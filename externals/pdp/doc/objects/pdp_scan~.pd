@@ -12,7 +12,6 @@
 #X floatatom 117 224 5 0 0;
 #X floatatom 131 171 5 0 0;
 #X obj 73 198 lop~ 1000;
-#X text 214 43 pdp_scan~: scanned synthesis;
 #X msg 217 102 interpolate \$1;
 #X obj 217 76 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
@@ -20,9 +19,10 @@
 ;
 #X text 216 142 (the audio crossfade size is determined by the pd blocksize.
 so you can use a block~ object to set this);
-#X text 218 236 it works like osc~ \, only the waveform is scanned
-from the luma plane of an image. the path is an oval centered at the
-middle of the image with axes equal to 60% of the image width/height
+#X text 218 236 the waveform is scanned from the luma plane of an image.
+the path is an oval centered at the middle of the image with axes equal
+to 60% of the image width/height.;
+#X text 214 43 pdp_scan~: oval scanned synthesis with a phase input
 ;
 #X connect 0 0 12 0;
 #X connect 1 0 0 0;
@@ -37,5 +37,5 @@ middle of the image with axes equal to 60% of the image width/height
 #X connect 10 0 9 1;
 #X connect 11 0 12 1;
 #X connect 12 0 9 0;
-#X connect 14 0 0 0;
-#X connect 15 0 14 0;
+#X connect 13 0 0 0;
+#X connect 14 0 13 0;

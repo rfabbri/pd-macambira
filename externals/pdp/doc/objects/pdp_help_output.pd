@@ -1,7 +1,6 @@
-#N canvas 664 342 450 300 10;
-#X obj 158 71 inlet;
+#N canvas 482 342 450 300 10;
+#X obj 59 95 inlet;
 #X obj 59 178 pdp_xv;
-#X obj 162 180 pdp_sdl;
 #X text 17 11 this abstraction is used as an output module in most
 of the documentation patches. change it to reflect your preferred output
 object.;

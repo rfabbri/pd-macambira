@@ -21,11 +21,13 @@ image processors:
 pdp_add		adds two images
 pdp_bq		spatial biquad filter
 pdp_bqt		temporal biquad filter
+pdp_constant	fills an image with a constant
 pdp_conv	horizontal/vertical seperable convolution filter
 pdp_cheby	chebyshev color shaper
 pdp_chrot	rotates the chroma components
 pdp_gradient	converts a greyscale image using a colour palette
 pdp_grey	converts an image to greyscale
+pdp_grey2mask	converts a greyscale image to an image mask
 pdp_mul		multiplies two images
 pdp_affine	shifts and scales a colour plane
 pdp_mix		crossfade between 2 images
@@ -35,7 +37,8 @@ pdp_noise	a noise generator
 pdp_rotate	tiled rotate
 pdp_scope~	a very simple oscilloscope
 pdp_scale	rescale an image
-pdp_scan~	scanned synthesis oscillator
+pdp_scan~	phase input scanned synthesis oscillator
+pdp_scanxy~	x,y coordinate input scanned synthesis oscillator
 pdp_zoom	tiled zoom
 pdp_zrot	tiled zoom + rotate
 
@@ -59,6 +62,7 @@ pdp_conv_sobel_hor	horizontal sobel edge detector
 pdp_conv_sobel_ver	vertical sobel edge detector
 pdp_conv_sobel_edge	sum of squares of hor and ver
 pdp_saturation		change colour saturation
+pdp_invert		inverse video
 
 cellular automata (separate lib):
 

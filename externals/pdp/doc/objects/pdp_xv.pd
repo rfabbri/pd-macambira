@@ -1,5 +1,5 @@
-#N canvas 303 183 708 385 10;
-#X obj 29 328 pdp_xv;
+#N canvas 150 382 708 497 10;
+#X obj 29 412 pdp_xv;
 #X msg 132 223 dim 320 240;
 #X msg 132 246 dim 640 480;
 #X text 271 226 dim sets the window dimensions;
@@ -18,6 +18,12 @@ window;
 #X obj 29 61 pdp_help_input;
 #X msg 29 25 start;
 #X msg 78 24 stop;
+#X text 269 326 specify the x window display;
+#X msg 134 324 display :0;
+#X obj 29 448 print;
+#X text 133 445 the output channel sends mouse event messages (press/release/drag
+and individual p/r/d for each button);
+#X connect 0 0 16 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 4 0 0 0;
@@ -27,3 +33,4 @@ window;
 #X connect 11 0 0 0;
 #X connect 12 0 11 0;
 #X connect 13 0 11 0;
+#X connect 15 0 0 0;
