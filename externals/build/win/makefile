@@ -20,6 +20,7 @@ clean:
 
 install-doc:
 	@test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
+	cd ../doc && make all
 	cp -r ../doc/* $(prefix)/doc/5.reference
 
 install: install-doc
