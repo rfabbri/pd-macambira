@@ -3,9 +3,6 @@
 
 current: darwin_pkg
 
-clean:
-	-rm -Rf installroot *~ */*~ */*/*~ */*/*/*~
-
 PDDOC_VERSION = $(shell date +20%y.%m.%d)
 PACKAGE_NAME = pd-doc-$(PDDOC_VERSION)
 
