@@ -1,5 +1,5 @@
 
-current: dmg
+current: darwin_mpkg
 
 #
 # Fetch the versions of the various included packages
@@ -26,14 +26,14 @@ DOUBLECLICKER_NAME =  $(DOUBLECLICKER_PREFIX)-$(DOUBLECLICKER_VERSION)
 
 PACKAGE_MAJOR_VERSION = 0
 PACKAGE_MINOR_VERSION = 2
-PACKAGE_BUGFIX_VERSION = 4
+PACKAGE_BUGFIX_VERSION = 5
 PACKAGE_VERSION = $(PACKAGE_MAJOR_VERSION).$(PACKAGE_MINOR_VERSION).$(PACKAGE_BUGFIX_VERSION)
 PACKAGE_PREFIX = Pure Data
 PACKAGE_NAME = $(PACKAGE_PREFIX)
 
 # needs to have no spaces for SourceForce
 DMG_PREFIX = PureData
-DMG_NAME = $(DMG_PREFIX)-$(PD_VERSION)_MacOSX-$(PACKAGE_VERSION))
+DMG_NAME = $(DMG_PREFIX)-$(PD_VERSION)_MacOSX-($(PACKAGE_VERSION))
 
 WELCOME_FILE = Welcome.html
 README_FILE = ReadMe.html
@@ -144,8 +144,8 @@ darwin_mpkg: darwin_mpkg_readme darwin_mpkg_license darwin_mpkg_welcome
 # maybe? a--enable-portaudio
 	cd ../../pd/src && ./configure && make darwin_pkg 
 	sudo cp -R ../../pd/pd-*.pkg installroot/Packages
-# cyclone
-	cd ../../externals/miXed/cyclone && make darwin_pkg 
+# miXed (cyclone,toxy)
+	cd ../../externals/miXed/cyclone && make darwin_pkg
 	sudo cp -R ../../externals/miXed/cyclone/pd-*.pkg installroot/Packages
 # 'externals'
 	cd ../../externals/build/darwin && make darwin_pkg
@@ -169,8 +169,8 @@ darwin_mpkg: darwin_mpkg_readme darwin_mpkg_license darwin_mpkg_welcome
 	cd ../../doc/pddp  && make darwin_pkg
 	sudo cp -R ../../doc/pddp/pd-pddp*.pkg installroot/Packages
 # double-clicker
-	cd double-clicker && make darwin_pkg
-	sudo cp -R double-clicker/pd-*.pkg installroot/Packages
+	cd double-clickers && make darwin_pkg
+	sudo cp -R double-clickers/pd-*.pkg installroot/Packages
 # don't fail on these since they aren't in CVS
 # pd-noncvs
 	-cd noncvs && make darwin_pkg

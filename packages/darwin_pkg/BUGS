@@ -6,7 +6,7 @@
   name is different.  This doesn't matter yet since an upgrade doesn't behave
   any differently.
 
-- alt stops working?
+- alt stops working/doesn't work?
 
 - shift sometimes does not work with multiple selections
 
@@ -14,8 +14,7 @@
   it should be.
 
 - many unauthorized externals don't work.  try -bundle_loader ../../../pd/bin/pd
-
-- "compute audio" checkbox only refreshes when you click on the Pd window
+- externals/sprinkler doesn't compile
 
 ------------------------------------------------------------------------------
 DONE?
@@ -23,6 +22,9 @@ DONE?
 - The installer selects the System Disk by default as the disk to install
   to but it doesn't allow you to install there. You have to either click "Go
   Back" then "Continue" or click on another disk, then click on the System Disk.
-
 - help files don't load properly (can't seem to find anymore broken ones)
+
+- Gem help files don't load due to path problem
+
+- "compute audio" checkbox only refreshes when you click on the Pd window
 
