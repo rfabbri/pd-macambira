@@ -51,7 +51,7 @@ build-stamp: configure-stamp
 	#
 	 
 	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
-	FLEXTINC=../../grill/flext/source)
+	FLEXTINC=../../grill/flext/source FLUIDLIB=" -lfluidsynth")
 
 	# OSC
 
