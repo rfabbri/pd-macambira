@@ -40,7 +40,6 @@
 /*                                                                              */
 /*                                                                              */
 
-
 #include <flext.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
@@ -52,31 +51,32 @@ class tbroute: public flext_base
   FLEXT_HEADER(tbroute,flext_base);
   
 public: // constructor
-  tbroute(t_int chan);
+  tbroute(int chan);
 
 protected:
   void route(t_float f);
 
   void routebang();
-  void set_route(t_int i);
+  void set_route(int i);
 
 private:
   FLEXT_CALLBACK_1(route,t_float);
   
   FLEXT_CALLBACK(routebang);
-  FLEXT_CALLBACK_1(set_route,t_int);
-  t_int dest;
+  FLEXT_CALLBACK_1(set_route,int);
+  
+  int dest;
 };
 
 
 FLEXT_LIB_1("tbroute",tbroute,int);
 
-tbroute::tbroute(t_int chan)
+tbroute::tbroute(int chan)
 {
   AddInAnything();
   AddInInt();
   
-  for (t_int i=0; i!=chan;++i)
+  for (int i=0; i!=chan;++i)
     {    
       AddOutAnything();
     }
@@ -98,7 +98,7 @@ void tbroute::routebang()
   ToOutBang(dest);
 }
 
-void tbroute::set_route(t_int i)
+void tbroute::set_route(int i)
 {
   --i;
   if ((i>-1) && (i<CntOut()))

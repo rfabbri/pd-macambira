@@ -59,7 +59,7 @@ protected:
 
 private:
 
-  FLEXT_CALLBACK_1(set_route,t_int);
+  FLEXT_CALLBACK(set_route,t_int);
   t_int dest;
 };
 

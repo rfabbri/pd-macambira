@@ -54,10 +54,13 @@ void ttbext_setup()
   post("");
 
   FLEXT_SETUP(tbroute);
-  FLEXT_SETUP(tbstrg);
+  //FLEXT_SETUP(tbstrg);
   FLEXT_DSP_SETUP(tbsroute);
   FLEXT_DSP_SETUP(tbsig);
   FLEXT_DSP_SETUP(tbpow);
+  //  FLEXT_DSP_SETUP(tbg7xx);
+  FLEXT_DSP_SETUP(tbfft1);
+
 
 }
 

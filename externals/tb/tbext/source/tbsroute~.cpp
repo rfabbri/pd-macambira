@@ -51,21 +51,22 @@ class tbsroute: public flext_dsp
   FLEXT_HEADER(tbsroute,flext_dsp)
 
 public: // constructor
-  tbsroute(int chan);
+  tbsroute(t_int chan);
 
 protected:
   virtual void m_signal (int n, float *const *in, float *const *out);
   void set_route(int i);
 
 private:
-  FLEXT_CALLBACK_1(set_route,t_int)
+  FLEXT_CALLBACK_1(set_route,int)
   t_int dest;
 };
 
 
-FLEXT_LIB_DSP_1("tbroute~",tbsroute,int)
+FLEXT_LIB_DSP_1("tbroute~",tbsroute,int);
 
-  tbsroute::tbsroute(t_int chan):dest(0)
+tbsroute::tbsroute (t_int chan):
+  dest(0)
 {
   AddInSignal();
   AddInInt();
@@ -92,8 +93,7 @@ void tbsroute::m_signal(int n, float *const *in, float *const *out)
 
 }
 
-
-void tbsroute::set_route(t_int i)
+void tbsroute::set_route(int i)
 {
   --i;
   if ((i>-1) && (i<CntOutSig()))
