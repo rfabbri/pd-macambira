@@ -54,6 +54,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <string.h>
+#include <stdio.h>
 #include "input.h"
 
 
@@ -455,7 +457,7 @@ void ffPeriodic_level(t_ff *x,  t_floatarg level)
 void ffPeriodic_waveform(t_ff *x, t_symbol* waveform)
 {
 	if (x->ff_fd < 0) return;
-	unsigned short shortwave;
+	unsigned short shortwave = 0;
 	int n = 0;
 
 	while (waves[n].wave) {
