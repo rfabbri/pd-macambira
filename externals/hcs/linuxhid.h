@@ -1,4 +1,4 @@
-#include <m_imp.h>
+#include "m_imp.h"
 
 #include <linux/input.h>
 
@@ -14,8 +14,6 @@
 
 #define DEBUG(x)
 /*#define DEBUG(x) x */
-
-static char *version = "$Revision: 1.2 $";
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
