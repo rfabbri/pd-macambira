@@ -1,11 +1,11 @@
-#N canvas 46 193 827 465 12;
+#N canvas 46 193 829 467 12;
 #X obj 53 97 inlet;
 #X obj 54 386 outlet;
 #X text 26 414 outputs red \, green and blue;
 #X text 21 61 connection from fs.frame | x and y packed;
 #X obj 244 95 inlet;
 #X obj 53 241 fs_sender;
-#X text 159 187 tell plugin where to send results!;
+#X text 181 232 tell plugin where to send results!;
 #X obj 77 343 pack f f f;
 #X obj 339 150 symbol \$0rgb;
 #X obj 77 310 r \$0rgbred;
