@@ -58,7 +58,7 @@ well:;
 #X floatatom 673 425 5 0 0 0 - - -;
 #X msg 695 259 note 1 60 120;
 #X obj 741 425 ctlin;
-#X msg 741 469 cc \$3 \$1 \$2;
+#X msg 741 469 cc \$3 \$2 \$1;
 #X obj 741 447 pack 0 0 0;
 #X obj 856 433 bendin;
 #X obj 856 455 pack 0 0;
