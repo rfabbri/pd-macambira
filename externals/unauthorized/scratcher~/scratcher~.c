@@ -778,8 +778,14 @@ void scratcher_tilde_setup(void)
     scratcher_widgetbehavior.w_deletefn =     scratcher_delete;
     scratcher_widgetbehavior.w_visfn =        scratcher_vis;
     scratcher_widgetbehavior.w_clickfn =      scratcher_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     scratcher_widgetbehavior.w_propertiesfn = scratcher_properties;
     scratcher_widgetbehavior.w_savefn =       scratcher_save;
+#endif
+#endif
 
     CLASS_MAINSIGNALIN( scratcher_class, t_scratcher, x_f );
     class_addmethod(scratcher_class, (t_method)scratcher_dsp, gensym("dsp"), A_NULL);

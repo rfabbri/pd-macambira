@@ -535,8 +535,14 @@ void grid_setup(void)
     grid_widgetbehavior.w_deletefn =     grid_delete;
     grid_widgetbehavior.w_visfn =        grid_vis;
     grid_widgetbehavior.w_clickfn =      grid_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     grid_widgetbehavior.w_propertiesfn = grid_properties;
     grid_widgetbehavior.w_savefn =       grid_save;
+#endif
+#endif
     class_setwidget(grid_class, &grid_widgetbehavior);
     class_sethelpsymbol(grid_class, gensym("help-grid.pd"));
 }

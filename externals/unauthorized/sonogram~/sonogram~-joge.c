@@ -1992,8 +1992,14 @@ void sonogram_tilde_setup(void)
     sonogram_widgetbehavior.w_deletefn =     sonogram_delete;
     sonogram_widgetbehavior.w_visfn =        sonogram_vis;
     sonogram_widgetbehavior.w_clickfn =      sonogram_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     sonogram_widgetbehavior.w_propertiesfn = NULL;
     sonogram_widgetbehavior.w_savefn =       sonogram_save;
+#endif
+#endif
 
     CLASS_MAINSIGNALIN( sonogram_class, t_sonogram, x_f );
     class_addmethod(sonogram_class, (t_method)sonogram_dsp, gensym("dsp"), A_NULL);

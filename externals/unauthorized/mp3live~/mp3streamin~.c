@@ -30,8 +30,13 @@
 /* ---------------------------------------------------------------------------- */
                                                                                      
 
+#include <m_pd.h>
 #include <m_imp.h>
 #include <g_canvas.h>
+
+#if PD_MINOR_VERSION >=37
+#include "s_stuff.h"
+#endif
 
 #include <sys/types.h>
 #include <string.h>

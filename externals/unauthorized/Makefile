@@ -172,7 +172,7 @@ clean:
 # delete emacs backup files
 	-rm -f */*.?~ */*.~?.?.~
 # delete compile products
-	-rm -f *.o *.pd_* *.dll *.tk2c core so_locations
+	-rm -f *.o *.pd_* *.dll *.tk2c core so_locations ChangeLog
 	-rm -f */*.?~ */*.o */*.pd_* */*.dll */*.tk2c */.*.swp */core so_locations
 # delete autoconf/automake product
 	-rm -Rf */autom4te.cache

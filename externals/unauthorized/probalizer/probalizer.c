@@ -687,8 +687,14 @@ void probalizer_setup(void)
     probalizer_widgetbehavior.w_deletefn =     probalizer_delete;
     probalizer_widgetbehavior.w_visfn =        probalizer_vis;
     probalizer_widgetbehavior.w_clickfn =      probalizer_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     probalizer_widgetbehavior.w_propertiesfn = probalizer_properties;
     probalizer_widgetbehavior.w_savefn =       probalizer_save;
+#endif
+#endif
     class_setwidget(probalizer_class, &probalizer_widgetbehavior);
     class_sethelpsymbol(probalizer_class, gensym("help-probalizer.pd"));
 }

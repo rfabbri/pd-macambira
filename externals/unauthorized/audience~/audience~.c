@@ -1049,6 +1049,8 @@ void audience_tilde_setup(void)
     audience_widgetbehavior.w_deletefn =     audience_delete;
     audience_widgetbehavior.w_visfn =        audience_vis;
     audience_widgetbehavior.w_clickfn =      audience_click;
+	 /* As of 0.37, pd does not have these last two elements in */
+	 /* a t_widgetbehavoir anymore.  <hans@eds.org> */
 #if PD_MAJOR_VERSION == 0 
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     audience_widgetbehavior.w_propertiesfn = audience_properties;

@@ -94,7 +94,12 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
     char *tagRoot;
 
-    rtext_new(glist, (t_text *)x, glist->gl_editor->e_rtext, 0);
+/* rtext_new(); in g_canvas.h changed in 0.37 */
+#if PD_MINOR_VERSION >= 37
+	 rtext_new(glist, (t_text *)x);
+#else
+	 rtext_new(glist, (t_text *)x, glist->gl_editor->e_rtext, 0);
+#endif
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
     GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #124392 -tags %xGRID\n",
 	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
@@ -664,8 +669,14 @@ void grid_setup(void)
     grid_widgetbehavior.w_deletefn =     grid_delete;
     grid_widgetbehavior.w_visfn =        grid_vis;
     grid_widgetbehavior.w_clickfn =      grid_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     grid_widgetbehavior.w_propertiesfn = grid_properties;
     grid_widgetbehavior.w_savefn =       grid_save;
+#endif
+#endif
     class_setwidget(grid_class, &grid_widgetbehavior);
     class_sethelpsymbol(grid_class, gensym("help-grid.pd"));
 }

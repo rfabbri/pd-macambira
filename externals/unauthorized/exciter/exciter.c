@@ -810,8 +810,15 @@ void exciter_setup(void)
     exciter_widgetbehavior.w_deletefn =     exciter_delete;
     exciter_widgetbehavior.w_visfn =        exciter_vis;
     exciter_widgetbehavior.w_clickfn =      exciter_click;
+	 /* As of 0.37, the last two elements of t_widgetbehavoir */
+	 /* have been removed.  <hans@eds.org> */
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     exciter_widgetbehavior.w_propertiesfn = exciter_properties;
     exciter_widgetbehavior.w_savefn =       exciter_save;
+#endif
+#endif
+
     class_setwidget(exciter_class, &exciter_widgetbehavior);
     class_sethelpsymbol(exciter_class, gensym("help-exciter.pd"));
 }
