@@ -77,3 +77,6 @@
 
 # WINDOWS FILES
 *.lnk -k 'b'
+
+# MACOS X FILES
+*.pmsp -k 'b'
