@@ -11,8 +11,9 @@ PDPATH=c:\programme\audio\pd
 # where do the flext libraries reside?
 FLEXTPATH=$(PDPATH)\flext
 
-# where is MS VC++?
-MSVCPATH=c:\programme\prog\microsoft visual studio\VC98
+# where is MS VC++ installed?
+# if the VC++ command prompt is used VCINSTALLDIR should already be set correctly 
+MSVCDIR=$(VCINSTALLDIR)
 
 # where should the external be built?
 OUTPATH=pd-msvc
