@@ -98,7 +98,7 @@ areas.
 #define		MAXSTREAMCHANS          2           /* maximum number of channels: restricted to 2 by Ogg specs */
 #define     UPDATE_INTERVAL         250         /* time in milliseconds between updates of output values */
 
-static char   *oggcast_version = "oggcast~: ogg/vorbis streaming client version 0.2h, written by Olaf Matthes";
+static char   *oggcast_version = "oggcast~: ogg/vorbis streaming client version 0.2i, written by Olaf Matthes";
 
 static t_class *oggcast_class;
 
@@ -190,6 +190,49 @@ typedef struct _oggcast
     pthread_cond_t    x_answercondition;
     pthread_t         x_childthread;
 } t_oggcast;
+
+
+static char base64table[65] = {
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+    'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
+    'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+    'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/',
+};
+
+	/* This isn't efficient, but it doesn't need to be */
+char *oggcast_util_base64_encode(char *data)
+{
+	int len = strlen(data);
+	char *out = malloc(len*4/3 + 4);
+	char *result = out;
+	int chunk;
+
+	while(len > 0) {
+		chunk = (len >3)?3:len;
+		*out++ = base64table[(*data & 0xFC)>>2];
+		*out++ = base64table[((*data & 0x03)<<4) | ((*(data+1) & 0xF0) >> 4)];
+
+		switch(chunk) {
+		case 3:
+			*out++ = base64table[((*(data+1) & 0x0F)<<2) | ((*(data+2) & 0xC0)>>6)];
+			*out++ = base64table[(*(data+2)) & 0x3F];
+			break;
+		case 2:
+			*out++ = base64table[((*(data+1) & 0x0F)<<2)];
+			*out++ = '=';
+			break;
+		case 1:
+			*out++ = '=';
+			*out++ = '=';
+			break;
+		}
+		data += chunk;
+		len -= chunk;
+	}
+	*out = 0;
+
+	return result;
+}
 
 	/* check server for writeability */
 static int oggcast_checkserver(t_int sock)
@@ -564,20 +607,24 @@ static int oggcast_child_connect(char *hostname, char *mountpoint, t_int portno,
 	}
 	else	/* or try to log in at IceCast2 server using HTTP/1.0 base auth scheme */
 	{
-			/* send the request, a string like: "SOURCE /<mountpoint> HTTP/1.0\nContent-Type: application/x-ogg" */
-		buf = "SOURCE ";
-		send(sockfd, buf, strlen(buf), 0);
-		buf = "/";
+			/* send the request, a string like: "SOURCE /<mountpoint> HTTP/1.0\n\r" */
+		buf = "SOURCE /";
 		send(sockfd, buf, strlen(buf), 0);
 		buf = mountpoint;
 		send(sockfd, buf, strlen(buf), 0);
-		buf = " HTTP/1.0";
+		buf = " HTTP/1.0\r\n";
 		send(sockfd, buf, strlen(buf), 0);
-		buf = "\nContent-Type: application/x-ogg";
+			/* send basic authorization */
+		sprintf(resp, "source:%s", passwd);
+		buf = oggcast_util_base64_encode(resp);
+		sprintf(resp, "Authorization: Basic %s\r\n", buf);
+		send(sockfd, resp, strlen(resp), 0);
+			/* send content type */
+		buf = "Content-Type: application/x-ogg";
 		send(sockfd, buf, strlen(buf), 0);
 			/* send the ice headers */
 					/* password */
-		buf = "\nice-password: ";
+		buf = "\r\nice-password: ";
 		send(sockfd, buf, strlen(buf), 0);
 		buf = passwd;
 		send(sockfd, buf, strlen(buf), 0);
@@ -601,11 +648,11 @@ static int oggcast_child_connect(char *hostname, char *mountpoint, t_int portno,
 		send(sockfd, buf, strlen(buf), 0);
 		if(bcpublic==0)                            /* set the public flag for broadcast */
 		{
-			buf = "no";
+			buf = "0";
 		}
 		else
 		{
-			buf ="yes";
+			buf = "1";
 		}
 		send(sockfd, buf, strlen(buf), 0);
 			/* bitrate */
@@ -619,10 +666,10 @@ static int oggcast_child_connect(char *hostname, char *mountpoint, t_int portno,
 			/* description */
 		buf = "\r\nice-description: ";
 		send(sockfd, buf, strlen(buf), 0);
-		buf = "ogg/vorbis streamed from pure-data with oggcast~";
+		buf = "Ogg/Vorbis streamed from Pure Data with oggcast~\r\n";
 		send(sockfd, buf, strlen(buf), 0);
-			/* end of header */
-		buf = "\r\n\r\n";
+			/* end of header: write an empty line */
+		buf = "\r\n";
 		send(sockfd, buf, strlen(buf), 0);
 			/* end login for IceCast2 using ICE/1.0 scheme */
 	}
@@ -1012,7 +1059,7 @@ static void *oggcast_new(t_floatarg fnchannels, t_floatarg fbufsize)
 	x->x_bcdate = "";
 	x->x_bcpublic = 1;
 	x->x_mountpoint = "puredata.ogg";
-	x->x_servertype = 0;			/* ICE/1.0 protocol for JRoar and old Icecast2 */
+	x->x_servertype = 1;			/* HTTP/1.0 protocol for Icecast2 */
     
     post(oggcast_version);
 	post("oggcast~: set buffer to %dk bytes", bufsize / 1024);
