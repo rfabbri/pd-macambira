@@ -73,6 +73,7 @@ public:
 	I GetSub(const A **&dirs);
 
 	poolval *RefVal(const A &key);
+	poolval *RefVali(I ix);
 	
 	BL Paste(const pooldir *p,I depth,BL repl,BL mkdir);
 	BL Copy(pooldir *p,I depth,BL cur);
@@ -107,6 +108,8 @@ public:
 	BL ClrAll(const AtomList &d,BL rec,BL dironly = false);
 	AtomList *Peek(const AtomList &d,const A &key);
 	AtomList *Get(const AtomList &d,const A &key);
+	poolval *Ref(const AtomList &d,const A &key);
+	poolval *Refi(const AtomList &d,I ix);
 	I CntAll(const AtomList &d);
 	I GetAll(const AtomList &d,A *&keys,AtomList *&lst);
 	I GetSub(const AtomList &d,const t_atom **&dirs);

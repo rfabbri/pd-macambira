@@ -82,6 +82,18 @@ flext::AtomList *pooldata::Peek(const AtomList &d,const A &key)
 	return pd?pd->PeekVal(key):NULL;
 }
 
+poolval *pooldata::Ref(const AtomList &d,const A &key)
+{
+	pooldir *pd = root.GetDir(d);
+	return pd?pd->RefVal(key):NULL;
+}
+
+poolval *pooldata::Refi(const AtomList &d,I ix)
+{
+	pooldir *pd = root.GetDir(d);
+	return pd?pd->RefVali(ix):NULL;
+}
+
 flext::AtomList *pooldata::Get(const AtomList &d,const A &key)
 {
 	pooldir *pd = root.GetDir(d);

@@ -10,7 +10,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "pool.h"
 
-#define POOL_VERSION "0.1.1"
+#define POOL_VERSION "0.1.1pre"
 
 class pool:
 	public flext_base
@@ -54,6 +54,7 @@ protected:
 	V m_clrrec();	// also subdirectories
 	V m_clrsub();	// only subdirectories
 	V m_get(I argc,const A *argv);
+	V m_geti(I ix); // get value at index
 	V m_getall();	// only values
 	V m_getrec(I argc,const A *argv);	// also subdirectories
 	V m_getsub(I argc,const A *argv);	// only subdirectories
@@ -139,6 +140,7 @@ private:
 	FLEXT_CALLBACK(m_clrrec)
 	FLEXT_CALLBACK(m_clrsub)
 	FLEXT_CALLBACK_V(m_get)
+	FLEXT_CALLBACK_I(m_geti)
 	FLEXT_CALLBACK(m_getall)
 	FLEXT_CALLBACK_V(m_getrec)
 	FLEXT_CALLBACK_V(m_getsub)
@@ -214,6 +216,7 @@ pool::pool(I argc,const A *argv):
 	FLEXT_ADDMETHOD_(0,"clrrec",m_clrrec);
 	FLEXT_ADDMETHOD_(0,"clrsub",m_clrsub);
 	FLEXT_ADDMETHOD_(0,"get",m_get);
+	FLEXT_ADDMETHOD_(0,"geti",m_geti);
 	FLEXT_ADDMETHOD_(0,"getall",m_getall);
 	FLEXT_ADDMETHOD_(0,"getrec",m_getrec);
 	FLEXT_ADDMETHOD_(0,"getsub",m_getsub);
@@ -443,20 +446,43 @@ V pool::m_get(I argc,const A *argv)
 		if(argc > 1) 
 			post("%s - get: superfluous arguments ignored",thisName());
 
-		AtomList *r = pl->Get(curdir,argv[0]);
+		poolval *r = pl->Ref(curdir,argv[0]);
 
 		ToOutAnything(3,MakeSymbol("get"),0,NULL);
 		if(absdir)
 			ToOutList(2,curdir);
 		else
 			ToOutList(2,0,NULL);
-		ToOutAtom(1,argv[0]);
-		if(r) {
-			ToOutList(0,*r);
-			delete r;
-		}
+		ToOutAtom(1,r->key);
+		if(r)
+			ToOutList(0,*r->data);
 		else
 			ToOutBang(0);
+	}
+
+	echodir();
+}
+
+V pool::m_geti(I ix)
+{
+	if(ix < 0)
+		post("%s - geti: invalid index",thisName());
+	else {
+		poolval *r = pl->Refi(curdir,ix);
+
+		ToOutAnything(3,MakeSymbol("geti"),0,NULL);
+		if(absdir)
+			ToOutList(2,curdir);
+		else
+			ToOutList(2,0,NULL);
+		if(r) {
+			ToOutAtom(1,r->key);
+			ToOutList(0,*r->data);
+		}
+		else {
+			ToOutBang(1);
+			ToOutBang(0);
+		}
 	}
 
 	echodir();

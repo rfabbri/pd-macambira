@@ -54,6 +54,7 @@ Version history:
 
 0.1.1:
 - attributes (pool,private,echodir,absdir)
+- added "geti" message for retrieval of a value at an index
 
 0.1.0:
 - first public release

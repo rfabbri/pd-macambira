@@ -205,6 +205,15 @@ poolval *pooldir::RefVal(const A &key)
 	return c || !ix?NULL:ix;
 }
 
+poolval *pooldir::RefVali(I rix)
+{
+	I c = 0;
+	poolval *ix = vals;
+	for(; ix && c < rix; ix = ix->nxt,++c) {}
+
+	return c == rix?ix:NULL;
+}
+
 flext::AtomList *pooldir::PeekVal(const A &key)
 {
 	poolval *ix = RefVal(key);
