@@ -73,6 +73,10 @@ protected:
 	range = hi - lo;
     }
 
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
 
 private:
     float m_sample;
@@ -84,6 +88,7 @@ private:
     FLEXT_CALLBACK(m_bang);
     FLEXT_CALLBACK_F(m_setlo);
     FLEXT_CALLBACK_F(m_sethi);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("TRand~",TRand_ar);
@@ -101,13 +106,14 @@ TRand_ar::TRand_ar(int argc, t_atom *argv)
     hi=sc_getfloatarg(Args,1);
     range = hi - lo;
     
-    rgen.init(0); //this should be changed
+    rgen.init(timeseed());
 
     AddOutSignal();
 
     FLEXT_ADDBANG(0,m_bang);
     FLEXT_ADDMETHOD_(0,"setlo",m_setlo);
     FLEXT_ADDMETHOD_(0,"sethi",m_sethi);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 }
 
 void TRand_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
@@ -160,6 +166,11 @@ protected:
 	range = hi - lo;
     }
 
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
+
 private:
     float lo;
     float hi;
@@ -168,6 +179,7 @@ private:
     FLEXT_CALLBACK(m_bang);
     FLEXT_CALLBACK_F(m_setlo);
     FLEXT_CALLBACK_F(m_sethi);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("TRand",TRand_kr);
@@ -184,13 +196,14 @@ TRand_kr::TRand_kr(int argc, t_atom *argv)
     hi=sc_getfloatarg(Args,1);
     range = hi - lo;
     
-    rgen.init(0);
+    rgen.init(timeseed());
     
     AddOutFloat();
 
     FLEXT_ADDBANG(0,m_bang);
     FLEXT_ADDMETHOD_(0,"setlo",m_setlo);
     FLEXT_ADDMETHOD_(0,"sethi",m_sethi);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 }
 
 void TRand_kr::m_loadbang()

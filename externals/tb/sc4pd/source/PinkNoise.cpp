@@ -57,11 +57,17 @@ public:
     
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     uint32 m_dice[16];
     int32 m_total;
     RGen rgen;
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("PinkNoise~",PinkNoise_ar);
@@ -69,11 +75,12 @@ FLEXT_LIB_DSP_V("PinkNoise~",PinkNoise_ar);
 PinkNoise_ar::PinkNoise_ar(int argc, t_atom *argv)
     : m_total(0)
 {
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
 
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
 
     for (int i=0; i<16; ++i) 
     {
@@ -123,12 +130,18 @@ public:
     
 protected:
     void m_perform();
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     uint32 m_dice[16];
     int32 m_total;
     RGen rgen;
     FLEXT_CALLBACK(m_perform);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("PinkNoise",PinkNoise_kr);
@@ -137,11 +150,12 @@ PinkNoise_kr::PinkNoise_kr(int argc, t_atom *argv)
     : m_total(0)
 {
     FLEXT_ADDBANG(0,m_perform);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
     
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
 
     for (int i=0; i<16; ++i) 
     {

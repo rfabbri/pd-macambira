@@ -72,6 +72,11 @@ protected:
 	lo = f;
 	ratio = hi / lo;
     }
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     float m_sample;
@@ -83,6 +88,7 @@ private:
     FLEXT_CALLBACK(m_bang);
     FLEXT_CALLBACK_F(m_setlo);
     FLEXT_CALLBACK_F(m_sethi);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("TExpRand~",TExpRand_ar);
@@ -100,13 +106,14 @@ TExpRand_ar::TExpRand_ar(int argc, t_atom *argv)
     hi=sc_getfloatarg(Args,1);
     ratio = hi / lo;
     
-    rgen.init(0); //this should be changed
+    rgen.init(timeseed());
 
     AddOutSignal();
 
     FLEXT_ADDBANG(0,m_bang);
     FLEXT_ADDMETHOD_(0,"setlo",m_setlo);
     FLEXT_ADDMETHOD_(0,"sethi",m_sethi);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 }
 
 void TExpRand_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
@@ -159,6 +166,11 @@ protected:
 	ratio = hi / lo;
     }
 
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
+
 private:
     float lo;
     float hi;
@@ -167,6 +179,7 @@ private:
     FLEXT_CALLBACK(m_bang);
     FLEXT_CALLBACK_F(m_setlo);
     FLEXT_CALLBACK_F(m_sethi);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("TExpRand",TExpRand_kr);
@@ -183,13 +196,14 @@ TExpRand_kr::TExpRand_kr(int argc, t_atom *argv)
     hi=sc_getfloatarg(Args,1);
     ratio = hi / lo;
     
-    rgen.init(0);
+    rgen.init(timeseed());
     
     AddOutFloat();
 
     FLEXT_ADDBANG(0,m_bang);
     FLEXT_ADDMETHOD_(0,"setlo",m_setlo);
     FLEXT_ADDMETHOD_(0,"sethi",m_sethi);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 }
 
 void TExpRand_kr::m_loadbang()

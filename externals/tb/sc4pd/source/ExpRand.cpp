@@ -1,5 +1,5 @@
 /* sc4pd 
-   IRand, IRand~
+   ExpRand, ExpRand~
 
    Copyright (c) 2004 Tim Blechmann.
 
@@ -31,7 +31,7 @@
      SuperCollider by James McCartney
          http://www.audiosynth.com
      
-   Coded while listening to: Assif Tsahar: Open Systems
+   Coded while listening to: Jim O'Rourke & Loren Mazzacane Connors: In Bern
    
 */
 
@@ -45,15 +45,15 @@
 #endif
 
 
-/* ------------------------ IRand~ -------------------------------*/
+/* ------------------------ ExpRand~ -------------------------------*/
 
-class IRand_ar:
+class ExpRand_ar:
     public flext_dsp
 {
-    FLEXT_HEADER(IRand_ar,flext_dsp);
+    FLEXT_HEADER(ExpRand_ar,flext_dsp);
     
 public:
-    IRand_ar(int argc, t_atom *argv);
+    ExpRand_ar(int argc, t_atom *argv);
     
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
@@ -66,15 +66,16 @@ protected:
     
 private:
     float m_sample;
-    int lo;
-    int hi;
+    float lo;
+    float hi;
+    int sc_n;
     RGen rgen;
     FLEXT_CALLBACK_I(m_seed);
 };
 
-FLEXT_LIB_DSP_V("IRand~",IRand_ar);
+FLEXT_LIB_DSP_V("ExpRand~",ExpRand_ar);
 
-IRand_ar::IRand_ar(int argc, t_atom *argv)
+ExpRand_ar::ExpRand_ar(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
@@ -85,22 +86,22 @@ IRand_ar::IRand_ar(int argc, t_atom *argv)
 	post("not enough arguments");
 	return;
     }
-    lo=int(sc_getfloatarg(Args,0));
-    hi=int(sc_getfloatarg(Args,1));
+    lo=sc_getfloatarg(Args,0);
+    hi=sc_getfloatarg(Args,1);
     
     rgen.init(timeseed());
 
     AddOutSignal();
 }
 
-void IRand_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
+void ExpRand_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
 {
-    int range = hi - lo;
-    m_sample = float(rgen.irand(range) + lo);
+    float ratio = hi / lo;
+    m_sample = pow(ratio,rgen.frand()) * lo);
 }
 
 
-void IRand_ar::m_signal(int n, t_sample *const *in, 
+void ExpRand_ar::m_signal(int n, t_sample *const *in, 
 		       t_sample *const *out)
 {
     t_sample *nout = *out;
@@ -114,15 +115,15 @@ void IRand_ar::m_signal(int n, t_sample *const *in,
 }
 
 
-/* ------------------------ IRand ---------------------------------*/
+/* ------------------------ ExpRand ---------------------------------*/
 
-class IRand_kr:
+class ExpRand_kr:
     public flext_base
 {
-    FLEXT_HEADER(IRand_kr,flext_base);
+    FLEXT_HEADER(ExpRand_kr,flext_base);
 
 public:
-    IRand_kr(int argc, t_atom *argv);
+    ExpRand_kr(int argc, t_atom *argv);
     
 protected:
     void m_loadbang();
@@ -133,15 +134,16 @@ protected:
     }
 
 private:
-    int lo;
-    int hi;
+    float lo;
+    float hi;
+    int sc_n;
     RGen rgen;
     FLEXT_CALLBACK_I(m_seed);
 };
 
-FLEXT_LIB_V("IRand",IRand_kr);
+FLEXT_LIB_V("ExpRand",ExpRand_kr);
 
-IRand_kr::IRand_kr(int argc, t_atom *argv)
+ExpRand_kr::ExpRand_kr(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
@@ -151,17 +153,16 @@ IRand_kr::IRand_kr(int argc, t_atom *argv)
 	post("not enough arguments");
 	return;
     }
-    lo=int(sc_getfloatarg(Args,0));
-    hi=int(sc_getfloatarg(Args,1));
+    lo=sc_getfloatarg(Args,0);
+    hi=sc_getfloatarg(Args,1);
     
     rgen.init(timeseed());
-    
-    AddOutInt();
+
+    AddOutFloat();
 }
 
-void IRand_kr::m_loadbang()
+void ExpRand_kr::m_loadbang()
 {
-    int range = hi - lo;
-    
-    ToOutInt(0,rgen.irand(range) + lo);
+    float ratio = hi / lo;
+    ToOutFloat(0,pow(ratio,rgen.frand()) * lo);
 }

@@ -57,21 +57,28 @@ public:
     
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     int m_counter;
     RGen rgen;
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("GrayNoise~",GrayNoise_ar);
 
 GrayNoise_ar::GrayNoise_ar(int argc, t_atom *argv)
 {
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
 
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
 
     AddOutSignal();
 }    
@@ -108,11 +115,17 @@ public:
     
 protected:
     void m_perform();
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     int m_counter;
     RGen rgen;
     FLEXT_CALLBACK(m_perform);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("GrayNoise",GrayNoise_kr);
@@ -120,11 +133,12 @@ FLEXT_LIB_V("GrayNoise",GrayNoise_kr);
 GrayNoise_kr::GrayNoise_kr(int argc, t_atom *argv)
 {
     FLEXT_ADDBANG(0,m_perform);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
     
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
 
     AddOutFloat();
 }

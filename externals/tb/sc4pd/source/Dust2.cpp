@@ -64,9 +64,15 @@ protected:
 	m_thresh = m_density/Samplerate();
 	m_scale = m_thresh > 0.f ? 1.f / m_thresh : 0.f;
     }
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     FLEXT_CALLBACK_F(m_set);
+    FLEXT_CALLBACK_I(m_seed);
     float m_density, m_thresh, m_scale;
     RGen rgen;
 
@@ -77,12 +83,13 @@ FLEXT_LIB_DSP_V("Dust2~",Dust2_ar);
 Dust2_ar::Dust2_ar(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"set",m_set);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
     m_density=sc_getfloatarg(Args,0);
 
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
 
     AddOutSignal();
 }    
@@ -130,12 +137,18 @@ protected:
     void m_set(float f);
     Timer Dust2_timer;
     void m_doit(void*);
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     float m_density, m_scale;
     float mtbt; //medium time between trigger
     RGen rgen;
     FLEXT_CALLBACK_1(m_set,float);
+    FLEXT_CALLBACK_I(m_seed);
     FLEXT_CALLBACK_T(m_doit);
 };
 
@@ -145,12 +158,13 @@ Dust2_kr::Dust2_kr(int argc, t_atom *argv)
     : Dust2_timer(false)
 {
     FLEXT_ADDMETHOD(0,m_set);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
     m_density=sc_getfloatarg(Args,0);
     
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
     AddOutFloat();
     
     FLEXT_ADDTIMER(Dust2_timer,m_doit);

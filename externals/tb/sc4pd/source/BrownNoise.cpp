@@ -58,22 +58,29 @@ public:
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
     
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
+    
 private:
     float m_level;
     RGen rgen;
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("BrownNoise~",BrownNoise_ar);
 
 BrownNoise_ar::BrownNoise_ar(int argc, t_atom *argv)
 {
-
     //parse arguments
     AtomList Args(argc,argv);
 
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
     m_level=rgen.frand2();
-
+    
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
+    
     AddOutSignal();
 }    
 
@@ -115,11 +122,17 @@ public:
     
 protected:
     void m_perform();
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     float m_level;
     RGen rgen;
     FLEXT_CALLBACK(m_perform);
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("BrownNoise",BrownNoise_kr);
@@ -127,11 +140,12 @@ FLEXT_LIB_V("BrownNoise",BrownNoise_kr);
 BrownNoise_kr::BrownNoise_kr(int argc, t_atom *argv)
 {
     FLEXT_ADDBANG(0,m_perform);
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
 
     //parse arguments
     AtomList Args(argc,argv);
     
-    rgen.init(0); //set seed to 0
+    rgen.init(timeseed());
     m_level=rgen.frand2(); 
 
     AddOutFloat();

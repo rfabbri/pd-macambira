@@ -36,12 +36,14 @@
 */
 
 #include <flext.h>
+#include "SC_PlugIn.h"
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
 #error You need at least FLEXT version 0.4.6
 #endif
 
 #define SC4PD_VERSION "0.01"
+
 
 void sc4pd_library_setup()
 {
@@ -53,7 +55,8 @@ void sc4pd_library_setup()
 	 "BrownNoise(~),\n"
 	 "          ClipNoise(~), GrayNoise(~), Dust2(~), WhiteNoise(~), "
 	 "PinkNoise(~), \n          Crackle(~), Rand(~), TRand(~), "
-	 "TExpRand(~), IRand(~), TIRand(~)\n");
+	 "TExpRand(~), IRand(~), TIRand(~),\n          CoinGate, "
+	 "LinRand(~), NRand(~), ExpRand(~)\n");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -103,6 +106,17 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(TIRand_ar);
     FLEXT_SETUP(TIRand_kr);
+
+    FLEXT_SETUP(CoinGate_kr);
+
+    FLEXT_DSP_SETUP(LinRand_ar);
+    FLEXT_SETUP(LinRand_kr);
+
+    FLEXT_DSP_SETUP(NRand_ar);
+    FLEXT_SETUP(NRand_kr);
+
+    FLEXT_DSP_SETUP(ExpRand_ar);
+    FLEXT_SETUP(ExpRand_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

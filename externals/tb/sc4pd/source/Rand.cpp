@@ -58,18 +58,26 @@ public:
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
     virtual void m_dsp(int n, t_sample *const *in, t_sample *const *out);
+
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
     
 private:
     float m_sample;
     float lo;
     float hi;
     RGen rgen;
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_DSP_V("Rand~",Rand_ar);
 
 Rand_ar::Rand_ar(int argc, t_atom *argv)
 {
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
+
     AtomList Args(argc,argv);
 
     if (Args.Count() != 2)
@@ -80,7 +88,7 @@ Rand_ar::Rand_ar(int argc, t_atom *argv)
     lo=sc_getfloatarg(Args,0);
     hi=sc_getfloatarg(Args,1);
     
-    rgen.init(0); //this should be changed
+    rgen.init(timeseed());
 
     AddOutSignal();
 }
@@ -119,16 +127,24 @@ public:
 protected:
     void m_loadbang();
 
+    void m_seed(int i)
+    {
+	rgen.init(i);
+    }
+
 private:
     float lo;
     float hi;
     RGen rgen;
+    FLEXT_CALLBACK_I(m_seed);
 };
 
 FLEXT_LIB_V("Rand",Rand_kr);
 
 Rand_kr::Rand_kr(int argc, t_atom *argv)
 {
+    FLEXT_ADDMETHOD_(0,"seed",m_seed);
+
     AtomList Args(argc,argv);
     if (Args.Count() != 2)
     {
@@ -138,8 +154,8 @@ Rand_kr::Rand_kr(int argc, t_atom *argv)
     lo=sc_getfloatarg(Args,0);
     hi=sc_getfloatarg(Args,1);
     
-    rgen.init(0);
-    
+    rgen.init(timeseed());
+
     AddOutFloat();
 }
 
