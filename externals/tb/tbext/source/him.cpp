@@ -71,7 +71,6 @@ protected:
     void set_etilde(t_float);
     void set_dt(t_float);
     void set_regtime(bool);
-    void set_output(t_int);
     void state();
     void reset();
 
@@ -92,7 +91,6 @@ private:
 
     //and these our settings
     t_float dt;
-    t_int output;   //mu, muv, nu, nuv, x, y 
     bool regtime; //if true "regularisierte zeit"
 
     //Callbacks
@@ -103,7 +101,6 @@ private:
     FLEXT_CALLBACK_1(set_etilde,t_float);
     FLEXT_CALLBACK_1(set_dt,t_float);
     FLEXT_CALLBACK_1(set_regtime,bool);
-    FLEXT_CALLBACK_1(set_output,t_int);
     FLEXT_CALLBACK(state);
     FLEXT_CALLBACK(reset);
 
@@ -135,6 +132,11 @@ him::him(int argc, t_atom *argv)
 {
     AddInAnything();
     AddOutSignal();
+    AddOutSignal();
+    AddOutSignal();
+    AddOutSignal();
+    AddOutSignal();
+    AddOutSignal();
     FLEXT_ADDMETHOD_F(0,"mu",set_mu);
     FLEXT_ADDMETHOD_F(0,"muv",set_muv);
     FLEXT_ADDMETHOD_F(0,"nu",set_nu);
@@ -142,7 +144,6 @@ him::him(int argc, t_atom *argv)
     FLEXT_ADDMETHOD_F(0,"e",set_etilde);
     FLEXT_ADDMETHOD_F(0,"dt",set_dt);
     FLEXT_ADDMETHOD_B(0,"regtime",set_regtime);
-    FLEXT_ADDMETHOD_I(0,"output",set_output);
     FLEXT_ADDMETHOD_(0,"state",state);
     FLEXT_ADDMETHOD_(0,"reset",reset);
     
@@ -159,7 +160,6 @@ him::him(int argc, t_atom *argv)
 
     //default mode
     regtime=true;
-    output=0;
     dt=0.01;
 } 
 
@@ -199,8 +199,18 @@ void him::runge_kutta_4(t_float dt)
 	    k4[i] = dt * deriv(temp3,i);
 	    data[i] = data[i] + (k1[i] + (2.*(k2[i]+k3[i])) + k4[i])/6.;
         }
-    
-    reset_muv();
+
+ 
+    /*
+      the system might become unstable ... in this case, we'll reset the system
+    */    
+
+    for(i=0;i<=NUMB_EQ-1;i++)
+	if(data[i]>2)
+	    reset();
+	else
+	    if(PD_BADFLOAT(data[i])) //not that we get some troubles with denormals
+		data[i]=0;
     
 }
 
@@ -208,118 +218,31 @@ void him::runge_kutta_4(t_float dt)
 
 void him::m_signal(int n, t_float *const *in, t_float *const *out)
 {
-    outs = out[0];
-    
     if (regtime)
 	{
-	    switch (output)
+	    for (int j=0;j!=n;++j)
 		{
-		case 0:
-		    for (int j=0;j!=n;++j)
-			{
-			runge_kutta_4(dt);
-			*(outs+j)=data[0];
-			}
-		    break;
-		    
-		case 1:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt);
-			    *(outs+j)=data[1];
-			}
-		    break;
-		    
-		case 2:
-		    for (int j=0;j!=n;++j)
-			{
-			runge_kutta_4(dt);
-			*(outs+j)=data[2];
-			}
-		    break;
-		
-		case 3:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt);
-			    *(outs+j)=data[3];
-			}
-		    break;
-		    
-		case 4:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt);
-			    *(outs+j)=data[0]*data[2];
-			}
-		    break;
-		    
-		case 5:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt);
-			    *(outs+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
-			}
-		    break;
+		    runge_kutta_4(dt);
+		    *(out[0]+j)=data[0];
+		    *(out[1]+j)=data[1];
+		    *(out[2]+j)=data[2];
+		    *(out[3]+j)=data[3];
+		    *(out[4]+j)=data[0]*data[2];
+		    *(out[5]+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
 		}
 	}
     else
 	{
-	    switch (output)
-		{	    
-		case 0:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt/
-					  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			    *(outs+j)=data[0];
-			}
-		    break;
-		    
-		case 1:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt/
-					  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			    *(outs+j)=data[1];
-			}
-		    break;
-		    
-		case 2:
-		    for (int j=0;j!=n;++j)
-		    {
-			runge_kutta_4(dt/
-				      (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			*(outs+j)=data[2];
-		    }
-		    break;
-		    
-		case 3:
-		    for (int j=0;j!=n;++j)
-		    {
-			runge_kutta_4(dt/
-				      (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			*(outs+j)=data[3];
-		    }
-		    break;
-		    
-		case 4:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt/
-					  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			    *(outs+j)=data[0]*data[2];
-			}
-		break;
-		
-		case 5:
-		    for (int j=0;j!=n;++j)
-			{
-			    runge_kutta_4(dt/
-					  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-			    *(outs+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
-			}
-		    break;
+	    for (int j=0;j!=n;++j)
+		{
+		    runge_kutta_4(dt/
+				  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
+		    *(out[0]+j)=data[0];
+		    *(out[1]+j)=data[1];
+		    *(out[2]+j)=data[2];
+		    *(out[3]+j)=data[3];
+		    *(out[4]+j)=data[0]*data[2];
+		    *(out[5]+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
 		}
 	}
 }    
@@ -365,10 +288,6 @@ void him::set_regtime(bool b)
     regtime=b;
 }
 
-void him::set_output(t_int i)
-{
-    output=i;
-}
 
 void him::state()
 {
@@ -384,6 +303,6 @@ void him::reset()
     data[0]=float(rand())/float(RAND_MAX);
     data[1]=float(rand())/float(RAND_MAX);
     data[2]=float(rand())/float(RAND_MAX);
-    reset_muv();
+    reset_nuv();
     post("randomizing values");
 }
