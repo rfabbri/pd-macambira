@@ -28,7 +28,7 @@
 #include "pdp.h"
 #include <math.h>
 
-#define MAGIC_THRESHOLD 5
+#define MAGIC_THRESHOLD 30
 
 static unsigned int fastrand_val;
 #define inline_fastrand() (fastrand_val=fastrand_val*1103515245+12345)
@@ -114,18 +114,17 @@ static void pdp_ripple_allocate(t_pdp_ripple *x)
  int i;
 
   x->x_diff = (short int*) getbytes((x->x_vsize + (x->x_vsize>>1))<<1);
-  x->x_bdata = (short int *)getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
+  x->x_bdata = (short int *) getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
   x->x_maph = x->x_vheight / 2 + 1;
   x->x_mapw = x->x_vwidth / 2 + 1;
   x->x_map = (int *)getbytes(x->x_maph*x->x_mapw*3*sizeof(t_int));
   x->x_vtable = (signed char *)getbytes(x->x_maph*x->x_mapw*2*sizeof(signed char));
-  if( !x->x_map || x->x_vtable || !x->x_bdata || ! x->x_diff ) {
+  if( !x->x_map || !x->x_vtable || !x->x_bdata || !x->x_diff ) {
       post( "pdp_ripple : severe error : cannot allocate buffers" );
   }
   x->x_map1 = x->x_map;
   x->x_map2 = x->x_map + x->x_maph * x->x_mapw;
   x->x_map3 = x->x_map + x->x_mapw * x->x_maph * 2;
-
 }
 
 /* check if there is a real difference with background image */
@@ -308,7 +307,7 @@ static void pdp_ripple_process_yv12(t_pdp_ripple *x)
     if ( x->x_bdata && x->x_snapshot )
     {
        x->x_snapshot = 0;
-       memcpy( x->x_bdata, data, (x->x_vsize + (x->x_vsize<<1))<<1 );
+       memcpy( x->x_bdata, data, (x->x_vsize + (x->x_vsize>>1))<<1 );
     }
 
     totalnbpixels = x->x_vsize;

@@ -1,4 +1,5 @@
 0.12.9
+  fixed pdp_ripple
   added pdp_shape : a shape recognition object (based on color, similar to color tracker ) 
   added "fill" in pdp_pen 
   ( on request from ben )
