@@ -1,18 +1,9 @@
 CC=gcc
 
-OS_NAME=$(shell uname -s)
+EXT=$(shell uname -s | sed -e 's/^[lL]/pd_l/' | sed -e 's/^[dD]/pd_d/' | sed -e 's/MINGW.*/dll/')
 
-#echo $(OS_NAME)
-
-# this needs to also recognize MINGW_NT-5.0
-# also, XP uses CYGWIN_NT-5.1 and MINGW_NT-5.1
-ifneq "$(OS_NAME)" "CYGWIN_NT-5.0"
-EXT=pd_$(shell uname -s | sed -e 's/L/l/' | sed -e 's/D/d/')
 # This is Miller's default install location
 INSTALL_PREFIX=/usr/local/lib/pd
-else
-EXT=dll
-endif
 
 # find all files to compile
 TARGETS=$(subst .tk,.tk2c,$(wildcard */*.tk)) $(subst .c,.$(EXT),$(wildcard */*.c))
@@ -27,46 +18,20 @@ current: $(EXT)
 	./tk2c.bash < $*.tk > $*.tk2c
 
 
-# ----------------------- MINGW-NT -----------------------
+# ----------------------- Windows -----------------------
 
-pd_nt: $(TARGETS)
+dll: $(TARGETS)
 
-MINGW_CFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
-		-Wall -W -Wno-shadow -Wstrict-prototypes -g \
-		-Wno-unused -Wno-parentheses -Wno-switch \
-		-mno-cygwin -c -DBUILD_DLL
+WINCFLAGS = -DPD -DNT -DICECAST -funroll-loops \
+    -Wall -W -Wno-shadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
-MINGW_INCLUDE =  -I../../src -I../../pd/src
+WININCLUDE =  -I../../src -I../../pd/src
 
-MINGW_LFLAGS = -L../../pd/bin -lpd
-
-.c.dll: CURRENT_DIR = `echo $* | cut -d '/' -f 1`
 .c.dll:
-	$(CC) $(MINGW_CFLAGS) $(MINGW_INCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.dll $*.o -lc -lm $(MINGW_LFLAGS)
-#	strip --strip-unneeded $*.dll
-#	dllwrap --target=i386-mingw32 -mno-cygwin --output-lib=lib$*.a \
-#				--dllname=$*.dll --driver-name=gcc $*.o $(MINGW_LFLAGS)
-#	-rm $*.o
-
-# PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
-# VC="C:\Program Files\Microsoft Visual Studio\Vc98"
-
-# PDNTINCLUDE = /I. /I\tcl\include /I\ftp\pd\src /I$(VC)\include
-
-# PDNTLDIR = $(VC)\lib
-# PDNTLIB = $(PDNTLDIR)\libc.lib \
-# 	$(PDNTLDIR)\oldnames.lib \
-# 	$(PDNTLDIR)\kernel32.lib \
-# 	\ftp\pd\bin\pd.lib 
-
-# .c.ont:
-# 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-
-# .c.dll:
-# 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-# need to find a way to replace $(CSYM)
-#	link /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+	$(CC) $(WINCFLAGS) $(WININCLUDE) -o $*.o -c $*.c
+	gcc -shared -o $*.dll $*.o ../../bin/pd.dll -lpthreadGC
+	-rm $*.o
 
 # ----------------------- IRIX 5.x -----------------------
 
