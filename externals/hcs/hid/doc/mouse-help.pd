@@ -1,0 +1,44 @@
+#N canvas 127 178 668 433 10;
+#X symbolatom 211 183 0 0 0 0 - - -;
+#X obj 178 21 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+;
+#X floatatom 287 185 5 0 0 0 - - -;
+#X floatatom 168 184 5 0 0 3 wheel - -;
+#X floatatom 113 184 7 0 0 3 Y - -;
+#X floatatom 59 184 7 0 0 3 X - -;
+#X obj 178 76 mouse 4;
+#X obj 28 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+;
+#X obj 108 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 188 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 28 271 route btn_left btn_middle btn_right;
+#X text 26 250 the standard three buttons;
+#X obj 268 323 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 342 323 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 417 323 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 491 323 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 566 323 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 268 295 route btn_side btn_extra btn_forward btn_back btn_task
+;
+#X connect 1 0 6 0;
+#X connect 6 0 5 0;
+#X connect 6 1 4 0;
+#X connect 6 2 3 0;
+#X connect 6 3 0 0;
+#X connect 6 4 2 0;
+#X connect 10 0 7 0;
+#X connect 10 1 8 0;
+#X connect 10 2 9 0;
+#X connect 10 3 17 0;
+#X connect 17 0 12 0;
+#X connect 17 1 13 0;
+#X connect 17 2 14 0;
+#X connect 17 3 15 0;
+#X connect 17 4 16 0;
