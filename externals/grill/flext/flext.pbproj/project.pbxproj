@@ -2852,13 +2852,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				HEADER_SEARCH_PATHS = /usr/local/pd/src;
-				LIBRARY_STYLE = BUNDLE;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
 				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_CFLAGS = "-D FLEXT_SYS_PD -D FLEXT_SHARED -D FLEXT_THREADS -D FLEXT_USE_SIMD -Wno-switch  -Wno-long-double";
-				OTHER_LDFLAGS = "-bundle_loader /usr/local/pd/bin/pd";
+				OTHER_LDFLAGS = "-lgcc -lstdc++ -flat_namespace -undefined suppress";
 				OTHER_LIBTOOL_FLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = flext.dylib;
+				PRODUCT_NAME = libflext.dylib;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
@@ -2868,6 +2869,7 @@
 			);
 			isa = PBXLibraryTarget;
 			name = "PD@OSX shared";
+			productInstallPath = /usr/local/lib;
 			productName = "PD@OSX";
 			productReference = F5CBC5B704757A5901A0C81C;
 			shouldUseHeadermap = 0;
@@ -3139,7 +3141,7 @@
 		};
 		F5CBC5B704757A5901A0C81C = {
 			isa = PBXLibraryReference;
-			path = flext.dylib;
+			path = libflext.dylib;
 			refType = 3;
 		};
 		F5CBC5B804757BC801A0C81C = {
@@ -3825,13 +3827,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				HEADER_SEARCH_PATHS = /usr/local/pd/src;
-				LIBRARY_STYLE = BUNDLE;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "-DFLEXT_SYS_PD -DFLEXT_DEBUG -DFLEXT_SHARED -DFLEXT_THREADS -DFLEXT_USE_SIMD -Wno-switch  -Wno-long-double";
-				OTHER_LDFLAGS = "-bundle_loader /usr/local/pd/bin/pd";
+				OTHER_LDFLAGS = "-lgcc -lstdc++ -flat_namespace -undefined suppress";
 				OTHER_LIBTOOL_FLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = flext_d.dylib;
+				PRODUCT_NAME = libflext_d.dylib;
 				REZ_EXECUTABLE = YES;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
@@ -3841,6 +3844,7 @@
 			);
 			isa = PBXLibraryTarget;
 			name = "PD@OSX shared debug";
+			productInstallPath = /usr/local/lib;
 			productName = "PD@OSX";
 			productReference = F5CBC69B047584CD01A0C81C;
 			shouldUseHeadermap = 0;
@@ -4190,7 +4194,7 @@
 		};
 		F5CBC69B047584CD01A0C81C = {
 			isa = PBXLibraryReference;
-			path = flext_d.dylib;
+			path = libflext_d.dylib;
 			refType = 3;
 		};
 	};
