@@ -62,7 +62,6 @@ public:
 
 protected:
     virtual void m_signal (int n, float *const *in, float *const *out);
-    t_float *outs;
     
     void set_mu(t_float);
     void set_muv(t_float);
@@ -77,13 +76,9 @@ protected:
 private:
     // contains DGL-System
     t_float deriv(t_float x[],int eq);
-    t_float result;
 
     // 4th order Runge Kutta update of the dynamical variables 
     void   runge_kutta_4(t_float dt);
-    int i;
-    t_float k1[NUMB_EQ],k2[NUMB_EQ],k3[NUMB_EQ],k4[NUMB_EQ];
-    t_float temp1[NUMB_EQ], temp2[NUMB_EQ], temp3[NUMB_EQ];
 
     //these are our data
     t_float data[4]; //mu, muv, nu, nuv (semi-parabolische koordinaten)
@@ -112,8 +107,10 @@ private:
 			   + (8*E*data[0]) - (8*E*data[2]) - 
 			   (data[0]*data[0]*data[0]*data[0]*data[1]*data[1])
 			   + 16);
+     	if (fabs((data[3]))<1e-5)
+ 	    data[3]=0;
     }
-
+    
     void reset_muv()
     {
 	data[1]= 0.5*sqrt( - (4*data[3]*data[3]) - 
@@ -121,6 +118,8 @@ private:
 			   + (8*E*data[0]) - (8*E*data[2]) - 
 			   (data[0]*data[0]*data[0]*data[0]*data[1]*data[1])
 			   + 16);
+ 	if (fabs((data[1]))<1e-5)
+ 	    data[1]=0;
     }
     
 };
@@ -163,9 +162,10 @@ him::him(int argc, t_atom *argv)
     dt=0.01;
 } 
 
-t_float him::deriv(t_float x[], int eq)
+inline t_float him::deriv(t_float * x, int eq)
 {
-  // set DGL-System here
+    t_float result;
+    // set DGL-System here
     if (eq == 0) result =  x[1];
     if (eq == 1) result = 2*E*x[0]-0.25*x[0]*x[2]*x[2]*(2*x[0]*x[0]+x[2]*x[2]);
     if (eq == 2) result =  x[3];
@@ -174,77 +174,89 @@ t_float him::deriv(t_float x[], int eq)
   return result;
 }
 
-void him::runge_kutta_4(t_float dt)                          
+inline void him::runge_kutta_4(t_float dt)                          
 {
-    for(i=0;i<=NUMB_EQ-1;i++) // iterate over equations 
-	{
-	    k1[i] = dt * deriv(data,i);
-	    temp1[i] = data[i] + 0.5*k1[i];	    	    
-	}
+    t_float k1[NUMB_EQ],k2[NUMB_EQ],k3[NUMB_EQ],k4[NUMB_EQ];
+    t_float temp1[NUMB_EQ], temp2[NUMB_EQ], temp3[NUMB_EQ];
     
-    for(i=0;i<=NUMB_EQ-1;i++)
-	{
-	    k2[i] = dt * deriv(temp1,i);
-	    temp2[i] = data[i] + 0.5*k2[i];
-        }
+    for(int i=0;i<=NUMB_EQ-1;i++) // iterate over equations 
+    {
+	k1[i] = dt * deriv(data,i);
+	temp1[i] = data[i] + 0.5*k1[i];	    	    
+    }
     
-    for(i=0;i<=NUMB_EQ-1;i++)
-	{
-	    k3[i] = dt * deriv(temp2,i);
-	    temp3[i] = data[i] + k3[i];    
-	}
+    for(int i=0;i<=NUMB_EQ-1;i++)
+    {
+	k2[i] = dt * deriv(temp1,i);
+	temp2[i] = data[i] + 0.5*k2[i];
+    }
     
-    for(i=0;i<=NUMB_EQ-1;i++)
-	{
-	    k4[i] = dt * deriv(temp3,i);
-	    data[i] = data[i] + (k1[i] + (2.*(k2[i]+k3[i])) + k4[i])/6.;
-        }
+    for(int i=0;i<=NUMB_EQ-1;i++)
+    {
+	k3[i] = dt * deriv(temp2,i);
+	temp3[i] = data[i] + k3[i];    
+    }
+    
+    for(int i=0;i<=NUMB_EQ-1;i++)
+    {
+	k4[i] = dt * deriv(temp3,i);
+	data[i] = data[i] + (k1[i] + (2.*(k2[i]+k3[i])) + k4[i])/6.;
+    	
+	// we don't want to experience denormals in the next step */
+	if(fabs((data[i]))<1e-5)   
+	    data[i]=0;
+    }
 
- 
+    
     /*
       the system might become unstable ... in this case, we'll reset the system
     */    
 
-    for(i=0;i<=NUMB_EQ-1;i++)
+    for(int i=0;i<=NUMB_EQ-1;i++)
+    {
 	if(data[i]>2)
 	    reset();
-	else
-	    if(PD_BADFLOAT(data[i])) //not that we get some troubles with denormals
-		data[i]=0;
-    
+    }
 }
 
 
 
 void him::m_signal(int n, t_float *const *in, t_float *const *out)
 {
+    t_float * out0 = out[0];
+    t_float * out1 = out[1];
+    t_float * out2 = out[2];
+    t_float * out3 = out[3];
+    t_float * out4 = out[4];
+    t_float * out5 = out[5];
+
+    
     if (regtime)
+    {
+	for (int j=0;j!=n;++j)
 	{
-	    for (int j=0;j!=n;++j)
-		{
-		    runge_kutta_4(dt);
-		    *(out[0]+j)=data[0];
-		    *(out[1]+j)=data[1];
-		    *(out[2]+j)=data[2];
-		    *(out[3]+j)=data[3];
-		    *(out[4]+j)=data[0]*data[2];
-		    *(out[5]+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
-		}
+	    runge_kutta_4(dt);
+	    (*(out0)++)=data[0];
+	    (*(out1)++)=data[1];
+	    (*(out2)++)=data[2];
+	    (*(out3)++)=data[3];
+	    (*(out4)++)=data[0]*data[2];
+	    (*(out5)++)=(data[0]*data[0]-data[2]*data[2])*0.5;
 	}
+    }
     else
+    {
+	for (int j=0;j!=n;++j)
 	{
-	    for (int j=0;j!=n;++j)
-		{
-		    runge_kutta_4(dt/
-				  (2*sqrt(data[0]*data[0]+data[2]*data[2])));
-		    *(out[0]+j)=data[0];
-		    *(out[1]+j)=data[1];
-		    *(out[2]+j)=data[2];
-		    *(out[3]+j)=data[3];
-		    *(out[4]+j)=data[0]*data[2];
-		    *(out[5]+j)=(data[0]*data[0]-data[2]*data[2])*0.5;
-		}
+	    runge_kutta_4(dt/(2*sqrt(data[0]*data[0]+data[2]*data[2])));
+	    (*(out0)++)=data[0];
+	    (*(out1)++)=data[1];
+	    (*(out2)++)=data[2];
+	    (*(out3)++)=data[3];
+	    (*(out4)++)=data[0]*data[2];
+	    (*(out5)++)=(data[0]*data[0]-data[2]*data[2])*0.5;
 	}
+    }
 }    
 
 void him::set_mu(t_float f)
