@@ -41,4 +41,7 @@ BUGS:
   The left outlet will send a "bang" message when we're ready to set values,
   see example patch on how to use this to set a default value.
 
+- If you change virtual desktops or "shade" the patcher window the selection 
+  visible on the popup will be reset to the popup-name.
+
 Have Fun.
