@@ -98,7 +98,7 @@ public:
 		for(I i = 0; i < CntIn(); ++i) flags[i] = false;
 	}
 
-	virtual bool m_method_(I inlet,const t_symbol *s,I argc,t_atom *argv)
+	virtual bool m_method_(I inlet,const t_symbol *s,I argc,const t_atom *argv)
 	{
 		if(inlet > 0 && (!vasponly || s == sym_vasp)) {
 			Vasp *a = new Vasp(argc,argv);

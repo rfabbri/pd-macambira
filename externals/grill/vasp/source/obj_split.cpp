@@ -133,7 +133,7 @@ public:
 		for(I i = 0; i < cnt-1; ++i) if(vi[i]) { delete vi[i]; vi[i] = NULL; }
 	}
 
-	virtual bool m_method_(I inlet,const t_symbol *s,I argc,t_atom *argv)
+	virtual bool m_method_(I inlet,const t_symbol *s,I argc,const t_atom *argv)
 	{
 		if(inlet > 0 && s == sym_vasp) {
 			if(vi[inlet-1]) delete vi[inlet-1];

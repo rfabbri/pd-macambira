@@ -38,6 +38,8 @@ objects:
 bugs:
 ---------------------
 
+- vasp.join doesn't like length -1
+
 
 tests:
 ---------------------

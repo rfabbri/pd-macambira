@@ -13,6 +13,7 @@ Version history:
 - ADD: vasp.shift,vasp.xshift - attribute "fill"
 - ADD: vasp.tilt,vasp.xtilt - attributes "fill","inter"
 - ADD: vasp.offset=,vasp.frames= - attributes "dir","slope"
+- CHANGE: update m_method_ virtual functions of same objects
 
 0.1.1:
 - FIX: bug in resize of immediate buffers
