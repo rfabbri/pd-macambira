@@ -100,7 +100,7 @@ static SCM pd_backtrace_run1;
 static SCM pd_backtrace_run2;
 static SCM pd_backtrace_run3;
 static SCM pd_backtrace_run4;
-
+static SCM eval_string_func;
 
 
 
@@ -473,6 +473,8 @@ static void k_guile_init(void){
 
   pd_backtrace_run4=EVAL("pd-backtrace-run4");
   scm_permanent_object(pd_backtrace_run4);
+
+  eval_string_func=EVAL("eval-string");
 }
 
 
@@ -557,6 +559,12 @@ static void k_guile_reload(t_k_guile *x){
   k_guile_load(x,x->filename);
 }
 
+static void k_guile_eval(t_k_guile *x,t_symbol *s){
+  scm_call_2(pd_backtrace_run1,eval_string_func,MAKE_STRING(s->s_name));
+}
+
+//static void k_guile_evalfile(t_k_guile *x,t_symbol *s){
+//}
 
 
 /*****************************************************************************************************
@@ -573,6 +581,8 @@ void k_guile_setup(void){
 
   class_addanything(k_guile_class, (t_method)k_guile_anything_first);
   class_addmethod(k_guile_class, (t_method)k_guile_reload, gensym("reload"), 0);
+  class_addmethod(k_guile_class, (t_method)k_guile_eval, gensym("eval"), A_DEFSYM, 0);
+  //class_addmethod(k_guile_class, (t_method)k_guile_evalfile, gensym("evalfile"), A_DEFSYM, 0);
   class_sethelpsymbol(k_guile_class, gensym("help-k_guile.pd"));
 
 
