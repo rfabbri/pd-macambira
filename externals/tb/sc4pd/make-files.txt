@@ -14,4 +14,5 @@ SRCS= \
 	DelayC.cpp CombN.cpp CombL.cpp CombC.cpp AllpassN.cpp AllpassL.cpp \
 	AllpassC.cpp PitchShift.cpp Resonz.cpp OnePole.cpp OneZero.cpp \
 	TwoPole.cpp TwoZero.cpp FOS.cpp SOS.cpp RLPF.cpp RHPF.cpp LPF.cpp \
-	HPF.cpp BPF.cpp BRF.cpp
+	HPF.cpp BPF.cpp BRF.cpp LPZ1.cpp HPZ1.cpp LPZ2.cpp HPZ2.cpp \
+	BPZ2.cpp BRZ2.cpp
