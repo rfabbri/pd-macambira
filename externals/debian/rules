@@ -50,7 +50,7 @@ build-stamp: configure-stamp
 
 	# Build flext
 
-	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include)
+	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include STK="" )
 
 	# Flext externals
 	#
@@ -146,9 +146,9 @@ install: build
 
 	# Install cyclone
 
-	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
+	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
 	install $(CURDIR)/miXed/bin/*.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone/
-	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
+	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 
 
