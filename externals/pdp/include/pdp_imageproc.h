@@ -21,6 +21,7 @@
 
 /* this is a c wrapper around platform specific (mmx) code */
 
+#include "pdp_types.h"
 
 #ifndef PDP_IMAGEPROC_H
 #define PDP_IMAGEPROC_H
@@ -31,6 +32,16 @@ extern "C"
 {
 #endif
 */
+
+/* get legal image dimensions */
+/* this is a fix for the dimension problem */
+/* some imageproc implementations require the dims to be a multiple of some square */
+u32 pdp_imageproc_legalwidth(int i);
+u32 pdp_imageproc_legalheight(int i);
+u32 pdp_imageproc_legalwidth_round_down(int i);
+u32 pdp_imageproc_legalheight_round_down(int i);
+
+
 
 /****************************** 16 bit signed (pixel) routines ***************************************/
 

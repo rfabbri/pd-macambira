@@ -24,9 +24,9 @@ pdp xvideo output
 
 */
 
-
 // x stuff
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
@@ -51,6 +51,7 @@ typedef struct pdp_xv_struct
 {
     t_object x_obj;
     t_float x_f;
+    t_outlet *x_outlet;
 
     int x_packet0;
     int x_queue_id;
@@ -60,6 +61,7 @@ typedef struct pdp_xv_struct
     int x_screen;
     Window x_win;
     GC x_gc;
+    Atom    x_WM_DELETE_WINDOW;
 
     int x_xv_format;
     int x_xv_port;
@@ -77,6 +79,7 @@ typedef struct pdp_xv_struct
     int  x_autocreate;
 
     float x_cursor;
+    t_symbol *x_dragbutton;
 
 
 } t_pdp_xv;
@@ -122,10 +125,12 @@ void pdp_xv_create_xvimage(t_pdp_xv *x)
 {
 
     long size = (x->x_width * x->x_height + (((x->x_width>>1)*(x->x_height>>1))<<1));
+    //post("create xvimage %d %d", x->x_width, x->x_height);
     x->x_data = (unsigned char *)malloc(size);
     x->x_xvi = XvCreateImage(x->x_dpy, x->x_xv_port, x->x_xv_format, (char *)x->x_data, x->x_width, x->x_height);
     x->x_last_encoding = -1;
-    if (!(x->x_xvi) || (!x->x_data)) post ("ERROR CREATING XVIMAGE");
+    if ((!x->x_xvi) || (!x->x_data)) post ("ERROR CREATING XVIMAGE");
+    //post("created xvimag data:%x xvi:%x",x->x_data,x->x_xvi);
 
 }
 
@@ -193,6 +198,7 @@ static void pdp_xv_create(t_pdp_xv* x)
     XEvent e;
     unsigned int i;
 
+
     if(  x->x_initialized ){
 	//post("pdp_xv: window already created");
 	return;
@@ -230,6 +236,11 @@ static void pdp_xv_create(t_pdp_xv* x)
 	BlackPixel(x->x_dpy, x->x_screen),
 	BlackPixel(x->x_dpy, x->x_screen));
 
+
+    /* enable handling of close window event */
+    x->x_WM_DELETE_WINDOW = XInternAtom(x->x_dpy, "WM_DELETE_WINDOW", True);
+    (void)XSetWMProtocols(x->x_dpy, x->x_win, &x->x_WM_DELETE_WINDOW, 1);
+
     if(!(x->x_win)){
 	/* clean up mess */
 	post("pdp_xv: could not create window\n");
@@ -243,7 +254,10 @@ static void pdp_xv_create(t_pdp_xv* x)
 	return;
     }
 
-    XSelectInput(x->x_dpy, x->x_win, StructureNotifyMask);
+    /* select input events */
+    XSelectInput(x->x_dpy, x->x_win, StructureNotifyMask 
+		 | ButtonPressMask | ButtonReleaseMask | MotionNotify | ButtonMotionMask);
+
 
     XMapWindow(x->x_dpy, x->x_win);
 
@@ -255,7 +269,10 @@ static void pdp_xv_create(t_pdp_xv* x)
     }
 
 
+    /* we're done initializing */
     x->x_initialized = true;
+
+    /* disable/enable cursor */
     pdp_xv_cursor(x, x->x_cursor);
 
 }
@@ -380,31 +397,104 @@ static void pdp_xv_random(t_pdp_xv *x)
     for(i=0; i<x->x_width*x->x_height/4; i++) intdata[i]=random();
 }
 
+
 /* redisplays image */
 static void pdp_xv_bang_thread(t_pdp_xv *x)
 {
 
-    XEvent e;
     unsigned int i;
+    XEvent e;
+    XConfigureEvent *ce = (XConfigureEvent *)&e;
+    XButtonEvent *be = (XButtonEvent *)&e;
+    XMotionEvent *me = (XMotionEvent *)&e;
+    float inv_x, inv_y;
+    t_symbol *s;
+    t_atom atom[2];
+    char nextdrag[]="drag0";
+    char b='0';
+    
+    inv_x = 1.0f / (float)(x->x_winwidth);
+    inv_y = 1.0f / (float)(x->x_winheight);
 
-    //while (XEventsQueued(x->x_dpy, QueuedAlready)){
     while (XPending(x->x_dpy)){
-        //post("pdp_xv: waiting for event");
+
 	XNextEvent(x->x_dpy, &e);
-	//post("pdp_xv: XEvent %d", e.type);
-	if(e.type == ConfigureNotify){
-	    XConfigureEvent *ce = (XConfigureEvent *)&e;
+
+	switch(e.type){
+	case ConfigureNotify:
 	    x->x_winwidth = ce->width;
 	    x->x_winheight = ce->height;
+	    inv_x = 1.0f / (float)(x->x_winwidth);
+	    inv_y = 1.0f / (float)(x->x_winheight);
+	    break;
+	    
+	case ClientMessage:
+	    if ((Atom)e.xclient.data.l[0] == x->x_WM_DELETE_WINDOW) {
+		post("pdp_xv: button disabled, please send a \"close\" message to close the window");
+		//destroy = 1;
+	    }
+	    break;
 
+	case ButtonPress:
+	    //post("pdp_xv: press %f %f", inv_x * (float)be->x, inv_y * (float)be->y);
+	    SETFLOAT(atom+0,inv_x * (float)be->x);
+	    SETFLOAT(atom+1,inv_y * (float)be->y);
+	    outlet_anything(x->x_outlet, gensym("press"), 2, atom);
+	    switch(be->button){
+	    case Button1: outlet_anything(x->x_outlet, gensym("press1"), 2, atom); b='1'; break;
+	    case Button2: outlet_anything(x->x_outlet, gensym("press2"), 2, atom); b='2'; break;
+	    case Button3: outlet_anything(x->x_outlet, gensym("press3"), 2, atom); b='3'; break;
+	    case Button4: outlet_anything(x->x_outlet, gensym("press4"), 2, atom); b='4'; break;
+	    case Button5: outlet_anything(x->x_outlet, gensym("press5"), 2, atom); b='5'; break;
+	    default: break;
+	    }
+	    nextdrag[4]=b;
+	    x->x_dragbutton = gensym(nextdrag);
+	    break;
+
+	case ButtonRelease:
+	    //post("pdp_xv: release %f %f", inv_x * (float)be->x, inv_y * (float)be->y);
+	    SETFLOAT(atom+0,inv_x * (float)be->x);
+	    SETFLOAT(atom+1,inv_y * (float)be->y);
+	    outlet_anything(x->x_outlet, gensym("release"), 2, atom);
+	    switch(be->button){
+	    case Button1: outlet_anything(x->x_outlet, gensym("release1"), 2, atom); break;
+	    case Button2: outlet_anything(x->x_outlet, gensym("release2"), 2, atom); break;
+	    case Button3: outlet_anything(x->x_outlet, gensym("release3"), 2, atom); break;
+	    case Button4: outlet_anything(x->x_outlet, gensym("release4"), 2, atom); break;
+	    case Button5: outlet_anything(x->x_outlet, gensym("release5"), 2, atom); break;
+	    default: break;
+	    }
+
+	    break;
+	case MotionNotify:
+	    //post("pdp_xv: drag %f %f", inv_x * (float)be->x, inv_y * (float)be->y);
+	    SETFLOAT(atom+0,inv_x * (float)be->x);
+	    SETFLOAT(atom+1,inv_y * (float)be->y);
+	    outlet_anything(x->x_outlet, gensym("drag"), 2, atom);
+	    outlet_anything(x->x_outlet, x->x_dragbutton, 2, atom);
+	    break;
+
+	default:
+	    //post("pdp_xv: unknown event");
+	    break;
 	}
-        //post("pdp_xv: received event");
 	
     }
 
+    // THIS SEEMS TO CRASH ON VERY LARGE IMAGES..
+    //post("start");
+    //post("XvPutImage xvi:%x",x->x_xvi);
     XvPutImage(x->x_dpy,x->x_xv_port,x->x_win,x->x_gc,x->x_xvi, 
 	       0,0,x->x_width,x->x_height, 0,0,x->x_winwidth,x->x_winheight);
+    //post("XFlush");
     XFlush(x->x_dpy);
+
+    //post("end");
+
+
+
+
 }
 
 static void pdp_xv_bang_callback(t_pdp_xv *x)
@@ -415,6 +505,11 @@ static void pdp_xv_bang_callback(t_pdp_xv *x)
 
 static void pdp_xv_bang(t_pdp_xv *x)
 {
+
+    /* check if window is initialized */
+    if (!(x->x_initialized)){
+        if (!pdp_xv_try_autocreate(x)) return;
+    }
 
 
     /* if previous queued method returned
@@ -433,6 +528,11 @@ static void pdp_xv_input_0(t_pdp_xv *x, t_symbol *s, t_floatarg f)
 
 }
 
+
+static void pdp_xv_vga(t_pdp_xv *x)
+{
+    pdp_xv_resize(x, 640, 480);
+}
 
 static void pdp_xv_autocreate(t_pdp_xv *x, t_floatarg f)
 {
@@ -468,6 +568,7 @@ t_class *pdp_xv_class;
 void *pdp_xv_new(void)
 {
     t_pdp_xv *x = (t_pdp_xv *)pd_new(pdp_xv_class);
+    x->x_outlet = outlet_new(&x->x_obj, &s_anything);
 
 
     x->x_packet0 = -1;
@@ -495,9 +596,14 @@ void *pdp_xv_new(void)
     x->x_last_encoding = -1;
 
     x->x_cursor = 0;
+    x->x_dragbutton = gensym("drag1");
+
+    //pdp_xv_create(x);
 
     return (void *)x;
 }
+
+
 
 
 
@@ -517,6 +623,7 @@ void pdp_xv_setup(void)
 
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_bang, gensym("bang"), A_NULL);
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_random, gensym("random"), A_NULL);
+    class_addmethod(pdp_xv_class, (t_method)pdp_xv_create, gensym("open"), A_NULL);
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_create, gensym("create"), A_NULL);
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_autocreate, gensym("autocreate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_destroy, gensym("destroy"), A_NULL);
@@ -527,8 +634,13 @@ void pdp_xv_setup(void)
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_xv_class, (t_method)pdp_xv_cursor, gensym("cursor"), A_FLOAT, A_NULL);
 
+    /* some shortcuts for the lazy */
+    class_addmethod(pdp_xv_class, (t_method)pdp_xv_vga, gensym("vga"), A_NULL);
+
 }
 
 #ifdef __cplusplus
 }
 #endif
+
+

@@ -19,9 +19,10 @@
  */
 
 
-
+#include "pdp_config.h"
 #include "pdp.h"
 #include "pdp_llconv.h"
+#include "pdp_imageproc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -45,9 +46,7 @@
 // is reset when manually opened or closed
 #define PDP_XV_RETRIES 10
 
-//uncomment this for additional philips webcam control
-//#define HAVE_V4LPWC
-#ifdef HAVE_V4LPWC
+#ifdef HAVE_PWCV4L
 #include "pwc-ioctl.h"
 #endif
 
@@ -107,6 +106,11 @@ typedef struct pdp_v4l_struct
 
     int x_open_retry;
 
+    u32 x_minwidth;
+    u32 x_maxwidth;
+    u32 x_minheight;
+    u32 x_maxheight;
+
 
 } t_pdp_v4l;
 
@@ -158,7 +162,7 @@ static void pdp_v4l_pwc_init(t_pdp_v4l *x)
 {
   /* todo add detection code for pwc */
 
-#ifdef HAVE_V4LPWC
+#ifdef HAVE_PWCV4L
 
   if(ioctl(x->x_tvfd, VIDIOCPWCRUSER)){
     perror("pdp_v4l: pwc: VIDIOCPWCRUSER");
@@ -259,6 +263,7 @@ static void *pdp_v4l_thread(void *voidx)
     return 0;
 }
 
+static void pdp_v4l_setlegaldim(t_pdp_v4l *x, int xx, int yy);
 
 static void pdp_v4l_open(t_pdp_v4l *x, t_symbol *name)
 {
@@ -302,6 +307,12 @@ static void pdp_v4l_open(t_pdp_v4l *x, t_symbol *name)
     post("pdp_v4l: cap: name %s type %d channels %d maxw %d maxh %d minw %d minh %d",
         x->x_vcap.name, x->x_vcap.type,  x->x_vcap.channels,  x->x_vcap.maxwidth,  x->x_vcap.maxheight,
             x->x_vcap.minwidth,  x->x_vcap.minheight);
+
+    x->x_minwidth = pdp_imageproc_legalwidth(x->x_vcap.minwidth);
+    x->x_maxwidth = pdp_imageproc_legalwidth_round_down(x->x_vcap.maxwidth);
+    x->x_minheight = pdp_imageproc_legalheight(x->x_vcap.minheight);
+    x->x_maxheight = pdp_imageproc_legalheight_round_down(x->x_vcap.maxheight);
+
  
     if (ioctl(x->x_tvfd, VIDIOCGPICT, &x->x_vpicture) < 0)
     {
@@ -376,10 +387,9 @@ static void pdp_v4l_open(t_pdp_v4l *x, t_symbol *name)
         goto closit;
     }
 
-    width = (x->x_width > (unsigned int)x->x_vcap.minwidth) ? x->x_width :  (unsigned int)x->x_vcap.minwidth;   
-    width = (width > (unsigned int)x->x_vcap.maxwidth) ?(unsigned int) x->x_vcap.maxwidth : width;
-    height = (x->x_height > (unsigned int)x->x_vcap.minheight) ? x->x_height :(unsigned int) x->x_vcap.minheight;
-    height = (height > (unsigned int)x->x_vcap.maxheight) ? (unsigned int)x->x_vcap.maxheight : height;
+    pdp_v4l_setlegaldim(x, x->x_width, x->x_height);
+    width = x->x_width;
+    height = x->x_height;
 
     for (i = 0; i < NBUF; i++)
     {
@@ -633,27 +643,34 @@ static void pdp_v4l_bang(t_pdp_v4l *x)
 }
 
 
-static void pdp_v4l_dim(t_pdp_v4l *x, t_floatarg xx, t_floatarg yy)
+static void pdp_v4l_setlegaldim(t_pdp_v4l *x, int xx, int yy)
 {
-  unsigned int w,h;
 
-  xx = (xx < 0.0f) ? 0.0f : xx;
-  yy = (yy < 0.0f) ? 0.0f : yy;
+    unsigned int w,h;
 
-  w = (unsigned int)xx;
-  h = (unsigned int)yy;
+    w  = pdp_imageproc_legalwidth((int)xx);
+    h  = pdp_imageproc_legalheight((int)yy);
+    
+    w = (w < x->x_maxwidth) ? w : x->x_maxwidth;
+    w = (w > x->x_minwidth) ? w : x->x_minwidth;
 
+    h = (h < x->x_maxheight) ? h : x->x_maxheight;
+    h = (h > x->x_minheight) ? h : x->x_minheight;
 
-  if (x->x_initialized){
-    pdp_v4l_close(x);
     x->x_width = w;
     x->x_height = h;
+}
+
+static void pdp_v4l_dim(t_pdp_v4l *x, t_floatarg xx, t_floatarg yy)
+{
+  if (x->x_initialized){
+    pdp_v4l_close(x);
+    pdp_v4l_setlegaldim(x, (int)xx, (int)yy);
     pdp_v4l_open(x, x->x_device);
     
   }
   else{
-    x->x_width = w;
-    x->x_height = h;
+    pdp_v4l_setlegaldim(x, (int)xx, (int)yy);
   }
 }
 
@@ -698,6 +715,12 @@ void *pdp_v4l_new(void)
 
     x->x_channel = 0;
     x->x_freq = -1; //don't set freq by default
+
+    x->x_minwidth = pdp_imageproc_legalwidth(0);
+    x->x_maxwidth = pdp_imageproc_legalwidth_round_down(0x7fffffff);
+    x->x_minheight = pdp_imageproc_legalheight(0);
+    x->x_maxheight = pdp_imageproc_legalheight_round_down(0x7fffffff);
+
 
     return (void *)x;
 }

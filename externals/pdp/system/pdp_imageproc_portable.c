@@ -24,6 +24,24 @@
 #include <math.h>
 #include "pdp_imageproc.h"
 
+/* all image dims are legal  */
+u32 pdp_imageproc_legalwidth(int i)
+{
+    if (i>1024) return 1024;
+    if (i>0) return  i;
+    return 1;
+}
+
+u32 pdp_imageproc_legalheight(int i)
+{
+    if (i>1024) return 1024;
+    if (i>0) return  i;
+    return 1;
+}
+u32 pdp_imageproc_legalwidth_round_down(int i) {return pdp_imageproc_legalwidth(i);}
+u32 pdp_imageproc_legalheight_round_down(int i) {return pdp_imageproc_legalheight(i);}
+
+
 // utility stuff
 inline static s32 float2fixed(float f)
 {

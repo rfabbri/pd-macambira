@@ -63,10 +63,17 @@ typedef int bool;
 /* image data packet */   
 typedef struct
 {
-    unsigned int encoding;  /* image encoding (data format ) */
-    unsigned int width;     /* image width in pixels */
-    unsigned int height;    /* image height in pixels */
-    unsigned int channels;  /* number of colour planes if PDP_IMAGE_MCHP */
+    /* standard images */
+    unsigned int encoding;    /* image encoding (data format ) */
+    unsigned int width;       /* image width in pixels */
+    unsigned int height;      /* image height in pixels */
+    unsigned int channels;    /* number of colour planes if PDP_IMAGE_MCHP */
+
+    /* sliced image extensions */ /* THIS IS EXPERIMENTAL, DON'T DEPEND ON IT STATYING HERE */
+    unsigned int slice_sync;  /* slice synchro information */
+    unsigned int slice_yoff;  /* y offset of the slice in original image */
+    unsigned int orig_height; /* height of original image (this is zero for ordinary images) */
+
 } t_image;
 
 
@@ -75,6 +82,12 @@ typedef struct
 #define PDP_IMAGE_GREY   2  /* 16bbp: 16 bit Y plane */
 #define PDP_IMAGE_RGBP   3  /* 48bpp: 16 bit planar RGB */
 #define PDP_IMAGE_MCHP   4  /* generic 16bit multi channel planar */
+
+/* slice synchro information */
+#define PDP_IMAGE_SLICE_FIRST (1<<0)
+#define PDP_IMAGE_SLICE_LAST  (1<<1)
+#define PDP_IMAGE_SLICE_BODY  (1<<2)
+
 
 /* ascii data packet */   
 typedef struct
@@ -106,16 +119,17 @@ typedef unsigned int t_raw;
 /* general pdp header struct */
 typedef struct
 {
-    unsigned int type;      /* datatype of this object */
-    unsigned int size;      /* datasize including header */
-    unsigned int users;     /* nb users of this object, readonly if > 1 */
-    unsigned int __pad__;   /* pad to quad word size */
-    union
+    unsigned int type;        /* datatype of this object */
+    unsigned int size;        /* datasize including header */
+    unsigned int users;       /* nb users of this object, readonly if > 1 */
+    unsigned int reserved[1]; /* reserved to provide binary compatibility for future extensions */
+
+    union                     /* each packet type has a unique subheader */
     {
-	t_raw    raw;       /* raw subheader (for extensions unkown to pdp core system) */
-	t_image  image;     /* bitmap image */
-	//t_ca     ca;      /* cellular automaton state data */
-	t_ascii  ascii;     /* ascii packet */
+	t_raw    raw;         /* raw subheader (for extensions unkown to pdp core system) */
+	t_image  image;       /* bitmap image */
+	//t_ca     ca;        /* cellular automaton state data */
+	t_ascii  ascii;       /* ascii packet */
     } info;
 
 } t_pdp;

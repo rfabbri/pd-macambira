@@ -1,4 +1,4 @@
-last modified: 2003/02/03
+last modified: 2003/02/27
 
 
 ChangeLog:
@@ -61,3 +61,17 @@ v0.8:	2003/02/02
 	(0.8.1) fixed scaf + gcc<3 compilation problem
 	(0.8.2) fixed compile prob + added documentation
 	(0.8.3) completed documentation
+
+v0.9:	2003/02/27
+	added pdp_scanxy~, pdp_invert
+	now uses autoconf for configuration
+	standard "make install" target
+	optional compililation for external dependencies (xv,qt,v4l,sdl)
+	experimental OSX port (without i/o)
+	fixed crash when closing xv window manually
+	added mouse event output to pdp_xv
+	pdp_ca now automaticly compiles rule files
+	fixed image dimension crashes
+	fixed pdp_xv bang crash
+	added pdp_grey2mask
+	added pdp_slice_cut/pdp_slice_glue (experimental/nondoc)

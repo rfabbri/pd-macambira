@@ -1,38 +1,39 @@
 
-bugs:
+fatal crash bugs:
 
-* some image dimensions cause crashes: solution: add checks in sources (pdp_v4l / pdp_qt / pdp_ca)
-(workaround: use a multiple of 8x8 to prevent this. ca dims should be a multiple of 64x2)
-* pdp_xv: catch sigpipe when window is closed (workaround: don't close the video windows manually ;)
+* none that i know of (if pdp dies on you, please let me know)
+
 
 todo 0.9:
 
-* improve scanned synthesis (method to specify scanning path)
-* solve image dimension problenms for sources
-* ascii art packet stuff (yves?)
+* 2D affine transforms parametrized by vectors (center, x-axis, y-axis)
+* some abstractions around pdp_cheby (colour shape, ...)
 * add real trigger object (problem with 3 phase protocol ?)
-* add shear -> simplify code to use general affine 2d transformations
+* absolute value object
 * displacement warp, substitution warp
 * efficient rescalers: pdp_double pdp_halve
 * move float color conversion and float<->fixed point conv code to system
-* add mouse pointer code to pdp_xv
 * crop, shift (pad+scroll)
 
-todo:
+todo 0.10:
 
+* solve biquad (blur) boundary init prob
+* optimize blur effect (1 pole ? / dependency stalls)
+* jpeg/png file and streaming support?
 * thresholding
 * find out why resampling code (warping) is so slow (reg->mem->reg->mem stalls?)
+* mmx profiling
 * add audio resampling in pdp_qt~
-* add some more abstractions
-* fix dimension problems on input (for now, make sure images have correct dim, else generate error)
 * use pd_error instead of post for errors
-* move to autoconf/automake/libtool
 * interface with gem
 * think about the memory allocation strategy (there is no garbage collection right now)
+* add automatic pwc detection
+* frame rate limited delay line (burst delay?)
 
 wish list:
 
+* ascii art packet stuff (yves?)
+* 3D time space interpolation
 * colour keying
 * camera controller (motion tracking ?)
 * moebius transforms  (integer inverse square root??) & other complex plane stuff
-

@@ -18,7 +18,7 @@
  *
  */
 
-
+#include "pdp_config.h"
 #include "pdp.h"
 #include <stdio.h>
 
@@ -63,8 +63,13 @@ void pdp_scope_setup(void);
 void pdp_scale_setup(void);
 void pdp_zoom_setup(void);
 void pdp_scan_setup(void);
+void pdp_scanxy_setup(void);
 void pdp_sdl_setup(void);
 void pdp_cheby_setup(void);
+void pdp_grey2mask_setup(void);
+void pdp_constant_setup(void);
+void pdp_slice_cut_setup(void);
+void pdp_slice_glue_setup(void);
 
 
 
@@ -92,9 +97,6 @@ void pdp_setup(void){
     pdp_mul_setup();
     pdp_mix_setup();
     pdp_randmix_setup();
-    pdp_xv_setup();
-    pdp_qt_setup();
-    pdp_v4l_setup();
     pdp_reg_setup();
     pdp_conv_setup();
     pdp_bq_setup();
@@ -112,9 +114,34 @@ void pdp_setup(void){
     pdp_scale_setup();
     pdp_zoom_setup();
     pdp_scan_setup();
-    pdp_sdl_setup();
+    pdp_scanxy_setup();
     pdp_cheby_setup();
+    pdp_grey2mask_setup();
+    pdp_constant_setup();
 
+
+    /* experimental stuff */
+    pdp_slice_cut_setup();
+    pdp_slice_glue_setup();
+
+
+    /* optional modules */
+
+#ifdef HAVE_PDP_QT
+    pdp_qt_setup();
+#endif
+
+#ifdef HAVE_PDP_XV
+    pdp_xv_setup();
+#endif
+
+#ifdef HAVE_PDP_SDL
+    pdp_sdl_setup();
+#endif
+
+#ifdef HAVE_PDP_V4L
+    pdp_v4l_setup();
+#endif
 
 }
 

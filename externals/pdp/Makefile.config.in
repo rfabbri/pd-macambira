@@ -1,0 +1,38 @@
+# if configure can't find the m_pd.h header         
+# specify pd's include path here and ignore the warning
+#
+#PD_CPPFLAGS=-I/path_to_pd_dir/src
+#PD_EXECUTABLE=/path_to_pd_dir/bin/pd
+PD_CPPFLAGS=@PD_CPPFLAGS@
+PD_EXECUTABLE=@PD_EXECUTABLE@
+
+
+prefix=@prefix@
+PDP_VERSION = @PDP_VERSION@
+PDP_TARGET = @PDP_TARGET@
+PDP_LIBRARY_NAME = @PDP_LIBRARY_NAME@
+PDP_OPTMOD = @PDP_OPTMOD@
+PDP_EXTRA_CPPFLAGS = @PDP_EXTRA_CPPFLAGS@
+SDL_FLAGS = -D_REENTRANT
+
+PDP_CPPFLAGS =  -I. -I/usr/X11R6/include  -I../include $(PD_CPPFLAGS) $(PDP_EXTRA_CPPFLAGS) 
+PDP_LIBS    = @LIBS@
+PDP_AFLAGS  = 
+#--gstabs
+PDP_CFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+    -Wall -W -Wstrict-prototypes -Werror \
+    -Wno-unused -Wno-parentheses -Wno-switch -DPDP_VERSION=\"$(PDP_VERSION)\" \
+   -g $(SDL_CFLAGS)
+# -Wshadow
+
+# compiler and assembler
+#CC = gcc-3.2
+#CC = gcc
+#AS = as
+
+# build rules
+
+.c.o:
+	$(CC) $(PDP_CFLAGS) $(PDP_CPPFLAGS) -o $*.o -c $*.c
+.s.o:
+	$(AS) -o $*.o $*.s $(PDP_AFLAGS)

@@ -1,17 +1,17 @@
 cd ~/pd/packet
 file ~/pd/distro/pd/bin/pd.debug
 # file ~/pd/distro/pd/bin/pd
-set args -r 44100 -alsa -frags 64 -lib pdp -nodac -noadc -path abstractions test/test_pdp_zoom2.pd
+set args -r 44100 -alsa -frags 64 -lib pdp -nodac -noadc -path abstractions doc/objects/pdp_grey2mask.pd
 # set args  -lib pdp -nodac -noadc -path abstractions test/test_pdp_thread.pd
 # set args  -lib pdp -nodac -noadc test/test_pdp_ca.pd
 # set args -r 44100 -alsa -frags 64 -lib pdp -nodac -noadc test/test_pdp_qt_read.pd 
 # dir ~/pd/distro/pd/src
+dir include
 dir modules
 dir system
 dir system/mmx
-dir scaf
-dir scaf/modules
-dir scaf/system
+dir scaf/include
+dir scaf/pdp
 
 # until i figure out how to stop pd without hanging it
 # or set a breakpoint before a library is loaded

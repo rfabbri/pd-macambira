@@ -19,7 +19,6 @@
  */
 
 
-
 #include "pdp.h"
 #include "pdp_llconv.h"
 #include <quicktime/lqt.h>
@@ -169,8 +168,15 @@ static void pdp_qt_close(t_pdp_qt *x)
 void  pdp_qt_create_pdp_packet(t_pdp_qt *x)
 {
     t_pdp *header;
-    int nbpixels = x->x_video_width * x->x_video_height;
-    //int packet_size = (x->x_qt_cmodel == BC_RGB888) ? (nbpixels << 1) : (nbpixels + (nbpixels >> 1)) << 1;
+
+
+    /* round to next legal size */
+    /* if size is illegal, image distortion will occur */
+    u32 w  = pdp_imageproc_legalwidth(x->x_video_width);
+    u32 h  = pdp_imageproc_legalheight(x->x_video_height);
+
+    
+    int nbpixels = w * h;
     int packet_size = (nbpixels + (nbpixels >> 1)) << 1;
 
 
@@ -180,8 +186,8 @@ void  pdp_qt_create_pdp_packet(t_pdp_qt *x)
 
     //header->info.image.encoding = (x->x_qt_cmodel == BC_RGB888) ? PDP_IMAGE_GREY : PDP_IMAGE_YV12;
     header->info.image.encoding = PDP_IMAGE_YV12;
-    header->info.image.width = x->x_video_width;
-    header->info.image.height =  x->x_video_height;
+    header->info.image.width = w;
+    header->info.image.height =  h;
 }
 
 
@@ -939,3 +945,5 @@ void pdp_qt_setup(void)
 #ifdef __cplusplus
 }
 #endif
+
+

@@ -149,16 +149,14 @@ static void pdp_noise_bang(t_pdp_noise *x)
 
     /* release the packet */
 
-}
 
+}
 
 static void pdp_noise_dim(t_pdp_noise *x, t_floatarg w, t_floatarg h)
 {
-    if (w<32.0f) w = 32.0f;
-    if (h<32.0f) h = 32.0f;
-
-    x->x_width = (unsigned int)w;
-    x->x_height = (unsigned int)h;
+    x->x_width  = pdp_imageproc_legalwidth((int)w);
+    x->x_height = pdp_imageproc_legalheight((int)h);
+    //post("dims %d %d",  x->x_width, x->x_height);
 }
 
 

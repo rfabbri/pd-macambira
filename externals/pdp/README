@@ -1,4 +1,4 @@
-PDP - Pure Data Packet v0.8.3
+PDP - Pure Data Packet v0.9
 a packet processing library for pure data
 
 Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
@@ -26,18 +26,13 @@ This external pd library is a framework for image/video processing (and
 other raw data packets) that is fast, simple and flexible and as much 
 as possible compatible with the pd messaging system.
 
-Unfortunately, since the main idea is to "have something for myself to 
-play with", i haven't payed much attention to portability or even  
-compilablility yet. So if some of the requirements are missing on your 
-system, you'll have to tinker a bit to get it working until i move to 
-automatic configuration and building...
 
 Features:
 
 * packet formats: greyscale and YV12 encoded images,
   binary cellular automata (CA)
 * sources: noise, video4linux and quicktime (with audio), CA
-* sink: xvideo display
+* sinks: xvideo display, sdl
 * filters: convolution, biquad time, biquad space, CA
 * warping: rotate, zoom, stretch
 * transforms: colour translation/scaling, grey->palette
@@ -47,12 +42,6 @@ Features:
 * minimal forth system for defining CA rules (only for mmx)
 
 
-Implementation:
-
-* mmx/c 16bit internal integer processing
-* sort of cache optimized (locality + minimal memory usage)
-
-
 Requirements:
 
 * pd
@@ -60,49 +49,62 @@ Requirements:
 * a video4linux device for video input. special support for 
 philips webcam included.
 * libquicktime (not quicktime4linux!) for quicktime playback.
-* an X display with XVideo extension for video display
-* libsdl
+* an X display with XVideo extension or SDL for video display.
 
 
 Documentation:
 
-Have a look in doc/ for documentation. The file doc/reference.txt 
-contains a list of all objects. doc/introduction has some basic
-facts on using pdp. doc/objects is a reference doc for all the
-objects and doc/examples contains some more example patches.
+When you use "make install" to install pd, all docs will be in
+the pd doc directory. Right click on an object and select help
+for a help patch. The pdp directory in pd's doc contains a
+reference.txt file which lists all objects and abstractions and
+an introduction and example section. 
 
-The directory abstractions/ has some abstractions using the pdp 
-objects (some specific filters) that can serve as example.
-
-For developer docs see modules/README, scaf/README. 
+NOTE: all help patches use a pdp_help_input and pdp_help_output
+abstraction. you can edit these to choose which input or output
+object you want for the help patches.
 
 
 Building:
 
-Edit Makefile.config to reflect your system settings. For now this 
-should be the pd dir, the pdp dir, a toggle for philips web cam 
-support and the compilation target (linux / linux_mmx). 
-type "make" in the top directory. Remember to type 
-"make clean all" after editing Makefile.config
+./configure
+make
 
+Options for configure:
+--enable-mmx		compile with mmx support
+--enable-pwc		compile with philips webcam support
 
-Using:
+If pd is not installed in /usr/local you'll have to
+specify the prefix on the configure command line with
 
-launch pd with the options -lib $PDP_DIR/pdp -path $PDP_DIR/abstractions
+./configure --prefix=dir
+
+type
+
+make install
+
+To install pd in $prefix/lib/pd: the library in externs/
+the abstractions in extra/ and the documentation in doc/5.reference
+and doc/pdp
+
+NOTE: If you're not using the standard pd install location, and have
+everything in a single tree, just untar pdp next to the pd source tree.
 
 
 Bugs:
 
-see the TODO file
+See the TODO file. Apart from the few items listed on top of this
+file, pdp is fairly stable. If you encounter a crash please consider
+sending a bug report.
 
 
 Additional Remarks: 
 
-* If some of the modules don't compile due to some missing libraries, 
-you can try to comment out the offending code in modules/Makefile and 
-system/pdp.c If compilation or linking fails due to other reasons, 
-please let me know. If you have both libquicktime and quicktime4linux
-installed, make sure pdp.pd_linux loads the right library.
+* The modules that depend on system libraries only get compiled when
+the configure script can locate them. If compilation or linking fails 
+please let me know. NOTE: If you have libquicktime and quicktime4linux
+installed, this can give problems with the configure script. Consider
+removing quicktime4linux. (libquicktime is a drop-in replacement).
 
 * The reason i use YV12 and not RGB is simple: it's faster, and for 
 linear operations it doesn't make much difference. Most camera's and
@@ -130,13 +132,9 @@ thread. Note that when using the pdp thread, the control flow is no
 longer depth first. Additinal delays will be introduced.
 
 * There have been some requests for an osx port, but i wil probably not
-do this myself (at least not right now). However, i've ported all
-the mmx code to c, so it should work on other architectures as well.
-This should ease porting a bit for anyone who wants to give it a try. 
-Also i've moved all the image conversion routines to pdp_llconv.c  
-This means porting is reduced to writing new objects for the os specific 
-stuff like movie playback&record and live video input. Thanks to Martin
-Pi we now have sdl support for video output.
+do this myself (at least not right now). However, the platform
+independent part of pdp compiles on darwin, although it is not of much
+use yet without input and output modules.
 
 * Have a look at Yves Degoyon's PiDiP library. It contains some extra 
 effects (from EffecTV and FreeJ), a quicktime recording object, some 
@@ -150,8 +148,11 @@ suggested codec is jpeg (photo) and uncompressed audio with the same
 samplerate as the one pd is using. (hint: compile libquicktime with
 mmx jpeg support)
 
-* The cellular automata object (pdp_ca) is now moved to a separate lib.
-It requires mmx to be compiled. see the scaf/ dir.
+* Writing new objects is not much different than normal pd externs.
+Pdp just adds some functions to the pd kernel for package allocation,
+manipulation and communication. The api is very raw to keep it as
+simple as possible. In the future there will probably be a layer on
+top of this that will make things a bit less spartan.
 
 * New versions of this package can be found at
 http://zwizwa.fartit.com/pd/pdp
@@ -164,7 +165,6 @@ abstractions/		some abstractions that use the pdp objects
 doc/introduction/	getting started with pdp
 doc/examples/		some example patches
 doc/objects/		pd style reference documentation
-debug/			debug scripts
 include/		header files
 modules/		pdp module code
 scaf/			CA extension lib (needs to be compiled separately)
@@ -173,13 +173,12 @@ system/mmx/		mmx assembler files
 
 
 
-Please let me know if you discover a bug or think something doesn't work 
-right. Code, documentation or example patches are more than welcome of 
-course.
+Bugreports, feature suggestions, code, documentation, example patches
+and general comments and questions are welcome.
 
 Have Fun,
 
 Tom
 
 
-last modified: 2003/02/03
+last modified: 2003/02/24

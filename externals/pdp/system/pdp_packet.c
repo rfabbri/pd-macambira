@@ -80,10 +80,13 @@ pdp_packet_new(unsigned int datatype, unsigned int datasize /*without header*/)
 	    /* remark: if p->size >= totalsize we can give away the packet */
 	    /* but that would lead to unefficient use if we have a lot of packets */
 	    /* of different sizes */
-	    if ((p->users == 0) && (p->size == totalsize) && (p->type == datatype)){
+	    if ((p->users == 0) && (p->size == totalsize)){
 	      //post("pdp_new_object: can reuse %d", i);
-	      p->users = 1;
-	      return i;
+		memset(p, 0, PDP_HEADER_SIZE); //initialize header to 0
+		p->type = datatype;
+		p->size = totalsize;
+		p->users = 1;
+		return i;
 	    }
 	    else{
 	      //post("pdp_new_object: can't reuse %d, (%d users)", i, p->users);
@@ -96,6 +99,7 @@ pdp_packet_new(unsigned int datatype, unsigned int datasize /*without header*/)
 	    align = ((unsigned int)p) & (PDP_ALIGN - 1);
 	    if (align) post("pdp_new_object: warning data misaligned by %x", align);
 	    pdp_stack[i] = p;
+	    memset(p, 0, PDP_HEADER_SIZE); //initialize header to 0
 	    p->type = datatype;
 	    p->size = totalsize;
 	    p->users = 1;

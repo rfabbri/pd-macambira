@@ -265,8 +265,11 @@ static void pdp_gradient_input_0(t_pdp_gradient *x, t_symbol *s, t_floatarg f)
 
 
 	/* add the process method and callback to the process queue */
-
-	pdp_queue_add(x, pdp_gradient_process, pdp_gradient_sendpacket, &x->x_queue_id);
+	// since the process method creates a packet, this is not processed in the thread
+	// $$$TODO: fix this
+	//pdp_queue_add(x, pdp_gradient_process, pdp_gradient_sendpacket, &x->x_queue_id);
+	pdp_gradient_process(x);
+	pdp_gradient_sendpacket(x);
     }
 
 }

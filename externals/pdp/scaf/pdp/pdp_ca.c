@@ -33,6 +33,8 @@ t_class *pdp_image2ca_class;   // converter from grey/yv12 -> ca
 // *********************** CA CLASS STUFF *********************
 
 
+// this is defined in the makefile
+// #define PDP_CA_RULES_LIB "/path/default.scafo"
 
 #define PDP_CA_STACKSIZE 256
 #define PDP_CA_MODE_1D 1
@@ -64,6 +66,7 @@ typedef struct pdp_ca_struct
     char *x_ca_rulenames;
     int x_ca_nbrules;
     char ** x_ca_rulename;
+    t_symbol *x_lastrule;
     
     /* nb of iterations */
     int x_iterations;
@@ -477,6 +480,7 @@ static void pdp_ca_rule_string(t_pdp_ca *x, char *c)
     /* ok, so store routine address */
     else{
 	x->x_ca_routine = ca_routine;
+	x->x_lastrule = gensym(c);
     }
 }
 
@@ -503,7 +507,7 @@ static void pdp_ca_rule_index(t_pdp_ca *x, t_float f)
 
     /* set rule by index */
     pdp_ca_rule_string(x, x->x_ca_rulename[i]);
-    
+
 }
 
 
@@ -534,7 +538,8 @@ static void pdp_ca_printrules(t_pdp_ca *x)
 
 }
 
-static void pdp_ca_open(t_pdp_ca *x, t_symbol *s)
+/* open code library */
+static void pdp_ca_openlib(t_pdp_ca *x, t_symbol *s)
 {
 
     char *c;
@@ -545,8 +550,9 @@ static void pdp_ca_open(t_pdp_ca *x, t_symbol *s)
 
     /* try to open new lib */
     if (!(x->x_ca_libhandle = dlopen(s->s_name, RTLD_NOW))){
-	post("pdp_ca: can't open ca library %s, %s", s->s_name, dlerror());
+	post("pdp_ca: can't open ca library %s\n%s", s->s_name, dlerror());
 	x->x_ca_libhandle = 0;
+	return;
     }
 
     /* scan for valid rules */
@@ -579,8 +585,57 @@ static void pdp_ca_open(t_pdp_ca *x, t_symbol *s)
     /* print rule names */
     //pdp_ca_printrules(x);
 
+    /* set last selected rule */
+    pdp_ca_rule(x, x->x_lastrule);
   
     
+}
+
+/* compile source file and open resulting code library */
+static void pdp_ca_opensrc(t_pdp_ca *x, t_symbol *s)
+{
+    #define TMPSIZE 1024
+    char commandline[TMPSIZE];
+    char library[TMPSIZE];
+    int status;
+
+    /*  setup compiler args */
+    snprintf(library, TMPSIZE, "%so", s->s_name);
+    snprintf(commandline, TMPSIZE, "scafc %s %s", s->s_name, library);
+
+
+
+    /* call compiler */
+    if (system(commandline)) 
+    {
+	post ("pdp_ca: error compiling %s", s->s_name);
+    }
+    else 
+    {
+	post("pdp_ca: compiled %s", s->s_name);
+	pdp_ca_openlib(x, gensym(library));
+    }
+}
+
+/* open a source file or a library, depending on extension */
+static void pdp_ca_open(t_pdp_ca *x, t_symbol *s)
+{
+    char *name = s->s_name;
+    char *end = name;
+    while(*end) end++;
+    if (end == name){
+	post("pdp_ca: invalid file name");
+	return;
+    }
+    /* if the name ends with 'o' assume it is a library */
+    if (end[-1] == 'o'){
+	pdp_ca_openlib(x, s);
+    }
+    /* otherwize, assume it is a source file */
+    else{
+	pdp_ca_opensrc(x, s);
+    }
+
 }
 
 /* init the current packet with random noise */
@@ -736,6 +791,8 @@ void *pdp_ca_new(void)
     pdp_ca_fullscreen1d(x, 0);
 
     x->x_packet_type = gensym("grey");
+    x->x_lastrule = gensym("gameoflife");
+    pdp_ca_openlib(x, gensym(PDP_CA_RULES_LIB));
 
     return (void *)x;
 }
@@ -878,9 +935,12 @@ void pdp_ca_setup(void)
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_printrules, gensym("rules"), A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rand, gensym("random"), A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_newca, gensym("ca"), A_FLOAT, A_FLOAT, A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_newca, gensym("dim"), A_FLOAT, A_FLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_horshift16, gensym("hshift16"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_vershift, gensym("vshift"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_close, gensym("close"), A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_openlib, gensym("openlib"),  A_SYMBOL, A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_opensrc, gensym("opensrc"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_open, gensym("open"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rule, gensym("rule"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rule_index, gensym("ruleindex"),  A_FLOAT, A_NULL);

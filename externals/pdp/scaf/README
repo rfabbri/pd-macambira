@@ -51,12 +51,16 @@ Requirements:
 
 Building:
 
-Edit Makefile.config to reflect your system settings. For now this 
-should be the pd dir, the pdp dir and the pdp_scaf dir.
+./configure
+make
+make install
 
-type "make" in the top directory. Remember to type "make clean all" 
-after editing Makefile.config
-
+If you don't have both libraries in the same dir and want to keep
+it that way, hardcode the paths in Makefile.config.in and run 
+configure. You need to do "make install" to install the scaf compiler 
+"scafc" and the default ruleset. This is to be able to load plain 
+(text) rule files and have the default rules loaded when you create
+a pdp_ca object.
 
 Using:
 
@@ -71,9 +75,9 @@ Directory structure:
 
 include/	header files
 pdp/		pdp external code
-system/		forth system code
+compiler/	forth system code
 test/		some test patches (cryptic doc)
-modules/	ca rule libraries
+rules/		ca rule libraries
 
 
 

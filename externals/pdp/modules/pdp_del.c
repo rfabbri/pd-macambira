@@ -23,29 +23,19 @@
 #include "pdp.h"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 typedef struct pdp_del_struct
 {
-  t_object x_obj;
-  t_float x_f;
+    t_object x_obj;
+    t_float x_f;
   
-  t_outlet *x_outlet0;
+    t_outlet *x_outlet0;
 
-  int *x_packet;
-  int x_order;
-  int x_head;
-  int x_delay;
+    t_outlet **x_outlet;
+
+    int *x_packet;
+    int x_order;
+    int x_head;
+    int x_delay;
 } t_pdp_del;
 
 
@@ -63,7 +53,7 @@ static void pdp_del_input_0(t_pdp_del *x, t_symbol *s, t_floatarg f)
     /* if this is a process message, start the processing + propagate stuff to outputs */
 
     if (s == gensym("register_ro")){
-      in = (x->x_head & (x->x_order-1));
+      in = (x->x_head % x->x_order);
       //post("pdp_del: marking unused packed id=%d on loc %d", x->x_packet[0], in);
       pdp_packet_mark_unused(x->x_packet[in]);
       packet = pdp_packet_copy_ro((int)f);
@@ -71,7 +61,7 @@ static void pdp_del_input_0(t_pdp_del *x, t_symbol *s, t_floatarg f)
       //post("pdp_del: writing packed id=%d on loc %d", packet, in);
     }
     else if (s == gensym("process")){
-      out = ((x->x_head + x->x_delay) & (x->x_order-1));
+      out = (((x->x_head + x->x_delay)) % x->x_order);
       packet = x->x_packet[out];
 
       if (-1 != packet){
@@ -83,7 +73,7 @@ static void pdp_del_input_0(t_pdp_del *x, t_symbol *s, t_floatarg f)
       else {
 	//post("pdp_del: packet %d is empty", out);
       }
-      x->x_head--;
+      x->x_head = (x->x_head + x->x_order - 1) % x->x_order;
     }
 
 
@@ -132,39 +122,19 @@ void *pdp_del_new(t_floatarg forder, t_floatarg fdel)
   int i;
   t_pdp_del *x = (t_pdp_del *)pd_new(pdp_del_class);
 
-
   del = order;
   order++;
 
   if (del < 0) del = 0;
-  
-
   if (order <= 2) order = 2;
-  else {
 
-    order--;
-    logorder = 1;
-
-
-    while ((order | 1) != 1) {
-      order >>= 1;
-      logorder++;
-    }
-
-    order = 1 << logorder;
-  }
-
-  post("pdp_del: order = %d", order);
+  //post("pdp_del: order = %d", order);
 
   x->x_order = order;
   x->x_packet = (int *)malloc(sizeof(int)*order);
   for(i=0; i<order; i++) x->x_packet[i] = -1;
-
   x->x_delay = del;
-
-
   inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("delay"));
-
   x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
 
 
