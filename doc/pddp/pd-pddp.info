@@ -1,6 +1,6 @@
 Title Pure Data Documentation Project
 Version MSP standard paths
-Description Dave Sabine's Docs
+Description Dave Sabine's enhanced help patches for many Pd objects.
 DefaultLocation /usr/local/lib
 DeleteWarning 
 
