@@ -353,10 +353,10 @@ static void som_rule(t_som *x, t_symbol *s, int argc, t_atom *argv)
 
   if (argv->a_type==A_FLOAT) rule=atom_getint(argv);
   else if (argv->a_type==A_SYMBOL) {
-    char *name=atom_getsymbol(argv)->s_name;
-    if      (!strcmp(name, "instar")  && !strcmp(name, "INSTAR"))  rule=INSTAR;
-    else if (!strcmp(name, "outstar") && !strcmp(name, "OUTSTAR")) rule=OUTSTAR;
-    else if (!strcmp(name, "kohonen") && !strcmp(name, "KOHONEN")) rule=KOHONEN;
+    char name=*atom_getsymbol(argv)->s_name;
+    if (name=='I' || name=='i')  rule=INSTAR;
+    else if (name=='O' || name=='O')  rule=OUTSTAR;
+    else if (name=='K' || name=='k')  rule=KOHONEN;
   }
 
   switch (rule) {
