@@ -1,13 +1,12 @@
-/* Copyright (c) 2003-2004 Tim Blechmann.                                       */
+/* Copyright (c) 2004 Tim Blechmann.                                            */
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL     */
 /* WARRANTIES, see the file, "COPYING"  in this distribution.                   */
 /*                                                                              */
+/* sym2num interpretes a symbol as decimal number that is related to the ascii  */
+/* representation.                                                              */
 /*                                                                              */
-/* tbext is the collection of some external i wrote.                            */
-/* some are useful, others aren't...                                            */
 /*                                                                              */
-/*                                                                              */
-/* tbext uses the flext C++ layer for Max/MSP and PD externals.                 */
+/* sym2num uses the flext C++ layer for Max/MSP and PD externals.               */
 /* get it at http://www.parasitaere-kapazitaeten.de/PD/ext                      */
 /* thanks to Thomas Grill                                                       */
 /*                                                                              */
@@ -33,42 +32,59 @@
 /*                                                                              */
 /*                                                                              */
 /*                                                                              */
-/* coded while listening to: Hamid Drake & Assif Tsahar: Soul Bodies, Vol. 1    */
-/*                           I.S.O.: I.S.O                                      */
+/* coded while listening to: Phil Minton & Veryan Weston: Ways                  */
+/*                                                                              */
+/*                                                                              */
 /*                                                                              */
 
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.05"
+
+#include <cstring>
+#include <cmath>
+
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
 #error upgrade your flext version!!!!!!
 #endif
 
-void ttbext_setup()
+class sym2num: public flext_base
 {
-  post("\nTBEXT: by tim blechmann");
-  post("version "TBEXT_VERSION);
-  post("compiled on "__DATE__);
-  post("contains: tbroute(~), tbfft1~, tbfft2~, bufline~, fftgrrev~");
-  post("          fftgrsort~, fftgrshuf~, him~, sym2num\n");
+  FLEXT_HEADER(sym2num,flext_base);
 
-  FLEXT_SETUP(tbroute);
-  FLEXT_DSP_SETUP(tbsroute);
-  /* obsolete: FLEXT_DSP_SETUP(tbsig); */
-  /* obsolete: FLEXT_DSP_SETUP(tbpow); */
-  FLEXT_DSP_SETUP(tbfft1);
-  FLEXT_DSP_SETUP(tbfft2);
-  FLEXT_DSP_SETUP(fftbuf);
-  FLEXT_DSP_SETUP(fftgrsort);
-  FLEXT_DSP_SETUP(fftgrshuf);
-  FLEXT_DSP_SETUP(fftgrrev);
-  FLEXT_DSP_SETUP(him);
-  FLEXT_SETUP(sym2num);
+public:
+    sym2num();
+  
+protected:
+    void m_symbol(t_symbol *s);
 
+private:
 
+    FLEXT_CALLBACK_S(m_symbol);
+};
 
+FLEXT_LIB("sym2num",sym2num);
+
+sym2num::sym2num()
+{
+  AddInSymbol();
+  
+  FLEXT_ADDMETHOD(0,m_symbol);
+
+  AddOutFloat();
 }
 
-FLEXT_LIB_SETUP(tbext,ttbext_setup)
+void sym2num::m_symbol(t_symbol * s)
+{
+    const char* str = GetString(s);
+    
+    int length = strlen(str);
+    
+    int ret(0);
+    while (length--)
+    {
+	ret+=str[length]*pow(2,length);
+    }
+    ToOutFloat(0,ret);
+}
