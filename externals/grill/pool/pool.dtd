@@ -1,0 +1,5 @@
+<!ELEMENT pool ((dir|value)*)>
+<!ELEMENT dir ((dir|value)*)>
+<!ATTLIST dir key CDATA #REQUIRED>
+<!ELEMENT value ANY>
+<!ATTLIST value key CDATA #REQUIRED>

@@ -52,16 +52,22 @@ o CodeWarrior: edit "pool.cw" and build
 
 Version history:
 
-0.1.1:
+0.2.0:
 - attributes (pool,private,echodir,absdir)
 - added "geti" message for retrieval of a value at an index
 - fixed bug in "get" message if key not present
 - adapted source to flext 0.4.1 - register methods at class creation
+- extensive use of hashing for keys and directories
+- database can be saved/loaded as XML data
 
 0.1.0:
 - first public release
 
 ---------------------------------------------------------------------------
+
+BUGS:
+- pool does not handle symbols with spaces or all digits
+
 
 TODO list:
 

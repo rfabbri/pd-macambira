@@ -101,6 +101,10 @@ SOURCE=.\pool.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\pool.dtd
+# End Source File
+# Begin Source File
+
 SOURCE=.\pool.h
 # End Source File
 # Begin Source File
