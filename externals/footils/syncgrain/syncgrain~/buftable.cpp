@@ -51,7 +51,7 @@ buftable::~buftable()
 
 float buftable::Lookup(int pos)
 {
-	if ( pos < GetLen() - 1 && pos >= 0)
+	if ( buf && pos < GetLen() - 1 && pos >= 0)
 	{
 		return buf->Data()[pos];
 	}

@@ -52,7 +52,12 @@ class buftable : public Table
 		}
 		float* GetTable()
 		{ 
-			return buf->Data(); 
+			if ( buf )
+			{
+				return buf->Data(); 
+			}
+			else
+				return NULL;
 		}
 		float Lookup(int pos);
 		char* ErrorMessage();
