@@ -1,0 +1,677 @@
+#N canvas 0 0 653 613 12;
+#N canvas 132 0 591 609 What_is_an_array_in_PD 0;
+#X text 27 17 WHAT IS AN ARRAY IN PURE DATA?;
+#X text 45 42 Arrays \, in most programming environments \, are considered
+to be "a sequence of objects all of which have the same variable type"
+wherein each object is called an element and the elements are numbered
+in a row 0 \, 1 \, 2 \, 3 \, etc. These numbers are called indices.
+Each index holds a corresponding value.;
+#X text 46 222 Arrays in PD look like this:;
+#N canvas 0 0 450 300 graph18 0;
+#X array example_array 100 float 0;
+#X coords 0 1 99 -1 200 140 1;
+#X restore 277 225 graph;
+#X text 63 486 1 Right-click on the array and select "Properties" from
+the menu. Two dialogue boxes will open - one called "graph" and one
+called "array".;
+#X text 64 543 2 Then right-click again on the array and select "Help"
+from the menu. The window that opens is the table.pd help document.
+;
+#X text 45 148 All of this is true in PD \, except that arrays in PD
+can only hold floating point data. (other data types in PD are called
+"lists" or "anythings" and require different tools to manipulate them.)
+;
+#X text 45 378 The array above is actually only the horizontal line!
+The rectangle surrounding the array is called a "graph". These two
+objects are separate \, but PD creates both simoultaneously for purposes
+of convenience. These two objects together are called a "table". To
+see what I mean by all of this:;
+#X restore 43 42 pd What_is_an_array_in_PD;
+#N canvas 118 1 608 615 How_to_manipulate_arrays_in_PD 0;
+#X text 13 5 HOW TO MANIPULATE ARRAYS IN PD;
+#N canvas 0 0 452 302 graph28 0;
+#X array exampleArray 67 float 0;
+#X coords 0 2 67 -2 200 140 1;
+#X restore 369 451 graph;
+#N canvas 2 29 722 269 Setting_the_size_of_an_array 0;
+#X msg 44 88 \; exampleArray resize \$1;
+#X floatatom 44 66 5 0 0 0 - - -;
+#X text 16 18 1 The size of an array can be set using the array's dialogue
+box. Or with a [send] message like below.;
+#X text 15 65 2;
+#X text 231 91 same as;
+#X floatatom 305 66 5 0 0 0 - - -;
+#X obj 305 114 s exampleArray;
+#X msg 305 88 resize \$1;
+#X text 19 158 Note that new elements always have a default value of
+zero when you make an array larger. Also note that if you make arrays
+smaller \, you may lose data as each element is deleted from the end
+of the array.;
+#X connect 1 0 0 0;
+#X connect 5 0 7 0;
+#X connect 7 0 6 0;
+#X restore 24 270 pd Setting_the_size_of_an_array;
+#N canvas 4 30 720 447 Concatenate_two_arrays 0;
+#X text 19 10 This example assumes that we already know the size of
+the two arrays which will be concatenated. This process will fill NewArray
+with the contents of exampleArray and concatArray.;
+#N canvas 0 0 450 300 graph33 0;
+#X array concatArray 15 float 1;
+#A 0 -0.700355 -0.371783 -0.443212 -0.700355 -0.714641 -0.386069 0.0425035
+0.399647 0.513933 0.399647 0.128218 -0.128925 -0.21464 -0.0289252 -0.700355
+;
+#X coords 0 1 14 -1 200 140 1;
+#X restore 492 25 graph;
+#N canvas 0 0 450 300 graph34 0;
+#X array NewArray 82 float 0;
+#X coords 0 1 81 -1 300 140 1;
+#X restore 389 267 graph;
+#X obj 125 66 bng 15 250 50 0 empty empty Bang_me 18 7 0 8 -262144
+-1 -1;
+#X obj 28 96 until;
+#X obj 28 171 f;
+#X obj 58 171 + 1;
+#X obj 28 286 tabread exampleArray;
+#X obj 28 340 tabwrite NewArray;
+#X obj 141 311 tabread concatArray;
+#X text 372 194 This example is much more interesting if;
+#X text 373 212 you draw new values into each array with;
+#X text 373 230 your mouse - then reset and bang again.;
+#X obj 150 134 arraysize exampleArray;
+#X obj 125 163 arraysize concatArray;
+#X obj 125 188 +;
+#X msg 178 241 \; NewArray resize \$1;
+#X text 28 75 loop;
+#X obj 28 219 moses;
+#X obj 141 254 -;
+#X obj 125 85 t b b b;
+#X obj 125 212 t f f;
+#X msg 47 144 0;
+#X obj 176 109 s clr1;
+#X obj 47 119 r clr1;
+#X connect 3 0 20 0;
+#X connect 4 0 5 0;
+#X connect 5 0 6 0;
+#X connect 5 0 18 0;
+#X connect 5 0 8 1;
+#X connect 6 0 5 1;
+#X connect 7 0 8 0;
+#X connect 9 0 8 0;
+#X connect 13 0 15 1;
+#X connect 13 0 19 1;
+#X connect 13 0 18 1;
+#X connect 14 0 15 0;
+#X connect 15 0 21 0;
+#X connect 18 0 7 0;
+#X connect 18 1 19 0;
+#X connect 19 0 9 0;
+#X connect 20 0 14 0;
+#X connect 20 1 13 0;
+#X connect 20 2 23 0;
+#X connect 21 0 4 0;
+#X connect 21 1 16 0;
+#X connect 22 0 5 1;
+#X connect 24 0 22 0;
+#X restore 24 371 pd Concatenate_two_arrays;
+#N canvas 4 30 735 395 Join_array_elements_into_a_list 0;
+#X text 16 12 JOIN ARRAY ELEMENTS INTO A LIST;
+#X obj 22 163 bng 15 250 50 0 empty empty Bang_me 18 7 0 8 -24198 -1
+-1;
+#X obj 23 241 until;
+#X obj 24 320 tabread exampleArray;
+#X obj 216 235 pack s f;
+#X obj 216 183 t b f;
+#X obj 24 292 f;
+#X obj 58 292 + 1;
+#X obj 24 348 s \$1-value;
+#X obj 216 157 r \$1-value;
+#X obj 216 261 route list;
+#X obj 519 210 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 519 229 savepanel;
+#X msg 519 252 \; exampleArray write \$1;
+#X obj 283 353 print;
+#X text 289 330 store the list;
+#X obj 283 312 textfile;
+#X msg 345 285 rewind;
+#X obj 216 209 symbol add2;
+#X obj 310 240 bng 15 250 50 0 empty empty THEN_Print_the_list 18 7
+0 8 -24198 -1 -1;
+#X text 451 308 can be achieved by saving the;
+#X text 451 324 array elements to a text file;
+#X text 452 341 using the savepanel and write;
+#X text 453 357 message.;
+#X text 452 292 Alternatively \, a similar result;
+#X obj 22 183 arraysize exampleArray;
+#X msg 129 261 clear;
+#X obj 310 261 t b b;
+#X msg 74 260 0;
+#X text 29 37 In some other programming environments \, including Visual
+Basic and Java (among others) \, there are functions which join all
+elements of an array into a list. This example shows how this functionality
+can be duplicated in PD. This example uses the elements of exampleArray
+from the previous help window. The list can either be printed to the
+terminal window \, or it can be saved to a text file.;
+#X obj 23 214 t f b;
+#X connect 1 0 25 0;
+#X connect 2 0 6 0;
+#X connect 3 0 8 0;
+#X connect 4 0 10 0;
+#X connect 5 0 18 0;
+#X connect 5 1 4 1;
+#X connect 6 0 7 0;
+#X connect 6 0 3 0;
+#X connect 7 0 6 1;
+#X connect 9 0 5 0;
+#X connect 10 0 16 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 16 0 14 0;
+#X connect 17 0 16 0;
+#X connect 18 0 4 0;
+#X connect 19 0 27 0;
+#X connect 25 0 30 0;
+#X connect 26 0 16 0;
+#X connect 27 0 16 0;
+#X connect 27 1 17 0;
+#X connect 28 0 6 1;
+#X connect 30 0 2 0;
+#X connect 30 1 28 0;
+#X connect 30 1 26 0;
+#X restore 24 397 pd Join_array_elements_into_a_list;
+#N canvas 2 29 719 337 Getting_the_size_of_an_array 0;
+#X text 15 11 GETTING THE SIZE OF AN ARRAY;
+#X text 34 34 If you deal with arrays often \, you will want to download
+the [arraysize] external written by PIX. PD lacks a native object for
+this purpose and I'm afraid that without this external this functionality
+is impossible in PD.;
+#X obj 38 127 arraysize exampleArray;
+#X obj 38 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 38 152 5 0 0 0 - - -;
+#X text 35 183 Having said that...PD arrays accept a "print" command
+which will output important array information to the terminal window.
+Like below:;
+#X msg 40 258 \; exampleArray print;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X restore 24 320 pd Getting_the_size_of_an_array;
+#N canvas 0 31 721 390 Reversing_an_array 0;
+#X text 20 15 REVERSING AN ARRAY;
+#X text 23 35 When an array is reversed \, as the name implies the
+first element becomes the last and the last becomes the first. When
+viewing this example \, please be sure you can see the "exampleArray"
+in the previous window.;
+#X obj 110 109 bng 15 250 50 0 empty empty Reverse_me 18 7 0 8 -262144
+-1 -1;
+#X obj 110 128 arraysize exampleArray;
+#X obj 110 200 until;
+#X obj 176 228 + 1;
+#X obj 144 228 f;
+#X obj 135 176 s \$1-length;
+#X obj 169 281 tabread exampleArray;
+#X obj 313 342 table tempArray;
+#X obj 110 152 t f f f;
+#X obj 234 196 s tempArray;
+#X msg 234 172 resize \$1;
+#X obj 65 308 tabwrite tempArray;
+#X obj 510 41 sel;
+#X obj 586 31 - 1;
+#X obj 586 7 r \$1-length;
+#X obj 144 254 t f f f;
+#X obj 57 278 s \$1-eof;
+#X obj 510 8 r \$1-eof;
+#X obj 510 113 until;
+#X obj 510 88 f;
+#X obj 510 161 f;
+#X obj 542 161 - 1;
+#X obj 561 108 r \$1-length;
+#X obj 529 64 r \$1-length;
+#X obj 510 213 tabread tempArray;
+#X obj 510 345 tabwrite exampleArray;
+#X obj 574 265 f;
+#X obj 593 241 r \$1-length;
+#X obj 574 314 mod;
+#X obj 593 289 r \$1-length;
+#X obj 604 265 + 1;
+#X obj 510 186 t f b;
+#X obj 561 131 - 1;
+#X text 13 346 Copies array to a temporary location.;
+#X msg 327 124 0;
+#X obj 327 148 s clr2;
+#X obj 443 150 r clr2;
+#X obj 163 200 r clr2;
+#X connect 2 0 3 0;
+#X connect 2 0 36 0;
+#X connect 3 0 10 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 1;
+#X connect 6 0 5 0;
+#X connect 6 0 17 0;
+#X connect 8 0 13 0;
+#X connect 10 0 4 0;
+#X connect 10 1 7 0;
+#X connect 10 2 12 0;
+#X connect 12 0 11 0;
+#X connect 14 0 21 0;
+#X connect 15 0 14 1;
+#X connect 16 0 15 0;
+#X connect 17 0 18 0;
+#X connect 17 1 8 0;
+#X connect 17 2 13 1;
+#X connect 19 0 14 0;
+#X connect 20 0 22 0;
+#X connect 21 0 20 0;
+#X connect 22 0 23 0;
+#X connect 22 0 33 0;
+#X connect 23 0 22 1;
+#X connect 24 0 34 0;
+#X connect 25 0 21 1;
+#X connect 26 0 27 0;
+#X connect 28 0 30 0;
+#X connect 28 0 32 0;
+#X connect 29 0 28 1;
+#X connect 30 0 27 1;
+#X connect 31 0 30 1;
+#X connect 32 0 28 1;
+#X connect 33 0 26 0;
+#X connect 33 1 28 0;
+#X connect 34 0 22 1;
+#X connect 36 0 37 0;
+#X connect 38 0 22 1;
+#X connect 39 0 6 1;
+#X restore 24 474 pd Reversing_an_array;
+#N canvas 2 30 719 390 Popping_and_Pushing_arrays 0;
+#X obj 62 181 bng 15 250 50 0 empty empty Pop_me -18 -6 0 8 -262144
+-1 -1;
+#X obj 134 199 arraysize exampleArray;
+#X obj 134 294 tabread exampleArray;
+#X floatatom 134 318 0 0 0 0 - - -;
+#X obj 99 173 t b b;
+#X obj 51 320 - 1;
+#X msg 51 346 \; exampleArray resize \$1;
+#X floatatom 158 223 0 0 0 0 - - -;
+#X text 175 318 value of last element;
+#X obj 458 188 bng 15 250 50 0 empty empty Push_me 18 7 0 8 -262144
+-1 -1;
+#X text 31 33 I got this idea from Java \, which provides a method
+to "pop" an array. The "pop" method will remove the last element in
+the array and return its value. The interesting thing about this in
+PD is that we need to know the length of the array before we start
+(hence another situation where [arraysize] is an essential tool). "Pushing"
+is the opposite effect and also a tool provided in Java. When an array
+is pushed \, an element is added to the array and the new size is returned.
+;
+#X obj 458 208 arraysize exampleArray;
+#X obj 458 232 + 1;
+#X msg 458 292 \; exampleArray resize \$1;
+#X floatatom 476 258 0 0 0 0 - - -;
+#X text 521 258 new size;
+#X text 16 12 POPPING AND PUSHING AN ARRAY;
+#X obj 158 246 - 1;
+#X text 197 223 # of total elements;
+#X floatatom 158 271 0 0 0 0 - - -;
+#X text 198 273 new size;
+#X connect 0 0 4 0;
+#X connect 1 0 2 0;
+#X connect 1 0 5 0;
+#X connect 1 0 7 0;
+#X connect 2 0 3 0;
+#X connect 4 0 5 0;
+#X connect 4 1 1 0;
+#X connect 5 0 6 0;
+#X connect 7 0 17 0;
+#X connect 9 0 11 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 12 0 14 0;
+#X connect 17 0 19 0;
+#X restore 24 423 pd Popping_and_Pushing_arrays;
+#N canvas 2 30 722 391 Shifting_an_array 0;
+#X obj 30 90 bng 15 250 50 0 empty empty Shift_me 18 7 0 8 -24198 -1
+-1;
+#X text 16 12 SHIFTING AN ARRAY;
+#X text 20 32 The shift method \, in Java \, will remove the first
+element of the array and return its value. This is opposite of the
+"Pop" method which removes the last element.;
+#X obj 30 272 tabread exampleArray;
+#X obj 30 354 tabwrite tempArray2;
+#X obj 551 11 table tempArray2;
+#X obj 30 110 arraysize exampleArray;
+#X msg 225 160 \; tempArray2 resize \$1;
+#X obj 30 163 until;
+#X obj 30 215 f;
+#X obj 62 215 + 1;
+#X obj 30 136 t f f f;
+#X obj 129 167 s \$1-length;
+#X obj 160 301 spigot;
+#X obj 203 276 < 1;
+#X floatatom 160 328 5 0 0 0 - - -;
+#X text 209 327 First value.;
+#X text 208 345 ...to be deleted.;
+#X obj 304 239 - 1;
+#X obj 304 212 r \$1-length;
+#X obj 30 239 t f f f f;
+#X obj 285 263 sel;
+#X obj 285 288 s \$2-eof;
+#X obj 427 71 r \$2-eof;
+#X obj 427 95 t b b;
+#X msg 419 304 \; tempArray2 resize \$1 \; exampleArray resize \$1
+;
+#X obj 401 256 r \$1-length;
+#X obj 401 280 - 1;
+#X obj 382 304 f;
+#X obj 497 128 until;
+#X obj 497 102 f;
+#X obj 551 69 r \$1-length;
+#X obj 529 155 + 1;
+#X obj 574 156 r \$1-length;
+#X obj 497 184 mod;
+#X obj 497 155 f 1;
+#X obj 497 209 t f f;
+#X obj 497 257 tabread tempArray2;
+#X obj 497 281 tabwrite exampleArray;
+#X obj 551 93 - 1;
+#X obj 574 179 - 1;
+#X obj 497 234 + 1;
+#X msg 223 105 0;
+#X msg 588 118 1;
+#X obj 223 129 s clr;
+#X obj 588 94 r clr;
+#X obj 49 188 r clr;
+#X connect 0 0 6 0;
+#X connect 0 0 42 0;
+#X connect 3 0 4 0;
+#X connect 3 0 13 0;
+#X connect 6 0 11 0;
+#X connect 8 0 9 0;
+#X connect 9 0 10 0;
+#X connect 9 0 20 0;
+#X connect 10 0 9 1;
+#X connect 11 0 8 0;
+#X connect 11 1 12 0;
+#X connect 11 2 7 0;
+#X connect 13 0 15 0;
+#X connect 14 0 13 1;
+#X connect 18 0 21 1;
+#X connect 19 0 18 0;
+#X connect 20 0 3 0;
+#X connect 20 1 4 1;
+#X connect 20 2 14 0;
+#X connect 20 3 21 0;
+#X connect 21 0 22 0;
+#X connect 23 0 24 0;
+#X connect 24 0 28 0;
+#X connect 24 1 30 0;
+#X connect 26 0 27 0;
+#X connect 27 0 28 1;
+#X connect 28 0 25 0;
+#X connect 29 0 35 0;
+#X connect 30 0 29 0;
+#X connect 31 0 39 0;
+#X connect 32 0 35 1;
+#X connect 33 0 40 0;
+#X connect 34 0 36 0;
+#X connect 35 0 32 0;
+#X connect 35 0 34 0;
+#X connect 36 0 41 0;
+#X connect 36 1 38 1;
+#X connect 37 0 38 0;
+#X connect 39 0 30 1;
+#X connect 40 0 34 1;
+#X connect 41 0 37 0;
+#X connect 42 0 44 0;
+#X connect 43 0 35 1;
+#X connect 45 0 43 0;
+#X connect 46 0 9 1;
+#X restore 24 449 pd Shifting_an_array;
+#X text 25 32 Arrays in PD are different than the arrays in other languages
+primarily because \, in PD \, they are designed to be displayed graphically
+on screen. This is due to the nature of audio synthesis - we want to
+see our wave forms and visually understand the data. That's why arrays
+in PD are complicated by other objects like tables \, graphs and widgets.
+PD uses these objects to provide a graphic representation of the array
+data. If you're not interested in seeing the array data within your
+PD patch \, you can use the [table] object to store the array and corresponding
+table in a sub-window. Note that [table]s are more CPU friendly than
+their graphical counterpart.;
+#X text 26 230 Like all programming languages \, PD provides numerous
+tools to manipulate arrays and their data.;
+#N canvas 3 32 718 310 Setting_a_constant_array_value 0;
+#X floatatom 26 151 0 0 0 0 - - -;
+#X obj 26 185 / 100;
+#X msg 26 215 \; exampleArray const \$1;
+#X text 18 16 SETTING A CONSTANT ARRAY VALUE;
+#X text 27 46 By default \, all array element values are zero. However
+\, PD allows you to change that using the "CONST" message.;
+#X text 26 88 This feature is useful to reset all values in an array
+\, or with a little creativity can be used to "delete" a slice \, or
+create silence in audio samples.;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X restore 24 345 pd Setting_a_constant_array_value;
+#N canvas 3 26 727 395 Higher_math_using_arrays 0;
+#X text -7 12 HIGHER MATH USING ARRAYS;
+#X text -3 226 Normalize;
+#X text 78 227 (arg: renormer...a number by which all array values
+will be normalized);
+#X msg 6 278 \; exampleArray normalize \$1;
+#X floatatom 6 256 5 0 0 0 - - -;
+#N canvas 5 55 710 432 sine_waves 0;
+#X text 34 188 Sinesum;
+#X text 98 190 (arg 1: Number of Points - arg 2: list of partial strengths)
+;
+#X msg 40 293 \; exampleArray sinesum 64 1 0 0.5 0 0.2 0 0.15;
+#X msg 40 251 \; exampleArray sinesum 64 1 0.5 0.38 0.3 0.28 0.25 0.2
+;
+#X msg 40 210 \; exampleArray sinesum 64 1;
+#X text 26 7 SINE WAVES;
+#X text 29 30 comment;
+#X text 45 29 When the "sinesum" message is sent to the array \, PD
+will want to know two things:;
+#X text 58 65 1 How many samples (array elements) should be used? The
+higher the number is \, the higher the resolution of the wave form.
+;
+#X text 58 122 2 What is the relative strength of each "partial" or
+"overtone" in the sound? For more info about this \, please lookup
+"overtones" or "harmonics" or "partials" on the internet.;
+#X text 250 220 a pure sine wave!;
+#X text 479 259 a triangle wave;
+#X text 412 303 a square wave;
+#X text 33 346 Note that these waves aren't exactly triangular or square...instead
+they are "smoothed" by the sinesum function to more accurately produce
+these wave forms as analog instruments do.;
+#X restore 7 42 pd sine_waves;
+#X text 141 26 Audio signals in a digital realm are created using a
+series of samples. It is digitally possible to create extremely angular
+wave forms using PD arrays \, but the aural result is sometimes distorted
+and unpleasant. Hence \, higher math functions help our digital tools
+to produce data which can effectively be converted to analog signals
+similar to those of our electronic and mechanical predecessors. The
+first and one of the most important mathematic functions in digital
+synthesis is undoubtebly "sinesum". PD provides an easy method for
+us to integrate these higher math functions in our arrays.;
+#N canvas 0 195 750 302 cosine_waves 0;
+#X text 11 22 Cosinesum;
+#X text 91 22 (arg 1: Number of Points - arg 2: list of partial strengths)
+;
+#X text 273 84 pure cosine wave!;
+#X msg 23 117 \; exampleArray cosinesum 64 0 -0.5 0 -0.2 0.1 0;
+#X msg 24 76 \; exampleArray cosinesum 64 0 1;
+#X msg 22 159 \; exampleArray cosinesum 64 -0.15 0.2 0.15 -0.15 0.1
+0.1 0.2 -0.2 0.35 -0.25 -0.1 0.1 0.199;
+#X restore 6 73 pd cosine_waves;
+#X text 222 257 To normalize an audio signal means to alter the average
+amplitude of the signal. For the sake of clear \, undistored sounds
+\, PD would like all of your audio signals to never exceed 1 or -1
+The first step in achieving this is "normalization" \, but can be assisted
+by more drastic tools like compressors \, limiters \, gain multipliers
+\, etc.;
+#X connect 4 0 3 0;
+#X restore 24 499 pd Higher_math_using_arrays;
+#N canvas 2 31 727 416 Files_and_arrays 0;
+#X text 24 14 OTHER IMPORTANT STUFF;
+#X obj 225 91 savepanel;
+#X obj 225 70 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 225 117 \; exampleArray write \$1;
+#X obj 475 70 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 475 89 openpanel;
+#X msg 475 113 \; exampleArray read \$1;
+#X text 26 29 Using text files can be helpful in saving or loading
+arrays in PD. Note that the "read" message does not resize your array
+automatically.;
+#X text 29 160 Audio files can be treated in similar ways by incorporating
+the [soundfiler] object. The soundfiler object provides PD with tools
+to automatically resize arrays \, and read/write audio files in a variety
+of formats.;
+#X obj 77 231 openpanel;
+#X obj 52 232 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 4 280 symbol read;
+#X obj 54 380 soundfiler;
+#X obj 54 355 route list;
+#X obj 54 332 pack s s s s;
+#X obj 100 280 symbol -resize;
+#X obj 78 254 t b b s b;
+#X obj 145 305 symbol exampleArray;
+#X obj 373 231 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 375 378 soundfiler;
+#X obj 375 353 route list;
+#X obj 375 330 pack s s s s;
+#X obj 399 253 t b b s b;
+#X obj 466 303 symbol exampleArray;
+#X obj 398 230 savepanel;
+#X obj 317 278 symbol write;
+#X obj 421 278 symbol -aiff;
+#X connect 1 0 3 0;
+#X connect 2 0 1 0;
+#X connect 4 0 5 0;
+#X connect 5 0 6 0;
+#X connect 9 0 16 0;
+#X connect 10 0 9 0;
+#X connect 11 0 14 0;
+#X connect 13 0 12 0;
+#X connect 14 0 13 0;
+#X connect 15 0 14 1;
+#X connect 16 0 11 0;
+#X connect 16 1 15 0;
+#X connect 16 2 14 2;
+#X connect 16 3 17 0;
+#X connect 17 0 14 3;
+#X connect 18 0 24 0;
+#X connect 20 0 19 0;
+#X connect 21 0 20 0;
+#X connect 22 0 25 0;
+#X connect 22 1 26 0;
+#X connect 22 2 21 2;
+#X connect 22 3 23 0;
+#X connect 23 0 21 3;
+#X connect 24 0 22 0;
+#X connect 25 0 21 0;
+#X connect 26 0 21 1;
+#X restore 24 526 pd Files_and_arrays;
+#N canvas 0 0 719 423 Additional_tools 0;
+#X text 18 14 ADDITIONAL TOOLS;
+#X text 29 38 The "array" object in PD accepts special messages to
+alter the appearance of the array on screen.;
+#X text 19 81 Arrays can be renamed:;
+#X msg 203 78 \; exampleArray rename george;
+#X msg 431 78 \; george rename exampleArray;
+#X msg 303 173 \; exampleArray bounds 0 1 67 -1;
+#X text 20 129 You can set the bounds of the rectangle: (the arguments
+are:;
+#X text 353 146 low x \, high y \, high x \, low y);
+#X msg 58 173 \; exampleArray bounds 0 2 67 -2;
+#X text 18 219 Array graphs can be given "ticks" on both the x and
+y axis to help you visually measure your data. The tick messages require
+3 values: (the index or value of the FIRST large tick \, then the interval
+between ticks \, then finally the number of ticks overall per large
+tick).;
+#X msg 488 243 \; exampleArray xticks 0 5 3;
+#X msg 471 290 \; exampleArray yticks 0 0.5 4;
+#X msg 354 369 \; exampleArray ylabel -5 -2 -1.5 -1 1 1.5 2;
+#X msg 26 369 \; exampleArray xlabel 0 10 20 30 40 50 60;
+#X text 17 325 Arrays can be given labels to describe the x and y axis.
+Give a y value and a bunch of x values or vice versa:;
+#X restore 24 553 pd Additional_tools;
+#N canvas 4 29 717 375 Populating_an_array 0;
+#X text 27 12 POPULATING AN ARRAY;
+#X text 41 37 An array in PD is primarily a storage device for numbers.
+The result is a series of numbers that you can do with whatever you
+wish...but how does one populate an array?;
+#X text 53 185 list element 1 = array[0];
+#X text 53 201 list element 2 = array[1];
+#X text 39 94 Advanced techniques using text or audio files is described
+later \, but for now it's important to know that you can send an array
+a list. Each element in the list will be assigned to the corresponding
+element in the array. Note that the first index in an array is always
+zero!;
+#X msg 39 303 \; exampleArray 0 -1 1 -1 0.5 -0.5 0.5 -0.2 0.2 -0.2
+0.1 -0.1 0;
+#X text 37 232 Note that if your array is larger than your list \,
+then only the first elements will be effected. If your array is smaller
+than your list \, then your list will be truncated.;
+#X restore 24 295 pd Populating_an_array;
+#X restore 41 173 pd How_to_manipulate_arrays_in_PD;
+#N canvas 132 0 587 609 How_to_create_an_array_in_PD 0;
+#X text 22 9 1 Select "array" from the "Put" menu above.;
+#X text 21 288 4 If you want PD to create a new graph for this array
+\, then select "in new graph". If you have another location in mind
+-- for example if you want to overlap two arrays in a single graph
+\, then select "in last graph".;
+#X text 19 361 5 Then click "OK" and place the new array anywhere in
+this window.;
+#X text 19 403 6 Note: if you do not want to see the graph in this
+window \, then you can use the [table] object instead...the array will
+then be created inside the [table] object and will be seen only if
+you manually open the table.;
+#X text 22 31 2 A dialogue box appears where you can type the name
+of the array and the desired size. Names can be anything you want -
+if you want a localized array \, then name it something like \$1-dave
+(the dollar sign indicates that part of the name is a variable which
+is unique to this patch). The size of the array can be anything greater
+than 0 (zero). At a sample rate of 441000 khz \, an array of 882000
+will provide you with 2 seconds of audio data.;
+#X text 21 167 3 The "Save contents" checkbox will inform Pure Data
+that you want the array saved within the source code of this patch.
+This way \, you can ensure that the array will maintain its values
+each time you open this patch. This is recommended only for relatively
+small arrays...larger arrays should be saved to either a text file
+\, or an audio file.;
+#X restore 42 106 pd How_to_create_an_array_in_PD;
+#N canvas 133 1 646 607 Common_uses_for_arrays_in_PD 0;
+#X text 27 26 COMMON USES FOR ARRAYS IN PD;
+#X text 49 60 Arrays are versatile. Their simple structure make them
+useful in countless situations. This page discusses perhaps the most
+common applications.;
+#X text 50 225 2 MIDI Sequencers: array values limited to a range between
+0 and 127 are suitable for MIDI output to be used as pitch \, velocity
+\, or controller numbers. Some MIDI information requires a much larger
+range \, such as pitch benders.;
+#X text 50 306 3 Envelopes: an array with four elements can be used
+effectively as an ADSR enveloper. There are numerous examples of this
+in other PD help documents.;
+#X text 53 377 4 Math and conversion tables: arrays are an excellent
+visual tool when performing fourier analysis and other higher mathematic
+functions.;
+#X text 54 450 5 Wave editing: with proper manipulation of array data
+\, PD can be fully functional wave editor \, complete with mouse-clickable
+cut-n-paste \, pitch-shift \, time expansion \, down/upsampling \,
+and other tools typically found in commercial wave editors.;
+#X text 49 128 1 Audio sample data: when an array's values are limited
+to a range between -1 and 1 \, the numbers are suitable for conversion
+to analog audio signal. These arrays are typically many thousands of
+elements and stored on hard disk in the form of aiff \, wav or pure
+text.;
+#X restore 40 239 pd Common_uses_for_arrays_in_PD;
+#X text 39 309 NOTE: I strongly recommend that you download the [arraysize]
+external to your "pd/extra" folder before continuing. Some of these
+examples are impossible without it -- I personally feel that [arraysize]
+should be considered for permanent inclusion in future PD distributions.
+Check the CVS Repository or Pure-data.org for [arraysize].;
+#X text 40 459 This document is meant to supplement the help documentation
+for [table] \, [tabread] \, [tabwrite] \, [soundfiler] \, [tabsend~]
+\, [tabreceive~] \, [tabplay~] \, etc.;

@@ -1,0 +1,67 @@
+#N canvas 249 47 492 554 10;
+#X floatatom 17 124 5 0 0;
+#X floatatom 61 141 5 0 0;
+#N canvas 240 135 476 472 other_midi_objects 0;
+#X obj 55 31 ctlin;
+#X obj 97 31 pgmin;
+#X obj 140 30 bendin;
+#X obj 191 29 touchin;
+#X obj 252 29 polytouchin;
+#X obj 337 29 midiin;
+#X obj 388 28 sysexin;
+#X obj 6 85 noteout;
+#X obj 63 84 ctlout;
+#X obj 161 85 touchout;
+#X obj 225 84 polytouchout;
+#X obj 314 84 midiout;
+#X obj 113 84 pgmout;
+#X obj 11 153 makenote;
+#X text 10 194 MIDI notes deconstruction:;
+#X text 8 128 MIDI note construction:;
+#X text 8 58 MIDI output:;
+#X text 8 2 MIDI input:;
+#X obj 15 226 stripnote;
+#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+by Olaf Matthes);
+#X obj 148 297 chord;
+#X obj 109 296 borax;
+#X obj 54 296 score o;
+#X obj 13 296 pitch;
+#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X obj 16 359 midiformat;
+#X obj 172 359 midiflush;
+#X obj 98 359 midiparse;
+#X text 15 386 and xeq \, from the same developer;
+#X obj 16 411 xeq;
+#X text 41 402 an experimental MIDI sequencer;
+#X obj 8 31 midiin;
+#X restore 20 392 pd other_midi_objects;
+#X text 18 337 related object;
+#X obj 282 412 midi-basics;
+#X text 18 412 for an explanation of MIDI usage in PD see:;
+#X floatatom 20 266 5 0 0;
+#X text 111 263 <-- pitch bend values on channel 2;
+#X obj 39 21 bendout;
+#X obj 17 165 bendout;
+#X text 120 114 inlets:;
+#X text 119 165 outlets : none (writes directly to the MIDI port);
+#X text 128 132 left: 14-bit pitchbend value;
+#X text 127 148 right: MIDI channel number;
+#X text 14 198 Arguments: the MIDI channel number to which to write
+to. If no argument is given [bendout] defaults to channel 1 The channel
+can be then chaned byy sending an int to the right inlet:;
+#X obj 20 284 bendout 2;
+#X text 16 314 Output: the output is direct to the MIDI port.;
+#X obj 21 352 bendin;
+#X text 12 51 The [bendout] object takes a pitchbend value (0-127)
+and formats it into a pitchbend MIDI message and sends out the MIDI
+port on the appropriate channel. If no argument is given it defaults
+to channel 1;
+#X text 87 22 - send pitchbend value to the MIDI port;
+#X text 18 482 This document was updated for PD version 0.35 by Michal
+Seta as part of a project called pddp proposed by Krzysztof Czaja \,
+managed and edited by Dave Sabine \, to build comprehensive documentation
+for PD.;
+#X connect 0 0 9 0;
+#X connect 1 0 9 1;
+#X connect 6 0 15 0;

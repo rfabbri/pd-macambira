@@ -1,0 +1,11 @@
+#N canvas 62 40 511 244 10;
+#X obj 27 10 receive;
+#X text 79 12 - receive messages without patch cords.;
+#X text 22 63 See;
+#X obj 48 63 send;
+#X text 79 63 for documentation regarding this object.;
+#X text 25 36 This object can be abbreviated as;
+#X obj 233 36 r;
+#X text 21 95 This document was updated for PD version 0.35 by Dave
+Sabine as part of a project called pddp proposed by Krzysztof Czaja
+to build comprehensive documentation for PD.;

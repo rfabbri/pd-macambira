@@ -1,0 +1,97 @@
+#N canvas 2 1 603 598 12;
+#X text 108 18 - SEND "bang" AUTOMATICALLY WHEN PATCH LOADS.;
+#X obj 126 218 loadbang;
+#X obj 126 385 loadbang;
+#X obj 126 410 metro 1000;
+#X obj 126 434 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 126 266 f 1;
+#X obj 169 266 f 4;
+#X obj 126 291 +;
+#X floatatom 126 315 5 0 0 0 - - -;
+#X obj 126 241 t b b;
+#X obj 104 540 pddp;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 21 18 loadbang;
+#X text 104 464 PD Documentation Chapter 3.6 - doc/1.manual/x3.htm
+;
+#X text 104 53 The inlet is inactive and serves no purpose.;
+#X text 104 81 This object does not accept arguments of any type.;
+#X text 104 112 A "bang" message is sent automatically when the containing
+patch is loaded.;
+#X text 104 161 In this example \, [loadbang] was used to process a
+simple mathematic equation when this patch was loaded. In this case:
+1 + 4 = 5;
+#X text 104 344 In this example \, [loadbang] was used simply to start
+a process automatically when this patch was loaded.;
+#X text 152 541 - Dave Sabine \, November 12 \, 2002;
+#N canvas 85 2 579 656 More_Info 0;
+#X obj 25 152 print foo;
+#X obj 25 104 loadbang;
+#X text 14 188 As well \, the following [float]s were set with a group
+of numbers. Click the [bng] below to verify that the numbers were stored
+in the [float] objects.;
+#X obj 26 355 f;
+#X floatatom 26 380 2 0 0 0 - - -;
+#X obj 65 355 f;
+#X floatatom 65 380 2 0 0 0 - - -;
+#X obj 105 355 f;
+#X floatatom 104 380 2 0 0 0 - - -;
+#X obj 26 263 bng 15 250 50 0 empty empty Click_here_to_see_the_numbers_stored_in_the_float_objects.
+0 -6 0 8 -262144 -1 -1;
+#X obj 195 316 random 10;
+#X obj 104 317 random 10;
+#X text 14 415 IMPORTANT;
+#X text 44 600 c:/pd/pd.exe -noloadbang;
+#X text 14 10 The loadbang object will send a "bang" message when a
+canvas/patch loads and is used most often to 'initialize' or set default
+values in a patch. For example \, when you opened this patch \, the
+message below was immediately printed in the terminal window.;
+#X obj 104 283 loadbang;
+#X obj 288 317 random 10;
+#X text 14 438 Loadbangs are a useful tool to set initial values in
+a patch - however \, there are times when it might be necessary to
+debug a patch and "turn off" all the loadbang objects. This can be
+accomplished by opening PD with the -noloadbang flag.;
+#X text 14 523 For example \, to suppress all loadbangs \, your command
+line might look something like this: (more info about PD's command
+line can be found in Chapter 3.6 of the HTML documentation.;
+#X msg 25 127 you have opened the [loadbang] help document;
+#X connect 1 0 19 0;
+#X connect 3 0 4 0;
+#X connect 5 0 6 0;
+#X connect 7 0 8 0;
+#X connect 9 0 3 0;
+#X connect 9 0 5 0;
+#X connect 9 0 7 0;
+#X connect 10 0 5 1;
+#X connect 11 0 3 1;
+#X connect 15 0 11 0;
+#X connect 15 0 10 0;
+#X connect 15 0 16 0;
+#X connect 16 0 7 1;
+#X connect 19 0 0 0;
+#X restore 104 514 pd More_Info;
+#N canvas 85 2 389 238 Related_Objects 0;
+#X obj 44 49 bang;
+#X obj 102 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 143 48 trigger;
+#X text 25 8 Native PD Objects;
+#X text 25 92 Externals and other object libraries;
+#X text 36 126 [init];
+#X restore 104 488 pd Related_Objects;
+#X text 38 53 INLETS:;
+#X text 14 82 ARGUMENTS:;
+#X text 29 112 OUTLETS:;
+#X text 20 161 EXAMPLES:;
+#X text 21 463 SEE ALSO:;
+#X connect 1 0 9 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 5 0 7 0;
+#X connect 6 0 7 1;
+#X connect 7 0 8 0;
+#X connect 9 0 5 0;
+#X connect 9 1 6 0;

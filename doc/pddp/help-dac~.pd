@@ -1,0 +1,68 @@
+#N canvas 2 1 613 608 12;
+#X obj 104 540 pddp;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#N canvas 85 2 595 611 More_Info 0;
+#X text 16 13 MULTI-CHANNEL AUDIO;
+#X text 32 40 All sound cards are capable of at least two channels
+of audio. PD supports these two channels by default and uses your system's
+generic audio drivers to communicate with your hardware. However \,
+for faster input/output and for more than two channels of audio \,
+PD incorporates the use of "PortAudio" which uses ASIO drivers to communicate
+with your hardware. So \, to instruct PD to use more than two channels
+of audio \, your command line should read like below:;
+#X text 93 182 c:/pd/bin/pd.exe -pa -inchannels 8 -outchannels 8;
+#X text 32 211 The "-pa" switch means "PortAudio". This switch is new
+as of PD version 0.37 TEST 4 and replaces the old "-asio" switch.;
+#X text 32 271 The "-inchannels" and "-outchannels" switches can be
+summarized by using "-channels 8" because currently PortAudio requires
+that the number of incoming and outgoing channels must be equal. This
+may change in the PD's future...;
+#X text 32 361 To further optimize PD's usage of your audio hardware
+\, you can explore the following:;
+#X text 42 402 - audiobuf;
+#X text 43 420 - blocksize;
+#X text 42 436 - audioindev;
+#X text 42 454 - audiooutdev;
+#X text 38 480 With the right hardware \, PD can manage audio input
+and output with lower than 10 milliseconds of latency.;
+#X restore 104 514 pd More_Info;
+#N canvas 85 2 397 246 Related_Objects 0;
+#X text 25 8 Native PD Objects;
+#X text 25 92 Externals and other object libraries;
+#X obj 98 46 switch~;
+#X obj 171 46 block~;
+#X obj 45 46 adc~;
+#X restore 104 488 pd Related_Objects;
+#X text 16 107 ARGUMENTS:;
+#X text 23 344 EXAMPLES:;
+#X text 20 487 SEE ALSO:;
+#X text 30 53 PURPOSE:;
+#X text 152 541 - Dave Sabine \, May 6 \, 2003;
+#X text 153 346 default stereo signals: same as;
+#X text 280 435 all channels on an 8-channel device;
+#X obj 33 20 dac~;
+#X text 108 18 - AUDIO OUTPUT: DIGITAL/ANALOG CONVERTER SIGNAL;
+#X text 104 53 [dac~] is an acronym meaning "Digital/Analog Converter
+Signal" and is PD's interface to send audio information to the audio
+channels of your soundcard(s).;
+#X text 106 106 The object defaults to 2 outgoing audio channels (usually
+a left and right stereo pair). Any number of arguments (integers) can
+be used to define multiple output channels - each integer corresponds
+to an output channel on your audio hardware.;
+#X text 36 188 INLETS:;
+#X text 108 188 Signal: the number of inlets correspond with the number
+of arguments - each inlet represents an output channel on your audio
+hardware which corresponds to the argument you provide. If no arguments
+are provided \, then there are two inlets which represent audio channels
+1 and 2 on your computer's sound card.;
+#X text 107 290 The information at each inlet should be an audio signal
+(i.e. the object operates at 'audio-rate') and therefore must be connected
+to an audio outlet on a related object.;
+#X obj 109 346 dac~;
+#X obj 411 348 dac~ 1 2;
+#X obj 109 373 dac~ 5;
+#X text 167 374 a mono signal to channel 5;
+#X obj 109 404 dac~ 1 3 8 6 11 15 19 22 23 24 36;
+#X text 383 405 11 channels of output;
+#X obj 109 434 dac~ 1 2 3 4 5 6 7 8;

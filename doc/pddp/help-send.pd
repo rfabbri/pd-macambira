@@ -1,0 +1,199 @@
+#N canvas -7 -1 1011 660 10;
+#X obj 25 11 send;
+#X text 58 12 - sends messages without patch cords.;
+#X text 481 26 At this point \, it is necessary to explain 'locality'
+and 'scope'. When creating a [send] and/or [receive] object it is helpful
+to determine whether or not the messages you pass through those objects
+will be used by only ONE patch \, or throughout all open patches.;
+#X obj 229 34 s;
+#X text 23 35 This object can be abbreviated as;
+#X text 23 158 Send and recevie objects are given a name to tell them
+who to connect to. Here is a simple example of how these objects work
+together:;
+#X text 25 60 The [send] object \, and its counterpart \, [receive]
+\, are useful for linking objects and subroutines together in a single
+canvas or throughout multiple patches. Understanding these objects
+will help 'clean up' your patches and allow you to communicate messages
+between various modules that you build or between objects where patch
+cords are not possible.;
+#X floatatom 246 223 5 0 0;
+#X floatatom 26 205 5 0 0;
+#X text 67 205 Click-n-drag this number box.;
+#X obj 26 222 send this_number;
+#X obj 246 204 receive this_number;
+#X obj 26 293 send this_symbol;
+#X obj 245 279 receive this_symbol;
+#X symbolatom 245 297 15 0 0;
+#X msg 26 252 symbol dog;
+#X msg 40 272 symbol cat;
+#X text 101 253 Click these messages.;
+#X text 23 323 Also note that you can send messages to a receive object
+by providing the name of the receive object and your message in a message
+box \, like below: (watch the receive object ABOVE);
+#X msg 27 385 \; this_number 20 \; this_symbol symbol foo \;;
+#X msg 230 384 \; this_number 4000 \; this_symbol symbol hello_world
+\;;
+#X msg 27 435 \; this_number 42 \;;
+#X msg 230 434 \; this_symbol symbol Jupiter \;;
+#X obj 436 5 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 436 581 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 473 10 IMPORTANT;
+#N canvas 0 0 248 163 example_a 0;
+#X obj 18 9 r foo;
+#X floatatom 18 34 5 0 0;
+#X obj 24 96 r a-foo;
+#X floatatom 24 116 5 0 0;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 561 139 pd example_a;
+#N canvas 2 238 250 157 example_b 0;
+#X obj 12 9 r foo;
+#X floatatom 12 28 5 0 0;
+#X obj 15 74 r b-foo;
+#X floatatom 15 93 5 0 0;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 642 140 pd example_b;
+#N canvas -1 473 225 163 example_c 0;
+#X obj 12 8 r foo;
+#X floatatom 12 30 5 0 0;
+#X obj 12 65 r c-foo;
+#X floatatom 12 86 5 0 0;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 724 140 pd example_c;
+#X obj 480 240 s foo;
+#X floatatom 480 224 5 0 0;
+#X text 478 196 Click-n-drag these number boxes and notice the appropriate
+receive objects in each open sub-patch.;
+#X floatatom 525 224 5 0 0;
+#X floatatom 581 225 5 0 0;
+#X floatatom 639 225 5 0 0;
+#X obj 525 240 s a-foo;
+#X obj 581 241 s b-foo;
+#X obj 639 241 s c-foo;
+#X text 475 166 TO SEND MESSAGES TO ALL RECEIVES OF THE SAME NAME IN
+ALL OPEN PATCHES - global scope.;
+#X text 482 95 To observe these features \, click on the following
+sub-patches to open each one on your screen. Move them all so that
+you can see each one clearly and also see this main patch.;
+#X text 470 397 TO SEND MESSAGES TO RECEIVE OBJECTS WITHIN A SINGLE
+PATCH - local scope.;
+#X text 480 426 There are many cases where you may want messages to
+be sent within a single patch. For example \, you might have designed
+many modules with a receive object called [r number] but you want that
+'number' to be passed to only the objects within a single module so
+that they don't effect the performance of the other modules.;
+#X text 481 506 In these cases \, you should use "local variables"
+to name your send and receive objects. Local variables are assigned
+using dollar signs and numbers. There is more documentation about this
+in 2.control.examples/locality.pd;
+#X text 23 550 RELATED OBJECTS;
+#X obj 86 574 send~;
+#X obj 123 574 receive~;
+#X obj 179 574 netsend;
+#X obj 228 574 netreceive;
+#X obj 24 574 receive;
+#X obj 23 596 tabsend~;
+#X text 477 262 Send objects simply post their information to the cyberspace
+within your computer (that's one way to look at it!) Receive objects
+simply keep their ears open for all messages floating through that
+cyberspace from send objects of the same name! Hence \, if you name
+a [send] something like "foo" \, then all [receive] objects in open
+patches named "foo" will 'hear' those messages. Also note that the
+term 'open patches' includes all sub-patches \, abstractions and patches
+that are currently open in PD - they don't have to be VISIBLE...they
+only have to be active.;
+#X text 481 585 This document was updated for PD version 0.35 by Dave
+Sabine as part of a project called pddp proposed by Krzysztof Czaja
+to build comprehensive documentation for PD.;
+#X text 21 478 SPECIAL OBJECTS AND THEIR PROPERTIES;
+#X text 27 492 Some objects in PD contain their own internal send and
+receive functionality. Open the following sub-patch for more information:
+;
+#N canvas 129 123 768 452 special-send-and-receives 0;
+#X text 26 18 SPECIAL OBJECTS;
+#X obj 28 41 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 28 66 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 28 91 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X obj 28 117 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 0 1;
+#X obj 21 368 hdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X obj 159 129 vdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X obj 24 343 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 79 208 vu 15 120 empty empty -1 -8 0 8 -66577 -1 1 0;
+#X obj 192 31 cnv 15 100 60 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 54 41 bng;
+#X text 51 66 toggle;
+#X text 93 90 number 2;
+#X text 48 168 Vertical Slider;
+#X text 185 167 Vertical Dial;
+#X text 164 344 Horizontal Slider;
+#X text 154 368 Horizontal Dial;
+#X text 136 261 VU Meter;
+#X text 225 55 canvas;
+#X text 331 28 The objects in this patch \, and likely many more which
+I have not included \, include their own send and receive functionality.
+This functionality can be accessed by right-clicking on the object
+and choosing "Properties" from the menu that appears.;
+#X text 328 101 EXAMPLE;
+#X text 333 117 In other words \, these objects can send and/or receive
+messages without attaching a separate [send] or [receive] object to
+them with a patch cord.;
+#X text 328 161 THE OL'FASHION WAY;
+#X floatatom 330 182 5 0 0;
+#X floatatom 375 200 5 0 0;
+#X obj 330 199 s a;
+#X obj 375 181 r a;
+#X text 330 222 USING THESE OBJECTS' INTERNAL SEND AND RECEIVE FUNCTIONALITY
+;
+#X text 422 181 As you see here \, these number boxes are linked together
+with send and receives objects.;
+#X obj 332 244 nbx 5 14 -1e+037 1e+037 0 0 b empty empty 0 -6 128 10
+-262144 -1 -1 0 256;
+#X obj 394 244 nbx 5 14 -1e+037 1e+037 0 0 empty b empty 0 -6 64 10
+-262144 -1 -1 0 256;
+#X text 334 262 These number boxes are linked together via their 'send'
+or 'receive' property.;
+#X connect 23 0 25 0;
+#X connect 26 0 24 0;
+#X restore 136 523 pd special-send-and-receives;
+#N canvas 0 0 439 206 related_objects_from_other_libraries 0;
+#X text 17 52 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 16 101 The best places to find information about PD's libraries
+is:;
+#X text 13 123 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 15 138 or;
+#X text 15 153 iem.kug.ac.at/pdb/;
+#X obj 16 22 streamout~;
+#X obj 82 22 sendlocal;
+#X obj 144 22 system;
+#X obj 186 22 shoutcast~;
+#X obj 254 22 sendOSC;
+#X obj 304 22 send13~;
+#X restore 172 596 pd related_objects_from_other_libraries;
+#X obj 76 596 throw~;
+#X obj 118 596 catch~;
+#X obj 297 574 value;
+#X connect 8 0 10 0;
+#X connect 11 0 7 0;
+#X connect 13 0 14 0;
+#X connect 15 0 12 0;
+#X connect 16 0 12 0;
+#X connect 23 0 24 0;
+#X connect 30 0 29 0;
+#X connect 32 0 35 0;
+#X connect 33 0 36 0;
+#X connect 34 0 37 0;

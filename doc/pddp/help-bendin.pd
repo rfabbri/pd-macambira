@@ -1,0 +1,66 @@
+#N canvas 244 81 492 554 10;
+#X text 118 123 outlets:;
+#X floatatom 16 149 5 0 0;
+#X floatatom 59 149 5 0 0;
+#N canvas 240 135 476 472 other_midi_objects 0;
+#X obj 7 29 ctlin;
+#X obj 49 29 pgmin;
+#X obj 92 28 bendin;
+#X obj 143 27 touchin;
+#X obj 204 27 polytouchin;
+#X obj 289 27 midiin;
+#X obj 340 26 sysexin;
+#X obj 6 85 noteout;
+#X obj 63 84 ctlout;
+#X obj 160 84 bendout;
+#X obj 217 83 touchout;
+#X obj 281 82 polytouchout;
+#X obj 370 82 midiout;
+#X obj 113 84 pgmout;
+#X obj 11 153 makenote;
+#X text 10 194 MIDI notes deconstruction:;
+#X text 8 128 MIDI note construction:;
+#X text 8 58 MIDI output:;
+#X text 8 2 MIDI input:;
+#X obj 15 226 stripnote;
+#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+by Olaf Matthes);
+#X obj 148 297 chord;
+#X obj 109 296 borax;
+#X obj 54 296 score o;
+#X obj 13 296 pitch;
+#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X obj 16 359 midiformat;
+#X obj 172 359 midiflush;
+#X obj 98 359 midiparse;
+#X text 15 386 and xeq \, from the same developer;
+#X obj 16 411 xeq;
+#X text 41 402 an experimental MIDI sequencer;
+#X restore 20 401 pd other_midi_objects;
+#X text 18 346 related object;
+#X obj 283 420 midi-basics;
+#X text 18 421 for an explanation of MIDI usage in PD see:;
+#X obj 33 18 bendin;
+#X text 119 103 inlets : none (reads directly from the MIDI port);
+#X obj 23 107 bendin;
+#X text 9 49 The [bendin] object reads incoming pitch bend values and
+reports them. If started with no arguments it reports the channel number
+through the right outlet.;
+#X text 14 192 Arguments: the MIDI channel number from which to read.
+If the argument is present \, the [bendin] object does not show the
+second (right) outlet:;
+#X obj 25 256 bendin 2;
+#X floatatom 25 278 5 0 0;
+#X obj 21 361 bendout;
+#X text 76 279 <-- pitch bend values on channel 2;
+#X text 16 312 Output (int) is a 14-bit pitchbend value;
+#X text 130 142 left: pitchbend value;
+#X text 129 159 right: MIDI channel number (if no argument);
+#X text 81 19 - read incoming pitch bend values.;
+#X text 19 482 This document was updated for PD version 0.35 by Michal
+Seta as part of a project called pddp proposed by Krzysztof Czaja \,
+managed and edited by Dave Sabine \, to build comprehensive documentation
+for PD.;
+#X connect 9 0 1 0;
+#X connect 9 1 2 0;
+#X connect 12 0 13 0;

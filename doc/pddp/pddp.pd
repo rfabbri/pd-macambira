@@ -1,0 +1,31 @@
+#N canvas 262 2 490 557 10;
+#X text 14 17 PDDP: Pure Data Documentation Project;
+#X text 25 40 The PDDP was proposed initially in early 2002 by Krzysztof
+Czaja who suggested that Pure Data was in need of comprehensive documentation.
+;
+#X text 45 162 - Michal Seta;
+#X text 45 135 - Miller Puckette;
+#X text 45 148 - Dave Sabine;
+#X text 25 89 The project is now managed un-officially by Dave Sabine
+who acts as primary author and editor. The people involved in this
+project include (alphabetically):;
+#X text 25 184 PDDP will eventually be available in the main PD distribution
+\, but for now is available at Dave's web site: http://www.davesabine.com/media/puredata.asp
+;
+#X text 25 231 All comments \, corrections \, etc. regarding the PDDP
+reference files should be directed to Dave Sabine: dave@davesabine.com
+;
+#X text 14 282 THINGS TO NOTE:;
+#X text 25 308 Authors: If you would like to participate in this project
+\, simply gather together information about objects \, tutorials \,
+examples \, etc. and contact Dave Sabine for info about formatting
+your documents. All documents should then be forwarded to Dave to be
+included in the PDDP download which is available at his web site.;
+#X text 25 396 Externals and other Libraries: Each PDDP document includes
+mention of "related objects from other PD libraries" as well as mention
+of "related native PD objects". The objects from other libraries are
+available only if you download those libraries from their respective
+authors and integrate them properly into your version of PD. We do
+not and cannot maintain a complete list of externals - but we try.
+For more info about externals and other objects \, see http://www.pure-data.org/
+and the Pure Data Base at http://iem.kug.ac.at/pdb/;

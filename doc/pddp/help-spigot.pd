@@ -1,0 +1,119 @@
+#N canvas 94 12 862 647 10;
+#X msg 16 96 0.5 1000;
+#X floatatom 47 160 1 0 0;
+#X obj 16 177 spigot;
+#X obj 16 198 print;
+#X msg 28 136 walk the cat;
+#X msg 22 116 bang;
+#X obj 35 11 spigot;
+#X text 83 11 - pass or block messages;
+#X text 72 160 control: nonzero to pass messages \, zero to stop them
+;
+#X text 12 294 USING [SPIGOT] TO CREATE A GATE.;
+#X text 15 309 Unlike its closest cousin MAX \, PD does not have a
+native [gate] object. There are other PD libraries which include gates
+for both audio and numerical data \, but similar routines can be built
+in PD using [spigot]. The example below shows a two-way gate using
+two [spigots] and the [expr] object.;
+#X obj 95 505 spigot;
+#X floatatom 96 459 1 0 0;
+#X text 113 458 controls: open and close the gates.;
+#X floatatom 31 527 5 0 0;
+#X floatatom 95 527 5 0 0;
+#X obj 15 400 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 15 418 metro 200;
+#X obj 15 439 f;
+#X obj 39 439 + 1;
+#X obj 126 484 expr 1-$f1;
+#X text 32 398 Click to start sending info through the gates.;
+#X obj 96 439 loadbang;
+#X text 16 38 [spigot] passes messages from its left inlet to its outlet
+\, as long as a nonzero number is sent to its right inlet. When its
+right inlet gets zero \, incoming messages are "blocked" (i.e. ignored).
+;
+#X text 14 231 [spigot] works essentially like a doorway. When the
+door is open \, messages can pass through. When the door is closed
+\, messages are ignored. By default \, the door is always closed!;
+#X obj 31 505 spigot;
+#X text 13 547 In the example above \, the magic is created by the
+[expr] object which performs a simple calculation using the incoming
+number (1 or 0). Note that the figure "$f1" is a variable which assumes
+the value of the incoming number.;
+#X text 402 36 CREATION ARGUMENTS?;
+#X obj 416 98 spigot 0;
+#X text 404 196 [SPIGOT] FOR AUDIO SIGNALS?;
+#X text 417 213 [spigot] does not work with audio signals. The data
+types which are accepted by this object are floats \, symbols \, lists
+\, bangs \, anythings and pointers. However \, audio signals require
+a completely different treatment.;
+#X text 414 265 PD does not have a [spigot] for audio signals \, but
+the same effect can be created using the following structure:;
+#X obj 418 312 osc~ 800;
+#X obj 386 15 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 386 596 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 418 369 *~;
+#X floatatom 431 352 1 0 0;
+#X obj 400 447 env~;
+#X floatatom 400 468 5 0 0;
+#X msg 628 341 \; pd dsp \$1 \;;
+#X obj 628 322 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 445 466 dac~;
+#X obj 445 446 *~ 0.05;
+#X text 645 323 Turn on audio computation first.;
+#X text 449 357 Here is the [spigot].;
+#X text 448 370 When "0" \, audio signal;
+#X text 447 386 is effectively blocked.;
+#X text 448 400 When "1" \, audio signal is;
+#X text 448 415 not effected in any way.;
+#X text 406 498 RELATED OBJECTS;
+#N canvas 0 0 454 304 related_objects_from_other_libraries 0;
+#X obj 40 36 gate;
+#X text 18 86 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 17 135 The best places to find information about PD's libraries
+is:;
+#X text 14 157 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 15 173 or;
+#X text 16 187 iem.kug.ac.at/pdb/;
+#X restore 419 519 pd related_objects_from_other_libraries;
+#X text 453 574 This document was updated for PD version 0.35 test
+26 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X obj 416 170 spigot cat;
+#X obj 490 170 spigot dog;
+#X text 415 119 It also accepts any symbol \, but all of these are
+meaningless and have no effect on the operation of the object.;
+#X text 416 54 [spigot] only accepts one numerical creation argument:
+a zero. At creation time the [spigot] is "closed". So this creation
+argument is not needed and is rather useless.;
+#X connect 0 0 2 0;
+#X connect 1 0 2 1;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;
+#X connect 11 0 15 0;
+#X connect 12 0 20 0;
+#X connect 12 0 25 1;
+#X connect 16 0 17 0;
+#X connect 17 0 18 0;
+#X connect 18 0 19 0;
+#X connect 18 0 11 0;
+#X connect 18 0 25 0;
+#X connect 19 0 18 1;
+#X connect 20 0 11 1;
+#X connect 22 0 12 0;
+#X connect 25 0 14 0;
+#X connect 32 0 35 0;
+#X connect 33 0 34 0;
+#X connect 35 0 37 0;
+#X connect 35 0 42 0;
+#X connect 36 0 35 1;
+#X connect 37 0 38 0;
+#X connect 40 0 39 0;
+#X connect 42 0 41 0;

@@ -1,0 +1,244 @@
+#N canvas 2 0 609 604 12;
+#X obj 104 539 pddp;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 104 463 PD Documentation Chapter 3.6 - doc/1.manual/x3.htm
+;
+#N canvas 85 2 593 608 More_Info 1;
+#X text 17 24 COMMON USES;
+#X text 15 417 INNOVATIVE USES;
+#X text 47 47 I believe that this object was developed first to allow
+PD to generate sequential file names - perhaps to be used in conjunction
+with [soundfiler] or [openpanel]. For example \, an audio loop recorder
+might generate a continuous series of sound files to be saved on a
+hard drive...like below:;
+#X obj 54 136 bng 15 250 50 0 empty empty Bang_me 18 7 0 8 -262144
+-1 -1;
+#X obj 54 160 f;
+#X symbolatom 54 215 0 0 0 0 - - -;
+#X text 53 238 This file name could be used when saving the audio data
+to disk.;
+#X obj 87 161 + 1;
+#X obj 54 187 makefilename file-%d.aif;
+#X text 20 280 LIMITATIONS;
+#N canvas 175 3 583 599 spaces_and_multiple_variables 0;
+#X text 25 19 Instead of using spaces \, an underscore will often produce
+a tolerable compromise.;
+#X obj 210 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 210 64 f;
+#X symbolatom 210 119 0 0 0 0 - - -;
+#X obj 243 64 + 1;
+#X obj 210 91 makefilename I_am_%d_years_old.;
+#X text 28 143 With careful planning \, multiple variables can be incorporated
+using a stack of [makefilename]s. In the example below \, let's assume
+that this tool is used to generate file names for an audio loop recorder
+which operates 24 hours per day \, every day.;
+#X obj 31 235 loadbang;
+#X obj 31 280 metro 200;
+#X obj 31 261 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X obj 64 305 + 1;
+#X obj 209 349 route 0 1 2 3 4 5 6;
+#X obj 31 354 mod 24;
+#X floatatom 31 379 5 0 0 0 - - -;
+#X floatatom 31 329 0 0 0 0 - - -;
+#X obj 31 305 f;
+#X obj 53 405 sel 0;
+#X obj 218 269 f;
+#X obj 250 269 + 1;
+#X obj 218 294 mod 7;
+#X obj 218 322 pack f f;
+#X obj 230 498 makefilename Monday_%d.wav;
+#X symbolatom 65 548 0 0 0 0 - - -;
+#X obj 334 374 makefilename Saturday_%d.wav;
+#X obj 314 399 makefilename Friday_%d.wav;
+#X obj 290 326 t b f;
+#X obj 293 424 makefilename Thursday_%d.wav;
+#X obj 272 449 makefilename Wednesday_%d.wav;
+#X obj 251 474 makefilename Tuesday_%d.wav;
+#X obj 209 522 makefilename Sunday_%d.wav;
+#X text 81 377 hour of day;
+#X text 79 330 total hours;
+#X text 199 549 Crude...but effective.;
+#X obj 31 455 s dayHour;
+#X obj 53 430 s weekDay;
+#X obj 218 236 r weekDay;
+#X obj 290 300 r dayHour;
+#X text 284 271 loop through weekdays;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 2 0 5 0;
+#X connect 4 0 2 1;
+#X connect 5 0 3 0;
+#X connect 7 0 9 0;
+#X connect 8 0 15 0;
+#X connect 9 0 8 0;
+#X connect 10 0 15 1;
+#X connect 11 0 29 0;
+#X connect 11 1 21 0;
+#X connect 11 2 28 0;
+#X connect 11 3 27 0;
+#X connect 11 4 26 0;
+#X connect 11 5 24 0;
+#X connect 11 6 23 0;
+#X connect 12 0 13 0;
+#X connect 13 0 16 0;
+#X connect 13 0 33 0;
+#X connect 14 0 12 0;
+#X connect 15 0 10 0;
+#X connect 15 0 14 0;
+#X connect 16 0 34 0;
+#X connect 17 0 18 0;
+#X connect 17 0 19 0;
+#X connect 18 0 17 1;
+#X connect 19 0 20 0;
+#X connect 20 0 11 0;
+#X connect 21 0 22 0;
+#X connect 23 0 22 0;
+#X connect 24 0 22 0;
+#X connect 25 0 20 0;
+#X connect 25 1 20 1;
+#X connect 26 0 22 0;
+#X connect 27 0 22 0;
+#X connect 28 0 22 0;
+#X connect 29 0 22 0;
+#X connect 35 0 17 0;
+#X connect 36 0 25 0;
+#X restore 47 445 pd spaces_and_multiple_variables;
+#N canvas 175 4 503 605 help_with_interfaces 1;
+#X text 17 16 Building user interfaces in PD is a difficult balance
+between usability and performance. PD is not winning any awards for
+usability - let's face it: it's powerful \, it's cool \, and that's
+the way we like it. You're not here because you want a colourful \,
+bevelled interface...you want the raw power that object oriented languages
+provide mixed with a few of the conveniences that a graphic environment
+affords.;
+#X obj 17 269 cnv 15 450 300 empty empty empty 20 12 0 14 -261681 -66577
+0;
+#X obj 45 379 tgl 15 0 s_dsp empty DSP 18 7 128 8 -262144 -1 -1 0 1
+;
+#X obj 45 424 vsl 15 128 0 127 0 0 v_slider empty Volume 18 7 128 8
+-262144 -1 -1 0 1;
+#X obj 45 401 bng 15 250 50 0 b_panel empty Open_File 18 7 128 8 -262144
+-1 -1;
+#X obj 40 280 cnv 15 400 20 empty d_canvas DSP 20 12 64 8 -233017 -66577
+0;
+#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN 20 12 64 8 -233017
+-66577 0;
+#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME 20 12 64 8 -233017
+-66577 0;
+#X text 187 361 The grey canvases above could;
+#X text 189 383 be used like "status bars" to;
+#X text 189 404 write relevant information to;
+#X text 186 460 [makefilename] helps to format;
+#X text 188 484 the information in a meaningful;
+#X text 189 505 way.;
+#X text 187 426 the screen.;
+#N canvas 217 9 470 320 look_inside 0;
+#X obj 199 14 r b_panel;
+#X obj 235 166 r v_slider;
+#X obj 36 236 s d_canvas;
+#X obj 199 114 s f_canvas;
+#X obj 235 263 s v_canvas;
+#X obj 36 80 sel 0;
+#X obj 71 152 symbol ON;
+#X obj 36 128 symbol OFF;
+#X obj 71 103 bang;
+#X msg 36 210 label \$1;
+#X obj 36 184 makefilename DSP:%s;
+#X obj 36 13 r s_dsp;
+#X msg 45 38 \; pd dsp \$1;
+#X obj 199 40 openpanel;
+#X obj 199 65 makefilename FILE_OPEN:%s;
+#X msg 199 90 label \$1;
+#X msg 235 240 label \$1;
+#X obj 235 192 expr ($f1/128)*100;
+#X obj 235 217 makefilename VOLUME:%d/100;
+#X connect 0 0 13 0;
+#X connect 1 0 17 0;
+#X connect 5 0 7 0;
+#X connect 5 1 8 0;
+#X connect 6 0 10 0;
+#X connect 7 0 10 0;
+#X connect 8 0 6 0;
+#X connect 9 0 2 0;
+#X connect 10 0 9 0;
+#X connect 11 0 5 0;
+#X connect 11 0 12 0;
+#X connect 13 0 14 0;
+#X connect 14 0 15 0;
+#X connect 15 0 3 0;
+#X connect 16 0 4 0;
+#X connect 17 0 18 0;
+#X connect 18 0 16 0;
+#X restore 40 350 pd look_inside;
+#X text 18 156 However \, there are times when sacrifices must be made
+in the area of performance to provide users with on-screen reporting
+\, record keeping \, and sometimes even a few 'pleasantries'. Consider
+the following examples - but always weight the pros and cons when incorporating
+these types of interfaces. Performance vs. Usability.;
+#X restore 47 477 pd help_with_interfaces;
+#X text 45 304 This object does not provide advanced formatting and
+parsing abilities. For example \, you cannot use spaces or odd characters
+in the argument - also the argument can only include ONE variable.
+Although \, these limitations can be easily overcome with a little
+ingenuity and compromise -- see below.;
+#X connect 3 0 4 0;
+#X connect 4 0 7 0;
+#X connect 4 0 8 0;
+#X connect 7 0 4 1;
+#X connect 8 0 5 0;
+#X restore 104 513 pd More_Info;
+#N canvas 85 2 393 242 Related_Objects 0;
+#X text 25 8 Native PD Objects;
+#X text 25 92 Externals and other object libraries;
+#X text 35 125 [strcat];
+#X obj 42 46 symbol;
+#X obj 112 46 int;
+#X obj 156 46 openpanel;
+#X text 34 151 [makesymbol];
+#X restore 104 487 pd Related_Objects;
+#X text 38 53 INLETS:;
+#X text 15 197 ARGUMENTS:;
+#X text 29 316 OUTLETS:;
+#X text 22 342 EXAMPLES:;
+#X text 21 462 SEE ALSO:;
+#X obj 5 18 makefilename;
+#X text 115 18 - FORMAT A STRING WITH A VARIABLE FIELD.;
+#X text 104 316 Symbol - The output is formatted like "symbol YOURSTRING".
+;
+#X floatatom 114 346 0 0 0 0 - - -;
+#X obj 114 400 print;
+#X obj 114 373 makefilename soundfile%d.aif;
+#X text 170 400 numbered filenames;
+#X obj 353 431 print;
+#X text 406 433 text examples;
+#X obj 353 380 symbol;
+#X msg 353 343 dave;
+#X msg 412 341 drums;
+#X msg 479 344 PD;
+#X msg 526 355 cool;
+#X obj 353 404 makefilename %s_PD.aif;
+#X text 107 198 This object generates symbols according to a format
+string (the argument) \, for use as a series of filenames \, table
+names \, or whatnot. You can plug in a variable number or symbol by
+putting "%d" or "%s" in the string. If you put "%s" in the string \,
+be sure to send it a symbol and vice versa... there' no checking. Each
+[makefilename] object can have only one variable.;
+#X text 152 540 - Dave Sabine \, April 25 \, 2003;
+#X text 108 53 Integer - If a number is sent to the inlet \, the argument
+should be written with a "%d" which represents the location of the
+incoming variable number in the outgoing symbol. Floats will be converted
+to integers.;
+#X text 107 126 Symbol - If a symbol is sent to the inlet \, the argument
+should be written with a "%s" which represent the location of the incoming
+variable symbol in the outgoing symbol. Lists will be truncated.;
+#X connect 13 0 15 0;
+#X connect 15 0 14 0;
+#X connect 19 0 24 0;
+#X connect 20 0 19 0;
+#X connect 21 0 19 0;
+#X connect 22 0 19 0;
+#X connect 23 0 19 0;
+#X connect 24 0 17 0;

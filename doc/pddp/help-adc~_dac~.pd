@@ -1,0 +1,108 @@
+#N canvas 3 0 619 592 12;
+#X obj 104 540 pddp;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#N canvas 129 0 415 237 More_Info 0;
+#N canvas 131 29 532 435 sample_rate 0;
+#X text 12 24 SAMPLE RATE;
+#X text 29 46 [adc~] and [dac~] always operate at the sample rate that
+is specified in PD's command line. By default \, the sample rate is
+44100 hz. But PD operates any sample rate supported by standard audio
+hardware. Sample rates cannot be changed at run-time in PD \, but must
+be stated in the command line when PD is instantiated. As well \, two
+or more instances of PD running simoultaneously can each be using different
+sample rates! Having said that \, PD can easily upsample or downsample
+by using the [block~] object. Here are some example of the common sample
+rates:;
+#X text 85 232 c:/pd/bin/pd.exe -r 11025;
+#X text 85 262 c:/pd/bin/pd.exe -r 22050;
+#X text 86 329 c:/pd/bin/pd.exe -r 88200;
+#X text 85 217 c:/pd/bin/pd.exe -r 8000;
+#X text 85 247 c:/pd/bin/pd.exe -r 16000;
+#X text 86 278 c:/pd/bin/pd.exe -r 32000;
+#X text 86 294 c:/pd/bin/pd.exe -r 44100 CD Quality;
+#X text 86 311 c:/pd/bin/pd.exe -r 48000 DAT Quality;
+#X text 87 366 c:/pd/bin/pd.exe -r 192000 DVD-Audio Quality;
+#X text 86 347 c:/pd/bin/pd.exe -r 96000 DVD-Video/Audio Quality;
+#X restore 40 75 pd sample_rate;
+#N canvas 131 31 564 558 multi-channel_audio 0;
+#X text 16 13 MULTI-CHANNEL AUDIO;
+#X text 32 40 All sound cards are capable of at least two channels
+of audio. PD supports these two channels by default and uses your system's
+generic audio drivers to communicate with your hardware. However \,
+for faster input/output and for more than two channels of audio \,
+PD incorporates the use of "PortAudio" which uses ASIO drivers to communicate
+with your hardware. So \, to instruct PD to use more than two channels
+of audio \, your command line should read like below:;
+#X text 93 182 c:/pd/bin/pd.exe -pa -inchannels 8 -outchannels 8;
+#X text 32 211 The "-pa" switch means "PortAudio". This switch is new
+as of PD version 0.37 TEST 4 and replaces the old "-asio" switch.;
+#X text 32 271 The "-inchannels" and "-outchannels" switches can be
+summarized by using "-channels 8" because currently PortAudio requires
+that the number of incoming and outgoing channels must be equal. This
+may change in the PD's future...;
+#X text 32 361 To further optimize PD's usage of your audio hardware
+\, you can explore the following:;
+#X text 42 402 - audiobuf;
+#X text 43 420 - blocksize;
+#X text 42 436 - audioindev;
+#X text 42 454 - audiooutdev;
+#X text 38 480 With the right hardware \, PD can manage audio input
+and output with lower than 10 milliseconds of latency.;
+#X restore 40 112 pd multi-channel_audio;
+#N canvas 132 30 528 211 defeating_audio_computation 0;
+#X text 21 15 -NODAC and -NOADC;
+#X text 26 37 There may be cases when you do not want PD to send or
+receive audio signal with your soundcard. You can manually disable
+the [dac~] and [adc~] objects separately using the "-nodac" and "-noadc"
+switch \, or disable both using the "-nosound" switch.;
+#X restore 41 152 pd defeating_audio_computation;
+#X restore 104 514 pd More_Info;
+#N canvas 85 2 399 248 Related_Objects 0;
+#X text 25 8 Native PD Objects;
+#X text 25 118 Externals and other object libraries;
+#X obj 57 35 bilge;
+#X text 35 143 [shoutcast~];
+#X text 35 166 [oggcast~];
+#X obj 115 35 send~;
+#X obj 169 35 receive~;
+#X obj 58 66 throw~;
+#X obj 121 66 catch~;
+#X obj 185 66 block~;
+#X obj 249 66 switch~;
+#X restore 104 488 pd Related_Objects;
+#X text 14 84 ARGUMENTS:;
+#X text 22 219 EXAMPLES:;
+#X text 21 463 SEE ALSO:;
+#X obj 12 19 adc~;
+#X obj 61 19 dac~;
+#X text 108 18 - AUDIO INPUT/OUTPUT;
+#X text 30 47 PURPOSE:;
+#X text 104 47 [adc~] and [dac~] provide real-time audio input and
+output for PD \, respectively \, whether analog or digital.;
+#X text 152 541 - Dave Sabine \, May 5 \, 2003;
+#X text 104 83 Both of these objects accept arguments (numbers) which
+indicate which audio channels are to be used by PD. By default \, these
+objects are stereo and communicate on audio channels 1 and 2 (left
+and right respectively) but by using arguments \, other channel numbers
+can be specified. These objects can communicate with hundreds of audio
+channels \, but you are likely limited by your audio hardware to 2
+\, 4 \, 6 \, 8 \, 12 \, 16 \, 32 \, 64 \, etc.;
+#X obj 114 222 adc~;
+#X text 162 222 incoming stereo signals;
+#X obj 114 251 dac~;
+#X text 162 252 outgoing stereo signals;
+#X obj 114 280 adc~ 1 2 3 4 5 6 7 8;
+#X text 290 281 eight incoming audio signals;
+#X text 210 314 three outgoing signals on channels 1 \, 5 \, and 6
+;
+#X obj 115 314 dac~ 1 5 6;
+#X text 107 345 The actual number of PD inputs and outputs are set
+on PD's command line. You can open patches that want to use more channels
+\, but channel numbers that out of range will be dropped by [dac~]
+or appears as zero by [adc~].;
+#X text 14 344 IMPORTANT:;
+#X text 108 419 Also \, these objects do not operate unless PD is instructed
+to "Compute Audio".;
+#X obj 104 464 help-adc~;
+#X obj 190 464 help-dac~;

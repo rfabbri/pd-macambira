@@ -1,0 +1,83 @@
+#N canvas 9 19 907 630 10;
+#X msg 33 230 bang;
+#X floatatom 23 313 0 0 0;
+#X floatatom 23 208 0 0 0;
+#X floatatom 47 255 0 0 0;
+#X text 71 230 You can force the object to output the stored number.
+;
+#X text 68 208 You can set and output the value simoultaneously.;
+#X text 105 255 You can store the number \, without outputting it.
+;
+#X text 488 142 NOTE;
+#X obj 450 8 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 450 547 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 284 568 This document was updated for PD version 0.35 test
+24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X text 482 480 RELATED OBJECTS;
+#X obj 529 507 symbol;
+#X text 97 11 - STORE AN INTEGER;
+#X obj 55 12 int;
+#X text 19 41 The int object stores an integer (which is set either
+by its creation argument or by the right inlet) and then outputs that
+number when it receives a "bang" message or a new number in its left
+inlet.;
+#X text 18 98 This object acts exactly as its nearest cousin:;
+#X obj 307 97 float;
+#X text 495 159 All numbers in PD are kept in 32-bit floating point
+and can represent real numbers between -8 \, 388 \, 608 and 8 \, 388
+\, 608 Hence \, the [int] object takes about as much CPU as the [float]
+object \; but is useful when numbers need to be truncated and/or when
+patches are being designed to be compatible with PD and MAX/MSP.;
+#X text 18 160 Tip: Press and hold SHIFT while click-n-dragging these
+number boxes to see how the [int] object truncates the number - drops
+decimal places.;
+#X obj 23 287 int 6.5;
+#X text 17 114 with only one exception: All decimal places are dropped!
+All fractions will be truncated \; they will not be 'rounded off'.
+;
+#X obj 491 507 float;
+#X obj 573 506 random;
+#X text 487 10 WHAT IS AN INTEGER?;
+#X text 493 29 Integers are "whole" numbers - numbers which do not
+contain fractions. The following are examples of whole numbers:;
+#X text 494 59 1;
+#X text 494 74 -544;
+#X text 494 103 10024;
+#X text 493 88 420;
+#N canvas 0 0 414 279 related_objects_from_other_libraries 0;
+#X obj 22 19 list2int;
+#X obj 77 19 i2l;
+#X obj 104 19 probalizer;
+#X text 20 56 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 19 105 The best places to find information about PD's libraries
+is:;
+#X text 16 127 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 18 157 iem.kug.ac.at/pdb/;
+#X restore 490 529 pd related_objects_from_other_libraries;
+#X text 496 283 The [int] object can be used as a basis for building
+simple counter mechanisms in PD. In the example below \, the [int]
+object's stored value is incremented by 1 with each "bang".;
+#X text 87 281 The creation argument initializes the object and stores
+the number until the value is reset. The creation argument is optional.
+If no creation argument is provided \, the object defaults to zero.
+;
+#X msg 511 340 bang;
+#X obj 511 369 int;
+#X obj 539 369 + 1;
+#X floatatom 511 395 5 0 0;
+#X text 486 263 EXAMPLE: BUILDING A COUNTER;
+#X connect 0 0 20 0;
+#X connect 2 0 20 0;
+#X connect 3 0 20 1;
+#X connect 8 0 9 0;
+#X connect 20 0 1 0;
+#X connect 33 0 34 0;
+#X connect 34 0 35 0;
+#X connect 34 0 36 0;
+#X connect 35 0 34 1;

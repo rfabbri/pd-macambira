@@ -1,0 +1,108 @@
+#N canvas 64 358 939 645 10;
+#X msg 43 113 bang;
+#X msg 18 91 bang;
+#X floatatom 18 157 0 0 0;
+#X text 90 159 Output is in milliseconds;
+#X text 53 91 Click here to start or reset;
+#X obj 52 545 time_measurements;
+#X obj 52 441 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 17 572 0 0 0;
+#X floatatom 108 585 0 0 0;
+#X floatatom 175 573 0 0 0;
+#X text 9 357 In the example below \, I've created an abstraction which
+will force each of PD's stop-watches \, [timer] [cputime] and [realtime]
+to measure various processes and report the elapsed time. Click on
+each [bng] to begin the process and wait for the results. Notice the
+discrepancies in the results.;
+#X text 15 587 Logical Time;
+#X text 173 587 Real Time;
+#X text 107 601 CPU Time;
+#X obj 67 477 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 72 435 1 Measures elapsed time between two "bangs" from a [trigger]
+object.;
+#X text 87 469 2 Measures the amount of time PD requires to turn on
+DSP and start an oscillator.;
+#X obj 445 484 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 445 17 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 472 36 WHY THE DISCREPANCIES BETWEEN CLOCKS?;
+#X text 475 59 In a fantasy world \, computers could exist somehow
+beyond the restrictions of time and digital computation could be performed
+in ZERO time. However \, that is not the case. Instead \, every process
+within PD and within your operating system requires at least a few
+nanoseconds of your CPU's time.;
+#X obj 111 509 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 476 144 The [timer] object is like a clock that is not constrained
+to the regular laws of physics and the universal space-time continuum.
+It reports "time" measurements as only PD can see them!;
+#X text 477 204 The [cputime] object is like a clock that measures
+how much time your CPU actually required to carry out your request.
+Keep in mind however that your CPU is busy doing many things simoultaneously
+\, so even though a process might take 5 minutes to complete \, your
+CPU does not pay full attention to that process for the entire 5 minutes.
+Instead \, it simply begins the process \, then refers back to that
+process from time to time until the it is complete. In other cases
+\, your CPU might require a full 5 minutes while PD might report that
+merely a few milliseconds have passed. This type of discrepancy depends
+heavily on your computer's hardware and the type of processing it is
+performing.;
+#X text 478 368 The [realtime] object is as much like your own wrist
+watch as PD can possibly manage. It measures time according to your
+operating system's internal clock.;
+#N canvas 0 0 454 304 related_objects_from_other_libraries 0;
+#X text 27 63 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 26 112 The best places to find information about PD's libraries
+is:;
+#X text 23 134 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 25 149 or;
+#X text 25 164 iem.kug.ac.at/pdb/;
+#X obj 44 24 t3_timer;
+#X text 469 589 This document was updated for PD version 0.35 test
+26 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X restore 505 476 pd related_objects_from_other_libraries;
+#X text 309 580 This document was updated for PD version 0.35 test
+28 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X obj 607 445 metro;
+#X text 504 422 RELATED OBJECTS;
+#X obj 504 446 cputime;
+#X text 132 501 3 Measures the amount of time PD requires count to
+three...please wait for approximately 3 seconds.;
+#X obj 25 15 realtime;
+#X text 83 15 -- ask Operating System for elasped real time;
+#X text 13 44 The [realtime] object measures elapsed "real" time as
+measured by your operating system.;
+#X obj 18 135 realtime;
+#X text 81 114 Click here to get elapsed real time. Click again...and
+again...to see periodic measurements from the start or reset time.
+;
+#X text 11 185 [realtime] works like essentially like a stop-watch.
+Once it starts \, you can continue to "poll" [realtime] to view the
+elapsed time.;
+#X text 11 232 The odd aspect about comparing [realtime] to a stop-watch
+is that a stop-watch can be stopped! [realtime] can only be started
+or reset. It cannot be stopped.;
+#X text 9 282 As stated above \, [realtime] measures "real" or actual
+time. This value may be slightly different that CPU time or "logical"
+time. PD offers two objects which measure CPU time and "logical" time.
+See the reference documents for those objects for more information.
+;
+#X obj 562 445 timer;
+#X connect 0 0 34 1;
+#X connect 1 0 34 0;
+#X connect 5 0 7 0;
+#X connect 5 1 8 0;
+#X connect 5 2 9 0;
+#X connect 6 0 5 0;
+#X connect 14 0 5 1;
+#X connect 18 0 17 0;
+#X connect 21 0 5 2;
+#X connect 34 0 2 0;

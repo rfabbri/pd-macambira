@@ -1,0 +1,435 @@
+#N canvas 16 1 887 655 10;
+#X floatatom 217 438 0 0 0;
+#X floatatom 267 517 0 0 0;
+#X obj 466 28 &;
+#X obj 494 28 |;
+#X obj 574 28 &&;
+#X obj 601 28 ||;
+#X obj 7 25 >;
+#X obj 36 25 >=;
+#X obj 67 24 ==;
+#X obj 125 24 <=;
+#X obj 153 24 <;
+#X obj 217 417 >;
+#X obj 267 496 ==;
+#X obj 96 24 !=;
+#X obj 521 28 <<;
+#X obj 548 28 >>;
+#X obj 627 28 %;
+#X text 464 5 THE LOGICAL OPERATORS -- A.K.A. "Bit Twiddling";
+#X text 6 6 THE RELATIONAL OPERATORS;
+#N canvas 0 0 454 304 understanding_%_modulus 0;
+#X text 24 23 MODULUS - [%];
+#X floatatom 28 187 0 0 0;
+#X text 22 40 - this object has nothing to do with percentage!;
+#X text 20 54 - a modulus is a number by which two given numbers can
+be divided and produce the same remainder.;
+#X text 21 81 - in the example below: 9 / 2 = 4.5 \, and 7 / 2 = 3.5.
+Hence if 7 and 9 are divided by 2 \, then the remainder of both equations
+is .5. Therefore \, the modulus of 7 and 9 is "2".;
+#X msg 28 138 9;
+#X obj 28 166 % 7;
+#X floatatom 62 142 5 0 0;
+#X text 20 222 Note that the modulus operator is not a "bitwise" operator
+\, but a math function.;
+#X connect 5 0 6 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 0;
+#X restore 476 418 pd understanding_%_modulus;
+#X text 478 252 Below is a brief explanation of each of these logical
+operators.;
+#X text 473 53 These objects are adopted from the mother of all object
+oriented languages: C. They are "bitwise" operators which perform logical
+and shift operations on 32-bit numbers.;
+#X text 467 100 WHAT DOES "BITWISE" MEAN?;
+#X text 478 208 Hence \, performing "bitwise" relational tests means
+that PD can compare "1101" to "1001" instead of operating with the
+integers that are represented by those binary codes.;
+#N canvas 81 197 456 306 understanding_&_AND 0;
+#X obj 33 216 &;
+#X floatatom 87 182 5 0 0;
+#X floatatom 129 183 5 0 0;
+#X msg 33 154 13;
+#X msg 62 155 9;
+#X text 18 18 [&] -- This is the bitwise AND operator which returns
+a "1" for each bit position where the corresponding bits of both its
+operands are "1". For example:;
+#X text 22 67 13 = "1101";
+#X text 28 79 9 = "1001";
+#X text 15 92 Hence:"1001";
+#X obj 33 114 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 33 132 t b b;
+#X text 101 66 When comparing the binary codes for 13 and 9 \, we can
+see that the first and fourth digits of both codes are 1 Hence the
+result will be "1001" -- in other words "9".;
+#X floatatom 33 238 0 0 0;
+#X connect 0 0 12 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 1;
+#X connect 3 0 0 0;
+#X connect 4 0 0 1;
+#X connect 9 0 10 0;
+#X connect 10 0 3 0;
+#X connect 10 1 4 0;
+#X restore 478 286 pd understanding_&_AND;
+#N canvas 190 317 454 304 understanding_|_OR 0;
+#X floatatom 32 247 0 0 0;
+#X floatatom 86 191 5 0 0;
+#X floatatom 128 192 5 0 0;
+#X msg 32 163 13;
+#X msg 61 164 9;
+#X text 21 76 13 = "1101";
+#X text 27 88 9 = "1001";
+#X obj 32 123 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 32 141 t b b;
+#X text 18 18 [|] -- This is the bitwise OR operator which returns
+a "1" for each bit position where one OR both of the corresponding
+bits of both its operands is a "1". For example:;
+#X text 14 101 Hence:"1101";
+#X text 98 76 When comparing the binary codes for 13 and 9 \, we can
+see that the first and fourth digits of both codes are both 1 and the
+second position of 13 is a one. Hence the result will be "1101" --
+in other words "13".;
+#X obj 32 225 |;
+#X connect 1 0 12 0;
+#X connect 2 0 12 1;
+#X connect 3 0 12 0;
+#X connect 4 0 12 1;
+#X connect 7 0 8 0;
+#X connect 8 0 3 0;
+#X connect 8 1 4 0;
+#X connect 12 0 0 0;
+#X restore 478 307 pd understanding_|_OR;
+#N canvas 0 0 454 304 understanding_<<_LEFT-SHIFT 0;
+#X obj 46 142 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 46 160 t b b;
+#X msg 46 181 13;
+#X obj 46 222 <<;
+#X floatatom 46 244 5 0 0;
+#X msg 74 181 2;
+#X floatatom 112 193 5 0 0;
+#X floatatom 160 193 5 0 0;
+#X text 29 25 [<<] -- This is the left shift operator and it works
+by shifting the digits of the binary representation of the first operand
+(left inlet) to the left by the number of places specified by the second
+operand (right inlet). The spaces created to the right are filled by
+zeros \, and any digits falling off the left are discarded. The following
+code returns 52 as the binary of 13 ("1101") is shifted two places
+to the left giving "110100":;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 1 5 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 5 0 3 1;
+#X connect 6 0 3 0;
+#X connect 7 0 3 1;
+#X restore 477 328 pd understanding_<<_LEFT-SHIFT;
+#N canvas 0 0 456 380 understanding_>>_RIGHT-SHIFT 0;
+#X obj 41 155 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 41 173 t b b;
+#X floatatom 41 257 5 0 0;
+#X floatatom 107 206 5 0 0;
+#X floatatom 155 206 5 0 0;
+#X msg 41 194 13;
+#X obj 41 235 >>;
+#X msg 69 194 2;
+#X text 33 21 [>>] -- This is the sign-propagating right shift operator
+which shifts the digits of the binary representation of the first operand
+(left inlet) to the right by the number of places specified by the
+second operand (right inlet) \, discarding any shifted off to the right.
+The copies of the leftmost bit are added on from the left \, thereby
+preserving the sign of the number. This next examples returns 3 ("11")
+as the two right-most bits of 13 ("1101") are shifted off to the right
+and discarded.;
+#X text 33 284 Note that this object preserves negative values for
+negative operands. ("sign-propagating").;
+#X connect 0 0 1 0;
+#X connect 1 0 5 0;
+#X connect 1 1 7 0;
+#X connect 3 0 6 0;
+#X connect 4 0 6 1;
+#X connect 5 0 6 0;
+#X connect 6 0 2 0;
+#X connect 7 0 6 1;
+#X restore 477 350 pd understanding_>>_RIGHT-SHIFT;
+#N canvas 56 51 528 425 understanding_&&_LOGICAL-AND 0;
+#X msg 56 269 5;
+#X obj 25 319 &&;
+#X floatatom 25 339 5 0 0;
+#X floatatom 194 277 5 0 0;
+#X text 12 26 [&&] - This is the logical AND operator \, which returns
+a Boolean true (a one) if both operands are true. Logically it follows
+that if the first operand is false \, then the whole expression is
+false \, and this is how the objects works: It first evaluates the
+left hand operand (left inlet) and if this returns false (zero) then
+\, without going any further \, it returns a false (a zero). Otherwise
+it returns the value of the second operand (right inlet).;
+#X floatatom 237 277 5 0 0;
+#X text 25 364 Note that this is not a bitwise operator. It compares
+floats.;
+#X obj 25 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 25 245 t b b;
+#X msg 25 269 17;
+#X text 12 145 In other words \, IF the left inlet is zero \, THEN
+output zero. ELSEIF the left inlet is non-zero AND the right inlet
+is zero \, then output zero. ELSEIF the left inlet is non-zero AND
+the right inlet is non-zero \, THEN output non-zero!;
+#X obj 91 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 91 245 t b b;
+#X msg 91 269 17;
+#X msg 122 269 0;
+#X connect 0 0 1 1;
+#X connect 1 0 2 0;
+#X connect 3 0 1 0;
+#X connect 5 0 1 1;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;
+#X connect 8 1 0 0;
+#X connect 9 0 1 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 12 1 14 0;
+#X connect 13 0 1 0;
+#X connect 14 0 1 1;
+#X restore 477 373 pd understanding_&&_LOGICAL-AND;
+#N canvas 244 51 530 427 understanding_||_LOGICAL-OR 0;
+#X msg 56 269 5;
+#X floatatom 25 339 5 0 0;
+#X floatatom 196 280 5 0 0;
+#X floatatom 239 280 5 0 0;
+#X text 25 364 Note that this is not a bitwise operator. It compares
+floats.;
+#X obj 25 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 25 245 t b b;
+#X msg 25 269 17;
+#X text 17 21 [||] -- This is the logical OR operator and it returns
+a value of true (non-zero) if one or both of the operands is true.
+It works by first evaluating the left-hand operand (left inlet) and
+\, if this is true \, diregarding the right-hand operand (right inlet)
+and returning a non-zero. If \, however \, the left-hand operand (left
+inlet) is false \, then it returns the value of the right-hand operand
+(right inlet).;
+#X text 12 145 In other words \, IF the left inlet is non-zero \, THEN
+output non-zero. ELSEIF the left inlet is zero AND the right inlet
+is zero \, then output zero. ELSEIF the left inlet is zero AND the
+right inlet is non-zero \, THEN output non-zero!;
+#X obj 25 319 ||;
+#X obj 96 226 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 96 244 t b b;
+#X msg 96 268 0;
+#X msg 127 268 0;
+#X connect 0 0 10 1;
+#X connect 2 0 10 0;
+#X connect 3 0 10 1;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 6 1 0 0;
+#X connect 7 0 10 0;
+#X connect 10 0 1 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 12 1 14 0;
+#X connect 13 0 10 0;
+#X connect 14 0 10 1;
+#X restore 477 395 pd understanding_||_LOGICAL-OR;
+#X obj 432 12 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 432 607 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 54 186 == 42;
+#X floatatom 54 165 5 0 0;
+#X floatatom 54 212 2 0 0;
+#X obj 79 211 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 24 161 42;
+#X text 9 143 For example: IF 42 is equal to x \, then "1" (True);
+#X text 99 203 Note that the object outputs 1 or 0 with every incoming
+message.;
+#X text 10 233 All of these objects operate the same way. The right
+inlet or creation argument sets the "condition" to which the incoming
+messages are compared. The left inlet accepts numbers or a "bang" --
+a number will reset the value and output a true or false (1 or 0) depending
+on whether or not the incoming value meets the necessary condition.
+A "bang" will force the object to output a true or false (1 or 0) based
+on the value that is already stored in the left inlet.;
+#X floatatom 25 378 5 0 0;
+#X floatatom 98 345 5 0 0;
+#X text 10 376 a;
+#X text 138 344 b;
+#X text 93 439 Is a greater than b?;
+#X floatatom 242 478 0 0 0;
+#X text 47 478 Is a greater than or equal to b?;
+#X obj 242 457 >=;
+#X text 166 517 Is a equal to b?;
+#X obj 295 534 !=;
+#X floatatom 295 554 0 0 0;
+#X obj 325 367 r a_b;
+#X obj 325 386 unpack f f;
+#X obj 25 395 pack f f;
+#X obj 25 415 s a_b;
+#X obj 98 361 bang;
+#X text 172 555 Is a NOT equal to b?;
+#X floatatom 321 592 0 0 0;
+#X text 215 592 Is a less than b?;
+#X obj 321 572 <;
+#X floatatom 346 631 0 0 0;
+#X obj 346 611 <;
+#X text 168 631 Is a less than or equal to b?;
+#X text 474 583 This document was updated for PD version 0.35 test
+29 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X text 461 460 RELATED OBJECTS;
+#X obj 813 477 +;
+#X text 480 477 Visit the Help document for MATH for more math objects:
+;
+#N canvas 0 0 452 302 related_objects_from_other_libraries 0;
+#X obj 47 34 strcomp;
+#X text 102 33 Relational tests for strings.;
+#X text 29 104 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 28 153 The best places to find information about PD's libraries
+is:;
+#X text 25 175 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 27 190 or;
+#X text 27 205 iem.kug.ac.at/pdb/;
+#X restore 482 501 pd related_objects_from_other_libraries;
+#X text 478 120 Well \, these objects perform "relational" tests on
+the binary forms of 32-bit numbers. For example \, the number 13 is
+represented in your computer's operating system in binary code by "1101"
+and the number 9 is "1001". Each of those binary digits is an 8-bit
+word: 8 bits * 4 digits = 32-bits!;
+#X obj 179 24 mod;
+#X obj 206 24 div;
+#X text 8 84 Most relational operators output a boolean value: true
+or false (1 or 0) depending on the relation between the input (left
+inlet) and the condition (right inlet or creation argument).;
+#N canvas 7 1 506 648 understanding_MOD_and_DIV 0;
+#X text 24 5 [mod] and [div] are helpful objects to determine whether
+or not a fraction produces a remainder \, or to determine the value
+of the remainder.;
+#X text 24 80 while \, 4 / 3 = 1 with a remainder of 1;
+#X text 25 51 For example \, 3 / 3 = 1 with a remainder of zero (i.e.
+no remainder).;
+#X floatatom 26 190 0 0 0;
+#X floatatom 26 232 0 0 0;
+#X floatatom 138 192 0 0 0;
+#X text 68 191 divided by;
+#X text 184 192 has a remainder of;
+#X floatatom 300 193 0 0 0;
+#X obj 26 211 mod;
+#X text 22 103 [mod] takes a number in its left inlet and will divide
+that number by either the creation argument or the number given at
+its left inlet and will produce the value of the remainder at its outlet.
+If no creation argument is given \, then the default value is 1;
+#X obj 88 173 loadbang;
+#X msg 138 173 1;
+#X text 23 255 [div] takes a number in its left inlet and will divide
+that number by either the creation argument or the number given at
+its left inlet and will produce the result without a remainder. If
+no creation argument is given \, then the default value is 1;
+#X floatatom 28 341 0 0 0;
+#X floatatom 28 383 0 0 0;
+#X floatatom 140 343 0 0 0;
+#X text 70 342 divided by;
+#X floatatom 256 344 0 0 0;
+#X obj 90 324 loadbang;
+#X msg 140 324 1;
+#X obj 28 362 div;
+#X text 186 343 is equal to;
+#X text 294 343 with no remainder.;
+#X obj 257 371 /;
+#X floatatom 257 391 0 0 0;
+#X text 237 389 or;
+#X text 310 392 with a remainder.;
+#X text 23 408 In the following example \, I've built a metronome which
+counts bar numbers and beat numbers: default time signature is 4/4
+(Common Time).;
+#X obj 23 489 metro 500;
+#X obj 23 470 tgl 15 0 empty empty Start-Stop 0 -6 0 8 -262144 -1 -1
+0 1;
+#X obj 48 510 + 1;
+#X floatatom 23 530 0 0 0;
+#X text 52 532 Total Beat Count;
+#X obj 23 559 div 4;
+#X obj 134 560 mod 4;
+#X floatatom 219 601 0 0 0;
+#X floatatom 108 600 0 0 0;
+#X obj 23 510 f 1;
+#X msg 107 468 1;
+#X obj 23 579 + 1;
+#X obj 134 579 + 1;
+#X text 131 468 Reset;
+#X text 44 599 Bar number;
+#X text 157 601 Beat Count;
+#X floatatom 339 511 0 0 0;
+#X text 196 511 How many beats per bar?;
+#X connect 3 0 9 0;
+#X connect 4 0 8 0;
+#X connect 5 0 9 1;
+#X connect 9 0 4 0;
+#X connect 11 0 12 0;
+#X connect 12 0 5 0;
+#X connect 14 0 21 0;
+#X connect 14 0 24 0;
+#X connect 15 0 18 0;
+#X connect 16 0 21 1;
+#X connect 16 0 24 1;
+#X connect 19 0 20 0;
+#X connect 20 0 16 0;
+#X connect 21 0 15 0;
+#X connect 24 0 25 0;
+#X connect 29 0 38 0;
+#X connect 30 0 29 0;
+#X connect 31 0 38 1;
+#X connect 32 0 34 0;
+#X connect 32 0 35 0;
+#X connect 34 0 40 0;
+#X connect 35 0 41 0;
+#X connect 38 0 31 0;
+#X connect 38 0 32 0;
+#X connect 39 0 38 1;
+#X connect 40 0 37 0;
+#X connect 41 0 36 0;
+#X connect 45 0 35 1;
+#X connect 45 0 34 1;
+#X restore 9 58 pd understanding_MOD_and_DIV;
+#X connect 11 0 0 0;
+#X connect 12 0 1 0;
+#X connect 30 0 31 0;
+#X connect 32 0 34 0;
+#X connect 32 0 35 0;
+#X connect 33 0 32 0;
+#X connect 36 0 32 0;
+#X connect 40 0 53 0;
+#X connect 41 0 53 1;
+#X connect 41 0 55 0;
+#X connect 47 0 45 0;
+#X connect 49 0 50 0;
+#X connect 51 0 52 0;
+#X connect 52 0 11 0;
+#X connect 52 0 47 0;
+#X connect 52 0 12 0;
+#X connect 52 0 49 0;
+#X connect 52 0 59 0;
+#X connect 52 0 61 0;
+#X connect 52 1 11 1;
+#X connect 52 1 47 1;
+#X connect 52 1 12 1;
+#X connect 52 1 49 1;
+#X connect 52 1 59 1;
+#X connect 52 1 61 1;
+#X connect 53 0 54 0;
+#X connect 55 0 40 0;
+#X connect 59 0 57 0;
+#X connect 61 0 60 0;

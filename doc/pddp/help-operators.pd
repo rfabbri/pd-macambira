@@ -1,0 +1,283 @@
+#N canvas 23 29 920 640 10;
+#X obj 622 350 +~;
+#X obj 626 499 trigger;
+#X text 25 8 ARITHMETIC;
+#X text 30 29 PD's arithmetic objects include:;
+#X obj 231 30 +;
+#X obj 256 30 -;
+#X obj 282 30 *;
+#X obj 308 30 /;
+#X obj 334 30 pow;
+#X obj 359 30 max;
+#X obj 385 30 min;
+#X obj 32 276 +;
+#X floatatom 32 205 0 0 0;
+#X floatatom 32 297 0 0 0;
+#X floatatom 45 228 0 0 0;
+#X msg 63 254 bang;
+#X text 98 255 Bang outputs sum;
+#X text 70 204 Numbers in left inlet add and output sum;
+#X text 87 227 Numbers in right inlet only change the inlet's value
+;
+#X text 29 171 The example below performs basic addition with two numbers:
+i.e. a + b = c;
+#X text 28 54 All of these objects operate the same way. The right
+inlet sets or changes the numeric value of the object. Sending a number
+to the left inlet forces the object to perform the operation with the
+current numeric value of the object and output the result. A "bang"
+will output the result without changing the numeric values at either
+inlet. A creation argument can be used to define the initial numeric
+value of the right inlet.;
+#X text 29 325 The example below incorporates a creation argument:
+i.e. a + 42 = b;
+#X floatatom 29 357 0 0 0;
+#X floatatom 29 400 0 0 0;
+#X obj 29 379 + 42;
+#N canvas 38 134 637 241 basic_examples 0;
+#X obj 44 129 +;
+#X obj 113 129 -;
+#X obj 179 129 *;
+#X obj 244 129 /;
+#X obj 316 129 pow;
+#X obj 394 129 max;
+#X obj 482 129 min;
+#X floatatom 44 32 5 0 0;
+#X floatatom 44 150 0 0 0;
+#X floatatom 113 149 0 0 0;
+#X floatatom 179 149 0 0 0;
+#X floatatom 244 149 0 0 0;
+#X floatatom 316 149 0 0 0;
+#X floatatom 394 150 0 0 0;
+#X floatatom 482 149 0 0 0;
+#X floatatom 495 32 5 0 0;
+#X msg 360 32 bang;
+#X connect 0 0 8 0;
+#X connect 1 0 9 0;
+#X connect 2 0 10 0;
+#X connect 3 0 11 0;
+#X connect 4 0 12 0;
+#X connect 5 0 13 0;
+#X connect 6 0 14 0;
+#X connect 7 0 0 0;
+#X connect 7 0 1 0;
+#X connect 7 0 2 0;
+#X connect 7 0 3 0;
+#X connect 7 0 4 0;
+#X connect 7 0 5 0;
+#X connect 7 0 6 0;
+#X connect 15 0 6 1;
+#X connect 15 0 5 1;
+#X connect 15 0 4 1;
+#X connect 15 0 3 1;
+#X connect 15 0 2 1;
+#X connect 15 0 1 1;
+#X connect 15 0 0 1;
+#X connect 16 0 0 0;
+#X connect 16 0 1 0;
+#X connect 16 0 2 0;
+#X connect 16 0 3 0;
+#X connect 16 0 4 0;
+#X connect 16 0 5 0;
+#X connect 16 0 6 0;
+#X restore 28 542 pd basic_examples;
+#X text 29 425 + - * / are probably self-explanatory...if you are using
+PD \, then it is safe to say that you have passed third grade.;
+#X text 27 463 However \, [pow] \, [max] \, and [min] objects may need
+some explanation.;
+#N canvas 0 0 452 302 understanding_POW 0;
+#X text 12 25 [POW];
+#X obj 17 66 pow 2;
+#X floatatom 17 86 2 0 0;
+#X msg 17 46 2;
+#X text 61 115 - it is important to note that [pow] only works with
+NON-negative mantissas. That is to say that negative floating point
+fractions will be ignored.;
+#X obj 18 153 pow 2;
+#X floatatom 18 173 2 0 0;
+#X msg 13 111 -2;
+#X msg 24 132 -1.5;
+#X text 65 202 - however \, [pow] is capable of computing negative
+exponents!;
+#X floatatom 19 201 0 0 0;
+#X obj 19 221 pow -2;
+#X floatatom 19 242 0 0 0;
+#X text 57 39 - this object is used to exponentiate a number. The object
+returns the value at the left inlet to the power of the right inlet
+where the left inlet is the base and the right inlet is the exponent.
+For example: 2 to the power of 2 = 4 (i.e. 2 Squared);
+#X connect 1 0 2 0;
+#X connect 3 0 1 0;
+#X connect 5 0 6 0;
+#X connect 7 0 5 0;
+#X connect 8 0 5 0;
+#X connect 10 0 11 0;
+#X connect 11 0 12 0;
+#X restore 28 497 pd understanding_POW;
+#N canvas 0 0 474 341 understanding_MAX_and_MIN 0;
+#X text 34 9 [MAX];
+#X obj 32 51 max 10;
+#X floatatom 32 29 5 0 0;
+#X floatatom 32 76 5 0 0;
+#X text 87 26 - [max] returns the greater of the two numbers passed
+to its inlets. For example \, if the creation argument (or right inlet)
+is equal to 10 \, and you send 9 to the left inlet then the object
+will return 10 If you pass it an 11 \, then object returns 11;
+#X floatatom 33 116 5 0 0;
+#X floatatom 33 163 5 0 0;
+#X text 35 96 [MIN];
+#X text 88 113 - [min] returns the lesser of the two numbers passed
+to its inlets. For example \, if the creation argument (or right inlet)
+is equal to 10 \, and you send 9 to the left inlet then the object
+will return 9 If you pass it an 11 \, then object returns 10;
+#X obj 33 138 min 10;
+#X text 32 185 - It is important to note that [max] and [min] output
+a number with every number or "bang" that is sent to the left inlet.
+;
+#X floatatom 35 234 5 0 0;
+#X floatatom 35 282 5 0 0;
+#X obj 35 256 min 10;
+#X obj 76 281 bng 15 50 10 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 80 232 Move this number box above 10;
+#X connect 1 0 3 0;
+#X connect 2 0 1 0;
+#X connect 5 0 9 0;
+#X connect 9 0 6 0;
+#X connect 11 0 13 0;
+#X connect 13 0 12 0;
+#X connect 13 0 14 0;
+#X restore 28 519 pd understanding_MAX_and_MIN;
+#X obj 430 568 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 430 12 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 469 20 THE SUM OF MANY NUMBERS;
+#X text 473 40 PD has wonderful object called [expr] which allows you
+to write mathematical expressions. I would suggest that you investigate
+the [expr] object to process basic mathematical equations with more
+than 2 separate values.;
+#X msg 481 151 bang;
+#X obj 481 203 random 10;
+#X obj 543 203 random 10;
+#X obj 605 203 random 10;
+#X text 509 222 a;
+#X text 571 223 b;
+#X text 632 222 c;
+#X text 512 288 d;
+#X floatatom 481 288 0 0 0;
+#X obj 481 172 t b b b;
+#X obj 481 245 +;
+#X obj 481 266 +;
+#X floatatom 481 223 0 0 0;
+#X floatatom 543 223 0 0 0;
+#X floatatom 605 223 0 0 0;
+#X text 474 102 Having said that \, it IS possible to build equations
+with multiple elements using these basic math objects \, as in the
+example below: (i.e. a + b + c = d);
+#X text 469 324 RELATED OBJECTS;
+#X obj 651 350 -~;
+#X obj 680 350 *~;
+#X obj 708 350 /~;
+#X obj 736 350 max~;
+#X obj 766 350 min~;
+#X text 550 350 Audio Math;
+#X obj 622 374 ==;
+#X obj 680 374 >;
+#X obj 736 374 <;
+#X obj 708 374 >=;
+#X obj 766 373 <=;
+#X obj 652 374 !=;
+#X text 514 375 Relational Tests;
+#X text 508 398 Logical Operators;
+#X obj 623 398 &;
+#X obj 652 398 |;
+#X obj 680 398 &&;
+#X obj 708 398 ||;
+#X obj 736 398 <<;
+#X obj 766 398 >>;
+#X obj 680 499 expr;
+#X obj 622 422 mtof;
+#X obj 653 422 ftom;
+#X obj 684 422 powtodb;
+#X obj 734 422 rmstodb;
+#X obj 784 422 dbtopow;
+#X obj 834 422 dbtorms;
+#X text 455 423 Acoustical Unit Conversion;
+#X text 547 450 Higher Math;
+#X obj 793 374 mod;
+#X obj 820 374 div;
+#X obj 626 449 sin;
+#X obj 652 449 cos;
+#X obj 679 449 tan;
+#X obj 706 449 atan;
+#X obj 625 473 atan2;
+#X obj 716 499 random;
+#X obj 663 473 sqrt;
+#X obj 694 473 log;
+#X obj 720 473 exp;
+#X obj 746 473 abs;
+#X text 580 499 Other;
+#N canvas 181 122 454 304 related_objects_from_other_libraries 0;
+#X obj 37 25 vector+;
+#X obj 37 45 vector-;
+#X obj 37 65 vector*;
+#X obj 85 25 vector/;
+#X obj 85 45 rgb2hsv;
+#X obj 85 65 hsv2rgb;
+#X obj 133 25 abs~;
+#X obj 133 45 db2v;
+#X obj 133 65 v2db;
+#X obj 163 25 avg~;
+#X obj 164 45 tavg~;
+#X obj 164 65 pdf~;
+#X obj 201 24 <~;
+#X obj 201 45 ==~;
+#X obj 201 67 >~;
+#X obj 228 25 &&~;
+#X obj 228 46 ||~;
+#X obj 228 67 matrix~;
+#X obj 280 25 mavg;
+#X obj 280 46 mean;
+#X obj 280 68 divide;
+#X obj 323 27 divmod;
+#X obj 324 47 minus;
+#X obj 324 67 plus;
+#X text 29 104 These objects are offered in PD only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 28 153 The best places to find information about PD's libraries
+is:;
+#X text 25 175 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 27 190 or;
+#X text 27 205 iem.kug.ac.at/pdb/;
+#X obj 370 27 q8_rsqrt~;
+#X obj 370 51 q8_sqrt~;
+#X restore 520 537 pd related_objects_from_other_libraries;
+#X obj 763 499 f;
+#X obj 791 499 int;
+#X obj 794 398 %;
+#X obj 251 539 timer;
+#X text 292 584 This document was updated for PD version 0.35 test
+28 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X obj 739 449 pow;
+#X connect 11 0 13 0;
+#X connect 12 0 11 0;
+#X connect 14 0 11 1;
+#X connect 15 0 11 0;
+#X connect 22 0 24 0;
+#X connect 24 0 23 0;
+#X connect 31 0 30 0;
+#X connect 34 0 43 0;
+#X connect 35 0 46 0;
+#X connect 36 0 47 0;
+#X connect 37 0 48 0;
+#X connect 43 0 35 0;
+#X connect 43 1 36 0;
+#X connect 43 2 37 0;
+#X connect 44 0 45 0;
+#X connect 45 0 42 0;
+#X connect 46 0 44 0;
+#X connect 47 0 44 1;
+#X connect 48 0 45 1;

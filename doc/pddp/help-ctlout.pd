@@ -1,0 +1,90 @@
+#N canvas 251 9 495 634 10;
+#N canvas 240 135 476 472 other_midi_objects 0;
+#X obj 55 31 ctlin;
+#X obj 97 31 pgmin;
+#X obj 140 30 bendin;
+#X obj 191 29 touchin;
+#X obj 252 29 polytouchin;
+#X obj 337 29 midiin;
+#X obj 388 28 sysexin;
+#X obj 6 85 noteout;
+#X obj 63 84 ctlout;
+#X obj 161 85 touchout;
+#X obj 225 84 polytouchout;
+#X obj 314 84 midiout;
+#X obj 113 84 pgmout;
+#X obj 11 153 makenote;
+#X text 10 194 MIDI notes deconstruction:;
+#X text 8 128 MIDI note construction:;
+#X text 8 58 MIDI output:;
+#X text 8 2 MIDI input:;
+#X obj 15 226 stripnote;
+#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+by Olaf Matthes);
+#X obj 148 297 chord;
+#X obj 109 296 borax;
+#X obj 54 296 score o;
+#X obj 13 296 pitch;
+#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X obj 16 359 midiformat;
+#X obj 172 359 midiflush;
+#X obj 98 359 midiparse;
+#X text 15 386 and xeq \, from the same developer;
+#X obj 16 411 xeq;
+#X text 41 402 an experimental MIDI sequencer;
+#X obj 8 31 midiin;
+#X restore 89 430 pd other_midi_objects;
+#X obj 285 469 midi-basics;
+#X text 21 469 for an explanation of MIDI usage in PD see:;
+#X obj 18 16 ctlout;
+#X text 14 43 The [ctlout] objects sends control messages to the MIDI
+port. See a MIDI specification chart for various controller numbers/values
+descriptions.;
+#X text 15 89 Arguments (optional):;
+#X text 24 105 1st (or only one) argument represents the controller
+number to transmit to.;
+#X text 24 137 2nd argument designates the channel number to transmit
+on. If no channel is specified it transmits on channel 1;
+#X floatatom 21 181 5 0 0;
+#X obj 21 231 ctlout;
+#X floatatom 39 197 5 0 0;
+#X floatatom 57 213 5 0 0;
+#X text 108 175 Inlets:;
+#X text 107 240 Outlets: none. Transmits directly to the MIDI port.
+;
+#X text 120 192 Left: (int) control value (0-127).;
+#X text 120 207 Middle: (int) controller number.;
+#X text 120 223 Right: (int) channel number.;
+#X text 21 264 NOTE: the left inlet accepts also a list of (2 or 3)
+integers where the first item is controller value \, second controller
+number and third the channel number.;
+#X obj 24 356 ctlout;
+#X obj 116 356 ctlout 64;
+#X obj 218 356 ctlout 64 2;
+#X obj 320 355 ctlout;
+#X msg 43 337 64;
+#X msg 73 337 2;
+#X msg 317 320 67 64 2;
+#X floatatom 218 318 5 0 0;
+#X floatatom 116 316 5 0 0;
+#X floatatom 24 316 5 0 0;
+#X msg 173 333 2;
+#X text 23 379 All these examples will transmit control no 64 on channel
+2 (remember to click the message boxes to initialize).;
+#X text 22 411 See also:;
+#X obj 25 430 ctlin;
+#X text 66 17 - send MIDI control messages to the MIDI port;
+#X text 19 515 This document was updated for PD version 0.35 by Michal
+Seta as part of a project called pddp proposed by Krzysztof Czaja \,
+managed and edited by Dave Sabine \, to build comprehensive documentation
+for PD.;
+#X connect 8 0 9 0;
+#X connect 10 0 9 1;
+#X connect 11 0 9 2;
+#X connect 22 0 18 1;
+#X connect 23 0 18 2;
+#X connect 24 0 21 0;
+#X connect 25 0 20 0;
+#X connect 26 0 19 0;
+#X connect 27 0 18 0;
+#X connect 28 0 19 2;
