@@ -11,7 +11,7 @@ LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes  \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE = -I. -I.. -I../../../pd/src
+LINUXINCLUDE = -I. -I.. -I../include
 
 %.pd_linux: ../src/%.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o "$*.o" -c "../src/$*.c"
@@ -25,9 +25,11 @@ clean:
 	-rm link.stamp
 
 install-doc:
+	@test -d $(prefix)/lib/pd/doc/5.reference || mkdir -p $(prefix)/lib/pd/doc/5.reference
 	cp -r ../doc/* $(prefix)/lib/pd/doc/5.reference
 
 install: install-doc
+	@test -d $(prefix)/lib/pd/extra || mkdir -p $(prefix)/lib/pd/extra
 	install -m644 *.pd_linux $(prefix)/lib/pd/extra
 
 
