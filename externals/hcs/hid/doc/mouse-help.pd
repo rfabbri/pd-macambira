@@ -1,6 +1,6 @@
 #N canvas 53 201 666 460 10;
 #X symbolatom 211 268 6 0 0 1 code - -;
-#X obj 130 106 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+#X obj 130 106 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
 #X floatatom 339 268 5 0 0 1 value - -;
 #X floatatom 140 268 5 0 0 3 wheel - -;
@@ -52,7 +52,6 @@
 #X obj 425 119 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X text 308 95 turn this on to make some noise with the mouse;
-#X obj 130 161 mouse 1;
 #X obj 211 241 unpack symbol float;
 #X text 282 284 buttons;
 #X obj 329 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -73,7 +72,7 @@
 ;
 #X text 228 436 released under the GNU GPL;
 #X text 424 436 $Author: eighthave $;
-#X text 424 423 $Revision: 1.6 $;
+#X text 424 423 $Revision: 1.7 $;
 #X obj 526 382 all_about_hid;
 #X text 417 383 For more info:;
 #X obj 601 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -83,28 +82,30 @@ btn_8;
 #X text 12 36 Use a mouse device with Pd. This object auto-calibrates
 the output of axis data. Move the device around as fast as possible
 in each axis to calibrate it.;
-#X connect 1 0 18 0;
-#X connect 9 0 18 0;
-#X connect 10 0 18 0;
-#X connect 11 0 18 0;
+#X obj 130 161 mouse 0;
+#X text 13 111 turn on polling:;
+#X connect 1 0 36 0;
+#X connect 9 0 36 0;
+#X connect 10 0 36 0;
+#X connect 11 0 36 0;
 #X connect 13 0 12 1;
 #X connect 14 0 12 1;
 #X connect 15 0 12 1;
 #X connect 16 0 12 0;
-#X connect 18 0 5 0;
-#X connect 18 1 4 0;
-#X connect 18 2 3 0;
-#X connect 18 3 19 0;
-#X connect 18 3 35 0;
-#X connect 19 0 0 0;
-#X connect 19 1 2 0;
-#X connect 35 0 6 0;
-#X connect 35 1 7 0;
-#X connect 35 2 8 0;
-#X connect 35 3 21 0;
-#X connect 35 4 22 0;
-#X connect 35 5 23 0;
-#X connect 35 6 24 0;
-#X connect 35 7 25 0;
-#X connect 35 8 27 0;
-#X connect 35 9 34 0;
+#X connect 18 0 0 0;
+#X connect 18 1 2 0;
+#X connect 34 0 6 0;
+#X connect 34 1 7 0;
+#X connect 34 2 8 0;
+#X connect 34 3 20 0;
+#X connect 34 4 21 0;
+#X connect 34 5 22 0;
+#X connect 34 6 23 0;
+#X connect 34 7 24 0;
+#X connect 34 8 26 0;
+#X connect 34 9 33 0;
+#X connect 36 0 5 0;
+#X connect 36 1 4 0;
+#X connect 36 2 3 0;
+#X connect 36 3 18 0;
+#X connect 36 3 34 0;

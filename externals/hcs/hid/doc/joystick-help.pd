@@ -21,7 +21,6 @@
 1;
 #X obj 497 324 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 168 154 joystick 3;
 #X obj 538 324 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X obj 579 324 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -37,39 +36,40 @@
 ;
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;
-#X text 414 413 $Revision: 1.4 $;
+#X text 414 413 $Revision: 1.5 $;
 #X obj 519 372 all_about_hid;
 #X text 410 373 For more info:;
 #X floatatom 245 234 5 0 0 3 hat0X - -;
 #X floatatom 288 234 5 0 0 3 hat0Y - -;
 #X msg 220 112 open 3;
-#X msg 225 131 open 4;
 #X text 8 36 Use a joystick device with Pd. This object auto-calibrates
 the output of axis data. Move each element of the device across its
 full range to calibrate it.;
 #X obj 212 291 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8 btn_9;
-#X connect 0 0 13 0;
-#X connect 13 0 2 0;
-#X connect 13 1 1 0;
-#X connect 13 2 7 0;
-#X connect 13 3 8 0;
-#X connect 13 4 28 0;
-#X connect 13 5 29 0;
-#X connect 13 6 18 0;
-#X connect 13 6 33 0;
-#X connect 18 0 16 0;
-#X connect 18 1 17 0;
-#X connect 21 0 13 0;
-#X connect 30 0 13 0;
-#X connect 31 0 13 0;
-#X connect 33 0 3 0;
-#X connect 33 1 4 0;
-#X connect 33 2 5 0;
-#X connect 33 3 6 0;
-#X connect 33 4 9 0;
-#X connect 33 5 10 0;
-#X connect 33 6 11 0;
-#X connect 33 7 12 0;
-#X connect 33 8 14 0;
-#X connect 33 9 15 0;
+#X msg 225 131 open 5;
+#X obj 168 154 joystick 0;
+#X connect 0 0 33 0;
+#X connect 17 0 15 0;
+#X connect 17 1 16 0;
+#X connect 20 0 33 0;
+#X connect 29 0 33 0;
+#X connect 31 0 3 0;
+#X connect 31 1 4 0;
+#X connect 31 2 5 0;
+#X connect 31 3 6 0;
+#X connect 31 4 9 0;
+#X connect 31 5 10 0;
+#X connect 31 6 11 0;
+#X connect 31 7 12 0;
+#X connect 31 8 13 0;
+#X connect 31 9 14 0;
+#X connect 32 0 33 0;
+#X connect 33 0 2 0;
+#X connect 33 1 1 0;
+#X connect 33 2 7 0;
+#X connect 33 3 8 0;
+#X connect 33 4 27 0;
+#X connect 33 5 28 0;
+#X connect 33 6 17 0;
+#X connect 33 6 31 0;
