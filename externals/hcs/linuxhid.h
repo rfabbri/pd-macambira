@@ -1,3 +1,22 @@
+#include <m_imp.h>
+
+#include <linux/input.h>
+
+#include <sys/stat.h>
+
+#include <string.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+
+#define DEBUG(x)
+/*#define DEBUG(x) x */
+
+static char *version = "$Revision: 1.2 $";
+
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
  */

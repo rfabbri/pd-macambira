@@ -1,30 +1,9 @@
-
-#include <m_imp.h>
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-#include <linux/input.h>
-
-#include <sys/stat.h>
-
-#include <string.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <termios.h>
-
 #include "linuxhid.h"
-
-#define DEBUG(x) 
-/*#define DEBUG(x) x */
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 #define LINUXEVENT_OUTLETS  4
+
+static char *version = "$Revision: 1.2 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

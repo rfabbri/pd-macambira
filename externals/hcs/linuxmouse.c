@@ -1,35 +1,9 @@
-
-#include <m_imp.h>
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
-
-#include <linux/input.h>
-
-#include <sys/stat.h>
-
-#include <string.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <termios.h>
-
 #include "linuxhid.h"
 
-#define DEBUG(x)
-/*#define DEBUG(x) x */
-
-
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
-
 #define LINUXMOUSE_AXES     3
-#define LINUXMOUSE_BUTTONS  7
 
+static char *version = "$Revision: 1.2 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -46,8 +20,6 @@ typedef struct _linuxmouse {
   t_outlet            *x_axis_out[LINUXMOUSE_AXES];
   t_outlet            *x_button_num_out;
   t_outlet            *x_button_val_out;
-  t_clock             *x_clock;
-  double              x_delaytime;
   unsigned char       x_buttons;
   unsigned char       x_axes;
 }t_linuxmouse;
