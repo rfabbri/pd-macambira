@@ -1,0 +1,80 @@
+This file describes implementation and API changes; stuff more visible to the
+user appears in the "release notes" instead.
+
+0.37.1
+
+makefile.in: MANINSTDIR = $(DESTDIR)/$(MANDIR) changed to
+    $(DESTDIR)/$(INSTALL_PREFIX)/$(MANDIR) (thx. Mathieu Bouchard)
+
+applied 2 jack patches from Luke Yelavich
+
+add -fno-strict-aliasing to config script (linux&mac) to improve underflow,
+etc., protection
+
+add underflow protection to vcf~ object; rewrote underflow protection to be
+faster in throw~/catch~ and send~/receive~
+
+fixed bug in -inchannels/-outchannels arg parsing
+
+fixed u_main.tk to make "apple" key work to accelerate menus on MACOS
+
+fooled with MIDI to try to get sysex and other system messages to work.
+Needs lots of testing now...
+
+finally fixed OSS to open audio with NODELAY... also cleared dup-on-exec flag.
+
+bug fix in scalar_properties
+
+major editions to the IEM GUIs to fix bugs in how "$" variables are handled.
+The code still isn't pretty but hopefully at least works now.
+
+tried to get alsa noninterleaved access to work (needed for RME).  Failed
+to get my RME card to load under ALSA and gave up for now.
+
+fixed scalar drawing to fail gracefully when the template canvas disappears
+
+bug fix in vd~ for very small delays (d_delay.c)
+
+set up sys_oldtclversion flag to correct for changed text selection
+(u_main.tk, s_main.c, g_rtext.c)
+
+tried again to add "readn" support to s_audio_alsa.c: coded, but failing so far.
+
+fixed broken octave divider example
+
+removed "-Werror" from default makefile; fixed  configure script to respect
+"CFLAGS" environment variable instead.  Suggest developers should use
+"setenv CFLAGS -Werror".
+
+added "-alsaadd" flag so people can specify alsa devnames to add to list.
+fixed some problems with Pd crashing when ALSA failed to open.
+
+took out the 2-pixel padding for MSW in g_canvas.g (HORIZBORDER/VERTBORDER)
+
+went back to s_midi_mmio (portaudio version got assertion errors and anyway
+I could never get sysex working in it as I had wanted.)
+
+Took bug fixes from s_midi_pm.c, s_audio_jack.c, s_inter.c from "devel" branch;
+also added "static" flag to configure.in (but the devel configure.in as a whole
+doesn't seem to work for OSX, for me at least.)
+ 
+Might have fixed a bug where labels disappear in buttons, etc, when saved
+and reloaded.
+
+brought s_audio_alsa.c up to alsa 1.0.0 compatibility
+
+fixed "-alsaadd" (never worked before)
+
+fooled with macintosh audio.  Fixed some (not all) of the audio I/O APIs
+to deal with open failures better (reducing sys_{in,out}channels accordingly)
+
+In the Alsa API, the synchronization test was too stringent and was loosened
+to 3*DACBLKSIZE/2.
+
+'make install' fixed to deal with 'extra' correctly.
+
+one more improvement in jack support (guenter)
+
+make an "nrt" flag so mac can disable pthread_setschedparam call if yu want.
+
+

@@ -43,6 +43,9 @@ extern "C" {
  *               prevent opening an input as output and vice versa.
  *             Added comments and documentation.
  *             Implemented Pm_Terminate().
+ *
+ * 27Jun03 X. J. Scott (XJS)
+ *             - Adding void arg to Pm_GetHostError() to stop compiler gripe.
  */
 
 #ifndef FALSE
@@ -88,7 +91,7 @@ PmError Pm_Terminate( void );
     number, call Pm_GetHostError().
     This can be called after a function returns a PmError equal to pmHostError.
 */
-int Pm_GetHostError();
+int Pm_GetHostError( void ); /* xjs - void param to stop compiler gripe */
 
 /*
     Translate the error number into a human readable message.
@@ -111,8 +114,8 @@ typedef int PmDeviceID;
 
 typedef struct {
     int structVersion; 
-    const char *interf;
-    const char *name;
+    char const *interf;
+    char const *name;
     int input; /* true iff input is available */
     int output; /* true iff output is available */
 } PmDeviceInfo;

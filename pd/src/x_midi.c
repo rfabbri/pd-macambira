@@ -85,24 +85,23 @@ static void midiin_setup(void)
 
 void inmidi_byte(int portno, int byte)
 {
-    static int sysex;
     t_atom at[2];
-    if (byte == 0xf0)
-    	sysex |= (1 << portno);
-    if (sysexin_sym->s_thing && (sysex & (1 << portno)))
-    {
-    	SETFLOAT(at, byte);
-    	SETFLOAT(at+1, portno + 1);
-    	pd_list(sysexin_sym->s_thing, 0, 2, at);
-    }
-    if (byte == 0xf7)
-    	sysex &= (~(1 << portno));
-
     if (midiin_sym->s_thing)
     {
     	SETFLOAT(at, byte);
     	SETFLOAT(at+1, portno + 1);
     	pd_list(midiin_sym->s_thing, 0, 2, at);
+    }
+}
+
+void inmidi_sysex(int portno, int byte)
+{
+    t_atom at[2];
+    if (sysexin_sym->s_thing)
+    {
+    	SETFLOAT(at, byte);
+    	SETFLOAT(at+1, portno + 1);
+    	pd_list(sysexin_sym->s_thing, 0, 2, at);
     }
 }
 

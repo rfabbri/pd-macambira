@@ -40,11 +40,9 @@ static t_int *sigsend_perform(t_int *w)
     int n = (int)(w[3]);
     while (n--)
     {
-	float f = *in++;
-    	if (PD_BADFLOAT(f))
-	    f = 0;
-	
-	*out++ = f;
+    	*out = (PD_BADFLOAT(*in) ? 0 : *in);
+	out++;
+	in++;
     }
     return (w+4);
 }
@@ -244,10 +242,9 @@ static t_int *sigthrow_perform(t_int *w)
     {
     	while (n--)
 	{
-	    float f = *in++;
-    	    if (PD_BADFLOAT(f))
-	    	f = 0;
-	    *out++ += f;
+    	    *out += (PD_BADFLOAT(*in) ? 0 : *in);
+	    out++;
+	    in++;
 	}
     }
     return (w+4);

@@ -10,7 +10,7 @@ pd_nt: obj1.dll obj2.dll obj3.dll obj4.dll obj5.dll dspobj~.dll
 .SUFFIXES: .obj .dll
 
 PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
-VC="C:\Program Files\Microsoft Visual Studio\Vc98"
+VC="D:\Program Files\Microsoft Visual Studio\Vc98"
 
 PDNTINCLUDE = /I. /I\tcl\include /I..\..\src /I$(VC)\include
 

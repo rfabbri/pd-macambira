@@ -3,7 +3,28 @@
  * 
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: pmmacosx.c,v 1.1.1.1 2003-05-09 16:04:00 ggeiger Exp $
+ * $Id: pmmacosx.c,v 1.1.1.2 2004-02-02 11:28:02 ggeiger Exp $
+ *
+ * 27Jun02 XJS (X. J. Scott)
+ *   - midi_length():
+ *     fixed bug that gave bad lengths for system messages
+ *
+ *   / pm_macosx_init():
+ *     Now allocates the device names. This fixes bug before where
+ *     it assigned same string buffer on stack to all devices.
+ *   - pm_macosx_term(), deleteDeviceName():
+ *     devices strings allocated during pm_macosx_init() are deallocated.
+ *
+ *   + pm_macosx_init(), newDeviceName():
+ *     registering kMIDIPropertyManufacturer + kMIDIPropertyModel + kMIDIPropertyName
+ *     for name strings instead of just name.
+ *
+ *   / pm_macosx_init(): unsigned i to quiet compiler griping
+ *   - get_timestamp():
+ *     no change right here but type of Pt_Time() was altered in porttime.h
+ *     so it matches type PmTimeProcPtr in assignment in this function.
+ *   / midi_write():
+ *     changed unsigned to signed to stop compiler griping
  */ 
 
 #include "portmidi.h"
@@ -17,6 +38,8 @@
 #include <CoreServices/CoreServices.h>
 #include <CoreMIDI/MIDIServices.h>
 
+#define PM_DEVICE_NAME_LENGTH 64
+
 #define PACKET_BUFFER_SIZE 1024
 
 static MIDIClientRef	client = NULL;	/* Client handle to the MIDI server */
@@ -25,6 +48,9 @@ static MIDIPortRef		portOut = NULL;	/* Output port handle */
 
 extern pm_fns_node pm_macosx_in_dictionary;
 extern pm_fns_node pm_macosx_out_dictionary;
+
+static char * newDeviceName(MIDIEndpointRef endpoint);
+static void deleteDeviceName(char **szDeviceName_p);
 
 static int
 midi_length(long msg)
@@ -42,8 +68,8 @@ midi_length(long msg)
     status = msg & 0xFF;
     high = status >> 4;
     low = status & 15;
-
-    return (high != 0xF0) ? high_lengths[high] : low_lengths[low];
+//    return (high != 0xF0) ? high_lengths[high] : low_lengths[low];
+   return (high != 0x0F) ? high_lengths[high] : low_lengths[low]; // fixed 6/27/03, xjs
 }
 
 static PmTimestamp
@@ -171,7 +197,7 @@ midi_write(PmInternal *midi, PmEvent *events, long length)
 	PmTimeProcPtr time_proc;
 	PmEvent event;
 	unsigned int pm_time;
-	unsigned int eventIndex;
+  long eventIndex; // xjs: long instead of unsigned int, to match type of 'length' which compares against it
 	unsigned int messageLength;
 	Byte message[3];
 
@@ -202,7 +228,7 @@ midi_write(PmInternal *midi, PmEvent *events, long length)
 
 	/* Extract the event data and pack it into the message buffer */
 	for (eventIndex = 0; eventIndex < length; eventIndex++) {
-		event = events[eventIndex];
+        	event = events[eventIndex];
 
 		/* Compute the timestamp */
 		pm_time = (*time_proc)(midi->time_info);
@@ -228,6 +254,78 @@ midi_write(PmInternal *midi, PmEvent *events, long length)
 	return pmNoError;
 }
 
+/* newDeviceName()    -- create a string that describes a MIDI endpoint device
+ * deleteDeviceName() -- dispose of string created.
+ *
+ * Concatenates manufacturer, model and name of endpoint and returns
+ * within freshly allocated space, to be registered in pm_add_device().
+ *
+ * 27Jun03: XJS -- extracted and extended from pm_macosx_init().
+ * 11Nov03: XJS -- safely handles cases where any string properties are
+ *   not present, such as is the case with the virtual ports created
+ *   by many programs.
+ */
+
+static char * newDeviceName(MIDIEndpointRef endpoint)
+{
+  CFStringEncoding defaultEncoding;
+  CFStringRef deviceCFString;
+  char manufBuf[PM_DEVICE_NAME_LENGTH];
+  char modelBuf[PM_DEVICE_NAME_LENGTH];
+  char nameBuf[PM_DEVICE_NAME_LENGTH];
+  char manufModelNameBuf[PM_DEVICE_NAME_LENGTH * 3 + 1];
+  char *szDeviceName;
+  size_t length;
+  OSStatus iErr;
+
+  /* Determine the default system character encording */
+
+  defaultEncoding = CFStringGetSystemEncoding();
+
+  /* Get the manufacturer, model and name of this device and combine into one string. */
+
+  iErr = MIDIObjectGetStringProperty(endpoint, kMIDIPropertyManufacturer, &deviceCFString);
+  if (noErr == iErr) {
+      CFStringGetCString(deviceCFString, manufBuf, sizeof(manufBuf), defaultEncoding);
+      CFRelease(deviceCFString);
+      }
+   else
+     strcpy(manufBuf, "<undef. manuf>");
+
+  iErr = MIDIObjectGetStringProperty(endpoint, kMIDIPropertyModel, &deviceCFString);
+  if (noErr == iErr) {
+      CFStringGetCString(deviceCFString, modelBuf, sizeof(modelBuf), defaultEncoding);
+      CFRelease(deviceCFString);
+      }
+   else
+     strcpy(modelBuf, "<undef. model>");
+
+  iErr = MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &deviceCFString);
+  if (noErr == iErr) {
+      CFStringGetCString(deviceCFString, nameBuf, sizeof(nameBuf), defaultEncoding);
+      CFRelease(deviceCFString);
+      }
+   else
+     strcpy(nameBuf, "<undef. name>");
+
+  sprintf(manufModelNameBuf, "%s %s: %s", manufBuf, modelBuf, nameBuf);
+  length = strlen(manufModelNameBuf);
+
+  /* Allocate a new string and return. */
+
+  szDeviceName = (char *)pm_alloc(length + 1);
+  strcpy(szDeviceName, manufModelNameBuf);
+
+  return szDeviceName;
+}
+
+static void deleteDeviceName(char **szDeviceName_p)
+{
+  pm_free(*szDeviceName_p);
+  *szDeviceName_p = NULL;
+  return;
+}
+
 pm_fns_node pm_macosx_in_dictionary = {
     none_write,
     midi_in_open,
@@ -248,14 +346,12 @@ pm_macosx_init(void)
 	OSStatus status;
 	ItemCount numDevices, numInputs, numOutputs;
 	MIDIEndpointRef endpoint;
-	CFStringEncoding defaultEncoding;
-	CFStringRef deviceName;
-	char nameBuf[256];
-	int i;
+	unsigned int i; // xjs, unsigned
+  char *szDeviceName;
 
 	/* Determine the number of MIDI devices on the system */
 	numDevices = MIDIGetNumberOfDevices();
-	numInputs = MIDIGetNumberOfSources();
+	numInputs  = MIDIGetNumberOfSources();
 	numOutputs = MIDIGetNumberOfDestinations();
 
 	/* Return prematurely if no devices exist on the system */
@@ -263,8 +359,6 @@ pm_macosx_init(void)
 		return pmHostError;
 	}
 
-	/* Determine the default system character encording */
-	defaultEncoding = CFStringGetSystemEncoding();
 
 	/* Iterate over the MIDI input devices */
 	for (i = 0; i < numInputs; i++) {
@@ -273,13 +367,12 @@ pm_macosx_init(void)
 			continue;
 		}
 
-		/* Get the name of this device */
-		MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &deviceName);
-		CFStringGetCString(deviceName, nameBuf, 256, defaultEncoding);
-		CFRelease(deviceName);
+    /* Get the manufacturer, model and name of this device and combine into one string. */
+    szDeviceName = newDeviceName(endpoint); // xjs
 
 		/* Register this device with PortMidi */
-		pm_add_device("CoreMIDI", nameBuf, TRUE, (void *)endpoint,
+    // xjs: szDeviceName is allocated memory since each has to be different and is not copied in pm_add_device()
+    pm_add_device("CoreMIDI", szDeviceName, TRUE, (void *)endpoint,
 					  &pm_macosx_in_dictionary);
 	}
 
@@ -290,14 +383,13 @@ pm_macosx_init(void)
 			continue;
 		}
 
-		/* Get the name of this device */
-		MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName, &deviceName);
-		CFStringGetCString(deviceName, nameBuf, 256, defaultEncoding);
-		CFRelease(deviceName);
+		/* Get the manufacturer & model of this device */
+    szDeviceName = newDeviceName(endpoint); // xjs
 
 		/* Register this device with PortMidi */
-		pm_add_device("CoreMIDI", nameBuf, FALSE, (void *)endpoint,
-					  &pm_macosx_out_dictionary);
+		pm_add_device("CoreMIDI", szDeviceName, FALSE, (void *)endpoint, // xjs, szDeviceName (as above)
+            &pm_macosx_out_dictionary);
+
 	}
 
 	/* Initialize the client handle */
@@ -328,6 +420,17 @@ pm_macosx_init(void)
 PmError
 pm_macosx_term(void)
 {
+  int i;
+  int device_count;
+  const PmDeviceInfo *deviceInfo;
+
+  /* release memory allocated for device names */
+  device_count = Pm_CountDevices();
+  for (i = 0; i < device_count; i++) {
+    deviceInfo = Pm_GetDeviceInfo(i);
+    deleteDeviceName((char **)&deviceInfo->name);
+  }
+
 	if (client != NULL)		MIDIClientDispose(client);
 	if (portIn != NULL)		MIDIPortDispose(portIn);
 	if (portOut != NULL)	MIDIPortDispose(portOut);

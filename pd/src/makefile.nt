@@ -13,12 +13,12 @@ LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames  /NODEFAULTLIB:kernel \
     $(LDIR)\libc.lib $(LDIR)\oldnames.lib $(LDIR)\kernel32.lib \
     $(LDIR)\wsock32.lib $(LDIR)\winmm.lib ..\bin\pthreadVC.lib
 
-GLIB =  $(LIB) ..\lib\tcl83.lib ..\lib\tk83.lib
+GLIB =  $(LIB) ..\bin\tcl83.lib ..\bin\tk83.lib
 CFLAGS = /nologo /W3 /DMSW /DNT /DPD /DPD_INTERNAL /DWIN32 /DWINDOWS /Ox \
 	-DPA_LITTLE_ENDIAN -DUSEAPI_MMIO -DUSEAPI_PORTAUDIO 
 LFLAGS = /nologo
 
-SYSSRC = s_audio_pa.c s_audio_mmio.c s_midi_pm.c
+SYSSRC = s_audio_pa.c s_audio_mmio.c s_midi_mmio.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -37,56 +37,19 @@ SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
 
 PADIR = ..\portaudio
 INCPA = -I$(PADIR) -I$(PADIR)\pa_common -I$(PADIR)\pablio -I..\lib\asio
-SRCPA = \
-        $(PADIR)/pa_common/pa_allocation.c        \
-        $(PADIR)/pa_common/pa_converters.c        \
-        $(PADIR)/pa_common/pa_cpuload.c           \
-        $(PADIR)/pa_common/pa_dither.c            \
-        $(PADIR)/pa_common/pa_front.c             \
-        $(PADIR)/pa_common/pa_process.c           \
-        $(PADIR)/pa_common/pa_skeleton.c          \
-        $(PADIR)/pa_common/pa_stream.c            \
-        $(PADIR)/pa_common/pa_trace.c             \
-        $(PADIR)/pablio/pablio_pd.c               \
-        $(PADIR)/pablio/ringbuffer_pd.c           \
-        $(PADIR)/pa_win/pa_win_hostapis.c         \
-        $(PADIR)/pa_win/pa_win_util.c             \
-        $(PADIR)/pa_win/pa_x86_plain_converters.c \
-        $(PADIR)/pa_win_wmme/pa_win_wmme.c       
-
-#       $(PADIR)/pa_win_ds/dsound_wrapper.c       \
-#       $(PADIR)/pa_win_ds/pa_dsound.c            \
-#       $(PADIR)/pa_win_ds/pa_win_ds.c            \
-
-PAOBJ = \
- pa_allocation.obj pa_converters.obj pa_cpuload.obj pa_dither.obj pa_front.obj \
- pa_process.obj pa_skeleton.obj pa_stream.obj pa_trace.obj pablio_pd.obj  \
- ringbuffer_pd.obj pa_win_hostapis.obj pa_win_util.obj \
- pa_x86_plain_converters.obj \
- pa_win_wmme.obj pa_asio.obj \
-
-# dsound_wrapper.obj pa_dsound.obj pa_win_ds.obj 
-
-
+SRCPA = $(PADIR)/pa_common/pa_lib.c $(PADIR)/pa_common/pa_trace.c \
+	$(PADIR)/pablio/pablio_pd.c $(PADIR)/pablio/ringbuffer_pd.c
 SRCASIO = $(PADIR)/pa_asio/pa_asio.cpp 
-ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib \
-    $(LDIR)\comdlg32.lib \
+
+ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib $(LDIR)\comdlg32.lib \
 $(LDIR)\advapi32.lib $(LDIR)\shell32.lib $(LDIR)\ole32.lib $(LDIR)\oleaut32.lib $(LDIR)\uuid.lib \
 $(LDIR)\odbc32.lib $(LDIR)\odbccp32.lib ..\lib\asio\asiolib.lib
 
-PMDIR = ..\portmidi
-INCPM = -I$(PMDIR)\pm_common -I$(PMDIR)\pm_win -I$(PMDIR)\porttime
-SRCPM = \
-        $(PMDIR)/pm_common/portmidi.c     \
-        $(PMDIR)/pm_common/pmutil.c       \
-        $(PMDIR)/pm_win/pmwin.c           \
-        $(PMDIR)/pm_win/pmwinmm.c         \
-        $(PMDIR)/porttime/porttime.c         \
-        $(PMDIR)/porttime/ptwinmm.c         \
 
-PMOBJ = portmidi.obj pmutil.obj pmwin.obj pmwinmm.obj porttime.obj ptwinmm.obj
+PAOBJ = pa_lib.obj pa_trace.obj pablio_pd.obj ringbuffer_pd.obj pa_asio.obj
 
-OBJC = $(SRC:.c=.obj) $(PAOBJ) $(PMOBJ)
+
+OBJC = $(SRC:.c=.obj) $(PAOBJ)
 
 GSRC =  t_main.c t_tkcmd.c
 
@@ -124,59 +87,18 @@ gui: ..\bin\pdtcl.dll
 	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO u_pdreceive.obj \
 	    $(LIB)
 
-# explicit rules to compile portaudio and portmidi sources:
-pa_allocation.obj: $(PADIR)\pa_common\pa_allocation.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_allocation.c
-pa_converters.obj: $(PADIR)\pa_common\pa_converters.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_converters.c
-pa_cpuload.obj: $(PADIR)\pa_common\pa_cpuload.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_cpuload.c
-pa_dither.obj: $(PADIR)\pa_common\pa_dither.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_dither.c
-pa_front.obj: $(PADIR)\pa_common\pa_front.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_front.c
-pa_process.obj: $(PADIR)\pa_common\pa_process.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_process.c
-pa_skeleton.obj: $(PADIR)\pa_common\pa_skeleton.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_skeleton.c
-pa_stream.obj: $(PADIR)\pa_common\pa_stream.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_stream.c
+# explicit rules to compile portaudio sources:
+pa_lib.obj: $(PADIR)\pa_common\pa_lib.c
+	cl /c $(ALLCF) $(PADIR)\pa_common\pa_lib.c
 pa_trace.obj: $(PADIR)\pa_common\pa_trace.c
 	cl /c $(ALLCF) $(PADIR)\pa_common\pa_trace.c
 pablio_pd.obj: $(PADIR)\pablio\pablio_pd.c
 	cl /c $(ALLCF) $(PADIR)\pablio\pablio_pd.c
 ringbuffer_pd.obj: $(PADIR)\pablio\ringbuffer_pd.c
 	cl /c $(ALLCF) $(PADIR)\pablio\ringbuffer_pd.c
-pa_win_hostapis.obj: $(PADIR)\pa_win\pa_win_hostapis.c
-	cl /c $(ALLCF) $(PADIR)\pa_win\pa_win_hostapis.c
-pa_win_util.obj: $(PADIR)\pa_win\pa_win_util.c
-	cl /c $(ALLCF) $(PADIR)\pa_win\pa_win_util.c
-pa_x86_plain_converters.obj: $(PADIR)\pa_win\pa_x86_plain_converters.c
-	cl /c $(ALLCF) $(PADIR)\pa_win\pa_x86_plain_converters.c
-dsound_wrapper.obj: $(PADIR)\pa_win_ds\dsound_wrapper.c
-	cl /c $(ALLCF) $(PADIR)\pa_win_ds\dsound_wrapper.c
-pa_dsound.obj: $(PADIR)\pa_win_ds\pa_dsound.c
-	cl /c $(ALLCF) $(PADIR)\pa_win_ds\pa_dsound.c
-pa_win_ds.obj: $(PADIR)\pa_win_ds\pa_win_ds.c
-	cl /c $(ALLCF) $(PADIR)\pa_win_ds\pa_win_ds.c
-pa_win_wmme.obj: $(PADIR)\pa_win_wmme\pa_win_wmme.c 
-	cl /c $(ALLCF) $(PADIR)\pa_win_wmme\pa_win_wmme.c 
 
 pa_asio.obj: $(PADIR)\pa_asio\pa_asio.cpp
 	cl /c $(ALLCF) $(PADIR)\pa_asio\pa_asio.cpp
-
-portmidi.obj: $(PMDIR)\pm_common\portmidi.c
-	cl /c $(ALLCF) $(PMDIR)\pm_common\portmidi.c
-pmutil.obj: $(PMDIR)\pm_common\pmutil.c
-	cl /c $(ALLCF) $(PMDIR)\pm_common\pmutil.c
-pmwin.obj: $(PMDIR)\pm_win\pmwin.c
-	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwin.c
-pmwinmm.obj: $(PMDIR)\pm_win\pmwinmm.c
-	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwinmm.c
-porttime.obj: $(PMDIR)\porttime\porttime.c
-	cl /c $(ALLCF) $(PMDIR)\porttime\porttime.c
-ptwinmm.obj: $(PMDIR)\porttime\ptwinmm.c
-	cl /c $(ALLCF) $(PMDIR)\porttime\ptwinmm.c
 
 # the following should also clean up "bin" but it doesn't because "bin" holds
 # precious stuff from elsewhere.

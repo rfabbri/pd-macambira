@@ -1,5 +1,5 @@
 /*
- * $Id: ringbuffer_pd.c,v 1.1.1.1 2003-05-09 16:04:00 ggeiger Exp $
+ * $Id: ringbuffer_pd.c,v 1.1.1.2 2004-02-02 11:27:58 ggeiger Exp $
  * ringbuffer.c
  * Ring Buffer utility..
  *
@@ -58,9 +58,12 @@ long RingBuffer_Init( RingBuffer *rbuf, long numBytes, void *dataPtr )
 ** Return number of bytes available for reading. */
 long RingBuffer_GetReadAvailable( RingBuffer *rbuf )
 {
-    long ret = (rbuf->writeIndex - rbuf->readIndex) + rbuf->bufferSize;
-    if (ret >= 2 * rbuf->bufferSize)
-        ret -= 2 * rbuf->bufferSize;
+    long ret = rbuf->writeIndex - rbuf->readIndex;
+    if (ret < 0)
+    	ret += 2 * rbuf->bufferSize;
+    if (ret < 0 || ret > rbuf->bufferSize)
+    	fprintf(stderr,
+	    "consistency check failed: RingBuffer_GetReadAvailable\n");
     return ( ret );
 }
 /***************************************************************************
@@ -119,7 +122,7 @@ long RingBuffer_GetWriteRegions( RingBuffer *rbuf, long numBytes,
 long RingBuffer_AdvanceWriteIndex( RingBuffer *rbuf, long numBytes )
 {
     long ret = (rbuf->writeIndex + numBytes);
-    if ( ret > 2 * rbuf->bufferSize)
+    if ( ret >= 2 * rbuf->bufferSize)
         ret -= 2 * rbuf->bufferSize;	/* check for end of buffer */
     return rbuf->writeIndex = ret;
 }
@@ -139,7 +142,7 @@ long RingBuffer_GetReadRegions( RingBuffer *rbuf, long numBytes,
     if( numBytes > available ) numBytes = available;
     /* Check to see if read is not contiguous. */
     index = rbuf->readIndex;
-    while (index > rbuf->bufferSize)
+    while (index >= rbuf->bufferSize)
         index -= rbuf->bufferSize;
     
     if( (index + numBytes) > rbuf->bufferSize )
@@ -165,7 +168,7 @@ long RingBuffer_GetReadRegions( RingBuffer *rbuf, long numBytes,
 long RingBuffer_AdvanceReadIndex( RingBuffer *rbuf, long numBytes )
 {
     long ret = (rbuf->readIndex + numBytes);
-    if( ret > 2 * rbuf->bufferSize)
+    if( ret >= 2 * rbuf->bufferSize)
         ret -= 2 * rbuf->bufferSize;
     return rbuf->readIndex = ret;
 }

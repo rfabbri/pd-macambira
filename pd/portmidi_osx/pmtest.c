@@ -25,11 +25,12 @@ main()
     int statusprefix;
 
 
-
+    Pm_Initialize(); // xjs
+    
     /* always start the timer before you start midi */
     Pt_Start(1, 0, 0); /* start a timer with millisecond accuracy */
 
-
+    printf("%d midi ports found...\n", Pm_CountDevices()); // xjs
     for (i = 0; i < Pm_CountDevices(); i++) {
         const PmDeviceInfo *info = Pm_GetDeviceInfo(i);
         printf("%d: %s, %s", i, info->interf, info->name);
@@ -86,6 +87,7 @@ main()
         gets(line);
     }
 
+    printf("delay %d, tranpose %d\n", delay, transpose); // xjs
 
 
     /* loop, echoing input back transposed with multiple taps */
@@ -111,7 +113,7 @@ main()
         printf("\nReceived key message = %X %X %X, at time %ld\n", status, data1, data2, buffer[0].timestamp);
         fflush(stdout);
 
-        /* immediately send the echoes to PortMIDI */
+        /* immediately send the echoes to PortMIDI (note that only the echoes are to be transposed) */
         for (i = 1; i < NUM_ECHOES; i++) {
             buffer[i].message = Pm_Message(status, data1 + transpose, data2 >> i);
             buffer[i].timestamp = buffer[0].timestamp + (i * delay);
@@ -122,11 +124,15 @@ main()
     printf("Key C2 pressed.  Exiting...\n");
     fflush(stdout);
 
+    Pt_Stop(); // xjs
+
     /* Give the echoes time to finish before quitting. */
     sleep(((NUM_ECHOES * delay) / 1000) + 1);
 
     Pm_Close(midi_in);
     Pm_Close(midi_out);
+
+    Pm_Terminate(); // xjs
 
     printf("Done.\n");
     return 0;

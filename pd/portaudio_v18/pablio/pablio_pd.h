@@ -7,7 +7,7 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: pablio_pd.h,v 1.1.1.1 2003-05-09 16:04:00 ggeiger Exp $
+ * $Id: pablio_pd.h,v 1.1.1.2 2004-02-02 11:27:58 ggeiger Exp $
  * PABLIO.h
  * Portable Audio Blocking read/write utility.
  *
@@ -53,7 +53,7 @@ typedef struct
 {
     RingBuffer   inFIFO;
     RingBuffer   outFIFO;
-    PaStream *stream;      /* MSP -- was PortAudioStream; probably an error */
+    PortAudioStream *stream;
     int          bytesPerFrame;
     int          samplesPerFrame;
 }

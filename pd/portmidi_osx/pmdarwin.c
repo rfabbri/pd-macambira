@@ -2,7 +2,15 @@
  * PortMidi OS-dependent interface for Darwin (MacOS X)
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: pmdarwin.c,v 1.1.1.1 2003-05-09 16:04:00 ggeiger Exp $
+ * $Id: pmdarwin.c,v 1.1.1.2 2004-02-02 11:28:02 ggeiger Exp $
+ *
+ * CHANGE LOG:
+ * 03Jul03 - X. J. Scott (xjs):
+ *   - Pm_GetDefaultInputDeviceID() and Pm_GetDefaultOutputDeviceID()
+ *     now return id of first input and output devices in system,
+ *     rather than returning 0 as before.
+ *     This fix enables valid default port values to be returned.
+ *     0 is returned if no such device is found.
  */
 
 /*
@@ -17,18 +25,52 @@
 #include "portmidi.h"
 #include "pmmacosx.h"
 
-PmError pm_init()
+PmError pm_init(void) // xjs added void
 {
 	return pm_macosx_init();
 }
 
-PmError pm_term()
+PmError pm_term(void) // xjs added void
 {
 	return pm_macosx_term();
 }
 
-PmDeviceID Pm_GetDefaultInputDeviceID() { return 0; };
-PmDeviceID Pm_GetDefaultOutputDeviceID() { return 0; };
+/* Pm_GetDefaultInputDeviceID() - return input with lowest id # (xjs)
+ */
+PmDeviceID Pm_GetDefaultInputDeviceID()
+{
+  int i;
+  int device_count;
+  const PmDeviceInfo *deviceInfo;
+
+  device_count = Pm_CountDevices();
+  for (i = 0; i < device_count; i++) {
+    deviceInfo = Pm_GetDeviceInfo(i);
+    if (deviceInfo->input)
+      return i;
+  }
+
+  return 0;
+};
+
+/* Pm_GetDefaultOutputDeviceID() - return output with lowest id # (xjs)
+*/
+PmDeviceID Pm_GetDefaultOutputDeviceID()
+{
+  int i;
+  int device_count;
+  const PmDeviceInfo *deviceInfo;
+
+  device_count = Pm_CountDevices();
+  for (i = 0; i < device_count; i++) {
+    deviceInfo = Pm_GetDeviceInfo(i);
+    if (deviceInfo->output)
+      return i;
+  }
+
+  return 0;
+};
+
 
 void *pm_alloc(size_t s) { return malloc(s); }
 

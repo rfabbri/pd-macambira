@@ -3,7 +3,7 @@
  *
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: ptdarwin.c,v 1.1.1.1 2003-05-09 16:04:00 ggeiger Exp $
+ * $Id: ptdarwin.c,v 1.1.1.2 2004-02-02 11:28:02 ggeiger Exp $
  */
 
 #include <stdio.h>
@@ -28,20 +28,20 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 }
 
 
-PtError Pt_Stop()
+PtError Pt_Stop(void) // xjs added void
 {
     time_started_flag = FALSE;
     return ptNoError;
 }
 
 
-int Pt_Started()
+int Pt_Started(void) // xjs added void
 {
     return time_started_flag;
 }
 
 
-PtTimestamp Pt_Time()
+PtTimestamp Pt_Time(void *time_info) // xjs added void *time_info
 {
     long seconds, milliseconds;
     struct timeval now;

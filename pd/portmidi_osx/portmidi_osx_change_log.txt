@@ -1,0 +1,70 @@
+PortMIDI changes of 27 June 2003 by X. J. Scott
+
+pmdarwin.c
+----------
+- added void parameter list to pm_init and pm_term
+  (to remove a compiler warning)
+- Pm_GetDefaultInputDeviceID() and Pm_GetDefaultOutputDeviceID()
+  now return id of first input and output devices in system,
+  rather than returning 0 as before.
+  This fix enables valid default port values to be returned.
+  0 is returned if no such device is found.
+
+ptdarwin.c
+----------
+- added void parameter list to Pt_Stop and Pt_Started
+  (to remove a compiler warning)
+- added void *time_info parameter list to Pt_time
+  -> since Pt_Time is assigned in pmmacosx.c:get_timestamp() to
+    a variable of type PMTimeProcPtr, which requires this signature.
+
+porttime.h
+----------
+- added void parameter list to Pt_Stop and Pt_Started
+- added void *time_info parameter list to Pt_time
+
+pmmacosx.c
+----------
+- midi_length():
+  fixed bug that gave bad lengths for system messages
+  [note that the F5 message may be an issue for someone
+  to deal with later since the MIDITimePiece interface appopriated
+  the F5 for a two byte long CableSelectID - this usage
+  and length differ from the MIDI standard.]
+
+/ pm_macosx_init():
+  Now allocates the device names. This fixes bug before where
+  it assigned same string buffer on stack to all devices.
+- pm_macosx_term(), deleteDeviceName():
+  devices strings allocated during pm_macosx_init() are deallocated.
+
++ pm_macosx_init(), newDeviceName():
+  registering kMIDIPropertyManufacturer + kMIDIPropertyModel +
+  kMIDIPropertyName for name strings instead of just name.
+
+/ pm_macosx_init():
+  unsigned i to quiet compiler griping
+- get_timestamp():
+  no change right here but type of Pt_Time() was altered in porttime.h
+  so it matches type PmTimeProcPtr in assignment in this function.
+/ midi_write():
+  changed unsigned to signed to stop compiler griping
+
+portmidi.h
+----------
+- Added void arg to Pm_GetHostError() to stop compiler gripe.
+
+pmtest.c
+---------
+- Added Initialize and Terminate calls so that it doesn't
+  fail the 2nd time the test is run.
+
+-----
+ 
+PortMIDI changes of 11 Nov 2003 by X. J. Scott
+
+pmmacosx.c
+----------
+- Handles ports that don't have the full set of property strings.
+  This fixes bug where crash would occur if a virtual port was present.
+

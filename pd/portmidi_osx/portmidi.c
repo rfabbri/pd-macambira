@@ -12,13 +12,15 @@ descriptor_node descriptors[pm_descriptor_max];
 
 /* pm_add_device -- describe interface/device pair to library 
  *
- * This is called at intialization time, once for each 
+ * This is called at initialization time, once for each 
  * interface (e.g. DirectSound) and device (e.g. SoundBlaster 1)
  * The strings are retained but NOT COPIED, so do not destroy them!
  *
  * returns pmInvalidDeviceId if device memory is exceeded
  * otherwise returns pmNoError
+ *
  */
+
 PmError pm_add_device(char *interf, char *name, int input, 
                       void *descriptor, pm_fns_type dictionary)
 {
@@ -279,7 +281,6 @@ PmError Pm_Abort( PortMidiStream* stream )
     return (*midi->dictionary->abort)(midi);
 }
 
-
 PmError Pm_Close( PortMidiStream *stream )
 {
     PmInternal *midi = (PmInternal *) stream;
@@ -353,6 +354,4 @@ int pm_queue_full(PmInternal *midi)
     if (tail == midi->buffer_len) tail = 0;
     return tail == midi->head;
 }
-
-
 

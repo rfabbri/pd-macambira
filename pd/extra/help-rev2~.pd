@@ -25,6 +25,7 @@
 #X obj 96 101 0;
 #X obj 41 355 outlet~;
 #X obj 279 126 inlet;
+#X obj 40 175 *~;
 #X connect 0 0 17 0;
 #X connect 1 0 8 0;
 #X connect 2 0 3 0;
@@ -47,13 +48,16 @@
 #X connect 13 0 6 1;
 #X connect 14 0 6 1;
 #X connect 15 0 2 0;
-#X connect 16 0 21 0;
+#X connect 16 0 23 0;
 #X connect 17 0 18 0;
 #X connect 17 0 19 0;
 #X connect 18 0 20 0;
 #X connect 19 0 16 0;
+#X connect 19 0 23 1;
 #X connect 20 0 16 0;
+#X connect 20 0 23 1;
 #X connect 22 0 15 0;
+#X connect 23 0 21 0;
 #X restore 17 154 pd tests;
 #X msg 56 35 10;
 #X msg 54 62 20;

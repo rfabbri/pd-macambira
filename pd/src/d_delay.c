@@ -247,7 +247,7 @@ static t_int *sigvd_perform(t_int *w)
 
     int nsamps = ctl->c_n;
     float limit = nsamps - n - 1;
-    float fn = n-4;
+    float fn = n-1;
     float *vp = ctl->c_vec, *bp, *wp = vp + ctl->c_phase;
     float zerodel = x->x_zerodel;
     while (n--)
@@ -261,7 +261,7 @@ static t_int *sigvd_perform(t_int *w)
     	fn = fn - 1.0f;
     	idelsamps = delsamps;
     	frac = delsamps - (float)idelsamps;
-    	bp = wp - (idelsamps + 3);
+    	bp = wp - idelsamps;
     	if (bp < vp + 4) bp += nsamps;
     	d = bp[-3];
     	c = bp[-2];

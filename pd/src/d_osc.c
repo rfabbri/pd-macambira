@@ -448,6 +448,10 @@ static t_int *sigvcf_perform(t_int *w)
     	    + coefr * re2 - coefi * im;
     	*out2++ = im = coefi * re2 + coefr * im;
     }
+    if (PD_BADFLOAT(re))
+	re = 0;
+    if (PD_BADFLOAT(im))
+	im = 0;
     c->c_re = re;
     c->c_im = im;
     return (w+7);

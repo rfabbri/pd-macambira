@@ -38,7 +38,7 @@ WARRANTIES, see the file, "LICENSE.txt," included in the Pd distribution.
 ACKNOWLEDGEMENTS.  Thanks to Harry Castle, Krzysztof Czaja, Mark Danks,
 Christian Feldbauer, Guenter Geiger, Kerry Hagan, Trevor Johnson, Fernando
 Lopez-Lezcano, Adam Lindsay, Karl MacMillan, Thomas Musil, Toshinori Ohkouchi,
-Winfried Ritsch, Vibeke Sorensen, Rand Steiger, Shahrokh Yadegari, David
-Zicarelli, Iohannes Zmoelnig, and probably many others for contributions of
-code, documentation, ideas, and expertise.  This work has received generous
-support from the Intel Research Council.
+Winfried Ritsch, Vibeke Sorensen, Rand Steiger, Hans-Christoph Steiner,
+Shahrokh Yadegari, David Zicarelli, Iohannes Zmoelnig, and probably many others
+for contributions of code, documentation, ideas, and expertise.  This work has
+received generous support from the Intel Research Council.
