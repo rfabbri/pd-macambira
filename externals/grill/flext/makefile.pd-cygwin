@@ -1,0 +1,108 @@
+# flext - C++ layer for Max/MSP and pd (pure data) externals
+# Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ cygwin
+#
+# usage:
+# to build run "make -f makefile.pd-cygwin"
+#
+# ---------------------------------------------
+#
+# compiling for threaded usage is not supported
+#
+
+CONFIG=config-pd-cygwin.txt
+
+include $(CONFIG)
+
+
+# compiler+linker stuff
+INCLUDES=$(PDPATH)/src $(SNDOBJ)
+FLAGS=-DPD -DNT -DNOPTHREAD
+CFLAGS=-O6 -mcpu=pentiumpro
+CFLAGS_D=-mcpu=pentiumpro -g
+CFLAGS_T=-DFLEXT_THREADS
+LIBS=
+
+INSTDIR=$(PDPATH)/flext
+
+# ----------------------------------------------
+# the rest can stay untouched
+# ----------------------------------------------
+
+NAME=flext
+
+# all the source files from the package
+include make-files.txt
+
+ifdef SNDOBJ
+_SRCS=$(SRCS) flsndobj.cpp
+_HDRS=$(HDRS) flsndobj.h
+else
+_SRCS=$(SRCS) 
+_HDRS=$(HDRS) 
+endif
+
+MAKEFILE=makefile.pd-cygwin
+TARGET=$(TARGDIR)/$(NAME)-pdwin.lib
+TARGET_D=$(TARGDIR)/$(NAME)_d-pdwin.lib
+TARGET_T=$(TARGDIR)/$(NAME)_t-pdwin.lib
+TARGET_TD=$(TARGDIR)/$(NAME)_td-pdwin.lib
+
+all: $(TARGDIR) $(TARGET) $(TARGET_D) # $(TARGET_T) $(TARGET_TD)
+
+$(TARGDIR):
+	-mkdir $(TARGDIR)
+
+$(SRCS): $(_HDRS) $(IHDRS) $(MAKEFILE) $(CONFIG)
+	touch $@
+
+$(TARGDIR)/%.o : source/%.cpp
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) source) $< -o $@
+
+$(TARGDIR)/%.do : source/%.cpp
+	$(CXX) -c $(CFLAGS_D) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) source) $< -o $@
+
+$(TARGDIR)/%.to : source/%.cpp
+	$(CXX) -c $(CFLAGS) $(CFLAGS_T) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) source) $< -o $@
+
+$(TARGDIR)/%.tdo : source/%.cpp
+	$(CXX) -c $(CFLAGS_D) $(CFLAGS_T) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) source) $< -o $@
+
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(_SRCS))
+	ar rc $@ $^
+	chmod 755 $@
+
+$(TARGET_D) : $(patsubst %.cpp,$(TARGDIR)/%.do,$(_SRCS))
+	ar rc $@ $^
+	chmod 755 $@
+
+$(TARGET_T) : $(patsubst %.cpp,$(TARGDIR)/%.to,$(_SRCS))
+	ar rc $@ $^
+	chmod 755 $@
+
+$(TARGET_TD) : $(patsubst %.cpp,$(TARGDIR)/%.tdo,$(_SRCS))
+	ar rc $@ $^
+	chmod 755 $@
+
+.PHONY: clean install
+clean:
+	rm -f $(TARGDIR)/*.o $(TARGET) $(TARGET_D)
+	
+$(INSTDIR):
+	-mkdir $(INSTDIR)
+
+install:: $(INSTDIR)
+
+install:: $(TARGET) $(TARGET_D) $(patsubst %,source/%,$(_HDRS)) # $(TARGET_T) $(TARGET_TD)  
+	cp $^ $(INSTDIR)
+
+
+
+
+
+
+
+
+
+
