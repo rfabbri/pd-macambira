@@ -1,39 +1,100 @@
-#N canvas 92 68 856 623 10;
-#X obj 0 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
+#N canvas 215 37 866 651 10;
+#X obj 3 3 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
 -66577 0;
-#X obj 816 3 pddp;
-#X text 17 601 by Hans-Christoph Steiner <hans@at.or.at>;
-#X text 629 603 updated for Pd version 0.37.1;
+#X obj 819 4 pddp;
 #X text 10 36 "HID" stands for "Human Interface Device". A HID is any
 device that is meant to allow humans to interact with a computer. Usually
 \, HIDs are mice \, keyboards \, joysticks \, tablets \, gamepads \,
 etc. There a number of unusual HIDs \, like the Griffin PowerMate on
 the low end \, or the SensAble PHANTOM 6DOF on the high end.;
-#X text 11 124 When talking about HIDs \, "DOF" is often mentioned.
+#X obj 610 415 gemmouse;
+#X text 5 241 KEYBOARDS;
+#X obj 39 270 key;
+#X obj 71 270 keyup;
+#X obj 446 415 gemkeyboard;
+#X obj 674 415 gemtablet;
+#X obj 745 415 gemorb;
+#X obj 532 415 gemkeyname;
+#X obj 116 270 keyname;
+#X text 16 598 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 233 612 released under the GNU GPL;
+#X text 439 599 $Revision: 1.2 $$Date: 2004-11-27 20:05:25 $;
+#X text 440 612 $Author: eighthave $;
+#N canvas 0 22 627 431 deprecated 0;
+#X text 35 38 The use of these objects is deprecated since the functionality
+that they provide is available in the [hid] object \, which is a unified
+\, cross-platform approach.;
+#X text 23 14 DEPRECATED HID OBJECTS;
+#X text 22 148 CYCLONE;
+#X obj 27 181 MouseState;
+#X obj 108 181 mousefilter;
+#X obj 105 311 linuxmouse;
+#X obj 184 311 linuxjoystick;
+#X obj 27 311 linuxevent;
+#X text 22 346 J. SARLO'S [joystick];
+#X text 31 374 only works with Windows and GNU/Linux;
+#X text 26 293 only works with Linux kernels;
+#X text 22 278 LINUXEVENT;
+#X text 26 163 meant for porting Max/MSP patches to Pd.;
+#X text 21 218 RAWHID;
+#X text 28 230 incomplete \, first stab at creating [hid];
+#X obj 30 248 rawmouse;
+#X obj 94 248 rawjoystick;
+#X restore 443 532 pd deprecated HID objects;
+#X text 440 393 USING HIDs WITH GEM;
+#X text 450 468 There are quite a few objects that support HIDs from
+many different sources. Here are a bunch whose functionality is available
+in the [hid] object \, so it is recommended that you do not use these
+objects any more.;
+#X text 440 153 REFRESH RATES;
+#X text 451 175 device type;
+#X text 727 159 latency;
+#X text 780 175 (Hz);
+#X text 700 175 (ms);
+#X text 450 185 --------------------------------------------------------
+;
+#X text 700 200 15.5;
+#X text 780 200 64;
+#X text 450 215 USB mice on Windows;
+#X text 700 215 8-10;
+#X text 780 215 100-125;
+#X text 450 230 USB mice on GNU/Linux;
+#X text 700 230 1-10;
+#X text 780 230 100-1000;
+#X text 450 245 USB wireless mice;
+#X text 700 245 12-20;
+#X text 780 245 50-80;
+#X text 450 260 PS/2 mouse;
+#X text 700 260 5-25;
+#X text 780 260 40-200;
+#X text 10 301 - these objects are quite simple to use \, but are limited
+to the 'printing' characters.;
+#X text 450 65 While it does not make sense to use a poll rate that
+is much faster than the refresh rate of the device \, it does make
+sense to make the poll rate somewhat faster. If you poll at the same
+rate as the device refreshes \, you could get up to double the latency
+\, i.e. if [hid] polls right before the event is reported.;
+#X text 440 451 DEPRECATED OBJECTS;
+#X text 440 40 POLLING AND LATENCY;
+#X text 10 124 When talking about HIDs \, "DOF" is often mentioned.
 "DOF" stands for "degrees of freedom". A degree of freedom is one dimension
 in which that HID can give information. A mouse generally had 2DOFs:
 X-axis and Y-axis \, though a wheel could be considered another DOF.
-The PHANTOM 6DOF has six degrees of freedom: X \, Y \, Z movement \;
-X \, Y \, Z rotation.;
-#X text 10 218 MICE;
-#X obj 24 243 MouseState;
-#X obj 110 243 linuxmouse;
-#X obj 191 243 gemmouse;
-#X text 9 306 JOYSTICKS;
-#X obj 258 243 rawmouse;
-#X obj 25 330 joystick;
-#X obj 98 330 linuxjoystick;
-#X obj 204 330 rawjoystick;
-#X text 9 484 GENERIC HID OBJECTS;
-#X obj 24 510 linuxevent;
-#X obj 24 270 mousefilter;
-#X text 10 367 KEYBOARDS;
-#X obj 25 396 key;
-#X obj 57 396 keyup;
-#X obj 159 396 gemkeyboard;
-#X obj 23 453 gemtablet;
-#X text 10 430 TABLETS;
-#X text 12 544 MISC;
-#X obj 24 568 gemorb;
-#X obj 247 396 gemkeyname;
-#X obj 102 396 keyname;
+The PHANTOM 6DOF device has six degrees of freedom: X \, Y \, Z movement
+\; X \, Y \, Z rotation.;
+#X text 12 336 - [keyname] reports Shift \, Ctrl \, Alt \, Meta \,
+etc.;
+#X text 8 379 GENERAL HIDs;
+#X obj 85 405 mouse;
+#X obj 128 405 joystick;
+#X obj 192 405 tablet;
+#X obj 242 405 gamepad;
+#X text 450 200 ADB (Apple Desktop Bus) devices;
+#X text 450 289 P5 Glove;
+#X text 700 289 22;
+#X text 780 289 45;
+#X text 450 275 Serial mouse;
+#X text 780 275 40;
+#X text 700 275 25;
+#X obj 21 405 keyboard;
