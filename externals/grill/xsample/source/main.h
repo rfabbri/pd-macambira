@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define __XSAMPLE_H
 
 
-#define XSAMPLE_VERSION "0.3.0pre19"
+#define XSAMPLE_VERSION "0.3.0pre20"
 
 
 #define FLEXT_ATTRIBUTES 1 
@@ -113,7 +113,7 @@ public:
 	
 	enum xs_intp {
 		xsi__ = -1,  // don't change
-		xsi_none = 0,xsi_lin,xsi_4p
+		xsi_none = 0,xsi_4p,xsi_lin
 	};
 	
 	enum xs_sclmd {
