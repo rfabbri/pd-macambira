@@ -11,7 +11,7 @@
 
 /* ----------------------------- receive13~ ----------------------------- */
 
- void *sigreceive13_new(t_symbol *s)
+void *sigreceive13_new(t_symbol *s)
 {
     t_sigreceive13 *x = (t_sigreceive13 *)pd_new(sigreceive13_class);
     if (!*s->s_name) s = gensym("receive13~");
@@ -22,7 +22,7 @@
     return (x);
 }
 
- t_int *sigreceive13_perform(t_int *w)
+t_int *sigreceive13_perform(t_int *w)
 {
     t_sigreceive13 *x = (t_sigreceive13 *)(w[1]);
     t_float *out = (t_float *)(w[2]);
@@ -41,7 +41,33 @@
     return (w+4);
 }
 
- void sigreceive13_set(t_sigreceive13 *x, t_symbol *s)
+/* tb: vectorized */
+t_int *sigreceive13_perf8(t_int *w)
+{
+    t_sigreceive13 *x = (t_sigreceive13 *)(w[1]);
+    t_float *out = (t_float *)(w[2]);
+    int n = (int)(w[3]);
+    t_float *in = x->x_wherefrom;
+    if (in)
+    {
+	for (; n; n -= 8, in += 8, out += 8)
+	{
+	    out[0] = in[0]; out[1] = in[1]; out[2] = in[2]; out[3] = in[3]; 
+	    out[4] = in[4]; out[5] = in[5]; out[6] = in[6]; out[7] = in[7]; 
+	}
+    }
+    else
+    {
+    	for (; n; n -= 8, in += 8, out += 8)
+	{
+	    out[0] = 0; out[1] = 0; out[2] = 0; out[3] = 0; 
+	    out[4] = 0; out[5] = 0; out[6] = 0; out[7] = 0; 
+	}
+    }
+    return (w+4);
+}
+
+void sigreceive13_set(t_sigreceive13 *x, t_symbol *s)
 {
     t_sigsend13 *sender = (t_sigsend13 *)pd_findbyclass((x->x_sym = s),
     	sigsend13_class);
@@ -71,8 +97,12 @@
     else
     {
     	sigreceive13_set(x, x->x_sym);
-    	dsp_add(sigreceive13_perform, 3,
-    	    x, sp[0]->s_vec, sp[0]->s_n);
+	if(sp[0]->s_n&7)
+	    dsp_add(sigreceive13_perform, 3,
+		    x, sp[0]->s_vec, sp[0]->s_n);
+	else
+	    dsp_add(sigreceive13_perf8, 3,
+		    x, sp[0]->s_vec, sp[0]->s_n);
     }
 }
 
