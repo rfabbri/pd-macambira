@@ -55,3 +55,20 @@ You must have the following "Source Trees" defined:
 "MP SDK" - Pointing to the Multiprocessing SDK (for threading support)
 
 
+----------------------------------------------------------------------------
+
+PORTING NOTES:
+
+- cross:
+	- what about the class members for "correction"?! (superfluous)
+
+- dentist:
+	- tooth count ("teeth") is preserved and checked on every reshuffle
+	- different knee correction
+
+- disarray:
+	- different frequency correction
+
+- ether:
+	- possibility to change qual?
+

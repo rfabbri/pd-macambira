@@ -142,6 +142,26 @@ SOURCE=.\src\unconvert.c
 
 SOURCE=.\src\burrow~.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\cross~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\dentist~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\disarray~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\drown~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\ether~.cpp
+# End Source File
 # End Group
 # Begin Group "doc"
 
@@ -159,229 +179,232 @@ SOURCE=.\license.txt
 SOURCE=.\readme.txt
 # End Source File
 # End Group
-# Begin Group "Ori"
+# Begin Group "ori.jmax"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\burrow~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\burrow~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\cross~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\cross~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\dentist~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\dentist~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\disarray~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\disarray~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\drown~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\drown~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\ether~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\ether~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\morphine~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\FFTease.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\pvcompand~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\morphine~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\pvoc~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\pvcompand~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\scrape~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\pvoc~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\shapee~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\scrape~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\swinger~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\shapee~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\taint~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\swinger~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\thresher~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\taint~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\unconvert.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\thresher~.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\vacancy~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\unconvert.c
 # PROP Exclude_From_Build 1
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\packs\FFTease\c\src\xsyn~.c
-
-!IF  "$(CFG)" == "fftease - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
-
+SOURCE=.\ori.jmax\vacancy~.c
 # PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
 
-!ENDIF 
+SOURCE=.\ori.jmax\xsyn~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# End Group
+# Begin Group "ori.maxmsp"
 
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\ori.max\burrow~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=".\ori.max\cross-opt~.c"
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\dentist~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\denude~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\disarray~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\ether~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\fxsyn~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\morphine~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\multyQ_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\nacho_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\pvcompand_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\pvcompand~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\pvharm~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\pvoc_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\pvoc~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\residency~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\scrape_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\scrape~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\shapee_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\swinger_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\swinger~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\taint~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\thresher_opt~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\thresher~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.max\vacancy~.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=".\ori.max\xsyn-opt~.c"
+# PROP Exclude_From_Build 1
 # End Source File
 # End Group
 # Begin Source File

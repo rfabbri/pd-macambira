@@ -1,0 +1,10 @@
+# all the source files from the package
+SRCS= \
+	convert.c convert_new.c fft4.c fft.c fold.c \
+	leanconvert.c leanunconvert.c makewindows.c overlapadd.c unconvert.c \
+	main.cpp \
+	burrow~.cpp cross~.cpp dentist~.cpp disarray~.cpp drown~.cpp ether~.cpp 
+              
+HDRS= \
+	pv.h main.h 
+

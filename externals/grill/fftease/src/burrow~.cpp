@@ -3,8 +3,6 @@
 FFTease - A set of Live Spectral Processors
 Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
 
-This flext port is based on the jMax port of Christian Klippel
-
 Copyright (c)Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
@@ -30,22 +28,23 @@ protected:
 
 	I blsz;
     BL _invert;
-    I _inCount;
-    I *_bitshuffle;
 
     F _threshold,_multiplier;
     F _thresh_dB,_mult_dB;
 
-    F *_Wanal;
-    F *_Wsyn;
-    F *_inputOne,*_inputTwo;
-    F *_Hwin;
-    F *_bufferOne,*_bufferTwo;
-    F *_channelOne,*_channelTwo;
+    F *_input1,*_input2;
+    F *_buffer1,*_buffer2;
+    F *_channel1,*_channel2;
     F *_output;
     F *_trigland;
+    I *_bitshuffle;
+    F *_Wanal,*_Wsyn,*_Hwin;
+
+    I _inCount;
 
 private:
+	enum { _MULT_ = 4 };
+
 	V Clear();
 	V Delete();
 	
@@ -103,8 +102,8 @@ burrow::burrow(I argc,const t_atom *argv):
 
 	Clear();
 
-	AddInSignal("Commands and original signal");
-	AddInSignal("Modulating signal");
+	AddInSignal("Messages and input signal");
+	AddInSignal("Reference signal");
 	AddOutSignal("Transformed signal");
 }
 
@@ -117,11 +116,11 @@ V burrow::Clear()
 {
 	_bitshuffle = NULL;
 	_trigland = NULL;
-	_inputOne = _inputTwo = NULL;
+	_input1 = _input2 = NULL;
 	_Hwin = NULL;
 	_Wanal = _Wsyn = NULL;
-	_bufferOne = _bufferTwo = NULL;
-	_channelOne = _channelTwo = NULL;
+	_buffer1 = _buffer2 = NULL;
+	_channel1 = _channel2 = NULL;
 	_output = NULL;
 }
 
@@ -129,15 +128,15 @@ V burrow::Delete()
 {
 	if(_bitshuffle) delete[] _bitshuffle;
 	if(_trigland) delete[] _trigland;
-	if(_inputOne) delete[] _inputOne;
-	if(_inputTwo) delete[] _inputTwo;
+	if(_input1) delete[] _input1;
+	if(_input2) delete[] _input2;
 	if(_Hwin) delete[] _Hwin;
 	if(_Wanal) delete[] _Wanal;
 	if(_Wsyn) delete[] _Wsyn;
-	if(_bufferOne) delete[] _bufferOne;
-	if(_bufferTwo) delete[] _bufferTwo;
-	if(_channelOne) delete[] _channelOne;
-	if(_channelTwo) delete[] _channelTwo;
+	if(_buffer1) delete[] _buffer1;
+	if(_buffer2) delete[] _buffer2;
+	if(_channel1) delete[] _channel1;
+	if(_channel2) delete[] _channel2;
 	if(_output) delete[] _output;
 }
 
@@ -152,23 +151,25 @@ V burrow::m_dsp(I n,S *const *in,S *const *out)
 		Delete();
 
 		/* preset the objects data */
-		const I _N = _D*4,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+		const I _N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 		_inCount = -_Nw;
 
 		/* assign memory to the buffers */
+		_input1 = new F[_Nw];
+		_input2 = new F[_Nw];
+		_buffer1 = new F[_N];
+		_buffer2 = new F[_N];
+		_channel1 = new F[_N+2];
+		_channel2 = new F[_N+2];
+		_output = new F[_Nw];
+
 		_bitshuffle = new I[_N*2];
 		_trigland = new F[_N*2];
-		_inputOne = new F[_Nw];
-		_inputTwo = new F[_Nw];
+
 		_Hwin = new F[_Nw];
 		_Wanal = new F[_Nw];
 		_Wsyn = new F[_Nw];
-		_bufferOne = new F[_N];
-		_bufferTwo = new F[_N];
-		_channelOne = new F[_N+2];
-		_channelTwo = new F[_N+2];
-		_output = new F[_Nw];
 
 		/* initialize pv-lib functions */
 		init_rdft( _N, _bitshuffle, _trigland);
@@ -178,75 +179,75 @@ V burrow::m_dsp(I n,S *const *in,S *const *out)
 
 V burrow::m_signal(I n,S *const *in,S *const *out)
 {
-	const S *inOne = in[0],*inTwo = in[1];
-	S *outOne = out[0];
-
 	/* declare working variables */
 	I i, j; 
-	const I _D = blsz,_N = _D*4,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = blsz,_N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
 	_inCount += _D;
 
 	for(i = 0; i < _N-_D ; i++ ) {
-		_inputOne[i] = _inputOne[i+_D];
-		_inputTwo[i] = _inputTwo[i+_D];
+		_input1[i] = _input1[i+_D];
+		_input2[i] = _input2[i+_D];
 	}
 	for(j = 0; i < _N; i++,j++) {
-		_inputOne[i] = inOne[j];
-		_inputTwo[i] = inTwo[j];
+		_input1[i] = in[0][j];
+		_input2[i] = in[1][j];
 	}
 
 	/* apply hamming window and fold our window buffer into the fft buffer */
-	fold( _inputOne, _Wanal, _Nw, _bufferOne, _N, _inCount );
-	fold( _inputTwo, _Wanal, _Nw, _bufferTwo, _N, _inCount );
+	fold( _input1, _Wanal, _Nw, _buffer1, _N, _inCount );
+	fold( _input2, _Wanal, _Nw, _buffer2, _N, _inCount );
 
 	/* do an fft */
-	rdft( _N, 1, _bufferOne, _bitshuffle, _trigland );
-	rdft( _N, 1, _bufferTwo, _bitshuffle, _trigland );
+	rdft( _N, 1, _buffer1, _bitshuffle, _trigland );
+	rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
 
 
-	/* convert to polar coordinates from complex values */
+	// ---- BEGIN --------------------------------
+
 	for ( i = 0; i <= _N2; i++ ) {
 		const I even = i<<1,odd = even+1;
+
+		/* convert to polar coordinates from complex values */
 		register F a,b;
 
-		a = ( i == _N2 ? _bufferOne[1] : _bufferOne[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _bufferOne[odd] );
+		a = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
+		b = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
 
-		_channelOne[even] = hypot( a, b );
-		_channelOne[odd] = -atan2( b, a );
+		_channel1[even] = hypot( a, b );
+		_channel1[odd] = -atan2( b, a );
 
-		a = ( i == _N2 ? _bufferTwo[1] : _bufferTwo[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _bufferTwo[odd] );
+		a = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
+		b = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
 
-		_channelTwo[even] = hypot( a, b );
+		_channel2[even] = hypot( a, b );
 
 		/* use simple threshold from second signal to trigger filtering */
-		if (_invert?(_channelTwo[even] < _threshold):(_channelTwo[even] > _threshold) )
-			_channelOne[even] *= _multiplier;
-	}
+		if (_invert?(_channel2[even] < _threshold):(_channel2[even] > _threshold) )
+			_channel1[even] *= _multiplier;
 
-	/* convert back to complex form, read for the inverse fft */
-	for ( i = 0; i <= _N2; i++ ) {
-		const I even = i<<1,odd = even+1;
-
-		_bufferOne[even] = _channelOne[even] * cos( _channelOne[odd] );
+		/* convert back to complex form, read for the inverse fft */
+		_buffer1[even] = _channel1[even] * cos( _channel1[odd] );
 
 		if ( i != _N2 )
-			_bufferOne[odd] = -_channelOne[even] * sin( _channelOne[odd] );
+			_buffer1[odd] = -_channel1[even] * sin( _channel1[odd] );
 	}
 
+
+	// ---- END --------------------------------
+
+
 	/* do an inverse fft */
-	rdft( _N, -1, _bufferOne, _bitshuffle, _trigland );
+	rdft( _N, -1, _buffer1, _bitshuffle, _trigland );
 
 	/* dewindow our result */
-	overlapadd( _bufferOne, _N, _Wsyn, _output, _Nw, _inCount);
+	overlapadd( _buffer1, _N, _Wsyn, _output, _Nw, _inCount);
 
 	/* set our output and adjust our retaining output buffer */
-	F mult = 1./_N;
+	const F mult = 1./_N;
 	for ( j = 0; j < _D; j++ )
-		outOne[j] = _output[j] * mult;
+		out[0][j] = _output[j] * mult;
 
 	for ( j = 0; j < _N-_D; j++ )
 		_output[j] = _output[j+_D];
