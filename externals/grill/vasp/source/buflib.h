@@ -24,12 +24,12 @@ namespace BufLib
 {
 	VBuffer *Get(const VSymbol &s,I chn = 0,I len = -1,I offs = 0);
 
-	BufEntry *NewImm(I fr);
+	BufEntry *NewImm(I fr,BL zero = true);
 
 	V IncRef(t_symbol *s);
 	V DecRef(t_symbol *s);
 
-	BufEntry *Resize(BufEntry *e,I fr,BL keep = false); 
+	BufEntry *Resize(BufEntry *e,I fr,BL keep = false,BL zero = true); 
 }
 
 

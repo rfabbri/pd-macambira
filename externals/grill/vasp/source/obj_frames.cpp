@@ -136,7 +136,7 @@ public:
 	virtual Vasp *x_work() 
 	{ 
 		Vasp *ret = new Vasp(ref); 
-		if(setf) ret->FramesM(frms);
+		if(setf) ret->FramesM(factor);
 		return ret;
 	}
 

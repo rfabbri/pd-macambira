@@ -32,7 +32,7 @@ public:
 class BufEntry
 {
 public:
-	BufEntry(t_symbol *s,I fr);
+	BufEntry(t_symbol *s,I fr,BL zero = true);
 	~BufEntry();
 
 	V IncRef();
@@ -62,11 +62,12 @@ static V FreeLibSym(t_symbol *s);
 
 
 
-BufEntry::BufEntry(t_symbol *s,I fr): 
+BufEntry::BufEntry(t_symbol *s,I fr,BL zero): 
 	sym(s), //magic(LIBMAGIC),
 	alloc(fr),len(fr),data(new S[fr]),
 	refcnt(0),nxt(NULL) 
 {
+	if(zero) flext::ZeroMem(data,len*sizeof(*data));
 //	ASSERT(!flext_base::GetThing(sym));
 //	flext_base::SetThing(sym,this);
 }
@@ -129,7 +130,7 @@ static t_symbol *GetLibSym()
 	#ifdef __MWERKS__
 		std::
 	#endif
-		sprintf(tmp,"vasp!%04i",libcnt); // what if libcnt has > 4 digits?
+		sprintf(tmp,"vasp!%04i",libcnt); //! \todo what if libcnt has > 4 digits?
 		libcnt++;
 		return gensym(tmp);
 	}
@@ -181,7 +182,7 @@ static V LibTick(V *)
 #endif
 }
 
-BufEntry *BufLib::NewImm(I fr)
+BufEntry *BufLib::NewImm(I fr,BL zero)
 {
 	if(!libclk) {
 		libclk = (t_clock *)clock_new(NULL,(t_method)LibTick);
@@ -193,7 +194,7 @@ BufEntry *BufLib::NewImm(I fr)
 		s = GetLibSym();
 //	} while(s->s_thing);
 
-	BufEntry *entry = new BufEntry(s,fr);
+	BufEntry *entry = new BufEntry(s,fr,zero);
 
 #ifdef FLEXT_THREADS
 	libmtx.Lock();
@@ -213,18 +214,21 @@ BufEntry *BufLib::NewImm(I fr)
 static F reuse_maxloserel = (F)REUSE_MAXLOSEREL;
 static I reuse_maxloseabs = REUSE_MAXLOSEABS;
 
-BufEntry *BufLib::Resize(BufEntry *e,I fr,BL keep)
+BufEntry *BufLib::Resize(BufEntry *e,I fr,BL keep,BL zero)
 { 
 	if(e->alloc >= fr && fr >= e->alloc*(1-reuse_maxloserel) && fr >= (e->alloc-reuse_maxloseabs)) {
 		// reuse buffer
 		e->len = fr;
 	}
 	else {
-		S *nd = new S[fr];
+		S *nd = new S[fr]; 
 		if(keep) {
 			I l = fr;
-			if(e->len < l) l = e->len;
-			flext::CopyMem(e->data,nd,l);
+			if(e->len < l) {
+				l = e->len;
+				if(zero) flext::ZeroMem(nd+l,(fr-l)*sizeof(*nd));
+			}
+			flext::CopyMem(nd,e->data,l*sizeof(*nd));
 		}
 
 		delete[] e->data;

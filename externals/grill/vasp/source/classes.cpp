@@ -101,7 +101,7 @@ vasp_op::vasp_op(BL op)
 V vasp_op::m_dobang()
 {
 #ifdef FLEXT_THREADS
-	if(detach) 
+	if(detach)
 		FLEXT_CALLMETHOD(m_bang);
 	else
 #endif
@@ -216,6 +216,7 @@ V vasp_tx::m_bang()
 #ifdef FLEXT_THREADS
 	thrid = 0;
 #endif
+
 	Unlock();
 }
 

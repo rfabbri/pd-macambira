@@ -11,7 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.1";
+const C *VASP_VERSION = "0.1.2pre2";
 
 V lib_setup()
 {
@@ -20,7 +20,7 @@ V lib_setup()
 	post("           VASP modular %s            ",VASP_VERSION);
 	post("   vector assembling signal processor    ");
 	post("          (C)2002 Thomas Grill           ");
-#if defined(_DEBUG) && !defined(__MWERKS__)
+#ifdef _DEBUG
 	post("   DEBUG BUILD - " __DATE__ " " __TIME__);
 #endif
 	post("");
