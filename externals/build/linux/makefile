@@ -17,7 +17,7 @@ LINUXINCLUDE = -I. -I.. -I../include
 
 %.pd_linux: ../src/%.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o "$*.o" -c "../src/$*.c"
-	ld -export_dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
+	gcc -Wl,-export_dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
 	`test -f $*.libs && cat $*.libs`
 	chmod a-x "$*.pd_linux"
 	$(STRIP) $*.pd_linux
