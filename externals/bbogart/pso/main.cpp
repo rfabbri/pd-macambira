@@ -23,6 +23,7 @@
 #include <flext.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 // check for appropriate flext version
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
@@ -99,10 +100,11 @@ FLEXT_NEW_3("pso",pso, int,int,int)
 pso::pso(int Popsize, int Dimen, int HoodSize)
 { 
 	// Say hello
-	post("--------------------------------------------\nParticle Swarm Optimizer (PSO)\nCopyright Ben Bogart 2003.\nBased on code by Thomas Grill & Jim Kennedy.\n--------------------------------------------");
-
-	// var defines
-	int i,j,k;
+	post("--------------------------------------------");
+	post("Particle Swarm Optimizer (PSO)");
+	post("Copyright Ben Bogart 2003.");
+	post("Based on code by Thomas Grill & Jim Kennedy.");
+	post("--------------------------------------------");
 
 	// default vars
 	this->Min = 0;
@@ -126,7 +128,7 @@ pso::pso(int Popsize, int Dimen, int HoodSize)
 
 	// define inlets:
 	// first inlet must always by of type anything (or signal for dsp objects)
-	AddInAnything();  // add one inlet for any message
+	AddInAnything("Send 'help' message for details...");  // add one inlet for any message
 	
 	// define outlets:
 	AddOutList("Particle positions.");
@@ -252,7 +254,7 @@ void pso::set_pop(int argc,t_atom *argv)
 
 void pso::set_particle(int argc,t_atom *argv)
 {
-        int i,particle,in,out;
+        int i,particle;
 
         // If the number of arguments matches the number of dimensions plus the index value
         if ( argc == this->dimen+1 )
@@ -295,7 +297,7 @@ void pso::set_target(int argc,t_atom *argv)
 	{
 		for (i=0; i<dimen; i++)
 		{
-			this->target[i] = GetFloat(argv[i]);
+			this->target[i] = GetAFloat(argv[i]);
 		}
 		post("%s: Target Set.", thisName() );
 	} else {
@@ -428,7 +430,7 @@ void pso::iterate()
 
 void pso::output_positions()
 {
-	int d,p,atoms;
+	int d,p;
 	t_atom atom;
 	t_atom p_atom;
 	AtomList list;
@@ -440,7 +442,7 @@ void pso::output_positions()
 		list.Clear();
 	
 		// start the lists with the index of the particle
-		SetFloat(p_atom, (float)p );
+		SetInt(p_atom, p );
 		list.Append(p_atom);
 
 		for (d=0; d< this->dimen; d++)
