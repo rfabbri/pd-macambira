@@ -40,6 +40,7 @@ darwin_pkg: darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
 #	install -m 644 License.html Welcome.txt $(PACKAGE_NAME).pkg/Contents/Resources
 	sudo chown -R root:staff $(PACKAGE_NAME).pkg/Contents/Resources
 
+# install into MacOS X style path: /Library/Pd
 
 darwin_altpkg:  darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
 	test -d installroot/Help || mkdir -p installroot/Help
