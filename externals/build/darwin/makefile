@@ -1,5 +1,5 @@
 
-prefix=$(DESTDIR)/usr/local/pd
+prefix=$(DESTDIR)/usr/local/lib/pd
 
 EXTERNALS = $(shell ls )
 
@@ -7,7 +7,7 @@ all: link.stamp $(EXTERNALS:.c=.pd_darwin)
 
 .SUFFIXES: .pd_darwin
 
-PDEXECUTABLE = /usr/local/pd/bin/pd
+PDEXECUTABLE = /usr/local/bin/pd
 # or ../../../pd/bin/pd
 
 MACOSXCFLAGS = -DPD -Os  -DUNIX -DMACOSX -Dunix \
@@ -26,8 +26,8 @@ MACOSXLINKFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE)
 	rm -f "$*.o" 
 
 clean:
-	-rm *.pd_darwin *~ *.c
-	-rm -rf root Package.pkg
+	-rm *.pd_darwin *~ *.c *.o
+	-rm -rf root *.pkg
 	-rm link.stamp
 
 install-doc:
@@ -38,33 +38,70 @@ install: install-doc
 	test -d $(prefix)/extra || mkdir -p $(prefix)/extra
 	install -m644 *.pd_darwin $(prefix)/extra
 
-package:
-	test -d root/doc/5.reference || mkdir -p root/doc/5.reference
-	cp -r ../doc/* root/doc/5.reference
-	test -d root/extra || mkdir -p root/extra
-	install -m644 *.pd_darwin root/extra
-	echo Now opening PackageMaker. Interact with that program now. \
-	Choose the Files tab, and correct the path to point to the newly-made ./root \
-	directory. Then choose File -\> Create Package.
-	open Package.pmsp
-
-altpackage:
-	test -d root/Help || mkdir -p root/Help
-	cp -r ../doc/* root/Help
-	test -d root/Externals || mkdir -p root/Externals
-	install -m644 *.pd_darwin root/Externals
-	echo Now opening PackageMaker. Interact with that program now. \
-	Choose the Files tab, and correct the path to point to the newly-made ./root \
-	directory. Then choose File -\> Create Package.
-	open Altpackage.pmsp
-
 link: link.stamp
 
 link.stamp:
 	cp ../src/*.c .
 #	rm vst.c 
 # MacOSX exceptions that don't work just yet
-	rm ogg* ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
-	rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
+	-rm ogg* ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
+	-rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
 	touch link.stamp
 	make
+
+
+EXTERNALS_VERSION = $(shell date +20%y.%m.%d)
+PACKAGE_NAME = pd-externals-$(EXTERNALS_VERSION)
+
+darwin_pkg_license:
+  # generate HTML version of License
+	echo "<HTML><BODY><FONT SIZE="-1">" > License.html
+	cat ../../creb/COPYING | sed -e 's/^$$/\<P\>/g' >> License.html	
+	echo "</FONT></BODY></HTML>" >> License.html
+
+darwin_pkg_welcome:
+# generate Welcome.html from ../README.txt
+
+darwin_pkg_clean:
+	-sudo rm -Rf installroot/ pd-externals*.pkg/
+	-rm -f pd-externals-*.info 1 License.html Welcome.???*
+
+# install into MSP's default: /usr/local/lib
+
+darwin_pkg: all darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
+# set up installroot dir
+	test -d installroot/pd/doc/5.reference/ || mkdir -p installroot/pd/doc/5.reference/
+	cp -r ../doc/* installroot/pd/doc/5.reference
+	test -d installroot/pd/extra || mkdir -p installroot/pd/extra
+	install -m644 --group=staff *.pd_darwin installroot/pd/extra
+	cp -f pd-externals.info $(PACKAGE_NAME).info
+# delete cruft
+	-find installroot -name .DS_Store -delete
+	-rm -f 1
+# set proper permissions
+	sudo chown -R root:staff installroot
+	package installroot $(PACKAGE_NAME).info -d . -ignoreDSStore
+# install pkg docs
+	install -m 644 License.html $(PACKAGE_NAME).pkg/Contents/Resources
+	sudo chown -R root:staff $(PACKAGE_NAME).pkg/Contents/Resources
+
+
+# install into MacOS X style path: /Library/Pd
+
+darwin_altpkg: all darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
+	test -d installroot/Help || mkdir -p installroot/Help
+	cp -r ../doc/* installroot/Help
+	test -d installroot/Externals || mkdir -p installroot/Externals
+	install -m644 --group=staff *.pd_darwin installroot/Externals
+	sed -e 's/\/usr\/local\/lib/\/Library\/Pd/' pd-externals.info \
+		 | sed -e 's/MSP standard paths/MacOS X-style Paths/' \
+		 > $(PACKAGE_NAME)-alt.info
+ # delete cruft
+	-find installroot -name .DS_Store -delete
+	-rm -f 1
+ # set proper permissions
+	sudo chown -R root:staff installroot
+	package installroot $(PACKAGE_NAME)-alt.info -d . -ignoreDSStore
+ # install pkg docs
+	install -m 644 License.html $(PACKAGE_NAME)-alt.pkg/Contents/Resources
+	sudo chown -R root:staff $(PACKAGE_NAME)-alt.pkg/Contents/Resources
