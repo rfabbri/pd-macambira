@@ -1,0 +1,16 @@
+This is a short example how to "script" a pd patch
+with pd commands.
+
+First start pd
+# pd lisp.pd
+
+Then either start the automated shell script
+# ./test.sh
+
+or pipe the pd commands to pdsend directly:
+
+# pdsend 3005 < test.txt
+
+Read through text.txt for further explanations
+
+Guenter
