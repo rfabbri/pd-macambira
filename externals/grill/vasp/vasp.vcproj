@@ -2,11 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="vasp"
-	SccProjectName="max/vasp/source"
-	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Jalindi Igloo">
+	Name="vasp">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
