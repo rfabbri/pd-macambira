@@ -16,18 +16,18 @@
  *
  */
 /* 
- * $Id: rawjoystick.c,v 1.3 2003-10-12 16:26:39 eighthave Exp $
+ * $Id: rawjoystick.c,v 1.4 2003-10-20 16:17:52 eighthave Exp $
  *
  * TODO
  * -make work with multiple joysticks (using SDL_JoyHatEvent.which)
  * -figure out why it takes so long for [rawjoystick] to start
  * -get throttle and twist working 
+ * -use SDL_PumpEvent rather than SDL_PollEvent in _read
  */
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 #include <SDL/SDL.h>
 #include <m_pd.h>
-#include "m_imp.h"
 
 #define DEBUG(x)
 /* #define DEBUG(x) x */
@@ -70,11 +70,12 @@ static int rawjoystick_close(t_rawjoystick *x)  {
     DEBUG(post("rawjoystick_CLOSE"));
 
     if ( SDL_JoystickOpened(x->x_devnum) ) {
-      SDL_JoystickClose(x->x_joystick);
+		 SDL_JoystickClose(x->x_joystick);
       return 1;
     }
     else {	 
-      return 0;
+		 post("ERROR: joystick not closed!!");
+		 return 0;
     }
 }
 
@@ -90,10 +91,11 @@ static int rawjoystick_open(t_rawjoystick *x)  {
   /* test if device open */
   /* get name of device */  
   if ( SDL_JoystickOpened(x->x_devnum) ) {
-    post ("Configuring %s",SDL_JoystickName(x->x_devnum));
+	  post ("Configuring %s",SDL_JoystickName(x->x_devnum));
   }
   else {	 
-    return 0;
+	  post("ERROR: joystick not opened!!");
+	  return 0;
   }
 
   x->x_axes = SDL_JoystickNumAxes(x->x_joystick);
@@ -231,8 +233,7 @@ static void *rawjoystick_new(t_float argument) {
   t_rawjoystick *x = (t_rawjoystick *)pd_new(rawjoystick_class);
 
   DEBUG(post("rawjoystick_NEW"));
-  post("rawHID objects, %s", version);
-  post("       by Hans-Christoph Steiner <hans@eds.org>");
+  post("rawHID(e) rawjoystick %s, <hans@eds.org>", version);
 
   /* init vars */
   x->x_devnum = 0;
@@ -244,10 +245,10 @@ static void *rawjoystick_new(t_float argument) {
 
   /* INIT SDL using joystick layer  */  
   /* Note: Video is required to start Event Loop !! */
-  if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) { 
-    post("Could not initialize SDL: %s.\n", SDL_GetError());
-    // exit(-1);
-	return (0);	/* changed by olafmatt */
+  if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) < 0 ) { 
+	  post("Could not initialize SDL: %s\n", SDL_GetError());
+	  // exit(-1);
+	  return (0);	/* changed by olafmatt */
   }    
 
   post("%i joysticks were found:", SDL_NumJoysticks() );
