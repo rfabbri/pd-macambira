@@ -275,6 +275,7 @@ void pdp_nervous_setup(void)
     class_addmethod(pdp_nervous_class, (t_method)pdp_nervous_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_nervous_class, (t_method)pdp_nervous_mode, gensym("mode"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_nervous_class, (t_method)pdp_nervous_planes, gensym("planes"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_nervous_class, gensym("pdp_nervous.pd") );
 
 }
 

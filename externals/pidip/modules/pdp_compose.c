@@ -436,7 +436,7 @@ extern "C"
 
 void pdp_compose_setup(void)
 {
-    post( pdp_compose_version );
+    // post( pdp_compose_version );
     pdp_compose_class = class_new(gensym("pdp_compose"), (t_newmethod)pdp_compose_new,
     	(t_method)pdp_compose_free, sizeof(t_pdp_compose), 0, A_NULL);
 
@@ -452,6 +452,7 @@ void pdp_compose_setup(void)
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_luminosity, gensym("luminosity"), A_FLOAT, A_NULL);
     class_addmethod(pdp_compose_class, (t_method)pdp_compose_setcur, gensym("setcur"), A_FLOAT, A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_compose_class, gensym("pdp_compose.pd") );
 }
 
 #ifdef __cplusplus

@@ -220,6 +220,7 @@ void pdp_smuck_setup(void)
 
     class_addmethod(pdp_smuck_class, (t_method)pdp_smuck_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_smuck_class, (t_method)pdp_smuck_n, gensym("n"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_smuck_class, gensym("pdp_smuck.pd") );
 
 }
 

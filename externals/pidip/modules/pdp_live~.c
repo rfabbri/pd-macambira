@@ -772,7 +772,7 @@ extern "C"
 
 void pdp_live_tilde_setup(void)
 {
-    post( pdp_live_version );
+    // post( pdp_live_version );
     pdp_live_class = class_new(gensym("pdp_live~"), (t_newmethod)pdp_live_new,
     	(t_method)pdp_live_free, sizeof(t_pdp_live), 0, A_NULL);
 
@@ -781,6 +781,7 @@ void pdp_live_tilde_setup(void)
     class_addmethod(pdp_live_class, (t_method)pdp_live_disconnect, gensym("disconnect"), A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_priority, gensym("priority"), A_FLOAT, A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_audio, gensym("audio"), A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_live_class, gensym("pdp_live~.pd") );
 
 }
 

@@ -508,6 +508,7 @@ void pdp_radioactiv_setup(void)
     class_addmethod(pdp_radioactiv_class, (t_method)pdp_radioactiv_mode, gensym("mode"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_radioactiv_class, (t_method)pdp_radioactiv_snap_time, gensym("snaptime"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_radioactiv_class, (t_method)pdp_radioactiv_snap_interval, gensym("snapinterval"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_radioactiv_class, gensym("pdp_radioactiv.pd") );
 
 }
 

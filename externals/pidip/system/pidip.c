@@ -55,6 +55,7 @@ extern "C"
     void pdp_transition_setup(void);
     void pdp_imgloader_setup(void);
     void pdp_imgsaver_setup(void);
+    void pdp_cache_setup(void);
 
 
 /* library setup routine */
@@ -108,6 +109,7 @@ void pidip_setup(void){
     pdp_transition_setup();
     pdp_imgloader_setup();
     pdp_imgsaver_setup();
+    pdp_cache_setup();
 
 }
 

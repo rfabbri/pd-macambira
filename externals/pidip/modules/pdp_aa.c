@@ -309,13 +309,14 @@ extern "C"
 
 void pdp_aa_setup(void)
 {
-    post( pdp_aa_version );
+    // post( pdp_aa_version );
     pdp_aa_class = class_new(gensym("pdp_aa"), (t_newmethod)pdp_aa_new,
     	(t_method)pdp_aa_free, sizeof(t_pdp_aa), 0, A_NULL);
 
     class_addmethod(pdp_aa_class, (t_method)pdp_aa_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_aa_class, (t_method)pdp_aa_driver, gensym("driver"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_aa_class, (t_method)pdp_aa_render, gensym("render"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_aa_class, gensym("pdp_aa.pd") );
 
 }
 

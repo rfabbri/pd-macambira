@@ -919,7 +919,7 @@ extern "C"
 
 void pdp_capture_setup(void)
 {
-    post( pdp_capture_version );
+    // post( pdp_capture_version );
     pdp_capture_class = class_new(gensym("pdp_capture"), (t_newmethod)pdp_capture_new,
     	(t_method)pdp_capture_free, sizeof(t_pdp_capture), 0, A_NULL);
 
@@ -930,6 +930,7 @@ void pdp_capture_setup(void)
     class_addmethod(pdp_capture_class, (t_method)pdp_capture_y, gensym("y"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_capture_class, (t_method)pdp_capture_width, gensym("width"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_capture_class, (t_method)pdp_capture_height, gensym("height"), A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_capture_class, gensym("pdp_capture.pd") );
 
 }
 

@@ -569,7 +569,7 @@ extern "C"
 
 void pdp_o_setup(void)
 {
-    post( pdp_o_version );
+    // post( pdp_o_version );
     pdp_o_class = class_new(gensym("pdp_o"), (t_newmethod)pdp_o_new,
     	(t_method)pdp_o_free, sizeof(t_pdp_o), 0, A_NULL);
 
@@ -581,6 +581,7 @@ void pdp_o_setup(void)
     class_addmethod(pdp_o_class, (t_method)pdp_o_refresh, gensym("refresh"), A_NULL);
     class_addmethod(pdp_o_class, (t_method)pdp_o_framerate, gensym("framerate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_o_class, (t_method)pdp_o_smoothing, gensym("smoothing"), A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_o_class, gensym("pdp_o.pd") );
 
 }
 

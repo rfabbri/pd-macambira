@@ -682,7 +682,7 @@ extern "C"
 
 void pdp_rec_tilde_setup(void)
 {
-    post( pdp_rec_version );
+    // post( pdp_rec_version );
     pdp_rec_class = class_new(gensym("pdp_rec~"), (t_newmethod)pdp_rec_new,
     	(t_method)pdp_rec_free, sizeof(t_pdp_rec), 0, A_NULL);
 
@@ -697,6 +697,7 @@ void pdp_rec_tilde_setup(void)
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_jpeg, gensym("jpeg"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_start, gensym("start"), A_NULL);
     class_addmethod(pdp_rec_class, (t_method)pdp_rec_stop, gensym("stop"), A_NULL);
+    class_sethelpsymbol( pdp_rec_class, gensym("pdp_rec~.pd") );
 
 }
 

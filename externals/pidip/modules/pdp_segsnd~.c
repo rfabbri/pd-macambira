@@ -115,7 +115,7 @@ static void pdp_segsnd_allocate(t_pdp_segsnd *x)
 
 static void pdp_segsnd_free_ressources(t_pdp_segsnd *x)
 {
-   if ( x->x_image != NULL ) imlib_free_image();
+   // if ( x->x_image != NULL ) imlib_free_image();
    x->x_image = NULL;
    if ( x->x_data ) freebytes( x->x_data, (( x->x_vsize + (x->x_vsize>>1))<<1));
    x->x_data = NULL;
@@ -151,6 +151,7 @@ static void pdp_segsnd_process_yv12(t_pdp_segsnd *x)
     memcpy( newdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
     memcpy( x->x_data, data, ((x->x_vsize+(x->x_vsize>>1))<<1));
 
+    if ( x->x_image != NULL ) imlib_context_set_image(x->x_image);
     imlib_image_clear();
     imlib_context_set_direction(IMLIB_TEXT_TO_ANGLE);
     imdata = imlib_image_get_data();
@@ -392,7 +393,7 @@ extern "C"
 void pdp_segsnd_tilde_setup(void)
 {
 
-    post( pdp_segsnd_version );
+    // post( pdp_segsnd_version );
     pdp_segsnd_class = class_new(gensym("pdp_segsnd~"), (t_newmethod)pdp_segsnd_new,
     	(t_method)pdp_segsnd_free, sizeof(t_pdp_segsnd), 0, A_NULL);
 
@@ -404,6 +405,7 @@ void pdp_segsnd_tilde_setup(void)
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_x2, gensym("x2"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_y2, gensym("y2"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_segsnd_class, (t_method)pdp_segsnd_random, gensym("random"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_segsnd_class, gensym("pdp_segsnd~.pd") );
 
 }
 

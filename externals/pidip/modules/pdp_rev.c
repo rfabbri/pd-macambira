@@ -253,6 +253,7 @@ void pdp_rev_setup(void)
     class_addmethod(pdp_rev_class, (t_method)pdp_rev_linespace, gensym("linespace"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_rev_class, (t_method)pdp_rev_vscale, gensym("vscale"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_rev_class, (t_method)pdp_rev_color, gensym("color"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_rev_class, gensym("pdp_rev.pd") );
 
 }
 

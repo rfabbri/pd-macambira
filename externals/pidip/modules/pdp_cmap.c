@@ -513,7 +513,7 @@ extern "C"
 
 void pdp_cmap_setup(void)
 {
-    post( pdp_cmap_version );
+    // post( pdp_cmap_version );
     pdp_cmap_class = class_new(gensym("pdp_cmap"), (t_newmethod)pdp_cmap_new,
     	(t_method)pdp_cmap_free, sizeof(t_pdp_cmap), 0, A_NULL);
 
@@ -532,6 +532,7 @@ void pdp_cmap_setup(void)
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_delete, gensym("delete"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_resize, gensym("resize"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_cmap_class, (t_method)pdp_cmap_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_cmap_class, gensym("pdp_cmap.pd") );
 }
 
 #ifdef __cplusplus

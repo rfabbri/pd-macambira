@@ -372,6 +372,7 @@ void pdp_aging_setup(void)
     class_addmethod(pdp_aging_class, (t_method)pdp_aging_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_aging_class, (t_method)pdp_aging_area_scale, gensym("area_scale"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_aging_class, (t_method)pdp_aging_scratches, gensym("scratches"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_aging_class, gensym("pdp_aging.pd") );
 
 }
 

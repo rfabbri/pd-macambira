@@ -41,6 +41,7 @@ clean:
 
 install:
 	cp fonts/* /usr/X11R6/lib/X11/fonts/TTF
+	cp -f --remove-destination doc/* $(PD_DIR)/doc/5.reference
 
 distro: clean all
 	rm */*.o

@@ -236,6 +236,7 @@ void pdp_underwatch_setup(void)
 
     class_addmethod(pdp_underwatch_class, (t_method)pdp_underwatch_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_underwatch_class, (t_method)pdp_underwatch_stripsize, gensym("stripsize"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_underwatch_class, gensym("pdp_underwatch.pd") );
 
 }
 

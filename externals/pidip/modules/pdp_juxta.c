@@ -305,12 +305,13 @@ extern "C"
 
 void pdp_juxta_setup(void)
 {
-    post( pdp_juxta_version );
+    // post( pdp_juxta_version );
     pdp_juxta_class = class_new(gensym("pdp_juxta"), (t_newmethod)pdp_juxta_new,
     	(t_method)pdp_juxta_free, sizeof(t_pdp_juxta), CLASS_NOINLET, A_NULL);
 
     class_addmethod(pdp_juxta_class, (t_method)pdp_juxta_input_0, gensym("pdp1"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_juxta_class, (t_method)pdp_juxta_input_1, gensym("pdp2"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_juxta_class, gensym("pdp_juxta.pd") );
 
 }
 

@@ -318,7 +318,7 @@ extern "C"
 
 void pdp_mgrid_setup(void)
 {
-    post( pdp_mgrid_version );
+    // post( pdp_mgrid_version );
     pdp_mgrid_class = class_new(gensym("pdp_mgrid"), (t_newmethod)pdp_mgrid_new,
     	(t_method)pdp_mgrid_free, sizeof(t_pdp_mgrid), 0, A_NULL);
 
@@ -327,6 +327,7 @@ void pdp_mgrid_setup(void)
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_x_dim, gensym("dimx"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_y_dim, gensym("dimy"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_mgrid_class, (t_method)pdp_mgrid_color, gensym("color"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_mgrid_class, gensym("pdp_mgrid.pd") );
 
 
 }

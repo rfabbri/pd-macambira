@@ -341,6 +341,7 @@ void pdp_vertigo_setup(void)
     class_addmethod(pdp_vertigo_class, (t_method)pdp_vertigo_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_vertigo_class, (t_method)pdp_vertigo_increment, gensym("increment"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_vertigo_class, (t_method)pdp_vertigo_zoomrate, gensym("zoomrate"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_vertigo_class, gensym("pdp_vertigo.pd") );
 
 }
 

@@ -122,11 +122,11 @@ static void *pdp_imgsaver_do_save(void *tdata)
       post( "pdp_imgsaver : saved to : %s", x->x_filename->s_name );
    }
 
-   if ( x->x_image != NULL ) 
-   {
-      imlib_free_image();
-      x->x_image = NULL;
-   }
+   //if ( x->x_image != NULL ) 
+   //{
+   //   imlib_free_image();
+   //}
+   x->x_image = NULL;
 
    x->x_save_pending = 0;
    x->x_filename = NULL;
@@ -150,11 +150,11 @@ static void pdp_imgsaver_save(t_pdp_imgsaver *x, t_symbol *filename)
    }
    x->x_save_pending = 1;
    x->x_filename = filename;
-   if ( x->x_image != NULL ) 
-   {
-      imlib_free_image();
-      x->x_image = NULL;
-   }
+   //if ( x->x_image != NULL ) 
+   //{
+   //   imlib_free_image();
+   //}
+   x->x_image = NULL;
 
    // launch saving thread
    if ( pthread_attr_init( &save_child_attr ) < 0 ) 
@@ -325,13 +325,14 @@ extern "C"
 void pdp_imgsaver_setup(void)
 {
 
-    post( pdp_imgsaver_version );
+    // post( pdp_imgsaver_version );
     pdp_imgsaver_class = class_new(gensym("pdp_imgsaver"), (t_newmethod)pdp_imgsaver_new,
     	(t_method)pdp_imgsaver_free, sizeof(t_pdp_imgsaver), 0, A_NULL);
 
     class_addmethod(pdp_imgsaver_class, (t_method)pdp_imgsaver_input_0, gensym("pdp"),  
                              A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgsaver_class, (t_method)pdp_imgsaver_save, gensym("save"),  A_SYMBOL, A_NULL);
+    class_sethelpsymbol( pdp_imgsaver_class, gensym("pdp_imgsaver.pd") );
 
 }
 

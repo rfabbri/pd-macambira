@@ -559,6 +559,7 @@ void pdp_ripple_setup(void)
     class_addmethod(pdp_ripple_class, (t_method)pdp_ripple_background, gensym("background"), A_NULL);
     class_addmethod(pdp_ripple_class, (t_method)pdp_ripple_threshold, gensym("threshold"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ripple_class, (t_method)pdp_ripple_increment, gensym("increment"), A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_ripple_class, gensym("pdp_ripple.pd") );
 
 }
 

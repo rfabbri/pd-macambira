@@ -242,7 +242,7 @@ extern "C"
 
 void pdp_ascii_setup(void)
 {
-    post( pdp_ascii_version );
+    // post( pdp_ascii_version );
     pdp_ascii_class = class_new(gensym("pdp_ascii"), (t_newmethod)pdp_ascii_new,
     	(t_method)pdp_ascii_free, sizeof(t_pdp_ascii), 0, A_NULL);
 
@@ -250,6 +250,7 @@ void pdp_ascii_setup(void)
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_color, gensym("color"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_brightness, gensym("brightness"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_ratio, gensym("ratio"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_ascii_class, gensym("pdp_ascii.pd") );
 
 }
 

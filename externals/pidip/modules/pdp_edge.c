@@ -292,6 +292,7 @@ void pdp_edge_setup(void)
     	(t_method)pdp_edge_free, sizeof(t_pdp_edge), 0, A_NULL);
 
     class_addmethod(pdp_edge_class, (t_method)pdp_edge_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_edge_class, gensym("pdp_edge.pd") );
 
 }
 

@@ -387,7 +387,7 @@ static void pdp_text_allocate(t_pdp_text *x)
 
 static void pdp_text_free_ressources(t_pdp_text *x)
 {
-   if ( x->x_image != NULL ) imlib_free_image();
+   // if ( x->x_image != NULL ) imlib_free_image();
 }
 
 static void pdp_text_process_yv12(t_pdp_text *x)
@@ -421,6 +421,7 @@ static void pdp_text_process_yv12(t_pdp_text *x)
     memcpy( newdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
 
     // draw all texts
+    if ( x->x_image != NULL ) imlib_context_set_image(x->x_image);
     imlib_image_clear();
     imlib_context_set_direction(IMLIB_TEXT_TO_ANGLE);
     imdata = imlib_image_get_data();
@@ -593,7 +594,7 @@ void pdp_text_setup(void)
 {
   Imlib_Font font;
 
-    post( pdp_text_version );
+    // post( pdp_text_version );
     pdp_text_class = class_new(gensym("pdp_text"), (t_newmethod)pdp_text_new,
     	(t_method)pdp_text_free, sizeof(t_pdp_text), 0, A_NULL);
 
@@ -615,6 +616,7 @@ void pdp_text_setup(void)
     class_addmethod(pdp_text_class, (t_method)pdp_text_dither, gensym("dither"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_blend, gensym("blend"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_antialias, gensym("antialias"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_text_class, gensym("pdp_text.pd") );
 
     imlib_add_path_to_font_path("/usr/X11R6/lib/X11/fonts/TTF");
     font = imlib_load_font(DEFAULT_FONT);

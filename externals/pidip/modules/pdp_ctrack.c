@@ -652,7 +652,7 @@ extern "C"
 
 void pdp_ctrack_setup(void)
 {
-    post( pdp_ctrack_version );
+    // post( pdp_ctrack_version );
     pdp_ctrack_class = class_new(gensym("pdp_ctrack"), (t_newmethod)pdp_ctrack_new,
     	(t_method)pdp_ctrack_free, sizeof(t_pdp_ctrack), 0, A_NULL);
 
@@ -669,6 +669,7 @@ void pdp_ctrack_setup(void)
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_cursor, gensym("cursor"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_frame, gensym("frame"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ctrack_class, (t_method)pdp_ctrack_setcur, gensym("setcur"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_ctrack_class, gensym("pdp_ctrack.pd") );
 }
 
 #ifdef __cplusplus

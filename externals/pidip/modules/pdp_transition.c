@@ -19,7 +19,7 @@
  */
 
 /*  This object is an object allowing transitions between two video sources
- *  "circle", "wipe", "random", "melt" and "blend"
+ *  "circle", "wipe", "random", "melt", "page" and "blend"
  *  Written by Yves Degoyon                                 
  */
 
@@ -27,6 +27,7 @@
 #include <math.h>
 
 #define BLEND_MAX 200
+#define PAGE_RAY  50
 
 static char   *pdp_transition_version = "pdp_transition: version 0.1, two sources transition, written by Yves Degoyon (ydegoyon@free.fr)";
 
@@ -240,6 +241,22 @@ static void pdp_transition_blend(t_pdp_transition *x, t_floatarg finc, t_floatar
     x->x_pos = 0;
 }
 
+static void pdp_transition_page(t_pdp_transition *x, t_floatarg finc )
+{
+    if ( x->x_transition_pending )
+    {
+       post ( "pdp_transition : a transition is already pending, retry later...." );
+       return;
+    }
+    if ( (int) finc > 0 )
+    {
+       x->x_inc = (int)finc;
+    }
+    x->x_transition_mode = 10;
+    x->x_transition_pending = 1;
+    x->x_pos = x->x_vheight;
+}
+
 static void pdp_transition_process_yv12(t_pdp_transition *x)
 {
     t_pdp     *header0 = pdp_packet_header(x->x_packet0);
@@ -249,8 +266,8 @@ static void pdp_transition_process_yv12(t_pdp_transition *x)
     t_pdp     *header;
     short int *data;
     t_int     tsource, cx=0, cy=0;
-    t_int     px, py, rvalue=0;
-    t_float   factor;
+    t_int     px, py, rvalue=0, h1pos, h2pos, xcent, ycent;
+    t_float   factor, alpha;
     int       i;
     short int *poY, *poV, *poU, *p0Y, *p0V, *p0U, *p1Y, *p1V, *p1U;
 
@@ -595,6 +612,64 @@ static void pdp_transition_process_yv12(t_pdp_transition *x)
           x->x_pos += x->x_inc;
           break;
 
+        case 10: // page
+          xcent = (int) ( (float) ( x->x_vheight - x->x_pos ) * (( float ) x->x_vwidth ) /
+                  ( 2.0 * ( (float) x->x_vheight ) ) );
+          ycent = (int) ( ( (float) x->x_pos + (float) x->x_vheight ) / 2.0 );
+          for ( px=0; px<x->x_vwidth; px++ )
+          {
+            for ( py=0; py<x->x_vheight; py++ )
+            {
+               if ( ( ((float) py)-
+                    ((float)x->x_vheight)/((float)x->x_vwidth)*((float)px) ) >= x->x_pos )
+               {
+                 *(poY+py*x->x_vwidth+px) = *(p1Y+py*x->x_vwidth1+px);     
+                 *(poU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 
+			 *(p1U+(py>>1)*(x->x_vwidth1>>1)+(px>>1));     
+                 *(poV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 
+			 *(p1V+(py>>1)*(x->x_vwidth1>>1)+(px>>1));     
+               }
+	       else
+	       {
+		  h1pos = ((float) py) + ((float)x->x_vheight)/((float)x->x_vwidth)*((float)px);
+		  h2pos = ((float) py) - ((float)x->x_vheight)/((float)x->x_vwidth)*((float)px);
+		  alpha = atan( ( (float) x->x_vheight ) / ( (float) x->x_vwidth ) );
+                  if ( ( h1pos <= x->x_vheight ) &&
+		       ( h1pos >= ( (float) x->x_vheight - PAGE_RAY*cos(alpha) ) ) &&
+		       ( h2pos >= ( x->x_pos - PAGE_RAY*sin(alpha) ) ) &&
+		       ( pow ( px-xcent, 2 ) + pow ( py-(ycent-PAGE_RAY), 2 ) 
+		                        >= pow( PAGE_RAY*cos(alpha), 2 ) ) )
+		  {
+                     *(poY+py*x->x_vwidth+px) = 0xff<<7;     
+                     *(poU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 0xff<<8;
+                     *(poV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 0xff<<8;
+		  }
+                  if ( ( h1pos >= x->x_vheight ) &&
+		       ( h1pos <= ( (float) x->x_vheight + PAGE_RAY*cos(alpha) ) ) &&
+		       ( h2pos >= ( x->x_pos - PAGE_RAY*sin(alpha) ) ) &&
+		       ( pow ( px-(xcent+PAGE_RAY), 2 ) + pow ( py-ycent, 2 ) 
+		                        >= pow( PAGE_RAY*sin(alpha), 2 ) ) )
+		  {
+                     *(poY+py*x->x_vwidth+px) = 0xff<<7;     
+                     *(poU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 0xff<<8;
+                     *(poV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) = 0xff<<8;
+		  }
+	       }
+            }
+          }
+          if ( x->x_pos <= -x->x_vheight )
+          {
+            post( "pdp_transition : page transition finished" );
+            x->x_transition_pending = 0;
+            x->x_transition_mode = 0;
+            tsource = x->x_current_source;
+            x->x_current_source = x->x_target_source;
+            x->x_target_source = tsource;
+            x->x_pos = 0;
+          }
+          x->x_pos -= x->x_inc;
+          break;
+
         default:
           break;
       }
@@ -763,7 +838,7 @@ extern "C"
 
 void pdp_transition_setup(void)
 {
-    post( pdp_transition_version );
+    // post( pdp_transition_version );
     pdp_transition_class = class_new(gensym("pdp_transition"), (t_newmethod)pdp_transition_new,
     	(t_method)pdp_transition_free, sizeof(t_pdp_transition), 0, A_NULL);
 
@@ -778,6 +853,8 @@ void pdp_transition_setup(void)
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_random, gensym("random"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_melt, gensym("melt"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_transition_class, (t_method)pdp_transition_blend, gensym("blend"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_transition_class, (t_method)pdp_transition_page, gensym("page"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_transition_class, gensym("pdp_transition.pd") );
 
 
 }

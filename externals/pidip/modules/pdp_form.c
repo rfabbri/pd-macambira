@@ -372,7 +372,7 @@ static void pdp_form_allocate(t_pdp_form *x)
 
 static void pdp_form_free_ressources(t_pdp_form *x)
 {
-   if ( x->x_image != NULL ) imlib_free_image();
+   // if ( x->x_image != NULL ) imlib_free_image();
 }
 
 static void pdp_form_process_yv12(t_pdp_form *x)
@@ -405,6 +405,7 @@ static void pdp_form_process_yv12(t_pdp_form *x)
     memcpy( newdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
 
     // draw all texts
+    if ( x->x_image != NULL ) imlib_context_set_image(x->x_image); 
     imlib_image_clear();
     imlib_context_set_direction(IMLIB_TEXT_TO_ANGLE);
     imdata = imlib_image_get_data();
@@ -580,7 +581,7 @@ extern "C"
 void pdp_form_setup(void)
 {
 
-    post( pdp_form_version );
+    // post( pdp_form_version );
     pdp_form_class = class_new(gensym("pdp_form"), (t_newmethod)pdp_form_new,
     	(t_method)pdp_form_free, sizeof(t_pdp_form), 0, A_NULL);
 
@@ -600,6 +601,7 @@ void pdp_form_setup(void)
     class_addmethod(pdp_form_class, (t_method)pdp_form_clear, gensym("clear"),  A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_delete, gensym("delete"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_resize, gensym("resize"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_form_class, gensym("pdp_form.pd") );
 
 }
 

@@ -331,6 +331,7 @@ void pdp_lens_setup(void)
     class_addmethod(pdp_lens_class, (t_method)pdp_lens_csize, gensym("csize"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_lens_class, (t_method)pdp_lens_zoom, gensym("zoom"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_lens_class, (t_method)pdp_lens_mode, gensym("mode"),  A_FLOAT, A_NULL);
+    class_sethelpsymbol( pdp_lens_class, gensym("pdp_lens.pd") );
 
 }
 

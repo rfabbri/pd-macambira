@@ -435,6 +435,7 @@ void pdp_simura_setup(void)
     class_addmethod(pdp_simura_class, (t_method)pdp_simura_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_simura_class, (t_method)pdp_simura_color, gensym("color"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_simura_class, (t_method)pdp_simura_mode, gensym("mode"),  A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_simura_class, gensym("pdp_simura.pd") );
 
 }
 

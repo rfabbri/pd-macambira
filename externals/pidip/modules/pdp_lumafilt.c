@@ -123,7 +123,7 @@ static void pdp_lumafilt_process_yv12(t_pdp_lumafilt *x)
     for (py = 0; py < x->x_vheight; py++) {
       for (px = 0; px < x->x_vwidth; px++) {
          luma = (*(pnY)>>7);
-	 if ( ( luma >0 ) && ( luma < MAX_LUMA ) ) // paranoid
+	 if ( ( luma >=0 ) && ( luma < MAX_LUMA ) ) // paranoid
 	 {
 	   if ( x->x_filter[luma] )
 	   {
@@ -247,6 +247,7 @@ void pdp_lumafilt_setup(void)
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_input_0, gensym("pdp"), A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_filter, gensym("filter"),  A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_lumafilt_class, (t_method)pdp_lumafilt_mfilter, gensym("mfilter"),  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_sethelpsymbol( pdp_lumafilt_class, gensym("pdp_lumafilt.pd") );
 
 }
 
