@@ -84,7 +84,7 @@ public:
 			S *dst = imm.Pointer();
 			const S *src = buf->Pointer();
 			register int i;
-			_DE_LOOP(i,len, ( *(dst++) = *src,src += chns ) )
+			_DE_LOOP(i,len, ( dst[i] = *src,src += chns ) )
 
 			Vasp ret(len,Vasp::Ref(imm));
 			ToOutVasp(0,ret);

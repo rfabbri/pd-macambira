@@ -1,33 +1,33 @@
-#N canvas 292 80 638 415 12;
-#X obj 60 241 bng 50 250 50 0 start_bang empty start 0 -6 128 8 -24198
+#N canvas 410 154 646 423 12;
+#X obj 60 241 bng 50 250 50 0 start_bang empty start 0 -6 160 8 -24198
 -1 -1;
 #X text 15 77 load/save/play etc.;
-#X obj 179 125 nbx 8 16 0 1e+008 0 0 len_src empty empty 0 -8 128 12
--225271 -1 -1 4e+006 256;
+#X obj 179 125 nbx 8 16 0 1e+08 0 0 len_src empty empty 0 -8 32 12
+-225271 -1 -1 4e+06 256;
 #X text 275 137 (defines the size of the result);
-#X obj 177 179 nbx 8 16 0 1e+008 0 0 len_arg empty empty 0 -8 128 12
--225271 -1 -1 89000 256;
+#X obj 177 179 nbx 8 16 0 1e+08 0 0 len_arg empty empty 0 -8 32 12
+-225271 -1 -1 4e+06 256;
 #X obj 32 122 wedit buf_src;
 #X obj 30 176 wedit buf_arg;
 #X obj 33 350 wedit buf_res;
 #X text 122 255 start convolution;
-#X obj 177 356 bng 15 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
--1;
-#X obj 201 357 nbx 8 16 0 1e+008 0 0 len_arg empty empty 0 -8 128 12
--261689 -1 -1 4e+006 256;
-#X obj 11 10 cnv 15 600 50 empty empty convolve 10 22 0 24 -260818
+#X obj 177 356 bng 15 250 50 0 empty empty empty 0 -6 32 8 -258699
+-1 -1;
+#X obj 201 357 nbx 8 16 0 1e+08 0 0 len_arg empty empty 0 -8 160 12
+-261689 -1 -1 4e+06 256;
+#X obj 11 10 cnv 15 600 50 empty empty convolve 10 22 32 24 -260818
 -1 0;
-#X text 202 41 http://www.parasitaere-kapazitaeten.net;
-#X text 203 10 fft-based convolution \, (C)2003 Thomas Grill;
-#X text 203 25 needs vasp and wedit;
+#X text 178 42 http://www.parasitaere-kapazitaeten.net;
+#X text 179 11 fft-based convolution \, (C)2003 Thomas Grill;
+#X text 179 26 needs vasp and wedit;
 #X text 32 329 result buffer;
 #X text 31 102 source buffer;
 #X text 29 157 argument buffer;
 #X text 278 124 length of source (samples);
 #X text 276 178 length of argument (samples);
-#N canvas 0 0 464 314 do 0;
+#N canvas 0 22 510 318 do 0;
 #X obj 29 215 vasp.u;
-#N canvas 406 75 430 580 convolve 0;
+#N canvas 406 75 510 584 convolve 0;
 #X obj 29 195 vasp.!;
 #X obj 107 280 vasp.conv;
 #X obj 107 311 t a a;
@@ -39,7 +39,7 @@
 #X obj 29 131 t a b a;
 #X obj 194 111 vasp;
 #X obj 28 106 vasp;
-#N canvas 0 0 458 308 sf 0;
+#N canvas 0 22 458 308 sf 0;
 #X obj 39 178 outlet;
 #X obj 38 43 inlet;
 #X obj 41 79 vasp.s;
@@ -51,7 +51,7 @@
 #X connect 3 0 4 1;
 #X connect 4 0 0 0;
 #X restore 194 211 pd sf;
-#N canvas 0 0 452 302 sf 0;
+#N canvas 0 22 452 302 sf 0;
 #X obj 39 178 outlet;
 #X obj 38 43 inlet;
 #X obj 41 79 vasp.s;
