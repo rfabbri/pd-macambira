@@ -17,7 +17,7 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 # compiler stuff
 INCLUDES=$(PDINC) 
 FLAGS=-DFLEXT_SYS=2
-CFLAGS=${UFLAGS} -O3 -I/usr/lib/flext -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions -fno-rtti -fno-exceptions
+CFLAGS=${UFLAGS} -O3 -I/home/tim/pd/externals/grill/flext/source -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions -fno-rtti -fno-exceptions 
 LIBS=m
 
 ifdef FLEXT_SHARED

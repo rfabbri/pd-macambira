@@ -3,11 +3,10 @@
 /* WARRANTIES, see the file, "COPYING"  in this distribution.                   */
 /*                                                                              */
 /*                                                                              */
-/* tbext is the collection of some external i wrote.                            */
-/* some are useful, others aren't...                                            */
+/* fftgrshuf divides the incoming fft signal into single grains and reverses    */
+/* the samples in every grain                                                   */
 /*                                                                              */
-/*                                                                              */
-/* tbext uses the flext C++ layer for Max/MSP and PD externals.                 */
+/* fftgrrev uses the flext C++ layer for Max/MSP and PD externals.              */
 /* get it at http://www.parasitaere-kapazitaeten.de/PD/ext                      */
 /* thanks to Thomas Grill                                                       */
 /*                                                                              */
@@ -33,39 +32,134 @@
 /*                                                                              */
 /*                                                                              */
 /*                                                                              */
-/* coded while listening to: Hamid Drake & Assif Tsahar: Soul Bodies, Vol. 1    */
-/*                           I.S.O.: I.S.O                                      */
+/* coded while listening to: Howard Skempton/John Tilbury: Well, well, Cornelius*/
+/*                                                                              */
 /*                                                                              */
 
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.03"
+#include <algorithm>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
 #error upgrade your flext version!!!!!!
 #endif
 
-void ttbext_setup()
+class fftgrrev: public flext_dsp
 {
-  post("TBEXT: by tim blechmann");
-  post("version "TBEXT_VERSION);
-  post("compiled on "__DATE__);
-  post("");
+  FLEXT_HEADER(fftgrrev,flext_dsp);
 
-  FLEXT_SETUP(tbroute);
-  //FLEXT_SETUP(tbstrg);
-  FLEXT_DSP_SETUP(tbsroute);
-  FLEXT_DSP_SETUP(tbssel);
-  FLEXT_DSP_SETUP(tbsig);
-  FLEXT_DSP_SETUP(tbpow);
-  //  FLEXT_DSP_SETUP(tbg7xx);
-  FLEXT_DSP_SETUP(tbfft1);
-  FLEXT_DSP_SETUP(tbfft2);
-  FLEXT_DSP_SETUP(fftbuf);
-  FLEXT_DSP_SETUP(fftgrsort);
-  FLEXT_DSP_SETUP(fftgrshuf);
-  FLEXT_DSP_SETUP(fftgrrev);
+public: // constructor
+  fftgrrev(int);
+
+protected:
+  virtual void m_signal (int n, float *const *in, float *const *out);
+  void set_grains(t_int);
+  void set_offset(t_int);
+  void set_reverse();
+  
+private:
+  FLEXT_CALLBACK_1(set_grains,t_int)
+  FLEXT_CALLBACK_1(set_offset,t_int)
+    
+  t_int grains;
+  t_int grainsize;
+  t_int offset;
+  
+  t_int bs; //blocksize
+  t_int bs1; //bs+1
+  t_int counter;
+
+  t_sample * data; //array with data
+  t_sample * d1; //1. element in array with data
+  t_sample * dend; //1 element after the last element
+  
+  t_sample * ins;
+  t_sample * outs;
+
+  bool reverse;
+  
+};
+
+
+FLEXT_LIB_DSP_1("fftgrrev~",fftgrrev,int)
+
+fftgrrev::fftgrrev(int arg):
+  grains(1),offset(0),counter(1)
+{
+  bs=arg/2;
+  grainsize=bs;
+  bs1=bs+1;
+  post("blocksize: %i",bs);
+  
+  data = new t_sample[bs+1];
+  
+  data[0]=0;
+  d1=data+1;
+  dend=data+bs+1;
+  
+  AddInSignal();
+  AddOutSignal();
+  FLEXT_ADDMETHOD_I(0,"grains",set_grains);
+  FLEXT_ADDMETHOD_I(0,"offset",set_offset);
+} 
+
+void fftgrrev::m_signal(int n, t_float * const *in, t_float *const *out)
+{
+  ins = in[0];
+  outs = out[0];
+
+
+  if (offset>0)
+    {
+      CopySamples(d1+bs-offset,ins,offset);
+      CopySamples(d1,ins+offset,bs-offset);
+    }
+  else if (offset<0)
+    {
+      CopySamples(d1-offset,ins,bs+offset);
+      CopySamples(d1,ins+bs+offset,-offset);
+    } 
+  else 
+    CopySamples(data,ins,bs1);
+  
+  
+  //grains
+  
+  counter=1;
+  
+  while (counter!=grains)
+    {
+      std::reverse(d1+grainsize*(counter-1),d1+grainsize*counter);
+      ++counter;
+    }
+  
+  std::reverse(d1+grainsize*(counter-1),dend);
+  
+  CopySamples(outs,data,bs1);
 }
 
-FLEXT_LIB_SETUP(tbext,ttbext_setup)
+void fftgrrev::set_offset(t_int o)
+{
+  if (o-bs<0 && o+bs>0)
+    {
+      offset=-o;
+      post("offset %i",o);
+    }
+  else
+    post("Offset out of range!");
+}
+
+
+void fftgrrev::set_grains(t_int g)
+{
+  if (  (g > 0) )
+    {
+      grains=g;
+      grainsize=(bs)/grains;
+    }
+}
+
+
+
+

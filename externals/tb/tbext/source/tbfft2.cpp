@@ -3,11 +3,11 @@
 /* WARRANTIES, see the file, "COPYING"  in this distribution.                   */
 /*                                                                              */
 /*                                                                              */
-/* tbext is the collection of some external i wrote.                            */
-/* some are useful, others aren't...                                            */
+/* tbfft2~ transforms the fft spectrum. it reverses the order of the samples in */
+/* the fft spectrum. see the help file for further instruction...               */
 /*                                                                              */
 /*                                                                              */
-/* tbext uses the flext C++ layer for Max/MSP and PD externals.                 */
+/* tbfft2~ uses the flext C++ layer for Max/MSP and PD externals.               */
 /* get it at http://www.parasitaere-kapazitaeten.de/PD/ext                      */
 /* thanks to Thomas Grill                                                       */
 /*                                                                              */
@@ -33,39 +33,115 @@
 /*                                                                              */
 /*                                                                              */
 /*                                                                              */
-/* coded while listening to: Hamid Drake & Assif Tsahar: Soul Bodies, Vol. 1    */
-/*                           I.S.O.: I.S.O                                      */
+/* coded while listening to: Naked City: Heretic, Jeux Des Dames Cruelles       */
+/*                           Bob Ostertag: Attention Span                       */
+/*                                                                              */
 /*                                                                              */
 
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.03"
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
 #error upgrade your flext version!!!!!!
 #endif
 
-void ttbext_setup()
-{
-  post("TBEXT: by tim blechmann");
-  post("version "TBEXT_VERSION);
-  post("compiled on "__DATE__);
-  post("");
 
-  FLEXT_SETUP(tbroute);
-  //FLEXT_SETUP(tbstrg);
-  FLEXT_DSP_SETUP(tbsroute);
-  FLEXT_DSP_SETUP(tbssel);
-  FLEXT_DSP_SETUP(tbsig);
-  FLEXT_DSP_SETUP(tbpow);
-  //  FLEXT_DSP_SETUP(tbg7xx);
-  FLEXT_DSP_SETUP(tbfft1);
-  FLEXT_DSP_SETUP(tbfft2);
-  FLEXT_DSP_SETUP(fftbuf);
-  FLEXT_DSP_SETUP(fftgrsort);
-  FLEXT_DSP_SETUP(fftgrshuf);
-  FLEXT_DSP_SETUP(fftgrrev);
+class tbfft2: public flext_dsp
+{
+  FLEXT_HEADER(tbfft2,flext_dsp);
+
+public: // constructor
+  tbfft2();
+
+protected:
+  virtual void m_signal (int n, float *const *in, float *const *out);
+  void set_freq(t_float);
+  void set_width(t_float);
+
+private:
+  FLEXT_CALLBACK_1(set_freq,t_float)
+  FLEXT_CALLBACK_1(set_width,t_float)
+  
+  t_int center;
+  t_int width;
+  
+  t_float pos;
+  t_int posi;
+
+  float *ins;
+  float *outs;
+  float *tmps;
+  t_float tmp[2049];
+  
+  t_float s;
+  t_float b;
+  
+  t_int n0;
+};
+
+
+FLEXT_LIB_DSP("tbfft2~",tbfft2)
+
+tbfft2::tbfft2()
+{
+  AddInSignal();
+  AddOutSignal();
+  FLEXT_ADDMETHOD_F(0,"center",set_freq);
+  FLEXT_ADDMETHOD_F(0,"width",set_width);
+} 
+
+
+void tbfft2::m_signal(int n, t_float *const *in, t_float *const *out)
+{
+  ins = in[0];
+  outs = out[0];
+
+  CopySamples(tmp,ins,n);
+  
+  n0=n/2;  
+
+  if (center-width>0)
+    {
+      n=center-width;
+    }
+  else
+    n=0;
+  
+  while (n<center+width)
+    {
+      tmp[n]=*(ins+2*center-n);
+      ++n;
+    }
+  
+
+
+  //memcp
+  CopySamples(outs,tmp,n0*2);
+  
 }
 
-FLEXT_LIB_SETUP(tbext,ttbext_setup)
+void tbfft2::set_freq(t_float freq)
+{
+  center=freq;
+  set_width(width);
+}
+
+void tbfft2::set_width(t_float w)
+{
+
+  if (w+center>n0)
+    {
+      width=n0-center;
+      return;
+    }
+  if (center-w<0)
+    {
+      width=center;
+      return;
+    }
+
+  width=w;
+}
+
+
