@@ -16,12 +16,12 @@ Package files:
 - gpl.txt,license.txt: GPL license stuff
 - flext.h: main include file
 - flstdc.h: Basic definitions in classic C - some common vocabulary for the different platforms
-- flbase.h,flbase.cpp: GEM-like C++ interface
+- flbase.h,flbase.cpp: C++ interface
 - flclass.h,flext.cpp: actual base classes for message (flext_base) and dsp (flext_dsp) processing
 - fldsp.h,fldsp.cpp: code for signal externals
 - flthr.h,flthr.cpp: code for threaded methods
 - flsupport.h,flsupport.cpp: various flext support functions and classes
-- flatom.cpp: code for functions dealing with lists of atoms
+- flatom.cpp flatom_pr.cpp: code for functions dealing with lists of atoms
 - flutil.cpp: additional utility functions
 - flxlet.cpp: code for variable inlet/outlet stuff
 - flattr.cpp: code for attribute stuff
@@ -41,21 +41,35 @@ The package should at least compile (and is tested) with the following compilers
 
 pd - Windows:
 -------------
-o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
+For any of these compilers define "PD" and "NT".
 
 o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
+
+o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
 
 o Cygwin: edit "config-pd-cygwin.txt" & run "sh build-pd-cygwin.sh" 
 
 pd - linux:
 -----------
+Be sure to define "PD".
+
 o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
+
+pd - MacOSX:
+-----------
+Be sure to define "PD".
+
+o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 
 Max/MSP - MacOS 9:
 ------------------
+Be sure to define "MAXMSP".
+
 o Metrowerks CodeWarrior V6: edit & use the "flext.cw" project file
 
-o Apple MPW-PR: edit & use the "flext.mpw" makefile
+Max/MSP - MacOSX:
+------------------
+... sorry, not yet... would someone please donate me a CodeWarrior V8 ?
 
 ----------------------------------------------------------------------------
 
@@ -80,20 +94,34 @@ see flext.h, fldefs.h and flclass.h for the documented base definitions and clas
 
 Version history:
 
+0.4.1:
+- fixed crash issue in flext_dsp when there are NO signal inlets or outlets defined
+	(this is possibly only a problem for the signal2 tutorial example)
+
 0.4.0:
+- the use of the const keyword is enforced (e.g. the preferred type for symbols is now "const t_symbol *")
+	- there _might_ be some problems with sensitive compilers
 - introduced Max/Jitter-like attribute functionality ("@value" command line, "getvalue" get and "value" set functions)
 - introduced a flext static class for general flext functions (to clean up the flext_base class)
 - creation argument handling is now done by flext
 	no more weird PD re-ordering of arguments 
-- calling SetupInOut() has become obsolete - flext creates all inlets/outlets by itself at the right time
+- no more support for the Apple MPW compiler - MacOS9 is dying anyway...
+- calling SetupInOut() has become obsolete 
+	- flext creates all inlets/outlets by itself after the constructor has finished
+	- this implies that CntIn(),CntOut() and the outlet pointers are not valid in the constructor
+	- there is a virtual bool Init() function that may be used for such initialization
 - completely redesigned FLEXT_NEW macros, usage of dynamic classes (in fllib.cpp)
 - added ToQueue* functions - like ToOut* but messages or not directly sent (well suited for deadlock situations)
+- introduced additional per-class methods and attributes (just like it ever was in Max and PD)
 - fixed potentially dangerous typo in flext.cpp - (was: FLEXT_THREAD instead of FLEXT_THREADS)
 - added OSX/darwin support (originally done by Adam T. Lindsay)
 - SndObj interface now also available for cygwin and BCC 
 - added prepend and append functions to AtomList class
 - added IsNothing, SetNothing, CanbeBool and GetABool functions
-- deprecated the remaining Get*Flint and Set*Flint functions 
+- eliminated the remaining Get*Flint and Set*Flint functions 
+- added/completed Is/Canbe/Get/Set for pointer atoms
+- added print/scan functions for atoms
+- fixed anything outlets for Max/MSP... for some strange reason this severe bug has not had severe consequences....
 
 0.3.3:
 - PD: fixed bug for DSP objects having no signal inlets
@@ -237,11 +265,12 @@ general:
 - check that SetupInOut is only called once
 - feed assist function with in/outlet description
 - MaxMSP: how to call separate help files for objects in a library?
+- MaxMSP for OSX: add support 
 
 bugs:
 - PD: problems with timed buffer redrawing (takes a lot of cpu time)
 - hard thread termination upon object destruction doesn't seem to work properly -> crash
-- Max rounding bug (at least version 4.0.5) ... buffer resize could be one sample less!
+- Max rounding bug ... buffer resize could be one sample less!
 - flext_dsp: Max/MSP doesn't correctly report in/out channel counts
 
 tests:

@@ -38,8 +38,8 @@ CFLAGS=-6 -O2 -OS -ff -tWD
 !include make-files.txt
 
 !ifdef SNDOBJ
-SRCS=$(SRCS) flsndobj.cpp
-HDRS=$(HDRS) flsndobj.h
+SRCS=$(SRCS) $(SRCS_SNDOBJ)
+HDRS=$(HDRS) $(HDRS_SNDOBJ)
 !endif
 
 #default target
@@ -56,6 +56,9 @@ OBJS= $(SRCS:.cpp=.obj)
 
 #.PATH.obj=$(OUTPATH)
 
+
+DIR="/"
+
 {$(SOURCE)}.cpp.obj:
 	bcc32 -c $(CFLAGS) $(DEFS) $(INCPATH) -n$(OUTPATH) $<
 
@@ -69,12 +72,10 @@ $(OUTPATH)\$(NAME)-$(TARGET).lib:: $(OBJS)
 	cd $(OUTPATH)
 	tlib "..\$<" +$(**: = +)
 	cd ..
-!ifdef INSTALL
-!if "$(INSTALL)" == "yes"
+!if $d(INSTDIR) && "$(INSTDIR)" != ""
 	@-if not exist $(INSTDIR) mkdir $(INSTDIR)
 	copy $< $(INSTDIR) >nul
 	copy $(SOURCE)\*.h $(INSTDIR) >nul
-!endif
 !endif
 
 

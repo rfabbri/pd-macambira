@@ -139,12 +139,20 @@ SOURCE=.\source\fldoxygen.h
 # End Source File
 # Begin Source File
 
+SOURCE=".\make-files.txt"
+# End Source File
+# Begin Source File
+
 SOURCE=.\readme.txt
 # End Source File
 # End Group
 # Begin Source File
 
 SOURCE=.\source\flatom.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\source\flatom_pr.cpp
 # End Source File
 # Begin Source File
 
