@@ -1,0 +1,35 @@
+first, install  :
+
+imlib2 ( http://sourceforge.net/project/showfiles.php?group_id=2 )
+aalib (http://aa-project.sourceforge.net/aalib/)
+Image Magick ( http://www.imagemagick.org )
+and ffmpeg ( watchout, it requires the cvs snapshot ! ) ( http://ffmpeg.sourceforge.net/cvs )
+
+you should also have installed libquicktime that is necessary for PDP 
+( http://sourceforge.net/projects/libquicktime ).
+
+gone through it ?? yeh, i know it's a lot.
+ok, first stage reached )
+
+fix PD, PDP and FFMPEG paths in configure.ac
+
+autoconf 
+
+./configure 
+
+make clean 
+
+make
+
+as root, make install
+
+pidip is a library, it should be loaded
+with the "-lib <path>/pidip" command line option
+but, BEWARE, it should be place AFTER the 
+loading of PDP library ( option "-lib <path>/pdp" )
+
+Enjoy!!
+
+Thanx for getting here.
+Yves/
+comments and bugs @ ydegoyon@free.fr

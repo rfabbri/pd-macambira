@@ -1,0 +1,53 @@
+#N canvas 168 29 842 529 10;
+#X text 460 551 written by Yves Degoyon (ydegoyon@free.fr);
+#X floatatom 226 441 5 0 0 0 - - -;
+#X text 272 440 Streaming status;
+#X floatatom 221 419 5 0 0 0 - - -;
+#X obj 36 449 pdp_xv;
+#X text 526 79 Connect to a live stream;
+#X text 325 118 Disconnect from the current stream;
+#X msg 247 116 disconnect;
+#X text 270 420 Number of video frames decoded;
+#X text 457 527 ( at least from ffserver );
+#X text 23 547 NOTE : as for pdp_ffmpeg~ \, transmitting audio;
+#X text 22 565 with the video stream produces some unsteady sound;
+#X text 23 580 a prefered solution would be to use mp3cast~/mp3amp~
+;
+#X msg 246 335 priority \$1;
+#X floatatom 335 336 5 0 0 0 - - -;
+#X text 385 357 ( optional \, if you know what you're doing );
+#X obj 70 493 outlet~;
+#X obj 146 486 outlet~;
+#X text 387 342 ([-20 \, 20 ] default : 0 );
+#X text 390 329 Set the priority of decoding thread;
+#X obj 65 60 block~ 4096;
+#X msg 247 225 connect \$1;
+#X msg 246 78 connect http://localhost:8090/test1.mpg;
+#X text 460 513 pdp_live~ : decodes a live video stream;
+#X text 458 539 and reads most common files ( avi \, mpg \, .... )
+;
+#X text 325 175 Read video file;
+#X obj 247 154 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 247 176 openpanel;
+#X msg 248 296 audio \$1;
+#X obj 317 298 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 348 298 Activate decoding of audio ( default : off );
+#X obj 113 390 pdp_live~;
+#X obj 247 200 makefilename file://%s;
+#X connect 7 0 31 0;
+#X connect 13 0 31 0;
+#X connect 14 0 13 0;
+#X connect 21 0 31 0;
+#X connect 22 0 31 0;
+#X connect 26 0 27 0;
+#X connect 27 0 32 0;
+#X connect 28 0 31 0;
+#X connect 29 0 28 0;
+#X connect 31 0 4 0;
+#X connect 31 1 16 0;
+#X connect 31 2 17 0;
+#X connect 31 3 1 0;
+#X connect 31 4 3 0;
+#X connect 32 0 21 0;

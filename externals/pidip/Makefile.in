@@ -1,0 +1,58 @@
+PD_DIR = @PD_DIR@
+PDP_DIR = @PDP_DIR@
+FFMPEG_SOURCE_DIR = @FFMPEG_SOURCE_DIR@
+
+LIBS = @LIBS@
+IMLIB_CFLAGS = @IMLIB_CFLAGS@
+IMLIB_LIBS = @IMLIB_LIBS@
+AALIB_CFLAGS = @AALIB_CFLAGS@
+AALIB_LIBS = @AALIB_LIBS@
+MAGICK_CFLAGS = @MAGICK_CFLAGS@
+MAGICK_LIBS = @MAGICK_LIBS@
+PDP_PIDIP_VERSION = @PDP_PIDIP_VERSION@
+
+PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)
+PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
+# build flags
+
+PDP_PIDIP_INCLUDE =  -I$(PD_DIR)/src -I. -I$(PDP_DIR)/include  -I$(FFMPEG_SOURCE_DIR)/libavcodec -I$(FFMPEG_SOURCE_DIR)/libavformat -I../include
+PDP_PIDIP_CFLAGS  = $(MAGICK_CFLAGS) $(AALIB_CFLAGS) $(IMLIB_CFLAGS) \
+    -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
+    -Wall -W -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch \
+    -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" \
+   -g
+PDP_PIDIP_CPPFLAGS  = -O
+
+all: pidip.pd_linux
+
+pdp_pidip_all:
+	make -C system
+	make -C modules
+
+pidip.pd_linux: pdp_pidip_all
+	rm -f pidip.pd_linux
+	gcc -export_dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(FFMPEG_SOURCE_DIR)/libavformat/libavformat.a $(FFMPEG_SOURCE_DIR)/libavcodec/libavcodec.a $(LIBS) $(IMLIB_LIBS) $(AALIB_LIBS) $(MAGICK_LIBS)
+
+clean:
+	rm -f */*.o
+	rm -f pidip.pd_linux
+	rm -f *~
+
+install:
+	cp fonts/* /usr/X11R6/lib/X11/fonts/TTF
+
+distro: clean all
+	rm */*.o
+	strip --strip-unneeded pidip.pd_linux
+	cd .. && cp -rf pidip /tmp/pidip-$(PDP_PIDIP_VERSION)
+	cd /tmp && tar vczf $(PDP_PIDIP_TARBALL) pidip-$(PDP_PIDIP_VERSION)
+	cp /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION).tar.gz /mnt/c/Yves
+	rm -rf /tmp/pidip-$(PDP_PIDIP_VERSION)
+
+.c.o:
+	gcc $(PDP_PIDIP_CFLAGS) $(PDP_PIDIP_INCLUDE) -o $*.o -c $*.c
+
+.cpp.o:
+	g++ $(PDP_PIDIP_CPPFLAGS) $(PDP_PIDIP_INCLUDE) -o $*.o -c $*.cpp
+

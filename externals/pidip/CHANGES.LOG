@@ -1,0 +1,125 @@
+0.12.4
+  added pdp_imgsaver : save an image from the current video stream
+  pdp_transition : added "melt" and "blend" transitions
+0.12.3
+  added pdp_imgloader : load an image and blend it with a video
+  added pdp_transition : some funky transitions, "circle", "wipe" and "random"
+  added pdp_lumafilt : lumosity filter, useful to isolate some objects
+  added pdp_smuck : same as pdp_transform ( mode 5 ) but setable, ported from veejay
+0.12.2
+  Fixed problems with Image Magick includes
+0.12.1
+  Added color components output in pdp_ctrack
+0.12.0
+  Compatibility with PDP 0.12
+0.11.3
+  Nicolas Lhommet added scroll parameter in pdp_text 
+0.11.2
+  added pdp_capture : capture a portion of screen : lets you import browser data, etc ....
+  fixed pdp_compose
+0.11.1
+  added pdp_juxta : allow juxtaposition of frames
+0.11.0
+  change some packet allocation policies to comply with PDP 0.11
+  no new object
+0.10.1
+  added pdp_noquark object : moving object are clear, the background is noisy
+  added tolerance input in pdp_quark
+0.10.0
+  added pdp_segsnd~ : produces sound from a segment of the video ( similar to pdp_scanxy~ )
+  binary compatible with pdp v.0.10
+  improved installation instructions
+0.9.2
+  fixed disconnection phase in pdp_live~
+0.9.1
+  remove synchronization proposed by martin pi : it lead to some deadlocks sometimes
+0.9.0
+  fixed audio encoding/decoding in pdp_ffmpeg~/pdp_live~ ( which caused a lot of crashes )
+  add synchronization in pdp_live~ and other nice features ( thanks to martin pi )
+  made the audio decoding in pdp_live~ optional 
+  add "set cursor" message in pdp_cmap, pdp_ctrack, pdp_compose 
+  ( used in conjonction with coordinates output of pdp_xv v0.9 )
+0.8.4
+  added pdp_live~ : receive a video feed, at least from a ffmpeg server ( ffserver )
+  fixed resampling in pdp_ffmpeg~ : resizing to a bigger image used to crash PD 
+  ( now, you can't resize to a bigger scale, blame it on libavcodec )
+0.8.3
+  pdp_rec became pdp_rec~ : it can record audio now
+  fix crash in pdp_ascii, pdp_nervous, pdp_quark
+0.8.2
+  added pdp_ffmpeg : stream to a ffmpeg server with possibly several formats ( mpeg, asf, ... )
+  NOTE : although there is an experimental audio streaming possibility,
+  there are BIG synchronization issues and it's recommended to use mp3cast~ for audio streaming.
+  added a ratio action in pdp_ascii
+  added a planes number action in pdp_quark and pdp_nervous ( plays on speed of switching )
+  fixed index bug in pdp_ctrack, pdp_cmap
+0.8.1
+  fixed colors in pdp_warhol
+0.8.0
+  added pdp_ascii : rendering of videos in ASCII art using character maps
+0.7.7
+  added pdp_aa : rendering of videos in ASCII art using aalib
+0.7.6
+  added pdp_cmap : color mapper ( thanx to liz for the suggestion )
+  added actions in color tracker ( steady mode, cursor on/off, frame on/off ), generally improved
+  fixed colors in pdp_spiral, pdp_dice
+0.7.5
+  added pdp_form : addition of geometric forms 
+  added pdp_compose : color-based video compositor ( thanx to liz for the suggestion )
+  added actions in pdp_text ( rotations, font, resize, dither, blend )
+  fixed colors in pdp_transform, pdp_warp
+  fix install stage
+0.7.4
+  added pdp_text : text addition on videos ( requires imlib2 )
+  use the automake/autoconf system
+  optimized streaming again (pdp_i/pdp_o)
+  fixed colors in pdp_puzzle
+0.7.3
+  fixed streaming objects pdp_i/pdp_o
+  added "smoothing" and "framerate" controls to act on the bandwidth
+0.7.2
+  added shagadelic, dice and puzzle from effecTV
+  modified objects to use PDP queue
+0.7.1
+  added cycle and transform : first effetTV objects using PDP queue
+  ( i know i changed my mind )
+  all other objects must be modified to use PDP queue
+0.7.0
+  compatibility with PDP 0.7
+0.6.2
+  added pdp_ctrack : color tracker : lets you follow an object
+0.6.1
+  added pdp_i/pdp_o : PDP packets streaming objects using bz2
+  added pdp_mgrid : motion grid detects movement within a grid
+0.6.0
+  added pdp_rec : a video recording object
+  fixed a bug in pdp_edge                      
+  incremented PDP release number : it's now 0.6
+  set proper credits for each effecTV plugin
+0.5.8
+  added pdp_spigot : a video signal routing utility
+0.5.7
+  added nervous and quark objects
+  these will be the last effecTV objects added
+  some effectv have been left aside ( fireTV, ... )
+  because they are just clones of some other effects
+  or because i simply wasn't interested in porting them
+0.5.6
+  added radioactiv and warhol objects
+0.5.5
+  added edge and spiral objects
+  happy new year 2003
+0.5.4
+  renamed to PiDiP
+  added rev and mosaic objects
+0.5.3
+  added parameter "increment" to ripple
+  fix "threshold" in ripple
+  added warp and mosaic object
+0.5.2
+  remove buggy support of GREY packets
+0.5.1
+  added aging and ripple effects
+0.5
+  initial release
+  it is called 0.5 because it should be used with PDP 0.5
