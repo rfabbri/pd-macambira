@@ -28,6 +28,8 @@ all:
 			../../gem2pdp/*.pd \
 			../../ff/*.pd \
 			../../hcs/*.pd \
+			../../hcs/hid/*-help.pd \
+			../../hcs/hid/ev*-list.pd \
 			../../markex/*.pd \
 			../../maxlib/help/*.* \
 			../../mjlib/doc/*.pd \
