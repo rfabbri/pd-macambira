@@ -42,7 +42,7 @@ LINCLUDE =
 $(LINUXOBJECTS): *.h
 
 #CFLAGS = -O2 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
-CFLAGS = -O2 -O6 -funroll-loops -mpentiumpro -fomit-frame-pointer -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS) 
+CFLAGS = -O2 -O6 -funroll-loops -march=pentium3 -fomit-frame-pointer -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS) 
 
 everything: clean all install distclean
 
