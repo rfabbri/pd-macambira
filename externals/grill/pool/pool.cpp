@@ -688,7 +688,7 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
                 }
                 else if(tag.type == xmltag::t_end) {
                     if(d.Count())
-                        d.Set(d.Count()-1,d.Atoms(),0,true);
+                        d.Part(0,d.Count()-1);
                     else
                         post("pool - superfluous </dir> in XML data");
                 }

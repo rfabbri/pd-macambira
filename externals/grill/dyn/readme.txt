@@ -65,3 +65,4 @@ CHANGES:
 TODO:
 --------
 - Hash table for object tags
+- add mute attribute
