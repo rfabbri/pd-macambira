@@ -30,6 +30,15 @@ sub getDataFromHeaderLine
 }
 
 #------------------------------------------------------------------------
+# declare each array in the header
+#
+sub printCArrayDeclarations
+{
+	 my @arrayToPrint = @_;
+	 print(HEADER "char *${arrayToPrint[0]}[$#arrayToPrint];\n");
+}
+
+#------------------------------------------------------------------------
 # print an array out in C format
 #
 sub printCArray
@@ -38,19 +47,19 @@ sub printCArray
 
 #	 print("$arrayToPrint[0] $#arrayToPrint \n");
 
-	 print("int ${arrayToPrint[0]}_total = $#arrayToPrint;  /* # of elements in array */\n");
-	 print("char *${arrayToPrint[0]}[$#arrayToPrint] = {");
+	 print(ARRAYS "int ${arrayToPrint[0]}_total = $#arrayToPrint;  /* # of elements in array */\n");
+	 print(ARRAYS "char *${arrayToPrint[0]}[$#arrayToPrint] = {");
 
 	 for($i = 1; $i < $#arrayToPrint; $i++)
 	 {
 		  # format nicely in sets of 6
-		  if ( ($i+4)%6 == 5 ) { print("\n       "); }
+		  if ( ($i+4)%6 == 5 ) { print(ARRAYS "\n       "); }
 		  # if the array element's data is null, print NULL
-		  if ($arrayToPrint[$i]) { print("\"$arrayToPrint[$i]\","); }
-		  else { print("NULL,"); }
+		  if ($arrayToPrint[$i]) { print(ARRAYS "\"$arrayToPrint[$i]\","); }
+		  else { print(ARRAYS "NULL,"); }
 	 }
 
-	 print("\"$arrayToPrint[$#arrayToPrint]\"\n };\n\n\n");
+	 print(ARRAYS "\"$arrayToPrint[$#arrayToPrint]\"\n };\n\n\n");
 }
 
 #------------------------------------------------------------------------
@@ -86,6 +95,16 @@ sub printPdFile
 	 close(PDFILE);
 }
 
+#------------------------------------------------------------------------
+# 
+#
+sub printArray
+{
+	 printPdFile(@_);
+	 printCArray(@_);
+	 printCArrayDeclarations(@_);
+}
+
 #========================================================================
 # MAIN
 #========================================================================
@@ -95,9 +114,14 @@ $SOURCEFILENAME = "linux/input.h";
 open(INPUT_H, "<$SOURCEFILENAME");
 
 # output files
-$ARRAYSFILENAME = "input_arrays.h";
+$HEADERFILENAME = "input_arrays.h";
+open(HEADER, ">$HEADERFILENAME");
+$ARRAYSFILENAME = "input_arrays.c";
 open(ARRAYS, ">$ARRAYSFILENAME");
 
+
+#----------------------------------------
+# create the arrays from INPUT_H
 while (<INPUT_H>)
 {
 	 if (m/\#define (FF_STATUS|[A-Z_]*?)_/)
@@ -129,72 +153,57 @@ while (<INPUT_H>)
 	 }
 }
 
-# generate a .pd file for each array
-printPdFile("ev",@EV);
-printPdFile("ev_syn",@SYN);
-printPdFile("ev_key",@KEY);
-printPdFile("ev_rel",@REL);
-printPdFile("ev_abs",@ABS);
-printPdFile("ev_msc",@MSC);
-printPdFile("ev_led",@LED);
-printPdFile("ev_snd",@SND);
-printPdFile("ev_rep",@REP);
-printPdFile("ev_ff",@FF);
-# there doesn't seem to be any PWR events yet...
-#printPdFile("pwr",@PWR);
-printPdFile("ev_ff_status",@FF_STATUS);
+#----------------------------------------
+# create the files from the arrays
+
+# print file headers
+print(ARRAYS "#include \"hid.h\"\n\n");
+
+print(HEADER "\#ifndef _INPUT_ARRAYS_H\n");
+print(HEADER "\#define _INPUT_ARRAYS_H\n\n\n");
 
 # generate a C array for each array and stick them all in the same file
-select ARRAYS;
-printCArray("ev",@EV);
-printCArray("ev_syn",@SYN);
-printCArray("ev_key",@KEY);
-printCArray("ev_rel",@REL);
-printCArray("ev_abs",@ABS);
-printCArray("ev_msc",@MSC);
-printCArray("ev_led",@LED);
-printCArray("ev_snd",@SND);
-printCArray("ev_rep",@REP);
-printCArray("ev_ff",@FF);
+printArray("ev",@EV);
+printArray("ev_syn",@SYN);
+printArray("ev_key",@KEY);
+printArray("ev_rel",@REL);
+printArray("ev_abs",@ABS);
+printArray("ev_msc",@MSC);
+printArray("ev_led",@LED);
+printArray("ev_snd",@SND);
+printArray("ev_rep",@REP);
+printArray("ev_ff",@FF);
 # there doesn't seem to be any PWR events yet...
-#printCArray("pwr",@PWR);
-print("char *ev_pwr[1] = { NULL };\n\n");
-printCArray("ev_ff_status",@FF_STATUS);
+#printArray("pwr",@PWR);
+print(ARRAYS "char *ev_pwr[1] = { NULL };\n\n");
+print(HEADER "char *ev_pwr[1];\n");
+#
+printArray("ev_ff_status",@FF_STATUS);
 
 # print array of arrays
-print("char **event_names[",$#EV+1,"] = {");
+print(ARRAYS "char **event_names[",$#EV+1,"] = {");
 for($i = 0; $i < $#EV; $i++)
 {
 	 # format nicely in sets of 6
-	 if ( ($i+4)%6 == 5 ) { print("\n       "); }
+	 if ( ($i+4)%6 == 5 ) { print(ARRAYS "\n       "); }
 
 	 # if the array element's data is null, print NULL
 	 if ($EV[$i]) 
 	 { 
 		  $_ = $EV[$i];
 		  m/(ev_[a-z_]+)/;
-		  print("$1,");  
+		  print(ARRAYS "$1,");  
 	 }
-	 else { print("NULL,"); }
+	 else { print(ARRAYS "NULL,"); }
 }
 $_ = $EV[$#EV];
 m/(ev_[a-z_]+)/;
-print("$1\n };\n");
+print(ARRAYS "$1\n };\n");
 
-
-# print "EV: $#EV \n";
-# print "SYN: $#SYN \n";
-# print "KEY: $#KEY \n";
-# print "REL: $#REL \n";
-# print "ABS: $#ABS \n";
-# print "MSC: $#MSC \n";
-# print "LED: $#LED \n";
-# print "SND: $#SND \n";
-# print "REP: $#REP \n";
-# print "FF: $#FF \n";
-# #print "PWR: $#PWR \n";
-# print "FF_STATUS: $#FF_STATUS \n";
+# print file footers
+print(HEADER "\n\n\#endif  /* #ifndef _INPUT_ARRAYS_H */\n");
 
 close(ARRAYS);
+close(HEADER);
 close(INPUT_H);
 

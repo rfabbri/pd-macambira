@@ -1,4 +1,3 @@
-CC=gcc
 
 OS_NAME = $(shell uname -s)
 
@@ -15,7 +14,11 @@ endif
 
 # ----------------------- DARWIN -----------------------
 ifeq ($(OS_NAME),Darwin)
-LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) -L/sw/lib
+FRAMEWORKS = Carbon IOKit
+LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) \
+	       -L/sw/lib -L./HID\ Utilities\ Source/build \
+	       -lHIDUtilities \
+			 $(patsubst %,-framework %,$(FRAMEWORKS))
 .SUFFIXES: .pd_darwin
 
 all: input_arrays pd_darwin
@@ -28,24 +31,25 @@ endif
 PDEXECUTABLE = ../../../pd/bin/pd
 
 CFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+    -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-INCLUDE =  -I../ -I../../../pd/src -I/usr/local/include -I./HID\ Utilities\ Source
+INCLUDE =  -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 
-.c.pd_darwin:
-	$(CC) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.c
-	$(CC) $(LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm 
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDE) -c *.c
 
-.c.pd_linux:
-	$(CC) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.c
+.o.pd_darwin:
+	$(CC) $(LDFLAGS) -o $*.pd_darwin *.o
+
+.o.pd_linux:
 	ld $(LDFLAGS) -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
-	rm $*.o
+#	rm $*.o
 
 input_arrays:
 	./make-arrays-from-input.h.pl
 
 
-clean: ; rm -f *.pd_* *.o *~ input_arrays.h ev*-list.pd
+clean: ; rm -f *.pd_* *.o *~ input_arrays.? ev*-list.pd
 

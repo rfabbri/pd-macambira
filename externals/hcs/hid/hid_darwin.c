@@ -1,3 +1,4 @@
+#ifdef __APPLE__
 /*
  *  Apple Darwin HID Manager support for [hid]
  *
@@ -20,6 +21,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  */
+
+
 #include <Carbon/Carbon.h>
 
 #include "HID_Utilities_External.h"
@@ -53,12 +56,27 @@
 #include "GC.h"
 */
 
+
+#define DEBUG(x)
+//#define DEBUG(x) x 
+
+/*==============================================================================
+ *  GLOBAL VARS
+ *======================================================================== */
+
 int gNumberOfHIDDevices = 0;
 EventLoopTimerRef gTimer = NULL; // timer for element data updates
 
 
-void releaseHIDDevices ()
+/*==============================================================================
+ *  FUNCTIONS
+ *==============================================================================
+ */
+
+void releaseHIDDevices (void)
 {
+	DEBUG(post("releaseHIDDevices"););
+
 	if (gTimer)
     {    
 		RemoveEventLoopTimer(gTimer);
@@ -69,16 +87,21 @@ void releaseHIDDevices ()
 	gNumberOfHIDDevices = 0;
 }
 
-int prHIDBuildElementList()
+int prHIDBuildElementList(void)
 {
+	DEBUG(post("prHIDBuildElementList"););
+
 /*
 	PyrSlot *a = g->sp - 1; //class
 	PyrSlot *b = g->sp; //locID device
 */
-	int i, locID, cookieNum;
+	int locID = NULL;
+	int cookieNum = NULL;
+	UInt32 i;
 	pRecElement	devElement;
 	pRecDevice pCurrentHIDDevice;
-//	int err;
+	UInt32 numElements;
+	char cstrElementName [256];
 
 //	int err = slotIntVal(b, &locID);
 //	if (err) return err;
@@ -90,13 +113,12 @@ int prHIDBuildElementList()
 	if(!pCurrentHIDDevice) return (1);
 	
 	devElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeInput);
-	UInt32 numElements = HIDCountDeviceElements (pCurrentHIDDevice, kHIDElementTypeInput);
+	numElements = HIDCountDeviceElements (pCurrentHIDDevice, kHIDElementTypeInput);
 
 	//PyrObject* devAllElementsArray = newPyrArray(g->gc, numElements * sizeof(PyrObject), 0 , true);
 		
 		for(i=0; i<numElements; i++)
 		{
-			char cstrElementName [256];
 			//PyrObject* devElementArray = newPyrArray(g->gc, 5 * sizeof(PyrObject), 0 , true);
 			HIDGetTypeName((IOHIDElementType) devElement->type, cstrElementName);
 			//PyrString *devstring = newPyrString(g->gc, cstrElementName, 0, true);
@@ -122,8 +144,10 @@ int prHIDBuildElementList()
 		return (0);	
 }
 
-int prHIDBuildDeviceList()
+int prHIDBuildDeviceList(void)
 {
+	DEBUG(post("prHIDBuildDeviceList"););
+
 	int i,err;
 	UInt32 usagePage, usage;
 /*
@@ -210,46 +234,54 @@ int prHIDBuildDeviceList()
 	return (0);	
 }
 
-/*
-int prHIDGetValue(VMGlobals *g);
-int prHIDGetValue(VMGlobals *g)
+
+int prHIDGetValue(void)
 {
+	DEBUG(post("prHIDGetValue"););
+
+	int locID = NULL; 
+	int cookieNum = NULL;
+	SInt32 value;
+	/*
 	PyrSlot *a = g->sp - 2; //class
 	PyrSlot *b = g->sp - 1; //locID device
 	PyrSlot *c = g->sp; //element cookie
-	int locID, cookieNum;
 	int err = slotIntVal(b, &locID);
 	if (err) return err;
 	err = slotIntVal(c, &cookieNum);
 	if (err) return err;
+	*/
 	IOHIDElementCookie cookie = (IOHIDElementCookie) cookieNum;
 	// look for the right device: 
-    pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
+	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
 	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-        pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
+		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
 	if(!pCurrentHIDDevice) return (1);
 	// look for the right element:
 	pRecElement pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO);
 	// use gElementCookie to find current element
-    while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
-        pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
-		
+	while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
+		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
+	
 	if (pCurrentHIDElement)
-    {
-		SInt32 value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement);
-		 // if it's not a button and it's not a hatswitch then calibrate
+	{
+		value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement);
+		// if it's not a button and it's not a hatswitch then calibrate
 		if(( pCurrentHIDElement->type != kIOHIDElementTypeInput_Button ) &&
 			( pCurrentHIDElement->usagePage == 0x01 && pCurrentHIDElement->usage != kHIDUsage_GD_Hatswitch)) 
 			value = HIDCalibrateValue ( value, pCurrentHIDElement );
-		SetInt(a, value);
+		//SetInt(a, value);
 	}
-	else SetNil(a);
+	//else SetNil(a);
 	return (0);	
 	
 }
-*/
-void PushQueueEvents_RawValue ()
+
+
+void PushQueueEvents_RawValue(void)
 {
+	DEBUG(post("PushQueueEvents_RawValue"););
+
 	int i;
 	
 	IOHIDEventStruct event;
@@ -277,8 +309,11 @@ void PushQueueEvents_RawValue ()
 	}
 }
 
-void PushQueueEvents_CalibratedValue ()
+
+void PushQueueEvents_CalibratedValue(void)
 {
+	DEBUG(post("PushQueueEvents_CalibratedValue"););
+
 	int i;
 	
 	IOHIDEventStruct event;
@@ -318,20 +353,29 @@ void PushQueueEvents_CalibratedValue ()
 	}
 }
 
-static pascal void IdleTimer (EventLoopTimerRef inTimer, void* userData)
+
+static pascal void IdleTimer(EventLoopTimerRef inTimer, void* userData)
 {
+	DEBUG(post("IdleTimer"););
+
 	#pragma unused (inTimer, userData)
 	PushQueueEvents_CalibratedValue ();
 }
 
-int prHIDReleaseDeviceList()
+
+int prHIDReleaseDeviceList(void)
 {
+	DEBUG(post("prHIDReleaseDeviceList"););
+
 	releaseHIDDevices();
 	return (0);	
 }
 
-static EventLoopTimerUPP GetTimerUPP (void)
+
+static EventLoopTimerUPP GetTimerUPP(void)
 {
+	DEBUG(post("GetTimerUPP"););
+
 	static EventLoopTimerUPP	sTimerUPP = NULL;
 	
 	if (sTimerUPP == NULL)
@@ -350,22 +394,26 @@ void callback  (void * target, IOReturn result, void * refcon, void * sender)
 {
 }
 */
-/* 
-int prHIDRunEventLoop(VMGlobals *g);
-int prHIDRunEventLoop(VMGlobals *g)
+
+int prHIDRunEventLoop(void)
 {
-	PyrSlot *a = g->sp - 1; //class
+	DEBUG(post("prHIDRunEventLoop"););
+
+	//PyrSlot *a = g->sp - 1; //class
 
 	InstallEventLoopTimer (GetCurrentEventLoop(), 0, 0.001, GetTimerUPP (), 0, &gTimer);
 
 	//HIDSetQueueCallback(pCurrentHIDDevice, callback);
 	return (0);	
 }
-*/
 
-int prHIDQueueDevice()
+
+int prHIDQueueDevice(void)
 {
-	int locID, cookieNum;
+	DEBUG(post("prHIDQueueDevice"););
+
+	int locID = NULL;
+	int cookieNum = NULL;
 	
 	//PyrSlot *a = g->sp - 1; //class
 	//PyrSlot *b = g->sp; //locID device
@@ -380,9 +428,13 @@ int prHIDQueueDevice()
 	return (0);	
 }
 
-int prHIDQueueElement()
+
+int prHIDQueueElement(void)
 {
-	int locID, cookieNum;
+	DEBUG(post("prHIDQueueElement"););
+
+	int locID = NULL;
+	int cookieNum = NULL;
 	
 	//PyrSlot *a = g->sp - 2; //class
 	//PyrSlot *b = g->sp - 1; //locID device
@@ -407,9 +459,13 @@ int prHIDQueueElement()
 	return (0);	
 }
 
-int prHIDDequeueElement()
+
+int prHIDDequeueElement(void)
 {
-	int locID, cookieNum;
+	DEBUG(post("prHIDDequeueElement"););
+
+	int locID = NULL;
+	int cookieNum = NULL;
 	
 	//PyrSlot *a = g->sp - 2; //class
 	//PyrSlot *b = g->sp - 1; //locID device
@@ -433,9 +489,13 @@ int prHIDDequeueElement()
 	return (0);	
 }
 
-int prHIDDequeueDevice()
+
+int prHIDDequeueDevice(void)
 {
-	int locID, cookieNum;
+	DEBUG(post("prHIDDequeueDevice"););
+
+	int locID = NULL;
+	int cookieNum = NULL;
 	
 	/*
 	PyrSlot *a = g->sp - 1; //class
@@ -452,8 +512,11 @@ int prHIDDequeueDevice()
 	return (0);	
 }
 
-int prHIDStopEventLoop()
+
+int prHIDStopEventLoop(void)
 {
+	DEBUG(post("prHIDStopEventLoop"););
+
 	if (gTimer)
         RemoveEventLoopTimer(gTimer);
 	gTimer = NULL;
@@ -461,3 +524,4 @@ int prHIDStopEventLoop()
 }
 
 
+#endif  /* #ifdef __APPLE__ */

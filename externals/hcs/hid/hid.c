@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------------- */
 /*                                                                              */
-/* MacOS X object to use HIDs (Human Interface Devices                          */
+/* MacOS X object to use HIDs (Human Interface Devices)                         */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                            */
 /*                                                                              */
 /* Copyright (c) 2004 Hans-Christoph Steiner                                    */
@@ -21,27 +21,39 @@
 /* along with this program; if not, write to the Free Software                  */
 /* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.  */
 /*                                                                              */
-/* Based on PureData by Miller Puckette and others.                             */
-/*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
 #include "hid.h"
+
+#include "input_arrays.h"
 #include "../linuxhid.h"
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
+void hid_devicelist_refresh(t_hid* x)
+{
+	/* the device list should be refreshed here */
+}
+
+
 void hid_stop(t_hid* x) 
 {
   DEBUG(post("hid_stop"););
   
+#ifdef __linux__  
   if (x->x_fd >= 0 && x->x_started) 
   { 
 	  clock_unset(x->x_clock);
 	  post("hid: polling stopped");
 	  x->x_started = 0;
   }
+#elif __APPLE__
+  prHIDStopEventLoop();
+#endif
+
+  hid_devicelist_refresh(x);
 }
 
 static t_int hid_close(t_hid *x) 
@@ -60,18 +72,17 @@ static t_int hid_close(t_hid *x)
 
 static t_int hid_open(t_hid *x, t_symbol *s) 
 {
+	DEBUG(post("hid_open"););
+	
 	t_int eventType, eventCode;
 	char *eventTypeName = "";
-#ifdef __linux__
-	struct input_event hid_input_event;
-#endif
 	/* counts for various event types */
 	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
 #ifdef __gnu_linux__
-  unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+	struct input_event hid_input_event;
+	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 #endif
-  char devicename[256] = "Unknown";
-  DEBUG(post("hid_open");)
+	char devicename[256] = "Unknown";
 
   hid_close(x);
 
@@ -200,7 +211,7 @@ static t_int hid_open(t_hid *x, t_symbol *s)
 
 static t_int hid_read(t_hid *x,int fd) 
 {
-	t_atom event_data[5];
+	t_atom event_data[5];  /* this should probably be 4, not 5 */
 	char *eventType;
 	char *eventCode;
 #ifdef __linux__
@@ -217,18 +228,17 @@ static t_int hid_read(t_hid *x,int fd)
 		SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
 		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
 	}
-#endif /* #ifdef__gnu_linux__ */
-#ifdef IGNOREIGNOREIGNORE
-	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow);
-	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow);
+#elif __APPLE__
+/* 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow); */
+/* 	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow); */
 
-	// if we have a good device and element which is not a collecion
-	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection))
-	{
-		SInt32 value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement);
-		SInt32 valueCal = HIDCalibrateValue (value, pCurrentHIDElement);
-		SInt32 valueScale = HIDScaleValue (valueCal, pCurrentHIDElement);
-	 }
+/* 	// if we have a good device and element which is not a collecion */
+/* 	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection)) */
+/* 	{ */
+/* 		SInt32 value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement); */
+/* 		SInt32 valueCal = HIDCalibrateValue (value, pCurrentHIDElement); */
+/* 		SInt32 valueScale = HIDScaleValue (valueCal, pCurrentHIDElement); */
+/* 	 } */
 #endif  /* #ifdef __APPLE__ */
 
 	if (x->x_started) 
@@ -236,7 +246,7 @@ static t_int hid_read(t_hid *x,int fd)
 		clock_delay(x->x_clock, x->x_delay);
 	}
 
-	return 1;    
+	return 1;  /* why is this 1? */
 }
 
 /* Actions */
