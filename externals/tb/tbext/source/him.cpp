@@ -200,7 +200,7 @@ void him::runge_kutta_4(t_float dt)
 	    data[i] = data[i] + (k1[i] + (2.*(k2[i]+k3[i])) + k4[i])/6.;
         }
     
-    reset_muv;
+    reset_muv();
     
 }
 
@@ -327,32 +327,32 @@ void him::m_signal(int n, t_float *const *in, t_float *const *out)
 void him::set_mu(t_float f)
 {
     data[0]=f;
-    reset_nuv;
+    reset_nuv();
 }
 
 void him::set_muv(t_float f)
 {
     data[1]=f;
-    reset_nuv;
+    reset_nuv();
 }
 
 void him::set_nu(t_float f)
 {
     data[3]=f;
-    reset_nuv;
+    reset_nuv();
 }
 
 void him::set_nuv(t_float f)
 {
     data[3]=f;
-    reset_muv;
+    reset_muv();
     post("resetting muv!!!");
 }
 
 void him::set_etilde(t_float f)
 {
     E=f;
-    reset_nuv;
+    reset_nuv();
 }
 
 void him::set_dt(t_float f)
@@ -384,6 +384,6 @@ void him::reset()
     data[0]=float(rand())/float(RAND_MAX);
     data[1]=float(rand())/float(RAND_MAX);
     data[2]=float(rand())/float(RAND_MAX);
-    reset_muv;
+    reset_muv();
     post("randomizing values");
 }
