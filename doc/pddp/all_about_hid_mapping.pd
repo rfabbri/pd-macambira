@@ -1,4 +1,4 @@
-#N canvas 304 56 868 550 10;
+#N canvas 304 56 880 562 10;
 #N canvas 0 22 450 300 graph1 0;
 #X array cuberoot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
@@ -15,11 +15,6 @@
 #X array square 100 float 0;
 #X coords 0 1 99 0 100 100 1;
 #X restore 731 165 graph;
-#X obj 60 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X floatatom 38 227 5 0 0 0 - - -;
-#X floatatom 81 226 5 0 0 0 - - -;
-#X floatatom 126 226 5 0 0 0 - - -;
 #N canvas 0 22 450 300 graph1 0;
 #X array logarithmic 100 float 0;
 #X coords 0 1 99 0 100 100 1;
@@ -28,18 +23,8 @@
 #X array squareroot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
 #X restore 516 165 graph;
-#X obj 172 253 hid_rel2abs;
-#X msg 184 224 reset;
-#X floatatom 176 288 5 0 0 0 - - -;
-#X obj 81 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 125 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 38 251 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X msg 102 165 poll 50;
-#X floatatom 50 343 5 0 0 0 - - -;
-#X obj 49 281 hid_smooth;
+#X obj 179 124 hid_rel2abs;
+#X obj 9 167 hid_smooth;
 #N canvas 27 65 573 553 draw_arrays 0;
 #X msg 77 62 bang;
 #X obj 77 83 until;
@@ -98,15 +83,11 @@
 #X restore 563 30 pd draw_arrays;
 #X obj 650 316 hid_exp;
 #X obj 411 317 hid_log;
-#X obj 80 187 mouse 0;
-#X msg 86 113 open 1;
-#X msg 96 139 open 2;
 #X obj 5 2 cnv 15 850 20 empty empty all_about_hid_mapping 20 10 1
 18 -233017 -66577 0;
 #X obj 821 3 pddp;
 #X obj 156 329 hid_graph;
-#X floatatom 130 476 5 0 0 0 - - -;
-#X obj 13 40 notescale;
+#X obj 9 102 notescale;
 #X obj 653 104 pow 3;
 #X obj 406 100 pow 0.333333;
 #X text 643 173 square;
@@ -117,38 +98,32 @@
 #X obj 651 203 pow 2;
 #X obj 410 194 pow 0.5;
 #X obj 410 214 sqrt;
-#X obj 110 33 hid_centered;
+#X obj 87 124 hid_centered;
 #X obj 406 123 hid_cuberoot;
 #X obj 653 130 hid_cube;
 #X obj 651 224 hid_square;
 #X obj 411 235 hid_squareroot;
 #X text 641 297 exponential;
-#X obj 12 64 buttongate;
-#X obj 12 83 keygate;
+#X obj 9 213 buttongate;
+#X obj 88 213 keygate;
 #X text 341 393 - CURVE TEXT IDEAS;
 #X text 370 419 - amplitude is generally perceived on a logarithmic
 scale;
-#X text 371 443 - pitch is perceived on [some kind of scale];
-#X obj 110 52 hid_invert;
+#X obj 9 124 hid_invert;
 #X text 22 500 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 239 514 released under the GNU GPL;
-#X text 445 501 $Revision: 1.4 $$Date: 2004-11-28 23:58:41 $;
+#X text 445 501 $Revision: 1.5 $$Date: 2004-12-19 18:22:45 $;
 #X text 446 514 $Author: eighthave $;
-#X connect 4 0 22 0;
-#X connect 5 0 15 0;
-#X connect 5 0 18 0;
-#X connect 6 0 13 0;
-#X connect 7 0 14 0;
-#X connect 7 0 10 0;
-#X connect 10 0 12 0;
-#X connect 11 0 10 0;
-#X connect 16 0 22 0;
-#X connect 17 0 27 0;
-#X connect 18 0 17 0;
-#X connect 22 0 5 0;
-#X connect 22 1 6 0;
-#X connect 22 2 7 0;
-#X connect 23 0 22 0;
-#X connect 24 0 22 0;
-#X connect 27 0 28 0;
+#X obj 88 167 hid_average;
+#X text 1 83 SCALING AND RANGING;
+#X text 1 150 SMOOTHING;
+#X obj 173 167 hid_lowpass;
+#X obj 85 102 autoscale;
+#X text 1 196 BASIC CONTROLS;
+#X text 2 237 ONE-TO-MANY MAPPING;
+#X obj 9 262 hid_one2two;
+#X obj 94 262 hid_one2three;
+#X text 379 30 CURVES;
+#X text 371 443 - pitch is perceived on logarithmic scale;
+#X text 371 466 - many sensors work best on other curves;

@@ -1,0 +1,28 @@
+#N canvas 541 218 473 316 10;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_one2two] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 284 released under the GNU GPL;
+#X floatatom 153 110 5 0 0 0 - - -;
+#X floatatom 83 186 5 0 0 0 - - -;
+#X obj 156 91 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 11200 1;
+#X obj 86 203 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 11200 1;
+#X text 98 243 For more info:;
+#X obj 202 241 all_about_hid_mapping;
+#X floatatom 263 186 5 0 0 0 - - -;
+#X obj 266 203 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 10557 1;
+#X text 18 28 Simple one-to-two mapping object. The first inlet is
+passed thru \, the range of the output data on the second inlet starts
+at the point in the input range specified as an arugment.;
+#X obj 153 145 hid_one2two 0.3;
+#X connect 4 0 13 0;
+#X connect 5 0 7 0;
+#X connect 6 0 4 0;
+#X connect 10 0 11 0;
+#X connect 13 0 5 0;
+#X connect 13 1 10 0;
