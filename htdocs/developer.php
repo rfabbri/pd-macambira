@@ -30,25 +30,29 @@ HREF="http://cvsgui.sourceforge.net/">from the net</A>.  Then, if you have cvs
 installed (this example is assuming the commandline version) use the following
 line to login into the CVS server:
 <pre>
-% cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data login 
+% cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data login 
 </pre> 
 <p>
 
 Hit return when you are asked for a password.  In order to get the source:
 <pre>
-% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co externals
+% cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co externals
 </pre>
 <p>
 
 This will give you a local copy of the externals-directory in the repository.
-After some time, if you want to get all the latest additions and updates, type
-(in the externals directory):
+Other modules are for example called "abstractions" (see below) or you could
+also use "." to check out everything. After some time, if you want to get all
+the latest additions and updates, type (in the externals directory):
+
 <pre>
-% cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data update -d
+% cvs update -d
 </pre>
 <p>
 
-Without the -d only existing directories on your local copy get updated. 
+Without the -d only existing directories on your local copy get updated.
+Depending on your configuration you might have -d as default anyways.
+
 <p>
 
 Currently building the externals works to same way it did before, just cd into
@@ -62,7 +66,7 @@ respective modulename.
 <p>
 For example check out the abstractions with:
 <pre>
-% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co abstractions
+% cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co abstractions
 </pre>
 <p>
 or Pd with 
@@ -71,9 +75,9 @@ or Pd with
 % cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co pd
 </pre>
 <p>
-To check out the current developers' branch, which is tagged with &quot;devel_0_36&quot;, use 
+To check out the current developers' branch, which is tagged with &quot;devel_0_37&quot;, use 
 <pre>
-% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co -r devel_0_36 pd
+% cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co -r devel_0_37 pd
 </pre>
 <p>
 You can find out the available branches in the pulldown menu on the project's
@@ -110,7 +114,7 @@ Make sure you are in this directory and issue the command:
 <p>
 <pre>
 % export CVS_RSH=ssh
-% cvs -z3 -d:ext: developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data 
+% cvs -z3 -d:ext:developername@cvs.sourceforge.net:/cvsroot/pure-data \
   import externals/dirname developername source-dist
 </pre>
 <p>
@@ -123,7 +127,7 @@ once for your external(s).
 If all of this went well, move away your external directory (keep it as a
 backup) and checkout the code with:
 <pre>
-% cvs -z3 -d:ext:developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data 
+% cvs -z3 -d:ext:developername@cvs.sourceforge.net:/cvsroot/pure-data \
   co externals
 </pre>
 <p>
