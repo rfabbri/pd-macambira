@@ -1,6 +1,6 @@
 #N canvas 496 472 848 467 10;
 #X obj 59 396 sendOSC;
-#X floatatom 59 423 5 0 0;
+#X floatatom 59 423 5 0 0 0 - - -;
 #X msg 44 119 disconnect;
 #X msg 79 163 send /test/bla 1 2 3;
 #X msg 26 93 connect localhost 9999;
@@ -24,7 +24,7 @@
 #X text 462 312 when last bundle is closed the buffer is sent.;
 #X text 463 333 so: first "[" \, then add messages with send /bla;
 #X text 466 351 open nested nudle etc \, close with "]";
-#X floatatom 113 425 5 0 0;
+#X floatatom 113 425 5 0 0 0 - - -;
 #X text 162 428 bundleDepth;
 #X text 24 11 sendOSC: send OSC formatted packet to network. at the
 moment over UDP only is supported.;
@@ -39,6 +39,8 @@ moment over UDP only is supported.;
 #X msg 315 154 send;
 #X msg 315 179 send /;
 #X msg 368 156 send /bang;
+#X msg 265 57 connect 192.168.0.255 5555;
+#X text 462 58 use something like this to broadcast on UDP;
 #X connect 0 0 1 0;
 #X connect 0 1 24 0;
 #X connect 2 0 0 0;
@@ -55,3 +57,4 @@ moment over UDP only is supported.;
 #X connect 34 0 0 0;
 #X connect 35 0 0 0;
 #X connect 36 0 0 0;
+#X connect 37 0 0 0;
