@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: bug-report.php,v 1.3 2004-10-19 15:47:33 ggeiger Exp $  -->
+<!-- $Id: bug-report.php,v 1.4 2004-10-25 10:39:25 ggeiger Exp $  -->
 
 <HTML>
 
@@ -24,11 +24,14 @@
 <div id="Content">
 <!-- Quote of the day -->
 
+
+Bugs, Patches and Requested Features can be submitted via the Sourceforge
+tracker system. Please read through the sections below.
+
 <h2>Bug reporting</h2>
 
 <p>
-Bug reporting is done via the tracker system on sourceforge. Click on
-<a href="http://sourceforge.net/tracker/?func=add&group_id=55736&atid=478070">Submit Bug</a> to submit a bug against one of the subprojects.
+Click on <a href="http://sourceforge.net/tracker/?func=add&group_id=55736&atid=478070">Submit Bug</a> to submit a bug against one of the subprojects.
 </p>
 <p>
 It is important that you assign the bug to the correct subproject. This
@@ -36,18 +39,23 @@ is done by selecting the appropriate Category from the category tab. Before
 submitting a bug report, you might check if the bug you encountered hasn't been
 reported already by looking at the <a href=http://sourceforge.net/tracker/?group_id=55736&atid=478070>open bug reports</a> page.
 </p>
+Please, before reporting a bug, try out the latest version of the software.
 
 <h2>Patches</h2>
 
 <p> 
-There is another tracker which is used to submit patches against Pd and the
-subprojects.
 This tracker is a collection of up to date patches (patches that apply
-cleanly against the latest version of Pd in CVS). Patches that don't apply
-cleanly will be removed from the list (after notification, so the author has
-time to fix the problem).
+cleanly against the latest version of Pd. The latest version can either be
+found as a <a href="http://crca.ucsd.edu/~msp/Software/">downloadable file on Miller Puckettes site</a> or in the <a href="http://cvs.sourceforge.net/viewcvs.py/pure-data/pd/">HEAD branch of the CVS</a>. 
 </p>
 <br>
+<p>
+The main purpose of the patches tracker is to make it easier to incorporate
+changes and bug fixes into the Pd core. Including new stuff may take some
+time, and the inclusion of some features might not get accepted. This
+can have more reasons. We will try to comment on each rejected patch.
+</p>
+
 <p>
 All patches need to have a detailed description. This can later be used
 to decide if the patch can go into the main Pd distribution or not, and
