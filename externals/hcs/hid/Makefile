@@ -44,8 +44,8 @@ INCLUDE =  -I../ -I../../../pd/src -I/usr/local/include -I./HID\ Utilities\ Sour
 	rm $*.o
 
 input_arrays:
-	./make-arrays-from-input.h.pl > input_arrays.h
+	./make-arrays-from-input.h.pl
 
 
-clean: ; rm -f *.pd_* *.o *~ input_arrays.h
+clean: ; rm -f *.pd_* *.o *~ input_arrays.h ev*-list.pd
 

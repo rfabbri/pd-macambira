@@ -2,15 +2,6 @@
 
 use Switch;
 
-# BUGS: FF_STATUS, REP, SND, SYN are not building properly. Its still dropping the first element
-
-
-#========================================================================
-# GLOBAL VARS
-#========================================================================
-
-$FILENAME = "linux/input.h";
-
 #========================================================================
 # FUNCTIONS
 #========================================================================
@@ -62,13 +53,50 @@ sub printCArray
 	 print("\"$arrayToPrint[$#arrayToPrint]\"\n };\n\n\n");
 }
 
+#------------------------------------------------------------------------
+# print an array out in a comment table in Pd
+#
+sub printPdFile
+{
+	 my @arrayToPrint = @_;
+	 my $x;
+	 my $y;
+	 my $lineNum = 1;
+
+	 my $PDFILENAME = "$arrayToPrint[0]-list.pd";
+	 open(PDFILE, ">$PDFILENAME");
+
+	 print(PDFILE "#N canvas 282 80 210 570 10;\n");
+	 if ($arrayToPrint[0] eq "ev") { print(PDFILE "#X text 5 5 Event Types;\n"); }
+	 else { print(PDFILE "#X text 5 5 Codes for Type: $arrayToPrint[0];\n"); }
+	 print(PDFILE "#X text 5 20 ----------------------------;\n");
+
+	 for($i = 1; $i <= $#arrayToPrint; $i++)
+	 {
+		  # if the array element's data is null, print NULL
+		  if ($arrayToPrint[$i]) 
+		  { 
+				$x = 5;
+				$y = $lineNum * 20 + 20;
+				print(PDFILE "#X text $x $y $arrayToPrint[$i];\n"); 
+				$lineNum++;
+		  }
+	 }
+
+	 close(PDFILE);
+}
+
 #========================================================================
 # MAIN
 #========================================================================
 
-$FILENAME = "linux/input.h";
+# source file
+$SOURCEFILENAME = "linux/input.h";
+open(INPUT_H, "<$SOURCEFILENAME");
 
-open(INPUT_H, "<$FILENAME");
+# output files
+$ARRAYSFILENAME = "input_arrays.h";
+open(ARRAYS, ">$ARRAYSFILENAME");
 
 while (<INPUT_H>)
 {
@@ -101,6 +129,23 @@ while (<INPUT_H>)
 	 }
 }
 
+# generate a .pd file for each array
+printPdFile("ev",@EV);
+printPdFile("ev_syn",@SYN);
+printPdFile("ev_key",@KEY);
+printPdFile("ev_rel",@REL);
+printPdFile("ev_abs",@ABS);
+printPdFile("ev_msc",@MSC);
+printPdFile("ev_led",@LED);
+printPdFile("ev_snd",@SND);
+printPdFile("ev_rep",@REP);
+printPdFile("ev_ff",@FF);
+# there doesn't seem to be any PWR events yet...
+#printPdFile("pwr",@PWR);
+printPdFile("ev_ff_status",@FF_STATUS);
+
+# generate a C array for each array and stick them all in the same file
+select ARRAYS;
 printCArray("ev",@EV);
 printCArray("ev_syn",@SYN);
 printCArray("ev_key",@KEY);
@@ -150,6 +195,6 @@ print("$1\n };\n");
 # #print "PWR: $#PWR \n";
 # print "FF_STATUS: $#FF_STATUS \n";
 
-
+close(ARRAYS);
 close(INPUT_H);
 
