@@ -6,7 +6,7 @@ include $(BUILDPATH)config-$(PLATFORM)-$(RTSYS)-$(COMPILER).txt
 # these are project specific
 
 # package info
-include build/package.txt
+include $(USRINFO)
 
 # special settings
 ifdef USRCONFIG
@@ -19,6 +19,9 @@ include $(USRMAKE)
 endif
 
 ##############################
+
+# flext-specific make stuff
+include $(BUILDPATH)gnumake-flext.inc
 
 # platform-specific make stuff
 include $(BUILDPATH)$(PLATFORM)/$(RTSYS)/make-$(COMPILER).inc
