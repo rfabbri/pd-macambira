@@ -1,0 +1,21 @@
+first, install pdp and gem sources
+( it has been tested successfully with gem-0.87
+pdp-0.9.0 and pidip-0.9.1 )
+
+fix PD, PDP and GEM paths in configure.ac
+
+autoconf 
+
+./configure 
+
+make clean 
+
+make
+
+gem2pdp requires the loading of gem and pdp libraries, of course.
+
+Enjoy!!
+
+Thanx for getting here.
+Yves/
+comments and bugs @ ydegoyon@free.fr

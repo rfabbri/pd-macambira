@@ -1,0 +1,107 @@
+#N canvas 222 41 827 508 12;
+#X obj 526 366 gemwin;
+#X msg 523 304 create;
+#X msg 530 329 destroy;
+#X obj 608 334 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
+1;
+#X obj 90 391 pix_texture2;
+#X obj 90 297 pix_rgba;
+#X msg 231 321 -1 -2 -1 -2 8 -2 1 -2 1;
+#X obj 90 358 pix_convolve 3 3;
+#X obj 91 272 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1
+;
+#X floatatom 153 440 5 0 0 0 - - -;
+#X obj 72 201 gemhead;
+#X text 67 230 ============================================================
+;
+#X text 69 178 ============================================================
+;
+#X text 365 449 pdp2gem : pdp to gem bridge;
+#X text 365 467 written by Yves Degoyon (ydegoyon@free.fr);
+#X text 369 278 GEM field;
+#X obj 132 67 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 118 102 loop \$1;
+#X obj 96 105 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1
+;
+#X msg 194 39 open \$1;
+#X obj 106 38 openpanel;
+#X obj 77 39 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X floatatom 284 71 5 0 0 0 - - -;
+#X msg 156 68 stop;
+#X obj 202 68 metro 70;
+#X obj 637 119 pdp_v4l;
+#X obj 637 93 metro 70;
+#X obj 688 61 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 637 61 stop;
+#X obj 197 100 pdp_yqt;
+#X obj 267 100 dac~;
+#X text 653 37 Live;
+#X text 322 9 PDP field;
+#X text 368 202 pdp2gem must be inserted in GEM's rendering chain;
+#X obj 287 202 pdp2gem;
+#X obj 475 130 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 501 131 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 525 131 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 81 12 Play a movie (.mov);
+#X text 75 64 Start;
+#X obj 450 156 pdp_cycle;
+#X floatatom 185 416 0 0 0 0 - - -;
+#X obj 90 416 rotateXYZ;
+#X obj 298 414 metro 10;
+#X obj 223 415 + 1;
+#X obj 264 415 f;
+#X msg 383 414 bang;
+#X obj 436 414 loadbang;
+#X obj 90 440 cube;
+#X obj 449 95 pdp_spigot;
+#X obj 539 71 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 42 0;
+#X connect 5 0 7 0;
+#X connect 6 0 7 2;
+#X connect 7 0 4 0;
+#X connect 8 0 5 0;
+#X connect 9 0 48 1;
+#X connect 10 0 34 0;
+#X connect 16 0 24 0;
+#X connect 17 0 29 0;
+#X connect 18 0 17 0;
+#X connect 19 0 29 0;
+#X connect 20 0 19 0;
+#X connect 21 0 20 0;
+#X connect 22 0 24 1;
+#X connect 23 0 24 0;
+#X connect 24 0 29 0;
+#X connect 25 0 49 0;
+#X connect 26 0 25 0;
+#X connect 27 0 26 0;
+#X connect 28 0 26 0;
+#X connect 29 0 49 0;
+#X connect 29 3 30 0;
+#X connect 29 4 30 1;
+#X connect 34 0 5 0;
+#X connect 35 0 40 1;
+#X connect 36 0 40 2;
+#X connect 37 0 40 3;
+#X connect 40 0 34 0;
+#X connect 41 0 42 1;
+#X connect 41 0 42 2;
+#X connect 42 0 48 0;
+#X connect 43 0 45 0;
+#X connect 44 0 45 1;
+#X connect 45 0 44 0;
+#X connect 45 0 41 0;
+#X connect 46 0 43 0;
+#X connect 47 0 46 0;
+#X connect 49 0 34 0;
+#X connect 49 1 40 0;
+#X connect 50 0 49 1;
