@@ -27,11 +27,14 @@
 (use-modules (ice-9 stack-catch))
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc. functions
 ;;
 ;;
+(define (pd-load-if-exists filename)
+  (if (access? filename F_OK)
+      (load filename)))
+
 (define (pd-display . args)
   (if (not (null? args))
       (begin
@@ -171,3 +174,5 @@
 	       pd-display-errorfunc))
 
 
+(pd-backtrace-run1 pd-load-if-exists "/etc/.k_guile.scm")
+(pd-backtrace-run1 pd-load-if-exists (string-append (getenv "HOME") "/.k_guile.scm"))
