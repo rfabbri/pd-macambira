@@ -2,7 +2,7 @@
 
 VASP modular - vector assembling signal processor / objects for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -23,19 +23,48 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 namespace VecOp {
 
+// multi-layer templates
+
+template<class T,class OP,int LR>
+inline BL vec_un(T *v,const T *a,I n = 0) { 
+    const I _n = LR?LR:n;
+    for(I i = 0; i < _n; ++i) OP::run(v[i],a[i]); 
+    return true;
+}
+
+template<class T,class OP,int LR>
+inline BL vec_un(T *v,T a,I n = 0) { 
+    const I _n = LR?LR:n;
+    for(I i = 0; i < _n; ++i) OP::run(v[i],a); 
+    return true;
+}
+
+template<class T,class TR,class OP,int LR>
+inline BL vec_bin(T *v,const T *a,const TR *b,I n = 0) { 
+    const I _n = LR?LR:n;
+    for(I i = 0; i < _n; ++i) OP::rbin(v[i],a[i],b[i]); 
+    return true;
+}
+
+template<class T,class TR,class OP,int LR>
+inline BL vec_bin(T *v,const T *a,TR b,I n = 0) { 
+    const I _n = LR?LR:n;
+    for(I i = 0; i < _n; ++i) OP::rbin(v[i],a[i],b); 
+    return true;
+}
+
 /*! \brief skeleton for unary real operations
 */
-//template<class T,V FUN(T &v,T a)> BL V__run(register const T *sr,I rss,register T *dr,I rds,I frames)
 template<class T,class OP> BL V__run(register const T *sr,I rss,register T *dr,I rds,I frames)
 {																
     register I i;
-    if(sr == dr)												
-		if(_D_ALWAYS1 || rds == 1)							
+    if(sr == dr && OP::run_opt() >= 3)												
+		if((_D_ALWAYS1 || rds == 1) && OP::run_opt() >= 2)							
             _DE_LOOP(i,frames, ( OP::run(*dr,*dr), dr++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::run(*dr,*dr), dr += rds ) )
 	else														
-		if(_D_ALWAYS1 || (rss == 1 && rds == 1))			
+		if((_D_ALWAYS1 || (rss == 1 && rds == 1)) && OP::run_opt() >= 2)			
 			_DE_LOOP(i,frames, ( OP::run(*dr,*sr), sr++,dr++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::run(*dr,*sr), sr += rss,dr += rds ) )
@@ -48,13 +77,13 @@ template<class T,class OP> BL V__run(register const T *sr,I rss,register T *dr,I
 template<class T,class OP> BL V__cun(register const T *sr,register const T *si,I rss,I iss,register T *dr,register T *di,I rds,I ids,I frames)
 {																
     register I i;
-	if(sr == dr && si == di)									
-		if(_D_ALWAYS1 || (rds == 1 && ids == 1))			
+	if(sr == dr && si == di && OP::cun_opt() >= 3)									
+		if((_D_ALWAYS1 || (rds == 1 && ids == 1)) && OP::cun_opt() >= 2)			
             _DE_LOOP(i,frames, ( OP::cun(*dr,*di,*dr,*di), dr++,di++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::cun(*dr,*di,*dr,*di), dr += rds,di += ids ) )
 	else														
-		if(_D_ALWAYS1 || (rss == 1 && iss == 1 && rds == 1 && ids == 1)) 
+		if((_D_ALWAYS1 || (rss == 1 && iss == 1 && rds == 1 && ids == 1)) && OP::cun_opt() >= 2) 
 			_DE_LOOP(i,frames, ( OP::cun(*dr,*di,*sr,*si), sr++,si++,dr++,di++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::cun(*dr,*di,*sr,*si), sr += rss,si += iss,dr += rds,di += ids ) )
@@ -69,13 +98,13 @@ template<class T,class OP> BL V__vun(I layers,register const T *sr,register T *d
             V__run<T,OP>(sr,1,dr,1,frames); 
             break;
     case 2: 
-			_DF_LOOP(i,frames, ( vec_un<T,OP,2>(dr,sr), sr += 2, dr += 2) )
+			_DF_LOOP(i,frames, ( vec_un<T,OP,2>(dr,sr,2), sr += 2, dr += 2) )
             break;
     case 3: 
-			_DF_LOOP(i,frames, ( vec_un<T,OP,3>(dr,sr), sr += 3, dr += 3) )
+			_DF_LOOP(i,frames, ( vec_un<T,OP,3>(dr,sr,3), sr += 3, dr += 3) )
             break;
     case 4: 
-			_DF_LOOP(i,frames, ( vec_un<T,OP,4>(dr,sr), sr += 4, dr += 4) )
+			_DF_LOOP(i,frames, ( vec_un<T,OP,4>(dr,sr,4), sr += 4, dr += 4) )
             break;
     default:
 			_DF_LOOP(i,frames, ( vec_un<T,OP,0>(dr,sr,layers), sr += layers, dr += layers) )
@@ -88,13 +117,13 @@ template<class T,class OP> BL V__vun(I layers,register const T *sr,register T *d
 template<class T,class OP> BL V__rbin(register const T *sr,I rss,register T *dr,I rds,register const T *ar,I ras,I frames)
 {																
 	register I i;												
-	if(sr == dr)								
-		if(_D_ALWAYS1 || (rds == 1 && ras == 1))				
+	if(sr == dr && OP::rbin_opt() >= 3)								
+		if((_D_ALWAYS1 || (rds == 1 && ras == 1)) && OP::rbin_opt() >= 2)				
             _DE_LOOP(i,frames, ( OP::rbin(*dr,*dr,*ar), dr++,ar++ ) )
 		else												
 			_DE_LOOP(i,frames, ( OP::rbin(*dr,*dr,*ar), dr += rds,ar += ras ) )
 	else													
-		if(_D_ALWAYS1 || (rss == 1 && rds == 1 && ras == 1))	
+		if((_D_ALWAYS1 || (rss == 1 && rds == 1 && ras == 1)) && OP::rbin_opt() >= 2)	
 			_DE_LOOP(i,frames, ( OP::rbin(*dr,*sr,*ar), sr++,dr++,ar++ ) )
 		else												
 			_DE_LOOP(i,frames, ( OP::rbin(*dr,*sr,*ar), sr += rss,dr += rds,ar += ras ) )
@@ -104,8 +133,8 @@ template<class T,class OP> BL V__rbin(register const T *sr,I rss,register T *dr,
 template<class T,class OP> BL V__cbin(register const T *sr,register const T *si,I rss,I iss,register T *dr,register T *di,I ids,I rds,const T *ar,const T *ai,I ras,I ias,I frames)
 {																
 	register I i;												
-	if(sr == dr && si == di)							
-		if(_D_ALWAYS1 || (rds == 1 && ids == 1 && ras == 1 && ias == 1)) 
+	if(sr == dr && si == di && OP::cbin_opt() >= 3)							
+		if((_D_ALWAYS1 || (rds == 1 && ids == 1 && ras == 1 && ias == 1)) && OP::cbin_opt() >= 2) 
             _DE_LOOP(i,frames, ( OP::cbin(*dr,*di,*dr,*di,*ar,*ai), dr++,di++,ar++,ai++ ) )
 		else											
 			_DE_LOOP(i,frames, ( OP::cbin(*dr,*di,*dr,*di,*ar,*ai), dr += rds,di += ids,ar += ras,ai += ias ) )
@@ -117,45 +146,48 @@ template<class T,class OP> BL V__cbin(register const T *sr,register const T *si,
 
 template<class TR> class _A__vector {
 public:
+	static BL unroll() { return true; }
     static TR ev(const TR *a,I i,I m) { return a[i*m]; }
 };
 
 template<class TR> class _A__scalar {
 public:
+	static BL unroll() { return true; }
     static TR ev(TR a,I i,I m) { return a; }
 };
 
 class _A__env {
 public:
+	static BL unroll() { return false; }
     static R ev(Env::Iter &a,I i,I m) { return a.ValFwd(i); }
 };
 
 template<class T,class TA,class TR,class OP,class EVARG> BL Vx__rbin(register const T *sr,I rss,register T *dr,I rds,TA ar,I frames)
 {																
 	register I i;												
-	if(sr == dr)								
-		if(_D_ALWAYS1 || rds == 1)				
-            _DE_LOOP(i,frames, ( OP::rbin(*dr,*dr,EVARG::ev(ar,i,1)), dr++ ) )
+	if(sr == dr && OP::rbin_opt() >= 3)
+		if((_D_ALWAYS1 || rds == 1) && OP::rbin_opt() >= 2)				
+            _DQ_LOOP(EVARG::unroll(),i,frames, ( OP::rbin(*dr,*dr,EVARG::ev(ar,i,1)), dr++ ) )
 		else												
-            _DE_LOOP(i,frames, ( OP::rbin(*dr,*dr,EVARG::ev(ar,i,1)), dr += rds ) )
+            _DQ_LOOP(EVARG::unroll(),i,frames, ( OP::rbin(*dr,*dr,EVARG::ev(ar,i,1)), dr += rds ) )
 	else													
-		if(_D_ALWAYS1 || rss == 1 && rds == 1)	
-            _DE_LOOP(i,frames, ( OP::rbin(*dr,*sr,EVARG::ev(ar,i,1)), sr++,dr++ ) )
+		if((_D_ALWAYS1 || rss == 1 && rds == 1) && OP::rbin_opt() >= 2)	
+            _DQ_LOOP(EVARG::unroll(),i,frames, ( OP::rbin(*dr,*sr,EVARG::ev(ar,i,1)), sr++,dr++ ) )
 		else												
-            _DE_LOOP(i,frames, ( OP::rbin(*dr,*sr,EVARG::ev(ar,i,1)), sr += rss,dr += rds ) )
+            _DQ_LOOP(EVARG::unroll(),i,frames, ( OP::rbin(*dr,*sr,EVARG::ev(ar,i,1)), sr += rss,dr += rds ) )
     return true;
 }
 
 template<class T,class TA1,class TA2,class TR,class OP,class EVARG1,class EVARG2> BL Vx__cbin(register const T *sr,register const T *si,I rss,I iss,register T *dr,register T *di,I ids,I rds,TA1 ar,TA2 ai,I ras,I ias,I frames)
 {																
 	register I i;												
-	if(sr == dr && si == di)							
-		if(_D_ALWAYS1 || (rds == 1 && ids == 1 && ras == 1 && ias == 1)) 
-            _DE_LOOP(i,frames, ( OP::cbin(*dr,*di,*dr,*di,EVARG1::ev(ar,i,1),EVARG2::ev(ai,i,1)), dr++,di++ ) )
+	if(sr == dr && si == di && OP::cbin_opt() >= 3)							
+		if((_D_ALWAYS1 || (rds == 1 && ids == 1 && ras == 1 && ias == 1)) && OP::cbin_opt() >= 2) 
+            _DQ_LOOP(EVARG1::unroll() && EVARG2::unroll(),i,frames, ( OP::cbin(*dr,*di,*dr,*di,EVARG1::ev(ar,i,1),EVARG2::ev(ai,i,1)), dr++,di++ ) )
 		else											
-            _DE_LOOP(i,frames, ( OP::cbin(*dr,*di,*dr,*di,EVARG1::ev(ar,i,ras),EVARG2::ev(ai,i,ias)), dr += rds,di += ids ) )
+            _DQ_LOOP(EVARG1::unroll() && EVARG2::unroll(),i,frames, ( OP::cbin(*dr,*di,*dr,*di,EVARG1::ev(ar,i,ras),EVARG2::ev(ai,i,ias)), dr += rds,di += ids ) )
 	else												
-        _DE_LOOP(i,frames, ( OP::cbin(*dr,*di,*sr,*si,EVARG1::ev(ar,i,ras),EVARG2::ev(ai,i,ias)), sr += rss,si += iss,dr += rds,di += ids ) )
+        _DQ_LOOP(EVARG1::unroll() && EVARG2::unroll(),i,frames, ( OP::cbin(*dr,*di,*sr,*si,EVARG1::ev(ar,i,ras),EVARG2::ev(ai,i,ias)), sr += rss,si += iss,dr += rds,di += ids ) )
     return true;
 }
 
@@ -167,16 +199,16 @@ template<class T,class TA,class TR,class OP,class EVARG> BL Vx__vbin(I layers,re
             Vx__rbin<T,TA,TR,OP,EVARG>(sr,1,dr,1,ar,frames); 
             break;
     case 2: 
-			_DF_LOOP(i,frames, ( vec_bin<T,OP,2>(dr,sr,EVARG::ev(ar,i,2)), sr += 2, dr += 2) )
+			_DF_LOOP(i,frames, ( vec_bin<T,TR,OP,2>(dr,sr,EVARG::ev(ar,i,2),2), sr += 2, dr += 2) )
             break;
     case 3: 
-			_DF_LOOP(i,frames, ( vec_bin<T,OP,3>(dr,sr,EVARG::ev(ar,i,3)), sr += 3, dr += 3) )
+			_DF_LOOP(i,frames, ( vec_bin<T,TR,OP,3>(dr,sr,EVARG::ev(ar,i,3),3), sr += 3, dr += 3) )
             break;
     case 4: 
-			_DF_LOOP(i,frames, ( vec_bin<T,OP,4>(dr,sr,EVARG::ev(ar,i,4)), sr += 4, dr += 4) )
+			_DF_LOOP(i,frames, ( vec_bin<T,TR,OP,4>(dr,sr,EVARG::ev(ar,i,4),4), sr += 4, dr += 4) )
             break;
     default:
-			_DF_LOOP(i,frames, ( vec_bin<T,OP,0>(dr,sr,EVARG::ev(ar,i,layers),layers), sr += layers, dr += layers) )
+			_DF_LOOP(i,frames, ( vec_bin<T,TR,OP,0>(dr,sr,EVARG::ev(ar,i,layers),layers), sr += layers, dr += layers) )
             break;
     }
     return true;
@@ -250,13 +282,13 @@ template<class T,class OP> BL _F__cbin(OpParam &p)
 template<class T,class ARG,class OP> BL V__rop(ARG p,register const S *sr,I rss,register S *dr,I rds,I frames)
 {																
 	register I i;												
-	if(sr == dr)												
-		if(_D_ALWAYS1 || rds == 1)											
+	if(sr == dr && OP::rop_opt() >= 3)												
+		if((_D_ALWAYS1 || rds == 1) && OP::rop_opt() >= 2)											
             _DE_LOOP(i,frames, ( OP::rop(*dr,*dr,p), dr++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::rop(*dr,*dr,p), dr += rds ) )
 	else														
-		if(_D_ALWAYS1 || (rss == 1 && p.rds == 1))			
+		if((_D_ALWAYS1 || (rss == 1 && p.rds == 1)) && OP::rop_opt() >= 2)			
 			_DE_LOOP(i,frames, ( OP::rop(*dr,*sr,p), sr++,dr++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::rop(*dr,*sr,p), sr += rss,dr += rds ) )
@@ -268,13 +300,13 @@ template<class T,class ARG,class OP> BL V__rop(ARG p,register const S *sr,I rss,
 template<class T,class ARG,class OP> BL V__cop(ARG p,register const S *sr,register const S *si,I rss,I iss,register S *dr,register S *di,I rds,I ids,I frames)
 {																
 	register I i;												
-	if(sr == dr && si == di)									
-		if(_D_ALWAYS1 || (rds == 1 && ids == 1))			
+	if(sr == dr && si == di && OP::cop_opt() >= 3)									
+		if((_D_ALWAYS1 || (rds == 1 && ids == 1)) && OP::cop_opt() >= 2)			
 			_DE_LOOP(i,frames, ( OP::cop(*dr,*di,*dr,*di,p), dr++,di++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::cop(*dr,*di,*dr,*di,p), dr += rds,di += ids ) )
 	else														
-		if(_D_ALWAYS1 || (p.rss == 1 && p.iss == 1 && p.rds == 1 && p.ids == 1)) 
+		if((_D_ALWAYS1 || (p.rss == 1 && p.iss == 1 && p.rds == 1 && p.ids == 1)) && OP::cop_opt() >= 2) 
 			_DE_LOOP(i,frames, ( OP::cop(*dr,*di,*sr,*si,p), sr++,si++,dr++,di++ ) )
 		else													
 			_DE_LOOP(i,frames, ( OP::cop(*dr,*di,*sr,*si,p), sr += rss,si += iss,dr += rds,di += ids ) )
@@ -289,48 +321,148 @@ template<class T,class CL> inline BL _D__rop(OpParam &p) { return V__rop<T,OpPar
 template<class T,class CL> inline BL _D__cop(OpParam &p) { return V__cop<T,OpParam &,CL>(p,p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
 
 
-template<class T,class CL> inline BL d__run(OpParam &p) { return _d__run<T>(CL::run,p); }
-template<class T,class CL> inline BL d__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
-template<class T,class CL> inline BL d__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
-template<class T,class CL> inline BL d__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
-template<class T,class CL> inline BL d__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
-template<class T,class CL> inline BL d__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
+template<class T> BL _d__run(V fun(T &v,T a),OpParam &p) 
+{ 
+	int i;
+	if(p.rds == 1 && p.rss == 1)
+		_DE_LOOP(i,p.frames, ( fun(p.rddt[i],p.rsdt[i]) ) ) 
+	else
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i]) ) ) 
+	return true;
+}
 
-template<class T,class CL> inline BL f__run(OpParam &p) { return _d__run(CL::run,p); }
-template<class T,class CL> inline BL f__cun(OpParam &p) { return _d__cun(CL::cun,p); }
-template<class T,class CL> inline BL f__rbin(OpParam &p) { return _d__rbin(CL::rbin,p); }
-template<class T,class CL> inline BL f__cbin(OpParam &p) { return _d__cbin(CL::cbin,p); }
-template<class T,class CL> inline BL f__rop(OpParam &p) { return _d__rop(CL::rop,p); }
-template<class T,class CL> inline BL f__cop(OpParam &p) { return _d__cop(CL::cop,p); }
+template<class T> BL _d__cun(V fun(T &rv,T &iv,T ra,T ia),OpParam &p)
+{ 
+	int i;
+	if(p.rds == 1 && p.ids == 1 && p.rss == 1 && p.iss == 1)
+		_DE_LOOP(i,p.frames, ( fun(p.rddt[i],p.iddt[i],p.rsdt[i],p.isdt[i]) ) ) 
+	else
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i]) ) ) 
+	return true;
+}
+
+template<class T> BL _d__rbin(V fun(T &v,T a,T b),OpParam &p)
+{ 
+	int i;
+	if(p.HasArg() && p.arg[0].Is()) {							
+		switch(p.arg[0].argtp) {								
+		case OpParam::Arg::arg_v: {	
+			const T *adr = p.arg[0].v.rdt;
+			const I asr = p.arg[0].v.rs;
+			_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i],adr[asr*i]) ) ) 
+			break;												
+		}														
+		case OpParam::Arg::arg_env: {							
+			Env::Iter it(*p.arg[0].e.env); it.Init(0);
+			_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i],it.ValFwd(i)) ) ) 
+			break;												
+		}														
+		case OpParam::Arg::arg_x: {
+			const T av = p.arg[0].x.r;
+			_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i],av) ) ) 
+			break;												
+		}														
+		}														
+	}															
+	else {														
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i],p.rbin.arg) ) ) 
+	}															
+	return true;
+}
+
+template<class T> BL _d__cbin(V fun(T &rv,T &iv,T ra,T ia,T rb,T ib),OpParam &p)
+{ 
+	int i;
+	if(p.HasArg() && p.arg[0].Is()) {							
+		switch(p.arg[0].argtp) {									
+		case OpParam::Arg::arg_v: {									
+			const T *adr = p.arg[0].v.rdt,*adi = p.arg[0].v.idt;
+			const I asr = p.arg[0].v.rs,asi = p.arg[0].v.is;
+			if(adi)
+				_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],adr[asr*i],adi[asi*i]) ) ) 
+            else
+				_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],adr[asr*i],0) ) ) 
+			break;												
+		}														
+		case OpParam::Arg::arg_env: {							
+			Env::Iter it(*p.arg[0].e.env); it.Init(0);			
+			_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],it.ValFwd(i),0) ) ) 
+			break;												
+		}														
+		case OpParam::Arg::arg_x: {								
+			const T avr = p.arg[0].x.r,avi = p.arg[0].x.i;
+			_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],avr,avi) ) ) 
+			break;
+		}														
+		}														
+	}															
+	else {														
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],p.cbin.rarg,p.cbin.iarg) ) ) 
+	}															
+	return true;
+}
+
+template<class T> BL _d__rop(V fun(T &v,T a,OpParam &p),OpParam &p)
+{ 
+	int i;
+	if(p.rds == 1 && p.rss == 1)
+		_DE_LOOP(i,p.frames, ( fun(p.rddt[i],p.rsdt[i],p) ) ) 
+	else
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.rsdt[p.rss*i],p) ) ) 
+	return true;
+}
+
+template<class T> BL _d__cop(V fun(T &rv,T &iv,T ra,T ia,OpParam &p),OpParam &p)
+{ 
+	int i;
+	if(p.rds == 1 && p.ids == 1 && p.rss == 1 && p.iss == 1)
+		_DE_LOOP(i,p.frames, ( fun(p.rddt[i],p.iddt[i],p.rsdt[i],p.isdt[i],p) ) ) 
+	else
+		_DF_LOOP(i,p.frames, ( fun(p.rddt[p.rds*i],p.iddt[p.ids*i],p.rsdt[p.rss*i],p.isdt[p.iss*i],p) ) ) 
+	return true;
+}
+
 
 
 #ifdef VASP_COMPACT
-template<class T,class CL> inline BL D__run(OpParam &p) { return _d__run<T>(CL::run,p); }
-template<class T,class CL> inline BL D__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
-template<class T,class CL> inline BL D__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
-template<class T,class CL> inline BL D__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
-template<class T,class CL> inline BL D__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
-template<class T,class CL> inline BL D__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
-template<class T,class CL> inline BL F__run(OpParam &p) { return _d__run(CL::run,p); }
-template<class T,class CL> inline BL F__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
-template<class T,class CL> inline BL F__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
-template<class T,class CL> inline BL F__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
-template<class T,class CL> inline BL F__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
-template<class T,class CL> inline BL F__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
+    template<class T,class CL> inline BL D__run(OpParam &p) { return _d__run<T>(CL::run,p); }
+    template<class T,class CL> inline BL D__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
+    template<class T,class CL> inline BL D__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
+    template<class T,class CL> inline BL D__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
+	template<class T,class CL> inline BL D__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
+	template<class T,class CL> inline BL D__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
 #else
-template<class T,class CL> inline BL D__run(OpParam &p) { return _D__run<T,CL>(p); }
-template<class T,class CL> inline BL D__cun(OpParam &p) { return _D__cun<T,CL>(p); }
-template<class T,class CL> inline BL D__rbin(OpParam &p) { return _D__rbin<T,CL>(p); }
-template<class T,class CL> inline BL D__cbin(OpParam &p) { return _D__cbin<T,CL>(p); }
-template<class T,class CL> inline BL D__rop(OpParam &p) { return _D__rop<T,CL>(p); }
-template<class T,class CL> inline BL D__cop(OpParam &p) { return _D__cop<T,CL>(p); }
-template<class T,class CL> inline BL F__run(OpParam &p) { return V__run<T,CL>(p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
-template<class T,class CL> inline BL F__cun(OpParam &p) { return V__cun<T,CL>(p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
-template<class T,class CL> inline BL F__rbin(OpParam &p) { return _F__rbin<T,CL>(p); }
-template<class T,class CL> inline BL V__cbin(OpParam &p) { return _F__cbin<T,CL>(p); }
-template<class T,class CL> inline BL F__rop(OpParam &p) { return V__rop<T,OpParam &,CL>(p,p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
-template<class T,class CL> inline BL F__cop(OpParam &p) { return V__cop<T,OpParam &,CL>(p,p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
+	template<class T,class CL> inline BL D__run(OpParam &p) { return CL::run_opt()?_D__run<T,CL>(p):_d__run<T>(CL::run,p); }
+	template<class T,class CL> inline BL D__cun(OpParam &p) { return CL::cun_opt()?_D__cun<T,CL>(p):_d__cun<T>(CL::cun,p); }
+	template<class T,class CL> inline BL D__rbin(OpParam &p) { return CL::rbin_opt()?_D__rbin<T,CL>(p):_d__rbin<T>(CL::rbin,p); }
+	template<class T,class CL> inline BL D__cbin(OpParam &p) { return CL::cbin_opt()?_D__cbin<T,CL>(p):_d__cbin<T>(CL::cbin,p); }
+	template<class T,class CL> inline BL D__rop(OpParam &p) { return CL::rop_opt()?_D__rop<T,CL>(p):_d__rop<T>(CL::rop,p); }
+	template<class T,class CL> inline BL D__cop(OpParam &p) { return CL::cop_opt()?_D__cop<T,CL>(p):_d__cop<T>(CL::cop,p); }
 #endif
+
+
+// process multi-dimensional data
+
+template<class T> inline BL V__vmulti(BL vbin(I layers,const T *sr,T *dr,const T *ar,I len),I layers,const T *sr,T *dr,const T *ar,I dim,const I *dims)
+{
+	if(dim == 1 || !dims) {
+		return vbin(layers,sr,dr,ar,dims?dims[0]:dim);
+	}
+	else if(dim > 1) {
+		// calculate stride for next dimensions
+		I i,s,str = layers*dims[0];
+		for(i = 1; i < dim-1; ++i) str *= dims[i];
+		const I dimn = dims[i];
+		
+		for(s = i = 0; i < dimn; ++i,s += str)
+			V__vmulti(vbin,layers,sr+s,dr+s,ar+s,dim-1,dims);
+		return true;
+	}
+	else
+		return false;
+}
+
+
 
 } // namespace VecOp
 

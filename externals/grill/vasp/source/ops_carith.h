@@ -15,20 +15,19 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // Arithmetic math functions
 
-namespace VecOp {
-    inline BL d_cadd(OpParam &p) { return D__cbin<S,f_add<S> >(p); }
-    inline BL d_csub(OpParam &p) { return D__cbin<S,f_sub<S> >(p); }
-    inline BL d_csubr(OpParam &p) { return D__cbin<S,f_subr<S> >(p); }
-    inline BL d_cmul(OpParam &p) { return D__cbin<S,f_mul<S> >(p); }
-    inline BL d_cdiv(OpParam &p) { return d__cbin<S,f_div<S> >(p); }
-    inline BL d_cdivr(OpParam &p) { return d__cbin<S,f_divr<S> >(p); }
+DEFOP(S,d_cadd,add,cbin)
+DEFOP(S,d_csub,sub,cbin)
+DEFOP(S,d_csubr,subr,cbin)
+DEFOP(S,d_cmul,mul,cbin)
+DEFOP(S,d_cdiv,div,cbin)
+DEFOP(S,d_cdivr,divr,cbin)
 
-    inline BL d_csqr(OpParam &p) { return D__cun<S,f_sqr<S> >(p); }
+DEFOP(S,d_csqr,sqr,cun)
 
-    inline BL d_cpowi(OpParam &p) { return d__cop<S,f_powi<S> >(p); }
+DEFOP(S,d_cpowi,powi,cop)
 
-    inline BL d_cabs(OpParam &p) { return D__cun<S,f_abs<S> >(p); }
-}
+DEFOP(S,d_cabs,abs,cun)
+
 
 namespace VaspOp {
 	inline Vasp *m_cadd(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_cbin(p,src,arg,dst,VecOp::d_cadd); }  // complex add (pairs of vecs or complex)

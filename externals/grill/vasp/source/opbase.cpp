@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "opbase.h"
 #include "opdefs.h"
 
-Vasp *VaspOp::m_run(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun) 
+Vasp *VaspOp::m_run(OpParam &p,CVasp &src,CVasp *dst,opfun fun) 
 { 
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
@@ -24,7 +24,7 @@ Vasp *VaspOp::m_run(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun)
 	return ret;
 }
 
-Vasp *VaspOp::m_cun(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun) 
+Vasp *VaspOp::m_cun(OpParam &p,CVasp &src,CVasp *dst,opfun fun) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);
@@ -36,7 +36,7 @@ Vasp *VaspOp::m_cun(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun)
 	return ret;
 }
 
-Vasp *VaspOp::m_rbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun fun) 
+Vasp *VaspOp::m_rbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,opfun fun) 
 { 
 	Vasp *ret = NULL;
 	BL argvasp = arg.IsVasp();
@@ -58,7 +58,7 @@ Vasp *VaspOp::m_rbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp:
 	return ret;
 }
 
-Vasp *VaspOp::m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun fun) 
+Vasp *VaspOp::m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,opfun fun) 
 { 
 	Vasp *ret = NULL;
 	BL argvasp = arg.IsVasp();
@@ -83,8 +83,3 @@ Vasp *VaspOp::m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp:
 
 	return ret;
 }
-
-#ifdef FLEXT_THREADS
-flext::ThrMutex VecOp::C_base::mtx;
-#endif
-

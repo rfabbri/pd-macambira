@@ -15,13 +15,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // Assignment functions
 
-namespace VecOp {
-    inline BL d_copy(OpParam &p) { return D__run<S,f_copy<S> >(p); }
-    inline BL d_ccopy(OpParam &p) { return D__cun<S,f_copy<S> >(p); }
+DEFOP(S,d_copy,copy,run)
+DEFOP(S,d_ccopy,copy,cun)
 
-    inline BL d_set(OpParam &p) { return D__rbin<S,f_set<S> >(p); }
-    inline BL d_cset(OpParam &p) { return D__cbin<S,f_set<S> >(p); }
-}
+DEFOP(S,d_set,set,rbin)
+DEFOP(S,d_cset,set,cbin)
+
 
 namespace VaspOp {
 	inline Vasp *m_set(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_rbin(p,src,arg,dst,VecOp::d_set); } // copy to (one vec or real)

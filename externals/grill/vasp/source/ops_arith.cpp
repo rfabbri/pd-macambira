@@ -2,7 +2,7 @@
 
 VASP modular - vector assembling signal processor / objects for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -31,5 +31,5 @@ VASP_UNARY("vasp.ssqr",ssqr,true,"Calculates the square with preservation of the
 // -----------------------------------------------------
 
 VASP_UNARY("vasp.sign",sign,true,"Calculates the sign (signum function)") 
-VASP_UNARY("vasp.abs",abs,true,"Calulates the absolute value") 
+VASP_UNARY("vasp.abs",abs,true,"Calculates the absolute value") 
 

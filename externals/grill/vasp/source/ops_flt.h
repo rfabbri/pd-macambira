@@ -21,9 +21,9 @@ namespace VecOp {
 
 	BL d_int(OpParam &p);
 	BL d_dif(OpParam &p); 
-
-    inline BL d_fix(OpParam &p) { return D__run<S,f_fix<S> >(p); }
 }
+
+DEFOP(S,d_fix,fix,run)
 
 namespace VaspOp {
 	// passive filters

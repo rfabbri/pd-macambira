@@ -12,6 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "util.h"
 #include <math.h>
 
+/*
 R arg(R re,R im)
 {
 	if(re) 
@@ -20,4 +21,4 @@ R arg(R re,R im)
 		if(im || re) return im > 0?PI/2:-PI/2;
 		else return 0;
 }
-
+*/

@@ -15,37 +15,36 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // Comparison functions
 
-namespace VecOp {
-    inline BL d_lwr(OpParam &p) { return D__rbin<S,f_lwr<S> >(p); }
-    inline BL d_gtr(OpParam &p) { return D__rbin<S,f_gtr<S> >(p); }
-    inline BL d_alwr(OpParam &p) { return D__rbin<S,f_alwr<S> >(p); }
-    inline BL d_agtr(OpParam &p) { return D__rbin<S,f_agtr<S> >(p); }
-    inline BL d_leq(OpParam &p) { return D__rbin<S,f_leq<S> >(p); }
-    inline BL d_geq(OpParam &p) { return D__rbin<S,f_geq<S> >(p); }
-    inline BL d_aleq(OpParam &p) { return D__rbin<S,f_aleq<S> >(p); }
-    inline BL d_ageq(OpParam &p) { return D__rbin<S,f_ageq<S> >(p); }
-    inline BL d_equ(OpParam &p) { return D__rbin<S,f_equ<S> >(p); }
-    inline BL d_neq(OpParam &p) { return D__rbin<S,f_neq<S> >(p); }
+DEFOP(S,d_lwr,lwr,rbin)
+DEFOP(S,d_gtr,gtr,rbin)
+DEFOP(S,d_alwr,alwr,rbin)
+DEFOP(S,d_agtr,agtr,rbin)
+DEFOP(S,d_leq,leq,rbin)
+DEFOP(S,d_geq,geq,rbin)
+DEFOP(S,d_aleq,aleq,rbin)
+DEFOP(S,d_ageq,ageq,rbin)
+DEFOP(S,d_equ,equ,rbin)
+DEFOP(S,d_neq,neq,rbin)
 
-    inline BL d_min(OpParam &p) { return D__rbin<S,f_min<S> >(p); }
-    inline BL d_max(OpParam &p) { return D__rbin<S,f_max<S> >(p); }
-    inline BL d_rmin(OpParam &p) { return d__cbin<S,f_min<S> >(p); }
-    inline BL d_rmax(OpParam &p) { return d__cbin<S,f_max<S> >(p); }
+DEFOP(S,d_min,min,rbin)
+DEFOP(S,d_max,max,rbin)
+DEFOP(S,d_rmin,min,cbin)
+DEFOP(S,d_rmax,max,cbin)
 
-    inline BL d_minmax(OpParam &p) { return d__cun<S,f_minmax<S> >(p); }
+DEFOP(S,d_minmax,minmax,cun)
 
-    inline BL d_minq(OpParam &p) { return D__rop<S,f_minq<S> >(p); }
-    inline BL d_maxq(OpParam &p) { return D__rop<S,f_maxq<S> >(p); }
-    inline BL d_rminq(OpParam &p) { return d__cop<S,f_minq<S> >(p); }
-    inline BL d_rmaxq(OpParam &p) { return d__cop<S,f_maxq<S> >(p); }
-    inline BL d_aminq(OpParam &p) { return d__rop<S,f_aminq<S> >(p); }
-    inline BL d_amaxq(OpParam &p) { return d__rop<S,f_amaxq<S> >(p); }
+DEFOP(S,d_minq,minq,rop)
+DEFOP(S,d_maxq,maxq,rop)
+DEFOP(S,d_rminq,minq,cop)
+DEFOP(S,d_rmaxq,maxq,cop)
+DEFOP(S,d_aminq,aminq,rop)
+DEFOP(S,d_amaxq,amaxq,rop)
 
-    inline BL d_gate(OpParam &p) { return D__rbin<S,f_gate<S> >(p); }
-    inline BL d_igate(OpParam &p) { return d__rbin<S,f_igate<S> >(p); }
-    inline BL d_rgate(OpParam &p) { return d__cbin<S,f_gate<S> >(p); }
-    inline BL d_rigate(OpParam &p) { return d__cbin<S,f_igate<S> >(p); }
-}
+DEFOP(S,d_gate,gate,rbin)
+DEFOP(S,d_igate,igate,rbin)
+DEFOP(S,d_rgate,gate,cbin)
+DEFOP(S,d_rigate,igate,cbin)
+
 
 namespace VaspOp {
 	inline Vasp *m_lwr(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_rbin(p,src,arg,dst,VecOp::d_lwr); } // lower than

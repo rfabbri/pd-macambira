@@ -6,18 +6,18 @@
 # CXX=g++
 
 # where does the PD installation reside?
-PD=/usr/local/lib/pd
+PD=/cygdrive/c/programme/audio/pd
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include),
 # 	since gcc 3.2 complains about it
-PDINC=
+PDINC=${PD}/src
 
 # where do the flext libraries reside?
 FLEXTPATH=${PD}/flext
 
 # where should flext libraries be built?
-TARGDIR=./pd-linux
+TARGDIR=./pd-cygwin
 
 # where should VASP be installed?
 # (leave blank to omit installation)
@@ -31,5 +31,5 @@ HELPDIR=${PD}/doc/5.reference
 
 # additional compiler flags
 # (check if they fit to your system!)
-# UFLAGS=-mcpu=pentium3 -msse -mfpmath=sse -fprefetch-loop-arrays
-UFLAGS=-mcpu=pentiumpro
+UFLAGS=-mcpu=pentium3 -msse -mfpmath=sse -fprefetch-loop-arrays
+# UFLAGS=-mcpu=pentiumpro

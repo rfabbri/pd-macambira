@@ -20,14 +20,32 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define BIG 1.e10
 
 
-R arg(R re,R im);
-inline R arg(const CX &c) { return arg(c.real,c.imag); }
-inline F sqabs(F re,F im) { return re*re+im*im; }
-inline F sqabs(const CX &c) { return sqabs(c.real,c.imag); }
-inline F sgn(F x) { return x < 0.?-1.F:1.F; }
-inline V swap(F &a,F &b) { F c = a; a = b; b = c; }
+template<class T>
+inline V swap(T &a,T &b) { T c = a; a = b; b = c; }
 
-inline I min(I a,I b) { return a < b?a:b; }
-inline I max(I a,I b) { return a > b?a:b; }
+template<class T>
+inline T min(T a,T b) { return a < b?a:b; }
+
+template<class T>
+inline T max(T a,T b) { return a > b?a:b; }
+
+
+template<class T>
+T arg(T re,T im)
+{
+    if(re) 
+	return (T)(fmod(atan(im/re)+(re < 0?2*PI:PI),2*PI)-PI);
+    else
+	if(im || re) return (T)(im > 0?PI/2:-PI/2);
+        else return 0;
+}
+
+template<class T>
+inline T sgn(T x) { return (T)(x?(x < 0?-1:1):0); }
+
+template<class T>
+inline T sqabs(T re,T im) { return re*re+im*im; }
+
+
 
 #endif

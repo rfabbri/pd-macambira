@@ -418,7 +418,7 @@ CVecBlock *VaspOp::GetCVecs(const C *op,CVasp &src,const CVasp &arg,CVasp *dst,I
 
 	\remark operative function must be capable of handling reversed direction
 */
-Vasp *VaspOp::DoOp(RVecBlock *vecs,VecOp::opfun *fun,OpParam &p,BL symm)
+Vasp *VaspOp::DoOp(RVecBlock *vecs,opfun *fun,OpParam &p,BL symm)
 {
 	BL ok = true;
 
@@ -521,7 +521,7 @@ Vasp *VaspOp::DoOp(RVecBlock *vecs,VecOp::opfun *fun,OpParam &p,BL symm)
 
 	\remark operative function must be capable of handling reversed direction
 */
-Vasp *VaspOp::DoOp(CVecBlock *vecs,VecOp::opfun *fun,OpParam &p,BL symm)
+Vasp *VaspOp::DoOp(CVecBlock *vecs,opfun *fun,OpParam &p,BL symm)
 {
 	BL ok = true;
 

@@ -1,26 +1,27 @@
 # VASP - vector assembling vector processor
 # Copyright (c)2002-2003 Thomas Grill (xovo@gmx.net)
 #
-# Makefile for gcc @ linux
+# Makefile for gcc @ cygwin
 #
 # usage:
-# to build run "make -f makefile.pd-linux"
-# to install (as root), do "make -f makefile.pd-linux install"
-# to install help, do "make -f makefile.pd-linux install-help"
+# to build run "make -f makefile.pd-cygwin"
+# to install (as root), do "make -f makefile.pd-cygwin install"
+# to install help, do "make -f makefile.pd-cygwin install-help"
 #
 
-include config-pd-linux.txt
+include config-pd-cygwin.txt
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a
+FLEXTLIB=$(FLEXTPATH)/flext_t-pdwin.lib 
+PDLIBS=$(PD)/bin/pd.dll $(PD)/bin/pthreadVC.dll
 
 # compiler stuff
-INCLUDES=$(PDINC) 
+INCLUDES=/usr/include $(PDINC) 
 FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -fno-exceptions
 CFLAGS=-O6 ${UFLAGS} -fmove-all-movables -frerun-loop-opt
 #CFLAGS+=-funroll-loops -fmove-all-movables -freduce-all-givs -fschedule-insns2 -foptimize-register-move
 LDFLAGS=-Wl,-s
 
-LIBS=m
+LIBS=m 
 
 # ----------------------------------------------
 # the rest can stay untouched
@@ -31,8 +32,8 @@ SRCDIR=source
 
 include make-files.txt
 
-MAKEFILE=makefile.pd-linux
-TARGET=$(TARGDIR)/$(NAME).pd_linux
+MAKEFILE=makefile.pd-cygwin
+TARGET=$(TARGDIR)/$(NAME).dll
 
 
 # default target
@@ -48,7 +49,7 @@ $(TARGDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) -shared $^ $(patsubst %,-l%,$(LIBS)) -o $@ 
+	$(CXX) $(LDFLAGS) -shared $^ ${PDLIBS} $(patsubst %,-l%,$(LIBS)) -o $@ 
 	strip --strip-unneeded $@
 	chmod 755 $@
 

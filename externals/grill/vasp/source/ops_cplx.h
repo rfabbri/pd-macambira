@@ -15,16 +15,15 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // Complex functions
 
-namespace VecOp {
-    inline BL d_polar(OpParam &p) { return d__cun<S,f_polar<S> >(p); }
-    inline BL d_rect(OpParam &p) { return d__cun<S,f_rect<S> >(p); }
+DEFOP(S,d_polar,polar,cun)
+DEFOP(S,d_rect,rect,cun)
 
-    inline BL d_radd(OpParam &p) { return d__cbin<S,f_radd<S> >(p); }
+DEFOP(S,d_radd,radd,cbin)
 
-    inline BL d_cnorm(OpParam &p) { return d__cun<S,f_norm<S> >(p); }
+DEFOP(S,d_cnorm,norm,cun)
 
-    inline BL d_cconj(OpParam &p) { return D__cun<S,f_conj<S> >(p); }
-}
+DEFOP(S,d_cconj,conj,cun)
+
 
 namespace VaspOp {
 	inline Vasp *m_polar(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cun(p,src,dst,VecOp::d_polar); } // cartesian -> polar (each two)
