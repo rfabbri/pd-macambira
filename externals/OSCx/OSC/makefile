@@ -1,11 +1,15 @@
+current: pd_linux
 ###############################
 NAME=OSC
+EXT=o
 
 # ----------------------- Mac OS X (Darwin) -----------------------
 
 pd_darwin: $(NAME).pd_darwin
 
-.SUFFIXES: .pd_darwin
+SFX=.pd_darwin
+
+.SUFFIXES: $(SFX)
 
 DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wall -W -Wshadow -Wstrict-prototypes \
@@ -15,7 +19,6 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
 DARWININCLUDE =  -I../../../pd/src -I../../obj
 
 DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
-# lorenz.o rossler.o henon.o ikeda.o
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
@@ -28,14 +31,16 @@ DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
 pd_linux: $(NAME).pd_linux
 
-.SUFFIXES: .pd_linux
+SFX=pd_linux
+
+.SUFFIXES: .$(SFX)
 
 LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-LINUXINCLUDE =  -I/usr/local/include
+LINUXINCLUDE =  -I../../../src/pd-0.35-0/src
 
 LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
@@ -45,4 +50,12 @@ LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 	strip --strip-unneeded $*.pd_linux
 
 # ----------------------------------------------------------
+
+pd_linux_clean:
+	    -rm -rf *.$(EXT) *.$(SFX) *~
+
+pd_darwin_clean:
+	       EXT=o
+	       SFX=pd_darwin
+	       -rm *.$(EXT) *.$(SFX) *~
 
