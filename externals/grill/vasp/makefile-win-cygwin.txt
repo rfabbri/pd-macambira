@@ -1,0 +1,6 @@
+# usage:
+# to build run "sh build-win-max-cygwin.sh" or "sh build-win-pd-cygwin.sh"
+#
+
+# multi-threaded build
+THREADED=1

@@ -1,0 +1,6 @@
+# usage:
+# to build run "sh build-lnx-max-gcc.sh" or "sh build-lnx-pd-gcc.sh"
+#
+
+# multi-threaded build
+THREADED=1

@@ -1,0 +1,8 @@
+# Makefile for BCC
+#
+# usage:
+# to build run "build-win-max-bcc.bat" or "build-win-pd-bcc.bat"
+#
+
+# multi-threaded build
+THREADED=1
