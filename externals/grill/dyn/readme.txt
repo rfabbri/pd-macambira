@@ -25,4 +25,19 @@ pd - MacOSX:
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-darwin
 
+----------------------------------------------------------------------------
 
+CHANGES:
+--------
+
+0.0.1:
+- send loadbangs for loaded abstractions
+
+
+0.0.0 - initial cvs version
+
+
+
+TODO:
+--------
+- Hash table for object tags

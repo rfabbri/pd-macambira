@@ -87,6 +87,18 @@ LINK32=link.exe
 
 # Name "dyn - Win32 Release"
 # Name "dyn - Win32 Debug"
+# Begin Group "doc"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=".\make-files.txt"
+# End Source File
+# Begin Source File
+
+SOURCE=.\readme.txt
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\src\main.cpp

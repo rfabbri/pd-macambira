@@ -2,7 +2,7 @@
 
 dyn~ - dynamical object management for PD
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -28,7 +28,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "flinternal.h"
 #include <stdlib.h>
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4091 4244)
+#endif
 #include "g_canvas.h"
 
 
@@ -64,42 +66,40 @@ protected:
 
 	obj *Find(const t_symbol *n);
 	void Add(const t_symbol *n,t_object *o);
+
 	void ToCanvas(t_object *o,t_binbuf *b,int x,int y);
 	void FromCanvas(t_object *o);
 
 	virtual bool m_method_(int n,const t_symbol *s,int argc,const t_atom *argv);
 	virtual void m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs);
 
-	static t_class *pxin_class,*pxout_class;
-	static t_class *pxins_class,*pxouts_class;
-
-
-	// proxy for inbound messages
-	class proxyin  
+	// proxy object
+	class proxy
 	{ 
 	public:
 		t_object obj;
 		dyn *th;
-		t_outlet *outlet;
-		t_sample *buf;
-		bool sig;
 		int n;
+		t_sample *buf;
 		t_sample defsig;
+
+		void init(dyn *t);
+		void exit();
+	};
+
+	// proxy for inbound messages
+	class proxyin:
+		public proxy
+	{ 
+	public:
+		t_outlet *outlet;
 
 		void Message(const t_symbol *s,int argc,const t_atom *argv) 
 		{
 			typedmess((t_pd *)&obj,(t_symbol *)s,argc,(t_atom *)argv);
 		}
 
-		void init(dyn *t,bool s) 
-		{ 
-			th = t; sig = s;
-			n = 0,buf = NULL;
-			defsig = 0;
-			outlet = outlet_new(&obj,sig?&s_signal:&s_anything); 
-		}
-
-		void exit() { if(buf) delete[] buf; }
+		void init(dyn *t,bool s);
 
 		static void px_method(proxyin *obj,const t_symbol *s,int argc,const t_atom *argv)
 		{
@@ -107,30 +107,17 @@ protected:
 		}
 
 		static void dsp(proxyin *x, t_signal **sp);
-	} **pxin;
+	};
+
 
 	// proxy for outbound messages
-	class proxyout  
+	class proxyout:
+		public proxy
 	{ 
 	public:
-		t_object obj;
-		dyn *th;
 		int outlet;
-		int n;
-		bool sig;
-		t_sample *buf;
-		t_sample defsig;
 
-		void init(dyn *t,int o,bool s) 
-		{ 
-			th = t,outlet = o;
-			sig = s;
-			defsig = 0;
-			n = 0,buf = NULL;
-			if(sig) outlet_new(&obj,&s_signal); 
-		}
-
-		void exit() { if(buf) delete[] buf; }
+		void init(dyn *t,int o,bool s);
 
 		static void px_method(proxyout *obj,const t_symbol *s,int argc,const t_atom *argv)
 		{
@@ -138,8 +125,13 @@ protected:
 		}
 
 		static void dsp(proxyout *x, t_signal **sp);
-	} **pxout;
+	};
 
+	static t_class *pxin_class,*pxout_class;
+	static t_class *pxins_class,*pxouts_class;
+
+	proxyin **pxin;
+	proxyout **pxout;
 	int m_inlets,s_inlets,m_outlets,s_outlets;
 	t_canvas *canvas;
 
@@ -174,6 +166,7 @@ void dyn::setup(t_classid c)
 	pxin_class = class_new(gensym("dyn proxy in"),NULL,NULL,sizeof(proxyin),0, A_NULL);
 	add_anything(pxin_class,proxyin::px_method); 
 
+	// set up proxy class for inbound signals
 	pxins_class = class_new(gensym("dyn proxy in~"),NULL,NULL,sizeof(proxyin),0, A_NULL);
     add_dsp(pxins_class,proxyin::dsp);
     CLASS_MAINSIGNALIN(pxins_class, proxyin, defsig);
@@ -182,6 +175,7 @@ void dyn::setup(t_classid c)
 	pxout_class = class_new(gensym("dyn proxy out"),NULL,NULL,sizeof(proxyout),0, A_NULL);
 	add_anything(pxout_class,proxyout::px_method); 
 
+	// set up proxy class for outbound signals
 	pxouts_class = class_new(gensym("dyn proxy out~"),NULL,NULL,sizeof(proxyout),0, A_NULL);
 	add_dsp(pxouts_class,proxyout::dsp);
     CLASS_MAINSIGNALIN(pxouts_class, proxyout, defsig);
@@ -200,7 +194,7 @@ void dyn::setup(t_classid c)
 
 /*
 There must be a separate canvas for the dynamically created objects as some mechanisms in PD
-(like copy/cut/paste) get confused.
+(like copy/cut/paste) get confused otherwise.
 On the other hand it seems to be possible to create objects without a canvas. 
 They won't receive DSP processing, though, hence it's only possible for message objects.
 Problems arise when an object is not yet loaded... the canvas environment is then needed to
@@ -231,9 +225,14 @@ In both cases the 1)s have been chosen as the cleaner solution
 
 dyn::dyn(int argc,const t_atom *argv):
 	root(NULL),
-	canvas(NULL)
+	canvas(NULL),
+	pxin(NULL),pxout(NULL)
 {
-	if(argc < 4) { InitProblem(); return; }
+	if(argc < 4) { 
+		post("%s - Syntax: dyn~ sig-ins msg-ins sig-outs msg-outs",thisName());
+		InitProblem(); 
+		return; 
+	}
 
 	s_inlets = GetAInt(argv[0]);
 	m_inlets = GetAInt(argv[1]);
@@ -397,22 +396,29 @@ void dyn::m_newobj(int _argc_,const t_atom *_argv_)
 			// now set canvas 
 			canvas_setcurrent(canvas); 
 
-			// send message to object maker
 			t_binbuf *b = binbuf_new();
+			// make arg list
 			binbuf_add(b,argc-1,(t_atom *)argv+1);
+			// send message to object maker
 			binbuf_eval(b,&pd_objectmaker,0,NULL);
 
 			t_object *x = (t_object *)pd_newest();
 			if(x) {
 				// place it
 				ToCanvas(x,b,posx,posy);
+				// add to database
 				Add(name,x);
+
+				// send loadbang (if it is an abstraction)
+				if(pd_class(&x->te_g.g_pd) == canvas_class)
+					pd_vmess((t_pd *)x,gensym("loadbang"),"");			
 			}
 			else {
 				post("%s - new: Could not create object",thisName());
 				binbuf_free(b);
 			}
 
+			// pop the dyn~ canvas 
 			canvas_unsetcurrent(canvas); 
 		}
 	}
@@ -459,7 +465,7 @@ void dyn::conndis(bool conn,int argc,const t_atom *argv)
 		d_x = GetAInt(argv[2]);
 	}
 	else if(argc == 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
-		// pure connection between proxy-in and proxy-out (for testing above all....)
+		// direct connection from proxy-in to proxy-out (for testing above all....)
 		s_n = NULL;
 		s_x = GetAInt(argv[0]);
 		d_n = NULL;
@@ -533,8 +539,10 @@ void dyn::conndis(bool conn,int argc,const t_atom *argv)
 bool dyn::m_method_(int n,const t_symbol *s,int argc,const t_atom *argv)
 {
 	if(n == 0) 
+		// messages into inlet 0 are for dyn~
 		return flext_base::m_method_(n,s,argc,argv);
 	else {
+		// all other messages are forwarded to proxies (and connected objects)
 		pxin[n-1]->Message(s,argc,argv);
 		return true;
 	}
@@ -554,6 +562,16 @@ void dyn::m_send(int argc,const t_atom *argv)
 	}
 }
 
+
+void dyn::proxy::init(dyn *t) 
+{ 
+	th = t; 
+	n = 0,buf = NULL;
+	defsig = 0;
+}
+
+void dyn::proxy::exit() { if(buf) delete[] buf; }
+
 	
 void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
 {
@@ -566,6 +584,14 @@ void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
 	dsp_add_copy(x->buf,sp[0]->s_vec,n);
 }
 
+void dyn::proxyin::init(dyn *t,bool s) 
+{ 
+	proxy::init(t);
+	outlet = outlet_new(&obj,s?&s_signal:&s_anything); 
+}
+
+
+
 	
 void dyn::proxyout::dsp(proxyout *x,t_signal **sp)
 {
@@ -576,6 +602,13 @@ void dyn::proxyout::dsp(proxyout *x,t_signal **sp)
 		x->buf = new t_sample[x->n = n];
 	}
 	dsp_add_copy(sp[0]->s_vec,x->buf,n);
+}
+
+void dyn::proxyout::init(dyn *t,int o,bool s) 
+{ 
+	proxy::init(t);
+	outlet = o;
+	if(s) outlet_new(&obj,&s_signal); 
 }
 
 
