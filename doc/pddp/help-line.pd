@@ -1,27 +1,27 @@
-#N canvas 70 32 802 522 10;
-#X obj 22 14 line;
-#X text 57 14 -- ramp generator;
-#X text 17 43 [line]'s left inlet defines the "target" value. The right
+#N canvas 190 248 862 534 10;
+#X obj 3 29 line;
+#X text 38 29 -- ramp generator;
+#X text 5 59 [line]'s left inlet defines the "target" value. The right
 inlet defines the "time" value. The "target \, time" pair of numbers
 inform [line] to produce a numeric "ramp" from its current value (whatever
 that might be at any given moment) to the new value within the alloted
 time which is defined at the right inlet.;
-#X text 18 131 It is important to realize that [line] stores only the
+#X text 5 147 It is important to realize that [line] stores only the
 current value...it does not remember the defined "time" (duration of
 the ramp). Hence \, the following works:;
-#X obj 26 246 line;
-#X msg 60 222 1000;
-#X msg 26 222 1000;
-#X obj 26 179 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 10 262 line;
+#X msg 44 238 1000;
+#X msg 10 238 1000;
+#X obj 10 195 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 26 199 t b b;
-#X floatatom 26 268 5 0 0;
-#X obj 167 254 line;
-#X msg 167 230 1000;
-#X obj 167 210 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 10 215 t b b;
+#X floatatom 10 284 5 0 0 0 - - -;
+#X obj 151 270 line;
+#X msg 151 246 1000;
+#X obj 151 226 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X floatatom 167 276 5 0 0;
-#X text 20 293 If [line] receives a new target value without an accompanying
+#X floatatom 151 292 5 0 0 0 - - -;
+#X text 5 309 If [line] receives a new target value without an accompanying
 "time" \, it simply jumps to the new value...as in the example above
 on the right. In the example above on the left \, you'll see that [line]
 will create a numeric ramp from 0 to 1000 over 1000 milliseconds. You
@@ -29,25 +29,25 @@ should also note that if you click that [bng] again a second time \,
 nothing happens. This is because [line] is already at 1000 \, so sending
 it new instructions to ramp to 1000 is meaningless and has no effect.
 ;
-#X text 18 419 Having said all of that \, let's just reiterate that
+#X text 5 435 Having said all of that \, let's just reiterate that
 it's important to send a "time" value to [line] before sending it a
 new "target" value...unless of course you WANT it to jump immediately
 to the new target.;
-#X text 415 20 [line] will accept a list of two numbers. The first
+#X text 430 41 [line] will accept a list of two numbers. The first
 in the list will be assigned as the new target \, the second in the
 list will be the new time (duration of the ramp) as below:;
-#X obj 387 11 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 416 7 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 387 473 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 416 501 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 420 187 line;
-#X msg 420 99 1000 1000;
-#X floatatom 420 208 5 0 0;
-#X text 486 98 ramp up.;
-#X msg 429 122 0 1000;
-#X text 476 122 ramp down.;
-#X msg 441 166 stop;
-#X text 416 65 [line] will also accept the "stop" message which effectively
+#X obj 449 215 line;
+#X msg 449 127 1000 1000;
+#X floatatom 449 236 5 0 0 0 - - -;
+#X text 515 126 ramp up.;
+#X msg 458 150 0 1000;
+#X text 505 150 ramp down.;
+#X msg 470 194 stop;
+#X text 430 86 [line] will also accept the "stop" message which effectively
 halt the current ramp.;
 #N canvas 51 105 536 509 continuous_ramps 0;
 #X text 29 44 [line] does not schedule its incoming messages. What
@@ -68,8 +68,8 @@ takes off from its current value.;
 #X text 24 278 Due to this unique behavior \, a common construct found
 in PD patches includes the [pack] object as follows:;
 #X obj 38 399 line;
-#X floatatom 38 420 10 0 0;
-#X floatatom 38 313 5 0 0;
+#X floatatom 38 420 10 0 0 0 - - -;
+#X floatatom 38 313 5 0 0 0 - - -;
 #X obj 38 379 pack f 500;
 #X msg 49 332 50;
 #X msg 57 353 2000;
@@ -83,21 +83,21 @@ in PD patches includes the [pack] object as follows:;
 #X connect 13 0 10 0;
 #X connect 14 0 13 0;
 #X connect 15 0 13 0;
-#X restore 404 262 pd continuous_ramps;
-#X text 168 180 While this does NOT work unless;
-#X text 166 190 you click "500" first.;
-#X msg 201 230 500;
-#X msg 437 145 42;
-#X text 463 146 jumps to this value immediately.;
-#X text 478 166 stops the current ramp.;
-#X text 403 288 More information about [line] can be found in the Pure
+#X restore 443 290 pd continuous_ramps;
+#X text 152 196 While this does NOT work unless;
+#X text 150 206 you click "500" first.;
+#X msg 185 246 500;
+#X msg 466 173 42;
+#X text 492 174 jumps to this value immediately.;
+#X text 507 194 stops the current ramp.;
+#X text 428 316 More information about [line] can be found in the Pure
 Documentation folder doc/3.audio.examples.;
-#X text 412 450 This document was updated for PD version 0.35 test
+#X text 431 478 This document was updated for PD version 0.35 test
 28 by Dave Sabine as part of a project called pddp proposed by Krzysztof
 Czaja to build comprehensive documentation for PD.;
-#X text 404 326 RELATED OBJECTS;
-#X obj 405 346 line~;
-#N canvas 0 0 452 302 related_objects_from_other_libraries 0;
+#X text 423 354 RELATED OBJECTS;
+#X obj 443 373 line~;
+#N canvas 0 22 456 306 related_objects_from_other_libraries 0;
 #X obj 23 21 tripleline;
 #X obj 105 20 t3_line~;
 #X obj 171 20 fade~;
@@ -111,8 +111,8 @@ is:;
 ;
 #X text 14 141 or;
 #X text 15 155 iem.kug.ac.at/pdb/;
-#X restore 406 370 pd related_objects_from_other_libraries;
-#N canvas 0 0 454 528 grain_rate_and_creation_arguments 0;
+#X restore 444 397 pd related_objects_from_other_libraries;
+#N canvas 0 22 462 536 grain_rate_and_creation_arguments 0;
 #X text 20 18 GRAIN RATE;
 #X text 32 38 The "grain rate" of [line] is the rate at which it will
 output its values. The faster the grain is \, the smoother the ramp
@@ -147,7 +147,10 @@ the following two examples to see how the grain rate effects the output.
 #X connect 11 0 7 0;
 #X connect 11 0 13 0;
 #X connect 13 0 12 0;
-#X restore 404 235 pd grain_rate_and_creation_arguments;
+#X restore 443 263 pd grain_rate_and_creation_arguments;
+#X obj 3 3 cnv 5 850 20 empty empty [line] 20 10 1 18 -233017
+-66577 0;
+#X obj 819 4 pddp;
 #X connect 4 0 9 0;
 #X connect 5 0 4 1;
 #X connect 6 0 4 0;
