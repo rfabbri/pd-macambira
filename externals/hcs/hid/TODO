@@ -1,5 +1,17 @@
 
 ==============================================================================
+= check out GDAM HID implementation 
+
+- GDAM has a HID Manager implementation and probably a Linux one too
+
+==============================================================================
+= profile [hid] object and usage
+
+- find out how much more CPU the names (btn_?, abs, rel, etc) use over using
+  just floats.
+
+
+==============================================================================
 = define generic event timestamp struct (probably Pd-ized input_event )
 
 The question is whether the timeval is needed at all.  Linux and Darwin
@@ -85,6 +97,23 @@ void hid_post(const char *format, const char *);
   the events.
 
 
+==============================================================================
+= mapping object ideas
+
+[hid2midi] [midi2hid]
+
+midi value + bend <-> hid
+	  - use MIDI pitch and bend data for values in between MIDI notes?
+
+object for Fletcher-Munson Equal-loudness contours 
+
+median average object
+
+non-linear one-to-many mapping object (one curve spans the whole range of the
+movement, the other curve kicks in at a specifable point.  Arguments could be
+start-point and start-value.
+
+
  /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS 
@@ -125,4 +154,14 @@ ______________________________________________________________________________
   abs   abs_hat0y       Button Input, Keyboard Usage 0x39
 
 I am pretty sure this is just a hid_print_element_list() display problem.
+
+
+______________________________________________________________________________
+- BUG: multiple instances pointing to the same device don't have seperate close/free
+
+- closing the device on one instance closing that same device on all other
+  instances of [hid]
+
+- deleting that instance also closes the device for all other instances
+  pointing to that same device
 
