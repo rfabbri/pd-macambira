@@ -10,5 +10,8 @@ clean:
 	make -C shabby clean
 	make -C syncgrain clean
 
-# install: ???
-	
+install: 
+	make -C flext-iiwu install
+	make -C shabby install 
+	make -C syncgrain install 
+				

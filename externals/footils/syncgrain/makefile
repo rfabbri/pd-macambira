@@ -13,7 +13,7 @@ FLEXTLIB=$(FLEXTPATH)/flext_t.a  # take threaded library for all
 
 
 # compiler+linker stuff	### EDIT! ###
-INCLUDES=$(PDPATH)/src $(SNDOBJ)
+INCLUDES=$(PDPATH)/src $(SNDOBJ) $(FLEXTINC)
 LIBPATH=
 FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -DFLEXT_ATTRIBUTES
 CFLAGS=-O6 -fno-rtti 

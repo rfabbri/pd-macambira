@@ -4,13 +4,13 @@ CFLAGS=-O6 -mcpu=pentium -g
 #CFLAGS=-O6  -g -march=athlon
 FLAGS=-DPD
 
-FLEXTPATH=../../grill/flext/source
+FLEXTPATH=/usr/lib/pd/flext
 
-INCLUDES=/usr/lib/pd/include $(FLEXTPATH)
-FLEXTLIB=$(FLEXTPATH)/../pd-linux/flext.a
+INCLUDES=/usr/lib/pd/include $(FLEXTINC)
+FLEXTLIB=$(FLEXTPATH)/flext.a
 LIBS=m
 
-PDEXTRA=/usr/lib/pd/extra
+PDEXTRA=$(DESTDIR)/usr/lib/pd/extra
 
 TARGDIR=./
 TARGET=$(TARGDIR)/shabby~.pd_linux $(TARGDIR)/shaffy~.pd_linux 
