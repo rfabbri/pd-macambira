@@ -1,4 +1,4 @@
-#N canvas 105 0 1015 761 10;
+#N canvas 79 6 1015 761 10;
 #X text 35 71 A soundfont player using If I Were You \, from www.iiwu.org
 ;
 #X text 170 296 fluid~ wants channel # first: should I change this?
@@ -67,7 +67,7 @@
 #X msg 857 574 bank 1 \$1;
 #X floatatom 857 555 5 0 0 0 - - -;
 #X text 857 595 bank select;
-#X obj 789 187 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 789 187 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 715 187 metro 1000;
 #X obj 40 261 cnv 15 102 32 empty empty empty 20 12 1 14 -1 -66577
@@ -82,18 +82,73 @@
 #X text 145 185 init [soundfont] can (re)initialize fluid~ for example
 to adapt to new samplerates.;
 #X msg 741 432 cc \$3 \$2 \$1;
-#X obj 203 615 cnv 15 200 110 empty empty empty 20 12 1 14 -1 -66577
+#X obj 203 617 cnv 15 302 110 empty empty empty 20 12 1 14 -1 -66577
 0;
-#X obj 204 616 cnv 15 198 108 empty Notes generators 20 12 1 14 -228992
+#X obj 204 618 cnv 15 300 108 empty Notes generators 20 12 1 14 -228992
 -66577 0;
 #X msg 231 682 gen 1 \$2 \$1;
 #X obj 231 704 s \$0-iiwu;
-#X floatatom 289 642 5 0 0 0 - - -;
+#X floatatom 289 642 5 0 60 0 - - -;
 #X floatatom 231 642 5 0 0 0 - - -;
 #X obj 231 662 pack 0 17;
 #X text 78 607 gen 17 is "pan".;
 #X text 78 594 Setting generators like for example:;
 #X obj 695 266 del 1000;
+#X symbolatom 343 684 20 0 0 0 - - -;
+#X obj 343 656 fluid.gen2sym;
+#X text 345 700 a little helper;
+#N canvas 402 274 605 444 dust 0;
+#X obj 119 135 del 10;
+#X obj 119 41 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X floatatom 386 66 5 0 0 1 dustiness - -;
+#X floatatom 386 164 5 0 0 1 note_range - -;
+#X floatatom 387 198 5 0 0 1 note_center - -;
+#X obj 237 417 s \$0-iiwu;
+#X obj 387 242 / 2;
+#X floatatom 387 223 5 0 0 1 pan_mod - -;
+#X msg 237 281 gen 1 17 \$1;
+#X obj 237 237 random 100;
+#X obj 237 259 - 50;
+#X obj 119 273 pack 0 0;
+#X obj 119 63 metro;
+#X obj 126 339 pack 0 0;
+#X msg 126 371 note 1 \$1 \$2;
+#X obj 119 251 makenote 100 2;
+#X obj 119 212 + 60;
+#X obj 119 178 random 24;
+#X obj 198 80 random 150;
+#X obj 119 301 poly 8 1;
+#X obj 198 108 t f f;
+#X text 98 11 Inspired by Hans-Christoph Steiner and Derek Holzer;
+#X text 15 11 __Dust__;
+#X connect 0 0 9 0;
+#X connect 0 0 17 0;
+#X connect 1 0 12 0;
+#X connect 2 0 18 1;
+#X connect 3 0 17 1;
+#X connect 4 0 16 1;
+#X connect 6 0 10 1;
+#X connect 7 0 6 0;
+#X connect 7 0 9 1;
+#X connect 8 0 5 0;
+#X connect 9 0 10 0;
+#X connect 10 0 8 0;
+#X connect 11 0 19 0;
+#X connect 12 0 0 0;
+#X connect 12 0 18 0;
+#X connect 13 0 14 0;
+#X connect 14 0 5 0;
+#X connect 15 0 11 0;
+#X connect 15 1 11 1;
+#X connect 16 0 15 0;
+#X connect 17 0 16 0;
+#X connect 18 0 20 0;
+#X connect 19 1 13 0;
+#X connect 19 2 13 1;
+#X connect 20 0 0 1;
+#X restore 709 715 pd dust;
+#X text 601 716 A composition:;
 #X connect 9 0 13 0;
 #X connect 10 0 13 0;
 #X connect 11 0 10 0;
@@ -136,6 +191,8 @@ to adapt to new samplerates.;
 #X connect 61 0 27 0;
 #X connect 64 0 65 0;
 #X connect 66 0 68 1;
+#X connect 66 0 73 0;
 #X connect 67 0 68 0;
 #X connect 68 0 64 0;
 #X connect 71 0 19 0;
+#X connect 73 0 72 0;
