@@ -9,20 +9,34 @@
 # Makefile for MSVC++ 6
 #
 # usage:
-# to build run "make -f makefile.pd-msvc"
+# to build run "make -f makefile.max-msvc"
 #
 
-!include config-pd-msvc.txt
+!include config-max-msvc.txt
 
 # includes
-INCPATH=/I"$(MSVCPATH)\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
-LIBPATH=/LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)"
-LIBS=pd.lib flext-pdwin.lib 
+INCPATH=/I$(MAXSDKPATH)\max-includes /I$(MAXSDKPATH)\msp-includes /I$(FLEXTPATH)
+LDFLAGS=/LIBPATH:$(FLEXTPATH)
+
+!ifdef MSVCPATH
+INCPATH=$(INCPATH) /I$(MSVCPATH)\include 
+LDFLAGS=$(LDFLAGS) /LIBPATH:$(MSVCPATH)\lib
+!endif
+
+!ifdef _DEBUG
+LIBS=flext_d-maxwin.lib 
+LDFLAGS=$(LDFLAGS) /LIBPATH:$(MAXSDKPATH)\max-includes\win-includes\debug\ /LIBPATH:$(MAXSDKPATH)\msp-includes\win-includes\debug\
+!else
+LIBS=flext-maxwin.lib 
+LDFLAGS=$(LDFLAGS) /LIBPATH:$(MAXSDKPATH)\max-includes\win-includes\release\ /LIBPATH:$(MAXSDKPATH)\msp-includes\win-includes\release\
+!endif
+
+LIBS=$(LIBS) maxapi.lib maxaudio.lib
 
 # compiler definitions and flags
-DEFS=/DFLEXT_SYS=2 
+DEFS=/DFLEXT_SYS=1 $(UFLAGS)
 
-CFLAGS=/GR- /GX- /GD /Ox 
+CFLAGS=/ML /GR- /GD /Ox /GX
 
 # the rest can stay untouched
 # ----------------------------------------------
@@ -33,7 +47,7 @@ CFLAGS=/GR- /GX- /GD /Ox
 # -----------------------------------------------
 
 NAME=fftease
-EXT=dll
+EXT=mxe
 DIR=src
 
 all: $(OUTPATH) $(OUTPATH)\$(NAME).$(EXT)
@@ -59,7 +73,7 @@ $(OUTPATH):
 
 $(OUTPATH)\$(NAME).$(EXT): $(OBJS)
 	cd $(OUTPATH)
-	link /DLL /out:$(NAME).$(EXT) /INCREMENTAL:NO $** $(LIBS) $(LIBPATH)
+	link /DLL $(LDFLAGS) /out:$(NAME).$(EXT) /INCREMENTAL:NO $** $(LIBS) $(LIBPATH)
 	@-del *.exp
 	@-del *.lib
 	cd ..

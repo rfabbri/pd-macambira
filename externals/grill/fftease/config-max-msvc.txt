@@ -7,24 +7,24 @@
 #
 
 
-# where is PD?
-PDPATH=c:\programme\audio\pd		
+# where is the Max SDK?
+MAXSDKPATH="F:\prog\audio\MaxWinSDK\c74support"	
 
 # where do the flext libraries reside?
-FLEXTPATH=$(PDPATH)\flext
+FLEXTPATH="%CommonProgramFiles%\Cycling '74\flext"
 
 # where is MS VC++?
 # (need not be defined if the build is started with the compiler environment set)
-# MSVCPATH=c:\programme\prog\microsoft visual studio\VC98
+# MSVCPATH="c:\programme\prog\microsoft visual studio\VC98"
 
 
 # where should the external be built?
-OUTPATH=pd-msvc
+OUTPATH=max-msvc
 
 # where should the external be installed?
 # (leave blank to omit installation)
-INSTPATH=$(PDPATH)\extra
+INSTPATH="%CommonProgramFiles%\Cycling '74\externals\flext"
 
 
 # some user-definable flags
-UFLAGS=/G6 
+UFLAGS=/G6 /arch:SSE
