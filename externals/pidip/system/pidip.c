@@ -56,6 +56,7 @@ extern "C"
     void pdp_imgloader_setup(void);
     void pdp_imgsaver_setup(void);
     void pdp_cache_setup(void);
+    void pdp_canvas_setup(void);
 
 
 /* library setup routine */
@@ -110,6 +111,7 @@ void pidip_setup(void){
     pdp_imgloader_setup();
     pdp_imgsaver_setup();
     pdp_cache_setup();
+    pdp_canvas_setup();
 
 }
 
