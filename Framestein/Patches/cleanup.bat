@@ -1,0 +1,1 @@
+del *.exp *.lib *.obj
