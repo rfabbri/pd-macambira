@@ -65,17 +65,18 @@ void vbap_setup(void)
 	vbap_class = class_new(gensym("vbap"), (t_newmethod)vbap_new, 0, (short)sizeof(t_vbap), 0, A_GIMME, 0); 
 	/* vbap_new = creation function, A_DEFLONG = its (optional) arguement is a long (32-bit) int */
 
+#if 0
 /* max methods ... */
-/*
-/*	addbang((method)vbap_bang);			/* the procedure it uses when it gets a bang in the left inlet */
-/*	addint((method)vbap_int);			/* the rocedure for an int in the left inlet (inlet 0) */
-/*	addinx((method)vbap_in1, 1);		/* the rocedure for an int in the right inlet (inlet 1) */
-/*	addinx((method)vbap_in2, 2);		/* the rocedure for an int in the right inlet (inlet 2) */
-/*	addinx((method)vbap_in3, 3);
-/*	addmess((method)vbap_matrix, "loudspeaker-matrices", A_GIMME, 0); */
 
-/* pure data: */
+	addbang((method)vbap_bang);			/* the procedure it uses when it gets a bang in the left inlet */
+	addint((method)vbap_int);			/* the rocedure for an int in the left inlet (inlet 0) */
+	addinx((method)vbap_in1, 1);		/* the rocedure for an int in the right inlet (inlet 1) */
+	addinx((method)vbap_in2, 2);		/* the rocedure for an int in the right inlet (inlet 2) */
+	addinx((method)vbap_in3, 3);
+	addmess((method)vbap_matrix, "loudspeaker-matrices", A_GIMME, 0); */
 
+ pure data: 
+#endif
 	class_addbang(vbap_class, vbap_bang);
 	class_addfloat(vbap_class, vbap_int);
 	class_addmethod(vbap_class, (t_method)vbap_matrix, gensym("loudspeaker-matrices"), A_GIMME, 0);
@@ -466,7 +467,7 @@ static void vbap_bang(t_vbap *x)
 	}
 	else
 		post("vbap: Configure loudspeakers first!",0);
-/*	freebytes(final_gs, x->x_ls_amount * sizeof(float)); /* bug fix added 9/00 */
+/*	freebytes(final_gs, x->x_ls_amount * sizeof(float));  bug fix added 9/00 */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -601,17 +602,18 @@ static void *vbap_new(t_symbol *s, int ac, t_atom *av)
 	t_vbap *x;
 	x = (t_vbap *)pd_new(vbap_class);
 
-/* MAX:	
-/*	intin(x,3);	
-/*	intin(x,2);					/* create a second (int) inlet... remember right-to-left ordering in Max */
-/*	intin(x,1);					/* create a second (int) inlet... remember right-to-left ordering in Max */
-/*	x->x_outlet3 = intout(x);
-/*	x->x_outlet2 = intout(x);	/* create an (int) outlet  - rightmost outlet first... */
-/*	x->x_outlet1 = intout(x);	/* create an (int) outlet */
-/*	x->x_outlet0 = listout(x);	/* create a (list) outlet */
-/*
-/* pure data: */
+#if 0
+ MAX:	
+	intin(x,3);	
+	intin(x,2);					/* create a second (int) inlet... remember right-to-left ordering in Max */
+	intin(x,1);					/* create a second (int) inlet... remember right-to-left ordering in Max */
+	x->x_outlet3 = intout(x);
+	x->x_outlet2 = intout(x);	/* create an (int) outlet  - rightmost outlet first... */
+	x->x_outlet1 = intout(x);	/* create an (int) outlet */
+	x->x_outlet0 = listout(x);	/* create a (list) outlet */
 
+ pure data: 
+#endif
 	floatinlet_new(&x->x_ob, &x->x_azi);
 	floatinlet_new(&x->x_ob, &x->x_ele);
 	floatinlet_new(&x->x_ob, &x->x_spread);
