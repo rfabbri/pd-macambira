@@ -55,7 +55,5 @@ pd_linux_clean:
 	    -rm -rf *.$(EXT) *.$(SFX) *~
 
 pd_darwin_clean:
-	       EXT=o
-	       SFX=pd_darwin
-	       -rm *.$(EXT) *.$(SFX) *~
+	    -rm -rf *.$(EXT) *.$(SFX) *~
 
