@@ -8,21 +8,21 @@ Standards-Version: 3.5.2
 Package: pd-externals
 Architecture: any
 Depends: pd, ${shlibs:Depends}
-Description: pd external collection
+Description: PD external collection
  This is a collection of pd externals (plugins for the pure data software
  synthesizer). The collection includes tons of well known pd externals.
 
-Package: zexy
+Package: pd-zexy
 Architecture: any
 Depends: pd, ${shlibs:Depends}
-Description: zexy library for pd
+Description: Zexy library for pd
  Zexy is a library that you can load into pd (the pure data software 
  synthesizer). Zexy provides additional functionality to pd.
 
-Package: flext
+Package: pd-flext
 Architecture: any
 Depends: pd, ${shlibs:Depends}
-Description: flext C++ external layer for pd
+Description: Flext C++ external layer for pd
  Flext is a C++ layer for programming pd externals
 
 Package: pd-osc
