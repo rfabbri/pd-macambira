@@ -1,0 +1,44 @@
+#N canvas 123 65 764 661 10;
+#X obj 10 520 careGUI;
+#X msg 8 597 set;
+#X obj 7 617 s SET_ALL_RRADICALS;
+#X obj 6 238 print a1;
+#X obj 194 239 print a2;
+#X obj 382 238 print a3;
+#X obj 571 240 print a4;
+#X obj 7 471 print a5;
+#X obj 195 472 print a6;
+#X obj 383 469 print a7;
+#X obj 572 473 print a8;
+#X msg 177 10 /a1/preset \$1;
+#X obj 277 9 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 1;
+#X obj 6 29 rrad.evo33 /a1;
+#X text 326 517 rrad.evo33 is a bridge between a midi controller and
+OSC. It was designed with the author's Evolution UC-33 in mind \, which
+has 8 columns of 3 knobs and one slider each. Orange bang initiates
+a midi learn. You have some seconds to move a controller after banging
+it. The target symbols let you set the OSC string to be prepended to
+each controller. Default strings are \$1/k1 \, \$1/k2 \, \$1/k3 for
+the three top knobs and \$1/s for the vertical slider.;
+#X text 326 630 All controllers are expected to be in the range 0-127.
+;
+#X obj 194 30 rrad.evo33 /a2;
+#X obj 382 31 rrad.evo33 /a3;
+#X obj 571 29 rrad.evo33 /a4;
+#X obj 7 262 rrad.evo33 /a5;
+#X obj 195 263 rrad.evo33 /a6;
+#X obj 383 264 rrad.evo33 /a7;
+#X obj 572 262 rrad.evo33 /a8;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 11 0 13 1;
+#X connect 12 0 11 0;
+#X connect 13 0 3 0;
+#X connect 16 0 4 0;
+#X connect 17 0 5 0;
+#X connect 18 0 6 0;
+#X connect 19 0 7 0;
+#X connect 20 0 8 0;
+#X connect 21 0 9 0;
+#X connect 22 0 10 0;
