@@ -1,7 +1,7 @@
 PD_DIR = /usr/local/pd/src
 PD_EXECUTABLE = /usr/local/pd/bin/pd
 
-CREB_VERSION = 0.5
+CREB_VERSION = 0.8
 
 LIBNAME = creb.pd_darwin
 
@@ -15,11 +15,11 @@ INCLUDE =  -I$(PD_DIR) -I../include -I../include/dspi
 
 LIBFLAGS = -bundle -bundle_loader $(PD_EXECUTABLE)
 
-CC = gcc
-CPLUSPLUS = g++
+#CC = gcc
+#CXX = g++
 
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.c 
 .cc.o:
-	$(CPLUSPLUS) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.cc
+	$(CXX) $(CFLAGS) $(INCLUDE) -o $*.o -c $*.cc
 

@@ -17,7 +17,7 @@
 #X msg 226 150 coef 2 \$1;
 #X msg 305 150 coef 3 \$1;
 #X msg 384 150 coef 4 \$1;
-#X text 96 3 chebychev waveshaper;
+#X text 96 3 chebyshev waveshaper;
 #X text 207 229 creation argument: order of polynomial;
 #X text 135 47 coef n x sets coefficient of nth order cheby poly to
 x;

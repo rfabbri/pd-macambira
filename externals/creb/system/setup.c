@@ -27,6 +27,7 @@ void ffpoly_setup(void);
 void fwarp_setup(void);
 void junction_tilde_setup(void);
 void fdn_tilde_setup(void);
+void window_tilde_setup(void);
 
 void creb_setup(void)
 {
@@ -54,6 +55,7 @@ void creb_setup(void)
   lattice_tilde_setup();
   junction_tilde_setup();
   fdn_tilde_setup();
+  window_tilde_setup();
 
   /* setup other objects */
   ratio_setup();

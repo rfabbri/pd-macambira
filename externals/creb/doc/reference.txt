@@ -12,6 +12,7 @@ fblock		block relative frequency conversion
 inv		inverse
 pdynwav~	phasor~ + dynwav~
 scale7		arbitrary 7 tone scale
+tblock		block relative time conversion
 vols~		volume for a stereo signal
 vol~		volume for a mono signal
 
@@ -27,7 +28,9 @@ tilde externs
 abs~		absolute value
 bdiag~		block diagonal state space system (spectral processor)
 bfft~		reordered fft
-cheby~		chebychev polynomial waveshaper
+bwin~		several windowing functions and spectral envelopes
+biquadseries~	biquad second order sections (i.e. butterworth)
+cheby~		chebyshev polynomial waveshaper
 diag~		diagonal state space system (spectral processor)
 dist~		several distortions & waveshaping functions
 dwt~		discrete wavelet transform
@@ -36,6 +39,7 @@ dynwav~		dynamic wavetable: use a signal block as wavetable
 ead~		exp. attack decay
 eadsr~		exp. attack decay sustain release
 ear~		exp. attack release
+filterortho~	several biquad filters, orthogonal implementation
 fdn~		a feedback delay network
 junction~	a circulant lossless signal junction
 lattice~	lattice filter
@@ -47,5 +51,4 @@ ramp~		generates an integer ramp
 statwav~	a tabread4~ clone with 8 point interpolation
 tabreadmix~	a tabread~ clone with overlap add (for smooth time stretch)
 xfm~		coupled frequency modulation
-biquadseries~	biquad second order sections (i.e. butterworth)
-filterortho~	several biquad filters, orthogonal implementation
+

@@ -1,6 +1,5 @@
 Create a symbolic link to Makefile.config_darwin:
 
-  mv Makefile.config Makefile.config_linux
   ln -s Makefile.config_darwin Makefile.config
 
 Make the file using the pd_darwin file:

@@ -7,7 +7,7 @@ current:
 	make -C modules++ 
 
 	rm -f $(LIBNAME)
-	$(CPLUSPLUS) $(LIBFLAGS) -o $(LIBNAME) system/*.o modules/*.o modules++/*.o -lm
+	$(CXX) $(LIBFLAGS) -o $(LIBNAME) system/*.o modules/*.o modules++/*.o -lm
 #	strip --strip-unneeded $(LIBNAME)
 
 clean:

@@ -12,7 +12,7 @@ current:
 	make -C modules++
 
 	rm -f $(LIBNAME)
-	$(CPLUSPLUS) -export_dynamic -shared -o $(LIBNAME) system/*.o modules/*.o modules++/*.o -lm
+	$(CXX) -export_dynamic -shared -o $(LIBNAME) system/*.o modules/*.o modules++/*.o -lm
 	strip --strip-unneeded $(LIBNAME)
 
 clean:

@@ -30,6 +30,7 @@ check filtering code
 #include "extlib_util.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define FDN_MIN_DECAY_TIME .01f
 
