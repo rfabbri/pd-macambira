@@ -153,8 +153,8 @@ install: build
 
 	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
 	install $(CURDIR)/miXed/bin/*.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone/
-	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
-	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
+	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd  $(CURDIR)/miXed/doc/*/cyclone/*.* \
+				$(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
 
 # Build architecture-independent files here.
