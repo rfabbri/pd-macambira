@@ -2,6 +2,8 @@ current: pd_linux
 ###############################
 NAME=OSC
 EXT=o
+LIBS = -lm -lc
+LIBOSC = 	../libOSC/libOSC.a
 
 # ----------------------- Mac OS X (Darwin) -----------------------
 
@@ -22,7 +24,8 @@ DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS)
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBOSC)
+
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
 
@@ -46,7 +49,7 @@ LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
 .c.pd_linux:
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc
+	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) $(LIBS)  $(LIBOSC)
 	strip --strip-unneeded $*.pd_linux
 
 # ----------------------------------------------------------
