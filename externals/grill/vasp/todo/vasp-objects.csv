@@ -27,6 +27,7 @@ vasp.qvectors;vasp.vectors?;vasp.n?
 
 vasp.channel;;vasp.c
 vasp.qchannel;vasp.channel?;vasp.c?
+vasp.qchannels;vasp.channels?;
 
 vasp.frames;;vasp.f
 vasp.dframes;vasp.frames+;vasp.f+
@@ -63,7 +64,7 @@ vasp.div;vasp./;
 vasp.cdiv;vasp.c/;
 vasp.divr;vasp.r/;
 vasp.cdivr;vasp.c!/;
-vasp.mod;vasp.%;
+vasp.mod;vasp.%
 
 vasp.sqr;
 vasp.ssqr;
