@@ -5,7 +5,7 @@ PORT=3005
 
 function setfreq() 
 {
-./pdsend $PORT <<EOF
+pdsend $PORT <<EOF
 freq $1 $2;
 EOF
 }
