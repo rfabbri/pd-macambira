@@ -1,7 +1,7 @@
 
-EXT=pd_darwin
+EXT=pd_$(shell uname -s | sed -e 's/L/l/' | sed -e 's/D/d/')
 
-CC=gcc
+CC=gcc-2.95
 
 # This is Miller's default install location
 INSTALL_PREFIX=/usr/local/lib/pd
@@ -70,23 +70,22 @@ SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: $(NAME).pd_linux
+pd_linux: $(TARGETS)
 
 LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wno-shadow -Wstrict-prototypes -g \
-    -Wno-unused -Wno-parentheses -Wno-switch -Werror
+    -Wno-unused -Wno-parentheses -Wno-switch
 
 LINUXINCLUDE =  -I../../src -I../../pd/src
 
-.c.o:
-	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+.tk.tk2c:
+	./tk2c.bash < $*.tk > $*.tk2c
 
 .c.pd_linux:
-	./tk2c.bash < $*.tk > $*.tk2c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
-	rm $*.o
+	-rm $*.o
 
 # ----------------------- Mac OSX -----------------------
 
