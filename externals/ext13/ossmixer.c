@@ -1,3 +1,6 @@
+
+#ifdef LINUX
+
 #include "ext13.h"
 #include "m_pd.h"
 #include <stdio.h>
@@ -325,3 +328,6 @@ void ossmixer_setup(void)
     class_addmethod(ossmixer_class, (t_method) ossmixer_set_source, gensym("set_source"), A_DEFSYM, 0);
     class_addmethod(ossmixer_class, (t_method) ossmixer_set_device, gensym("set_device"), A_DEFFLOAT, 0);
 }
+
+
+#endif

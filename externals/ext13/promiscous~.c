@@ -1,3 +1,7 @@
+#ifdef LINUX
+// find a replacement for <linux/if_packet.h>
+// then this will work on other UNIXes
+
 #include "m_pd.h"
 #include "ext13.h"
 #include <sys/types.h>
@@ -14,7 +18,6 @@
 #include <netinet/ip.h>
 #include <netdb.h>
 #include <linux/if_packet.h>
-
 
 
 /* ------------------------ promiscous_tilde~ ----------------------------- */
@@ -157,3 +160,5 @@ void promiscous_tilde_setup(void)
 		sizeof(t_promiscous_tilde), CLASS_NOINLET, A_DEFSYM, 0);
 	class_addmethod(promiscous_tilde_class, (t_method) promiscous_tilde_dsp, gensym("dsp"), 0);
 }
+
+#endif

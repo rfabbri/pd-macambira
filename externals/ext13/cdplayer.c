@@ -1,3 +1,5 @@
+#ifdef LINUX
+
 #include "ext13.h"
 #include "m_pd.h"
 #include <stdio.h>
@@ -174,3 +176,5 @@ void cdplayer_setup(void)
     class_addmethod(cdplayer_class, (t_method) cdplayer_stop, gensym("stop"), 0);
     class_addmethod(cdplayer_class, (t_method) cdplayer_eject, gensym("eject"), 0);
 }
+
+#endif
