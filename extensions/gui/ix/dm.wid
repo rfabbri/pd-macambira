@@ -2,7 +2,7 @@
 namespace eval ::ix {
     variable _
     proc spin_resize {w} {
-	update
+#	update
 	$w config -height [winfo height $w] -width [winfo width $w]
     }
     proc spin {c w t bg fg font items arrows} {
