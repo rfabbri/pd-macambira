@@ -6,6 +6,7 @@
 /* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
 
 /* 'knob' gui object by Frank Barknecht, 'externalised' by Olaf Matthes */
+/* changed for devel_0.37 by Christoph Kummerer - hardly tested         */
 
 /* I had to out-comment the loadbang stuff because I couldn't find the code
    in Pd where it is declared */
@@ -641,9 +642,12 @@ static void *knob_new(t_symbol *s, int argc, t_atom *argv)
     t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
+    //srl[0] = gensym("empty");
+    //srl[1] = gensym("empty");
+    //srl[2] = gensym("empty");
+
+    iem_inttosymargs(&x->x_gui.x_isa, 0);
+    iem_inttofstyle(&x->x_gui.x_fsf, 0);
 
 
     if(((argc == 17)||(argc == 18))&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)
@@ -655,91 +659,68 @@ static void *knob_new(t_symbol *s, int argc, t_atom *argv)
        &&IS_A_FLOAT(argv,9)&&IS_A_FLOAT(argv,10)
        &&IS_A_FLOAT(argv,11)&&IS_A_FLOAT(argv,12)&&IS_A_FLOAT(argv,13)
        &&IS_A_FLOAT(argv,14)&&IS_A_FLOAT(argv,15)&&IS_A_FLOAT(argv,16))
-    {
-	w = (int)atom_getintarg(0, argc, argv);
-	h = (int)atom_getintarg(1, argc, argv);
-	min = (double)atom_getfloatarg(2, argc, argv);
-	max = (double)atom_getfloatarg(3, argc, argv);
-	lilo = (int)atom_getintarg(4, argc, argv);
-	iinit = (int)atom_getintarg(5, argc, argv);
-	srl[0] = atom_getsymbolarg(6, argc, argv);
-	srl[1] = atom_getsymbolarg(7, argc, argv);
-	srl[2] = atom_getsymbolarg(8, argc, argv);
-	if(IS_A_SYMBOL(argv,6))
-	    srl[0] = atom_getsymbolarg(6, argc, argv);
-	else if(IS_A_FLOAT(argv,6))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(6, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,7))
-	    srl[1] = atom_getsymbolarg(7, argc, argv);
-	else if(IS_A_FLOAT(argv,7))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,8))
-	    srl[2] = atom_getsymbolarg(8, argc, argv);
-	else if(IS_A_FLOAT(argv,8))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
-	    srl[2] = gensym(str);
-	}
-	ldx = (int)atom_getintarg(9, argc, argv);
-	ldy = (int)atom_getintarg(10, argc, argv);
-	ifstyle = (int)atom_getintarg(11, argc, argv);
-	fs = (int)atom_getintarg(12, argc, argv);
-	bflcol[0] = (int)atom_getintarg(13, argc, argv);
-	bflcol[1] = (int)atom_getintarg(14, argc, argv);
-	bflcol[2] = (int)atom_getintarg(15, argc, argv);
-	v = (int)atom_getintarg(16, argc, argv);
+   {
+        w = (int)atom_getintarg(0, argc, argv);
+        h = (int)atom_getintarg(1, argc, argv);
+        min = (double)atom_getfloatarg(2, argc, argv);
+        max = (double)atom_getfloatarg(3, argc, argv);
+        lilo = (int)atom_getintarg(4, argc, argv);
+        iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(5, argc, argv));
+        iemgui_new_getnames(&x->x_gui, 6, argv);
+        ldx = (int)atom_getintarg(9, argc, argv);
+        ldy = (int)atom_getintarg(10, argc, argv);
+        iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(11, argc, argv));
+        fs = (int)atom_getintarg(12, argc, argv);
+        bflcol[0] = (int)atom_getintarg(13, argc, argv);
+        bflcol[1] = (int)atom_getintarg(14, argc, argv);
+        bflcol[2] = (int)atom_getintarg(15, argc, argv);
+        v = (int)atom_getintarg(16, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 6, 0);
     if((argc == 18)&&IS_A_FLOAT(argv,17))
-	steady = (int)atom_getintarg(17, argc, argv);
+        steady = (int)atom_getintarg(17, argc, argv);
+
     x->x_gui.x_draw = (t_iemfunptr)knob_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
+
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
     if(x->x_gui.x_isa.x_loadinit)
-	x->x_val = v;
+        x->x_val = v;
     else
-	x->x_val = 0;
+        x->x_val = 0;
     x->x_pos = x->x_val;
     if(lilo != 0) lilo = 1;
     x->x_lin0_log1 = lilo;
     if(steady != 0) steady = 1;
     x->x_steady = steady;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
-    // gone in PD 0.37:
-	// x->x_gui.x_unique_num = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
-	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+        x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+        x->x_gui.x_fsf.x_rcv_able = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
+        strcpy(x->x_gui.x_font, "courier"); }
+    if(x->x_gui.x_fsf.x_rcv_able)
+        pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
     if(fs < 4)
-	fs = 4;
+        fs = 4;
     x->x_gui.x_fontsize = fs;
-    x->x_gui.x_h = iemgui_clip_size(w);
-    knob_check_height(x, h);
+    x->x_gui.x_h = iemgui_clip_size(h);
+    knob_check_height(x, w);
     knob_check_minmax(x, min, max);
     iemgui_all_colfromload(&x->x_gui, bflcol);
+    //x->x_thick = 0;
     iemgui_verify_snd_ne_rcv(&x->x_gui);
     outlet_new(&x->x_gui.x_obj, &s_float);
     return (x);
 }
+
+
 
 static void knob_free(t_knob *x)
 {
