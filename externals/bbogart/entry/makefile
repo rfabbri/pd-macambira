@@ -1,11 +1,11 @@
 current:
 	echo make pd_linux, pd_nt, pd_irix5, or pd_irix6
 
-clean: ; rm -f popup.pd_{linux,nt,irix?,darwin} *.o
+clean: ; rm -f entry.pd_{linux,nt,irix?,darwin} *.o
 
 # ----------------------- NT -----------------------
 
-pd_nt: popup.dll
+pd_nt: entry.dll
 
 .SUFFIXES: .obj .dll
 
@@ -31,7 +31,7 @@ dspobj~.dll: dspobj~.c;
 
 # ----------------------- IRIX 5.x -----------------------
 
-pd_irix5: popup.pd_irix5 
+pd_irix5: entry.pd_irix5 
 
 .SUFFIXES: .pd_irix5
 
@@ -47,7 +47,7 @@ SGIINCLUDE =  -I../../src/
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: popup.pd_linux
+pd_linux: entry.pd_linux
 
 .SUFFIXES: .pd_linux
 
@@ -65,7 +65,7 @@ LINUXINCLUDE =  -I../../src
 
 # ----------------------- Mac OSX -----------------------
 
-pd_darwin: popup.pd_darwin
+pd_darwin: entry.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
