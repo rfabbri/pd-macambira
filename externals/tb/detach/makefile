@@ -1,5 +1,5 @@
-NAME=detatch
-CSYM=detatch
+NAME=detach
+CSYM=detach
 
 current: pd_linux
 

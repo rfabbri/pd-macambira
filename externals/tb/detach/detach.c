@@ -1,6 +1,6 @@
 /* 
 * 
-* detatch
+* detach
 * Copyright (C) 2005  Tim Blechmann
 * 
 * This program is free software; you can redistribute it and/or modify
@@ -25,11 +25,11 @@
 #include "pthread.h"
 
 
-static t_class *detatch_class;
+static t_class *detach_class;
 
 typedef t_fifo fifo_t; /* for emacs syntax highlighting */
 
-typedef struct _detatch
+typedef struct _detach
 {
     t_object x_obj;
 
@@ -41,9 +41,9 @@ typedef struct _detatch
 
 	fifo_t * x_fifo;
 
-} detatch_t;
+} detach_t;
 
-typedef struct _detatch_content
+typedef struct _detach_content
 {
 	enum { BANG, 
 		   POINTER,
@@ -54,17 +54,17 @@ typedef struct _detatch_content
 		   CANCEL} type;
 	int argc;
 	t_atom * argv;
-} detatch_content_t;
+} detach_content_t;
 
 
-static void detatch_thread(detatch_t* x)
+static void detach_thread(detach_t* x)
 {
-	detatch_content_t * me;
+	detach_content_t * me;
 	while(1)
 	{
 		pthread_cond_wait(&x->x_cond, &x->x_mutex);
 		
-		me = (detatch_content_t*) fifo_get(x->x_fifo);
+		me = (detach_content_t*) fifo_get(x->x_fifo);
 		
 		while (me != NULL)
 		{
@@ -96,9 +96,9 @@ static void detatch_thread(detatch_t* x)
 			/* free */
 			if (me->argc)
 				freebytes(me->argv, me->argc * sizeof (t_atom));
-			freebytes (me, sizeof(detatch_content_t));
+			freebytes (me, sizeof(detach_content_t));
 			
-			me = (detatch_content_t*) fifo_get(x->x_fifo);
+			me = (detach_content_t*) fifo_get(x->x_fifo);
 		}
 	}
 	
@@ -108,18 +108,18 @@ static void detatch_thread(detatch_t* x)
 	{
 		if (me->argc)
 			freebytes(me->argv, me->argc * sizeof (t_atom));
-		freebytes (me, sizeof(detatch_content_t));
+		freebytes (me, sizeof(detach_content_t));
 	}
-	while (me = (detatch_content_t*) fifo_get(x->x_fifo));
+	while (me = (detach_content_t*) fifo_get(x->x_fifo));
 
 	fifo_destroy(x->x_fifo);
 	return;
 }
 
 /* todo: take argument for thread priority */
-static detatch_t * detatch_new(void)
+static detach_t * detach_new(void)
 {
-	detatch_t *x = (detatch_t*) pd_new(detatch_class);
+	detach_t *x = (detach_t*) pd_new(detach_class);
 	pthread_attr_t thread_attr;
 	struct sched_param thread_sched;
 	int status;
@@ -138,19 +138,19 @@ static detatch_t * detatch_new(void)
     pthread_attr_setschedparam(&thread_attr,&thread_sched);
 #endif
 	status = pthread_create(&x->x_thread, &thread_attr,
-							(void*)detatch_thread, x);
+							(void*)detach_thread, x);
 
 #if 1
 	if (status == 0)
-		post("detatching thread");
+		post("detaching thread");
 #endif
 	return x;
 }
 
 
-static void detatch_free(detatch_t * x)
+static void detach_free(detach_t * x)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = CANCEL;
 	me->argc = 0;
@@ -159,9 +159,9 @@ static void detatch_free(detatch_t * x)
 }
 
 
-static void detatch_bang(detatch_t * x)
+static void detach_bang(detach_t * x)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = BANG;
 	me->argc = 0;
@@ -171,9 +171,9 @@ static void detatch_bang(detatch_t * x)
 }
 
 
-static void detatch_float(detatch_t * x, t_float f)
+static void detach_float(detach_t * x, t_float f)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = FLOAT;
 	me->argc = 1;
@@ -184,9 +184,9 @@ static void detatch_float(detatch_t * x, t_float f)
 	pthread_cond_broadcast(&x->x_cond);
 }
 
-static void detatch_pointer(detatch_t * x, t_gpointer* gp)
+static void detach_pointer(detach_t * x, t_gpointer* gp)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = POINTER;
 	me->argc = 1;
@@ -197,9 +197,9 @@ static void detatch_pointer(detatch_t * x, t_gpointer* gp)
 	pthread_cond_broadcast(&x->x_cond);
 }
 
-static void detatch_symbol(detatch_t * x, t_symbol * s)
+static void detach_symbol(detach_t * x, t_symbol * s)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = SYMBOL;
 	me->argc = 1;
@@ -211,10 +211,10 @@ static void detatch_symbol(detatch_t * x, t_symbol * s)
 }
 
 
-static void detatch_list(detatch_t * x, t_symbol * s, 
+static void detach_list(detach_t * x, t_symbol * s, 
 						 int argc, t_atom* argv)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = LIST;
 	me->argc = argc;
@@ -224,10 +224,10 @@ static void detatch_list(detatch_t * x, t_symbol * s,
 	pthread_cond_broadcast(&x->x_cond);
 }
 
-static void detatch_anything(detatch_t * x, t_symbol * s, 
+static void detach_anything(detach_t * x, t_symbol * s, 
 							 int argc, t_atom* argv)
 {
-	detatch_content_t * me = getbytes(sizeof(detatch_content_t));
+	detach_content_t * me = getbytes(sizeof(detach_content_t));
 	
 	me->type = ANYTHING;
 	me->argc = argc;
@@ -238,15 +238,15 @@ static void detatch_anything(detatch_t * x, t_symbol * s,
 }
 
 
-void detatch_setup(void)
+void detach_setup(void)
 {
-	detatch_class = class_new(gensym("detatch"), (t_newmethod)detatch_new,
-							  (t_method)detatch_free, sizeof(detatch_t),
+	detach_class = class_new(gensym("detach"), (t_newmethod)detach_new,
+							  (t_method)detach_free, sizeof(detach_t),
 							  CLASS_DEFAULT, 0);
-	class_addbang(detatch_class, detatch_bang);
-    class_addfloat(detatch_class, detatch_float);
-    class_addpointer(detatch_class, detatch_pointer);
-    class_addsymbol(detatch_class, detatch_symbol);
-    class_addlist(detatch_class, detatch_list);
-    class_addanything(detatch_class, detatch_anything);
+	class_addbang(detach_class, detach_bang);
+    class_addfloat(detach_class, detach_float);
+    class_addpointer(detach_class, detach_pointer);
+    class_addsymbol(detach_class, detach_symbol);
+    class_addlist(detach_class, detach_list);
+    class_addanything(detach_class, detach_anything);
 }
