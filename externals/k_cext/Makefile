@@ -11,7 +11,7 @@ pd_nt: $(NAME).dll
 
 .SUFFIXES: .dll
 
-PDNTCFLAGS = /W3  /DNT /DPD /nologo /DINCLUDEPATH=\"D:\\sourcescvs\\pd\"
+PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo /DINCLUDEPATH=\"D:\\sourcescvs\\pd\"
 
 PDNTINCLUDE = /I. /ID:\sourcescvs\pd\src
 PDNTLIB = libc.lib oldnames.lib kernel32.lib "C:\Pure Data\bin\pd.lib"
