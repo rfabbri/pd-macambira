@@ -730,17 +730,34 @@ private:
 
 	// queue stuff
 
-	class qmsg;
-	qmsg *qhead,*qtail;
+//	class qmsg;
+//	static qmsg *qhead,*qtail;
+
+	//! Flush messages in the queue
+	static void QFlush(flext_base *th = NULL);
+
+	//! Queue worker function
+//	static void QWork(bool qlock,bool syslock);
+
+	//! Start message queue
+	static void StartQueue();
 #if FLEXT_SYS == FLEXT_SYS_JMAX
-	static void QTick(fts_object_t *c, int winlet, fts_symbol_t s, int ac, const fts_atom_t *at);
+//	static void QTick(int winlet = 0, fts_symbol_t s = NULL, int ac = 0, const fts_atom_t *at = NULL);
+#else // PD or Max
+//	static void QTick();
+#ifndef FLEXT_QTHR
+//	static t_qelem *qclk;
 #else
-	t_qelem *qclk;
-	static void QTick(flext_base *th);
+	//! Queue worker thread function
+//	static void *QWorker(void *);
+	//! Queue worker thread conditional
+//	static ThrCond qthrcond;
 #endif
-	void Queue(qmsg *m);
+#endif
+
+//	static void Queue(qmsg *m);
 #ifdef FLEXT_THREADS
-	ThrMutex qmutex;
+//	static ThrMutex qmutex;
 #endif
 
 
