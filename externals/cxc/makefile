@@ -8,7 +8,7 @@ AFLAGS =
 LFLAGS = -export_dynamic  -shared
 WFLAGS =
 IFLAGS = -I. -I../../pd/src
-PREFIX=/usr/lib
+PREFIX=/usr/
 INSTALL_PREFIX=$(PREFIX)
 
 VERSION = \"$(shell cat VERSION)\"
@@ -22,7 +22,7 @@ CXXFLAGS = $(CFLAGS)
 
 LIBS = -lc -lm 
 #LIBS = -lpthread -lm -lc 
-SOURCES = ENV.c ascseq.c ascwave.c bangfilt.c bangfilt2.c binshift.c counter.c cx.c ixprint.c mean.c microtime.c prepend.c proc.c randomix.c reson.c sigdelta.c split.c
+SOURCES = ENV.c ascseq.c ascwave.c bangfilt.c bangfilt2.c binshift.c cx.c ixprint.c mean.c microtime.c proc.c randomix.c reson.c sigdelta.c split.c
 TARGETS = $(SOURCES:.c=.$(EXT)) 
 
 # all: $(TARGETS) 
