@@ -1,0 +1,10 @@
+#N canvas 0 0 450 300 10;
+#X obj 136 209 promiscous~;
+#X obj 127 246 dac~;
+#X msg 201 35 bang;
+#X msg 201 61 \; pd dsp 1;
+#X text 69 166 thats passing by \, into a sound signal.;
+#X text 68 146 you must be root to turn all network traffic \,;
+#X connect 0 0 1 0;
+#X connect 0 0 1 1;
+#X connect 2 0 3 0;

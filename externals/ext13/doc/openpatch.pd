@@ -1,0 +1,11 @@
+#N canvas 19 591 373 232 10;
+#X obj 47 87 openpatch;
+#X text 120 88 =;
+#X obj 136 89 opa;
+#X msg 105 49 /tmp;
+#X msg 47 49 foo.pd;
+#X text 43 13 this would open /tmp/tst.pd;
+#X text 24 161 but you can also use;
+#X msg 176 160 \; pd open foo.pd /tmp/ 1 1 \;;
+#X connect 3 0 0 1;
+#X connect 4 0 0 0;
