@@ -3,9 +3,9 @@
 
 current: darwin_pkg
 
-PDDOC_VERSION = $(shell date +20%y.%m.%d)
+PACKAGE_VERSION = $(shell date +20%y.%m.%d)
 PACKAGE_PREFIX = pd-doc
-PACKAGE_NAME = $(PACKAGE_PREFIX)-$(PDDOC_VERSION)
+PACKAGE_NAME = $(PACKAGE_PREFIX)-$(PACKAGE_VERSION)
 
 darwin_pkg_license:
   # generate HTML version of License
