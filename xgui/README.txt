@@ -1,4 +1,4 @@
-This is the README file for Xgui_0.10, an experimental GUI (Graphical User Interface) server for pure data.
+This is the README file for Xgui_0.10b, an experimental GUI (Graphical User Interface) server for pure data.
 
 The goal of Xgui is not to replace the existing GUI, but to add some graphicals functionality to pd.
 

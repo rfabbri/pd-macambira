@@ -71,10 +71,16 @@ void *seg_new(void)
 {
     t_seg *x = (t_seg *)pd_new(seg_class);
     post("seg created");
+    
+    sys_vgui(".x%x.c create oval 10 10 20 20\n",glist_getcanvas(glist),
+			x->x_obj.te_xpos+1,x->x_obj.te_ypos+1,
+			x->x_obj.te_xpos + x->x_width -1,
+			x->x_obj.te_ypos + x->x_height -1,x->x_color->s_name,x);
     x->posx = 0; x->posy = 0;
     x->x1 = 10; x->y1 = 10;
     x->x1 = 20; x->y1 = 20;
     x->x_outlet1 = outlet_new(&x->t_ob, &s_float);
+    
     return (void *)x;
 }
 
