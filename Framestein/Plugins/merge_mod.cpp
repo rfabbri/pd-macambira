@@ -1,5 +1,5 @@
 //
-// merge_additive - add color components of two images, mod 255
+// merge_mod - add color components of two images, mod 255
 //
 
 #include "plugin.h"

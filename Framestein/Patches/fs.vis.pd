@@ -1,0 +1,19 @@
+#N canvas 81 22 821 315 12;
+#X obj 55 80 inlet;
+#X text 8 7 fs.vis -- make patch visible \, attempt to redock fs.frames
+;
+#X msg 65 114 bang;
+#X obj 84 165 symbol \$1;
+#X msg 106 233 \; \$1 vis 1;
+#X text 8 31 args: \$1 patch name to make visible;
+#X obj 252 164 delay 200;
+#X obj 252 216 s fs_main;
+#X obj 89 190 makefilename pd-%s;
+#X msg 252 190 symbol redock;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 0 6 0;
+#X connect 3 0 8 0;
+#X connect 6 0 9 0;
+#X connect 8 0 4 0;
+#X connect 9 0 7 0;
