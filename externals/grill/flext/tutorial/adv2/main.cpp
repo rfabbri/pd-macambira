@@ -1,7 +1,7 @@
 /* 
 flext tutorial - advanced 2
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002,2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -46,12 +46,12 @@ private:
 	// define the _static_ class setup function
 	static void setup(t_class *c);
 
-	FLEXT_CALLBACK(m_tag);  
-	FLEXT_CALLBACK_I(m_tag_and_int);  
-	FLEXT_CALLBACK_S(m_sym);  
+	FLEXT_CALLBACK(m_tag)  
+	FLEXT_CALLBACK_I(m_tag_and_int)
+	FLEXT_CALLBACK_S(m_sym)
 };
 
-// instantiate the class (constructor has a variable argument list)
+// instantiate the class (constructor takes no arguments)
 FLEXT_NEW("adv2",adv2)
 
 

@@ -6,16 +6,16 @@
 #include "flgui.h"
 
 
-class Canvas
+class FCanvas
 {
 public:
-	Canvas(t_canvas *c);
-	~Canvas();
+	FCanvas(t_canvas *c);
+	~FCanvas();
 
 #if FLEXT_SYS == FLEXT_SYS_PD
-	Canvas &Tk(char *fmt,...);
-	Canvas &TkC();
-	Canvas &TkE();
+	FCanvas &Tk(char *fmt,...);
+	FCanvas &TkC();
+	FCanvas &TkE();
 
 	void ToBuf(const char *t);
 #endif
@@ -48,17 +48,17 @@ protected:
 };
 
 
-class Pnt 
+class FPnt 
 {
 public:
-	Pnt() {}
-	Pnt(const Pnt &p): x(p.x),y(p.y) {}
-	Pnt(int px,int py): x(px),y(py) {}
+	FPnt() {}
+	FPnt(const FPnt &p): x(p.x),y(p.y) {}
+	FPnt(int px,int py): x(px),y(py) {}
 
-	Pnt &operator =(const Pnt &p) { x = p.x,y = p.y; return *this; }
-	Pnt &operator ()(int px,int py) { x = px,y = py; return *this; }
+	FPnt &operator =(const FPnt &p) { x = p.x,y = p.y; return *this; }
+	FPnt &operator ()(int px,int py) { x = px,y = py; return *this; }
 
-	Pnt &Move(int dx,int dy) { x += dx,y += dy; return *this; }
+	FPnt &Move(int dx,int dy) { x += dx,y += dy; return *this; }
 
 	int X() const { return x; }
 	int Y() const { return y; }
@@ -67,32 +67,32 @@ public:
 	int x,y;
 };
 
-class Rect
+class FRect
 {
 public:
-	Rect() {}
-	Rect(const Rect &r):  lo(r.lo),hi(r.hi) {}
-	Rect(int xlo,int ylo,int xhi,int yhi): lo(xlo,ylo),hi(xhi,yhi) {}
+	FRect() {}
+	FRect(const FRect &r):  lo(r.lo),hi(r.hi) {}
+	FRect(int xlo,int ylo,int xhi,int yhi): lo(xlo,ylo),hi(xhi,yhi) {}
 	
-	Rect &operator =(const Rect &r) { lo = r.lo; hi = r.hi; return *this; }
-	Rect &operator ()(const Pnt &l,const Pnt &h) { lo = l; hi = h; return *this; }
-	Rect &operator ()(int xlo,int ylo,int xhi,int yhi) { lo(xlo,ylo); hi(xhi,yhi); return *this; }
+	FRect &operator =(const FRect &r) { lo = r.lo; hi = r.hi; return *this; }
+	FRect &operator ()(const FPnt &l,const FPnt &h) { lo = l; hi = h; return *this; }
+	FRect &operator ()(int xlo,int ylo,int xhi,int yhi) { lo(xlo,ylo); hi(xhi,yhi); return *this; }
 
-	Rect &Move(int dx,int dy) { lo.Move(dx,dy); hi.Move(dx,dy); return *this; }
-	Rect &MoveTo(int x,int y) { hi(x+hi.X()-lo.X(),y+hi.Y()-lo.Y()); lo(x,y); return *this; }
+	FRect &Move(int dx,int dy) { lo.Move(dx,dy); hi.Move(dx,dy); return *this; }
+	FRect &MoveTo(int x,int y) { hi(x+hi.X()-lo.X(),y+hi.Y()-lo.Y()); lo(x,y); return *this; }
 
-	Pnt &Lo() { return lo; }
-	Pnt &Hi() { return hi; }
+	FPnt &Lo() { return lo; }
+	FPnt &Hi() { return hi; }
 	int SizeX() const { return hi.X()-lo.X()+1; }
 	int SizeY() const { return hi.Y()-lo.Y()+1; }
 	
-	Rect &Add(const Pnt &p);
-	Rect &Add(const Rect &r);
-	bool In(const Pnt &p) const;
-	bool Inter(const Rect &r) const;
+	FRect &Add(const FPnt &p);
+	FRect &Add(const FRect &r);
+	bool In(const FPnt &p) const;
+	bool Inter(const FRect &r) const;
 	
 protected:
-	Pnt lo,hi;
+	FPnt lo,hi;
 };
 
 class GuiObj:
@@ -100,7 +100,7 @@ class GuiObj:
 {
 	friend class GuiGroup;
 public:
-	GuiObj(Canvas *c = NULL,GuiGroup *p = NULL);
+	GuiObj(FCanvas *c = NULL,GuiGroup *p = NULL);
 	virtual ~GuiObj();
 
 	const t_symbol *Id() const { return idsym; }
@@ -111,8 +111,8 @@ public:
 
 /*
 	void Origin(int x,int y) { ori(x,y); }
-	void Origin(const Pnt &p) { ori = p; }
-	const Pnt &Origin() const { return ori; }
+	void Origin(const FPnt &p) { ori = p; }
+	const FPnt &Origin() const { return ori; }
 	void OriMove(int dx,int dy) { ori.Move(dx,dy); }
 	int OriX() const { return ori.X(); }
 	int OriY() const { return ori.Y(); }
@@ -126,18 +126,18 @@ public:
 
 	virtual GuiObj &Draw() = 0;
 	
-	Canvas &Canv() { return *canvas; }
+	FCanvas &Canv() { return *canvas; }
 
 protected:
 	virtual GuiObj &Delete() = 0;
 
 	GuiGroup *parent;
-	Canvas *canvas;
+	FCanvas *canvas;
 	const t_symbol *idsym;
 
 	virtual bool Method(flext_gui &g,const flext_gui::CBParams &p) = 0;
 
-	Rect rect;
+	FRect rect;
 };
 
 
@@ -146,7 +146,7 @@ class GuiSingle:
 {
 	friend class flext_gui;
 public:
-	GuiSingle(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL);
+	GuiSingle(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL);
 	~GuiSingle();
 
 	virtual const t_symbol *Symbol() const { return sym; }
@@ -156,7 +156,7 @@ public:
 	virtual void Active() { active = true; }
 	virtual void Inactive() { active = false; }
 
-	virtual bool In(const Pnt &p) const { return false; }
+	virtual bool In(const FPnt &p) const { return false; }
 
 	virtual GuiSingle *Find(const t_symbol *s);
 	virtual GuiObj &MoveTo(int x,int y);
@@ -197,7 +197,7 @@ class GuiPoint:
 {
 	friend class GuiGroup;
 
-	GuiPoint(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
+	GuiPoint(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
 	GuiObj &Set(int x,int y,long fill = -1);
 	virtual GuiObj &Draw();
 	
@@ -211,14 +211,14 @@ class GuiCloud:
 {
 	friend class GuiGroup;
 
-	GuiCloud(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s),pnt(NULL) {}
-	GuiObj &Set(int n,const Pnt *p,long fill = -1);
+	GuiCloud(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s),pnt(NULL) {}
+	GuiObj &Set(int n,const FPnt *p,long fill = -1);
 	virtual GuiObj &Draw();
 	virtual GuiObj &Delete();
 	
 	long fill;
 	int pnts;
-	Pnt *pnt;
+	FPnt *pnt;
 public:
 };
 
@@ -228,11 +228,11 @@ class GuiBox:
 {
 	friend class GuiGroup;
 
-	GuiBox(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
+	GuiBox(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
 	GuiObj &Set(int x,int y,int xsz,int ysz,int width = -1,long fill = -1,long outl = -1);
 	virtual GuiObj &Draw();
 	
-	virtual bool In(const Pnt &p) const { return rect.In(p); }
+	virtual bool In(const FPnt &p) const { return rect.In(p); }
 
 	int width;
 	long fill,outln;
@@ -245,11 +245,11 @@ class GuiRect:
 {
 	friend class GuiGroup;
 
-	GuiRect(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
+	GuiRect(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
 	GuiObj &Set(int x,int y,int xsz,int ysz,int width = -1,long outl = -1);
 	virtual GuiObj &Draw();
 	
-	virtual bool In(const Pnt &p) const { return rect.In(p); }
+	virtual bool In(const FPnt &p) const { return rect.In(p); }
 
 	int width;
 	long outln;
@@ -262,13 +262,13 @@ class GuiLine:
 {
 	friend class GuiGroup;
 
-	GuiLine(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
+	GuiLine(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
 	GuiObj &Set(int x1,int y1,int x2,int y2,int width = -1,long fill = -1);
 	virtual GuiObj &Draw();
 	
 	int width;
 	long fill;
-	Pnt p1,p2;
+	FPnt p1,p2;
 public:
 };
 
@@ -278,15 +278,15 @@ class GuiPoly:
 {
 	friend class GuiGroup;
 
-	GuiPoly(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s),pnt(NULL) {}
-	GuiObj &Set(int n,const Pnt *p,int width = -1,long fill = -1);
+	GuiPoly(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s),pnt(NULL) {}
+	GuiObj &Set(int n,const FPnt *p,int width = -1,long fill = -1);
 	virtual GuiObj &Draw();
 	virtual GuiObj &Delete();
 	
 	int width;
 	long fill;
 	int pnts;
-	Pnt *pnt;
+	FPnt *pnt;
 public:
 };
 
@@ -298,7 +298,7 @@ class GuiText:
 public:
 	enum just_t { none = -1,left = 0,right,center };
 protected:
-	GuiText(Canvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
+	GuiText(FCanvas *c = NULL,GuiGroup *p = NULL,const t_symbol *s = NULL): GuiSingle(c,p,s) {}
 	GuiObj &Set(int x,int y,const char *txt = NULL,long fill = -1,just_t just = none);
 	virtual GuiObj &Draw();
 	
@@ -312,7 +312,7 @@ class GuiGroup:
 {
 	friend class flext_gui;
 public:
-	GuiGroup(Canvas *c,GuiGroup *p = NULL);
+	GuiGroup(FCanvas *c,GuiGroup *p = NULL);
 	~GuiGroup();
 
 	virtual GuiSingle *Find(const t_symbol *s);
@@ -326,15 +326,15 @@ public:
 
 	GuiGroup *Add_Group();
 	GuiSingle *Add_Point(int x,int y,long fill = -1);
-	inline GuiSingle *Add_Point(const Pnt &p,long fill = -1) { return Add_Point(p.X(),p.Y(),fill); }
-	GuiSingle *Add_Cloud(int n,const Pnt *p,long fill = -1);
+	inline GuiSingle *Add_Point(const FPnt &p,long fill = -1) { return Add_Point(p.X(),p.Y(),fill); }
+	GuiSingle *Add_Cloud(int n,const FPnt *p,long fill = -1);
 	GuiSingle *Add_Box(int x,int y,int xsz,int ysz,int width = -1,long fill = -1,long outl = -1);
 	GuiSingle *Add_Rect(int x,int y,int xsz,int ysz,int width = -1,long outl = -1);
 	GuiSingle *Add_Line(int x1,int y1,int x2,int y2,int width = -1,long fill = -1);
-	inline GuiSingle *Add_Line(const Pnt &p1,const Pnt &p2,int width = -1,long fill = -1) { return Add_Line(p1.X(),p1.Y(),p2.X(),p2.Y(),width,fill); }
-	GuiSingle *Add_Poly(int n,const Pnt *p,int width = -1,long fill = -1);
+	inline GuiSingle *Add_Line(const FPnt &p1,const FPnt &p2,int width = -1,long fill = -1) { return Add_Line(p1.X(),p1.Y(),p2.X(),p2.Y(),width,fill); }
+	GuiSingle *Add_Poly(int n,const FPnt *p,int width = -1,long fill = -1);
 	GuiSingle *Add_Text(int x,int y,const char *txt,long fill = -1,GuiText::just_t just = GuiText::none);
-	inline GuiSingle *Add_Text(const Pnt &p,const char *txt,long fill = -1,GuiText::just_t just = GuiText::none) { return Add_Text(p.X(),p.Y(),txt,fill,just); }
+	inline GuiSingle *Add_Text(const FPnt &p,const char *txt,long fill = -1,GuiText::just_t just = GuiText::none) { return Add_Text(p.X(),p.Y(),txt,fill,just); }
 
 	GuiSingle *Remove(GuiSingle *obj);
 

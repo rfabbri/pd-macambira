@@ -13,18 +13,18 @@
 
 
 #if FLEXT_SYS == FLEXT_SYS_PD
-bool Canvas::store = true;
-bool Canvas::debug = false;
+bool FCanvas::store = true;
+bool FCanvas::debug = false;
 #endif
 
-Canvas::Canvas(t_canvas *c): 
+FCanvas::FCanvas(t_canvas *c): 
 	canvas(c)
 #if FLEXT_SYS == FLEXT_SYS_PD
 	,buffer(new char[BUFSIZE]),bufix(0),waiting(0) 
 #endif
 {}
 
-Canvas::~Canvas() 
+FCanvas::~FCanvas() 
 { 
 #if FLEXT_SYS == FLEXT_SYS_PD
 	if(buffer) delete[] buffer; 
@@ -32,13 +32,13 @@ Canvas::~Canvas()
 }
 
 #if FLEXT_SYS == FLEXT_SYS_PD
-void Canvas::Send(const char *t)
+void FCanvas::Send(const char *t)
 {
 	if(debug) post("GUI - %s",t);
 	sys_gui((char *)t);
 }
 
-void Canvas::SendBuf()
+void FCanvas::SendBuf()
 {
 	if(bufix) {
 		Send(buffer);
@@ -46,7 +46,7 @@ void Canvas::SendBuf()
 	}
 }
 
-void Canvas::ToBuf(const char *t)
+void FCanvas::ToBuf(const char *t)
 {
 	int len = strlen(t);
 	if(!len) return;
@@ -65,7 +65,7 @@ void Canvas::ToBuf(const char *t)
 	}
 }
 
-Canvas &Canvas::TkC()
+FCanvas &FCanvas::TkC()
 {
 	char tmp[20];
 	sprintf(tmp,".x%x.c ",canvas);
@@ -73,13 +73,13 @@ Canvas &Canvas::TkC()
 	return *this;
 }
 
-Canvas &Canvas::TkE()
+FCanvas &FCanvas::TkE()
 {
 	ToBuf("\n");
 	return *this;
 }
 
-Canvas &Canvas::Tk(char *fmt,...)
+FCanvas &FCanvas::Tk(char *fmt,...)
 {
  //   int result, i;
     char buf[2048];
@@ -93,7 +93,7 @@ Canvas &Canvas::Tk(char *fmt,...)
 }
 #endif
 
-bool Canvas::Pre(int x,int y) 
+bool FCanvas::Pre(int x,int y) 
 { 
 	xpos = x,ypos = y;
 #if FLEXT_SYS == FLEXT_SYS_PD
@@ -111,7 +111,7 @@ bool Canvas::Pre(int x,int y)
 #endif
 }
 
-void Canvas::Post() 
+void FCanvas::Post() 
 { 
 #if FLEXT_SYS == FLEXT_SYS_PD
 	if(!--waiting) SendBuf();
@@ -128,7 +128,7 @@ void Canvas::Post()
 // --------------------------------------------------------------------------
 
 
-Rect &Rect::Add(const Pnt &p)
+FRect &FRect::Add(const FPnt &p)
 {
 	if(p.x < lo.x) lo.x = p.x;
 	if(p.y < lo.y) lo.y = p.y;
@@ -137,7 +137,7 @@ Rect &Rect::Add(const Pnt &p)
 	return *this;
 }
 
-Rect &Rect::Add(const Rect &r)
+FRect &FRect::Add(const FRect &r)
 {
 	if(r.lo.x < lo.x) lo.x = r.lo.x;
 	if(r.lo.y < lo.y) lo.y = r.lo.y;
@@ -146,12 +146,12 @@ Rect &Rect::Add(const Rect &r)
 	return *this;
 }
 
-bool Rect::In(const Pnt &p) const
+bool FRect::In(const FPnt &p) const
 {
 	return p.x >= lo.x && p.x <= hi.x && p.y >= lo.y && p.y <= hi.y;
 }
 
-bool Rect::Inter(const Rect &r) const
+bool FRect::Inter(const FRect &r) const
 {
 	return true;
 }
@@ -160,7 +160,7 @@ bool Rect::Inter(const Rect &r) const
 // --------------------------------------------------------------------------
 
 
-GuiObj::GuiObj(Canvas *c,GuiGroup *p): 
+GuiObj::GuiObj(FCanvas *c,GuiGroup *p): 
 	canvas(c),idsym(NULL),
 	parent(p)
 //	,ori(0,0)
@@ -181,7 +181,7 @@ GuiSingle::Event::Event(int evmask,bool (*m)(flext_gui &g,GuiSingle &obj,const f
 GuiSingle::Event::~Event() { if(nxt) delete nxt; }
 
 
-GuiSingle::GuiSingle(Canvas *c,GuiGroup *p,const t_symbol *s): 
+GuiSingle::GuiSingle(FCanvas *c,GuiGroup *p,const t_symbol *s): 
 	GuiObj(c,p),sym(s),active(false),event(NULL)
 {
 	char tmp[20];
@@ -320,7 +320,7 @@ void GuiSingle::RmvEvent(int evmask,bool (*m)(flext_gui &g,GuiSingle &obj,const 
 // --------------------------------------------------------------------------
 
 
-GuiGroup::GuiGroup(Canvas *c,GuiGroup *p): 
+GuiGroup::GuiGroup(FCanvas *c,GuiGroup *p): 
 	GuiObj(c,p),head(NULL),tail(NULL)
 {
 	char tmp[20];
@@ -455,7 +455,7 @@ GuiSingle *GuiGroup::Add_Point(int x,int y,long fill)
 	return obj;
 }
 
-GuiSingle *GuiGroup::Add_Cloud(int n,const Pnt *p,long fill)
+GuiSingle *GuiGroup::Add_Cloud(int n,const FPnt *p,long fill)
 {
 	GuiCloud *obj = new GuiCloud(canvas,this);
 	obj->Set(n,p,fill);
@@ -487,7 +487,7 @@ GuiSingle *GuiGroup::Add_Line(int x1,int y1,int x2,int y2,int width,long fill)
 	return obj;
 }
 
-GuiSingle *GuiGroup::Add_Poly(int n,const Pnt *p,int width,long fill)
+GuiSingle *GuiGroup::Add_Poly(int n,const FPnt *p,int width,long fill)
 {
 	GuiPoly *obj = new GuiPoly(canvas,this);
 	obj->Set(n,p,width,fill);
@@ -561,13 +561,13 @@ GuiObj &GuiPoint::Draw()
 }
 
 
-GuiObj &GuiCloud::Set(int n,const Pnt *p,long fl)
+GuiObj &GuiCloud::Set(int n,const FPnt *p,long fl)
 {
 	int i;
 	Delete();
 
 	fill = fl;
-	pnt = new Pnt[pnts = n];
+	pnt = new FPnt[pnts = n];
 	rect(pnt[0] = p[0],p[0]);
 	for(i = 1; i < n; ++i) rect.Add(pnt[i] = p[i]);
 
@@ -713,14 +713,14 @@ GuiObj &GuiLine::Draw()
 }
 
 
-GuiObj &GuiPoly::Set(int n,const Pnt *p,int wd,long fl)
+GuiObj &GuiPoly::Set(int n,const FPnt *p,int wd,long fl)
 {
 	int i;
 
 	Delete();
 
 	width = wd,fill = fl;
-	pnt = new Pnt[pnts = n];
+	pnt = new FPnt[pnts = n];
 	rect(pnt[0] = p[0],p[0]);
 	for(i = 1; i < n; ++i) rect.Add(pnt[i] = p[i]);
 

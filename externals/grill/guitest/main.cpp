@@ -61,7 +61,7 @@ void guitest::g_Create()
 	Group().Add_Text(1,1,"Hula",-1);
 
 	I n = XSize()-16;
-	Pnt *p = new Pnt[n];
+	FPnt *p = new FPnt[n];
 	for(int i = 0; i < n; ++i) {
 		p[i](8+i,10+rand()%(YSize()-11));
 	}

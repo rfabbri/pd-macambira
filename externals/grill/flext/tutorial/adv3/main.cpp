@@ -1,7 +1,7 @@
 /* 
 flext tutorial - advanced 3
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002,2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -74,6 +74,7 @@ public:
 	}
 
 protected:
+
 	void m_reset() 
 	{ 
 		i_count = i_down; 
@@ -115,6 +116,7 @@ protected:
 	int i_count,i_down,i_up,i_step;
 	
 private:
+
 	static void setup(t_class *c)
 	{
 		// --- set up methods (class scope) ---
@@ -127,7 +129,7 @@ private:
 		// no, variable list or anything and all single arguments are recognized automatically, ...
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 		FLEXT_CADDMETHOD_(c,0,"set",m_set);
-		// ..., more complex types (combinations of types) have to be specified
+		// ..., more complex types (combinations of types) have to be specified explicitly
 		FLEXT_CADDMETHOD_II(c,0,"bound",m_bound);  // two int arguments
 
 		// set up methods for inlets 1 and 2

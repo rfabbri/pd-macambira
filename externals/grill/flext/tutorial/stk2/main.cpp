@@ -1,5 +1,5 @@
 /* 
-flext tutorial - stk 1
+flext tutorial - stk 2
 
 Copyright (c) 2002,2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -25,47 +25,61 @@ the respective platform (e.g. __OS_WINDOWS__ and __LITTLE_ENDIAN__ for Windows)
 #error You need at least flext version 0.4.1
 #endif
 
-#include "Noise.h"
+#include "PitShift.h"
 
 
-class stk1:
+class stk2:
 	public flext_stk
 {
-	FLEXT_HEADER(stk1,flext_stk)
+	FLEXT_HEADER_S(stk2,flext_stk,Setup)
 
 public:
-	stk1();
+	stk2();
 
-protected:
+	void m_sh1(float f) { if(inst[0]) inst[0]->setShift(f); }
+	void m_sh2(float f) { if(inst[1]) inst[1]->setShift(f); }
+
 	// these are obligatory!
 	virtual bool NewObjs(); // create STK instruments
 	virtual void FreeObjs(); // destroy STK instruments
 	virtual void ProcessObjs(int n);  // do DSP processing
 
+	PitShift *inst[2];
+
 private:
-	Noise *inst;
-	static void Setup(t_class *c); 
+	static void Setup(t_class *c);
+
+	FLEXT_CALLBACK_F(m_sh1)
+	FLEXT_CALLBACK_F(m_sh2)
 };
 
-FLEXT_NEW_DSP("stk1~",stk1)
+FLEXT_NEW_DSP("stk2~",stk2)
  
 
-stk1::stk1():
-	inst(NULL)
+stk2::stk2()
 { 
-	AddInAnything();
-	AddOutSignal();  
+	AddInSignal();
+	AddOutSignal(2);  
+
+	inst[0] = inst[1] = NULL;
+}
+
+void stk2::Setup(t_class *c)
+{
+	FLEXT_CADDMETHOD_F(c,0,"shL",m_sh1);
+	FLEXT_CADDMETHOD_F(c,0,"shR",m_sh2);
 }
 
 
 // create STK instruments
-bool stk1::NewObjs()
+bool stk2::NewObjs()
 {
 	bool ok = true;
 
 	// set up objects
 	try {
-		inst = new Noise;
+		for(int i = 0; i < 2; ++i)
+			inst[i] = new PitShift;
 	}
 	catch (StkError &) {
 		post("%s - Noise() setup failed!",thisName());
@@ -76,15 +90,20 @@ bool stk1::NewObjs()
 
 
 // destroy the STK instruments
-void stk1::FreeObjs()
+void stk2::FreeObjs()
 {
-	if(inst) delete inst;
+	for(int i = 0; i < 2; ++i)
+		if(inst[i]) delete inst[i];
 }
 
 // this is called on every DSP block
-void stk1::ProcessObjs(int n)
+void stk2::ProcessObjs(int n)
 {
-	while(n--) Outlet(0).tick(inst->tick());
+	while(n--) {
+		MY_FLOAT f = Inlet(0).tick();
+		for(int i = 0; i < 2; ++i)
+			Outlet(i).tick(inst[i]->tick(f));
+	}
 }
 
 

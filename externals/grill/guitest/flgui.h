@@ -9,7 +9,7 @@
 #include <g_canvas.h>
 #endif
 
-class Canvas;
+class FCanvas;
 class GuiObj;
 class GuiGroup;
 class GuiSingle;
@@ -135,7 +135,7 @@ protected:
 
 private:
 	bool visible;
-	Canvas *canvas;
+	FCanvas *canvas;
 	GuiGroup *objs;
 
 	const t_symbol *bindsym;

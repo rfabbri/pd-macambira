@@ -1,7 +1,7 @@
 /* 
 flext tutorial - sndobj 1
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002,2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -10,7 +10,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 This is an example of an external using the SndObj library.
 See http://www.may.ie/academic/music/musictec/SndObj/
 
-This object shows simple stereo pitch shifting.
+The SndObj library should be compiled multithreaded.
+
+This external features simple stereo pitch shifting.
 
 */
 
@@ -26,15 +28,13 @@ This object shows simple stereo pitch shifting.
 class sndobj1:
 	public flext_sndobj
 {
-	FLEXT_HEADER(sndobj1,flext_sndobj)
+	FLEXT_HEADER_S(sndobj1,flext_sndobj,Setup)
 
 public:
 	sndobj1();
 
-protected:
-
 	// these are obligatory!
-	virtual void NewObjs();
+	virtual bool NewObjs();
 	virtual void FreeObjs();
 	virtual void ProcessObjs();
 
@@ -42,6 +42,9 @@ protected:
 	Pitch *obj1,*obj2;
 
 	float sh1,sh2;
+
+private:
+	static void Setup(t_class *c);
 
 	FLEXT_ATTRVAR_F(sh1)
 	FLEXT_ATTRVAR_F(sh2)
@@ -51,23 +54,26 @@ FLEXT_NEW_DSP("sndobj1~",sndobj1)
 
 
 sndobj1::sndobj1():
-	sh1(1),sh2(1)
+	sh1(1),sh2(1),
+	obj1(NULL),obj2(NULL)
 { 
 	AddInSignal(2);  // audio ins
 	AddOutSignal(2);  // audio outs
+}
 
-	obj1 = obj2 = NULL;
-
-	FLEXT_ADDATTR_VAR1("shL",sh1);
-	FLEXT_ADDATTR_VAR1("shR",sh2);
+void sndobj1::Setup(t_class *c)
+{
+	FLEXT_CADDATTR_VAR1(c,"shL",sh1);
+	FLEXT_CADDATTR_VAR1(c,"shR",sh2);
 }
 
 // construct needed SndObjs
-void sndobj1::NewObjs()
+bool sndobj1::NewObjs()
 {
 	// set up objects
 	obj1 = new Pitch(.1f,&InObj(0),sh1,Blocksize(),Samplerate());
 	obj2 = new Pitch(.1f,&InObj(1),sh2,Blocksize(),Samplerate());
+	return true;
 }
 
 // destroy the SndObjs

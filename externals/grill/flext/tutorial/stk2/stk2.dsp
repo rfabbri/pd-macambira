@@ -1,35 +1,35 @@
-# Microsoft Developer Studio Project File - Name="stk1" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="stk2" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** NICHT BEARBEITEN **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
-CFG=stk1 - Win32 Debug
+CFG=stk2 - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
 !MESSAGE 
-!MESSAGE NMAKE /f "stk1.mak".
+!MESSAGE NMAKE /f "stk2.mak".
 !MESSAGE 
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
-!MESSAGE NMAKE /f "stk1.mak" CFG="stk1 - Win32 Debug"
+!MESSAGE NMAKE /f "stk2.mak" CFG="stk2 - Win32 Debug"
 !MESSAGE 
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
 !MESSAGE 
-!MESSAGE "stk1 - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "stk1 - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "stk2 - Win32 Release" (basierend auf  "Win32 (x86) Dynamic-Link Library")
+!MESSAGE "stk2 - Win32 Debug" (basierend auf  "Win32 (x86) Dynamic-Link Library")
 !MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
-# PROP Scc_ProjName "stk1"
+# PROP Scc_ProjName "stk2"
 # PROP Scc_LocalPath "."
 CPP=cl.exe
 MTL=midl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "stk1 - Win32 Release"
+!IF  "$(CFG)" == "stk2 - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -53,9 +53,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib pd.lib pthreadVC.lib flext_t-pdwin.lib stk.lib /nologo /dll /machine:I386 /out:"../pd-msvc/stk1~.dll" /libpath:"..\..\pd-msvc" /libpath:"f:\prog\packs\stk\lib"
+# ADD LINK32 kernel32.lib user32.lib pd.lib pthreadVC.lib flext_t-pdwin.lib stk.lib /nologo /dll /machine:I386 /out:"../pd-msvc/stk2~.dll" /libpath:"..\..\pd-msvc" /libpath:"f:\prog\packs\stk\lib"
 
-!ELSEIF  "$(CFG)" == "stk1 - Win32 Debug"
+!ELSEIF  "$(CFG)" == "stk2 - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -79,14 +79,14 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib pd.lib pthreadVC.lib flext_td-pdwin.lib stk_d.lib /nologo /dll /debug /machine:I386 /out:"msvc-debug/stk1~.dll" /pdbtype:sept /libpath:"..\..\pd-msvc" /libpath:"f:\prog\packs\stk\lib"
+# ADD LINK32 kernel32.lib user32.lib pd.lib pthreadVC.lib flext_td-pdwin.lib stk_d.lib /nologo /dll /debug /machine:I386 /out:"msvc-debug/stk2~.dll" /pdbtype:sept /libpath:"..\..\pd-msvc" /libpath:"f:\prog\packs\stk\lib"
 
 !ENDIF 
 
 # Begin Target
 
-# Name "stk1 - Win32 Release"
-# Name "stk1 - Win32 Debug"
+# Name "stk2 - Win32 Release"
+# Name "stk2 - Win32 Debug"
 # Begin Source File
 
 SOURCE=.\main.cpp

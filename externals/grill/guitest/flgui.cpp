@@ -40,7 +40,7 @@ flext_gui::flext_gui(int xs,int ys):
 #endif
 	bindsym(NULL)
 {
-	canvas = new Canvas(thisCanvas());
+	canvas = new FCanvas(thisCanvas());
 	objs = new GuiGroup(canvas);
 
 #if FLEXT_SYS == FLEXT_SYS_PD
