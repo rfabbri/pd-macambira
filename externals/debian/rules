@@ -64,11 +64,6 @@ build-stamp: configure-stamp
 	(cd OSCx/libOSC;$(MAKE))
 	(cd OSCx/OSC; $(MAKE))
 
-        # build PDP
-
-	(cd pdp;autoconf;./configure;$(MAKE))
-	(cd pdp/scaf/;autoconf;./configure;$(MAKE))
-
 	# build cyclone
 	-mkdir miXed/bin
 	(cd miXed/cyclone; make PD_DIR='../../build/include')
@@ -106,14 +101,6 @@ clean:
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
 #
-	-(cd pdp/scaf;$(MAKE) clean)
-	-(cd pdp/scaf;$(MAKE) mrproper)
-	-(cd pdp;$(MAKE) clean)
-	-(cd pdp;rm -rf configure \
-	            config.log \
-	            config.status \
-	            autom4te.cache \
-	            Makefile.config)
 #  Clean cyclone
 #
 	(cd miXed/cyclone; make clean)
@@ -157,11 +144,6 @@ install: build
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
 	install -m 644 OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
-	# install pdp (needs /usr/lib/extern)
-
-	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs
-	(cd pdp;make prefix=$(CURDIR)/debian/tmp/usr/ install)
-
 	# Install cyclone
 
 	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
@@ -182,10 +164,6 @@ install: build
 	# A good thought to move references to their right place, but finally, 
 	# this doesn't work, so move abstractions that are used by references
 	# back to their right place  ... damn.
-
-	(cd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference;\
-	 mv help-pdp_help_input.pd pdp_help_input.pd;\
-	 mv  help-pdp_help_output.pd  pdp_help_output.pd; )
 
 
 # Build architecture-independent files here.
