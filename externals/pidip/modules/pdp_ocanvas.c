@@ -53,6 +53,7 @@ typedef struct pdp_ocanvas_struct
     t_int *x_heights;
     t_float *x_xoffsets;
     t_float *x_yoffsets;
+    t_float *x_alphas;
     t_int *x_sizes;
 
     t_int x_owidth;
@@ -105,7 +106,7 @@ static void pdp_ocanvas_process_yv12(t_pdp_ocanvas *x)
                piU = idata+x->x_sizes[ii]+(x->x_sizes[ii]>>2);
                ppx = px-(int)x->x_xoffsets[ii];
                ppy = py-(int)x->x_yoffsets[ii];
-               *(pY+py*x->x_owidth+px) += *(piY+ppy*x->x_widths[ii]+ppx);
+               *(pY+py*x->x_owidth+px) += *(piY+ppy*x->x_widths[ii]+ppx)*x->x_alphas[ii];
                if ( (px%2==0) && (py%2==0) )
                {
                  *(pU+(py>>1)*(x->x_owidth>>1)+(px>>1)) +=
@@ -173,6 +174,21 @@ static void pdp_ocanvas_offset(t_pdp_ocanvas *x, t_floatarg ni, t_floatarg xoffs
   }
   x->x_xoffsets[(int)ni-1] = xoffset;
   x->x_yoffsets[(int)ni-1] = yoffset;
+}
+
+static void pdp_ocanvas_alpha(t_pdp_ocanvas *x, t_floatarg ni, t_floatarg xalpha)
+{
+  if ( ( ni < 1 ) || ( ni > x->x_nbinputs ) )
+  {
+     post( "pdp_ocanvas : alpha : wrong source : %d : must be between 1 and %d", ni, x->x_nbinputs );
+     return;
+  }
+  if ( ( xalpha < .0 ) || ( xalpha > 1.0 ) )
+  {
+     post( "pdp_ocanvas : alpha : wrong alpha value : %f : must be between 0 and 1", xalpha );
+     return;
+  }
+  x->x_alphas[(int)ni-1] = xalpha;
 }
 
 static void pdp_ocanvas_select(t_pdp_ocanvas *x, t_floatarg X, t_floatarg Y)
@@ -324,6 +340,7 @@ static void pdp_ocanvas_free(t_pdp_ocanvas *x)
   if ( x->x_sizes ) freebytes( x->x_sizes, x->x_nbinputs*sizeof(t_int) );
   if ( x->x_xoffsets ) freebytes( x->x_xoffsets, x->x_nbinputs*sizeof(t_float) );
   if ( x->x_yoffsets ) freebytes( x->x_yoffsets, x->x_nbinputs*sizeof(t_float) );
+  if ( x->x_alphas ) freebytes( x->x_alphas, x->x_nbinputs*sizeof(t_float) );
 }
 
 t_class *pdp_ocanvas_class;
@@ -381,6 +398,7 @@ void *pdp_ocanvas_new(t_symbol *s, int argc, t_atom *argv)
   x->x_sizes = ( t_int* ) getbytes( x->x_nbinputs*sizeof(t_int) );
   x->x_xoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
   x->x_yoffsets = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
+  x->x_alphas = ( t_float* ) getbytes( x->x_nbinputs*sizeof(t_float) );
 
   x->x_opacket = pdp_packet_new_image_YCrCb( x->x_owidth, x->x_oheight );
 
@@ -391,6 +409,7 @@ void *pdp_ocanvas_new(t_symbol *s, int argc, t_atom *argv)
     x->x_packets[ii] = -1;
     x->x_xoffsets[ii] = 0.;
     x->x_yoffsets[ii] = 0.;
+    x->x_alphas[ii] = 1.;
   }
   x->x_current = -1;
   x->x_average = 0;
@@ -426,6 +445,7 @@ void pdp_ocanvas_setup(void)
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_input8, gensym("pdp8"), A_SYMBOL, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_input9, gensym("pdp9"), A_SYMBOL, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_offset, gensym("offset"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+  class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_alpha, gensym("alpha"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_select, gensym("select"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_drag, gensym("drag"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_ocanvas_class, (t_method)pdp_ocanvas_unselect, gensym("unselect"), A_NULL);

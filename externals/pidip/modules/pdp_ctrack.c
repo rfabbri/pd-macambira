@@ -86,8 +86,8 @@ typedef struct pdp_ctrack_struct
     t_outlet *x_x2; // output x2 coordinate of block which has been detected
     t_outlet *x_y2; // output y2 coordinate of block which has been detected
     t_outlet *x_R;  // output R component of selected color
-    t_outlet *x_G;  // output R component of selected color
-    t_outlet *x_B;  // output R component of selected color
+    t_outlet *x_G;  // output G component of selected color
+    t_outlet *x_B;  // output B component of selected color
 
     t_canvas *x_canvas;
 

@@ -441,9 +441,18 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                oheight = x->x_avcontext->streams[i]->codec.height;
 
                if (x->x_img_resample_ctx) img_resample_close(x->x_img_resample_ctx);
+		
+#if LIBAVCODEC_BUILD > 4715	
+               x->x_img_resample_ctx = img_resample_full_init(
+                              owidth, oheight, 
+                              x->x_vwidth, x->x_vheight, 
+                              0, 0, 0, 0,
+                              0, 0, 0, 0);
+#else
                x->x_img_resample_ctx = img_resample_full_init(
                               owidth, oheight, 
                               x->x_vwidth, x->x_vheight, 0, 0, 0, 0);
+#endif
                  
                size = avpicture_get_size(x->x_avcontext->streams[i]->codec.pix_fmt, 
                                          owidth, oheight );
@@ -472,6 +481,9 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
              // encode and send the picture
              {
                AVFrame aframe;
+#if LIBAVCODEC_BUILD > 4715	
+               AVPacket vpkt;
+#endif
                t_int fsize, ret;
                 
                  memset(&aframe, 0, sizeof(AVFrame));
@@ -482,7 +494,21 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                  fsize = avcodec_encode_video(&x->x_avcontext->streams[i]->codec,
                              x->x_video_buffer, VIDEO_BUFFER_SIZE,
                              &aframe);
+
+#if LIBAVCODEC_BUILD > 4715	
+                 av_init_packet(&vpkt);
+
+                 vpkt.pts = aframe.pts;
+                 if((&x->x_avcontext->streams[i]->codec)->coded_frame->key_frame) 
+                        vpkt.flags |= PKT_FLAG_KEY;
+                 vpkt.stream_index= i;
+                 vpkt.data= (uint8_t *)x->x_video_buffer;
+                 vpkt.size= fsize;
+
+                 if ( ( ret = av_write_frame( x->x_avcontext, &vpkt) ) < 0 )
+#else
                  if ( ( ret = av_write_frame( x->x_avcontext, i, x->x_video_buffer, fsize) ) < 0 )
+#endif
                  {
                     post ("pdp_ffmpeg~ : error : could not send frame : (ret=%d)", ret );
                     return;
@@ -549,10 +575,26 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                     while (fifo_read(&x->x_audio_fifo[saudioindex], (uint8_t*)pencbuf, framebytes,
                                      &x->x_audio_fifo[saudioindex].rptr) == 0) 
                     {
+#if LIBAVCODEC_BUILD > 4715	
+                      AVPacket apkt;
+#endif
                          encsize = avcodec_encode_audio(&x->x_avcontext->streams[i]->codec, 
                                        (uint8_t*)&x->x_audio_out, sizeof(x->x_audio_out),
                                        (short *)pencbuf);
+#if LIBAVCODEC_BUILD > 4715	
+                         av_init_packet(&apkt);
+
+                         apkt.pts = etime.tv_sec*1000000 + etime.tv_usec;
+                         if((&x->x_avcontext->streams[i]->codec)->coded_frame->key_frame) 
+                                  apkt.flags |= PKT_FLAG_KEY;
+                         apkt.stream_index= i;
+                         apkt.data= (uint8_t *)x->x_audio_out;
+                         apkt.size= encsize;
+                         
+                         av_write_frame(x->x_avcontext, &apkt);
+#else
                          av_write_frame(x->x_avcontext, i, x->x_audio_out, encsize);
+#endif
                     }
                     saudioindex++;
                  }

@@ -7,6 +7,7 @@ IMLIB_CFLAGS = @IMLIB_CFLAGS@
 IMLIB_LIBS = @IMLIB_LIBS@
 MAGICK_CFLAGS = @MAGICK_CFLAGS@
 MAGICK_LIBS = @MAGICK_LIBS@
+THEORA_LIBS = @THEORA_LIBS@
 PDP_PIDIP_INCLUDES =  @PDP_PIDIP_INCLUDES@
 PDP_PIDIP_VERSION = @PDP_PIDIP_VERSION@
 MPEG4IP_CFLAGS = @MPEG4IP_CFLAGS@
@@ -35,7 +36,7 @@ pdp_pidip_all:
 
 pidip.pd_linux: pdp_pidip_all
 	rm -f pidip.pd_linux
-	g++ -export_dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(MAGICK_LIBS)
+	g++ -export_dynamic -shared -o pidip.pd_linux modules/*.o system/*.o $(THEORA_LIBS) $(PDP_PIDIP_LIBS) $(IMLIB_LIBS) $(MAGICK_LIBS)
 	strip --strip-unneeded pidip.pd_linux
 
 clean:
@@ -43,6 +44,7 @@ clean:
 	rm -f pidip.pd_linux
 
 install:
+	if test ! -d /usr/X11R6/lib/X11/fonts/TTF; then mkdir /usr/X11R6/lib/X11/fonts/TTF; fi
 	cp fonts/* /usr/X11R6/lib/X11/fonts/TTF
 	cp -f --remove-destination doc/* $(PD_DIR)/doc/5.reference
 

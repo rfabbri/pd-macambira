@@ -64,6 +64,16 @@ extern "C"
     void pdp_shape_setup(void);
     void pdp_spotlight_setup(void);
     void pdp_colorgrid_setup(void);
+    void pdp_binary_setup(void);
+    void pdp_erode_setup(void);
+    void pdp_dilate_setup(void);
+    void pdp_hitandmiss_setup(void);
+    void pdp_disintegration_setup(void);
+    void pdp_distance_setup(void);
+    void pdp_theorin_tilde_setup(void);
+    void pdp_theorout_tilde_setup(void);
+    void pdp_cropper_setup(void);
+    void pdp_background_setup(void);
 
 #ifdef HAVE_PIDIP_FFMPEG
     void pdp_ffmpeg_tilde_setup(void);
@@ -135,6 +145,16 @@ void pidip_setup(void){
     pdp_shape_setup();
     pdp_spotlight_setup();
     pdp_colorgrid_setup();
+    pdp_binary_setup();
+    pdp_erode_setup();
+    pdp_dilate_setup();
+    pdp_hitandmiss_setup();
+    pdp_disintegration_setup();
+    pdp_distance_setup();
+    pdp_theorin_tilde_setup();
+    pdp_theorout_tilde_setup();
+    pdp_cropper_setup();
+    pdp_background_setup();
 
 #ifdef HAVE_PIDIP_FFMPEG
     pdp_ffmpeg_tilde_setup();

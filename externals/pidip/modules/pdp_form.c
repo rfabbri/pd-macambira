@@ -74,6 +74,7 @@ typedef struct pdp_form_struct
     t_int x_nbforms;
     t_int x_current;
     t_int x_capacity;
+    t_float x_alpha;
 
         /* imlib data */
     Imlib_Image x_image;
@@ -312,6 +313,14 @@ static void pdp_form_delete(t_pdp_form *x,  t_floatarg fnum  )
     }
 }
 
+static void pdp_form_alpha(t_pdp_form *x, t_floatarg falpha )
+{
+    if ( ( falpha  >= 0. ) && ( falpha  <= 1. ) )
+    {
+       x->x_alpha = falpha;
+    }
+}
+
 static void pdp_form_resize(t_pdp_form *x,  t_floatarg fnewsize  )
 {
   t_form *forms;
@@ -448,11 +457,11 @@ static void pdp_form_process_yv12(t_pdp_form *x)
             u = yuv_RGBtoU(imdata[py*x->x_vwidth+px]);
             v = yuv_RGBtoV(imdata[py*x->x_vwidth+px]);
           
-            *(pY) = y<<7;
+            *(pY) = (y<<7)*x->x_alpha + (*pY)*(1-x->x_alpha);
             if ( (px%2==0) && (py%2==0) )
             {
-              *(pV) = (v-128)<<8;
-              *(pU) = (u-128)<<8;
+              *(pV) = ((v-128)<<8)*x->x_alpha + (*pV)*(1-x->x_alpha);
+              *(pU) = ((u-128)<<8)*x->x_alpha + (*pU)*(1-x->x_alpha);
             }
           }
           pY++;
@@ -549,6 +558,7 @@ void *pdp_form_new(void)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("r"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("g"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("b"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("alpha"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
     x->x_packet0 = -1;
@@ -567,6 +577,7 @@ void *pdp_form_new(void)
 
     x->x_nbforms = 0;
     x->x_current = -1;
+    x->x_alpha = 1.;
 
     return (void *)x;
 }
@@ -601,6 +612,7 @@ void pdp_form_setup(void)
     class_addmethod(pdp_form_class, (t_method)pdp_form_clear, gensym("clear"),  A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_delete, gensym("delete"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_form_class, (t_method)pdp_form_resize, gensym("resize"),  A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_form_class, (t_method)pdp_form_alpha, gensym("alpha"),  A_DEFFLOAT, A_NULL);
     class_sethelpsymbol( pdp_form_class, gensym("pdp_form.pd") );
 
 }

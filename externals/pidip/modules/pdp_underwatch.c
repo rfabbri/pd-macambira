@@ -73,18 +73,11 @@ static void pdp_underwatch_process_yv12(t_pdp_underwatch *x)
     short int *p=0, *po=0, *pu=0, *pv=0, *pou=0, *pov=0;
     int       i;
 
-    unsigned int u_offset;
-    unsigned int v_offset;
-    unsigned int totnbpixels;
     int px, py, pd, t;
 
     x->x_vwidth = header->info.image.width;
     x->x_vheight = header->info.image.height;
     x->x_vsize = x->x_vwidth*x->x_vheight;
-
-    u_offset = x->x_vsize;
-    v_offset = x->x_vsize + (x->x_vsize>>2);
-    totnbpixels = x->x_vsize + (x->x_vsize>>1);
 
     newheader->info.image.encoding = header->info.image.encoding;
     newheader->info.image.width = x->x_vwidth;

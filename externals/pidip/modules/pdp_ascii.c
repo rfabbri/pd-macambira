@@ -27,6 +27,7 @@
 #include "yuv.h"
 #include "default.map"
 #include <math.h>
+#include <stdio.h>
 
 #define LINE_MAX_LENGTH 1024
 

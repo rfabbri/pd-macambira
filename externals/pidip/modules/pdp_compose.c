@@ -61,7 +61,9 @@ typedef struct pdp_compose_struct
     t_float x_f;
 
     t_int x_packet0;
+    t_int x_packet1;
     t_int x_dropped;
+    t_int x_queue_id;
 
     t_int x_vwidth;
     t_int x_vheight;
@@ -228,6 +230,8 @@ static void pdp_compose_process_yv12(t_pdp_compose *x)
 {
     t_pdp     *header = pdp_packet_header(x->x_packet0);
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
+    t_pdp     *newheader = pdp_packet_header(x->x_packet1);
+    short int *newdata   = (short int *)pdp_packet_data(x->x_packet1);
     t_int     i, cf;
     t_int     px=0, py=0, ppx=0, ppy=0, found=0, xcell=0, ycell=0; 
     t_int     celldiff=0, cellwidth=0, cellheight=0;
@@ -285,9 +289,9 @@ static void pdp_compose_process_yv12(t_pdp_compose *x)
     pfY = x->x_frame;
     pfV = x->x_frame+x->x_vsize;
     pfU = x->x_frame+x->x_vsize+(x->x_vsize>>2);
-    pdY = data;
-    pdV = data+x->x_vsize;
-    pdU = data+x->x_vsize+(x->x_vsize>>2);
+    pdY = newdata;
+    pdV = newdata+x->x_vsize;
+    pdU = newdata+x->x_vsize+(x->x_vsize>>2);
     prY = x->x_right_frame;
     prV = x->x_right_frame+x->x_vsize;
     prU = x->x_right_frame+x->x_vsize+(x->x_vsize>>2);
@@ -326,9 +330,16 @@ static void pdp_compose_process_yv12(t_pdp_compose *x)
        }
     }
 
-    pdp_packet_pass_if_valid(x->x_pdp_output, &x->x_packet0);
-
     return;
+}
+
+static void pdp_compose_sendpacket(t_pdp_compose *x)
+{
+    pdp_packet_mark_unused(x->x_packet0);
+    x->x_packet0=-1;
+
+    /* unregister and propagate if valid dest packet */
+    pdp_packet_pass_if_valid(x->x_pdp_output, &x->x_packet1);
 }
 
 static void pdp_compose_process(t_pdp_compose *x)
@@ -344,7 +355,8 @@ static void pdp_compose_process(t_pdp_compose *x)
 	switch(pdp_packet_header(x->x_packet0)->info.image.encoding){
 
 	case PDP_IMAGE_YV12:
-            pdp_compose_process_yv12(x);
+            x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
+            pdp_queue_add(x, pdp_compose_process_yv12, pdp_compose_sendpacket, &x->x_queue_id);
 	    break;
 
 	case PDP_IMAGE_GREY:
@@ -365,20 +377,24 @@ static void pdp_compose_input_1(t_pdp_compose *x, t_symbol *s, t_floatarg f)
 {
   short int *rightdata   = (short int *)pdp_packet_data((int)f);
 
-    if (s== gensym("register_rw")) memcpy(x->x_right_frame, rightdata, (x->x_vsize + (x->x_vsize>>1))<<1 );
+    if ( s== gensym("register_rw") )  
+    {
+      memcpy(x->x_right_frame, rightdata, (x->x_vsize + (x->x_vsize>>1))<<1 );
+    }
+
+    pdp_packet_mark_unused( (int)f );
 }
 
 static void pdp_compose_input_0(t_pdp_compose *x, t_symbol *s, t_floatarg f)
 {
-    /* if this is a register_ro message or register_rw message, register with packet factory */
-
-    if (s== gensym("register_rw"))
+    if ( s== gensym("register_rw") )
+    {
        x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("image/YCrCb/*") );
+    }
 
-    if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped)){
-
+    if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped))
+    {
         pdp_compose_process(x);
-
     }
 }
 
@@ -386,7 +402,8 @@ static void pdp_compose_free(t_pdp_compose *x)
 {
   int i;
 
-    pdp_packet_mark_unused(x->x_packet0);
+    pdp_queue_finish(x->x_queue_id);
+    pdp_packet_mark_unused(x->x_packet1);
     pdp_compose_free_ressources( x );
 }
 
@@ -416,6 +433,8 @@ void *pdp_compose_new(void)
     x->x_colorV = (yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
 
     x->x_packet0 = -1;
+    x->x_packet1 = -1;
+    x->x_queue_id = -1;
 
     x->x_cursX = -1;
     x->x_cursY = -1;

@@ -182,7 +182,7 @@ static void pdp_o_smoothe(t_pdp_o *x, short int *source, t_int size )
 static int pdp_o_huffman(t_pdp_o *x, char *source, char *dest, t_int size, t_int *csize )
 {
   t_int i;
-  char value = source[0];
+  int value = source[0];
   char count = 0;
   t_int tcount=0;
   char *pcount=dest;
@@ -198,14 +198,14 @@ static int pdp_o_huffman(t_pdp_o *x, char *source, char *dest, t_int size, t_int
       }
       else
       {
-        value=source[i];
         *(pcount)=count;
         *(pvalue) = value;
         tcount+=count;
-        count=1;
         pcount+=2;
         pvalue+=2;
         *(csize)+=2;
+        value=source[i];
+        count=1;
       }
    }
    *(pcount)=count;
@@ -221,7 +221,7 @@ static int pdp_o_huffman(t_pdp_o *x, char *source, char *dest, t_int size, t_int
    else
    {
       // post( "pdp_o : huffman : compression ratio %d/%d : %f (total count=%d)", size, (*csize), 
-      //                  (t_float)size/(t_float)(*csize), tcount );
+      //                   (t_float)size/(t_float)(*csize), tcount );
       return HUFFMAN;
    }
 }
@@ -349,7 +349,8 @@ static void pdp_o_process_yv12(t_pdp_o *x)
           {
              // post( "pdp_o : y value out of range : %d", downvalue );
           }
-          if ( data[i] != x->x_previous_frame[i] )
+          if ( ( data[i] != x->x_previous_frame[i] ) ||
+               ( !strcmp( x->x_hpacket.tag, PDP_PACKET_TAG ) ) )
           {
              x->x_diff_frame[i] = (char)downvalue;
           }
@@ -368,7 +369,8 @@ static void pdp_o_process_yv12(t_pdp_o *x)
           {
              // post( "pdp_o : y value out of range : %d", downvalue );
           }
-          if ( data[i] != x->x_previous_frame[i] )
+          if ( ( data[i] != x->x_previous_frame[i] ) ||
+               ( !strcmp( x->x_hpacket.tag, PDP_PACKET_TAG ) ) )
           {
              x->x_diff_frame[i] = (char)downvalue;
           }
@@ -378,8 +380,8 @@ static void pdp_o_process_yv12(t_pdp_o *x)
           }
       }
 
-      x->x_hpacket.width = x->x_vwidth;
-      x->x_hpacket.height = x->x_vheight;
+      x->x_hpacket.width = htonl(x->x_vwidth);
+      x->x_hpacket.height = htonl(x->x_vheight);
       if ( gettimeofday(&x->x_hpacket.etime, NULL) == -1)
       {
         post("pdp_o : could not set emit time" );
@@ -391,13 +393,16 @@ static void pdp_o_process_yv12(t_pdp_o *x)
          x->x_bandwidthcount = 0;
       }
 
+      x->x_hpacket.etime.tv_sec = htonl( x->x_hpacket.etime.tv_sec );
+      x->x_hpacket.etime.tv_usec = htonl( x->x_hpacket.etime.tv_usec );
+
       // do not send the frame if too many frames 
       // have been sent in the current second
       if ( x->x_secondcount < x->x_framerate )
       {
 
         // try a huffman coding
-        x->x_hpacket.encoding = pdp_o_huffman(x, x->x_diff_frame, x->x_hdata, x->x_vsize+(x->x_vsize>>1), &x->x_hsize );
+        x->x_hpacket.encoding = htonl( pdp_o_huffman(x, x->x_diff_frame, x->x_hdata, x->x_vsize+(x->x_vsize>>1), &x->x_hsize ) );
 
         x->x_hpacket.clength = (x->x_vsize+(x->x_vsize>>1))*1.01+600;
         // compress the graphic data
@@ -415,6 +420,7 @@ static void pdp_o_process_yv12(t_pdp_o *x)
           memcpy( x->x_previous_frame, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
    
           // send header
+          x->x_hpacket.clength = htonl( x->x_hpacket.clength );
           count = send(x->x_fd, &x->x_hpacket, sizeof(x->x_hpacket), MSG_NOSIGNAL);
           if(count < 0)
           {
@@ -430,6 +436,7 @@ static void pdp_o_process_yv12(t_pdp_o *x)
             }
             x->x_bandwidthcount += count/1024;
           }
+          x->x_hpacket.clength = ntohl( x->x_hpacket.clength );
   
           // send data
           count = send(x->x_fd, x->x_cdata, x->x_hpacket.clength, MSG_NOSIGNAL);

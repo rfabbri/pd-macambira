@@ -445,8 +445,8 @@ static t_int *pdp_rec_perform(t_int *w)
        if (fsample < -1.0) { fsample = -1.0; }
        isample=(short) (32767.0 * fsample);
        x->x_audio_buf[1][x->x_audioin_position]=isample;
-       x->x_audioin_position=(x->x_audioin_position+1)%(2*MAX_AUDIO_PACKET_SIZE);
-       if ( x->x_audioin_position == 2*MAX_AUDIO_PACKET_SIZE-1 )
+       x->x_audioin_position=(x->x_audioin_position+1)%(MAX_AUDIO_PACKET_SIZE);
+       if ( x->x_audioin_position == MAX_AUDIO_PACKET_SIZE-1 )
        {
           post( "pdp_rec~ : reaching end of audio buffer" );
        }
@@ -624,6 +624,7 @@ static void pdp_rec_free(t_pdp_rec *x)
     pdp_packet_mark_unused(x->x_packet0);
     // close video file if existing
     pdp_rec_close(x);
+    pdp_rec_free_ressources(x);
     for ( i=0; i<x->x_channels; i++)
     {
        if ( x->x_audio_buf[i] ) freebytes( x->x_audio_buf[i], MAX_AUDIO_PACKET_SIZE*sizeof(int16_t) );

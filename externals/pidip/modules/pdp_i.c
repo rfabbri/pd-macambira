@@ -178,7 +178,7 @@ static void pdp_i_recv(t_pdp_i *x)
    t_hpacket *pheader;
 
      if ( ( ret = recv(x->x_socket, (void*) (x->x_inbuffer + x->x_inwriteposition), 
-                (size_t)((x->x_inbuffersize-x->x_inwriteposition)), 
+                (size_t)((x->x_inbuffersize-x->x_inwriteposition-1)), 
                 MSG_NOSIGNAL) ) < 0 )
      {
         post( "pdp_i : receive error" );
@@ -189,7 +189,7 @@ static void pdp_i_recv(t_pdp_i *x)
      {
         // post( "pdp_i : received %d bytes at %d on %d ( up to %d)", 
         //        ret, x->x_inwriteposition, x->x_socket,
-        //        x->x_inbuffersize-x->x_inwriteposition*sizeof( unsigned long) );
+        //        x->x_inbuffersize-x->x_inwriteposition );
 
         if ( ret == 0 ) 
         {
@@ -197,29 +197,34 @@ static void pdp_i_recv(t_pdp_i *x)
            outlet_float( x->x_connection_status, 0 );
            pdp_i_closesocket( x->x_socket ); 
            sys_rmpollfn(x->x_socket);
+           post( "pdp_i : lost the connection." );
            x->x_socket = -1;
         }
         else
         { 
            // check we don't overflow input buffer
-           if ( x->x_inwriteposition+ret >= x->x_inbuffersize )
+           if ( x->x_inwriteposition+ret >= x->x_inbuffersize/2 )
            {
               post( "pdp_i : too much input...resetting" );
               x->x_inwriteposition=0;
+              memset( (char*) x->x_inbuffer, 0x00, x->x_inbuffersize );
               return;
            }
            x->x_inwriteposition += ret;
-           if ( pheader = (t_hpacket*) strstr( (char*) x->x_inbuffer, PDP_PACKET_START ) )
+           if ( ( ( pheader = (t_hpacket*) strstr( (char*) x->x_inbuffer, PDP_PACKET_START ) ) != NULL ) ||
+                ( ( pheader = (t_hpacket*) strstr( (char*) x->x_inbuffer, PDP_PACKET_DIFF ) ) != NULL ) )
            {
              // check if a full packet is present
-             if ( x->x_inwriteposition >= (int)((char*)pheader - (char*)(x->x_inbuffer)) + (int)sizeof(t_hpacket) + (int)pheader->clength )
+             if ( x->x_inwriteposition >= 
+                  (int)((char*)pheader - (char*)(x->x_inbuffer)) +
+                        (int)sizeof(t_hpacket) + (int)ntohl(pheader->clength) )
              {
-                if ( ( x->x_vwidth != pheader->width ) ||
-                     ( x->x_vheight != pheader->height ) )
+                if ( ( x->x_vwidth != (t_int)ntohl(pheader->width) ) ||
+                     ( x->x_vheight != (t_int)ntohl(pheader->height) ) )
                 {
                    pdp_i_free_ressources(x);
-                   x->x_vheight = pheader->height;
-                   x->x_vwidth = pheader->width;
+                   x->x_vheight = ntohl(pheader->height);
+                   x->x_vwidth = ntohl(pheader->width);
                    x->x_vsize = x->x_vheight*x->x_vwidth;
                    pdp_i_allocate(x);
                    post( "pdp_i : allocated buffers : vsize=%d : hsize=%d", x->x_vsize, x->x_hsize );
@@ -230,18 +235,18 @@ static void pdp_i_recv(t_pdp_i *x)
                 x->x_data = (short int *)pdp_packet_data(x->x_packet);
                 memcpy( x->x_data, x->x_bdata, x->x_bsize );
 
-                // post( "pdp_i : decompress %d in %d bytes", pheader->clength, x->x_hsize );
+                // post( "pdp_i : decompress %d in %d bytes", ntohl(pheader->clength), x->x_hsize );
                 x->x_bzsize = x->x_hsize;
 
                 if ( ( ret = BZ2_bzBuffToBuffDecompress( (char*)x->x_hdata,
                                             &x->x_bzsize,
 					    (char *) pheader+sizeof(t_hpacket),
-					    pheader->clength,
+					    ntohl(pheader->clength),
 					    0, 0 ) ) == BZ_OK ) 
                 {
-                     // post( "pdp_i : bz2 decompression (%d)->(%d)", pheader->clength, x->x_bzsize );
+                     // post( "pdp_i : bz2 decompression (%d)->(%d)", ntohl(pheader->clength), x->x_bzsize );
 
-                     switch( pheader->encoding )
+                     switch( ntohl(pheader->encoding) )
                      {
                         case REGULAR :
                           memcpy( x->x_ddata, x->x_hdata, x->x_bzsize ); 
@@ -285,8 +290,8 @@ static void pdp_i_recv(t_pdp_i *x)
                      x->x_header->info.image.width = x->x_vwidth;
                      x->x_header->info.image.height = x->x_vheight;
 
-		     pdp_packet_pass_if_valid(x->x_pdp_output, &x->x_packet); 
                      // post( "pdp_i : propagate packet : %d", x->x_packet );
+		     pdp_packet_pass_if_valid(x->x_pdp_output, &x->x_packet); 
                      outlet_float( x->x_frames, ++x->x_framesreceived );
                 }
                 else
@@ -297,8 +302,20 @@ static void pdp_i_recv(t_pdp_i *x)
                 memcpy( x->x_bdata, x->x_data, x->x_bsize );
 
                 // roll buffer
-                x->x_inwriteposition -= (int)((char*)pheader-(char*)(x->x_inbuffer)) + sizeof(t_hpacket) + pheader->clength;
-                memcpy( x->x_inbuffer, pheader+sizeof(t_hpacket) + pheader->clength, x->x_inwriteposition );
+                x->x_inwriteposition -= (int)((char*)pheader-(char*)(x->x_inbuffer)) + sizeof(t_hpacket) + ntohl(pheader->clength);
+                if ( x->x_inwriteposition > 0 )
+                {
+                  memcpy( x->x_inbuffer, pheader+sizeof(t_hpacket) + ntohl(pheader->clength), x->x_inwriteposition );
+                }
+                else
+                {
+                  x->x_inwriteposition = 0;
+                  memset( (char*) x->x_inbuffer, 0x00, x->x_inbuffersize );
+                }
+             }
+             else
+             {
+                // post( "pdp_i : not a full frame" );
              }
            }
         }

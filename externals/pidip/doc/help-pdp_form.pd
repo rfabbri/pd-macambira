@@ -21,12 +21,12 @@
 #X msg 357 139 stop;
 #X msg 442 170 open /dev/video;
 #X obj 252 167 pdp_yqt;
-#X obj 606 530 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 628 513 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 606 582 pdp_control;
-#X msg 606 555 thread \$1;
-#X floatatom 606 643 5 0 0 0 - - -;
-#X obj 606 614 route pdp_drop;
+#X obj 628 565 pdp_control;
+#X msg 628 538 thread \$1;
+#X floatatom 628 626 5 0 0 0 - - -;
+#X obj 628 597 route pdp_drop;
 #X text 222 631 written by Yves Degoyon (ydegoyon@free.fr);
 #X obj 189 362 hdl 15 1 0 10 empty empty empty 0 -6 0 8 -262144 -1
 -1 0;
@@ -59,6 +59,9 @@
 #X msg 179 333 ellipse 89 120 56 78 0 255 0;
 #X text 222 605 pdp_form : geometric forms addition in PDP;
 #X obj 144 562 pdp_form -----------------;
+#X obj 346 540 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 487 540 alpha ( global );
 #X connect 1 0 10 0;
 #X connect 2 0 16 0;
 #X connect 3 0 2 0;
@@ -94,3 +97,4 @@
 #X connect 48 0 51 0;
 #X connect 49 0 51 0;
 #X connect 51 0 0 0;
+#X connect 52 0 51 9;

@@ -60,6 +60,7 @@ typedef struct pdp_text_struct
     t_int *x_g;
     t_int *x_b;
     t_float *x_angle;
+    t_float x_alpha;
     t_int *x_scroll;
 
     t_int x_nbtexts;
@@ -154,7 +155,7 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
    {
       x->x_angle[x->x_nbtexts] = argv[6].a_w.w_float;
    }
-      if ( (argc>=8) && (argv[7].a_type == A_FLOAT) )
+   if ( (argc>=8) && (argv[7].a_type == A_FLOAT) )
    {
       x->x_scroll[x->x_nbtexts] = (int)argv[7].a_w.w_float;
    }
@@ -221,6 +222,14 @@ static void pdp_text_angle(t_pdp_text *x, t_floatarg fangle )
     if ( ( x->x_current  >= 0 ) && ( x->x_current  < x->x_nbtexts ) )
     {
        x->x_angle[ x->x_current ] = fangle;
+    }
+}
+
+static void pdp_text_alpha(t_pdp_text *x, t_floatarg falpha )
+{
+    if ( ( falpha  >= 0. ) && ( falpha <= 1. ) )
+    {
+       x->x_alpha = falpha;
     }
 }
 
@@ -456,11 +465,11 @@ static void pdp_text_process_yv12(t_pdp_text *x)
             u = yuv_RGBtoU(imdata[py*x->x_vwidth+px]);
             v = yuv_RGBtoV(imdata[py*x->x_vwidth+px]);
           
-            *(pY) = y<<7;
+            *(pY) = ((y)<<7)*x->x_alpha + (*pY)*(1-x->x_alpha);
             if ( (px%2==0) && (py%2==0) )
             {
-              *(pV) = (v-128)<<8;
-              *(pU) = (u-128)<<8;
+              *(pV) = ((v-128)<<8)*x->x_alpha + *(pV)*(1-x->x_alpha);
+              *(pU) = ((u-128)<<8)*x->x_alpha + *(pU)*(1-x->x_alpha);
             }
           }
           pY++;
@@ -557,6 +566,7 @@ void *pdp_text_new(void)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("textb"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("angle"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("scroll"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("alpha"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
     x->x_packet0 = -1;
@@ -585,6 +595,7 @@ void *pdp_text_new(void)
 
     x->x_nbtexts = 0;
     x->x_current = -1;
+    x->x_alpha = 1.;
 
     return (void *)x;
 }
@@ -618,6 +629,7 @@ void pdp_text_setup(void)
     class_addmethod(pdp_text_class, (t_method)pdp_text_resize, gensym("resize"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_font, gensym("font"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_angle, gensym("angle"),  A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_text_class, (t_method)pdp_text_alpha, gensym("alpha"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_scroll, gensym("scroll"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_dither, gensym("dither"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_text_class, (t_method)pdp_text_blend, gensym("blend"),  A_DEFFLOAT, A_NULL);

@@ -26,7 +26,7 @@
 #include "yuv.h"
 #include <math.h>
 
-static char   *pdp_shape_version = "pdp_shape: version 0.1, shape recongnition object written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *pdp_shape_version = "pdp_shape: version 0.1, shape recognition object written by Yves Degoyon (ydegoyon@free.fr)";
 
 typedef struct pdp_shape_struct
 {
@@ -79,15 +79,15 @@ static void pdp_shape_allocate(t_pdp_shape *x, t_int newsize)
 {
  int i;
 
-  if ( x->x_bdata ) freebytes( x->x_bdata, (( x->x_vsize + (x->x_vsize>>1))<<1));
-  if ( x->x_bbdata ) freebytes( x->x_bbdata, (( x->x_vsize + (x->x_vsize>>1))<<1));
-  if ( x->x_checked ) freebytes( x->x_checked, x->x_vsize );
+  if ( x->x_bdata ) free( x->x_bdata );
+  if ( x->x_bbdata ) free( x->x_bbdata );
+  if ( x->x_checked ) free( x->x_checked );
 
   x->x_vsize = newsize;
  
-  x->x_bdata = (short int *)getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
-  x->x_bbdata = (short int *)getbytes((( x->x_vsize + (x->x_vsize>>1))<<1));
-  x->x_checked = (char *)getbytes( x->x_vsize );
+  x->x_bdata = (short int *)malloc((( x->x_vsize + (x->x_vsize>>1))<<1));
+  x->x_bbdata = (short int *)malloc((( x->x_vsize + (x->x_vsize>>1))<<1));
+  x->x_checked = (char *)malloc( x->x_vsize );
 }
 
 static void pdp_shape_tolerance(t_pdp_shape *x, t_floatarg ftolerance )
@@ -451,12 +451,15 @@ static void pdp_shape_process_yv12(t_pdp_shape *x)
     if ( x->x_cursX != -1 ) pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
   
     // paint cursor in red for debug purpose
-    pbbY = x->x_bbdata;
-    pbbU = (x->x_bbdata+x->x_vsize);
-    pbbV = (x->x_bbdata+x->x_vsize+(x->x_vsize>>2));
-    *(pbbY+x->x_cursY*x->x_vwidth+x->x_cursX) = (yuv_RGBtoY( 0xff ))<<7;
-    *(pbbU+(x->x_cursY>>1)*(x->x_vwidth>>1)+(x->x_cursX>>1)) = ((yuv_RGBtoU( 0xff )-128)<<8); 
-    *(pbbV+(x->x_cursY>>1)*(x->x_vwidth>>1)+(x->x_cursX>>1)) = ((yuv_RGBtoV( 0xff )-128)<<8);
+    if ( x->x_cursX != -1 )
+    {
+      pbbY = x->x_bbdata;
+      pbbU = (x->x_bbdata+x->x_vsize);
+      pbbV = (x->x_bbdata+x->x_vsize+(x->x_vsize>>2));
+      *(pbbY+x->x_cursY*x->x_vwidth+x->x_cursX) = (yuv_RGBtoY( 0xff ))<<7;
+      *(pbbU+(x->x_cursY>>1)*(x->x_vwidth>>1)+(x->x_cursX>>1)) = ((yuv_RGBtoU( 0xff )-128)<<8); 
+      *(pbbV+(x->x_cursY>>1)*(x->x_vwidth>>1)+(x->x_cursX>>1)) = ((yuv_RGBtoV( 0xff )-128)<<8);
+    }
 
     memcpy( newdata, x->x_bbdata, (x->x_vsize+(x->x_vsize>>1))<<1 );
 

@@ -52,6 +52,7 @@ typedef struct pdp_pen_struct
     t_int x_blue;
     t_int x_xoffset;
     t_int x_yoffset;
+    t_float x_alpha;
     
     t_int x_pwidth;
     t_int x_mode;  // 0=draw ( default), 1=erase
@@ -317,6 +318,14 @@ static void pdp_pen_yoffset(t_pdp_pen *x, t_floatarg yoffset)
   x->x_yoffset = (int) yoffset;
 }
 
+static void pdp_pen_alpha(t_pdp_pen *x, t_floatarg falpha)
+{
+  if ( falpha >= 0. && falpha <= 1. )
+  {
+    x->x_alpha = falpha;
+  }
+}
+
 static void pdp_pen_mode(t_pdp_pen *x, t_floatarg mode)
 {
   if ( ( mode == 0. ) || ( mode == 1. ) )
@@ -394,11 +403,15 @@ static void pdp_pen_process_yv12(t_pdp_pen *x)
         {
           if ( *(pbY+(py-x->x_yoffset)*x->x_vwidth+(px-x->x_xoffset)) != 0 )
           {
-            *(pnY+py*x->x_vwidth+px) = *(pbY+(py-x->x_yoffset)*x->x_vwidth+(px-x->x_xoffset));
+            *(pnY+py*x->x_vwidth+px) = 
+                      (*(pbY+(py-x->x_yoffset)*x->x_vwidth+(px-x->x_xoffset))*x->x_alpha) +
+                           (*(pnY+py*x->x_vwidth+px)*(1-x->x_alpha));
             *(pnU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
-                  *(pbU+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1));
+                  (*(pbU+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1))*x->x_alpha) +
+                           (*(pnU+(py>>1)*(x->x_vwidth>>1)+(px>>1))*(1-x->x_alpha));
             *(pnV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
-                  *(pbV+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1));
+                  (*(pbV+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1))*x->x_alpha) +
+                           (*(pnV+(py>>1)*(x->x_vwidth>>1)+(px>>1))*(1-x->x_alpha));
           }
         }
       } 
@@ -482,6 +495,7 @@ void *pdp_pen_new(void)
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("xoffset"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("yoffset"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("alpha"));
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
@@ -498,6 +512,7 @@ void *pdp_pen_new(void)
 
     x->x_pwidth = 3;
     x->x_mode = 0;
+    x->x_alpha = 1.;
 
     return (void *)x;
 }
@@ -525,6 +540,7 @@ void pdp_pen_setup(void)
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_mode, gensym("mode"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_xoffset, gensym("xoffset"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_yoffset, gensym("yoffset"), A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_pen_class, (t_method)pdp_pen_alpha, gensym("alpha"), A_DEFFLOAT, A_NULL);
 
 }
 

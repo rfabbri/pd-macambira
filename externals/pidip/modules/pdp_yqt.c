@@ -237,7 +237,7 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
 
     if ( gettimeofday(&etime, NULL) == -1)
     {
-        post("pdp_fcqt : could not get time" );
+        post("pdp_yqt : could not get time" );
     }
     if ( etime.tv_sec != x->x_cursec )
     {
@@ -248,7 +248,6 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
     x->x_framescount++;
     
     outlet_float(x->x_curframe, (float)pos);
-    pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
     // fills in the audio buffer with a chunk if necessary
     if ( x->x_audio && x->x_outunread < MIN_AUDIO_INPUT )
@@ -284,6 +283,8 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
          }
        }
     }
+
+    pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
 }
 

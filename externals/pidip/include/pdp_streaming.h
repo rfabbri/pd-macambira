@@ -30,5 +30,5 @@ typedef struct _hpacket
   int width;
   int height;
   struct timeval etime; // valid until 2038
-  unsigned int clength;
+  int clength;
 } t_hpacket;
