@@ -18,8 +18,10 @@ avail | xovo | externals/grill
 
 # this code was imported by Hans and not maintained in CVS
 # so changes here would have to be merged
-unavail |  | externals/maxlib,externals/iemlib
-avail | eighthave | externals/maxlib,externals/iemlib
+unavail |  | externals/maxlib
+avail | eighthave,olafmatt | externals/maxlib
+unavail |  | externals/iemlib
+avail | eighthave,zmoelnig | externals/iemlib
 
 # restrict the MAIN branch of "pd" to prevent accidental 
 # commits that should go to devel_0_37 or impd_0_37
