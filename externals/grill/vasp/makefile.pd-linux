@@ -13,24 +13,24 @@ CONFIG=config-pd-linux.txt
 
 include ${CONFIG}
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a
 
 # compiler stuff
 INCLUDES=$(PDINC) 
-FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -fno-exceptions
-CFLAGS=-O6 ${UFLAGS} -fmove-all-movables -frerun-loop-opt
-#CFLAGS+=-funroll-loops -fmove-all-movables -freduce-all-givs -fschedule-insns2 -foptimize-register-move
+FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS 
+CFLAGS=-O2 ${UFLAGS} 
 LDFLAGS=-Wl,-s
-
-LIBS=m
+LIBS=flext
 
 
 ifdef FLEXT_SHARED
-CFLAGS+=-DFLEXT_SHARED
-LDFLAGS+=-Bdynamic
-LINKFLEXT=-lflext
+CFLAGS+=-shared -DFLEXT_SHARED
+
+ifeq ($(CXX),icc)
+LDFLAGS+=-i_dynamic
 else
-LINKFLEXT=$(FLEXTLIB)
+LDFLAGS+=-Wl,-Bdynamic
+endif
+
 endif
 
 
@@ -59,7 +59,7 @@ $(TARGDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
-	$(CXX) $(LDFLAGS) -shared $^ $(patsubst %,-l%,$(LIBS)) -L$(FLEXTPATH) $(LINKFLEXT) -o $@ 
+	$(CXX) $(LDFLAGS) -shared -o$@ $^ -L$(FLEXTPATH) $(patsubst %,-l%,$(LIBS))   
 	strip --strip-unneeded $@
 	chmod 755 $@
 

@@ -12,15 +12,23 @@ CONFIG=config-pd-linux.txt
 
 include $(CONFIG)
 
-FLEXTLIB=$(FLEXTPATH)/flext.a
-
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
-LIBPATH=
-FLAGS=-DPD 
-CFLAGS=-O6 -mcpu=pentiumpro
-#CFLAGS=-g
-LIBS=m util 
+FLAGS=-DFLEXT_SYS=2 
+CFLAGS=-O2 $(UFLAGS)
+LIBPATH=$(FLEXTPATH)
+LIBS=flext 
+
+ifdef FLEXT_SHARED
+CFLAGS+=-shared -DFLEXT_SHARED
+
+ifeq ($(CXX),icc)
+LDFLAGS+=-i_dynamic
+else
+LDFLAGS+=-Wl,-Bdynamic
+endif
+
+endif
 
 
 # ---------------------------------------------
@@ -49,8 +57,9 @@ $(TARGDIR):
 $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) -shared $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS))  
+	strip --strip-unneeded $@
 	chmod 755 $@
 
 $(INSTPATH):

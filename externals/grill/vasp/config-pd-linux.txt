@@ -10,7 +10,7 @@ PD=/usr/local/lib/pd
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include),
-# 	since gcc 3.2 complains about it
+# 	since gcc >= 3.2 complains about it
 PDINC=
 
 # where do the flext libraries reside?
@@ -32,7 +32,7 @@ HELPDIR=${PD}/doc/5.reference
 # additional compiler flags
 # (check if they fit to your system!)
 # UFLAGS=-mcpu=pentium3 -msse -mfpmath=sse -fprefetch-loop-arrays
-UFLAGS=-mcpu=pentiumpro
+# UFLAGS=-mcpu=pentiumpro
 
 # define to link against shared flext library (flext version >= 0.5.0)
 #FLEXT_SHARED=1

@@ -7,7 +7,7 @@
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
-# 	since gcc 3.2 complains about it
+# 	since gcc >= 3.2 complains about it
 PDPATH=
 
 # where do the flext libraries reside?
@@ -20,5 +20,9 @@ TARGDIR=./pd-linux
 # (leave blank to omit installation)
 INSTPATH=/usr/local/lib/pd/extra
 
+# user defined compiler flags
+UFLAGS=
 
+# define for shared build
+# FLEXT_SHARED=1
 
