@@ -59,7 +59,7 @@ the parameters for each direction.;
 #X obj 309 527 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 1 10
 -233017 -1 -1 0 256;
 #X text 213 14 -- control force-feedback friction effect;
-#X obj 195 599 ff-friction 1 2000 0.5 0.5 0 0.1;
+#X obj 195 599 ff-friction 0 2000 0.5 0.5 0 0.1;
 #X msg 93 503 bang;
 #X msg 84 582 stop;
 #X text 32 483 start the effect;

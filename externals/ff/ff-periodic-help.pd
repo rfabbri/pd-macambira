@@ -8,7 +8,7 @@
 #X text 188 204 waveform phase in degrees;
 #X text 10 458 start the effect;
 #X text 15 474 with a;
-#X obj 319 573 ff-periodic 1 0 0 0.5;
+#X obj 319 573 ff-periodic 0 0 0 0.5;
 #X text 505 473 direction in degrees;
 #X text 547 511 duration in ms \, 0 is infinite;
 #X text 625 554 level \, range = [-1 \, 1];
