@@ -206,6 +206,7 @@ CHANGES
 	  -Some changes to k_cext to link with functions defined in k_cext, which wasn't possible
            before. (for Windows). (Tim Blechmann)
 	  -Added code to make it possible to use strings again. See help-strings.pd.
+	  -Fixed horrible bug that sometime caused FLOAT k_cfuncs to crash PD.
 
 	0.2.5 -> 0.3.0:
 	-Added the k_cfunc object. k_cfunc is very similar to k_cext, but instead of being triggered
