@@ -66,12 +66,14 @@ void ifeel_playcommand(t_ifeel *x) {
 /*   const struct timespec *requested_time; */
 /*   struct timespec *remaining; */
 
+#ifdef __linux__
   if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
     post("x->x_fd: %d",x->x_fd);
     post("level: %d   interval: %d   count: %d",x->x_ifeel_command.strength,x->x_ifeel_command.delay,x->x_ifeel_command.count);
     post("ERROR %s", strerror(errno));
     close(x->x_fd);  
   }
+#endif
 
   DEBUG(
   post("level: %d   interval: %d   count: %d",x->x_ifeel_command.strength,x->x_ifeel_command.delay,x->x_ifeel_command.count);
@@ -169,6 +171,11 @@ void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_float
   post ("As I write cross-platform versions, the interface might have to change.");
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
   post("");
+#ifndef __linux__
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+	post("     This is a dummy, since this object only works with a Linux kernel!");
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+#endif
   
   /* 
    * init to zero so I can use the ifeel_* methods to set the 

@@ -6,7 +6,9 @@
 #include "m_imp.h"
 #endif
 
+#ifdef __gnu_linux__
 #include <linux/input.h>
+#endif
 
 #include <sys/stat.h>
 
@@ -18,8 +20,8 @@
 #include <unistd.h>
 
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
@@ -32,7 +34,7 @@
 #define LONG(x) ((x)/BITS_PER_LONG)
 #define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
 
-
+#ifdef __gnu_linux__
 char *events[EV_MAX + 1] = { "Reset", "Key", "Relative", "Absolute", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL, NULL, NULL, "LED", "Sound", NULL, "Repeat", "ForceFeedback", NULL, "ForceFeedbackStatus"};
 char *keys[KEY_MAX + 1] = { "Reserved", "Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Minus", "Equal", "Backspace",
@@ -79,6 +81,8 @@ char *sounds[SND_MAX + 1] = { "Bell", "Click" };
 
 char **names[EV_MAX + 1] = { events, keys, relatives, absolutes, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL, NULL, leds, sounds, NULL, repeats, NULL, NULL, NULL };
+
+#endif
 
 /*------------------------------------------------------------------------------
  */

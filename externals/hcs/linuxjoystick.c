@@ -2,7 +2,7 @@
 
 #define LINUXJOYSTICK_AXES     6
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -17,7 +17,9 @@ typedef struct _linuxjoystick {
 		int                 read_ok;
 		int                 started;
 		int                 x_delaytime;
+#ifdef __gnu_linux__
 		struct input_event  x_input_event; 
+#endif
 		t_outlet            *x_axis_out[LINUXJOYSTICK_AXES];
 		t_outlet            *x_button_num_out;
 		t_outlet            *x_button_val_out;
@@ -54,7 +56,9 @@ static int linuxjoystick_close(t_linuxjoystick *x) {
 
 static int linuxjoystick_open(t_linuxjoystick *x, t_symbol *s) {
   int eventType, eventCode, buttons, rel_axes, abs_axes, ff;
+#ifdef __linux__
   unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+#endif
   char devicename[256] = "Unknown";
   DEBUG(post("linuxjoystick_open");)
 
@@ -66,6 +70,7 @@ static int linuxjoystick_open(t_linuxjoystick *x, t_symbol *s) {
   if (s != &s_)
     x->x_devname = s;
   
+#ifdef __linux__
   /* open device */
   if (x->x_devname) {
 	  /* open the device read-only, non-exclusive */
@@ -149,6 +154,7 @@ static int linuxjoystick_open(t_linuxjoystick *x, t_symbol *s) {
   post ("This object is under development!  The interface could change at anytime!");
   post ("As I write cross-platform versions, the interface might have to change.");
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING\n");
+#endif
   
   return 1;
 }
@@ -160,6 +166,7 @@ static int linuxjoystick_read(t_linuxjoystick *x,int fd) {
     
 	if (x->x_fd < 0) return 0;
 
+#ifdef __linux__
 	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
 		if  ( x->x_input_event.type == EV_ABS ) {
 			/* Relative Axes Event Type */
@@ -259,6 +266,7 @@ static int linuxjoystick_read(t_linuxjoystick *x,int fd) {
 			outlet_float (x->x_button_num_out, button_num);
 		}
 	}
+#endif
 	
 	if (x->started) {
 		clock_delay(x->x_clock, x->x_delaytime);
@@ -287,6 +295,7 @@ void linuxjoystick_delay(t_linuxjoystick* x, t_float f)  {
 void linuxjoystick_start(t_linuxjoystick* x) {
 	DEBUG(post("linuxjoystick_start"););
   
+#ifdef __linux__
    if (x->x_fd >= 0 && !x->started) {
 		clock_delay(x->x_clock, 5);
 		post("linuxjoystick: polling started");
@@ -294,6 +303,7 @@ void linuxjoystick_start(t_linuxjoystick* x) {
 	} else {
 		post("You need to set a input device (i.e /dev/input/event0)");
 	}
+#endif
 }
 
 /* setup functions */
@@ -314,6 +324,11 @@ static void *linuxjoystick_new(t_symbol *s) {
   DEBUG(post("linuxjoystick_new");)
 
   post("[linuxjoystick] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
+#ifndef __linux__
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+	post("     This is a dummy, since this object only works with a Linux kernel!");
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+#endif
 
   /* init vars */
   x->x_fd = -1;
@@ -337,7 +352,7 @@ static void *linuxjoystick_new(t_symbol *s) {
   /* Open the device and save settings */
   
   if (!linuxjoystick_open(x,s)) return x;
-  
+
   return (x);
 }
 

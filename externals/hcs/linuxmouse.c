@@ -3,7 +3,7 @@
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
 #define LINUXMOUSE_AXES     3
 
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -16,7 +16,9 @@ typedef struct _linuxmouse {
   t_symbol            *x_devname;
   int                 read_ok;
   int                 started;
+#ifdef __gnu_linux__
   struct input_event  x_input_event; 
+#endif
   t_outlet            *x_axis_out[LINUXMOUSE_AXES];
   t_outlet            *x_button_num_out;
   t_outlet            *x_button_val_out;
@@ -32,11 +34,13 @@ typedef struct _linuxmouse {
 void linuxmouse_stop(t_linuxmouse* x) {
 	DEBUG(post("linuxmouse_stop"););
 
+#ifdef __gnu_linux__
    if (x->x_fd >= 0 && x->started) { 
 		sys_rmpollfn(x->x_fd);
 		post("[linuxmouse] stopped");
 		x->started = 0;
 	} 
+#endif
 }
 
 static int linuxmouse_close(t_linuxmouse *x) {
@@ -57,8 +61,10 @@ static int linuxmouse_close(t_linuxmouse *x) {
 
 static int linuxmouse_open(t_linuxmouse *x, t_symbol *s) {
 	int eventType, eventCode;
-	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 	char devicename[256] = "Unknown";
+#ifdef __gnu_linux__
+	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+#endif
 	
 	DEBUG(post("linuxmouse_open"););
 	
@@ -74,7 +80,8 @@ static int linuxmouse_open(t_linuxmouse *x, t_symbol *s) {
 	 * otherwise set to default
 	 */  
 	if (s != &s_) x->x_devname = s;
-	
+
+#ifdef __gnu_linux__	
 	/* open device */
 	if (x->x_devname) {
 		/* open the device read-only, non-exclusive */
@@ -89,7 +96,6 @@ static int linuxmouse_open(t_linuxmouse *x, t_symbol *s) {
 		post("[linuxmouse] no device set: %s",x->x_devname->s_name);
 		return 1;
 	}
-	
 	
 /* read input_events from the LINUXMOUSE_DEVICE stream 
  * It seems that is just there to flush the event input buffer?
@@ -138,6 +144,7 @@ static int linuxmouse_open(t_linuxmouse *x, t_symbol *s) {
 	post ("This object is under development!  The interface could change at anytime!");
 	post ("As I write cross-platform versions, the interface might have to change.");
 	post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING\n");
+#endif
 	
 	return 1;
 }
@@ -148,6 +155,7 @@ static int linuxmouse_read(t_linuxmouse *x,int fd) {
 	
 	if (x->x_fd < 0) return 0;
 	
+#ifdef __gnu_linux__
 	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
 		if  ( x->x_input_event.type == EV_REL ) {
 			/* Relative Axes Event Type */
@@ -192,14 +200,16 @@ static int linuxmouse_read(t_linuxmouse *x,int fd) {
 			outlet_float (x->x_button_val_out, x->x_input_event.value);
 			outlet_float (x->x_button_num_out, button_num);
 		}
- 	}	 
-	
+ 	}
+#endif
+
 	return 1;    
 }
 
 void linuxmouse_start(t_linuxmouse* x) {
 	DEBUG(post("linuxmouse_start"););
 
+#ifdef __gnu_linux__
    if (x->x_fd >= 0 && !x->started) {
 		sys_addpollfn(x->x_fd, (t_fdpollfn)linuxmouse_read, x);
 		post("[linuxmouse] started");
@@ -207,6 +217,7 @@ void linuxmouse_start(t_linuxmouse* x) {
 	} else {
 		post("You need to set a input device (i.e /dev/input/event0)");
 	}
+#endif
 }
 
 /* setup functions */
@@ -225,6 +236,11 @@ static void *linuxmouse_new(t_symbol *s) {
 	DEBUG(post("linuxmouse_new"););
 	
 	post("[linuxmouse] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
+#ifndef __gnu_linux__
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+	post("     This is a dummy, since this object only works with a Linux kernel!");
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+#endif
 	
 	/* init vars */
 	x->x_fd = -1;

@@ -2,7 +2,7 @@
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.5 $";
+static char *version = "$Revision: 1.6 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -17,7 +17,9 @@ typedef struct _linuxevent {
   int                 read_ok;
   int                 started;
   int                 x_delaytime;
+#ifdef __gnu_linux__
   struct input_event  x_input_event; 
+#endif
   t_outlet            *x_input_event_time_outlet;
   t_outlet            *x_input_event_type_outlet;
   t_outlet            *x_input_event_code_outlet;
@@ -53,7 +55,9 @@ static int linuxevent_close(t_linuxevent *x) {
 
 static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
   int eventType, eventCode, buttons, rel_axes, abs_axes, ff;
+#ifdef __gnu_linux__
   unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+#endif
   char devicename[256] = "Unknown";
   DEBUG(post("linuxevent_open");)
 
@@ -65,6 +69,7 @@ static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
   if (s != &s_)
     x->x_devname = s;
   
+#ifdef __gnu_linux__
   /* open device */
   if (x->x_devname) {
 	  /* open the device read-only, non-exclusive */
@@ -148,6 +153,7 @@ static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
   post ("This object is under development!  The interface could change at anytime!");
   post ("As I write cross-platform versions, the interface might have to change.");
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING\n");
+#endif
   
   return 1;
 }
@@ -155,6 +161,7 @@ static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
 static int linuxevent_read(t_linuxevent *x,int fd) {
 	if (x->x_fd < 0) return 0;
 
+#ifdef __gnu_linux__
 	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
 		outlet_float (x->x_input_event_value_outlet, (int)x->x_input_event.value);
 		outlet_float (x->x_input_event_code_outlet, x->x_input_event.code);
@@ -162,6 +169,7 @@ static int linuxevent_read(t_linuxevent *x,int fd) {
 		/* input_event.time is a timeval struct from <sys/time.h> */
 		/*   outlet_float (x->x_input_event_time_outlet, x->x_input_event.time); */
 	}
+#endif
   
 	if (x->started) {
 		clock_delay(x->x_clock, x->x_delaytime);
@@ -217,6 +225,11 @@ static void *linuxevent_new(t_symbol *s) {
   DEBUG(post("linuxevent_new");)
 
   post("[linuxevent] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
+#ifndef __linux__
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+	post("     This is a dummy, since this object only works with a Linux kernel!");
+	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+#endif
 
   /* init vars */
   x->x_fd = -1;
