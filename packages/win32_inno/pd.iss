@@ -88,6 +88,8 @@ Source: pd.bat; DestDir: {app}
 Source: pd-novideo.bat; DestDir: {app}
 ;-----------------------------------------------------------------------------
 ; externals
+Source: ..\..\externals\build\win\*.dll; DestDir: {app}\extra
+; help patches
 Source: ..\..\externals\maxlib\help\*.*; DestDir: {app}\doc\5.reference\help-maxlib; Flags: ignoreversion
 Source: ..\..\externals\zexy\examples\*.*; DestDir: {app}\doc\5.reference\help-zexy; Flags: ignoreversion
 ;-----------------------------------------------------------------------------
@@ -111,20 +113,22 @@ Source: ..\..\abstractions\timestretch\*.*; DestDir: {app}\abstractions\timestre
 Source: ..\..\abstractions\vadsr~\*.*; DestDir: {app}\abstractions\vadsr~
 ;-----------------------------------------------------------------------------
 ; GEM
-; temp links to gem docs should be ..\..\Gem\, i.e. Gem from CVS
-Source: ..\..\pd\doc\gem\01.basic\*.*; DestDir: {app}\doc\gem\01.basic
-Source: ..\..\pd\doc\gem\02.advanced\*.*; DestDir: {app}\doc\gem\02.advanced
-Source: ..\..\pd\doc\gem\03.lighting\*.*; DestDir: {app}\doc\gem\03.lighting
-Source: ..\..\pd\doc\gem\04.pix\*.*; DestDir: {app}\doc\gem\04.pix
-Source: ..\..\pd\doc\gem\04.video\*.*; DestDir: {app}\doc\gem\04.video
-Source: ..\..\pd\doc\gem\05.text\*.*; DestDir: {app}\doc\gem\05.text
-Source: ..\..\pd\doc\gem\06.particle\*.*; DestDir: {app}\doc\gem\06.particle
-Source: ..\..\pd\doc\gem\07.texture\*.*; DestDir: {app}\doc\gem\07.texture
-Source: ..\..\pd\doc\gem\08.io\*.*; DestDir: {app}\doc\gem\08.io
-Source: ..\..\pd\doc\gem\99.games\*.*; DestDir: {app}\doc\gem\99.games
-Source: ..\..\pd\doc\gem\data\*.*; DestDir: {app}\doc\gem\data
-Source: ..\..\pd\doc\gem\manual\*.*; DestDir: {app}\doc\gem\manual
-Source: ..\..\pd\doc\gem\manual\index.html; DestDir: {app}\doc\gem\manual
+; uses Gem from CVS
+Source: ..\..\Gem\doc\*.*; DestDir: {app}\doc\gem
+Source: ..\..\Gem\help\*.*; DestDir: {app}\doc\5.reference
+Source: ..\..\Gem\examples\01.basic\*.*; DestDir: {app}\doc\gem\01.basic
+Source: ..\..\Gem\examples\02.advanced\*.*; DestDir: {app}\doc\gem\02.advanced
+Source: ..\..\Gem\examples\03.lighting\*.*; DestDir: {app}\doc\gem\03.lighting
+Source: ..\..\Gem\examples\04.pix\*.*; DestDir: {app}\doc\gem\04.pix
+Source: ..\..\Gem\examples\04.video\*.*; DestDir: {app}\doc\gem\04.video
+Source: ..\..\Gem\examples\05.text\*.*; DestDir: {app}\doc\gem\05.text
+Source: ..\..\Gem\examples\06.particle\*.*; DestDir: {app}\doc\gem\06.particle
+Source: ..\..\Gem\examples\07.texture\*.*; DestDir: {app}\doc\gem\07.texture
+Source: ..\..\Gem\examples\08.io\*.*; DestDir: {app}\doc\gem\08.io
+Source: ..\..\Gem\examples\99.games\*.*; DestDir: {app}\doc\gem\99.games
+Source: ..\..\Gem\examples\data\*.*; DestDir: {app}\doc\gem\data
+Source: ..\..\Gem\manual\*.*; DestDir: {app}\doc\gem\00.manual
+Source: ..\..\Gem\manual\index.html; DestDir: {app}\doc\gem\00.manual
 
 [INI]
 Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://www.pure-data.org
@@ -139,9 +143,11 @@ Name: {userdesktop}\Pure Data; Filename: {app}\pd.bat; Tasks: desktopicon; IconF
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon
 
 Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon
-Name: {group}\Pd Manual; Filename: {app}\doc\1.manual\index.htm
-Name: {group}\GEM Manual; Filename: {app}\doc\gem\manual\index.html
-Name: {group}\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
+Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
+Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
+Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
+Name: {group}\Documentation\Gem Primer; Filename: {app}\doc\gem\GemPrimer.pdf
+
 
 [Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
