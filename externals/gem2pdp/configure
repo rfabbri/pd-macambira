@@ -1150,7 +1150,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-GEM2PDP_VERSION=0.4
+GEM2PDP_VERSION=0.5
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 GEM_DIR=/usr/local/pd/gem
