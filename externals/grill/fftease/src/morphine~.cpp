@@ -1,0 +1,117 @@
+/*
+
+FFTease - A set of Live Spectral Processors
+Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
+
+Copyright (c)Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+
+*/
+
+#include "main.h"
+#include <stdlib.h>
+
+class morphine:
+	public fftease
+{
+	FLEXT_HEADER_S(morphine,fftease,setup)
+	
+public:
+	morphine(I argc,const t_atom *argv);
+
+protected:
+
+	virtual V Transform(I n,S *const *in);
+
+	F _index;
+
+	struct pickme { I bin; F value; };
+	static I sortpicks( const V *a, const V *b );
+
+    pickme *_picks;
+
+private:
+	virtual V Set();
+	virtual V Clear();
+	virtual V Delete();
+
+	static V setup(t_classid c);
+
+	FLEXT_ATTRVAR_F(_index)
+};
+
+FLEXT_LIB_DSP_V("fftease, morphine~",morphine)
+
+
+V morphine::setup(t_classid c)
+{
+	FLEXT_CADDATTR_VAR1(c,"index",_index);
+}
+
+
+morphine::morphine(I argc,const t_atom *argv):
+	fftease(4,F_STEREO|F_WINDOW|F_BITSHUFFLE|F_CONVERT),
+	_index(1)
+{
+	/* parse and set object's options given */
+	if(argc >= 1) {
+		if(CanbeFloat(argv[0]))
+			_index = GetAFloat(argv[0]);
+		else
+			post("%s - Index must be a float value - set to %f",thisName(),_index);
+	}
+
+	AddInSignal("Messages and input signal 1");
+	AddInSignal("Input signal 2");
+	AddOutSignal("Transformed signal");
+}
+
+V morphine::Clear()
+{
+	fftease::Clear();
+	_picks = NULL;
+}
+
+V morphine::Delete() 
+{
+	fftease::Delete();
+	if(_picks) delete[] _picks;
+}
+
+V morphine::Set() 
+{
+	fftease::Set();
+
+	const I _N2 = Blocksize()*Mult()/2;
+	_picks = new pickme[_N2+1];
+}
+
+I morphine::sortpicks( const void *a, const void *b )
+{
+	if ( ((pickme *)a)->value > ((pickme *) b)->value ) return 1;
+	if ( ((pickme *) a)->value < ((pickme *) b)->value ) return -1;
+	return 0;
+}
+
+V morphine::Transform(I _N2,S *const *in)
+{
+	I i;
+    for ( i = 0; i <= _N2; i++ ) {
+		// find amplitude differences between home and visitors 
+		_picks[i].value = fabs( _channel1[i*2] - _channel2[i*2]);
+		_picks[i].bin = i;
+    }
+
+    // sort our differences in ascending order 
+    qsort( _picks, _N2+1, sizeof(pickme), sortpicks );
+
+	const I morphindex = _index*(_N2+1)+.5;
+    // choose the bins that are least different first 
+    for ( i=0; i <= morphindex; i++ ) {
+		const I even = _picks[i].bin*2,odd = even + 1;
+		_channel1[even] = _channel2[even];
+		_channel1[odd] = _channel2[odd];
+    }
+}
+

@@ -32,12 +32,12 @@ V lib_setup()
 	FLEXT_DSP_SETUP(disarray);
 	FLEXT_DSP_SETUP(drown);
 	FLEXT_DSP_SETUP(ether);
-/*
 	FLEXT_DSP_SETUP(morphine);
-	FLEXT_DSP_SETUP(pvcompand);
-	FLEXT_DSP_SETUP(pvoc);
 	FLEXT_DSP_SETUP(scrape);
 	FLEXT_DSP_SETUP(shapee);
+/*
+	FLEXT_DSP_SETUP(pvcompand);
+	FLEXT_DSP_SETUP(pvoc);
 
 	FLEXT_DSP_SETUP(swinger);
 	FLEXT_DSP_SETUP(taint);

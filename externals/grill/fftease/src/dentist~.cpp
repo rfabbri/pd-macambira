@@ -63,7 +63,7 @@ V dentist::setup(t_classid c)
 
 
 dentist::dentist(I argc,const t_atom *argv):
-	fftease(4,false,true,true),	
+	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CONVERT),	
 	_knee(500),_tooth_count(10)
 {
 	/* parse and set object's options given */
@@ -127,13 +127,9 @@ V dentist::Set()
 
 V dentist::Transform(I _N2,S *const *in)
 {
-    leanconvert( _buffer1, _channel1, _N2 );
-
 	for(I i = 0; i < _N2 ; i++){
 		if( !_bin_selection[i] ) _channel1[i*2] = 0;
 	}
-
-	leanunconvert( _channel1, _buffer1,  _N2 );
 }
 
 

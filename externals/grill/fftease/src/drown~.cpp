@@ -21,7 +21,6 @@ public:
 	drown(I argc,const t_atom *argv);
 
 protected:
-
 	virtual V Transform(I n,S *const *in);
 };
 
@@ -29,7 +28,7 @@ FLEXT_LIB_DSP_V("fftease, drown~",drown)
 
 
 drown::drown(I argc,const t_atom *argv):
-	fftease(4,false,true,false)
+	fftease(4,F_WINDOW)
 {
 	AddInSignal("Messages and input signal");
 	AddInSignal("Threshold generator signal");
@@ -38,38 +37,32 @@ drown::drown(I argc,const t_atom *argv):
 }
 
 
-/* helper function */
-static void nudist( float *_S, float *_C, float threshold, float fmult, int N2 )
-{
-  int real, imag, amp, phase;
-  int i;
-  float maxamp = 1.;
-  for ( i = 0; i <= N2; i++ ) {
-    imag = phase = ( real = amp = i<<1 ) + 1;
-    F a = ( i == N2 ? _S[1] : _S[real] );
-    F b = ( i == 0 || i == N2 ? 0. : _S[imag] );
-
-    _C[amp] = hypot( a, b );
-    if( _C[amp] < threshold) _C[amp] *= fmult;
-
-    _C[phase] = -atan2( b, a );
-  }
-
-  for ( i = 0; i <= N2; i++ ) {
-    imag = phase = ( real = amp = i<<1 ) + 1;
-    _S[real] = _C[amp] * cos( _C[phase] );
-    if ( i != N2 )
-      _S[imag] = -_C[amp] * sin( _C[phase] );
-  }
-}
-
-
 V drown::Transform(I _N2,S *const *in)
 {
 	// only first value of the signal vectors
-	const F thresh = in[1][0],mult = in[2][0];
+	const F thresh = in[0][0],mult = in[1][0];
 
-	nudist( _buffer1, _channel1, thresh, mult, _N2 );
+	// nudist helper function is integrated
+
+	for (I i = 0; i <= _N2; i++ ) {
+		const I real = i*2,imag = real+1;
+		F amp,phase;
+
+		// convert to amp and phase
+		const F a = ( i == _N2 ? _buffer1[1] : _buffer1[real] );
+		const F b = ( i == 0 || i == _N2 ? 0. : _buffer1[imag] );
+
+		amp = hypot( a, b );
+		// make up low amplitude bins
+		if(amp < thresh) amp *= mult;
+
+		phase = -atan2( b, a );
+
+
+		// convert back to real and imag
+		_buffer1[real] = amp * cos( phase );
+		if (i != _N2)	_buffer1[imag] = -amp * sin( phase );
+	}
 }
 
 

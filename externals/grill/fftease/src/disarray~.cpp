@@ -24,9 +24,6 @@ protected:
 
 	virtual V Transform(I _N2,S *const *in);
 
-    I _inCount,_nmult;
-
-	// -----------------------------
 
 	BL _qual;
 	I _shuffle_count,_max_bin;
@@ -62,7 +59,7 @@ V disarray::setup(t_classid c)
 
 
 disarray::disarray(I argc,const t_atom *argv):
-	fftease(2,false,true,true),
+	fftease(2,F_BITSHUFFLE|F_CONVERT),
 	_freq(1300),_qual(false),_shuffle_count(20)
 {
 	/* parse and set object's options given */
@@ -86,7 +83,7 @@ disarray::disarray(I argc,const t_atom *argv):
 	}
 
 	_mult = _qual?4:2;
-	_window = _qual;
+	if(_qual) _flags |= F_WINDOW;
 
 	AddInSignal("Messages and input signal");
 	AddOutSignal("Transformed signal");
@@ -125,7 +122,7 @@ V disarray::ms_freq(F f)
 {
 	_freq = f; // store original
 
-	const F funda = Samplerate()/(2*_nmult*Blocksize());
+	const F funda = Samplerate()/(2*Mult()*Blocksize());
 
 	// TG: This is a different, but steady correction than in original fftease
 	if( f < funda ) f = funda;
@@ -135,17 +132,13 @@ V disarray::ms_freq(F f)
 	for(F curfreq = 0; curfreq < f; curfreq += funda) ++_max_bin;
 }
 
+inline V swap(F &a,F &b) { F t = a; a = b; b = t; }
+inline V swap(I &a,I &b) { I t = a; a = b; b = t; }
+
 V disarray::Transform(I _N2,S *const *in)
 {
-    leanconvert( _buffer1, _channel1, _N2 );
-
-	for(I i = 0; i < _shuffle_count ; i++){
-		F tmp = _channel1[ _shuffle_in[ i ] * 2 ];
-		_channel1[ _shuffle_in[ i ] * 2]  = _channel1[ _shuffle_out[ i ] * 2];
-		_channel1[ _shuffle_out[ i ] * 2]  = tmp;
-	}
-
-	leanunconvert( _channel1, _buffer1,  _N2 );
+	for(I i = 0; i < _shuffle_count ; i++)
+		swap(_channel1[ _shuffle_in[i] * 2 ],_channel1[ _shuffle_out[i] * 2]);
 }
 
 
@@ -158,11 +151,9 @@ V disarray::reset_shuffle()
 		_shuffle_out[i] = _shuffle_in[i] = i ;
 
 	for( i = 0; i < 10000; i++ ) {
-		int p1 = _shuffle_out[ rand()%_max_bin ];
-		int p2 = _shuffle_out[ rand()%_max_bin ];
-		int temp = _shuffle_out[ p1 ];
-		_shuffle_out[ p1 ] = _shuffle_out[ p2 ];
-		_shuffle_out[ p2 ] = temp;
+		I p1 = _shuffle_out[ rand()%_max_bin ];
+		I p2 = _shuffle_out[ rand()%_max_bin ];
+		swap(_shuffle_out[ p1 ],_shuffle_out[ p2 ]);
 	}
 
 }

@@ -162,6 +162,18 @@ SOURCE=.\src\drown~.cpp
 
 SOURCE=.\src\ether~.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\morphine~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\scrape~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\shapee~.cpp
+# End Source File
 # End Group
 # Begin Group "doc"
 

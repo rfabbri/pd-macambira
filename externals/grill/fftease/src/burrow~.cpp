@@ -55,7 +55,7 @@ V burrow::setup(t_classid c)
 
 
 burrow::burrow(I argc,const t_atom *argv):
-	fftease(4,true,true,true),
+	fftease(4,F_STEREO|F_WINDOW|F_BITSHUFFLE),
 	_thresh_dB(-30),_mult_dB(-18),
 	_invert(false)
 {
@@ -91,7 +91,7 @@ burrow::burrow(I argc,const t_atom *argv):
 V burrow::Transform(I _N2,S *const *in)
 {
 	for (I i = 0; i <= _N2; i++ ) {
-		const I even = i<<1,odd = even+1;
+		const I even = i*2,odd = even+1;
 
 		/* convert to polar coordinates from complex values */
 		register F a,b;
@@ -99,23 +99,21 @@ V burrow::Transform(I _N2,S *const *in)
 		a = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
 		b = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
 
-		_channel1[even] = hypot( a, b );
-		_channel1[odd] = -atan2( b, a );
+		F amp1 = hypot( a, b );
+		F phase1 = -atan2( b, a );
 
 		a = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
 		b = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
 
-		_channel2[even] = hypot( a, b );
+		F amp2 = hypot( a, b );
 
 		/* use simple threshold from second signal to trigger filtering */
-		if (_invert?(_channel2[even] < _threshold):(_channel2[even] > _threshold) )
-			_channel1[even] *= _multiplier;
+		if (_invert?(amp2 < _threshold):(amp2 > _threshold) )
+			amp1 *= _multiplier;
 
 		/* convert back to complex form, read for the inverse fft */
-		_buffer1[even] = _channel1[even] * cos( _channel1[odd] );
-
-		if ( i != _N2 )
-			_buffer1[odd] = -_channel1[even] * sin( _channel1[odd] );
+		_buffer1[even] = amp1 * cos(phase1);
+		if ( i != _N2 )	_buffer1[odd] = -amp1 * sin(phase1);
 	}
 }
 

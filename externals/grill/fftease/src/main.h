@@ -44,7 +44,7 @@ class fftease:
 	FLEXT_HEADER_S(fftease,flext_dsp,setup)
 	
 public:
-	fftease(I mult,BL stereo,BL window,BL bitshuf);
+	fftease(I mult,I flags);
 	virtual ~fftease();
 
 protected:
@@ -60,6 +60,7 @@ protected:
 	virtual V Delete();
 	virtual V Transform(I _N2,S *const *in) = 0;
 
+
 	I Mult() const { return _mult; }
 
     F *_input1,*_input2;
@@ -72,8 +73,14 @@ protected:
 
     I _inCount;
 
-	I _mult;
-	BL _stereo,_window,_bitshuf;
+	enum { 
+		F_STEREO = 0x01,
+		F_WINDOW = 0x02,
+		F_BITSHUFFLE = 0x04,
+		F_CONVERT = 0x08,F_CRES = 0x10,
+	};
+
+	I _mult,_flags;
 
 private:
 	I blsz;

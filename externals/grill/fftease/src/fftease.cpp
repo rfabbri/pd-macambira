@@ -12,8 +12,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "main.h"
 
 
-fftease::fftease(I mult,BL stereo,BL window,BL bitshuf):
-	_mult(mult),_stereo(stereo),_window(window),_bitshuf(bitshuf),
+fftease::fftease(I mult,I flags):
+	_mult(mult),_flags(flags),
 	_inCount(0),
 	blsz(0),smprt(0)
 {}
@@ -54,7 +54,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 	/* fill our retaining buffers */
 	_inCount += _D;
 
-	if(_stereo) {
+	if(_flags&F_STEREO) {
 		for(i = 0; i < _N-_D ; i++ ) {
 			_input1[i] = _input1[i+_D];
 			_input2[i] = _input2[i+_D];
@@ -73,28 +73,37 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 
 	/* apply hamming window and fold our window buffer into the fft buffer */
 	fold( _input1, _Wanal, _Nw, _buffer1, _N, _inCount );
-	if(_stereo) fold( _input2, _Wanal, _Nw, _buffer2, _N, _inCount );
+	if(_flags&F_STEREO) fold( _input2, _Wanal, _Nw, _buffer2, _N, _inCount );
 
 	/* do an fft */
-	if(_bitshuf) {
+	if(_flags&F_BITSHUFFLE) {
 		rdft( _N, 1, _buffer1, _bitshuffle, _trigland );
-		if(_stereo) rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
+		if(_flags&F_STEREO) rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
 	}
 	else {
 		rfft( _buffer1, _N2, 1);
-		if(_stereo) rfft( _buffer2, _N2,1);
+		if(_flags&F_STEREO) rfft( _buffer2, _N2,1);
 	}
 
+	if(_flags&F_BITSHUFFLE) {
+	    leanconvert( _buffer1, _channel1, _N2 );
+	    if(_flags&F_STEREO) leanconvert( _buffer2, _channel2, _N2 );
+	}
 
 	// ---- BEGIN --------------------------------
 
-	Transform(_N2,in+(_stereo?1:2));
+	Transform(_N2,in+((_flags&F_STEREO)?1:2));
 
 	// ---- END --------------------------------
 
+	if(_flags&F_CONVERT) {
+	    leanunconvert( _channel1, _buffer1, _N2 );
+	    if(_flags&F_STEREO) leanunconvert( _channel2, _buffer2, _N2 );
+	}
+
 
 	/* do an inverse fft */
-	if(_bitshuf)
+	if(_flags&F_BITSHUFFLE)
 		rdft( _N, -1, _buffer1, _bitshuffle, _trigland );
 	else
 		rfft( _buffer1, _N2, 0);
@@ -124,15 +133,15 @@ void fftease::Set()
 	/* assign memory to the buffers */
 	_input1 = new F[_Nw];
 	_buffer1 = new F[_N];
-	_channel1 = new F[_N+2];
-	if(_stereo) {
+	if(_flags&F_CONVERT) _channel1 = new F[_N+2];
+	if(_flags&F_STEREO) {
 		_input2 = new F[_Nw];
 		_buffer2 = new F[_N];
-		_channel2 = new F[_N+2];
+		if(_flags&F_CONVERT) _channel2 = new F[_N+2];
 	}
 	_output = new F[_Nw];
 
-	if(_bitshuf) {
+	if(_flags&F_BITSHUFFLE) {
 		_bitshuffle = new I[_N*2];
 		_trigland = new F[_N*2];
 		init_rdft( _N, _bitshuffle, _trigland);
@@ -141,7 +150,7 @@ void fftease::Set()
 	_Hwin = new F[_Nw];
 	_Wanal = new F[_Nw];
 	_Wsyn = new F[_Nw];
-	if(_window)
+	if(_flags&F_WINDOW)
 		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
 	else
 		makehanning( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0,0);
@@ -164,14 +173,14 @@ void fftease::Delete()
 	if(_input1) delete[] _input1;
 	if(_buffer1) delete[] _buffer1;
 	if(_channel1) delete[] _channel1;
-	if(_stereo) {
+	if(_flags&F_STEREO) {
 		if(_input2) delete[] _input2;
 		if(_buffer2) delete[] _buffer2;
 		if(_channel2) delete[] _channel2;
 	}
 	if(_output) delete[] _output;
 
-	if(_bitshuf) {
+	if(_flags&F_BITSHUFFLE) {
 		if(_bitshuffle) delete[] _bitshuffle;
 		if(_trigland) delete[] _trigland;
 	}
@@ -180,6 +189,5 @@ void fftease::Delete()
 	if(_Wanal) delete[] _Wanal;
 	if(_Wsyn) delete[] _Wsyn;
 }
-
 
 
