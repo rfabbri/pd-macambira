@@ -152,6 +152,10 @@ SOURCE=.\src\morphine~.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\pvoc~.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\scrape~.cpp
 # End Source File
 # Begin Source File

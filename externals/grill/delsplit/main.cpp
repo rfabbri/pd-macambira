@@ -54,7 +54,7 @@ protected:
 		
 	static V SetAtom(t_atom &l,const C *s);
 private:
-	static V Setup(t_class *c);
+	static V Setup(t_classid c);
 
 	FLEXT_CALLBACK_S(m_list)
 	FLEXT_CALLBACK_S(m_del)
@@ -63,7 +63,7 @@ private:
 FLEXT_NEW_V("delsplit",delsplit)
 
 
-V delsplit::Setup(t_class *c)
+V delsplit::Setup(t_classid c)
 {
 	FLEXT_CADDMETHOD(c,0,m_list);
 	FLEXT_CADDMETHOD(c,1,m_del);

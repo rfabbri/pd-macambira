@@ -93,7 +93,7 @@ I morphine::sortpicks( const void *a, const void *b )
 	return 0;
 }
 
-V morphine::Transform(I _N,S *const *in)
+V morphine::Transform(I _N,S *const *)
 {
 	const I _N2 = _N/2;
 	I i;

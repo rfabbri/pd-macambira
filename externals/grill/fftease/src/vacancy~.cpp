@@ -94,7 +94,7 @@ vacancy::vacancy(I argc,const t_atom *argv):
 }
 
 
-V vacancy::Transform(I _N,S *const *in)
+V vacancy::Transform(I _N,S *const *)
 {
 	const F useme = _useRms?_rms * _threshold:_threshold;
 

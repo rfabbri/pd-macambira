@@ -58,7 +58,7 @@ swinger::swinger(I argc,const t_atom *argv):
 }
 
 
-V swinger::Transform(I _N,S *const *in)
+V swinger::Transform(I _N,S *const *)
 {
 	for (I i = 0; i <= _N; i += 2) _channel1[i+1] = _channel2[i+1];
 }

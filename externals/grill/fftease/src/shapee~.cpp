@@ -56,7 +56,7 @@ shapee::shapee(I argc,const t_atom *argv):
 
 #define THRESH 0.000001
 
-V shapee::Transform(I _N,S *const *in)
+V shapee::Transform(I _N,S *const *)
 {
 	// lets just shape the entire signal in groups of three 
 

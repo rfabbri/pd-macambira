@@ -52,7 +52,7 @@ protected:
 	virtual void m_help();
 		
 private:
-	static V Setup(t_class *c);
+	static V Setup(t_classid c);
 
 	FLEXT_CALLBACK_A(m_list)
 	FLEXT_CALLBACK_S(m_del)
@@ -61,7 +61,7 @@ private:
 FLEXT_NEW_V("deljoin",deljoin)
 
 
-V deljoin::Setup(t_class *c)
+V deljoin::Setup(t_classid c)
 {
 	FLEXT_CADDMETHOD(c,0,m_list);
 	FLEXT_CADDMETHOD(c,1,m_del);

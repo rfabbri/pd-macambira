@@ -88,7 +88,7 @@ burrow::burrow(I argc,const t_atom *argv):
 }
 
 
-V burrow::Transform(I _N,S *const *in)
+V burrow::Transform(I _N,S *const *)
 {
 	register const F thr = _threshold,mul = _multiplier;
 

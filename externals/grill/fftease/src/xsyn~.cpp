@@ -36,7 +36,7 @@ xsyn::xsyn():
 }
 
 
-V xsyn::Transform(I _N,S *const *in)
+V xsyn::Transform(I _N,S *const *)
 {
     F maxamp = 0;
 	I i;

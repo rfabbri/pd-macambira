@@ -74,7 +74,7 @@ taint::taint(I argc,const t_atom *argv):
 }
 
 
-V taint::Transform(I _N,S *const *in)
+V taint::Transform(I _N,S *const *)
 {
 	register const F thr = _threshold;
 	

@@ -41,7 +41,7 @@ private:
 FLEXT_LIB_DSP("fftease, thresher~ nacho~",thresher)
 
 
-V thresher::setup(t_classid c)
+V thresher::setup(t_classid )
 {
 }
 
@@ -84,7 +84,7 @@ thresher::thresher():
 }
 
 
-V thresher::Transform(I _N,S *const *in)
+V thresher::Transform(I _N,S *const *)
 {
 	I *fr = _framesLeft;
 	if( _firstFrame ) {

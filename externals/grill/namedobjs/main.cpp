@@ -1,8 +1,8 @@
 /*
 
-namedobjs - retrieve list of named objects in patcher (MaxMSP only!)
+namedobjs - retrieve list of named objects in patcher (Max/MSP only!)
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -10,11 +10,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 203)
-#error You need at least flext version 0.2.3
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
+#error You need at least flext version 0.4.1
 #endif
 
-#ifndef MAXMSP
+#if FLEXT_SYS != FLEXT_SYS_MAX
 #error "This object is for MaxMSP only!"
 #endif
 
@@ -29,30 +29,32 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class namedobjs:
 	public flext_base
 {
-	FLEXT_HEADER(namedobjs,flext_base)
+	FLEXT_HEADER_S(namedobjs,flext_base,Setup)
  
 public:
-	namedobjs(I argc,t_atom *argv);
+	namedobjs();
 
 protected:
 	V m_bang();
-	virtual V m_assist(L msg,L arg,C *s);
 	
 private:
+	static V Setup(t_classid c);
+
 	FLEXT_CALLBACK(m_bang);
 };
 
-FLEXT_NEW_G("namedobjs",namedobjs)
+FLEXT_NEW("namedobjs",namedobjs)
 
+V namedobjs::Setup(t_classid c)
+{
+	FLEXT_CADDBANG(c,0,m_bang);
+}
 
-namedobjs::namedobjs(I argc,t_atom *argv)
+namedobjs::namedobjs()
 { 
-	AddInAnything();
-	AddOutList();
-	AddOutBang();
-	SetupInOut();
-	
-	FLEXT_ADDBANG(0,m_bang);
+	AddInAnything("Bang to retrieve list of named objects");
+	AddOutList("Consecutive object type/name pairs");
+	AddOutBang("Bang signals end of list");	
 }
 
 V namedobjs::m_bang()
@@ -87,26 +89,6 @@ V namedobjs::m_bang()
 	}
 	
 	ToOutBang(1);
-}
-
-V namedobjs::m_assist(L msg,L arg,C *s)
-{
-	switch(msg) {
-	case 1: //ASSIST_INLET:
-		switch(arg) {
-		case 0:
-			sprintf(s,"Bang to retrieve list of named objects"); break;
-		}
-		break;
-	case 2: //ASSIST_OUTLET:
-		switch(arg) {
-		case 0:
-			sprintf(s,"Consecutive object type/name pairs"); break;
-		case 1:
-			sprintf(s,"Bang signals end of list"); break;
-		}
-		break;
-	}
 }
 
 

@@ -123,7 +123,7 @@ V dentist::Set()
 	ms_knee(_knee); 
 }
 
-V dentist::Transform(I _N,S *const *in)
+V dentist::Transform(I _N,S *const *)
 {
 	const BL *bs = _bin_selection;
 	for(I i = 0; i < _N ; i += 2)

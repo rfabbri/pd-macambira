@@ -33,7 +33,7 @@ V fftease::Exit()
 	Delete();
 }
 
-V fftease::m_dsp(I n,S *const *in,S *const *out)
+V fftease::m_dsp(I n,S *const *,S *const *)
 {
 	const I _D = n;
 	const F sr = Samplerate();

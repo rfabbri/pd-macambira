@@ -66,7 +66,7 @@ ether::ether(I argc,const t_atom *argv):
 }
 
 
-V ether::Transform(I _N,S *const *in)
+V ether::Transform(I _N,S *const *)
 {
 	const BL inv = _invert;
 	const F threshMult = _threshMult?_threshMult:1;

@@ -5,8 +5,8 @@ void leanconvert( float *S, float *C, int N2 , int amp, int ph)
 #if 1
 	register int i;
 
-	float a = fabs(S[0]);  // real value at f=0
-	float b = fabs(S[1]);  // real value at f=Nyquist
+	float a = fabs(S[0]);  /* real value at f=0 */
+	float b = fabs(S[1]);  /* real value at f=Nyquist */
 
 	C[0] = a;
 	C[1] = 0;

@@ -41,7 +41,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class fftease:
 	public flext_dsp
 {
-	FLEXT_HEADER_S(fftease,flext_dsp,setup)
+	FLEXT_HEADER(fftease,flext_dsp)
 	
 public:
 	fftease(I mult,I flags);
@@ -91,7 +91,7 @@ protected:
 		F_NOAMP1 = 0x100,
 		F_NOPH1 = 0x200,
 		F_NOAMP2 = 0x400,
-		F_NOPH2 = 0x800,
+		F_NOPH2 = 0x800
 	};
 
 	I _flags;
@@ -104,9 +104,6 @@ private:
 	I blsz;
 	F smprt;
 	I _mult,_N;
-
-	static V setup(t_classid c) {}
-
 };
 
 

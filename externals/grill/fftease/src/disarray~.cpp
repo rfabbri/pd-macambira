@@ -134,7 +134,7 @@ V disarray::ms_freq(F f)
 inline V swap(F &a,F &b) { F t = a; a = b; b = t; }
 inline V swap(I &a,I &b) { I t = a; a = b; b = t; }
 
-V disarray::Transform(I _N,S *const *in)
+V disarray::Transform(I _N,S *const *)
 {
 	I shcnt = _shuffle_count;
 	if(shcnt < 0) shcnt = 0;
