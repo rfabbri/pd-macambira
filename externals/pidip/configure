@@ -1154,7 +1154,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-PDP_PIDIP_VERSION=0.12.4
+PDP_PIDIP_VERSION=0.12.8
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -4097,7 +4097,7 @@ fi
 
 
 
-MAGICK_LIBS="-L/usr/X11R6/lib `Magick-config --libs` `Magick-config --ldflags`"
+MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
 MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` "
 
 

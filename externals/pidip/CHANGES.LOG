@@ -1,3 +1,6 @@
+0.12.8
+  added pdp_pen : a free hand drawing object 
+  ( on request from patrick/11h11.com )
 0.12.7
   added pdp_canvas : a canvas to display several video sources
 0.12.6
