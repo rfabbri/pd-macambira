@@ -49,8 +49,9 @@ idelay::idelay(F maxmsec)
     if (nsamps < 1) nsamps = 1;
 	dline = new DelayLine<F>(nsamps);
 
-	AddInSignal(2);  // audio in & delay signals
-	AddOutSignal();  // audio out
+	AddInSignal("Audio In");  // audio in 
+	AddInSignal("Delay time (ms)");  // delay time
+	AddOutSignal("Audio Out");  // audio out
 }
 
 idelay::~idelay()

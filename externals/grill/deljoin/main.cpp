@@ -50,7 +50,6 @@ protected:
 	const t_symbol *delim;
 	
 	virtual void m_help();
-	virtual void m_assist(long /*msg*/,long /*arg*/,char * /*s*/);
 		
 private:
 	static V Setup(t_class *c);
@@ -64,16 +63,16 @@ FLEXT_NEW_V("deljoin",deljoin)
 
 V deljoin::Setup(t_class *c)
 {
-	FLEXT_CADDMETHOD_A(c,0,m_list);
+	FLEXT_CADDMETHOD(c,0,m_list);
 	FLEXT_CADDMETHOD(c,1,m_del);
 }
 
 deljoin::deljoin(I argc,const t_atom *argv):
 	delim(NULL)
 { 
-	AddInAnything();
-	AddInSymbol();
-	AddOutSymbol();
+	AddInAnything("Anything in - triggers output");
+	AddInSymbol("Set the Delimiter");
+	AddOutSymbol("A symbol representing the joined list");
 
 	if(argc && IsSymbol(argv[0])) delim = GetSymbol(argv[0]);
 }
@@ -81,26 +80,6 @@ deljoin::deljoin(I argc,const t_atom *argv):
 V deljoin::m_help()
 {
 	post("%s version " VERSION " (using flext " FLEXT_VERSTR "), (C) 2002 Thomas Grill",thisName());
-}
-
-V deljoin::m_assist(long msg,long arg,char *s)
-{
-	switch(msg) {
-	case 1: //ASSIST_INLET:
-		switch(arg) {
-		case 0:
-			STD::sprintf(s,"Anything in - triggers output"); break;
-		case 1:
-			STD::sprintf(s,"Set the Delimiter"); break;
-		}
-		break;
-	case 2: //ASSIST_OUTLET:
-		switch(arg) {
-		case 0:
-			STD::sprintf(s,"A symbol representing the joined list"); break;
-		}
-		break;
-	}
 }
 	
 /** \brief convert incoming list to a concatenated string

@@ -51,7 +51,6 @@ protected:
 	const t_symbol *delim;
 	
 	virtual void m_help();
-	virtual void m_assist(long /*msg*/,long /*arg*/,char * /*s*/);
 		
 	static V SetAtom(t_atom &l,const C *s);
 private:
@@ -73,9 +72,9 @@ V delsplit::Setup(t_class *c)
 delsplit::delsplit(I argc,const t_atom *argv):
 	delim(NULL)
 { 
-	AddInAnything();
-	AddInSymbol();
-	AddOutList();
+	AddInAnything("Symbol in, representing the delimited list");
+	AddInSymbol("Set the Delimiter");
+	AddOutList("The split list");
 
 	if(argc && IsSymbol(argv[0])) delim = GetSymbol(argv[0]);
 }
@@ -85,26 +84,6 @@ V delsplit::m_help()
 	post("%s version " VERSION " (using flext " FLEXT_VERSTR "), (C) 2002 Thomas Grill",thisName());
 }
 
-V delsplit::m_assist(long msg,long arg,char *s)
-{
-	switch(msg) {
-	case 1: //ASSIST_INLET:
-		switch(arg) {
-		case 0:
-			STD::sprintf(s,"Symbol in, representing the delimited list"); break;
-		case 1:
-			STD::sprintf(s,"Set the Delimiter"); break;
-		}
-		break;
-	case 2: //ASSIST_OUTLET:
-		switch(arg) {
-		case 0:
-			STD::sprintf(s,"The split list"); break;
-		}
-		break;
-	}
-}
-	
 /** \brief check whether string represents a number
 	\ret 0..integer, 1..float, -1..no number
 */
