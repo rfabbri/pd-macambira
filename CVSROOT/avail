@@ -1,38 +1,4 @@
-avail |  | Framestein
-avail |  | abstractions
-avail |  | doc
-avail |  | externals/OSCx
-avail |  | externals/aenv~
-avail |  | externals/ann
-avail |  | externals/arraysize
-avail |  | externals/build
-avail |  | externals/chaos
-avail |  | externals/creb
-avail |  | externals/cxc
-avail |  | externals/debian
-avail |  | externals/dfx
-avail |  | externals/ext13
-avail |  | externals/footils
-avail |  | externals/forward
-avail |  | externals/ggee
-avail |  | externals/grill
-avail |  | externals/hcs
-avail |  | externals/maxlib
-avail |  | externals/pdogg
-avail |  | externals/pdp
-avail |  | externals/plugin~
-avail |  | externals/rhythm_estimator
-avail |  | externals/sprinkler
-avail |  | externals/susloop~
-avail |  | externals/svf~
-avail |  | externals/tmp
-avail |  | externals/vbap
-avail |  | externals/vst
-avail |  | externals/zexy
-avail |  | externals/zhzxh~
+unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
-avail |  | htdocs
-avail |  | pd
-avail |  | xgui
+
 avail | bbogart,d13,dpro,eighthave,fbar,ggeiger,jusu,x75,zmoelnig | CVSROOT
-avail | bbogart,d13,dpro,eighthave,fbar,ggeiger,jusu,x75,zmoelnig
