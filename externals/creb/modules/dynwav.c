@@ -1,5 +1,5 @@
 /*
- *   dynwav.c  - dynamic wavetable oscillator
+ *   blosc.c  - bandlimited oscillators
  *   data organization is in (real, imag) pairs
  *   the first 2 components are (DC, NY)
  *   Copyright (c) 2000-2003 by Tom Schouten

@@ -1,0 +1,111 @@
+#N canvas 309 57 748 724 10;
+#X obj 116 116 scrollgrid1D~;
+#X msg 36 92 reset;
+#X floatatom 111 87 5 0 0;
+#X floatatom 187 87 5 0 0;
+#X floatatom 237 86 5 0 0;
+#X floatatom 290 85 5 0 0;
+#X obj 401 200 tabwrite~ t;
+#X obj 401 147 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144
+-1 -1;
+#X obj 504 206 table t 10000;
+#X obj 123 222 vol~;
+#X floatatom 146 196 5 0 0;
+#X text 103 47 frequency;
+#X text 197 45 T1;
+#X text 249 45 T2;
+#X text 301 46 N;
+#X msg 111 66 350;
+#X msg 235 66 1;
+#X msg 291 65 3;
+#X msg 188 65 12;
+#X obj 379 222 tabwrite~ t;
+#X obj 379 147 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144
+-1 -1;
+#X obj 353 243 tabwrite~ t;
+#X obj 353 148 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144
+-1 -1;
+#X text 233 292 parameters:;
+#X text 266 359 N = number of scrolls or unstable rotation centers
+in attractor;
+#X text 233 404 outputs:;
+#X text 230 468 some remarks;
+#X text 266 422 the first output is alongside the scoll centers \,
+the other two are orthogonal to this line.;
+#X text 368 130 X Y Z;
+#X obj 178 222 vol~;
+#X floatatom 201 196 5 0 0;
+#X obj 64 223 vol~;
+#X floatatom 87 197 5 0 0;
+#X obj 63 282 hip~ 10;
+#X floatatom 133 286 5 0 0;
+#X obj 63 305 blop~ 4;
+#X msg 132 263 500;
+#X msg 163 263 5000;
+#X text 265 325 T1 = unstable time constant in ms ("attack" time);
+#X text 265 342 T2 = stable time constant in ms ("release" time);
+#X text 265 660 the entire circuit is clipped \, which means that for
+some parameter values that would normally cause a blowup \, its behaviour
+is limited to that of an oscillator.;
+#X obj 4 283 hip~ 10;
+#X obj 4 306 blop~ 4;
+#X obj 34 340 dac~;
+#X floatatom 180 170 5 0 0;
+#X obj 4 402 tabwrite~ t;
+#X obj 21 380 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144 -1
+-1;
+#X msg 142 66 5000;
+#X text 264 309 freq = spiral frequency in Hz;
+#X text 265 493 this chaotic system is a switched unstable linear system.
+it consists of N scrolls (outward spirals). when the amplitude of the
+spiral has reached a certain threshold \, it is switched to the nearest
+fixed point (a neighbour spiral). the freq parameter determines the
+frequency of the outward spiralling motion on a scroll. T1 is the outward
+spiralling time constant. T1 large means slow buildup or mild chaotic
+motion \, T1 small means fast buildup or turbulent chaotic motion.
+T2 is the time constant with which a trajectory is attracted to the
+plane of a scroll. T2 small means fast attraction \, T2 large means
+slow attraction.;
+#X text 45 11 stabilized scroll grid chaotic oscillator with scroll
+centers located on a line.;
+#X msg 204 262 17000;
+#X connect 0 0 21 0;
+#X connect 0 0 31 0;
+#X connect 0 1 9 0;
+#X connect 0 1 19 0;
+#X connect 0 2 6 0;
+#X connect 0 2 29 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 1;
+#X connect 4 0 0 2;
+#X connect 5 0 0 3;
+#X connect 7 0 6 0;
+#X connect 9 0 41 0;
+#X connect 10 0 9 1;
+#X connect 15 0 2 0;
+#X connect 16 0 4 0;
+#X connect 17 0 5 0;
+#X connect 18 0 3 0;
+#X connect 20 0 19 0;
+#X connect 22 0 21 0;
+#X connect 29 0 33 0;
+#X connect 30 0 29 1;
+#X connect 31 0 33 0;
+#X connect 31 0 41 0;
+#X connect 32 0 31 1;
+#X connect 33 0 35 0;
+#X connect 34 0 35 1;
+#X connect 34 0 42 1;
+#X connect 35 0 43 1;
+#X connect 35 0 45 0;
+#X connect 36 0 34 0;
+#X connect 37 0 34 0;
+#X connect 41 0 42 0;
+#X connect 42 0 43 0;
+#X connect 42 0 45 0;
+#X connect 44 0 10 0;
+#X connect 44 0 30 0;
+#X connect 46 0 45 0;
+#X connect 47 0 2 0;
+#X connect 51 0 34 0;

@@ -29,7 +29,7 @@ typedef struct eadctl
   t_float c_attack;
   t_float c_decay;
   t_float c_state;
-  t_float c_target;
+  t_int c_target;
 } t_eadctl;
 
 
@@ -54,7 +54,13 @@ static void ead_decay(t_ead *x, t_floatarg f)
 
 static void ead_start(t_ead *x)
 {
-  x->x_ctl.c_target = 1;
+    /* reset state if necessary to prevent skipping */
+
+    // always reset, seems to be safest
+    //if (x->x_ctl.c_target == 1)
+
+    x->x_ctl.c_state = 0.0f; 
+    x->x_ctl.c_target = 1;
 }
 
 
@@ -68,7 +74,6 @@ static t_int *ead_perform(t_int *w)
     t_float attack  = ctl->c_attack;
     t_float decay   = ctl->c_decay;
     t_float state   = ctl->c_state;
-    t_float target  = ctl->c_target;
     t_int n = (t_int)(w[2]);
 
     t_int i;
@@ -76,29 +81,27 @@ static t_int *ead_perform(t_int *w)
 
     /* A/D code */
 
-    if (target == 1) 
-      /* attack phase */
-      {
-	for (i = 0; i < n; i++)
-	  {
+    for (i = 0; i < n; i++){
+	switch(ctl->c_target){
+	case 1:
+	    /* attack phase */
 	    *out++ = state;
 	    state += attack*(1 - state);
-	  }
-	if (state > ENVELOPE_MAX)
-	    ctl->c_target = 0;
-      }
-
-    else 
-    /* decay phase */
-      for (i = 0; i < n; i++)
-	{
-	  *out++ = state;
-	  state -= decay*state;
+	    ctl->c_target = (state <= ENVELOPE_MAX);
+	    break;
+	default:
+	    /* decay phase */
+	    *out++ = state;
+	    state -= decay*state;
+	    break;
 	}
+	
+    }
 
+    /* save state */
     ctl->c_state = IS_DENORMAL(state) ? 0 : state;
 
-    return (w+4); /* pd quirk: pointer for sequencer */
+    return (w+4); 
 }
 
 

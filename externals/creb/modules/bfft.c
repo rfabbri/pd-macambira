@@ -1,5 +1,5 @@
 /*
- *   bfft.c  - code for fourrier transform
+ *   bfft.c  - code for some fourrier transform variants and utility functions
  *   data organization is in (real, imag) pairs
  *   the first 2 components are (DC, NY)
  *   Copyright (c) 2000-2003 by Tom Schouten
@@ -29,17 +29,19 @@
 
 typedef struct bfftctl
 {
-  t_int c_levels;
-  char c_name[16];
-  t_int *c_clutter;
-  t_int *c_unclutter;
+    t_int c_levels;
+    char c_name[16];
+    t_int *c_clutter;
+    t_int *c_unclutter;
+    t_int c_kill_DC;
+    t_int c_kill_NY;
 } t_bfftctl;
 
 typedef struct bfft
 {
-  t_object x_obj;
-  t_float x_f;
-  t_bfftctl x_ctl;
+    t_object x_obj;
+    t_float x_f;
+    t_bfftctl x_ctl;
 } t_bfft;
 
 t_class *bfft_class, *ibfft_class, *fht_class;
@@ -127,10 +129,16 @@ static t_int *ibfft_perform(t_int *w)
   t_float scale = sqrt(1.0f / (float)(n));
 
 
+  if (ctl->c_kill_DC) {out[0] = 0.0f;}
+  if (ctl->c_kill_NY) {out[1] = 0.0f;}
+
   bfft_perform_permutation(out, n, ctl->c_clutter);
   mayer_fht(out, n);
+
+
   while (n--) *out++ *= scale;
 
+  
 
   return (w+5);
 }
@@ -240,13 +248,22 @@ static void *bfft_new(void)
 
 }
 
-static void *ibfft_new(void)
+static void *ibfft_new(t_symbol *s)
 {
     t_bfft *x = (t_bfft *)pd_new(ibfft_class);
     int i;
 
     outlet_new(&x->x_obj, gensym("signal")); 
 
+    if (s == gensym("killDCNY")){
+	x->x_ctl.c_kill_DC = 1;
+	x->x_ctl.c_kill_NY = 1;
+	post("ibfft: removing DC and NY components.");
+    }
+    else{
+	x->x_ctl.c_kill_DC = 0;
+	x->x_ctl.c_kill_NY = 0;
+    }
 
     x->x_ctl.c_clutter = NULL;
     x->x_ctl.c_unclutter = NULL;
@@ -286,7 +303,11 @@ void bfft_tilde_setup(void)
 
 
     ibfft_class = class_new(gensym("ibfft~"), (t_newmethod)ibfft_new,
-    	(t_method)bfft_free, sizeof(t_bfft), 0, 0);
+    	(t_method)bfft_free, sizeof(t_bfft), 0, A_DEFSYMBOL, A_NULL);
+
+    /* add the more logical bifft~ alias */
+    class_addcreator((t_newmethod)ibfft_new, 
+		     gensym("bifft~"), 0, A_DEFSYMBOL, A_NULL);
 
     CLASS_MAINSIGNALIN(ibfft_class, t_bfft, x_f);
     class_addmethod(ibfft_class, (t_method)ibfft_dsp, gensym("dsp"), 0); 

@@ -1,0 +1,10 @@
+#N canvas 523 376 560 300 10;
+#X msg 69 127 load matrix.bin;
+#X text 27 39 added for completeness. mainly intended for spectral
+transfos;
+#X text 26 73 the file format is binary floating point \, column encoded.
+;
+#X obj 46 174 bmatrix~;
+#X text 29 23 bmatrix multiplies a signal block with an arbitrary matrix
+;
+#X connect 0 0 3 0;

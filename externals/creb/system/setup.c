@@ -19,7 +19,7 @@ void dynwav_tilde_setup(void);
 void statwav_tilde_setup(void);
 void bdiag_tilde_setup(void);
 void diag_tilde_setup(void);
-void matrix_tilde_setup(void);
+void bmatrix_tilde_setup(void);
 void permut_tilde_setup(void);
 void lattice_tilde_setup(void);
 void ratio_setup(void);
@@ -28,6 +28,13 @@ void fwarp_setup(void);
 void junction_tilde_setup(void);
 void fdn_tilde_setup(void);
 void window_tilde_setup(void);
+void blosc_tilde_setup(void);
+void cmath_tilde_setup(void);
+void bitsplit_tilde_setup(void);
+void sbosc_tilde_setup(void);
+void blocknorm_tilde_setup(void);
+void resofilt_tilde_setup(void);
+void scrollgrid1D_tilde_setup(void);
 
 void creb_setup(void)
 {
@@ -50,12 +57,20 @@ void creb_setup(void)
   statwav_tilde_setup();
   bdiag_tilde_setup();
   diag_tilde_setup();
-  matrix_tilde_setup();
+  bmatrix_tilde_setup();
   permut_tilde_setup();
   lattice_tilde_setup();
   junction_tilde_setup();
   fdn_tilde_setup();
   window_tilde_setup();
+  blosc_tilde_setup();
+  cmath_tilde_setup();
+  bitsplit_tilde_setup();
+  sbosc_tilde_setup();
+  blocknorm_tilde_setup();
+  resofilt_tilde_setup();
+  scrollgrid1D_tilde_setup();
+
 
   /* setup other objects */
   ratio_setup();

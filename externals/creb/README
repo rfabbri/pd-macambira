@@ -22,22 +22,21 @@ The GNU Public Licence can be found in the file COPYING
 
 ------------------------------------------------------------------
 
-This is a collection of pd externals. No fancy stuff, just my
-personal bag of (ahem) tricks...
+This is a collection of pd externals. My bag of tricks.
 
-Edit Makefile.config, type make.
+To build:
+./configure
+make
 
+To run:
 add the library to the pd startup line, and specify the
 path for the included abstractions (<crebdir>/abs)
 
-Documentation packages in doc/
+To figure out how it works:
+Documentation patches in doc/
 See doc/reference.txt for a list of objects
 
-The package only includes linux + darwin makefiles. It is plain c/c++ so
-porting should be relatively simple.
-
-For compilation on OSX, see README.darwin (thanks to Adam Lindsay for
-the darwin makefiles)
+Should build on linux and darwin (OSX).
 
 Enjoy,
 

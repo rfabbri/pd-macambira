@@ -22,7 +22,8 @@
 #include "m_pd.h"
 #include <math.h>
 
-#define maxorder 1024
+#define MAXORDER 1024
+#define MAXREFCO 0.9999f
 
 typedef struct latticesegment
 {
@@ -32,7 +33,7 @@ typedef struct latticesegment
 
 typedef struct latticectl
 {
-    t_latticesegment c_segment[maxorder]; // array of lattice segment data
+    t_latticesegment c_segment[MAXORDER]; // array of lattice segment data
     t_int c_segments;
 } t_latticectl;
 
@@ -98,8 +99,8 @@ static void lattice_rc(t_lattice *x, t_float segment, t_float refco)
 {
     t_int seg = (t_float)segment;
     if ((seg >= 0) && (seg < x->x_ctl.c_segments)){
-	if (refco > 1.0f) refco = 1.0f;
-	if (refco < -1.0f) refco = -1.0f;
+	if (refco >= MAXREFCO) refco = MAXREFCO;
+	if (refco <= -MAXREFCO) refco = -MAXREFCO;
 	x->x_ctl.c_segment[seg].rc = refco;
     }
 }
@@ -120,7 +121,7 @@ static void *lattice_new(t_floatarg segments)
     outlet_new(&x->x_obj, gensym("signal")); 
 
     if (seg < 1) seg = 1;
-    if (seg > maxorder) seg = maxorder;
+    if (seg > MAXORDER) seg = MAXORDER;
 
     x->x_ctl.c_segments = seg;
 

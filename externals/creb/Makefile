@@ -22,3 +22,7 @@ tags:
 tagsclean:
 	rm -f TAGS
 
+mrproper: clean tagsclean
+	rm -rf Makefile.config config.status config.log configure autom4te.cache
+
+

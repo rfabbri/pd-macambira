@@ -30,5 +30,15 @@
 /* convert milliseconds to 1-p, with p a real pole */
 float milliseconds_2_one_minus_realpole(float time);
 
+
+typedef union
+{
+    unsigned int i;
+    float f;
+} t_flint;
+
 /* check if floating point number is denormal */
-#define IS_DENORMAL(f) (((*(unsigned int *)&(f))&0x7f800000) == 0) 
+
+//#define IS_DENORMAL(f) (((*(unsigned int *)&(f))&0x7f800000) == 0) 
+
+#define IS_DENORMAL(f) (((((t_flint)(f)).i) & 0x7f800000) == 0)

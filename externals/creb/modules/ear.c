@@ -47,6 +47,7 @@ void ear_release(t_ear *x, t_floatarg f)
 void ear_start(t_ear *x)
 {
     x->x_ctl.c_target = 1;
+    x->x_ctl.c_state = 0.0f;
 
 }
 
@@ -54,6 +55,12 @@ void ear_stop(t_ear *x)
 {
     x->x_ctl.c_target = 0;
 
+}
+
+void ear_float(t_ear *x, t_floatarg f)
+{
+    if (f == 0.0f) ear_stop(x);
+    else ear_start(x);
 }
 
 static t_int *ear_perform(t_int *w)
@@ -120,6 +127,7 @@ void ear_tilde_setup(void)
     //post("ear~ v0.1");
     ear_class = class_new(gensym("ear~"), (t_newmethod)ear_new,
     	(t_method)ear_free, sizeof(t_ear), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(ear_class, (t_method)ear_float, gensym("float"), A_FLOAT, 0);
     class_addmethod(ear_class, (t_method)ear_start, gensym("start"), 0);
     class_addmethod(ear_class, (t_method)ear_start, gensym("bang"), 0);
     class_addmethod(ear_class, (t_method)ear_stop, gensym("stop"), 0);

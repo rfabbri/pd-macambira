@@ -63,6 +63,7 @@ void eadsr_release(t_eadsr *x, t_floatarg f)
 void eadsr_start(t_eadsr *x)
 {
     x->x_ctl.c_target = 1;
+    x->x_ctl.c_state = 0.0f;
 
 }
 
@@ -70,6 +71,12 @@ void eadsr_stop(t_eadsr *x)
 {
     x->x_ctl.c_target = 0;
 
+}
+
+void eadsr_float(t_eadsr *x, t_floatarg f)
+{
+    if (f == 0.0f) eadsr_stop(x);
+    else eadsr_start(x);
 }
 
 static t_int *eadsr_perform(t_int *w)
@@ -87,35 +94,28 @@ static t_int *eadsr_perform(t_int *w)
     t_int i;
 
 
-    if (target == 1) 
-      /* attack phase */
-      {
-	for (i = 0; i < n; i++)
-	  {
+    for (i = 0; i < n; i++){
+	if (target == 1.0f){
+	    /* attack */
 	    *out++ = state;
 	    state += attack*(1 - state);
-	  }
-	if (state > ENVELOPE_MAX)
-	    ctl->c_target = sustain;
-      }
-
-    else if (target == 0) 
-    /* release phase */
-      for (i = 0; i < n; i++)
-	{
-	  *out++ = state;
-	  state -= release*state;
+	    target = (state > ENVELOPE_MAX) ? sustain : 1.0f;
 	}
-
-    else 
-    /* decay phase */
-      for (i = 0; i < n; i++)
-	{
-	  *out++ = state;
-	  state -= decay*(state-sustain);
+	else if (target == 0.0f){
+	    /* release */
+	    *out++ = state;
+	    state -= release*state;
 	}
+	else{
+	    /* decay */
+	    *out++ = state;
+	    state -= decay*(state-sustain);
+	}
+    }
 
+    /* save state */
     ctl->c_state = IS_DENORMAL(state) ? 0 : state;
+    ctl->c_target = target;
     return (w+4);
 }
 
@@ -157,6 +157,7 @@ void eadsr_tilde_setup(void)
     //post("eadsr~ v0.1");
     eadsr_class = class_new(gensym("eadsr~"), (t_newmethod)eadsr_new,
     	(t_method)eadsr_free, sizeof(t_eadsr), 0,  A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(eadsr_class, (t_method)eadsr_float, gensym("float"), A_FLOAT, 0);
     class_addmethod(eadsr_class, (t_method)eadsr_start, gensym("start"), 0);
     class_addmethod(eadsr_class, (t_method)eadsr_start, gensym("bang"), 0);
     class_addmethod(eadsr_class, (t_method)eadsr_stop, gensym("stop"), 0);

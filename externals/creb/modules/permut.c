@@ -20,9 +20,10 @@
  */
 
 
-#include "m_pd.h"
 #include <math.h>
 #include <stdlib.h>
+//#include "m_pd.h"
+#include "extlib_util.h"
                                
 
 
@@ -64,7 +65,8 @@ static void permut_random(t_permut *x, t_floatarg seed)
   int *p = x->x_ctl.c_permutationtable;
   int r, last = 0;
 
-  srand(* ((unsigned int *)(&seed)));
+  //srand(* ((unsigned int *)(&seed)));
+  srand (((t_flint)seed).i);
 
   if(p)
     {
@@ -91,7 +93,8 @@ static void permut_random(t_permut *x, t_floatarg seed)
 static void permut_bang(t_permut *x)
 {
     unsigned int r = rand();
-    permut_random(x, *((float *)(&r)));
+    //permut_random(x, *((float *)(&r)));
+    permut_random(x, ((t_flint)r).f);
 }
 
 static void permut_resize_table(t_permut *x, int size)

@@ -1,7 +1,7 @@
 include ../Makefile.config
 current: all
 
-all: biquadseries.o filterortho.o
+all: biquadseries.o filterortho.o blosc.o
 
 
 clean:

@@ -311,11 +311,11 @@ static void fdn_updatedamping(t_fdn *x)
 }
 
 static void fdn_timelow(t_fdn *x, t_float f){
-  x->x_ctl.c_timelow = f;
+  x->x_ctl.c_timelow = fabs(f);
   fdn_updatedamping(x);
 }
 static void fdn_timehigh(t_fdn *x, t_float f){
-  x->x_ctl.c_timehigh = f;
+  x->x_ctl.c_timehigh = fabs(f);
   fdn_updatedamping(x);
 }
 

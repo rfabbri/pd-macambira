@@ -67,11 +67,15 @@ static t_int *statwav_tilde_perform(t_int *w)
     {
       float phase = *in++;
       float modphase = phase - (int)phase;
-      float findex = modphase * maxindex;
-      int index = findex;
+      float findex;
+      int index;
       int ia, ib, ic, id;
       float frac,  a,  b,  c,  d, cminusb;
       static int count;
+
+      if (modphase < 0.0f) modphase += 1.0f;
+      findex = modphase * maxindex;
+      index = findex;
     
 
       frac = findex - index;

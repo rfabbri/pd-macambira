@@ -30,7 +30,7 @@ typedef struct filterortho_struct
 {
     t_object x_obj;
     t_float x_f;
-    DSPIfilterOrtho filterortho;
+    DSPIfilterOrtho *filterortho;
 } t_filterortho;
 
 void filterortho_bang(t_filterortho *x)
@@ -68,11 +68,12 @@ static t_int *filterortho_perform(t_int *w)
 
 static void filterortho_dsp(t_filterortho *x, t_signal **sp)
 {
-    dsp_add(filterortho_perform, 4, &(x->filterortho), sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
+    dsp_add(filterortho_perform, 4, x->filterortho, sp[0]->s_n, sp[0]->s_vec, sp[1]->s_vec);
 
 }                                  
-void filterortho_free(void)
+void filterortho_free(t_filterortho *x)
 {
+    delete x->filterortho;
 
 }
 
@@ -80,21 +81,22 @@ t_class *filterortho_class;
 
 
 
-void setLP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho.setLP(f / sys_getsr(), Q);}
-void setHP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho.setHP(f / sys_getsr(), Q);}
-void setBP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho.setBP(f / sys_getsr(), Q);}
-void setBR(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho.setBR(f / sys_getsr(), Q);}
-void setAP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho.setAP(f / sys_getsr(), Q);}
+void setLP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho->setLP(f / sys_getsr(), Q);}
+void setHP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho->setHP(f / sys_getsr(), Q);}
+void setBP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho->setBP(f / sys_getsr(), Q);}
+void setBR(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho->setBR(f / sys_getsr(), Q);}
+void setAP(t_filterortho *x,  t_floatarg f, t_floatarg Q) {x->filterortho->setAP(f / sys_getsr(), Q);}
 
-void setLS(t_filterortho *x,  t_floatarg f, t_floatarg A) {x->filterortho.setLS(f / sys_getsr(), A);}
-void setHS(t_filterortho *x,  t_floatarg f, t_floatarg A) {x->filterortho.setHS(f / sys_getsr(), A);}
+void setLS(t_filterortho *x,  t_floatarg f, t_floatarg A) {x->filterortho->setLS(f / sys_getsr(), A);}
+void setHS(t_filterortho *x,  t_floatarg f, t_floatarg A) {x->filterortho->setHS(f / sys_getsr(), A);}
 
-void setEQ(t_filterortho *x,  t_floatarg f, t_floatarg Q, t_floatarg A) {x->filterortho.setEQ(f / sys_getsr(), Q, A);}
+void setEQ(t_filterortho *x,  t_floatarg f, t_floatarg Q, t_floatarg A) {x->filterortho->setEQ(f / sys_getsr(), Q, A);}
 
 
 void *filterortho_new()
 {
     t_filterortho *x = (t_filterortho *)pd_new(filterortho_class);
+    x->filterortho = new DSPIfilterOrtho();
     outlet_new(&x->x_obj, gensym("signal")); 
     setLP(x, 10000, 2);
     return (void *)x;
@@ -107,11 +109,11 @@ extern "C" {
 void filterortho_tilde_setup(void)
 {
     //post("filterortho~ v0.1");
-
     filterortho_class = class_new(gensym("filterortho~"), (t_newmethod)filterortho_new,
     	(t_method)filterortho_free, sizeof(t_filterortho), 0, A_NULL);
 
     CLASS_MAINSIGNALIN(filterortho_class, t_filterortho, x_f); 
+
 
     class_addmethod(filterortho_class, (t_method)filterortho_bang, gensym("bang"), A_NULL);
 

@@ -1,0 +1,8 @@
+#N canvas 642 410 542 207 10;
+#X obj 85 82 clog~;
+#X obj 145 82 cexp~;
+#X text 235 81 complex log and exp.;
+#X text 237 105 see also;
+#X obj 309 104 cep~;
+#X text 351 103 and;
+#X obj 384 105 icep~;

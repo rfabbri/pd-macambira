@@ -140,10 +140,10 @@ static void *matrix_new(t_floatarg order)
     return (void *)x;
 }
 
-void matrix_tilde_setup(void)
+void bmatrix_tilde_setup(void)
 {
   //post("matrix~ v0.1");
-    matrix_class = class_new(gensym("matrix~"), (t_newmethod)matrix_new,
+    matrix_class = class_new(gensym("bmatrix~"), (t_newmethod)matrix_new,
     	(t_method)matrix_free, sizeof(t_matrix), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(matrix_class, t_matrix, x_f);
     class_addmethod(matrix_class, (t_method)matrix_dsp, gensym("dsp"), 0); 
