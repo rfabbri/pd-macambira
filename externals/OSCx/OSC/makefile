@@ -52,8 +52,8 @@ LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 # ----------------------------------------------------------
 
 pd_linux_clean:
-	    -rm -rf *.$(EXT) *.$(SFX) *~
+	    -rm -rf *.$(EXT) *.pd_linux *~
 
 pd_darwin_clean:
-	    -rm -rf *.$(EXT) *.$(SFX) *~
+	    -rm -rf *.$(EXT) *.pd_darwin *~
 
