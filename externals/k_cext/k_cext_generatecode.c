@@ -194,20 +194,16 @@ static void k_cext_gen_mainfunccode(t_k_cext *x,int argc, t_atom* argv,int i, st
     case A_SYMBOL:
       sprintf(string,"%s",atom_getsymbolarg(i,argc,argv)->s_name);
 
-      printf("string: \"%s\"\n",string);
-
       if(strstr(string,"s<")!=NULL){
 	char *pos=strstr(string,"s<");
 	pos[0]=' ';
 	pos[1]='\"';
-	printf("japp\n");
       }
 
       if(strstr(string,">s")!=NULL){
 	char *pos=strstr(string,">s");
 	pos[0]='\"';
 	pos[1]=' ';
-	printf("japp2n");
       }
       
       if(!strcmp(".",string)){
