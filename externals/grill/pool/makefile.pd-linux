@@ -16,17 +16,23 @@ include $(CONFIG)
 INCLUDES=$(PDPATH) 
 FLAGS=-DFLEXT_SYS=2 
 CFLAGS=-O2 $(UFLAGS)
-LIBPATH=$(FLEXTPATH)
-LIBS=flext 
+LIBS= 
 
 ifdef FLEXT_SHARED
 CFLAGS+=-shared -DFLEXT_SHARED
+LDFLAGS+=-L $(FLEXTPATH)
 
 ifeq ($(CXX),icc)
 LDFLAGS+=-i_dynamic
 else
 LDFLAGS+=-Wl,-Bdynamic
 endif
+
+FLEXTLIB=-lflext
+
+else
+
+FLEXTLIB=$(FLEXTPATH)/libflext.a
 
 endif
 
@@ -48,7 +54,7 @@ TARGET=$(TARGDIR)/$(NAME).pd_linux
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
@@ -58,7 +64,7 @@ $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
-	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS))  
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(FLEXTLIB)  $(patsubst %,-l%,$(LIBS))  
 	strip --strip-unneeded $@
 	chmod 755 $@
 
