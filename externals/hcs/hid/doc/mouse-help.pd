@@ -1,4 +1,4 @@
-#N canvas 138 201 676 441 10;
+#N canvas 225 161 684 449 10;
 #X symbolatom 233 198 0 0 0 0 - - -;
 #X obj 200 36 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
@@ -30,6 +30,34 @@
 #X msg 250 42 open 1;
 #X msg 255 61 open 2;
 #X obj 200 91 mouse 1;
+#N canvas 462 248 604 514 mouse-noise 0;
+#X obj 90 55 inlet;
+#X obj 113 173 mouse \$1;
+#X obj 180 294 noise~;
+#X obj 125 293 osc~;
+#X obj 125 266 * 4000;
+#X obj 113 367 *~;
+#X msg 162 103 \; pd dsp 1;
+#X obj 103 418 dac~;
+#X obj 91 78 t f a b;
+#X connect 0 0 8 0;
+#X connect 1 0 5 0;
+#X connect 1 1 4 0;
+#X connect 2 0 5 1;
+#X connect 3 0 5 1;
+#X connect 4 0 3 0;
+#X connect 5 0 7 0;
+#X connect 5 0 7 1;
+#X connect 8 0 5 0;
+#X connect 8 1 1 0;
+#X connect 8 2 6 0;
+#X restore 464 163 pd mouse-noise 1;
+#X msg 505 95 open 0;
+#X msg 510 114 open 1;
+#X msg 515 133 open 2;
+#X obj 464 96 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+;
+#X text 347 72 turn this on to make some noise with the mouse;
 #X connect 1 0 20 0;
 #X connect 9 0 6 0;
 #X connect 9 1 7 0;
@@ -48,3 +76,7 @@
 #X connect 20 2 3 0;
 #X connect 20 3 0 0;
 #X connect 20 4 2 0;
+#X connect 22 0 21 0;
+#X connect 23 0 21 0;
+#X connect 24 0 21 0;
+#X connect 25 0 21 0;

@@ -32,6 +32,16 @@
 //#define DEBUG(x)
 #define DEBUG(x) x 
 
+/* 
+ * Various Max Refresh Rates: 
+      ADB = 15.5 ms
+		USB mice on Windows = 8-10 ms
+		USB mice on GNU/Linux = 1-10 ms
+		USB wireless mice = 12-20 ms
+		PS/2 mouse = 5-25 ms
+		P5 Globe = 22 ms
+ */
+
 #define DEFAULT_DELAY 5
 
 /*------------------------------------------------------------------------------
@@ -44,6 +54,44 @@ t_int hid_open(t_hid *x, t_float f);
 t_int hid_close(t_hid *x);
 t_int hid_read(t_hid *x,int fd);
 static void hid_float(t_hid* x, t_floatarg f);
+
+
+/*------------------------------------------------------------------------------
+ * SUPPORT FUNCTIONS
+ */
+
+void hid_output_event(t_hid *x, 
+							  char *type, char *code, t_float value, t_float timestamp)
+{
+	t_atom event_data[4];
+	
+	SETSYMBOL(event_data, gensym(type));	   /* type */
+	SETSYMBOL(event_data + 1, gensym(code));	/* code */
+	SETFLOAT(event_data + 2, value);	         /* value */
+	SETFLOAT(event_data + 3, timestamp); 	   /* timestamp */
+
+	outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1);
+}
+
+void hid_set_from_float(t_hid *x, t_floatarg f)
+{
+/* values greater than 1 set the polling delay time */
+/* 1 and 0 for start/stop so you can use a [tgl] */
+	if (f > 1)
+	{
+		x->x_delay = (t_int)f;
+		hid_start(x,f);
+	}
+	else if (f == 1) 
+	{
+		if (! x->x_started)
+		hid_start(x,f);
+	}
+	else if (f == 0) 		
+	{
+		hid_stop(x);
+	}
+}
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
@@ -73,6 +121,7 @@ t_int hid_close(t_hid *x)
 	if(! hid_close_device(x)) 
 	{
 		post("[hid] closed device number %d",x->x_device_number);
+		x->x_device_open = 0;
 		return (0);
 	}
 
@@ -80,43 +129,53 @@ t_int hid_close(t_hid *x)
 }
 
 
+/* closed same device          open */
+/* open same device            no action */
+/* closed different device     open */
+/* open different device       close open */
+
 t_int hid_open(t_hid *x, t_float f) 
 {
 	DEBUG(post("hid_open"););
 
-/* store running state so that it can be restored after the device has been opened */
-	t_int started = x->x_started;
-	
-	hid_close(x);
+/* store running state to be restored after the device has been opened */
+		t_int started = x->x_started;
 
-  /* set obj device name to parameter 
-   * otherwise set to default
-   */  
-  if (f > 0)
-	  x->x_device_number = f;
-  else
-	  x->x_device_number = 0;
+		if ( (f != x->x_device_number) && (x->x_device_open) ) hid_close(x);
 
-  if (hid_open_device(x,x->x_device_number)) 
-  {
-	  error("[hid] can not open device %d",x->x_device_number);
-	  post("\\=========================== [hid] ===========================/\n");
-	  return (1);
-  }
+		/* set obj device name to parameter otherwise set to default   */  
+		if (f > 0)
+			x->x_device_number = f;
+		else
+			x->x_device_number = 0;
+		
+		if (! x->x_device_open) 
+			if (hid_open_device(x,x->x_device_number))
+			{
+				error("[hid] can not open device %d",x->x_device_number);
+				post("\\=========================== [hid] ===========================/\n");
+				return (1);
+			}
+			else
+			{
+				x->x_device_open = 1;
+			}
 
 /* restore the polling state so that when I [tgl] is used to start/stop [hid],
- * the [tgl]'s state will continue to accurately reflect [hid]'s state 
- */
-  hid_float(x,started);
+ * the [tgl]'s state will continue to accurately reflect [hid]'s state  */
+		hid_set_from_float(x,started);
 
-  post("\\=========================== [hid] ===========================/\n");
-  return (0);
+		
+	post("\\=========================== [hid] ===========================/\n");
+	return (0);
 }
 
 
 t_int hid_read(t_hid *x,int fd) 
 {
-	hid_output_events(x);
+//	DEBUG(post("hid_read"););
+
+	hid_get_events(x);
 	
 	if (x->x_started) 
 	{
@@ -147,22 +206,7 @@ static void hid_float(t_hid* x, t_floatarg f)
 {
 	DEBUG(post("hid_float"););
 
-/* values greater than 1 set the polling delay time */
-/* 1 and 0 for start/stop so you can use a [tgl] */
-	if(f > 1)
-	{
-		x->x_delay = (t_int)f;
-		hid_start(x,f);
-	}
-	else if(f == 1) 
-	{
-		if (! x->x_started)
-		hid_start(x,f);
-	}
-	else if(f == 0) 		
-	{
-		hid_stop(x);
-	}
+	hid_set_from_float(x,f);
 }
 
 /* setup functions */
@@ -194,6 +238,7 @@ static void *hid_new(t_float f)
 #endif
 
   /* init vars */
+  x->x_device_open = 0;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
 
@@ -203,7 +248,7 @@ static void *hid_new(t_float f)
   outlet_new(&x->x_obj, 0);
 
   /* find and report the list of devices */
-  hid_devicelist_refresh(x);
+  hid_build_device_list(x);
   
   /* Open the device and save settings.  If there is an error, return the object
    * anyway, so that the inlets and outlets are created, thus not breaking the
@@ -229,7 +274,7 @@ void hid_setup(void)
 	class_addbang(hid_class,(t_method) hid_read);
 	
 	/* add inlet message methods */
-	class_addmethod(hid_class,(t_method) hid_devicelist_refresh,gensym("refresh"),0);
+	class_addmethod(hid_class,(t_method) hid_build_device_list,gensym("refresh"),0);
 	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
 	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),A_DEFFLOAT,0);

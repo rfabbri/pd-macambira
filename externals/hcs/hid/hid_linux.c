@@ -37,9 +37,9 @@
  * which would be very annoying. 
  */
 
-t_int hid_output_events(t_hid *x)
+t_int hid_get_events(t_hid *x)
 {
-	DEBUG(post("hid_output_events"););
+	DEBUG(post("hid_get_events"););
 
 /*	for debugging, counts how many events are processed each time hid_read() is called */
 	t_int i;
@@ -217,9 +217,9 @@ t_int hid_close_device(t_hid *x)
 		return (close(x->x_fd));
 }
 
-t_int hid_devicelist_refresh(t_hid *x)
+t_int hid_build_device_list(t_hid *x)
 {
-	DEBUG(post("hid_devicelist_refresh"););
+	DEBUG(post("hid_build_device_list"););
 	/* the device list should be refreshed here */
 /*
  *	since in GNU/Linux the device list is the input event devices 

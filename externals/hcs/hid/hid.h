@@ -14,7 +14,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 1
 
-static char *version = "$Revision: 1.8 $";
+static char *version = "$Revision: 1.9 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -27,11 +27,11 @@ typedef struct _hid
 		t_int               x_fd;
 		t_symbol            *x_devname;
 		t_int               x_device_number;
-		long                x_locID;
 		t_clock             *x_clock;
 		t_int               x_delay;
 		t_int               x_started;
 		t_int               x_device_open;
+		t_int               x_instance_count;
 } t_hid;
 
 
@@ -48,11 +48,15 @@ char *codeList[256];
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS
  */
 
+/* support functions */
+void hid_output_event(t_hid *x,
+							  char *type, char *code, t_float value, t_float timestamp);
+
 /* generic, cross-platform functions */
 t_int hid_open_device(t_hid *x, t_int device_number);
 t_int hid_close_device(t_hid *x);
-t_int hid_devicelist_refresh(t_hid* x);
-t_int hid_output_events(t_hid *x) ;
+t_int hid_build_device_list(t_hid* x);
+t_int hid_get_events(t_hid *x) ;
 void hid_platform_specific_free(t_hid *x);
 
 #endif  /* #ifndef _HID_H */
