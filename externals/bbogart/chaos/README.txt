@@ -28,7 +28,11 @@ USAGE:
 
 The package only includes 2 and 3 dimentional attractors. There are
 outlets for each dimention. The scale of the values vary between the
-different attractors. The object methods are as follows:
+different attractors. To run pd with the chaos externals use:
+
+pd -lib chaos
+
+The object methods are as follows:
 
 bang:	Calculate one interation of the attractor.
 reset:	Reset to initial conditions.
