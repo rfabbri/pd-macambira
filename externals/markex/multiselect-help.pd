@@ -1,4 +1,4 @@
-#N canvas 320 324 484 381 10;
+#N canvas 320 324 492 389 10;
 #X text 13 14 [multiselect] is part of MarkEx \, which was formerly
 in GEM \, and was written by Mark Danks.;
 #X text 16 52 [multiselect] is like [select] \, except that you send
@@ -13,9 +13,9 @@ on the fly.;
 #X obj 92 345 select;
 #X text 21 346 see also:;
 #X floatatom 155 209 0 0 0 0 - - -;
-#X msg 219 167 1;
-#X msg 185 167 54;
-#X msg 155 167 23;
+#X msg 141 167 1;
+#X msg 110 167 54;
+#X msg 80 167 23;
 #X obj 155 239 multiselect 23 54 1;
 #X obj 155 259 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -24,6 +24,12 @@ on the fly.;
 -1;
 #X obj 240 259 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
+#X msg 171 167 57;
+#X msg 201 167 23;
+#X msg 232 167 5;
+#X msg 283 215 list 57 23 5;
+#X text 19 139 WARNING: changing the argument crashes Pd! I could not
+figure out how to get this to work.;
 #X connect 6 0 10 0;
 #X connect 7 0 6 0;
 #X connect 8 0 6 0;
@@ -32,3 +38,6 @@ on the fly.;
 #X connect 10 1 13 0;
 #X connect 10 2 14 0;
 #X connect 10 3 12 0;
+#X connect 15 0 6 0;
+#X connect 16 0 6 0;
+#X connect 17 0 6 0;
