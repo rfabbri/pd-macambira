@@ -2,7 +2,7 @@ Source: pdp
 Section: graphics
 Priority: extra
 Maintainer: Pablo Martín <caedes@sindominio.net>
-Build-Depends: debhelper (>> 4.0.0), libquicktime-dev, xlibs-dev, libquicktime-dev, liblame-dev
+Build-Depends: debhelper (>> 4.0.0), libquicktime-dev, xlibs-dev, libgsl0-dev
 Standards-Version: 3.5.8
 
 Package: pd-pdp
