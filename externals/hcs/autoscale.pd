@@ -1,5 +1,5 @@
-#N canvas 206 226 769 538 10;
-#X obj 45 20 inlet;
+#N canvas 206 226 773 542 10;
+#X obj 45 30 inlet;
 #X obj 175 453 outlet;
 #X obj 235 268 f;
 #X text 262 268 min;
@@ -31,14 +31,15 @@
 #X text 2 476 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 219 491 released under the GNU GPL;
-#X text 417 475 $Revision: 1.4 $$Date: 2004-11-27 19:31:17 $;
+#X text 417 475 $Revision: 1.5 $$Date: 2004-11-28 20:50:14 $;
 #X text 417 488 $Author: eighthave $;
-#X obj 45 54 route reset;
+#X obj 45 62 route reset;
 #X obj 45 81 bang;
 #X msg 45 129 0;
-#X text 150 41 these [oneshot] bits are just here to get the ball rolling
-;
 #X msg 114 102 clear;
+#X text 172 47 these [oneshot] bits are just here to get the max/min
+tracking started;
+#X text 8 3 [autoscale];
 #X connect 0 0 31 0;
 #X connect 2 0 7 1;
 #X connect 2 0 10 1;
@@ -79,8 +80,8 @@
 #X connect 31 0 32 0;
 #X connect 31 1 9 0;
 #X connect 32 0 33 0;
-#X connect 32 0 35 0;
+#X connect 32 0 34 0;
 #X connect 33 0 2 0;
 #X connect 33 0 12 0;
-#X connect 35 0 14 0;
-#X connect 35 0 11 0;
+#X connect 34 0 14 0;
+#X connect 34 0 11 0;
