@@ -51,10 +51,10 @@ void ttbext_setup()
   post("TBEXT: by tim blechmann");
   post("version "TBEXT_VERSION);
   post("compiled on "__DATE__);
-  post("");
+  post("contains: tbroute(~), tbsig~, tbpow~, tbfft1~, tbfft2~, bufline~, fftgrrev~");
+  post("          fftgrsort~, fftgrshuf~");
 
   FLEXT_SETUP(tbroute);
-  //FLEXT_SETUP(tbstrg);
   FLEXT_DSP_SETUP(tbsroute);
   //  FLEXT_DSP_SETUP(tbssel);
   FLEXT_DSP_SETUP(tbsig);
@@ -66,6 +66,7 @@ void ttbext_setup()
   FLEXT_DSP_SETUP(fftgrsort);
   FLEXT_DSP_SETUP(fftgrshuf);
   FLEXT_DSP_SETUP(fftgrrev);
+  FLEXT_DSP_SETUP(spigot_tilde);
 }
 
 FLEXT_LIB_SETUP(tbext,ttbext_setup)

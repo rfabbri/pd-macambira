@@ -121,26 +121,35 @@ fftbuf::~fftbuf()
 
 void fftbuf::m_signal(int n, t_float *const *in, t_float *const *out)
 {
-  outs = out[0];
-  
-  if (counter!=0)
+  if (check(buf))
     {
-      n=n/2+1;
+      outs = out[0];
+      
+      if (counter!=0)
+	{
+	  n=n/2+1;
       while (--n)
 	data[n] = data[n] - offset[n];
       
       
       /*      for(int i=0;i!=bs;++i)
-      {
+	      {
 	data[i] = data[i] - offset[i];
-      }
+	}
       */
-
+      
       --counter;
+	}
+      
+      CopySamples(out[0],data,bs);
     }
-
-  CopySamples(out[0],data,bs);
+  else
+    CopySamples(out[0],data,bs);
+  
 }
+
+//perform und dsp gleichzeitig?!?
+
 
 void fftbuf::perform()
 {
@@ -196,7 +205,7 @@ void fftbuf::set_buf(int argc, t_atom *argv)
 }
 
 template<typename T>
-/*inline*/ void fftbuf::clear(T* buf)
+inline void fftbuf::clear(T* buf)
 {
   if (buf)
     {
@@ -207,6 +216,8 @@ template<typename T>
 
 inline bool fftbuf::check(buffer * buf) 
 {
+  if (buf==NULL)
+    return false;
 //code taken from the flext tutorial (buffer 1) by thomas grill
 
   if(buf->Update()) 
@@ -241,7 +252,8 @@ void fftbuf::set_line(int argc, t_atom *argv)
 
 inline int fftbuf::blknumber()
 {
-  //  post("%i %i %i",delay,bs,sr);
-  //  post("computer counter: %i",delay*bs/sr*1000);
-  return delay*bs/sr*1000; //ms/sample
+  post("%i %i %i",delay,bs,sr);
+  post("blknumber: %i",delay*bs/sr);
+
+  return delay*bs/sr; //ms/sample
 }

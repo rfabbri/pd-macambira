@@ -72,7 +72,7 @@ private:
   float *ins;
   float *outs;
   float *tmps;
-  t_float tmp[2049];
+  t_float tmp[17000];
   
   t_float s;
   t_float b;
