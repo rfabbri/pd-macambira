@@ -1,4 +1,6 @@
 
+-real autoconf enable
+
 -scaler
 
 -event_quantize

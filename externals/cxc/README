@@ -1,5 +1,5 @@
 --------------------------
-  cxc stuffy pd eternals
+  cxc pd eternals library
   powered by  zt0ln d4ta
 --------------------------
 
@@ -74,7 +74,7 @@ x_connective*.diffs: patch for pd-src to make receives have inlets and set
 see reference folder for objects in action
 
 
-jdl@xdv.org, 20020702
+jdl@xdv.org, 20020922
 ------------------------------
 references see REFERENCES file
 bla
