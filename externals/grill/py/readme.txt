@@ -21,7 +21,7 @@ Package files:
 
 Goals/features of the package:
 
-Access the flexibility of the python language in PD/MaxMSP
+Access the flexibility of the python language in PD and MaxMSP
 
 
 PD - Load it as i library with e.g. "pd -lib py -path scripts"
@@ -38,6 +38,11 @@ With the pyext you can use python classes to represent full-featured pd/Max mess
 Multithreading (detached methods) is supported for both objects.
 You can send messages to named objects or receive (with pyext) with Python methods.
 
+
+Known bugs:
+There are problems with importing the "time" module, experienced with Python 2.2.2 under OSX.
+Therefore, some help patches may not be functional.
+
 ----------------------------------------------------------------------------
 
 The py/pyext package should run with Python version >= 2.1.
@@ -46,28 +51,35 @@ It has been thoroughly tested with version 2.2
 
 The package should at least compile (and is tested) with the following compilers:
 
-pd - Windows:
+PD @ Windows:
 -------------
 o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
 
-o Microsoft Visual C++ 6: edit the project file "py.dsp" & build 
+o Microsoft Visual C++ 6: usr "py.dsp" or edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
-pd - linux:
+PD @ linux:
 -----------
 Python doesn't provide a shared lib by default - static linking produces huge externals
 Ok, debian is an exception... the precompiled binary is for debian, therefore.
 
 o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
 
+PD @ MacOSX:
+---------------------
+
+o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
+
 ----------------------------------------------------------------------------
 
 Version history:
 
 0.1.1:
+- CHANGE: updates for flext 0.4.0
 - FIX: crash when module couldn't be loaded
 - FIX: GetBound method (modmeth.cpp, line 138) doesn't exist in flext any more
 - FIX: deadlock occured when connecting to py/pyext boxes in non-detached mode
 - ADD: current path and path of the canvas is added to the python path
+- FIX: path is not added to python path if already included
 
 0.1.0:
 - completely reworked all code
