@@ -159,7 +159,7 @@ begin
       if s<>'' then s:=s+' ';
       s:=s+Names[i];
     end;
-    main.Post('Plugins ('+IntToStr(Names.Count)+' loaded): '+s);
+//    main.Post('Plugins ('+IntToStr(Names.Count)+' loaded): '+s);
   end;
 end;
 

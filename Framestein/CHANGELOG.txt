@@ -18,7 +18,7 @@
 
 - added line width setting to fs.draw
 - fix: border_0 no longer alters frame dimensions
-- preventing lockups-feature to fs.main.pd
+- poor lockup-preventing feature to fs.main.pd
 
 0.31
 - added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!

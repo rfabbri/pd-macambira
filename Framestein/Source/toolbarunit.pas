@@ -4,17 +4,22 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ToolWin, Buttons, ExtCtrls, StdCtrls, ImgList;
+  ComCtrls, ToolWin, Buttons, ExtCtrls, StdCtrls, ImgList,
+  SendKeys, Filez;
 
 type
   Ttoolbar = class(TForm)
-    Panel1: TPanel;
-    LVFilters: TListView;
+    bar: TStatusBar;
+    sd: TScanDir;
+    Panel3: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
     Panel2: TPanel;
     LVTools: TListView;
-    Splitter1: TSplitter;
-    bar: TStatusBar;
     m1: TMemo;
+    Panel1: TPanel;
+    LVFilters: TListView;
     procedure FormCreate(Sender: TObject);
     procedure LVFiltersCustomDrawItem(Sender: TCustomListView;
       Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
@@ -24,8 +29,11 @@ type
       Selected: Boolean);
     procedure LVToolsSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
+    procedure sdHandleFile(const SearchRec: TSearchRec;
+      const FullPath: String);
   private
     { Private declarations }
+    SendKey: TSendKey;
   public
     { Public declarations }
   end;
@@ -39,6 +47,18 @@ uses
   mainunit, strz;
 
 {$R *.DFM}
+
+procedure Ttoolbar.sdHandleFile(const SearchRec: TSearchRec;
+  const FullPath: String);
+begin
+  if ExtractFileExt(UpperCase(FullPath))<>'.8BF' then Exit;
+
+  with LVFilters.Items.Add do begin
+    Caption := ExtractFileName(FullPath);
+    Caption := Copy(Caption, 1, Length(Caption)-4);
+    Data := Pointer(-1);
+  end;
+end;
 
 procedure Ttoolbar.FormCreate(Sender: TObject);
 var
@@ -56,7 +76,7 @@ begin
       end;
   end;
 
-  // Load filters
+  // Load plugins
   if main.Plugins.Names.Count>0 then
     for i:=0 to main.Plugins.Names.Count-1 do begin
       with LVFilters.Items.Add do begin
@@ -65,6 +85,11 @@ begin
         Data := Pointer(i);
       end;
     end;
+
+  // Load photoshop-filters
+  sd.Scan(main.FSFolder+'\Filters');
+
+  SendKey := TSendKey.Create(Self);
   Show;
 end;
 
@@ -83,7 +108,7 @@ procedure Ttoolbar.LVFiltersCustomDrawItem(Sender: TCustomListView;
   Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
 var
   Title: array[0..255] of Char;
-  s, cmd: String;
+  s: String;
   h: THandle;
 begin
   if (it=nil) or (Item.Caption='') then Exit;
@@ -97,10 +122,13 @@ begin
         if Pos('*', S)>0 then Delete(S, Pos('*', S), 255);
 //        main.Post(Item.Caption+' -> '+S);
         if Item.ListView=LVFilters then
-          cmd := 'msg'
-        else
-          cmd := 'obj';
-        main.SendReturnValues('obj pd-'+S+'='+cmd+' 10 10 '+Item.Caption+';');
+          main.SendReturnValues('obj pd-'+S+'=msg 10 10 '+Item.Caption+';')
+        else begin
+          SendKey.Delay := 100;
+          SendKey.TitleText := S;
+          SendKey.Keys := '{^1}'+Item.Caption;
+          SendKey.execute;
+        end;
         Item.ListView.Selected := nil;
       end;
     end;
@@ -110,13 +138,18 @@ end;
 procedure Ttoolbar.LVFiltersSelectItem(Sender: TObject; Item: TListItem;
   Selected: Boolean);
 var
+  i: Longint;
   S: String;
 begin
-  S := main.Plugins.Info(Integer(Item.Data));
-  if S='' then
-    bar.SimpleText := '<no info available>'
-  else
-    bar.SimpleText := Item.Caption+': '+S;
+  i := Longint(Item.Data);
+  if i=-1 then bar.SimpleText := Item.Caption+': Photoshop-filter'
+  else begin
+    S := main.Plugins.Info(i);
+    if S='' then
+      bar.SimpleText := Item.Caption+': <no info available>'
+    else
+      bar.SimpleText := Item.Caption+': '+S;
+  end;
 end;
 
 procedure Ttoolbar.LVToolsSelectItem(Sender: TObject; Item: TListItem;

@@ -1,10 +1,10 @@
-#N canvas 278 0 720 628 12;
+#N canvas 278 0 736 644 12;
 #X floatatom 27 322 4 0 0;
 #X obj 207 160 loadbang;
 #X msg 206 254 disconnect;
 #X msg 27 253 send \$1;
 #X obj 27 203 r fs_main;
-#X obj 127 128 inlet;
+#X obj 127 126 inlet;
 #X text 175 126 port;
 #X obj 127 170 t f b;
 #X text 9 30 only one fs.main at a time \,;
