@@ -12,10 +12,10 @@ sendOSC, dumpOSC, OSCroute
     * #bundle unpacking
 
     * static address resolution
+    * pattern matching
 
   OMITS
     * working with timetags
     * all advanced protocol features of documentation, typesigs, etc
     * connection oriented communication
-    * pattern matching
 
