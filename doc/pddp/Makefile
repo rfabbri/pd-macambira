@@ -3,7 +3,7 @@
 
 current: darwin_package
 
-PDDP_VERSION = 0.1
+PDDP_VERSION = $(shell date +20%y.%m.%d)
 
 PACKAGE_NAME = pd-pddp-$(PDDP_VERSION)
 
