@@ -18,6 +18,8 @@ Version history:
 		[vasp a b c( -> [vasp.spit 2] now outputs a(outlet 2), b(outlet 1), c(outlet 2), bang(outlet 3)
 - REMOVE: eliminated [vasp.cconj] as an object as it can easily be replaced by an abstraction
 - ADD: vasp.search (vasp.o=, vasp.f=) objects... @incl attribute (default false) to include current sample into search
+- ADD: [vasp.channels?] reports number of channels in the first vasp vector (buffer/array)
+- CHANGE: vasp.min?, vasp.max?, vasp.amin?, vasp.amax?, vasp.rmin?, vasp.rmax? no longer return the reference vasp / return a list of vector maxima/minima
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument

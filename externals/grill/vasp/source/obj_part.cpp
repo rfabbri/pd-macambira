@@ -34,7 +34,7 @@ class vasp_part:
 	FLEXT_HEADER_S(vasp_part,vasp_op,Setup)
 
 public:
-	vasp_part(I argc,t_atom *argv):
+	vasp_part(I argc,const t_atom *argv):
 		parts(0),part(NULL)
 	{
 		m_part(argc,argv);

@@ -61,8 +61,8 @@ $(INSTDIR)/vasp: $(INSTDIR)
 
 install:: $(INSTDIR)/vasp
 
-install:: $(TARGET) pd
-	cp -R $^ $(INSTDIR)/vasp
+install:: $(TARGET) pd/*
+	-cp $^ $(INSTDIR)/vasp
 #	chown -R root.root $(INSTDIR)/vasp
 
 
@@ -72,7 +72,7 @@ $(HELPDIR)/vasp:
 install-help:: $(HELPDIR)/vasp
 
 install-help:: ./pd-help
-	cp $^/*.* $(HELPDIR)/vasp
+	cp $^/* $(HELPDIR)/vasp
 #	chown -R root.root $(HELPDIR)/vasp
 
 

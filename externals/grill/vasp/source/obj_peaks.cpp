@@ -34,7 +34,7 @@ class vasp_qpeaks:
 	FLEXT_HEADER_S(vasp_qpeaks,vasp_op,Setup)
 
 public:
-	vasp_qpeaks(I argc,t_atom *argv):
+	vasp_qpeaks(I argc,const t_atom *argv):
 		peaks(1)
 	{
 		if(argc >= 1 && CanbeInt(argv[0]))

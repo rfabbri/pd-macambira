@@ -33,7 +33,7 @@ class vasp_size:
 	FLEXT_HEADER_S(vasp_size,vasp_tx,Setup)
 
 public:
-	vasp_size(I argc,t_atom *argv,BL abs = true):
+	vasp_size(I argc,const t_atom *argv,BL abs = true):
 		size(0),sets(false),keep(true),zero(true)
 	{
 		if(argc >= 1 && CanbeFloat(argv[0]))
@@ -105,7 +105,7 @@ class vasp_dsize:
 	FLEXT_HEADER(vasp_dsize,vasp_size)
 
 public:
-	vasp_dsize(I argc,t_atom *argv): vasp_size(argc,argv) {}
+	vasp_dsize(I argc,const t_atom *argv): vasp_size(argc,argv) {}
 
 	virtual Vasp *x_work() 
 	{ 
@@ -138,7 +138,7 @@ class vasp_msize:
 	FLEXT_HEADER_S(vasp_msize,vasp_size,Setup)
 
 public:
-	vasp_msize(I argc,t_atom *argv): 
+	vasp_msize(I argc,const t_atom *argv): 
 		vasp_size(argc,argv,false) 
 	{
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
@@ -191,7 +191,7 @@ class vasp_rsize:
 	FLEXT_HEADER(vasp_rsize,vasp_msize)
 
 public:
-	vasp_rsize(I argc,t_atom *argv): vasp_msize(argc,argv) {}
+	vasp_rsize(I argc,const t_atom *argv): vasp_msize(argc,argv) {}
 
 	virtual Vasp *x_work() 
 	{ 

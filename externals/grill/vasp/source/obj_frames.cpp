@@ -32,7 +32,7 @@ class vasp_frames:
 	FLEXT_HEADER_S(vasp_frames,vasp_tx,Setup)
 
 public:
-	vasp_frames(I argc,t_atom *argv,BL abs = true):
+	vasp_frames(I argc,const t_atom *argv,BL abs = true):
 		frms(0),setf(false)
 	{
 		if(argc && CanbeFloat(argv[0]))
@@ -101,7 +101,7 @@ class vasp_dframes:
 	FLEXT_HEADER(vasp_dframes,vasp_frames)
 
 public:
-	vasp_dframes(I argc,t_atom *argv): vasp_frames(argc,argv) {}
+	vasp_dframes(I argc,const t_atom *argv): vasp_frames(argc,argv) {}
 
 	virtual Vasp *x_work() 
 	{ 
@@ -134,7 +134,7 @@ class vasp_mframes:
 	FLEXT_HEADER_S(vasp_mframes,vasp_frames,Setup)
 
 public:
-	vasp_mframes(I argc,t_atom *argv): 
+	vasp_mframes(I argc,const t_atom *argv): 
 		vasp_frames(argc,argv,false) 
 	{
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
@@ -187,7 +187,7 @@ class vasp_rframes:
 	FLEXT_HEADER(vasp_rframes,vasp_mframes)
 
 public:
-	vasp_rframes(I argc,t_atom *argv): vasp_mframes(argc,argv) {}
+	vasp_rframes(I argc,const t_atom *argv): vasp_mframes(argc,argv) {}
 
 	virtual Vasp *x_work() 
 	{ 

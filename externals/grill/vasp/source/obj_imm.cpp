@@ -37,7 +37,7 @@ class vasp_imm:
 	FLEXT_HEADER_S(vasp_imm,vasp_op,Setup)
 
 public:
-	vasp_imm(I argc,t_atom *argv):
+	vasp_imm(I argc,const t_atom *argv):
 		frms(0),zero(true)
 	{
 		if(argc >= 1 && CanbeInt(argv[0]))

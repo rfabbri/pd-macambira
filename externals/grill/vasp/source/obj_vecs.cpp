@@ -33,7 +33,7 @@ class vasp_vector:
 	FLEXT_HEADER_S(vasp_vector,vasp_tx,Setup)
 
 public:
-	vasp_vector(I argc,t_atom *argv):
+	vasp_vector(I argc,const t_atom *argv):
 		ix(0)
 	{
 		if(argc >= 1 && CanbeInt(argv[0]))

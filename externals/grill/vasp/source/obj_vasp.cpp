@@ -36,7 +36,7 @@ class vasp_v:
 
 public:
 
-	vasp_v(I argc,t_atom *argv)
+	vasp_v(I argc,const t_atom *argv)
 	{
 		m_set(argc,argv);
 
@@ -53,7 +53,7 @@ public:
 		FLEXT_CADDMETHOD_(c,1,"radio",a_radio);
 	}
 
-	V a_radio(I,t_atom *) {}
+	V a_radio(I,const t_atom *) {}
 
 	virtual Vasp *x_work() { return new Vasp(ref); }
 
@@ -174,7 +174,7 @@ class vasp_multi:
 
 public:
 
-	vasp_multi(I argc,t_atom *argv)
+	vasp_multi(I argc,const t_atom *argv)
 	{
 		I cnt = -1;
 		if(argc) {

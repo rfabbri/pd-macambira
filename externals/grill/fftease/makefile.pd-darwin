@@ -48,7 +48,7 @@ $(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(MAK
 	touch $@
 
 $(TARGDIR):
-	mkdir $(TARGDIR)
+	-mkdir $(TARGDIR)
 
 $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
@@ -61,7 +61,7 @@ $(TARGET) : $(patsubst %.c,$(TARGDIR)/%.co,$(patsubst %.cpp,$(TARGDIR)/%.o,$(SRC
 	chmod 755 $@
 
 $(INSTPATH):
-	mkdir $(INSTPATH)
+	-mkdir $(INSTPATH)
 
 install:: $(INSTPATH)
 

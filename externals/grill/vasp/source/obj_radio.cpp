@@ -42,7 +42,7 @@ public:
 		FLEXT_CADDMETHOD(c,0,m_any);
 	}
 
-	virtual V m_any(const t_symbol *s,I argc,t_atom *argv);
+	virtual V m_any(const t_symbol *s,I argc,const t_atom *argv);
 
 	virtual V m_help() { post("%s - split into radio and non-radio messages",thisName()); }
 private:
@@ -52,7 +52,7 @@ private:
 FLEXT_LIB("vasp, vasp.radio",vasp_radio)
 
 
-V vasp_radio::m_any(const t_symbol *s,I argc,t_atom *argv) 
+V vasp_radio::m_any(const t_symbol *s,I argc,const t_atom *argv) 
 {
 	ToOutAnything(s == vasp_base::sym_radio?0:1,s,argc,argv);
 }

@@ -44,7 +44,7 @@ $(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(MAKEFILE)
 	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
 
 $(TARGDIR):
-	mkdir $(TARGDIR)
+	-mkdir $(TARGDIR)
 
 $(TARGDIR)/%.o : $(SRCDIR)/%.cpp 
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
@@ -55,20 +55,20 @@ $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB)
 
 
 $(INSTDIR):
-	mkdir $(INSTDIR)
+	-mkdir $(INSTDIR)
 
 $(INSTDIR)/vasp: $(INSTDIR)
-	mkdir $(INSTDIR)/vasp
+	-mkdir $(INSTDIR)/vasp
 
 install:: $(INSTDIR)/vasp
 
-install:: $(TARGET) pd
-	cp -R $^ $(INSTDIR)/vasp
+install:: $(TARGET) pd/*
+	-cp $^ $(INSTDIR)/vasp
 #	chown -R root.root $(INSTDIR)/vasp
 
 
 $(HELPDIR)/vasp:
-	mkdir $(HELPDIR)/vasp
+	-mkdir $(HELPDIR)/vasp
 
 install-help:: $(HELPDIR)/vasp
 

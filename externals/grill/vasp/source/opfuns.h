@@ -460,7 +460,7 @@ namespace VecOp {
 
 
 #define DEFOP(T,FUN,OP,KIND) \
-namespace VecOp { inline BL FUN(OpParam &p) { return D__##KIND(T,f_##OP<T>,p); } }
+namespace VecOp { inline BL FUN(OpParam &p) { return D__##KIND(T,f_##OP < T > ,p); } }
 
 
 #define DEFVEC_R(T,OP) \

@@ -28,33 +28,41 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	\param inlet set - vasp to be stored 
 	\retval outlet float - minimum sample value
 
-	\todo Should we provide a cmdln default vasp?
-	\todo Should we inhibit output for invalid vasps?
 	\remark Returns 0 for a vasp with 0 frames
 */
 class vasp_qmin:
-	public vasp_unop
+	public vasp_op
 {
-	FLEXT_HEADER(vasp_qmin,vasp_unop)
+	FLEXT_HEADER(vasp_qmin,vasp_op)
 
 public:
-	vasp_qmin(): vasp_unop(true,XletCode(xlet::tp_float,0)) {}
+	vasp_qmin() { 
+		AddInAnything(); 
+		AddOutList(); 
+	}
 
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = BIG;
-		CVasp cref(ref);
-		Vasp *ret = VaspOp::m_qmin(p,cref); 
-		if(p.norm.minmax == BIG) p.norm.minmax = 0;
-		return ret;
+		Vasp *ret = VaspOp::m_qmin(p,v); 
+		delete ret;
+		return p.norm.minmax == BIG?0:p.norm.minmax;
 	}
 		
-	virtual Vasp *tx_work() 
+	virtual V m_bang() 
 	{ 
-		OpParam p(thisName(),0);													
-		Vasp *ret = do_opt(p);
-		ToOutFloat(1,p.norm.minmax);
-		return ret;
+		if(!ref.Ok()) return;
+
+		AtomList ret(ref.Vectors());
+		OpParam p(thisName(),0);	
+		
+		for(I i = 0; i < ret.Count(); ++i) {
+			Vasp vasp(ref.Frames(),ref.Vector(i));
+			CVasp ref(vasp);
+			F v = do_opt(p,ref); 
+			SetFloat(ret[i],v);
+		}
+		ToOutList(0,ret);
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's minimum sample value",thisName()); }
@@ -70,7 +78,7 @@ FLEXT_LIB("vasp, vasp.min?",vasp_qmin)
 	\param inlet vasp - is stored and output triggered
 	\param inlet bang - triggers output
 	\param inlet set - vasp to be stored 
-	\retval outlet float - minimum sample value
+	\retval outlet float - minimum absolute sample value
 
 	\todo Should we provide a cmdln default vasp?
 	\todo Should we inhibit output for invalid vasps?
@@ -81,15 +89,14 @@ class vasp_qamin:
 {
 	FLEXT_HEADER(vasp_qamin,vasp_qmin)
 public:
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = BIG;
-		CVasp cref(ref);
-		Vasp *ret = VaspOp::m_qamin(p,cref); 
-		if(p.norm.minmax == BIG) p.norm.minmax = 0;
-		return ret;
+		Vasp *ret = VaspOp::m_qmin(p,v); 
+		delete ret;
+		return p.norm.minmax == BIG?0:p.norm.minmax;
 	}
-
+		
 	virtual V m_help() { post("%s - Get a vasp's minimum absolute sample value",thisName()); }
 };
 
@@ -104,7 +111,7 @@ FLEXT_LIB("vasp, vasp.amin?",vasp_qamin)
 	\param inlet vasp - is stored and output triggered
 	\param inlet bang - triggers output
 	\param inlet set - vasp to be stored 
-	\retval outlet float - minimum sample value
+	\retval outlet float - maximum sample value
 
 	\todo Should we provide a cmdln default vasp?
 	\todo Should we inhibit output for invalid vasps?
@@ -115,13 +122,12 @@ class vasp_qmax:
 {
 	FLEXT_HEADER(vasp_qmax,vasp_qmin)
 public:
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = -BIG;
-		CVasp cref(ref);
-		Vasp *ret = VaspOp::m_qmax(p,cref); 
-		if(p.norm.minmax == -BIG) p.norm.minmax = 0;
-		return ret;
+		Vasp *ret = VaspOp::m_qmax(p,v); 
+		delete ret;
+		return p.norm.minmax == -BIG?0:p.norm.minmax;
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's maximum sample value",thisName()); }
@@ -138,7 +144,7 @@ FLEXT_LIB("vasp, vasp.max?",vasp_qmax)
 	\param inlet vasp - is stored and output triggered
 	\param inlet bang - triggers output
 	\param inlet set - vasp to be stored 
-	\retval outlet float - minimum sample value
+	\retval outlet float - maximum absolute sample value
 
 	\todo Should we provide a cmdln default vasp?
 	\todo Should we inhibit output for invalid vasps?
@@ -149,11 +155,12 @@ class vasp_qamax:
 {
 	FLEXT_HEADER(vasp_qamax,vasp_qmax)
 public:
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = 0;
-		CVasp cref(ref);
-		return VaspOp::m_qamax(p,cref); 
+		Vasp *ret = VaspOp::m_qamax(p,v); 
+		delete ret;
+		return p.norm.minmax;
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's maximum absolute sample value",thisName()); }
@@ -171,35 +178,50 @@ FLEXT_LIB("vasp, vasp.amax?",vasp_qamax)
 	\param inlet vasp - is stored and output triggered
 	\param inlet bang - triggers output
 	\param inlet set - vasp to be stored 
-	\retval outlet float - minimum sample value
+	\retval outlet list - minimum radius value per complex vector pair
 
 	\todo Should we provide a cmdln default vasp?
 	\todo Should we inhibit output for invalid vasps?
 	\remark Returns 0 for a vasp with 0 frames
 */
 class vasp_qrmin:
-	public vasp_unop
+	public vasp_op
 {
-	FLEXT_HEADER(vasp_qrmin,vasp_unop)
-
+	FLEXT_HEADER(vasp_qrmin,vasp_op)
 public:
-	vasp_qrmin(): vasp_unop(true,XletCode(xlet::tp_float,0)) {}
+	vasp_qrmin() { 
+		AddInAnything(); 
+		AddOutList(); 
+	}
 
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = BIG;
-		CVasp cref(ref);
-		Vasp *ret = VaspOp::m_qrmin(p,cref); 
-		if(p.norm.minmax == BIG) p.norm.minmax = 0;
-		return ret;
+		Vasp *ret = VaspOp::m_qrmin(p,v);
+		delete ret; 
+		return sqrt(p.norm.minmax == BIG?0:p.norm.minmax);
 	}
 		
-	virtual Vasp *tx_work() 
+	virtual V m_bang() 
 	{ 
-		OpParam p(thisName(),0);													
-		Vasp *ret = do_opt(p);
-		ToOutFloat(1,sqrt(p.norm.minmax));
-		return ret;
+		if(!ref.Ok()) return;
+
+		AtomList ret(ref.Vectors()/2);
+		OpParam p(thisName(),0);	
+		
+		for(I i = 0; i < ret.Count(); ++i) {
+			Vasp vasp(ref.Frames(),ref.Vector(i*2));
+			vasp.AddVector(ref.Vector(i*2+1));
+			CVasp ref(vasp);
+			F v = do_opt(p,ref); 
+			SetFloat(ret[i],v);
+		}
+		
+		if(ref.Vectors()%2) {
+			post("%s - omitting dangling vector of complex pairs",thisName());
+		}
+		
+		ToOutList(0,ret);
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's minimum complex radius",thisName()); }
@@ -216,7 +238,7 @@ FLEXT_LIB("vasp, vasp.rmin?",vasp_qrmin)
 	\param inlet vasp - is stored and output triggered
 	\param inlet bang - triggers output
 	\param inlet set - vasp to be stored 
-	\retval outlet float - minimum sample value
+	\retval outlet float - maximum radius value per complex vector pair
 
 	\todo Should we provide a cmdln default vasp?
 	\todo Should we inhibit output for invalid vasps?
@@ -227,11 +249,12 @@ class vasp_qrmax:
 {
 	FLEXT_HEADER(vasp_qrmax,vasp_qrmin)
 public:
-	virtual Vasp *do_opt(OpParam &p) 
+	virtual F do_opt(OpParam &p,CVasp &v) 
 	{ 
 		p.norm.minmax = 0;
-		CVasp cref(ref);
-		return VaspOp::m_qrmax(p,cref); 
+		Vasp *ret = VaspOp::m_qrmax(p,v); 
+		delete ret;
+		return sqrt(p.norm.minmax);
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's maximum complex radius",thisName()); }

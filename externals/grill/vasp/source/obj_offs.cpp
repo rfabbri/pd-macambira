@@ -33,7 +33,7 @@ class vasp_offset:
 	FLEXT_HEADER_S(vasp_offset,vasp_tx,Setup)
 
 public:
-	vasp_offset(I argc,t_atom *argv):
+	vasp_offset(I argc,const t_atom *argv):
 		offs(0),seto(false)
 	{
 		if(argc >= 1 && CanbeFloat(argv[0]))
@@ -100,7 +100,7 @@ class vasp_doffset:
 	FLEXT_HEADER(vasp_doffset,vasp_offset)
 
 public:
-	vasp_doffset(I argc,t_atom *argv): vasp_offset(argc,argv) {}
+	vasp_doffset(I argc,const t_atom *argv): vasp_offset(argc,argv) {}
 
 	virtual Vasp *x_work() 
 	{ 

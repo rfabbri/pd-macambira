@@ -34,7 +34,7 @@ class vasp_sync:
 	FLEXT_HEADER_S(vasp_sync,vasp_op,Setup)
 
 public:
-	vasp_sync(I argc,t_atom *argv):
+	vasp_sync(I argc,const t_atom *argv):
 		autoreset(true),vasponly(false)
 	{
 		I cnt = -1;

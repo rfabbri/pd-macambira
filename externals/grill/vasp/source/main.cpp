@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre8";
+const C *VASP_VERSION = "0.1.3pre10";
 
 #include "opfuns.h"
 
@@ -64,6 +64,7 @@ static V vasp_main()
 
 	VASP_SETUP(channel);  // vasp.channel
 	VASP_SETUP(qchannel);  // vasp.channel?
+	VASP_SETUP(qchannels);  // vasp.channels?
 
 	VASP_SETUP(split);
 	VASP_SETUP(join);

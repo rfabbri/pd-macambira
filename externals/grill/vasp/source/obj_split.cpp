@@ -32,7 +32,7 @@ class vasp_split:
 	FLEXT_HEADER(vasp_split,vasp_op)
 
 public:
-	vasp_split(I argc,t_atom *argv)
+	vasp_split(I argc,const t_atom *argv)
 	{
 		I cnt = -1;
 		if(argc) {
@@ -98,7 +98,7 @@ class vasp_join:
 	FLEXT_HEADER_S(vasp_join,vasp_tx,Setup)
 
 public:
-	vasp_join(I argc,t_atom *argv):
+	vasp_join(I argc,const t_atom *argv):
 		cnt(-1),vi(NULL)
 	{
 		if(argc) {
@@ -175,7 +175,7 @@ class vasp_spit:
 	FLEXT_HEADER(vasp_spit,vasp_op)
 
 public:
-	vasp_spit(I argc,t_atom *argv)
+	vasp_spit(I argc,const t_atom *argv)
 	{
 		I n = 1;
 		if(argc >= 1) n = GetAInt(argv[0]);
@@ -237,7 +237,7 @@ class vasp_gather:
 	FLEXT_HEADER_S(vasp_gather,vasp_tx,Setup)
 
 public:
-	vasp_gather(I argc,t_atom *argv)
+	vasp_gather(I argc,const t_atom *argv)
 	{
 		cnt = 0;
 		if(argc >= 1) cnt = GetAInt(argv[0]);
@@ -267,9 +267,9 @@ public:
 
 	V m_reset() { ref.Clear(); cdst.Clear(); rem = cnt; }
 
-	virtual I m_set(I argc,t_atom *argv) { rem = cnt; return vasp_tx::m_set(argc,argv); }
+	virtual I m_set(I argc,const t_atom *argv) { rem = cnt; return vasp_tx::m_set(argc,argv); }
 
-	V m_add(I argc,t_atom *argv) 
+	V m_add(I argc,const t_atom *argv) 
 	{ 
 		cdst += Vasp(argc,argv);
 		if(cnt && !--rem) m_bang();
