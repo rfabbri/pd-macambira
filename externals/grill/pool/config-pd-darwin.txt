@@ -1,5 +1,5 @@
 # pool - hierarchical storage object for PD and Max/MSP
-# Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+# Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 #
 
 # your c++ compiler (define only if it's different than g++)
@@ -8,20 +8,20 @@
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDPATH=/usr/local/pd/src
+PDPATH=/usr/local/lib/pd/src
 
 # where is the PD executable?
-PD=/usr/local/pd/bin/pd
+PD=/usr/local/bin/pd
 
 # where do the flext libraries reside?
-FLEXTPATH=/usr/local/pd/flext
+FLEXTPATH=/usr/local/lib/pd/flext
 
 # where should flext libraries be built? 
 TARGDIR=./pd-darwin
 
 # where should pool be installed?
 # (leave blank to omit installation)
-INSTPATH=/usr/local/pd/extra
+INSTPATH=/usr/local/lib/pd/extra
 
 # additional compiler flags
 # (check if they match your system!)

@@ -1,5 +1,5 @@
 # pool - hierarchical storage object for PD and Max/MSP
-# Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+# Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 #
 
 # your c++ compiler (define only if it's different than g++)

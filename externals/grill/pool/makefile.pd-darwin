@@ -1,5 +1,5 @@
 # pool - hierarchical storage object for PD and Max/MSP
-# Copyright (C) 2002 Thomas Grill (xovo@gmx.net)
+# Copyright (C) 2002-2004 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for gcc @ darwin (OSX)
 #
@@ -28,26 +28,21 @@ FRAMEWORKS=Carbon
 # the rest can stay untouched
 # ----------------------------------------------
 
-NAME=pool
+include make-files.txt
 
-# all the source files from the package
-SRCS=main.cpp pool.cpp data.cpp
-HDRS=pool.h
-
-DIR=.
 
 TARGET=$(TARGDIR)/$(NAME).pd_darwin
 
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
 	-mkdir $(TARGDIR)
 
-$(TARGDIR)/%.o : $(DIR)/%.cpp
+$(TARGDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
@@ -68,10 +63,6 @@ install:: $(TARGET)
 clean:
 	rm -f $(TARGDIR)/*.o $(TARGET)
 	
-
-
-
-
 
 
 

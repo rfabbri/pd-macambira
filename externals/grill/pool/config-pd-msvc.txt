@@ -1,5 +1,5 @@
 # pool - hierarchical storage object for PD and Max/MSP
-# Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+# Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 #
 
 # where is PD?
@@ -18,3 +18,7 @@ OUTPATH=pd-msvc
 # where should the external be installed?
 # (leave blank to omit installation)
 INSTPATH=$(PDPATH)\extra
+
+
+# additional compiler flags
+UFLAGS=/G6 /Ox 

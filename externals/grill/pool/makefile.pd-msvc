@@ -1,5 +1,5 @@
 # pool - hierarchical storage object for PD and Max/MSP
-# Copyright (C) 2002 Thomas Grill (xovo@gmx.net)
+# Copyright (C) 2002-2004 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for MSVC++ 6 and 7
 #
@@ -17,19 +17,13 @@ LIBS=pd.lib flext-pdwin.lib
 # compiler definitions and flags
 DEFS=/DFLEXT_SYS=2
 
-CFLAGS=/G6 /Ox /ML /EHsc
+CFLAGS=/ML /EHsc $(UFLAGS)
+
 
 # the rest can stay untouched
-# ----------------------------------------------
+####################################
 
-# all the source files from the package
-SRCS= main.cpp data.cpp pool.cpp
-HDRS= pool.h
-
-# -----------------------------------------------
-
-NAME=pool
-DIR=.
+!include make-files.txt
 
 all: $(OUTPATH) $(OUTPATH)\$(NAME).dll
 
@@ -43,7 +37,7 @@ OBJS= $(SRCS:.cpp=.obj)
 $(OUTPATH):
 	-mkdir $(OUTPATH) > nul
 
-{$(DIR)}.cpp{}.obj:
+{$(SRCDIR)}.cpp{}.obj:
 	cl /c /LD $(CFLAGS) $(DEFS) $(INCPATH) $** /Fo$(OUTPATH)\$@
 
 $(OUTPATH)\$(NAME).dll: $(OBJS)

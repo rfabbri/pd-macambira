@@ -284,118 +284,16 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="data.cpp">
-			<FileConfiguration
-				Name="PD Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="PD Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"
-					BasicRuntimeChecks="3"
-					BrowseInformation="1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
+			RelativePath=".\source\data.cpp">
 		</File>
 		<File
-			RelativePath="main.cpp">
-			<FileConfiguration
-				Name="PD Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="PD Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"
-					BasicRuntimeChecks="3"
-					BrowseInformation="1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
+			RelativePath=".\source\main.cpp">
 		</File>
 		<File
-			RelativePath="pool.cpp">
-			<FileConfiguration
-				Name="PD Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="PD Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"
-					BasicRuntimeChecks="3"
-					BrowseInformation="1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Max Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=1"/>
-			</FileConfiguration>
+			RelativePath=".\source\pool.cpp">
 		</File>
 		<File
-			RelativePath="pool.h">
+			RelativePath=".\source\pool.h">
 		</File>
 		<File
 			RelativePath="readme.txt">
