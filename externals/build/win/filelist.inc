@@ -18,13 +18,14 @@ bandpass.c \
 #base3.c \
 #bdiag~.c \
 beat.c \
+#beatpipe.c \
 beta.c \
 #bfft~.c \
 bfilt.c \
 bfilt2.c \
 bilex.c \
 borax.c \
-#button.c \
+button.c \
 #bwin~.c \
 catch13~.c \
 cauchy.c \
@@ -53,7 +54,7 @@ dynwav~.c \
 #ead~.c \
 #ear~.c \
 edge.c \
-#envgen.c \
+envgen.c \
 equalizer.c \
 expo.c \
 #fdn~.c \
@@ -63,7 +64,7 @@ filesize.c \
 ftos.c \
 #fwarp.c \
 gauss.c \
-#gcanvas.c \
+gcanvas.c \
 gem_average.c \
 gem_change.c \
 gem_counter.c \
@@ -82,7 +83,7 @@ hlshelf.c \
 #ifeel.c \
 ignore.c \
 #ikeda.c \
-#image.c \
+image.c \
 inv.c \
 invert.c \
 iso.c \
@@ -152,6 +153,7 @@ pol2rec~.c \
 polygate~.c \
 pong.c \
 #popcorn.c \
+#popup.c \
 prepend.c \
 proc.c \
 #promiscous~.c \
@@ -197,8 +199,8 @@ sfwrite~.c \
 shuffle.c \
 sinh.c \
 sl.c \
-#slider.c \
-#sliderh.c \
+slider.c \
+sliderh.c \
 speedlim.c \
 split.c \
 #sprinkler.c \
@@ -225,7 +227,7 @@ temperature.c \
 #three_d.c \
 #threeply.c \
 throw13~.c \
-#ticker.c \
+ticker.c \
 tilt.c \
 timebang.c \
 #tinkerbell.c \
