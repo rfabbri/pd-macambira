@@ -1,0 +1,44 @@
+#N canvas 155 183 711 418 10;
+#X msg 27 211 bang;
+#X msg 3 274 stop;
+#X floatatom 340 294 5 0 0 0 - - -;
+#X msg 87 12 waveform sine;
+#X msg 87 35 period 400;
+#X msg 87 86 phase 90;
+#X msg 87 60 offset 0.25;
+#X text 192 13 square|sine|triangle|saw_up|saw_down;
+#X text 192 35 period time in ms (defaults 1000 ms);
+#X text 194 59 waveform offset from center [-1 \, 1] (defaults 0=centered)
+;
+#X floatatom 169 234 5 0 0 0 - - -;
+#X text 164 210 direction in degrees;
+#X floatatom 257 263 5 0 0 0 - - -;
+#X text 338 274 level \, range = [-1 \, 1];
+#X text 255 89 waveform phase in degrees;
+#X text -34 191 start the effect;
+#X text -29 207 with a;
+#X msg 87 139 delay 250;
+#X msg 87 113 interval 500;
+#X text 255 143 delay before starting;
+#X text 257 114 minimum time between triggers;
+#X obj 87 329 ff-periodic 0 0 0 0.5;
+#X text 90 354 arguments are device-number \, duration and level;
+#X msg 87 168 envelope 0 1000 0 100;
+#X text 259 160 startlevel attack-duration endlevel decay-duration
+levels or in the range [0 \, 1];
+#X text 254 226 duration in ms \, 0 is infinite \, this includes the
+attack/decay times;
+#X text 90 370 the outlet gives the effect number on the device or
+-1 if it is not loaded.;
+#X connect 0 0 21 0;
+#X connect 1 0 21 0;
+#X connect 2 0 21 3;
+#X connect 3 0 21 0;
+#X connect 4 0 21 0;
+#X connect 5 0 21 0;
+#X connect 6 0 21 0;
+#X connect 10 0 21 1;
+#X connect 12 0 21 2;
+#X connect 17 0 21 0;
+#X connect 18 0 21 0;
+#X connect 23 0 21 0;

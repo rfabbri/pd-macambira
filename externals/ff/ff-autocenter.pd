@@ -1,0 +1,9 @@
+#N canvas 393 404 450 300 10;
+#X text 30 34 sets the amount of "autocentering" of the force-feedback
+joystick. Range is [0 \, 1]. 0 is no auto-centering;
+#X msg 48 141 0.5;
+#X obj 48 191 ff-autocenter 0 0;
+#X text 29 69 creation arguments are the device number (starting at
+0) and autocenter amount. This affects all effects for that device
+;
+#X connect 1 0 2 0;
