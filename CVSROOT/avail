@@ -2,11 +2,18 @@
 unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
 
+# ACLs at Yves Degoyon's request
+unavail |  | gem2pdp
+avail | sevyves,eighthave | gem2pdp
 unavail |  | pidip
-avail | sevyves,eighthave,ggeiger | pidip
-
+avail | sevyves,eighthave | pidip
 unavail |  | unauthorized
-avail | sevyves,eighthave,ggeiger | unauthorized
+avail | sevyves,eighthave | unauthorized
+
+# T. Grill's cvs automatically syncs with the SourceForge
+# so changes here wouldn't make it to his CVS.
+unavail |  | grill
+avail | xovo | grill
 
 # this line ALWAYS needs to be the last line in this file
 # otherwise, its possible to lock everyone out of the CVS
