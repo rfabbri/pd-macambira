@@ -93,6 +93,18 @@ void hid_post(const char *format, const char *);
 = if device is closed and obj is started, open device and start
 
 
+==============================================================================
+= event name changes
+
+- make key/button Type ev_btn rather than ev_key
+
+- perhaps remove the "ev_" prefix on event Types for efficiency and clarity
+
+==============================================================================
+= mapping object ideas
+
+- [mousefilter]-like object to easily control things with a button
+
 ______________________________________________________________________________
 ------------------------------------------------------------------------------
 BUGS

@@ -76,12 +76,12 @@ void convertAxis(pRecElement element, char *linux_type, char *linux_code, char a
 {
 	if (element->relative) 
 	{ 
-		sprintf(linux_type,"ev_rel"); 
+		sprintf(linux_type,"rel"); 
 		sprintf(linux_code,"rel_%c",axis); 
 	}
 	else 
 	{ 
-		sprintf(linux_type,"ev_abs"); 
+		sprintf(linux_type,"abs"); 
 		sprintf(linux_code,"abs_%c",axis); 
 	}
 }
@@ -94,7 +94,7 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 	switch(element->type)
 	{
 		case kIOHIDElementTypeInput_Button:
-			sprintf(linux_type, "ev_key");
+			sprintf(linux_type, "key");
 			break;
 	}
 
@@ -110,11 +110,11 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 				case kHIDUsage_GD_Ry: convertAxis(element, linux_type, linux_code, 'y'); break;
 				case kHIDUsage_GD_Rz: convertAxis(element, linux_type, linux_code, 'z'); break;
 				case kHIDUsage_GD_Wheel: 
-					sprintf(linux_type,"ev_rel");sprintf(linux_code,"rel_wheel");break;
+					sprintf(linux_type,"rel");sprintf(linux_code,"rel_wheel");break;
 			}
 			break;
 		case kHIDPage_Button:
-			sprintf(linux_type, "ev_key"); 
+			sprintf(linux_type, "key"); 
 			sprintf(linux_code, "btn_%ld", element->usage); 
 			break;
 	}
@@ -172,15 +172,20 @@ t_int hid_build_element_list(t_hid *x)
 	
 	DEBUG(post("[hid] found %d elements:",numElements););
 	
+	post("-----------------------------------------------------------");
+	post("  TYPE\t\tCODE\tEVENT NAME");
+	post("-----------------------------------------------------------");
 	for(i=0; i<numElements; i++)
 	{
 		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
 		HIDGetTypeName((IOHIDElementType) pCurrentHIDElement->type, type_name);
 		HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, usage_name);
-		post("\tType: %s \t code: %s \t event name: \t %s, %s",type,code,type_name,usage_name);
+		post("  %s\t%s\t%s, %s",type,code,type_name,usage_name);
 
 		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeInput);
 	}
+	post("-----------------------------------------------------------");
+
 	return (0);	
 }
 
@@ -230,7 +235,7 @@ t_int hid_get_events(t_hid *x)
 		); //end DEBUG
 		
 		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
-		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
+//		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
 
 	// TODO: convert this to a common time format, i.e. Linux struct timeval
 		hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);

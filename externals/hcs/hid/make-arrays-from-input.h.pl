@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl 
 
 use Switch;
 
@@ -162,8 +162,15 @@ print(ARRAYS "#include \"hid.h\"\n\n");
 print(HEADER "\#ifndef _INPUT_ARRAYS_H\n");
 print(HEADER "\#define _INPUT_ARRAYS_H\n\n\n");
 
+# strip the ev_ from the type names
+for ($i=0; $i <= $#EV; ++$i) {
+	 $_ = $EV[$i];
+	 s/ev_//;
+	 $EVtemp[$i] = $_;	 
+}
+
 # generate a C array for each array and stick them all in the same file
-printArray("ev",@EV);
+printArray("ev",@EVtemp);
 printArray("ev_syn",@SYN);
 printArray("ev_key",@KEY);
 printArray("ev_rel",@REL);

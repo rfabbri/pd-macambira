@@ -32,16 +32,6 @@
 //#define DEBUG(x)
 #define DEBUG(x) x 
 
-/* 
- * Various Max Refresh Rates: 
-      ADB = 15.5 ms
-		USB mice on Windows = 8-10 ms
-		USB mice on GNU/Linux = 1-10 ms
-		USB wireless mice = 12-20 ms
-		PS/2 mouse = 5-25 ms
-		P5 Globe = 22 ms
- */
-
 #define DEFAULT_DELAY 5
 
 /*------------------------------------------------------------------------------
