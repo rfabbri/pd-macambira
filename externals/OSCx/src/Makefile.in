@@ -1,0 +1,94 @@
+# current: all
+# pd_linux
+###############################
+NAME=OSC
+EXT=o
+LIBS = -lm -lc
+LIBOSC = 	../libOSC/libOSC.a
+DEFS= -Dunix
+
+prefix=$(DESTDIR)/usr
+
+# ----------------------- LINUX i386 -----------------------
+
+# pd_linux: $(NAME).pd_linux
+
+SFX=@pd_suffix@
+
+.SUFFIXES: .$(SFX)
+
+CFLAGS += $(DEFS) -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+# where is your m_pd.h ???
+INCLUDE =  -I../../build/include
+
+# LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o OSCroute.o
+# SOURCES = $(wildcard *.c)
+SOURCES = OSC-pattern-match.c  OSC.c  dumpOSC.c \
+htmsocket.c  OSCroute.c  sendOSC.c
+TARGETS = $(SOURCES:.c=.o)
+EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@ OSC.@pd_suffix@
+
+all: $(EXTS)
+sendOSC.pd_linux: htmsocket.o sendOSC.o
+	cc -Wl,-export_dynamic -shared -o $*.@pd_suffix@ *.o -lc -lm ../libOSC/libOSC.a
+
+dumpOSC.pd_linux: dumpOSC.o
+	cc -Wl,-export_dynamic -shared -o $*.@pd_suffix@ $*.o -lc -lm
+OSCroute.pd_linux: OSCroute.o OSC-pattern-match.o
+	cc -Wl,-export_dynamic -shared -o $*.@pd_suffix@ $? -lc -lm
+
+OSC.pd_linux: OSC.o
+	cc -Wl,-export_dynamic -shared -o $*.@pd_suffix@ $? -lc -lm
+	# $(LD) $(LDFLAGS) -o OSC.$(EXT) *.$(EXT) *.o $(LIBS) $(LIBOSC)
+#	$(LD) $(LDFLAGS) -o OSC.$(EXT) *.$(EXT) $(LIBS) $(LIBOSC)
+$(TARGETS): %.o : %.c
+	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
+
+	# 	cc -c $(CFLAGS) OSC.c
+
+# .c.pd_linux:
+#	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c
+#	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) $(LIBS)  $(LIBOSC)
+#	strip --strip-unneeded $*.pd_linux
+
+# ----------------------------------------------------------
+
+install-doc:
+	@test -d $(prefix)/lib/pd/doc/5.reference || mkdir -p $(prefix)/lib/pd/doc/5.reference
+	cp -r ../doc/* $(prefix)/lib/pd/doc/5.reference/
+
+install: install-doc
+	@test -d $(prefix)/lib/pd/extra || mkdir -p $(prefix)/lib/pd/extra
+	install -m644 *.pd_linux $(prefix)/lib/pd/extra
+
+clean:
+	rm -rf *.$(EXT) *.@pd_suffix@
+
+# ----------------------- Mac OS X (Darwin) -----------------------
+
+pd_darwin: $(NAME).pd_darwin
+
+SFX=.pd_darwin
+
+.SUFFIXES: $(SFX)
+
+DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+# where is your m_pd.h ???
+DARWININCLUDE =  -I../../../pd/src
+
+DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o OSCroute.o
+
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
+	cc -bundle -bundle_loader /usr/local/pd/bin/pd -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBS) $(LIBOSC)
+
+	rm -f $*.o ../$*.pd_darwin
+	ln -s $*/$*.pd_darwin ..
+
+

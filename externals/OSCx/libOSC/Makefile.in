@@ -3,8 +3,10 @@ ARFLAGS=srv
 # uncomment the following for linux/win
 # DEFS= -Dunix
 # and this for osx
-DEFS= -Dunix -DMACOSX
+# DEFS= -Dunix -DMACOSX
 LIB=libOSC.a
+
+CFLAGS= @CFLAGS@
 
 LIBOBJS= ${LIB}(OSC-client.o) ${LIB}(OSC-timetag.o)
 

@@ -4,14 +4,20 @@ for more information on OSC see: http://cnmat.cnmat.berkeley.edu/OSC
 they also have an osc_dev mailinglist.
 primary source for pd: http://lena.ucsd.edu/~msp/
 
-ok, merged the windows and linux trees.
+to build run
+./configure
+make
+make install
+
+
+merged the windows and linux trees.
 for linux do the usual makes etc, for window either use extra/OSC.dll,
 .dsw and .dsp files are also included.
 
 
 files:
 
-OSC/		contains the code for OSC pd objects (send,dump,route)
+src/		contains the code for OSC pd objects (send,dump,route)
 README.txt	this file
 doc/		pd help files
 extra/		OSC.dll, the windows binary
@@ -21,6 +27,9 @@ send+dump/	CNMAT's OSC commandline utils
 
 
 log:
+
+  20040409: changed build setup to suit externals build system
+            single object objects, no lib
 
   20030531: added OSCroute /* (route everything) hard-fix
 

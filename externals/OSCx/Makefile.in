@@ -1,0 +1,15 @@
+dirs = libOSC send+dump  src
+
+all: 
+	cd libOSC ; make
+	cd send+dump ; make
+	cd src ; make
+
+install:
+	cd src ; make install
+
+clean:
+	cd  libOSC && make clean
+	cd send+dump && make clean
+	cd src && make clean
+
