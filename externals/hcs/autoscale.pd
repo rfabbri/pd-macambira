@@ -1,4 +1,4 @@
-#N canvas 254 119 637 533 10;
+#N canvas 254 119 641 537 10;
 #X obj 45 20 inlet;
 #X obj 45 453 outlet;
 #X obj 105 233 f;
@@ -28,10 +28,11 @@
 127 \, $f2);
 #X msg 348 278 using default range (0-127);
 #X obj 348 256 oneshot;
-#X text 2 480 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 2 476 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
-#X text 219 495 released under the GNU GPL;
-#X text 5 510 $Revision: 1.1 $$Author: eighthave $$Date: 2004-11-02 06:21:59 $;
+#X text 219 491 released under the GNU GPL;
+#X text 11 512 $Revision: 1.2 $$Date: 2004-11-02 06:39:29 $;
+#X text 349 512 $Author: eighthave $;
 #X connect 0 0 9 0;
 #X connect 2 0 7 1;
 #X connect 2 0 10 1;
