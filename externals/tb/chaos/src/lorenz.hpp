@@ -32,7 +32,7 @@ public:
 	lorenz()
 	{
 		m_num_eq = 3;
-		m_data = new data_t[3];
+		m_data = new data_t[m_num_eq];
 
 		CHAOS_SYS_INIT(method,0);
 		CHAOS_SYS_INIT(dt,1);
@@ -43,11 +43,14 @@ public:
 		CHAOS_SYS_INIT(b,4);
 		CHAOS_SYS_INIT(r,40);
 
+		ode_base_alloc();
+
 		set_method(0);
 	}
 	
 	~lorenz()
 	{
+		ode_base_free();
 		delete m_data;
 	}
 

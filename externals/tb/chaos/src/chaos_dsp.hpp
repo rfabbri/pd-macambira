@@ -60,12 +60,12 @@ public:
 	int m_phase;         /* phase counter */
 	float m_sr;          /* sample rate */
 	
-	char m_method;       /* interpolation method */
+	int m_method;       /* interpolation method */
 	
 };
 
 
-/* create constructor / destructor */			\
+/* create constructor / destructor */
 #define CHAOS_DSP_INIT(SYSTEM, ATTRIBUTES)		\
 FLEXT_HEADER(SYSTEM##_dsp, chaos_dsp<SYSTEM>)	\
 												\
@@ -87,7 +87,10 @@ SYSTEM##_dsp(int argc, t_atom* argv )			\
     m_freq = GetAFloat(argv[0]);				\
 	m_method = (char)GetAFloat(argv[1]);		\
     m_phase = 0;								\
-    											\
+												\
+    FLEXT_ADDATTR_VAR1("frequency",m_freq);		\
+    FLEXT_ADDATTR_VAR1("method",m_method);		\
+												\
     ATTRIBUTES;									\
 }												\
 												\
@@ -99,21 +102,23 @@ SYSTEM##_dsp(int argc, t_atom* argv )			\
 	delete m_nextvalues;						\
 	delete m_nextmidpts;						\
 	delete m_curves;							\
-}
-
+}												\
+												\
+FLEXT_ATTRVAR_F(m_freq);						\
+FLEXT_ATTRVAR_I(m_method);
 
 
 
 template <class system> 
 void chaos_dsp<system>::m_signal(int n, t_sample *const *insigs,
-									   t_sample *const *outsigs)
+								 t_sample *const *outsigs)
 {
 	if (m_freq >= m_sr * 0.5)
 	{
 		m_signal_(n, insigs, outsigs);
 		return;
 	}
-	
+
 	switch (m_method)
 	{
 	case 0:
@@ -157,7 +162,7 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 
 	while (n)
 	{
-		if (m_phase == 0)
+		if (phase == 0)
 		{
 			m_system->m_step();
 			phase = int (m_sr / m_freq);
@@ -194,7 +199,7 @@ void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 
 	while (n)
 	{
-		if (m_phase == 0)
+		if (phase == 0)
 		{
 			m_system->m_step();
 			phase = int (m_sr / m_freq);
@@ -233,7 +238,7 @@ void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 
 	while (n)
 	{
-		if (m_phase == 0)
+		if (phase == 0)
 		{
 			m_system->m_step();
 			phase = int (m_sr / m_freq);

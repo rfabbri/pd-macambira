@@ -25,7 +25,7 @@
 //                0 <= alpha <= 4
 
 class logistic:
-	protected map_base
+	public map_base
 {
 public:
 	logistic()

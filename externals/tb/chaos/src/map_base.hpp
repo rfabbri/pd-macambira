@@ -24,7 +24,7 @@
 #include "chaos_base.hpp"
 
 class map_base
-	: protected chaos_base
+	: public chaos_base
 {
 	
 };

@@ -49,6 +49,28 @@ public:
 
 	virtual void m_step();
 	
+	void ode_base_alloc()
+	{
+		int dimension = get_num_eq();
+
+		for (int i = 0; i != 3; ++i)
+		{
+			m_k[i] = new data_t[dimension];
+		}
+
+		m_tmp = new data_t[dimension];
+	}
+	
+	void ode_base_free()
+	{
+		for (int i = 0; i != 3; ++i)
+		{
+			delete m_k[i];
+		}
+
+		delete m_tmp;
+	}
+
 protected:
 	unsigned char m_method; /* 0: rk1, 1: rk2, 3: rk4 */
 

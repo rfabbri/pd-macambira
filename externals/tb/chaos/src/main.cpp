@@ -19,13 +19,13 @@
 //  Boston, MA 02111-1307, USA.
 
 #include "chaos.hpp"
-#include "logistic_map.hpp"
 
 void chaos_library_setup()
 {
 	post("chaos~ version "PACKAGE_VERSION"\n");
 	
 	FLEXT_DSP_SETUP(lorenz_dsp);
+	FLEXT_DSP_SETUP(logistic_dsp);
 }
 
 FLEXT_LIB_SETUP(chaos, chaos_library_setup);

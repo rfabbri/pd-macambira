@@ -1,7 +1,7 @@
 NAME = chaos
 
 BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp \
-	lorenz_dsp.cpp
+	lorenz_dsp.cpp logistic_dsp.cpp
 
 
 CXXFLAGS  = @CXXFLAGS@ \

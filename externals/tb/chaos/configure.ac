@@ -49,7 +49,10 @@ AC_ARG_ENABLE(system,
 
 AC_ARG_WITH(sysdir,
 	[  --with-sysdir           path pd / max installation],
-		SYSDIR=$withval,
+	[
+		SYSDIR=$withval
+		INCLUDEDIR="-I$withval $INCLUDEDIR"
+	],	
 	[echo "path to pd / max installation required" && exit 1])
 
 
