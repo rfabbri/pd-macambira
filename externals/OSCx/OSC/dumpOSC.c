@@ -740,7 +740,11 @@ static void dumpOSC_PrintTypeTaggedArgs(t_dumpOSC *x, void *v, int n) {
 #ifdef DEBUG
       //post("integer: %d", ntohl(*((int *) p)));
 #endif
-      SETFLOAT(mya+myargc,ntohl(*((int *) p)));
+      /* Martin Peach fix for negative floats:
+	   * was: SETFLOAT(mya+myargc,ntohl(*((int *) p))); 
+	   * now is: 
+	   */
+      SETFLOAT(mya+myargc,(signed)ntohl(*((int *) p)));
       myargc++;
 
       p += 4;
