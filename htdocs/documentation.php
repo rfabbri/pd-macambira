@@ -11,11 +11,24 @@
 
 <div id="Menu">
 
-<?php include('menu.inc'); ?>
+| <a href="index.php" title=""><b>Introduction</b></a><br>
+| <a href="download.php" title=""><b>Download</b></a><br>
+| <a href="documentation.php" title=""><b>Documentation</b></a><br>
+| <a href="developer.php" title=""><b>Developers</b></a><br>
+| <a href="http://pure-data.info/community/lists/"><b>Mailing Lists</b></a><br>
+| <a href="contact.php" title=""><b>Contact</b></a><br>
+| <a href="http://sourceforge.net/projects/pure-data" title=""><b>Project Page</b></a><br>
+| <a href="http://puredata.info" title""><b>Community Site</b></a><br>
+
 <br>
 <br>
 <!-- Quote of the day -->
-<?php include('quote.inc'); ?>
+<span class="quote">
+<b>Tip of the month</b><br />
+When working on a patch, it's often best to stay in edit mode and use the CTRL key to modify any parameters.
+<br>
+<a href="http://www.gamasutra.com/resource_guide/20030528/paul_01.shtml">Leonard J. Paul</a>
+</span>
 
 </div>
 <div id="Content">
@@ -238,7 +251,30 @@ control.
 <BR>
 <BR>
 <p align="center">
-<?php include('webring.inc'); ?>
+<form action="http://pd.klingt.org/webring/" method="post">
+<input type="hidden" name="base_url" value="">
+<input type="hidden" name="description" value="CVS Repository at SourceForge">
+
+<table width=260 cellpadding=0 cellspacing=0 border=0 bgcolor="#FFFFFF">
+  <tr>
+    <td width=55 height=25 align="center">
+      <input type="image" name="next" src="http://pd.klingt.org/webring/next.gif" align="middle" border="0"></td>      
+    <td width=62 height=25 align="center">
+      <input type="image" name="list" src="http://pd.klingt.org/webring/list.gif" align="middle" border="0"></td>
+    <td width=63 height=25 align="center">
+      <input type="image" name="random" src="http://pd.klingt.org/webring/random.gif" align="middle" border="0"></td>
+    <td width=80 height=25 align="center">
+      <input type="image" name="previous" src="http://pd.klingt.org/webring/previous.gif" align="middle" border="0"></td>
+  </tr>
+  <tr>
+    <td colspan=4 width=260 height=50 align="center">
+      <a href="http://pd.klingt.org/webring/info.html">
+      <img src="http://pd.klingt.org/webring/webring.gif" border=0 width=260
+      height=50 align="middle" alt="pd webring"></a>
+    </td>
+  </tr>
+</table>
+</form>
 <br clear="all">
 
 <!-- REMOVE CMNTS AT PUBLISHING: -->
@@ -247,7 +283,10 @@ control.
  width="210" height="62" border="0" alt="SourceForge Logo"></A>
 
 </p>
-<?php include('lastmodified.inc'); ?>
+
+<BR>
+<P CLASS="small">
+Last Modified: October 04 2003 11:09:15 GMT</P>
 
 </div>
 
