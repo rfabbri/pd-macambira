@@ -53,11 +53,12 @@ public:
 	void m_connect(int argc,const t_atom *argv) { ConnDis(true,argc,argv); }
 	void m_disconnect(int argc,const t_atom *argv) { ConnDis(false,argc,argv); }
 	void m_send(int argc,const t_atom *argv);
-	void m_vis(bool vis);
+    void ms_vis(bool vis) { canvas_vis(canvas,vis?1:0); }
+    void mg_vis(bool &vis) const { vis = canvas && canvas->gl_editor; }
 
 protected:
 
-    virtual void m_click() { m_vis(true); }
+    virtual void m_click() { ms_vis(true); }
 
     static const t_symbol *k_obj,*k_msg,*k_text;
 
@@ -81,7 +82,6 @@ protected:
 	void Delete(t_gobj *o);
 
 	void ConnDis(bool conn,int argc,const t_atom *argv);
-
 
     virtual bool m_method_(int n,const t_symbol *s,int argc,const t_atom *argv);
 	virtual void m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs);
@@ -170,7 +170,8 @@ private:
 	FLEXT_CALLBACK_V(m_connect)
 	FLEXT_CALLBACK_V(m_disconnect)
 	FLEXT_CALLBACK_V(m_send)
-	FLEXT_CALLBACK_B(m_vis)
+	FLEXT_CALLVAR_B(mg_vis,ms_vis)
+//	FLEXT_CALLBACK(m_refresh)
 
 	FLEXT_ATTRVAR_B(stripext)
 
@@ -242,8 +243,7 @@ void dyn::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"conn",m_connect);
 	FLEXT_CADDMETHOD_(c,0,"dis",m_disconnect);
 	FLEXT_CADDMETHOD_(c,0,"send",m_send);
-	FLEXT_CADDMETHOD_(c,0,"vis",m_vis);
-
+	FLEXT_CADDATTR_VAR(c,"vis",mg_vis,ms_vis);
     FLEXT_CADDATTR_VAR1(c,"stripext",stripext);
 
     // set up symbols
@@ -550,11 +550,6 @@ void dyn::m_reset()
 		o = n;
 	}
 	root = NULL; 
-}
-
-void dyn::m_vis(bool vis)
-{
-	canvas_vis(canvas,vis?1:0);
 }
 
 void dyn::m_reload()

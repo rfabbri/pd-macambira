@@ -28,6 +28,7 @@ CHANGES:
 - cached several symbols
 - strip .pd extension from abstraction filenames (if stripext attribute is set)
 - debug patcher opens on alt-click
+- made vis an attribute (visibility can now be queried)
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality
