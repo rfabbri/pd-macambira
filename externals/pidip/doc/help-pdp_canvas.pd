@@ -89,9 +89,9 @@
 1;
 #X text 544 451 Average sources at intersections;
 #X text 544 463 ( default = 0 );
-#X obj 367 177 pdp_nyqt;
-#X obj 121 177 pdp_nyqt;
-#X obj 632 174 pdp_nyqt;
+#X obj 367 177 pdp_fqt;
+#X obj 121 177 pdp_fqt;
+#X obj 632 174 pdp_fqt;
 #X obj 187 138 metro 40;
 #X obj 431 137 metro 40;
 #X connect 0 0 69 0;
