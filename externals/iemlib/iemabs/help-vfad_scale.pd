@@ -1,0 +1,15 @@
+#N canvas 4 20 450 300 10;
+#X obj 82 90 vfad_scale -1;
+#X msg 108 94 vfad_scale;
+#X obj 65 92 vsl 15 121 0 120 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 8400 1;
+#X obj 65 221 fadtodb;
+#X obj 65 243 - 100;
+#X floatatom 65 264 5 0 0 0 - - -;
+#X text 105 266 dB;
+#X text 10 9 vfad_scale;
+#X text 121 8 vertical fader scale;
+#X text 101 31 for vertical slider with height of 121 pixels;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 5 0;
