@@ -1,4 +1,5 @@
 CFLAGS=  -O2 -Wall -fPIC
+ARFLAGS=srv
 # uncomment the following for linux/win
 DEFS= -Dunix
 # and this for osx
