@@ -1,0 +1,20 @@
+Change log for PD external 'sprinkler' (formerly 'forward')
+
+v0.03 Sun Sep  8 00:56:33 CEST 2002
+   + renamed to 'sprinkler'
+   + added 'configure' option --enable-forward to allow
+     backwards-compatibility
+   + added 'configure option --enable-debug
+   + added help-file tweaking to 'configure.in'
+
+v0.02 Sun Sep  1 00:47:40 CEST 2002
+   + added black magic in 'forward_anything()' to generate
+     real selectors for single-element arglists (especially symbols)
+   + gutted 'configure.in'
+   + added check for MacOSX in 'configure.in'
+   + added 'OFLAGS' autoconf->makefile variable for
+     optimization flags: contents from pd-0.35-test16
+   + added 'autogen.sh' and 'README.cvs'
+
+v0.01 Sun Apr 21 15:21:42 CEST 2002
+   + initial distributed version

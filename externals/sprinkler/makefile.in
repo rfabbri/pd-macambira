@@ -1,0 +1,86 @@
+PD_DIR = @PD_DIR@
+PD_INC = @PD_INC@
+
+EXT = @EXT@
+DEFS = @DEFS@
+CC = @CC@
+LD = @LD@
+AFLAGS = @AFLAGS@
+DFLAGS = @DFLAGS@
+LFLAGS = @LFLAGS@
+WFLAGS = -Wall
+OFLAGS = @OFLAGS@
+##############
+# DEBUG
+# OFLAGS = -g 
+##############
+IFLAGS = -I$(PD_INC) @IFLAGS@
+INSTALL_PREFIX=@prefix@
+
+VERSION = "@PACKAGE_VERSION@"
+DISTVERSION = @PACKAGE_VERSION@
+
+
+.SUFFIXES: .$(EXT) .pod .txt
+
+
+PDCFLAGS = $(OFLAGS) $(DEFS) $(IFLAGS) $(WFLAGS) $(LFLAGS) $(AFLAGS) $(DFLAGS) -DVERSION=$(VERSION) 
+CFLAGS = $(OFLAGS) $(DEFS) $(IFLAGS) $(WFLAGS) $(DFLAGS) -DVERSION=$(VERSION)
+
+
+LIBS = @LIBS@
+SOURCES = @MYSOURCES@
+PODS = @MYPODS@
+PDDOC = @MYPDDOC@
+DISTNAME = @MYDISTNAME@
+DISTOTHER = GnuGPL.txt Changes makefile.in configure.in sprinkler-help.pd.in configure install-sh
+TARGETS = $(SOURCES:.c=.$(EXT)) $(PODS:.pod=.txt)
+
+DISTTARGETS = $(SOURCES) $(PODS:.pod=.txt) $(PDDOC) $(DISTOTHER)
+
+all:  $(TARGETS) 
+
+clean::
+	rm  -f *.$(EXT) so_locations ; rm -f *~ *.o
+
+distclean: clean
+	rm -f config.cache config.log config.status makefile
+
+maintainerclean: distclean
+	rm -f configure $(PODS:.pod=.txt) sprinkler-help.pd
+
+cvsclean: maintainerclean
+
+distcleancvs:
+	rm -f CVS reference/CVS
+
+
+.pod.txt:
+	pod2text $< $@
+
+.c.o:
+	$(CC) -DPD $(CFLAGS) -o $@ -c $*.c
+
+# cp $@ $*_stat.o
+
+.o.$(EXT):
+	$(CC) -DPD $(PDCFLAGS) -o $@ $*.o
+
+
+install::
+	install -d $(INSTALL_PREFIX)/lib/pd/externs
+	install -m 644 *.pd_linux $(INSTALL_PREFIX)/lib/pd/externs
+	for f in $(PDDOC) ; do \
+	   install -m 644 $$f $(INSTALL_PREFIX)/lib/pd/doc/5.reference ;\
+	done
+
+.PHONY: dist
+
+dist:
+	( cd ..;\
+	  rm -f $(DISTNAME)-$(DISTVERSION);\
+	  ln -s $(DISTNAME) $(DISTNAME)-$(DISTVERSION);\
+	  tar czvf $(DISTNAME)-$(DISTVERSION).tgz $(patsubst %,$(DISTNAME)-$(DISTVERSION)/%,$(DISTTARGETS));\
+	  mv $(DISTNAME)-$(DISTVERSION).tgz $(DISTNAME);\
+	  rm -f $(DISTNAME)-$(DISTVERSION);\
+	)

@@ -1,0 +1,162 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl -- adapted from 'configure.in' in ggee distribution by Guenter Geiger
+AC_PREREQ(2.5)
+AC_INIT(sprinkler, [0.03], [moocow@ling.uni-potsdam.de])
+
+dnl
+dnl Programs, prefix
+dnl
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PREFIX_DEFAULT(/usr/local)
+
+dnl
+dnl Substitutions
+dnl 
+AC_SUBST(AFLAGS)
+AC_SUBST(DFLAGS)
+AC_SUBST(IFLAGS)
+AC_SUBST(LFLAGS)
+AC_SUBST(OFLAGS)
+AC_SUBST(LD)
+
+AC_SUBST(EXT)
+
+AC_SUBST(MYSOURCES)
+AC_SUBST(MYPODS)
+AC_SUBST(MYPDDOC)
+AC_SUBST(MYDISTNAME)
+
+
+dnl version stuff (automatically exported?)
+AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(PACKAGE_NAME)
+AC_SUBST(BUGREPORT)
+
+
+dnl
+dnl pd-directory/ies
+dnl 
+AC_ARG_WITH(pd-dir,
+	AC_HELP_STRING([--with-pd-dir=DIR], [PD base directory (default=/usr/local/pd)]),
+	[PD_DIR="$withval"],
+	[PD_DIR="/usr/local/pd"])
+AC_SUBST(PD_DIR)
+
+AC_ARG_WITH(pd-include,
+	AC_HELP_STRING([--with-pd-include=DIR], [PD include directory (default=${PD_DIR}/src)]),
+	[PD_INC="$withval"],
+	[PD_INC="${PD_DIR}/src"])
+AC_SUBST(PD_INC)
+	    
+
+dnl
+dnl configuration stuff here
+dnl 
+MYDISTNAME="sprinkler"
+MYSOURCES="sprinkler.c"
+MYPODS="`echo *.pod`"
+MYPDDOC="sprinkler-help.pd"
+IFLAGS="-I./include -I${PD_INC}"
+
+dnl
+dnl debug version?
+dnl
+AC_MSG_CHECKING([whether we are building a debug version])
+AC_ARG_ENABLE([debug],
+	AC_HELP_STRING([--enable-debug],[build debug version (default=no)]))
+
+if test "$enable_debug" == "yes" ; then
+  AC_MSG_RESULT(yes)
+  DEBUG="yes"
+  DFLAGS="$DFLAGS -DSPRINKLER_DEBUG"
+else
+  AC_MSG_RESULT(no)
+  DEBUG="no"
+fi
+AC_SUBST(DEBUG)
+
+
+dnl
+dnl build backwards-compatible non-max 'forward'?
+dnl
+AC_MSG_CHECKING([whether to allow non-MAX "forward" alias])
+AC_ARG_ENABLE([forward],
+	AC_HELP_STRING([--enable-forward],[allow backwards-compatible non-MAX "forward" alias (default=no)]))
+
+if test "$enable_forward" == "yes" ; then
+  AC_MSG_RESULT(yes)
+  NON_MAX_FORWARD="yes"
+  DFLAGS="$DFLAGS -DNON_MAX_FORWARD"
+  SPRINKLER_COMPAT_TEXT=["(with MAX-incompatible [forward] alias)"]
+  SPRINKLER_ALIAS_1="#X obj 102 327 forward;"
+  SPRINKLER_ALIAS_2="#X obj 102 352 fw;"
+else
+  AC_MSG_RESULT(no)
+  NON_MAX_FORWARD="no"
+  SPRINKLER_COMPAT_TEXT=["(formerly MAX-incompatible \[forward\])"]
+  SPRINKLER_ALIAS_1="#X text 102 327 none;"
+  SPRINKLER_ALIAS_2="#X text 102 352 (disabled);"
+fi
+AC_SUBST(NON_MAX_FORWARD)
+AC_SUBST(SPRINKLER_COMPAT_TEXT)
+AC_SUBST(SPRINKLER_ALIAS_1)
+AC_SUBST(SPRINKLER_ALIAS_2)
+
+
+
+dnl
+dnl machine-dependent variables
+dnl
+LD=ld
+if test `uname -s` = Linux; 
+then
+  LFLAGS="-export_dynamic -shared"
+  if test "$DEBUG" == "no"; then
+    OFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
+  else
+    OFLAGS="-g"
+  fi
+  EXT=pd_linux	
+fi
+
+if test `uname -m` = alpha; 
+then 
+ AFLAGS="-mieee  -mcpu=ev56"; 
+ OFLAGS="$CFLAGS"
+fi
+
+if test `uname -s` = IRIX64; 
+then
+  LFLAGS="-n32 -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
+	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
+	-shared -rdata_shared"
+  OFLAGS="$CFLAGS"
+EXT=pd_irix6
+fi
+
+if test `uname -s` = IRIX32; 
+then
+  LFLAGS="-o32 -DUNIX -DIRIX -O2 -shared -rdata_shared"
+  OFLAGS="$CFLAGS"
+  EXT=pd_irix5
+fi
+
+dnl
+dnl Flags for MacOSX, borrowed from pd-0.35-test16
+dnl
+if test `uname -s` = Darwin;
+then
+  LD=cc
+  LFLAGS="-bundle -undefined suppress  -flat_namespace"
+  EXT=pd_darwin
+  DFLAGS="$DFLAGS -DMACOSX"
+
+  if test "$DEBUG" == "no"; then
+    OFLAGS="-O2"
+  else
+    OFLAGS="-g"
+  fi
+fi
+
+AC_OUTPUT(makefile sprinkler-help.pd)
