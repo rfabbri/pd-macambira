@@ -179,6 +179,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="&quot;F:\prog\audio\MaxWinSDK\c74support\msp-includes\win-includes\release&quot;;&quot;F:\prog\audio\MaxWinSDK\c74support\max-includes\win-includes\release&quot;,f:\prog\max\flext\max-msvc"
+				IgnoreAllDefaultLibraries="TRUE"
 				ProgramDatabaseFile="$(outdir)/fftease.pdb"
 				ImportLibrary="$(outdir)/fftease.lib"
 				TargetMachine="1"/>
@@ -540,8 +541,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -576,8 +576,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -612,8 +611,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -648,8 +646,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -684,8 +681,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -720,8 +716,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -756,8 +751,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -792,8 +786,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -828,8 +821,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -864,8 +856,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -900,8 +891,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -936,8 +926,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -972,8 +961,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -1008,8 +996,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -1044,8 +1031,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+						AdditionalIncludeDirectories=""/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Max Debug|Win32">
@@ -3306,8 +3292,7 @@
 				<Tool
 					Name="VCCLCompilerTool"
 					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+					AdditionalIncludeDirectories=""/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Max Debug|Win32">
@@ -3342,8 +3327,7 @@
 				<Tool
 					Name="VCCLCompilerTool"
 					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;FLEXT_SYS=2;$(NoInherit)"/>
+					AdditionalIncludeDirectories=""/>
 			</FileConfiguration>
 			<FileConfiguration
 				Name="Max Debug|Win32">

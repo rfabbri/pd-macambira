@@ -511,8 +511,15 @@ void flext_gui::SetWidget(t_class *c)
     widgetbehavior.w_deletefn =     sg_delete;
     widgetbehavior.w_visfn =        sg_vis;
     widgetbehavior.w_clickfn =      sg_click;
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(c,sg_properties);
+    class_setsavefn(c,sg_save);
+#else
     widgetbehavior.w_propertiesfn = sg_properties;
     widgetbehavior.w_savefn =       sg_save;
+#endif
+
     class_setwidget(c, &widgetbehavior);
 }
 
