@@ -252,10 +252,9 @@ BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
                 ret = pd->LdDirXML(fl,depth,mkdir);
             return ret;
 		}
-		else return false;
 	}
-	else
-		return false;
+
+    return false;
 }
 
 BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
@@ -277,10 +276,9 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
                 return ret;
             }
 		}
-		else return false;
 	}
-	else
-		return false;
+
+    return false;
 }
 
 

@@ -7,6 +7,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 ----------------------------------------------------------------------------
 
+You will need the flext C++ layer for PD and Max/MSP externals to compile this.
+see http://www.parasitaere-kapazitaeten.net/ext
+
+----------------------------------------------------------------------------
+
 The package should at least compile (and is tested) with the following compilers/platforms:
 
 pd - Windows:

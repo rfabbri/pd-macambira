@@ -90,6 +90,7 @@ pvoc::pvoc(I argc,const t_atom *argv):
 
 V pvoc::Transform(I _N,S *const *in)
 {
+    /*
 	int freq,amp;
 	int chan;
 
@@ -122,6 +123,7 @@ V pvoc::Transform(I _N,S *const *in)
         index[chan] = address;
       }
     }
+    */
 }
 
 
