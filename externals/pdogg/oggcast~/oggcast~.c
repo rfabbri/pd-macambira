@@ -203,7 +203,7 @@ static char base64table[65] = {
 char *oggcast_util_base64_encode(char *data)
 {
 	int len = strlen(data);
-	char *out = malloc(len*4/3 + 4);
+	char *out = (char *)getbytes(len*4/3 + 4);
 	char *result = out;
 	int chunk;
 
@@ -1239,63 +1239,57 @@ static void oggcast_password(t_oggcast *x, t_symbol *password)
     /* set comment fields for header (reads in just anything) */
 static void oggcast_comment(t_oggcast *x, t_symbol *s, t_int argc, t_atom* argv)
 {
-	t_int i = argc;
-	char *comment = NULL;
-	int len = strlen(atom_gensym(argv)->s_name);
-
-	comment = atom_gensym(argv)->s_name;
-
-	while (len--)
-	{
-		if(*(comment + len) == '=')*(comment + len) = ' ';
-		if(*(comment + len) == '_')*(comment + len) = ' ';
-	}
+	t_binbuf *b = binbuf_new();
+	char* comment;
+	int length;
+	binbuf_add(b, argc, argv);
+	binbuf_gettext(b, &comment, &length);
 
     pthread_mutex_lock(&x->x_mutex);
     if(strstr(s->s_name, "ARTIST"))
 	{
-		x->x_bcartist = comment;
-		post("oggcast~: ARTIST=%s", x->x_bcartist);
+		strcpy(x->x_bcartist, comment);
+		post("oggcast~: ARTIST = %s", x->x_bcartist);
 	}
 	else if(strstr(s->s_name, "GENRE"))
 	{
-		x->x_bcgenre = comment;
-		post("oggcast~: GENRE=%s", x->x_bcgenre);
+		strcpy(x->x_bcgenre, comment);
+		post("oggcast~: GENRE = %s", x->x_bcgenre);
 	}
 	else if(strstr(s->s_name, "TITLE"))
 	{
-		x->x_bcname = comment;
-		post("oggcast~: TITLE=%s", x->x_bcname);
+		strcpy(x->x_bcname, comment);
+		post("oggcast~: TITLE = %s", x->x_bcname);
 	}
 	else if(strstr(s->s_name, "PERFORMER"))
 	{
-		x->x_bcperformer = comment;
-		post("oggcast~: PERFORMER=%s", x->x_bcperformer);
+		strcpy(x->x_bcperformer, comment);
+		post("oggcast~: PERFORMER = %s", x->x_bcperformer);
 	}
 	else if(strstr(s->s_name, "LOCATION"))
 	{
-		x->x_bclocation = comment;
-		post("oggcast~: LOCATION=%s", x->x_bclocation);
+		strcpy(x->x_bclocation, comment);
+		post("oggcast~: LOCATION = %s", x->x_bclocation);
 	}
 	else if(strstr(s->s_name, "COPYRIGHT"))
 	{
-		x->x_bccopyright = comment;
-		post("oggcast~: COPYRIGHT=%s", x->x_bccopyright);
+		strcpy(x->x_bccopyright, comment);
+		post("oggcast~: COPYRIGHT = %s", x->x_bccopyright);
 	}
 	else if(strstr(s->s_name, "CONTACT"))
 	{
-		x->x_bccontact = comment;
-		post("oggcast~: CONTACT=%s", x->x_bccontact);
+		strcpy(x->x_bccontact, comment);
+		post("oggcast~: CONTACT = %s", x->x_bccontact);
 	}
 	else if(strstr(s->s_name, "DESCRIPTION"))
 	{
-		x->x_bcdescription = comment;
-		post("oggcast~: DESCRIPTION=%s", x->x_bcdescription);
+		strcpy(x->x_bcdescription, comment);
+		post("oggcast~: DESCRIPTION = %s", x->x_bcdescription);
 	}
 	else if(strstr(s->s_name, "DATE"))
 	{
-		x->x_bcdate = comment;
-		post("oggcast~: DATE=%s", x->x_bcdate);
+		strcpy(x->x_bcdate, comment);
+		post("oggcast~: DATE = %s", x->x_bcdate);
 	}
 	else post("oggcast~: no method for %s", s->s_name);
 	if(x->x_state == STATE_STREAM)
@@ -1305,6 +1299,7 @@ static void oggcast_comment(t_oggcast *x, t_symbol *s, t_int argc, t_atom* argv)
 		oggcast_cond_signal(&x->x_requestcondition);
 	}
     pthread_mutex_unlock(&x->x_mutex);
+	freebytes(comment, strlen(comment));
 }
     /* settings for variable bitrate encoding */
 static void oggcast_vbr(t_oggcast *x, t_floatarg fsr, t_floatarg fchannels,
