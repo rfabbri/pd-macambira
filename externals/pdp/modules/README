@@ -1,0 +1,33 @@
+This file describes the protocol used for communicating packets.
+See include/pdp.h and the sources in this directory for more info.
+
+There are 3 kinds of pdp messages:
+
+[pdp register_ro <packet_id>]
+[pdp register_rw <packet_id>]
+[pdp process]
+
+An object can receive a packet by catching the 3 kinds of messages:
+
+When a register_ro message is received, the object can call 
+pdp_packet_copy_ro(packet) to reseve a read only copy for itself.
+The only operations on the packet at that time are read only
+operations. 
+
+The same goes for handling the register_rw message. You can
+reserve a read/write copy by using pdp_packet_copy_rw(packet)
+
+When a process message is received, the object is allowed to start
+processing the data.
+
+In the register_ro or register_rw phases, the object can inspect
+the packet to see if it wants to register it (using pdp_packet_header
+and pdp_packet_data operations) but it is not allowed to allocate other objects
+in that phase. This is only allowed in the process phase. (or after
+the receiving packet is registerd.) 
+
+An object can send out a pdp message using the outlet_pdp(outlet, packet)
+function. This sends out these 3 messages in sequence. It is best to
+unregister a packet using pdp_packet_mark_unused(packet) before sending it out,
+if it is no longer used by the sending object. This eliminates one extra 
+copy operation on the data.

@@ -1,0 +1,21 @@
+#N canvas 504 346 450 300 10;
+#X obj 107 108 pdp_scope~;
+#X obj 81 45 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 109 161 pdp_xv;
+#X msg 118 23 type grey;
+#X obj 253 58 metro 40;
+#X obj 249 37 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 198 29 5 0 0;
+#X obj 127 55 noise~ 50;
+#X obj 248 175 r~ scope;
+#X msg 270 113 dim 1024 512;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 4 0;
+#X connect 6 0 7 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;

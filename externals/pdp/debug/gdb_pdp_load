@@ -1,0 +1,25 @@
+cd ~/pd/packet
+file ~/pd/distro/pd/bin/pd.debug
+# file ~/pd/distro/pd/bin/pd
+set args -r 44100 -alsa -frags 64 -lib pdp -nodac -noadc -path abstractions test/test_pdp_scale.pd
+# set args  -lib pdp -nodac -noadc -path abstractions test/test_pdp_thread.pd
+# set args  -lib pdp -nodac -noadc test/test_pdp_ca.pd
+# set args -r 44100 -alsa -frags 64 -lib pdp -nodac -noadc test/test_pdp_qt_read.pd 
+# dir ~/pd/distro/pd/src
+dir modules
+dir system
+dir mmx
+dir scaf
+dir scaf/modules
+dir scaf/system
+
+# until i figure out how to stop pd without hanging it
+# or set a breakpoint before a library is loaded
+# i'll use the bng_new routine (alt-b) to stop
+
+break bng_new
+
+# uncomment this to break in the library loader
+# break sys_load_lib
+
+

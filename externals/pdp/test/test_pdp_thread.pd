@@ -1,0 +1,33 @@
+#N canvas 512 101 579 567 10;
+#X msg 86 6 stop;
+#X obj 61 6 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1 -1
+;
+#X floatatom 130 3 5 0 0;
+#X obj 88 30 metro 40;
+#X obj 174 125 pdp_v4l;
+#X floatatom 207 93 5 0 0;
+#X obj 93 407 pdp_xv;
+#X msg 162 66 type grey;
+#X msg 242 63 type yv12;
+#X obj 332 322 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 346 413 pdp_control;
+#X msg 332 363 thread \$1;
+#X obj 153 408 pdp_xv;
+#X obj 212 408 pdp_xv;
+#X floatatom 213 289 5 0 0;
+#X obj 124 329 pdp_route 3;
+#X connect 0 0 3 0;
+#X connect 1 0 3 0;
+#X connect 2 0 3 1;
+#X connect 3 0 4 0;
+#X connect 4 0 15 0;
+#X connect 5 0 4 1;
+#X connect 7 0 4 0;
+#X connect 8 0 4 0;
+#X connect 9 0 11 0;
+#X connect 11 0 10 0;
+#X connect 14 0 15 1;
+#X connect 15 0 6 0;
+#X connect 15 1 12 0;
+#X connect 15 2 13 0;

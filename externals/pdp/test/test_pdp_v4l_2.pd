@@ -1,0 +1,26 @@
+#N canvas 207 394 450 300 10;
+#X obj 112 96 pdp_v4l;
+#X obj 111 177 pdp_xv;
+#X obj 111 48 metro 40;
+#X obj 110 21 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 232 76 channel \$1;
+#X floatatom 227 45 5 0 0;
+#X msg 135 22 stop;
+#X msg 52 78 close;
+#X msg 222 147 dim 1280 1024;
+#X obj 63 35 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 223 120 dim 320 240;
+#X obj 110 121 pdp_grey;
+#X connect 0 0 11 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 5 0 4 0;
+#X connect 6 0 2 0;
+#X connect 7 0 0 0;
+#X connect 8 0 1 0;
+#X connect 9 0 0 0;
+#X connect 10 0 1 0;
+#X connect 11 0 1 0;

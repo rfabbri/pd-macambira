@@ -1,0 +1,4 @@
+pdp.pd_linux: pdp_all
+	rm -f pdp.pd_linux
+	gcc -export_dynamic -shared -o pdp.pd_linux modules/*.o system/*.o system/mmx/*.o $(PDP_LIBS)
+	#strip --strip-unneeded pdp.pd_linux

@@ -1,0 +1,54 @@
+last modified: 2003/01/12
+
+
+ChangeLog:
+
+v0.1:	2002/11/23
+	initial release
+
+v0.2:	2002/11/27
+ 	added support for BC_YUV422 video and audio playback in pdp_qt /
+	pdp_qt~ (thanks to Yves Degoyon for contrib)
+	some makefile cleanups
+
+v0.3:	2002/11/28
+	pdp_qt / pdp_qt~: fixed some bugs in audio playback and added 
+	suport for BC_RGB888 colormodel (loads as greyscale until there 
+	is internal support for a rgb image packet)
+
+v0.4:	2002/12/03
+	code style changes
+	added scaf / cellular automata support. 
+	added some basic filter abstractions. (blur, phase)
+
+v0.5:	2002/12/13
+	first attempt at a documentation (see doc/)
+	added support for processing in separate lower priority thread 
+	with a packet dropping mechanism to avoid audio dropouts.
+	added pdp_control object for controlling pdp's scheduling and
+	detecting packet drops
+	pdp api cleanup (name changes)
+	added some more filter abstractions 
+	(motion blur/phase, emboss, sobel, edge)
+	added pdp_route
+
+v0.6:	2003/01/03
+	added pdp_gain, finished pdp_gradient
+	added channel method to pdp_v4l, display method to pdp_xv
+	added some examples in doc/examples
+	fixed gcc3 compilation probs
+	fixed some pdp_qt bugs (shouldn't crash any more)
+
+v0.7:	2003/01/12
+	moved image format conversion routines to pdp_llconv.c
+	added support for rgb->PDP_IMAGE_YV12 in pdp_v4l, pdp_qt
+	added pdp_grey, pdp_chrot, pdp_scope~
+	moved mmx wrappers to pdp_imageproc_mmx.c
+	added portable c code in pdp_imageproc_portable.c
+	added mmx code for pdp_gain
+	fixed bug in pdp_mix/pdp_mix2
+	fixed bug in pdp_bq (removed state reset)
+	move CA stuff to separate lib (see scaf/)
+	(0.7.1) fixed rgb colour conversion bug
+
+v0.8:	added pdp_scale, pdp_zoom

@@ -1,0 +1,2 @@
+platform_targets: pdp_imageproc_portable.o pdp_llconv_portable.o
+

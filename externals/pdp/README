@@ -1,0 +1,185 @@
+PDP - Pure Data Packet v0.7
+a packet processing library for pure data
+
+Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+The GNU Public Licence can be found in the file COPYING
+
+
+------------------------------------------------------------------
+
+This external pd library is a framework for image/video processing (and 
+other raw data packets) that is fast, simple and flexible and as much 
+as possible compatible with the pd messaging system.
+
+Unfortunately, since the main idea is to "have something for myself to 
+play with", i haven't payed much attention to portability or even  
+compilablility yet. So if some of the requirements are missing on your 
+system, you'll have to tinker a bit to get it working until i move to 
+automatic configuration and building...
+
+The goal (for now) is not to write a general purpose video processing 
+tool for pd, the goal is to experiment with cache optimization, mmx 
+integer processing, time and space feedback in video, nonlinear 
+difference equations, cellular automata, computer vision, and other 
+buzzwords...
+
+
+Features:
+
+* packet formats: greyscale and YV12 encoded images,
+  binary cellular automata (CA)
+* sources: noise, video4linux and quicktime (with audio), CA
+* sink: xvideo display
+* filters: convolution, biquad time, biquad space, CA
+* transforms: colour translation/scaling, grey->palette
+* add, mul, mix, random pixel mix
+* utility objs: packet register, snapshot, trigger
+* packet delay line
+* minimal forth system for defining CA rules (only for mmx)
+
+
+Implementation:
+
+* mmx/c 16bit internal integer processing
+* sort of cache optimized (locality + minimal memory usage)
+
+
+Requirements:
+
+* pd
+* linux
+* a video4linux device for video input. special support for 
+philips webcam included.
+* libquicktime (not quicktime4linux!) for quicktime playback.
+* an X display with XVideo extension for video display
+
+
+Documentation:
+
+Have a look in doc/ for documentation. It is not finished yet. More info 
+in modules/README, scaf/README, the files in abstractions/ and test/ and 
+the code. If you wan't to make your own pdp modules, you can take the 
+simplest one (modules/pdp_add.c) as an example.
+The file doc/reference.txt contains a list of all objects.
+
+
+Building:
+
+Edit Makefile.config to reflect your system settings. For now this 
+should be the pd dir, the pdp dir, a toggle for philips web cam 
+support and the compilation target (linux / linux_mmx). 
+type "make" in the top directory. Remember to type 
+"make clean all" after editing Makefile.config
+
+
+Using:
+
+launch pd with the options -lib $PDP_DIR/pdp -path $PDP_DIR/abstractions
+
+
+Bugs:
+
+see the TODO file
+
+
+Additional Remarks: 
+
+* If some of the modules don't compile due to some missing libraries, 
+you can try to comment out the offending code in modules/Makefile and 
+system/pdp.c If compilation or linking fails due to other reasons, 
+please let me know. if you have both libquicktime and quicktime4linux
+installed. make sure pdp.pd_linux loads the right library.
+
+* The reason i use YV12 and not RGB is simple: it's faster, and for 
+linear operations it doesn't make much difference. Most camera's and
+codecs use a luma/chroma system, and most video cards support hardware
+accellerated display. Note that in YUV, the u (Cb) and v (Cr) components 
+can be negative, so saturation after multiplication with a positive 
+(or negative) value produces not only black and white, but also red, 
+green, blue and their complements. In short, in YUV, nonlinear operations 
+have a different effect than in RGB. Another thing: all the spatial 
+operations are not implemented "correctly" because of the subsampling 
+involved.
+
+* The image packets are 16bit/component planar. This is to simplify 
+the mmx code and to have a little more headroom and precision for 
+processing. 
+
+* Packets can be processed in a low priority thread with a dropping 
+mechanism to prevent overload or audio drops, or they can be processed 
+in the main pd thread. This can be set/unset by sending a "thread x"
+message to pdp_control. Processing in thread is on by default. If you
+don't need audio, (i.e. if you are using 2 pd's, one for audio and one 
+for video) having threads disabled can have advantages, since no pdp
+frames are dropped and no extra delays are introduced. Even when you use 
+audio and pdp in the same pd session, it is possible to run with threads 
+disabled and without audio dropouts by tuning pd's fragsize and keeping
+the frame rate low. 
+
+* There have been some requests for an osx port, but i wil probably not
+do this myself (at least not right now). However, i've ported all
+the mmx code to c, so it should work on other architectures as well.
+This should ease porting a bit for anyone who wants to give it a try. 
+Also i've moved all the image conversion routines to pdp_llconv.c  
+This means porting is reduced to writing new objects for the os specific 
+stuff like video/movie input/output.
+
+* Have a look at Yves Degoyon's PiDiP library. It contains some extra 
+effects (from EffecTV and FreeJ), a quicktime recording object, some 
+streaming modules, ... (the list is growing rapidly ;) see
+http://ydegoyon.free.fr/
+
+* Some quicktime remarks: pdp_qt~ is still a bit experimental, you might 
+try pdp_yqt in yves' lib to see if it works better for you. Also, it 
+seems that libquicktime does not work with compressed headers. The 
+suggested codec is jpeg (photo) and uncompressed audio with the same 
+samplerate as the one pd is using. (hint: compile libquicktime with
+mmx jpeg support)
+
+* The cellular automata object (pdp_ca) is now moved to a separate lib.
+It requires mmx to be compiled. see the scaf/ dir.
+
+* New versions of this package can be found at
+http://zwizwa.fartit.com/pd/pdp
+Experimental relases are in the subdirectory test/
+
+
+Directory structure:
+
+abstractions/	some abstractions that use the pdp objects
+doc/		start of a decent set of document patches
+debug/		debug scripts
+include/	header files
+modules/	pdp module code
+scaf/		CA extension lib (needs to be compiled separately)
+system/		core pdp system
+system/mmx/	mmx assembler files
+test/		some test patches (pretty complete doc but cryptic)
+
+
+
+Please let me know if you discover a bug or think something doesn't work 
+right. Code, documentation or example patches are more than welcome of 
+course.
+
+Have Fun,
+
+Tom
+
+
+last modified: 2003/01/19

@@ -1,0 +1,22 @@
+#N canvas 606 93 450 300 10;
+#X obj 68 71 pdp_v4l;
+#X obj 69 163 pdp_xv;
+#X obj 71 11 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 184 13 stop;
+#X obj 143 44 metro 20;
+#X msg 133 13 bang;
+#X floatatom 189 103 5 0 0;
+#X floatatom 243 102 5 0 0;
+#X msg 17 47 type grey;
+#X obj 388 25 vsl 15 128 -1 1 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 4500 1;
+#X obj 69 125 pdp_phase_hor;
+#X connect 0 0 10 0;
+#X connect 2 0 0 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
+#X connect 5 0 4 0;
+#X connect 8 0 0 0;
+#X connect 9 0 10 1;
+#X connect 10 0 1 0;

@@ -1,0 +1,64 @@
+This is a list of all pdp objects and abstractions with a minimal description.
+Take a look at the patches in the doc/ directory for more info. 
+(Messy doc/test patches can be found in the test/ directory.)
+
+general purpose pdp modules:
+
+pdp_del		a packet delay line
+pdp_reg		a packet register
+pdp_snap	takes a snapshot of a packet stream
+pdp_trigger	sends out a bang message when a packet is recieved
+pdp_route	routes a packet to a specific outlet
+
+image inputs/outputs:
+
+pdp_xv		displays images using the xvideo extension
+pdp_v4l		reads images from a video4linux device
+pdp_qt		reads quicktime movies
+
+image processors:
+
+pdp_add		adds two images
+pdp_bq		spatial biquad filter
+pdp_bqt		temporal biquad filter
+pdp_conv	horizontal/vertical seperable convolution filter
+pdp_gradient	converts a greyscale image using a colour palette
+pdp_grey	converts an image to greyscale
+pdp_mul		multiplies two images
+pdp_affine	shifts and scales a colour plane
+pdp_mix		crossfade between 2 images
+pdp_mix2	mixes 2 images after applying a gain to each of them
+pdp_randmix	crossfades 2 images by taking random pixels
+pdp_noise	a noise generator
+pdp_scope~	a very simple oscilloscope
+pdp_chrot	rotates the chroma components
+pdp_scale	rescale an image
+pdp_zoom	tiled zoom
+
+utility abstractions
+
+pdp_pps			computes the packet rate in packets/sec
+
+image abstractions:
+
+pdp_blur		blurs an image
+pdp_blur_hor		horizontal blur
+pdp_blur_ver		vertical blur
+pdp_phase		applies an allpass filter to an image
+pdp_phase_hor		horizontal allpass
+pdp_phase_ver		vertical allpass
+pdp_motion_blur		blurs motion
+pdp_motion_phase	phase shifts motion
+pdp_alledge		an all edge detector
+pdp_conv_emboss		emboss
+pdp_conv_sobel_hor	horizontal sobel edge detector
+pdp_conv_sobel_ver	vertical sobel edge detector
+pdp_conv_sobel_edge	sum of squares of hor and ver
+pdp_saturation		change colour saturation
+
+cellular automata:
+
+pdp_ca		computes a cellular automaton (as a generator or a filter)
+pdp_ca2image	converts a CA packet to a greyscale image
+pdp_image2ca	converts an image to a CA packet (black and white)
+

@@ -1,0 +1,13 @@
+#N canvas 661 462 467 193 10;
+#X obj 33 137 pdp_xv;
+#X obj 33 57 pdp_v4l;
+#X msg 33 12 bang;
+#X obj 33 92 pdp_trigger;
+#X obj 33 35 metro 1000;
+#X obj 105 138 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X connect 1 0 3 0;
+#X connect 2 0 4 0;
+#X connect 3 0 0 0;
+#X connect 3 1 5 0;
+#X connect 4 0 1 0;
