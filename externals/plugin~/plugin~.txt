@@ -1,0 +1,144 @@
+plugin~: LADSPA and VST plug-in hosting for Pd
+==============================================
+
+This is a Pd [1] tilde object for hosting LADSPA [2] and VST [3] audio
+plug-ins on Linux and Windows systems, respectively.  The LADSPA
+plug-in interface is supported completely on Linux, while the VST 1.0
+audio processing plug-in interface (without plug-in graphics) is
+supported on Windows.
+
+This text corresponds to release 0.2 of plugin~ as of 4th April, 2001.
+This release of plugin~ has been tested with Pd 0.32P1.
+
+plugin~ is distributed under the GNU General Public License.  For more
+information, please read the accompanying file "COPYING".
+
+Loading the plug-in
+-------------------
+The plug-ins are located using the environment variable LADSPA_PATH or
+VST_PATH.  You need to set the corresponding variable to specify the
+directories where you have the plug-in files.  For example, on Linux
+(bash) you should use something like
+
+	$ export LADSPA_PATH=/usr/local/lib/ladspa:$HOME/myplugins
+
+and on Windows something like
+
+	C:\>set VST_PATH=C:\Program Files\Steinberg\Vstplugins;D:\myplugins
+
+Note that Linux and Windows use different delimiters within
+paths and directories.
+
+LADSPA.  You can load a LADSPA plug-in in two ways: (1) Create the
+plug-in by label: "plugin~ lpf".  Here, "lpf" is the label of the
+plug-in that is to be searched for.  All LADSPA plug-in libraries in
+your LADSPA_PATH are searched; (2) Create a plug-in by label and
+library name: "plugin~ lpf filter.so".  Here, "lpf" is the label as
+before, and "filter.so" is the name of the plug-in library, which
+contains the plug-in.  Only the selected LADSPA plug-in library is
+searched.
+
+VST.  There is always only one VST plug-in within one DLL and thus you
+only need to create the plug-in by library name: "plugin~ northpole".
+This will search through your VST_PATH for the plug-in library named
+"northpole.dll".
+
+After loading the plug-in successfully, the number of inlets and
+outlets of the corresponding plugin~ object should represent the
+number of audio inputs and outputs to/from the plug-in (plus one inlet
+and one outlet for control information, see below).
+
+In- and outlet functionality
+----------------------------
+The audio inputs and outputs ports of LADSPA and VST plug-ins are
+represented as separate signal inlets and outlets.  The control input
+and output ports (LADSPA) or the parameter inputs (VST), however, are
+all represented together with one inlet and one outlet.
+
+The first inlet and the first outlet are for control input and output
+messages, respectively.  Control messages are messages, which start
+with the text "control".  Second should come the name of the
+corresponding control port (called parameter in VST parlance), and
+third the value.  The first inlet accepts and the first outlet sends
+this kinds of messages.  Additionally, you can use port/parameter
+number (like this: #1, #2, ...) instead of the name to send control
+changes.  You should note, however, that the port numbering is not
+necessarily the same between different versions of a plug-in, so you
+should use port/parameter names where possible.
+
+The first inlet and outlet are always there, even if the plug-in
+doesn't have control ports.  The rest of the in- and outlets are for
+audio input and output signals, respectively.
+
+The first inlet accepts other messages in addition to "control".  You
+can investigate the plug-in inputs and outputs by sending a "print"
+message to the first inlet.  You can reset the plug-in internal state
+(clear delay lines etc.) by sending a "reset" message.
+
+Loading the plugin~ object
+--------------------------
+In order to be able to use the plugin~ object with Pd, you need to
+start Pd with the "-lib" command line parameter.  On Linux, the
+plugin~ object resides in a library called "plugin~.pd_linux", while
+on Windows the library is called "winplugintilde.dll".  Thus, you need
+to say either "pd -lib plugin~" (on Linux) or "pd -lib winplugintilde"
+(on Windows) to start Pd with the plugin~ object loaded.
+
+You probably need to give the "-path" parameter to Pd as well in order
+to specify the exact location of the "plugin~.pd_linux" (on Linux) or
+"winplugintilde.dll" (on Windows) library file.  By default, the
+library file is installed to the "extra/plugin~" directory under your
+Pd installation directory.
+
+Compiling the plugin~ object
+----------------------------
+Linux.  All the necessary files for compilation under Linux are
+included in the distribution.  Just type "./configure" and "make all
+install" and you should be done.  The plugin~ object file will be
+installed in your Pd directory tree, in "extra/plugin~".  You may
+specify the path to your Pd directory with the "--with-pddir" argument
+to configure, eg. like this: "./configure --with-pddir=/usr/local/pd".
+
+Windows.  The winplugintilde.dll library is included in the plugin~
+distribution, in the directory "win", so it is not necessary to
+compile plugin~.  Anyhow, in order to compile plugin~ for VST plug-ins
+yourself, you need to download the VST SDK from Steinberg and agree to
+the Steinberg SDK license.  The SDK and the license are available from
+http://www.steinberg.net/developers/VST2SDKAbout.html.  After
+downloading you need to copy the files from the SDK subdirectory
+"source/common" to the "vst" subdirectory of the plugin~ distribution.
+You can then compile plugin~ using the ready-made project and
+workspace files for Microsoft Visual C 6.0, found in the "win"
+subdirectory.  You will need to modify the MSVC project settings by
+hand to point to your Pd directory.
+
+Remaining problems
+------------------
+Pd.  There is a problem with Pd which makes it really hard to send
+"control" messages to parameters with a space character in the
+parameter name such as "filter freq" or "filter q".  When you
+send a `control "filter freq" 440' message, Pd will (incorrectly) not
+handle "filter freq" as one symbol.  You can currently circumvent this
+by addressing problematic control parameters by number instead of
+name.
+
+LADSPA.  No known issues.
+
+VST.  plugin~ doesn't support VST 2.0 synthesizer plug-ins.
+Additionally, the VST 1.0 plug-ins are required to implement the
+processReplacing() interface in order for them to work with plugin~.
+You will get an error message if this is not the case.  Furthermore,
+no graphics is displayed for the plug-ins; I am helplessly waiting for
+someone to volunteer to add VST GUI support.  Also, plugin~ should
+observe the Windows registry (HKEY_LOCAL_MACHINE\Software\VST\VSTPluginsPath)
+for the VST plug-in path.
+
+For more information, see:
+--------------------------
+[1] Pd: http://iem.kug.ac.at/pd/
+[2] LADSPA: http://www.ladspa.org/
+[3] VST: http://www.steinberg.net/
+
+All trademarks are acknowledged.
+
+Jarno Seppänen, jams@cs.tut.fi

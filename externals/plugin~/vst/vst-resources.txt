@@ -1,0 +1,9 @@
+In order to compile plugin~ with VST hosting, you need to copy the files from
+"source/common" subdirectory from the Steinberg VST SDK into this directory.
+The required files are "AEffect.h", "AEffEditor.hpp", and "AudioEffect.hpp".
+
+http://www.steinberg.net/developers/VST2SDKAbout.html
+http://www.steinberg.de/~yvan/vstgui/V2.1/beta2/windows/vstgui.zip
+http://www.steinberg.de/~yvan/vstgui/V2.0/windows/vstgui.zip
+http://www.bebits.com/app/1805/
+http://www.bebits.com/bob/7346/VSTPluginsAdapterSources-1.0.zip

@@ -1,0 +1,6 @@
+* VST: add support for graphics
+* VST: add support for plug-ins without processReplacing()
+  (will require out-of-place buffers just like in plugin~_ladspa.c)
+* VST: add support for VST2 synthesizers
+* make is possible to use both LADSPA and VST plug-ins in a single Pd
+  patch (i.e. act as either LADSPA or VST host "on demand")

@@ -1,0 +1,23 @@
+plugin~ NEWS --- history of changes.
+
+Overview of changes in version 0.2, released April 4 2001
+=========================================================
+* control/parameter value setting by parameter number (starting with a
+  '#' character) in addition to using parameter name
+* LADSPA: Implemented control value bounding
+* Support for VST 1.0 (processReplacing()) plug-ins under Windows
+* LADSPA bug fixes under Linux (huge thanks to Linium <intent@club-internet.fr>
+  for quality assurance, merci! :)
+
+Overview of changes in version 0.1, released June 15 2000
+=========================================================
+* Initial release
+* Control ports mapped to Pd asynchronous messages.  Input controls
+  are changed on incoming messages and outgoing messages are sent on
+  changes in output control values.
+* Audio ports mapped to Pd signal in/outlets
+* Searching for plug-ins in all LADSPA libraries
+* Resetting the plug-in's internal state on incoming "reset" messages
+* Printing plug-in information on incoming "print" messages
+* Supports out-of-place processing for plug-ins that need this
+* Distributed under the GNU General Public License

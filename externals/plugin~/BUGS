@@ -1,0 +1,18 @@
+LADSPA
+------
+- Linium avez écrit: "The output of syndrum and organ is a curious uncontrallable
+  screaming noise that can resist a multipliy by 0. Some sort of bytes flow...
+  It seems that the audio output spits something which is not an audio signal and
+  even confuses PD."  A bug in plugin~ or what?
+
+VST
+---
+- plugin~ doesn't support VST 2.0 synthesizer plug-ins.
+- Additionally, the VST 1.0 plug-ins are required to implement the
+  processReplacing() interface in order for them to work with plugin~.
+  You will get an error message if this is not the case.
+- Furthermore, no graphics is displayed for the plug-ins; I am
+  helplessly waiting for someone to volunteer to add VST GUI support.
+- Also, plugin~ should observe the Windows registry
+  (HKEY_LOCAL_MACHINE\Software\VST\VSTPluginsPath) for the VST plug-in
+  path.
