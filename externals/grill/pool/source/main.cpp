@@ -16,6 +16,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define VCNT 64
 #define DCNT 16
 
+const t_symbol *sym_echo = flext::MakeSymbol("echo");
+
 class pool:
 	public flext_base
 {
@@ -23,7 +25,7 @@ class pool:
 
 public:
 	pool(I argc,const A *argv);
-	~pool();
+	virtual ~pool();
 
 	static V setup(t_classid);
 	
@@ -55,9 +57,11 @@ protected:
 	V m_rmsub(I argc,const A *argv) { m_rmdir(argc,argv,false); }
 
 	// handle data
-	V m_set(I argc,const A *argv) { set(MakeSymbol("set"),argc,argv,true); }
-	V m_add(I argc,const A *argv) { set(MakeSymbol("add"),argc,argv,false); }
+	V m_set(I argc,const A *argv) { set(argc,argv,true); }
+	V m_seti(I argc,const A *argv); // set value at index
+	V m_add(I argc,const A *argv) { set(argc,argv,false); }
 	V m_clr(I argc,const A *argv);
+	V m_clri(I ix); // clear value at index
 	V m_clrall();	// only values
 	V m_clrrec();	// also subdirectories
 	V m_clrsub();	// only subdirectories
@@ -79,15 +83,15 @@ protected:
     V m_printroot() { m_printrec(0,NULL,true); }   // print values recursively from root
 
 	// cut/copy/paste
-	V m_paste(I argc,const A *argv) { paste(MakeSymbol("paste"),argc,argv,true); } // paste contents of clipboard
-	V m_pasteadd(I argc,const A *argv) { paste(MakeSymbol("pasteadd"),argc,argv,false); } // paste but don't replace
+	V m_paste(I argc,const A *argv) { paste(thisTag(),argc,argv,true); } // paste contents of clipboard
+	V m_pasteadd(I argc,const A *argv) { paste(thisTag(),argc,argv,false); } // paste but don't replace
 	V m_clrclip();  // clear clipboard
-	V m_cut(I argc,const A *argv) { copy(MakeSymbol("cut"),argc,argv,true); } // cut value into clipboard
-	V m_copy(I argc,const A *argv) { copy(MakeSymbol("copy"),argc,argv,false); } 	// copy value into clipboard
-	V m_cutall() { copyall(MakeSymbol("cutall"),true,0); }   // cut all values in current directory into clipboard
-	V m_copyall() { copyall(MakeSymbol("copyall"),false,0); }   // copy all values in current directory into clipboard
-	V m_cutrec(I argc,const A *argv) { copyrec(MakeSymbol("cutrec"),argc,argv,true); }   // cut directory (and subdirs) into clipboard
-	V m_copyrec(I argc,const A *argv) { copyrec(MakeSymbol("copyrec"),argc,argv,false); }   // cut directory (and subdirs) into clipboard
+	V m_cut(I argc,const A *argv) { copy(thisTag(),argc,argv,true); } // cut value into clipboard
+	V m_copy(I argc,const A *argv) { copy(thisTag(),argc,argv,false); } 	// copy value into clipboard
+	V m_cutall() { copyall(thisTag(),true,0); }   // cut all values in current directory into clipboard
+	V m_copyall() { copyall(thisTag(),false,0); }   // copy all values in current directory into clipboard
+	V m_cutrec(I argc,const A *argv) { copyrec(thisTag(),argc,argv,true); }   // cut directory (and subdirs) into clipboard
+	V m_copyrec(I argc,const A *argv) { copyrec(thisTag(),argc,argv,false); }   // cut directory (and subdirs) into clipboard
 
 	// load/save from/to file
     V m_load(I argc,const A *argv) { load(argc,argv,false); }
@@ -115,7 +119,7 @@ private:
 
     enum get_t { get_norm,get_cnt,get_print };
 
-	V set(const S *tag,I argc,const A *argv,BL over);
+	V set(I argc,const A *argv,BL over);
 	V getdir(const S *tag);
 	I getrec(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
 	I getsub(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
@@ -132,7 +136,7 @@ private:
 	V svdir(I argc,const A *argv,BL xml);   // save values in current dir
 	V svrec(I argc,const A *argv,BL xml);   // save values recursively
 
-	V echodir() { if(echo) getdir(MakeSymbol("echo")); }
+	V echodir() { if(echo) getdir(sym_echo); }
 
 	BL priv,absdir,echo;
 	I vcnt,dcnt;
@@ -173,8 +177,10 @@ private:
 	FLEXT_CALLBACK_V(m_rmsub)
 
 	FLEXT_CALLBACK_V(m_set)
+	FLEXT_CALLBACK_V(m_seti)
 	FLEXT_CALLBACK_V(m_add)
 	FLEXT_CALLBACK_V(m_clr)
+	FLEXT_CALLBACK_I(m_clri)
 	FLEXT_CALLBACK(m_clrall)
 	FLEXT_CALLBACK(m_clrrec)
 	FLEXT_CALLBACK(m_clrsub)
@@ -239,8 +245,6 @@ V pool::setup(t_classid c)
 	FLEXT_CADDATTR_VAR1(c,"dircnt",dcnt);
 
 	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
-	FLEXT_CADDMETHOD_(c,0,"set",m_set);
-	FLEXT_CADDMETHOD_(c,0,"add",m_add);
 	FLEXT_CADDMETHOD_(c,0,"getdir",m_getdir);
 	FLEXT_CADDMETHOD_(c,0,"mkdir",m_mkdir);
 	FLEXT_CADDMETHOD_(c,0,"chdir",m_chdir);
@@ -253,7 +257,10 @@ V pool::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"rmsub",m_rmsub);
 
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
+	FLEXT_CADDMETHOD_(c,0,"seti",m_seti);
+	FLEXT_CADDMETHOD_(c,0,"add",m_add);
 	FLEXT_CADDMETHOD_(c,0,"clr",m_clr);
+	FLEXT_CADDMETHOD_(c,0,"clri",m_clri);
 	FLEXT_CADDMETHOD_(c,0,"clrall",m_clrall);
 	FLEXT_CADDMETHOD_(c,0,"clrrec",m_clrrec);
 	FLEXT_CADDMETHOD_(c,0,"clrsub",m_clrsub);
@@ -392,19 +399,19 @@ V pool::getdir(const S *tag)
 	ToOutList(2,curdir);
 }
 
-V pool::m_getdir() { getdir(MakeSymbol("getdir")); }
+V pool::m_getdir() { getdir(thisTag()); }
 
 V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
 {
-    const char *nm = chg?"mkchdir":"mkdir";
+//    const char *nm = chg?"mkchdir":"mkdir";
 	if(!ValChk(argc,argv))
-		post("%s - %s: invalid directory name",thisName(),nm);
+		post("%s - %s: invalid directory name",thisName(),GetString(thisTag()));
 	else {
 		AtomList ndir;
 		if(abs) ndir(argc,argv);
 		else (ndir = curdir).Append(argc,argv);
 		if(!pl->MkDir(ndir,vcnt,dcnt)) {
-			post("%s - %s: directory couldn't be created",thisName(),nm);
+			post("%s - %s: directory couldn't be created",thisName(),GetString(thisTag()));
 		}
         else if(chg) 
             // change to newly created directory
@@ -417,13 +424,13 @@ V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
 V pool::m_chdir(I argc,const A *argv,BL abs)
 {
 	if(!ValChk(argc,argv)) 
-		post("%s - chdir: invalid directory name",thisName());
+		post("%s - %s: invalid directory name",thisName(),GetString(thisTag()));
 	else {
 		AtomList prv(curdir);
 		if(abs) curdir(argc,argv);
 		else curdir.Append(argc,argv);
 		if(!pl->ChkDir(curdir)) {
-			post("%s - chdir: directory couldn't be changed",thisName());
+			post("%s - %s: directory couldn't be changed",thisName(),GetString(thisTag()));
 			curdir = prv;
 		}
 	}
@@ -437,26 +444,26 @@ V pool::m_updir(I argc,const A *argv)
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - updir: superfluous arguments ignored",thisName());
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 			if(lvls < 0)
-				post("%s - updir: invalid level specification - set to 1",thisName());
+				post("%s - %s: invalid level specification - set to 1",thisName(),GetString(thisTag()));
 		}
 		else
-			post("%s - updir: invalid level specification - set to 1",thisName());
+			post("%s - %s: invalid level specification - set to 1",thisName(),GetString(thisTag()));
 	}
 
 	AtomList prv(curdir);
 
 	if(lvls > curdir.Count()) {
-		post("%s - updir: level exceeds directory depth - corrected",thisName());
+		post("%s - %s: level exceeds directory depth - corrected",thisName(),GetString(thisTag()));
 		curdir();
 	}
 	else
 		curdir.Part(0,curdir.Count()-lvls);
 
 	if(!pl->ChkDir(curdir)) {
-		post("%s - updir: directory couldn't be changed",thisName());
+		post("%s - %s: directory couldn't be changed",thisName(),GetString(thisTag()));
 		curdir = prv;
 	}
 
@@ -469,22 +476,36 @@ V pool::m_rmdir(I argc,const A *argv,BL abs)
 	else curdir.Append(argc,argv);
 
 	if(!pl->RmDir(curdir)) 
-		post("%s - rmdir: directory couldn't be removed",thisName());
+		post("%s - %s: directory couldn't be removed",thisName(),GetString(thisTag()));
 	curdir();
 
 	echodir();
 }
 
-V pool::set(const S *tag,I argc,const A *argv,BL over)
+V pool::set(I argc,const A *argv,BL over)
 {
 	if(!argc || !KeyChk(argv[0])) 
-		post("%s - %s: invalid key",thisName(),GetString(tag));
+		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
 	else if(!ValChk(argc-1,argv+1)) {
-		post("%s - %s: invalid data values",thisName(),GetString(tag));
+		post("%s - %s: invalid data values",thisName(),GetString(thisTag()));
 	}
 	else 
 		if(!pl->Set(curdir,argv[0],new AtomList(argc-1,argv+1),over))
-			post("%s - %s: value couldn't be set",thisName(),GetString(tag));
+			post("%s - %s: value couldn't be set",thisName(),GetString(thisTag()));
+
+	echodir();
+}
+
+V pool::m_seti(I argc,const A *argv)
+{
+	if(!argc || !CanbeInt(argv[0])) 
+		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
+	else if(!ValChk(argc-1,argv+1)) {
+		post("%s - %s: invalid data values",thisName(),GetString(thisTag()));
+	}
+	else 
+		if(!pl->Seti(curdir,GetAInt(argv[0]),new AtomList(argc-1,argv+1)))
+			post("%s - %s: value couldn't be set",thisName(),GetString(thisTag()));
 
 	echodir();
 }
@@ -492,13 +513,25 @@ V pool::set(const S *tag,I argc,const A *argv,BL over)
 V pool::m_clr(I argc,const A *argv)
 {
 	if(!argc || !KeyChk(argv[0]))
-		post("%s - clr: invalid key",thisName());
+		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
 	else {
 		if(argc > 1) 
-			post("%s - clr: superfluous arguments ignored",thisName());
+			post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 
 		if(!pl->Clr(curdir,argv[0]))
-			post("%s - clr: value couldn't be cleared",thisName());
+			post("%s - %s: value couldn't be cleared",thisName(),GetString(thisTag()));
+	}
+
+	echodir();
+}
+
+V pool::m_clri(I ix)
+{
+	if(ix < 0)
+		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
+	else {
+		if(!pl->Clri(curdir,ix))
+			post("%s - %s: value couldn't be cleared",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -507,7 +540,7 @@ V pool::m_clr(I argc,const A *argv)
 V pool::m_clrall()
 {
 	if(!pl->ClrAll(curdir,false))
-		post("%s - clrall: values couldn't be cleared",thisName());
+		post("%s - %s: values couldn't be cleared",thisName(),GetString(thisTag()));
 
 	echodir();
 }
@@ -515,7 +548,7 @@ V pool::m_clrall()
 V pool::m_clrrec()
 {
 	if(!pl->ClrAll(curdir,true))
-		post("%s - clrrec: values couldn't be cleared",thisName());
+		post("%s - %s: values couldn't be cleared",thisName(),GetString(thisTag()));
 
 	echodir();
 }
@@ -523,7 +556,7 @@ V pool::m_clrrec()
 V pool::m_clrsub()
 {
 	if(!pl->ClrAll(curdir,true,true))
-		post("%s - clrsub: directories couldn't be cleared",thisName());
+		post("%s - %s: directories couldn't be cleared",thisName(),GetString(thisTag()));
 
 	echodir();
 }
@@ -531,14 +564,14 @@ V pool::m_clrsub()
 V pool::m_get(I argc,const A *argv)
 {
 	if(!argc || !KeyChk(argv[0]))
-		post("%s - get: invalid key",thisName());
+		post("%s - %s: invalid key",thisName(),GetString(thisTag()));
 	else {
 		if(argc > 1) 
-			post("%s - get: superfluous arguments ignored",thisName());
+			post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 
 		poolval *r = pl->Ref(curdir,argv[0]);
 
-		ToOutAnything(3,MakeSymbol("get"),0,NULL);
+		ToOutAnything(3,thisTag(),0,NULL);
 		if(absdir)
 			ToOutList(2,curdir);
 		else
@@ -559,11 +592,11 @@ V pool::m_get(I argc,const A *argv)
 V pool::m_geti(I ix)
 {
 	if(ix < 0)
-		post("%s - geti: invalid index",thisName());
+		post("%s - %s: invalid index",thisName(),GetString(thisTag()));
 	else {
 		poolval *r = pl->Refi(curdir,ix);
 
-		ToOutAnything(3,MakeSymbol("geti"),0,NULL);
+		ToOutAnything(3,thisTag(),0,NULL);
 		if(absdir)
 			ToOutList(2,curdir);
 		else
@@ -581,7 +614,7 @@ V pool::m_geti(I ix)
 	echodir();
 }
 
-I pool::getrec(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
+I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rdir)
 {
 	AtomList gldir(curdir);
 	gldir.Append(rdir);
@@ -634,7 +667,7 @@ I pool::getrec(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 
 V pool::m_getall()
 {
-	getrec(MakeSymbol("getall"),0,false);
+	getrec(thisTag(),0,false);
 	ToOutBang(3);
 
 	echodir();
@@ -642,7 +675,7 @@ V pool::m_getall()
 
 V pool::m_ogetall()
 {
-	getrec(MakeSymbol("ogetall"),0,true);
+	getrec(thisTag(),0,true);
 	ToOutBang(3);
 
 	echodir();
@@ -654,13 +687,13 @@ V pool::m_getrec(I argc,const A *argv)
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - getrec: superfluous arguments ignored",thisName());
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - getrec: invalid level specification - set to infinite",thisName());
+			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
-	getrec(MakeSymbol("getrec"),lvls,false);
+	getrec(thisTag(),lvls,false);
 	ToOutBang(3);
 
 	echodir();
@@ -673,13 +706,13 @@ V pool::m_ogetrec(I argc,const A *argv)
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - ogetrec: superfluous arguments ignored",thisName());
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - ogetrec: invalid level specification - set to infinite",thisName());
+			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
-	getrec(MakeSymbol("ogetrec"),lvls,true);
+	getrec(thisTag(),lvls,true);
 	ToOutBang(3);
 
 	echodir();
@@ -727,14 +760,14 @@ V pool::m_getsub(I argc,const A *argv)
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - getsub: superfluous arguments ignored",thisName());
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - getsub: invalid level specification - set to 0",thisName());
+			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
 
-	getsub(MakeSymbol("getsub"),lvls,false);
+	getsub(thisTag(),lvls,false);
 	ToOutBang(3);
 
 	echodir();
@@ -747,14 +780,14 @@ V pool::m_ogetsub(I argc,const A *argv)
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - ogetsub: superfluous arguments ignored",thisName());
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - ogetsub: invalid level specification - set to 0",thisName());
+			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
 
-	getsub(MakeSymbol("ogetsub"),lvls,true); 
+	getsub(thisTag(),lvls,true); 
 	ToOutBang(3);
 
 	echodir();
@@ -763,9 +796,8 @@ V pool::m_ogetsub(I argc,const A *argv)
 
 V pool::m_cntall()
 {
-	const S *tag = MakeSymbol("cntall");
-	I cnt = getrec(tag,0,false,get_cnt);
-	ToOutSymbol(3,tag);
+	I cnt = getrec(thisTag(),0,false,get_cnt);
+	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
 	ToOutInt(0,cnt);
@@ -775,21 +807,19 @@ V pool::m_cntall()
 
 V pool::m_cntrec(I argc,const A *argv)
 {
-	const S *tag = MakeSymbol("cntrec");
-
 	I lvls = -1;
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(tag));
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(tag));
+			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
 	
-	I cnt = getrec(tag,lvls,false,get_cnt);
-	ToOutSymbol(3,tag);
+	I cnt = getrec(thisTag(),lvls,false,get_cnt);
+	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
 	ToOutInt(0,cnt);
@@ -800,21 +830,19 @@ V pool::m_cntrec(I argc,const A *argv)
 
 V pool::m_cntsub(I argc,const A *argv)
 {
-	const S *tag = MakeSymbol("cntsub");
-
 	I lvls = 0;
 	if(argc > 0) {
 		if(CanbeInt(argv[0])) {
 			if(argc > 1)
-				post("%s - %s: superfluous arguments ignored",thisName(),GetString(tag));
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			lvls = GetAInt(argv[0]);
 		}
 		else 
-			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(tag));
+			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
 
-	I cnt = getsub(tag,lvls,false,get_cnt);
-	ToOutSymbol(3,tag);
+	I cnt = getsub(thisTag(),lvls,false,get_cnt);
+	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
 	ToOutInt(0,cnt);
@@ -824,8 +852,7 @@ V pool::m_cntsub(I argc,const A *argv)
 
 V pool::m_printall()
 {
-    const S *tag = MakeSymbol("printall");
-	I cnt = getrec(tag,0,false,get_print);
+	I cnt = getrec(thisTag(),0,false,get_print);
     post("");
 }
 
@@ -938,19 +965,18 @@ V pool::copyrec(const S *tag,I argc,const A *argv,BL cut)
 
 V pool::load(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"loadx":"load";
 	const C *flnm = NULL;
 	if(argc > 0) {
-		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
 	if(!flnm) 
-		post("%s - %s: no filename given",thisName(),sym);
+		post("%s - %s: no filename given",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
 		if(!(xml?pl->LoadXML(fl.c_str()):pl->Load(fl.c_str())))
-			post("%s - %s: error loading data",thisName(),sym);
+			post("%s - %s: error loading data",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -958,19 +984,18 @@ V pool::load(I argc,const A *argv,BL xml)
 
 V pool::save(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"savex":"save";
 	const C *flnm = NULL;
 	if(argc > 0) {
-		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
 	if(!flnm) 
-		post("%s - %s: no filename given",thisName(),sym);
+		post("%s - %s: no filename given",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
 		if(!(xml?pl->SaveXML(fl.c_str()):pl->Save(fl.c_str())))
-			post("%s - %s: error saving data",thisName(),sym);
+			post("%s - %s: error saving data",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -978,19 +1003,18 @@ V pool::save(I argc,const A *argv,BL xml)
 
 V pool::lddir(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"ldxdir":"lddir";
 	const C *flnm = NULL;
 	if(argc > 0) {
-		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
 	if(!flnm)
-		post("%s - %s: invalid filename",thisName(),sym);
+		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
 		if(!(xml?pl->LdDirXML(curdir,fl.c_str(),0):pl->LdDir(curdir,fl.c_str(),0))) 
-			post("%s - %s: directory couldn't be loaded",thisName(),sym);
+			post("%s - %s: directory couldn't be loaded",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -998,7 +1022,6 @@ V pool::lddir(I argc,const A *argv,BL xml)
 
 V pool::ldrec(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"ldxrec":"ldrec";
 	const C *flnm = NULL;
 	I depth = -1;
 	BL mkdir = true;
@@ -1008,24 +1031,24 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 		if(argc >= 2) {
 			if(CanbeInt(argv[1])) depth = GetAInt(argv[1]);
 			else
-				post("%s - %s: invalid depth argument - set to -1",thisName(),sym);
+				post("%s - %s: invalid depth argument - set to -1",thisName(),GetString(thisTag()));
 
 			if(argc >= 3) {
 				if(CanbeBool(argv[2])) mkdir = GetABool(argv[2]);
 				else
-					post("%s - %s: invalid mkdir argument - set to true",thisName(),sym);
+					post("%s - %s: invalid mkdir argument - set to true",thisName(),GetString(thisTag()));
 
-				if(argc > 3) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+				if(argc > 3) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 			}
 		}
 	}
 
 	if(!flnm)
-		post("%s - %s: invalid filename",thisName(),sym);
+		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
         if(!(xml?pl->LdDirXML(curdir,fl.c_str(),depth,mkdir):pl->LdDir(curdir,fl.c_str(),depth,mkdir))) 
-		    post("%s - %s: directory couldn't be saved",thisName(),sym);
+		    post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -1033,19 +1056,18 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 
 V pool::svdir(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"svxdir":"svdir";
 	const C *flnm = NULL;
 	if(argc > 0) {
-		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
 	if(!flnm)
-		post("%s - %s: invalid filename",thisName(),sym);
+		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
         if(!(xml?pl->SvDirXML(curdir,fl.c_str(),0,absdir):pl->SvDir(curdir,fl.c_str(),0,absdir))) 
-		post("%s - %s: directory couldn't be saved",thisName(),sym);
+		post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -1053,19 +1075,18 @@ V pool::svdir(I argc,const A *argv,BL xml)
 
 V pool::svrec(I argc,const A *argv,BL xml)
 {
-    const C *sym = xml?"svxrec":"svrec";
 	const C *flnm = NULL;
 	if(argc > 0) {
-		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),sym);
+		if(argc > 1) post("%s - %s: superfluous arguments ignored",thisName(),GetString(thisTag()));
 		if(IsString(argv[0])) flnm = GetString(argv[0]);
 	}
 
 	if(!flnm)
-		post("%s - %s: invalid filename",thisName(),sym);
+		post("%s - %s: invalid filename",thisName(),GetString(thisTag()));
 	else {
 		string fl(MakeFilename(flnm));
         if(!(xml?pl->SvDirXML(curdir,fl.c_str(),-1,absdir):pl->SvDir(curdir,fl.c_str(),-1,absdir))) 
-		post("%s - %s: directory couldn't be saved",thisName(),sym);
+		post("%s - %s: directory couldn't be saved",thisName(),GetString(thisTag()));
 	}
 
 	echodir();
@@ -1096,7 +1117,7 @@ V pool::ToOutAtom(I ix,const t_atom &a)
 	else if(IsInt(a))
 		ToOutInt(ix,GetInt(a));
 	else
-		post("%s - output atom: type not supported!",thisName());
+		post("%s - %s type not supported!",thisName(),GetString(thisTag()));
 }
 
 

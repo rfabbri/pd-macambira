@@ -69,7 +69,9 @@ public:
 	pooldir *AddDir(const AtomList &d,I vcnt = 0,I dcnt = 0) { return AddDir(d.Count(),d.Atoms(),vcnt,dcnt); }
 
 	V SetVal(const A &key,AtomList *data,BL over = true);
+	BL SetVali(I ix,AtomList *data);
 	V ClrVal(const A &key) { SetVal(key,NULL); }
+    BL ClrVali(I ix) { return SetVali(ix,NULL); }
 	AtomList *PeekVal(const A &key);
 	AtomList *GetVal(const A &key,BL cut = false);
 	I CntAll() const;
@@ -116,6 +118,7 @@ private:
   	BL LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d);
 };
 
+
 class pooldata:
 	public flext
 {
@@ -126,22 +129,103 @@ public:
 	V Push() { ++refs; }
 	BL Pop() { return --refs > 0; }
 
-	V Reset();
-	BL MkDir(const AtomList &d,I vcnt = 0,I dcnt = 0); 
-	BL ChkDir(const AtomList &d);
-	BL RmDir(const AtomList &d);
+    V Reset() { root.Reset(); }
 
-	BL Set(const AtomList &d,const A &key,AtomList *data,BL over = true);
-	BL Clr(const AtomList &d,const A &key);
-	BL ClrAll(const AtomList &d,BL rec,BL dironly = false);
-	AtomList *Peek(const AtomList &d,const A &key);
-	AtomList *Get(const AtomList &d,const A &key);
-	poolval *Ref(const AtomList &d,const A &key);
-	poolval *Refi(const AtomList &d,I ix);
-	I CntAll(const AtomList &d);
+    BL MkDir(const AtomList &d,I vcnt = 0,I dcnt = 0) 
+    { 
+        root.AddDir(d,vcnt,dcnt); 
+        return true; 
+    }
+
+    BL ChkDir(const AtomList &d) 
+    { 
+        return root.GetDir(d) != NULL; 
+    }
+
+    BL RmDir(const AtomList &d) 
+    { 
+        return root.DelDir(d); 
+    }
+
+    BL Set(const AtomList &d,const A &key,AtomList *data,BL over = true)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    if(!pd) return false;
+	    pd->SetVal(key,data,over);
+	    return true;
+    }
+
+    BL Seti(const AtomList &d,I ix,AtomList *data)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    if(!pd) return false;
+	    pd->SetVali(ix,data);
+	    return true;
+    }
+
+	BL Clr(const AtomList &d,const A &key)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    if(!pd) return false;
+	    pd->ClrVal(key);
+	    return true;
+    }
+
+	BL Clri(const AtomList &d,I ix)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    if(!pd) return false;
+	    pd->ClrVali(ix);
+	    return true;
+    }
+
+	BL ClrAll(const AtomList &d,BL rec,BL dironly = false)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    if(!pd) return false;
+	    pd->Clear(rec,dironly);
+	    return true;
+    }
+
+	AtomList *Peek(const AtomList &d,const A &key)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->PeekVal(key):NULL;
+    }
+
+	AtomList *Get(const AtomList &d,const A &key)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->GetVal(key):NULL;
+    }
+
+	poolval *Ref(const AtomList &d,const A &key)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->RefVal(key):NULL;
+    }
+
+	poolval *Refi(const AtomList &d,I ix)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->RefVali(ix):NULL;
+    }
+
+	I CntAll(const AtomList &d)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->CntAll():0;
+    }
+
 	I PrintAll(const AtomList &d);
 	I GetAll(const AtomList &d,A *&keys,AtomList *&lst);
-	I CntSub(const AtomList &d);
+
+    I CntSub(const AtomList &d)
+    {
+	    pooldir *pd = root.GetDir(d);
+	    return pd?pd->CntSub():0;
+    }
+
 	I GetSub(const AtomList &d,const t_atom **&dirs);
 
 	BL Paste(const AtomList &d,const pooldir *clip,I depth = -1,BL repl = true,BL mkdir = true);

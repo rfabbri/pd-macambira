@@ -191,7 +191,7 @@ BL pooldir::DelDir(I argc,const A *argv)
 
 V pooldir::SetVal(const A &key,AtomList *data,BL over)
 {
-	I c = 1,vix = VIdx(key);
+    I c = 1,vix = VIdx(key);
 	poolval *prv = NULL,*ix = vals[vix].v;
 	for(; ix; prv = ix,ix = ix->nxt) {
 		c = compare(key,ix->key);
@@ -228,6 +228,38 @@ V pooldir::SetVal(const A &key,AtomList *data,BL over)
 	}
 }
 
+BL pooldir::SetVali(I rix,AtomList *data)
+{
+    poolval *prv = NULL,*ix = NULL;
+	for(I vix = 0; vix < vsize; ++vix) 
+		if(rix > vals[vix].cnt) rix -= vals[vix].cnt;
+		else {
+			ix = vals[vix].v;
+			for(; ix && rix; prv = ix,ix = ix->nxt) --rix;
+			if(ix && !rix) break;
+		}  
+
+	if(ix) { 
+		// data exists... overwrite it
+		
+		if(data)
+			ix->Set(data);
+		else {
+			// delete key
+		
+			poolval *nv = ix->nxt;
+			if(prv) prv->nxt = nv;
+			else vals[vix].v = nv;
+			vals[vix].cnt--;
+			ix->nxt = NULL;
+			delete ix;
+		}
+        return true;
+	}
+    else
+        return false;
+}
+
 poolval *pooldir::RefVal(const A &key)
 {
 	I c = 1,vix = VIdx(key);
@@ -239,7 +271,6 @@ poolval *pooldir::RefVal(const A &key)
 
 	return c || !ix?NULL:ix;
 }
-
 
 poolval *pooldir::RefVali(I rix)
 {

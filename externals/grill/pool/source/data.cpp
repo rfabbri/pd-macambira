@@ -32,7 +32,7 @@ pooldata::~pooldata()
 
 const A pooldata::nullatom = { A_NULL };
 
-
+/*
 V pooldata::Reset()
 {
 	root.Reset();
@@ -43,6 +43,7 @@ BL pooldata::MkDir(const AtomList &d,I vcnt,I dcnt)
 	root.AddDir(d,vcnt,dcnt);
 	return true;
 }
+
 
 BL pooldata::ChkDir(const AtomList &d)
 {
@@ -67,6 +68,14 @@ BL pooldata::Clr(const AtomList &d,const A &key)
 	pooldir *pd = root.GetDir(d);
 	if(!pd) return false;
 	pd->ClrVal(key);
+	return true;
+}
+
+V pooldata::Clri(const AtomList &d,I ix)
+{
+	pooldir *pd = root.GetDir(d);
+	if(!pd) return false;
+	pd->ClrVali(ix);
 	return true;
 }
 
@@ -107,6 +116,7 @@ I pooldata::CntAll(const AtomList &d)
 	pooldir *pd = root.GetDir(d);
 	return pd?pd->CntAll():0;
 }
+*/
 
 I pooldata::GetAll(const AtomList &d,A *&keys,AtomList *&lst)
 {
@@ -128,11 +138,13 @@ I pooldata::PrintAll(const AtomList &d)
 	return pd?pd->PrintAll(tmp,sizeof tmp):0;
 }
 
+/*
 I pooldata::CntSub(const AtomList &d)
 {
 	pooldir *pd = root.GetDir(d);
 	return pd?pd->CntSub():0;
 }
+*/
 
 I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
 {
@@ -149,10 +161,7 @@ I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
 BL pooldata::Paste(const AtomList &d,const pooldir *clip,I depth,BL repl,BL mkdir)
 {
 	pooldir *pd = root.GetDir(d);
-	if(pd)
-		return pd->Paste(clip,depth,repl,mkdir);
-	else
-		return false;
+	return pd && pd->Paste(clip,depth,repl,mkdir);
 }
 
 pooldir *pooldata::Copy(const AtomList &d,const A &key,BL cut)
@@ -290,5 +299,3 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 
     return false;
 }
-
-

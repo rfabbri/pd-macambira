@@ -89,6 +89,9 @@ Version history:
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten
 - store/create also empty dirs with file I/O
+- more inlined functions and better symbol handling
+- added "seti" message to set elements at index
+- added "clri" message to erase elements at index
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
