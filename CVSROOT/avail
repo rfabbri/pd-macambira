@@ -1,4 +1,7 @@
+# defunct gem directory
 unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
 
+# this line ALWAYS needs to be the last line in this file
+# otherwise, its possible to lock everyone out of the CVS
 avail | bbogart,d13,dpro,eighthave,fbar,ggeiger,jusu,x75,zmoelnig | CVSROOT
