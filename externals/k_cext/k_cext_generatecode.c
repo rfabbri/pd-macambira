@@ -205,6 +205,17 @@ static void k_cext_gen_mainfunccode(t_k_cext *x,int argc, t_atom* argv,int i, st
 	pos[0]='\"';
 	pos[1]=' ';
       }
+
+      if(strstr(string,"SEND(")!=NULL){
+	char *pos=strstr(string,"SEND(")+3;
+	int len;
+	pos[0]='(';
+	pos[1]='\"';
+
+	len=strlen(string);
+	string[len]='\"';
+	string[len+1]=0;
+      }
       
       if(!strcmp(".",string)){
 	sprintf(string," ");

@@ -106,7 +106,7 @@ do{ \
   if(k_cext_internal_symbol->s_thing) pd_float(k_cext_internal_symbol->s_thing, val);  \
 }while(0)
 
-
+#define SEN(symname,val) SEND(symname,val)
 
 #define INTARRAY(name,len) int name[len]={0}
 #define FLOATARRAY(name,len) t_float name[len]={0.0f}
@@ -151,7 +151,9 @@ int k_cext_setvalue(char c[],float f);
 #define NL "\n"
   
 #define SP " "
+  //#define STRING(a) " " ## a ## " "
 
+  //#define gakk system("echo");
 
 typedef int (*k_cext_f_int_callback)(t_k_cext *x,...);
 typedef float (*k_cext_f_float_callback)(t_k_cext *x,...);
