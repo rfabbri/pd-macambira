@@ -17,11 +17,11 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 # compiler stuff
 INCLUDES=$(PDINC) 
 FLAGS=-DFLEXT_SYS=2
-CFLAGS=${UFLAGS} -O3 -I/home/tim/pd/externals/grill/flext/source -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions -fno-rtti -fno-exceptions 
+CFLAGS=${UFLAGS} -O3 -I/home/tim/pd/externals/grill/flext/source -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions -fno-rtti -fno-exceptions -DFLEXT_THREADS
 LIBS=m
 
 ifdef FLEXT_SHARED
-CFLAGS+=-DFLEXT_SHARED -DFLEXT_THREADS
+CFLAGS+=-DFLEXT_SHARED 
 LDFLAGS+=-Bdynamic
 LINKFLEXT=-lflext    #-L/usr/lib/flext/libflext.so
 else

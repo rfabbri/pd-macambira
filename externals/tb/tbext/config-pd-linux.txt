@@ -32,5 +32,5 @@ HELPDIR=${PD}/doc/5.reference
 # UFLAGS=-mcpu=pentium4 -mmmx -msse2 -msse -mfpmath=sse  # gcc 3.2 
 
 # define to link against shared flext library (flext version >= 0.5.0)
-FLEXT_SHARED=1
+#FLEXT_SHARED=1
 
