@@ -104,7 +104,7 @@ pd_darwin: $(NAME).pd_darwin
 .SUFFIXES: .pd_darwin
 
 DARWINCFLAGS = -DPD -DMAXLIB -DUNIX -DMACOSX -O2 \
-    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wall -W -Wno-shadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
@@ -119,7 +119,7 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
                   beta.o bilex.o cauchy.o expo.o gauss.o linear.o poisson.o \
                   triang.o weibull.o netserver.o netclient.o nroute.o \
                   edge.o pong.o limit.o unroute.o urn.o split.o wrap.o \
-                  rewrap.o timebang.obj
+                  rewrap.o timebang.o
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/arbran.c
@@ -161,11 +161,12 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/pulse.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/pitch.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/remote.c
-	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/rewarp.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/rewrap.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/rhythm.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/scale.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/score.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/speedlim.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/step.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/weibull.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/split.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/subst.c
