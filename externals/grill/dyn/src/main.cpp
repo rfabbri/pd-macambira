@@ -406,12 +406,10 @@ void dyn::m_newobj(int _argc_,const t_atom *_argv_)
 				if(pd_class(&x->te_g.g_pd) == canvas_class) {
 					// loadbang the abstraction
 					pd_vmess((t_pd *)x,gensym("loadbang"),"");			
-
-					// for an abstraction dsp must be restarted 
-					// that's necessary because ToCanvas is called manually
-					// (may also be necessary for normal objects in a later PD version)
-					canvas_update_dsp();
 				}
+
+				// restart dsp - that's necessary because ToCanvas is called manually
+				canvas_update_dsp();
 			}
 			else {
 				post("%s - new: Could not create object",thisName());
@@ -615,7 +613,7 @@ void dyn::proxyout::init(dyn *t,int o,bool s)
 void dyn::m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs)
 {
 	// add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
-    mess1((t_pd *)canvas, gensym("dsp"),NULL);
+//    mess1((t_pd *)canvas, gensym("dsp"),NULL);
 
 	flext_dsp::m_dsp(n,insigs,outsigs);
 }
@@ -624,8 +622,10 @@ void dyn::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
 {
 	int i;
 	for(i = 0; i < s_inlets; ++i)
+		if(pxin[i]->buf)
 		CopySamples(pxin[i]->buf,insigs[i+1],n);
 	for(i = 0; i < s_outlets; ++i)
+		if(pxout[i]->buf)
 		CopySamples(outsigs[i],pxout[i]->buf,n);
 }
 
