@@ -1,4 +1,4 @@
-#N canvas 112 247 493 349 10;
+#N canvas 112 247 501 357 10;
 #X msg 20 72 version;
 #X obj 86 72 r rcvOSC;
 #X obj 86 109 OSCroute /test /ix /yps;
@@ -13,7 +13,7 @@
 of routing tag after match.;
 #X obj 68 143 print test;
 #X obj 241 212 print rejected;
-#N canvas 663 325 672 347 patternmatching 1;
+#N canvas 663 325 676 351 patternmatching 0;
 #X obj 26 242 OSCroute /freq;
 #X obj 150 242 OSCroute /freq;
 #X obj 272 241 OSCroute /freq;
@@ -81,6 +81,8 @@ thought it should work the other way round:;
 #X text 252 280 -patterns not starting with /;
 #X text 252 294 -patterns starting with a number;
 #X text 325 324 2002-09-08 \, jdl xdv.org;
+#X text 28 318 for more info \, get help on:;
+#X obj 195 319 OSC;
 #X connect 0 0 2 0;
 #X connect 1 0 2 0;
 #X connect 2 0 5 0;

@@ -1,4 +1,4 @@
-#N canvas 496 472 848 467 10;
+#N canvas 496 472 852 471 10;
 #X obj 59 396 sendOSC;
 #X floatatom 59 423 5 0 0 0 - - -;
 #X msg 44 119 disconnect;
@@ -41,6 +41,8 @@ moment over UDP only is supported.;
 #X msg 368 156 send /bang;
 #X msg 265 57 connect 192.168.0.255 5555;
 #X text 462 58 use something like this to broadcast on UDP;
+#X text 607 435 for more info \, get help on:;
+#X obj 774 436 OSC;
 #X connect 0 0 1 0;
 #X connect 0 1 24 0;
 #X connect 2 0 0 0;
