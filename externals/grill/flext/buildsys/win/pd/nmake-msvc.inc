@@ -5,5 +5,3 @@ LIBPATH=$(LIBPATH) /LIBPATH:$(PDPATH)\bin
 
 # these are both in PDPATH
 LIBS=$(LIBS) pd.lib pthreadVC.lib
-
-EXT=dll

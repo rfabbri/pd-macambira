@@ -6,5 +6,3 @@ LIBPATH=$(LIBPATH) /LIBPATH:$(MAXSDKPATH)\max-includes /LIBPATH:$(MAXSDKPATH)\ms
 
 # these are both in MAXSDKPATH
 LIBS=$(LIBS) maxapi.lib maxaudio.lib
-
-EXT=mxe

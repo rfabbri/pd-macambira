@@ -1,6 +1,6 @@
 flext - C++ layer for Max/MSP and pd (pure data) externals
 
-Copyright (c) 2001-2004 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2001-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -23,7 +23,7 @@ Version history:
 - dropped support for Max UI objects
 - added global system locking
 - added general atom outlet functions To{Sys,Out,Queue}Atom
-- added build system for flext-based externals
+- new build system for flext and flext-based externals
 - flags for object construction and destruction phase (Initing() and Exiting())
 - reconsidered flext::buffer::Update
 
