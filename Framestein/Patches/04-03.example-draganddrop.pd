@@ -1,4 +1,4 @@
-#N canvas 323 36 593 434 12;
+#N canvas 323 36 595 436 12;
 #X obj 15 37 fs.main;
 #X msg 66 12 reset;
 #X obj 38 234 fs.event;
@@ -10,12 +10,15 @@
 #X msg 15 12 6001;
 #X text 18 95 Using fs.frame and fs.event to provide drag & drop:;
 #X obj 38 185 fs.framed draganddrop 352+233;
-#X msg 50 387 drop a file..;
+#X msg 50 387 ;
+#X msg 120 150 dropfile.bmp;
 #X connect 1 0 0 1;
 #X connect 2 0 3 0;
 #X connect 3 0 10 0;
 #X connect 4 0 9 0;
+#X connect 4 0 11 0;
 #X connect 5 0 9 0;
 #X connect 7 0 0 0;
 #X connect 7 0 1 0;
 #X connect 9 0 2 0;
+#X connect 11 0 9 0;
