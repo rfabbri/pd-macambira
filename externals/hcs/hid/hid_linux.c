@@ -61,6 +61,56 @@ void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
 	}
 }
 
+/* Georg Holzmann: implementation of the keys */
+void hid_convert_linux_keys(__u16 linux_code, char *hid_code)
+{  
+  if(linux_code > 226)
+    return;
+  
+  /*         quick hack to get the keys         */
+  /* (in future this should be auto-generated)  */
+
+  char key_names[227][20] =
+  { 
+    "reserved", "esc", "1", "2", "3", "4", "5", "6", "7",
+    "8", "9", "0", "minus", "equal", "backspace", "tab",
+    "q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
+    "leftbrace", "rightbrace", "enter", "leftctrl", "a",
+    "s", "d", "f", "g", "h", "j", "k", "l", "semicolon",
+    "apostrophe", "grave", "leftshift", "backslash", "z",
+    "x", "c", "v", "b", "n", "m", "comma", "dot", "slash",
+    "rightshift", "kpasterisk", "leftalt", "space", "capslock",
+    "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10",
+    "numlock", "scrolllock", "kp7", "kp8", "kp9", "kpminus",
+    "kp4", "kp5", "kp6", "kpplus", "kp1", "kp2", "kp3", "kp3",  "kpdot",
+    "103rd", "f13", "102nd", "f11", "f12", "f14", "f15", "f16",
+    "f17", "f18", "f19", "f20", "kpenter", "rightctrl", "kpslash",
+    "sysrq", "rightalt", "linefeed", "home", "up", "pageup", "left",
+    "right", "end", "down", "pagedown", "insert", "delete", "macro",
+    "mute", "volumedown", "volumeup", "power", "kpequal", "kpplusminus",
+    "pause", "f21", "f22", "f23", "f24", "kpcomma", "leftmeta",
+    "rightmeta", "compose",
+    
+    "stop", "again", "props", "undo", "front", "copy", "open",
+    "paste", "find", "cut", "help", "menu", "calc", "setup", "sleep", "wakeup",
+    "file", "sendfile", "deletefile", "xfer", "prog1", "prog2", "www",
+    "msdos", "coffee", "direction", "cyclewindows", "mail", "bookmarks",
+    "computer", "back", "forward", "colsecd", "ejectcd", "ejectclosecd",
+    "nextsong", "playpause", "previoussong", "stopcd", "record",
+    "rewind", "phone", "iso", "config", "homepage", "refresh", "exit",
+    "move", "edit", "scrollup", "scrolldown", "kpleftparen", "kprightparen",
+    
+    "intl1", "intl2", "intl3", "intl4", "intl5", "intl6", "intl7",
+    "intl8", "intl9", "lang1", "lang2", "lang3", "lang4", "lang5",
+    "lang6", "lang7", "lang8", "lang9", "playcd", "pausecd", "prog3",
+    "prog4", "suspend", "close", "play", "fastforward", "bassboost",
+    "print", "hp", "camera", "sound", "question", "email", "chat",
+    "search", "connect", "finance", "sport", "shop", "alterase",
+    "cancel", "brightnessdown", "brightnessup", "media"
+  };
+  
+  sprintf(hid_code,"key_%s",key_names[linux_code]);
+}
 
 void hid_print_element_list(t_hid *x)
 {
@@ -237,6 +287,7 @@ t_int hid_get_events(t_hid *x)
 		{
 			char hid_code[7];
 			hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
+      hid_convert_linux_keys(hid_input_event.code,hid_code);
 			SETSYMBOL(event_data + 1, 
 						 gensym(hid_code));
 		}
