@@ -111,7 +111,7 @@ public:
 		struct { R arg; } rbin; 
 		struct { R rarg,iarg; } cbin; 
 		struct { I *order; } perm;
-		struct { R val; I offs,dif,dir,slope; } srch;
+		struct { R val; I offs,dif,dir,slope; BL incl; } srch;
 	};
 
 private:

@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre7";
+const C *VASP_VERSION = "0.1.3pre8";
 
 #include "opfuns.h"
 

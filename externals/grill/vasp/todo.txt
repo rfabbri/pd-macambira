@@ -25,6 +25,8 @@ warning, treat as 0, calculate unit operation, loop, mirror on buffer end, stay 
 
 - reduce number of warnings for wrong offset, frame size etc.
 
+- review vasp.f=, vasp.o= for quasi-constant envelopes
+
 
 objects:
 ---------------------
@@ -35,7 +37,6 @@ objects:
 
 - slope: frequency distortion with given exponent
 
-- vasp.trigger object... in PD [t a] is ok, what about Max?
 - vasp.expr
 
 - vasp.state.... current vasp, operation, progress meter

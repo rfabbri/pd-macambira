@@ -22,37 +22,43 @@ BL VecOp::d_search(OpParam &p)
 
 	I i,ofl = -1,ofr = -1;
 	
-	if(p.srch.dir <= 0) {
-		BL y = cur >= val;
-		i = off-1;
-		_D_WHILE(i >= 0)
-			BL y2 = p.rsdt[i] >= val;
-			if(y != y2) {
-				if(p.srch.slope <= 0 && y2) break; 
-				if(p.srch.slope >= 0 && !y2) break;
-			}
-			y = y2;
-			--i;
-		_E_WHILE
+    if(p.srch.incl && cur == val) {
+        // if @incl attribute is set and current sample matches 
+        ofl = ofr = off;
+    }
+    else {
+	    if(p.srch.dir <= 0) {
+		    BL y = cur >= val;
+		    i = off-1;
+		    _D_WHILE(i >= 0)
+			    BL y2 = p.rsdt[i] >= val;
+			    if(y != y2) {
+				    if(p.srch.slope <= 0 && y2) break; 
+				    if(p.srch.slope >= 0 && !y2) break;
+			    }
+			    y = y2;
+			    --i;
+		    _E_WHILE
 
-		if(i >= 0) ofl = i;
-	}
+		    if(i >= 0) ofl = i;
+	    }
 
-	if(p.srch.dir >= 0) {
-		BL y = cur >= val;
-		i = off+1; 
-		_D_WHILE(i < p.frames)
-			BL y2 = p.rsdt[i] >= val;
-			if(y != y2) {
-				if(p.srch.slope <= 0 && !y2) break;
-				if(p.srch.slope >= 0 && y2) break;
-			}
-			y = y2;
-			++i;
-		_E_WHILE
+	    if(p.srch.dir >= 0) {
+		    BL y = cur >= val;
+		    i = off+1; 
+		    _D_WHILE(i < p.frames)
+			    BL y2 = p.rsdt[i] >= val;
+			    if(y != y2) {
+				    if(p.srch.slope <= 0 && !y2) break;
+				    if(p.srch.slope >= 0 && y2) break;
+			    }
+			    y = y2;
+			    ++i;
+		    _E_WHILE
 
-		if(i < p.frames) ofr = i;
-	}
+		    if(i < p.frames) ofr = i;
+	    }
+    }
 
 	if(!p.srch.dir) {
 		if(ofl >= 0) {
@@ -133,13 +139,14 @@ public:
 	
 	vasp_search(I argc,t_atom *argv): 
 		vasp_anyop(argc,argv,VASP_ARG_R(0),false,XletCode(xlet::tp_float,0)),
-		slope(0),dir(0)
+		slope(0),dir(0),incl(false)
 	{}
 
 	static V Setup(t_classid c)
 	{
 		FLEXT_CADDATTR_VAR1(c,"dir",dir);
 		FLEXT_CADDATTR_VAR1(c,"slope",slope);
+		FLEXT_CADDATTR_VAR1(c,"incl",incl);
 	}
 
 	virtual Vasp *do_work(OpParam &p) = 0;
@@ -149,6 +156,7 @@ public:
 		OpParam p(thisName(),1);													
 		p.srch.dir = dir;
 		p.srch.slope  = slope;
+        p.srch.incl = incl;
 
 		Vasp *ret = do_work(p);
 		if(ret) ToOutFloat(1,p.srch.dif);
@@ -157,10 +165,12 @@ public:
 
 protected:
 	I dir,slope;
+    BL incl;
 
 private:
 	FLEXT_ATTRVAR_I(dir)
 	FLEXT_ATTRVAR_I(slope)
+	FLEXT_ATTRVAR_B(incl)
 };																				
 
 
