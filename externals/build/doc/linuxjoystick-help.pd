@@ -1,0 +1,125 @@
+#N canvas 107 356 731 483 10;
+#X floatatom 324 292 2 0 0 3 button# - -;
+#X floatatom 381 291 2 0 0 3 button_value - -;
+#X floatatom 70 292 5 0 0 3 y-axis - -;
+#X floatatom 23 292 5 0 0 3 x-axis - -;
+#X floatatom 169 293 3 0 0 3 hat-X - -;
+#X floatatom 215 293 3 0 0 3 hat-Y - -;
+#X floatatom 119 293 5 0 0 3 twist - -;
+#X floatatom 258 292 5 0 0 3 throttle - -;
+#X obj 119 235 linuxjoystick /dev/input/event1;
+#X obj 211 364 select 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+19 20 21;
+#X obj 211 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 229 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 248 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 266 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 285 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 303 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 322 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 629 403 bng 30 250 50 0 empty empty not_recognized 0 -6 0 8
+-261689 -1 -1;
+#X obj 600 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 581 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 563 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 544 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 526 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 507 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 489 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 470 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 452 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 433 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 415 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 396 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 377 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 359 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 340 403 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 366 332 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 20 9 cnv 15 700 30 empty empty linuxjoystick 20 12 1 16 -257472
+-66577 0;
+#X text 502 17 related HID objects:;
+#X obj 653 16 linuxhid;
+#X msg 214 136 start;
+#X msg 214 157 stop;
+#X obj 156 118 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 67 118 metro 20;
+#X text 335 194 time between polls (ms);
+#X obj 67 96 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 87 96 stop;
+#X msg 268 194 delay 20;
+#X obj 156 69 key;
+#X msg 278 135 poll;
+#X msg 278 156 nopoll;
+#X text 195 117 start/stop polling (synonyms for the same thing);
+#X obj 156 89 sel 98;
+#X text 202 89 <- (type 'b' for a bang);
+#X connect 0 0 9 0;
+#X connect 1 0 33 0;
+#X connect 8 0 3 0;
+#X connect 8 1 2 0;
+#X connect 8 2 6 0;
+#X connect 8 3 4 0;
+#X connect 8 4 5 0;
+#X connect 8 5 7 0;
+#X connect 8 6 0 0;
+#X connect 8 7 1 0;
+#X connect 9 0 10 0;
+#X connect 9 1 11 0;
+#X connect 9 2 12 0;
+#X connect 9 3 13 0;
+#X connect 9 4 14 0;
+#X connect 9 5 15 0;
+#X connect 9 6 16 0;
+#X connect 9 7 32 0;
+#X connect 9 8 31 0;
+#X connect 9 9 30 0;
+#X connect 9 10 29 0;
+#X connect 9 11 28 0;
+#X connect 9 12 27 0;
+#X connect 9 13 26 0;
+#X connect 9 14 25 0;
+#X connect 9 15 24 0;
+#X connect 9 16 23 0;
+#X connect 9 17 22 0;
+#X connect 9 18 21 0;
+#X connect 9 19 20 0;
+#X connect 9 20 19 0;
+#X connect 9 21 18 0;
+#X connect 9 22 17 0;
+#X connect 33 0 0 0;
+#X connect 37 0 8 0;
+#X connect 38 0 8 0;
+#X connect 39 0 8 0;
+#X connect 40 0 8 0;
+#X connect 42 0 40 0;
+#X connect 43 0 40 0;
+#X connect 44 0 8 0;
+#X connect 45 0 49 0;
+#X connect 46 0 8 0;
+#X connect 47 0 8 0;
+#X connect 49 0 39 0;
