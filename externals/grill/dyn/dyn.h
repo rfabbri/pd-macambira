@@ -23,7 +23,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
         #define DYN_EXPORT __declspec(dllimport)
     #endif
 #else
-    #define DYN_EXPORT extern
+    #define DYN_EXPORT
 #endif
 
 
