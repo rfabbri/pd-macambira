@@ -34,7 +34,7 @@ public:
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		set_x(0.5);
+		CHAOS_SYS_INIT(x,0);
 	}
 
 	~sine()
@@ -47,26 +47,20 @@ public:
 		m_data[0] = sin (M_PI * m_data[0]);
 	}
 
-	void set_x(t_float f)
-	{
-		if ( (f >= 0) && (f <= 1))
-			m_data[0] = (data_t) f;
-		else
-			post("value for x %f out of range", f);
-	}
+	CHAOS_SYSVAR_FUNCS_PRED(x, m_pred);
 
-	t_float get_x()
+	bool m_pred(t_float f)
 	{
-		return (t_float)m_data[0];
+		return (f >= 0) && (f <= 1);
 	}
-
 };
 
-#define SINE_CALLBACKS								\
-MAP_CALLBACKS										\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);
+#define SINE_CALLBACKS							\
+MAP_CALLBACKS									\
+CHAOS_SYS_CALLBACKS(x);
 
-#define SINE_ATTRIBUTES										\
-MAP_ATTRIBUTES												\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);
+#define SINE_ATTRIBUTES							\
+MAP_ATTRIBUTES									\
+CHAOS_SYS_ATTRIBUTE(x);
+
 

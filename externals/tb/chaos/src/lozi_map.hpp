@@ -30,12 +30,13 @@ class lozi:
 {
 public:
 	lozi()
-		: m_a(1.4), m_b(0.3)
 	{
 		m_num_eq = 2;
 		m_data = new data_t[1];
-		set_x(0.5);
-		set_y(0.5);
+		CHAOS_SYS_INIT(x,0);
+		CHAOS_SYS_INIT(y,0);
+		CHAOS_SYS_INIT(a,1.4);
+		CHAOS_SYS_INIT(b,0.3);
 	}
 
 	~lozi()
@@ -49,78 +50,37 @@ public:
 		data_t y = m_data[1];
 		
 		if (x > 0)
-			m_data[0] = 1 + y - m_a * x;
+			m_data[0] = 1 + y - CHAOS_PARAMETER(a) * x;
 		else
-			m_data[0] = 1 + y + m_a * x;
+			m_data[0] = 1 + y + CHAOS_PARAMETER(a) * x;
 			
-		m_data[1] = m_b * x;
+		m_data[1] = CHAOS_PARAMETER(b) * x;
 		
 	}
 
+	CHAOS_SYSVAR_FUNCS(x, 0);
+	CHAOS_SYSVAR_FUNCS(y, 1);
 
-	void set_x(t_float f)
+	CHAOS_SYSPAR_FUNCS(a);
+
+	CHAOS_SYSPAR_FUNCS_PRED(b, m_pred_b);
+	bool m_pred_b(t_float f)
 	{
-		m_data[0] = (data_t) f;
+		return (f != 0);
 	}
-
-	t_float get_x()
-	{
-		return (t_float)m_data[0];
-	}
-
-
-	void set_y(t_float f)
-	{
-		m_data[1] = (data_t) f;
-	}
-
-	t_float get_y()
-	{
-		return (t_float)m_data[1];
-	}
-
-
-	void set_a(t_float f)
-	{
-		m_a = (data_t) f;
-	}
-
-	t_float get_a()
-	{
-		return (t_float)m_a;
-	}
-
-
-	void set_b(t_float f)
-	{
-		if (f != 0)
-			m_b = (data_t) f;
-		else
-			post("value for b %f out of range", f);
-	}
-
-	t_float get_b()
-	{
-		return (t_float)m_b;
-	}
-
-
-private:	
-	data_t m_a;
-	data_t m_b;
 };
 
 
-#define LOZI_CALLBACKS								\
-MAP_CALLBACKS;										\
-FLEXT_CALLVAR_F(m_system->get_a, m_system->set_a);	\
-FLEXT_CALLVAR_F(m_system->get_b, m_system->set_b);	\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);	\
-FLEXT_CALLVAR_F(m_system->get_y, m_system->set_y);
+#define LOZI_CALLBACKS							\
+MAP_CALLBACKS;									\
+CHAOS_SYS_CALLBACKS(a);							\
+CHAOS_SYS_CALLBACKS(b);							\
+CHAOS_SYS_CALLBACKS(x);							\
+CHAOS_SYS_CALLBACKS(y);
 
-#define LOZI_ATTRIBUTES										\
-MAP_ATTRIBUTES;												\
-FLEXT_ADDATTR_VAR("a",m_system->get_a, m_system->set_a);	\
-FLEXT_ADDATTR_VAR("b",m_system->get_b, m_system->set_b);	\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);	\
-FLEXT_ADDATTR_VAR("y",m_system->get_y, m_system->set_y);
+#define LOZI_ATTRIBUTES							\
+MAP_ATTRIBUTES;									\
+CHAOS_SYS_ATTRIBUTE(a);							\
+CHAOS_SYS_ATTRIBUTE(b);							\
+CHAOS_SYS_ATTRIBUTE(x);							\
+CHAOS_SYS_ATTRIBUTE(y);

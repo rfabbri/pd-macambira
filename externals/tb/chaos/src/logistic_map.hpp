@@ -29,11 +29,11 @@ class logistic:
 {
 public:
 	logistic()
-		: m_alpha(3.8)
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		set_x(0.5f);
+		CHAOS_SYS_INIT(alpha, 3.8);
+		CHAOS_SYS_INIT(x, 0.5);
 	}
 
 	~logistic()
@@ -44,48 +44,31 @@ public:
 	virtual void m_step()
 	{
 		data_t data = m_data[0];
-		data_t alpha = m_alpha;
+		data_t alpha = CHAOS_PARAMETER(alpha);
 		m_data[0] = alpha * data * (1.f - data);
 	}
 
-	void set_alpha(t_float f)
+	CHAOS_SYSPAR_FUNCS_PRED(alpha, m_pred_alpha);
+	bool m_pred_alpha(t_float f)
 	{
-		if ( (f > 0) && (f < 4))
-			m_alpha = (data_t) f;
-		else
-			post("value for alpha %f out of range", f);
+		return (f > 0) && (f < 4);
 	}
 
-	t_float get_alpha()
+	CHAOS_SYSVAR_FUNCS_PRED(x, m_pred_x);
+	
+	bool m_pred_x(t_float f)
 	{
-		return (t_float)m_alpha;
+		return (f > 0) && (f < 1);
 	}
-
-	void set_x(t_float f)
-	{
-		if ( (f > 0) && (f < 1))
-			m_data[0] = (data_t) f;
-		else
-			post("value for x %f out of range", f);
-	}
-
-	t_float get_x()
-	{
-		return (t_float)m_data[0];
-	}
-
-private:
-	data_t m_alpha;
 };
 
-#define LOGISTIC_CALLBACKS									\
-MAP_CALLBACKS;												\
-FLEXT_CALLVAR_F(m_system->get_alpha, m_system->set_alpha);	\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);
+#define LOGISTIC_CALLBACKS						\
+MAP_CALLBACKS;									\
+CHAOS_SYS_CALLBACKS(alpha);						\
+CHAOS_SYS_CALLBACKS(x);
 
-#define LOGISTIC_ATTRIBUTES												\
-MAP_ATTRIBUTES;															\
-FLEXT_ADDATTR_VAR("alpha",m_system->get_alpha, m_system->set_alpha);	\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);
-
+#define LOGISTIC_ATTRIBUTES						\
+MAP_ATTRIBUTES;									\
+CHAOS_SYS_ATTRIBUTE(alpha);						\
+CHAOS_SYS_ATTRIBUTE(x);
 

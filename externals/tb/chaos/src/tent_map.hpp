@@ -33,7 +33,7 @@ public:
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		set_x(0.5);
+		CHAOS_SYS_INIT(x, 0.5);
 	}
 
 	~tent()
@@ -50,14 +50,21 @@ public:
 		else
 			m_data[0] = 2.f * (1.f - data);
 	}
+
+	CHAOS_SYSPAR_FUNCS_PRED(x, m_pred_x);
+	bool m_pred_x(t_float f)
+	{
+		return (f >= 0) && (f < 1);
+	}
 };
 
 
-#define LOGISTIC_CALLBACKS							\
-MAP_CALLBACKS										\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);
+#define LOGISTIC_CALLBACKS						\
+MAP_CALLBACKS									\
+CHAOS_SYS_CALLBACKS(x);
 
-#define LOGISTIC_ATTRIBUTES									\
-MAP_ATTRIBUTES												\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);
+#define LOGISTIC_ATTRIBUTES						\
+MAP_ATTRIBUTES									\
+CHAOS_SYS_ATTRIBUTE(x);
+
 

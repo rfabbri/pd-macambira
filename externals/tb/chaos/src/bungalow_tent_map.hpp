@@ -37,11 +37,11 @@ class bungalow_tent:
 {
 public:
 	bungalow_tent()
-		: m_r(0.5)
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		set_x(0.5f);
+		CHAOS_SYS_INIT(x, 0.5);
+		CHAOS_SYS_INIT(r, 0.5);
 	}
 
 	~bungalow_tent()
@@ -52,7 +52,7 @@ public:
 	virtual void m_step()
 	{
 		data_t x = m_data[0];
-		data_t r = m_r;
+		data_t r = CHAOS_PARAMETER(r);
 		
 		if ( x < - 0.5)
 		{
@@ -77,45 +77,25 @@ public:
 
 	}
 
-	void set_x(t_float f)
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
+	bool m_pred_x(t_float f)
 	{
-		if ( (f > -1) && (f < 1))
-			m_data[0] = (data_t) f;
-		else
-			post("value for x %f out of range", f);
+		return (f >= -1) && (f < 1);
 	}
 
-	t_float get_x()
+	CHAOS_SYSVAR_FUNCS_PRED(r, 0, m_pred_r);
+	bool m_pred_r(t_float f)
 	{
-		return (t_float)m_data[0];
+		return (f >= -0.5) && (f < 1);
 	}
-
-	void set_r(t_float f)
-	{
-		if ( (f > -.5) && (f < 1))
-			m_data[0] = (data_t) f;
-		else
-			post("value for r %f out of range", f);
-	}
-
-	t_float get_r()
-	{
-		return (t_float)m_data[0];
-	}
-
-private:
-	data_t m_r;
-
 };
 
+#define BUNGALOW_TENT_CALLBACKS					\
+MAP_CALLBACKS;									\
+CHAOS_SYS_CALLBACKS(x);							\
+CHAOS_SYS_CALLBACKS(r);
 
-#define BUNGALOW_TENT_CALLBACKS						\
-MAP_CALLBACKS;										\
-FLEXT_CALLVAR_F(m_system->get_r, m_system->set_r);	\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);	\
-
-
-#define BUNGALOW_TENT_ATTRIBUTES							\
-MAP_ATTRIBUTES;												\
-FLEXT_ADDATTR_VAR("r",m_system->get_r, m_system->set_r);	\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);
+#define BUNGALOW_TENT_ATTRIBUTES				\
+MAP_ATTRIBUTES;									\
+CHAOS_SYS_ATTRIBUTE(x)							\
+CHAOS_SYS_ATTRIBUTE(r)

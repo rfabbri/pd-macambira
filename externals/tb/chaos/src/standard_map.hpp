@@ -31,12 +31,13 @@ class standard:
 {
 public:
 	standard()
-		: m_k(0.8)
 	{
 		m_num_eq = 2;
 		m_data = new data_t[2];
-		set_I(0.1);
-		set_theta(0.2);
+
+		CHAOS_SYS_INIT(I,0.1);
+		CHAOS_SYS_INIT(theta,0.2);
+		CHAOS_SYS_INIT(k, 0.8);
 	}
 
 	~standard()
@@ -48,8 +49,9 @@ public:
 	{
 		data_t I = m_data[0];
 		data_t theta = m_data[1];
+		data_t k = CHAOS_PARAMETER(k);
 		
-		m_data[0] = I + m_k * sin(theta);
+		m_data[0] = I + k * sin(theta);
 		theta = theta + I + k * sin(theta);
 
 		if (y > 2 * M_PI)
@@ -76,55 +78,27 @@ public:
 	}
 
 
-	void set_I(t_float f)
+	CHAOS_SYSVAR_FUNCS(I, 0);
+
+	CHAOS_SYSVAR_FUNCS_PRED(theta, 1, m_pred_theta);
+	bool m_pred_theta(t_float f)
 	{
-		m_data[0] = (data_t) f;
+		return (f >= 0) && (f < 2*M_PI);
 	}
 
-	t_float get_I()
-	{
-		return (t_float)m_data[0];
-	}
-
-
-	void set_theta(t_float f)
-	{
-		if ( (f >= 0) && (f < 2*M_PI))
-			m_data[1] = (data_t) f;
-		else
-			post("value for theta %f out of range", f);
-	}
-
-	t_float get_theta()
-	{
-		return (t_float)m_data[1];
-	}
-
-
-	void set_k(t_float f)
-	{
-		m_k = (data_t) f;
-	}
-
-	t_float get_k()
-	{
-		return (t_float)m_k;
-	}
-
-private:	
-	data_t m_k;
+	CHAOS_SYSPAR_FUNCS(I, 1);
 };
 
 
-#define STANDARD_CALLBACKS									\
-MAP_CALLBACKS;												\
-FLEXT_CALLVAR_F(m_system->get_I, m_system->set_I);			\
-FLEXT_CALLVAR_F(m_system->get_theta, m_system->set_theta);	\
-FLEXT_CALLVAR_F(m_system->get_k, m_system->set_k);
+#define STANDARD_CALLBACKS						\
+MAP_CALLBACKS;									\
+CHAOS_SYS_CALLBACKS(I);							\
+CHAOS_SYS_CALLBACKS(theta);						\
+CHAOS_SYS_CALLBACKS(k);
 
 
-#define STANDARD_ATTRIBUTES												\
-MAP_ATTRIBUTES;															\
-FLEXT_ADDATTR_VAR("I",m_system->get_I, m_system->set_I);				\
-FLEXT_ADDATTR_VAR("theta",m_system->get_theta, m_system->set_theta);	\
-FLEXT_ADDATTR_VAR("k",m_system->get_k, m_system->set_k);
+#define STANDARD_ATTRIBUTES						\
+MAP_ATTRIBUTES;									\
+CHAOS_SYS_ATTRIBUTE(I);							\
+CHAOS_SYS_ATTRIBUTE(theta);						\
+CHAOS_SYS_ATTRIBUTE(k);

@@ -36,12 +36,15 @@ class ikeda:
 {
 public:
 	ikeda()
-		: m_c1(0.4), m_c2(0.9), m_c3(9), m_roh(0.85)
 	{
 		m_num_eq = 2;
 		m_data = new data_t[2];
-		set_x(0.5);
-		set_y(0.5);
+		CHAOS_SYS_INIT(c1,0.4);
+		CHAOS_SYS_INIT(c2,0.9);
+		CHAOS_SYS_INIT(c3,9);
+		CHAOS_SYS_INIT(roh,0.85);
+		CHAOS_SYS_INIT(x,0.5);
+		CHAOS_SYS_INIT(y,0.5);
 	}
 
 	~ikeda()
@@ -54,100 +57,41 @@ public:
 		data_t x = m_data[0];
 		data_t y = m_data[1];
 		
-		data_t tau = m_c1 - m_c3 / (1 + x*x + y*y);
+		data_t tau = CHAOS_PARAMETER(c1) - 
+			CHAOS_PARAMETER(c3) / (1 + x*x + y*y);
 		data_t cos_tau = cos(tau);
 		data_t sin_tau = sin(tau);
 
-		m_data[0] = m_roh + m_c2 * (x * cos_tau - y * sin_tau);
-		m_data[1] = m_c2 * (x * sin_tau + y * cos_tau);
+		m_data[0] = CHAOS_PARAMETER(roh) + CHAOS_PARAMETER(c2) 
+			* (x * cos_tau - y * sin_tau);
+		m_data[1] = CHAOS_PARAMETER(c2) * (x * sin_tau + y * cos_tau);
 	}
 	
-
-	void set_x(t_float f)
-	{
-		m_data[0] = (data_t) f;
-	}
-
-	t_float get_x()
-	{
-		return (t_float)m_data[0];
-	}
-
-	void set_y(t_float f)
-	{
-		m_data[1] = (data_t) f;
-	}
-
-	t_float get_y()
-	{
-		return (t_float)m_data[1];
-	}
-
-
-	void set_c1(t_float f)
-	{
-		m_c1 = (data_t) f;
-	}
-
-	t_float get_c1()
-	{
-		return (t_float)m_c1;
-	}
-
-
-	void set_c2(t_float f)
-	{
-		m_c2[1] = (data_t) f;
-	}
-
-	t_float get_c2()
-	{
-		return (t_float)m_c2;
-	}
-
-
-	void set_c3(t_float f)
-	{
-		m_c3 = (data_t) f;
-	}
-
-	t_float get_c3()
-	{
-		return (t_float)m_c3;
-	}
-
-
-	void set_roh(t_float f)
-	{
-		m_roh = (data_t) f;
-	}
-
-	t_float get_roh()
-	{
-		return (t_float)m_roh;
-	}
-
+	CHAOS_SYSVAR_FUNCS(x, 0);
+	CHAOS_SYSVAR_FUNCS(y, 1);
 	
-private:
-	data_t m_c1, m_c2, m_c3, m_roh;
+	CHAOS_PAR_FUNCS(c1);
+	CHAOS_PAR_FUNCS(c2);
+	CHAOS_PAR_FUNCS(c3);
+	CHAOS_PAR_FUNCS(roh);
+
 };
 
 
-#define IKEDA_CALLBACKS									\
-MAP_CALLBACKS;											\
-FLEXT_CALLVAR_F(m_system->get_c1, m_system->set_c1);	\
-FLEXT_CALLVAR_F(m_system->get_c2, m_system->set_c2);	\
-FLEXT_CALLVAR_F(m_system->get_c3, m_system->set_c3);	\
-FLEXT_CALLVAR_F(m_system->get_roh, m_system->set_roh);	\
-FLEXT_CALLVAR_F(m_system->get_x, m_system->set_x);		\
-FLEXT_CALLVAR_F(m_system->get_y, m_system->set_y);		\
+#define IKEDA_CALLBACKS							\
+MAP_CALLBACKS;									\
+CHAOS_SYS_CALLBACKS(c1);						\
+CHAOS_SYS_CALLBACKS(c2);						\
+CHAOS_SYS_CALLBACKS(c3);						\
+CHAOS_SYS_CALLBACKS(roh);						\
+CHAOS_SYS_CALLBACKS(x);							\
+CHAOS_SYS_CALLBACKS(y);
 
-
-#define IKEDA_ATTRIBUTES										\
-MAP_ATTRIBUTES;													\
-FLEXT_ADDATTR_VAR("c1",m_system->get_c1, m_system->set_c1);		\
-FLEXT_ADDATTR_VAR("c2",m_system->get_c2, m_system->set_c2);		\
-FLEXT_ADDATTR_VAR("c3",m_system->get_c3, m_system->set_c3);		\
-FLEXT_ADDATTR_VAR("roh",m_system->get_roh, m_system->set_roh);	\
-FLEXT_ADDATTR_VAR("x",m_system->get_x, m_system->set_x);		\
-FLEXT_ADDATTR_VAR("y",m_system->get_y, m_system->set_y);
+#define IKEDA_ATTRIBUTES						\
+MAP_ATTRIBUTES;									\
+CHAOS_SYS_ATTRIBUTE(c1);						\
+CHAOS_SYS_ATTRIBUTE(c2);						\
+CHAOS_SYS_ATTRIBUTE(c3);						\
+CHAOS_SYS_ATTRIBUTE(roh);						\
+CHAOS_SYS_ATTRIBUTE(x);							\
+CHAOS_SYS_ATTRIBUTE(y);
