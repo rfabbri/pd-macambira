@@ -199,12 +199,12 @@ Median_kr::Median_kr(int argc,t_atom * argv)
 
 
     AtomList Args(argc,argv);
-    m_size=sc_getfloatarg(Args,0);
+    m_size=(int)sc_getfloatarg(Args,0);
 
     float m_set=sc_getfloatarg(Args,1);
 
     Median.Init(m_size,m_set);
-    AddOutSignal();
+    AddOutFloat();
 }
 
 void Median_kr::m_perform(float f)
