@@ -1,7 +1,6 @@
-#N canvas 323 116 596 539 10;
+#N canvas 323 116 608 551 10;
 #X text 33 38 Here are various text conventions for discussing various
 aspects of Pd in text:;
-#X text 36 88 atoms:;
 #X text 52 108 "anything" \, "bang" \, "float" \, "list" \, "pointer"
 \, "symbol";
 #X text 33 138 objects:;
@@ -9,4 +8,19 @@ aspects of Pd in text:;
 \, etc.;
 #X text 34 191 messages:;
 #X text 49 214 [pd dsp 1 ( \, [set 0 ( \,;
-#X obj 37 450 standard_gui_elements;
+#X text 41 276 design principles;
+#X text 75 372 - Avoid arbitrary syntax;
+#X text 75 386 - Use standard language;
+#X text 76 319 - Teach by example \, not by formalism;
+#X text 76 303 - Make states visible and visibly distinguished;
+#X text 72 426 - Support clear conceptual models for documentation
+;
+#X text 71 444 - Respect the rules of human conversation;
+#X text 71 457 - Respond with an appropriate amount of information
+;
+#X text 77 406 - Use the application's terminology;
+#X text 73 335 - Communicate visually;
+#X text 74 355 - Strive for consistency;
+#X text 255 346 - Offer informative feedback;
+#X text 36 88 reserved words:;
+#X text 6 525 Hans-Christoph Steiner <hans@at.or.at>;
