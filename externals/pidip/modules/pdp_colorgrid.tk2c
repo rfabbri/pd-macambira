@@ -1,0 +1,65 @@
+// ########### pdp_colorgrid procedures -- ydegoyon@free.fr #########
+sys_gui("proc pdp_colorgrid_apply {id} {\n");
+// strip "." from the TK id to make a variable name suffix
+sys_gui("set vid [string trimleft $id .]\n");
+// for each variable, make a local variable to hold its name...
+sys_gui("set var_graph_pdp_colorgrid [concat graph_pdp_colorgrid_$vid]\n");
+sys_gui("global $var_graph_pdp_colorgrid\n");
+sys_gui("set var_graph_xlines [concat graph_xlines_$vid]\n");
+sys_gui("global $var_graph_xlines\n");
+sys_gui("set var_graph_ylines [concat graph_ylines_$vid]\n");
+sys_gui("global $var_graph_ylines\n");
+sys_gui("set cmd [concat $id dialog [eval concat $$var_graph_xlines] [eval concat $$var_graph_ylines] [eval concat $$var_graph_pdp_colorgrid] \\;]\n");
+// puts stderr $cmd
+sys_gui("pd $cmd\n");
+sys_gui("}\n");
+sys_gui("proc pdp_colorgrid_cancel {id} {\n");
+sys_gui("set cmd [concat $id cancel \\;]\n");
+// puts stderr $cmd
+sys_gui("pd $cmd\n");
+sys_gui("}\n");
+sys_gui("proc pdp_colorgrid_ok {id} {\n");
+sys_gui("pdp_colorgrid_apply $id\n");
+sys_gui("pdp_colorgrid_cancel $id\n");
+sys_gui("}\n");
+sys_gui("proc pdtk_pdp_colorgrid_dialog {id xlines ylines pdp_colorgrid} {\n");
+sys_gui("set vid [string trimleft $id .]\n");
+sys_gui("set var_graph_pdp_colorgrid [concat graph_pdp_colorgrid_$vid]\n");
+sys_gui("global $var_graph_pdp_colorgrid\n");
+sys_gui("set var_graph_xlines [concat graph_xlines_$vid]\n");
+sys_gui("global $var_graph_xlines\n");
+sys_gui("set var_graph_ylines [concat graph_ylines_$vid]\n");
+sys_gui("global $var_graph_ylines\n");
+sys_gui("set $var_graph_pdp_colorgrid $pdp_colorgrid\n");
+sys_gui("set $var_graph_xlines $xlines\n");
+sys_gui("set $var_graph_ylines $ylines\n");
+sys_gui("toplevel $id\n");
+sys_gui("wm title $id {pdp_colorgrid}\n");
+sys_gui("wm protocol $id WM_DELETE_WINDOW [concat pdp_colorgrid_cancel $id]\n");
+sys_gui("label $id.label -text {COLORGRID PROPERTIES}\n");
+sys_gui("pack $id.label -side top\n");
+sys_gui("frame $id.buttonframe\n");
+sys_gui("pack $id.buttonframe -side bottom -fill x -pady 2m\n");
+sys_gui("button $id.buttonframe.cancel -text {Cancel} -command \"pdp_colorgrid_cancel $id\"\n");
+sys_gui("button $id.buttonframe.apply -text {Apply} -command \"pdp_colorgrid_apply $id\"\n");
+sys_gui("button $id.buttonframe.ok -text {OK} -command \"pdp_colorgrid_ok $id\"\n");
+sys_gui("pack $id.buttonframe.cancel -side left -expand 1\n");
+sys_gui("pack $id.buttonframe.apply -side left -expand 1\n");
+sys_gui("pack $id.buttonframe.ok -side left -expand 1\n");
+sys_gui("frame $id.42rangef\n");
+sys_gui("pack $id.42rangef -side top\n");
+sys_gui("label $id.42rangef.lxlines -text \"X sections :\"\n");
+sys_gui("entry $id.42rangef.xlines -textvariable $var_graph_xlines -width 7\n");
+sys_gui("pack $id.42rangef.lxlines $id.42rangef.xlines -side left\n");
+sys_gui("frame $id.72rangef\n");
+sys_gui("pack $id.72rangef -side top\n");
+sys_gui("label $id.72rangef.lylines -text \"Y sections :\"\n");
+sys_gui("entry $id.72rangef.ylines -textvariable $var_graph_ylines -width 7\n");
+sys_gui("pack $id.72rangef.lylines $id.72rangef.ylines -side left\n");
+sys_gui("checkbutton $id.showpdp_colorgrid -text {Show Grid} -variable $var_graph_pdp_colorgrid -anchor w\n");
+sys_gui("pack $id.showpdp_colorgrid -side top\n");
+sys_gui("bind $id.42rangef.xlines <KeyPress-Return> [concat pdp_colorgrid_ok $id]\n");
+sys_gui("bind $id.72rangef.ylines <KeyPress-Return> [concat pdp_colorgrid_ok $id]\n");
+sys_gui("focus $id.42rangef.xlines\n");
+sys_gui("}\n");
+// ########### pdp_colorgrid procedures END -- lluis@artefacte.org #########

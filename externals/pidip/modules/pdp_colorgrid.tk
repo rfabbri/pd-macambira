@@ -1,0 +1,87 @@
+############ pdp_colorgrid procedures  -- ydegoyon@free.fr        #########
+
+proc pdp_colorgrid_apply {id} {
+# strip "." from the TK id to make a variable name suffix 
+     set vid [string trimleft $id .]
+# for each variable, make a local variable to hold its name...
+     set var_graph_pdp_colorgrid [concat graph_pdp_colorgrid_$vid]
+     global $var_graph_pdp_colorgrid
+     set var_graph_xlines [concat graph_xlines_$vid]
+     global $var_graph_xlines
+     set var_graph_ylines [concat graph_ylines_$vid]
+     global $var_graph_ylines
+ 
+     set cmd [concat $id dialog \
+     	[eval concat $$var_graph_xlines] \
+     	[eval concat $$var_graph_ylines] \
+     	[eval concat $$var_graph_pdp_colorgrid] \
+ 	\;]
+     #puts stderr $cmd
+     pd $cmd
+}
+ 
+proc pdp_colorgrid_cancel {id} {
+     set cmd [concat $id cancel \;]
+     #puts stderr $cmd
+     pd $cmd
+}
+ 
+proc pdp_colorgrid_ok {id} {
+     pdp_colorgrid_apply $id
+     pdp_colorgrid_cancel $id
+}
+ 
+proc pdtk_pdp_colorgrid_dialog {id xlines ylines pdp_colorgrid} {
+     set vid [string trimleft $id .]
+     set var_graph_pdp_colorgrid [concat graph_pdp_colorgrid_$vid]
+     global $var_graph_pdp_colorgrid
+     set var_graph_xlines [concat graph_xlines_$vid]
+     global $var_graph_xlines
+     set var_graph_ylines [concat graph_ylines_$vid]
+     global $var_graph_ylines
+ 
+     set $var_graph_pdp_colorgrid $pdp_colorgrid
+     set $var_graph_xlines $xlines
+     set $var_graph_ylines $ylines
+ 
+     toplevel $id
+     wm title $id {pdp_colorgrid}
+     wm protocol $id WM_DELETE_WINDOW [concat pdp_colorgrid_cancel $id]
+ 
+     label $id.label -text {COLORGRID PROPERTIES}
+     pack $id.label -side top
+ 
+     frame $id.buttonframe
+     pack $id.buttonframe -side bottom -fill x -pady 2m
+     button $id.buttonframe.cancel -text {Cancel}\
+     	-command "pdp_colorgrid_cancel $id"
+     button $id.buttonframe.apply -text {Apply}\
+     	-command "pdp_colorgrid_apply $id"
+     button $id.buttonframe.ok -text {OK}\
+     	-command "pdp_colorgrid_ok $id"
+     pack $id.buttonframe.cancel -side left -expand 1
+     pack $id.buttonframe.apply -side left -expand 1
+     pack $id.buttonframe.ok -side left -expand 1
+     
+     frame $id.42rangef
+     pack $id.42rangef -side top
+     label $id.42rangef.lxlines -text "X sections :"
+     entry $id.42rangef.xlines -textvariable $var_graph_xlines -width 7
+     pack $id.42rangef.lxlines $id.42rangef.xlines -side left
+ 
+     frame $id.72rangef
+     pack $id.72rangef -side top
+     label $id.72rangef.lylines -text "Y sections :"
+     entry $id.72rangef.ylines -textvariable $var_graph_ylines -width 7
+     pack $id.72rangef.lylines $id.72rangef.ylines -side left
+ 
+     checkbutton $id.showpdp_colorgrid -text {Show Grid} -variable $var_graph_pdp_colorgrid \
+     	-anchor w
+     pack $id.showpdp_colorgrid -side top
+ 
+     bind $id.42rangef.xlines <KeyPress-Return> [concat pdp_colorgrid_ok $id]
+     bind $id.72rangef.ylines <KeyPress-Return> [concat pdp_colorgrid_ok $id]
+     focus $id.42rangef.xlines
+}
+
+############ pdp_colorgrid procedures END -- lluis@artefacte.org     #########
