@@ -23,7 +23,9 @@
 
 void chaos_library_setup()
 {
-	post("chaos~ version"PACKAGE_VERSION"\n");
+	post("chaos~ version "PACKAGE_VERSION"\n");
+	
+	FLEXT_DSP_SETUP(lorenz_dsp);
 }
-		
+
 FLEXT_LIB_SETUP(chaos, chaos_library_setup);

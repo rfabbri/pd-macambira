@@ -54,7 +54,7 @@ public:
 		return (f > 0) && (f < 4);
 	}
 
-	CHAOS_SYSVAR_FUNCS_PRED(x, m_pred_x);
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
 	
 	bool m_pred_x(t_float f)
 	{

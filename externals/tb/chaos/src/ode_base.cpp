@@ -83,7 +83,7 @@ void ode_base::m_step()
 		rk2();
 		break;
 	case 2:
-		rk3();
+		rk4();
 		break;
 	}
 	

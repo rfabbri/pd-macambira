@@ -1,6 +1,7 @@
-NAME = chaos~
+NAME = chaos
 
-BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp 
+BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp \
+	lorenz_dsp.cpp
 
 
 CXXFLAGS  = @CXXFLAGS@ \
@@ -17,7 +18,7 @@ FRAMEWORKS = @FRAMEWORKS@
 
 TARGET =$(NAME).@EXTENSION@
 
-OBJECTS = $(patsubst %.cpp,./%.@OBJEXT@,$(BUILT_SOURCES))
+OBJECTS = $(patsubst %.cpp,%.@OBJEXT@,$(BUILT_SOURCES))
 
 SYSDIR = @SYSDIR@
 
@@ -26,10 +27,10 @@ SYSDIR = @SYSDIR@
 
 
 all-local: $(OBJECTS)
-	$(CXX) $(LDFLAGS) -shared ./*.@OBJEXT@ $(LIBS) -o ../$(TARGET)
+	$(CXX) $(LDFLAGS) -shared $^ $(LIBS) -o ../$(TARGET)
 	strip --strip-unneeded ../$(TARGET)
 
-./%.@OBJEXT@ : %.cpp 
+%.@OBJEXT@ : %.cpp 
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 dist-hook:
@@ -38,7 +39,7 @@ dist-hook:
 
 clean-local:
 	rm -f ../$(TARGET)
-	rm -f ../obj/*
+	rm -f ./*.@OBJEXT@
 
 install-exec-local:
 	install ../$(TARGET) $(SYSDIR)extra

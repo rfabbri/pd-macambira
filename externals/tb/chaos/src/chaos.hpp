@@ -22,7 +22,7 @@
 
 #define FLEXT_ATTRIBUTES 1
 
-//#include "flext.h"
+#include "flext.h"
 
 /* internal we can work with a higher precision than pd */
 #ifdef DOUBLE_PRECISION
@@ -30,6 +30,7 @@ typedef double data_t;
 #else
 typedef t_float data_t;
 #endif
+
 
 #define __chaos_hpp
 #endif /* __chaos_hpp */

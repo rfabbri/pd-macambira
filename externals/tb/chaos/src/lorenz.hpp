@@ -26,14 +26,16 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class lorenz
-	: protected ode_base
+	: public ode_base
 {
 public:
-	logistic()
+	lorenz()
 	{
 		m_num_eq = 3;
 		m_data = new data_t[3];
 
+		CHAOS_SYS_INIT(method,0);
+		CHAOS_SYS_INIT(dt,1);
 		CHAOS_SYS_INIT(x1,0.8);
 		CHAOS_SYS_INIT(x2,0.8);
 		CHAOS_SYS_INIT(x3,0.8);
@@ -44,7 +46,7 @@ public:
 		set_method(0);
 	}
 	
-	~logistic()
+	~lorenz()
 	{
 		delete m_data;
 	}

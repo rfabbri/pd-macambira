@@ -20,12 +20,12 @@
 
 #include "chaos_base.hpp"
 
-class chaos_dsp
+template <class system> class chaos_dsp
 	: public flext_dsp
 {
 	FLEXT_HEADER(chaos_dsp, flext_dsp);
 
-protected:
+public:
 
 	/* signal functions: */
 	/* for frequency = sr/2 */
@@ -38,11 +38,15 @@ protected:
 	void m_signal_c(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	
 	virtual void m_signal(int n, t_sample *const *insigs,t_sample *const *outsigs);
-	virtual void m_dsp(int n, t_sample *const *insigs,t_sample *const *outsigs);
 
-
+	virtual void m_dsp(int n, t_sample *const *insigs,t_sample *const *outsigs)
+	{
+		m_sr = Samplerate();
+	}
+	
+	
 	/* local data for system, output and interpolation */
-	chaos_base * m_system; /* the system */
+	system * m_system; /* the system */
 
 	t_sample * m_values;   /* actual value */
 	t_sample * m_slopes;   /* actual slope for cubic interpolation */
@@ -59,3 +63,212 @@ protected:
 	char m_method;       /* interpolation method */
 	
 };
+
+
+/* create constructor / destructor */			\
+#define CHAOS_DSP_INIT(SYSTEM, ATTRIBUTES)		\
+FLEXT_HEADER(SYSTEM##_dsp, chaos_dsp<SYSTEM>)	\
+												\
+SYSTEM##_dsp(int argc, t_atom* argv )			\
+{												\
+	m_system = new SYSTEM;						\
+												\
+	int size = m_system->get_num_eq();			\
+												\
+    for (int i = 0; i != size; ++i)				\
+        AddOutSignal();							\
+												\
+	m_values = new t_float[size];				\
+	m_slopes = new t_float[size];				\
+	m_nextvalues = new t_float[size];			\
+	m_nextmidpts = new t_float[size];			\
+	m_curves = new t_float[size];				\
+												\
+    m_freq = GetAFloat(argv[0]);				\
+	m_method = (char)GetAFloat(argv[1]);		\
+    m_phase = 0;								\
+    											\
+    ATTRIBUTES;									\
+}												\
+												\
+~SYSTEM##_dsp()									\
+{												\
+	delete m_system;							\
+	delete m_values;							\
+	delete m_slopes;							\
+	delete m_nextvalues;						\
+	delete m_nextmidpts;						\
+	delete m_curves;							\
+}
+
+
+
+
+template <class system> 
+void chaos_dsp<system>::m_signal(int n, t_sample *const *insigs,
+									   t_sample *const *outsigs)
+{
+	if (m_freq >= m_sr * 0.5)
+	{
+		m_signal_(n, insigs, outsigs);
+		return;
+	}
+	
+	switch (m_method)
+	{
+	case 0:
+		m_signal_n(n, insigs, outsigs);
+		return;
+	case 1:
+		m_signal_l(n, insigs, outsigs);
+		return;
+	case 2:
+		m_signal_c(n, insigs, outsigs);
+		return;
+	}
+}
+
+template <class system> 
+void chaos_dsp<system>::m_signal_(int n, t_sample *const *insigs,
+								 t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+
+	for (int i = 0; i!=n; ++i)
+	{
+		m_system->m_step();
+		for (int j = 0; j != outlets; ++j)
+		{
+			outsigs[j][i] = m_system->get_data(j);
+		}
+	}
+	
+}
+
+template <class system> 
+void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
+								   t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	int phase = m_phase;
+
+	int i = 0;
+
+	while (n)
+	{
+		if (m_phase == 0)
+		{
+			m_system->m_step();
+			phase = int (m_sr / m_freq);
+		}
+		
+		int next = (phase < n) ? phase : n;
+		n -= next;
+		phase -=next;
+		
+		while (next--)
+		{
+			for (int j = 0; j != outlets; ++j)
+			{
+				outsigs[j][i] = m_system->get_data(j);
+			}
+			++i;
+		}
+	}
+	m_phase = phase;
+}
+
+
+/* linear and cubic interpolation adapted from supercollider by James McCartney */
+
+template <class system> 
+void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
+								   t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	int phase = m_phase;
+
+	int i = 0;
+
+	while (n)
+	{
+		if (m_phase == 0)
+		{
+			m_system->m_step();
+			phase = int (m_sr / m_freq);
+
+			for (int j = 0; j != outlets; ++j)
+				m_slopes[j] = (m_system->get_data(j) - m_values[j]) / phase;
+		}
+		
+		int next = (phase < n) ? phase : n;
+		n -= next;
+		phase -=next;
+		
+		while (next--)
+		{
+			for (int j = 0; j != outlets; ++j)
+			{
+				outsigs[j][i] = m_values[j];
+				m_values[j]+=m_slopes[j];
+			}
+			++i;
+		}
+	}
+	m_phase = phase;
+}
+
+
+template <class system> 
+void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
+								   t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	int phase = m_phase;
+
+	int i = 0;
+
+	while (n)
+	{
+		if (m_phase == 0)
+		{
+			m_system->m_step();
+			phase = int (m_sr / m_freq);
+			phase = (phase > 2) ? phase : 2;
+			
+			for (int j = 0; j != outlets; ++j)
+			{
+				t_sample value = m_nextvalues[j];
+				m_nextvalues[j]= m_system->get_data(j);
+				
+				m_values[j] =  m_nextmidpts[j];
+				m_nextmidpts[j] = (m_values[j] + value) * 0.5f;
+				
+				float fseglen = (float)phase;
+				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - fseglen * m_slopes[j]) 
+					/ (fseglen * fseglen + fseglen);
+				
+				m_values[j] = value;
+			}
+		}
+		
+		int next = (phase < n) ? phase : n;
+		n -= next;
+		phase -=next;
+		
+		while (next--)
+		{
+			for (int j = 0; j != outlets; ++j)
+			{
+				outsigs[j][i] = m_values[j];
+				m_slopes[j]+=m_curves[j];
+				m_values[j]+=m_slopes[j];
+			}
+			++i;
+		}
+	}
+	m_phase = phase;
+}
