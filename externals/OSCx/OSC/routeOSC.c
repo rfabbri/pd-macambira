@@ -319,7 +319,6 @@ void OSCroute_doanything(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
 	  outlet_bang(x->x_outlets[i]);
 	} else if (argv[0].a_type == A_SYMBOL) {
 	  // Promote the symbol that was argv[0] to the special symbol
-	  
 	  outlet_anything(x->x_outlets[i], argv[0].a_w.w_symbol, argc-1, argv+1);
 	} else if (argc > 1) {
 	  // Multiple arguments starting with a number, so naturally we have

@@ -56,7 +56,13 @@ Boolean PatternMatch (const char *  pattern, const char * test) {
   // printf("OSC-pattern-match.c: pattern: %s, test: %s\n", pattern, test);
 
   theWholePattern = pattern;
+
+  // post("pattern: %s, test: %s", pattern, test);
   
+  if(test[0] == '*') {
+    return TRUE;
+  }
+
   if (pattern == 0 || pattern[0] == 0) {
     return test[0] == 0;
   } 

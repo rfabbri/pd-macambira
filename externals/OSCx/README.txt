@@ -22,6 +22,8 @@ send+dump/	CNMAT's OSC commandline utils
 
 log:
 
+  20030531: added OSCroute /* (route everything) hard-fix
+
   20030527: added sending to broadcast address capability to htmsocket
 
   20020908: 0.16-4:
