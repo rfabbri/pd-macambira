@@ -11,21 +11,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __MAIN_H
 #define __MAIN_H
 
-#define FLEXT_ATTRIBUTES 1
-
-#include <flext.h>
-#if FLEXT_OS == FLEXT_OS_MAC
-#include <Python/Python.h>
-#else
-#include <Python.h>
-#endif
+#include "pyprefix.h"
+#include "pysymbol.h"
 
 #if FLEXT_OS == FLEXT_LINUX || FLEXT_OS == FLEXT_IRIX
 #include <unistd.h>
-#endif
-
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
-#error You need at least flext version 0.5.0
 #endif
 
 #define PY__VERSION "0.2.0pre"
@@ -61,7 +51,7 @@ protected:
 class py:
 	public flext_base
 {
-	FLEXT_HEADER(py,flext_base)
+	FLEXT_HEADER_S(py,flext_base,Setup)
 
 public:
 	py();
@@ -190,8 +180,12 @@ public:
 	static PyObject* StdOut_Write(PyObject* Self, PyObject* Args);
 
 protected:
-	// callbacks
 
+    virtual void m_click();
+
+	static void Setup(t_classid c);
+
+	// callbacks
 	FLEXT_ATTRVAR_I(detach)
 	FLEXT_ATTRVAR_B(respond)
 	FLEXT_CALLBACK_V(m_stop)

@@ -20,20 +20,13 @@ void pyext::Setup(t_classid c)
 {
     sym_get = flext::MakeSymbol("get");
     
-    FLEXT_CADDMETHOD_(c,0,"reload.",m_reload);
 	FLEXT_CADDMETHOD_(c,0,"reload",m_reload_);
-	FLEXT_CADDMETHOD_(c,0,"dir",m_dir);
-	FLEXT_CADDMETHOD_(c,0,"dir+",m_dir_);
-	FLEXT_CADDMETHOD_(c,0,"doc",m_doc);
+    FLEXT_CADDMETHOD_(c,0,"reload.",m_reload);
 	FLEXT_CADDMETHOD_(c,0,"doc+",m_doc_);
-
-  	FLEXT_CADDATTR_VAR(c,"args",args,ms_args);
+	FLEXT_CADDMETHOD_(c,0,"dir+",m_dir_);
 	FLEXT_CADDATTR_GET(c,"dir+",mg_dir_);
 
-#ifdef FLEXT_THREADS
-	FLEXT_CADDATTR_VAR1(c,"detach",detach);
-	FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
-#endif
+    FLEXT_CADDATTR_VAR(c,"args",args,ms_args);
 
 	FLEXT_CADDMETHOD_(c,0,"get",m_get);
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
@@ -172,58 +165,8 @@ pyext::pyext(int argc,const t_atom *argv):
 	if(methname) {
 		MakeInstance();
 
-        if(pyobj) {
-            if(inlets >= 0) {
-                // set number of inlets
-			    PyObject *res = PyInt_FromLong(inlets);
-                int ret = PyObject_SetAttrString(pyobj,"_inlets",res);
-                FLEXT_ASSERT(!ret);
-            }
-            if(outlets >= 0) {
-                // set number of outlets
-			    PyObject *res = PyInt_FromLong(outlets);
-			    int ret = PyObject_SetAttrString(pyobj,"_outlets",res);
-                FLEXT_ASSERT(!ret);
-            }
-
-            DoInit(); // call __init__ constructor
-            // __init__ can override the number of inlets and outlets
-
-            if(inlets < 0) {
-		        // get number of inlets
-		        inlets = 1;
-			    PyObject *res = PyObject_GetAttrString(pyobj,"_inlets"); // get ref
-			    if(res) {
-				    if(PyCallable_Check(res)) {
-					    PyObject *fres = PyEval_CallObject(res,NULL);
-					    Py_DECREF(res);
-					    res = fres;
-				    }
-				    if(PyInt_Check(res)) 
-					    inlets = PyInt_AsLong(res);
-				    Py_DECREF(res);
-			    }
-			    else 
-				    PyErr_Clear();
-            }
-            if(outlets < 0) {
-                // get number of outlets
-                outlets = 1;
-			    PyObject *res = PyObject_GetAttrString(pyobj,"_outlets"); // get ref
-			    if(res) {
-				    if(PyCallable_Check(res)) {
-					    PyObject *fres = PyEval_CallObject(res,NULL);
-					    Py_DECREF(res);
-					    res = fres;
-				    }
-				    if(PyInt_Check(res))
-					    outlets = PyInt_AsLong(res);
-				    Py_DECREF(res);
-			    }
-			    else
-				    PyErr_Clear();
-            }
-        }
+        if(pyobj) 
+            InitInOut(inlets,outlets);
 	}
     else 
         inlets = outlets = 0;
@@ -245,12 +188,7 @@ pyext::~pyext()
 {
 	PyThreadState *state = PyLock();
 
-	ClearBinding();
-    
-    if(pyobj) {
-        if(pyobj->ob_refcnt > 1) post("%s - Python object is still referenced",thisName());
-    	Py_DECREF(pyobj);  // opposite of SetClssMeth
-    }
+    DoExit();
 
     Unregister("_pyext");
 	UnimportModule();
@@ -269,8 +207,8 @@ bool pyext::DoInit()
 
 	PyObject *init = PyObject_GetAttrString(pyobj,"__init__"); // get ref
     if(init) {
-        if(PyCallable_Check(init)) {
-			PyObject *res = PyEval_CallObject(init,pargs);
+        if(PyMethod_Check(init)) {
+			PyObject *res = PyObject_CallObject(init,pargs);
 			if(!res)
 				PyErr_Print();
 			else
@@ -281,6 +219,86 @@ bool pyext::DoInit()
     
 	Py_XDECREF(pargs);
     return true;
+}
+
+void pyext::DoExit()
+{
+	ClearBinding();
+
+    if(pyobj) {
+        if(pyobj->ob_refcnt > 1) {
+            post("%s - Python object is still referenced",thisName());
+
+            // Force-quit object:
+            // call __del__ manually
+            // this is dangerous, because it could get called a second time
+            // if object really has no more references then
+	        PyObject *meth = PyObject_GetAttrString(pyobj,"__del__"); // get ref
+            if(meth) {
+                if(PyMethod_Check(meth)) {
+			        PyObject *res = PyObject_CallObject(meth,NULL);
+			        if(!res)
+				        PyErr_Print();
+			        else
+				        Py_DECREF(res);
+                }
+                Py_DECREF(meth);
+	        }
+        }
+    	Py_DECREF(pyobj);  // opposite of SetClssMeth
+    }
+}
+
+void pyext::InitInOut(int &inl,int &outl)
+{
+    if(inl >= 0) {
+        // set number of inlets
+        int ret = PyObject_SetAttrString(pyobj,"_inlets",PyInt_FromLong(inl));
+        FLEXT_ASSERT(!ret);
+    }
+    if(outl >= 0) {
+        // set number of outlets
+		int ret = PyObject_SetAttrString(pyobj,"_outlets",PyInt_FromLong(outl));
+        FLEXT_ASSERT(!ret);
+    }
+
+    DoInit(); // call __init__ constructor
+    // __init__ can override the number of inlets and outlets
+
+    if(inl < 0) {
+		// get number of inlets
+		inl = 1;
+		PyObject *res = PyObject_GetAttrString(pyobj,"_inlets"); // get ref
+		if(res) {
+			if(PyCallable_Check(res)) {
+				PyObject *fres = PyEval_CallObject(res,NULL);
+				Py_DECREF(res);
+				res = fres;
+			}
+			if(PyInt_Check(res)) 
+				inl = PyInt_AS_LONG(res);
+			Py_DECREF(res);
+		}
+		else 
+			PyErr_Clear();
+    }
+    if(outl < 0) {
+        // get number of outlets
+        outl = 1;
+		PyObject *res = PyObject_GetAttrString(pyobj,"_outlets"); // get ref
+		if(res) {
+			if(PyCallable_Check(res)) {
+				PyObject *fres = PyEval_CallObject(res,NULL);
+				Py_DECREF(res);
+				res = fres;
+			}
+			if(PyInt_Check(res))
+				outl = PyInt_AS_LONG(res);
+			Py_DECREF(res);
+		}
+		else
+			PyErr_Clear();
+    }
 }
 
 bool pyext::MakeInstance()
@@ -311,8 +329,7 @@ bool pyext::MakeInstance()
 
 void pyext::Reload()
 {
-	ClearBinding();
-	Py_XDECREF(pyobj);
+	DoExit();
 
 	// by here, the Python class destructor should have been called!
 
@@ -320,6 +337,12 @@ void pyext::Reload()
 	ReloadModule();
 	
 	MakeInstance();
+
+    int inl = -1,outl = -1;
+    InitInOut(inl,outl);
+
+    if(inl != inlets || outl != outlets)
+        post("%s - Inlet and outlet count can't be changed by reload",thisName());
 }
 
 

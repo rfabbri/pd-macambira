@@ -70,6 +70,8 @@ private:
 	void ClearBinding();
 	bool MakeInstance();
 	bool DoInit();
+	void DoExit();
+    void InitInOut(int &inlets,int &outlets);
 
 	AtomList args;
 
