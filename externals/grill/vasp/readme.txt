@@ -91,3 +91,15 @@ o GCC: edit "config-pd-darwin.txt" and run "sh build-pd-darwin.sh"
 o Metrowerks CodeWarrior V6: edit vasp.cw project and build it
 
 
+----------------------------------------------------------------------------
+
+
+HINTS:
+======
+
+- Click-free operation: All objects where it makes sense (e.g. transformation of data, vasp.!, etc.)
+	can be set to "detached mode" by sending a "detach 1" message (which is setting the detach attribute to 1). 
+	The operation will then take place in a detached thread with lower priority. 
+	Thus, longer operations will not disturb the dsp processing of the real-time engine.
+
+
