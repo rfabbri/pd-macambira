@@ -17,6 +17,8 @@ Version history:
 - FIX: immediate vasp garbage collection is now done in separate thread
 - ADD: vasp.size... objects: attribute "keep" determines whether buffer content should be preserved (default = 1)
 - CHANGE: buffer reference checks upon all operations enforced (by new CVasp (checked vasp) class)
+- FIX: immediate vasps can not have frames > size
+- FIX: immediate garbage collection was not triggered in threaded build
 
 0.1.1:
 - FIX: bug in resize of immediate buffers

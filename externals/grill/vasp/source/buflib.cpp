@@ -157,8 +157,8 @@ static V LibThr(flext::thr_params *)
 {
 	flext::RelPriority(-2);
 
-	while(libthrexit) {
-		libthrcond->TimedWait(0.5f);
+	while(!libthrexit) {
+		libthrcond->TimedWait(1); // don't go below 1 here as TimedWait might not support fractions of seconds!!!
 		// TODO - should process return value of TimedWait
 		Collect();	
 	}
@@ -286,7 +286,12 @@ ImmBuf::ImmBuf(I len):
 ImmBuf::ImmBuf(BufEntry *e,I len,I offs): 
 	VBuffer(0,len,offs),
 	entry(e) 
-{}
+{
+	if(Length() > e->alloc) {
+		Length(e->alloc);
+		post("vasp - buffer %s: Length (%i) is out of range, corrected to %i",GetString(e->sym),len,e->alloc);
+	}
+}
 
 VSymbol ImmBuf::Symbol() const { return entry->sym; }
 

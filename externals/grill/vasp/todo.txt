@@ -23,6 +23,9 @@ warning, treat as 0, calculate unit operation, loop, mirror on buffer end, stay 
 
 - introduce "groups" for attribute organisation (e.g. detach etc.)
 
+- reduce number of warnings for wrong offset, frame size etc.
+
+
 objects:
 ---------------------
 - wave object for table-lookup oscs.

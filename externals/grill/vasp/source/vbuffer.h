@@ -13,7 +13,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "main.h"
 
-class VSymbol
+class VSymbol:
+	public flext
 {
 public:
 	VSymbol(const t_symbol *s = NULL): sym(s) { Inc(); }
@@ -38,7 +39,8 @@ protected:
 	const t_symbol *sym;
 };
 
-class VBuffer
+class VBuffer:
+	public flext
 {
 public:
 	virtual ~VBuffer() {}
