@@ -12,10 +12,11 @@ CONFIG=config-pd-darwin.txt
 
 include $(CONFIG)
 
-FLEXTLIB=$(FLEXTPATH)/flext.a
+#FLEXTLIB=$(FLEXTPATH)/flext.a
+FLEXTLIB=$(FLEXTPATH)/pd-darwin/libflext.a
 
 # compiler+linker stuff	
-INCLUDES=$(PDPATH) 
+INCLUDES=$(PDPATH) ../../grill/flext/source
 LIBPATH=
 FLAGS=-DFLEXT_SYS=2 
 CFLAGS=-O6 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
@@ -67,7 +68,6 @@ install:: $(TARGET)
 .PHONY: clean
 clean:
 	rm -f $(TARGDIR)/*.o $(TARGET)
-	
 
 
 
