@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.1.0pre"
+#define VST_VERSION "0.1.0pre3"
 
 #if 0
 /* ----- MFC stuff ------------- */
@@ -378,7 +378,7 @@ BL vst::ms_plug(I argc,const A *argv)
 	}
 
     // re-init dsp stuff 
-    InitPlug();
+    if(plug) InitPlug();
 
     return lf;
 }
