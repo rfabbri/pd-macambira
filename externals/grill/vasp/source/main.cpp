@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre12";
+const C *VASP_VERSION = "0.1.3";
 
 #include "opfuns.h"
 
@@ -22,12 +22,12 @@ static V vasp_main()
 	post("-----------------------------------------");
 	post("           VASP modular %s            ",VASP_VERSION);
 	post("   vector assembling signal processor    ");
-	post("       (C)2002-2003 Thomas Grill         ");
+	post("       (C)2002-2005 Thomas Grill         ");
 #ifdef FLEXT_DEBUG
 	post("   DEBUG BUILD - " __DATE__ " " __TIME__);
 #endif
 	post("");
-	post(" http://www.parasitaere-kapazitaeten.net ");
+	post("          http://grrrr.org/ext           ");
 	post("-----------------------------------------");
 	post("");
 

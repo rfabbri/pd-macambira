@@ -13,7 +13,7 @@ Visit https://www.paypal.com/xclick/business=gr%40grrrr.org&item_name=vasp&no_no
 DOWNLOAD:
 =========
 
-http://grrrr.org/vasp
+http://grrrr.org/ext/vasp
 
 ----------------------------------------------------------------------------
 
