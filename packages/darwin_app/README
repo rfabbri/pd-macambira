@@ -1,0 +1,17 @@
+
+To compile a standalone Pd.app, you need this stuff:
+
+Tcl/Tk Standalone .app
+
+  1. download TclTkAquaStandalone-8.?.?.dmg from http://tcltkaqua.sourceforge.net/
+  	  (I used 8.4.7)		  
+  2. mount the dmg
+  3. the Makefile will find what it needs in the mounted .dmg
+
+
+JackOSX 
+
+  1. download latest JackOSX from http://www.jackosx.com/download.html 
+  	  (I used version 0.4.1)
+  2. install the .pkg
+  3. 

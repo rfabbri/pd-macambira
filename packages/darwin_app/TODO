@@ -1,10 +1,7 @@
 
-- change s_inter.c to use /Applications/Pd.app/Contents/MacOS/Wish\ Shell
+- fix socket.patch and s_audio_jack.patch
 
-- AppMain.tcl:
-   http://www.wordtech-software.com/tcl-bundle-tutorial.html
-	http://wiki.tcl.tk/tclhttpd/3214
-	check WaveSurfer
+- add context to all patches
 
 - include auto-.pdrc script in package somewhere...
 

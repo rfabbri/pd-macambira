@@ -7,7 +7,12 @@ DESTDIR = installroot
 PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
-WISH_SHELL_CONTENTS = /Applications/Utilities/Wish\ Shell.app/Contents
+# source for the Wish Shell.app used to build Pd
+# download TclTkAquaStandalone-8.?.?.dmg from http://tcltkaqua.sourceforge.net/
+# and mount it.  The files will be copied from the mounted .dmg image.
+#WISH_SHELL = /Applications/Utilities/Wish\ Shell.app
+WISH_SHELL = /Volumes/TclTkAquaStandalone-8.?.*/Wish\ Shell.app
+WISH_SHELL_CONTENTS = $(WISH_SHELL)/Contents
 
 PD_FILE_ROOT = $(DESTDIR)$(INSTALL_PREFIX)/lib/pd
 ABSTRACTIONS_DIR = $(PD_FILE_ROOT)/doc/abstractions
@@ -23,7 +28,7 @@ PD_BUGFIX_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 # release version for this distro
-PACKAGE_VERSION = beta3
+PACKAGE_VERSION = beta4
 PACKAGE_NAME = pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 DMG_NAME = $(PACKAGE_NAME)
 
@@ -47,13 +52,13 @@ FLEXT_VERSION = $(shell grep PROJECT_NUMBER ../../externals/grill/flext/flext.do
 
 GEM_VERSION = $(shell grep "GEM_VERSION" ../../Gem/src/Base/GemVersion.h | cut -d '"' -f 2)
 
-MAXLIB_VERSION = $(shell grep "#define VERSION" ../../externals/maxlib/maxlib.c | cut -d '"' -f 2)
+MAXLIB_VERSION = $(shell grep "define VERSION" ../../externals/maxlib/maxlib.c | cut -d '"' -f 2)
 
-OSC_VERSION = $(shell grep "#define VERSION" ../../externals/OSCx/OSC.c | cut -d '"' -f 2)
+OSC_VERSION = $(shell grep "define VERSION" ../../externals/OSCx/OSC.c | cut -d '"' -f 2)
 
 PDP_VERSION = $(shell grep PDP_VERSION= ../../externals/pdp/configure | cut -d '=' -f 2)
 
-PMPD_VERSION = $(shell grep "#define VERSION" ../../externals/pmpd/src/pmpd.c | cut -d '"' -f 2)
+PMPD_VERSION = $(shell grep "define VERSION" ../../externals/pmpd/src/pmpd.c | cut -d '"' -f 2)
 
 TOXY_MAJOR_VERSION = $(shell grep TOXY_VERSION ../../externals/miXed/toxy/build_counter | cut -d ' ' -f 3 | cut -d '"' -f 2)
 TOXY_RELEASE = $(shell grep TOXY_RELEASE ../../externals/miXed/toxy/build_counter | cut -d ' ' -f 3 | cut -d '"' -f 2)
@@ -63,7 +68,7 @@ TOXY_VERSION = $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
 ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
-darwin_app: darwin_app_wrapper darwin_app_core darwin_unix_pkg darwin_app_externals \
+darwin_app: darwin_app_wrapper darwin_app_core darwin_app_externals \
 		darwin_app_docs darwin_app_abstractions
 
 
@@ -112,9 +117,9 @@ darwin_app_readme:
 # these cause this error:
 # Makefile:308: *** unterminated call to function `shell': missing `)'.  Stop.
 #
-#	echo "<li>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
-#	echo "<li>osc: $(OSC_VERSION)" >> $(README_FILE)
-#	echo "<li>pmpd: $(PMPD_VERSION)" >> $(README_FILE)
+	echo "<li>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
+	echo "<li>osc: $(OSC_VERSION)" >> $(README_FILE)
+	echo "<li>pmpd: $(PMPD_VERSION)" >> $(README_FILE)
 	echo "<li>pd-abstractions: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>pd-doc: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>pd-externals: `date +20%y.%m.%d`" >> $(README_FILE)
@@ -133,19 +138,15 @@ darwin_app_wrapper:
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
 	install -m0755 -p \
-		/Applications/Utilities/Wish\ Shell.app/Contents/MacOS/Wish\ Shell \
+		$(WISH_SHELL_CONTENTS)/MacOS/Wish\ Shell \
 		"$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p \
-		/Applications/Utilities/Wish\ Shell.app/Contents/Resources/Wish\ Shell.rsrc \
+		$(WISH_SHELL_CONTENTS)/Resources/Wish\ Shell.rsrc \
 		"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 #	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"
-	cp -Rp \
-		/Applications/Utilities/Wish\ Shell.app/Contents/Frameworks \
-		"$(DESTDIR)$(PD_APP_CONTENTS)"
-	cp -Rp \
-                /Applications/Utilities/Wish\ Shell.app/Contents/Frameworks \
-                "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
+	cp -Rp $(WISH_SHELL_CONTENTS)/Frameworks "$(DESTDIR)$(PD_APP_CONTENTS)"
+	cp -Rp $(WISH_SHELL_CONTENTS)/Frameworks "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 
 #	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"  \
 #	"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
@@ -161,20 +162,24 @@ darwin_app_wrapper:
 	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
 
 
-# INSTALL_PREFIX=$(INSTALL_PREFIX) is for pd-MSP 0.37.1
-# prefix=$(INSTALL_PREFIX) is for pd-CVS 0.37
 darwin_app_core:
 # apply some patches 
-	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/socket.patch
+# with CVS version, next line causes: s_inter.c:645: error: parse error before "if"
+#	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/socket.patch
 	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/makefile.in.patch
 	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/u_main.tk.patch
 	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/configure.jackosx.patch
-	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/s_audio_jack.patch
+# this patch isn't applied properly, so pd doesn't compile
+#	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/s_audio_jack.patch
 # pd core
 	cd ../../pd/src/ && ./configure --enable-jack &&\
 		make install \
 			DESTDIR=../../packages/darwin_app/$(DESTDIR) \
-			INSTALL_PREFIX=$(INSTALL_PREFIX)
+			prefix=$(INSTALL_PREFIX)
+# The last line above needs to be changed based on which version
+# of the pd core source you are compiling:
+#        INSTALL_PREFIX=$(INSTALL_PREFIX) is for pd-MSP 0.37.1
+#        prefix=$(INSTALL_PREFIX) is for pd-CVS 0.37
 
 darwin_app_docs:
 #----------------------------------------------------------------------------
@@ -210,7 +215,6 @@ darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard d
 darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
-	
 	cd ../../externals/grill/build/darwin && make 
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
