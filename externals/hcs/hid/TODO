@@ -119,6 +119,8 @@ void hid_post(const char *format, const char *);
 
 - exponential
 
+- [noterange] scale an input range to an output range of MIDI note #s
+
 ______________________________________________________________________________
 ------------------------------------------------------------------------------
 BUGS

@@ -1,0 +1,17 @@
+#N canvas 0 22 458 308 10;
+#X obj 137 20 inlet;
+#X obj 222 267 outlet;
+#X floatatom 221 81 5 0 0 0 - - -;
+#X obj 137 81 route reset;
+#X obj 221 174 +;
+#X obj 251 174 f;
+#X msg 137 126 0;
+#X connect 0 0 3 0;
+#X connect 3 0 6 0;
+#X connect 3 1 2 0;
+#X connect 3 1 4 0;
+#X connect 4 0 5 0;
+#X connect 4 0 1 0;
+#X connect 5 0 4 1;
+#X connect 6 0 4 1;
+#X connect 6 0 5 1;
