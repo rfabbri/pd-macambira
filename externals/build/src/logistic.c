@@ -1,2 +1,2 @@
-#include "../../chaos/lyapunov.c"
-#include "../../chaos/logistic.c"
+#include "../../bbogart/chaos/lyapunov.c"
+#include "../../bbogart/chaos/logistic.c"

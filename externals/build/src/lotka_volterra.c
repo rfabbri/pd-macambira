@@ -1,2 +1,2 @@
-#include "../../chaos/lyapunov.c"
-#include "../../chaos/lotka_volterra.c"
+#include "../../bbogart/chaos/lyapunov.c"
+#include "../../bbogart/chaos/lotka_volterra.c"
