@@ -21,6 +21,7 @@
 
 
 #include <stdlib.h>
+#include <math.h>
 #include "pdp_imageproc.h"
 
 // utility stuff
@@ -490,3 +491,173 @@ void pdp_imageproc_random_process(void *x, s16 *image, u32 width, u32 height)
     
 }
 
+
+
+/* resampling code */
+// zoom + rotate
+
+/* bilinear resampling core routine */
+/* virtual coordinates are the lowest 16 bits in virt_x and virt_y*/
+static inline s32 pdp_resample_bilin(s16 *image, s32 width, s32 height, s32 virt_x, s32 virt_y)
+{
+
+    s32 fp_x, fp_y, frac_x, frac_y, f, offset, r_1, r_2;
+
+    //virt_x &= 0xffff;
+    //virt_y &= 0xffff;
+
+    fp_x = virt_x * (width - 1);
+    fp_y = virt_y * (height - 1);
+
+    frac_x = fp_x & (0xffff);
+    frac_y = fp_y & (0xffff);
+
+    offset = (fp_x >> 16) + (fp_y >> 16) * width;
+    image += offset;
+
+    f = 0x10000 - frac_x;
+
+    r_1 = ((f * (s32)(image[0])  +  frac_x * (s32)(image[1])))>>16;
+
+    image += width;
+
+    r_2 = ((f * (s32)(image[0])  +  frac_x * (s32)(image[1])))>>16;
+
+    f = 0x10000 - frac_y;
+
+    return ((f * r_1 + frac_y * r_2)>>16);
+    
+}
+
+typedef struct
+{
+    float centerx;
+    float centery;
+    float zoomx;
+    float zoomy;
+    float angle;
+} t_affine_map;
+
+
+void *pdp_imageproc_resample_affinemap_new(void)
+{
+
+    t_affine_map *a  = (t_affine_map *)malloc(sizeof(t_affine_map));
+    a->centerx = 0.5;
+    a->centery = 0.5;
+    a->zoomx = 1.0;
+    a->zoomy = 1.0;
+    a->angle = 0.0f;
+    return (void *)a;
+}
+void pdp_imageproc_resample_affinemap_delete(void *x){free(x);}
+void pdp_imageproc_resample_affinemap_setcenterx(void *x, float f){((t_affine_map *)x)->centerx = f;}
+void pdp_imageproc_resample_affinemap_setcentery(void *x, float f){((t_affine_map *)x)->centery = f;}
+void pdp_imageproc_resample_affinemap_setzoomx(void *x, float f){((t_affine_map *)x)->zoomx = f;}
+void pdp_imageproc_resample_affinemap_setzoomy(void *x, float f){((t_affine_map *)x)->zoomy = f;}
+void pdp_imageproc_resample_affinemap_setangle(void *x, float f){((t_affine_map *)x)->angle = f;}
+void pdp_imageproc_resample_affinemap_process(void *x, s16 *src_image, s16 *dst_image, u32 width, u32 height)
+{
+    t_affine_map *a = (t_affine_map *)x;
+    double izx = 1.0f / (a->zoomx);
+    double izy = 1.0f / (a->zoomy);
+    double scale = (double)0xffffffff;
+    double scalew = scale / ((double)(width - 1));
+    double scaleh = scale / ((double)(height - 1));
+    double cx = ((double)a->centerx) * ((double)(width - 1));
+    double cy = ((double)a->centery) * ((double)(height - 1));
+    double angle = a->angle * (-M_PI / 180.0);
+    double c = cos(angle);
+    double s = sin(angle);
+
+    /* affine x, y mappings in screen coordinates */
+    double mapx(double x, double y){return cx + izx * ( c * (x-cx) + s * (y-cy));}
+    double mapy(double x, double y){return cy + izy * (-s * (x-cx) + c * (y-cy));}
+
+    u32 colstate_x = (u32)(scalew * mapx(0,0));
+    u32 colstate_y = (u32)(scaleh * mapy(0,0));
+    u32 rowstate_x = colstate_x;
+    u32 rowstate_y = colstate_y;
+
+    u32 row_inc_x = (u32)(scalew * (mapx(1,0)-mapx(0,0)));
+    u32 row_inc_y = (u32)(scaleh * (mapy(1,0)-mapy(0,0)));
+    u32 col_inc_x = (u32)(scalew * (mapx(0,1)-mapx(0,0)));
+    u32 col_inc_y = (u32)(scaleh * (mapy(0,1)-mapy(0,0)));
+
+    u32 i,j;
+
+    for (j=0; j<height; j++){
+	for (i=0; i<width; i++){
+	    *dst_image++ = pdp_resample_bilin(src_image, width, height, rowstate_x>>16, rowstate_y>>16);
+	    rowstate_x += row_inc_x;
+	    rowstate_y += row_inc_y;
+	}
+	colstate_x += col_inc_x;
+	colstate_y += col_inc_y;
+	rowstate_x = colstate_x;
+	rowstate_y = colstate_y;
+    }
+
+}
+
+
+
+
+
+// polynomials
+
+
+
+
+typedef struct
+{
+    u32 order;
+    s32 coefs[0];
+} t_cheby;
+
+void *pdp_imageproc_cheby_new(int order)
+{
+    t_cheby *z;
+    int i;
+    if (order < 2) order = 2;
+    z = (t_cheby *)malloc(sizeof(t_cheby) + (order + 1) * sizeof(s32));
+    z->order = order;
+    z->coefs[0] = 0;
+    z->coefs[1] = 0x7fff;
+    for (i=2; i<=order; i++) z->coefs[i] = 0;
+    return z;
+}
+void pdp_imageproc_cheby_delete(void *x){free(x);}
+void pdp_imageproc_cheby_setcoef(void *x, u32 n, float f)
+{
+
+    t_cheby *z = (t_cheby *)x;
+    if (n <= z->order){
+	z->coefs[n] = (s32)(f * 32767.0f); // coefs are in s16.15 format
+    }
+
+}
+void pdp_imageproc_cheby_process(void *x, s16 *image, u32 width, u32 height, u32 iterations)
+{
+
+    t_cheby *z = (t_cheby *)x;
+    u32 i,j,k;
+    s32 *c = z->coefs;
+    for (j=0; j < (height*width); j++){
+	s32 acc = (s32)image[j];
+	for (i=0; i<iterations; i++){
+	    s32 T2 = 0x7fff; /* 1 */
+	    s32 T1 = acc;
+	    s32 t;
+	    s32 in = acc;
+	    acc = c[0] + ((in*c[1])>>15);
+	    for (k=2; k<=z->order; k++){
+		t = ((T1*in)>>14) - T2; /* T_n = 2 x T_n-1 - T_n-2 */
+		T2 = T1;
+		T1 = t;
+		acc += ((c[k] * t)>>15);
+	    }
+	}
+	image[j] = (s16)(CLAMP16(acc));
+    }
+}

@@ -32,6 +32,7 @@ typedef struct
     unsigned int width;     /* CA width (in 1 bit cells) */
     unsigned int height;    /* CA height (in 1 bit cells) */
     unsigned int offset;    /* bit offset of upper left corner */
+    unsigned int currow;    /* current row to compute for 1D CA */
     
 } t_ca;
 

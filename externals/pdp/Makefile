@@ -22,13 +22,18 @@ clean: buildclean
 	rm -f pdp.pd_linux
 	rm -f *~
 
+distroclean: buildclean
+	make -C scaf clean
+
 tags:
 	etags --language=auto include/*.h system/mmx/*.s system/*.c modules/*.c
 
 tagsclean:
 	rm -f TAGS
 
-distro: clean
+
+
+distro: distroclean
 	rm -rf $(PDP_DISTRO)
 	mkdir $(PDP_DISTRO)
 	cp -av $(PDP_DIR)/*  $(PDP_DISTRO)
@@ -44,6 +49,9 @@ distro: clean
 www:	$(PDP_TARBALL) 
 	cp -av  $(PDP_TARBALL) $(PDP_WWWDIR)
 	cp -av  $(PDP_DIR)/README $(PDP_WWWDIR)/README.txt
+	cp -av  $(PDP_DIR)/doc/reference.txt $(PDP_WWWDIR)/REFERENCE.txt
+	cp -av  $(PDP_DIR)/CHANGES.LOG $(PDP_WWWDIR)/CHANGELOG.txt
+	
 
 www-test:$(PDP_TARBALL) 
 	cp -av  $(PDP_TARBALL) $(PDP_WWWTESTDIR)

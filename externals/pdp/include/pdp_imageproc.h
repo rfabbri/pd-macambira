@@ -141,10 +141,30 @@ void pdp_imageproc_bqt_process(void *x, s16 *image, s16 *state0, s16 *state1, u3
 
 
 
+// zoom object
+void *pdp_imageproc_resample_affinemap_new(void);
+void pdp_imageproc_resample_affinemap_delete(void *x);
+void pdp_imageproc_resample_affinemap_setcenterx(void *x, float f);
+void pdp_imageproc_resample_affinemap_setcentery(void *x, float f);
+void pdp_imageproc_resample_affinemap_setzoomx(void *x, float f);
+void pdp_imageproc_resample_affinemap_setzoomy(void *x, float f);
+void pdp_imageproc_resample_affinemap_setangle(void *x, float f);
+void pdp_imageproc_resample_affinemap_process(void *x, s16 *srcimage, s16 *dstimage, u32 width, u32 height);
+
+
+
+//chebyshev poly
+void *pdp_imageproc_cheby_new(int order);
+void pdp_imageproc_cheby_delete(void *x);
+void pdp_imageproc_cheby_setcoef(void *x, u32 n, float f);
+void pdp_imageproc_cheby_process(void *x, s16 *image, u32 width, u32 height, u32 iterations);
+
+
 /*
 #ifdef __cplusplus
 }
 #endif
 */
+
 
 #endif //PDP_IMAGEPROC_H

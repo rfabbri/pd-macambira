@@ -150,6 +150,19 @@ void pixel_crot2d_s16(short int *pixel_array,
 		      short int *row_encoded_vector_matrix);
 
 
+/********************************** RESAMPLE OPERATIONS *******************************************/
+
+// affine transformation (called linear map, but that's flou terminology)
+void pixel_resample_linmap_s16(void *x);
+
+
+
+/********************************** POLYNOMIAL OPERATIONS *****************************************/
+// chebychev polynomial
+void pixel_cheby_s16_3plus(short int *buf, int nb_8pixel_vectors, int orderplusone, short int *coefs);
+
+
+
 #ifdef __cplusplus
 }
 #endif

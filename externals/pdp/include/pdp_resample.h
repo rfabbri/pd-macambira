@@ -28,15 +28,17 @@
 void pdp_resample_scale_bilin(s16 *src_image, s16 *dst_image, s32 src_w, s32 src_h, s32 dst_w, s32 dst_h);
 void pdp_resample_scale_nn(s16 *src_image, s16 *dst_image, s32 src_w, s32 src_h, s32 dst_w, s32 dst_h);
 
+/* USE pdp_imageproc_resample_affinemap
 void pdp_resample_zoom_tiled_bilin(s16 *src_image, s16 *dst_image, s32 w, s32 h, 
 				   float zoom_x, float zoom_y, float center_x_relative, float center_y_relative);
+*/
 
 //void pdp_resample_zoom_tiled_nn(s16 *src_image, s16 *dst_image, s32 w, s32 h, float zoom_x, float zoom_y);
 
 
 
 /* core routines */
-s32 pdp_resample_bilin(s16 *image, s32 width, s32 height, s32 virt_x, s32 virt_y);
+//s32 pdp_resample_bilin(s16 *image, s32 width, s32 height, s32 virt_x, s32 virt_y);
 
 
 #endif

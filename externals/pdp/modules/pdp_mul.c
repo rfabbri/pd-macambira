@@ -70,15 +70,10 @@ static void pdp_mul_process_grey(t_pdp_mul *x)
     unsigned int w = header0->info.image.width;
     unsigned int h = header0->info.image.height;
 
-    // set hight so it includes the chroma frames
-    h = h + (h>>1);
 
     pdp_imageproc_mul_process((short int*)data0, (short int*)data1, w, h);
 
     return;
-
-
-
 }
 
 static void pdp_mul_process(t_pdp_mul *x)

@@ -62,6 +62,10 @@ void pdp_chrot_setup(void);
 void pdp_scope_setup(void);
 void pdp_scale_setup(void);
 void pdp_zoom_setup(void);
+void pdp_scan_setup(void);
+void pdp_sdl_setup(void);
+void pdp_cheby_setup(void);
+
 
 
 /* library setup routine */
@@ -107,6 +111,10 @@ void pdp_setup(void){
     pdp_scope_setup();
     pdp_scale_setup();
     pdp_zoom_setup();
+    pdp_scan_setup();
+    pdp_sdl_setup();
+    pdp_cheby_setup();
+
 
 }
 

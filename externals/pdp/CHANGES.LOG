@@ -1,4 +1,4 @@
-last modified: 2003/01/12
+last modified: 2003/02/03
 
 
 ChangeLog:
@@ -48,7 +48,16 @@ v0.7:	2003/01/12
 	added mmx code for pdp_gain
 	fixed bug in pdp_mix/pdp_mix2
 	fixed bug in pdp_bq (removed state reset)
-	move CA stuff to separate lib (see scaf/)
+	moved CA stuff to separate lib (see scaf/)
 	(0.7.1) fixed rgb colour conversion bug
 
-v0.8:	added pdp_scale, pdp_zoom
+v0.8:	2003/02/02
+	added pdp_scale, pdp_zoom, pdp_rotate, pdp_zrot, pdp_scan~, pdp_cheby
+	added support for 1D ca's + shift compensation in pdp_ca
+	thread processing is off by default now
+	added cursor method to pdp_xv, freq method to pdp_v4l (thanks CK)
+	added pdp_sdl (thanks Martin Pi)
+	added some example patches in doc/examples
+	(0.8.1) fixed scaf + gcc<3 compilation problem
+	(0.8.2) fixed compile prob + added documentation
+	(0.8.3) completed documentation

@@ -116,7 +116,7 @@ void pdp_route_setup(void)
 
 
     pdp_route_class = class_new(gensym("pdp_route"), (t_newmethod)pdp_route_new,
-    	(t_method)pdp_route_free, sizeof(t_pdp_route), 0, A_FLOAT, A_NULL);
+    	(t_method)pdp_route_free, sizeof(t_pdp_route), 0, A_DEFFLOAT, A_NULL);
 
 
     class_addmethod(pdp_route_class, (t_method)pdp_route_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);

@@ -27,7 +27,7 @@
 #X msg 463 191 tb 0;
 #X msg 501 191 bt 0;
 #X text 99 235 this uses pdp_bq as an allpass filter to produce a phase
-shift effect. 2nd inlet sets amount. 3rd and 4t inlets set directions.
+shift effect. 2nd inlet sets amount. 3rd and 4th inlets set directions.
 ;
 #X connect 0 0 2 0;
 #X connect 2 0 1 0;

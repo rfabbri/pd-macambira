@@ -14,7 +14,9 @@ pixel_biquad_s16.o \
 pixel_ca_s1.o \
 pixel_rand_s16.o \
 pixel_crot_s16.o \
-pixel_gain_s16.o
+pixel_gain_s16.o \
+pixel_resample_s16.o \
+pixel_cheby_s16.o
 
 all:	$(OBJ)
 
@@ -26,4 +28,5 @@ clean:
 	rm -f *~
 	rm -f pdp_mmx.a
 	rm -f pdp_mmx_test
+
 

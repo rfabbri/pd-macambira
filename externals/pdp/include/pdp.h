@@ -76,6 +76,20 @@ typedef struct
 #define PDP_IMAGE_RGBP   3  /* 48bpp: 16 bit planar RGB */
 #define PDP_IMAGE_MCHP   4  /* generic 16bit multi channel planar */
 
+/* ascii data packet */   
+typedef struct
+{
+    unsigned int encoding;  /* image encoding (data format ) */
+    unsigned int width;     /* image width in pixels */
+    unsigned int height;    /* image height in pixels */
+} t_ascii;
+
+
+/* image encodings */
+#define PDP_ASCII_BW     1  /* 8 bit per character black and white.*/
+#define PDP_ASCII_IBM    2  /* 16 bit per character colour (8 bit character, 8 bit colour, like good old text framebuffers.*/
+#define PDP_ASCII_RGB    3  /* 64 bit per character colour (8 bit character, 3x8 bit RGB */
+
 /*
 PDP_IMAGE_GREY = PDP_IMAGE_MCHP, channels = 1
 PDP_IMAGE_RGBP = PDP_IMAGE_MCHP, channels = 3
@@ -95,12 +109,13 @@ typedef struct
     unsigned int type;      /* datatype of this object */
     unsigned int size;      /* datasize including header */
     unsigned int users;     /* nb users of this object, readonly if > 1 */
-    unsigned int __pad__;
+    unsigned int __pad__;   /* pad to quad word size */
     union
     {
 	t_raw    raw;       /* raw subheader (for extensions unkown to pdp core system) */
 	t_image  image;     /* bitmap image */
 	//t_ca     ca;      /* cellular automaton state data */
+	t_ascii  ascii;     /* ascii packet */
     } info;
 
 } t_pdp;
@@ -108,7 +123,7 @@ typedef struct
 /* pdp data packet types */
 #define PDP_IMAGE            1  /* 16bit signed planar scanline encoded image packet */
 //RESERVED: #define PDP_CA   2  /* 1bit toroidial shifted scanline encoded cellular automaton */
-
+#define PDP_ASCII            3  /* ascii packet */
 
 
 

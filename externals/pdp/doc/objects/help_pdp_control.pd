@@ -1,0 +1,37 @@
+#N canvas 259 276 579 567 10;
+#X obj 237 316 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 237 406 pdp_control;
+#X msg 237 357 thread \$1;
+#X obj 48 54 pdp_help_input;
+#X msg 48 24 start;
+#X msg 105 24 stop;
+#X obj 48 205 pdp_help_output;
+#X obj 48 154 pdp_conv;
+#X floatatom 117 86 5 0 0;
+#X obj 79 350 osc~;
+#X floatatom 79 315 5 0 0;
+#X obj 79 419 osc~;
+#X floatatom 112 391 5 0 0;
+#X obj 79 449 dac~;
+#X obj 237 445 print;
+#X text 276 314 switch thread processing on or of;
+#X text 291 446 a pdp_drop message will be sent out;
+#X text 291 462 when a package is dropped;
+#X text 175 82 increase this with thread processing enabled \, no audio
+should be dropped. if you do it with thread processing enabled \, increasing
+it too much can lock up the machine when real time scheduling is enabled.
+;
+#X text 119 155 a convolution object to burn cycles;
+#X connect 0 0 2 0;
+#X connect 1 0 14 0;
+#X connect 2 0 1 0;
+#X connect 3 0 7 0;
+#X connect 4 0 3 0;
+#X connect 5 0 3 0;
+#X connect 7 0 6 0;
+#X connect 8 0 7 1;
+#X connect 9 0 11 0;
+#X connect 10 0 9 0;
+#X connect 11 0 13 0;
+#X connect 12 0 11 1;

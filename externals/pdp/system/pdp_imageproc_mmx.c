@@ -21,8 +21,10 @@
 
 /* this is a c wrapper around platform specific (mmx) code */
 #include <stdlib.h>
+#include <math.h>
 #include "pdp_mmx.h"
 #include "pdp_imageproc.h"
+#include "m_pd.h"
 
 // utility stuff
 inline static s16 float2fixed(float f)
@@ -317,3 +319,236 @@ void pdp_imageproc_random_process(void *x, s16 *image, u32 width, u32 height)
 }
 
 
+/* resampling stuff
+   this is quite a zoo of data structures
+   the major point is this: the resampler mmx code is shared for all resampling code
+   it uses data specified in t_resample_cbrd (Cooked Bilinear Resampler Data)
+
+   then the there are several feeder algorithms. one is the linear mapper. it's
+   data is specified in t_resample_clrd (Cooked Linear Remapper Data)
+
+   for each feeder algorithm, there are several high level algorithms. like zoom,
+   rotate, ... 
+*/
+
+typedef struct
+{
+    u32 lineoffset;
+    s16 *image;
+    u32 width;
+    u32 height;
+    
+} t_resample_id; // Image Data
+
+/* initialize image meta data (dimensions + location) */
+static void pdp_imageproc_resample_init_id(t_resample_id *x, u32 offset, s16* image, u32 w, u32 h)
+{
+    x->lineoffset = offset;
+    x->image = image;
+    x->width = w;
+    x->height = h;
+}
+
+// mmx resampling source image resampling data + coefs
+typedef struct
+{
+    // vector data for resampling routine (resampling computation)
+    u8  reserved[0x60];  //internal data
+    s16 *address[2];     //64 bit splatted offset address
+    s16 twowidthm1[4];   //64 bit splatted 2*(width-1)
+    s16 twoheightm1[4];  //64 bit splatted 2*(height-1)
+    s16 lineoffset[4];   //64 bit splatted line offset in pixels
+
+} t_resample_cid; // Cooked Image Data
+
+/* convert image meta data into a cooked format used by the resampler routine */
+static void pdp_imageproc_resample_init_cid(t_resample_cid *r, t_resample_id *i)
+{
+    u32 twowm1 = (i->width-1)<<1;
+    u32 twohm1 = (i->height-1)<<1;
+    r->address[0] = i->image;
+    r->address[1] = i->image;
+    r->twowidthm1[0] = twowm1;
+    r->twowidthm1[1] = twowm1;
+    r->twowidthm1[2] = twowm1;
+    r->twowidthm1[3] = twowm1;
+    r->twoheightm1[0] = twohm1;
+    r->twoheightm1[1] = twohm1;
+    r->twoheightm1[2] = twohm1;
+    r->twoheightm1[3] = twohm1;
+    r->lineoffset[0] = i->lineoffset;
+    r->lineoffset[1] = i->lineoffset;
+    r->lineoffset[2] = i->lineoffset;
+    r->lineoffset[3] = i->lineoffset;
+}
+
+// linear mapping data struct (zoom, scale, rotate, shear, ...)
+typedef struct
+{
+    s32 rowstatex[2]; // row state x coord
+    s32 rowstatey[2]; // row state y coord
+    s32 colstatex[2]; // column state x coord
+    s32 colstatey[2]; // column state y coord
+    s32 rowincx[2];   // row inc vector x coord
+    s32 rowincy[2];   // row inc vector y coord
+    s32 colincx[2];   // column inc vector x coord
+    s32 colincy[2];   // column inc vector y coord
+} t_resample_clmd; // Cooked Linear Mapping Data
+
+/* convert incremental linear remapping vectors to internal cooked format */
+static void pdp_imageproc_resample_cookedlinmap_init(t_resample_clmd *l, s32 sx, s32 sy, s32 rix, s32 riy, s32 cix, s32 ciy)
+{
+    l->colstatex[0] = l->rowstatex[0] = sx;
+    l->colstatex[1] = l->rowstatex[1] = sx + rix;
+    l->colstatey[0] = l->rowstatey[0] = sy;
+    l->colstatey[1] = l->rowstatey[1] = sy + riy;
+    l->rowincx[0] = rix << 1;
+    l->rowincx[1] = rix << 1;
+    l->rowincy[0] = riy << 1;
+    l->rowincy[1] = riy << 1;
+    l->colincx[0] = cix;
+    l->colincx[1] = cix;
+    l->colincy[0] = ciy;
+    l->colincy[1] = ciy;
+}
+
+
+/* this struct contains all the data necessary for
+   bilin interpolation from src -> dst image
+   (src can be == dst) */
+typedef struct
+{
+    t_resample_cid csrc;     //cooked src image meta data for bilinear interpolator
+    t_resample_id src;       //src image meta
+    t_resample_id dst;       //dst image meta
+} t_resample_cbrd;            //Bilinear Resampler Data
+
+
+/* this struct contains high level zoom parameters,
+   all image relative */
+typedef struct
+{
+    float centerx;
+    float centery;
+    float zoomx;
+    float zoomy;
+    float angle;
+} t_resample_zrd;
+
+
+/* convert floating point center and zoom data to incremental linear remapping vectors */
+static void pdp_imageproc_resample_clmd_init_from_id_zrd(t_resample_clmd *l, t_resample_id *i, t_resample_zrd *z)
+{
+    double izx = 1.0f / (z->zoomx);
+    double izy = 1.0f / (z->zoomy);
+    double scale = (double)0xffffffff;
+    double scalew = scale / ((double)(i->width - 1));
+    double scaleh = scale / ((double)(i->height - 1));
+    double cx = ((double)z->centerx) * ((double)(i->width - 1));
+    double cy = ((double)z->centery) * ((double)(i->height - 1));
+    double angle = z->angle * (-M_PI / 180.0);
+    double c = cos(angle);
+    double s = sin(angle);
+
+    /* affine x, y mappings in screen coordinates */
+    double mapx(double x, double y){return cx + izx * ( c * (x-cx) + s * (y-cy));}
+    double mapy(double x, double y){return cy + izy * (-s * (x-cx) + c * (y-cy));}
+
+    u32 tl_x = (u32)(scalew * mapx(0,0));
+    u32 tl_y = (u32)(scaleh * mapy(0,0));
+
+
+    u32 row_inc_x = (u32)(scalew * (mapx(1,0)-mapx(0,0)));
+    u32 row_inc_y = (u32)(scaleh * (mapy(1,0)-mapy(0,0)));
+    u32 col_inc_x = (u32)(scalew * (mapx(0,1)-mapx(0,0)));
+    u32 col_inc_y = (u32)(scaleh * (mapy(0,1)-mapy(0,0)));
+
+
+    pdp_imageproc_resample_cookedlinmap_init(l, tl_x, tl_y, row_inc_x, row_inc_y, col_inc_x, col_inc_y);
+}
+
+/* this struct contains all data for the zoom object */
+typedef struct
+{
+    t_resample_cbrd cbrd;      // Bilinear Resampler Data
+    t_resample_clmd clmd;      // Cooked Linear Mapping data
+    t_resample_zrd   zrd;      // Zoom / Rotate Data
+} t_resample_zoom_rotate;
+
+// zoom + rotate
+void *pdp_imageproc_resample_affinemap_new(void)
+{
+    t_resample_zoom_rotate *z = (t_resample_zoom_rotate *)malloc(sizeof(t_resample_zoom_rotate));
+    z->zrd.centerx = 0.5;
+    z->zrd.centery = 0.5;
+    z->zrd.zoomx = 1.0;
+    z->zrd.zoomy = 1.0;
+    z->zrd.angle = 0.0f;
+    return (void *)z;
+}
+void pdp_imageproc_resample_affinemap_delete(void *x){free(x);}
+void pdp_imageproc_resample_affinemap_setcenterx(void *x, float f){((t_resample_zoom_rotate *)x)->zrd.centerx = f;}
+void pdp_imageproc_resample_affinemap_setcentery(void *x, float f){((t_resample_zoom_rotate *)x)->zrd.centery = f;}
+void pdp_imageproc_resample_affinemap_setzoomx(void *x, float f){((t_resample_zoom_rotate *)x)->zrd.zoomx = f;}
+void pdp_imageproc_resample_affinemap_setzoomy(void *x, float f){((t_resample_zoom_rotate *)x)->zrd.zoomy = f;}
+void pdp_imageproc_resample_affinemap_setangle(void *x, float f){((t_resample_zoom_rotate *)x)->zrd.angle = f;}
+void pdp_imageproc_resample_affinemap_process(void *x, s16 *srcimage, s16 *dstimage, u32 width, u32 height)
+{
+    t_resample_zoom_rotate *z = (t_resample_zoom_rotate *)x;
+
+    /* setup resampler image meta data */
+    pdp_imageproc_resample_init_id(&(z->cbrd.src), width, srcimage, width, height);
+    pdp_imageproc_resample_init_id(&(z->cbrd.dst), width, dstimage, width, height);
+    pdp_imageproc_resample_init_cid(&(z->cbrd.csrc),&(z->cbrd.src)); 
+
+    /* setup linmap data from zoom_rotate parameters */
+    pdp_imageproc_resample_clmd_init_from_id_zrd(&(z->clmd), &(z->cbrd.src), &(z->zrd));
+
+
+    /* call assembler routine */
+    pixel_resample_linmap_s16(z);   
+}
+
+
+
+// polynomials
+
+
+typedef struct
+{
+    u32 order;
+    u8 pad[4];
+    s16 coefs[0];
+} t_cheby;
+
+void *pdp_imageproc_cheby_new(int order)
+{
+    t_cheby *z;
+    int i;
+    if (order < 2) order = 2;
+    z = (t_cheby *)malloc(sizeof(t_cheby) + (order + 1) * sizeof(s16[4]));
+    z->order = order;
+    setvec(z->coefs + 0*4, 0);
+    setvec(z->coefs + 1*4, 0.25);
+    for (i=2; i<=order; i++)  setvec(z->coefs + i*4, 0);
+
+    return z;
+}
+void pdp_imageproc_cheby_delete(void *x){free(x);}
+void pdp_imageproc_cheby_setcoef(void *x, u32 n, float f)
+{
+    t_cheby *z = (t_cheby *)x;
+    if (n <= z->order){
+	setvec(z->coefs + n*4, f * 0.25); // coefs are in s2.13 format
+    }
+}
+void pdp_imageproc_cheby_process(void *x, s16 *image, u32 width, u32 height, u32 iterations)
+{
+    t_cheby *z = (t_cheby *)x;
+    u32 i,j;
+    for (j=0; j < (height*width); j += width)
+	for (i=0; i<iterations; i++)
+	    pixel_cheby_s16_3plus(image+j, width>>2, z->order+1, z->coefs);
+
+    //pixel_cheby_s16_3plus(image, (width*height)>>2, z->order+1, z->coefs);
+}

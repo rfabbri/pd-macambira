@@ -64,11 +64,11 @@ static void pdp_control_thread(t_pdp_control *x, t_floatarg f)
     int t = (int)f;
 
     if (t){
-	post("pdp_control: switching on processing in thread");
+	post("pdp_control: pdp is now using its own processing thread");
 	pdp_queue_use_thread(1);
     }
     else {
-	post("pdp_control: switching off processing in thread");
+	post("pdp_control: pdp is now using the main pd thread");
 	pdp_queue_use_thread(0);
     }
 }

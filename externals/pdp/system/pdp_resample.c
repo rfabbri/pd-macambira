@@ -31,7 +31,10 @@ i.e. 16 bit virtual coordinates: easy modular addressing
 
 */
 
-s32 pdp_resample_bilin(s16 *image, s32 width, s32 height, s32 virt_x, s32 virt_y)
+
+/* code in this file should go out to be replaced by code in pdp_imageproc */
+
+static s32 pdp_resample_bilin(s16 *image, s32 width, s32 height, s32 virt_x, s32 virt_y)
 {
 
     s32 fp_x, fp_y, frac_x, frac_y, f, offset, r_1, r_2;
@@ -106,6 +109,7 @@ void pdp_resample_scale_nn(s16 *src_image, s16 *dst_image, s32 src_w, s32 src_h,
 
 }
 
+/* USE pdp_resample_affinemap
 void pdp_resample_zoom_tiled_bilin(s16 *src_image, s16 *dst_image, s32 w, s32 h, 
 				   float zoom_x, float zoom_y, float center_x_relative, float center_y_relative)
 {
@@ -132,4 +136,4 @@ void pdp_resample_zoom_tiled_bilin(s16 *src_image, s16 *dst_image, s32 w, s32 h,
     }
 
 }
-
+*/

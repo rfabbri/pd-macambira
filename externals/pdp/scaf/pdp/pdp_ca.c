@@ -35,6 +35,8 @@ t_class *pdp_image2ca_class;   // converter from grey/yv12 -> ca
 
 
 #define PDP_CA_STACKSIZE 256
+#define PDP_CA_MODE_1D 1
+#define PDP_CA_MODE_2D 2
 
 typedef struct pdp_ca_data_struct
 {
@@ -66,7 +68,13 @@ typedef struct pdp_ca_struct
     /* nb of iterations */
     int x_iterations;
 
+    /* shift ca on output */
+    int x_horshift;
+    int x_vershift;
 
+    /* operation mode */
+    int x_mode;
+    int x_fullscreen1d;
 
     /* aligned vector data */
     t_pdp_ca_data *x_data;
@@ -77,9 +85,95 @@ typedef struct pdp_ca_struct
 } t_pdp_ca;
 
 
+/* 1D: process from packet0 -> packet0 */
+static void pdp_ca_process_ca_1D(t_pdp_ca *x)
+{
+    t_pdp *header = pdp_packet_header(x->x_packet0);
+    unsigned int  *data   = (unsigned int *)pdp_packet_data  (x->x_packet0);
 
-/* process from packet0 -> packet1 */
-static void pdp_ca_process_ca(t_pdp_ca *x)
+    int width  = pdp_type_ca_info(header)->width;
+    int height = pdp_type_ca_info(header)->height;
+    int i;
+
+    unsigned int saved;
+
+    /* load TOS in middle of buffer to limit the effect of stack errors */
+    unsigned int *tos = &x->x_data->stack[2*(PDP_CA_STACKSIZE/2)];
+    unsigned int *env = &x->x_data->env[0];
+    unsigned int *reg = &x->x_data->reg[0];
+    void *ca_routine = x->x_ca_routine;
+    unsigned int rtos;
+
+    /* double word width: number of unsigned ints per row  */
+    int dwwidth = width >> 5;
+    int currow = pdp_type_ca_info(header)->currow;
+
+    unsigned long long result = 0;
+
+    unsigned short temp;
+    unsigned short *usdata;
+
+    /* set destination row to 4th row from top (ca time horizon is 3 deep) */
+    int dwrow0 = (((currow + height - 3) % height) * width) >> 5;
+    int dwrow1 = (((currow + height - 2) % height) * width) >> 5;
+    int dwrow2 = (((currow + height - 1) % height) * width) >> 5;
+    int dwrow3 = (currow * width) >> 5;
+
+    /* exit if there isn't a valid routine */
+    if(!ca_routine) return;
+
+
+    /* compute new row */
+    for(i=0; i < (dwwidth-1) ; i+=1){
+	env[0] = data[dwrow0 + i];
+	env[1] = data[dwrow0 + i + 1];
+	env[2] = data[dwrow1 + i];
+	env[3] = data[dwrow1 + i + 1];
+	env[4] = data[dwrow2 + i];
+	env[5] = data[dwrow2 + i + 1];
+	result = scaf_feeder(tos, reg, ca_routine, env);
+	data[dwrow3 + i] = result & 0xffffffff;
+    }
+    // i == dwwidth-1
+    
+    /* compute last column in row */
+    env[0] = data[dwrow0 + i];
+    env[1] = data[dwrow0];
+    env[2] = data[dwrow1 + i];
+    env[3] = data[dwrow1];
+    env[4] = data[dwrow2 + i];
+    env[5] = data[dwrow2];
+    result = scaf_feeder(tos, reg, ca_routine, env);
+    data[dwrow3 + i] = result & 0xffffffff;
+
+
+    /* undo the shift */
+    usdata = (unsigned short *)(&data[dwrow3]);
+    temp = usdata[(dwwidth*2)-1];
+    for (i = (dwwidth*2 - 1); i > 0; i--){
+	usdata[i] = usdata[i-1];
+    }
+    usdata[0] = temp;
+
+    /* check data stack pointer */
+    rtos = (unsigned int)tos;
+
+    if (env[0] != rtos){
+	if (env[0] > rtos) post("pdp_ca: ERROR: stack underflow detected in ca routine");
+	if (env[0] < rtos) post("pdp_ca: ERROR: ca routine returned more than one item");
+	x->x_ca_routine = 0;
+	post("pdp_ca: rule disabled");
+	
+    }
+
+    /* save current row */
+    pdp_type_ca_info(header)->currow = (currow + 1) % height;
+
+}
+
+
+/* 2D: process from packet0 -> packet1 */
+static void pdp_ca_process_ca_2D(t_pdp_ca *x)
 {
     t_pdp *header0 = pdp_packet_header(x->x_packet0);
     t_pdp *header1 = pdp_packet_header(x->x_packet1);
@@ -216,25 +310,66 @@ static void pdp_ca_bang_thread(t_pdp_ca *x)
    int encoding;
    int packet;
    int i;
+   int iterations =  x->x_iterations;
   
    /* invariant: the two packets are allways valid and compatible 
       so a bang is allways possible. this means that in the pdp an 
       invalid packet needs to be converted to a valid one */
 
-   for(i=0; i < x->x_iterations; i++){
+
+   if (PDP_CA_MODE_2D == x->x_mode){
+       for(i=0; i < iterations; i++){
       
-       /* process form packet0 -> packet1 and propagate */
-       pdp_ca_process_ca(x);
+	   /* process form packet0 -> packet1 */
+	   pdp_ca_process_ca_2D(x);
 
-       /* swap */
-       pdp_ca_swappackets(x);
-
+	   /* swap */
+	   pdp_ca_swappackets(x);
+       }
+   }
+   else if (PDP_CA_MODE_1D == x->x_mode){
+       if (x->x_fullscreen1d){
+	   t_pdp *header0 = pdp_packet_header(x->x_packet0);
+	   pdp_type_ca_info(header0)->currow = 0;
+	   pdp_type_ca_info(header0)->offset = 0;
+	   iterations = pdp_type_ca_info(header0)->height;
+       }
+       for(i=0; i < iterations; i++){
+ 
+	   pdp_ca_process_ca_1D(x);
+       }
    }
 
 }
 
 static void pdp_ca_sendpacket(t_pdp_ca *x)
 {
+
+    /* adjust offset before sending */
+    t_pdp *header0 = pdp_packet_header(x->x_packet0);
+
+    int offset = pdp_type_ca_info(header0)->offset;
+    int width  = pdp_type_ca_info(header0)->width;
+    int height = pdp_type_ca_info(header0)->height;
+    int xoffset = offset % width;
+    int yoffset = offset / width;
+
+    int horshift = x->x_horshift;
+    int vershift = x->x_vershift;
+
+    horshift %= width;
+    if (horshift < 0) horshift += width;
+    vershift %= height;
+    if (vershift < 0) vershift += height;
+
+    xoffset = (xoffset + horshift) % width;
+    yoffset = (yoffset + vershift) % height;
+    offset =  yoffset * width + xoffset;
+
+    pdp_type_ca_info(header0)->offset = offset;
+
+
+
    /* output the packet */
    outlet_pdp(x->x_outlet0, x->x_packet0);
 }
@@ -330,23 +465,22 @@ static void pdp_ca_input_1(t_pdp_ca *x, t_symbol *s, t_floatarg f)
 static void pdp_ca_rule_string(t_pdp_ca *x, char *c)
 {
     char tmp[256];
-    void (*prev_routine)(void);
+    void (*ca_routine)(void);
 
-    /* save previous routine ptr */
-    prev_routine = x->x_ca_routine;
 
     /* check if we can find string */
     sprintf(tmp, "rule_%s", c);
-    if (!(x->x_ca_routine = dlsym(x->x_ca_libhandle, tmp))){
+    if (!(ca_routine = dlsym(x->x_ca_libhandle, tmp))){
 	post("pdp_ca: can't fine ca rule %s (symbol: %s)", c, tmp);
-	x->x_ca_routine = x->x_ca_routine;
 	return;
     }
-
-    /* all seems ok */
-    //post("pdp_ca: using ca rule %s", c);
-   
+    /* ok, so store routine address */
+    else{
+	x->x_ca_routine = ca_routine;
+    }
 }
+
+
 static void pdp_ca_rule(t_pdp_ca *x, t_symbol *s)
 {
     /* make sure lib is loaded */
@@ -494,6 +628,8 @@ static void pdp_ca_newca(t_pdp_ca *x, t_float width, t_float height)
     pdp_type_ca_info(header)->width = w;
     pdp_type_ca_info(header)->height = h;
     pdp_type_ca_info(header)->offset = 0;
+    pdp_type_ca_info(header)->currow = 0; /* only used for 1D ca */
+
     x->x_packet1 = pdp_packet_clone_rw(x->x_packet0);
 
 
@@ -537,6 +673,32 @@ static void pdp_ca_iterations(t_pdp_ca *x, t_float f)
     x->x_iterations = i;
 }
 
+static void pdp_ca_horshift16(t_pdp_ca *x, t_float f)
+{
+    x->x_horshift = 16 * (int)f;
+}
+
+static void pdp_ca_vershift(t_pdp_ca *x, t_float f)
+{
+    x->x_vershift = (int)f;
+}
+
+static void pdp_ca_set1d(t_pdp_ca *x)
+{
+    x->x_mode = PDP_CA_MODE_1D;
+}
+
+static void pdp_ca_set2d(t_pdp_ca *x)
+{
+    x->x_mode = PDP_CA_MODE_2D;
+}
+
+static void pdp_ca_fullscreen1d(t_pdp_ca *x, t_floatarg f)
+{
+    if (f == 0.0f) x->x_fullscreen1d = 0;
+    if (f == 1.0f) x->x_fullscreen1d = 1;
+}
+
 static void pdp_ca_free(t_pdp_ca *x)
 {
     pdp_packet_mark_unused(x->x_packet0);
@@ -565,8 +727,13 @@ void *pdp_ca_new(void)
     x->x_ca_libhandle = 0;
     x->x_ca_rulename = 0;
 
+    x->x_horshift = 0;
+    x->x_vershift = 0;
+
     pdp_ca_newca(x, 64, 64);
     pdp_ca_iterations(x, 1);
+    pdp_ca_set2d(x);
+    pdp_ca_fullscreen1d(x, 0);
 
     x->x_packet_type = gensym("grey");
 
@@ -711,12 +878,17 @@ void pdp_ca_setup(void)
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_printrules, gensym("rules"), A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rand, gensym("random"), A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_newca, gensym("ca"), A_FLOAT, A_FLOAT, A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_horshift16, gensym("hshift16"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_vershift, gensym("vshift"), A_FLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_close, gensym("close"), A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_open, gensym("open"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rule, gensym("rule"),  A_SYMBOL, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_rule_index, gensym("ruleindex"),  A_FLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ca_class, (t_method)pdp_ca_input_1, gensym("pdp1"), A_SYMBOL, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_set1d, gensym("1D"), A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_set2d, gensym("2D"), A_NULL);
+    class_addmethod(pdp_ca_class, (t_method)pdp_ca_fullscreen1d, gensym("fullscreen1D"), A_FLOAT, A_NULL);
 
 }
 

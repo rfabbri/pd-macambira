@@ -38,11 +38,7 @@ typedef struct pdp_zoom_struct
     int x_dropped;
     int x_queue_id;
 
-    float x_zoom_x;
-    float x_zoom_y;
-
-    float x_center_x;
-    float x_center_y;
+    void *x_zoom;
 
     int x_quality; //not used
 
@@ -67,10 +63,10 @@ static void pdp_zoom_process_yv12(t_pdp_zoom *x)
     unsigned int voffset = size;
     unsigned int uoffset = size + (size>>2);
 
+    pdp_imageproc_resample_affinemap_process(x->x_zoom, src_image, dst_image, w, h);
+    pdp_imageproc_resample_affinemap_process(x->x_zoom, src_image+voffset, dst_image+voffset, w>>1, h>>1);
+    pdp_imageproc_resample_affinemap_process(x->x_zoom, src_image+uoffset, dst_image+uoffset, w>>1, h>>1);
 
-    pdp_resample_zoom_tiled_bilin(src_image, dst_image, w, h, x->x_zoom_x, x->x_zoom_y, x->x_center_x, x->x_center_y);
-    pdp_resample_zoom_tiled_bilin(src_image+voffset, dst_image+voffset, w>>1, h>>1, x->x_zoom_x, x->x_zoom_y, x->x_center_x, x->x_center_y);
-    pdp_resample_zoom_tiled_bilin(src_image+uoffset, dst_image+uoffset, w>>1, h>>1, x->x_zoom_x, x->x_zoom_y, x->x_center_x, x->x_center_y);
 
     return;
 }
@@ -89,7 +85,7 @@ static void pdp_zoom_process_grey(t_pdp_zoom *x)
     short int *src_image = (short int *)data0;
     short int *dst_image = (short int *)data1;
 
-    pdp_resample_zoom_tiled_bilin(src_image, dst_image, w, h, x->x_zoom_x, x->x_zoom_y, x->x_center_x, x->x_center_y);
+    pdp_imageproc_resample_affinemap_process(x->x_zoom, src_image, dst_image, w, h);
 
     return;
 
@@ -160,30 +156,35 @@ static void pdp_zoom_input_0(t_pdp_zoom *x, t_symbol *s, t_floatarg f)
 
 
 
-static void pdp_zoom_x(t_pdp_zoom *x, t_floatarg f)
+static void pdp_zoom_zoom_x(t_pdp_zoom *x, t_floatarg f)
 {
-    x->x_zoom_x = f;
+    pdp_imageproc_resample_affinemap_setzoomx(x->x_zoom, f);
 }
 
-static void pdp_zoom_y(t_pdp_zoom *x, t_floatarg f)
+static void pdp_zoom_angle(t_pdp_zoom *x, t_floatarg f)
 {
-    x->x_zoom_y = f;
+    pdp_imageproc_resample_affinemap_setangle(x->x_zoom, f);
 }
 
-static void pdp_zoom(t_pdp_zoom *x, t_floatarg f)
+static void pdp_zoom_zoom_y(t_pdp_zoom *x, t_floatarg f)
 {
-    pdp_zoom_x(x, f);
-    pdp_zoom_y(x, f);
+    pdp_imageproc_resample_affinemap_setzoomy(x->x_zoom, f);
+}
+
+static void pdp_zoom_zoom(t_pdp_zoom *x, t_floatarg f)
+{
+    pdp_zoom_zoom_x(x, f);
+    pdp_zoom_zoom_y(x, f);
 }
 
 static void pdp_zoom_center_x(t_pdp_zoom *x, t_floatarg f)
 {
-    x->x_center_x = (f + 0.5f);
+    pdp_imageproc_resample_affinemap_setcenterx(x->x_zoom, f);
 }
 
 static void pdp_zoom_center_y(t_pdp_zoom *x, t_floatarg f)
 {
-    x->x_center_y = (f + 0.5f);
+    pdp_imageproc_resample_affinemap_setcentery(x->x_zoom, f);
 }
 static void pdp_zoom_center(t_pdp_zoom *x, t_floatarg fx, t_floatarg fy)
 {
@@ -191,6 +192,7 @@ static void pdp_zoom_center(t_pdp_zoom *x, t_floatarg fx, t_floatarg fy)
     pdp_zoom_center_y(x, fy);
 }
 
+// not used
 static void pdp_zoom_quality(t_pdp_zoom *x, t_floatarg f)
 {
     if (f==0) x->x_quality = 0;
@@ -205,30 +207,69 @@ t_class *pdp_zoom_class;
 void pdp_zoom_free(t_pdp_zoom *x)
 {
     pdp_queue_finish(x->x_queue_id);
+    pdp_imageproc_resample_affinemap_delete(x->x_zoom);
     pdp_packet_mark_unused(x->x_packet0);
     pdp_packet_mark_unused(x->x_packet1);
 }
 
-void *pdp_zoom_new(t_floatarg fw, t_floatarg zoom)
+
+void pdp_zoom_init_common(t_pdp_zoom *x)
+{
+    x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    x->x_packet0 = -1;
+    x->x_packet1 = -1;
+    x->x_queue_id = -1;
+
+    x->x_zoom = pdp_imageproc_resample_affinemap_new();
+
+    //quality is not used: all routines are "high quality" bilinear
+    //pdp_zoom_quality(x, 1);
+    pdp_zoom_center_x(x, 0.5f);
+    pdp_zoom_center_y(x, 0.5f);
+  
+}
+
+
+void *pdp_zoom_new(t_floatarg zoom)
 {
     t_pdp_zoom *x = (t_pdp_zoom *)pd_new(pdp_zoom_class);
 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("zoom"));
 
-  
+    pdp_zoom_init_common(x);
 
-    x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    if (zoom == 0.0f) zoom = 1.0f;
+    pdp_zoom_zoom(x, zoom);
+    pdp_zoom_angle(x, 0.0f);
 
-    x->x_packet0 = -1;
-    x->x_packet1 = -1;
-    x->x_queue_id = -1;
+    return (void *)x;
+}
 
-    pdp_zoom_quality(x, 1);
-    pdp_zoom_center_x(x, 0);
-    pdp_zoom_center_y(x, 0);
+void *pdp_zrot_new(t_floatarg zoom, t_floatarg angle)
+{
+    t_pdp_zoom *x = (t_pdp_zoom *)pd_new(pdp_zoom_class);
 
-    if (zoom = 0.0f) zoom = 1.0f;
-    pdp_zoom(x, zoom);
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("zoom"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("angle"));
+
+    pdp_zoom_init_common(x);
+
+    if (zoom == 0.0f) zoom = 1.0f;
+    pdp_zoom_zoom(x, zoom);
+    pdp_zoom_angle(x, angle);
+
+    return (void *)x;
+}
+
+void *pdp_rotate_new(t_floatarg angle)
+{
+    t_pdp_zoom *x = (t_pdp_zoom *)pd_new(pdp_zoom_class);
+
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("angle"));
+
+    pdp_zoom_init_common(x);
+    pdp_zoom_zoom(x, 1.0f);
+    pdp_zoom_angle(x, angle);
 
     return (void *)x;
 }
@@ -243,18 +284,21 @@ extern "C"
 void pdp_zoom_setup(void)
 {
 
-
     pdp_zoom_class = class_new(gensym("pdp_zoom"), (t_newmethod)pdp_zoom_new,
-    	(t_method)pdp_zoom_free, sizeof(t_pdp_zoom), 0, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    	(t_method)pdp_zoom_free, sizeof(t_pdp_zoom), 0, A_DEFFLOAT, A_NULL);
+
+    class_addcreator((t_newmethod)pdp_zrot_new, gensym("pdp_zrot"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addcreator((t_newmethod)pdp_rotate_new, gensym("pdp_rotate"), A_DEFFLOAT, A_NULL);
 
 
     class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_quality, gensym("quality"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_center_x, gensym("centerx"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_center_y, gensym("centery"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_center, gensym("center"),  A_FLOAT, A_FLOAT, A_NULL);   
-    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_x, gensym("zoomx"),  A_FLOAT, A_NULL);   
-    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_y, gensym("zoomy"),  A_FLOAT, A_NULL);   
-    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom, gensym("zoom"),  A_FLOAT, A_NULL);   
+    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_zoom_x, gensym("zoomx"),  A_FLOAT, A_NULL);   
+    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_zoom_y, gensym("zoomy"),  A_FLOAT, A_NULL);   
+    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_zoom, gensym("zoom"),  A_FLOAT, A_NULL);   
+    class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_angle, gensym("angle"),  A_FLOAT, A_NULL);   
     class_addmethod(pdp_zoom_class, (t_method)pdp_zoom_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
 
 }

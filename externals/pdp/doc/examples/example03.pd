@@ -8,16 +8,16 @@
 #X floatatom 240 518 5 0 0;
 #X obj 68 514 pdp_blur;
 #X obj 243 499 hsl 128 15 0 1 0 1 empty empty empty -2 -6 0 8 -262144
--1 -1 2400 1;
+-1 -1 5600 1;
 #X floatatom 240 367 5 0 0;
 #X obj 243 342 hsl 128 15 0 5 0 1 empty empty empty -2 -6 0 8 -262144
--1 -1 4400 1;
+-1 -1 500 1;
 #X floatatom 240 587 5 0 0;
 #X obj 243 567 hsl 128 15 0 1 0 1 empty empty empty -2 -6 0 8 -262144
--1 -1 5400 1;
+-1 -1 12700 1;
 #X floatatom 239 428 5 0 0;
 #X obj 242 409 hsl 128 15 -5 5 0 1 empty empty empty -2 -6 0 8 -262144
--1 -1 4200 1;
+-1 -1 8700 1;
 #X msg 15 460 reset;
 #X obj 68 459 pdp_add;
 #X obj 68 357 pdp_gain;
@@ -49,8 +49,8 @@ signals is easily drawn. this network can be seen as a nonlinear feedback
 delay network. (nonlinear because of the saturating gain). the image
 delay line can be seen as a parallel delay line \, one for each pixel.
 coupling between the delays is done using a spatial blur effect. the
-additional temporal filtering in't necessary \, but it produces a nice
-additional effect.;
+additional temporal filtering isn't necessary \, but it produces a
+nice additional effect.;
 #X connect 0 0 16 0;
 #X connect 1 0 0 0;
 #X connect 2 0 1 0;

@@ -297,7 +297,7 @@ void pdp_queue_setup(void)
   curr = 0;
   q = getbytes(PDP_QUEUE_SIZE * sizeof(*q));
 
-  /* use threads by default */
+  /* enable threads */
   use_thread = 1;
 
   /* setup synchro stuff */
@@ -323,6 +323,9 @@ void pdp_queue_setup(void)
   pthread_create(&thread_id, &attr, pdp_queue_thread, (void *)0);
 
 
+
+  /* set default disable/enable thread here */
+  pdp_queue_use_thread(0);
 
 }
 

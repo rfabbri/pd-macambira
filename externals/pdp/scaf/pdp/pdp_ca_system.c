@@ -87,16 +87,16 @@ if (srcindex >= (s >> 4)) post ("pdp_type_ca2grey: srcindex out of bound");
 if ((x+y) >= s) post ("pdp_type_ca2grey: dstindex out of bound");
 
 
-    /* dont' shift offset */
+    /* debug : dont' shift offset 
     if (0){
-	for(y=0; y< (h*w); y+=w){
-	    for(x=0; x<w; x+=16){
-		 _pdp_type_ca2grey_convert_word (source[(x+y)>>4],  &dest[x+y]);
-	    }
-	}
-	return newpacket;
+       for(y=0; y< (h*w); y+=w){
+          for(x=0; x<w; x+=16){
+	    _pdp_type_ca2grey_convert_word (source[(x+y)>>4],  &dest[x+y]);
+	  }
+       }
+       return newpacket;
     }
-
+    */
 
     /* create top left */
     for (y=0; y < (h*w) - yoffset; y+=w) { 

@@ -1,0 +1,29 @@
+#N canvas 303 183 708 385 10;
+#X obj 29 328 pdp_xv;
+#X msg 132 223 dim 320 240;
+#X msg 132 246 dim 640 480;
+#X text 271 226 dim sets the window dimensions;
+#X msg 132 177 create;
+#X msg 132 198 destroy;
+#X text 130 114 pdp_xv ouputs video in a window using the xVideo extension.
+if your graphics card/driver supports it you can have multiple output
+windows. if a pdp message is received and a window is not open \, one
+is created automaticly.;
+#X text 271 180 use these messages to explicitly create/destroy the
+window;
+#X msg 134 294 cursor \$1;
+#X obj 134 274 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 270 294 enables/disables cursor in xv window;
+#X obj 29 61 pdp_help_input;
+#X msg 29 25 start;
+#X msg 78 24 stop;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 8 0;
+#X connect 11 0 0 0;
+#X connect 12 0 11 0;
+#X connect 13 0 11 0;

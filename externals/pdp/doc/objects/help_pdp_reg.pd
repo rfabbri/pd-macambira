@@ -1,0 +1,20 @@
+#N canvas 623 480 596 300 10;
+#X obj 41 171 pdp_reg;
+#X obj 41 140 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 85 15 start;
+#X msg 135 15 stop;
+#X obj 85 53 pdp_help_input;
+#X obj 41 240 pdp_help_output;
+#X text 113 144 pdp_reg works in the same way as the pd float or int
+objects;
+#X text 263 178 bang: sends stored packet to output;
+#X text 263 163 pdp: stores packet and sends to output;
+#X text 263 199 pdp: stores a new packet;
+#X text 112 164 left intlet (hot):;
+#X text 112 199 right intlet (cold):;
+#X connect 0 0 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 4 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 1;

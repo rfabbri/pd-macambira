@@ -5,29 +5,34 @@ bugs:
 (workaround: use a multiple of 8x8 to prevent this. ca dims should be a multiple of 64x2)
 * pdp_xv: catch sigpipe when window is closed (workaround: don't close the video windows manually ;)
 
-todo 0.8:
-* rotate
-* crop, shift (pad+scroll)
+todo 0.9:
+
+* improve scanned synthesis (method to specify scanning path)
+* solve image dimension problenms for sources
+* ascii art packet stuff (yves?)
+* add real trigger object (problem with 3 phase protocol ?)
+* add shear -> simplify code to use general affine 2d transformations
+* displacement warp, substitution warp
 * efficient rescalers: pdp_double pdp_halve
 * move float color conversion and float<->fixed point conv code to system
-* thresholding / color "waveshaping"
-* documentation (+cleanup)
+* add mouse pointer code to pdp_xv
+* crop, shift (pad+scroll)
 
 todo:
 
+* thresholding
+* find out why resampling code (warping) is so slow (reg->mem->reg->mem stalls?)
 * add audio resampling in pdp_qt~
-* clean up and add some ca rules
-* add some more abstractions to have faster acces to different modes of all the modules
+* add some more abstractions
 * fix dimension problems on input (for now, make sure images have correct dim, else generate error)
 * use pd_error instead of post for errors
-* finish documentation
-* add developer documentation
 * move to autoconf/automake/libtool
 * interface with gem
 * think about the memory allocation strategy (there is no garbage collection right now)
-* add general x window display code (hmm, this is more hassle than i thought..)
 
 wish list:
+
 * colour keying
 * camera controller (motion tracking ?)
+* moebius transforms  (integer inverse square root??) & other complex plane stuff
 
