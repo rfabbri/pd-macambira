@@ -1365,8 +1365,12 @@ void cooled_tilde_setup(void)
     cooled_widgetbehavior.w_deletefn =     cooled_delete;
     cooled_widgetbehavior.w_visfn =        cooled_vis;
     cooled_widgetbehavior.w_clickfn =      cooled_click;
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37 || !defined(PD_MINOR_VERSION)
     cooled_widgetbehavior.w_propertiesfn = cooled_properties;
     cooled_widgetbehavior.w_savefn =       cooled_save;
+#endif
+#endif
 
     CLASS_MAINSIGNALIN( cooled_class, t_cooled, x_f );
     class_addmethod(cooled_class, (t_method)cooled_dsp, gensym("dsp"), A_NULL);

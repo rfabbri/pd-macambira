@@ -37,8 +37,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include <m_pd.h>
-
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -1050,8 +1049,13 @@ void audience_tilde_setup(void)
     audience_widgetbehavior.w_deletefn =     audience_delete;
     audience_widgetbehavior.w_visfn =        audience_vis;
     audience_widgetbehavior.w_clickfn =      audience_click;
+#if PD_MAJOR_VERSION == 0 
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     audience_widgetbehavior.w_propertiesfn = audience_properties;
     audience_widgetbehavior.w_savefn =       audience_save;
+#endif
+#endif
+
     class_setwidget(audience_class_tilde, &audience_widgetbehavior);
     class_sethelpsymbol(audience_class_tilde, gensym("help-audience~.pd"));
 }
