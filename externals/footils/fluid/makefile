@@ -21,6 +21,8 @@ LIBPATH=
 FLAGS=-DPD 
 CFLAGS=-O6 -mcpu=pentiumpro
 LIBS=m 
+STRIP = strip --strip-unneeded -R .note -R .comment
+
 
 # the rest can stay untouched
 # ----------------------------------------------
@@ -50,6 +52,7 @@ $(OUTPATH)/%.o : %/main.cpp
 
 $(OUTPATH)/%.pd_linux : $(OUTPATH)/%.o 
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%,$(LIBPATH)) $^ $(patsubst %,-l%,$(LIBS)) $(FLUIDLIB) $(FLEXTLIB) -o $@
+	$(STRIP) $@
 	chmod 755 $@
 
 
