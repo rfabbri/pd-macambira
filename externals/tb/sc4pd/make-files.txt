@@ -3,4 +3,5 @@ SRCDIR = source
 SRCS= \
         main.cpp  Dust.cpp MantissaMask.cpp Hasher.cpp Median.cpp \
 	BrownNoise.cpp ClipNoise.cpp GrayNoise.cpp WhiteNoise.cpp \
-	PinkNoise.cpp Dust2.cpp Crackle.cpp
+	PinkNoise.cpp Dust2.cpp Crackle.cpp Rand.cpp TRand.cpp TExpRand.cpp \
+	IRand.cpp TIRand.cpp

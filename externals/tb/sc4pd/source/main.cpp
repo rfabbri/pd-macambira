@@ -1,4 +1,5 @@
-/* sc4pd    library initialization
+/* sc4pd
+   library initialization
 
    Copyright (c) 2004 Tim Blechmann.               
 
@@ -51,7 +52,8 @@ void sc4pd_library_setup()
     post("contains: Dust(~), MantissaMask(~), Hasher(~), Median(~), "
 	 "BrownNoise(~),\n"
 	 "          ClipNoise(~), GrayNoise(~), Dust2(~), WhiteNoise(~), "
-	 "PinkNoise(~), \n          Crackle(~), Rand(~)\n");
+	 "PinkNoise(~), \n          Crackle(~), Rand(~), TRand(~), "
+	 "TExpRand(~), IRand(~), TIRand(~)\n");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -90,6 +92,17 @@ void sc4pd_library_setup()
     FLEXT_DSP_SETUP(Rand_ar);
     FLEXT_SETUP(Rand_kr);
 
+    FLEXT_DSP_SETUP(TRand_ar);
+    FLEXT_SETUP(TRand_kr);
+
+    FLEXT_DSP_SETUP(TExpRand_ar);
+    FLEXT_SETUP(TExpRand_kr);
+
+    FLEXT_DSP_SETUP(IRand_ar);
+    FLEXT_SETUP(IRand_kr);
+
+    FLEXT_DSP_SETUP(TIRand_ar);
+    FLEXT_SETUP(TIRand_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);
