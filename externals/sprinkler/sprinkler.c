@@ -58,13 +58,14 @@ static char sprinkler_errbuf[EBUFSIZE];
  * Structures and Types
  *=====================================================================*/
 
-static char *sprinkler_version = "\nsprinkler version 0.03 by Bryan Jurish : dynamic message dissemination";
+static char *sprinkler_banner = "\nsprinkler version %s by Bryan Jurish : dynamic message dissemination";
 
 static t_class *sprinkler_class;
 
 typedef struct _sprinkler
 {
-    t_object x_obj;
+  t_object x_obj;
+  t_outlet *x_thru; //-- pass-through outlet
 } t_sprinkler;
 
 
@@ -98,7 +99,12 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
 	pd_typedmess(dst->s_thing,&s_float,argc,argv);
 	return;
       case A_SYMBOL:
-	pd_typedmess(dst->s_thing,&s_symbol,argc,argv);
+	//-- special handling for 'bang'
+	if (argv->a_w.w_symbol == &s_bang) {
+	  pd_typedmess(dst->s_thing,&s_bang,0,0);
+	} else {
+	  pd_typedmess(dst->s_thing,&s_symbol,argc,argv);
+	}
 	return;
       case A_POINTER:
 	pd_typedmess(dst->s_thing,&s_pointer,argc,argv);
@@ -115,12 +121,16 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
       case A_CANT:
       default:
 	// just fall though
-		  ;	// empty statement to keep VC++ happy
       }
     }
     // default -- sprinkler anything else with 'pd_forwardmess'
     pd_forwardmess(dst->s_thing,argc,argv);
+    return;
   }
+
+  //post("sprinkler: no destination for `%s'", dst ? dst->s_name : "(null)");
+  //-- pass through
+  outlet_anything(x->x_thru, dst, argc, argv);
 }
 
 static void sprinkler_list(t_sprinkler *x, t_symbol *s, int argc, t_atom *argv)
@@ -131,10 +141,19 @@ static void sprinkler_list(t_sprinkler *x, t_symbol *s, int argc, t_atom *argv)
   sprinkler_anything(x,atom_getsymbol(argv),--argc,++argv);
 }
 
+
+/*--------------------------------------------------------------------
+ * newmethod, freemethod
+ */
 void *sprinkler_new(t_symbol *s)
 {
     t_sprinkler *x = (t_sprinkler *)pd_new(sprinkler_class);
+    x->x_thru = outlet_new(&x->x_obj, &s_anything);
     return (x);
+}
+
+void sprinkler_free(t_sprinkler *x) {
+  outlet_free(x->x_thru);
 }
 
 /*--------------------------------------------------------------------
@@ -142,8 +161,12 @@ void *sprinkler_new(t_symbol *s)
  *--------------------------------------------------------------------*/
 void sprinkler_setup(void)
 {
-  post(sprinkler_version);
-  sprinkler_class = class_new(gensym("sprinkler"), (t_newmethod)sprinkler_new, 0, sizeof(t_sprinkler), 0, 0);
+  post(sprinkler_banner, PACKAGE_VERSION);
+  sprinkler_class = class_new(gensym("sprinkler"),
+			      (t_newmethod)sprinkler_new,
+			      (t_method)sprinkler_free,
+			      sizeof(t_sprinkler),
+			      0, 0);
 
 #ifdef NON_MAX_FORWARD
   // add aliases [forward] and [fw]

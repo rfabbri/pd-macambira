@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl -- adapted from 'configure.in' in ggee distribution by Guenter Geiger
 AC_PREREQ(2.5)
-AC_INIT(sprinkler, [0.04], [moocow@ling.uni-potsdam.de])
+AC_INIT(sprinkler, [0.05], [moocow@ling.uni-potsdam.de])
 
 dnl
 dnl Programs, prefix
@@ -89,14 +89,14 @@ if test "$enable_forward" == "yes" ; then
   NON_MAX_FORWARD="yes"
   DFLAGS="$DFLAGS -DNON_MAX_FORWARD"
   SPRINKLER_COMPAT_TEXT=["(with MAX-incompatible [forward] alias)"]
-  SPRINKLER_ALIAS_1="#X obj 102 327 forward;"
-  SPRINKLER_ALIAS_2="#X obj 102 352 fw;"
+  SPRINKLER_ALIAS_1="#X obj 102 407 forward;"
+  SPRINKLER_ALIAS_2="#X obj 102 432 fw;"
 else
   AC_MSG_RESULT(no)
   NON_MAX_FORWARD="no"
   SPRINKLER_COMPAT_TEXT=["(formerly MAX-incompatible \[forward\])"]
-  SPRINKLER_ALIAS_1="#X text 102 327 none;"
-  SPRINKLER_ALIAS_2="#X text 102 352 (disabled);"
+  SPRINKLER_ALIAS_1="#X text 102 407 none;"
+  SPRINKLER_ALIAS_2="#X text 102 432 (disabled);"
 fi
 AC_SUBST(NON_MAX_FORWARD)
 AC_SUBST(SPRINKLER_COMPAT_TEXT)

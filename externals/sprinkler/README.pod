@@ -2,8 +2,6 @@
 
 README for pd external 'sprinkler' (formerly 'forward')
 
-Last updated for sprinkler v0.04
-
 =head1 DESCRIPTION
 
 'sprinkler' objects do dynamic control-message dissemination.
