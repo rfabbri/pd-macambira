@@ -20,8 +20,10 @@ avail | xovo | externals/grill
 # so changes here would have to be merged
 unavail |  | externals/maxlib
 avail | eighthave,olafmatt | externals/maxlib
+
+# Thomas joined the SourceForge project and is maintaining this now (yay!)
 unavail |  | externals/iemlib
-avail | eighthave,zmoelnig | externals/iemlib
+avail | tmusil | externals/iemlib
 
 # restrict the MAIN branch of "pd" to prevent accidental 
 # commits that should go to devel_0_37 or impd_0_37
