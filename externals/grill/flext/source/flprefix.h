@@ -371,7 +371,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	#define FLEXT_CLASSDEF(CL) CL##_single
 #endif
 
-
 // std namespace
 #ifdef __MWERKS__
 #define STD std
