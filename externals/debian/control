@@ -1,9 +1,9 @@
 Source: pd-externals
-Section: unknown
+Section: sound
 Priority: optional
 Maintainer: Guenter Geiger <geiger@debian.org>
 Build-Depends: debhelper (>> 3.0.0), pd, libsndobj-dev
-Standards-Version: 3.5.2
+Standards-Version: 3.8.0
 
 Package: pd-zexy
 Architecture: any

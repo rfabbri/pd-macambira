@@ -17,8 +17,8 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
-orig:
-	(cd ..;tar czvf pd-externals-00.`date +%Y%m%d`)
+orig: clean
+	(cd ..;tar czvf pd-externals_00.`date +%Y%m%d`.orig.tar.gz pd-externals)
 
 
 configure: configure-stamp
@@ -28,9 +28,6 @@ configure-stamp:
 
 	touch configure-stamp
 
-orig: clean
-	cd ..;tar --exclude=CVS -czvf pd-externals_0.3.orig.tar.gz pd-externals
-	
 
 build: build-stamp
 
@@ -63,11 +60,10 @@ build-stamp: configure-stamp
 	(cd OSCx/libOSC;$(MAKE))
 	(cd OSCx/OSC; $(MAKE))
 
-        #
+        # build PDP
 	
 	(cd pdp;autoconf;./configure;$(MAKE))
-
-        #/usr/bin/docbook-to-man debian/pd-externals.sgml > pd-externals.1
+	(cd pdp/scaf/;autoconf;./configure;$(MAKE))
 
 	touch build-stamp
 
@@ -83,6 +79,12 @@ clean:
 	-rm `find . -name "*.dll"`
 	-rm `find . -name "*.obj"` 
 
+	# fix up wrong permissions
+	
+	chmod 644 `find . -name "*.h"`
+	chmod 644 `find . -name "*.c"`
+	chmod 644 `find . -name "*.pd"`
+
 	# Add here commands to clean up after the build process.
 	-(cd build/linux;$(MAKE) clean)
 
@@ -95,7 +97,15 @@ clean:
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
 #
-	(cd pdp;autoconf;./configure;$(MAKE) mrproper)
+	-(cd pdp/scaf;$(MAKE) clean)
+	-(cd pdp/scaf;$(MAKE) mrproper)
+	-(cd pdp;$(MAKE) clean)
+	-(cd pdp;rm -rf configure \
+	            config.log \
+	            config.status \
+	            autom4te.cache \
+	            Makefile.config)
+		    
 
 	dh_clean
 
@@ -107,6 +117,8 @@ install: build
 
 	# Add here commands to install the package into debian/pd-externals.
 	(cd build/linux; $(MAKE) install DESTDIR=$(CURDIR)/debian/tmp)
+	(rm -r `find $(CURDIR)/debian/tmp/ -name CVS`)
+	
 	(cd zexy/src; $(MAKE) -f makefile.linux install DESTDIR=$(CURDIR)/debian/tmp \
 	                              INSTALL_PREFIX=/usr/ \
 				      PDLIBDIR=lib/pd )
@@ -119,7 +131,7 @@ install: build
 	# Install OSC
 
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
-	install OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
+	install -m 644 OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
 	# install pdp (needs /usr/lib/extern)
 	

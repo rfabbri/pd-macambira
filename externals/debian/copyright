@@ -1,10 +1,10 @@
 This package was debianized by Guenter Geiger <geiger@debian.org> on
 Wed,  6 Nov 2002 12:38:33 +0100.
 
-It was downloaded from <pure-data.sf.net>
-
-Upstream Author(s): <several>
+Downloaded from <pure-data.sf.net>
 
 Copyright:
 
-This is GPL.
+This software is distributed under the GPL version 2 
+(see /usr/share/common-licenses/GPL-2).
+
