@@ -159,6 +159,7 @@ void fluid::fluid_load(int argc, t_atom *argv)
 		if ( fluid_synth_sfload(synth, filename, 0) >= 0)
 		{
 			post("Loaded Soundfont: %s", filename);
+			fluid_synth_program_reset(synth);
 		}
 	}
 }
