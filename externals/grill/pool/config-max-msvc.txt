@@ -4,7 +4,7 @@
 
 # where is the Max SDK?
 # you should have the latest version!
-MAXSDKPATH="F:\prog\audio\MaxWinSDK\c74support"	
+MAXSDKPATH="F:\prog\audio\maxmspsdk_win\4.5 headers\c74support"	
 
 # where do the flext libraries reside?
 FLEXTPATH="%CommonProgramFiles%\Cycling '74\flext"

@@ -19,7 +19,7 @@ FLAGS=-DFLEXT_SYS=2
 CFLAGS=-O2 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
 LIBS=m
 FRAMEWORKS=Carbon
-LDFLAGS+=-bundle -bundle_loader $(PD)
+LDFLAGS+=-Wl,-x -Wl,-S -bundle -bundle_loader $(PD)
 
 ifdef FLEXT_SHARED
 CFLAGS+=-dynamic -DFLEXT_SHARED

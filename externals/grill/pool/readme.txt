@@ -9,17 +9,6 @@ Visit https://www.paypal.com/xclick/business=t.grill%40gmx.net&item_name=pool&no
 
 ----------------------------------------------------------------------------
 
-You will need the flext C++ layer for PD and Max/MSP externals to compile this.
-see http://grrrr.org/ext
-
-
-Package files:
-- readme.txt: this one
-- gpl.txt,license.txt: GPL license stuff
-- main.cpp, pool.h, pool.cpp, data.cpp
-
-----------------------------------------------------------------------------
-
 Goals/features of the package:
 
 - pool can store and retrieve key/value pairs, where a key can be any atom and 
@@ -28,6 +17,41 @@ Goals/features of the package:
 - pool objects can be named and then share their data space
 - clipboard operations are possible in a pool or among several pools
 - file operations can load/save data from disk
+
+----------------------------------------------------------------------------
+
+IMPORTANT INFORMATION for all PD users:
+
+Put the pd-msvc/pool.dll, pd-linux/pool.pd_linux or pd-darwin/pool.pd_darwin file
+into the extra folder of the PD installation, or use a -path or -lib option 
+at PD startup to find the pool external.
+
+Put the help-pool.pd file into the doc\5.reference subfolder of your PD installation.
+
+----------------------------------------------------------------------------
+
+IMPORTANT INFORMATION for all Max/MSP users:
+
+For Mac OSX put the max-osx/pool.mxd file into the folder 
+/Library/Application Support/Cycling '74/externals
+
+For Mac OS9 put the max-os9/pool.mxe file into the externals subfolder of your Max/MSP installation
+
+For Windows put the max-msvc\pool.mxe file into the folder
+C:\program files\common files\Cycling '74\externals (english version)
+
+Put the pool.help file into the max-help folder.
+
+============================================================================
+
+You will need the flext C++ layer for PD and Max/MSP externals to compile the source distribution.
+see http://grrrr.org/ext
+
+
+Package files:
+- readme.txt: this one
+- gpl.txt,license.txt: GPL license stuff
+- main.cpp, pool.h, pool.cpp, data.cpp
 
 ----------------------------------------------------------------------------
 
@@ -58,7 +82,7 @@ Max/MSP - Windows:
 o Microsoft Visual C++ 6/7: edit "config-max-msvc.txt" & run "build-max-msvc.bat" 
 
 
-----------------------------------------------------------------------------
+============================================================================
 
 Version history:
 

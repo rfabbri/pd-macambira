@@ -8,7 +8,7 @@
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDPATH=/usr/local/lib/pd/src
+# PDPATH=/usr/local/lib/pd/src
 
 # where is the PD executable?
 PD=/usr/local/bin/pd
@@ -25,9 +25,9 @@ INSTPATH=/usr/local/lib/pd/extra
 
 # additional compiler flags
 # (check if they match your system!)
-UFLAGS=-malign-power -maltivec
+UFLAGS=-malign-power -maltivec -faltivec
 
 # use shared flext library
-FLEXT_SHARED=1
+#FLEXT_SHARED=1
 
 
