@@ -13,15 +13,18 @@ all: filelist.inc link.stamp $(EXTERNALS:.c=.dll)
 PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
 VC="C:\Program Files\Microsoft Visual Studio\Vc98"
 SRCPATH=..\src
+PDPATH=..\..\..\pd
 
-PDNTINCLUDE = /I. /I.. /I..\..\..\pd\src /I$(VC)\include
+PDNTINCLUDE = /I. /I.. /I..\..\..\pd\src /I$(VC)\include /I..\..\creb\include
 
 PDNTLDIR = $(VC)\lib
 PDNTLIB = $(PDNTLDIR)\libc.lib \
 	$(PDNTLDIR)\oldnames.lib \
 	$(PDNTLDIR)\kernel32.lib \
-	$(PDNTLDIR)\wsock32.lib \
-	..\..\..\pd\bin\pd.lib 
+	$(PDNTLDIR)\uuid.lib \
+	$(PDNTLDIR)\ws2_32.lib \
+	$(PDPATH)\bin\pthreadVC.lib \
+	$(PDPATH)\bin\pd.lib 
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
@@ -35,7 +38,7 @@ filelist.inc:
 
 transfer:
 	copy $(SRCPATH)\*.c .
-	
+
 link.stamp: filelist.inc
 	copy $(SRCPATH)\*.c .
 	copy /y nul link.stamp
@@ -45,7 +48,7 @@ clean:
 # don't delete filelist.inc at the moment, as some externals can't be compiled
 # on win32
 	-del link.stamp
- 	-del *.c	
+	-del *.c	
 	-del *.obj
 	-del *.lib
 	-del *.exp
