@@ -2,6 +2,7 @@
 
 
 #include <m_imp.h>
+
 #ifdef NT
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
@@ -32,7 +33,6 @@
 
 #define RAWMOUSE_AXES     3
 #define RAWMOUSE_BUTTONS  7
-#define MAX_AXIS_OUTS     5
 
 /* from <linux/input.h>
 // button types
@@ -162,9 +162,14 @@ static int rawmouse_open(t_rawmouse *x,t_symbol* s)
 
   rawmouse_close(x);
 
-  /* set obj device name to parameter */  
+  /* set obj device name to parameter 
+   * otherwise set to default
+   */  
   if (s != &s_)
     x->x_devname = s;
+  else {
+    post("You need to set a input device (i.e /dev/input/event0)");
+  }
   
   /* open device */
   if (x->x_devname) {
@@ -229,6 +234,10 @@ static int rawmouse_open(t_rawmouse *x,t_symbol* s)
   }
     
   post ("\nUsing %d axes and %d buttons.", x->x_axes, x->x_buttons);
+  post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
+  post ("This object is under development!  The interface could change at anytime!");
+  post ("As I write cross-platform versions, the interface might have to change.");
+  post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
     
   return 1;
 }
