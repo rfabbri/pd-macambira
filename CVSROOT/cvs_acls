@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/perl
 # -*-Perl-*-
 #
 # Access control lists for CVS.  dgg@ksr.com (David G. Grubbs)
