@@ -1,0 +1,12 @@
+max v2;
+#N vpatcher 40 55 440 355;
+#P newex 50 149 85 196617 vasp.- 3.141593;
+#P newex 50 120 101 196617 vasp.% 6.283185;
+#P newex 50 88 134 196617 vasp.+ 3.141593;
+#P outlet 50 223 15 0;
+#P inlet 50 49 15 0;
+#P connect 0 0 2 0;
+#P connect 2 0 3 0;
+#P connect 3 0 4 0;
+#P connect 4 0 1 0;
+#P pop;

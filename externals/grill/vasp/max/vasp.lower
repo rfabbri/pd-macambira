@@ -1,0 +1,18 @@
+max v2;
+#N vpatcher 40 55 215 336;
+#P newex 53 156 32 196617 + 0.9;
+#P newex 14 180 64 196617 vasp.frames;
+#P newex 53 135 27 196617 / 2;
+#P newex 53 110 70 196617 vasp.frames?;
+#P newex 14 79 64 196617 vasp.multi 2;
+#P outlet 14 208 15 0;
+#P inlet 15 54 15 0;
+#P comment 16 34 100 196617 lower half of a vasp;
+#P connect 1 0 3 0;
+#P connect 3 0 6 0;
+#P connect 6 0 2 0;
+#P connect 3 1 4 0;
+#P connect 4 0 5 0;
+#P connect 5 0 7 0;
+#P connect 7 0 6 1;
+#P pop;
