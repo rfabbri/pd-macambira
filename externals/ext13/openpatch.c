@@ -1,6 +1,12 @@
 #include "ext13.h"
-//#include "m_pd.h"
+#include "m_pd.h"
+
+#ifndef PD_MAJOR_VERSION
+#include "s_stuff.h"
+#else 
 #include "m_imp.h"
+#endif
+
 #include <sys/stat.h>
 #include <stdio.h>
 #ifndef NT

@@ -1,6 +1,5 @@
 #include "ext13.h"
 #include "m_pd.h"
-#include "g_canvas.h"
 #include <sys/stat.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -47,7 +46,6 @@ static t_class *wavinfo_class;
 typedef struct _wavinfo
 {
     t_object x_obj;
-    t_glist  *x_glist;
     t_float  x_samplerate;
     t_float  x_bitspersample;
     t_float  x_channels;
@@ -65,7 +63,6 @@ typedef struct _wavinfo
 static void *wavinfo_new(t_symbol *s)
 {
     t_wavinfo *x = (t_wavinfo *)pd_new(wavinfo_class);
-    x->x_glist = (t_glist*) canvas_getcurrent();
     x->x_s = s;
 //    outlet_new(&x->x_obj, &s_float);
     x->x_out0 = outlet_new(&x->x_obj, &s_float);
@@ -88,7 +85,7 @@ static void wavinfo_symbol(t_wavinfo *x, t_symbol *filename)
    char fname[MAXPDSTRING];
    int ok=(stat(filename->s_name, &statbuf) >= 0);
    if (ok>0) {
-       canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,fname, MAXPDSTRING);
+       canvas_makefilename(canvas_getcurrent(), filename->s_name,fname, MAXPDSTRING);
        if ((x->x_fd = open(fname,( O_NONBLOCK | O_RDONLY))) < 0)
        {
             error("can't open %s",fname);

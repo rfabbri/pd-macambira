@@ -1,9 +1,10 @@
 /* original source (sfwrite~.c) by  Guenter Geiger <geiger@epy.co.at> */
 /* added buffering for write-actions to reduce disc-activity <dieb13 at klingt.org>*/
 
-
-#include "m_imp.h"
+ 
+#include "m_pd.h"
 #include "g_canvas.h"
+
 #ifdef NT
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )

@@ -1,5 +1,4 @@
 #include "m_pd.h"
-#include "g_canvas.h"
 #ifdef NT
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
@@ -35,7 +34,6 @@ typedef struct _piperead_tilde
      short x_sample;
      t_int   x_play;
      t_int   x_channels;
-     t_glist * x_glist;
      int buflen;
      short  buf[32768];
      int  readpointer;
@@ -47,7 +45,7 @@ void piperead_tilde_open(t_piperead_tilde *x,t_symbol *filename)
 {
 /*     struct stat  fstate;*/
      char fname[MAXPDSTRING];
-     canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
+     canvas_makefilename(canvas_getcurrent(), filename->s_name,
 			 fname, MAXPDSTRING);
 
      /* close the old file */
@@ -142,7 +140,6 @@ static void *piperead_tilde_new(t_floatarg chan, t_floatarg buflen)
     t_piperead_tilde *x = (t_piperead_tilde *)pd_new(piperead_tilde_class);
     t_int c = chan;
     t_int bl = buflen;
-    x->x_glist = (t_glist*) canvas_getcurrent();
 
     if (c<1 || c > MAX_CHANS) c = 1;
     if (bl<8 || bl > 32767) bl = 256;
