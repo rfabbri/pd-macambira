@@ -53,7 +53,7 @@ static t_class *playlist_class;
 
 static int guidebug=0;
 
-static char   *playlist_version = "playlist: 1 click file chooser : version 0.8, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *playlist_version = "playlist: 1 click file chooser : version 0.9, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define MAX_DIR_LENGTH 2048 // maximum length for a directory name
 
@@ -239,6 +239,13 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
 void playlist_output_current(t_playlist* x)
 {
     // output the selected dir+file
+    // check that it's not a directory 
+    if ( chdir( x->x_dentries[x->x_itemselected] ) == 0 )
+    {
+       chdir( x->x_curdir );
+       return;
+    }
+
     if ( x->x_dentries && x->x_itemselected < x->x_nentries && x->x_itemselected >= 0 )
     {
        char* tmpstring = (char*) getbytes( strlen( x->x_curdir ) + strlen( x->x_dentries[x->x_itemselected]) + 2 );
@@ -638,7 +645,7 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
 
 t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 {
-  t_int i;
+  t_int i, argoffset=0;
   t_playlist *x;
   char *tmpcurdir;
 
@@ -708,51 +715,70 @@ t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
    }
    if ( argc >= 6 )
    {
-      if ( argv[3].a_type != A_SYMBOL || argv[4].a_type != A_FLOAT  || 
+      if ( argv[3].a_type != A_SYMBOL || 
            argv[5].a_type != A_SYMBOL )
       {
-        error( "playlist : wrong arguments (font : 4,5,6)" );
+        error( "playlist : wrong arguments (font : 4,6)" );
+        error( "argument types : %d %d", argv[3].a_type, argv[5].a_type );
         return NULL;
       }
-      sprintf( x->x_font, "%s %d %s", argv[3].a_w.w_symbol->s_name, 
-                           (t_int)argv[4].a_w.w_float, argv[5].a_w.w_symbol->s_name );
-      x->x_charheight = (t_int)argv[4].a_w.w_float;
-   }
-   if ( argc >= 7 )
-   {
-      if ( argv[6].a_type != A_SYMBOL )
+      if ( argv[4].a_type != A_SYMBOL &&
+           argv[4].a_type != A_FLOAT )
       {
-        error( "playlist : wrong arguments (background color : 7)" );
+        error( "playlist : wrong arguments (font size : 5)" );
+        error( "argument types : %d", argv[4].a_type );
         return NULL;
       }
-      strcpy( x->x_bgcolor, argv[6].a_w.w_symbol->s_name );
-   }
-   if ( argc >= 8 )
-   {
-      if ( argv[7].a_type != A_SYMBOL )
+      if ( argv[4].a_type == A_SYMBOL )
       {
-        error( "playlist : wrong arguments (scrollbar color : 8)" );
-        return NULL;
+        sprintf( x->x_font, "%s", argv[3].a_w.w_symbol->s_name );
+        x->x_charheight = (t_int)atoi( strstr( argv[3].a_w.w_symbol->s_name, " ") );
+        argoffset=2;
       }
-      strcpy( x->x_sbcolor, argv[7].a_w.w_symbol->s_name );
-   }
-   if ( argc >= 9 )
-   {
-      if ( argv[8].a_type != A_SYMBOL )
+      if ( argv[4].a_type == A_FLOAT )
       {
-        error( "playlist : wrong arguments (foreground color : 9)" );
-        return NULL;
+        x->x_charheight = (t_int)argv[4].a_w.w_float;
+        sprintf( x->x_font, "%s %d %s", argv[3].a_w.w_symbol->s_name, 
+                           x->x_charheight, argv[5].a_w.w_symbol->s_name );
+        argoffset=0;
       }
-      strcpy( x->x_fgcolor, argv[8].a_w.w_symbol->s_name );
+      post( "playlist : font : %s, size : %d", x->x_font, x->x_charheight );
    }
-   if ( argc >= 10 )
+   if ( argc >= 7-argoffset )
    {
-      if ( argv[9].a_type != A_SYMBOL )
+      if ( argv[6-argoffset].a_type != A_SYMBOL )
       {
-        error( "playlist : wrong arguments (selection color : 10)" );
+        error( "playlist : wrong arguments (background color : %d)", 7-argoffset );
         return NULL;
       }
-      strcpy( x->x_secolor, argv[9].a_w.w_symbol->s_name );
+      strcpy( x->x_bgcolor, argv[6-argoffset].a_w.w_symbol->s_name );
+   }
+   if ( argc >= 8-argoffset )
+   {
+      if ( argv[7-argoffset].a_type != A_SYMBOL )
+      {
+        error( "playlist : wrong arguments (scrollbar color : %d)", 8-argoffset );
+        return NULL;
+      }
+      strcpy( x->x_sbcolor, argv[7-argoffset].a_w.w_symbol->s_name );
+   }
+   if ( argc >= 9-argoffset )
+   {
+      if ( argv[8-argoffset].a_type != A_SYMBOL )
+      {
+        error( "playlist : wrong arguments (foreground color : %d)", 9-argoffset );
+        return NULL;
+      }
+      strcpy( x->x_fgcolor, argv[8-argoffset].a_w.w_symbol->s_name );
+   }
+   if ( argc >= 10-argoffset )
+   {
+      if ( argv[9-argoffset].a_type != A_SYMBOL )
+      {
+        error( "playlist : wrong arguments (selection color : %d)", 10-argoffset );
+        return NULL;
+      }
+      strcpy( x->x_secolor, argv[9-argoffset].a_w.w_symbol->s_name );
    }
 
    x->x_fullpath = outlet_new(&x->x_obj, &s_symbol );
@@ -781,7 +807,7 @@ t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 
     // post( "playlist : built extension=%s width=%d height=%d", x->x_extension, x->x_width, x->x_height );
 
-    return (x);
+   return (x);
 }
 
 void playlist_free(t_playlist *x)
@@ -838,8 +864,7 @@ void playlist_seek(t_playlist *x, t_floatarg fseeked)
    }
    SYS_VGUI5(".x%x.c itemconfigure %xENTRY%d -fill %s\n", x->x_glist, x, x->x_itemselected, x->x_fgcolor); 
    x->x_itemselected = iout;
-   SYS_VGUI5(".x%x.c itemconfigure %xENTRY%d -fill %s\n", 
-              x->x_glist, x, x->x_itemselected, x->x_secolor); 
+   SYS_VGUI5(".x%x.c itemconfigure %xENTRY%d -fill %s\n", x->x_glist, x, x->x_itemselected, x->x_secolor); 
    playlist_output_current(x);
 }
 
