@@ -9,18 +9,18 @@
 
 include config-pd-linux.txt
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a  # take threaded library for all
-
+FLEXTLIB=$(FLEXTPATH)/flext.a  # take normal library 
+SNDOBJLIB=/usr/lib/libsndobj.a
 
 # compiler+linker stuff	### EDIT! ###
 INCLUDES=$(PDPATH)/src $(SNDOBJ) $(FLEXTINC)
 LIBPATH=
-FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -DFLEXT_ATTRIBUTES
+FLAGS=-DFLEXT_SYS=2 -DFLEXT_ATTRIBUTES
 CFLAGS=-O6 -fno-rtti 
 CFLAGS+=-mcpu=pentiumpro  # gcc 2.95
 # CFLAGS+=-mcpu=pentium3 -msse  # gcc 3.2
 LIBS=m
-LIBS+=sndobj
+#LIBS+=sndobj
 
 
 # the rest can stay untouched
@@ -51,7 +51,7 @@ $(OUTPATH):
 $(OUTPATH)/%.o : $(EXAMPLES)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(OUTPATH)/%.pd_linux :  $(OUTPATH)/buftable.o $(OUTPATH)/BufSyncGrain.o $(OUTPATH)/main.o $(FLEXTLIB)
+$(OUTPATH)/%.pd_linux :  $(OUTPATH)/buftable.o $(OUTPATH)/BufSyncGrain.o $(OUTPATH)/main.o $(FLEXTLIB) $(SNDOBJLIB)
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%,$(LIBPATH)) $^ $(patsubst %,-l%,$(LIBS)) -o $@
 	chmod 755 $@
 
