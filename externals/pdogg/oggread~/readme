@@ -1,4 +1,4 @@
-oggread~ version 0.2a
+oggread~ version 0.2c
 copyright (c) 2002 by Olaf Matthes
 
 oggread~ is an ogg/vorbis file player external for pd (by Miller 

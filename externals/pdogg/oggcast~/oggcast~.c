@@ -38,7 +38,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef unix 
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -98,7 +98,7 @@ areas.
 #define		MAXSTREAMCHANS          2           /* maximum number of channels: restricted to 2 by Ogg specs */
 #define     UPDATE_INTERVAL         250         /* time in milliseconds between updates of output values */
 
-static char   *oggcast_version = "oggcast~: ogg/vorbis streaming client version 0.2g, written by Olaf Matthes";
+static char   *oggcast_version = "oggcast~: ogg/vorbis streaming client version 0.2h, written by Olaf Matthes";
 
 static t_class *oggcast_class;
 
@@ -173,6 +173,7 @@ typedef struct _oggcast
 	char*    x_mountpoint;    /* mountpoint for IceCast server */
 	t_float  x_port;          /* port number on which the connection is made */
     t_int    x_bcpublic;      /* do(n't) publish broadcast on www.oggcast.com */
+	t_int    x_servertype;    /* type of server: 0 = JRoar or old Icecast2; 1 = new Icecast2 */
 
 	
 	
@@ -439,7 +440,7 @@ static int oggcast_encode(t_oggcast *x, float *buf, int channels, int fifosize, 
     /* connect to icecast2 server */
 static int oggcast_child_connect(char *hostname, char *mountpoint, t_int portno, 
 								 char *passwd, char *bcname, char *bcurl,
-								 char *bcgenre, t_int bcpublic, t_int br_nom)
+								 char *bcgenre, t_int bcpublic, t_int br_nom, t_int servertype)
 {
     struct          sockaddr_in server;
     struct          hostent *hp;
@@ -497,67 +498,134 @@ static int oggcast_child_connect(char *hostname, char *mountpoint, t_int portno,
         return (-1);
     }
 
-		/* now try to log in at IceCast2 server using ICE/1.0 scheme */
 	post("oggcast~: logging in to IceCast2 server...");
-		/* send the request, a string like: "SOURCE /<mountpoint> ICE/1.0\n" */
-	buf = "SOURCE ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = "/";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = mountpoint;
-	send(sockfd, buf, strlen(buf), 0);
-	buf = " ICE/1.0";
-	send(sockfd, buf, strlen(buf), 0);
-		/* send the ice headers */
-                /* password */
-	buf = "\nice-password: ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = passwd;
-	send(sockfd, buf, strlen(buf), 0);
-                /* name */
-	buf = "\r\nice-name: ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = bcname;
-	send(sockfd, buf, strlen(buf), 0);
-        	/* url */
-	buf = "\r\nice-url: ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = bcurl;
-	send(sockfd, buf, strlen(buf), 0);
-		/* genre */
-	buf = "\r\nice-genre: ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = bcgenre;
-	send(sockfd, buf, strlen(buf), 0);
-		/* public */
-	buf = "\r\nice-public: ";
-	send(sockfd, buf, strlen(buf), 0);
-	if(bcpublic==0)                            /* set the public flag for broadcast */
+		/* now try to log in at IceCast2 server using ICE/1.0 scheme */
+	if(servertype == 0)
 	{
-		buf = "no";
+			/* send the request, a string like: "SOURCE /<mountpoint> ICE/1.0\n" */
+		buf = "SOURCE ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = "/";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = mountpoint;
+		send(sockfd, buf, strlen(buf), 0);
+		buf = " ICE/1.0";
+		send(sockfd, buf, strlen(buf), 0);
+			/* send the ice headers */
+					/* password */
+		buf = "\nice-password: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = passwd;
+		send(sockfd, buf, strlen(buf), 0);
+					/* name */
+		buf = "\r\nice-name: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcname;
+		send(sockfd, buf, strlen(buf), 0);
+        		/* url */
+		buf = "\r\nice-url: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcurl;
+		send(sockfd, buf, strlen(buf), 0);
+			/* genre */
+		buf = "\r\nice-genre: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcgenre;
+		send(sockfd, buf, strlen(buf), 0);
+			/* public */
+		buf = "\r\nice-public: ";
+		send(sockfd, buf, strlen(buf), 0);
+		if(bcpublic==0)                            /* set the public flag for broadcast */
+		{
+			buf = "no";
+		}
+		else
+		{
+			buf ="yes";
+		}
+		send(sockfd, buf, strlen(buf), 0);
+			/* bitrate */
+		buf = "\r\nice-bitrate: ";
+		send(sockfd, buf, strlen(buf), 0);
+		if(sprintf(resp, "%d", br_nom) == -1)    /* convert int to a string */
+		{
+			error("oggcast~: wrong bitrate");
+		}
+		send(sockfd, resp, strlen(resp), 0);
+			/* description */
+		buf = "\r\nice-description: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = "ogg/vorbis streamed from pure-data with oggcast~";
+		send(sockfd, buf, strlen(buf), 0);
+			/* end of header */
+		buf = "\r\n\r\n";
+		send(sockfd, buf, strlen(buf), 0);
+			/* end login for IceCast using ICE/1.0 scheme */
 	}
-	else
+	else	/* or try to log in at IceCast2 server using HTTP/1.0 base auth scheme */
 	{
-		buf ="yes";
+			/* send the request, a string like: "SOURCE /<mountpoint> HTTP/1.0\nContent-Type: application/x-ogg" */
+		buf = "SOURCE ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = "/";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = mountpoint;
+		send(sockfd, buf, strlen(buf), 0);
+		buf = " HTTP/1.0";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = "\nContent-Type: application/x-ogg";
+		send(sockfd, buf, strlen(buf), 0);
+			/* send the ice headers */
+					/* password */
+		buf = "\nice-password: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = passwd;
+		send(sockfd, buf, strlen(buf), 0);
+					/* name */
+		buf = "\r\nice-name: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcname;
+		send(sockfd, buf, strlen(buf), 0);
+        		/* url */
+		buf = "\r\nice-url: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcurl;
+		send(sockfd, buf, strlen(buf), 0);
+			/* genre */
+		buf = "\r\nice-genre: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = bcgenre;
+		send(sockfd, buf, strlen(buf), 0);
+			/* public */
+		buf = "\r\nice-public: ";
+		send(sockfd, buf, strlen(buf), 0);
+		if(bcpublic==0)                            /* set the public flag for broadcast */
+		{
+			buf = "no";
+		}
+		else
+		{
+			buf ="yes";
+		}
+		send(sockfd, buf, strlen(buf), 0);
+			/* bitrate */
+		buf = "\r\nice-bitrate: ";
+		send(sockfd, buf, strlen(buf), 0);
+		if(sprintf(resp, "%d", br_nom) == -1)    /* convert int to a string */
+		{
+			error("oggcast~: wrong bitrate");
+		}
+		send(sockfd, resp, strlen(resp), 0);
+			/* description */
+		buf = "\r\nice-description: ";
+		send(sockfd, buf, strlen(buf), 0);
+		buf = "ogg/vorbis streamed from pure-data with oggcast~";
+		send(sockfd, buf, strlen(buf), 0);
+			/* end of header */
+		buf = "\r\n\r\n";
+		send(sockfd, buf, strlen(buf), 0);
+			/* end login for IceCast2 using ICE/1.0 scheme */
 	}
-	send(sockfd, buf, strlen(buf), 0);
-		/* bitrate */
-	buf = "\r\nice-bitrate: ";
-	send(sockfd, buf, strlen(buf), 0);
-	if(sprintf(resp, "%d", br_nom) == -1)    /* convert int to a string */
-	{
-		error("oggcast~: wrong bitrate");
-	}
-	send(sockfd, resp, strlen(resp), 0);
-		/* description */
-	buf = "\r\nice-description: ";
-	send(sockfd, buf, strlen(buf), 0);
-	buf = "ogg/vorbis streamed from pure-data with oggcast~";
-	send(sockfd, buf, strlen(buf), 0);
-		/* end of header */
-	buf = "\r\n\r\n";
-	send(sockfd, buf, strlen(buf), 0);
-		/* end login for IceCast */
 
 		/* check if we can write to server */
 	if(oggcast_checkserver(sockfd)!= 0)
@@ -654,6 +722,7 @@ static void *oggcast_child_main(void *zz)
 			char *bcurl = x->x_bcurl;
 			t_int bcpublic = x->x_bcpublic;
 			t_int br_nom = x->x_br_nom;
+			t_int servertype = x->x_servertype;
 	    		/* alter the request code so that an ensuing "open" will get
 			noticed. */
     			pute("4\n");
@@ -666,7 +735,7 @@ static void *oggcast_child_main(void *zz)
 			{
 				pthread_mutex_unlock(&x->x_mutex);
 				fd = oggcast_child_connect(hostname, mountpoint, portno, passwd, bcname,
-											bcurl, bcgenre, bcpublic, br_nom);
+											bcurl, bcgenre, bcpublic, br_nom, servertype);
 				pthread_mutex_lock(&x->x_mutex);
     			pute("5\n");
     	    		/* copy back into the instance structure. */
@@ -943,6 +1012,7 @@ static void *oggcast_new(t_floatarg fnchannels, t_floatarg fbufsize)
 	x->x_bcdate = "";
 	x->x_bcpublic = 1;
 	x->x_mountpoint = "puredata.ogg";
+	x->x_servertype = 0;			/* ICE/1.0 protocol for JRoar and old Icecast2 */
     
     post(oggcast_version);
 	post("oggcast~: set buffer to %dk bytes", bufsize / 1024);
@@ -1229,11 +1299,31 @@ static void oggcast_vorbis(t_oggcast *x, t_floatarg fsr, t_floatarg fchannels,
 	}
     pthread_mutex_unlock(&x->x_mutex);
 }
+    /* select server type */
+static void oggcast_server(t_oggcast *x, t_floatarg f)
+{
+    pthread_mutex_lock(&x->x_mutex);
+	if(f)
+	{
+		x->x_servertype = 1;
+		post("oggcast~: set server type to new Icecast2 (HTTP/1.0 scheme)");
+	}
+	else
+	{
+		x->x_servertype = 0;
+		post("oggcast~: set server type to JRoar (ICE/1.0 scheme)");
+	}
+    pthread_mutex_unlock(&x->x_mutex);
+}
     /* print settings to pd's console window */
 static void oggcast_print(t_oggcast *x)
 {
     pthread_mutex_lock(&x->x_mutex);
-	post("oggcast~: mountpoint at IceCast2: %s", x->x_mountpoint);
+	if(x->x_servertype)
+		post("oggcast~: server type is Icecast2");
+	else
+		post("oggcast~: server type is JRoar");
+	post("oggcast~: mountpoint at Icecast2: %s", x->x_mountpoint);
 	if(x->x_vbr == 1)
 	{
 		post("oggcast~: Ogg Vorbis encoder: %d channels @ %d Hz, quality %.2f", x->x_channels, x->x_samplerate, x->x_quality);
@@ -1297,6 +1387,7 @@ void oggcast_tilde_setup(void)
     class_addmethod(oggcast_class, (t_method)oggcast_password, gensym("passwd"), A_SYMBOL, 0);
     class_addmethod(oggcast_class, (t_method)oggcast_vorbis, gensym("vorbis"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
     class_addmethod(oggcast_class, (t_method)oggcast_vbr, gensym("vbr"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
+    class_addmethod(oggcast_class, (t_method)oggcast_server, gensym("server"), A_FLOAT, 0);
     class_addanything(oggcast_class, oggcast_comment);
     class_sethelpsymbol(oggcast_class, gensym("help-oggcast~.pd"));
 }

@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
-#ifdef unix
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -56,10 +56,10 @@
 #endif
 
 #define     READ                    4096        /* amount of data we pass on to decoder */
-#define     MIN_AUDIO_INPUT 		READ*8     /* this is completely guessed! we just fill half the buffer */
+#define     MIN_AUDIO_INPUT 		READ*8      /* this is completely guessed! we just fill half the buffer */
 #define     OUTPUT_BUFFER_SIZE 		65536   	/* audio output buffer: 64k */
 
-static char   *oggread_version = "oggread~: ogg/vorbis file reader version 0.2b, written by Olaf Matthes";
+static char   *oggread_version = "oggread~: ogg/vorbis file reader version 0.2c, written by Olaf Matthes";
 
 /* ------------------------ oggread~ ----------------------------- */
 
@@ -83,8 +83,8 @@ typedef struct _oggread
     char            *x_buffer;/* buffer used to pass on data to ogg/vorbis */
 
 	t_float   x_position;     /* current playing position */
-    t_outlet *x_out_position;     /* output to send them to */
-
+    t_outlet *x_out_position; /* output to send them to */
+	t_outlet *x_out_end;      /* signal end of file */
 
     t_outlet *x_connection;
     t_int    x_fd;            /* the file handle */
@@ -127,7 +127,8 @@ static int oggread_decode_input(t_oggread *x)
 			x->x_eos = 1;
 			x->x_stream = 0;
 			clock_unset(x->x_clock);
-			post("oggread~: end of file detected, stopping");
+			// post("oggread~: end of file detected, stopping");
+			outlet_bang(x->x_out_end);
 		}
 		else if (ret < 0)
 		{
@@ -290,7 +291,7 @@ static void oggread_open(t_oggread *x, t_symbol *filename)
 		post("oggread~: previous file closed");
 	}
 		/* open file for reading */
-#ifdef unix
+#ifdef UNIX
     if((x->x_file = fopen(filename->s_name, "r")) < 0)
 #else
 	if((x->x_file = fopen(filename->s_name, "rb")) < 0)
@@ -367,6 +368,7 @@ static void *oggread_new(t_floatarg fdographics)
     outlet_new(&x->x_obj, gensym("signal"));
     outlet_new(&x->x_obj, gensym("signal"));
     x->x_out_position = outlet_new(&x->x_obj, gensym("float"));
+    x->x_out_end      = outlet_new(&x->x_obj, gensym("bang"));
 	x->x_clock = clock_new(x, (t_method)oggread_tick);
     
     x->x_fd = -1;

@@ -10,7 +10,7 @@ pd_nt: $(NAME).dll
 .SUFFIXES: .dll
 
 PDNTCFLAGS = /W3 /WX /MD /O2 /G6 /DNT /DPD /nologo
-VC="C:\Programme\Microsoft Visual Studio\VC98"
+VC = "C:\Programme\Microsoft Visual Studio\VC98"
 
 PDNTINCLUDE = /I. /Ic:\pd\tcl\include /Ic:\pd\src /I$(VC)\include /Iinclude
 
@@ -25,6 +25,7 @@ PDNTLIB = $(PDNTLDIR)\msvcrt.lib \
 	lib\ogg_static.lib \
 	lib\vorbis_static.lib \
 	lib\vorbisenc_static.lib \
+	lib\vorbisfile_static.lib \
 	c:\pd\bin\pd.lib
         
 

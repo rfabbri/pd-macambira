@@ -42,7 +42,7 @@
 #include <malloc.h>
 #include <ctype.h>
 #include <time.h>
-#ifdef unix
+#ifdef UNIX
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -124,7 +124,7 @@ typedef struct _oggwrite
 
 static void sys_closesocket(int fd)
 {
-#ifdef unix
+#ifdef UNIX
     close(fd);
 #endif
 #ifdef NT
@@ -145,7 +145,7 @@ static int oggwrite_write(t_oggwrite *x)
 	{
 		int result=ogg_stream_pageout(&(x->x_os),&(x->x_og));
 		if(result==0)break;
-#ifndef unix 
+#ifndef UNIX
 		err = _write(x->x_fd, x->x_og.header, x->x_og.header_len);
 #else
 		err = write(x->x_fd, x->x_og.header, x->x_og.header_len);
@@ -156,7 +156,7 @@ static int oggwrite_write(t_oggwrite *x)
 			x->x_eos = 1;	/* indicate (artificial) end of stream */
 			return err;
 		} 
-#ifndef unix
+#ifndef UNIX
 		err = _write(x->x_fd, x->x_og.body, x->x_og.body_len);
 #else
 		err = write(x->x_fd, x->x_og.body, x->x_og.body_len);
@@ -219,7 +219,7 @@ static void oggwrite_encode(t_oggwrite *x)
 	{
 		if(x->x_fd > 0)
 		{
-#ifndef unix
+#ifndef UNIX
 			if(_close(x->x_fd) < 0)
 #else
 			if(close(x->x_fd) < 0)
@@ -373,7 +373,7 @@ static void oggwrite_vorbis_init(t_oggwrite *x)
 		{
 			int result=ogg_stream_flush(&(x->x_os),&(x->x_og));
 			if(result==0)break;
-#ifndef unix
+#ifndef UNIX
 			err = _write(x->x_fd, x->x_og.header, x->x_og.header_len);
 #else
 			err = write(x->x_fd, x->x_og.header, x->x_og.header_len);
@@ -385,7 +385,7 @@ static void oggwrite_vorbis_init(t_oggwrite *x)
 				x->x_vorbis = -1; /* stop encoding instantly */
 				if(x->x_fd > 0)
 				{
-#ifndef unix
+#ifndef UNIX
 					if(_close(x->x_fd) < 0)
 #else
 					if(close(x->x_fd) < 0)
@@ -397,7 +397,7 @@ static void oggwrite_vorbis_init(t_oggwrite *x)
 				}
 				return;
 			} 
-#ifndef unix
+#ifndef UNIX
 			err = _write(x->x_fd, x->x_og.body, x->x_og.body_len);
 #else
 			err = write(x->x_fd, x->x_og.body, x->x_og.body_len);
@@ -409,7 +409,7 @@ static void oggwrite_vorbis_init(t_oggwrite *x)
 				x->x_vorbis = -1; /* stop encoding instantly */
 				if(x->x_fd > 0)
 				{
-#ifndef unix
+#ifndef UNIX
 					if(_close(x->x_fd) < 0)
 #else
 					if(close(x->x_fd) < 0)
@@ -449,7 +449,7 @@ static void oggwrite_open(t_oggwrite *x, t_symbol *sfile)
 		/* closing previous file descriptor */
     if(x->x_fd > 0)
 	{
-#ifndef unix
+#ifndef UNIX
 		if(_close(x->x_fd) < 0)
 #else
 		if(close(x->x_fd) < 0)
@@ -465,7 +465,7 @@ static void oggwrite_open(t_oggwrite *x, t_symbol *sfile)
 		x->x_recflag = 0;
     }
 
-#ifndef unix
+#ifndef UNIX
     if((x->x_fd = _open( sfile->s_name, x->x_file_open_mode, _S_IREAD|_S_IWRITE)) < 0)
 #else
     if((x->x_fd = open( sfile->s_name, x->x_file_open_mode, S_IRWXU|S_IRWXG|S_IRWXO )) < 0)
@@ -490,7 +490,7 @@ static void oggwrite_open(t_oggwrite *x, t_symbol *sfile)
     /* setting file write mode to append */
 static void oggwrite_append(t_oggwrite *x)
 {
-#ifndef unix
+#ifndef UNIX
     x->x_file_open_mode = _O_CREAT|_O_WRONLY|_O_APPEND|_O_BINARY;
 #else
 	x->x_file_open_mode = O_CREAT|O_WRONLY|O_APPEND|O_NONBLOCK;
@@ -501,7 +501,7 @@ static void oggwrite_append(t_oggwrite *x)
     /* setting file write mode to truncate */
 static void oggwrite_truncate(t_oggwrite *x)
 {
-#ifndef unix
+#ifndef UNIX
     x->x_file_open_mode = _O_CREAT|_O_WRONLY|_O_TRUNC|_O_BINARY;
 #else
     x->x_file_open_mode = O_CREAT|O_WRONLY|O_TRUNC|O_NONBLOCK;
@@ -680,7 +680,7 @@ static void oggwrite_free(t_oggwrite *x)
 	}
     if(x->x_fd >= 0)
 	{		/* close file */
-#ifndef unix
+#ifndef UNIX
         _close(x->x_fd);
 #else
         close(x->x_fd);
@@ -697,7 +697,7 @@ static void *oggwrite_new(void)
     outlet_new(&x->x_obj, gensym("float"));
     x->x_outpages = outlet_new(&x->x_obj, gensym("float"));
     x->x_fd = -1;
-#ifndef unix
+#ifndef UNIX
     x->x_file_open_mode = _O_CREAT|_O_WRONLY|_O_APPEND|_O_BINARY;
 #else
 	x->x_file_open_mode = O_CREAT|O_WRONLY|O_APPEND|O_NONBLOCK;

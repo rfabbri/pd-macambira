@@ -1,5 +1,5 @@
 #ifndef VERSION
-#define VERSION "0.22"
+#define VERSION "0.23"
 #endif
 
 #include <m_pd.h>
@@ -42,5 +42,5 @@ void pdogg_setup(void)
      post("       version: "VERSION);
      post("       compiled: "__DATE__", using Ogg Vorbis library 1.0");
      post("       home: http://www.akustische-kunst.org/puredata/pdogg/");
-     post("       including: oggamp~0.2f, oggcast~0.2g, oggread~0.2b, oggwrite~0.1c\n");
+     post("       including: oggamp~0.2f, oggcast~0.2h, oggread~0.2c, oggwrite~0.1c\n");
 }

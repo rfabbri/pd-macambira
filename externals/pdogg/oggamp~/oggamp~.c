@@ -42,7 +42,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef unix 
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>

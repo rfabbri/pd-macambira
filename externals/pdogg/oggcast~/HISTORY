@@ -1,5 +1,10 @@
 Version history of oggcast~ external for pure-data
 
+v 0.2h (27th March 2003):
+- added HTTP base auth login for (alpha) Icecast2 server:
+  message 'server 1' switches to Icecast2, 'server 0' back
+  top JRoar and PeerCast compatibility (which is the default)
+
 v 0.2g (3rd August 2002):
 - finally fixed the bug that made oggcast~ crash after a 
   while. seems to be realted with output from child thread
@@ -24,7 +29,7 @@ v 0.2c (13th june 2002):
 
 v 0.2b (12th june 2002):
 - completetly rewritten multithreaded version, first
-  sort of stable release
+  sort-of-stable release
 - KNOWN BUG: eats too much CPU power
 
 v 0.1g (23rd feb. 2002, not for public use!):
