@@ -1,14 +1,14 @@
 #N canvas 252 88 510 630 10;
-#X obj 12 316 ff-gain;
-#X obj 12 360 ff-autocenter;
-#X obj 12 405 ff-spring;
-#X obj 12 450 ff-friction;
-#X obj 13 496 ff-periodic;
-#X obj 13 542 ff-constant;
+#X obj 12 346 ff-gain;
+#X obj 12 385 ff-autocenter;
+#X obj 12 425 ff-spring;
+#X obj 12 465 ff-friction;
+#X obj 13 506 ff-periodic;
+#X obj 13 547 ff-constant;
 #X obj 4 4 cnv 15 500 20 empty empty all_about_haptics 20 10 1 18 -233017
 -66577 0;
 #X obj 471 5 pddp;
-#X obj 12 269 ifeel;
+#X obj 12 304 ifeel;
 #X text 20 41 "Haptic" means relating to the sense of touch. Haptic
 feedback relates to the sense of touch at the skin level \, and the
 feeling of forces in the muscles and joints. Vibrations stimulate the
@@ -19,19 +19,21 @@ devices used for remote control surgery. Immersion \, Inc. has almost
 a monopoly on this technology due to a number of patents. These objects
 all work with Immersion technology \, generally known as "TouchSense".
 ;
-#X text 21 207 Numerous companies produce haptic game controllers:
-mice \, joysticks \, gamepads \, steering wheels. These objects work
-with game controllers.;
 #X text 17 584 by Hans-Christoph Steiner <hans@at.or.at>;
 #X text 293 604 updated for Pd version 0.37.1;
-#X text 107 266 Control the pulses and vibrations of a TouchSense (aka
+#X text 107 301 Control the pulses and vibrations of a TouchSense (aka
 iFeel) mouse;
-#X text 110 319 Set the overall gain for all force effects;
-#X text 110 359 Apply forces to automatically center the controller
+#X text 110 349 Set the overall gain for all force effects;
+#X text 111 385 Apply forces to automatically center the controller
 ;
-#X text 111 407 Apply a spring force in a specified direction;
-#X text 111 445 Apply friction to the movement of the controller. Also
+#X text 111 427 Apply a spring force in a specified direction;
+#X text 111 460 Apply friction to the movement of the controller. Also
 known as damping.;
-#X text 111 492 Periodic effects are forces controlled by waveforms
+#X text 111 502 Periodic effects are forces controlled by waveforms
 of various shape \, strength \, and frequency;
-#X text 112 542 Apply a constant force in a specified direction;
+#X text 112 547 Apply a constant force in a specified direction;
+#X text 21 207 Numerous companies produce haptic game controllers:
+mice \, joysticks \, gamepads \, steering wheels. These objects work
+with game controllers. Belkin \, Logitech \, Microsoft \, Saitek \,
+and others make TouchSense game controllers.;
+#X text 21 269 Currently \, these objects only work on GNU/Linux.;
