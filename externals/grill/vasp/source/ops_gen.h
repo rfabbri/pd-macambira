@@ -27,14 +27,14 @@ namespace VecOp {
 }
 
 namespace VaspOp {
-	Vasp *m_osc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul = false);  // real osc
-	inline Vasp *m_mosc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) { return m_osc(p,src,arg,dst,true); }   // * real osc
-	Vasp *m_cosc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul = false);  // complex osc (phase rotates)
-	inline Vasp *m_mcosc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) { return m_cosc(p,src,arg,dst,true); }  // * complex osc (phase rotates)
-	Vasp *m_phasor(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul = false);  // phasor
-	inline Vasp *m_mphasor(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) { return m_phasor(p,src,arg,dst,true); }  // * phasor
-	Vasp *m_noise(OpParam &p,Vasp &src,Vasp *dst);  // real noise
-	Vasp *m_cnoise(OpParam &p,Vasp &src,Vasp *dst); // complex noise (arg and abs random)
+	Vasp *m_osc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul = false);  // real osc
+	inline Vasp *m_mosc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) { return m_osc(p,src,arg,dst,true); }   // * real osc
+	Vasp *m_cosc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul = false);  // complex osc (phase rotates)
+	inline Vasp *m_mcosc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) { return m_cosc(p,src,arg,dst,true); }  // * complex osc (phase rotates)
+	Vasp *m_phasor(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul = false);  // phasor
+	inline Vasp *m_mphasor(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) { return m_phasor(p,src,arg,dst,true); }  // * phasor
+	Vasp *m_noise(OpParam &p,CVasp &src,CVasp *dst);  // real noise
+	Vasp *m_cnoise(OpParam &p,CVasp &src,CVasp *dst); // complex noise (arg and abs random)
 }
 
 #endif

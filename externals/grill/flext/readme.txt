@@ -111,6 +111,10 @@ Version history:
 - SndObjs: fixed typo (numbers of output slots was wrong) and init bug
 - introduced a helper thread for launching flext threads in the background
 - threads are now handled on class (as opposed to object) level
+- threads can now be terminated separately
+- put more flext functions into flext static class
+- replaced ChangePriority by RefPriority
+- fixed setting of priorities...  problems were caused by a compiler bug (MSVC 6)
 
 0.4.0:
 - the use of the const keyword is enforced (e.g. the preferred type for symbols is now "const t_symbol *")
@@ -274,12 +278,8 @@ TODO list:
 general:
 - documentation
 - add log messages for debugging version
-- where to put flext source/lib in linux: /usr/local/lib,/usr/local/include ?
-- clean up headers (eliminate flstdc.h?)
-- check that SetupInOut is only called once
 - feed assist function with in/outlet description
 - MaxMSP: how to call separate help files for objects in a library?
-- MaxMSP for OSX: add support 
 
 bugs:
 - PD: problems with timed buffer redrawing (takes a lot of cpu time)

@@ -36,6 +36,7 @@ V lib_setup()
 
 	VASP_SETUP(check);  // vasp.check
 	VASP_SETUP(update);  // vasp.update
+//	VASP_SETUP(post);  // vasp.post
 
 	VASP_SETUP(sync);  // vasp.sync
 

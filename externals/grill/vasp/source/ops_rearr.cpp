@@ -16,7 +16,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 /*! \brief vasp shift or rotation
 	\todo units for shift
 */
-Vasp *VaspOp::m_shift(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL shift,BL symm) 
+Vasp *VaspOp::m_shift(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL shift,BL symm) 
 {
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
@@ -114,7 +114,11 @@ public:
 		xsf_none = 0,xsf_zero,xsf_edge
 	};	
 
-	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_shift(p,ref,arg,&dst); }
+	virtual Vasp *do_shift(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_shift(p,CVasp(ref),arg,&cdst); 
+	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
 	{ 
@@ -144,7 +148,11 @@ public:
 	
 	vasp_xshift(I argc,const t_atom *argv): vasp_shift(argc,argv) {}
 
-	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_xshift(p,ref,arg,&dst); }
+	virtual Vasp *do_shift(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_xshift(p,CVasp(ref),arg,&cdst); 
+	}
 		
 	virtual V m_help() { post("%s - Shifts buffer data symmetrically (in two halves)",thisName()); }
 };																				
@@ -225,7 +233,7 @@ BL VecOp::d_mirr(OpParam &p)
 
 /*! \brief vasp mirror
 */
-Vasp *VaspOp::m_mirr(OpParam &p,Vasp &src,Vasp *dst,BL symm) 
+Vasp *VaspOp::m_mirr(OpParam &p,CVasp &src,CVasp *dst,BL symm) 
 {
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);

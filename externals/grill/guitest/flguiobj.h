@@ -12,7 +12,7 @@ public:
 	Canvas(t_canvas *c);
 	~Canvas();
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	Canvas &Tk(char *fmt,...);
 	Canvas &TkC();
 	Canvas &TkE();
@@ -31,7 +31,7 @@ protected:
 	t_canvas *canvas;
 	int xpos,ypos;
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	void Send(const char *t);
 	void SendBuf();
 
@@ -339,7 +339,7 @@ public:
 	GuiSingle *Remove(GuiSingle *obj);
 
 protected:
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	void AddTag(GuiObj *o);
 	void RemoveTag(GuiObj *o);
 #endif

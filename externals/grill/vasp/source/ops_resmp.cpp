@@ -176,7 +176,7 @@ BL VecOp::d_tilt(OpParam &p)
 	\param mode interpolation mode
 	\return normalized destination vasp
 */
-Vasp *VaspOp::m_tilt(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL symm) 
+Vasp *VaspOp::m_tilt(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL symm) 
 { 
 	Vasp *ret = NULL;
 	if(arg.IsList() && arg.GetList().Count() >= 1) {
@@ -222,7 +222,11 @@ public:
 		xti_inpl = 0,xti_none,xti_lin,xti_4p
 	};	
 
-	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_tilt(p,ref,arg,&dst); }
+	virtual Vasp *do_shift(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_tilt(p,CVasp(ref),arg,&cdst); 
+	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
 	{ 
@@ -255,7 +259,11 @@ public:
 	
 	vasp_xtilt(I argc,t_atom *argv): vasp_tilt(argc,argv) {}
 
-	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_xtilt(p,ref,arg,&dst); }
+	virtual Vasp *do_shift(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_xtilt(p,CVasp(ref),arg,&cdst); 
+	}
 		
 	virtual V m_help() { post("%s - Resamples buffer data symmetrically (in two halves)",thisName()); }
 };																				

@@ -62,7 +62,7 @@ public:
 		}
 		if(rem > 0) {
 			Vasp v(ref.Frames(),ref.Vector(outs));
-			for(I i = 1; i < rem; ++i) v += ref.Vector(outs+i);
+			for(I i = 1; i < rem; ++i) v.AddVector(ref.Vector(outs+i));
 			ToOutVasp(outs,v);
 		}
 		else
@@ -122,7 +122,7 @@ public:
 	~vasp_join()	{ if(vi) delete[] vi; }
 
 	virtual Vasp *x_work() { 
-		Vasp *ret = new Vasp(ref);
+		CVasp *ret = new CVasp(ref);
 		for(I i = 0; i < cnt-1; ++i) if(vi[i]) *ret += *vi[i];
 		return ret;
 	}
@@ -255,25 +255,26 @@ public:
 
 	virtual Vasp *x_work() 
 	{ 
-		Vasp *ret = new Vasp(ref); 
-		*ret += dst;
+		CVasp *ret = new CVasp(ref); 
+		*ret += cdst;
 		m_reset(); 
 		return ret; 
 	}
 
-	V m_reset() { ref.Clear(); dst.Clear(); rem = cnt; }
+	V m_reset() { ref.Clear(); cdst.Clear(); rem = cnt; }
 
 	virtual I m_set(I argc,t_atom *argv) { rem = cnt; return vasp_tx::m_set(argc,argv); }
 
 	V m_add(I argc,t_atom *argv) 
 	{ 
-		dst += Vasp(argc,argv);
+		cdst += Vasp(argc,argv);
 		if(cnt && !--rem) m_bang();
 	}
 
 	virtual V m_help() { post("%s - Gather several vasps into one",thisName()); }
 private:
 	I cnt,rem;
+	CVasp cdst;
 
 	FLEXT_CALLBACK(m_reset)
 	FLEXT_CALLBACK_V(m_add)

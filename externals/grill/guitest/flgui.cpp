@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 t_class *flext_gui::px_class = NULL;
 t_class *flext_gui::pxkey_class = NULL;
 
@@ -31,10 +31,10 @@ struct flext_gui::pxkey_object  // no virtual table!
 
 flext_gui::flext_gui(int xs,int ys):
 	objs(NULL),
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	xsize(xs),ysize(ys),
 #endif
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 	curx(-1),cury(-1),curmod(-1),
 	created(false),
 #endif
@@ -43,7 +43,7 @@ flext_gui::flext_gui(int xs,int ys):
 	canvas = new Canvas(thisCanvas());
 	objs = new GuiGroup(canvas);
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	AddCanvas();
 #else
 	t_box *b = (t_box *)gensym("#B")->s_thing;
@@ -58,7 +58,7 @@ flext_gui::flext_gui(int xs,int ys):
 
 flext_gui::~flext_gui()
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	RmvCanvas();
 #endif
 
@@ -69,7 +69,7 @@ flext_gui::~flext_gui()
 
 void flext_gui::setup(t_class *c)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	SetWidget(c);
 
     pxkey_class = class_new(gensym("flext_gui key proxy"),NULL,NULL,sizeof(pxkey_object),CLASS_PD|CLASS_NOINLET, A_NULL);
@@ -105,7 +105,7 @@ void flext_gui::setup(t_class *c)
 #endif
 }
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 
 int flext_gui::evmask = evMotion|evMouseDown|evKeyDown|evKeyUp;
 int flext_gui::curmod = 0;
@@ -216,7 +216,7 @@ void flext_gui::pxkey_method(pxkey_object *obj,const t_symbol *s,int argc,t_atom
 					}
 				}
 			}
-#ifdef DEBUG
+#if 0 //def FLEXT_DEBUG
 			else
 				post("unknown modifier %s",str);
 #endif

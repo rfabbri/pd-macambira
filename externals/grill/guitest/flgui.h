@@ -4,7 +4,7 @@
 #define FLEXT_VIRT
 #include <flext.h>
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 #pragma warning( disable : 4091 ) 
 #include <g_canvas.h>
 #endif
@@ -72,7 +72,7 @@ protected:
 	virtual bool g_Focus(GuiObj &obj,bool on,int mod) { return false; }
 */	
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	bool Selected() const { return selected; }
 
 	void FixLines() { canvas_fixlinesfor( thisCanvas(), thisHdr() ); }
@@ -143,7 +143,7 @@ private:
 	
 	virtual void m_Method(const CBParams &p);
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	bool selected;
 	int xsize,ysize;
 

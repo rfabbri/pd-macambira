@@ -189,8 +189,10 @@ public:
 
 	virtual V m_bang() 
 	{ 
-		Vasp r(ref); 
-		for(I i = CntOut()-1; i >= 0; --i) ToOutVasp(i,r);
+		if(ref.Check())
+			for(I i = CntOut()-1; i >= 0; --i) ToOutVasp(i,ref);
+		else
+			post("%s - Invalid vasp",thisName());
 	}
 
 	virtual V m_help() { post("%s - Output a vasp multiple times",thisName()); }

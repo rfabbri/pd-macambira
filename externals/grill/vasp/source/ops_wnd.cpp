@@ -141,7 +141,7 @@ BL VecOp::d_window(OpParam &p)
 	return true;
 }
 
-Vasp *VaspOp::m_window(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL inv,BL mul,BL symm) 
+Vasp *VaspOp::m_window(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL inv,BL mul,BL symm) 
 { 
 	static const int wndnum = 8;
 	static const char *wndtps[wndnum] = {"lin","sin","hanning","hamming","blackman","connes","welch","lanczos" /*,"gaussian","kaiser"*/};

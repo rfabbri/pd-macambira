@@ -27,15 +27,15 @@ namespace VecOp {
 
 namespace VaspOp {
 	// passive filters
-	Vasp *m_fhp(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL,BL hp = true); //! hi pass
-	inline Vasp *m_flp(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_fhp(p,src,arg,dst,false); } //! lo pass	
+	Vasp *m_fhp(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL,BL hp = true); //! hi pass
+	inline Vasp *m_flp(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_fhp(p,src,arg,dst,false); } //! lo pass	
 
 	// int/dif functions
-	Vasp *m_int(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL,BL inv = false); //! integrate
-	inline Vasp *m_dif(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_int(p,src,arg,dst,true); } //! differentiate
+	Vasp *m_int(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL,BL inv = false); //! integrate
+	inline Vasp *m_dif(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_int(p,src,arg,dst,true); } //! differentiate
 
 	// fix denormals/NANs
-	inline Vasp *m_fix(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_run(p,src,dst,VecOp::d_fix); }    // ! NAN/denormal filter
+	inline Vasp *m_fix(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_run(p,src,dst,VecOp::d_fix); }    // ! NAN/denormal filter
 }
 
 #endif

@@ -40,7 +40,7 @@ template<class T> V f_radd(T &rv,T &iv,T ra,T ia,T rb,T)
 
 BL VecOp::d_radd(OpParam &p) { d__cbin(f_radd<S>,p); }
 
-Vasp *VaspOp::m_radd(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) 
+Vasp *VaspOp::m_radd(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);

@@ -65,7 +65,7 @@ inline BL corrlen(I &frms,VBuffer &b)
 
 	\remark working size is maximum common vector size
 */
-RVecBlock *VaspOp::GetRVecs(const C *op,Vasp &src,Vasp *dst)
+RVecBlock *VaspOp::GetRVecs(const C *op,CVasp &src,CVasp *dst)
 {
 	I nvecs = src.Vectors();
 	if(dst && dst->Ok() && dst->Vectors() != nvecs) {
@@ -116,7 +116,7 @@ RVecBlock *VaspOp::GetRVecs(const C *op,Vasp &src,Vasp *dst)
 	\param full true if imaginary part is compulsory
 	\return struct with vector data 
 */
-CVecBlock *VaspOp::GetCVecs(const C *op,Vasp &src,Vasp *dst,BL full)
+CVecBlock *VaspOp::GetCVecs(const C *op,CVasp &src,CVasp *dst,BL full)
 {
 	I nvecs = src.Vectors();
 	if(dst && dst->Ok() && dst->Vectors() != nvecs) {
@@ -193,7 +193,7 @@ CVecBlock *VaspOp::GetCVecs(const C *op,Vasp &src,Vasp *dst,BL full)
 	\param multi 0 off/1 on/-1 auto... controls whether argument vector is single- or multi-vectored
 	\return struct with vector data 
 */
-RVecBlock *VaspOp::GetRVecs(const C *op,Vasp &src,const Vasp &arg,Vasp *dst,I multi,BL ssize)
+RVecBlock *VaspOp::GetRVecs(const C *op,CVasp &src,const CVasp &arg,CVasp *dst,I multi,BL ssize)
 {
 	if(!arg.Ok()) {
 		post("%s - invalid argument vasp detected and ignored",op);
@@ -285,7 +285,7 @@ RVecBlock *VaspOp::GetRVecs(const C *op,Vasp &src,const Vasp &arg,Vasp *dst,I mu
 	\param full true if imaginary part is compulsory
 	\return struct with vector data 
 */
-CVecBlock *VaspOp::GetCVecs(const C *op,Vasp &src,const Vasp &arg,Vasp *dst,I multi,BL ssize,BL full)
+CVecBlock *VaspOp::GetCVecs(const C *op,CVasp &src,const CVasp &arg,CVasp *dst,I multi,BL ssize,BL full)
 {
 	if(!arg.Ok()) {
 		post("%s - invalid argument vasp detected and ignored",op);

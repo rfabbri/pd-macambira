@@ -34,7 +34,7 @@ class vasp_size:
 
 public:
 	vasp_size(I argc,t_atom *argv,BL abs = true):
-		size(0),sets(false)
+		size(0),sets(false),keep(true)
 	{
 		if(argc >= 1 && CanbeFloat(argv[0]))
 			m_arg(GetAFloat(argv[0]));
@@ -47,6 +47,7 @@ public:
 
 		FLEXT_ADDMETHOD(1,m_arg);
 		if(abs) FLEXT_ADDATTR_VAR("frames",size,m_arg);
+		FLEXT_ADDATTR_VAR1("keep",keep);
 	}
 
 	virtual V m_arg(F s) 
@@ -58,19 +59,20 @@ public:
 	virtual Vasp *x_work() 
 	{ 
 		Vasp *ret = new Vasp(ref); 
-		if(sets) ret->Size(size);
+		if(sets) ret->Size(size,keep);
 		return ret;
 	}
 
 	virtual V m_help() { post("%s - Set the size of the vector buffers",thisName()); }
 protected:
 	I size;
-	BL sets;
+	BL sets,keep;
 
 private:
 	FLEXT_CALLBACK_F(m_arg);
 	FLEXT_CALLSET_I(m_arg);
 	FLEXT_ATTRGET_I(size);
+	FLEXT_ATTRVAR_B(keep);
 };
 
 FLEXT_LIB_V("vasp, vasp.size vasp.s",vasp_size)
@@ -227,7 +229,7 @@ public:
 
 	virtual V m_bang() 
 	{ 
-		if(!ref.Ok())
+		if(!ref.Check())
 			post("%s - Invalid vasp!",thisName());
 		else if(ref.Vectors() > 1) 
 			post("%s - More than one vector in vasp!",thisName());

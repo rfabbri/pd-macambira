@@ -82,7 +82,7 @@ void guitest::g_Properties()
 void guitest::g_Save(t_binbuf *b)
 {
 	post("save");
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	binbuf_addv(b, "ssiis;", gensym("#X"),gensym("obj"),
 		(t_int)XLo(), (t_int)YLo(),MakeSymbol(thisName())
 		// here the arguments

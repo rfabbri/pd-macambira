@@ -21,6 +21,8 @@ warning, treat as 0, calculate unit operation, loop, mirror on buffer end, stay 
 - make in place rotation more efficient (use temporary space)
 
 
+- introduce "groups" for attribute organisation (e.g. detach etc.)
+
 objects:
 ---------------------
 - wave object for table-lookup oscs.
@@ -43,17 +45,11 @@ objects:
 bugs:
 ---------------------
 
-- vasp.join doesn't like length -1
-
-- immediate vasp garbage collection causes clicks.... do it in a separate thread!
-
 
 tests:
 ---------------------
-- vasp.size always keeps the data... do we want that? -> flag if yes/no
 - in-place operation (src == dst), test if strides are equal!
 - should frame count always be pre-evaluated (e.g. in vasp.f+ etc. ?)
-- review/change questionable permutation algorithm
 - test DFT objects on strided buffers
 - check for odd remainder frame on symmetric operations!!
 

@@ -32,7 +32,7 @@ VASP_BINARY("vasp.cset vasp.c=",cset,false,VASP_ARG_R(0),"Assigns a complex valu
 
 
 
-Vasp *VaspOp::m_copy(OpParam &p,Vasp &src,Vasp &arg) 
+Vasp *VaspOp::m_copy(OpParam &p,CVasp &src,CVasp &arg) 
 { 
 	Vasp *s = NULL,*d = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,&arg);
@@ -45,7 +45,7 @@ Vasp *VaspOp::m_copy(OpParam &p,Vasp &src,Vasp &arg)
 	return s;
 }
 
-Vasp *VaspOp::m_ccopy(OpParam &p,Vasp &src,Vasp &arg) 
+Vasp *VaspOp::m_ccopy(OpParam &p,CVasp &src,CVasp &arg) 
 { 
 	Vasp *s = NULL,*d = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,&arg);
@@ -69,14 +69,14 @@ public:
 
 	virtual V m_to(I,const t_atom *) { post("s - destination vasp is ignored!",thisName()); }
 
-	virtual Vasp *do_copy(OpParam &p,Vasp &dst) { return VaspOp::m_copy(p,ref,dst); }
+	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { return VaspOp::m_copy(p,CVasp(ref),dst); }
 		
 	virtual Vasp *tx_work(const Argument &arg) 
 	{ 
 		OpParam p(thisName(),0);													
 		
 		if(arg.CanbeVasp()) {
-			Vasp dst = arg.GetAVasp();
+			CVasp dst(arg.GetAVasp());
 			Vasp *ret = do_copy(p,dst);
 			ToOutVasp(1,dst);
 			return ret;
@@ -100,7 +100,7 @@ public:
 	
 	vasp_ccopy(I argc,const t_atom *argv): vasp_copy(argc,argv) {}
 
-	virtual Vasp *do_copy(OpParam &p,Vasp &dst) { return VaspOp::m_ccopy(p,ref,dst); }
+	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { return VaspOp::m_ccopy(p,CVasp(ref),dst); }
 
 	virtual V m_help() { post("%s - Copies complex pairs of the triggering vasp to the argument vasp",thisName()); }
 };																				

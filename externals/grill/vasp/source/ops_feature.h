@@ -20,10 +20,10 @@ namespace VecOp {
 
 namespace VaspOp {
 	// extrema functions
-	Vasp *m_peaks(OpParam &p,Vasp &src,Vasp *dst = NULL,BL inv = false); //! find peaks
-	inline Vasp *m_valleys(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_peaks(p,src,dst,true); } //! find valleys	
-	Vasp *m_rpeaks(OpParam &p,Vasp &src,Vasp *dst = NULL,BL inv = false); //! find radius peaks
-	inline Vasp *m_rvalleys(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_rpeaks(p,src,dst,true); } //! find radius valleys	
+	Vasp *m_peaks(OpParam &p,CVasp &src,CVasp *dst = NULL,BL inv = false); //! find peaks
+	inline Vasp *m_valleys(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_peaks(p,src,dst,true); } //! find valleys	
+	Vasp *m_rpeaks(OpParam &p,CVasp &src,CVasp *dst = NULL,BL inv = false); //! find radius peaks
+	inline Vasp *m_rvalleys(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_rpeaks(p,src,dst,true); } //! find radius valleys	
 }
 
 #endif

@@ -584,7 +584,7 @@ static I radix2(I size)
 	return j == size?i:-1;
 }
 
-Vasp *VaspOp::m_rfft(OpParam &p,Vasp &src,Vasp *dst,BL inv) 
+Vasp *VaspOp::m_rfft(OpParam &p,CVasp &src,CVasp *dst,BL inv) 
 { 
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
 	if(vecs) {
@@ -614,7 +614,7 @@ Vasp *VaspOp::m_rfft(OpParam &p,Vasp &src,Vasp *dst,BL inv)
 		return NULL;
 }
 
-Vasp *VaspOp::m_cfft(OpParam &p,Vasp &src,Vasp *dst,BL inv) 
+Vasp *VaspOp::m_cfft(OpParam &p,CVasp &src,CVasp *dst,BL inv) 
 { 
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst,true);
 	if(vecs) {

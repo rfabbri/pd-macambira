@@ -256,7 +256,8 @@ protected:																		\
 	virtual Vasp *tx_work()														\
 	{																			\
 		OpParam p(thisName(),0);												\
-		return VaspOp::m_##op(p,ref,&dst);										\
+		CVasp cdst(dst);														\
+		return VaspOp::m_##op(p,CVasp(ref),&cdst);								\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
@@ -269,12 +270,13 @@ class vasp_ ## op:																\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_binop)											\
 public:																			\
-	vasp_##op(I argc,const t_atom *argv): vasp_binop(argc,argv,def,to) {}				\
+	vasp_##op(I argc,const t_atom *argv): vasp_binop(argc,argv,def,to) {}		\
 protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\
 		OpParam p(thisName(),1);												\
-		return VaspOp::m_##op(p,ref,arg,&dst);									\
+		CVasp cdst(dst);														\
+		return VaspOp::m_##op(p,CVasp(ref),arg,&cdst);							\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
@@ -287,12 +289,13 @@ class vasp_ ## op:																\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_anyop)											\
 public:																			\
-	vasp_##op(I argc,const t_atom *argv): vasp_anyop(argc,argv,def,to) {}				\
+	vasp_##op(I argc,const t_atom *argv): vasp_anyop(argc,argv,def,to) {}		\
 protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\
 		OpParam p(thisName(),args);												\
-		return VaspOp::m_##op(p,ref,arg,&dst);									\
+		CVasp cdst(dst);														\
+		return VaspOp::m_##op(p,CVasp(ref),arg,&cdst);							\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\

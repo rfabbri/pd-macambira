@@ -12,26 +12,26 @@
 #define ZONE 1000
 
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 bool Canvas::store = true;
 bool Canvas::debug = false;
 #endif
 
 Canvas::Canvas(t_canvas *c): 
 	canvas(c)
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	,buffer(new char[BUFSIZE]),bufix(0),waiting(0) 
 #endif
 {}
 
 Canvas::~Canvas() 
 { 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(buffer) delete[] buffer; 
 #endif
 }
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 void Canvas::Send(const char *t)
 {
 	if(debug) post("GUI - %s",t);
@@ -96,7 +96,7 @@ Canvas &Canvas::Tk(char *fmt,...)
 bool Canvas::Pre(int x,int y) 
 { 
 	xpos = x,ypos = y;
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	++waiting;
 	return true;
 #else
@@ -113,7 +113,7 @@ bool Canvas::Pre(int x,int y)
 
 void Canvas::Post() 
 { 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(!--waiting) SendBuf();
 #else
 	if(svgp) {
@@ -210,7 +210,7 @@ GuiSingle *GuiSingle::Find(const t_symbol *s)
 
 GuiObj &GuiSingle::MoveTo(int x,int y)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
     if(active) { 
 		canvas->TkC().Tk("coords %s %i %i\n",GetString(Id()), x, y);
 	}
@@ -221,7 +221,7 @@ GuiObj &GuiSingle::MoveTo(int x,int y)
 
 GuiObj &GuiSingle::MoveRel(int dx,int dy)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(active) {
 		canvas->TkC().Tk("move %s %i %i\n",GetString(Id()), dx, dy);
 	}
@@ -232,7 +232,7 @@ GuiObj &GuiSingle::MoveRel(int dx,int dy)
 
 GuiObj &GuiSingle::Delete()
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(active) {
 		canvas->TkC().Tk("delete -tags %s\n",GetString(Id()));
 		active = false;
@@ -243,7 +243,7 @@ GuiObj &GuiSingle::Delete()
 
 GuiObj &GuiSingle::FillColor(unsigned long col)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(active) {
 		canvas->TkC().Tk("itemconfigure %s -fill #%06x\n",GetString(Id()),col);
 	}
@@ -253,7 +253,7 @@ GuiObj &GuiSingle::FillColor(unsigned long col)
 
 GuiObj &GuiSingle::Outline(unsigned long col)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(active) {
 		canvas->TkC().Tk("itemconfigure %s -outline #%06x\n",GetString(Id()),col);
 	}
@@ -263,7 +263,7 @@ GuiObj &GuiSingle::Outline(unsigned long col)
 
 GuiObj &GuiSingle::Focus()
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	if(active) {
 		canvas->TkC().Tk("focus %s\n",GetString(Id()));
 	}
@@ -337,7 +337,7 @@ void GuiGroup::Clear()
 {
 	for(Part *ix = head; ix; ) {
 		Part *n = ix->nxt;
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 		RemoveTag(ix->obj);
 #endif
 		if(ix->owner) delete ix->obj;
@@ -350,7 +350,7 @@ void GuiGroup::Clear()
 void GuiGroup::Add(GuiObj *o,bool owner)
 {
 	o->canvas = canvas;
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	AddTag(o); // valid only for GuiSingle!
 #endif
 	Part *n = new Part(o,owner);
@@ -380,7 +380,7 @@ GuiSingle *GuiGroup::Detach(const t_symbol *s)
 				if(p) p->nxt = ix->nxt;
 				GuiSingle *ret = (GuiSingle *)(ix->obj);
 				
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 				RemoveTag(ret);
 #endif
 				if(head == ix) head = ix->nxt;
@@ -398,7 +398,7 @@ GuiSingle *GuiGroup::Detach(const t_symbol *s)
 
 GuiObj &GuiGroup::MoveRel(int dx,int dy)
 {
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	canvas->TkC().Tk("move %s %i %i\n",GetString(Id()), dx, dy);
 #endif
 	for(Part *ix = head; ix; ix = ix->nxt) {
@@ -409,7 +409,7 @@ GuiObj &GuiGroup::MoveRel(int dx,int dy)
 
 GuiObj &GuiGroup::Delete()
 {	
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	canvas->TkC().Tk("delete -tags %s\n",GetString(Id()));
 
 	for(Part *ix = head; ix; ix = ix->nxt) ix->obj->Inactive();
@@ -425,7 +425,7 @@ GuiObj &GuiGroup::Draw()
 }
 
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 
 void GuiGroup::AddTag(GuiObj *o)
 {
@@ -542,7 +542,7 @@ GuiObj &GuiPoint::Set(int x,int y,long fl)
 	fill = fl;
 	rect(x,y,x,y);
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
     canvas->TkC();
 	canvas->Tk("create line %i %i %i %i -tags %s",x,y,x+1,y,GetString(Id()));
 	if(fill >= 0) canvas->Tk(" -fill #%06x",fill);
@@ -555,7 +555,7 @@ GuiObj &GuiPoint::Set(int x,int y,long fl)
 
 GuiObj &GuiPoint::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 #endif
 	return *this;
 }
@@ -571,7 +571,7 @@ GuiObj &GuiCloud::Set(int n,const Pnt *p,long fl)
 	rect(pnt[0] = p[0],p[0]);
 	for(i = 1; i < n; ++i) rect.Add(pnt[i] = p[i]);
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
     canvas->TkC().Tk("create line");
 	for(i = 0; i < n; ++i)
 		canvas->Tk(" %i %i",p[i].X(),p[i].Y());
@@ -586,7 +586,7 @@ GuiObj &GuiCloud::Set(int n,const Pnt *p,long fl)
 
 GuiObj &GuiCloud::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 #endif
 	return *this;
 }
@@ -604,7 +604,7 @@ GuiObj &GuiBox::Set(int x,int y,int xsz,int ysz,int wd,long fl,long outl)
 	rect(x,y,x+xsz-1,y+ysz-1);
 	width = wd,fill = fl,outln = outl;
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
     canvas->TkC().Tk("create rectangle %i %i %i %i -tags %s",x,y,x+xsz,y+ysz,GetString(Id()));
 	if(wd >= 0) canvas->Tk(" -width %i",wd);
 	if(fl >= 0) canvas->Tk(" -fill #%06x",fl);
@@ -618,7 +618,7 @@ GuiObj &GuiBox::Set(int x,int y,int xsz,int ysz,int wd,long fl,long outl)
 
 GuiObj &GuiBox::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 	::Rect r;
 	::RGBColor col;
 	int w = width; 
@@ -653,7 +653,7 @@ GuiObj &GuiRect::Set(int x,int y,int xsz,int ysz,int wd,long outl)
 	rect(x,y,x+xsz-1,y+ysz-1);
 	width = wd,outln = outl;
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
     canvas->TkC().Tk("create line %i %i %i %i %i %i %i %i %i %i -tags %s",x,y,x+xsz,y,x+xsz,y+ysz,x,y+ysz,x,y,GetString(Id()));
 	if(width >= 0) canvas->Tk(" -width %i",width);
 	if(outl >= 0) canvas->Tk(" -fill #%06x",outl);
@@ -666,7 +666,7 @@ GuiObj &GuiRect::Set(int x,int y,int xsz,int ysz,int wd,long outl)
 
 GuiObj &GuiRect::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 #endif
 	return *this;
 }
@@ -678,7 +678,7 @@ GuiObj &GuiLine::Set(int x1,int y1,int x2,int y2,int wd,long fl)
 	rect(p1(x1,y1),p2(x2,y2));
 	width = wd,fill = fl;
 	
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	canvas->TkC().Tk("create line %i %i %i %i -tags %s",x1,y1,x2,y2,GetString(Id()));
 	if(width >= 0) canvas->Tk(" -width %i",width);
 	if(fill >= 0) canvas->Tk(" -fill #%06x",fill);
@@ -691,7 +691,7 @@ GuiObj &GuiLine::Set(int x1,int y1,int x2,int y2,int wd,long fl)
 
 GuiObj &GuiLine::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 	::Point p;
 	::RGBColor col;
 	int w = width; 
@@ -724,7 +724,7 @@ GuiObj &GuiPoly::Set(int n,const Pnt *p,int wd,long fl)
 	rect(pnt[0] = p[0],p[0]);
 	for(i = 1; i < n; ++i) rect.Add(pnt[i] = p[i]);
 
-#ifdef PD	
+#if FLEXT_SYS == FLEXT_SYS_PD
 	canvas->TkC().Tk("create line");
 	for(i = 0; i < n; ++i)
 		canvas->Tk(" %i %i",p[i].X(),p[i].Y());
@@ -740,7 +740,7 @@ GuiObj &GuiPoly::Set(int n,const Pnt *p,int wd,long fl)
 
 GuiObj &GuiPoly::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 	::Point p;
 	::RGBColor col;
 	int ox = Canv().X(),oy = Canv().Y();
@@ -777,7 +777,7 @@ GuiObj &GuiText::Set(int x,int y,const char *txt,long fl,just_t jt)
 	rect(x,y,x,y);
 	fill = fl,just = jt;
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 	canvas->TkC().Tk("create text %i %i -tags %s",x,y,GetString(Id()));
 	if(txt) canvas->Tk(" -text %s",txt);
 	if(fill >= 0) canvas->Tk(" -fill #%06x",fill);
@@ -794,7 +794,7 @@ GuiObj &GuiText::Set(int x,int y,const char *txt,long fl,just_t jt)
 
 GuiObj &GuiText::Draw()
 {
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 #endif
 	return *this;
 }

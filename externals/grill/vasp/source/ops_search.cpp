@@ -70,17 +70,17 @@ BL VecOp::d_search(OpParam &p)
 	return true;
 }
 
-Vasp *VaspOp::m_search(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL st) 
+Vasp *VaspOp::m_search(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL st) 
 { 
 	Vasp *ret = NULL;
 	if(src.Vectors() > 1) 
 		post("%s -  More than one vector in vasp!",p.opName());
 	else if(arg.CanbeFloat() || (arg.IsList() && arg.GetList().Count() >= 1)) {
-		I fr = src.ChkFrames();
+		I fr = src.Frames();
 		I o = src.Vector(0).Offset();
 		I sz = src.Buffer(0)->Frames();
 
-		Vasp all(src);
+		CVasp all(src);
 		if(st) {
 			// search start point
 			p.srch.offs = o;
@@ -112,7 +112,7 @@ Vasp *VaspOp::m_search(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL st)
 			if(ret) {
 				ret->Offset(o);
 				ret->Frames(fr);
-				ret->Frames(ret->ChkFrames());
+				ret->Frames(ret->ChkFrames()); // What's that????
 			}
 
 			delete vecs;
@@ -167,7 +167,11 @@ class vasp_soffset:
 	FLEXT_HEADER(vasp_soffset,vasp_search)
 public:			
 	vasp_soffset(I argc,t_atom *argv): vasp_search(argc,argv) {}
-	virtual Vasp *do_work(OpParam &p) { return VaspOp::m_soffset(p,ref,arg,&dst); }
+	virtual Vasp *do_work(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_soffset(p,CVasp(ref),arg,&cdst); 
+	}
 };																				
 FLEXT_LIB_V("vasp, vasp.offset= vasp.o=",vasp_soffset)
 
@@ -178,7 +182,11 @@ class vasp_sframes:
 	FLEXT_HEADER(vasp_sframes,vasp_search)
 public:			
 	vasp_sframes(I argc,t_atom *argv): vasp_search(argc,argv) {}
-	virtual Vasp *do_work(OpParam &p) { return VaspOp::m_sframes(p,ref,arg,&dst); }
+	virtual Vasp *do_work(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_sframes(p,CVasp(ref),arg,&cdst); 
+	}
 };																				
 FLEXT_LIB_V("vasp, vasp.frames= vasp.f=",vasp_sframes)
 

@@ -54,13 +54,20 @@ Vasp::Vasp(I fr,const Ref &r):
 	refs(0),chns(0),ref(NULL),
 	frames(fr) 
 {
-	operator +=(r);
+	AddVector(r);
 }
 
 
 Vasp::~Vasp()
 {
+	Clear();
+}
+
+Vasp &Vasp::Clear() 
+{ 
+	refs = frames = chns = 0; 
 	if(ref) delete[] ref;
+	return *this; 
 }
 
 
@@ -131,30 +138,13 @@ Vasp &Vasp::operator =(const Vasp &v)
 }
 
 
-Vasp &Vasp::operator +=(const Ref &r)
+Vasp &Vasp::AddVector(const Ref &r)
 {
 	Resize(chns+1);
 	ref[chns++] = r;
 	return *this;
 }
 
-
-Vasp &Vasp::operator +=(const Vasp &v)
-{
-	if(v.Ok()) {
-		if(!Ok()) *this = v;
-		else {
-			if(Frames() != v.Frames()) {
-				post("vasp - Frame count of joined vasps is different - taking the minimum");
-				Frames(min(Frames(),v.Frames()));
-			}
-
-			Resize(Vectors()+v.Vectors());
-			for(I i = 0; i < v.Vectors(); ++i) *this += v.Vector(i);
-		}
-	}
-	return *this;
-}
 
 // parse argument list
 Vasp &Vasp::operator ()(I argc,const t_atom *argv)
@@ -291,37 +281,37 @@ V Vasp::Channel(I c)
 }
 
 
-V Vasp::Size(I s)
+V Vasp::Size(I s,BL keep)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
-			buf->Frames(s,true);
+			buf->Frames(s,keep);
 			delete buf;
 		}
 	}
 }
 
-V Vasp::SizeD(I sd)
+V Vasp::SizeD(I sd,BL keep)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
 			I s = buf->Frames()+sd;
-			buf->Frames(s >= 0?s:0,true);
+			buf->Frames(s >= 0?s:0,keep);
 			delete buf;
 		}
 	}
 }
 
 
-V Vasp::SizeM(R f)
+V Vasp::SizeM(R f,BL keep)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
 			I s = (I)(buf->Frames()*f);
-			buf->Frames(s >= 0?s:0,true);
+			buf->Frames(s >= 0?s:0,keep);
 			delete buf;
 		}
 	}
@@ -357,5 +347,38 @@ I Vasp::ChkFrames() const
 	}
 
 	return frms < 0?0:frms;
+}
+
+
+// ------------------------------------
+
+CVasp::CVasp() {}
+
+CVasp::CVasp(const Vasp &v):
+	Vasp(v)
+{
+	if(!Check()) 
+		Clear();
+	else
+		Frames(ChkFrames());
+}
+
+CVasp &CVasp::operator +=(const CVasp &v)
+{
+	if(v.Ok()) {
+		if(!Ok()) *this = v;
+		else {
+			I f = Frames(),vf = v.Frames();
+
+			if(f != vf) {
+				post("vasp - Frame count of joined vasps is different - taking the minimum");
+				Frames(min(f,vf));
+			}
+
+			Resize(Vectors()+v.Vectors());
+			for(I i = 0; i < v.Vectors(); ++i) AddVector(v.Vector(i));
+		}
+	}
+	return *this;
 }
 

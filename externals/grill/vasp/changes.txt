@@ -14,6 +14,9 @@ Version history:
 - ADD: vasp.tilt,vasp.xtilt - attributes "fill","inter"
 - ADD: vasp.offset=,vasp.frames= - attributes "dir","slope"
 - CHANGE: update m_method_ virtual functions of same objects
+- FIX: immediate vasp garbage collection is now done in separate thread
+- ADD: vasp.size... objects: attribute "keep" determines whether buffer content should be preserved (default = 1)
+- CHANGE: buffer reference checks upon all operations enforced (by new CVasp (checked vasp) class)
 
 0.1.1:
 - FIX: bug in resize of immediate buffers

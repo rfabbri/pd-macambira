@@ -20,9 +20,9 @@ namespace VecOp {
 }
 
 namespace VaspOp {
-	Vasp *m_tilt(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL,BL symm = false); 
+	Vasp *m_tilt(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL,BL symm = false); 
 	// Symmetric resampling (around center sample)
-	inline Vasp *m_xtilt(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_tilt(p,src,arg,dst,true); }
+	inline Vasp *m_xtilt(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_tilt(p,src,arg,dst,true); }
 }
 
 #endif

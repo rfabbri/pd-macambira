@@ -22,12 +22,12 @@ namespace VecOp {
 }
 
 namespace VaspOp {
-	Vasp *m_shift(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL,BL sh = true,BL symm = false);  // shift buffer
-	inline Vasp *m_xshift(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_shift(p,src,arg,dst,true,true); }  // shift buffer (symmetrically)
-	inline Vasp *m_rot(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_shift(p,src,arg,dst,false,false); } // rotate buffer
-	inline Vasp *m_xrot(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL)  { return m_shift(p,src,arg,dst,false,true); }  // rotate buffer (symmetrically)
-	Vasp *m_mirr(OpParam &p,Vasp &src,Vasp *dst = NULL,BL symm = false);  //! mirror buffer
-	inline Vasp *m_xmirr(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_mirr(p,src,dst,true); } //! mirror buffer (symmetrically)
+	Vasp *m_shift(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL,BL sh = true,BL symm = false);  // shift buffer
+	inline Vasp *m_xshift(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_shift(p,src,arg,dst,true,true); }  // shift buffer (symmetrically)
+	inline Vasp *m_rot(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_shift(p,src,arg,dst,false,false); } // rotate buffer
+	inline Vasp *m_xrot(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL)  { return m_shift(p,src,arg,dst,false,true); }  // rotate buffer (symmetrically)
+	Vasp *m_mirr(OpParam &p,CVasp &src,CVasp *dst = NULL,BL symm = false);  //! mirror buffer
+	inline Vasp *m_xmirr(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_mirr(p,src,dst,true); } //! mirror buffer (symmetrically)
 
 }
 

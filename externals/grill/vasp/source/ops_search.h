@@ -21,9 +21,9 @@ namespace VecOp {
 
 namespace VaspOp {
 	// search functions
-	Vasp *m_search(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL st); //! find values
-	inline Vasp *m_soffset(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_search(p,src,arg,dst,true); }
-	inline Vasp *m_sframes(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst = NULL) { return m_search(p,src,arg,dst,false); }
+	Vasp *m_search(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL st); //! find values
+	inline Vasp *m_soffset(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_search(p,src,arg,dst,true); }
+	inline Vasp *m_sframes(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst = NULL) { return m_search(p,src,arg,dst,false); }
 }
 
 #endif

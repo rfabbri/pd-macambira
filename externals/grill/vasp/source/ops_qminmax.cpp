@@ -84,7 +84,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = BIG;
-		Vasp *ret = VaspOp::m_qmin(p,ref); 
+		Vasp *ret = VaspOp::m_qmin(p,CVasp(ref)); 
 		if(p.norm.minmax == BIG) p.norm.minmax = 0;
 		return ret;
 	}
@@ -124,7 +124,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = BIG;
-		Vasp *ret = VaspOp::m_qamin(p,ref); 
+		Vasp *ret = VaspOp::m_qamin(p,CVasp(ref)); 
 		if(p.norm.minmax == BIG) p.norm.minmax = 0;
 		return ret;
 	}
@@ -157,7 +157,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = -BIG;
-		Vasp *ret = VaspOp::m_qmax(p,ref); 
+		Vasp *ret = VaspOp::m_qmax(p,CVasp(ref)); 
 		if(p.norm.minmax == -BIG) p.norm.minmax = 0;
 		return ret;
 	}
@@ -190,7 +190,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = 0;
-		return VaspOp::m_qamax(p,ref); 
+		return VaspOp::m_qamax(p,CVasp(ref)); 
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's maximum absolute sample value",thisName()); }
@@ -225,7 +225,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = BIG;
-		Vasp *ret = VaspOp::m_qrmin(p,ref); 
+		Vasp *ret = VaspOp::m_qrmin(p,CVasp(ref)); 
 		if(p.norm.minmax == BIG) p.norm.minmax = 0;
 		return ret;
 	}
@@ -266,7 +266,7 @@ public:
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 
 		p.norm.minmax = 0;
-		return VaspOp::m_qrmax(p,ref); 
+		return VaspOp::m_qrmax(p,CVasp(ref)); 
 	}
 
 	virtual V m_help() { post("%s - Get a vasp's maximum complex radius",thisName()); }

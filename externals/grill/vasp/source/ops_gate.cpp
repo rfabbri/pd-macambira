@@ -43,7 +43,7 @@ BL VecOp::d_rigate(OpParam &p) { d__cbin(f_rigate<S>,p); }
 
 
 
-Vasp *VaspOp::m_gate(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) 
+Vasp *VaspOp::m_gate(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
@@ -62,7 +62,7 @@ Vasp *VaspOp::m_gate(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst)
 }
 
 
-Vasp *VaspOp::m_rgate(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) 
+Vasp *VaspOp::m_rgate(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);

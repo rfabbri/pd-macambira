@@ -39,7 +39,7 @@ Vasp *VecBlock::_DstVasp(I n)
 {
 	Vasp *ret = new Vasp;
 	ret->Frames(Frames());
-	for(I i = 0; i < n; ++i) *ret += Vasp::Ref(*_Dst(i));
+	for(I i = 0; i < n; ++i) ret->AddVector(Vasp::Ref(*_Dst(i)));
 	return ret;
 }
 
@@ -47,7 +47,7 @@ Vasp *VecBlock::_SrcVasp(I n)
 {
 	Vasp *ret = new Vasp;
 	ret->Frames(Frames());
-	for(I i = 0; i < n; ++i) *ret += Vasp::Ref(*_Src(i));
+	for(I i = 0; i < n; ++i) ret->AddVector(Vasp::Ref(*_Src(i)));
 	return ret;
 }
 

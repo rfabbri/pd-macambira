@@ -52,7 +52,6 @@ public:
 static BufEntry *libhead = NULL,*libtail = NULL;
 static FreeEntry *freehead = NULL,*freetail = NULL;
 static I libcnt = 0,libtick = 0;
-static t_clock *libclk = NULL;
 
 #ifdef FLEXT_THREADS
 static flext::ThrMutex libmtx;
@@ -114,40 +113,7 @@ V BufLib::DecRef(t_symbol *s)
 	}
 }
 
-static t_symbol *GetLibSym()
-{
-	if(freehead) {
-		// reuse from free-list
-		FreeEntry *r = freehead;
-		freehead = r->nxt;
-		if(!freehead) freetail = NULL;
-		t_symbol *s = r->sym;
-		delete r;
-		return s;
-	}
-	else {
-		// allocate new symbol
-		char tmp[20];
-	#ifdef __MWERKS__
-		std::
-	#endif
-		sprintf(tmp,"vasp!%04i",libcnt); //! \todo what if libcnt has > 4 digits?
-		libcnt++;
-		return gensym(tmp);
-	}
-	
-	clock_delay(libclk,LIBTICK);
-}
-
-static V FreeLibSym(t_symbol *sym)
-{
-	FreeEntry *f = new FreeEntry(sym);
-	if(!freehead) freehead = f;
-	else freetail->nxt = f;
-	freetail = f;
-}
-
-static V LibTick(V *)
+static V Collect()
 {
 #ifdef FLEXT_THREADS
 	libmtx.Lock();
@@ -175,16 +141,92 @@ static V LibTick(V *)
 			p = e,e = e->nxt;
 	}
 
-	++libtick;
-	clock_delay(libclk,LIBTICK);
-
 #ifdef FLEXT_THREADS
 	libmtx.Unlock();
 #endif
 }
 
+
+#ifdef FLEXT_THREADS
+static bool libthractive = false;
+static pthread_t libthrid;
+static bool libthrexit = false; // currently not used
+static flext::ThrCond *libthrcond = NULL;
+
+static V *LibThr(V *)
+{
+	flext::RelPriority(-2);
+
+	while(libthrexit) {
+		libthrcond->TimedWait(0.5f);
+		// TODO - should process return value of TimedWait
+		Collect();	
+	}
+	return NULL;
+}
+#endif
+
+static t_clock *libclk = NULL;
+static V LibTick(V *)
+{
+#ifdef FLEXT_THREADS
+	libthrcond->Signal();
+#else
+	Collect();
+#endif
+
+	++libtick;
+	clock_delay(libclk,LIBTICK);
+
+}
+
+static t_symbol *GetLibSym()
+{
+	if(freehead) {
+		// reuse from free-list
+		FreeEntry *r = freehead;
+		freehead = r->nxt;
+		if(!freehead) freetail = NULL;
+		t_symbol *s = r->sym;
+		delete r;
+		return s;
+	}
+	else {
+		// allocate new symbol
+		char tmp[20];
+	#ifdef __MWERKS__
+		std::
+	#endif
+		sprintf(tmp,"vasp!%04i",libcnt); //! \todo what if libcnt has > 4 digits?
+		libcnt++;
+		return gensym(tmp);
+	}
+
+	clock_delay(libclk,LIBTICK);
+}
+
+static V FreeLibSym(t_symbol *sym)
+{
+	FreeEntry *f = new FreeEntry(sym);
+	if(!freehead) freehead = f;
+	else freetail->nxt = f;
+	freetail = f;
+}
+
+
 BufEntry *BufLib::NewImm(I fr,BL zero)
 {
+#ifdef FLEXT_THREADS
+	if(!libthractive) {
+		int ret = pthread_create(&libthrid,NULL,LibThr,NULL);
+		if(ret)
+			error("vasp - Could not launch helper thread");
+		else {
+			libthrcond = new flext::ThrCond;
+			libthractive = true;
+		}
+	}
+#endif
 	if(!libclk) {
 		libclk = (t_clock *)clock_new(NULL,(t_method)LibTick);
 		clock_delay(libclk,LIBTICK);

@@ -101,7 +101,7 @@ inline BL d_rvalleys(OpParam &p) { return d_vlpk(p,lower); }
 	\param inv true for valley operation
 	\return normalized destination vasp
 */
-Vasp *VaspOp::m_peaks(OpParam &p,Vasp &src,Vasp *dst,BL inv) 
+Vasp *VaspOp::m_peaks(OpParam &p,CVasp &src,CVasp *dst,BL inv) 
 { 
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
@@ -123,7 +123,7 @@ Vasp *VaspOp::m_peaks(OpParam &p,Vasp &src,Vasp *dst,BL inv)
 	\param inv true for valley operation
 	\return normalized destination vasp
 */
-Vasp *VaspOp::m_rpeaks(OpParam &p,Vasp &src,Vasp *dst,BL inv) 
+Vasp *VaspOp::m_rpeaks(OpParam &p,CVasp &src,CVasp *dst,BL inv) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);
@@ -146,7 +146,11 @@ public:
 		vasp_anyop(argc,argv,VASP_ARG(),true,XletCode(xlet::tp_float,0)) 
 	{}
 
-	virtual Vasp *do_peaks(OpParam &p) { return VaspOp::m_peaks(p,ref,&dst); }
+	virtual Vasp *do_peaks(OpParam &p) 
+	{ 
+		CVasp cdst(dst); 
+		return VaspOp::m_peaks(p,CVasp(ref),&cdst); 
+	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
 	{ 
@@ -174,7 +178,11 @@ class vasp_valleys:
 	FLEXT_HEADER(vasp_valleys,vasp_peaks)
 public:			
 	vasp_valleys(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
-	virtual Vasp *do_peaks(OpParam &p) { return VaspOp::m_valleys(p,ref,&dst); }
+	virtual Vasp *do_peaks(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_valleys(p,CVasp(ref),&cdst); 
+	}
 };																				
 FLEXT_LIB_V("vasp, vasp.valleys",vasp_valleys)
 
@@ -185,7 +193,11 @@ class vasp_rpeaks:
 	FLEXT_HEADER(vasp_rpeaks,vasp_peaks)
 public:			
 	vasp_rpeaks(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
-	virtual Vasp *do_peaks(OpParam &p) { return VaspOp::m_rpeaks(p,ref,&dst); }
+	virtual Vasp *do_peaks(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_rpeaks(p,CVasp(ref),&cdst); 
+	}
 };																				
 FLEXT_LIB_V("vasp, vasp.rpeaks",vasp_rpeaks)
 
@@ -196,7 +208,11 @@ class vasp_rvalleys:
 	FLEXT_HEADER(vasp_rvalleys,vasp_peaks)
 public:			
 	vasp_rvalleys(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
-	virtual Vasp *do_peaks(OpParam &p) { return VaspOp::m_rvalleys(p,ref,&dst); }
+	virtual Vasp *do_peaks(OpParam &p) 
+	{ 
+		CVasp cdst(dst);
+		return VaspOp::m_rvalleys(p,CVasp(ref),&cdst); 
+	}
 };																				
 FLEXT_LIB_V("vasp, vasp.rvalleys",vasp_rvalleys)
 

@@ -71,7 +71,7 @@ template<class T> V f_cpowi(T &rv,T &iv,T ra,T ia,OpParam &p)
 
 BL VecOp::d_cpowi(OpParam &p) { d__cop(f_cpowi<S>,p); }
 
-Vasp *VaspOp::m_cpowi(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst) 
+Vasp *VaspOp::m_cpowi(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);

@@ -16,10 +16,10 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 // Fourier transforms
 
 namespace VaspOp {
-	Vasp *m_rfft(OpParam &p,Vasp &src,Vasp *dst = NULL,BL inv = false);  // real forward
-	inline Vasp *m_rifft(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_rfft(p,src,dst,true); } // real inverse
-	Vasp *m_cfft(OpParam &p,Vasp &src,Vasp *dst = NULL,BL inv = false); // complex forward
-	inline Vasp *m_cifft(OpParam &p,Vasp &src,Vasp *dst = NULL) { return m_cfft(p,src,dst,true); } // complex inverse
+	Vasp *m_rfft(OpParam &p,CVasp &src,CVasp *dst = NULL,BL inv = false);  // real forward
+	inline Vasp *m_rifft(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_rfft(p,src,dst,true); } // real inverse
+	Vasp *m_cfft(OpParam &p,CVasp &src,CVasp *dst = NULL,BL inv = false); // complex forward
+	inline Vasp *m_cifft(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cfft(p,src,dst,true); } // complex inverse
 }
 
 #endif

@@ -94,7 +94,6 @@ vasp_op::vasp_op(BL op)
 	FLEXT_ADDBANG(0,m_dobang);
 	FLEXT_ADDMETHOD_(0,"vasp",m_vasp);
 	FLEXT_ADDMETHOD_(0,"set",m_set);
-//	if(op) FLEXT_ADDMETHOD_(0,"to",m_to);
 
 	FLEXT_ADDATTR_VAR("ref",m_getref,m_setref);
 	if(op) FLEXT_ADDATTR_VAR("to",m_getto,m_setto);
@@ -170,23 +169,6 @@ V vasp_op::m_update(I argc,const t_atom *argv)
 	}
 }
 
-
-/*
-V vasp_op::m_detach(BL thr) 
-{ 
-#ifdef FLEXT_THREADS
-	detach = thr; 
-#endif
-}
-
-V vasp_op::m_prior(I p) 
-{ 
-#ifdef FLEXT_THREADS
-	prior = p; 
-#endif
-}
-*/
-
 V vasp_op::m_stop() {}
 
 ///////////////////////////////////////////////////////////////////////////
@@ -201,10 +183,10 @@ V vasp_tx::m_bang()
 	Lock(); 
 
 #ifdef FLEXT_THREADS
-//	ChangePriority(prior);
+//	RelPriority(prior);
 #endif
 
-	if(ref.Ok()) 
+	if(ref.Check()) 
 	{
 		Vasp *ret = x_work();
 		if(ret) {

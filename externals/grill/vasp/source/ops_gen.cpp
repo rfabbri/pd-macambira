@@ -48,7 +48,7 @@ BL VecOp::d_mosc(OpParam &p)
 
 	\todo Replace period length by frequency specification
 */
-Vasp *VaspOp::m_osc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul) 
+Vasp *VaspOp::m_osc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul) 
 { 
 	Vasp *ret = NULL;
 	if(arg.IsList() && arg.GetList().Count() >= 1) {
@@ -109,7 +109,7 @@ BL VecOp::d_mcosc(OpParam &p)
 
 	\todo Replace period length by frequency specification
 */
-Vasp *VaspOp::m_cosc(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul) 
+Vasp *VaspOp::m_cosc(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul) 
 { 
 	Vasp *ret = NULL;
 	if(arg.IsList() && arg.GetList().Count() >= 1) {
@@ -172,7 +172,7 @@ BL VecOp::d_mphasor(OpParam &p)
 
 	\todo Replace period length by frequency specification
 */
-Vasp *VaspOp::m_phasor(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL mul) 
+Vasp *VaspOp::m_phasor(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL mul) 
 { 
 	Vasp *ret = NULL;
 	if(arg.IsList() && arg.GetList().Count() >= 1) {
@@ -220,7 +220,7 @@ BL VecOp::d_noise(OpParam &p)
 
 	\return normalized destination vasp
 */
-Vasp *VaspOp::m_noise(OpParam &p,Vasp &src,Vasp *dst) 
+Vasp *VaspOp::m_noise(OpParam &p,CVasp &src,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
@@ -250,7 +250,7 @@ BL VecOp::d_cnoise(OpParam &p)
 
 	\todo Replace period length by frequency specification
 */
-Vasp *VaspOp::m_cnoise(OpParam &p,Vasp &src,Vasp *dst) 
+Vasp *VaspOp::m_cnoise(OpParam &p,CVasp &src,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
 	CVecBlock *vecs = GetCVecs(p.opname,src,dst);

@@ -60,13 +60,8 @@ public:
 	Vasp &operator =(const Vasp &v);
 	Vasp &operator ()(I argc,const t_atom *argv /*,BL withvasp = false*/);
 
-	// add another vector
-	Vasp &operator +=(const Ref &r);
-	// add vectors of another vasp
-	Vasp &operator +=(const Vasp &v);
-
 	// set used channels to 0
-	Vasp &Clear() { frames = 0; chns = 0; return *this; }
+	Vasp &Clear();
 
 	// used vectors
 	I Vectors() const { return chns; }
@@ -83,13 +78,13 @@ public:
 	V FramesR(R f) { if(f) FramesM(1./f); else Frames(0); }
 
 	// set buffer sizes
-	V Size(I fr);
+	V Size(I fr,BL keep = true);
 	// set frame count differentially
-	V SizeD(I frd);
+	V SizeD(I frd,BL keep = true);
 	// set frame count 
-	V SizeM(R f);
+	V SizeM(R f,BL keep = true);
 	// set frame count 
-	V SizeR(R f) { if(f) SizeM(1./f); else Size(0); }
+	V SizeR(R f,BL keep = true) { if(f) SizeM(1./f,keep); else Size(0,false); }
 
 	// actual length of the vasp (in frames)
 	I ChkFrames() const;
@@ -120,6 +115,9 @@ public:
 	// get buffer associated to a channel
 	VBuffer *Buffer(I ix) const;
 
+	// add another vector
+	Vasp &AddVector(const Ref &r);
+
 	// Real/Complex
 	VBuffer *ReBuffer() const { return Buffer(0); }
 	VBuffer *ImBuffer() const { return Buffer(1); }
@@ -140,5 +138,21 @@ protected:
 
 	V Resize(I rcnt);
 };
+
+/*! \brief Checked vasp
+	\remark Only use that for immediate operation!
+*/
+class CVasp:
+	public Vasp
+{
+public:
+	CVasp();
+	CVasp(const Vasp &v);
+
+	// add vectors of another vasp
+	CVasp &operator +=(const CVasp &v);
+
+};
+
 
 #endif

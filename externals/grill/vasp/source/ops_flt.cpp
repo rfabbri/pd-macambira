@@ -105,7 +105,7 @@ BL VecOp::d_flp(OpParam &p)
 
 
 
-Vasp *VaspOp::m_fhp(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL hp) 
+Vasp *VaspOp::m_fhp(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL hp) 
 { 
 	Vasp *ret = NULL;
 	if(arg.IsList() && arg.GetList().Count() >= 1) {
@@ -186,7 +186,7 @@ BL VecOp::d_dif(OpParam &p)
 	\param inv true for differentiation
 	\return normalized destination vasp
 */
-Vasp *VaspOp::m_int(OpParam &p,Vasp &src,const Argument &arg,Vasp *dst,BL inv) 
+Vasp *VaspOp::m_int(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL inv) 
 { 
 	Vasp *ret = NULL;
 	RVecBlock *vecs = GetRVecs(p.opname,src,dst);
