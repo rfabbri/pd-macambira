@@ -111,6 +111,9 @@ protected:
 	
 	valentry *vals;
 	direntry *dirs;
+
+private:
+  	BL LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d);
 };
 
 class pooldata:

@@ -367,7 +367,7 @@ I pooldir::GetSub(const A **&lst)
 {
 	const I cnt = CntSub();
 	lst = new const A *[cnt];
-	for(I i = 0,dix = 0; dix < dsize; ++dix) {
+	for(I i = 0,dix = 0; i < cnt; ++dix) {
 		pooldir *ix = dirs[dix].d;
 		for(; ix; ix = ix->nxt) lst[i++] = &ix->dir;
 	}
@@ -539,14 +539,18 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 		AtomList d,k,*v = new AtomList;
 		BL r = 
             ReadAtoms(is,d,',') && 
-            ReadAtoms(is,k,',') && k.Count() == 1 && 
+            ReadAtoms(is,k,',') &&
             ReadAtoms(is,*v,'\n');
 
 		if(r) {
 			if(depth < 0 || d.Count() <= depth) {
 				pooldir *nd = mkdir?AddDir(d):GetDir(d);
 				if(nd) {
-					nd->SetVal(k[0],v); v = NULL;
+                    if(k.Count() == 1) {
+	    				nd->SetVal(k[0],v); v = NULL;
+                    }
+                    else if(k.Count() > 1)
+                        post("pool - file format invalid: key must be a single word");
 				}
 	#ifdef FLEXT_DEBUG
 				else
@@ -564,6 +568,7 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 
 BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
 {
+    I cnt = 0;
 	for(I vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
 			WriteAtoms(os,dir);
@@ -572,9 +577,16 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
 			os << " , ";
 			WriteAtoms(os,*ix->data);
 			os << endl;
+            ++cnt;
 		}
 	}
+    if(!cnt) {
+        // no key/value pairs present -> force empty directory
+		WriteAtoms(os,dir);
+		os << " , ," << endl;
+    }
 	if(depth) {
+        // save sub-directories
 		I nd = depth > 0?depth-1:-1;
 		for(I di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
@@ -703,11 +715,11 @@ static void getvalue(istream &is,string &s)
     s = tmp;
 }
 
-BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
+BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
 {
-    AtomList d,k,v;
-    bool inpool = false,inval = false,inkey = false,indata = false;
-    const t_symbol *empty = MakeSymbol("");
+    AtomList k,v;
+    bool inval = false,inkey = false,indata = false;
+    int cntval = 0;
 
 	while(!is.eof()) {
         xmltag tag;
@@ -717,7 +729,7 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
             string s;
             getvalue(is,s);
 
-            if(s.length() && inpool && 
+            if(s.length() &&
                 (
                     (!inval && inkey && d.Count()) ||  /* dir */
                     (inval && (inkey || indata)) /* value */
@@ -752,86 +764,108 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
             else
                 post("pool - error reading XML data");
         }
-        else if(tag == "pool") {
-            if(tag.type == xmltag::t_end) break;
-            else inpool = true;
+        else if(tag == "dir") {
+            if(tag.type == xmltag::t_start) {
+                // warn if last directory key was not given
+                if(d.Count() && GetSymbol(d[d.Count()-1]) == sym__)
+                    post("pool - XML load: dir key must be given prior to subdirs, ignoring items");
+
+                AtomList dnext(d.Count()+1);
+                // copy existing dir
+                dnext.Set(d.Count(),d.Atoms(),0,false);
+                // initialize current dir key as empty
+                SetSymbol(dnext[d.Count()],sym__);
+
+                // read next level
+                LdDirXMLRec(is,depth,mkdir,dnext); 
+            }
+            else if(tag.type == xmltag::t_end) {
+                if(!cntval && mkdir) {
+                    // no values have been found in dir -> make empty dir
+                    AddDir(d);
+                }
+
+                // break tag loop
+                break;
+            }
         }
-        else if(inpool) {
-            if(tag == "dir") {
-                if(tag.type == xmltag::t_start) {
-                    // warn if last directory key was not given
-                    if(d.Count() && GetSymbol(d[d.Count()-1]) == empty)
-                        post("pool - XML load: dir key must be given prior to subdirs, ignoring items");
-
-                    // initialize dir key as empty
-                    t_atom at; SetSymbol(at,empty);
-                    d.Append(at);
-                }
-                else if(tag.type == xmltag::t_end) {
-                    if(d.Count())
-                        d.Part(0,d.Count()-1);
-                    else
-                        post("pool - XML load: superfluous </dir> in XML data");
-                }
+        else if(tag == "value") {
+            if(tag.type == xmltag::t_start) {
+                inval = true;
+                ++cntval;
+                k.Clear(); v.Clear();
             }
-            else if(tag == "value") {
-                if(tag.type == xmltag::t_start) {
-                    inval = true;
-                    k.Clear(); v.Clear();
-                }
-                else if(tag.type == xmltag::t_end) {
-        			if(depth < 0 || d.Count() <= depth) {
-                        // NOW set value
+            else if(tag.type == xmltag::t_end) {
+                // set value after tag closing, but only if level <= depth
+        	    if(depth < 0 || d.Count() <= depth) {
+                    int fnd;
+                    for(fnd = d.Count()-1; fnd >= 0; --fnd)
+                        if(GetSymbol(d[fnd]) == sym__) break;
 
-                        int fnd;
-                        for(fnd = d.Count()-1; fnd >= 0; --fnd)
-                            if(GetSymbol(d[fnd]) == empty) break;
+                    // look if last dir key has been given
+                    if(fnd >= 0) {
+                        if(fnd == d.Count()-1)
+                            post("pool - XML load: dir key must be given prior to values");
 
-                        // look if last dir key has been given
-                        if(fnd >= 0) {
-                            if(fnd == d.Count()-1)
-                                post("pool - XML load: dir key must be given prior to values");
-
-                            // else: one directoy level has been left unintialized, ignore items
-                        }
-                        else {
-                            // only use first word of key
-                            if(k.Count() == 1) {
-		        		        pooldir *nd = mkdir?AddDir(d):GetDir(d);
-        				        if(nd) 
-                                    nd->SetVal(k[0],new AtomList(v));
-                                else
-                                    post("pool - XML load: value key must be exactly one word, value not stored");
-				            }
-                        }
+                        // else: one directoy level has been left unintialized, ignore items
                     }
-                    inval = false;
+                    else {
+                        // only use first word of key
+                        if(k.Count() == 1) {
+		        		    pooldir *nd = mkdir?AddDir(d):GetDir(d);
+        				    if(nd) 
+                                nd->SetVal(k[0],new AtomList(v));
+                            else
+                                post("pool - XML load: value key must be exactly one word, value not stored");
+				        }
+                    }
                 }
+                inval = false;
             }
-            else if(tag == "key") {
-                if(tag.type == xmltag::t_start) {
-                    inkey = true;
-                }
-                else if(tag.type == xmltag::t_end) {
-                    inkey = false;
-                }
+        }
+        else if(tag == "key") {
+            if(tag.type == xmltag::t_start) {
+                inkey = true;
             }
-            else if(tag == "data") {
-                if(!inval) 
-                    post("pool - XML tag <data> not within <value>");
+            else if(tag.type == xmltag::t_end) {
+                inkey = false;
+            }
+        }
+        else if(tag == "data") {
+            if(!inval) 
+                post("pool - XML tag <data> not within <value>");
 
-                if(tag.type == xmltag::t_start) {
-                    indata = true;
-                }
-                else if(tag.type == xmltag::t_end) {
-                    indata = false;
-                }
+            if(tag.type == xmltag::t_start) {
+                indata = true;
             }
+            else if(tag.type == xmltag::t_end) {
+                indata = false;
+            }
+        }
+        else if(!d.Count() && tag == "pool" && tag.type == xmltag::t_end) {
+            // break tag loop
+            break;
+        }
 #ifdef FLEXT_DEBUG
-            else {
-                post("pool - unknown XML tag '%s'",tag.tag.c_str());
-            }
+        else {
+            post("pool - unknown XML tag '%s'",tag.tag.c_str());
+        }
 #endif
+    }
+    return true;
+}
+
+BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
+{
+	while(!is.eof()) {
+        xmltag tag;
+        if(!gettag(is,tag)) break;
+
+        if(tag == "pool") {
+            if(tag.type == xmltag::t_start) 
+                LdDirXMLRec(is,depth,mkdir,AtomList());
+            else
+                post("pool - pool not initialized yet");
         }
         else if(tag == "!DOCTYPE") {
             // ignore

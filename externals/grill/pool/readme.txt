@@ -86,6 +86,10 @@ o Microsoft Visual C++ 6/7: edit "config-max-msvc.txt" & run "build-max-msvc.bat
 
 Version history:
 
+0.2.1:
+- fixed "cntsub"... directories in current directory have been forgotten
+- store/create also empty dirs with file I/O
+
 0.2.0:
 - attributes (pool,private,echodir,absdir)
 - added "geti" message for retrieval of a value at an index

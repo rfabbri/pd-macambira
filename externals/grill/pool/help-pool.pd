@@ -1,4 +1,4 @@
-#N canvas 132 22 958 714 12;
+#N canvas 4 3 927 697 12;
 #X msg 296 105 set 1 2 3;
 #X obj 238 631 print K;
 #X msg 607 211 getall;

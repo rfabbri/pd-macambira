@@ -11,7 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "pool.h"
 #include <string>
 
-#define POOL_VERSION "0.2.0"
+#define POOL_VERSION "0.2.1pre"
 
 #define VCNT 64
 #define DCNT 16
@@ -703,6 +703,7 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 		for(I i = 0; i < cnt; ++i) {
 			AtomList ndir(absdir?gldir:rdir);
 			ndir.Append(*r[i]);
+            ++ret;
 
 			if(how == get_norm) {
 				ToOutAnything(3,tag,0,NULL);
