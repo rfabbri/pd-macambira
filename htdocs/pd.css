@@ -86,3 +86,28 @@ P.small {
 	padding: 5px;
 }
 
+
+#Content>p {margin:0px;}
+#Content>p+p {text-indent:30px;}
+
+#Content {
+	margin:0px 50px 50px 160px;
+	padding:10px;
+	}
+
+#Menu {
+	position:absolute;
+	top:120px;
+	left:10px;
+	width:150px;
+	padding:10px;
+	line-height:17px;
+/* Again, the ugly brilliant hack. */
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	width:140px;
+	}
+/* Again, "be nice to Opera 5". */
+body>#Menu {width:140px;}
+
+
