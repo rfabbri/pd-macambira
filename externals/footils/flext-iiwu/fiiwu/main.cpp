@@ -46,14 +46,17 @@ class fiiwu:
 			// setting up inlets and outlets and for registering
 			// inlet-methods:
 			
-			AddInAnything();         // 2 audio ins
-			AddOutSignal(2);         // 1 audio out [ == AddOutSignal(1) ]
+			AddInAnything();         // slurp anything
+			AddOutSignal(3);         // 2 audio out [ == AddOutSignal(2) ]
 			
 			SetupInOut();           // set up inlets and outlets. 
 			                        // Must be called once!
-			// IIWU_DEFAULT_SETTINGS;	
-			iiwu_synth_settings_t pd_iiwu_settings = 
-				{ IIWU_SETTINGS_VERSION, 128, 0, NULL, NULL};
+			
+			iiwu_synth_settings_t pd_iiwu_settings = IIWU_DEFAULT_SETTINGS;
+			
+			// plugin synth: AUDIO off
+			pd_iiwu_settings.flags        &= ~IIWU_AUDIO;
+			pd_iiwu_settings.sample_format = IIWU_FLOAT_FORMAT;
 			
 			// Create iiwusynth instance:
 			synth = new_iiwu_synth(&pd_iiwu_settings);
@@ -209,6 +212,11 @@ void fiiwu::m_signal(int n, float *const *in, float *const *out)
 	float *left  = out[0];
 	float *right = out[1];
 	
-	iiwu_synth_write_float(synth, n, left, 0, 1, right, 0, 1); 
+	// now comes the strange thing: we're using *tmp for the 3. outlet,
+	// feed *tmp to the iiwu-function, but the sound actuall comes out the
+	// second outlet...
+	float *tmp   = out[2];
+	
+	iiwu_synth_write_float(synth, n, left, 0, 1, tmp, 0, 1); 
 	
 }  // end m_signal
