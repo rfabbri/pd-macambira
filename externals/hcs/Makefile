@@ -1,11 +1,8 @@
-current:
-	echo make pd_linux
+pd_linux: pan_gogins~.pd_linux rawmouse.pd_linux rawevent.pd_linux rawjoystick.pd_linux 
 
 clean: ; rm -f *.pd_linux *.o
 
 # ----------------------- LINUX i386 -----------------------
-
-pd_linux: pan_gogins~.pd_linux rawmouse.pd_linux rawevent.pd_linux rawjoystick.pd_linux 
 
 .SUFFIXES: .pd_linux
 
