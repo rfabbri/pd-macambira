@@ -1,15 +1,15 @@
-#N canvas 146 124 817 543 12;
+#N canvas 146 124 833 559 12;
 #X obj 26 190 dac~;
 #X obj 26 94 noise~;
 #X obj 140 192 print A;
-#X obj 230 433 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
+#X obj 443 431 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;
-#X msg 229 455 vis \$1;
-#X obj 25 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
-;
-#X msg 24 452 edit \$1;
-#X msg 92 452 getedit;
-#X msg 292 455 getvis;
+#X msg 442 453 vis \$1;
+#X obj 231 430 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+1;
+#X msg 230 452 edit \$1;
+#X msg 298 452 getedit;
+#X msg 505 453 getvis;
 #N canvas 367 122 558 434 info 0;
 #X msg 94 130 getversion;
 #X msg 94 75 getname;
@@ -52,10 +52,10 @@
 #X connect 23 0 7 0;
 #X restore 445 110 pd info;
 #X obj 96 96 r \$0-vst;
-#X obj 23 479 s \$0-vst;
-#X obj 228 481 s \$0-vst;
-#X text 50 429 display edit window;
-#X text 253 431 make edit window (in)visible;
+#X obj 229 479 s \$0-vst;
+#X obj 441 479 s \$0-vst;
+#X text 256 429 display edit window;
+#X text 466 429 make edit window (in)visible;
 #X msg 105 295 getplug;
 #X obj 26 323 s \$0-vst;
 #X text 65 249 set/get plugin;
@@ -142,10 +142,8 @@
 #X restore 445 208 pd midi;
 #X text 134 33 based on the work of Jarno Seppanen and Mark Williamson
 ;
-#X text 133 14 VST plugins for PD \, (C)2003-04 Thomas Grill;
-#X obj 26 140 vst~ 1 2 @pnames 100;
-#X obj 666 433 loadbang;
-#X msg 666 460 \; pd dsp 1;
+#X obj 723 444 loadbang;
+#X msg 723 471 \; pd dsp 1;
 #X obj 230 324 tgl 15 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X obj 228 373 s \$0-vst;
@@ -228,25 +226,35 @@
 #X text 513 209 midi messages for VST synths;
 #X text 448 314 Attention: this vst~ version will crash when a plugin
 is unloaded with the editor window open!;
-#X connect 1 0 30 0;
+#X text 133 14 VST plugins for PD \, (C)2003-05 Thomas Grill;
+#X msg 27 429 subplug AudioTrack;
+#X obj 27 479 s \$0-vst;
+#X msg 39 452 getsubplug;
+#X obj 26 140 vst~ 2 2 @pnames 100;
+#X text 27 387 subplugin name for plugin shells;
+#X text 229 501 you can also alt-click on the vst~ object;
+#X connect 1 0 52 0;
+#X connect 1 0 52 1;
 #X connect 3 0 4 0;
 #X connect 4 0 12 0;
 #X connect 5 0 6 0;
 #X connect 6 0 11 0;
 #X connect 7 0 11 0;
 #X connect 8 0 12 0;
-#X connect 10 0 30 0;
+#X connect 10 0 52 0;
 #X connect 15 0 16 0;
 #X connect 24 0 16 0;
 #X connect 25 0 26 0;
 #X connect 26 0 24 0;
-#X connect 30 0 0 0;
-#X connect 30 1 0 1;
-#X connect 30 2 2 0;
-#X connect 31 0 32 0;
-#X connect 33 0 35 0;
-#X connect 35 0 34 0;
-#X connect 36 0 34 0;
-#X connect 38 0 41 0;
-#X connect 41 0 39 0;
-#X connect 42 0 39 0;
+#X connect 29 0 30 0;
+#X connect 31 0 33 0;
+#X connect 33 0 32 0;
+#X connect 34 0 32 0;
+#X connect 36 0 39 0;
+#X connect 39 0 37 0;
+#X connect 40 0 37 0;
+#X connect 49 0 50 0;
+#X connect 51 0 50 0;
+#X connect 52 0 0 0;
+#X connect 52 1 0 1;
+#X connect 52 2 2 0;

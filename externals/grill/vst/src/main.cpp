@@ -2,10 +2,13 @@
 vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
+
+// needed for CoInitializeEx
+#define _WIN32_DCOM
 
 #include "main.h"
 
@@ -19,10 +22,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #if FLEXT_OS == FLEXT_OS_WIN
 #include <direct.h>
 #include <io.h>
+#include <objbase.h>
 #endif
 
 
-#define VST_VERSION "0.1.0pre17"
+#define VST_VERSION "0.1.0pre18"
 
 
 class vst:
@@ -38,9 +42,15 @@ protected:
     virtual V m_dsp(I n,t_signalvec const *insigs,t_signalvec const *outsigs);
     virtual V m_signal(I n,R *const *insigs,R *const *outsigs);
 
+    virtual void m_click() { ms_edit(true); }
+
     BL ms_plug(I argc,const A *argv);
     BL ms_plug(const AtomList &args) { return ms_plug(args.Count(),args.Atoms()); }
     V mg_plug(AtomList &sym) const { sym(1); SetString(sym[0],plugname.c_str()); }
+
+    void ms_subplug(I argc,const A *argv);
+    void ms_subplug(const AtomList &args) { ms_subplug(args.Count(),args.Atoms()); }
+    void mg_subplug(AtomList &sym) const { sym(1); SetString(sym[0],subplug.c_str()); }
 
     V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
 
@@ -97,7 +107,7 @@ private:
     V display_parameter(I param,BL showparams);
 
     VSTPlugin *plug;
-    std::string plugname;
+    std::string plugname,subplug;
     bool echoparam,visible,bypass,mute;
     int paramnames;
 
@@ -118,6 +128,7 @@ private:
     FLEXT_CALLBACK_V(m_print)
 
     FLEXT_CALLVAR_V(mg_plug,ms_plug)
+    FLEXT_CALLVAR_V(mg_subplug,ms_subplug)
 
     FLEXT_CALLVAR_B(mg_edit,ms_edit)
     FLEXT_CALLGET_B(mg_editor)
@@ -175,11 +186,12 @@ const t_symbol *vst::sym_progname,*vst::sym_pname,*vst::sym_param,*vst::sym_ptex
 V vst::Setup(t_classid c)
 {
     post("");
-	post("vst~ %s - VST plugin object, (C)2003-04 Thomas Grill",VST_VERSION);
+	post("vst~ %s - VST plugin object, (C)2003-05 Thomas Grill",VST_VERSION);
 	post("based on the work of Jarno Seppänen and Mark Williamson");
 	post("");
 
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
+	FLEXT_CADDATTR_VAR(c,"subplug",mg_subplug,ms_subplug);
 	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
 	FLEXT_CADDATTR_GET(c,"editor",mg_editor);
 	FLEXT_CADDATTR_VAR(c,"vis",mg_vis,ms_vis);
@@ -247,11 +259,19 @@ vst::vst(I argc,const A *argv):
     }
     else
         throw "syntax: vst~ inputs outputs [plug]";
+
+#if FLEXT_OS == FLEXT_OS_WIN
+    // this is necessary for Waveshell
+    CoInitializeEx(NULL,COINIT_MULTITHREADED+COINIT_SPEED_OVER_MEMORY);
+#endif
 }
 
 vst::~vst()
 {
     ClearPlug();
+#if FLEXT_OS == FLEXT_OS_WIN
+    CoUninitialize();
+#endif
 }
 
 V vst::ClearPlug()
@@ -390,7 +410,7 @@ BL vst::ms_plug(I argc,const A *argv)
     int loaderr = VSTINSTANCE_NO_ERROR;
 
 	// try loading the dll from the raw filename 
-	if ((loaderr = plug->Instance(plugname.c_str())) == VSTINSTANCE_NO_ERROR) {
+	if ((loaderr = plug->Instance(plugname.c_str(),subplug.c_str())) == VSTINSTANCE_NO_ERROR) {
 		FLEXT_LOG("raw filename loaded fine");
 		lf = true;
 	}
@@ -460,6 +480,27 @@ BL vst::ms_plug(I argc,const A *argv)
     if(plug) InitPlug();
 
     return lf;
+}
+
+void vst::ms_subplug(I argc,const A *argv)
+{
+    subplug.clear();
+	C buf[255];	
+	for(I i = 0; i < argc; i++) {
+		if(i > 0) subplug += ' ';
+		GetAString(argv[i],buf,sizeof buf);
+
+#if FLEXT_SYS == FLEXT_SYS_PD
+        // strip char escapes (only in newer/devel PD version)
+        char *cs = buf,*cd = cs;
+        while(*cs) {
+            if(*cs != '\\') *(cd++) = *cs;
+            ++cs;
+        }
+        *cd = 0;
+#endif
+		subplug += buf;
+	}
 }
 
 V vst::m_dsp(I n,t_signalvec const *,t_signalvec const *)
