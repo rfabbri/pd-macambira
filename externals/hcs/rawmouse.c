@@ -292,7 +292,7 @@ static int rawmouse_read(t_rawmouse *x,int fd)
       axis_num = 2;
       break;
     }
-    outlet_float (x->x_axis_out[axis_num], x->x_input_event.value);	
+    outlet_float (x->x_axis_out[axis_num], (int)x->x_input_event.value);	
   }
 
   return 1;    
