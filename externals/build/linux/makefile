@@ -12,16 +12,26 @@ all: $(EXTERNALS:.c=.pd_linux)
 
 .SUFFIXES: .pd_linux
 
-# Pentium III or better
-#CPU_FLAGS = -march=pentium3
-# PowerPC G3
-#CPU_FLAGS = -mpowerpc-gpopt
-# PowerPC G4
-#CPU_FLAGS = -mpowerpc-gpopt -mcpu=7450 -maltivec
-# PowerPC G5
-#CPU_FLAGS = -mpowerpc64 -maltivec -falign-functions=32 -falign-labels=32 -falign-loops=32 -falign-jumps=32
+# AMD Athlon XP K7
+#CPU_FLAGS = -O3 -march=athlon-xp -m3dnow -msse -mfpmath=sse
 
-OPTIM_FLAGS = -O3 -funroll-loops -fomit-frame-pointer $(CPU_FLAGS)
+# Generic i386 (tune for 686, since that's about the bottom these days)
+CPU_FLAGS =  -O2 -mcpu=i686
+# Pentium III or better
+#CPU_FLAGS = -O3 -march=pentium3
+# Pentium 4 or better
+#CPU_FLAGS = -O3 -march=pentium4
+
+# PowerPC 750 (G3)
+#CPU_FLAGS = -O3 -mpowerpc-gpopt -mcpu=750
+# PowerPC 7400 (G4 <= 700MHz)
+#CPU_FLAGS = -O3 -mpowerpc-gpopt -mcpu=7400 -maltivec
+# PowerPC 7450 (G4 >= 533Mhz)
+#CPU_FLAGS = -O3 -mpowerpc-gpopt -mcpu=7450 -maltivec
+# PowerPC G5
+#CPU_FLAGS = -O3 -mpowerpc64 -maltivec -falign-functions=32 -falign-labels=32 -falign-loops=32 -falign-jumps=32
+
+OPTIM_FLAGS = -funroll-loops -fomit-frame-pointer $(CPU_FLAGS)
 
 CFLAGS = -fPIC -DPD -DUNIX $(OPTIM_FLAGS)  \
     -Wall -W -Wshadow -Wstrict-prototypes  \
