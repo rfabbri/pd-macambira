@@ -71,15 +71,18 @@ class fiiwu:
 			FLEXT_ADDMETHOD_(0,"note", iiwu_note);
 			FLEXT_ADDMETHOD_(0,"prog", iiwu_program_change);
 			FLEXT_ADDMETHOD_(0,"control", iiwu_control_change);
+			FLEXT_ADDMETHOD_(0,"bend", iiwu_pitch_bend);
+			FLEXT_ADDMETHOD_(0,"bank",  iiwu_bank);
 			
 			// list input calls iiwu_note(...)
 			FLEXT_ADDMETHOD_(0, "list",  iiwu_note);
 			
-			// alias shortcuts:
+			// some alias shortcuts:
 			FLEXT_ADDMETHOD_(0,"n",  iiwu_note);
 			FLEXT_ADDMETHOD_(0,"p",  iiwu_program_change);
 			FLEXT_ADDMETHOD_(0,"c",  iiwu_control_change);
 			FLEXT_ADDMETHOD_(0,"cc", iiwu_control_change);
+			FLEXT_ADDMETHOD_(0,"b",  iiwu_pitch_bend);
 			
 			
 			// We're done constructing:
@@ -112,6 +115,12 @@ class fiiwu:
 		
 		FLEXT_CALLBACK_G(iiwu_control_change)
 		void iiwu_control_change(int argc, t_atom *argv);
+		
+		FLEXT_CALLBACK_G(iiwu_pitch_bend)
+		void iiwu_pitch_bend(int argc, t_atom *argv);
+		
+		FLEXT_CALLBACK_G(iiwu_bank)
+		void iiwu_bank(int argc, t_atom *argv);
 
 }; // end of class declaration for fiiwu
 
@@ -163,9 +172,29 @@ void fiiwu::iiwu_control_change(int argc, t_atom *argv)
 	int   chan, ctrl, val;
 	chan  = GetAInt(argv[0]);
 	ctrl  = GetAInt(argv[1]);
-	val   = GetAInt(argv[1]);
+	val   = GetAInt(argv[2]);
 	iiwu_synth_cc(synth,chan-1,ctrl,val);
 }
+
+void fiiwu::iiwu_pitch_bend(int argc, t_atom *argv)
+{
+	if (synth == NULL) return;
+	int   chan, val;
+	chan  = GetAInt(argv[0]);
+	val   = GetAInt(argv[1]);
+	iiwu_synth_pitch_bend(synth, chan-1, val);
+}
+
+void fiiwu::iiwu_bank(int argc, t_atom *argv)
+{
+	if (synth == NULL) return;
+	int   chan, bank;
+	chan  = GetAInt(argv[0]);
+	bank  = GetAInt(argv[1]);
+	iiwu_synth_bank_select(synth, chan-1, bank);
+}
+
+
 
 // Now we define our DSP function. It gets this arguments:
 // 
