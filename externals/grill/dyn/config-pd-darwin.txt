@@ -6,27 +6,27 @@
 #
 
 # your c++ compiler (define only if not g++)
-# CXX=
+# CXX=gcc-3.3
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDPATH=/usr/local/pd/src
+PDPATH=/usr/src/pd-0.37-0/src
 
 # where is the PD executable?
-PD=/usr/local/pd/bin/pd
+PD=/usr/local/bin/pd
 
 # where do the flext libraries reside?
-FLEXTPATH=/usr/local/pd/flext
+FLEXTPATH=/usr/local/lib/pd/flext
 
 # where should flext libraries be built?
 TARGDIR=./pd-darwin
 
-# where should pool be installed?
+# where should dyn be installed?
 # (leave blank to omit installation)
-INSTPATH=/usr/local/pd/extra
+INSTPATH=/usr/local/lib/pd/extra
 
 
 # additional compiler flags
 # (check if they fit for your system!)
-# UFLAGS=-maltivec
+UFLAGS=-maltivec -faltivec

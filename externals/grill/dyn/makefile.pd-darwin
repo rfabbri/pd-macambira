@@ -22,9 +22,10 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 INCLUDES=$(PDPATH) 
 LIBPATH=
 FLAGS=-DFLEXT_SYS=2 ${U_FLAGS}
-CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions -fno-rtti
+CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-rtti
 #CFLAGS=-g
 LIBS=m
+FRAMEWORKS=vecLib
 LDFLAGS=-bundle -bundle_loader $(PD)
 
 
@@ -52,7 +53,7 @@ $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(patsubst %,-framework %,$(FRAMEWORKS)) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):
