@@ -10,7 +10,7 @@ LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes  \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE =  -I..
+LINUXINCLUDE =  -I.. -I../../../pd/src
 
 %.pd_linux: ../src/%.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c ../src/$*.c
@@ -21,3 +21,7 @@ LINUXINCLUDE =  -I..
 
 clean:
 	-rm *.pd_linux *~
+
+install:
+	install -m644 *.pd_linux $(prefix)/lib/pd/extra
+
