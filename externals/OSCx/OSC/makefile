@@ -19,7 +19,7 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-DARWININCLUDE =  -I../../../pd/src -I../../obj
+DARWININCLUDE =  -I../../build/include -I../../obj
 
 DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
@@ -44,7 +44,7 @@ LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-LINUXINCLUDE =  -I../../../pd-0.37-test4/src
+LINUXINCLUDE =  -I../../build/include
 
 LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 

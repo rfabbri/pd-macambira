@@ -64,6 +64,7 @@ Technologies, University of California, Berkeley.
 */
 
 #include "m_pd.h"
+//#include "m_imp.h"
 #include "s_stuff.h"
 //#include "x_osc.h"
 
@@ -524,6 +525,24 @@ int timeRound(double x)
 {	
 	return x >= 0.0 ? x+0.5 : x-0.5;
 }
+/*
+void WriteLogicalTime(char* dst)
+{
+        static double startTime = -1.0;
+        double sTime;
+                                                                                
+        // Initialisierung der Startzeit.
+        // Knnte effizienter (ohne 'if') auch irgendwo vorher passieren.
+        // Knnte wahrscheinlich auch 0.0 sein.
+        if (startTime < 0.0) {
+                startTime = clock_getlogicaltime();
+        }
+                                                                                
+        sTime = clock_gettimesince(startTime) * 0.001;
+        *(int32_t*)dst = hton'K l((int32_t)sTime);
+        *(int32_t*)(dst+4) = htonl((int32_t)(4294967296.0 * sTime));
+}
+*/
 
 void WriteLogicalTime(char* dst)
 {
@@ -552,7 +571,7 @@ Boolean dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLeng
 		dt0 = TimeToSeconds(t0); // client time
 		dt1 = TimeToSeconds(t1); // server time	
 		
-		fprintf(stderr, "%f\t%f\t%f\n", dt0, dt1, dt0 - dt1);
+		//		fprintf(stderr, "%f\t%f\t%f\n", dt0, dt1, dt0 - dt1);
 
 		sendto(fd, buf, n, 0, (struct sockaddr *)clientDesc, clientDescLenght);		
 		return TRUE;
