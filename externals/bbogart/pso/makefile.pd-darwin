@@ -31,8 +31,8 @@ FRAMEWORKS=Carbon
 NAME=pso
 
 # all the source files from the package
-SRCS=main.cpp pool.cpp data.cpp
-HDRS=pool.h
+SRCS=main.cpp
+HDRS=
 
 DIR=.
 

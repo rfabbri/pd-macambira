@@ -1,0 +1,28 @@
+# PSO - Particle Swarm Optimizer - Copyright Ben Bogart 2003
+# makefile adapted from pool - Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+#
+
+# your c++ compiler (define only if it's different than g++)
+# CXX=g++
+
+# where are the PD header files?
+# leave it blank if it is a system directory (like /usr/local/include), 
+# 	since gcc >= 3.2 complains about it
+PDPATH=/usr/local/include
+
+# where do the flext libraries reside?
+FLEXTPATH=/usr/local/lib/pd/flext
+
+# where should flext libraries be built?
+TARGDIR=./pd-linux
+
+# where should the external be installed?
+# (leave blank to omit installation)
+INSTPATH=/usr/local/lib/pd/extra
+
+# user defined compiler flags
+UFLAGS=
+
+# define for shared build
+#FLEXT_SHARED=1
+

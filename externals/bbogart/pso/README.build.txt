@@ -6,13 +6,13 @@ Note: Flext is required to compile this external!
 
 To build & Install (under linux):
 
-   edit makefile.pd-linux to suit your needs
+   edit config-pd-linux.txt to suit your needs
 
    make -f makefile.pd-linux
 
 To build & Install (under OSX):
 
-   edit makefile.pd-darwin to suit your needs
+   edit config-pd-darwin.txt to suit your needs
 
    make -f makefile.pd-darwin
 

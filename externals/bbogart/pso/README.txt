@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 USAGE:
 
+MAX: Put it in your externals folder.
+PD:  Put it in your extra folder.
+
 The PSO object requires three arguments (see below). The object has one inlet and three outlets. 
 In order to calculate one iteration of the PSO send it a bang. The three outlets are:
 
