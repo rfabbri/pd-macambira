@@ -62,7 +62,7 @@ void sc4pd_library_setup()
 	 "DelayN~,\n"
 	 "          DelayL~, DelayC~, CombN~, CombL~, CombC~, AllpassN~, "
 	 "AllpassL~,\n"
-	 "          AllpassC~"
+	 "          AllpassC~, PitchShift~"
 	 "\n"
 	 );
 
