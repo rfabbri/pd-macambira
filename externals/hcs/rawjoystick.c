@@ -1,5 +1,24 @@
-/* (C) Guenter Geiger <geiger@epy.co.at> */
-
+/* Copyright 2003 Hans-Christoph Steiner <hans@eds.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ */
+/* 
+ * $Id: rawjoystick.c,v 1.3 2003-04-22 21:46:22 eighthave Exp $
+ */
+static char *version = "$Revision: 1.3 $";
 
 #include <m_imp.h>
 
@@ -8,7 +27,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-#include <linux/input.h>
+#include <SDL/SDL.h>
 
 #include <sys/stat.h>
 
@@ -20,220 +39,72 @@
 #include <unistd.h>
 #include <termios.h>
 
-#define DEBUG(x) 
-/*#define DEBUG(x) x */
-
-
-#define RAWJOYSTICK_DEVICE   "/dev/input/event0"
-
-// scaling factor for output
-#define DEF_SCALE         1
-// delay/refresh time in milliseconds
-#define DEF_DELTIME       5
+/*#define DEBUG(x) */
+#define DEBUG(x) x 
 
 #define RAWJOYSTICK_AXES     6
 #define RAWJOYSTICK_BUTTONS  9
 
-/* from <linux/input.h>
-// button types
-#define BTN_LEFT		0x110
-#define BTN_RIGHT		0x111
-#define BTN_MIDDLE		0x112
-#define BTN_SIDE		0x113
-#define BTN_EXTRA		0x114
-#define BTN_FORWARD		0x115
-#define BTN_BACK		0x116
-
-// axes
-#define REL_X			0x00
-#define REL_Y			0x01
-#define REL_WHEEL		0x08
-*/
-
-
-/*------------------------------------------------------------------------------
- * from evtest.c from the ff-utils package
- */
-
-#define BITS_PER_LONG (sizeof(long) * 8)
-#define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
-#define OFF(x)  ((x)%BITS_PER_LONG)
-#define BIT(x)  (1UL<<OFF(x))
-#define LONG(x) ((x)/BITS_PER_LONG)
-#define test_bit(bit, array)	((array[LONG(bit)] >> OFF(bit)) & 1)
-
-
-char *events[EV_MAX + 1] = { "Reset", "Key", "Relative", "Absolute", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL, NULL, NULL, "LED", "Sound", NULL, "Repeat", "ForceFeedback", NULL, "ForceFeedbackStatus"};
-char *keys[KEY_MAX + 1] = { "Reserved", "Esc", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Minus", "Equal", "Backspace",
-"Tab", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "LeftBrace", "RightBrace", "Enter", "LeftControl", "A", "S", "D", "F", "G",
-"H", "J", "K", "L", "Semicolon", "Apostrophe", "Grave", "LeftShift", "BackSlash", "Z", "X", "C", "V", "B", "N", "M", "Comma", "Dot",
-"Slash", "RightShift", "KPAsterisk", "LeftAlt", "Space", "CapsLock", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10",
-"NumLock", "ScrollLock", "KP7", "KP8", "KP9", "KPMinus", "KP4", "KP5", "KP6", "KPPlus", "KP1", "KP2", "KP3", "KP0", "KPDot", "103rd",
-"F13", "102nd", "F11", "F12", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "KPEnter", "RightCtrl", "KPSlash", "SysRq",
-"RightAlt", "LineFeed", "Home", "Up", "PageUp", "Left", "Right", "End", "Down", "PageDown", "Insert", "Delete", "Macro", "Mute",
-"VolumeDown", "VolumeUp", "Power", "KPEqual", "KPPlusMinus", "Pause", "F21", "F22", "F23", "F24", "KPComma", "LeftMeta", "RightMeta",
-"Compose", "Stop", "Again", "Props", "Undo", "Front", "Copy", "Open", "Paste", "Find", "Cut", "Help", "Menu", "Calc", "Setup",
-"Sleep", "WakeUp", "File", "SendFile", "DeleteFile", "X-fer", "Prog1", "Prog2", "WWW", "MSDOS", "Coffee", "Direction",
-"CycleWindows", "Mail", "Bookmarks", "Computer", "Back", "Forward", "CloseCD", "EjectCD", "EjectCloseCD", "NextSong", "PlayPause",
-"PreviousSong", "StopCD", "Record", "Rewind", "Phone", "ISOKey", "Config", "HomePage", "Refresh", "Exit", "Move", "Edit", "ScrollUp",
-"ScrollDown", "KPLeftParenthesis", "KPRightParenthesis",
-"International1", "International2", "International3", "International4", "International5",
-"International6", "International7", "International8", "International9",
-"Language1", "Language2", "Language3", "Language4", "Language5", "Language6", "Language7", "Language8", "Language9",
-NULL, 
-"PlayCD", "PauseCD", "Prog3", "Prog4", "Suspend", "Close",
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-"Btn0", "Btn1", "Btn2", "Btn3", "Btn4", "Btn5", "Btn6", "Btn7", "Btn8", "Btn9",
-NULL, NULL,  NULL, NULL, NULL, NULL,
-"LeftBtn", "RightBtn", "MiddleBtn", "SideBtn", "ExtraBtn", "ForwardBtn", "BackBtn",
-NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-"Trigger", "ThumbBtn", "ThumbBtn2", "TopBtn", "TopBtn2", "PinkieBtn",
-"BaseBtn", "BaseBtn2", "BaseBtn3", "BaseBtn4", "BaseBtn5", "BaseBtn6",
-NULL, NULL, NULL, "BtnDead",
-"BtnA", "BtnB", "BtnC", "BtnX", "BtnY", "BtnZ", "BtnTL", "BtnTR", "BtnTL2", "BtnTR2", "BtnSelect", "BtnStart", "BtnMode",
-"BtnThumbL", "BtnThumbR", NULL,
-"ToolPen", "ToolRubber", "ToolBrush", "ToolPencil", "ToolAirbrush", "ToolFinger", "ToolMouse", "ToolLens", NULL, NULL,
-"Touch", "Stylus", "Stylus2" };
-
-char *absval[5] = { "Value", "Min  ", "Max  ", "Fuzz ", "Flat " };
-char *relatives[REL_MAX + 1] = { "X", "Y", "Z", NULL, NULL, NULL, "HWheel", "Dial", "Wheel" };
-char *absolutes[ABS_MAX + 1] = { "X", "Y", "Z", "Rx", "Ry", "Rz", "Throttle", "Rudder", "Wheel", "Gas", "Brake",
-NULL, NULL, NULL, NULL, NULL,
-"Hat0X", "Hat0Y", "Hat1X", "Hat1Y", "Hat2X", "Hat2Y", "Hat3X", "Hat 3Y", "Pressure", "Distance", "XTilt", "YTilt"};
-char *leds[LED_MAX + 1] = { "NumLock", "CapsLock", "ScrollLock", "Compose", "Kana", "Sleep", "Suspend", "Mute" };
-char *repeats[REP_MAX + 1] = { "Delay", "Period" };
-char *sounds[SND_MAX + 1] = { "Bell", "Click" };
-
-char **names[EV_MAX + 1] = { events, keys, relatives, absolutes, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-NULL, NULL, leds, sounds, NULL, repeats, NULL, NULL, NULL };
-
-/*------------------------------------------------------------------------------
- */
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
 static t_class *rawjoystick_class;
 
-typedef struct _rawjoystick {
+typedef struct _rawjoystick  {
   t_object            x_obj;
-  t_int               x_fd;
-  t_symbol*           x_devname;
+  SDL_Joystick        *x_joystick;
+  t_int               x_devnum;
   int                 read_ok;
   int                 started;
-  struct input_event  x_input_event; 
-  float               x_scale;
-  float               x_translation;
   t_outlet            *x_axis_out[RAWJOYSTICK_AXES];
   t_outlet            *x_button_num_out;
   t_outlet            *x_button_val_out;
   t_clock             *x_clock;
   double              x_delaytime;
-  unsigned char       x_buttons;
-  unsigned char       x_axes;
-}t_rawjoystick;
+  int                 x_buttons;
+  int                 x_hats;
+  int                 x_axes;
+} t_rawjoystick;
 
 /*------------------------------------------------------------------------------
- * IMPLEMENTATION                    
- */
+  */
 
-//DONE
-static int rawjoystick_close(t_rawjoystick *x)
-{
-    DEBUG(post("rawjoystick_close");)
+static int rawjoystick_close(t_rawjoystick *x)  {
+    DEBUG(post("rawjoystick_CLOSE"));
 
-     if (x->x_fd <0) return 0;
-
-     close (x->x_fd);
-
-     return 1;
+    if ( SDL_JoystickOpened(x->x_devnum) ) {
+      SDL_JoystickClose(x->x_joystick);
+      return 1;
+    }
+    else {	 
+      return 0;
+    }
 }
 
-//DONE
-static int rawjoystick_open(t_rawjoystick *x,t_symbol* s)
-{
-  int eventType, eventCode;
-  unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
-  char devicename[256] = "Unknown";
-  DEBUG(post("rawjoystick_open");)
-
+static int rawjoystick_open(t_rawjoystick *x)  {
   rawjoystick_close(x);
 
-  /* set obj device name to parameter 
-   * otherwise set to default
-   */  
-  if (s != &s_)
-    x->x_devname = s;
-  else {
-    post("You need to set a input device (i.e /dev/input/event0)");
-  }
+  DEBUG(post("rawjoystick_OPEN"));
   
   /* open device */
-  if (x->x_devname) {
-    post("opening ...");
-    /* open the rawjoystick device read-only, non-exclusive */
-    x->x_fd = open (x->x_devname->s_name, O_RDONLY | O_NONBLOCK);
-    if (x->x_fd >= 0 ) post("done");
-    else post("failed");
-  }
-  else {
-    return 1;
-  }
-  
+  SDL_JoystickEventState(SDL_ENABLE);
+  x->x_joystick = SDL_JoystickOpen(x->x_devnum);
+
   /* test if device open */
-  if (x->x_fd >= 0)
-    post("%s opened",x->x_devname->s_name);
-  else {
-    post("unable to open %s",x->x_devname->s_name);
-    x->x_fd = -1;
+  /* get name of device */  
+  if ( SDL_JoystickOpened(x->x_devnum) ) {
+    post ("Configuring %s",SDL_JoystickName(x->x_devnum));
+  }
+  else {	 
     return 0;
   }
-  
-  /* read input_events from the RAWJOYSTICK_DEVICE stream 
-   * It seems that is just there to flush the event input buffer?
-   */
-  while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1);
-  
-  /* get name of device */
-  ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
-  post ("configuring %s",devicename);
 
-  /* get bitmask representing supported events (axes, buttons, etc.) */
-  memset(bitmask, 0, sizeof(bitmask));
-  ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), bitmask[0]);
-  post("Supported events:");
-    
-  x->x_axes = 0;
-  x->x_buttons = 0;
-    
-  /* cycle through all possible event types */
-  for (eventType = 0; eventType < EV_MAX; eventType++) {
-    if (test_bit(eventType, bitmask[0])) {
-      post(" %s (type %d) ", events[eventType] ? events[eventType] : "?", eventType);
-      //	post("Event type %d",eventType);
+  x->x_axes = SDL_JoystickNumAxes(x->x_joystick);
+  x->x_hats = SDL_JoystickNumHats(x->x_joystick);
+  x->x_buttons = SDL_JoystickNumButtons(x->x_joystick);
 
-      /* get bitmask representing supported button types */
-      ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
-
-      /* cycle through all possible event codes (axes, keys, etc.) 
-       * testing to see which are supported  
-       */
-      for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
-	if (test_bit(eventCode, bitmask[eventType])) {
-	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
-
-	  if ( eventType == EV_KEY ) 
-	    x->x_buttons++;
-	  else if  ( eventType == EV_ABS ) 
-	    x->x_axes++;
-	}
-    }        
-  }
-    
-  post ("\nUsing %d axes and %d buttons.", x->x_axes, x->x_buttons);
+  post ("   device has %i axes, %i hats, and %i buttons.\n",x->x_axes,x->x_hats,x->x_buttons);
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
   post ("This object is under development!  The interface could change at anytime!");
   post ("As I write cross-platform versions, the interface might have to change.");
@@ -242,191 +113,120 @@ static int rawjoystick_open(t_rawjoystick *x,t_symbol* s)
   return 1;
 }
 
+static int rawjoystick_read(t_rawjoystick *x,int fd)  {
+  SDL_Event           event; 
 
+  DEBUG(post("rawjoystick_READ"));   
 
-static int rawjoystick_read(t_rawjoystick *x,int fd)
-{
-  int readBytes;
-  int axis_num = 0;
-  t_float button_num = 0;
-    
-  if (x->x_fd < 0) return 0;
-  if (x->read_ok) {
-    readBytes = read(x->x_fd, &(x->x_input_event), sizeof(struct input_event));
-    DEBUG(post("reading %d",readBytes);)
-    if ( readBytes < 0 ) {
-      post("rawjoystick: read failed");
-      x->read_ok = 0;
-      return 0;
-    }
+  if ( ! SDL_JoystickOpened(x->x_devnum) ) {
+    return 0;
   }
-  if ( x->x_input_event.type == EV_KEY ) {
-    /* key/button event type */
-    switch ( x->x_input_event.code ) {
-    case BTN_0:
-      button_num = 0;
+  
+  post("Joystick read: %s",SDL_JoystickName(x->x_devnum));
+
+  if ( SDL_PollEvent(&event) ) {
+    post("SDL_Event.type: %i",event.type);
+    post("SDL_JoyAxisEvent.value: %i",event.jaxis.value);
+    post("SDL_JoyButtonEvent.value: %i",event.jbutton.state);
+    switch (event.type) {
+    case SDL_JOYAXISMOTION:
+      outlet_float (x->x_axis_out[event.jaxis.axis], event.jaxis.value);	
       break;
-    case BTN_1:
-      button_num = 1;
+    case SDL_JOYHATMOTION:
       break;
-    case BTN_2:
-      button_num = 2;
+    case SDL_JOYBUTTONDOWN:
+      outlet_float (x->x_button_val_out, 1);
+      outlet_float (x->x_button_num_out, event.jaxis.axis);
       break;
-    case BTN_3:
-      button_num = 3;
+    case SDL_JOYBUTTONUP:
+      outlet_float (x->x_button_val_out, 0);
+      outlet_float (x->x_button_num_out, event.jaxis.axis);
       break;
-    case BTN_4:
-      button_num = 4;
-      break;
-    case BTN_5:
-      button_num = 5;
-      break;
-    case BTN_6:
-      button_num = 6;
-      break;
-    case BTN_7:
-      button_num = 7;
-      break;
-    case BTN_8:
-      button_num = 8;
-      break;
-    case BTN_9:
-      button_num = 9;
-      break;
-    case BTN_TRIGGER:
-      button_num = 10;
-      break;
-    case BTN_THUMB:
-      button_num = 11;
-      break;
-    case BTN_THUMB2:
-      button_num = 12;
-      break;
-    case BTN_TOP:
-      button_num = 13;
-      break;
-    case BTN_TOP2:
-      button_num = 14;
-      break;
-    case BTN_PINKIE:
-      button_num = 15;
-      break;
-    case BTN_BASE:
-      button_num = 16;
-      break;
-    case BTN_BASE2:
-      button_num = 17;
-      break;
-    case BTN_BASE3:
-      button_num = 18;
-      break;
-    case BTN_BASE4:
-      button_num = 19;
-      break;
-    case BTN_BASE5:
-      button_num = 20;
-      break;
-    case BTN_BASE6:
-      button_num = 21;
-      break;
+    default:
+      DEBUG(post("Unhandled event."));
     }
-    outlet_float (x->x_button_val_out, x->x_input_event.value);
-    outlet_float (x->x_button_num_out, button_num);
-  }
-  else if  ( x->x_input_event.type == EV_ABS ) {
-    /* Relative Axes Event Type */
-    switch ( x->x_input_event.code ) {
-    case ABS_X:
-      axis_num = 0;
-      break;
-    case ABS_Y:
-      axis_num = 1;
-      break;
-    case ABS_Z:
-      axis_num = 2;
-      break;
-    case ABS_HAT0X:
-      axis_num = 3;
-      break;
-    case ABS_HAT0Y:
-      axis_num = 4;
-      break;
-    case ABS_THROTTLE:
-      axis_num = 5;
-      break;
-    }
-    outlet_float (x->x_axis_out[axis_num], (int)x->x_input_event.value);	
   }
 
   return 1;    
 }
 
-
-
 /* Actions */
 
-static void rawjoystick_bang(t_rawjoystick* x)
-{
-    DEBUG(post("rawjoystick_bang");)
-   
+static void rawjoystick_bang(t_rawjoystick* x)  {
+    DEBUG(post("rawjoystick_bang"));   
 }
 
-static void rawjoystick_float(t_rawjoystick* x)
-{
-    DEBUG(post("rawjoystick_float");)
-   
+static void rawjoystick_float(t_rawjoystick* x)  {
+    DEBUG(post("rawjoystick_float"));   
 }
 
 // DONE
 void rawjoystick_start(t_rawjoystick* x)
 {
-  DEBUG(post("rawjoystick_start");)
+  DEBUG(post("rawjoystick_START"));
 
-    if (x->x_fd >= 0 && !x->started) {
-       sys_addpollfn(x->x_fd, (t_fdpollfn)rawjoystick_read, x);
-       post("rawjoystick: start");
-       x->started = 1;
-    }
+  if ( ( SDL_JoystickOpened(x->x_devnum) ) && ( ! x->started ) ) {
+    sys_addpollfn(x->x_devnum, (t_fdpollfn)rawjoystick_read, x);
+    x->started = 1;
+  }
 }
 
 
 // DONE
-void rawjoystick_stop(t_rawjoystick* x)
-{
-  DEBUG(post("rawjoystick_stop");)
+void rawjoystick_stop(t_rawjoystick* x)  {
+  DEBUG(post("rawjoystick_STOP");)
 
-    if (x->x_fd >= 0 && x->started) { 
-        sys_rmpollfn(x->x_fd);
-        post("rawjoystick: stop");
-        x->started = 0;
-    }
+  if ( ( SDL_JoystickOpened(x->x_devnum) ) && ( x->started ) ) {
+    sys_rmpollfn(x->x_devnum);
+    x->started = 0;
+  }
 }
 
 /* Misc setup functions */
 
 
-static void rawjoystick_free(t_rawjoystick* x)
-{
-  DEBUG(post("rawjoystick_free");)
+static void rawjoystick_free(t_rawjoystick* x) {
+  DEBUG(post("rawjoystick_free"));
     
-    if (x->x_fd < 0) return;
-  
   rawjoystick_stop(x);
   
-  close (x->x_fd);
+  if ( SDL_JoystickOpened(x->x_devnum)) 
+    SDL_JoystickClose(x->x_joystick);
+  
+  SDL_Quit();
 }
 
-static void *rawjoystick_new(t_symbol *s)
-{
-  int i;
+static void *rawjoystick_new(t_float argument) {
+  int i,joystickNumber;
   t_rawjoystick *x = (t_rawjoystick *)pd_new(rawjoystick_class);
 
-  DEBUG(post("rawjoystick_new");)
-  
+  DEBUG(post("rawjoystick_NEW"));
+  post("rawHID objects, %s", version);
+  post("       by Hans-Christoph Steiner <hans@eds.org>");
+
   /* init vars */
-  x->x_fd = -1;
+  x->x_devnum = 0;
   x->read_ok = 1;
   x->started = 0;
+
+  /* INIT SDL using joystick layer  */  
+  if ( SDL_Init( SDL_INIT_JOYSTICK ) == -1 ) { 
+    post("Could not initialize SDL: %s.\n", SDL_GetError());
+    exit(-1);
+  }    
+
+  post("%i joysticks were found:", SDL_NumJoysticks() );
+  
+  for( i=0; i < SDL_NumJoysticks(); i++ ) {
+    post("    %s", SDL_JoystickName(i));
+  }  
+
+  joystickNumber = (int)argument;
+
+  if ( (joystickNumber >= 0) && (joystickNumber < SDL_NumJoysticks() ) )
+    x->x_devnum = joystickNumber;
+  else 
+    post("Joystick %i does not exist!",joystickNumber);
   
   /* create outlets for each axis */
   for (i = 0; i < RAWJOYSTICK_AXES; i++) 
@@ -436,12 +236,9 @@ static void *rawjoystick_new(t_symbol *s)
   x->x_button_num_out = outlet_new(&x->x_obj, &s_float);
   x->x_button_val_out = outlet_new(&x->x_obj, &s_float);
   
-  if (s != &s_)
-    x->x_devname = s;
-  
   /* Open the device and save settings */
   
-  if (!rawjoystick_open(x,s)) return x;
+  if ( ! rawjoystick_open(x) ) return x;
   
   return (x);
 }
@@ -460,10 +257,11 @@ void rawjoystick_setup(void)
   class_addbang(rawjoystick_class,(t_method) rawjoystick_bang);
 
   /* add inlet message methods */
-  class_addmethod(rawjoystick_class, (t_method) rawjoystick_open,gensym("open"),A_DEFSYM);
+  class_addmethod(rawjoystick_class,(t_method) rawjoystick_open,gensym("open"),0);
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_close,gensym("close"),0);
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_start,gensym("start"),0);
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_stop,gensym("stop"),0);
+  class_addmethod(rawjoystick_class,(t_method) rawjoystick_read,gensym("read"),0);
   
 }
 
