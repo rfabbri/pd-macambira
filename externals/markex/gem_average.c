@@ -78,6 +78,8 @@ void gem_average_setup(void)
     class_addmethod(gem_average_class, (t_method)gem_average_clear, gensym("clear"), A_NULL);
     class_addmethod(gem_average_class, (t_method)gem_average_reset, gensym("reset"), A_FLOAT,  0);
 
-	class_sethelpsymbol(gem_average_class, gensym("help-gem_average"));
+	#if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(gem_average_class, gensym("gem_average-help.pd"));
+#endif
 }
 

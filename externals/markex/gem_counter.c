@@ -224,5 +224,7 @@ void gem_counter_setup(void)
     class_addmethod(gem_counter_class, (t_method)gem_counter_reset, gensym("reset"), A_GIMME, 0);
     class_addmethod(gem_counter_class, (t_method)gem_counter_clear, gensym("clear"), A_GIMME, 0);
 
-	class_sethelpsymbol(gem_counter_class, gensym("help-gem_counter"));
+	#if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(gem_counter_class, gensym("gem_counter-help.pd"));
+#endif
 }

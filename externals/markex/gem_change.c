@@ -42,5 +42,7 @@ void gem_change_setup(void)
     	    	    	sizeof(t_gem_change), 0, A_NULL);
     class_addfloat(gem_change_class, gem_change_float);
 
-	 class_sethelpsymbol(gem_change_class, gensym("help-gem_change"));
+	 #if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(gem_change_class, gensym("gem_change-help.pd"));
+#endif
 }

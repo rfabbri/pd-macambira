@@ -56,6 +56,8 @@ void oneshot_setup(void)
     class_addfloat(oneshot_class, (t_method)oneshot_float);
     class_addbang(oneshot_class, (t_method)oneshot_bang);
     class_addmethod(oneshot_class, (t_method)oneshot_clear, gensym("clear"), A_NULL);
-	class_sethelpsymbol(oneshot_class, gensym("help-oneshot"));
+	#if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(oneshot_class, gensym("oneshot-help.pd"));
+#endif
 }
 

@@ -103,7 +103,9 @@ void tripleRand_setup(void)
     class_addmethod(tripleRand_class, (t_method)setTripleRandVals,
     	    gensym("newVals"), A_GIMME, A_NULL); 
 
-	 class_sethelpsymbol(tripleRand_class, gensym("help-tripleRand"));
+	 #if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(tripleRand_class, gensym("tripleRand-help.pd"));
+#endif
 }
 
 

@@ -57,5 +57,7 @@ void randomF_setup(void)
 
     class_addbang(randomF_class, (t_method)randomF_bang);
 
-	 class_sethelpsymbol(randomF_class, gensym("help-randomF"));
+	 #if PD_MINOR_VERSION < 37 
+	class_sethelpsymbol(randomF_class, gensym("randomF-help.pd"));
+#endif
 }
