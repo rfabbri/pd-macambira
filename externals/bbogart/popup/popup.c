@@ -5,12 +5,12 @@
  * This program is distributed under the terms of the GNU General Public *
  * License                                                               *
 
- * popup is free software; you can redistribute it and/or modify           *
+ * popup is free software; you can redistribute it and/or modify         *
  * it under the terms of the GNU General Public License as published by  *
  * the Free Software Foundation; either version 2 of the License, or     *
  * (at your option) any later version.                                   *
 
- * popup is distributed in the hope that it will be useful,                *
+ * popup is distributed in the hope that it will be useful,              *
  * but WITHOUT ANY WARRANTY; without even the implied warranty of        *
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
  * GNU General Public License for more details.                          */
@@ -21,7 +21,6 @@
 #include <g_canvas.h>
 #include <stdio.h>
 #include <string.h>
-
 
 
 #ifdef NT
@@ -44,7 +43,7 @@ typedef struct _popup
      t_object x_obj;
 
      t_glist * x_glist;
-	 t_outlet* out2;
+     t_outlet* out2;
      int x_rect_width;
      int x_rect_height;
      t_symbol*  x_sym;
@@ -52,16 +51,17 @@ typedef struct _popup
      int x_height;
      int x_width;
 	 
-	 int x_num_options;	 
-	 t_symbol* x_colour;
+     int x_num_options;	 
+     t_symbol* x_colour;
      t_symbol* x_name;
 	
-	 t_symbol* x_options[MAX_OPTIONS];
+     t_symbol* x_options[MAX_OPTIONS];
 
 } t_popup;
 
 /* widget helper functions */
 
+/* Append " x " to the following line to show debugging messages */
 #define DEBUG(x)
 
 
@@ -111,23 +111,30 @@ static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int 
 
 
 static void draw_handle(t_popup *x, t_glist *glist, int firsttime) {
-  int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH+2);
 
-  if (firsttime)
+  DEBUG(post("draw_handle start");)
+  int onset = text_xpix(&x->x_obj, glist) + (x->x_rect_width - IOWIDTH);
+
+  if (firsttime) {
     sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xhandle\n",
 	     glist_getcanvas(glist),
 	     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
 	     onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4,
 	     x);
-  else
+  } 
+  else {
     sys_vgui(".x%x.c coords %xhandle %d %d %d %d\n",
 	     glist_getcanvas(glist), x, 
 	     onset, text_ypix(&x->x_obj, glist) + x->x_rect_height - 12,
 	     onset + IOWIDTH-2, text_ypix(&x->x_obj, glist) + x->x_rect_height-4);
+  }
+  DEBUG(post("draw_handle end");)
 }
 
 static void create_widget(t_popup *x, t_glist *glist)
 {
+  DEBUG(post("create_widget start");)
+
   char text[MAXPDSTRING];
   int len,i;
   t_canvas *canvas=glist_getcanvas(glist);
@@ -135,8 +142,10 @@ static void create_widget(t_popup *x, t_glist *glist)
   x->x_rect_height =  x->x_height+2;
   
   /* Create menubutton and empty menu widget -- maybe the menu should be created elseware?*/
-  /* Seems we have to delete the widget in case it already exists */
+
+  /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
   sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+
   sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
 		x,canvas,x,x,x->x_colour->s_name,x->x_name->s_name,x,x);
 
@@ -147,18 +156,20 @@ static void create_widget(t_popup *x, t_glist *glist)
   }
   
   DEBUG(post("id: .x%x.c.s%x", canvas, x);)
+  DEBUG(post("create_widget end");)
 }
 
 static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
 {
   t_canvas *canvas=glist_getcanvas(glist);
+  DEBUG(post("drawme start");)
   DEBUG(post("drawme %d",firsttime);)
      if (firsttime) {
        DEBUG(post("glist %x canvas %x",x->x_glist,canvas);)
        create_widget(x,glist);	       
        x->x_glist = canvas;
-       sys_vgui(".x%x.c create window %d %d -width %d -height 25 -anchor nw -window .x%x.c.s%x -tags %xS\n", 
-		canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist), x->x_width, x->x_glist,x,x);
+       sys_vgui(".x%x.c create window %d %d -width %d -height %d -anchor nw -window .x%x.c.s%x -tags %xS\n", 
+		canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist), x->x_width, x->x_height, x->x_glist,x,x);
               
      }     
      else {
@@ -170,6 +181,7 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
      draw_inlets(x, glist, firsttime, 2,1);
      //     draw_handle(x, glist, firsttime);
 
+  DEBUG(post("drawme end");)
 }
 
 
@@ -177,7 +189,7 @@ static void popup_erase(t_popup* x,t_glist* glist)
 {
      int n;
 
-     DEBUG(post("erase");)
+     DEBUG(post("erase start");)
      sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
 
      sys_vgui(".x%x.c delete %xS\n",glist_getcanvas(glist), x);
@@ -187,6 +199,8 @@ static void popup_erase(t_popup* x,t_glist* glist)
      sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
      sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
      sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
+
+    DEBUG(post("erase end");)
 }
 	
 
@@ -197,6 +211,8 @@ static void popup_erase(t_popup* x,t_glist* glist)
 static void popup_getrect(t_gobj *z, t_glist *owner,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
+    DEBUG(post("getrect start");)
+
     int width, height;
     t_popup* s = (t_popup*)z;
 
@@ -206,13 +222,15 @@ static void popup_getrect(t_gobj *z, t_glist *owner,
     *yp1 = text_ypix(&s->x_obj, owner) - 1;
     *xp2 = text_xpix(&s->x_obj, owner) + width;
     *yp2 = text_ypix(&s->x_obj, owner) + height;
+  
+    DEBUG(post("getrect end");)
 }
 
 static void popup_displace(t_gobj *z, t_glist *glist,
     int dx, int dy)
 {
     t_popup *x = (t_popup *)z;
-    DEBUG(post("displace");)
+    DEBUG(post("displace start");)
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
@@ -230,6 +248,8 @@ static void popup_displace(t_gobj *z, t_glist *glist,
 
 static void popup_select(t_gobj *z, t_glist *glist, int state)
 {
+     DEBUG(post("select start");)
+
      t_popup *x = (t_popup *)z;
      if (state) {
 	  sys_vgui(".x%x.c create rectangle \
@@ -243,10 +263,14 @@ static void popup_select(t_gobj *z, t_glist *glist, int state)
 	  sys_vgui(".x%x.c delete %xSEL\n",
 		   glist_getcanvas(glist), x);
      }
+
+     DEBUG(post("select end");)
 }
 
 static void popup_activate(t_gobj *z, t_glist *glist, int state)
 {
+    DEBUG(post("activate commented out!");)
+  
 /* What does this do, why commented out? 
     t_text *x = (t_text *)z;
     t_rtext *y = glist_findrtext(glist, x);
@@ -255,8 +279,12 @@ static void popup_activate(t_gobj *z, t_glist *glist, int state)
 
 static void popup_delete(t_gobj *z, t_glist *glist)
 {
+    DEBUG(post("delete start");)
+
     t_text *x = (t_text *)z;
     canvas_deletelinesfor(glist_getcanvas(glist), x);
+
+    DEBUG(post("delete end");)
 }
 
        
@@ -264,6 +292,7 @@ static void popup_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_popup* s = (t_popup*)z;
     t_rtext *y;
+    DEBUG(post("vis start");)
     DEBUG(post("vis: %d",vis);)
     if (vis) {
 #ifdef PD_MINOR_VERSION
@@ -278,6 +307,8 @@ static void popup_vis(t_gobj *z, t_glist *glist, int vis)
 	 popup_erase(s,glist);
 	rtext_free(y);
     }
+
+    DEBUG(post("vis end");)
 }
 
 static void popup_save(t_gobj *z, t_binbuf *b);
@@ -296,10 +327,13 @@ t_widgetbehavior   popup_widgetbehavior = {
 #if PD_MINOR_VERSION < 37
   w_propertiesfn: NULL,
 #endif
+
 }; 
 
 static void popup_output(t_popup* x, t_floatarg popup_index)
 {
+  DEBUG(post("output start");)
+
   outlet_symbol(x->out2, x->x_options[(int)popup_index]);
   outlet_float(x->x_obj.ob_outlet, popup_index); 
 }
@@ -307,23 +341,29 @@ static void popup_output(t_popup* x, t_floatarg popup_index)
 
 static void popup_save(t_gobj *z, t_binbuf *b)
 {
+        DEBUG(post("save start");)
+    
 	int i;
     t_popup *x = (t_popup *)z;
 
-    binbuf_addv(b, "ssiisiss", gensym("#X"),gensym("obj"),
+    binbuf_addv(b, "ssiisiiss", gensym("#X"),gensym("obj"),
 		x->x_obj.te_xpix, x->x_obj.te_ypix ,  
-		gensym("popup"), x->x_width, x->x_colour, x->x_name);
+		gensym("popup"), x->x_width, x->x_height, x->x_colour, x->x_name);
 	/* Loop for menu items */
 	for(i=0 ; i<x->x_num_options ; i++)
 	{
 		binbuf_addv(b, "s", x->x_options[i]);
 	}
     binbuf_addv(b, ";");
+
+    DEBUG(post("vis end");)
 }
 
 /* function to change the popup's menu */
 void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 {
+	DEBUG(post("options start");)
+	
 	int i;
 
 	x->x_num_options = argc;
@@ -337,11 +377,15 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 		sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
 			x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
 	}
+
+	DEBUG(post("options end");)
 }
 
 /* function to change colour of popup background */
 void popup_bgcolour(t_popup* x, t_symbol* col)
 {
+	DEBUG(post("bgcolour start");)
+
 	x->x_colour->s_name = col->s_name;
 	sys_vgui(".x%x.c.s%x configure -background \"%s\"\n", x->x_glist, x, col->s_name);
 }
@@ -349,6 +393,8 @@ void popup_bgcolour(t_popup* x, t_symbol* col)
 /* Function to change name of popup */
 static void popup_name(t_popup* x, t_symbol *name)
 {
+	DEBUG(post("name start");)
+
 	x->x_name->s_name = name->s_name;
 	sys_vgui(".x%x.c.s%x configure -text \"%s\"\n", x->x_glist, x, name->s_name);
 }
@@ -356,6 +402,8 @@ static void popup_name(t_popup* x, t_symbol *name)
 /* Function to select a menu option by inlet */
 static void popup_iselect(t_popup* x, t_floatarg item)
 {
+	DEBUG(post("iselect start");)
+
 	int i=(int)item;
 	if( i<x->x_num_options && i>=0)
 	{
@@ -364,6 +412,8 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 	} else {
 		post("popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options, i);
 	}
+
+	DEBUG(post("iselect end");)
 }
 
 static t_class *popup_class;
@@ -371,6 +421,8 @@ static t_class *popup_class;
 
 static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 {
+    DEBUG(post("popup new start");)
+
     t_popup *x = (t_popup *)pd_new(popup_class);
     int i;
 	char buf[256];
@@ -384,6 +436,7 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 	{
 		post("popup: You must enter at least 4 arguments. Default values used.");
 		x->x_width = 124;
+		x->x_height = 25;
 		x->x_num_options = 1; 
 		x->x_colour = gensym("#ffffff");
 		x->x_name = gensym("popup");
@@ -393,14 +446,15 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 	} else {
 		/* Copy args into structure */
 		x->x_width = atom_getint(argv);
-		x->x_colour = atom_getsymbol(argv+1);
-		x->x_name = atom_getsymbol(argv+2);
+		x->x_height = atom_getint(argv+1);
+		x->x_colour = atom_getsymbol(argv+2);
+		x->x_name = atom_getsymbol(argv+3);
 		
-		x->x_num_options = argc-3;
+		x->x_num_options = argc-4;
 		
 		for(i=0 ; i<x->x_num_options ; i++)
 		{
-			x->x_options[i] = atom_getsymbol( argv+(i+3) );
+			x->x_options[i] = atom_getsymbol( argv+(i+4) );
 		}
 	}	
 
@@ -415,9 +469,14 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     outlet_new(&x->x_obj, &s_float);
 	x->out2 = outlet_new(&x->x_obj, &s_symbol);
     return (x);
+
+    DEBUG(post("popup new end");)
 }
 
 void popup_setup(void) {
+
+    DEBUG(post("setup start");)
+
     popup_class = class_new(gensym("popup"), (t_newmethod)popup_new, 0,
 				sizeof(t_popup),0,A_GIMME,0);
 				
