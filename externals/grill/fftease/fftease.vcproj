@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="fftease"
+	ProjectGUID="{F0C94DB3-3747-478E-86A1-0AE613156D93}"
 	SccProjectName="max/fftease"
 	SccAuxPath=""
 	SccLocalPath="."

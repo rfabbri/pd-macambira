@@ -291,8 +291,11 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="3"
 				AdditionalIncludeDirectories="&quot;f:\prog\pd\pd-cvs\src&quot;;f:\prog\packs\pthreads;f:\prog\max\flext\source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_SHARED"
 				StringPooling="TRUE"
@@ -300,9 +303,6 @@
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\pd-msvc/r/pool.pch"
-				AssemblerListingLocation=".\pd-msvc/r/"
-				ObjectFile=".\pd-msvc/r/"
-				ProgramDataBaseFileName=".\pd-msvc/r/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="0"

@@ -196,7 +196,7 @@ const t_symbol *dyn::sym_dsp = NULL;
 void dyn::setup(t_classid c)
 {
 	post("");
-	post("dyn~ %s - dynamic object management, (C)2003-2004 Thomas Grill",DYN_VERSION);
+	post("dyn~ %s - dynamic object management, (C)2003-04 Thomas Grill",DYN_VERSION);
 	post("");
 
     sym_dynsin = MakeSymbol("dyn_in~");

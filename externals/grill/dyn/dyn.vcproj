@@ -145,6 +145,73 @@
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
+		<Configuration
+			Name="PD Shared Release|Win32"
+			OutputDirectory="./pd-msvc/sr"
+			IntermediateDirectory="./pd-msvc/sr"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				FavorSizeOrSpeed="2"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="3"
+				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\max\flext\source;f:\prog\packs\pthreads"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_SHARED"
+				StringPooling="TRUE"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile="$(outdir)/dyn.pch"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="pd.lib pthreadVC.lib"
+				OutputFile="$(outdir)/dyn~.dll"
+				LinkIncremental="1"
+				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs/bin,..\flext\pd-msvc,f:\prog\packs\pthreads"
+				ProgramDatabaseFile="$(outdir)/dyn~.pdb"
+				ImportLibrary="$(outdir)/dyn~.lib"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="TRUE"
+				SuppressStartupBanner="TRUE"
+				TargetEnvironment="1"
+				TypeLibraryName=".\pd-msvc/r/dyn.tlb"
+				HeaderFileName=""/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="3079"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -178,6 +245,13 @@
 					Optimization="2"
 					AdditionalIncludeDirectories=""
 					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;PD;$(NoInherit)"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="PD Shared Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					Optimization="2"
+					AdditionalIncludeDirectories=""/>
 			</FileConfiguration>
 		</File>
 	</Files>
