@@ -26,7 +26,7 @@ USAGE:
 Put the binary in your extra folder.
 Put the helpfile in your 5.reference folder.
 
-Arguments: [pixel width] [background colour] [name] [opt1] [opt2] [...]
+Arguments: [pixel width] [pixel height] [background colour] [name] [opt1] [opt2] [...]
 
 Methods:
 
@@ -34,8 +34,11 @@ Methods:
   name [name]		Popup's name
   bgcolour [colour]	Background Colour (white, green, #5500ff)
   options [opt1] [...]	List of the popup options
+  append [opt1] [...]   Add the arg list to the bottom of the current options
 
 BUGS:
 - Do not use a loadbang to set a patch-default value. Will cause a segfault.
+  The left outlet will send a "bang" message when we're ready to set values,
+  see example patch on how to use this to set a default value.
 
 Have Fun.

@@ -154,7 +154,7 @@ static void create_widget(t_popup *x, t_glist *glist)
 	sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
 		canvas, x, x->x_options[i]->s_name, canvas, x, x->x_options[i]->s_name, x, i);
   }
-  
+
   DEBUG(post("id: .x%x.c.s%x", canvas, x);)
   DEBUG(post("create_widget end");)
 }
@@ -182,6 +182,9 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
      //     draw_handle(x, glist, firsttime);
 
   DEBUG(post("drawme end");)
+
+// Output a bang to first outlet when we're ready to receive float messages the first time!. 
+if(firsttime) {outlet_bang(x->x_obj.ob_outlet);}
 }
 
 
@@ -382,11 +385,11 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 }
 
 /* function to change colour of popup background */
-void popup_bgcolour(t_popup* x, t_symbol* col)
+static void popup_bgcolour(t_popup* x, t_symbol* col)
 {
 	DEBUG(post("bgcolour start");)
 
-	x->x_colour->s_name = col->s_name;
+	x->x_colour = col;
 	sys_vgui(".x%x.c.s%x configure -background \"%s\"\n", x->x_glist, x, col->s_name);
 }
 
@@ -415,6 +418,44 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 
 	DEBUG(post("iselect end");)
 }
+
+/* Function to append symbols to popup list 
+static void popup_append(t_popup* x, t_symbol *item)
+{
+	// Add menu item
+        sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
+                x->x_glist, x, item->s_name, x->x_glist, x, item->s_name, x, (x->x_num_options-1) );
+
+	post("orig num_options: %d", x->x_num_options);
+
+	// Incriment num_options
+	x->x_num_options++;
+
+	post("post  num_options: %d", x->x_num_options);
+} */
+
+/* Function to append symbols to popup list */
+void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
+{
+        DEBUG(post("append start");)
+
+        int i, new_limit;
+
+        new_limit = x->x_num_options + argc;
+
+        for(i=x->x_num_options ; i<new_limit ; i++)
+        {
+                x->x_options[i] = atom_getsymbol(argv+i-x->x_num_options);
+                sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
+                        x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
+        }
+
+	x->x_num_options = new_limit;
+
+        DEBUG(post("append end");)
+}
+
+
 
 static t_class *popup_class;
 
@@ -471,6 +512,7 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 
     DEBUG(post("popup new end");)
+
 }
 
 void popup_setup(void) {
@@ -499,6 +541,12 @@ void popup_setup(void) {
 								  gensym("bgcolour"),
 								  A_DEFSYMBOL,
 								  0);
+
+        class_addmethod(popup_class, (t_method)popup_append,
+                                                                  gensym("append"),
+                                                                  A_GIMME,
+                                                                  0);
+
 	class_doaddfloat(popup_class, (t_method)popup_iselect);
 
     class_setwidget(popup_class,&popup_widgetbehavior);
@@ -506,7 +554,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.8 $ $Date: 2004-11-07 17:53:46 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.9 $ $Date: 2004-12-13 23:56:59 $");
 }
 
 
