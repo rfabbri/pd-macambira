@@ -16,7 +16,7 @@ FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
 MPEG4IP_SOURCE_DIR=/SOURCES/mpeg4ip
 PDP_STREAMING_OBJECTS=
 PDP_PIDIP_LIBS="$PDP_PIDIP_LIBS -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc"
-PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include"
+PDP_PIDIP_INCLUDES="-I$PD_DIR/src -I. -I$PDP_DIR/include -I../include -I../charmaps"
 
 make clean
 

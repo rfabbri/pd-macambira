@@ -1,5 +1,10 @@
 0.12.14 ( codename Naveen's Ethiopian Cafe )
-  added pdp_mp4player~ : a quicktime stream picker ( compiled against meg4ip v1.0 )
+  added pdp_mp4player~ : a quicktime stream reader ( compiled against meg4ip v1.0, needs some testing )
+  fixed pdp_mp4live~ : fixed audio encoding
+  pdp_ascii : added loadable character maps support ( added two maps : default and arabic )
+  fixed pdp_canvas : fixed a huge memory leak ( reported by Ian Smith Heisters )
+  added colorgrid : a color picker written by Lluis Gomez i Bigorda ( http://www.artefacte.org/pd )
+  added help_pdp-tatiana.pd : a more simple to use help patch for effects, contribution from Tatiana de la O.
 0.12.13 ( codename Gollum Club Riereta )
   improved decoding in pdp_live~, in particular for audio/video synchronization
   added a "end of stream" outlet in pdp_live~ ( when reaching the end of a file )

@@ -7,7 +7,7 @@ IMLIB_CFLAGS = -I/usr/local/include -I/usr/X11R6/include
 IMLIB_LIBS = -L/usr/local/lib -lImlib2 -lttf -lm -ldl -lXext -lXext -lX11 -L/usr/X11R6/lib
 MAGICK_CFLAGS = -I/usr/X11R6/include -g -O2 -Wall 
 MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljasper -ljpeg -lpng -lXext -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -L/usr/local/lib -L/usr/X11R6/lib -L/usr/X11R6/lib -L/usr/local/lib
-PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include  -I/SOURCES/ffmpeg/libavcodec -I/SOURCES/ffmpeg/libavformat
+PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps  -I/SOURCES/ffmpeg/libavcodec -I/SOURCES/ffmpeg/libavformat
 PDP_PIDIP_VERSION = 0.12.14
 MPEG4IP_CFLAGS = 
 
@@ -53,6 +53,10 @@ distro: clean all
 	cd /tmp && tar vczf $(PDP_PIDIP_TARBALL) pidip-$(PDP_PIDIP_VERSION)
 	cp /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION).tar.gz /mnt/c/Yves/Software
 	rm -rf /tmp/pidip-$(PDP_PIDIP_VERSION)
+
+pdp_colorgrid.o: pdp_colorgrid.c
+	./tk2c.bash < $*.tk > $*.tk2c
+	PWD=`pwd`; cc -DPWD=\"$(PWD)\" $(PDP_PIDIP_CFLAGS) $(PDP_PIDIP_INCLUDES) -o $*.o -c $*.c
 
 .c.o:
 	gcc $(PDP_PIDIP_CFLAGS) $(PDP_PIDIP_INCLUDES) -o $*.o -c $*.c
