@@ -57,7 +57,7 @@ V vasp_base::m_radio(I argc,const t_atom *argv)
 {
 	if(argc > 0 && IsSymbol(argv[0])) {
 		// send command to self!
-		m_methodmain(0,GetSymbol(argv[0]),argc-1,argv+1);
+		ToSelfAnything(0,GetSymbol(argv[0]),argc-1,argv+1);
 
 		// send command to the next objects in line
 		ToOutAnything(0,sym_radio,argc,argv);
