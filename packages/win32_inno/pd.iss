@@ -116,7 +116,7 @@ Source: ..\..\abstractions\vadsr~\*.*; DestDir: {app}\abstractions\vadsr~
 ; GEM
 ; uses Gem from CVS
 Source: ..\..\Gem\doc\*.*; DestDir: {app}\doc\gem
-Source: ..\..\Gem\help\*.*; DestDir: {app}\doc\5.reference
+Source: ..\..\Gem\help\*.*; DestDir: {app}\doc\5.reference\Gem
 Source: ..\..\Gem\examples\01.basic\*.*; DestDir: {app}\doc\gem\01.basic
 Source: ..\..\Gem\examples\02.advanced\*.*; DestDir: {app}\doc\gem\02.advanced
 Source: ..\..\Gem\examples\03.lighting\*.*; DestDir: {app}\doc\gem\03.lighting
