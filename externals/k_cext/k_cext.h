@@ -77,9 +77,11 @@ K_EXTERN void k_sys_makecompilestring(char *to,char *name,char *funcname);
 K_EXTERN void k_sys_deletefile(char *name);
 K_EXTERN void k_sys_init(void);
 
-/* TB value accessing functions*/
+/* TB value accessing / send functions */
 K_EXTERN t_float k_cext_getvalue(char c[]);
 K_EXTERN int k_cext_setvalue(char c[],float f);
+K_EXTERN void k_cext_sendfloat (char c[],float f);
+K_EXTERN void k_cext_sendsymbol (char c[],char s[]);
 
 
 #define V(a) (x->values[a])
@@ -120,6 +122,12 @@ float k_cext_getvalue(char c[]);
 int k_cext_setvalue(char c[],float f);
 #define VALUE(char) k_cext_getvalue(char)
 #define SETVALUE(char,float) k_cext_setvalue(char,float)
+
+/* TB: send float and symbol functions */
+void k_cext_sendfloat (char c[],float f);
+void k_cext_sendsymbol (char c[],char s[]);
+#define SENDFLOAT(char,float) k_cext_sendfloat(char,float)
+#define SENDSYMBOL(char1,char2) k_cext_sendsymbol(char1,char2)
 
 
 #define IF if(

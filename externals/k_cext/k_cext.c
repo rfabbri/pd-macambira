@@ -353,3 +353,28 @@ int k_cext_setvalue(char c[],float f)
     }
     return value_setfloat(gensym(c),f);
 }
+
+void k_cext_sendfloat (char c[],float f)
+{
+    static t_symbol *k_cext_internal_symbol=NULL;
+    while ( isspace(c[0]) )
+    {
+	c++;
+    }
+    if(k_cext_internal_symbol==NULL) k_cext_internal_symbol=gensym(c);
+    if(k_cext_internal_symbol->s_thing) 
+	pd_float(k_cext_internal_symbol->s_thing, f); 
+}
+
+void k_cext_sendsymbol (char c[],char s[])
+{
+    static t_symbol *k_cext_internal_symbol=NULL;
+    while ( isspace(c[0]) )
+    {
+	c++;
+    }
+    if(k_cext_internal_symbol==NULL) 
+	k_cext_internal_symbol=gensym(c);
+    if(k_cext_internal_symbol->s_thing) 
+	pd_symbol(k_cext_internal_symbol->s_thing, gensym(s)); 
+}
