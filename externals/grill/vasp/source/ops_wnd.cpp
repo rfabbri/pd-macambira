@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "ops_wnd.h"
 #include "oploop.h"
 #include <math.h>

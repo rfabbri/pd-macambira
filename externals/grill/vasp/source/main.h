@@ -11,6 +11,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_H
 #define __VASP_H
 
+// enable attributes
+#define FLEXT_ATTRIBUTES 1
+
 #include <flext.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
@@ -52,7 +55,7 @@ class vector;
 	typedef vector VX;
 #endif
 
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 // buffers are never interleaved - special optimizations may occur
 // attention: possibly obsolete when immediate file access is implemented
 #define VASP_CHN1  
@@ -76,6 +79,9 @@ public:
 	I Dim() const { return dim; }
 	F *Data() { return data; }
 	const F *Data() const { return data; }
+
+	F operator [](I ix) const { return data[ix]; }
+	F &operator [](I ix) { return data[ix]; }
 protected:
 	I dim; F *data; 
 };

@@ -37,12 +37,13 @@ protected:
 	vasp_base();
 	virtual ~vasp_base();
 
-	virtual V m_radio(I argc,t_atom *argv);  // commands for all
+	virtual V m_radio(I argc,const t_atom *argv);  // commands for all
 
+/*
 	V m_argchk(BL chk);  // precheck argument on arrival
 	V m_loglvl(I lvl);  // noise level of log messages
 	V m_unit(xs_unit u);  // unit command
-
+*/
 	BL refresh;  // immediate graphics refresh?
 	BL argchk;   // pre-operation argument feasibility check
 	xs_unit unit;  // time units
@@ -57,9 +58,9 @@ private:
 
 	FLEXT_CALLBACK_V(m_radio)
 
-	FLEXT_CALLBACK_B(m_argchk)
-	FLEXT_CALLBACK_I(m_loglvl)
-	FLEXT_CALLBACK_1(m_unit,xs_unit)
+	FLEXT_ATTRVAR_B(argchk)
+	FLEXT_ATTRVAR_I(loglvl)
+	FLEXT_ATTRVAR_E(unit,xs_unit)
 };
 
 
@@ -73,17 +74,25 @@ protected:
 
 	virtual V m_dobang();						// bang method
 
-	virtual V m_vasp(I argc,t_atom *argv); // trigger
-	virtual I m_set(I argc,t_atom *argv);  // non trigger
-	virtual V m_to(I argc,t_atom *argv); // set destination
-	V m_detach(BL thr);		// detached thread
-	virtual V m_prior(I dp);  // thread priority +-
+	virtual V m_vasp(I argc,const t_atom *argv); // trigger
+	virtual I m_set(I argc,const t_atom *argv);  // non trigger
+	virtual V m_to(I argc,const t_atom *argv); // set destination
+//	V m_detach(BL thr);		// detached thread
+//	virtual V m_prior(I dp);  // thread priority +-
 	virtual V m_stop();				// stop working
 
-	virtual V m_update(I argc = 0,t_atom *argv = NULL);  // graphics update
+	virtual V m_update(I argc = 0,const t_atom *argv = NULL);  // graphics update
+
+	V m_setupd(const AtomList &l) { m_update(l.Count(),l.Atoms()); }
+	V m_getupd(AtomList &l) { l(1); SetBool(l[0],refresh); }
 
 	// destination vasp
 	Vasp ref,dst;
+
+	V m_setref(const AtomList &l) { m_set(l.Count(),l.Atoms()); }
+	V m_getref(AtomList &l) { ref.MakeList(l); }
+	V m_setto(const AtomList &l) { m_to(l.Count(),l.Atoms()); }
+	V m_getto(AtomList &l) { dst.MakeList(l); }
 
 	FLEXT_CALLBACK_V(m_to)
 
@@ -106,10 +115,17 @@ protected:
 #endif
 	FLEXT_CALLBACK_V(m_vasp)
 	FLEXT_CALLBACK_V(m_set)
-	FLEXT_CALLBACK_V(m_update)
-	FLEXT_CALLBACK_B(m_detach)
-	FLEXT_CALLBACK_I(m_prior)
+
+	FLEXT_CALLVAR_V(m_getref,m_setref)
+	FLEXT_CALLVAR_V(m_getto,m_setto)
+	
 	FLEXT_CALLBACK(m_stop)
+
+	FLEXT_CALLVAR_V(m_getupd,m_setupd)
+#ifdef FLEXT_THREADS
+	FLEXT_ATTRVAR_B(detach)
+	FLEXT_ATTRVAR_I(prior)
+#endif
 
 private:
 	virtual V m_bang() = 0;						// do! and output current Vasp
@@ -160,24 +176,27 @@ class vasp_binop:
 	FLEXT_HEADER(vasp_binop,vasp_tx)
 
 protected:
-	vasp_binop(I argc,t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
+	vasp_binop(I argc,const t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
 
 	// assignment functions
-	virtual V a_list(I argc,t_atom *argv); 
-	/*virtual*/ V a_vasp(I argc,t_atom *argv);
-	/*virtual*/ V a_env(I argc,t_atom *argv);
+	virtual V a_list(I argc,const t_atom *argv); 
+	/*virtual*/ V a_vasp(I argc,const t_atom *argv);
+	/*virtual*/ V a_env(I argc,const t_atom *argv);
 	/*virtual*/ V a_float(F f); 
 	/*virtual*/ V a_int(I f); 
-	/*virtual*/ V a_double(I argc,t_atom *argv); 
-	/*virtual*/ V a_complex(I argc,t_atom *argv); 
-	/*virtual*/ V a_vector(I argc,t_atom *argv); 
+	/*virtual*/ V a_double(I argc,const t_atom *argv); 
+	/*virtual*/ V a_complex(I argc,const t_atom *argv); 
+	/*virtual*/ V a_vector(I argc,const t_atom *argv); 
 
-	V a_radio(I,t_atom *) {}
+	V a_radio(I,const t_atom *) {}
 
 	virtual Vasp *x_work();
 	virtual Vasp *tx_work(const Argument &arg);
 
 	Argument arg;
+
+	V m_setarg(const AtomList &l) { a_list(l.Count(),l.Atoms()); }
+	V m_getarg(AtomList &l) { arg.MakeList(l); }
 
 private:
 	FLEXT_CALLBACK_V(a_list)
@@ -189,6 +208,8 @@ private:
 	FLEXT_CALLBACK_V(a_complex)
 	FLEXT_CALLBACK_V(a_vector)
 	FLEXT_CALLBACK_V(a_radio)
+
+	FLEXT_CALLVAR_V(m_getarg,m_setarg)
 };
 
 
@@ -200,21 +221,26 @@ class vasp_anyop:
 	FLEXT_HEADER(vasp_anyop,vasp_tx)
 
 protected:
-	vasp_anyop(I argc,t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
+	vasp_anyop(I argc,const t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
 
 	// assignment functions
-	virtual V a_list(I argc,t_atom *argv); 
+	virtual V a_list(I argc,const t_atom *argv); 
 
-	V a_radio(I,t_atom *) {}
+	V a_radio(I,const t_atom *) {}
 
 	virtual Vasp *x_work();
 	virtual Vasp *tx_work(const Argument &arg);
 
 	Argument arg;
 
+	V m_setarg(const AtomList &l) { a_list(l.Count(),l.Atoms()); }
+	V m_getarg(AtomList &l) { arg.MakeList(l); }
+
 private:
 	FLEXT_CALLBACK_V(a_list)
 	FLEXT_CALLBACK_V(a_radio)
+
+	FLEXT_CALLVAR_V(m_getarg,m_setarg)
 };
 
 
@@ -243,7 +269,7 @@ class vasp_ ## op:																\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_binop)											\
 public:																			\
-	vasp_##op(I argc,t_atom *argv): vasp_binop(argc,argv,def,to) {}				\
+	vasp_##op(I argc,const t_atom *argv): vasp_binop(argc,argv,def,to) {}				\
 protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\
@@ -261,7 +287,7 @@ class vasp_ ## op:																\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_anyop)											\
 public:																			\
-	vasp_##op(I argc,t_atom *argv): vasp_anyop(argc,argv,def,to) {}				\
+	vasp_##op(I argc,const t_atom *argv): vasp_anyop(argc,argv,def,to) {}				\
 protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\

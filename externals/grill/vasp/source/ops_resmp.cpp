@@ -12,6 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	\brief Routines for resampling
 */
 
+#include "main.h"
 #include "ops_resmp.h"
 
 
@@ -207,8 +208,8 @@ public:
 		vasp_anyop(argc,argv,VASP_ARG_R(1),true),
 		fill(xtf_zero),inter(xti_4p)
 	{
-		FLEXT_ADDMETHOD_E(0,"fill",m_fill);
-		FLEXT_ADDMETHOD_E(0,"inter",m_inter);
+		FLEXT_ADDATTR_VAR1_E("fill",fill);
+		FLEXT_ADDATTR_VAR1_E("inter",inter);
 	}
 
 	enum xt_fill {
@@ -220,9 +221,6 @@ public:
 		xti__ = -1,  // don't change
 		xti_inpl = 0,xti_none,xti_lin,xti_4p
 	};	
-
-	V m_fill(xt_fill f) { fill = f; }
-	V m_inter(xt_inter m) { inter = m; }
 
 	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_tilt(p,ref,arg,&dst); }
 		
@@ -243,8 +241,8 @@ protected:
 	xt_inter inter;
 
 private:
-	FLEXT_CALLBACK_1(m_fill,xt_fill)
-	FLEXT_CALLBACK_1(m_inter,xt_inter)
+	FLEXT_ATTRVAR_E(fill,xt_fill)
+	FLEXT_ATTRVAR_E(inter,xt_inter)
 };																				
 FLEXT_LIB_V("vasp, vasp.tilt",vasp_tilt)
 

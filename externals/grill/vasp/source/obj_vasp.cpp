@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	\brief basic vasp objects.
 */
 
-
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -72,7 +72,7 @@ FLEXT_LIB_V("vasp, vasp",vasp_v)
 	\param inlet set - vasp to be stored (and not immediately output)
 	\retval outlet vasp
 
-	\note In MaxMSP only necessary when buffer is in another window.
+	\note In Max/MSP only necessary when buffer is in another window.
 */
 class vasp_update:
 	public vasp_tx

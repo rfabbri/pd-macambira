@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	\brief Definitions for immediate vasps
 */
 
-
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 #include "buflib.h"
@@ -48,10 +48,9 @@ public:
 		AddInAnything();
 		AddInInt();
 		AddOutAnything();
-		SetupInOut();
 
-		FLEXT_ADDMETHOD_(0,"frames",m_frames);
 		FLEXT_ADDMETHOD(1,m_frames);
+		FLEXT_ADDATTR_VAR("frames",frms,m_frames);
 	}
 
 	V m_frames(I n) { frms = n; }
@@ -97,6 +96,8 @@ protected:
 	
 private:
 	FLEXT_CALLBACK_I(m_frames)
+	FLEXT_CALLSET_I(m_frames);
+	FLEXT_ATTRGET_I(frms);
 };
 
 FLEXT_LIB_V("vasp, vasp.imm vasp.!",vasp_imm)

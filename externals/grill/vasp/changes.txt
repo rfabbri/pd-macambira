@@ -4,6 +4,15 @@ Version history:
 - FIX: bug in vasp.frames* ... wrong argument
 - FIX: another bug in resize of immediate buffers
 - CHANGE: immediates will be initialized to zero, also upon resize to a larger size (by default, later make this optional)
+- ADD: attributes for all basic parameters: ref,to,arg, update,detach,prior (loglvl,argchk,unit later)
+- ADD: vasp.channel,vasp.vector - attribute "index"
+- ADD: vasp.frames,vasp.frames+,vasp.offset,vasp.offset+,vasp.size,vasp.size+,vasp.imm - attribute "frames"
+- ADD: vasp.frames*,vasp.frames/,vasp.size*,vasp.size/ - attribute "factor"
+- ADD: vasp.part - attribute "parts"
+- ADD: vasp.peaks? - attribute "peaks"
+- ADD: vasp.shift,vasp.xshift - attribute "fill"
+- ADD: vasp.tilt,vasp.xtilt - attributes "fill","inter"
+- ADD: vasp.offset=,vasp.frames= - attributes "dir","slope"
 
 0.1.1:
 - FIX: bug in resize of immediate buffers

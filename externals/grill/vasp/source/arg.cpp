@@ -1,3 +1,14 @@
+/* 
+
+VASP modular - vector assembling signal processor / objects for Max/MSP and PD
+
+Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+
+*/
+
+#include "main.h"
 #include "arg.h"
 //#include <math.h>
 #include "classes.h"
@@ -5,7 +16,7 @@
 Argument::Argument(): tp(tp_none),nxt(NULL) {}
 Argument::~Argument() { ClearAll(); }
 
-Argument &Argument::Parse(I argc,t_atom *argv)
+Argument &Argument::Parse(I argc,const t_atom *argv)
 {
 	if(argc == 0)
 		Clear();
@@ -47,6 +58,56 @@ Argument &Argument::Parse(I argc,t_atom *argv)
 	return *this;
 }
 
+V Argument::MakeList(flext::AtomList &ret)
+{
+	switch(tp) {
+	case tp_none:
+		ret();
+		break;
+	case tp_list:
+		ret = *dt.atoms;
+		break;
+	case tp_vasp:
+		dt.v->MakeList(ret);
+		break;
+	case tp_env:
+		dt.env->MakeList(ret);
+		break;
+	case tp_vx: {
+		I d = dt.vx->Dim();
+		ret(d+1);
+		flext::SetSymbol(ret[0],vasp_base::sym_vector);
+		for(I i = 0; i < d; ++i)
+			flext::SetFloat(ret[i+1],(*dt.vx)[i]);
+		break;
+	}
+	case tp_cx:
+		ret(3);
+		flext::SetSymbol(ret[0],vasp_base::sym_complex);
+		flext::SetFloat(ret[1],dt.cx->real);
+		flext::SetFloat(ret[2],dt.cx->imag);
+		break;
+	case tp_int:
+		ret(1);
+		flext::SetInt(ret[0],dt.i);
+		break;
+	case tp_float:
+		ret(1);
+		flext::SetFloat(ret[0],dt.f);
+		break;
+	case tp_double: {
+		F f = (F)dt.d;
+		ret(3);
+		flext::SetSymbol(ret[0],vasp_base::sym_double);
+		flext::SetFloat(ret[1],f);
+		flext::SetFloat(ret[2],dt.d-f);
+		break;
+	}
+	default:
+		ERRINTERNAL();
+	}
+}
+
 
 Argument &Argument::Clear()
 {
@@ -73,7 +134,7 @@ Argument &Argument::Clear()
 	case tp_double:
 		break;
 	default:
-		error("Argument: Internal error - type unknown!");
+		ERRINTERNAL();
 	}
 	tp = tp_none;
 	return *this;
@@ -100,7 +161,7 @@ Argument &Argument::SetEnv(Env *e)
 	return *this;
 }
 
-Argument &Argument::SetList(I argc,t_atom *argv)
+Argument &Argument::SetList(I argc,const t_atom *argv)
 {
 	if(tp != tp_none) Clear();
 	dt.atoms = new flext::AtomList(argc,argv); tp = tp_list;
@@ -202,7 +263,7 @@ Argument &Argument::AddVasp(Vasp *v) { Argument *a = new Argument; a->SetVasp(v)
 
 Argument &Argument::AddEnv(Env *e) { Argument *a = new Argument; a->SetEnv(e); return Add(a); }
 
-Argument &Argument::AddList(I argc,t_atom *argv) { Argument *a = new Argument; a->SetList(argc,argv); return Add(a); }
+Argument &Argument::AddList(I argc,const t_atom *argv) { Argument *a = new Argument; a->SetList(argc,argv); return Add(a); }
 
 Argument &Argument::AddI(I i) { Argument *a = new Argument; a->SetI(i); return Add(a); }
 

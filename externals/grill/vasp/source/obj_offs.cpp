@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -43,9 +44,9 @@ public:
 		AddInAnything();
 		AddInFloat();
 		AddOutAnything();
-		SetupInOut();
 
 		FLEXT_ADDMETHOD(1,m_offs);
+		FLEXT_ADDATTR_VAR("frames",offs,m_offs);
 	}
 
 	V m_offs(F o) 
@@ -68,6 +69,8 @@ protected:
 
 private:
 	FLEXT_CALLBACK_F(m_offs);
+	FLEXT_CALLSET_I(m_offs);
+	FLEXT_ATTRGET_I(offs);
 };
 
 FLEXT_LIB_V("vasp, vasp.offset vasp.o",vasp_offset)
@@ -138,7 +141,6 @@ public:
 		AddInAnything();
 //		AddOutAnything();
 		AddOutFloat();
-		SetupInOut();
 	}
 
 	virtual V m_bang() 

@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "ops_rearr.h"
 #include "oploop.h"
 #include "oppermute.h"
@@ -101,19 +102,17 @@ class vasp_shift:
 	FLEXT_HEADER(vasp_shift,vasp_anyop)
 public:			
 	
-	vasp_shift(I argc,t_atom *argv): 
+	vasp_shift(I argc,const t_atom *argv): 
 		vasp_anyop(argc,argv,VASP_ARG_I(0),true),
 		fill(xsf_zero)
 	{
-		FLEXT_ADDMETHOD_E(0,"fill",m_fill);
+		FLEXT_ADDATTR_VAR1_E("fill",fill);
 	}
 
 	enum xs_fill {
 		xsf__ = -1,  // don't change
 		xsf_none = 0,xsf_zero,xsf_edge
 	};	
-
-	V m_fill(xs_fill f) { fill = f; }
 
 	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_shift(p,ref,arg,&dst); }
 		
@@ -132,7 +131,7 @@ protected:
 	xs_fill fill;
 
 private:
-	FLEXT_CALLBACK_1(m_fill,xs_fill)
+	FLEXT_ATTRVAR_E(fill,xs_fill)
 };																				
 FLEXT_LIB_V("vasp, vasp.shift",vasp_shift)
 
@@ -143,7 +142,7 @@ class vasp_xshift:
 	FLEXT_HEADER(vasp_xshift,vasp_shift)
 public:			
 	
-	vasp_xshift(I argc,t_atom *argv): vasp_shift(argc,argv) {}
+	vasp_xshift(I argc,const t_atom *argv): vasp_shift(argc,argv) {}
 
 	virtual Vasp *do_shift(OpParam &p) { return VaspOp::m_xshift(p,ref,arg,&dst); }
 		

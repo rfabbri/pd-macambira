@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -42,9 +43,9 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything();
-		SetupInOut();
 
 		FLEXT_ADDMETHOD(1,m_ix);
+		FLEXT_ADDATTR_VAR("index",ix,m_ix);
 	}
 
 	V m_ix(I i) { ix = i; }
@@ -58,6 +59,8 @@ protected:
 
 private:
 	FLEXT_CALLBACK_I(m_ix);
+	FLEXT_CALLSET_I(m_ix);
+	FLEXT_ATTRGET_I(ix);
 };
 
 FLEXT_LIB_V("vasp, vasp.vector vasp.n",vasp_vector)
@@ -88,7 +91,6 @@ public:
 		AddInAnything();
 //		AddOutAnything();
 		AddOutInt();
-		SetupInOut();
 	}
 
 	virtual V m_bang() 

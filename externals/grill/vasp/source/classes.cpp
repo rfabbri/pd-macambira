@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 //#include <stdarg.h>
 
@@ -38,15 +39,19 @@ vasp_base::vasp_base():
 	unit(xsu_sample),loglvl(0)
 {
 	FLEXT_ADDMETHOD_(0,"radio",m_radio);
-	FLEXT_ADDMETHOD_(0,"argchk",m_argchk);
-	FLEXT_ADDMETHOD_(0,"loglvl",m_loglvl);
-	FLEXT_ADDMETHOD_E(0,"unit",m_unit);
+
+// LATER!
+/*
+	FLEXT_ADDATTR_VAR1("argchk",argchk);
+	FLEXT_ADDATTR_VAR1("loglvl",loglvl);
+	FLEXT_ADDATTR_VAR1_E("unit",unit);
+*/
 }
 
 vasp_base::~vasp_base() {}
 
 
-V vasp_base::m_radio(I argc,t_atom *argv)
+V vasp_base::m_radio(I argc,const t_atom *argv)
 {
 	if(argc > 0 && IsSymbol(argv[0])) {
 		// send command to self!
@@ -59,11 +64,11 @@ V vasp_base::m_radio(I argc,t_atom *argv)
 		post("%s - radio message invalid",thisName());
 }
 
-
+/*
 V vasp_base::m_unit(xs_unit u) { unit = u; }
 V vasp_base::m_argchk(BL chk) {	argchk = chk; }
 V vasp_base::m_loglvl(I lvl) { loglvl = lvl; }
-
+*/
 
 BL vasp_base::ToOutVasp(I oix,Vasp &v) 
 {
@@ -89,13 +94,19 @@ vasp_op::vasp_op(BL op)
 	FLEXT_ADDBANG(0,m_dobang);
 	FLEXT_ADDMETHOD_(0,"vasp",m_vasp);
 	FLEXT_ADDMETHOD_(0,"set",m_set);
-	if(op) FLEXT_ADDMETHOD_(0,"to",m_to);
+//	if(op) FLEXT_ADDMETHOD_(0,"to",m_to);
 
-	FLEXT_ADDMETHOD_(0,"update",m_update);
+	FLEXT_ADDATTR_VAR("ref",m_getref,m_setref);
+	if(op) FLEXT_ADDATTR_VAR("to",m_getto,m_setto);
 
-	FLEXT_ADDMETHOD_(0,"detach",m_detach);
 	FLEXT_ADDMETHOD_(0,"stop",m_stop);
-	FLEXT_ADDMETHOD_(0,"prior",m_prior);
+
+	FLEXT_ADDATTR_VAR("update",m_getupd,m_setupd);
+	
+#ifdef FLEXT_THREADS
+	FLEXT_ADDATTR_VAR1("detach",detach);
+	FLEXT_ADDATTR_VAR1("prior",prior);
+#endif
 }
 
 V vasp_op::m_dobang()
@@ -108,7 +119,7 @@ V vasp_op::m_dobang()
 		m_bang();
 }
 
-I vasp_op::m_set(I argc,t_atom *argv)
+I vasp_op::m_set(I argc,const t_atom *argv)
 {
 	Vasp arg(argc,argv);
 
@@ -128,13 +139,14 @@ I vasp_op::m_set(I argc,t_atom *argv)
 	return 0; 
 }
 
-V vasp_op::m_vasp(I argc,t_atom *argv)
+V vasp_op::m_vasp(I argc,const t_atom *argv)
 {
 	m_set(argc,argv);
 	m_dobang();
 }
 
-V vasp_op::m_to(I argc,t_atom *argv)
+
+V vasp_op::m_to(I argc,const t_atom *argv)
 {
 	Vasp to(argc,argv);
 
@@ -146,7 +158,7 @@ V vasp_op::m_to(I argc,t_atom *argv)
 		dst = to;
 }
 
-V vasp_op::m_update(I argc,t_atom *argv) 
+V vasp_op::m_update(I argc,const t_atom *argv) 
 {
 	if(argc == 0) 
 		ref.Refresh();
@@ -158,6 +170,8 @@ V vasp_op::m_update(I argc,t_atom *argv)
 	}
 }
 
+
+/*
 V vasp_op::m_detach(BL thr) 
 { 
 #ifdef FLEXT_THREADS
@@ -171,6 +185,7 @@ V vasp_op::m_prior(I p)
 	prior = p; 
 #endif
 }
+*/
 
 V vasp_op::m_stop() {}
 
@@ -204,7 +219,7 @@ V vasp_tx::m_bang()
 			delete ret;
 		}
 		else {
-#ifdef _DEBUG
+#ifdef FLEXT_DEBUG
 			post("%s - no valid return",thisName());
 #endif
 		}
@@ -246,7 +261,7 @@ Vasp *vasp_unop::tx_work()
 ///////////////////////////////////////////////////////////////////////////
 
 
-vasp_binop::vasp_binop(I argc,t_atom *argv,const Argument &def,BL op,UL outcode):
+vasp_binop::vasp_binop(I argc,const t_atom *argv,const Argument &def,BL op,UL outcode):
 	vasp_tx(op)
 {
 	a_list(argc,argv);
@@ -265,9 +280,11 @@ vasp_binop::vasp_binop(I argc,t_atom *argv,const Argument &def,BL op,UL outcode)
 	FLEXT_ADDMETHOD_(1,"complex",a_complex);
 	FLEXT_ADDMETHOD_(1,"vector",a_vector);
 	FLEXT_ADDMETHOD_(1,"radio",a_radio);
+
+	FLEXT_ADDATTR_VAR("arg",m_getarg,m_setarg);
 }
 
-V vasp_binop::a_list(I argc,t_atom *argv) 
+V vasp_binop::a_list(I argc,const t_atom *argv) 
 { 
 	if(argc) {
 		arg.Parse(argc,argv);
@@ -282,7 +299,7 @@ V vasp_binop::a_list(I argc,t_atom *argv)
 	}
 }
 
-V vasp_binop::a_vasp(I argc,t_atom *argv) 
+V vasp_binop::a_vasp(I argc,const t_atom *argv) 
 { 
 	Vasp *v = new Vasp(argc,argv);
 	if(v->Ok()) {
@@ -297,7 +314,7 @@ V vasp_binop::a_vasp(I argc,t_atom *argv)
 	}
 }
 
-V vasp_binop::a_env(I argc,t_atom *argv) 
+V vasp_binop::a_env(I argc,const t_atom *argv) 
 { 
 	Env *bp = new Env(argc,argv);
 	if(bp->Ok()) {
@@ -314,7 +331,7 @@ V vasp_binop::a_env(I argc,t_atom *argv)
 
 V vasp_binop::a_float(F v) { arg.SetR(v); }
 
-V vasp_binop::a_double(I argc,t_atom *argv) 
+V vasp_binop::a_double(I argc,const t_atom *argv) 
 { 
 	if(
 		(argc == 1 && CanbeFloat(argv[0])) || 
@@ -331,7 +348,7 @@ V vasp_binop::a_double(I argc,t_atom *argv)
 
 V vasp_binop::a_int(I v) { arg.SetI(v); }
 
-V vasp_binop::a_complex(I argc,t_atom *argv) 
+V vasp_binop::a_complex(I argc,const t_atom *argv) 
 { 
 	if(
 		(argc == 1 && CanbeFloat(argv[0])) || 
@@ -346,7 +363,7 @@ V vasp_binop::a_complex(I argc,t_atom *argv)
 		post("%s - invalid complex argument (ignored)",thisName());
 }
 
-V vasp_binop::a_vector(I argc,t_atom *argv)
+V vasp_binop::a_vector(I argc,const t_atom *argv)
 {
 	error("%s - vector type not implemented",thisName());
 }
@@ -366,7 +383,7 @@ Vasp *vasp_binop::tx_work(const Argument &arg)
 ///////////////////////////////////////////////////////////////////////////
 
 
-vasp_anyop::vasp_anyop(I argc,t_atom *argv,const Argument &def,BL op,UL outcode):
+vasp_anyop::vasp_anyop(I argc,const t_atom *argv,const Argument &def,BL op,UL outcode):
 	vasp_tx(op)
 {
 	a_list(argc,argv);
@@ -379,9 +396,11 @@ vasp_anyop::vasp_anyop(I argc,t_atom *argv,const Argument &def,BL op,UL outcode)
 	FLEXT_ADDMETHOD(1,a_list);
 	FLEXT_ADDMETHOD_(1,"vasp",a_list);
 	FLEXT_ADDMETHOD_(1,"radio",a_radio);
+
+	FLEXT_ADDATTR_VAR("arg",m_getarg,m_setarg);
 }
 
-V vasp_anyop::a_list(I argc,t_atom *argv) 
+V vasp_anyop::a_list(I argc,const t_atom *argv) 
 { 
 	if(argc) {
 		arg.SetList(argc,argv);

@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -51,7 +52,6 @@ public:
 
 		AddInAnything(cnt);
 		AddOutAnything(cnt);
-		SetupInOut();
 
 		FLEXT_ADDMETHOD_(0,"reset",m_reset);
 

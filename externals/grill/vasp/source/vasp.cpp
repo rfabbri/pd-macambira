@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 #include "buflib.h"
@@ -233,24 +234,31 @@ VBuffer *Vasp::Buffer(I ix) const
 }
 
 // generate Vasp list of buffer references
-flext::AtomList *Vasp::MakeList(BL withvasp)
+V Vasp::MakeList(flext::AtomList &ret,BL withvasp) const
 {
 	I voffs = withvasp?1:0;
 	I needed = voffs+1+Vectors()*3;
-	flext::AtomList *ret = new flext::AtomList(needed);
+	ret(needed);
 
 	if(withvasp) 
-		flext::SetSymbol((*ret)[0],vasp_base::sym_vasp);  // VASP
+		flext::SetSymbol(ret[0],vasp_base::sym_vasp);  // VASP
 
-	flext::SetInt((*ret)[voffs],frames);  // frames
+	flext::SetInt(ret[voffs],frames);  // frames
 
 	for(I ix = 0; ix < Vectors(); ++ix) {
-		Ref &r = Vector(ix);
-		flext::SetSymbol((*ret)[voffs+1+ix*3],r.Symbol().Symbol());  // buf
-		flext::SetInt((*ret)[voffs+2+ix*3],r.Offset());  // offs
-		flext::SetInt((*ret)[voffs+3+ix*3],r.Channel());  // chn
+		const Ref &r = Vector(ix);
+		flext::SetSymbol(ret[voffs+1+ix*3],r.Symbol().Symbol());  // buf
+		flext::SetInt(ret[voffs+2+ix*3],r.Offset());  // offs
+		flext::SetInt(ret[voffs+3+ix*3],r.Channel());  // chn
 	}
+}
 
+
+// generate Vasp list of buffer references
+flext::AtomList *Vasp::MakeList(BL withvasp) const
+{
+	flext::AtomList *ret = new flext::AtomList;
+	MakeList(*ret,withvasp);
 	return ret;
 }
 

@@ -23,6 +23,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	In-place transformation is only possible for stride=1
 */
 
+#include "main.h"
 #include "ops_dft.h"
 #include <math.h>
 #include <string.h>

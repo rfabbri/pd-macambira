@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -32,7 +33,7 @@ class vasp_size:
 	FLEXT_HEADER(vasp_size,vasp_tx)
 
 public:
-	vasp_size(I argc,t_atom *argv):
+	vasp_size(I argc,t_atom *argv,BL abs = true):
 		size(0),sets(false)
 	{
 		if(argc >= 1 && CanbeFloat(argv[0]))
@@ -43,9 +44,9 @@ public:
 		AddInAnything();
 		AddInFloat();
 		AddOutAnything();
-		SetupInOut();
 
 		FLEXT_ADDMETHOD(1,m_arg);
+		if(abs) FLEXT_ADDATTR_VAR("frames",size,m_arg);
 	}
 
 	virtual V m_arg(F s) 
@@ -68,6 +69,8 @@ protected:
 
 private:
 	FLEXT_CALLBACK_F(m_arg);
+	FLEXT_CALLSET_I(m_arg);
+	FLEXT_ATTRGET_I(size);
 };
 
 FLEXT_LIB_V("vasp, vasp.size vasp.s",vasp_size)
@@ -128,9 +131,10 @@ class vasp_msize:
 
 public:
 	vasp_msize(I argc,t_atom *argv): 
-		vasp_size(argc,argv) 
+		vasp_size(argc,argv,false) 
 	{
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
+		FLEXT_ADDATTR_VAR("factor",factor,m_arg);
 	}
 
 	virtual Vasp *x_work() 
@@ -150,6 +154,8 @@ public:
 
 protected:
 	R factor;
+	FLEXT_CALLSET_F(m_arg);
+	FLEXT_ATTRGET_F(factor);
 };
 
 FLEXT_LIB_V("vasp, vasp.size* vasp.s*",vasp_msize)
@@ -217,7 +223,6 @@ public:
 		AddInAnything();
 //		AddOutAnything();
 		AddOutFloat();
-		SetupInOut();
 	}
 
 	virtual V m_bang() 

@@ -23,6 +23,8 @@ public:
 
 	static BL ChkArgs(I argc,const t_atom *argv);
 
+	V MakeList(flext::AtomList &ret) const;
+
 	V Clear();
 
 	BL Ok() const { return cnt && pos != NULL && val != NULL; }

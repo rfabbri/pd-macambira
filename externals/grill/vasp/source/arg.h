@@ -25,13 +25,13 @@ public:
 	Argument();
 	~Argument();
 	
-	Argument &Parse(I argc,t_atom *argv);
+	Argument &Parse(I argc,const t_atom *argv);
 	Argument &Clear();
 	Argument &ClearAll();
 
 	Argument &SetVasp(Vasp *v);
 	Argument &SetEnv(Env *e);
-	Argument &SetList(I argc,t_atom *argv);
+	Argument &SetList(I argc,const t_atom *argv);
 	Argument &SetI(I i);
 	Argument &SetR(F f);
 	Argument &SetR(D d);
@@ -45,7 +45,7 @@ public:
 
 	Argument &AddVasp(Vasp *v);
 	Argument &AddEnv(Env *e);
-	Argument &AddList(I argc,t_atom *argv);
+	Argument &AddList(I argc,const t_atom *argv);
 	Argument &AddI(I i);
 	Argument &AddR(F f);
 	Argument &AddR(D d);
@@ -85,6 +85,8 @@ public:
 	CX GetAComplex() const;
 	const VX &GetVector() const { return *dt.vx; }
 	VX GetAVector() const;
+
+	V MakeList(flext::AtomList &ret);
 
 protected:
 	enum {

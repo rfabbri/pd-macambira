@@ -13,6 +13,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "opbase.h"
 #include "classes.h"
 #include "vecblk.h"

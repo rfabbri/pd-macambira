@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "ops_search.h"
 #include "util.h"
 #include "oploop.h"
@@ -134,8 +135,8 @@ public:
 		vasp_anyop(argc,argv,VASP_ARG_R(0),false,XletCode(xlet::tp_float,0)),
 		slope(0),dir(0)
 	{
-		FLEXT_ADDMETHOD_I(0,"dir",m_dir);
-		FLEXT_ADDMETHOD_I(0,"slope",m_slope);
+		FLEXT_ADDATTR_VAR1("dir",dir);
+		FLEXT_ADDATTR_VAR1("slope",slope);
 	}
 
 	virtual Vasp *do_work(OpParam &p) = 0;
@@ -151,15 +152,12 @@ public:
 		return ret;
 	}
 
-	V m_dir(I d) { dir = d; }
-	V m_slope(I sl) { slope = sl; }
-
 protected:
 	I dir,slope;
 
 private:
-	FLEXT_CALLBACK_I(m_dir)
-	FLEXT_CALLBACK_I(m_slope)
+	FLEXT_ATTRVAR_I(dir)
+	FLEXT_ATTRVAR_I(slope)
 };																				
 
 

@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "env.h"
 #include "classes.h"
 #include "util.h"
@@ -58,12 +59,12 @@ BL Env::ChkArgs(I argc,const t_atom *argv)
 	if(v && v == vasp_base::sym_env) ix++; // if it is "env" ignore it
 
 	while(argc > ix) {
-		// check for position
+		// check for value 
 		if(flext::CanbeFloat(argv[ix])) ix++;
 		else 
 			return false;
 
-		// check for value
+		// check for position
 		if(argc > ix)
 			if(flext::CanbeFloat(argv[ix])) ix++;
 			else 
@@ -73,7 +74,15 @@ BL Env::ChkArgs(I argc,const t_atom *argv)
 	return true;
 }
 
-
+V Env::MakeList(flext::AtomList &ret) const
+{
+	ret(cnt*2+1);
+	flext::SetSymbol(ret[0],vasp_base::sym_env);
+	for(I i = 0; i < cnt; ++i) {
+		flext::SetFloat(ret[i*2+1],val[i]);
+		flext::SetFloat(ret[i*2+2],pos[i]);
+	}
+}
 
 V Env::Clear()
 {

@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "ops_gen.h"
 #include "util.h"
 #include <math.h>

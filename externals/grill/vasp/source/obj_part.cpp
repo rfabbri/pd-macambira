@@ -8,6 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#include "main.h"
 #include "classes.h"
 #include "util.h"
 
@@ -40,14 +41,14 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything(2);
-		SetupInOut();
 
 		FLEXT_ADDMETHOD_(1,"list",m_part);
+		FLEXT_ADDATTR_VAR("parts",m_getpart,m_setpart);
 	}
 
 	~vasp_part() { if(part) delete[] part; }
 
-	V m_part(I argc,t_atom *argv) 
+	V m_part(I argc,const t_atom *argv) 
 	{ 
 		if(part) delete[] part; parts = 0;
 		part = new I[argc]; 
@@ -61,6 +62,14 @@ public:
 			part[i] = p; ++parts;
 		}
 	}
+
+	V m_getpart(AtomList &ret) 
+	{
+		ret(parts);
+		for(I i = 0; i < parts; ++i) SetInt(ret[i],part[i]);
+	}
+
+	V m_setpart(const AtomList &ret) { m_part(ret.Count(),ret.Atoms()); }
 
 	virtual V m_bang() 
 	{ 
@@ -95,6 +104,7 @@ protected:
 	I parts,*part;
 
 	FLEXT_CALLBACK_V(m_part)
+	FLEXT_CALLVAR_V(m_getpart,m_setpart);
 };
 
 FLEXT_LIB_V("vasp, vasp.part",vasp_part)

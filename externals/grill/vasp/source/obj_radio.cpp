@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	\brief objects for radio messages.
 */
 
-
+#include "main.h"
 #include "classes.h"
 
 
@@ -35,7 +35,6 @@ public:
 	{
 		AddInAnything();
 		AddOutAnything(2);
-		SetupInOut();
 
 		FLEXT_ADDMETHOD(0,m_any);
 	}
