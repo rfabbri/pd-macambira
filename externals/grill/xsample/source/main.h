@@ -19,8 +19,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 402)
-#error You need at least flext version 0.4.2
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
+#error You need at least flext version 0.5.0
 #endif
 
 
@@ -127,10 +127,10 @@ protected:
 
 	inline F scale(F smp) const { return (smp-sclmin)*sclmul; }
 	
-	static V arrscale(I n,const S *in,S *out,S add,S mul);
+    static V arrscale(I n,const S *in,S *out,S add,S mul) { flext::ScaleSamples(out,in,mul,add,n); }
 	inline V arrscale(I n,const S *in,S *out) const { arrscale(n,in,out,(S)-sclmin,sclmul); }
 	
-	static V arrmul(I n,const S *in,S *out,S mul);
+	static V arrmul(I n,const S *in,S *out,S mul) { flext::MulSamples(out,in,mul,n); }
 	inline V arrmul(I n,const S *in,S *out) const { arrmul(n,in,out,(S)(1./s2u)); }
 
 	BL bufchk();

@@ -1,9 +1,9 @@
-#N canvas 504 38 464 478 12;
+#N canvas 504 38 466 480 12;
 #X obj 27 11 inlet;
 #X obj 90 158 vasp.amax?;
 #X obj 35 206 route 0 1;
 #X obj 107 415 outlet;
-#X obj 165 415 outlet;
+#X obj 256 418 outlet;
 #X obj 27 306 vasp;
 #X obj 47 255 t b;
 #X obj 90 116 vasp.m 2;
@@ -14,8 +14,8 @@
 #X text 131 79 catch messages ("to" not handled);
 #X obj 28 41 vasp.radio;
 #X connect 0 0 13 0;
-#X connect 1 1 2 0;
-#X connect 1 1 4 0;
+#X connect 1 0 2 0;
+#X connect 1 0 4 0;
 #X connect 2 0 6 0;
 #X connect 2 1 6 0;
 #X connect 2 2 9 0;
