@@ -1,0 +1,18 @@
+#N canvas 0 1 450 300 8;
+#X obj 112 79 openpanel;
+#X msg 112 49 bang;
+#X obj 111 105 wavinfo;
+#X floatatom 45 168 20 0 0;
+#X floatatom 165 168 5 0 0;
+#X floatatom 212 169 5 0 0;
+#X floatatom 257 169 5 0 0;
+#X text 44 183 samples;
+#X text 165 183 channels;
+#X text 212 183 bitsize;
+#X text 257 184 rate;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 2 1 4 0;
+#X connect 2 2 5 0;
+#X connect 2 3 6 0;

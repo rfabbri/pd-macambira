@@ -1,0 +1,13 @@
+#N canvas 322 265 450 300 10;
+#X obj 186 244 print;
+#X msg 200 102 itsch ni san chi;
+#X obj 186 187 cxc.prepend /bla;
+#X obj 186 210 cxc.prepend send;
+#X floatatom 155 79 5 0 0;
+#X msg 214 138 qui qua 2 3.4555 "bla ha";
+#X text 25 11 prepend arbitrary length lists/anythings with stuff;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 0 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;

@@ -1,0 +1,9 @@
+#N canvas 305 149 450 300 10;
+#X obj 199 94 utime;
+#X msg 192 55 bang;
+#X floatatom 259 170 8 0 0;
+#X floatatom 174 129 20 0 0;
+#X text 25 8 output seconds since epoch and microsecond fraction;
+#X connect 0 0 3 0;
+#X connect 0 1 2 0;
+#X connect 1 0 0 0;
