@@ -1,0 +1,10 @@
+# dyn~ - dynamic object management for PD
+# 
+# Copyright (c)Thomas Grill (gr@grrrr.org)
+# For information on usage and redistribution, and for a DISCLAIMER OF ALL
+# WARRANTIES, see the file, "license.txt," in this distribution.  
+#
+# Makefile for MSVC++ 6 and .NET
+#
+# usage:
+# to build run "build-win-pd-msvc.bat"

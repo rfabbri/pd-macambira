@@ -158,7 +158,7 @@
 				FavorSizeOrSpeed="2"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="3"
-				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\max\flext\source;f:\prog\packs\pthreads"
+				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;c:\data\prog\max\flext\source;c:\data\prog\packs\pthreads"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_SHARED"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -176,7 +176,7 @@
 				OutputFile="$(outdir)/dyn~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs/bin,..\flext\pd-msvc,f:\prog\packs\pthreads"
+				AdditionalLibraryDirectories="&quot;c:\data\prog\pd\pd-cvs/bin&quot;;&quot;..\flext\pd-msvc&quot;;c:\data\prog\packs\pthreads"
 				ProgramDatabaseFile="$(outdir)/dyn~.pdb"
 				ImportLibrary="$(outdir)/dyn~.lib"
 				TargetMachine="1"/>

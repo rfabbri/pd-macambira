@@ -1,7 +1,7 @@
 NAME=dyn~
 
 # all the source files from the package
-DIR=src
+SRCDIR=src
 
 SRCS= main.cpp
 HDRS= 
