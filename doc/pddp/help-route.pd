@@ -95,6 +95,7 @@ a mixture of the two unless the data types are defined explicitly)
 \, then sends the messages through the appropriate outlets.;
 #N canvas 0 0 454 304 related_objects_from_other_libraries 0;
 #X obj 26 33 segregate;
+#X obj 126 33 multiselect;
 #X text 18 86 These objects are offered in PD only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
