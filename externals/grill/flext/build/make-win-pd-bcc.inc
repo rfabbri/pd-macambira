@@ -1,9 +1,8 @@
 DEFS=$(DEFS) /DFLEXT_SYS=2
 
-INCPATH=$(INCPATH) /I$(PDPATH)\src
-LIBPATH=$(LIBPATH) /LIBPATH:$(PDPATH)\bin
+INCPATH=$(INCPATH) -I$(PDPATH)\src
 
-# these are both in PDPATH
+# these are both in FLEXTPATH
 LIBS=$(LIBS) pd.lib pthreadVC.lib
 
 EXT=dll
@@ -13,7 +12,8 @@ EXT=dll
 !ifdef SHARED
 # --- shared ---
 
-!elseifdef THREADED
+!else
+!ifdef THREADED
 # --- static multi-threaded ---
 
 !ifdef DEBUG
@@ -31,4 +31,5 @@ LIBS=$(LIBS) flext_d-pdwin.lib
 LIBS=$(LIBS) flext-pdwin.lib 
 !endif
 
+!endif
 !endif

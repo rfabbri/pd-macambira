@@ -6,26 +6,25 @@ INCPATH=$(INCPATH) /I$(MSVCPATH)\include
 LIBPATH=$(LIBPATH) /LIBPATH:$(MSVCPATH)\lib
 !endif
 
-# add user flags
-CFLAGS=$(UFLAGS)
-
-# for VC7 - exception handling
+# for VC7 - enable exception handling
 CFLAGS=$(CFLAGS) /EHsc 
 
 ##############################################
 
 # use multithreaded static libraries
-!ifdef _DEBUG
-CFLAGS=$(CFLAGS) /DMTd
+!ifdef DEBUG
+CFLAGS=$(CFLAGS) /D_DEBUG /DMTd
+LDFLAGS=$(LDFLAGS) /DEBUG
 !else
-CFLAGS=$(CFLAGS) /DMT
+CFLAGS=$(CFLAGS) $(OFLAGS) /DNDEBUG /DMT
+LDFLAGS=$(LDFLAGS) /INCREMENTAL:NO 
 !endif
 
-!ifdef FLEXT_SHARED
+!ifdef SHARED
 # --- shared ---
 DEFS=$(DEFS) /DFLEXT_SHARED
 
-!elseifdef FLEXT_THREADED
+!elseifdef THREADED
 # --- static multi-threaded ---
 DEFS=$(DEFS) /DFLEXT_THREADS
 
@@ -36,12 +35,8 @@ DEFS=$(DEFS) /DFLEXT_THREADS
 
 ##############################################
 
+# default target
 all: $(OUTPATH) $(OUTPATH)\$(NAME).$(EXT)
-
-# remove build
-clean:
-	-del /q $(OUTPATH) > nul
-	-rmdir $(OUTPATH) > nul
 
 OBJS= $(SRCS:.c=.obj)
 OBJS= $(OBJS:.objpp=.obj)
@@ -57,11 +52,17 @@ $(OUTPATH):
 
 $(OUTPATH)\$(NAME).$(EXT): $(OBJS)
 	cd $(OUTPATH)
-	link /DLL $(LDFLAGS) /out:$(NAME).$(EXT) /INCREMENTAL:NO $** $(LIBS) $(LIBPATH)
+	link /DLL $(LDFLAGS) /out:$(NAME).$(EXT) $** $(LIBS) $(LIBPATH)
 	@-del *.exp
 	@-del *.lib
 	cd ..
-!ifdef INSTPATH
+
+# remove build
+clean:
+	-del /q $(OUTPATH) > nul
+	-rmdir $(OUTPATH) > nul
+
+# install build
+install:
 	@-if not exist $(INSTPATH) mkdir $(INSTPATH)
-	copy $@ $(INSTPATH) > nul
-!endif
+	copy $(OUTPATH)\$(NAME).$(EXT) $(INSTPATH) > nul
