@@ -395,7 +395,7 @@ static void popup_name(t_popup* x, t_symbol *name)
 {
 	DEBUG(post("name start");)
 
-	x->x_name->s_name = name->s_name;
+	x->x_name = name;
 	sys_vgui(".x%x.c.s%x configure -text \"%s\"\n", x->x_glist, x, name->s_name);
 }
 

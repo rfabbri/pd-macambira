@@ -35,4 +35,7 @@ Methods:
   bgcolour [colour]	Background Colour (white, green, #5500ff)
   options [opt1] [...]	List of the popup options
 
+BUGS:
+- Do not use a loadbang to set a patch-default value. Will cause a segfault.
+
 Have Fun.
