@@ -62,13 +62,6 @@ A:hover {
 	color: #003300 ;
 } 
 
-A.nonexistent { 
-	background: #EEE; 
-	color: #CC6600;
-}
-
-
-
 
 HR {
 	height:1px;
@@ -84,6 +77,12 @@ P.small {
 	text-align: right;
 	/*border: dotted 1px;*/
 	padding: 5px;
+}
+
+span.quote {
+	margin:0px;
+	font-family: Verdana, Helvetica, Arial, Tahoma, sans-serif;
+	font-size: 8pt;
 }
 
 UL {
