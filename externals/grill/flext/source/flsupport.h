@@ -35,10 +35,10 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_root) {
 public:
 // --- console output -----------------------------------------------	
 
-		//! post message to console
-		static void post(const char *s,...);
-		//! post error message to console
-		static void error(const char *s,...);
+		//! post message to console, with line feed (limited to 1k chars!)
+		static void post(const char *fmt,...);
+		//! post error message to console (limited to 1k chars!)
+		static void error(const char *fmt,...);
 
 // --- memory -------------------------------------------------------	
 
@@ -567,7 +567,7 @@ public:
 		AtomList &Part(int offs,int len) { return (*this = GetPart(offs,len)); }
 
 		//! Represent as a string
-		bool Print(char *buffer,int buflen) const;
+		bool Print(char *buffer,int buflen) const { return flext::PrintList(Count(),Atoms(),buffer,buflen); }
 
 	protected:
 		int cnt;
