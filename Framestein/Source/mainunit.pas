@@ -112,9 +112,9 @@ type
 
 const
 {$IFDEF FSDLL}
-  STARTMSG = 'FramesteinLib 0.32 DLL TEST 1 running...';
+  STARTMSG = 'FramesteinLib 0.32 DLL running...';
 {$ELSE}
-  STARTMSG = 'Framestein 0.32 dev running...';
+  STARTMSG = 'Framestein 0.32 running...';
 {$ENDIF}
   MCAPTION = 'Framestein 0.32';
   SocketBufferSize = 100000;
@@ -495,9 +495,11 @@ begin
       FSPort := Reg.ReadInteger('FSPort');
       EnableFSConns := Reg.ReadBool('EnableFSConns');
       DockMain := Reg.ReadBool('DockMain');
+{$IFDEF FSDLL}
       FSFolder := Reg.ReadString('FSFolder');
       if FSFolder='' then
         FSFolder := ExtractFilePath(Application.Exename);
+{$ENDIF}
     end;
   except
     RunConfig := True;

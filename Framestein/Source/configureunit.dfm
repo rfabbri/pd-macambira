@@ -21,12 +21,13 @@ object configure: Tconfigure
     Top = 0
     Width = 427
     Height = 275
-    ActivePage = TSFolders
+    ActivePage = TSConnections
     Align = alClient
     TabOrder = 0
     object TSFolders: TTabSheet
       Caption = 'Folders'
       ImageIndex = 2
+      TabVisible = False
       object Label6: TLabel
         Left = 16
         Top = 36

@@ -1,6 +1,6 @@
 0.32
 - new plugin: lightspeed
-- fs.frame: |title this is the main window(
+- fs.frame: |title this is the main window( and |undock( commands
 - fs.copy: transcolor <r> <g> <b> to set the transparent color
 - better gol algo (Plugins\gol.c)
 - added 1d cell automata where each iteration will add a new row: Plugins\rowca

@@ -1,11 +1,9 @@
-#N canvas 44 16 905 629 12;
+#N canvas 44 16 907 631 12;
 #X text 346 170 "next" "prev" "random" "seek <number>" to show frames
 in video or buffered images.;
 #X text 347 211 "clear" to flush buffered images.;
 #X text 347 237 "flip_auto" "flip_manual" "flip" controls how the display
 should reflect changes in the image.;
-#X text 348 282 "320x240" to set image size "100+100" to set frame
-position "display 600x450" to set display size;
 #X text 348 329 "borders_0" "borders_1" "stayontop_0"/1 "mute_0"/1
 \, also right-click the image for display options.;
 #X text 327 59 inlet accepts:;
@@ -140,7 +138,9 @@ you load a patch.;
 ;
 #X text 351 544 minimize \, maximize \, bringtofront \, hidecursor_1
 \, hidecursor_0;
-#X connect 15 0 17 0;
-#X connect 16 0 15 0;
-#X connect 18 0 9 0;
-#X connect 18 1 11 0;
+#X text 348 282 "320 x 240" to set image size "100 + 100" to set frame
+position "display 600 x 450" to set display size;
+#X connect 14 0 16 0;
+#X connect 15 0 14 0;
+#X connect 17 0 8 0;
+#X connect 17 1 10 0;

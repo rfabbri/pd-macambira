@@ -1,4 +1,4 @@
-all: vframe vsig vsnapshot vrgb vcolor vframeread vdrawarray arraysize buildstr l2s
+all: vframe vsig vsnapshot vrgb vcolor vframeread vdrawarray arraysize buildstr l2s system
 
 # FLAGS:
 #
@@ -36,3 +36,6 @@ buildstr:
 
 l2s:
 	cl l2s.c $(F) /link /export:l2s_setup $(L)
+
+system:
+	cl system.c $(F) /link /export:system_setup $(L)

@@ -67,12 +67,14 @@ begin
   main.FSPort := StrToInt(EditFsPort.Text);
   main.EnableFSConns := CBEnableFSConns.Checked;
   main.DockMain := CBDockMain.Checked;
+{$IFDEF FSDLL}
   if main.FSFolder <> EditFSFolder.Text then begin
     main.FSFolder := EditFSFolder.Text;
     main.Plugins.Clear;
     main.Plugins.ReLoad;
     main.SearchPath.Add(main.FSFolder);
   end;
+{$ENDIF}
 
   try
     if Reg.OpenKey('\Software\Framestein', True) then begin
@@ -82,7 +84,9 @@ begin
       Reg.WriteInteger('FSPort', main.FSPort);
       Reg.WriteBool('EnableFSConns', main.EnableFSConns);
       Reg.WriteBool('DockMain', main.DockMain);
+{$IFDEF FSDLL}
       Reg.WriteString('FSFolder', main.FSFolder);
+{$ENDIF}
     end;
   except
   end;
@@ -113,6 +117,14 @@ end;
 
 procedure Tconfigure.Execute;
 begin
+{$IFDEF FSDLL}
+  TSFolders.TabVisible := True;
+  TSFolders.Visible := True;
+{$ELSE}
+  TSFolders.TabVisible := False;
+  TSFolders.Visible := False;
+{$ENDIF}
+
   // load values from main
   EditPdHost.Text := main.PdHost;
   if EditPdHost.Text='' then EditPdHost.Text:='localhost';

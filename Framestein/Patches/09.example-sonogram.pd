@@ -1,4 +1,4 @@
-#N canvas 308 -3 607 678 12;
+#N canvas 308 -3 609 680 12;
 #X obj 13 40 fs.main;
 #X msg 13 13 6001;
 #X msg 64 12 reset;
@@ -51,7 +51,7 @@
 #X text 77 636 modify fs.sonogram.pd for a proper temporary path.;
 #X obj 330 451 *~ 4;
 #X obj 479 592 init;
-#X msg 248 48 g:/fsrel/framestein/extract.wav;
+#X msg 248 48 e:/fs/framestein/extract.wav;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;

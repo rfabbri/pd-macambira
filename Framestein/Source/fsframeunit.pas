@@ -601,6 +601,9 @@ begin
       end;
     end;
   end else
+  if s1='UNDOCK' then begin
+    MiUndock.Click;
+  end else
   if s1='SHOW' then begin
     Self.Top := prevtop;
     if not prevmute and MiMute.Checked then

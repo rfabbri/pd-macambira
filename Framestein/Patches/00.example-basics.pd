@@ -1,4 +1,4 @@
-#N canvas 228 3 650 663 12;
+#N canvas 228 3 652 665 12;
 #X obj 5 31 fs.main;
 #X msg 5 7 6001;
 #X msg 56 7 reset;
@@ -12,8 +12,6 @@ at a time!;
 #X obj 358 273 fs.fx;
 #X text 120 304 1st outlet: fs.frame ID. Connect this to other fs.*-objects
 \, like fs.copy \, fs.info \, fs.event etc.;
-#X text 120 344 2nd outlet: reports mouse movement in the frame when
-mousetrack_1 is set. See example-docking.pd!;
 #X text 119 384 3rd outlet: report the window position when docked
 \, see example-docking2.pd!;
 #X obj 45 442 fs.copy;
@@ -34,6 +32,8 @@ patch.;
 plugins \, photoshop-filters \, interaction and more ...;
 #X text 49 602 Have fun! (close this patch before loading another)
 ;
+#X text 120 344 2nd outlet: reports mouse movement in the frame when
+mousetrack_1 is set. See example-info-rgb-event.pd!;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;

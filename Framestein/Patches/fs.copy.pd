@@ -1,53 +1,61 @@
-#N canvas 52 54 936 448 12;
-#X obj 173 21 loadbang;
-#X obj 208 271 fs_sender;
-#X msg 173 204 copy \$1;
-#X obj 352 14 inlet;
-#X text 465 118 dest_all;
-#X text 465 132 dest_random;
-#X text 465 152 copy;
-#X text 465 167 alpha <value>;
-#X text 466 197 sub <value>;
-#X text 465 183 add <value>;
-#X text 466 62 source_all;
-#X text 466 79 source_random;
-#X obj 23 22 inlet;
-#X obj 23 155 outlet;
-#X obj 23 62 pack s s;
-#X msg 23 95 fs_op \$2 \$1;
-#X obj 352 156 pack s s;
-#X msg 352 185 \$2 \$1;
-#X obj 352 127 l2s;
-#X text 466 47 source <left> <top> <right> <bottom>;
-#X text 465 104 dest <left> <top> <right> <bottom>;
-#X text 399 15 for these commands:;
-#X obj 173 174 symbol;
-#X obj 194 114 r fs_reset;
-#X msg 194 140 bang;
-#X text 467 267 blackness dstinvert mergecopy mergepaint notsrccopy
+#N canvas 52 54 727 454 12;
+#X text 253 117 dest_all;
+#X text 253 131 dest_random;
+#X text 253 151 copy;
+#X text 253 166 alpha <value>;
+#X text 254 196 sub <value>;
+#X text 253 182 add <value>;
+#X text 254 61 source_all;
+#X text 254 78 source_random;
+#X text 254 46 source <left> <top> <right> <bottom>;
+#X text 253 103 dest <left> <top> <right> <bottom>;
+#X text 255 266 blackness dstinvert mergecopy mergepaint notsrccopy
 notsrcerase patcopy patinvert patpaint srcand srccopy srcerase srcinvert
 srcpaint whiteness;
-#X text 466 226 try these raster operations: (some of them do nothing)
+#X text 254 225 try these raster operations: (some of them do nothing)
 ;
-#X text 468 329 transparent_0/1 mirrorleftright_0/1 mirrorupdown_0/1
+#X text 256 328 transparent_0/1 mirrorleftright_0/1 mirrorupdown_0/1
 ;
-#X text 467 378 "plugin_name" (see example-plugins.pd);
-#X obj 173 51 symbol \$0C;
-#X text 466 404 "filter_name" (see example-photoshopfilters.pd);
-#X text 468 349 transcolor <r> <g> <b> to set the transparent color
+#X text 255 377 "plugin_name" (see example-plugins.pd);
+#X text 254 403 "filter_name" (see example-photoshopfilters.pd);
+#X text 256 348 transcolor <r> <g> <b> to set the transparent color
 ;
-#X connect 0 0 29 0;
+#N canvas 254 135 586 445 guts 0;
+#X obj 231 48 loadbang;
+#X obj 266 298 fs_sender;
+#X msg 231 231 copy \$1;
+#X obj 410 41 inlet;
+#X obj 81 49 inlet;
+#X obj 81 182 outlet;
+#X obj 81 89 pack s s;
+#X msg 81 122 fs_op \$2 \$1;
+#X obj 410 183 pack s s;
+#X msg 410 212 \$2 \$1;
+#X obj 410 154 l2s;
+#X obj 231 201 symbol;
+#X obj 252 141 r fs_reset;
+#X msg 252 167 bang;
+#X obj 231 78 symbol \$0C;
+#X connect 0 0 14 0;
 #X connect 2 0 1 0;
-#X connect 3 0 18 0;
-#X connect 12 0 14 0;
-#X connect 14 0 15 0;
-#X connect 15 0 13 0;
-#X connect 16 0 17 0;
-#X connect 17 0 1 0;
-#X connect 18 0 16 0;
-#X connect 22 0 2 0;
-#X connect 23 0 24 0;
-#X connect 24 0 29 0;
-#X connect 29 0 14 1;
-#X connect 29 0 16 1;
-#X connect 29 0 22 0;
+#X connect 3 0 10 0;
+#X connect 4 0 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 5 0;
+#X connect 8 0 9 0;
+#X connect 9 0 1 0;
+#X connect 10 0 8 0;
+#X connect 11 0 2 0;
+#X connect 12 0 13 0;
+#X connect 13 0 14 0;
+#X connect 14 0 6 1;
+#X connect 14 0 8 1;
+#X connect 14 0 11 0;
+#X restore 45 84 pd guts;
+#X obj 45 30 inlet;
+#X obj 96 30 inlet;
+#X obj 45 149 outlet;
+#X text 187 14 The right inlet accepts these commands:;
+#X connect 16 0 19 0;
+#X connect 17 0 16 0;
+#X connect 18 0 16 1;

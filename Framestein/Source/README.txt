@@ -15,7 +15,7 @@ http://turbo.gamedev.net/delphix.asp
 - Install TScanDir in Filez.pas (in this directory).
 
 
-- Correct your Search path and compile!
+- Correct your Search path and compile Framestein.dpr!
 
 
 - Framestein needs ijl15.dll (included in Framestein-directory) to load/save jpegs
@@ -23,7 +23,6 @@ http://turbo.gamedev.net/delphix.asp
 
 
 --- note to versions >= 0.27 ---
-
 
 The photoshop filter host functionality is based on commercial code from http://www.case2000.com.
 Due to my modifications the original component won't compile with Framestein and
@@ -34,3 +33,11 @@ the implementation in pshostunit.pas.
 
 I'm planning a .dll of my version of the component to rid of this problem.
 Mail me for info.
+
+
+--- versions > 0.31:
+
+Framestein.dpr is the Delphi-project to use. FramesteinLib.dpr is an experimental
+project to compile Framestein as a Pure Data library, loaded with the -lib-parameter.
+This seems to give a better response, but still crashes when quitting Pd, so no binary
+is yet distributed.
