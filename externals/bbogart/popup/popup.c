@@ -135,6 +135,8 @@ static void create_widget(t_popup *x, t_glist *glist)
   x->x_rect_height =  x->x_height+2;
   
   /* Create menubutton and empty menu widget -- maybe the menu should be created elseware?*/
+  /* Seems we have to delete the widget in case it already exists */
+  sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
   sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
 		x,canvas,x,x,x->x_colour->s_name,x->x_name->s_name,x,x);
 
