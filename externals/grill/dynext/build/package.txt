@@ -1,8 +1,0 @@
-NAME=dyn~
-
-# all the source files from the package
-SRCDIR=src
-
-SRCS= main.cpp
-HDRS= 
-
