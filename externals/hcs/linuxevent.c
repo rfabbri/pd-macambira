@@ -3,7 +3,7 @@
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 #define LINUXEVENT_OUTLETS  4
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -14,6 +14,7 @@ typedef struct _linuxevent {
   t_object            x_obj;
   t_int               x_fd;
   t_symbol*           x_devname;
+  t_clock             *x_clock;
   int                 read_ok;
   int                 started;
   struct input_event  x_input_event; 
@@ -21,6 +22,7 @@ typedef struct _linuxevent {
   t_outlet            *x_input_event_type_outlet;
   t_outlet            *x_input_event_code_outlet;
   t_outlet            *x_input_event_value_outlet;
+  int                 x_delaytime;
 }t_linuxevent;
 
 /*------------------------------------------------------------------------------
@@ -30,13 +32,14 @@ typedef struct _linuxevent {
 //DONE
 static int linuxevent_close(t_linuxevent *x)
 {
-    DEBUG(post("linuxevent_close");)
-
-     if (x->x_fd <0) return 0;
-
-     close (x->x_fd);
-
-     return 1;
+  DEBUG(post("linuxevent_close");)
+    
+  if (x->x_fd <0) {
+    return 0;
+  } else {
+    close (x->x_fd);
+    return 1;
+  }
 }
 
 //DONE
@@ -157,36 +160,26 @@ static int linuxevent_open(t_linuxevent *x,t_symbol* s)
 
 static int linuxevent_read(t_linuxevent *x,int fd)
 {
-  int readBytes;
-  int axis_num = 0;
-  t_float button_num = 0;
+//  int readBytes;
     
   if (x->x_fd < 0) return 0;
-  if (x->read_ok) {
-    readBytes = read(x->x_fd, &(x->x_input_event), sizeof(struct input_event));
-    DEBUG(post("reading %d",readBytes);)
-    if ( readBytes < 0 ) {
-      post("linuxevent: read failed");
-      x->read_ok = 0;
-      return 0;
-    }
+
+  while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
+	  outlet_float (x->x_input_event_value_outlet, (int)x->x_input_event.value);
+	  outlet_float (x->x_input_event_code_outlet, x->x_input_event.code);
+	  outlet_float (x->x_input_event_type_outlet, x->x_input_event.type);
+	  /* input_event.time is a timeval struct from <sys/time.h> */
+	  /*   outlet_float (x->x_input_event_time_outlet, x->x_input_event.time); */
   }
-  /* input_event.time is a timeval struct from <sys/time.h> */
-  /*   outlet_float (x->x_input_event_time_outlet, x->x_input_event.time); */
-  outlet_float (x->x_input_event_type_outlet, x->x_input_event.type);
-  outlet_float (x->x_input_event_code_outlet, x->x_input_event.code);
-  outlet_float (x->x_input_event_value_outlet, (int)x->x_input_event.value);
   
+  if (x->started) {
+	  clock_delay(x->x_clock, x->x_delaytime);
+  }
+
   return 1;    
 }
 
 /* Actions */
-
-static void linuxevent_bang(t_linuxevent* x)
-{
-    DEBUG(post("linuxevent_bang");)
-   
-}
 
 static void linuxevent_float(t_linuxevent* x)
 {
@@ -194,29 +187,43 @@ static void linuxevent_float(t_linuxevent* x)
    
 }
 
+void linuxevent_delay(t_linuxevent* x, t_float f)  {
+	DEBUG(post("linuxevent_DELAY %f",f);)
+		
+/*	if the user sets the delay less than zero, reset to default */
+	if ( f > 0 ) {	
+		x->x_delaytime = (int)f;
+	} else {
+		x->x_delaytime = 5;
+	}
+}
+
 // DONE
 void linuxevent_start(t_linuxevent* x)
 {
-  DEBUG(post("linuxevent_start");)
-
-    if (x->x_fd >= 0 && !x->started) {
-       sys_addpollfn(x->x_fd, (t_fdpollfn)linuxevent_read, x);
-       post("linuxevent: start");
-       x->started = 1;
-    }
+  DEBUG(post("linuxevent_start"););
+  post("clock delay: %d",x->x_delaytime);
+  
+  if (x->x_fd >= 0 && !x->started) {
+    clock_delay(x->x_clock, 2);
+    post("linuxevent: start");
+    x->started = 1;
+  }
 }
 
 
 // DONE
 void linuxevent_stop(t_linuxevent* x)
 {
-  DEBUG(post("linuxevent_stop");)
-
-    if (x->x_fd >= 0 && x->started) { 
-        sys_rmpollfn(x->x_fd);
-        post("linuxevent: stop");
-        x->started = 0;
-    }
+  DEBUG(post("linuxevent_stop"););
+	
+  post("clock delay: %d",x->x_delaytime);
+	  
+  if (x->x_fd >= 0 && x->started) { 
+    clock_unset(x->x_clock);
+    post("linuxevent: stop");
+    x->started = 0;
+  }
 }
 
 /* Misc setup functions */
@@ -226,10 +233,10 @@ static void linuxevent_free(t_linuxevent* x)
 {
   DEBUG(post("linuxevent_free");)
     
-    if (x->x_fd < 0) return;
-  
+  if (x->x_fd < 0) return;
+
   linuxevent_stop(x);
-  
+  clock_free(x->x_clock);
   close (x->x_fd);
 }
 
@@ -239,11 +246,16 @@ static void *linuxevent_new(t_symbol *s)
   t_linuxevent *x = (t_linuxevent *)pd_new(linuxevent_class);
 
   DEBUG(post("linuxevent_new");)
-  
+
+  post("[linuxevent] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
+
   /* init vars */
   x->x_fd = -1;
   x->read_ok = 1;
   x->started = 0;
+  x->x_delaytime = 5;
+
+  x->x_clock = clock_new(x, (t_method)linuxevent_read);
   
   /* create outlets for each axis */
   x->x_input_event_time_outlet = outlet_new(&x->x_obj, &s_float);
@@ -272,13 +284,14 @@ void linuxevent_setup(void)
 
   /* add inlet datatype methods */
   class_addfloat(linuxevent_class,(t_method) linuxevent_float);
-  class_addbang(linuxevent_class,(t_method) linuxevent_bang);
+  class_addbang(linuxevent_class,(t_method) linuxevent_read);
 
   /* add inlet message methods */
   class_addmethod(linuxevent_class, (t_method) linuxevent_open,gensym("open"),A_DEFSYM);
   class_addmethod(linuxevent_class,(t_method) linuxevent_close,gensym("close"),0);
   class_addmethod(linuxevent_class,(t_method) linuxevent_start,gensym("start"),0);
   class_addmethod(linuxevent_class,(t_method) linuxevent_stop,gensym("stop"),0);
+  class_addmethod(linuxevent_class,(t_method) linuxevent_delay,gensym("delay"),A_FLOAT,0);
   
 }
 
