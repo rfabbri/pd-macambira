@@ -1,5 +1,5 @@
-#N struct 3368-dial float x float y float w float color;
-#N struct 3368-rect float x float y float w float color;
+#N struct 1173-dial float x float y float w float color;
+#N struct 1173-rect float x float y float w float color;
 #N canvas 525 291 327 74 10;
 #N canvas 342 163 727 574 guts 0;
 #N canvas 639 520 450 300 rect 0;
@@ -148,8 +148,8 @@
 #X obj 331 493 r \$0-setmax;
 #X obj 348 529 set \$0-dial w;
 #X obj 282 66 t b b b;
-#X obj 169 113 s \$0-setmax;
-#X msg 179 84 320;
+#X obj 151 131 s \$0-setmax;
+#X msg 161 102 320;
 #X connect 1 0 4 0;
 #X connect 2 0 10 0;
 #X connect 3 0 1 0;
@@ -217,63 +217,63 @@
 #X connect 52 2 10 0;
 #X connect 54 0 53 0;
 #X restore 328 22 pd guts;
-#X obj 2 39 bng 20 250 50 0 \$0-bang0 empty empty 0 -6 0 8 -262144
+#X obj 2 44 bng 20 250 50 0 \$0-bang0 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 22 39 bng 20 250 50 0 \$0-bang1 empty empty 0 -6 0 8 -262144
+#X obj 22 44 bng 20 250 50 0 \$0-bang1 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 42 39 bng 20 250 50 0 \$0-bang2 empty empty 0 -6 0 8 -262144
+#X obj 42 44 bng 20 250 50 0 \$0-bang2 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 62 39 bng 20 250 50 0 \$0-bang3 empty empty 0 -6 0 8 -262144
+#X obj 62 44 bng 20 250 50 0 \$0-bang3 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 82 39 bng 20 250 50 0 \$0-bang4 empty empty 0 -6 0 8 -262144
+#X obj 82 44 bng 20 250 50 0 \$0-bang4 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 102 39 bng 20 250 50 0 \$0-bang5 empty empty 0 -6 0 8 -262144
+#X obj 102 44 bng 20 250 50 0 \$0-bang5 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 122 39 bng 20 250 50 0 \$0-bang6 empty empty 0 -6 0 8 -262144
+#X obj 122 44 bng 20 250 50 0 \$0-bang6 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 143 39 bng 20 250 50 0 \$0-bang7 empty empty 0 -6 0 8 -262144
+#X obj 143 44 bng 20 250 50 0 \$0-bang7 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 162 39 bng 20 250 50 0 \$0-bang8 empty empty 0 -6 0 8 -262144
+#X obj 162 44 bng 20 250 50 0 \$0-bang8 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 182 39 bng 20 250 50 0 \$0-bang9 empty empty 0 -6 0 8 -262144
+#X obj 182 44 bng 20 250 50 0 \$0-bang9 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 202 39 bng 20 250 50 0 \$0-bang10 empty empty 0 -6 0 8 -262144
+#X obj 202 44 bng 20 250 50 0 \$0-bang10 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 222 39 bng 20 250 50 0 \$0-bang11 empty empty 0 -6 0 8 -262144
+#X obj 222 44 bng 20 250 50 0 \$0-bang11 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 242 39 bng 20 250 50 0 \$0-bang12 empty empty 0 -6 0 8 -262144
+#X obj 242 44 bng 20 250 50 0 \$0-bang12 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 262 39 bng 20 250 50 0 \$0-bang13 empty empty 0 -6 0 8 -262144
+#X obj 262 44 bng 20 250 50 0 \$0-bang13 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 282 39 bng 20 250 50 0 \$0-bang14 empty empty 0 -6 0 8 -262144
+#X obj 282 44 bng 20 250 50 0 \$0-bang14 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 302 39 bng 20 250 50 0 \$0-bang15 empty empty 0 -6 0 8 -262144
+#X obj 302 44 bng 20 250 50 0 \$0-bang15 empty empty 0 -6 0 8 -262144
 -1 -1;
-#X obj 2 19 cnv 15 320 40 empty empty empty 20 12 0 12 -1 -66577 0
+#X obj 2 17 cnv 15 320 40 empty empty empty 20 12 0 12 -1 -66577 0
 ;
-#N canvas 0 0 391 182 3368-seqs 0;
-#X scalar 3368-dial 0 0 40 111 \;;
-#X scalar 3368-dial 0 10 192 222 \;;
-#X scalar 3368-rect 0 20 0 900 \;;
-#X scalar 3368-rect 20 20 0 900 \;;
-#X scalar 3368-rect 40 20 0 900 \;;
-#X scalar 3368-rect 60 20 0 900 \;;
-#X scalar 3368-rect 80 20 0 900 \;;
-#X scalar 3368-rect 100 20 0 900 \;;
-#X scalar 3368-rect 120 20 0 900 \;;
-#X scalar 3368-rect 140 20 0 900 \;;
-#X scalar 3368-rect 160 20 0 900 \;;
-#X scalar 3368-rect 180 20 0 900 \;;
-#X scalar 3368-rect 200 20 0 900 \;;
-#X scalar 3368-rect 220 20 0 900 \;;
-#X scalar 3368-rect 240 20 0 900 \;;
-#X scalar 3368-rect 260 20 0 900 \;;
-#X scalar 3368-rect 280 20 0 900 \;;
-#X scalar 3368-rect 300 20 0 900 \;;
+#N canvas 0 0 391 182 1173-seqs 0;
+#X scalar 1173-dial 0 0 0 111 \;;
+#X scalar 1173-dial 0 10 320 222 \;;
+#X scalar 1173-rect 0 20 20 900 \;;
+#X scalar 1173-rect 20 20 0 900 \;;
+#X scalar 1173-rect 40 20 0 900 \;;
+#X scalar 1173-rect 60 20 0 900 \;;
+#X scalar 1173-rect 80 20 20 900 \;;
+#X scalar 1173-rect 100 20 0 900 \;;
+#X scalar 1173-rect 120 20 0 900 \;;
+#X scalar 1173-rect 140 20 0 900 \;;
+#X scalar 1173-rect 160 20 20 900 \;;
+#X scalar 1173-rect 180 20 0 900 \;;
+#X scalar 1173-rect 200 20 0 900 \;;
+#X scalar 1173-rect 220 20 0 900 \;;
+#X scalar 1173-rect 240 20 20 900 \;;
+#X scalar 1173-rect 260 20 0 900 \;;
+#X scalar 1173-rect 280 20 0 900 \;;
+#X scalar 1173-rect 300 20 0 900 \;;
 #X coords 0 0 320 40 320 40 1;
-#X restore 1 19 pd \$0-seqs;
+#X restore 1 17 pd \$0-seqs;
 #X obj 396 22 inlet;
-#X obj 306 5 bng 12 250 50 0 empty empty empty 0 -6 0 8 -258699 -262144
+#X obj 306 2 bng 12 250 50 0 empty empty empty 0 -6 0 8 -258699 -262144
 -262144;
 #N canvas 0 0 547 441 saves 0;
 #X obj 120 16 inlet;
@@ -430,6 +430,12 @@
 #X obj 368 100 + 1;
 #X obj 447 192 * 20;
 #X obj 402 185 + 1;
+#X obj 142 265 r \$0-copy;
+#X obj 198 303 r \$0-paste;
+#X msg 142 315 copy;
+#X msg 198 329 paste;
+#X obj 142 358 s \$0-orig;
+#X obj 196 99 r \$0-orig;
 #X connect 0 0 14 0;
 #X connect 1 0 4 1;
 #X connect 4 0 11 0;
@@ -459,12 +465,21 @@
 #X connect 27 0 5 1;
 #X connect 28 0 27 0;
 #X connect 29 0 23 0;
+#X connect 31 0 33 0;
+#X connect 32 0 34 0;
+#X connect 33 0 35 0;
+#X connect 34 0 35 0;
+#X connect 36 0 4 0;
 #X restore 395 43 pd saves;
 #X obj 438 22 inlet;
 #X obj 341 44 outlet;
 #X obj 455 46 outlet;
-#X obj 282 5 tgl 12 0 \$0-play \$0-play empty 0 -6 0 8 -261681 -1 -1
+#X obj 282 2 tgl 12 0 \$0-play \$0-play empty 0 -6 0 8 -261681 -1 -1
 1 1;
+#X obj 231 2 bng 12 250 50 0 \$0-copy empty cp 2 7 0 8 -225271 -1 -1
+;
+#X obj 254 2 bng 12 250 50 0 \$0-paste empty pst 2 7 0 8 -257472 -1
+-1;
 #X connect 19 0 21 0;
 #X connect 20 0 0 0;
 #X connect 21 0 23 0;
