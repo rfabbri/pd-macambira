@@ -1,0 +1,34 @@
+Source: pd-externals
+Section: unknown
+Priority: optional
+Maintainer: Guenter Geiger <geiger@debian.org>
+Build-Depends: debhelper (>> 3.0.0), pd, libsndobj-dev
+Standards-Version: 3.5.2
+
+Package: pd-externals
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: pd external collection
+ This is a collection of pd externals (plugins for the pure data software
+ synthesizer). The collection includes tons of well known pd externals.
+
+Package: zexy
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: zexy library for pd
+ Zexy is a library that you can load into pd (the pure data software 
+ synthesizer). Zexy provides additional functionality to pd.
+
+Package: flext
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: flext C++ external layer for pd
+ Flext is a C++ layer for programming pd externals
+
+Package: pd-osc
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: Open Sound Control Support for PD
+ Open Sound Control is a protocol designed for remote controlling
+ sound applications.
+
