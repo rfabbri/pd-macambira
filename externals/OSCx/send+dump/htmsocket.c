@@ -85,6 +85,7 @@ typedef struct
 void *OpenHTMSocket(char *host, int portnumber)
 {
 	int sockfd;
+	int oval = 1;
 	struct sockaddr_in  cl_addr;
 	struct sockaddr_un  ucl_addr;
 	desc *o;
@@ -126,7 +127,7 @@ void *OpenHTMSocket(char *host, int portnumber)
 
 			mkstemp(ucl_addr.sun_path);
 			clilen = sizeof(ucl_addr.sun_family) + strlen(ucl_addr.sun_path);
-		
+
 			if (bind(sockfd, (struct sockaddr *) &ucl_addr, clilen) < 0)
 			{
 				perror("client: can't bind local address");
@@ -183,6 +184,10 @@ void *OpenHTMSocket(char *host, int portnumber)
 			cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 			cl_addr.sin_port = htons(0);
 			
+			if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
+			  perror("setsockopt");
+			}
+		
 			if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0)
 			{
 				perror("could not bind\n");
