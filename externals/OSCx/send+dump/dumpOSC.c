@@ -84,6 +84,7 @@ Technologies, University of California, Berkeley.
 #include <grp.h>
 #include <sys/file.h>
 #include <sys/prctl.h>
+#include <bits/sigset.h>
 
 #ifdef NEED_SCHEDCTL_AND_LOCK
 #include <sys/schedctl.h>
@@ -172,7 +173,7 @@ static int initudp(int chan)
 }
 
 static void closeudp(int sockfd) {
-		close(sockfd);
+   close(sockfd);
 }
 
 static Boolean catchupflag=FALSE;
@@ -692,7 +693,7 @@ printf("polldev %d\n", polldevs[j].fd);
 				}
 			}
 		} /* End of while(!caught_sigint) */
-		
+	   closeudp(sockfd);
 		
 out: ;
 	}

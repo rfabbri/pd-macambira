@@ -4,6 +4,7 @@ NAME=OSC
 EXT=o
 LIBS = -lm -lc
 LIBOSC = 	../libOSC/libOSC.a
+DEFS= -Dunix
 
 # ----------------------- Mac OS X (Darwin) -----------------------
 

@@ -1,4 +1,5 @@
-CFLAGS=  -O2 
+CFLAGS=  -O2 -Wall
+DEFS= -Dunix
 LIB=libOSC.a
 
 LIBOBJS= ${LIB}(OSC-client.o) ${LIB}(OSC-timetag.o)
@@ -6,7 +7,7 @@ LIBOBJS= ${LIB}(OSC-client.o) ${LIB}(OSC-timetag.o)
 all:	${LIBOBJS}
 
 .c.a:
-	${CC} -c ${CFLAGS} $<
+	${CC} -c ${CFLAGS} ${DEFS} $<
 	${AR} ${ARFLAGS} $@ $*.o
 	rm -f $*.o
 

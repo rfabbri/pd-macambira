@@ -61,6 +61,9 @@ The OpenSound Control WWW page is
 #ifdef MACOSX
   #include <stdio.h>
 #endif
+#ifdef UNIX
+  #include <stdio.h>
+#endif
 
 /* structure definition of your object */
 #define MAX_NUM 20

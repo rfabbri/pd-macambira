@@ -64,6 +64,10 @@ University of California, Berkeley.
 	#include 	<sys/stat.h>
 #endif
 
+#ifdef unix
+  #include <netinet/in.h>
+  #include <stdio.h>
+#endif
 	
 #include "OSC-client.h"
 

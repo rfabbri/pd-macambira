@@ -83,6 +83,7 @@ compiling:
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netdb.h>
+	#include <ctype.h>
 #endif
 
 ///////////////////////
@@ -707,7 +708,7 @@ typedArg ParseToken(char *token) {
 
 int WriteMessage(OSCbuf *buf, char *messageName, int numArgs, typedArg *args) {
   int j, returnVal;
-  const wmERROR = -1;
+  const int wmERROR = -1;
 
   returnVal = 0;
 

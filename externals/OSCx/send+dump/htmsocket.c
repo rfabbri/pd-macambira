@@ -93,8 +93,8 @@ void *OpenHTMSocket(char *host, int portnumber)
 		return 0;
 	if(!host)
 	{
-		char *mktemp(char *);
-		int clilen;
+	   // char *mkstemp(char *);
+	   int clilen;
 		  o->len = sizeof(ucl_addr);
 		/*
 		         * Fill in the structure "userv_addr" with the address of the
@@ -124,7 +124,7 @@ void *OpenHTMSocket(char *host, int portnumber)
 			ucl_addr.sun_family = AF_UNIX;
 			strcpy(ucl_addr.sun_path, UNIXDG_TMP);
 
-			mktemp(ucl_addr.sun_path);
+			mkstemp(ucl_addr.sun_path);
 			clilen = sizeof(ucl_addr.sun_family) + strlen(ucl_addr.sun_path);
 		
 			if (bind(sockfd, (struct sockaddr *) &ucl_addr, clilen) < 0)

@@ -55,6 +55,10 @@ compiling:
 /* #include <bstring.h> */
 #include <string.h>
 
+#ifdef unix
+  #include <ctype.h>
+  #include <netinet/in.h>
+#endif
 
 typedef struct {
     enum {INT, FLOAT, STRING} type;
@@ -88,7 +92,7 @@ static int exitStatus = 0;
 
 static int useTypeTags = 1;
 
-main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     int portnumber;
     char *hostname = 0;
     void *htmsocket;

@@ -35,9 +35,14 @@ The OpenSound Control WWW page is
     Matt Wright, 3/16/98
     Adapted from oscpattern.c, by Matt Wright and Amar Chaudhury
  */
-#ifdef MACOSX
-#include <stdio.h>
+#ifdef UNIX
+  #include <stdio.h>
 #endif
+
+// #ifdef MACOSX
+// #include <stdio.h>
+// #endif
+
 #include "OSC-common.h"
 #include "OSC-pattern-match.h"
 
