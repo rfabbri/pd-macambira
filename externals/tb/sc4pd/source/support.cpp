@@ -77,16 +77,20 @@ bool sc_ar(flext::AtomList a)
     return false;
 }
 
-// macros to put rgen state in registers
-#define RGET \
-	uint32 s1 = rgen.s1; \
-	uint32 s2 = rgen.s2; \
-	uint32 s3 = rgen.s3; 
-
-#define RPUT \
-	rgen.s1 = s1; \
-	rgen.s2 = s2; \
-	rgen.s3 = s3;
+bool sc_inv(flext::AtomList a)
+{
+    for (int i = 0; i!=a.Count();++i)
+    {
+	if ( flext::IsSymbol(a[i]) )
+	{
+	    const char * teststring; 
+	    teststring = flext::GetString(a[i]);
+	    if((strcmp(teststring,"inv"))==0)
+		return true;
+	}
+    }
+    return false;
+}
 
 int32 timeseed()
 {

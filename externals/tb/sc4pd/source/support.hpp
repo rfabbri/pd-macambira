@@ -50,6 +50,7 @@
 bool sc_add (flext::AtomList a);
 float sc_getfloatarg (flext::AtomList a,int i);
 bool sc_ar(flext::AtomList a);
+bool sc_inv(flext::AtomList a);
 
 
 /* for rngs */
@@ -94,7 +95,7 @@ inline float CalcFeedback(float delaytime, float decaytime)
 }
 
 
-/* this is copied from thomas grill's xsample:
+/* this is adapted from thomas grill's xsample:
 xsample - extended sample objects for Max/MSP and pd (pure data)
 
 Copyright (c) 2001-2004 Thomas Grill (xovo@gmx.net)
@@ -102,34 +103,17 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#define F float
-#define D double
-#define I int
-#define L long
-#define C char
-#define V void
-#define BL bool
-#define S t_sample
-
 #define SETSIGFUN(VAR,FUN) v_##VAR = FUN
 
-#define DEFSIGFUN(NAME)	V NAME(I n,S *const *in,S *const *out)
+#define DEFSIGFUN(NAME)	void NAME(int n,t_sample *const *in,t_sample *const *out)
 
 #define DEFSIGCALL(NAME) \
-	inline V NAME(I n,S *const *in,S *const *out) \
+	inline void NAME(int n,t_sample *const *in,t_sample *const *out) \
         { (this->*v_##NAME)(n,in,out); } \
-	V (thisType::*v_##NAME)(I n,S *const *invecs,S *const *outvecs)
+	void (thisType::*v_##NAME)(int n,t_sample *const *invecs,t_sample *const *outvecs)
 
 #define SIGFUN(FUN) &thisType::FUN
 
-#undef F
-#undef D
-#undef I
-#undef L
-#undef C
-#undef V
-#undef BL
-#undef S
 
 
 #endif

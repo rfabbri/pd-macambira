@@ -124,5 +124,5 @@ class sc4pd_dsp
 };
 
     
-#define _SC$PD_HPP
+#define _SC4PD_HPP
 #endif

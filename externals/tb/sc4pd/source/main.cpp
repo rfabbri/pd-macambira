@@ -66,8 +66,9 @@ void sc4pd_library_setup()
 	 "TwoPole~, \n"
 	 "          TwoZero~, FOS(~), SOS~, RLPF~, RHPF~, LPF~, HPF~, BPF~, "
 	 "BRF~,\n"
-	 "          LPZ1(~), HPZ1(~), LPZ2(~), HPZ2(~), BPZ2(~), BRZ2(~)"
-	 "\n"
+	 "          LPZ1(~), HPZ1(~), LPZ2(~), HPZ2(~), BPZ2(~), BRZ2(~), "
+	 "LFDNoise0~,\n" 
+	 "          LFDNoise1~, LFDNoise2~, sc+~, sc-~, sc*~, sc/~\n"
 	 );
 
     //initialize objects
@@ -281,6 +282,20 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(BPZ2_ar); 
     FLEXT_SETUP(BPZ2_kr); 
+
+    FLEXT_DSP_SETUP(LFDNoise0_ar); 
+
+    FLEXT_DSP_SETUP(LFDNoise1_ar); 
+
+    FLEXT_DSP_SETUP(LFDNoise2_ar); 
+
+    FLEXT_DSP_SETUP(scadd_ar); 
+
+    FLEXT_DSP_SETUP(scsub_ar); 
+
+    FLEXT_DSP_SETUP(scmul_ar); 
+
+    FLEXT_DSP_SETUP(scdiv_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

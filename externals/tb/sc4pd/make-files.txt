@@ -15,4 +15,5 @@ SRCS= \
 	AllpassC.cpp PitchShift.cpp Resonz.cpp OnePole.cpp OneZero.cpp \
 	TwoPole.cpp TwoZero.cpp FOS.cpp SOS.cpp RLPF.cpp RHPF.cpp LPF.cpp \
 	HPF.cpp BPF.cpp BRF.cpp LPZ1.cpp HPZ1.cpp LPZ2.cpp HPZ2.cpp \
-	BPZ2.cpp BRZ2.cpp
+	BPZ2.cpp BRZ2.cpp LFDNoise0.cpp LFDNoise1.cpp LFDNoise2.cpp \
+	sc+.cpp sc-.cpp
