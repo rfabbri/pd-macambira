@@ -57,7 +57,7 @@ V shapee::Transform(I _N2,S *const *in)
 {
 	// lets just shape the entire signal in groups of three 
 
-	const _N = _N2*2;
+	const I _N = _N2*2;
 	I i;
 	for ( i=2; i < _N+2; i += 6 ) {
 		F lowerMult = _channel1[i-2] / _channel1[i];

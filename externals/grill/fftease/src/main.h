@@ -78,9 +78,11 @@ protected:
 		F_WINDOW = 0x02,
 		F_BITSHUFFLE = 0x04,
 		F_CONVERT = 0x08,F_CRES = 0x10,
+		F_RMS = 0x20
 	};
 
 	I _mult,_flags;
+	F _rms;
 
 private:
 	I blsz;

@@ -174,6 +174,26 @@ SOURCE=.\src\scrape~.cpp
 
 SOURCE=.\src\shapee~.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\src\swinger~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\taint~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\thresher~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\vacancy~.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\xsyn~.cpp
+# End Source File
 # End Group
 # Begin Group "doc"
 

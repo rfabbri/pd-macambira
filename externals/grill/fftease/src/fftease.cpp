@@ -22,9 +22,8 @@ fftease::~fftease() {}
 
 BL fftease::Init()
 {
-	BL ret = flext_dsp::Init();
 	Clear();
-	return ret;
+	return flext_dsp::Init();
 }
 
 V fftease::Exit()
@@ -69,6 +68,13 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 			_input1[i] = _input1[i+_D];
 		for (I j = 0; i < _N; i++,j++ )
 			_input1[i] = in[0][j];
+	}
+
+	_rms = 0.;
+	if(_flags&F_RMS) {
+		for ( i=0; i < _Nw; i++ )
+			_rms += _input1[i] * _input1[i];
+		_rms = sqrt(_rms / _Nw);
 	}
 
 	/* apply hamming window and fold our window buffer into the fft buffer */
@@ -133,11 +139,11 @@ void fftease::Set()
 	/* assign memory to the buffers */
 	_input1 = new F[_Nw];
 	_buffer1 = new F[_N];
-	if(_flags&F_CONVERT) _channel1 = new F[_N+2];
+	if(_flags&(F_CONVERT|F_CRES)) _channel1 = new F[_N+2];
 	if(_flags&F_STEREO) {
 		_input2 = new F[_Nw];
 		_buffer2 = new F[_N];
-		if(_flags&F_CONVERT) _channel2 = new F[_N+2];
+		if(_flags&(F_CONVERT|F_CRES)) _channel2 = new F[_N+2];
 	}
 	_output = new F[_Nw];
 

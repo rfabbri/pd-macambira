@@ -16,8 +16,6 @@ pd - Windows:
 -------------
 OK o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
-o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
-
 o Cygwin: edit "config-pd-cygwin.txt" & run "sh build-pd-cygwin.sh" 
 	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-cygwin
 
@@ -77,3 +75,10 @@ PORTING NOTES:
 - ether:
 	- possibility to change qual?
 
+- scrape:
+	- maxamp is computed (from spectral amplitudes) before this is initialized!! -> corrected
+
+- swinger:
+	- phase is calculated from signal1 (instead of correct signal 2)!! (jMax version)
+
+- 

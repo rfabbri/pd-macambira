@@ -19,7 +19,7 @@
 # includes
 INCPATH=/I"$(MSVCPATH)\include" /I"$(PDPATH)\src" /I"$(FLEXTPATH)"
 LIBPATH=/LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPATH)"
-LIBS=pd.lib flext_t-pdwin.lib 
+LIBS=pd.lib flext-pdwin.lib 
 
 # compiler definitions and flags
 DEFS=/DPD 
@@ -44,13 +44,19 @@ clean:
 	-del /q $(OUTPATH) > nul
 	-rmdir $(OUTPATH) > nul
 
-OBJS= $(SRCS:.cpp=.obj)
+OBJS= $(SRCS:.c=.obj)
+OBJS= $(OBJS:.objpp=.obj)
+
 
 $(OUTPATH):
 	-mkdir $(OUTPATH) > nul
 
 {$(DIR)}.cpp{}.obj:
-	cl /c /LD $(CFLAGS) $(DEFS) $(INCPATH) $** /Fo$(OUTPATH)\$@
+	cl /c /LD $(CFLAGS) $(DEFS) $(INCPATH) $** /Fo$(OUTPATH)/$@
+
+{$(DIR)}.c{}.obj:
+	cl /c /LD $(CFLAGS) $(DEFS) $(INCPATH) $** /Fo$(OUTPATH)/$@
+
 
 $(OUTPATH)\$(NAME).dll: $(OBJS)
 	cd $(OUTPATH)

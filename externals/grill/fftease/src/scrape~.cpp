@@ -37,8 +37,8 @@ private:
 
 	static V setup(t_classid c);
 
-	V ms_knee(F knee) { _knee = knee; UpdThrFun(); }
-	V ms_cutoff(F cutoff) { _cutoff = cutoff; UpdThrFun(); }
+	inline V ms_knee(F knee) { _knee = knee; UpdThrFun(); }
+	inline V ms_cutoff(F cutoff) { _cutoff = cutoff; UpdThrFun(); }
 
 	FLEXT_ATTRGET_F(_knee)
 	FLEXT_CALLSET_F(ms_knee)
@@ -57,7 +57,7 @@ V scrape::setup(t_classid c)
 
 
 scrape::scrape(I argc,const t_atom *argv):
-	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CRES),
+	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CONVERT),
 	_thresh1(.0001),_thresh2(.09),
 	_knee(1000),_cutoff(4000)
 
@@ -116,7 +116,7 @@ V scrape::UpdThrFun()
 		if( curfreq  < _knee )
 			_threshfunc[i] = 0;
 		else if( curfreq >= _knee && curfreq < _cutoff ) {
-			F m = (_knee - curfreq) / (_cutoff - _knee) ;
+			const F m = (_knee - curfreq) / (_cutoff - _knee) ;
 			_threshfunc[i] = (1-m) * _thresh1 + m * _thresh2 ;
 		} else
 			_threshfunc[i] = _thresh2;
@@ -125,34 +125,22 @@ V scrape::UpdThrFun()
 	}
 }
 
+/*! \brief Do the spectral transformation
 
+	\remark maxamp is calculated later than in the original FFTease scrape~ object
+*/
 V scrape::Transform(I _N2,S *const *in)
 {
 	const F fmult = *in[0];
 
 	I i;
 	F maxamp = 1.;
+	for( i = 0; i <= _N2; i++ )
+		if(maxamp < _channel1[i*2]) 
+			maxamp = _channel1[i*2];
 
-	for( i = 0; i <= _N2; i++ ) {
-		const I amp = i*2;
-		if( maxamp < _channel1[amp] ) maxamp = _channel1[amp];
-	}
-
-	for ( i = 0; i <= _N2; i++ ) {
-		const I real = i*2,imag = real+1;
-
-		F a = ( i == _N2 ? _buffer1[1] : _buffer1[real] );
-		F b = ( i == 0 || i == _N2 ? 0. : _buffer1[imag] );
-
-		_channel1[real] = hypot( a, b );
-		if ( _channel1[real] < _threshfunc[i] * maxamp ) _channel1[real] *= fmult;
-		_channel1[imag] = -atan2( b, a );
-	}
-
-	for ( i = 0; i <= _N2; i++ ) {
-		const I real = i*2, imag = real+1;
-		_buffer1[real] = _channel1[real] * cos( _channel1[imag] );
-		if( i != _N2 ) _buffer1[imag] = -_channel1[real] * sin( _channel1[imag] );
-	}
+	for( i = 0; i <= _N2; i++ )
+		if(_channel1[i*2] < _threshfunc[i] * maxamp) 
+			_channel1[i*2] *= fmult;
 }
 
