@@ -4,7 +4,14 @@ AC_INIT(filesize.c)
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_CXX
+
 AC_SUBST(STK)
+AC_SUBST(DFLAGS)
+AC_SUBST(LFLAGS)
+AC_SUBST(EXT)
+AC_SUBST(LD)
+AC_SUBST(STRIPFLAGS)
 
 
 dnl Checks for libraries.
@@ -27,6 +34,51 @@ AC_HEADER_TIME
 dnl Checks for library functions.
 AC_FUNC_MMAP
 AC_CHECK_FUNCS(select socket strerror)
+
+
+LD=ld
+
+dnl
+dnl  OK, checks for machines are here now
+dnl
+if test `uname -s` = Linux; 
+then
+  LFLAGS="-export_dynamic  -shared"
+  EXT=pd_linux	
+  DFLAGS="-DUNIX -DLINUX"
+  STRIPFLAGS="--strip-unneeded"
+fi
+
+dnl This should use '-bundle_loader /path/to/pd/bin/pd' instead of'-undefined suppress'
+dnl then strip might do something
+if test `uname -s` = Darwin; 
+then
+  LD=cc
+  LFLAGS="-bundle -undefined suppress -flat_namespace"
+  EXT=pd_darwin
+  DFLAGS="-DUNIX -DMACOSX"
+  STRIPFLAGS=
+fi
+
+if test `uname -s` = IRIX64; 
+then
+  LFLAGS="-n32 -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
+	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
+        -shared -rdata_shared"
+  EXT=pd_irix6
+  DFLAGS="-DUNIX -DIRIX6"
+  STRIPFLAGS="--strip-unneeded"
+fi
+
+if test `uname -s` = IRIX32; 
+then
+  LFLAGS="-o32 -DUNIX -DIRIX -O2 
+         -shared -rdata_shared"
+  EXT=pd_irix5
+  DFLAGS="-DUNIX -DIRIX5"
+  STRIPFLAGS="--strip-unneeded"
+fi
+
 
 
 AC_OUTPUT(makefile)

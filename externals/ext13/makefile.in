@@ -1,11 +1,11 @@
 
-EXT = pd_linux
-DEFS =  -DHAVE_LIBC=1 -DHAVE_LIBM=1 -DHAVE_LIBPTHREAD=1 -DSTDC_HEADERS=1 -DHAVE_FCNTL_H=1 -DHAVE_SYS_TIME_H=1 -DHAVE_UNISTD_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_UNISTD_H=1 -DHAVE_GETPAGESIZE=1 -DHAVE_MMAP=1 -DHAVE_SELECT=1 -DHAVE_SOCKET=1 -DHAVE_STRERROR=1  -DPD_VERSION_MINOR=32
-CC = gcc
-CXX = c++
-LD = ld
+EXT = @EXT@ 
+DEFS = @DFLAGS@ -DHAVE_LIBC=1 -DHAVE_LIBM=1 -DHAVE_LIBPTHREAD=1 -DSTDC_HEADERS=1 -DHAVE_FCNTL_H=1 -DHAVE_SYS_TIME_H=1 -DHAVE_UNISTD_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_UNISTD_H=1 -DHAVE_GETPAGESIZE=1 -DHAVE_MMAP=1 -DHAVE_SELECT=1 -DHAVE_SOCKET=1 -DHAVE_STRERROR=1  -DPD_VERSION_MINOR=32
+CC = @CC@
+CXX = @CXX@
+LD = @LD@
 AFLAGS = 
-LFLAGS = -export_dynamic  -shared
+LFLAGS = @LFLAGS@
 WFLAGS =
 IFLAGS = -I./include
 PREFIX=@prefix@
@@ -29,8 +29,8 @@ all: $(TARGETS)
 
 ext13: $(TARGETS)
 	cc -c $(CFLAGS) -DPD ext13.c
-	$(LD) -export_dynamic  -shared -o ext13.pd_linux *.o $(LIBS)
-	strip --strip-unneeded ext13.pd_linux
+	$(LD) $(LFLAGS) -o ext13.$(EXT) *.o $(LIBS)
+	strip @STRIPFLAGS@ ext13.$(EXT)
 
 clean::
 	-rm *.$(EXT) *.o 
@@ -45,7 +45,7 @@ distclean: clean
 
 # cp $@ $*_stat.o
 
-.o.pd_linux:
+.o.$(EXT):
 	$(CC) -o $@ $(PDCFLAGS) -DPD $*.o
 
 
@@ -53,7 +53,7 @@ distclean: clean
 install::
 	install -d $(INSTALL_PREFIX)/pd/externs
 	install -m 644 *.$(EXT) $(INSTALL_PREFIX)/pd/externs
-	-install -m 644 ext13.pd_linux $(INSTALL_PREFIX)/pd/externs
+	-install -m 644 ext13.$(EXT) $(INSTALL_PREFIX)/pd/externs
 	install -m 644 doc/*.pd $(INSTALL_PREFIX)/pd/doc/5.reference
 
 
