@@ -1,0 +1,34 @@
+#N canvas 588 67 469 401 10;
+#X floatatom 26 88 5 0 0 0 - - -;
+#X floatatom 26 152 0 0 0 0 - - -;
+#X obj 68 270 autoscale;
+#X obj 2 2 cnv 15 450 20 empty empty [autoscale] 2 11 1 18 -233017
+-66577 0;
+#X obj 418 3 pddp;
+#X text 18 35 [autoscale] scales a stream of numbers based on an output
+range set as arguments \, and an input range which is set dynamically.
+;
+#X text 13 193 If you use [autoscale] with no arguments \, then the
+output range defaults to 0-127.;
+#X floatatom 68 249 5 0 0 0 - - -;
+#X obj 71 293 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 17 343 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 234 357 released under the GNU GPL;
+#X floatatom 150 152 0 0 0 0 - - -;
+#X floatatom 297 152 0 0 0 0 - - -;
+#X obj 213 83 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 18 376 $Revision: 1.1 $$Author: eighthave $$Date: 2004-11-02 06:21:59 $;
+#X obj 26 122 autoscale 0 1;
+#X obj 150 122 autoscale -0.01 0.01;
+#X obj 297 122 autoscale -4095 4095;
+#X connect 0 0 15 0;
+#X connect 2 0 8 0;
+#X connect 7 0 2 0;
+#X connect 13 0 16 0;
+#X connect 13 0 17 0;
+#X connect 15 0 1 0;
+#X connect 16 0 11 0;
+#X connect 17 0 12 0;
