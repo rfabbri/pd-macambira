@@ -30,7 +30,7 @@ sub getDataFromHeaderLine
 		  if ($index >=0) 
 		  {
 				$returnArray[0] = $index;
-				$returnArray[1] = "$1";
+				$returnArray[1] = lc("$1");
 				return @returnArray;
 		  }
 #		  print "$1 \t\t\t $index   $#returnArray\n "; 
@@ -47,7 +47,7 @@ sub printCArray
 
 #	 print("$arrayToPrint[0] $#arrayToPrint \n");
 
-	 print("int ${arrayToPrint[0]}_TOTAL = $#arrayToPrint;  /* # of elements in array */\n");
+	 print("int ${arrayToPrint[0]}_total = $#arrayToPrint;  /* # of elements in array */\n");
 	 print("char *${arrayToPrint[0]}[$#arrayToPrint] = {");
 
 	 for($i = 1; $i < $#arrayToPrint; $i++)
@@ -70,18 +70,18 @@ $FILENAME = "linux/input.h";
 
 open(INPUT_H, "<$FILENAME");
 
-while(<INPUT_H>)
+while (<INPUT_H>)
 {
-	 if (m/#define (FF_STATUS|[A-Z_]*?)_/)
+	 if (m/\#define (FF_STATUS|[A-Z_]*?)_/)
 	 {
 # filter EV_VERSION and *_MAX
-		  m/#define\s+(EV_VERSION|[A-Z_]+_MAX)\s+/;
+		  m/\#define\s+(EV_VERSION|[A-Z_]+_MAX)\s+/;
 #		  print "$1 \n";
 		  switch ($1) 
 		  {
-		  # types
+				# types
 				case "EV"        { ($index, $value) = getDataFromHeaderLine($_); $EV[$index] = $value; }
-        # codes
+				# codes
 				case "SYN"       { ($index, $value) = getDataFromHeaderLine($_); $SYN[$index] = $value; }
 				case "KEY"       { ($index, $value) = getDataFromHeaderLine($_); $KEY[$index] = $value; }
 # BTN codes are actually part of the KEY type
@@ -94,28 +94,30 @@ while(<INPUT_H>)
 				case "REP"       { ($index, $value) = getDataFromHeaderLine($_); $REP[$index] = $value; }
 				case "FF"        { ($index, $value) = getDataFromHeaderLine($_); $FF[$index] = $value; }
 # there doesn't seem to be any PWR events yet...
-				case "PWR"       { ($index, $value) = getDataFromHeaderLine($_); $PWR[$index] = $value; }
+#				case "PWR"       { ($index, $value) = getDataFromHeaderLine($_); $PWR[$index] = $value; }
 				case "FF_STATUS" { ($index, $value) = getDataFromHeaderLine($_); $FF_STATUS[$index] = $value; }
 #				else { print " none $_"; } 
 		  }
 	 }
 }
 
-printCArray("EV",@EV);
-printCArray("SYN",@SYN);
-printCArray("KEY",@KEY);
-printCArray("REL",@REL);
-printCArray("ABS",@ABS);
-printCArray("MSC",@MSC);
-printCArray("LED",@LED);
-printCArray("SND",@SND);
-printCArray("REP",@REP);
-printCArray("FF",@FF);
-printCArray("PWR",@PWR);
-printCArray("FF_STATUS",@FF_STATUS);
+printCArray("ev",@EV);
+printCArray("ev_syn",@SYN);
+printCArray("ev_key",@KEY);
+printCArray("ev_rel",@REL);
+printCArray("ev_abs",@ABS);
+printCArray("ev_msc",@MSC);
+printCArray("ev_led",@LED);
+printCArray("ev_snd",@SND);
+printCArray("ev_rep",@REP);
+printCArray("ev_ff",@FF);
+# there doesn't seem to be any PWR events yet...
+#printCArray("pwr",@PWR);
+print("char *ev_pwr[1] = { NULL };\n\n");
+printCArray("ev_ff_status",@FF_STATUS);
 
 # print array of arrays
-print("char **EVENTNAMES[",$#EV+1,"] = {");
+print("char **event_names[",$#EV+1,"] = {");
 for($i = 0; $i < $#EV; $i++)
 {
 	 # format nicely in sets of 6
@@ -125,13 +127,13 @@ for($i = 0; $i < $#EV; $i++)
 	 if ($EV[$i]) 
 	 { 
 		  $_ = $EV[$i];
-		  m/EV_([A-Z_]+)/;
+		  m/(ev_[a-z_]+)/;
 		  print("$1,");  
 	 }
 	 else { print("NULL,"); }
 }
 $_ = $EV[$#EV];
-m/EV_([A-Z_]+)/;
+m/(ev_[a-z_]+)/;
 print("$1\n };\n");
 
 

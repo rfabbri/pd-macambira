@@ -54,7 +54,7 @@
 #include "linuxhid.h"
 #include "input_arrays.h"
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -156,52 +156,56 @@ static int hid_open(t_hid *x, t_symbol *s) {
   ff = 0;
     
   /* cycle through all possible event types */
-  for (eventType = 0; eventType < EV_MAX; eventType++) {
-    if (test_bit(eventType, bitmask[0])) {
-      post(" %s (type %d) ", events[eventType] ? events[eventType] : "?", eventType);
-      //	post("Event type %d",eventType);
-
-      /* get bitmask representing supported button types */
-      ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
-
-      /* cycle through all possible event codes (axes, keys, etc.) 
-       * testing to see which are supported  
-       */
-      for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
-	if (test_bit(eventCode, bitmask[eventType])) {
-	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
-
-	  switch(eventType) {
+  for (eventType = 0; eventType < EV_MAX; eventType++) 
+  {
+    if (test_bit(eventType, bitmask[0])) 
+	 {
+		 post(" %s (type %d) ", ev[eventType] ? ev[eventType] : "?", eventType);
+		 //	post("Event type %d",eventType);
+		 
+		 /* get bitmask representing supported button types */
+		 ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
+		 
+		 /* cycle through all possible event codes (axes, keys, etc.) 
+		  * testing to see which are supported  
+		  */
+		 for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
+			 if (test_bit(eventCode, bitmask[eventType])) 
+			 {
+				 post("    Event code %s (%d)", event_names[eventType] ? (event_names[eventType][eventCode] ? event_names[eventType][eventCode] : "?") : "?", eventCode);
+/* 	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?"); */
+				
+				switch(eventType) {
 // the API changed at some point...
 #ifdef EV_RST
-	  case EV_RST:
-	    break;
+					case EV_RST:
+						break;
 #else 
-	  case EV_SYN:
-	    break;
+					case EV_SYN:
+						break;
 #endif
-	  case EV_KEY:
-	    buttons++;
-	    break;
-	  case EV_REL:
-	    rel_axes++;
-	    break;
-	  case EV_ABS:
-	    abs_axes++;
-	    break;
-	  case EV_MSC:
-	    break;
-	  case EV_LED:
-	    break;
-	  case EV_SND:
-	    break;
-	  case EV_REP:
-	    break;
-	  case EV_FF:
-	    ff++;
-	    break;
-	  }
-	}
+					case EV_KEY:
+						buttons++;
+						break;
+					case EV_REL:
+						rel_axes++;
+						break;
+					case EV_ABS:
+						abs_axes++;
+						break;
+					case EV_MSC:
+						break;
+					case EV_LED:
+						break;
+					case EV_SND:
+						break;
+					case EV_REP:
+						break;
+					case EV_FF:
+						ff++;
+						break;
+				}
+			}
     }        
   }
     
@@ -223,12 +227,13 @@ static int hid_read(t_hid *x,int fd)
 #ifdef __gnu_linux__
 	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
 		outlet_float (x->x_input_event_value_outlet, (int)x->x_input_event.value);
-		outlet_float (x->x_input_event_code_outlet, x->x_input_event.code);
-		outlet_float (x->x_input_event_type_outlet, x->x_input_event.type);
+		outlet_symbol (x->x_input_event_code_outlet, gensym(event_names[x->x_input_event.type][x->x_input_event.code]));
+		outlet_symbol (x->x_input_event_type_outlet, gensym(ev[x->x_input_event.type]));
 		/* input_event.time is a timeval struct from <sys/time.h> */
 		/*   outlet_float (x->x_input_event_time_outlet, x->x_input_event.time); */
 	}
-#else defined (__APPLE__)
+#endif
+#ifdef __APPLE__
 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow);
 	pRecElement pCurrentHIDElement = GetSetCurrentElement (gWindow);
 	
@@ -307,7 +312,7 @@ static void *hid_new(t_symbol *s) {
   x->x_read_ok = 1;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
-  x->x_devname = gensym(HID_DEVICE);
+  x->x_devname = gensym("/dev/input/event0");
 
   x->x_clock = clock_new(x, (t_method)hid_read);
   
