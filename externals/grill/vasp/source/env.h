@@ -13,7 +13,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "vasp.h"
 
-class Env
+class Env:
+    public flext
 {
 public:
 	Env(): cnt(0),pos(NULL),val(NULL) {}

@@ -13,10 +13,13 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "vbuffer.h"
 
-class Vasp 
+class Vasp:
+    public flext
 {
 public:
-	class Ref {
+    class Ref:
+        public flext
+    {
 	public:
 		Ref(): sym(NULL) {}
 		Ref(VBuffer &b);

@@ -13,7 +13,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "vasp.h"
 
-class VecBlock 
+class VecBlock:
+    public flext
 {
 public:
 

@@ -26,7 +26,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 
-class FreeEntry
+class FreeEntry:
+    public flext
 {
 public:
 	FreeEntry(const t_symbol *s): sym(s),nxt(NULL) {}
@@ -35,7 +36,8 @@ public:
 	FreeEntry *nxt;
 };
 
-class BufEntry
+class BufEntry:
+    public flext
 {
 public:
 	BufEntry(const t_symbol *s,I fr,BL zero = true);
@@ -68,16 +70,17 @@ static V FreeLibSym(const t_symbol *s);
 
 BufEntry::BufEntry(const t_symbol *s,I fr,BL zero): 
 	sym(s), 
-	alloc(fr),len(fr),data(new S[fr]),
+	alloc(fr),len(fr),
 	refcnt(0),nxt(NULL) 
 {
+    data = (S *)NewAligned(fr*sizeof(S));
 	if(zero) flext::ZeroMem(data,len*sizeof(*data));
 }
 
 BufEntry::~BufEntry()
 {
 	if(sym) FreeLibSym(sym);
-	if(data) delete[] data;
+	if(data) FreeAligned(data);
 }
 
 V BufEntry::IncRef() { ++refcnt; }

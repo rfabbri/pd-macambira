@@ -19,7 +19,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define VASP_ARG_R(VAL) Argument().SetR(VAL)
 #define VASP_ARG_CX(RV,IV) Argument().SetCX(RV,IV)
 
-class Argument
+class Argument:
+    public flext
 {
 public:
 	Argument();
