@@ -437,11 +437,11 @@ public:
 	//! Check whether the atom can be a pointer
 	static bool CanbePointer(const t_atom &a) { return IsPointer(a); }
 	//! Access the pointer value (without type check)
-	static void *GetPointer(const t_atom &a) { return a.a_w.w_gpointer; }
+	static t_gpointer *GetPointer(const t_atom &a) { return a.a_w.w_gpointer; }
 	//! Check for a pointer and get its value 
-	static void *GetAPointer(const t_atom &a,void *def = NULL) { return IsPointer(a)?GetPointer(a):def; }
+	static t_gpointer *GetAPointer(const t_atom &a,t_gpointer *def = NULL) { return IsPointer(a)?GetPointer(a):def; }
 	//! Set the atom to represent a pointer
-	static void SetPointer(t_atom &a,void *p) { a.a_type = A_POINTER; a.a_w.w_gpointer = (t_gpointer *)p; }
+	static void SetPointer(t_atom &a,t_gpointer *p) { a.a_type = A_POINTER; a.a_w.w_gpointer = (t_gpointer *)p; }
 
 #elif FLEXT_SYS == FLEXT_SYS_MAX
 	//! Check for a float and get its value 
@@ -644,6 +644,29 @@ public:
     
 
 // --- thread stuff -----------------------------------------------
+
+	/*!	\defgroup FLEXT_S_LOCK Global system locking
+		@{ 
+	*/
+
+#if FLEXT_SYS == FLEXT_SYS_PD
+    #if PD_MINOR_VERSION >= 38 || (PD_MINOR_VERSION >= 37 && defined(PD_DEVEL_VERSION))
+        static void Lock() { sys_lock(); }
+        static void Unlock() { sys_unlock(); }
+    #else
+        // no system locking for old PD versions
+        static void Lock() {}
+        static void Unlock() {}
+    #endif
+#elif FLEXT_SYS == FLEXT_SYS_MAX
+    // Max 4.2 upwards!
+    static void Lock() { critical_enter(0); }
+    static void Unlock() { critical_exit(0); }
+#else
+#error
+#endif
+
+//!		@} FLEXT_S_LOCK
 
 #ifdef FLEXT_THREADS
 	/*!	\defgroup FLEXT_S_THREAD Flext thread handling 
