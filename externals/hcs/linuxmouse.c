@@ -3,7 +3,7 @@
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
 #define LINUXMOUSE_AXES     3
 
-static char *version = "$Revision: 1.5 $";
+static char *version = "$Revision: 1.6 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -69,18 +69,11 @@ static int linuxmouse_open(t_linuxmouse *x, t_symbol *s) {
 	DEBUG(post("linuxmouse_open"););
 	
 	linuxmouse_close(x);
-
-/* For some reason, not initializing x->x_devname causes a seg fault */
-/* on this object, but it works fine on [linuxevent] */
-	t_symbol *temp = malloc(20);
-	temp->s_name = "/dev/input/event0";
-	x->x_devname = temp;
 	
-	/* set obj device name to parameter 
-	 * otherwise set to default
-	 */  
-	if (s != &s_) x->x_devname = s;
-
+	/* set obj device name to parameter otherwise set to default */  
+	if ( s != &s_ )  
+		x->x_devname = s;
+	
 #ifdef __gnu_linux__	
 	/* open device */
 	if (x->x_devname) {
@@ -209,6 +202,10 @@ static int linuxmouse_read(t_linuxmouse *x,int fd) {
 void linuxmouse_start(t_linuxmouse* x) {
 	DEBUG(post("linuxmouse_start"););
 
+/* if the device isn't open already, open it */
+/* (I'll test this later -HCS) */
+/*    if (x->x_fd < 0) linuxmouse_open(x,&s_); */
+		
 #ifdef __gnu_linux__
    if (x->x_fd >= 0 && !x->x_started) {
 		sys_addpollfn(x->x_fd, (t_fdpollfn)linuxmouse_read, x);
@@ -246,7 +243,8 @@ static void *linuxmouse_new(t_symbol *s) {
 	x->x_fd = -1;
 	x->x_read_ok = 1;
 	x->x_started = 0;
-	
+	x->x_devname = gensym("/dev/input/event0");
+
 	/* create outlets for each axis */
 	for (i = 0; i < LINUXMOUSE_AXES; i++) 
 		x->x_axis_out[i] = outlet_new(&x->x_obj, &s_float);
