@@ -1,0 +1,47 @@
+#N canvas 237 22 740 692 10;
+#X obj 177 152 metro 70;
+#X obj 222 118 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 179 119 stop;
+#X obj 414 352 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 414 404 pdp_control;
+#X msg 414 377 thread \$1;
+#X floatatom 414 465 5 0 0 0 - - -;
+#X obj 414 436 route pdp_drop;
+#X text 33 439 pdp_ieee1394 : fire wire capture object for OSX;
+#X text 31 455 inspired by pix_video from Gem;
+#X text 31 469 written by Yves Degoyon (ydegoyon@free.fr);
+#X msg 296 154 open;
+#X text 339 155 Start Capture;
+#X msg 300 185 close;
+#X text 344 187 Stop Capture;
+#X text 179 97 This autostarts capture;
+#X msg 321 218 reset;
+#X text 366 220 Reset Capture;
+#X msg 288 267 quality \$1;
+#X obj 422 264 vradio 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X text 446 262 Normal Quality;
+#X text 446 280 High Quality;
+#X text 446 295 Fast Quality;
+#X text 447 311 All data;
+#X text 171 329 Constructor : pdp_ieee1394 <width> <height>;
+#X text 363 245 Quality (set before starting capture !);
+#X obj 143 396 pdp_glx;
+#X obj 168 305 pdp_ieee1394 640 480;
+#X obj 166 358 pdp_scale 320 240;
+#X connect 0 0 27 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 5 0;
+#X connect 4 0 7 0;
+#X connect 5 0 4 0;
+#X connect 7 0 6 0;
+#X connect 11 0 27 0;
+#X connect 13 0 27 0;
+#X connect 16 0 27 0;
+#X connect 18 0 27 0;
+#X connect 19 0 18 0;
+#X connect 27 0 28 0;
+#X connect 28 0 26 0;
