@@ -276,7 +276,7 @@ V xgroove::m_xzone(F xz)
 { 
 	bufchk();
 	_xzone = xz < 0?0:xz; 
-	do_xzone();
+//	do_xzone();
 	s_dsp(); 
 }
 
@@ -335,6 +335,8 @@ V xgroove::m_xkeep(BL k)
 
 V xgroove::do_xzone()
 {
+	if(!s2u) return; // this can happen if DSP is off
+
 	xzone = _xzone/s2u;
 	I smin = curmin,smax = curmax,plen = smax-smin; //curlen;
 	if(xsymm < 0) {
@@ -346,7 +348,7 @@ V xgroove::do_xzone()
 		// desired crossfade points
 		znmin = smin+xzone*xsymm,znmax = smax+xzone*(xsymm-1);
 		// extra space at beginning and end
-		F o1 = znmin-xzone,o2 = buf->Frames()-(znmax+xzone);
+		F o1 = znmin-xzone,o2 = buf->Frames()-(znmax+xzone); 
 
 		if(o1 < 0 || o2 < 0) { // or (o1*o2 < 0)
 			if(o1+o2 < 0) {
@@ -595,7 +597,9 @@ V xgroove::s_dsp()
 		switch(loopmode) {
 		case xsl_once: SETSIGFUN(posfun,SIGFUN(s_pos_once)); break;
 		case xsl_loop: 
-			if(xzone > 0) {
+			if(_xzone > 0) {
+                // xzone might not be set yet (is done in do_xzone() )
+
 				const I blksz = Blocksize();
 
 				if(pblksz != blksz) {
@@ -610,34 +614,17 @@ V xgroove::s_dsp()
 					pblksz = blksz;
 				}
 
+				do_xzone(); // recalculate (s2u may have been 0 before)
+
 				SETSIGFUN(posfun,SIGFUN(s_pos_loopzn)); 
 
 				// linear interpolation should be just ok for fade zone, no?
-/*
-				if(interp == xsi_4p) 
-					switch(outchns) {
-						case 1:	SETSTFUN(zonefun,TMPLSTF(st_play4,1,1)); break;
-						case 2:	SETSTFUN(zonefun,TMPLSTF(st_play4,1,2)); break;
-						case 4:	SETSTFUN(zonefun,TMPLSTF(st_play4,1,4)); break;
-						default: SETSTFUN(zonefun,TMPLSTF(st_play4,1,-1));
-					}
-				else if(interp == xsi_lin) 
-*/
-					switch(outchns) {
-						case 1:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,1)); break;
-						case 2:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,2)); break;
-						case 4:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,4)); break;
-						default: SETSTFUN(zonefun,TMPLSTF(st_play2,1,-1));
-					}
-/*
-				else 
-					switch(outchns) {
-						case 1:	SETSTFUN(zonefun,TMPLSTF(st_play1,1,1)); break;
-						case 2:	SETSTFUN(zonefun,TMPLSTF(st_play1,1,2)); break;
-						case 4:	SETSTFUN(zonefun,TMPLSTF(st_play1,1,4)); break;
-						default: SETSTFUN(zonefun,TMPLSTF(st_play1,1,-1));
-					}
-*/
+				switch(outchns) {
+					case 1:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,1)); break;
+					case 2:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,2)); break;
+					case 4:	SETSTFUN(zonefun,TMPLSTF(st_play2,1,4)); break;
+					default: SETSTFUN(zonefun,TMPLSTF(st_play2,1,-1));
+				}
 			}
 			else
 				SETSIGFUN(posfun,SIGFUN(s_pos_loop)); 

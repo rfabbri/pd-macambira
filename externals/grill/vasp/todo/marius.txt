@@ -1,20 +1,5 @@
-Thomas' Änderungen:
-
-- vasp.frames: der Ausdruck "framesize" ist eigentlich irreführend 
-	... die kann bei verschiedenen Buffern in MaxMSP tatsächlich verschieden sein
-	framesize = sample-Länge*Bufferkanäle !!
-	besser ist frame count
-	Ich frage mich auch, ob wir die Nummernboxen bei Periodenlängen nicht durch ein 
-	paar Standard-float-messages ersetzen sollten (die meisten werden wohl zu kurbeln versuchen....)
-
-- vasp.join / vasp.split.... man sollte vielleicht sagen, dass es sich um EInzelvektoren der vasps handelt=======
-
-- wavedisplay-select überprüfen.
-
-- die default-längen und resize einstellungen noch einmal überprüfen
-
-- vasp.cpowi, vasp.csqr und vasp.rpow vorläufig noch mit resize, ...
-
-- alle unnötigen objekte aus der hilfe rausnehemen.
-
-- schauen ob alle abkürzungen angeführt sind...
+vasp.copy besser die offsets erklären
+genauso bei vasp.= nicht so komplizierte sachen...
+bei den peaks muss man erklären, was die density genau aussagt
+bei vasp.! zeigen, dass man einfach aus einem normalen einen immediate machen kann...
+phase bei den oscillatoren??
