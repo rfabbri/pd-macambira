@@ -1,17 +1,14 @@
 #include "m_pd.h"
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
+
+#ifndef NT
+#include <sys/mman.h>
 #endif
-
-
 #include <sys/types.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 

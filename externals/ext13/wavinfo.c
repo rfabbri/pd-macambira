@@ -8,12 +8,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/mman.h>
 #include <fcntl.h>
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
+#ifndef NT
+#include <sys/mman.h>
 #endif
 
 /*--*/

@@ -9,14 +9,15 @@
 #ifdef __gnu_linux__
 #include <linux/input.h>
 #endif
+#ifndef NT
+#include <sys/ioctl.h>
+#endif
 
 #include <sys/stat.h>
-
 #include <string.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
 

@@ -7,4 +7,7 @@
 #define srand48(n) srand((n));
 #define expm1(e) exp(e)-1
 #define bzero(p,n) memset(p,0,n)
-#define O_NONBLOCK 0
+#define PROT_READ 1
+#define MAP_PRIVATE 2
+#define O_NONBLOCK 1
+#define O_NDELAY O_NONBLOCK

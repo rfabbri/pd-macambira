@@ -28,9 +28,7 @@
  */
 
 #include "m_pd.h"
-
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -38,6 +36,10 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
+
+#ifndef NT
+#include <sys/ioctl.h>
+#endif
 
 #include "ifeel.h"
 
