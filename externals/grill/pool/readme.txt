@@ -1,11 +1,11 @@
 pool - a hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2004 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 Donations for further development of the package are highly appreciated.
-Visit https://www.paypal.com/xclick/business=t.grill%40gmx.net&item_name=pool&no_note=1&tax=0&currency_code=EUR
+Visit https://www.paypal.com/xclick/business=gr%40grrrr.org&item_name=pool&no_note=1&tax=0&currency_code=EUR
 
 ----------------------------------------------------------------------------
 
@@ -44,42 +44,31 @@ Put the pool.help file into the max-help folder.
 
 ============================================================================
 
-You will need the flext C++ layer for PD and Max/MSP externals to compile the source distribution.
-see http://grrrr.org/ext
+
+BUILDING from source
+--------------------
+
+You will need the flext C++ layer for PD and Max/MSP externals to compile this.
+See http://grrrr.org/ext/flext
+Download, install and compile the package.
+Afterwards you can proceed with building this external.
 
 
-Package files:
-- readme.txt: this one
-- gpl.txt,license.txt: GPL license stuff
-- main.cpp, pool.h, pool.cpp, data.cpp
+pd/Max - Windows - Microsoft Visual C, Borland C++, MinGW:
+----------------------------------------------------------
+Start a command shell with your eventual build environment
+(e.g. run vcvars32.bat for Microsoft Visual Studio)
 
-----------------------------------------------------------------------------
+then run
+ ..\flext\build.bat
+(you would have to substitute ..\flext with the respective path to the flext package)
 
-The package should at least compile (and is tested) with the following compilers:
 
-pd - Windows:
--------------
-o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
-
-o Microsoft Visual C++ 6/7: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
-
-o GCC (MinGW): edit "config-pd-mingw.txt" & run "build-pd-mingw.bat" 
-
-pd - linux:
------------
-o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
-
-pd - darwin (MacOSX):
----------------------
-o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
-
-Max/MSP - MacOS9/X:
--------------------
-o CodeWarrior: edit "pool.cw" and build 
-
-Max/MSP - Windows:
--------------------
-o Microsoft Visual C++ 6/7: edit "config-max-msvc.txt" & run "build-max-msvc.bat" 
+pd/Max - OSX/Linux - GCC:
+-------------------------
+From a shell run
+bash ../flext/build.sh
+(you would have to substitute ../flext with the respective path to the flext package)
 
 
 ============================================================================
