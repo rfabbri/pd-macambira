@@ -12,12 +12,12 @@ void g_canvas_setup(void);
 void g_guiconnect_setup(void);
 /* iemlib */
 void g_bang_setup(void);
-void g_hdial_setup(void);
+void g_hradio_setup(void);
 void g_hslider_setup(void);
 void g_mycanvas_setup(void);
 void g_numbox_setup(void);
 void g_toggle_setup(void);
-void g_vdial_setup(void);
+void g_vradio_setup(void);
 void g_vslider_setup(void);
 void g_vumeter_setup(void);
 /* iemlib */
@@ -58,12 +58,12 @@ void conf_init(void)
     g_guiconnect_setup();
 /* iemlib */
     g_bang_setup();
-    g_hdial_setup();
+    g_hradio_setup();
     g_hslider_setup();
     g_mycanvas_setup();
     g_numbox_setup();
     g_toggle_setup();
-    g_vdial_setup();
+    g_vradio_setup();
     g_vslider_setup();
     g_vumeter_setup();
 /* iemlib */

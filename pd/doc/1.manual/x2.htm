@@ -69,7 +69,7 @@ whether you can see them or not.  Here is a simple Pd patch:
     <IMG src="fig1.2.jpg">
 </CENTER><P>
 
-There are four <I> text items </I> in this patch: a number box (showing zero),
+There are four <I> text boxes </I> in this patch: a number box (showing zero),
 an object box showing "print," and two comments.  The number box and the object
 box are connected, the number box's output to the print box's input.  Boxes may
 have zero or more inputs and/or outputs, with the inputs on top and the outputs
@@ -651,7 +651,7 @@ carried out in the order they were scheduled.
 <H4> <A name=s6> 2.6. semantics </A> </H4>
 
 This section describes how objects in Pd are created, how they store data and
-how object and other boxes they pass messages among themselves.
+how object and other boxes pass messages among themselves.
 
 <H4> <A name=s6.1> 2.6.1. creation of objects </A> </H4>
 
@@ -758,6 +758,13 @@ taked from the abstractions' creation arguments.
 is the mechanism for making local variables.  In particular, $0 in an abstraction
 is a counter which is guaranteed to be unique to that abstraction, so sends and
 receives with names like "$0-bear" can be used as local send/receive pairs.
+
+<P>  Note that the expansion of variables such as $0 and $1 only works at the
+beginning of the symbol; so, for instance, "rats-$1" will not be expanded.
+Occasionally you may want to have double or triple substitutions; this can
+be done one stage at a time by nesting abstractions (with each subpatch
+adding its own $-variable to the beginning of a symbol and passing that on
+as argument to a further anstraction.)
 
 <H4> <A name=s7> 2.7. subpatches </A> </H4>
 
@@ -946,7 +953,7 @@ width and height, in screen pixels.
 <P> Many other operations are defined for arrays; see the related patches
 in the tutorial (starting at 2.control/15.array.pd) for more possibliities.
 
-<H4> <A name=s8> 2.9. Data structures </A> </H4>
+<H4> <A name=s9> 2.9. Data structures </A> </H4>
 (Note: this section is adapted from an article submitted to ICMC 2002.)
 
 <P>  The original idea in developing Pd was to make a real-time computer music

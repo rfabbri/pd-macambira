@@ -159,13 +159,11 @@ void toggle_draw_select(t_toggle* x, t_glist* glist)
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
@@ -362,22 +360,6 @@ static void toggle_nonzero(t_toggle *x, t_floatarg f)
 	x->x_nonzero = f;
 }
 
-static void toggle_list(t_toggle *x, t_symbol *s, int ac, t_atom *av)
-{
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    if(l < 0)
-    {
-	if(IS_A_FLOAT(av,0))
-	    toggle_float(x, atom_getfloatarg(0, ac, av));
-    }
-    else if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
-}
-
 static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_toggle *x = (t_toggle *)pd_new(toggle_class);
@@ -480,8 +462,6 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 
 static void toggle_ff(t_toggle *x)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     gfxstub_deleteforkey(x);
@@ -494,7 +474,6 @@ void g_toggle_setup(void)
     class_addcreator((t_newmethod)toggle_new, gensym("toggle"), A_GIMME, 0);
     class_addbang(toggle_class, toggle_bang);
     class_addfloat(toggle_class, toggle_float);
-    class_addlist(toggle_class, toggle_list);
     class_addmethod(toggle_class, (t_method)toggle_click, gensym("click"),
 		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
     class_addmethod(toggle_class, (t_method)toggle_dialog, gensym("dialog"),
@@ -512,8 +491,6 @@ void g_toggle_setup(void)
     class_addmethod(toggle_class, (t_method)toggle_label_font, gensym("label_font"), A_GIMME, 0);
     class_addmethod(toggle_class, (t_method)toggle_init, gensym("init"), A_FLOAT, 0);
     class_addmethod(toggle_class, (t_method)toggle_nonzero, gensym("nonzero"), A_FLOAT, 0);
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
     toggle_widgetbehavior.w_getrectfn = toggle_getrect;
     toggle_widgetbehavior.w_displacefn = iemgui_displace;
     toggle_widgetbehavior.w_selectfn = iemgui_select;

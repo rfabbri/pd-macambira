@@ -151,14 +151,12 @@ void bng_draw_select(t_bng* x, t_glist* glist)
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
 	sys_vgui(".x%x.c itemconfigure %xBUT -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xBUT -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
@@ -359,17 +357,7 @@ static void bng_pointer(t_bng *x, t_gpointer *gp)
 
 static void bng_list(t_bng *x, t_symbol *s, int ac, t_atom *av)
 {
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    if(l < 0)
-    {
-	bng_bang2(x);
-    }
-    else if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
+    bng_bang2(x);
 }
 
 static void bng_anything(t_bng *x, t_symbol *s, int argc, t_atom *argv)
@@ -548,8 +536,6 @@ static void *bng_new(t_symbol *s, int argc, t_atom *argv)
 
 static void bng_ff(t_bng *x)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     clock_free(x->x_clock_lck);
@@ -584,8 +570,6 @@ void g_bang_setup(void)
     class_addmethod(bng_class, (t_method)bng_label_pos, gensym("label_pos"), A_GIMME, 0);
     class_addmethod(bng_class, (t_method)bng_label_font, gensym("label_font"), A_GIMME, 0);
     class_addmethod(bng_class, (t_method)bng_init, gensym("init"), A_FLOAT, 0);
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
     bng_widgetbehavior.w_getrectfn = bng_getrect;
     bng_widgetbehavior.w_displacefn = iemgui_displace;
     bng_widgetbehavior.w_selectfn = iemgui_select;

@@ -161,13 +161,11 @@ static void vslider_draw_select(t_vslider *x, t_glist *glist)
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, x->x_gui.x_lcol);
     }
@@ -381,8 +379,8 @@ static void vslider_click(t_vslider *x, t_floatarg xpos, t_floatarg ypos,
     x->x_pos = x->x_val;
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
     vslider_bang(x);
-    glist_grab(x->x_gui.x_glist, &x->x_gui.x_obj.te_g, (t_glistmotionfn)vslider_motion,
-	       0, xpos, ypos);
+    glist_grab(x->x_gui.x_glist, &x->x_gui.x_obj.te_g,
+    	(t_glistmotionfn)vslider_motion, 0, xpos, ypos);
 }
 
 static int vslider_newclick(t_gobj *z, struct _glist *glist,
@@ -505,22 +503,6 @@ static void vslider_loadbang(t_vslider *x)
     }
 }
 
-static void vslider_list(t_vslider *x, t_symbol *s, int ac, t_atom *av)
-{
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    if(l < 0)
-    {
-	if(IS_A_FLOAT(av,0))
-	    vslider_float(x, atom_getfloatarg(0, ac, av));
-    }
-    else if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
-}
-
 static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_vslider *x = (t_vslider *)pd_new(vslider_class);
@@ -635,8 +617,6 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
 
 static void vslider_free(t_vslider *x)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     gfxstub_deleteforkey(x);
@@ -649,7 +629,6 @@ void g_vslider_setup(void)
     class_addcreator((t_newmethod)vslider_new, gensym("vslider"), A_GIMME, 0);
     class_addbang(vslider_class,vslider_bang);
     class_addfloat(vslider_class,vslider_float);
-    class_addlist(vslider_class, vslider_list);
     class_addmethod(vslider_class, (t_method)vslider_click, gensym("click"),
 		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
     class_addmethod(vslider_class, (t_method)vslider_motion, gensym("motion"),
@@ -672,8 +651,6 @@ void g_vslider_setup(void)
     class_addmethod(vslider_class, (t_method)vslider_lin, gensym("lin"), 0);
     class_addmethod(vslider_class, (t_method)vslider_init, gensym("init"), A_FLOAT, 0);
     class_addmethod(vslider_class, (t_method)vslider_steady, gensym("steady"), A_FLOAT, 0);
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
     vslider_widgetbehavior.w_getrectfn =    vslider_getrect;
     vslider_widgetbehavior.w_displacefn =   iemgui_displace;
     vslider_widgetbehavior.w_selectfn =     iemgui_select;

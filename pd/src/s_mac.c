@@ -303,16 +303,37 @@ void sys_poll_midi(void)
     }
 }
 
+#if defined(_POSIX_PRIORITY_SCHEDULING) || defined(_POSIX_MEMLOCK)
+#include <sched.h>
+#endif
+
 void sys_set_priority(int higher) 
 {
+#ifdef _POSIX_PRIORITY_SCHEDULING
+    struct sched_param par;
+    int p1 ,p2, p3;
+    p1 = sched_get_priority_min(SCHED_FIFO);
+    p2 = sched_get_priority_max(SCHED_FIFO);
+    p3 = (higher ? p2 - 1 : p2 - 3);
+    par.sched_priority = p3;
+    if (sched_setscheduler(0,SCHED_FIFO,&par) != -1)
+       fprintf(stderr, "priority %d scheduling enabled.\n", p3);
+#else /* no priority scheduling, so renice and wish for something better */
     int retval;
     errno = 0;
     retval = setpriority(PRIO_PROCESS, 0, (higher? -20 : -19));
     if (retval == -1 & errno != 0)
     {
         perror("setpriority");
-        fprintf(stderr, "priority bost faled.\n");
+        fprintf(stderr, "priority boost faled.\n");
     }
+#endif
+
+#ifdef _POSIX_MEMLOCK
+    if (mlockall(MCL_FUTURE) != -1) 
+    	fprintf(stderr, "memory locking enabled.\n");
+#endif
+
 }
 
 void sys_listdevs(void )

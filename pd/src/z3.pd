@@ -1,3 +1,14 @@
-#N canvas 408 176 626 431 12;
-#X obj 104 154 z4 foo;
-#X obj 102 200 z4 baz;
+#N canvas 409 180 735 452 12;
+#X floatatom 267 57 0 0 0 1 input-dB - -;
+#X obj 267 82 r tuning;
+#X obj 267 129 r rest;
+#X obj 267 35 r in-DB;
+#X floatatom 267 104 0 0 0 1 tuning - -;
+#X obj 267 10 tgl 20 0 meters set-meters meters 24 8 192 12 -262144
+-1 -1 0 1;
+#X obj 267 152 tgl 20 0 empty empty rest 24 8 0 12 -262144 -1 -1 0
+1;
+#X connect 1 0 4 0;
+#X connect 2 0 6 0;
+#X connect 3 0 0 0;
+#X coords 0 0 1 1 300 200 1;

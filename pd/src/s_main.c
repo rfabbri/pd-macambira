@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.35\n";
+char pd_version[] = "Pd version 0.36 PRELIMINARY TEST 5\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 

@@ -40,6 +40,7 @@ mtof ftom powtodb rmstodb dbtopow dbtorms        convert acoustical units
 mod div sin cos tan atan atan2 sqrt log exp abs  higher math
 random                                           lower math
 max min                                          greater or lesser of 2 numbers
+clip                                             force a number into a range
 ------------------------------ MIDI ----------------------------------
 notein ctlin pgmin bendin touchin polytouchin midiin sysexin - MIDI input
 noteout ctlout pgmout bendout touchout polytouchout midiout  - MIDI output
@@ -91,8 +92,8 @@ throw~ -    add to a summing bus
 catch~ -    define and read a summing bus
 block~ -    specify block size and overlap
 switch~ -   switch DSP computation on and off
-readsf~ -   soundfile playback from disk (UNIX only.)
-writesf~ -  record sound to disk (UNIX only.)
+readsf~ -   soundfile playback from disk
+writesf~ -  record sound to disk
 -------------------- AUDIO OSCILLATORS AND TABLES ------------------------
 phasor~ -   sawtooth oscillator
 cos~ -      cosine

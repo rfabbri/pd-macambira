@@ -2685,7 +2685,7 @@ void alsa_resync( void)
     }
     memset(alsa_buf, 0,
     	sizeof(char) * alsa_samplewidth * DACBLKSIZE * linux_outchannels);
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 1000000; i++)
     {
 	result = snd_pcm_writei(alsa_device.outhandle, alsa_buf,
 	    DACBLKSIZE);

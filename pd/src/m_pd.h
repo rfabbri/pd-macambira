@@ -26,7 +26,7 @@ extern "C" {
 
     /* and depending on the compiler, hidden data structures are
     declared differently: */
-#ifdef __GNUC__
+#if defined( __GNUC__) || defined( __BORLANDC__ )
 #define EXTERN_STRUCT struct
 #else
 #define EXTERN_STRUCT extern struct
@@ -262,6 +262,7 @@ EXTERN void atom_string(t_atom *a, char *buf, unsigned int bufsize);
 
 EXTERN t_binbuf *binbuf_new(void);
 EXTERN void binbuf_free(t_binbuf *x);
+EXTERN t_binbuf *binbuf_duplicate(t_binbuf *y);
 
 EXTERN void binbuf_text(t_binbuf *x, char *text, size_t size);
 EXTERN void binbuf_gettext(t_binbuf *x, char **bufp, int *lengthp);
@@ -339,6 +340,7 @@ EXTERN void outlet_float(t_outlet *x, t_float f);
 EXTERN void outlet_symbol(t_outlet *x, t_symbol *s);
 EXTERN void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom *argv);
 EXTERN void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv);
+EXTERN t_symbol *outlet_getsymbol(t_outlet *x);
 EXTERN void outlet_free(t_outlet *x);
 EXTERN t_object *pd_checkobject(t_pd *x);
 
@@ -580,14 +582,16 @@ EXTERN void c_addmess(t_method fn, t_symbol *sel, t_atomtype arg1, ...);
 #define typedmess pd_typedmess
 #define vmess pd_vmess
 
-#ifdef MACOSX
-#define cabs() smerdyakov(void)
-#endif
-
 /* A definition to help gui objects straddle 0.34-0.35 changes.  If this is
 defined, there is a "te_xpix" field in objects, not a "te_xpos" as before: */
 
 #define PD_USE_TE_XPIX
+
+/* a test for NANs and denormals.  Shouldn't be necessary on Mac but can't
+test this just now. */
+
+#define PD_BADFLOAT(f) ((((*(unsigned int*)&(f))&0x7f800000)==0) || \
+    (((*(unsigned int*)&(f))&0x7f800000)==0x7f800000))
 
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 }

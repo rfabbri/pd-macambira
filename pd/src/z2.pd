@@ -1,12 +1,25 @@
-#N canvas 682 208 558 499 10;
-#X obj 225 80 inlet;
-#X obj 119 198 outlet;
-#X obj 109 160 hsl 128 15 0 127 0 0 empty empty empty 20 8 0 8 -262144
--1 -1 0 1;
-#X floatatom 495 43 5 0 0;
-#N canvas 0 0 450 300 foo3 0;
-#X restore 82 78 pd foo3;
-#X obj 54 151 print;
-#X connect 0 0 2 0;
-#X connect 2 0 1 0;
-#X coords 0 0 1 1 200 140 1;
+#N canvas 176 287 548 368 12;
+#X obj 51 82 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X obj 150 82 vdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X obj 78 240 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X floatatom 149 52 5 0 0 0 - - -;
+#X floatatom 244 182 5 0 0 0 - - -;
+#X obj 361 97 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X floatatom 374 257 5 0 0 0 - - -;
+#X obj 256 285 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X floatatom 478 73 5 0 0 0 receive asd -;
+#X floatatom 245 246 5 0 0 0 - - -;
+#X floatatom 475 156 5 0 0 0 send weghg -;
+#X floatatom 466 220 5 0 0 0 both - rty;
+#X connect 3 0 1 0;
+#X connect 3 0 0 0;
+#X connect 3 0 5 0;
+#X connect 4 0 2 0;
+#X connect 5 0 6 0;
+#X connect 9 0 7 0;
+#X coords 0 0 1 1 300 200 1;

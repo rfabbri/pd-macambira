@@ -129,7 +129,9 @@ void glist_grab(t_glist *x, t_gobj *y, t_glistmotionfn motionfn,
     t_glistkeyfn keyfn, int xpos, int ypos)
 {
     t_glist *x2 = glist_getcanvas(x);
-    x2->gl_editor->e_onmotion = MA_PASSOUT;
+    if (motionfn)
+    	x2->gl_editor->e_onmotion = MA_PASSOUT;
+    else x2->gl_editor->e_onmotion = 0;
     x2->gl_editor->e_grab = y;
     x2->gl_editor->e_motionfn = motionfn;
     x2->gl_editor->e_keyfn = keyfn;
@@ -262,9 +264,6 @@ t_inlet *canvas_addinlet(t_canvas *x, t_pd *who, t_symbol *s)
     if (!x->gl_loading) canvas_resortinlets(x);
     return (ip);
 }
-
-void canvas_deletelinesforio(t_canvas *x, t_text *text,
-    t_inlet *inp, t_outlet *outp);
 
 void canvas_rminlet(t_canvas *x, t_inlet *ip)
 {

@@ -12,6 +12,10 @@ set pd_nt 0
 # a new dialogbox was inserted, named:
 # "pdtk_iemgui_dialog -- dialog window for iem guis"
 #
+# there are 2 new features: 1.) line-delete-protection in edit-menue
+#
+# 2.) there are all iem-guis in a seperated put-gui-menue
+#
 # all this changes are labeled with #######iemlib##########
 
 if {$pd_nt == 1} {
@@ -104,9 +108,10 @@ set untitled_number 1
 set untitled_directory [pwd]
 set saveas_client doggy
 set pd_opendir $untitled_directory
-set pd_undoaction no
-set pd_redoaction no
-set pd_undocanvas no
+############iemlib##################
+# need it to know, if new or open file
+set iem_new_open_flag "open"
+############iemlib##################
 
 ################ utility functions #########################
 
@@ -147,6 +152,11 @@ proc pdtk_fixwindowmenu {} {
 proc menu_new {} {
     global untitled_number
     global untitled_directory
+############iemlib##################
+    global iem_new_open_flag
+    
+    set iem_new_open_flag "new"
+############iemlib##################
     pd [concat pd filename Untitled-$untitled_number $untitled_directory \;]
     pd {
     	#N canvas;
@@ -160,6 +170,11 @@ proc menu_new {} {
 proc menu_open {} {
     global pd_opendir
     global pd_nt
+############iemlib##################
+    global iem_new_open_flag
+    
+    set iem_new_open_flag "open"
+############iemlib##################
 
 # workaround -- initialdir doesn't work on MACOSX yet ---
     if {$pd_nt == 2} {
@@ -221,7 +236,7 @@ proc menu_opentext {filename} {
     global pd_myversion
     set name [format ".help%d" $doc_number]
     toplevel $name
-    text $name.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
+    text $name.text -relief raised -bd 2 -font fixed \
     	-yscrollcommand "$name.scroll set" -background white
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
@@ -243,6 +258,11 @@ set help_directory $pd_guidir/doc
 proc menu_documentation {} {
     global help_directory
     global pd_nt
+############iemlib##################
+    global iem_new_open_flag
+    
+    set iem_new_open_flag "open"
+############iemlib##################
  
     if {$pd_nt == 2} {
 	cd $help_directory
@@ -281,6 +301,11 @@ proc menu_documentation {} {
 
 proc menu_doc_open {subdir basename} {
     global pd_guidir
+############iemlib##################
+    global iem_new_open_flag
+    
+    set iem_new_open_flag "open"
+############iemlib##################
  
     set dirname $pd_guidir/$subdir
 
@@ -340,24 +365,6 @@ proc menu_print {name} {
 
 proc menu_close {name} {
     pd [concat $name menuclose \;]
-}
-
-proc menu_undo {name} {
-    global pd_undoaction
-    global pd_redoaction
-    global pd_undocanvas
-    if {$name == $pd_undocanvas && $pd_undoaction != "no"} {
-    	pd [concat $name undo \;]
-    }
-}
-
-proc menu_redo {name} {
-    global pd_undoaction
-    global pd_redoaction
-    global pd_undocanvas
-    if {$name == $pd_undocanvas && $pd_redoaction != "no"} {
-    	pd [concat $name redo \;]
-    }
 }
 
 proc menu_cut {name} {
@@ -445,12 +452,12 @@ proc menu_hslider {name accel} {
     pd [concat $name hslider $accel \;]
 }
 
-proc menu_hradio {name accel} {
-    pd [concat $name hradio $accel \;]
+proc menu_hdial {name accel} {
+    pd [concat $name hdial $accel \;]
 }
 
-proc menu_vradio {name accel} {
-    pd [concat $name vradio $accel \;]
+proc menu_vdial {name accel} {
+    pd [concat $name vdial $accel \;]
 }
 
 proc menu_vumeter {name accel} {
@@ -461,38 +468,11 @@ proc menu_mycnv {name accel} {
     pd [concat $name mycnv $accel \;]
 }
 
+proc menu_protectmode {name} {
+    pd [concat $name protectmode 0 \;]
+}
+
 ############iemlib##################
-
-# correct edit menu, enabling or disabling undo/redo
-# LATER also cut/copy/paste
-proc menu_fixeditmenu {name} {
-    global pd_undoaction
-    global pd_redoaction
-    global pd_undocanvas
-#    puts stderr [concat menu_fixeditmenu $name $pd_undocanvas $pd_undoaction]
-    if {$name == $pd_undocanvas && $pd_undoaction != "no"} {
-	$name.m.edit.m entryconfigure "Undo*" -state normal \
-	    -label [concat "Undo " $pd_undoaction]
-    } else {
-	$name.m.edit.m entryconfigure "Undo*" -state disabled -label "Undo"
-    }
-    if {$name == $pd_undocanvas && $pd_redoaction != "no"} {
-	$name.m.edit.m entryconfigure "Redo" -state normal
-    } else {
-	$name.m.edit.m entryconfigure "Redo" -state disabled
-    }
-}
-
-# message from Pd to update the currently available undo/redo action
-proc pdtk_undomenu {name undoaction redoaction} {
-    global pd_undoaction
-    global pd_redoaction
-    global pd_undocanvas
-#    puts stderr [concat pdtk_undomenu $name $undoaction $redoaction]
-    set pd_undocanvas $name
-    set pd_undoaction $undoaction
-    set pd_redoaction $redoaction
-}
 
 proc menu_windowparent {name} {
     pd [concat $name findparent \;]
@@ -577,8 +557,9 @@ proc menu_findobject {canvas} {
 
 
 ############# pdtk_canvas_new -- create a new canvas ###############
-proc pdtk_canvas_new {name width height geometry editable} {
+proc pdtk_canvas_new {name width height geometry} {
     global pd_opendir
+    global iem_new_open_flag
     
     toplevel $name
     frame $name.m -relief raised -bd 2
@@ -599,6 +580,7 @@ proc pdtk_canvas_new {name width height geometry editable} {
     pack $name.c -side left -expand 1 -fill both
     wm minsize $name 1 1
     wm geometry $name $geometry
+    
 # the file menu
 
     menubutton $name.m.file -text File -menu $name.m.file.m
@@ -637,15 +619,8 @@ proc pdtk_canvas_new {name width height geometry editable} {
 # the edit menu
     menubutton $name.m.edit -text Edit -menu $name.m.edit.m
     pack $name.m.edit -side left
-    menu $name.m.edit.m -postcommand [concat menu_fixeditmenu $name]
+    menu $name.m.edit.m
     
-    $name.m.edit.m add command -label Undo -command [concat menu_undo $name] \
-	-accelerator "Ctrl+z"
-
-    $name.m.edit.m add command -label Redo -command [concat menu_redo $name] \
-	-accelerator "Ctrl+Z"
-
-    $name.m.edit.m add separator
 
     $name.m.edit.m add command -label Cut -command [concat menu_cut $name] \
 	-accelerator "Ctrl+x"
@@ -686,8 +661,16 @@ proc pdtk_canvas_new {name width height geometry editable} {
     	-command [concat menu_editmode $name] \
 	-accelerator "Ctrl+e"	
 
-    if { $editable == 0 } {
+
+
+    $name.m.edit.m add checkbutton -label "Protect" \
+    	-indicatoron true -selectcolor grey85 \
+       	-command [concat menu_protectmode $name] \
+	-accelerator "Ctrl+r"
+
+    if { $iem_new_open_flag == "open" } {
             $name.m.edit.m entryconfigure "Edit mode" -indicatoron false }
+    $name.m.edit.m entryconfigure "Protect" -indicatoron false
 	
 ############iemlib##################
 
@@ -738,12 +721,12 @@ proc pdtk_canvas_new {name width height geometry editable} {
     	-command [concat menu_hslider $name 0] \
 	-accelerator "Alt+h"
     
-    $name.m.put.m add command -label Vradio \
-    	-command [concat menu_vradio $name 0] \
+    $name.m.put.m add command -label Vdial \
+    	-command [concat menu_vdial $name 0] \
 	-accelerator "Alt+d"
     
-    $name.m.put.m add command -label Hradio \
-    	-command [concat menu_hradio $name 0] \
+    $name.m.put.m add command -label Hdial \
+    	-command [concat menu_hdial $name 0] \
 	-accelerator "Alt+i"
     
     $name.m.put.m add command -label VU \
@@ -841,8 +824,7 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
     bind $name.c <Alt-Key> {pdtk_canvas_altkey %W %K %A}
 #    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
-    bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
-    bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
+    bind $name.c <Key> {pdtk_canvas_key %W %K %A}
     bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
     bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
     bind $name.c <Alt-Motion> {pdtk_canvas_motion %W %x %y 4}
@@ -955,7 +937,7 @@ proc pdtk_canvas_mouseup {name x y b} {
     pdtk_canvas_checkgeometry [canvastosym $name]
 }
 
-proc pdtk_canvas_key {name key iso shift} {
+proc pdtk_canvas_key {name key iso} {
 #    puts stderr [concat down key= $key iso= $iso]
 #    .controls.switches.meterbutton configure -text $key
 #  HACK for MAC OSX -- backspace seems different; I don't understand why.
@@ -973,9 +955,9 @@ proc pdtk_canvas_key {name key iso shift} {
     }
     if {$iso != ""} {
     	scan $iso %c keynum 
-    	pd [canvastosym $name] key 1 $keynum $shift\;
+    	pd [canvastosym $name] key 1 $keynum \;
     } else {
-    	pd [canvastosym $name] key 1 $key $shift\;
+    	pd [canvastosym $name] key 1 $key \;
     }
 }
 
@@ -998,8 +980,8 @@ proc pdtk_canvas_altkey {name key iso} {
     if {$key == "n" || $key == "N"} {menu_numbox $topname 1}
     if {$key == "v" || $key == "V"} {menu_vslider $topname 1}
     if {$key == "h" || $key == "H"} {menu_hslider $topname 1}
-    if {$key == "i" || $key == "I"} {menu_hradio $topname 1}
-    if {$key == "d" || $key == "D"} {menu_vradio $topname 1}
+    if {$key == "i" || $key == "I"} {menu_hdial $topname 1}
+    if {$key == "d" || $key == "D"} {menu_vdial $topname 1}
     if {$key == "u" || $key == "U"} {menu_vumeter $topname 1}
     if {$key == "c" || $key == "C"} {menu_mycnv $topname 1}
 ############iemlib##################
@@ -1019,9 +1001,6 @@ proc pdtk_canvas_ctrlkey {name key shift} {
     if {$key == "s" || $key == "S"} {
       	if {$shift == 1} {menu_saveas $topname} else {menu_save $topname}
     }
-    if {$key == "z" || $key == "Z"} {
-      	if {$shift == 1} {menu_redo $topname} else {menu_undo $topname}
-    }
     if {$key == "w" || $key == "W"} {menu_close $topname}
     if {$key == "p" || $key == "P"} {menu_print $topname}
     if {$key == "x" || $key == "X"} {menu_cut $topname}
@@ -1040,6 +1019,9 @@ proc pdtk_canvas_ctrlkey {name key shift} {
     if {$key == "slash"} {menu_audio 1}
     if {$key == "period"} {menu_audio 0}
     if {$key == "e" || $key == "E"} {menu_editmode $topname}
+############iemlib##################
+    if {$key == "r" || $key == "R"} {menu_protectmode $topname}
+############iemlib##################
 }
 
 proc pdtk_canvas_motion {name x y mods} {
@@ -1283,12 +1265,9 @@ proc pdtk_gatom_dialog {id initwidth initlo inithi \
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
     	-command "dogatom_cancel $id"
-    button $id.buttonframe.apply -text {Apply}\
+    button $id.buttonframe.ok -text {Apply}\
     	-command "dogatom_apply $id"
-    button $id.buttonframe.ok -text {OK}\
-    	-command "dogatom_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
-    pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
 
     frame $id.paramsymto
@@ -2458,7 +2437,7 @@ proc pdtk_data_dialog {name stuff} {
     pack $name.buttonframe.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 40 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font -*-courier-bold--normal--12-*
+    	-yscrollcommand "$name.scroll set" -font fixed
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -2477,14 +2456,22 @@ proc pdtk_canvas_editval {name value} {
         $name.m.edit.m entryconfigure "Edit mode" -indicatoron false
     }                                                 
 }
+
+proc pdtk_canvas_protectval {name value} {
+    if { $value } {
+	$name.m.edit.m entryconfigure "Protect" -indicatoron true
+    } else {                          
+        $name.m.edit.m entryconfigure "Protect" -indicatoron false
+    }                                                 
+}
 #####################iemlib#######################
 
 ############ pdtk_text_new -- create a new text object #2###########
 proc pdtk_text_new {canvasname myname x y text font color} {
-#    if {$font < 13} {set fontname [format -*-courier-bold----%d-* $font]}
-#    if {$font >= 13} {set fontname [format -*-courier-----%d-* $font]}
+#    if {$font < 13} {set fontname [format fixed $font]}
+#    if {$font >= 13} {set fontname [format fixed $font]}
     $canvasname create text $x $y \
-    	-font [format -*-courier-bold--normal--%d-* $font] \
+    	-font [format fixed $font] \
     	-tags $myname -text $text -fill $color  -anchor nw 
 #    pd [concat $myname size [$canvasname bbox $myname] \;]
 }
@@ -2519,26 +2506,26 @@ proc pdtk_pd_startup {version} {
     global pd_myversion
     set pd_myversion $version
 
-    set width1 [font measure  -*-courier-bold--normal--8-* x]
-    set height1 [lindex [font metrics -*-courier-bold--normal--8-*] 5]
+    set width1 [font measure  fixed x]
+    set height1 [lindex [font metrics fixed] 5]
 
-    set width2 [font measure  -*-courier-bold--normal--10-* x]
-    set height2 [lindex [font metrics -*-courier-bold--normal--10-*] 5]
+    set width2 [font measure  fixed x]
+    set height2 [lindex [font metrics fixed] 5]
 
-    set width3 [font measure  -*-courier-bold--normal--12-* x]
-    set height3 [lindex [font metrics -*-courier-bold--normal--12-*] 5]
+    set width3 [font measure  fixed x]
+    set height3 [lindex [font metrics fixed] 5]
 
-    set width4 [font measure  -*-courier-bold--normal--14-* x]
-    set height4 [lindex [font metrics -*-courier-bold--normal--14-*] 5]
+    set width4 [font measure  fixed x]
+    set height4 [lindex [font metrics fixed] 5]
 
-    set width5 [font measure  -*-courier-bold--normal--16-* x]
-    set height5 [lindex [font metrics -*-courier-bold--normal--16-*] 5]
+    set width5 [font measure  fixed x]
+    set height5 [lindex [font metrics fixed] 5]
 
-    set width6 [font measure  -*-courier-bold--normal--24-* x]
-    set height6 [lindex [font metrics -*-courier-bold--normal--24-*] 5]
+    set width6 [font measure  fixed x]
+    set height6 [lindex [font metrics fixed] 5]
 
-    set width7 [font measure  -*-courier-bold--normal--36-* x]
-    set height7 [lindex [font metrics -*-courier-bold--normal--36-*] 5]
+    set width7 [font measure  fixed x]
+    set height7 [lindex [font metrics fixed] 5]
 
     pd [concat pd init [pdtk_enquote [pwd]] \
     	8 $width1 $height1 \
@@ -2625,7 +2612,7 @@ proc pdtk_pd_texteditor {stuff} {
     pack $name.buttons.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 12 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font -*-courier-bold--normal--12-*
+    	-yscrollcommand "$name.scroll set" -font fixed
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1

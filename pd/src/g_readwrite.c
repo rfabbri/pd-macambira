@@ -587,20 +587,20 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
     linetraverser_start(&t, x);
     while (oc = linetraverser_next(&t))
     {
-    	int srcno, sinkno;
-    	for (srcno = 0, y = x->gl_list; y && y != &t.tr_ob->ob_g; y = y->g_next)
-    	    srcno++;
-    	for (sinkno = 0, y = x->gl_list; y && y != &t.tr_ob2->ob_g; y = y->g_next)
-    	    sinkno++;
+    	int srcno = canvas_getindex(x, &t.tr_ob->ob_g);
+	int sinkno = canvas_getindex(x, &t.tr_ob2->ob_g);
     	binbuf_addv(b, "ssiiii;", gensym("#X"), gensym("connect"),
     	    srcno, t.tr_outno, sinkno, t.tr_inno);
     }
-    if (x->gl_isgraph)
-	binbuf_addv(b, "ssfffffff;", gensym("#X"), gensym("coords"),
-    	    x->gl_x1, x->gl_y1,
-    	    x->gl_x2, x->gl_y2,
-    	    (float)x->gl_pixwidth, (float)x->gl_pixheight,
-	    (float)x->gl_isgraph);
+    	/* unless everything is the default (as in ordinary subpatches)
+	print out a "coords" message to set up the coordinate systems */
+    if (x->gl_isgraph || x->gl_x1 || x->gl_y1 ||
+    	x->gl_x2 != 1 ||  x->gl_y2 != 1 || x->gl_pixwidth || x->gl_pixheight)
+	    binbuf_addv(b, "ssfffffff;", gensym("#X"), gensym("coords"),
+    		x->gl_x1, x->gl_y1,
+    		x->gl_x2, x->gl_y2,
+    		(float)x->gl_pixwidth, (float)x->gl_pixheight,
+		(float)x->gl_isgraph);
 }
 
     /* call this recursively to collect all the template names for

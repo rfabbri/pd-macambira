@@ -52,8 +52,7 @@ static t_int *tabwrite_tilde_perform(t_int *w)
     	while (nxfer--)
 	{
 	    float f = *in++;
-	    	/* bash NANs and underflow/overflow hazards to zero */
-	    if (!((f > 1.0e-20f && f < 1.0e20f) || (f < -1e-20f && f > -1e20)))
+    	    if (PD_BADFLOAT(f))
 	    	f = 0;
 	    *fp++ = f;
     	}
@@ -735,8 +734,7 @@ static t_int *tabsend_perform(t_int *w)
     while (n--)
     {	
     	float f = *in++;
-	    /* bash NANs and underflow/overflow hazards to zero */
-	if (!((f > 1.0e-20f && f < 1.0e20f) || (f < -1e-20f && f > -1e20)))
+    	if (PD_BADFLOAT(f))
 	    f = 0;
 	 *dest++ = f;
     }

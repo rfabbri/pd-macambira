@@ -384,6 +384,12 @@ void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv)
     	typedmess(oc->oc_to, s, argc, argv);
 }
 
+    /* get the outlet's declared symbol */
+t_symbol *outlet_getsymbol(t_outlet *x)
+{
+    return (x->o_sym);
+}
+
 void outlet_free(t_outlet *x)
 {
     t_object *y = x->o_owner;

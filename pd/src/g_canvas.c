@@ -254,6 +254,15 @@ void canvas_rename(t_canvas *x, t_symbol *s, t_symbol *dir)
 
 /* --------------- traversing the set of lines in a canvas ----------- */
 
+int canvas_getindex(t_canvas *x, t_gobj *y)
+{
+    t_gobj *y2;
+    int indexno;
+    for (indexno = 0, y2 = x->gl_list; y2 && y2 != y; y2 = y2->g_next)
+    	indexno++;
+    return (indexno);
+}
+
 void linetraverser_start(t_linetraverser *t, t_canvas *x)
 {
     t->tr_ob = 0;
@@ -516,10 +525,13 @@ int glist_isgraph(t_glist *x)
     moved or resized. */
 static void canvas_setbounds(t_canvas *x, int x1, int y1, int x2, int y2)
 {
+    int heightwas = y2 - y1;
+    int heightchange = y2 - y1 - (x->gl_screeny2 - x->gl_screeny1);
     x->gl_screenx1 = x1;
     x->gl_screeny1 = y1;
     x->gl_screenx2 = x2;
     x->gl_screeny2 = y2;
+    /* post("set bounds %d %d %d %d", x1, y1, x2, y2); */
     if (!glist_isgraph(x) && (x->gl_y2 < x->gl_y1)) 
     {
     	    /* if it's flipped so that y grows upward,
@@ -527,8 +539,14 @@ static void canvas_setbounds(t_canvas *x, int x1, int y1, int x2, int y2)
 	    only appropriate if we're a regular "text" object on the
 	    parent. */
 	float diff = x->gl_y1 - x->gl_y2;
-    	x->gl_y1 = x->gl_screeny2 * diff;
+	t_gobj *y;
+    	x->gl_y1 = heightwas * diff;
     	x->gl_y2 = x->gl_y1 - diff;
+	    /* and move text objects accordingly; they should stick
+	    to the bottom, not the top. */
+	for (y = x->gl_list; y; y = y->g_next)
+	    if (pd_checkobject(&y->g_pd))
+	    	gobj_displace(y, x, 0, heightchange);
 	canvas_redraw(x);
     }
 }
@@ -607,6 +625,9 @@ void canvas_map(t_canvas *x, t_floatarg f)
 	    	canvas_selectme = 0;
 	    }
     	    canvas_drawlines(x);
+	    	/* simulate a mouse up so u_main will calculate scrollbars...
+		    ugly! */
+    	    sys_vgui("pdtk_canvas_mouseup .x%x.c 0 0 0\n", x);
 	}
     }
     else
@@ -700,15 +721,12 @@ void canvas_vis(t_canvas *x, t_floatarg f)
 	else
 	{
     	    canvas_create_editor(x, 1);
-    	    sys_vgui("pdtk_canvas_new .x%x %d %d +%d+%d\n", x,
+    	    sys_vgui("pdtk_canvas_new .x%x %d %d +%d+%d %d\n", x,
     		(int)(x->gl_screenx2 - x->gl_screenx1),
     		(int)(x->gl_screeny2 - x->gl_screeny1),
-	    	(int)(x->gl_screenx1), (int)(x->gl_screeny1)
-    		);
+	    	(int)(x->gl_screenx1), (int)(x->gl_screeny1),
+    		x->gl_edit);
     	    canvas_reflecttitle(x);
-	    	/* simulate a mouse up so u_main will calculate scrollbars...
-		    ugly! */
-    	    sys_vgui("pdtk_canvas_mouseup .x%x.c 0 0 0\n", x);
 	    x->gl_havewindow = 1;
 	    canvas_updatewindowlist();
     	}
@@ -799,6 +817,7 @@ void canvas_free(t_canvas *x)
     t_gobj *y;
     int dspstate = canvas_suspend_dsp();
 
+    canvas_noundo(x);
     if (canvas_editing == x)
     	canvas_editing = 0;
     if (canvas_whichfind == x)
@@ -831,9 +850,11 @@ static void canvas_drawlines(t_canvas *x)
     {
     	linetraverser_start(&t, x);
     	while (oc = linetraverser_next(&t))
-    	    sys_vgui(".x%x.c create line %d %d %d %d -tags l%x\n",
+    	    sys_vgui(".x%x.c create line %d %d %d %d -width %d -tags l%x\n",
 		    glist_getcanvas(x),
-		    	t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2, oc);
+		    	t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2, 
+			    (outlet_getsymbol(t.tr_outlet) == &s_signal ? 2:1),
+			    	oc);
     }
 }
 
@@ -1376,7 +1397,12 @@ extern void canvas_toggle(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_vslider(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_hslider(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_vdial(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
+    /* old version... */
 extern void canvas_hdial(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
+extern void canvas_hdial(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
+    /* new version: */
+extern void canvas_hradio(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
+extern void canvas_vradio(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_vumeter(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_mycnv(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
 extern void canvas_numbox(t_glist *gl, t_symbol *s, int argc, t_atom *argv);
@@ -1433,6 +1459,10 @@ void g_canvas_setup(void)
     class_addmethod(canvas_class, (t_method)canvas_hdial, gensym("hdial"),
 		    A_GIMME, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_vdial, gensym("vdial"),
+                    A_GIMME, A_NULL);
+    class_addmethod(canvas_class, (t_method)canvas_hradio, gensym("hradio"),
+                    A_GIMME, A_NULL);
+    class_addmethod(canvas_class, (t_method)canvas_vradio, gensym("vradio"),
                     A_GIMME, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_vumeter, gensym("vumeter"),
                     A_GIMME, A_NULL);

@@ -1,18 +1,34 @@
+done for 0.35:
+bug fix: flipping canvases
+bug fix: canvas coordinates saved correctly
+signal lines fatter than control ones
+number box labels, send&receive
+rework [vh]dial
+'make install' depending on Pd, etc
+undo
+fix symbol binding GUI problem
+new expr object
+test on p4s
+undo paste and duplicate
+fix flipped window resizing to move comments
+
 ---------------- dolist --------------------
-++portno wierdness in gcc 3 worked around (Burton)
-non-power-of-2 channel counts in ASIO (Olaf Matthes)
-Bug, David McCallum, Jul. 13 -- find last error crashes
+pddp doc
 
+scheduler to do DSP computations even if no audio
+hook to scheduler to let others get called for DSP I/O
+figure out how to avoid "dac freeze" if nosound
 
-last-minute bug fixes:
-add flag to select MIDI open to use select()?
-check top-of-window problem in OSX
-denormal protection
-
-doc:
-fix readme file and recopy to web page (add to README in dist instructions)
+try again to fix the font scene
+look at zeros to IIR filters
+compile pdsend, pdreceive for windows and document somehow
+addcomma message to message
+pasting should look at current mouse location
 
 problems:
+number boxes should ignore non-numeric characters
+messages & comments don't come up with text activated?
+arrays of non-existent templates crash
 don't draw in/outlets on gui objects in graphs
 Alsa degradation after several hours running on soundblaster
 font size should depend on subpatch/abstraction
@@ -22,9 +38,6 @@ missed Thomas's multi-dialog trick???
 fix iemguis not to bash symbol names
 check what happens when going back and forth between graph-on-parent
 deal with spaces in iemgui labels and send/receive names
-David McCallum, table crashes in 98?
-font hack (pix@test.at, 30 Nov 2001
-    perl -pi -e 's/-[*%a-z0-9-]*\*[*%a-z0-9-]*/fixed/' u_main.tk
 get rid of messages causing renaming; try to prevent patches closing themselves.
 Krzysztof's qlist_next reentrancy bug
 dac~/ adc~/ block~ incompatibility
@@ -35,6 +48,7 @@ rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
 soundfile writing gets wrong sample rate; see /* lie */ in d_soundfile.c
 
 data:
+doesn't redraw when changing draw commands?
 vget, vset traversal objects
 cursor to show (x, y) location
 better hit detection (getrect is too greedy)
@@ -48,6 +62,7 @@ scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
 
 features:
+signal inlets with initialized values...
 Pd to open html help on windows/mac
 flag to hide array names 
 ??? have a way to disambiguate externs from different libs???
@@ -56,7 +71,6 @@ if there's just one array, don't do stringent hit check.
 netsend separate thread
 netreceive (and netsend?) message to set port number
 delete-in-rectangle message to Pds
-pasting should look at current mouse location
 "regular" numbers/symbols to do send/receive thing ala IEMGUI
 make selecting text grab keyboard focus
 think about x and y scale preservation when changing between graph and object
@@ -112,6 +126,8 @@ pique~ and fiddle~ unification (notice pique filtering is different!)
 new message box look
 figure out what to do when "pd sym" conflicts with window title as in Pluton?
 
+MAX compatibilty:
+trigger 1 (on Pd, outputs 0; on Max?)
 
 LATER
 Hammerfall adapt to ALSA

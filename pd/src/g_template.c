@@ -279,7 +279,8 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
     t_scalar *x;
     t_gpointer gp;
     int nto = tto->t_n, nfrom = tfrom->t_n, i;
-    post("conform scalar");
+    t_template *scalartemplate;
+    /* post("conform scalar"); */
     	/* possibly replace the scalar */
     if (scfrom->sc_template == tfrom->t_sym)
     {
@@ -321,15 +322,17 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
 	pd_free(&scfrom->sc_gobj.g_pd);
     }
     else x = scfrom;
+    scalartemplate = template_findbyname(x->sc_template);
     	/* convert all array elements and sublists */
-    for (i = 0; i < nto; i++)
+    for (i = 0; i < scalartemplate->t_n; i++)
     {
-    	if (tto->t_vec[i].ds_type == DT_LIST)
+    	t_dataslot *ds = scalartemplate->t_vec + i;
+    	if (ds->ds_type == DT_LIST)
 	{
 	    t_glist *gl2 = x->sc_vec[i].w_list;
 	    template_conformglist(tfrom, tto, gl2, conformaction);
 	}
-	else if (tto->t_vec[i].ds_type == DT_ARRAY)
+	else if (ds->ds_type == DT_ARRAY)
 	{
 	    template_conformarray(tfrom, tto, conformaction, 
 	    	x->sc_vec[i].w_array);
@@ -373,7 +376,7 @@ static void template_conformglist(t_template *tfrom, t_template *tto,
     t_glist *glist,  int *conformaction)
 {
     t_gobj *g;
-    post("conform glist %s", glist->gl_name->s_name);
+    /* post("conform glist %s", glist->gl_name->s_name); */
     for (g = glist->gl_list; g; g = g->g_next)
     {
     	if (pd_class(&g->g_pd) == scalar_class)

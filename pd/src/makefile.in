@@ -12,6 +12,10 @@ GUINAME= @GUINAME@
 INSTALL_PREFIX = @prefix@
 GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
+# there should be a better way to do this...
+prefix = @prefix@
+MANDIR = @mandir@
+
 # ALSA compilation
 
 SOUND_ALSA = @alsa@
@@ -105,7 +109,7 @@ GOBJ = $(GSRC:.c=.o)
 #  ------------------ targets ------------------------------------
 #
 
-.PHONY: pd gui externs
+.PHONY: pd gui externs all
 
 all: $(PDEXEC) $(BIN_DIR)/pd-watchdog $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
     $(BIN_DIR)/pdreceive  $(BIN_DIR)/pd.tk externs
@@ -164,7 +168,9 @@ externs:
 	cd ../extra/pique;make @EXTERNTARGET@
 
 INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
-install: 
+MANINSTDIR = $(DESTDIR)/$(MANDIR)
+
+install:  all
 	install -d $(INSTDIR)/lib/pd/bin
 	install $(BIN_DIR)/$(GUINAME) $(INSTDIR)/lib/pd/bin/$(GUINAME)
 	install $(BIN_DIR)/pd-watchdog $(INSTDIR)/lib/pd/bin/pd-watchdog
@@ -179,12 +185,13 @@ install:
 	cp -r ../doc $(INSTDIR)/lib/pd/
 	install -d $(INSTDIR)/include
 	install -m644 m_pd.h $(INSTDIR)/include/m_pd.h
-	gzip < ../man/pd.1 >  $(INSTDIR)/man/man1/pd.1.gz
-	chmod 644 $(INSTDIR)/man/man1/pd.1.gz
-	gzip < ../man/pdsend.1 >  $(INSTDIR)/man/man1/pdsend.1.gz
-	chmod 644 $(INSTDIR)/man/man1/pdsend.1.gz
-	gzip < ../man/pdreceive.1 >  $(INSTDIR)/man/man1/pdreceive.1.gz
-	chmod 644 $(INSTDIR)/man/man1/pdreceive.1.gz
+	install -d $(MANINSTDIR)/man1
+	gzip < ../man/pd.1 >  $(MANINSTDIR)/man1/pd.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pd.1.gz
+	gzip < ../man/pdsend.1 >  $(MANINSTDIR)/man1/pdsend.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pdsend.1.gz
+	gzip < ../man/pdreceive.1 >  $(MANINSTDIR)/man1/pdreceive.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pdreceive.1.gz
 
 local-clean:
 	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
@@ -219,9 +226,9 @@ uninstall:
 	-rm $(INSTDIR)/bin/pdsend
 	-rm $(INSTDIR)/bin/pdreceive
 	-rm $(INSTDIR)/include/m_pd.h
-	-rm $(INSTDIR)/man/man1/pd.1.gz
-	-rm $(INSTDIR)/man/man1/pdsend.1.gz
-	-rm $(INSTDIR)/man/man1/pdreceive.1.gz
+	-rm $(MANINSTDIR)/man/man1/pd.1.gz
+	-rm $(MANINSTDIR)/man/man1/pdsend.1.gz
+	-rm $(MANINSTDIR)/man/man1/pdreceive.1.gz
 
 include makefile.dependencies
 

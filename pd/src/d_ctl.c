@@ -105,9 +105,9 @@ static t_int *line_perform(t_int *w)
     t_float *out = (t_float *)(w[2]);
     int n = (int)(w[3]);
     float f = x->x_value;
-	/* bash NANs and underflow/overflow hazards to zero */
-    if (!((f > 1.0e-20f && f < 1.0e20f) || (f < -1e-20f && f > -1e20)))
-	x->x_value = f = 0;
+
+    if (PD_BADFLOAT(f))
+	    x->x_value = f = 0;
     if (x->x_retarget)
     {
     	int nticks = x->x_inletwas * x->x_msectodsptick;

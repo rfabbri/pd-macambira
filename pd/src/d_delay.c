@@ -78,8 +78,7 @@ static t_int *sigdelwrite_perform(t_int *w)
     while (n--)
     {
     	float f = *in++;
-	    /* bash NANs and underflow/overflow hazards to zero */
-	if (!((f > 1.0e-20f && f < 1.0e20f) || (f < -1e-20f && f > -1e20)))
+    	if (PD_BADFLOAT(f))
 	    f = 0;
     	*bp++ = f;
     	if (bp == ep)

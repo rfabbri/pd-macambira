@@ -412,15 +412,24 @@ void sys_pollmidiinqueue( void)
     comes in, as a result of our calling sys_poll_midi.  We stick it on a
     timetag queue and dispatch it at the appropriate logical time. */
 
+
 void sys_midibytein(int portno, int byte)
 {
+    static int warned = 0;
     t_midiqelem *midiqelem;
     int newhead = midi_inhead +1;
     if (newhead == MIDIQSIZE)
     	newhead = 0;
     	    /* if FIFO is full flush an element to make room */
     if (newhead == midi_intail)
-    	post("flush"), sys_dispatchnextmidiin();
+    {
+    	if (!warned)
+	{
+	    post("warning: MIDI timing FIFO overflowed");
+	    warned = 1;
+	}
+	sys_dispatchnextmidiin();
+    }
     midi_inqueue[midi_inhead].q_portno = portno;
     midi_inqueue[midi_inhead].q_onebyte = 1;
     midi_inqueue[midi_inhead].q_byte1 = byte;

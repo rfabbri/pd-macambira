@@ -349,7 +349,7 @@ void pdgui_setname(char *s)
 
 int Pdtcl_Init(Tcl_Interp *interp)
 {
-	char *myvalue = Tcl_GetVar(interp, "argv", 0);
+	const char *myvalue = Tcl_GetVar(interp, "argv", 0);
 	int myportno;
 	if (myvalue && (myportno = atoi(myvalue)) > 1)
 			pdgui_setsock(myportno);

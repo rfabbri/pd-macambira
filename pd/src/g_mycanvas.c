@@ -95,12 +95,10 @@ void my_canvas_draw_select(t_my_canvas* x, t_glist* glist)
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, x->x_gui.x_bcol);
     }
 }
@@ -261,21 +259,6 @@ static void my_canvas_label_pos(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
 static void my_canvas_label_font(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_label_font((void *)x, &x->x_gui, s, ac, av);}
 
-static void my_canvas_list(t_my_canvas *x, t_symbol *s, int ac, t_atom *av)
-{
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    /*if(l < 0)
-    {
-	post("error: my_canvas: no method for 'list'");
-    }
-    else */if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
-}
-
 static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_my_canvas *x = (t_my_canvas *)pd_new(my_canvas_class);
@@ -397,8 +380,6 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
 
 static void my_canvas_ff(t_my_canvas *x)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     gfxstub_deleteforkey(x);
@@ -409,7 +390,6 @@ void g_mycanvas_setup(void)
     my_canvas_class = class_new(gensym("cnv"), (t_newmethod)my_canvas_new,
 				(t_method)my_canvas_ff, sizeof(t_my_canvas), CLASS_NOINLET, A_GIMME, 0);
     class_addcreator((t_newmethod)my_canvas_new, gensym("my_canvas"), A_GIMME, 0);
-    class_addlist(my_canvas_class, my_canvas_list);
     class_addmethod(my_canvas_class, (t_method)my_canvas_dialog, gensym("dialog"), A_GIMME, 0);
     class_addmethod(my_canvas_class, (t_method)my_canvas_size, gensym("size"), A_GIMME, 0);
     class_addmethod(my_canvas_class, (t_method)my_canvas_delta, gensym("delta"), A_GIMME, 0);
@@ -423,8 +403,6 @@ void g_mycanvas_setup(void)
     class_addmethod(my_canvas_class, (t_method)my_canvas_label_font, gensym("label_font"), A_GIMME, 0);
     class_addmethod(my_canvas_class, (t_method)my_canvas_get_pos, gensym("get_pos"), 0);
 
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
     my_canvas_widgetbehavior.w_getrectfn = my_canvas_getrect;
     my_canvas_widgetbehavior.w_displacefn = iemgui_displace;
     my_canvas_widgetbehavior.w_selectfn = iemgui_select;

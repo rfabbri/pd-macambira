@@ -26,8 +26,6 @@
 
 /*------------------ global varaibles -------------------------*/
 
-t_symbol *iemgui_key_sym=0;
-
 int iemgui_color_hex[]=
 {
     16579836, 10526880, 4210752, 16572640, 16572608,
@@ -739,56 +737,6 @@ void iemgui_color(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av)
 	iemgui->x_lcol = iemgui_compatible_col(atom_getintarg(1, ac, av));
     if(glist_isvisible(iemgui->x_glist))
 	(*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_CONFIG);
-}
-
-int iemgui_list(void *x, t_iemgui *iemgui, t_symbol *s, int ac, t_atom *av)
-{
-    if(iemgui->x_fsf.x_selected)
-    {
-	if((ac == 2)&&IS_A_FLOAT(av,0)&&IS_A_SYMBOL(av,1))
-	{
-	    t_symbol *key = atom_getsymbolarg(1, ac, av);
-	    int keydown = atom_getintarg(0, ac, av);
-
-	    if(keydown)
-	    {
-		int refresh = 1,i,d=1;
-		static char buf[20];
-
-		buf[0] = 0;
-		if(!strcmp(key->s_name, "Shift_L")||!strcmp(key->s_name, "Shift_R"))
-		    iemgui->x_fsf.x_shiftdown = 1;
-		else
-		{
-		    if(iemgui->x_fsf.x_shiftdown)
-			d = 10;
-		    if(!strcmp(key->s_name, "Up"))
-			iemgui->x_obj.te_ypix -= d;
-		    else if(!strcmp(key->s_name, "Down"))
-			iemgui->x_obj.te_ypix += d;
-		    else if(!strcmp(key->s_name, "Left"))
-			iemgui->x_obj.te_xpix -= d;
-		    else if(!strcmp(key->s_name, "Right"))
-			iemgui->x_obj.te_xpix += d;
-		    else
-			refresh = 0;
-		    if(refresh)
-			return(1);
-		}
-		return(0);
-	    }
-	    else
-	    {
-		if(!strcmp(key->s_name, "Shift_L")||!strcmp(key->s_name, "Shift_R"))
-		    iemgui->x_fsf.x_shiftdown = 0;
-		return(0);
-	    }
-	}
-	else
-	    return(-1);
-    }
-    else
-	return(-1);
 }
 
 void iemgui_displace(t_gobj *z, t_glist *glist, int dx, int dy)

@@ -43,6 +43,15 @@ void binbuf_free(t_binbuf *x)
     t_freebytes(x,  sizeof(*x));
 }
 
+t_binbuf *binbuf_duplicate(t_binbuf *y)
+{
+    t_binbuf *x = (t_binbuf *)t_getbytes(sizeof(*x));
+    x->b_n = y->b_n;
+    x->b_vec = t_getbytes(x->b_n * sizeof(*x->b_vec));
+    memcpy(x->b_vec, y->b_vec, x->b_n * sizeof(*x->b_vec));
+    return (x);
+}
+
 void binbuf_clear(t_binbuf *x)
 {
     x->b_vec = t_resizebytes(x->b_vec, x->b_n * sizeof(*x->b_vec), 0);
@@ -729,7 +738,7 @@ int binbuf_write(t_binbuf *x, char *filename, char *dir, int crflag)
     	    bp += length;
 	    ncolumn += length;
     	}
-    	if (ap->a_type == A_SEMI || ncolumn > 65)
+    	if (ap->a_type == A_SEMI || (!crflag && ncolumn > 65))
 	{
 	    *bp++ = '\n';
 	    ncolumn = 0;

@@ -4,7 +4,6 @@
 
 /*  "filters", both linear and nonlinear. 
 */
-
 #include "m_pd.h"
 #include <math.h>
 
@@ -65,9 +64,8 @@ static t_int *sighip_perform(t_int *w)
 	*out++ = new - last;
 	last = new;
     }
-    	/* NAN protect */
-    if (!((last <= 0) || (last >= 0)))
-    	last = 0;
+    if (PD_BADFLOAT(last))
+	last = 0; 
     c->c_x = last;
     return (w+5);
 }
@@ -158,8 +156,7 @@ static t_int *siglop_perform(t_int *w)
     float feedback = 1 - coef;
     for (i = 0; i < n; i++)
 	last = *out++ = coef * *in++ + feedback * last;
-    	    /* NAN protect */
-    if (!((last <= 0) || (last >= 0)))
+    if (PD_BADFLOAT(last))
     	last = 0;
     c->c_x = last;
     return (w+5);
@@ -290,10 +287,9 @@ static t_int *sigbp_perform(t_int *w)
 	prev = last;
 	last = output;
     }
-    	    /* NAN protect */
-    if (!((last <= 0) || (last >= 0)))
+    if (PD_BADFLOAT(last))
     	last = 0;
-    if (!((prev <= 0) || (prev >= 0)))
+    if (PD_BADFLOAT(prev))
     	prev = 0;
     c->c_x1 = last;
     c->c_x2 = prev;
@@ -376,6 +372,8 @@ static t_int *sigbiquad_perform(t_int *w)
     for (i = 0; i < n; i++)
     {
     	float output =  *in++ + fb1 * last + fb2 * prev;
+	if (PD_BADFLOAT(output))
+	    output = 0; 
     	*out++ = ff1 * output + ff2 * last + ff3 * prev;
 	prev = last;
 	last = output;

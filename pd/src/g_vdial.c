@@ -2,7 +2,10 @@
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution. */
 
-/* vdial.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
+/* vradio.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
+
+/* name change to vradio by MSP (it's a radio button really) and changed to
+put out a "float" as in sliders, toggles, etc. */
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +17,7 @@
 #include "g_all_guis.h"
 #include <math.h>
 
-/*------------------ global varaibles -------------------------*/
+/*------------------ global variables -------------------------*/
 
 
 /*------------------ global functions -------------------------*/
@@ -22,14 +25,14 @@
 
 
 
-/* ------------- vdl     gui-vertical dial ---------------------- */
+/* ------------- vdl     gui-vertical radio button ---------------------- */
 
-t_widgetbehavior vdial_widgetbehavior;
-static t_class *vdial_class;
+t_widgetbehavior vradio_widgetbehavior;
+static t_class *vradio_class, *vradio_old_class;
 
 /* widget helper functions */
 
-void vdial_draw_update(t_vdial *x, t_glist *glist)
+void vradio_draw_update(t_vradio *x, t_glist *glist)
 {
     if(glist_isvisible(glist))
     {
@@ -44,7 +47,7 @@ void vdial_draw_update(t_vdial *x, t_glist *glist)
     }
 }
 
-void vdial_draw_new(t_vdial *x, t_glist *glist)
+void vradio_draw_new(t_vradio *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dy=x->x_gui.x_h, s4=dy/4;
@@ -82,7 +85,7 @@ void vdial_draw_new(t_vdial *x, t_glist *glist)
 	     canvas, xx11, yy11b, xx11 + IOWIDTH, yy11b+1, x, 0);
 }
 
-void vdial_draw_move(t_vdial *x, t_glist *glist)
+void vradio_draw_move(t_vradio *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i, dy=x->x_gui.x_h, s4=dy/4;
@@ -113,7 +116,7 @@ void vdial_draw_move(t_vdial *x, t_glist *glist)
 	     canvas, x, 0, xx11, yy11b, xx11 + IOWIDTH, yy11b+1);
 }
 
-void vdial_draw_erase(t_vdial* x, t_glist* glist)
+void vradio_draw_erase(t_vradio* x, t_glist* glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
@@ -130,7 +133,7 @@ void vdial_draw_erase(t_vdial* x, t_glist* glist)
         sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
 }
 
-void vdial_draw_config(t_vdial* x, t_glist* glist)
+void vradio_draw_config(t_vradio* x, t_glist* glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
@@ -149,7 +152,7 @@ void vdial_draw_config(t_vdial* x, t_glist* glist)
     }
 }
 
-void vdial_draw_io(t_vdial* x, t_glist* glist, int old_snd_rcv_flags)
+void vradio_draw_io(t_vradio* x, t_glist* glist, int old_snd_rcv_flags)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int xpos=text_xpix(&x->x_gui.x_obj, glist);
@@ -172,14 +175,13 @@ void vdial_draw_io(t_vdial* x, t_glist* glist, int old_snd_rcv_flags)
 	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
 }
 
-void vdial_draw_select(t_vdial* x, t_glist* glist)
+void vradio_draw_select(t_vradio* x, t_glist* glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
     int n=x->x_number, i;
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	for(i=0; i<n; i++)
 	{
 	    sys_vgui(".x%x.c itemconfigure %xBASE%d -outline #%6.6x\n", canvas, x, i,
@@ -189,7 +191,6 @@ void vdial_draw_select(t_vdial* x, t_glist* glist)
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	for(i=0; i<n; i++)
 	{
 	    sys_vgui(".x%x.c itemconfigure %xBASE%d -outline #%6.6x\n", canvas, x, i,
@@ -200,29 +201,29 @@ void vdial_draw_select(t_vdial* x, t_glist* glist)
     }
 }
 
-void vdial_draw(t_vdial *x, t_glist *glist, int mode)
+void vradio_draw(t_vradio *x, t_glist *glist, int mode)
 {
     if(mode == IEM_GUI_DRAW_MODE_UPDATE)
-	vdial_draw_update(x, glist);
+	vradio_draw_update(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_MOVE)
-	vdial_draw_move(x, glist);
+	vradio_draw_move(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_NEW)
-	vdial_draw_new(x, glist);
+	vradio_draw_new(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_SELECT)
-	vdial_draw_select(x, glist);
+	vradio_draw_select(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_ERASE)
-	vdial_draw_erase(x, glist);
+	vradio_draw_erase(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_CONFIG)
-	vdial_draw_config(x, glist);
+	vradio_draw_config(x, glist);
     else if(mode >= IEM_GUI_DRAW_MODE_IO)
-	vdial_draw_io(x, glist, mode - IEM_GUI_DRAW_MODE_IO);
+	vradio_draw_io(x, glist, mode - IEM_GUI_DRAW_MODE_IO);
 }
 
 /* ------------------------ vdl widgetbehaviour----------------------------- */
 
-static void vdial_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *xp2, int *yp2)
+static void vradio_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *xp2, int *yp2)
 {
-    t_vdial *x = (t_vdial *)z;
+    t_vradio *x = (t_vradio *)z;
 
     *xp1 = text_xpix(&x->x_gui.x_obj, glist);
     *yp1 = text_ypix(&x->x_gui.x_obj, glist);
@@ -230,9 +231,9 @@ static void vdial_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *xp
     *yp2 = *yp1 + x->x_gui.x_h*x->x_number;
 }
 
-static void vdial_save(t_gobj *z, t_binbuf *b)
+static void vradio_save(t_gobj *z, t_binbuf *b)
 {
-    t_vdial *x = (t_vdial *)z;
+    t_vradio *x = (t_vradio *)z;
     int bflcol[3], *ip1, *ip2;
     t_symbol *srl[3];
 
@@ -242,7 +243,9 @@ static void vdial_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, "ssiisiiiisssiiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix,
 		(t_int)x->x_gui.x_obj.te_ypix,
-		gensym("vdl"), x->x_gui.x_w,
+		(pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class ?
+		    gensym("vdl") : gensym("vradio")),
+		x->x_gui.x_w,
 		x->x_change, (*ip1)&IEM_INIT_ARGS_ALL, x->x_number,
 		srl[0], srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
@@ -251,14 +254,14 @@ static void vdial_save(t_gobj *z, t_binbuf *b)
     binbuf_addv(b, ";");
 }
 
-static void vdial_properties(t_gobj *z, t_glist *owner)
+static void vradio_properties(t_gobj *z, t_glist *owner)
 {
-    t_vdial *x = (t_vdial *)z;
+    t_vradio *x = (t_vradio *)z;
     char buf[800];
     t_symbol *srl[3];
 
     iemgui_properties(&x->x_gui, srl);
-    sprintf(buf, "pdtk_iemgui_dialog %%s VDIAL \
+    sprintf(buf, "pdtk_iemgui_dialog %%s vradio \
 	    ----------dimensions(pix):----------- %d %d size: 0 0 empty \
 	    empty 0.0 empty 0.0 empty %d \
 	    %d new-only new&old %d %d number: %d \
@@ -276,7 +279,7 @@ static void vdial_properties(t_gobj *z, t_glist *owner)
     gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
 }
 
-static void vdial_dialog(t_vdial *x, t_symbol *s, int argc, t_atom *argv)
+static void vradio_dialog(t_vradio *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_symbol *srl[3];
     int a = (int)atom_getintarg(0, argc, argv);
@@ -309,7 +312,7 @@ static void vdial_dialog(t_vdial *x, t_symbol *s, int argc, t_atom *argv)
     }
 }
 
-static void vdial_set(t_vdial *x, t_floatarg f)
+static void vradio_set(t_vradio *x, t_floatarg f)
 {
     int i=(int)f;
     int old;
@@ -333,54 +336,30 @@ static void vdial_set(t_vdial *x, t_floatarg f)
     }
 }
 
-static void vdial_bang(t_vdial *x)
+static void vradio_bang(t_vradio *x)
 {
-    if((x->x_change)&&(x->x_on != x->x_on_old))
+    	/* compatibility with earlier  "vdial" behavior */
+    if (pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class)
     {
-	SETFLOAT(x->x_at, (float)x->x_on_old);
-	SETFLOAT(x->x_at+1, 0.0);
-	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
-	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
-	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
-    }
-    x->x_on_old = x->x_on;
-    SETFLOAT(x->x_at, (float)x->x_on);
-    SETFLOAT(x->x_at+1, 1.0);
-    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
-    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
-	pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
-}
-
-static void vdial_fout(t_vdial *x, t_floatarg f)
-{
-    int i=(int)f;
-
-    if(i < 0)
-	i = 0;
-    if(i >= x->x_number)
-	i = x->x_number-1;
-
-    if((x->x_change)&&(i != x->x_on_old))
-    {
-        SETFLOAT(x->x_at, (float)x->x_on_old);
-	SETFLOAT(x->x_at+1, 0.0);
-	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
-	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
-	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
-    }
-    if(x->x_on != x->x_on_old)
+	if((x->x_change)&&(x->x_on != x->x_on_old))
+	{
+	    SETFLOAT(x->x_at, (float)x->x_on_old);
+	    SETFLOAT(x->x_at+1, 0.0);
+	    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+		pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+	}
 	x->x_on_old = x->x_on;
-    x->x_on = i;
-    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
-    x->x_on_old = x->x_on;
-    SETFLOAT(x->x_at, (float)x->x_on);
-    SETFLOAT(x->x_at+1, 1.0);
-    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
-    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
-	pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+	SETFLOAT(x->x_at, (float)x->x_on);
+	SETFLOAT(x->x_at+1, 1.0);
+	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+    }
+    else outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on);
 }
 
-static void vdial_float(t_vdial *x, t_floatarg f)
+static void vradio_fout(t_vradio *x, t_floatarg f)
 {
     int i=(int)f;
 
@@ -389,9 +368,10 @@ static void vdial_float(t_vdial *x, t_floatarg f)
     if(i >= x->x_number)
 	i = x->x_number-1;
 
-    if((x->x_change)&&(i != x->x_on_old))
+    if (pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class)
     {
-	if(x->x_gui.x_fsf.x_put_in2out)
+    	    /* compatibility with earlier  "vdial" behavior */
+	if((x->x_change)&&(i != x->x_on_old))
 	{
             SETFLOAT(x->x_at, (float)x->x_on_old);
 	    SETFLOAT(x->x_at+1, 0.0);
@@ -399,44 +379,100 @@ static void vdial_float(t_vdial *x, t_floatarg f)
 	    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
 		pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
 	}
-    }
-    if(x->x_on != x->x_on_old)
+	if(x->x_on != x->x_on_old)
+	    x->x_on_old = x->x_on;
+	x->x_on = i;
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 	x->x_on_old = x->x_on;
-    x->x_on = i;
-    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
-    x->x_on_old = x->x_on;
-    if(x->x_gui.x_fsf.x_put_in2out)
-    {
 	SETFLOAT(x->x_at, (float)x->x_on);
-        SETFLOAT(x->x_at+1, 1.0);
+	SETFLOAT(x->x_at+1, 1.0);
 	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
 	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
 	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
     }
+    else
+    {
+    	outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on = i);
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+	x->x_on_old = x->x_on;
+    }
 }
 
-static void vdial_click(t_vdial *x, t_floatarg xpos, t_floatarg ypos,
+static void vradio_float(t_vradio *x, t_floatarg f)
+{
+    int i=(int)f;
+
+    if(i < 0)
+	i = 0;
+    if(i >= x->x_number)
+	i = x->x_number-1;
+
+    if (pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class)
+    {
+    	    /* compatibility with earlier  "vdial" behavior */
+	if((x->x_change)&&(i != x->x_on_old))
+	{
+	    if(x->x_gui.x_fsf.x_put_in2out)
+	    {
+        	SETFLOAT(x->x_at, (float)x->x_on_old);
+		SETFLOAT(x->x_at+1, 0.0);
+		outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+		if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+		    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+	    }
+	}
+	if(x->x_on != x->x_on_old)
+	    x->x_on_old = x->x_on;
+	x->x_on = i;
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+	x->x_on_old = x->x_on;
+	if(x->x_gui.x_fsf.x_put_in2out)
+	{
+	    SETFLOAT(x->x_at, (float)x->x_on);
+            SETFLOAT(x->x_at+1, 1.0);
+	    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+		pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+	}
+    }
+    else
+    {
+    	x->x_on = i;
+	if (x->x_gui.x_fsf.x_put_in2out)
+	{
+	    outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on);
+	    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+		pd_float(x->x_gui.x_snd->s_thing, x->x_on);
+	}
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+	x->x_on_old = x->x_on;
+    }
+}
+
+static void vradio_click(t_vradio *x, t_floatarg xpos, t_floatarg ypos,
     t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
 {
     int yy =  (int)ypos - text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist);
 
-    vdial_fout(x, (float)(yy / x->x_gui.x_h));
+    vradio_fout(x, (float)(yy / x->x_gui.x_h));
 }
 
-static int vdial_newclick(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
+static int vradio_newclick(t_gobj *z, struct _glist *glist,
+    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
     if(doit)
-	vdial_click((t_vdial *)z, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift, 0, (t_floatarg)alt);
+	vradio_click((t_vradio *)z, (t_floatarg)xpix, (t_floatarg)ypix,
+	    (t_floatarg)shift, 0, (t_floatarg)alt);
     return (1);
 }
 
-static void vdial_loadbang(t_vdial *x)
+static void vradio_loadbang(t_vradio *x)
 {
     if(!sys_noloadbang && x->x_gui.x_isa.x_loadinit)
-	vdial_bang(x);
+	vradio_bang(x);
 }
 
-static void vdial_number(t_vdial *x, t_floatarg num)
+static void vradio_number(t_vradio *x, t_floatarg num)
 {
     int n=(int)num;
 
@@ -455,67 +491,51 @@ static void vdial_number(t_vdial *x, t_floatarg num)
     }
 }
 
-static void vdial_size(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_size(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {
     x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
     x->x_gui.x_h = x->x_gui.x_w;
     iemgui_size((void *)x, &x->x_gui);
 }
 
-static void vdial_delta(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_delta(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_delta((void *)x, &x->x_gui, s, ac, av);}
 
-static void vdial_pos(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_pos(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_pos((void *)x, &x->x_gui, s, ac, av);}
 
-static void vdial_color(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_color(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_color((void *)x, &x->x_gui, s, ac, av);}
 
-static void vdial_send(t_vdial *x, t_symbol *s)
+static void vradio_send(t_vradio *x, t_symbol *s)
 {iemgui_send(x, &x->x_gui, s);}
 
-static void vdial_receive(t_vdial *x, t_symbol *s)
+static void vradio_receive(t_vradio *x, t_symbol *s)
 {iemgui_receive(x, &x->x_gui, s);}
 
-static void vdial_label(t_vdial *x, t_symbol *s)
+static void vradio_label(t_vradio *x, t_symbol *s)
 {iemgui_label((void *)x, &x->x_gui, s);}
 
-static void vdial_label_pos(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_label_pos(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_label_pos((void *)x, &x->x_gui, s, ac, av);}
 
-static void vdial_label_font(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void vradio_label_font(t_vradio *x, t_symbol *s, int ac, t_atom *av)
 {iemgui_label_font((void *)x, &x->x_gui, s, ac, av);}
 
-static void vdial_init(t_vdial *x, t_floatarg f)
+static void vradio_init(t_vradio *x, t_floatarg f)
 {
     x->x_gui.x_isa.x_loadinit = (f==0.0)?0:1;
 }
 
-static void vdial_double_change(t_vdial *x)
+static void vradio_double_change(t_vradio *x)
 {x->x_change = 1;}
 
-static void vdial_single_change(t_vdial *x)
+static void vradio_single_change(t_vradio *x)
 {x->x_change = 0;}
 
-static void vdial_list(t_vdial *x, t_symbol *s, int ac, t_atom *av)
+static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 {
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    if(l < 0)
-    {
-	if(IS_A_FLOAT(av,0))
-	    vdial_float(x, atom_getfloatarg(0, ac, av));
-    }
-    else if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
-}
-
-static void *vdial_new(t_symbol *s, int argc, t_atom *argv)
-{
-    t_vdial *x = (t_vdial *)pd_new(vdial_class);
+    t_vradio *x = (t_vradio *)pd_new(old? vradio_old_class : vradio_class);
     int bflcol[]={-262144, -1, -1};
     t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
@@ -526,6 +546,7 @@ static void *vdial_new(t_symbol *s, int argc, t_atom *argv)
     t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
+    /* post("new %s %d", s->s_name, old); */
     srl[0] = gensym("empty");
     srl[1] = gensym("empty");
     srl[2] = gensym("empty");
@@ -573,7 +594,7 @@ static void *vdial_new(t_symbol *s, int argc, t_atom *argv)
 	bflcol[2] = (int)atom_getintarg(13, argc, argv);
 	on = (int)atom_getintarg(14, argc, argv);
     }
-    x->x_gui.x_draw = (t_iemfunptr)vdial_draw;
+    x->x_gui.x_draw = (t_iemfunptr)vradio_draw;
     iinit &= IEM_INIT_ARGS_ALL;
     ifstyle &= IEM_FSTYLE_FLAGS_ALL;
     fstyle->x_snd_able = 1;
@@ -621,52 +642,99 @@ static void *vdial_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 }
 
-static void vdial_ff(t_vdial *x)
+static void *vradio_new(t_symbol *s, int argc, t_atom *argv)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
+    return (vradio_donew(s, argc, argv, 0));
+}
+
+static void *vdial_new(t_symbol *s, int argc, t_atom *argv)
+{
+    return (vradio_donew(s, argc, argv, 1));
+}
+
+static void vradio_ff(t_vradio *x)
+{
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     gfxstub_deleteforkey(x);
 }
 
-void g_vdial_setup(void)
+void g_vradio_setup(void)
 {
-    vdial_class = class_new(gensym("vdl"), (t_newmethod)vdial_new,
-			    (t_method)vdial_ff, sizeof(t_vdial), 0, A_GIMME, 0);
-    class_addbang(vdial_class, vdial_bang);
-    class_addfloat(vdial_class, vdial_float);
-    class_addlist(vdial_class, vdial_list);
-    class_addmethod(vdial_class, (t_method)vdial_click, gensym("click"),
+    vradio_class = class_new(gensym("vradio"), (t_newmethod)vradio_new,
+    	(t_method)vradio_ff, sizeof(t_vradio), 0, A_GIMME, 0);
+    class_addbang(vradio_class, vradio_bang);
+    class_addfloat(vradio_class, vradio_float);
+    class_addmethod(vradio_class, (t_method)vradio_click, gensym("click"),
 		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
-    class_addmethod(vdial_class, (t_method)vdial_dialog, gensym("dialog"),
+    class_addmethod(vradio_class, (t_method)vradio_dialog, gensym("dialog"),
 		    A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_loadbang, gensym("loadbang"), 0);
-    class_addmethod(vdial_class, (t_method)vdial_set, gensym("set"), A_FLOAT, 0);
-    class_addmethod(vdial_class, (t_method)vdial_size, gensym("size"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_delta, gensym("delta"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_pos, gensym("pos"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_color, gensym("color"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_send, gensym("send"), A_DEFSYM, 0);
-    class_addmethod(vdial_class, (t_method)vdial_receive, gensym("receive"), A_DEFSYM, 0);
-    class_addmethod(vdial_class, (t_method)vdial_label, gensym("label"), A_DEFSYM, 0);
-    class_addmethod(vdial_class, (t_method)vdial_label_pos, gensym("label_pos"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_label_font, gensym("label_font"), A_GIMME, 0);
-    class_addmethod(vdial_class, (t_method)vdial_init, gensym("init"), A_FLOAT, 0);
-    class_addmethod(vdial_class, (t_method)vdial_number, gensym("number"), A_FLOAT, 0);
-    class_addmethod(vdial_class, (t_method)vdial_single_change, gensym("single_change"), 0);
-    class_addmethod(vdial_class, (t_method)vdial_double_change, gensym("double_change"), 0);
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
-    vdial_widgetbehavior.w_getrectfn = vdial_getrect;
-    vdial_widgetbehavior.w_displacefn = iemgui_displace;
-    vdial_widgetbehavior.w_selectfn = iemgui_select;
-    vdial_widgetbehavior.w_activatefn = NULL;
-    vdial_widgetbehavior.w_deletefn = iemgui_delete;
-    vdial_widgetbehavior.w_visfn = iemgui_vis;
-    vdial_widgetbehavior.w_clickfn = vdial_newclick;
-    vdial_widgetbehavior.w_propertiesfn = vdial_properties;
-    vdial_widgetbehavior.w_savefn = vdial_save;
-    class_setwidget(vdial_class, &vdial_widgetbehavior);
-    class_sethelpsymbol(vdial_class, gensym("vdial"));
+    class_addmethod(vradio_class, (t_method)vradio_loadbang,
+    	gensym("loadbang"), 0);
+    class_addmethod(vradio_class, (t_method)vradio_set,
+    	gensym("set"), A_FLOAT, 0);
+    class_addmethod(vradio_class, (t_method)vradio_size,
+    	gensym("size"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_delta,
+    	gensym("delta"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_pos,
+    	gensym("pos"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_color,
+    	gensym("color"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_send,
+    	gensym("send"), A_DEFSYM, 0);
+    class_addmethod(vradio_class, (t_method)vradio_receive,
+    	gensym("receive"), A_DEFSYM, 0);
+    class_addmethod(vradio_class, (t_method)vradio_label,
+    	gensym("label"), A_DEFSYM, 0);
+    class_addmethod(vradio_class, (t_method)vradio_label_pos,
+    	gensym("label_pos"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_label_font,
+    	gensym("label_font"), A_GIMME, 0);
+    class_addmethod(vradio_class, (t_method)vradio_init,
+    	gensym("init"), A_FLOAT, 0);
+    class_addmethod(vradio_class, (t_method)vradio_number,
+    	gensym("number"), A_FLOAT, 0);
+    class_addmethod(vradio_class, (t_method)vradio_single_change,
+    	gensym("single_change"), 0);
+    class_addmethod(vradio_class, (t_method)vradio_double_change,
+    	gensym("double_change"), 0);
+    vradio_widgetbehavior.w_getrectfn = vradio_getrect;
+    vradio_widgetbehavior.w_displacefn = iemgui_displace;
+    vradio_widgetbehavior.w_selectfn = iemgui_select;
+    vradio_widgetbehavior.w_activatefn = NULL;
+    vradio_widgetbehavior.w_deletefn = iemgui_delete;
+    vradio_widgetbehavior.w_visfn = iemgui_vis;
+    vradio_widgetbehavior.w_clickfn = vradio_newclick;
+    vradio_widgetbehavior.w_propertiesfn = vradio_properties;
+    vradio_widgetbehavior.w_savefn = vradio_save;
+    class_setwidget(vradio_class, &vradio_widgetbehavior);
+    class_sethelpsymbol(vradio_class, gensym("vradio"));
+
+    	/* obsolete version (0.34-0.35) */
+    vradio_old_class = class_new(gensym("vdl"), (t_newmethod)vdial_new,
+	(t_method)vradio_ff, sizeof(t_vradio), 0, A_GIMME, 0);
+    class_addbang(vradio_old_class, vradio_bang);
+    class_addfloat(vradio_old_class, vradio_float);
+    class_addmethod(vradio_old_class, (t_method)vradio_click, gensym("click"),
+		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_dialog, gensym("dialog"),
+		    A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_loadbang, gensym("loadbang"), 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_set, gensym("set"), A_FLOAT, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_size, gensym("size"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_delta, gensym("delta"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_pos, gensym("pos"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_color, gensym("color"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_send, gensym("send"), A_DEFSYM, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_receive, gensym("receive"), A_DEFSYM, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_label, gensym("label"), A_DEFSYM, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_label_pos, gensym("label_pos"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_label_font, gensym("label_font"), A_GIMME, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_init, gensym("init"), A_FLOAT, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_number, gensym("number"), A_FLOAT, 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_single_change, gensym("single_change"), 0);
+    class_addmethod(vradio_old_class, (t_method)vradio_double_change, gensym("double_change"), 0);
+    class_setwidget(vradio_old_class, &vradio_widgetbehavior);
+    class_sethelpsymbol(vradio_old_class, gensym("vradio"));
 }

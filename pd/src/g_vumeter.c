@@ -330,7 +330,6 @@ static void vu_draw_select(t_vu* x,t_glist* glist)
 
     if(x->x_gui.x_fsf.x_selected)
     {
-	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
 	for(i=1; i<=IEM_VU_STEPS; i++)
 	{
@@ -348,7 +347,6 @@ static void vu_draw_select(t_vu* x,t_glist* glist)
     }
     else
     {
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
 	sys_vgui(".x%x.c itemconfigure %xBASE -outline #%6.6x\n", canvas, x, IEM_GUI_COLOR_NORMAL);
 	for(i=1; i<=IEM_VU_STEPS; i++)
 	{
@@ -598,25 +596,6 @@ static void vu_ft1(t_vu *x, t_floatarg peak)
     vu_update_peak(x, x->x_gui.x_glist);
 }
 
-static void vu_list(t_vu *x, t_symbol *s, int ac, t_atom *av)
-{
-    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
-
-    if(l < 0)
-    {
-	if((IS_A_FLOAT(av,0))&&(IS_A_FLOAT(av,1)))
-	{
-	    vu_ft1(x, atom_getfloatarg(1, ac, av));
-	    vu_float(x, atom_getfloatarg(0, ac, av));
-	}
-    }
-    else if(l > 0)
-    {
-	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
-	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
-    }
-}
-
 static void vu_bang(t_vu *x)
 {
     outlet_float(x->x_out_peak, x->x_fp);
@@ -720,8 +699,6 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
 
 static void vu_free(t_vu *x)
 {
-    if(x->x_gui.x_fsf.x_selected)
-	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
     if(x->x_gui.x_fsf.x_rcv_able)
 	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     gfxstub_deleteforkey(x);
@@ -734,7 +711,6 @@ void g_vumeter_setup(void)
     class_addbang(vu_class,vu_bang);
     class_addfloat(vu_class,vu_float);
     class_addmethod(vu_class, (t_method)vu_ft1, gensym("ft1"), A_FLOAT, 0);
-    class_addlist(vu_class, vu_list);
     class_addmethod(vu_class, (t_method)vu_dialog, gensym("dialog"),
 		    A_GIMME, 0);
     class_addmethod(vu_class, (t_method)vu_size, gensym("size"), A_GIMME, 0);
@@ -746,8 +722,6 @@ void g_vumeter_setup(void)
     class_addmethod(vu_class, (t_method)vu_label, gensym("label"), A_DEFSYM, 0);
     class_addmethod(vu_class, (t_method)vu_label_pos, gensym("label_pos"), A_GIMME, 0);
     class_addmethod(vu_class, (t_method)vu_label_font, gensym("label_font"), A_GIMME, 0);
-    if(!iemgui_key_sym)
-	iemgui_key_sym = gensym("#keyname");
     vu_widgetbehavior.w_getrectfn =    vu_getrect;
     vu_widgetbehavior.w_displacefn =   iemgui_displace;
     vu_widgetbehavior.w_selectfn =     iemgui_select;

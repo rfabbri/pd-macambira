@@ -265,8 +265,10 @@ typedef struct _vdial
     t_atom   x_at[2];
 } t_vdial;
 
+#define t_vradio t_vdial
+#define t_hradio t_hdial
+
 extern int sys_noloadbang;
-extern t_symbol *iemgui_key_sym;
 extern int iemgui_color_hex[];
 extern int iemgui_vu_db2i[];
 extern int iemgui_vu_col[];
