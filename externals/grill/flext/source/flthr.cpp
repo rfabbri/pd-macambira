@@ -69,14 +69,14 @@ bool flext::StartHelper()
         // now we have to wait for thread helper to initialize
         while(!thrhelpid || !thrhelpcond) Sleep(0.001);
 
-        // we are reading for threading now!
+        // we are ready for threading now!
     }
 	return ok;
 }
 
 #if 0
 /*! \brief Stop helper thread
-	\note not called!
+	\note Never called!
 */
 bool flext::StopHelper()
 {
@@ -84,6 +84,7 @@ bool flext::StopHelper()
 	if(thrhelpcond) thrhelpcond->Signal();
 }
 #endif
+
 
 //! Static helper thread function
 void flext::ThrHelper(void *)
@@ -242,7 +243,7 @@ bool flext_base::StopThreads()
 {
 	thr_entry *t;
 
-	// signal termination
+	// signal termination for all object's threads
 	tlmutex.Lock();
 	for(t = thrhead; t; t = t->nxt) {
 		if(t->This() == this) t->shouldexit = true;
@@ -254,12 +255,16 @@ bool flext_base::StopThreads()
 	// wait for thread termination (1 second max.)
 	int cnt;
 	for(int wi = 0; wi < 100; ++wi) {
-		cnt = 0;
+        // lock and count this object's threads
 		tlmutex.Lock();
-		for(t = thrhead; t; t = t->nxt)
+		for(cnt = 0,t = thrhead; t; t = t->nxt)
 			if(t->This() == this) ++cnt;
 		tlmutex.Unlock();
+
+        // if no threads are remaining, we are done
 		if(!cnt) break;
+
+        // Wait
 		Sleep(0.01f);
 	}
 
