@@ -1,0 +1,72 @@
+current: all
+
+.SUFFIXES: .pd_darwin
+
+INCLUDE = -I. -I/usr/local/src/pd-0.37-1test6/src
+
+LDFLAGS = -export-dynamic -shared
+LIB = -ldl -lm -lpthread
+
+#select either the DBG and OPT compiler flags below:
+
+CFLAGS = -DPD -DUNIX -g -Wall -W -Werror -Wno-unused \
+	-Wno-parentheses -Wno-switch -O2 $(INCLUDE) $(UCFLAGS) $(AFLAGS) \
+
+MACOSXLINKFLAGS = -bundle -bundle_loader /usr/local/src/pd-0.37-1test6/bin/pd
+
+SYSTEM = $(shell uname -m)
+
+# the sources
+
+SRC = biquad_freq_resp.c \
+	db2v.c \
+	f2note.c \
+	forpp.c \
+	gate.c \
+	sigfilter.c \
+	sigFIR.c \
+	sighml_shelf.c \
+	sigiem_cot4.c \
+	sigiem_delay.c \
+	sigiem_pow4.c \
+	sigiem_sqrt4.c \
+	siglp1_t.c \
+	sigmov_avrg_kern.c \
+	sigpara_bp2.c \
+	sigpeakenv.c \
+	sigprvu.c \
+	sigpvu.c \
+	sigrvu.c \
+	sigsin_phase.c \
+	sigvcf_filter.c \
+	soundfile_info.c \
+	split.c \
+	v2db.c \
+	iemlib1.c
+
+TARGET = iemlib1.pd_darwin
+
+
+OBJ = $(SRC:.c=.o) 
+
+#
+#  ------------------ targets ------------------------------------
+#
+
+clean:
+	rm ../../lib/$(TARGET)
+	rm *.o
+
+all: $(OBJ)
+	@echo :: $(OBJ)
+	$(CC) $(MACOSXLINKFLAGS) -o $(TARGET) *.o $(LIB)
+	strip --strip-unneeded $(TARGET)
+	mv $(TARGET) ../../lib
+
+$(OBJ) : %.o : %.c
+	touch $*.c
+	$(CC) $(CFLAGS) -DPD $(INCLUDE) -c -o $*.o $*.c
+
+
+
+
