@@ -4077,6 +4077,8 @@ fi
 
 #AC_CHECK_HEADER(tcl.h,, echo "no tcl/tk header found" || exit 1)
 
+#	FreeBSD has lots of libs there ...
+LIBS="$LIBS -L/usr/local/lib"
 
 foundit=no
 if test $foundit == "no";
@@ -4402,7 +4404,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_7_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_7_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";LIBS="$LIBS -ltcl87 -ltk87";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";foundit=yes
 fi
 
 
@@ -4620,7 +4622,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_6_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_6_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";LIBS="$LIBS -ltcl86 -ltk86";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";foundit=yes
 fi
 
 
@@ -4839,7 +4841,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_5_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_5_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";LIBS="$LIBS -ltcl85 -ltk85";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";foundit=yes
 fi
 
 
@@ -5058,7 +5060,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_4_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_4_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";LIBS="$LIBS -ltcl84 -ltk84";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";foundit=yes
 fi
 
 
@@ -5277,7 +5279,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_3_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_3_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";LIBS="$LIBS -ltcl83 -ltk83";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";foundit=yes
 fi
 
 
@@ -5496,7 +5498,7 @@ echo "${ECHO_T}$ac_cv_header__usr_local_include_tcl8_2_tcl_h" >&6
 
 fi
 if test $ac_cv_header__usr_local_include_tcl8_2_tcl_h = yes; then
-  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";LIBS="$LIBS -ltcl82 -ltk82";foundit=yes
+  GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";foundit=yes
 fi
 
 
@@ -5568,6 +5570,58 @@ _ACEOF
   LIBS="-ltcl8.7 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltcl87" >&5
+echo $ECHO_N "checking for main in -ltcl87... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl87_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl87  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl87_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl87_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl87_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl87_main" >&6
+if test $ac_cv_lib_tcl87_main = yes; then
+  LIBS="$LIBS -ltcl87"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.6" >&5
 echo $ECHO_N "checking for main in -ltcl8.6... $ECHO_C" >&6
@@ -5625,6 +5679,58 @@ _ACEOF
 
   LIBS="-ltcl8.6 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltcl86" >&5
+echo $ECHO_N "checking for main in -ltcl86... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl86_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl86  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl86_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl86_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl86_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl86_main" >&6
+if test $ac_cv_lib_tcl86_main = yes; then
+  LIBS="$LIBS -ltcl86"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.5" >&5
@@ -5684,6 +5790,58 @@ _ACEOF
   LIBS="-ltcl8.5 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltcl85" >&5
+echo $ECHO_N "checking for main in -ltcl85... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl85_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl85  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl85_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl85_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl85_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl85_main" >&6
+if test $ac_cv_lib_tcl85_main = yes; then
+  LIBS="$LIBS -ltcl85"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.4" >&5
 echo $ECHO_N "checking for main in -ltcl8.4... $ECHO_C" >&6
@@ -5741,6 +5899,58 @@ _ACEOF
 
   LIBS="-ltcl8.4 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltcl84" >&5
+echo $ECHO_N "checking for main in -ltcl84... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl84_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl84  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl84_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl84_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl84_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl84_main" >&6
+if test $ac_cv_lib_tcl84_main = yes; then
+  LIBS="$LIBS -ltcl84"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.3" >&5
@@ -5800,6 +6010,58 @@ _ACEOF
   LIBS="-ltcl8.3 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltcl83" >&5
+echo $ECHO_N "checking for main in -ltcl83... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl83_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl83  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl83_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl83_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl83_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl83_main" >&6
+if test $ac_cv_lib_tcl83_main = yes; then
+  LIBS="$LIBS -ltcl83"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.2" >&5
 echo $ECHO_N "checking for main in -ltcl8.2... $ECHO_C" >&6
@@ -5857,6 +6119,220 @@ _ACEOF
 
   LIBS="-ltcl8.2 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltcl82" >&5
+echo $ECHO_N "checking for main in -ltcl82... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl82_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl82  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl82_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl82_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl82_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl82_main" >&6
+if test $ac_cv_lib_tcl82_main = yes; then
+  LIBS="$LIBS -ltcl82"
+else
+
+echo "$as_me:$LINENO: checking for main in -ltcl81" >&5
+echo $ECHO_N "checking for main in -ltcl81... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl81_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl81  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl81_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl81_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl81_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl81_main" >&6
+if test $ac_cv_lib_tcl81_main = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBTCL81 1
+_ACEOF
+
+  LIBS="-ltcl81 $LIBS"
+
+else
+  echo "$as_me:$LINENO: checking for main in -ltcl81" >&5
+echo $ECHO_N "checking for main in -ltcl81... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl81_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl81  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl81_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl81_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl81_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl81_main" >&6
+if test $ac_cv_lib_tcl81_main = yes; then
+  LIBS="$LIBS -ltcl81"
+else
+  echo "$as_me:$LINENO: checking for main in -ltcl80" >&5
+echo $ECHO_N "checking for main in -ltcl80... $ECHO_C" >&6
+if test "${ac_cv_lib_tcl80_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltcl80  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tcl80_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tcl80_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tcl80_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tcl80_main" >&6
+if test $ac_cv_lib_tcl80_main = yes; then
+  LIBS="$LIBS -ltcl80"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltcl8.0" >&5
@@ -5929,6 +6405,25 @@ fi
 
 fi
 
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+
 
 
 echo "$as_me:$LINENO: checking for main in -ltk8.7" >&5
@@ -5988,6 +6483,58 @@ _ACEOF
   LIBS="-ltk8.7 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltk87" >&5
+echo $ECHO_N "checking for main in -ltk87... $ECHO_C" >&6
+if test "${ac_cv_lib_tk87_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk87  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk87_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk87_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk87_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk87_main" >&6
+if test $ac_cv_lib_tk87_main = yes; then
+  LIBS="$LIBS -ltk87"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.6" >&5
 echo $ECHO_N "checking for main in -ltk8.6... $ECHO_C" >&6
@@ -6045,6 +6592,58 @@ _ACEOF
 
   LIBS="-ltk8.6 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltk86" >&5
+echo $ECHO_N "checking for main in -ltk86... $ECHO_C" >&6
+if test "${ac_cv_lib_tk86_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk86  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk86_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk86_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk86_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk86_main" >&6
+if test $ac_cv_lib_tk86_main = yes; then
+  LIBS="$LIBS -ltk86"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.5" >&5
@@ -6104,6 +6703,58 @@ _ACEOF
   LIBS="-ltk8.5 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltk85" >&5
+echo $ECHO_N "checking for main in -ltk85... $ECHO_C" >&6
+if test "${ac_cv_lib_tk85_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk85  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk85_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk85_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk85_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk85_main" >&6
+if test $ac_cv_lib_tk85_main = yes; then
+  LIBS="$LIBS -ltk85"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.4" >&5
 echo $ECHO_N "checking for main in -ltk8.4... $ECHO_C" >&6
@@ -6161,6 +6812,58 @@ _ACEOF
 
   LIBS="-ltk8.4 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltk84" >&5
+echo $ECHO_N "checking for main in -ltk84... $ECHO_C" >&6
+if test "${ac_cv_lib_tk84_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk84  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk84_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk84_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk84_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk84_main" >&6
+if test $ac_cv_lib_tk84_main = yes; then
+  LIBS="$LIBS -ltk84"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.3" >&5
@@ -6220,6 +6923,58 @@ _ACEOF
   LIBS="-ltk8.3 $LIBS"
 
 else
+  echo "$as_me:$LINENO: checking for main in -ltk83" >&5
+echo $ECHO_N "checking for main in -ltk83... $ECHO_C" >&6
+if test "${ac_cv_lib_tk83_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk83  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk83_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk83_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk83_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk83_main" >&6
+if test $ac_cv_lib_tk83_main = yes; then
+  LIBS="$LIBS -ltk83"
+else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.2" >&5
 echo $ECHO_N "checking for main in -ltk8.2... $ECHO_C" >&6
@@ -6277,6 +7032,220 @@ _ACEOF
 
   LIBS="-ltk8.2 $LIBS"
 
+else
+  echo "$as_me:$LINENO: checking for main in -ltk82" >&5
+echo $ECHO_N "checking for main in -ltk82... $ECHO_C" >&6
+if test "${ac_cv_lib_tk82_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk82  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk82_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk82_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk82_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk82_main" >&6
+if test $ac_cv_lib_tk82_main = yes; then
+  LIBS="$LIBS -ltk82"
+else
+
+echo "$as_me:$LINENO: checking for main in -ltk81" >&5
+echo $ECHO_N "checking for main in -ltk81... $ECHO_C" >&6
+if test "${ac_cv_lib_tk81_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk81  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk81_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk81_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk81_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk81_main" >&6
+if test $ac_cv_lib_tk81_main = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBTK81 1
+_ACEOF
+
+  LIBS="-ltk81 $LIBS"
+
+else
+  echo "$as_me:$LINENO: checking for main in -ltk81" >&5
+echo $ECHO_N "checking for main in -ltk81... $ECHO_C" >&6
+if test "${ac_cv_lib_tk81_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk81  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk81_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk81_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk81_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk81_main" >&6
+if test $ac_cv_lib_tk81_main = yes; then
+  LIBS="$LIBS -ltk81"
+else
+  echo "$as_me:$LINENO: checking for main in -ltk80" >&5
+echo $ECHO_N "checking for main in -ltk80... $ECHO_C" >&6
+if test "${ac_cv_lib_tk80_main+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltk80  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+
+#ifdef F77_DUMMY_MAIN
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+#endif
+int
+main ()
+{
+main ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_tk80_main=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_cv_lib_tk80_main=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_tk80_main" >&5
+echo "${ECHO_T}$ac_cv_lib_tk80_main" >&6
+if test $ac_cv_lib_tk80_main = yes; then
+  LIBS="$LIBS -ltk80"
 else
 
 echo "$as_me:$LINENO: checking for main in -ltk8.0" >&5
@@ -6349,6 +7318,25 @@ fi
 
 fi
 
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+fi
+
+
 
 
 if test `uname -s` = Linux;
@@ -6387,8 +7375,7 @@ fi
 
 if test `uname -s` = FreeBSD;
 then
-    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib -L/usr/local/lib/pth -lpthread"
-	LIBS="$LIBS -L/usr/local/lib"
+    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib/pth -lpthread"
     EXT=pd_linux
     MORECFLAGS="-DDL_OPEN  -DUSEAPI_OSS"
     CFLAGS="$CFLAGS -I/usr/local/include"
