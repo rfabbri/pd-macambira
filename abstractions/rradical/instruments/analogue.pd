@@ -12,8 +12,8 @@
 #X msg 572 170 control #4 \$1;
 #X obj 286 135 clip 0.0441 22005;
 #X obj 460 135 clip 0 1;
-#X obj 458 111 scale 0 127 0 1;
-#X obj 567 114 scale 0 127 0 1;
+#X obj 458 111 rrad.scale 0 127 0 1;
+#X obj 567 114 rrad.scale 0 127 0 1;
 #X obj 569 138 clip 0 1;
 #X obj 325 271 outlet~;
 #X obj 164 36 inlet waveform;

@@ -12,7 +12,7 @@ RRADical Pd
     Application Development", if it includes non-audio patches, with Pd. In
     the design of this system, a way to save state flexibly in Pd
     (persistence) had to be developed. For communication among each other
-    the RRADical patches integrates the Open Sound Control protocol.
+    the RRADical patches integrate the Open Sound Control protocol.
     
 
 What it takes to be a RRADical
@@ -44,7 +44,7 @@ the filter can also be done in advance inside of a so called abstraction,
 that is, in a saved Pd patch file. Thanks to the Graph-On-Parent feature of
 Pd the cutoff slider even can be made visible when using that abstraction in
 another patch. The new filter abstraction now carries its own GUI and is
-immediatly ready to be used. 
+immediately ready to be used. 
 
 Of course the GUI-filter is a rather simple example (although already quite
 useful). But building a graphical note sequencer with 32 sliders and 32
@@ -85,12 +85,9 @@ Pd author Miller S. Puckette writes about this in the Pd manual in section
     appearance, they are not saved as part of the file which specifies the
     patch and will be forgotten when the patch is reloaded.
 
-(I'll show an example of a float object changing "state" by a message in
-its right inlet here.)
-
 Still, in a musician's practice some kind of persistence turns out to be an
-important feature, that many Pd beginners do miss. And as soon as patched
-start to use lots of graphical control objects, users will - and should -
+important feature, that many Pd beginners do miss. And as soon as a patch
+starts to use lots of graphical control objects, users will - and should -
 play around with different settings until they find some combination they
 like. But unless a way to save this combination for later use is found, all
 this is temporary and gone, as soon as the patch is closed.
@@ -211,9 +208,6 @@ Nolan where - quoting IMDB:
     A man, suffering from short-term memory loss, uses notes and tattoos to
     hunt down his wife's killer.
 
-Here's a scene from "Memento": 
-
-.. image:: memento.png
 
 The movie's main character Leonard has a similar problem as Pd: he cannot
 remember things. To deal with his persistence problem, his inability to save
@@ -272,7 +266,7 @@ called "RRADICAL". The same ``pool RRADICAL`` also is used inside the
 ``originator`` object. This abstraction handles all access to this pool. A
 user should not read or write the contents of ``pool RRADICAL`` directly.
 The ``originator`` patch also handles the border crossing through OSC
-messages by it's rightmost inlet. The patch accepts two mandatory
+messages by its rightmost inlet. The patch accepts two mandatory
 arguments: The first on is the name under which this patch is to be stored
 inside the ``pool`` data. Each ``originator SomeName secondarg``  stores
 it's data in a virtual subdirectory inside the RRADICAL-pool called like
@@ -381,7 +375,7 @@ characteristics:
 
 I already developed a growing number of patches that follow the RRADical
 paradigm, among these are a complex pattern sequencer, some synths and
-effects and more. All those are available in the Pure data CVS, which
+effects and more. All those are available in the Pure Data CVS, which
 currently lives at pure-data.sourceforge.net_ in the directory
 "abstractions/rradical".
 The RRADical collection comes with a template file, called
@@ -403,7 +397,7 @@ all because it always seemed to be too complicated to bother with it. This
 limited my patches to being used in improvisational pieces without the
 possibility to prepare parts of a musical story in advance and to "design"
 those pieces. It was like being forced to write a book without having access
-to a sheet of paper (or a harddisk nowadays). This has change: having
+to a sheet of paper (or a harddisk nowadays). This has changed: having
 "paper" in great supply now has made it possible to "write" pieces of art,
 to "remember" what was good and what rather should not be repeated, to
 really "work" on a certain project over a longer time.
@@ -413,7 +407,7 @@ which is important as usage of Pd in workshops and at universities is
 growing -- also thanks to its availability as Free Software. RRADical
 patches directly can be used by novices as they are created just like any
 other patch, but they already provide sound creation and GUI elements that
-the students can use immediatly to create more satisfactory sounds that the
+the students can use immediately to create more satisfactory sounds that the
 sine waves used as standard examples in basic Pd tutorials. With a grown
 proficiency the students later can dive into the internals of a RRADical
 patch to see what's inside and how it was done.  This allows a new top-down

@@ -56,7 +56,7 @@
 #X floatatom 777 489 5 0 0 0 - - -;
 #X obj 808 460 ctlin;
 #X obj 641 442 ctlin;
-#X obj 639 466 scale 0 128 1 5;
+#X obj 639 466 rrad.scale 0 128 1 5;
 #X obj 851 534 route 15 14;
 #X obj 424 548 netcontrol /erster inst;
 #X obj 881 620 loadbang;
