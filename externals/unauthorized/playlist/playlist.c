@@ -757,5 +757,4 @@ void playlist_setup(void)
 #endif
 
     class_setwidget(playlist_class, &playlist_widgetbehavior);
-    class_sethelpsymbol(playlist_class, gensym("help-playlist.pd"));
 }

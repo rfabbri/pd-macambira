@@ -666,5 +666,4 @@ void mp3streamin_tilde_setup(void)
 
     class_addmethod(mp3streamin_class, nullfn, gensym("signal"), 0);
     class_addmethod(mp3streamin_class, (t_method) mp3streamin_dsp, gensym("dsp"), 0);
-    class_sethelpsymbol(mp3streamin_class, gensym("help-mp3live~.pd"));
 }

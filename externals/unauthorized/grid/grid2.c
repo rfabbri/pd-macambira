@@ -544,10 +544,11 @@ void grid_setup(void)
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     grid_widgetbehavior.w_propertiesfn = grid_properties;
     grid_widgetbehavior.w_savefn =       grid_save;
+/*  this is needed to make the help patch work on < 0.37  */
+    class_sethelpsymbol(grid_class, gensym("grid-help.pd"));
 #else
 	 class_setsavefn(grid_class, &grid_save);
 	 class_setpropertiesfn(grid_class, &grid_properties);
 #endif
     class_setwidget(grid_class, &grid_widgetbehavior);
-    class_sethelpsymbol(grid_class, gensym("help-grid.pd"));
 }

@@ -824,7 +824,6 @@ void exciter_setup(void)
 	 class_setpropertiesfn(exciter_class, &exciter_properties);
 #endif
     class_setwidget(exciter_class, &exciter_widgetbehavior);
-    class_sethelpsymbol(exciter_class, gensym("help-exciter.pd"));
 }
 
 /* OPTIONAL */

@@ -1355,7 +1355,6 @@ void cooled_tilde_setup(void)
     post(cooled_version);
     cooled_class = class_new(gensym("cooled~"), (t_newmethod)cooled_new, (t_method)cooled_free,
                     sizeof(t_cooled), 0, A_GIMME, 0);
-    class_sethelpsymbol( cooled_class, gensym("help-cooled~.pd") );
 
     // set callbacks
     cooled_widgetbehavior.w_getrectfn =    cooled_getrect;

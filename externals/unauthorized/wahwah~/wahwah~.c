@@ -396,7 +396,6 @@ void wahwah_tilde_setup(void)
     	sizeof(t_wahwah), 0, 0);
 
     CLASS_MAINSIGNALIN( wahwah_class, t_wahwah, x_f );
-    class_sethelpsymbol( wahwah_class, gensym("help-wahwah~.pd") );
     class_addmethod(wahwah_class, (t_method)wahwah_step, gensym("step"), A_FLOAT, 0);
     class_addmethod(wahwah_class, (t_method)wahwah_minfreq, gensym("minfreq"), A_FLOAT, 0);
     class_addmethod(wahwah_class, (t_method)wahwah_maxfreq, gensym("maxfreq"), A_FLOAT, 0);

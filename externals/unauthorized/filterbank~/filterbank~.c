@@ -668,5 +668,4 @@ void filterbank_tilde_setup(void)
 	 class_setpropertiesfn(filterbank_class_tilde, &filterbank_properties);
 #endif
     class_setwidget(filterbank_class_tilde, &filterbank_widgetbehavior);
-    class_sethelpsymbol(filterbank_class_tilde, gensym("help-filterbank~.pd"));
 }

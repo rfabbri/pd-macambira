@@ -1251,5 +1251,4 @@ void mp3amp_tilde_setup(void)
     class_addmethod(mp3amp_class, (t_method)mp3amp_connect_url, gensym("connecturl"), A_SYMBOL, 0);
     class_addmethod(mp3amp_class, (t_method)mp3amp_standby, gensym("standby"), A_DEFFLOAT, 0);
     class_addmethod(mp3amp_class, (t_method)mp3amp_disconnect, gensym("disconnect"), 0);
-    class_sethelpsymbol(mp3amp_class, gensym("help-mp3amp~.pd"));
 }

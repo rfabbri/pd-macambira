@@ -701,5 +701,4 @@ void probalizer_setup(void)
 	 class_setpropertiesfn(probalizer_class, &probalizer_properties);
 #endif
     class_setwidget(probalizer_class, &probalizer_widgetbehavior);
-    class_sethelpsymbol(probalizer_class, gensym("help-probalizer.pd"));
 }

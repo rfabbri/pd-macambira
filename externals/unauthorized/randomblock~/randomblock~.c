@@ -115,5 +115,4 @@ void randomblock_tilde_setup(void)
         sizeof(t_randomblock), 0, A_DEFFLOAT, 0);
   class_addmethod( randomblock_class, (t_method)randomblock_dsp, gensym("dsp"), 0);
   class_addmethod( randomblock_class, (t_method)randomblock_limit, gensym("limit"), A_FLOAT, 0);
-  class_sethelpsymbol( randomblock_class, gensym("help-randomblock~.pd"));
 }

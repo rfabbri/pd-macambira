@@ -768,7 +768,6 @@ void scratcher_tilde_setup(void)
 #include "scratcher~.tk2c"
     scratcher_class = class_new(gensym("scratcher~"), (t_newmethod)scratcher_new, (t_method)scratcher_free,
                     sizeof(t_scratcher), 0, A_GIMME, 0);
-    class_sethelpsymbol( scratcher_class, gensym("help-scratcher~.pd") );
 
     // set callbacks
     scratcher_widgetbehavior.w_getrectfn =    scratcher_getrect;

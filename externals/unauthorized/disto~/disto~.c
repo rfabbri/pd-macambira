@@ -476,7 +476,6 @@ void disto_tilde_setup(void)
     	sizeof(t_disto), 0, 0);
 
     CLASS_MAINSIGNALIN( disto_class, t_disto, x_f );
-    class_sethelpsymbol( disto_class, gensym("help-disto~.pd") );
     class_addmethod(disto_class, (t_method)disto_drive, gensym("drive"), A_FLOAT, 0);
     class_addmethod(disto_class, (t_method)disto_drymix, gensym("drymix"), A_FLOAT, 0);
     class_addmethod(disto_class, (t_method)disto_wetmix, gensym("wetmix"), A_FLOAT, 0);

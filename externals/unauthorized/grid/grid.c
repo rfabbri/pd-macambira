@@ -683,5 +683,4 @@ void grid_setup(void)
 	 class_setpropertiesfn(grid_class, &grid_properties);
 #endif
     class_setwidget(grid_class, &grid_widgetbehavior);
-    class_sethelpsymbol(grid_class, gensym("help-grid.pd"));
 }

@@ -814,5 +814,4 @@ void pianoroll_setup(void)
 	 class_setpropertiesfn(pianoroll_class, &pianoroll_properties);
 #endif
     class_setwidget(pianoroll_class, &pianoroll_widgetbehavior);
-    class_sethelpsymbol(pianoroll_class, gensym("help-pianoroll.pd"));
 }

@@ -666,5 +666,4 @@ void blinkenlights_setup(void)
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_pixoff, gensym("pixoff"), A_FLOAT, A_FLOAT, 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_pixel, gensym("pixel"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_clear, gensym("clear"), 0);
-  class_sethelpsymbol( blinkenlights_class, gensym("help-blinkenlights.pd"));
 }

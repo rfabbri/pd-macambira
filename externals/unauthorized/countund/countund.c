@@ -115,5 +115,4 @@ void countund_setup(void)
         sizeof(t_countund), 0, A_DEFFLOAT, 0);
   class_addmethod( countund_class, (t_method)countund_bang, &s_bang, 0);
   class_addmethod( countund_class, (t_method)countund_limit, gensym("limit"), A_FLOAT, 0);
-  class_sethelpsymbol( countund_class, gensym("help-countund.pd"));
 }

@@ -1,6 +1,6 @@
 Title Unauthorized Externals for Pd
 Version MSP standard paths
-Description Yves Degoyon's Unauthorized Externals
+Description Yves Degoyon's 'Unauthorized' Externals
 DefaultLocation /usr/local/lib
 DeleteWarning 
 

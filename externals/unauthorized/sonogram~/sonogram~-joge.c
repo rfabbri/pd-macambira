@@ -1982,7 +1982,6 @@ void sonogram_tilde_setup(void)
     post(sonogram_version);
     sonogram_class = class_new(gensym("sonogram~"), (t_newmethod)sonogram_new, (t_method)sonogram_free,
                     sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_sethelpsymbol( sonogram_class, gensym("help-sonogram~.pd") );
 
     // set callbacks
     sonogram_widgetbehavior.w_getrectfn =    sonogram_getrect;
@@ -2001,6 +2000,8 @@ void sonogram_tilde_setup(void)
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     sonogram_widgetbehavior.w_propertiesfn = NULL;
     sonogram_widgetbehavior.w_savefn =       sonogram_save;
+/*  this is needed to make the help patch work on < 0.37  */
+    class_sethelpsymbol( sonogram_class, gensym("sonogram~-help.pd") );
 #else
 	 class_setpropertiesfn(sonogram_class, NULL);
 	 class_setsavefn(sonogram_class, &sonogram_save);

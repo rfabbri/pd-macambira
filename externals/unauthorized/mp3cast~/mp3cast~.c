@@ -903,7 +903,6 @@ void mp3cast_tilde_setup(void)
     mp3cast_class = class_new(gensym("mp3cast~"), (t_newmethod)mp3cast_new, (t_method)mp3cast_free,
         sizeof(t_mp3cast), 0, 0);
     CLASS_MAINSIGNALIN(mp3cast_class, t_mp3cast, x_f );
-    class_sethelpsymbol(mp3cast_class, gensym("help-mp3cast~.pd"));
     class_addmethod(mp3cast_class, (t_method)mp3cast_dsp, gensym("dsp"), 0);
     class_addmethod(mp3cast_class, (t_method)mp3cast_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);
     class_addmethod(mp3cast_class, (t_method)mp3cast_disconnect, gensym("disconnect"), 0);

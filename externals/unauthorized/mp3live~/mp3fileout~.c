@@ -550,5 +550,4 @@ void mp3fileout_tilde_setup(void)
     class_addmethod(mp3fileout_class, (t_method)mp3fileout_resume, gensym("resume"), 0);
     class_addmethod(mp3fileout_class, (t_method)mp3fileout_seek, gensym("seek"), A_DEFFLOAT, 0);
     class_addmethod(mp3fileout_class, (t_method)mp3fileout_stop, gensym("stop"), 0);
-    class_sethelpsymbol(mp3fileout_class, gensym("help-mp3live~.pd"));
 }
