@@ -38,7 +38,6 @@ typedef struct _popup
      int x_height;
      int x_width;
 	 
-	 int x_char_width;
 	 int x_num_options;	 
 	 t_symbol* x_colour;
      t_symbol* x_name;
@@ -118,12 +117,12 @@ static void create_widget(t_popup *x, t_glist *glist)
   char text[MAXPDSTRING];
   int len,i;
   t_canvas *canvas=glist_getcanvas(glist);
-  x->x_rect_width = x->x_width+10;
-  x->x_rect_height =  x->x_height*20+9;
+  x->x_rect_width = x->x_width;
+  x->x_rect_height =  x->x_height+2;
   
   /* Create menubutton and empty menu widget -- maybe the menu should be created elseware?*/
-  sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -width \"%d\" -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
-		x,canvas,x,x,x->x_char_width,x->x_colour->s_name,x->x_name->s_name,x,x);
+  sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
+		x,canvas,x,x,x->x_colour->s_name,x->x_name->s_name,x,x);
 
   for(i=0 ; i<x->x_num_options ; i++)
   {
@@ -142,8 +141,8 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
        DEBUG(post("glist %x canvas %x",x->x_glist,canvas);)
        create_widget(x,glist);	       
        x->x_glist = canvas;
-       sys_vgui(".x%x.c create window %d %d -anchor nw -window .x%x.c.s%x -tags %xS\n", 
-		canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),x->x_glist,x,x);
+       sys_vgui(".x%x.c create window %d %d -width %d -height 25 -anchor nw -window .x%x.c.s%x -tags %xS\n", 
+		canvas,text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist), x->x_width, x->x_glist,x,x);
               
      }     
      else {
@@ -297,7 +296,7 @@ static void popup_save(t_gobj *z, t_binbuf *b)
 
     binbuf_addv(b, "ssiisiss", gensym("#X"),gensym("obj"),
 		x->x_obj.te_xpix, x->x_obj.te_ypix ,  
-		gensym("popup"), x->x_char_width, x->x_colour, x->x_name);
+		gensym("popup"), x->x_width, x->x_colour, x->x_name);
 	/* Loop for menu items */
 	for(i=0 ; i<x->x_num_options ; i++)
 	{
@@ -322,13 +321,6 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 		sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
 			x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
 	}
-}
-
-/* function to change width of popup */
-void popup_width(t_popup* x, t_floatarg w)
-{
-	x->x_char_width = (int)w;
-	sys_vgui(".x%x.c.s%x configure -width %d\n", x->x_glist, x, x->x_char_width);
 }
 
 /* function to change colour of popup background */
@@ -370,12 +362,12 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     x->x_glist = (t_glist*)NULL;
 
     
-    x->x_height = 1;
+    x->x_height = 25;
 	
 	if (argc < 4)
 	{
 		post("popup: You must enter at least 4 arguments. Default values used.");
-		x->x_char_width = 10;
+		x->x_width = 124;
 		x->x_num_options = 1; 
 		x->x_colour = gensym("#ffffff");
 		x->x_name = gensym("popup");
@@ -384,7 +376,7 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 		
 	} else {
 		/* Copy args into structure */
-		x->x_char_width = atom_getint(argv);
+		x->x_width = atom_getint(argv);
 		x->x_colour = atom_getsymbol(argv+1);
 		x->x_name = atom_getsymbol(argv+2);
 		
@@ -395,10 +387,6 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 			x->x_options[i] = atom_getsymbol( argv+(i+3) );
 		}
 	}	
-
-    /* TODO .. ask the popup for its width -- "[canvas] itemcget [tags] -width" -- but how to pass the data back?*/
-    /* x->x_width = x->x_char_width*10; 	 tuned for OSX */
-    x->x_width = x->x_char_width*7;    /* tuned for Linux */
 
 	/* Bind the recieve "popup%p" to the widget outlet*/
     sprintf(buf,"popup%p",x);
@@ -422,11 +410,6 @@ void popup_setup(void) {
 								  A_DEFFLOAT,
 								  0);
 
-	class_addmethod(popup_class, (t_method)popup_width,
-								  gensym("width"),
-								  A_DEFFLOAT,
-								  0);
-								  
 	class_addmethod(popup_class, (t_method)popup_name,
 								  gensym("name"),
 								  A_DEFSYMBOL,
