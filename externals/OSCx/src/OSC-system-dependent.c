@@ -27,9 +27,55 @@ The OpenSound Control WWW page is
 */
 
 
-/*
-    OSC-pattern-match.h
+
+/* OSC-system-dependent.c
+
+   Matt Wright, 3/13/98
+
+   File of procedures OSC has to call that are not part of the OSC package
+   and that you, the developer adding OSC addressability to an application,
+   must write in a way that makes sense in the context of your system.
+
+   You should also look at OSC-timetag.c and see if there's a better way
+   to handle time tags on your system.
+
 */
 
-Boolean PatternMatch (const char *pattern, const char *test);
+#include "OSC-common.h"
 
+/* Printing stuff: for now, use stderr.  Some cleverer stuff we could do:
+
+    - Make a silent mode where these don't do anything.
+    - Return error messages via OSC to some client
+*/
+
+#include <stdarg.h>
+#include <stdio.h>
+
+void fatal_error(char *s, ...) {
+    va_list ap;
+    fprintf(stderr, "Fatal error: ");
+    va_start(ap, s);
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, "\n");
+    va_end(ap);
+    exit(-321);
+}
+
+void OSCProblem(char *s, ...) {
+    va_list ap;
+    fprintf(stderr, "OSC Problem: ");
+    va_start(ap, s);
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, "\n");
+    va_end(ap);
+}
+
+void OSCWarning(char *s, ...) {
+    va_list ap;
+    fprintf(stderr, "OSC Warning: ");
+    va_start(ap, s);
+    vfprintf(stderr, s, ap);
+    fprintf(stderr, "\n");
+    va_end(ap);
+}

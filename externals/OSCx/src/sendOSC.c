@@ -60,30 +60,26 @@ University of California, Berkeley.
 compiling:
         cc -o sendOSC sendOSC.c htmsocket.c OpenSoundControl.c OSC_timeTag.c
 */
+#include "m_pd.h"
+
+#include "OSC-common.h"
+#include "OSC-client.h"
+#include "htmsocket.h"
+
+#include <string.h>
+#include <sys/types.h>
+#include <stdlib.h>
 
 #ifdef WIN32
-	#include "m_pd.h"
-	#include "OSC-client.h"
-	#include "htmsocket.h"
-	#include "OSC-common.h"
 	#include <winsock2.h>	
 	#include <io.h>    
 	#include <errno.h>
 	#include <fcntl.h>
 	#include <sys/stat.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <sys/types.h>
 #else
-	#include "m_pd.h"
 	//#include "x_osc.h"
-	#include "OSC-client.h"
-	#include "htmsocket.h"
 
 	#include <stdio.h>
-	#include <stdlib.h>
-	#include <string.h>
-	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netdb.h>
@@ -111,7 +107,8 @@ typedArg ParseToken(char *token);
 int WriteMessage(OSCbuf *buf, char *messageName, int numArgs, typedArg *args);
 void SendBuffer(void *htmsocket, OSCbuf *buf);
 void SendData(void *htmsocket, int size, char *data);
-void fatal_error(char *s);
+/* defined in OSC-system-dependent.c now */
+/* void fatal_error(char *s); */
 void send_complain(char *s, ...);
 
 //static void *htmsocket;
@@ -581,7 +578,7 @@ OSCTimeTag ParseTimeTag(char *s) {
 	       and this machine is little-endian, so sscanf
 	       wrote each half of the time tag in the wrong half
 	       of the struct. */
-	    uint32 temp;
+	    uint4 temp;
 	    temp = tt.seconds;
 	    tt.seconds = tt.fraction ;
 	    tt.fraction = temp;
@@ -837,11 +834,12 @@ void SendData(void *htmsocket, int size, char *data) {
   }
 }
 
-void fatal_error(char *s) {
-    fprintf(stderr, "FATAL ERROR: %s\n", s);
-    post("fatal error, not exiting ...");
-    //exit(4);
-}
+/* defined in OSC-system-dependent.c now */
+/* void fatal_error(char *s) { */
+/*     fprintf(stderr, "FATAL ERROR: %s\n", s); */
+/*     post("fatal error, not exiting ..."); */
+/*     //exit(4); */
+/* } */
 
 #include <stdarg.h>
 void send_complain(char *s, ...) {

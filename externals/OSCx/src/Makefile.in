@@ -1,3 +1,20 @@
+#
+# Copyright (C) 2004 Hans-Christoph Steiner
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 
 EXT=o
 LIBS = -lm -lc
@@ -9,7 +26,7 @@ LDFLAGS = @LDFLAGS@
 
 prefix=$(DESTDIR)/usr
 
-SOURCES = OSC-pattern-match.c  OSC.c  dumpOSC.c htmsocket.c  OSCroute.c  sendOSC.c
+SOURCES = OSC-pattern-match.c OSC.c dumpOSC.c htmsocket.c OSCroute.c sendOSC.c OSC-system-dependent.c
 TARGETS = $(SOURCES:.c=.o)
 EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@ OSC.@pd_suffix@
 
@@ -17,16 +34,16 @@ EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@ OSC.@pd_suffix
 
 all: $(EXTS)
 
-sendOSC.@pd_suffix@: sendOSC.o htmsocket.o
-	cc $(LDFLAGS) -o sendOSC.@pd_suffix@ $? -lc -lm $(LIBOSC)
-
 dumpOSC.@pd_suffix@: dumpOSC.o
 	cc $(LDFLAGS) -o dumpOSC.@pd_suffix@ $? -lc -lm
 
-OSCroute.@pd_suffix@: OSCroute.o OSC-pattern-match.o
+sendOSC.@pd_suffix@: sendOSC.o htmsocket.o OSC-system-dependent.o
+	cc $(LDFLAGS) -o sendOSC.@pd_suffix@ $? -lc -lm $(LIBOSC)
+
+OSCroute.@pd_suffix@: OSCroute.o OSC-pattern-match.o OSC-system-dependent.o
 	cc $(LDFLAGS) -o OSCroute.@pd_suffix@ $? -lc -lm
 
-OSC.@pd_suffix@: OSC.o sendOSC.o dumpOSC.o OSCroute.o htmsocket.o OSC-pattern-match.o
+OSC.@pd_suffix@: OSC.o sendOSC.o dumpOSC.o OSCroute.o htmsocket.o OSC-pattern-match.o OSC-system-dependent.o
 	cc $(LDFLAGS) -o OSC.@pd_suffix@ $? -lc -lm $(LIBOSC)
 
 $(TARGETS): %.o : %.c

@@ -314,7 +314,7 @@ OSCTimeTag ParseTimeTag(char *s) {
 	       and this machine is little-endian, so sscanf
 	       wrote each half of the time tag in the wrong half
 	       of the struct. */
-	    uint32 temp;
+	    uint4 temp;
 	    temp = tt.seconds;
 	    tt.seconds = tt.fraction ;
 	    tt.fraction = temp;

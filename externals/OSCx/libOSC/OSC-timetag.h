@@ -1,33 +1,31 @@
 /*
-Copyright (c) 1998.  The Regents of the University of California (Regents).
+Copyright © 1998. The Regents of the University of California (Regents). 
 All Rights Reserved.
-
-Permission to use, copy, modify, and distribute this software and its
-documentation for educational, research, and not-for-profit purposes, without
-fee and without a signed licensing agreement, is hereby granted, provided that
-the above copyright notice, this paragraph and the following two paragraphs
-appear in all copies, modifications, and distributions.  Contact The Office of
-Technology Licensing, UC Berkeley, 2150 Shattuck Avenue, Suite 510, Berkeley,
-CA 94720-1620, (510) 643-7201, for commercial licensing opportunities.
 
 Written by Matt Wright, The Center for New Music and Audio Technologies,
 University of California, Berkeley.
 
-     IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
-     SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-     ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
-     REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Permission to use, copy, modify, distribute, and distribute modified versions
+of this software and its documentation without fee and without a signed
+licensing agreement, is hereby granted, provided that the above copyright
+notice, this paragraph and the following two paragraphs appear in all copies,
+modifications, and distributions.
 
-     REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
-     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-     FOR A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING
-     DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS".
-     REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-     ENHANCEMENTS, OR MODIFICATIONS.
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
+OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 The OpenSound Control WWW page is 
     http://www.cnmat.berkeley.edu/OpenSoundControl
 */
+
 
 /*
  OSC_timeTag.h: library for manipulating OSC time tags
@@ -35,11 +33,11 @@ The OpenSound Control WWW page is
 
  Time tags in OSC have the same format as in NTP: 64 bit fixed point, with the
  top 32 bits giving number of seconds sinve midnight 1/1/1900 and the bottom
- 32 bits giving fractional parts of a second.  We represent this by a 64-bit
+ 32 bits giving fractional parts of a second.  We represent this by an 8-byte
  unsigned long if possible, or else a struct. 
 
- NB: On many architectures with 64-bit ints, it's illegal (like maybe a bus error)
- to dereference a pointer to a 64-bit int that's not 64-bit aligned.  
+ NB: On many architectures with 8-byte ints, it's illegal (like maybe a bus error)
+ to dereference a pointer to an 8 byte int that's not 8-byte aligned.  
 */
 
 #ifndef OSC_TIMETAG
@@ -48,23 +46,23 @@ The OpenSound Control WWW page is
 #ifdef __sgi
     #define HAS8BYTEINT
     /* You may have to change this typedef if there's some other
-       way to specify 64 bit ints on your system */
-    typedef long long int64;
-    typedef unsigned long long uint64;
-    typedef unsigned long uint32;
+       way to specify 8 byte ints on your system */
+    typedef long long int8;
+    typedef unsigned long long uint8;
+    typedef unsigned long uint4;
 #else
     /* You may have to redefine this typedef if ints on your system 
-       aren't 32 bits. */
-    typedef unsigned int uint32;
+       aren't 4 bytes. */
+    typedef unsigned int uint4;
 #endif
 
 
 #ifdef HAS8BYTEINT
-    typedef uint64 OSCTimeTag;
+    typedef uint8 OSCTimeTag;
 #else
     typedef struct {
-	uint32 seconds;
-	uint32 fraction;
+	uint4 seconds;
+	uint4 fraction;
     } OSCTimeTag;
 #endif
 
