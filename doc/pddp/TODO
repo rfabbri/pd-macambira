@@ -1,0 +1,6 @@
+
+- auto-generate table_of_contents.pd from all all_about_*.pd patches
+
+- make a Pd patch to launch table_of_contents.pd to solve recursive problem
+
+
