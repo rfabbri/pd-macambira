@@ -1,5 +1,11 @@
 Change log for PD external 'sprinkler' (formerly 'forward')
 
+v0.06 Tue, 14 Sep 2004 18:50:03 +0200
+  + added --enable-all-forwardmess configure option to use pd_forwardmess()
+    for all messages (even those of length 1) : should fix 'bang' problem
+  + fixed gcc-3.3 warning re: (++argv) in sprinkler_list() thanks to
+    Erasmus Zipfel
+
 v0.05 Mon, 23 Feb 2004 01:14:08 +0100
   + added pass-through outlet for unbound destination symbols
   + added hack to prevent 'bang's being sprinkled as 'normal' symbols

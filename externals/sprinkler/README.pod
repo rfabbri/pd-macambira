@@ -25,16 +25,28 @@ The 'configure' script supports the following options, among others:
 
 =over 4
 
-=item * --enable-debug , --disable-debug
+=item --enable-debug , --disable-debug
 
 Whether to enable verbose debugging messages.
 Default=no.
 
-=item * --enable-forward , --disable-forward
+=item --enable-forward , --disable-forward
 
 Whether to create [forward] objects as instances
 of the [sprinkler] class (MAX-incompatible).
 Default=no.
+
+=item --enable-all-forwardmess , --disable-all-forwardmess
+
+Whether to use pd_forwardmess() for all messages.  If this
+option is disabled (the default), messages of length 1 will
+be handled specially; thus a symbol 'foo' will be passed as
+'symbol foo', rather than just 'foo'.
+
+Default=no.
+
+Future versions of 'sprinkler' may use pd_forwardmess() for
+all messages by default -- go on, try it!
 
 =back
 
@@ -48,12 +60,16 @@ from code by Guenter Geiger, Larry Troxler, and iohannes m zmoeling.
 Thanks to Krzysztof Czaja for pointing out to me the existence of MAX "forward",
 and to Miller Puckette for the name "sprinkler".
 
+Thanks to Erasmus Zipfel for a bugreport and useful ideas.
+
 =head1 KNOWN BUGS
 
 One of the acknowledgements used to be in this section.
 Sorry, folks.
 
 Backwards-compatible version is incompatible with MAX.
+
+Semantic strangeness with singleton messages is somewhat cryptic.
 
 =head1 AUTHOR
 

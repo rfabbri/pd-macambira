@@ -1,14 +1,17 @@
-/* -*- Mode: C -*- */
-/*=============================================================================*\
- * File: sprinkler.c
+/* File: sprinkler.c
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
- * Description: message-forwarding : workaround for missing dynamic 'send'
+ * Contributors:
+ *    Krzysztof Czaja pointed out the MAX-incompatibility of the name 'forward'
+ *    Miller Puckette suggested the name 'sprinkler'
+ *    Erasmus Zipfel diagnosed a bug in sprinkler_list()
+ *
+ * Description: dynamic message-forwarding object
  *
  *   + code adapted from 'send_class' in $PD_ROOT/src/x_connective.c
  *   + formerly 'forward.c'
-
  *
- * Copyright (c) 2002 Bryan Jurish.
+ *
+ * Copyright (c) 2002,2004 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -31,7 +34,6 @@
  *=============================================================================*/
 
 #include <m_pd.h>
-//#include "sprinkler.h"
 
 /* black magic */
 #ifdef NT
@@ -58,7 +60,8 @@ static char sprinkler_errbuf[EBUFSIZE];
  * Structures and Types
  *=====================================================================*/
 
-static char *sprinkler_banner = "\nsprinkler version %s by Bryan Jurish : dynamic message dissemination";
+static char *sprinkler_banner =
+"\nsprinkler version %s by Bryan Jurish : dynamic message dissemination";
 
 static t_class *sprinkler_class;
 
@@ -73,26 +76,30 @@ typedef struct _sprinkler
  * the guts:
  *  + send (the tail of) a list or message to the control-bus
  *    named by its initial element
- *  + HACK for single-element arglists *ONLY*:
+ *  + [DEPRECATED] : HACK for single-element arglists *ONLY*
  *    - sprinkler float- and pointer-initial arglists with 'pd_sprinklermess',
- *      everything else with 'pd_typedmess' as a *LIST*
+ *      everything else with 'pd_forwardmess'
  *--------------------------------------------------------------------*/
 static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *argv)
 {
 
 #ifdef SPRINKLER_DEBUG
   atom_string(argv, sprinkler_errbuf, EBUFSIZE);
-  post("sprinkler_debug : sprinkler_anything : dst=%s, argc=%d, arg1=%s", dst->s_name, argc, argc ? sprinkler_errbuf : "NULL");
+  post("sprinkler_debug : sprinkler_anything : dst=%s, argc=%d, arg1=%s",
+       dst->s_name, argc, argc ? sprinkler_errbuf : "NULL");
 #endif
 
-  /*-----------------------------------------------------------------------
-   * HACK:
-   * + single-element arglists *ONLY*
-   * + sprinkler float- and pointer-initial arglists with 'pd_sprinklermess',
-   *   everything else with 'pd_typedmess' as a *LIST*
-   *------------------------------------------------------------------------
-   */
   if (dst->s_thing) {
+
+#if !defined(ALL_FORWARDMESS)
+
+    /*-----------------------------------------------------------------------
+     * HACK (obsolete):
+     * + single-element arglists *ONLY*
+     * + sprinkler float- and pointer-initial arglists with 'pd_sprinklermess',
+     *   everything else with 'pd_forwardmess'
+     *------------------------------------------------------------------------
+     */
     if (argc == 1) {
       switch (argv->a_type) {
       case A_FLOAT:
@@ -124,6 +131,9 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
 	// just fall though
       }
     }
+
+#endif /* !defined(ALL_FORWARDMESS) */
+
     // default -- sprinkler anything else with 'pd_forwardmess'
     pd_forwardmess(dst->s_thing,argc,argv);
     return;
@@ -139,7 +149,7 @@ static void sprinkler_list(t_sprinkler *x, t_symbol *s, int argc, t_atom *argv)
 #ifdef SPRINKLER_DEBUG
   post("sprinkler_debug : sprinkler_list : argc=%d", argc);
 #endif
-  sprinkler_anything(x,atom_getsymbol(argv),--argc,++argv);
+  sprinkler_anything(x,atom_getsymbol(argv), argc-1, argv+1);
 }
 
 
@@ -170,17 +180,22 @@ void sprinkler_setup(void)
 			      0, 0);
 
 #ifdef NON_MAX_FORWARD
-  // add aliases [forward] and [fw]
+  //-- add aliases [forward] and [fw]
   post("sprinkler : non-MAX [forward] alias enabled");
   class_addcreator((t_newmethod)sprinkler_new, gensym("forward"), A_DEFSYM, 0);
   class_addcreator((t_newmethod)sprinkler_new, gensym("fw"), A_DEFSYM, 0);
+#endif
+
+#ifdef ALL_FORWARDMESS
+  //-- report new semantics
+  post("sprinkler : will use pd_forwardmess() for all messages");
 #endif
 
 #ifdef SPRINKLER_DEBUG
   post("sprinkler : debugging enabled");
 #endif
   
-  // methods
+  //-- methods
   class_addlist(sprinkler_class, sprinkler_list);    
   class_addanything(sprinkler_class, sprinkler_anything);
   
