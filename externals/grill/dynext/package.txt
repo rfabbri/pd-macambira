@@ -1,9 +1,5 @@
 NAME=dyn~
 
-BUILDCLASS=ext
-BUILDMODE=release
-BUILDTYPE=single
-
 SRCDIR=src
 
 SRCS= main.cpp
