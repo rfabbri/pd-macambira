@@ -11,23 +11,10 @@
 
 <div id="Menu">
 
-| <a href="index.php" title=""><b>Introduction</b></a><br>
-| <a href="download.php" title=""><b>Download</b></a><br>
-| <a href="documentation.php" title=""><b>Documentation</b></a><br>
-| <a href="developer.php" title=""><b>Developers</b></a><br>
-| <a href="http://pure-data.info/community/lists/"><b>Mailing Lists</b></a><br>
-| <a href="contact.php" title=""><b>Contact</b></a><br>
-| <a href="http://sourceforge.net/projects/pure-data" title=""><b>Project Page</b></a><br>
-| <a href="http://puredata.info" title""><b>Community Site</b></a><br>
-
+<?php include('menu.inc'); ?>
 <br>
 <br>
-<span class="quote">
-<b>Tip of the month</b><br />
-When working on a patch, it's often best to stay in edit mode and use the CTRL key to modify any parameters.
-<br>
-<a href="http://www.gamasutra.com/resource_guide/20030528/paul_01.shtml">Leonard J. Paul</a>
-</span>
+<?php include('quote.inc'); ?>
 
 </div>
 <div id="Content">
@@ -49,10 +36,7 @@ mailing list</a>.  (Except if you want to ask to be added to the developer list 
 
 
 <BR>
-
-<BR>
-<P CLASS="small">
-Last Modified: October 04 2003 11:09:13 GMT</P>
+<?php include('lastmodified.inc'); ?>
 
 </DIV>
 
