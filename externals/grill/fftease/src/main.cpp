@@ -13,7 +13,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 // Initialization function for xsample library
-V lib_setup()
+static V fftease_main()
 {
 	post("");
 	post("-------------------------------------------------------------------");
@@ -64,5 +64,5 @@ V lib_setup()
 }
 
 // setup the library
-FLEXT_LIB_SETUP(fftease,lib_setup)
+FLEXT_LIB_SETUP(fftease,fftease_main)
 
