@@ -4,7 +4,8 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 	convolution compare darken deinterlace difference interlace lighten \
 	multiply overlay screen shadowcaster softlight \
 	rgbseek modgain traffic constrain eclipse eclipse02 eclipse03 \
-	cga keyscreen rene cutout fromage rgbavg rgbavg02
+	cga keyscreen rene cutout fromage rgbavg rgbavg02 \
+	rowca
 
 	dir *.dll
 
@@ -181,3 +182,6 @@ rgbavg02:
 #
 # </PeRColate>
 #
+
+rowca:
+	cl rowca.cpp $(FLAGS) /GX /link $(EFFECT)

@@ -54,6 +54,9 @@ public:
 
 	__inline int eof() { return y==m_f.height ? 1 : 0; }
 	void next();
+
+	__inline int width() { return m_f.width; }
+	__inline int height() { return m_f.height; }
 };
 
 byte pixels::red()
