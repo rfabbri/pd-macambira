@@ -26,12 +26,13 @@ is a quick start:
 
 -Go to the example directory and try to run the help-sc.pd patch.
  Make sure you have at least PD v0.37, and the latest version
- of the pyext external.
+ of the pyext external. The supertest.py file must be placed
+ in the scripts folder for pyext.
 
 
-If you have any questions, don't ask me directly, ask on the
-pd-list or on the supercollider list. I'm very tired about
-replying the same questions over and over again. Thanks!
+If you have a general questions (compiling it up, error messages),
+don't ask me directly; ask on the pd-list or on the supercollider list.
+
 
 
 Enjoy!
