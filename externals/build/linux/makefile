@@ -29,6 +29,7 @@ clean:
 
 install-doc:
 	@test -d $(prefix)/lib/pd/doc/5.reference || mkdir -p $(prefix)/lib/pd/doc/5.reference
+	cd ../doc && make all
 	cp -r ../doc/* $(prefix)/lib/pd/doc/5.reference
 
 install: install-doc

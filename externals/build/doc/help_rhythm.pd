@@ -1,3 +1,0 @@
-#N canvas 0 0 450 300 10;
-#X obj 105 105 rhythm;
-#X text 48 31 TODO;
