@@ -8,5 +8,7 @@ NAME=`cat CVS/Root | sed  y/:/" "/ | sed y/@/" "/ | awk '{print $2}'`
 
 
 scp $FILES $NAME@pure-data.sf.net:/home/groups/p/pu/pure-data/htdocs
+# make writeable to pd-group:
+ssh chmod g+w $NAME@pure-data.sf.net:/home/groups/p/pu/pure-data/htdocs/*
 
 
