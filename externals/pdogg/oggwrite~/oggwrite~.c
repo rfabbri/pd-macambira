@@ -39,7 +39,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #include <time.h>
 #ifdef UNIX
