@@ -2,6 +2,12 @@
 unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
 
+unavail |  | pidip
+avail | sevyves,eighthave,ggeiger | pidip
+
+unavail |  | unauthorized
+avail | sevyves,eighthave,ggeiger | unauthorized
+
 # this line ALWAYS needs to be the last line in this file
 # otherwise, its possible to lock everyone out of the CVS
-avail | bbogart,d13,dpro,eighthave,fbar,ggeiger,jusu,x75,zmoelnig | CVSROOT
+avail | adamlindsay,eighthave,fbar,ggeiger | CVSROOT
