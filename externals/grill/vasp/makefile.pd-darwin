@@ -22,7 +22,7 @@ CFLAGS=-O6 ${UFLAGS} -fmove-all-movables -frerun-loop-opt -fprefetch-loop-arrays
 #CFLAGS+=-funroll-loops -freduce-all-givs -fschedule-insns2 -foptimize-register-move
 LIBS=m
 LDFLAGS=-bundle -bundle_loader $(PDBIN)
-FRAMEWORKS=Carbon
+FRAMEWORKS=Carbon veclib
 
 # ----------------------------------------------
 # the rest can stay untouched

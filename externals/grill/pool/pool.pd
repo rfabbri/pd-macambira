@@ -1,4 +1,4 @@
-#N canvas 12 3 934 690 12;
+#N canvas 12 3 936 692 12;
 #X msg 295 108 set 1 2 3;
 #X obj 308 619 print K;
 #X msg 607 211 getall;
@@ -94,7 +94,7 @@
 #X connect 23 0 26 0;
 #X restore 718 511 pd dirs;
 #X text 715 485 directory operations;
-#N canvas 0 0 819 451 file 0;
+#N canvas 0 0 821 453 file 0;
 #X text 117 207 save dir and subdirs;
 #X text 117 165 save data in current dir;
 #X text 117 253 load data into current dir;
@@ -127,6 +127,8 @@
 #X msg 473 228 svxrec pool.xml;
 #X msg 472 274 ldxdir pool.xml;
 #X msg 472 321 ldxrec pool.xml;
+#X text 26 398 If the file name is given without a path specification
+the folder containing the current patcher will be used.;
 #X connect 20 0 9 0;
 #X connect 21 0 9 0;
 #X connect 22 0 9 0;
@@ -202,6 +204,7 @@ Grill;
 #X text 332 457 can be given for optimal performance;
 #X msg 428 218 get 3;
 #X msg 299 227 set 3 -1 1;
+#X msg 41 518 getmethods;
 #X connect 0 0 72 0;
 #X connect 2 0 72 0;
 #X connect 3 0 72 0;
@@ -236,3 +239,4 @@ Grill;
 #X connect 72 4 64 0;
 #X connect 75 0 72 0;
 #X connect 76 0 72 0;
+#X connect 77 0 72 0;

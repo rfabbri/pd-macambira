@@ -9,6 +9,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "pool.h"
+#include <string>
 
 #define POOL_VERSION "0.2.0pre"
 
@@ -139,6 +140,8 @@ private:
 	static pooldata *GetPool(const S *s);
 	static V RmvPool(pooldata *p);
 
+	std::string MakeFilename(const C *fn) const;
+
 	FLEXT_CALLVAR_V(mg_pool,ms_pool)
 	FLEXT_ATTRVAR_B(absdir)
 	FLEXT_ATTRVAR_B(echo)
@@ -209,7 +212,7 @@ pooldata *pool::head,*pool::tail;
 V pool::setup(t_classid c)
 {
 	post("");
-	post("pool %s - hierarchical storage object,(C)2002-2003 Thomas Grill",POOL_VERSION);
+	post("pool %s - hierarchical storage object, (C)2002-2003 Thomas Grill",POOL_VERSION);
 	post("");
 
 	head = tail = NULL;
@@ -874,8 +877,11 @@ V pool::load(I argc,const A *argv,BL xml)
 
 	if(!flnm) 
 		post("%s - %s: no filename given",thisName(),sym);
-    else if(!(xml?pl->LoadXML(flnm):pl->Load(flnm)))
-		post("%s - %s: error loading data",thisName(),sym);
+	else {
+		string fl(MakeFilename(flnm));
+		if(!(xml?pl->LoadXML(fl.c_str()):pl->Load(fl.c_str())))
+			post("%s - %s: error loading data",thisName(),sym);
+	}
 
 	echodir();
 }
@@ -891,8 +897,11 @@ V pool::save(I argc,const A *argv,BL xml)
 
 	if(!flnm) 
 		post("%s - %s: no filename given",thisName(),sym);
-    else if(!(xml?pl->SaveXML(flnm):pl->Save(flnm)))
-		post("%s - %s: error saving data",thisName(),sym);
+	else {
+		string fl(MakeFilename(flnm));
+		if(!(xml?pl->SaveXML(fl.c_str()):pl->Save(fl.c_str())))
+			post("%s - %s: error saving data",thisName(),sym);
+	}
 
 	echodir();
 }
@@ -908,8 +917,11 @@ V pool::lddir(I argc,const A *argv,BL xml)
 
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),sym);
-    else if(!(xml?pl->LdDirXML(curdir,flnm,0):pl->LdDir(curdir,flnm,0))) 
-		post("%s - %s: directory couldn't be loaded",thisName(),sym);
+	else {
+		string fl(MakeFilename(flnm));
+		if(!(xml?pl->LdDirXML(curdir,fl.c_str(),0):pl->LdDir(curdir,fl.c_str(),0))) 
+			post("%s - %s: directory couldn't be loaded",thisName(),sym);
+	}
 
 	echodir();
 }
@@ -941,7 +953,8 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),sym);
 	else {
-        if(!(xml?pl->LdDirXML(curdir,flnm,depth,mkdir):pl->LdDir(curdir,flnm,depth,mkdir))) 
+		string fl(MakeFilename(flnm));
+        if(!(xml?pl->LdDirXML(curdir,fl.c_str(),depth,mkdir):pl->LdDir(curdir,fl.c_str(),depth,mkdir))) 
 		post("%s - %s: directory couldn't be saved",thisName(),sym);
 	}
 
@@ -960,7 +973,8 @@ V pool::svdir(I argc,const A *argv,BL xml)
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),sym);
 	else {
-        if(!(xml?pl->SvDirXML(curdir,flnm,0,absdir):pl->SvDir(curdir,flnm,0,absdir))) 
+		string fl(MakeFilename(flnm));
+        if(!(xml?pl->SvDirXML(curdir,fl.c_str(),0,absdir):pl->SvDir(curdir,fl.c_str(),0,absdir))) 
 		post("%s - %s: directory couldn't be saved",thisName(),sym);
 	}
 
@@ -979,7 +993,8 @@ V pool::svrec(I argc,const A *argv,BL xml)
 	if(!flnm)
 		post("%s - %s: invalid filename",thisName(),sym);
 	else {
-        if(!(xml?pl->SvDirXML(curdir,flnm,-1,absdir):pl->SvDir(curdir,flnm,-1,absdir))) 
+		string fl(MakeFilename(flnm));
+        if(!(xml?pl->SvDirXML(curdir,fl.c_str(),-1,absdir):pl->SvDir(curdir,fl.c_str(),-1,absdir))) 
 		post("%s - %s: directory couldn't be saved",thisName(),sym);
 	}
 
@@ -1051,3 +1066,18 @@ V pool::RmvPool(pooldata *p)
 	}
 }
 
+std::string pool::MakeFilename(const C *fn) const
+{
+#if FLEXT_SYS == FLEXT_SYS_PD
+	C *sl = strrchr(fn,'/');
+	if(!sl) sl = strrchr(fn,'\\');
+	if(!sl) {
+		const C *p = GetString(canvas_getdir(thisCanvas()));
+		return string(p)+'/'+fn;
+	}
+	else
+		return fn;
+#else
+	return fn;
+#endif
+}

@@ -46,8 +46,8 @@ pd - darwin (MacOSX):
 ---------------------
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 
-Max/MSP - MacOS9:
------------------
+Max/MSP - MacOS9/X:
+-------------------
 o CodeWarrior: edit "pool.cw" and build 
 
 ----------------------------------------------------------------------------
@@ -62,6 +62,7 @@ Version history:
 - extensive use of hashing for keys and directories
 - database can be saved/loaded as XML data
 - fixed bug with stored numbers starting with - or +
+- file names without paths will use the folder of the current patcher
 
 0.1.0:
 - first public release
