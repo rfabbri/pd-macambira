@@ -141,7 +141,7 @@ Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename
 Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon
 Name: {group}\Pd Manual; Filename: {app}\doc\1.manual\index.htm
 Name: {group}\GEM Manual; Filename: {app}\doc\gem\manual\index.html
-Name: {group}\PD Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
+Name: {group}\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
 
 [Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
