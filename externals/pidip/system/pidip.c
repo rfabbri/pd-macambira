@@ -15,6 +15,7 @@ extern "C"
     void pdp_yvu2rgb_setup(void);
     void pdp_yqt_setup(void);
     void pdp_fqt_setup(void);
+    void pdp_fcqt_setup(void);
     void pdp_lens_setup(void);
     void pdp_baltan_setup(void);
     void pdp_aging_setup(void);
@@ -70,6 +71,7 @@ void pidip_setup(void){
     pdp_intrusion_setup();
     pdp_yqt_setup();
     pdp_fqt_setup();
+    pdp_fcqt_setup();
     pdp_simura_setup();
     pdp_underwatch_setup();
     pdp_vertigo_setup();

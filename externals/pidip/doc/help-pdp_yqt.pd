@@ -3,7 +3,7 @@
 #X obj 268 64 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 123 136 loop \$1;
-#X obj 124 114 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 1
+#X obj 124 114 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
 1;
 #X msg 370 44 open \$1;
 #X obj 369 20 openpanel;
@@ -26,8 +26,6 @@
 #X text 346 306 Total number of frames;
 #X floatatom 317 164 5 0 0 0 - - -;
 #X text 368 164 Frame command;
-#X floatatom 320 209 5 0 0 0 - - -;
-#X text 370 209 Gain;
 #X obj 316 183 t b f;
 #X obj 296 261 dac~;
 #X obj 225 223 pdp_yqt;
@@ -36,25 +34,24 @@
 #X text 82 392 with big plundering from pdp_qt ( Tom Schouten );
 #X text 81 376 written by Yves Degoyon;
 #X connect 1 0 10 0;
-#X connect 2 0 26 0;
+#X connect 2 0 24 0;
 #X connect 3 0 2 0;
-#X connect 4 0 26 0;
+#X connect 4 0 24 0;
 #X connect 5 0 4 0;
 #X connect 6 0 5 0;
 #X connect 7 0 10 1;
 #X connect 8 0 10 0;
 #X connect 9 0 7 0;
-#X connect 10 0 26 0;
+#X connect 10 0 24 0;
 #X connect 11 0 13 0;
 #X connect 12 0 15 0;
 #X connect 13 0 12 0;
 #X connect 15 0 14 0;
-#X connect 20 0 24 0;
-#X connect 22 0 26 2;
-#X connect 24 0 26 0;
-#X connect 24 1 26 1;
-#X connect 26 0 0 0;
-#X connect 26 1 16 0;
-#X connect 26 2 17 0;
-#X connect 26 3 25 0;
-#X connect 26 4 25 1;
+#X connect 20 0 22 0;
+#X connect 22 0 24 0;
+#X connect 22 1 24 1;
+#X connect 24 0 0 0;
+#X connect 24 1 16 0;
+#X connect 24 2 17 0;
+#X connect 24 3 23 0;
+#X connect 24 4 23 1;

@@ -29,11 +29,6 @@
 #define     OUTPUT_BUFFER_SIZE        128*1024  /* audio output buffer : 128k */
 #define     DECODE_PACKET_SIZE        16*1024  /* size of audio data decoded in one call */
 
-typedef struct pdp_yqt_data
-{
-    short int gain[4];
-} t_pdp_yqt_data;
-
 typedef struct pdp_yqt_struct
 {
     t_object x_obj;
@@ -72,8 +67,6 @@ typedef struct pdp_yqt_struct
     t_int    x_outbuffersize;
     t_float  *x_outl;
     t_float  *x_outr;
-
-    t_pdp_yqt_data *state_data;
 
 } t_pdp_yqt;
 
@@ -182,8 +175,6 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
   int object, length, pos, i, j;
   short int* data;
   t_pdp* header;
-
-  static short int gain[4] = {0x7fff, 0x7fff, 0x7fff, 0x7fff};
 
     if (!(x->initialized)){
 	//post("pdp_yqt: no qt file opened");
@@ -307,26 +298,9 @@ static void pdp_yqt_frame(t_pdp_yqt *x, t_floatarg frameindex)
     pdp_yqt_bang(x);
 }
 
-static void pdp_yqt_gain(t_pdp_yqt *x, t_floatarg f)
-{
-    int i;
-    short int g;
-    float bound = (float)0x7fff;
-
-    f *= (float)0x7fff;
-
-    f = (f>bound) ? bound : f;
-    f = (f<-bound) ? -bound : f;
-
-    g = (short int)f;
-
-    for (i=0; i<4; i++) x->state_data->gain[i] = g;
-}
-
 static void pdp_yqt_free(t_pdp_yqt *x)
 {
   
-    free (x->state_data);
     pdp_yqt_close(x);
 
     freebytes(x->x_outbuffer, OUTPUT_BUFFER_SIZE*sizeof(t_float));
@@ -341,7 +315,6 @@ void *pdp_yqt_new(void)
     t_pdp_yqt *x = (t_pdp_yqt *)pd_new(pdp_yqt_class);
 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("frame_cold"));
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("gain"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything);
     x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
@@ -355,9 +328,6 @@ void *pdp_yqt_new(void)
     x->initialized = false;
 
     x->loop = false;
-
-    x->state_data = (t_pdp_yqt_data *)malloc(sizeof(t_pdp_yqt_data));
-    pdp_yqt_gain(x, 1.0f);
 
     // allocate audio buffers
     x->x_outbuffersize = OUTPUT_BUFFER_SIZE;
@@ -433,7 +403,6 @@ void pdp_yqt_setup(void)
     class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_loop, gensym("loop"), A_DEFFLOAT, A_NULL);
     class_addfloat (pdp_yqt_class, (t_method)pdp_yqt_frame);
     class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
-    class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_gain, gensym("gain"), A_FLOAT, A_NULL);
     class_addmethod(pdp_yqt_class, nullfn, gensym("signal"), 0);
     class_addmethod(pdp_yqt_class, (t_method)pdp_yqt_dsp, gensym("dsp"), 0);
     class_sethelpsymbol( pdp_yqt_class, gensym("pdp_yqt.pd") );

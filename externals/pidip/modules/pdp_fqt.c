@@ -22,13 +22,10 @@
 
 #include "pdp.h"
 #include "pdp_llconv.h"
+#include "time.h"
+#include "sys/time.h"
 #include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
-
-typedef struct pdp_fqt_data
-{
-    short int gain[4];
-} t_pdp_fqt_data;
 
 typedef struct pdp_fqt_struct
 {
@@ -36,16 +33,21 @@ typedef struct pdp_fqt_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_outlet *x_outlet1;
-    t_outlet *x_outlet2;
+    t_outlet *x_curframe;
+    t_outlet *x_nbframes;
+    t_outlet *x_framerate;
 
     int packet0;
     bool initialized;
 
-    unsigned int x_vwidth;
-    unsigned int x_vheight;
-
-    bool loop;
+    t_int x_vwidth;
+    t_int x_vheight;
+    t_int x_size;
+    t_int x_fsize; // frames size
+    t_int x_length;
+    t_int x_current_frame;
+    t_int x_cursec;
+    t_int x_framescount;
 
     unsigned char * qt_rows[3];
 
@@ -53,7 +55,8 @@ typedef struct pdp_fqt_struct
     quicktime_t *qt;
     int qt_cmodel;
 
-    t_pdp_fqt_data *state_data;
+    unsigned int** x_frames;
+    t_int* x_fsizes;
 
 } t_pdp_fqt;
 
@@ -61,9 +64,16 @@ typedef struct pdp_fqt_struct
 
 static void pdp_fqt_close(t_pdp_fqt *x)
 {
+  t_int fi;
+
     if (x->initialized){
 	quicktime_close(x->qt);
-	free(x->qt_frame);
+	if ( x->qt_frame ) freebytes(x->qt_frame, x->x_size*3/2);
+        for ( fi=0; fi<x->x_length; fi++ )
+        {
+          if ( x->x_frames[fi] ) freebytes( x->x_frames[fi], x->x_fsizes[fi] );
+        }
+        if ( x->x_frames ) freebytes( x->x_frames, x->x_length*sizeof(unsigned int*) );
 	x->initialized = false;
     }
 
@@ -71,13 +81,13 @@ static void pdp_fqt_close(t_pdp_fqt *x)
 
 static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 {
-    unsigned int size;
+  t_int fi;
 
     post("pdp_fqt: opening %s", name->s_name);
 
     pdp_fqt_close(x);
 
-    x->qt = quicktime_open(name->s_name, 1, 0);
+    x->qt = quicktime_open(name->s_name, 1, 0); // read=yes, write=no 
 
     if (!(x->qt)){
 	post("pdp_fqt: error opening qt file");
@@ -103,86 +113,105 @@ static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 	x->qt_cmodel = BC_YUV420P;
 	x->x_vwidth  = quicktime_video_width(x->qt,0);
 	x->x_vheight = quicktime_video_height(x->qt,0);
-	x->qt_frame = (unsigned char*)malloc(x->x_vwidth*x->x_vheight*4);
-	size = x->x_vwidth * x->x_vheight;
+	x->x_size = x->x_vwidth * x->x_vheight;
+	x->qt_frame = (unsigned char*)getbytes(x->x_size*3/2);
 	x->qt_rows[0] = &x->qt_frame[0];
-	x->qt_rows[2] = &x->qt_frame[size];
-	x->qt_rows[1] = &x->qt_frame[size + (size>>2)];
+	x->qt_rows[2] = &x->qt_frame[x->x_size];
+	x->qt_rows[1] = &x->qt_frame[x->x_size + (x->x_size>>2)];
     
 	quicktime_set_cmodel(x->qt, x->qt_cmodel);
 	x->initialized = true;
-	outlet_float(x->x_outlet2, (float)quicktime_video_length(x->qt,0));
+        x->x_length = quicktime_video_length(x->qt,0);
+	outlet_float(x->x_nbframes, (float)x->x_length);
 
     }
+
+    // read all frames
+    x->x_current_frame = 0;
+    x->x_frames = (unsigned int**) getbytes( x->x_length*sizeof(unsigned int*) );
+    x->x_fsizes = (t_int*) getbytes( x->x_length*sizeof(t_int) );
+    x->x_fsize = 0;
+    if ( !x->x_frames )
+    {
+      post("pdp_fqt: couldn't allocate memory for frames" );
+      quicktime_close(x->qt);
+      x->initialized = false;
+      return;
+    }
+
+    for ( fi=0; fi<x->x_length; fi++ )
+    {
+       x->x_fsizes[fi] = ((x->x_size)+(x->x_size>>1))<<1;
+       x->x_fsize += x->x_fsizes[fi];
+       x->x_frames[fi] = (unsigned int*) getbytes( x->x_fsizes[fi] );
+       if ( !x->x_frames[fi] )
+       {
+         post("pdp_fqt: couldn't allocate memory for frames" );
+         quicktime_close(x->qt);
+         x->initialized = false;
+         return;
+       }
+
+       lqt_decode_video(x->qt, x->qt_rows, 0);
+
+       switch(x->qt_cmodel){
+       case BC_YUV420P:
+           pdp_llconv(x->qt_frame, RIF_YVU__P411_U8, x->x_frames[fi], RIF_YVU__P411_S16, 
+                            x->x_vwidth, x->x_vheight);
+           break;
+
+       default:
+           post("pdp_fqt : error on decode: unkown colour model");
+           break;
+       }
+    
+    }
+
+    post("pdp_fqt: allocated memory for %d frames (size=%db %dM)", 
+                   x->x_length, x->x_fsize, x->x_fsize/(1024*1024) );
 }
 
 
 static void pdp_fqt_bang(t_pdp_fqt *x)
 {
-  unsigned int w, h, nbpixels, packet_size;
-  int object, length, pos, i, j;
+  int object;
   short int* data;
   t_pdp* header;
-
-  static short int gain[4] = {0x7fff, 0x7fff, 0x7fff, 0x7fff};
+  struct timeval etime;
 
     if (!(x->initialized)){
 	//post("pdp_fqt: no qt file opened");
 	return;
     }
 
-    w = x->x_vwidth;
-    h = x->x_vheight;
-    nbpixels = w * h;
-    packet_size = (nbpixels + (nbpixels >> 1)) << 1;
-
     object = pdp_packet_new_image_YCrCb( x->x_vwidth, x->x_vheight );
     header = pdp_packet_header(object);
     data = (short int *) pdp_packet_data(object);
 
     header->info.image.encoding = PDP_IMAGE_YV12;
-    header->info.image.width = w;
-    header->info.image.height = h;
+    header->info.image.width = x->x_vwidth;
+    header->info.image.height = x->x_vheight;
 
-    length = quicktime_video_length(x->qt,0);
-    pos = quicktime_video_position(x->qt,0);
-    // post("pdp_fqt : video position : %d length =%d", pos, length );
+    x->x_current_frame = ( x->x_current_frame + 1 ) % x->x_length;
+    // post( "pdp_fqt : current frame : %d", x->x_current_frame );
 
-    if (pos >= length){
-	pos = (x->loop) ? 0 : length - 1;
-        // post("pdp_fqt : setting video position to %d", pos);
-	quicktime_set_video_position(x->qt, pos, 0);
+    memcpy( data, x->x_frames[x->x_current_frame], x->x_fsizes[x->x_current_frame] );
+
+    if ( gettimeofday(&etime, NULL) == -1)
+    {
+        post("pdp_fcqt : could not get time" );
     }
-
-    lqt_decode_video(x->qt, x->qt_rows, 0);
-
-    switch(x->qt_cmodel){
-    case BC_YUV420P:
-        pdp_llconv(x->qt_frame, RIF_YVU__P411_U8, data, RIF_YVU__P411_S16, x->x_vwidth, x->x_vheight);
-        break;
-
-    case BC_YUV422:
-        pdp_llconv(x->qt_frame, RIF_YUYV_P____U8, data, RIF_YVU__P411_S16, x->x_vwidth, x->x_vheight);
-        break;
-
-    case BC_RGB888:
-        pdp_llconv(x->qt_frame, RIF_RGB__P____U8, data, RIF_YVU__P411_S16, x->x_vwidth, x->x_vheight);
-        break;
-
-    default:
-        post("pdp_fqt : error on decode: unkown colour model");
-        break;
+    if ( etime.tv_sec != x->x_cursec )
+    {
+       x->x_cursec = etime.tv_sec;
+       outlet_float(x->x_framerate, (float)x->x_framescount);
+       x->x_framescount = 0;
     }
-    
-    outlet_float(x->x_outlet1, (float)pos);
+    x->x_framescount++;
+
+    outlet_float(x->x_curframe, (float)x->x_current_frame);
     pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
-}
-
-static void pdp_fqt_loop(t_pdp_fqt *x, t_floatarg loop)
-{
-    int loopi = (int)loop;
-    x->loop = !(loopi == 0);
 }
 
 static void pdp_fqt_frame_cold(t_pdp_fqt *x, t_floatarg frameindex)
@@ -208,25 +237,8 @@ static void pdp_fqt_frame(t_pdp_fqt *x, t_floatarg frameindex)
     pdp_fqt_bang(x);
 }
 
-static void pdp_fqt_gain(t_pdp_fqt *x, t_floatarg f)
-{
-    int i;
-    short int g;
-    float bound = (float)0x7fff;
-
-    f *= (float)0x7fff;
-
-    f = (f>bound) ? bound : f;
-    f = (f<-bound) ? -bound : f;
-
-    g = (short int)f;
-
-    for (i=0; i<4; i++) x->state_data->gain[i] = g;
-}
-
 static void pdp_fqt_free(t_pdp_fqt *x)
 {
-    free (x->state_data);
     pdp_fqt_close(x);
 }
 
@@ -237,20 +249,15 @@ void *pdp_fqt_new(void)
     t_pdp_fqt *x = (t_pdp_fqt *)pd_new(pdp_fqt_class);
 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("frame_cold"));
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("gain"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything);
-    x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
-    x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
+    x->x_curframe = outlet_new(&x->x_obj, &s_float);
+    x->x_nbframes = outlet_new(&x->x_obj, &s_float);
+    x->x_framerate = outlet_new(&x->x_obj, &s_float);
 
     x->packet0 = -1;
 
     x->initialized = false;
-
-    x->loop = false;
-
-    x->state_data = (t_pdp_fqt_data *)malloc(sizeof(t_pdp_fqt_data));
-    pdp_fqt_gain(x, 1.0f);
 
     return (void *)x;
 }
@@ -269,10 +276,8 @@ void pdp_fqt_setup(void)
     class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_bang, gensym("bang"), A_NULL);
     class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_close, gensym("close"), A_NULL);
     class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_open, gensym("open"), A_SYMBOL, A_NULL);
-    class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_loop, gensym("loop"), A_DEFFLOAT, A_NULL);
     class_addfloat (pdp_fqt_class, (t_method)pdp_fqt_frame);
     class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);
-    class_addmethod(pdp_fqt_class, (t_method)pdp_fqt_gain, gensym("gain"), A_FLOAT, A_NULL);
     class_addmethod(pdp_fqt_class, nullfn, gensym("signal"), 0);
     class_sethelpsymbol( pdp_fqt_class, gensym("pdp_fqt.pd") );
 
