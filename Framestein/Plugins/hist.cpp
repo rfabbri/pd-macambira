@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "pixels.h"
 
+INFO("helper for fs.hist")
+
 void perform_effect(_frame f, _args a)
 {
 	if(!a.s) return;

@@ -12,3 +12,5 @@ void perform_effect(_frame f, _args a)
 		p.next();
 	}
 }
+
+INFO("go green")

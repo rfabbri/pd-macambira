@@ -3505,8 +3505,12 @@ object main: Tmain
       Caption = 'Reload plugins'
       OnClick = MiReloadPluginsClick
     end
+    object MiToolbar: TMenuItem
+      Caption = 'Show Toolbar'
+      OnClick = MiToolbarClick
+    end
     object MiLog: TMenuItem
-      Caption = 'Show debug'
+      Caption = 'Show Debug'
       OnClick = MiLogClick
     end
     object MiExit: TMenuItem

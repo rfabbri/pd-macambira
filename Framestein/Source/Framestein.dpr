@@ -17,7 +17,8 @@ uses
   logunit in 'logunit.pas' {log},
   pluginunit in 'pluginunit.pas',
   progressunit in 'progressunit.pas' {Progress},
-  configureunit in 'configureunit.pas' {configure};
+  configureunit in 'configureunit.pas' {configure},
+  toolbarunit in 'toolbarunit.pas' {toolbar};
 
 {$R *.RES}
 
@@ -28,6 +29,7 @@ begin
   Application.CreateForm(TProgress, Progress);
   Application.CreateForm(Tconfigure, configure);
   Application.CreateForm(Tlog, log);
+  Application.CreateForm(Ttoolbar, toolbar);
   Application.Run;
 end.
 

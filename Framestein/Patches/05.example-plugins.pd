@@ -1,8 +1,8 @@
-#N canvas 106 10 880 659 12;
+#N canvas 106 10 882 661 12;
 #X obj 11 41 fs.main;
 #X msg 11 11 6001;
 #X msg 62 12 reset;
-#X text 157 37 Using Plugins;
+#X text 159 40 Using Plugins;
 #X obj 65 224 fs.framed plugins;
 #X msg 209 225 76 + 446;
 #X msg 34 95 noize;
@@ -23,6 +23,7 @@ operation.;
 #X msg 209 289 xbend 40 140;
 #X obj 321 359 init;
 #X obj 284 225 init;
+#X text 160 591 See the Plugins-dir for more.;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;

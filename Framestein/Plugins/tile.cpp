@@ -3,6 +3,8 @@
 #include "plugin.h"
 #include "pixels.h"
 
+INFO("duplicate image to multiple rows and columns")
+
 void perform_copy(_frame f1, _frame f2, _args a)
 {
 	pixels px(f2);

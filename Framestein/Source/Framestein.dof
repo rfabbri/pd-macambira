@@ -39,7 +39,7 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=
+OutputDir=e:\fs\Framestein
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
@@ -90,3 +90,6 @@ Item1=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\commo
 Item2=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\common\pshost
 Item3=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib
 Item4=E:\lab\common\DelphiX2000_0717-2\Source
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=e:\fs\Framestein

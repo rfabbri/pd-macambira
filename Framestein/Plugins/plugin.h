@@ -133,4 +133,8 @@ __inline byte klamp601(long in)
 	return(out);
 }
 
+// use this to easily describe your plugins:
+
+#define INFO(x) void info(char *s) { sprintf(s, x); }
+
 #endif // #ifndef _PLUGINH

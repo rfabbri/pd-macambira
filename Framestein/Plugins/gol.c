@@ -11,6 +11,8 @@
 #define BORN	1
 #define DYING	2
 
+INFO("Conway's Game Of Life")
+
 int aroundme(_frame f, int x, int y)
 {
 	pixel16 *p;

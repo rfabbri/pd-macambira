@@ -1,6 +1,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("randomly move around pixels")
+
 void perform_effect(_frame f, _args a)
 {
 	int i, o=1000, x1, y1, x2, y2, range=10;

@@ -34,6 +34,7 @@ type
     csToPd: TClientSocket;
     MiExit: TMenuItem;
     REConsole: TRichEdit;
+    MiToolbar: TMenuItem;
     procedure ss1ClientRead(Sender: TObject; Socket: TCustomWinSocket);
     procedure FormCreate(Sender: TObject);
     procedure ss1ClientError(Sender: TObject; Socket: TCustomWinSocket;
@@ -63,6 +64,7 @@ type
     procedure MiExitClick(Sender: TObject);
     procedure ImageLogoDblClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure MiToolbarClick(Sender: TObject);
   private
     { Private declarations }
     SocketMem: Pointer;
@@ -142,7 +144,7 @@ uses
   fscopyunit, fstextunit, fsdrawunit, fsbrowserunit,
   fsinfounit, fsaviunit,
   fastfiles,
-  Strz, logunit, configureunit, progressunit;
+  Strz, logunit, configureunit, progressunit, toolbarunit;
 
 {$IFDEF FSDLL}
 procedure TMainThread.Execute;
@@ -942,6 +944,12 @@ begin
 {$IFDEF FSDLL}
   MainT.Terminate;
 {$ENDIF}
+end;
+
+procedure Tmain.MiToolbarClick(Sender: TObject);
+begin
+  MiToolbar.Checked := not MiToolbar.Checked;
+  Toolbar.Visible := MiToolbar.Checked;
 end;
 
 end.

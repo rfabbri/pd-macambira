@@ -32,18 +32,21 @@ type
    const ret: PChar
    ); cdecl;
 
+  TInfoProc = procedure(const str: PChar); cdecl;
+
   TPointerList = TList;
   TLibraryList = TList;
 
   TPlugins = class(TComponent)
   private
-    Names: TStringList;
     EffectProcs: TPointerList;
     CopyProcs: TPointerList;
+    InfoProcs: TPointerList;
     Libs: TLibraryList;
     procedure LoadHandleFile(const SearchRec: TSearchRec;
      const FullPath: String);
   public
+    Names: TStringList;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Load;
@@ -56,6 +59,7 @@ type
     function CallCopy(const d1: TDirectDrawSurface;
      const d2: TDirectDrawSurface;
      const procIndex: Integer; const args: String): Boolean;
+    function Info(const procIndex: Integer): String;
   end;
 
 implementation
@@ -70,6 +74,7 @@ type
 const
   EffectProcName = 'perform_effect';
   CopyProcName = 'perform_copy';
+  InfoProcName = 'info';
 
 { TPlugins }
 
@@ -79,6 +84,7 @@ begin
   Names := TStringList.Create;
   EffectProcs := TPointerList.Create;
   CopyProcs := TPointerList.Create;
+  InfoProcs := TPointerList.Create;
   Libs := TLibraryList.Create;
 end;
 
@@ -114,6 +120,7 @@ var
   b: array[0..255] of Char;
   EffectProc: TEffectProc;
   CopyProc: TCopyProc;
+  InfoProc: TInfoProc;
   s: String;
   i: Integer;
 begin
@@ -123,12 +130,14 @@ begin
     if h<>0 then begin
       @EffectProc := GetProcAddress(h, EffectProcName);
       @CopyProc := GetProcAddress(h, CopyProcName);
+      @InfoProc := GetProcAddress(h, InfoProcName);
       s := ExtractFileName(FullPath);
       i := Pos('.DLL', UpperCase(s));
       if i>0 then Delete(s, i, 255);
       Names.Add(s);
       EffectProcs.Add(@EffectProc);
       CopyProcs.Add(@CopyProc);
+      InfoProcs.Add(@InfoProc);
       Libs.Add(@h);
     end;
   end;
@@ -215,6 +224,24 @@ begin
   if P[0]<>#0 then
     main.SendReturnValues(StrPas(P));
   Result := True;
+end;
+
+function TPlugins.Info(const procIndex: Integer): String;
+var
+  Proc: TInfoProc;
+  buf: array[0..255] of Char;
+  p: PChar;
+begin
+  if (procIndex=-1) or (procIndex>=InfoProcs.Count) then Exit;
+  @Proc := InfoProcs[procIndex];
+  if @Proc=nil then begin
+    Result := '';
+    Exit;
+  end;
+  buf[0]:=#0;
+  p := @buf;
+  Proc(p);
+  Result := StrPas(p);
 end;
 
 end.

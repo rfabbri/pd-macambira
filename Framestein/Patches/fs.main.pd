@@ -1,4 +1,4 @@
-#N canvas 278 0 710 499 12;
+#N canvas 278 0 720 628 12;
 #X floatatom 27 322 4 0 0;
 #X obj 207 160 loadbang;
 #X msg 206 254 disconnect;
@@ -13,10 +13,10 @@
 #X text 439 42 reset;
 #X obj 393 132 t b b;
 #X msg 428 158 send reset;
-#X obj 157 382 pack s f;
+#X obj 280 409 pack s f;
 #X floatatom 272 378 4 0 0;
 #X text 10 7 fs.main - handles communication with Framestein.;
-#X msg 157 411 \; \$1 \$2;
+#X msg 280 433 \; \$1 \$2;
 #X text 149 291 you can run framestein and the control-patches on separate
 machines by changing "localhost" to "your.windows.slave" above and
 configuring fs likewise (right-click fs).;
@@ -32,6 +32,15 @@ configuring fs likewise (right-click fs).;
 #X obj 530 207 r fs_reset;
 #X msg 207 185 6001;
 #X obj 27 293 netsend;
+#X msg 159 551 ping;
+#X obj 159 576 print fs.main;
+#X text 152 484 this can be used to resolve lockups: mark an area in
+pd console \, after a while pd will stop sending commands to fs.;
+#X msg 137 439 \; \$1 \$2 \$3 \$4 \$5;
+#X obj 137 416 pack s s f f s;
+#X obj 157 382 route obj;
+#X obj 159 526 fps 0;
+#X text 209 525 change to 0.1 to turn it on;
 #X connect 1 0 29 0;
 #X connect 2 0 30 0;
 #X connect 3 0 30 0;
@@ -46,8 +55,13 @@ configuring fs likewise (right-click fs).;
 #X connect 14 0 17 0;
 #X connect 20 0 12 0;
 #X connect 20 1 21 0;
-#X connect 22 0 14 0;
+#X connect 22 0 36 0;
 #X connect 22 1 15 0;
 #X connect 23 0 30 0;
 #X connect 29 0 23 0;
 #X connect 30 0 0 0;
+#X connect 31 0 32 0;
+#X connect 35 0 34 0;
+#X connect 36 0 35 0;
+#X connect 36 1 14 0;
+#X connect 37 0 31 0;

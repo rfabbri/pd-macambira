@@ -20,7 +20,7 @@ to tell Pd where to find Framestein's abstractions and externals.
 
 LICENCE
 
-Copyright (c) 2001-2002 Juha Vehviläinen.
+Copyright (c) 2001-2003 Juha Vehviläinen.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -39,8 +39,8 @@ Juha Vehviläinen, jusu@iki.fi
 
 "Framestein" name and logo: Vesa Vehviläinen
 
-Pink Twins (http://pinktwins.com) are making some heavy use of Framestein.
-Check their site!
+Pink Twins (http://pinktwins.com) are using Framestein for all their videos.
+Check that site!
 
 Plugins by Olaf Matthes:
 http://www.akustische-kunst.de/puredata/framestein/framestein.html

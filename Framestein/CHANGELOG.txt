@@ -1,4 +1,5 @@
 0.32
+- added toolbar, paste objects to patches
 - new plugin: lightspeed
 - fs.frame: |title this is the main window( and |undock( commands
 - fs.copy: transcolor <r> <g> <b> to set the transparent color
@@ -17,6 +18,7 @@
 
 - added line width setting to fs.draw
 - fix: border_0 no longer alters frame dimensions
+- preventing lockups-feature to fs.main.pd
 
 0.31
 - added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!

@@ -1,6 +1,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("helper for fs.rgb")
+
 void perform_effect(_frame f, _args a)
 {
 	char *t;

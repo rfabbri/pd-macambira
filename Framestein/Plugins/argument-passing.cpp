@@ -1,8 +1,10 @@
-//
-// example of parsing arguments in a plugin using the arguments-class (defined in pixels.h)
-//
-
+#include "plugin.h"
 #include "pixels.h"
+
+//
+INFO("example of parsing arguments in a plugin using the arguments-class")
+// (defined in pixels.h)
+//
 
 void perform_effect(_frame f, _args a)
 {

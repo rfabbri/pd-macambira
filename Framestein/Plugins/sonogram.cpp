@@ -18,6 +18,8 @@
 #define SONOMAXVAL 500
 #define sonotype float
 
+INFO("helper for fs.sonogram")
+
 int callcount=-1;
 
 void perform_effect(_frame f, _args a)
@@ -80,3 +82,4 @@ void perform_effect(_frame f, _args a)
 		}
 	}
 }
+

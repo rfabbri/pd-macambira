@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "pixels.h"
 
+INFO("subtract color components");
+
 void perform_effect(_frame f, _args a)
 {
 	arguments ar(a.s);

@@ -15,9 +15,10 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 
 FLAGS = /LD /Gd /GD /Ox
 
-EFFECT = /export:perform_effect
-COPY = /export:perform_copy
-BOTH = /export:perform_effect /export:perform_copy
+# does this suck or what? how to do it better?
+EFFECT = /export:info /export:perform_effect
+COPY = /export:info /export:perform_copy
+BOTH = /export:info /export:perform_effect /export:perform_copy
 
 noize:
 	cl noize.c $(FLAGS) /link $(BOTH)
