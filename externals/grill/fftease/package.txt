@@ -1,5 +1,11 @@
 NAME=fftease
 
+BUILDCLASS=ext
+BUILDMODE=release
+BUILDTYPE=single
+
+PRECOMPILE=main.h
+
 SRCDIR=src
 
 # all the source files from the package
