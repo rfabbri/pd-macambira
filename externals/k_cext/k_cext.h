@@ -23,7 +23,6 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include <ctype.h>
 #ifdef _MSC_VER
 typedef int bool;
 #define true 1
