@@ -8,23 +8,25 @@
 ###############################################
 # package info
 
-USRINFO=package.txt
+!ifndef PKGINFO
+PKGINFO=package.txt
+!endif
 
-!include $(USRINFO)
+!include $(PKGINFO)
 
 ###############################################
 # check variables
 
 !ifndef BUILDCLASS
-!error BUILDCLASS must be specified in $(USRINFO)
+BUILDCLASS=ext
 !endif
 
 !ifndef BUILDMODE
-!error BUILDMODE must be specified in $(USRINFO)
+BUILDMODE=release
 !endif
 
 !ifndef BUILDTYPE
-!error BUILDTYPE must be specified in $(USRINFO)
+BUILDTYPE=single
 !endif
 
 ##############################
@@ -44,7 +46,7 @@ SYSDEFAULT=$(BUILDPATH)$(PLATFORM)\$(RTSYS)\config-$(COMPILER).def
 
 OPTIONS=-f $(BUILDPATH)bmake-sub.mak -N \
 	PLATFORM=$(PLATFORM) RTSYS=$(RTSYS) COMPILER=$(COMPILER) \
-	BUILDPATH=$(BUILDPATH) USRINFO=$(USRINFO)
+	BUILDPATH=$(BUILDPATH) PKGINFO=$(PKGINFO) BUILDCLASS=$(BUILDCLASS)
 
 ###############################################
 
@@ -52,7 +54,7 @@ OPTIONS=-f $(BUILDPATH)bmake-sub.mak -N \
 USRCONFIG=config.txt
 USRDEFAULT=$(BUILDDIR)\config-$(PLATFORM).def
 
-USRMAKE=$(BUILDDIR)\makefile-$(PLATFORM)-$(COMPILER).inc
+USRMAKE=$(BUILDDIR)\bmake-$(PLATFORM)-$(COMPILER).inc
 
 OPTIONS=$(OPTIONS) USRCONFIG=$(USRCONFIG) USRMAKE=$(USRMAKE)
 !endif
