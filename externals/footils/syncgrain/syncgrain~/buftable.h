@@ -70,7 +70,7 @@ class buftable : public Table
 
 	private:
 		int   m_error;     // error code
-		flext::flext::buffer * buf;
+		flext::buffer * buf;
 };
 
 #endif

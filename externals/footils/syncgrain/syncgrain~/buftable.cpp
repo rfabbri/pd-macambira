@@ -35,12 +35,12 @@ buftable::buftable()
 	: 
 	buf(NULL)
 {
-	buf = new flext::flext::buffer(NULL);
+	buf = new flext::buffer(NULL);
 }
 
 buftable::buftable(const t_symbol *s, bool delayed)
 {
-	buf = new flext::flext::buffer(s, delayed);
+	buf = new flext::buffer(s, delayed);
 }
 
 
