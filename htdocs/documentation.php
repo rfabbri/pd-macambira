@@ -14,15 +14,11 @@
 <?php include('menu.inc'); ?>
 <br>
 <br>
+<!-- Quote of the day -->
 <?php include('quote.inc'); ?>
-
 
 </div>
 <div id="Content">
-<!-- Quote of the day -->
-<table border=0 width=650 class="bordered">
-<tr>
-<td>
 
 <h2>Projects at the Pure Data Ext. Repository</h2>
 <p>The following projects already have put their sources inside the Pure Data
@@ -241,7 +237,7 @@ control.
 
 <BR>
 <BR>
-<center>
+<p align="center">
 <?php include('webring.inc'); ?>
 <br clear="all">
 
@@ -250,8 +246,7 @@ control.
  src="http://sourceforge.net/sflogo.php?group_id=55736&amp;type=5"
  width="210" height="62" border="0" alt="SourceForge Logo"></A>
 
-</center>
-</td></tr></table>
+</p>
 <?php include('lastmodified.inc'); ?>
 
 </div>
