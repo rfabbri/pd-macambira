@@ -1,6 +1,6 @@
 This is the readme for "Chaos PD Externals" a set of objects for PD which 
 calculate various "Chaotic Attractors"; including, Lorenz, Rossler, Henon 
-and Ikeda. Hopefully more will be on thier way. 
+and Ikeda. Hopefully more will be on their way. 
 
 If you have any questions/comments you can reach me at ben@ekran.org
 
