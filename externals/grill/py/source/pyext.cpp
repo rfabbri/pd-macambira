@@ -1,6 +1,6 @@
 /* 
 
-py/pyext - python script object for PD and MaxMSP
+py/pyext - python script object for PD and Max/MSP
 
 Copyright (c)2002-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -32,6 +32,8 @@ V pyext::Setup(t_classid c)
 
 	FLEXT_CADDMETHOD_(c,0,"get",m_get);
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
+
+  	FLEXT_CADDATTR_VAR1(c,"respond",respond);
 }
 
 pyext *pyext::GetThis(PyObject *self)
@@ -224,7 +226,6 @@ pyext::~pyext()
 	Unregister("_pyext");
 
 	Py_XDECREF(pyobj);
-
 	Py_XDECREF(class_obj);
 	Py_XDECREF(class_dict);
 
@@ -244,39 +245,45 @@ BL pyext::SetClssMeth() //I argc,t_atom *argv)
 		PyObject *pref = PyObject_GetAttrString(module,const_cast<C *>(GetString(methname)));  
 		if(!pref) 
 			PyErr_Print();
-		else if(PyClass_Check(pref)) {
-			// make instance, but don't call __init__ 
-			pyobj = PyInstance_NewRaw(pref,NULL);
+        else {
+            if(PyClass_Check(pref)) {
+			    // make instance, but don't call __init__ 
+			    pyobj = PyInstance_NewRaw(pref,NULL);
 
-			Py_DECREF(pref);
-			if(pyobj == NULL) 
-				PyErr_Print();
-			else {
-				// remember the this pointer
-				PyObject *th = PyLong_FromVoidPtr(this); 
-				int ret = PyObject_SetAttrString(pyobj,"_this",th); // ref is taken
+			    Py_DECREF(pref);
+			    if(pyobj == NULL) 
+				    PyErr_Print();
+			    else {
+				    // remember the this pointer
+				    PyObject *th = PyLong_FromVoidPtr(this); 
+				    int ret = PyObject_SetAttrString(pyobj,"_this",th); // ref is taken
 
-				// call init now, after _this has been set, which is
-				// important for eventual callbacks from __init__ to c
-				PyObject *pargs = MakePyArgs(NULL,args,-1,true);
-				if (pargs == NULL) PyErr_Print();
+				    // call init now, after _this has been set, which is
+				    // important for eventual callbacks from __init__ to c
+				    PyObject *pargs = MakePyArgs(NULL,args,-1,true);
+				    if (pargs == NULL) PyErr_Print();
 
-				PyObject *init;
-				init = PyObject_GetAttrString(pyobj,"__init__"); // get ref
-				if(init && PyCallable_Check(init)) {
-					PyObject *res = PyEval_CallObject(init,pargs);
-					if(!res)
-						PyErr_Print();
-					else
-						Py_DECREF(res);
-                    Py_DECREF(init);
-				}
-				
-				Py_XDECREF(pargs);
-			}
+				    PyObject *init;
+				    init = PyObject_GetAttrString(pyobj,"__init__"); // get ref
+                    if(init) {
+                        if(PyCallable_Check(init)) {
+					        PyObject *res = PyEval_CallObject(init,pargs);
+					        if(!res)
+						        PyErr_Print();
+					        else
+						        Py_DECREF(res);
+                        }
+                        Py_DECREF(init);
+				    }
+    				
+				    Py_XDECREF(pargs);
+			    }
+            }
+            else
+			    post("%s - Type of \"%s\" is unhandled!",thisName(),GetString(methname));
+
+		    Py_DECREF(pref);
 		}
-		else 
-			post("%s - Type of \"%s\" is unhandled!",thisName(),GetString(methname));
 		return true;
 	}
 	else
@@ -287,6 +294,7 @@ V pyext::Reload()
 {
 	ClearBinding();
 	Py_XDECREF(pyobj);
+
 	// by here, the Python class destructor should have been called!
 
 	SetArgs(0,NULL);
@@ -321,7 +329,7 @@ void pyext::m_get(const t_symbol *s)
     PY_LOCK
 
 	PyObject *pvar  = PyObject_GetAttrString(pyobj,const_cast<char *>(GetString(s))); /* fetch bound method */
-	if(pvar == NULL) {
+	if(!pvar) {
 		PyErr_Clear(); // no method found
         post("%s - get: Python variable %s not found",thisName(),GetString(s));
 	}
@@ -384,13 +392,12 @@ void pyext::m_set(int argc,const t_atom *argv)
 
 BL pyext::m_method_(I n,const t_symbol *s,I argc,const t_atom *argv)
 {
-	if(pyobj && n >= 1) {
-		return callwork(n,s,argc,argv);
-	}
-	else {
+    BL ret = false;
+	if(pyobj && n >= 1)
+		ret = callwork(n,s,argc,argv);
+    else
 		post("%s - no method for type '%s' into inlet %i",thisName(),GetString(s),n);
-		return false;
-	}
+    return ret;
 }
 
 
@@ -413,6 +420,8 @@ V pyext::m_help()
 	post("\treload. : reload with former arguments");
 	post("\tdoc: display module doc string");
 	post("\tdoc+: display class doc string");
+	post("\tdir: dump module dictionary");
+	post("\tdir+: dump class dictionary");
 #ifdef FLEXT_THREADS
 	post("\tdetach 0/1: detach threads");
 	post("\tstop {wait time (ms)}: stop threads");
@@ -502,19 +511,19 @@ V pyext::work_wrapper(V *data)
 
 BL pyext::callwork(I n,const t_symbol *s,I argc,const t_atom *argv)
 {
-	if(detach) {
-		if(shouldexit) {
+    BL ret = true,ok = false;
+    if(detach) {
+		if(shouldexit)
 			post("%s - Stopping.... new threads can't be launched now!",thisName());
-			return true;
-		}
 		else {
-			BL ret = FLEXT_CALLMETHOD_X(work_wrapper,new work_data(n,s,argc,argv));
+			ret = FLEXT_CALLMETHOD_X(work_wrapper,new work_data(n,s,argc,argv));
 			if(!ret) post("%s - Failed to launch thread!",thisName());
-			return true;
 		}
 	}
-	else 
-		return work(n,s,argc,argv);
+    else
+		ret = ok = work(n,s,argc,argv);
+    Respond(ok);
+    return ret;
 }
 
 BL pyext::work(I n,const t_symbol *s,I argc,const t_atom *argv)
