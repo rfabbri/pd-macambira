@@ -1,0 +1,152 @@
+#N canvas 144 2 604 484 12;
+#X text 19 14 WHAT IS THIS ALL ABOUT?;
+#X text 31 40 Depending on the complexity of your patches \, you may
+need to control whether or not messages will be used by only ONE patch
+\, or throughout all open patches. The scope of a message is considered
+either 'local' or 'global'.;
+#N canvas 146 223 600 383 GLOBAL_SCOPE 0;
+#N canvas 0 0 254 169 example_a 0;
+#X obj 18 9 r foo;
+#X floatatom 18 34 5 0 0 0 - - -;
+#X obj 24 96 r a-foo;
+#X floatatom 24 116 5 0 0 0 - - -;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 34 56 pd example_a;
+#N canvas 2 238 256 163 example_b 0;
+#X obj 12 9 r foo;
+#X floatatom 12 28 5 0 0 0 - - -;
+#X obj 15 74 r b-foo;
+#X floatatom 15 93 5 0 0 0 - - -;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 155 57 pd example_b;
+#N canvas 0 473 231 169 example_c 0;
+#X obj 12 8 r foo;
+#X floatatom 12 30 5 0 0 0 - - -;
+#X obj 12 65 r c-foo;
+#X floatatom 12 86 5 0 0 0 - - -;
+#X connect 0 0 1 0;
+#X connect 2 0 3 0;
+#X restore 269 57 pd example_c;
+#X text 377 58 Open these subpatches.;
+#X obj 43 142 s foo;
+#X floatatom 43 126 5 0 0 0 - - -;
+#X text 33 85 Click-n-drag these number boxes and notice the appropriate
+receive objects in each open sub-patch.;
+#X floatatom 102 126 5 0 0 0 - - -;
+#X floatatom 179 126 5 0 0 0 - - -;
+#X floatatom 252 126 5 0 0 0 - - -;
+#X obj 102 142 s a-foo;
+#X obj 179 142 s b-foo;
+#X obj 252 142 s c-foo;
+#X text 18 23 GLOBAL SCOPE - send and receive messages in ALL OPEN
+PATCHES;
+#X text 35 177 Send objects simply post their information to the cyberspace
+within your computer (that's one way to look at it!) Receive objects
+simply keep their ears open for all messages floating through that
+cyberspace from send objects of the same name! Hence \, if you name
+a [send] something like "foo" \, then all [receive] objects in open
+patches named "foo" will 'hear' those messages. Also note that the
+term 'open patches' includes all sub-patches \, abstractions and patches
+that are currently open in PD - they don't have to be VISIBLE...they
+only have to be active.;
+#X connect 5 0 4 0;
+#X connect 7 0 10 0;
+#X connect 8 0 11 0;
+#X connect 9 0 12 0;
+#X restore 21 146 pd GLOBAL_SCOPE;
+#N canvas 146 94 608 553 LOCAL_SCOPE 0;
+#X text 3 16 LOCAL SCOPE -send and receive messages within a SINGLE
+PATCH;
+#X text 13 44 There are many cases where you may want messages to be
+sent within a single patch. For example \, you might have designed
+many modules with a receive object called [r number] but you want that
+'number' to be passed to only the objects within a single module so
+that they don't effect the performance of the other modules.;
+#X text 12 151 In these cases \, you should use "local variables" to
+name your send and receive objects. Local variables are assigned using
+dollar signs and numbers. There is more documentation about this in
+2.control.examples/locality.pd;
+#X obj 87 240 r \$1;
+#X obj 21 263 s \$1;
+#X floatatom 21 239 5 0 0 0 - - -;
+#X floatatom 87 266 5 0 0 0 - - -;
+#X floatatom 192 242 5 0 0 0 - - -;
+#X floatatom 281 268 5 0 0 0 - - -;
+#X obj 281 242 r \$1-foo;
+#X obj 192 266 s \$1-foo;
+#X floatatom 370 242 5 0 0 0 - - -;
+#X floatatom 459 268 5 0 0 0 - - -;
+#X text 23 298 In the examples above I have used a variable ($1) to
+name these [send] and [receive] objects. The value of this variable
+is assigned either by PD (randomly for each abstraction or patch) \,
+or by me with the use of arguments. Notice in the 'title' of this patch
+\, you should see:;
+#X text 22 392 LOCAL_SCOPE (and inheritance);
+#X obj 459 242 r \$2-dave;
+#X obj 370 266 s \$2-dave;
+#X text 21 420 The words "and" and "inheritance" are arguments that
+I used when I created the abstraction called "all_about_scope_and_locality".
+These two agruments are now available in this patch by using \$1 or
+\$2 variables. There's more information about this in the section called
+'Inheritance'.;
+#X connect 3 0 6 0;
+#X connect 5 0 4 0;
+#X connect 7 0 10 0;
+#X connect 9 0 8 0;
+#X connect 11 0 16 0;
+#X connect 15 0 12 0;
+#X restore 21 175 pd LOCAL_SCOPE;
+#N canvas 145 31 602 607 INHERITANCE 0;
+#X text 20 18 The word "Inherit" means to "receive a characteristic
+from one's parent".;
+#X text 19 59 In PD \, all abstracions and subpatches have 'parents'
+-- the parent is the main patch which created the instance of the abstraction
+or subpatch.;
+#X text 18 117 We can use 'arguments' when creating an abstraction
+in a patch to send values to those 'children'. For example \, this
+help document contains a number of different subpatches and abstractions.
+One abstraction is called "all_about_scope_and_locality" -- you are
+currently reading a subpatch in that abstraction. When I created that
+abstraction in the parent patch \, I defined two arguments: "and" and
+"inheritance". So \, those two values are now available throughout
+this abstraction and all of its subpatches!;
+#X obj 49 327 symbol \$1;
+#X symbolatom 49 356 0 0 0 0 - - -;
+#X obj 49 305 bng 15 250 50 0 empty empty click_here_to_see 0 -6 0
+8 -262144 -1 -1;
+#X symbolatom 146 356 0 0 0 0 - - -;
+#X obj 146 327 symbol \$2;
+#X text 24 388 So \, if a [send] object is named "$1-foo" or "$2-foo"
+inside this abstraction \, PD identifies that [send] object as "and-foo"
+or "inheritance-foo".;
+#X obj 47 466 s and-foo;
+#X obj 47 516 s \$1-foo;
+#X obj 47 445 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 47 493 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 163 495 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 163 462 r and-foo;
+#X obj 280 443 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 280 491 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 431 497 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 280 464 s inheritance-foo;
+#X obj 431 464 r inheritance-foo;
+#X obj 280 514 s \$2-foo;
+#X connect 3 0 4 0;
+#X connect 5 0 3 0;
+#X connect 5 0 7 0;
+#X connect 7 0 6 0;
+#X connect 11 0 9 0;
+#X connect 12 0 10 0;
+#X connect 14 0 13 0;
+#X connect 15 0 18 0;
+#X connect 16 0 20 0;
+#X connect 19 0 17 0;
+#X restore 21 206 pd INHERITANCE;
