@@ -1,0 +1,110 @@
+oggwrite~ version 0.1b
+copyright (c) 2002 by Olaf Matthes
+
+oggwrite~ is an ogg/vorbis file writing external for pd (by Miller 
+Puckette).
+
+
+To run oggwrite~ place the file oggwrite~.dll for win or oggwrite~.pd_linux 
+in the directory of our patch or start pd with '-lib oggwrite~' flag. 
+
+To compile oggwrite~ on Linux get the ogg/vorbice library from 
+http://www.vorbis.com/.
+You have to modify the makefile to make it point to the place where the
+ogg/vorbis library is.
+
+
+This software is published under LGPL terms.
+
+This is software with ABSOLUTELY NO WARRANTY.
+Use it at your OWN RISK. It's possible to damage e.g. hardware or your hearing
+due to a bug or for other reasons. 
+
+*****************************************************************************
+
+oggwrite~ uses the ogg/vorbice library to encode audio data.
+The latest version of ogg/vorbis can be found at http://www.vorbice.com/
+
+Below is the original copyright information taken from the ogg/vorbis library:
+
+
+Copyright (c) 2001, Xiphophorus
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+- Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+- Neither the name of the Xiphophorus nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*****************************************************************************
+
+Usage:
+
+Use message "vbr <samplerate> <channels> <quality>" to set the vorbis
+encoding parameters. Resampling is currently not supported, so 'samplerate' 
+should be the one pd is running at. 'channels' specyfies the number of channels 
+to stream. This can be set to 2 (default) or 1 which means mono stream taking
+the leftmost audio input only. 'quality' can be a value between 0.0 and 1.0 
+giving the quality of the stream. 0.4 (default) results in a stream that's 
+about 128kbps. 
+
+Since Vorbis uses VBR encoding, bitrates vary depending on the type of audio
+signal to be encoded. A pure sine [osc~] results in the smalest stream, com-
+plex audio signals will increase this value significantly. To test the maximum 
+bitrate that might occur for a quality setting use noise~ as signal input.
+
+Use message "vorbis <samplerate> <channels> <maximum bitrate> <nominal bit-
+rate> <minimal bitrate>" to set encoding quality on the basis of bitrates.
+When setting all three bitrate parameters to the same value one gets a
+constant bitrate stream. Values are in kbps!
+
+Message "open <filename>" opens an existing file. In case the file does not
+exist oggwrite~ will create it. Previously opened files will be closed. To
+determine how data should be written to the file choose "append" (default) 
+or "truncate" (in case you want to overwrite data in your file).
+
+To set the comment tags in the ogg/vorbis header (which can be displayed by
+the receiving client) use message "<NAMEOFTAG> <comment>". Supported tags are:
+TITLE, ARTIST, GENRE, PERFORMER, LOCATION, COPYRIGHT, CONTACT, DESCRIPTION and
+DATE (which is automatically set to the date/time the broadcast started). To
+get spaces use '=' instead.
+
+Note that changing encoding parameters or header comments while oggwrite~ is
+recording to file might result in audible dropouts.
+
+
+Listening to it:
+
+To listen to ogg/vorbis encoded audio files many player need an extra plug-in.
+Have a look at http://www.vorbis.com/ to find the appropiate plug-in for your
+player.
+
+
+
+
+
+Latest version can be found at:
+http://www.akustische-kunst.de/puredata/
+
+Please report any bugs to olaf.matthes@gmx.de!

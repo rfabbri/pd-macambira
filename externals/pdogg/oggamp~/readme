@@ -1,0 +1,87 @@
+Version 0.2
+copyright (c) 2002 by Olaf Matthes
+
+oggamp~ is an ogg/vorbis streaming client external for pd (by Miller 
+Puckette) that connects to an IceCast2 server.
+Graphical buffer status display written by Yves Degoyon (ydegoyon@free.fr).
+
+
+To run oggamp~ place the file oggamp~.dll for win or oggamp~.pd_linux 
+in the directory of our patch or start pd with '-lib oggamp~' flag. 
+
+To compile oggamp~ on Linux get the ogg/vorbice library from 
+http://www.vorbis.com/.
+You have to modify the makefile to make it point to the place where the
+ogg/vorbis library is.
+
+
+This software is published under LGPL terms.
+
+This is software with ABSOLUTELY NO WARRANTY.
+Use it at your OWN RISK. It's possible to damage e.g. hardware or your hearing
+due to a bug or for other reasons. 
+
+*****************************************************************************
+
+oggamp~ uses the ogg/vorbice library to encode audio data.
+The latest version of ogg/vorbis can be found at http://www.vorbice.com/
+
+Below is the original copyright information taken from the ogg/vorbis library:
+
+
+Copyright (c) 2001, Xiphophorus
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+- Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+- Neither the name of the Xiphophorus nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*****************************************************************************
+
+Usage:
+
+To run oggamp~ innormal mode, just use [oggamp~] or, to get the buffer status
+displayed, use [oggamp~ 1].
+
+Message "connect <host> <mountpoint> <port>" connects to an IceCast2 server.
+Note that no response about succesfull connection is send by the server. All
+messages in the pd console window about connection status depend on the ability
+to receive data from the server.
+Use "connecturl <url>" to use url-like server adresses (like http://host:post/
+stream.ogg).
+
+Known bugs and other things:
+- pd halts for a moment when oggamp~ connects to the server. This results in a
+  short audio drop out of sound currently played back.
+- resampling not jet supported
+- playback does not stop on a buffer underrun
+- oggamp~ disconnects at end of stream, i.e. it is not possible to play back
+  files streamed one after another without manual reconnect
+
+
+Latest version can be found at:
+http://www.akustische-kunst.de/puredata/
+
+Please report any bugs to olaf.matthes@gmx.de!

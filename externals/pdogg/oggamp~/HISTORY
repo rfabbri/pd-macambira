@@ -1,0 +1,40 @@
+Version history of oggamp~ external for pure-data
+
+v 0.2f (20st july 2002):
+- recompiled with the final 1.0 release of Ogg Vorbis
+
+v 0.2e (21st june 2002 - stable release):
+- added downsamling
+- cleaned up code a bit
+- added some more info-printout
+- fixed some bugs to make it work correctly on Linux
+  thanks to Oliver Thuns at radiostudio.org
+- now disconnects correctly at end-of-stream (when no
+  chained stream follows)
+- KNOWN BUG: graphic buffer status display might cause ugly
+  printout of Tcl/Tk commands to console window on Linux
+  under some circumstances (e.g. in case server dies)
+
+v 0.2d (12th june 2002):
+- added upsamling
+- finally fixed the End-Of-Stream bug: it's now 
+  possible to listen to a playlist with correct
+  update of stream information
+
+v 0.2c (10th june 2002):
+- fixed some bugs, introduced some new ones...
+
+v 0.2a (11th mar. 2002):
+- introduced child thread for connect: now pd
+  does no longer 'stop' audio; as a side effect it
+  is now possible to connect to an oggcast~ stream
+  from the same instance of pd
+- threads now use pthreads libraray on Win to have 
+  things compatible with UNIX
+- fixed a small bug that made 'old' audio appear on 
+  the beginning of 'new' one after reconnecting
+
+v 0.1c (19th feb. 2002):
+- first (sort of) stable release
+
+

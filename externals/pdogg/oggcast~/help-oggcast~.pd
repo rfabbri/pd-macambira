@@ -1,0 +1,57 @@
+#N canvas 256 31 609 501 10;
+#X floatatom 18 36 0 40 16000;
+#X msg 467 454 \; pd dsp 1;
+#X floatatom 18 470 0 0 0;
+#X msg 171 152 disconnect;
+#X msg 207 283 print;
+#X msg 533 454 \; pd dsp 0;
+#X obj 467 428 loadbang;
+#X floatatom 96 448 10 0 0;
+#X text 120 80 connect <host> <mountpoint> <port>;
+#X text 272 45 get latest version at;
+#X text 274 59 http://www.akustische-kunst.de/puredata/;
+#X text 188 178 vorbis <samplerate> <channles> <max.br> <nom.br> <min.br>
+;
+#X text 167 448 ogg pages;
+#X text 47 473 connection state;
+#X text 372 249 channels: 1 or 2 (default);
+#X text 203 214 vbr <samplerate> <channels> <quality>;
+#X msg 100 57 passwd letmein;
+#X obj 18 63 osc~ 440;
+#X text 323 236 quality settings: 0 - 1 (low - hi);
+#X text 324 265 resampling currently not supported!;
+#X text 216 345 possible tags: TITLE \, ARTIST \, PERFORMER \, DESCRIPTION
+\,;
+#X text 305 358 GENRE \, LOCATION \, COPYRIGHT \, CONTACT \, DATE;
+#X msg 188 195 vorbis 44100 2 144 128 96;
+#X msg 152 120 connect 141.53.196.149 puredata.ogg 8000;
+#X msg 122 98 connect localhost puredata.ogg 8000;
+#X msg 202 230 vbr 44100 2 0.4;
+#X obj 17 421 oggcast~ 2 512;
+#X text 19 6 oggcast~ 0.2b - send Ogg Vorbis stream to IceCast2 or
+JRoar;
+#X text 273 34 written by Olaf Matthes <olaf.matthes@gmx.de>;
+#X text 246 284 print current settings to console window;
+#X text 214 306 comment: <TAG> <content>;
+#X msg 214 323 ARTIST your_name;
+#X text 118 421 creation arguments: oggcast~ <channles> <buffer size>
+;
+#X text 239 439 default is 2 channels and 512k;
+#X text 240 451 bytes buffer size;
+#X text 217 376 '_' (underline) or '=' (equal sign) will get replaced
+with spaces! Note that changing any settings while streaming might
+result in audible dropouts!;
+#X connect 0 0 17 0;
+#X connect 3 0 26 0;
+#X connect 4 0 26 0;
+#X connect 6 0 1 0;
+#X connect 16 0 26 0;
+#X connect 17 0 26 0;
+#X connect 17 0 26 1;
+#X connect 22 0 26 0;
+#X connect 23 0 26 0;
+#X connect 24 0 26 0;
+#X connect 25 0 26 0;
+#X connect 26 0 2 0;
+#X connect 26 1 7 0;
+#X connect 31 0 26 0;

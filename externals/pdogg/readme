@@ -1,0 +1,79 @@
+Version 0.2
+copyright (c) 2002 by Olaf Matthes
+
+pdogg~ is a collection of ogg/vorbis externals for pd (by Miller 
+Puckette).
+
+It includes:
+- oggamp~   : streaming client
+- oggcast~  : streamer (for Icecast2)
+- oggread~  : reads files from disk
+- oggwrite~ : writes files to disk
+
+
+To use pdogg~ start pd with '-lib path\to\pdogg' flag. 
+On Win32 systems Pd 0.35 test 17 or later is necessary to get it working!
+
+To compile pdogg~ you need the ogg/vorbice library from 
+http://www.vorbis.com/ and under win additionally Pthreads-win32 from
+http://sources.redhat.com/pthreads-win32/.
+You have to modify the makefile to make it point to the place where the
+libraries can be found on your system.
+
+
+This software is published under LGPL terms.
+
+This is software with ABSOLUTELY NO WARRANTY.
+Use it at your OWN RISK. It's possible to damage e.g. hardware or your hearing
+due to a bug or for other reasons. 
+
+*****************************************************************************
+
+pdogg~ uses the ogg/vorbice library to encode audio data.
+The latest version of ogg/vorbis can be found at http://www.vorbice.com/
+
+Below is the original copyright information taken from the ogg/vorbis library:
+
+
+Copyright (c) 2001, Xiphophorus
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+- Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+- Neither the name of the Xiphophorus nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+
+Below the copyright notice for Pthreads-win32:
+
+    Pthreads-win32 is open software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public License
+    as published by the Free Software Foundation version 2.1 of the
+    License.
+    Pthreads-win32 is several binary link libraries, several modules,
+    associated interface definition files and scripts used to control
+    its compilation and installation.
+    Pthreads-win32 is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+*****************************************************************************
+
+For information about the included externals see the README files provided
+in the subdirectories.
+
+
+Latest version can be found at:
+http://www.akustische-kunst.de/puredata/
+
+Please report any bugs to olaf.matthes@gmx.de!
