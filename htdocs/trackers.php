@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: trackers.php,v 1.1 2004-11-15 15:04:39 ggeiger Exp $  -->
+<!-- $Id: trackers.php,v 1.2 2004-11-15 15:07:53 ggeiger Exp $  -->
 
 <HTML>
 
@@ -59,7 +59,7 @@ developers list or to Miller directly.
 </p>
 <br>
 <p>
-If your patch is a bug fix, please choose the category "bugfix" in order
+If your patch is a bug fix, please choose the group "bugfix" in order
 to mark it clearly.
 </p>
 <br>
