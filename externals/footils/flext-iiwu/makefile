@@ -10,6 +10,7 @@ include config-pd-linux.txt
 
 FLEXTLIB=$(FLEXTPATH)/flext_t.a  # take threaded library for all
 
+PDEXTRA=$(DESTDIR)/usr/lib/pd/extra
 
 # compiler+linker stuff	### EDIT! ###
 #CXX=g++ #-3.2
@@ -50,6 +51,9 @@ $(OUTPATH)/%.pd_linux : $(OUTPATH)/%.o $(FLEXTLIB)
 	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%,$(LIBPATH)) $^ $(patsubst %,-l%,$(LIBS)) -o $@
 	chmod 755 $@
 
+
+install:
+	install -m 644 pd-linux/fiiwu~.pd_linux $(PDEXTRA)
 
 .PHONY: clean
 clean:
