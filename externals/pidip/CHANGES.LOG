@@ -1,3 +1,13 @@
+0.12.6
+  fix conflict between pdp_text and pdp_imgloader ( and the likes using Imlib2 )
+  fix successive loading of images in pdp_imgloader
+  set help patches for all objects and install them in PD's doc folder ( compliant with 0.37 )
+0.12.5
+  pdp_cache : hiding triangular zones from a video stream to let you do some collage 
+  ( see collage.pd patch )
+  pdp_imgloader : added "hide" method for triangles to let you do some collage 
+  ( see collage.pd patch )
+  pdp_transition : added "page" transitions
 0.12.4
   added pdp_imgsaver : save an image from the current video stream
   pdp_transition : added "melt" and "blend" transitions

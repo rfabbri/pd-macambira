@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
-PDP_PIDIP_VERSION=0.12.4
+PDP_PIDIP_VERSION=0.12.6
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -50,7 +50,7 @@ AC_CHECK_LIB(vorbisenc, vorbis_encode_setup_init, , AC_MSG_ERROR(streaming requi
 
 AC_SUBST(PDP_PIDIP_VERSION)
 
-MAGICK_LIBS="-L/usr/X11R6/lib `Magick-config --libs` `Magick-config --ldflags`"
+MAGICK_LIBS="-L/usr/X11R6/lib -lMagick `Magick-config --libs` `Magick-config --ldflags`"
 MAGICK_CFLAGS="-I/usr/X11R6/include `Magick-config --cflags` "
 AC_SUBST(MAGICK_LIBS)
 AC_SUBST(MAGICK_CFLAGS)
