@@ -1,3 +1,4 @@
+
 /*
 rawmouse - an external object for Miller Puckette's Pure Data
 
@@ -140,7 +141,7 @@ struct input_event {
 
 typedef struct _rawmouse {
   t_object t_ob;
-  struct input_event x_mouse_event[64]; /* the events (up to 64 at once) */
+  struct input_event x_mouse_event; 
   int x_mouse_fd;
   float x_scale;
   float x_translation;
@@ -184,13 +185,10 @@ void *rawmouse_new(t_float delaytime, t_float scale, t_float translation)
     x->x_mouse_fd = open (RAWMOUSE_DEVICE, O_RDONLY | O_NONBLOCK);
 
     /* read input_events from the RAWMOUSE_DEVICE stream 
-     *
-     * what is this doing?  its doesn't make sense
-     * there seems to be two while loops in joystick.c reading
-     * the input device, one in _new, and the other in _read
-    while (read (x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event)) > -1);
-    */
-    while ( read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event) * 64) > -1);
+     * It seems that is just there to prime the event input
+     */
+    while (read (x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event)) > -1)
+      post("prime the stream test %d", x->x_mouse_event);
     
     /* if delaytime is set in the object's creation arguments
      * use that value, otherwise use the default  */
@@ -242,9 +240,11 @@ void *rawmouse_new(t_float delaytime, t_float scale, t_float translation)
 	for (eventcode = 0; eventcode < KEY_MAX; eventcode++) 
 	  if (test_bit(eventcode, bitmask[eventtype])) {
 	    post("    Event code %d (%s)", eventcode, names[eventtype] ? (names[eventtype][eventcode] ? names[eventtype][eventcode] : "?") : "?");
-	    //	    post ("    Event code %d", eventcode); 	    
-	    x->x_mouse_buttons += 1;
-	    post(" number: %d   eventtype: %d    eventcode: %d",x->x_mouse_buttons, eventtype, eventcode);
+
+	    if ( eventtype == EV_KEY ) 
+		x->x_mouse_buttons++;
+	    else if  ( eventtype == EV_REL ) 
+	      x->x_mouse_axes++;
 	  }
       }        
     }
@@ -263,8 +263,7 @@ void *rawmouse_new(t_float delaytime, t_float scale, t_float translation)
     /* set refresh time */
     clock_delay (x->x_clock, x->x_delaytime);
 
-    post ("  found %d axes", x->x_mouse_axes);
-    post ("  found %d buttons", x->x_mouse_buttons);
+    post ("\nUsing %d axes and %d buttons.", x->x_mouse_axes, x->x_mouse_buttons);
 
     return (void *)x;
 }
@@ -272,9 +271,17 @@ void *rawmouse_new(t_float delaytime, t_float scale, t_float translation)
 void rawmouse_setup(void)
 {
   post ("rawmouse object loaded using %s",RAWMOUSE_DEVICE);
-  rawmouse_class = class_new(gensym("rawmouse"),(t_newmethod)rawmouse_new, 
-			     (t_method)rawmouse_free, sizeof(t_rawmouse), 0, A_DEFFLOAT, A_DEFFLOAT, 
-			     A_DEFFLOAT, 0);
+
+  rawmouse_class = class_new(gensym("rawmouse"),
+			     (t_newmethod)rawmouse_new, 
+			     (t_method)rawmouse_free, 
+			     sizeof(t_rawmouse), 
+			     CLASS_DEFAULT, 
+			     A_DEFFLOAT, 
+			     A_DEFFLOAT, 
+			     A_DEFFLOAT, 
+			     0);
+
   class_addfloat(rawmouse_class, rawmouse_change_delaytime);
 }
 
@@ -287,66 +294,71 @@ void rawmouse_read(t_rawmouse *x)
    * all platforms.  Let's hope the order is the same on all...
    */
   int i;              /* loop counter */
-  int axis_num;
-  t_float button_num;
+  int axis_num = 0;
+  t_float button_num = 0;
   size_t read_bytes;  /* how many bytes were read */
 
-  while (1) {
-    read_bytes = read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event) * 64);
-    
-    if (read_bytes < (int) sizeof(struct input_event)) {
-      post("rawmouse: short read");
-      break;
-    }
+/*   while (1) { */
+/*     read_bytes = read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event) * 64); */
   
-    for (i = 0; i < (int) (read_bytes / sizeof(struct input_event)); i++)  {
-      post("Event: time %ld.%06ld, type %d, code %d, value %d",
-	   x->x_mouse_event[i].time.tv_sec, x->x_mouse_event[i].time.tv_usec, 
-	   x->x_mouse_event[i].type,x->x_mouse_event[i].code, x->x_mouse_event[i].value);
+/*     if (read_bytes < (int) sizeof(struct input_event)) { */
+/*       post("rawmouse: short read"); */
+/*       break; */
+/*     } */
 
-      if ( x->x_mouse_event[i].type == EV_KEY ) {
-	/* key/button event type */
-	switch ( x->x_mouse_event[i].code ) {
-	case BTN_LEFT:
-	  button_num = 0;
-	  break;
-	case BTN_RIGHT:
-	  button_num = 1;
-	  break;
-	case BTN_MIDDLE:
-	  button_num = 2;
-	  break;
-	case BTN_SIDE:
-	  button_num = 3;
-	  break;
-	case BTN_EXTRA:
-	  button_num = 4;
-	  break;
-	case BTN_FORWARD:
-	  button_num = 5;
-	  break;
-	case BTN_BACK:
-	  button_num = 6;
-	  break;
-	}
-	outlet_float (x->x_button_val_out, x->x_mouse_event[i].value);
-	outlet_float (x->x_button_num_out, button_num);
+  post("in rawmouse_read");
+  
+  while ( read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event)) > -1 ) {
+
+    post("testing");
+    
+    /*     for (i = 0; i < (int) (read_bytes / sizeof(struct input_event)); i++)  { */
+    post("Event: time %ld.%06ld, type %d, code %d, value %d",
+	 x->x_mouse_event.time.tv_sec, x->x_mouse_event.time.tv_usec, 
+	 x->x_mouse_event.type,x->x_mouse_event.code, x->x_mouse_event.value);
+    
+    if ( x->x_mouse_event.type == EV_KEY ) {
+      /* key/button event type */
+      switch ( x->x_mouse_event.code ) {
+      case BTN_LEFT:
+	button_num = 0;
+	break;
+      case BTN_RIGHT:
+	button_num = 1;
+	break;
+      case BTN_MIDDLE:
+	button_num = 2;
+	break;
+      case BTN_SIDE:
+	button_num = 3;
+	break;
+      case BTN_EXTRA:
+	button_num = 4;
+	break;
+      case BTN_FORWARD:
+	button_num = 5;
+	break;
+      case BTN_BACK:
+	button_num = 6;
+	break;
       }
-      else if  ( x->x_mouse_event[i].type == EV_REL ) {
-	/* Relative Axes Event Type */
-	switch ( x->x_mouse_event[i].code ) {
-	case REL_X:
-	  axis_num = 0;
-	  break;
-	case REL_Y:
-	  axis_num = 1;
-	  break;
-	case REL_WHEEL:
-	  axis_num = 2;
-	  break;
-	}
-	outlet_float (x->x_axis_out[axis_num], x->x_mouse_event[i].value);	
+      outlet_float (x->x_button_val_out, x->x_mouse_event.value);
+      outlet_float (x->x_button_num_out, button_num);
+    }
+    else if  ( x->x_mouse_event.type == EV_REL ) {
+      /* Relative Axes Event Type */
+      switch ( x->x_mouse_event.code ) {
+      case REL_X:
+	axis_num = 0;
+	break;
+      case REL_Y:
+	axis_num = 1;
+	break;
+      case REL_WHEEL:
+	axis_num = 2;
+	break;
       }
+      outlet_float (x->x_axis_out[axis_num], x->x_mouse_event.value);	
     }
   }
   clock_delay (x->x_clock, x->x_delaytime);
@@ -354,6 +366,7 @@ void rawmouse_read(t_rawmouse *x)
 
 void rawmouse_change_delaytime(t_rawmouse *x, t_float delaytime)
 {
+  post("rawmouse_change_delaytime");
   if (delaytime < 0)
     delaytime = 0;
   x->x_delaytime = delaytime;
@@ -361,6 +374,7 @@ void rawmouse_change_delaytime(t_rawmouse *x, t_float delaytime)
 
 void rawmouse_free(t_rawmouse *x)
 {
+  post("rawmouse_free");
   close (x->x_mouse_fd);
   clock_free (x->x_clock);
 }
