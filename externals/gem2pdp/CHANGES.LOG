@@ -1,0 +1,9 @@
+0.4
+  fixed pdp-0.12 compatibility on my own this time
+0.3
+  fixed pdp-0.11 compatibility with advice from Thomas Wurzer
+0.2
+  added pdp2gem based on a skeleton of pix_film
+  spare a refresh in gem2pdp (faster)
+0.1
+  first implementation : includes gem2pdp
