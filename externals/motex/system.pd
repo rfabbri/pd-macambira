@@ -1,0 +1,8 @@
+#N canvas 131 96 450 300 10;
+#X obj 151 137 system;
+#X text 47 33 send a system message to the console;
+#X msg 113 72 echo "Hello my name is" $USERNAME;
+#X msg 160 102 ps -ef | grep $USERNAME;
+#X text 242 186 IM 2001;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
