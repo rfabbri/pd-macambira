@@ -191,6 +191,7 @@ void pdp2gem :: obj_setupCallback(t_class *classPtr)
 {
   post( "pdp2gem : a bridge between PDP/PiDiP and GEM v"GEM2PDP_VERSION" (ydegoyon@free.fr)" );
   class_addmethod(classPtr, (t_method)&pdp2gem::pdpCallback, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
+  class_sethelpsymbol( classPtr, gensym("pdp2gem.pd") );
 }
 
 void pdp2gem :: pdpCallback(void *data, t_symbol *action, t_floatarg fpcktno)

@@ -46,4 +46,5 @@ distro: clean all
 	cat $(PDP_DIR)/include/pdp.h | grep -v m_pd > pdp-light.h
 	gcc $(GEM2PDP_CPPFLAGS) $(GEM2PDP_INCLUDE) -o $*.o -c $*.c
 
-
+install:
+	cp -f --remove-destination *.pd $(PD_DIR)/doc/5.reference

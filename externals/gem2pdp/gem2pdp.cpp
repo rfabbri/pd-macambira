@@ -142,6 +142,7 @@ void gem2pdp :: obj_setupCallback(t_class *classPtr)
   post( "gem2pdp : a bridge between GEM and PDP/PiDiP v"GEM2PDP_VERSION" (ydegoyon@free.fr)" );
   class_addmethod(classPtr, (t_method)&gem2pdp::bangMessCallback,
     	    gensym("bang"), A_NULL);
+  class_sethelpsymbol( classPtr, gensym("gem2pdp.pd") );
 }
 
 void gem2pdp :: bangMessCallback(void *data)
