@@ -80,6 +80,6 @@ void ENV_setup(void)
     class_addmethod(ENV_class, (t_method)ENV_getenv, gensym("getenv"), A_SYMBOL);
     class_addmethod(ENV_class, (t_method)ENV_setenv, gensym("setenv"), A_SYMBOL, A_SYMBOL);
     class_addfloat(ENV_class, ENV_float);
-    class_sethelpsymbol(ENV_class, gensym("cxc/ENV"));
+    class_sethelpsymbol(ENV_class, gensym("ENV.pd"));
 }
 

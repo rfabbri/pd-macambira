@@ -38,8 +38,11 @@ void split_setup();
 void utime_setup();
 // RNG's
 void random1_setup();
+void random1_tilde_setup(); // signal version
 void random_fl_setup();
+void random_fl_tilde_setup();
 void random_icg_setup();
+void random_icg_tilde_setup();
 void random_tw_setup();
 void dist_normal_setup();
 
@@ -82,8 +85,11 @@ void cxc_setup(void)
   utime_setup();
   // RNG's
   random1_setup();
+  random1_tilde_setup();
   random_fl_setup();
+  random_fl_tilde_setup();
   random_icg_setup();
+  random_icg_tilde_setup();
   random_tw_setup();
   dist_normal_setup();
   

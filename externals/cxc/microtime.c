@@ -50,5 +50,5 @@ void utime_setup(void)
   class_addbang(utime_class, utime_bang);
   
   class_addmethod(utime_class, (t_method)help_utime, gensym("help"), 0);
-  class_sethelpsymbol(utime_class, gensym("cxc/utime.pd"));
+  class_sethelpsymbol(utime_class, gensym("utime.pd"));
 }

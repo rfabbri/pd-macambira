@@ -52,5 +52,5 @@ void delta_tilde_setup(void)
 			  sizeof(t_delta), 0, A_DEFFLOAT, 0);
   class_addmethod(delta_class, nullfn, gensym("signal"), 0);
   class_addmethod(delta_class, (t_method)delta_dsp, gensym("dsp"), 0);
-  class_sethelpsymbol(delta_class, gensym("cxc/delta.pd"));
+  class_sethelpsymbol(delta_class, gensym("delta.pd"));
 }

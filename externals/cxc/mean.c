@@ -101,7 +101,7 @@ void cxmean_setup(void)
   class_addmethod(cxmean_class, (t_method)cxmean_mean,
 		  gensym("mean"), A_DEFSYM, 0);
   class_addbang(cxmean_class, cxmean_bang);
-  class_sethelpsymbol(cxmean_class, gensym("cxc/statistics.pd"));
+  class_sethelpsymbol(cxmean_class, gensym("statistics.pd"));
 }
 
 
@@ -206,7 +206,7 @@ void cxavgdev_setup(void)
 /* 		  gensym("mean"), A_DEFSYM, 0); */
   class_addfloat(cxavgdev_class, (t_method)cxavgdev_float);
   class_addbang(cxavgdev_class, cxavgdev_bang);
-  class_sethelpsymbol(cxavgdev_class, gensym("cxc/statistics.pd"));
+  class_sethelpsymbol(cxavgdev_class, gensym("statistics.pd"));
 }
 
 /* cx.stddev: calculate the standard deviation of an array from
@@ -310,7 +310,7 @@ void cxstddev_setup(void)
 /* 		  gensym("mean"), A_DEFSYM, 0); */
   class_addfloat(cxstddev_class, (t_method)cxstddev_float);
   class_addbang(cxstddev_class, cxstddev_bang);
-  class_sethelpsymbol(cxstddev_class, gensym("cxc/statistics.pd"));
+  class_sethelpsymbol(cxstddev_class, gensym("statistics.pd"));
 }
 
 /* ---------- mean~ ---------- */
