@@ -19,7 +19,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.2
 #endif
 
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
 
 typedef void V;
 typedef int I;

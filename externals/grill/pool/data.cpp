@@ -11,10 +11,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "pool.h"
 
 #include <string.h>
-#include <fstream.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <fstream>
 
+using namespace std;
 
 pooldata::pooldata(const S *s,I vcnt,I dcnt):
 	sym(s),nxt(NULL),refs(0),

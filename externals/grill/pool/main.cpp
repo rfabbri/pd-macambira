@@ -203,7 +203,7 @@ private:
 FLEXT_NEW_V("pool",pool);
 
 
-pooldata *pool::head,*pool::tail;
+pooldata *pool::head,*pool::tail;	
 
 
 V pool::setup(t_classid c)
