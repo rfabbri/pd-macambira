@@ -1,0 +1,49 @@
+abstractions
+
+64k		a beat shuffler using raw 64k/break sample banks
+bdft,bdfts	set decay time (ms/sec) and osc frequency (for bdiag~)
+bhip~		butterworth high pass filter
+blop~		butterworth low pass filter
+bpm		convert bpm to metro time and phasor freq
+count		modulo counter
+eadh~		exponential attack decay (with hold == duration)
+eadsrh~		exponential attack decay sustain release (..)
+fblock		block relative frequency conversion
+inv		inverse
+pdynwav~	phasor~ + dynwav~
+scale7		arbitrary 7 tone scale
+vols~		volume for a stereo signal
+vol~		volume for a mono signal
+
+externs
+
+ffpoly		finite field polynomial
+fwarp		tangent warp frequency
+ratio		multiply by 2^k so result is 1<=r<2 (transposer)		
+
+
+tilde externs
+
+abs~		absolute value
+bdiag~		block diagonal state space system (spectral processor)
+bfft~		reordered fft
+cheby~		chebychev polynomial waveshaper
+diag~		diagonal state space system (spectral processor)
+dist~		several distortions & waveshaping functions
+dwt~		discrete wavelet transform
+idwt~		inverse
+dynwav~		dynamic wavetable: use a signal block as wavetable
+ead~		exp. attack decay
+eadsr~		exp. attack decay sustain release
+ear~		exp. attack release
+lattice~	lattice filter
+matrix~		multiply a signal block with an arbitrary matrix
+permut~		random permute a signal block
+qmult~		multiply 2 quaternion signals
+qnorm~		normalize a quaternion signal (or any 4 channel sig)
+ramp~		generates an integer ramp
+statwav~	a tabread4~ clone with 8 point interpolation
+tabreadmix~	a tabread~ clone with overlap add (for smooth time stretch)
+xfm~		coupled frequency modulation
+biquadseries~	biquad second order sections (i.e. butterworth)
+filterortho~	several biquad filters, orthogonal implementation
