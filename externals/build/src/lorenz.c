@@ -1,1 +1,1 @@
-#include "../chaos/lorenz.c"
+#include "../../chaos/lorenz.c"

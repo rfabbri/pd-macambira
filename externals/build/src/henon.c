@@ -1,2 +1,1 @@
-#include "../chaos/henon.c"
-
+#include "../../chaos/henon.c"

@@ -1,1 +1,1 @@
-#include "../sprinkler/sprinkler.c"
+#include "../../sprinkler/sprinkler.c"
