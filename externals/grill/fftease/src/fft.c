@@ -12,7 +12,7 @@ bitreverse( float *x, int N );
 
 static float sqr(float x) { return x*x; }
 
-void rfft( float *x, int N, int forward )
+void pv_rfft( float *x, int N, int forward )
 {
   float 	c1,c2,
   		h1r,h1i,
@@ -37,7 +37,7 @@ void rfft( float *x, int N, int forward )
     c1 = 0.5;
     if ( forward ) {
 	c2 = -0.5;
-	cfft( x, N, forward );
+	pv_cfft( x, N, forward );
 	xr = x[0];
 	xi = x[1];
     } else {
@@ -80,7 +80,7 @@ void rfft( float *x, int N, int forward )
     if ( forward )
 	x[1] = xr;
     else
-	cfft( x, N, forward );
+	pv_cfft( x, N, forward );
 }
 
 /* cfft replaces float array x containing NC complex values
@@ -90,7 +90,7 @@ void rfft( float *x, int N, int forward )
    recursive Fast Fourier transform method due to Danielson
    and Lanczos.  NC MUST be a power of 2. */
 
-void cfft( float *x, int NC, int forward )
+void pv_cfft( float *x, int NC, int forward )
 {
   float 	wr,wi,
 		wpr,wpi,

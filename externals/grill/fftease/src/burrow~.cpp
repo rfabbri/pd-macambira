@@ -56,8 +56,8 @@ V burrow::setup(t_classid c)
 
 burrow::burrow(I argc,const t_atom *argv):
 	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_NOPH2),
-	_thresh_dB(-30),_mult_dB(-18),
-	_invert(false)
+	_invert(false),
+	_thresh_dB(-30),_mult_dB(-18)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {

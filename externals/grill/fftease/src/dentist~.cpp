@@ -64,7 +64,7 @@ V dentist::setup(t_classid c)
 
 dentist::dentist(I argc,const t_atom *argv):
 	fftease(4,F_BALANCED|F_BITSHUFFLE),	
-	_knee(500),_teeth(10)
+	_teeth(10),_knee(500),_max_bin(0)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {

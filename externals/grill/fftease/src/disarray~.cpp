@@ -60,7 +60,7 @@ V disarray::setup(t_classid c)
 
 disarray::disarray(I argc,const t_atom *argv):
 	fftease(2,F_BITSHUFFLE),
-	_freq(1300),_qual(false),_shuffle_count(20)
+	_qual(false),_shuffle_count(20),_max_bin(0),_freq(1300)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {

@@ -47,7 +47,7 @@ V ether::setup(t_classid c)
 
 ether::ether(I argc,const t_atom *argv):
 	fftease(2,F_STEREO|F_BITSHUFFLE),
-	_qual(false),_threshMult(0),_invert(false)
+	_qual(false),_invert(false),_threshMult(0)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {

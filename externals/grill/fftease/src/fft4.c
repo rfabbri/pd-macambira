@@ -32,7 +32,7 @@ void init_rdft(int n, int *ip, float *w)
 }
 
 
-void rdft(int n, int isgn, float *a, int *ip, float *w)
+void pv_rdft(int n, int isgn, float *a, int *ip, float *w)
 {
 
   int		j,

@@ -22,8 +22,8 @@ FLEXTLIB=${FLEXTPATH}/flext.a
 # compiler+linker stuff	
 INCLUDES=${PDPATH} ${FLEXTPATH} 
 LIBPATH= 
-FLAGS=-DPD -Dunix -DMACOSX 
-CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes # -maltivec
+FLAGS=-DFLEXT_SYS=2 ${UFLAGS}
+CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions -fno-rtti
 #CFLAGS=-g
 LIBS=m 
 LDFLAGS=-bundle -bundle_loader ${PD}

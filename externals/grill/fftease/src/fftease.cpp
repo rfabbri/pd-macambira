@@ -13,9 +13,10 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 fftease::fftease(I mult,I flags):
-	_mult(mult),_flags(flags),_N(0),
 	_inCount(0),
-	blsz(0),smprt(0)
+	_flags(flags),
+	blsz(0),smprt(0),
+	_mult(mult),_N(0)
 {}
 
 fftease::~fftease() {}
@@ -50,7 +51,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 {
 	/* declare working variables */
 	I i; 
-	const I _D = n,_N = get_N(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = n,_N = get_N(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
 	_inCount += _D;
@@ -85,12 +86,12 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 
 	/* do an fft */
 	if(_flags&F_BITSHUFFLE) {
-		rdft( _N, 1, _buffer1, _bitshuffle, _trigland );
-		if(_flags&F_STEREO) rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
+		pv_rdft( _N, 1, _buffer1, _bitshuffle, _trigland );
+		if(_flags&F_STEREO) pv_rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
 	}
 	else {
-		rfft( _buffer1, _N2, 1);
-		if(_flags&F_STEREO) rfft( _buffer2, _N2,1);
+		pv_rfft( _buffer1, _N2, 1);
+		if(_flags&F_STEREO) pv_rfft( _buffer2, _N2,1);
 	}
 
 	if(!(_flags&F_NOSPEC)) {
@@ -112,9 +113,9 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 
 	/* do an inverse fft */
 	if(_flags&F_BITSHUFFLE)
-		rdft( _N, -1, _buffer1, _bitshuffle, _trigland );
+		pv_rdft( _N, -1, _buffer1, _bitshuffle, _trigland );
 	else
-		rfft( _buffer1, _N2, 0);
+		pv_rfft( _buffer1, _N2, 0);
 
 	/* dewindow our result */
 	overlapadd( _buffer1, _N, _Wsyn, _output, _Nw, _inCount);
@@ -134,7 +135,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 void fftease::Set()
 {
 	/* preset the objects data */
-	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2;
+	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N; //,_N2 = _N/2,_Nw2 = _Nw/2;
 
 	_inCount = -_Nw;
 
