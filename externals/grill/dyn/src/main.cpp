@@ -262,7 +262,7 @@ dyn::dyn(int argc,const t_atom *argv):
 		pxin[i] = (proxyin *)object_new(sig?pxins_class:pxin_class);
 		pxin[i]->init(this,sig);
 		t_binbuf *b = binbuf_new();
-		binbuf_text(b,sig?"dyn-in~":"dyn-in",7);
+		binbuf_text(b,(char *)(sig?"dyn-in~":"dyn-in"),7);
 		ToCanvas(&pxin[i]->obj,b,i*100,10); // place them left-to-right 
 	}
 
@@ -272,7 +272,7 @@ dyn::dyn(int argc,const t_atom *argv):
 		pxout[i] = (proxyout *)object_new(sig?pxouts_class:pxout_class);
 		pxout[i]->init(this,i,sig);
 		t_binbuf *b = binbuf_new();
-		binbuf_text(b,sig?"dyn-out~":"dyn-out",8);
+		binbuf_text(b,(char *)(sig?"dyn-out~":"dyn-out"),8);
 		ToCanvas(&pxout[i]->obj,b,i*100,500); // place them left-to-right 
 	}
 
