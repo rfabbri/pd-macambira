@@ -16,14 +16,14 @@
  *
  */
 /* 
- * $Id: rawjoystick.c,v 1.1 2003-04-25 03:39:28 eighthave Exp $
+ * $Id: rawjoystick.c,v 1.2 2003-08-20 16:20:43 eighthave Exp $
  */
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 #include "m_imp.h"
 
-/*#define DEBUG(x) */
+//#define DEBUG(x)
 #define DEBUG(x) x 
 
 #define RAWJOYSTICK_AXES     6
@@ -105,7 +105,7 @@ static int rawjoystick_read(t_rawjoystick *x,int fd)  {
   if ( ! SDL_JoystickOpened(x->x_devnum) ) {
     return 0;
   }
-  
+
   post("Joystick read: %s",SDL_JoystickName(x->x_devnum));
 
   if ( SDL_PollEvent(&event) ) {
@@ -130,7 +130,6 @@ static int rawjoystick_read(t_rawjoystick *x,int fd)  {
       DEBUG(post("Unhandled event."));
     }
   }
-
   return 1;    
 }
 
@@ -194,9 +193,11 @@ static void *rawjoystick_new(t_float argument) {
   x->started = 0;
 
   /* INIT SDL using joystick layer  */  
-  if ( SDL_Init( SDL_INIT_JOYSTICK ) == -1 ) { 
+  /* Note: Video is required to start Event Loop !! */
+  if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) { 
     post("Could not initialize SDL: %s.\n", SDL_GetError());
-    exit(-1);
+    // exit(-1);
+	return (0);	/* changed by olafmatt */
   }    
 
   post("%i joysticks were found:", SDL_NumJoysticks() );
@@ -234,7 +235,7 @@ void rawjoystick_setup(void)
   rawjoystick_class = class_new(gensym("rawjoystick"), 
 			     (t_newmethod)rawjoystick_new, 
 			     (t_method)rawjoystick_free,
-			     sizeof(t_rawjoystick),0,A_DEFSYM,0);
+			     sizeof(t_rawjoystick),0,A_DEFFLOAT,0);
 
   /* add inlet datatype methods */
   class_addfloat(rawjoystick_class,(t_method) rawjoystick_float);
