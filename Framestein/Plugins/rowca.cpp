@@ -1,6 +1,12 @@
 /*
-	Two dimensional cellular automata, where each iteration
+	One dimensional cellular automata, where each iteration
 	adds a new row.
+
+	Each cell has three neighbourns, top left, top and top right,
+	as illustrated below:
+
+	123
+	 O
 
 	Patterns that lead to a white cell are given as parameter,
 	forming the rule of the automata.
