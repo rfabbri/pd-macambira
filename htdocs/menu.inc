@@ -4,4 +4,5 @@
 | <a href="developer.php" title=""><b>Developers</b></a><br>
 | <a href="lists.php" title=""><b>Mailing Lists</b></a><br>
 | <a href="contact.php" title=""><b>Contact</b></a><br>
+| <a href="http://sourceforge.net/projects/pure-data" title=""><b>Project Page</b></a><br>
 
