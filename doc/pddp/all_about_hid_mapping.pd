@@ -1,45 +1,45 @@
-#N canvas 230 123 871 499 10;
+#N canvas 304 56 868 550 10;
 #N canvas 0 22 450 300 graph1 0;
 #X array cuberoot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 426 61 graph;
+#X restore 516 61 graph;
 #N canvas 0 22 450 300 graph5 0;
-#X array exponent 100 float 0;
+#X array exponential 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 741 269 graph;
+#X restore 731 269 graph;
 #N canvas 0 22 450 300 graph1 0;
 #X array cube 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 741 61 graph;
+#X restore 731 61 graph;
 #N canvas 0 22 450 300 graph5 0;
 #X array square 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 741 165 graph;
-#X obj 54 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X restore 731 165 graph;
+#X obj 60 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X floatatom 32 227 5 0 0 0 - - -;
-#X floatatom 75 226 5 0 0 0 - - -;
-#X floatatom 120 226 5 0 0 0 - - -;
+#X floatatom 38 227 5 0 0 0 - - -;
+#X floatatom 81 226 5 0 0 0 - - -;
+#X floatatom 126 226 5 0 0 0 - - -;
 #N canvas 0 22 450 300 graph1 0;
 #X array logarithmic 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 426 269 graph;
+#X restore 516 269 graph;
 #N canvas 0 22 450 300 graph1 0;
 #X array squareroot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
-#X restore 426 165 graph;
-#X obj 166 253 hid_rel2abs;
-#X msg 178 224 reset;
-#X floatatom 170 288 5 0 0 0 - - -;
-#X obj 75 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 516 165 graph;
+#X obj 172 253 hid_rel2abs;
+#X msg 184 224 reset;
+#X floatatom 176 288 5 0 0 0 - - -;
+#X obj 81 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 119 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 125 244 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 32 251 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 38 251 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 96 165 poll 50;
-#X floatatom 44 343 5 0 0 0 - - -;
-#X obj 43 281 hid_smooth;
+#X msg 102 165 poll 50;
+#X floatatom 50 343 5 0 0 0 - - -;
+#X obj 49 281 hid_smooth;
 #N canvas 27 65 573 553 draw_arrays 0;
 #X msg 77 62 bang;
 #X obj 77 83 until;
@@ -50,7 +50,7 @@
 #X obj 106 127 mod 100;
 #X obj 183 345 tabwrite logarithmic;
 #X obj 77 170 t f f;
-#X obj 183 486 tabwrite exponent;
+#X obj 183 486 tabwrite exponential;
 #X obj 114 197 s array_index;
 #X obj 443 267 r array_index;
 #X obj 183 439 tabwrite square;
@@ -95,36 +95,46 @@
 #X connect 22 0 15 0;
 #X connect 23 0 12 0;
 #X connect 24 0 13 0;
-#X restore 573 30 pd draw_arrays;
-#X obj 621 316 hid_exp;
-#X obj 289 317 hid_log;
-#X obj 74 187 mouse 0;
-#X msg 80 113 open 1;
-#X msg 90 139 open 2;
-#X obj 2 2 cnv 15 850 20 empty empty all_about_hid_mapping 20 10 1
+#X restore 563 30 pd draw_arrays;
+#X obj 650 316 hid_exp;
+#X obj 411 317 hid_log;
+#X obj 80 187 mouse 0;
+#X msg 86 113 open 1;
+#X msg 96 139 open 2;
+#X obj 5 2 cnv 15 850 20 empty empty all_about_hid_mapping 20 10 1
 18 -233017 -66577 0;
-#X obj 818 3 pddp;
-#X obj 125 329 hid_graph;
-#X floatatom 124 476 5 0 0 0 - - -;
-#X obj 15 41 notescale;
-#X obj 624 104 pow 3;
-#X obj 284 100 pow 0.333333;
-#X text 614 173 square;
-#X text 617 82 cube;
-#X text 279 175 square root;
-#X text 275 78 cube root;
-#X text 280 299 logarithmic;
-#X obj 622 203 pow 2;
-#X obj 288 194 pow 0.5;
-#X obj 288 213 sqrt;
-#X obj 112 43 hid_centered;
-#X obj 284 123 hid_cuberoot;
-#X obj 624 130 hid_cube;
-#X obj 622 224 hid_square;
-#X obj 289 235 hid_squareroot;
-#X text 612 297 exponential;
-#X obj 29 68 buttongate;
-#X obj 125 66 keygate;
+#X obj 821 3 pddp;
+#X obj 156 329 hid_graph;
+#X floatatom 130 476 5 0 0 0 - - -;
+#X obj 13 40 notescale;
+#X obj 653 104 pow 3;
+#X obj 406 100 pow 0.333333;
+#X text 643 173 square;
+#X text 646 82 cube;
+#X text 401 175 square root;
+#X text 397 78 cube root;
+#X text 402 299 logarithmic;
+#X obj 651 203 pow 2;
+#X obj 410 194 pow 0.5;
+#X obj 410 214 sqrt;
+#X obj 110 33 hid_centered;
+#X obj 406 123 hid_cuberoot;
+#X obj 653 130 hid_cube;
+#X obj 651 224 hid_square;
+#X obj 411 235 hid_squareroot;
+#X text 641 297 exponential;
+#X obj 12 64 buttongate;
+#X obj 12 83 keygate;
+#X text 341 393 - CURVE TEXT IDEAS;
+#X text 370 419 - amplitude is generally perceived on a logarithmic
+scale;
+#X text 371 443 - pitch is perceived on [some kind of scale];
+#X obj 110 52 hid_invert;
+#X text 22 500 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 239 514 released under the GNU GPL;
+#X text 445 501 $Revision: 1.4 $$Date: 2004-11-28 23:58:41 $;
+#X text 446 514 $Author: eighthave $;
 #X connect 4 0 22 0;
 #X connect 5 0 15 0;
 #X connect 5 0 18 0;
