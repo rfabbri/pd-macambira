@@ -1,5 +1,5 @@
-# VASP - vector assembling vector processor
-# Copyright(c) 2002 Thomas Grill (xovo@gmx.net)
+# xsample - extended sample objects for Max/MSP and pd (pure data)
+# Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
 #
 
 # your c++ compiler (normally g++)
@@ -11,20 +11,21 @@ PD=/usr/local/pd
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDINC=
+PDINC=${PD}/src
+
+# where is the PD executable?
+PDBIN=${PD}/bin/pd
 
 # where do the flext libraries reside?
 FLEXTPATH=${PD}/flext
 
 # where should flext libraries be built?
-TARGDIR=./pd-linux
+TARGDIR=./pd-darwin
 
-# where should VASP be installed?
+# where should xsample be installed?
 # (leave blank to omit installation)
-# a subfolder "vasp" will be created for the files
 INSTDIR=${PD}/extra
 
-# where should the VASP help be installed?
+# where should the xsample help be installed?
 # (leave blank to omit installation)
-# a subfolder "vasp" will be created for the files
 HELPDIR=${PD}/doc/5.reference

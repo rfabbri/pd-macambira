@@ -1,5 +1,5 @@
-# VASP - vector assembling vector processor
-# Copyright (c)2002 Thomas Grill (xovo@gmx.net)
+# xsample - extended sample objects for Max/MSP and pd (pure data)
+# Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for gcc @ OSX (darwin)
 #
@@ -26,7 +26,7 @@ LDFLAGS=-bundle -bundle_loader $(PDBIN)
 # the rest can stay untouched
 # ----------------------------------------------
 
-NAME=vasp
+NAME=xsample
 SRCDIR=source
 
 include make-files.txt
@@ -55,24 +55,21 @@ $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB)
 $(INSTDIR):
 	mkdir $(INSTDIR)
 
-$(INSTDIR)/vasp: $(INSTDIR)
-	mkdir $(INSTDIR)/vasp
+install:: $(INSTDIR)
 
-install:: $(INSTDIR)/vasp
-
-install:: $(TARGET) pd
-	cp -R $^ $(INSTDIR)/vasp
-#	chown -R root.root $(INSTDIR)/vasp
+install:: $(TARGET) 
+	cp -R $^ $(INSTDIR)
+#	chown -R root.root $(INSTDIR)
 
 
-$(HELPDIR)/vasp:
-	mkdir $(HELPDIR)/vasp
+$(HELPDIR):
+	mkdir $(HELPDIR)
 
-install-help:: $(HELPDIR)/vasp
+install-help:: $(HELPDIR)
 
-install-help:: ./pd-help
-	cp $^/*.* $(HELPDIR)/vasp
-#	chown -R root.root $(HELPDIR)/vasp
+install-help:: ./pd
+	cp $^/*.* $(HELPDIR)
+#	chown -R root.root $(HELPDIR)
 
 
 .PHONY: clean
