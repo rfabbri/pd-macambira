@@ -169,6 +169,25 @@ install: build
 	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 
+
+	# Clean up make references
+
+	(cd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference; \
+	 for i in *.pd; do\
+	     if [ "$$i" = "$${i#help-*}" ]; then\
+	        mv $$i help-$$i;\
+	     fi;\
+	 done)
+
+	# A good thought to move references to their right place, but finally, 
+	# this doesn't work, so move abstractions that are used by references
+	# back to their right place  ... damn.
+
+	(cd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference;\
+	 mv help-pdp_help_input.pd pdp_help_input.pd;\
+	 mv  help-pdp_help_output.pd  pdp_help_output.pd; )
+
+
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
