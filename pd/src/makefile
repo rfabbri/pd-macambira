@@ -10,14 +10,14 @@ GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
 MANDIR = ${prefix}/man
 
-MORECFLAGS = -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portaudio/portmidi-macosx 	-fno-strict-aliasing -DPA_USE_ALSA -DUSEAPI_ALSA
+MORECFLAGS = -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portaudio/portmidi-macosx 	-fno-strict-aliasing
 
 INCLUDE = -I.
 GINCLUDE = $(INCLUDE) 
 GLIB = -ltk8.4 -ltcl8.4  -lX11 -L/usr/X11R6/lib -lrt
 
-LDFLAGS = -Wl,-export-dynamic -lasound
-LIB =   -ldl -lpthread -lasound
+LDFLAGS = -Wl,-export-dynamic
+LIB =   -ldl -lpthread
 
 OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
 WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
@@ -28,7 +28,7 @@ CFLAGS = -Werror $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 
-SYSSRC += s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c
+SYSSRC += s_midi_oss.c s_audio_oss.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -94,8 +94,7 @@ $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
 	$(GLIB)
 
 $(BIN_DIR)/pd.tk: u_main.tk
-	echo set pd_nt 0 > $(BIN_DIR)/pd.tk
-	grep -v "set pd_nt" < u_main.tk >> $(BIN_DIR)/pd.tk
+	cp u_main.tk $(BIN_DIR)/pd.tk
 
 #this is for Max OSX only...
 $(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)

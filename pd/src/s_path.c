@@ -471,6 +471,40 @@ void sys_doflags( void)
         post("error parsing RC arguments");
 }
 
+/* undo pdtl_encodedialog.  This allows dialogs to send spaces, commas,
+    dollars, and semis down here. */
+t_symbol *sys_decodedialog(t_symbol *s)
+{
+    char buf[MAXPDSTRING], *sp = s->s_name;
+    int i;
+    if (*sp != '+')
+        bug("sys_decodedialog: %s", sp);
+    else sp++;
+    for (i = 0; i < MAXPDSTRING-1; i++)
+    {
+        if (!sp[0])
+            break;
+        if (sp[0] == '+')
+        {
+            if (sp[1] == '_')
+                buf[i] = ' ', sp++;
+            else if (sp[1] == '+')
+                buf[i] = '+', sp++;
+            else if (sp[1] == 'c')
+                buf[i] = ',', sp++;
+            else if (sp[1] == 's')
+                buf[i] = ';', sp++;
+            else if (sp[1] == 'd')
+                buf[i] = '$', sp++;
+            else buf[i] = sp[0];
+            sp++;
+        }
+    }
+    buf[i] = 0;
+    return (gensym(buf));
+}
+
+
     /* start a search path dialog window */
 void glob_start_path_dialog(t_pd *dummy)
 {
@@ -495,9 +529,9 @@ void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     sys_searchpath = 0;
     sys_usestdpath = atom_getintarg(0, argc, argv);
     sys_verbose = atom_getintarg(1, argc, argv);
-    for (i = 0; i < argc; i++)
+    for (i = 0; i < argc-2; i++)
     {
-        t_symbol *s = atom_getsymbolarg(i+2, argc, argv);
+        t_symbol *s = sys_decodedialog(atom_getsymbolarg(i+2, argc, argv));
         if (*s->s_name)
             sys_searchpath = namelist_append_files(sys_searchpath, s->s_name);
     }
@@ -527,10 +561,10 @@ void glob_startup_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     namelist_free(sys_externlist);
     sys_externlist = 0;
     sys_defeatrt = atom_getintarg(0, argc, argv);
-    sys_flags = atom_getsymbolarg(1, argc, argv);
-    for (i = 0; i < argc; i++)
+    sys_flags = sys_decodedialog(atom_getsymbolarg(1, argc, argv));
+    for (i = 0; i < argc-2; i++)
     {
-        t_symbol *s = atom_getsymbolarg(i+2, argc, argv);
+        t_symbol *s = sys_decodedialog(atom_getsymbolarg(i+2, argc, argv));
         if (*s->s_name)
             sys_externlist = namelist_append_files(sys_externlist, s->s_name);
     }

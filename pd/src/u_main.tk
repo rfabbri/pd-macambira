@@ -175,10 +175,21 @@ set pd_undocanvas no
 
 ################ utility functions #########################
 
+# enquote a string to send it to a tcl function
 proc pdtk_enquote {x} {
     set foo [string map {"," "" ";" "" \" ""} $x]
     set foo2 [string map {" " "\\ "} $foo]
     concat $foo2
+}
+
+#enquote a string to send it to Pd.  Blow off semi and comma; alias spaces
+proc pdtk_unspace {x} {
+    string map {" " "_" ";" "" "," ""} $x
+}
+
+#enquote a string for preferences (command strings etc.)
+proc pdtk_encodedialog {x} {
+    concat +[string map {" " "+_" "$" "+d" ";" "+s" "," "+c" "+" "++"} $x]
 }
 
 proc pdtk_debug {x} {
@@ -1337,7 +1348,7 @@ proc gatom_escape {sym} {
     	    }
 	}
     }
-    concat $ret
+    pdtk_unspace $ret
 }
 
 proc gatom_unescape {sym} {
@@ -2020,9 +2031,9 @@ proc iemgui_apply {id} {
     if {[string index $hhhgui_nam 0] == "$"} {
        set hhhgui_nam [string replace $hhhgui_nam 0 0 #] }
     
-    set hhhsnd [string map {" " _} $hhhsnd]
-    set hhhrcv [string map {" " _} $hhhrcv]
-    set hhhgui_nam [string map {" " _} $hhhgui_nam]
+    set hhhsnd [pdtk_unspace $hhhsnd]
+    set hhhrcv [pdtk_unspace $hhhrcv]
+    set hhhgui_nam [pdtk_unspace $hhhgui_nam]
     
     pd [concat $id dialog \
         [eval concat $$var_iemgui_wdt] \
@@ -3404,11 +3415,11 @@ proc path_apply {id} {
     global pd_path5 pd_path6 pd_path7 pd_path8 pd_path9 
 
     pd [concat pd path-dialog $pd_extrapath $pd_verbose \
-    [pdtk_enquote $pd_path0] [pdtk_enquote $pd_path1] \
-    [pdtk_enquote $pd_path2] [pdtk_enquote $pd_path3] \
-    [pdtk_enquote $pd_path4] [pdtk_enquote $pd_path5] \
-    [pdtk_enquote $pd_path6] [pdtk_enquote $pd_path7] \
-    [pdtk_enquote $pd_path8] [pdtk_enquote $pd_path9] \;]
+    [pdtk_encodedialog $pd_path0] [pdtk_encodedialog $pd_path1] \
+    [pdtk_encodedialog $pd_path2] [pdtk_encodedialog $pd_path3] \
+    [pdtk_encodedialog $pd_path4] [pdtk_encodedialog $pd_path5] \
+    [pdtk_encodedialog $pd_path6] [pdtk_encodedialog $pd_path7] \
+    [pdtk_encodedialog $pd_path8] [pdtk_encodedialog $pd_path9] \;]
 }
 
 proc path_cancel {id} {
@@ -3476,12 +3487,12 @@ proc startup_apply {id} {
     global pd_startup0 pd_startup1 pd_startup2 pd_startup3 pd_startup4 
     global pd_startup5 pd_startup6 pd_startup7 pd_startup8 pd_startup9 
 
-    pd [concat pd startup-dialog $pd_nort [pdtk_enquote $pd_flags] \
-    [pdtk_enquote $pd_startup0] [pdtk_enquote $pd_startup1] \
-    [pdtk_enquote $pd_startup2] [pdtk_enquote $pd_startup3] \
-    [pdtk_enquote $pd_startup4] [pdtk_enquote $pd_startup5] \
-    [pdtk_enquote $pd_startup6] [pdtk_enquote $pd_startup7] \
-    [pdtk_enquote $pd_startup8] [pdtk_enquote $pd_startup9] \;]
+    pd [concat pd startup-dialog $pd_nort [pdtk_encodedialog $pd_flags] \
+    [pdtk_encodedialog $pd_startup0] [pdtk_encodedialog $pd_startup1] \
+    [pdtk_encodedialog $pd_startup2] [pdtk_encodedialog $pd_startup3] \
+    [pdtk_encodedialog $pd_startup4] [pdtk_encodedialog $pd_startup5] \
+    [pdtk_encodedialog $pd_startup6] [pdtk_encodedialog $pd_startup7] \
+    [pdtk_encodedialog $pd_startup8] [pdtk_encodedialog $pd_startup9] \;]
 
 }
 

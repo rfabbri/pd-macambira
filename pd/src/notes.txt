@@ -31,6 +31,8 @@ uploaded to CVS
 bug fix: click on minaturized subpatch fails to "vis" it
 bug fix: CK on Oct. 4 (crash changing font size)
 sched_idle hook
+fixed startup flags, path, etc. so that spaces, "," chars, etc., are allowed
+configure script fixed to handle enable- and disable- correctly
 
 doc:
 document env~ second argument (and why is it no less than 1/10 of first???)
@@ -38,9 +40,6 @@ update 0.intro.pd
 vibrato example
 
 problems:
---enable-alsa actually disables it???
-startup flags need to handle spaces, duh.
-test MIDI I/O on all platforms, inc. sysex...
 '[' in numbox label breaks it (Yury Sept. 3)
 soundfiles with 3-byte samples buzz for the first readsf buffer (bug/x.pd)
 read xx.txt in "bad" gives warnings
@@ -61,13 +60,15 @@ loading e-mailed patches without removing headers crashes pd
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')
 data copy/paste doesn't check templates aren't changed
 figure out why Pd sometimes crashes when you close example after adding fields
+check if _vsnprintf with zero argument in windows works any better...
 
 next release:
+update portmusic to latest
+IEM guis to use queued updates
 pixel font sizes
 pd to find running ones (pd -new to defeat)
 "enter" into object box to create new one (also, changing borders? forking?)
 tab to jump to a connected object (first one?) (shift-tab to back up?)
-portaudio v19?
 tables:
     if there's just one array, don't do stringent hit check.
     array click protection (Krzysztof's suggestion)

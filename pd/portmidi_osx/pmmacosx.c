@@ -3,7 +3,7 @@
  * 
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: pmmacosx.c,v 1.4 2004-11-06 16:07:31 millerpuckette Exp $
+ * $Id: pmmacosx.c,v 1.5 2004-11-07 04:04:14 millerpuckette Exp $
  *
  * 27Jun02 XJS (X. J. Scott)
  *   - midi_length():

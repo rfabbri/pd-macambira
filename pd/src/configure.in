@@ -9,7 +9,7 @@ AC_SUBST(PDLIB)
 AC_SUBST(MORECFLAGS)
 AC_SUBST(EXT)
 AC_SUBST(OPT_CFLAGS)
-AC_SUBST(USE_OPT_CFLAGS, yes)
+AC_SUBST(USE_DEBUG_CFLAGS, no)
 AC_SUBST(SYSSRC)
 AC_SUBST(STRIPFLAG)
 AC_SUBST(GUINAME)
@@ -21,18 +21,18 @@ dnl other defaults
 
 dnl check for features
 
-AC_ARG_ENABLE(alsa,     [  --disable-alsa          force disabling ALSA],
-    alsa="no")
+AC_ARG_ENABLE(alsa,     [  --enable-alsa           alsa audio driver], 
+    alsa=$enableval)
 AC_ARG_ENABLE(jack,     [  --enable-jack           jack audio server],
-    jack="yes")
+    jack=$enableval)
 AC_ARG_ENABLE(portaudio,[  --enable-portaudio      portaudio],
-    portaudio="yes")
+    portaudio=$enableval)
 AC_ARG_ENABLE(debug,    [  --enable-debug          debugging support],
-    USE_OPT_CFLAGS="no")
+    USE_DEBUG_CFLAGS="no")
 AC_ARG_ENABLE(static,   [  --enable-static         link statically],
-    static=yes)
+    static=$enableval)
 AC_ARG_ENABLE(setuid,   [  --enable-setuid         install as setuid (linux)],
-    setuid=yes)
+    setuid=$enableval)
     
 dnl Checks for programs.
 AC_PROG_CC
@@ -144,10 +144,9 @@ AC_CHECK_LIB(tk8.7, main,,
 if test `uname -s` = Linux;
 then
     dnl Ckecking for ALSA
-
+    echo .................... alsa= $alsa
 dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
     if test x$alsa == xyes; then
-	echo yes ... alsa is... $alsa
 	AC_CHECK_LIB(asound,snd_pcm_info,PDLIB="$PDLIB -lasound" ; alsa="yes",alsa="no")
     fi
 
@@ -204,11 +203,11 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
     fi
     STRIPFLAG=-s
     GUINAME="pd-gui"
-    if test x$USE_OPT_CFLAGS == "xyes";
+    if test x$USE_DEBUG_CFLAGS == "xyes";
     then
-	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
-    else
 	OPT_CFLAGS="-g"
+    else
+	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
     fi
     echo OPT_CFLAGS --------------- $OPT_CFLAGS
     OSNUMBER=0
@@ -243,11 +242,11 @@ then
         -I../../Frameworks/Tk.framework/Versions/Current/Headers \
         -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
         -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
-    if test x$USE_OPT_CFLAGS == "xyes";
+    if test x$USE_DEBUG_CFLAGS == "xyes";
     then
-	OPT_CFLAGS="-O2"
-    else
 	OPT_CFLAGS="-g"
+    else
+	OPT_CFLAGS="-O2"
     fi
     OSNUMBER=2
     EXTERNTARGET=pd_darwin
