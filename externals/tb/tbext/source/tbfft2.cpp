@@ -49,35 +49,28 @@
 
 class tbfft2: public flext_dsp
 {
-  FLEXT_HEADER(tbfft2,flext_dsp);
-
+    FLEXT_HEADER(tbfft2,flext_dsp);
+    
 public: // constructor
-  tbfft2();
+    tbfft2();
+    ~tbfft2();
 
 protected:
-  virtual void m_signal (int n, float *const *in, float *const *out);
-  void set_freq(t_float);
-  void set_width(t_float);
-
+    virtual void m_signal (int n, float *const *in, float *const *out);
+    virtual void m_dsp (int n, float *const *in, float *const *out);
+    void set_freq(t_float);
+    void set_width(t_float);
+    
 private:
-  FLEXT_CALLBACK_1(set_freq,t_float)
-  FLEXT_CALLBACK_1(set_width,t_float)
+    FLEXT_CALLBACK_1(set_freq,t_float);
+    FLEXT_CALLBACK_1(set_width,t_float);
   
-  t_int center;
-  t_int width;
-  
-  t_float pos;
-  t_int posi;
-
-  float *ins;
-  float *outs;
-  float *tmps;
-  t_float tmp[17000];
-  
-  t_float s;
-  t_float b;
-  
-  t_int n0;
+    t_int center;
+    t_int width;
+    
+    t_float * tmp;
+    
+    t_int n0;
 };
 
 
@@ -91,40 +84,52 @@ tbfft2::tbfft2()
   FLEXT_ADDMETHOD_F(0,"width",set_width);
 } 
 
+tbfft2::~tbfft2()
+{
+    free(tmp);
+}
+
+void tbfft2::m_dsp(int n, t_float *const *in, t_float *const *out)
+{
+    free(tmp);
+    tmp=(t_float*)malloc(n*sizeof(t_float));
+}
+
+
 
 void tbfft2::m_signal(int n, t_float *const *in, t_float *const *out)
 {
-  ins = in[0];
-  outs = out[0];
+    t_float * ins = in[0];
+    t_float * outs = out[0];
 
-  CopySamples(tmp,ins,n);
-  
-  n0=n/2;  
-
-  if (center-width>0)
+    CopySamples(tmp,ins,n);
+    
+    n0=n/2;  
+    
+    if (center-width>0)
     {
-      n=center-width;
+	n=center-width;
     }
-  else
-    n=0;
-  
-  while (n<center+width)
+    else
+	n=0;
+    
+    while (n<center+width)
     {
-      tmp[n]=*(ins+2*center-n);
-      ++n;
+	tmp[n]=*(ins+2*center-n);
+	++n;
     }
-  
+    
 
-
-  //memcp
-  CopySamples(outs,tmp,n0*2);
+    
+    //memcpy
+    CopySamples(outs,tmp,n0*2);
   
 }
 
 void tbfft2::set_freq(t_float freq)
 {
-  center=freq;
-  set_width(width);
+    center=freq;
+    set_width(width);
 }
 
 void tbfft2::set_width(t_float w)
