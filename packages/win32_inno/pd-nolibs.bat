@@ -1,0 +1,1 @@
+C:\Program Files\Pure Data\bin\pd.exe -font 10 -path c:\pd\extra -listdev "%1" "%2" "%3" "%4" "%5" "%6" "%7" "%8" "%9"
