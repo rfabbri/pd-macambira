@@ -2,7 +2,7 @@
 #X obj 268 64 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 123 136 loop \$1;
-#X obj 124 114 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
+#X obj 124 114 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 1
 1;
 #X msg 370 44 open \$1;
 #X obj 369 20 openpanel;
@@ -13,12 +13,12 @@
 #X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X obj 257 134 metro 70;
-#X obj 322 276 pdp_v4l;
-#X obj 331 245 metro 70;
-#X obj 376 211 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+#X obj 454 170 pdp_v4l;
+#X obj 463 139 metro 70;
+#X obj 508 105 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X msg 333 212 stop;
-#X msg 418 243 open /dev/video;
+#X msg 465 106 stop;
+#X msg 550 137 open /dev/video;
 #X obj 252 167 pdp_yqt;
 #X obj 606 530 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
@@ -47,10 +47,19 @@ here \,;
 #X obj 193 413 pdp_ffmpeg~;
 #X text 81 547 pdp_ffmeg~ : streams video & audio towards an ffmpeg
 server;
-#X obj 122 228 pdp_xv;
+#X obj 620 284 pdp_xv;
 #X msg 321 411 feed http://ayp.unia.es:8888/feed1.ffm;
-#X obj 94 297 catch~ lout;
-#X obj 56 372 dac~;
+#X obj 619 251 pdp_spigot;
+#X obj 684 223 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 171 309 adc~;
+#X obj 504 284 dac~;
+#X obj 504 252 spigot~;
+#X obj 684 223 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 548 223 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 674 285 close;
 #X connect 0 0 9 0;
 #X connect 1 0 15 0;
 #X connect 2 0 1 0;
@@ -62,15 +71,17 @@ server;
 #X connect 8 0 6 0;
 #X connect 9 0 15 0;
 #X connect 10 0 36 0;
-#X connect 10 0 38 0;
+#X connect 10 0 40 0;
 #X connect 11 0 10 0;
 #X connect 12 0 11 0;
 #X connect 13 0 11 0;
 #X connect 14 0 10 0;
 #X connect 15 0 36 0;
-#X connect 15 0 38 0;
+#X connect 15 0 40 0;
 #X connect 15 3 36 0;
+#X connect 15 3 44 0;
 #X connect 15 4 36 1;
+#X connect 15 4 44 0;
 #X connect 16 0 18 0;
 #X connect 17 0 20 0;
 #X connect 18 0 17 0;
@@ -81,7 +92,11 @@ server;
 #X connect 36 1 26 0;
 #X connect 36 2 31 0;
 #X connect 39 0 36 0;
-#X connect 40 0 36 0;
-#X connect 40 0 36 1;
-#X connect 40 0 41 0;
-#X connect 40 0 41 1;
+#X connect 40 1 38 0;
+#X connect 41 0 40 1;
+#X connect 42 0 36 0;
+#X connect 42 1 36 1;
+#X connect 44 1 43 1;
+#X connect 44 1 43 0;
+#X connect 46 0 44 1;
+#X connect 47 0 38 0;
