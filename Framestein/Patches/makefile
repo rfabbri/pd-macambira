@@ -4,8 +4,8 @@ all: vframe vsig vsnapshot vrgb vcolor vframeread vdrawarray arraysize buildstr 
 #
 # note: maximum optimization (/Ox) causes crashes with plugins..
 
-F = /DNT /DPD /LD /Gd /GD /Ogitb1 /Gs /I\system\pd\src /I..\Plugins
-L = \system\pdt17\bin\pd.lib
+F = /DNT /DPD /LD /Gd /GD /Ogitb1 /Gs /Ic:\pd\src /I..\Plugins
+L = c:\pd\bin\pd.lib
 
 vframe:
 	cl vframe.c $(F) /link /export:vframe_setup $(L) user32.lib
