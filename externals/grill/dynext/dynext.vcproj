@@ -217,9 +217,6 @@
 			Name="doc"
 			Filter="">
 			<File
-				RelativePath="make-files.txt">
-			</File>
-			<File
 				RelativePath="readme.txt">
 			</File>
 		</Filter>

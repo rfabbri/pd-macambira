@@ -11,6 +11,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
+#define FLEXT_ATTRIBUTES 1
+
 #include <flext.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
@@ -154,6 +156,7 @@ protected:
 
     int m_inlets,s_inlets,m_outlets,s_outlets;
 	t_canvas *canvas;
+    bool stripext;
 
 private:
 	static void setup(t_classid c);
@@ -168,6 +171,8 @@ private:
 	FLEXT_CALLBACK_V(m_disconnect)
 	FLEXT_CALLBACK_V(m_send)
 	FLEXT_CALLBACK_B(m_vis)
+
+	FLEXT_ATTRVAR_B(stripext)
 
     static const t_symbol *sym_dot,*sym_dynsin,*sym_dynsout,*sym_dynin,*sym_dynout,*sym_dyncanvas;
     static const t_symbol *sym_vis,*sym_loadbang,*sym_dsp;
@@ -239,6 +244,8 @@ void dyn::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"send",m_send);
 	FLEXT_CADDMETHOD_(c,0,"vis",m_vis);
 
+    FLEXT_CADDATTR_VAR1(c,"stripext",stripext);
+
     // set up symbols
     k_obj = MakeSymbol("obj"); 
     k_msg = MakeSymbol("msg"); 
@@ -285,7 +292,8 @@ In all cases the 1)s have been chosen as the cleaner solution
 dyn::dyn(int argc,const t_atom *argv):
 	root(NULL),
 	canvas(NULL),
-	pxin(NULL),pxout(NULL)
+	pxin(NULL),pxout(NULL),
+    stripext(false)
 {
 	if(argc < 4) { 
 		post("%s - Syntax: dyn~ sig-ins msg-ins sig-outs msg-outs",thisName());
@@ -458,7 +466,7 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 			err = "Canvas could not be found";
         else {
             // convert abstraction filenames
-            if(kind == k_obj && argc >= 3 && IsSymbol(argv[2])) {
+            if(stripext && kind == k_obj && argc >= 3 && IsSymbol(argv[2])) {
                 const char *c = GetString(argv[2]);
                 int l = strlen(c);
                 // check end of string for .pd file extension
@@ -472,7 +480,7 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
                 }
             }
 
-			// set selected canvas as current
+            // set selected canvas as current
 			canvas_setcurrent(glist); 
 
             t_gobj *last = GetLast(glist);

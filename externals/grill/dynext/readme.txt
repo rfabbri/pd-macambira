@@ -26,7 +26,7 @@ CHANGES:
 0.1.1:
 - using aligned memory
 - cached several symbols
-- strip .pd extension from abstraction filenames
+- strip .pd extension from abstraction filenames (if stripext attribute is set)
 - debug patcher opens on alt-click
 
 0.1.0:
