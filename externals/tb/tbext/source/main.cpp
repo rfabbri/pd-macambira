@@ -48,17 +48,16 @@
 
 void ttbext_setup()
 {
-  post("TBEXT: by tim blechmann");
+  post("\nTBEXT: by tim blechmann");
   post("version "TBEXT_VERSION);
   post("compiled on "__DATE__);
-  post("contains: tbroute(~), tbsig~, tbpow~, tbfft1~, tbfft2~, bufline~, fftgrrev~");
-  post("          fftgrsort~, fftgrshuf~, him~");
+  post("contains: tbroute(~), tbfft1~, tbfft2~, bufline~, fftgrrev~");
+  post("          fftgrsort~, fftgrshuf~, him~\n");
 
   FLEXT_SETUP(tbroute);
   FLEXT_DSP_SETUP(tbsroute);
-  FLEXT_DSP_SETUP(tbsig);
-  FLEXT_DSP_SETUP(tbpow);
-  //  FLEXT_DSP_SETUP(tbg7xx);
+  /* obsolete: FLEXT_DSP_SETUP(tbsig); */
+  /* obsolete: FLEXT_DSP_SETUP(tbpow); */
   FLEXT_DSP_SETUP(tbfft1);
   FLEXT_DSP_SETUP(tbfft2);
   FLEXT_DSP_SETUP(fftbuf);
