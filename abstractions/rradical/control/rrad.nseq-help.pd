@@ -1,4 +1,4 @@
-#N canvas 252 197 903 653 10;
+#N canvas 213 155 903 653 10;
 #X obj 190 155 rrad.nseq /id;
 #X floatatom 190 519 5 0 0 0 - - -;
 #X obj 190 61 metro 250;
@@ -6,7 +6,7 @@
 #X obj 234 84 + 1;
 #X floatatom 147 154 5 0 0 0 - - -;
 #X obj 190 39 tgl 15 0 empty \$0-start empty 0 -6 0 8 -24198 -1 -1
-1 1;
+0 1;
 #X obj 190 129 mod 16;
 #X text 468 49 rrad.nseq: 16-step number box sequencer;
 #X text 422 133 nseq supports alphanumerical keyboard control. Clicking
@@ -73,12 +73,16 @@ step or the keyboard input.;
 #X obj 53 156 vline~;
 #X obj 53 184 *~;
 #X obj 55 207 *~;
-#X msg 52 134 1 10 \, 0 150 80;
 #X obj 171 158 osc~ 0;
+#X obj 235 159 osc~ 0;
+#X floatatom 279 101 5 0 0 0 - - -;
+#X msg 52 134 0.8 10 \, 0 150 80;
+#X obj 237 133 + 11;
 #X connect 0 0 3 0;
-#X connect 2 0 10 0;
+#X connect 2 0 9 0;
+#X connect 2 0 13 0;
 #X connect 3 1 4 0;
-#X connect 4 0 9 0;
+#X connect 4 0 12 0;
 #X connect 4 1 2 0;
 #X connect 5 0 1 0;
 #X connect 6 0 7 0;
@@ -86,12 +90,12 @@ step or the keyboard input.;
 #X connect 7 0 8 0;
 #X connect 7 0 8 1;
 #X connect 8 0 5 0;
-#X connect 9 0 6 0;
+#X connect 9 0 5 1;
 #X connect 10 0 5 1;
+#X connect 11 0 13 1;
+#X connect 12 0 6 0;
+#X connect 13 0 10 0;
 #X restore 190 540 pd testtone;
-#X text 423 78 rrad.nseq (called nseq for now) is a sequencer for numberboxes
-carrying values from 0 to 127 . Arranged from top to bottom nseq is
-similar to old-fashioned tracker interfaces.;
 #X msg 291 64 /id/preset \$1;
 #X obj 291 39 tgl 15 0 empty empty switch_presets 20 10 0 8 -24198
 -1 -1 0 1;
@@ -130,11 +134,15 @@ nseq /id/n2 95 \; nseq /id/n1 37 \; nseq /id/n5 41 \; nseq /id/n4 91
 #X obj 241 129 sel 31;
 #X text 439 584 The rightmost outlet is OSC outlet. See the main RRADical
 documentation for details.;
+#X text 423 76 rrad.nseq (called nseq for now) is a sequencer for numberboxes
+carrying values from -1 to 127 . Arranged from top to bottom nseq is
+similar to old-fashioned tracker interfaces. Only values of 0-127 are
+sent to the outlet.;
 #X connect 0 0 1 0;
 #X connect 1 0 30 0;
 #X connect 2 0 3 0;
 #X connect 3 0 7 0;
-#X connect 3 0 39 0;
+#X connect 3 0 38 0;
 #X connect 3 0 4 0;
 #X connect 4 0 3 1;
 #X connect 6 0 2 0;
@@ -143,8 +151,8 @@ documentation for details.;
 #X connect 7 0 0 0;
 #X connect 30 0 29 0;
 #X connect 30 0 29 1;
-#X connect 32 0 0 1;
-#X connect 33 0 32 0;
-#X connect 35 0 0 1;
-#X connect 39 0 40 0;
-#X connect 40 0 33 0;
+#X connect 31 0 0 1;
+#X connect 32 0 31 0;
+#X connect 34 0 0 1;
+#X connect 38 0 39 0;
+#X connect 39 0 32 0;
