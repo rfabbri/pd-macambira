@@ -616,12 +616,15 @@ static bool gettag(istream &is,xmltag &tag)
         }
 
         if(!*c) { // is comment
-            char cmp[2] = {0,0};
+            char cmp[2] = {0,0}; // set to some unusual initial value
+
             for(int ic = 0; ; ic = (++ic)%2) {
                 char c = is.get();
                 if(c == '>') {
-                    for(int i = 0; i < 2 && cmp[(ic+i)%2] == commend[i]; ++i);
-                    if(i == 2) break; // comment end!
+                    // if third character is > then check also the former two
+                    int i;
+                    for(i = 0; i < 2 && cmp[(ic+i)%2] == commend[i]; ++i);
+                    if(i == 2) break; // match: comment end found!
                 }
                 else
                     cmp[ic] = c;
