@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: download.php,v 1.1 2003-03-14 21:55:18 eighthave Exp $  -->
+<!-- $Id: download.php,v 1.2 2003-03-14 22:40:06 eighthave Exp $  -->
 
 <HTML>
 
@@ -30,17 +30,16 @@ We are aiming to make this page the one stop for all of your Pd downloads.
 
 <h3>Pure Data</h3>
 
-<h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D144081">pure-data</a></h4>
+<h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=144081">pure-data</a></h4>
 <p>Miller Puckette's distribution.  You can also get it from <a href="http://crca.ucsd.edu/~msp" >his site</a>.</p>
 
-<h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D145993" >pd-extended</a></h4>
-<p>The Pd developers community have added a few extensions to the core of MSP,
-like colored audio cords, GUI glitch prevention, and more.  The pd-extended
+<h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=145993" >pd-extended</a></h4>
+<p>The Pd developer community have added some extensions to Pd, like colored audio cords, GUI glitch prevention, and more.  The pd-extended
 distribtution includes these patches.</p>
 
 <h3>Externals</h3>
 
-<h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D146085"
+<h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=146085"
 >pd-externals</a></h4>
 <p>The core package of pd externals.  It includes all externals that
 do not depend on other libraries.</p>
@@ -49,7 +48,7 @@ do not depend on other libraries.</p>
 <p>flext is a C++ layer for cross-platform development of Max/MSP and Pd
 externals.  Package is coming soon... look <a href="http://www.parasitaere-kapazitaeten.net/Pd/ext/flext/" >here</a> in the meantime.</p>
 
-<h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D146087" >pd-gem</a></h4>
+<h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=146087" >pd-gem</a></h4>
 <p>GEM is an OpenGL and video extension for Pd.</p>
 
 <h4>pd-osc</h4>
