@@ -39,6 +39,6 @@ param:  Modify the paramaters of the equation, the number of args depend
 See the example patches for clarification.
 
 
-Have fun with them, I'd be happy to hear about any interesting uses you
+Have fun with them. I'd be happy to hear about any interesting uses you
 find for them. As well as any interesting attractor equations you come
 across.
