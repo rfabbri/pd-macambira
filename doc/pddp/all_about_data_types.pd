@@ -1,40 +1,21 @@
-#N canvas 106 77 861 642 10;
-#X obj 434 490 route;
-#X obj 213 411 symbol;
-#X obj 153 432 int;
-#X floatatom 91 286 5 0 0 0 - - -;
-#X text 130 286 float;
-#X symbolatom 182 286 10 0 0 0 - - -;
-#X text 263 287 symbol;
-#X obj 271 411 pointer;
-#X obj 519 109 symbol;
-#X symbolatom 519 156 0 0 0 0 - - -;
-#X msg 528 133 word;
-#X msg 519 91 test;
-#X obj 42 414 bang;
-#X obj 42 434 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X text 61 434 aka [bng];
-#X msg 502 69 symbol this;
-#X text 576 111 casting as a symbol;
-#X text 593 68 set type directly;
-#X text 567 134 does not work (check console messages);
-#X floatatom 432 131 5 0 0 0 - - -;
-#X msg 437 110 12;
-#X msg 420 90 float 83;
-#X obj 18 556 int;
-#X obj 26 536 / 5.23;
-#X floatatom 26 508 5 0 0 0 - - -;
-#X floatatom 59 576 5 0 0 0 - - -;
-#X floatatom 18 576 5 0 0 0 - - -;
-#X text 5 308 casting and storage objects:;
-#X obj 153 412 float;
-#X text 5 326 There a number of objects which are used for storing
-messages \, or casting messages as a specific data type \, sometimes
-converting from one data type to another. The right inlet on these
-objects is stores that value \, which can be later output using a bang.
-;
-#N canvas 770 126 478 328 Related_Objects 0;
+#N canvas 310 87 865 646 10;
+#X obj 462 499 route;
+#X floatatom 102 114 5 0 0 0 - - -;
+#X text 141 114 float;
+#X symbolatom 193 114 10 0 0 0 - - -;
+#X text 274 115 symbol;
+#X obj 105 210 symbol;
+#X symbolatom 105 257 0 0 0 0 - - -;
+#X msg 114 234 word;
+#X msg 105 192 test;
+#X msg 88 170 symbol this;
+#X text 162 212 casting as a symbol;
+#X text 179 169 set type directly;
+#X text 153 235 does not work (check console messages);
+#X floatatom 24 232 5 0 0 0 - - -;
+#X msg 29 211 12;
+#X msg 12 191 float 83;
+#N canvas 770 126 482 332 Related_Objects 0;
 #X obj 32 54 ftos;
 #X obj 68 54 list2symbol;
 #X text 23 22 data type conversion;
@@ -50,79 +31,102 @@ objects is stores that value \, which can be later output using a bang.
 #X obj 158 159 symbol2list;
 #X obj 247 138 l2s;
 #X obj 247 158 s2l;
-#X restore 678 536 pd Related_Objects;
-#X text 10 240 Data types are known as 'atoms' in Pd. float and symbol
-atoms have 'atom boxes'for realtime display and control from within
-a patch.;
-#X obj 404 19 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 706 549 pd Related_Objects;
+#X obj 419 19 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 404 594 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 419 594 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 411 239 Many objects cast the data they receive when they output
+#X text 436 255 Many objects cast the data they receive when they output
 it:;
-#X text 530 336 Some objects do not cast the data:;
-#X obj 428 307 trigger anything;
-#X msg 428 282 this is a list without a cast;
-#X obj 428 330 print;
-#X text 414 380 Some objects need to have the data explicitly declared
+#X text 555 336 Some objects do not cast the data:;
+#X obj 453 307 trigger anything;
+#X msg 453 282 this is a list without a cast;
+#X obj 453 330 print;
+#X text 439 390 Some objects need to have the data explicitly declared
 in order to handle it. These are mostly symbol handling objects.;
-#X text 414 447 Objects which route data generally can handle explicitly
+#X text 439 466 Objects which route data generally can handle explicitly
 or implicitly defined data.;
-#X obj 480 490 trigger;
-#X obj 538 490 niagara;
-#X obj 430 423 select;
-#X text 411 41 symbols need to be declared explicitly \, floats do
-not \, but can be:;
-#X obj 213 434 lister;
+#X obj 509 499 trigger;
+#X obj 567 499 niagara;
+#X obj 455 433 select;
+#X text 3 142 symbols need to be declared explicitly \, floats do not
+\, but can be:;
 #X obj 4 -3 cnv 15 850 20 empty empty all_about_data_types 20 10 1
 18 -233017 -66577 0;
 #X obj 820 -2 pddp;
 #X text 17 604 by Hans-Christoph Steiner <hans@at.or.at>;
-#X text 12 81 the "anything" data type allows anything to pass through
+#X text 12 303 the "anything" data type allows anything to pass through
 unchanged.;
-#X text 17 470 examples of casting:;
-#X text 424 517 click on these for more info:;
+#X text 441 530 click on these for more info:;
 #X text 629 606 updated for Pd version 0.37.1;
-#X text 82 49 anything bang float list pointer scalar symbol;
-#X text 6 34 data types (atoms):;
-#X text 0 68 "anything";
-#X text 0 184 "list";
-#X text 0 170 "float";
-#X text 0 211 "symbol";
-#X text 0 197 "scalar";
-#X text 0 157 "bang";
-#X msg 100 105 anything 1 two three;
-#X msg 251 105 one 2 3;
-#X obj 156 188 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X text 0 290 "anything";
+#X text 0 406 "list";
+#X text 0 392 "float";
+#X text 0 433 "symbol";
+#X text 0 419 "scalar";
+#X text 0 379 "bang";
+#X msg 100 327 anything 1 two three;
+#X msg 251 327 one 2 3;
+#X obj 156 410 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 160 162 t a b f l p s;
-#X obj 190 189 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 160 384 t a b f l p s;
+#X obj 190 411 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 253 139 list one 2 3;
-#X msg 292 169 1 2 3;
-#X obj 108 506 tosymbol;
-#X obj 172 507 fromsymbol;
-#X obj 255 506 list2symbol;
-#X obj 259 548 ftos;
-#X obj 425 537 all_about_lists_vs_anythings;
-#X obj 424 564 all_about_symbol_construction;
-#X obj 640 564 all_about_data_structures;
-#X connect 8 0 9 0;
-#X connect 10 0 9 0;
-#X connect 11 0 8 0;
-#X connect 15 0 9 0;
-#X connect 20 0 19 0;
-#X connect 21 0 19 0;
-#X connect 22 0 26 0;
-#X connect 23 0 22 0;
-#X connect 23 0 25 0;
-#X connect 24 0 23 0;
-#X connect 32 0 33 0;
-#X connect 36 0 38 0;
-#X connect 37 0 36 0;
-#X connect 61 0 64 0;
-#X connect 62 0 64 0;
-#X connect 64 0 63 0;
-#X connect 64 3 65 0;
-#X connect 66 0 64 0;
-#X connect 67 0 64 0;
+#X msg 253 361 list one 2 3;
+#X msg 292 391 1 2 3;
+#X obj 453 550 all_about_lists_vs_anythings;
+#X obj 452 571 all_about_symbol_construction;
+#X obj 668 571 all_about_data_structures;
+#X text 206 34 float symbol pointer;
+#X text 6 34 atoms (basic data types):;
+#X text 6 59 The basic data types are known as 'atoms' in Pd. "float"
+and "symbol" atoms have 'atom boxes' for realtime display and control
+from within a patch. "pointer" atoms are used for accessing data stored
+in graphical data structures.;
+#X obj 450 207 int;
+#X obj 458 187 / 5.23;
+#X floatatom 458 159 5 0 0 0 - - -;
+#X floatatom 491 227 5 0 0 0 - - -;
+#X floatatom 450 227 5 0 0 0 - - -;
+#X text 439 137 examples of casting:;
+#X obj 540 157 tosymbol;
+#X obj 604 158 fromsymbol;
+#X obj 687 157 list2symbol;
+#X obj 691 199 ftos;
+#X obj 646 42 symbol;
+#X obj 613 85 int;
+#X obj 728 42 pointer;
+#X obj 473 85 bang;
+#X obj 511 86 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 528 86 aka [bng];
+#X text 10 508 casting and storage objects:;
+#X obj 528 42 float;
+#X text 10 526 There a number of objects which are used for storing
+messages \, or casting messages as a specific data type \, sometimes
+converting from one data type to another. The right inlet on these
+objects is stores that value \, which can be later output using a bang.
+;
+#X obj 641 85 lister;
+#X text 464 42 atoms:;
+#X text 569 43 aka;
+#X obj 595 42 f;
+#X connect 5 0 6 0;
+#X connect 7 0 6 0;
+#X connect 8 0 5 0;
+#X connect 9 0 6 0;
+#X connect 14 0 13 0;
+#X connect 15 0 13 0;
+#X connect 17 0 18 0;
+#X connect 21 0 23 0;
+#X connect 22 0 21 0;
+#X connect 42 0 45 0;
+#X connect 43 0 45 0;
+#X connect 45 0 44 0;
+#X connect 45 3 46 0;
+#X connect 47 0 45 0;
+#X connect 48 0 45 0;
+#X connect 55 0 59 0;
+#X connect 56 0 55 0;
+#X connect 56 0 58 0;
+#X connect 57 0 56 0;
