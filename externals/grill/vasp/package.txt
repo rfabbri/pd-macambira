@@ -1,7 +1,5 @@
 NAME=vasp
 
-BUILDCLASS=ext
-BUILDMODE=release
 BUILDTYPE=multi
 
 PRECOMPILE=main.h
