@@ -19,7 +19,7 @@ echo $FOLDER does not exist
 exit 2
 fi
 
-SIZE=`du -s "$FOLDER" | awk '{ print $1 }'`
+SIZE=`/usr/bin/du -s "$FOLDER" | awk '{ print $1 }'`
 # allow space for partition map and directory structure
 SIZE=`echo 1024 + $SIZE \* 1.1 / 1 | bc`
 NAME=`basename "$FOLDER"`
