@@ -5,7 +5,7 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 	multiply overlay screen shadowcaster softlight \
 	rgbseek modgain traffic constrain eclipse eclipse02 eclipse03 \
 	cga keyscreen rene cutout fromage rgbavg rgbavg02 \
-	rowca argument-passing
+	rowca argument-passing lightspeed
 
 	dir *.dll
 
@@ -188,3 +188,6 @@ rowca:
 
 argument-passing:
 	cl argument-passing.cpp $(FLAGS) /GX /link $(EFFECT)
+
+lightspeed:
+	cl lightspeed.c $(FLAGS) /link $(EFFECT)

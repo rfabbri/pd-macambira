@@ -43,7 +43,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=
+SearchPath=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\common\pshost;E:\lab\common\G32
 Packages=Vcl50;Vclx50;VclSmp50;Qrpt50;Vcldb50;Vclbde50;ibevnt50;vcldbx50;TeeUI50;TeeDB50;Tee50;TeeQR50;VCLIB50;vclie50;Inetdb50;Inet50;NMFast50;dclocx50;dclaxserver50;DelphiX_for5;fspak
 Conditionals=FSDLL
 DebugSourceDirs=
@@ -53,7 +53,7 @@ RunParams=
 HostApplication=
 [Language]
 ActiveLang=
-ProjectLang=
+ProjectLang=$0000040B
 RootDir=
 [Version Info]
 IncludeVerInfo=0
@@ -86,3 +86,6 @@ Item0=FSDLL
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=1
+Item0=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\common\pshost;E:\lab\common\G32

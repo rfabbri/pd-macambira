@@ -1,5 +1,5 @@
 //
-// example of passing arguments to plugin using the arguments-class (defined in pixels.h)
+// example of parsing arguments in a plugin using the arguments-class (defined in pixels.h)
 //
 
 #include "pixels.h"
@@ -10,7 +10,7 @@ void perform_effect(_frame f, _args a)
 
 	//
 	// ar.count()	return the number of arguments
-	// ar[i]	return i'th argument
+	// ar[i]	return i'th argument, starting from zero
 	//
 
 	for(int i=0; i<ar.count(); i++)

@@ -37,14 +37,14 @@ uses
 
 {$R *.RES}
 
-function framestein_setup: Longint; stdcall;
+function framesteinlib_setup: Longint; stdcall;
 begin
-  MainT := TMainThread.Create(False);
+  mainunit.MainT := TMainThread.Create(False);
   Result := 0;
 end;
 
 exports
-  framestein_setup;
+  framesteinlib_setup;
 
 var
   SaveExit: Pointer;

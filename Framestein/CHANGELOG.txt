@@ -1,9 +1,10 @@
 0.32
+- new plugin: lightspeed
 - fs.frame: |title this is the main window(
 - fs.copy: transcolor <r> <g> <b> to set the transparent color
 - better gol algo (Plugins\gol.c)
 - added 1d cell automata where each iteration will add a new row: Plugins\rowca
-- added arguments-class in pixels.h to ease parsing arguments to plugins.
+- added arguments-class in pixels.h to ease parsing arguments in plugins.
   example:
 
   void perform_effect(_frame f, _args a)
