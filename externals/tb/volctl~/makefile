@@ -62,7 +62,7 @@ pd_linux: $(NAME).pd_linux
 
 LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
-    -Wno-unused -Wno-parentheses -Wno-switch 
+    -Wno-unused -Wno-parentheses -Wno-switch
 
 LINUXINCLUDE =  -I../../src
 
