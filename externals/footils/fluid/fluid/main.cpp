@@ -46,7 +46,7 @@
 class fluid: 
 	public flext_dsp
 {
-	FLEXT_HEADER(fluid, flext_dsp)
+	FLEXT_HEADER_S(fluid, flext_dsp, setup)
 
 	public:
 		fluid(int argc, t_atom *argv) 
@@ -54,9 +54,7 @@ class fluid:
 			AddInAnything();         // slurp anything
 			AddOutSignal(2);         // 2 audio out [ == AddOutSignal(2) ]
 			
-			SetupInOut();           // set up inlets and outlets. 
-			                        // Must be called once!
-			
+
 			float sr=Samplerate();
 			
 			if (sr != 44100.f) 
@@ -86,7 +84,6 @@ class fluid:
 			
 	
 			// Create fluidsynth instance:
-			synth = NULL;
 			synth = new_fluid_synth(settings);
 			
 			if ( synth == NULL )
@@ -97,25 +94,7 @@ class fluid:
 			// try to load argument as soundfont
 			fluid_load(argc, argv);
 
-
-			FLEXT_ADDMETHOD_(0,"load", fluid_load);
-			FLEXT_ADDMETHOD_(0,"note", fluid_note);
-			FLEXT_ADDMETHOD_(0,"prog", fluid_program_change);
-			FLEXT_ADDMETHOD_(0,"control", fluid_control_change);
-			FLEXT_ADDMETHOD_(0,"bend", fluid_pitch_bend);
-			FLEXT_ADDMETHOD_(0,"bank",  fluid_bank);
-			
-			// list input calls fluid_note(...)
-			FLEXT_ADDMETHOD_(0, "list",  fluid_note);
-			
-			// some alias shortcuts:
-			FLEXT_ADDMETHOD_(0,"n",  fluid_note);
-			FLEXT_ADDMETHOD_(0,"p",  fluid_program_change);
-			FLEXT_ADDMETHOD_(0,"c",  fluid_control_change);
-			FLEXT_ADDMETHOD_(0,"cc", fluid_control_change);
-			FLEXT_ADDMETHOD_(0,"b",  fluid_pitch_bend);
-			
-			
+		
 			if (settings != NULL )
 				delete_fluid_settings(settings);
 			
@@ -153,28 +132,49 @@ class fluid:
 
 		}
 	protected:
+
+        static void setup(t_classid c)
+        {
+        	FLEXT_CADDMETHOD_(c,0,"load", fluid_load);
+			FLEXT_CADDMETHOD_(c,0,"note", fluid_note);
+			FLEXT_CADDMETHOD_(c,0,"prog", fluid_program_change);
+			FLEXT_CADDMETHOD_(c,0,"control", fluid_control_change);
+			FLEXT_CADDMETHOD_(c,0,"bend", fluid_pitch_bend);
+			FLEXT_CADDMETHOD_(c,0,"bank",  fluid_bank);
+			
+			// list input calls fluid_note(...)
+			FLEXT_CADDMETHOD_(c,0, "list",  fluid_note);
+			
+			// some alias shortcuts:
+			FLEXT_CADDMETHOD_(c,0,"n",  fluid_note); 
+			FLEXT_CADDMETHOD_(c,0,"p",  fluid_program_change);
+			FLEXT_CADDMETHOD_(c,0,"c",  fluid_control_change);
+			FLEXT_CADDMETHOD_(c,0,"cc", fluid_control_change);
+			FLEXT_CADDMETHOD_(c,0,"b",  fluid_pitch_bend);
+        }
+
 		// here we declare the virtual DSP function
 		virtual void m_signal(int n, float *const *in, float *const *out);
 		
 	private:	
 		fluid_synth_t *synth;
 		
-		FLEXT_CALLBACK_G(fluid_load)
+		FLEXT_CALLBACK_V(fluid_load)
 		void fluid_load(int argc, t_atom *argv);
 		
-		FLEXT_CALLBACK_G(fluid_note)
+		FLEXT_CALLBACK_V(fluid_note)
 		void fluid_note(int argc, t_atom *argv);
 		
-		FLEXT_CALLBACK_G(fluid_program_change)
+		FLEXT_CALLBACK_V(fluid_program_change)
 		void fluid_program_change(int argc, t_atom *argv);
 		
-		FLEXT_CALLBACK_G(fluid_control_change)
+		FLEXT_CALLBACK_V(fluid_control_change)
 		void fluid_control_change(int argc, t_atom *argv);
 		
-		FLEXT_CALLBACK_G(fluid_pitch_bend)
+		FLEXT_CALLBACK_V(fluid_pitch_bend)
 		void fluid_pitch_bend(int argc, t_atom *argv);
 		
-		FLEXT_CALLBACK_G(fluid_bank)
+		FLEXT_CALLBACK_V(fluid_bank)
 		void fluid_bank(int argc, t_atom *argv);
 
 }; // end of class declaration for fluid
@@ -185,7 +185,7 @@ class fluid:
 // that be for?  Registering is made easy with the FLEXT_NEW_* macros defined
 // in flext.h. 
 
-FLEXT_NEW_TILDE_G("fluid~", fluid)
+FLEXT_NEW_DSP_V("fluid~", fluid)
 
 
 void fluid::fluid_load(int argc, t_atom *argv)
@@ -214,7 +214,7 @@ void fluid::fluid_note(int argc, t_atom *argv)
 		int   chan, key, vel;
 		chan  = GetAInt(argv[0]);
 		key   = GetAInt(argv[1]);
-		vel   = GetAInt(argv[2]);
+		vel   = GetAInt(argv[2]); 
 		fluid_synth_noteon(synth,chan-1,key,vel);
 	}
 }
