@@ -12,8 +12,9 @@ all:
 	cp ../../sprinkler/sprinkler-help.pd $(DOC_DIR)
 # all of the rest
 	cp ../../OSCx/doc/*.pd \
-			../../ann/examples/*.* \
 			../../aenv~/*.pd \
+			../../ann/examples/*.* \
+			../../arraysize/*.pd \
 			../../beatpipe/*.pd \
 			../../build/*.pd \
 			../../bbogart/chaos/tools/*.pd \
