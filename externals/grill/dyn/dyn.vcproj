@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="pd.lib flext_d-pdwin.lib pthreadVC.lib"
-				OutputFile="pd-msvc/d/dyn~.dll"
+				OutputFile="$(outdir)/dyn~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="c:\programme\audio\pd/bin,..\flext\pd-msvc"

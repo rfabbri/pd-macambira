@@ -51,7 +51,7 @@ protected:
     V ms_args(const AtomList &a) { m_reload_(a.Count(),a.Atoms()); }
     V m_dir_() { m__dir(pyobj); }
     V mg_dir_(AtomList &lst) { GetDir(pyobj,lst); }
-    V m_doc_() { m__doc(pyobj); }
+    V m_doc_() { m__doc(((PyInstanceObject *)pyobj)->in_class->cl_dict); }
 	virtual V m_help();
 
 	V m_get(const t_symbol *s);
@@ -66,13 +66,12 @@ private:
 
 	static pyext *GetThis(PyObject *self);
 	V ClearBinding();
-	BL SetClssMeth(); //I argc,t_atom *argv);
+	BL MakeInstance();
 
 	AtomList args;
 
 	virtual V Reload();
 
-	static I pyextref;
 	static PyObject *class_obj,*class_dict;
 	static PyMethodDef attr_tbl[],meth_tbl[];
 	static const C *pyext_doc;

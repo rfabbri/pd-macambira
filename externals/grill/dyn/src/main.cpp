@@ -2,7 +2,7 @@
 
 dyn~ - dynamical object management for PD
 
-Copyright (c) 2003 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -13,11 +13,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 405)
-#error You need at least flext version 0.4.5
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
+#error You need at least flext version 0.4.6
 #endif
 
-#define DYN_VERSION "0.1.0"
+#define DYN_VERSION "0.1.1pre"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
@@ -96,7 +96,7 @@ protected:
 
 		void init(dyn *t);
 
-        static void px_exit(proxy *px) { if(px->buf) delete[] px->buf; }
+        static void px_exit(proxy *px) { if(px->buf) FreeAligned(px->buf); }
 	};
 
 	// proxy for inbound messages
@@ -685,14 +685,13 @@ void dyn::proxy::init(dyn *t)
 	defsig = 0;
 }
 
-	
 void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
 {
 	int n = sp[0]->s_n;
 	if(n != x->n) {
 		// if vector size has changed make new buffer
-		if(x->buf) delete[] x->buf;
-		x->buf = new t_sample[x->n = n];
+		if(x->buf) FreeAligned(x->buf);
+		x->buf = (t_sample *)NewAligned(sizeof(t_sample)*(x->n = n));
 	}
 	dsp_add_copy(x->buf,sp[0]->s_vec,n);
 }
@@ -711,8 +710,8 @@ void dyn::proxyout::dsp(proxyout *x,t_signal **sp)
 	int n = sp[0]->s_n;
 	if(n != x->n) {
 		// if vector size has changed make new buffer
-		if(x->buf) delete[] x->buf;
-		x->buf = new t_sample[x->n = n];
+		if(x->buf) FreeAligned(x->buf);
+		x->buf = (t_sample *)NewAligned(sizeof(t_sample)*(x->n = n));
 	}
 	dsp_add_copy(sp[0]->s_vec,x->buf,n);
 }

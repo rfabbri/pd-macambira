@@ -22,4 +22,3 @@ UFLAGS=
 
 # define for shared build
 FLEXT_SHARED=1
-

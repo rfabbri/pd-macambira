@@ -10,30 +10,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "main.h"
 
-V py::lib_setup()
-{
-	post("");
-	post("py/pyext %s - python script objects, (C)2002-2004 Thomas Grill",PY__VERSION);
-	post("");
-
-	FLEXT_SETUP(pyobj);
-	FLEXT_SETUP(pyext);
-
-	pyref = 0;
-}
-
-FLEXT_LIB_SETUP(py,py::lib_setup)
-
-PyInterpreterState *py::pystate = NULL;
-
-#ifdef FLEXT_THREADS
-std::map<flext::thrid_t,PyThreadState *> py::pythrmap;
-#endif
-
-I py::pyref = 0;
-PyObject *py::module_obj = NULL;
-PyObject *py::module_dict = NULL;
-
 
 static PyMethodDef StdOut_Methods[] =
 {
@@ -41,51 +17,76 @@ static PyMethodDef StdOut_Methods[] =
 	{ NULL,    NULL,           }  
 };
 
+V py::lib_setup()
+{
+	post("");
+	post("py/pyext %s - python script objects, (C)2002-2004 Thomas Grill",PY__VERSION);
+	post("");
+
+	// -------------------------------------------------------------
+
+	Py_Initialize();
+
+#if 0 //def FLEXT_DEBUG
+	Py_DebugFlag = 1;
+	Py_VerboseFlag = 1;
+#endif
+
+#ifdef FLEXT_THREADS
+    // enable thread support and acquire the global thread lock
+	PyEval_InitThreads();
+
+    // get thread state
+    pythrmain = PyThreadState_Get();
+    // get main interpreter state
+	pystate = pythrmain->interp;
+
+    // add thread state of main thread to map
+    pythrmap[GetThreadId()] = pythrmain;
+#endif
+
+    // register/initialize pyext module only once!
+	module_obj = Py_InitModule(PYEXT_MODULE, func_tbl);
+	module_dict = PyModule_GetDict(module_obj); // borrowed reference
+
+	PyModule_AddStringConstant(module_obj,"__doc__",(C *)py_doc);
+
+	// redirect stdout
+	PyObject* py_out = Py_InitModule("stdout", StdOut_Methods);
+	PySys_SetObject("stdout", py_out);
+
+#ifdef FLEXT_THREADS
+    // release global lock
+    PyEval_ReleaseLock();
+#endif
+
+	// -------------------------------------------------------------
+
+	FLEXT_SETUP(pyobj);
+	FLEXT_SETUP(pyext);
+}
+
+FLEXT_LIB_SETUP(py,py::lib_setup)
+
+
+#ifdef FLEXT_THREADS
+PyInterpreterState *py::pystate = NULL;
+PyThreadState *py::pythrmain = NULL;
+PyThrMap py::pythrmap;
+#endif
+
+PyObject *py::module_obj = NULL;
+PyObject *py::module_dict = NULL;
+
 
 py::py(): 
 	module(NULL),
 	detach(false),shouldexit(false),thrcount(0),
 	stoptick(0)
 {
-	Lock();
-
-	if(!(pyref++)) {
-		Py_Initialize();
-
-	#ifdef FLEXT_THREADS
-        // enable thread support and acquire the global thread lock
-		PyEval_InitThreads();
-
-        // get thread state
-        PyThreadState *pythrmain = PyThreadState_Get();
-        // get main interpreter state
-		pystate = pythrmain->interp;
-
-        // release global lock
-        PyEval_ReleaseLock();
-
-        // add thread state of main thread to map
-        pythrmap[GetThreadId()] = pythrmain;
-    #endif
-
-        // register/initialize pyext module only once!
-		module_obj = Py_InitModule(PYEXT_MODULE, func_tbl);
-		module_dict = PyModule_GetDict(module_obj);
-
-		PyModule_AddStringConstant(module_obj,"__doc__",(C *)py_doc);
-
-		// redirect stdout
-		PyObject* py_out = Py_InitModule("stdout", StdOut_Methods);
-		PySys_SetObject("stdout", py_out);
-	}
-	else {
-		PY_LOCK
-		Py_INCREF(module_obj);
-		Py_INCREF(module_dict);
-		PY_UNLOCK
-	}
-
-	Unlock();
+	PY_LOCK
+	Py_INCREF(module_obj);
+	PY_UNLOCK
 
     FLEXT_ADDTIMER(stoptmr,tick);
 }
@@ -104,38 +105,7 @@ py::~py()
 		post("%s - Okay, all threads have terminated",thisName());
 	}
 		
-	Lock();
-
-    if(!(--pyref)) {
-        // no more py/pyext objects left... shut down Python
-
-		module_obj = NULL;
-		module_dict = NULL;
-
-		Py_XDECREF(module);
-
-        PyEval_AcquireLock();
-
-#ifdef FLEXT_THREADS
-		PyThreadState_Swap(pythrmap[GetThreadId()]);
-#endif
-
-#if 0 //def FLEXT_DEBUG
-        // need not necessarily do that....
-        Py_Finalize();
-#endif
-
-#ifdef FLEXT_THREADS
-        // reset thread state map
-        pythrmap.clear();
-#endif
-	}
-    else {
-    	Py_DECREF(module_obj);
-	    Py_DECREF(module_dict);
-    }
-
-	Unlock();
+   	Py_XDECREF(module_obj);
 }
 
 
@@ -229,16 +199,31 @@ V py::ImportModule(const C *name)
 {
 	if(!name) return;
 
-	module = PyImport_ImportModule((C *)name);
+	module = PyImport_ImportModule((C *)name);  // increases module_obj ref count by one
 	if (!module) {
+
 		PyErr_Print();
 		dict = NULL;
 	}
 	else
-		dict = PyModule_GetDict(module); // borrowed
-
+		dict = PyModule_GetDict(module);
 }
 
+V py::UnimportModule()
+{
+	if(!module) return;
+
+	assert(dict && module_obj && module_dict);
+
+	Py_DECREF(module);
+
+	// reference count to module is not 0 here, altough probably the last instance was unloaded
+	// Python retains one reference to the module all the time 
+	// we don't care
+
+	module = NULL;
+	dict = NULL;
+}
 
 V py::ReloadModule()
 {
@@ -262,7 +247,7 @@ V py::ReloadModule()
 V py::GetModulePath(const C *mod,C *dir,I len)
 {
 #if FLEXT_SYS == FLEXT_SYS_PD
-	// uarghh... pd doesn't show it's path for extra modules
+	// uarghh... pd doesn't show its path for extra modules
 
 	C *name;
 	I fd = open_via_path("",mod,".py",dir,&name,len,0);

@@ -176,11 +176,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="maxapi.lib maxext.lib maxaudio.lib"
+				AdditionalDependencies="maxapi.lib  maxaudio.lib"
 				OutputFile="max-msvc/pool.mxe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="&quot;F:\prog\audio\MaxWinSDK\c74support\max-includes\win-includes\release&quot;;&quot;F:\prog\audio\MaxWinSDK\c74support\msp-includes\win-includes\release&quot;,f:\prog\max\flext\max-msvc"
+				AdditionalLibraryDirectories="&quot;F:\prog\audio\maxwinsdk\c74support\max-includes&quot;;&quot;F:\prog\audio\MaxWinSDK\c74support\msp-includes&quot;;&quot;f:\prog\max\flext\max-msvc&quot;"
 				ProgramDatabaseFile=".\pd-msvc/r/pool.pdb"
 				ImportLibrary=".\max-msvc/r/pool.lib"
 				TargetMachine="1"/>

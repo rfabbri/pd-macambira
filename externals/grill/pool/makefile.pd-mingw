@@ -57,12 +57,3 @@ install:: $(TARGET)
 .PHONY: clean
 clean:
 	rm -f $(TARGDIR)/*.o $(TARGET)
-	
-
-
-
-
-
-
-
-

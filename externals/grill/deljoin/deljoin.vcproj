@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_d-pdwin.lib"
+				AdditionalDependencies="pd.lib"
 				OutputFile=".\pd-msvc/d/deljoin.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"

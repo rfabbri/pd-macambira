@@ -34,6 +34,43 @@ V pyext::Setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
 
   	FLEXT_CADDATTR_VAR1(c,"respond",respond);
+
+
+	// ----------------------------------------------------
+
+	// register/initialize pyext base class along with module
+	class_dict = PyDict_New();
+	PyObject *className = PyString_FromString(PYEXT_CLASS);
+	PyMethodDef *def;
+
+	// add setattr/getattr to class 
+	for(def = attr_tbl; def->ml_name; def++) {
+			PyObject *func = PyCFunction_New(def, NULL);
+			PyDict_SetItemString(class_dict, def->ml_name, func);
+			Py_DECREF(func);
+	}
+
+	class_obj = PyClass_New(NULL, class_dict, className);
+	Py_DECREF(className);
+
+	// add methods to class 
+	for (def = meth_tbl; def->ml_name != NULL; def++) {
+		PyObject *func = PyCFunction_New(def, NULL);
+		PyObject *method = PyMethod_New(func, NULL, class_obj); // increases class_obj ref count by 1
+		PyDict_SetItemString(class_dict, def->ml_name, method);
+		Py_DECREF(func);
+		Py_DECREF(method);
+	}
+
+#if PY_VERSION_HEX >= 0x02020000
+	// not absolutely necessary, existent in python 2.2 upwards
+	// make pyext functions available in class scope
+	PyDict_Merge(class_dict,module_dict,0);
+#endif
+	// after merge so that it's not in class_dict as well...
+	PyDict_SetItemString(module_dict, PYEXT_CLASS,class_obj); // increases class_obj ref count by 1
+
+	PyDict_SetItemString(class_dict,"__doc__",PyString_FromString(pyext_doc));
 }
 
 pyext *pyext::GetThis(PyObject *self)
@@ -60,7 +97,6 @@ static short patcher_myvol(t_patcher *x)
 #endif
 
 
-I pyext::pyextref = 0;
 PyObject *pyext::class_obj = NULL;
 PyObject *pyext::class_dict = NULL;
 
@@ -71,52 +107,13 @@ pyext::pyext(I argc,const t_atom *argv):
 { 
     int apre = 0;
 
-    PY_LOCK
-
-	if(!pyextref++) {
-		// register/initialize pyext base class along with module
-		class_dict = PyDict_New();
-		PyObject *className = PyString_FromString(PYEXT_CLASS);
-		PyMethodDef *def;
-
-		// add setattr/getattr to class 
-		for(def = attr_tbl; def->ml_name; def++) {
-			  PyObject *func = PyCFunction_New(def, NULL);
-			  PyDict_SetItemString(class_dict, def->ml_name, func);
-			  Py_DECREF(func);
-		}
-
-		class_obj = PyClass_New(NULL, class_dict, className);
-		PyDict_SetItemString(module_dict, PYEXT_CLASS,class_obj);
-		Py_DECREF(className);
-    
-		// add methods to class 
-		for (def = meth_tbl; def->ml_name != NULL; def++) {
-			PyObject *func = PyCFunction_New(def, NULL);
-			PyObject *method = PyMethod_New(func, NULL, class_obj);
-			PyDict_SetItemString(class_dict, def->ml_name, method);
-			Py_DECREF(func);
-			Py_DECREF(method);
-		}
-
-#if PY_VERSION_HEX >= 0x02020000
-		// not absolutely necessary, existent in python 2.2 upwards
-		// make pyext functions available in class scope
-		PyDict_Merge(class_dict,module_dict,0);
-#endif
-
-		PyDict_SetItemString(class_dict,"__doc__",PyString_FromString(pyext_doc));
- 	}
-	else {
-		Py_INCREF(class_obj);
-		Py_INCREF(class_dict);
-	}
-
     if(argc >= apre+2 && CanbeInt(argv[apre]) && CanbeInt(argv[apre+1])) {
         inlets = GetAInt(argv[apre]);
         outlets = GetAInt(argv[apre+1]);
         apre += 2;
     }
+
+    PY_LOCK
 
 	// init script module
 	if(argc > apre) {
@@ -151,7 +148,7 @@ pyext::pyext(I argc,const t_atom *argv):
         ++apre;
 	}
 
-	Register("_pyext");
+ 	Register("_pyext");
 
 //	t_symbol *sobj = NULL;
 	if(argc > apre) {
@@ -168,7 +165,7 @@ pyext::pyext(I argc,const t_atom *argv):
 	if(argc > apre) args(argc-apre,argv+apre);
 
 	if(methname) {
-		SetClssMeth();
+		MakeInstance();
 
         if(inlets < 0 && outlets < 0) {
 		    // now get number of inlets and outlets
@@ -222,22 +219,15 @@ pyext::~pyext()
 	PY_LOCK
 
 	ClearBinding();
-	
 	Unregister("_pyext");
+	UnimportModule();
 
-	Py_XDECREF(pyobj);
-	Py_XDECREF(class_obj);
-	Py_XDECREF(class_dict);
-
-	if(!--pyextref) {
-		class_obj = NULL;
-		class_dict = NULL;
-	}
+	Py_XDECREF(pyobj);  // opposite of SetClssMeth
 
 	PY_UNLOCK
 }
 
-BL pyext::SetClssMeth() //I argc,t_atom *argv)
+BL pyext::MakeInstance()
 {
 	// pyobj should already have been decref'd / cleared before getting here!!
 	
@@ -250,7 +240,6 @@ BL pyext::SetClssMeth() //I argc,t_atom *argv)
 			    // make instance, but don't call __init__ 
 			    pyobj = PyInstance_NewRaw(pref,NULL);
 
-			    Py_DECREF(pref);
 			    if(pyobj == NULL) 
 				    PyErr_Print();
 			    else {
@@ -260,8 +249,9 @@ BL pyext::SetClssMeth() //I argc,t_atom *argv)
 
 				    // call init now, after _this has been set, which is
 				    // important for eventual callbacks from __init__ to c
-				    PyObject *pargs = MakePyArgs(NULL,args,-1,true);
-				    if (pargs == NULL) PyErr_Print();
+				    PyObject *pargs = MakePyArgs(NULL,args.Count(),args.Atoms(),-1,true);
+				    if (pargs == NULL) 
+						PyErr_Print();
 
 				    PyObject *init;
 				    init = PyObject_GetAttrString(pyobj,"__init__"); // get ref
@@ -300,7 +290,7 @@ V pyext::Reload()
 	SetArgs(0,NULL);
 	ReloadModule();
 	
-	SetClssMeth();
+	MakeInstance();
 }
 
 
@@ -367,7 +357,7 @@ void pyext::m_set(int argc,const t_atom *argv)
             post("%s - set: Python variable %s not found",thisName(),ch);
 	    }
 	    else {
-            PyObject *pval = MakePyArgs(NULL,AtomList(argc-1,argv+1),-1,false);
+            PyObject *pval = MakePyArgs(NULL,argc-1,argv+1,-1,false);
 
             if(!pval)
 			    PyErr_Print();
@@ -438,17 +428,13 @@ PyObject *pyext::call(const C *meth,I inlet,const t_symbol *s,I argc,const t_ato
 		PyErr_Clear(); // no method found
 	}
 	else {
-		PyObject *pargs = MakePyArgs(s,AtomList(argc,argv),inlet?inlet:-1,true);
+		PyObject *pargs = MakePyArgs(s,argc,argv,inlet?inlet:-1,true);
 		if(!pargs)
 			PyErr_Print();
 		else {
 			ret = PyEval_CallObject(pmeth, pargs); 
 			if (ret == NULL) // function not found resp. arguments not matching
-#ifdef FLEXT_DEBUG
 				PyErr_Print();
-#else
-				PyErr_Clear();  
-#endif
 
 			Py_DECREF(pargs);
 		}
@@ -470,7 +456,6 @@ V pyext::work_wrapper(V *data)
         // --- make new Python thread ---
         // get the global lock
         PyEval_AcquireLock();
-        // get a reference to the PyInterpreterState
         // create a thread state object for this thread
         PyThreadState *newthr = PyThreadState_New(pystate);
         // free the lock

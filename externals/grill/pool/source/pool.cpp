@@ -623,7 +623,7 @@ static bool gettag(istream &is,xmltag &tag)
                 if(c == '>') {
                     // if third character is > then check also the former two
                     int i;
-                    for(i = 0; i < 2 && cmp[(ic+i)%2] == commend[i]; ++i);
+                    for(i = 0; i < 2 && cmp[(ic+i)%2] == commend[i]; ++i) {}
                     if(i == 2) break; // match: comment end found!
                 }
                 else
@@ -647,17 +647,17 @@ static bool gettag(istream &is,xmltag &tag)
 
             char *tb = tmp,*te = t-1,*tf;
 
-            for(; isspace(*tb); ++tb);
+            for(; isspace(*tb); ++tb) {}
             if(*tb == '/') { 
                 // slash at the beginning -> end tag
                 tag.type = xmltag::t_end;
-                for(++tb; isspace(*tb); ++tb);
+                for(++tb; isspace(*tb); ++tb) {}
             }
             else {
-                for(; isspace(*te); --te);
+                for(; isspace(*te); --te) {}
                 if(*te == '/') { 
                     // slash at the end -> empty tag
-                    for(--te; isspace(*te); --te);
+                    for(--te; isspace(*te); --te) {}
                     tag.type = xmltag::t_empty;
                 }
                 else 
@@ -666,7 +666,7 @@ static bool gettag(istream &is,xmltag &tag)
             }
 
             // copy tag text without slashes
-            for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf);
+            for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf) {}
             tag.tag.assign(tb,tf-tb);
             while(isspace(*tf)) ++tf;
             tag.attr.assign(tf,te-tf+1);

@@ -12,16 +12,25 @@ CONFIG=config-pd-darwin.txt
 
 include $(CONFIG)
 
-FLEXTLIB=$(FLEXTPATH)/flext.a
-
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
 LIBPATH=
 FLAGS=-DFLEXT_SYS=2 
-CFLAGS=-O6 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
+CFLAGS=-O2 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
 LIBS=m
-LDFLAGS=-bundle -bundle_loader $(PD)
 FRAMEWORKS=Carbon
+LDFLAGS+=-bundle -bundle_loader $(PD)
+
+ifdef FLEXT_SHARED
+CFLAGS+=-dynamic -DFLEXT_SHARED
+LDFLAGS+=-dynamic -L$(FLEXTPATH)
+FLEXTLIB=-lflext
+
+else
+
+FLEXTLIB=$(FLEXTPATH)/libflext.a
+
+endif
 
 
 # ---------------------------------------------
@@ -36,7 +45,7 @@ TARGET=$(TARGDIR)/$(NAME).pd_darwin
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
@@ -45,8 +54,8 @@ $(TARGDIR):
 $(TARGDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(FLEXTLIB) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):
@@ -56,8 +65,8 @@ install:: $(INSTPATH)
 
 install:: $(TARGET)
 	cp $^ $(INSTPATH)
-#	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-#	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+	chown root $(patsubst %,$(INSTPATH)/%,$(notdir $^))
 
 .PHONY: clean
 clean:

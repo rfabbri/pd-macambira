@@ -50,6 +50,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "main.h"
 
+typedef std::map<flext::thrid_t,PyThreadState *> PyThrMap;
+
 class py:
 	public flext_base
 {
@@ -60,7 +62,7 @@ public:
 	~py();
 	static V lib_setup();
 
-	static PyObject *MakePyArgs(const t_symbol *s,const AtomList &args,I inlet = -1,BL withself = false);
+	static PyObject *MakePyArgs(const t_symbol *s,int argc,const t_atom *argv,I inlet = -1,BL withself = false);
 	static AtomList *GetPyArgs(PyObject *pValue,PyObject **self = NULL);
 
 protected:
@@ -74,7 +76,6 @@ protected:
 
 	PyObject *module,*dict; // inherited user class module and associated dictionary
 
-	static I pyref;
 	static const C *py_doc;
 
     V GetDir(PyObject *obj,AtomList &lst);
@@ -83,6 +84,7 @@ protected:
 	V AddToPath(const C *dir);
 	V SetArgs(I argc,const t_atom *argv);
 	V ImportModule(const C *name);
+	V UnimportModule();
 	V ReloadModule();
 
 	V Register(const C *reg);
@@ -124,16 +126,17 @@ protected:
 	V tick(V *);
 
 public:
-	static PyInterpreterState *pystate;
 
 #ifdef FLEXT_THREADS
-    static std::map<flext::thrid_t,PyThreadState *> pythrmap;
+	static PyInterpreterState *pystate;
+	static PyThreadState *pythrmain;
+    static PyThrMap pythrmap;
 	ThrMutex mutex;
-	V Lock() { mutex.Unlock(); }
-	V Unlock() { mutex.Unlock(); }
+	inline V Lock() { mutex.Unlock(); }
+	inline V Unlock() { mutex.Unlock(); }
 #else
-	V Lock() {}
-	V Unlock() {}
+	inline V Lock() {}
+	inline V Unlock() {}
 #endif
 
 	static PyObject* StdOut_Write(PyObject* Self, PyObject* Args);
@@ -152,11 +155,14 @@ protected:
 
 #ifdef FLEXT_THREADS
 
+// if thread is not found in the thread map, the state of the system thread is used
+// we have yet to see if this has bad side-effects
+
 #define PY_LOCK \
 	{ \
     PyEval_AcquireLock(); \
-    PyThreadState *__st = pythrmap[GetThreadId()]; \
-    FLEXT_ASSERT(__st != NULL); \
+	PyThrMap::iterator it = pythrmap.find(GetThreadId()); \
+	PyThreadState *__st = it != pythrmap.end()?it->second:pythrmain; \
 	PyThreadState *__oldst = PyThreadState_Swap(__st);
 
 #define PY_UNLOCK \

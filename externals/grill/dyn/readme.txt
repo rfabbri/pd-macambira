@@ -39,6 +39,9 @@ BUGS:
 CHANGES:
 --------
 
+0.1.1:
+- using aligned memory
+
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality
 - cleaner message-based object creation

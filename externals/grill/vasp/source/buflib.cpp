@@ -60,7 +60,7 @@ static FreeEntry *freehead = NULL,*freetail = NULL;
 static I libcnt = 0,libtick = 0;
 
 #ifdef FLEXT_THREADS
-static flext::ThrMutex libmtx;
+static flext::ThrMutex libmtx,freemtx;
 #endif
 
 static V FreeLibSym(const t_symbol *s);
@@ -73,7 +73,7 @@ BufEntry::BufEntry(const t_symbol *s,I fr,BL zero):
 	alloc(fr),len(fr),
 	refcnt(0),nxt(NULL) 
 {
-    data = (S *)NewAligned(fr*sizeof(S));
+    data = (S *)NewAligned(len*sizeof(*data));
 	if(zero) flext::ZeroMem(data,len*sizeof(*data));
 }
 
@@ -197,6 +197,11 @@ static V LibTick(V *)
 
 static const t_symbol *GetLibSym()
 {
+#ifdef FLEXT_THREADS
+	freemtx.Lock();
+#endif
+	const t_symbol *ret;
+
 	if(freehead) {
 		// reuse from free-list
 		FreeEntry *r = freehead;
@@ -204,7 +209,7 @@ static const t_symbol *GetLibSym()
 		if(!freehead) freetail = NULL;
 		const t_symbol *s = r->sym;
 		delete r;
-		return s;
+		ret = s;
 	}
 	else {
 		// allocate new symbol
@@ -214,8 +219,13 @@ static const t_symbol *GetLibSym()
 		else // better hash lookup for 4 digits
 			STD::sprintf(tmp,"vasp!%04x",libcnt); 
 		libcnt++;
-		return gensym(tmp);
+		ret = gensym(tmp);
 	}
+
+#ifdef FLEXT_THREADS
+	freemtx.Unlock();
+#endif
+	return ret;
 }
 
 static V FreeLibSym(const t_symbol *sym)
@@ -224,10 +234,18 @@ static V FreeLibSym(const t_symbol *sym)
 //	post("free %s",flext::GetString(sym));
 #endif
 
+#ifdef FLEXT_THREADS
+	freemtx.Lock();
+#endif
+
 	FreeEntry *f = new FreeEntry(sym);
 	if(!freehead) freehead = f;
 	else freetail->nxt = f;
 	freetail = f;
+
+#ifdef FLEXT_THREADS
+	freemtx.Unlock();
+#endif
 }
 
 
