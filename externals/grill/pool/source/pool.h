@@ -103,6 +103,9 @@ protected:
 	pooldir *parent;
 	const I vbits,dbits,vsize,dsize;
 	
+	static unsigned int FoldBits(unsigned long h,int bits);
+	static int Int2Bits(unsigned long n);
+
 	struct valentry { int cnt; poolval *v; };
 	struct direntry { int cnt; pooldir *d; };
 	

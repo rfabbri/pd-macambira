@@ -878,6 +878,19 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 	return true;
 }
 
+unsigned int pooldir::FoldBits(unsigned long h,int bits)
+{
+	if(!bits) return 0;
+	const int hmax = (1<<bits)-1;
+	unsigned int ret = 0;
+	for(unsigned int i = 0; i < sizeof(h)*8; i += bits)
+		ret ^= (h>>i)&hmax;
+	return ret;
+}
 
-
-
+int pooldir::Int2Bits(unsigned long n)
+{
+	int b;
+	for(b = 0; n; ++b) n >>= 1;
+	return b;
+}
