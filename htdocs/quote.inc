@@ -1,5 +1,6 @@
 <span class="quote">
-<b>Quote of the month</b><br />
-Do you think the MIDI revolution was a step forward or backward?<br />
-MSP: <em> I think it was a huge step sideways. </em>
+<b>Tip of the month</b><br />
+When working on a patch, it's often best to stay in edit mode and use the CTRL key to modify any parameters.
+<br>
+<a href="http://www.gamasutra.com/resource_guide/20030528/paul_01.shtml">Leonard J. Paul</a>
 </span>
