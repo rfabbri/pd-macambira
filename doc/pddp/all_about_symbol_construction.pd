@@ -1,4 +1,4 @@
-#N canvas 180 74 859 631 10;
+#N canvas 180 74 863 635 10;
 #X obj 0 2 cnv 15 850 20 empty empty all_about_symbol_construction
 20 10 1 18 -233017 -66577 0;
 #X obj 816 3 pddp;
@@ -34,6 +34,7 @@ to name them with a sequential number.;
 #X text 446 523 Related objects:;
 #X msg 517 260 separator -|-;
 #X text 616 261 <- click here to use "-|-";
+#X obj 452 575 concat;
 #X connect 9 0 8 0;
 #X connect 10 0 9 1;
 #X connect 11 0 10 0;

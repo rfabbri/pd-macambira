@@ -56,7 +56,7 @@ and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
 #X text 19 105 The best places to find information about PD's libraries
 is:;
-#X text 16 127 www.pure-data.org and click on "Downloads" then "Software"
+#X text 16 127 www.puredata.org and click on "Downloads" then "Software"
 ;
 #X text 18 157 iem.kug.ac.at/pdb/;
 #X restore 490 529 pd related_objects_from_other_libraries;

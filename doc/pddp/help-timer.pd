@@ -75,7 +75,7 @@ and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
 #X text 26 112 The best places to find information about PD's libraries
 is:;
-#X text 23 134 www.pure-data.org and click on "Downloads" then "Software"
+#X text 23 134 www.puredata.org and click on "Downloads" then "Software"
 ;
 #X text 25 149 or;
 #X text 25 164 iem.kug.ac.at/pdb/;

@@ -1,11 +1,11 @@
-#N canvas 317 126 761 632 10;
+#N canvas 317 126 765 636 10;
 #X text 43 164 see also:;
 #X obj 84 219 template;
-#X obj 161 277 append;
+#X obj 202 277 append;
 #X obj 54 187 getsize;
 #X obj 121 187 setsize;
 #X obj 149 219 element;
-#X obj 216 277 sublist;
+#X obj 257 277 sublist;
 #X obj 35 277 pointer;
 #X obj 99 277 get;
 #X obj 37 377 drawnumber;
@@ -30,3 +30,4 @@ a score. Pd's "data structures" are the system devised for this purpose.
 #X text 9 98 "scalar" is the basic graphical component of Pd's data
 structures. When working with data structures \, all of the objects
 pertain to reading and editing "scalars".;
+#X obj 164 277 add;

@@ -45,7 +45,7 @@ the appropriate data type.;
 #X obj 52 27 unsymbol;
 #X text 10 129 The best places to find information about PD's libraries
 is:;
-#X text 13 159 www.pure-data.org and click on "Downloads" then "Software"
+#X text 13 159 www.puredata.org and click on "Downloads" then "Software"
 ;
 #X text 14 172 or;
 #X text 15 186 iem.kug.ac.at/pdb/;
