@@ -37,7 +37,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef MACOSX
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
@@ -48,6 +50,7 @@
 #endif
 #include <math.h>
 
+#include <m_pd.h>
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
