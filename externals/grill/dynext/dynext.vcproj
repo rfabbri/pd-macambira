@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src;..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PD"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -38,11 +38,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_d-pdwin.lib pthreadVC.lib"
+				AdditionalDependencies="pd.lib pthreadVC.lib"
 				OutputFile="$(outdir)/dyn~.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd/bin,..\flext\pd-msvc"
+				AdditionalLibraryDirectories="c:\programme\audio\pd/bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/dyn~.pdb"
 				ImportLibrary=".\pd-msvc/d/dyn~.lib"

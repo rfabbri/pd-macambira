@@ -2,7 +2,7 @@
 
 dyn~ - dynamical object management for PD
 
-Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -13,8 +13,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
-#error You need at least flext version 0.4.6
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
+#error You need at least flext version 0.5.0
 #endif
 
 #define DYN_VERSION "0.1.1pre"
@@ -54,6 +54,8 @@ public:
 	void m_vis(bool vis);
 
 protected:
+
+    virtual void m_click() { m_vis(true); }
 
     static const t_symbol *k_obj,*k_msg,*k_text;
 
@@ -196,7 +198,7 @@ const t_symbol *dyn::sym_dsp = NULL;
 void dyn::setup(t_classid c)
 {
 	post("");
-	post("dyn~ %s - dynamic object management, (C)2003-04 Thomas Grill",DYN_VERSION);
+	post("dyn~ %s - dynamic object management, (C)2003-2005 Thomas Grill",DYN_VERSION);
 	post("");
 
     sym_dynsin = MakeSymbol("dyn_in~");
@@ -455,6 +457,21 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
         else if(!canv || !(glist = FindCanvas(canv)))
 			err = "Canvas could not be found";
         else {
+            // convert abstraction filenames
+            if(kind == k_obj && argc >= 3 && IsSymbol(argv[2])) {
+                const char *c = GetString(argv[2]);
+                int l = strlen(c);
+                // check end of string for .pd file extension
+                if(l >= 4 && !memcmp(c+l-3,".pd",4)) {
+                    // found -> get rid of it
+                    char tmp[64],*t = tmp;
+                    if(l > sizeof tmp-1) t = new char[l+1];
+                    memcpy(tmp,c,l-3); tmp[l-3] = 0;
+                    SetString(argv[2],tmp);
+                    if(tmp != t) delete[] t;
+                }
+            }
+
 			// set selected canvas as current
 			canvas_setcurrent(glist); 
 

@@ -1,6 +1,6 @@
 dyn~ - dynamic object management for PD
 
-Copyright (c)Thomas Grill (xovo@gmx.net)
+Copyright (c)Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -8,25 +8,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 ----------------------------------------------------------------------------
 
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
-see http://www.parasitaere-kapazitaeten.net/ext
+see http://grrrr.org/ext
 
-----------------------------------------------------------------------------
-
-The package should at least compile (and is tested) with the following compilers/platforms:
-
-pd - Windows:
--------------
-o Microsoft Visual C++: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
-
-
-pd - linux:
------------
-o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
-
-
-pd - MacOSX:
------------
-o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
+Please see build.txt in the flext package on how to compile dyn~.
 
 ----------------------------------------------------------------------------
 
@@ -42,6 +26,8 @@ CHANGES:
 0.1.1:
 - using aligned memory
 - cached several symbols
+- strip .pd extension from abstraction filenames
+- debug patcher opens on alt-click
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality
