@@ -1,8 +1,0 @@
-#N canvas 0 0 450 300 10;
-#X text 26 62 sets the overall gain [0 \, 1] of the force-feedback
-joystick on the device.;
-#X msg 74 182 0.3;
-#X obj 74 222 ff-gain 0 0.5;
-#X text 24 105 creation arguments are the device-number (starting at
-0) and gain. This effects all effects for that device;
-#X connect 1 0 2 0;

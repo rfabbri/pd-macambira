@@ -35,6 +35,7 @@ install-doc:
 	install -m444 ../../OSCx/doc/*.pd \
 			../../ann/examples/*.* \
 			../../aenv~/*.pd \
+			../../beatpipe/*.pd \
 			../../build/*.pd \
 			../../chaos/*.pd \
 			../../creb/doc/*.pd \

@@ -15,6 +15,7 @@ bandpass.c
 bdiag~.c
 beat.c
 beta.c
+beatpipe.c
 bfft~.c
 bfilt.c
 bfilt2.c
@@ -50,6 +51,7 @@ envgen.c
 equalizer.c
 expo.c
 fdn~.c
+ff.c
 ffpoly.c
 fifo.c
 filesize.c

@@ -14,6 +14,7 @@ atan2~.c \
 average.c \
 bandpass.c \
 #bdiag~.c \
+beatpipe.c \
 beat.c \
 beta.c \
 #bfft~.c \
