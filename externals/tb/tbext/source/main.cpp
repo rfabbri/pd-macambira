@@ -40,7 +40,7 @@
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.01"
+#define TBEXT_VERSION "0.02"
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
 #error upgrade your flext version!!!!!!
