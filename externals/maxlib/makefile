@@ -205,11 +205,12 @@ pd_linux: $(NAME).pd_linux
 .SUFFIXES: .pd_linux
 
 LINUXCFLAGS = -DPD -DMAXLIB -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+# LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-LINUXINCLUDE =  -I/usr/local/include -I./include
+LINUXINCLUDE =  -I/usr/local/include -I./include -I../../pd/src
 
 LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
                  plus.o minus.o divide.o multi.o average.o chord.o \
@@ -285,7 +286,7 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 
 # ----------------------------------------------------------
 
-PDDIR=/usr/local/lib/pd
+PDDIR=/usr/lib/pd
 
 install:
 	install -d $(PDDIR)/doc/5.reference/maxlib

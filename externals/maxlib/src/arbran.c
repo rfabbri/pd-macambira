@@ -58,7 +58,14 @@ static void rand_arbran_pdfscale(t_rand_arbran *x)
 	t_int k = 0;
 	t_float *tx, *tp;
 	t_int ix, ip;
-	if (!garray_getfloatarray(bx, &ix, &tx))
+
+   if(!bx || !bp) 
+     {
+	post("arbran: no arrays: pdfscale!");
+	return;
+     }
+
+   if (!garray_getfloatarray(bx, &ix, &tx))
 	{
 		post("arbran: couldn't read from array!");
 		return;
@@ -87,11 +94,19 @@ static void rand_arbran_bang(t_rand_arbran *x)
 	t_int k = 0;
 	t_float *tx, *tp;
 	t_int ix, ip;
-	if (!garray_getfloatarray(bx, &ix, &tx))
+
+   if(!bx || !bp) 
+     {
+	post("arbran: no arrays: bang!");
+	return;
+     }
+
+   if (!garray_getfloatarray(bx, &ix, &tx))
 	{
 		post("arbran: couldn't read from array!");
 		return;
 	}
+      
 	if (!garray_getfloatarray(bp, &ip, &tp))
 	{
 		post("arbran: couldn't read from array!");
@@ -158,9 +173,10 @@ static void *rand_arbran_new(t_symbol *s1, t_symbol *s2)
     t_rand_arbran *x = (t_rand_arbran *)pd_new(rand_arbran_class);
     srand( (unsigned)time( NULL ) );
     outlet_new(&x->x_obj, &s_float);
-	x->x_x = s1;
-	x->x_p = s2;
-	rand_arbran_set(x);
+   rand_arbran_setarrays(x, s1, s2);
+   /* x->x_x = s1;
+    x->x_p = s2;
+    rand_arbran_set(x); */
     return (x);
 }
 
