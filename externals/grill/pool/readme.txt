@@ -74,7 +74,6 @@ BUGS:
 TODO list:
 
 general:
-- speed up the database
 - what is output as value if it is key only? (Max->nothing!)
-
+- XML interpretation? (only files written by pool or others too)
 

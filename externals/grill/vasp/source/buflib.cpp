@@ -68,7 +68,7 @@ BufEntry::BufEntry(const t_symbol *s,I fr,BL zero):
 	refcnt(0),nxt(NULL) 
 {
 	if(zero) flext::ZeroMem(data,len*sizeof(*data));
-//	ASSERT(!flext_base::GetThing(sym));
+//	FLEXT_ASSERT(!flext_base::GetThing(sym));
 //	flext_base::SetThing(sym,this);
 }
 
@@ -123,7 +123,7 @@ static V Collect()
 	BufEntry *e,*p;
 	for(p = NULL,e = libhead; e; ) {
 		if(e->refcnt <= 0 && e->tick+LIBTOL < libtick) {
-			ASSERT(e->refcnt == 0);
+			FLEXT_ASSERT(e->refcnt == 0);
 
 			BufEntry *n = e->nxt;
 

@@ -19,6 +19,7 @@ Version history:
 - CHANGE: buffer reference checks upon all operations enforced (by new CVasp (checked vasp) class)
 - FIX: immediate vasps can not have frames > size
 - FIX: immediate garbage collection was not triggered in threaded build
+- FIX: changed forgotten standard ASSERT to FLEXT_ASSERT (thanks to Frank Barknecht)
 
 0.1.1:
 - FIX: bug in resize of immediate buffers

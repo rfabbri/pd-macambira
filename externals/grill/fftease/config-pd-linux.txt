@@ -7,7 +7,8 @@
 #
 
 
-# your c++ compiler (define only if not g++)
+# your c/c++ compilers (define only if not gcc/g++)
+# CC=gcc
 # CXX=g++
 
 # where are the PD header files?

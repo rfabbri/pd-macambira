@@ -97,7 +97,7 @@ Env::Iter::Iter(const Env &bpl): bp(bpl),ppt(-BIG),npt(BIG),pvl(0),k(0) {}
 V Env::Iter::Init(R p) 
 {
 	I cnt = bp.Count();
-	ASSERT(cnt > 0);
+	FLEXT_ASSERT(cnt > 0);
 
 	if(p < bp.Pos(0)) {
 		// position is before the head
@@ -115,7 +115,7 @@ V Env::Iter::Init(R p)
 			if(p >= bp.Pos(ix)) break;
 		ppt = bp.Pos(ix); pvl = bp.Val(ix);
 
-		ASSERT(ix < cnt);
+		FLEXT_ASSERT(ix < cnt);
 	}
 
 	if(ix >= cnt) {

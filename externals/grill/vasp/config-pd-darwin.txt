@@ -1,9 +1,9 @@
 # VASP - vector assembling vector processor
-# Copyright(c) 2002 Thomas Grill (xovo@gmx.net)
+# Copyright(c) 2002-2003 Thomas Grill (xovo@gmx.net)
 #
 
-# your c++ compiler (normally g++)
-CXX=g++
+# your c++ compiler (define only if it's different than g++)
+# CXX=g++
 
 # where does the PD installation reside?
 PD=/usr/local/pd
