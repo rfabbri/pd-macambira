@@ -1,0 +1,12 @@
+#N canvas 370 195 454 304 12;
+#X obj 70 95 bng 20 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 70 192 5 0 0;
+#X text 13 20 expo :: exponetionally distributed random numbers
+;
+#X obj 70 140 expo 0.5;
+#X floatatom 169 101 5 0 0;
+#X text 222 103 lambda;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;
+#X connect 4 0 3 1;
