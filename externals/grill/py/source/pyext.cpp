@@ -225,28 +225,26 @@ void pyext::DoExit()
 {
 	ClearBinding();
 
+    bool gcrun = false;
     if(pyobj) {
-        if(pyobj->ob_refcnt > 1) {
-            post("%s - Python object is still referenced",thisName());
-
-            // Force-quit object:
-            // call __del__ manually
-            // this is dangerous, because it could get called a second time
-            // if object really has no more references then
-	        PyObject *meth = PyObject_GetAttrString(pyobj,"__del__"); // get ref
-            if(meth) {
-                if(PyMethod_Check(meth)) {
-			        PyObject *res = PyObject_CallObject(meth,NULL);
-			        if(!res)
-				        PyErr_Print();
-			        else
-				        Py_DECREF(res);
-                }
-                Py_DECREF(meth);
-	        }
+        // try to run del to clean up the class instance
+        PyObject *objdel = PyObject_GetAttrString(pyobj,"_del");
+        if(objdel) {
+            PyObject *args = PyTuple_New(0);
+            PyObject *ret = PyObject_Call(objdel,args,NULL);
+            if(!ret)
+                post("%s - Could not call _del method",thisName());
+            else 
+                Py_DECREF(ret);
+            Py_DECREF(args);
+            Py_DECREF(objdel);
         }
+
+        gcrun = pyobj->ob_refcnt > 1;
     	Py_DECREF(pyobj);  // opposite of SetClssMeth
     }
+
+    if(gcrun) collect();
 }
 
 void pyext::InitInOut(int &inl,int &outl)
@@ -542,13 +540,7 @@ bool pyext::work(int n,const t_symbol *s,int argc,const t_atom *argv)
 	// try anything/inlet
     if(!ret) {
 		sprintf(str,"_anything_%i",n);
-		if(s == sym_bang && !argc) {
-			t_atom argv;
-			SetSymbol(argv,sym__);
-			ret = call(str,0,s,1,&argv);
-		}
-		else
-			ret = call(str,0,s,argc,argv);
+		ret = call(str,0,s,argc,argv);
 	}
 
     // try int at any inlet
