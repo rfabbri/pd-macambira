@@ -1,0 +1,34 @@
+#!/bin/bash
+dir=`basename "$1"`
+y=0
+count=0
+
+echo "#N canvas 200 22 300 500 10;"
+
+for eachitem in $1/*.pd
+do
+  let count=$count+1
+done
+
+let y=$count*25+50
+
+echo "#N canvas 0 22 454 304 opendoc 0;"
+echo "#X obj 35 66 symbol;"
+echo "#X obj 34 38 inlet;"
+echo "#X msg 35 90 \; pd open \\\$1 ../lib/pd/doc/$dir/ \;;"
+echo "#X connect 0 0 2 0;"
+echo "#X connect 1 0 0 0;"
+echo "#X restore 50 $y pd opendoc;"
+
+count=0
+
+for eachitem in $1/*.pd
+do
+   name=`basename $eachitem`
+   let y=25+$count*25
+   msg="#X msg 50 $y $name;"
+   let count=$count+1
+   con="#X connect $count 0 0 0;"
+   echo $msg
+   echo $con
+done
