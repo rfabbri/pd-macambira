@@ -79,7 +79,7 @@ class syncgrain:
 		FLEXT_CALLBACK_F(setFreq)
 		void setFreq(float f)
 		{
-			fr = f;
+			fr = f < 0 ? 0 : f;
 			grain->SetFreq(f);
 		}
 		
