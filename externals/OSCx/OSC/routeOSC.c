@@ -75,7 +75,7 @@ typedef struct _OSCroute
   t_int x_num;				// Number of address prefixes we store
   t_int x_complainmode;			// Do we print a message if no match?
   char *x_prefixes[MAX_NUM];
-  void *x_outlets[MAX_NUM];
+  void *x_outlets[MAX_NUM+1];
 } t_OSCroute;
 
 t_symbol *ps_list, *ps_complain, *ps_emptySymbol;
@@ -106,9 +106,9 @@ static void OSCroute_free(t_OSCroute *x)
 
 // setup
 #ifdef WIN32
-	OSC_API void OSCroute_setup(void) { 
+ OSC_API void OSCroute_setup(void) { 
 #else
-	void OSCroute_setup(void) {
+void OSCroute_setup(void) {
 #endif
   OSCroute_class = class_new(gensym("OSCroute"), (t_newmethod)OSCroute_new,
 			     (t_method)OSCroute_free,sizeof(t_OSCroute), 0, A_GIMME, 0);
@@ -129,7 +129,7 @@ static void OSCroute_free(t_OSCroute *x)
 /*   ps_complain = gensym("complain"); */
   ps_emptySymbol = gensym("");
   
-  post("OSCroute object version " OSC_ROUTE_VERSION " by Matt Wright. pd-fication cxc. Win32 raf.");
+  post("OSCroute object version " OSC_ROUTE_VERSION " by Matt Wright. pd: jdl Win32 raf.");
   post("OSCroute Copyright © 1999 Regents of the University of California. All Rights Reserved.");
 }
 
@@ -139,10 +139,9 @@ static void OSCroute_free(t_OSCroute *x)
 
 void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
 {
-  //OSCroute *x;
+
   t_OSCroute *x = (t_OSCroute *)pd_new(OSCroute_class);   // get memory for a new object & initialize
 
-  //int i, n;
   int i;	//{{raf}} n not used
   
   // EnterCallback();
@@ -152,8 +151,6 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
     // ExitCallback();
     return 0;
   }
-
-  //x = newobject(OSCroute_class);		// get memory for a new object & initialize
 
   x->x_complainmode = 0;
   x->x_num = 0;
@@ -212,7 +209,8 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
   /* Have to create the outlets in reverse order */
   /* well, not in pd ? */
   //  for (i = x->x_num-1; i >= 0; --i) {
-  for (i = 0; i <= x->x_num-1; i++) {
+  // for (i = 0; i <= x->x_num-1; i++) {
+  for (i = 0; i <= x->x_num; i++) {
     //    x->x_outlets[i] = listout(x);
     x->x_outlets[i] = outlet_new(&x->x_obj, &s_list);
   }
@@ -225,7 +223,7 @@ void *OSCroute_new(t_symbol *s, int argc, t_atom *argv)
 void OSCroute_version (t_OSCroute *x) {
   // EnterCallback();
   post("OSCroute Version " OSC_ROUTE_VERSION
-       ", by Matt Wright. pd-fication cxc@web.fm\nOSCroute Compiled " __TIME__ " " __DATE__);
+       ", by Matt Wright. pd jdl, win32: raf.\nOSCroute Compiled " __TIME__ " " __DATE__);
   // ExitCallback();
 }
 
@@ -258,7 +256,13 @@ void OSCroute_list(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
     /* Ignore the fact that this is a "list" */
     OSCroute_doanything(x, argv[0].a_w.w_symbol, argc-1, argv+1);
   } else {
-    post("* OSC-route: invalid list beginning with a number");
+    // post("* OSC-route: invalid list beginning with a number");
+    // output on unmatched outlet jdl 20020908
+    if (argv[0].a_type == A_FLOAT) {
+      outlet_float(x->x_outlets[x->x_num], argv[0].a_w.w_float);
+    } else {
+      post("* OSC-route: unrecognized atom type!");
+    }
   }
   // ExitCallback();
 }
@@ -282,6 +286,7 @@ void OSCroute_doanything(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
   pattern = s->s_name;
   if (pattern[0] != '/') {
     post("* OSC-route: invalid message pattern %s does not begin with /", s->s_name);
+    outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
     return;
   }
   
@@ -358,6 +363,13 @@ void OSCroute_doanything(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
       post("* OSC-route: pattern %s did not match any prefixes", pattern);
     }
   }
+
+  // output unmatched data on rightmost outlet a la normal 'route' object, jdl 20020908
+  if (!matchedAnything) {
+    outlet_anything(x->x_outlets[x->x_num], s, argc, argv);
+  }
+
+
 }
 
 static char *NextSlashOrNull(char *p) {

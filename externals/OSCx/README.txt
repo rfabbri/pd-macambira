@@ -1,7 +1,8 @@
 OSC, OpenSoundControl for pd
 ============================
-OSC: http://cnmat.cnmat.berkeley.edu/OSC
-pd: http://lena.ucsd.edu/~msp/
+for more information on OSC see: http://cnmat.cnmat.berkeley.edu/OSC
+they also have an osc_dev mailinglist.
+primary source for pd: http://lena.ucsd.edu/~msp/
 
 ok, merged the windows and linux trees.
 for linux do the usual makes etc, for window either use extra/OSC.dll,
@@ -21,12 +22,22 @@ send+dump/	CNMAT's OSC commandline utils
 
 log:
 
-  20020417: 0.16-2: more changes by raf + jdl (send with no argument fix, send / fix,
+  20020908: 0.16-4:
+  	    added non-match / unmatched outlet to OSCroute
+  	    updated doc/OSCroute-help.pd including a new chapter
+	    about patternmatching.
+
+  20020901: ca., refixed MAXPDARG vs. MAX_ARGS, causing crash when sending
+            messages with more than 4 arguments
+
+  20020417: 0.16-2:
+            more changes by raf + jdl (send with no argument fix, send / fix,
             ...)
 
   20020416: added bundle stuff to sendOSC
 
-  200204: 0.15b1: windowified version and implied linux enhancements
+  200204: 0.15b1:
+          windowified version and implied linux enhancements
           by raf@interaccess.com
 	  for now get it at http://207.208.254.239/pd/win32_osc_02.zip
 	  most importantly: enhanced connect->disconnect-connect behaviour
@@ -76,6 +87,8 @@ TODO
 see also TODO.txt in OSC/
 
 --
-jdl at xdv.org, http://barely.a.live.fm/pd/OSC
+jdl at xdv.org
+http://barely.a.live.fm/pd/OSC
+http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/pure-data/externals/OSCx/
 windows version:
 raf at interaccess.com, http://207.208.254.239/pd/win32_osc_02.zip

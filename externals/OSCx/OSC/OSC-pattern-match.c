@@ -46,6 +46,8 @@ static Boolean MatchList (const char *pattern, const char *test);
 
 Boolean PatternMatch (const char *  pattern, const char * test) {
 
+  // printf("OSC-pattern-match.c: pattern: %s, test: %s\n", pattern, test);
+
   theWholePattern = pattern;
   
   if (pattern == 0 || pattern[0] == 0) {
