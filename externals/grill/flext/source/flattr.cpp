@@ -48,6 +48,8 @@ void flext_base::AddAttrib(ItemCont *aa,ItemCont *ma,const char *attr,metharg tp
 	const t_symbol *asym = MakeSymbol(attr);
 	AttrItem *a,*b;
 
+    FLEXT_ASSERT(asym != sym__ && asym != sym_list && asym != sym_float && asym != sym_symbol && asym != sym_anything);
+
 	if(sfun) // if commented out, there will be a warning at run-time (more user-friendly)
 	{
 		a = new AttrItem(asym,tp,sfun,AttrItem::afl_set);
@@ -238,9 +240,9 @@ bool flext_base::SetAttrib(const t_symbol *tag,AttrItem *a,int argc,const t_atom
 			break;
 		case a_symbol:
 			if(argc == 1 && IsSymbol(argv[0])) {
-				// \todo shall we analyze the patcher args????
-//				any.st = const_cast<t_symbol *>(GetParamSym(GetSymbol(argv[0]),thisCanvas()));
-				any.st = GetSymbol(argv[0]);
+                t_atom at;
+                GetParamSym(at,GetSymbol(argv[0]),thisCanvas());
+				any.st = const_cast<t_symbol *>(GetSymbol(at));
 				((methfun_1)a->fun)(this,any);				
 			}
 			else ok = false;

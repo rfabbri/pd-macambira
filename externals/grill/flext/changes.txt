@@ -23,6 +23,11 @@ Version history:
 - removed Mach-O/CFM glue stuff again and added makefiles for Max/MachO
 - in flext::StopThread don't wait for thread to have stopped!
 - support PD tooltips (only in devel branch at the moment)
+- attribute editor: added individual apply buttons
+- attribute editor: added escaping for , and ; 
+- attribute editor: zoomed editor accepts , as newline separator
+- attribute editor: close editor window on object destruction
+- fixed $0-arguments in attribute saving
 
 0.4.6:
 - added a text edit window for list attributes
@@ -302,15 +307,12 @@ TODO list:
 
 for 0.4.7:
 - SIMD for gcc
-- individual apply buttons for each attribute in the attribute editor
 - Max/MSP MachO support
 
 bugs:
 - recreation of object with different argument line forgets about eventually present attributes
-- deletion of object with open attribute editor: press apply -> crash
 
-- attributes and attribute editor saving with patcher arguments (like $0-gugu )
-
+TEST:
 - PD: problems with timed buffer redrawing (takes a lot of cpu time)
 - hard thread termination upon object destruction doesn't seem to work properly -> crash
 - Max rounding bug ... buffer resize could be one sample less!
