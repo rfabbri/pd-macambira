@@ -17,7 +17,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.2
 #endif
 
-#define DYN_VERSION "0.0.3"
+#define DYN_VERSION "0.0.4"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
@@ -456,11 +456,11 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 
 				// send loadbang (if it is an abstraction)
 				if(pd_class(&newest->g_pd) == canvas_class) {
-					// loadbang the abstraction
-					pd_vmess((t_pd *)newest,gensym("loadbang"),"");			
-
 					// hide the sub-canvas
 					pd_vmess((t_pd *)newest,gensym("vis"),"i",0);
+
+                    // loadbang the abstraction
+					pd_vmess((t_pd *)newest,gensym("loadbang"),"");
                 }
 
 				// restart dsp - that's necessary because ToCanvas is called manually

@@ -9,7 +9,9 @@
 # to install help, do "make -f makefile.pd-linux install-help"
 #
 
-include config-pd-linux.txt
+CONFIG=config-pd-linux.txt
+
+include ${CONFIG}
 
 FLEXTLIB=$(FLEXTPATH)/flext_t.a
 
@@ -27,7 +29,6 @@ LIBS=m
 # ----------------------------------------------
 
 NAME=vasp
-SRCDIR=source
 
 include make-files.txt
 

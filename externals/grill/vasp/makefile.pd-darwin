@@ -29,7 +29,6 @@ FRAMEWORKS=Carbon
 # ----------------------------------------------
 
 NAME=vasp
-SRCDIR=source
 
 include make-files.txt
 

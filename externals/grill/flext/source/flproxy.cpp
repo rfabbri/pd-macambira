@@ -105,6 +105,7 @@ void flext_base::SetProxies(t_class *c)
 	add_anything(c,cb_px_anything); // for leftmost inlet
     px_class = class_new(gensym("flext_base proxy"),NULL,NULL,sizeof(px_object),CLASS_PD|CLASS_NOINLET, A_NULL);
 	add_anything(px_class,px_object::px_method); // for other inlets
+
 #elif FLEXT_SYS == FLEXT_SYS_MAX
 	add_bang(c,cb_px_bang);
 	add_method1(c,cb_px_int,"int",A_INT);  
@@ -112,7 +113,7 @@ void flext_base::SetProxies(t_class *c)
 	add_methodG(c,cb_px_anything,"list");  
 	add_anything(c,cb_px_anything);
 #else
-#error
+#error Not implemented!
 #endif	
 
 	// setup non-leftmost ints and floats

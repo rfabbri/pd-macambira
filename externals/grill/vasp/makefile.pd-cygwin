@@ -28,7 +28,6 @@ LIBS=m
 # ----------------------------------------------
 
 NAME=vasp
-SRCDIR=source
 
 include make-files.txt
 

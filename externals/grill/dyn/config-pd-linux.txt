@@ -10,8 +10,9 @@
 
 # where are the PD source files?
 # (the normal header file doesn't work as g_canvas.h is not there)
+# please note that currently the development branch (e.g devel_0_36) is needed
 # 
-PDPATH=/usr/src/pd-0.36-0/src
+PDPATH=/home/thomas/prog/pd-devel/src
 
 # where do the flext libraries reside?
 FLEXTPATH=/usr/local/lib/pd/flext

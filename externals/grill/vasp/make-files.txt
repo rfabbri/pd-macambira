@@ -1,4 +1,6 @@
 # all the source files from the package
+SRCDIR=source
+
 SRCS= \
 arg.cpp      mixfft.cpp      obj_part.cpp   obj_split.cpp  opparam.cpp     ops_cplx.cpp     ops_gen.cpp      ops_trnsc.cpp  util.cpp \
 buflib.cpp   obj_chns.cpp    obj_peaks.cpp  obj_sync.cpp   ops_arith.cpp   ops_dft.cpp      ops_qminmax.cpp  ops_wnd.cpp    vasp.cpp \

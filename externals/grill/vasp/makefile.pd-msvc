@@ -24,8 +24,6 @@ CFLAGS=/GR /GX- /GD /G6 /Ox /MT
 
 NAME=vasp
 
-DIR=source
-
 !include make-files.txt
 
 
@@ -43,7 +41,7 @@ $(OUTPATH):
 
 # bad tricks here... the obj's are phantom files... no real make
 
-{$(DIR)}.cpp.obj:
+{$(SRCDIR)}.cpp.obj:
 	cl /c /LD $(CFLAGS) $(DEFS) $(INCPATH) $** /Fo$(OUTPATH)\$@
 
 $(OUTPATH)\$(NAME).dll: $(OBJS)

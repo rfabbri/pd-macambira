@@ -16,7 +16,7 @@ PDINC=${PD}/src
 # where do the flext libraries reside?
 FLEXTPATH=${PD}/flext
 
-# where should flext libraries be built?
+# where should VASP be built?
 TARGDIR=./pd-cygwin
 
 # where should VASP be installed?
