@@ -102,10 +102,13 @@ static void pdp_mp4player_disconnect(t_pdp_mp4player *x)
    }
 
    x->x_streaming = 0;
+   x->x_newpicture = 0;
 
    outlet_float( x->x_outlet_streaming, x->x_streaming );
    x->x_nbframes = 0;
    outlet_float( x->x_outlet_nbframes, x->x_nbframes );
+   x->x_framerate = 0;
+   outlet_float( x->x_outlet_framerate, x->x_framerate );
 
    post( "pdp_mp4player~ : deleting session" );
    delete x->x_psession;
@@ -227,11 +230,12 @@ static t_int *pdp_mp4player_perform(t_int *w)
   struct timeval etime;
   t_int sn;
 
+    x->x_blocksize = n;
+
     // just read the buffer
     if ( x->x_audioon )
     {
       sn=0;
-      n=n*DEFAULT_CHANNELS;
       while (n--) 
       {
         sampleL=x->x_audio_in[ sn++ ];
@@ -249,7 +253,7 @@ static t_int *pdp_mp4player_perform(t_int *w)
         out2++;
       }
       x->x_audioin_position-=sn;
-      memcpy( &x->x_audio_in[0], &x->x_audio_in[sn], 4*MAX_AUDIO_PACKET_SIZE-sn );
+      memcpy( &x->x_audio_in[0], &x->x_audio_in[sn], (4*MAX_AUDIO_PACKET_SIZE-sn-1)*sizeof(short) );
       // post( "pdp_mp4player~ : audio in position : %d", x->x_audioin_position );
       if ( x->x_audioin_position <= sn )
       {
@@ -281,13 +285,17 @@ static t_int *pdp_mp4player_perform(t_int *w)
 
     if ( x->x_newpicture )
     {
-      pdp_packet_pass_if_valid(x->x_pdp_out, &x->x_packet0);
+      x->x_packet = pdp_packet_new_image_YCrCb( x->x_vwidth, x->x_vheight );
+      x->x_data = (short int *)pdp_packet_data(x->x_packet);
+      memcpy( x->x_data, x->x_datav, (x->x_vsize + (x->x_vsize>>1))<<1 );
+      pdp_packet_pass_if_valid(x->x_pdp_out, &x->x_packet);
 
       // update streaming status
       outlet_float( x->x_outlet_streaming, x->x_streaming );
       x->x_nbframes++;
       x->x_secondcount++;
       outlet_float( x->x_outlet_nbframes, x->x_nbframes );
+      x->x_newpicture = 0;
     }
 
     return (w+5);
@@ -307,7 +315,7 @@ static void pdp_mp4player_free(t_pdp_mp4player *x)
        pdp_mp4player_disconnect(x);
     }
     post( "pdp_mp4player~ : freeing object" );
-    pdp_packet_mark_unused(x->x_packet0);
+    pdp_packet_mark_unused(x->x_packet);
 
     // remove invalid global ports
     close_plugins();
@@ -330,16 +338,20 @@ void *pdp_mp4player_new(void)
     x->x_outlet_nbframes = outlet_new(&x->x_obj, &s_float);
     x->x_outlet_framerate = outlet_new(&x->x_obj, &s_float);
 
-    x->x_packet0 = -1;
+    x->x_packet = -1;
     x->x_nbframes = 0;
     x->x_cursec = 0;
     x->x_secondcount = 0;
     x->x_audioin_position = 0;
+    x->x_blocksize = MIN_AUDIO_SIZE;
     x->x_priority = DEFAULT_PRIORITY;
     x->x_decodechild = 0;
     x->x_newpicture = 0;
 
-    memset( &x->x_audio_buf[0], 0x0, 4*MAX_AUDIO_PACKET_SIZE*sizeof(short) );
+    x->x_vwidth = -1;
+    x->x_vheight = -1;
+    x->x_datav = NULL;
+
     memset( &x->x_audio_in[0], 0x0, 4*MAX_AUDIO_PACKET_SIZE*sizeof(short) );
 
     // initialize mpeg4hippies

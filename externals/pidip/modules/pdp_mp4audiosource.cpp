@@ -101,8 +101,7 @@ bool CPDPAudioSource::Init(void)
 
   // for live capture we can match the source to the destination
   m_audioSrcSamplesPerFrame = m_audioDstSamplesPerFrame;
-  m_pcmFrameSize = 
-    m_audioSrcSamplesPerFrame * m_audioSrcChannels * sizeof(u_int16_t);
+  m_pcmFrameSize = m_audioSrcSamplesPerFrame * m_audioSrcChannels * sizeof(u_int16_t);
 
   if (m_audioOssMaxBufferSize > 0) {
     size_t array_size;
@@ -135,7 +134,6 @@ bool CPDPAudioSource::Init(void)
 
 void CPDPAudioSource::ProcessAudio(u_int8_t* pcmBuffer, u_int32_t pcmBufferSize)
 {
-  audio_buf_info info;
   Timestamp currentTime = GetTimestamp();
   Timestamp timestamp;
 
@@ -156,49 +154,14 @@ void CPDPAudioSource::ProcessAudio(u_int8_t* pcmBuffer, u_int32_t pcmBufferSize)
        memcpy( m_pcmFrameBuffer, pcmBuffer, pcmBufferSize );
     }
 
-    if (info.bytes == m_audioOssMaxBufferSize) {
-      // means the audio buffer is full, and not capturing
-      // we want to make the timestamp based on the previous one
-      // When we hit this case, we start using the m_timestampOverflowArray
-      // This will give us a timestamp for when the array is full.
-      // 
-      // In other words, if we have a full audio buffer (ie: it's not loading
-      // any more), we start storing the current timestamp into the array.
-      // This will let us "catch up", and have a somewhat accurate timestamp
-      // when we loop around
-      // 
-      // wmay - I'm not convinced that this actually works - if the buffer
-      // cleans up, we'll ignore m_timestampOverflowArray
-      if (m_timestampOverflowArray != NULL && 
-	  m_timestampOverflowArray[m_timestampOverflowArrayIndex] != 0) {
-	timestamp = m_timestampOverflowArray[m_timestampOverflowArrayIndex];
-      } else {
-	timestamp = m_prevTimestamp + SrcSamplesToTicks(m_audioSrcSamplesPerFrame);
-      }
-
-      if (m_timestampOverflowArray != NULL)
-	m_timestampOverflowArray[m_timestampOverflowArrayIndex] = currentTime;
-
-      debug_message("pdp_mp4live~ : audio buffer full !");
-
-    } else {
-      // buffer is not full - so, we make the timestamp based on the number
-      // of bytes in the buffer that we read.
-      timestamp = currentTime - SrcSamplesToTicks(SrcBytesToSamples(info.bytes));
-      if (m_timestampOverflowArray != NULL)
-	m_timestampOverflowArray[m_timestampOverflowArrayIndex] = 0;
-    }
+    timestamp = currentTime - SrcSamplesToTicks(SrcBytesToSamples(pcmBufferSize));
 
 #ifdef DEBUG_TIMESTAMPS
-    debug_message("pdp_mp4live~ : info.bytes=%d t=%llu timestamp=%llu delta=%llu",
-                  info.bytes, currentTime, timestamp, timestamp - m_prevTimestamp);
+    debug_message("pdp_mp4live~ : bytes=%d t=%llu timestamp=%llu delta=%llu",
+                  pcmBufferSize, currentTime, timestamp, timestamp - m_prevTimestamp);
 #endif
 
     m_prevTimestamp = timestamp;
-    if (m_timestampOverflowArray != NULL) {
-      m_timestampOverflowArrayIndex = (m_timestampOverflowArrayIndex + 1) % 
-	m_audioOssMaxBufferFrames;
-    }
 
     ProcessAudioFrame(m_pcmFrameBuffer, m_pcmFrameSize, timestamp, false);
 }

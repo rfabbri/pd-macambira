@@ -25,8 +25,10 @@
 
 #include "pdp.h"
 #include "yuv.h"
-#include "charmaps.h"
+#include "default.map"
 #include <math.h>
+
+#define LINE_MAX_LENGTH 1024
 
 static char *pdp_ascii_version = "pdp_ascii: version 0.1, ASCII art output written by ydegoyon@free.fr";
 
@@ -49,6 +51,13 @@ typedef struct pdp_ascii_struct
     t_int x_brightness; // added value for brightness
     t_float x_ratio;    // character to pixel ratio
 
+    t_int x_charwidth;  // width of characters 
+    t_int x_charheight; // height of characters 
+    t_int x_nbchars;    // number of characters in the map
+    char* x_charmaps;   // the table of characters
+
+    FILE  *x_filed;     // charmaps file descriptor
+
 } t_pdp_ascii;
 
 static void pdp_ascii_color(t_pdp_ascii *x, t_floatarg fcolor)
@@ -61,9 +70,12 @@ static void pdp_ascii_color(t_pdp_ascii *x, t_floatarg fcolor)
 
 static void pdp_ascii_ratio(t_pdp_ascii *x, t_floatarg fratio)
 {
-   if ( ( fratio > 0) && ( x->x_ratio < x->x_vwidth/2 ) ) 
+   if ( ( fratio > 0) 
+        && ( fratio < x->x_vwidth/x->x_charwidth ) 
+        && ( fratio < x->x_vheight/x->x_charheight ) ) 
    {
       x->x_ratio = fratio;
+      // post( "psp_ascii : set ratio : %f", x->x_ratio );
    }
 }
 
@@ -84,7 +96,7 @@ static void pdp_ascii_process_yv12(t_pdp_ascii *x)
     t_int     i, pixsum;
     t_int     px, py, ppx, ppy;
     t_int     rank, value;
-    t_int     pwidth, pheight;
+    t_int     pwidth, pheight, offset;
 
     x->x_vwidth = header->info.image.width;
     x->x_vheight = header->info.image.height;
@@ -96,14 +108,16 @@ static void pdp_ascii_process_yv12(t_pdp_ascii *x)
 
     memset( newdata, 0x00, (x->x_vsize+(x->x_vsize>>1))<<1 );
 
-    pwidth = (int) CHARWIDTH*x->x_ratio;
+    pwidth = (int) x->x_charwidth*x->x_ratio;
     if (pwidth==0) pwidth=1;
-    if (pwidth>x->x_vwidth) return;
-    pheight = (int) CHARHEIGHT*x->x_ratio;
+    // if (pwidth>x->x_vwidth) return;
+    pheight = (int) x->x_charheight*x->x_ratio;
     if (pheight==0) pheight=1;
-    if (pheight>x->x_vheight) return;
+    // if (pheight>x->x_vheight) return;
 
-    for(py=1; py<x->x_vheight; py+=pheight)
+    // post( "psp_ascii : pwidth=%d, pheight=%d", pwidth, pheight );
+
+    for(py=0; py<x->x_vheight; py+=pheight)
     {
       for(px=0; px<x->x_vwidth; px+=pwidth)
       {
@@ -112,6 +126,11 @@ static void pdp_ascii_process_yv12(t_pdp_ascii *x)
          {
            for ( ppx=0; ppx<pwidth; ppx++ )
            {
+             if ( ( px+ppx >= x->x_vwidth ) ||
+                  ( py+ppy >= x->x_vheight ) )
+             {
+                break;
+             }
              pixsum += (data[(py+ppy)*x->x_vwidth + (px+ppx)]>>7);
            }
          }
@@ -120,12 +139,14 @@ static void pdp_ascii_process_yv12(t_pdp_ascii *x)
          {
            for ( ppx=0; ppx<pwidth; ppx++ )
            {
-              if ( ( px+ppx > x->x_vwidth ) ||
-                   ( py+ppy > x->x_vheight ) )
+              if ( ( px+ppx >= x->x_vwidth ) ||
+                   ( py+ppy >= x->x_vheight ) )
               {
                  break;
               }
-              if ( charmaps[rank][((int)(ppy/x->x_ratio))*CHARWIDTH+((int)(ppx/x->x_ratio))] )
+              offset = rank*x->x_charwidth*x->x_charheight
+                   +((int)(ppy/x->x_ratio))*x->x_charwidth+((int)(ppx/x->x_ratio));
+              if ( *(x->x_charmaps+offset) && ( offset < x->x_nbchars*x->x_charwidth*x->x_charheight ) )
               {
                  value = ( (2*rank+x->x_brightness) > 255 ) ? 255 : (2*rank+x->x_brightness);
                  newdata[(py+ppy)*x->x_vwidth+(px+ppx)] = (value)<<7;
@@ -209,8 +230,111 @@ static void pdp_ascii_free(t_pdp_ascii *x)
 {
   int i;
 
+   if ( x->x_charmaps ) free( x->x_charmaps );
    pdp_queue_finish(x->x_queue_id);
    pdp_packet_mark_unused(x->x_packet0);
+}
+
+    /* load a new charmaps file */
+static void pdp_ascii_load(t_pdp_ascii *x, t_symbol *sfile)
+{
+ char *lineread = (char*) getbytes( LINE_MAX_LENGTH );
+ char *word1 = (char*) getbytes( LINE_MAX_LENGTH );
+ char *word2 = (char*) getbytes( LINE_MAX_LENGTH );
+ char *word3 = (char*) getbytes( LINE_MAX_LENGTH );
+ t_int charwidth, charheight, nbchars, nblines;
+ t_int nbexpdata;
+ char *pdata;
+ char charread;
+
+  // opening new charmaps file
+  if ( ( x->x_filed = fopen( sfile->s_name, "r" ) ) == NULL )
+  {
+       error( "pdp_ascii : cannot open >%s<", sfile->s_name);
+       return;
+  }
+  post( "pdp_ascii : opened >%s<", sfile->s_name);
+
+  // read the new dimensions of the charmaps
+  charwidth = -1;
+  charheight = -1;
+  nbchars = -1;
+  nblines = 0;
+  while ( lineread[0] != '{' )
+  {
+     if ( fgets( lineread, LINE_MAX_LENGTH, x->x_filed ) == 0 )
+     {
+       post( "pdp_ascii : abnormal end of file encountered..." );
+       goto closeandreturn;
+     }
+
+     if ( strncmp( lineread, "#define", 7 ) == 0 )
+     {
+        sscanf( lineread, "%s %s %s", word1, word2, word3 );
+        // post( "pdp_ascii : definition : %s = %s", word2, word3 );
+        if ( !strcmp( word2, "CHARWIDTH" ) )
+        {
+           charwidth = atoi( word3 );
+        }
+        if ( !strcmp( word2, "CHARHEIGHT" ) )
+        {
+           charheight = atoi( word3 );
+        }
+        if ( !strcmp( word2, "NBCHARS" ) )
+        {
+           nbchars = atoi( word3 );
+        }
+     }
+
+     nblines++;
+     if ( nblines>20 ) break;
+  }
+
+  if ( ( charwidth > 0 ) && ( charheight > 0 ) && ( nbchars > 0 ) )
+  {
+    post( "pdp_ascii : new dimensions : %d %dx%d characters", nbchars, charwidth, charheight );
+    if ( x->x_charmaps ) free( x->x_charmaps );
+    x->x_charwidth = charwidth;
+    x->x_charheight = charheight;
+    x->x_nbchars = nbchars;
+    x->x_charmaps = (char*)malloc(x->x_nbchars*x->x_charwidth*x->x_charheight*sizeof(char));
+  }
+  else
+  {
+    post( "pdp_ascii : wrong file format : couldn't read new dimensions" );
+    goto closeandreturn;
+  }
+
+  nbexpdata = nbchars*charwidth*charheight;
+  pdata = x->x_charmaps;
+
+  while ( ( ( charread = fgetc( x->x_filed ) ) != EOF ) && ( nbexpdata > 0 ) )
+  {
+    switch ( charread )
+    {
+      case '0':
+      case '1':
+        *pdata++ = ( charread == '0' )?0:1;
+        nbexpdata--;
+        break;
+
+      default:
+        break;
+    }
+  }
+
+closeandreturn :
+
+  // closing opened file
+  if ( x->x_filed != NULL ) 
+  {
+    if(fclose(x->x_filed) < 0)
+    {
+      perror( "pdp_ascii : closing file" );
+    }
+    x->x_filed = NULL;
+    return;
+  }
 }
 
 t_class *pdp_ascii_class;
@@ -229,6 +353,12 @@ void *pdp_ascii_new(void)
    x->x_color = 1;
    x->x_ratio = 1.;
    x->x_brightness = 25;
+
+   x->x_charwidth = CHARWIDTH;
+   x->x_charheight = CHARHEIGHT;
+   x->x_nbchars = NBCHARS;
+   x->x_charmaps = (char*)malloc(x->x_nbchars*x->x_charwidth*x->x_charheight*sizeof(char));
+   memcpy( (void*)x->x_charmaps, (void*)charmaps, x->x_nbchars*x->x_charwidth*x->x_charheight*sizeof(char) );
 
    return (void *)x;
 }
@@ -250,6 +380,7 @@ void pdp_ascii_setup(void)
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_color, gensym("color"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_brightness, gensym("brightness"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_ascii_class, (t_method)pdp_ascii_ratio, gensym("ratio"),  A_DEFFLOAT, A_NULL);
+    class_addmethod( pdp_ascii_class, (t_method)pdp_ascii_load, gensym("load"), A_SYMBOL, 0);
     class_sethelpsymbol( pdp_ascii_class, gensym("pdp_ascii.pd") );
 
 }

@@ -4,14 +4,14 @@
 #X text 279 128 where the block size is redefined;
 #X text 279 143 this is necessary for an;
 #X text 280 155 ( acceptable? ) audio decoding;
-#X obj 395 221 loadbang;
 #X msg 395 251 \; pd dsp 1;
 #X text 51 295 pdp_mp4player~ : decodes a mpeg4ip video stream;
-#X text 51 308 ( from darwin or quicktime server );
 #X obj 128 113 rs_pdp_mp4player~;
 #X text 50 333 The rest is written by Yves Degoyon (ydegoyon@free.fr)
 ;
 #X text 51 321 This object uses some code from mpeg4ip;
-#X connect 5 0 6 0;
-#X connect 9 0 0 0;
-#X connect 9 1 0 1;
+#X text 51 308 ( from a darwin or quicktime server );
+#X obj 395 221 loadbang;
+#X connect 7 0 0 0;
+#X connect 7 1 0 1;
+#X connect 11 0 5 0;

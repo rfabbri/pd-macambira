@@ -33,54 +33,36 @@
 #include "our_config_file.h"
 #include "m_pd.h"
 
-#define audio_message(loglevel, fmt...) message(loglevel, "audiosync", fmt)
-
 static void pdp_audio_callback (void *userdata, Uint8 *stream, int len)
 {
   CPDPAudioSync *a = (CPDPAudioSync *)userdata;
+  // post( "pdp_mp4audiosync : audio callback" );
   a->audio_callback(stream, len);
 }
 
 CPDPAudioSync::CPDPAudioSync (CPlayerSession *psptr, t_pdp_mp4player *pdp_father) : CAudioSync(psptr)
 {
-  m_fill_index = m_play_index = 0;
-  for (int ix = 0; ix < DECODE_BUFFERS_MAX; ix++) {
-    m_buffer_filled[ix] = 0;
-    m_sample_buffer[ix] = NULL;
-  }
-  m_buffer_size = 0;
   m_config_set = 0;
-  m_audio_initialized = 0;
-  m_audio_paused = 1;
+  m_audio_initialized = 1;
+  m_audio_paused = 0;
   m_resync_required = 0;
   m_dont_fill = 0;
-  m_consec_no_buffers = 0;
-  m_audio_waiting_buffer = 0;
-  m_skipped_buffers = 0;
-  m_didnt_fill_buffers = 0;
   m_play_time = 0         ;
   m_buffer_latency = 0;
   m_first_time = 1;
-  m_first_filled = 1;
-  m_buffer_offset_on = 0;
-  m_buffer_ts = 0;
-  m_load_audio_do_next_resync = 0;
   m_convert_buffer = NULL;
   m_father = pdp_father;
+  post( "pdp_mp4audiosync : created audio sync" );
 }
 
 CPDPAudioSync::~CPDPAudioSync (void)
 {
-  for (int ix = 0; ix < DECODE_BUFFERS_MAX; ix++) {
-    if (m_sample_buffer[ix] != NULL)
-      free(m_sample_buffer[ix]);
-    m_sample_buffer[ix] = NULL;
+  if (m_sample_buffer[0] != NULL)
+  {
+    free(m_sample_buffer[0]);
   }
+  m_sample_buffer[0] = NULL;
   CHECK_AND_FREE(m_convert_buffer);
-  audio_message(LOG_NOTICE, 
-		"Audio sync skipped %u buffers", 
-		m_skipped_buffers);
-  audio_message(LOG_NOTICE, "didn't fill %u buffers", m_didnt_fill_buffers);
 }
 
 void CPDPAudioSync::set_config (int freq, 
@@ -107,10 +89,9 @@ void CPDPAudioSync::set_config (int freq,
   
   m_buffer_size = channels * sample_size * m_bytes_per_sample;
 
-  for (int ix = 0; ix < DECODE_BUFFERS_MAX; ix++) {
-    m_buffer_filled[ix] = 0;
-    m_sample_buffer[ix] = (uint8_t *)malloc(2 * m_buffer_size);
-  }
+  m_buffer_filled[0] = 0;
+  m_sample_buffer[0] = (uint8_t *)malloc(2 * m_buffer_size);
+
   m_freq = freq;
   m_channels = channels;
   m_format = format;
@@ -121,7 +102,7 @@ void CPDPAudioSync::set_config (int freq,
   }
   m_config_set = 1;
   m_msec_per_frame = (sample_size * 1000) / m_freq;
-  audio_message(LOG_DEBUG, "buffer size %d msec per frame %d", m_buffer_size, m_msec_per_frame);
+  post("pdp_mp4audiosync : buffer size %d msec per frame %d", m_buffer_size, m_msec_per_frame);
 };
 
 uint8_t *CPDPAudioSync::get_audio_buffer (void)
@@ -132,28 +113,14 @@ uint8_t *CPDPAudioSync::get_audio_buffer (void)
     return (NULL);
   }
 
-  if (m_audio_initialized != 0) {
-    locked = 1;
+  ret = m_buffer_filled[0];
+  if (ret == 1) 
+  {
+    post("pdp_mp4audiosync : no buffer");
+    return (NULL);
   }
-  ret = m_buffer_filled[m_fill_index];
-  if (ret == 1) {
-    m_audio_waiting_buffer = 1;
-    m_audio_waiting_buffer = 0;
-    if (m_dont_fill != 0) {
-      return (NULL);
-    }
-    locked = 0;
-    if (m_audio_initialized != 0) {
-      locked = 1;
-    }
-    ret = m_buffer_filled[m_fill_index];
-    if (locked)
-    if (ret == 1) {
-      post("pdp_mp4audiosync : no buffer");
-      return (NULL);
-    }
-  }
-  return (m_sample_buffer[m_fill_index]);
+  // post("pdp_mp4audiosync : get_audio_buffer : return %x", m_sample_buffer[0]);
+  return (m_sample_buffer[0]);
 }
 
 void CPDPAudioSync::load_audio_buffer (uint8_t *from, 
@@ -164,182 +131,71 @@ void CPDPAudioSync::load_audio_buffer (uint8_t *from,
   uint8_t *to;
   uint32_t copied;
   copied = 0;
-  if (m_buffer_offset_on == 0) {
-    int64_t diff = ts - m_buffer_ts;
 
-    if (m_buffer_ts != 0 && diff > 1) {
-      m_load_audio_do_next_resync = 1;
-      audio_message(LOG_DEBUG, "timeslot doesn't match - %llu %llu",
-		    ts, m_buffer_ts);
-    }
-    m_buffer_ts = ts;
-  } else {
-    int64_t check;
-    check = ts - m_loaded_next_ts;
-    if (check > m_msec_per_frame) {
-      audio_message(LOG_DEBUG, "potential resync at ts "U64" should be ts "U64,
-		    ts, m_loaded_next_ts);
-      uint32_t left;
-      left = m_buffer_size - m_buffer_offset_on;
-      to = get_audio_buffer();
-      memset(to + m_buffer_offset_on, 0, left);
-      filled_audio_buffer(m_buffer_ts, 0);
-      m_buffer_offset_on = 0;
-      m_load_audio_do_next_resync = 1;
-      m_buffer_ts = ts;
-    }
+  post( "pdp_mp4audiosync : load audio buffer : length=%d", bytes );
+
+  to = get_audio_buffer();
+  if (to == NULL) 
+  {
+    return;
   }
-  m_loaded_next_ts = bytes * M_64;
-  m_loaded_next_ts /= m_bytes_per_sample;
-  m_loaded_next_ts /= m_freq;
-  m_loaded_next_ts += ts;
+  int copy;
+  uint32_t left;
 
-  while ( bytes > 0) {
-    to = get_audio_buffer();
-    if (to == NULL) {
-      return;
-    }
-    int copy;
-    uint32_t left;
+  bytes = MIN(m_buffer_size, bytes);
+  memcpy(to, from, bytes);
 
-    left = m_buffer_size - m_buffer_offset_on;
-    copy = MIN(left, bytes);
-    memcpy(to + m_buffer_offset_on, from, copy);
-    bytes -= copy;
-    copied += copy;
-    from += copy;
-    m_buffer_offset_on += copy;
-    if (m_buffer_offset_on >= m_buffer_size) {
-      m_buffer_offset_on = 0;
-      filled_audio_buffer(m_buffer_ts, resync | m_load_audio_do_next_resync);
-      m_buffer_ts += m_msec_per_frame;
-      resync = 0;
-      m_load_audio_do_next_resync = 0;
-    }
-  }
   return;
 }
 
 void CPDPAudioSync::filled_audio_buffer (uint64_t ts, int resync)
 {
-  uint32_t fill_index;
-  int locked;
-  // m_dont_fill will be set when we have a pause
-  if (m_dont_fill == 1) {
-    return;
-  }
-  //  resync = 0;
-  fill_index = m_fill_index;
-  m_fill_index++;
-  m_fill_index %= DECODE_BUFFERS_MAX;
+  // post( "pdp_mp4audiosync : filled audio buffer" );
+  // if (resync) m_psptr->wake_sync_thread();
 
-  locked = 0;
-  if (m_audio_initialized != 0) {
-    locked = 1;
-  }
-  if (m_first_filled != 0) {
-    m_first_filled = 0;
-    resync = 0;
-    m_resync_required = 0;
-  } else {
-    int64_t diff;
-    diff = ts - m_last_fill_timestamp;
-    if (diff - m_msec_per_frame > m_msec_per_frame) {
-      // have a hole here - don't want to resync
-      if (diff > ((m_msec_per_frame + 1) * 4)) {
-	resync = 1;
-      } else {
-	// try to fill the holes
-	m_last_fill_timestamp += m_msec_per_frame + 1; // fill plus extra
-	int64_t ts_diff;
-	do {
-	  uint8_t *retbuffer;
-	  // Get and swap buffers.
-	  retbuffer = get_audio_buffer();
-	  if (retbuffer == NULL) {
-	    return;
-	  }
-	  if (retbuffer != m_sample_buffer[m_fill_index]) {
-	    audio_message(LOG_ERR, "retbuffer not fill index in audio sync");
-	    return;
-	  }
-	  locked = 0;
-	  if (m_audio_initialized != 0) {
-	    locked = 1;
-	  }
-	  m_sample_buffer[m_fill_index] = m_sample_buffer[fill_index];
-	  m_sample_buffer[fill_index] = retbuffer;
-	  memset(retbuffer, m_silence, m_buffer_size);
-	  m_buffer_time[fill_index] = m_last_fill_timestamp;
-	  m_buffer_filled[fill_index] = 1;
-	  m_samples_loaded += m_buffer_size;
-	  fill_index++;
-	  fill_index %= DECODE_BUFFERS_MAX;
-	  m_fill_index++;
-	  m_fill_index %= DECODE_BUFFERS_MAX;
-	  audio_message(LOG_NOTICE, "Filling timestamp %llu with silence",
-			m_last_fill_timestamp);
-	  m_last_fill_timestamp += m_msec_per_frame + 1; // fill plus extra
-	  ts_diff = ts - m_last_fill_timestamp;
-	  audio_message(LOG_DEBUG, "diff is %lld", ts_diff);
-	} while (ts_diff > 0);
-	locked = 0;
-	if (m_audio_initialized != 0) {
-	  locked = 1;
-	}
-      }
-    } else {
-      if (m_last_fill_timestamp == ts) {
-	audio_message(LOG_NOTICE, "Repeat timestamp with audio %llu", ts);
-	return;
+  if (  m_father->x_audio )
+  {
+    // copy the buffer filled by the codec towards pdp
+    if ( (m_father->x_audioin_position*sizeof(short)+m_buffer_size) < (4*MAX_AUDIO_PACKET_SIZE*sizeof(short)) )
+    {
+      memcpy( m_father->x_audio_in+m_father->x_audioin_position, m_sample_buffer[0], m_buffer_size );
+      m_father->x_audioin_position+=(m_buffer_size/sizeof(short));
+      // post( "pdp_mp4audiosync : filled_audio_buffer : copied %d PCM samples : audio in : %d : resync : %d", 
+      //                           m_buffer_size/sizeof(short), m_father->x_audioin_position, resync );
+      if ( ( m_father->x_audioin_position > DEFAULT_CHANNELS*m_father->x_blocksize ) 
+           && (!m_father->x_audioon) )
+      {
+        m_father->x_audioon = 1;
+        // post( "pdp_mp4audiosync : audio on" );
       }
     }
+    else
+    {
+      post( "pdp_mp4audiosync : filled_audio_buffer : skipped buffer : (in : %d)", 
+             m_father->x_audioin_position );
+    }
   }
-  m_last_fill_timestamp = ts;
-  m_buffer_filled[fill_index] = 1;
-  m_samples_loaded += m_buffer_size;
-  m_buffer_time[fill_index] = ts;
-  if (resync) {
-    m_resync_required = 1;
-    m_resync_buffer = fill_index;
-#ifdef DEBUG_AUDIO_FILL
-    audio_message(LOG_DEBUG, "Resync from filled_audio_buffer");
-#endif
-  }
-
-  // Check this - we might not want to do this unless we're resyncing
-  if (resync) m_psptr->wake_sync_thread();
-#ifdef DEBUG_AUDIO_FILL
-  audio_message(LOG_DEBUG, "Filling " LLU " %u %u", ts, fill_index, m_samples_loaded);
-#endif
+  
+  return;
 }
 
 void CPDPAudioSync::set_eof(void) 
 { 
   uint8_t *to;
-  if (m_buffer_offset_on != 0) {
-    to = get_audio_buffer();
-    if (to != NULL) {
-      uint32_t left;
-      left = m_buffer_size - m_buffer_offset_on;
-      memset(to + m_buffer_offset_on, 0, left);
-      m_buffer_offset_on = 0;
-      filled_audio_buffer(m_buffer_ts, 0);
-      m_buffer_ts += m_msec_per_frame;
-    }
-  }
+
+  to = get_audio_buffer();
   CAudioSync::set_eof();
 }
 
-int CPDPAudioSync::initialize_audio (int have_video) 
+int CPDPAudioSync::initialize_audio (int have_audio) 
 {
+  m_audio_initialized = 1;
   return (1);
 }
 
 int CPDPAudioSync::is_audio_ready (uint64_t &disptime)
 {
-  disptime = m_buffer_time[m_play_index];
-  return (m_dont_fill == 0 && m_buffer_filled[m_play_index] == 1);
+  return (1);
 }
 
 uint64_t CPDPAudioSync::check_audio_sync (uint64_t current_time, int &have_eof)
@@ -355,6 +211,8 @@ void CPDPAudioSync::audio_callback (Uint8 *stream, int ilen)
   int delay = 0;
   int playtime;
 
+  post( "pdp_mp4audiosync : audio callback" );
+
 }
 
 void CPDPAudioSync::play_audio (void)
@@ -366,29 +224,14 @@ void CPDPAudioSync::play_audio (void)
 
 void CPDPAudioSync::flush_sync_buffers (void)
 {
+  post( "pdp_mp4audiosync : flush sync buffer" );
   clear_eof();
-  m_dont_fill = 1;
-  if (m_audio_waiting_buffer) {
-    m_audio_waiting_buffer = 0;
-  }
 }
 
 void CPDPAudioSync::flush_decode_buffers (void)
 {
-  int locked = 0;
-  if (m_audio_initialized != 0) {
-    locked = 1;
-  }
-  m_dont_fill = 0;
-  m_first_filled = 1;
-  for (int ix = 0; ix < DECODE_BUFFERS_MAX; ix++) {
-    m_buffer_filled[ix] = 0;
-  }
-  m_buffer_offset_on = 0;
-  m_play_index = m_fill_index = 0;
-  m_audio_paused = 1;
-  m_resync_buffer = 0;
-  m_samples_loaded = 0;
+  post( "pdp_mp4audiosync : flush decode buffer" );
+  m_buffer_filled[0] = 0;
 }
 
 void CPDPAudioSync::set_volume (int volume)
@@ -466,7 +309,7 @@ static void pdp_filled_audio_buffer (void *ifptr,
 				   int resync_req)
 {
   ((CPDPAudioSync *)ifptr)->filled_audio_buffer(ts, 
-					     resync_req);
+				   resync_req);
 }
 
 static void pdp_load_audio_buffer (void *ifptr, 

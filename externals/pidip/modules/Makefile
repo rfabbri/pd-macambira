@@ -15,7 +15,7 @@ OBJECTS = pdp_intrusion.o  pdp_yqt.o  pdp_simura.o  pdp_underwatch.o  \
           pdp_capture.o pdp_smuck.o pdp_lumafilt.o \
           pdp_transition.o pdp_imgloader.o pdp_imgsaver.o pdp_cache.o \
           pdp_canvas.o pdp_pen.o pdp_shape.o pdp_fqt.o pdp_fcqt.o \
-          pdp_ocanvas.o pdp_spotlight.o  pdp_live~.o pdp_ffmpeg~.o
+          pdp_ocanvas.o pdp_spotlight.o pdp_colorgrid.o  pdp_live~.o pdp_ffmpeg~.o
           # pdp_xcanvas.o pdp_aa.o
 
 all_modules: $(OBJECTS) 

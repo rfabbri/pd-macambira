@@ -175,8 +175,46 @@ void CPDPVideoSync::set_video_frame(const uint8_t *y,
 				    int pixelw_uv, 
 				    uint64_t time)
 {
-  // post( "pdp_mp4videosync : set video frame : %dx%d", m_width, m_height );
+ short int *pY, *pU, *pV;
+ t_int px, py;
+
   m_psptr->wake_sync_thread();
+
+  if ( !m_father->x_streaming )
+  {
+    return;
+  }
+
+  // transforming into a image for pdp 
+  if ( ( (t_int)m_father->x_vheight != (t_int)m_height ) ||
+       ( (t_int)m_father->x_vwidth != (t_int)m_width ) )
+  {
+    m_father->x_vheight = m_height;
+    m_father->x_vwidth = m_width;
+    m_father->x_vsize = m_father->x_vheight*m_father->x_vwidth;
+    post( "pdp_mp4videosync : allocating video data : %dx%d", m_width, m_height ); 
+
+    // allocate video data
+    m_father->x_datav = ( short int* ) malloc( (m_father->x_vsize+(m_father->x_vsize>>1))<<1 );
+  }
+
+  // post( "pdp_mp4videosync : set video frame : width : y:%d, uv:%d", pixelw_y, pixelw_uv );
+
+  pY = m_father->x_datav;
+  pV = m_father->x_datav+m_father->x_vsize;
+  pU = m_father->x_datav+m_father->x_vsize+(m_father->x_vsize>>2);
+  for(py=0; py<m_father->x_vheight; py++) 
+  {
+    for(px=0; px<m_father->x_vwidth; px++)
+    {
+       *(pY+py*m_father->x_vwidth+px) = *(y+py*pixelw_y+px)<<7;
+       if ( ( px%2 == 0 ) && ( py%2 == 0 ) )
+       {
+         *(pU+(py>>1)*(m_father->x_vwidth>>1)+(px>>1)) = ((*(u+(py>>1)*pixelw_uv+(px>>1)))-128)<<8;
+         *(pV+(py>>1)*(m_father->x_vwidth>>1)+(px>>1)) = ((*(v+(py>>1)*pixelw_uv+(px>>1)))-128)<<8;
+       }
+    }
+  }
 
   // pass the data to the pdp object
   m_father->x_newpicture = 1;

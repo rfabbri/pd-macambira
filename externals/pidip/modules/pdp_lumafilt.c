@@ -134,7 +134,7 @@ static void pdp_lumafilt_process_yv12(t_pdp_lumafilt *x)
 	 }
 	 else
 	 {
-           post( "pdp_lumafilt : luminosity value out of bounds : %d", luma );
+           // post( "pdp_lumafilt : luminosity value out of bounds : %d", luma );
 	 }
 	 pnY++;
 	 if ( (px%2==0) && (py%2==0) )

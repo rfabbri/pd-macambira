@@ -204,7 +204,7 @@ static void pdp_i_recv(t_pdp_i *x)
            // check we don't overflow input buffer
            if ( x->x_inwriteposition+ret >= x->x_inbuffersize )
            {
-              // post( "pdp_i : too much input...resetting" );
+              post( "pdp_i : too much input...resetting" );
               x->x_inwriteposition=0;
               return;
            }

@@ -60,7 +60,7 @@
 
 #define VIDEO_BUFFER_SIZE (1024*1024)
 #define MAX_AUDIO_PACKET_SIZE (128 * 1024)
-#define AUDIO_PACKET_SIZE (2*1024) /* using aac encoding */
+#define AUDIO_PACKET_SIZE (2*1024*2) /* using aac encoding, 2 channels, 2 bytes per sample */
 
 static char   *pdp_mp4live_version = "pdp_mp4live~: version 0.1, an mpeg4ip video streaming object ( ydegoyon@free.fr )";
 
@@ -90,8 +90,6 @@ typedef struct pdp_mp4live_struct
 
       /* audio structures */
     short x_audio_buf[2*MAX_AUDIO_PACKET_SIZE]; /* buffer for incoming audio */
-    short x_audio_enc_buf[2*MAX_AUDIO_PACKET_SIZE]; /* buffer for audio to be encoded */
-    uint8_t x_audio_out[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for encoded audio */
     t_int x_audioin_position; // writing position for incoming audio
     t_int x_audio_per_frame;  // number of audio samples to transmit for each frame
 
@@ -425,8 +423,6 @@ static void pdp_mp4live_process_yv12(t_pdp_mp4live *x)
          pU = data+x->x_vsize;
          pV = data+x->x_vsize+(x->x_vsize>>2);
 
-         x->x_videosource->ProcessVideo( pY, pV, pU );
-   
             /* update frames counter */
 
          if ( gettimeofday(&etime, NULL) == -1)
@@ -442,17 +438,8 @@ static void pdp_mp4live_process_yv12(t_pdp_mp4live *x)
          x->x_nbframes++;
          x->x_secondcount++;
 
-            /* send an audio frame */
-         if ( x->x_audioin_position > x->x_audio_per_frame )
-         {
-            x->x_audiosource->ProcessAudio( (u_int8_t*)x->x_audio_buf, 
-                           (u_int32_t)x->x_audio_per_frame*sizeof(short) );
+         x->x_videosource->ProcessVideo( pY, pV, pU );
 
-            /* output resampled raw samples */
-            memcpy( x->x_audio_buf, x->x_audio_buf+x->x_audio_per_frame, 
-                    x->x_audioin_position-x->x_audio_per_frame ); 
-            x->x_audioin_position-=x->x_audio_per_frame;
-         }
     }
     return;
 }
@@ -499,6 +486,21 @@ static t_int *pdp_mp4live_perform(t_int *w)
        }
     }
 
+    if ( x->x_streaming )
+    {
+          /* send an audio frame */
+       if ( (t_int)(x->x_audioin_position*sizeof(short)) > (t_int)x->x_audio_per_frame )
+       {
+         x->x_audiosource->ProcessAudio( (u_int8_t*)x->x_audio_buf, 
+                        (u_int32_t)x->x_audio_per_frame );
+
+           /* recopy the buffer and set new pointers */
+         memcpy( x->x_audio_buf, x->x_audio_buf+(x->x_audio_per_frame/sizeof(short)), 
+                    x->x_audioin_position*sizeof(short)-x->x_audio_per_frame ); 
+         x->x_audioin_position-=(x->x_audio_per_frame/sizeof(short));
+       }
+    }
+ 
     return (w+5);
 }
 

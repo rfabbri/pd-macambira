@@ -54,7 +54,7 @@ typedef struct pdp_mp4player_struct t_pdp_mp4player;
 #include "pdp_mp4videosource.h"
 #include "pdp_mp4audiosource.h"
 
-#define DEFAULT_CHANNELS 1
+#define DEFAULT_CHANNELS 2
 #define MIN_PRIORITY -20
 #define DEFAULT_PRIORITY 0
 #define MAX_PRIORITY 20
@@ -69,7 +69,7 @@ typedef struct pdp_mp4player_struct
     t_object x_obj;
     t_float x_f;
 
-    t_int x_packet0;
+    t_int x_packet;
     t_int x_dropped;
 
     t_pdp *x_header;
@@ -93,6 +93,7 @@ typedef struct pdp_mp4player_struct
     t_int x_samplerate;     // audio sample rate
     t_int x_audiochannels;  // audio channels
     t_int x_audioon;        // enough audio data to start playing
+    t_int x_blocksize;      // audio block size
     struct timeval x_starttime; // streaming starting time
     t_int x_cursec;         // current second
     t_int x_secondcount;    // number of frames received in the current second
@@ -100,9 +101,10 @@ typedef struct pdp_mp4player_struct
     t_int x_priority;       // priority of decoding thread
     t_int x_newpicture;     // flag indicating a new picture
 
+    short int *x_datav;     // video data from mpeg4hippies
+
       /* audio structures */
     t_int x_audio;           // flag to activate the decoding of audio
-    short x_audio_buf[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for audio from stream*/
     short x_audio_in[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for resampled PCM audio */
     t_int x_audioin_position; // writing position for incoming audio
 

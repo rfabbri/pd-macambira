@@ -238,7 +238,7 @@ static void pdp_ocanvas_input(t_pdp_ocanvas *x, t_symbol *s, t_floatarg f, t_int
       /* release the packet */
       if ( x->x_packets[ni] != -1 )
       {
-        pdp_packet_mark_unused(x->x_packets[ni]);
+        pdp_packet_delete(x->x_packets[ni]);
         x->x_packets[ni] = -1;
       }
       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packets[ni], (int)f, pdp_gensym("image/YCrCb/*") );

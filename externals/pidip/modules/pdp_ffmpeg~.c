@@ -601,7 +601,7 @@ static t_int *pdp_ffmpeg_perform(t_int *w)
        x->x_audioin_position=(x->x_audioin_position+1)%(2*MAX_AUDIO_PACKET_SIZE); 
        if ( x->x_audioin_position == 2*MAX_AUDIO_PACKET_SIZE-1 ) 
        {
-          post( "pdp_ffmpeg~ : reaching end of audio buffer" );
+          // post( "pdp_ffmpeg~ : reaching end of audio buffer" );
        }
     }
 

@@ -211,7 +211,7 @@ static void pdp_vertigo_process_yv12(t_pdp_vertigo *x)
           if ( i >= (x->x_vsize + (x->x_vsize>>1)) ) i = (x->x_vsize + (x->x_vsize>>1))-1;
           v = pcy[i] & 0xffff;
           v = (v * 3) + ((*poy++) & 0xffff);
-          *pny++ = (v>>2);
+          *pny++ = (v>>2)<<7;
           if ( (((px+1)%2)==0) && (((py+1)%2)==0) )
           {
               ninc++;

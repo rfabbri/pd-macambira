@@ -41,6 +41,7 @@ typedef struct pdp_canvas_struct
     t_int x_queue_id;
 
     t_int x_opacket;
+    t_int x_lastpacket;
 
     t_int x_current;
     t_float x_xmouse;
@@ -139,6 +140,7 @@ static void pdp_canvas_process_yv12(t_pdp_canvas *x)
          memcpy( pV+((py>>1)*(x->x_owidth>>1))+((t_int)(x->x_xoffsets[ii]+mx)>>1), 
                      ppV+((py-(t_int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), dx );
       }
+
     }
   }
 
@@ -241,10 +243,10 @@ static void pdp_canvas_input(t_pdp_canvas *x, t_symbol *s, t_floatarg f, t_int n
 
     if (s== gensym("register_rw")) 
     {
-      /* release the packet */
       if ( x->x_packets[ni] != -1 )
-      {
-        pdp_packet_mark_unused(x->x_packets[ni]);
+      { 
+        // delete the packet
+        pdp_packet_delete(x->x_packets[ni]);
         x->x_packets[ni] = -1;
       }
       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packets[ni], (int)f, pdp_gensym("image/YCrCb/*") );

@@ -63,6 +63,7 @@ extern "C"
     void pdp_pen_setup(void);
     void pdp_shape_setup(void);
     void pdp_spotlight_setup(void);
+    void pdp_colorgrid_setup(void);
 
 #ifdef HAVE_PIDIP_FFMPEG
     void pdp_ffmpeg_tilde_setup(void);
@@ -133,6 +134,7 @@ void pidip_setup(void){
     pdp_pen_setup();
     pdp_shape_setup();
     pdp_spotlight_setup();
+    pdp_colorgrid_setup();
 
 #ifdef HAVE_PIDIP_FFMPEG
     pdp_ffmpeg_tilde_setup();
