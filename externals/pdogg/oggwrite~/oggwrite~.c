@@ -719,7 +719,7 @@ static void *oggwrite_new(void)
     x->x_bytesbuffered = 0;
 	x->x_pages = 0;
 	x->x_bcname = "ogg/vorbis stream";
-	x->x_bcurl = "http://www.pure-data.org/";
+	x->x_bcurl = "http://www.pure-data.info/";
 	x->x_bcgenre = "experimental";
 	x->x_bcdescription = "ogg/vorbis stream recorded with pure-data using oggwrite~";
 	x->x_bcartist = "pure-data";
