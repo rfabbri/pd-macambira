@@ -44,6 +44,8 @@ struct _class
     t_anymethod c_anymethod;
     struct _widgetbehavior *c_wb; 	/* "gobjs" only */
     struct _parentwidgetbehavior *c_pwb;/* widget behavior in parent */
+    t_savefn c_savefn;	    	    	/* function to call when saving */
+    t_propertiesfn c_propertiesfn; 	/* function to start prop dialog */
     int c_floatsignalin; 	    	/* onset to float for signal input */
     char c_gobj;	    		/* true if is a gobj */
     char c_patchable;	    	    	/* true if we have a t_object header */

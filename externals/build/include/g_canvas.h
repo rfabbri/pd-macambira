@@ -174,7 +174,6 @@ struct _glist
     unsigned int gl_loading:1;	    /* am now loading from file */
     unsigned int gl_willvis:1;	    /* make me visible after loading */ 
     unsigned int gl_edit:1;  	    /* edit mode */
-    unsigned int gl_imatemplate:1;  /* someone needs me as template */
     unsigned int gl_isdeleting:1;   /* we're inside glist_delete -- hack! */
     unsigned int gl_stretch:1;	    /* stretch contents on resize */
     unsigned int gl_isgraph:1;	    /* show as graph on parent */
@@ -259,10 +258,6 @@ typedef void (*t_visfn)(t_gobj *x, struct _glist *glist, int flag);
     	/* field a mouse click (when not in "edit" mode) */
 typedef int (*t_clickfn)(t_gobj *x, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
-    	/*  save to a binbuf */
-typedef void (*t_savefn)(t_gobj *x, t_binbuf *b);
-    	/*  open properties dialog */
-typedef void (*t_propertiesfn)(t_gobj *x, struct _glist *glist);
     	/* ... and later, resizing; getting/setting font or color... */
 
 struct _widgetbehavior
@@ -274,8 +269,6 @@ struct _widgetbehavior
     t_deletefn w_deletefn;
     t_visfn w_visfn;
     t_clickfn w_clickfn;
-    t_savefn w_savefn;
-    t_propertiesfn w_propertiesfn;
 };
 
 /* -------- behaviors for scalars defined by objects in template --------- */
@@ -350,6 +343,7 @@ EXTERN int gobj_click(t_gobj *x, struct _glist *glist,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
 EXTERN void gobj_save(t_gobj *x, t_binbuf *b);
 EXTERN void gobj_properties(t_gobj *x, struct _glist *glist);
+EXTERN void gobj_save(t_gobj *x, t_binbuf *b);
 
 /* -------------------- functions on glists --------------------- */
 EXTERN t_glist *glist_new( void);

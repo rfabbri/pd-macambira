@@ -12,6 +12,9 @@ extern "C" {
 #define PD_MAJOR_VERSION 0  /* ... use these two instead. */
 #define PD_MINOR_VERSION 37   
 
+#define PD_DEVEL_VERSION 1  /* T.Grill - mark for devel branch */
+
+
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
 #if defined(NT) && !defined(MSW)
@@ -19,7 +22,7 @@ extern "C" {
 #endif
 
 #ifdef MSW
-// #pragma warning( disable : 4091 ) 
+/* #pragma warning( disable : 4091 ) */
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
 #pragma warning( disable : 4101 )  /* unused automatic variables */
@@ -38,7 +41,7 @@ extern "C" {
 
     /* and depending on the compiler, hidden data structures are
     declared differently: */
-#if defined( __GNUC__) || defined( __BORLANDC__ )
+#if defined( __GNUC__) || defined( __BORLANDC__ ) || defined( __MWERKS__ )
 #define EXTERN_STRUCT struct
 #else
 #define EXTERN_STRUCT extern struct
@@ -52,12 +55,9 @@ extern "C" {
 #define MAXPDSTRING 1000	/* use this for anything you want */
 #define MAXPDARG 5    	    	/* max number of args we can typecheck today */
 
-    /* signed and unsigned integer types the size of a pointer:  */
-#ifdef __alpha__
+/* signed and unsigned integer types the size of a pointer:  */
+/* GG: long is the size of a pointer */
 typedef long t_int;
-#else
-typedef int t_int;
-#endif
 
 typedef float t_float;	/* a floating-point number at most the same size */
 typedef float t_floatarg;  /* floating-point type for function calls */
@@ -419,6 +419,15 @@ EXTERN void class_domainsignalin(t_class *c, int onset);
 #define CLASS_MAINSIGNALIN(c, type, field) \
     class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
 
+    	 /* prototype for functions to save Pd's to a binbuf */
+typedef void (*t_savefn)(t_gobj *x, t_binbuf *b);
+EXTERN void class_setsavefn(t_class *c, t_savefn f);
+EXTERN t_savefn class_getsavefn(t_class *c);
+    	/* prototype for functions to open properties dialogs */
+typedef void (*t_propertiesfn)(t_gobj *x, struct _glist *glist);
+EXTERN void class_setpropertiesfn(t_class *c, t_propertiesfn f);
+EXTERN t_propertiesfn class_getpropertiesfn(t_class *c);
+
 #ifndef PD_CLASS_DEF
 #define class_addbang(x, y) class_addbang((x), (t_method)(y))
 #define class_addpointer(x, y) class_addpointer((x), (t_method)(y))
@@ -456,6 +465,15 @@ EXTERN int open_via_path(const char *name, const char *ext, const char *dir,
     char *dirresult, char **nameresult, unsigned int size, int bin);
 EXTERN int sched_geteventno(void);
 EXTERN double sys_getrealtime(void);
+
+
+/* ------------  threading ------------------- */
+/* T.Grill - see m_sched.c */
+ 
+EXTERN void sys_lock(void);
+EXTERN void sys_unlock(void);
+EXTERN int sys_trylock(void);
+
 
 /* --------------- signals ----------------------------------- */
 
@@ -561,6 +579,7 @@ EXTERN t_class *garray_class;
 EXTERN int garray_getfloatarray(t_garray *x, int *size, t_float **vec);
 EXTERN float garray_get(t_garray *x, t_symbol *s, t_int indx);
 EXTERN void garray_redraw(t_garray *x);
+EXTERN double garray_updatetime(t_garray *x); /* T.Grill - get last update time (clock_getlogicaltime) */
 EXTERN int garray_npoints(t_garray *x);
 EXTERN char *garray_vec(t_garray *x);
 EXTERN void garray_resize(t_garray *x, t_floatarg f);
@@ -577,8 +596,11 @@ EXTERN int value_setfloat(t_symbol *s, t_float f);
 EXTERN void sys_vgui(char *fmt, ...);
 EXTERN void sys_gui(char *s);
 
+    /* dialog window creation and destruction */
 EXTERN void gfxstub_new(t_pd *owner, void *key, const char *cmd);
 EXTERN void gfxstub_deleteforkey(void *key);
+
+extern t_class *glob_pdobject;	/* object to send "pd" messages */
 
 /*-------------  Max 0.26 compatibility --------------------*/
 
