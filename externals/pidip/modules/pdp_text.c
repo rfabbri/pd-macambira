@@ -77,6 +77,7 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
 {
  char *pname;
  char *pdname;
+ t_int len;
 
    if ( x->x_nbtexts >= x->x_capacity )
    {
@@ -95,8 +96,11 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
    }
 
    // allocate new text area
-   pdname = x->x_text_array[x->x_nbtexts] = (char *) malloc( strlen( argv[0].a_w.w_symbol->s_name ) );
-   pname=argv[0].a_w.w_symbol->s_name;
+   len = strlen( argv[0].a_w.w_symbol->s_name ); 
+   pdname = x->x_text_array[x->x_nbtexts] = (char *) getbytes( len+1 );
+   pname = (char *) getbytes( len+1 );
+   memset( pname, 0x0, len+1 );
+   memcpy( pname, argv[0].a_w.w_symbol->s_name, len );
    while (*(pname))
    {
       if ( (*pname=='%') && ( isdigit(*(pname+1)) || (*(pname+1)=='%') ) )
@@ -154,7 +158,6 @@ static void pdp_text_add(t_pdp_text *x, t_symbol *s, int argc, t_atom *argv)
    {
       x->x_scroll[x->x_nbtexts] = (int)argv[7].a_w.w_float;
    }
-
    
    post( "pdp_text : added text >%s< @ %d (r=%d g=%d b=%d)", 
                 x->x_text_array[x->x_nbtexts], x->x_nbtexts,
@@ -349,7 +352,7 @@ static void pdp_text_resize(t_pdp_text *x,  t_floatarg fnewsize  )
     x->x_angle = angle;
     x->x_scroll = scroll;
     x->x_nbtexts = csize;
-    x->x_capacity = csize;
+    x->x_capacity = (int) fnewsize;
     if ( x->x_nbtexts > 0 )
     {
        x->x_current = 0;
@@ -358,6 +361,7 @@ static void pdp_text_resize(t_pdp_text *x,  t_floatarg fnewsize  )
     {
        x->x_current = -1;
     }
+    post( "pdp_text : resized to %d", (int) fnewsize );
 }
 
 static void pdp_text_font(t_pdp_text *x, t_symbol *sfont  )
@@ -434,7 +438,9 @@ static void pdp_text_process_yv12(t_pdp_text *x)
 
        imlib_get_text_size( x->x_text_array[ti], &text_width, &text_height);
 
-       imlib_text_draw( x->x_xoffsets[ti] - (0.5*text_width) + (cos(x->x_angle[ti]) * x->x_scroll[ti]), x->x_yoffsets[ti] - (0.5*text_height) + (sin(x->x_angle[ti]) * x->x_scroll[ti]), x->x_text_array[ti] );
+       imlib_text_draw( x->x_xoffsets[ti] - (0.5*text_width) + (cos(x->x_angle[ti]) * x->x_scroll[ti]), 
+                        x->x_yoffsets[ti] - (0.5*text_height) + (sin(x->x_angle[ti]) * x->x_scroll[ti]), 
+                        x->x_text_array[ti] );
     }
 
     pY = newdata;
