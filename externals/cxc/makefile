@@ -18,7 +18,7 @@ TARGETS = binshift ascwave ixprint bangfilt bangfilt2 \
 
 LINUXOBJECTS = $(TARGETS:%=%.o)
 
-LINCLUDE = -I. -I../pd-0.35-test24/src
+LINCLUDE = -I. -I../pd-0.35-0/src
 # possible defines
 # -DPRINTADDRS
 DEBUG = -DDEBUG -ggdb

@@ -8,7 +8,7 @@
 #endif
 
 #include <m_pd.h>
-
+#include "cx.h"
 
 typedef struct _cxc
 {
@@ -99,5 +99,6 @@ void cxc_setup(void)
   post("c  : jdl@xdv.org ========================================");
   post(" x : ver: "VERSION" ============================================");
   post("  c: compiled: "__DATE__" ==================================");
-  post("\\");
+   // post("\\");
+   // L;
 }
