@@ -11,7 +11,10 @@
  */
 #include "input_arrays.h"
 
-static char *version = "$Revision: 1.7 $";
+#define HID_MAJOR_VERSION 0
+#define HID_MINOR_VERSION 1
+
+static char *version = "$Revision: 1.8 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

@@ -185,7 +185,8 @@ static void *hid_new(t_float f)
   DEBUG(post("hid_new"););
 
   post("/=========================== [hid] ===========================\\");
-  post("[hid] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
+  post("[hid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
+		 HID_MAJOR_VERSION, HID_MINOR_VERSION);  
 #if !defined(__linux__) && !defined(__APPLE__)
   error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
   error("     This is a dummy, since this object only works GNU/Linux and MacOS X!");
