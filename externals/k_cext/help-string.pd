@@ -1,0 +1,5 @@
+#N canvas 0 0 450 300 10;
+#X msg 31 84 bang;
+#X obj 30 125 k_cext \; system(s<echo something>s) \;;
+#X text 26 40 Strings are started with s< and ended with >s;
+#X connect 0 0 1 0;

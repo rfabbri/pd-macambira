@@ -193,10 +193,28 @@ static void k_cext_gen_mainfunccode(t_k_cext *x,int argc, t_atom* argv,int i, st
       break;
     case A_SYMBOL:
       sprintf(string,"%s",atom_getsymbolarg(i,argc,argv)->s_name);
+
+      printf("string: \"%s\"\n",string);
+
+      if(strstr(string,"s<")!=NULL){
+	char *pos=strstr(string,"s<");
+	pos[0]=' ';
+	pos[1]='\"';
+	printf("japp\n");
+      }
+
+      if(strstr(string,">s")!=NULL){
+	char *pos=strstr(string,">s");
+	pos[0]='\"';
+	pos[1]=' ';
+	printf("japp2n");
+      }
+      
       if(!strcmp(".",string)){
 	sprintf(string," ");
 	k->indentation++;
-	
+
+      
       }else{if(!strcmp("DO",string)){
 	k->set_indentation[k->indentation]=1;
 	sprintf(string,"BEGIN");
@@ -253,6 +271,7 @@ static void k_cext_gen_mainfunccode(t_k_cext *x,int argc, t_atom* argv,int i, st
       */
       }
       }
+
       fprintf(k->file,"%s",string);
       if(string[strlen(string)-1]!='\n') fprintf(k->file," ");
       break;
