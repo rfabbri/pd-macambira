@@ -9,7 +9,8 @@
 include config-pd-linux.txt
 
 FLEXTLIB=$(FLEXTPATH)/flext.a  # take threaded library for all
-FLUIDLIB=/usr/local/lib/libfluidsynth.a
+#FLUIDLIB=/usr/local/lib/libfluidsynth.a
+FLUIDLIB=-L/usr/local/lib -lfluidsynth
 
 PDEXTRA=$(DESTDIR)/usr/lib/pd/extra
 
