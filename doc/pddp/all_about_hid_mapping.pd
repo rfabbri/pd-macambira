@@ -1,4 +1,4 @@
-#N canvas 230 123 867 495 10;
+#N canvas 230 123 871 499 10;
 #N canvas 0 22 450 300 graph1 0;
 #X array cuberoot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
@@ -123,6 +123,8 @@
 #X obj 622 224 hid_square;
 #X obj 289 235 hid_squareroot;
 #X text 612 297 exponential;
+#X obj 29 68 buttongate;
+#X obj 125 66 keygate;
 #X connect 4 0 22 0;
 #X connect 5 0 15 0;
 #X connect 5 0 18 0;
