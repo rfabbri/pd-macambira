@@ -44,7 +44,7 @@ LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-LINUXINCLUDE =  -I../../../src/pd-0.35-0/src
+LINUXINCLUDE =  -I../../../pd-0.37-test4/src
 
 LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 

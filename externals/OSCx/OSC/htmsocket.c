@@ -121,6 +121,7 @@ void *OpenHTMSocket(char *host, int portnumber)
 	o = malloc(sizeof(*o));
 	if(!o)
 		return 0;
+	int oval = 1;
 
   #ifndef WIN32
 
@@ -162,14 +163,14 @@ void *OpenHTMSocket(char *host, int portnumber)
 		
 			if (bind(sockfd, (struct sockaddr *) &ucl_addr, clilen) < 0)
 			{
-				perror("client: can't bind local address");
-				close(sockfd);
-				sockfd = -1;
+			  perror("client: can't bind local address");
+			  close(sockfd);
+			  sockfd = -1;
 			}
 		}
 		else
-			perror("unable to make socket\n");
-
+		  perror("unable to make socket\n");
+		
 	}else
 
   #endif
@@ -228,6 +229,11 @@ void *OpenHTMSocket(char *host, int portnumber)
 				cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 				cl_addr.sin_port = htons(0);
 				
+				// enable broadcast
+				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
+				  perror("setsockopt");
+				}
+
 				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
 					perror("could not bind\n");
 					closesocket(sockfd);
@@ -244,6 +250,11 @@ void *OpenHTMSocket(char *host, int portnumber)
 				cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 				cl_addr.sin_port = htons(0);
 				
+				// enable broadcast
+				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
+				  perror("setsockopt");
+				}
+
 				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
 					perror("could not bind\n");
 					close(sockfd);
@@ -293,7 +304,11 @@ void CloseHTMSocket(void *htmsendhandle)
 		return;
 	}
 	#else
-		close(o->sockfd);
+	if(close(o->sockfd) == -1)
+	  {
+	    perror("CloseHTMSocket::closesocket failed");
+	    return;
+	  }
 	#endif
 
 	free(o);

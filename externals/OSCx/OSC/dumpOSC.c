@@ -64,11 +64,12 @@ Technologies, University of California, Berkeley.
 */
 
 #include "m_pd.h"
+#include "s_stuff.h"
 //#include "x_osc.h"
 
 /* declarations */
 
-typedef void (*t_fdpollfn)(void *ptr, int fd);
+// typedef void (*t_fdpollfn)(void *ptr, int fd);
 void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 
 
@@ -201,7 +202,7 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
 	#ifdef WIN32
 	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, (SOCKADDR*)&x->x_server, &clilen)) >0)
 	#else
-	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, &x->x_server, &clilen)) >0)
+	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, (struct sockaddr *)&x->x_server, &clilen)) >0)
 	#endif 
 	{
 		//int r;
@@ -241,13 +242,12 @@ static void *dumpOSC_new(t_symbol *compatflag,
   //x->x_outatc = 0;   {{raf}}
 
   /* create a socket */
-  sockfd = socket(AF_INET, (udp ? SOCK_DGRAM : SOCK_STREAM), 0);
-
-  if (sockfd < 0)
+  if ((sockfd = socket(AF_INET, (udp ? SOCK_DGRAM : SOCK_STREAM), 0)) == -1)
     {
       sys_sockerror("socket");
       return (0);
     }
+
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   /* assign server port number */
@@ -265,15 +265,9 @@ static void *dumpOSC_new(t_symbol *compatflag,
 
   x->x_msgout = outlet_new(&x->x_obj, &s_anything);
   
-  if (udp)	    /* datagram protocol */
+  // if (udp)	    /* datagram protocol */
     {
       
-/*       t_socketreceiver *y = socketreceiver_new((void *)x, */
-/*                         0, */
-/*                         (x->x_msgout ? dumpOSC_doit : 0)); */
-
-      //      sys_addpollfn(sockfd, (t_fdpollfn)socketreceiver_read_x, y);
-
       sys_addpollfn(sockfd, (t_fdpollfn)dumpOSC_read, x);
       x->x_connectout = 0;
     }
@@ -481,7 +475,7 @@ void PrintClientAddr(ClientAddr CA) {
     printf("  clilen %d, sockfd %d\n", CA->clilen, CA->sockfd);
     printf("  sin_family %d, sin_port %d\n", CA->cl_addr.sin_family,
 	   CA->cl_addr.sin_port);
-    printf("  address: (%x) %s\n", addr,  inet_ntoa(CA->cl_addr.sin_addr));
+    printf("  address: (%x) %s\n", addr, inet_ntoa(CA->cl_addr.sin_addr));
 
     printf("  sin_zero = \"%c%c%c%c%c%c%c%c\"\n", 
 	   CA->cl_addr.sin_zero[0],
