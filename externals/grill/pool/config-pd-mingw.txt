@@ -21,4 +21,4 @@ INSTPATH=$(PDPATH)/extra
 UFLAGS=
 
 # define for shared build
-FLEXT_SHARED=1
+#FLEXT_SHARED=1
