@@ -154,8 +154,8 @@ public:
     LFNoise0_kr(int argc, t_atom *argv);
     
 protected:
-    void m_perform();
-    
+    void m_perform(void*);
+
     void m_seed(int i)
     {
 	rgen.init(i);
@@ -163,9 +163,9 @@ protected:
  
     void m_set(float f)
     {
-	double dt = sc_min(1/f, .001f);
+	double dt = sc_max(1/f, .001f);
 	m_timer.Reset();
-	m_timer.Periodic(1000*dt);
+	m_timer.Periodic(dt);
     }
    
 private:
@@ -187,16 +187,16 @@ LFNoise0_kr::LFNoise0_kr(int argc, t_atom *argv)
     //parse arguments
     AtomList Args(argc,argv);
     
-    double dt = sc_min(1/sc_getfloatarg(Args,0), .001f);
+    double dt = sc_max(1/sc_getfloatarg(Args,0), .001f);
     
     rgen.init(timeseed());
 
-    m_timer.Periodic(1000*dt);
+    m_timer.Periodic(dt);
 
     AddOutFloat();
 }
 
-void LFNoise0_kr::m_perform()
+void LFNoise0_kr::m_perform(void*)
 {
     ToOutFloat(0,rgen.frand2());
 }

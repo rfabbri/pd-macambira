@@ -55,7 +55,7 @@ $(TARGDIR)/%.o : $(SRCDIR)/%.cpp
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))  
 	$(CXX) $(LDFLAGS) -shared $^ $(patsubst %,-l%,$(LIBS)) -L$(FLEXTPATH) $(LINKFLEXT) -o $@ 
-		#strip --strip-unneeded $@
+		strip --strip-unneeded $@
 	chmod 755 $@
 
 $(INSTDIR):
