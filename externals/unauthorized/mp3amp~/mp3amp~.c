@@ -52,6 +52,8 @@
 #define SOCKET_ERROR -1
 #else
 #include <winsock.h>
+#include <winbase.h>
+#include <io.h>
 #endif
 
 #ifdef NT
@@ -64,7 +66,10 @@
 #endif
 #ifdef NT
 #define STRDUP _strdup
+#define MSG_NOSIGNAL 0
+#define sys_closesocket closesocket
 #endif
+
 
 #define     LAME_AUDIO_CHUNK_SIZE     1152
 #define     MIN_AUDIO_INPUT           2*LAME_AUDIO_CHUNK_SIZE  /* we must have at least n chunks to play a steady sound */

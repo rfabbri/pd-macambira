@@ -51,18 +51,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
-#include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
-#include "interface.h"   /* mpglib decoding library from lame 3.92 */
 #define SOCKET_ERROR -1
 #else
 #include <winsock.h>
+#define MSG_NOSIGNAL 0
+#define SOL_TCP IPPROTO_TCP
 #endif
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
+#include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
+#include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
+#include "interface.h"   /* mpglib decoding library from lame 3.92 */
 
 #define MIN_AUDIO_INPUT 8064 // we must a least have 8 chunks to play a correct sound
 #define INPUT_BUFFER_SIZE MIN_AUDIO_INPUT

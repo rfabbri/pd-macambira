@@ -47,18 +47,16 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
-#include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
-#include "interface.h"   /* mpglib decoding library from lame 3.92 */
 #define SOCKET_ERROR -1
 #else
 #include <winsock.h>
+#include <io.h>
+#include <fcntl.h>
+#define  MSG_NOSIGNAL 0
 #endif
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
+#include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
+#include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
+#include "interface.h"   /* mpglib decoding library from lame 3.92 */
 
 #define INPUT_BUFFER_SIZE 32768
 #define OUTPUT_BUFFER_SIZE 32768
@@ -90,8 +88,9 @@ void mp3fileout_closesocket(int fd)
 #endif
 #ifdef NT
     closesocket(fd);
-#endif
+#else
     sys_rmpollfn(fd);
+#endif
 }
 
 /* ------------------------ mp3fileout~ ----------------------------- */
@@ -390,6 +389,7 @@ static void mp3fileout_open(t_mp3fileout *x, t_symbol *filename)
        x->x_outframes = 0;
        outlet_float( x->x_frames, x->x_outframes );
     }
+
     if ( ( x->x_fd = open( filename->s_name, O_RDONLY ) ) < 0 )
     {
        post( "mp3fileout~ : could not open file : %s", filename->s_name );

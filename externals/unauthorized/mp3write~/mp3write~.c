@@ -29,13 +29,6 @@
 /* Gang Of Four - "Guns Before Butter"                                          */
 /* ---------------------------------------------------------------------------- */
 
-
-
-#ifdef NT
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4305 )
-#endif
-
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -54,16 +47,14 @@
 #include <netdb.h>
 #include <time.h>
 #include <sys/time.h>
-#include <lame/lame.h>        /* lame encoder stuff */
 #define SOCKET_ERROR -1
 #else
 #include <io.h>
 #include <windows.h>
 #include <winsock.h>
 #include <windef.h>
-#include "lame_enc.h"        /* lame encoder stuff */
 #endif
-
+#include <lame/lame.h>        /* lame encoder stuff */
 #include "m_pd.h"            /* standard pd stuff */
 
 #define        MY_MP3_MALLOC_IN_SIZE        65536
@@ -75,17 +66,6 @@
 
 static char   *mp3write_version = "mp3write~: mp3 file recorder version 0.4, written by Yves Degoyon";
 static int    sockfd;
-
-#ifndef UNIX
-static        HINSTANCE           dll             = NULL;
-static        BEINITSTREAM        initStream      = NULL;
-static        BEENCODECHUNK       encodeChunk     = NULL;
-static        BEDEINITSTREAM      deinitStream    = NULL;
-static        BECLOSESTREAM       closeStream     = NULL;
-static        BEVERSION           dllVersion      = NULL;
-static        BEWRITEVBRHEADER    writeVBRHeader  = NULL;
-#endif
-
 
 static t_class *mp3write_class;
 
@@ -122,9 +102,7 @@ typedef struct _mp3write
     t_float x_f;              /* float needed for signal input */
     char *x_title;            /* title of the mp3              */
 
-#ifdef UNIX
     lame_global_flags *lgfp;  /* lame encoder configuration */
-#endif
 } t_mp3write;
 
 
@@ -189,27 +167,17 @@ static void mp3write_encode(t_mp3write *x)
     }
 
         /* encode mp3 data */
-#ifndef UNIX
-    err = encodeChunk(x->x_lame, x->x_lamechunk, x->x_mp3inbuf, x->x_mp3outbuf, &x->x_mp3size);
-#else
+
     x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf, 
                    x->x_lamechunk/lame_get_num_channels(x->lgfp), 
                    x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     // post( "mp3write~ : encoding returned %d frames", x->x_mp3size );
-#endif
 
         /* check result */
-#ifndef UNIX
-    if(err != BE_ERR_SUCCESSFUL)
-    {
-        closeStream(x->x_lame);
-        error("mp3write~: lameEncodeChunk() failed (%lu)", err);
-#else
     if(x->x_mp3size<0)
     {
         lame_close( x->lgfp );
         error("mp3write~: lame_encode_buffer_interleaved failed (%d)", x->x_mp3size);
-#endif
         x->x_lame = -1;
     }
 }
@@ -233,11 +201,7 @@ static void mp3write_writeframes(t_mp3write *x)
     if(err < 0)
     {
         error("mp3write~: could not write encoded data to file (%d)", err);
-#ifndef UNIX
-        closeStream(x->x_lame);
-#else
         lame_close( x->lgfp );
-#endif
         x->x_lame = -1;
 #ifndef UNIX
         error("mp3write~: writing data");
@@ -361,19 +325,12 @@ static int mp3write_tilde_lame_init(t_mp3write *x)
 {
   time_t now;
 
-#ifndef UNIX
-        /* encoder related stuff (calculating buffer size) */
-    BE_VERSION    lameVersion        = {0,};                                /* version number of LAME */
-    BE_CONFIG     lameConfig         = {0,};                                /* config structure of LAME */
-    unsigned int    ret;
-#else
     int    ret;
     x->lgfp = lame_init(); /* set default parameters for now */
-#endif
 
 #ifndef UNIX
     /* load lame_enc.dll library */
-
+    HINSTANCE dll;
     dll=LoadLibrary("lame_enc.dll");
     if(dll==NULL)
     {
@@ -383,74 +340,12 @@ static int mp3write_tilde_lame_init(t_mp3write *x)
         post("mp3write~: connection closed");
         return -1;
     }
-
-        /* get Interface functions */
-    initStream      = (BEINITSTREAM) GetProcAddress(dll, TEXT_BEINITSTREAM);
-    encodeChunk     = (BEENCODECHUNK) GetProcAddress(dll, TEXT_BEENCODECHUNK);
-    deinitStream    = (BEDEINITSTREAM) GetProcAddress(dll, TEXT_BEDEINITSTREAM);
-    closeStream     = (BECLOSESTREAM) GetProcAddress(dll, TEXT_BECLOSESTREAM);
-    dllVersion      = (BEVERSION) GetProcAddress(dll, TEXT_BEVERSION);
-    writeVBRHeader  = (BEWRITEVBRHEADER) GetProcAddress(dll,TEXT_BEWRITEVBRHEADER);
-
-        /* check if all interfaces are present */
-    if(!initStream || !encodeChunk || !deinitStream || !closeStream || !dllVersion || !writeVBRHeader)
-    {
-
-        error("mp3write~: unable to get LAME interfaces");
-        closesocket(x->x_fd);
-        x->x_fd = -1;
-        post("mp3write~: connection closed");
-        return -1;
-    }
-
-        /* get LAME version number */
-    dllVersion(&lameVersion);
-
-    post(   "mp3write~: lame_enc.dll version %u.%02u (%u/%u/%u)\n"
-            "            lame_enc engine %u.%02u",    
-            lameVersion.byDLLMajorVersion, lameVersion.byDLLMinorVersion,
-            lameVersion.byDay, lameVersion.byMonth, lameVersion.wYear,
-            lameVersion.byMajorVersion, lameVersion.byMinorVersion);
-
-    memset(&lameConfig,0,sizeof(lameConfig));                        /* clear all fields */
-#else
+#endif
     {
        const char *lameVersion = get_lame_version();
        post( "mp3write~ : using lame version : %s", lameVersion );
     }
-#endif 
 
-#ifndef UNIX
-
-        /* use the LAME config structure */
-    lameConfig.dwConfig = BE_CONFIG_LAME;
-
-        /* set the mpeg format flags */
-    lameConfig.format.LHV1.dwStructVersion  = 1;
-    lameConfig.format.LHV1.dwStructSize     = sizeof(lameConfig);        
-    lameConfig.format.LHV1.dwSampleRate     = (int)sys_getsr();     /* input frequency - pd's sample rate */
-    lameConfig.format.LHV1.dwReSampleRate   = x->x_samplerate;      /* output s/r - resample if necessary */
-    lameConfig.format.LHV1.nMode            = x->x_mp3mode;         /* output mode */
-    lameConfig.format.LHV1.dwBitrate        = x->x_bitrate;         /* mp3 bitrate */
-    lameConfig.format.LHV1.nPreset          = x->x_mp3quality;      /* mp3 encoding quality */
-    lameConfig.format.LHV1.dwMpegVersion    = MPEG1;                /* use MPEG1 */
-    lameConfig.format.LHV1.dwPsyModel       = 0;                    /* USE DEFAULT PSYCHOACOUSTIC MODEL */
-    lameConfig.format.LHV1.dwEmphasis       = 0;                    /* NO EMPHASIS TURNED ON */
-    lameConfig.format.LHV1.bOriginal        = TRUE;                 /* SET ORIGINAL FLAG */
-    lameConfig.format.LHV1.bCopyright       = TRUE;                 /* SET COPYRIGHT FLAG */
-    lameConfig.format.LHV1.bNoRes           = TRUE;                 /* no bit resorvoir */
-
-        /* init the MP3 stream */
-    ret = initStream(&lameConfig, &x->x_lamechunk, &x->x_mp3size, &x->x_lame);
-
-        /* check result */
-    if(ret != BE_ERR_SUCCESSFUL)
-    {
-        post("mp3write~: error opening encoding stream (%lu)", ret);
-        return -1;
-    }
-
-#else
         /* setting lame parameters */
     lame_set_num_channels( x->lgfp, 2);
     lame_set_in_samplerate( x->lgfp, sys_getsr() );
@@ -485,7 +380,6 @@ static int mp3write_tilde_lame_init(t_mp3write *x)
     sprintf( x->x_title, "Started at %s", ctime(&now) );
     id3tag_set_title(x->lgfp, x->x_title );
     
-#endif
     return 0;
 
 }
@@ -638,11 +532,7 @@ static void mp3write_stop(t_mp3write *x)
     x->x_recflag = 0;
 
     /* flushing remaining frames and tag */
-#ifndef UNIX
-    deinitStream(x->x_lame, x->x_mp3outbuf, &x->x_mp3size);
-#else
     x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE ); 
-#endif
     
     mp3write_writeframes(x);   /* write mp3 to file */
 
@@ -654,11 +544,7 @@ static void mp3write_stop(t_mp3write *x)
 static void mp3write_free(t_mp3write *x)    
 {
     if(x->x_lame >= 0)
-#ifndef UNIX
-        closeStream(x->x_lame);
-#else
         lame_close( x->lgfp );
-#endif
     if(x->x_fd >= 0)
 #ifndef UNIX
         _close(x->x_fd);
