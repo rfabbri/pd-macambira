@@ -84,7 +84,7 @@ static int sortcmp(const void *a, const void *b)
 	return strcmp(flext::GetString(*(t_atom *)a),flext::GetString(*(t_atom *)b)); 
 }
 
-int flext_base::ListAttr(AtomList &la) const
+int flext_base::ListAttrib(AtomList &la) const
 {
 	int cnt = attrhead?attrhead->Count():0;
 	int ccnt = clattrhead?clattrhead->Count():0;
@@ -111,7 +111,7 @@ int flext_base::ListAttr(AtomList &la) const
 	return ix;
 }
 
-int flext_base::ListMeth(AtomList &la,int inlet) const
+int flext_base::ListMethods(AtomList &la,int inlet) const
 {
 	int cnt = methhead?methhead->Count():0;
 	int ccnt = clmethhead?clmethhead->Count():0;
@@ -156,7 +156,11 @@ bool flext_base::InitAttrib(int argc,const t_atom *argv)
 			if(IsString(argv[nxt]) && *GetString(argv[nxt]) == '@') break;
 
 		const t_symbol *tag = MakeSymbol(GetString(argv[cur])+1);
-		SetAttrib(tag,nxt-cur-1,argv+cur+1);
+		attritem *attr = FindAttrib(tag,false,true);
+		if(attr) {
+			if(SetAttrib(attr,nxt-cur-1,argv+cur+1))
+				SetAttribSave(attr,true);
+		}
 	}
 	return true;
 }
@@ -165,7 +169,7 @@ bool flext_base::ListAttrib() const
 {
 	if(procattr) {
 		AtomList la;
-		int c = ListAttr(la);
+		int c = ListAttrib(la);
 		ToOutAnything(GetOutAttr(),MakeSymbol("attributes"),c,la.Atoms());
 		return true;
 	}
@@ -177,7 +181,7 @@ bool flext_base::ListMethods(int inlet) const
 {
 	if(procattr) {
 		AtomList la;
-		int c = ListMeth(la,inlet);
+		int c = ListMethods(la,inlet);
 		ToOutAnything(GetOutAttr(),MakeSymbol("methods"),c,la.Atoms());
 		return true;
 	}
@@ -193,7 +197,7 @@ bool flext_base::cb_ListMethods(flext_base *c,int argc,const t_atom *argv)
 		return false;
 }
 
-flext_base::attritem *flext_base::FindAttr(const t_symbol *tag,bool get) const
+flext_base::attritem *flext_base::FindAttrib(const t_symbol *tag,bool get,bool msg) const
 {
     // first search within object scope
 	attritem *a = (attritem *)attrhead->Find(tag);
@@ -204,19 +208,22 @@ flext_base::attritem *flext_base::FindAttr(const t_symbol *tag,bool get) const
 		a = (attritem *)clattrhead->Find(tag);	
 		while(a && (a->tag != tag || a->inlet != 0 || (get?a->IsSet():a->IsGet()))) a = (attritem *)a->nxt;
 	}
+
+	if(!a && msg) {
+		// print a message
+		error("%s - %s: attribute not found",thisName(),GetString(tag));
+	}
 	return a;
 }
 
 bool flext_base::SetAttrib(const t_symbol *tag,int argc,const t_atom *argv)
 {
 	// search for matching attribute
-	attritem *a = FindAttr(tag,false);
+	attritem *a = FindAttrib(tag,false,true);
 	if(a) 
 		return SetAttrib(a,argc,argv);
-	else {
-		error("%s - %s: attribute not found",thisName(),GetString(tag));
+	else
 		return true;
-	}
 }
 
 bool flext_base::SetAttrib(attritem *a,int argc,const t_atom *argv)
@@ -264,52 +271,84 @@ bool flext_base::SetAttrib(attritem *a,int argc,const t_atom *argv)
 	return true;
 }
 
-bool flext_base::GetAttrib(attritem *a)
+
+bool flext_base::GetAttrib(attritem *a,AtomList &la) const
 {
+	bool ok = true;
 	// main attribute tag
 	if(a) {
 		if(a->fun) {
-			AtomList la;
 			t_any any;
 			switch(a->argtp) {
 			case a_float: {
-				((methfun_1)a->fun)(this,any);				
+				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
 				la(1);
 				SetFloat(la[0],any.ft);
 				break;
 			}
 			case a_int: {
-				((methfun_1)a->fun)(this,any);				
+				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
 				la(1);
 				SetInt(la[0],any.it);
 				break;
 			}
 			case a_symbol: {
-				((methfun_1)a->fun)(this,any);				
+				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
 				la(1);
 				SetSymbol(la[0],any.st);
 				break;
 			}
 			case a_LIST: {
 				any.vt = &la;
-				((methfun_1)a->fun)(this,any);				
+				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
 				break;
 			}
 			default:
 				ERRINTERNAL();
+				ok = false;
 			}
-			ToOutAnything(GetOutAttr(),a->tag,la.Count(),la.Atoms());
 		}
-		else 
-			post("%s - attribute %s has no set method",thisName(),GetString(a->tag));
+		else {
+			post("%s - attribute %s has no get method",thisName(),GetString(a->tag));
+			ok = false;
+		}
 	}
-	else
+	else {
 		error("%s - %s: attribute not found",thisName(),GetString(a->tag));
-	return true;
+		ok = false;
+	}
+	return ok;
 }
+
+bool flext_base::GetAttrib(attritem *a)
+{
+	AtomList la;
+	bool ret = GetAttrib(a,la);
+	if(ret) ToOutAnything(GetOutAttr(),a->tag,la.Count(),la.Atoms());
+	return ret;
+}
+
+bool flext_base::GetAttrib(const t_symbol *s,AtomList &a) const
+{
+	attritem *attr = FindAttrib(s,true);
+	return attr && GetAttrib(attr,a);
+}
+
 
 bool flext_base::DumpAttrib(const t_symbol *attr) const
 {
-	attritem *item = FindAttr(attr,true);
+	attritem *item = FindAttrib(attr,true);
 	return item && const_cast<flext_base *>(this)->GetAttrib(item);
+}
+
+void flext_base::SetAttribSave(attritem *a,bool save)
+{
+	a->SetSave(save);
+	if(a->BothExist()) {
+		// find opposite attribute item
+		attritem *b = FindAttrib(a->tag,!a->IsGet());
+		FLEXT_ASSERT(b != NULL);
+
+		b->SetSave(save);
+	}
 }
