@@ -50,7 +50,7 @@ public:
 	static F FromdB(F v) { return pow(10.,v*.05); } 
 
 	inline I get_N() const { return _N; }
-	inline F get_Fund() const { return smprt/(_N*2); }
+	inline F get_Fund() const { return smprt/_N; }
 
 protected:
 
@@ -77,14 +77,17 @@ protected:
     I *_bitshuffle;
     F *_Wanal,*_Wsyn,*_Hwin;
 
+	F *_c_lastphase_in1,*_c_lastphase_in2,*_c_lastphase_out;
+	F _c_factor_in;
+
     I _inCount;
 
 	enum { 
 		F_STEREO = 0x01,
 		F_BALANCED = 0x02,
 		F_BITSHUFFLE = 0x04,
-		F_NOSPEC = 0x08,F_SPECRES = 0x10,
-		F_RMS = 0x20,
+		F_RMS = 0x08,
+		F_NOSPEC = 0x10,F_SPECRES = 0x20,F_PHCONV = 0x40,
 		F_NOAMP1 = 0x100,
 		F_NOPH1 = 0x200,
 		F_NOAMP2 = 0x400,

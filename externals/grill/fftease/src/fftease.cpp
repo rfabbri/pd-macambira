@@ -95,8 +95,14 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 	}
 
 	if(!(_flags&F_NOSPEC)) {
-	    leanconvert( _buffer1, _channel1, _N2 , !(_flags&F_NOAMP1),!(_flags&F_NOPH1));
-	    if(_flags&F_STEREO) leanconvert( _buffer2, _channel2, _N2 ,!(_flags&F_NOAMP2),!(_flags&F_NOPH2) );
+		if(_flags&F_PHCONV) {
+			convert( _buffer1, _channel1, _N2, _c_lastphase_in1, get_Fund(), _c_factor_in );
+			if(_flags&F_STEREO) convert( _buffer2, _channel2, _N2, _c_lastphase_in2, get_Fund(), _c_factor_in );
+		}
+		else {
+			leanconvert( _buffer1, _channel1, _N2 , !(_flags&F_NOAMP1),!(_flags&F_NOPH1));
+			if(_flags&F_STEREO) leanconvert( _buffer2, _channel2, _N2 ,!(_flags&F_NOAMP2),!(_flags&F_NOPH2) );
+		}
 	}
 
 	// ---- BEGIN --------------------------------
@@ -106,8 +112,10 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 	// ---- END --------------------------------
 
 	if(!(_flags&F_NOSPEC)) {
-	    leanunconvert( _channel1, _buffer1, _N2 );
-	    if(_flags&F_STEREO) leanunconvert( _channel2, _buffer2, _N2 );
+		if(_flags&F_PHCONV)
+			unconvert( _channel1, _buffer1, _N2, _c_lastphase_out, get_Fund(), 1./_c_factor_in  );
+		else
+			leanunconvert( _channel1, _buffer1, _N2 );
 	}
 
 
@@ -135,7 +143,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 void fftease::Set()
 {
 	/* preset the objects data */
-	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N; //,_N2 = _N/2,_Nw2 = _Nw/2;
+	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2;
 
 	_inCount = -_Nw;
 
@@ -143,19 +151,34 @@ void fftease::Set()
 	_input1 = new F[_Nw];
 	ZeroMem(_input1,_Nw*sizeof(*_input1));
 	_buffer1 = new F[_N];
-	if(!(_flags&F_NOSPEC) || (_flags&F_SPECRES)) {
-		_channel1 = new F[_N+2];
-		ZeroMem(_channel1,(_N+2)*sizeof(*_channel1));
-	}
 	if(_flags&F_STEREO) {
 		_input2 = new F[_Nw];
 		ZeroMem(_input2,_Nw*sizeof(*_input2));
 		_buffer2 = new F[_N];
-		if(!(_flags&F_NOSPEC) || (_flags&F_SPECRES)) {
+	}
+
+	if(!(_flags&F_NOSPEC) || (_flags&F_SPECRES)) {
+		_channel1 = new F[_N+2];
+		ZeroMem(_channel1,(_N+2)*sizeof(*_channel1));
+		if(_flags&F_STEREO) {
 			_channel2 = new F[_N+2];
 			ZeroMem(_channel2,(_N+2)*sizeof(*_channel2));
 		}
+
+		if(_flags&F_PHCONV) {
+			_c_lastphase_in1 = new F[_N2+1];
+			ZeroMem(_c_lastphase_in1,(_N2+1)*sizeof(*_c_lastphase_in1));
+			if(_flags&F_STEREO) {
+				_c_lastphase_in2 = new F[_N2+1];
+				ZeroMem(_c_lastphase_in2,(_N2+1)*sizeof(*_c_lastphase_in2));
+			}
+			_c_lastphase_out = new F[_N2+1];
+			ZeroMem(_c_lastphase_out,(_N2+1)*sizeof(*_c_lastphase_out));
+
+			_c_factor_in = Samplerate()/(_D * PV_2PI);
+		}
 	}
+
 	_output = new F[_Nw];
 	ZeroMem(_output,_Nw*sizeof(*_output));
 
@@ -184,6 +207,8 @@ void fftease::Clear()
 	_buffer1 = _buffer2 = NULL;
 	_channel1 = _channel2 = NULL;
 	_output = NULL;
+
+	_c_lastphase_in1 = _c_lastphase_in2 = _c_lastphase_out = NULL;
 }
 
 void fftease::Delete()
@@ -191,17 +216,18 @@ void fftease::Delete()
 	if(_input1) delete[] _input1;
 	if(_buffer1) delete[] _buffer1;
 	if(_channel1) delete[] _channel1;
-	if(_flags&F_STEREO) {
-		if(_input2) delete[] _input2;
-		if(_buffer2) delete[] _buffer2;
-		if(_channel2) delete[] _channel2;
-	}
+	if(_input2) delete[] _input2;
+	if(_buffer2) delete[] _buffer2;
+	if(_channel2) delete[] _channel2;
+
+	if(_c_lastphase_in1) delete[] _c_lastphase_in1;
+	if(_c_lastphase_in2) delete[] _c_lastphase_in2;
+	if(_c_lastphase_out) delete[] _c_lastphase_out;
+
 	if(_output) delete[] _output;
 
-	if(_flags&F_BITSHUFFLE) {
-		if(_bitshuffle) delete[] _bitshuffle;
-		if(_trigland) delete[] _trigland;
-	}
+	if(_bitshuffle) delete[] _bitshuffle;
+	if(_trigland) delete[] _trigland;
 
 	if(_Hwin) delete[] _Hwin;
 	if(_Wanal) delete[] _Wanal;

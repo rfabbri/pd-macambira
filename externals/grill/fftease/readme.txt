@@ -55,12 +55,14 @@ You must have the following "Source Trees" defined:
 
 PORTING NOTES:
 
-The example audio files schubert.aiff and nixon.aiff have been thankfully taken from 
-Christian Klippels FFTease jMax port.
+The example audio files schubert.aiff and nixon.aiff have been taken from the original FFTease package for Max/MSP.
 
 
 - pv-lib:
 	- gcc (OSX) complains about _cfft being defined by pv-lib and pd.... any problems with that?
+
+- burrow:
+	- max_bin calculation: fundamental frequency seems to be wrong
 
 - cross:
 	- STRANGE: spectral amplitude in channel1 is undefined if gainer <= threshie
@@ -73,7 +75,8 @@ Christian Klippels FFTease jMax port.
 	- use different knee correction 
 
 - disarray:
-	- different frequency correction
+	- different frequency correction employed
+	- max_bin calculation: fundamental frequency seems to be wrong
 	- check whether freq oder number of bins should be selectable -> frequency!
 
 - ether:

@@ -29,8 +29,6 @@ protected:
 
 	F *_compositeFrame;
 	I *_framesLeft;
-	F *_c_lastphase_in,*_c_lastphase_out;
-	F _c_fundamental,_c_factor_in,_c_factor_out;
 	BL _firstFrame;
 
 	F _moveThreshold;
@@ -40,7 +38,7 @@ private:
 	static V setup(t_classid c);
 };
 
-FLEXT_LIB_DSP("fftease, thresher~",thresher)
+FLEXT_LIB_DSP("fftease, thresher~ nacho~",thresher)
 
 
 V thresher::setup(t_classid c)
@@ -56,14 +54,6 @@ void thresher::Set()
 
 	_compositeFrame = new F[_N+2];
 	_framesLeft = new I[_N2+1];
-	_c_lastphase_in = new F[_N2+1];
-	ZeroMem(_c_lastphase_in,(_N2+1)*sizeof(*_c_lastphase_in));
-	_c_lastphase_out = new F[_N2+1];
-	ZeroMem(_c_lastphase_out,(_N2+1)*sizeof(*_c_lastphase_out));
-
-	_c_fundamental = _R/_N;
-	_c_factor_in = _R/(_D * PV_2PI);
-	_c_factor_out = 1./_c_factor_in;
 
 	_firstFrame = true;
 	_moveThreshold = .00001 ;
@@ -76,7 +66,6 @@ void thresher::Clear()
 	fftease::Clear();
 	_compositeFrame = NULL;
 	_framesLeft = NULL;
-	_c_lastphase_in = _c_lastphase_out = NULL;
 }
 
 void thresher::Delete()
@@ -84,13 +73,11 @@ void thresher::Delete()
 	fftease::Delete();
 	if(_compositeFrame) delete[] _compositeFrame;
 	if(_framesLeft) delete[] _framesLeft;
-	if(_c_lastphase_in) delete[] _c_lastphase_in;
-	if(_c_lastphase_out) delete[] _c_lastphase_out;
 }
 
 
 thresher::thresher():
-	fftease(4,F_BALANCED|F_BITSHUFFLE|F_NOSPEC|F_SPECRES)
+	fftease(4,F_BALANCED|F_BITSHUFFLE|F_PHCONV)
 {
 	AddInSignal("Messages and input signal");
 	AddOutSignal("Transformed signal");
@@ -99,8 +86,6 @@ thresher::thresher():
 
 V thresher::Transform(I _N,S *const *in)
 {
-	convert( _buffer1, _channel1, _N/2, _c_lastphase_in, _c_fundamental, _c_factor_in  );
-
 	I *fr = _framesLeft;
 	if( _firstFrame ) {
 		for (I i = 0; i <= _N; i += 2,++fr ){
@@ -117,10 +102,11 @@ V thresher::Transform(I _N,S *const *in)
 				_compositeFrame[i+1] = _channel1[i+1];
 				*fr = _maxHoldFrames;
 			}
-			else
+			else {
+				_channel1[i] = _compositeFrame[i];
+				_channel1[i+1] = _compositeFrame[i+1];
 				--*fr;
+			}
 		}
 	}
-
-	unconvert( _compositeFrame, _buffer1, _N/2, _c_lastphase_out, _c_fundamental, _c_factor_out  );
 }
