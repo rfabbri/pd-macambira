@@ -13,6 +13,7 @@ OBJECTS = pdp_intrusion.o  pdp_yqt.o  pdp_simura.o  pdp_underwatch.o  \
           pdp_compose.o pdp_cmap.o pdp_aa.o pdp_ascii.o \
           pdp_ffmpeg~.o pdp_live~.o pdp_segsnd~.o pdp_noquark.o \
           pdp_juxta.o pdp_capture.o pdp_smuck.o pdp_lumafilt.o \
-          pdp_transition.o pdp_imgloader.o pdp_imgsaver.o pdp_cache.o
+          pdp_transition.o pdp_imgloader.o pdp_imgsaver.o pdp_cache.o \
+          pdp_canvas.o
 
 all_modules: $(OBJECTS) 
