@@ -53,7 +53,7 @@ typedef struct _volctl
 
 void *volctl_new(t_symbol *s, int argc, t_atom *argv)
 {
-    if (argc > 2) post("volctl~: extra arguments ignored");
+    if (argc > 3) post("volctl~: extra arguments ignored");
 
     t_volctl *x = (t_volctl *)pd_new(volctl_class);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("f1"));
@@ -171,6 +171,7 @@ static t_int *volctl_perf8(t_int *w)
     return (w+5);
 }
 
+
 static t_int *volctl_perf_simd(t_int *w)
 {
     t_volctl * x = (t_volctl *)(w[1]);
@@ -229,7 +230,53 @@ static t_int *volctl_perf_simd(t_int *w)
 	}
     else
     {
-		if(x->x_target)
+		switch(x->x_target)
+		{
+		case 0:
+			asm(
+				".set T_FLOAT,4                          \n"
+			
+				"xorps     %%xmm0, %%xmm0                \n"
+				"shrl      $4, %1                        \n"
+			
+				"1:                                      \n"
+				"movaps    %%xmm0, (%0)                  \n" 
+				"movaps    %%xmm0, 4*T_FLOAT(%0)         \n"
+				"movaps    %%xmm0, 8*T_FLOAT(%0)         \n"
+				"movaps    %%xmm0, 12*T_FLOAT(%0)        \n"
+				"addl      $16*T_FLOAT, %0               \n"
+				"loop      1b                            \n"
+				:
+				:"r"(out),
+				"c"(w[4])
+				: "%xmm0");
+			break;
+
+		case 1:
+			asm(
+				".set T_FLOAT,4                          \n"
+			
+				"shrl      $4, %1                        \n"
+
+				"1:                                        \n"
+				"movaps    (%1), %%xmm0                    \n"
+				"movaps    4*T_FLOAT(%1), %%xmm1           \n"
+				"movaps    8*T_FLOAT(%1), %%xmm2           \n"
+				"movaps    12*T_FLOAT(%1), %%xmm3          \n"
+				"movaps    %%xmm0, (%2)                    \n"
+				"movaps    %%xmm1, 4*T_FLOAT(%2)           \n"
+				"movaps    %%xmm2, 8*T_FLOAT(%2)           \n"
+				"movaps    %%xmm3, 12*T_FLOAT(%2)          \n"
+				
+				"addl      $16*T_FLOAT,%1                  \n"
+				"addl      $16*T_FLOAT,%2                  \n"
+				"loop      1b                              \n"
+				:
+				:"c"(w[4]),"r"(in),"r"(out)
+				:"%xmm0","%xmm1","%xmm2","%xmm3");
+			break;
+
+		default:
 			asm(
 				".set T_FLOAT,4                          \n"
 			
@@ -257,25 +304,7 @@ static t_int *volctl_perf_simd(t_int *w)
 				: "r"(in), "r"(out),
 				"c"(w[4]),"r"(&(t_float)(x->x_target))
 				: "%xmm0", "%xmm1","%xmm2","%xmm3","%xmm4");
-		else
-			asm(
-				".set T_FLOAT,4                          \n"
-			
-				"xorps     %%xmm0, %%xmm0                \n"
-				"shrl      $4, %1                        \n"
-			
-				"1:                                      \n"
-				"movaps    %%xmm0, (%0)                  \n" 
-				"movaps    %%xmm0, 4*T_FLOAT(%0)         \n"
-				"movaps    %%xmm0, 8*T_FLOAT(%0)         \n"
-				"movaps    %%xmm0, 12*T_FLOAT(%0)        \n"
-				"addl      $16*T_FLOAT, %0               \n"
-				"loop      1b                            \n"
-				:
-				:"r"(out),
-				"c"(w[4])
-				: "%xmm0");
-			
+		}
     }
     return (w+5);
 }
