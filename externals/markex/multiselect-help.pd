@@ -1,0 +1,6 @@
+#N canvas 0 22 454 304 10;
+#X text 13 14 [multiselect] is part of MarkEx \, which was formerly
+in GEM;
+#X obj 171 121 multiselect;
+#X text 29 209 Unfortunately \, this is undocumented \, so someone
+should write a help page for it!;
