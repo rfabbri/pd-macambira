@@ -10,6 +10,8 @@ all:
 #----------------------------------------------------------------------------
 # all standard objs' help files
 	cp ../../OSCx/doc/*.pd \
+			../../control/*/*.pd \
+			../../signal/*/*.pd \
 			../../aenv~/*.pd \
 			../../ann/examples/*.* \
 			../../arraysize/*.pd \
