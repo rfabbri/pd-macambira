@@ -58,7 +58,7 @@ public:
 
 protected:
 
-    virtual void m_click() { ms_vis(true); }
+    virtual void CbClick() { ms_vis(true); }
 
     static const t_symbol *k_obj,*k_msg,*k_text;
 
@@ -83,9 +83,9 @@ protected:
 
 	void ConnDis(bool conn,int argc,const t_atom *argv);
 
-    virtual bool m_method_(int n,const t_symbol *s,int argc,const t_atom *argv);
-	virtual void m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs);
-	virtual void m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs);
+    virtual bool CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv);
+	virtual bool CbDsp();
+	virtual void CbSignal();
 
 
 	// proxy object
@@ -702,7 +702,7 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 }
 
 
-bool dyn::m_method_(int n,const t_symbol *s,int argc,const t_atom *argv)
+bool dyn::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
 {
 	if(n == 0) 
 		// messages into inlet 0 are for dyn~
@@ -775,22 +775,23 @@ void dyn::proxyout::init(dyn *t,int o,bool s)
 }
 
 
-void dyn::m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs)
+bool dyn::CbDsp()
 {
 	// add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
     mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
-
-	flext_dsp::m_dsp(n,insigs,outsigs);
+    return true;
 }
     
-void dyn::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
+void dyn::CbSignal()
 {
-	int i;
+	int i,n = Blocksize();
+    t_sample *const *in = InSig(),*const *out = OutSig();
 	for(i = 0; i < s_inlets; ++i)
 		if(pxin[i]->buf)
-		CopySamples(pxin[i]->buf,insigs[i+1],n);
+		    CopySamples(pxin[i]->buf,in[i+1],n);
+
 	for(i = 0; i < s_outlets; ++i)
 		if(pxout[i]->buf)
-		CopySamples(outsigs[i],pxout[i]->buf,n);
+		    CopySamples(out[i],pxout[i]->buf,n);
 }
 
