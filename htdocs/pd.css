@@ -1,0 +1,88 @@
+
+HTML { 
+	background: #ffffff; 
+	color: #000;
+	font-family: Verdana, Helvetica, Arial, Tahoma, sans-serif;
+	font-size: 8pt;
+} 
+
+BODY{ 
+	padding: 5px;
+	font-family: Verdana, Helvetica, Arial, Tahoma, sans-serif;
+	font-size: 8pt;
+} 
+
+.footer {
+	background:#EEEEEE;
+	width: 650px;
+}
+
+.bordered {
+	padding: 5px;
+}
+
+
+H1 { 
+	color: #600; 
+	border: solid 1px;
+	font-family: monospace;
+	padding: 5px;
+	background:#EEEEEE;
+}
+
+H2 { 
+	font-family: Courier, monospace;
+	border: solid 1px;
+	color: #000; 
+	padding: 4px;
+}
+
+H3 { 
+	font-family: Courier, monospace;
+	border: solid 1px;
+	color: #000; 
+	padding: 4px;
+}
+
+pre { 
+	color: #333333; 
+	padding: 3px;
+	background:#EEEEEE;
+}
+
+A { 
+	text-decoration: none; 
+/*	background: #FFFFFF;  */
+	color: #b00; 
+} 
+
+A:hover { 
+	text-decoration: underline; 
+	/* background: #FFFFFF; */
+	color: #003300 ;
+} 
+
+A.nonexistent { 
+	background: #EEE; 
+	color: #CC6600;
+}
+
+
+
+
+HR {
+	height:1px;
+	width: 75%;
+	/* background:#eeaa00;  */
+	background:#eee; 
+	color:#000;
+}
+
+P.small {
+	font-size: xx-small;
+	background:#fff; 
+	text-align: right;
+	/*border: dotted 1px;*/
+	padding: 5px;
+}
+

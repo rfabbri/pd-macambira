@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Pure Data External Repository</TITLE>
+<link rel="stylesheet" type="text/css" href="pd.css" media="screen">
+
+</HEAD>
+<BODY text="#000000" bgcolor="#ffffff" >
+
+<table border=0 width=650 class="bordered">
+<tr>
+<td>
+<h1>Pure Data External Repository</h1>
+<!-- Quote of the day -->
+<p class="small"><br>
+I think it is certainly true that the open-source movement is a very powerful
+source toward higher-quality software, and I would turn the question around and
+ask if open-source music wouldn t also be a very good thing. 
+<br><em>MSP</em>
+
+
+<h2>Introduction</h2>
+
+The Pure Data external repository is meant to be a place where developers of
+externals for the Pure Data computer music system can put their code. For
+information about PD, look at the <A HREF="http://www.pure-data.org">Pure Data
+website</A>.
+<p>
+
+PD has a huge user base and we all enjoy working with PD. A lot of externals
+are being written and published on the web. As a consequence, it has become
+increasingly hard to have an overview of all the externals. A central code
+repository will offer this, as well as many other advantages. It will be easier
+to manage the code, update orphaned externals, distribute compiled versions for
+different systems, avoid duplication of effort, collaborate on improving the
+same external, and finally the users have the advantage of being able to
+download it from one single place.
+<p>
+
+I could go on listing the advantages, but there is one big disadvantage. We
+have to work on it in order to make it a success. We have to learn CVS and we
+have to import our projects into the repository. I think it is worth this work,
+because you gain a lot too. If you don´t have the time to get into this, but
+still agree that your external becomes part of the repository, just <A
+HREF="mailto:geiger@xdv.org">send an email </A> with the information how to
+download your code.
+<p>
+
+Another drawback is that your code has to be GPL'd. If this is a problem for
+you, let <a href="mailto:pd-dev@iem.kug.ac.at">us</a> know.
+
+<h2>Projects at the Pure Data Repository</h2>
+There is a list with short descriptions of the <a
+href="subprojects.html">Externals currently in the Repository</a>
+
+<h2>Accessing the Externals via CVS</h2>
+
+You have to install cvs. On most Linux systems this is already installed, on
+Windows or Mac OS/X you will have to download it <A
+HREF="http://cvsgui.sourceforge.net/">from the net</A>.  Then, if you have cvs
+installed (this example is assuming the commandline version) use the following
+line to login into the CVS server:
+<pre>
+% cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data login 
+</pre> 
+<p>
+
+Hit return when you are asked for a password.  In order to get the source:
+<pre>
+% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co externals
+</pre>
+<p>
+
+This will give you a local copy of the externals-directory in the repository.
+After some time, if you want to get all the latest additions and updates, type
+(in the externals directory):
+<pre>
+% cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data update -d
+</pre>
+<p>
+
+Without the -d only existing directories on your local copy get updated. 
+<p>
+
+Currently building the externals works to same way it did before, just cd into
+the external directory (e.g. cd vst) and read through the compilation
+instructions.  Later this process will be automated and you can build al the
+externals in one go, or even download a precompiled archive for your system.
+<p>
+Some other modules in the repository include Pd abstractions or the developers
+version of Pd. You can check these out by replacing the modulename with the
+respective modulename.
+<p>
+For example check out the abstractions with:
+<pre>
+% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co abstractions
+</pre>
+<p>
+or Pd with 
+
+<pre>
+% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co pd
+</pre>
+<p>
+To check out the current developers' branch, which is tagged with &quot;devel_0_36&quot;, use 
+<pre>
+% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co -r devel_0_36 pd
+</pre>
+<p>
+You can find out the available branches in the pulldown menu on the project's
+<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/pure-data/pd/">CVS-page</a>
+(or use "cvs -T ..."). 
+<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/pure-data/">Browsing CVS</a>
+is a good way to see what else is in the repository anyway.
+<p>
+If you absoluetly cannot use CVS, there are <a href="http://cvs.sourceforge.net/cvstarballs/pure-data-cvsroot.tar.gz">nightly CVS-tarballs</a> 
+of the whole project tree available (around 15 MB currently).
+<h2>Putting Your Externals in the Repository</h2>
+
+This description is mainly about Linux, if you are working with Windows, you
+might try the procedure described in this <a
+href="http://sfsetup.sourceforge.net/tutorial_cvsaccess.html">tutorial</a>. Let
+us know if it works.
+<p>
+
+To contribute your pd externals to the repository you'll first have to register
+yourself at sourceforge (making you an official developer of the project). Go
+to sourceforge.net and click on the "new user" link on the upper left corner.
+Then <A HREF="mailto:geiger@xdv.org">send an email </A> with the user you
+created and Guenter will add you to the pure-data developer list.
+<p>
+
+At the <A HREF="HTTP://sourceforge.net/projects/pure-data">project page</A> you
+can see if you are already listed as a developer. The next step is to "import"
+your source code. First make sure that your code is in a directory, and remove
+everything from that directory that you don´t want to put under CVS.  Compiled
+code, for example, is not normally put into CVS. 
+<p>
+
+Make sure you are in this directory and issue the command:
+<p>
+<pre>
+% export CVS_RSH=ssh
+% cvs -z3 -d:ext: developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data 
+  import externals/dirname developername source-dist
+</pre>
+<p>
+
+Exchange "developername" with your sourceforge accountname and "dirname" with
+the  name of your  externals directory.  You have to import the source only
+once for your external(s).
+<p>
+
+If all of this went well, move away your external directory (keep it as a
+backup) and checkout the code with:
+<pre>
+% cvs -z3 -d:ext:developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data 
+  co externals
+</pre>
+<p>
+
+From this point on, if you are working in your externals directory, and want to
+commit your changes to the server you just have to do
+<pre>
+% cvs commit
+</pre>
+<p>
+
+or 
+<pre>
+% cvs update
+</pre>
+<p>
+
+to take a look at what you have changed.
+<p>
+
+All the information about where the repository is, the loginname etc, is in the
+"CVS" directory, that should be part of your external directory now.
+<p>
+
+If you are still unsure about the workings, take a look at this <a
+href="http://www.cvshome.org/docs/blandy.html">introduction</A> about using
+CVS.
+
+<h2>Contact</h2>
+
+All questions, suggestions should go to the <a href="mailto:pd-dev@iem.kug.ac.at">PD Developer 
+mailing list</a>.  (Except if you want to ask to be added to the developer list on sourceforge).
+
+<br>
+<br>
+
+<center>
+<form action="http://pd.klingt.org/webring/" method="post">
+<input type="hidden" name="base_url" value="">
+<input type="hidden" name="description" value="CVS Repository at SourceForge">
+
+<table width=260 height=75 cellpadding=0 cellspacing=0 border=0 bgcolor="#FFFFFF">
+  <tr>
+    <td width=55 height=25 align="middle">
+      <input type="image" name="next" src="http://pd.klingt.org/webring/next.gif" border=0 width=55 height=25 align="middle"></td>
+    <td width=62 height=25 align="middle">
+      <input type="image" name="list" src="http://pd.klingt.org/webring/list.gif" border=0 width=62 height=25 align="middle"></td>
+    <td width=63 height=25 align="middle">
+      <input type="image" name="random" src="http://pd.klingt.org/webring/random.gif" border=0 width=63 height=25 align="middle"></td>
+    <td width=80 height=25 align="middle">
+      <input type="image" name="previous" src="http://pd.klingt.org/webring/previous.gif" border=0 width=80 height=25 align="middle"></td>
+  </tr>
+  <tr>
+    <td colspan=4 width=260 height=50 align="middle">
+      <a href="http://pd.klingt.org/webring/info.html">
+      <img src="http://pd.klingt.org/webring/webring.gif" border=0 width=260 height=50 align="middle"></a>
+    </td>
+  </tr>
+</table>
+</form>
+<br clear="all">
+<A href="http://sourceforge.net"><IMG
+ src="http://sourceforge.net/sflogo.php?group_id=55736&amp;type=5"
+ width="210" height="62" border="0" alt="SourceForge Logo"></A>
+
+
+</center>
+</td></tr></table>
+
+</BODY></HTML>

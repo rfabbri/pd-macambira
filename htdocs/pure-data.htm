@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HEAD>
+<TITLE>Pure Data External Repository</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Pure Data External Repository</H1>
+
+<H2> Introduction</H2>
+The Pure Data external reopsitory is meant to be a place where developers of externals
+for the Pure Data computer music system can put their code. For information about PD,
+look at the <A HREF="http://www.pure-data.org">Pure Data website</A>.
+
+<H2>How to download the PD externals</H2>
+
+ANN:This is preliminary information, later it will be just downloading a source tarball or
+the precompiled binary distributions.
+<p>
+You have to install cvs. On most Linux system this is already install, on Windows or MACOS/X
+you will have to download it from the net (TODO: add link).
+</p>
+Then, if you have cvs install (this example is assuming the commandline version) use the following line
+to login into the CVS server:
+<p>
+cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data login  
+</p>
+hit return when you are asked for a password.
+In order to get the source:
+<p>
+cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co externals
+</p>
+<h2>How to put your externals in the repository</h2>
+
+<h3>Why you should care</h3>
+<p>
+PD has a huge user base, we are all enjoying to work with PD. But sometimes when you do a big project
+there are some things that you want to do, but it is not possible to do it by patching only.
+Thats why so many different people wrote lots of externals for PD, and most of them (I hope so at least) 
+are putting them on the web for free download.
+</p>
+<p>
+It has become increasingly hard to have the overview over all these externals, thats why we started this
+external repository, where developers can add their externals. This way it will be easier to manage the
+externals, update orphaned externals, distribute compiled versions for different systems, avoid duplication 
+of effort, and finally the users have the advantage of beeing able to download it from one single place.
+</p>
+I could go on listing advantages of this system, but there is one big disadvantage. We have to work 
+on it inorder to make it a sucess. We have to learn CVS, we have to import our projects into the 
+repository. I think it is worth this work, because you gain a lot too. If you don´t have the time to
+get into this, but still agree that your external becomes part of the repository, just write me an email
+(ANN: link to email).
+<h3>The procedure</h3>
+<p>
+To contribute your pd externals to the repository you have to register yourself at sourceforge first.
+(You will be a official developer of the project then). Go to sourceforge.net and click on the "new
+user" link on the upper left corner. Then send me an email and tell me the user you created, I will add
+you to the pure-data developer list then.
+</p>
+<p>
+You can see at the 
+<A HREF="HTTP://sourceforge.net/projects/pure-data">project page</A> if you are already listed as
+a developer. The next step is to "import" your source code. First make sure that your code is in a 
+directory, and remove everything from that directory that you don´t want to put under CVS.
+Compiled code, for example, is not put into CVS, normally. 
+</p>
+Make sure you are in this directory and issue the command:<BR>
+cvs -z3 -d:ext:developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data import externals/dirname developername source<BR>
+If all of this went well, move away your external directory (keep it as a backup) and checkout the code
+with:<BR>
+ cvs -z3 -d:ext:developername@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co externals
+
+
+
+
+
+</BODY></HTML>
