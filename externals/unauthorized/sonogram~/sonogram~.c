@@ -37,7 +37,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef MACOSX
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX

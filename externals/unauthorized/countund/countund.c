@@ -32,7 +32,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef MACOSX
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -41,7 +43,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "m_pd.h"            /* standard pd stuff */
+#include <m_pd.h>            /* standard pd stuff */
 
 static char   *countund_version = "countund~: count up to a value and then down to zero : author : ydegoyon@free.fr";
 

@@ -34,7 +34,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifndef MACOSX
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #ifdef UNIX
 #include <unistd.h>
@@ -44,7 +46,7 @@
 #endif
 #include <math.h>
 
-#include "m_pd.h"            /* standard pd stuff */
+#include <m_pd.h>            /* standard pd stuff */
 
 static char   *formant_version = "formant~: formant synthesis version 0.1, written by Yves Degoyon";
 
