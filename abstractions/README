@@ -1,0 +1,28 @@
+Collection of abstractions for Pd
+=================================
+
+This is a collection of abstractions for Pd. Pd is a 
+language that is very low-level. There are several 
+concepts that need a certain amount of work in order
+to be implemented. Instead of reimplementing these higher
+level concepts again and again, this collection of abstractions
+try to establish a layer of Pd abstractions that should grow
+into a reusable library that can be shared by Pd users. 
+
+How to add your abstractions ?
+==============================
+
+First rule for adding an abstraction is that it is written
+in Pd (without using externals). 
+
+You can either send your abstarction with the request for
+adding it to the pd-dev list, or if you are a Pd developer
+already, you can add them by yourself. 
+
+If you have questions about how, feel free to ask.
+
+I hope that we can come up with a style guide for abstractions
+at some point, but we need to gather experience how this should
+look like before.
+
+Guenter
