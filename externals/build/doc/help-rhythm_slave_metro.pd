@@ -1,0 +1,2 @@
+#N canvas 0 0 450 300 10;
+#X obj 67 116 rhythm_slave_metro;

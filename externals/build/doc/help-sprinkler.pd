@@ -1,0 +1,48 @@
+#N canvas 186 52 500 508 10;
+#X floatatom 26 36 5 0 0;
+#X symbolatom 36 100 10 0 0;
+#X text 25 309 ARGUMENTS: none;
+#X text 183 307 INLETS:;
+#X text 183 343 OUTLETS: none;
+#X text 217 161 forward lists;
+#X text 161 45 forward single floats;
+#X text 169 107 forward single symbols;
+#X text 41 379 NOTES:;
+#X text 185 321 1 - list or message of the form DST MSG;
+#X text 165 477 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X floatatom 118 254 5 0 0;
+#X obj 54 254 pack s 0;
+#X text 175 219 dynamic destination;
+#X msg 45 153 420;
+#X obj 26 284 sprinkler;
+#X text 53 3 sprinkler : dynamic control-message dissemination;
+#X text 41 393 When a [sprinkler] object gets an input message of the
+form "DST MSG" at its inlet \, the message MSG is sent to the [receive]
+object(s) named by DST. 'sprinkler' is really only useful if you don't
+know (or don't want to know) the length and/or type(s) of your messages
+beforehand.;
+#X msg 25 59 sprinkler-help1 \$1;
+#X msg 35 121 sprinkler-help2 \$1;
+#X msg 45 177 sprinkler-help1 \$1 24 7;
+#X msg 55 209 sprinkler-help1;
+#X msg 61 231 sprinkler-help2;
+#X obj 340 42 r sprinkler-help1;
+#X obj 340 64 print sprinkler-help1;
+#X obj 340 110 r sprinkler-help2;
+#X obj 340 132 print sprinkler-help2;
+#X text 39 327 ALIASES:;
+@SPRINKLER_ALIAS_1@
+@SPRINKLER_ALIAS_2@
+#X text 135 18 @SPRINKLER_COMPAT_TEXT@;
+#X connect 0 0 18 0;
+#X connect 1 0 19 0;
+#X connect 11 0 12 1;
+#X connect 12 0 15 0;
+#X connect 14 0 20 0;
+#X connect 18 0 15 0;
+#X connect 19 0 15 0;
+#X connect 20 0 15 0;
+#X connect 21 0 12 0;
+#X connect 22 0 12 0;
+#X connect 23 0 24 0;
+#X connect 25 0 26 0;

@@ -1,0 +1,18 @@
+#N canvas 328 388 450 300 10;
+#X obj 75 99 ratio;
+#X obj 103 192 osc~;
+#X floatatom 131 122 5 0 0;
+#X obj 103 150 *;
+#X obj 103 223 dac~;
+#X floatatom 75 51 5 0 0;
+#X floatatom 35 135 5 0 0;
+#X text 189 32 ratio is an octave shifter.;
+#X text 188 46 output is between 1 and 2;
+#X text 189 62 it computes 2^(log2(x)-int(log2(x)));
+#X connect 0 0 3 0;
+#X connect 0 0 6 0;
+#X connect 1 0 4 0;
+#X connect 1 0 4 1;
+#X connect 2 0 3 1;
+#X connect 3 0 1 0;
+#X connect 5 0 0 0;
