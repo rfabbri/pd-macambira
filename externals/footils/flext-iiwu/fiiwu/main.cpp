@@ -18,8 +18,8 @@
 #include <flext.h>
 #include <iiwusynth.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 300)
-#error You need at least flext version 0.3.0
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 303)
+#error You need at least flext version 0.3.3
 #endif
 
 
@@ -47,7 +47,7 @@ class fiiwu:
 			// inlet-methods:
 			
 			AddInAnything();         // slurp anything
-			AddOutSignal(3);         // 2 audio out [ == AddOutSignal(2) ]
+			AddOutSignal(2);         // 2 audio out [ == AddOutSignal(2) ]
 			
 			SetupInOut();           // set up inlets and outlets. 
 			                        // Must be called once!
@@ -100,6 +100,22 @@ class fiiwu:
 			}
 		}
 	
+	
+		virtual void m_help()
+		{
+			const char * helptext = 
+			"_ __fiiwu~_ _  a soundfont external for Pd and Max/MSP \n"
+			"_ argument: \"/path/to/soundfont.sf\" to load on object creation\n"
+			"_ messages: \n"
+			"load /path/to/soundfont.sf2  --- Loads a Soundfont \n"
+			"note 0 0 0                   --- Play note. Arguments: \n"
+			"                                 channel-# note-#  veloc-#\n"
+			"n 0 0 0                      --- Play note, same as above\n"
+			"0 0 0                        --- Play note, same as above\n"
+			;
+			post("%s", helptext);
+
+		}
 	protected:
 		// here we declare the virtual DSP function
 		virtual void m_signal(int n, float *const *in, float *const *out);
@@ -213,10 +229,10 @@ void fiiwu::m_signal(int n, float *const *in, float *const *out)
 	float *right = out[1];
 	
 	// now comes the strange thing: we're using *tmp for the 3. outlet,
-	// feed *tmp to the iiwu-function, but the sound actuall comes out the
+	// feed *tmp to the iiwu-function, but the sound actually comes out the
 	// second outlet...
-	float *tmp   = out[2];
+	//float *tmp   = out[2];
 	
-	iiwu_synth_write_float(synth, n, left, 0, 1, tmp, 0, 1); 
+	iiwu_synth_write_float(synth, n, left, 0, 1, right, 0, 1); 
 	
 }  // end m_signal
