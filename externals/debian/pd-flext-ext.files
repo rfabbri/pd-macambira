@@ -2,6 +2,6 @@
 /usr/lib/pd/extra/shaffy*
 /usr/lib/pd/extra/syncgrain~.pd_linux
 /usr/lib/pd/extra/fluid*
-/usr/lib/pd/doc/5.reference/help-fluid.pd
-/usr/lib/pd/doc/5.reference/help-shaffy~.pd
-/usr/lib/pd/doc/5.reference/help-shabby~.pd
+/usr/lib/pd/doc/5.reference/*fluid*.pd
+/usr/lib/pd/doc/5.reference/*shaffy~*.pd
+/usr/lib/pd/doc/5.reference/*shabby~*.pd

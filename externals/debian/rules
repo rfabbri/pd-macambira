@@ -119,13 +119,19 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/pd-externals.
+
 	(cd build/linux; $(MAKE) install DESTDIR=$(CURDIR)/debian/tmp)
 	(rm -r `find $(CURDIR)/debian/tmp/ -name CVS`)
+
+# Install zexy
 
 	(cd zexy/src; $(MAKE) -f makefile.linux install DESTDIR=$(CURDIR)/debian/tmp \
 	                              INSTALL_PREFIX=/usr/ \
 				      PDLIBDIR=lib/pd )
-	ln -s zexy $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-zexy
+#	ln -s zexy $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-zexy
+
+# Install flext
+
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux install INSTDIR=$(CURDIR)/debian/tmp/usr/lib/pd/flext)
 
 # Install footils ... this is quite messy still, have to find a better solution
@@ -133,37 +139,22 @@ install: build
 	(make -C footils/fluid -k  $(FOOINSTALL) install)
 	(make -C footils/shabby -k  $(FOOINSTALL) install)
 	(make -C footils/syncgrain -k  $(FOOINSTALL) install)
-	install -m 644 footils/fluid/pd/fluid.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-fluid.pd
-	install -m 644 footils/shabby/shaffy~-help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shaffy~.pd
-	install -m 644 footils/shabby/shabby~.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shabby~.pd
+	install -m 644 footils/fluid/pd/fluid.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/fluid-help.pd
+	install -m 644 footils/shabby/shaffy~-help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
+	install -m 644 footils/shabby/shabby~.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 	-rm $(CURDIR)/debian/tmp/usr/lib/pd/extra/fiiwu*
 
-
-	# Install OSC
+# Install OSC
 
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
-	install -m 644 OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
+	install -m 644 OSCx/doc/*help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
-	# Install cyclone
+# Install cyclone
 
 	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
 	install $(CURDIR)/miXed/bin/*.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone/
 	mkdirhier $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
-
-
-	# Clean up make references
-
-	(cd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference; \
-	 for i in *.pd; do\
-	     if [ "$$i" = "$${i#help-*}" ]; then\
-	        mv $$i help-$$i;\
-	     fi;\
-	 done)
-
-	# A good thought to move references to their right place, but finally, 
-	# this doesn't work, so move abstractions that are used by references
-	# back to their right place  ... damn.
 
 
 # Build architecture-independent files here.
