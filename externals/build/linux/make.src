@@ -59,7 +59,6 @@ gauss.c
 gcanvas.c
 gestalt.c
 getenv.c
-henon.c
 hex2dec.c
 highpass.c
 highshelf.c
@@ -69,7 +68,6 @@ ibfft~.c
 idwt~.c
 ifeel.c
 ignore.c
-ikeda.c
 image.c
 inv.c
 iso.c
@@ -87,7 +85,6 @@ linuxjoystick.c
 linuxmouse.c
 listfunnel.c
 ln~.c
-lorenz.c
 lowpass.c
 lowshelf.c
 mandelbrot.c
@@ -155,7 +152,6 @@ rhythm_ioi_histogram.c
 rhythm_quantum.c
 rhythm_slave_metro.c
 rl.c
-rossler.c
 rtin~.c
 scale.c
 score.c
