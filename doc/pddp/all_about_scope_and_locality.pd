@@ -1,10 +1,10 @@
-#N canvas 144 2 604 484 12;
+#N canvas 129 2 606 486 12;
 #X text 19 14 WHAT IS THIS ALL ABOUT?;
 #X text 31 40 Depending on the complexity of your patches \, you may
 need to control whether or not messages will be used by only ONE patch
 \, or throughout all open patches. The scope of a message is considered
 either 'local' or 'global'.;
-#N canvas 146 223 600 383 GLOBAL_SCOPE 0;
+#N canvas 146 223 606 389 GLOBAL_SCOPE 0;
 #N canvas 0 0 254 169 example_a 0;
 #X obj 18 9 r foo;
 #X floatatom 18 34 5 0 0 0 - - -;
@@ -55,50 +55,58 @@ only have to be active.;
 #X connect 7 0 10 0;
 #X connect 8 0 11 0;
 #X connect 9 0 12 0;
-#X restore 21 146 pd GLOBAL_SCOPE;
-#N canvas 146 94 608 553 LOCAL_SCOPE 0;
-#X text 3 16 LOCAL SCOPE -send and receive messages within a SINGLE
+#X restore 21 137 pd GLOBAL_SCOPE;
+#N canvas 146 2 618 662 LOCAL_SCOPE 0;
+#X text 4 9 LOCAL SCOPE -send and receive messages within a SINGLE
 PATCH;
-#X text 13 44 There are many cases where you may want messages to be
+#X text 13 37 There are many cases where you may want messages to be
 sent within a single patch. For example \, you might have designed
 many modules with a receive object called [r number] but you want that
 'number' to be passed to only the objects within a single module so
 that they don't effect the performance of the other modules.;
-#X text 12 151 In these cases \, you should use "local variables" to
-name your send and receive objects. Local variables are assigned using
-dollar signs and numbers. There is more documentation about this in
-2.control.examples/locality.pd;
-#X obj 87 240 r \$1;
-#X obj 21 263 s \$1;
-#X floatatom 21 239 5 0 0 0 - - -;
-#X floatatom 87 266 5 0 0 0 - - -;
-#X floatatom 192 242 5 0 0 0 - - -;
-#X floatatom 281 268 5 0 0 0 - - -;
-#X obj 281 242 r \$1-foo;
-#X obj 192 266 s \$1-foo;
-#X floatatom 370 242 5 0 0 0 - - -;
-#X floatatom 459 268 5 0 0 0 - - -;
-#X text 23 298 In the examples above I have used a variable ($1) to
-name these [send] and [receive] objects. The value of this variable
-is assigned either by PD (randomly for each abstraction or patch) \,
-or by me with the use of arguments. Notice in the 'title' of this patch
-\, you should see:;
-#X text 22 392 LOCAL_SCOPE (and inheritance);
-#X obj 459 242 r \$2-dave;
-#X obj 370 266 s \$2-dave;
-#X text 21 420 The words "and" and "inheritance" are arguments that
+#X obj 84 222 r \$1;
+#X obj 18 245 s \$1;
+#X floatatom 18 221 5 0 0 0 - - -;
+#X floatatom 84 248 5 0 0 0 - - -;
+#X floatatom 189 224 5 0 0 0 - - -;
+#X floatatom 278 250 5 0 0 0 - - -;
+#X obj 278 224 r \$1-foo;
+#X obj 189 248 s \$1-foo;
+#X floatatom 367 224 5 0 0 0 - - -;
+#X floatatom 456 250 5 0 0 0 - - -;
+#X text 62 513 LOCAL_SCOPE (and inheritance);
+#X obj 456 224 r \$2-dave;
+#X obj 367 248 s \$2-dave;
+#X text 14 541 The words "and" and "inheritance" are arguments that
 I used when I created the abstraction called "all_about_scope_and_locality".
 These two agruments are now available in this patch by using \$1 or
 \$2 variables. There's more information about this in the section called
 'Inheritance'.;
-#X connect 3 0 6 0;
-#X connect 5 0 4 0;
-#X connect 7 0 10 0;
-#X connect 9 0 8 0;
-#X connect 11 0 16 0;
-#X connect 15 0 12 0;
-#X restore 21 175 pd LOCAL_SCOPE;
-#N canvas 145 31 602 607 INHERITANCE 0;
+#X text 13 267 In the examples above I have used a variable ($1) to
+name these [send] and [receive] objects. The value of this variable
+is assigned either by PD (randomly for each abstraction or patch) \,
+or by me with the use of arguments.;
+#X text 11 335 If you would like PD to assign the value of your local
+variable at random \, use \$0. This will ensure that your local variables
+will always be 'local' and won't ever correspond with variables in
+other open patches or abstractions.;
+#X text 12 138 In these cases \, you should use "local variables" ...as
+in [r \$0-number] to name your send and receive objects. Local variables
+are assigned using dollar signs and numbers. There is more documentation
+about this in 2.control.examples/locality.pd;
+#X text 13 424 If you want to define the value of the local variables
+\, you can use 'arguments' when you create the abstraction and then
+refer to those arguments by using \$1 (for the first agrument) or \$2
+(for the second) and so on. Notice in the 'title' of this patch \,
+you should see:;
+#X connect 2 0 5 0;
+#X connect 4 0 3 0;
+#X connect 6 0 9 0;
+#X connect 8 0 7 0;
+#X connect 10 0 14 0;
+#X connect 13 0 11 0;
+#X restore 21 166 pd LOCAL_SCOPE;
+#N canvas 145 31 610 615 INHERITANCE 0;
 #X text 20 18 The word "Inherit" means to "receive a characteristic
 from one's parent".;
 #X text 19 59 In PD \, all abstracions and subpatches have 'parents'
@@ -149,4 +157,14 @@ or "inheritance-foo".;
 #X connect 15 0 18 0;
 #X connect 16 0 20 0;
 #X connect 19 0 17 0;
-#X restore 21 206 pd INHERITANCE;
+#X restore 21 197 pd INHERITANCE;
+#X text 26 265 From section 2.6.5 of the PD manual \, Miller Puckette
+says:;
+#X text 49 296 "Note that the expansion of variables such as \$0 and
+\$1 only works at the beginning of the symbol. So \, for instance \,
+[rats-$1] will not be expanded. Occasionally you may want to have double
+or triple sustitutions. This can be done one stage at a time by nesting
+abstractions (with each subpatch adding its own $-variable to the begining
+of a symbol and passing that on as agrument to a further abstraction."
+;
+#X text 17 241 MILLER'S WISDOM;
