@@ -1,0 +1,6 @@
+# all the source files from the package
+SRCS= \
+        main.cpp tbroute.cpp tbstrg.cpp tbsig~.cpp tbsroute~.cpp tbpow~.cpp
+              
+#HDRS= \
+	main.h 
