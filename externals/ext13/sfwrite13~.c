@@ -3,7 +3,6 @@
 
  
 #include "m_pd.h"
-#include "g_canvas.h"
 
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -54,7 +53,6 @@ typedef struct _sfwrite13
      t_int rec;
      t_int x_channels;
      uint32  size;
-     t_glist * x_glist;
      t_int x_blocked;
      t_int x_blockwarn;
 } t_sfwrite13;
@@ -157,7 +155,7 @@ static void sfwrite13_open(t_sfwrite13 *x,t_symbol *filename)
 	  return;
      }
 
-     canvas_makefilename(glist_getcanvas(x->x_glist), filename->s_name,
+     canvas_makefilename(canvas_getcurrent(), filename->s_name,
 			 fname, MAXPDSTRING);
 
      x->x_blocked = 0;
@@ -269,7 +267,6 @@ static void *sfwrite13_new(t_floatarg chan)
 
     if (c<1 || c > MAX_CHANS) c = 1;
 
-    x->x_glist = (t_glist*) canvas_getcurrent();
     x->x_channels = c--;
     x->x_file=0;
     x->rec = 0;
