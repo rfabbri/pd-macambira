@@ -1,4 +1,4 @@
-#N canvas 154 46 570 623 10;
+#N canvas 560 58 570 624 10;
 #X floatatom 234 320 5 0 0 3 code - -;
 #X floatatom 298 320 5 0 0 3 value - -;
 #X floatatom 170 320 4 0 0 3 type - -;
@@ -167,7 +167,7 @@
 #X text 138 476 BTN_BASE6;
 #X text 245 463 298;
 #X text 245 477 299;
-#X restore 125 564 pd Event_Codes;
+#X restore 132 556 pd Event_Codes;
 #N canvas 50 289 469 317 Event_Types 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
@@ -210,22 +210,22 @@
 #X text 331 255 22;
 #X text 230 255 EV_PWR;
 #X text 61 255 Power Events (for UPS);
-#X restore 125 544 pd Event_Types;
+#X restore 132 536 pd Event_Types;
 #N canvas 0 22 450 300 Event_Values 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
 #X obj 11 9 cnv 15 400 30 empty empty Event_Values 20 12 1 14 -261681
 -66577 0;
-#X restore 125 584 pd Event_Values;
+#X restore 132 576 pd Event_Values;
 #X text 1 367 Check the Pd console for supported event types and codes.
 This object will report them when it opens a device.;
-#X obj 2 2 cnv 15 550 30 empty empty linuxevent 20 12 1 16 -228992
+#X obj 2 2 cnv 15 550 25 empty empty [linuxevent] 20 12 1 16 -228992
 -66577 0;
 #X text 10 44 [linuxevent] outputs raw events from the Linux Event
 system. It is used for access the output of various Human Interface
 Devices \, like mice \, joysticks \, tablets \, etc.;
-#X text 260 547 related HID objects:;
-#X obj 411 546 linuxhid;
+#X text 267 539 related HID objects:;
+#X obj 418 538 linuxhid;
 #X text 26 105 bang to get an update when polling is stopped.;
 #X msg 229 195 poll;
 #X msg 229 217 nopoll;
@@ -244,9 +244,11 @@ Devices \, like mice \, joysticks \, tablets \, etc.;
 #X floatatom 220 493 3 0 0 3 hat-Y - -;
 #X floatatom 124 493 5 0 0 3 twist - -;
 #X floatatom 263 492 5 0 0 3 throttle - -;
-#X obj 411 575 all_about_hid;
-#X text 302 574 for more info:;
-#X text 6 562 detailed info:;
+#X obj 418 567 all_about_hid;
+#X text 309 566 for more info:;
+#X text 13 554 detailed info:;
+#X text 14 605 by Hans-Christoph Steiner <hans@at.or.at>;
+#X text 379 604 updated for Pd 0.38test4;
 #X connect 4 0 6 0;
 #X connect 5 0 6 0;
 #X connect 6 0 3 0;
