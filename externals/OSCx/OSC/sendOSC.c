@@ -50,7 +50,7 @@ University of California, Berkeley.
 
 //#define VERSION "http://cnmat.berkeley.edu/OpenSoundControl/sendOSC-0.1.html"
 #define MAX_ARGS 2000
-#define SC_BUFFER_SIZE 32000
+#define SC_BUFFER_SIZE 64000
 
 /*
 compiling:
@@ -261,7 +261,7 @@ void sendOSC_senduntyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 
 static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
-  char* targv[MAXPDARG];
+  char* targv[MAX_ARGS];
   char tmparg[MAXPDSTRING];
   char* tmp = tmparg;
   int c;

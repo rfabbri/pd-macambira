@@ -1,6 +1,6 @@
 ###############################
 # change these
-IFLAGS = -I. -I../../pd-0.34-4/src
+IFLAGS = -I. -I../../../src/pd-0.35-0/src
 INSTALL_PREFIX=/usr
 
 # should be oke below ..
@@ -14,8 +14,8 @@ AFLAGS =
 LFLAGS = -export_dynamic  -shared
 WFLAGS =
 
-# DEBUG = -DDEBUG -g
-DEBUG = 
+DEBUG = -DDEBUG -g
+# DEBUG = 
 
 VERSION = \"$(shell cat VERSION)\"
 
