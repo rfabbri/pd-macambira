@@ -545,14 +545,14 @@ static t_int *scratcher_perform(t_int *w)
            }
         }
         // set outputs
-        // if ( x->x_play) {
+        if ( x->x_play) {
             *out = *(x->x_sdata+(int)x->x_readpos);
             x->x_readpos+=x->x_readspeed;
             if ( x->x_readpos < 0 ) x->x_readpos = x->x_size-1;
             if ( x->x_readpos >= x->x_size ) x->x_readpos = 0;
-        // } else {
-        //     *out=0.0;
-        // }
+        } else {
+            *out=0.0;
+        }
 
         in++;out++;
     }
