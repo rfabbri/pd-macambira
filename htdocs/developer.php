@@ -72,7 +72,7 @@ For example check out the abstractions with:
 or Pd with 
 
 <pre>
-% cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co pd
+% cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co pd
 </pre>
 <p>
 To check out the current developers' branch, which is tagged with &quot;devel_0_37&quot;, use 
