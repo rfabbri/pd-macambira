@@ -51,7 +51,8 @@ link.stamp:
 
 
 EXTERNALS_VERSION = $(shell date +20%y.%m.%d)
-PACKAGE_NAME = pd-externals-$(EXTERNALS_VERSION)
+PACKAGE_PREFIX = pd-externals
+PACKAGE_NAME = $(PACKAGE_PREFIX)-$(EXTERNALS_VERSION)
 
 darwin_pkg_license:
   # generate HTML version of License
@@ -63,8 +64,8 @@ darwin_pkg_welcome:
 # generate Welcome.html from ../README.txt
 
 darwin_pkg_clean:
-	-sudo rm -Rf installroot/ pd-externals*.pkg/
-	-rm -f pd-externals-*.info 1 License.html Welcome.???*
+	-sudo rm -Rf installroot/ $(PACKAGE_PREFIX)*.pkg/
+	-rm -f $(PACKAGE_PREFIX)-*.info 1 License.html Welcome.???*
 
 # install into MSP's default: /usr/local/lib
 
