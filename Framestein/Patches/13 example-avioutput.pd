@@ -1,4 +1,4 @@
-#N canvas 252 23 721 631 12;
+#N canvas 252 23 723 633 12;
 #X obj 13 39 fs.main;
 #X msg 13 12 6001;
 #X msg 64 13 reset;
@@ -23,14 +23,16 @@
 #X msg 349 318 write;
 #X text 400 318 apply compression and finish;
 #X text 482 50 start writing!;
-#X text 158 481 Bang fs.frame to fs.avi to save one frame of video
-;
-#X text 158 508 Finish it off with "write [filename.avi]";
+#X text 90 440 Bang fs.frame to fs.avi to save one frame of video;
+#X text 90 467 Finish it off with "write [filename.avi]";
 #X msg 434 220 xbend \$1;
 #X floatatom 507 220 5 0 0;
 #X msg 507 195 75;
 #X msg 550 103 0;
 #X text 584 102 stop;
+#X text 90 518 WARNING: This feature is currently UNSTABLE. I recommend
+using the "save" feature of fs.frame to ensure your work won't be lost.
+;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;

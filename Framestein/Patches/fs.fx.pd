@@ -1,4 +1,4 @@
-#N canvas 275 32 645 476 12;
+#N canvas 275 32 647 478 12;
 #X obj 22 171 outlet;
 #X obj 22 138 inlet;
 #X text 114 91 - effects:;
@@ -15,7 +15,7 @@
 ;
 #X text 130 190 "smooth_1" and "smooth_0" sets smoothing on/off for
 rotate and rotozoom (default is on).;
+#X text 10 6 Yeah \, quite an abstraction!;
 #X text 9 34 (you can send these commands directly to fs.frame \, but
 using fs.fx might make your patches more clear);
-#X text 10 6 Yeah \, quite an abstraction!;
 #X connect 1 0 0 0;

@@ -1,8 +1,8 @@
-#N canvas 190 88 658 327 12;
+#N canvas 190 88 660 329 12;
 #X text 25 18 PixelPack :: examples and help;
 #X text 130 47 PixelPack contains several objects that would just overcrowd
 a single helpfile. thus I've splitted them into a few categories:;
 #X text 250 135 note: uses fs.layermode.pd perform the effects;
 #X text 130 116 layer modes :: example-PixelPack-layermodes.pd;
-#X text 31 244 PixelPack can be found at: http://www.akustische-kunst.de/puredata/framestein
+#X text 31 244 PixelPack can be found at: http://www.akustische-kunst.org/puredata/framestein
 ;

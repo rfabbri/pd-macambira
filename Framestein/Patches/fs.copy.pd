@@ -1,4 +1,4 @@
-#N canvas 205 60 932 444 12;
+#N canvas 52 54 934 446 12;
 #X obj 173 21 loadbang;
 #X obj 208 271 fs_sender;
 #X msg 173 204 copy \$1;

@@ -1,4 +1,4 @@
-#N canvas 248 12 718 586 12;
+#N canvas 248 12 720 588 12;
 #X obj 13 33 fs.main;
 #X msg 13 6 6001;
 #X msg 64 5 reset;
@@ -8,15 +8,15 @@
 #X obj 284 263 fs.frame;
 #X msg 284 233 head.avi;
 #X obj 284 203 init;
-#X msg 62 170 dock example-docking;
 #X text 63 320 There's a wrapper for the dock-command \, fs.framed.pd:
 ;
 #X obj 65 348 fs.framed example-docking 50+420;
 #X msg 62 203 500+150;
+#X msg 62 170 dock ample-docki;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;
 #X connect 6 0 5 0;
 #X connect 7 0 6 0;
-#X connect 8 0 5 0;
+#X connect 10 0 5 0;
 #X connect 11 0 5 0;

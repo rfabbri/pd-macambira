@@ -1,39 +1,75 @@
-#N canvas 19 -3 1010 686 12;
-#X msg 444 119 frame \$1;
-#X obj 276 355 fs_sender;
-#X obj 76 25 inlet;
-#X obj 76 145 symbol;
-#X obj 151 126 route fs_op;
-#X obj 151 168 pack s s s;
-#X obj 76 192 outlet;
-#X obj 276 193 l2s;
-#X obj 276 226 pack s s;
-#X msg 276 259 \$2 \$1;
-#X text 468 227 "next" "prev" "random" "seek <number>" to show frames
+#N canvas 44 16 905 629 12;
+#X text 346 170 "next" "prev" "random" "seek <number>" to show frames
 in video or buffered images.;
-#X text 469 264 "clear" to flush buffered images.;
-#X text 468 300 "flip_auto" "flip_manual" "flip" controls how the display
+#X text 347 211 "clear" to flush buffered images.;
+#X text 347 237 "flip_auto" "flip_manual" "flip" controls how the display
 should reflect changes in the image.;
-#X text 468 343 "320x240" to set image size "100+100" to set frame
+#X text 348 282 "320x240" to set image size "100+100" to set frame
 position "display 600x450" to set display size;
-#X text 469 382 "borders_0" "borders_1" "stayontop_0"/1 "mute_0"/1
+#X text 348 329 "borders_0" "borders_1" "stayontop_0"/1 "mute_0"/1
 \, also right-click the image for display options.;
-#X text 450 149 inlet accepts:;
-#X obj 444 91 symbol;
-#X text 469 428 "save <directory> <"bmp" or number for jpeg quality>"
+#X text 327 59 inlet accepts:;
+#X text 348 371 "save <directory> <"bmp" or number for jpeg quality>"
 save image in directory under name fs000001 \, fs000002 ...;
-#X text 467 470 "plugin_name" (see example-plugins.pd);
-#X text 471 494 mousetrack_1 and mousetrack_0 to report mouse x \,
+#X text 347 420 "plugin_name" (see example-plugins.pd);
+#X text 350 453 mousetrack_1 and mousetrack_0 to report mouse x \,
 y thru second outlet;
-#X msg 19 295 bang;
-#X text 27 244 drag&drop will bang;
-#X obj 275 482 outlet;
-#X text 471 530 mouserect_1 and mouserect_0 to report dragged rectangle
+#X obj 128 127 outlet;
+#X text 350 492 mouserect_1 and mouserect_0 to report dragged rectangle
 ;
-#X obj 444 24 reset;
-#X obj 76 55 route bang float;
-#X msg 137 98 vf2fs \$1;
-#N canvas 0 0 646 581 report 0;
+#X obj 195 127 outlet;
+#X text 346 106 "buffer <filename(.bmp .jpg)>" to load to memory;
+#X text 346 81 filename to load and display (.avi .bmp .jpg);
+#X text 346 124 "buffer <directory>" to load all images in dir;
+#N canvas 216 35 557 597 guts 0;
+#X msg 405 180 frame \$1;
+#X obj 296 388 fs_sender;
+#X obj 96 45 inlet;
+#X obj 96 409 symbol;
+#X obj 171 159 route fs_op;
+#X obj 171 201 pack s s s;
+#X obj 96 456 outlet;
+#X obj 296 226 l2s;
+#X obj 296 259 pack s s;
+#X msg 296 292 \$2 \$1;
+#X obj 405 152 symbol;
+#X msg 27 320 bang;
+#X text 35 269 drag&drop will bang;
+#X obj 405 85 reset;
+#X obj 96 88 route bang float;
+#X msg 157 131 vf2fs \$1;
+#X obj 405 115 symbol \$0F;
+#X obj 160 58 r \$0Finlet;
+#X obj 27 294 r \$0Fbang;
+#X text 65 496 If you wish to know what is going on \, right-click
+the Framestein-logo \, choose "Show debug" and watch the log while
+you load a patch.;
+#X connect 0 0 1 0;
+#X connect 2 0 14 0;
+#X connect 3 0 6 0;
+#X connect 4 0 5 0;
+#X connect 4 1 7 0;
+#X connect 5 0 1 0;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;
+#X connect 9 0 1 0;
+#X connect 10 0 0 0;
+#X connect 11 0 3 0;
+#X connect 13 0 16 0;
+#X connect 14 0 3 0;
+#X connect 14 1 15 0;
+#X connect 14 2 4 0;
+#X connect 15 0 4 0;
+#X connect 16 0 3 1;
+#X connect 16 0 5 2;
+#X connect 16 0 8 1;
+#X connect 16 0 10 0;
+#X connect 17 0 14 0;
+#X connect 18 0 11 0;
+#X restore 56 92 pd guts;
+#X obj 56 59 inlet;
+#X obj 56 127 outlet;
+#N canvas 0 0 646 581 events 0;
 #X obj 54 94 pack f f;
 #X obj 88 248 pack f f f f;
 #X text 58 17 report mouse x \, y;
@@ -97,41 +133,14 @@ y thru second outlet;
 #X connect 33 0 34 0;
 #X connect 34 0 32 1;
 #X connect 36 0 31 0;
-#X restore 275 440 pd report;
-#X obj 444 54 symbol \$0F;
-#X obj 140 25 r \$0Finlet;
-#X obj 19 269 r \$0Fbang;
-#X obj 327 482 outlet;
-#X text 472 575 minimize \, maximize \, bringtofront;
-#X text 471 553 bufferize will copy the current image to image buffer
+#X restore 128 92 pd events;
+#X text 346 142 "use <directory>" - like buffer \, but without preloading
 ;
-#X text 471 600 hidecursor_1 \, hidecursor_0;
-#X text 470 622 use "directory" - like buffer \, without buffering
-(load on demand);
-#X text 468 190 "buffer <filename(.bmp .jpg)>" to load to memory;
-#X text 469 171 filename to load and display (.avi .bmp .jpg);
-#X text 468 208 "buffer <directory>" to load all images in dir;
-#X connect 0 0 1 0;
-#X connect 2 0 25 0;
-#X connect 3 0 6 0;
-#X connect 4 0 5 0;
-#X connect 4 1 7 0;
-#X connect 5 0 1 0;
-#X connect 7 0 8 0;
-#X connect 8 0 9 0;
-#X connect 9 0 1 0;
-#X connect 16 0 0 0;
-#X connect 20 0 3 0;
-#X connect 24 0 28 0;
-#X connect 25 0 3 0;
-#X connect 25 1 26 0;
-#X connect 25 2 4 0;
-#X connect 26 0 4 0;
-#X connect 27 0 22 0;
-#X connect 27 1 31 0;
-#X connect 28 0 3 1;
-#X connect 28 0 5 2;
-#X connect 28 0 8 1;
-#X connect 28 0 16 0;
-#X connect 29 0 25 0;
-#X connect 30 0 20 0;
+#X text 349 519 "bufferize" will copy the current image to image buffer
+;
+#X text 351 544 minimize \, maximize \, bringtofront \, hidecursor_1
+\, hidecursor_0;
+#X connect 15 0 17 0;
+#X connect 16 0 15 0;
+#X connect 18 0 9 0;
+#X connect 18 1 11 0;

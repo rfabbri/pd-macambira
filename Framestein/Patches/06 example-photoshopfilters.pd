@@ -1,4 +1,4 @@
-#N canvas 76 11 897 646 12;
+#N canvas 76 11 899 648 12;
 #X obj 16 54 fs.main;
 #X msg 16 27 6001;
 #X msg 58 27 reset;
@@ -26,13 +26,13 @@
 #X obj 519 438 pack s s;
 #X msg 519 464 \$2 \$1;
 #X obj 652 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 8000 1;
+-1 -1 8600 1;
 #X obj 669 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 7500 1;
+-1 -1 12200 1;
 #X obj 686 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 0 1;
 #X obj 703 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 12700 1;
+-1 -1 0 1;
 #X obj 720 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 0 1;
 #X obj 737 355 vsl 15 128 0 255 0 0 empty empty empty 0 -8 0 8 -262144
@@ -48,12 +48,12 @@
 #X msg 530 128 yage;
 #X msg 530 192 yage 74 74;
 #X text 634 191 with parameters \, no dialog;
-#X obj 652 562 delay 50;
 #X msg 652 536 bang;
 #X obj 364 95 r next;
 #X obj 327 476 s next;
 #X text 529 281 select filter -> try the sliders ...;
 #X text 448 33 Using Photoshop-filters;
+#X obj 652 562 delay 25;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;
@@ -69,33 +69,33 @@
 #X connect 9 0 37 0;
 #X connect 10 0 5 1;
 #X connect 10 0 37 0;
-#X connect 10 0 44 0;
+#X connect 10 0 43 0;
 #X connect 11 0 7 0;
 #X connect 12 0 5 1;
 #X connect 12 0 37 0;
-#X connect 12 0 44 0;
+#X connect 12 0 43 0;
 #X connect 13 0 5 1;
 #X connect 13 0 37 0;
-#X connect 13 0 44 0;
+#X connect 13 0 43 0;
 #X connect 14 0 5 1;
 #X connect 14 0 37 0;
-#X connect 14 0 44 0;
+#X connect 14 0 43 0;
 #X connect 18 0 7 0;
 #X connect 19 0 5 1;
 #X connect 19 0 37 0;
-#X connect 19 0 44 0;
+#X connect 19 0 43 0;
 #X connect 20 0 5 1;
 #X connect 20 0 37 0;
-#X connect 20 0 44 0;
+#X connect 20 0 43 0;
 #X connect 21 0 5 1;
 #X connect 21 0 37 0;
-#X connect 21 0 44 0;
+#X connect 21 0 43 0;
 #X connect 22 0 5 1;
 #X connect 22 0 37 0;
-#X connect 22 0 44 0;
+#X connect 22 0 43 0;
 #X connect 23 0 5 1;
 #X connect 23 0 37 0;
-#X connect 23 0 44 0;
+#X connect 23 0 43 0;
 #X connect 24 0 25 0;
 #X connect 25 0 5 1;
 #X connect 26 0 36 0;
@@ -115,13 +115,13 @@
 #X connect 33 0 36 7;
 #X connect 34 0 36 0;
 #X connect 35 0 24 0;
-#X connect 35 0 42 0;
+#X connect 35 0 41 0;
 #X connect 36 0 35 0;
 #X connect 37 0 24 1;
 #X connect 38 0 5 1;
 #X connect 38 0 11 0;
 #X connect 39 0 5 1;
 #X connect 39 0 11 0;
-#X connect 41 0 44 0;
-#X connect 42 0 41 0;
-#X connect 43 0 11 0;
+#X connect 41 0 46 0;
+#X connect 42 0 11 0;
+#X connect 46 0 43 0;

@@ -1,17 +1,17 @@
-#N canvas 323 36 587 428 12;
+#N canvas 323 36 589 430 12;
 #X obj 15 37 fs.main;
 #X msg 66 12 reset;
 #X obj 38 185 fs.framed draganddrop;
-#X msg 201 212 352 + 233;
+#X msg 210 185 352 + 233;
 #X obj 38 244 fs.event;
 #X msg 50 288 set \$1;
-#X obj 92 150 init;
+#X obj 134 146 init;
 #X obj 48 151 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X text 18 95 Using fs.frame to provide drag & drop:;
 #X text 352 180 Drop a file here:;
 #X msg 15 12 6001;
-#X msg 67 329;
+#X msg 50 387 G:/fsrel!;
 #X connect 1 0 0 1;
 #X connect 2 0 4 0;
 #X connect 2 2 3 0;
