@@ -12,7 +12,7 @@
 #X msg 288 265 stop;
 #X msg 365 267 rate \$1;
 #X msg 455 264 pan \$1;
-#X obj 260 66 from_sc~;
+#X obj 260 66 k_jack~ supercollider;
 #X obj 71 325 pyext supertest supertest;
 #X text 15 15 Play a soundfile on the supercollider server.;
 #X text 333 67 <- We get the supercollider sound here.;
