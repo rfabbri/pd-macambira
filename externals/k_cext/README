@@ -161,6 +161,10 @@ MACROS / USING THE PD OBJECT AS A TEXT-EDITOR
 		writing ". " instead. The k_cext external removes all
 		". "'s at the beginning of lines before compiling the code.
 
+	strings -
+		It does not seem to be possible to write "'s anymore in PD.
+		The workaround is to define strings like this: s<thisisastring>s
+
 
 	More macros are defined in the k_cext.h header file.
 
@@ -183,16 +187,25 @@ FAQ
 	   compile the .dll file yourself, if you know how to use the k_cext
 	   external. So you have to make it yourself.
 
+	Q: k_func does not work with Visual C.
+	A: Visual C does not have a varargs macro. Send complains to Microsoft.
+
+
 
 CHANGES
 	0.3.0 -> 0.3.1:
 	-Works with VisualC. (0.3.0 didn't):
 	  -Workaround for missing variable number of argument macros in VisualC, (which is not a gcc
-	   extension, by the way, but a part of the iso99 c-standard).
+	   extension, by the way, but a part of the iso99 c-standard). (Does not work)
 	  -Workaround for missing stdbool.h file in VisualC. (also a part of the iso99 c-standard)
-	   (code by Thomas Grill)
+	   (Thomas Grill)
 	  -Workaround for missing static <something> <something>[] in VisualC.
 	  -Fixed a variable which was not defined at the beginning of the function. (Thomas Grill)
+	  -Added macros to bang outlet and to access values (Tim Blechman)
+	  -Support for $0 values. (Tim Blechmann)
+	  -Some changes to k_cext to link with functions defined in k_cext, which wasn't possible
+           before. (for Windows). (Tim Blechmann)
+	  -Added code to make it possible to use strings again. See help-strings.pd.
 
 	0.2.5 -> 0.3.0:
 	-Added the k_cfunc object. k_cfunc is very similar to k_cext, but instead of being triggered
