@@ -1,0 +1,6 @@
+
+- figure out why MinGW-compiled "unauthorized" externals don't work
+
+- get Windows Makefiles for cyclone, toxy, zexy, Gem, unauthorized
+
+

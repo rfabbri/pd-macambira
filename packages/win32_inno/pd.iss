@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=Pure Data
-AppVerName=Pure Data 0.37
+AppVerName=Pure Data 0.37.1
 AppPublisher=pure-data.org
 AppPublisherURL=http://www.pure-data.org
 AppSupportURL=http://www.pure-data.org/community/lists/
@@ -14,7 +14,7 @@ LicenseFile=..\..\pd\LICENSE.txt
 
 Compression=zip/9
 ChangesAssociations=true
-OutputBaseFilename=PureData-0.37
+OutputBaseFilename=PureData-0.37.1
 [Tasks]
 ; NOTE: The following entry contains English phrases ("Create a desktop icon" and "Additional icons"). You are free to translate them into another language if required.
 Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:
@@ -90,6 +90,7 @@ Source: pd-novideo.bat; DestDir: {app}
 ;-----------------------------------------------------------------------------
 ; externals
 Source: ..\..\externals\build\win\*.dll; DestDir: {app}\extra
+;Source: ..\..\externals\unauthorized\bin\*.dll; DestDir: {app}\extra
 ; help patches
 Source: ..\..\externals\maxlib\help\*.*; DestDir: {app}\doc\5.reference\help-maxlib; Flags: ignoreversion
 Source: ..\..\externals\zexy\examples\*.*; DestDir: {app}\doc\5.reference\help-zexy; Flags: ignoreversion
@@ -135,15 +136,15 @@ Source: ..\..\Gem\manual\index.html; DestDir: {app}\doc\gem\00.manual
 Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://www.pure-data.org
 
 [Icons]
-Name: {group}\Pure Data; Filename: {app}\pd.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0
+Name: {group}\Pure Data; Filename: {app}\pd.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
 ; NOTE: The following entry contains an English phrase ("on the Web"). You are free to translate it into another language if required.
 Name: {group}\pure-data.org; Filename: {app}\pd.url
 ; NOTE: The following entry contains an English phrase ("Uninstall"). You are free to translate it into another language if required.
 Name: {group}\Uninstall Pure Data; Filename: {uninstallexe}
-Name: {userdesktop}\Pure Data; Filename: {app}\pd.bat; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon
+Name: {userdesktop}\Pure Data; Filename: {app}\pd.bat; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\pd.bat; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
 
-Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon
+Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon; WorkingDir: {app}
 Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
 Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
 Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
@@ -163,9 +164,10 @@ Root: HKCR; SubKey: Pure.Data; ValueType: dword; ValueName: BrowserFlags; ValueD
 Root: HKCR; SubKey: Pure.Data; ValueType: string; ValueData: Pure Data; Flags: uninsdeletekey noerror
 Root: HKCR; SubKey: Pure.Data\DefaultIcon; ValueType: string; ValueData: {app}\lib\pdpatch.ico,0; Flags: createvalueifdoesntexist noerror
 Root: HKCR; SubKey: Pure.Data\shell; ValueType: string; ValueData: open; Flags: noerror uninsdeletekey
-Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: """{app}\pd.bat"" ""%1"""; Flags: uninsdeletekey noerror
+Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: """{app}\bin\pd.exe"" -lib cyclone -lib Gem -lib iemlib1 -lib iem_t3_lib -lib iem_mp3 -lib mjLib -lib OSC -lib percolate -lib vasp -lib xeq -lib xsample -lib zexy -listdev ""%1"""; Flags: uninsdeletekey noerror
 Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror uninsdeletekey
 Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey
 
 [_ISTool]
 Use7zip=false
+OutputExeFilename=C:\Documents and Settings\hans\CVS\pure-data\packages\win32_inno\Output\PureData-0.37.1.exe
