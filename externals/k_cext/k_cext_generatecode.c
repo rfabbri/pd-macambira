@@ -18,17 +18,20 @@
  */
 
 
-static bool has_intfunc(char *string){
-  if(strstr(string,"INT_(")) return false;
-  if(strstr(string,"INT_")) return true;
-  return false;
+static char *has_intfunc(char *string){
+  char *s=strstr(string,"INT_");
+  if(s==NULL) return NULL;
+  if(s[4]=='(') return has_intfunc(s+4);
+  return s;
 }
 
-static bool has_floatfunc(char *string){
-  if(strstr(string,"FLOAT_(")) return false;
-  if(strstr(string,"FLOAT_")) return true;
-  return false;
+static char *has_floatfunc(char *string){
+  char *s=strstr(string,"FLOAT_");
+  if(s==NULL) return NULL;
+  if(s[4]=='(') return has_floatfunc(s+4);
+  return s;
 }
+
 
 static void k_cext_fixfuncs(struct k_cext_init *k,char *string){
   char newstring[500];
@@ -37,7 +40,7 @@ static void k_cext_fixfuncs(struct k_cext_init *k,char *string){
 
   if(has_intfunc(newstring)){
     char name[500]={0};
-    char *f_intstart=strstr(newstring,"INT_");
+    char *f_intstart=has_intfunc(newstring);
     char *f_namestart=f_intstart+4;
     char *f_nameend=strstr(f_namestart+1,"(");
     int lastarg=false;
@@ -69,7 +72,7 @@ static void k_cext_fixfuncs(struct k_cext_init *k,char *string){
   }else{
     if(has_floatfunc(newstring)){
       char name[500]={0};
-      char *f_floatstart=strstr(newstring,"FLOAT_");
+      char *f_floatstart=has_floatfunc(newstring);
       char *f_namestart=f_floatstart+6;
       char *f_nameend=strstr(f_namestart+1,"(");
       int lastarg=false;
@@ -210,7 +213,7 @@ static void k_cext_gen_mainfunccode(t_k_cext *x,int argc, t_atom* argv,int i, st
 	
       }else{
 	
-	if(strstr(string,"INT_") || strstr(string,"FLOAT_")){
+	if(has_intfunc(string) || has_floatfunc(string)){
 	  k_cext_fixfuncs(k,string);
 	}
 	
