@@ -28,7 +28,7 @@ static char *has_intfunc(char *string){
 static char *has_floatfunc(char *string){
   char *s=strstr(string,"FLOAT_");
   if(s==NULL) return NULL;
-  if(s[4]=='(') return has_floatfunc(s+4);
+  if(s[6]=='(') return has_floatfunc(s+6);
   return s;
 }
 
