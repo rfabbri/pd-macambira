@@ -1,4 +1,4 @@
-#N canvas 12 3 948 704 12;
+#N canvas 12 3 950 706 12;
 #X msg 296 105 set 1 2 3;
 #X obj 308 619 print K;
 #X msg 607 211 getall;
@@ -193,8 +193,8 @@ the folder containing the current patcher will be used.;
 #X obj 298 389 r \$0-pool;
 #X text 174 517 data is shared among pool objects with the same name
 ;
-#X obj 26 10 cnv 15 850 40 empty empty empty 10 22 0 24 -260818 -1
-0;
+#X obj 26 10 cnv 15 850 40 empty empty pool 10 22 0 24 -260818 -1 0
+;
 #X text 272 33 http://www.parasitaere-kapazitaeten.net;
 #X obj 456 541 print A;
 #X text 521 541 attributes;
