@@ -34,6 +34,7 @@ void counter_setup();
 void reson_setup();
 //void serialize_setup();
 void prepend_setup();
+void split_setup();
 void utime_setup();
 // RNG's
 void random1_setup();
@@ -77,6 +78,7 @@ void cxc_setup(void)
   reson_setup();
   //serialize_setup();
   prepend_setup();
+  split_setup();
   utime_setup();
   // RNG's
   random1_setup();

@@ -10,7 +10,7 @@ VERSION = \"$(shell cat VERSION)\"
 LIBOSC = 
 
 TARGETS = binshift ascwave ixprint bangfilt bangfilt2 \
-	counter reson prepend microtime ascseq \
+	counter reson prepend split microtime ascseq \
 	randomix ENV proc mean sigdelta cx
 
 # mean
@@ -18,7 +18,7 @@ TARGETS = binshift ascwave ixprint bangfilt bangfilt2 \
 
 LINUXOBJECTS = $(TARGETS:%=%.o)
 
-LINCLUDE = -I. -I../pd-0.35-0/src
+LINCLUDE = -I. -I../../pd/src
 # possible defines
 # -DPRINTADDRS
 DEBUG = -DDEBUG -ggdb

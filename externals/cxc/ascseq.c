@@ -44,7 +44,7 @@ static void ascseq_tick(t_ascseq *x)
   }
 }
 
-void ascseq_anything(t_ascseq *x,t_symbol* s,t_int argc,t_atom* argv)
+void ascseq_anything(t_ascseq *x, t_symbol* s, t_int argc, t_atom* argv)
 {
   int i = argc;
   int chr, cnt, len;
@@ -80,6 +80,12 @@ void ascseq_anything(t_ascseq *x,t_symbol* s,t_int argc,t_atom* argv)
 /*     chr = x->x_bla[cnt]; */
 /*     outlet_float(x->x_obj.ob_outlet, chr); */
 /*   } */
+}
+
+void ascseq_symbol(t_ascseq *x, t_symbol *s)
+{
+  t_atom* a;
+  ascseq_anything(x, s, 0, a);
 }
 
 void ascseq_float(t_ascseq *x, t_floatarg f)
@@ -141,4 +147,5 @@ void ascseq_setup(void)
   class_addanything(ascseq_class,ascseq_anything);
   class_addfloat(ascseq_class, ascseq_float);
   class_addmethod(ascseq_class, (t_method)ascseq_ft1, gensym("ft1"), A_FLOAT, 0);
+  class_addsymbol(ascseq_class, ascseq_symbol);
 }
