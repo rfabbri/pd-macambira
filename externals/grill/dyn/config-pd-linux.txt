@@ -8,10 +8,10 @@
 # your c++ compiler (define only if not g++)
 # CXX=
 
-# where are the PD header files?
-# leave it blank if it is a system directory (like /usr/local/include), 
-# 	since gcc 3.2 complains about it
-PDPATH=
+# where are the PD source files?
+# (the normal header file doesn't work as g_canvas.h is not there)
+# 
+PDPATH=/usr/src/pd-0.36-0/src
 
 # where do the flext libraries reside?
 FLEXTPATH=/usr/local/lib/pd/flext
