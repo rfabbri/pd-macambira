@@ -12,10 +12,12 @@ all: filelist.inc link.stamp $(EXTERNALS:.c=.dll)
 
 PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
 VC="C:\Program Files\Microsoft Visual Studio\Vc98"
+OGGPATH="C:\oggvorbis-win32sdk-1.0"
 SRCPATH=..\src
 PDPATH=..\..\..\pd
 
-PDNTINCLUDE = /I. /I.. /I..\..\..\pd\src /I$(VC)\include /I..\..\creb\include
+PDNTINCLUDE = /I. /I.. /I..\..\..\pd\src /I$(VC)\include \
+	/I..\..\creb\include /I$(OGGPATH)/include
 
 PDNTLDIR = $(VC)\lib
 PDNTLIB = $(PDNTLDIR)\libc.lib \
@@ -24,7 +26,11 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 	$(PDNTLDIR)\uuid.lib \
 	$(PDNTLDIR)\ws2_32.lib \
 	$(PDPATH)\bin\pthreadVC.lib \
-	$(PDPATH)\bin\pd.lib 
+	$(PDPATH)\bin\pd.lib \
+	$(OGGPATH)\lib\vorbis.lib \
+	$(OGGPATH)\lib\vorbisenc.lib \
+	$(OGGPATH)\lib\vorbisfile.lib \
+	$(OGGPATH)\lib\ogg.lib
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
