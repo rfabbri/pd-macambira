@@ -19,5 +19,8 @@ thanks to:
        Miller Puckette for PureData
        Thomas Grill    for Flext
 					three great pieces of software...
-       
+
+       thanks for bug reports:
+       Gerard (0001@ooo000ooo.org)
+              
 bugs, suggestions, complains to: TimBlechmann@gmx.de

@@ -58,7 +58,7 @@ void sc4pd_library_setup()
 	 "          ring2(~), ring3(~), ring4(~), difsqr(~), sumsqr(~), "
 	 "sqrdif(~),\n"
 	 "          sqrsum(~), absdif(~), LFSaw(~), LFPulse(~), Impulse(~),\n"
-	 "          Integrator(~), Decay~\n"
+	 "          Integrator(~), Decay~, Decay2~\n"
 	 );
 
     //initialize objects
@@ -194,6 +194,8 @@ void sc4pd_library_setup()
     FLEXT_SETUP(Integrator_kr);
 
     FLEXT_DSP_SETUP(Decay_ar); 
+
+    FLEXT_DSP_SETUP(Decay2_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

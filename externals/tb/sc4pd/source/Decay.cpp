@@ -37,6 +37,7 @@
 
 #include "sc4pd.hpp"
 
+/* todo: linear interpolation is broken */
 /* ------------------------ Decay~ -----------------------------*/
 
 class Decay_ar
@@ -67,7 +68,7 @@ Decay_ar::Decay_ar(int argc,t_atom * argv)
 
     AtomList Args(argc,argv);
 
-    m_b1 = sc_getfloatarg(Args,0);
+    decayTime = sc_getfloatarg(Args,0);
 
     AddOutSignal();
 
@@ -148,12 +149,12 @@ void Decay_ar::m_signal(int n, t_sample *const *in,
 void Decay_ar::m_set(float f)
 {
     decayTime = f;
-    m_b1= 0.f ? 0.f : exp(log001 / (decayTime * Samplerate()));
+    m_b1= f == 0.f ? 0.f : exp(log001 / (decayTime * Samplerate()));
 }
 
 void Decay_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
 {
-    m_b1= 0.f ? 0.f : exp(log001 / (decayTime * Samplerate()));
+    m_b1= decayTime == 0.f ? 0.f : exp(log001 / (decayTime * Samplerate()));
 }
 
 /* todo: does it make sense to implement a message-based Decay? 
