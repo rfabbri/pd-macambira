@@ -47,7 +47,7 @@ public:
 		AddOutAnything(2);
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD(c,1,m_peaks);
 		FLEXT_CADDATTR_VAR(c,"peaks",peaks,m_peaks);

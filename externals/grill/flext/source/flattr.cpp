@@ -88,7 +88,7 @@ void flext_base::AddAttrib(const char *attr,metharg tp,methfun gfun,methfun sfun
 		error("%s - attribute procession is not enabled!",thisName());
 }
 
-void flext_base::AddAttrib(t_class *c,const char *attr,metharg tp,methfun gfun,methfun sfun)
+void flext_base::AddAttrib(t_classid c,const char *attr,metharg tp,methfun gfun,methfun sfun)
 {
 	AddAttrib(ClAttrs(c),ClMeths(c),attr,tp,gfun,sfun);
 }
@@ -106,9 +106,9 @@ int flext_base::ListAttr(AtomList &la) const
 			for(int ai = 0; ai < a->Size(); ++ai) {
 				for(item *l = a->Item(ai); l; l = l->nxt) 
 				{
-					attritem *a = (attritem *)l;
-					if(!a->BothExist() || a->IsGet())
-						SetSymbol(la[ix++],a->tag);
+					attritem *aa = (attritem *)l;
+					if(!aa->BothExist() || aa->IsGet())
+						SetSymbol(la[ix++],aa->tag);
 				}
 			}
 		}

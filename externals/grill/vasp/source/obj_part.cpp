@@ -45,7 +45,7 @@ public:
 
 	~vasp_part() { if(part) delete[] part; }
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD_(c,1,"list",m_part);
 		FLEXT_CADDATTR_VAR(c,"parts",m_getpart,m_setpart);

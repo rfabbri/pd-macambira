@@ -24,6 +24,13 @@ The recommended order to go through the tutorial examples is the following:
 and, if needed
 7) sndobj* and/or stk*
 
+if you choose to compile with SndObj support you will need the respective library
+download from: http://www.may.ie/academic/music/musictec/SndObj/main.html
+
+if you choose to compile with STK support you will need the respective package and build a library
+download from: http://ccrma-www.stanford.edu/software/stk/
+
+
 ----------------------------------------------------------------------------
 
 The package should at least compile (and is tested) with the following compilers:
@@ -51,7 +58,17 @@ Max/MSP - MacOS 9:
 ------------------
 o Metrowerks CodeWarrior V6: edit & use the several ".cw" project files
 
+You must have the following "Source Trees" defined:
+"flext" - Pointing to the flext main directory
+"Cycling74" - Pointing to the Cycling 74 SDK
+
 Max/MSP - MacOSX:
 ------------------
 o Metrowerks CodeWarrior V6: edit & use the several ".cw" project files
+
+You must have the following "Source Trees" defined:
+"OS X Volume" - Pointing to your OSX boot drive
+"flext" - Pointing to the flext main directory
+"Cycling74 OSX" - Pointing to the Cycling 74 SDK for xmax
+"MP SDK" - Pointing to the Multiprocessing SDK (for threading support)
 

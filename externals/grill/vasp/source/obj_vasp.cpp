@@ -44,7 +44,7 @@ public:
 		AddOutAnything();
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD_(c,0,"list",m_vasp);
 

@@ -48,7 +48,7 @@ public:
 		if(abs) FLEXT_ADDATTR_VAR("frames",size,m_arg);
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD(c,1,m_arg);
 		FLEXT_CADDATTR_VAR1(c,"keep",keep);
@@ -142,7 +142,7 @@ public:
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDATTR_VAR(c,"factor",factor,m_arg);
 	}

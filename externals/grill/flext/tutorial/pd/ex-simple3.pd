@@ -1,4 +1,4 @@
-#N canvas 329 97 583 344 12;
+#N canvas 329 97 589 350 12;
 #X msg 22 87 help;
 #X msg 119 136 born;
 #X msg 168 137 to;

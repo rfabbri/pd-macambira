@@ -54,7 +54,7 @@ protected:
 	BL ToOutVasp(I outlet,Vasp &v);
 
 private:
-	static V Setup(t_class *);
+	static V Setup(t_classid);
 
 	FLEXT_CALLBACK_V(m_radio)
 
@@ -128,7 +128,7 @@ protected:
 #endif
 
 private:
-	static V Setup(t_class *);
+	static V Setup(t_classid);
 
 	virtual V m_bang() = 0;						// do! and output current Vasp
 };
@@ -201,7 +201,7 @@ protected:
 	V m_getarg(AtomList &l) { arg.MakeList(l); }
 
 private:
-	static V Setup(t_class *);
+	static V Setup(t_classid);
 
 	FLEXT_CALLBACK_V(a_list)
 	FLEXT_CALLBACK_V(a_vasp)
@@ -241,7 +241,7 @@ protected:
 	V m_getarg(AtomList &l) { arg.MakeList(l); }
 
 private:
-	static V Setup(t_class *);
+	static V Setup(t_classid);
 
 	FLEXT_CALLBACK_V(a_list)
 	FLEXT_CALLBACK_V(a_radio)

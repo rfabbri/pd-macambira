@@ -136,7 +136,7 @@ public:
 		slope(0),dir(0)
 	{}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDATTR_VAR1(c,"dir",dir);
 		FLEXT_CADDATTR_VAR1(c,"slope",slope);

@@ -54,7 +54,7 @@ public:
 		AddOutAnything(cnt);
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 	}

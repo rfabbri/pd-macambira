@@ -24,7 +24,7 @@ const t_symbol *vasp_base::sym_double;
 const t_symbol *vasp_base::sym_complex;
 const t_symbol *vasp_base::sym_vector;
 
-V vasp_base::Setup(t_class *c)
+V vasp_base::Setup(t_classid c)
 {
 	sym_radio = MakeSymbol("radio");
 	sym_vasp = MakeSymbol("vasp");
@@ -94,7 +94,7 @@ vasp_op::vasp_op(BL op)
 	if(op) FLEXT_ADDATTR_VAR("to",m_getto,m_setto);
 }
 
-V vasp_op::Setup(t_class *c)
+V vasp_op::Setup(t_classid c)
 {
 	FLEXT_CADDBANG(c,0,m_dobang);
 	FLEXT_CADDMETHOD_(c,0,"vasp",m_vasp);
@@ -258,7 +258,7 @@ vasp_binop::vasp_binop(I argc,const t_atom *argv,const Argument &def,BL op,UL ou
 	AddOutlets(outcode);
 }
 
-V vasp_binop::Setup(t_class *c)
+V vasp_binop::Setup(t_classid c)
 {
 	FLEXT_CADDMETHOD(c,1,a_list);
 	FLEXT_CADDMETHOD_(c,1,"vasp",a_vasp);
@@ -383,7 +383,7 @@ vasp_anyop::vasp_anyop(I argc,const t_atom *argv,const Argument &def,BL op,UL ou
 	AddOutlets(outcode);
 }
 
-V vasp_anyop::Setup(t_class *c)
+V vasp_anyop::Setup(t_classid c)
 {
 	FLEXT_CADDMETHOD(c,1,a_list);
 	FLEXT_CADDMETHOD_(c,1,"vasp",a_list);

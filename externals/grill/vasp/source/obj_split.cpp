@@ -119,7 +119,7 @@ public:
 
 	~vasp_join()	{ if(vi) delete[] vi; }
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 	}
@@ -251,7 +251,7 @@ public:
 		AddOutAnything();
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 		FLEXT_CADDMETHOD_(c,1,"vasp",m_add);

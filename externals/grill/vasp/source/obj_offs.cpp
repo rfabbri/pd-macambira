@@ -46,7 +46,7 @@ public:
 		AddOutAnything();
 	}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDMETHOD(c,1,m_offs);
 		FLEXT_CADDATTR_VAR(c,"frames",offs,m_offs);

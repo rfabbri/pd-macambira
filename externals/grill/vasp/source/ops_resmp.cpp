@@ -209,7 +209,7 @@ public:
 		fill(xtf_zero),inter(xti_4p)
 	{}
 
-	static V Setup(t_class *c)
+	static V Setup(t_classid c)
 	{
 		FLEXT_CADDATTR_VAR1_E(c,"fill",fill);
 		FLEXT_CADDATTR_VAR1_E(c,"inter",inter);

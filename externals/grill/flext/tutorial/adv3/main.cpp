@@ -65,12 +65,12 @@ public:
 		i_count = i_down;
 
 		// --- define inlets and outlets ---
-		AddInAnything(); // default inlet
-		AddInList();	// inlet for bounds
-		AddInInt();		// inlet for step size
+		AddInAnything("bang, reset, etc."); // default inlet
+		AddInList("bounds (2 element list)");	// inlet for bounds
+		AddInInt("step size");		// inlet for step size
 
-		AddOutInt();	// outlet for integer count
-		AddOutBang();	// outlet for bang
+		AddOutInt("counter");	// outlet for integer count
+		AddOutBang("overflow bang");	// outlet for bang
 	}
 
 protected:
@@ -117,7 +117,7 @@ protected:
 	
 private:
 
-	static void setup(t_class *c)
+	static void setup(t_classid c)
 	{
 		// --- set up methods (class scope) ---
 

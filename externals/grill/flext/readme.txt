@@ -29,7 +29,7 @@ Package files:
 - flbuf.cpp: buffer object handling for base classes
 - fllib.cpp: code for handling external libraries in MaxMSP
 - fldefs.h: definitions for internal flext use
-- flcwmax.h: trivial prefix header file for Max/MSP CodeWarrior projects
+- flcwmax*.h: trivial prefix headers for Max/MSP CodeWarrior projects
 - flmspbuffer.h: MaxMSP's inofficial buffer.h included here for conveniance
 
 > for PD you need the pd source code (which is most likely part of the distribution)
@@ -37,6 +37,9 @@ Package files:
 
 > if you choose to compile with SndObj support you will need the respective library
 > download from: http://www.may.ie/academic/music/musictec/SndObj/main.html
+
+> if you choose to compile with STK support you will need the respective package and build a library
+> download from: http://ccrma-www.stanford.edu/software/stk/
 
 ----------------------------------------------------------------------------
 
@@ -70,11 +73,21 @@ Be sure to define "FLEXT_SYS=1" - alternatively use the prefix file "flcwmax.h"
 
 o Metrowerks CodeWarrior V6: edit & use the "flext.cw" project file
 
+You must have the following "Source Trees" defined:
+"flext" - Pointing to the flext main directory
+"Cycling74" - Pointing to the Cycling 74 SDK
+
 Max/MSP - MacOSX:
 ------------------
 Be sure to define "FLEXT_SYS=1" - alternatively use the prefix file "flcwmax-x.h" or "flcwmax-x-thr.h" for threading support.
 
 o Metrowerks CodeWarrior V6: edit & use the "flext.cw" project file
+
+You must have the following "Source Trees" defined:
+"OS X Volume" - Pointing to your OSX boot drive
+"flext" - Pointing to the flext main directory
+"Cycling74 OSX" - Pointing to the Cycling 74 SDK for xmax
+"MP SDK" - Pointing to the Multiprocessing SDK (for threading support)
 
 ----------------------------------------------------------------------------
 
@@ -102,6 +115,8 @@ Version history:
 0.4.1:
 - full port for Max@OSX
 - completely redesigned message and attribute handling: now hashed and much more efficient
+- greatly enhanced object creation and destruction (esp. for library objects)
+- class setup functions now take t_classid type arg... this is BACKWARDS-INCOMPATIBLE for Max/MSP
 - added some prerequisites for usage of flext as a shared library
 - completed Max/MSPs inlet/outlet assist description functionality
 - Max/MSP signal objects: fixed bug of reporting wrong number of inlets
