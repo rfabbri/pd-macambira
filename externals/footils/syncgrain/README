@@ -34,8 +34,7 @@ To build syncgrain~ you also need flext by Thomas Grill in version 0.4.1,
 Get at http://www.parasitaere-kapazitaeten.net/Pd/ext/
 
 _ ____Bugs__ _
-_  DON'T EVER DELETE THE "set" TABLE. Crashes Pd. If you can fix this, speak up, please.
-_ probably more...
+_ probably some...
 
 _ ____License__ _
 GPL, see license.txt.
