@@ -27,6 +27,7 @@ new filter objects: cpole~, fpole~, etc.
 put in Wini's RME ALSA code; there are still bugs...
 portaudio fixed for inchans != outchans, e.g., emi emagic (2/6)
 sprout inlets/outlets on objects whose creation failed.
+uploaded to CVS
 
 doc:
 document env~ second argument (and why is it no less than 1/10 of first???)

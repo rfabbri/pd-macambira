@@ -1159,7 +1159,7 @@ void text_drawborder(t_text *x, t_glist *glist,
     height = y2 - y1;
     if (x->te_type == T_OBJECT)
     {
-    	char *pattern = ((pd_class(&x->te_pd) == text_class) ? "." : "\"\"");
+    	char *pattern = ((pd_class(&x->te_pd) == text_class) ? "-" : "\"\"");
         if (firsttime)
             sys_vgui(".x%lx.c create line\
  %d %d %d %d %d %d %d %d %d %d -dash %s -tags %sR\n",
@@ -1171,7 +1171,8 @@ void text_drawborder(t_text *x, t_glist *glist,
  %d %d %d %d %d %d %d %d %d %d\n",
                 glist_getcanvas(glist), tag,
                     x1, y1,  x2, y1,  x2, y2,  x1, y2,  x1, y1);
-    	    sys_vgui(".x%lx.c itemconfigure -dash %s\n", pattern);
+    	    sys_vgui(".x%lx.c itemconfigure -dash %s\n",
+	    	glist_getcanvas(glist), pattern);
 	}
     }
     else if (x->te_type == T_MESSAGE)
