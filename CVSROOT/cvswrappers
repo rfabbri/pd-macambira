@@ -29,6 +29,18 @@
 *.jpeg -k 'b'
 *.tif -k 'b'
 *.tiff -k 'b'
+*.GIF -K 'b'
+*.PNG -k 'b'
+*.JPG -k 'b'
+*.JPEG -k 'b'
+*.TIF -k 'b'
+*.TIFF -k 'b'
+
+# FONTS
+*.ttf -k 'b'
+
+# 3D MODELS
+*.mtl -k 'b'
 
 # WEB FILES
 *.swf -k 'b'
@@ -43,6 +55,12 @@
 *.au -k 'b'
 *.mp2 -k 'b'
 *.mp3 -k 'b'
+
+# VIDEO FILES
+*.avi -k 'b'
+*.mov -k 'b'
+*.mpg -k 'b'
+*.mpeg -k 'b'
 
 # DOCUMENTS
 *.pdf -k 'b'
