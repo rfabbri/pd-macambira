@@ -10,17 +10,25 @@ all: link.stamp $(EXTERNALS:.c=.pd_darwin)
 #PDEXECUTABLE = /usr/local/bin/pd
 PDEXECUTABLE = ../../../pd/bin/pd
 
-MACOSXCFLAGS = -DPD -Os  -DUNIX -DMACOSX -Dunix \
-    -Wall -W  \
-    -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
+# Pentium III or better
+#CPU_FLAGS = -march=pentium3
+# PowerPC G3
+#CPU_FLAGS = -mpowerpc-gpopt
+# PowerPC G4 (gcc-3.3)
+#CPU_FLAGS = -fast -mcpu=G4
+# PowerPC G5 (gcc-3.3)
+#CPU_FLAGS = -fast
 
-MACOSXINCLUDE = -I. -I.. -I../include
+OPTIM_FLAGS = -O3 -funroll-loops -fomit-frame-pointer $(CPU_FLAGS)
 
-MACOSXLINKFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) 
+CFLAGS = -DPD -DUNIX -DMACOSX -Dunix $(OPTIM_FLAGS) \
+    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
+INCLUDES = -I. -I.. -I../include
+LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) 
 
 %.pd_darwin: ../src/%.c
-	$(CC) $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o "$*.o" -c "../src/$*.c"
-	$(CC) $(MACOSXLINKFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm \
+	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
+	$(CC) $(LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm \
 #	`test -f $*.libs && cat $*.libs`
 	chmod a-x "$*.pd_darwin"
 	rm -f "$*.o" 
