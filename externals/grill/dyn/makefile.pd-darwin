@@ -22,7 +22,7 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 INCLUDES=$(PDPATH) 
 LIBPATH=
 FLAGS=-DFLEXT_SYS=2 ${U_FLAGS}
-CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-rtti
+CFLAGS=-O2 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-rtti
 #CFLAGS=-g
 LIBS=m
 FRAMEWORKS=vecLib

@@ -13,8 +13,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 402)
-#error You need at least flext version 0.4.2
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 405)
+#error You need at least flext version 0.4.5
 #endif
 
 #define DYN_VERSION "0.1.0"

@@ -16,19 +16,17 @@ The package should at least compile (and is tested) with the following compilers
 
 pd - Windows:
 -------------
-o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
+o Microsoft Visual C++: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
 
 pd - linux:
 -----------
 o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
-	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-linux
 
 
 pd - MacOSX:
 -----------
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
-	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-darwin
 
 ----------------------------------------------------------------------------
 
