@@ -137,7 +137,7 @@ pso::pso(int Popsize, int Dimen, int HoodSize)
 	FLEXT_ADDMETHOD_(0,"set_pop",set_pop);
 	FLEXT_ADDMETHOD_(0,"set_part", set_particle);
 	FLEXT_ADDMETHOD_FF(0,"rand_pop",rand_pop);
-	FLEXT_ADDMETHOD_F(0,"optimization_threshold", optim_thresh);
+	FLEXT_ADDMETHOD_F(0,"optim_thresh", optim_thresh);
 	FLEXT_ADDBANG(0,iterate);
 	FLEXT_ADDMETHOD_(0,"reset",reset);
 	FLEXT_ADDMETHOD_(0,"help",m_help);
