@@ -65,8 +65,12 @@ class fiiwu:
 			// plugin synth: AUDIO off
 			pd_iiwu_settings.flags        &= ~IIWU_AUDIO;
 			pd_iiwu_settings.sample_format = IIWU_FLOAT_FORMAT;
-			pd_iiwu_settings.sample_rate   = static_cast<int>(sr);
+			if (sr != 0)
+			{
+				pd_iiwu_settings.sample_rate   = static_cast<int>(sr);
+			}
 			
+	
 			// Create iiwusynth instance:
 			synth = new_iiwu_synth(&pd_iiwu_settings);
 			
