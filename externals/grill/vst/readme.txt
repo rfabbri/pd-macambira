@@ -55,6 +55,9 @@ Version history:
 - pre14: allow window titles with spaces and update it on window startup
 - pre18: open plug interface on Alt-Click
 - pre18: experimental plug shell support
+- pre19: better shell support
+- pre19: restructured code and added time info
+- pre19: support for event processing (like MIDI in)
 
 0.0.0:
 - version of mark@junklight.com
