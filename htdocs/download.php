@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: download.php,v 1.2 2003-03-14 22:40:06 eighthave Exp $  -->
+<!-- $Id: download.php,v 1.3 2003-03-14 22:53:48 eighthave Exp $  -->
 
 <HTML>
 
@@ -48,7 +48,7 @@ do not depend on other libraries.</p>
 <p>flext is a C++ layer for cross-platform development of Max/MSP and Pd
 externals.  Package is coming soon... look <a href="http://www.parasitaere-kapazitaeten.net/Pd/ext/flext/" >here</a> in the meantime.</p>
 
-<h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=146087" >pd-gem</a></h4>
+<h4><a href="http://gem.iem.at/" >pd-gem</a></h4>
 <p>GEM is an OpenGL and video extension for Pd.</p>
 
 <h4>pd-osc</h4>
