@@ -1,0 +1,67 @@
+
+You can get more inofrmation on the expr object at
+http://www.crca.ucsd.edu/~yadegari/expr.html
+
+-----------
+
+New in Version 0.3
+-Full function functionality
+
+------------
+
+The object "expr" is used for expression evaluaion of control data.
+
+Expr~ and fexpr~ are extentions to the expr object to work with vectors.
+The expr~ object is designed to efficiently combine signal and control
+stream processing by vector operations on the basis of the block size of
+the environment.
+
+fexpr~ object provides a flexible mechanism for building FIR and
+IIR filters by evaluating expressions on a sample by sample basis
+and providing access to prior samples of the input and output audio
+streams. When fractional offset is used, fexpr~ uses linear interpolation
+to determine the value of the indexed sample. fexpr~ evaluates the
+expression for every single sample and at every evaluation previous
+samples (limited by the audio vector size) can be accessed. $x is used to
+denote a singnal input whose samples we would like to access. The syntax
+is $x followed by the inlet number and indexed by brackets, for example
+$x1[-1] specifies the previous sample of the first inlet. Therefore,
+if we are to build a simple filter which replaces every sample by
+the average of that sample and its previous one, we would use "fexpr~
+($x1[0]+$x1[-1])/2 ". For ease of when the brackets are omitted, the
+current sample is implied, so we can right the previous filter expression
+as follows:  " fexpr~ ($x1+$x1[-1])/2". To build IIR filters $y is used
+to access the previous samples of the output stream.
+
+The three objects expr, expr~, and fexpr~ are implemented in the same object
+so the files expr~.pd_linux and fexpr~.pd_linux are links to expr.pd_linux
+This release has been compiled and tested on Linux 6.0.
+
+--------
+
+Here are some syntax information: (refer to help-expr.pd for examples)
+ 
+Syntyax:
+The syntax is very close to how expression are written in
+C. Variables are specified as follows where the '#' stands
+for the inlet number:
+$i#: integer input variable
+$f#: float input variable
+$s#: symbol input variable
+
+Used for expr~ only:
+$v#: signal (vector) input (vector by vector evaluation)
+
+Used for fexpr~ only:
+$x#[n]: the sample from inlet # indexed by n, where n has to
+	satisfy 0 => n >= -vector size,
+	($x# is a shorthand for $x#[0], specifying the current sample)
+
+$y[n]: the output value indexed by n, where n has to
+	satisfy 0 > n >= -vector size,
+
+
+I'll appreciate hearing about bugs, comments, suggestions, ...
+
+Shahrokh Yadegari (sdy@ucsd.edu)
+1/29/02
