@@ -1,6 +1,6 @@
 pool - a hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -37,7 +37,7 @@ pd - Windows:
 -------------
 o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
 
-o Microsoft Visual C++ 6: edit the project file "pool.dsp" & build 
+o Microsoft Visual C++ 6/7: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
 pd - linux:
 -----------
@@ -50,6 +50,11 @@ o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh"
 Max/MSP - MacOS9/X:
 -------------------
 o CodeWarrior: edit "pool.cw" and build 
+
+Max/MSP - Windows:
+-------------------
+o Microsoft Visual C++ 7: edit "config-max-msvc.txt" & run "build-max-msvc.bat" 
+
 
 ----------------------------------------------------------------------------
 
