@@ -56,7 +56,7 @@ void ttbext_setup()
   FLEXT_SETUP(tbroute);
   //FLEXT_SETUP(tbstrg);
   FLEXT_DSP_SETUP(tbsroute);
-  FLEXT_DSP_SETUP(tbssel);
+  //  FLEXT_DSP_SETUP(tbssel);
   FLEXT_DSP_SETUP(tbsig);
   FLEXT_DSP_SETUP(tbpow);
   //  FLEXT_DSP_SETUP(tbg7xx);
