@@ -25,7 +25,7 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
-
+#include <m_pd.h>
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "pthread.h"
