@@ -1,0 +1,136 @@
+==============================================================================
+= define generic event struct (probably Pd-ized input_event )
+  something like:
+  
+struct input_event {
+	struct timeval time;
+	t_int type;
+	t_int code;
+	t_int value;
+};
+
+
+The question is whether the timeval is needed at all.  Linux and Darwin
+support it.  Currently, I can only think of UPS PWR events actually using
+timevals.
+
+
+
+===============================================================================
+= HID Manager Type/Usage/UsagePage -> Linux Type/Code mapping
+
+ UsagePage
+
+
+Misc Input/Generic Desktop X  == ev_rel/rel_x
+Button Input/Button #1 == ev_key/btn_left
+
+
+LED UsagePage => ev_led
+LED Usages == Linux ev_led codes
+
+
+
+==============================================================================
+= device selection 
+
+by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
+("Trackpad", "Microsoft 5-button Mouse with IntelliEye(TM)", etc.)
+
+ first get # working, that's probably the easiest
+
+by #
+------------------------------
+GNU/Linux
+    sprintf(x_devname->s_name,"/dev/input/event%d",deviceNum + 1);
+
+Darwin
+	 prHIDBuildDeviceList();
+	 currentHIDDevice = discoveredDevices[gNumberOfHIDDevices];
+
+
+==============================================================================
+= figure out how to store device ID in obj struct
+
+(in SC_HID.c its locID and cookie)
+
+it should probably just store the Pd arguments
+
+
+
+==============================================================================
+= raw values vs. calibrated
+
+- relative axes should probably be raw data, since its pixel data, but then
+  this causes problems with sensitivity across different mice.  The mouse
+  sensitivity would probably best translate as resolution, ie calibrated data,
+  rather than sensitivity, ie raw data.
+
+- absolute axes should be calibrated, so that the same positions on different
+  devices map to the same value
+
+- but then, I could just create an [autocal] object in Pd, and have [hid]
+  output only raw values.  This would probably be best in keeping with the
+  idea of having [hid] giving as low level access as possible, then using
+  [mouse], [joystick], [tablet], etc. objects providing a nice, consistent
+  interface to the respective devices.
+
+
+
+==============================================================================
+= pollfn for mouse-like devices
+
+- determine whether using a pollfn is actually better than using a t_clock
+
+- any device that acts like a system mouse can be used with a pollfn, since
+  the mouse data will go thru Pd's network port, triggering the pollfn.
+
+- this is probably unnecessary since the t_clock seems to run well at 1ms delay
+
+
+
+==============================================================================
+=  make generic functions for the basic actions
+
+    releaseDevices()
+    buildDeviceList()
+    buildElementList()
+    getEvent()
+
+ - make Darwin HID Manager -> Linux input event convertor functions
+
+
+
+==============================================================================
+= [close( message might be totally frivolous.
+
+- what does Max's [hi] do with that?
+
+- when would you need to close a device, yet still have the object there?
+  [open( closes the previous device anyway.
+
+
+
+==============================================================================
+= function return values
+
+- most functions probably do not need return values
+
+- return (1) seems to be the default on many functions
+
+
+==============================================================================
+= control input messages
+
+- the [delay( message should be replaced by the [poll( msg
+
+- should [poll( also start things, or should it just set polling time?
+
+- are [start( and [stop( needed?  is 0/1 enough?
+
+
+
+
+
+
+

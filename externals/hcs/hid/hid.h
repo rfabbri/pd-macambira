@@ -11,7 +11,7 @@
  */
 #include "input_arrays.h"
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -28,9 +28,10 @@ typedef struct _hid
 		t_int               x_read_ok;
 		t_int               x_started;
 		t_int               x_delay;
-		t_int               x_vendorID;
-		t_int               x_productID;
-		t_int               x_locID;
+		long                x_locID;
+/* these two are probably unnecessary */
+		long                x_vendorID;
+		long                x_productID;
 } t_hid;
 
 

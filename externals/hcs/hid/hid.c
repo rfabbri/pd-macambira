@@ -25,7 +25,6 @@
 
 #include "hid.h"
 
-
 /*------------------------------------------------------------------------------
  * LOCAL DEFINES
  */
@@ -33,13 +32,14 @@
 //#define DEBUG(x)
 #define DEBUG(x) x 
 
-#define DEFAULT_DELAY 500
+#define DEFAULT_DELAY 5
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
-void hid_stop(t_hid *x) 
+/* stop polling the device */
+void hid_stop(t_hid* x) 
 {
   DEBUG(post("hid_stop"););
   
@@ -49,11 +49,9 @@ void hid_stop(t_hid *x)
 	  post("[hid] polling stopped");
 	  x->x_started = 0;
   }
-  
-  hid_devicelist_refresh(x);
 }
 
-
+/* close the device */
 t_int hid_close(t_hid *x) 
 {
 	DEBUG(post("hid_close"););
@@ -79,19 +77,16 @@ t_int hid_open(t_hid *x, t_float f)
   if (f > 0)
 	  x->x_device_number = f;
   else
-	  x->x_device_number = 1;
-  
+	  x->x_device_number = 0;
+
   if (hid_open_device(x,x->x_device_number)) 
   {
 	  error("[hid] can not open device %d",x->x_device_number);
+  post("\\================================ [hid] ================================/\n");
 	  return (1);
   }
 
-  post("\nWARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
-  post("This object is under development!  The interface could change at anytime!");
-  post("As I write cross-platform versions, the interface might have to change.");
-  post("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
-  post("================================= [hid] =================================\n");
+  post("\\================================ [hid] ================================/\n");
   return (0);
 }
 
@@ -156,13 +151,14 @@ static void hid_free(t_hid* x)
 	clock_free(x->x_clock);
 }
 
+/* create a new instance of this class */
 static void *hid_new(t_float f) 
 {
   t_hid *x = (t_hid *)pd_new(hid_class);
 
   DEBUG(post("hid_new"););
 
-  post("================================= [hid] =================================");
+  post("/================================ [hid] ================================\\");
   post("[hid] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
 #if !defined(__linux__) && !defined(__APPLE__)
   error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
@@ -179,11 +175,16 @@ static void *hid_new(t_float f)
 
   /* create anything outlet used for HID data */ 
   outlet_new(&x->x_obj, 0);
-  
-  /* Open the device and save settings */
-  if (hid_open(x,f))
-	  error("[hid] device %d did not open",(t_int)f);
 
+  /* find and report the list of devices */
+  hid_devicelist_refresh(x);
+  
+  /* Open the device and save settings.  If there is an error, return the object
+   * anyway, so that the inlets and outlets are created, thus not breaking the
+   * patch.   */
+/*   if (hid_open(x,f)) */
+/* 	  error("[hid] device %d did not open",(t_int)f); */
+  
   return (x);
 }
 
@@ -204,6 +205,7 @@ void hid_setup(void)
 	/* add inlet message methods */
 	class_addmethod(hid_class,(t_method) hid_delay,gensym("delay"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_devicelist_refresh,gensym("refresh"),0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
 	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),0);
 	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),0);
