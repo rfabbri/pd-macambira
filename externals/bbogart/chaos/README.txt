@@ -35,7 +35,8 @@ pd -lib chaos
 The object methods are as follows:
 
 bang:	Calculate one interation of the attractor.
-reset:	Reset to initial conditions.
+reset:	Reset to initial conditions defined by the two or three arguments.
+        [reset a b c] will reset the xyz values to abc respectively.
 param:  Modify the paramaters of the equation, the number of args depend
 	on the attractor. (Be careful with the parameters, an attractor
 	will go from stable to infinity in very few interations.)
