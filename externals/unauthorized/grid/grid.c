@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
-#include <m_pd.h>
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -35,7 +35,7 @@ static int gridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *grid_version = "grid: version 0.4, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *grid_version = "grid: version 0.5, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define GRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -94,12 +94,7 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
     t_canvas *canvas=glist_getcanvas(glist);
     char *tagRoot;
 
-/* rtext_new(); in g_canvas.h changed in 0.37 */
-#if PD_MINOR_VERSION >= 37
-	 rtext_new(glist, (t_text *)x);
-#else
-	 rtext_new(glist, (t_text *)x, glist->gl_editor->e_rtext, 0);
-#endif
+    rtext_new(glist, (t_text *)x );
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
     GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #124392 -tags %xGRID\n",
 	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
@@ -669,18 +664,15 @@ void grid_setup(void)
     grid_widgetbehavior.w_deletefn =     grid_delete;
     grid_widgetbehavior.w_visfn =        grid_vis;
     grid_widgetbehavior.w_clickfn =      grid_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(grid_class, grid_properties);
+    class_setsavefn(grid_class, grid_save);
+#else
     grid_widgetbehavior.w_propertiesfn = grid_properties;
     grid_widgetbehavior.w_savefn =       grid_save;
-#else
-	 class_setsavefn(grid_class, &grid_save);
-	 class_setpropertiesfn(grid_class, &grid_properties);
 #endif
+
     class_setwidget(grid_class, &grid_widgetbehavior);
+    class_sethelpsymbol(grid_class, gensym("grid.pd"));
 }

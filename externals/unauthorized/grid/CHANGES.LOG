@@ -1,3 +1,5 @@
+0.5
+  Adapted for pd 0.37
 0.4
   Added functions bang, values, valuemotion, xvalues, xvaluemotion made by Maurizio Umberto Puxeddu
   Integrated patch from Joseph A. Sarlo for connections 
