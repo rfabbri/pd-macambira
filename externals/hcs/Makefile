@@ -1,4 +1,4 @@
-pd_linux: pan_gogins~.pd_linux range.pd_linux linuxmouse.pd_linux linuxevent.pd_linux linuxjoystick.pd_linux rawjoystick.pd_linux
+pd_linux: pan_gogins~.pd_linux range.pd_linux linuxmouse.pd_linux linuxevent.pd_linux linuxjoystick.pd_linux ifeel.pd_linux
 
 clean: ; rm -f *.pd_linux *.o *~
 
