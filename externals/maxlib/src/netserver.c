@@ -33,7 +33,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -52,7 +52,7 @@
 #define MAX_CONNECT  32		/* maximum number of connections */
 #define INBUFSIZE    4096   /* size of receiving data buffer */
 
-static char *version = "netserver v0.1 :: bidirectional communication for Pd\n"
+static char *version = "netserver v0.2 :: bidirectional communication for Pd\n"
                        "                  written by Olaf Matthes <olaf.matthes@gmx.de>";
 
 /* ----------------------------- netserver ------------------------- */
@@ -542,7 +542,12 @@ static void *netserver_new(t_floatarg fportno)
 
 static void netserver_free(t_netserver *x)
 {
-    	/* LATER make me clean up open connections */
+	int i;
+	for(i = 0; i < x->x_nconnections; i++)
+	{
+		sys_rmpollfn(x->x_fd[i]);
+    	sys_closesocket(x->x_fd[i]);
+	}
     if (x->x_connectsocket >= 0)
     {
     	sys_rmpollfn(x->x_connectsocket);

@@ -22,7 +22,7 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 #ifndef VERSION
-#define VERSION "1.1b"
+#define VERSION "1.2"
 #endif
 
 #include "m_pd.h"
@@ -79,17 +79,23 @@ void poisson_setup();
 void pong_setup();
 void pulse_setup();
 void remote_setup();
+void rewrap_setup();
 void rhythm_setup();
 void scale_setup();
 void score_setup();
 void speedlim_setup();
+void split_setup();
 void step_setup();
 void subst_setup();
 void temperature_setup();
 void tilt_setup();
+void timebang_setup();
 void triang_setup();
+void unroute_setup();
+void urn_setup();
 void velocity_setup();
 void weibull_setup();
+void wrap_setup();
 
 static void* maxlib_new(t_symbol* s)
 {
@@ -141,17 +147,23 @@ void maxlib_setup(void)
 	pong_setup();
 	pulse_setup();
 	remote_setup();
+	rewrap_setup();
 	rhythm_setup();
 	scale_setup();
 	score_setup();
 	speedlim_setup();
+	split_setup();
 	step_setup();
     subst_setup();
 	temperature_setup();
 	tilt_setup();
+	timebang_setup();
 	triang_setup();
+	unroute_setup();
+	urn_setup();
 	velocity_setup();
 	weibull_setup();
+	wrap_setup();
 
 	post("\n       maxlib :: Music Analysis eXtensions LIBrary");
 	post("       written by Olaf Matthes <olaf.matthes@gmx.de>");
@@ -162,6 +174,7 @@ void maxlib_setup(void)
 	post("                divide divmod edge expo fifo gauss gestalt history ignore iso ");
 	post("                lifo linear listfunnel match minus mlife multi netclient ");
 	post("                netdist netrec netserver nroute pitch plus poisson pong pulse ");
-	post("                remote rhythm scale score speedlim step subst temperature tilt ");
-	post("                triang velocity weibull\n");
+	post("                remote rewrap rhythm scale score speedlim split step subst ");
+	post("                temperature tilt timebang triang unroute urn velocity weibull ");
+	post("                wrap\n");
 }

@@ -2,7 +2,7 @@
 /*                                                                              */
 /* Send data to receive obejct <name>.                                          */
 /* Written by Olaf Matthes (olaf.matthes@gmx.de)                                */
-/* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
+/* Get source at http://www.akustische-kunst.de/puredata/                       */
 /*                                                                              */
 /* This program is free software; you can redistribute it and/or                */
 /* modify it under the terms of the GNU General Public License                  */
@@ -30,13 +30,15 @@
 #define MAX_REC 64		            /* maximum number of receive objects */
 #define MAX_ARG 32		            /* maximum number of arguments to pass on */
 
-static char *version = "remote v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
+static char *version = "remote v0.2, written by Olaf Matthes <olaf.matthes@gmx.de>";
 
 static t_class *remote_class;
 
 typedef struct _remote
 {
     t_object x_obj;
+	t_symbol *x_prefix;
+	t_int    x_prepend;
 } t_remote;
 
 	/* send 'anything' to receiver */
@@ -45,6 +47,8 @@ static void remote_anything(t_remote *x, t_symbol *s, int argc, t_atom *argv)
 	int i;
 	t_atom av[MAX_ARG];		/* the 'new' t_atom without first element */
 	t_int ac = argc - 1;    /* the 'new' number of arguments */
+	char mysym[MAXPDSTRING];
+	t_symbol *target;
 
 	if(argc < 1)			/* need <name> <data> */
 	{
@@ -62,12 +66,23 @@ static void remote_anything(t_remote *x, t_symbol *s, int argc, t_atom *argv)
 		av[i - 1] = argv[i];	/* just copy, don't care about types */
 	}
 		/* send only argument-part to receivers */
-	if (s->s_thing) pd_forwardmess(s->s_thing, argc, argv);
+	if(x->x_prepend)
+	{
+		sprintf(mysym,"%s%s", x->x_prefix->s_name, s->s_name);
+		target = gensym(mysym);
+		if (target->s_thing) pd_forwardmess(target->s_thing, argc, argv);
+	}
+	else
+		if (s->s_thing) pd_forwardmess(s->s_thing, argc, argv);
 }
 
-static void *remote_new(void)
+static void *remote_new(t_symbol *s)
 {
     t_remote *x = (t_remote *)pd_new(remote_class);
+
+	x->x_prefix = s;
+	if(x->x_prefix) x->x_prepend = 1;
+	else x->x_prepend = 0;
 
 #ifndef MAXLIB
     post(version);
@@ -78,7 +93,7 @@ static void *remote_new(void)
 void remote_setup(void)
 {
     remote_class = class_new(gensym("remote"), (t_newmethod)remote_new, 0,
-    	sizeof(t_remote), 0, 0);
+    	sizeof(t_remote), 0, A_DEFSYM, 0);
     class_addanything(remote_class, remote_anything);
-	class_sethelpsymbol(remote_class, gensym("maxlib/help-remote.pd"));
+	class_sethelpsymbol(remote_class, gensym("help-remote.pd"));
 }

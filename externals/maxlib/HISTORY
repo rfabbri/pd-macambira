@@ -1,5 +1,12 @@
 version history of maxlib library for pure-data
 
+v 1.2 (27.january 2003):
+- new objects: unroute urn split wrap rewrap timebang
+- another fix for the makefile
+- fixed a bug in netserver (sockets remained open when netserver closed) 
+- added a 'prepend' option (with additional creation argument) to remote,
+  patch was supplied by Maurizio Umberto Puxeddu
+
 v 1.1b2 (23. oktober 2002):
 - corrected two small bugs in the makefile (linux only!), thanks to 
   Hans-Christoph Steiner
