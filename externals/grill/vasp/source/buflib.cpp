@@ -297,6 +297,6 @@ VSymbol ImmBuf::Symbol() const { return entry->sym; }
 
 I ImmBuf::Frames() const { return entry->len; }
 
-V ImmBuf::Frames(I fr,BL keep) { entry = BufLib::Resize(entry,fr,keep); }
+V ImmBuf::Frames(I fr,BL keep,BL zero) { entry = BufLib::Resize(entry,fr,keep,zero); }
 
 S *ImmBuf::Data() { return entry->data; }

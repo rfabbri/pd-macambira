@@ -313,13 +313,6 @@ template<class T,class ARG,class OP> BL V__cop(ARG p,register const S *sr,regist
 	return true;												
 }
 
-template<class T,class CL> inline BL _D__run(OpParam &p) { return V__run<T,CL>(p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
-template<class T,class CL> inline BL _D__cun(OpParam &p) { return V__cun<T,CL>(p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
-template<class T,class CL> inline BL _D__rbin(OpParam &p) { return _F__rbin<T,CL>(p); }
-template<class T,class CL> inline BL _D__cbin(OpParam &p) { return _F__cbin<T,CL>(p); }			
-template<class T,class CL> inline BL _D__rop(OpParam &p) { return V__rop<T,OpParam &,CL>(p,p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
-template<class T,class CL> inline BL _D__cop(OpParam &p) { return V__cop<T,OpParam &,CL>(p,p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
-
 
 template<class T> BL _d__run(V fun(T &v,T a),OpParam &p) 
 { 
@@ -423,21 +416,54 @@ template<class T> BL _d__cop(V fun(T &rv,T &iv,T ra,T ia,OpParam &p),OpParam &p)
 }
 
 
+/*
+template<class T,class CL> inline BL _D__run(OpParam &p) { return V__run<T,CL>(p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
+template<class T,class CL> inline BL _D__cun(OpParam &p) { return V__cun<T,CL>(p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
+template<class T,class CL> inline BL _D__rbin(OpParam &p) { return _F__rbin<T,CL>(p); }
+template<class T,class CL> inline BL _D__cbin(OpParam &p) { return _F__cbin<T,CL>(p); }			
+template<class T,class CL> inline BL _D__rop(OpParam &p) { return V__rop<T,OpParam &,CL>(p,p.rsdt,p.rss,p.rddt,p.rds,p.frames); }
+template<class T,class CL> inline BL _D__cop(OpParam &p) { return V__cop<T,OpParam &,CL>(p,p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames); }
 
 #ifdef VASP_COMPACT
-    template<class T,class CL> inline BL D__run(OpParam &p) { return _d__run<T>(CL::run,p); }
-    template<class T,class CL> inline BL D__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
-    template<class T,class CL> inline BL D__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
-    template<class T,class CL> inline BL D__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
-	template<class T,class CL> inline BL D__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
-	template<class T,class CL> inline BL D__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
+    template<class T,class CL> BL D__run(OpParam &p) { return _d__run<T>(CL::run,p); }
+    template<class T,class CL> BL D__cun(OpParam &p) { return _d__cun<T>(CL::cun,p); }
+    template<class T,class CL> BL D__rbin(OpParam &p) { return _d__rbin<T>(CL::rbin,p); }
+    template<class T,class CL> BL D__cbin(OpParam &p) { return _d__cbin<T>(CL::cbin,p); }
+	template<class T,class CL> BL D__rop(OpParam &p) { return _d__rop<T>(CL::rop,p); }
+	template<class T,class CL> BL D__cop(OpParam &p) { return _d__cop<T>(CL::cop,p); }
 #else
-	template<class T,class CL> inline BL D__run(OpParam &p) { return CL::run_opt()?_D__run<T,CL>(p):_d__run<T>(CL::run,p); }
-	template<class T,class CL> inline BL D__cun(OpParam &p) { return CL::cun_opt()?_D__cun<T,CL>(p):_d__cun<T>(CL::cun,p); }
-	template<class T,class CL> inline BL D__rbin(OpParam &p) { return CL::rbin_opt()?_D__rbin<T,CL>(p):_d__rbin<T>(CL::rbin,p); }
-	template<class T,class CL> inline BL D__cbin(OpParam &p) { return CL::cbin_opt()?_D__cbin<T,CL>(p):_d__cbin<T>(CL::cbin,p); }
-	template<class T,class CL> inline BL D__rop(OpParam &p) { return CL::rop_opt()?_D__rop<T,CL>(p):_d__rop<T>(CL::rop,p); }
-	template<class T,class CL> inline BL D__cop(OpParam &p) { return CL::cop_opt()?_D__cop<T,CL>(p):_d__cop<T>(CL::cop,p); }
+	template<class T,class CL> BL D__run(OpParam &p) { return CL::run_opt()?_D__run<T,CL>(p):_d__run<T>(CL::run,p); }
+	template<class T,class CL> BL D__cun(OpParam &p) { return CL::cun_opt()?_D__cun<T,CL>(p):_d__cun<T>(CL::cun,p); }
+	template<class T,class CL> BL D__rbin(OpParam &p) { return CL::rbin_opt()?_D__rbin<T,CL>(p):_d__rbin<T>(CL::rbin,p); }
+	template<class T,class CL> BL D__cbin(OpParam &p) { return CL::cbin_opt()?_D__cbin<T,CL>(p):_d__cbin<T>(CL::cbin,p); }
+	template<class T,class CL> BL D__rop(OpParam &p) { return CL::rop_opt()?_D__rop<T,CL>(p):_d__rop<T>(CL::rop,p); }
+	template<class T,class CL> BL D__cop(OpParam &p) { return CL::cop_opt()?_D__cop<T,CL>(p):_d__cop<T>(CL::cop,p); }
+#endif
+*/
+
+// MSVC 6 can't handle optimization here!! (silently produces wrong code!!!)
+
+#define _D__run(T,CL,p) V__run<T,CL>(p.rsdt,p.rss,p.rddt,p.rds,p.frames)
+#define _D__cun(T,CL,p) V__cun<T,CL>(p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames)
+#define _D__rbin(T,CL,p) _F__rbin<T,CL>(p)
+#define _D__cbin(T,CL,p) _F__cbin<T,CL>(p)
+#define _D__rop(T,CL,p) V__rop<T,OpParam &,CL>(p,p.rsdt,p.rss,p.rddt,p.rds,p.frames)
+#define _D__cop(T,CL,p) V__cop<T,OpParam &,CL>(p,p.rsdt,p.isdt,p.rss,p.iss,p.rddt,p.iddt,p.rds,p.ids,p.frames)
+
+#if defined(VASP_COMPACT) || (defined(_MSC_VER) && _MSC_VER <= 1200)
+    #define D__run(T,CL,p) _d__run<T>(CL::run,p)
+    #define D__cun(T,CL,p) _d__cun<T>(CL::cun,p)
+    #define D__rbin(T,CL,p) _d__rbin<T>(CL::rbin,p)
+    #define D__cbin(T,CL,p) _d__cbin<T>(CL::cbin,p)
+    #define D__rop(T,CL,p) _d__rop<T>(CL::rop,p)
+    #define D__cop(T,CL,p) _d__cop<T>(CL::cop,p)
+#else
+	#define D__run(T,CL,p) ( CL::run_opt()?_D__run(T,CL,p):_d__run<T>(CL::run,p) ) 
+	#define D__cun(T,CL,p) ( CL::cun_opt()?_D__cun(T,CL,p):_d__cun<T>(CL::cun,p) )
+	#define D__rbin(T,CL,p) ( CL::rbin_opt()?_D__rbin(T,CL,p):_d__rbin<T>(CL::rbin,p) )
+	#define D__cbin(T,CL,p) ( CL::cbin_opt()?_D__cbin(T,CL,p):_d__cbin<T>(CL::cbin,p) )
+	#define D__rop(T,CL,p) ( CL::rop_opt()?_D__rop(T,CL,p):_d__rop<T>(CL::rop,p) )
+	#define D__cop(T,CL,p) ( CL::cop_opt()?_D__cop(T,CL,p):_d__cop<T>(CL::cop,p) )
 #endif
 
 

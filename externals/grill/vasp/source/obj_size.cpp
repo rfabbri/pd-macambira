@@ -34,7 +34,7 @@ class vasp_size:
 
 public:
 	vasp_size(I argc,t_atom *argv,BL abs = true):
-		size(0),sets(false),keep(true)
+		size(0),sets(false),keep(true),zero(true)
 	{
 		if(argc >= 1 && CanbeFloat(argv[0]))
 			m_arg(GetAFloat(argv[0]));
@@ -52,6 +52,7 @@ public:
 	{
 		FLEXT_CADDMETHOD(c,1,m_arg);
 		FLEXT_CADDATTR_VAR1(c,"keep",keep);
+		FLEXT_CADDATTR_VAR1(c,"zero",zero);
 	}
 
 	virtual V m_arg(F s) 
@@ -63,20 +64,21 @@ public:
 	virtual Vasp *x_work() 
 	{ 
 		Vasp *ret = new Vasp(ref); 
-		if(sets) ret->Size(size,keep);
+		if(sets) ret->Size(size,keep,zero);
 		return ret;
 	}
 
 	virtual V m_help() { post("%s - Set the size of the vector buffers",thisName()); }
 protected:
 	I size;
-	BL sets,keep;
+	BL sets,keep,zero;
 
 private:
 	FLEXT_CALLBACK_F(m_arg);
 	FLEXT_CALLSET_I(m_arg);
 	FLEXT_ATTRGET_I(size);
 	FLEXT_ATTRVAR_B(keep);
+	FLEXT_ATTRVAR_B(zero);
 };
 
 FLEXT_LIB_V("vasp, vasp.size vasp.s",vasp_size)

@@ -78,13 +78,13 @@ public:
 	V FramesR(R f) { if(f) FramesM(1./f); else Frames(0); }
 
 	// set buffer sizes
-	V Size(I fr,BL keep = true);
+	V Size(I fr,BL keep = true,BL zero = true);
 	// set frame count differentially
-	V SizeD(I frd,BL keep = true);
+	V SizeD(I frd,BL keep = true,BL zero = true);
 	// set frame count 
-	V SizeM(R f,BL keep = true);
+	V SizeM(R f,BL keep = true,BL zero = true);
 	// set frame count 
-	V SizeR(R f,BL keep = true) { if(f) SizeM(1./f,keep); else Size(0,false); }
+	V SizeR(R f,BL keep = true,BL zero = true) { if(f) SizeM(1./f,keep,zero); else Size(0,false); }
 
 	// actual length of the vasp (in frames)
 	I ChkFrames() const;

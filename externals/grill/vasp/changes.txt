@@ -5,6 +5,7 @@ Version history:
 - FIX: bug for binary operations of complex vasps
 - ADD: implemented (factor-4) loop unrolling for vector calculation loops
 - CHANGE: completely restructured vector optimization and introduced multi-dimensional multi-layered functionality
+- ADD: attribute "zero" of vasp.size variants (default: true) - whether new samples shall be zeroed
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument

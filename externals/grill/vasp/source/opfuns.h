@@ -121,7 +121,7 @@ namespace VecOp {
     template<class T> class f_sqr {
     public: 
     	static I run_opt() { return 3; }
-        static V run(T &v,T a) { v = a*a; } 
+        static V run(T &v,T a) { v = a*a; post("sq"); } 
     	static I cun_opt() { return 1; }
         static V cun(T &rv,T &iv,T ra,T ia) { rv = ra*ra-ia*ia; iv = ra*ia*2; }
     };
@@ -449,8 +449,9 @@ namespace VecOp {
 }
 
 
+
 #define DEFOP(T,FUN,OP,KIND) \
-namespace VecOp { inline BL FUN(OpParam &p) { return D__##KIND<T,f_##OP<T> >(p); } }
+namespace VecOp { inline BL FUN(OpParam &p) { return D__##KIND(T,f_##OP<T>,p); } }
 
 
 #define DEFVEC_R(T,OP) \

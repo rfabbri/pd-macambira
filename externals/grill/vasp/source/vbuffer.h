@@ -47,7 +47,7 @@ public:
 
 	virtual BL Ok() const = 0;
 	virtual I Frames() const = 0;
-	virtual V Frames(I fr,BL keep) = 0;
+	virtual V Frames(I fr,BL keep,BL zero) = 0;
 
 	virtual I Channels() const = 0;
 	virtual S *Data() = 0;
@@ -91,7 +91,7 @@ public:
 	SysBuf &Set(const VSymbol &s,I chn = 0,I len = -1,I offs = 0);
 
 	virtual I Frames() const { return buf.Frames(); }
-	virtual V Frames(I fr,BL keep) { buf.Frames(fr,keep); }
+	virtual V Frames(I fr,BL keep,BL zero) { buf.Frames(fr,keep,zero); }
 
 	virtual I Channels() const { return buf.Channels(); }
 	virtual S *Data() { return buf.Data(); }
@@ -115,7 +115,7 @@ public:
 	virtual VSymbol Symbol() const;
 
 	virtual I Frames() const;
-	virtual V Frames(I fr,BL keep);
+	virtual V Frames(I fr,BL keep,BL zero);
 
 	virtual I Channels() const { return 1; }
 	virtual S *Data();

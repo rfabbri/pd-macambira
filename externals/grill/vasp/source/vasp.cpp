@@ -281,37 +281,37 @@ V Vasp::Channel(I c)
 }
 
 
-V Vasp::Size(I s,BL keep)
+V Vasp::Size(I s,BL keep,BL zero)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
-			buf->Frames(s,keep);
+			buf->Frames(s,keep,zero);
 			delete buf;
 		}
 	}
 }
 
-V Vasp::SizeD(I sd,BL keep)
+V Vasp::SizeD(I sd,BL keep,BL zero)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
 			I s = buf->Frames()+sd;
-			buf->Frames(s >= 0?s:0,keep);
+			buf->Frames(s >= 0?s:0,keep,zero);
 			delete buf;
 		}
 	}
 }
 
 
-V Vasp::SizeM(R f,BL keep)
+V Vasp::SizeM(R f,BL keep,BL zero)
 {
 	for(I i = 0; i < Vectors(); ++i) {
 		VBuffer *buf = Buffer(i);
 		if(buf) { 
 			I s = (I)(buf->Frames()*f);
-			buf->Frames(s >= 0?s:0,keep);
+			buf->Frames(s >= 0?s:0,keep,zero);
 			delete buf;
 		}
 	}

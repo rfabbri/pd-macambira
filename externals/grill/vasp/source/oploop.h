@@ -67,11 +67,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
         #define _DE_LOOP(VAR,LEN,BODY) { \
 	        for(VAR = 0; VAR < LEN; flext_base::ThrYield()) { \
                 register const I __m__ = _D_MIN(LEN,VAR+_D_BLOCK); \
-                for(; VAR <= __m__-4; VAR += 4) { \
-                    BODY; \
-                    BODY; \
-                    BODY; \
-                    BODY; \
+                for(; VAR <= __m__-4; ) { \
+                    BODY; ++VAR; \
+                    BODY; ++VAR; \
+                    BODY; ++VAR; \
+                    BODY; ++VAR; \
                 } \
                 for(; VAR < __m__; ++VAR) { \
                     BODY; \
@@ -82,11 +82,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
     #else
 
         #define _DE_LOOP(VAR,LEN,BODY) { \
-            for(VAR = 0; VAR <= LEN-4; VAR += 4) { \
-                BODY; \
-                BODY; \
-                BODY; \
-                BODY; \
+            for(VAR = 0; VAR <= LEN-4; ) { \
+                BODY; ++VAR; \
+                BODY; ++VAR; \
+                BODY; ++VAR; \
+                BODY; ++VAR; \
             } \
             for(; VAR < LEN; ++VAR) { \
                 BODY; \
