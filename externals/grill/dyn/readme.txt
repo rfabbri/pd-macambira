@@ -41,6 +41,7 @@ CHANGES:
 
 0.1.1:
 - using aligned memory
+- cached several symbols
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality

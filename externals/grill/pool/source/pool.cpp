@@ -862,8 +862,10 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
         if(!gettag(is,tag)) break;
 
         if(tag == "pool") {
-            if(tag.type == xmltag::t_start) 
-                LdDirXMLRec(is,depth,mkdir,AtomList());
+            if(tag.type == xmltag::t_start) {
+                AtomList empty; // must be a separate definition for gcc
+                LdDirXMLRec(is,depth,mkdir,empty);
+            }
             else
                 post("pool - pool not initialized yet");
         }

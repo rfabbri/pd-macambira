@@ -166,6 +166,9 @@ private:
 	FLEXT_CALLBACK_V(m_disconnect)
 	FLEXT_CALLBACK_V(m_send)
 	FLEXT_CALLBACK_B(m_vis)
+
+    static const t_symbol *sym_dot,*sym_dynsin,*sym_dynsout,*sym_dynin,*sym_dynout,*sym_dyncanvas;
+    static const t_symbol *sym_vis,*sym_loadbang,*sym_dsp;
 };
 
 FLEXT_NEW_DSP_V("dyn~",dyn)
@@ -178,28 +181,47 @@ const t_symbol *dyn::k_obj = NULL;
 const t_symbol *dyn::k_msg = NULL;
 const t_symbol *dyn::k_text = NULL;
 
+const t_symbol *dyn::sym_dot = NULL;
+const t_symbol *dyn::sym_dynsin = NULL;
+const t_symbol *dyn::sym_dynsout = NULL;
+const t_symbol *dyn::sym_dynin = NULL;
+const t_symbol *dyn::sym_dynout = NULL;
+const t_symbol *dyn::sym_dyncanvas = NULL;
+
+const t_symbol *dyn::sym_vis = NULL;
+const t_symbol *dyn::sym_loadbang = NULL;
+const t_symbol *dyn::sym_dsp = NULL;
+
 
 void dyn::setup(t_classid c)
 {
 	post("");
-	post("dyn~ %s - dynamic object management, (C)2003 Thomas Grill",DYN_VERSION);
+	post("dyn~ %s - dynamic object management, (C)2003-2004 Thomas Grill",DYN_VERSION);
 	post("");
 
+    sym_dynsin = MakeSymbol("dyn_in~");
+    sym_dynsout = MakeSymbol("dyn_out~");
+    sym_dynin = MakeSymbol("dyn_in");
+    sym_dynout = MakeSymbol("dyn_out");
+
+    sym_dot = MakeSymbol(".");
+    sym_dyncanvas = MakeSymbol(" dyn~-canvas ");
+
 	// set up proxy class for inbound messages
-    pxin_class = class_new(gensym("dyn_in"),(t_newmethod)pxin_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
+    pxin_class = class_new(const_cast<t_symbol *>(sym_dynin),(t_newmethod)pxin_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
 	add_anything(pxin_class,proxyin::px_method); 
 
 	// set up proxy class for inbound signals
-	pxins_class = class_new(gensym("dyn_in~"),(t_newmethod)pxins_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
+	pxins_class = class_new(const_cast<t_symbol *>(sym_dynsin),(t_newmethod)pxins_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
     add_dsp(pxins_class,proxyin::dsp);
     CLASS_MAINSIGNALIN(pxins_class, proxyin, defsig);
 
 	// set up proxy class for outbound messages
-	pxout_class = class_new(gensym("dyn_out"),(t_newmethod)pxout_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
+	pxout_class = class_new(const_cast<t_symbol *>(sym_dynout),(t_newmethod)pxout_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
 	add_anything(pxout_class,proxyout::px_method); 
 
 	// set up proxy class for outbound signals
-	pxouts_class = class_new(gensym("dyn_out~"),(t_newmethod)pxouts_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
+	pxouts_class = class_new(const_cast<t_symbol *>(sym_dynsout),(t_newmethod)pxouts_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
 	add_dsp(pxouts_class,proxyout::dsp);
     CLASS_MAINSIGNALIN(pxouts_class, proxyout, defsig);
 
@@ -219,6 +241,10 @@ void dyn::setup(t_classid c)
     k_obj = MakeSymbol("obj"); 
     k_msg = MakeSymbol("msg"); 
     k_text = MakeSymbol("text"); 
+
+    sym_vis = MakeSymbol("vis");
+    sym_loadbang = MakeSymbol("loadbang");
+    sym_dsp = MakeSymbol("dsp");
 }
 
 
@@ -279,7 +305,7 @@ dyn::dyn(int argc,const t_atom *argv):
 	SetInt(arg[1],0);	// ypos
 	SetInt(arg[2],700);	// xwidth 
 	SetInt(arg[3],520);	// xwidth 
-	SetString(arg[4]," dyn~-canvas ");	// canvas name
+	SetSymbol(arg[4],sym_dyncanvas);	// canvas name
 	SetInt(arg[5],0);	// visible
 
 	canvas = canvas_new(NULL, NULL, 6, arg);
@@ -295,9 +321,9 @@ dyn::dyn(int argc,const t_atom *argv):
         t_atom lst[5];
         SetInt(lst[0],i*100);
         SetInt(lst[1],10);
-        SetString(lst[2],".");
-        SetString(lst[3],"");
-        SetString(lst[4],sig?"dyn_in~":"dyn_in");
+        SetSymbol(lst[2],sym_dot);
+        SetSymbol(lst[3],sym__);
+        SetSymbol(lst[4],sig?sym_dynsin:sym_dynin);
 
         try {
             pxin[i] = (proxyin *)New(k_obj,5,lst,false);
@@ -317,9 +343,9 @@ dyn::dyn(int argc,const t_atom *argv):
         t_atom lst[5];
         SetInt(lst[0],i*100);
         SetInt(lst[1],500);
-        SetString(lst[2],".");
-        SetString(lst[3],"");
-        SetString(lst[4],sig?"dyn_out~":"dyn_out");
+        SetSymbol(lst[2],sym_dot);
+        SetSymbol(lst[3],sym__);
+        SetSymbol(lst[4],sig?sym_dynsout:sym_dynout);
 
         try {
             pxout[i] = (proxyout *)New(k_obj,5,lst,false);
@@ -360,7 +386,7 @@ dyn::obj *dyn::Find(const t_symbol *n)
 
 t_glist *dyn::FindCanvas(const t_symbol *n)
 {
-    if(n == MakeSymbol(".")) 
+    if(n == sym_dot) 
         return canvas;
     else {
         obj *o = Find(n);
@@ -385,8 +411,10 @@ void dyn::Delete(t_gobj *o)
 
 static t_gobj *GetLast(t_glist *gl)
 {
-    t_gobj *go;
-    for (go = gl->gl_list; go->g_next; go = go->g_next);
+    t_gobj *go = gl->gl_list;
+    if(go)
+        while(go->g_next) 
+            go = go->g_next;
     return go;
 }
 
@@ -422,7 +450,7 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 	}
 
 	if(argv) {
-		if(add && (!name || name == MakeSymbol(".") || Find(name))) 
+		if(add && (!name || name == sym_dot || Find(name))) 
 			err = "Object name is already present";
         else if(!canv || !(glist = FindCanvas(canv)))
 			err = "Canvas could not be found";
@@ -430,24 +458,27 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 			// set selected canvas as current
 			canvas_setcurrent(glist); 
 
-            pd_typedmess((t_pd *)glist,(t_symbol *)kind,argc,(t_atom *)argv);
+            t_gobj *last = GetLast(glist);
+            pd_typedmess((t_pd *)glist,(t_symbol *)kind,argc,argv);
+            newest = GetLast(glist);
 
             if(kind == k_obj) {
                 t_object *o = (t_object *)pd_newest();
-                newest = o?&o->te_g:NULL;
 
-                if(!newest) {
+                if(!o) {
                     // PD creates a text object when the intended object could not be created
                     t_gobj *trash = GetLast(glist);
 
-                    // TODO: Test for it....
-
-                    // Delete it!
-                    Delete(trash);
+                    // Test for newly created object....
+                    if(trash && last != trash) {
+                        // Delete it!
+                        glist_delete(glist,trash);
+                    }
+                    newest = NULL;
                 }
+                else
+                    newest = &o->te_g;
             }
-            else 
-                newest = GetLast(glist);
 
 			// look for latest created object
 			if(newest) {
@@ -457,10 +488,10 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 				// send loadbang (if it is an abstraction)
 				if(pd_class(&newest->g_pd) == canvas_class) {
 					// hide the sub-canvas
-					pd_vmess((t_pd *)newest,gensym("vis"),"i",0);
+					pd_vmess((t_pd *)newest,const_cast<t_symbol *>(sym_vis),"i",0);
 
                     // loadbang the abstraction
-					pd_vmess((t_pd *)newest,gensym("loadbang"),"");
+					pd_vmess((t_pd *)newest,const_cast<t_symbol *>(sym_loadbang),"");
                 }
 
 				// restart dsp - that's necessary because ToCanvas is called manually
@@ -727,7 +758,7 @@ void dyn::proxyout::init(dyn *t,int o,bool s)
 void dyn::m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs)
 {
 	// add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
-    mess1((t_pd *)canvas, gensym("dsp"),NULL);
+    mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
 
 	flext_dsp::m_dsp(n,insigs,outsigs);
 }
