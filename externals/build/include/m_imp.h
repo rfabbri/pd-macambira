@@ -72,6 +72,8 @@ extern char *sys_guicmd;
 /* in s_main.c */
 EXTERN int sys_nearestfontsize(int fontsize);
 EXTERN int sys_hostfontsize(int fontsize);
+extern char sys_cordcolor[];
+extern int sys_guishadow;
 
 extern int sys_defaultfont;
 extern t_symbol *sys_libdir;	/* library directory for auxilliary files */
@@ -90,6 +92,7 @@ and MIDI I/O as follows: */
 #define SENDDACS_YES 1 
 #define SENDDACS_SLEPT 2
 
+#define API_PROBE -1
 #define API_OSS 0   	/* API choices */
 #define API_ALSA 1
 #define API_RME 2

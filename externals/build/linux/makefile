@@ -1,9 +1,9 @@
 
 prefix=$(DESTDIR)/usr
 
-EXTERNALS = $(shell ls )
+EXTERNALS = $(shell ls ../src )
 
-all: link.stamp $(EXTERNALS:.c=.pd_linux)
+all: $(EXTERNALS:.c=.pd_linux)
 
 .SUFFIXES: .pd_linux
 
@@ -33,14 +33,4 @@ install: install-doc
 	@test -d $(prefix)/lib/pd/extra || mkdir -p $(prefix)/lib/pd/extra
 	install -m644 *.pd_linux $(prefix)/lib/pd/extra
 
-
-link: link.stamp
-
-link.stamp:
-	cp ../src/*.c .
-	rm vst.c
-	touch link.stamp
-	make
-	
-	
 

@@ -66,9 +66,6 @@ EXTERN_STRUCT _tscalar;
 EXTERN_STRUCT _canvasenvironment;
 #define t_canvasenvironment struct _canvasenvironment 
 
-EXTERN_STRUCT _linetraverser;
-#define t_linetraverser struct _linetraverser 
-
 typedef struct _selection
 {
     t_gobj *sel_what;
@@ -92,9 +89,15 @@ typedef struct _editor
     struct _glist *e_glist;	    /* glist which owns this */
     int e_xwas;   	    	    /* xpos on last mousedown or motion event */
     int e_ywas;   	    	    /* ypos, similarly */
+    int e_selectline_index1;	    /* indices for the selected line if any */
+    int e_selectline_outno; 	    /* (only valid if e_selectedline is set) */
+    int e_selectline_index2;
+    int e_selectline_inno;
+    t_outconnect *e_selectline_tag;
     unsigned int e_onmotion: 3;     /* action to take on motion */
     unsigned int e_lastmoved: 1;    /* one if mouse has moved since click */
     unsigned int e_textdirty: 1;    /* one if e_textedfor has changed */
+    unsigned int e_selectedline: 1; /* one if a line is selected */
 } t_editor;
 
 #define MA_NONE    0 	/* e_onmotion: do nothing on mouse motion */
@@ -166,7 +169,6 @@ struct _glist
     unsigned int gl_edit:1;  	    /* edit mode */
     unsigned int gl_imatemplate:1;  /* someone needs me as template */
     unsigned int gl_isdeleting:1;   /* we're inside glist_delete -- hack! */
-    unsigned int gl_protect:1;	    /* don't delete connections on click */
     unsigned int gl_stretch:1;	    /* stretch contents on resize */
     unsigned int gl_isgraph:1;	    /* show as graph on parent */
 };
@@ -209,7 +211,7 @@ struct _array
 };
 
     /* structure for traversing all the connections in a glist */
-struct _linetraverser
+typedef struct _linetraverser
 {
     t_canvas *tr_x;
     t_object *tr_ob;
@@ -225,7 +227,7 @@ struct _linetraverser
     int tr_lx1, tr_ly1, tr_lx2, tr_ly2;
     t_outconnect *tr_nextoc;
     int tr_nextoutno;
-};
+} t_linetraverser;
 
 /* function types used to define graphical behavior for gobjs, a bit like X
 widgets.  We don't use Pd methods because Pd's typechecking can't specify the
@@ -388,6 +390,9 @@ EXTERN void glist_drawiofor(t_glist *glist, t_object *ob, int firsttime,
     char *tag, int x1, int y1, int x2, int y2);
 EXTERN void glist_eraseiofor(t_glist *glist, t_object *ob, char *tag);
 EXTERN void canvas_create_editor(t_glist *x, int createit);
+void canvas_deletelinesforio(t_canvas *x, t_text *text,
+    t_inlet *inp, t_outlet *outp);
+
 
 /* -------------------- functions on texts ------------------------- */
 EXTERN void text_setto(t_text *x, t_glist *glist, char *buf, int bufsize);
@@ -469,6 +474,16 @@ EXTERN void canvas_loadbang(t_canvas *x);
 EXTERN int canvas_hitbox(t_canvas *x, t_gobj *y, int xpos, int ypos,
     int *x1p, int *y1p, int *x2p, int *y2p);
 EXTERN int canvas_setdeleting(t_canvas *x, int flag);
+
+typedef void (*t_undofn)(t_canvas *canvas, void *buf,
+    int action);	/* a function that does UNDO/REDO */
+#define UNDO_FREE 0	    	    	/* free current undo/redo buffer */
+#define UNDO_UNDO 1 	    	    	/* undo */
+#define UNDO_REDO 2 	    	    	/* redo */
+EXTERN void canvas_setundo(t_canvas *x, t_undofn undofn, void *buf,
+    const char *name);
+EXTERN void canvas_noundo(t_canvas *x);
+EXTERN int canvas_getindex(t_canvas *x, t_gobj *y);
 
 /* ---- functions on canvasses as objects  --------------------- */
 
@@ -562,3 +577,7 @@ EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
 /* ----------------------- guiconnects, g_guiconnect.c --------- */
 EXTERN t_guiconnect *guiconnect_new(t_pd *who, t_symbol *sym);
 EXTERN void guiconnect_notarget(t_guiconnect *x, double timedelay);
+
+/* ------------- IEMGUI routines used in other g_ files ---------------- */
+EXTERN t_symbol *iemgui_raute2dollar(t_symbol *s);
+EXTERN t_symbol *iemgui_dollar2raute(t_symbol *s);
