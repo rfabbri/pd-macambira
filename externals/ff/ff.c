@@ -149,7 +149,7 @@ void ff_stop(t_ff *x)
 		perror("couldn't read status of effect");
 	}
 
-	if (x->do_that.value = FF_STATUS_PLAYING) {
+	if (x->do_that.value == FF_STATUS_PLAYING) {
 
 		x->do_that.type = EV_FF;
 		x->do_that.code = x->effects.id;
