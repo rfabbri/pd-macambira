@@ -1,0 +1,98 @@
+#N canvas 61 386 886 505 10;
+#X msg 192 64 start;
+#X msg 203 95 stop;
+#X floatatom 397 180 2 0 0 3 button# - -;
+#X floatatom 454 179 2 0 0 3 button_value - -;
+#X floatatom 143 180 5 0 0 3 y-axis - -;
+#X floatatom 95 180 5 0 0 3 x-axis - -;
+#X floatatom 242 181 3 0 0 3 hat-X - -;
+#X floatatom 288 181 3 0 0 3 hat-Y - -;
+#X floatatom 192 181 5 0 0 3 twist - -;
+#X floatatom 331 180 5 0 0 3 throttle - -;
+#X obj 192 123 rawjoystick /dev/input/event1;
+#X obj 299 309 select 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+19 20 21;
+#X obj 297 354 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 313 355 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 333 354 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 351 354 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 370 353 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 389 354 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 409 353 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 734 354 bng 30 250 50 0 empty empty not_recognized 0 -6 0 8
+-261689 -1 -1;
+#X obj 689 352 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 667 350 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 647 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 631 354 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 613 352 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 596 350 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 579 352 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 561 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 541 349 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 523 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 503 350 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 485 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 466 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 447 353 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 428 353 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 439 220 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X connect 0 0 10 0;
+#X connect 1 0 10 0;
+#X connect 2 0 11 0;
+#X connect 3 0 35 0;
+#X connect 10 0 5 0;
+#X connect 10 1 4 0;
+#X connect 10 2 8 0;
+#X connect 10 3 6 0;
+#X connect 10 4 7 0;
+#X connect 10 5 9 0;
+#X connect 10 6 2 0;
+#X connect 10 7 3 0;
+#X connect 11 0 12 0;
+#X connect 11 1 13 0;
+#X connect 11 2 14 0;
+#X connect 11 3 15 0;
+#X connect 11 4 16 0;
+#X connect 11 5 17 0;
+#X connect 11 6 18 0;
+#X connect 11 7 34 0;
+#X connect 11 8 33 0;
+#X connect 11 9 32 0;
+#X connect 11 10 31 0;
+#X connect 11 11 30 0;
+#X connect 11 12 29 0;
+#X connect 11 13 28 0;
+#X connect 11 14 27 0;
+#X connect 11 15 26 0;
+#X connect 11 16 25 0;
+#X connect 11 17 24 0;
+#X connect 11 18 23 0;
+#X connect 11 19 22 0;
+#X connect 11 20 21 0;
+#X connect 11 21 20 0;
+#X connect 11 22 19 0;
+#X connect 35 0 2 0;
