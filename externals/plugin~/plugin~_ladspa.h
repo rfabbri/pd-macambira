@@ -1,6 +1,6 @@
 /* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
    Copyright (C) 2000 Jarno Seppänen
-   $Id: plugin~_ladspa.h,v 1.1 2002-11-19 09:51:40 ggeiger Exp $
+   $Id: plugin~_ladspa.h,v 1.2 2003-01-23 12:32:04 ggeiger Exp $
 
    This file is part of plugin~.
 
@@ -43,6 +43,7 @@ typedef struct
     /* Memory to pass async control data to/from the plugin */
     float*		control_input_values;
     float*		control_output_values;
+
     /* Used for monitoring changes in the values */
     float*		prev_control_output_values;
     int			prev_control_output_values_invalid;

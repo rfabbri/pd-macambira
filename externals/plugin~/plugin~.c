@@ -1,6 +1,6 @@
 /* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
    Copyright (C) 2000 Jarno Seppänen
-   $Id: plugin~.c,v 1.1 2002-11-19 09:51:40 ggeiger Exp $
+   $Id: plugin~.c,v 1.2 2003-01-23 12:32:04 ggeiger Exp $
 
    This file is part of plugin~.
 
@@ -328,15 +328,18 @@ plugin_tilde_perform (t_int* w)
 void
 plugin_tilde_emit_control_output (Pd_Plugin_Tilde* x,
 				  const char* name,
-				  float new_value)
+				  float new_value,
+				  int output_port_index)
 {
-    /* Construct and outlet a "control" message with two Pd atoms */
-    t_atom anything_atoms[2];
+    /* Construct and outlet a "control" message with three Pd atoms */
+    t_atom anything_atoms[3];
     anything_atoms[0].a_type = A_SYMBOL;
     anything_atoms[0].a_w.w_symbol = gensym ((char*)name);
     anything_atoms[1].a_type = A_FLOAT;
     anything_atoms[1].a_w.w_float = new_value;
-    outlet_anything (x->control_outlet, gensym ("control"), 2, anything_atoms);
+    anything_atoms[2].a_type = A_FLOAT;
+    anything_atoms[2].a_w.w_float = output_port_index;
+    outlet_anything (x->control_outlet, gensym ("control"), 3, anything_atoms);
 }
 
 static void

@@ -1,6 +1,6 @@
 /* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
    Copyright (C) 2000 Jarno Seppänen
-   $Id: plugin~_ladspa.c,v 1.1 2002-11-19 09:51:40 ggeiger Exp $
+   $Id: plugin~_ladspa.c,v 1.2 2003-01-23 12:32:04 ggeiger Exp $
 
    This file is part of plugin~.
 
@@ -121,6 +121,8 @@ plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
     x->plugin.ladspa.instance = NULL;
     x->plugin.ladspa.control_input_values = NULL;
     x->plugin.ladspa.control_output_values = NULL;
+    x->plugin.ladspa.control_input_ports = NULL;
+    x->plugin.ladspa.control_output_ports = NULL;
     x->plugin.ladspa.prev_control_output_values = NULL;
     x->plugin.ladspa.prev_control_output_values_invalid = 1;
     x->plugin.ladspa.outofplace_audio_outputs = NULL;
@@ -253,8 +255,9 @@ plugin_tilde_ladspa_apply_plugin (Pd_Plugin_Tilde* x)
 	{
 	    /* Emit a control message */
 	    plugin_tilde_emit_control_output (x,
-					      x->plugin.ladspa.type->PortNames[i],
-					      x->plugin.ladspa.control_output_values[i]);
+					      x->plugin.ladspa.type->PortNames[x->plugin.ladspa.control_output_ports[i]],
+					      x->plugin.ladspa.control_output_values[i],
+					      i);
 	    /* Update the corresponding control monitoring value */
 	    x->plugin.ladspa.prev_control_output_values[i] = x->plugin.ladspa.control_output_values[i];
 	}
@@ -619,6 +622,7 @@ plugin_tilde_ladspa_connect_control_ports (Pd_Plugin_Tilde* x)
 		x->plugin.ladspa.type->connect_port (x->plugin.ladspa.instance,
 					      port_index,
 					      &x->plugin.ladspa.control_input_values[input_count]);
+		x->plugin.ladspa.control_input_ports[input_count] = port_index;
 		input_count++;
 	    }
 	    else if (LADSPA_IS_PORT_OUTPUT (port_type))
@@ -626,6 +630,8 @@ plugin_tilde_ladspa_connect_control_ports (Pd_Plugin_Tilde* x)
 		x->plugin.ladspa.type->connect_port (x->plugin.ladspa.instance,
 					      port_index,
 					      &x->plugin.ladspa.control_output_values[output_count]);
+		x->plugin.ladspa.control_output_ports[output_count] = port_index;
+
 		output_count++;
 	    }
 	}
@@ -684,24 +690,32 @@ static int
 plugin_tilde_ladspa_alloc_control_memory (Pd_Plugin_Tilde* x)
 {
     x->plugin.ladspa.control_input_values = NULL;
+    x->plugin.ladspa.control_input_ports = NULL;
     if (x->num_control_inputs > 0)
     {
 	x->plugin.ladspa.control_input_values = (float*)calloc
 	    (x->num_control_inputs, sizeof (float));
-	if (x->plugin.ladspa.control_input_values == NULL) {
+	x->plugin.ladspa.control_input_ports = (int*)calloc
+	    (x->num_control_inputs, sizeof (int));
+	if (x->plugin.ladspa.control_input_values == NULL
+	    || x->plugin.ladspa.control_input_ports == NULL) {
 	    return 1; /* error */
 	}
     }
     x->plugin.ladspa.control_output_values = NULL;
+    x->plugin.ladspa.control_output_ports = NULL;
     x->plugin.ladspa.prev_control_output_values = NULL;
     if (x->num_control_outputs > 0)
     {
 	x->plugin.ladspa.control_output_values = (float*)calloc
 	    (x->num_control_outputs, sizeof (float));
+	x->plugin.ladspa.control_output_ports = (int*)calloc
+	    (x->num_control_outputs, sizeof (int));
 	x->plugin.ladspa.prev_control_output_values = (float*)calloc
 	    (x->num_control_outputs, sizeof (float));
 	if (x->plugin.ladspa.control_output_values == NULL
-	    || x->plugin.ladspa.prev_control_output_values == NULL) {
+	    || x->plugin.ladspa.prev_control_output_values == NULL
+	    || x->plugin.ladspa.control_output_ports == NULL) {
 	    return 1; /* error */
 	}
     }
@@ -727,6 +741,16 @@ plugin_tilde_ladspa_free_control_memory (Pd_Plugin_Tilde* x)
     {
 	free (x->plugin.ladspa.prev_control_output_values);
 	x->plugin.ladspa.prev_control_output_values = NULL;
+    }
+    if (x->plugin.ladspa.control_input_ports != NULL)
+    {
+	free (x->plugin.ladspa.control_input_ports);
+	x->plugin.ladspa.control_input_ports = NULL;
+    }
+    if (x->plugin.ladspa.control_output_ports != NULL)
+    {
+	free (x->plugin.ladspa.control_output_ports);
+	x->plugin.ladspa.control_output_ports = NULL;
     }
 }
 

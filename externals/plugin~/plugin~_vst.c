@@ -1,6 +1,6 @@
 /* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
    Copyright (C) 2000 Jarno Seppänen
-   $Id: plugin~_vst.c,v 1.1 2002-11-19 09:51:40 ggeiger Exp $
+   $Id: plugin~_vst.c,v 1.2 2003-01-23 12:32:04 ggeiger Exp $
 
    This file is part of plugin~.
 
@@ -381,7 +381,7 @@ plugin_tilde_vst_audioMaster (AEffect* effect,
 	    /* Send "control" messages from here */
 	    memset (param_name, 0, 9);
 	    effect->dispatcher (effect, effGetParamName, index, 0, param_name, 0);
-	    plugin_tilde_emit_control_output (effect->user, param_name, opt);
+	    plugin_tilde_emit_control_output (effect->user, param_name, opt, index);
 	    return 0;
 	    break;
 	case audioMasterVersion:
