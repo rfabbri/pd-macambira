@@ -108,3 +108,77 @@ int32 timeseed()
 	
 	return (int32)tsec ^ (int32)tusec ^ count--;
 }
+
+/* from Convolution.cpp */
+extern "C" 
+{
+    float *cosTable[32];
+    float *fftWindow[32];
+}
+
+
+float* create_cosTable(int log2n)
+{
+	int size = 1 << log2n;
+	int size2 = size / 4 + 1;
+	float *win = (float*)malloc(size2 * sizeof(float));
+	double winc = twopi / size;
+	for (int i=0; i<size2; ++i) {
+		double w = i * winc;
+		win[i] = cos(w);
+	}
+	return win;
+}
+
+float* create_fftwindow(int log2n)
+{
+	int size = 1 << log2n;
+	float *win = (float*)malloc(size * sizeof(float));
+	//double winc = twopi / size;
+	double winc = pi / size;
+	for (int i=0; i<size; ++i) {
+		double w = i * winc;
+		//win[i] = 0.5 - 0.5 * cos(w);
+		win[i] = sin(w);
+	}
+	return win;
+}
+
+void init_ffts()
+{
+#if __VEC__
+	
+	for (int i=0; i<32; ++i) {
+		fftsetup[i] = 0;
+	}
+	for (int i=0; i<15; ++i) {
+		fftsetup[i] = create_fftsetup(i, kFFTRadix2);
+	}
+#else
+	for (int i=0; i<32; ++i) {
+		cosTable[i] = 0;
+		fftWindow[i] = 0;
+	}
+	for (int i=3; i<15; ++i) {
+		cosTable[i] = create_cosTable(i);
+		fftWindow[i] = create_fftwindow(i);
+	}
+#endif
+}
+
+void DoWindowing(int log2n, float * fftbuf, int bufsize)
+{
+	float *win = fftWindow[log2n];
+	
+	//printf("fail? %i %d /n", log2n, win);
+	
+	if (!win) return;
+	float *in = fftbuf - 1;
+	win--;
+        
+	for (int i=0; i<bufsize; ++i) {
+		*++in *= *++win;
+	}
+}
+
+#include "fftlib.c"

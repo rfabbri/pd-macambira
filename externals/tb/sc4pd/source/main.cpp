@@ -1,3 +1,4 @@
+
 /* sc4pd
    library initialization
 
@@ -68,7 +69,8 @@ void sc4pd_library_setup()
 	 "BRF~,\n"
 	 "          LPZ1(~), HPZ1(~), LPZ2(~), HPZ2(~), BPZ2(~), BRZ2(~), "
 	 "LFDNoise0~,\n" 
-	 "          LFDNoise1~, LFDNoise2~, sc+~, sc-~, sc*~, sc/~\n"
+	 "          LFDNoise1~, LFDNoise2~, sc+~, sc-~, sc*~, sc/~, "
+	 "Convolution~\n"
 	 );
 
     //initialize objects
@@ -296,6 +298,11 @@ void sc4pd_library_setup()
     FLEXT_DSP_SETUP(scmul_ar); 
 
     FLEXT_DSP_SETUP(scdiv_ar); 
+
+    FLEXT_DSP_SETUP(Convolution_ar); 
+
+    //init ffts
+    init_ffts();
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

@@ -115,5 +115,10 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define SIGFUN(FUN) &thisType::FUN
 
 
+/* from Convolution.cpp */
+void init_ffts();
+float* create_fftwindow(int log2n);
+float* create_cosTable(int log2n);
+void DoWindowing(int log2n, float * fftbuf, int bufsize);
 
 #endif
