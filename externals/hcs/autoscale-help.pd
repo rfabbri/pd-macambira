@@ -1,4 +1,4 @@
-#N canvas 470 47 473 417 10;
+#N canvas 48 99 479 531 10;
 #X floatatom 26 88 5 0 0 0 - - -;
 #X floatatom 26 152 0 0 0 0 - - -;
 #X obj 68 270 autoscale;
@@ -13,23 +13,33 @@ output range defaults to 0-127.;
 #X floatatom 68 249 5 0 0 0 - - -;
 #X obj 71 293 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 17 343 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 17 453 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
-#X text 234 357 released under the GNU GPL;
+#X text 234 467 released under the GNU GPL;
 #X floatatom 150 152 0 0 0 0 - - -;
 #X floatatom 297 152 0 0 0 0 - - -;
 #X obj 213 83 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 17 376 $Revision: 1.2 $$Date: 2004-11-02 06:39:29 $;
-#X text 18 389 $Author: eighthave $;
+#X text 17 486 $Revision: 1.3 $$Date: 2004-11-15 21:16:56 $;
+#X text 18 499 $Author: eighthave $;
+#X text 25 336 The [reset( message resets the stored max and min to
+zero.;
+#X floatatom 46 360 5 0 0 0 - - -;
+#X obj 71 413 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 11112 1;
+#X msg 96 358 reset;
 #X obj 26 122 autoscale 0 1;
 #X obj 150 122 autoscale -0.01 0.01;
 #X obj 297 122 autoscale -4095 4095;
-#X connect 0 0 16 0;
+#X obj 68 390 autoscale;
+#X connect 0 0 20 0;
 #X connect 2 0 8 0;
 #X connect 7 0 2 0;
-#X connect 13 0 17 0;
-#X connect 13 0 18 0;
-#X connect 16 0 1 0;
-#X connect 17 0 11 0;
-#X connect 18 0 12 0;
+#X connect 13 0 21 0;
+#X connect 13 0 22 0;
+#X connect 17 0 23 0;
+#X connect 19 0 23 0;
+#X connect 20 0 1 0;
+#X connect 21 0 11 0;
+#X connect 22 0 12 0;
+#X connect 23 0 18 0;
