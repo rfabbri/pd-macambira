@@ -1,4 +1,9 @@
-all: noize colortv subtract xbend bend gol shuffle green tile rgbcopy copyvert black rgb hist setbits xshred sonogram vf2fs fs2vf swap 2colors plot makesliders
+all:	noize colortv subtract xbend bend gol shuffle green \
+	tile rgbcopy copyvert black rgb hist setbits xshred \
+	sonogram vf2fs fs2vf swap 2colors plot makesliders \
+	convolution compare darken deinterlace difference interlace lighten \
+	multiply overlay screen shadowcaster softlight
+
 	dir *.dll
 
 # FLAGS:
@@ -80,3 +85,47 @@ plot:
 makesliders:
 	cl makesliders.c $(FLAGS) /link $(EFFECT)
 	copy makesliders.dll ms.dll
+
+#
+# PixelPack by Olaf Matthes
+#
+
+convolution:
+	cl convolution.c $(FLAGS) /link $(EFFECT)
+
+compare:
+	cl compare.c $(FLAGS) /link $(COPY)
+
+darken:
+	cl darken.c $(FLAGS) /link $(COPY)
+
+deinterlace:
+	cl deinterlace.c $(FLAGS) /link $(EFFECT)
+
+difference:
+	cl difference.c $(FLAGS) /link $(COPY)
+
+interlace:
+	cl interlace.c $(FLAGS) /link $(COPY)
+
+lighten:
+	cl lighten.c $(FLAGS) /link $(COPY)
+
+multiply:
+	cl multiply.c $(FLAGS) /link $(COPY)
+
+overlay:
+	cl overlay.c $(FLAGS) /link $(COPY)
+
+screen:
+	cl screen.c $(FLAGS) /link $(COPY)
+
+shadowcaster:
+	cl shadowcaster.c $(FLAGS) /link $(BOTH)
+
+softlight:
+	cl softlight.c $(FLAGS) /link $(COPY)
+
+#
+# </PixelPack>
+#

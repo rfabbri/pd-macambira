@@ -116,4 +116,21 @@ __inline pixel32 rgbtocolor32(byte r, byte g, byte b)
 	return (b << 16) | (g << 8) | r;
 }
 
+// restrict input to be 0..255 <olaf.matthes@gmx.de>
+__inline byte klamp255(long in)
+{
+	byte out = in<0 ? 0 : in;
+	out = 255<out ? 255 : out;
+	return(out);
+}
+
+// restrict input to be 16..235 as it is usual with signals
+// conforming to ITU-R 601     <olaf.matthes@gmx.de>
+__inline byte klamp601(long in)
+{
+	byte out = in<16 ? 16 : in;
+	out = 235<out ? 235 : out;
+	return(out);
+}
+
 #endif // #ifndef _PLUGINH
