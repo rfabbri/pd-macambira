@@ -31,10 +31,6 @@ pd - darwin (MacOSX):
 ---------------------
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 
-Max/MSP - MacOS9/X:
--------------------
-o CodeWarrior: edit "vst.cw" and build 
-
 
 ----------------------------------------------------------------------------
 
@@ -50,7 +46,8 @@ Version history:
 - fixed crash on destroying vst~ with open editor window
 - stripped all MFC code
 - fixed DSP initialization, zero dangling audio vectors
-- added "bypass" and "mute" attributes
+- pre12: added "bypass" and "mute" attributes
+- pre13: with flext 0.4.7 no more interruptions on window close
 
 0.0.0:
 - version of mark@junklight.com
@@ -62,6 +59,9 @@ features:
 - include necessary Steinberg license stuff
 
 BUGS:
-- Quadrafuzz crashes on closing editor window
 - Waveshell crashes on load
+- mouse interaction in editor can cause audio dropouts
 
+TODO:
+- do name scanning in the background
+- translate special characters in strings (like ° as param_label) into system-digestible form
