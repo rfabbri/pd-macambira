@@ -26,6 +26,9 @@
 #include "m_pd.h"
 #include <stdio.h>
 #include <math.h>
+#ifdef UNIX
+#include <stdlib.h>
+#endif
 
 #define ALPHA 10
 #define ADAPT_ARRAY_SIZE  1000

@@ -25,6 +25,9 @@
 #include "m_pd.h"
 #include <math.h>
 #include <stdio.h>
+#ifdef UNIX
+#include <stdlib.h>
+#endif
 
 static char *version = "gestalt v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
  

@@ -22,7 +22,7 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 #ifndef VERSION
-#define VERSION "1.2"
+#define VERSION "1.5.2"
 #endif
 
 #include "m_pd.h"
@@ -40,7 +40,9 @@ typedef struct _maxlib
 static t_class* maxlib_class;
 
 	/* objects */
+void maxlib_allow_setup();
 void maxlib_arbran_setup();
+void maxlib_arraycopy_setup();
 void maxlib_average_setup();
 void maxlib_beat_setup();
 void maxlib_beta_setup();
@@ -49,6 +51,7 @@ void maxlib_borax_setup();
 void maxlib_cauchy_setup();
 void maxlib_chord_setup();
 void maxlib_delta_setup();
+void maxlib_deny_setup();
 void maxlib_dist_setup();
 void maxlib_divide_setup();
 void maxlib_divmod_setup();
@@ -63,11 +66,13 @@ void maxlib_iso_setup();
 void maxlib_lifo_setup();
 void maxlib_limit_setup();
 void maxlib_linear_setup();
+void maxlib_listfifo_setup();
 void maxlib_listfunnel_setup();
 void maxlib_match_setup();
 void maxlib_minus_setup();
 void maxlib_mlife_setup();
 void maxlib_multi_setup();
+void maxlib_nchange_setup();
 void maxlib_netclient_setup();
 void maxlib_netdist_setup();
 void maxlib_netrec_setup();
@@ -87,6 +92,7 @@ void maxlib_speedlim_setup();
 void maxlib_split_setup();
 void maxlib_step_setup();
 void maxlib_subst_setup();
+void maxlib_sync_setup();
 void maxlib_temperature_setup();
 void maxlib_tilt_setup();
 void maxlib_timebang_setup();
@@ -108,7 +114,9 @@ void maxlib_setup(void)
 	maxlib_class = class_new(gensym("maxlib"), (t_newmethod)maxlib_new, 0,
     	sizeof(t_maxlib), 0,0);
 
-   maxlib_arbran_setup();
+	maxlib_allow_setup();
+	maxlib_arbran_setup();
+	maxlib_arraycopy_setup();
 	maxlib_average_setup();
 	maxlib_beat_setup();
 	maxlib_beta_setup();
@@ -117,6 +125,7 @@ void maxlib_setup(void)
 	maxlib_cauchy_setup();
 	maxlib_chord_setup();
 	maxlib_delta_setup();
+	maxlib_deny_setup();
 	maxlib_dist_setup();
 	maxlib_divide_setup();
 	maxlib_divmod_setup();
@@ -131,11 +140,13 @@ void maxlib_setup(void)
 	maxlib_lifo_setup();
 	maxlib_limit_setup();
 	maxlib_linear_setup();
+	maxlib_listfifo_setup();
 	maxlib_listfunnel_setup();
 	maxlib_match_setup();
 	maxlib_minus_setup();
     maxlib_mlife_setup();
 	maxlib_multi_setup();
+	maxlib_nchange_setup();
 	maxlib_netclient_setup();
 	maxlib_netdist_setup();
 	maxlib_netrec_setup();
@@ -155,6 +166,7 @@ void maxlib_setup(void)
 	maxlib_split_setup();
 	maxlib_step_setup();
     maxlib_subst_setup();
+	maxlib_sync_setup();
 	maxlib_temperature_setup();
 	maxlib_tilt_setup();
 	maxlib_timebang_setup();
@@ -170,11 +182,11 @@ void maxlib_setup(void)
 	post("       version "VERSION);
 	post("       compiled "__DATE__);
 	post("       latest version at http://www.akustische-kunst.org/puredata/maxlib/");
-	post("       objects: arbran average beat beta bilex borax cauchy chord delta dist ");
-	post("                divide divmod edge expo fifo gauss gestalt history ignore iso ");
-	post("                lifo linear listfunnel match minus mlife multi netclient ");
-	post("                netdist netrec netserver nroute pitch plus poisson pong pulse ");
-	post("                remote rewrap rhythm scale score speedlim split step subst ");
-	post("                temperature tilt timebang triang unroute urn velocity weibull ");
-	post("                wrap\n");
+	post("       objects: allow arbran arraycopy average beat beta bilex borax cauchy ");
+	post("                chord delta deny dist divide divmod edge expo fifo gauss ");
+	post("                gestalt history ignore iso lifo linear listfifo listfunnel ");
+	post("                match minus mlife multi nchange netclient netdist netrec ");
+	post("                netserver nroute pitch plus poisson pong pulse remote rewrap ");
+	post("                rhythm scale score speedlim split step subst sync temperature ");
+	post("                tilt timebang triang unroute urn velocity weibull wrap\n");
 }

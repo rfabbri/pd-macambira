@@ -1,6 +1,27 @@
 version history of maxlib library for pure-data
 
-v 1.2 (27.january 2003):
+v 1.5.2 (17. december 2003):
+- modified netclient for not to drop received data: use of syspollfn
+  instead of clock to poll for incoming data, circular recv buffer
+
+v 1.5 (18. october 2003):
+- added some usefull features to arraycopy (i.e. copying just parts of
+  an array and copying to specified position in destination array)
+- new object: nchange
+- IRIX 6.5 port (for GCC 3.3)
+- OS X binary (Jaguar 10.2.6)
+
+v 1.4 (22. may 2003):
+- updated sources to compile with Pd0.37-test4
+- new object: arraycopy
+
+v 1.3 (12. april 2003):
+- new objects: sync listfifo
+- all setup routines renamed to maxlib_<object>_setup() to avoid name
+  clashes, old names still work via class_addcreator()
+- some improvements for the help files
+
+v 1.2 (30. january 2003):
 - new objects: unroute urn split wrap rewrap timebang
 - another fix for the makefile
 - fixed a bug in netserver (sockets remained open when netserver closed) 

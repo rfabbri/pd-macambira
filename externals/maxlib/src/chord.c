@@ -25,6 +25,10 @@
 #include "m_pd.h"
 #include <stdio.h>
 #include <string.h>
+#ifdef UNIX
+#include <stdlib.h>
+#endif
+
 
 #define MAX_POLY 32                 /* maximum number of notes played at a time */
 

@@ -1,7 +1,7 @@
 NAME=maxlib
 CSYM=maxlib
 
-current: pd_nt pd_linux pd_darwin
+current: pd_irix6
 
 # ----------------------- NT -----------------------
 
@@ -9,7 +9,8 @@ pd_nt: $(NAME).dll
 
 .SUFFIXES: .dll
 
-PDNTCFLAGS = /W3 /WX /MD /O2 /G6 /DNT /DPD /DMAXLIB /nologo
+# define PD_0_36 to compilie with pd0.36 and below
+PDNTCFLAGS = /W3 /WX /MD /O2 /G6 /DNT /DPD /DPD_0_36 /DMAXLIB /nologo
 VC="C:\Programme\Microsoft Visual Studio\VC98"
 
 PDNTINCLUDE = /I. /Ic:\pd\tcl\include /Ic:\pd\src /I$(VC)\include /Iinclude
@@ -33,10 +34,13 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
                 cauchy.obj expo.obj gauss.obj linear.obj poisson.obj triang.obj \
                 weibull.obj netserver.obj netclient.obj nroute.obj remote.obj \
                 edge.obj subst.obj pong.obj mlife.obj limit.obj unroute.obj \
-                urn.obj split.obj wrap.obj rewrap.obj timebang.obj
+                urn.obj split.obj wrap.obj rewrap.obj timebang.obj sync.obj \
+		listfifo.obj arraycopy.obj allow.obj deny.obj nchange.obj
 
 .c.dll:
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\allow.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\arbran.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\arraycopy.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\average.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\beat.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\beta.c
@@ -45,6 +49,7 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\cauchy.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\chord.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\delta.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\deny.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\dist.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\divide.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\divmod.c
@@ -57,6 +62,7 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\ignore.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\iso.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\linear.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\listfifo.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\listfunnel.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\lifo.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\limit.c
@@ -64,6 +70,7 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\minus.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\mlife.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\multi.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\nchange.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\netclient.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\netdist.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\netrec.c
@@ -83,6 +90,7 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\split.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\step.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\subst.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\sync.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\temperature.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\tilt.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c src\timebang.c
@@ -96,6 +104,101 @@ PDNTEXTERNALS = borax.obj divide.obj ignore.obj match.obj pitch.obj speedlim.obj
 	link /dll /export:$(CSYM)_setup $*.obj $(PDNTEXTERNALS) $(PDNTLIB)
 
 
+# ----------------------- IRIX 6.5 -----------------------
+
+pd_irix6: $(NAME).pd_irix6
+
+.SUFFIXES: .pd_irix6
+
+SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
+	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
+	-Ofast=ip32 -r12000 -shared
+
+SGIINCLUDE =  -I../../src
+
+SGIGCFLAGS = -mabi=n32 -DPD -DMAXLIB -DUNIX -DIRIX -DN32 -O3 -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch -mips4
+
+SGIEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
+                 plus.o minus.o divide.o multi.o average.o chord.o \
+                 score.o divmod.o pulse.o fifo.o lifo.o iso.o dist.o \
+                 remote.o step.o netdist.o beat.o rhythm.o history.o \
+                 netrec.o scale.o delta.o velocity.o mlife.o subst.o \
+                 listfunnel.o tilt.o gestalt.o temperature.o arbran.o \
+                 beta.o bilex.o cauchy.o expo.o gauss.o linear.o poisson.o \
+                 triang.o weibull.o netserver.o netclient.o nroute.o \
+                 edge.o pong.o limit.o unroute.o urn.o split.o wrap.o \
+                 rewrap.o timebang.o sync.o listfifo.o arraycopy.o \
+		 allow.o deny.o nchange.o
+
+.c.pd_irix6:
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/allow.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/arbran.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/arraycopy.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/average.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/beat.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/beta.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/bilex.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/borax.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/cauchy.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/chord.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/delta.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/deny.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/dist.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/divide.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/divmod.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/edge.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/expo.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/fifo.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/gauss.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/gestalt.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/history.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/ignore.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/iso.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/lifo.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/limit.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/linear.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/listfifo.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/listfunnel.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/match.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/minus.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/mlife.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/multi.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/nchange.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/netclient.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/netdist.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/netrec.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/netserver.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/nroute.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/plus.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/pong.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/poisson.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/pulse.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/pitch.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/remote.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/rewrap.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/rhythm.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/scale.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/score.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/speedlim.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/split.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/step.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/subst.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/sync.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/temperature.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/tilt.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/timebang.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/triang.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/unroute.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/urn.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/velocity.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/weibull.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c src/wrap.c
+	gcc $(SGIGCFLAGS) $(SGIINCLUDE) -c $*.c
+	ld -n32 -IPA -shared -rdata_shared -o $*.pd_irix6 $*.o $(SGIEXTERNALS)
+	rm $*.o
+
 # ----------------------- Mac OS X (Darwin) -----------------------
 
 
@@ -104,7 +207,7 @@ pd_darwin: $(NAME).pd_darwin
 .SUFFIXES: .pd_darwin
 
 DARWINCFLAGS = -DPD -DMAXLIB -DUNIX -DMACOSX -O2 \
-    -Wall -W -Wno-shadow -Wstrict-prototypes \
+    -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
@@ -119,10 +222,13 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
                   beta.o bilex.o cauchy.o expo.o gauss.o linear.o poisson.o \
                   triang.o weibull.o netserver.o netclient.o nroute.o \
                   edge.o pong.o limit.o unroute.o urn.o split.o wrap.o \
-                  rewrap.o timebang.o
+                  rewrap.o timebang.o sync.o listfifo.o arraycopy.o \
+		  allow.o deny.o nchange.o
 
 .c.pd_darwin:
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/allow.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/arbran.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/arraycopy.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/average.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/beat.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/beta.c
@@ -131,6 +237,7 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/cauchy.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/chord.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/delta.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/deny.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/dist.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/divide.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/divmod.c
@@ -145,11 +252,13 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/lifo.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/limit.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/linear.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/listfifo.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/listfunnel.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/match.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/minus.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/mlife.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/multi.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/nchange.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/netclient.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/netdist.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/netrec.c
@@ -166,10 +275,11 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/scale.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/score.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/speedlim.c
-	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/step.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/weibull.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/split.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/step.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/subst.c
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/sync.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/temperature.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/tilt.c
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c src/timebang.c
@@ -184,20 +294,6 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
 
-darwin_package: pd_darwin
-	test -d root/doc/5.reference || mkdir -p root/doc/5.reference
-	-cp  help/* root/doc/5.reference
-	test -d root/extra || mkdir -p root/extra
-	install -m644 *.pd_darwin root/extra
-	open darwin_package.pmsp
-
-darwin_altpackage: pd_darwin
-	test -d root/Help || mkdir -p root/Help
-	-cp help/* root/Help
-	test -d root/Externals || mkdir -p root/Externals
-	install -m644 *.pd_darwin root/Externals
-	open darwin_altpackage.pmsp
-
 # ----------------------- LINUX i386 -----------------------
 
 pd_linux: $(NAME).pd_linux
@@ -205,12 +301,11 @@ pd_linux: $(NAME).pd_linux
 .SUFFIXES: .pd_linux
 
 LINUXCFLAGS = -DPD -DMAXLIB -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
-# LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-LINUXINCLUDE =  -I/usr/local/include -I./include -I../../pd/src
+LINUXINCLUDE =  -I/usr/local/include -I./include
 
 LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
                  plus.o minus.o divide.o multi.o average.o chord.o \
@@ -221,10 +316,13 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
                  beta.o bilex.o cauchy.o expo.o gauss.o linear.o poisson.o \
                  triang.o weibull.o netserver.o netclient.o nroute.o \
                  edge.o pong.o limit.o unroute.o urn.o split.o wrap.o \
-                 rewrap.o timebang.o
+                 rewrap.o timebang.o sync.o listfifo.o arraycopy.o \
+		 allow.o deny.o nchange.o
 
 .c.pd_linux:
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/allow.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/arbran.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/arraycopy.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/average.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/beat.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/beta.c
@@ -233,6 +331,7 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/cauchy.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/chord.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/delta.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/deny.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/dist.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/divide.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/divmod.c
@@ -247,11 +346,13 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/lifo.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/limit.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/linear.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/listfifo.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/listfunnel.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/match.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/minus.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/mlife.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/multi.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/nchange.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/netclient.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/netdist.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/netrec.c
@@ -271,6 +372,7 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/split.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/step.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/subst.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/sync.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/temperature.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/tilt.c
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/timebang.c
@@ -286,7 +388,7 @@ LINUXEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 
 # ----------------------------------------------------------
 
-PDDIR=/usr/lib/pd
+PDDIR=/usr/local/lib/pd
 
 install:
 	install -d $(PDDIR)/doc/5.reference/maxlib

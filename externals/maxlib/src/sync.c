@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define SYNC_MAX_SIZE (sizeof(unsigned int) * 8)
+#define SYNC_MAX_SIZE (int)(sizeof(unsigned int) * 8)
 
 static char *version = "sync v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>\n"
                        "           based on sync from jMax";

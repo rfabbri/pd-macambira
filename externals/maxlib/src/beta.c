@@ -61,7 +61,7 @@ static void *rand_beta_new(t_floatarg a, t_floatarg b)
 
 static void rand_beta_bang(t_rand_beta *x)
 {
-	t_float u1, u2, y1, y2, sum, a, b, ainv, binv;
+	t_float u1, u2, y01, y2, sum, a, b, ainv, binv;
 	a = (x->x_a <= 0 ? 0.0001 : x->x_a);
 	b = (x->x_b <= 0 ? 0.0001 : x->x_b);
 	ainv = 1/a;
@@ -78,12 +78,12 @@ static void rand_beta_bang(t_rand_beta *x)
 			u2 = fran();
 		}
 		while(u2 == 0);
-		y1 = pow(u1, ainv);
+		y01 = pow(u1, ainv);
 		y2 = pow(u2, binv);
-		sum = y1 + y2;
+		sum = y01 + y2;
 	}
 	while(sum > 1);
-    outlet_float(x->x_obj.ob_outlet, y1/sum);
+    outlet_float(x->x_obj.ob_outlet, y01/sum);
 }
 
 #ifndef MAXLIB

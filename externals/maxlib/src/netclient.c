@@ -22,14 +22,20 @@
 /* Based on PureData by Miller Puckette and others.                             */
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
+/* Changes: use circular message buffer for receive */
+/*          using pollfunction instead of clock (suggested by HCS) */
 
-
+#ifdef PD_0_37
 #include "m_pd.h"
+#include "s_stuff.h"
+#endif
+#include "m_imp.h"
 
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
 #ifdef UNIX
+#include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -41,18 +47,17 @@
 #include <winsock.h>
 #endif
 
-#define STRBUF_SIZE 32	/* maximum numbers of characters to read */
-#define DEFPOLLTIME 20  /* check for input every 20 ms */
+#define INBUFSIZE 4096	/* maximum numbers of characters to read */
 
-static char *version = "netclient v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
+static char *version = "netclient v0.3, written by Olaf Matthes <olaf.matthes@gmx.de>";
 
 static t_class *netclient_class;
+static t_binbuf *inbinbuf;
 
 typedef struct _netclient
 {
     t_object x_obj;
 	t_clock *x_clock;
-	t_clock *x_poll;
 	t_outlet *x_outdata;
 	t_outlet *x_outconnect;
     int x_fd;
@@ -60,37 +65,28 @@ typedef struct _netclient
 	int x_connectstate;
 	int x_port;
     int x_protocol;
+	char x_inbuf[INBUFSIZE];	/* circular message buffer for received data */
+	int x_intail;
+	int x_inhead;
 		/* multithread stuff */
 	pthread_t x_threadid;            /* id of child thread */
 	pthread_attr_t x_threadattr;     /* attributes of child thread */
 } t_netclient;
 
-static void sys_sockerror(char *s)
-{
-#ifdef NT
-    int err = WSAGetLastError();
-    if (err == 10054) return;
+#ifdef USE_CIRCULAR
+static t_binbuf *inbinbuf;
 #endif
-#ifdef UNIX
-    int err = errno;
-#endif
-    post("%s: %s (%d)\n", s, strerror(err), err);
-}
 
-static void sys_closesocket(int fd) {
-
-#ifdef UNIX
-    close(fd);
-#endif
-#ifdef NT
-    closesocket(fd);
-#endif
-}
+	/* one lonlely prototype */
+static void netclient_rcv(t_netclient *x);
 
 
+	/* get's called when connection has been made */
 static void netclient_tick(t_netclient *x)
 {
     outlet_float(x->x_outconnect, 1);
+		/* add pollfunction for checking for input */
+	sys_addpollfn(x->x_fd, (t_fdpollfn)netclient_rcv, x);
 }
 
 static void *netclient_child_connect(void *w)
@@ -163,6 +159,7 @@ static void netclient_disconnect(t_netclient *x)
 {
     if (x->x_fd >= 0)
     {
+		sys_rmpollfn(x->x_fd);
     	sys_closesocket(x->x_fd);
     	x->x_fd = -1;
 		x->x_connectstate = 0;
@@ -219,14 +216,39 @@ static void netclient_send(t_netclient *x, t_symbol *s, int argc, t_atom *argv)
     else error("netclient: not connected");
 }
 
+    /* this is in a separately called subroutine so that the buffer isn't
+    sitting on the stack while the messages are getting passed. */
+static int netclient_doread(t_netclient *x)
+{
+    char messbuf[INBUFSIZE], *bp = messbuf;
+    int indx;
+    int inhead = x->x_inhead;
+    int intail = x->x_intail;
+    char *inbuf = x->x_inbuf;
+    if (intail == inhead) return (0);
+    for (indx = intail; indx != inhead; indx = (indx+1)&(INBUFSIZE-1))
+    {
+    	char c = *bp++ = inbuf[indx];
+    	if (c == ';' && (!indx || inbuf[indx-1] != '\\'))
+    	{
+    	    intail = (indx+1)&(INBUFSIZE-1);
+    	    binbuf_text(inbinbuf, messbuf, bp - messbuf);
+    	    x->x_inhead = inhead;
+    	    x->x_intail = intail;
+    	    return (1);
+    	}
+    }
+    return (0);
+}
+
 static void netclient_rcv(t_netclient *x)
 {
-	int sockfd = x->x_fd;
+	int fd = x->x_fd;
 	int ret;
-    char resp[STRBUF_SIZE];
+    char resp[INBUFSIZE];
 	fd_set readset;
 	fd_set exceptset;
-    struct timeval  ztout;
+    struct timeval ztout;
 		/* output data */
 	t_binbuf *binbuf;
     t_atom messbuf[1024];
@@ -239,74 +261,79 @@ static void netclient_rcv(t_netclient *x)
 			/* check if we can read/write from/to the socket */
 		FD_ZERO(&readset);
 		FD_ZERO(&exceptset);
-		FD_SET(x->x_fd, &readset );
-		FD_SET(x->x_fd, &exceptset );
+		FD_SET(fd, &readset );
+		FD_SET(fd, &exceptset );
 
 		ztout.tv_sec = 0;
 		ztout.tv_usec = 0;
-
-		ret = select(sockfd+1, &readset, NULL, &exceptset, &ztout);
+		ret = select(fd+1, &readset, NULL, &exceptset, &ztout);
 		if(ret < 0)
 		{
 			error("netclient: can not read from socket");
-			sys_closesocket(sockfd);
+			sys_closesocket(fd);
 			return;
 		}
-		if(FD_ISSET(sockfd, &readset) || FD_ISSET(sockfd, &exceptset))
+		if(FD_ISSET(fd, &readset) || FD_ISSET(fd, &exceptset))
 		{
-				/* read from server */
-			ret = recv(sockfd, resp, STRBUF_SIZE, 0);
-			if(ret > 0) 
-			{
-				// post("netclient: received: %s, %d bytes, %d stringlen", resp, ret, strlen(resp));
-					/* convert string into atoms using a binbuf */
-				binbuf = binbuf_new();
-				binbuf_text(binbuf, resp, ret); //strlen(resp));
-				natom = binbuf_getnatom(binbuf);	/* get number of atoms */
-				at = binbuf_getvec(binbuf);	/* get the atoms */
-					/* now split it into several parts at every A_SEMI because
-					   we probably received more than one message at a time     */
-				for (msg = 0; msg < natom;)
-				{
-    				int emsg;
-					for (emsg = msg; emsg < natom && at[emsg].a_type != A_COMMA
-						&& at[emsg].a_type != A_SEMI; emsg++);
+			int readto = (x->x_inhead >= x->x_intail ? INBUFSIZE : x->x_intail-1);
 
-					if (emsg > msg)
-					{
-						int ii;
-						for (ii = msg; ii < emsg; ii++)
-	    					if (at[ii].a_type == A_DOLLAR || at[ii].a_type == A_DOLLSYM)
-							{
-	    						pd_error(x, "netserver: -- got dollar sign in message");
-								goto nodice;
-							}
-						if (at[msg].a_type == A_FLOAT)
-						{
-	    					if (emsg > msg + 1)
-								outlet_list(x->x_outdata, 0, emsg-msg, at + msg);
-							else outlet_float(x->x_outdata, at[msg].a_w.w_float);
-						}
-						else if (at[msg].a_type == A_SYMBOL)
-	    					outlet_anything(x->x_outdata, at[msg].a_w.w_symbol,
-							emsg-msg-1, at + msg + 1);
-					}
-					nodice:
-    					msg = emsg + 1;
-				}
-				binbuf_free(binbuf);
+			ret = recv(fd, x->x_inbuf + x->x_inhead, readto - x->x_inhead, 0);
+			if (ret < 0)
+			{
+				sys_sockerror("recv");
+				sys_rmpollfn(fd);
+	    		sys_closesocket(fd);
 			}
-			else post("netclient: read() did not return any data");
+			else if (ret == 0)
+			{
+	    		post("netclient: connection closed on socket %d", fd);
+				sys_rmpollfn(fd);
+	    		sys_closesocket(fd);
+			}
+			else
+			{
+    			x->x_inhead += ret;
+    			if (x->x_inhead >= INBUFSIZE) x->x_inhead = 0;
+    			while (netclient_doread(x))
+				{
+					/* output binbuf */
+					natom = binbuf_getnatom(inbinbuf);	/* get number of atoms */
+					at = binbuf_getvec(inbinbuf);	/* get the atoms */
+						/* now split it into several parts at every A_SEMI because
+						   we probably received more than one message at a time     */
+					for (msg = 0; msg < natom;)
+					{
+    					int emsg;
+						for (emsg = msg; emsg < natom && at[emsg].a_type != A_COMMA
+							&& at[emsg].a_type != A_SEMI; emsg++);
+
+						if (emsg > msg)
+						{
+							int ii;
+							for (ii = msg; ii < emsg; ii++)
+	    						if (at[ii].a_type == A_DOLLAR || at[ii].a_type == A_DOLLSYM)
+								{
+	    							pd_error(x, "netserver: -- got dollar sign in message");
+									goto nodice;
+								}
+							if (at[msg].a_type == A_FLOAT)
+							{
+	    						if (emsg > msg + 1)
+									outlet_list(x->x_outdata, 0, emsg-msg, at + msg);
+								else outlet_float(x->x_outdata, at[msg].a_w.w_float);
+							}
+							else if (at[msg].a_type == A_SYMBOL)
+	    						outlet_anything(x->x_outdata, at[msg].a_w.w_symbol,
+								emsg-msg-1, at + msg + 1);
+						}
+						nodice:
+    						msg = emsg + 1;
+					}
+ 	    		}
+			}
 		}
 	}
 	else post("netclient: not connected");
-}
-
-static void netclient_poll(t_netclient *x)
-{
-    if(x->x_connectstate)
-		netclient_rcv(x);	/* try to read in case we're connected */
-	clock_delay(x->x_poll, DEFPOLLTIME);	/* see you later */
 }
 
 static void *netclient_new(t_floatarg udpflag)
@@ -315,7 +342,7 @@ static void *netclient_new(t_floatarg udpflag)
     x->x_outdata = outlet_new(&x->x_obj, &s_anything);	/* received data */
     x->x_outconnect = outlet_new(&x->x_obj, &s_float);	/* connection state */
     x->x_clock = clock_new(x, (t_method)netclient_tick);
-    x->x_poll = clock_new(x, (t_method)netclient_poll);
+	inbinbuf = binbuf_new();
     x->x_fd = -1;
     x->x_protocol = (udpflag != 0 ? SOCK_DGRAM : SOCK_STREAM);
 		/* prepare child thread */
@@ -323,15 +350,14 @@ static void *netclient_new(t_floatarg udpflag)
        post("netclient: warning: could not prepare child thread" );
     if(pthread_attr_setdetachstate(&x->x_threadattr, PTHREAD_CREATE_DETACHED) < 0)
        post("netclient: warning: could not prepare child thread" );
-	clock_delay(x->x_poll, 0);	/* start polling the input */
     return (x);
 }
 
 static void netclient_free(t_netclient *x)
 {
     netclient_disconnect(x);
-    clock_free(x->x_poll);
     clock_free(x->x_clock);
+	binbuf_free(inbinbuf);
 }
 
 #ifndef MAXLIB
