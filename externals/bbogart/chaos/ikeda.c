@@ -61,10 +61,10 @@ static void calculate(ikeda_struct *x)
 	outlet_float(x->y_outlet, (t_float)ly1);
 }
 
-static void reset(ikeda_struct *x)
+static void reset(ikeda_struct *x, t_floatarg lx0, t_floatarg ly0)
 {
-	x->lx0 = 0.1;
-	x->ly0 = 0.1;
+	x->lx0 = lx0;
+	x->ly0 = ly0;
 }
 
 static void param(ikeda_struct *x, t_floatarg a, t_floatarg b, t_floatarg c, t_floatarg rho)
@@ -108,6 +108,8 @@ void ikeda_setup(void)
 	class_addmethod(ikeda_class,
 		(t_method)reset,
 		gensym("reset"),
+                A_DEFFLOAT,
+                A_DEFFLOAT,
 		0);
 
 	class_addmethod(ikeda_class,

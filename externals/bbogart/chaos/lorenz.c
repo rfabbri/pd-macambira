@@ -60,11 +60,11 @@ static void calculate(lorenz_struct *x)
 	outlet_float(x->z_outlet, (t_float)lz1);
 }
 
-static void reset(lorenz_struct *x)
+static void reset(lorenz_struct *x, t_floatarg lx0, t_floatarg ly0, t_floatarg lz0)
 {
-	x->lx0 = 0.1;
-	x->ly0 = 0;
-	x->lz0 = 0;
+	x->lx0 = lx0;
+	x->ly0 = ly0;
+	x->lz0 = lz0;
 }	
 
 static void param(lorenz_struct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_floatarg c)
@@ -111,6 +111,9 @@ void lorenz_setup(void)
 	class_addmethod(lorenz_class,
 		(t_method)reset,
 		gensym("reset"),
+                A_DEFFLOAT,
+                A_DEFFLOAT,
+                A_DEFFLOAT,
 		0);
 
 	class_addmethod(lorenz_class,
