@@ -22,7 +22,7 @@ CFLAGS += $(DEFS) -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-INCLUDE =  -I../../build/include
+INCLUDE =  -I../../build/include -I../libOSC
 
 # LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o OSCroute.o
 # SOURCES = $(wildcard *.c)

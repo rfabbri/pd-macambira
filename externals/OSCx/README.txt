@@ -1,19 +1,24 @@
 OSC, OpenSoundControl for pd
 ============================
 for more information on OSC see: http://cnmat.cnmat.berkeley.edu/OSC
-they also have an osc_dev mailinglist.
-primary source for pd: http://lena.ucsd.edu/~msp/
+
+for more information on pure-data: http://lena.ucsd.edu/~msp/ and http://www.google.com/search?q=pure-data
+
+Build:
+linux, macosx:
 
 to build run
 ./configure
 make
 make install
 
+which installs the files in /usr/lib/pd/extra and /usr/lib/pd/doc
 
-merged the windows and linux trees.
-for linux do the usual makes etc, for window either use extra/OSC.dll,
+
+windows:
+use extra/OSC.dll
 .dsw and .dsp files are also included.
-
+i m not sure how compilation would work on windows. if you manage to build the current stuff on win let me know then i can include these instead of the outdated OSC.dll
 
 files:
 
@@ -22,7 +27,7 @@ README.txt	this file
 doc/		pd help files
 extra/		OSC.dll, the windows binary
 libOSC/		CNMAT's OSC library
-send+dump/	CNMAT's OSC commandline utils
+send+dump/	CNMAT's OSC commandline utils (with some changes)
                 http://cnmat.cnmat.berkeley.edu/OpenSoundControl/
 
 
