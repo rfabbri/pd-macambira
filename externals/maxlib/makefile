@@ -184,6 +184,20 @@ DARWINEXTERNALS = borax.o ignore.o match.o pitch.o speedlim.o \
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
 
+darwin_package: pd_darwin
+	test -d root/doc/5.reference || mkdir -p root/doc/5.reference
+	-cp  help/* root/doc/5.reference
+	test -d root/extra || mkdir -p root/extra
+	install -m644 *.pd_darwin root/extra
+	open darwin_package.pmsp
+
+darwin_altpackage: pd_darwin
+	test -d root/Help || mkdir -p root/Help
+	-cp help/* root/Help
+	test -d root/Externals || mkdir -p root/Externals
+	install -m644 *.pd_darwin root/Externals
+	open darwin_altpackage.pmsp
+
 # ----------------------- LINUX i386 -----------------------
 
 pd_linux: $(NAME).pd_linux
