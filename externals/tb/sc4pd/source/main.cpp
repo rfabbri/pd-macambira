@@ -32,7 +32,6 @@
          http://www.audiosynth.com
      
    Coded while listening to: Phosphor
-
 */
 
 #include <flext.h>
@@ -61,9 +60,9 @@ void sc4pd_library_setup()
 	 "Latoocarfian(~),\n"
 	 "          LinCong(~), amclip(~), scaleneg(~), excess(~), hypot(~), "
 	 "ring1(~),\n"
-	 "          ring2(~), ring3(~), ring4(~), difsqr(~), sumsqr(~)\n"
-	 "sqrdif(~), sqrsum(~),\n"
-	 "          absdif(~)");
+	 "          ring2(~), ring3(~), ring4(~), difsqr(~), sumsqr(~), "
+	 "sqrdif(~),\n"
+	 "          sqrsum(~), absdif(~), LFSaw(~), LFPulse(~)");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -184,6 +183,12 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(absdif_ar);
     FLEXT_SETUP(absdif_kr);
+
+    FLEXT_DSP_SETUP(LFSaw_ar);
+    FLEXT_SETUP(LFSaw_kr);
+
+    FLEXT_DSP_SETUP(LFPulse_ar);
+    FLEXT_SETUP(LFPulse_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

@@ -64,3 +64,32 @@ bool sc_ar(flext::AtomList a);
 	rgen.s3 = s3;
 
 int32 timeseed();
+
+
+/* this is copied from thomas grill's xsample:
+xsample - extended sample objects for Max/MSP and pd (pure data)
+
+Copyright (c) 2001-2004 Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+*/
+
+#define F float
+#define D double
+#define I int
+#define L long
+#define C char
+#define V void
+#define BL bool
+#define S t_sample
+
+#define SETSIGFUN(VAR,FUN) v_##VAR = FUN
+
+#define DEFSIGFUN(NAME)	V NAME(I n,S *const *in,S *const *out)
+
+#define DEFSIGCALL(NAME) \
+	inline V NAME(I n,S *const *in,S *const *out) \
+        { (this->*v_##NAME)(n,in,out); } \
+	V (thisType::*v_##NAME)(I n,S *const *invecs,S *const *outvecs)
+
+#define SIGFUN(FUN) &thisType::FUN
