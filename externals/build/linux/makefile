@@ -36,3 +36,5 @@ install: install-doc
 	install -m644 *.pd_linux $(prefix)/lib/pd/extra
 
 
+deb:
+	cd ../.. && dpkg-buildpackage -b
