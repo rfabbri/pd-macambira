@@ -1,20 +1,20 @@
-#N canvas 148 25 908 628 10;
-#X msg 430 325 rel rel_y -6 1.10049e+09;
+#N canvas 148 25 912 632 10;
+#X msg 430 325 rel rel_x 0 1.63404e+09;
 #X obj 430 304 prepend set;
-#X obj 149 473 route rel_x rel_y;
-#X floatatom 149 493 5 0 0 0 - - -;
-#X floatatom 206 493 5 0 0 0 - - -;
+#X obj 169 458 route rel_x rel_y;
+#X floatatom 169 478 5 0 0 0 - - -;
+#X floatatom 226 478 5 0 0 0 - - -;
 #X msg 148 77 start;
 #X msg 174 96 stop;
 #X floatatom 521 385 12 0 0 1 time - -;
 #X obj 428 365 unpack s s f f;
-#X msg 239 57 open 0;
-#X msg 246 75 open 1;
-#X msg 253 93 open 2;
-#X msg 259 111 open 3;
-#X msg 265 129 open 4;
-#X floatatom 206 454 7 0 0 0 - - -;
-#X floatatom 264 454 7 0 0 0 - - -;
+#X msg 239 37 open 0;
+#X msg 246 55 open 1;
+#X msg 253 73 open 2;
+#X msg 259 91 open 3;
+#X msg 265 109 open 4;
+#X floatatom 226 439 7 0 0 0 - - -;
+#X floatatom 284 439 7 0 0 0 - - -;
 #X obj 86 81 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25 25
 ;
 #X floatatom 490 402 12 0 0 1 value - -;
@@ -42,9 +42,9 @@
 #X obj 63 241 spigot;
 #X obj 109 241 tgl 17 0 empty empty console_print 19 9 1 9 -262131
 -1 -1 0 1;
-#X floatatom 289 398 5 0 0 1 ev_syn - -;
-#X obj 262 397 +;
-#X msg 262 377 1;
+#X floatatom 309 383 5 0 0 1 ev_syn - -;
+#X obj 282 382 +;
+#X msg 282 362 1;
 #X msg 336 136 close;
 #X msg 336 113 refresh;
 #X text 397 111 refresh device list;
@@ -53,10 +53,10 @@
 #X text 49 588 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 266 602 released under the GNU GPL;
-#X text 472 589 $Revision: 1.10 $$Date: 2004-11-15 04:05:39 $;
+#X text 472 589 $Revision: 1.11 $$Date: 2004-11-15 05:17:45 $;
 #X text 473 602 $Author: eighthave $;
-#X obj 206 433 route abs_x abs_y abs_z;
-#X floatatom 322 454 7 0 0 0 - - -;
+#X obj 226 418 route abs_x abs_y abs_z;
+#X floatatom 342 439 7 0 0 0 - - -;
 #X msg 398 180 poll 20;
 #X msg 336 180 poll 2;
 #X text 332 159 start polling and set the poll delay in ms;
@@ -65,29 +65,29 @@
 #X text 371 56 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
 #X obj 248 225 hid 1;
-#X obj 93 345 route key rel abs syn;
-#X obj 53 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X obj 113 330 route key rel abs syn;
+#X obj 73 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 93 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
-;
-#X obj 134 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 113 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 175 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 154 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 216 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 195 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 257 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 236 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 297 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 277 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 338 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 317 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 379 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 358 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X msg 270 149 open 5;
-#X obj 53 519 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
+#X obj 399 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X msg 270 129 open 5;
+#X obj 73 504 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8 btn_9;
-#X obj 420 552 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 440 537 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;

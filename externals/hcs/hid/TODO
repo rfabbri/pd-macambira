@@ -93,9 +93,17 @@ void hid_post(const char *format, const char *);
 
 
 ==============================================================================
+= device 0 gets events for all available devices
+
+- it might be useful to have device #0 open all available devices and output
+  the events.
+
+==============================================================================
 = mapping object ideas
 
+- log
 
+- exponential
 
 ______________________________________________________________________________
 ------------------------------------------------------------------------------

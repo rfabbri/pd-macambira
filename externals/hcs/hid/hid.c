@@ -29,8 +29,8 @@
  * LOCAL DEFINES
  */
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 #define DEFAULT_DELAY 5
 

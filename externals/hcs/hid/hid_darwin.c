@@ -51,8 +51,8 @@
 
 #include "hid.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
@@ -115,7 +115,8 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 			break;
 		case kHIDPage_Button:
 			sprintf(linux_type, "key"); 
-			sprintf(linux_code, "btn_%ld", element->usage); 
+			/* HID Manager button numbers start at 1, [hid] start at 0 */
+			sprintf(linux_code, "btn_%ld", element->usage - 1); 
 			break;
 	}
 }
@@ -173,7 +174,7 @@ t_int hid_build_element_list(t_hid *x)
 	DEBUG(post("[hid] found %d elements:",numElements););
 	
 	post("");
-	post("  TYPE\t\tCODE\tEVENT NAME");
+	post("  TYPE\tCODE\tEVENT NAME");
 	post("-----------------------------------------------------------");
 	for(i=0; i<numElements; i++)
 	{

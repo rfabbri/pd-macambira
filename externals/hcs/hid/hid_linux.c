@@ -222,7 +222,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 		  ioctl(x->x_fd, EVIOCGBIT(event_type, KEY_MAX), bitmask[event_type]);
 		 
 		  post("");
-		  post("  TYPE\t\tCODE\tEVENT NAME");
+		  post("  TYPE\tCODE\tEVENT NAME");
 		  post("-----------------------------------------------------------");
 
 		  /* cycle through all possible event codes (axes, keys, etc.) 
@@ -236,7 +236,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 				  {
 					  char hid_code[7];
 					  hid_convert_linux_buttons_to_numbers(event_code,hid_code);
-					  post("  %s\t\t%s\t%s",
+					  post("  %s\t%s\t%s",
 							 ev[event_type] ? ev[event_type] : "?", 
 							 hid_code,
 							 event_names[event_type] ? (event_names[event_type][event_code] ? event_names[event_type][event_code] : "?") : "?");
