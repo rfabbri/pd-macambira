@@ -24,6 +24,7 @@ protected:
 	virtual V Transform(I n,S *const *in);
 
 	V ms_thresh(F thr) { _threshold = FromdB(_threshdB = thr); }
+	V ms_userms(BL r) { if(r) _flags |= F_RMS; else _flags &= ~F_RMS; }
 
 	F _threshold,_threshdB;
 	BL _invert,_useRms,_swapPhase;
@@ -34,7 +35,8 @@ private:
 	FLEXT_ATTRGET_F(_threshdB)
 	FLEXT_CALLSET_F(ms_thresh)
 	FLEXT_ATTRVAR_B(_invert)
-	FLEXT_ATTRVAR_B(_useRms)
+	FLEXT_ATTRGET_B(_useRms)
+	FLEXT_CALLSET_B(ms_userms)
 	FLEXT_ATTRVAR_B(_swapPhase)
 };
 
@@ -43,15 +45,15 @@ FLEXT_LIB_DSP_V("fftease, vacancy~",vacancy)
 
 V vacancy::setup(t_classid c)
 {
-	FLEXT_CADDATTR_VAR(c,"threshold",_threshdB,ms_thresh);
+	FLEXT_CADDATTR_VAR(c,"thresh",_threshdB,ms_thresh);
 	FLEXT_CADDATTR_VAR1(c,"invert",_invert);
-	FLEXT_CADDATTR_VAR1(c,"rms",_useRms);
-	FLEXT_CADDATTR_VAR1(c,"swapphase",_swapPhase);
+	FLEXT_CADDATTR_VAR(c,"rms",_useRms,ms_userms);
+	FLEXT_CADDATTR_VAR1(c,"swap",_swapPhase);
 }
 
 
 vacancy::vacancy(I argc,const t_atom *argv):
-	fftease(2,F_BITSHUFFLE|F_CONVERT),
+	fftease(2,F_STEREO|F_BITSHUFFLE),
 	_threshdB(-30),_invert(false),_useRms(true),_swapPhase(false)
 {
 	/* parse and set object's options given */
@@ -84,6 +86,7 @@ vacancy::vacancy(I argc,const t_atom *argv):
 	}
 
 	ms_thresh(_threshdB);
+	ms_userms(_useRms);
 
 	AddInSignal("Messages and input signal");
 	AddInSignal("Reference signal");
@@ -91,36 +94,41 @@ vacancy::vacancy(I argc,const t_atom *argv):
 }
 
 
-V vacancy::Transform(I _N2,S *const *in)
+V vacancy::Transform(I _N,S *const *in)
 {
 	const F useme = _useRms?_rms * _threshold:_threshold;
-	const I _N = _N2;
 
 	// composite here please
-	if (_invert)
-		if (_swapPhase)
+	if (_invert) {
+		if (_swapPhase) {
 			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] > useme && _channel2[i] < _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					_channel1[i+1] = _channel2[i+1];
 				}
-		else
+		}
+		else {
 			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] > useme && _channel2[i] < _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					if ( _channel1[i+1] == 0. ) _channel1[i+1] = _channel2[i+1];
 				}
-	else
-		if (_swapPhase)
+		}
+	}
+	else {
+		if (_swapPhase) {
 			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] < useme && _channel2[i] > _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					_channel1[i+1] = _channel2[i+1];
 				}
-		else
+		}
+		else {
 			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] < useme && _channel2[i] > _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					if ( _channel1[i+1] == 0. ) _channel1[i+1] = _channel2[i+1];
 				}
+		}
+	}
 }

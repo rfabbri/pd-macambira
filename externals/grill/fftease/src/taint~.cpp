@@ -42,13 +42,13 @@ FLEXT_LIB_DSP_V("fftease, taint~",taint)
 
 V taint::setup(t_classid c)
 {
-	FLEXT_CADDATTR_VAR(c,"threshold",_threshdB,ms_thresh);
+	FLEXT_CADDATTR_VAR(c,"thresh",_threshdB,ms_thresh);
 	FLEXT_CADDATTR_VAR1(c,"invert",_invert);
 }
 
 
 taint::taint(I argc,const t_atom *argv):
-	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_CONVERT),
+	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_NOPH2),
 	_threshdB(-10),_invert(false)
 {
 	/* parse and set object's options given */
@@ -74,9 +74,8 @@ taint::taint(I argc,const t_atom *argv):
 }
 
 
-V taint::Transform(I _N2,S *const *in)
+V taint::Transform(I _N,S *const *in)
 {
-	const I _N = _N2*2;
 	register const F thr = _threshold;
 	
 	if(_invert) {

@@ -63,7 +63,7 @@ protected:
 	virtual V Set();
 	virtual V Clear();
 	virtual V Delete();
-	virtual V Transform(I _N2,S *const *in) = 0;
+	virtual V Transform(I _N,S *const *in) = 0;
 
 
 	V Mult(I n) { _mult = n; MakeVar(); }
@@ -83,8 +83,12 @@ protected:
 		F_STEREO = 0x01,
 		F_BALANCED = 0x02,
 		F_BITSHUFFLE = 0x04,
-		F_CONVERT = 0x08,F_CRES = 0x10,
-		F_RMS = 0x20
+		F_NOSPEC = 0x08,F_SPECRES = 0x10,
+		F_RMS = 0x20,
+		F_NOAMP1 = 0x100,
+		F_NOPH1 = 0x200,
+		F_NOAMP2 = 0x400,
+		F_NOPH2 = 0x800,
 	};
 
 	I _flags;

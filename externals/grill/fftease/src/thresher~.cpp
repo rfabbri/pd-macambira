@@ -57,7 +57,9 @@ void thresher::Set()
 	_compositeFrame = new F[_N+2];
 	_framesLeft = new I[_N2+1];
 	_c_lastphase_in = new F[_N2+1];
+	ZeroMem(_c_lastphase_in,(_N2+1)*sizeof(*_c_lastphase_in));
 	_c_lastphase_out = new F[_N2+1];
+	ZeroMem(_c_lastphase_out,(_N2+1)*sizeof(*_c_lastphase_out));
 
 	_c_fundamental = _R/_N;
 	_c_factor_in = _R/(_D * PV_2PI);
@@ -88,18 +90,16 @@ void thresher::Delete()
 
 
 thresher::thresher():
-	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CRES)
+	fftease(4,F_BALANCED|F_BITSHUFFLE|F_NOSPEC|F_SPECRES)
 {
 	AddInSignal("Messages and input signal");
 	AddOutSignal("Transformed signal");
 }
 
 
-V thresher::Transform(I _N2,S *const *in)
+V thresher::Transform(I _N,S *const *in)
 {
-	const I _N = _N2*2;
-	
-	convert( _buffer1, _channel1, _N2, _c_lastphase_in, _c_fundamental, _c_factor_in  );
+	convert( _buffer1, _channel1, _N/2, _c_lastphase_in, _c_fundamental, _c_factor_in  );
 
 	I *fr = _framesLeft;
 	if( _firstFrame ) {
@@ -122,5 +122,5 @@ V thresher::Transform(I _N2,S *const *in)
 		}
 	}
 
-	unconvert( _compositeFrame, _buffer1, _N2, _c_lastphase_out, _c_fundamental, _c_factor_out  );
+	unconvert( _compositeFrame, _buffer1, _N/2, _c_lastphase_out, _c_fundamental, _c_factor_out  );
 }

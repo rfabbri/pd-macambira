@@ -46,7 +46,7 @@ void fold( float *I, float *W, int Nw, float *O, int N, int n );
 void overlapadd(float *I, int N, float *W, float *O, int Nw, int n );
 void makehanning( float *H, float *A, float *S, int Nw, int N, int I, int osc, int odd );
 void makewindows( float *H, float *A, float *S, int Nw, int N, int I, int osc );
-void leanconvert( float *S, float *C, int N2 );
+void leanconvert( float *S, float *C, int N2 , int amp, int ph );
 void leanunconvert( float *C, float *S, int N2 );
 void rfft( float *x, int N, int forward );
 void cfft( float *x, int NC, int forward );

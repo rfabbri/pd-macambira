@@ -51,8 +51,8 @@ V morphine::setup(t_classid c)
 
 
 morphine::morphine(I argc,const t_atom *argv):
-	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_CONVERT),
-	_index(1)
+	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE),
+	_index(0)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {
@@ -69,8 +69,8 @@ morphine::morphine(I argc,const t_atom *argv):
 
 V morphine::Clear()
 {
-	fftease::Clear();
 	_picks = NULL;
+	fftease::Clear();
 }
 
 V morphine::Delete() 
@@ -93,8 +93,9 @@ I morphine::sortpicks( const void *a, const void *b )
 	return 0;
 }
 
-V morphine::Transform(I _N2,S *const *in)
+V morphine::Transform(I _N,S *const *in)
 {
+	const I _N2 = _N/2;
 	I i;
     for ( i = 0; i <= _N2; i++ ) {
 		// find amplitude differences between home and visitors 
@@ -105,10 +106,12 @@ V morphine::Transform(I _N2,S *const *in)
     // sort our differences in ascending order 
     qsort( _picks, _N2+1, sizeof(pickme), sortpicks );
 
-	const I morphindex2 = (I)(_index*(_N2+1)+.5)*2;
+	I ix2 = (I)(_index*(_N2+1)+.5)*2;
+	if(ix2 < 0) ix2 = 0; 
+	else if(ix2 > _N+2) ix2 = _N+2;
 
     // choose the bins that are least different first 
-    for (i=0; i <= morphindex2; i += 2) {
+    for (i=0; i < ix2; i += 2) {
 		_channel1[i] = _channel2[i];
 		_channel1[i+1] = _channel2[i+1];
     }

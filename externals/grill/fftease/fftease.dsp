@@ -198,6 +198,65 @@ SOURCE=.\readme.txt
 # Begin Group "ori.jmax"
 
 # PROP Default_Filter ""
+# Begin Group "pv"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\ori.jmax\convert.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\convert_new.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\fft.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\fft4.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\fold.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\leanconvert.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\leanunconvert.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\makewindows.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\overlapadd.c
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\pv.h
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\ori.jmax\unconvert.c
+# PROP Exclude_From_Build 1
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\ori.jmax\burrow~.c
@@ -271,11 +330,6 @@ SOURCE=.\ori.jmax\taint~.c
 # Begin Source File
 
 SOURCE=.\ori.jmax\thresher~.c
-# PROP Exclude_From_Build 1
-# End Source File
-# Begin Source File
-
-SOURCE=.\ori.jmax\unconvert.c
 # PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File

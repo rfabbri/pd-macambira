@@ -39,11 +39,17 @@ private:
 
 	inline V ms_knee(F knee) { _knee = knee; UpdThrFun(); }
 	inline V ms_cutoff(F cutoff) { _cutoff = cutoff; UpdThrFun(); }
+	inline V ms_thresh1(F thr) { _thresh1 = thr; UpdThrFun(); }
+	inline V ms_thresh2(F thr) { _thresh2 = thr; UpdThrFun(); }
 
 	FLEXT_ATTRGET_F(_knee)
 	FLEXT_CALLSET_F(ms_knee)
 	FLEXT_ATTRGET_F(_cutoff)
 	FLEXT_CALLSET_F(ms_cutoff)
+	FLEXT_ATTRGET_F(_thresh1)
+	FLEXT_CALLSET_F(ms_thresh1)
+	FLEXT_ATTRGET_F(_thresh2)
+	FLEXT_CALLSET_F(ms_thresh2)
 };
 
 FLEXT_LIB_DSP_V("fftease, scrape~",scrape)
@@ -53,11 +59,13 @@ V scrape::setup(t_classid c)
 {
 	FLEXT_CADDATTR_VAR(c,"knee",_knee,ms_knee);
 	FLEXT_CADDATTR_VAR(c,"cutoff",_cutoff,ms_cutoff);
+	FLEXT_CADDATTR_VAR(c,"thresh1",_thresh1,ms_thresh1);
+	FLEXT_CADDATTR_VAR(c,"thresh2",_thresh2,ms_thresh2);
 }
 
 
 scrape::scrape(I argc,const t_atom *argv):
-	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CONVERT),
+	fftease(4,F_BALANCED|F_BITSHUFFLE),
 	_thresh1(.0001),_thresh2(.09),
 	_knee(1000),_cutoff(4000)
 
@@ -87,8 +95,8 @@ scrape::scrape(I argc,const t_atom *argv):
 
 V scrape::Clear()
 {
-	fftease::Clear();
 	_threshfunc = NULL;
+	fftease::Clear();
 }
 
 V scrape::Delete() 
@@ -128,18 +136,19 @@ V scrape::UpdThrFun()
 
 	\remark maxamp is calculated later than in the original FFTease scrape~ object
 */
-V scrape::Transform(I _N2,S *const *in)
+V scrape::Transform(I _N,S *const *in)
 {
 	const F fmult = *in[0];
+	const F *thrf = _threshfunc;
 
 	I i;
 	F maxamp = 1.;
-	for( i = 0; i <= _N2; i++ )
-		if(maxamp < _channel1[i*2]) 
-			maxamp = _channel1[i*2];
+	for( i = 0; i <= _N; i += 2 )
+		if(maxamp < _channel1[i]) 
+			maxamp = _channel1[i];
 
-	for( i = 0; i <= _N2; i++ )
-		if(_channel1[i*2] < _threshfunc[i] * maxamp) 
-			_channel1[i*2] *= fmult;
+	for( i = 0; i <= _N; i += 2 )
+		if(_channel1[i] < *(thrf++) * maxamp) 
+			_channel1[i] *= fmult;
 }
 

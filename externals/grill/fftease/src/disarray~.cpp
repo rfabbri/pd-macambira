@@ -53,13 +53,13 @@ V disarray::setup(t_classid c)
 {
 	FLEXT_CADDBANG(c,0,reset_shuffle);
 
-	FLEXT_CADDATTR_VAR(c,"freq",_freq,ms_freq);
-	FLEXT_CADDATTR_VAR1(c,"shcnt",_shuffle_count);
+	FLEXT_CADDATTR_VAR(c,"knee",_freq,ms_freq);
+	FLEXT_CADDATTR_VAR1(c,"partials",_shuffle_count);
 }
 
 
 disarray::disarray(I argc,const t_atom *argv):
-	fftease(2,F_BITSHUFFLE|F_CONVERT),
+	fftease(2,F_BITSHUFFLE),
 	_freq(1300),_qual(false),_shuffle_count(20)
 {
 	/* parse and set object's options given */
@@ -79,7 +79,7 @@ disarray::disarray(I argc,const t_atom *argv):
 		if(CanbeInt(argv[2]))
 			_shuffle_count = GetAInt(argv[2]);
 		else
-			post("%s - Shufflecount must be an integer value - set to %0i",thisName(),_shuffle_count);
+			post("%s - Partials must be an integer value - set to %0i",thisName(),_shuffle_count);
 	}
 
 	Mult(_qual?4:2);
@@ -92,8 +92,8 @@ disarray::disarray(I argc,const t_atom *argv):
 
 V disarray::Clear()
 {
-	fftease::Clear();
 	_shuffle_in = _shuffle_out = NULL;
+	fftease::Clear();
 }
 
 V disarray::Delete() 
@@ -134,13 +134,14 @@ V disarray::ms_freq(F f)
 inline V swap(F &a,F &b) { F t = a; a = b; b = t; }
 inline V swap(I &a,I &b) { I t = a; a = b; b = t; }
 
-V disarray::Transform(I _N2,S *const *in)
+V disarray::Transform(I _N,S *const *in)
 {
 	I shcnt = _shuffle_count;
 	if(shcnt < 0) shcnt = 0;
-	else if(shcnt > _N2) shcnt = _N2;
+	else if(shcnt > _N/2) shcnt = _N/2;
 
 	for(I i = 0; i < shcnt; i++)
+		// leave phase, just swap amplitudes
 		swap(_channel1[ _shuffle_in[i] * 2 ],_channel1[ _shuffle_out[i] * 2]);
 }
 
@@ -153,7 +154,7 @@ V disarray::reset_shuffle()
 	for( i = 0; i < _N2; i++ )
 		_shuffle_out[i] = _shuffle_in[i] = i ;
 
-	for( i = 0; i < 10000; i++ ) {
+	for( i = 0; i < _max_bin*2; i++ ) {
 		I p1 = _shuffle_out[ rand()%_max_bin ];
 		I p2 = _shuffle_out[ rand()%_max_bin ];
 		swap(_shuffle_out[ p1 ],_shuffle_out[ p2 ]);

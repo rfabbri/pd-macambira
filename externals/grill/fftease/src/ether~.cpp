@@ -46,7 +46,7 @@ V ether::setup(t_classid c)
 
 
 ether::ether(I argc,const t_atom *argv):
-	fftease(2,F_STEREO|F_BITSHUFFLE|F_CONVERT),
+	fftease(2,F_STEREO|F_BITSHUFFLE),
 	_qual(false),_threshMult(0),_invert(false)
 {
 	/* parse and set object's options given */
@@ -66,9 +66,8 @@ ether::ether(I argc,const t_atom *argv):
 }
 
 
-V ether::Transform(I _N2,S *const *in)
+V ether::Transform(I _N,S *const *in)
 {
-	const I _N = _N2*2;
 	const BL inv = _invert;
 	const F threshMult = _threshMult?_threshMult:1;
 

@@ -28,7 +28,7 @@ FLEXT_LIB_DSP("fftease, xsyn~",xsyn)
 
 
 xsyn::xsyn():
-	fftease(2,F_STEREO|F_BITSHUFFLE|F_CONVERT)
+	fftease(2,F_STEREO|F_BITSHUFFLE|F_NOPH2)
 {
 	AddInSignal("Messages and source signal 1");
 	AddInSignal("Source signal 2");
@@ -36,17 +36,15 @@ xsyn::xsyn():
 }
 
 
-V xsyn::Transform(I _N2,S *const *in)
+V xsyn::Transform(I _N,S *const *in)
 {
-	const I _N = _N2*2;
-
     F maxamp = 0;
 	I i;
-    for( i = 0; i < _N; i+= 2 )
+    for( i = 0; i <= _N; i+= 2 )
 		if(_channel2[i] > maxamp ) maxamp = _channel2[i];
 
 	const F f = maxamp?1./maxamp:1.;
 
-    for( i = 0; i < _N; i+= 2 )
+    for( i = 0; i <= _N; i+= 2 )
 		_channel1[i] *= (_channel2[i] * f);
 }

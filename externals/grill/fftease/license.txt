@@ -1,7 +1,6 @@
 FFTease - A set of Live Spectral Processors
 Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
 
-This flext port is based on the jMax port of Christian Klippel
 Copyright (c)Thomas Grill (xovo@gmx.net)
 
 ---------------------------------------------------------

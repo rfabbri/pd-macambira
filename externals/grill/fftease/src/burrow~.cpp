@@ -55,7 +55,7 @@ V burrow::setup(t_classid c)
 
 
 burrow::burrow(I argc,const t_atom *argv):
-	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_CONVERT),
+	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_NOPH2),
 	_thresh_dB(-30),_mult_dB(-18),
 	_invert(false)
 {
@@ -88,13 +88,12 @@ burrow::burrow(I argc,const t_atom *argv):
 }
 
 
-V burrow::Transform(I _N2,S *const *in)
+V burrow::Transform(I _N,S *const *in)
 {
-	const I _N = _N2*2;
 	register const F thr = _threshold,mul = _multiplier;
 
 	// use simple threshold from second signal to trigger filtering 
-	// transform does not need phase of signal 2 (-> optimize it!)
+	// transform does not need phase of signal 2 
 
 	if(_invert)
 		for (I i = 0; i <= _N; i += 2) 

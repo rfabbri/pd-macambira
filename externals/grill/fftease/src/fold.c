@@ -6,6 +6,7 @@
  */
 void fold( float *I, float  *W, int Nw, float *O, int N, int n )
 {
+#if 1
     int i;
     for ( i = 0; i < N; i++ ) O[i] = 0.;
 
@@ -16,6 +17,21 @@ void fold( float *I, float  *W, int Nw, float *O, int N, int n )
 		O[n] += I[i]*W[i];
 		if ( ++n == N )  n = 0;
     }
+#else
+   int i;
+
+    for ( i = 0; i < N; i++ )
+	O[i] = 0.;
+
+    while ( n < 0 )
+	n += N;
+    n %= N;
+    for ( i = 0; i < Nw; i++ ) {
+	O[n] += I[i]*W[i];
+	if ( ++n == N )
+	    n = 0;
+    }
+#endif
 }
 
 
@@ -26,6 +42,7 @@ void fold( float *I, float  *W, int Nw, float *O, int N, int n )
  */
 void overlapadd( float *I, int N, float *W, float *O, int Nw, int n )
 {
+#if 1
 	int i ;
     while ( n < 0 ) n += N ;
     n %= N ;
@@ -34,5 +51,17 @@ void overlapadd( float *I, int N, float *W, float *O, int Nw, int n )
 		O[i] += I[n]*W[i] ;
 		if ( ++n == N ) n = 0 ;
     }
+#else
+ int i ;
+    while ( n < 0 )
+	n += N ;
+    n %= N ;
+    for ( i = 0 ; i < Nw ; i++ ) {
+	O[i] += I[n]*W[i] ;
+	if ( ++n == N )
+	    n = 0 ;
+    }
+
+#endif
 }
 

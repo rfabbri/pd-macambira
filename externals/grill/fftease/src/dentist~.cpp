@@ -24,7 +24,7 @@ protected:
 
 	virtual V Transform(I _N2,S *const *in);
 
-	I *_bin_selection;
+	BL *_bin_selection;
 	I _teeth;  
 	F _knee;
 	I _max_bin; // determined by _knee and fundamental frequency
@@ -63,7 +63,7 @@ V dentist::setup(t_classid c)
 
 
 dentist::dentist(I argc,const t_atom *argv):
-	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CONVERT),	
+	fftease(4,F_BALANCED|F_BITSHUFFLE),	
 	_knee(500),_teeth(10)
 {
 	/* parse and set object's options given */
@@ -86,15 +86,13 @@ dentist::dentist(I argc,const t_atom *argv):
 
 V dentist::Clear()
 {
-	fftease::Clear();
-
 	_bin_selection = NULL;
+	fftease::Clear();
 }
 
 V dentist::Delete() 
 {
 	fftease::Delete();
-
 	if(_bin_selection) delete[] _bin_selection;
 }
 
@@ -119,17 +117,17 @@ V dentist::Set()
 {
 	fftease::Set();
 	
-	_bin_selection = new I[get_N()/2];
+	_bin_selection = new BL[get_N()/2];
 
 	// calculation of _max_bin
 	ms_knee(_knee); 
 }
 
-V dentist::Transform(I _N2,S *const *in)
+V dentist::Transform(I _N,S *const *in)
 {
-	for(I i = 0; i < _N2 ; i++){
-		if( !_bin_selection[i] ) _channel1[i*2] = 0;
-	}
+	const BL *bs = _bin_selection;
+	for(I i = 0; i < _N ; i += 2)
+		if(!*(bs++)) _channel1[i] = 0;
 }
 
 
@@ -145,7 +143,7 @@ V dentist::reset_shuffle()
 	// clear and set random bins
 	I i;
 	for( i = 0; i < _N2; i++ )
-		_bin_selection[i] = 0;
+		_bin_selection[i] = false;
 	for( i = 0; i < t; i++ )
-		_bin_selection[rand()%_max_bin] = 1;
+		_bin_selection[rand()%_max_bin] = true;
 }

@@ -31,7 +31,7 @@ FLEXT_LIB_DSP_V("fftease, shapee~",shapee)
 
 
 shapee::shapee(I argc,const t_atom *argv):
-	fftease(2,F_STEREO|F_BITSHUFFLE|F_CONVERT),
+	fftease(2,F_STEREO|F_BITSHUFFLE),
 	_qual(false)
 {
 	/* parse and set object's options given */
@@ -54,16 +54,23 @@ shapee::shapee(I argc,const t_atom *argv):
 	AddOutSignal("Transformed signal");
 }
 
+#define THRESH 0.000001
 
-V shapee::Transform(I _N2,S *const *in)
+V shapee::Transform(I _N,S *const *in)
 {
 	// lets just shape the entire signal in groups of three 
 
-	const I _N = _N2*2;
 	I i;
-	for ( i=2; i < _N+2; i += 6 ) {
-		F lowerMult = _channel1[i-2] / _channel1[i];
-		F upperMult = _channel1[i+2] / _channel1[i];
+	for ( i=2; i <= _N; i += 6 ) {
+		const F ref = _channel1[i];
+		F lowerMult,upperMult;
+
+		if(!ref)
+			lowerMult = upperMult = 1;
+		else {
+			lowerMult = _channel1[i-2] / ref;
+			upperMult = _channel1[i+2] / ref;
+		}
 		F newCenter = ( _channel2[i-2]+_channel2[i]+_channel2[i+2] ) / (upperMult + lowerMult + 1);
 
 		_channel2[i-2] = lowerMult * newCenter;
@@ -71,7 +78,7 @@ V shapee::Transform(I _N2,S *const *in)
 		_channel2[i] = newCenter; 
 	}
 
-	for ( i=0; i < _N; i+=2 ) {
+	for ( i=0; i <= _N; i+=2 ) {
 		_channel1[i] = _channel2[i];
 		if ( _channel1[i] == 0. ) 
 			_channel1[i+1] = 0.;

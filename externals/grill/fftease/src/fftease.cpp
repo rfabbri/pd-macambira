@@ -23,6 +23,7 @@ fftease::~fftease() {}
 BL fftease::Init()
 {
 	Clear();
+	Set();
 	return flext_dsp::Init();
 }
 
@@ -92,18 +93,18 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 		if(_flags&F_STEREO) rfft( _buffer2, _N2,1);
 	}
 
-	if(_flags&F_BITSHUFFLE) {
-	    leanconvert( _buffer1, _channel1, _N2 );
-	    if(_flags&F_STEREO) leanconvert( _buffer2, _channel2, _N2 );
+	if(!(_flags&F_NOSPEC)) {
+	    leanconvert( _buffer1, _channel1, _N2 , !(_flags&F_NOAMP1),!(_flags&F_NOPH1));
+	    if(_flags&F_STEREO) leanconvert( _buffer2, _channel2, _N2 ,!(_flags&F_NOAMP2),!(_flags&F_NOPH2) );
 	}
 
 	// ---- BEGIN --------------------------------
 
-	Transform(_N2,in+((_flags&F_STEREO)?1:2));
+	Transform(_N,in+((_flags&F_STEREO)?2:1));
 
 	// ---- END --------------------------------
 
-	if(_flags&F_CONVERT) {
+	if(!(_flags&F_NOSPEC)) {
 	    leanunconvert( _channel1, _buffer1, _N2 );
 	    if(_flags&F_STEREO) leanunconvert( _channel2, _buffer2, _N2 );
 	}
@@ -139,14 +140,23 @@ void fftease::Set()
 
 	/* assign memory to the buffers */
 	_input1 = new F[_Nw];
+	ZeroMem(_input1,_Nw*sizeof(*_input1));
 	_buffer1 = new F[_N];
-	if(_flags&(F_CONVERT|F_CRES)) _channel1 = new F[_N+2];
+	if(!(_flags&F_NOSPEC) || (_flags&F_SPECRES)) {
+		_channel1 = new F[_N+2];
+		ZeroMem(_channel1,(_N+2)*sizeof(*_channel1));
+	}
 	if(_flags&F_STEREO) {
 		_input2 = new F[_Nw];
+		ZeroMem(_input2,_Nw*sizeof(*_input2));
 		_buffer2 = new F[_N];
-		if(_flags&(F_CONVERT|F_CRES)) _channel2 = new F[_N+2];
+		if(!(_flags&F_NOSPEC) || (_flags&F_SPECRES)) {
+			_channel2 = new F[_N+2];
+			ZeroMem(_channel2,(_N+2)*sizeof(*_channel2));
+		}
 	}
 	_output = new F[_Nw];
+	ZeroMem(_output,_Nw*sizeof(*_output));
 
 	if(_flags&F_BITSHUFFLE) {
 		_bitshuffle = new I[_N*2];

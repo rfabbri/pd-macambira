@@ -21,44 +21,44 @@ class swinger:
 	FLEXT_HEADER(swinger,fftease)
 	
 public:
-	swinger();
+	swinger(I argc,const t_atom *argv);
 
 protected:
+
+	BL _qual;
 
 	virtual V Transform(I n,S *const *in);
 };
 
-FLEXT_LIB_DSP("fftease, swinger~",swinger)
+FLEXT_LIB_DSP_V("fftease, swinger~",swinger)
 
 
-swinger::swinger():
-	fftease(2,F_STEREO|F_BITSHUFFLE)
+swinger::swinger(I argc,const t_atom *argv):
+	fftease(2,F_STEREO|F_BITSHUFFLE|F_NOPH1|F_NOAMP2),
+	_qual(false)
 {
+	/* parse and set object's options given */
+	if(argc >= 1) {
+		if(CanbeBool(argv[0]))
+			_qual = GetABool(argv[0]);
+		else
+			post("%s - Quality must be a boolean value - set to %0i",thisName(),_qual?1:0);
+	}
+
+	if(_qual) {
+		Mult(4);
+		_flags |= F_BALANCED;
+	}
+	else
+		Mult(2);
+
 	AddInSignal("Messages and input signal");
 	AddInSignal("Signal to supply phase information");
 	AddOutSignal("Transformed signal");
 }
 
 
-V swinger::Transform(I _N2,S *const *in)
+V swinger::Transform(I _N,S *const *in)
 {
-	for (I i = 0; i <= _N2; i++ ) {
-		const I even = i*2,odd = even+1;
-
-		// convert to polar coordinates from complex values 
-		// replace signal one's phases with those of signal two 
-		const F a1 = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
-		const F b1 = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
-		// amplitude only
-		const F amp = hypot( a1, b1 );
-
-		const F a2 = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
-		const F b2 = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
-		// phase only
-		const F ph = -atan2( b2, a2 );
-
-		_buffer1[even] = amp * cos( ph );
-		if ( i != _N2 )
-			_buffer1[odd] = -amp * sin( ph );
-	}
+	for (I i = 0; i <= _N; i += 2) _channel1[i+1] = _channel2[i+1];
 }

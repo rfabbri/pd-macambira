@@ -18,17 +18,17 @@ class drown:
 	FLEXT_HEADER(drown,fftease)
 	
 public:
-	drown(I argc,const t_atom *argv);
+	drown();
 
 protected:
 	virtual V Transform(I n,S *const *in);
 };
 
-FLEXT_LIB_DSP_V("fftease, drown~ denude~",drown)
+FLEXT_LIB_DSP("fftease, drown~ denude~",drown)
 
 
-drown::drown(I argc,const t_atom *argv):
-	fftease(4,F_BALANCED|F_CONVERT)
+drown::drown():
+	fftease(4,F_BALANCED)
 {
 	AddInSignal("Messages and input signal");
 	AddInSignal("Threshold generator signal");
@@ -37,12 +37,10 @@ drown::drown(I argc,const t_atom *argv):
 }
 
 
-V drown::Transform(I _N2,S *const *in)
+V drown::Transform(I _N,S *const *in)
 {
 	// only first value of the signal vectors
 	const F thresh = *in[0],mult = *in[1];
-
-	const I _N = _N2*2;
 
 	// make up low amplitude bins
 	for (I i = 0; i <= _N; i += 2)

@@ -12,7 +12,8 @@
 
 void convert(float *S, float *C, int N2, float *lastphase,  float fundamental, float factor )
 {
-	float phase, phasediff;
+#if 1
+	float phase,phasediff;
 	int even,odd;
 	float a,b;
 	int i;
@@ -26,20 +27,62 @@ void convert(float *S, float *C, int N2, float *lastphase,  float fundamental, f
 		if ( C[even] == 0. )
 			phasediff = 0.;
 		else {
-			phasediff = ( phase = -atan2( b, a ) ) - lastphase[i];
+			phase = -atan2( b, a );
+			phasediff = fmod(phase - lastphase[i] + (PV_2PI+PV_PI), PV_2PI)-PV_PI;
 			lastphase[i] = phase;
-
-			while ( phasediff > PV_PI )	phasediff -= PV_2PI;
-			while ( phasediff < -PV_PI ) phasediff += PV_2PI;
 		}
 
 		C[odd] = phasediff*factor + i*fundamental;
 	}
+#else
+  float 	phase,
+		phasediff;
+  int 		real,
+		imag,
+		amp,
+		freq;
+  float 	a,
+		b;
+  int 		i;
+
+  float myTWOPI, myPI;
+
+  myTWOPI = 8.*atan(1.);
+  myPI = 4.*atan(1.);
+
+
+    for ( i = 0; i <= N2; i++ ) {
+      imag = freq = ( real = amp = i<<1 ) + 1;
+      a = ( i == N2 ? S[1] : S[real] );
+      b = ( i == 0 || i == N2 ? 0. : S[imag] );
+
+      C[amp] = hypot( a, b );
+      if ( C[amp] == 0. )
+	phasediff = 0.;
+      else {
+	phasediff = ( phase = -atan2( b, a ) ) - lastphase[i];
+	lastphase[i] = phase;
+	
+	// TG: DANGEROUS!!!! (and slow, if lastphase not correctly initialized)
+	while ( phasediff > myPI )
+	  phasediff -= myTWOPI;
+	while ( phasediff < -myPI )
+	  phasediff += myTWOPI;
+      }
+      C[freq] = phasediff*factor + i*fundamental;
+      /*
+      if( i > 8 && i < 12 ) {
+	fprintf(stderr,"convert freq %d: %f\n",i, C[freq]);
+      }
+      */
+    }
+#endif
 }
 
 
 void unconvert(float  *C, float *S, int N2, float *lastphase, float fundamental,  float factor )
 {
+#if 1
 	int i,even,odd;
 	float mag,phase;
 
@@ -57,4 +100,35 @@ void unconvert(float  *C, float *S, int N2, float *lastphase, float fundamental,
 		else
 			S[1] = mag*cos( phase );
 	}
+#else
+  int 		i,
+		real,
+		imag,
+		amp,
+		freq;
+  float 	mag,
+		phase;
+
+    for ( i = 0; i <= N2; i++ ) {
+
+	imag = freq = ( real = amp = i<<1 ) + 1;
+
+	if ( i == N2 )
+	  real = 1;
+
+	mag = C[amp];
+	lastphase[i] += C[freq] - i*fundamental;
+	phase = lastphase[i]*factor;
+	S[real] = mag*cos( phase );
+
+	if ( i != N2 )
+	  S[imag] = -mag*sin( phase );
+	/*
+      if( i == 10 ) {
+	fprintf(stderr,"unconvert: amp: %f freq: %f funda %f fac %f\n", C[amp],C[freq],fundamental,factor);
+      }
+	*/
+    }
+
+#endif
 }
