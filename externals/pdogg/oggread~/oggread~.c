@@ -25,9 +25,8 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
-
-#include "m_imp.h"
-#include "g_canvas.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 #include "codec.h"
 #include "vorbis/vorbisfile.h"
 
