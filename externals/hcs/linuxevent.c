@@ -2,7 +2,7 @@
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -113,8 +113,10 @@ static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
 	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
 
 	  switch(eventType) {
+#ifdef EV_RST
 	  case EV_RST:
 	    break;
+#endif
 	  case EV_KEY:
 	    buttons++;
 	    break;

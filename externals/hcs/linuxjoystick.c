@@ -2,7 +2,7 @@
 
 #define LINUXJOYSTICK_AXES     6
 
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -114,8 +114,10 @@ static int linuxjoystick_open(t_linuxjoystick *x, t_symbol *s) {
 	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
 
 	  switch(eventType) {
+#ifdef EV_RST
 	  case EV_RST:
 	    break;
+#endif
 	  case EV_KEY:
 	    buttons++;
 	    break;
