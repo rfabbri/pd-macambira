@@ -1,6 +1,6 @@
 object main: Tmain
-  Left = 16
-  Top = 497
+  Left = 31
+  Top = 502
   Width = 239
   Height = 223
   Caption = 'Framestein'
@@ -3490,9 +3490,11 @@ object main: Tmain
     OnClientDisconnect = ss1ClientDisconnect
     OnClientRead = ss1ClientRead
     OnClientError = ss1ClientError
+    Top = 96
   end
   object PopupMenu1: TPopupMenu
     Left = 64
+    Top = 96
     object MiConfig: TMenuItem
       Caption = 'Configure'
       OnClick = MiConfigClick
@@ -3506,7 +3508,7 @@ object main: Tmain
       OnClick = MiReloadPluginsClick
     end
     object MiToolbar: TMenuItem
-      Caption = 'Show Toolbar'
+      Caption = 'Show Tools && Filters'
       OnClick = MiToolbarClick
     end
     object MiLog: TMenuItem
@@ -3547,5 +3549,6 @@ object main: Tmain
     OnDisconnect = csToPdDisconnect
     OnError = csToPdError
     Left = 32
+    Top = 96
   end
 end

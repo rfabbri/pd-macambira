@@ -31,11 +31,14 @@ type
       Selected: Boolean);
     procedure sdHandleFile(const SearchRec: TSearchRec;
       const FullPath: String);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure PageControl1Change(Sender: TObject);
   private
     { Private declarations }
     SendKey: TSendKey;
   public
     { Public declarations }
+    procedure UpdateLists;
   end;
 
 var
@@ -60,24 +63,26 @@ begin
   end;
 end;
 
-procedure Ttoolbar.FormCreate(Sender: TObject);
+procedure Ttoolbar.UpdateLists;
 var
   i: Integer;
 begin
-  // Load tools
+   // Load tools
   if FileExists(main.FSFolder+'\toolbar.txt') then begin
+    LVTools.Items.Clear;
     m1.Lines.LoadFromFile(main.FSFolder+'\toolbar.txt');
     if m1.Lines.Count>0 then
       for i:=0 to m1.Lines.Count-1 do begin
         with LVTools.Items.Add do begin
-          Caption := ExtractWord(1, m1.Lines[i], [' ']);
+          Caption := ExtractWord(1, m1.Lines[i], [';']);
           Data := Pointer(i);
         end;
       end;
   end;
 
   // Load plugins
-  if main.Plugins.Names.Count>0 then
+  if main.Plugins.Names.Count>0 then begin
+    LVFilters.Items.Clear;
     for i:=0 to main.Plugins.Names.Count-1 do begin
       with LVFilters.Items.Add do begin
         Caption := main.Plugins.Names[i];
@@ -85,12 +90,17 @@ begin
         Data := Pointer(i);
       end;
     end;
+  end;
 
   // Load photoshop-filters
   sd.Scan(main.FSFolder+'\Filters');
+end;
 
+procedure Ttoolbar.FormCreate(Sender: TObject);
+begin
+  UpdateLists;
   SendKey := TSendKey.Create(Self);
-  Show;
+//  Show;
 end;
 
 const
@@ -99,9 +109,18 @@ const
 procedure Ttoolbar.LVFiltersChange(Sender: TObject; Item: TListItem;
   Change: TItemChange);
 begin
+
+(* Trying to provide "paste objects to patches" feature,
+   real toolbar-style, but:
+
+   disabled together with CustomDrawItem -
+   doesn't work well enough, might introduce new bugs etc.
+
   if Item.Selected then
     it := item;
   if Item.ListView.Selected=nil then it:=nil;
+*)
+
 end;
 
 procedure Ttoolbar.LVFiltersCustomDrawItem(Sender: TCustomListView;
@@ -111,6 +130,9 @@ var
   s: String;
   h: THandle;
 begin
+
+(* NOT GOOD ENOUGH
+
   if (it=nil) or (Item.Caption='') then Exit;
   if it.Caption=item.Caption then begin
     Sleep(50); // wait for pd window to get focus
@@ -128,11 +150,14 @@ begin
           SendKey.TitleText := S;
           SendKey.Keys := '{^1}'+Item.Caption;
           SendKey.execute;
+//          Self.Hide;
         end;
         Item.ListView.Selected := nil;
       end;
     end;
   end;
+*)
+
 end;
 
 procedure Ttoolbar.LVFiltersSelectItem(Sender: TObject; Item: TListItem;
@@ -161,9 +186,20 @@ begin
   i := Integer(Item.Data);
   if (i>=0) and (i<m1.Lines.Count) then begin
     S := m1.Lines[i];
-    if Pos(' ', S)>0 then Delete(S, 1, Pos(' ', S));
+    if Pos(';', S)>0 then Delete(S, 1, Pos(';', S));
     bar.SimpleText := S;
   end;
 end;
 
+procedure Ttoolbar.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  main.MiToolbar.Checked := False;
+end;
+
+procedure Ttoolbar.PageControl1Change(Sender: TObject);
+begin
+  bar.SimpleText := '';
+end;
+
 end.
+

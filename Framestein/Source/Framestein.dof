@@ -85,8 +85,8 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=7
-Item0=e:\lab\common\fastlib;e:\lab\common\pshost;e:\lab\common\G32;e:\fs\framestein\source
-Item1=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\common\pshost;E:\lab\common\G32;e:\fs\framestein\source
+Item0=E:\lab\common\DelphiX2000_0717-2\Source;E:\lab\common\fastlib;E:\lab\common\pshost;E:\lab\common\G32;E:\fs\Framestein\Source
+Item1=e:\lab\common\fastlib;e:\lab\common\pshost;e:\lab\common\G32;e:\fs\framestein\source
 Item2=e:\lab\common\fastlib;e:\lab\common\pshost;e:\lab\common\G32
 Item3=g:\lab\common\fastlib;G:\lab\common\pshost;G:\lab\common\G32
 Item4=g:\lab\common\fastlib;G:\lab\common\pshost

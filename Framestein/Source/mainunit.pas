@@ -18,7 +18,7 @@ uses
   StdCtrls, ScktComp,
   pluginunit, fsformunit, fsframeunit,
   FastDIB,
-  ExtCtrls, Menus, C2PhotoShopHost, Filez, ComCtrls;
+  ExtCtrls, Menus, C2PhotoShopHost, Filez, ComCtrls, Buttons;
 
 type
   Tmain = class(TFsForm)
@@ -540,6 +540,7 @@ end;
 procedure Tmain.MiReloadPluginsClick(Sender: TObject);
 begin
   Plugins.Reload;
+  Toolbar.UpdateLists;
 end;
 
 function Tmain.GetFrameByTag(const tag: String): TFsFrame;
