@@ -1,3 +1,10 @@
+0.31
+- added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!
+- the console is back. It's good for printf():ing from plugins..
+- New filters: BitLeft, Picasso, PicChop, yage, zoomnoise
+- Rewrote some examples, added a couple and numbered them
+- Fs got CVS'd: http://sourceforge.net/projects/pure-data/cvs
+
 0.30
 - vframe supports plugin parameters
 - doubleclicking the framestein-logo equals "reset"

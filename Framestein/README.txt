@@ -70,6 +70,9 @@ framestein.org
 List for receiving update information:
 http://groups.yahoo.com/group/framestein
 
+Framestein is CVS'd at
+http://sourceforge.net/projects/pure-data/cvs
+
 Send your feedback, ideas, plugins, ...
 jusu@iki.fi
 .
