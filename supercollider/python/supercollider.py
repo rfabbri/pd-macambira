@@ -24,7 +24,7 @@
 # -Kjetil.
 
 
-import OSC,tempfile,xreadlines,os,time
+import OSC,tempfile,xreadlines,os,time,types
 
 standardport=57110
 startnode=1001;
@@ -45,12 +45,17 @@ class Server:
     def __init__(self,magic,port=standardport):
         if magic!=1234:
             print "Server.__init__: Are you sure you know what you are doing?"
-            print "Seems like probably wanted to use the 'localServer' variable."
+            print "Seems like you probably wanted to use the 'localServer' variable."
         self.port=port
         self.freenode=startnode;
         self.freebuffer=startbuffer;
     def sendMsg(self,command,*args):
-        OSC.Message(command,args).sendlocal(self.port)
+        def floatToInt(x):
+            if type(x)==types.FloatType:
+                return int(x)
+            else:
+                return x
+        OSC.Message(command,map(floatToInt,args)).sendlocal(self.port)
     def sendgetMsg(self,command,*args):
         apply(self.sendMsg,[command]+list(args))
         time.sleep(1)
