@@ -21,11 +21,29 @@
 
 
 # This file is far from complete, but its a start.
+#
+# All variables, classes and methods that are implemented in this file are
+# tested, and should work.
+#
+# It would be easy to read the Supercollider server command reference, and just
+# implement the missing methods and classes blindly. But I don't want to. When the
+# implementation is so straight forward as here, its better to it properly.
+#
+# So if you need more functionality, you can either just read the Supercollider
+# server command reference manual and implement the functionality directly
+# in this file (and send me the changes afterwards!), or send me some python
+# code you want to make work with this module, and I'll try to
+# implement it for you.
+#
+# Serious missing functionality: Have no way to get reply from server. Have to
+# find a more advanced OSC implementation than OSC.py 1.2 by Stefan Kersten used now.
+#
 # -Kjetil.
 
 
 import OSC,tempfile,xreadlines,os,time,types
 
+standardip="127.0.0.1"
 standardport=57110
 startnode=1001;
 startbuffer=0;
@@ -37,15 +55,14 @@ sc_after=3
 sc_replace=4
 
 
-# For some crazy reason, the sclang command tells the server to quits when exiting.
-# To fix that strange and unpleasant behaviour, uncommnet the following lines in etc. etc. etc.
-
-
 class Server:
-    def __init__(self,magic,port=standardport):
+    def __init__(self,magic,ip=standardip,port=standardport):
         if magic!=1234:
             print "Server.__init__: Are you sure you know what you are doing?"
             print "Seems like you probably wanted to use the 'localServer' variable."
+        if ip!=standardip:
+            print "Warning. Ip only supprted for evalSynth (but not tested)."
+        self.ip=ip
         self.port=port
         self.freenode=startnode;
         self.freebuffer=startbuffer;
@@ -58,6 +75,7 @@ class Server:
         OSC.Message(command,map(floatToInt,args)).sendlocal(self.port)
     def sendgetMsg(self,command,*args):
         apply(self.sendMsg,[command]+list(args))
+        # Simulated (and most probably extremely unaccurate) time used to get a reply. Use with care.
         time.sleep(1)
     def dumpOSC(self,code):
         self.sendMsg("dumpOSC",code);
@@ -77,15 +95,13 @@ class Server:
         outfile.write('SynthDef("'+synthname+'",{')
         for line in xreadlines.xreadlines(open(synthname+".sc","r")):
             outfile.write(line)
-        tmpname2=tempfile.mktemp("")
-        outfile.write('}).writeDefFile("'+tmpname2+'");\n')
+        outfile.write('}).send(Server.new(\localhost,NetAddr("'+self.ip+'",'+str(self.port)+')););\n')
         outfile.close()
         os.system("sclang "+tmpname)
-        tmpname2+=synthname+".scsyndef"
-        self.loadSynthDef(tmpname2)
-        os.system("rm "+tmpname+" "+tmpname2)
+        os.system("rm "+tmpname)
         
 localServer=Server(1234)
+
 
 class Node:
     def __del__(self):
@@ -95,7 +111,8 @@ class Node:
 
 
 class Synth(Node):
-    def __init__(self,server,name,args=[],position=sc_tail):
+    global localServer
+    def __init__(self,name,args=[],position=sc_tail,server=localServer):
         self.server=server
         self.id=server.nextNodeID()
         apply(self.server.sendMsg,["/s_new",name,self.id,position,0]+args)
@@ -115,12 +132,11 @@ class BufferSuper:
 
 
 class Buffer(BufferSuper):
-    def __init__(self,server,numFrames,numChannels=1):
+    def __init__(self,numFrames,numChannels=1,server=localServer):
         BufferSuper.__init__(self,server,numFrames,numChannels)
 
 class BufferRead(BufferSuper):
-    def __init__(self,server,filename,startFrame=0,numFrames=0):
+    def __init__(self,filename,startFrame=0,numFrames=0,server=localServer):
         BufferSuper.__init__(self,server,numFrames,-1,filename,startFrame)
-
 
 
