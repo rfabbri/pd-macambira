@@ -29,7 +29,13 @@ Package: pd-footils
 Architecture: any
 Depends: pd, ${shlibs:Depends}
 Description: Footils externals
-  Externals built using the flext library.
+ Externals built using the flext library.
+
+Package: pd-pdp
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: Graphics system for pd
+ PDP allows you to manipulate movies and live video data within pd. 
 
 Package: pd-externals
 Architecture: any

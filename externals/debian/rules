@@ -57,7 +57,11 @@ build-stamp: configure-stamp
 
 	(cd OSCx/libOSC;$(MAKE))
 	(cd OSCx/OSC; $(MAKE))
+
+        #
 	
+	(cd pdp;autoconf;./configure;$(MAKE))
+
         #/usr/bin/docbook-to-man debian/pd-externals.sgml > pd-externals.1
 
 	touch build-stamp
@@ -78,6 +82,8 @@ clean:
 
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
+#
+	(cd pdp;autoconf;./configure;$(MAKE) clean)
 
 	dh_clean
 
@@ -94,13 +100,16 @@ install: build
 				      PDLIBDIR=lib/pd )
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux install INSTDIR=$(CURDIR)/debian/tmp/usr/lib/pd/flext)
 
-	(cd footils; make install DESTDIR=$(CURDIR)/debian/tmp/ \
-	INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra)
+	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
+	        FLEXTINC=../../grill/flext/source \
+		DESTDIR=$(CURDIR)/debian/tmp INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra install)
 		
 	# Install OSC
 
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
 	install OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
+
+	(cd pdp;make prefix=$(CURDIR)/debian/tmp/usr/ install)
 
 # Build architecture-independent files here.
 binary-indep: build install
