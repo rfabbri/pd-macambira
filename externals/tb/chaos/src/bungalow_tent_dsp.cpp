@@ -21,14 +21,4 @@
 #include "bungalow_tent_map.hpp"
 #include "chaos_dsp.hpp"
 
-class bungalow_tent_dsp:
-	public chaos_dsp<bungalow_tent>
-{
-	CHAOS_DSP_INIT(bungalow_tent, BUNGALOW_TENT_ATTRIBUTES);
-
-	BUNGALOW_TENT_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("bungalow_tent~", bungalow_tent_dsp);
+CHAOS_DSP_CLASS(bungalow_tent,BUNGALOW_TENT);

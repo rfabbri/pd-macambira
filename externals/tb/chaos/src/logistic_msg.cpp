@@ -21,14 +21,4 @@
 #include "logistic_map.hpp"
 #include "chaos_msg.hpp"
 
-class logistic_msg:
-	public chaos_msg<logistic>
-{
-	CHAOS_MSG_INIT(logistic, LOGISTIC_ATTRIBUTES);
-
-	LOGISTIC_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("logistic", logistic_msg);
+CHAOS_MSG_CLASS(logistic, LOGISTIC);

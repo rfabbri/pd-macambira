@@ -21,14 +21,4 @@
 #include "standard_map.hpp"
 #include "chaos_msg.hpp"
 
-class standard_map_msg:
-	public chaos_msg<standard_map>
-{
-	CHAOS_MSG_INIT(standard_map, STANDARD_MAP_ATTRIBUTES);
-
-	STANDARD_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("standard_map", standard_map_msg);
+CHAOS_MSG_CLASS(standard_map, STANDARD_MAP);

@@ -21,14 +21,5 @@
 #include "sine_map.hpp"
 #include "chaos_dsp.hpp"
 
-class sine_map_dsp:
-	public chaos_dsp<sine_map>
-{
-	CHAOS_DSP_INIT(sine_map, SINE_MAP_ATTRIBUTES);
 
-	SINE_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("sine_map~", sine_map_dsp);
+CHAOS_DSP_CLASS(sine_map, SINE_MAP);

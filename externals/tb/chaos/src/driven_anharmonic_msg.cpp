@@ -18,7 +18,8 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "lozi_map.hpp"
-#include "chaos_dsp.hpp"
+#include "driven_anharmonic.hpp"
+#include "chaos_msg.hpp"
 
-CHAOS_DSP_CLASS_NAME(lozi_map, LOZI_MAP, "lozi");
+CHAOS_MSG_CLASS(driven_anharmonic, DRIVEN_ANHARMONIC);
+

@@ -21,14 +21,4 @@
 #include "gauss_map.hpp"
 #include "chaos_msg.hpp"
 
-class gauss_map_msg:
-	public chaos_msg<gauss_map>
-{
-	CHAOS_MSG_INIT(gauss_map, GAUSS_MAP_ATTRIBUTES);
-
-	GAUSS_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("gauss_map", gauss_map_msg);
+CHAOS_MSG_CLASS(gauss_map, GAUSS_MAP);

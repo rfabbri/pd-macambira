@@ -21,14 +21,4 @@
 #include "logistic_map.hpp"
 #include "chaos_dsp.hpp"
 
-class logistic_dsp:
-	public chaos_dsp<logistic>
-{
-	CHAOS_DSP_INIT(logistic, LOGISTIC_ATTRIBUTES);
-
-	LOGISTIC_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("logistic~", logistic_dsp);
+CHAOS_DSP_CLASS(logistic, LOGISTIC);

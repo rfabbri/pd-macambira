@@ -21,14 +21,4 @@
 #include "circle_map.hpp"
 #include "chaos_dsp.hpp"
 
-class circle_map_dsp:
-	public chaos_dsp<circle_map>
-{
-	CHAOS_DSP_INIT(circle_map, CIRCLE_MAP_ATTRIBUTES);
-
-	CIRCLE_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("circle_map~", circle_map_dsp);
+CHAOS_DSP_CLASS(circle_map, CIRCLE_MAP)

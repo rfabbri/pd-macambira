@@ -21,14 +21,4 @@
 #include "tent_map.hpp"
 #include "chaos_msg.hpp"
 
-class tent_map_msg:
-	public chaos_msg<tent_map>
-{
-	CHAOS_MSG_INIT(tent_map, TENT_MAP_ATTRIBUTES);
-
-	TENT_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("tent", tent_map_msg);
+CHAOS_MSG_CLASS_NAME(tent_map, TENT_MAP, "tent");

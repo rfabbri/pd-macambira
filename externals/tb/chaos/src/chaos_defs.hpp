@@ -131,7 +131,47 @@ set_##NAME(VALUE);
 
 
 
+/* macros for class generation */
+#define CHAOS_DSP_CLASS(CLASSNAME,CLASSNAME_UC)				\
+class CLASSNAME##_dsp:										\
+	public chaos_dsp<CLASSNAME>								\
+{															\
+	CHAOS_DSP_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;								\
+};															\
+FLEXT_LIB_DSP_V(#CLASSNAME"~", CLASSNAME##_dsp);
 
+#define CHAOS_DSP_CLASS_NAME(CLASSNAME,CLASSNAME_UC, NAME)	\
+class CLASSNAME##_dsp:										\
+	public chaos_dsp<CLASSNAME>								\
+{															\
+	CHAOS_DSP_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;								\
+};															\
+FLEXT_LIB_DSP_V(#NAME, CLASSNAME##_dsp);
+
+
+#define CHAOS_MSG_CLASS(CLASSNAME,CLASSNAME_UC)				\
+class CLASSNAME##_msg:										\
+	public chaos_msg<CLASSNAME>								\
+{															\
+	CHAOS_MSG_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;								\
+};															\
+FLEXT_LIB_V(#CLASSNAME, CLASSNAME##_msg);
+
+#define CHAOS_MSG_CLASS_NAME(CLASSNAME,CLASSNAME_UC, NAME)	\
+class CLASSNAME##_msg:										\
+	public chaos_msg<CLASSNAME>								\
+{															\
+	CHAOS_MSG_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;								\
+};															\
+FLEXT_LIB_V(#NAME, CLASSNAME##_msg);
+
+#define CHAOS_ADD(NAME)							\
+FLEXT_DSP_SETUP(NAME##_dsp);					\
+FLEXT_SETUP(NAME##_msg);
 
 #define __chaos_defs_hpp
 #endif /* __chaos_defs_hpp */

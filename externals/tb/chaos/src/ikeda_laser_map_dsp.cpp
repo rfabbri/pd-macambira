@@ -21,14 +21,6 @@
 #include "ikeda_laser_map.hpp"
 #include "chaos_dsp.hpp"
 
-class ikeda_laser_map_dsp:
-	public chaos_dsp<ikeda_laser_map>
-{
-	CHAOS_DSP_INIT(ikeda_laser_map, IKEDA_LASER_MAP_ATTRIBUTES);
 
-	IKEDA_LASER_MAP_CALLBACKS;
-};
+CHAOS_DSP_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, "ikeda");
 
-
-
-FLEXT_LIB_DSP_V("ikeda~", ikeda_laser_map_dsp);

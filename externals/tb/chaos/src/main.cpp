@@ -19,46 +19,28 @@
 //  Boston, MA 02111-1307, USA.
 
 #include "chaos.hpp"
+#include "chaos_defs.hpp"
 
 void chaos_library_setup()
 {
 	post("chaos~ version "PACKAGE_VERSION"\n");
 
-	FLEXT_DSP_SETUP(bernoulli_dsp);
-	FLEXT_SETUP(bernoulli_msg);
-
-	FLEXT_DSP_SETUP(bungalow_tent_dsp);
-	FLEXT_SETUP(bungalow_tent_msg);
-
-	FLEXT_DSP_SETUP(circle_map_dsp);
-	FLEXT_SETUP(circle_map_msg);
-
-	FLEXT_DSP_SETUP(gauss_map_dsp);
-	FLEXT_SETUP(gauss_map_msg);
-
-	FLEXT_DSP_SETUP(henon_dsp);
-	FLEXT_SETUP(henon_msg);
-
-	FLEXT_DSP_SETUP(ikeda_laser_map_dsp);
-	FLEXT_SETUP(ikeda_laser_map_msg);
-	
-	FLEXT_DSP_SETUP(logistic_dsp);
-	FLEXT_SETUP(logistic_msg);
-
-	FLEXT_DSP_SETUP(lorenz_dsp);
-	FLEXT_SETUP(lorenz_msg);
-
-	FLEXT_DSP_SETUP(lozi_map_dsp);
-	FLEXT_SETUP(lozi_map_msg);
-
-	FLEXT_DSP_SETUP(sine_map_dsp);
-	FLEXT_SETUP(sine_map_msg);
-
-	FLEXT_DSP_SETUP(standard_map_dsp);
-	FLEXT_SETUP(standard_map_msg);
-
-	FLEXT_DSP_SETUP(tent_map_dsp);
-	FLEXT_SETUP(tent_map_msg);
+	CHAOS_ADD(bernoulli);
+	CHAOS_ADD(bungalow_tent);
+	CHAOS_ADD(circle_map);
+	CHAOS_ADD(coupled_logistic);
+	CHAOS_ADD(driven_anharmonic);
+	CHAOS_ADD(driven_van_der_pol);
+	CHAOS_ADD(gauss_map);
+	CHAOS_ADD(henon);
+	CHAOS_ADD(ikeda_laser_map);
+	CHAOS_ADD(logistic);
+	CHAOS_ADD(lorenz);
+	CHAOS_ADD(lozi_map);
+	CHAOS_ADD(roesser);
+	CHAOS_ADD(sine_map);
+	CHAOS_ADD(standard_map);
+	CHAOS_ADD(tent_map);
 }
 
 FLEXT_LIB_SETUP(chaos, chaos_library_setup);

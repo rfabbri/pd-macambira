@@ -21,14 +21,4 @@
 #include "lorenz.hpp"
 #include "chaos_msg.hpp"
 
-class lorenz_msg:
-	public chaos_msg<lorenz>
-{
-	CHAOS_MSG_INIT(lorenz, LORENZ_ATTRIBUTES);
-
-	LORENZ_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("lorenz", lorenz_msg);
+CHAOS_MSG_CLASS(lorenz, LORENZ);

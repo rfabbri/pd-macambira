@@ -21,14 +21,4 @@
 #include "henon_map.hpp"
 #include "chaos_dsp.hpp"
 
-class henon_dsp:
-	public chaos_dsp<henon>
-{
-	CHAOS_DSP_INIT(henon, HENON_ATTRIBUTES);
-
-	HENON_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("henon~", henon_dsp);
+CHAOS_DSP_CLASS_NAME(henon, HENON, "henon~");

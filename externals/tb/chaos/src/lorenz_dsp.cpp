@@ -21,14 +21,4 @@
 #include "lorenz.hpp"
 #include "chaos_dsp.hpp"
 
-class lorenz_dsp:
-	public chaos_dsp<lorenz>
-{
-	CHAOS_DSP_INIT(lorenz, LORENZ_ATTRIBUTES);
-
-	LORENZ_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("lorenz~", lorenz_dsp);
+CHAOS_DSP_CLASS(lorenz, LORENZ);

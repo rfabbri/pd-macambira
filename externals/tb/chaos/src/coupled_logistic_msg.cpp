@@ -18,7 +18,17 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "lozi_map.hpp"
-#include "chaos_dsp.hpp"
+#include "coupled_logistic.hpp"
+#include "chaos_msg.hpp"
 
-CHAOS_DSP_CLASS_NAME(lozi_map, LOZI_MAP, "lozi");
+class coupled_logistic_msg:
+	public chaos_msg<coupled_logistic>
+{
+	CHAOS_MSG_INIT(coupled_logistic, COUPLED_LOGISTIC_ATTRIBUTES);
+
+	COUPLED_LOGISTIC_CALLBACKS;
+};
+
+
+
+FLEXT_LIB_V("coupled_logistic", coupled_logistic_msg);

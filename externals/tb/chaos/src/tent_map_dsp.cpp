@@ -21,14 +21,6 @@
 #include "tent_map.hpp"
 #include "chaos_dsp.hpp"
 
-class tent_map_dsp:
-	public chaos_dsp<tent_map>
-{
-	CHAOS_DSP_INIT(tent_map, TENT_MAP_ATTRIBUTES);
-
-	TENT_MAP_CALLBACKS;
-};
 
 
-
-FLEXT_LIB_DSP_V("tent~", tent_map_dsp);
+CHAOS_DSP_CLASS_NAME(tent_map, TENT_MAP, "tent~");

@@ -21,14 +21,4 @@
 #include "bungalow_tent_map.hpp"
 #include "chaos_msg.hpp"
 
-class bungalow_tent_msg:
-	public chaos_msg<bungalow_tent>
-{
-	CHAOS_MSG_INIT(bungalow_tent, BUNGALOW_TENT_ATTRIBUTES);
-
-	BUNGALOW_TENT_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("bungalow_tent", bungalow_tent_msg);
+CHAOS_MSG_CLASS(bungalow_tent, BUNGALOW_TENT);

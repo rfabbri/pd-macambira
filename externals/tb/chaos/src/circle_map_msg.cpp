@@ -21,14 +21,4 @@
 #include "circle_map.hpp"
 #include "chaos_msg.hpp"
 
-class circle_map_msg:
-	public chaos_msg<circle_map>
-{
-	CHAOS_MSG_INIT(circle_map, CIRCLE_MAP_ATTRIBUTES);
-
-	CIRCLE_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("circle_map", circle_map_msg);
+CHAOS_MSG_CLASS(circle_map, CIRCLE_MAP);

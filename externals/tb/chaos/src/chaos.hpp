@@ -23,6 +23,7 @@
 #define FLEXT_ATTRIBUTES 1
 
 #include "flext.h"
+#include "chaos_defs.hpp"
 
 /* internal we can work with a higher precision than pd */
 #ifdef DOUBLE_PRECISION

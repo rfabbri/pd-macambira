@@ -21,14 +21,4 @@
 #include "bernoulli_map.hpp"
 #include "chaos_dsp.hpp"
 
-class bernoulli_dsp:
-	public chaos_dsp<bernoulli>
-{
-	CHAOS_DSP_INIT(bernoulli, BERNOULLI_ATTRIBUTES);
-
-	BERNOULLI_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("bernoulli~", bernoulli_dsp);
+CHAOS_DSP_CLASS(bernoulli, BERNOULLI);

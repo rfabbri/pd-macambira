@@ -21,14 +21,4 @@
 #include "henon_map.hpp"
 #include "chaos_msg.hpp"
 
-class henon_msg:
-	public chaos_msg<henon>
-{
-	CHAOS_MSG_INIT(henon, HENON_ATTRIBUTES);
-
-	HENON_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("henon", henon_msg);
+CHAOS_MSG_CLASS_NAME(henon, HENON, "henon");

@@ -21,14 +21,5 @@
 #include "standard_map.hpp"
 #include "chaos_dsp.hpp"
 
-class standard_map_dsp:
-	public chaos_dsp<standard_map>
-{
-	CHAOS_DSP_INIT(standard_map, STANDARD_MAP_ATTRIBUTES);
 
-	STANDARD_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("standard_map~", standard_map_dsp);
+CHAOS_DSP_CLASS(standard_map, STANDARD_MAP);

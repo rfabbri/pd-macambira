@@ -21,14 +21,4 @@
 #include "sine_map.hpp"
 #include "chaos_msg.hpp"
 
-class sine_map_msg:
-	public chaos_msg<sine_map>
-{
-	CHAOS_MSG_INIT(sine_map, SINE_MAP_ATTRIBUTES);
-
-	SINE_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("sine_map", sine_map_msg);
+CHAOS_MSG_CLASS(sine_map, SINE_MAP);

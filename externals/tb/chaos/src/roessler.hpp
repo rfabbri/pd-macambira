@@ -20,33 +20,32 @@
 
 #include "ode_base.hpp"
 
-//  lorenz model: dx1/dt = sigma * (x2 - x1)
-//                dx2/dt = - x1 * x3 + r * x1 - x2
-//                dx3/dt = x1 * x2 - b * x3
-//  taken from Willi-Hans Steeb: Chaos and Fractals
+//  roessler model: dx1/dt = - (x2 + x3)
+//                  dx2/dt = x1 + a * x2
+//                  dx3/dt = b + (x1 - c) * x3
+//  taken from Peitgen / Jürgens / Saupe: Chaos and Fractals
 
-class lorenz
+class roessler
 	: public ode_base
 {
 public:
-	lorenz()
+	roessler()
 	{
 		m_num_eq = 3;
 		m_data = new data_t[m_num_eq];
 
 		CHAOS_SYS_INIT(method,0);
-		CHAOS_SYS_INIT(dt,0.01);
-		CHAOS_SYS_INIT(x1,0.8);
-		CHAOS_SYS_INIT(x2,0.7);
-		CHAOS_SYS_INIT(x3,0.6);
-		CHAOS_SYS_INIT(sigma,16);
+		CHAOS_SYS_INIT(x1,0);
+		CHAOS_SYS_INIT(x2,0);
+		CHAOS_SYS_INIT(x3,0);
+		CHAOS_SYS_INIT(a,4);
 		CHAOS_SYS_INIT(b,4);
-		CHAOS_SYS_INIT(r,40);
+		CHAOS_SYS_INIT(c,4);
 
 		ode_base_alloc();
 	}
 	
-	~lorenz()
+	~roessler()
 	{
 		ode_base_free();
 		delete m_data;
@@ -56,41 +55,35 @@ public:
 	{
 		data_t x1 = data[0], x2 = data[1], x3 = data[2];
 		
-		deriv[0] = CHAOS_PARAMETER(sigma) * (x2 - x1);
-		deriv[1] = - x1 * x3 + CHAOS_PARAMETER(r) * x1 - x2;
-		deriv[2] = x1 * x2 - CHAOS_PARAMETER(b) * x3;
+		deriv[0] = - (x2 - x1);
+		deriv[1] = x1 + CHAOS_PARAMETER(a) * x2;
+		deriv[2] = CHAOS_PARAMETER(b) + (x1 - CHAOS_PARAMETER(c)) * x3;
 	}
 
 	CHAOS_SYSVAR_FUNCS(x1, 0);
 	CHAOS_SYSVAR_FUNCS(x2, 1);
 	CHAOS_SYSVAR_FUNCS(x3, 2);
 
-	CHAOS_SYSPAR_FUNCS_PRED(sigma, m_pred);
-	CHAOS_SYSPAR_FUNCS_PRED(b, m_pred);
-	CHAOS_SYSPAR_FUNCS_PRED(r, m_pred);
-
-	bool m_pred (t_float f)
-	{
-		return (f > 0);
-	}
-
+	CHAOS_SYSPAR_FUNCS(a);
+	CHAOS_SYSPAR_FUNCS(b);
+	CHAOS_SYSPAR_FUNCS(c);
 };
 
 
-#define LORENZ_CALLBACKS						\
+#define ROESSLER_CALLBACKS						\
 ODE_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(x1);						\
 CHAOS_SYS_CALLBACKS(x2);						\
 CHAOS_SYS_CALLBACKS(x3);						\
-CHAOS_SYS_CALLBACKS(sigma);						\
-CHAOS_SYS_CALLBACKS(r);							\
-CHAOS_SYS_CALLBACKS(b);
+CHAOS_SYS_CALLBACKS(a);							\
+CHAOS_SYS_CALLBACKS(b);							\
+CHAOS_SYS_CALLBACKS(c);
 
-#define LORENZ_ATTRIBUTES						\
+#define ROESSLER_ATTRIBUTES						\
 ODE_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(x1);						\
 CHAOS_SYS_ATTRIBUTE(x2);						\
 CHAOS_SYS_ATTRIBUTE(x3);						\
-CHAOS_SYS_ATTRIBUTE(sigma);						\
-CHAOS_SYS_ATTRIBUTE(r);							\
-CHAOS_SYS_ATTRIBUTE(b);
+CHAOS_SYS_ATTRIBUTE(a);							\
+CHAOS_SYS_ATTRIBUTE(b);							\
+CHAOS_SYS_ATTRIBUTE(c);

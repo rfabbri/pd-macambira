@@ -21,14 +21,4 @@
 #include "lozi_map.hpp"
 #include "chaos_msg.hpp"
 
-class lozi_map_msg:
-	public chaos_msg<lozi_map>
-{
-	CHAOS_MSG_INIT(lozi_map, LOZI_MAP_ATTRIBUTES);
-
-	LOZI_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("lozi", lozi_map_msg);
+CHAOS_MSG_CLASS_NAME(lozi_map, LOZI_MAP, "lozi");

@@ -21,7 +21,6 @@
 #ifndef __chaos_base_hpp
 
 #include "chaos.hpp"
-#include "chaos_defs.hpp"
 
 class chaos_base
 {

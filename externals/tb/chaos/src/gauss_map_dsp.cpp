@@ -21,14 +21,4 @@
 #include "gauss_map.hpp"
 #include "chaos_dsp.hpp"
 
-class gauss_map_dsp:
-	public chaos_dsp<gauss_map>
-{
-	CHAOS_DSP_INIT(gauss_map, GAUSS_MAP_ATTRIBUTES);
-
-	GAUSS_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_DSP_V("gauss_map~", gauss_map_dsp);
+CHAOS_DSP_CLASS(gauss_map, GAUSS_MAP);

@@ -21,14 +21,4 @@
 #include "ikeda_laser_map.hpp"
 #include "chaos_msg.hpp"
 
-class ikeda_laser_map_msg:
-	public chaos_msg<ikeda_laser_map>
-{
-	CHAOS_MSG_INIT(ikeda_laser_map, IKEDA_LASER_MAP_ATTRIBUTES);
-
-	IKEDA_LASER_MAP_CALLBACKS;
-};
-
-
-
-FLEXT_LIB_V("ikeda_laser_map", ikeda_laser_map_msg);
+CHAOS_MSG_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, "ikeda~");

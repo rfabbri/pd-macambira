@@ -18,7 +18,8 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "lozi_map.hpp"
+#include "driven_van_der_pol.hpp"
 #include "chaos_dsp.hpp"
 
-CHAOS_DSP_CLASS_NAME(lozi_map, LOZI_MAP, "lozi");
+CHAOS_DSP_CLASS(driven_van_der_pol, DRIVEN_VAN_DER_POL);
+
