@@ -120,7 +120,8 @@ void flext_base::ListAttrib(AtomList &la) const
 	typedef std::set<AttrItem *,attrless> AttrList;
 	AttrList list[2];
 
-	for(int i = 0; i <= 1; ++i) {
+	int i;
+	for(i = 0; i <= 1; ++i) {
 		ItemCont *a = i?attrhead:clattrhead;
 		if(a) {
 			for(int ai = 0; ai < a->Size(); ++ai) {
@@ -246,6 +247,13 @@ bool flext_base::SetAttrib(AttrItem *a,int argc,const t_atom *argv)
 			}
 			else ok = false;
 			break;
+		case a_bool:
+			if(argc == 1 && CanbeBool(argv[0])) {
+				any.bt = GetABool(argv[0]);
+				((methfun_1)a->fun)(this,any);				
+			}
+			else ok = false;
+			break;
 		case a_LIST:
 			any.vt = &(la(argc,argv));
 			((methfun_1)a->fun)(this,any);				
@@ -281,6 +289,12 @@ bool flext_base::GetAttrib(AttrItem *a,AtomList &la) const
 				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
 				la(1);
 				SetInt(la[0],any.it);
+				break;
+			}
+			case a_bool: {
+				((methfun_1)a->fun)(const_cast<flext_base *>(this),any);				
+				la(1);
+				SetBool(la[0],any.bt);
 				break;
 			}
 			case a_symbol: {
