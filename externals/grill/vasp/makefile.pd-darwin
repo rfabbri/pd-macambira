@@ -1,0 +1,81 @@
+# VASP - vector assembling vector processor
+# Copyright (c)2002 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ OSX (darwin)
+#
+# usage:
+# to build run "make -f makefile.pd-darwin"
+# to install (as root), do "make -f makefile.pd-darwin install"
+# to install help, do "make -f makefile.pd-darwin install-help"
+#
+
+CONFIG=config-pd-darwin.txt
+
+include ${CONFIG}
+
+FLEXTLIB=$(FLEXTPATH)/flext_t.a
+
+# compiler stuff
+INCLUDES=$(PDPATH) 
+FLAGS=-DPD -Dunix -DMACOSX -DFLEXT_THREADS
+CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes # -maltivec
+LIBS=m
+LDFLAGS=-bundle -bundle_loader $(PD)
+
+# ----------------------------------------------
+# the rest can stay untouched
+# ----------------------------------------------
+
+NAME=vasp
+SRCDIR=source
+
+include make-files.txt
+
+MAKEFILE=makefile.pd-darwin
+TARGET=$(TARGDIR)/$(NAME).pd_darwin
+
+
+# default target
+all: $(TARGDIR) $(TARGET) 
+
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(MAKEFILE) $(CONFIG)
+	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
+
+$(TARGDIR):
+	mkdir $(TARGDIR)
+
+$(TARGDIR)/%.o : $(SRCDIR)/%.cpp 
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-l%,$(LIBS)) -o $@ 
+	chmod 755 $@
+
+
+$(INSTDIR):
+	mkdir $(INSTDIR)
+
+$(INSTDIR)/vasp: $(INSTDIR)
+	mkdir $(INSTDIR)/vasp
+
+install:: $(INSTDIR)/vasp
+
+install:: $(TARGET) pd
+	cp -R $^ $(INSTDIR)/vasp
+#	chown -R root.root $(INSTDIR)/vasp
+
+
+$(HELPDIR)/vasp:
+	mkdir $(HELPDIR)/vasp
+
+install-help:: $(HELPDIR)/vasp
+
+install-help:: ./pd-help
+	cp $^/*.* $(HELPDIR)/vasp
+#	chown -R root.root $(HELPDIR)/vasp
+
+
+.PHONY: clean
+clean:
+	rm -f $(TARGDIR)/*.o $(TARGET)
+	

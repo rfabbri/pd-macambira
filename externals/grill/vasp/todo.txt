@@ -1,0 +1,61 @@
+TODO list:
+
+features:
+---------------------
+- introduce attributes!!
+
+- introduce several log levels (for warning posts)
+- grab (and recompose) signals for granular vasp usage
+- vasp~s for realtime-capable vasp objects
+
+- complex power operations - delta phase
+
+- optimize (c)osc with table lookup, phasor with Höldrichs code (in pd)
+
+- how to handle beyond buffer-domain:
+warning, treat as 0, calculate unit operation, loop, mirror on buffer end, stay on last frame
+
+- better algorithm for vasp.fix
+
+- make loops interruptible ("stop" message?)
+- make in place rotation more efficient (use temporary space)
+
+
+objects:
+---------------------
+- wave object for table-lookup oscs.
+- various random distributions for noise
+
+- vasp.window: one should be able to use just a portion of the windowing envelope
+
+- slope: frequency distortion with given exponent
+
+- vasp.trigger object... in PD [t a] is ok, what about Max?
+- vasp.expr
+
+- vasp.state.... current vasp, operation, progress meter
+
+bugs:
+---------------------
+
+
+tests:
+---------------------
+- vasp.size always keeps the data... do we want that? -> flag if yes/no
+- in-place operation (src == dst), test if strides are equal!
+- should frame count always be pre-evaluated (e.g. in vasp.f+ etc. ?)
+- review/change questionable permutation algorithm
+- test DFT objects on strided buffers
+- check for odd remainder frame on symmetric operations!!
+
+premature thoughts:
+---------------------
+- interface to scripting language (python)
+
+
+documentation:
+---------------------
+- have all the objects written in their full names
+- no special characters!
+
+

@@ -1,0 +1,27 @@
+# VASP - vector assembling vector processor
+# Copyright(c) 2002 Thomas Grill (xovo@gmx.net)
+#
+
+# your c++ compiler (normally g++)
+CXX=g++
+
+# where are the PD header files?
+# leave it blank if it is a system directory (like /usr/local/include), 
+# 	since gcc 3.2 complains about it
+PDPATH=
+
+# where do the flext libraries reside?
+FLEXTPATH=/usr/local/lib/pd/flext
+
+# where should flext libraries be built?
+TARGDIR=./pd-linux
+
+# where should VASP be installed?
+# (leave blank to omit installation)
+# a subfolder "vasp" will be created for the files
+INSTDIR=/usr/local/lib/pd/extra
+
+# where should the VASP help be installed?
+# (leave blank to omit installation)
+# a subfolder "vasp" will be created for the files
+HELPDIR=/usr/local/lib/pd/doc/5.reference

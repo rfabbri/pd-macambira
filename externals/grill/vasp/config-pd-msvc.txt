@@ -1,0 +1,21 @@
+# VASP - vector assembling signal processor
+# Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+#
+
+# where is PD?
+PDPATH=c:\programme\audio\pd		
+
+# where do the flext libraries reside?
+FLEXTPATH=$(PDPATH)\flext
+
+# where is MS VC++?
+MSVCPATH=c:\programme\prog\microsoft visual studio\VC98
+
+# where should the external be built?
+OUTPATH=pd-msvc
+
+# should the external be installed? (yes/no)
+INSTALL=yes
+
+# where should the external be installed?
+INSTPATH=$(PDPATH)\extra
