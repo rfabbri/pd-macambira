@@ -1,69 +1,48 @@
 ###############################
-# change these
-IFLAGS = -I. -I../../../src/pd-0.35-0/src
-INSTALL_PREFIX=/usr
+NAME=OSC
 
-# should be oke below ..
-EXT = o
-#DEFS =  -DHAVE_LIBC=1 -DHAVE_LIBM=1 -DHAVE_LIBPTHREAD=1 -DSTDC_HEADERS=1 -DHAVE_FCNTL_H=1 -DHAVE_SYS_TIME_H=1 -DHAVE_UNISTD_H=1 -DTIME_WITH_SYS_TIME=1 -DHAVE_UNISTD_H=1 -DHAVE_GETPAGESIZE=1 -DHAVE_MMAP=1 -DHAVE_SELECT=1 -DHAVE_SOCKET=1 -DHAVE_STRERROR=1  -DPD_VERSION_MINOR=32
-DEFS =
-CC = gcc
-CXX = c++
-LD = ld
-AFLAGS = 
-LFLAGS = -export_dynamic  -shared
-WFLAGS =
+# ----------------------- Mac OS X (Darwin) -----------------------
 
-# DEBUG = -DDEBUG -g
-DEBUG = 
+pd_darwin: $(NAME).pd_darwin
 
-VERSION = \"$(shell cat VERSION)\"
+.SUFFIXES: .pd_darwin
 
-.SUFFIXES: .$(EXT)
+DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
-PDCFLAGS = -O2 $(DEFS) $(IFLAGS) $(WFLAGS) $(LFLAGS) $(AFLAGS) -DVERSION=$(VERSION)
-CFLAGS = -O2 $(DEFS) $(IFLAGS) $(WFLAGS) -DVERSION=$(VERSION) $(DEBUG)
-CXXFLAGS = $(CFLAGS)
-LIBOSC = 	../libOSC/libOSC.a
-LIBS = -lpthread -lm -lc 
-SOURCES = htmsocket.c OSC-pattern-match.c sendOSC.c dumpOSC.c routeOSC.c
-TARGETS = $(SOURCES:.c=.$(EXT)) 
+# where is your m_pd.h ???
+DARWININCLUDE =  -I../../../pd/src -I../../obj
 
-all: $(TARGETS) 
+DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
+# lorenz.o rossler.o henon.o ikeda.o
 
-OSC: $(TARGETS)
-	cc -c $(CFLAGS) -DPD OSC.c
-	$(LD) -export_dynamic  -shared -o OSC.pd_linux *.o $(LIBS) $(LIBOSC)
-	strip --strip-unneeded OSC.pd_linux
-
-clean::
-	-rm *.$(EXT) *.pd_linux *~
-
-distclean: clean
-	-rm config.cache config.log config.status makefile
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS)
+	rm -f $*.o ../$*.pd_darwin
+	ln -s $*/$*.pd_darwin ..
 
 
-distcleancvs:
-	-rm -r CVS reference/CVS
+# ----------------------- LINUX i386 -----------------------
 
+pd_linux: $(NAME).pd_linux
 
-.c.o:
-	$(CC) -c -o $@ $(CFLAGS) -DPD $*.c
+.SUFFIXES: .pd_linux
 
-# cp $@ $*_stat.o
+LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
-#.o.pd_linux:
-#	$(CC) -o $@ $(PDCFLAGS) -DPD $*.o
+# where is your m_pd.h ???
+LINUXINCLUDE =  -I/usr/local/include
 
+LINUXEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
+.c.pd_linux:
+	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c
+	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc
+	strip --strip-unneeded $*.pd_linux
 
-install::
-	install -d $(INSTALL_PREFIX)/lib/pd/externs
-#	install -m 644 *.pd_linux $(INSTALL_PREFIX)/lib/pd/externs
-	install -m 644 OSC.pd_linux $(INSTALL_PREFIX)/lib/pd/externs
-	install -d $(INSTALL_PREFIX)/lib/pd/doc/5.reference/OSC
-	install -m 644 ../doc/*.pd $(INSTALL_PREFIX)/lib/pd/doc/5.reference/OSC
+# ----------------------------------------------------------
 
-
-#dist: distclean
-#	(cd ..;tar czvf ggext.tgz ggext)

@@ -36,6 +36,9 @@ University of California, Berkeley.
     in addition to X.X.X.X addresses.
  */
 
+#ifdef MACOSX
+  #include <string.h>
+#endif
 
 #ifdef WIN32
 	#include <sys/types.h>
@@ -53,7 +56,7 @@ University of California, Berkeley.
 	#include <sys/stat.h>
 	#include <netinet/in.h>
 
-	#include <rpc/rpc.h>
+//	#include <rpc/rpc.h>
 	#include <sys/socket.h>
 	#include <sys/un.h>
 	#include <sys/times.h>
@@ -71,7 +74,7 @@ University of California, Berkeley.
 	#include <sys/file.h>
 	#include <sys/time.h>
 	#include <sys/types.h>
-	#include <sys/prctl.h>
+//	#include <sys/prctl.h>
 
 	#include <stdlib.h>
 #endif
