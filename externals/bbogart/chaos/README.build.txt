@@ -12,5 +12,4 @@ make pd_darwin
 
 To Install:
 
-Copy the .pd* files where PD will seem them, like the "extra" folder.
-Precompiled binaries for OSX and Win32 are in the "Release" directory.
+Copy the .pd_* files where PD will seem them, like the "extra" folder.

@@ -26,22 +26,46 @@
 #include "m_pd.h"
 
 
-#ifndef __DATE__ 
+#ifndef __DATE__
 #define __DATE__ "without using a gnu compiler"
 #endif
 
 typedef struct _chaos
 {
-     t_object x_obj;
+	t_object x_obj;
 } t_chaos;
 
 static t_class* chaos_class;
 
-	/* objects */
-void henon_setup();
-void ikeda_setup();
-void lorenz_setup();
-void rossler_setup();
+/* objects */
+extern void attract1_setup();
+extern void base_setup();
+extern void base3_setup();
+extern void dejong_setup();
+extern void gingerbreadman_setup();
+extern void henon_setup();
+extern void hopalong_setup();
+extern void ikeda_setup();
+extern void lotkavolterra_setup();
+extern void latoocarfian_setup();
+extern void latoomutalpha_setup();
+extern void latoomutbeta_setup();
+extern void latoomutgamma_setup();
+extern void logistic_setup();
+extern void lorenz_setup();
+extern void martin_setup();
+extern void mlogistic_setup();
+extern void pickover_setup();
+extern void popcorn_setup();
+extern void quadruptwo_setup();
+extern void rossler_setup();
+extern void standardmap_setup();
+extern void strange1_setup();
+extern void tent_setup();
+extern void three_d_setup();
+extern void threeply_setup();
+extern void tinkerbell_setup();
+extern void unity_setup();
 
 static void* chaos_new(t_symbol* s)
 {
@@ -49,21 +73,43 @@ static void* chaos_new(t_symbol* s)
     return (x);
 }
 
-void chaos_setup(void) 
+void chaos_setup(void)
 {
-	chaos_class = class_new(gensym("chaos"), (t_newmethod)chaos_new, 0,
-    	sizeof(t_chaos), 0,0);
+	chaos_class = class_new(gensym("chaos"), (t_newmethod)chaos_new, 0, sizeof(t_chaos), 0,0);
 
 	post("-------------------------");              /* Copyright info */
 	post("Chaos PD Externals");
-	post("Copyright Ben Bogart 2002");
+	post("Copyright Ben Bogart 2002, Copyright Ben Bogart and Michael McGonagle 2003");
 	post("Win32 compilation by joge 2002");
 
+	attract1_setup();
+	base_setup();
+	base3_setup();
+	dejong_setup();
+	gingerbreadman_setup();
 	henon_setup();
+	hopalong_setup();
 	ikeda_setup();
+	lotkavolterra_setup();
+	latoocarfian_setup();
+	latoomutalpha_setup();
+	latoomutbeta_setup();
+	latoomutgamma_setup();
+	logistic_setup();
 	lorenz_setup();
+	martin_setup();
+	mlogistic_setup();
+	pickover_setup();
+	popcorn_setup();
+	quadruptwo_setup();
 	rossler_setup();
-	
-	post("-------------------------");	
-}
+	standardmap_setup();
+	strange1_setup();
+	tent_setup();
+	three_d_setup();
+	threeply_setup();
+	tinkerbell_setup();
+	unity_setup();
 
+	post("-------------------------");
+}

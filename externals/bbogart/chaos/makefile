@@ -24,7 +24,7 @@ PDNTLIB = $(PDNTLDIR)\msvcrt.lib \
 	$(PDNTLDIR)\pthreadVC.lib \
 	c:\pd\bin\pd.lib
         
-PDNTEXTERNALS = lorenz.obj rossler.obj henon.obj ikeda.obj
+PDNTEXTERNALS = lyapunov.obj henon.obj hopalong.obj ikeda.obj latoocarfian.obj latoomutalpha.obj latoomutbeta.obj latoomutgamma.obj logistic.obj lorenz.obj mlogistic.obj rossler.obj standardmap.obj tent.obj three_d.obj
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c *.c
@@ -43,13 +43,29 @@ DARWINCFLAGS = -DPD -DMAXLIB -DUNIX -DMACOSX -O2 \
 # where is your m_pd.h ???
 DARWININCLUDE =  -I../../src -I../../obj
 
-DARWINEXTERNALS = lorenz.o rossler.o henon.o ikeda.o
+DARWINEXTERNALS = lyapunov.o attract1.o base.o base3.o dejong.o gingerbreadman.o henon.o hopalong.o ikeda.o latoocarfian.o latoomutalpha.o \
+latoomutbeta.o latoomutgamma.o logistic.o lorenz.o martin.o mlogistic.o pickover.o popcorn.o quadruptwo.o rossler.o standardmap.o \
+strange1.o tent.o three_d.o threeply.o tinkerbell.o unity.o lotka_volterra.o
 
-.c.pd_darwin:
+PD_LOCAL_EXTERNALS = $(HOME)/Library/Pd/Externals
+PD_LOCAL_HELP = $(HOME)/Library/Pd/Help
+PD_BINARY = /usr/local/pd/bin/pd
+MTARGET = $(NAME).pd_darwin
+MDARWININCLUDE =  -I/usr/local/pd/src
+
+.c.o:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS)
+
+.o.pd_darwin:
+	cc -bundle -bundle_loader $(PD_BINARY) -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS)
+
+pd_darwin: $(DARWINEXTERNALS)
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
+
+minstall: $(MTARGET) $(DARWINEXTERNALS)
+	mv -f $(MTARGET) $(PD_LOCAL_EXTERNALS)
+	cp -f help-*.pd $(PD_LOCAL_HELP)
 
 # ----------------------- LINUX i386 -----------------------
 
@@ -64,7 +80,9 @@ LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
 # where is your m_pd.h ???
 LINUXINCLUDE =  -I/usr/local/include 
 
-LINUXEXTERNALS = lorenz.o rossler.o henon.o ikeda.o
+LINUXEXTERNALS = lyapunov.o attract1.o base.o base3.o dejong.o gingerbreadman.o henon.o hopalong.o ikeda.o latoocarfian.o latoomutalpha.o \
+latoomutbeta.o latoomutgamma.o logistic.o lorenz.o martin.o mlogistic.o pickover.o popcorn.o quadruptwo.o rossler.o standardmap.o \
+strange1.o tent.o three_d.o threeply.o tinkerbell.o unity.o lotka_volterra.o
 
 .c.pd_linux:
 	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c 

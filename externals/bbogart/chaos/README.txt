@@ -1,11 +1,15 @@
 This is the readme for "Chaos PD Externals" a set of objects for PD which 
-calculate various "Chaotic Attractors"; including, Lorenz, Rossler, Henon 
-and Ikeda. Hopefully more will be on their way. 
+calculate various "Chaotic Attractors"; including: lorenz, rossler, henon, 
+ikeda, attract1, base, base3, dejong, gingerbreadman, hopalong, latoocarfian, 
+latoomutalpha, latoomutbeta, latoomutgamma, logistic, lotka_volterra, martin,
+mlogistic, pickover, popcorn, quadruptwo, standardmap, strange1, tent, three_d, threeply, tinkerbell and unity.
 
-If you have any questions/comments you can reach me at ben@ekran.org
+If you have any questions/comments you can reach the co-authors at:
+Ben Bogart		ben@ekran.org
+Michael McGonagle	mjmogo@comcast.net
 
 Please Note:
-These programs are Copyright Ben Bogart 2002
+These programs are Copyright Ben Bogart 2002, Ben Bogart and Michael McGonagle 2003.
 
 These programs are distributed under the terms of the GNU General Public 
 License 
@@ -26,24 +30,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 USAGE:
 
-The package only includes 2 and 3 dimentional attractors. There are
-outlets for each dimention. The scale of the values vary between the
-different attractors. To run pd with the chaos externals use:
+The package includes 1, 2 and 3 dimentional attractors. There are outlets for 
+each dimention, starting from the left, followed by three outlets for attractor
+data (see the help patches for details). The scale of the values vary between 
+the different attractors. To run pd with the chaos externals use:
 
 pd -lib chaos
 
-The object methods are as follows:
+The basic object methods are as follows:
 
-bang:	Calculate one interation of the attractor.
+bang:	Calculate one iteration of the attractor.
 reset:	Reset to initial conditions defined by the two or three arguments.
         [reset a b c] will reset the xyz values to abc respectively.
 param:  Modify the paramaters of the equation, the number of args depend
 	on the attractor. (Be careful with the parameters, an attractor
 	will go from stable to infinity in very few interations.)
 
-See the example patches for clarification.
+See the example patches for other methods (parameter searching etc.)
 
+The next release will include a script to generate your own attractor object 
+for chaos from the attractor attributes. 
 
-Have fun with them. I'd be happy to hear about any interesting uses you
-find for them. As well as any interesting attractor equations you come
-across.
+Have Fun.
