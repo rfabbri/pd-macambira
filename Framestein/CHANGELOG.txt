@@ -1,10 +1,17 @@
-0.32
+0.33	()
+
+- closing a patch with a docked fs.frame will no longer kill the fs.frame.
+  use fs.vis to make a patch visible and redock any lost docked fs.frames
+
+
+0.32	(03-02-18)
+
 - added toolbar (just a list of framestein objects & filters for now)
 - new plugins: lightspeed, merge_additive, merge_mod, ping, fader
 - fs.frame: |title this is the main window( and |undock( commands
 - fs.copy: transcolor <r> <g> <b> to set the transparent color
 - better gol algo (Plugins\gol.c)
-- added 1d cell automata where each iteration will add a new row: Plugins\rowca
+- added row cell automata where each iteration will add a new row: Plugins\rowca
 - added arguments-class in pixels.h to ease parsing arguments in plugins.
   example:
 
@@ -20,14 +27,18 @@
 - fix: border_0 no longer alters frame dimensions
 - poor lockup-preventing feature to fs.main.pd
 
+
 0.31
+
 - added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!
 - the console is back. It's good for printf():ing from plugins..
 - New filters: BitLeft, Picasso, PicChop, yage, zoomnoise
 - Rewrote some examples, added a couple and numbered them
 - Fs got CVS'd: http://sourceforge.net/projects/pure-data/cvs
 
+
 0.30
+
 - vframe supports plugin parameters
 - doubleclicking the framestein-logo equals "reset"
 - fs.frame "stayontop" OFF by default
@@ -35,7 +46,9 @@
 - l2s from zexy included in Patches-dir, zexy no longer needed
 - disconnecting pd from fs will cause a reset
 
+
 0.29
+
 - example-basics.pd is really just the basics now
 - fs.event.pd: get more events from fs.frame (mousedown, mouseup, dropped filename)
 - fs.waveform.pd: array display with selection capabilities, see example-waveformdisplay.pd
@@ -48,7 +61,9 @@
 - fs.sonogram made compatible with latest pd test-version
 - cleaned up some examples..
 
+
 0.28
+
 - finally, the ability to write AVIs! see example-avioutput.pd
 - added searchpath, see example-searchpath.pd
 
@@ -60,39 +75,53 @@
 - fix: borders/stayontop discarded the image
 - dock <window title> string matching is now substring
 
+
 0.27
+
 - runs Adobe Photoshop Filter Plugins, see example-photoshopfilters.pd
 - hide/show messed fs.frame positions
 - vsnap~, wrapper for vsnapshot~
 
+
 0.26
+
 - no more typing docked window positions! see example-docking2.pd
 - easy loading of images from fs.frame popup-menu
 - new fs.frame commands: minimize, maximize, bringtofront, hidecursor_1, bufferize (copy to image buffer)
 - dock main window to pd on connect (out of the way)
 - init.pd to load patches correctly
 
+
 0.25
+
 - vframeread~: read image with a control-signal
 - vcolor~, merge r g and b channels (must be used with vrgb~)
 
+
 0.24
+
 - externals: vframe, vsig~, vsnapshot~, vrgb~, ...
   in short, the ability to convert video to signal and back,
   and run framestein plugins in pd.
   see Patches\externals-documentation.pd
 
+
 0.23
+
 - fs.film
 - fs.hist and example-hist.pd
 - fs.sonogram and example-sonogram.pd
 - mouserect_1 will report rectangle "drawn" in frame (mousetrack_1 must be on)
 
+
 0.22
+
 - add: drag and drop images/video to fs.frame
 - add: videoscrub.pd
 
+
 0.21
+
 - add: dock frames to pd patches, see example-docking.pd
 - add: fs.info, get information of images (width, height and framecount)
 - add: fs.rgb, get rgb information of pixel at x, y
@@ -100,7 +129,9 @@
 - add: easy moving of frames (drag the window when mousetrack is off)
 - improved fs.browser, see example-browser.pd
 
+
 0.20
+
 - add: send_auto to automate sending frames thru network. works like send but
   keeps sending frames on each flip until you give it send_manual
 - add: BETA of fs.browser, see example-browser.pd
@@ -108,7 +139,9 @@
 - fix: most plugins now work on displays other than 16 bits
 - more meaningless plugins: copy_vert
 
+
 0.19
+
 - major fix: bigger patches were not initialized correctly
 - new plugins: rgbcopy
 - fix: colors to fs.draw and fs.text are now given in r g b,
@@ -117,17 +150,23 @@
 - fix: banging fs.main's reset-inlet resets framestein before recreating fs.*-objects
 - add: play.pd, really just |inlet|-|fps $1|-|next|-|outlet|, but i do that a lot
 
+
 0.18
+
 - add: sending frames thru network jpeg-compressed, see example-network.pd
 - add: some plugins, notably xbend, bend, shuffle, tile
 - add: pixels-class for easy iteration thru pixels in c++, see pixels.h and green.cpp
 - fix: finally fixed the annoying "asynchronous socket error" when exiting pd before fs
 
+
 0.17
+
 - add: plugins, write effects with C without recompiling Framestein
 - add: plugins colortv, noize and subtract
 
+
 0.16
+
 - add: effectsunit.pas shows how easy it is to add pixel level routines
 - fix: alpha, sub and add modes of fs.copy had fixed values :(
 - add: blend mode to fs.copy, same as alpha but i'm trying to make it faster
@@ -137,23 +176,33 @@
 - fix: access violation when closing a frame under copy operations
 - loading video no longer sets display to 1:1
 
+
 0.15
+
 - add: fs.frame accepts "SAVE <directory> <"BMP" or number for jpeg quality>"
 - add: framestein-link.pd and framestein-demo.pd
 
+
 0.14
+
 - fix: occasional access violation with "SEEK"
 - default copymodes are now "source_all" and "dest_all"
 - add: "reset" inlet to fs.main
 
+
 0.13
+
 - add: "Reset" to main popup-menu (right-click the logo)
 - "prev" for previous frame/buffered image
 - "seek 0.5*" will seek to middle of video/buffered images
 - updated documentation in fs.frame.pd
 
+
 0.12
+
 With source under GPL.
 
+
 0.1
+
 Initial version.

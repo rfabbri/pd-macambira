@@ -16,7 +16,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ScktComp,
-  pluginunit, fsformunit, fsframeunit,
+  pluginunit, fsformunit, fsframeunit, fsmemounit,
   FastDIB,
   ExtCtrls, Menus, C2PhotoShopHost, Filez, ComCtrls, Buttons;
 
@@ -77,6 +77,7 @@ type
     function ItemCount( const ClassName: String ): Integer;
     procedure Reset;
     procedure minimizeall;
+    procedure ReDock;
     procedure DropFileHandler(const h: HWND; const DroppedFileName: String);
     procedure AppMessage(var Msg: Tmsg; var Handled: Boolean);
     procedure ExceptionHandler(Sender: TObject; E: Exception);
@@ -115,11 +116,11 @@ type
 
 const
 {$IFDEF FSDLL}
-  STARTMSG = 'FramesteinLib 0.32 DLL running...';
+  STARTMSG = 'FramesteinLib 0.33 DLL running...';
 {$ELSE}
-  STARTMSG = 'Framestein 0.32 running...';
+  STARTMSG = 'Framestein 0.33 running...';
 {$ENDIF}
-  MCAPTION = 'Framestein 0.32';
+  MCAPTION = 'Framestein 0.33';
   SocketBufferSize = 100000;
 
 var
@@ -247,6 +248,7 @@ var
   fsbrowser: TFsBrowser;
   fsinfo: TFsInfo;
   fsavi: TFsAvi;
+  fsmemo: TFsMemo;
   f: TFsForm;
 begin
   if logstate then
@@ -319,8 +321,22 @@ begin
     fsavi.Name := CompName(s2);
     fsavi.Caption := s2;
   end else
+  if S1='MEMO' then begin
+    FreeIfCompExists(CompName(s2));
+    fsmemo := TFsMemo.Create(Self);
+    fsmemo.PdName := s2;
+    fsmemo.Name := CompName(s2);
+    fsmemo.Caption := s2;
+    i := ItemCount('TFsMemo')-1;
+    fsmemo.Left := fsmemo.Width*(i div 4);
+    fsmemo.Top := fsmemo.Height*(i mod 4);
+    fsmemo.Show;
+  end else
   if S1='MINIMIZEALL' then begin
     minimizeall;
+  end else
+  if S1='REDOCK' then begin
+    ReDock;
   end else
   if s1='PATH' then begin
     SearchPath.Add(Copy(S, Length(s1)+2, 255));
@@ -342,7 +358,8 @@ procedure Tmain.Parse(const S: String);
      (s1='DRAW') or
      (s1='BROWSER') or
      (s1='INFO') or
-     (s1='AVI');
+     (s1='AVI') or
+     (s1='MEMO');
   end;
 
 var
@@ -837,6 +854,9 @@ begin
   if Pos('1400', E.Message)>0 then begin // invalid window handle
     // check any fs.frames with invalid window handles
     // (due to closing a patch with docked fs.frames)
+
+(* // Do nothing - fs.frames can be redocked
+
     if ComponentCount=0 then Exit;
     for i:=ComponentCount-1 downto 0 do
       if Components[i] is TFsFrame then begin
@@ -847,11 +867,13 @@ begin
 // A: this will not happed immediately when a patch is closed,
 // so closing the frame is more intuitive than popping it up
 // after a while.
-          f.Free;
-{          f.ParentWindow := 0;
-          f.Borders(True);}
+// A2: Nonetheless, let's see how popping it up feels.
+//          f.Free;
+          f.ParentWindow := 0;
+          f.Borders(True);
         end;
       end else
+*)
   end else
     ShowMessage(E.Message);
 end;
@@ -906,6 +928,22 @@ begin
   for i:=ComponentCount-1 downto 0 do
     if Components[i] is TfsForm then
       TForm(Components[i]).WindowState := wsMinimized;
+end;
+
+procedure Tmain.ReDock;
+var
+  i: Integer;
+  f: TFsFrame;
+begin
+  if ComponentCount=0 then Exit;
+  for i:=ComponentCount-1 downto 0 do
+    if Components[i] is TFsFrame then begin
+      f := Components[i] as TFsFrame;
+      if f.doRedock or ((f.ParentWindow>0) and
+       not IsWindow(f.ParentWindow)) then begin
+        f.Parse('REDOCK');
+      end;
+    end;
 end;
 
 procedure Tmain.MiExitClick(Sender: TObject);

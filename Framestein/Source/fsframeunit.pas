@@ -1,4 +1,4 @@
-{ Copyright (C) 2001-2002 Juha Vehviläinen
+{ Copyright (C) 2001-2003 Juha Vehviläinen
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
   as published by the Free Software Foundation; either version 2
@@ -18,7 +18,7 @@ uses
   Menus, Jpeg, DXDraws,
   FastDIB, fsDcAvi,
   fsformunit, ExtCtrls, DIB, Filez, ExtDlgs, C2PhotoShopHost, Buttons,
-  StdCtrls;
+  StdCtrls, ComCtrls;
 
 type
   TFastDIBList = TList;
@@ -83,8 +83,8 @@ type
     AutoSend_Address: String;
     AutoSend_jpegqualitynet: Integer;
     AutoSend_sendjpg: Boolean;
-    MouseTrack: Boolean;      // report mouse x y
-    MouseRect: Boolean;       // report dragged rectangle
+    MouseTrack: Boolean;       // report mouse x y
+    MouseRect: Boolean;        // report dragged rectangle
     FHideCursor: Boolean;      // hide cursor in this frame
     jpgquality: Integer;
     jpegqualitynet: Integer;
@@ -92,6 +92,7 @@ type
     prevmute: Boolean;
     filelist: TStringList;
     filelistIndex: Integer;
+    lastdockedtitle: String;   // title of last dock-command
 
     procedure ClearPicBuf;
     procedure StayOnTop(const Yes: Boolean);
@@ -109,6 +110,8 @@ type
     { Public declarations }
     avi: TDcAviPlayer;
     NameTag: String;
+    doRedock: Boolean;
+
     procedure Borders(const Yes: Boolean);
     procedure Parse(const S: String); override;
     procedure FlipRequest;
@@ -172,8 +175,17 @@ var
   R: TRect;
 begin
   if S='' then Exit;
-  if (ParentWindow>0) and not
-   IsWindow(ParentWindow) then Exit;
+  if (doRedock or ((ParentWindow>0) and
+   not IsWindow(ParentWindow))) and
+   (LastDockedTitle<>'') then begin
+    // Attempt to redock fs.frame
+    doRedock := False;
+    ParentWindow := 0;
+    x := Left;  y := Top;
+    Parse('DOCK '+LastDockedTitle);
+    Left := x;  Top := y;
+    if S='REDOCK' then Exit;
+  end;
 
   s1 := UpperCase(ExtractWord(1, S, [' ']));
   Ext := UpperCase(ExtractFileExt(S));
@@ -598,8 +610,14 @@ begin
         d1.Initialize;
         BringToFront;
         DragAcceptFiles(Handle, True);
+        doRedock := False;
       end;
+    end else begin
+      // Docking failed, likely patch not open.
+      // Set a flag to say, try redocking later
+      doRedock := True;
     end;
+    LastDockedTitle := DockTitle;
   end else
   if s1='UNDOCK' then begin
     MiUndock.Click;
@@ -846,6 +864,8 @@ begin
   prevmute := False;
   filelist := TStringList.Create;
   filelistIndex := -1;
+  doRedock := False;
+  LastDockedTitle := '';
   DragAcceptFiles(Handle, True);
 end;
 
