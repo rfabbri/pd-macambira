@@ -1,0 +1,12 @@
+0.6
+  added properties menu
+0.5
+  handle location messages with wrong argument
+0.4
+  added location message + fix memory allocation problems
+0.3
+  fixed crash when list is empty
+0.2
+  fixed extension saving ( all ---> ll )
+0.1
+  first implementation

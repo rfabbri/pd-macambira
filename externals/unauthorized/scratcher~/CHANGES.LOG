@@ -1,0 +1,19 @@
+0.6
+  fixed a crash when resizing
+0.5
+  introduced turntable inertia
+  allow playing when the scratcher is stopped
+0.4.1
+  little optimisation in movement processing
+0.4
+  change algorithm, new one requires a small block size
+  added maximum speed limit
+  added ability to toggle speed line
+  suppressed internal velocity measurement
+  ( because time measurement is not reliable )
+0.3
+  introduced internal velocity measurement
+0.2
+  added sensibility setting
+0.1
+  first implementation

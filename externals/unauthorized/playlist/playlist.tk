@@ -1,0 +1,89 @@
+############ playlist procedures  -- ydegoyon@free.fr        #########
+
+proc playlist_apply {id} {
+# strip "." from the TK id to make a variable name suffix 
+     set vid [string trimleft $id .]
+# for each variable, make a local variable to hold its name...
+     set var_graph_extension [concat graph_extension_$vid]
+     global $var_graph_extension
+     set var_graph_width [concat graph_width_$vid]
+     global $var_graph_width
+     set var_graph_height [concat graph_height$vid]
+     global $var_graph_height
+ 
+     set cmd [concat $id dialog \
+     	[eval concat $$var_graph_extension] \
+     	[eval concat $$var_graph_width] \
+     	[eval concat $$var_graph_height] \
+ 	\;]
+     #puts stderr $cmd
+     pd $cmd
+}
+ 
+proc playlist_cancel {id} {
+     set cmd [concat $id cancel \;]
+     #puts stderr $cmd
+     pd $cmd
+}
+ 
+proc playlist_ok {id} {
+     playlist_apply $id
+     playlist_cancel $id
+}
+ 
+proc pdtk_playlist_dialog {id extension width height} {
+     set vid [string trimleft $id .]
+     set var_graph_extension [concat graph_extension_$vid]
+     global $var_graph_extension
+     set var_graph_width [concat graph_width_$vid]
+     global $var_graph_width
+     set var_graph_height [concat graph_height$vid]
+     global $var_graph_height
+ 
+     set $var_graph_extension $extension
+     set $var_graph_width $width
+     set $var_graph_height $height
+ 
+     toplevel $id
+     wm title $id {playlist}
+     wm protocol $id WM_DELETE_WINDOW [concat playlist_cancel $id]
+ 
+     label $id.label -text {PLAYLIST PROPERTIES}
+     pack $id.label -side top
+ 
+     frame $id.buttonframe
+     pack $id.buttonframe -side bottom -fill x -pady 2m
+     button $id.buttonframe.cancel -text {Cancel}\
+     	-command "playlist_cancel $id"
+     button $id.buttonframe.apply -text {Apply}\
+     	-command "playlist_apply $id"
+     button $id.buttonframe.ok -text {OK}\
+     	-command "playlist_ok $id"
+     pack $id.buttonframe.cancel -side left -expand 1
+     pack $id.buttonframe.apply -side left -expand 1
+     pack $id.buttonframe.ok -side left -expand 1
+     
+     frame $id.1rangef
+     pack $id.1rangef -side top
+     label $id.1rangef.lextension -text "Files Extension :"
+     entry $id.1rangef.extension -textvariable $var_graph_extension -width 7
+     pack $id.1rangef.lextension $id.1rangef.extension -side left
+ 
+     frame $id.2rangef
+     pack $id.2rangef -side top
+     label $id.2rangef.lwidth -text "Width :"
+     entry $id.2rangef.width -textvariable $var_graph_width -width 7
+     pack $id.2rangef.lwidth $id.2rangef.width -side left
+ 
+     frame $id.3rangef
+     pack $id.3rangef -side top
+     label $id.3rangef.lheight -text "Height :"
+     entry $id.3rangef.height -textvariable $var_graph_height -width 7
+     pack $id.3rangef.lheight $id.3rangef.height -side left
+ 
+     bind $id.1rangef.extension <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.2rangef.width <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.3rangef.height <KeyPress-Return> [concat playlist_ok $id]
+}
+
+############ playlist procedures END -- ydegoyon@free.fr     #########
