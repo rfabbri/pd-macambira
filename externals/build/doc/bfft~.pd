@@ -1,0 +1,18 @@
+#N canvas 488 64 480 309 10;
+#X obj 17 62 osc~ 500;
+#X floatatom 17 -11 5 0 0;
+#X obj 17 23 * 187.5;
+#X obj 17 180 tabsend~ scope;
+#N canvas 0 0 450 300 graph2 0;
+#X array scope 64 float 0;
+#X coords 0 1 63 -1 200 140 1;
+#X restore 233 16 graph;
+#X obj 18 113 bfft~;
+#X obj 71 112 ibfft~;
+#X text 12 -60 spectrum: (DC \, NY) \, (R1 \, I1) \, ...(RN-1 \, IN-1)
+;
+#X text 13 -74 like fft~ but normalized and;
+#X connect 0 0 5 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 5 0 3 0;
