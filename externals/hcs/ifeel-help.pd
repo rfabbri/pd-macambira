@@ -1,27 +1,40 @@
-#N canvas 736 320 450 300 10;
-#X obj 105 228 ifeel /dev/input/ifeel0;
-#X obj 160 82 hsl 128 20 0 255 0 0 empty empty interval_(0-255) 6 8
-32 8 -225271 -1 -1 12700 0;
-#X obj 212 130 hsl 128 20 0 255 0 0 empty empty count_(0-255) 6 8 32
-8 -261681 -1 -1 0 0;
-#X obj 264 178 hsl 128 20 0 1 0 0 empty empty level_(0-1) 6 8 32 8
--261689 -1 -1 12700 0;
-#X obj 61 157 bng 25 250 50 0 empty empty empty 0 -6 32 8 -24198 -1
+#N canvas 208 93 480 482 10;
+#X obj 187 324 ifeel /dev/input/ifeel0;
+#X obj 242 224 hsl 128 20 0 255 0 0 empty empty interval_(0-255) 6
+10 1 10 -225271 -1 -1 0 0;
+#X obj 294 253 hsl 128 20 0 255 0 0 empty empty count_(0-255) 6 10
+1 10 -261681 -1 -1 0 0;
+#X obj 346 282 hsl 128 20 0 1 0 0 empty empty strength_(0-1) 6 10 1
+10 -261689 -1 -1 0 0;
+#X obj 182 46 bng 25 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
 -1;
-#X obj 105 157 bng 25 250 50 0 empty empty empty 0 -6 32 8 -258699
--1 -1;
-#X msg 105 187 stop;
-#X msg 61 187 start;
-#X obj 261 201 nbx 5 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 33 10 -233017 -1 -1 1 256;
-#X obj 209 153 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 33 10 -233017 -1 -1 0 256;
-#X obj 157 105 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 33 10 -233017 -1 -1 255 256;
-#X obj 120 9 cnv 15 20 20 empty empty ifeel 4 12 33 14 -228992 -66577
+#X obj 226 46 bng 25 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X msg 226 76 stop;
+#X msg 182 76 start;
+#X obj 343 305 nbx 5 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 0 10 -233017 -1 -1 0 256;
+#X obj 291 276 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 0 10 -233017 -1 -1 0 256;
+#X obj 239 247 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 0 10 -233017 -1 -1 0 256;
+#X obj 3 4 cnv 15 470 30 empty empty [ifeel] 4 12 1 16 -228992 -66577
 0;
-#X text 190 15 control the pulse in an iFeel mouse;
-#X obj 4 13 force-feedback;
+#X text 73 10 control the pulse in an iFeel mouse;
+#X text 37 359 If you feed data to the ifeel mouse too quickly \, it
+has a tendency to crash the whole machine. I suspect a bug in the kernel
+module ifeel.o.;
+#X text 13 449 by Hans-Christoph Steiner <hans@at.or.at>;
+#X obj 324 416 all_about_haptics;
+#X text 201 417 For more info:;
+#X msg 251 168 strength 0.56;
+#X msg 234 124 interval 73;
+#X msg 243 147 count 14;
+#X msg 26 271 command 50 10 1;
+#X text 19 223 interval count strength;
+#X text 1 205 Or give a single command:;
+#X msg 26 249 command 25 255 1;
+#X msg 26 293 command 0 0 0;
 #X connect 1 0 10 0;
 #X connect 2 0 9 0;
 #X connect 3 0 8 0;
@@ -32,3 +45,9 @@
 #X connect 8 0 0 3;
 #X connect 9 0 0 2;
 #X connect 10 0 0 1;
+#X connect 17 0 0 0;
+#X connect 18 0 0 0;
+#X connect 19 0 0 0;
+#X connect 20 0 0 0;
+#X connect 23 0 0 0;
+#X connect 24 0 0 0;
