@@ -25,59 +25,8 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
-
-#ifdef __APPLE__
-#include <sys/errno.h>
-#include <sysexits.h>
-#include <mach/mach.h>
-#include <mach/mach_error.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#include <IOKit/hid/IOHIDLib.h>
-#include <IOKit/hid/IOHIDKeys.h>
-#include <IOKit/hid/IOHIDUsageTables.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <Carbon/Carbon.h>
-
-#ifndef __APPLE_CC__
-#include "Carbon_Include.h"
-#endif  /* #ifndef __APPLE_CC__ */
-
-#include <HID_Utilities.h>
-#endif  /* #ifdef __APPLE__ */
-
-#include "linuxhid.h"
-#include "input_arrays.h"
-
-static char *version = "$Revision: 1.3 $";
-
-/*------------------------------------------------------------------------------
- *  CLASS DEF
- */
-static t_class *hid_class;
-
-typedef struct _hid 
-{
-  t_object            x_obj;
-  t_int               x_fd;
-  t_symbol            *x_devname;
-  t_clock             *x_clock;
-  t_int               x_read_ok;
-  t_int               x_started;
-  t_int               x_delay;
-#ifdef __gnu_linux__
-  struct input_event  x_input_event; 
-#elif defined (__APPLE__)
-  IOHIDEventStruct event;
-#endif
-  t_outlet            *x_event_outlet;
-}t_hid;
-
+#include "hid.h"
+#include "../linuxhid.h"
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
@@ -113,6 +62,9 @@ static t_int hid_open(t_hid *x, t_symbol *s)
 {
 	t_int eventType, eventCode;
 	char *eventTypeName = "";
+#ifdef __linux__
+	struct input_event hid_input_event;
+#endif
 	/* counts for various event types */
 	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
 #ifdef __gnu_linux__
@@ -147,7 +99,7 @@ static t_int hid_open(t_hid *x, t_symbol *s)
   /* read input_events from the HID_DEVICE stream 
    * It seems that is just there to flush the input event queue
    */
-  while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1);
+  while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
   
   /* get name of device */
   ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
@@ -251,24 +203,25 @@ static t_int hid_read(t_hid *x,int fd)
 	t_atom event_data[5];
 	char *eventType;
 	char *eventCode;
+#ifdef __linux__
+	struct input_event hid_input_event;
 
-#ifdef __gnu_linux__
 	if (x->x_fd < 0) return 0;
 
-	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) 
+	while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1) 
 	{
 		/* build event_data list from event data */
-		SETSYMBOL(event_data, gensym(ev[x->x_input_event.type]));
-		SETSYMBOL(event_data + 1, gensym(event_names[x->x_input_event.type][x->x_input_event.code]));
-		SETFLOAT(event_data + 2, (t_float)x->x_input_event.value);
-		SETFLOAT(event_data + 3, (t_float)(x->x_input_event.time).tv_sec);
+		SETSYMBOL(event_data, gensym(ev[hid_input_event.type]));
+		SETSYMBOL(event_data + 1, gensym(event_names[hid_input_event.type][hid_input_event.code]));
+		SETFLOAT(event_data + 2, (t_float)hid_input_event.value);
+		SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
 		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
 	}
 #endif /* #ifdef__gnu_linux__ */
-#ifdef __APPLE__
+#ifdef IGNOREIGNOREIGNORE
 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow);
 	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow);
-	r/l
+
 	// if we have a good device and element which is not a collecion
 	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection))
 	{
@@ -364,7 +317,7 @@ static void *hid_new(t_symbol *s)
 
   x->x_clock = clock_new(x, (t_method)hid_read);
 
-  /* create anything outlet */ 
+  /* create anything outlet used for HID data */ 
   outlet_new(&x->x_obj, 0);
   
   /* set to the value from the object argument, if that exists */
