@@ -1,63 +1,37 @@
 FFTease - A set of Live Spectral Processors
 Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
 
-Copyright (c)Thomas Grill (xovo@gmx.net)
+Copyright (c)Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 
 ----------------------------------------------------------------------------
 
+BUILDING from source
+--------------------
+
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
-see http://www.parasitaere-kapazitaeten.net/ext
-
-----------------------------------------------------------------------------
-
-
-BUILDING:
-=========
+See http://grrrr.org/ext/flext
+Download, install and compile the package.
+Afterwards you can proceed with building this external.
 
 
-pd - Windows:
--------------
-OK o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
+pd/Max - Windows - Microsoft Visual C, Borland C++, MinGW:
+----------------------------------------------------------
+Start a command shell with your eventual build environment
+(e.g. run vcvars32.bat for Microsoft Visual Studio)
 
-o Cygwin: edit "config-pd-cygwin.txt" & run "sh build-pd-cygwin.sh" 
-	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-cygwin
-
-
-pd - linux:
------------
-o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
-	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-linux
+then run
+ ..\flext\build.bat
+(you would have to substitute ..\flext with the respective path to the flext package)
 
 
-pd - MacOSX:
------------
-OK o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
-	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-darwin
-
-
-Max/MSP - MacOS 9:
-------------------
-OK o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
-
-You must have the following "Source Trees" defined:
-"flext" - Pointing to the flext main directory
-"Cycling74" - Pointing to the Cycling 74 SDK
-
-
-
-Max/MSP - MacOSX:
-------------------
-OK o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
-
-You must have the following "Source Trees" defined:
-"OS X Volume" - Pointing to your OSX boot drive
-"flext" - Pointing to the flext main directory
-"Cycling74 OSX" - Pointing to the Cycling 74 SDK for xmax
-"MP SDK" - Pointing to the Multiprocessing SDK (for threading support)
-
+pd/Max - OSX/Linux - GCC:
+-------------------------
+From a shell run
+bash ../flext/build.sh
+(you would have to substitute ../flext with the respective path to the flext package)
 
 ----------------------------------------------------------------------------
 
