@@ -30,7 +30,10 @@ Problems with this approach:
 - it can't be applied to externals that use additional libraries.
 - it might be hard for externals that use several source files
   (not always, look at src/ann.c)
+- I could not find a way how this should work on windows with nmake ..
+  for now I just put the windows links in build/win/*.c ...
 
+Guenter
 
 
 
