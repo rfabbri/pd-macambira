@@ -17,4 +17,4 @@ avail | xovo | grill
 
 # this line ALWAYS needs to be the last line in this file
 # otherwise, its possible to lock everyone out of the CVS
-avail | adamlindsay,eighthave,fbar,ggeiger | CVSROOT
+avail | adamlindsay,eighthave,fbar,ggeiger,millerpuckette | CVSROOT
