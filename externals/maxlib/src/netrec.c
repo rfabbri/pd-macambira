@@ -31,7 +31,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>

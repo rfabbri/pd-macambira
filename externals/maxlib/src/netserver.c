@@ -33,7 +33,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
