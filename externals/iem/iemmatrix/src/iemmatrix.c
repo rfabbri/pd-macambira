@@ -17,6 +17,7 @@ void mtx_binops_setup();
 void mtx_col_setup();
 void mtx_diag_setup();
 void mtx_diegg_setup();
+void mtx_distance2_setup();
 void mtx_egg_setup();
 void mtx_element_setup();
 void mtx_eye_setup();
@@ -43,6 +44,7 @@ void iemtx_setup(){
   mtx_col_setup();
   mtx_diag_setup();
   mtx_diegg_setup();
+  mtx_distance2_setup();
   mtx_egg_setup();
   mtx_element_setup();
   mtx_eye_setup();
