@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -21,7 +21,7 @@ public:
 	pool(I argc,const A *argv);
 	~pool();
 
-	static V setup(t_class *);
+	static V setup(t_classid);
 
 	pooldata *Pool() { return pl; }
 
@@ -172,7 +172,7 @@ FLEXT_NEW_V("pool",pool);
 pooldata *pool::head,*pool::tail;
 
 
-V pool::setup(t_class *c)
+V pool::setup(t_classid c)
 {
 	post("");
 	post("pool %s - hierarchical storage object, (C)2002 Thomas Grill",POOL_VERSION);
