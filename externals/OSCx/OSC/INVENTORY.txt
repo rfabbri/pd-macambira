@@ -5,9 +5,9 @@ sendOSC, dumpOSC, OSCroute
   INCLUDES
     * typed and untyped packing of OSC messages
     * #bundle packing
-    * transmission of OSC messages via UDP
+    * transmission of OSC messages via UDP socket
 
-    * receive OSC messages on UDP port
+    * receive OSC messages on UDP socket
     * unpacking of typed and untyped OSC messages
     * #bundle unpacking
 

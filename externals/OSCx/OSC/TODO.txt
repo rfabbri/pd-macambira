@@ -6,6 +6,8 @@ for win32:   port also the command line utilities (send, dump)
 
 -dynamic space allocation for message buffers.
 
+-configure proper (autoconf)
+
 
 changelog:
 
