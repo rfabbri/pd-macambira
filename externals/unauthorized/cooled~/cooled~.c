@@ -36,9 +36,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef MACOSX
 #include <malloc.h>
-#endif
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
@@ -48,8 +46,8 @@
 #define M_PI 3.14159265358979323846
 #endif
 #include <math.h>
-#include <m_pd.h>
 
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -108,7 +106,7 @@ static int ignorevisible=1; // ignore visible test
 #define COOLED_DEFAULT_WIDTH 400
 #define COOLED_DEFAULT_HEIGHT 200
 
-static char   *cooled_version = "cooled~: version 0.11, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *cooled_version = "cooled~: version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *cooled_class;
 t_widgetbehavior cooled_widgetbehavior;
@@ -1355,6 +1353,7 @@ void cooled_tilde_setup(void)
     post(cooled_version);
     cooled_class = class_new(gensym("cooled~"), (t_newmethod)cooled_new, (t_method)cooled_free,
                     sizeof(t_cooled), 0, A_GIMME, 0);
+    class_sethelpsymbol( cooled_class, gensym("cooled~.pd") );
 
     // set callbacks
     cooled_widgetbehavior.w_getrectfn =    cooled_getrect;
@@ -1364,19 +1363,8 @@ void cooled_tilde_setup(void)
     cooled_widgetbehavior.w_deletefn =     cooled_delete;
     cooled_widgetbehavior.w_visfn =        cooled_vis;
     cooled_widgetbehavior.w_clickfn =      cooled_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     cooled_widgetbehavior.w_propertiesfn = cooled_properties;
     cooled_widgetbehavior.w_savefn =       cooled_save;
-#else
-	 class_setsavefn(cooled_class, &cooled_save);
-	 class_setpropertiesfn(cooled_class, &cooled_properties);
-#endif
 
     CLASS_MAINSIGNALIN( cooled_class, t_cooled, x_f );
     class_addmethod(cooled_class, (t_method)cooled_dsp, gensym("dsp"), A_NULL);

@@ -1,3 +1,5 @@
+0.12
+  adapted for pd 0.37
 0.11
   prevent crashes during reallocation
 0.10
