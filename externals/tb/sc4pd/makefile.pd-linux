@@ -45,7 +45,7 @@ TARGET=$(TARGDIR)/$(NAME).pd_linux
 all: $(TARGDIR) $(TARGET) 
 
 $(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(MAKEFILE) $(CONFIG)
-	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
+#	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
 
 $(TARGDIR):
 	-mkdir $(TARGDIR)
