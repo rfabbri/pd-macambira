@@ -2,7 +2,7 @@
 
 flext - C++ layer for Max/MSP and pd (pure data) externals
 
-Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2001-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -77,6 +77,7 @@ typedef t_clock t_qelem;
 #define A_NOTHING A_NULL
 #define A_FLINT A_FLOAT
 #define A_DEFFLINT A_DEFFLOAT
+#define A_DEFSYMBOL A_DEFSYM
 
 
 #elif FLEXT_SYS == FLEXT_SYS_MAX
@@ -135,8 +136,16 @@ typedef void t_binbuf;
 #define A_INT A_LONG
 #endif
 
+#ifndef A_DEFINT
+#define A_DEFINT A_DEFLONG
+#endif
+
 #ifndef A_SYMBOL
 #define A_SYMBOL A_SYM
+#endif
+
+#ifndef A_DEFSYMBOL
+#define A_DEFSYMBOL A_DEFSYM
 #endif
 
 
