@@ -1,4 +1,4 @@
-#N canvas 278 0 700 494 12;
+#N canvas 278 0 702 496 12;
 #X obj 27 293 netsend;
 #X floatatom 27 322 4 0 0;
 #X obj 207 160 loadbang;
@@ -31,6 +31,7 @@ configuring fs likewise (right-click fs).;
 #X obj 408 408 r symbolmouseup;
 #X text 404 364 ignore some errors;
 #X obj 408 431 r symbolfile;
+#X obj 530 207 r fs_reset;
 #X connect 0 0 1 0;
 #X connect 2 0 6 0;
 #X connect 3 0 0 0;

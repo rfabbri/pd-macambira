@@ -22,12 +22,9 @@ uses
   Windows, Graphics, DIB,
   mainunit;
 
-var
-  FilterPath: String;
-
 function FullFilterPath(const S: String): String;
 begin
-  Result := FilterPath+'\'+S;
+  Result := main.FSFolder+'\Filters\'+S;
   if Uppercase(ExtractFileExt(S))<>'.8BF' then
     Result := Result+'.8BF';
 end;
@@ -139,7 +136,5 @@ begin
   Active := False;
 end;
 
-begin
-  FilterPath := ExtractFilePath(Application.ExeName)+'\Filters'
 end.
 

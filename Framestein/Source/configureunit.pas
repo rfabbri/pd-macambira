@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ComCtrls;
+  StdCtrls, ExtCtrls, ComCtrls, Buttons, FileCtrl;
 
 type
   Tconfigure = class(TForm)
@@ -25,9 +25,17 @@ type
     CBEnableFSConns: TCheckBox;
     TSGeneral: TTabSheet;
     CBDockMain: TCheckBox;
+    TSFolders: TTabSheet;
+    Label6: TLabel;
+    EditFSFolder: TEdit;
+    Memo1: TMemo;
+    DirectoryListBox1: TDirectoryListBox;
+    DriveComboBox1: TDriveComboBox;
     procedure ButtonCancelClick(Sender: TObject);
     procedure ButtonOkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure DriveComboBox1Change(Sender: TObject);
+    procedure DirectoryListBox1Change(Sender: TObject);
   private
     { Private declarations }
   public
@@ -59,6 +67,12 @@ begin
   main.FSPort := StrToInt(EditFsPort.Text);
   main.EnableFSConns := CBEnableFSConns.Checked;
   main.DockMain := CBDockMain.Checked;
+  if main.FSFolder <> EditFSFolder.Text then begin
+    main.FSFolder := EditFSFolder.Text;
+    main.Plugins.Clear;
+    main.Plugins.ReLoad;
+    main.SearchPath.Add(main.FSFolder);
+  end;
 
   try
     if Reg.OpenKey('\Software\Framestein', True) then begin
@@ -68,6 +82,7 @@ begin
       Reg.WriteInteger('FSPort', main.FSPort);
       Reg.WriteBool('EnableFSConns', main.EnableFSConns);
       Reg.WriteBool('DockMain', main.DockMain);
+      Reg.WriteString('FSFolder', main.FSFolder);
     end;
   except
   end;
@@ -106,6 +121,7 @@ begin
   EditFsPort.Text := IntToStr(main.FSPort);
   CBEnableFSConns.Checked := main.EnableFSConns;
   CBDockMain.Checked := main.DockMain;
+  EditFSFolder.Text := main.FSFolder;
   // show
   ShowModal;
 end;
@@ -114,6 +130,18 @@ procedure Tconfigure.FormCreate(Sender: TObject);
 begin
   if main.RunConfig then
     Execute;
+end;
+
+procedure Tconfigure.DriveComboBox1Change(Sender: TObject);
+begin
+  DirectoryListBox1.Drive :=
+   (Sender as TDriveComboBox).Drive;
+end;
+
+procedure Tconfigure.DirectoryListBox1Change(Sender: TObject);
+begin
+  EditFSFolder.Text :=
+   (Sender as TDirectoryListBox).Directory;
 end;
 
 end.

@@ -74,9 +74,9 @@ type
     function ItemCount( const ClassName: String ): Integer;
     procedure Reset;
     procedure minimizeall;
-    procedure ExceptionHandler(Sender: TObject; E: Exception);
     procedure DropFileHandler(const h: HWND; const DroppedFileName: String);
     procedure AppMessage(var Msg: Tmsg; var Handled: Boolean);
+    procedure ExceptionHandler(Sender: TObject; E: Exception);
   public
     { Public declarations }
     RunConfig: Boolean;
@@ -89,6 +89,7 @@ type
     logstate: Boolean;
     Plugins: TPlugins;
     SearchPath: TStringList;
+    FSFolder: String;
 
     function CompName(const S: String): String;
     procedure Parse(const S: String); override;
@@ -102,15 +103,30 @@ type
     function FileExistsInSearchPath(var S: String): Boolean; // modifying S allowed!
   end;
 
+{$IFDEF FSDLL}
+  TMainThread = class(TThread)
+  public
+    procedure Execute; override;
+  end;
+{$ENDIF}
+
 const
-  STARTMSG = 'Framestein 0.31 running...';
-  MCAPTION = 'Framestein 0.31';
+{$IFDEF FSDLL}
+  STARTMSG = 'FramesteinLib 0.32 DLL TEST 1 running...';
+{$ELSE}
+  STARTMSG = 'Framestein 0.32 dev running...';
+{$ENDIF}
+  MCAPTION = 'Framestein 0.32';
   SocketBufferSize = 100000;
 
 var
   main: Tmain;
   DockTitle: String;
   DockHandle: HWND;
+
+{$IFDEF FSDLL}
+  MainT: TMainThread;
+{$ENDIF}
 
 function WinEnumerator(h: HWND; i: LongInt): BOOL; stdcall;
 function WinEnumerator_Exact(h: HWND; i: LongInt): BOOL; stdcall;
@@ -125,7 +141,23 @@ uses
   fscopyunit, fstextunit, fsdrawunit, fsbrowserunit,
   fsinfounit, fsaviunit,
   fastfiles,
-  Strz, logunit, configureunit;
+  Strz, logunit, configureunit, progressunit;
+
+{$IFDEF FSDLL}
+procedure TMainThread.Execute;
+begin
+  Application.Initialize;
+  Application.Title := '';
+  Application.CreateForm(Tmain, main);
+  Application.CreateForm(Tlog, log);
+  Application.CreateForm(Tconfigure, configure);
+  Application.CreateForm(TProgress, Progress);
+  Application.Run;
+// ???
+  Application.OnException := nil;
+  Application.OnMessage := nil;
+end;
+{$ENDIF}
 
 function WinEnumerator(h: HWND; i: LongInt): BOOL; stdcall;
 var
@@ -354,6 +386,7 @@ end;
 
 procedure Tmain.FormCreate(Sender: TObject);
 begin
+  FSFolder := ExtractFilePath(Application.Exename);
   Randomize;
   RunConfig:=False;
   PdHost := 'localhost';
@@ -384,7 +417,7 @@ begin
   logstate := False;
 
   SearchPath := TStringList.Create;
-  SearchPath.Add(ExtractFilePath(Application.ExeName));
+  SearchPath.Add(FSFolder);
 
   Application.OnException := ExceptionHandler;
   Application.OnMessage := AppMessage;
@@ -462,6 +495,9 @@ begin
       FSPort := Reg.ReadInteger('FSPort');
       EnableFSConns := Reg.ReadBool('EnableFSConns');
       DockMain := Reg.ReadBool('DockMain');
+      FSFolder := Reg.ReadString('FSFolder');
+      if FSFolder='' then
+        FSFolder := ExtractFilePath(Application.Exename);
     end;
   except
     RunConfig := True;
@@ -790,6 +826,8 @@ var
   i: Integer;
   f: TFsFrame;
 begin
+  if main=nil then Exit;
+  with main do
   if Pos('1400', E.Message)>0 then begin // invalid window handle
     // check any fs.frames with invalid window handles
     // (due to closing a patch with docked fs.frames)
@@ -897,6 +935,10 @@ begin
   if main.ParentWindow<>0 then begin
     main.ParentWindow:=0;
   end;
+  Action := caFree;
+{$IFDEF FSDLL}
+  MainT.Terminate;
+{$ENDIF}
 end;
 
 end.

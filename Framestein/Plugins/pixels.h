@@ -6,10 +6,11 @@
 // - dot16() dot24() and dot32() added
 // - get/put dot() removed, use above
 
-#include "plugin.h"
-
 #ifndef _PIXELSH
 #define _PIXELSH
+
+#include <vector>
+#include "plugin.h"
 
 class pixels
 {
@@ -116,5 +117,30 @@ void pixels::updaterowp()
 	p24 = (pixel24 *)p8;
 	p32 = (pixel32 *)p8;
 }
+
+//
+// arguments-class, to make it easier to parse parameters.
+// using vector<char *> for this might be a bit overkill (??),
+// but I like the ease of it.
+
+class arguments
+{
+private:
+	std::vector<char *> m_ptrs;
+public:
+	arguments(char *s)
+	{
+		char *t = s;
+		if(!t || !t[0]) return;
+		if(t[0]) m_ptrs.push_back(t);
+		while(t = strstr(t+1, " "))
+		{
+			t[0]=0;
+			m_ptrs.push_back(t+1);
+		}
+	}
+	char *operator[](int i) { return m_ptrs[i]; }
+	int count() { return m_ptrs.size(); }
+};
 
 #endif // #ifndef _PIXELSH

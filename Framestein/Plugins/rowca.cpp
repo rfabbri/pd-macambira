@@ -42,11 +42,19 @@ void draw(const _frame &f);
 
 void perform_effect(_frame f, _args a)
 {
-	if(!a.s || !a.s[0]) return;
+	arguments ar(a.s);
+	if(!ar.count()) {
+		printf("Usage: rowca <rule of automata, or command>\n");
+		printf("Example rule: 001-010-011-100\n");
+		printf("Commands: draw, clear\n");
+		return;
+	}
 
-	if(strstr(a.s, "0") || strstr(a.s, "1")) iterate(a.s); else
-	if(strcmp(a.s, "draw")==0) draw(f); else
-	if(strcmp(a.s, "clear")==0) sv.clear();
+	char *t = ar[0];
+
+	if(strstr(t, "0") || strstr(t, "1")) iterate(t); else
+	if(strcmp(t, "draw")==0) draw(f); else
+	if(strcmp(t, "clear")==0) sv.clear();
 }
 
 void iterate(const char *arg)

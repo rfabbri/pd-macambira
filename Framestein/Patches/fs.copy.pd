@@ -1,4 +1,4 @@
-#N canvas 52 54 934 446 12;
+#N canvas 52 54 936 448 12;
 #X obj 173 21 loadbang;
 #X obj 208 271 fs_sender;
 #X msg 173 204 copy \$1;
@@ -31,9 +31,11 @@ srcpaint whiteness;
 ;
 #X text 468 329 transparent_0/1 mirrorleftright_0/1 mirrorupdown_0/1
 ;
-#X text 467 358 "plugin_name" (see example-plugins.pd);
+#X text 467 378 "plugin_name" (see example-plugins.pd);
 #X obj 173 51 symbol \$0C;
-#X text 467 389 "filter_name" (see example-photoshopfilters.pd);
+#X text 466 404 "filter_name" (see example-photoshopfilters.pd);
+#X text 468 349 transcolor <r> <g> <b> to set the transparent color
+;
 #X connect 0 0 29 0;
 #X connect 2 0 1 0;
 #X connect 3 0 18 0;

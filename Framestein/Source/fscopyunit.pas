@@ -37,7 +37,9 @@ type
     iAlpha, iAdd, iSub: Integer;
     iBlend: Extended;
     Transparent, MirrorLeftRight, MirrorUpdown: Boolean;
-    iPlugin, iPluginArgs: String;
+    TransColor: Cardinal;
+    iPlugin: Integer;
+    iPluginArgs: String;
     iFilter, iFilterArgs: String;
 
     procedure GetFrames(const S: String);
@@ -101,6 +103,7 @@ var
   df: TDDBltFX;
   ddck: TDDColorKey;
   sx1, sy1, sx2, sy2, dx1, dy1, dx2, dy2: Integer;
+  r, g, b: Byte;
 begin
   if (S='') then Exit;
 
@@ -165,13 +168,19 @@ begin
 
   if s1='TRANSPARENT_0' then begin Transparent := False; Exit; end else
   if s1='TRANSPARENT_1' then begin Transparent := True; Exit; end else
+  if s1='TRANSCOLOR' then begin
+    r := MyStrToInt(ExtractWord(2, S, [' ']));
+    g := MyStrToInt(ExtractWord(3, S, [' ']));
+    b := MyStrToInt(ExtractWord(4, S, [' ']));
+    TransColor := RGB(r, g, b);
+    Exit;
+  end else
   if s1='MIRRORLEFTRIGHT_0' then begin MirrorLeftRight := False; Exit; end else
   if s1='MIRRORLEFTRIGHT_1' then begin MirrorLeftRight := True; Exit; end else
   if s1='MIRRORUPDOWN_0' then begin MirrorUpDown := False; Exit; end else
   if s1='MIRRORUPDOWN_1' then begin MirrorUpDown := True; Exit; end else
-  if main.Plugins.IsPlugin(s1) then begin
+  if main.Plugins.IsPlugin(iPlugin, s1) then begin
     DrawStyle := dsPlugin;
-    iPlugin := s1;
     iPluginArgs := Copy(S, Length(s1)+2, 255);
     Exit;
   end else
@@ -181,7 +190,6 @@ begin
     iFilterArgs := Copy(S, Length(s1)+2, 255);
     Exit;
   end;
-
 
   GetFrames(S);
   if (f1=nil) or (f2=nil) then Exit;
@@ -257,15 +265,15 @@ begin
 
   case DrawStyle of
     dsCopy: begin
-      ddck.dwColorSpaceLowValue := 0;
-      ddck.dwColorSpaceHighValue := 0;
+      ddck.dwColorSpaceLowValue := TransColor;
+      ddck.dwColorSpaceHighValue := TransColor;
       DF.dwsize := SizeOf(DF);
       DF.dwROP := cmSrcCopy;
       DF.dwDDFX := 0;
       DF.ddckSrcColorkey := ddck;
       DF.ddckDestColorkey := ddck;
       bltFlags := DDBLT_DDFX;
-      if Transparent then bltFlags := bltFlags or DDBLT_KEYSRCOVERRIDE;
+      if Transparent then bltFlags := bltFlags or DDBLT_KEYSRCOVERRIDE;//OVERRIDE;
       if MirrorLeftRight then
         DF.dwDDFX := DF.dwDDFX or DDBLTFX_MIRRORLEFTRIGHT;
       if MirrorUpDown then
@@ -341,6 +349,7 @@ begin
   DestType := rtAll;
   iAlpha := 50;  iAdd := 255;  iSub := 255;
   Transparent := False;
+  TransColor := 0;
   MirrorLeftRight := False;
   MirrorUpDown := False;
 end;

@@ -5,7 +5,7 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 	multiply overlay screen shadowcaster softlight \
 	rgbseek modgain traffic constrain eclipse eclipse02 eclipse03 \
 	cga keyscreen rene cutout fromage rgbavg rgbavg02 \
-	rowca
+	rowca argument-passing
 
 	dir *.dll
 
@@ -26,7 +26,7 @@ colortv:
 	cl colortv.c $(FLAGS) /link $(BOTH)
 
 subtract:
-	cl subtract.cpp $(FLAGS) /link $(EFFECT)
+	cl subtract.cpp $(FLAGS) /GX /link $(EFFECT)
 
 xbend:
 	cl xbend.c $(FLAGS) /link $(BOTH)
@@ -185,3 +185,6 @@ rgbavg02:
 
 rowca:
 	cl rowca.cpp $(FLAGS) /GX /link $(EFFECT)
+
+argument-passing:
+	cl argument-passing.cpp $(FLAGS) /GX /link $(EFFECT)

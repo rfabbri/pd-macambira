@@ -1,4 +1,4 @@
-{ Copyright (C) 2001 Juha Vehviläinen
+{ Copyright (C) 2001-2002 Juha Vehviläinen
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
   as published by the Free Software Foundation; either version 2
@@ -49,12 +49,13 @@ type
     procedure Load;
     procedure Reload;
     procedure Clear;
-    function IsPlugin(const s: String): Boolean;
+    // IsPlugins sets Index if S is a plugin
+    function IsPlugin(var Index: Integer; const s: String): Boolean;
     function CallEffect(const d: TDirectDrawSurface;
-     const procname: String; const args: String): Boolean;
+     const procIndex: Integer; const args: String): Boolean;
     function CallCopy(const d1: TDirectDrawSurface;
      const d2: TDirectDrawSurface;
-     const procname: String; const args: String): Boolean;
+     const procIndex: Integer; const args: String): Boolean;
   end;
 
 implementation
@@ -141,7 +142,7 @@ var
 begin
   sd := TScanDir.Create(Self);
   sd.OnHandleFile := LoadHandleFile;
-  sd.Scan(ExtractFilePath(Application.ExeName)+'\Plugins');
+  sd.Scan(main.FSFolder+'\Plugins');
   sd.Free;
   if Names.Count>0 then begin
     s := '';
@@ -159,27 +160,25 @@ begin
   Load;
 end;
 
-function TPlugins.IsPlugin(const s: String): Boolean;
+function TPlugins.IsPlugin(var Index: Integer; const s: String): Boolean;
 begin
-  Result := Names.IndexOf(s)<>-1;
+  Index := Names.IndexOf(s);
+  Result := Index<>-1;
 end;
 
 var
   argsBuf: array[0..255] of Char;
 
 function TPlugins.CallEffect(const d: TDirectDrawSurface;
-  const procname: String; const args: String): Boolean;
+  const procIndex: Integer; const args: String): Boolean;
 var
-  i: Integer;
   Proc: TEffectProc;
   sd: TDDSurfaceDesc;
   P: PChar;
 begin
   Result := False;
-  if (Names.Count=0) or (d.Width=0) or (d.Height=0) then Exit;
-  i := Names.IndexOf(procname);
-  if (i=-1) or (i>=EffectProcs.Count) then Exit;
-  @Proc := EffectProcs[i];
+  if (procIndex=-1) or (procIndex>=EffectProcs.Count) then Exit;
+  @Proc := EffectProcs[procIndex];
   if @Proc=nil then Exit;
   P:=@argsBuf;
   P[0]:=#0;
@@ -193,21 +192,16 @@ begin
 end;
 
 function TPlugins.CallCopy(const d1, d2: TDirectDrawSurface;
-  const procname: String; const args: String): Boolean;
+  const procIndex: Integer; const args: String): Boolean;
 var
-  i: Integer;
   Proc: TCopyProc;
   sd1: TDDSurfaceDesc;
   sd2: TDDSurfaceDesc;
   P: PChar;
 begin
   Result := False;
-  if (Names.Count=0) or
-   (d1.Width=0) or (d1.Height=0) or
-   (d2.Width=0) or (d2.Height=0) then Exit;
-  i := Names.IndexOf(procname);
-  if (i=-1) or (i>=CopyProcs.Count) then Exit;
-  @Proc := CopyProcs[i];
+  if (procIndex=-1) or (procIndex>=CopyProcs.Count) then Exit;
+  @Proc := CopyProcs[procIndex];
   if @Proc=nil then Exit;
   P:=@argsBuf;
   P[0]:=#0;

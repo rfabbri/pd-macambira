@@ -1,10 +1,10 @@
-#N canvas 17 261 466 316 12;
+#N canvas 17 261 472 322 12;
 #X obj 307 192 /;
 #X obj 319 128 t b f;
 #X obj 67 27 inlet;
 #X msg 293 157 1000;
 #X obj 87 222 outlet;
-#X obj 87 112 metro 1000;
+#X obj 87 111 metro 1000;
 #X text 10 -1 sends bangs to make "frames per second";
 #X obj 226 62 float \$1;
 #X obj 226 32 loadbang;

@@ -1,3 +1,19 @@
+0.32
+- fs.frame: |title this is the main window(
+- fs.copy: transcolor <r> <g> <b> to set the transparent color
+- better gol algo (Plugins\gol.c)
+- added 1d cell automata where each iteration will add a new row: Plugins\rowca
+- added arguments-class in pixels.h to ease parsing arguments to plugins.
+  example:
+
+  void perform_effect(_frame f, _args a)
+  {
+	arguments ar(a.s);
+
+	// ar.count()	return the number of arguments
+	// ar[i]	return i'th argument
+	...
+
 0.31
 - added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!
 - the console is back. It's good for printf():ing from plugins..

@@ -21,9 +21,62 @@ object configure: Tconfigure
     Top = 0
     Width = 427
     Height = 275
-    ActivePage = TSConnections
+    ActivePage = TSFolders
     Align = alClient
     TabOrder = 0
+    object TSFolders: TTabSheet
+      Caption = 'Folders'
+      ImageIndex = 2
+      object Label6: TLabel
+        Left = 16
+        Top = 36
+        Width = 83
+        Height = 13
+        Caption = 'Framestein folder:'
+      end
+      object EditFSFolder: TEdit
+        Left = 152
+        Top = 32
+        Width = 225
+        Height = 21
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 0
+        Text = 'E:\'
+      end
+      object Memo1: TMemo
+        Left = 16
+        Top = 200
+        Width = 389
+        Height = 33
+        BorderStyle = bsNone
+        Enabled = False
+        Lines.Strings = (
+          
+            'Choose the folder where Framestein will find its Plugins and Fil' +
+            'ters.'
+          '')
+        ReadOnly = True
+        TabOrder = 1
+      end
+      object DirectoryListBox1: TDirectoryListBox
+        Left = 152
+        Top = 88
+        Width = 225
+        Height = 97
+        ItemHeight = 16
+        TabOrder = 2
+        OnChange = DirectoryListBox1Change
+      end
+      object DriveComboBox1: TDriveComboBox
+        Left = 152
+        Top = 64
+        Width = 225
+        Height = 19
+        TabOrder = 3
+        OnChange = DriveComboBox1Change
+      end
+    end
     object TSConnections: TTabSheet
       Caption = 'Connections'
       object Label1: TLabel
@@ -116,7 +169,7 @@ object configure: Tconfigure
       Caption = 'General'
       ImageIndex = 1
       object CBDockMain: TCheckBox
-        Left = 16
+        Left = 26
         Top = 36
         Width = 377
         Height = 17
@@ -134,7 +187,7 @@ object configure: Tconfigure
     BevelOuter = bvNone
     TabOrder = 1
     object ButtonOk: TButton
-      Left = 8
+      Left = 344
       Top = 8
       Width = 75
       Height = 25
@@ -144,7 +197,7 @@ object configure: Tconfigure
       OnClick = ButtonOkClick
     end
     object ButtonCancel: TButton
-      Left = 96
+      Left = 256
       Top = 8
       Width = 75
       Height = 25

@@ -1,4 +1,4 @@
-{ Copyright (C) 2001 Juha Vehviläinen
+{ Copyright (C) 2001-2002 Juha Vehviläinen
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
   as published by the Free Software Foundation; either version 2
@@ -646,10 +646,14 @@ begin
      ExtractWord(4, s1, [' '])                // caption
     );
   end else
+  if s1='TITLE' then begin
+    s1 := Copy(S, Length(s1)+2, 255);
+    Caption := s1;
+  end else
   if False{your new effect here} then begin
   end else
-  if main.Plugins.IsPlugin(s1) then begin
-    if main.Plugins.CallEffect(d1.Surface, s1, Copy(S, Length(s1)+2, 255)) then
+  if main.Plugins.IsPlugin(i, s1) then begin
+    if main.Plugins.CallEffect(d1.Surface, i, Copy(S, Length(s1)+2, 255)) then
       FlipRequest;
   end else
   if pshostunit.IsFilter(s1) then begin
@@ -954,9 +958,6 @@ begin
 end;
 
 procedure Tfsframe.HandleDroppedFile(const S: String);
-var
-  i: Integer;
-  St: String;
 begin
   Parse(S);
   main.SendReturnValues(PdName+'bang=1');
