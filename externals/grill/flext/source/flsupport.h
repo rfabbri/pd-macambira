@@ -17,14 +17,47 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "flstdc.h"
 
-class FLEXT_EXT flext_base;
+class FLEXT_SHARE flext_base;
 
-class FLEXT_EXT flext {
+/*! \brief Flext support class
+	A number of methods (most are static functions) are defined here for convenience.
+	This class doesn't define any data members, hence it can be inherited to all
+	classes (not only PD objects) to profit from the cross-platform functionality.
+	Examples are the overloaded memory allocation, atom and atom list functions,
+	thread functions and classes, the sample buffer class and others.
+*/
+class FLEXT_SHARE flext {
 
 	/*!	\defgroup FLEXT_SUPPORT Flext support class
 		@{ 
 	*/
 public:
+
+// --- memory -------------------------------------------------------	
+
+	/*!	\defgroup FLEXT_S_MEMORY Memory allocation functions
+		@{ 
+	*/
+
+		/*! Overloaded new memory allocation method
+			\warning Max/MSP (or MacOS) allows only 16K in overdrive mode!
+		*/
+		void *operator new(size_t bytes);
+		//! Overloaded delete method
+		void operator delete(void *blk);
+
+		#ifndef __MRC__ // doesn't allow new[] overloading?!
+		void *operator new[](size_t bytes) { return operator new(bytes); }
+		void operator delete[](void *blk) { operator delete(blk); }
+		#endif
+
+		//! Get an aligned memory block
+		static void *NewAligned(size_t bytes,int bitalign = 128);
+		//! Free an aligned memory block
+		static void FreeAligned(void *blk);
+		
+	//!	@}  FLEXT_S_MEMORY  	
+
 // --- buffer/array stuff -----------------------------------------	
 
 	/*!	\defgroup FLEXT_S_BUFFER Buffer handling
@@ -32,7 +65,7 @@ public:
 	*/
 
 	//! Class for platform independent buffer handling
-	class buffer
+	class FLEXT_SHARE buffer
 	{
 	public:
 		/*! \brief Construct buffer.
@@ -122,7 +155,7 @@ public:
 	//! Zero a memory region
 	static void ZeroMem(void *dst,int bytes);
 	//! Sleep for an amount of time
-	static void Sleep(float s);
+	static void Sleep(double s);
 
 //!		@} FLEXT_S_UTIL
 
@@ -277,7 +310,7 @@ public:
 // --- atom list stuff -------------------------------------------
 
 	//! Class representing a list of atoms
-	class AtomList
+	class FLEXT_SHARE AtomList
 	{
 	public:
 		//! Construct list
@@ -337,7 +370,7 @@ public:
 
 
 	//! Class representing an "anything"
-	class AtomAnything: 
+	class FLEXT_SHARE AtomAnything: 
 		public AtomList
 	{
 	public:
@@ -551,7 +584,7 @@ public:
 	/*! \brief Thread mutex
 		\sa pthreads documentation
 	*/
-	class FLEXT_EXT ThrMutex 
+	class FLEXT_SHARE ThrMutex 
 #if FLEXT_THREADS == FLEXT_THR_POSIX
 	{
 	public:
@@ -605,7 +638,7 @@ public:
 	/*! \brief Thread conditional
 		\sa pthreads documentation
 	*/
-	class FLEXT_EXT ThrCond
+	class FLEXT_SHARE ThrCond
 #if FLEXT_THREADS == FLEXT_THR_POSIX
 		:public ThrMutex
 	{
