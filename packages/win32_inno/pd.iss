@@ -5,12 +5,12 @@
 AppName=Pure Data
 AppVerName=Pure Data 0.37.1
 AppPublisher=pure-data.org
-AppPublisherURL=http://www.pure-data.org
-AppSupportURL=http://www.pure-data.org/community/lists/
-AppUpdatesURL=http://www.pure-data.org/downloads/
+AppPublisherURL=http://pure-data.iem.at
+AppSupportURL=http://pure-data.iem.at/community/lists/
+AppUpdatesURL=http://pure-data.iem.at/downloads/
 DefaultDirName={pf}\Pure Data
 DefaultGroupName=Pure Data
-LicenseFile=..\..\pd\LICENSE.txt
+LicenseFile=..\..\externals\maxlib\LICENSE
 
 Compression=zip/9
 ChangesAssociations=true
@@ -139,11 +139,11 @@ Source: noncvs\extra\*.dll; DestDir: {app}\extra
 Source: noncvs\doc\5.reference\*.*; DestDir: {app}\doc\5.reference; Flags: ignoreversion
 Source: noncvs\doc\5.reference\iemhelp\*.*; DestDir: {app}\doc\5.reference\iemhelp; Flags: ignoreversion
 ;abstractions
-Source: noncvs\abstractions\xp4pd\*.*; DestDir: {app}\abstractions\xp4pd
+Source: noncvs\abstractions\serendipd\*.*; DestDir: {app}\abstractions\serendiPd
 Source: noncvs\abstractions\iemabs\*.*; DestDir: {app}\abstractions\iemabs
 
 [INI]
-Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://www.pure-data.org
+Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://pure-data.iem.at
 
 [Icons]
 Name: {group}\Pure Data; Filename: {app}\pd.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
