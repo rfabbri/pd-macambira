@@ -2,7 +2,7 @@
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.7 $";
+static char *version = "$Revision: 1.8 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -236,6 +236,7 @@ static void *linuxevent_new(t_symbol *s) {
   x->x_read_ok = 1;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
+  x->x_devname = gensym(LINUXEVENT_DEVICE);
 
   x->x_clock = clock_new(x, (t_method)linuxevent_read);
   
