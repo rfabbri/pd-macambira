@@ -2,7 +2,7 @@ Source: pd-externals
 Section: sound
 Priority: optional
 Maintainer: Guenter Geiger <geiger@debian.org>
-Build-Depends: debhelper (>> 3.0.0), pd, libsndobj-dev
+Build-Depends: debhelper (>> 3.0.0), pd, libsndobj-dev, libvorbis-dev, libogg-dev, libfluidsynth-dev, autoconf
 Standards-Version: 3.8.0
 
 Package: pd-zexy
@@ -25,10 +25,10 @@ Description: Open Sound Control Support for PD
  Open Sound Control is a protocol designed for remote controlling
  sound applications.
 
-Package: pd-footils
+Package: pd-flext-ext
 Architecture: any
 Depends: pd, ${shlibs:Depends}
-Description: Footils externals
+Description: Flext externals
  Externals built using the flext library.
 
 Package: pd-pdp

@@ -45,7 +45,7 @@ build-stamp: configure-stamp
 
 	# Build flext
 	
-	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include  STK=/usr/include/stk)
+	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include)
 
 	# Flext externals
 	#
@@ -127,6 +127,10 @@ install: build
 	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
 	        FLEXTINC=../../grill/flext/source \
 		DESTDIR=$(CURDIR)/debian/tmp INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra install)
+	install -m 644 footils/fluid/pd/fluid.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-fluid.pd
+	install -m 644 footils/shabby/shaffy~-help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shaffy~.pd
+	install -m 644 footils/shabby/shabby~.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shabby~.pd
+
 		
 	# Install OSC
 
