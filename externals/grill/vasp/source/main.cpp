@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre6";
+const C *VASP_VERSION = "0.1.3pre7";
 
 #include "opfuns.h"
 
@@ -162,7 +162,7 @@ static V vasp_main()
 
 	VASP__SETUP(cnorm)
 //	VASP__SETUP(cswap)
-	VASP__SETUP(cconj)
+//	VASP__SETUP(cconj)
 
 	VASP_SETUP(shift)
 	VASP_SETUP(xshift)

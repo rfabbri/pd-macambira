@@ -1,7 +1,7 @@
 # VASP - vector assembling signal processor
 # Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 #
-
+ 
 # where is PD?
 PDPATH=c:\programme\audio\pd		
 

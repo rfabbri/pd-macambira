@@ -52,5 +52,5 @@ VASP_UNARY("vasp.cnorm",cnorm,true,"normalize complex radius to 1 (but preserve 
 
 // -----------------------------------------------------
 
-VASP_UNARY("vasp.cconj",cconj,true,"complex conjugate: multiply imaginary part with -1")  // should be replaced by an abstraction
+//VASP_UNARY("vasp.cconj",cconj,true,"complex conjugate: multiply imaginary part with -1")  // should be replaced by an abstraction
 

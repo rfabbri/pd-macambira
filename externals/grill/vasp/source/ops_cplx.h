@@ -22,7 +22,7 @@ DEFOP(S,d_radd,radd,cbin)
 
 DEFOP(S,d_cnorm,norm,cun)
 
-DEFOP(S,d_cconj,conj,cun)
+//DEFOP(S,d_cconj,conj,cun)
 
 
 namespace VaspOp {
@@ -34,7 +34,7 @@ namespace VaspOp {
 	inline Vasp *m_cnorm(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cun(p,src,dst,VecOp::d_cnorm); } // complex normalize
 
 //	inline Vasp *m_cswap(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cun(p,src,dst,VecOp::d_cswap); }  // swap real and imaginary parts
-	inline Vasp *m_cconj(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cun(p,src,dst,VecOp::d_cconj); }  // complex conjugate
+//	inline Vasp *m_cconj(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_cun(p,src,dst,VecOp::d_cconj); }  // complex conjugate
 }
 
 #endif

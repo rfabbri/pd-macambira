@@ -1,9 +1,9 @@
-#N canvas 504 38 462 476 12;
+#N canvas 504 38 464 478 12;
 #X obj 27 11 inlet;
 #X obj 90 158 vasp.amax?;
 #X obj 35 206 route 0 1;
-#X obj 107 393 outlet;
-#X obj 165 393 outlet;
+#X obj 107 415 outlet;
+#X obj 165 415 outlet;
 #X obj 27 306 vasp;
 #X obj 47 255 t b;
 #X obj 90 116 vasp.m 2;

@@ -13,6 +13,10 @@ Version history:
 - FIX: vasp.imm - bug with memory reservation length
 - ADD: vasp.imm - attribute "zero" (default: true) - whether array should be cleared 
 - FIX: Max/MSP - freeing immediate buffers with overdrive is bogus -> using queued flext timer
+- FIX: Bug in clearing vasp references
+- CHANGE: changed behavior of vasp.spit on uneven vector counts
+		[vasp a b c( -> [vasp.spit 2] now outputs a(outlet 2), b(outlet 1), c(outlet 2), bang(outlet 3)
+- REMOVE: eliminated [vasp.cconj] as an object as it can easily be replaced by an abstraction
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument

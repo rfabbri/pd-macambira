@@ -201,7 +201,7 @@ public:
 			I r = min(rem,outs);
 			for(I i = 0; i < r; ++i) {
 				Vasp v(ref.Frames(),ref.Vector(vi+i));
-				ToOutVasp(r-1-i,v);
+				ToOutVasp(outs-1-i,v);
 			}
 			vi += r;
 			rem -= r;
