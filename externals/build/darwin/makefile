@@ -1,52 +1,60 @@
-NAME=choice
-CSYM=choice
 
-current: pd_linux
+prefix=$(DESTDIR)/usr/local/pd
 
-# ----------------------- NT -----------------------
+EXTERNALS = $(shell ls )
 
-pd_nt: $(NAME).dll
-
-.SUFFIXES: .dll
-
-PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
-VC="C:\Program Files\Microsoft Visual Studio\Vc98"
-
-# ----------------------- LINUX i386 -----------------------
-
-pd_linux: $(NAME).pd_linux
-
-.SUFFIXES: .pd_linux
-
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
-    -Wno-unused -Wno-parentheses -Wno-switch
-
-LINUXINCLUDE =  -I../../src
-
-.c.pd_linux:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
-	strip --strip-unneeded $*.pd_linux
-	rm -f $*.o ../$*.pd_linux
-	ln -s $*/$*.pd_linux ..
-
-# ----------------------- Mac OSX -----------------------
-
-pd_darwin: $(NAME).pd_darwin
+all: link.stamp $(EXTERNALS:.c=.pd_darwin)
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+PDEXECUTABLE = /usr/local/pd/bin/pd
+# or ../../../pd/bin/pd
 
-.c.pd_darwin:
-	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress  -flat_namespace -o $*.pd_darwin $*.o 
-	rm -f $*.o ../$*.pd_darwin
-	ln -s $*/$*.pd_darwin ..
+MACOSXCFLAGS = -DPD -Os  -DUNIX -DMACOSX -Dunix \
+    -Wall -W  \
+    -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
 
-# ----------------------------------------------------------
+MACOSXINCLUDE = -I. -I.. -I../include
+
+MACOSXLINKFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) 
+
+%.pd_darwin: ../src/%.c
+	$(CC) $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o "$*.o" -c "../src/$*.c"
+	$(CC) $(MACOSXLINKFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm \
+#	`test -f $*.libs && cat $*.libs`
+	chmod a-x "$*.pd_darwin"
+	rm -f "$*.o" 
 
 clean:
-	rm -f *.o *.pd_* so_locations
+	-rm *.pd_darwin *~ *.c
+	-rm -rf root Package.pkg
+	-rm link.stamp
+
+install-doc:
+	test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
+	cp -r ../doc/* $(prefix)/doc/5.reference
+
+install: install-doc
+	test -d $(prefix)/extra || mkdir -p $(prefix)/extra
+	install -m644 *.pd_darwin $(prefix)/extra
+
+package:
+	test -d root/doc/5.reference || mkdir -p root/doc/5.reference
+	cp -r ../doc/* root/doc/5.reference
+	test -d root/extra || mkdir -p root/extra
+	install -m644 *.pd_darwin root/extra
+	echo Now opening PackageMaker. Interact with that program now. \
+	Choose the Files tab, and correct the path to point to the newly-made ./root \
+	directory. Then choose File -\> Create Package.
+	open Package.pmsp
+
+link: link.stamp
+
+link.stamp:
+	cp ../src/*.c .
+	rm vst.c 
+# MacOSX exceptions that don't work just yet
+	rm ogg* ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
+	rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
+	touch link.stamp
+	make
