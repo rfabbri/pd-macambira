@@ -432,9 +432,9 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     
     x->x_height = 25;
 	
-	if (argc < 4)
+	if (argc < 5)
 	{
-		post("popup: You must enter at least 4 arguments. Default values used.");
+		post("popup: You must enter at least 5 arguments. Default values used.\n\nArguments:\npopup [width] [height] [colour] [name] [option-1] [option-2] ...");
 		x->x_width = 124;
 		x->x_height = 25;
 		x->x_num_options = 1; 
@@ -506,7 +506,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.8 $ $Date: 2004-11-07 17:53:46 $");
 }
 
 

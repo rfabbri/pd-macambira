@@ -431,7 +431,7 @@ void entry_setup(void) {
     class_setsavefn(entry_class,&entry_save);
 #endif
 
-	post("Text v0.1 Ben Bogart.");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.3 $ $Date: 2004-11-07 17:53:35 $");
 }
 
 
