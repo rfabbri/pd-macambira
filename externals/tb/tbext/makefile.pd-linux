@@ -1,5 +1,4 @@
-# xsample - extended sample objects for Max/MSP and pd (pure data)
-# Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
+# makefile adapted from thomas grill's xsample makefile
 #
 # Makefile for gcc @ linux
 #
@@ -26,6 +25,11 @@ LDFLAGS+=-Bdynamic
 LINKFLEXT=-lflext    #-L/usr/lib/flext/libflext.so
 else
 LINKFLEXT=$(FLEXTLIB)
+endif
+
+ifdef FFTW
+LDFLAGS+=-lfftw3f
+CFLAGS+=-DFFTW
 endif
 
 # ----------------------------------------------

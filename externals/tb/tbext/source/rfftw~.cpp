@@ -1,13 +1,13 @@
-/* Copyright (c) 2003-2004 Tim Blechmann.                                       */
+/* Copyright (c) 2004 Tim Blechmann.                                            */
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL     */
 /* WARRANTIES, see the file, "COPYING"  in this distribution.                   */
 /*                                                                              */
 /*                                                                              */
-/* tbext is the collection of some external i wrote.                            */
-/* some are useful, others aren't...                                            */
+/* rfftw~ is doing the same as rfft~, but it's based on the fftw library,       */
+/* that is much faster that pd's internal fft ...                               */
 /*                                                                              */
 /*                                                                              */
-/* tbext uses the flext C++ layer for Max/MSP and PD externals.                 */
+/* rfftw~ uses the flext C++ layer for Max/MSP and PD externals.                */
 /* get it at http://www.parasitaere-kapazitaeten.de/PD/ext                      */
 /* thanks to Thomas Grill                                                       */
 /*                                                                              */
@@ -33,47 +33,106 @@
 /*                                                                              */
 /*                                                                              */
 /*                                                                              */
-/* coded while listening to: Hamid Drake & Assif Tsahar: Soul Bodies, Vol. 1    */
-/*                           I.S.O.: I.S.O                                      */
+/* coded while listening to: Wolfgang Mitterer: Radiofractal & Beat Music       */
+/*                           Sun Ra: Reflections In Blue                        */
+/*                                                                              */
 /*                                                                              */
 
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.04"
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#include "fftw3.h"
+#include <algorithm>
+
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
 #error upgrade your flext version!!!!!!
 #endif
 
-void ttbext_setup()
+class rfftw: public flext_dsp
 {
-  post("TBEXT: by tim blechmann");
-  post("version "TBEXT_VERSION);
-  post("compiled on "__DATE__);
-  post("contains: tbroute(~), tbsig~, tbpow~, tbfft1~, tbfft2~, bufline~, fftgrrev~");
-  post("          fftgrsort~, fftgrshuf~, rfftw~, rifftw~");
+  FLEXT_HEADER(rfftw,flext_dsp);
 
-  FLEXT_SETUP(tbroute);
-  FLEXT_DSP_SETUP(tbsroute);
-  //  FLEXT_DSP_SETUP(tbssel);
-  FLEXT_DSP_SETUP(tbsig);
-  FLEXT_DSP_SETUP(tbpow);
-  //  FLEXT_DSP_SETUP(tbg7xx);
-  FLEXT_DSP_SETUP(tbfft1);
-  FLEXT_DSP_SETUP(tbfft2);
-  FLEXT_DSP_SETUP(fftbuf);
-  FLEXT_DSP_SETUP(fftgrsort);
-  FLEXT_DSP_SETUP(fftgrshuf);
-  FLEXT_DSP_SETUP(fftgrrev);
+public: // constructor
+  rfftw();
+  ~rfftw();
+
+protected:
+  virtual void m_signal (int n, float *const *in, float *const *out);
+  
+  fftwf_plan p;    //fftw plan
+  int bins;        //number of bins
+  float * outreal; //pointer to real output
+  float * outimag; //pointer to imaginary output
+  
+  float * infft;   //array fftw is working on
+  float * outfft;  //array fftw uses to output it's values
+  
+
+ private:
+};
 
 
-#if (FFTW == 1)
-  FLEXT_DSP_SETUP(rfftw);
-  FLEXT_DSP_SETUP(rifftw);
-#endif
+FLEXT_LIB_DSP("rfftw~",rfftw);
 
+rfftw::rfftw()
+  :bins(64)
+{
+  //get ready for the default blocksize
+  infft = fftwf_malloc(sizeof(float) * bins);
+  outfft = fftwf_malloc(sizeof(float) * bins);
+  p=fftwf_plan_r2r_1d(bins,infft,outfft,FFTW_FORWARD,FFTW_MEASURE);
+  
+  AddInSignal();
+  AddOutSignal();
+  AddOutSignal();
+} 
+
+rfftw::~rfftw()
+{
+  fftwf_free(infft);
+  fftwf_free(outfft);
+  fftwf_destroy_plan(p);
+} 
+
+
+void rfftw::m_signal(int n, float *const *in, float *const *out)
+{
+  //set output pointers
+  outreal = out[0];
+  outimag = out[1];
+
+  //if blocksize changed, we have to set a new plan for the fft
+  if (n!=bins)
+    {
+      bins=n;
+
+      //re-allocate fft buffers
+      fftwf_free(infft);
+      infft = fftwf_malloc(sizeof(float) * bins);
+      fftwf_free(outfft);
+      outfft = fftwf_malloc(sizeof(float) * bins);
+      
+      //set plan, this might take a few seconds
+      //but you don't have to do that on the fly...
+      fftwf_destroy_plan(p);
+      p=fftwf_plan_r2r_1d(bins,infft,outfft,FFTW_FORWARD,FFTW_MEASURE);
+  }
+
+  CopySamples(infft,in[0],n);
+  
+  //execute
+  fftwf_execute(p);
+
+  //Copy samples to outlets
+  CopySamples(outreal,outfft,n/2);
+  std::reverse_copy(outfft+n/2+1,outfft+n,outimag+1);
+
+  //why do we have to invert the samples???
+  for (int i = n/2+1; i!=0;--i)
+    {
+      *(outimag+i)=-*(outimag+i);
+    }
 
 }
 
-FLEXT_LIB_SETUP(tbext,ttbext_setup)

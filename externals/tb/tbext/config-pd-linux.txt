@@ -32,6 +32,10 @@ HELPDIR=${PD}/doc/5.reference
 UFLAGS=-g -xW -tpp7 -ip -ipo_obj    # icc
 # UFLAGS=-mcpu=pentium4 -mmmx -msse2 -msse -mfpmath=sse  # gcc 3.2 
 
+#compile support for the fftw3 library 
+#make sure that you compiled fftw3 for single precision floats!!!
+FFTW=1
+
 # define to link against shared flext library (flext version >= 0.5.0)
 FLEXT_SHARED=1
 
