@@ -1,0 +1,12 @@
+#N canvas 454 117 570 300 10;
+#X obj 132 168 print ascseq;
+#X msg 253 112 bang;
+#X obj 223 70 random_fl -10000 10000;
+#X obj 131 118 ascseq 100;
+#X floatatom 268 137 5 0 0;
+#X msg 83 34 "abcde 123 dsfjnsdf ewrte 3k4n5 3n hjb5465hj 6";
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 0 0;
+#X connect 4 0 3 1;
+#X connect 5 0 3 0;
