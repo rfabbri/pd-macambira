@@ -82,6 +82,8 @@ dnl look for tcl 8.x... do I really have to go through all this!?
 
 #AC_CHECK_HEADER(tcl.h,, echo "no tcl/tk header found" || exit 1)
 
+#	FreeBSD has lots of libs there ...
+LIBS="$LIBS -L/usr/local/lib"
 
 foundit=no
 if test $foundit == "no";
@@ -97,7 +99,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.7/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";LIBS="$LIBS -ltcl87 -ltk87";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";foundit=yes,)
 fi
 if test $foundit == "no";
 then
@@ -107,7 +109,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.6/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";LIBS="$LIBS -ltcl86 -ltk86";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";foundit=yes,)
 fi
 
 if test $foundit == "no";
@@ -118,7 +120,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.5/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";LIBS="$LIBS -ltcl85 -ltk85";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";foundit=yes,)
 fi
 
 if test $foundit == "no";
@@ -129,7 +131,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.4/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";LIBS="$LIBS -ltcl84 -ltk84";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";foundit=yes,)
 fi
 
 if test $foundit == "no";
@@ -140,7 +142,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.3/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";LIBS="$LIBS -ltcl83 -ltk83";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";foundit=yes,)
 fi
 
 if test $foundit == "no";
@@ -151,7 +153,7 @@ fi
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(/usr/local/include/tcl8.2/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";LIBS="$LIBS -ltcl82 -ltk82";foundit=yes,)
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";foundit=yes,)
 fi
 
 if test $foundit == "no";
@@ -163,20 +165,40 @@ fi
 
 
 AC_CHECK_LIB(tcl8.7, main,,
+AC_CHECK_LIB(tcl87, main,LIBS="$LIBS -ltcl87",
     AC_CHECK_LIB(tcl8.6, main,,
-	AC_CHECK_LIB(tcl8.5, main,,
-	    AC_CHECK_LIB(tcl8.4, main,,
-		AC_CHECK_LIB(tcl8.3, main,,
-		    AC_CHECK_LIB(tcl8.2, main,,
-        		AC_CHECK_LIB(tcl8.0, main)))))))
+	AC_CHECK_LIB(tcl86, main,LIBS="$LIBS -ltcl86",
+		AC_CHECK_LIB(tcl8.5, main,,
+		AC_CHECK_LIB(tcl85, main,LIBS="$LIBS -ltcl85",
+		    AC_CHECK_LIB(tcl8.4, main,,
+			AC_CHECK_LIB(tcl84, main,LIBS="$LIBS -ltcl84",
+				AC_CHECK_LIB(tcl8.3, main,,
+				AC_CHECK_LIB(tcl83, main,LIBS="$LIBS -ltcl83",
+				    AC_CHECK_LIB(tcl8.2, main,,
+					AC_CHECK_LIB(tcl82, main,LIBS="$LIBS -ltcl82",
+	  					AC_CHECK_LIB(tcl81, main,,
+						AC_CHECK_LIB(tcl81, main,LIBS="$LIBS -ltcl81",
+							AC_CHECK_LIB(tcl80, main,LIBS="$LIBS -ltcl80",
+					 		AC_CHECK_LIB(tcl8.0, main))))))))))))))))
+
 
 AC_CHECK_LIB(tk8.7, main,,
+AC_CHECK_LIB(tk87, main,LIBS="$LIBS -ltk87",
     AC_CHECK_LIB(tk8.6, main,,
-	AC_CHECK_LIB(tk8.5, main,,
-	    AC_CHECK_LIB(tk8.4, main,,
-		AC_CHECK_LIB(tk8.3, main,,
-		    AC_CHECK_LIB(tk8.2, main,,
-        		AC_CHECK_LIB(tk8.0, main)))))))
+	AC_CHECK_LIB(tk86, main,LIBS="$LIBS -ltk86",
+		AC_CHECK_LIB(tk8.5, main,,
+		AC_CHECK_LIB(tk85, main,LIBS="$LIBS -ltk85",
+		    AC_CHECK_LIB(tk8.4, main,,
+			AC_CHECK_LIB(tk84, main,LIBS="$LIBS -ltk84",
+				AC_CHECK_LIB(tk8.3, main,,
+				AC_CHECK_LIB(tk83, main,LIBS="$LIBS -ltk83",
+				    AC_CHECK_LIB(tk8.2, main,,
+					AC_CHECK_LIB(tk82, main,LIBS="$LIBS -ltk82",
+	  					AC_CHECK_LIB(tk81, main,,
+						AC_CHECK_LIB(tk81, main,LIBS="$LIBS -ltk81",
+							AC_CHECK_LIB(tk80, main,LIBS="$LIBS -ltk80",
+					 		AC_CHECK_LIB(tk8.0, main))))))))))))))))
+
 
 dnl Checking for tk.h or tkstep.h - not used at the moment
 dnl AC_CHECK_HEADER(tk.h,DEFINES="$DEFINES -DTKINC=\\\"tk.h\\\"")
@@ -219,8 +241,7 @@ fi
 dnl FreeBSD hack
 if test `uname -s` = FreeBSD;
 then
-    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib -L/usr/local/lib/pth -lpthread"
-	LIBS="$LIBS -L/usr/local/lib"
+    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib/pth -lpthread"
     EXT=pd_linux
     MORECFLAGS="-DDL_OPEN  -DUSEAPI_OSS"
     CFLAGS="$CFLAGS -I/usr/local/include"
