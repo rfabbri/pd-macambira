@@ -1,0 +1,20 @@
+# pool - hierarchical storage object for PD and Max/MSP
+# Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+#
+
+# where is PD?
+PDPATH=c:\programme\audio\pd		
+
+# where do the flext libraries reside?
+FLEXTPATH=$(PDPATH)\flext
+
+# where is BorlandC++?
+BCCPATH=c:\programme\prog\bcc55		
+
+# where should the external(s) be built?
+OUTPATH=.\pd-bcc
+
+# where should the external be installed?
+# (leave blank to omit installation)
+INSTPATH=$(PDPATH)\extra
+

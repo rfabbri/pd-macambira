@@ -1,0 +1,77 @@
+# pool - hierarchical storage object for PD and Max/MSP
+# Copyright (C) 2002 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ linux
+#
+# usage:
+# to build run "make -f makefile.pd-linux"
+# to install (as root), do "make -f makefile.pd-linux install"
+#
+
+CONFIG=config-pd-linux.txt
+
+include $(CONFIG)
+
+FLEXTLIB=$(FLEXTPATH)/flext.a
+
+# compiler+linker stuff	
+INCLUDES=$(PDPATH) 
+LIBPATH=
+FLAGS=-DPD 
+CFLAGS=-O6 -mcpu=pentiumpro
+#CFLAGS=-g
+LIBS=m util 
+
+
+# ---------------------------------------------
+# the rest can stay untouched
+# ----------------------------------------------
+
+NAME=pool
+
+# all the source files from the package
+SRCS=main.cpp pool.cpp data.cpp
+HDRS=pool.h
+
+DIR=.
+
+TARGET=$(TARGDIR)/$(NAME).pd_linux
+
+# default target
+all: $(TARGDIR) $(TARGET)
+
+$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+	touch $@
+
+$(TARGDIR):
+	mkdir $(TARGDIR)
+
+$(TARGDIR)/%.o : $(DIR)/%.cpp
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
+	$(CXX) -shared $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+	chmod 755 $@
+
+$(INSTPATH):
+	mkdir $(INSTPATH)
+
+install:: $(INSTPATH)
+
+install:: $(TARGET)
+	cp $^ $(INSTPATH)
+	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+
+.PHONY: clean
+clean:
+	rm -f $(TARGDIR)/*.o $(TARGET)
+	
+
+
+
+
+
+
+
+
