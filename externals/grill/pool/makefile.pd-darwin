@@ -22,8 +22,8 @@ FRAMEWORKS=Carbon
 LDFLAGS+=-Wl,-x -Wl,-S -bundle -bundle_loader $(PD)
 
 ifdef FLEXT_SHARED
-CFLAGS+=-dynamic -DFLEXT_SHARED
-LDFLAGS+=-dynamic -L$(FLEXTPATH)
+CFLAGS+=-DFLEXT_SHARED
+LDFLAGS+=-L$(FLEXTPATH)
 FLEXTLIB=-lflext
 
 else

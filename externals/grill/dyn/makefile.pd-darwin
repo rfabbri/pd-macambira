@@ -16,24 +16,30 @@ CONFIG=config-pd-darwin.txt
 
 include $(CONFIG)
 
-FLEXTLIB=$(FLEXTPATH)/flext.a
-
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
 LIBPATH=
-FLAGS=-DFLEXT_SYS=2 ${U_FLAGS}
-CFLAGS=-O2 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-rtti
-#CFLAGS=-g
+FLAGS=-DFLEXT_SYS=2 
+CFLAGS=-O2 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
 LIBS=m
 FRAMEWORKS=vecLib
-LDFLAGS=-bundle -bundle_loader $(PD)
+LDFLAGS+=-Wl,-x -Wl,-S -bundle -bundle_loader $(PD)
+
+ifdef FLEXT_SHARED
+CFLAGS+=-DFLEXT_SHARED
+LDFLAGS+=-L$(FLEXTPATH)
+FLEXTLIB=-lflext
+
+else
+
+FLEXTLIB=$(FLEXTPATH)/libflext.a
+
+endif
 
 
 # ---------------------------------------------
 # the rest can stay untouched
 # ----------------------------------------------
-
-NAME=dyn~
 
 # all the source files from the package
 include make-files.txt
@@ -43,7 +49,7 @@ TARGET=$(TARGDIR)/$(NAME).pd_darwin
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
@@ -52,8 +58,8 @@ $(TARGDIR):
 $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(patsubst %,-framework %,$(FRAMEWORKS)) -o $@ 
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(patsubst %,-framework %,$(FRAMEWORKS)) $(FLEXTLIB) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):

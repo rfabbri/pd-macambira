@@ -1,5 +1,5 @@
 # VASP - vector assembling vector processor
-# Copyright (c)2002-2003 Thomas Grill (xovo@gmx.net)
+# Copyright (c)2002-2004 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for gcc @ OSX (darwin)
 #
@@ -13,22 +13,31 @@ CONFIG=config-pd-darwin.txt
 
 include ${CONFIG}
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a
-
 # compiler stuff
 INCLUDES=$(PDINC) 
-FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions 
-CFLAGS=-O6 ${UFLAGS} -fmove-all-movables -frerun-loop-opt -fprefetch-loop-arrays 
+FLAGS=-DFLEXT_SYS=2 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions 
+CFLAGS=-O2 ${UFLAGS} -fmove-all-movables -frerun-loop-opt -fprefetch-loop-arrays 
 #CFLAGS+=-funroll-loops -freduce-all-givs -fschedule-insns2 -foptimize-register-move
 LIBS=m
 LDFLAGS=-bundle -bundle_loader $(PDBIN)
 FRAMEWORKS=Carbon veclib
 
+ifdef FLEXT_SHARED
+CFLAGS+=-DFLEXT_SHARED
+LDFLAGS+=-L$(FLEXTPATH)
+FLEXTLIB=-lflext
+
+else
+
+CFLAGS+=-DFLEXT_THREADS
+FLEXTLIB=$(FLEXTPATH)/libflext_t.a
+
+endif
+
+
 # ----------------------------------------------
 # the rest can stay untouched
 # ----------------------------------------------
-
-NAME=vasp
 
 include make-files.txt
 
@@ -48,8 +57,8 @@ $(TARGDIR):
 $(TARGDIR)/%.o : $(SRCDIR)/%.cpp 
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(FLEXTLIB) -o $@ 
 	chmod 755 $@
 
 
