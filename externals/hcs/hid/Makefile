@@ -43,7 +43,7 @@ INCLUDE =  -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 	$(CC) $(LDFLAGS) -o $*.pd_darwin *.o
 
 .o.pd_linux:
-	ld $(LDFLAGS) -o $*.pd_linux $*.o -lc -lm
+	ld $(LDFLAGS) -o $*.pd_linux *.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 #	rm $*.o
 

@@ -5,7 +5,7 @@
 
 #include "hid.h"
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -28,19 +28,33 @@ typedef struct _hid
 
 
 /*------------------------------------------------------------------------------
- *  FUNCTION PROTOTYPES FOR APPLE HID MANAGER
+ *  GLOBALS
  */
+
+char *deviceList[64];
+char *typeList[256];
+char *codeList[256];
+
+/*------------------------------------------------------------------------------
+ *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS
+ */
+
+#ifdef __linux__
+void releaseDevices(void);
+void buildDeviceList(void);
+void buildTypeList(void);
+
+#endif
+
+
 #ifdef __APPLE__
-void releaseHIDDevices (void);
+void releaseHIDDevices(void);
 int prHIDBuildElementList(void);
 int prHIDBuildDeviceList(void);
 int prHIDGetValue(void);
 void PushQueueEvents_RawValue(void);
 void PushQueueEvents_CalibratedValue(void);
-//static pascal void IdleTimer(EventLoopTimerRef inTimer, void* userData);
 int prHIDReleaseDeviceList(void);
-//static EventLoopTimerUPP GetTimerUPP(void);
-//void callback(void * target, IOReturn result, void * refcon, void * sender);
 int prHIDRunEventLoop(void);
 int prHIDQueueDevice(void);
 int prHIDQueueElement(void);

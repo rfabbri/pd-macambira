@@ -26,7 +26,18 @@
 #include "hid.h"
 
 #include "input_arrays.h"
+
+/* this should be removed once things are ported to hid_linux.c */
 #include "../linuxhid.h"
+
+/*------------------------------------------------------------------------------
+ * LOCAL DEFINES
+ */
+
+#define DEBUG(x)
+//#define DEBUG(x) x 
+
+#define DEFAULT_DELAY 300
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
@@ -56,6 +67,7 @@ void hid_stop(t_hid* x)
   hid_devicelist_refresh(x);
 }
 
+
 static t_int hid_close(t_hid *x) 
 {
 	DEBUG(post("hid_close"););
@@ -70,6 +82,7 @@ static t_int hid_close(t_hid *x)
    return 1;
 }
 
+
 static t_int hid_open(t_hid *x, t_symbol *s) 
 {
 	DEBUG(post("hid_open"););
@@ -78,7 +91,7 @@ static t_int hid_open(t_hid *x, t_symbol *s)
 	char *eventTypeName = "";
 	/* counts for various event types */
 	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
-#ifdef __gnu_linux__
+#ifdef __linux__
 	struct input_event hid_input_event;
 	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 #endif
@@ -92,7 +105,7 @@ static t_int hid_open(t_hid *x, t_symbol *s)
   if (s != &s_)
     x->x_devname = s;
   
-#ifdef __gnu_linux__
+#ifdef __linux__
   /* open device */
   if (x->x_devname) 
   {
@@ -204,10 +217,11 @@ static t_int hid_open(t_hid *x, t_symbol *s)
   post("As I write cross-platform versions, the interface might have to change.");
   post("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
   post("================================= [hid] =================================\n");
-#endif /* #ifdef __gnu_linux__ */
+#endif /* #ifdef __linux__ */
   
-  return 1;
+  return 1;  /* why is this return 1? */
 }
+
 
 static t_int hid_read(t_hid *x,int fd) 
 {

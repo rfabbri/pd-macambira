@@ -1,14 +1,12 @@
 #ifdef __linux__
 
+
 #include <linux/input.h>
+#include <sys/ioctl.h>
 
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
-
-
-
-
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
@@ -23,5 +21,11 @@
 
 
 
+/* The application reading the device is supposed to queue all events up to */
+/* the SYN_REPORT event, and then process them, so that a mouse pointer */
+/* will move diagonally instead of following the sides of a rectangle, */
+/* which would be very annoying. */
+
 
 #endif  /* #ifdef __linux__ */
+

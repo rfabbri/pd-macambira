@@ -181,6 +181,7 @@ print(HEADER "char *ev_pwr[1];\n");
 printArray("ev_ff_status",@FF_STATUS);
 
 # print array of arrays
+print(HEADER "char **event_names[",$#EV+1,"];\n\n");
 print(ARRAYS "char **event_names[",$#EV+1,"] = {");
 for($i = 0; $i < $#EV; $i++)
 {
