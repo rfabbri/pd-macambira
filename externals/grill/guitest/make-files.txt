@@ -1,0 +1,7 @@
+# all the source files from the package
+NAME=guitest
+
+SRCDIR=.
+
+SRCS= flgui.cpp flguiobj.cpp main.cpp 
+HDRS= flgui.h flguiobj.h

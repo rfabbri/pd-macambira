@@ -1,0 +1,87 @@
+# Copyright (C) 2002-2004 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ linux
+#
+# usage:
+# to build run "make -f makefile.pd-linux"
+# to install (as root), do "make -f makefile.pd-linux install"
+#
+
+CONFIG=config-pd-linux.txt
+
+include $(CONFIG)
+
+# compiler+linker stuff	
+INCLUDES=$(PDPATH) 
+FLAGS=-DFLEXT_SYS=2 
+CFLAGS=-O2 $(UFLAGS)
+LDFLAGS=$(UFLAGS)  # needed by icc
+LIBS= 
+
+ifdef FLEXT_SHARED
+CFLAGS+=-shared -DFLEXT_SHARED
+LDFLAGS+=-L $(FLEXTPATH)
+
+ifeq ($(CXX),icc)
+LDFLAGS+=-i_dynamic
+else
+LDFLAGS+=-Wl,-Bdynamic
+endif
+
+FLEXTLIB=-lflext
+
+else
+
+FLEXTLIB=$(FLEXTPATH)/libflext.a
+
+endif
+
+
+# ---------------------------------------------
+# the rest can stay untouched
+# ----------------------------------------------
+
+include make-files.txt
+
+
+TARGET=$(TARGDIR)/$(NAME).pd_linux
+
+# default target
+all: $(TARGDIR) $(TARGET)
+
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(CONFIG)
+	touch $@
+
+$(TARGDIR):
+	mkdir $(TARGDIR)
+
+$(TARGDIR)/%.o : $(SRCDIR)/%.cpp
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(FLEXTLIB)  $(patsubst %,-l%,$(LIBS))  
+	strip --strip-unneeded $@
+	chmod 755 $@
+
+$(INSTPATH):
+	mkdir $(INSTPATH)
+
+install:: $(INSTPATH)
+
+install:: $(TARGET)
+	cp $^ $(INSTPATH)
+	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+
+.PHONY: clean
+clean:
+	rm -f $(TARGDIR)/*.o $(TARGET)
+	
+
+
+
+
+
+
+
+

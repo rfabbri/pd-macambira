@@ -1,0 +1,7 @@
+#N canvas 0 0 456 306 12;
+#X obj 31 87 guitest;
+#X obj 32 47 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 30 231 print OUTPUT;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
