@@ -30,7 +30,16 @@
     if (out)
     {
     	while (n--)
+	{
+	/* TB: denormal handling in pd >0.37-2 */
+#ifdef PD_BIGORSMALL
+	    *out += (PD_BIGORSMALL(*in) ? 0 : *in);
+	    out++;
+	    in++;
+#else
 	    *out++ += *in++; 
+#endif
+	}
     }
     return (w+4);
 }
