@@ -21,7 +21,7 @@
 #X obj 478 213 ==;
 #X obj 478 233 sel 1;
 #X obj 545 77 loadbang;
-#X obj 478 299 print [autocal];
+#X obj 478 299 print [autoscale];
 #X floatatom 472 189 5 0 0 0 - - -;
 #X obj 545 100 t b b;
 #X obj 454 329 expr if ($f1 == $f2 \, 0 \, $f1) \; if ($f1 == $f2 \,
@@ -31,7 +31,7 @@
 #X text 2 476 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 219 491 released under the GNU GPL;
-#X text 417 475 $Revision: 1.3 $$Date: 2004-11-15 21:16:56 $;
+#X text 417 475 $Revision: 1.4 $$Date: 2004-11-27 19:31:17 $;
 #X text 417 488 $Author: eighthave $;
 #X obj 45 54 route reset;
 #X obj 45 81 bang;
