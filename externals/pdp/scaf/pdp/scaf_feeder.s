@@ -16,7 +16,8 @@
 #    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-.include "scafmacro.s"
+# for dup
+.include "../compiler/scafmacro.s"
 
 
 # *rg is only used for returning the stack pointer
