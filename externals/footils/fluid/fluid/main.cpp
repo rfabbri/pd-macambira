@@ -53,54 +53,7 @@ class fluid:
 		{
 			AddInAnything();         // slurp anything
 			AddOutSignal(2);         // 2 audio out [ == AddOutSignal(2) ]
-			
-
-			float sr=Samplerate();
-			
-			if (sr != 44100.f) 
-			{
-				post("WARNING: Current samplerate %.0f != 44100", sr);
-				post("WARNING: fluid~ might be out of tune!");
-			}
-			
-			fluid_settings_t * settings = NULL;
-			settings = new_fluid_settings();
-			
-			// fluid_settings_setstr(settings, "audio.driver", "float");
-			
-			// settings:
-			fluid_settings_setnum(settings, "synth.midi-channels", 16);
-			fluid_settings_setnum(settings, "synth.polyphony", 256);
-			fluid_settings_setnum(settings, "synth.gain", 0.600000);
-			fluid_settings_setnum(settings, "synth.sample-rate", 44100.000000);
-			fluid_settings_setstr(settings, "synth.chorus.active", "no");
-			fluid_settings_setstr(settings, "synth.reverb.active", "no");
-			fluid_settings_setstr(settings, "synth.ladspa.active", "no");
-
-			if (sr != 0)
-			{
-				fluid_settings_setnum(settings, "synth.sample-rate", sr);
-			}
-			
-	
-			// Create fluidsynth instance:
-			synth = new_fluid_synth(settings);
-			
-			if ( synth == NULL )
-			{
-			        post("fluid~: couldn't create synth\n");
-			}
-			
-			// try to load argument as soundfont
-			fluid_load(argc, argv);
-
-		
-			if (settings != NULL )
-				delete_fluid_settings(settings);
-			
-			// We're done constructing:
-			if (synth)
-				post("-- fluid~ with flext ---");
+			fluid::fluid_init(argc, argv);
 	
 		} // end of constructor
 		~fluid()
@@ -135,6 +88,7 @@ class fluid:
 
         static void setup(t_classid c)
         {
+			FLEXT_CADDMETHOD_(c,0,"init",  fluid_init);
         	FLEXT_CADDMETHOD_(c,0,"load", fluid_load);
 			FLEXT_CADDMETHOD_(c,0,"note", fluid_note);
 			FLEXT_CADDMETHOD_(c,0,"prog", fluid_program_change);
@@ -176,6 +130,9 @@ class fluid:
 		
 		FLEXT_CALLBACK_V(fluid_bank)
 		void fluid_bank(int argc, t_atom *argv);
+		
+		FLEXT_CALLBACK_V(fluid_init)
+		void fluid_init(int argc, t_atom *argv);
 
 }; // end of class declaration for fluid
 
@@ -268,6 +225,59 @@ void fluid::fluid_bank(int argc, t_atom *argv)
 	}
 }
 
+void fluid::fluid_init(int argc, t_atom *argv)
+{
+	if (synth != NULL) 
+		delete_fluid_synth(synth);
+
+	float sr=Samplerate();
+	
+//	if (sr != 44100.f) 
+//	{
+//		post("Current samplerate %.0f != 44100", sr);
+//		// post("WARNING: fluid~ might be out of tune!");
+//	}
+	
+	fluid_settings_t * settings = NULL;
+	settings = new_fluid_settings();
+	
+	// fluid_settings_setstr(settings, "audio.driver", "float");
+	
+	// settings:
+	fluid_settings_setnum(settings, "synth.midi-channels", 16);
+	fluid_settings_setnum(settings, "synth.polyphony", 256);
+	fluid_settings_setnum(settings, "synth.gain", 0.600000);
+	fluid_settings_setnum(settings, "synth.sample-rate", 44100.000000);
+	fluid_settings_setstr(settings, "synth.chorus.active", "no");
+	fluid_settings_setstr(settings, "synth.reverb.active", "no");
+	fluid_settings_setstr(settings, "synth.ladspa.active", "no");
+
+	if (sr != 0)
+	{
+		fluid_settings_setnum(settings, "synth.sample-rate", sr);
+	}
+	
+
+	// Create fluidsynth instance:
+	synth = new_fluid_synth(settings);
+	
+	if ( synth == NULL )
+	{
+			post("fluid~: couldn't create synth\n");
+	}
+	
+	// try to load argument as soundfont
+	fluid_load(argc, argv);
+
+
+	if (settings != NULL )
+		delete_fluid_settings(settings);
+	
+	// We're done constructing:
+	if (synth)
+		post("-- fluid~ with flext ---");
+
+}
 
 
 // Now we define our DSP function. It gets this arguments:
