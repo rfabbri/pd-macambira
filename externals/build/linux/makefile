@@ -3,7 +3,7 @@ prefix=$(DESTDIR)/usr
 
 EXTERNALS = $(shell ls )
 
-all: $(EXTERNALS:.c=.pd_linux)
+all: link.stamp $(EXTERNALS:.c=.pd_linux)
 
 .SUFFIXES: .pd_linux
 
@@ -21,7 +21,8 @@ LINUXINCLUDE = -I. -I.. -I../../../pd/src
 	rm -f "$*.o" 
 
 clean:
-	-rm *.pd_linux *~
+	-rm *.pd_linux *~ *.c
+	-rm link.stamp
 
 install-doc:
 	cp -r ../doc/* $(prefix)/lib/pd/doc/5.reference
@@ -34,6 +35,9 @@ link: link.stamp
 
 link.stamp:
 	cp ../src/*.c .
+	rm vst.c
 	touch link.stamp
+	make
+	
 	
 
