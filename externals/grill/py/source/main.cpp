@@ -24,8 +24,8 @@ static PyObject *gcollect = NULL;
 typedef std::map<flext::thrid_t,PyThreadState *> PyThrMap;
 
 static PyInterpreterState *pymain = NULL;
-static PyThreadState *pythrmain = NULL;
 static PyThrMap pythrmap;
+PyThreadState *pybase::pythrsys = NULL;
 
 int pybase::lockcount = 0;
 
@@ -62,8 +62,6 @@ void pybase::FreeThreadState()
 PyObject *pybase::module_obj = NULL;
 PyObject *pybase::module_dict = NULL;
 
-PyObject *pybase::emptytuple = NULL;
-
 
 void initsymbol();
 void initsamplebuffer();
@@ -95,12 +93,12 @@ void pybase::lib_setup()
 	PyEval_InitThreads();
 
     // get thread state
-    pythrmain = PyThreadState_Get();
+    pythrsys = PyThreadState_Get();
     // get main interpreter state
-	pymain = pythrmain->interp;
+	pymain = pythrsys->interp;
 
     // add thread state of main thread to map
-    pythrmap[GetThreadId()] = pythrmain;
+    pythrmap[GetThreadId()] = pythrsys;
 #endif
 
     // sys.argv must be set to empty tuple
@@ -143,8 +141,6 @@ void pybase::lib_setup()
     initsamplebuffer();
     PyModule_AddObject(module_obj,"Buffer",(PyObject *)&pySamplebuffer_Type);
 
-    emptytuple = PyTuple_New(0);
-
 	// -------------------------------------------------------------
 
 	FLEXT_SETUP(pyobj);
@@ -169,14 +165,14 @@ pybase::pybase()
     , shouldexit(false),thrcount(0),stoptick(0)
 #endif
 {
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
 	Py_INCREF(module_obj);
     PyUnlock(state);
 }
 
 pybase::~pybase()
 {
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
    	Py_XDECREF(module_obj);
     PyUnlock(state);
 }
@@ -527,13 +523,13 @@ bool pybase::qucall(PyObject *fun,PyObject *args)
 void pybase::threadworker()
 {
     FifoEl *el;
-    PyThreadState *state;
+    PyThreadState *my = FindThreadState(),*state;
 
    	++thrcount;
     for(;;) {
         while(el = qufifo.Get()) {
         	++thrcount;
-            state = PyLock();
+            state = PyLock(my);
             callpy(el->fun,el->args);
             Py_XDECREF(el->fun);
             Py_XDECREF(el->args);
@@ -547,7 +543,7 @@ void pybase::threadworker()
             qucond.Wait();
     }
 
-    state = PyLock();
+    state = PyLock(my);
     // unref remaining Python objects
     while(el = qufifo.Get()) {
         Py_XDECREF(el->fun);
@@ -575,9 +571,7 @@ short pybase::patcher_myvol(t_patcher *x)
 bool pybase::collect()
 {
     if(gcollect) {
-        Py_INCREF(emptytuple);
-        PyObject *ret = PyObject_Call(gcollect,emptytuple,NULL);
-        Py_DECREF(emptytuple);
+        PyObject *ret = PyObject_CallObject(gcollect,NULL);
         if(ret) {
 #ifdef FLEXT_DEBUG
             int refs = PyInt_AsLong(ret);

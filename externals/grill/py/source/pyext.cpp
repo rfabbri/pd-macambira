@@ -131,7 +131,7 @@ pyext::pyext(int argc,const t_atom *argv,bool sig):
 
     const t_atom *clname = NULL;
 
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
 
 	// init script module
 	if(argc > apre) {
@@ -188,7 +188,7 @@ pyext::pyext(int argc,const t_atom *argv,bool sig):
 
 bool pyext::Init()
 {
-	PyThreadState *state = PyLock();
+	PyThreadState *state = PyLockSys();
 
 	if(methname) {
 		MakeInstance();
@@ -215,7 +215,7 @@ void pyext::Exit()
 { 
     pybase::Exit(); // exit threads
 
-	PyThreadState *state = PyLock();
+	PyThreadState *state = PyLockSys();
     DoExit();
     Unregister("_pyext");
 	UnimportModule();
@@ -259,15 +259,13 @@ void pyext::DoExit()
         // try to run del to clean up the class instance
         PyObject *objdel = PyObject_GetAttrString(pyobj,"_del");
         if(objdel) {
-            Py_INCREF(emptytuple);
-            PyObject *ret = PyObject_Call(objdel,emptytuple,NULL);
+            PyObject *ret = PyObject_CallObject(objdel,NULL);
             if(ret)
                 Py_DECREF(ret);
 #ifdef FLEXT_DEBUG
             else 
                 post("%s - Could not call _del method",thisName());
 #endif
-            Py_DECREF(emptytuple);
             Py_DECREF(objdel);
         }
         else
@@ -381,7 +379,7 @@ void pyext::Reload()
 
 void pyext::m_reload()
 {
-	PyThreadState *state = PyLock();
+	PyThreadState *state = PyLockSys();
 
 	Unregister("_pyext"); // self
 
@@ -403,7 +401,7 @@ void pyext::m_reload_(int argc,const t_atom *argv)
 
 void pyext::m_get(const t_symbol *s)
 {
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
 
 	PyObject *pvar  = PyObject_GetAttrString(pyobj,const_cast<char *>(GetString(s))); /* fetch bound method */
 	if(!pvar) {
@@ -431,7 +429,7 @@ void pyext::m_get(const t_symbol *s)
 
 void pyext::m_set(int argc,const t_atom *argv)
 {
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
 
     if(argc < 2 || !IsString(argv[0]))
         post("%s - Syntax: set varname arguments...",thisName());
@@ -506,7 +504,7 @@ void pyext::m_help()
 
 bool pyext::callpy(PyObject *fun,PyObject *args)
 {
-    PyObject *ret = PyObject_Call(fun,args,NULL);
+    PyObject *ret = PyObject_CallObject(fun,args);
     if(ret == NULL) {
         // function not found resp. arguments not matching
         PyErr_Print();
