@@ -7,7 +7,7 @@ soundfont synthesis using the advanced fluidsynth library.
 This is a source-code only release for most systems except Pd on Linux, because
 I only have access to a Linux system with developer tools, no Mac, no Windows.
 
-_ ___ whassit?__
+_ ___ what's it?__
 
 fluid~ is an external build around the free fluidsynth soundfont synthesizer
 available on www.fluidsynth.org Soundfonts collect digitally sampled
@@ -27,20 +27,23 @@ versions of fluid~, and the same goes for a Windows version of fluid~ for Pd.
 
 _ ___getting it __
 
-Source and the Pd binary are available either from this URL:
-
-http://footils.org/pkg/fluid-0.1.tgz
-
-or without the Pd/Linux-binary in source only form at the Pure Data cvs on
-Sourceforge
+Source of this external is available at the Pure Data CVS, currently residing
+at pure-data.sf.net
 
 Instructions for checking out the source are available on this site, as well.
 In short checking out fluid goes like this:
 
-$ cvs -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data login 
+$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data login 
 [no password]
 
-$ cvs -z3 -d:pserver:anonymous@cvs.pure-data.sourceforge.net:/cvsroot/pure-data co externals/footils/fluid
+$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co externals/footils/fluid
+
+_ __troubleshooting __
+
+If you encounter Pd crashes when using fluid~ then the reason might be a bug in
+libfluidsynth's LADSPA code. Try to get or build a version of libfluidsynth
+that does not have LADSPA enabled (--enable-ladspa=no). This does not seem to
+be a bug in fluid~ but one in libfluidsynth.
 
 _ __the thankyous __
 
