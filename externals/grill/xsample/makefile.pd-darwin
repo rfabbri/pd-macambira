@@ -1,5 +1,5 @@
 # xsample - extended sample objects for Max/MSP and pd (pure data)
-# Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
+# Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for gcc @ OSX (darwin)
 #
@@ -13,11 +13,11 @@ CONFIG=config-pd-darwin.txt
 
 include ${CONFIG}
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a
+FLEXTLIB=$(FLEXTPATH)/flext.a
 
 # compiler stuff
 INCLUDES=$(PDINC) 
-FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS
+FLAGS=-DFLEXT_SYS=2
 CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes # -maltivec
 LIBS=m
 LDFLAGS=-bundle -bundle_loader $(PDBIN)
@@ -42,7 +42,7 @@ $(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(MAKEFILE)
 	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
 
 $(TARGDIR):
-	mkdir $(TARGDIR)
+	-mkdir $(TARGDIR)
 
 $(TARGDIR)/%.o : $(SRCDIR)/%.cpp 
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
@@ -53,7 +53,7 @@ $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB)
 
 
 $(INSTDIR):
-	mkdir $(INSTDIR)
+	-mkdir $(INSTDIR)
 
 install:: $(INSTDIR)
 
@@ -63,7 +63,7 @@ install:: $(TARGET)
 
 
 $(HELPDIR):
-	mkdir $(HELPDIR)
+	-mkdir $(HELPDIR)
 
 install-help:: $(HELPDIR)
 

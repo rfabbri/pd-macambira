@@ -1,5 +1,5 @@
 # xsample - extended sample objects for Max/MSP and pd (pure data)
-# Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
+# Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
 #
 # Makefile for gcc @ linux
 #
@@ -8,30 +8,17 @@
 # to install (as root), do "make -f makefile.pd-linux install"
 #
 
-## EDIT ZONE ##################################
+CONFIG=config-pd-linux.txt
 
-# flext path 
-FLEXTPATH=/usr/local/lib/pd/flext
-
-# pd path 
-#PDPATH=/usr/local/lib/pd/include
-
-# where to install  
-INSTDIR=/usr/local/lib/pd/extra
-
-###############################################
+include ${CONFIG}
 
 FLEXTLIB=$(FLEXTPATH)/flext.a
 
-# where to build (temporary)
-TARGDIR=../pd-linux
-
 # compiler stuff
-CXX=g++-3.2
-INCLUDES=$(PDPATH)
-FLAGS=-DPD
-#CFLAGS=-O6 -mcpu=pentiumpro -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions
-CFLAGS=-O6 -mcpu=pentium3 -msse -mfpmath=sse -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions
+INCLUDES=$(PDINC) 
+FLAGS=-DFLEXT_SYS=2
+CFLAGS=-O6 -mcpu=pentiumpro -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions
+#CFLAGS=-O6 -mcpu=pentium3 -msse -mfpmath=sse -funroll-loops -fmove-all-movables -frerun-loop-opt -finline-functions
 LIBS=m
 
 # ----------------------------------------------
@@ -39,10 +26,9 @@ LIBS=m
 # ----------------------------------------------
 
 NAME=xsample
+SRCDIR=source
 
-# all the source files from the package
-SRCS=main.cpp inter.cpp play.cpp record.cpp groove.cpp
-HDRS=main.h
+include make-files.txt
 
 MAKEFILE=makefile.pd-linux
 TARGET=$(TARGDIR)/$(NAME).pd_linux
@@ -50,13 +36,13 @@ TARGET=$(TARGDIR)/$(NAME).pd_linux
 # default target
 all: $(TARGDIR) $(TARGET) 
 
-$(SRCS): $(HDRS) $(MAKEFILE)
-	touch $@
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(MAKEFILE) $(CONFIG)
+	touch $(patsubst %,$(SRCDIR)/%,$(SRCS))
 
 $(TARGDIR):
-	mkdir $(TARGDIR)
+	-mkdir $(TARGDIR)
 
-$(TARGDIR)/%.o : %.cpp 
+$(TARGDIR)/%.o : $(SRCDIR)/%.cpp 
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
@@ -65,13 +51,23 @@ $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB)
 	chmod 755 $@
 
 $(INSTDIR):
-	mkdir $(INSTDIR)
+	-mkdir $(INSTDIR)
 
 install:: $(INSTDIR)
 
 install:: $(TARGET) 
 	cp $^ $(INSTDIR)
 	chown root.root $(patsubst %,$(INSTDIR)/%,$(notdir $^))
+
+$(HELPDIR):
+	-mkdir $(HELPDIR)
+
+install-help:: $(HELPDIR)
+
+install-help:: ./pd
+	chmod 644 $^/*.*
+	cp $^/*.* $(HELPDIR)
+
 
 .PHONY: clean
 clean:
