@@ -75,7 +75,7 @@ pd_linux: $(NAME).pd_linux
 LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE =  -I../../src
+LINUXINCLUDE =  -I../../src -I ../../pd/src
 
 LINUXEXTERNALS = oggamp~.o oggcast~.o oggread~.o oggwrite~.o
 
