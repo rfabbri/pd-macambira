@@ -1,26 +1,43 @@
 #ifdef __APPLE__
 /*
- *  Apple Darwin HID Manager support for [hid]
+ *  Apple Darwin HID Manager support for Pd [hid] object
  *
  *  based on SC_HID.cpp from SuperCollider3 by Jan Truetzschler v. Falkenstein
  *
  *  Copyright (c) 2004 Hans-Christoph All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *
  */
+
+/* struct IOHIDEventStruct */
+/* { */
+/*     IOHIDElementType	type; */
+/*     IOHIDElementCookie	elementCookie; */
+/*     SInt32		value; */
+/*     AbsoluteTime	timestamp; */
+/*     UInt32		longValueSize; */
+/*     void *		longValue; */
+/* }; */
+
+/* typedef struct { */
+/*         natural_t hi; */
+/*         natural_t lo; */
+/* } AbsoluteTime; */
+
 
 
 #include <Carbon/Carbon.h>
@@ -40,33 +57,24 @@
 
 #include "hid.h"
 
-/*
-#include "SCBase.h"
-#include "VMGlobals.h"
-#include "PyrSymbolTable.h"
-#include "PyrInterpreter.h"
-#include "PyrKernel.h"
-
-#include "PyrObjectProto.h"
-#include "PyrPrimitiveProto.h"
-#include "PyrKernelProto.h"
-#include "SC_InlineUnaryOp.h"
-#include "SC_InlineBinaryOp.h"
-#include "PyrSched.h"
-#include "GC.h"
-*/
-
-
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
  *======================================================================== */
 
+/* count of total number of devices found */
 int gNumberOfHIDDevices = 0;
-EventLoopTimerRef gTimer = NULL; // timer for element data updates
 
+/* 
+ *	an array of discovered devices, which is used for selecting the
+ * current device, by #, type, or name
+ */
+pRecDevice discoveredDevices[256];
+
+/* timer for element data updates */
+EventLoopTimerRef gTimer = NULL; 
 
 /*==============================================================================
  *  FUNCTIONS
@@ -91,10 +99,6 @@ int prHIDBuildElementList(void)
 {
 	DEBUG(post("prHIDBuildElementList"););
 
-/*
-	PyrSlot *a = g->sp - 1; //class
-	PyrSlot *b = g->sp; //locID device
-*/
 	int locID = NULL;
 	int cookieNum = NULL;
 	UInt32 i;
@@ -103,45 +107,38 @@ int prHIDBuildElementList(void)
 	UInt32 numElements;
 	char cstrElementName [256];
 
-//	int err = slotIntVal(b, &locID);
-//	if (err) return err;
+// Apple Trackpad locID for testing
+	locID = 50397184;
 
-	// look for the right device: 
+	// look for the right device using locID 
 	pCurrentHIDDevice = HIDGetFirstDevice ();
 	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-        pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
+		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
 	if(!pCurrentHIDDevice) return (1);
 	
-	devElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeInput);
-	numElements = HIDCountDeviceElements (pCurrentHIDDevice, kHIDElementTypeInput);
-
-	//PyrObject* devAllElementsArray = newPyrArray(g->gc, numElements * sizeof(PyrObject), 0 , true);
+	devElement = HIDGetFirstDeviceElement(pCurrentHIDDevice, kHIDElementTypeInput);
+	numElements = HIDCountDeviceElements(pCurrentHIDDevice, kHIDElementTypeInput);
+	
+	post("[hid] found %d elements",numElements);
+	
+	for(i=0; i<numElements; i++)
+	{
+		//type
+		HIDGetTypeName((IOHIDElementType) devElement->type, cstrElementName);
+		post("Type: %s  %d  0x%x",cstrElementName,devElement->type,devElement->type);
+		//usage
+		HIDGetUsageName (devElement->usagePage, devElement->usage, cstrElementName);
+		post("Usage: %s  %d  0x%x",cstrElementName,devElement->usage,devElement->usage);
 		
-		for(i=0; i<numElements; i++)
-		{
-			//PyrObject* devElementArray = newPyrArray(g->gc, 5 * sizeof(PyrObject), 0 , true);
-			HIDGetTypeName((IOHIDElementType) devElement->type, cstrElementName);
-			//PyrString *devstring = newPyrString(g->gc, cstrElementName, 0, true);
-			//SetObject(devElementArray->slots+devElementArray->size++, devstring);
-			//g->gc->GCWrite(devElementArray, (PyrObject*) devstring);
-			//usage
-			HIDGetUsageName (devElement->usagePage, devElement->usage, cstrElementName);
 			//devstring = newPyrString(g->gc, cstrElementName, 0, true);
 			//SetObject(devElementArray->slots+devElementArray->size++, devstring);
 			//g->gc->GCWrite(devElementArray, (PyrObject*) devstring);
-			//cookie
-			//SetInt(devElementArray->slots+devElementArray->size++, (long) devElement->cookie);
-			//SetInt(devElementArray->slots+devElementArray->size++, (long) devElement->min);
-			//SetInt(devElementArray->slots+devElementArray->size++, (long) devElement->max);
-			
-			//SetObject(devAllElementsArray->slots+devAllElementsArray->size++, devElementArray);
-			//g->gc->GCWrite(devAllElementsArray, (PyrObject*) devElementArray);
-			
-			devElement =  HIDGetNextDeviceElement (devElement, kHIDElementTypeInput);
-		}
-		//SetObject(a, devAllElementsArray);
-
-		return (0);	
+		//cookie
+		post("Cookie: %d %d %d",devElement->cookie,devElement->min,devElement->max);
+		
+		devElement =  HIDGetNextDeviceElement (devElement, kHIDElementTypeInput);
+	}
+	return (0);	
 }
 
 int prHIDBuildDeviceList(void)
@@ -150,37 +147,18 @@ int prHIDBuildDeviceList(void)
 
 	int i,err;
 	UInt32 usagePage, usage;
-/*
-	//build a device list
-	PyrSlot *a = g->sp - 2;
-	PyrSlot *b = g->sp - 1; //usagePage
-	PyrSlot *c = g->sp;		//usage
-
-	if(IsNil(b)) 
-		usagePage = NULL;
-	else
-	{	
-		err = slotIntVal(b, &usagePage);
-		if (err) return err;
-	}
-	if(IsNil(c)) 
-		usage = NULL;
-	else
-	{
-		err = slotIntVal(c, &usage);
-		if (err) return err;
-	}
+	pRecElement devElement;
+	pRecDevice pCurrentHIDDevice;
 
 	//pass in usage & usagepage
 	//kHIDUsage_GD_Joystick kHIDUsage_GD_GamePad
-	*/
 	usagePage = kHIDPage_GenericDesktop;
 	usage = NULL;
 
 	Boolean result = HIDBuildDeviceList (usagePage, usage); 
-	// returns false if no device found (ignored in this case) - returns always false ?
+	// returns false if no device found
 
-	if(result) post("no HID devices found\n");
+	if(result) error("[hid]: no HID devices found\n");
 	
 	int numdevs = HIDCountDevices();
 	gNumberOfHIDDevices = numdevs;
@@ -190,46 +168,20 @@ int prHIDBuildDeviceList(void)
 	post("number of devices: %d", numdevs);
 	char cstrDeviceName [256];
 	
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	pRecElement devElement;
-	//PyrObject* allDevsArray = newPyrArray(g->gc, numdevs * sizeof(PyrObject), 0 , true);
+	pCurrentHIDDevice = HIDGetFirstDevice();
 	for(i=0; i<numdevs; i++)
 	{
-		/*
-		//device:
-		/PyrObject* devNameArray = newPyrArray(g->gc, 6 * sizeof(PyrObject), 0 , true);
-		//manufacturer:
-		PyrString *devstring = newPyrString(g->gc, pCurrentHIDDevice->manufacturer, 0, true);
-		SetObject(devNameArray->slots+devNameArray->size++, devstring);
-		g->gc->GCWrite(devNameArray, (PyrObject*) devstring);
-		//product name:
-		devstring = newPyrString(g->gc, pCurrentHIDDevice->product, 0, true);
-		SetObject(devNameArray->slots+devNameArray->size++, devstring);
-		g->gc->GCWrite(devNameArray, (PyrObject*) devstring);
-		*/
+		post("'%s' '%s' version %d",
+			  pCurrentHIDDevice->manufacturer,pCurrentHIDDevice->product,pCurrentHIDDevice->version);
 		//usage
 		HIDGetUsageName (pCurrentHIDDevice->usagePage, pCurrentHIDDevice->usage, cstrDeviceName);
-		/*
-		devstring = newPyrString(g->gc, cstrDeviceName, 0, true);
-		SetObject(devNameArray->slots+devNameArray->size++, devstring);
-		g->gc->GCWrite(devNameArray, (PyrObject*) devstring);
-		//vendor id
-		SetInt(devNameArray->slots+devNameArray->size++, pCurrentHIDDevice->vendorID);
-		//product id
-		SetInt(devNameArray->slots+devNameArray->size++, pCurrentHIDDevice->productID);
-		//locID
-		SetInt(devNameArray->slots+devNameArray->size++, pCurrentHIDDevice->locID);
-		
-		SetObject(allDevsArray->slots+allDevsArray->size++, devNameArray);
-		g->gc->GCWrite(allDevsArray, (PyrObject*) devNameArray);
-		*/
+		post("vendorID: %d   productID: %d   locID: %d",
+			  pCurrentHIDDevice->vendorID,pCurrentHIDDevice->productID,pCurrentHIDDevice->locID);
 		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
-
 	}
 
-	//UInt32 outnum = HIDCountDeviceElements (pCurrentHIDDevice, kHIDElementTypeOutput);
-	//post("number of outputs: %d \n", outnum);
-//	SetObject(a, allDevsArray);
+	UInt32 outnum = HIDCountDeviceElements (pCurrentHIDDevice, kHIDElementTypeOutput);
+	post("number of outputs: %d \n", outnum);
 
 	return (0);	
 }
@@ -376,10 +328,10 @@ static EventLoopTimerUPP GetTimerUPP(void)
 {
 	DEBUG(post("GetTimerUPP"););
 
-	static EventLoopTimerUPP	sTimerUPP = NULL;
+	static EventLoopTimerUPP sTimerUPP = NULL;
 	
 	if (sTimerUPP == NULL)
-		sTimerUPP = NewEventLoopTimerUPP (IdleTimer);
+		sTimerUPP = NewEventLoopTimerUPP(IdleTimer);
 	
 	return sTimerUPP;
 }
@@ -401,10 +353,10 @@ int prHIDRunEventLoop(void)
 
 	//PyrSlot *a = g->sp - 1; //class
 
-	InstallEventLoopTimer (GetCurrentEventLoop(), 0, 0.001, GetTimerUPP (), 0, &gTimer);
+	InstallEventLoopTimer(GetCurrentEventLoop(), 0, 0.001, GetTimerUPP (), 0, &gTimer);
 
 	//HIDSetQueueCallback(pCurrentHIDDevice, callback);
-	return (0);	
+	return (0);
 }
 
 
@@ -520,8 +472,49 @@ int prHIDStopEventLoop(void)
 	if (gTimer)
         RemoveEventLoopTimer(gTimer);
 	gTimer = NULL;
-	return (0);	
+	return (0);
 }
+
+
+t_int hid_open_device(t_hid *x, t_int device_number)
+{
+	post("open_device %d",device_number);
+
+	return (1);
+}
+
+t_int hid_open_device(t_hid *x)
+{
+	return (0);
+}
+
+
+t_int hid_devicelist_refresh(t_hid *x)
+{
+	/* the device list should be refreshed here */
+	if ( (prHIDBuildDeviceList()) && (prHIDBuildElementList()) )
+		return (0);
+	else
+		return (1);
+}
+
+
+/* this is just a rough sketch */
+
+/* getEvents(t_hid *x) { */
+/* 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow); */
+/* 	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow); */
+
+/* 	// if we have a good device and element which is not a collecion */
+/* 	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection)) */
+/* 	{ */
+/* 		SInt32 value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement); */
+/* 		SInt32 valueCal = HIDCalibrateValue (value, pCurrentHIDElement); */
+/* 		SInt32 valueScale = HIDScaleValue (valueCal, pCurrentHIDElement); */
+/* 	 } */
+/* } */
+
+
 
 
 #endif  /* #ifdef __APPLE__ */
