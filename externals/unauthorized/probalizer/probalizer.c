@@ -43,6 +43,7 @@
 
 #ifdef NT
 #include <io.h>
+#define random rand
 #else
 #include <unistd.h>
 #endif

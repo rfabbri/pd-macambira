@@ -40,9 +40,6 @@
 #endif
 #include <ctype.h>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <time.h>
 #include <sys/time.h>
 

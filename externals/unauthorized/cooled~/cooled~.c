@@ -43,7 +43,11 @@
 #include <unistd.h>
 #endif
 #ifdef NT
-#define M_PI 3.14159265358979323846
+#include <windows.h>
+int usleep (unsigned int us) {
+  Sleep((long)(us/1000.));
+  return 0;
+}
 #endif
 #include <math.h>
 
@@ -1363,8 +1367,13 @@ void cooled_tilde_setup(void)
     cooled_widgetbehavior.w_deletefn =     cooled_delete;
     cooled_widgetbehavior.w_visfn =        cooled_vis;
     cooled_widgetbehavior.w_clickfn =      cooled_click;
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(cooled_class, cooled_properties);
+    class_setsavefn(cooled_class, cooled_save);
+#else
     cooled_widgetbehavior.w_propertiesfn = cooled_properties;
     cooled_widgetbehavior.w_savefn =       cooled_save;
+#endif
 
     CLASS_MAINSIGNALIN( cooled_class, t_cooled, x_f );
     class_addmethod(cooled_class, (t_method)cooled_dsp, gensym("dsp"), A_NULL);

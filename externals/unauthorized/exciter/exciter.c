@@ -37,8 +37,6 @@
 #include <math.h>
 #include <ctype.h>
 #include <time.h>
-#include <sys/time.h>
-
 #include <m_pd.h>
 
 #include "m_imp.h"
@@ -48,7 +46,10 @@
 
 #ifdef NT
 #include <io.h>
+#include <winsock2.h>
+#include <sys/timeb.h>
 #else
+#include <sys/time.h>
 #include <unistd.h>
 #endif
 
@@ -687,16 +688,27 @@ static t_int *exciter_perform(t_int *w)
     t_int ei, gi;
     t_int gstart, gend;
     t_exciter* x = (t_exciter*)(w[1]);
+#ifdef NT
+    time_t et;
+    struct _timeb tv;
+#else
     struct timeval tv;
     struct timezone tz;
+#endif
     long long looptime = 0L; 
     double preltime = x->x_reltime;
 
     if ( x->x_started )
     {
        // get current time in ms
-       gettimeofday( &tv, &tz );
-       looptime = tv.tv_sec*1000 + tv.tv_usec/1000;
+#ifdef NT
+      time( &et );
+      _ftime( &tv );
+      looptime = et*1000 + tv.millitm;
+#else
+      gettimeofday( &tv, &tz );
+      looptime = tv.tv_sec*1000 + tv.tv_usec/1000;      
+#endif
        if ( x->x_plooptime == 0L )
        {
           x->x_plooptime = looptime;

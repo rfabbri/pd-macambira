@@ -44,7 +44,12 @@
 #include <unistd.h>
 #endif
 #ifdef NT
-#define M_PI 3.14159265358979323846
+#define random rand
+#include <windows.h>
+static int usleep (unsigned int us) {
+  Sleep((long)(us/1000.));
+  return 0;
+}
 #endif
 #include <math.h>
 

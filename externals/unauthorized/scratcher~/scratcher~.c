@@ -48,7 +48,8 @@
 #include <unistd.h>
 #endif
 #ifdef NT
-#define M_PI 3.14159265358979323846
+#include <winsock2.h>
+#include <sys/timeb.h>
 #endif
 #include <math.h>
 
@@ -325,8 +326,13 @@ static void scratcher_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 
 static void scratcher_motion(t_scratcher *x, t_floatarg dx, t_floatarg dy)
 {
+#ifdef NT
+    time_t et;
+    struct _timeb tv;
+#else
   struct timeval tv;
   struct timezone tz;
+#endif
 
    // post( "scratcher_motion dx=%f dy=%f", dx, dy );
 
@@ -334,8 +340,14 @@ static void scratcher_motion(t_scratcher *x, t_floatarg dx, t_floatarg dy)
 
    x->x_mousemoved = 1;
    // get current time in ms
+#ifdef NT
+      time( &et );
+      _ftime( &tv );
+      x->x_lastmovetime = et*1000 + tv.millitm;
+#else
    gettimeofday( &tv, &tz );
    x->x_lastmovetime = tv.tv_sec*1000 + tv.tv_usec/1000;
+#endif
    // post( "scratcher~ : move time : %ld", x->x_lastmovetime );
 
    if ( x->x_showspeed )
@@ -477,8 +489,13 @@ static t_int *scratcher_perform(t_int *w)
     t_float *out = (t_float *)(w[2]);
     t_int n = (int)(w[3]);                      /* number of samples */
     t_scratcher *x = (t_scratcher *)(w[4]);
+#ifdef NT
+    time_t et;
+    struct _timeb tv;
+#else
     struct timeval tv;
     struct timezone tz;
+#endif
     long long perftime = 0L;
 
     x->x_readspeed += x->x_speedinc;
@@ -497,8 +514,14 @@ static t_int *scratcher_perform(t_int *w)
     if ( x->x_mousemoved )
     {
        // get current time in ms
-       gettimeofday( &tv, &tz );
-       perftime = tv.tv_sec*1000 + tv.tv_usec/1000;
+#ifdef NT
+      time( &et );
+      _ftime( &tv );
+      perftime = et*1000 + tv.millitm;
+#else
+      gettimeofday( &tv, &tz );
+      perftime = tv.tv_sec*1000 + tv.tv_usec/1000;
+#endif
        if ( perftime - x->x_lastmovetime > SCRATCHER_MOVE_TIMEOUT )
        {
           // post( "scratcher~ : mouse timeout (m=%ld)", perftime );
