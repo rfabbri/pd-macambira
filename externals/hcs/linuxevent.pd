@@ -1,0 +1,14 @@
+#N canvas 454 205 450 300 10;
+#X floatatom 244 176 5 0 0 3 code - -;
+#X floatatom 303 176 5 0 0 3 value - -;
+#X floatatom 185 176 4 0 0 3 type - -;
+#X floatatom 112 176 9 0 0 3 time - -;
+#X msg 176 53 start;
+#X msg 187 91 stop;
+#X obj 126 123 linuxevent /dev/input/event0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 3 0;
+#X connect 6 1 2 0;
+#X connect 6 2 0 0;
+#X connect 6 3 1 0;
