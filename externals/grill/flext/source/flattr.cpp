@@ -33,6 +33,7 @@ flext_base::AttrItem::AttrItem(const t_symbol *t,metharg tp,methfun f,int fl):
 {}
 
 
+/*
 flext_base::AttrDataCont::AttrDataCont() {}
 
 flext_base::AttrDataCont::~AttrDataCont()
@@ -40,6 +41,7 @@ flext_base::AttrDataCont::~AttrDataCont()
 	for(iterator it = begin(); it != end(); ++it)
 		if(it.data()) delete it.data();
 }
+*/
 
 
 //! Add get and set attributes
@@ -101,7 +103,7 @@ void flext_base::AddAttrib(t_classid c,const t_symbol *attr,metharg tp,methfun g
 
 void flext_base::ListAttrib(AtomList &la) const
 {
-	typedef DataMap<int,const t_symbol *> AttrList;
+	typedef TableMap<int,t_symbol,32> AttrList;
 	AttrList list[2];
 
 	int i;
@@ -109,10 +111,10 @@ void flext_base::ListAttrib(AtomList &la) const
         ItemCont *a = i?attrhead:clattrhead;
 		if(a && a->Contained(0)) {
             ItemSet &ai = a->GetInlet();
-            for(ItemSet::iterator as = ai.begin(); as != ai.end(); ++as) {
+            for(ItemSet::iterator as(ai); as; ++as) {
                 for(Item *al = as.data(); al; al = al->nxt) {
 					AttrItem *aa = (AttrItem *)al;
-					list[i][aa->index] = as.key();
+					list[i].insert(aa->index,const_cast<t_symbol *>(as.key()));
                     break;
                 }
 			}
@@ -121,9 +123,8 @@ void flext_base::ListAttrib(AtomList &la) const
 
 	la((int)(list[0].size()+list[1].size()));
 	int ix = 0;
-	AttrList::iterator it;
 	for(i = 0; i <= 1; ++i)
-		for(it = list[i].begin(); it != list[i].end(); ++it) 
+		for(AttrList::iterator it(list[i]); it; ++it) 
 			SetSymbol(la[ix++],it.data());
 }
 
@@ -149,6 +150,7 @@ bool flext_base::InitAttrib(int argc,const t_atom *argv)
 		AttrItem *attr = FindAttrib(tag,false,true);
 		if(attr) {
 			// make an entry (there are none beforehand...)
+/*
 			AttrDataCont::iterator it = attrdata->find(tag);
 			if(it == attrdata->end()) {
 				AttrDataCont::pair pair; 
@@ -163,6 +165,15 @@ bool flext_base::InitAttrib(int argc,const t_atom *argv)
 
 			// pass value to object
 			SetAttrib(tag,attr,a.GetInitValue());
+*/
+			AttrData *a = attrdata->find(tag);
+			if(!a) attrdata->insert(tag,a = new AttrData);
+
+			a->SetInit(true);
+			a->SetInitValue(nxt-cur-1,argv+cur+1);
+
+			// pass value to object
+			SetAttrib(tag,attr,a->GetInitValue());
 		}
 	}
 	return true;
@@ -174,7 +185,7 @@ bool flext_base::ListAttrib() const
         // defined in flsupport.cpp
         extern const t_symbol *sym_attributes;
 
-		AtomList la;
+		AtomListStatic<32> la;
 		ListAttrib(la);
 		ToOutAnything(GetOutAttr(),sym_attributes,la.Count(),la.Atoms());
 		return true;
@@ -257,7 +268,7 @@ bool flext_base::SetAttrib(const t_symbol *tag,AttrItem *a,int argc,const t_atom
 			else ok = false;
 			break;
 		case a_LIST: {
-			AtomList la(argc);
+			AtomListStatic<16> la(argc);
 			for(int i = 0; i < argc; ++i)
 				if(IsSymbol(argv[i])) 
 					GetParamSym(la[i],GetSymbol(argv[i]),thisCanvas());
@@ -344,7 +355,7 @@ bool flext_base::GetAttrib(const t_symbol *s,AtomList &a) const
 //! \param tag symbol "get[attribute]"
 bool flext_base::DumpAttrib(const t_symbol *tag,AttrItem *a) const
 {
-	AtomList la;
+	AtomListStatic<16> la;
 	bool ret = GetAttrib(tag,a,la);
 	if(ret) {
 		ToOutAnything(GetOutAttr(),a->tag,la.Count(),la.Atoms());
@@ -360,7 +371,7 @@ bool flext_base::DumpAttrib(const t_symbol *attr) const
 
 bool flext_base::BangAttrib(const t_symbol *attr,AttrItem *item)
 {
-	AtomList val;
+	AtomListStatic<16> val;
 	AttrItem *item2;
 	if(!item->IsGet()) 
 		item = item->Counterpart();
@@ -384,7 +395,15 @@ bool flext_base::BangAttribAll()
         ItemCont *a = i?attrhead:clattrhead;
 		if(a) {
             ItemSet &ai = a->GetInlet(); // \todo need to check for presence of inlet 0?
+/*
             for(ItemSet::iterator as = ai.begin(); as != ai.end(); ++as) {
+                for(Item *al = as.data(); al; al = al->nxt) {
+					AttrItem *a = (AttrItem *)al;
+	        		if(a->IsGet() && a->BothExist()) BangAttrib(as.key(),a);
+                }
+			}
+*/
+            for(ItemSet::iterator as(ai); as; ++as) {
                 for(Item *al = as.data(); al; al = al->nxt) {
 					AttrItem *a = (AttrItem *)al;
 	        		if(a->IsGet() && a->BothExist()) BangAttrib(as.key(),a);
