@@ -38,6 +38,7 @@ University of California, Berkeley.
 
 
 #include <stdio.h>
+#include <strings.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,7 +62,9 @@ University of California, Berkeley.
 #include <sys/file.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/prctl.h>
+#ifndef MACOSX
+  #include <sys/prctl.h>
+#endif
 
 #include <stdlib.h>
 

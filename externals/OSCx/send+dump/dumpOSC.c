@@ -83,8 +83,10 @@ Technologies, University of California, Berkeley.
 #include <signal.h>
 #include <grp.h>
 #include <sys/file.h>
-#include <sys/prctl.h>
-#include <bits/sigset.h>
+#ifndef MACOSX
+  #include <sys/prctl.h>
+  #include <bits/sigset.h>
+#endif
 
 #ifdef NEED_SCHEDCTL_AND_LOCK
 #include <sys/schedctl.h>
@@ -632,8 +634,9 @@ printf("polldev %d\n", polldevs[j].fd);
 		printf("nfds %d\n", nfds);
 */
 		caught_sigint = 0;
+#ifndef MACOSX
    		sigset(SIGINT, catch_sigint);       /* set sig handler       */
-	
+#endif	
 		while(!caught_sigint)
 		{
 			

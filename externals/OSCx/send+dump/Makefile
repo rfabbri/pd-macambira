@@ -1,7 +1,11 @@
 LIBOSCDIR = ../libOSC
 LIBOSC = ${LIBOSCDIR}/libOSC.a
-CFLAGS=  -O2 -I$(LIBOSCDIR) -Wall
-DEFS= -Dunix
+# for eg. linux
+# DEFS= -Dunix
+# for MAC OSX, should be DARWIN
+DEFS=-Dunix -DMACOSX
+
+CFLAGS=  -O2 -I$(LIBOSCDIR) $(DEFS) -Wall
 
 DUMPOBJS=dumpOSC.o
 
@@ -19,6 +23,7 @@ dumpUDP: dumpUDP.o
 
 ${LIBOSC}:
 	echo "You need to go to " ${LIBOSCDIR} " and do a make."
+	(cd ../libOSC ; make)
 
 clean:
 	rm -f sendOSC dumpOSC *.o
