@@ -1121,8 +1121,9 @@ std::string pool::MakeFilename(const C *fn) const
 {
 #if FLEXT_SYS == FLEXT_SYS_PD
     // / and \ must not be mixed!
-	C *sl = strchr(fn,'/');
-	if(!sl) sl = strchr(fn,'\\');
+    // (char *) type casts for BorlandC++
+	C *sl = strchr((C *)fn,'/');
+	if(!sl) sl = strchr((C *)fn,'\\');
     if(!sl || (sl != fn 
 #if FLEXT_OS == FLEXT_OS_WIN
         && sl[-1] != ':' // look for drive specification with ":/" or ":\\"
