@@ -42,7 +42,7 @@
 
 #define VIDEO_BUFFER_SIZE (1024*1024)
 #define MAX_AUDIO_PACKET_SIZE (64 * 1024)
-#define MIN_AUDIO_SIZE (64*1024)
+#define MIN_AUDIO_SIZE (128*1024)
 
 #define DEFAULT_CHANNELS 1
 #define DEFAULT_WIDTH 320
@@ -52,6 +52,7 @@
 #define MIN_PRIORITY 0
 #define DEFAULT_PRIORITY 1
 #define MAX_PRIORITY 20
+#define NB_NOFRAMES_HIT 10
 
 #define THEORA_NUM_HEADER_PACKETS 3
 
@@ -80,6 +81,8 @@ typedef struct pdp_theorin_struct
     t_outlet *x_outlet_filesize;   // for informing of the file size
 
     pthread_t x_decodechild;       // file decoding thread
+    pthread_mutex_t x_audiolock;   // audio mutex
+    pthread_mutex_t x_videolock;   // video mutex
     t_int x_usethread;             // flag to activate decoding in a thread
     t_int x_autoplay;              // flag to autoplay the file ( default = true )
     t_int x_nextimage;             // flag to play next image in manual mode
@@ -90,9 +93,9 @@ typedef struct pdp_theorin_struct
     t_int x_decoding;       // decoding flag
     t_int x_theorainit;     // flag for indicating that theora is initialized
     t_int x_videoready;     // video ready flag
+    t_int x_noframeshits;   // number of tries without getting a frame  
     t_int x_newpicture;     // new picture flag
     t_int x_newpictureready;// new picture ready flag
-    t_int x_loop;           // looping flag ( default = on )
     t_int x_notpackets;     // number of theora packets decoded
     t_int x_novpackets;     // number of vorbis packets decoded
     t_int x_endoffile;      // end of the file reached
@@ -124,9 +127,10 @@ typedef struct pdp_theorin_struct
 
       /* audio structures */
     t_int x_audio;           // flag to activate the decoding of audio
-    t_float x_audio_inl[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for float audio decoded from ogg */
-    t_float x_audio_inr[4*MAX_AUDIO_PACKET_SIZE]; /* buffer for float audio decoded from ogg */
-    t_int x_audioin_position; // writing position for incoming audio
+    t_float x_audio_inl[4*MAX_AUDIO_PACKET_SIZE]; // left buffer for pd
+    t_float x_audio_inr[4*MAX_AUDIO_PACKET_SIZE]; // right buffer for pd
+    t_int x_audioin_position;// writing position for incoming audio
+    t_float **x_pcm;         // buffer for vorbis decoding
 
 } t_pdp_theorin;
 
@@ -162,14 +166,6 @@ static void pdp_theorin_autoplay(t_pdp_theorin *x, t_floatarg fautoplay )
    }
 }
 
-static void pdp_theorin_loop(t_pdp_theorin *x, t_floatarg floop )
-{
-   if ( ( floop == 0. ) || ( floop == 1. ) )
-   {
-      x->x_loop = (int)floop;
-   }
-}
-
 static void pdp_theorin_bang(t_pdp_theorin *x)
 {
    if ( x->x_nextimage == 1 )
@@ -201,40 +197,39 @@ static t_int pdp_theorin_queue_page(t_pdp_theorin *x)
 static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
 {
   int ret, count, maxsamples, samples, si=0, sj=0;
-  float **pcm;
   struct timespec mwait;
   struct timeval ctime;
   long long tplaying;
   long long ttheoretical;
   unsigned char *pY, *pU, *pV; 
   unsigned char *psY, *psU, *psV; 
+  t_float **lpcm;
   t_int px, py;
 
    // post( "pdp_theorin~ : decode packet" );
 
    if ( !x->x_reading ) return -1;
 
-   while ( x->x_novpackets && !x->x_audioon )
+   while ( x->x_novpackets )
    {
      /* if there's pending, decoded audio, grab it */
-     if((ret=vorbis_synthesis_pcmout(&x->x_dsp_state, &pcm))>0)
+     x->x_pcm = NULL;
+     if((ret=vorbis_synthesis_pcmout(&x->x_dsp_state, &x->x_pcm))>0)
      {
        if (x->x_audio) 
        {
+         if ( pthread_mutex_lock( &x->x_audiolock ) < 0 )
+         {
+           post( "pdp_theorin~ : unable to lock audio mutex" ); 
+           perror( "pthread_mutex_lock" );
+         }  
          maxsamples=(3*MAX_AUDIO_PACKET_SIZE-x->x_audioin_position);
          samples=(ret<maxsamples)?ret:maxsamples;
 
-         if ( x->x_audioin_position + samples*x->x_audiochannels < 3*MAX_AUDIO_PACKET_SIZE )
-         {        
-           memcpy( (void*)&x->x_audio_inl[x->x_audioin_position], pcm[0], samples*sizeof(t_float) );
-           memcpy( (void*)&x->x_audio_inr[x->x_audioin_position], pcm[1], samples*sizeof(t_float) );
-           x->x_audioin_position = ( x->x_audioin_position + samples ) % (4*MAX_AUDIO_PACKET_SIZE);
-         }
-         else
-         {
-           post( "pdp_theorin~ : audio overflow : packet ignored...");
-           x->x_audioin_position = 0;
-         }
+         memcpy( (void*)&x->x_audio_inl[x->x_audioin_position], x->x_pcm[0], samples*sizeof(t_float) );
+         memcpy( (void*)&x->x_audio_inr[x->x_audioin_position], x->x_pcm[1], samples*sizeof(t_float) );
+         x->x_audioin_position = ( x->x_audioin_position + samples ) % (3*MAX_AUDIO_PACKET_SIZE);
+
          if ( ( x->x_audioin_position > MIN_AUDIO_SIZE ) && (!x->x_audioon) )
          {
            x->x_audioon = 1;
@@ -243,6 +238,15 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
          // tell vorbis how many samples were read
          // post( "pdp_theorin~ : got %d audio samples (audioin=%d)", samples, x->x_audioin_position );
          vorbis_synthesis_read(&x->x_dsp_state, samples);
+         if((ret=vorbis_synthesis_lapout(&x->x_dsp_state, &x->x_pcm))>0)
+         {
+         //   post( "pdp_theorin~ : supplemental samples (nb=%d)", ret );
+         }
+         if ( pthread_mutex_unlock( &x->x_audiolock ) < 0 )
+         {
+           post( "pdp_theorin~ : unable to audio unlock mutex" ); 
+           perror( "pthread_mutex_unlock" );
+         }  
        }
        else
        {
@@ -276,27 +280,15 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
          theora_decode_packetin(&x->x_theora_state, &x->x_ogg_packet);
          // post( "pdp_theorin~ : got one video frame" );
          x->x_videoready=1;
+         x->x_noframeshits=0;  
        }
        else
        {
          // post( "pdp_theorin~ : no more video frame (frames=%d)", x->x_nbframes );
-         if ( x->x_nbframes > 0 ) 
+         x->x_noframeshits++;  
+         if ( x->x_nbframes > 0 && ( x->x_noframeshits > NB_NOFRAMES_HIT ) ) 
          {
-           if ( !x->x_loop )
-           {
              x->x_endoffile = 1;
-           }
-           else
-           {
-             // restart a new loop
-             if ( gettimeofday(&x->x_starttime, NULL) == -1)
-             {
-               post("pdp_theorin~ : could not set start time" );
-             }
-           } 
-           x->x_nbframes = 0;
-           x->x_audioin_position = 0; // reset audio
-           x->x_audioon = 0; 
          }
          break;
        }
@@ -304,6 +296,11 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
 
      if ( x->x_videoready )
      {
+       if ( pthread_mutex_lock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_theorin~ : unable to lock video mutex" ); 
+         perror( "pthread_mutex_lock" );
+       }  
        theora_decode_YUVout(&x->x_theora_state, &x->x_yuvbuffer); 
 
        // create a new pdp packet from PIX_FMT_YUV420P image format
@@ -350,6 +347,11 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
        {
          x->x_newpictureready = 1;
        }
+       if ( pthread_mutex_unlock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_theorin~ : unable to unlock video mutex" ); 
+         perror( "pthread_mutex_unlock" );
+       }  
      }
    }
 
@@ -363,7 +365,7 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
      tplaying = ( ctime.tv_sec-x->x_starttime.tv_sec )*1000 + 
                 ( ctime.tv_usec-x->x_starttime.tv_usec )/1000;
      ttheoretical = ((x->x_nbframes)*1000 )/x->x_framerate;
-     // post( "pdp-theorin~ : %d playing since : %lldms ( theory : %lldms )", 
+     // post( "pdp_theorin~ : %d playing since : %lldms ( theory : %lldms )", 
      //        x->x_nbframes, tplaying, ttheoretical );
 
      if ( ttheoretical <= tplaying ) 
@@ -372,19 +374,6 @@ static t_int pdp_theorin_decode_packet(t_pdp_theorin *x)
        x->x_newpictureready = 0;
      }
 
-   }
-
-   // check end of file
-   if(!x->x_videoready && feof(x->x_infile)) 
-   {
-     if ( x->x_loop )
-     {
-        if ( fseek( x->x_infile, 0x0, SEEK_SET ) < 0 )
-        {
-          post( "pdp_theorin~ : could not reset file." );
-          perror( "fseek" );
-        } 
-     }
    }
 
    // read more data in
@@ -412,7 +401,7 @@ static void *pdp_decode_file(void *tdata)
   struct timespec twait;
 
     twait.tv_sec = 0; 
-    twait.tv_nsec = 5000000; // 5 ms
+    twait.tv_nsec = 10000000; // 10 ms
  
     schedprio.sched_priority = sched_get_priority_min(SCHED_FIFO) + x->x_priority;
     if ( sched_setscheduler(0, SCHED_FIFO, &schedprio) == -1)
@@ -449,7 +438,7 @@ static void pdp_theorin_close(t_pdp_theorin *x)
  struct timespec twait;
 
    twait.tv_sec = 0; 
-   twait.tv_nsec = 10000000; // 10 ms
+   twait.tv_nsec = 100000000; // 100 ms
 
    if ( x->x_infile == NULL )
    {
@@ -460,8 +449,9 @@ static void pdp_theorin_close(t_pdp_theorin *x)
    if ( x->x_reading )
    {
      x->x_newpicture = 0;
+     x->x_newpictureready = 0;
      x->x_reading = 0;
-     post("pdp_theorin~ : waiting end of decoding..." );
+     // post("pdp_theorin~ : waiting end of decoding..." );
      while ( x->x_decoding ) nanosleep( &twait, NULL );
 
      if ( fclose( x->x_infile ) < 0 )
@@ -492,7 +482,6 @@ static void pdp_theorin_close(t_pdp_theorin *x)
 
    x->x_notpackets = 0;
    x->x_novpackets = 0;
-   x->x_endoffile = 0;
    x->x_nbframes = 0;
    x->x_decoding = 0;
    x->x_theorainit = 0;
@@ -515,14 +504,15 @@ static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
 
    if ( x->x_infile != NULL )
    {
-     post("pdp_theorin~ : open request but a file is open ... closing" );
+     // post("pdp_theorin~ : open request but a file is open ... closing" );
      pdp_theorin_close(x);
    }
 
    if ( x->x_filename ) free( x->x_filename );
    x->x_filename = (char*) malloc( strlen( s->s_name ) + 1 );
    strcpy( x->x_filename, s->s_name );
-   post( "pdp_theorin~ : opening file : %s", x->x_filename );
+   // post( "pdp_theorin~ : opening file : %s", x->x_filename );
+   x->x_audio = 1;
 
    if ( ( x->x_infile = fopen(x->x_filename,"r") ) == NULL )
    {
@@ -635,17 +625,17 @@ static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
        }
      }
    }
-   post( "pdp_theorin~ : parsed headers ok." );
+   // post( "pdp_theorin~ : parsed headers ok." );
 
    // initialize decoders
    if( x->x_notpackets )
    {
      theora_decode_init(&x->x_theora_state, &x->x_theora_info);
      x->x_framerate = (t_int)x->x_theora_info.fps_numerator/x->x_theora_info.fps_denominator;
-     post("pdp_theorin~ : stream %x is theora %dx%d %d fps video.",
-                          x->x_statet.serialno,
-                          x->x_theora_info.width,x->x_theora_info.height,
-                          x->x_framerate);
+     // post("pdp_theorin~ : stream %x is theora %dx%d %d fps video.",
+     //                      x->x_statet.serialno,
+     //                      x->x_theora_info.width,x->x_theora_info.height,
+     //                      x->x_framerate);
      if(x->x_theora_info.width!=x->x_theora_info.frame_width || 
         x->x_theora_info.height!=x->x_theora_info.frame_height)
      {
@@ -663,10 +653,10 @@ static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
         /* nothing to report */
         break;;
       case OC_CS_ITU_REC_470M:
-        post("pdp_theorin~ : encoder specified ITU Rec 470M (NTSC) color.");
+        // post("pdp_theorin~ : encoder specified ITU Rec 470M (NTSC) color.");
         break;;
       case OC_CS_ITU_REC_470BG:
-        post("pdp_theorin~ : encoder specified ITU Rec 470BG (PAL) color.");
+        // post("pdp_theorin~ : encoder specified ITU Rec 470BG (PAL) color.");
         break;;
       default:
         post("pdp_theorin~ : warning: encoder specified unknown colorspace (%d).", 
@@ -690,9 +680,9 @@ static void pdp_theorin_open(t_pdp_theorin *x, t_symbol *s)
      vorbis_block_init(&x->x_dsp_state, &x->x_vorbis_block); 
      x->x_audiochannels = x->x_vorbis_info.channels;
      x->x_samplerate = x->x_vorbis_info.rate;
-     post("pdp_theorin~ : ogg logical stream %x is vorbis %d channel %d Hz audio.",
-                          x->x_statev.serialno,
-                          x->x_audiochannels, x->x_samplerate);
+     // post("pdp_theorin~ : ogg logical stream %x is vorbis %d channel %d Hz audio.",
+     //                      x->x_statev.serialno,
+     //                      x->x_audiochannels, x->x_samplerate);
    }
    else
    {
@@ -788,8 +778,13 @@ static t_int *pdp_theorin_perform(t_int *w)
     x->x_blocksize = n;
 
     // just read the buffer
-    if ( x->x_audioon )
+    if ( x->x_audioon && x->x_reading )
     {
+      if ( pthread_mutex_lock( &x->x_audiolock ) < 0 )
+      {
+        post( "pdp_theorin~ : unable to lock audio mutex" ); 
+        perror( "pthread_mutex_lock" );
+      }  
       sn=0;
       while (n--) 
       {
@@ -816,6 +811,11 @@ static t_int *pdp_theorin_perform(t_int *w)
          // post( "pdp_theorin~ : audio off ( audioin : %d, channels=%d )", 
          //       x->x_audioin_position, x->x_audiochannels );
       }
+      if ( pthread_mutex_unlock( &x->x_audiolock ) < 0 )
+      {
+        post( "pdp_theorin~ : unable to unlock audio mutex" ); 
+        perror( "pthread_mutex_unlock" );
+      }  
     }
     else
     {
@@ -826,6 +826,8 @@ static t_int *pdp_theorin_perform(t_int *w)
         *(out2++) = 0.0;
       }
     }	
+
+    if ( !x->x_reading ) return (w+5);
 
     // check if the framerate has been exceeded
     if ( gettimeofday(&etime, NULL) == -1)
@@ -842,19 +844,28 @@ static t_int *pdp_theorin_perform(t_int *w)
     // output image if there's a new one decoded
     if ( x->x_newpicture )
     {
+       if ( pthread_mutex_lock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_theorin~ : unable to lock video mutex" ); 
+         perror( "pthread_mutex_lock" );
+       }  
        pdp_packet_pass_if_valid(x->x_pdp_out, &x->x_packet0);
        x->x_newpicture = 0;
 
        // update streaming status
        x->x_nbframes++;
        x->x_secondcount++;
+       // post( "pdp_theorin~ : frame #%d", x->x_nbframes ); 
        outlet_float( x->x_outlet_nbframes, x->x_nbframes );
-
+       if ( pthread_mutex_unlock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_theorin~ : unable to unlock video mutex" ); 
+         perror( "pthread_mutex_unlock" );
+       }  
     }
     if ( x->x_endoffile == 1 ) // only once
     {
       outlet_float( x->x_outlet_endoffile, x->x_endoffile );
-      x->x_endoffile = 0;
     }
     if ( x->x_endoffile == -1 ) // reset
     {
@@ -883,8 +894,19 @@ static void pdp_theorin_free(t_pdp_theorin *x)
     {
        pdp_theorin_close(x);
     }
+    
+    if ( pthread_mutex_destroy( &x->x_audiolock ) < 0 )
+    {
+      post( "pdp_theorin~ : unable to destroy audio mutex" );
+      perror( "pthread_mutex_destroy" );
+    }
+    if ( pthread_mutex_destroy( &x->x_videolock ) < 0 )
+    {
+      post( "pdp_theorin~ : unable to destroy video mutex" );
+      perror( "pthread_mutex_destroy" );
+    }
 
-    post( "pdp_theorin~ : freeing object" );
+    // post( "pdp_theorin~ : freeing object" );
 }
 
 t_class *pdp_theorin_class;
@@ -909,6 +931,18 @@ void *pdp_theorin_new(void)
 
     x->x_packet0 = -1;
     x->x_decodechild = 0;
+    if ( pthread_mutex_init( &x->x_audiolock, NULL ) < 0 )
+    {
+       post( "pdp_theorin~ : unable to initialize audio mutex" );
+       perror( "pthread_mutex_init" );
+       return NULL;
+    }
+    if ( pthread_mutex_init( &x->x_videolock, NULL ) < 0 )
+    {
+       post( "pdp_theorin~ : unable to initialize video mutex" );
+       perror( "pthread_mutex_init" );
+       return NULL;
+    }
     x->x_decoding = 0;
     x->x_theorainit = 0;
     x->x_usethread = 1;
@@ -927,7 +961,6 @@ void *pdp_theorin_new(void)
     x->x_novpackets = 0;
     x->x_blocksize = MIN_AUDIO_SIZE;
     x->x_autoplay = 1;
-    x->x_loop = 1;
     x->x_nextimage = 0;
     x->x_infile = NULL;
     x->x_reading = 0;
@@ -957,7 +990,6 @@ void pdp_theorin_tilde_setup(void)
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_priority, gensym("priority"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_audio, gensym("audio"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_autoplay, gensym("autoplay"), A_FLOAT, A_NULL);
-    class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_loop, gensym("loop"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_threadify, gensym("thread"), A_FLOAT, A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_bang, gensym("bang"), A_NULL);
     class_addmethod(pdp_theorin_class, (t_method)pdp_theorin_frame_cold, gensym("frame_cold"), A_FLOAT, A_NULL);

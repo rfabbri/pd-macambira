@@ -1,4 +1,18 @@
+0.12.18 ( codename Benisensi )
+  added pdp_icedthe~  : a threaded theora stream reader ( from flumotion or icecast )
+  added pdp_theonice~ : a theora a/v streamer ( to flumotion or icecast )
+        the icecast server can be found here : http://mediacast1.com/~karl/
+  added pdp_mapper : a pixel mapper ( copying regions and single pixels )
+
+  modified pdp_theorin~ : removed loop option ( was crashing ), added mutexes
+  modified pdp_live~ : added mutexes
+  modified pdp_ascii : added T. de la O. charmaps  
+
+  fixed pdp_ffmpeg~ : fixed framerate control
+  fixed pdp_binary : fixed wrong diff calculation
+
 0.12.17 ( codename No pasa nada )
+  fixed pdp_shape : a unitializded cursor caused some crashes
   added pdp_theorout~ : theora file recorder
   fixed pdp_theorin~ : fixed buggy end of file detection
   fixed pdp_theorin~ : now, it's able to read files without sound

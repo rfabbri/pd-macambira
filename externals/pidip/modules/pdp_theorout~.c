@@ -166,8 +166,8 @@ static void pdp_theorout_init_encoder(t_pdp_theorout *x)
     x->x_theora_info.offset_y=(x->x_tvheight-x->x_vheight)>>1;
     x->x_theora_info.fps_numerator=x->x_framerate;
     x->x_theora_info.fps_denominator=1;
-    x->x_theora_info.aspect_numerator=x->x_vwidth;
-    x->x_theora_info.aspect_denominator=x->x_vheight;
+    x->x_theora_info.aspect_numerator=1;
+    x->x_theora_info.aspect_denominator=1;
     x->x_theora_info.colorspace=OC_CS_UNSPECIFIED;
     x->x_theora_info.target_bitrate=x->x_vkbps;
     x->x_theora_info.quality=x->x_vquality;
@@ -181,8 +181,10 @@ static void pdp_theorout_init_encoder(t_pdp_theorout *x)
     x->x_theora_info.keyframe_auto_threshold=80;
     x->x_theora_info.keyframe_mindistance=8;
     x->x_theora_info.noise_sensitivity=1; 
+    x->x_theora_info.sharpness=2; 
 
     theora_encode_init(&x->x_theora_state,&x->x_theora_info);
+    theora_info_clear (&x->x_theora_info);
 
     vorbis_info_init(&x->x_vorbis_info);
 
@@ -203,6 +205,7 @@ static void pdp_theorout_init_encoder(t_pdp_theorout *x)
     }
 
     vorbis_comment_init(&x->x_vorbis_comment);
+    vorbis_comment_add_tag (&x->x_vorbis_comment, "ENCODER", "pdp_theorout~");
     vorbis_analysis_init(&x->x_dsp_state,&x->x_vorbis_info);
     vorbis_block_init(&x->x_dsp_state,&x->x_vorbis_block);
     
@@ -249,6 +252,7 @@ static void pdp_theorout_write_headers(t_pdp_theorout *x)
     }
 
     theora_comment_init(&x->x_theora_comment);
+    theora_comment_add_tag (&x->x_theora_comment, "ENCODER", "pdp_theorout~");
     theora_encode_comment(&x->x_theora_comment, &x->x_ogg_packet);
     ogg_stream_packetin(&x->x_statet, &x->x_ogg_packet);
     theora_encode_tables(&x->x_theora_state, &x->x_ogg_packet);
@@ -532,6 +536,10 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
   ogg_page  vpage;
   t_float   **vbuffer;
   double    videotime, audiotime;
+  theora_info    lti;
+  theora_comment ltc;
+  ogg_packet logp, logp2;
+
 
     if ( ( (int)(header->info.image.width) != x->x_vwidth ) || 
          ( (int)(header->info.image.height) != x->x_vheight ) || 
@@ -607,17 +615,28 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
       else
       {
          // stream one packet
-         theora_encode_packetout(&x->x_theora_state, 0, &x->x_ogg_packet);
-         ogg_stream_packetin(&x->x_statet, &x->x_ogg_packet);
+         theora_encode_packetout(&x->x_theora_state, 0, &logp);
+         ogg_stream_packetin(&x->x_statet, &logp);
          // post( "pdp_theorout~ : new (theora) ogg packet : bytes:%ld, bos:%ld, eos:%ld, no:%lld",
-         //                        x->x_ogg_packet.bytes, x->x_ogg_packet.b_o_s, 
-         //                        x->x_ogg_packet.e_o_s, x->x_ogg_packet.packetno );
+         //                        logp.bytes, logp.b_o_s, 
+         //                        logp.e_o_s, logp.packetno );
+
 
          while( ( ret = ogg_stream_pageout(&x->x_statet, &vpage) ) >0 )
          {
            videotime = theora_granule_time(&x->x_theora_state, ogg_page_granulepos(&vpage));
-           x->x_vbytesout+=fwrite(vpage.header, 1, vpage.header_len, x->x_tfile );
-           x->x_vbytesout+=fwrite(vpage.body, 1, vpage.body_len, x->x_tfile );
+           if ( ( ret = fwrite(vpage.header, 1, vpage.header_len, x->x_tfile) ) <= 0 )
+           {
+             post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+             perror( "fwrite" );
+           }
+           x->x_vbytesout+=ret;
+           if ( ( ret = fwrite(vpage.body, 1, vpage.body_len, x->x_tfile) ) <= 0 )
+           {
+             post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+             perror( "fwrite" );
+           }
+           x->x_vbytesout+=ret;
          }
       }
 
@@ -655,9 +674,9 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
         vorbis_bitrate_addblock( &x->x_vorbis_block );
 
         // weld packets into the bitstream 
-        while(vorbis_bitrate_flushpacket( &x->x_dsp_state, &x->x_ogg_packet))
+        while(vorbis_bitrate_flushpacket( &x->x_dsp_state, &logp2))
         {
-          ogg_stream_packetin( &x->x_statev, &x->x_ogg_packet);
+          ogg_stream_packetin( &x->x_statev, &logp2);
         }
 
       }
@@ -665,8 +684,18 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
       while( ogg_stream_pageout( &x->x_statev, &apage) >0 )
       {
         audiotime = vorbis_granule_time(&x->x_dsp_state, ogg_page_granulepos(&apage));
-        x->x_abytesout+=fwrite(apage.header, 1, apage.header_len, x->x_tfile );
-        x->x_abytesout+=fwrite(apage.body, 1, apage.body_len, x->x_tfile );
+        if ( ( ret = fwrite(apage.header, 1, apage.header_len, x->x_tfile) ) <= 0 )
+        {
+          post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+          perror( "fwrite" );
+        }
+        x->x_abytesout+=ret;
+        if ( ( ret = fwrite(apage.body, 1, apage.body_len, x->x_tfile) ) <= 0 )
+        {
+          post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+          perror( "fwrite" );
+        }
+        x->x_abytesout+=ret;
       }
 
       memcpy( &x->x_audio_buf[0][0], &x->x_audio_buf[0][nbrecorded], 
@@ -693,14 +722,24 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
       else
       {
          // stream one packet
-         theora_encode_packetout(&x->x_theora_state, 1, &x->x_ogg_packet);
-         ogg_stream_packetin( &x->x_statet, &x->x_ogg_packet);
+         theora_encode_packetout(&x->x_theora_state, 1, &logp);
+         ogg_stream_packetin( &x->x_statet, &logp);
 
          while( ( ret = ogg_stream_pageout( &x->x_statet, &vpage) ) > 0 )
          {
            videotime = theora_granule_time(&x->x_theora_state, ogg_page_granulepos(&vpage));
-           x->x_vbytesout+=fwrite(vpage.header, 1, vpage.header_len, x->x_tfile );
-           x->x_vbytesout+=fwrite(vpage.body, 1, vpage.body_len, x->x_tfile );
+           if ( ( ret = fwrite(vpage.header, 1, vpage.header_len, x->x_tfile) ) <= 0 )
+           {
+             post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+             perror( "fwrite" );
+           }
+           x->x_vbytesout+=ret;
+           if ( ( ret = fwrite(vpage.body, 1, vpage.body_len, x->x_tfile) ) <= 0 )
+           {
+             post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+             perror( "fwrite" );
+           }
+           x->x_vbytesout+=ret;
          }
       }
 
@@ -714,17 +753,27 @@ static void pdp_theorout_process_yv12(t_pdp_theorout *x)
         vorbis_bitrate_addblock( &x->x_vorbis_block);
 
         // weld packets into the bitstream 
-        while(vorbis_bitrate_flushpacket( &x->x_dsp_state, &x->x_ogg_packet))
+        while(vorbis_bitrate_flushpacket( &x->x_dsp_state, &logp2))
         {
-          ogg_stream_packetin( &x->x_statev, &x->x_ogg_packet);
+          ogg_stream_packetin( &x->x_statev, &logp2);
         }
       }
 
       while( ogg_stream_pageout( &x->x_statev, &apage) >0 )
       {
         audiotime = vorbis_granule_time(&x->x_dsp_state, ogg_page_granulepos(&apage));
-        x->x_abytesout+=fwrite(apage.header, 1, apage.header_len, x->x_tfile );
-        x->x_abytesout+=fwrite(apage.body, 1, apage.body_len, x->x_tfile );
+        if ( ( ret = fwrite(apage.header, 1, apage.header_len, x->x_tfile) ) <= 0 )
+        {
+          post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+          perror( "fwrite" );
+        }
+        x->x_abytesout+=ret;
+        if ( ( ret = fwrite(apage.body, 1, apage.body_len, x->x_tfile) ) <= 0 )
+        {
+          post( "pdp_theorout~ : could not write headers (ret=%d).", ret );
+          perror( "fwrite" );
+        }
+        x->x_abytesout+=ret;
       }
 
       post("pdp_theorout~ : stop recording");

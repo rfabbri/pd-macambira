@@ -198,7 +198,7 @@ static void pdp_binary_process_yv12(t_pdp_binary *x)
          diff = 0;
          if ( x->x_colorY >= 0 )
          {
-            diff += abs(y-x->x_colorY );
+            diff = abs(y-x->x_colorY );
          }
          if ( x->x_colorV >= 0 )
          {

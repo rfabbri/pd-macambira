@@ -155,7 +155,7 @@ static void pdp_i_free_ressources(t_pdp_i *x)
 {
    if ( x->x_ddata ) freebytes( x->x_ddata, x->x_psize );
    if ( x->x_hdata ) freebytes( x->x_hdata, x->x_hsize );
-   if ( x->x_bdata ) freebytes( x->x_hdata, x->x_bsize );
+   if ( x->x_bdata ) freebytes( x->x_bdata, x->x_bsize );
 }
 
 static void pdp_i_allocate(t_pdp_i *x)

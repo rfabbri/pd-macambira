@@ -315,6 +315,7 @@ static void pdp_ascii_load(t_pdp_ascii *x, t_symbol *sfile)
     {
       case '0':
       case '1':
+        // post( "pdp_ascii : read %c", charread );
         *pdata++ = ( charread == '0' )?0:1;
         nbexpdata--;
         break;

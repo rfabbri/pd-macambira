@@ -83,6 +83,8 @@ typedef struct pdp_live_struct
 
     pthread_t x_connectchild;      // thread used for connecting to a stream
     pthread_t x_decodechild;       // stream decoding thread
+    pthread_mutex_t x_audiolock;   // audio mutex
+    pthread_mutex_t x_videolock;   // video mutex
     t_int x_usethread;             // flag to activate decoding in a thread
     t_int x_autoplay;              // flag to autoplay the file ( default = true )
     t_int x_nextimage;             // flag to play next image in manual mode
@@ -178,8 +180,8 @@ static void pdp_live_bang(t_pdp_live *x)
 
 static void pdp_live_frame_cold(t_pdp_live *x, t_floatarg frameindex)
 {
-    int frame = (int)frameindex;
-    int ret;
+    t_int frame = (int)frameindex;
+    t_int ret, flags=0;
     uint64_t newpts;
 
     if (!(x->x_streaming)) return;
@@ -196,7 +198,8 @@ static void pdp_live_frame_cold(t_pdp_live *x, t_floatarg frameindex)
         post( "pdp_live~ : couldn't seek requested frame ( framerate = %d )", x->x_framerate );
         return;
       }
-      if ( ( ret = av_seek_frame(x->x_avcontext, x->x_videoindex, newpts) ) < 0 )
+      if ( frame < x->x_nbframes ) flags = AVSEEK_FLAG_BACKWARD;
+      if ( ( ret = av_seek_frame(x->x_avcontext, x->x_videoindex, newpts, flags) ) < 0 )
       {
         post( "pdp_live~ : couldn't seek the requested frame (ret=%d)", ret );
       }
@@ -242,7 +245,7 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
           if ( ( x->x_avcontext->iformat->flags & AVFMT_NOFILE ) == 0 )
           {
             post( "pdp_live~ : looping file reading..." );
-            if ( ( ret = av_seek_frame(x->x_avcontext, x->x_videoindex, 0) ) < 0 )
+            if ( ( ret = av_seek_frame(x->x_avcontext, x->x_videoindex, 0, 0) ) < 0 )
             {
                post( "pdp_live~ : couldn't seek the requested frame (ret=%d)", ret );
             }
@@ -301,6 +304,12 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                         continue;
                     }
 
+                    if ( pthread_mutex_lock( &x->x_audiolock ) < 0 )
+                    {
+                      post( "pdp_live~ : unable to lock audio mutex" );
+                      perror( "pthread_mutex_lock" );
+                    }
+
                     // resample received audio
                     // post( "pdp_live~ : resampling from %dHz-%dch to %dHz-%dch (in position=%d)",
                     //                x->x_avcontext->streams[x->x_pkt.stream_index]->codec.sample_rate,
@@ -335,6 +344,11 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     {
                        x->x_audioon = 1;
                        // post( "pdp_live~ : audio on" );
+                    }
+                    if ( pthread_mutex_unlock( &x->x_audiolock ) < 0 )
+                    {
+                      post( "pdp_live~ : unable to unlock audio mutex" );
+                      perror( "pthread_mutex_unlock" );
                     }
                     break;
 
@@ -383,6 +397,11 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     }
                     else
                     {  
+                        if ( pthread_mutex_lock( &x->x_videolock ) < 0 )
+                        {
+                          post( "pdp_live~ : unable to lock video mutex" );
+                          perror( "pthread_mutex_lock" );
+                        }
                         x->x_newpicture=1;
                         x->x_vwidth = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width;
                         x->x_vheight = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height;
@@ -429,13 +448,13 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                         {
                           if ( gettimeofday(&ctime, NULL) == -1)
                           {
-                            post("pdp_theorin~ : could not read time" );
+                            post("pdp_live~ : could not read time" );
                           }
 
                           tplaying = ( ctime.tv_sec-x->x_starttime.tv_sec )*1000 +
                                      ( ctime.tv_usec-x->x_starttime.tv_usec )/1000;
                           ttheoretical = ((x->x_nbframes)*1000 )/x->x_framerate;
-                          // post( "pdp-theorin~ : %d playing since : %lldms ( theory : %lldms )",
+                          // post( "pdp_live~ : %d playing since : %lldms ( theory : %lldms )",
                           //              x->x_nbframes, tplaying, ttheoretical );
      
                           if ( tplaying < ttheoretical )
@@ -446,6 +465,11 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                             // wait between the two successive frames
                             if ( x->x_autoplay ) nanosleep( &mwait, NULL );
                           }
+                        }
+                        if ( pthread_mutex_unlock( &x->x_videolock ) < 0 )
+                        {
+                          post( "pdp_live~ : unable to unlock video mutex" );
+                          perror( "pthread_mutex_unlock" );
                         }
                     }
                     break;
@@ -473,7 +497,7 @@ static void *pdp_decode_stream_from_url(void *tdata)
     schedprio.sched_priority = sched_get_priority_min(SCHED_FIFO) + x->x_priority;
     if ( sched_setscheduler(0,SCHED_FIFO,&schedprio) == -1)
     {
-        post("pdp_theorin~ : couldn't set priority for decoding thread.");
+        post("pdp_live~ : couldn't set priority for decoding thread.");
     }
 
     if ( ! (x->x_avcontext->iformat->flags & AVFMT_NOHEADER ) )
@@ -764,6 +788,11 @@ static t_int *pdp_live_perform(t_int *w)
     // just read the buffer
     if ( x->x_audioon )
     {
+      if ( pthread_mutex_lock( &x->x_audiolock ) < 0 )
+      {
+        post( "pdp_live~ : unable to lock audio mutex" );
+        perror( "pthread_mutex_lock" );
+      }
       sn=0;
       while (n--) 
       {
@@ -788,6 +817,11 @@ static t_int *pdp_live_perform(t_int *w)
       {
          x->x_audioon = 0;
          // post( "pdp_live~ : audio off" );
+      }
+      if ( pthread_mutex_unlock( &x->x_audiolock ) < 0 )
+      {
+        post( "pdp_live~ : unable to audio unlock mutex" );
+        perror( "pthread_mutex_unlock" );
       }
     }
     else
@@ -819,6 +853,11 @@ static t_int *pdp_live_perform(t_int *w)
     // output image if there's a new one decoded
     if ( x->x_newpicture )
     {
+       if ( pthread_mutex_lock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_live~ : unable to lock video mutex" );
+         perror( "pthread_mutex_lock" );
+       }
        pdp_packet_pass_if_valid(x->x_pdp_out, &x->x_packet0);
        x->x_newpicture = 0;
 
@@ -826,6 +865,11 @@ static t_int *pdp_live_perform(t_int *w)
        x->x_nbframes++;
        x->x_secondcount++;
        outlet_float( x->x_outlet_nbframes, x->x_nbframes );
+       if ( pthread_mutex_unlock( &x->x_videolock ) < 0 )
+       {
+         post( "pdp_live~ : unable to unlock video mutex" );
+         perror( "pthread_mutex_unlock" );
+       }
     }
     outlet_float( x->x_outlet_streaming, x->x_streaming );
     outlet_float( x->x_outlet_endofstream, x->x_endofstream );
@@ -856,6 +900,17 @@ static void pdp_live_free(t_pdp_live *x)
     post( "pdp_live~ : freeing object" );
     pdp_packet_mark_unused(x->x_packet0);
     av_free_static();
+    
+    if ( pthread_mutex_destroy( &x->x_audiolock ) < 0 )
+    {
+      post( "pdp_live~ : unable to destroy audio mutex" );
+      perror( "pthread_mutex_destroy" );
+    }
+    if ( pthread_mutex_destroy( &x->x_videolock ) < 0 )
+    {
+      post( "pdp_live~ : unable to destroy video mutex" );
+      perror( "pthread_mutex_destroy" );
+    }
 }
 
 t_class *pdp_live_class;
@@ -906,6 +961,19 @@ void *pdp_live_new(void)
     x->x_pts = -1;
     x->x_previouspts = -1;
     x->x_firstpts = -1;
+
+    if ( pthread_mutex_init( &x->x_audiolock, NULL ) < 0 )
+    {
+       post( "pdp_live~ : unable to initialize audio mutex" );
+       perror( "pthread_mutex_init" );
+       return NULL;
+    }
+    if ( pthread_mutex_init( &x->x_videolock, NULL ) < 0 )
+    {
+       post( "pdp_live~ : unable to initialize video mutex" );
+       perror( "pthread_mutex_init" );
+       return NULL;
+    }
 
     x->x_avcontext = av_mallocz(sizeof(AVFormatContext));
     if ( !x->x_avcontext )

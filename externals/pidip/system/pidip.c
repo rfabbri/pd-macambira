@@ -74,6 +74,9 @@ extern "C"
     void pdp_theorout_tilde_setup(void);
     void pdp_cropper_setup(void);
     void pdp_background_setup(void);
+    void pdp_mapper_setup(void);
+    void pdp_theonice_tilde_setup(void);
+    void pdp_icedthe_tilde_setup(void);
 
 #ifdef HAVE_PIDIP_FFMPEG
     void pdp_ffmpeg_tilde_setup(void);
@@ -155,6 +158,9 @@ void pidip_setup(void){
     pdp_theorout_tilde_setup();
     pdp_cropper_setup();
     pdp_background_setup();
+    pdp_mapper_setup();
+    pdp_theonice_tilde_setup();
+    pdp_icedthe_tilde_setup();
 
 #ifdef HAVE_PIDIP_FFMPEG
     pdp_ffmpeg_tilde_setup();

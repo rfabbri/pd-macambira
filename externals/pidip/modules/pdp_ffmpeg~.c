@@ -322,6 +322,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
     t_int   framebytes;
     t_int   owidth, oheight;
     short   *pencbuf;
+    t_int   framerate, atime, ttime;
 
         /* allocate all ressources */
     if ( ((int)header->info.image.width != x->x_vwidth) ||
@@ -391,12 +392,12 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                    x->x_secondcount[ j ] = 0;
                 }
              }
-             if ( x->x_secondcount[ svideoindex ] >= (x->x_avcontext->streams[i]->codec.frame_rate/10000) )
+             framerate = x->x_avcontext->streams[i]->codec.frame_rate/10000;
+             ttime = ( ( x->x_nbframes + 1 ) % framerate ) * ( 1000 / framerate );
+             atime = ( etime.tv_usec / 1000 );
+             // post("pdp_theonice~ : actual : %d, theoretical : %d", atime, ttime );
+             if ( atime < ttime )
              {
-                // post("pdp_ffmpeg : index=%d actual : %d, nominal : %d", 
-                //                    svideoindex,
-                //                    x->x_secondcount[ svideoindex ],
-                //                    (x->x_avcontext->streams[i]->codec.frame_rate/10000) );
                 x->x_nbframes_dropped++;
                 continue;
              }

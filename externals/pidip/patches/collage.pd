@@ -43,7 +43,7 @@
 #X obj 196 20 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 55 85 loop \$1;
-#X obj 56 63 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1
+#X obj 56 63 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 1 1
 ;
 #X msg 100 54 open \$1;
 #X obj 99 30 openpanel;
@@ -70,7 +70,7 @@
 #X obj 157 255 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
 -1 0;
 #X msg 156 274 unhide \$1;
-#X obj 506 434 hradio 15 1 0 5 hide-layer empty empty 0 -6 128 8 -262144
+#X obj 506 434 hradio 15 1 0 5 hide-layer empty empty 0 -6 0 8 -262144
 -1 -1 4;
 #X text 506 416 Select layer;
 #X obj 486 292 r layer-4;
@@ -108,6 +108,7 @@
 #X floatatom 122 360 5 0 0 0 - - -;
 #X obj 75 483 pdp_affine;
 #X floatatom 105 442 5 0 0 0 - - -;
+#X msg 178 427 cursor 1;
 #X connect 0 0 6 1;
 #X connect 1 0 6 2;
 #X connect 2 0 7 0;
@@ -196,3 +197,4 @@
 #X connect 88 0 84 1;
 #X connect 89 0 32 0;
 #X connect 90 0 89 1;
+#X connect 91 0 83 0;
