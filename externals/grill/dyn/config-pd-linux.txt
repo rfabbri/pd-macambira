@@ -1,0 +1,31 @@
+# dyn~ - dynamic object management for PD
+# 
+# Copyright (c)Thomas Grill (xovo@gmx.net)
+# For information on usage and redistribution, and for a DISCLAIMER OF ALL
+# WARRANTIES, see the file, "license.txt," in this distribution.  
+#
+
+# your c++ compiler (define only if not g++)
+# CXX=
+
+# where are the PD header files?
+# leave it blank if it is a system directory (like /usr/local/include), 
+# 	since gcc 3.2 complains about it
+PDPATH=
+
+# where do the flext libraries reside?
+FLEXTPATH=/usr/local/lib/pd/flext
+
+# where should flext libraries be built?
+TARGDIR=./pd-linux
+
+# where should the external be installed?
+# (leave blank to omit installation)
+INSTPATH=/usr/local/lib/pd/extra
+
+
+# additional compiler flags
+# (check if they fit for your system!)
+UFLAGS=-mcpu=pentiumpro  # gcc 2.95
+# UFLAGS=-mcpu=pentium3 -msse  # gcc 3.2
+

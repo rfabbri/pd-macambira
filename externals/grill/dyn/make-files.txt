@@ -1,0 +1,6 @@
+# all the source files from the package
+DIR=src
+
+SRCS= main.cpp
+HDRS= 
+
