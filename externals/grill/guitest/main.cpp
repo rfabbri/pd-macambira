@@ -37,13 +37,13 @@ public:
 protected:
 
 	virtual void g_Create();
-	virtual void g_Edit(bool selected);
+//	virtual void g_Edit(bool selected);
 
 	static bool g_Motion(flext_gui &g,GuiSingle &obj,const CBParams &p);
 	static bool g_MouseKey(flext_gui &g,GuiSingle &obj,const CBParams &p);
 	static bool g_Key(flext_gui &g,GuiSingle &obj,const CBParams &p);
 
-	virtual void g_Properties();
+//	virtual void g_Properties();
 	virtual void g_Save(t_binbuf *b);
 
 private:
@@ -52,14 +52,27 @@ private:
 
 FLEXT_NEW_V("guitest",guitest)
 
+guitest::guitest(I argc,t_atom *argv):
+	flext_gui(400,100)
+{ 
+	AddInAnything();  
+	AddOutInt(2); 
+
+	FLEXT_ADDBANG(0,m_bang);
+}
+
+guitest::~guitest()
+{
+}
+
 
 void guitest::g_Create()
 {
 	GuiSingle *frame = Group().Add_Box(0,0,XSize(),YSize(),-1,0xE0E0E0);
 	frame->Symbol("rect1");
-	GuiSingle *wave = Group().Add_Box(8,10,XSize()-16,YSize()-11,0,0x4040FF);
-	Group().Add_Text(1,1,"Hula",-1);
-
+//	GuiSingle *wave = Group().Add_Box(8,10,XSize()-16,YSize()-11,0,0x4040FF);
+	Group().Add_Text(1,1,"Hula",-1,GuiText::left);
+/*
 	I n = XSize()-16;
 	FPnt *p = new FPnt[n];
 	for(int i = 0; i < n; ++i) {
@@ -74,12 +87,15 @@ void guitest::g_Create()
 	if(!BindEvent(*wave,g_MouseKey,evKeyDown)) post("KeyDown not supported");
 	if(!BindEvent(*wave,g_MouseKey,evKeyUp)) post("KeyUp not supported");
 	if(!BindEvent(*wave,g_MouseKey,evKeyRepeat)) post("KeyRepeat not supported");
+*/
 }
 
+/*
 void guitest::g_Properties()
 {
-    post("properties");
+	post("properties");
 }
+*/
 
 void guitest::g_Save(t_binbuf *b)
 {
@@ -93,6 +109,7 @@ void guitest::g_Save(t_binbuf *b)
 #endif
 }
 
+/*
 void guitest::g_Edit(bool selected)
 {
 	post("select is=%d", selected);
@@ -103,6 +120,7 @@ void guitest::g_Edit(bool selected)
 	else
 		post("obj not found");
 }
+*/
 
 bool guitest::g_Motion(flext_gui &g,GuiSingle &obj,const CBParams &p)
 {
@@ -144,17 +162,5 @@ bool guitest::g_Key(flext_gui &g,GuiSingle &obj,const CBParams &p)
 
 
 
-guitest::guitest(I argc,t_atom *argv):
-	flext_gui(400,100)
-{ 
-	AddInAnything();  
-	AddOutInt(2); 
-
-	FLEXT_ADDBANG(0,m_bang);
-}
-
-guitest::~guitest()
-{
-}
 
 

@@ -64,7 +64,7 @@ protected:
 	virtual void g_Displace(int dx, int dy);
 //	virtual void g_Activate(bool state) {}
 //	virtual int g_Click(int xpix, int ypix, int shift, int alt, int dbl, int doit) { return 0; }
-	virtual void g_Properties() {}
+	virtual void g_Properties();
 	virtual void g_Save(t_binbuf *b) {}
 /*
 	virtual bool g_Motion(GuiObj &obj,int x,int y,int mod) { return false; }

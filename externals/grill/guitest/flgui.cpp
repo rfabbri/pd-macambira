@@ -67,7 +67,7 @@ flext_gui::~flext_gui()
 }
 
 
-void flext_gui::setup(t_class *c)
+void flext_gui::setup(t_classid c)
 {
 #if FLEXT_SYS == FLEXT_SYS_PD
 	SetWidget(c);
@@ -95,6 +95,91 @@ void flext_gui::setup(t_class *c)
 
 	// this is wrong if a modifier key is pressed during creation of the first object.....
 	curmod = 0;
+
+
+
+	sys_gui(
+		"proc flgui_apply {id} {\n"
+			// strip "." from the TK id to make a variable name suffix
+			"set vid [string trimleft $id .]\n"
+
+			// for each variable, make a local variable to hold its name...
+			"set var_graph_width [concat graph_width_$vid]\n"
+			"global $var_graph_width\n"
+			"set var_graph_height [concat graph_height_$vid]\n"
+			"global $var_graph_height\n"
+			"set var_graph_draw [concat graph_draw_$vid]\n"
+			"global $var_graph_draw\n"
+
+			"set cmd [concat $id dialog [eval concat $$var_graph_width] [eval concat $$var_graph_height] [eval concat $$var_graph_draw] \\;]\n"
+			// puts stderr $cmd
+			"pd $cmd\n"
+		"}\n"
+
+		"proc flgui_cancel {id} {\n"
+			"set cmd [concat $id cancel \\;]\n"
+			// puts stderr $cmd
+			"pd $cmd\n"
+		"}\n"
+
+		"proc flgui_ok {id} {\n"
+			"flgui_apply $id\n"
+			"flgui_cancel $id\n"
+		"}\n"
+
+		"proc pdtk_flgui_dialog {id width height draw} {\n"
+				"set vid [string trimleft $id .]\n"
+
+				"set var_graph_width [concat graph_width_$vid]\n"
+				"global $var_graph_width\n"
+				"set var_graph_height [concat graph_height_$vid]\n"
+				"global $var_graph_height\n"
+				"set var_graph_draw [concat graph_draw_$vid]\n"
+				"global $var_graph_draw\n"
+
+				"set $var_graph_width $width\n"
+				"set $var_graph_height $height\n"
+				"set $var_graph_draw $draw\n"
+
+				"toplevel $id\n"
+				"wm title $id {flext}\n"
+				"wm protocol $id WM_DELETE_WINDOW [concat flgui_cancel $id]\n"
+
+				"label $id.label -text {Attributes}\n"
+				"pack $id.label -side top\n"
+
+				"frame $id.buttonframe\n"
+				"pack $id.buttonframe -side bottom -fill x -pady 2m\n"
+
+				"button $id.buttonframe.cancel -text {Cancel} -command \"flgui_cancel $id\"\n"
+				"button $id.buttonframe.apply -text {Apply} -command \"flgui_apply $id\"\n"
+				"button $id.buttonframe.ok -text {OK} -command \"flgui_ok $id\"\n"
+
+				"pack $id.buttonframe.cancel -side left -expand 1\n"
+				"pack $id.buttonframe.apply -side left -expand 1\n"
+				"pack $id.buttonframe.ok -side left -expand 1\n"
+
+				"frame $id.1rangef\n"
+				"pack $id.1rangef -side top\n"
+				"label $id.1rangef.lwidth -text \"Width :\"\n"
+				"entry $id.1rangef.width -textvariable $var_graph_width -width 7\n"
+				"pack $id.1rangef.lwidth $id.1rangef.width -side left\n"
+
+				"frame $id.2rangef\n"
+				"pack $id.2rangef -side top\n"
+				"label $id.2rangef.lheight -text \"Height :\"\n"
+				"entry $id.2rangef.height -textvariable $var_graph_height -width 7\n"
+				"pack $id.2rangef.lheight $id.2rangef.height -side left\n"
+
+				"checkbutton $id.draw -text {Draw Sample} -variable $var_graph_draw -anchor w\n"
+				"pack $id.draw -side top\n"
+
+				"bind $id.1rangef.width <KeyPress-Return> [concat flgui_ok $id]\n"
+				"bind $id.2rangef.height <KeyPress-Return> [concat flgui_ok $id]\n"
+				"focus $id.1rangef.width\n"
+		"}\n"
+	);
+
 #else
 	addmess((method)sg_update, "update", A_CANT, A_NULL);
 	addmess((method)sg_click, "click", A_CANT, A_NULL);
@@ -260,6 +345,13 @@ void flext_gui::pxkey_method(pxkey_object *obj,const t_symbol *s,int argc,t_atom
 	}
 	else
 		post("flext_gui key proxy - unknown method");
+}
+
+void flext_gui::g_Properties()
+{
+   char buf[800];
+   sprintf(buf, "pdtk_flgui_dialog %%s %d %d %d\n",0, 0, 0);
+   gfxstub_new((t_pd *)thisHdr(), thisHdr(), buf);
 }
 
 
