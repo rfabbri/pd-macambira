@@ -28,6 +28,7 @@ protected:
 	virtual V m_dsp(I n,S *const *in,S *const *out);
 	virtual V m_signal(I n,S *const *in,S *const *out);
 
+	I blsz;
     BL _invert;
     I _inCount;
     I *_bitshuffle;
@@ -45,8 +46,8 @@ protected:
     F *_trigland;
 
 private:
-	V Reset();
 	V Clear();
+	V Delete();
 	
 	V ms_thresh(F v) { _threshold = (float) (pow( 10., ((_thresh_dB = v) * .05))); }
 	V ms_mult(F v) { _multiplier = (float) (pow( 10., ((_mult_dB = v) * .05))); }
@@ -74,7 +75,8 @@ V burrow::setup(t_classid c)
 
 burrow::burrow(I argc,const t_atom *argv):
 	_thresh_dB(-30),_mult_dB(-18),
-	_invert(false)
+	_invert(false),
+	blsz(0)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {
@@ -93,24 +95,25 @@ burrow::burrow(I argc,const t_atom *argv):
 		if(CanbeBool(argv[2]))
 			_invert = GetABool(argv[2]);
 		else
-			post("%s - Invert flags must be a boolean value - set to %i",thisName(),_invert?1:0);
+			post("%s - Invert flag must be a boolean value - set to %i",thisName(),_invert?1:0);
 	}
 
 	ms_thresh(_thresh_dB);
 	ms_mult(_mult_dB);
 
-	Reset();
+	Clear();
 
-	AddInSignal(2);
-	AddOutSignal();
+	AddInSignal("Commands and original signal");
+	AddInSignal("Modulating signal");
+	AddOutSignal("Transformed signal");
 }
 
 burrow::~burrow()
 {
-	Clear();
+	Delete();
 }
 
-V burrow::Reset()
+V burrow::Clear()
 {
 	_bitshuffle = NULL;
 	_trigland = NULL;
@@ -122,7 +125,7 @@ V burrow::Reset()
 	_output = NULL;
 }
 
-V burrow::Clear() 
+V burrow::Delete() 
 {
 	if(_bitshuffle) delete[] _bitshuffle;
 	if(_trigland) delete[] _trigland;
@@ -142,31 +145,35 @@ V burrow::Clear()
 
 V burrow::m_dsp(I n,S *const *in,S *const *out)
 {
-	Clear();
-
-	/* preset the objects data */
 	const I _D = Blocksize();
-	const I _N = _D* 4,_Nw = _N,_N2 = _N / 2,_Nw2 = _Nw / 2; 
+	if(_D != blsz) {
+		blsz = _D;
 
-	_inCount = -_Nw;
+		Delete();
 
-	/* assign memory to the buffers */
-	_bitshuffle = new I[_N*2];
-	_trigland = new F[_N*2];
-	_inputOne = new F[_Nw];
-	_inputTwo = new F[_Nw];
-	_Hwin = new F[_Nw];
-	_Wanal = new F[_Nw];
-	_Wsyn = new F[_Nw];
-	_bufferOne = new F[_N];
-	_bufferTwo = new F[_N];
-	_channelOne = new F[_N+2];
-	_channelTwo = new F[_N+2];
-	_output = new F[_Nw];
+		/* preset the objects data */
+		const I _N = _D*4,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
-	/* initialize pv-lib functions */
-	init_rdft( _N, _bitshuffle, _trigland);
-	makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
+		_inCount = -_Nw;
+
+		/* assign memory to the buffers */
+		_bitshuffle = new I[_N*2];
+		_trigland = new F[_N*2];
+		_inputOne = new F[_Nw];
+		_inputTwo = new F[_Nw];
+		_Hwin = new F[_Nw];
+		_Wanal = new F[_Nw];
+		_Wsyn = new F[_Nw];
+		_bufferOne = new F[_N];
+		_bufferTwo = new F[_N];
+		_channelOne = new F[_N+2];
+		_channelTwo = new F[_N+2];
+		_output = new F[_Nw];
+
+		/* initialize pv-lib functions */
+		init_rdft( _N, _bitshuffle, _trigland);
+		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
+	}
 }
 
 V burrow::m_signal(I n,S *const *in,S *const *out)
@@ -175,9 +182,8 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 	S *outOne = out[0];
 
 	/* declare working variables */
-	I i, j, even, odd; 
-	const I _D = Blocksize();
-	const I _N = _D* 4,_Nw = _N,_N2 = _N / 2,_Nw2 = _Nw / 2; 
+	I i, j; 
+	const I _D = blsz,_N = _D*4,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
 	_inCount += _D;
@@ -202,9 +208,8 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 
 	/* convert to polar coordinates from complex values */
 	for ( i = 0; i <= _N2; i++ ) {
+		const I even = i<<1,odd = even+1;
 		register F a,b;
-
-		odd = ( even = i<<1 ) + 1;
 
 		a = ( i == _N2 ? _bufferOne[1] : _bufferOne[even] );
 		b = ( i == 0 || i == _N2 ? 0. : _bufferOne[odd] );
@@ -224,12 +229,12 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 
 	/* convert back to complex form, read for the inverse fft */
 	for ( i = 0; i <= _N2; i++ ) {
-		odd = ( even = i<<1 ) + 1;
+		const I even = i<<1,odd = even+1;
 
-		*(_bufferOne+even) = *(_channelOne+even) * cos( *(_channelOne+odd) );
+		_bufferOne[even] = _channelOne[even] * cos( _channelOne[odd] );
 
 		if ( i != _N2 )
-			*(_bufferOne+odd) = -(*(_channelOne+even)) * sin( *(_channelOne+odd) );
+			_bufferOne[odd] = -_channelOne[even] * sin( _channelOne[odd] );
 	}
 
 	/* do an inverse fft */
@@ -247,8 +252,6 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 		_output[j] = _output[j+_D];
 	for (; j < _N; j++ )
 		_output[j] = 0.;
-
-	/* restore state variables */
 }
 
 
