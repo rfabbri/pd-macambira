@@ -1,5 +1,5 @@
-#N canvas 195 68 751 577 12;
-#N canvas 218 20 570 669 examples 0;
+#N canvas 195 68 753 579 12;
+#N canvas 41 57 572 671 examples 0;
 #X floatatom 153 276 5 0 0 0 - - -;
 #X floatatom 110 353 5 0 0 0 - - -;
 #X floatatom 111 576 5 0 0 0 - - -;
@@ -19,11 +19,11 @@
 #X obj 101 117 dyn~ 0 1 0 1;
 #X obj 111 315 dyn~ 0 2 0 1;
 #X obj 111 543 dyn~ 0 3 0 1;
-#X msg 34 34 reset \, newobj a f \, conn 0 a 0 \, conn a 0 0;
-#X msg 42 234 reset \, newobj a + \, conn 0 a 0 \, conn 1 a 1 \, conn
-a 0 0;
-#X msg 35 443 reset \, newobj a * 2 \, newobj b + 1 \, conn 0 a 0 \,
-conn 1 a 1 \, conn a 0 b 0 \, conn 2 b 1 \, conn b 0 0;
+#X msg 36 34 reset \, newobj . a f \, conn 0 a 0 \, conn a 0 0;
+#X msg 42 234 reset \, newobj . a + \, conn 0 a 0 \, conn 1 a 1 \,
+conn a 0 0;
+#X msg 35 443 reset \, newobj . a * 2 \, newobj . b + 1 \, conn 0 a
+0 \, conn 1 a 1 \, conn a 0 b 0 \, conn 2 b 1 \, conn b 0 0;
 #X connect 0 0 3 0;
 #X connect 0 0 17 1;
 #X connect 3 0 4 0;
@@ -66,7 +66,7 @@ conn 1 a 1 \, conn a 0 b 0 \, conn 2 b 1 \, conn b 0 0;
 #X obj 54 468 dyn~ 0 1 0 2;
 #X text 156 467 dyn sig/msg inlets sig/msg outlets;
 #X msg 165 421 vis \$1;
-#X obj 129 421 tgl 20 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 129 421 tgl 20 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X text 222 417 make patch visible/invisible;
 #X msg 129 323 dis x 2 y 3;
@@ -74,33 +74,42 @@ conn 1 a 1 \, conn a 0 b 0 \, conn 2 b 1 \, conn b 0 0;
 #X text 187 98 reload all objects (keep connections);
 #X msg 127 98 reload;
 #X text 218 432 (connections are not drawn at the moment!);
-#N canvas 178 192 571 385 dsp-ex 0;
-#X obj 77 345 dac~;
-#X obj 143 281 hsl 128 15 0 1000 0 1 empty empty empty -2 -6 0 8 -261681
--1 -1 6000 1;
-#X obj 155 306 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -262144 -1 -1 472.441 256;
-#X msg 66 101 reset;
+#N canvas 178 192 570 426 dsp-ex 0;
+#X obj 73 380 dac~;
+#X obj 144 258 hsl 128 15 0 1000 0 0 empty empty empty -2 -6 0 8 -261681
+-1 -1 2800 1;
+#X obj 155 283 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 220.472 256;
+#X msg 66 78 reset;
 #X obj 482 19 loadbang;
 #X msg 481 43 \; pd dsp 1;
-#X text 65 79 clear all;
-#X obj 47 301 dyn~ 0 1 2 0;
-#X text 70 130 make an oscillator (left);
-#X text 66 190 add an oscillator (double frq \, right);
+#X text 65 56 clear all;
+#X obj 47 278 dyn~ 0 1 2 0;
+#X text 70 107 make an oscillator (left);
+#X text 66 167 add an oscillator (double frq \, right);
 #X text 24 17 signals passing through dyn~ are delayed by one block
 ;
-#X text 67 261 select frequency;
-#X msg 64 152 newobj o1 osc~ \, conn 0 o1 0 \, conn o1 0 0;
-#X msg 67 210 newobj m * 2 \, newobj o2 osc~ \, conn 0 m 0 \, conn
-m 0 o2 0 \, conn o2 0 1;
+#X text 74 239 select frequency;
+#X obj 57 341 *~ 0.2;
+#X obj 112 341 *~ 0.2;
+#X obj 140 314 hsl 128 15 0.001 1 1 0 empty empty empty -2 -6 0 8 -262131
+-1 -1 9100 1;
+#X text 277 310 gain;
+#X msg 64 129 newobj . o1 osc~ 220 \, conn 0 o1 0 \, conn o1 0 0;
+#X msg 67 187 newobj . m * 1.5 \, newobj . o2 osc~ 330 \, conn 0 m
+0 \, conn m 0 o2 0 \, conn o2 0 1;
 #X connect 1 0 2 0;
 #X connect 1 0 7 1;
 #X connect 3 0 7 0;
 #X connect 4 0 5 0;
-#X connect 7 0 0 0;
-#X connect 7 1 0 1;
-#X connect 12 0 7 0;
-#X connect 13 0 7 0;
+#X connect 7 0 12 0;
+#X connect 7 1 13 0;
+#X connect 12 0 0 0;
+#X connect 13 0 0 1;
+#X connect 14 0 12 1;
+#X connect 14 0 13 1;
+#X connect 16 0 7 0;
+#X connect 17 0 7 0;
 #X restore 514 487 pd dsp-ex;
 #X msg 129 156 newmsg . b Hello;
 #X msg 128 124 newobj . a + 1;

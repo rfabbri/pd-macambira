@@ -41,7 +41,8 @@ BUGS:
 CHANGES:
 --------
 
-0.0.3:
+0.1.0:
+- first release: PD 0.37 supports all necessary functionality
 - cleaner message-based object creation
 - also messages and comments can be created now
 - handle sub-canvases
@@ -63,5 +64,4 @@ CHANGES:
 
 TODO:
 --------
-- support message boxes (do we need them?)
 - Hash table for object tags

@@ -17,7 +17,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.2
 #endif
 
-#define DYN_VERSION "0.0.4"
+#define DYN_VERSION "0.1.0"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
