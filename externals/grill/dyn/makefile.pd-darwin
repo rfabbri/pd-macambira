@@ -1,12 +1,5 @@
-# dyn~ - dynamic object management for PD
+# Makefile for gcc @ darwin
 # 
-# Copyright (c)Thomas Grill (xovo@gmx.net)
-# For information on usage and redistribution, and for a DISCLAIMER OF ALL
-# WARRANTIES, see the file, "license.txt," in this distribution.  
-#
-#
-# Makefile for gcc @ darwin (OSX)
-#
 # usage:
 # to build run "make -f makefile.pd-darwin"
 # to install (as root), do "make -f makefile.pd-darwin install"
@@ -14,73 +7,70 @@
 
 CONFIG=config-pd-darwin.txt
 
-include $(CONFIG)
+include ${CONFIG}
 
-# compiler+linker stuff	
-INCLUDES=$(PDPATH) 
-LIBPATH=
-FLAGS=-DFLEXT_SYS=2 
-CFLAGS=-O2 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
-LIBS=m
-FRAMEWORKS=vecLib
-LDFLAGS+=-Wl,-x -Wl,-S -bundle -bundle_loader $(PD)
+# compiler+linker stuff 
+INCLUDES=${PDPATH}
+FLAGS=${UFLAGS}
 
-ifdef FLEXT_SHARED
-CFLAGS+=-DFLEXT_SHARED
-LDFLAGS+=-L$(FLEXTPATH)
-FLEXTLIB=-lflext
+# compiler flags for optimized build
+CFLAGS=-O2
 
-else
+# compiler flags for debug build
+CFLAGS_D=-g
 
-FLEXTLIB=$(FLEXTPATH)/libflext.a
+# flags for shared linking
+LSHFLAGS= -dylib -dynamic -flat_namespace -undefined suppress
 
-endif
+# frameworks
+#FRAMEWORKS=Carbon veclib
 
 
-# ---------------------------------------------
+# ----------------------------------------------
 # the rest can stay untouched
 # ----------------------------------------------
 
 # all the source files from the package
 include make-files.txt
 
-TARGET=$(TARGDIR)/$(NAME).pd_darwin
+MAKEFILE=makefile.pd-darwin
 
-# default target
-all: $(TARGDIR) $(TARGET)
+TARGET=$(TARGDIR)/lib$(NAME).dylib
+TARGET_D=$(TARGDIR)/lib$(NAME)_d.dylib
+HDRS=$(PHDRS) $(IHDRS)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(CONFIG)
-	touch $@
+
+all: $(TARGDIR) $(TARGET) $(TARGET_D)
 
 $(TARGDIR):
 	mkdir $(TARGDIR)
 
-$(TARGDIR)/%.o : $(DIR)/%.cpp
-	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+$(patsubst %,$(SRCDIR)/%,$(SRCS)): $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(patsubst %,$(SRCDIR)/%,$(IHDRS)) $(MAKEFILE) $(CONFIG)
+	touch $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) $(patsubst %,-framework %,$(FRAMEWORKS)) $(FLEXTLIB) -o $@ 
-	chmod 755 $@
+$(TARGDIR)/%.o : $(SRCDIR)/%.cpp
+	$(CXX) -c -dynamic $(CFLAGS) $(CFLAGS_T)  $(CFLAGS_S) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(SRCDIR)) $(patsubst %,-F%,$(FRAMEWORKS)) $< -o $@
 
-$(INSTPATH):
-	mkdir $(INSTPATH)
+$(TARGDIR)/%.do : $(SRCDIR)/%.cpp 
+	$(CXX) -c -dynamic $(CFLAGS_D) $(CFLAGS_T)  $(CFLAGS_S) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(SRCDIR)) $(patsubst %,-F%,$(FRAMEWORKS)) $< -o $@
 
-install:: $(INSTPATH)
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))
+	ld $(LSHFLAGS) -o $@ $^ -ldylib1.o -lgcc -lstdc++ $(patsubst %,-framework %,$(FRAMEWORKS)) 
 
-install:: $(TARGET)
-	cp $^ $(INSTPATH)
-#	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-#	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+$(TARGET_D) : $(patsubst %.cpp,$(TARGDIR)/%.do,$(SRCS))
+	ld $(LSHFLAGS) -o $@ $^ -ldylib1.o -lgcc -lstdc++ $(patsubst %,-framework %,$(FRAMEWORKS)) 
 
-.PHONY: clean
+.PHONY: clean install
+
 clean:
-	rm -f $(TARGDIR)/*.o $(TARGET)
+	rm -f $(TARGDIR)/*.{o,do} $(TARGET) $(TARGET_D)
 	
+ifdef PREFIX
 
+install:: $(PREFIX)
+endif
 
-
-
-
-
-
+install:: $(TARGET) $(TARGET_D)
+#	cp $(patsubst %,$(SRCDIR)/%,$(PHDRS)) $(PREFIX)/include
+	cp $(TARGDIR)/lib*.dylib $(PREFIX)/lib
 

@@ -3,19 +3,16 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="dyn"
-	SccProjectName="dyn"
-	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Jalindi Igloo">
+	ProjectGUID="{0176D72E-797E-4221-BB4A-0A37BB0860AC}">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory=".\pd-msvc/d"
-			IntermediateDirectory=".\pd-msvc/d"
+			Name="PD Debug|Win32"
+			OutputDirectory=".\Debug"
+			IntermediateDirectory=".\Debug"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -23,32 +20,29 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PD"
+				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;DYN_EXPORTS;NT;PD"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\pd-msvc/d/dyn.pch"
-				AssemblerListingLocation=".\pd-msvc/d/"
-				ObjectFile=".\pd-msvc/d/"
-				ProgramDataBaseFileName=".\pd-msvc/d/"
-				BrowseInformation="1"
+				PrecompiledHeaderFile=".\Debug/dyn.pch"
+				AssemblerListingLocation=".\Debug/"
+				ObjectFile=".\Debug/"
+				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
-				CompileAs="0"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_d-pdwin.lib pthreadVC.lib"
-				OutputFile="$(outdir)/dyn~.dll"
+				OutputFile="../../debug/dyn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd/bin,..\flext\pd-msvc"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\pd-msvc/d/dyn~.pdb"
-				ImportLibrary=".\pd-msvc/d/dyn~.lib"
+				ProgramDatabaseFile=".\Debug/dyn.pdb"
+				ImportLibrary=".\Debug/dyn.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -56,7 +50,7 @@
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\pd-msvc/d/dyn.tlb"
+				TypeLibraryName=".\Debug/dyn.tlb"
 				HeaderFileName=""/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -80,9 +74,9 @@
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\pd-msvc/r"
-			IntermediateDirectory=".\pd-msvc/r"
+			Name="PD Release|Win32"
+			OutputDirectory=".\Release"
+			IntermediateDirectory=".\Release"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -91,97 +85,30 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PD"
-				StringPooling="TRUE"
-				RuntimeLibrary="4"
-				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile=".\pd-msvc/r/dyn.pch"
-				AssemblerListingLocation=".\pd-msvc/r/"
-				ObjectFile=".\pd-msvc/r/"
-				ProgramDataBaseFileName=".\pd-msvc/r/"
-				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
-				CompileAs="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext-pdwin.lib pthreadVC.lib"
-				OutputFile="pd-msvc/dyn~.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\programme\audio\pd/bin,..\flext\pd-msvc"
-				ProgramDatabaseFile=".\pd-msvc/r/dyn~.pdb"
-				ImportLibrary=".\pd-msvc/r/dyn~.lib"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\pd-msvc/r/dyn.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="3079"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="PD Shared Release|Win32"
-			OutputDirectory="./pd-msvc/sr"
-			IntermediateDirectory="./pd-msvc/sr"
-			ConfigurationType="2"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="3"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="2"
-				FavorSizeOrSpeed="2"
-				OmitFramePointers="TRUE"
-				OptimizeForProcessor="3"
-				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\max\flext\source;f:\prog\packs\pthreads"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_SHARED"
+				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;DYN_EXPORTS,PD,NT"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
-				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderFile="$(outdir)/dyn.pch"
+				PrecompiledHeaderFile=".\Release/dyn.pch"
+				AssemblerListingLocation=".\Release/"
+				ObjectFile=".\Release/"
+				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib pthreadVC.lib"
-				OutputFile="$(outdir)/dyn~.dll"
+				AdditionalDependencies="pd.lib"
+				OutputFile="../../Release/dyn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs/bin,..\flext\pd-msvc,f:\prog\packs\pthreads"
-				ProgramDatabaseFile="$(outdir)/dyn~.pdb"
-				ImportLibrary="$(outdir)/dyn~.lib"
+				AdditionalLibraryDirectories="../..\api\lib"
+				ProgramDatabaseFile=".\Release/dyn.pdb"
+				ImportLibrary="..\..\api\lib\dyn.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -189,10 +116,14 @@
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\pd-msvc/r/dyn.tlb"
+				TypeLibraryName=".\Release/dyn.tlb"
 				HeaderFileName=""/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				Description="copy API"
+				CommandLine="
+copy dyn.h ..\..\api\include
+"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -217,42 +148,66 @@
 	</References>
 	<Files>
 		<Filter
-			Name="doc"
+			Name="objects"
 			Filter="">
 			<File
-				RelativePath="make-files.txt">
+				RelativePath=".\dyn_base.cpp">
 			</File>
 			<File
-				RelativePath="readme.txt">
+				RelativePath=".\dyn_conn.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_message.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_object.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_patchable.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_patcher.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_text.cpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="io"
+			Filter="">
+			<File
+				RelativePath=".\dyn_create.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_listen.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_proxy.cpp">
+			</File>
+			<File
+				RelativePath=".\dyn_proxy.h">
+			</File>
+			<File
+				RelativePath=".\dyn_send.cpp">
 			</File>
 		</Filter>
 		<File
-			RelativePath="src\main.cpp">
-			<FileConfiguration
-				Name="Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;PD;$(NoInherit)"
-					BasicRuntimeChecks="3"
-					BrowseInformation="1"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;PD;$(NoInherit)"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="PD Shared Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""/>
-			</FileConfiguration>
+			RelativePath="dyn.h">
+		</File>
+		<File
+			RelativePath=".\dyn_api.cpp">
+		</File>
+		<File
+			RelativePath=".\dyn_data.h">
+		</File>
+		<File
+			RelativePath=".\dyn_main.cpp">
+		</File>
+		<File
+			RelativePath=".\dyn_pd.h">
+		</File>
+		<File
+			RelativePath=".\dyn_proto.h">
 		</File>
 	</Files>
 	<Globals>

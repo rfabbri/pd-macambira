@@ -1,35 +1,17 @@
-# dyn~ - dynamic object management for PD
-# 
-# Copyright (c)Thomas Grill (xovo@gmx.net)
-# For information on usage and redistribution, and for a DISCLAIMER OF ALL
-# WARRANTIES, see the file, "license.txt," in this distribution.  
-#
 
-# your c++ compiler (define only if not g++)
-# CXX=gcc-3.3
+# your c++ compiler (define only if it's different than g++)
+# CXX=g++-3.3
 
-# where are the PD header files?
-# leave it blank if it is a system directory (like /usr/local/include), 
-# 	since gcc 3.2 complains about it
-PDPATH=../../../pd/src
-
-# where is the PD executable?
-PD=/usr/local/bin/pd
-
-# where do the flext libraries reside?
-FLEXTPATH=/usr/local/lib/pd/flext
+# where are the PD header files? (m_pd.h, m_imp.h, g_canvas.h)
+PDPATH=/Volumes/Daten/Prog/pd-0.37-4/src
 
 # where should flext libraries be built?
 TARGDIR=./pd-darwin
 
-# where should dyn be installed?
+# where should the dyn library and header be installed?
 # (leave blank to omit installation)
-INSTPATH=/usr/local/lib/pd/extra
+PREFIX=/usr/local
 
 # additional compiler flags
 # (check if they fit for your system!)
 UFLAGS=-malign-power -maltivec -faltivec
-
-# build with a shared flext library
-FLEXT_SHARED=1
-
