@@ -18,10 +18,10 @@ CXXFLAGS  = @CXXFLAGS@ \
 	$(DEFS) \
 	-DFLEXT_SHARED
 
-LDFLAGS = @LDFLAGS@ \
+LDFLAGS = @DYNAMIC_LDFLAGS@ @LDFLAGS@ \
 	$(patsubst %,-framework %,$(FRAMEWORKS))
 
-LIBS = @LIBS@ -lflext
+LIBS = @LIBS@ -lflext-pd
 
 FRAMEWORKS = @FRAMEWORKS@
 
