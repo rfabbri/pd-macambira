@@ -1,51 +1,41 @@
+/* (C) Guenter Geiger <geiger@epy.co.at> */
 
-/*
-rawmouse - an external object for Miller Puckette's Pure Data
 
-This object gets the raw data from the mouse for use in Pd
-It is based on J. Sarlo's joystick
-
-Copyright (C) 2003 Hans-Christoph Steiner <hans@eds.org>
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  
-
-*/
-
-#include "m_pd.h"
+#include <m_imp.h>
+#ifdef NT
+#pragma warning( disable : 4244 )
+#pragma warning( disable : 4305 )
+#endif
 
 #include <linux/input.h>
 
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+
+#include <string.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+#include <termios.h>
+
+#define DEBUG(x)
+/*#define DEBUG(x) x */
+
 
 #define RAWMOUSE_DEVICE   "/dev/input/event0"
 
 // scaling factor for output
-#define RAWMOUSE_SCALE         1
+#define DEF_SCALE         1
 // delay/refresh time in milliseconds
-#define RAWMOUSE_DELAYTIME       5
+#define DEF_DELTIME       5
 
-/* total supported number of axes and buttons */
 #define RAWMOUSE_AXES     3
 #define RAWMOUSE_BUTTONS  7
+#define MAX_AXIS_OUTS     5
 
 /* from <linux/input.h>
- * supported buttons
+// button types
 #define BTN_LEFT		0x110
 #define BTN_RIGHT		0x111
 #define BTN_MIDDLE		0x112
@@ -54,11 +44,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define BTN_FORWARD		0x115
 #define BTN_BACK		0x116
 
- * supported axes
+// axes
 #define REL_X			0x00
 #define REL_Y			0x01
 #define REL_WHEEL		0x08
 */
+
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
@@ -122,259 +113,294 @@ NULL, NULL, leds, sounds, NULL, repeats, NULL, NULL, NULL };
 /*------------------------------------------------------------------------------
  */
 
-
-/*
- * The event structure itself from <linux/input.h>
- * only here as a reference
-
-struct input_event {
-	struct timeval time;
-	unsigned short type;
-	unsigned short code;
-	unsigned int value;
-};
-*/
-
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
+static t_class *rawmouse_class;
 
 typedef struct _rawmouse {
-  t_object t_ob;
-  struct input_event x_mouse_event; 
-  int x_mouse_fd;
-  float x_scale;
-  float x_translation;
-  t_outlet *x_axis_out[RAWMOUSE_AXES];
-  t_outlet *x_button_num_out;
-  t_outlet *x_button_val_out;
-  t_clock *x_clock;
-  double x_delaytime;
-  unsigned char x_mouse_buttons;
-  unsigned char x_mouse_axes;
+  t_object            x_obj;
+  t_int               x_fd;
+  t_symbol*           x_devname;
+  int                 read_ok;
+  int                 started;
+  struct input_event  x_input_event; 
+  float               x_scale;
+  float               x_translation;
+  t_outlet            *x_axis_out[RAWMOUSE_AXES];
+  t_outlet            *x_button_num_out;
+  t_outlet            *x_button_val_out;
+  t_clock             *x_clock;
+  double              x_delaytime;
+  unsigned char       x_buttons;
+  unsigned char       x_axes;
 }t_rawmouse;
-
-t_class *rawmouse_class;
-
- 
-/*------------------------------------------------------------------------------
- * INTERFACE                   
- */
-
-void *rawmouse_new(t_float delaytime, t_float scale, t_float translation); 
-void rawmouse_setup(void);
-void rawmouse_read(t_rawmouse *x);
-void rawmouse_change_delaytime(t_rawmouse *x, t_float delaytime);
-void rawmouse_free(t_rawmouse *x);
-
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
-void *rawmouse_new(t_float delaytime, t_float scale, t_float translation)
-{  
-    int i,eventtype, eventcode, num_axes;   
-    unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
-    char devicename[256] = "Unknown";
-	
-     
-    t_rawmouse *x = (t_rawmouse *)pd_new(rawmouse_class);
+//DONE
+static int rawmouse_close(t_rawmouse *x)
+{
+    DEBUG(post("rawmouse_close");)
 
-    /* open the rawmouse device read-only, non-exclusive */
-    x->x_mouse_fd = open (RAWMOUSE_DEVICE, O_RDONLY | O_NONBLOCK);
+     if (x->x_fd <0) return 0;
 
-    /* read input_events from the RAWMOUSE_DEVICE stream 
-     * It seems that is just there to prime the event input
-     */
-    while (read (x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event)) > -1)
-      post("prime the stream test %d", x->x_mouse_event);
-    
-    /* if delaytime is set in the object's creation arguments
-     * use that value, otherwise use the default  */
-    if (delaytime == 0)
-      x->x_delaytime = RAWMOUSE_DELAYTIME;
-    else
-      x->x_delaytime = (int)delaytime;
+     close (x->x_fd);
 
-    /* if scale is set in the object's creation arguments
-     * use that value, otherwise use the default */
-    if (scale == 0)
-      x->x_scale = RAWMOUSE_SCALE;
-    else
-      x->x_scale = scale;
-    
-    /* get translation from object arguments */
-    x->x_translation = translation;
-
-    /* from evtest.c in the ff-utils distro
-     * get the number of supported axes and buttons
-     * EVIOCGBIT (EV_KEY) for buttons
-     * EVIOCGBIT (EV_REL) for axes
-     */
-
-    /* get name of device */
-    ioctl(x->x_mouse_fd, EVIOCGNAME(sizeof(devicename)), devicename);
-    post ("configuring %s",devicename);
-
-    /* get bitmask representing supported events (axes, buttons, etc.) */
-    memset(bitmask, 0, sizeof(bitmask));
-    ioctl(x->x_mouse_fd, EVIOCGBIT(0, EV_MAX), bitmask[0]);
-    post("Supported events:");
-    
-    x->x_mouse_axes = 0;
-    x->x_mouse_buttons = 0;
-    
-    /* cycle through all possible event types */
-    for (eventtype = 0; eventtype < EV_MAX; eventtype++) {
-      if (test_bit(eventtype, bitmask[0])) {
-	post(" %s (type %d) ", events[eventtype] ? events[eventtype] : "?", eventtype);
-	//	post("Event type %d",eventtype);
-
-	/* get bitmask representing supported button types */
-	ioctl(x->x_mouse_fd, EVIOCGBIT(eventtype, KEY_MAX), bitmask[eventtype]);
-
-	/* cycle through all possible event codes (axes, keys, etc.) 
-	 * testing to see which are supported  
-	 */
-	for (eventcode = 0; eventcode < KEY_MAX; eventcode++) 
-	  if (test_bit(eventcode, bitmask[eventtype])) {
-	    post("    Event code %d (%s)", eventcode, names[eventtype] ? (names[eventtype][eventcode] ? names[eventtype][eventcode] : "?") : "?");
-
-	    if ( eventtype == EV_KEY ) 
-		x->x_mouse_buttons++;
-	    else if  ( eventtype == EV_REL ) 
-	      x->x_mouse_axes++;
-	  }
-      }        
-    }
-    
-    /* create outlets for each axis */
-    for (i = 0; i < RAWMOUSE_AXES; i++)
-      x->x_axis_out[i] = outlet_new(&x->t_ob, &s_float);
-
-    /* create outlets for buttons */
-    x->x_button_num_out = outlet_new(&x->t_ob, &s_float);
-    x->x_button_val_out = outlet_new(&x->t_ob, &s_float);
-
-    /* get pd clock */
-    x->x_clock = clock_new (x, (t_method)rawmouse_read);
-
-    /* set refresh time */
-    clock_delay (x->x_clock, x->x_delaytime);
-
-    post ("\nUsing %d axes and %d buttons.", x->x_mouse_axes, x->x_mouse_buttons);
-
-    return (void *)x;
+     return 1;
 }
+
+//DONE
+static int rawmouse_open(t_rawmouse *x,t_symbol* s)
+{
+  int eventType, eventCode;
+  unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
+  char devicename[256] = "Unknown";
+  DEBUG(post("rawmouse_open");)
+
+  rawmouse_close(x);
+
+  /* set obj device name to parameter */  
+  if (s != &s_)
+    x->x_devname = s;
+  
+  /* open device */
+  if (x->x_devname) {
+    post("opening ...");
+    /* open the rawmouse device read-only, non-exclusive */
+    x->x_fd = open (x->x_devname->s_name, O_RDONLY | O_NONBLOCK);
+    if (x->x_fd >= 0 ) post("done");
+    else post("failed");
+  }
+  else {
+    return 1;
+  }
+  
+  /* test if device open */
+  if (x->x_fd >= 0)
+    post("%s opened",x->x_devname->s_name);
+  else {
+    post("unable to open %s",x->x_devname->s_name);
+    x->x_fd = -1;
+    return 0;
+  }
+  
+  /* read input_events from the RAWMOUSE_DEVICE stream 
+   * It seems that is just there to flush the event input buffer?
+   */
+  while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1);
+  
+  /* get name of device */
+  ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
+  post ("configuring %s",devicename);
+
+  /* get bitmask representing supported events (axes, buttons, etc.) */
+  memset(bitmask, 0, sizeof(bitmask));
+  ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), bitmask[0]);
+  post("Supported events:");
+    
+  x->x_axes = 0;
+  x->x_buttons = 0;
+    
+  /* cycle through all possible event types */
+  for (eventType = 0; eventType < EV_MAX; eventType++) {
+    if (test_bit(eventType, bitmask[0])) {
+      post(" %s (type %d) ", events[eventType] ? events[eventType] : "?", eventType);
+      //	post("Event type %d",eventType);
+
+      /* get bitmask representing supported button types */
+      ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
+
+      /* cycle through all possible event codes (axes, keys, etc.) 
+       * testing to see which are supported  
+       */
+      for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
+	if (test_bit(eventCode, bitmask[eventType])) {
+	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
+
+	  if ( eventType == EV_KEY ) 
+	    x->x_buttons++;
+	  else if  ( eventType == EV_REL ) 
+	    x->x_axes++;
+	}
+    }        
+  }
+    
+  post ("\nUsing %d axes and %d buttons.", x->x_axes, x->x_buttons);
+    
+  return 1;
+}
+
+
+
+static int rawmouse_read(t_rawmouse *x,int fd)
+{
+  int readBytes;
+  int axis_num = 0;
+  t_float button_num = 0;
+    
+  if (x->x_fd < 0) return 0;
+  if (x->read_ok) {
+    readBytes = read(x->x_fd, &(x->x_input_event), sizeof(struct input_event));
+    DEBUG(post("reading %d",readBytes);)
+    if ( readBytes < 0 ) {
+      post("rawmouse: read failed");
+      x->read_ok = 0;
+      return 0;
+    }
+  }
+  if ( x->x_input_event.type == EV_KEY ) {
+    /* key/button event type */
+    switch ( x->x_input_event.code ) {
+    case BTN_LEFT:
+      button_num = 0;
+      break;
+    case BTN_RIGHT:
+      button_num = 1;
+      break;
+    case BTN_MIDDLE:
+      button_num = 2;
+      break;
+    case BTN_SIDE:
+      button_num = 3;
+      break;
+    case BTN_EXTRA:
+      button_num = 4;
+      break;
+    case BTN_FORWARD:
+      button_num = 5;
+      break;
+    case BTN_BACK:
+      button_num = 6;
+      break;
+    }
+    outlet_float (x->x_button_val_out, x->x_input_event.value);
+    outlet_float (x->x_button_num_out, button_num);
+  }
+  else if  ( x->x_input_event.type == EV_REL ) {
+    /* Relative Axes Event Type */
+    switch ( x->x_input_event.code ) {
+    case REL_X:
+      axis_num = 0;
+      break;
+    case REL_Y:
+      axis_num = 1;
+      break;
+    case REL_WHEEL:
+      axis_num = 2;
+      break;
+    }
+    outlet_float (x->x_axis_out[axis_num], x->x_input_event.value);	
+  }
+
+  return 1;    
+}
+
+
+
+/* Actions */
+
+static void rawmouse_bang(t_rawmouse* x)
+{
+    DEBUG(post("rawmouse_bang");)
+   
+}
+
+static void rawmouse_float(t_rawmouse* x)
+{
+    DEBUG(post("rawmouse_float");)
+   
+}
+
+// DONE
+void rawmouse_start(t_rawmouse* x)
+{
+  DEBUG(post("rawmouse_start");)
+
+    if (x->x_fd >= 0 && !x->started) {
+       sys_addpollfn(x->x_fd, (t_fdpollfn)rawmouse_read, x);
+       post("rawmouse: start");
+       x->started = 1;
+    }
+}
+
+
+// DONE
+void rawmouse_stop(t_rawmouse* x)
+{
+  DEBUG(post("rawmouse_stop");)
+
+    if (x->x_fd >= 0 && x->started) { 
+        sys_rmpollfn(x->x_fd);
+        post("rawmouse: stop");
+        x->started = 0;
+    }
+}
+
+/* Misc setup functions */
+
+
+static void rawmouse_free(t_rawmouse* x)
+{
+  DEBUG(post("rawmouse_free");)
+    
+    if (x->x_fd < 0) return;
+  
+  rawmouse_stop(x);
+  
+  close (x->x_fd);
+}
+
+static void *rawmouse_new(t_symbol *s)
+{
+  int i;
+  t_rawmouse *x = (t_rawmouse *)pd_new(rawmouse_class);
+
+  DEBUG(post("rawmouse_new");)
+  
+  /* init vars */
+  x->x_fd = -1;
+  x->read_ok = 1;
+  x->started = 0;
+  
+  /* create outlets for each axis */
+  for (i = 0; i < RAWMOUSE_AXES; i++) 
+    x->x_axis_out[i] = outlet_new(&x->x_obj, &s_float);
+  
+  /* create outlets for buttons */
+  x->x_button_num_out = outlet_new(&x->x_obj, &s_float);
+  x->x_button_val_out = outlet_new(&x->x_obj, &s_float);
+  
+  if (s != &s_)
+    x->x_devname = s;
+  
+  /* Open the device and save settings */
+  
+  if (!rawmouse_open(x,s)) return x;
+  
+  return (x);
+}
+
 
 void rawmouse_setup(void)
 {
-  post ("rawmouse object loaded using %s",RAWMOUSE_DEVICE);
-
-  rawmouse_class = class_new(gensym("rawmouse"),
+  DEBUG(post("rawmouse_setup");)
+  rawmouse_class = class_new(gensym("rawmouse"), 
 			     (t_newmethod)rawmouse_new, 
-			     (t_method)rawmouse_free, 
-			     sizeof(t_rawmouse), 
-			     CLASS_DEFAULT, 
-			     A_DEFFLOAT, 
-			     A_DEFFLOAT, 
-			     A_DEFFLOAT, 
-			     0);
+			     (t_method)rawmouse_free,
+			     sizeof(t_rawmouse),0,A_DEFSYM,0);
 
-  class_addfloat(rawmouse_class, rawmouse_change_delaytime);
-}
+  /* add inlet datatype methods */
+  class_addfloat(rawmouse_class,(t_method) rawmouse_float);
+  class_addbang(rawmouse_class,(t_method) rawmouse_bang);
 
-void rawmouse_read(t_rawmouse *x)
-{
-  /* Currently, the mouse button #s are directly taken from the 
-   * sequence in the Linux input event system <linux/input.h>
-   * this might have to change when creating the MacOS X and 
-   * Windows objects in order to keep it consistent across
-   * all platforms.  Let's hope the order is the same on all...
-   */
-  int i;              /* loop counter */
-  int axis_num = 0;
-  t_float button_num = 0;
-  size_t read_bytes;  /* how many bytes were read */
-
-/*   while (1) { */
-/*     read_bytes = read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event) * 64); */
+  /* add inlet message methods */
+  class_addmethod(rawmouse_class, (t_method) rawmouse_open,gensym("open"),A_DEFSYM);
+  class_addmethod(rawmouse_class,(t_method) rawmouse_close,gensym("close"),0);
+  class_addmethod(rawmouse_class,(t_method) rawmouse_start,gensym("start"),0);
+  class_addmethod(rawmouse_class,(t_method) rawmouse_stop,gensym("stop"),0);
   
-/*     if (read_bytes < (int) sizeof(struct input_event)) { */
-/*       post("rawmouse: short read"); */
-/*       break; */
-/*     } */
-
-  post("in rawmouse_read");
-  
-  while ( read(x->x_mouse_fd, &(x->x_mouse_event), sizeof(struct input_event)) > -1 ) {
-
-    post("testing");
-    
-    /*     for (i = 0; i < (int) (read_bytes / sizeof(struct input_event)); i++)  { */
-    post("Event: time %ld.%06ld, type %d, code %d, value %d",
-	 x->x_mouse_event.time.tv_sec, x->x_mouse_event.time.tv_usec, 
-	 x->x_mouse_event.type,x->x_mouse_event.code, x->x_mouse_event.value);
-    
-    if ( x->x_mouse_event.type == EV_KEY ) {
-      /* key/button event type */
-      switch ( x->x_mouse_event.code ) {
-      case BTN_LEFT:
-	button_num = 0;
-	break;
-      case BTN_RIGHT:
-	button_num = 1;
-	break;
-      case BTN_MIDDLE:
-	button_num = 2;
-	break;
-      case BTN_SIDE:
-	button_num = 3;
-	break;
-      case BTN_EXTRA:
-	button_num = 4;
-	break;
-      case BTN_FORWARD:
-	button_num = 5;
-	break;
-      case BTN_BACK:
-	button_num = 6;
-	break;
-      }
-      outlet_float (x->x_button_val_out, x->x_mouse_event.value);
-      outlet_float (x->x_button_num_out, button_num);
-    }
-    else if  ( x->x_mouse_event.type == EV_REL ) {
-      /* Relative Axes Event Type */
-      switch ( x->x_mouse_event.code ) {
-      case REL_X:
-	axis_num = 0;
-	break;
-      case REL_Y:
-	axis_num = 1;
-	break;
-      case REL_WHEEL:
-	axis_num = 2;
-	break;
-      }
-      outlet_float (x->x_axis_out[axis_num], x->x_mouse_event.value);	
-    }
-  }
-  clock_delay (x->x_clock, x->x_delaytime);
 }
 
-void rawmouse_change_delaytime(t_rawmouse *x, t_float delaytime)
-{
-  post("rawmouse_change_delaytime");
-  if (delaytime < 0)
-    delaytime = 0;
-  x->x_delaytime = delaytime;
-}
-
-void rawmouse_free(t_rawmouse *x)
-{
-  post("rawmouse_free");
-  close (x->x_mouse_fd);
-  clock_free (x->x_clock);
-}
