@@ -1,4 +1,4 @@
-// 
+//
 //  
 //  chaos~
 //  Copyright (C) 2004  Tim Blechmann
@@ -18,22 +18,7 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#ifndef __chaos_hpp
+#include "duffing_map.hpp"
+#include "chaos_msg.hpp"
 
-#define FLEXT_ATTRIBUTES 1
-
-#include "flext.h"
-#include "chaos_defs.hpp"
-
-/* internal we can work with a higher precision than pd */
-#ifdef DOUBLE_PRECISION
-typedef double data_t;
-#define CHAOS_ABS(x) fabs(x)
-#else
-typedef float data_t;
-#define CHAOS_ABS(x) fabsf(x)
-#endif
-
-
-#define __chaos_hpp
-#endif /* __chaos_hpp */
+CHAOS_MSG_CLASS(duffing_map,DUFFING_MAP);

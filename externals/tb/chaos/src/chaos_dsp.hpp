@@ -60,62 +60,118 @@ public:
 	int m_phase;         /* phase counter */
 	float m_sr;          /* sample rate */
 	
-	int m_method;       /* interpolation method */
+	int m_imethod;       /* interpolation method */
+
+	int get_imethod(int &i)
+	{
+		i = m_imethod;
+	}
+
+	void set_imethod(int i)
+	{
+		if( (i >= 0) && (i <= 2) )
+			m_imethod = i;
+		else
+		{
+			post("interpolation method out of range");
+			return;
+		}
+		if( i != 2)
+		{
+			for (int j = 0; j != m_system->get_num_eq(); ++j)
+			{
+				m_nextvalues[i] = 0;
+				m_nextmidpts[i] = 0;
+				m_curves[i] = 0;
+			}
+		}
+
+	}
+
+	int get_freq(float &f)
+	{
+		f = m_freq;
+	}
+
+	void set_freq(float f)
+	{
+		if( (f >= 0) && (f <= m_sr*0.5) )
+			m_freq = f;
+		else
+			post("frequency out of range");
+	}
 	
+	FLEXT_CALLVAR_F(get_freq, set_freq);
+	FLEXT_CALLVAR_I(get_imethod, set_imethod);
 };
 
 
 /* create constructor / destructor */
-#define CHAOS_DSP_INIT(SYSTEM, ATTRIBUTES)		\
-FLEXT_HEADER(SYSTEM##_dsp, chaos_dsp<SYSTEM>)	\
-												\
-SYSTEM##_dsp(int argc, t_atom* argv )			\
-{												\
-	m_system = new SYSTEM;						\
-												\
-	int size = m_system->get_num_eq();			\
-												\
-	m_values = new t_float[size];				\
-	m_slopes = new t_float[size];				\
-	m_nextvalues = new t_float[size];			\
-	m_nextmidpts = new t_float[size];			\
-	m_curves = new t_float[size];				\
-												\
-    /* create inlets and zero arrays*/ 			\
-    for (int i = 0; i != size; ++i)				\
-	{											\
-		AddOutSignal();							\
-		m_values[i] = 0;						\
-		m_slopes[i] = 0;						\
-		m_nextvalues[i] = 0;					\
-		m_nextmidpts[i] = 0;					\
-		m_curves[i] = 0;						\
-	}											\
-												\
-												\
-												\
-    m_freq = GetAFloat(argv[0]);				\
-	m_method = (char)GetAFloat(argv[1]);		\
-    m_phase = 0;								\
-												\
-    FLEXT_ADDATTR_VAR1("frequency",m_freq);		\
-    FLEXT_ADDATTR_VAR1("method",m_method);		\
-												\
-    ATTRIBUTES;									\
-}												\
-												\
-~SYSTEM##_dsp()									\
-{												\
-	delete m_system;							\
-	delete m_values;							\
-	delete m_slopes;							\
-	delete m_nextvalues;						\
-	delete m_nextmidpts;						\
-	delete m_curves;							\
-}												\
-												\
-FLEXT_ATTRVAR_F(m_freq);						\
-FLEXT_ATTRVAR_I(m_method);
+#define CHAOS_DSP_INIT(SYSTEM, ATTRIBUTES)									\
+FLEXT_HEADER(SYSTEM##_dsp, chaos_dsp<SYSTEM>)								\
+																			\
+SYSTEM##_dsp(int argc, t_atom* argv )										\
+{																			\
+    m_sr = 44100; /* assume default sampling rate (for max frequency) */	\
+	m_system = new SYSTEM;													\
+																			\
+	int size = m_system->get_num_eq();										\
+																			\
+	m_values = new t_float[size];											\
+	m_slopes = new t_float[size];											\
+	m_nextvalues = new t_float[size];										\
+	m_nextmidpts = new t_float[size];										\
+	m_curves = new t_float[size];											\
+																			\
+    /* create inlets and zero arrays*/										\
+    for (int i = 0; i != size; ++i)											\
+	{																		\
+		AddOutSignal();														\
+		m_values[i] = 0;													\
+		m_slopes[i] = 0;													\
+		m_nextvalues[i] = 0;												\
+		m_nextmidpts[i] = 0;												\
+		m_curves[i] = 0;													\
+	}																		\
+																			\
+    FLEXT_ADDATTR_VAR("frequency", get_freq, set_freq);						\
+    FLEXT_ADDATTR_VAR("interpolation_method",get_imethod, set_imethod);		\
+																			\
+    if (argc > 0)															\
+	{																		\
+		CHAOS_SYS_INIT(freq, GetAInt(argv[0]));								\
+	}																		\
+    else																	\
+	{																		\
+		CHAOS_SYS_INIT(freq, 440);											\
+	}																		\
+																			\
+	if (argc > 1)															\
+	{																		\
+		CHAOS_SYS_INIT(imethod, GetAInt(argv[1]));							\
+	}																		\
+    else																	\
+    {																		\
+		CHAOS_SYS_INIT(imethod, 0);											\
+    }																		\
+																			\
+    m_phase = 0;															\
+																			\
+    ATTRIBUTES;																\
+}																			\
+																			\
+~SYSTEM##_dsp()																\
+{																			\
+	delete m_system;														\
+	delete m_values;														\
+	delete m_slopes;														\
+	delete m_nextvalues;													\
+	delete m_nextmidpts;													\
+	delete m_curves;														\
+}																			\
+																			\
+FLEXT_ATTRVAR_F(m_freq);													\
+FLEXT_ATTRVAR_I(m_imethod);
 
 
 
@@ -129,7 +185,7 @@ void chaos_dsp<system>::m_signal(int n, t_sample *const *insigs,
 		return;
 	}
 
-	switch (m_method)
+	switch (m_imethod)
 	{
 	case 0:
 		m_signal_n(n, insigs, outsigs);

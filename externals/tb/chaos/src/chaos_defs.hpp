@@ -106,6 +106,7 @@ void set_##NAME(t_float &f)						\
 	m_system->set_##NAME(f);					\
 }												\
 FLEXT_CALLVAR_F(get_##NAME, set_##NAME);
+
  
 #define CHAOS_SYS_CALLBACKS_I(NAME)				\
 public:											\

@@ -20,55 +20,57 @@
 
 #include "map_base.hpp"
 
-//  logistic map: x[n+1] = alpha * x[n] * (1 - x[n])
-//                0 <= x[n]  <  1
-//                0 <= alpha <= 4
+//  duffing map: x1[n+1] = x2[n]
+//               x2[n+1] = -b*x1[n] + a*x2[n] - pow(x2,3)
+//  
+//  taken from Viktor Avrutin: AnT-Demos-4.669
 
-class logistic:
+class duffing_map:
 	public map_base
 {
 public:
-	logistic()
+	duffing_map()
 	{
-		m_num_eq = 1;
+		m_num_eq = 2;
 		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(alpha, 3.8);
-		CHAOS_SYS_INIT(x, 0.5);
+		CHAOS_SYS_INIT(x1, 0.5);
+		CHAOS_SYS_INIT(x2, 0.5);
+		CHAOS_SYS_INIT(a, 0.5);
+		CHAOS_SYS_INIT(b, 0.5);
 	}
 
-	~logistic()
+	~duffing_map()
 	{
 		delete m_data;
 	}
 
 	virtual void m_step()
 	{
-		data_t data = m_data[0];
-		data_t alpha = CHAOS_PARAMETER(alpha);
-		m_data[0] = alpha * data * (1.f - data);
+		data_t x1 = m_data[0], x2 = m_data[1];
+
+		m_data[0] = x2;
+		m_data[1] = - CHAOS_PARAMETER(b)*x1 + CHAOS_PARAMETER(a)*x2
+			- x2*x2*x2;
 	}
 
-	CHAOS_SYSPAR_FUNCS_PRED(alpha, m_pred_alpha);
-	bool m_pred_alpha(t_float f)
-	{
-		return (f > 0) && (f < 4);
-	}
+	CHAOS_SYSVAR_FUNCS(x1,0);
+	CHAOS_SYSVAR_FUNCS(x2,1);
 
-	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
-	
-	bool m_pred_x(t_float f)
-	{
-		return (f > 0) && (f < 1);
-	}
+	CHAOS_SYSPAR_FUNCS(a);
+	CHAOS_SYSPAR_FUNCS(b);
 };
 
-#define LOGISTIC_CALLBACKS						\
+#define DUFFING_MAP_CALLBACKS					\
 MAP_CALLBACKS;									\
-CHAOS_SYS_CALLBACKS(alpha);						\
-CHAOS_SYS_CALLBACKS(x);
+CHAOS_SYS_CALLBACKS(x1);						\
+CHAOS_SYS_CALLBACKS(x2);						\
+CHAOS_SYS_CALLBACKS(a);							\
+CHAOS_SYS_CALLBACKS(b);
 
-#define LOGISTIC_ATTRIBUTES						\
+#define DUFFING_MAP_ATTRIBUTES					\
 MAP_ATTRIBUTES;									\
-CHAOS_SYS_ATTRIBUTE(alpha);						\
-CHAOS_SYS_ATTRIBUTE(x);
+CHAOS_SYS_ATTRIBUTE(x1);						\
+CHAOS_SYS_ATTRIBUTE(x2);						\
+CHAOS_SYS_ATTRIBUTE(a);							\
+CHAOS_SYS_ATTRIBUTE(b);
 
