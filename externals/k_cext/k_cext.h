@@ -17,12 +17,11 @@
  *
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <stdbool.h>
+//#include <stdbool.h>
 #ifdef _MSC_VER
 typedef int bool;
 #define true 1
@@ -32,6 +31,12 @@ typedef int bool;
 #endif
 
 #include <stdarg.h>
+
+#ifdef MSW
+#define K_EXTERN __declspec(dllexport) extern
+#else
+#define K_EXTERN extern
+#endif
 
 typedef struct k_cext
 {
@@ -56,22 +61,25 @@ typedef struct k_cext
 
 
 /* The following functions are used by intsort and floatsort */
-extern int k_cext_intcompare(const void *p1, const void *p2);
-extern int k_cext_floatcompare(const void *p1, const void *p2);
+K_EXTERN int k_cext_intcompare(const void *p1, const void *p2);
+K_EXTERN int k_cext_floatcompare(const void *p1, const void *p2);
 
 
 /* The following functions are system dependant, and called internally from k_cext only.
    All ports must implement these functions.
  */
 
-extern int k_sys_getprocessfunction(t_k_cext *x,char *funcname,char *name);
-extern void k_sys_freehandle(t_k_cext *x);
-extern void k_sys_mktempfilename(char *to);
-extern void k_sys_writeincludes(FILE *file);
-extern void k_sys_makecompilestring(char *to,char *name,char *funcname);
-extern void k_sys_deletefile(char *name);
-extern void k_sys_init(void);
+K_EXTERN int k_sys_getprocessfunction(t_k_cext *x,char *funcname,char *name);
+K_EXTERN void k_sys_freehandle(t_k_cext *x);
+K_EXTERN void k_sys_mktempfilename(char *to);
+K_EXTERN void k_sys_writeincludes(FILE *file);
+K_EXTERN void k_sys_makecompilestring(char *to,char *name,char *funcname);
+K_EXTERN void k_sys_deletefile(char *name);
+K_EXTERN void k_sys_init(void);
 
+/* TB value accessing functions*/
+K_EXTERN t_float k_cext_getvalue(char c[]);
+K_EXTERN int k_cext_setvalue(char c[],float f);
 
 
 #define V(a) (x->values[a])
@@ -108,7 +116,7 @@ do{ \
 
 /* TB: values and bang outlets */
 #define Ob(a) outlet_bang(x->outlets[a]);
-t_float k_cext_getvalue(char c[]);
+float k_cext_getvalue(char c[]);
 int k_cext_setvalue(char c[],float f);
 #define VALUE(char) k_cext_getvalue(char)
 #define SETVALUE(char,float) k_cext_setvalue(char,float)

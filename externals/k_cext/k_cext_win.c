@@ -86,7 +86,7 @@ void k_sys_writeincludes(FILE *file){
 }
 
 void k_sys_makecompilestring(char *to,char *name,char *funcname){
-  sprintf(to,"cl %s " INCLUDEPATH "\\bin\\pd.lib /LD /Gd /GD /Ox /DNT /link /export:%s",
+  sprintf(to,"cl %s " INCLUDEPATH "\\bin\\pd.lib " INCLUDEPATH "\\bin\\k_cext.lib /LD /Gd /GD /Ox /DNT /link /export:%s",
 	  name, funcname);
 }
 

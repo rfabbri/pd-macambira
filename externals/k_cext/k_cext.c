@@ -22,6 +22,8 @@
 #include "m_pd.h"
 #include "k_cext.h"
 
+#include <ctype.h>
+
 static char *version = 
 "k_cext v0.3.0, written by Kjetil S. Matheussen, k.s.matheussen@notam02.no\n"
 "Windows-port by Olaf Matthes.";

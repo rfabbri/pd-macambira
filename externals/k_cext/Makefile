@@ -11,14 +11,14 @@ pd_nt: $(NAME).dll
 
 .SUFFIXES: .dll
 
-PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo /DINCLUDEPATH=\"c:\\programme\\audio\\pd\"
+PDNTCFLAGS = /W3  /DNT /DPD /nologo /DINCLUDEPATH=\"D:\\sourcescvs\\pd\"
 
-PDNTINCLUDE = /I. /Ic:\programme\audio\pd\src
-PDNTLIB = libc.lib oldnames.lib kernel32.lib c:\programme\audio\pd\bin\pd.lib 
+PDNTINCLUDE = /I. /ID:\sourcescvs\pd\src
+PDNTLIB = libc.lib oldnames.lib kernel32.lib "C:\Pure Data\bin\pd.lib"
 
 .c.dll:
-	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c k_cext_win.c
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c k_cext_win.c
 	link /dll /export:$(CSYM)_setup $*.obj k_cext_win.obj $(PDNTLIB)
 
 # ----------------------- IRIX 5.x -----------------------
