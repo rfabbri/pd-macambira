@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <ctype.h>
 #ifdef _MSC_VER
 typedef int bool;
 #define true 1
@@ -107,9 +108,11 @@ do{ \
 #define FLOATSORT(a,b) qsort((void *)(a),b, sizeof (float), k_cext_floatcompare);
 
 /* TB: values and bang outlets */
-#define VALUE(char) (*(value_get(gensym(char))))
-#define SETVALUE(char,float) value_setfloat(gensym(char),float)
 #define Ob(a) outlet_bang(x->outlets[a]);
+t_float k_cext_getvalue(char c[]);
+int k_cext_setvalue(char c[],float f);
+#define VALUE(char) k_cext_getvalue(char)
+#define SETVALUE(char,float) k_cext_setvalue(char,float)
 
 
 #define IF if(

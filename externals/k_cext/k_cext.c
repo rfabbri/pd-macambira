@@ -32,7 +32,6 @@ int instancenumber=0; // Can not be static because of the win-port.
 static t_class *k_cext_class;
 static t_class *k_cfunc_class;
 
-
 int k_cext_intcompare(const void *p1, const void *p2)
 {
   int i = *((int *)p1);
@@ -332,4 +331,23 @@ void k_cext_setup(void)
 
 void k_cfunc_setup(void){
   k_cext_setup();
+}
+
+/* TB: for accessing $0 values */
+t_float k_cext_getvalue(char c[])
+{
+    while ( isspace(c[0]) )
+    {
+	c++;
+    }
+    return (*(value_get(gensym(c))));
+}
+
+int k_cext_setvalue(char c[],float f)
+{
+    while ( isspace(c[0]) )
+    {
+	c++;
+    }
+    return value_setfloat(gensym(c),f);
 }
