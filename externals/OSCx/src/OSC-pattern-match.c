@@ -39,7 +39,7 @@ The OpenSound Control WWW page is
   #include <stdio.h>
 #endif
 
-// #ifdef MACOSX
+// #ifdef __APPLE__
 // #include <stdio.h>
 // #endif
 

@@ -3,7 +3,7 @@
 	pd
 	-------------
 		-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
-
+		-- smoothed out build, clean up for Darwin  <hans@at.or.at> 2004.04.04
 */
 
 #if HAVE_CONFIG_H 
@@ -47,7 +47,8 @@ OSC_API void OSC_version (t_OSC *x) {
   // EnterCallback();
   post("OSC4PD Version " VERSION
        "\n ¯\\    original code by matt wright. pd-fication jdl@xdv.org\n"
-       "   ·   Win32-port raf@interaccess.com\n    \\_ Compiled " __TIME__ " " __DATE__);
+       "   ·   Win32-port raf@interaccess.com    Darwin cleanup hans@at.or.at\n"
+		 "		 \\_ Compiled " __TIME__ " " __DATE__);
   // ExitCallback();
 }
 

@@ -2,8 +2,6 @@ LIBOSCDIR = ../libOSC
 LIBOSC = ${LIBOSCDIR}/libOSC.a
 # for eg. linux
 # DEFS= -Dunix
-# for MAC OSX, should be DARWIN
-# DEFS=-Dunix -DMACOSX
 
 CFLAGS= @CFLAGS@
 # INCLUDES= @INCLUDES@
@@ -18,7 +16,7 @@ sendOSC: sendOSC.o htmsocket.o ${LIBOSC}
 
 dumpOSC: ${DUMPOBJS}
 	${CC} ${CFLAGS} $(INCLUDES) -o $@ ${DUMPOBJS}
-	
+
 dumpUDP: dumpUDP.o
 	${CC} ${CFLAGS} $(INCLUDES) -o dumpUDP dumpUDP.o
 

@@ -64,7 +64,7 @@ University of California, Berkeley.
 	#include 	<sys/stat.h>
 #endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
   #include <sys/types.h>
 #endif
 

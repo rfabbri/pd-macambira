@@ -62,7 +62,7 @@ University of California, Berkeley.
 #include <sys/file.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#ifndef MACOSX
+#ifndef __APPLE__
   #include <sys/prctl.h>
 #endif
 

@@ -1,19 +1,18 @@
-CFLAGS=  -O2 -Wall -fPIC
+#CFLAGS=  -O2 -Wall -fPIC
 ARFLAGS=srv
 # uncomment the following for linux/win
 # DEFS= -Dunix
-# and this for osx
-# DEFS= -Dunix -DMACOSX
 LIB=libOSC.a
 
-CFLAGS= @CFLAGS@
+CFLAGS=@CFLAGS@
+INCLUDES=@INCLUDES@
 
 LIBOBJS= ${LIB}(OSC-client.o) ${LIB}(OSC-timetag.o)
 
 all:	${LIBOBJS}
 
 .c.a:
-	${CC} -c ${CFLAGS} ${DEFS} $<
+	${CC} -c ${CFLAGS} ${INCLUDES} ${DEFS} $<
 	${AR} ${ARFLAGS} $@ $*.o
 	rm -f $*.o
 

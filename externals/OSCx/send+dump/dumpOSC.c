@@ -83,7 +83,7 @@ Technologies, University of California, Berkeley.
 #include <signal.h>
 #include <grp.h>
 #include <sys/file.h>
-#ifndef MACOSX
+#ifndef __APPLE__
   #include <sys/prctl.h>
   #include <bits/sigset.h>
 #endif
@@ -116,7 +116,9 @@ Boolean ClientReply(int packetsize, void *packet, int socketfd,
 void sgi_CleanExit(void);
 Boolean sgi_HaveToQuit(void);
 int RegisterPollingDevice(int fd, void (*callbackfunction)(int , void *), void *dummy);
+#ifndef __APPLE__
 static void catch_sigint();
+#endif
 static int Synthmessage(char *m, int n, void *clientdesc, int clientdesclength, int fd) ;
 void ParseOSCPacket(char *buf, int n, ClientAddr returnAddr);
 static void Smessage(char *address, void *v, int n, ClientAddr returnAddr);
@@ -232,9 +234,11 @@ int RegisterPollingDevice(int fd, void (*callbackfunction)(int , void *), void *
 
 static int caught_sigint;
 
+#ifndef __APPLE__
 static void catch_sigint()  {
    caught_sigint = 1;
 }
+#endif
 static int sockfd, usockfd;
 
 
@@ -634,7 +638,7 @@ printf("polldev %d\n", polldevs[j].fd);
 		printf("nfds %d\n", nfds);
 */
 		caught_sigint = 0;
-#ifndef MACOSX
+#ifndef __APPLE__
    		sigset(SIGINT, catch_sigint);       /* set sig handler       */
 #endif	
 		while(!caught_sigint)

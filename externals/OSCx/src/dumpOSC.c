@@ -78,7 +78,7 @@ Technologies, University of California, Berkeley.
 void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 
 
-#if defined(__sgi) || defined(__linux) || defined(WIN32) || defined(MACOSX)
+#if defined(__sgi) || defined(__linux) || defined(WIN32) || defined(__APPLE__)
 
 #ifdef WIN32
 	#include "OSC-common.h"

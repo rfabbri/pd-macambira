@@ -5,11 +5,17 @@ all:
 	cd send+dump ; make
 	cd src ; make
 
-install:
+install: all
 	cd src ; make install
 
 clean:
-	cd  libOSC && make clean
+	cd libOSC && make clean
 	cd send+dump && make clean
 	cd src && make clean
+
+distclean: clean
+	-rm *~
+	rm Makefile */Makefile
+	rm config.log config.status config.h
+	-rm -Rf ./autom4te.cache/ extra
 

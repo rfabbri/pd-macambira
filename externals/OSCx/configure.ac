@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.58)
+AC_PREREQ(2.57)
 AC_INIT(OSCxpd, 0.2, jdl@xdv.org)
 AC_CONFIG_SRCDIR([libOSC/OSC-client.h])
 AC_CONFIG_HEADER([config.h])
@@ -28,7 +28,7 @@ dnl ------------------------------------------
 dnl ----  do some magic to gues the host opsys
 dnl ----  taken from libvorbis configure.in
 dnl ------------------------------------------
-# AC_CANONICAL_HOST
+AC_CANONICAL_HOST
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lc':
@@ -60,7 +60,7 @@ dnl  for each of the *-*-host's in the following, do the checking and then set y
 dnl  CFLAGS get set for C code, CPPFLAGS for c++ code.  LDFLAGS is the linking flags for both c and c++
 dnl ------------------------------------------
 
-INCLUDES="-I../libOSC"
+INCLUDES="-I../libOSC -I../../../pd/src"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -ldl"
 if test -z "$GCC"; then
         case $host in 
@@ -102,9 +102,9 @@ else
 		echo "YOU HAVE A SPARC STATION,	not setting any flags, not supported yet"
 		;;
         *-*-darwin*)
-                CFLAGS="$CPFLAGS -DUNIX -DMACOSX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
-		# LDFLAGS="$LDFLAGS -bundle -bundle_loader /usr/local/pd/bin/pd -undefined suppress -flat_namespace"
-		LDFLAGS="$LDFLAGS -bundle -bundle_loader /usr/local/pd/bin/pd -flat_namespace"
+                CFLAGS="$CPFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
+		# LDFLAGS="$LDFLAGS -bundle -bundle_loader ../../../pd/bin/pd -undefined suppress -flat_namespace"
+		LDFLAGS="$LDFLAGS -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace"
 		pd_suffix=pd_darwin
 		;;
         *)

@@ -9,6 +9,8 @@ DEFS= -Dunix
 
 prefix=$(DESTDIR)/usr
 
+current: @pd_suffix@
+
 # ----------------------- LINUX i386 -----------------------
 
 # pd_linux: $(NAME).pd_linux
@@ -42,12 +44,12 @@ OSCroute.pd_linux: OSCroute.o OSC-pattern-match.o
 
 OSC.pd_linux: OSC.o
 	cc -Wl,-export_dynamic -shared -o $*.@pd_suffix@ $? -lc -lm
-	# $(LD) $(LDFLAGS) -o OSC.$(EXT) *.$(EXT) *.o $(LIBS) $(LIBOSC)
+# $(LD) $(LDFLAGS) -o OSC.$(EXT) *.$(EXT) *.o $(LIBS) $(LIBOSC)
 #	$(LD) $(LDFLAGS) -o OSC.$(EXT) *.$(EXT) $(LIBS) $(LIBOSC)
 $(TARGETS): %.o : %.c
 	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
-	# 	cc -c $(CFLAGS) OSC.c
+# 	cc -c $(CFLAGS) OSC.c
 
 # .c.pd_linux:
 #	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c
@@ -75,20 +77,20 @@ SFX=.pd_darwin
 
 .SUFFIXES: $(SFX)
 
-DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
+DARWINCFLAGS = -DPD -DUNIX -O2 \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-DARWININCLUDE =  -I../../../pd/src
+DARWININCLUDE = @INCLUDES@
 
 DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o OSCroute.o
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
-	cc -bundle -bundle_loader /usr/local/pd/bin/pd -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBS) $(LIBOSC)
+	cc -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBS) $(LIBOSC)
 
 	rm -f $*.o ../$*.pd_darwin
-	ln -s $*/$*.pd_darwin ..
+#	ln -s $*/$*.pd_darwin ..
 
 

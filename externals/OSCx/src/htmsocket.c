@@ -40,7 +40,7 @@ University of California, Berkeley.
 #include <config.h> 
 #endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
   #include <string.h>
 #endif
 

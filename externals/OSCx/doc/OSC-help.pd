@@ -1,4 +1,4 @@
-#N canvas 608 335 471 304 12;
+#N canvas 608 335 565 311 12;
 #X obj 21 149 sendOSC-help;
 #X obj 21 174 dumpOSC-help;
 #X obj 21 200 OSCroute-help;

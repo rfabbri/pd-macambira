@@ -1,4 +1,4 @@
-#N canvas 112 247 501 357 10;
+#N canvas 112 247 505 361 10;
 #X msg 20 72 version;
 #X obj 86 72 r rcvOSC;
 #X obj 86 109 OSCroute /test /ix /yps;
@@ -82,7 +82,7 @@ thought it should work the other way round:;
 #X text 252 294 -patterns starting with a number;
 #X text 325 324 2002-09-08 \, jdl xdv.org;
 #X text 28 318 for more info \, get help on:;
-#X obj 195 319 OSC;
+#X obj 226 317 OSC;
 #X connect 0 0 2 0;
 #X connect 1 0 2 0;
 #X connect 2 0 5 0;
