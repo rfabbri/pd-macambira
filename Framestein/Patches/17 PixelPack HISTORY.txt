@@ -1,0 +1,11 @@
+version history of PixlePack plugins
+
+v 0.02:
+- added plugins: interlace
+- some code optimization
+
+v 0.01:
+- plugins: compare, convolution, darken, deinterlace, difference,
+  lighten, multiply, overlay, screen, shadowcaster, softlight
+- KNOWN BUG: some artefacts due to rounding errors (as we are using 
+  8bir values), especially in convolution
