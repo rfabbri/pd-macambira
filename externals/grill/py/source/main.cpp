@@ -35,6 +35,13 @@ PyObject *py::module_obj = NULL;
 PyObject *py::module_dict = NULL;
 
 
+static PyMethodDef StdOut_Methods[] =
+{
+	{ "write", py::StdOut_Write, 1 },
+	{ NULL,    NULL,           }  
+};
+
+
 py::py(): 
 	module(NULL),
 	detach(false),shouldexit(false),thrcount(0),
@@ -66,6 +73,10 @@ py::py():
 		module_dict = PyModule_GetDict(module_obj);
 
 		PyModule_AddStringConstant(module_obj,"__doc__",(C *)py_doc);
+
+		// redirect stdout
+		PyObject* py_out = Py_InitModule("stdout", StdOut_Methods);
+		PySys_SetObject("stdout", py_out);
 	}
 	else {
 		PY_LOCK
@@ -166,7 +177,28 @@ V py::m__doc(PyObject *obj)
 		PyObject *docf = PyDict_GetItemString(obj,"__doc__"); // borrowed!!!
 		if(docf && PyString_Check(docf)) {
 			post("");
-			post(PyString_AsString(docf));
+			const char *s = PyString_AsString(docf);
+
+			// FIX: Python doc strings can easily be larger than 1k characters
+			// -> split into separate lines
+			for(;;) {
+				char buf[1024];
+				char *nl = strchr(s,'\n');
+				if(!nl) {
+					// no more newline found
+					post(s);
+					break;
+				}
+				else {
+					// copy string before newline to temp buffer and post
+					int l = nl-s;
+					if(l >= sizeof(buf)) l = sizeof buf-1;
+					strncpy(buf,s,l); // copy all but newline
+					buf[l] = 0;
+					post(buf);
+					s = nl+1;  // set after newline
+				}
+			}
 		}
 
         PY_UNLOCK
@@ -263,7 +295,7 @@ V py::AddToPath(const C *dir)
 			int i,n = PyList_Size(pobj);
 			for(i = 0; i < n; ++i) {
 				PyObject *pt = PyList_GetItem(pobj,i);
-				if(PyString_Check(pt) && !strcmp(dir,PyString_AsString(pt))) break;
+				if(PyString_Check(pt) && !strcmp(dir,PyString_AS_STRING(pt))) break;
 			}
 			if(i == n) { // string is not yet existent in path
 				PyObject *ps = PyString_FromString(dir);
@@ -272,4 +304,43 @@ V py::AddToPath(const C *dir)
 		}
 		PySys_SetObject("path",pobj);
 	}
+}
+
+static PyObject *output = NULL;
+
+// post to the console
+PyObject* py::StdOut_Write(PyObject* self, PyObject* args)
+{
+    if(PySequence_Check(args)) {
+		int sz = PySequence_Size(args);
+		for(int i = 0; i < sz; ++i) {
+			PyObject *val = PySequence_GetItem(args,i); // borrowed
+			PyObject *str = PyObject_Str(val);
+			char *cstr = PyString_AS_STRING(str);
+			char *lf = strchr(cstr,'\n');
+
+			// line feed in string
+			if(!lf) {
+				// no -> just append
+				if(output)
+					PyString_ConcatAndDel(&output,str);
+				else
+					output = str;
+			}
+			else {
+				// yes -> append up to line feed, reset output buffer to string remainder
+				PyObject *part = PyString_FromStringAndSize(cstr,lf-cstr);
+				if(output)
+					PyString_ConcatAndDel(&output,part);			
+				else
+					output = part;
+				post(PyString_AS_STRING(output));
+				Py_DECREF(output);
+				output = PyString_FromString(lf+1);
+			}
+		}
+	}
+
+    Py_INCREF(Py_None);
+    return Py_None;
 }
