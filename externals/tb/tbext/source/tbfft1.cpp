@@ -124,11 +124,11 @@ void tbfft1::set_freq(t_float freq)
   b=Blocksize();     
   
   center=freq/(s/b);
-  post("%i",int(center));
 }
 
 
 void tbfft1::set_fact(t_float f)
 {
-  factor=f;
+  if (f<2)
+    factor=f;
 }
