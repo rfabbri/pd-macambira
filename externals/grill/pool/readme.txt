@@ -63,7 +63,8 @@ Version history:
 - extensive use of hashing for keys and directories
 - database can be saved/loaded as XML data
 - fixed bug with stored numbers starting with - or +
-- file names without paths will use the folder of the current patcher
+- relative file names will be based on the folder of the current patcher
+- added printall, printrec, printroot messages for console printout
 
 0.1.0:
 - first public release
@@ -78,5 +79,5 @@ TODO list:
 
 general:
 - what is output as value if it is key only? (Max->nothing!)
-- XML interpretation? (only files written by pool or others too)
+- XML format ok?
 

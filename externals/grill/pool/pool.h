@@ -74,6 +74,7 @@ public:
 	AtomList *GetVal(const A &key,BL cut = false);
 	I CntAll() const;
 	I GetAll(A *&keys,AtomList *&lst,BL cut = false);
+	I PrintAll(char *buf,int len) const;
 	I GetKeys(AtomList &keys);
 	I CntSub() const;
 	I GetSub(const A **&dirs);
@@ -87,7 +88,7 @@ public:
 	BL LdDir(istream &is,I depth,BL mkdir);
 	BL LdDirXML(istream &is,I depth,BL mkdir);
 	BL SvDir(ostream &os,I depth,const AtomList &dir = AtomList());
-	BL SvDirXML(ostream &os,I depth,const AtomList &dir = AtomList());
+	BL SvDirXML(ostream &os,I depth,const AtomList &dir = AtomList(),I ind = 0);
 
 	int VSize() const { return vsize; }
 	int DSize() const { return dsize; }
@@ -132,6 +133,7 @@ public:
 	poolval *Ref(const AtomList &d,const A &key);
 	poolval *Refi(const AtomList &d,I ix);
 	I CntAll(const AtomList &d);
+	I PrintAll(const AtomList &d);
 	I GetAll(const AtomList &d,A *&keys,AtomList *&lst);
 	I CntSub(const AtomList &d);
 	I GetSub(const AtomList &d,const t_atom **&dirs);

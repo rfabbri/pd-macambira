@@ -71,6 +71,11 @@ protected:
 	V m_cntrec(I argc,const A *argv);	// also subdirectories
 	V m_cntsub(I argc,const A *argv);	// only subdirectories
 
+	// print directories
+	V m_printall();   // print values in current dir
+	V m_printrec(I argc,const A *argv,BL fromroot = false);   // print values recursively
+    V m_printroot() { m_printrec(0,NULL,true); }   // print values recursively from root
+
 	// cut/copy/paste
 	V m_paste(I argc,const A *argv) { paste(MakeSymbol("paste"),argc,argv,true); } // paste contents of clipboard
 	V m_pasteadd(I argc,const A *argv) { paste(MakeSymbol("pasteadd"),argc,argv,false); } // paste but don't replace
@@ -106,10 +111,12 @@ private:
 	static BL ValChk(const AtomList &l) { return ValChk(l.Count(),l.Atoms()); }
 	V ToOutAtom(I ix,const A &a);
 
+    enum get_t { get_norm,get_cnt,get_print };
+
 	V set(const S *tag,I argc,const A *argv,BL over);
 	V getdir(const S *tag);
-	I getrec(const S *tag,I level,BL order,BL cntonly = false,const AtomList &rdir = AtomList());
-	I getsub(const S *tag,I level,BL order,BL cntonly = false,const AtomList &rdir = AtomList());
+	I getrec(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
+	I getsub(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
 
 	V paste(const S *tag,I argc,const A *argv,BL repl);
 	V copy(const S *tag,I argc,const A *argv,BL cut);
@@ -178,6 +185,9 @@ private:
 	FLEXT_CALLBACK(m_cntall)
 	FLEXT_CALLBACK_V(m_cntrec)
 	FLEXT_CALLBACK_V(m_cntsub)
+	FLEXT_CALLBACK(m_printall)
+	FLEXT_CALLBACK_V(m_printrec)
+	FLEXT_CALLBACK(m_printroot)
 
 	FLEXT_CALLBACK_V(m_paste)
 	FLEXT_CALLBACK_V(m_pasteadd)
@@ -253,6 +263,10 @@ V pool::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"cntrec",m_cntrec);
 	FLEXT_CADDMETHOD_(c,0,"cntsub",m_cntsub);
 
+	FLEXT_CADDMETHOD_(c,0,"printall",m_printall);
+	FLEXT_CADDMETHOD_(c,0,"printrec",m_printrec);
+	FLEXT_CADDMETHOD_(c,0,"printroot",m_printroot);
+
 	FLEXT_CADDMETHOD_(c,0,"paste",m_paste);
 	FLEXT_CADDMETHOD_(c,0,"pasteadd",m_pasteadd);
 	FLEXT_CADDMETHOD_(c,0,"clrclip",m_clrclip);
@@ -284,7 +298,7 @@ pool::pool(I argc,const A *argv):
 {
 	holdname = argc >= 1 && IsSymbol(argv[0])?GetSymbol(argv[0]):NULL;
 
-	AddInAnything();
+	AddInAnything("Commands in");
 	AddOutList();
 	AddOutAnything();
 	AddOutList();
@@ -549,32 +563,38 @@ V pool::m_geti(I ix)
 	echodir();
 }
 
-I pool::getrec(const S *tag,I level,BL order,BL cntonly,const AtomList &rdir)
+I pool::getrec(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 {
 	AtomList gldir(curdir);
 	gldir.Append(rdir);
 
 	I ret = 0;
 
-	if(cntonly)
-		ret = pl->CntAll(gldir);
-	else {
-		A *k;
-		AtomList *r;
-		I cnt = pl->GetAll(gldir,k,r);
-		if(!k) 
-			post("%s - %s: error retrieving values",thisName(),GetString(tag));
-		else {
-			for(I i = 0; i < cnt; ++i) {
-				ToOutAnything(3,tag,0,NULL);
-				ToOutList(2,absdir?gldir:rdir);
-				ToOutAtom(1,k[i]);
-				ToOutList(0,r[i]);
-			}
-			delete[] k;
-			delete[] r;
-		}
-		ret = cnt;
+    switch(how) {
+        case get_cnt: 
+            ret = pl->CntAll(gldir);
+            break;
+        case get_print:
+            ret = pl->PrintAll(gldir);
+            break;
+        case get_norm: {
+		    A *k;
+		    AtomList *r;
+		    I cnt = pl->GetAll(gldir,k,r);
+		    if(!k) 
+			    post("%s - %s: error retrieving values",thisName(),GetString(tag));
+		    else {
+			    for(I i = 0; i < cnt; ++i) {
+				    ToOutAnything(3,tag,0,NULL);
+				    ToOutList(2,absdir?gldir:rdir);
+				    ToOutAtom(1,k[i]);
+				    ToOutList(0,r[i]);
+			    }
+			    delete[] k;
+			    delete[] r;
+		    }
+		    ret = cnt;
+        }
 	}
 
 	if(level != 0) {
@@ -585,7 +605,7 @@ I pool::getrec(const S *tag,I level,BL order,BL cntonly,const AtomList &rdir)
 		else {
 			I lv = level > 0?level-1:-1;
 			for(I i = 0; i < cnt; ++i) {
-				ret += getrec(tag,lv,order,cntonly,AtomList(rdir).Append(*r[i]));
+				ret += getrec(tag,lv,order,how,AtomList(rdir).Append(*r[i]));
 			}
 			delete[] r;
 		}
@@ -648,7 +668,7 @@ V pool::m_ogetrec(I argc,const A *argv)
 }
 
 
-I pool::getsub(const S *tag,I level,BL order,BL cntonly,const AtomList &rdir)
+I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 {
 	AtomList gldir(curdir);
 	gldir.Append(rdir);
@@ -666,7 +686,7 @@ I pool::getsub(const S *tag,I level,BL order,BL cntonly,const AtomList &rdir)
 			AtomList ndir(absdir?gldir:rdir);
 			ndir.Append(*r[i]);
 
-			if(!cntonly) {
+			if(how == get_norm) {
 				ToOutAnything(3,tag,0,NULL);
 				ToOutList(2,curdir);
 				ToOutList(1,ndir);
@@ -674,7 +694,7 @@ I pool::getsub(const S *tag,I level,BL order,BL cntonly,const AtomList &rdir)
 			}
 
 			if(level != 0)
-				ret += getsub(tag,lv,order,cntonly,AtomList(rdir).Append(*r[i]));
+				ret += getsub(tag,lv,order,how,AtomList(rdir).Append(*r[i]));
 		}
 		delete[] r;
 	}
@@ -725,7 +745,7 @@ V pool::m_ogetsub(I argc,const A *argv)
 V pool::m_cntall()
 {
 	const S *tag = MakeSymbol("cntall");
-	I cnt = getrec(tag,0,false,true);
+	I cnt = getrec(tag,0,false,get_cnt);
 	ToOutSymbol(3,tag);
 	ToOutBang(2);
 	ToOutBang(1);
@@ -749,7 +769,7 @@ V pool::m_cntrec(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(tag));
 	}
 	
-	I cnt = getrec(tag,lvls,false,true);
+	I cnt = getrec(tag,lvls,false,get_cnt);
 	ToOutSymbol(3,tag);
 	ToOutBang(2);
 	ToOutBang(1);
@@ -774,13 +794,44 @@ V pool::m_cntsub(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(tag));
 	}
 
-	I cnt = getsub(tag,lvls,false,true);
+	I cnt = getsub(tag,lvls,false,get_cnt);
 	ToOutSymbol(3,tag);
 	ToOutBang(2);
 	ToOutBang(1);
 	ToOutInt(0,cnt);
 
 	echodir();
+}
+
+V pool::m_printall()
+{
+    const S *tag = MakeSymbol("printall");
+	I cnt = getrec(tag,0,false,get_print);
+    post("");
+}
+
+V pool::m_printrec(I argc,const A *argv,BL fromroot)
+{
+	const S *tag = MakeSymbol(fromroot?"printroot":"printrec");
+
+	I lvls = -1;
+	if(argc > 0) {
+		if(CanbeInt(argv[0])) {
+			if(argc > 1)
+				post("%s - %s: superfluous arguments ignored",thisName(),GetString(tag));
+			lvls = GetAInt(argv[0]);
+		}
+		else 
+			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(tag));
+	}
+
+	AtomList svdir(curdir);
+    if(fromroot) curdir.Clear();
+
+	I cnt = getrec(tag,lvls,false,get_print);
+    post("");
+
+    curdir = svdir;
 }
 
 
@@ -1069,15 +1120,22 @@ V pool::RmvPool(pooldata *p)
 std::string pool::MakeFilename(const C *fn) const
 {
 #if FLEXT_SYS == FLEXT_SYS_PD
-	C *sl = strrchr(fn,'/');
-	if(!sl) sl = strrchr(fn,'\\');
-	if(!sl) {
+    // / and \ must not be mixed!
+	C *sl = strchr(fn,'/');
+	if(!sl) sl = strchr(fn,'\\');
+    if(!sl || (sl != fn 
+#if FLEXT_OS == FLEXT_OS_WIN
+        && sl[-1] != ':' // look for drive specification with ":/" or ":\\"
+#endif
+    )) {
+        // prepend absolute canvas path if filename has no absolute path
 		const C *p = GetString(canvas_getdir(thisCanvas()));
 		return string(p)+'/'+fn;
 	}
 	else
 		return fn;
 #else
+#pragma message("Relative file paths not implemented")
 	return fn;
 #endif
 }

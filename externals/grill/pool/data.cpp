@@ -119,6 +119,15 @@ I pooldata::GetAll(const AtomList &d,A *&keys,AtomList *&lst)
 	}
 }
 
+I pooldata::PrintAll(const AtomList &d)
+{
+    char tmp[1024];
+    d.Print(tmp,sizeof tmp);
+    pooldir *pd = root.GetDir(d);
+    strcat(tmp," , ");
+	return pd?pd->PrintAll(tmp,sizeof tmp):0;
+}
+
 I pooldata::CntSub(const AtomList &d)
 {
 	pooldir *pd = root.GetDir(d);
@@ -242,13 +251,13 @@ BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
                 fl.getline(tmp,sizeof tmp);
                 ret = !strncmp(tmp,"<?xml",5);
             }
+/*
             if(ret) {
                 fl.getline(tmp,sizeof tmp);
                 // DOCTYPE need not be present / only external DOCTYPE is allowed!
-                if(!strncmp(tmp,"<!DOCTYPE",9)) 
-                    fl.getline(tmp,sizeof tmp);
-                ret = !strncmp(tmp,"<pool>",6);
+                ret = !strncmp(tmp,"<!DOCTYPE",9);
             }
+*/
             if(ret)
                 ret = pd->LdDirXML(fl,depth,mkdir);
             return ret;
@@ -270,6 +279,7 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 			if(absdir) tmp = d;
             if(fl.good()) {
                 fl << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;
+//                fl << "<!DOCTYPE pool SYSTEM \"http://www.parasitaere-kapazitaeten.net/ext/pool/pool.dtd\">" << endl;
                 fl << "<!DOCTYPE pool SYSTEM \"pool.dtd\">" << endl;
                 fl << "<pool>" << endl;
                 BL ret = pd->SvDirXML(fl,depth,tmp);

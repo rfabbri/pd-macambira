@@ -294,6 +294,28 @@ I pooldir::CntAll() const
 	return cnt;
 }
 
+I pooldir::PrintAll(char *buf,int len) const
+{
+    int offs = strlen(buf);
+
+    I cnt = 0;
+    for(I vix = 0; vix < vsize; ++vix) {
+		poolval *ix = vals[vix].v;
+        for(I i = 0; ix; ++i,ix = ix->nxt) {
+			PrintAtom(ix->key,buf+offs,len-offs);
+            strcat(buf+offs," , ");
+            int l = strlen(buf+offs)+offs;
+			ix->data->Print(buf+l,len-l);
+            post(buf);
+        }
+        cnt += vals[vix].cnt;
+    }
+    
+    buf[offs] = 0;
+
+	return cnt;
+}
+
 I pooldir::GetKeys(AtomList &keys)
 {
 	I cnt = CntAll();
@@ -452,12 +474,8 @@ static C *ReadAtom(C *c,A *a)
 	return c;
 }
 
-static BL ReadAtoms(istream &is,flext::AtomList &l,C del)
+static BL ParseAtoms(C *tmp,flext::AtomList &l)
 {
-	C tmp[1024];
-	is.getline(tmp,sizeof tmp,del); 
-	if(is.eof() || !is.good()) return false;
-
 	I i,cnt;
 	C *t = tmp;
 	for(cnt = 0; ; ++cnt) {
@@ -471,6 +489,21 @@ static BL ReadAtoms(istream &is,flext::AtomList &l,C del)
 			t = ReadAtom(t,&l[i]);
 	}
 	return true;
+}
+
+static BL ParseAtoms(string &s,flext::AtomList &l) 
+{ 
+    return ParseAtoms((C *)s.c_str(),l); 
+}
+
+static BL ReadAtoms(istream &is,flext::AtomList &l,C del)
+{
+	C tmp[1024];
+	is.getline(tmp,sizeof tmp,del); 
+	if(is.eof() || !is.good()) 
+        return false;
+    else
+        return ParseAtoms(tmp,l);
 }
 
 static V WriteAtom(ostream &os,const A &a)
@@ -551,52 +584,196 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
 	return true;
 }
 
-BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
+class xmltag {
+public:
+    string tag,attr;
+    bool Ok() const { return tag.length() > 0; }
+    bool operator ==(const C *t) const { return !tag.compare(t); }
+    void Clear() { tag.clear(); attr.clear(); }
+    enum { t_start,t_end,t_empty } type;
+};
+
+static bool gettag(istream &is,xmltag &t)
 {
-/*
-	for(I i = 1; !is.eof(); ++i) {
-		AtomList d,k,*v = new AtomList;
-		BL r = ReadAtoms(is,d,',');
-		r = r && ReadAtoms(is,k,',') && k.Count() == 1;
-		r = r && ReadAtoms(is,*v,'\n') && v->Count();
+    while(isspace(is.peek())) is.get();
+    if(is.peek() == '<') {
+        is.get();
+        char tmp[256];
+        is.getline(tmp,sizeof tmp,'>');
+        char *tb = tmp,*te = tmp+strlen(tmp)-1,*tf;
 
-		if(r) {
-			if(depth < 0 || d.Count() <= depth) {
-				pooldir *nd = mkdir?AddDir(d):GetDir(d);
-				if(nd) {
-					nd->SetVal(k[0],v); v = NULL;
-				}
-	#ifdef FLEXT_DEBUG
-				else
-					post("pool - directory was not found",i);
-	#endif
-			}
-		}
-		else if(!is.eof())
-			post("pool - format mismatch encountered, skipped line %i",i);
+        for(; isspace(*tb); ++tb);
+        if(*tb == '/') {
+            t.type = xmltag::t_end;
+            for(++tb; isspace(*tb); ++tb);
+        }
+        else {
+            for(; isspace(*te); --te);
+            if(*te == '/') {
+                for(--te; isspace(*te); --te);
+                t.type = xmltag::t_empty;
+            }
+            else
+                t.type = xmltag::t_start;
+        }
 
-		if(v) delete v;
-	}
-	return true;
-*/
-    return false;
+        for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf);
+        t.tag.assign(tb,tf-tb);
+        while(isspace(*tf)) ++tf;
+        t.attr.assign(tf,te-tf+1);
+        return true;
+    }
+    else {
+        t.Clear();
+        return false;
+    }
 }
 
-BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir)
+static void getvalue(istream &is,string &s)
+{
+    char tmp[1024],*t = tmp; 
+    bool intx = false;
+    for(;;) {
+        char c = is.peek();
+        if(c == '"') intx = !intx;
+        else if(c == '<' && !intx) break;
+        *(t++) = is.get();
+    }
+    *t = 0;
+    s = tmp;
+}
+
+BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
+{
+    AtomList d,k,v;
+    bool inpool = false,inval = false,inkey = false,indata = false;
+	while(!is.eof()) {
+        xmltag tag;
+        gettag(is,tag);
+        if(!tag.Ok()) {
+            // look for value
+            string s;
+            getvalue(is,s);
+
+            if(s.length() && inpool && 
+                (
+                    (!inval && inkey && d.Count()) ||  /* dir */
+                    (inval && (inkey || indata)) /* value */
+                )
+            ) {
+                BL ret;
+                if(indata)
+                    ret = ParseAtoms(s,v);
+                else // inkey
+                    if(inval)
+                        ret = ParseAtoms(s,k);
+                    else {
+                        SetString(d[d.Count()-1],s.c_str());
+                        ret = true;
+                    }
+                if(!ret) post("pool - error interpreting XML value (%s)",s.c_str());
+            }
+            else
+                post("pool - error reading XML data");
+        }
+        else if(tag == "pool") {
+            if(tag.type == xmltag::t_end) break;
+            else inpool = true;
+        }
+        else if(inpool) {
+            if(tag == "dir") {
+                if(tag.type == xmltag::t_start) {
+                    t_atom at; SetString(at,"");
+                    d.Append(at);
+                }
+                else if(tag.type == xmltag::t_end) {
+                    if(d.Count())
+                        d.Set(d.Count()-1,d.Atoms(),0,true);
+                    else
+                        post("pool - superfluous </dir> in XML data");
+                }
+            }
+            else if(tag == "value") {
+                if(tag.type == xmltag::t_start) {
+                    inval = true;
+                    k.Clear(); v.Clear();
+                }
+                else if(tag.type == xmltag::t_end) {
+        			if(depth < 0 || d.Count() <= depth) {
+                        // NOW set value
+				        pooldir *nd = mkdir?AddDir(d):GetDir(d);
+				        if(nd) {
+                            // only use first word of key
+                            if(k.Count() == 1)
+					            nd->SetVal(k[0],new AtomList(v));
+                            else
+                                post("pool - Invalid key (!= 1 atom)");
+				        }
+                    }
+                    inval = false;
+                }
+            }
+            else if(tag == "key") {
+                if(tag.type == xmltag::t_start) {
+                    inkey = true;
+                }
+                else if(tag.type == xmltag::t_end) {
+                    inkey = false;
+                }
+            }
+            else if(tag == "data") {
+                if(!inval) 
+                    post("pool - XML tag <data> not within <value>");
+
+                if(tag.type == xmltag::t_start) {
+                    indata = true;
+                }
+                else if(tag.type == xmltag::t_end) {
+                    indata = false;
+                }
+            }
+#ifdef FLEXT_DEBUG
+            else {
+                post("pool - unknown XML tag '%s'",tag.tag.c_str());
+            }
+#endif
+        }
+        else if(tag == "!DOCTYPE") {
+            // ignore
+        }
+#ifdef FLEXT_DEBUG
+        else {
+            post("pool - unknown XML tag '%s'",tag.tag.c_str());
+        }
+#endif
+    }
+    return true;
+}
+
+static void indent(ostream &s,I cnt) 
+{
+    for(I i = 0; i < cnt; ++i) s << '\t';
+}
+
+BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 {
     if(dir.Count()) {
-        os << "<dir key=\"";
+        indent(os,ind);
+        os << "<dir>" << endl;
+        indent(os,ind+1);
+        os << "<key>";
         WriteAtom(os,dir[dir.Count()-1]);
-        os << "\">" << endl;
+        os << "</key>" << endl;
     }
 
 	for(I vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
-            os << "<value key=\"";
+            indent(os,ind+1);
+            os << "<value><key>";
 			WriteAtom(os,ix->key);
-            os << "\">";
+            os << "</key><data>";
 			WriteAtoms(os,*ix->data);
-			os << "</value>" << endl;
+			os << "</data></value>" << endl;
 		}
 	}
 
@@ -604,12 +781,15 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir)
 		I nd = depth > 0?depth-1:-1;
 		for(I di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
-				ix->SvDirXML(os,nd,AtomList(dir).Append(ix->dir));
+				ix->SvDirXML(os,nd,AtomList(dir).Append(ix->dir),ind+1);
 			}
 		}
 	}
 
-    if(dir.Count()) os << "</dir>" << endl;
+    if(dir.Count()) {
+        indent(os,ind);
+        os << "</dir>" << endl;
+    }
 	return true;
 }
 
