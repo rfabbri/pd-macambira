@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: download.php,v 1.3 2003-03-14 22:53:48 eighthave Exp $  -->
+<!-- $Id: download.php,v 1.4 2003-03-14 23:28:54 eighthave Exp $  -->
 
 <HTML>
 
@@ -31,7 +31,7 @@ We are aiming to make this page the one stop for all of your Pd downloads.
 <h3>Pure Data</h3>
 
 <h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=144081">pure-data</a></h4>
-<p>Miller Puckette's distribution.  You can also get it from <a href="http://crca.ucsd.edu/~msp" >his site</a>.</p>
+<p>Miller Puckette's distribution.  You can also get it from <a href="http://crca.ucsd.edu/~msp/" >his site</a>.</p>
 
 <h4><a href="http://sourceforge.net/project/showfiles.php?group_id=55736&release_id=145993" >pd-extended</a></h4>
 <p>The Pd developer community have added some extensions to Pd, like colored audio cords, GUI glitch prevention, and more.  The pd-extended
