@@ -12,7 +12,7 @@
 # (the normal header file doesn't work as g_canvas.h is not there)
 # please note that currently the development branch (e.g devel_0_36) is needed
 # 
-PDPATH=/home/thomas/prog/pd-devel/src
+PDPATH=/usr/src/pd-0.37-0/src
 
 # where do the flext libraries reside?
 FLEXTPATH=/usr/local/lib/pd/flext
@@ -22,11 +22,14 @@ TARGDIR=./pd-linux
 
 # where should the external be installed?
 # (leave blank to omit installation)
-#INSTPATH=/usr/local/lib/pd/extra
+INSTPATH=/usr/local/lib/pd/extra
 
 
 # additional compiler flags
 # (check if they fit for your system!)
-UFLAGS=-mcpu=pentiumpro  # gcc 2.95
+# UFLAGS=-mcpu=pentiumpro  # gcc 2.95
 # UFLAGS=-mcpu=pentium3 -msse  # gcc 3.2
+
+# define for shared build
+#FLEXT_SHARED=1
 

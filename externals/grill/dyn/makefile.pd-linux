@@ -16,15 +16,31 @@ CONFIG=config-pd-linux.txt
 
 include $(CONFIG)
 
-FLEXTLIB=$(FLEXTPATH)/flext.a
 
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
 LIBPATH=
-FLAGS=-DFLEXT_SYS=2 ${U_FLAGS}
-CFLAGS=-O6 
-#CFLAGS=-g
-LIBS=m util 
+FLAGS=-DFLEXT_SYS=2 
+CFLAGS=-O2 $(UFLAGS) 
+LIBS=stdc++ 
+
+
+ifdef FLEXT_SHARED
+CFLAGS+=-shared -DFLEXT_SHARED
+LDFLAGS+=-L $(FLEXTPATH)
+LIBFLEXT=-lflext
+
+ifeq ($(CXX),icc)
+LDFLAGS+=-i_dynamic
+else
+LDFLAGS+=-Wl,-Bdynamic
+endif
+
+else
+
+LIBFLEXT=$(FLEXTPATH)/libflext.a
+
+endif
 
 
 # ---------------------------------------------
@@ -43,21 +59,22 @@ TARGET=$(TARGDIR)/$(NAME).pd_linux
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(MAKEFILE) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
-	mkdir $(TARGDIR)
+	-mkdir $(TARGDIR)
 
 $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) -shared $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))  
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(LIBFLEXT) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS))  
+	strip --strip-unneeded $@	
 	chmod 755 $@
 
 $(INSTPATH):
-	mkdir $(INSTPATH)
+	-mkdir $(INSTPATH)
 
 install:: $(INSTPATH)
 

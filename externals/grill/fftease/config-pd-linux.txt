@@ -9,7 +9,6 @@
 
 # your c/c++ compilers (define only if not gcc/g++)
 # CC=gcc
-# CXX=g++
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
@@ -28,7 +27,9 @@ INSTPATH=/usr/local/lib/pd/extra
 
 # additional compiler flags
 # (check if they fit for your system!)
-UFLAGS=-mcpu=pentiumpro  # gcc 2.95
+# UFLAGS=-mcpu=pentiumpro  # gcc 2.95
 # UFLAGS=-mcpu=pentium3 -msse  # gcc 3.2
 
+# define for shared build
+# FLEXT_SHARED=1
 
