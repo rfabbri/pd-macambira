@@ -22,6 +22,8 @@ send+dump/	CNMAT's OSC commandline utils
 
 log:
 
+  20030527: added sending to broadcast address capability to htmsocket
+
   20020908: 0.16-4:
   	    added non-match / unmatched outlet to OSCroute
   	    updated doc/OSCroute-help.pd including a new chapter
