@@ -48,9 +48,10 @@ if ( -d $ENV{'HOME'} ) {
 				 "-lib iem_mp3",
 				 "-lib iem_t3_lib",
 				 "-lib pdp",
+				 "-lib xsample",
 				 "-lib zexy",
-				 "$EXTERNALS",
-				 "$HELP"
+				 "-path $EXTERNALS",
+				 "-helppath $HELP"
 				 );
 	 
 	 foreach $line (@pdrc) {

@@ -13,7 +13,7 @@ INFO_FILE = $(PKG_NAME).info
 clean: darwin_pkg_clean
 
 darwin_pkg_clean:
-	-sudo rm -Rf installroot $(PKG_NAME)*
+	-sudo rm -Rf installroot $(PKG_NAME)* *.pkg
 	-rm -f *~ 1
 
 # install into MSP's default: /usr/local/lib

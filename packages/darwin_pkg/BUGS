@@ -1,12 +1,28 @@
 
-- zexy crashes with an error due to _z_wrap_setup
+- fix transparent file icon pd-file.icns
 
-- maxlib/unauthorized/etc. help files don't load properly
+- the .pkg names should probably not have the version in them. The installer
+  then doesn't recognize that it is upgrading a package, since the package
+  name is different.  This doesn't matter yet since an upgrade doesn't behave
+  any differently.
+
+- alt stops working?
+
+- shift sometimes does not work with multiple selections
+
+- right-click menu sometimes comes up about 10 pixels to the right of where
+  it should be.
+
+- many unauthorized externals don't work.  try -bundle_loader ../../../pd/bin/pd
+
+- "compute audio" checkbox only refreshes when you click on the Pd window
+
+------------------------------------------------------------------------------
+DONE?
 
 - The installer selects the System Disk by default as the disk to install
   to but it doesn't allow you to install there. You have to either click "Go
   Back" then "Continue" or click on another disk, then click on the System Disk.
 
-- the .pkg names should probably non have the version in them. The installer
-  then doesn't recognize that it is upgrading a package, since the package
-  name is different.
+- help files don't load properly (can't seem to find anymore broken ones)
+

@@ -33,6 +33,7 @@ The recommended way to do this is:
 	 mkdir pure-data && cd pure-data
 	 setenv CVSROOT :pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data
 	 tar xzf pd-0.37.tar.gz (or cvs checkout -r devel_0_37 pd )
+	 ln -s pd-0.37.0 pd
 	 cvs checkout darwin-pkg
 	 cvs checkout doc
 	 cvs checkout externals
@@ -44,5 +45,8 @@ that is the same minor version as the one you are compiling into the package
 (e.g. 0.36-*, 0.37-*, etc).  This is necessary for this linker flag:
 
 -bundle_loader /usr/local/bin/pd
+
+This should probably be changed to be a relative path so that you can use the
+pd version that you are compiling to link with.
 
   - Hans-Christoph Steiner <hans@eds.org>
