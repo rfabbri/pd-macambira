@@ -28,7 +28,6 @@ orig:
 	cd ..;tar --exclude=CVS -czvf pd-externals_0.3.orig.tar.gz externals
 	
 
-
 build: build-stamp
 
 build-stamp: configure-stamp 
@@ -41,17 +40,19 @@ build-stamp: configure-stamp
 
         # Build zexy
 	
-	(cd zexy/src; $(MAKE) -f makefile.linux)
+	(cd zexy/src; $(MAKE) -f makefile.linux LINCLUDE="-I ../../build/include")
 
 	# Build flext
 	
-	(cd grill/flext; $(MAKE) -f makefile.pd-linux STK=/usr/include/stk)
+	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include  STK=/usr/include/stk)
 
 	# Flext externals
 	#
 	 
-	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
-	FLEXTINC=../../grill/flext/source FLUIDLIB=" -lfluidsynth")
+	(cd footils; make PD_DIR=../../build/include \
+                          FLEXTPATH=../../grill/flext/pd-linux \
+	                  FLEXTINC=../../grill/flext/source \
+                          FLUIDLIB=" -lfluidsynth")
 
 	# OSC
 
