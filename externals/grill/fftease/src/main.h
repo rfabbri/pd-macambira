@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __FFTEASE_H
 #define __FFTEASE_H
 
-#define FFTEASE_VERSION "0.0.1"
+#define FFTEASE_VERSION "0.0.0"
 
 
 #define FLEXT_ATTRIBUTES 1 
