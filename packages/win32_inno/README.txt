@@ -1,19 +1,35 @@
 
-Package Maker
+------------------------------------------------------------------------------
+Software Requirements
+------------------------------------------------------------------------------
 
-This package is assembled using Inno Setup
-(http://www.jrsoftware.org/isinfo.php ).  Check pd.iss for what's happening.
+Inno Setup - http://www.jrsoftware.org/isinfo.php
+	  This package is assembled using Inno Setup, check pd.iss for details.
 
+ogg vorbis win32k SDK - 
+	 Install into C:\ to make it work with the current Makefile
+
+pthreads - ftp://sources.redhat.com/pub/pthreads-win32/
+	 pthreads is a standard, cross-platform threading library used in the pd 
+	 core and externals.  You can use the version included with Pd.
+
+Microsoft Visual Studio - 
+    Sad but true, Pd is free software, but you need some very unfree software
+	 to compile it on Windows.  You need MS Visual Studio 6.0 or better.
+
+------------------------------------------------------------------------------
 Makefile
+------------------------------------------------------------------------------
 
 Currently, the Makefile.nmake only compiles the 'externals' collection.  It
 can also compile flext if you manually check the flext config and uncomment
 things from the Makefile.nmake.  Ideally, everything would be compiled and
 built from a Makefile using MinGW, so that only free software would be
-needed.  Currently, to compile Pd on Windows you need MS Visual Studio 6.0 or
-better.
+needed.
 
+------------------------------------------------------------------------------
 Directory Layout
+------------------------------------------------------------------------------
 
 This directory is for files that are used in the creation of the Windows
 installer.  In order to use this to compile/assemble Pd and externals.
