@@ -37,9 +37,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef MACOSX
 #include <malloc.h>
-#endif
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
@@ -98,7 +96,7 @@ static int ignorevisible=1; // ignore visible test
 
 #define THREAD_SLEEP_TIME 100000   // 100000 us = 100 ms
 
-static char   *sonogram_version = "sonogram~: version 0.11, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *sonogram_version = "sonogram~: version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *sonogram_class;
 t_widgetbehavior sonogram_widgetbehavior;
@@ -2018,6 +2016,7 @@ void sonogram_tilde_setup(void)
     post(sonogram_version);
     sonogram_class = class_new(gensym("sonogram~"), (t_newmethod)sonogram_new, (t_method)sonogram_free,
                     sizeof(t_sonogram), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_sethelpsymbol( sonogram_class, gensym("sonogram~.pd") );
 
     // set callbacks
     sonogram_widgetbehavior.w_getrectfn =    sonogram_getrect;
@@ -2027,18 +2026,14 @@ void sonogram_tilde_setup(void)
     sonogram_widgetbehavior.w_deletefn =     sonogram_delete;
     sonogram_widgetbehavior.w_visfn =        sonogram_vis;
     sonogram_widgetbehavior.w_clickfn =      sonogram_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(sonogram_class, NULL);
+    class_setsavefn(sonogram_class, sonogram_save);
+#else
     sonogram_widgetbehavior.w_propertiesfn = NULL;
     sonogram_widgetbehavior.w_savefn =       sonogram_save;
-#else
-	 class_setpropertiesfn(sonogram_class, NULL);
-	 class_setsavefn(sonogram_class, &sonogram_save);
 #endif
 
     CLASS_MAINSIGNALIN( sonogram_class, t_sonogram, x_f );
