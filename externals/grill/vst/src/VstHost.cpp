@@ -9,91 +9,55 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "Editor.h"
 #include "VstHost.h"
-#include "vst\aeffeditor.h"
 #include "vst\aeffectx.h"
 
 using namespace std;
 
-VstTimeInfo VSTPlugin::_timeInfo;
+static VstTimeInfo _timeInfo;
 
-float VSTPlugin::sample_rate = 44100;
+typedef AEffect *(*PVSTMAIN)(audioMasterCallback audioMaster);
 
 
-////////////////////
-//
-/////////////////////
 VSTPlugin::VSTPlugin():
+    h_dll(NULL),hwnd(NULL),_pEffect(NULL),
     posx(0),posy(0),
-    hwnd(NULL),
-    _editor(false)
-{
-	queue_size=0;
-	_sDllName = NULL;
-	h_dll=NULL;
-	instantiated=false;		// Constructin' with no instance
-	overwrite = false;
-//    wantidle = false;
-//	 show_params = false;
-	 _midichannel = 0;
-}
+	_midichannel(0),queue_size(0)
+{}
 
 VSTPlugin::~VSTPlugin()
 {
 	Free();				// Call free
-	delete _sDllName;	// if _sDllName = NULL , the operation does nothing -> it's safe.
 }
  
-int VSTPlugin::Instance( const char *dllname)
+int VSTPlugin::Instance(const char *dllname)
 {
 	h_dll = LoadLibrary(dllname);
-
-	if(!h_dll) {
+	if(!h_dll)
 		return VSTINSTANCE_ERR_NO_VALID_FILE;
-	}
 
-//	post("Loaded library %s" , dllname);
 	PVSTMAIN main = (PVSTMAIN)GetProcAddress(h_dll,"main");
 	if(!main) {	
 		FreeLibrary(h_dll);
-		_pEffect=NULL;
-		instantiated=false;
+		_pEffect = NULL;
 		return VSTINSTANCE_ERR_NO_VST_PLUGIN;
 	}
-	//post("Found main function - about to call it");
+
 	//This calls the "main" function and receives the pointer to the AEffect structure.
-	_pEffect = main((audioMasterCallback)&(this->Master));
+	_pEffect = main((audioMasterCallback)Master);
 	
-	if(!_pEffect) {
-		post("VST plugin : unable to create effect");
-		FreeLibrary(h_dll);
-		_pEffect=NULL;
-		instantiated=false;
-		return VSTINSTANCE_ERR_REJECTED;
-	}
+	if(!_pEffect || _pEffect->magic != kEffectMagic) {
+		post("VST plugin : Unable to create effect");
+
+	    _pEffect = NULL;
+		FreeLibrary(h_dll); h_dll = NULL;
+	    return VSTINSTANCE_ERR_REJECTED;
+    }
 	
-	if(  _pEffect->magic!=kEffectMagic) {
-		post("VST plugin : Instance query rejected by 0x%.8X\n",(int)_pEffect);
-		FreeLibrary(h_dll);
-		_pEffect=NULL;
-		instantiated=false;
-		return VSTINSTANCE_ERR_REJECTED;
-	}
-
-	//post("VST plugin : Instanced at (Effect*): %.8X\n",(int)_pEffect);
-
 	//init plugin 
 	_pEffect->user = this;
-	Dispatch( effOpen        ,  0, 0, NULL, 0.0f);
-	Dispatch( effSetProgram  ,  0, 0, NULL, 0.0f);
-//	Dispatch( effMainsChanged,  0, 1, NULL, 0.0f);
+    FLEXT_ASSERT(Dispatch( effOpen ));
+//	Dispatch( effMainsChanged,  0, 1);
 
-	//************************************set samplerate and stream size here
-    // we get it when we init our DSP
-
-//	Dispatch( effSetSampleRate, 0, 0, NULL, (float)Global::pConfig->_pOutputDriver->_samplesPerSec);
-//	Dispatch( effSetBlockSize,  0, STREAM_SIZE, NULL, 0.0f);
-
-	
 	if (!Dispatch( effGetProductString, 0, 0, &_sProductName, 0.0f)) {
 		string str1(dllname);
 		string str2 = str1.substr(str1.rfind('\\')+1);
@@ -105,43 +69,23 @@ int VSTPlugin::Instance( const char *dllname)
 		strcpy(_sProductName,str1.c_str());
 	}
 	
-	if (!_pEffect->dispatcher(_pEffect, effGetVendorString, 0, 0, &_sVendorName, 0.0f)) {
+	if(!Dispatch( effGetVendorString, 0, 0, &_sVendorName, 0.0f))
 		strcpy(_sVendorName, "Unknown vendor");
-	}
 
-	_version = _pEffect->version;
-	_isSynth = (_pEffect->flags & effFlagsIsSynth)?true:false;
-	overwrite = (_pEffect->flags & effFlagsCanReplacing)?true:false;
-	_editor = (_pEffect->flags & effFlagsHasEditor)?true:false;
-
-	if ( _sDllName != NULL ) delete _sDllName;
-	_sDllName = new char[strlen(dllname)+1];
-	sprintf(_sDllName,dllname);
+	_sDllName = dllname;
 	
-	
-	//keep plugin name
-	instantiated=true;
-
 	return VSTINSTANCE_NO_ERROR;
 }
 
-int VSTPlugin::getNumInputs( void )
-{
-	return _pEffect->numInputs;
-}
 
-int VSTPlugin::getNumOutputs( void )
-{
-	return _pEffect->numOutputs;
-}
-
-
+/*
 void VSTPlugin::Create(VSTPlugin *plug)
 {
-	h_dll=plug->h_dll;
-	_pEffect=plug->_pEffect;
-	_pEffect->user=this;
-	Dispatch( effMainsChanged,  0, 1, NULL, 0.0f);
+	h_dll = plug->h_dll;
+	_pEffect = plug->_pEffect;
+	_pEffect->user = this;
+
+	Dispatch( effMainsChanged,  0, 1);
 //	strcpy(_editName,plug->_editName); On current implementation, this replaces the right one. 
 	strcpy(_sProductName,plug->_sProductName);
 	strcpy(_sVendorName,plug->_sVendorName);
@@ -157,96 +101,117 @@ void VSTPlugin::Create(VSTPlugin *plug)
 								// doesn't unload the Dll.
 	instantiated=true;
 }
+*/
 
 void VSTPlugin::Free() // Called also in destruction
 {
-    if(IsEdited()) StopEditor(this);
+	if(Is()) {
+        if(IsEdited()) StopEditor(this);
 
-	if(instantiated) {
-		instantiated=false;
-		post("VST plugin : Free query 0x%.8X\n",(int)_pEffect);
-		_pEffect->user = NULL;
-		Dispatch( effMainsChanged, 0, 0, NULL, 0.0f);
-		Dispatch( effClose,        0, 0, NULL, 0.0f);
+        // shut down plugin
+		Dispatch(effMainsChanged, 0, 0);
+		Dispatch(effClose);
+
 //		delete _pEffect; // <-  Should check for the necessity of this command.
-		_pEffect=NULL;
-		FreeLibrary(h_dll);
+		_pEffect = NULL;
+        if(h_dll) { FreeLibrary(h_dll); h_dll = NULL; }
 	}
 }
 
-void VSTPlugin::Init( float samplerate , float blocksize )
+void VSTPlugin::DspInit(float samplerate,int blocksize)
 {
-	sample_rate = samplerate;
-	Dispatch(effOpen        ,  0, 0, NULL, 0.f);
-	Dispatch(effMainsChanged,  0, 1, NULL, 0.f);
-	Dispatch(effSetSampleRate, 0, 0, 0, (float) sample_rate );
-	Dispatch(effSetBlockSize,  0, blocksize, NULL, 0.f );
+//	sample_rate = samplerate;
+
+    Dispatch(effMainsChanged,  0, 1);
+	Dispatch(effSetSampleRate, 0, 0,NULL,samplerate);
+	Dispatch(effSetBlockSize,  0, blocksize);
 }
 
-
-bool VSTPlugin::DescribeValue(int p,char* psTxt)
+void VSTPlugin::GetParamName(int numparam,char *name) const
 {
-	int parameter = p;
-	if(instantiated)
-	{
-		if(parameter<_pEffect->numParams)
-		{
+	if(numparam < GetNumParams()) 
+        Dispatch(effGetParamName,numparam,0,name,0.0f);
+	else 
+        strcpy(name,"Index out of Range");
+}
+
+bool VSTPlugin::SetParamFloat(int parameter,float value)
+{
+	if(Is() && parameter >= 0 && parameter < GetNumParams()) {
+		_pEffect->setParameter(_pEffect,parameter,value);
+		return true;
+	}
+    else
+	    return false;
+}
+
+void VSTPlugin::GetParamValue(int numparam,char *parval) const
+{
+    if(Is()) {
+        if(numparam < GetNumParams()) {
 //			char par_name[64];
 			char par_display[64];
 			char par_label[64];
 
 //			Dispatch(effGetParamName,parameter,0,par_name,0.0f);
-			Dispatch(effGetParamDisplay,parameter,0,par_display,0.0f);
-			Dispatch(effGetParamLabel,parameter,0,par_label,0.0f);
+			Dispatch(effGetParamDisplay,numparam,0,par_display,0.0f);
+			Dispatch(effGetParamLabel,numparam,0,par_label,0.0f);
 //			sprintf(psTxt,"%s:%s%s",par_name,par_display,par_label);
-			sprintf(psTxt,"%s%s",par_display,par_label);
-			return true;
-		}
-		else	sprintf(psTxt,"NumParams Exeeded");
+			sprintf(parval,"%s%s",par_display,par_label);
+        }
+	    else 
+            strcpy(parval,"Index out of range");
+    }
+	else		
+        strcpy(parval,"Plugin not loaded");
+}
+
+float VSTPlugin::GetParamValue(int numparam) const
+{
+	if(Is() && numparam < GetNumParams()) 
+        return _pEffect->getParameter(_pEffect, numparam);
+	else 
+        return -1.0;
+}
+
+void VSTPlugin::Edit(bool open)
+{	
+	if(Is()) { 	
+        if(open) {
+		    if(HasEditor() && !IsEdited())
+                StartEditor(this);
+        }
+        else if(IsEdited())
+            StopEditor(this);
 	}
-	else		sprintf(psTxt,"Not loaded");
-
-	return false;
 }
 
-bool VSTPlugin::SetParameter(int parameter, float value)
+void VSTPlugin::StartEditing(WHandle h)
 {
-	if(instantiated)
-	{
-		if (( parameter >= 0 ) && (parameter<=_pEffect->numParams))
-		{
-			_pEffect->setParameter(_pEffect,parameter,value);
-			return true;
-		}
-	}
-
-	return false;
+    FLEXT_ASSERT(h != NULL);
+	Dispatch(effEditOpen,0,0,hwnd = h);
 }
 
-bool VSTPlugin::SetParameter(int parameter, int value)
-{
-	return SetParameter(parameter,value/65535.0f);
+void VSTPlugin::StopEditing() 
+{ 
+	Dispatch(effEditClose);					
+    hwnd = NULL; 
 }
 
-int VSTPlugin::GetCurrentProgram()
-{
-	if(instantiated)
-		return Dispatch(effGetProgram,0,0,NULL,0.0f);
-	else
-		return 0;
+void VSTPlugin::Visible(bool vis)
+{	
+	if(Is() && IsEdited()) ShowEditor(this,vis);
 }
 
-void VSTPlugin::SetCurrentProgram(int prg)
-{
-	if(instantiated)
-		Dispatch(effSetProgram,0,prg,NULL,0.0f);
+bool VSTPlugin::IsVisible() const
+{	
+	return Is() && IsEdited() && IsEditorShown(this);
 }
 
 bool VSTPlugin::AddMIDI(unsigned char data0,unsigned char data1,unsigned char data2)
 {
-	if (instantiated)
-	{
-		VstMidiEvent* pevent=&midievent[queue_size];
+	if(Is()) {
+		VstMidiEvent* pevent = &midievent[queue_size];
 
 		pevent->type = kVstMidiType;
 		pevent->byteSize = 24;
@@ -273,17 +238,73 @@ bool VSTPlugin::AddMIDI(unsigned char data0,unsigned char data1,unsigned char da
 
 void VSTPlugin::SendMidi()
 {
-	if(/*instantiated &&*/ queue_size>0)
-	{
+	if(Is() && queue_size > 0) {
 		// Prepare MIDI events and free queue dispatching all events
 		events.numEvents = queue_size;
 		events.reserved  = 0;
-		for(int q=0;q<queue_size;q++) events.events[q] = (VstEvent*)&midievent[q];
+		for(int q = 0; q < queue_size; q++) 
+            events.events[q] = (VstEvent*)&midievent[q];
 		
 		Dispatch(effProcessEvents, 0, 0, &events, 0.0f);
-		queue_size=0;
+		queue_size = 0;
 	}
 }
+
+static int range(int value,int mn = 0,int mx = 127) 
+{
+    return value < mn?mn:(value > mx?mx:value);
+}
+
+bool VSTPlugin::AddNoteOn( unsigned char note,unsigned char speed,unsigned char midichannel)
+{
+    return AddMIDI((char)MIDI_NOTEON | midichannel,note,speed);
+}
+
+bool VSTPlugin::AddNoteOff( unsigned char note,unsigned char midichannel)
+{
+    return AddMIDI((char)MIDI_NOTEOFF | midichannel,note,0);
+}
+
+void VSTPlugin::AddAftertouch(int value)
+{
+ 	AddMIDI( (char)MIDI_NOTEOFF | _midichannel , range(value) );
+}
+
+void VSTPlugin::AddPitchBend(int value)
+{
+	AddMIDI( MIDI_PITCHBEND + (_midichannel & 0xf) , ((value>>7) & 127), (value & 127));
+}
+
+void VSTPlugin::AddProgramChange(int value)
+{
+    AddMIDI( MIDI_PROGRAMCHANGE + (_midichannel & 0xf), range(value), 0);
+}
+
+void VSTPlugin::AddControlChange(int control, int value)
+{
+    AddMIDI( MIDI_CONTROLCHANGE + (_midichannel & 0xf), range(control), range(value));
+}
+
+
+bool VSTPlugin::GetProgramName( int cat , int p, char *buf) const
+{
+	int parameter = p;
+	if(parameter < GetNumPrograms()) {
+		Dispatch(effGetProgramNameIndexed,parameter,cat,buf,0.0f);
+		return true;
+	}
+	else
+        return false;
+}
+
+void VSTPlugin::SetPos(int x,int y,bool upd) 
+{
+    if(Is()) {
+        posx = x; posy = y; 
+        if(upd && IsEdited()) MoveEditor(this,posx,posy);
+    }
+}
+
 
 
 void VSTPlugin::processReplacing( float **inputs, float **outputs, long sampleframes )
@@ -297,16 +318,31 @@ void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
 	_pEffect->process( _pEffect , inputs , outputs , sampleframes );
 }
 
+#if 1
 
 // Host callback dispatcher
 long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
 {
-#if 0
-    if(!effect) {
-        FLEXT_LOG("effect = NULL");
+    switch (opcode) {
+    case audioMasterVersion:
+        return 2;
+    case audioMasterCurrentId:
+        return 'AASH';
+    default:
+#ifdef FLEXT_DEBUG
+    	post("VST -> host: Eff = 0x%.8X, Opcode = %d, Index = %d, Value = %d, PTR = %.8X, OPT = %.3f\n",(int)effect, opcode,index,value,(int)ptr,opt);
+#endif
         return 0;
     }
-#endif
+}
+
+#else
+
+// Host callback dispatcher
+long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, void *ptr, float opt)
+{
+    VSTPlugin *th = effect?(VSTPlugin *)effect->user:NULL;
+    if(!th) FLEXT_LOG("No this");
 
 #ifdef FLEXT_DEBUG
     if(opcode != audioMasterGetTime)
@@ -331,17 +367,11 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 0;		// call application idle routine (this will call effEditIdle for all open editors too) 
 		
 	case audioMasterPinConnected:	
-		if (value == 0) //input
-		{
-			if ( index < 2) return 0;
-			else return 1;
-		}
-		else //output
-		{
-			if ( index < 2) return 0;
-			else return 1;
-		}
-		return 0;	// inquire if an input or output is beeing connected;
+		if(value == 0)
+            return index < 2?0:1; //input
+		else 
+            return index < 2?0:1; //output
+
 /*
 	case audioMasterWantMidi:			
 		return 0;
@@ -352,7 +382,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	case audioMasterGetTime:
 		memset(&_timeInfo, 0, sizeof(_timeInfo));
 		_timeInfo.samplePos = 0;
-		_timeInfo.sampleRate = sample_rate;
+        _timeInfo.sampleRate = th?th->sample_rate:0;
 		return (long)&_timeInfo;
 		
 		
@@ -364,7 +394,7 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 1;
 
 	case audioMasterGetSampleRate:		
-		return sample_rate;	
+        return th?(long)th->sample_rate:0;	
 
 	case audioMasterGetVendorString:	// Just fooling version string
 		strcpy((char*)ptr,"Steinberg");
@@ -374,37 +404,32 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 		return 5000;	// HOST version 5000
 
 	case audioMasterGetProductString:	// Just fooling product string
-		strcpy((char*)ptr,"Cubase 5.0");
+		strcpy((char *)ptr,"Cubase 5.0");
 		return 0;
 
 	case audioMasterVendorSpecific:		
-		{
-			return 0;
-		}
-		
+		return 0;
 
 	case audioMasterGetLanguage:		
 		return kVstLangEnglish;
 	
 	case audioMasterUpdateDisplay:
-#ifdef FLEXT_DEBUG
-		post("audioMasterUpdateDisplay");
-#endif
+		FLEXT_LOG("audioMasterUpdateDisplay");
 		effect->dispatcher(effect, effEditIdle, 0, 0, NULL, 0.0f);
 		return 0;
 
 	case 	audioMasterCanDo:
-		if (!strcmp((char*)ptr,"sendVstEvents")) return 1;
-		if (!strcmp((char*)ptr,"sendVstMidiEvent")) return 1;
-		if (!strcmp((char*)ptr,"sendVstTimeInfo")) return 1;
+		if (!strcmp((char *)ptr,"sendVstEvents")) return 1;
+		else if (!strcmp((char *)ptr,"sendVstMidiEvent")) return 1;
+		else if (!strcmp((char *)ptr,"sendVstTimeInfo")) return 1;
 //			"receiveVstEvents",
 //			"receiveVstMidiEvent",
 //			"receiveVstTimeInfo",
 		
 //			"reportConnectionChanges",
 //			"acceptIOChanges",
-		if (!strcmp((char*)ptr,"sizeWindow")) return 1;
-		if (!strcmp((char*)ptr,"supplyIdle")) return 1;
+//		else if (!strcmp((char*)ptr,"sizeWindow")) return 1;
+		else if (!strcmp((char*)ptr,"supplyIdle")) return 1;
 		return -1;
 		
 	case 	audioMasterSetTime:						FLEXT_LOG("VST master dispatcher: Set Time");break;
@@ -433,137 +458,13 @@ long VSTPlugin::Master(AEffect *effect, long opcode, long index, long value, voi
 	case 	audioMasterGetDirectory:				FLEXT_LOG("VST master dispatcher: GetDirectory");break;
 //	case		audioMasterUpdateDisplay:				post("VST master dispatcher: audioMasterUpdateDisplay");break;
 
-	default: post("VST master dispatcher: undefed: %d , %d",opcode , effKeysRequired )	;break;
+#ifdef FLEXT_DEBUG
+	default: 
+        post("VST master dispatcher: undefed: %d , %d",opcode , effKeysRequired );
+#endif
 	}	
 	
 	return 0;
 }
 
-bool VSTPlugin::AddNoteOn( unsigned char note,unsigned char speed,unsigned char midichannel)
-{
-    return AddMIDI((char)MIDI_NOTEON | midichannel,note,speed);
-}
-
-bool VSTPlugin::AddNoteOff( unsigned char note,unsigned char midichannel)
-{
-    return AddMIDI((char)MIDI_NOTEOFF | midichannel,note,0);
-}
-
-
-bool VSTPlugin::replace()
-{
-	return overwrite;
-}
-
-
-void VSTPlugin::edit(bool open)
-{	
-	if(instantiated) { 	
-        if(open) {
-		    if(HasEditor() && !IsEdited())
-                StartEditor(this);
-        }
-        else if(IsEdited())
-            StopEditor(this);
-	}
-}
-
-void VSTPlugin::visible(bool vis)
-{	
-	if(instantiated && IsEdited()) ShowEditor(this,vis);
-}
-
-void VSTPlugin::EditorIdle()
-{
-    FLEXT_ASSERT(hwnd != NULL);
-	Dispatch(effEditIdle,0,0, hwnd,0.0f);			
-}
-
-RECT VSTPlugin::GetEditorRect()
-{
-	RECT ret;
-	ERect *r;
-	Dispatch(effEditGetRect,0,0, &r,0.0f);				
-	ret.top = r->top;
-	ret.bottom = r->bottom;
-	ret.left = r->left;
-	ret.right = r->right;
-	return ret;
-}
-
-void VSTPlugin::SetEditWindow(HWND h)
-{
-	hwnd = h;	
-    FLEXT_ASSERT(hwnd != NULL);
-	Dispatch(effEditOpen,0,0, hwnd,0.0f);							
-}
-
-void VSTPlugin::OnEditorClose()
-{
-    FLEXT_ASSERT(hwnd != NULL);
-	Dispatch(effEditClose,0,0, hwnd,0.0f);					
-}
-
-void VSTPlugin::StopEditing()
-{
-    hwnd = NULL;
-}
-
-/*
-void VSTPlugin::SetShowParameters(bool s)
-{
-	show_params = s;
-}
-
-bool VSTPlugin::ShowParams()
-{
-	return show_params;
-}
-*/
-
-void VSTPlugin::AddAftertouch(int value)
-{
-	if (value < 0) value = 0; else if (value > 127) value = 127;
- 	AddMIDI( (char)MIDI_NOTEOFF | _midichannel , value );
-}
-
-void VSTPlugin::AddPitchBend(int value)
-{
-		AddMIDI( MIDI_PITCHBEND + (_midichannel & 0xf) , ((value>>7) & 127), (value & 127));
-}
-
-void VSTPlugin::AddProgramChange(int value)
-{
- if (value < 0) value = 0; else if (value > 127) value = 127;
-    AddMIDI( MIDI_PROGRAMCHANGE + (_midichannel & 0xf), value, 0);
-}
-
-void VSTPlugin::AddControlChange(int control, int value)
-{
-  if (control < 0) control = 0;  else if (control > 127) control = 127;
-    if (value < 0) value = 0;  else if (value > 127) value = 127;
-    AddMIDI( MIDI_CONTROLCHANGE + (_midichannel & 0xf), control, value);
-}
-
-
-bool VSTPlugin::GetProgramName( int cat , int p, char *buf)
-{
-	int parameter = p;
-	if(instantiated)
-	{
-		if(parameter<NumPrograms())
-		{
-			Dispatch(effGetProgramNameIndexed,parameter,cat,buf,0.0f);
-			return true;
-		}
-	}
-	return false;
-}
-
-int VSTPlugin::GetNumCategories()
-{
-	if(instantiated)
-		return Dispatch(effGetNumProgramCategories,0,0,NULL,0.0f);
-	else
-		return 0;
-}
+#endif 
