@@ -62,6 +62,7 @@ public:
 
 protected:
     virtual void m_signal (int n, float *const *in, float *const *out);
+    virtual void m_dsp (int n, float *const *in, float *const *out);
     
     void set_mu(t_float);
     void set_muv(t_float);
@@ -78,7 +79,7 @@ private:
     t_float deriv(t_float x[],int eq);
 
     // 4th order Runge Kutta update of the dynamical variables 
-    void   runge_kutta_4(t_float dt);
+    void runge_kutta_4(t_float dt);
 
     //these are our data
     t_float data[4]; //mu, muv, nu, nuv (semi-parabolische koordinaten)
@@ -87,6 +88,14 @@ private:
     //and these our settings
     t_float dt;
     bool regtime; //if true "regularisierte zeit"
+
+    bool xfade;
+    t_float newE;
+    t_float newdt;
+    bool newsystem;
+    bool newregtime;
+
+    t_float * m_fader;
 
     //Callbacks
     FLEXT_CALLBACK_1(set_mu,t_float);
@@ -209,13 +218,21 @@ inline void him::runge_kutta_4(t_float dt)
 
     
     /*
-      the system might become unstable ... in this case, we'll reset the system
+      the system might become unstable ... in this case, we'll request a new system
     */    
 
     for(int i=0;i<=NUMB_EQ-1;i++)
     {
 	if(data[i]>2)
-	    reset();
+	    {
+		xfade = newsystem =  true;
+		data[i] = 2;
+	    }
+	if(data[i]<-2)
+	    {
+		xfade = newsystem = true;
+		data[i] = -2;
+	    }
     }
 }
 
@@ -233,7 +250,7 @@ void him::m_signal(int n, t_float *const *in, t_float *const *out)
     
     if (regtime)
     {
-	for (int j=0;j!=n;++j)
+	for (int i=0;i!=n;++i)
 	{
 	    runge_kutta_4(dt);
 	    (*(out0)++)=data[0];
@@ -246,7 +263,7 @@ void him::m_signal(int n, t_float *const *in, t_float *const *out)
     }
     else
     {
-	for (int j=0;j!=n;++j)
+	for (int i=0;i!=n;++i)
 	{
 	    runge_kutta_4(dt/(2*sqrt(data[0]*data[0]+data[2]*data[2])));
 	    (*(out0)++)=data[0];
@@ -257,7 +274,96 @@ void him::m_signal(int n, t_float *const *in, t_float *const *out)
 	    (*(out5)++)=(data[0]*data[0]-data[2]*data[2])*0.5;
 	}
     }
+    
+    if (xfade)
+    {
+	/* fading */
+	out0 = out[0];
+	out1 = out[1];
+	out2 = out[2];
+	out3 = out[3];
+	out4 = out[4];
+	out5 = out[5];
+	
+	t_float * fader = m_fader + n - 1;
+	for (int i=0;i!=n;++i)
+	{
+	    (*(out0)++) *= *fader;
+	    (*(out1)++) *= *fader;
+	    (*(out2)++) *= *fader;
+	    (*(out3)++) *= *fader;
+	    (*(out4)++) *= *fader;
+	    (*(out5)++) *= *fader--;
+	}
+
+	if (newsystem)
+	{
+	    reset();
+	    newsystem = false;
+	}
+	
+	E = newE;
+	dt = newdt;
+	regtime = newregtime;
+
+	out0 = out[0];
+	out1 = out[1];
+	out2 = out[2];
+	out3 = out[3];
+	out4 = out[4];
+	out5 = out[5];
+    
+	fader = m_fader;
+	if (regtime)
+	{
+	    for (int i=0;i!=n;++i)
+	    {
+		runge_kutta_4(dt);
+		(*(out0)++)+= data[0]* *fader;
+		(*(out1)++)+= data[1]* *fader;
+		(*(out2)++)+= data[2]* *fader;
+		(*(out3)++)+= data[3]* *fader;
+		(*(out4)++)+= data[0]*data[2]* *fader;
+		(*(out5)++)+= (data[0]*data[0]-data[2]*data[2])*0.5* *fader++;
+	    }
+	}
+	else
+	{
+	    for (int i=0;i!=n;++i)
+	    {
+		runge_kutta_4(dt/(2*sqrt(data[0]*data[0]+data[2]*data[2])));
+		(*(out0)++)+= data[0]* *fader;
+		(*(out1)++)+= data[1]* *fader;
+		(*(out2)++)+= data[2]* *fader;
+		(*(out3)++)+= data[3]* *fader;
+		(*(out4)++)+= data[0]*data[2]* *fader;
+		(*(out5)++)+= (data[0]*data[0]-data[2]*data[2])*0.5* *fader++;
+	    }
+	}
+	
+	xfade = false;
+    }
+    
 }    
+
+void him::m_dsp(int n, t_float *const *in, t_float *const *out)
+{
+    m_fader = new t_float[n];
+    t_float on = 1.f/(n-1);
+    
+    t_float value = 0;
+
+    t_float* localfader = m_fader;
+
+    while (n--)
+    {
+	*localfader = value;
+	value += on;
+	++localfader;
+    }
+    xfade = false;
+}
+
 
 void him::set_mu(t_float f)
 {
@@ -281,23 +387,25 @@ void him::set_nuv(t_float f)
 {
     data[3]=f;
     reset_muv();
-    post("resetting muv!!!");
 }
 
 void him::set_etilde(t_float f)
 {
-    E=f;
-    reset_nuv();
+    newE=f;
+    xfade = true;
+    //reset_nuv();
 }
 
 void him::set_dt(t_float f)
 {
-    dt=f;
+    newdt=f;
+    xfade = true;
 }
 
 void him::set_regtime(bool b)
 {
-    regtime=b;
+    newregtime=b;
+    xfade = true;
 }
 
 
@@ -316,5 +424,4 @@ void him::reset()
     data[1]=float(rand())/float(RAND_MAX);
     data[2]=float(rand())/float(RAND_MAX);
     reset_nuv();
-    post("randomizing values");
 }
