@@ -22,6 +22,8 @@
 
 #include "pdp.h"
 #include "pdp_llconv.h"
+#include "time.h"
+#include "sys/time.h"
 #include <quicktime/lqt.h>
 #include <quicktime/colormodels.h>
 
@@ -35,22 +37,25 @@ typedef struct pdp_yqt_struct
     t_float x_f;
 
     t_outlet *x_outlet0;
-    t_outlet *x_outlet1;
-    t_outlet *x_outlet2;
-    t_outlet *x_outlet3;   /* audio left channel  */
-    t_outlet *x_outlet4;   /* audio right channel */
+    t_outlet *x_curframe;
+    t_outlet *x_nbframes;
+    t_outlet *x_framerate;
+    t_outlet *x_ol;   /* audio left channel  */
+    t_outlet *x_or;   /* audio right channel */
 
     int packet0;
     bool initialized;
 
     unsigned int x_vwidth;
     unsigned int x_vheight;
+    t_int x_cursec;
+    t_int x_framescount;
 
     bool loop;
 
     unsigned char * qt_rows[3];
 
-    unsigned char * qt_frame;
+    unsigned char *qt_frame;
     quicktime_t *qt;
     int qt_cmodel;
 
@@ -124,7 +129,7 @@ static void pdp_yqt_open(t_pdp_yqt *x, t_symbol *name)
     
 	quicktime_set_cmodel(x->qt, x->qt_cmodel);
 	x->initialized = true;
-	outlet_float(x->x_outlet2, (float)quicktime_video_length(x->qt,0));
+	outlet_float(x->x_nbframes, (float)quicktime_video_length(x->qt,0));
 
     }
 
@@ -175,6 +180,7 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
   int object, length, pos, i, j;
   short int* data;
   t_pdp* header;
+  struct timeval etime;
 
     if (!(x->initialized)){
 	//post("pdp_yqt: no qt file opened");
@@ -228,8 +234,20 @@ static void pdp_yqt_bang(t_pdp_yqt *x)
         post("pdp_yqt : error on decode: unkown colour model");
         break;
     }
+
+    if ( gettimeofday(&etime, NULL) == -1)
+    {
+        post("pdp_fcqt : could not get time" );
+    }
+    if ( etime.tv_sec != x->x_cursec )
+    {
+       x->x_cursec = etime.tv_sec;
+       outlet_float(x->x_framerate, (float)x->x_framescount);
+       x->x_framescount = 0;
+    }
+    x->x_framescount++;
     
-    outlet_float(x->x_outlet1, (float)pos);
+    outlet_float(x->x_curframe, (float)pos);
     pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
     // fills in the audio buffer with a chunk if necessary
@@ -317,11 +335,12 @@ void *pdp_yqt_new(void)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("frame_cold"));
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything);
-    x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
-    x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
+    x->x_curframe = outlet_new(&x->x_obj, &s_float);
+    x->x_nbframes = outlet_new(&x->x_obj, &s_float);
+    x->x_framerate = outlet_new(&x->x_obj, &s_float);
 
-    x->x_outlet3 = outlet_new(&x->x_obj, &s_signal);   /* audio left channel  */
-    x->x_outlet4 = outlet_new(&x->x_obj, &s_signal);   /* audio right channel */
+    x->x_ol = outlet_new(&x->x_obj, &s_signal);   /* audio left channel  */
+    x->x_or = outlet_new(&x->x_obj, &s_signal);   /* audio right channel */
 
     x->packet0 = -1;
 
