@@ -30,8 +30,7 @@
          http://www.parasitaere-kapazitaeten.net/ext
      SuperCollider by James McCartney
          http://www.audiosynth.com
-     
-   Coded while listening to: 
+        Coded while listening to: 
 
 
 */

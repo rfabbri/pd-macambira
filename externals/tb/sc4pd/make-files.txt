@@ -11,4 +11,4 @@ SRCS= \
 	difsqr.cpp sumsqr.cpp sqrdif.cpp sqrsum.cpp absdif.cpp LFSaw.cpp \
 	LFPulse.cpp Impulse.cpp Integrator.cpp Decay.cpp Decay2.cpp Lag.cpp \
 	Lag2.cpp Lag3.cpp LinExp.cpp DelayUnit.cpp DelayN.cpp DelayL.cpp \
-	DelayC.cpp CombN.cpp
+	DelayC.cpp CombN.cpp CombL.cpp

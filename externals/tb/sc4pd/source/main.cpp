@@ -60,7 +60,7 @@ void sc4pd_library_setup()
 	 "          sqrsum(~), absdif(~), LFSaw(~), LFPulse(~), Impulse(~),\n"
 	 "          Integrator(~), Decay~, Decay2~, Lag~, Lag2~, LinExp(~), "
 	 "DelayN~,\n"
-	 "          DelayL~, DelayC~"
+	 "          DelayL~, DelayC~, CombN~, CombL~"
 	 );
 
     //initialize objects
@@ -213,6 +213,10 @@ void sc4pd_library_setup()
     FLEXT_DSP_SETUP(DelayL_ar); 
 
     FLEXT_DSP_SETUP(DelayC_ar); 
+
+    FLEXT_DSP_SETUP(CombN_ar); 
+
+    FLEXT_DSP_SETUP(CombL_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);
