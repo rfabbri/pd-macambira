@@ -2,7 +2,7 @@
 vst~ - VST plugin object for PD 
 based on the work of Jarno Seppänen and Mark Williamson
 
-Copyright (c)2003-2004 Thomas Grill (xovo@gmx.net)
+Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
@@ -37,12 +37,13 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             // Initialize the window. 
             plug->StartEditing(hwnd);
             break; 
+
         case WM_CLOSE:
 #ifdef FLEXT_LOGGING
             flext::post("WM_CLOSE");
 #endif
-            // plug could already have been unloaded...
-            plug->StopEditing(); // this sets plug->hwnd = NULL
+            plug->StopEditing();
+
             DestroyWindow(hwnd);
             break; 
         case WM_DESTROY: 
@@ -57,7 +58,26 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
         case WM_ENTERIDLE:
             plug->EditorIdle();		
             break; 
+#if 0
+        case WM_WINDOWPOSCHANGED: {
+            // ignore after WM_CLOSE so that x,y positions are preserved
+            if(!plug->IsEdited()) break;
 
+            WINDOWPOS *w = (WINDOWPOS *)lp;
+
+	        WINDOWINFO winfo;
+	        winfo.cbSize = sizeof(winfo);
+	        GetWindowInfo(hwnd,&winfo);
+            int cpx = winfo.rcWindow.left-winfo.rcClient.left;
+            int cpy = winfo.rcWindow.top-winfo.rcClient.top;
+            int csx = winfo.rcWindow.right-winfo.rcClient.right-cpx;
+            int csy = winfo.rcWindow.bottom-winfo.rcClient.bottom-cpy;
+            // send normalized coordinates to plugin
+            plug->SetPos(w->x+cpx,w->y+cpy,false);
+            plug->SetSize(w->cx+csx,w->cy+csy,false);
+            return 0; 
+        }
+#else
         case WM_MOVE: {
             // ignore after WM_CLOSE so that x,y positions are preserved
             if(!plug->IsEdited()) break;
@@ -65,12 +85,36 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             WORD wx = LOWORD(lp),wy = HIWORD(lp);
             short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
             // x and y are the coordinates of the client rect (= actual VST interface)
-            plug->SetPos(x,y,false);
-#ifdef FLEXT_LOGGING
-            flext::post("WM_MOVE x/y=%i/%i",x,y);
-#endif
+
+	        WINDOWINFO winfo;
+	        winfo.cbSize = sizeof(winfo);
+	        GetWindowInfo(hwnd,&winfo);
+            int px = winfo.rcWindow.left-winfo.rcClient.left;
+            int py = winfo.rcWindow.top-winfo.rcClient.top;
+            // send normalized coordinates to plugin
+            plug->SetPos(x+px,y+py,false);
             break; 
         }
+
+        case WM_SIZE: {
+            if(!plug->IsEdited()) break;
+
+            WORD wx = LOWORD(lp),wy = HIWORD(lp);
+            short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
+            // x and y are the coordinates of the client rect (= actual VST interface)
+
+	        WINDOWINFO winfo;
+	        winfo.cbSize = sizeof(winfo);
+	        GetWindowInfo(hwnd,&winfo);
+            int px = winfo.rcWindow.left-winfo.rcClient.left;
+            int py = winfo.rcWindow.top-winfo.rcClient.top;
+            int sx = winfo.rcWindow.right-winfo.rcClient.right-px;
+            int sy = winfo.rcWindow.bottom-winfo.rcClient.bottom-py;
+            // send normalized coordinates to plugin
+            plug->SetSize(x+sx,y+sy,false);
+            break; 
+        }
+#endif
 
 #if 0 // NOT needed for Windows
         case WM_PAINT: {
@@ -86,16 +130,9 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
             break;  
         }
 #endif
-
-#if 0 //def FLEXT_LOGGING
-        case WM_SIZE: {
-            WORD wx = LOWORD(lp),wy = HIWORD(lp);
-            short x = reinterpret_cast<short &>(wx),y = reinterpret_cast<short &>(wy);
-            // x and y are the coordinates of the client rect (= actual VST interface)
-            flext::post("WM_SIZE x/y=%i/%i",x,y);
-            break; 
-        }
-#endif
+        case WM_SHOWWINDOW:
+            plug->Visible(wp != FALSE,false);
+            break;
 
         default: 
         #ifdef FLEXT_LOGGING
@@ -107,22 +144,25 @@ static LRESULT CALLBACK wndproc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp)
     return res;
 }
 
-static void windowsize(HWND wnd,int x,int y,int w,int h,bool caption,LONG flags = 0)
+static void windowsize(HWND wnd,int x,int y,int w,int h)
 {
-	WINDOWINFO winfo;
+    // pre correction
+    WINDOWINFO winfo;
 	winfo.cbSize = sizeof(winfo);
 	GetWindowInfo(wnd,&winfo);
+    int sx1 = (winfo.rcWindow.right-winfo.rcClient.right)-(winfo.rcWindow.left-winfo.rcClient.left);
+    int sy1 = (winfo.rcWindow.bottom-winfo.rcClient.bottom)-(winfo.rcWindow.top-winfo.rcClient.top);
 
-    int cy = caption?GetSystemMetrics(SM_CYCAPTION):0;
+    // First reflect new state in flags
+    SetWindowPos(wnd,NULL,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED);
 
-	SetWindowPos(wnd,HWND_TOP,
-    	x-(winfo.rcClient.left-winfo.rcWindow.left),
-        y-(winfo.rcClient.top-winfo.rcWindow.top),
-		w+winfo.cxWindowBorders*2,
-		h+cy+winfo.cyWindowBorders*2, 
-        flags
-	);
+    // post correction
+	GetWindowInfo(wnd,&winfo);
+    int sx2 = (winfo.rcWindow.right-winfo.rcClient.right)-(winfo.rcWindow.left-winfo.rcClient.left);
+    int sy2 = (winfo.rcWindow.bottom-winfo.rcClient.bottom)-(winfo.rcWindow.top-winfo.rcClient.top);
 
+    // set pos, size and flags
+    SetWindowPos(wnd,NULL,x,y,w+sx2-sx1,h+sy2-sy1,SWP_NOZORDER);
 }
 
 static void threadfun(flext::thr_params *p)
@@ -137,14 +177,18 @@ static void threadfun(flext::thr_params *p)
     wndmap[thrid] = plug;
     mapmutex.Unlock();    
 
-
     char tmp[256];
     sprintf(tmp,"vst~ - %s",plug->GetName());
 
-    HWND wnd = CreateWindow( 
+    // Get size from plugin
+	ERect r;
+    plug->GetEditorRect(r);
+
+    HWND wnd = CreateWindowEx(
+        plug->GetHandle()?WS_EX_APPWINDOW:WS_EX_TOOLWINDOW,
         WCLNAME,tmp,
-        (plug->GetCaption()?WS_BORDER|WS_CAPTION:0)|WS_POPUP|WS_SYSMENU|WS_MINIMIZEBOX,
-        CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,CW_USEDEFAULT,
+        WS_POPUP|WS_SYSMENU|WS_MINIMIZEBOX, // no border for the beginning to set proper coordinates
+        plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,
         NULL,NULL,
         hinstance,NULL
     );
@@ -152,34 +196,30 @@ static void threadfun(flext::thr_params *p)
     if(!wnd) 
         FLEXT_LOG1("wnd == NULL: %i",GetLastError());
     else {
-//        plug->Dispatch(effEditOpen , 0 , 0 , wnd, 0.0f  );  // Done in WNDPROC!!
-    /*
-	    CString str = theApp->GetProfileString( "VSTPos" , plug->GetName() , "10,10");
-	    int idx = str.Find(",");
-	    CString x = str.Left( idx );
-	    CString y = str.Right( idx );
-	    printf(" index is %d left is %s and right is %s" , idx , x , y);	
-    */
+        // idle timer
+        SetTimer(wnd,0,TIMER_INTERVAL,NULL);
 
-//	    plug->Dispatch(effEditTop,0,0, 0,0.0f);			
-    //	printf("Dispatched to the top\n");
+        // set caption style
+        CaptionEditor(plug,plug->GetCaption());
 
-	    SetTimer(wnd,0,TIMER_INTERVAL,NULL);
+        if(plug->IsVisible()) {
+            SetForegroundWindow(wnd);
+            ShowWindow(wnd,1); 
 
-	    ERect r;
-        plug->GetEditorRect(r);
-        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,plug->GetCaption(),SWP_SHOWWINDOW);
-#ifdef FLEXT_LOGGING
-        flext::post("Editor rect left/top=%i/%i, right/bottom=%i/%i",r.left,r.top,r.right,r.bottom);
-#endif
+            // notify plugin
+    //	    plug->Dispatch(effEditTop,0,0,0,0);
+        }
+        else
+            ShowWindow(wnd,0);
 
-	//	SetFocus();
+        try 
+        {
 
-        // Message pump
+        // Message loop
         MSG msg;
         BOOL bRet;
         while( (bRet = GetMessage( &msg, NULL, 0, 0 )) != 0) { 
-            if (bRet == -1) {
+            if(bRet == -1) {
                 // handle the error and possibly exit
                 FLEXT_LOG1("GetMessage error: %i",GetLastError());
             }
@@ -188,9 +228,18 @@ static void threadfun(flext::thr_params *p)
                 DispatchMessage(&msg); 
             }
         }
-    }
 
-//    UnregisterClass(wcx.lpszClassName,hinstance);
+        }
+
+        catch(exception &e) {
+            flext::post("vst~ - exception caught, exiting: %s",e.what());
+        }
+        catch(...) {
+            flext::post("vst~ - exception caught, exiting");
+        }
+
+        if(plug) plug->EditingEnded();
+    }
 
     mapmutex.Lock();
     wndmap.erase(thrid);
@@ -235,7 +284,7 @@ void StopEditor(VSTPlugin *p)
     flext::post("Stop editor 1");
 #endif
     PostMessage(p->EditorHandle(),WM_CLOSE,0,0); 
-    flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
+//    flext::StopThread(threadfun,reinterpret_cast<flext::thr_params *>(p));
 #ifdef FLEXT_LOGGING
     flext::post("Stop editor 2");
 #endif
@@ -249,21 +298,18 @@ void ShowEditor(VSTPlugin *p,bool show)
 void MoveEditor(VSTPlugin *p,int x,int y) 
 {
     HWND wnd = p->EditorHandle();
-
-	WINDOWINFO winfo;
-	winfo.cbSize = sizeof(winfo);
-	GetWindowInfo(wnd,&winfo);
-
-    SetWindowPos(wnd,NULL,
-		x-(winfo.rcClient.left-winfo.rcWindow.left),y-(winfo.rcClient.top-winfo.rcWindow.top),
-        0,0,
-		SWP_NOSIZE|SWP_NOZORDER
-	);
+    SetWindowPos(wnd,NULL,x,y,0,0,SWP_NOSIZE|SWP_NOZORDER);
 }
 
 void SizeEditor(VSTPlugin *p,int x,int y) 
 {
-    SetWindowPos(p->EditorHandle(),NULL,0,0,x,y,SWP_NOMOVE|SWP_NOZORDER);
+    HWND wnd = p->EditorHandle();
+    SetWindowPos(wnd,NULL,0,0,x,y,SWP_NOMOVE|SWP_NOZORDER);
+}
+
+void FrontEditor(VSTPlugin *p) 
+{
+    SetForegroundWindow(p->EditorHandle());
 }
 
 void CaptionEditor(VSTPlugin *plug,bool c)
@@ -274,10 +320,17 @@ void CaptionEditor(VSTPlugin *plug,bool c)
     else ns = style&~(WS_BORDER|WS_CAPTION);
     if(ns != style) {
         SetWindowLong(wnd,GWL_STYLE,ns);
-
-        ERect r; plug->GetEditorRect(r);
-        windowsize(wnd,plug->GetX(),plug->GetY(),r.right-r.left,r.bottom-r.top,c,SWP_FRAMECHANGED);
+        windowsize(wnd,plug->GetX(),plug->GetY(),plug->GetW(),plug->GetH());
     }
+}
+
+void HandleEditor(VSTPlugin *plug,bool h)
+{
+    HWND wnd = plug->EditorHandle();
+    bool v = plug->IsVisible();
+    if(v) ShowWindow(wnd,FALSE);
+    SetWindowLong(wnd,GWL_EXSTYLE,h?WS_EX_APPWINDOW:WS_EX_TOOLWINDOW);
+    if(v) ShowWindow(wnd,TRUE);
 }
 
 void TitleEditor(VSTPlugin *p,const char *t) 
@@ -285,7 +338,9 @@ void TitleEditor(VSTPlugin *p,const char *t)
     SetWindowText(p->EditorHandle(),t);
 }
 
+/*
 bool IsEditorShown(const VSTPlugin *p) 
 {
     return IsWindowVisible(p->EditorHandle()) != FALSE;
 }
+*/

@@ -8,7 +8,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 #include "vsthost.h"
-
+#include "editor.h"
+#include <exception>
+#include "flcontainers.h"
 
 const t_symbol 
     *VSTPlugin::sym_param,
@@ -22,8 +24,22 @@ const t_symbol
     *VSTPlugin::sym_ev_,
     *VSTPlugin::sym_midi[8];
 
+
+class DelPlugin
+    : public Fifo::Cell
+{
+public:
+    DelPlugin(VSTPlugin *p): plug(p) {}
+    VSTPlugin *plug;
+};
+
+static TypedLifo<DelPlugin> todel;
+flext::ThrCond VSTPlugin::thrcond;
+
 void VSTPlugin::Setup()
 {
+    LaunchThread(worker);
+
     sym_param = flext::MakeSymbol("param");
     sym_event = flext::MakeSymbol("event");
     sym_evmidi = flext::MakeSymbol("midi");
@@ -34,22 +50,23 @@ void VSTPlugin::Setup()
     sym_evsysex = flext::MakeSymbol("sysex");
     sym_ev_ = flext::MakeSymbol("???");
 
-    sym_midi[0] = flext::MakeSymbol("noteon");
-    sym_midi[1] = flext::MakeSymbol("noteoff");
-    sym_midi[2] = flext::MakeSymbol("polyafter");
-    sym_midi[3] = flext::MakeSymbol("cntl");
+    sym_midi[0] = flext::MakeSymbol("noteoff");
+    sym_midi[1] = flext::MakeSymbol("note");
+    sym_midi[2] = flext::MakeSymbol("atouch");
+    sym_midi[3] = flext::MakeSymbol("ctlchg");
     sym_midi[4] = flext::MakeSymbol("progchg");
-    sym_midi[5] = flext::MakeSymbol("chnafter");
-    sym_midi[6] = flext::MakeSymbol("pitchbend");
-    sym_midi[7] = sym__;
+    sym_midi[5] = flext::MakeSymbol("atouch");
+    sym_midi[6] = flext::MakeSymbol("pbend");
+    sym_midi[7] = flext::MakeSymbol("sysex");
 }
 
 VSTPlugin::VSTPlugin(Responder *resp)
     : hdll(NULL),hwnd(NULL)
     , effect(NULL),pluginmain(NULL),audiomaster(NULL)
     , responder(resp)
-    , posx(0),posy(0),caption(true)
-    , midichannel(0),eventqusz(0)
+    , posx(0),posy(0),sizex(0),sizey(0)
+    , visible(true),caption(true),handle(false)
+    , midichannel(0),eventqusz(0),dumpevents(false)
     , paramnamecnt(0)
     , transchg(true)
     , playing(false),looping(false),feedback(false)
@@ -67,7 +84,55 @@ VSTPlugin::~VSTPlugin()
 	Free();
 }
 
+VSTPlugin *VSTPlugin::New(Responder *resp)
+{
+    FLEXT_ASSERT(resp);
+    return new VSTPlugin(resp);
+}
 
+void VSTPlugin::Delete(VSTPlugin *p)
+{
+    FLEXT_ASSERT(p);
+
+    // tell plugin to close editor!
+    StopEditor(p);
+    // transfer to deletion thread
+    todel.Push(new DelPlugin(p));
+    thrcond.Signal();
+}
+
+void VSTPlugin::worker(thr_params *)
+{
+    TypedLifo<DelPlugin> tmp;
+    bool again = false;
+    for(;;) {
+        // wait for signal
+        if(again) {
+            thrcond.TimedWait(0.01);
+            again = false;
+        }
+        else
+            thrcond.Wait();
+
+        DelPlugin *p;
+        while((p = todel.Pop()) != NULL) {
+            // see if editing has stopped
+            if(p && p->plug->hwnd == NULL) {
+                // yes, it is now safe to delete the plug
+                delete p->plug;
+                delete p;
+            }
+            else {
+                tmp.Push(p);
+                again = true;
+            }
+        }
+
+        // put back remaining entries
+        while((p = tmp.Pop()) != NULL) todel.Push(p);
+    }
+}
+    
 #if FLEXT_OS == FLEXT_OS_MAC
 OSStatus FSPathMakeFSSpec(const UInt8 *path,FSSpec *spec,Boolean *isDirectory)  /* can be NULL */
 {
@@ -208,9 +273,17 @@ bool VSTPlugin::InstPlugin(long plugid)
     FLEXT_ASSERT(pluginmain && audiomaster);
 
 	//This calls the "main" function and receives the pointer to the AEffect structure.
-	effect = pluginmain(audiomaster);
-	if(!effect || effect->magic != kEffectMagic) {
-		post("VST plugin : Unable to create effect");
+    try { effect = pluginmain(audiomaster); }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while instantiating plugin: %s",e.what());
+    }
+    catch(...) {
+        flext::post("vst~ - caught exception while instantiating plugin");
+    }
+
+    if(!effect) 
+        return false;
+    else if(effect->magic != kEffectMagic) {
 		effect = NULL; 
 	    return false;
     }
@@ -219,13 +292,19 @@ bool VSTPlugin::InstPlugin(long plugid)
 
 bool VSTPlugin::Instance(const char *name,const char *subname)
 {
-    bool ok = effect != NULL;
+    bool ok = false;
+    FLEXT_ASSERT(effect == NULL);
     
+    try {
+
+/*
     if(!ok && dllname != name) {
         FreePlugin();
         // freshly load plugin
         ok = NewPlugin(name) && InstPlugin();
     }
+*/
+    ok = NewPlugin(name) && InstPlugin();
 
     if(ok && subname && *subname && Dispatch(effGetPlugCategory) == kPlugCategShell) {
         // sub plugin-name given -> scan plugs
@@ -294,37 +373,53 @@ bool VSTPlugin::Instance(const char *name,const char *subname)
 	    Dispatch(effGetVendorString,0,0,vendorname);
     }
 
+    }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while loading plugin: %s",e.what());
+        ok = false;
+    }
+    catch(...) {
+        flext::post("vst~ - Caught exception while loading plugin");
+        ok = false;
+    }
+
     if(!ok) Free();
 	return ok;
 }
 
-void VSTPlugin::Free() // Called also in destruction
+void VSTPlugin::Free() 
 {
-	if(effect) {
-        Edit(false);
+    // This should only also in destruction
 
-        // shut down plugin
-		Dispatch(effMainsChanged, 0, 0);
-		Dispatch(effClose);
+    try {
+	    if(effect) {
+            FLEXT_ASSERT(!IsEdited());
+
+            // shut down plugin
+		    Dispatch(effMainsChanged, 0, 0);
+		    Dispatch(effClose);
+        }
     }
-
-    // \TODO
-    // Here, we really have to wait until the editor thread has terminated
-    // otherwise WM_DESTROY etc. messages may still be pending
-    // in other words: this is a design flaw
-    // There should be a data stub accessible from the plugin object and the thread
-    // holding the necessary data, so that both can operate independently
+    catch(...) {}
 
     FreePlugin(); 
 }
 
 void VSTPlugin::DspInit(float sr,int blsz)
 {
-    // sample rate and block size must _first_ be set
-	Dispatch(effSetSampleRate,0,0,NULL,samplerate = sr);
-	Dispatch(effSetBlockSize, 0,blsz);
-    // then signal that mains have changed!
-    Dispatch(effMainsChanged,0,1);
+    try {
+        // sample rate and block size must _first_ be set
+	    Dispatch(effSetSampleRate,0,0,NULL,samplerate = sr);
+	    Dispatch(effSetBlockSize, 0,blsz);
+        // then signal that mains have changed!
+        Dispatch(effMainsChanged,0,1);
+    }
+    catch(exception &e) {
+        flext::post("vst~ - caught exception while initializing dsp: %s",e.what());
+    }
+    catch(...) {
+        flext::post("vst~ - caught exception while initializing dsp");
+    }
 }
 
 void VSTPlugin::ListPlugs(const t_symbol *sym) const

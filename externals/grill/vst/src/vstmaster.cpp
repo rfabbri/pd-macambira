@@ -16,7 +16,7 @@ static const char *product = "vst~";
 
 void VSTPlugin::ProcessEvent(const VstEvent &ev)
 {
-    if(!responder) return;
+    if(!responder && dumpevents) return;
 
     if(ev.type == kVstMidiType) {
         const VstMidiEvent &mev = (const VstMidiEvent &)ev;
