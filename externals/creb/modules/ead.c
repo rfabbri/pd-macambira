@@ -96,7 +96,7 @@ static t_int *ead_perform(t_int *w)
 	  state -= decay*state;
 	}
 
-    ctl->c_state = state;
+    ctl->c_state = IS_DENORMAL(state) ? 0 : state;
 
     return (w+4); /* pd quirk: pointer for sequencer */
 }

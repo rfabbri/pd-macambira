@@ -36,6 +36,8 @@ dynwav~		dynamic wavetable: use a signal block as wavetable
 ead~		exp. attack decay
 eadsr~		exp. attack decay sustain release
 ear~		exp. attack release
+fdn~		a feedback delay network
+junction~	a circulant lossless signal junction
 lattice~	lattice filter
 matrix~		multiply a signal block with an arbitrary matrix
 permut~		random permute a signal block

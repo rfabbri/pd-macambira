@@ -22,9 +22,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
-#include "m_pd.h"
-#include <math.h>
+#include "extlib_util.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -169,6 +167,9 @@ static t_int *bdiag_perform(t_int *w)
 
       s1new = (a * s1) - (b * s2) + u1; /* update state */
       s2new = (a * s2) + (b * s1) + u2;
+
+      s1new = IS_DENORMAL(s1new) ? 0 : s1new; /* clear denormals */
+      s2new = IS_DENORMAL(s2new) ? 0 : s2new;
 
       *state++ = s1new; /* store state */
       *state++ = s2new;

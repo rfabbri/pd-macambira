@@ -22,8 +22,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "m_pd.h"
-#include <math.h>
+#include "extlib_util.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -113,17 +112,16 @@ static t_int *diag_perform(t_int *w)
   t_float *eigen = ctl->c_eigen;
   t_float *state = ctl->c_state;
   t_int n = (t_int)(w[2]);
-
-  t_float x;
+  t_float newstate;
 
   int i;
 
   for (i=0; i<n; i++)
     {
-      x = *in;
-      *state += x;
-      *state *= *eigen;
-      *out    = *state;
+      newstate = (*state + *in) * (*eigen);
+      newstate = IS_DENORMAL(newstate) ? 0 : newstate;
+      *state   = newstate;
+      *out     = newstate;
 
       in++;
       out++;

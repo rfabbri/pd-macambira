@@ -29,3 +29,6 @@
 
 /* convert milliseconds to 1-p, with p a real pole */
 float milliseconds_2_one_minus_realpole(float time);
+
+/* check if floating point number is denormal */
+#define IS_DENORMAL(f) (((*(unsigned int *)&(f))&0x7f800000) == 0) 

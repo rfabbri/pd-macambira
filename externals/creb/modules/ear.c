@@ -81,7 +81,7 @@ static t_int *ear_perform(t_int *w)
 	  state -= release*state;
 	}
 
-    ctl->c_state = state;
+    ctl->c_state = IS_DENORMAL(state) ? 0 : state;
     return (w+4);
 }
 

@@ -31,7 +31,7 @@
 #define     PULSE         8
 #define     NEWTON1       9
 #define     UPPERCLIP    10
-
+#define     COMPARATOR   11
 
 
 
@@ -207,6 +207,18 @@ static t_int *dist_perform(t_int *w)
 
 	x = (x < 0.0f) ? 0.0f : x;
 	x = (x > 0.9999f) ? 0.9999f : x;
+
+	*out++ = x; 
+	
+      }
+    break;
+
+  case COMPARATOR:
+    for (i = 0; i < n; i++)
+      {
+	x = *in++ * gain;
+
+	x = (x > 0.0f) ? 1.0f : -1.0f;
 
 	*out++ = x; 
 	

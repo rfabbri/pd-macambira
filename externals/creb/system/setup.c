@@ -25,6 +25,8 @@ void lattice_tilde_setup(void);
 void ratio_setup(void);
 void ffpoly_setup(void);
 void fwarp_setup(void);
+void junction_tilde_setup(void);
+void fdn_tilde_setup(void);
 
 void creb_setup(void)
 {
@@ -40,7 +42,6 @@ void creb_setup(void)
   qmult_tilde_setup();
   qnorm_tilde_setup();
   cheby_tilde_setup();
-  abs_tilde_setup();
   ramp_tilde_setup();
   dwt_tilde_setup();
   bfft_tilde_setup();
@@ -51,6 +52,8 @@ void creb_setup(void)
   matrix_tilde_setup();
   permut_tilde_setup();
   lattice_tilde_setup();
+  junction_tilde_setup();
+  fdn_tilde_setup();
 
   /* setup other objects */
   ratio_setup();
@@ -60,5 +63,10 @@ void creb_setup(void)
   /* setup c++ modules */
   biquadseries_tilde_setup();
   filterortho_tilde_setup();
+
+  /* optional modules */
+#ifdef HAVE_ABS_TILDE
+  abs_tilde_setup();
+#endif
 
 }
