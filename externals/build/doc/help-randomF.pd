@@ -1,0 +1,12 @@
+#N canvas 749 231 604 504 10;
+#X text 124 68 GEM object;
+#X msg 123 155 bang;
+#X text 138 23 randomF;
+#X obj 123 223 randomF 0.5;
+#X text 60 385 randomF is a floating point random number generator
+;
+#X floatatom 195 161 5 0 0 1 range - -;
+#X floatatom 123 289 5 0 0 0 - - -;
+#X connect 1 0 3 0;
+#X connect 3 0 6 0;
+#X connect 5 0 3 1;
