@@ -16,23 +16,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // --------------------------------------------------------------
 
-template<class T> V f_rpow(T &v,T a,T b) { v = pow(fabs(a),b)*sgn(a); } 
-
-BL VecOp::d_pow(OpParam &p) { d__rbin(f_rpow<S>,p); }
-
-template<class T> V f_crpow(T &rv,T &iv,T ra,T ia,T rb,T) 
-{ 
-	register const R _abs = sqrt(sqabs(ra,ia));
-	if(_abs) {
-		register const R _p = pow(_abs,rb)/_abs;
-		rv = _p*ra,iv = _p*ia;
-	}
-	else
-		rv = iv = 0;
-} 
-
-BL VecOp::d_rpow(OpParam &p) { d__cbin(f_crpow<S>,p); }
-
 Vasp *VaspOp::m_rpow(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;
@@ -58,25 +41,10 @@ VASP_ANYOP("vasp.rpow",rpow,0,true,VASP_ARG_R(1),"Power function acting on compl
 
 // --------------------------------------------------------------
 
-template<class T> V f_rsqrt(T &v,T a) { v = sqrt(fabs(a)); } 
-template<class T> V f_rssqrt(T &v,T a) { v = sqrt(fabs(a))*sgn(a); } 
-
-BL VecOp::d_sqrt(OpParam &p) { d__run(f_rsqrt<S>,p); }
-BL VecOp::d_ssqrt(OpParam &p) { d__run(f_rssqrt<S>,p); }
-
-
 VASP_UNARY("vasp.sqrt",sqrt,true,"Square root") 
 VASP_UNARY("vasp.ssqrt",ssqrt,true,"Square root preserving the sign") 
 
 // --------------------------------------------------------------
-
-
-template<class T> V f_rexp(T &v,T a) { v = exp(a); } 
-template<class T> V f_rlog(T &v,T a) { v = log(a); }  // \todo detect NANs
-
-BL VecOp::d_exp(OpParam &p) { d__run(f_rexp<S>,p); }
-BL VecOp::d_log(OpParam &p) { d__run(f_rlog<S>,p); }
-
 
 VASP_UNARY("vasp.exp",exp,true,"Exponential function") 
 VASP_UNARY("vasp.log",log,true,"Natural logarithm") 

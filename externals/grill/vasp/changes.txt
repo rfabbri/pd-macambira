@@ -1,5 +1,9 @@
 Version history:
 
+0.1.3:
+- CHANGE: exchanged #defines for templates in vector calculation loops
+- FIX: bug for binary operations of complex vasps
+
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument
 - FIX: another bug in resize of immediate buffers

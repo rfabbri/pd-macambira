@@ -209,27 +209,4 @@ VASP_ANYOP("vasp.int",int,0,true,VASP_ARG_I(1),"Integration")
 VASP_ANYOP("vasp.dif",dif,0,true,VASP_ARG_I(1),"Differentiation") 
 
 
-
-/*! \brief Bashes denormals and NANs to zero
-
-	\param arg argument list 
-	\param dst destination vasp (NULL for in-place operation)
-	\return normalized destination vasp
-*/
-template<class T> inline V f_fix(T &v,T a) 
-{ 
-	if(a != a) // NAN
-		v = 0; 
-	else {
-		// denormal bashing (doesn't propagate to the next stage)
-
-		static const F anti_denormal = 1e-18F;
-		a += anti_denormal;
-		a -= anti_denormal;
-		v = a; 
-	}
-} 
-
-BL VecOp::d_fix(OpParam &p) { D__run(f_fix<S>,p); }
-
 VASP_UNARY("vasp.fix",fix,true,"Bashes denormals/NANs to zero") 

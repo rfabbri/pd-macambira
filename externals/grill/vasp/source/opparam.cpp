@@ -149,14 +149,35 @@ V OpParam::AI_Rev(I bl)
 		arg[bl].v.idt -= (frames-1)*(arg[bl].v.is = -arg[bl].v.is); 
 }
 
-BL OpParam::AR_In(I bl) const { return arg[bl].argtp == Arg::arg_v && arg[bl].v.rdt && rddt > arg[bl].v.rdt && rddt < arg[bl].v.rdt+frames*arg[bl].v.rs; } 
-BL OpParam::AI_In(I bl) const { return arg[bl].argtp == Arg::arg_v && arg[bl].v.idt && iddt > arg[bl].v.idt && iddt < arg[bl].v.idt+frames*arg[bl].v.is; } 
+BL OpParam::AR_In(I bl) const 
+{ 
+    return arg[bl].argtp == Arg::arg_v && arg[bl].v.rdt && rddt > arg[bl].v.rdt && rddt < arg[bl].v.rdt+frames*arg[bl].v.rs; 
+} 
 
-BL OpParam::AR_Can(I bl) const { return arg[bl].argtp != Arg::arg_v || !arg[bl].v.rdt || arg[bl].v.rdt <= rddt || arg[bl].v.rdt >= rddt+frames*rds; } 
-BL OpParam::AI_Can(I bl) const { return arg[bl].argtp != Arg::arg_v || !arg[bl].v.idt || arg[bl].v.idt <= iddt || arg[bl].v.idt >= iddt+frames*ids; } 
+BL OpParam::AI_In(I bl) const 
+{ 
+    return arg[bl].argtp == Arg::arg_v && arg[bl].v.idt && iddt > arg[bl].v.idt && iddt < arg[bl].v.idt+frames*arg[bl].v.is; 
+} 
 
-BL OpParam::AR_Ovr(I bl) const { return arg[bl].argtp == Arg::arg_v && arg[bl].v.rdt && rddt != arg[bl].v.rdt && rddt < arg[bl].v.rdt+frames*arg[bl].v.rs && arg[bl].v.rdt < rddt+frames*rds; } 
-BL OpParam::AI_Ovr(I bl) const { return arg[bl].argtp == Arg::arg_v && arg[bl].v.idt && iddt != arg[bl].v.idt && iddt < arg[bl].v.idt+frames*arg[bl].v.is && arg[bl].v.idt < iddt+frames*ids; } 
+BL OpParam::AR_Can(I bl) const 
+{ 
+    return arg[bl].argtp != Arg::arg_v || !arg[bl].v.rdt || arg[bl].v.rdt <= rddt || arg[bl].v.rdt >= rddt+frames*rds; 
+} 
+
+BL OpParam::AI_Can(I bl) const 
+{ 
+    return arg[bl].argtp != Arg::arg_v || !arg[bl].v.idt || arg[bl].v.idt <= iddt || arg[bl].v.idt >= iddt+frames*ids; 
+} 
+
+BL OpParam::AR_Ovr(I bl) const 
+{ 
+    return arg[bl].argtp == Arg::arg_v && arg[bl].v.rdt && rddt != arg[bl].v.rdt && rddt < arg[bl].v.rdt+frames*arg[bl].v.rs && arg[bl].v.rdt < rddt+frames*rds; 
+} 
+
+BL OpParam::AI_Ovr(I bl) const 
+{ 
+    return arg[bl].argtp == Arg::arg_v && arg[bl].v.idt && iddt != arg[bl].v.idt && iddt < arg[bl].v.idt+frames*arg[bl].v.is && arg[bl].v.idt < iddt+frames*ids; 
+} 
 
 
 
@@ -170,7 +191,7 @@ BL OpParam::AR_In() const
 BL OpParam::AI_In() const
 {
 	for(I i = 0; i < args; ++i) 
-		if(!AI_In(i)) return true;
+		if(AI_In(i)) return true;
 	return false;
 }
 

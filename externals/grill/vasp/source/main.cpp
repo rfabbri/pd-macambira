@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 
-const C *VASP_VERSION = "0.1.2";
+const C *VASP_VERSION = "0.1.3pre1";
 
 
 

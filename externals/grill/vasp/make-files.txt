@@ -8,6 +8,6 @@ main.cpp     obj_offs.cpp    obj_size.cpp   opbase.cpp     ops_cmp.cpp     ops_g
               
 HDRS= \
 arg.h      env.h     opdefs.h   oppermute.h  ops_assign.h  ops_cplx.h     ops_flt.h    ops_resmp.h   ops_wnd.h  vbuffer.h \
-buflib.h   main.h    oploop.h   ops.h        ops_carith.h  ops_dft.h      ops_gen.h    ops_search.h  util.h     vecblk.h \
+buflib.h   main.h    opfuns.h 	oploop.h   ops.h        ops_carith.h  ops_dft.h      ops_gen.h    ops_search.h  util.h     vecblk.h \
 classes.h  opbase.h  opparam.h  ops_arith.h  ops_cmp.h     ops_feature.h  ops_rearr.h  ops_trnsc.h   vasp.h
 

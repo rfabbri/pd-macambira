@@ -16,47 +16,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 // --------------------------------------------------------------
 
-template<class T> V f_maxq(T &,T ra,OpParam &p) 
-{ 
-	if(ra > p.norm.minmax) p.norm.minmax = ra; 
-} 
-
-template<class T> V f_minq(T &,T ra,OpParam &p) 
-{ 
-	if(ra < p.norm.minmax) p.norm.minmax = ra; 
-} 
-
-template<class T> V f_amaxq(T &,T ra,OpParam &p) 
-{ 
-	register T s = fabs(ra); 
-	if(s > p.norm.minmax) p.norm.minmax = s; 
-} 
-
-template<class T> V f_aminq(T &,T ra,OpParam &p) 
-{ 
-	register T s = fabs(ra); 
-	if(s < p.norm.minmax) p.norm.minmax = s; 
-} 
-
-template<class T> V f_rmaxq(T &,T &,T ra,T ia,OpParam &p) 
-{ 
-	register T s = sqabs(ra,ia); 
-	if(s > p.norm.minmax) p.norm.minmax = s; 
-} 
-
-template<class T> V f_rminq(T &,T &,T ra,T ia,OpParam &p) 
-{ 
-	register T s = sqabs(ra,ia); 
-	if(s < p.norm.minmax) p.norm.minmax = s; 
-} 
-
-BL VecOp::d_minq(OpParam &p) { D__rop(f_minq<S>,p); }
-BL VecOp::d_maxq(OpParam &p) { D__rop(f_maxq<S>,p); }
-BL VecOp::d_aminq(OpParam &p) { D__rop(f_aminq<S>,p); }
-BL VecOp::d_amaxq(OpParam &p) { D__rop(f_amaxq<S>,p); }
-BL VecOp::d_rminq(OpParam &p) { d__cop(f_rminq<S>,p); }
-BL VecOp::d_rmaxq(OpParam &p) { d__cop(f_rmaxq<S>,p); }
-
 // --------------------------------------------------------------
 
 

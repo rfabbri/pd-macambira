@@ -11,16 +11,16 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_ASSIGN_H
 #define __VASP_OPS_ASSIGN_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Assignment functions
 
 namespace VecOp {
-	BL d_copy(OpParam &p); 
-	BL d_set(OpParam &p); 
+    inline BL d_copy(OpParam &p) { return D__run<S,f_copy<S> >(p); }
+    inline BL d_ccopy(OpParam &p) { return D__cun<S,f_copy<S> >(p); }
 
-	BL d_ccopy(OpParam &p); 
-	BL d_cset(OpParam &p); 
+    inline BL d_set(OpParam &p) { return D__rbin<S,f_set<S> >(p); }
+    inline BL d_cset(OpParam &p) { return D__cbin<S,f_set<S> >(p); }
 }
 
 namespace VaspOp {

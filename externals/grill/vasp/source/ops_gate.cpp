@@ -17,32 +17,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 // --------------------------------------------------------------
 
 
-template<class T> V f_gate(T &rv,T ra,T rb) { rv = fabs(ra) >= rb?ra:0; } 
-template<class T> V f_igate(T &rv,T ra,T rb) { rv = fabs(ra) <= rb?ra:0; } 
-
-template<class T> V f_rgate(T &rv,T &iv,T ra,T ia,T rb,T) 
-{ 
-	register const T _abs = sqabs(ra,ia);
-
-	if(_abs >= rb*rb) rv = ra,iv = ia;
-	else rv = iv = 0;
-} 
-
-template<class T> V f_rigate(T &rv,T &iv,T ra,T ia,T rb,T) 
-{ 
-	register const T _abs = sqabs(ra,ia);
-
-	if(_abs <= rb*rb) rv = ra,iv = ia;
-	else rv = iv = 0;
-} 
-
-BL VecOp::d_gate(OpParam &p) { D__rbin(f_gate<S>,p); }
-BL VecOp::d_igate(OpParam &p) { d__rbin(f_igate<S>,p); }
-BL VecOp::d_rgate(OpParam &p) { d__cbin(f_rgate<S>,p); }
-BL VecOp::d_rigate(OpParam &p) { d__cbin(f_rigate<S>,p); }
-
-
-
 Vasp *VaspOp::m_gate(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst) 
 { 
 	Vasp *ret = NULL;

@@ -11,42 +11,40 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_CMP_H
 #define __VASP_OPS_CMP_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Comparison functions
 
 namespace VecOp {
-	BL d_lwr(OpParam &p); 
-	BL d_gtr(OpParam &p); 
-	BL d_alwr(OpParam &p); 
-	BL d_agtr(OpParam &p); 
-	BL d_leq(OpParam &p); 
-	BL d_geq(OpParam &p); 
-	BL d_aleq(OpParam &p); 
-	BL d_ageq(OpParam &p); 
-	BL d_equ(OpParam &p); 
-	BL d_neq(OpParam &p); 
+    inline BL d_lwr(OpParam &p) { return D__rbin<S,f_lwr<S> >(p); }
+    inline BL d_gtr(OpParam &p) { return D__rbin<S,f_gtr<S> >(p); }
+    inline BL d_alwr(OpParam &p) { return D__rbin<S,f_alwr<S> >(p); }
+    inline BL d_agtr(OpParam &p) { return D__rbin<S,f_agtr<S> >(p); }
+    inline BL d_leq(OpParam &p) { return D__rbin<S,f_leq<S> >(p); }
+    inline BL d_geq(OpParam &p) { return D__rbin<S,f_geq<S> >(p); }
+    inline BL d_aleq(OpParam &p) { return D__rbin<S,f_aleq<S> >(p); }
+    inline BL d_ageq(OpParam &p) { return D__rbin<S,f_ageq<S> >(p); }
+    inline BL d_equ(OpParam &p) { return D__rbin<S,f_equ<S> >(p); }
+    inline BL d_neq(OpParam &p) { return D__rbin<S,f_neq<S> >(p); }
 
-	BL d_min(OpParam &p); 
-	BL d_max(OpParam &p); 
+    inline BL d_min(OpParam &p) { return D__rbin<S,f_min<S> >(p); }
+    inline BL d_max(OpParam &p) { return D__rbin<S,f_max<S> >(p); }
+    inline BL d_rmin(OpParam &p) { return d__cbin<S,f_min<S> >(p); }
+    inline BL d_rmax(OpParam &p) { return d__cbin<S,f_max<S> >(p); }
 
-	BL d_rmin(OpParam &p); 
-	BL d_rmax(OpParam &p); 
+    inline BL d_minmax(OpParam &p) { return d__cun<S,f_minmax<S> >(p); }
 
-	BL d_minmax(OpParam &p); 
+    inline BL d_minq(OpParam &p) { return D__rop<S,f_minq<S> >(p); }
+    inline BL d_maxq(OpParam &p) { return D__rop<S,f_maxq<S> >(p); }
+    inline BL d_rminq(OpParam &p) { return d__cop<S,f_minq<S> >(p); }
+    inline BL d_rmaxq(OpParam &p) { return d__cop<S,f_maxq<S> >(p); }
+    inline BL d_aminq(OpParam &p) { return F__rop<S,f_aminq<S> >(p); }
+    inline BL d_amaxq(OpParam &p) { return F__rop<S,f_amaxq<S> >(p); }
 
-	BL d_minq(OpParam &p); 
-	BL d_maxq(OpParam &p); 
-	BL d_aminq(OpParam &p); 
-	BL d_amaxq(OpParam &p); 
-
-	BL d_rminq(OpParam &p); 
-	BL d_rmaxq(OpParam &p); 
-
-	BL d_gate(OpParam &p); 
-	BL d_igate(OpParam &p); 
-	BL d_rgate(OpParam &p); 
-	BL d_rigate(OpParam &p); 
+    inline BL d_gate(OpParam &p) { return D__rbin<S,f_gate<S> >(p); }
+    inline BL d_igate(OpParam &p) { return d__rbin<S,f_igate<S> >(p); }
+    inline BL d_rgate(OpParam &p) { return d__cbin<S,f_gate<S> >(p); }
+    inline BL d_rigate(OpParam &p) { return d__cbin<S,f_igate<S> >(p); }
 }
 
 namespace VaspOp {

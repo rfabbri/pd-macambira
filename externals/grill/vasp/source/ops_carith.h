@@ -11,22 +11,23 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_CARITH_H
 #define __VASP_OPS_CARITH_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Arithmetic math functions
 
 namespace VecOp {
-	BL d_cadd(OpParam &p); 
-	BL d_csub(OpParam &p); 
-	BL d_csubr(OpParam &p); 
-	BL d_cmul(OpParam &p); 
-	BL d_cdiv(OpParam &p); 
-	BL d_cdivr(OpParam &p);
-	
-	BL d_csqr(OpParam &p); 
-	BL d_cpowi(OpParam &p); 
+    inline BL d_cadd(OpParam &p) { return D__cbin<S,f_add<S> >(p); }
+    inline BL d_csub(OpParam &p) { return D__cbin<S,f_sub<S> >(p); }
+    inline BL d_csubr(OpParam &p) { return D__cbin<S,f_subr<S> >(p); }
+    inline BL d_cmul(OpParam &p) { return D__cbin<S,f_mul<S> >(p); }
+    inline BL d_cdiv(OpParam &p) { return d__cbin<S,f_div<S> >(p); }
+    inline BL d_cdivr(OpParam &p) { return d__cbin<S,f_divr<S> >(p); }
 
-	BL d_cabs(OpParam &p); 
+    inline BL d_csqr(OpParam &p) { return D__cun<S,f_sqr<S> >(p); }
+
+    inline BL d_cpowi(OpParam &p) { return d__cop<S,f_powi<S> >(p); }
+
+    inline BL d_cabs(OpParam &p) { return D__cun<S,f_abs<S> >(p); }
 }
 
 namespace VaspOp {

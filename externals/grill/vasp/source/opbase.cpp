@@ -84,12 +84,7 @@ Vasp *VaspOp::m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp:
 	return ret;
 }
 
-
-BL VecOp::_d__run(V fun(S &v,S a),OpParam &p)	{ _D__run(fun,p); }
-BL VecOp::_d__cun(V fun(S &rv,S &iv,S ra,S ia),OpParam &p) { _D__cun(fun,p); }
-BL VecOp::_d__rbin(V fun(S &v,S a,S b),OpParam &p) { _D__rbin(fun,p); }
-BL VecOp::_d__cbin(V fun(S &rv,S &iv,S ra,S ia,S rb,S ib),OpParam &p) { _D__cbin(fun,p); }
-BL VecOp::_d__rop(V fun(S &v,S a,OpParam &p),OpParam &p) { _D__rop(fun,p); }
-BL VecOp::_d__cop(V fun(S &rv,S &iv,S ra,S ia,OpParam &p),OpParam &p) { _D__cop(fun,p); }
-
+#ifdef FLEXT_THREADS
+flext::ThrMutex VecOp::C_base::mtx;
+#endif
 

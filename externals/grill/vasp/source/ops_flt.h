@@ -11,7 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_FLT_H
 #define __VASP_OPS_FLT_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Filtering functions
 
@@ -22,7 +22,7 @@ namespace VecOp {
 	BL d_int(OpParam &p);
 	BL d_dif(OpParam &p); 
 
-	BL d_fix(OpParam &p); 
+    inline BL d_fix(OpParam &p) { return D__run<S,f_fix<S> >(p); }
 }
 
 namespace VaspOp {

@@ -377,6 +377,10 @@ SOURCE=source\opdefs.h
 # End Source File
 # Begin Source File
 
+SOURCE=source\opfuns.h
+# End Source File
+# Begin Source File
+
 SOURCE=source\oploop.h
 # End Source File
 # Begin Source File

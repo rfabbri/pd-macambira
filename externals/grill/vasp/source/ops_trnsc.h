@@ -11,21 +11,19 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_TRNSC_H
 #define __VASP_OPS_TRNSC_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Transcendent math functions
 
 namespace VecOp {
-	BL d_pow(OpParam &p); 
+    inline BL d_pow(OpParam &p) { return d__rbin<S,f_pow<S> >(p); }
+    inline BL d_rpow(OpParam &p) { return d__cbin<S,f_pow<S> >(p); }
 
-	BL d_rpow(OpParam &p); 
+    inline BL d_sqrt(OpParam &p) { return d__run<S,f_sqrt<S> >(p); }
+    inline BL d_ssqrt(OpParam &p) { return d__run<S,f_ssqrt<S> >(p); }
 
-	BL d_sqrt(OpParam &p); 
-	BL d_ssqrt(OpParam &p); 
-
-
-	BL d_exp(OpParam &p); 
-	BL d_log(OpParam &p); 
+    inline BL d_exp(OpParam &p) { return d__run<S,f_exp<S> >(p); }
+    inline BL d_log(OpParam &p) { return d__run<S,f_log<S> >(p); }
 }
 
 namespace VaspOp {

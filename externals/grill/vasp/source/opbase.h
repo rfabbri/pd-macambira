@@ -19,12 +19,73 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 namespace VecOp {
 	typedef BL opfun(OpParam &p);
 
-	BL _d__run(V fun(S &v,S a),OpParam &p);
-	BL _d__cun(V fun(S &rv,S &iv,S ra,S ia),OpParam &p);
-	BL _d__rbin(V fun(S &v,S a,S b),OpParam &p);
-	BL _d__cbin(V fun(S &rv,S &iv,S ra,S ia,S rb,S ib),OpParam &p);
-	BL _d__rop(V fun(S &v,S a,OpParam &p),OpParam &p);
-	BL _d__cop(V fun(S &rv,S &iv,S ra,S ia,OpParam &p),OpParam &p);
+    class C_base {
+    public:
+    #ifdef FLEXT_THREADS
+        static flext::ThrMutex mtx;
+        static V Lock() { mtx.Lock(); }
+        static V Unlock() { mtx.Unlock(); }
+    #else
+        static V Lock() {}
+        static V Unlock() {}
+    #endif
+    };
+
+    template<class T> class C_run: public C_base {
+    public: 
+        static BL Do(V f(T &v,T a),OpParam &p) { Lock(); fun = f; _D__run<T,C_run<T> >(p); Unlock(); return true; }
+        static V run(T &v,T a) { fun(v,a); } 
+        static V (*fun)(T &v,T a);
+    };
+    template<class T> V (*C_run<T>::fun)(T &v,T a);
+
+    template<class T> class C_cun: public C_base {
+    public: 
+        static BL Do(V f(T &rv,T &iv,T ra,T ia),OpParam &p) { Lock(); fun = f; _D__cun<T,C_cun<T> >(p); Unlock(); return true; }
+        static V cun(T &rv,T &iv,T ra,T ia) { fun(rv,iv,ra,ia); } 
+        static V (*fun)(T &rv,T &iv,T ra,T ia);
+    };
+    template<class T> V (*C_cun<T>::fun)(T &rv,T &iv,T ra,T ia);
+
+    template<class T> class C_rbin: public C_base {
+    public: 
+        static BL Do(V f(T &v,T a,T b),OpParam &p) { Lock(); fun = f; _D__rbin<T,C_rbin<T> >(p); Unlock(); return true; }
+        static V rbin(T &v,T a,T b) { fun(v,a,b); } 
+        static V (*fun)(T &v,T a,T b);
+    };
+    template<class T> V (*C_rbin<T>::fun)(T &v,T a,T b);
+
+    template<class T> class C_cbin: public C_base {
+    public: 
+        static BL Do(V f(T &rv,T &iv,T ra,T ia,T rb,T ib),OpParam &p) { Lock(); fun = f; _D__cbin<T,C_cbin<T> >(p); Unlock(); return true; }
+        static V cbin(T &rv,T &iv,T ra,T ia,T rb,T ib) { fun(rv,iv,ra,ia,rb,ib); } 
+        static V (*fun)(T &rv,T &iv,T ra,T ia,T rb,T ib);
+    };
+    template<class T> V (*C_cbin<T>::fun)(T &rv,T &iv,T ra,T ia,T rb,T ib);
+
+    template<class T> class C_rop: public C_base {
+    public: 
+        static BL Do(V f(T &v,T a,OpParam &p),OpParam &p) { Lock(); fun = f; _D__rop<T,C_rop<T> >(p); Unlock(); return true; }
+        static V rop(T &v,T a,OpParam &p) { fun(v,a,p); } 
+        static V (*fun)(T &v,T a,OpParam &p);
+    };
+    template<class T> V (*C_rop<T>::fun)(T &v,T a,OpParam &p);
+
+    template<class T> class C_cop: public C_base {
+    public: 
+        static BL Do(V f(T &rv,T &iv,T ra,T ia,OpParam &p),OpParam &p) { Lock(); fun = f; _D__cop<T,C_cop<T> >(p); Unlock(); return true; }
+        static V cop(T &rv,T &iv,T ra,T ia,OpParam &p) { fun(rv,iv,ra,ia,p); } 
+        static V (*fun)(T &rv,T &iv,T ra,T ia,OpParam &p);
+    };
+    template<class T> V (*C_cop<T>::fun)(T &rv,T &iv,T ra,T ia,OpParam &p);
+
+
+    template<class T> BL _d__run(V fun(T &v,T a),OpParam &p)	{ return C_run<T>::Do(fun,p); }
+    template<class T> BL _d__cun(V fun(T &rv,T &iv,T ra,T ia),OpParam &p) { return C_cun<T>::Do(fun,p); }
+    template<class T> BL _d__rbin(V fun(T &v,T a,T b),OpParam &p) { return C_rbin<T>::Do(fun,p); }
+    template<class T> BL _d__cbin(V fun(T &rv,T &iv,T ra,T ia,T rb,T ib),OpParam &p) { return C_cbin<T>::Do(fun,p); }
+    template<class T> BL _d__rop(V fun(T &v,T a,OpParam &p),OpParam &p) { return C_rop<T>::Do(fun,p); }
+    template<class T> BL _d__cop(V fun(T &rv,T &iv,T ra,T ia,OpParam &p),OpParam &p) { return C_cop<T>::Do(fun,p); }
 }
 
 

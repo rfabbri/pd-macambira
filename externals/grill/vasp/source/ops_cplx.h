@@ -11,20 +11,19 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __VASP_OPS_CPLX_H
 #define __VASP_OPS_CPLX_H
 
-#include "opbase.h"
+#include "opfuns.h"
 
 // Complex functions
 
 namespace VecOp {
-	BL d_polar(OpParam &p); 
-	BL d_rect(OpParam &p); 
+    inline BL d_polar(OpParam &p) { return d__cun<S,f_polar<S> >(p); }
+    inline BL d_rect(OpParam &p) { return d__cun<S,f_rect<S> >(p); }
 
-	BL d_radd(OpParam &p); 
+    inline BL d_radd(OpParam &p) { return d__cbin<S,f_radd<S> >(p); }
 
-	BL d_cnorm(OpParam &p); 
+    inline BL d_cnorm(OpParam &p) { return d__cun<S,f_norm<S> >(p); }
 
-//	BL d_cswap(OpParam &p); 
-	BL d_cconj(OpParam &p); 
+    inline BL d_cconj(OpParam &p) { return D__cun<S,f_conj<S> >(p); }
 }
 
 namespace VaspOp {
