@@ -7,6 +7,8 @@ DESTDIR = installroot
 PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
+WISH_SHELL_CONTENTS = /Applications/Utilities/Wish\ Shell.app/Contents
+
 PD_FILE_ROOT = $(DESTDIR)$(INSTALL_PREFIX)/lib/pd
 ABSTRACTIONS_DIR = $(PD_FILE_ROOT)/doc/abstractions
 EXTERNALS_DIR = $(PD_FILE_ROOT)/extra
@@ -86,7 +88,7 @@ darwin_app_readme:
 	echo "<p>Pd is a free real-time computer music software package resembling Max.  It provides a patchable environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</p>" >> $(README_FILE)
 	echo "<p>For more information, go to: http://www.puredata.org</p>" >> $(README_FILE)
 	echo "<h3>Installation</h3>" >> $(README_FILE)	
-	echo "<p>To install Pd, drag the Pd.app to your /Applications folder. Currently, this app will only work in this location, nowhere else.</p>" >> $(README_FILE)	
+	echo "<p>To install Pd, drag the Pd.app to anywhere in your hard disk.</p>" >> $(README_FILE)	
 	echo "<h3>Pure Data CVS Developers</h3>" >> $(README_FILE)	
 # this may seem whack, but it generates the list of developers from the SourceForge site:
 	wget -q -O - 'http://sourceforge.net/project/memberlist.php?group_id=55736' | grep -e '<td>' | sed -e :a -e 's/<[^>]*>//g;/</N;//ba' | grep -v '^$$' | sed -e 's/\t*/ - /' >> $(README_FILE)
@@ -128,6 +130,7 @@ darwin_app_readme:
 
 darwin_app_wrapper:
 # copy Wish Shell.app from default install location
+# note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
 	install -m0755 -p \
 		/Applications/Utilities/Wish\ Shell.app/Contents/MacOS/Wish\ Shell \
@@ -136,21 +139,39 @@ darwin_app_wrapper:
 	install -m0644 -p \
 		/Applications/Utilities/Wish\ Shell.app/Contents/Resources/Wish\ Shell.rsrc \
 		"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
+#	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"
+	cp -Rp \
+		/Applications/Utilities/Wish\ Shell.app/Contents/Frameworks \
+		"$(DESTDIR)$(PD_APP_CONTENTS)"
+	cp -Rp \
+                /Applications/Utilities/Wish\ Shell.app/Contents/Frameworks \
+                "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
+
+#	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"  \
+#	"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 # set up app wrapper
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(DESTDIR)$(PD_APP_CONTENTS)"
-	install -m0644 -p Pd.term "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
+	#install -m0644 -p Pd.term "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p *.icns  "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 # using the shell script hack until AppMain.tcl works
-#	install -m0644 -p AppMain.tcl "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
-	install -m0755 -p Pd "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
+	install -m0644 -p AppMain.tcl "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
+	#  install -m0755 -p Pd "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
+# rename the Wish Shell executable to "Pd"
+	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
 
 
 # INSTALL_PREFIX=$(INSTALL_PREFIX) is for pd-MSP 0.37.1
 # prefix=$(INSTALL_PREFIX) is for pd-CVS 0.37
 darwin_app_core:
+# apply some patches 
+	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/socket.patch
+	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/makefile.in.patch
+	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/u_main.tk.patch
+	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/configure.jackosx.patch
+	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/s_audio_jack.patch
 # pd core
-	cd ../../pd/src/ && ./configure && \
+	cd ../../pd/src/ && ./configure --enable-jack &&\
 		make install \
 			DESTDIR=../../packages/darwin_app/$(DESTDIR) \
 			INSTALL_PREFIX=$(INSTALL_PREFIX)
@@ -165,6 +186,14 @@ darwin_app_docs:
 #----------------------------------------------------------------------------
 # PDDP
 	install -m644 --group=staff ../../doc/pddp/*.pd $(HELP_DIR)/5.reference
+
+# DOC menus
+	install -d $(HELP_DIR)/menus
+	cp -p ./doc-menu.pd $(HELP_DIR)/menus
+	./mkdocs $(HELP_DIR)/2.control.examples>$(HELP_DIR)/menus/2.control.examples.pd
+	./mkdocs $(HELP_DIR)/3.audio.examples>$(HELP_DIR)/menus/3.audio.examples.pd
+	./mkdocs $(HELP_DIR)/4.fft.examples>$(HELP_DIR)/menus/4.fft.examples.pd
+	./mkdocs $(HELP_DIR)/5.reference>$(HELP_DIR)/menus/5.reference.pd
 
 darwin_app_abstractions:
 #----------------------------------------------------------------------------
@@ -181,7 +210,7 @@ darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard d
 darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
-	install -d $(PD_FILE_ROOT)/flext
+	
 	cd ../../externals/grill/build/darwin && make 
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
@@ -347,7 +376,7 @@ darwin_unix_pkg:
 # mk the unix dir
 	install -d $(UNIX_DESTDIR)$(UNIX_prefix)
 # copy stuff to UNIX dirs
-	cp -Rp $(DESTDIR)$(INSTALL_PREFIX)/bin \
+	sudo cp -Rp $(DESTDIR)$(INSTALL_PREFIX)/bin \
 		$(DESTDIR)$(INSTALL_PREFIX)/include \
 		$(DESTDIR)$(INSTALL_PREFIX)/man \
 		$(UNIX_DESTDIR)$(UNIX_prefix)
@@ -378,10 +407,10 @@ darwin_unix_pkg:
 		-i $(PWD)/pkg/Info.plist		\
 		-d $(PWD)/Description.plist
 # generate .info file
-	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/pd.info \
-		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
-		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
-		> $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+#	 sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/pd.info \
+#		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+#		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+#		> $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 # install pkg docs
 #	sudo install -m 644 $(LICENSE_FILE) $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 #	sudo chown -R root:staff $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
@@ -416,3 +445,4 @@ darwin_app_clean:
 	-sudo rm -Rf $(DESTDIR) $(UNIX_DESTDIR) "$(DMG_NAME)" $(UNIX_PACKAGE_NAME) 
 	-rm -f *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
+	cd patches && ./unpatch
