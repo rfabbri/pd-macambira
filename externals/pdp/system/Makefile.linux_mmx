@@ -1,4 +1,0 @@
-platform_subtree:
-	make -C mmx
-
-platform_targets: pdp_imageproc_mmx.o pdp_llconv_mmx.o platform_subtree

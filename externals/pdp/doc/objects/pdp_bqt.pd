@@ -47,7 +47,7 @@
 #X text 264 342 set the filter type:;
 #X text 136 192 set the filter type:;
 #X text 538 319 (between 0 and 1 \, 0.5 = nyquist);
-#X text 540 333;
+#X text 540 333 comment;
 #X text 540 305 pole frequency;
 #X text 37 16 pdp_bqt: a temporal biquad filter;
 #X text 99 45 try one of the abstractions (pdp_motion_blur and;
@@ -55,6 +55,8 @@
 #X obj 434 190 pdp_motion_blur;
 #X obj 558 190 pdp_motion_phase;
 #X obj 27 499 pdp_bqt;
+#X msg 48 312 reset;
+#X text 95 313 reset state;
 #X connect 0 0 1 0;
 #X connect 1 0 54 0;
 #X connect 2 0 3 0;
@@ -93,3 +95,4 @@
 #X connect 52 0 21 0;
 #X connect 53 0 21 0;
 #X connect 54 0 39 0;
+#X connect 55 0 54 0;

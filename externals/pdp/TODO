@@ -1,39 +1,57 @@
 
-fatal crash bugs:
+known bugs:
 
-* none that i know of (if pdp dies on you, please let me know)
+* running out of memory (using delay lines or loops) will likely crash pd. 
+short story: don't, use pdp_control's memlimit for limiting pdp's memory usage.
+* no known other fatal (crashing) bugs. please let me know if you find one.
 
 
-todo 0.9:
 
-* 2D affine transforms parametrized by vectors (center, x-axis, y-axis)
+todo 0.13:
+
+* add source type to source objects (noise,plasma,constant,...)
+* pdp_crop/pad
+* seed plasma
+* reorganize headers to cut down compile time
+* fullscreen x command -> add window manager suppression
+* where to solve autoconvert? per type, or central in pdp_base? 2 cases:
+- template based autoconvert: in pdp_base
+- compatibility based autoconvert: i.e. pdp_add (solve in base: move_passive)
+* finish high level packet conversion:
+- move 8bit images to packet level (iow: cleanup pdp_qt, pdp_v4l, pdp_xv)
+- add bitmap packet support to source modules (optim for pdp_opengl usage)
+- get rid of pdp_type* methods
+* fix mac/linux name differences (use pdp_video, pdp_movie, pdp_window)
+* pdp_xv framerate doc + pwc addons
+
+todo 0.14:
+
+* stress test the memory manager. it looks like there's a bug that pops up after running for a while
+* image packet -> sound: interpret as sonogram: intensity = magnitude, colour = phase
+* enable audio output on bttv cards in pdp_v4l
+* fix cache slicer objects + thread problems (add slice objects to forth)
+* derive as much classes as possible from pdp_base class (part of module code reorg)
+* displacement warp, substitution warp, refraction warp, timespace warp, wormhole warp
+* check the use of varargs for image processing dispatching routine
+* more scopes
+* 2D affine transforms parametrized by vectors (center, x-axis, y-axis) (np1 + matrix processing objects)
 * some abstractions around pdp_cheby (colour shape, ...)
-* add real trigger object (problem with 3 phase protocol ?)
-* absolute value object
-* displacement warp, substitution warp
+* thresholding (abstraction using pdp_cheby?) + absolute value object
 * efficient rescalers: pdp_double pdp_halve
 * move float color conversion and float<->fixed point conv code to system
 * crop, shift (pad+scroll)
-
-todo 0.10:
-
-* solve biquad (blur) boundary init prob
+* solve biquad (blur) mmx boundary init prob (bands at edges: solve with proper init?)
 * optimize blur effect (1 pole ? / dependency stalls)
-* jpeg/png file and streaming support?
-* thresholding
+* jpeg/png packet and streaming support (pdp_netsend / pdp_netreceive : binary compat issues!!)
 * find out why resampling code (warping) is so slow (reg->mem->reg->mem stalls?)
 * mmx profiling
 * add audio resampling in pdp_qt~
 * use pd_error instead of post for errors
-* interface with gem
-* think about the memory allocation strategy (there is no garbage collection right now)
-* add automatic pwc detection
-* frame rate limited delay line (burst delay?)
-
-wish list:
-
-* ascii art packet stuff (yves?)
+* ascii art packet processors
 * 3D time space interpolation
 * colour keying
-* camera controller (motion tracking ?)
-* moebius transforms  (integer inverse square root??) & other complex plane stuff
+* motion tracking
+* moebius transforms
+* type multiplexing: find a way to use the same name for packet processors. (-> forth)
+i.e. pdp_add should add images, but also vectors, ascii packets, textures,...
+

@@ -1,10 +1,10 @@
-AC_INIT(system/pdp.c)
+AC_INIT(system/kernel/pdp.c)
 AC_CONFIG_HEADER(include/pdp_config.h)
 AC_PROG_CC
 AC_HEADER_STDC
 
-dnl TAG CVS WHEN VERSION CHANGES !!!
-PDP_VERSION=0.9
+dnl TAG CVS WHEN RELEASE VERSION CHANGES !!!
+PDP_VERSION=0.12.2
 AC_SUBST(PDP_VERSION)
 
 AC_ARG_ENABLE(pwc,    
@@ -13,6 +13,9 @@ AC_ARG_ENABLE(pwc,
 
 AC_ARG_ENABLE(mmx,    
 	[  --enable-mmx            enable MMX support], MMX=yes, MMX=no)
+
+AC_ARG_ENABLE(sdl,    
+	[  --enable-sdl            enable SDL support], SDL=yes, SDL=no)
 
 
 if test $prefix == NONE;
@@ -46,9 +49,7 @@ AC_CHECK_HEADER(m_pd.h,,
 	echo "WARNING: m_pd.h not found. Is PD installed?"
 	echo "WARNING: if you have changed PD_CPPFLAGS in Makefile.config.in you can ignore this warning." )
 
-
 AC_CHECK_LIB(m,sin)
-
 
 ARCH=`uname -s`
 if test $ARCH == Linux;
@@ -75,39 +76,67 @@ dnl Darwin specific stuff: this is still pretty experimental
 dnl How to test if frameworks are present ????
 if test $ARCH == Darwin
 then
-	PDP_OPTMOD="$PDP_OPTMOD pdp_sdl.o"
-	LIBS="$LIBS -framework SDL"
-	PDP_EXTRA_CPPFLAGS="$PDP_EXTRA_INCLUDE -I/Library/Frameworks/SDL.framework/Headers"
-	PD_EXECUTABLE=ihavenocluewherethepdbinaryislocated
-	AC_DEFINE(HAVE_PDP_SDL, 1, build pdp_sdl)
+	PD_EXECUTABLE=$prefix/bin/pd
+	LIBS="$LIBS -L/sw/lib"
+	CPPFLAGS="$CPPFLAGS -I/sw/include"
+	PDP_EXTRA_CPPFLAGS="-I/sw/include"
 
-dnl These are checks for libraries. 
-dnl Objects that depend on a lib only get included when the lib is found.
+dnl if not darwin, assume target is linux
 else
-
-	AC_CHECK_LIB(quicktime, lqt_decode_video,
-		PDP_OPTMOD="$PDP_OPTMOD pdp_qt.o"
-		LIBS="$LIBS -lquicktime"
-		AC_DEFINE(HAVE_PDP_QT, 1, build pdp_qt),
-		echo "   libquicktime not found: not building pdp_qt")
-
-	AC_CHECK_LIB(SDL, SDL_Init, 
-		PDP_OPTMOD="$PDP_OPTMOD pdp_sdl.o"
-		LIBS="$LIBS -lSDL"
-		AC_DEFINE(HAVE_PDP_SDL, 1, build pdp_sdl),
-		echo "   libSDL not found: not building pdp_sdl")
-
-	AC_CHECK_LIB(Xv, XvPutImage,
-		PDP_OPTMOD="$PDP_OPTMOD pdp_xv.o"
-		LIBS="$LIBS -L/usr/X11R6/lib -lX11 -lXv -lXext"
-		AC_DEFINE(HAVE_PDP_XV, 1, build pdp_xv),
-		echo "   libXv not found: not building pdp_xv",
-		-L/usr/X11R6/lib -lX11 -lXext)
+	PDP_EXTRA_CFLAGS=-Werror
 
 	AC_CHECK_HEADER(linux/videodev.h,
 		PDP_OPTMOD="$PDP_OPTMOD pdp_v4l.o"
 		AC_DEFINE(HAVE_PDP_V4L, 1, build pdp_v4l),
 		echo "   linux/videodev.h not found: not building pdp_v4l")
+
+
+fi
+
+AC_CHECK_LIB(gslcblas,main)
+AC_CHECK_LIB(gsl,main,,
+	echo "ERROR: libgsl not found"
+	exit)
+LIBS="$LIBS -lgslcblas -lgsl"
+
+
+AC_CHECK_LIB(Xv, XvPutImage,
+	PDP_OPTMOD="$PDP_OPTMOD pdp_xv.o"
+	LIBS="$LIBS -L/usr/X11R6/lib -lX11 -lXv -lXext"
+	AC_DEFINE(HAVE_PDP_XV, 1, build pdp_xv),
+	echo "   libXv not found: not building pdp_xv",
+	-L/usr/X11R6/lib -lX11 -lXext)
+
+
+AC_CHECK_LIB(quicktime, lqt_decode_video,
+	PDP_OPTMOD="$PDP_OPTMOD pdp_qt.o"
+	LIBS="$LIBS -lquicktime"
+	AC_DEFINE(HAVE_PDP_QT, 1, build pdp_qt),
+	echo "   libquicktime not found: not building pdp_qt")
+
+
+AC_CHECK_LIB(png, png_read_image,
+	LIBS="$LIBS -lpng"
+	AC_DEFINE(HAVE_PDP_PNG, 1, build png support),
+	echo "   libpng not found: not building png support")
+
+
+AC_CHECK_LIB(GL, glXSwapBuffers,
+	PDP_OPTMOD="$PDP_OPTMOD pdp_glx.o"
+	LIBS="$LIBS -lGL -lGLU"
+	AC_DEFINE(HAVE_PDP_GLX, 1, build pdp_glx),
+	echo "   libGL not found: not building pdp_glx",
+	-L/usr/X11R6/lib -lGLU)
+
+
+dnl optional sdl stuff
+if test $SDL == yes
+then
+	AC_CHECK_LIB(SDL, SDL_Init, 
+		PDP_OPTMOD="$PDP_OPTMOD pdp_sdl.o"
+		LIBS="$LIBS -lSDL"
+		AC_DEFINE(HAVE_PDP_SDL, 1, build pdp_sdl),
+		echo "   libSDL not found: not building pdp_sdl")
 fi
 
 
@@ -117,6 +146,7 @@ echo target is $PDP_TARGET
 AC_SUBST(PD_CPPFLAGS)
 AC_SUBST(PD_EXECUTABLE)
 AC_SUBST(PDP_EXTRA_CPPFLAGS)
+AC_SUBST(PDP_EXTRA_CFLAGS)
 AC_SUBST(PDP_LIBRARY_NAME)
 AC_SUBST(PDP_TARGET)
 AC_SUBST(PDP_OPTMOD)

@@ -1,4 +1,4 @@
-#N canvas 142 294 518 446 10;
+#N canvas 657 0 518 446 10;
 #X obj 133 414 pdp_xv;
 #X obj 177 76 pdp_v4l;
 #X obj 177 33 metro 40;
@@ -21,13 +21,13 @@
 #X text 223 174 edge detect;
 #X text 222 200 amplify;
 #X text 232 6 process in greyscale;
-#X obj 133 252 pdp_add;
 #X text 322 287 motion phase shifter;
 #X text 320 354 grey -> colour palette;
 #X msg 36 323 rgb 1 0.5 0;
-#X floatatom 170 386 5 0 0;
+#X obj 133 252 pdp_add;
+#X msg 133 216 debug;
 #X connect 1 0 12 0;
-#X connect 1 0 20 1;
+#X connect 1 0 23 1;
 #X connect 2 0 1 0;
 #X connect 3 0 2 0;
 #X connect 4 0 5 0;
@@ -38,8 +38,8 @@
 #X connect 10 0 9 0;
 #X connect 11 0 1 0;
 #X connect 12 0 4 0;
-#X connect 13 0 20 0;
+#X connect 13 0 23 0;
 #X connect 14 0 10 1;
-#X connect 20 0 10 0;
-#X connect 23 0 9 0;
-#X connect 24 0 0 1;
+#X connect 22 0 9 0;
+#X connect 23 0 10 0;
+#X connect 24 0 23 0;

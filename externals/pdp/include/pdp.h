@@ -23,230 +23,122 @@
 #ifndef PDP_H
 #define PDP_H
 
-
-/* header size in bytes */
-#define PDP_HEADER_SIZE 64
-
-/* subheader size in bytes */
-#define PDP_SUBHEADER_SIZE 48
+/* header and subheader size in bytes */
+#define PDP_HEADER_SIZE 256
 
 #include <string.h>
 #include <stdlib.h>
+
 #include "m_pd.h"
 
-#include "pdp_mmx.h"
-#include "pdp_imageproc.h"
+/* some typedefs */
 #include "pdp_types.h"
 
-/* hope this won't conflict with other types */
-#ifndef __cplusplus
-typedef int bool;
-#define true 1;
-#define false 0;
-#endif
+/* the list object */
+#include "pdp_list.h"
 
-/* remark: planar processing ensures (vector assembler) code reusability
-   for grayscale / rgb(a) / yuv processing. so it's best
-   to keep away from interleaved formats: deinterleaving
-   and interleaving can be done in the source/sink modules
-   (it will probably be very hard to eliminate extra copying
-   anyway, and this enables the possibility to ensure alignment
-   and correct (i.e. multiple of 8 or 16) image dimensions) 
 
-   all image data is short int (16 bit)
 
-*/
+/* PDP_IMAGE COMPONENTS */
 
+/* header and methods for the built in image packet type */
+#include "pdp_image.h"
 
+/* low level image processing and high level dispatching routines */
+#include "pdp_imageproc.h"
 
+/* low level image conversion routines */
+#include "pdp_llconv.h"
 
-/* image data packet */   
-typedef struct
-{
-    /* standard images */
-    unsigned int encoding;    /* image encoding (data format ) */
-    unsigned int width;       /* image width in pixels */
-    unsigned int height;      /* image height in pixels */
-    unsigned int channels;    /* number of colour planes if PDP_IMAGE_MCHP */
+/* low level image resampling routines */
+#include "pdp_resample.h"
 
-    /* sliced image extensions */ /* THIS IS EXPERIMENTAL, DON'T DEPEND ON IT STATYING HERE */
-    unsigned int slice_sync;  /* slice synchro information */
-    unsigned int slice_yoff;  /* y offset of the slice in original image */
-    unsigned int orig_height; /* height of original image (this is zero for ordinary images) */
 
-} t_image;
 
+/* PDP_BITMAP COMPONENTS */
 
-/* image encodings */
-#define PDP_IMAGE_YV12   1  /* 24bbp: 16 bit Y plane followed by 16 bit 2x2 subsampled V and U planes.*/
-#define PDP_IMAGE_GREY   2  /* 16bbp: 16 bit Y plane */
-#define PDP_IMAGE_RGBP   3  /* 48bpp: 16 bit planar RGB */
-#define PDP_IMAGE_MCHP   4  /* generic 16bit multi channel planar */
+/* header and methods for the built in bitmap packet type */
+#include "pdp_bitmap.h"
 
-/* slice synchro information */
-#define PDP_IMAGE_SLICE_FIRST (1<<0)
-#define PDP_IMAGE_SLICE_LAST  (1<<1)
-#define PDP_IMAGE_SLICE_BODY  (1<<2)
 
 
-/* ascii data packet */   
-typedef struct
-{
-    unsigned int encoding;  /* image encoding (data format ) */
-    unsigned int width;     /* image width in pixels */
-    unsigned int height;    /* image height in pixels */
-} t_ascii;
+/* PDP_MATRIX COMPONENTS */
+#include "pdp_matrix.h"
 
 
-/* image encodings */
-#define PDP_ASCII_BW     1  /* 8 bit per character black and white.*/
-#define PDP_ASCII_IBM    2  /* 16 bit per character colour (8 bit character, 8 bit colour, like good old text framebuffers.*/
-#define PDP_ASCII_RGB    3  /* 64 bit per character colour (8 bit character, 3x8 bit RGB */
 
-/*
-PDP_IMAGE_GREY = PDP_IMAGE_MCHP, channels = 1
-PDP_IMAGE_RGBP = PDP_IMAGE_MCHP, channels = 3
 
-remark: only 1 and 2 are implemented at this moment
+/* PDP SYSTEM COMPONENTS */
 
-*/
+/* packet pool stuff */
+#include "pdp_packet.h"
 
+/* processing queue object */
+#include "pdp_queue.h"
 
-/* generic packet subheader */
-//typedef unsigned char t_raw[PDP_SUBHEADER_SIZE];
-typedef unsigned int t_raw;
+/* several communication helper methods (pd specific) */
+#include "pdp_comm.h"
 
-/* general pdp header struct */
-typedef struct
-{
-    unsigned int type;        /* datatype of this object */
-    unsigned int size;        /* datasize including header */
-    unsigned int users;       /* nb users of this object, readonly if > 1 */
-    unsigned int reserved[1]; /* reserved to provide binary compatibility for future extensions */
+/* type handling subsystem */
+#include "pdp_type.h"
 
-    union                     /* each packet type has a unique subheader */
-    {
-	t_raw    raw;         /* raw subheader (for extensions unkown to pdp core system) */
-	t_image  image;       /* bitmap image */
-	//t_ca     ca;        /* cellular automaton state data */
-	t_ascii  ascii;       /* ascii packet */
-    } info;
+/* dpd command stuff */
+#include "pdp_dpd_command.h"
 
-} t_pdp;
 
-/* pdp data packet types */
-#define PDP_IMAGE            1  /* 16bit signed planar scanline encoded image packet */
-//RESERVED: #define PDP_CA   2  /* 1bit toroidial shifted scanline encoded cellular automaton */
-#define PDP_ASCII            3  /* ascii packet */
+/* BACKWARDS COMPAT STUFF */
+#include "pdp_compat.h"
 
 
 
-/* pdp specific constants */
-#define PDP_ALIGN 8
-
-
-/* this needs to be able to grow dynamically, think about it later */
-#define PDP_OBJECT_ARRAY_SIZE 1024
-
-
-/* all symbols are C-style */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-    //extern t_pdp* pdp_stack[];
-    //extern t_symbol* pdp_sym_register_rw;
-    //extern t_symbol* pdp_sym_register_ro;
-    //extern t_symbol* pdp_sym_process;
-
-/* setup methods */
-
-void pdp_init(void);
-void pdp_destroy(void);
-
-
-/* object manips */
-
-extern int pdp_packet_new(unsigned int datatype, unsigned int datasize); /* create a new packet */
-extern t_pdp* pdp_packet_header(int handle); /* get packet header */
-extern void*  pdp_packet_data(int handle); /* get packet raw data */
-extern int pdp_packet_copy_ro(int handle); /* get a read only copy */
-extern int pdp_packet_copy_rw(int handle); /* get a read/write copy */
-extern int pdp_packet_clone_rw(int handle); /* get an empty read/write packet of the same type (only copy header) */
-extern void pdp_packet_mark_unused(int handle); /* indicate that you're done with the packet */
-
-/* 
-
-If an owner unregisters a packet, he can still pass it along to clients. More
-specificly this is the desired behaviour. It is a simple way to have in place 
-data processing (if there is only one client) and garbage collection. The first 
-register call revives the object.
-
-WARNING: it is an error to call pdp_packet_new inside a pdp packet handler BEFORE 
-a packet is registered.
-
-packet id -1 is the id of an invalid packet. it is not an error to unregister it.
-packet id -2 can be used as a bogus id. it is an error to unregister it though.
-
-*/
-
-
-/* processor queue methods, callable from main pd thread */
-/* warning: only pdp_packet_header and pdp_packet_data are legal inside process routine!! */
-
-/* add a method to the processing queue */
-void  pdp_queue_add(void *owner, void *process, void *callback, int *queue_id);
-
-/* halt main tread until processing is done */
-void pdp_queue_wait(void);
-
-/* halt main tread until processing is done and remove 
-   callback from queue(for destructors) */
-void pdp_queue_finish(int queue_id);
-
-
-/* misc signals to pdp */
-void pdp_control_notify_drop(int packet);
-
-
-/* helper methods */
-
-/* send a packet to an outlet */
-void outlet_pdp(t_outlet *out, int packetid);
-
-
-/* if packet is valid, mark it unused and send it to an outlet */
-void pdp_pass_if_valid(t_outlet *outlet, int *packet);
-
-/* if source packet is valid, release dest packet and move src->dest */
-void pdp_replace_if_valid(int *dpacket, int *spacket);
-
-/* copy_ro if dest packet if invalid, else drop source 
-   (don't copy) + send drop notif to pdp system 
-   returns 1 if dropped, 0 if copied */
-int pdp_packet_copy_ro_or_drop(int *dpacket, int spacket);
-
-/* copy_rw if dest packit is invalid, else drop source 
-   (don't copy) + send drop notif to pdp system 
-   returns 1 if dropped, zero if copied */
-int pdp_packet_copy_rw_or_drop(int *dpacket, int spacket);
-
-
-/* check if packets are compatible */
-int pdp_type_compat(int packet0, int packet1);
-int pdp_type_compat_image(int packet0, int packet1);
-
-int pdp_type_isvalid_image(int packet);
-
-
-/* short cuts to create specific packets */
-int pdp_packet_new_image_yv12(u32 width, u32 height);
-int pdp_packet_new_image_grey(u32 width, u32 height);
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif 
+
+/*
+
+   PDP CORE API OVERVIEW
+
+   pdp_packet_* : packet methods, first argument is packet id
+
+      new:                construct a raw packet (depreciated)
+      new_*:              construct packet of specific type/subtype/...
+      mark_unused:        release
+      mark_passing:       conditional release (release on first copy ro/rw)
+      copy_ro:            readonly (shared) copy
+      copy_rw:            private copy
+      clone_rw:           private copy (copies only meta data, not the content)
+      header:             get the raw header (t_pdp *)
+      data:               get the raw data (void *)
+      pass_if_valid:      send a packet to pd outlet, if it is valid
+      replace_if_valid    delete packet and replace with new one, if new is valid
+      copy_ro_or_drop:    copy readonly, or don't copy if dest slot is full + send drop notify
+      copy_rw_or_drop:    same, but private copy
+      get_description:    retrieve type info
+      convert_ro:         same as copy_ro, but with an automatic conversion matching a type template
+      convert_rw:         same as convert_ro, but producing a private copy
+
+   pdp_pool_* : packet pool methods
+
+      collect_garbage:    manually free all unused resources in packet pool
+
+   pdp_queue_* : processing queue methods
+
+      add:                add a process method + callback
+      finish:             wait until a specific task is done
+      wait:               wait until processing queue is done
+
+   pdp_control_* : central pdp control hub methods
+
+      notify_drop:        notify that a packet has been dropped
+
+   pdp_type_* : packet type mediator methods
+
+      description_match:   check if two type templates match
+      register_conversion: register a type conversion program
+
+
+
+   NOTE: it is advised to derive your module from the pdp base class defined in pdp_base.h
+         instead of communicating directly with the pdp core
+
+*/

@@ -9,15 +9,16 @@ pdp_all:
 
 darwin:	pdp_all
 	rm -f pdp.pd_darwin
-	$(CC) -bundle -bundle_loader $(PD_EXECUTABLE) -o pdp.pd_darwin modules/*.o system/*.o $(PDP_LIBS)
+	$(CC)  -o pdp.pd_darwin modules/*/*.o system/*/*.o $(PDP_LIBS) -bundle -undefined error -twolevel_namespace -bundle_loader $(PD_EXECUTABLE) 
+
 
 linux: pdp_all
 	rm -f pdp.pd_linux
-	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*.o system/*.o $(PDP_LIBS)
+	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/*/*.o $(PDP_LIBS)
 
 linux_mmx: pdp_all
 	rm -f pdp.pd_linux
-	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*.o system/*.o system/mmx/*.o $(PDP_LIBS)
+	$(CC) -export_dynamic -shared -o pdp.pd_linux modules/*/*.o system/*/*.o $(PDP_LIBS)
 
 buildclean:
 	make -C include clean
@@ -30,6 +31,8 @@ clean: buildclean
 
 distroclean: buildclean
 	make -C scaf clean
+	make -C opengl clean
+	make -C guile clean
 
 mrproper: clean
 	make -C scaf mrproper
@@ -37,10 +40,12 @@ mrproper: clean
 	rm -rf config.log
 	rm -rf config.status
 	rm -rf autom4te.cache
-	rm -rf Makefile.config
+	#this needs to stay in to keep the makefiles working
+	#rm -rf Makefile.config
 
 tags:
-	etags --language=auto include/*.h system/mmx/*.s system/*.c modules/*.c
+	etags --language=auto include/*.h system/mmx/*.s system/*/*.c \
+	modules/*/*.c scaf/*/*.c scaf/*/*.s opengl/*/*.c
 
 tagsclean:
 	rm -f TAGS
@@ -48,7 +53,6 @@ tagsclean:
 
 install: all
 	#check if pd is installed. if this fails make install will stop here.
-	test -d $(prefix)/lib/pd
 	install -m 755 $(PDP_LIBRARY_NAME) $(prefix)/lib/pd/externs
 	install -m 755 -d $(prefix)/include/pdp
 	install -m 644 include/*.h $(prefix)/include/pdp

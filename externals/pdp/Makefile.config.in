@@ -13,16 +13,18 @@ PDP_TARGET = @PDP_TARGET@
 PDP_LIBRARY_NAME = @PDP_LIBRARY_NAME@
 PDP_OPTMOD = @PDP_OPTMOD@
 PDP_EXTRA_CPPFLAGS = @PDP_EXTRA_CPPFLAGS@
+PDP_EXTRA_CFLAGS = @PDP_EXTRA_CFLAGS@
 SDL_FLAGS = -D_REENTRANT
 
-PDP_CPPFLAGS =  -I. -I/usr/X11R6/include  -I../include $(PD_CPPFLAGS) $(PDP_EXTRA_CPPFLAGS) 
+PDP_CPPFLAGS =  -I. -I/usr/X11R6/include  -I../include -I../../include $(PD_CPPFLAGS) $(PDP_EXTRA_CPPFLAGS) 
 PDP_LIBS    = @LIBS@
 PDP_AFLAGS  = 
 #--gstabs
 PDP_CFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes -Werror \
+    -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch -DPDP_VERSION=\"$(PDP_VERSION)\" \
-   -g $(SDL_CFLAGS)
+   -g $(SDL_CFLAGS) $(PDP_EXTRA_CFLAGS)
+# -Werror
 # -Wshadow
 
 # compiler and assembler

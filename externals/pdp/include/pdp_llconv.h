@@ -26,7 +26,8 @@
    this is mainly to tuck away "ugly" parts of the code
    that come up in several places */
 
-
+#ifndef PDP_LLCONV_H
+#define PDP_LLCONV_H
 
 #include "pdp.h"
 
@@ -58,7 +59,8 @@ enum RIF {
 	RIF_RGBA_P____U8,
 	RIF_RGB__P444_S16,
 	RIF_GREY______S16,
-	RIF_GREY______U8
+	RIF_GREY______U8,
+        RIF_BGR__P____U8
 	
 };	
 
@@ -75,4 +77,7 @@ void pdp_llconv(void *src, int stype, void *dest, int dtype, int w, int h);
 
 #ifdef __cplusplus
 }
+#endif
+
+
 #endif

@@ -11,13 +11,13 @@
 #X msg 28 495 onep \$1;
 #X floatatom 89 526 5 0 0;
 #X msg 28 530 twop \$1;
-#X obj 85 272 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 85 272 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 87 304 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 79 209 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
-#X obj 82 244 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#X obj 82 244 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X msg 28 209 lr \$1;
 #X msg 28 244 rl \$1;
@@ -86,9 +86,12 @@
 #X text 264 342 set the filter type:;
 #X text 137 476 set the filter type:;
 #X text 538 319 (between 0 and 1 \, 0.5 = nyquist);
-#X text 540 333;
+#X text 540 333 comment;
 #X text 540 305 pole frequency;
 #X msg 100 572 1;
+#X msg 457 611 chanmask \$1;
+#X floatatom 457 585 5 0 0;
+#X text 456 633 binary channel mask;
 #X connect 0 0 5 1;
 #X connect 1 0 5 0;
 #X connect 2 0 5 0;
@@ -147,3 +150,5 @@
 #X connect 72 0 71 1;
 #X connect 73 0 72 0;
 #X connect 82 0 0 0;
+#X connect 83 0 5 0;
+#X connect 84 0 83 0;

@@ -39,7 +39,7 @@ void pdp_resample_zoom_tiled_bilin(s16 *src_image, s16 *dst_image, s32 w, s32 h,
 
 /* power of 2 resamplers */
 void pdp_resample_halve(s16 *src_image, s16 *dst_image, s32 src_w, s32 src_h);
-
+void pdp_resample_double(s16 *src_image, s16 *dst_image, s32 src_w, s32 src_h);
 
 
 

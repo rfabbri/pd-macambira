@@ -20,7 +20,10 @@
  */
 
 
-/* this file contains prototypes for "private" pdp methods */
+/* this file contains prototypes for "private" pdp methods.
+   DON'T CALL THESE FROM OUTSIDE OF PDP! unless you really
+   know what you are doing.
+ */
 
 
 /* pdp system code is not very well organized, this is an
@@ -40,7 +43,33 @@ extern "C"
 //#include <unistd.h>
 //#include <stdio.h>
 
+/* set/unset main pdp thread usage */
 void pdp_queue_use_thread(int t);
+
+/* create a new packet, reuse if possible.
+   ONLY USE THIS IN A TYPE SPECIFIC CONSTRUCTOR! */
+int pdp_packet_new(unsigned int datatype, unsigned int datasize); 
+
+
+/* send a packet to an outlet: it is only legal to call this on a "passing packet"
+   or a "read only packet".
+   this means it is illegal to change a packet after you have passed it to others,
+   since this would mess up all read only references to the packet.
+*/
+
+/* this seems like a nice place to hide a comment on the notion of read/write in pdp
+   which packets are writable? all packets with exactly 1 user. this includes all packets 
+   aquired with pdp_packet_*_rw or a constructor, and all packets that are not registered
+   after being sent out by outlet_pdp.
+   which packets are readable? all packets */
+
+void outlet_pdp(t_outlet *out, int packetid);
+
+/* send an accumulation (context) packet to an outlet. this is for usage in the dpd
+   base class. */
+void outlet_dpd(t_outlet *out, int packetid);
+
+
 
 #ifdef __cplusplus
 }
