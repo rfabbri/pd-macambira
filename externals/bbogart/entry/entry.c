@@ -129,6 +129,10 @@ static void create_widget(t_entry *x, t_glist *glist)
   x->x_rect_height =  x->x_height+2;
   
   /* Create text widget */
+
+  /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
+  sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+
   sys_vgui("set %xw .x%x.c.s%x ; text $%xw -font {helvetica 10} -border 1 -highlightthickness 1 -relief sunken -bg \"%s\" -fg \"%s\" \n",
 		x,canvas,x,x,x->x_bgcolour->s_name,x->x_fgcolour->s_name);
   sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", canvas, x, canvas, x);
