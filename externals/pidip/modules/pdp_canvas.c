@@ -46,6 +46,8 @@ typedef struct pdp_canvas_struct
     t_float x_xmouse;
     t_float x_ymouse;
 
+    t_int x_average;
+
     t_int *x_packets;
     t_int *x_widths;
     t_int *x_heights;
@@ -113,6 +115,15 @@ static void pdp_canvas_process_yv12(t_pdp_canvas *x)
                }
             }
          }
+       }
+       if ( ( nbs != 0 ) && x->x_average )
+       {
+           *(pY+py*x->x_owidth+px) /= nbs;
+           if ( (px%2==0) && (py%2==0) )
+           {
+             *(pU+(py>>1)*(x->x_owidth>>1)+(px>>1)) /= nbs;
+             *(pV+(py>>1)*(x->x_owidth>>1)+(px>>1)) /= nbs;
+           }
        }
     }
   }
@@ -205,6 +216,14 @@ static void pdp_canvas_drag(t_pdp_canvas *x, t_floatarg X, t_floatarg Y)
 static void pdp_canvas_unselect(t_pdp_canvas *x)
 {
   x->x_current = -1;
+}
+
+static void pdp_canvas_average(t_pdp_canvas *x, t_floatarg bvalue)
+{
+  if ( ( bvalue == 0.0 ) || ( bvalue == 1.0 ) )
+  {
+     x->x_average = (int) bvalue;
+  }
 }
 
 static void pdp_canvas_input(t_pdp_canvas *x, t_symbol *s, t_floatarg f, t_int ni)
@@ -374,6 +393,7 @@ void *pdp_canvas_new(t_symbol *s, int argc, t_atom *argv)
     x->x_yoffsets[ii] = 0.;
   }
   x->x_current = -1;
+  x->x_average = 0;
   x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
 
   return (void *)x;
@@ -409,6 +429,7 @@ void pdp_canvas_setup(void)
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_select, gensym("select"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_drag, gensym("drag"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_unselect, gensym("unselect"), A_NULL);
+  class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_average, gensym("average"), A_DEFFLOAT, A_NULL);
 
 }
 
