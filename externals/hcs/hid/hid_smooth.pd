@@ -1,10 +1,11 @@
-#N canvas 721 425 454 304 10;
+#N canvas 346 512 458 308 10;
 #X obj 67 31 inlet;
 #X obj 67 256 outlet;
 #X obj 122 78 loadbang;
 #X msg 96 113 weight;
 #X obj 67 149 average \$1;
 #X msg 150 113 10;
+#X text 9 9 [hid_smooth];
 #X connect 0 0 4 0;
 #X connect 2 0 5 0;
 #X connect 2 0 3 0;
