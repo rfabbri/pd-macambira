@@ -14,7 +14,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 1
 
-static char *version = "$Revision: 1.10 $";
+static char *version = "$Revision: 1.11 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -30,18 +30,26 @@ typedef struct _hid
 		t_int               x_delay;
 		t_int               x_started;
 		t_int               x_device_open;
-		t_int               x_instance_count;
 } t_hid;
 
 
 /*------------------------------------------------------------------------------
- *  GLOBALS
+ * GLOBAL DEFINES
  */
 
-/* TODO: what are these for again? */
-char *deviceList[64];
-char *typeList[256];
-char *codeList[256];
+#define DEFAULT_DELAY 5
+
+
+/*------------------------------------------------------------------------------
+ *  GLOBAL VARIABLES
+ */
+
+/*
+ * count the number of instances of this object so that certain free()
+ * functions can be called only after the final instance is detroyed.
+ */
+t_int hid_instance_count;
+
 
 /*------------------------------------------------------------------------------
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS
@@ -56,6 +64,7 @@ t_int hid_open_device(t_hid *x, t_int device_number);
 t_int hid_close_device(t_hid *x);
 t_int hid_build_device_list(t_hid* x);
 t_int hid_get_events(t_hid *x) ;
+void hid_print(t_hid* x);
 void hid_platform_specific_free(t_hid *x);
 
 #endif  /* #ifndef _HID_H */

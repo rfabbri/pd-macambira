@@ -1,4 +1,4 @@
-#N canvas 525 201 473 470 10;
+#N canvas 525 201 462 476 10;
 #X obj 5 2 cnv 15 450 20 empty empty [keygate] 2 11 1 18 -233017 -66577
 0;
 #X obj 160 257 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -24,6 +24,7 @@ inlet takes the data to be gated.;
 #X text 18 89 The "f" key on the any keyboard controls this gate:;
 #X text 310 263 <-- key released;
 #X text 41 264 key pressed -->;
+#X obj 422 3 pddp;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 4 0 14 0;

@@ -32,8 +32,6 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
-#define DEFAULT_DELAY 5
-
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */
@@ -95,7 +93,7 @@ void hid_stop(t_hid* x)
   if (x->x_started) 
   { 
 	  clock_unset(x->x_clock);
-	  post("[hid] polling stopped");
+	  DEBUG(post("[hid] polling stopped"););
 	  x->x_started = 0;
   }
 }
@@ -110,7 +108,7 @@ t_int hid_close(t_hid *x)
 
 	if(! hid_close_device(x)) 
 	{
-		post("[hid] closed device number %d",x->x_device_number);
+		post("[hid] closed device %d",x->x_device_number);
 		x->x_device_open = 0;
 		return (0);
 	}
@@ -119,44 +117,46 @@ t_int hid_close(t_hid *x)
 }
 
 
-/* closed same device          open */
-/* open same device            no action */
-/* closed different device     open */
-/* open different device       close open */
+/* closed / same device          open */
+/* open / same device            no action */
+/* closed / different device     open */
+/* open / different device       close open */
 
 t_int hid_open(t_hid *x, t_float f) 
 {
 	DEBUG(post("hid_open"););
 
 /* store running state to be restored after the device has been opened */
-		t_int started = x->x_started;
+	t_int started = x->x_started;
 
-		if ( (f != x->x_device_number) && (x->x_device_open) ) hid_close(x);
+/* only close the device if its different than the current and open */	
+	if ( (f != x->x_device_number) && (x->x_device_open) ) 
+		hid_close(x);
 
-		/* set obj device name to parameter otherwise set to default   */  
-		if (f > 0)
-			x->x_device_number = f;
+	if (f > 0)
+		x->x_device_number = f;
+	else
+		x->x_device_number = 0;
+
+/* if device is open still, that means the same device is trying to be opened,
+ * therefore ignore the redundant open request.  To reopen the same device,
+ * send a [close( msg, then an [open( msg. */
+	if (! x->x_device_open) 
+		if (hid_open_device(x,x->x_device_number))
+		{
+			error("[hid] can not open device %d",x->x_device_number);
+			return (1);
+		}
 		else
-			x->x_device_number = 0;
-		
-		if (! x->x_device_open) 
-			if (hid_open_device(x,x->x_device_number))
-			{
-				error("[hid] can not open device %d",x->x_device_number);
-				post("\\=========================== [hid] ===========================/\n");
-				return (1);
-			}
-			else
-			{
-				x->x_device_open = 1;
-			}
+		{
+			x->x_device_open = 1;
+		}
 
 /* restore the polling state so that when I [tgl] is used to start/stop [hid],
  * the [tgl]'s state will continue to accurately reflect [hid]'s state  */
-		hid_set_from_float(x,started);
+	if(started)
+		hid_set_from_float(x,x->x_delay);
 
-		
-	post("\\=========================== [hid] ===========================/\n");
 	return (0);
 }
 
@@ -181,13 +181,16 @@ void hid_start(t_hid* x, t_float f)
 	DEBUG(post("hid_start"););
   
 /*	if the user sets the delay less than one, ignore */
-	if ( f >= 1 ) 	
+	if( f >= 1 ) 	
 		x->x_delay = (t_int)f;
+
+	if(!x->x_device_open)
+		hid_open(x,x->x_device_number);
 	
-   if (!x->x_started) 
+   if(!x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
-		post("[hid]: polling started");
+		DEBUG(post("[hid] polling started"););
 		x->x_started = 1;
 	} 
 }
@@ -205,10 +208,10 @@ static void hid_free(t_hid* x)
 	DEBUG(post("hid_free"););
 		
 	hid_close(x);
-	
-	hid_platform_specific_free(x);
-	
 	clock_free(x->x_clock);
+	hid_instance_count--;
+
+	hid_platform_specific_free(x);
 }
 
 /* create a new instance of this class */
@@ -218,9 +221,11 @@ static void *hid_new(t_float f)
 
   DEBUG(post("hid_new"););
 
-  post("/=========================== [hid] ===========================\\");
-  post("[hid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
-		 HID_MAJOR_VERSION, HID_MINOR_VERSION);  
+/* only display the version when the first instance is loaded */
+  if(!hid_instance_count)
+	  post("[hid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
+			 HID_MAJOR_VERSION, HID_MINOR_VERSION);  
+
 #if !defined(__linux__) && !defined(__APPLE__)
   error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
   error("     This is a dummy, since this object only works GNU/Linux and MacOS X!");
@@ -245,7 +250,9 @@ static void *hid_new(t_float f)
    * patch.   */
   if (hid_open(x,f))
 	  error("[hid] device %d did not open",(t_int)f);
-  
+
+  hid_instance_count++;
+
   return (x);
 }
 
@@ -265,6 +272,7 @@ void hid_setup(void)
 	
 	/* add inlet message methods */
 	class_addmethod(hid_class,(t_method) hid_build_device_list,gensym("refresh"),0);
+	class_addmethod(hid_class,(t_method) hid_print,gensym("print"),0);
 	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
 	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),A_DEFFLOAT,0);

@@ -42,116 +42,8 @@
 /* LINUX-SPECIFIC SUPPORT FUNCTIONS */
 /* ============================================================================== */
 
-void hid_list_devices(void)
+void hid_print_element_list(t_hid *x)
 {
-	int i,fd;
-	char device_output_string[256] = "Unknown";
-	char device_name[20] = "/dev/input/event0";
-
-	post("");
-	for (i=0;i<128;++i) 
-	{
-		sprintf(device_name,"/dev/input/event%d",i);
-		if (device_name) 
-		{
-			/* open the device read-only, non-exclusive */
-			fd = open (device_name, O_RDONLY | O_NONBLOCK);
-			/* test if device open */
-			if (fd < 0 ) 
-			{ 
-				fd = -1;
-			} 
-			else 
-			{
-				/* get name of device */
-				ioctl(fd, EVIOCGNAME(sizeof(device_output_string)), device_output_string);
-				post("Device %d: '%s' on '%s'", i, device_output_string, device_name);
-			  
-				close (fd);
-			}
-		} 
-	}
-	post("");	
-}
-
-void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
-{
-	if(linux_code >= 0x100) 
-	{
-		if(linux_code < BTN_MOUSE)   
-			sprintf(hid_code,"btn_%d",linux_code - BTN_MISC);  /* numbered buttons */
-		else if(linux_code < BTN_JOYSTICK)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_MOUSE);  /* mouse buttons */
-		else if(linux_code < BTN_GAMEPAD)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_JOYSTICK);  /* joystick buttons */
-		else if(linux_code < BTN_DIGI)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_GAMEPAD);  /* gamepad buttons */
-		else if(linux_code < BTN_WHEEL)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
-		else if(linux_code < KEY_OK)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
-	}
-}
-
-/* ============================================================================== */
-/* Pd [hid] FUNCTIONS */
-/* ============================================================================== */
-
-t_int hid_get_events(t_hid *x)
-{
-	DEBUG(post("hid_get_events"););
-
-/*	for debugging, counts how many events are processed each time hid_read() is called */
-	t_int i;
-	DEBUG(t_int event_counter = 0;);
-	t_int read_bytes;
-	t_atom event_data[4];
-
-/* this will go into the generic read function declared in hid.h and
- * implemented in hid_linux.c 
- */
-	struct input_event hid_input_event;
-
-	if (x->x_fd < 0) return 0;
-
-	while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1)
-	{
-		/* build event_data list from event data */
-		/* type */
-		SETSYMBOL(event_data, gensym(ev[hid_input_event.type]));
-		/* code */
-		if (hid_input_event.type == EV_KEY)
-		{
-			char hid_code[7];
-			hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
-			SETSYMBOL(event_data + 1, 
-						 gensym(hid_code));
-		}
-		else
-			SETSYMBOL(event_data + 1, 
-						 gensym(event_names[hid_input_event.type][hid_input_event.code]));
-		/* value */
-		SETFLOAT(event_data + 2, (t_float)hid_input_event.value);
-		/* time */
-		SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
-		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
-		DEBUG(++event_counter;);
-	}
-	DEBUG(
-	if (event_counter > 0)
-	    post("output %d events",event_counter);
-	);
-	
-	return (0);
-}
-
-
-t_int hid_open_device(t_hid *x, t_int device_number)
-{
-	DEBUG(post("hid_open_device"););
-
-	char device_name[20];
-	struct input_event hid_input_event;
 	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 	char devicename[256] = "Unknown";
 	t_int event_type, event_code;
@@ -159,29 +51,6 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	/* counts for various event types */
 	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
 
-	x->x_fd = -1;
-  
-	x->x_device_number = device_number;
-	sprintf(device_name,"/dev/input/event%d",x->x_device_number);
-
-  if (device_name) 
-  {
-	  /* open the device read-only, non-exclusive */
-	  x->x_fd = open(device_name, O_RDONLY | O_NONBLOCK);
-	  /* test if device open */
-	  if (x->x_fd < 0 ) 
-	  { 
-		  error("[hid] open %s failed",device_name);
-		  x->x_fd = -1;
-		  return 1;
-	  }
-  } 
-  
-  /* read input_events from the HID_DEVICE stream 
-   * It seems that is just there to flush the input event queue
-   */
-  while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
-  
   /* get name of device */
   ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
   post ("\nConfiguring device %d as %s (%s)",
@@ -286,6 +155,148 @@ t_int hid_open_device(t_hid *x, t_int device_number)
   if (ffCount > 0) post ("  %d Force Feedback types",ffCount);
   if (pwrCount > 0) post ("  %d Power types",pwrCount);
   if (ff_statusCount > 0) post ("  %d Force Feedback types",ff_statusCount);
+}
+
+
+void hid_print_device_list(void)
+{
+	int i,fd;
+	char device_output_string[256] = "Unknown";
+	char device_name[20] = "/dev/input/event0";
+
+	post("");
+	for (i=0;i<128;++i) 
+	{
+		sprintf(device_name,"/dev/input/event%d",i);
+		if (device_name) 
+		{
+			/* open the device read-only, non-exclusive */
+			fd = open (device_name, O_RDONLY | O_NONBLOCK);
+			/* test if device open */
+			if (fd < 0 ) 
+			{ 
+				fd = -1;
+			} 
+			else 
+			{
+				/* get name of device */
+				ioctl(fd, EVIOCGNAME(sizeof(device_output_string)), device_output_string);
+				post("Device %d: '%s' on '%s'", i, device_output_string, device_name);
+			  
+				close (fd);
+			}
+		} 
+	}
+	post("");	
+}
+
+void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
+{
+	if(linux_code >= 0x100) 
+	{
+		if(linux_code < BTN_MOUSE)   
+			sprintf(hid_code,"btn_%d",linux_code - BTN_MISC);  /* numbered buttons */
+		else if(linux_code < BTN_JOYSTICK)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_MOUSE);  /* mouse buttons */
+		else if(linux_code < BTN_GAMEPAD)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_JOYSTICK);  /* joystick buttons */
+		else if(linux_code < BTN_DIGI)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_GAMEPAD);  /* gamepad buttons */
+		else if(linux_code < BTN_WHEEL)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
+		else if(linux_code < KEY_OK)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
+	}
+}
+
+/* ============================================================================== */
+/* Pd [hid] FUNCTIONS */
+/* ============================================================================== */
+
+t_int hid_get_events(t_hid *x)
+{
+	DEBUG(post("hid_get_events"););
+
+/*	for debugging, counts how many events are processed each time hid_read() is called */
+	t_int i;
+	DEBUG(t_int event_counter = 0;);
+	t_int read_bytes;
+	t_atom event_data[4];
+
+/* this will go into the generic read function declared in hid.h and
+ * implemented in hid_linux.c 
+ */
+	struct input_event hid_input_event;
+
+	if (x->x_fd < 0) return 0;
+
+	while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1)
+	{
+		/* build event_data list from event data */
+		/* type */
+		SETSYMBOL(event_data, gensym(ev[hid_input_event.type]));
+		/* code */
+		if (hid_input_event.type == EV_KEY)
+		{
+			char hid_code[7];
+			hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
+			SETSYMBOL(event_data + 1, 
+						 gensym(hid_code));
+		}
+		else
+			SETSYMBOL(event_data + 1, 
+						 gensym(event_names[hid_input_event.type][hid_input_event.code]));
+		/* value */
+		SETFLOAT(event_data + 2, (t_float)hid_input_event.value);
+		/* time */
+		SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
+		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
+		DEBUG(++event_counter;);
+	}
+	DEBUG(
+		//if (event_counter > 0)
+		//post("output %d events",event_counter);
+	);
+	
+	return (0);
+}
+
+
+void hid_print(t_hid* x)
+{
+	hid_print_device_list();
+}
+
+
+t_int hid_open_device(t_hid *x, t_int device_number)
+{
+	DEBUG(post("hid_open_device"););
+
+	char device_name[20];
+	struct input_event hid_input_event;
+
+	x->x_fd = -1;
+  
+	x->x_device_number = device_number;
+	sprintf(device_name,"/dev/input/event%d",x->x_device_number);
+
+  if (device_name) 
+  {
+	  /* open the device read-only, non-exclusive */
+	  x->x_fd = open(device_name, O_RDONLY | O_NONBLOCK);
+	  /* test if device open */
+	  if (x->x_fd < 0 ) 
+	  { 
+		  error("[hid] open %s failed",device_name);
+		  x->x_fd = -1;
+		  return 1;
+	  }
+  } 
+  
+  /* read input_events from the HID_DEVICE stream 
+   * It seems that is just there to flush the input event queue
+   */
+  while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
 
   return (0);
 }
@@ -312,8 +323,6 @@ t_int hid_build_device_list(t_hid *x)
  * the device list.  Once the device name can be other things in addition
  * the current t_float, then this will probably need to be changed.
  */
-
-	hid_list_devices();
 
 	return (0);
 }

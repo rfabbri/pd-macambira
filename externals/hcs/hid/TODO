@@ -1,3 +1,11 @@
+
+==============================================================================
+= write hid_print()
+
+- MacOS X (device/element list)
+
+- GNU/Linux 
+
 ==============================================================================
 = define generic event timestamp struct (probably Pd-ized input_event )
 
@@ -5,17 +13,10 @@ The question is whether the timeval is needed at all.  Linux and Darwin
 support it.  Currently, I can only think of UPS PWR events actually using
 timevals.
 
-
-
-===============================================================================
-= HID Manager Type/Usage/UsagePage -> Linux Type/Code mapping
-
- UsagePage
-
-
-LED UsagePage => ev_led
-LED Usages == Linux ev_led codes
-
+The timestamps should be in seconds since the first [hid] object was
+instantiated since Pd limits float resolution to 6 digits.  If there were two
+floats, one for seconds, and the other for microseconds, then the [hid]
+timestamp could represent up to 11.5 days (999999 seconds).
 
 
 ==============================================================================
@@ -23,17 +24,6 @@ LED Usages == Linux ev_led codes
 
 by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 ("Trackpad", "Microsoft 5-button Mouse with IntelliEye(TM)", etc.)
-
- first get # working, that's probably the easiest
-
-by #
-------------------------------
-GNU/Linux
-    sprintf(x_devname->s_name,"/dev/input/event%d",deviceNum + 1);
-
-Darwin
-	 prHIDBuildDeviceList();
-	 currentHIDDevice = discoveredDevices[gNumberOfHIDDevices];
 
 
 ==============================================================================
@@ -69,11 +59,7 @@ Darwin
 ==============================================================================
 = control input messages
 
-- the [delay( message should be replaced by the [poll( msg
-
-- should [poll( also start things, or should it just set polling time?
-
-- are [start( and [stop( needed?  is 0/1 enough?
+- are [poll(, [start(, and [stop( needed?  is 0/1/del# enough?
 
 
 ==============================================================================
@@ -83,28 +69,21 @@ void hid_post(const char *format, const char *);
 
 
 ==============================================================================
-= if device is closed and obj is started, open device and start
-
-==============================================================================
-= catalog Linux device behavior
-
-- more data needed to make the proper [hid] output for MacOS X
-
-- catalog hatswitch behavior
-
-- catalog axis directions: right/down positive?  left/up negative?
-
-==============================================================================
 = event name changes
 
 - make key/button Type btn rather than key (undecided on this one)
 
+
 ==============================================================================
-= make [macosxevent]
+= make [linuxhid] [darwinhid] and [windowshid]
 
 - so much info is lost in the translation to a common event scheme that it
-  would be quite handy to have a [macosxevent] object.  This would give
-  access to the entire range of devices supported by HID Manager.
+  would be quite handy to have platform-specific objects.  This would give
+  access to the entire range of devices supported by HID Manager, Linux input
+  events, etc.
+
+- these objects should follow the same conventions as [hid]
+
 
 ==============================================================================
 = device 0 gets events for all available devices
@@ -112,35 +91,12 @@ void hid_post(const char *format, const char *);
 - it might be useful to have device #0 open all available devices and output
   the events.
 
-==============================================================================
-= mapping object ideas
 
-- log
-
-- exponential
-
-- [noterange] scale an input range to an output range of MIDI note #s
-
-______________________________________________________________________________
-------------------------------------------------------------------------------
-BUGS
-______________________________________________________________________________
-------------------------------------------------------------------------------
-
-______________________________________________________________________________
-- BUG x->x_delay reset to default when device is opened
-
-______________________________________________________________________________
-- BUG: [mouse] and [joystick] arguments don't work to open device
-
-______________________________________________________________________________
-- BUG: [open('ing a device causes all other active [hid] objs to have their
-devices closed
-
-- this means only one [hid] object can have an open device at one time
-
-- I thought this was due to the hid_close_device() call in hid_open(), which releases
-  the device list, but this doesn't seem to be the case.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ______________________________________________________________________________
 - BUG: getting events from the queue doesn't output a 0 value event when the
@@ -169,10 +125,11 @@ ______________________________________________________________________________
   the screen.  Hopefully the HID Manager API will allow raw mouse data
   access.  It must since its used with games.
 
-_________________________________________________________________________________________
+______________________________________________________________________________
 - BUG: on MacOS X, two keyboard key codes are reported as hatswitches
 
   abs   abs_hat0x       Button Input, Keyboard Usage 0x39
   abs   abs_hat0y       Button Input, Keyboard Usage 0x39
 
-I am pretty sure this is just a display problem, but it might not be.
+I am pretty sure this is just a hid_print_element_list() display problem.
+

@@ -1,4 +1,4 @@
-#N canvas 470 274 674 468 10;
+#N canvas 470 274 661 472 10;
 #X symbolatom 211 268 6 0 0 1 code - -;
 #X obj 130 106 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
@@ -83,7 +83,7 @@
 #X connect 30 0 17 0;
 #X connect 31 0 16 0;
 #X restore 425 186 pd mouse-noise 1;
-#X obj 425 119 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
+#X obj 425 119 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
 #X text 308 95 turn this on to make some noise with the mouse;
 #X obj 211 241 unpack symbol float;
@@ -106,7 +106,7 @@
 ;
 #X text 228 436 released under the GNU GPL;
 #X text 424 436 $Author: eighthave $;
-#X text 424 423 $Revision: 1.8 $;
+#X text 424 423 $Revision: 1.9 $;
 #X obj 526 382 all_about_hid;
 #X text 417 383 For more info:;
 #X obj 601 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -123,6 +123,7 @@ in each axis to calibrate it.;
 #X floatatom 516 165 1 0 0 0 - - -;
 #X msg 180 146 refresh;
 #X obj 130 171 mouse 0;
+#X obj 619 3 pddp;
 #X connect 1 0 38 0;
 #X connect 9 0 38 0;
 #X connect 10 0 38 0;

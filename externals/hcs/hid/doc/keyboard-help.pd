@@ -1,5 +1,5 @@
-#N canvas 109 184 569 474 10;
-#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#N canvas 109 184 567 478 10;
+#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X obj 11 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
@@ -14,7 +14,7 @@
 ;
 #X text 218 446 released under the GNU GPL;
 #X text 414 446 $Author: eighthave $;
-#X text 414 433 $Revision: 1.1 $;
+#X text 414 433 $Revision: 1.2 $;
 #X obj 348 402 all_about_hid;
 #X text 239 403 For more info:;
 #X msg 220 112 open 3;
@@ -54,7 +54,7 @@
 1;
 #X obj 368 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 389 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 1
+#X obj 389 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X obj 410 369 tgl 20 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
@@ -76,6 +76,7 @@ will get keyboard events.;
 #X obj 75 315 route key_4 key_5 key_6 key_7 key_8 key_9 key_10 key_11
 key_12 key_13 key_14 key_15 key_16 key_17 key_18 key_19 key_20 key_21
 key_22 key_23 key_24 key_25 key_26 key_27;
+#X obj 519 3 pddp;
 #X connect 0 0 16 0;
 #X connect 4 0 2 0;
 #X connect 4 1 3 0;

@@ -58,6 +58,7 @@
  *  GLOBAL VARS
  *======================================================================== */
 
+extern t_int hid_instance_count;
 
 /*==============================================================================
  * FUNCTION PROTOTYPES
@@ -162,7 +163,7 @@ void hid_convert_hatswitch_values(IOHIDEventStruct event, char *linux_type, char
 
 pRecDevice hid_get_device_by_number(t_int device_number)
 {
-	pRecDevice currentDevice;
+	pRecDevice pCurrentHIDDevice;
 	t_int i, numdevs;
 
 /*
@@ -179,14 +180,21 @@ pRecDevice hid_get_device_by_number(t_int device_number)
  *	want the oldest to be number 0 rather than the newest, so I use (numdevs -
  *	device_number - 1).
  */
-	currentDevice = HIDGetFirstDevice();
+	pCurrentHIDDevice = HIDGetFirstDevice();
 	for(i=0; i < numdevs - device_number - 1; ++i)
-		currentDevice = HIDGetNextDevice(currentDevice);
+		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 
-	return currentDevice;
+	return pCurrentHIDDevice;
 }
 
-t_int hid_build_element_list(t_hid *x)
+
+void hid_build_element_list(t_hid *x) 
+{
+	
+}
+
+
+t_int hid_print_element_list(t_hid *x)
 {
 	DEBUG(post("hid_build_element_list"););
 
@@ -200,8 +208,12 @@ t_int hid_build_element_list(t_hid *x)
 	char usage_name[256];
 
 	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
-	if(!pCurrentHIDDevice) return (1);
-	
+	if ( ! HIDIsValidDevice(pCurrentHIDDevice) )
+	{
+		error("[hid]: device %d is not a valid device\n",x->x_device_number);
+		return(1);
+	}
+
 	pCurrentHIDElement = HIDGetFirstDeviceElement(pCurrentHIDDevice, kHIDElementTypeInput);
 	numElements = HIDCountDeviceElements(pCurrentHIDDevice, kHIDElementTypeInput);
 	
@@ -236,6 +248,36 @@ t_int hid_build_element_list(t_hid *x)
 }
 
 
+void hid_print_device_list(t_hid *x) 
+{
+	char cstrDeviceName [256];
+	t_int i,numdevs;
+	UInt32 usagePage, usage;
+	pRecDevice pCurrentHIDDevice;
+
+	if( HIDHaveDeviceList() )
+	{
+		numdevs = (t_int) HIDCountDevices();
+		
+		post("");
+		/* display device list in console */
+		for(i=0; i < numdevs; i++)
+		{
+			pCurrentHIDDevice = hid_get_device_by_number(i);
+			post("Device %d: '%s' '%s' version %d",i,pCurrentHIDDevice->manufacturer,
+				  pCurrentHIDDevice->product,pCurrentHIDDevice->version);
+			//usage
+			HIDGetUsageName (pCurrentHIDDevice->usagePage, 
+								  pCurrentHIDDevice->usage, 
+								  cstrDeviceName);
+			DEBUG(post("       vendorID: %d   productID: %d   locID: %d",
+						  pCurrentHIDDevice->vendorID,
+						  pCurrentHIDDevice->productID,
+						  pCurrentHIDDevice->locID););
+		}
+		post("");
+	}
+}
 
 /* ============================================================================== */
 /* Pd [hid] FUNCTIONS */
@@ -352,8 +394,8 @@ t_int hid_get_events(t_hid *x)
 		++event_counter;
 	}
 	DEBUG(
-	if(event_counter)
-		post("output %d events",event_counter);
+//	if(event_counter)
+//		post("output %d events",event_counter);
 	);
 /* 	/\* get the first element *\/ */
 /* 	pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO); */
@@ -396,24 +438,40 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 {
 	DEBUG(post("hid_open_device"););
 
-	t_int err,result;
-	pRecDevice currentDevice = NULL;
+	t_int result = 0;
+	pRecDevice pCurrentHIDDevice = NULL;
 
-	result = HIDBuildDeviceList (NULL, NULL); 
-	// returns false if no device found
-	if(result) error("[hid]: no HID devices found\n");
+/* rebuild device list to make sure the list is current */
+	if ( ! HIDHaveDeviceList() )
+	{
+		result = (t_int) HIDBuildDeviceList (NULL, NULL); 
+		// returns false if no device found
+		if(result) 
+		{
+			error("[hid]: no HID devices found\n");
+			return(result);
+		}
+	}
+	
+	pCurrentHIDDevice = hid_get_device_by_number(device_number);
+	if ( ! HIDIsValidDevice(pCurrentHIDDevice) )
+	{
+		error("[hid]: device %d is not a valid device\n",device_number);
+		return(1);
+	}
 
-	currentDevice = hid_get_device_by_number(device_number);
+// this doesn't seem to be needed at all
+//   result = HIDCreateOpenDeviceInterface(pCurrentHIDDevice);
 
 	post("[hid] opened device %d: %s %s",
-		  device_number, currentDevice->manufacturer, currentDevice->product);
+		  device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
 
 	hid_build_element_list(x);
 
-	HIDQueueDevice(currentDevice);
+	HIDQueueDevice(pCurrentHIDDevice);
 // TODO: queue all elements except absolute axes, those can just be polled
 
-	return (0);
+	return(result);
 }
 
 
@@ -421,8 +479,14 @@ t_int hid_close_device(t_hid *x)
 {
 	DEBUG(post("hid_close_device"););
 
-	post("[hid] closing device %d",x->x_device_number);
-	return( HIDDequeueDevice( hid_get_device_by_number(x->x_device_number) ) );
+	t_int result = 0;
+	pRecDevice pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+
+	HIDDequeueDevice(pCurrentHIDDevice);
+// this doesn't seem to be needed at all
+//   result = HIDCloseReleaseInterface(pCurrentHIDDevice);
+	
+	return(result);
 }
 
 
@@ -430,45 +494,33 @@ t_int hid_build_device_list(t_hid *x)
 {
 	DEBUG(post("hid_build_device_list"););
 
-	int i,err;
-	UInt32 usagePage, usage;
-	pRecDevice pCurrentHIDDevice;
-
-	Boolean result = HIDBuildDeviceList (NULL, NULL); 
 	// returns false if no device found
-	if(result) error("[hid]: no HID devices found\n");
-	
-	int numdevs = HIDCountDevices();
-	// exit if no devices found
-	if(!numdevs) return (0);
-
-	char cstrDeviceName [256];
-	
-	post("");
-   /* display device list in console */
-	for(i=0; i < numdevs; i++)
-	{
-		pCurrentHIDDevice = hid_get_device_by_number(i);
-		post("Device %d: '%s' '%s' version %d",i,pCurrentHIDDevice->manufacturer,
-			  pCurrentHIDDevice->product,pCurrentHIDDevice->version);
-		//usage
-		HIDGetUsageName (pCurrentHIDDevice->usagePage, 
-							  pCurrentHIDDevice->usage, 
-							  cstrDeviceName);
-		DEBUG(post("       vendorID: %d   productID: %d   locID: %d",
-					  pCurrentHIDDevice->vendorID,
-					  pCurrentHIDDevice->productID,
-					  pCurrentHIDDevice->locID););
-	}
-	post("");
+	if(HIDBuildDeviceList (NULL, NULL)) 
+		error("[hid]: no HID devices found\n");
 	
 	return (0);
 }
 
+
+void hid_print(t_hid *x)
+{
+	hid_print_device_list(x);
+	
+	if(x->x_device_open)
+		hid_print_element_list(x);
+}
+
+
 void hid_platform_specific_free(t_hid *x)
 {
-	HIDReleaseAllDeviceQueues();
-	HIDReleaseDeviceList();
+	DEBUG(post("hid_platform_specific_free"););
+/* only call this if the last instance is being freed */
+	if (hid_instance_count < 1) 
+	{
+		DEBUG(post("RELEASE ALL hid_instance_count: %d", hid_instance_count););
+		HIDReleaseAllDeviceQueues();
+		HIDReleaseDeviceList();
+	}
 }
 
 //void HIDGetUsageName (const long valueUsagePage, const long valueUsage, char * cstrName)
