@@ -119,7 +119,7 @@ class syncgrain:
 }; // end of class declaration for syncgrain
 
 // GIMME class:
-FLEXT_NEW_TILDE_G("syncgrain~", syncgrain)
+FLEXT_NEW_DSP_V("syncgrain~", syncgrain)
 
 
 // _ ___

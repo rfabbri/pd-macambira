@@ -1,5 +1,5 @@
 # change this!!!
-CXX=g++ # -3.2
+# CXX=g++ # -3.2
 CFLAGS=-O6 -mcpu=pentium -g
 FLAGS=-DPD
 
