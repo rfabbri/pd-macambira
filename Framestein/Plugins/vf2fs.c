@@ -11,6 +11,8 @@
 #include "sharemem.h"
 #include "vframe.h"
 
+INFO("display vframe contents, used automatically by fs.frame")
+
 void perform_effect(_frame f, _args a)
 {
 	HANDLE hlvframe=NULL, hl=NULL;

@@ -1,0 +1,23 @@
+fs.main;fs.main: connect Pd and Framestein
+
+fs.frame;fs.frame: Load, display and process images and video
+fs.framed;fs.framed: a docked version of fs.frame
+fs.copy;fs.copy: Perform operations on two fs.frames
+fs.fx;fs.fx: image effects
+fs.blend;fs.blend: Blend two images
+fs.mask;fs.mask: Copy frame to another using a mask
+fs.layermode;fs.layermode: Mix two images with difference layer mode
+
+fs.draw;fs.draw: Draw lines and rectangles
+fs.text;fs.text: Insert text
+
+fs.info;fs.info: Get info on fs.frame, such as width, height, framecount, ...
+fs.event;fs.event: Get mouse and drag & drop information from fs.frame
+fs.rgb;fs.rgb: Get red, green and blue of a pixel
+fs.hist;fs.hist: Calculate image color intensities
+fs.sonogram;fs.sonogram: Show a graphical spectogram
+
+fs.browser;fs.browser: View webpages and convert them to images
+fs.waveform;fs.waveform: Display a waveform in fs.frame
+
+fs.grid;fs.grid: Easy to use XY-control

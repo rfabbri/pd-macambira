@@ -30,6 +30,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("compare two images for differences")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using compare as effect does nothing!\n");

@@ -13,6 +13,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.fromage -- does cheezy wipes between two input images")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using fromage as effect does nothing!\n");

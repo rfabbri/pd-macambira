@@ -31,6 +31,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("5x5 convolution kernel matrix calculation")
+
 void perform_effect(struct frame f, struct args a)
 {
 	short x, y;

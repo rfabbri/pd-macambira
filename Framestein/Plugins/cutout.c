@@ -13,6 +13,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.cutout -- does a rectangular mask really quickly")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using cutout as effect does nothing!\n");

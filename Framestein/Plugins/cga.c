@@ -14,6 +14,8 @@
 #include <math.h>
 #include "plugin.h"
 
+INFO("242.cga -- does bit-level quantization on an input image")
+
 #pragma warning( disable : 4761 )	// the (lossy) conversion _IS_ our effect !
 
 void perform_effect(struct frame f, struct args arg)

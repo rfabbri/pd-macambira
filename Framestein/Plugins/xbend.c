@@ -2,6 +2,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("horizontal bend. usage: xbend <from> <to>")
+
 void perform_effect(_frame f, _args a)
 {
 	byte pixelsize = f.pixelformat/8;

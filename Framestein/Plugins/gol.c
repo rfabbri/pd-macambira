@@ -11,7 +11,7 @@
 #define BORN	1
 #define DYING	2
 
-INFO("Conway's Game Of Life")
+INFO("Conway's Game Of Life (only on 16bit displays)")
 
 int aroundme(_frame f, int x, int y)
 {

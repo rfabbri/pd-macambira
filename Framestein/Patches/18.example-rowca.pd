@@ -1,0 +1,58 @@
+#N canvas 328 14 664 542 12;
+#X obj 199 343 fs.frame;
+#X obj 293 342 init;
+#X msg 310 391 176x144;
+#X msg 319 415 1024x768;
+#X msg 327 439 3600x3600 \, display 720x576;
+#X msg 227 256 rowca 001-010-011-100;
+#X msg 115 282 rowca draw;
+#X msg 15 282 rowca clear;
+#X msg 293 368 640x480;
+#X msg 421 255 rowca 111-010-001-100;
+#X obj 9 35 fs.main;
+#X msg 9 9 6001;
+#X msg 60 9 reset;
+#X text 129 8 Row cellular automata \, where each iteration adds a
+new row.;
+#X text 129 31 Each cell has three neighbourns \, top left \, top and
+top right \, as shown below:;
+#X text 129 70 123;
+#X text 138 86 O;
+#X text 130 106 Patterns that lead to a white cell are given as parameter
+\, forming the rule of the automata.;
+#X obj 150 218 t b b b;
+#X msg 94 366 ping done;
+#X obj 94 395 r done;
+#X obj 94 422 delay 500;
+#X obj 150 165 bng 45 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 94 450 spigot;
+#X obj 151 452 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 23 510 (Using ping to determine when done processing);
+#X obj 94 478 s again;
+#X obj 73 176 r again;
+#X text 170 450 try this;
+#X text 205 177 click me;
+#X connect 1 0 8 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 11 0 10 0;
+#X connect 11 0 12 0;
+#X connect 12 0 10 1;
+#X connect 18 0 19 0;
+#X connect 18 1 6 0;
+#X connect 18 2 5 0;
+#X connect 19 0 0 0;
+#X connect 20 0 21 0;
+#X connect 21 0 23 0;
+#X connect 22 0 18 0;
+#X connect 23 0 26 0;
+#X connect 24 0 23 1;
+#X connect 27 0 22 0;

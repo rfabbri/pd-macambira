@@ -4,8 +4,10 @@
 #include "plugin.h"
 #include "pixels.h"
 
+INFO("plot pixel to vframe")
+
 // plot exists to provide plotting to vframe - much faster than
-// plot with fs.draw which goes thru network.
+// plot with fs.draw which goes thru TCP/IP.
 
 void perform_effect(_frame f, _args a)
 {

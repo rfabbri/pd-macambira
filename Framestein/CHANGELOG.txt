@@ -1,6 +1,6 @@
 0.32
-- added toolbar, paste objects to patches
-- new plugin: lightspeed
+- added toolbar (just a list of framestein objects & filters for now)
+- new plugins: lightspeed, merge_additive, merge_mod, ping, fader
 - fs.frame: |title this is the main window( and |undock( commands
 - fs.copy: transcolor <r> <g> <b> to set the transparent color
 - better gol algo (Plugins\gol.c)

@@ -8,6 +8,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("display slider values. usage: makesliders 14 56 76 140 [...]")
+
 #define MAXVALS 128
 
 void perform_effect(_frame f, _args a)

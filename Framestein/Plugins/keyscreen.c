@@ -15,6 +15,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.keyscreen -- does 3-source chroma keying")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using keyscreen as effect does nothing!\n");

@@ -13,6 +13,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.constrain -- does color range constraining on an input image")
+
 void perform_effect(struct frame f, struct args a)
 {
 	int x,y;

@@ -1,5 +1,5 @@
 //
-//  interlace - deinterlacing through pixel / line repitition
+//  interlace - deinterlacing through pixel / line repetition
 //  
 //	written by Olaf Matthes <olaf.matthes@gmx.de>
 //
@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "plugin.h"
+
+INFO("deinterlacing through pixel / line repetition")
 
 void perform_effect(struct frame f, struct args a)
 {

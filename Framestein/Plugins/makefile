@@ -5,7 +5,8 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 	multiply overlay screen shadowcaster softlight \
 	rgbseek modgain traffic constrain eclipse eclipse02 eclipse03 \
 	cga keyscreen rene cutout fromage rgbavg rgbavg02 \
-	rowca argument-passing lightspeed
+	rowca argument-passing lightspeed merge_additive merge_mod ping \
+	fader
 
 	dir *.dll
 
@@ -72,10 +73,10 @@ xshred:
 	cl xshred.c $(FLAGS) /link $(COPY)
 
 vf2fs:
-	cl vf2fs.c $(FLAGS) /I..\Externals /link $(EFFECT)
+	cl vf2fs.c $(FLAGS) /I..\Patches /link $(EFFECT)
 
 fs2vf:
-	cl fs2vf.c $(FLAGS) /I..\Externals /link $(EFFECT)
+	cl fs2vf.c $(FLAGS) /I..\Patches /link $(EFFECT)
 
 swap:
 	cl swap.cpp $(FLAGS) /link $(COPY)
@@ -192,3 +193,15 @@ argument-passing:
 
 lightspeed:
 	cl lightspeed.c $(FLAGS) /link $(EFFECT)
+
+merge_additive:
+	cl merge_additive.cpp $(FLAGS) /GX /link $(COPY)
+
+merge_mod:
+	cl merge_mod.cpp $(FLAGS) /GX /link $(COPY)
+
+ping:
+	cl ping.c $(FLAGS) /link $(EFFECT)
+
+fader:
+	cl fader.cpp $(FLAGS) /GX /link $(COPY)

@@ -2,6 +2,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("copy one vertical line at a given position")
+
 void perform_copy(_frame f1, _frame f2, _args a)
 {
 	byte pixelsize = f1.pixelformat/8;

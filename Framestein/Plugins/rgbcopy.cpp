@@ -3,6 +3,8 @@
 #include "plugin.h"
 #include "pixels.h"
 
+INFO("mix color components of two images. usage: rgbcopy RG red/green from first, blue from second image")
+
 void perform_copy(_frame f1, _frame f2, _args a)
 {
 	pixels p1(f1), p2(f2);

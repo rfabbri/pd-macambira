@@ -4,8 +4,7 @@
 #include "plugin.h"
 #include "pixels.h"
 
-// swap selected area on two images
-// args: swap sourcex1 sourcey1 sourcex2 sourcey2 destx desty
+INFO("swap selected area on two images. usage: swap sourcex1 sourcey1 sourcex2 sourcey2 destx desty")
 // (the selection is of equal size on both images)
 
 void swapint(int *a, int *b)

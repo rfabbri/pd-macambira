@@ -11,6 +11,8 @@
 #include "sharemem.h"
 #include "vframe.h"
 
+INFO("copy image data to PD's memory space")
+
 void perform_effect(_frame f, _args a)
 {
 	HANDLE hlvframe=NULL, hl=NULL;

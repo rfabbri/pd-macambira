@@ -14,6 +14,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.eclipse -- does meta-imaging on an input image")
+
 // the process image routines work like this:
 // 
 // two pointers (src and src2) access the pixels in the input image

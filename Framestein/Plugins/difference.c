@@ -22,6 +22,8 @@
 
 #include "plugin.h"
 
+INFO("difference of two images")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using difference as effect does nothing!\n");

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "plugin.h"
 
+INFO("horizontal shredding. usage: xshred <step>")
+
 void perform_copy(_frame f1, _frame f2, _args a)
 {
 	int step, w, h, y, pixelsize=f1.pixelformat/8;

@@ -16,6 +16,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("242.rene -- does 3-source chroma keying with transparency")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using keyscreen as effect does nothing!\n");

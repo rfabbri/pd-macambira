@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "plugin.h"
 
+INFO("turn some random bits")
+
 void perform_effect(struct frame f, struct args a)
 {
 	int i,o,x,y;

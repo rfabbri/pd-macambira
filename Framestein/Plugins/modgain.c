@@ -14,6 +14,8 @@
 #include <math.h>
 #include "plugin.h"
 
+INFO("242.modgain -- does modulo channel shifting on an input image")
+
 void perform_effect(struct frame f, struct args arg)
 {
 	int x,y;

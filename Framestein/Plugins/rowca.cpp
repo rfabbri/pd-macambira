@@ -1,5 +1,5 @@
 /*
-	One dimensional cellular automata, where each iteration
+	Row cellular automata, where each iteration
 	adds a new row.
 
 	Each cell has three neighbourns, top left, top and top right,
@@ -32,6 +32,8 @@
 
 #include "plugin.h"
 #include "pixels.h"
+
+INFO("Row cellular automata, where each iteration adds a new row")
 
 using namespace std;
 

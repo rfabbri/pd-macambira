@@ -22,6 +22,8 @@
 
 #include "plugin.h"
 
+INFO("multiply of two images")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using multiply as effect does nothing!\n");

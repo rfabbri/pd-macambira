@@ -2,6 +2,8 @@
 #include <string.h>
 #include "plugin.h"
 
+INFO("bend image horizontally or vertically")
+
 void perform_effect(_frame f, _args a)
 {
 	printf("NOTE: bend as effect does nothing. Use bend as copy operation.\n");

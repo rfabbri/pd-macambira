@@ -26,6 +26,8 @@
 #include "plugin.h"
 #include "tools.h"
 
+INFO("porduce a cutout with shadow.")
+
 #define MAX_SHADOW  128	/* maximum shadow width in px */
 
 void perform_effect(struct frame f, struct args a)

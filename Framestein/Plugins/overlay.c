@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include "plugin.h"
 
+INFO("overlay of two images")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using overlay as effect does nothing!\n");

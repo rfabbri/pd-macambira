@@ -24,6 +24,8 @@
 #include "plugin.h"
 #include "tools.h"
 
+INFO("softlight overlay of two images")
+
 void perform_effect(struct frame f, struct args a)
 {
 	printf("Using softlight as effect does nothing!\n");

@@ -1,5 +1,7 @@
 #include "plugin.h"
 
+INFO("color distortion")
+
 void perform_effect(struct frame f, struct args a)
 {
 	int x, y;

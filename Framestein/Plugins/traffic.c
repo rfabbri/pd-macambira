@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include "plugin.h"
 
+INFO("242.traffic -- does tristimulus matrix operations on an input image")
+
 // tristimulus product used for matrix conversions
 
 static void tristimulus_product(float *matrix, byte *input, byte *output)

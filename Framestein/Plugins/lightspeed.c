@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "plugin.h"
 
+INFO("a great effect. $1 = y offset")
+
 void perform_effect(_frame f, _args a)
 {
 	int pos, y, pixelsize=f.pixelformat/8;

@@ -14,6 +14,8 @@
 #include <math.h>
 #include "plugin.h"
 
+INFO("242.rgbavg -- does funky pixel averaging on an input image")
+
 #pragma warning( disable : 4761 )	// that's why it's funky !!
 
 void perform_effect(struct frame f, struct args a)
