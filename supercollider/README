@@ -24,14 +24,15 @@ is a quick start:
  your python site-packages directory. Usually placed here:
  /usr/lib/python2.x/site-packages/
 
--Go to the example directory and try to run the help-sc.pd patch.
- Make sure you have at least PD v0.37, and the latest version
- of the pyext external. The supertest.py file must be placed
- in the scripts folder for pyext.
+-Change directory to the example directory and try to run the
+ help-sc.pd patch. Make sure you have at least PD v0.37, and
+ the latest version of the pyext external. (Earlier versions
+ than cvs from 22.2.2004 should not be used.)
 
 
 If you have a general questions (compiling it up, error messages),
-don't ask me directly; ask on the pd-list or on the supercollider list.
+don't ask me directly; ask on the pd-list or on the supercollider 
+list.
 
 
 
