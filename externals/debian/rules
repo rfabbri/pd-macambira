@@ -17,6 +17,10 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
+orig:
+	(cd ..;tar czvf pd-externals-00.`date +%Y%m%d`)
+
+
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
@@ -24,8 +28,8 @@ configure-stamp:
 
 	touch configure-stamp
 
-orig:
-	cd ..;tar --exclude=CVS -czvf pd-externals_0.3.orig.tar.gz externals
+orig: clean
+	cd ..;tar --exclude=CVS -czvf pd-externals_0.3.orig.tar.gz pd-externals
 	
 
 build: build-stamp
@@ -72,6 +76,13 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 
+	# Remove the garbage that ppl put in CVS
+	-rm `find . -name "*.pd_linux"`
+	-rm `find . -name "*.lib"`
+	-rm `find . -name "*.o"`
+	-rm `find . -name "*.dll"`
+	-rm `find . -name "*.obj"` 
+
 	# Add here commands to clean up after the build process.
 	-(cd build/linux;$(MAKE) clean)
 
@@ -84,7 +95,7 @@ clean:
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
 #
-	(cd pdp;autoconf;./configure;$(MAKE) clean)
+	(cd pdp;autoconf;./configure;$(MAKE) mrproper)
 
 	dh_clean
 
@@ -110,6 +121,9 @@ install: build
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
 	install OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
+	# install pdp (needs /usr/lib/extern)
+	
+	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs
 	(cd pdp;make prefix=$(CURDIR)/debian/tmp/usr/ install)
 
 # Build architecture-independent files here.
