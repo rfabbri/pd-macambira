@@ -1,9 +1,9 @@
-#N canvas 129 17 793 665 12;
+#N canvas 159 17 793 665 12;
 #X obj 477 135 loadbang;
-#X obj 32 286 hip~ 5;
+#X obj 31 289 hip~ 5;
 #X obj 477 53 adc~ 1;
 #X obj 477 190 soundfiler;
-#X obj 32 313 output~;
+#X obj 32 322 output~;
 #X text 544 646 updated for Pd version 0.37;
 #X obj 478 100 tabwrite~ E03-table;
 #X msg 477 162 read ../sound/voice.wav E03-table;
@@ -60,7 +60,7 @@ with an adc~ if you want to go live.;
 #X connect 3 0 4 0;
 #X connect 4 0 2 0;
 #X connect 5 0 6 0;
-#X restore 31 30 pd looper;
+#X restore 118 18 pd looper;
 #X text 561 141 re-read original sample;
 #X obj 489 77 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -111,6 +111,8 @@ we'd rather stick with the most recent good one). This is converted
 from MIDI to Hertz \, and multiplied by 1/2 to control the modulation
 oscillator. (You can also try large-ish integers which leave the pitch
 intact but introduce funny formants.);
+#X msg 406 237 read ../../saucisse.wav E03-table;
+#X obj 25 16 adc~ 1;
 #X connect 0 0 7 0;
 #X connect 1 0 4 0;
 #X connect 1 0 4 1;
@@ -135,3 +137,5 @@ intact but introduce funny formants.);
 #X connect 24 0 6 0;
 #X connect 25 0 19 0;
 #X connect 25 0 12 0;
+#X connect 34 0 3 0;
+#X connect 35 0 25 0;
