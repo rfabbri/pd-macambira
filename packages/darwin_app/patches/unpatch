@@ -1,3 +1,0 @@
-cd ../../../pd/src 
-rm s_inter.c makefile.in u_main.tk s_audio_jack.c configure
-cvs update s_inter.c makefile.in u_main.tk s_audio_jack.c configure
