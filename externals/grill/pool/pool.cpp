@@ -424,7 +424,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 			for(pooldir *dix = dirs[di].d; ok && dix; dix = dix->nxt) {
 				pooldir *ndir = p->AddDir(1,&dix->dir);
 				if(ndir)
-					ok = ndir->Copy(dix,depth > 0?depth-1:depth,cut);
+					ok = dix->Copy(ndir,depth > 0?depth-1:depth,cut);
 				else
 					ok = false;
 			}
@@ -661,14 +661,28 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
                     (inval && (inkey || indata)) /* value */
                 )
             ) {
-                BL ret;
-                if(indata)
-                    ret = ParseAtoms(s,v);
+                BL ret = true;
+                if(indata) {
+                    if(v.Count())
+                        post("pool - XML load: value data already given, ignoring new data");
+                    else
+                        ret = ParseAtoms(s,v);
+                }
                 else // inkey
-                    if(inval)
-                        ret = ParseAtoms(s,k);
+                    if(inval) {
+                        if(k.Count())
+                            post("pool - XML load, value key already given, ignoring new key");
+                        else
+                            ret = ParseAtoms(s,k);
+                    }
                     else {
-                        SetString(d[d.Count()-1],s.c_str());
+                        t_atom &dkey = d[d.Count()-1];
+                        const char *ds = GetString(dkey);
+                        FLEXT_ASSERT(ds);
+                        if(*ds) 
+                            post("pool - XML load: dir key already given, ignoring new key");
+                        else
+                            SetString(dkey,s.c_str());
                         ret = true;
                     }
                 if(!ret) post("pool - error interpreting XML value (%s)",s.c_str());
@@ -683,6 +697,7 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
         else if(inpool) {
             if(tag == "dir") {
                 if(tag.type == xmltag::t_start) {
+                    // initialize dir key as empty
                     t_atom at; SetString(at,"");
                     d.Append(at);
                 }
@@ -690,7 +705,7 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
                     if(d.Count())
                         d.Part(0,d.Count()-1);
                     else
-                        post("pool - superfluous </dir> in XML data");
+                        post("pool - XML load: superfluous </dir> in XML data");
                 }
             }
             else if(tag == "value") {
@@ -701,14 +716,19 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
                 else if(tag.type == xmltag::t_end) {
         			if(depth < 0 || d.Count() <= depth) {
                         // NOW set value
-				        pooldir *nd = mkdir?AddDir(d):GetDir(d);
-				        if(nd) {
-                            // only use first word of key
-                            if(k.Count() == 1)
-					            nd->SetVal(k[0],new AtomList(v));
-                            else
-                                post("pool - Invalid key (!= 1 atom)");
-				        }
+                        const char *ds = d.Count()?GetString(d[d.Count()-1]):NULL;
+                        if(!ds || !*ds)
+                            post("pool - XML load: dir key must be given prior to dir values");
+                        else {
+				            pooldir *nd = mkdir?AddDir(d):GetDir(d);
+				            if(nd) {
+                                // only use first word of key
+                                if(k.Count() == 1)
+                                    nd->SetVal(k[0],new AtomList(v));
+                                else
+                                    post("pool - XML load: value key must be exactly one word, value not stored");
+				            }
+                        }
                     }
                     inval = false;
                 }
