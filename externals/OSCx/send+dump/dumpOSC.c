@@ -60,7 +60,7 @@ Technologies, University of California, Berkeley.
 */
 
 
-#if defined(__sgi) || defined(__linux)
+#ifdef unix 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

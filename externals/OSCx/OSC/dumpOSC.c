@@ -108,7 +108,7 @@ void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 	#include <signal.h>
 	#include <grp.h>
 	#include <sys/file.h>
-	#include <sys/prctl.h>
+	//#include <sys/prctl.h>
 
 	#ifdef NEED_SCHEDCTL_AND_LOCK
 	#include <sys/schedctl.h>
@@ -126,6 +126,8 @@ typedef struct ClientAddressStruct {
         int clilen;
         int sockfd;
 } *ClientAddr;
+
+typedef unsigned long long osc_time_t;
 
 Boolean ShowBytes = FALSE;
 Boolean Silent = FALSE;
@@ -173,6 +175,7 @@ typedef struct _dumpOSC
 } t_dumpOSC;
 
 void dumpOSC_ParsePacket(t_dumpOSC *x, char *buf, int n, ClientAddr returnAddr);
+Boolean dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLenght, int fd);
 static void dumpOSC_Smessage(t_dumpOSC *x, char *address, void *v, int n, ClientAddr returnAddr);
 static void dumpOSC_PrintTypeTaggedArgs(t_dumpOSC *x, void *v, int n);
 static void dumpOSC_PrintHeuristicallyTypeGuessedArgs(t_dumpOSC *x, void *v, int n, int skipComma);
@@ -213,8 +216,11 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
 		#ifdef DEBUG
 		printf("dumpOSC_read: received UDP packet of length %d\n",  n);
 		#endif
-		dumpOSC_ParsePacket(x, mbuf, n, ra);
-
+		
+		if(!dumpOSC_SendReply(mbuf, n, &x->x_server, clilen, sockfd))
+		{
+			dumpOSC_ParsePacket(x, mbuf, n, ra);
+		}
 		//r = Synthmessage(mbuf, n, &x->x_server, clilen, sockfd);
 		//post ("%d", r);
 		//outlet_anything(x->x_msgout, at[msg].a_w.w_symbol,
@@ -490,6 +496,74 @@ void PrintClientAddr(ClientAddr CA) {
     printf("\n");
 }
 
+//*******************
+
+void WriteTime(char* dst, osc_time_t osctime)
+{
+	*(int32_t*)dst = htonl((int32_t)(osctime >> 32));
+	*(int32_t*)(dst+4) = htonl((int32_t)osctime);
+}
+
+void WriteMode(char* dst)
+{
+	*(int32_t*)dst = htonl(0);
+}
+
+osc_time_t ReadTime(const char* src)
+{
+  osc_time_t osctime = ntohl(*(int32_t*)src);
+  return (osctime << 32) + ntohl(*(int32_t*)(src+4));
+}
+
+double TimeToSeconds(osc_time_t osctime)
+{
+  return (double)osctime * 2.3283064365386962890625e-10 /* 1/2^32 */;
+}
+
+int timeRound(double x)
+{	
+	return x >= 0.0 ? x+0.5 : x-0.5;
+}
+
+void WriteLogicalTime(char* dst)
+{
+	double sTime = clock_gettimesince(19230720) / 1000.0;
+	double tau = sTime - timeRound(sTime);
+	
+	//fprintf(stderr, "sSec = %f tau = %f\n", sTime, tau);
+	
+	*(int32_t*)dst = htonl((int32_t)(sTime));
+	*(int32_t*)(dst+4) = htonl((int32_t)(4294967296 * tau));
+}
+
+Boolean dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLenght, int fd)
+{
+	if((n == 24) && (strcmp(buf, "#time") == 0))
+	{		
+		osc_time_t t0, t1, t2;
+		double dt0, dt1, dt2;		
+
+		WriteMode(buf+6);
+		
+		t0 = ReadTime(buf+8);		
+		    
+		WriteLogicalTime(buf+16);
+		t1 = ReadTime(buf+16); // reverse
+		dt0 = TimeToSeconds(t0); // client time
+		dt1 = TimeToSeconds(t1); // server time	
+		
+		fprintf(stderr, "%f\t%f\t%f\n", dt0, dt1, dt0 - dt1);
+
+		sendto(fd, buf, n, 0, (struct sockaddr *)clientDesc, clientDescLenght);		
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
+//**********************
 
 void dumpOSC_ParsePacket(t_dumpOSC *x, char *buf, int n, ClientAddr returnAddr) {
   //  t_dumpOSC *x;
@@ -553,7 +627,15 @@ void dumpOSC_ParsePacket(t_dumpOSC *x, char *buf, int n, ClientAddr returnAddr) 
 			printf("]\n");
 		#endif
 
-  } else {
+  } 
+  else if ((n == 24) && (strcmp(buf, "#time") == 0))
+  {
+ 		complain("Time message: %s\n :).\n", htm_error_string);
+		return; 	
+
+  }
+  else
+  {
 		/* This is not a bundle message */
 
 		messageName = buf;

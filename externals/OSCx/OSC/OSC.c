@@ -4,55 +4,41 @@
 	-------------
 		-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
 
- */
+*/
 
-
-#ifndef VERSION
-	#ifdef WIN32
-		#define VERSION "0.01-w32"
-	#else
-		#define VERSION "0.01"
-	#endif
-#endif
-
-#ifndef __DATE__ 
-#define __DATE__ "without using a gnu compiler"
-#endif
 
 #include <m_pd.h>
+#include "OSC-common.h"
 
+#define VERSION "0.2"
+
+#ifndef OSC_API 
+#define OSC_API
+#endif
 
 typedef struct _OSC
 {
      t_object x_obj;
 } t_OSC;
 
+
+OSC_API void OSC_setup(void);
+OSC_API void OSC_version(t_OSC*);
+OSC_API void sendOSC_setup(void);
+OSC_API void dumpOSC_setup(void);
+OSC_API void OSCroute_setup(void);
+
 static t_class* OSC_class;
 
-#ifdef WIN32
-	#include "OSC-common.h"
-	OSC_API void OSC_setup(void);
-	OSC_API void OSC_version(t_OSC*);
-	OSC_API void sendOSC_setup(void);
-	OSC_API void dumpOSC_setup(void);
-	OSC_API void OSCroute_setup(void);
-#else
-	void OSC_version();
-	void sendOSC_setup();
-	void dumpOSC_setup();
-	void OSCroute_setup();
-#endif
 
 static void* OSC_new(t_symbol* s) {
     t_OSC *x = (t_OSC *)pd_new(OSC_class);
     return (x);
 }
 
-#ifdef WIN32
-	OSC_API void OSC_version (t_OSC *x) { 
-#else
-	void OSC_version (t_OSC *x) {
-#endif
+
+OSC_API void OSC_version (t_OSC *x) { 
+
   // EnterCallback();
   post("OSC4PD Version " VERSION
        "\n ¯\\    original code by matt wright. pd-fication jdl@xdv.org\n"
@@ -60,11 +46,7 @@ static void* OSC_new(t_symbol* s) {
   // ExitCallback();
 }
 
-#ifdef WIN32
-	OSC_API void OSC_setup(void) { 
-#else
-	void OSC_setup(void) {
-#endif
+OSC_API void OSC_setup(void) { 
   OSC_class = class_new(gensym("OSC"), (t_newmethod)OSC_new, 0,
 			  sizeof(t_OSC), 0,0);
   class_addmethod(OSC_class, (t_method)OSC_version, gensym("version"), A_NULL, 0, 0);
