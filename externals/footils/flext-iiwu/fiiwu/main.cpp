@@ -52,11 +52,20 @@ class fiiwu:
 			SetupInOut();           // set up inlets and outlets. 
 			                        // Must be called once!
 			
+			float sr=Samplerate();
+			
+			if (sr != 44100.f) 
+			{
+				post("WARNING: Current samplerate %.0f != 44100", sr);
+				post("WARNING: fiiwu~ might be out of tune!");
+			}
+			
 			iiwu_synth_settings_t pd_iiwu_settings = IIWU_DEFAULT_SETTINGS;
 			
 			// plugin synth: AUDIO off
 			pd_iiwu_settings.flags        &= ~IIWU_AUDIO;
 			pd_iiwu_settings.sample_format = IIWU_FLOAT_FORMAT;
+			pd_iiwu_settings.sample_rate   = static_cast<int>(sr);
 			
 			// Create iiwusynth instance:
 			synth = new_iiwu_synth(&pd_iiwu_settings);
@@ -147,7 +156,7 @@ class fiiwu:
 // Before we can run our fiiwu-class in PD, the object has to be registered as a
 // PD object. Otherwise it would be a simple C++-class, and what good would
 // that be for?  Registering is made easy with the FLEXT_NEW_* macros defined
-// in flext.h. For tilde objects without arguments call:
+// in flext.h. 
 
 FLEXT_NEW_TILDE_G("fiiwu~", fiiwu)
 
@@ -156,7 +165,7 @@ void fiiwu::iiwu_load(int argc, t_atom *argv)
 {
 	if (synth == NULL) return;
 	
-	if (argc == 1 && IsSymbol(argv[0]))	
+	if (argc >= 1 && IsSymbol(argv[0]))	
 	{
 		const char* filename = GetString(argv[0]);
 		if ( iiwu_synth_sfload(synth, filename) == 0)
@@ -169,48 +178,63 @@ void fiiwu::iiwu_load(int argc, t_atom *argv)
 void fiiwu::iiwu_note(int argc, t_atom *argv)
 {
 	if (synth == NULL) return;
-	int   chan, key, vel;
-	chan  = GetAInt(argv[0]);
-	key   = GetAInt(argv[1]);
-	vel   = GetAInt(argv[2]);
-	iiwu_synth_noteon(synth,chan-1,key,vel);    
+	if (argc == 3)
+	{
+		int   chan, key, vel;
+		chan  = GetAInt(argv[0]);
+		key   = GetAInt(argv[1]);
+		vel   = GetAInt(argv[2]);
+		iiwu_synth_noteon(synth,chan-1,key,vel);
+	}
 }
 
 void fiiwu::iiwu_program_change(int argc, t_atom *argv)
 {	
 	if (synth == NULL) return;
-	int   chan, prog;
-	chan  = GetAInt(argv[0]);
-	prog  = GetAInt(argv[1]);
-	iiwu_synth_program_change(synth,chan-1,prog);
+	if (argc == 2)
+	{
+		int   chan, prog;
+		chan  = GetAInt(argv[0]);
+		prog  = GetAInt(argv[1]);
+		iiwu_synth_program_change(synth,chan-1,prog);
+	}
 }
 
 void fiiwu::iiwu_control_change(int argc, t_atom *argv)
 {
 	if (synth == NULL) return;
-	int   chan, ctrl, val;
-	chan  = GetAInt(argv[0]);
-	ctrl  = GetAInt(argv[1]);
-	val   = GetAInt(argv[2]);
-	iiwu_synth_cc(synth,chan-1,ctrl,val);
+	if (argc == 3)
+	{
+		int   chan, ctrl, val;
+		chan  = GetAInt(argv[0]);
+		ctrl  = GetAInt(argv[1]);
+		val   = GetAInt(argv[2]);
+		iiwu_synth_cc(synth,chan-1,ctrl,val);
+	}
 }
 
 void fiiwu::iiwu_pitch_bend(int argc, t_atom *argv)
 {
 	if (synth == NULL) return;
-	int   chan, val;
-	chan  = GetAInt(argv[0]);
-	val   = GetAInt(argv[1]);
-	iiwu_synth_pitch_bend(synth, chan-1, val);
+	if (argc == 2)
+	{
+		int   chan, val;
+		chan  = GetAInt(argv[0]);
+		val   = GetAInt(argv[1]);
+		iiwu_synth_pitch_bend(synth, chan-1, val);
+	}
 }
 
 void fiiwu::iiwu_bank(int argc, t_atom *argv)
 {
 	if (synth == NULL) return;
-	int   chan, bank;
-	chan  = GetAInt(argv[0]);
-	bank  = GetAInt(argv[1]);
-	iiwu_synth_bank_select(synth, chan-1, bank);
+	if (argc == 2)
+	{	
+		int   chan, bank;
+		chan  = GetAInt(argv[0]);
+		bank  = GetAInt(argv[1]);
+		iiwu_synth_bank_select(synth, chan-1, bank);
+	}
 }
 
 
@@ -227,11 +251,6 @@ void fiiwu::m_signal(int n, float *const *in, float *const *out)
 	
 	float *left  = out[0];
 	float *right = out[1];
-	
-	// now comes the strange thing: we're using *tmp for the 3. outlet,
-	// feed *tmp to the iiwu-function, but the sound actually comes out the
-	// second outlet...
-	//float *tmp   = out[2];
 	
 	iiwu_synth_write_float(synth, n, left, 0, 1, right, 0, 1); 
 	
