@@ -74,6 +74,7 @@ public:
 
 	void set_imethod(int i)
 	{
+		int imethod = m_imethod;
 		if( (i >= 0) && (i <= 2) )
 		{
 			m_imethod = i;
@@ -95,13 +96,21 @@ public:
 			post("interpolation method out of range");
 			return;
 		}
-		if( i != 2)
+
+		if (imethod == 0)
+			for (int j = 0; j != m_system->get_num_eq(); ++j)
+			{
+				m_values[j] = m_system->get_data(j);
+				m_slopes[j] = 0;
+			}
+
+		if( i == 2)
 		{
 			for (int j = 0; j != m_system->get_num_eq(); ++j)
 			{
-				m_nextvalues[i] = 0;
-				m_nextmidpts[i] = 0;
-				m_curves[i] = 0;
+				m_phase = 0; /* reschedule to avoid click, find a better way later*/
+				m_nextvalues[j] = m_values[j];
+				m_nextmidpts[j] = m_values[j];
 			}
 		}
 
@@ -221,9 +230,8 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 	int outlets = m_system->get_num_eq();
 	
 	int phase = m_phase;
-
-	int i = 0;
-
+	
+	int offset = 0;
 	while (n)
 	{
 		if (phase == 0)
@@ -236,18 +244,14 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 		n -= next;
 		phase -=next;
 		
-		while (next--)
+		for (int i = 0; i != outlets; ++i)
 		{
-			for (int j = 0; j != outlets; ++j)
-			{
-				outsigs[j][i] = m_system->get_data(j);
-			}
-			++i;
+			SetSamples(outsigs[i]+offset, next, m_system->get_data(i));
 		}
+		offset += next;
 	}
 	m_phase = phase;
 }
-
 
 /* linear and cubic interpolation adapted from supercollider by James McCartney */
 template <class system> 
