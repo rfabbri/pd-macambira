@@ -3,8 +3,7 @@ CSYM=knob
 
 # !!!
 # change these two
-PD_DIR=/home/freak/big/audio/pd/cvs/pure-data/pd
-#PD_DIR=../../pd
+PD_DIR=../../../pd
 #current: pd_nt pd_linux
 current: pd_linux
 

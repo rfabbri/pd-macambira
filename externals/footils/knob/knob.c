@@ -789,8 +789,13 @@ void knob_setup(void)
     knob_widgetbehavior.w_deletefn =     iemgui_delete;
     knob_widgetbehavior.w_visfn =        iemgui_vis;
     knob_widgetbehavior.w_clickfn =      knob_newclick;
-    knob_widgetbehavior.w_propertiesfn = knob_properties;;
+#if PD_MINOR_VERSION < 37 /* TODO: remove old behaviour in exactly 2 months from now */
+	knob_widgetbehavior.w_propertiesfn = knob_properties;;
     knob_widgetbehavior.w_savefn =       knob_save;
-    class_setwidget(knob_class, &knob_widgetbehavior);
+#else
+	class_setpropertiesfn(knob_class, &knob_properties);
+	class_setsavefn(knob_class, &knob_save);
+#endif
+	class_setwidget(knob_class, &knob_widgetbehavior);
     class_sethelpsymbol(knob_class, gensym("knob"));
 }
