@@ -147,16 +147,30 @@ int iemgui_modulo_color(int col)
     return(col);
 }
 
-void iemgui_raute2dollar(t_symbol *s)
+t_symbol *iemgui_raute2dollar(t_symbol *s)
 {
-    if(s->s_name[0] == '#')
-	s->s_name[0] = '$';
+    if (s->s_name[0] == '#')
+    {
+    	char buf[MAXPDSTRING];
+	strncpy(buf, s->s_name, MAXPDSTRING);
+	buf[MAXPDSTRING-1] = 0;
+	buf[0] = '$';
+	return (gensym(buf));
+    }
+    else return (s);
 }
 
-void iemgui_dollar2raute(t_symbol *s)
+t_symbol *iemgui_dollar2raute(t_symbol *s)
 {
-    if(s->s_name[0] == '$')
-	s->s_name[0] = '#';
+    if (s->s_name[0] == '$')
+    {
+    	char buf[MAXPDSTRING];
+	strncpy(buf, s->s_name, MAXPDSTRING);
+	buf[MAXPDSTRING-1] = 0;
+	buf[0] = '#';
+	return (gensym(buf));
+    }
+    else return (s);
 }
 
 t_symbol *iemgui_unique2dollarzero(t_symbol *s, int unique_num, int and_unique_flag)
@@ -504,22 +518,16 @@ int iemgui_compatible_col(int i)
 
 void iemgui_all_dollar2raute(t_symbol **srlsym)
 {
-    if(srlsym[0]->s_name[0] == '$')
-	srlsym[0]->s_name[0] = '#';
-    if(srlsym[1]->s_name[0] == '$')
-	srlsym[1]->s_name[0] = '#';
-    if(srlsym[2]->s_name[0] == '$')
-	srlsym[2]->s_name[0] = '#';
+    srlsym[0] = iemgui_dollar2raute(srlsym[0]);
+    srlsym[1] = iemgui_dollar2raute(srlsym[1]);
+    srlsym[2] = iemgui_dollar2raute(srlsym[2]);
 }
 
 void iemgui_all_raute2dollar(t_symbol **srlsym)
 {
-    if(srlsym[0]->s_name[0] == '#')
-	srlsym[0]->s_name[0] = '$';
-    if(srlsym[1]->s_name[0] == '#')
-	srlsym[1]->s_name[0] = '$';
-    if(srlsym[2]->s_name[0] == '#')
-	srlsym[2]->s_name[0] = '$';
+    srlsym[0] = iemgui_raute2dollar(srlsym[0]);
+    srlsym[1] = iemgui_raute2dollar(srlsym[1]);
+    srlsym[2] = iemgui_raute2dollar(srlsym[2]);
 }
 
 void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
@@ -534,9 +542,8 @@ void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
 
     if(!strcmp(s->s_name, "empty")) sndable = 0;
-    iemgui_raute2dollar(s);
     iemgui_fetch_unique(iemgui);
-    snd = s;
+    snd = iemgui_raute2dollar(s);
     if(iemgui_is_dollarzero(snd))
     {
 	iemgui->x_fsf.x_snd_is_unique = 1;
@@ -577,8 +584,7 @@ void iemgui_receive(void *x, t_iemgui *iemgui, t_symbol *s)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
 
     if(!strcmp(s->s_name, "empty")) rcvable = 0;
-    iemgui_raute2dollar(s);
-    rcv = s;
+    rcv = iemgui_raute2dollar(s);
     iemgui_fetch_unique(iemgui);
     if(iemgui_is_dollarzero(rcv))
     {
@@ -628,8 +634,7 @@ void iemgui_label(void *x, t_iemgui *iemgui, t_symbol *s)
     int pargc, tail_len, nth_arg;
     t_atom *pargv;
 
-    iemgui_raute2dollar(s);
-    lab = s;
+    lab = iemgui_raute2dollar(s);
     iemgui_fetch_unique(iemgui);
 
     if(iemgui_is_dollarzero(lab))

@@ -2,7 +2,7 @@
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution. */
 
-/* vradio.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
+/* vdial.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
 
 /* name change to vradio by MSP (it's a radio button really) and changed to
 put out a "float" as in sliders, toggles, etc. */

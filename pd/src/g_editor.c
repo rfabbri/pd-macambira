@@ -494,6 +494,7 @@ static void canvas_undo_cut(t_canvas *x, void *z, int action)
 	else if (mode == UCUT_TEXT)
 	{
 	    t_gobj *y1, *y2;
+	    glist_noselect(x);
 	    for (y1 = x->gl_list; y2 = y1->g_next; y1 = y2)
 	    	;
 	    if (y1)
@@ -1113,6 +1114,8 @@ void canvas_doclick(t_canvas *x, int xpos, int ypos, int which,
 	if (!shiftmod) glist_noselect(x);
     	sys_vgui(".x%x.c create rectangle %d %d %d %d -tags x\n",
     	      x, xpos, ypos, xpos, ypos);
+	x->gl_editor->e_xwas = xpos;
+	x->gl_editor->e_ywas = ypos;
     	x->gl_editor->e_onmotion = MA_REGION;
     }
 }
@@ -1354,7 +1357,7 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
     }
     if (keynumsym->s_thing && down)
     	pd_float(keynumsym->s_thing, keynum);
-    if (keyupsym->s_thing && down)
+    if (keyupsym->s_thing && !down)
     	pd_float(keyupsym->s_thing, keynum);
     if (keynamesym->s_thing)
     {
@@ -1967,8 +1970,9 @@ static void canvas_connect(t_canvas *x, t_floatarg fwhoout, t_floatarg foutno,
     if (!(oc = obj_connect(objsrc, outno, objsink, inno))) goto bad;
     if (glist_isvisible(x))
     {
-    	sys_vgui(".x%x.c create line %d %d %d %d -tags l%x\n",
-	    glist_getcanvas(x), 0, 0, 0, 0, oc);
+    	sys_vgui(".x%x.c create line %d %d %d %d -width %d -tags l%x\n",
+	    glist_getcanvas(x), 0, 0, 0, 0,
+	    (canvas_issigoutlet(objsrc, outno) ? 2 : 1),oc);
 	canvas_fixlinesfor(x, objsrc);
     }
     return;

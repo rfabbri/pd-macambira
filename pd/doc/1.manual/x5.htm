@@ -16,6 +16,43 @@ This section tracks changes in Pd's current implementation.
 
 <H4> <A name=s2> 5.1. release notes </A> </H4>
 
+<P> ------------------ 0.36 -------------------------------
+
+<P> There's now an "undo" for most editing operations.  Undoing is only
+available in the window that was most recently edited.  (One gotcha remains,
+that "stretching" (in the font menu) affects all windows and you can't undo any
+but the last one it touched.)  Also, there's no "undo" for run-time operations,
+only editing ones.  That might be worth thinking about.
+
+<P> Some bugs were fixed that affected "flipped" canvases (ones whose
+"properties show a positive "y" increment per pixel.)  Also, the coordinates
+are now saved and restored correctly.  "text" objects (comments) now stick to
+the bottom of the window for flipped canvases.
+
+<P> Signal lines now show up fatter than control lines.  (Now I have to go
+through the figures in the HTML doc again... drat)
+
+<P> "Classic" number boxes now can have labels and send/receive signals, which
+work in the same way as the IEMGUI controls do.  I think "$1" style
+label/send/receive names work too.  I fixed a related bug
+in the IEM code (typing at boxes sometimes crashed Pd).  
+
+<P> "vdial" and "hdial" were renamed "vradio" and "hradio", and fixed to
+output numbers, not lists, like the other GUIs.  The old ones are still around
+for compatibility with old patches.
+
+<P> "Make install" should now actually make Pd before trying to install it.
+
+<P> "expr" is updated to Shahrokh's 0.4test3 version (which I modified somewhat
+to get it to compile.)  
+
+<P> The problem of CPU usage skyrocketing on underflows in P4s should
+be fixed.
+
+<P> Compiled "pdsend" and "pdreceive" for Windows.
+
+<P> "PD_VERSION" macro added to m_pd.h
+
 <P> ------------------ 0.35 -------------------------------
 
 <P> An experimental new feature called graph-on-parent allows subpatches and abstractions to show

@@ -603,14 +603,22 @@ int sys_startgui(const char *guidir)
                 char *homedir = getenv("HOME"), filename[250];
                 struct stat statbuf;
                 if (!homedir || strlen(homedir) > 150)
-                    goto nexttry;
+                    goto nohomedir;
+                sprintf(filename,
+                    "%s/Applications/Utilities/Wish shell.app/Contents/MacOS/Wish Shell",
+                        homedir);
+                if (stat(filename, &statbuf) >= 0)
+                    goto foundit;
                 sprintf(filename,
                     "%s/Applications/Wish shell.app/Contents/MacOS/Wish Shell",
                         homedir);
-                
                 if (stat(filename, &statbuf) >= 0)
                     goto foundit;
-            nexttry:
+            nohomedir:
+                strcpy(filename, 
+                    "/Applications/Utilities/Wish Shell.app/Contents/MacOS/Wish Shell");
+                if (stat(filename, &statbuf) >= 0)
+                    goto foundit;
                 strcpy(filename, 
                     "/Applications/Wish Shell.app/Contents/MacOS/Wish Shell");
             foundit:

@@ -1,31 +1,9 @@
-#N canvas 176 287 548 368 12;
-#X obj 51 82 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
-#X obj 110 93 vdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
-0;
-#X obj 78 240 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
-#X floatatom 149 52 5 0 0 0 - - -;
-#X floatatom 240 177 5 0 0 0 - - -;
-#X obj 361 97 vradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
-#X floatatom 374 257 5 0 0 0 - - -;
-#X obj 252 280 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
--262144 -1 -1 0 256;
-#X floatatom 478 73 5 0 0 0 receive asd -;
-#X floatatom 241 241 5 0 0 0 - - -;
-#X floatatom 477 102 5 0 0 0 send - fgdfh;
-#X floatatom 474 141 5 0 0 0 both wer rty;
-#X obj 242 120;
-#X floatatom 287 111 5 0 0 0 - - -;
-#X obj 186 116 + 5;
-#X obj 172 311 expr~ $v1 + 4;
-#X connect 3 0 1 0;
-#X connect 3 0 0 0;
-#X connect 3 0 5 0;
-#X connect 3 0 14 0;
-#X connect 4 0 2 0;
-#X connect 5 0 6 0;
-#X connect 9 0 7 0;
-#X connect 14 0 4 0;
-#X coords 0 0 1 1 300 200 1;
+#N canvas 0 0 450 300 10;
+#X obj 111 114 +~;
+#X obj 112 56 +~;
+#N canvas 281 44 450 300 foo 1;
+#X obj 111 114 +~;
+#X obj 112 56 +~;
+#X connect 1 0 0 0;
+#X restore 206 67 pd foo;
+#X connect 1 0 0 0;

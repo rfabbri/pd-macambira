@@ -577,3 +577,7 @@ EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
 /* ----------------------- guiconnects, g_guiconnect.c --------- */
 EXTERN t_guiconnect *guiconnect_new(t_pd *who, t_symbol *sym);
 EXTERN void guiconnect_notarget(t_guiconnect *x, double timedelay);
+
+/* ------------- IEMGUI routines used in other g_ files ---------------- */
+EXTERN t_symbol *iemgui_raute2dollar(t_symbol *s);
+EXTERN t_symbol *iemgui_dollar2raute(t_symbol *s);

@@ -159,19 +159,11 @@ proc menu_new {} {
 
 proc menu_open {} {
     global pd_opendir
-    global pd_nt
 
-# workaround -- initialdir doesn't work on MACOSX yet ---
-    if {$pd_nt == 2} {
-	cd $pd_opendir
-    	set filename [tk_getOpenFile -defaultextension .pd \
-    	    -filetypes { {{pd files} {.pd}} {{max files} {.pat}}} ]
-    } else {
-    	set filename [tk_getOpenFile -defaultextension .pd \
-    	    -filetypes { {{pd files} {.pd}} {{max files} {.pat}}} \
-            -initialdir $pd_opendir]
-    }
-#    puts stderr $filename
+    set filename [tk_getOpenFile -defaultextension .pd \
+    	-filetypes { {{pd files} {.pd}} {{max files} {.pat}}} \
+        -initialdir $pd_opendir]
+
     if {$filename != ""} {
     	set directory [string range $filename 0 \
     	    [expr [string last / $filename ] - 1]]
@@ -242,17 +234,10 @@ set help_directory $pd_guidir/doc
 
 proc menu_documentation {} {
     global help_directory
-    global pd_nt
  
-    if {$pd_nt == 2} {
-	cd $help_directory
-	set filename [tk_getOpenFile -defaultextension .pd \
-    	-filetypes { {{documentation} {.pd .txt .htm}} } ]
-    }  else {
-	set filename [tk_getOpenFile -defaultextension .pd \
-    	-filetypes { {{documentation} {.pd .txt .htm}} } \
-    	-initialdir $help_directory]
-    }
+    set filename [tk_getOpenFile -defaultextension .pd \
+    -filetypes { {{documentation} {.pd .txt .htm}} } \
+    -initialdir $help_directory]
 
     if {$filename != ""} {
     	if {[string first .txt $filename] >= 0} {
@@ -983,9 +968,9 @@ proc pdtk_canvas_keyup {name key iso} {
 #    puts stderr [concat up key= $key iso= $iso]
     if {$iso != ""} {
     	scan $iso %c keynum 
-    	pd [canvastosym $name] key 0 $keynum \;
+    	pd [canvastosym $name] key 0 $keynum 0 \;
     } else {
-    	pd [canvastosym $name] key 0 $key \;
+    	pd [canvastosym $name] key 0 $key 0 \;
     }
 }
 
@@ -1063,17 +1048,10 @@ set saveas_dir nowhere
 ############ pdtk_canvas_saveas -- run a saveas dialog ##############
 
 proc pdtk_canvas_saveas {name initfile initdir} {
-   global pd_nt
-   if {$pd_nt == 2} {
-        cd $initdir
-        set filename [tk_getSaveFile -initialfile $initfile \
-        -defaultextension .pd \
-            -filetypes { {{pd files} {.pd}} {{max files} {.pat}} }]
-    } else {
-        set filename [tk_getSaveFile -initialfile $initfile \
-	   -initialdir $initdir  -defaultextension .pd \
-            -filetypes { {{pd files} {.pd}} {{max files} {.pat}} }]
-    }
+    set filename [tk_getSaveFile -initialfile $initfile \
+       -initialdir $initdir  -defaultextension .pd \
+        -filetypes { {{pd files} {.pd}} {{max files} {.pat}} }]
+
     if {$filename != ""} {
     	set directory [string range $filename 0 \
     	    [expr [string last / $filename ] - 1]]
@@ -1184,9 +1162,14 @@ proc gatom_escape {sym} {
     	set ret [string replace $sym 0 0 "--"]
 #	puts stderr [concat escape $sym $ret]
 	} else {
-    	    set ret $sym
-#	    puts stderr [concat escape $sym "no change"]
-    	}
+    	    if {[string equal -length 1 $sym "$"]} {
+    		set ret [string replace $sym 0 0 "#"]
+#	    	puts stderr [concat unescape $sym $ret]
+    	    } else {
+    		set ret $sym
+#	    	puts stderr [concat escape $sym "no change"]
+    	    }
+	}
     }
     concat $ret
 }
@@ -1196,8 +1179,13 @@ proc gatom_unescape {sym} {
     	set ret [string replace $sym 0 0 ""]
 #	puts stderr [concat unescape $sym $ret]
     } else {
-    	set ret $sym
-#	puts stderr [concat unescape $sym "no change"]
+    	if {[string equal -length 1 $sym "#"]} {
+    	    set ret [string replace $sym 0 0 "$"]
+#	    puts stderr [concat unescape $sym $ret]
+    	} else {
+    	    set ret $sym
+#	    puts stderr [concat unescape $sym "no change"]
+    	}
     }
     concat $ret
 }
@@ -1221,7 +1209,7 @@ proc dogatom_apply {id} {
     global $var_gatomsymto
 
 #    set cmd [concat $id param $gatomwidth $gatomlo $gatomhi \;]
-
+    
     set cmd [concat $id param \
     	[eval concat $$var_gatomwidth] \
     	[eval concat $$var_gatomlo] \
@@ -2596,7 +2584,7 @@ proc texteditor_send {name} {
     	    {incr i 1} {
     	set cha [$name get [concat 0.0 + $i chars]]
     	scan $cha %c keynum
-    	pd [concat pd key 1 $keynum \;]
+    	pd [concat pd key 1 $keynum 0 \;]
     }
 }
 
@@ -2639,14 +2627,8 @@ proc pdtk_pd_texteditor {stuff} {
 
 proc pdtk_openpanel {target} {
     global pd_opendir
-    global pd_nt
-    if {$pd_nt == 2} {
-	cd $pd_opendir
-	set filename [tk_getOpenFile ]
-    } else {
-	set filename [tk_getOpenFile \
-    	    -initialdir $pd_opendir]
-    }
+    set filename [tk_getOpenFile \
+    	-initialdir $pd_opendir]
     if {$filename != ""} {
     	set directory [string range $filename 0 \
     	    [expr [string last / $filename ] - 1]]

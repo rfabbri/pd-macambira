@@ -1,14 +1,17 @@
-#N canvas 409 180 735 452 12;
-#X floatatom 267 57 0 0 0 1 input-dB - -;
-#X obj 267 82 r tuning;
-#X obj 267 129 r rest;
-#X obj 267 35 r in-DB;
-#X floatatom 267 104 0 0 0 1 tuning - -;
-#X obj 267 10 tgl 20 0 meters set-meters meters 24 8 192 12 -262144
--1 -1 0 1;
-#X obj 267 152 tgl 20 0 empty empty rest 24 8 0 12 -262144 -1 -1 0
+#N canvas 0 0 450 300 10;
+#X floatatom 87 39 5 0 0 0 - - -;
+#X floatatom 294 40 5 0 0 0 - - -;
+#X obj 88 75 vdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
 1;
-#X connect 1 0 4 0;
-#X connect 2 0 6 0;
-#X connect 3 0 0 0;
-#X coords 0 0 1 1 300 200 1;
+#X obj 294 69 hdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X floatatom 88 206 5 0 0 0 - - -;
+#X floatatom 295 207 5 0 0 0 - - -;
+#X obj 172 121 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 175 91 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X connect 0 0 2 0;
+#X connect 1 0 3 0;
+#X connect 2 0 4 0;
+#X connect 3 0 5 0;

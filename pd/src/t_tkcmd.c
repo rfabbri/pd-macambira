@@ -168,7 +168,11 @@ void pdgui_setupsocket(void)
 {
     struct sockaddr_in server;
     struct hostent *hp;
-
+#ifdef UNIX
+    int retry = 10;
+#else
+    int retry = 1;
+#endif
 #ifdef NT
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
@@ -197,14 +201,41 @@ void pdgui_setupsocket(void)
     server.sin_port = htons((unsigned short)portno);
 
 	/* try to connect */
-    if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
-    	pdgui_sockerror("connecting stream socket");
+    while (1)
+    {
+    	if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) >= 0)
+	    goto gotit;
+	retry--;
+	if (retry <= 0)
+	    break;
+    	  /* In UNIX there's a race condition; the child won't be
+	  able to connect before the parent (pd) has shed its
+	  setuid-ness.  In case this is the problem, sleep and
+	  retry. */
+    	else
+	{
+#ifdef UNIX
+    	    fd_set readset, writeset, exceptset;
+    	    struct timeval timout;
 
+    	    timout.tv_sec = 0;
+    	    timout.tv_usec = 100000;
+    	    FD_ZERO(&writeset);
+    	    FD_ZERO(&readset);
+    	    FD_ZERO(&exceptset);
+	    fprintf(stderr, "retrying connect...\n");
+    	    if (select(1, &readset, &writeset, &exceptset, &timout) < 0)
+    		perror("select");
+#endif /* UNIX */
+    	}
+    }
+    pdgui_sockerror("connecting stream socket");
+gotit: ;
 #ifdef UNIX
     	/* in unix we ask TK to call us back.  In NT we have to poll. */
     Tk_CreateFileHandler(sockfd, TK_READABLE | TK_EXCEPTION,
     	pd_readsocket, 0);
-#endif
+#endif /* UNIX */
 }
 
 /**************************** commands ************************/

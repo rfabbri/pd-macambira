@@ -9,9 +9,9 @@ from its standard input to Pd via the netsend/netreceive ("FUDI") protocol. */
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
 #include <stdlib.h>
 #ifdef UNIX
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -21,7 +21,7 @@ from its standard input to Pd via the netsend/netreceive ("FUDI") protocol. */
 #endif
 
 void sockerror(char *s);
-void closesocket(int fd);
+void x_closesocket(int fd);
 #define BUFSIZE 4096
 
 int main(int argc, char **argv)
@@ -31,6 +31,10 @@ int main(int argc, char **argv)
     struct hostent *hp;
     char *hostname;
     int nretry = 10;
+#ifdef NT
+    short version = MAKEWORD(2, 0);
+    WSADATA nobby;
+#endif
     if (argc < 2 || sscanf(argv[1], "%d", &portno) < 1 || portno <= 0)
     	goto usage;
     if (argc >= 3)
@@ -45,6 +49,9 @@ int main(int argc, char **argv)
 	else goto usage;
     }
     else protocol = SOCK_STREAM;
+#ifdef NT
+    if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
+#endif
 
     sockfd = socket(AF_INET, protocol, 0);
     if (sockfd < 0)
@@ -58,7 +65,7 @@ int main(int argc, char **argv)
     if (hp == 0)
     {
 	fprintf(stderr, "%s: unknown host\n", hostname);
-	closesocket(sockfd);
+	x_closesocket(sockfd);
 	exit(1);
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -81,7 +88,7 @@ int main(int argc, char **argv)
 	    goto connected;
     	sockerror("connect");
     }
-    closesocket(sockfd);
+    x_closesocket(sockfd);
     exit(1);
 connected: ;
 #else
@@ -89,7 +96,7 @@ connected: ;
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
     	sockerror("connect");
-    	closesocket(sockfd);
+    	x_closesocket(sockfd);
     	exit(1);
     }
 #endif
@@ -139,7 +146,7 @@ void sockerror(char *s)
     fprintf(stderr, "%s: %s (%d)\n", s, strerror(err), err);
 }
 
-void closesocket(int fd)
+void x_closesocket(int fd)
 {
 #ifdef UNIX
     close(fd);

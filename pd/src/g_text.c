@@ -65,7 +65,12 @@ void glist_text(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
     	glist_add(gl, &x->te_g);
     	glist_noselect(gl);
     	glist_select(gl, &x->te_g);
-    	gobj_activate(&x->te_g, gl, 1);
+	    /* it would be nice to "activate" here, but then the second,
+	    "put-me-down" click changes the text selection, which is quite
+	    irritating, so I took this back out.  It's OK in messages
+	    and objects though since there's no text in them at menu
+	    creation. */
+    	    /* gobj_activate(&x->te_g, gl, 1); */
     	canvas_startmotion(glist_getcanvas(gl));
     }
 }
@@ -410,8 +415,13 @@ typedef struct _gatom
     char a_buf[ATOMBUFSIZE];/* string buffer for typing */
     char a_shift;   	    /* was shift key down when dragging started? */
     char a_wherelabel;	    /* 0-3 for left, right, above, below */
+    t_symbol *a_expanded_to; /* a_symto after $0, $1, ...  expansion */
 } t_gatom;
 
+    /* prepend "-" as necessary to avoid empty strings, so we can
+    use them in Pd messages.  A more complete solution would be
+    to introduce some quoting mechanism; but then we'd be much more
+    complicated. */
 static t_symbol *gatom_escapit(t_symbol *s)
 {
     if (!*s->s_name)
@@ -424,15 +434,24 @@ static t_symbol *gatom_escapit(t_symbol *s)
 	shmo[99] = 0;
     	return (gensym(shmo));
     }
-    else return (s);
+    else return (iemgui_dollar2raute(s));
 }
 
+    /* undo previous operation: strip leading "-" if found. */
 static t_symbol *gatom_unescapit(t_symbol *s)
 {
     if (*s->s_name == '-')
     	return (gensym(s->s_name+1));
-    else return (s);
+    else return (iemgui_raute2dollar(s));
 }
+
+#if 0 /* ??? */
+    /* expand leading $0, $1, etc. in the symbol */
+static t_symbol *gatom_realizedollar(t_gatom *x, t_symbol *s)
+{
+    return (canvas_realizedollar(x->a_glist, s)); 
+}
+#endif
 
 static void gatom_set(t_gatom *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -453,13 +472,13 @@ static void gatom_bang(t_gatom *x)
     {
     	if (x->a_text.te_outlet)
 	    outlet_float(x->a_text.te_outlet, x->a_atom.a_w.w_float);
-	if (*x->a_symto->s_name && x->a_symto->s_thing)
+	if (*x->a_expanded_to->s_name && x->a_expanded_to->s_thing)
 	{
 	    if (x->a_symto == x->a_symfrom)
 	    	pd_error(x,
 		    "%s: atom with same send/receive name (infinite loop)",
 		    	x->a_symto->s_name);
-	    else pd_float(x->a_symto->s_thing, x->a_atom.a_w.w_float);
+	    else pd_float(x->a_expanded_to->s_thing, x->a_atom.a_w.w_float);
     	}
     }
     else if (x->a_atom.a_type == A_SYMBOL)
@@ -472,7 +491,7 @@ static void gatom_bang(t_gatom *x)
 	    	pd_error(x,
 		    "%s: atom with same send/receive name (infinite loop)",
 		    	x->a_symto->s_name);
-	    else pd_symbol(x->a_symto->s_thing, x->a_atom.a_w.w_symbol);
+	    else pd_symbol(x->a_expanded_to->s_thing, x->a_atom.a_w.w_symbol);
     	}
     }
 }
@@ -565,9 +584,15 @@ static void gatom_key(void *z, t_floatarg f)
     }
     else if (len < (ATOMBUFSIZE-1))
     {
-    	x->a_buf[len] = c;
-    	x->a_buf[len+1] = 0;
-    	goto redraw;
+    	    /* for numbers, only let reasonable characters through */
+    	if ((x->a_atom.a_type == A_SYMBOL) ||
+	    (c >= '0' && c <= '9' || c == '.' || c == '-'
+	    	|| c == 'e' || c == 'E'))
+	{
+    	    x->a_buf[len] = c;
+    	    x->a_buf[len+1] = 0;
+    	    goto redraw;
+	}
     }
     return;
 redraw:
@@ -648,11 +673,14 @@ static void gatom_param(t_gatom *x, t_symbol *sel, int argc, t_atom *argv)
     x->a_wherelabel = ((int)wherelabel & 3);
     x->a_label = label;
     if (*x->a_symfrom->s_name)
-    	pd_unbind(&x->a_text.te_pd, x->a_symfrom);
+    	pd_unbind(&x->a_text.te_pd,
+	    canvas_realizedollar(x->a_glist, x->a_symfrom));
     x->a_symfrom = symfrom;
     if (*x->a_symfrom->s_name)
-    	pd_bind(&x->a_text.te_pd, x->a_symfrom);
+    	pd_bind(&x->a_text.te_pd,
+	    canvas_realizedollar(x->a_glist, x->a_symfrom));
     x->a_symto = symto;
+    x->a_expanded_to = canvas_realizedollar(x->a_glist, x->a_symto);
     gobj_vis(&x->a_text.te_g, x->a_glist, 1);
 
     /* glist_retext(x->a_glist, &x->a_text); */
@@ -667,7 +695,8 @@ static void gatom_getwherelabel(t_gatom *x, t_glist *glist, int *xp, int *yp)
     height = y2 - y1;
     if (x->a_wherelabel == ATOM_LABELLEFT)
     {
-    	*xp = x1 - 3 - strlen(x->a_label->s_name) *
+    	*xp = x1 - 3 -
+	    strlen(canvas_realizedollar(x->a_glist, x->a_label)->s_name) *
 	    sys_fontwidth(glist_getfont(glist));
 	*yp = y1 + 2;
     }
@@ -710,7 +739,8 @@ static void gatom_vis(t_gobj *z, t_glist *glist, int vis)
     	    sys_vgui("pdtk_text_new .x%x.c %x.l %f %f {%s} %d %s\n",
 		glist_getcanvas(glist), x,
 		(double)x1, (double)y1,
-		x->a_label->s_name, sys_hostfontsize(glist_getfont(glist)),
+		canvas_realizedollar(x->a_glist, x->a_label)->s_name,
+		sys_hostfontsize(glist_getfont(glist)),
 		"black");
 	}
 	else sys_vgui(".x%x.c delete %x.l\n", glist_getcanvas(glist), x);
@@ -733,7 +763,7 @@ void canvas_atom(t_glist *gl, t_atomtype type,
     x->a_wherelabel = 0;
     x->a_label = &s_;
     x->a_symfrom = &s_;
-    x->a_symto = &s_;
+    x->a_symto = x->a_expanded_to = &s_;
     if (type == A_FLOAT)
     {
     	x->a_atom.a_w.w_float = 0;
@@ -764,9 +794,11 @@ void canvas_atom(t_glist *gl, t_atomtype type,
 	x->a_label = gatom_unescapit(atom_getsymbolarg(6, argc, argv));
 	x->a_symfrom = gatom_unescapit(atom_getsymbolarg(7, argc, argv));
 	if (*x->a_symfrom->s_name)
-    	    pd_bind(&x->a_text.te_pd, x->a_symfrom);
+    	    pd_bind(&x->a_text.te_pd,
+	    	canvas_realizedollar(x->a_glist, x->a_symfrom));
 
 	x->a_symto = gatom_unescapit(atom_getsymbolarg(8, argc, argv));
+	x->a_expanded_to = canvas_realizedollar(x->a_glist, x->a_symto);
 	if (x->a_symto == &s_)
 	    outlet_new(&x->a_text,
 		x->a_atom.a_type == A_FLOAT ? &s_float: &s_symbol);
@@ -805,7 +837,8 @@ void canvas_symbolatom(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
 static void gatom_free(t_gatom *x)
 {
     if (*x->a_symfrom->s_name)
-    	pd_bind(&x->a_text.te_pd, x->a_symfrom);
+    	pd_unbind(&x->a_text.te_pd,
+	    canvas_realizedollar(x->a_glist, x->a_symfrom));
     gfxstub_deleteforkey(x);
 }
 

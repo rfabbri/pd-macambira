@@ -1,32 +1,17 @@
-done for 0.35:
-bug fix: flipping canvases
-bug fix: canvas coordinates saved correctly
-signal lines fatter than control ones
-number box labels, send&receive
-rework [vh]dial
-'make install' depending on Pd, etc
-undo
-fix symbol binding GUI problem
-new expr object
-test on p4s
-undo paste and duplicate
-fix flipped window resizing to move comments
+done for 0.36:
 
 ---------------- dolist --------------------
-pddp doc
 
+pddp doc
 scheduler to do DSP computations even if no audio
 hook to scheduler to let others get called for DSP I/O
 figure out how to avoid "dac freeze" if nosound
 
 try again to fix the font scene
-look at zeros to IIR filters
-compile pdsend, pdreceive for windows and document somehow
 addcomma message to message
 pasting should look at current mouse location
 
 problems:
-number boxes should ignore non-numeric characters
 messages & comments don't come up with text activated?
 arrays of non-existent templates crash
 don't draw in/outlets on gui objects in graphs

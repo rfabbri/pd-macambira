@@ -3121,7 +3121,9 @@ fi
 
 if test `uname -s` = Darwin;
 then
-    LDFLAGS="-Wl -framework Tcl -framework Tk -framework CoreAudio -framework Carbon -framework CoreMIDI"
+    LDFLAGS="-Wl -framework Tcl -framework Tk -framework CoreAudio \
+        -framework AudioUnit -framework AudioToolbox \
+        -framework Carbon -framework CoreMIDI"
     EXT=pd_darwin
     MORECFLAGS="-DMACOSX -I/usr/X11R6/include -I../portaudio/pa_common \
         -I../portaudio/pablio -I../portaudio/portmidi-macosx -Wno-error"

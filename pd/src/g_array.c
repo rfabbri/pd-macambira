@@ -336,7 +336,7 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
 		{
 		    if (i == 0)
 		    {
-    			float newy = ywas + dy;
+    			float newy = ywas + dy * array_motion_yperpix;
 			if (newy < 0)
     			    newy = 0;
 			template_setfloat(array_motion_template,
@@ -346,7 +346,8 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
 		else
 		{
 		    template_setfloat(array_motion_template,
-    		    	array_motion_yfield, thisword, ywas + dy, 1);
+    		    	array_motion_yfield, thisword,
+			    ywas + dy * array_motion_yperpix, 1);
 	    	}
 	    }
 	}
@@ -488,9 +489,8 @@ int array_doclick(t_array *array, t_glist *glist, t_gobj *gobj,
 		    	elem = (char *)array->a_vec;
 			memmove(elem + elemsize * (i+1), 
 			    elem + elemsize * i,
-			    	(array->a_n - i) * elemsize);
+			    	(array->a_n - i - 1) * elemsize);
 			i++;
-			(array->a_n)++;
 		    }
 		    if (xonset >= 0)
 		    {
@@ -516,7 +516,7 @@ int array_doclick(t_array *array, t_glist *glist, t_gobj *gobj,
 		    	array_motion_yfield = gensym("w");
 			array_motion_ycumulative = 
 			    *(float *)((elem + elemsize * i) + wonset);
-			array_motion_xperpix *= array_motion_fatten;
+			array_motion_yperpix *= array_motion_fatten;
 		    }
 		    else if (yonset >= 0)
 		    {

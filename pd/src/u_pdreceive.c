@@ -6,14 +6,14 @@
 from Pd via the netsend/netreceive ("FUDI") protocol, and copies them to
 standard output. */
 
-#include <sys/time.h>
 #include <sys/types.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
 #include <stdlib.h>
 #ifdef UNIX
+#include <sys/time.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -38,7 +38,7 @@ static int sockfd;
 static int protocol;
 
 static void sockerror(char *s);
-static void closesocket(int fd);
+static void x_closesocket(int fd);
 static void dopoll(void);
 #define BUFSIZE 4096
 
@@ -47,6 +47,10 @@ int main(int argc, char **argv)
     int portno;
     struct sockaddr_in server;
     int nretry = 10;
+#ifdef NT
+    short version = MAKEWORD(2, 0);
+    WSADATA nobby;
+#endif
     if (argc < 2 || sscanf(argv[1], "%d", &portno) < 1 || portno <= 0)
     	goto usage;
     if (argc >= 3)
@@ -58,6 +62,9 @@ int main(int argc, char **argv)
 	else goto usage;
     }
     else protocol = SOCK_STREAM;
+#ifdef NT
+    if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
+#endif
     sockfd = socket(AF_INET, protocol, 0);
     if (sockfd < 0)
     {
@@ -82,7 +89,7 @@ int main(int argc, char **argv)
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
     	sockerror("bind");
-	closesocket(sockfd);
+	x_closesocket(sockfd);
     	return (0);
     }
     if (protocol == SOCK_STREAM)
@@ -90,7 +97,7 @@ int main(int argc, char **argv)
 	if (listen(sockfd, 5) < 0)
 	{
     	    sockerror("listen");
-    	    closesocket(sockfd);
+    	    x_closesocket(sockfd);
 	    exit(1);
 	}
     }
@@ -132,7 +139,7 @@ static void rmport(t_fdpoll *x)
     {
     	if (fp == x)
     	{
-	    closesocket(fp->fdp_fd);
+	    x_closesocket(fp->fdp_fd);
     	    free(fp->fdp_inbuf);
     	    while (i--)
     	    {
@@ -164,16 +171,22 @@ static void udpread(void)
     if (ret < 0)
     {
 	sockerror("recv (udp)");
-	close(sockfd);
+	x_closesocket(sockfd);
 	exit(1);
     }
     else if (ret > 0)
     {
+#ifdef UNIX
     	if (write(1, buf, ret) < ret)
 	{
 	    perror("write");
 	    exit(1);
 	}
+#else
+	int j;
+	for (j = 0; j < ret; j++)
+	    putchar(buf[j]);
+#endif
     }
 }
 
@@ -196,8 +209,16 @@ static int tcpmakeoutput(t_fdpoll *x)
 	    if (inbuf[intail] == '\n')
 	    	intail = (intail+1)&(BUFSIZE-1);
 	    *bp++ = '\n';
-    	    write(1, messbuf, bp - messbuf);
-    	    x->fdp_inhead = inhead;
+#ifdef UNIX
+	    write(1, messbuf, bp - messbuf);
+#else
+	    {
+	    	int j;
+		for (j = 0; j < bp - messbuf; j++)
+		    putchar(messbuf[j]);
+	    }
+#endif
+	    x->fdp_inhead = inhead;
     	    x->fdp_intail = intail;
     	    return (1);
     	}
@@ -207,7 +228,6 @@ static int tcpmakeoutput(t_fdpoll *x)
 
 static void tcpread(t_fdpoll *x)
 {
-    char *semi;
     int readto =
 	(x->fdp_inhead >= x->fdp_intail ? BUFSIZE : x->fdp_intail-1);
     int ret;
@@ -294,7 +314,7 @@ static void sockerror(char *s)
     fprintf(stderr, "%s: %s (%d)\n", s, strerror(err), err);
 }
 
-static void closesocket(int fd)
+static void x_closesocket(int fd)
 {
 #ifdef UNIX
     close(fd);

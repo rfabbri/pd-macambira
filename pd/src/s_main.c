@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.36 PRELIMINARY TEST 5\n";
+char pd_version[] = "Pd version 0.36-0\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -47,6 +47,7 @@ static t_symbol *sys_guidir;
 static t_namelist *sys_externlist;
 static t_namelist *sys_openlist;
 static t_namelist *sys_messagelist;
+static int sys_version;
 
 int sys_nmidiout = 1;
 #ifdef NT
@@ -241,8 +242,10 @@ int sys_main(int argc, char **argv)
 #endif
     if (sys_argparse(argc, argv)) return (1);	/* parse cmd line */
     sys_addextrapath();
-    if (sys_verbose) fprintf(stderr, "%s compiled %s %s\n",
+    if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
     	pd_version, pd_compiletime, pd_compiledate);
+    if (sys_version)	/* if we were just asked our version, exit here. */
+    	return (0);
     	    /* open audio and MIDI */
     sys_open_midi(sys_nmidiin, sys_midiindevlist,
     	sys_nmidiout, sys_midioutdevlist);
@@ -322,6 +325,7 @@ static char *(usagemessage[]) = {
 "-lib <file>      -- load object library(s)\n",
 "-font <n>        -- specify default font size in points\n",
 "-verbose         -- extra printout on startup and when searching for files\n",
+"-version         -- don't run Pd; just print out which version it is \n",
 "-d <n>           -- specify debug level\n",
 "-noloadbang      -- suppress all loadbangs\n",
 "-nogui           -- suppress starting the GUI\n",
@@ -607,6 +611,11 @@ int sys_argparse(int argc, char **argv)
     	else if (!strcmp(*argv, "-verbose"))
     	{
     	    sys_verbose = 1;
+    	    argc--; argv++;
+    	}
+    	else if (!strcmp(*argv, "-version"))
+    	{
+    	    sys_version = 1;
     	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-d") && argc > 1 &&

@@ -38,7 +38,7 @@ struct _canvasenvironment
 #define GLIST_DEFCANVASHEIGHT 300
 
 #ifdef MACOSX
-#define GLIST_DEFCANVASYLOC 20
+#define GLIST_DEFCANVASYLOC 22
 #else
 #define GLIST_DEFCANVASYLOC 0
 #endif
@@ -186,8 +186,6 @@ void canvas_getargs(int *argcp, t_atom **argvp)
     *argvp = e->ce_argv;
 }
 
-t_symbol *realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew);
-
 t_symbol *canvas_realizedollar(t_canvas *x, t_symbol *s)
 {
     t_symbol *ret;
@@ -196,7 +194,8 @@ t_symbol *canvas_realizedollar(t_canvas *x, t_symbol *s)
     {
     	t_canvasenvironment *env = canvas_getenv(x);
     	canvas_setcurrent(x);
-    	ret = realizedollsym(gensym(name+1), env->ce_argc, env->ce_argv, 1);
+    	ret = binbuf_realizedollsym(gensym(name+1),
+	    env->ce_argc, env->ce_argv, 1);
     	canvas_unsetcurrent(x);
     }
     else ret = s;
@@ -397,6 +396,10 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
     }
     else x->gl_env = 0;
 
+    if (yloc < GLIST_DEFCANVASYLOC)
+        yloc = GLIST_DEFCANVASYLOC;
+    if (xloc < 0)
+        xloc = 0;
     x->gl_x1 = 0;
     x->gl_y1 = 0;
     x->gl_x2 = 1;
@@ -957,7 +960,7 @@ void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
 	if (ap->a_type == A_DOLLSYM)
 	{
 	    t_canvasenvironment *e = canvas_getenv(canvas_getcurrent());
-    	    canvas_rename(x, realizedollsym(ap->a_w.w_symbol,
+    	    canvas_rename(x, binbuf_realizedollsym(ap->a_w.w_symbol,
 	    	e->ce_argc, e->ce_argv, 1), 0);	
 	}
 	else if (ap->a_type == A_SYMBOL)

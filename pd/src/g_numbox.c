@@ -318,8 +318,6 @@ static void my_numbox_draw_select(t_my_numbox *x, t_glist *glist)
 	    x->x_buf[0] = 0;
 	    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 	}
-	glist_grab(x->x_gui.x_glist, &x->x_gui.x_obj.ob_g,
-	    0, my_numbox_key, 0, 0);
 	sys_vgui(".x%x.c itemconfigure %xBASE1 -outline #%6.6x\n",
 	    canvas, x, IEM_GUI_COLOR_SELECTED);
 	sys_vgui(".x%x.c itemconfigure %xBASE2 -fill #%6.6x\n",
@@ -331,7 +329,6 @@ static void my_numbox_draw_select(t_my_numbox *x, t_glist *glist)
     }
     else
     {
-	glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
 	sys_vgui(".x%x.c itemconfigure %xBASE1 -outline #%6.6x\n",
 	    canvas, x, IEM_GUI_COLOR_NORMAL);
 	sys_vgui(".x%x.c itemconfigure %xBASE2 -fill #%6.6x\n",
@@ -533,6 +530,7 @@ static void my_numbox_motion(t_my_numbox *x, t_floatarg dx, t_floatarg dy)
     my_numbox_clip(x);
     (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
     my_numbox_bang(x);
+    clock_unset(x->x_clock_reset);
 }
 
 static void my_numbox_click(t_my_numbox *x, t_floatarg xpos, t_floatarg ypos,

@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+#define PD_VERSION 0.36
+
 #ifdef NT
 // #pragma warning( disable : 4091 ) 
 #pragma warning( disable : 4305 )  /* uncast const double to float */
@@ -283,6 +285,8 @@ EXTERN int binbuf_read_via_path(t_binbuf *b, char *filename, char *dirname,
 EXTERN int binbuf_write(t_binbuf *x, char *filename, char *dir,
     int crflag);
 EXTERN void binbuf_evalfile(t_symbol *name, t_symbol *dir);
+EXTERN t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av,
+    int tonew);
 
 /* ------------------  clocks --------------- */
 

@@ -419,7 +419,7 @@ t_atom *binbuf_getvec(t_binbuf *x)
 
 int canvas_getdollarzero( void);
 
-t_symbol *realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew) /* IOhannes: not static any more */
+t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
 {
     int argno = atol(s->s_name), lastnum;
     char buf[MAXPDSTRING], c, *sp;
@@ -475,7 +475,8 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
 	    }
 	    else if (at->a_type == A_DOLLSYM)
 	    {
-	    	if (!(s = realizedollsym(at->a_w.w_symbol, argc, argv, 0)))
+	    	if (!(s = binbuf_realizedollsym(at->a_w.w_symbol,
+		    argc, argv, 0)))
 		{
 		    error("$%s: not enough arguments supplied",
 		    	at->a_w.w_symbol->s_name);
@@ -554,7 +555,7 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
 		}
 		break;
 	    case A_DOLLSYM:
-	    	s9 = realizedollsym(at->a_w.w_symbol, argc, argv,
+	    	s9 = binbuf_realizedollsym(at->a_w.w_symbol, argc, argv,
 		    target == &pd_objectmaker);
 		if (!s9)
 		    goto broken;

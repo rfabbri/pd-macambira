@@ -1,6 +1,6 @@
 # Makefile for portaudio ASIO driver version of PD
 
-all: pd gui ..\bin\pd.tk
+all: pd gui ..\bin\pd.tk ..\bin\pdsend.exe ..\bin\pdreceive.exe
 
 VC = "C:\Program Files\Microsoft Visual Studio\VC98"
 #VC="\Program Files\DevStudio\Vc"
@@ -75,6 +75,14 @@ gui: ..\bin\pdtcl.dll
 	    t_tkcmd.obj $(GLIB)
 
 ..\bin\pd.tk: u_main.tk; copy u_main.tk ..\bin\pd.tk
+
+..\bin\pdsend.exe: u_pdsend.obj
+	link $(LFLAGS) /out:..\bin\pdsend.exe /INCREMENTAL:NO u_pdsend.obj \
+	    $(LIB)
+
+..\bin\pdreceive.exe: u_pdreceive.obj
+	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO u_pdreceive.obj \
+	    $(LIB)
 
 # explicit rules to compile portaudio sources:
 pa_lib.obj: $(PADIR)\pa_common\pa_lib.c

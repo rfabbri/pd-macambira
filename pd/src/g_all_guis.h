@@ -277,8 +277,6 @@ extern char *iemgui_vu_scale_str[];
 EXTERN int iemgui_clip_size(int size);
 EXTERN int iemgui_clip_font(int size);
 EXTERN int iemgui_modulo_color(int col);
-EXTERN void iemgui_raute2dollar(t_symbol *s);
-EXTERN void iemgui_dollar2raute(t_symbol *s);
 EXTERN t_symbol *iemgui_unique2dollarzero(t_symbol *s, int unique_num, int and_unique_flag);
 EXTERN t_symbol *iemgui_sym2dollararg(t_symbol *s, int nth_arg, int tail_len);
 EXTERN t_symbol *iemgui_dollarzero2unique(t_symbol *s, int unique_num);

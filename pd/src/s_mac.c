@@ -321,7 +321,7 @@ void sys_set_priority(int higher)
 #else /* no priority scheduling, so renice and wish for something better */
     int retval;
     errno = 0;
-    retval = setpriority(PRIO_PROCESS, 0, (higher? -20 : -19));
+    retval = setpriority(PRIO_PROCESS, 0, (higher? 0 : -20));
     if (retval == -1 & errno != 0)
     {
         perror("setpriority");
