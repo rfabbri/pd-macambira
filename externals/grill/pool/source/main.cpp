@@ -1024,7 +1024,7 @@ V pool::ldrec(I argc,const A *argv,BL xml)
 	else {
 		string fl(MakeFilename(flnm));
         if(!(xml?pl->LdDirXML(curdir,fl.c_str(),depth,mkdir):pl->LdDir(curdir,fl.c_str(),depth,mkdir))) 
-		post("%s - %s: directory couldn't be saved",thisName(),sym);
+		    post("%s - %s: directory couldn't be saved",thisName(),sym);
 	}
 
 	echodir();

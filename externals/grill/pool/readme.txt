@@ -1,6 +1,6 @@
 pool - a hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2004 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -10,7 +10,7 @@ Visit https://www.paypal.com/xclick/business=t.grill%40gmx.net&item_name=pool&no
 ----------------------------------------------------------------------------
 
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
-see http://www.parasitaere-kapazitaeten.net/ext
+see http://grrrr.org/ext
 
 
 Package files:
@@ -39,6 +39,8 @@ o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat"
 
 o Microsoft Visual C++ 6/7: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
+o GCC (MinGW): edit "config-pd-mingw.txt" & run "build-pd-mingw.bat" 
+
 pd - linux:
 -----------
 o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
@@ -53,7 +55,7 @@ o CodeWarrior: edit "pool.cw" and build
 
 Max/MSP - Windows:
 -------------------
-o Microsoft Visual C++ 7: edit "config-max-msvc.txt" & run "build-max-msvc.bat" 
+o Microsoft Visual C++ 6/7: edit "config-max-msvc.txt" & run "build-max-msvc.bat" 
 
 
 ----------------------------------------------------------------------------

@@ -590,7 +590,17 @@ public:
     string tag,attr;
     bool Ok() const { return tag.length() > 0; }
     bool operator ==(const C *t) const { return !tag.compare(t); }
-    void Clear() { tag.clear(); attr.clear(); }
+
+    void Clear() 
+    { 
+#if defined(_MSC_VER) && (_MSC_VER < 0x1200)
+        // incomplete STL implementation
+        tag = ""; attr = ""; 
+#else
+        tag.clear(); attr.clear(); 
+#endif
+    }
+
     enum { t_start,t_end,t_empty } type;
 };
 
