@@ -285,6 +285,54 @@ static void som_init(t_som *x, t_symbol *s, int argc, t_atom *argv)
   }
 }
 
+/* centered initialization: 
+ * the "first" neuron will be set to all zeros
+ * the "middle" neuron will be set to the given data
+ * the "last" neuron will be set to teh double of the given data
+ */
+static void som_cinit(t_som *x, t_symbol *s, int argc, t_atom *argv){
+  /* initialize the neuron-weights */
+  int i, j;
+  t_float f;
+  t_float v = 1.0f;
+  
+  switch (argc) {
+  case 0:
+  case 1:
+    f = (argc)?atom_getfloat(argv):0;
+    for (i=0; i<x->num_neurons; i++){
+      v=i*2.0/x->num_neurons;
+      for (j=0; j<x->num_sensors; j++)
+	x->weights[i][j]=f*v;
+    }
+    break;
+  default:
+    if (argc == x->num_sensors) {
+      for (i=0; i<x->num_neurons; i++){
+	v=i*2.0/x->num_neurons;
+	for (j=0; j<x->num_sensors; j++)
+	  x->weights[i][j]=v*atom_getfloat(&argv[j]);
+      }
+    } else 
+      error("som_init: you should pass a list of expected mean-values for each sensor to the SOM");
+  }
+}
+
+/* dump the weights of the queried neuron to the output */
+static void som_dump(t_som *x, t_float nf){
+  int n=nf;
+  int i=x->num_sensors;
+  t_atom*ap=0;
+  if (n<0 || n>=x->num_neurons)return;
+  ap=(t_atom*)getbytes(sizeof(t_atom)*x->num_sensors);
+  while(i--)SETFLOAT(&ap[i], x->weights[n][i]);
+  outlet_list(x->x_obj.ob_outlet, &s_list, x->num_sensors, ap);
+
+  freebytes(ap, x->num_sensors*sizeof(t_atom));
+  
+
+
+}
 
 static void som_makenewsom(t_som *x, t_symbol *s, int argc, t_atom *argv)
 { /* create a new SOM */
@@ -697,6 +745,7 @@ static void som_setup(void)
 
   class_addmethod(som_class, (t_method)som_makenewsom, gensym("new"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_init, gensym("init"), A_GIMME, 0);
+  class_addmethod(som_class, (t_method)som_cinit, gensym("cinit"), A_GIMME, 0);
 
   class_addmethod(som_class, (t_method)som_learn, gensym("learn"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_neighbour, gensym("neighbour"), A_GIMME, 0);
