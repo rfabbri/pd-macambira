@@ -8,15 +8,8 @@ GUINAME= @GUINAME@
 INSTALL_PREFIX = @prefix@
 GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
-# there should be a better way to do this...
-prefix = @prefix@
 MANDIR = @mandir@
 
-# ALSA compilation
-
-SOUND_ALSA = @alsa@
-
-DEFINES = @DEFINES@
 MORECFLAGS = @MORECFLAGS@
 
 INCLUDE = -I.
@@ -26,40 +19,12 @@ GLIB = @LIBS@
 LDFLAGS = @LDFLAGS@
 LIB =  @PDLIB@
 
-#select either the DBG and OPT compiler flags below:
 OPT_CFLAGS = @OPT_CFLAGS@
-WARN_CFLAGS = -Wall -W -Wstrict-prototypes  -Werror \
+WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 ARCH_CFLAGS = -DPD -DUNIX 
 
-CFLAGS = $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(DEFINES) $(MORECFLAGS)
-
-# you might want ALSA linked in non-shared because
-# many Linux machines don't have the ALSA shared library.  To link
-# ALSA non-shared, move the # sign below.
-
-ifeq (${SOUND_ALSA},yes)
-CFLAGS += -DPA_USE_ALSA -DUSEAPI_ALSA
-SYSSRC += s_audio_alsa.c \
-    ../portaudio/pa_linux_alsa/callback_thread.c \
-    ../portaudio/pa_linux_alsa/pa_linux_alsa.c \
-    ../portaudio/pa_linux_alsa/blocking_calls.c
-endif
-
-# Which system
-
-SYSTEM = $(shell uname -m)
-
-ifeq (${SYSTEM},alpha)
-#LIB += -lffm -lm
-CFLAGS += -mieee -mcpu=ev56
-endif
-
-# Which compiler
-
-ifeq (${CC},ccc)
-CFLAGS += -g3 -D__COMPAQC__ -arch host
-endif
+CFLAGS = @CFLAGS@ $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 
@@ -82,7 +47,6 @@ SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
 
 
 OBJ = $(SRC:.c=.o) 
-EXTERNS = ../extra/*/*.$(EXT)
 
 GSRC =  t_main.c t_tkcmd.c
 
@@ -113,13 +77,13 @@ gui: $(BIN_DIR)/$(GUINAME)
 pd-watchdog: $(BIN_DIR)/pd-watchdog
 
 $(BIN_DIR)/pd-watchdog: s_watchdog.c
-	cc -O2 $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
+	$(CC) -O2 $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
 
 $(BIN_DIR)/pdsend: u_pdsend.c
-	cc $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdsend u_pdsend.c
+	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdsend u_pdsend.c
 
 $(BIN_DIR)/pdreceive: u_pdreceive.c
-	cc $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
+	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
 
 $(PDEXEC): $(OBJ) 
 	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
@@ -150,7 +114,7 @@ externs:
 	cd ../extra/pique;make @EXTERNTARGET@
 
 INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
-MANINSTDIR = $(DESTDIR)/$(MANDIR)
+MANINSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)/$(MANDIR)
 
 install:  all
 	install -d $(INSTDIR)/lib/pd/bin
@@ -161,10 +125,8 @@ install:  all
 	install -m755 $(PDEXEC) $(INSTDIR)/bin/pd
 	install -m 755 $(BIN_DIR)/pdsend $(INSTDIR)/bin/pdsend
 	install -m 755 $(BIN_DIR)/pdreceive $(INSTDIR)/bin/pdreceive 
-	install -d $(INSTDIR)/lib/pd/extra
-	install -d $(INSTDIR)/lib/pd/externs
-	install -m 644 $(EXTERNS) $(INSTDIR)/lib/pd/extra
-	cp -r ../doc $(INSTDIR)/lib/pd/
+	cp -pr ../doc ../extra $(INSTDIR)/lib/pd/
+	rm -f $(INSTDIR)/extra/*/*.o
 	install -d $(INSTDIR)/include
 	install -m644 m_pd.h $(INSTDIR)/include/m_pd.h
 	install -d $(MANINSTDIR)/man1
@@ -179,7 +141,6 @@ local-clean:
 	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
 	    $(BIN_DIR)/pdreceive $(BIN_DIR)/pd-watchdog m_stamp.c
 	-rm -f *~
-	-rm -f $(BIN_DIR)/pdsend $(BIN_DIR)/pdreceive
 	-(cd ../doc/6.externs; rm -f *.pd_linux)
 	-rm -f makefile.dependencies
 	touch makefile.dependencies
@@ -192,7 +153,8 @@ extra-clean:
 clean: extra-clean local-clean
 
 distclean: clean
-	-rm config.cache config.log config.status makefile tags
+	rm -rf config.cache config.log config.status makefile tags \
+	     autom4te-*.cache
 	echo all: > makefile
 	echo -e  "\t./configure" >> makefile
 	echo -e "\tmake" >> makefile
@@ -203,14 +165,14 @@ depend:
 	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
 
 uninstall:
-	-rm -r $(INSTDIR)/lib/pd
-	-rm $(INSTDIR)/bin/pd
-	-rm $(INSTDIR)/bin/pdsend
-	-rm $(INSTDIR)/bin/pdreceive
-	-rm $(INSTDIR)/include/m_pd.h
-	-rm $(MANINSTDIR)/man/man1/pd.1.gz
-	-rm $(MANINSTDIR)/man/man1/pdsend.1.gz
-	-rm $(MANINSTDIR)/man/man1/pdreceive.1.gz
+	rm -f -r $(INSTDIR)/lib/pd
+	rm -f $(INSTDIR)/bin/pd
+	rm -f $(INSTDIR)/bin/pdsend
+	rm -f $(INSTDIR)/bin/pdreceive
+	rm -f $(INSTDIR)/include/m_pd.h
+	rm -f $(MANINSTDIR)/man1/pd.1.gz
+	rm -f $(MANINSTDIR)/man1/pdsend.1.gz
+	rm -f $(MANINSTDIR)/man1/pdreceive.1.gz
 
 include makefile.dependencies
 

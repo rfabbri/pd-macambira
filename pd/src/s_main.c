@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.37.1 TEST6 devel\n";
+char pd_version[] = "Pd version 0.37.1 TEST6\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -51,6 +51,7 @@ static t_namelist *sys_externlist;
 static t_namelist *sys_openlist;
 static t_namelist *sys_messagelist;
 static int sys_version;
+int sys_oldtclversion;	    /* hack to warn g_rtext.c about old text sel */
 
 int sys_nmidiout = 1;
 #ifdef MSW
@@ -182,7 +183,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     char *cwd = atom_getsymbolarg(0, argc, argv)->s_name;
     t_namelist *nl;
     unsigned int i, j;
-    if (argc != 1 + 3 * NHOSTFONT) bug("glob_initfromgui");
+    if (argc != 2 + 3 * NHOSTFONT) bug("glob_initfromgui");
     for (i = 0; i < NFONT; i++)
     {
     	int wantheight = sys_fontlist[i].fi_maxheight;
@@ -226,6 +227,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     }
     namelist_free(sys_messagelist);
     sys_messagelist = 0;
+    sys_oldtclversion = atom_getfloatarg(1 + 3 * NHOSTFONT, argc, argv);
 }
 
 static void sys_afterargparse(void);

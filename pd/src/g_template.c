@@ -608,10 +608,10 @@ static void *gtemplate_new_old(t_symbol *s, int argc, t_atom *argv)
     static int warned;
     if (!warned)
     {
-    	post("warning -- 'template' is obsolete; replace with 'struct'");
+    	post("warning -- 'template' (%s) is obsolete; replace with 'struct'",
+	    sym->s_name);
 	warned = 1;
     }
-    post("name: %s", sym->s_name);
     return (gtemplate_donew(sym, argc, argv));
 }
 

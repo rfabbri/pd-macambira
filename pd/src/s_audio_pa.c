@@ -127,6 +127,7 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
 	    err); 
 	fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
 	Pa_Terminate();
+	sys_inchannels = sys_outchannels = 0;
 	return (1);
     }
     else if (sys_verbose)

@@ -1028,11 +1028,12 @@ void canvas_loadbang(t_canvas *x)
 
     /* When you ask a canvas its size the result is 2 pixels more than what
     you gave it to open it; perhaps there's a 1-pixel border all around it
-    or something.  Anyway, we just add the 2 pixels back here: */
+    or something.  Anyway, we just add the 2 pixels back here; seems we
+    have to do this for linux but not MSW; not sure about MacOS. */
 
 #ifdef MSW
-#define HORIZBORDER 2
-#define VERTBORDER 2
+#define HORIZBORDER 0
+#define VERTBORDER 0
 #else
 #define HORIZBORDER 2
 #define VERTBORDER 2
@@ -1301,8 +1302,8 @@ void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv)
     	newstate = atom_getintarg(0, argc, argv);
     	if (newstate && !canvas_dspstate)
 	{
-    	    canvas_start_dsp();
 	    sys_set_audio_state(1);
+    	    canvas_start_dsp();
 	}
     	else if (!newstate && canvas_dspstate)
 	{

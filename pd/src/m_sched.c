@@ -360,6 +360,8 @@ static void sched_tick(double next_sys_time)
 	    countdown = 5000;
 	    sys_pollgui();
 	}
+	if (sys_quit)
+	    return;
     }
     sys_time = next_sys_time;
     dsp_tick();
@@ -399,7 +401,7 @@ int m_scheduler( void)
     else if (sys_sleepgrain > 5000)
     	sys_sleepgrain = 5000;
     sys_initmidiqueue();
-    while (1)
+    while (!sys_quit)
     {
     	int didsomething = 0;
     	int timeforward;

@@ -225,18 +225,33 @@ void outmidi_mclk(int portno)
 typedef struct midiparser
 {
     int mp_status;
-    int mp_sysex;
     int mp_gotbyte1;
     int mp_byte1;
 } t_midiparser;
 
-#define MIDINOTEOFF       0x80
-#define MIDINOTEON        0x90
-#define MIDIPOLYTOUCH     0xa0
-#define MIDICONTROLCHANGE 0xb0
-#define MIDIPROGRAMCHANGE 0xc0
-#define MIDICHANNELTOUCH  0xd0
-#define MIDIPITCHBEND     0xe0
+#define MIDINOTEOFF       0x80	/* 2 following 'data bytes' */
+#define MIDINOTEON        0x90	/* 2 */
+#define MIDIPOLYTOUCH     0xa0	/* 2 */
+#define MIDICONTROLCHANGE 0xb0	/* 2 */
+#define MIDIPROGRAMCHANGE 0xc0	/* 1 */
+#define MIDICHANNELTOUCH  0xd0	/* 1 */
+#define MIDIPITCHBEND     0xe0	/* 2 */
+#define MIDISTARTSYSEX    0xf0	/* (until F7) */
+#define MIDITIMECODE      0xf1	/* 1 */
+#define MIDISONGPOS       0xf2	/* 2 */
+#define MIDISONGSELECT    0xf3	/* 1 */
+#define MIDIRESERVED1     0xf4	/* ? */
+#define MIDIRESERVED2     0xf5	/* ? */
+#define MIDITUNEREQUEST   0xf6	/* 0 */
+#define MIDIENDSYSEX      0xf7	/* 0 */
+#define MIDICLOCK         0xf8	/* 0 */
+#define MIDITICK          0xf9	/* 0 */
+#define MIDISTART         0xfa	/* 0 */
+#define MIDICONT          0xfb	/* 0 */
+#define MIDISTOP          0xfc	/* 0 */
+#define MIDIACTIVESENSE   0xfe	/* 0 */
+#define MIDIRESET         0xff	/* 0 */
+
     /* functions in x_midi.c */
 void inmidi_realtimein(int portno, int cmd);
 void inmidi_byte(int portno, int byte);
@@ -265,59 +280,86 @@ static void sys_dispatchnextmidiin( void)
     else
     {
     	inmidi_byte(portno, byte);
-	if (byte < 0xf0)
+	if (byte & 0x80)
 	{
-	    if (byte & 0x80)
+	    if (byte == MIDITUNEREQUEST || byte == MIDIRESERVED1 ||
+	    	byte == MIDIRESERVED2)
+	    	    parserp->mp_status = 0;
+	    else if (byte == MIDISTARTSYSEX)
 	    {
+	    	inmidi_sysex(portno, byte);
 	    	parserp->mp_status = byte;
-		parserp->mp_gotbyte1 = 0;
+	    }
+	    else if (byte == MIDIENDSYSEX)
+	    {
+	    	inmidi_sysex(portno, byte);
+	    	parserp->mp_status = 0;
 	    }
 	    else
 	    {
-	    	int cmd = (parserp->mp_status & 0xf0);
-		int chan = (parserp->mp_status & 0xf);
-		int byte1 = parserp->mp_byte1, gotbyte1 = parserp->mp_gotbyte1;
-		switch (cmd)
-		{
-		case MIDINOTEOFF:
-		    if (gotbyte1)
-		    	inmidi_noteon(portno, chan, byte1, 0),
-			    parserp->mp_gotbyte1 = 0;
-		    else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
-		    break;
-		case MIDINOTEON:
-		    if (gotbyte1)
-		    	inmidi_noteon(portno, chan, byte1, byte),
-			    parserp->mp_gotbyte1 = 0;
-		    else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
-		    break;
-		case MIDIPOLYTOUCH:
-		    if (gotbyte1)
-		    	inmidi_polyaftertouch(portno, chan, byte1, byte),
-			    parserp->mp_gotbyte1 = 0;
-		    else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
-		    break;
-		case MIDICONTROLCHANGE:
-		    if (gotbyte1)
-		    	inmidi_controlchange(portno, chan, byte1, byte),
-			    parserp->mp_gotbyte1 = 0;
-		    else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
-		    break;
-		case MIDIPROGRAMCHANGE:
-		    inmidi_programchange(portno, chan, byte);
-		    break;
-		case MIDICHANNELTOUCH:
-		    inmidi_aftertouch(portno, chan, byte);
-		    break;
-		case MIDIPITCHBEND:
-		    if (gotbyte1)
-		    	inmidi_pitchbend(portno, chan, ((byte << 7) + byte1)),
-			    parserp->mp_gotbyte1 = 0;
-		    else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
-		    break;
-		}
+	    	parserp->mp_status = byte;
 	    }
-	 }
+	    parserp->mp_gotbyte1 = 0;
+	}
+	else
+	{
+	    int cmd = (parserp->mp_status >= 0xf0 ? parserp->mp_status :
+	    	(parserp->mp_status & 0xf0));
+	    int chan = (parserp->mp_status & 0xf);
+	    int byte1 = parserp->mp_byte1, gotbyte1 = parserp->mp_gotbyte1;
+	    switch (cmd)
+	    {
+	    case MIDINOTEOFF:
+		if (gotbyte1)
+		    inmidi_noteon(portno, chan, byte1, 0),
+			parserp->mp_gotbyte1 = 0;
+		else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
+		break;
+	    case MIDINOTEON:
+		if (gotbyte1)
+		    inmidi_noteon(portno, chan, byte1, byte),
+			parserp->mp_gotbyte1 = 0;
+		else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
+		break;
+	    case MIDIPOLYTOUCH:
+		if (gotbyte1)
+		    inmidi_polyaftertouch(portno, chan, byte1, byte),
+			parserp->mp_gotbyte1 = 0;
+		else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
+		break;
+	    case MIDICONTROLCHANGE:
+		if (gotbyte1)
+		    inmidi_controlchange(portno, chan, byte1, byte),
+			parserp->mp_gotbyte1 = 0;
+		else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
+		break;
+	    case MIDIPROGRAMCHANGE:
+		inmidi_programchange(portno, chan, byte);
+		break;
+	    case MIDICHANNELTOUCH:
+		inmidi_aftertouch(portno, chan, byte);
+		break;
+	    case MIDIPITCHBEND:
+		if (gotbyte1)
+		    inmidi_pitchbend(portno, chan, ((byte << 7) + byte1)),
+			parserp->mp_gotbyte1 = 0;
+		else parserp->mp_byte1 = byte, parserp->mp_gotbyte1 = 1;
+		break;
+    	    case MIDISTARTSYSEX:
+	    	inmidi_sysex(portno, byte);
+		break;
+		
+		/* other kinds of messages are just dropped here.  We'll
+		need another status byte before we start letting MIDI in
+		again (no running status across "system" messages). */
+	    case MIDITIMECODE:     /* 1 data byte*/
+	    	break;
+	    case MIDISONGPOS:       /* 2 */
+	    	break;
+	    case MIDISONGSELECT:    /* 1 */
+	    	break;
+	    }
+	}
     }  
     midi_intail  = (midi_intail + 1 == MIDIQSIZE ? 0 : midi_intail + 1);
 }

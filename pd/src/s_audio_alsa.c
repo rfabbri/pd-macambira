@@ -38,14 +38,21 @@ typedef int32_t t_alsa_sample32;
 #define INT32_MAX 0x7fffffff
 #endif
 
+#if (SND_LIB_MAJOR < 1)
+#define ALSAAPI9
+#endif
+
 typedef struct _alsa_dev
 {
     snd_pcm_t *inhandle;
     snd_pcm_t *outhandle;
+    int innoninterleave;    /* true if we're set for noninterleaved read */
+    int outnoninterleave;   /* same for write */
 } t_alsa_dev;
 
 t_alsa_dev alsa_device;
-static short *alsa_buf = 0;
+static void *alsa_snd_buf = 0;
+static void **alsa_buf_ptrs;
 static int alsa_samplewidth;
 static snd_pcm_status_t* in_status;
 static snd_pcm_status_t* out_status;
@@ -60,6 +67,7 @@ static int alsa_outchannels;
 #define DEBUG2(x) {x;}
 
 static void alsa_checkiosync( void);
+static void alsa_numbertoname(int devno, char *devname, int nchar);
 
     /* don't assume we can turn all 31 bits when doing float-to-fix; 
     otherwise some audio drivers (e.g. Midiman/ALSA) wrap around. */
@@ -89,6 +97,7 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
     int nfrags, i;
     short* tmp_buf;
     unsigned int tmp_uint;
+    snd_pcm_uframes_t tmp_snd_pcm_uframes;
     int wantinchans, wantoutchans, devno;
 
     if (naudioindev >= 2 || naudiooutdev >= 2)
@@ -105,10 +114,7 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
     devno = (naudioindev > 0 ? audioindev[0] :
     	(naudiooutdev > 0 ? audiooutdev[0] : 0));
 
-	/* device names are hw:0, plughw:0, hw:1, and so on. */
-    if (devno & 1)
-    	sprintf(devname, "plughw:%d", devno/2);
-    else sprintf(devname, "hw:%d", devno/2);
+    alsa_numbertoname(devno, devname, 512);
 
     if (sys_verbose)
     	post("device name %s; channels in %d, out %d", devname, wantinchans,
@@ -121,7 +127,7 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
     if (sys_verbose)
     	post("audio buffer set to %d", (int)(0.001 * sys_schedadvance));
     
-    
+    alsa_device.innoninterleave = alsa_device.outnoninterleave = 0;
     if (wantinchans)
     {
 	err = snd_pcm_open(&alsa_device.inhandle, devname,
@@ -160,9 +166,21 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
 	// get the default params
 	err = snd_pcm_hw_params_any(alsa_device.inhandle, hw_params);
 	check_error(err, "snd_pcm_hw_params_any (input)");
-	// set interleaved access - FIXME deal with other access types
-	err = snd_pcm_hw_params_set_access(alsa_device.inhandle, hw_params,
-					   SND_PCM_ACCESS_RW_INTERLEAVED);
+
+	/* try to set interleaved access */
+	err = snd_pcm_hw_params_set_access(alsa_device.inhandle,
+	    hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+	if (err < 0)
+	{
+	    	/* OK, so try non-interleaved */
+	    err = snd_pcm_hw_params_set_access(alsa_device.inhandle,
+	    	hw_params, SND_PCM_ACCESS_RW_NONINTERLEAVED);
+	    if (err >= 0)
+	    {
+	    	post("using non-interleaved audio input");
+	    	alsa_device.innoninterleave = 1;
+	    }
+	}
 	check_error(err, "snd_pcm_hw_params_set_access (input)");
 	// Try to set 32 bit format first
 	err = snd_pcm_hw_params_set_format(alsa_device.inhandle, hw_params,
@@ -212,20 +230,38 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
 	    snd_pcm_hw_params_get_period_size_min(hw_params, 0),
 	    snd_pcm_hw_params_get_period_size_max(hw_params, 0));
 #endif
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_period_size_near(alsa_device.inhandle,
 						    hw_params, 
 						    (snd_pcm_uframes_t)
 						    frag_size, 0);
+#else
+    	tmp_snd_pcm_uframes = frag_size;
+	err = snd_pcm_hw_params_set_period_size_near(alsa_device.inhandle,
+	    hw_params, &tmp_snd_pcm_uframes, 0);
+#endif
 	check_error(err, "snd_pcm_hw_params_set_period_size_near (input)");
 	// post("fragsize b %d", frag_size);
 	// set the number of periods - ie numfrags
 	// post("nfrags a %d", nfrags);
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_periods_near(alsa_device.inhandle,
 						hw_params, nfrags, 0);
+#else
+    	tmp_uint = nfrags;
+	err = snd_pcm_hw_params_set_periods_near(alsa_device.inhandle,
+    	    hw_params, &tmp_uint, 0);
+#endif
 	check_error(err, "snd_pcm_hw_params_set_periods_near (input)");
 	// set the buffer size
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_buffer_size_near(alsa_device.inhandle,
 						hw_params, nfrags * frag_size);
+#else
+    	tmp_snd_pcm_uframes = nfrags * frag_size;
+	err = snd_pcm_hw_params_set_buffer_size_near(alsa_device.inhandle,
+    	    hw_params, &tmp_snd_pcm_uframes);
+#endif
 	check_error(err, "snd_pcm_hw_params_set_buffer_size_near (input)");
 
 	err = snd_pcm_hw_params(alsa_device.inhandle, hw_params);
@@ -276,6 +312,24 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
 	err = snd_pcm_hw_params_set_access(alsa_device.outhandle, hw_params,
 					   SND_PCM_ACCESS_RW_INTERLEAVED);
 	check_error(err, "snd_pcm_hw_params_set_access (output)");
+
+	    /* try to set interleaved access */
+	err = snd_pcm_hw_params_set_access(alsa_device.outhandle,
+	    hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+	if (err < 0)
+	{
+	    	/* OK, so try non-interleaved */
+	    err = snd_pcm_hw_params_set_access(alsa_device.outhandle,
+	    	hw_params, SND_PCM_ACCESS_RW_NONINTERLEAVED);
+	    if (err >= 0)
+	    {
+	    	post("using non-interleaved audio");
+	    	alsa_device.outnoninterleave = 1;
+	    }
+	}
+	check_error(err, "snd_pcm_hw_params_set_access (output)");
+
+
 	// Try to set 32 bit format first
 	err = snd_pcm_hw_params_set_format(alsa_device.outhandle, hw_params,
 					     SND_PCM_FORMAT_S32);
@@ -320,20 +374,37 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
 	    snd_pcm_hw_params_get_period_size_max(hw_params, 0));
 #endif
 	// post("fragsize c %d", frag_size);
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_period_size_near(alsa_device.outhandle,
 						    hw_params,
 						    (snd_pcm_uframes_t)
 						    frag_size, 0);
+#else
+    	tmp_snd_pcm_uframes = frag_size;
+	err = snd_pcm_hw_params_set_period_size_near(alsa_device.outhandle,
+	    hw_params, &tmp_snd_pcm_uframes, 0);
+#endif
 	// post("fragsize d %d", frag_size);
 	check_error(err, "snd_pcm_hw_params_set_period_size_near (output)");
 	// set the number of periods - ie numfrags
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_periods_near(alsa_device.outhandle,
 						hw_params, nfrags, 0);
+#else
+    	tmp_uint = nfrags;
+	err = snd_pcm_hw_params_set_periods_near(alsa_device.outhandle,
+	    hw_params, &tmp_uint, 0);
+#endif
 	check_error(err, "snd_pcm_hw_params_set_periods_near (output)");
 	// set the buffer size
+#ifdef ALSAAPI9
 	err = snd_pcm_hw_params_set_buffer_size_near(alsa_device.outhandle,
 	    hw_params, nfrags * frag_size);
-
+#else
+    	tmp_snd_pcm_uframes = nfrags * frag_size;
+	err = snd_pcm_hw_params_set_buffer_size_near(alsa_device.outhandle,
+	    hw_params, &tmp_snd_pcm_uframes);
+#endif
 	check_error(err, "snd_pcm_hw_params_set_buffer_size_near (output)");
 
 	err = snd_pcm_hw_params(alsa_device.outhandle, hw_params);
@@ -384,42 +455,57 @@ int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
     check_error(err, "snd_pcm_status_malloc");
 
     // set up the buffer
-    if (alsa_buf)
-    	free(alsa_buf);
-    alsa_buf = (short *)malloc(
+    if (alsa_snd_buf)
+    	free(alsa_snd_buf);
+    alsa_snd_buf = (void *)malloc(
 	sizeof(char) * alsa_samplewidth * DEFDACBLKSIZE *
 	    (outchans > inchans ? outchans : inchans));
-    memset(alsa_buf, 0, sizeof(char) * alsa_samplewidth * DEFDACBLKSIZE *
+    memset(alsa_snd_buf, 0, sizeof(char) * alsa_samplewidth * DEFDACBLKSIZE *
 	    (outchans > inchans ? outchans : inchans));
+    	/* make an array of pointers too in case we need them */
+    if (alsa_buf_ptrs)
+    	free(alsa_buf_ptrs);
+    alsa_buf_ptrs = (void **)malloc(
+	sizeof(void *) * (outchans > inchans ? outchans : inchans));
+    for (i = 0; i < (outchans > inchans ? outchans : inchans); i++)
+    	alsa_buf_ptrs[i] = (t_alsa_sample32 *)alsa_snd_buf + i * DEFDACBLKSIZE;
+
     // fill the buffer with silence
     if (outchans)
     {
 	i = (frag_size * nfrags)/DEFDACBLKSIZE + 1;
 	while (i--)
-	    snd_pcm_writei(alsa_device.outhandle, alsa_buf, DEFDACBLKSIZE);
-	    	/* apparently we're not suppposed to start it in this case,
-	    	but can (and must) if there's only ADC open (below). */
+	{
+	    if (alsa_device.outnoninterleave)
+	    	snd_pcm_writen(alsa_device.outhandle, alsa_buf_ptrs,
+		    DEFDACBLKSIZE);
+	    else snd_pcm_writei(alsa_device.outhandle, alsa_snd_buf,
+		    DEFDACBLKSIZE);
+    	}
+	    	/* confused about this: */
 	/* if ((err = snd_pcm_start(alsa_device.outhandle) < 0))
 	    check_error(err, "output start failed\n"); */
     }
-    else if (snd_pcm_start(alsa_device.inhandle) < 0)
+    else if (inchans)
+    {
+    	if (snd_pcm_start(alsa_device.inhandle) < 0)
 	    check_error(err, "input start failed\n");
-
+    }
     alsa_outchannels = outchans;
     alsa_inchannels = inchans;
 	    
-    return 0;
+    return (!(inchans || outchans));
 }
 
 void alsa_close_audio(void)
 {
     int err;
-    if (sys_inchannels)
+    if (alsa_inchannels)
     {
 	err = snd_pcm_close(alsa_device.inhandle);
 	check_error(err, "snd_pcm_close (input)");
     }
-    if (sys_outchannels)
+    if (alsa_outchannels)
     {
 	err = snd_pcm_close(alsa_device.outhandle);
 	check_error(err, "snd_pcm_close (output)");
@@ -484,14 +570,30 @@ int alsa_send_dacs(void)
 	fp = sys_soundout;
 	if (alsa_samplewidth == 4)
 	{
-	    for (i = 0, fp1 = fp; i < outchannels; i++, fp1 += DEFDACBLKSIZE)
+	    if (alsa_device.outnoninterleave)
 	    {
-		for (j = i, k = DEFDACBLKSIZE, fp2 = fp1; k--;
-		     j += alsa_outchannels, fp2++)
+	    	int n = outchannels * DEFDACBLKSIZE;
+		for (i = 0, fp1 = fp; i < n; i++)
 		{
-		    float s1 = *fp2 * INT32_MAX;
-		    ((t_alsa_sample32 *)alsa_buf)[j] = CLIP32(s1);
-		} 
+		    float s1 = *fp1 * INT32_MAX;
+		    ((t_alsa_sample32 *)alsa_snd_buf)[i] = CLIP32(s1);
+		}
+		n = alsa_outchannels * DEFDACBLKSIZE;
+		for (; i < n; i++)
+		    ((t_alsa_sample32 *)alsa_snd_buf)[i] = 0;
+	    }
+	    else
+	    {
+		for (i = 0, fp1 = fp; i < outchannels; i++,
+		    fp1 += DEFDACBLKSIZE)
+		{
+		    for (j = i, k = DEFDACBLKSIZE, fp2 = fp1; k--;
+			 j += alsa_outchannels, fp2++)
+		    {
+			float s1 = *fp2 * INT32_MAX;
+			((t_alsa_sample32 *)alsa_snd_buf)[j] = CLIP32(s1);
+		    } 
+		}
 	    }
 	}
 	else
@@ -506,13 +608,17 @@ int alsa_send_dacs(void)
 			s = 32767;
 		    else if (s < -32767)
 			s = -32767;
-		    ((t_alsa_sample16 *)alsa_buf)[j] = s;
+		    ((t_alsa_sample16 *)alsa_snd_buf)[j] = s;
 		}
 	    }
 	}
 
-	result = snd_pcm_writei(alsa_device.outhandle, alsa_buf,
-				outtransfersize);
+	if (alsa_device.outnoninterleave)
+	    result = snd_pcm_writen(alsa_device.outhandle, alsa_buf_ptrs,
+		outtransfersize);
+	else result = snd_pcm_writei(alsa_device.outhandle, alsa_snd_buf,
+		outtransfersize);
+
 	if (result != (int)outtransfersize)
 	{
     #ifdef DEBUG_ALSA_XFER
@@ -547,7 +653,11 @@ int alsa_send_dacs(void)
     /* do input */
     if (alsa_inchannels)
     {
-	result = snd_pcm_readi(alsa_device.inhandle, alsa_buf, intransfersize);
+    	if (alsa_device.innoninterleave)
+	    result = snd_pcm_readn(alsa_device.inhandle, alsa_buf_ptrs,
+	    	intransfersize);
+	else result = snd_pcm_readi(alsa_device.inhandle, alsa_snd_buf,
+	    	intransfersize);
 	if (result < (int)intransfersize)
 	{
 #ifdef DEBUG_ALSA_XFER
@@ -570,12 +680,23 @@ int alsa_send_dacs(void)
 	fp = sys_soundin;
 	if (alsa_samplewidth == 4)
 	{
-	    for (i = 0, fp1 = fp; i < inchannels; i++, fp1 += DEFDACBLKSIZE)
+	    if (alsa_device.innoninterleave)
 	    {
-		for (j = i, k = DEFDACBLKSIZE, fp2 = fp1; k--;
-		     j += alsa_inchannels, fp2++)
-	    	    *fp2 = (float) ((t_alsa_sample32 *)alsa_buf)[j]
-		    	* (1./ INT32_MAX);
+	    	int n = inchannels * DEFDACBLKSIZE;
+		for (i = 0, fp1 = fp; i < n; i++)
+	    	    *fp1 = (float) ((t_alsa_sample32 *)alsa_snd_buf)[i]
+		    	    * (1./ INT32_MAX);
+	    }
+	    else
+	    {
+		for (i = 0, fp1 = fp; i < inchannels;
+		    i++, fp1 += DEFDACBLKSIZE)
+		{
+		    for (j = i, k = DEFDACBLKSIZE, fp2 = fp1; k--;
+			 j += alsa_inchannels, fp2++)
+	    		*fp2 = (float) ((t_alsa_sample32 *)alsa_snd_buf)[j]
+		    	    * (1./ INT32_MAX);
+	    	}
 	    }
 	}
 	else
@@ -584,7 +705,7 @@ int alsa_send_dacs(void)
 	    {
 		for (j = i, k = DEFDACBLKSIZE, fp2 = fp1; k--;
 		    j += alsa_inchannels, fp2++)
-	    	    	*fp2 = (float) ((t_alsa_sample16 *)alsa_buf)[j]
+	    	    	*fp2 = (float) ((t_alsa_sample16 *)alsa_snd_buf)[j]
 		    	    * 3.051850e-05;
 	    }
     	}
@@ -638,12 +759,15 @@ void alsa_resync( void)
     	error("restart-audio: implemented for ALSA only.");
 	return;
     }
-    memset(alsa_buf, 0,
+    memset(alsa_snd_buf, 0,
     	sizeof(char) * alsa_samplewidth * DEFDACBLKSIZE * sys_outchannels);
     for (i = 0; i < 1000000; i++)
     {
-	result = snd_pcm_writei(alsa_device.outhandle, alsa_buf,
-	    DEFDACBLKSIZE);
+	if (alsa_device.outnoninterleave)
+	    result = snd_pcm_writen(alsa_device.outhandle, alsa_buf_ptrs,
+		DEFDACBLKSIZE);
+	else result = snd_pcm_writei(alsa_device.outhandle, alsa_snd_buf,
+		DEFDACBLKSIZE);
 	if (result != (int)DEFDACBLKSIZE)
 	    break;
     }
@@ -653,11 +777,15 @@ void alsa_resync( void)
 void alsa_putzeros(int n)
 {
     int i, result;
-    memset(alsa_buf, 0,
+    memset(alsa_snd_buf, 0,
     	sizeof(char) * alsa_samplewidth * DEFDACBLKSIZE * alsa_outchannels);
     for (i = 0; i < n; i++)
     {
-	result = snd_pcm_writei(alsa_device.outhandle, alsa_buf, DEFDACBLKSIZE);
+	if (alsa_device.outnoninterleave)
+	    result = snd_pcm_writen(alsa_device.outhandle, alsa_buf_ptrs,
+		DEFDACBLKSIZE);
+	else result = snd_pcm_writei(alsa_device.outhandle, alsa_snd_buf,
+		DEFDACBLKSIZE);
 #if 0
 	if (result != DEFDACBLKSIZE)
 	    post("result %d", result);
@@ -671,7 +799,8 @@ void alsa_getzeros(int n)
     int i, result;
     for (i = 0; i < n; i++)
     {
-	result = snd_pcm_readi(alsa_device.inhandle, alsa_buf, DEFDACBLKSIZE);
+	result = snd_pcm_readi(alsa_device.inhandle, alsa_snd_buf,
+	    DEFDACBLKSIZE);
 #if 0
 	if (result != DEFDACBLKSIZE)
 	    post("result %d", result);
@@ -771,7 +900,7 @@ void alsa_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int *canmulti, 
     	int maxndev, int devdescsize)
 {
-    int ndev = 0, cardno = -1;
+    int ndev = 0, cardno = -1, i, j;
     *canmulti = 0;  /* only one device; must be the same for input&output */
     while (!snd_card_next(&cardno) && cardno >= 0)
     {
@@ -805,5 +934,12 @@ void alsa_getdevs(char *indevlist, int *nindevs,
         sprintf(outdevlist + (2*ndev + 1) * devdescsize, "%s (plug-in)", desc);
 	ndev++;
     }
-    *nindevs = *noutdevs = 2 * ndev;
+    for (i = 0, j = 2*ndev; i < alsa_nnames; i++, j++)
+    {
+    	if (j >= maxndev)
+	    break;
+        snprintf(indevlist + j * devdescsize, devdescsize, "%s", 
+	    alsa_names[i]);
+    }
+    *nindevs = *noutdevs = j;
 }

@@ -123,6 +123,11 @@ pack .controls.dio -side right -padx 20
 
 bind . <Control-Key> {pdtk_pd_ctrlkey %W %K 0}
 bind . <Control-Shift-Key> {pdtk_pd_ctrlkey %W %K 1}
+if {$pd_nt == 2} {
+    bind . <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+    bind . <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+}
+
 
 wm title . "Pd"
 . configure -menu .mbar -width 200 -height 150
@@ -924,6 +929,10 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
     bind $name.c <Alt-Key> {pdtk_canvas_altkey %W %K %A}
 #    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
+    if {$pd_nt == 2} {
+	bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+	bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+    }
     bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
     bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
     bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
@@ -2641,6 +2650,15 @@ proc pdtk_pd_startup {version apilist} {
     set width7 [font measure  -*-courier-bold--normal--36-* x]
     set height7 [lindex [font metrics -*-courier-bold--normal--36-*] 5]
 
+    set tclpatch [info patchlevel]
+    if {$tclpatch == "8.3.0" || \
+    	$tclpatch == "8.3.1" || \
+	$tclpatch == "8.3.2" || \
+	$tclpatch == "8.3.3" } {
+    	set oldtclversion 1
+    } else {
+    	set oldtclversion 0
+    }
     pd [concat pd init [pdtk_enquote [pwd]] \
     	8 $width1 $height1 \
     	10 $width2 $height2 \
@@ -2649,7 +2667,7 @@ proc pdtk_pd_startup {version apilist} {
     	16 $width5 $height5 \
     	24 $width6 $height6 \
     	36 $width7 $height7 \
-    	\;];
+    	$oldtclversion \;];
 
     # add the audio and help menus to the Pd window.  We delayed this
     # so that we'd know the value of "apilist".

@@ -27,6 +27,8 @@ typedef long t_pa_sample;
 #define SYS_XFERSAMPS (SYS_DEFAULTCH*DEFDACBLKSIZE)
 #define SYS_XFERSIZE (SYS_SAMPLEWIDTH * SYS_XFERSAMPS)
 
+    /* these are set in this file when opening audio, but then may be reduced,
+    even to zero, in the system dependent open_audio routines. */
 int sys_inchannels;
 int sys_outchannels;
 int sys_advance_samples;    	/* scheduler advance in samples */
@@ -189,7 +191,7 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
 	else
 	{
 	    for (i = 0; i < MAXAUDIOINDEV; i++)
-      	        audioindev[i] = i+1;
+      	        audioindev[i] = i;
 	    naudioindev = nchindev;
 	}
     }
@@ -235,7 +237,7 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
 	else
 	{
 	    for (i = 0; i < MAXAUDIOOUTDEV; i++)
-      	        audiooutdev[i] = i+1;
+      	        audiooutdev[i] = i;
 	    naudiooutdev = nchoutdev;
 	}
     }

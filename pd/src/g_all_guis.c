@@ -173,152 +173,6 @@ t_symbol *iemgui_dollar2raute(t_symbol *s)
     else return (s);
 }
 
-t_symbol *iemgui_unique2dollarzero(t_symbol *s, int unique_num, int and_unique_flag)
-{
-    if(and_unique_flag)
-    {
-	int l=0;
-	char *b, str[144];
-
-	sprintf(str, "%d", unique_num);
-	while(str[l])
-	{
-	    if(s->s_name[l] != str[l])
-		return(s);
-	    else
-		l++;
-	}
-	str[0] = '$';
-	str[1] = '0';
-	str[2] = 0;
-	b = s->s_name + l;
-	if(strlen(b) >= IEM_MAX_SYM_LEN)
-	    strncat(str, b, IEM_MAX_SYM_LEN-1);
-	else
-	    strcat(str, b);
-	return(gensym(str));
-    }
-    else
-	return(s);
-}
-
-t_symbol *iemgui_sym2dollararg(t_symbol *s, int nth_arg, int tail_len)
-{
-    if(nth_arg)
-    {
-	char *b, str[144];
-	int i=(int)strlen(s->s_name) - tail_len;
-
-	sprintf(str, "_%d", nth_arg);
-	str[0] = '$';
-	if(i < 0) i = 0;
-	b = s->s_name + i;
-	strcat(str, b);
-	return(gensym(str));
-    }
-    else
-	return(s);
-}
-
-t_symbol *iemgui_dollarzero2unique(t_symbol *s, int unique_num)
-{
-    int l;
-    char *b, str[144];
-
-    sprintf(str, "%d", unique_num);
-    l = (int)strlen(s->s_name);
-    b = s->s_name + 2;
-    if(l < 2)
-	strcat(str, "shorty");
-    else if(l >= IEM_MAX_SYM_LEN)
-	strncat(str, b, IEM_MAX_SYM_LEN-1);
-    else
-	strcat(str, b);
-    return(gensym(str));
-}
-
-t_symbol *iemgui_dollararg2sym(t_symbol *s, int nth_arg, int tail_len, int pargc, t_atom *pargv)
-{
-    int l=(int)strlen(s->s_name);
-    char *b, str[288]="0";
-    t_symbol *s2;
-
-    if(pargc <= 0){}
-    else if(nth_arg < 1){}
-    else if(nth_arg > pargc){}
-    else if(IS_A_FLOAT(pargv, nth_arg-1))
-	sprintf(str, "%d", atom_getintarg(nth_arg-1, pargc, pargv));
-    else if(IS_A_SYMBOL(pargv, nth_arg-1))
-    {
-	s2 = atom_getsymbolarg(nth_arg-1, pargc, pargv);
-	strcpy(str, s2->s_name);
-    }
-    b = s->s_name + (l - tail_len);
-    if(l <= tail_len)
-	strcat(str, "shorty");
-    else if(l >= IEM_MAX_SYM_LEN)
-	strncat(str, b, IEM_MAX_SYM_LEN-1);
-    else
-	strcat(str, b);
-    return(gensym(str));
-}
-
-int iemgui_is_dollarzero(t_symbol *s)
-{
-    char *name=s->s_name;
-
-    if((int)strlen(name) >= 2)
-    {
-	if((name[0] == '$') && (name[1] == '0') && ((name[2] < '0') || (name[2] > '9')))
-	    return(1);
-    }
-    return(0);
-}
-
-int iemgui_is_dollararg(t_symbol *s, int *tail_len)
-{
-    char *name=s->s_name;
-
-    *tail_len = (int)strlen(name);
-    if(*tail_len >= 2)
-    {
-	if((name[0] == '$') && (name[1] >= '1') && (name[1] <= '9'))
-	{
-	    int i=2, arg=(int)(name[1]-'0');
-
-	    (*tail_len) -= 2;
-	    while(name[i] && (name[i] >= '0') && (name[i] <= '9'))
-	    {
-		arg *= 10;
-		arg += (int)(name[i]-'0');
-		i++;
-		(*tail_len)--;
-	    }
-	    return(arg);
-	}
-    }
-    return(0);
-}
-
-void iemgui_fetch_unique(t_iemgui *iemgui)
-{
-    if(!iemgui->x_unique_num)
-    {
-	pd_bind(&iemgui->x_glist->gl_gobj.g_pd, gensym("#X"));
-	iemgui->x_unique_num = canvas_getdollarzero();
-	pd_unbind(&iemgui->x_glist->gl_gobj.g_pd, gensym("#X"));
-    }
-}
-
-void iemgui_fetch_parent_args(t_iemgui *iemgui, int *pargc, t_atom **pargv)
-{
-    t_canvas *canvas=glist_getcanvas(iemgui->x_glist);
-
-    canvas_setcurrent(canvas);
-    canvas_getargs(pargc, pargv);
-    canvas_unsetcurrent(canvas);
-}
-
 void iemgui_verify_snd_ne_rcv(t_iemgui *iemgui)
 {
     iemgui->x_fsf.x_put_in2out = 1;
@@ -329,131 +183,85 @@ void iemgui_verify_snd_ne_rcv(t_iemgui *iemgui)
     }
 }
 
-void iemgui_all_unique2dollarzero(t_iemgui *iemgui, t_symbol **srlsym)
+t_symbol *iemgui_new_dogetname(t_iemgui *iemgui, int indx, t_atom *argv)
 {
-    iemgui_fetch_unique(iemgui);
-    srlsym[0] = iemgui_unique2dollarzero(srlsym[0], iemgui->x_unique_num,
-					  iemgui->x_fsf.x_snd_is_unique);
-    srlsym[1] = iemgui_unique2dollarzero(srlsym[1], iemgui->x_unique_num,
-					  iemgui->x_fsf.x_rcv_is_unique);
-    srlsym[2] = iemgui_unique2dollarzero(srlsym[2], iemgui->x_unique_num,
-					  iemgui->x_fsf.x_lab_is_unique);
+    if (IS_A_SYMBOL(argv, indx))
+	return (atom_getsymbolarg(indx, 100000, argv));
+    else if (IS_A_FLOAT(argv, indx))
+    {
+    	char str[80];
+	sprintf(str, "%d", (int)atom_getintarg(indx, 100000, argv));
+	return (gensym(str));
+    }
+    else return (gensym("empty"));
 }
 
-void iemgui_all_sym2dollararg(t_iemgui *iemgui, t_symbol **srlsym)
+void iemgui_new_getnames(t_iemgui *iemgui, int indx, t_atom *argv)
 {
-    srlsym[0] = iemgui_sym2dollararg(srlsym[0], iemgui->x_isa.x_snd_is_arg_num,
-				      iemgui->x_isa.x_snd_arg_tail_len);
-    srlsym[1] = iemgui_sym2dollararg(srlsym[1], iemgui->x_isa.x_rcv_is_arg_num,
-				      iemgui->x_isa.x_rcv_arg_tail_len);
-    srlsym[2] = iemgui_sym2dollararg(srlsym[2], iemgui->x_fsf.x_lab_is_arg_num,
-				      iemgui->x_fsf.x_lab_arg_tail_len);
+    if (argv)
+    {
+	iemgui->x_snd = iemgui_new_dogetname(iemgui, indx, argv);
+	iemgui->x_rcv = iemgui_new_dogetname(iemgui, indx+1, argv);
+	iemgui->x_lab = iemgui_new_dogetname(iemgui, indx+2, argv);
+    }
+    else iemgui->x_snd = iemgui->x_rcv = iemgui->x_lab = gensym("empty");
+    iemgui->x_snd_unexpanded = iemgui->x_rcv_unexpanded =
+    	iemgui->x_lab_unexpanded = 0;
+    iemgui->x_binbufindex = indx;
+    iemgui->x_labelbindex = indx + 3;
 }
 
-void iemgui_all_dollarzero2unique(t_iemgui *iemgui, t_symbol **srlsym)
-{
-    iemgui_fetch_unique(iemgui);
-    if(iemgui_is_dollarzero(srlsym[0]))
-    {
-	iemgui->x_fsf.x_snd_is_unique = 1;
-	iemgui->x_isa.x_snd_is_arg_num = 0;
-	iemgui->x_isa.x_snd_arg_tail_len = 0;
-	srlsym[0] = iemgui_dollarzero2unique(srlsym[0], iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_snd_is_unique = 0;
-    if(iemgui_is_dollarzero(srlsym[1]))
-    {
-	iemgui->x_fsf.x_rcv_is_unique = 1;
-	iemgui->x_isa.x_rcv_is_arg_num = 0;
-	iemgui->x_isa.x_rcv_arg_tail_len = 0;
-	srlsym[1] = iemgui_dollarzero2unique(srlsym[1], iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_rcv_is_unique = 0;
-    if(iemgui_is_dollarzero(srlsym[2]))
-    {
-	iemgui->x_fsf.x_lab_is_unique = 1;
-	iemgui->x_fsf.x_lab_is_arg_num = 0;
-	iemgui->x_fsf.x_lab_arg_tail_len = 0;
-	srlsym[2] = iemgui_dollarzero2unique(srlsym[2], iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_lab_is_unique = 0;
-}
-
+    /* convert symbols in "$" form to the expanded symbols */
 void iemgui_all_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym)
 {
-    int pargc, tail_len, nth_arg;
-    t_atom *pargv;
+    	/* save unexpanded ones for later */
+    iemgui->x_snd_unexpanded = srlsym[0];
+    iemgui->x_rcv_unexpanded = srlsym[1];
+    iemgui->x_lab_unexpanded = srlsym[2];
+    srlsym[0] = canvas_realizedollar(iemgui->x_glist, srlsym[0]);
+    srlsym[1] = canvas_realizedollar(iemgui->x_glist, srlsym[1]);
+    srlsym[2] = canvas_realizedollar(iemgui->x_glist, srlsym[2]);
+}
 
-    iemgui_fetch_parent_args(iemgui, &pargc, &pargv);
-    if(nth_arg = iemgui_is_dollararg(srlsym[0], &tail_len))
+    /* initialize a single symbol in unexpanded form.  We reach into the
+    binbuf to grab them; if there's nothing there, set it to the
+    fallback; if still nothing, set to "empty". */
+static void iemgui_init_sym2dollararg(t_iemgui *iemgui, t_symbol **symp,
+    int indx, t_symbol *fallback)
+{
+    if (!*symp)
     {
-	iemgui->x_isa.x_snd_is_arg_num = nth_arg;
-	iemgui->x_isa.x_snd_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_snd_is_unique = 0;
-	srlsym[0] = iemgui_dollararg2sym(srlsym[0], nth_arg, tail_len, pargc, pargv);
+    	t_binbuf *b = iemgui->x_obj.ob_binbuf;
+	if (binbuf_getnatom(b) > indx)
+	{
+    	    char buf[80];
+	    atom_string(binbuf_getvec(b) + indx, buf, 80);
+	    *symp = gensym(buf);
+	}
+	else if (fallback)
+	    *symp = fallback;
+	else *symp = gensym("empty");
     }
-    else
-    {
-	iemgui->x_isa.x_snd_is_arg_num = 0;
-	iemgui->x_isa.x_snd_arg_tail_len = 0;
-    }
-    if(nth_arg = iemgui_is_dollararg(srlsym[1], &tail_len))
-    {
-	iemgui->x_isa.x_rcv_is_arg_num = nth_arg;
-	iemgui->x_isa.x_rcv_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_rcv_is_unique = 0;
-	srlsym[1] = iemgui_dollararg2sym(srlsym[1], nth_arg, tail_len, pargc, pargv);
-    }
-    else
-    {
-	iemgui->x_isa.x_rcv_is_arg_num = 0;
-	iemgui->x_isa.x_rcv_arg_tail_len = 0;
-    }
-    if(nth_arg = iemgui_is_dollararg(srlsym[2], &tail_len))
-    {
-	iemgui->x_fsf.x_lab_is_arg_num = nth_arg;
-	iemgui->x_fsf.x_lab_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_lab_is_unique = 0;
-	srlsym[2] = iemgui_dollararg2sym(srlsym[2], nth_arg, tail_len, pargc, pargv);
-    }
-    else
-    {
-	iemgui->x_fsf.x_lab_is_arg_num = 0;
-	iemgui->x_fsf.x_lab_arg_tail_len = 0;
-    }
+}
+
+    /* get the unexpanded versions of the symbols; initialize them if
+    necessary. */
+void iemgui_all_sym2dollararg(t_iemgui *iemgui, t_symbol **srlsym)
+{
+    iemgui_init_sym2dollararg(iemgui, &iemgui->x_snd_unexpanded,
+    	iemgui->x_binbufindex+1, iemgui->x_snd);
+    iemgui_init_sym2dollararg(iemgui, &iemgui->x_rcv_unexpanded,
+    	iemgui->x_binbufindex+2, iemgui->x_rcv);
+    iemgui_init_sym2dollararg(iemgui, &iemgui->x_lab_unexpanded,
+    	iemgui->x_labelbindex, iemgui->x_lab);
+    srlsym[0] = iemgui->x_snd_unexpanded;
+    srlsym[1] = iemgui->x_rcv_unexpanded;
+    srlsym[2] = iemgui->x_lab_unexpanded;
 }
 
 void iemgui_first_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym)
 {
-    int pargc=0, tail_len, nth_arg;
-    t_atom pargv;
-    char *name;
-
-    SETFLOAT(&pargv, 0.0);
-    name = srlsym[0]->s_name;
-    if(iemgui->x_isa.x_snd_is_arg_num && (name[0] == '$')
-       && (name[1] >= '1') && (name[1] <= '9'))
-    {
-	srlsym[0] = iemgui_dollararg2sym(srlsym[0], iemgui->x_isa.x_snd_is_arg_num,
-					  iemgui->x_isa.x_snd_arg_tail_len, pargc, &pargv);
-    }
-    name = srlsym[1]->s_name;
-    if(iemgui->x_isa.x_rcv_is_arg_num && (name[0] == '$')
-       && (name[1] >= '1') && (name[1] <= '9'))
-    {
-	srlsym[1] = iemgui_dollararg2sym(srlsym[1], iemgui->x_isa.x_rcv_is_arg_num,
-					  iemgui->x_isa.x_rcv_arg_tail_len, pargc, &pargv);
-    }
-    name = srlsym[2]->s_name;
-    if(iemgui->x_fsf.x_lab_is_arg_num && (name[0] == '$')
-       && (name[1] >= '1') && (name[1] <= '9'))
-    {
-	srlsym[2] = iemgui_dollararg2sym(srlsym[2], iemgui->x_fsf.x_lab_is_arg_num,
-					  iemgui->x_fsf.x_lab_arg_tail_len, pargc, &pargv);
-    }
+    /* delete this function */
 }
 
 void iemgui_all_col2save(t_iemgui *iemgui, int *bflcol)
@@ -542,31 +350,12 @@ void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
         oldsndrcvable += IEM_GUI_OLD_SND_FLAG;
 
     if(!strcmp(s->s_name, "empty")) sndable = 0;
-    iemgui_fetch_unique(iemgui);
     snd = iemgui_raute2dollar(s);
-    if(iemgui_is_dollarzero(snd))
-    {
-	iemgui->x_fsf.x_snd_is_unique = 1;
-	iemgui->x_isa.x_snd_is_arg_num = 0;
-	iemgui->x_isa.x_snd_arg_tail_len = 0;
-	snd = iemgui_dollarzero2unique(snd, iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_snd_is_unique = 0;
-    iemgui_fetch_parent_args(iemgui, &pargc, &pargv);
-    if(nth_arg = iemgui_is_dollararg(snd, &tail_len))
-    {
-	iemgui->x_isa.x_snd_is_arg_num = nth_arg;
-	iemgui->x_isa.x_snd_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_snd_is_unique = 0;
-	snd = iemgui_dollararg2sym(snd, nth_arg, tail_len, pargc, pargv);
-    }
-    else
-    {
-	iemgui->x_isa.x_snd_is_arg_num = 0;
-	iemgui->x_isa.x_snd_arg_tail_len = 0;
-    }
-    iemgui->x_snd = snd;
+    iemgui->x_snd_unexpanded = snd;
+    iemgui->x_snd = snd = canvas_realizedollar(iemgui->x_glist, snd);
+        post("send: before %s, after %s", iemgui->x_snd_unexpanded->s_name,
+    	    iemgui->x_snd->s_name);
+
     iemgui->x_fsf.x_snd_able = sndable;
     iemgui_verify_snd_ne_rcv(iemgui);
     (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_IO + oldsndrcvable);
@@ -585,29 +374,8 @@ void iemgui_receive(void *x, t_iemgui *iemgui, t_symbol *s)
 
     if(!strcmp(s->s_name, "empty")) rcvable = 0;
     rcv = iemgui_raute2dollar(s);
-    iemgui_fetch_unique(iemgui);
-    if(iemgui_is_dollarzero(rcv))
-    {
-	iemgui->x_fsf.x_rcv_is_unique = 1;
-	iemgui->x_isa.x_rcv_is_arg_num = 0;
-	iemgui->x_isa.x_rcv_arg_tail_len = 0;
-	rcv = iemgui_dollarzero2unique(rcv, iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_rcv_is_unique = 0;
-    iemgui_fetch_parent_args(iemgui, &pargc, &pargv);
-    if(nth_arg = iemgui_is_dollararg(rcv, &tail_len))
-    {
-	iemgui->x_isa.x_rcv_is_arg_num = nth_arg;
-	iemgui->x_isa.x_rcv_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_rcv_is_unique = 0;
-	rcv = iemgui_dollararg2sym(rcv, nth_arg, tail_len, pargc, pargv);
-    }
-    else
-    {
-	iemgui->x_isa.x_rcv_is_arg_num = 0;
-	iemgui->x_isa.x_rcv_arg_tail_len = 0;
-    }
+    iemgui->x_rcv_unexpanded = rcv;
+    iemgui->x_rcv = rcv = canvas_realizedollar(iemgui->x_glist, rcv);
     if(rcvable)
     {
 	if(strcmp(rcv->s_name, iemgui->x_rcv->s_name))
@@ -635,32 +403,9 @@ void iemgui_label(void *x, t_iemgui *iemgui, t_symbol *s)
     t_atom *pargv;
 
     lab = iemgui_raute2dollar(s);
-    iemgui_fetch_unique(iemgui);
+    iemgui->x_lab_unexpanded = lab;
+    iemgui->x_lab = lab = canvas_realizedollar(iemgui->x_glist, lab);
 
-    if(iemgui_is_dollarzero(lab))
-    {
-	iemgui->x_fsf.x_lab_is_unique = 1;
-	iemgui->x_fsf.x_lab_is_arg_num = 0;
-	iemgui->x_fsf.x_lab_arg_tail_len = 0;
-	lab = iemgui_dollarzero2unique(lab, iemgui->x_unique_num);
-    }
-    else
-	iemgui->x_fsf.x_lab_is_unique = 0;
-
-    iemgui_fetch_parent_args(iemgui, &pargc, &pargv);
-    if(nth_arg = iemgui_is_dollararg(lab, &tail_len))
-    {
-	iemgui->x_fsf.x_lab_is_arg_num = nth_arg;
-	iemgui->x_fsf.x_lab_arg_tail_len = tail_len;
-	iemgui->x_fsf.x_lab_is_unique = 0;
-	lab = iemgui_dollararg2sym(lab, nth_arg, tail_len, pargc, pargv);
-    }
-    else
-    {
-	iemgui->x_fsf.x_lab_is_arg_num = 0;
-	iemgui->x_fsf.x_lab_arg_tail_len = 0;
-    }
-    iemgui->x_lab = lab;
     if(glist_isvisible(iemgui->x_glist))
 	sys_vgui(".x%x.c itemconfigure %xLABEL -text {%s} \n",
 		 glist_getcanvas(iemgui->x_glist), x,
@@ -782,7 +527,6 @@ void iemgui_save(t_iemgui *iemgui, t_symbol **srl, int *bflcol)
     srl[0] = iemgui->x_snd;
     srl[1] = iemgui->x_rcv;
     srl[2] = iemgui->x_lab;
-    iemgui_all_unique2dollarzero(iemgui, srl);
     iemgui_all_sym2dollararg(iemgui, srl);
     iemgui_all_col2save(iemgui, bflcol);
 }
@@ -792,7 +536,6 @@ void iemgui_properties(t_iemgui *iemgui, t_symbol **srl)
     srl[0] = iemgui->x_snd;
     srl[1] = iemgui->x_rcv;
     srl[2] = iemgui->x_lab;
-    iemgui_all_unique2dollarzero(iemgui, srl);
     iemgui_all_sym2dollararg(iemgui, srl);
     iemgui_all_dollar2raute(srl);
 }
@@ -840,7 +583,6 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     if(!strcmp(srl[0]->s_name, "empty")) sndable = 0;
     if(!strcmp(srl[1]->s_name, "empty")) rcvable = 0;
     iemgui_all_raute2dollar(srl);
-    iemgui_all_dollarzero2unique(iemgui, srl);
     iemgui_all_dollararg2sym(iemgui, srl);
     if(rcvable)
     {
@@ -885,74 +627,36 @@ void iem_inttosymargs(t_iem_init_symargs *symargp, int n)
 {
     memset(symargp, 0, sizeof(*symargp));
     symargp->x_loadinit = (n >>  0);
-    symargp->x_rcv_arg_tail_len = (n >>  1);
-    symargp->x_snd_arg_tail_len = (n >>  7);
-    symargp->x_rcv_is_arg_num = (n >> 13);
-    symargp->x_snd_is_arg_num = (n >> 19);
     symargp->x_scale = (n >>  20);
-    symargp->x_flashed = (n >> 21);
-    symargp->x_locked = (n >> 22);
-    symargp->x_reverse = (n >> 23);
-    symargp->dummy = (n >> 24);
+    symargp->x_flashed = 0;
+    symargp->x_locked = 0;
+    symargp->x_reverse = 0;
+    symargp->dummy = 0;
 }
 
 int iem_symargstoint(t_iem_init_symargs *symargp)
 {
     return (
-	((symargp->x_loadinit <<  0) |
-	(symargp->x_rcv_arg_tail_len <<  1) |
-	(symargp->x_snd_arg_tail_len <<  7) |
-	(symargp->x_rcv_is_arg_num << 13) |
-	(symargp->x_snd_is_arg_num << 19) |
-	(symargp->x_scale <<  20) |
-	(symargp->x_flashed << 21) |
-	(symargp->x_locked << 22) |
-	(symargp->x_reverse << 23) |
-	(symargp->dummy << 24)) & IEM_INIT_ARGS_ALL
-    );
+	(((symargp->x_loadinit & 1) <<  0) |
+	((symargp->x_scale & 1) <<  20)));
 }
 
 void iem_inttofstyle(t_iem_fstyle_flags *fstylep, int n)
 {
     memset(fstylep, 0, sizeof(*fstylep));
     fstylep->x_font_style = (n >> 0);
-    fstylep->x_rcv_able = (n >> 6);
-    fstylep->x_snd_able = (n >> 7);
-    fstylep->x_lab_is_unique = (n >> 8);
-    fstylep->x_rcv_is_unique = (n >> 9);
-    fstylep->x_snd_is_unique = (n >> 10);
-    fstylep->x_lab_arg_tail_len = (n >> 11);
-    fstylep->x_lab_is_arg_num = (n >> 17);
-    fstylep->x_shiftdown = (n >> 23);
-    fstylep->x_selected = (n >> 24);
-    fstylep->x_finemoved = (n >> 25);
-    fstylep->x_put_in2out = (n >> 26);
-    fstylep->x_change = (n >> 27);
-    fstylep->x_thick = (n >> 28);
-    fstylep->x_lin0_log1 = (n >> 29);
-    fstylep->x_steady = (n >> 30);
-    fstylep->dummy = (n >> 31);
+    fstylep->x_shiftdown = 0;
+    fstylep->x_selected = 0;
+    fstylep->x_finemoved = 0;
+    fstylep->x_put_in2out = 0;
+    fstylep->x_change = 0;
+    fstylep->x_thick = 0;
+    fstylep->x_lin0_log1 = 0;
+    fstylep->x_steady = 0;
+    fstylep->dummy = 0;
 }
 
 int iem_fstyletoint(t_iem_fstyle_flags *fstylep)
 {
-    return (
-	((fstylep->x_font_style << 0) |
-	(fstylep->x_rcv_able << 6) |
-	(fstylep->x_snd_able << 7) |
-	(fstylep->x_lab_is_unique << 8) |
-	(fstylep->x_rcv_is_unique << 9) |
-	(fstylep->x_snd_is_unique << 10) |
-	(fstylep->x_lab_arg_tail_len << 11) |
-	(fstylep->x_lab_is_arg_num << 17) |
-	(fstylep->x_shiftdown << 23) |
-	(fstylep->x_selected << 24) |
-	(fstylep->x_finemoved << 25) |
-	(fstylep->x_put_in2out << 26) |
-	(fstylep->x_change << 27) |
-	(fstylep->x_thick << 28) |
-	(fstylep->x_lin0_log1 << 29) |
-	(fstylep->x_steady << 30) |
-	(fstylep->dummy << 31)) & IEM_FSTYLE_FLAGS_ALL
-    );
+    return ((fstylep->x_font_style << 0) & 63);
 }

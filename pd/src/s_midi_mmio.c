@@ -79,8 +79,7 @@ static void msw_open_midiout(int nmidiout, int *midioutvec)
     for (i = 0; i < nmidiout; i++)
     {
     	MIDIOUTCAPS mocap;
-	int devno = (midioutvec[i] == DEFMIDIDEV ?
-	    MIDI_MAPPER : midioutvec[i]-1);
+	int devno =  midioutvec[i];
 	result = midiOutOpen(&hMidiOut[dev], devno, 0, 0, 
 	    CALLBACK_NULL);
     	wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap,
@@ -534,7 +533,7 @@ void msw_open_midiin(int nmidiin, int *midiinvec)
         lpCallbackInstanceData[i]->lpBuf = lpInputBuffer;
         
         wRtn = midiInOpen((LPHMIDIIN)&hMidiIn[ndev],
-              midiinvec[i] - 1,
+              midiinvec[i],
               (DWORD)midiInputHandler,
               (DWORD)lpCallbackInstanceData[ndev],
               CALLBACK_FUNCTION);
@@ -661,7 +660,8 @@ void sys_poll_midi(void)
     }
 }
 
-void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
+void sys_do_open_midi(int nmidiin, int *midiinvec,
+    int nmidiout, int *midioutvec)
 {
     if (nmidiout)
     	msw_open_midiout(nmidiout, midioutvec);
@@ -680,7 +680,7 @@ void sys_close_midi( void)
     msw_close_midiout();
 }
 
-
+#if 0
 /* list the audio and MIDI device names */
 void sys_listmididevs(void)
 {
@@ -712,4 +712,34 @@ void sys_listmididevs(void)
     	    "MIDI output device #%d: %s\n", i+1, mocap.szPname);
     }
 
+}
+#endif
+
+void midi_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int maxndev, int devdescsize)
+{
+    int i, nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
+    UINT  wRtn;
+    if (nin > maxndev)
+    	nin = maxndev;
+    for (i = 0; i < nin; i++)
+    {
+    	MIDIINCAPS micap;
+    	wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
+	strncpy(indevlist + i * devdescsize, 
+	    (wRtn ? "???" : micap.szPname), devdescsize);
+        indevlist[(i+1) * devdescsize - 1] = 0;
+    }
+    if (nout > maxndev)
+    	nout = maxndev;
+    for (i = 0; i < nout; i++)
+    {
+    	MIDIOUTCAPS mocap;
+    	wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
+	strncpy(outdevlist + i * devdescsize, 
+	    (wRtn ? "???" : mocap.szPname), devdescsize);
+        outdevlist[(i+1) * devdescsize - 1] = 0;
+    }
+    *nindevs = nin;
+    *noutdevs = nout;
 }

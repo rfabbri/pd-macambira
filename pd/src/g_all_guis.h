@@ -151,10 +151,14 @@ typedef struct _iemgui
     int                x_fcol;
     int                x_bcol;
     int                x_lcol;
-    int                x_unique_num;
-    t_symbol           *x_snd;
-    t_symbol           *x_rcv;
-    t_symbol           *x_lab;
+    t_symbol           *x_snd;	    	    /* send symbol */
+    t_symbol           *x_rcv;	    	    /* receive */
+    t_symbol           *x_lab;	    	    /* label */
+    t_symbol	       *x_snd_unexpanded;   /* same 3, with '$' unexpanded */
+    t_symbol	       *x_rcv_unexpanded;
+    t_symbol	       *x_lab_unexpanded;
+    int                x_binbufindex;	    /* where in binbuf to find these */
+    int                x_labelbindex;	    /* where in binbuf to find label */
 } t_iemgui;
 
 typedef struct _iemguidummy
@@ -289,6 +293,8 @@ EXTERN void iemgui_verify_snd_ne_rcv(t_iemgui *iemgui);
 EXTERN void iemgui_all_unique2dollarzero(t_iemgui *iemgui, t_symbol **srlsym);
 EXTERN void iemgui_all_sym2dollararg(t_iemgui *iemgui, t_symbol **srlsym);
 EXTERN void iemgui_all_dollarzero2unique(t_iemgui *iemgui, t_symbol **srlsym);
+EXTERN t_symbol *iemgui_new_dogetname(t_iemgui *iemgui, int indx, t_atom *argv);
+EXTERN void iemgui_new_getnames(t_iemgui *iemgui, int indx, t_atom *argv);
 EXTERN void iemgui_all_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym);
 EXTERN void iemgui_first_dollararg2sym(t_iemgui *iemgui, t_symbol **srlsym);
 EXTERN void iemgui_all_col2save(t_iemgui *iemgui, int *bflcol);

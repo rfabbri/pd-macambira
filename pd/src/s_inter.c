@@ -47,6 +47,15 @@ typedef int pid_t;
 #define DEBUG_MESSUP 1	    /* messages up from pd to pd-gui */
 #define DEBUG_MESSDOWN 2    /* messages down from pd-gui to pd */
 
+/* T.Grill - make it a _little_ more adaptable... */
+#ifndef PDBINDIR
+#define PDBINDIR "bin/"
+#endif
+
+#ifndef WISHAPP
+#define WISHAPP "wish83.exe"
+#endif
+
 extern char pd_version[];
 
 typedef struct _fdpoll
@@ -439,7 +448,7 @@ static void sys_signal(int signo, sighandler_t sigfun)
     action.sa_flags = 0;
     action.sa_handler = sigfun;
     memset(&action.sa_mask, 0, sizeof(action.sa_mask));
-#ifdef __linux__
+#if 0  /* GG says: don't use that */
     action.sa_restorer = 0;
 #endif
     if (sigaction(signo, &action, 0) < 0)
@@ -570,7 +579,7 @@ int sys_startgui(const char *guidir)
     signal(SIGPIPE, sys_exithandler);
     signal(SIGALRM, SIG_IGN);
     signal(SIGTERM, SIG_IGN);
-#ifdef __linux__
+#if 0  /* GG says: don't use that */
     signal(SIGSTKFLT, sys_exithandler);
 #endif
 #endif
@@ -596,7 +605,8 @@ int sys_startgui(const char *guidir)
     	SETSYMBOL(zz, gensym(cmdbuf));
 	for (i = 1; i < 22; i++)
 	    SETFLOAT(zz + i, defaultfontshit[i-1]);
-    	glob_initfromgui(0, 0, 22, zz);
+	SETFLOAT(zz+22,0);
+    	glob_initfromgui(0, 0, 23, zz);
     }
     else
     {
@@ -741,16 +751,16 @@ int sys_startgui(const char *guidir)
     	
     	strcpy(scriptbuf, "\"");
     	strcat(scriptbuf, sys_libdir->s_name);
-    	strcat(scriptbuf, "/bin/pd.tk\"");
+    	strcat(scriptbuf, "/" PDBINDIR "pd.tk\"");
     	sys_bashfilename(scriptbuf, scriptbuf);
     	
 		sprintf(portbuf, "%d", portno);
 
     	strcpy(wishbuf, sys_libdir->s_name);
-    	strcat(wishbuf, "/bin/wish83.exe");
+    	strcat(wishbuf, "/" PDBINDIR WISHAPP);
     	sys_bashfilename(wishbuf, wishbuf);
     	
-     	spawnret = _spawnl(P_NOWAIT, wishbuf, "wish83", scriptbuf, portbuf, 0);
+     	spawnret = _spawnl(P_NOWAIT, wishbuf, WISHAPP, scriptbuf, portbuf, 0);
     	if (spawnret < 0)
     	{
     	    perror("spawnl");
@@ -891,13 +901,13 @@ int sys_pollgui(void)
     return (sys_domicrosleep(0, 1) || sys_poll_togui());
 }
 
+
 /* T.Grill - import clean quit function */
 extern void sys_exit(void);
 
 /* This is called when something bad has happened, like a segfault.
 Call glob_quit() below to exit cleanly.
 LATER try to save dirty documents even in the bad case. */
-
 void sys_bail(int n)
 {
     static int reentered = 0;

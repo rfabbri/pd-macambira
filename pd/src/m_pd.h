@@ -623,11 +623,14 @@ defined, there is a "te_xpix" field in objects, not a "te_xpos" as before: */
 
 #define PD_USE_TE_XPIX
 
-/* a test for NANs and denormals.  Shouldn't be necessary on Mac but can't
-test this just now. */
+/* a test for NANs and denormals.  Should only be necessary on i386. */
 
+#ifdef __i386__
 #define PD_BADFLOAT(f) ((((*(unsigned int*)&(f))&0x7f800000)==0) || \
     (((*(unsigned int*)&(f))&0x7f800000)==0x7f800000))
+#else
+#define PD_BADFLOAT(f) 0
+#endif
 
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 }

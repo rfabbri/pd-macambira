@@ -542,17 +542,11 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 {
     t_vradio *x = (t_vradio *)pd_new(old? vradio_old_class : vradio_class);
     int bflcol[]={-262144, -1, -1};
-    t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
     int ldx=0, ldy=-6, chg=1, num=8;
     int fs=8;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
     char str[144];
-
-    /* post("new %s %d", s->s_name, old); */
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
 
     if((argc == 15)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)&&IS_A_FLOAT(argv,2)
        &&IS_A_FLOAT(argv,3)
@@ -567,27 +561,7 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 	chg = (int)atom_getintarg(1, argc, argv);
 	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(2, argc, argv));
 	num = (int)atom_getintarg(3, argc, argv);
-	if(IS_A_SYMBOL(argv,4))
-	    srl[0] = atom_getsymbolarg(4, argc, argv);
-	else if(IS_A_FLOAT(argv,4))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(4, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,5))
-	    srl[1] = atom_getsymbolarg(5, argc, argv);
-	else if(IS_A_FLOAT(argv,5))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(5, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,6))
-	    srl[2] = atom_getsymbolarg(6, argc, argv);
-	else if(IS_A_FLOAT(argv,6))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(6, argc, argv));
-	    srl[2] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 4, argv);
 	ldx = (int)atom_getintarg(7, argc, argv);
 	ldy = (int)atom_getintarg(8, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(9, argc, argv));
@@ -597,17 +571,19 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 	bflcol[2] = (int)atom_getintarg(13, argc, argv);
 	on = (int)atom_getintarg(14, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 4, 0);
     x->x_gui.x_draw = (t_iemfunptr)vradio_draw;
     x->x_gui.x_fsf.x_snd_able = 1;
     x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+    	x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
     if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_unique_num = 0;
     if(num < 1)
 	num = 1;
     if(num > IEM_RADIO_MAX)
@@ -623,11 +599,8 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 	x->x_on = 0;
     x->x_on_old = x->x_on;
     x->x_change = (chg==0)?0:1;
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if (x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
     if(fs < 4)

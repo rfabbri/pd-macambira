@@ -174,24 +174,36 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     t_gobj *y;
     float basex, basey;
     scalar_getbasexy(x, &basex, &basey);
-    for (y = templatecanvas->gl_list; y; y = y->g_next)
+    	/* if someone deleted the template canvas, we're just a point */
+    if (!templatecanvas)
     {
-	t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-    	int nx1, ny1, nx2, ny2;
-	if (!wb) continue;
-	(*wb->w_parentgetrectfn)(y, owner,
-	    x->sc_vec, template, basex, basey,
-	    &nx1, &ny1, &nx2, &ny2);
-	if (hit)
-	{
-	    if (nx1 < x1) x1 = nx1;
-	    if (ny1 < y1) y1 = ny1;
-	    if (nx2 > x2) x2 = nx2;
-	    if (ny2 > y2) y2 = ny2;
-	}
-	else x1 = nx1, y1 = ny1, x2 = nx2, y2 = ny2, hit = 1;
+    	x1 = x2 = glist_xtopixels(owner, basex);
+    	y1 = y2 = glist_ytopixels(owner, basey);
     }
-    if (!hit) x1 = y1 = x2 = y2 = 0;
+    else
+    {
+    	int hit = 0;
+    	x1 = y1 = 0x7fffffff;
+	x2 = y2 = -0x7fffffff;
+    	for (y = templatecanvas->gl_list; y; y = y->g_next)
+	{
+	    t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+    	    int nx1, ny1, nx2, ny2;
+	    if (!wb) continue;
+	    (*wb->w_parentgetrectfn)(y, owner,
+		x->sc_vec, template, basex, basey,
+		&nx1, &ny1, &nx2, &ny2);
+	    if (hit)
+	    {
+		if (nx1 < x1) x1 = nx1;
+		if (ny1 < y1) y1 = ny1;
+		if (nx2 > x2) x2 = nx2;
+		if (ny2 > y2) y2 = ny2;
+	    }
+	    else x1 = nx1, y1 = ny1, x2 = nx2, y2 = ny2, hit = 1;
+	}
+	if (!hit) x1 = y1 = x2 = y2 = 0;
+    }
     /* post("scalar x1 %d y1 %d x2 %d y2 %d", x1, y1, x2, y2); */
     *xp1 = x1;
     *yp1 = y1;
@@ -208,6 +220,7 @@ static void scalar_select(t_gobj *z, t_glist *owner, int state)
     {
     	int x1, y1, x2, y2;
     	scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
+	x1--; x2++; y1--; y2++;
     	sys_vgui(".x%x.c create line %d %d %d %d %d %d %d %d %d %d \
 	    -width 0 -fill blue -tags select%x\n",
     	    	glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
@@ -266,12 +279,20 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
     t_canvas *templatecanvas = template_findcanvas(template);
     t_gobj *y;
     float basex, basey;
+    scalar_getbasexy(x, &basex, &basey);
+    	/* if we don't know how to draw it, make a small rectangle */
     if (!templatecanvas)
     {
-    	bug("scalar_vis");  /* it's still a bug, have to fix this for real... */
-    	return; /* proposed by Krzysztof Czaja to avoid crashing */
+    	if (vis)
+	{
+	    int x1 = glist_xtopixels(owner, basex);
+	    int y1 = glist_ytopixels(owner, basey);
+    	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags scalar%x\n",
+    	    	glist_getcanvas(owner), x1-1, y1-1, x1+1, y1+1, x);
+    	}
+	else sys_vgui(".x%x.c delete scalar%x\n", glist_getcanvas(owner), x);
+    	return;
     }
-    scalar_getbasexy(x, &basex, &basey);
 
     for (y = templatecanvas->gl_list; y; y = y->g_next)
     {
@@ -330,7 +351,7 @@ static void scalar_properties(t_gobj *z, struct _glist *owner)
     b = glist_writetobinbuf(owner, 0);
     binbuf_gettext(b, &buf, &bufsize);
     binbuf_free(b);
-    t_resizebytes(buf, bufsize, bufsize+1);
+    buf = t_resizebytes(buf, bufsize, bufsize+1);
     buf[bufsize] = 0;
     sprintf(buf2, "pdtk_data_dialog %%s {");
     gfxstub_new((t_pd *)owner, x, buf2);

@@ -261,7 +261,6 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_my_canvas *x = (t_my_canvas *)pd_new(my_canvas_class);
     int bflcol[]={-233017, -1, -66577};
-    t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, w=100, h=60;
     int ldx=20, ldy=12, f=2, i=0;
     int fs=14;
@@ -269,9 +268,6 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
 
     if(((argc >= 10)&&(argc <= 13))
        &&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)&&IS_A_FLOAT(argv,2))
@@ -283,32 +279,14 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     if((argc >= 12)&&(IS_A_SYMBOL(argv,3)||IS_A_FLOAT(argv,3))&&(IS_A_SYMBOL(argv,4)||IS_A_FLOAT(argv,4)))
     {
 	i = 2;
-	if(IS_A_SYMBOL(argv,3))
-	    srl[0] = atom_getsymbolarg(3, argc, argv);
-	else if(IS_A_FLOAT(argv,3))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(3, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,4))
-	    srl[1] = atom_getsymbolarg(4, argc, argv);
-	else if(IS_A_FLOAT(argv,4))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(4, argc, argv));
-	    srl[1] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 3, argv);
     }
     else if((argc == 11)&&(IS_A_SYMBOL(argv,3)||IS_A_FLOAT(argv,3)))
     {
 	i = 1;
-	if(IS_A_SYMBOL(argv,3))
-	    srl[1] = atom_getsymbolarg(3, argc, argv);
-	else if(IS_A_FLOAT(argv,3))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(3, argc, argv));
-	    srl[1] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 3, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 3, 0);
 
     if(((argc >= 10)&&(argc <= 13))
        &&(IS_A_SYMBOL(argv,i+3)||IS_A_FLOAT(argv,i+3))&&IS_A_FLOAT(argv,i+4)
@@ -336,9 +314,10 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     x->x_gui.x_fsf.x_snd_able = 1;
     x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+    	x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
     if(a < 1)
 	a = 1;
     x->x_gui.x_w = a;
@@ -353,11 +332,8 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if (x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
     if(fs < 4)

@@ -137,6 +137,11 @@ static int lastone(char *s, int c, int n)
 #define UPBUFSIZE 4000
 #define BOXWIDTH 60
 
+/* Older (pre-8.3.4) TCL versions handle text selection differently; this
+flag is set from the GUI if this happens.  LATER take this out: early 2006? */
+
+extern int sys_oldtclversion;	    	
+
 static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     int *indexp)
 {
@@ -229,13 +234,7 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     		sys_vgui(".x%x.c select from %s %d\n", canvas, 
     	    	    x->x_tag, x->x_selstart);
     		sys_vgui(".x%x.c select to %s %d\n", canvas, 
-    	    	    x->x_tag, x->x_selend
-#if defined (MSW) || defined(MACOSX)
-    	    /* Why is linux selecting text differently from MSW and OSX???
-	    	Just adjust it here... LATER revisit this one */
-			-1
-#endif
-			);
+    	    	    x->x_tag, x->x_selend + (sys_oldtclversion ? 0 : -1));
 	    	sys_vgui(".x%x.c focus \"\"\n", canvas);	
     	    }
 	    else

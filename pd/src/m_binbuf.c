@@ -446,7 +446,6 @@ void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
     t_atom *at = x->b_vec;
     int ac = x->b_n;
     int nargs;
-    
     while (1)
     {
     	t_pd *nexttarget;

@@ -1,14 +1,14 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(d_arithmetic.c)
 
-AC_SUBST(alsa)
-AC_SUBST(jack)
+AC_SUBST(alsa, yes)
+AC_SUBST(jack, no)
+AC_SUBST(portaudio, no)
 AC_SUBST(PDLIB)
-AC_SUBST(DEFINES)
 AC_SUBST(MORECFLAGS)
 AC_SUBST(EXT)
 AC_SUBST(OPT_CFLAGS)
-AC_SUBST(USE_OPT_CFLAGS)
+AC_SUBST(USE_OPT_CFLAGS, yes)
 AC_SUBST(SYSSRC)
 AC_SUBST(STRIPFLAG)
 AC_SUBST(GUINAME)
@@ -24,8 +24,12 @@ AC_ARG_ENABLE(alsa,    [  --disable-alsa          disable ALSA],
     alsa="no")
 AC_ARG_ENABLE(jack,    [  --enable-jack           jack audio server],
     jack="yes")
+AC_ARG_ENABLE(portaudio,    [  --enable-portaudio      portaudio],
+    portaudio="yes")
 AC_ARG_ENABLE(debug,   [  --enable-debug          debugging support],
-    USE_OPT_CFLAGS="NO", USE_OPT_CFLAGS="YES")
+    USE_OPT_CFLAGS="no")
+AC_ARG_ENABLE(static,   [  --enable-static         link statically],
+    static=yes)
     
 dnl Checks for programs.
 AC_PROG_CC
@@ -67,10 +71,6 @@ dnl Checking for `pthread_create' function in -pthread
 AC_CHECK_LIB(pthread, pthread_create,PDLIB="$PDLIB -lpthread",
          echo "pthreads required" || exit 1)
 
-dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
-if test "$alsa" != no; then
-    AC_CHECK_LIB(asound,snd_pcm_info,PDLIB="$PDLIB -lasound" ; alsa="yes",alsa="")
-fi
 
 dnl Find paths to includes and libraries for X11
 AC_PATH_X
@@ -80,26 +80,15 @@ AC_CHECK_LIB(X11, XCreateWindow, LIBS="$LIBS -lX11 -L$x_libraries",
 
 dnl look for tcl 8.x... do I really have to go through all this!?
 
-#AC_CHECK_HEADER(tcl.h,, echo "no tcl/tk header found" || exit 1)
-
-#	FreeBSD has lots of libs there ...
-LIBS="$LIBS -L/usr/local/lib"
-
 foundit=no
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(tcl.h,foundit=yes,)
 fi
-
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(tcl8.7/tcl.h,
     	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.7";foundit=yes,)
-fi
-if test $foundit == "no";
-then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.7/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";foundit=yes,)
 fi
 if test $foundit == "no";
 then
@@ -108,21 +97,9 @@ then
 fi
 if test $foundit == "no";
 then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.6/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";foundit=yes,)
-fi
-
-if test $foundit == "no";
-then
     AC_CHECK_HEADER(tcl8.5/tcl.h,
     	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.5";foundit=yes,)
 fi
-if test $foundit == "no";
-then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.5/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";foundit=yes,)
-fi
-
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(tcl8.4/tcl.h,
@@ -130,21 +107,9 @@ then
 fi
 if test $foundit == "no";
 then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.4/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";foundit=yes,)
-fi
-
-if test $foundit == "no";
-then
     AC_CHECK_HEADER(tcl8.3/tcl.h,
     	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.3";foundit=yes,)
 fi
-if test $foundit == "no";
-then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.3/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";foundit=yes,)
-fi
-
 if test $foundit == "no";
 then
     AC_CHECK_HEADER(tcl8.2/tcl.h,
@@ -152,67 +117,64 @@ then
 fi
 if test $foundit == "no";
 then
-    AC_CHECK_HEADER(/usr/local/include/tcl8.2/tcl.h,
-    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";foundit=yes,)
-fi
-
-if test $foundit == "no";
-then
     echo no tcl header found
     exit -1
 fi
 
-
-
 AC_CHECK_LIB(tcl8.7, main,,
-AC_CHECK_LIB(tcl87, main,LIBS="$LIBS -ltcl87",
     AC_CHECK_LIB(tcl8.6, main,,
-	AC_CHECK_LIB(tcl86, main,LIBS="$LIBS -ltcl86",
-		AC_CHECK_LIB(tcl8.5, main,,
-		AC_CHECK_LIB(tcl85, main,LIBS="$LIBS -ltcl85",
-		    AC_CHECK_LIB(tcl8.4, main,,
-			AC_CHECK_LIB(tcl84, main,LIBS="$LIBS -ltcl84",
-				AC_CHECK_LIB(tcl8.3, main,,
-				AC_CHECK_LIB(tcl83, main,LIBS="$LIBS -ltcl83",
-				    AC_CHECK_LIB(tcl8.2, main,,
-					AC_CHECK_LIB(tcl82, main,LIBS="$LIBS -ltcl82",
-	  					AC_CHECK_LIB(tcl81, main,,
-						AC_CHECK_LIB(tcl81, main,LIBS="$LIBS -ltcl81",
-							AC_CHECK_LIB(tcl80, main,LIBS="$LIBS -ltcl80",
-					 		AC_CHECK_LIB(tcl8.0, main))))))))))))))))
-
+	AC_CHECK_LIB(tcl8.5, main,,
+	    AC_CHECK_LIB(tcl8.4, main,,
+		AC_CHECK_LIB(tcl8.3, main,,
+		    AC_CHECK_LIB(tcl8.2, main,,
+        		AC_CHECK_LIB(tcl8.0, main,,echo no tcl library found || exit 1)))))))
 
 AC_CHECK_LIB(tk8.7, main,,
-AC_CHECK_LIB(tk87, main,LIBS="$LIBS -ltk87",
     AC_CHECK_LIB(tk8.6, main,,
-	AC_CHECK_LIB(tk86, main,LIBS="$LIBS -ltk86",
-		AC_CHECK_LIB(tk8.5, main,,
-		AC_CHECK_LIB(tk85, main,LIBS="$LIBS -ltk85",
-		    AC_CHECK_LIB(tk8.4, main,,
-			AC_CHECK_LIB(tk84, main,LIBS="$LIBS -ltk84",
-				AC_CHECK_LIB(tk8.3, main,,
-				AC_CHECK_LIB(tk83, main,LIBS="$LIBS -ltk83",
-				    AC_CHECK_LIB(tk8.2, main,,
-					AC_CHECK_LIB(tk82, main,LIBS="$LIBS -ltk82",
-	  					AC_CHECK_LIB(tk81, main,,
-						AC_CHECK_LIB(tk81, main,LIBS="$LIBS -ltk81",
-							AC_CHECK_LIB(tk80, main,LIBS="$LIBS -ltk80",
-					 		AC_CHECK_LIB(tk8.0, main))))))))))))))))
+	AC_CHECK_LIB(tk8.5, main,,
+	    AC_CHECK_LIB(tk8.4, main,,
+		AC_CHECK_LIB(tk8.3, main,,
+		    AC_CHECK_LIB(tk8.2, main,,
+        		AC_CHECK_LIB(tk8.0, main,,echo no tk library found || exit 1)))))))
 
-
-dnl Checking for tk.h or tkstep.h - not used at the moment
-dnl AC_CHECK_HEADER(tk.h,DEFINES="$DEFINES -DTKINC=\\\"tk.h\\\"")
-dnl AC_CHECK_HEADER(tkstep.h,DEFINES="$DEFINES -DTKINC=\\\"tkstep.h\\\"")
 
 if test `uname -s` = Linux;
 then
+    dnl Ckecking for ALSA
+
+dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
+    if test x$alsa == xyes; then
+	echo yes ... alsa is... $alsa
+	AC_CHECK_LIB(asound,snd_pcm_info,PDLIB="$PDLIB -lasound" ; alsa="yes",alsa="no")
+    fi
+
+    dnl Checking for JACK
+
+    AC_CHECK_LIB(rt,shm_open,LIBS="$LIBS -lrt")
+    AC_CHECK_LIB(jack,jack_set_xrun_callback,LIBS="$LIBS -ljack";jack=xrun,jack=no)
+    AC_CHECK_LIB(jack,jack_set_error_function,LIBS="$LIBS -ljack";jack=yes,jack=no)
+
     LDFLAGS="-Wl,-export-dynamic"
+    if test "$static" = "yes"; then 
+      LDFLAGS="$LDFLAGS -static"
+    fi 
     EXT=pd_linux
-    MORECFLAGS="-DDL_OPEN -DUSEAPI_PORTAUDIO -DPA_USE_OSS -DPA_LITTLE_ENDIAN \
+    MORECFLAGS="-DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN \
     	 -DUSEAPI_OSS \
         -I../portaudio/pa_common \
-        -I../portaudio/pablio -I../portaudio/portmidi-macosx -Werror"
-    SYSSRC="s_midi_oss.c s_audio_pa.c s_audio_oss.c \
+        -I../portaudio/pablio -I../portaudio/portmidi-macosx \
+	-fno-strict-aliasing"
+    SYSSRC="s_midi_oss.c s_audio_oss.c"
+    if test x$alsa == "xyes";
+    then
+    	SYSSRC=$SYSSRC" s_audio_alsa.c"
+	MORECFLAGS=$MORECFLAGS" -DPA_USE_ALSA -DUSEAPI_ALSA"
+	LDFLAGS=$LDFLAGS" -lasound"
+    fi
+    if test x$portaudio == "xyes";
+    then
+    	MORECFLAGS="-DUSEAPI_PORTAUDIO "$MORECFLAGS
+	SYSSRC="s_audio_pa.c \
 	../portaudio/pa_common/pa_allocation.c  \
 	../portaudio/pa_common/pa_converters.c  \
 	../portaudio/pa_common/pa_cpuload.c     \
@@ -226,62 +188,24 @@ then
 	../portaudio/pablio/ringbuffer_pd.c     \
 	../portaudio/pa_unix/pa_unix_hostapis.c \
 	../portaudio/pa_unix/pa_unix_util.c     \
-	../portaudio/pa_unix_oss/pa_unix_oss.c "
+	../portaudio/pa_unix_oss/pa_unix_oss.c "$SYSSRC
+	if test x$alsa == "xyes";
+	then
+	    SYSSRC=$SYSSRC" \
+    	    ../portaudio/pa_linux_alsa/callback_thread.c \
+    	    ../portaudio/pa_linux_alsa/pa_linux_alsa.c \
+    	    ../portaudio/pa_linux_alsa/blocking_calls.c "
+    	fi
+    fi
     STRIPFLAG=-s
     GUINAME="pd-gui"
-    if test $USE_OPT_CFLAGS == "YES";
+    if test x$USE_OPT_CFLAGS == "xyes";
     then
 	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
     else
 	OPT_CFLAGS="-g"
     fi
-    OSNUMBER=0
-fi
-
-dnl FreeBSD hack
-if test `uname -s` = FreeBSD;
-then
-    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib/pth -lpthread"
-    EXT=pd_linux
-    MORECFLAGS="-DDL_OPEN  -DUSEAPI_OSS"
-    CFLAGS="$CFLAGS -I/usr/local/include"
-    SYSSRC="s_midi_oss.c s_audio_oss.c "
-    STRIPFLAG=-s
-    GUINAME="pd-gui"
-	GUIFLAGS="$GUIFLAGS -I/usr/X11R6/include -I/usr/local/include"
-    if test $USE_OPT_CFLAGS == "YES";
-    then
-	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
-    else
-	OPT_CFLAGS="-g"
-    fi
-    OSNUMBER=0
-fi
-
-
-dnl **** note -- SGI/IRIX code is broken here!!! ***
-
-if test `uname -s` = IRIX64;
-then
-    LDFLAGS="-n32 -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
-	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
-	-shared -rdata_shared"
-    EXT=pd_irix6
-    MORECFLAGS=-DDL_OPEN
-    SYSSRC=s_sgi.c
-    STRIPFLAG=-s
-    GUINAME="pd-gui"
-    OSNUMBER=0
-fi
-
-if test `uname -s` = IRIX32;
-then
-    LDFLAGS="-o32 -DUNIX -DIRIX -O2 -shared -rdata_shared"
-    EXT=pd_irix5
-    MORECFLAGS=-DDL_OPEN
-    SYSSRC=s_sgi.c
-    STRIPFLAG=-s
-    GUINAME="pd-gui"
+    echo OPT_CFLAGS --------------- $OPT_CFLAGS
     OSNUMBER=0
 fi
 
@@ -315,7 +239,7 @@ then
         -I/Library/Frameworks/Tk.framework/Versions/Current/Headers \
         -I/Library/Frameworks/Tcl.framework/Versions/Current/Headers \
         -I/Library/Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
-    if test $USE_OPT_CFLAGS == "YES";
+    if test x$USE_OPT_CFLAGS == "xyes";
     then
 	OPT_CFLAGS="-O2"
     else
@@ -323,6 +247,38 @@ then
     fi
     OSNUMBER=2
     EXTERNTARGET=pd_darwin
+    if test x$jack == "xyes";
+    then
+    	LDFLAGS=$LDFLAGS" -framework Jack"
+	MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
+	SYSSRC=$SYSSRC" s_audio_jack.c"
+    fi
+fi
+
+# support for jack, on either linux or darwin:
+if test x$jack == "xyes";
+then
+    MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
+    SYSSRC=$SYSSRC" s_audio_jack.c"
+    LDFLAGS=$LDFLAGS" -lrt -ljack"
+fi
+if test x$jack == "xrun";
+then
+    MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK -DJACK_XRUN"
+    SYSSRC=$SYSSRC" s_audio_jack.c"
+    LDFLAGS=$LDFLAGS" -lrt -ljack"
+fi
+
+# extra flags for alpha machines
+if test `uname -m | awk '{print $1}'` = alpha;
+then
+    MORECFLAGS=$MORECFLAGS" -mieee -mcpu=ev56"
+fi
+
+# test for compaq compiler---not sure what this does or how to test it.
+if test x$CC == xccc;
+then
+    MORECFLAGS=$MORECFLAGS"  -g3 -D__COMPAQC__ -arch host"
 fi
 
 AC_OUTPUT(makefile)

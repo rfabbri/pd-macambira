@@ -5,18 +5,7 @@
 
 /* this file inputs and outputs audio using the OSS API available on linux. */
 
-#ifdef __linux__
 #include <linux/soundcard.h>
-#endif
-
-#ifdef __FreeBSD__
-#include <sys/soundcard.h>
-#include <sys/mman.h>
-#endif
-
-
-
-
 
 #include "m_pd.h"
 #include "s_stuff.h"
@@ -276,7 +265,7 @@ static int oss_setchannels(int fd, int wantchannels, char *devname)
     return (0);
 }
 
-#define O_AUDIOFLAG 0 /* O_NDELAY */
+#define O_AUDIOFLAG O_NDELAY
 
 int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     int noutdev, int *outdev, int nchout, int *chout, int rate)
@@ -284,7 +273,7 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     int capabilities = 0;
     int inchannels = 0, outchannels = 0;
     char devname[20];
-    int n, i, fd;
+    int n, i, fd, flags;
     char buf[OSS_MAXSAMPLEWIDTH * DEFDACBLKSIZE * OSS_MAXCHPERDEV];
     int num_devs = 0;
     int wantmore=0;
@@ -331,6 +320,12 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 	    }
 	    else
 	    {
+	    	if (fcntl(fd, F_SETFD, 1) < 0)
+		    post("couldn't set close-on-exec flag on audio");
+	    	if ((flags = fcntl(fd, F_GETFL)) < 0)
+		    post("couldn't get audio device flags");
+		else if (fcntl(fd, F_SETFL, flags & (!O_NDELAY)) < 0)
+		    post("couldn't set audio device flags");
 	    	if (sys_verbose)
 	    	    post("opened %s for reading and writing\n", devname);
 	    	linux_adcs[inindex].d_fd = fd;
@@ -346,6 +341,12 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 		     devname, strerror(errno));
 		break;
 	    }
+	    if (fcntl(fd, F_SETFD, 1) < 0)
+		post("couldn't set close-on-exec flag on audio");
+	    if ((flags = fcntl(fd, F_GETFL)) < 0)
+		post("couldn't get audio device flags");
+	    else if (fcntl(fd, F_SETFL, flags & (!O_NDELAY)) < 0)
+		post("couldn't set audio device flags");
 	    if (sys_verbose)
 	    	post("opened %s for writing only\n", devname);
     	}
@@ -405,7 +406,7 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     	    /* perhaps it's already open from the above? */
     	if (linux_dacs[n].d_fd >= 0)
 	{
-	    fd = linux_dacs[n].d_fd;
+	    fd = linux_adcs[n].d_fd;
 	    alreadyopened = 1;
 	}
 	else
@@ -416,6 +417,12 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 		post("%s (readonly): %s", devname, strerror(errno));
 		goto end_in_loop;
 	    }
+	    if (fcntl(fd, F_SETFD, 1) < 0)
+		post("couldn't set close-on-exec flag on audio");
+	    if ((flags = fcntl(fd, F_GETFL)) < 0)
+		post("couldn't get audio device flags");
+	    else if (fcntl(fd, F_SETFL, flags & (!O_NDELAY)) < 0)
+		post("couldn't set audio device flags");
 	    if (sys_verbose)
 	    	post("opened %s for reading only\n", devname);
     	}
@@ -789,14 +796,12 @@ int oss_send_dacs(void)
 	    for (i = DEFDACBLKSIZE,fp1 = sys_soundin + thischan*DEFDACBLKSIZE,
 		sp = (t_oss_int16 *)buf; i--; fp1++, sp += nchannels)
 	    {
-    		for (j=0;j<sys_inchannels;j++)
+    		for (j=0;j<nchannels;j++)
     	    	    fp1[j*DEFDACBLKSIZE] = (float)sp[j]*(float)3.051850e-05;
 	    }
 	}
 	thischan += nchannels; 	  
      }
-     if (thischan != sys_inchannels)
-     	bug("inchannels");
      return (rtnval);
 }
 

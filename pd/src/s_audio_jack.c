@@ -25,11 +25,13 @@ static int jack_started = 0;
 
 static jack_port_t *input_port[NUM_JACK_PORTS];
 static jack_port_t *output_port[NUM_JACK_PORTS];
-static jack_client_t *jack_client;
+static int outport_count = 0;
+static jack_client_t *jack_client = NULL;
 char *jack_client_names[MAX_CLIENTS];
 
 pthread_mutex_t jack_mutex;
 pthread_cond_t jack_sem;
+
 
 static int
 process (jack_nframes_t nframes, void *arg)
@@ -38,9 +40,9 @@ process (jack_nframes_t nframes, void *arg)
 	float *out; 
 	float *in;
 	
+	
         if (nframes > JACK_OUT_MAX) jack_out_max = nframes;
 	else jack_out_max = JACK_OUT_MAX;
-			
 	if (jack_filled >= nframes) {
 		if (jack_filled != nframes) fprintf(stderr,"Partial read");
 
@@ -67,9 +69,8 @@ process (jack_nframes_t nframes, void *arg)
 }
 
 static int
-srate (jack_nframes_t srate, void *arg)
+jack_srate (jack_nframes_t srate, void *arg)
 {
-        printf ("jack: sample rate %ld/sec\n", srate);
 	sys_dacsr = srate;
         return 0;
 }
@@ -202,12 +203,12 @@ jack_open_audio(int inchans, int outchans, int rate)
 {
 	int j;
 	char port_name[80] = "";
-	int samplerate;
 	int client_iterator = 0;
+	int new_jack = 0;
+	int srate;
 
 	if ((inchans == 0) && (outchans == 0)) return 0;
 
-	post("Testing for Jack");
 	if (outchans > NUM_JACK_PORTS) {
 		fprintf(stderr,"%d output ports not supported, setting to %d\n",outchans, NUM_JACK_PORTS);
 		outchans = NUM_JACK_PORTS;
@@ -219,88 +220,97 @@ jack_open_audio(int inchans, int outchans, int rate)
         }
 
 	/* try to become a client of the JACK server (we allow two pd's)*/
-
-	do {
-	  sprintf(port_name,"pure_data_%d",client_iterator);
-	  client_iterator++;
-	}
-	while (((jack_client = jack_client_new (port_name)) == 0) && client_iterator < 2);
- 
-	if (!jack_client) { // jack spits out enough messages already, do not warn
-	  return 1;
-        }
-
-	jack_get_clients();
-
-	/* tell the JACK server to call `process()' whenever
-           there is work to be done.
-        */
- 
-        jack_set_process_callback (jack_client, process, 0);
+	if (!jack_client) {
+	  do {
+	    sprintf(port_name,"pure_data_%d",client_iterator);
+	    client_iterator++;
+	  } while (((jack_client = jack_client_new (port_name)) == 0) && client_iterator < 2);
 	
-        jack_set_error_function (jack_error);
+	  
+	  if (!jack_client) { // jack spits out enough messages already, do not warn
+	    return 1;
+	  }
+	  
+	  jack_get_clients();
 
+	  /* tell the JACK server to call `process()' whenever
+	     there is work to be done.
+	  */
+	  
+	  jack_set_process_callback (jack_client, process, 0);
+	  
+	  jack_set_error_function (jack_error);
+	  
 #ifdef JACK_XRUN
-	jack_set_xrun_callback (jack_client, jack_xrun, NULL);
+	  jack_set_xrun_callback (jack_client, jack_xrun, NULL);
 #endif
+	  
+	  /* tell the JACK server to call `srate()' whenever
+	     the sample rate of the system changes.
+	  */
+	  
+	  jack_set_sample_rate_callback (jack_client, jack_srate, 0);
+	  
+	  
+	  /* tell the JACK server to call `jack_shutdown()' if
+	     it ever shuts down, either entirely, or if it
+	     just decides to stop calling us.
+	  */
+	  
+	  jack_on_shutdown (jack_client, jack_shutdown, 0);
+	  
+	  for (j=0;j<NUM_JACK_PORTS;j++) {
+	       input_port[j]=NULL;
+	       output_port[j] = NULL;
+	  }
+	  
+	  new_jack = 1;
+	}
 
-        /* tell the JACK server to call `srate()' whenever
-           the sample rate of the system changes.
-        */
- 
-        jack_set_sample_rate_callback (jack_client, srate, 0);
+	/* display the current sample rate. once the client is activated
+	   (see below), you should rely on your own sample rate
+	   callback (see above) for this value.
+	*/
 	
-
-	/* tell the JACK server to call `jack_shutdown()' if
-           it ever shuts down, either entirely, or if it
-           just decides to stop calling us.
-        */
- 
-        jack_on_shutdown (jack_client, jack_shutdown, 0);
- 
-
-        /* display the current sample rate. once the client is activated
-           (see below), you should rely on your own sample rate
-           callback (see above) for this value.
-        */
- 
-        samplerate = jack_get_sample_rate (jack_client);
-
+	srate = jack_get_sample_rate (jack_client);
+	sys_dacsr = srate;
+		
 	/* create the ports */
- 
+	
 	for (j = 0; j < inchans; j++) {
 		sprintf(port_name, "input%d", j);
-		input_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+		if (!input_port[j]) input_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
 	}
+
         for (j = 0; j < outchans; j++) {
 		sprintf(port_name, "output%d", j);
-		output_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+		if (!output_port[j]) output_port[j] = jack_port_register (jack_client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 	} 
+	outport_count = outchans;
 
         /* tell the JACK server that we are ready to roll */
  
-        if (jack_activate (jack_client)) {
-                fprintf (stderr, "cannot activate client");
-                return 1;
-        }
+	if (new_jack) {
+	  if (jack_activate (jack_client)) {
+	    fprintf (stderr, "cannot activate client");
+	    return 1;
+	  }
+	  
+	  memset(jack_outbuf,0,sizeof(jack_outbuf));
+	  
+	  if (jack_client_names[0])
+	    jack_connect_ports(jack_client_names[0]);
 
-	memset(jack_outbuf,0,sizeof(jack_outbuf));
-
-	if (jack_client_names[0])
-	  jack_connect_ports(jack_client_names[0]);
-
-	pthread_mutex_init(&jack_mutex,NULL);
-	pthread_cond_init(&jack_sem,NULL);
-
-	post("using JACK audio interface");
+	  pthread_mutex_init(&jack_mutex,NULL);
+	  pthread_cond_init(&jack_sem,NULL);
+	}
 	return 0;
 }
 
 void jack_close_audio(void) 
 
 {
-  jack_started = 0;
-	/* ignore for now */
+	jack_started = 0;
 }
 
 int jack_send_dacs(void)
@@ -340,6 +350,21 @@ int jack_send_dacs(void)
 	memset(sys_soundout,0,DEFDACBLKSIZE*sizeof(float)*sys_outchannels);
 	jack_filled += DEFDACBLKSIZE;
 	return rtnval;
+}
+
+void jack_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize)
+{
+    int i, ndev;
+    *canmulti = 0;  /* supports multiple devices */
+    ndev = 1;
+    for (i = 0; i < ndev; i++)
+    {
+    	sprintf(indevlist + i * devdescsize, "JACK");
+    	sprintf(outdevlist + i * devdescsize, "JACK");
+    }
+    *nindevs = *noutdevs = ndev;
 }
 
 void jack_listdevs( void)

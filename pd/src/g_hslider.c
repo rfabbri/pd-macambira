@@ -524,7 +524,6 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_hslider *x = (t_hslider *)pd_new(hslider_class);
     int bflcol[]={-262144, -1, -1};
-    t_symbol *srl[3];
     int w=IEM_SL_DEFAULTSIZE, h=IEM_GUI_DEFAULTSIZE;
     int lilo=0, ldx=-2, ldy=-6, f=0, v=0, steady=1;
     int fs=8;
@@ -533,9 +532,6 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
 
     if(((argc == 17)||(argc == 18))&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)
        &&IS_A_FLOAT(argv,2)&&IS_A_FLOAT(argv,3)
@@ -553,27 +549,7 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
 	max = (double)atom_getfloatarg(3, argc, argv);
 	lilo = (int)atom_getintarg(4, argc, argv);
 	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(5, argc, argv));
-	if(IS_A_SYMBOL(argv,6))
-	    srl[0] = atom_getsymbolarg(6, argc, argv);
-	else if(IS_A_FLOAT(argv,6))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(6, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,7))
-	    srl[1] = atom_getsymbolarg(7, argc, argv);
-	else if(IS_A_FLOAT(argv,7))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,8))
-	    srl[2] = atom_getsymbolarg(8, argc, argv);
-	else if(IS_A_FLOAT(argv,8))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
-	    srl[2] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 6, argv);
 	ldx = (int)atom_getintarg(9, argc, argv);
 	ldy = (int)atom_getintarg(10, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(11, argc, argv));
@@ -583,6 +559,7 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
 	bflcol[2] = (int)atom_getintarg(15, argc, argv);
 	v = (int)atom_getintarg(16, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 6, 0);
     if((argc == 18)&&IS_A_FLOAT(argv,17))
 	steady = (int)atom_getintarg(17, argc, argv);
 
@@ -601,18 +578,16 @@ static void *hslider_new(t_symbol *s, int argc, t_atom *argv)
     x->x_lin0_log1 = lilo;
     if(steady != 0) steady = 1;
     x->x_steady = steady;
-    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+    	x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
     if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if(x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
     if(fs < 4)

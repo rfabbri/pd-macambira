@@ -13,25 +13,29 @@ make watchdog work for MACOSX
 %x to %lx in all "tags" to make 64-bit safe
 plug-in support
 portaudio_pd files into src
+settings saver (registry in Windows; .pdrc in linux; defaults system in OSX?)
+text cut/copy/paste
 GOP bounding box object
+signal inlets to sense signals; fix +~ etc, vcf~, biquad~, and make a vcfb~
+
+makefile to set SETUID bit on install?
+loading e-mailed patches without removing headers crashes pd
+investigate gcc 3.3 warnings; try to reinstate -fstrict-aliasing
+message dialog not to disappear
+sprout inlets/outlets on objects whose creation failed.
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')
 why does changing the name of an explode in jupiter patch take so long?
 close-subwindows menu item
 trouble typing into number boxes
 abstraction reload doesn't have to vis everyone??
-check MIDI device numbering on MSW
 show results of opening audio and MIDI on dialogs
-settings saver
-latency testing
 windows escape from control-C
 add standard bindings (ctl-o, etc) to dialogs
-
 settable netsend and netreceive port numbers
 suspend/resume graphics updates
 scheduler to handle callbacks
 scheduler to do DSP computations even if no audio
 hook to scheduler to let others get called for DSP I/O
-figure out how to avoid "dac freeze" if nosound
 new: mline~, msnapshot~, abs~
 flags to defeat adding specified classes from libraries
 incorporate pddp doc
@@ -42,6 +46,7 @@ open/save panel to take messages to init directory
 look at prctl(2) for FP exception handling
 
 problems:
+qlist - 'next 1' seems not to work
 arrays of non-existent templates crash
 don't draw in/outlets on gui objects in graphs
 Alsa degradation after several hours running on soundblaster
@@ -59,6 +64,7 @@ data copy/paste doesn't check templates aren't changed
 rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
 
 data:
+allow field*2+5 etc. in drawing commands
 vget, vset traversal objects
 cursor to show (x, y) location
 better hit detection (getrect is too greedy)
@@ -75,7 +81,6 @@ figure out why Pd sometimes crashes when you close example after adding fields
 features:
 command line flag to defeat loading objects
 signal inlets with initialized values...
-Pd to open html help on windows/mac
 flag to hide array names 
 ??? have a way to disambiguate externs from different libs???
 put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)

@@ -607,7 +607,6 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_vu *x = (t_vu *)pd_new(vu_class);
     int bflcol[]={-66577, -1, -1};
-    t_symbol *srl[3];
     int w=IEM_GUI_DEFAULTSIZE, h=IEM_VU_STEPS*IEM_VU_DEFAULTSIZE;
     int ldx=-1, ldy=-8, f=0, fs=8, scale=1;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
@@ -615,9 +614,6 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
 
     if((argc >= 11)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)
        &&(IS_A_SYMBOL(argv,2)||IS_A_FLOAT(argv,2))
@@ -628,20 +624,7 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
     {
 	w = (int)atom_getintarg(0, argc, argv);
 	h = (int)atom_getintarg(1, argc, argv);
-	if(IS_A_SYMBOL(argv,2))
-	    srl[1] = atom_getsymbolarg(2, argc, argv);
-	else if(IS_A_FLOAT(argv,2))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(2, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,3))
-	    srl[2] = atom_getsymbolarg(3, argc, argv);
-	else if(IS_A_FLOAT(argv,3))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(3, argc, argv));
-	    srl[2] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 1, argv);
 	ldx = (int)atom_getintarg(4, argc, argv);
 	ldy = (int)atom_getintarg(5, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(6, argc, argv));
@@ -650,6 +633,7 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
 	bflcol[2] = (int)atom_getintarg(9, argc, argv);
 	scale = (int)atom_getintarg(10, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 1, 0);
     if((argc == 12)&&IS_A_FLOAT(argv,11))
 	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(11, argc, argv));
     x->x_gui.x_draw = (t_iemfunptr)vu_draw;
@@ -657,17 +641,16 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
     x->x_gui.x_fsf.x_snd_able = 0;
     x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
-    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
+    if (x->x_gui.x_fsf.x_font_style == 1)
+    	strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2)
+    	strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if(x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
 

@@ -753,18 +753,12 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_my_numbox *x = (t_my_numbox *)pd_new(my_numbox_class);
     int bflcol[]={-262144, -1, -1};
-    t_symbol *srl[3];
     int w=5, h=14;
     int lilo=0, f=0, ldx=0, ldy=-6;
     int fs=10;
     int log_height=256;
     double min=-1.0e+37, max=1.0e+37,v=0.0;
     char str[144];
-
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
-
 
     if((argc >= 17)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)
        &&IS_A_FLOAT(argv,2)&&IS_A_FLOAT(argv,3)
@@ -782,30 +776,7 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
 	max = (double)atom_getfloatarg(3, argc, argv);
 	lilo = (int)atom_getintarg(4, argc, argv);
 	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(5, argc, argv));
-	srl[0] = atom_getsymbolarg(6, argc, argv);
-	srl[1] = atom_getsymbolarg(7, argc, argv);
-	srl[2] = atom_getsymbolarg(8, argc, argv);
-	if(IS_A_SYMBOL(argv,6))
-	    srl[0] = atom_getsymbolarg(6, argc, argv);
-	else if(IS_A_FLOAT(argv,6))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(6, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,7))
-	    srl[1] = atom_getsymbolarg(7, argc, argv);
-	else if(IS_A_FLOAT(argv,7))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(7, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,8))
-	    srl[2] = atom_getsymbolarg(8, argc, argv);
-	else if(IS_A_FLOAT(argv,8))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(8, argc, argv));
-	    srl[2] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 6, argv);
 	ldx = (int)atom_getintarg(9, argc, argv);
 	ldy = (int)atom_getintarg(10, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(11, argc, argv));
@@ -815,6 +786,7 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
 	bflcol[2] = (int)atom_getintarg(15, argc, argv);
 	v = atom_getfloatarg(16, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 6, 0);
     if((argc == 18)&&IS_A_FLOAT(argv,17))
     {
         log_height = (int)atom_getintarg(17, argc, argv);
@@ -832,18 +804,16 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
     if(log_height < 10)
         log_height = 10;
     x->x_log_height = log_height;
-    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+    	x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
     if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if (x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
     if(fs < 4)

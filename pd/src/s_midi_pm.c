@@ -132,9 +132,93 @@ void sys_putmidimess(int portno, int a, int b, int c)
     }
 }
 
+static void writemidi4(PortMidiStream* stream, int a, int b, int c, int d)
+{
+    PmEvent buffer;
+    buffer.timestamp = 0;
+    buffer.message = ((a & 0xff) | ((b & 0xff) << 8)
+    	| ((c & 0xff) << 16) | ((d & 0xff) << 24));
+    Pm_Write(stream, &buffer, 1);
+}
+
+
 void sys_putmidibyte(int portno, int byte)
 {
-    post("sorry, no byte-by-byte MIDI output implemented in MAC OSX");
+    	/* try to parse the bytes into MIDI messages so they can
+	fit into PortMidi buffers. */
+    static int mess[4];
+    static int nbytes = 0, sysex = 0, i;
+    if (byte >= 0xf8)	/* MIDI real time */
+        writemidi4(mac_midioutdevlist[portno], byte, 0, 0, 0);
+    else if (byte == 0xf0)
+    {
+    	mess[0] = 0xf7;
+	nbytes = 1;
+	sysex = 1;
+    }
+    else if (byte == 0xf7)
+    {
+    	mess[nbytes] = byte;
+	for (i = nbytes+1; i < 4; i++)
+	    mess[i] = 0;
+    	writemidi4(mac_midioutdevlist[portno],
+	    mess[0], mess[1], mess[2], mess[3]);
+	sysex = 0;
+	nbytes = 0;
+    }
+    else if (byte >= 0x80)
+    {
+	sysex = 0;
+    	if (byte == 0xf4 || byte == 0xf5 || byte == 0xf6)
+	{
+	    writemidi4(mac_midioutdevlist[portno], byte, 0, 0, 0);
+	    nbytes = 0;
+	}
+	else
+	{
+	    mess[0] = byte;
+	    nbytes = 1;
+	}
+    }
+    else if (sysex)
+    {
+    	mess[nbytes] = byte;
+	nbytes++;
+	if (nbytes == 4)
+	{
+    	    writemidi4(mac_midioutdevlist[portno],
+		mess[0], mess[1], mess[2], mess[3]);
+	    nbytes = 0;
+	}
+    }
+    else if (nbytes)
+    {
+    	int status = mess[0];
+    	if (status < 0xf0)
+	    status &= 0xf0;
+	    	/* 2 byte messages: */
+    	if (status == 0xc0 || status == 0xd0 ||
+	    status == 0xf1 || status == 0xf3)
+	{
+    	    writemidi4(mac_midioutdevlist[portno],
+		mess[0], byte, 0, 0);
+	    nbytes = (status < 0xf0 ? 1 : 0);
+	}
+    	else
+	{
+	    if (nbytes == 1)
+	    {
+	    	mess[1] = byte;
+		nbytes = 2;
+	    }
+	    else
+	    {
+    	    	writemidi4(mac_midioutdevlist[portno],
+		    mess[0], mess[1], byte, 0);
+	    	nbytes = (status < 0xf0 ? 1 : 0);
+	    }
+	}
+    }
 }
 
 void sys_poll_midi(void)

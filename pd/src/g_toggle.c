@@ -362,7 +362,6 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_toggle *x = (t_toggle *)pd_new(toggle_class);
     int bflcol[]={-262144, -1, -1};
-    t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, f=0;
     int ldx=0, ldy=-6;
     int fs=8;
@@ -371,9 +370,6 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 
     iem_inttosymargs(&x->x_gui.x_isa, 0);
     iem_inttofstyle(&x->x_gui.x_fsf, 0);
-    srl[0] = gensym("empty");
-    srl[1] = gensym("empty");
-    srl[2] = gensym("empty");
 
     if(((argc == 13)||(argc == 14))&&IS_A_FLOAT(argv,0)
        &&IS_A_FLOAT(argv,1)
@@ -386,27 +382,7 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
     {
 	a = (int)atom_getintarg(0, argc, argv);
 	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(1, argc, argv));
-	if(IS_A_SYMBOL(argv,2))
-	    srl[0] = atom_getsymbolarg(2, argc, argv);
-	else if(IS_A_FLOAT(argv,2))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(2, argc, argv));
-	    srl[0] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,3))
-	    srl[1] = atom_getsymbolarg(3, argc, argv);
-	else if(IS_A_FLOAT(argv,3))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(3, argc, argv));
-	    srl[1] = gensym(str);
-	}
-	if(IS_A_SYMBOL(argv,4))
-	    srl[2] = atom_getsymbolarg(4, argc, argv);
-	else if(IS_A_FLOAT(argv,4))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(4, argc, argv));
-	    srl[2] = gensym(str);
-	}
+	iemgui_new_getnames(&x->x_gui, 2, argv);
 	ldx = (int)atom_getintarg(5, argc, argv);
 	ldy = (int)atom_getintarg(6, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(7, argc, argv));
@@ -416,6 +392,7 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 	bflcol[2] = (int)atom_getintarg(11, argc, argv);
 	on = (float)atom_getfloatarg(12, argc, argv);
     }
+    else iemgui_new_getnames(&x->x_gui, 2, 0);
     if((argc == 14)&&IS_A_FLOAT(argv,13))
 	nonzero = (float)atom_getfloatarg(13, argc, argv);
     x->x_gui.x_draw = (t_iemfunptr)toggle_draw;
@@ -423,9 +400,10 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
     x->x_gui.x_fsf.x_snd_able = 1;
     x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
+    if (!strcmp(x->x_gui.x_snd->s_name, "empty"))
+    	x->x_gui.x_fsf.x_snd_able = 0;
+    if (!strcmp(x->x_gui.x_rcv->s_name, "empty"))
+    	x->x_gui.x_fsf.x_rcv_able = 0;
     if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { x->x_gui.x_fsf.x_font_style = 0;
@@ -435,11 +413,8 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_on = (on!=0.0)?nonzero:0.0;
     else
 	x->x_on = 0.0;
-    iemgui_first_dollararg2sym(&x->x_gui, srl);
-    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
-    x->x_gui.x_snd = srl[0];
-    x->x_gui.x_rcv = srl[1];
-    x->x_gui.x_lab = srl[2];
+    if (x->x_gui.x_fsf.x_rcv_able)
+    	pd_bind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
     x->x_gui.x_ldx = ldx;
     x->x_gui.x_ldy = ldy;
 
