@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winsfftease.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib pd.lib ../flext_sh/pd-msvc/t/flext.lib /nologo /dll /machine:I386 /out:"pd-msvc/fftease.dll" /libpath:"c:\programme\audio\pd\bin" /libpath:"f:\prog\max\flext\pd-msvc"
+# ADD LINK32 kernel32.lib user32.lib pd.lib flext-pdwin.lib /nologo /dll /machine:I386 /out:"pd-msvc/fftease.dll" /libpath:"c:\programme\audio\pd\bin" /libpath:"f:\prog\max\flext\pd-msvc"
 
 !ELSEIF  "$(CFG)" == "fftease - Win32 Debug"
 
@@ -96,10 +96,6 @@ SOURCE=.\src\convert.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\convert_new.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\fft.c
 # End Source File
 # Begin Source File
@@ -116,23 +112,11 @@ SOURCE=.\src\leanconvert.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\leanunconvert.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\makewindows.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\overlapadd.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\pv.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\unconvert.c
 # End Source File
 # End Group
 # Begin Group "objects"

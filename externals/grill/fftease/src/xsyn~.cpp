@@ -30,7 +30,7 @@ FLEXT_LIB_DSP("fftease, xsyn~",xsyn)
 xsyn::xsyn():
 	fftease(2,F_STEREO|F_BITSHUFFLE|F_CONVERT)
 {
-	AddInSignal("Messages and Source signal 1");
+	AddInSignal("Messages and source signal 1");
 	AddInSignal("Source signal 2");
 	AddOutSignal("Transformed signal");
 }

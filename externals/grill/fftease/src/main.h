@@ -47,6 +47,11 @@ public:
 	fftease(I mult,I flags);
 	virtual ~fftease();
 
+	static F FromdB(F v) { return pow(10.,v*.05); } 
+
+	inline I get_N() const { return _N; }
+	inline F get_Fund() const { return smprt/(_N*2); }
+
 protected:
 
 	virtual BL Init();
@@ -61,7 +66,8 @@ protected:
 	virtual V Transform(I _N2,S *const *in) = 0;
 
 
-	I Mult() const { return _mult; }
+	V Mult(I n) { _mult = n; MakeVar(); }
+	inline I Mult() const { return _mult; }
 
     F *_input1,*_input2;
     F *_buffer1,*_buffer2;
@@ -75,18 +81,22 @@ protected:
 
 	enum { 
 		F_STEREO = 0x01,
-		F_WINDOW = 0x02,
+		F_BALANCED = 0x02,
 		F_BITSHUFFLE = 0x04,
 		F_CONVERT = 0x08,F_CRES = 0x10,
 		F_RMS = 0x20
 	};
 
-	I _mult,_flags;
+	I _flags;
 	F _rms;
 
 private:
+
+	V MakeVar() { _N = Blocksize()*_mult; }
+
 	I blsz;
 	F smprt;
+	I _mult,_N;
 
 	static V setup(t_classid c) {}
 

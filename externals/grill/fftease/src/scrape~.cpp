@@ -57,7 +57,7 @@ V scrape::setup(t_classid c)
 
 
 scrape::scrape(I argc,const t_atom *argv):
-	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CONVERT),
+	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CONVERT),
 	_thresh1(.0001),_thresh2(.09),
 	_knee(1000),_cutoff(4000)
 
@@ -70,8 +70,8 @@ scrape::scrape(I argc,const t_atom *argv):
 			post("%s - Knee must be a float value - set to %f",thisName(),_knee);
 	}
 	if(argc >= 2) {
-		if(CanbeFloat(argv[0])) {
-			F c = GetAFloat(argv[0]);
+		if(CanbeFloat(argv[1])) {
+			F c = GetAFloat(argv[1]);
 			if(c > 0) _cutoff = c;
 			else
 				post("%s - Cutoff must be > 0 - set to %f",thisName(),_cutoff);
@@ -101,15 +101,14 @@ V scrape::Set()
 {
 	fftease::Set();
 
-	const I _N2 = Blocksize()*Mult()/2; 
-	_threshfunc = new F[_N2];
+	_threshfunc = new F[get_N()/2];
 	UpdThrFun();
 }
 
 V scrape::UpdThrFun() 
 {
-	const I _N = Blocksize()*Mult(),_N2 = _N/2; 
-	const F funda = Samplerate()/(_N*2);
+	const I _N2 = get_N()/2; 
+	const F funda = get_Fund();
 
 	F curfreq = funda;
 	for(I i = 0; i < _N2; i++ ) {

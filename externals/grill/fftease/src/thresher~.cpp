@@ -52,15 +52,15 @@ void thresher::Set()
 	fftease::Set();
 
 	const F _R = Samplerate();
-	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = Blocksize(),_N = get_N(),_N2 = _N/2; 
 
 	_compositeFrame = new F[_N+2];
-	_framesLeft = new I[_N+2];
+	_framesLeft = new I[_N2+1];
 	_c_lastphase_in = new F[_N2+1];
 	_c_lastphase_out = new F[_N2+1];
 
 	_c_fundamental = _R/_N;
-	_c_factor_in = _R/(_D * 3.14159265358979*2);
+	_c_factor_in = _R/(_D * PV_2PI);
 	_c_factor_out = 1./_c_factor_in;
 
 	_firstFrame = true;
@@ -88,7 +88,7 @@ void thresher::Delete()
 
 
 thresher::thresher():
-	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CRES)
+	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CRES)
 {
 	AddInSignal("Messages and input signal");
 	AddOutSignal("Transformed signal");
@@ -101,23 +101,24 @@ V thresher::Transform(I _N2,S *const *in)
 	
 	convert( _buffer1, _channel1, _N2, _c_lastphase_in, _c_fundamental, _c_factor_in  );
 
+	I *fr = _framesLeft;
 	if( _firstFrame ) {
-		for (I i = 0; i < _N+2; i++ ){
+		for (I i = 0; i <= _N; i += 2,++fr ){
 			_compositeFrame[i] = _channel1[i];
-			_framesLeft[i] = _maxHoldFrames;
+			_compositeFrame[i+1] = _channel1[i+1];
+			*fr = _maxHoldFrames;
 		}
 		_firstFrame = false;
 	}
 	else {
-		for(I i = 0; i < _N+2; i += 2 ){
-			if( (fabs( _compositeFrame[i] - _channel1[i] ) > _moveThreshold) || (_framesLeft[i] <= 0) ) {
+		for(I i = 0; i <= _N; i += 2,++fr ){
+			if( (fabs( _compositeFrame[i] - _channel1[i] ) > _moveThreshold) || (*fr <= 0) ) {
 				_compositeFrame[i] = _channel1[i];
 				_compositeFrame[i+1] = _channel1[i+1];
-				_framesLeft[i] = _maxHoldFrames;
+				*fr = _maxHoldFrames;
 			}
-			else {
-				_framesLeft[i]--;
-			}
+			else
+				--*fr;
 		}
 	}
 

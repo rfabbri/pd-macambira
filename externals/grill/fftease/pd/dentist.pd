@@ -1,0 +1,40 @@
+#N canvas 140 138 598 364 12;
+#X obj 17 78 tgl 20 1 empty empty enable_dsp 0 -6 0 10 -225271 -1 -1
+1 1;
+#X msg 17 103 enable \$1;
+#X obj 374 91 nbx 5 18 0 20000 0 0 empty empty knee_frq 0 -6 0 10 -225271
+-1 -1 1375 256;
+#X obj 211 272 *~;
+#X obj 252 277 hsl 128 15 0.001 10 1 1 empty empty volume -2 -6 0 10
+-261681 -1 -1 10200 1;
+#X obj 200 309 dac~;
+#X obj 16 8 cnv 15 550 40 empty empty dentist~ 10 22 0 24 -260818 -1
+0;
+#X text 198 8 FFTease (C)Lyon \, Penrose (for Max/MSP);
+#X text 198 28 flext port by Thomas Grill;
+#X msg 14 181 getattributes;
+#X obj 432 255 print A;
+#X obj 294 90 bng 25 250 50 0 empty empty reshuffle 0 -6 0 8 -225271
+-1 -1;
+#X msg 374 123 knee \$1;
+#X obj 452 91 nbx 5 18 0 1000 0 0 empty empty teeth 0 -6 0 10 -225271
+-1 -1 6 256;
+#X msg 452 123 teeth \$1;
+#X text 343 207 knee frq. \, teeth;
+#X obj 211 207 dentist~ 1000 10;
+#X obj 211 84 adc~ 1;
+#X text 14 164 list attributes;
+#X connect 0 0 1 0;
+#X connect 1 0 16 0;
+#X connect 2 0 12 0;
+#X connect 3 0 5 0;
+#X connect 3 0 5 1;
+#X connect 4 0 3 1;
+#X connect 9 0 16 0;
+#X connect 11 0 16 0;
+#X connect 12 0 16 0;
+#X connect 13 0 14 0;
+#X connect 14 0 16 0;
+#X connect 16 0 3 0;
+#X connect 16 1 10 0;
+#X connect 17 0 16 0;

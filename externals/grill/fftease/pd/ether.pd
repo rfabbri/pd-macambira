@@ -1,0 +1,39 @@
+#N canvas 140 138 600 366 12;
+#X obj 17 78 tgl 20 1 empty empty enable_dsp 0 -6 0 10 -225271 -1 -1
+1 1;
+#X msg 17 103 enable \$1;
+#X obj 211 272 *~;
+#X obj 252 277 hsl 128 15 0.001 10 1 1 empty empty volume -2 -6 0 10
+-261681 -1 -1 7800 1;
+#X obj 200 309 dac~;
+#X obj 16 8 cnv 15 550 40 empty empty ether~ 10 22 0 24 -260818 -1
+0;
+#X text 206 7 FFTease (C)Lyon \, Penrose (for Max/MSP);
+#X text 206 27 flext port by Thomas Grill;
+#X msg 14 181 getattributes;
+#X obj 427 281 print A;
+#X text 14 164 list attributes;
+#X obj 419 87 nbx 5 18 0 1000 0 0 empty empty index 0 -6 0 10 -225271
+-1 -1 56 256;
+#X text 424 300 attributes;
+#X msg 307 120 invert \$1;
+#X obj 307 86 tgl 25 0 empty empty invert 0 -6 0 8 -225271 -1 -1 1
+1;
+#X msg 419 119 index \$1;
+#X obj 211 217 ether~ 1;
+#X text 280 215 quality \, invert \, index;
+#X obj 211 84 adc~;
+#X connect 0 0 1 0;
+#X connect 1 0 16 0;
+#X connect 2 0 4 0;
+#X connect 2 0 4 1;
+#X connect 3 0 2 1;
+#X connect 8 0 16 0;
+#X connect 11 0 15 0;
+#X connect 13 0 16 0;
+#X connect 14 0 13 0;
+#X connect 15 0 16 0;
+#X connect 16 0 2 0;
+#X connect 16 1 9 0;
+#X connect 18 0 16 0;
+#X connect 18 1 16 1;

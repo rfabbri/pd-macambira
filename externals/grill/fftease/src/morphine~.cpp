@@ -51,7 +51,7 @@ V morphine::setup(t_classid c)
 
 
 morphine::morphine(I argc,const t_atom *argv):
-	fftease(4,F_STEREO|F_WINDOW|F_BITSHUFFLE|F_CONVERT),
+	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_CONVERT),
 	_index(1)
 {
 	/* parse and set object's options given */
@@ -83,8 +83,7 @@ V morphine::Set()
 {
 	fftease::Set();
 
-	const I _N2 = Blocksize()*Mult()/2;
-	_picks = new pickme[_N2+1];
+	_picks = new pickme[get_N()/2+1];
 }
 
 I morphine::sortpicks( const void *a, const void *b )
@@ -106,12 +105,12 @@ V morphine::Transform(I _N2,S *const *in)
     // sort our differences in ascending order 
     qsort( _picks, _N2+1, sizeof(pickme), sortpicks );
 
-	const I morphindex = _index*(_N2+1)+.5;
+	const I morphindex2 = (I)(_index*(_N2+1)+.5)*2;
+
     // choose the bins that are least different first 
-    for ( i=0; i <= morphindex; i++ ) {
-		const I even = _picks[i].bin*2,odd = even + 1;
-		_channel1[even] = _channel2[even];
-		_channel1[odd] = _channel2[odd];
+    for (i=0; i <= morphindex2; i += 2) {
+		_channel1[i] = _channel2[i];
+		_channel1[i+1] = _channel2[i+1];
     }
 }
 

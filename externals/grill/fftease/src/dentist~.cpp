@@ -25,7 +25,7 @@ protected:
 	virtual V Transform(I _N2,S *const *in);
 
 	I *_bin_selection;
-	I _tooth_count;  
+	I _teeth;  
 	F _knee;
 	I _max_bin; // determined by _knee and fundamental frequency
 
@@ -38,7 +38,7 @@ private:
 	virtual V Delete();
 
 	V ms_knee(F knee);
-	V ms_teeth(I teeth) { _tooth_count = teeth;	reset_shuffle(); }
+	V ms_teeth(I teeth) { _teeth = teeth;	reset_shuffle(); }
 
 	
 	static V setup(t_classid c);
@@ -46,7 +46,7 @@ private:
 	FLEXT_CALLBACK(reset_shuffle)
 	FLEXT_ATTRGET_F(_knee)
 	FLEXT_CALLSET_F(ms_knee)
-	FLEXT_ATTRGET_I(_tooth_count)
+	FLEXT_ATTRGET_I(_teeth)
 	FLEXT_CALLSET_I(ms_teeth)
 };
 
@@ -58,13 +58,13 @@ V dentist::setup(t_classid c)
 	FLEXT_CADDBANG(c,0,reset_shuffle);
 
 	FLEXT_CADDATTR_VAR(c,"knee",_knee,ms_knee);
-	FLEXT_CADDATTR_VAR(c,"teeth",_tooth_count,ms_teeth);
+	FLEXT_CADDATTR_VAR(c,"teeth",_teeth,ms_teeth);
 }
 
 
 dentist::dentist(I argc,const t_atom *argv):
-	fftease(4,F_WINDOW|F_BITSHUFFLE|F_CONVERT),	
-	_knee(500),_tooth_count(10)
+	fftease(4,F_BALANCED|F_BITSHUFFLE|F_CONVERT),	
+	_knee(500),_teeth(10)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {
@@ -75,9 +75,9 @@ dentist::dentist(I argc,const t_atom *argv):
 	}
 	if(argc >= 2) {
 		if(CanbeInt(argv[1]))
-			_tooth_count = GetAInt(argv[1]);
+			_teeth = GetAInt(argv[1]);
 		else
-			post("%s - Teeth must be an integer value - set to %0i",thisName(),_tooth_count);
+			post("%s - Teeth must be an integer value - set to %0i",thisName(),_teeth);
 	}
 
 	AddInSignal("Messages and input signal");
@@ -103,14 +103,15 @@ V dentist::ms_knee(F f)
 {
 	_knee = f;	// store original
 
-	const F funda = Samplerate()/(2*Mult()*Blocksize());
+	const F funda = get_Fund();
 
 	// TG: This is a different, but steady correction than in original fftease
 	if( f < funda ) f = funda;
-	else if(f > funda/2) f = funda/2;
+	else if(f > Samplerate()/2) f = Samplerate()/2;
 
-	_max_bin = 1;  
-	for(F curfreq = 0; curfreq < f; curfreq += funda) ++_max_bin;
+	_max_bin = (I)(f/funda+0.5);
+
+	reset_shuffle();
 }
 
 
@@ -118,11 +119,10 @@ V dentist::Set()
 {
 	fftease::Set();
 	
+	_bin_selection = new I[get_N()/2];
+
 	// calculation of _max_bin
 	ms_knee(_knee); 
-
-	_bin_selection = new I[(Blocksize()*Mult())>>1];
-	reset_shuffle();
 }
 
 V dentist::Transform(I _N2,S *const *in)
@@ -135,17 +135,17 @@ V dentist::Transform(I _N2,S *const *in)
 
 V dentist::reset_shuffle()
 {
-	const I _N2 = Blocksize()*Mult()/2;
-	I teeth = _tooth_count;
+	const I _N2 = get_N()/2;
+	I t = _teeth;
 
 	// check number of teeth
-	if( teeth < 0 ) teeth = 0;
-	else if( teeth > _N2 ) teeth = _N2;
+	if( t < 0 ) t = 0;
+	else if( t > _N2 ) t = _N2;
 
 	// clear and set random bins
 	I i;
 	for( i = 0; i < _N2; i++ )
 		_bin_selection[i] = 0;
-	for( i = 0; i < _tooth_count; i++ )
+	for( i = 0; i < t; i++ )
 		_bin_selection[rand()%_max_bin] = 1;
 }

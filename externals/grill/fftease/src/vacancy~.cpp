@@ -23,7 +23,7 @@ public:
 protected:
 	virtual V Transform(I n,S *const *in);
 
-	V ms_thresh(F thr) { _threshold = (F)pow(10.,(_threshdB = thr)*.05); }
+	V ms_thresh(F thr) { _threshold = FromdB(_threshdB = thr); }
 
 	F _threshold,_threshdB;
 	BL _invert,_useRms,_swapPhase;
@@ -94,30 +94,31 @@ vacancy::vacancy(I argc,const t_atom *argv):
 V vacancy::Transform(I _N2,S *const *in)
 {
 	const F useme = _useRms?_rms * _threshold:_threshold;
+	const I _N = _N2;
 
 	// composite here please
 	if (_invert)
 		if (_swapPhase)
-			for (I i=0; i < _N2; i+=2 )
+			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] > useme && _channel2[i] < _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					_channel1[i+1] = _channel2[i+1];
 				}
 		else
-			for (I i=0; i < _N2; i+=2 )
+			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] > useme && _channel2[i] < _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					if ( _channel1[i+1] == 0. ) _channel1[i+1] = _channel2[i+1];
 				}
 	else
 		if (_swapPhase)
-			for (I i=0; i < _N2; i+=2 )
+			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] < useme && _channel2[i] > _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					_channel1[i+1] = _channel2[i+1];
 				}
 		else
-			for (I i=0; i < _N2; i+=2 )
+			for (I i=0; i < _N; i+=2 )
 				if ( _channel1[i] < useme && _channel2[i] > _channel1[i] ) {
 					_channel1[i] = _channel2[i];
 					if ( _channel1[i+1] == 0. ) _channel1[i+1] = _channel2[i+1];

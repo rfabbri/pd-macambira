@@ -11,16 +11,12 @@ void makewindows( float *H, float *A, float *S, int Nw, int N, int I, int osc )
 {
  int i ;
  float sum ;
-float PI, TWOPI;
-
-PI = 3.141592653589793115997963468544185161590576171875;
-TWOPI = 6.28318530717958623199592693708837032318115234375;
 
 /*
  * basic Hamming windows
  */
     for ( i = 0 ; i < Nw ; i++ )
-	H[i] = A[i] = S[i] = 0.54 - 0.46*cos( TWOPI*i/(Nw - 1) ) ;
+	H[i] = A[i] = S[i] = 0.54 - 0.46*cos( PV_2PI*i/(Nw - 1) ) ;
 /*
  * when Nw > N, also apply interpolating (sinc) windows to
  * ensure that window are 0 at increments of N (the FFT length)
@@ -36,9 +32,9 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
 	x = -(Nw - 1)/2. ;
 	for ( i = 0 ; i < Nw ; i++, x += 1. )
 	    if ( x != 0. ) {
-		A[i] *= N*sin( PI*x/N )/(PI*x) ;
+		A[i] *= N*sin( PV_PI*x/N )/(PV_PI*x) ;
 		if ( I )
-		    S[i] *= I*sin( PI*x/I )/(PI*x) ;
+		    S[i] *= I*sin( PV_PI*x/I )/(PV_PI*x) ;
 	    }
     }
 /*
@@ -67,10 +63,6 @@ void makehamming( float *H, float *A, float *S, int Nw, int N, int I, int osc,in
 {
  int i;
  float sum ;
-float PI, TWOPI;
-
-PI = 3.141592653589793115997963468544185161590576171875;
-TWOPI = 6.28318530717958623199592693708837032318115234375;
 
 /*
  * basic Hamming windows
@@ -79,13 +71,13 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
  
  if (odd) {
     for ( i = 0 ; i < Nw ; i++ )
-	  H[i] = A[i] = S[i] = sqrt(0.54 - 0.46*cos( TWOPI*i/(Nw - 1) ));
+	  H[i] = A[i] = S[i] = sqrt(0.54 - 0.46*cos( PV_2PI*i/(Nw - 1) ));
  }
 	
  else {
 
    for ( i = 0 ; i < Nw ; i++ )
-	  H[i] = A[i] = S[i] = 0.54 - 0.46*cos( TWOPI*i/(Nw - 1) );
+	  H[i] = A[i] = S[i] = 0.54 - 0.46*cos( PV_2PI*i/(Nw - 1) );
 
  }
  	
@@ -104,9 +96,9 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
 	x = -(Nw - 1)/2. ;
 	for ( i = 0 ; i < Nw ; i++, x += 1. )
 	    if ( x != 0. ) {
-		A[i] *= N*sin( PI*x/N )/(PI*x) ;
+		A[i] *= N*sin( PV_PI*x/N )/(PV_PI*x) ;
 		if ( I )
-		    S[i] *= I*sin( PI*x/I )/(PI*x) ;
+		    S[i] *= I*sin( PV_PI*x/I )/(PV_PI*x) ;
 	    }
     }
 /*
@@ -136,10 +128,6 @@ void makehanning( float *H, float *A, float *S, int Nw, int N, int I, int osc, i
 {
  int i;
  float sum ;
-float PI, TWOPI;
-
-PI = 3.141592653589793115997963468544185161590576171875;
-TWOPI = 6.28318530717958623199592693708837032318115234375;
 
 /*
  * basic Hanning windows
@@ -148,13 +136,13 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
  
  if (odd) {
     for ( i = 0 ; i < Nw ; i++ )
-	  H[i] = A[i] = S[i] = sqrt(0.5 * (1. + cos(PI + TWOPI * i / (Nw - 1))));
+	  H[i] = A[i] = S[i] = sqrt(0.5 * (1. + cos(PV_PI + PV_2PI * i / (Nw - 1))));
  }
 	
  else {
 
    for ( i = 0 ; i < Nw ; i++ )
-	  H[i] = A[i] = S[i] = 0.5 * (1. + cos(PI + TWOPI * i / (Nw - 1)));
+	  H[i] = A[i] = S[i] = 0.5 * (1. + cos(PV_PI + PV_2PI * i / (Nw - 1)));
 
  }
  	
@@ -173,9 +161,9 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
 	x = -(Nw - 1)/2. ;
 	for ( i = 0 ; i < Nw ; i++, x += 1. )
 	    if ( x != 0. ) {
-		A[i] *= N*sin( PI*x/N )/(PI*x) ;
+		A[i] *= N*sin( PV_PI*x/N )/(PV_PI*x) ;
 		if ( I )
-		    S[i] *= I*sin( PI*x/I )/(PI*x) ;
+		    S[i] *= I*sin( PV_PI*x/I )/(PV_PI*x) ;
 	    }
     }
 /*

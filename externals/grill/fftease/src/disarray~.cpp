@@ -24,12 +24,10 @@ protected:
 
 	virtual V Transform(I _N2,S *const *in);
 
-
 	BL _qual;
 	I _shuffle_count,_max_bin;
 	F _freq;
 	I *_shuffle_in,*_shuffle_out;
-
 
 	V reset_shuffle();
 
@@ -45,6 +43,7 @@ private:
 	FLEXT_CALLBACK(reset_shuffle)
 	FLEXT_ATTRGET_F(_freq)
 	FLEXT_CALLSET_F(ms_freq)
+	FLEXT_ATTRVAR_I(_shuffle_count)
 };
 
 FLEXT_LIB_DSP_V("fftease, disarray~",disarray)
@@ -55,6 +54,7 @@ V disarray::setup(t_classid c)
 	FLEXT_CADDBANG(c,0,reset_shuffle);
 
 	FLEXT_CADDATTR_VAR(c,"freq",_freq,ms_freq);
+	FLEXT_CADDATTR_VAR1(c,"shcnt",_shuffle_count);
 }
 
 
@@ -82,8 +82,8 @@ disarray::disarray(I argc,const t_atom *argv):
 			post("%s - Shufflecount must be an integer value - set to %0i",thisName(),_shuffle_count);
 	}
 
-	_mult = _qual?4:2;
-	if(_qual) _flags |= F_WINDOW;
+	Mult(_qual?4:2);
+	if(_qual) _flags |= F_BALANCED;
 
 	AddInSignal("Messages and input signal");
 	AddOutSignal("Transformed signal");
@@ -107,29 +107,28 @@ V disarray::Set()
 {
 	fftease::Set();
 
-	const I _N2 = Blocksize()*Mult()/2;
+	const I _N2 = get_N()/2;
 
 	_shuffle_in = new I[_N2];
 	_shuffle_out = new I[_N2];
 
 	// calculate _max_bin
 	ms_freq(_freq);
-
-	reset_shuffle();
 }
 
 V disarray::ms_freq(F f)
 {
 	_freq = f; // store original
 
-	const F funda = Samplerate()/(2*Mult()*Blocksize());
+	const F funda = get_Fund();
 
 	// TG: This is a different, but steady correction than in original fftease
 	if( f < funda ) f = funda;
-	else if(f > funda/2) f = funda/2;
+	else if(f > Samplerate()/2) f = Samplerate()/2;
 
-	_max_bin = 1;  
-	for(F curfreq = 0; curfreq < f; curfreq += funda) ++_max_bin;
+	_max_bin = (I)(f/funda+0.5);
+
+	reset_shuffle();
 }
 
 inline V swap(F &a,F &b) { F t = a; a = b; b = t; }
@@ -137,14 +136,18 @@ inline V swap(I &a,I &b) { I t = a; a = b; b = t; }
 
 V disarray::Transform(I _N2,S *const *in)
 {
-	for(I i = 0; i < _shuffle_count ; i++)
+	I shcnt = _shuffle_count;
+	if(shcnt < 0) shcnt = 0;
+	else if(shcnt > _N2) shcnt = _N2;
+
+	for(I i = 0; i < shcnt; i++)
 		swap(_channel1[ _shuffle_in[i] * 2 ],_channel1[ _shuffle_out[i] * 2]);
 }
 
 
 V disarray::reset_shuffle()
 {
-	const I _N2 = Blocksize()*Mult()/2;
+	const I _N2 = get_N()/2;
 
 	I i;
 	for( i = 0; i < _N2; i++ )

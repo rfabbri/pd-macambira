@@ -12,44 +12,49 @@
 
 void convert(float *S, float *C, int N2, float *lastphase,  float fundamental, float factor )
 {
-  float 	phase,
-		phasediff;
-  int 		real,
-		imag,
-		amp,
-		freq;
-  float 	a,
-		b;
-  int 		i;
+	float phase, phasediff;
+	int even,odd;
+	float a,b;
+	int i;
 
-  float myTWOPI, myPI;
+	for ( i = 0; i <= N2; i++ ) {
+		odd = ( even = i<<1 ) + 1;
+		a = ( i == N2 ? S[1] : S[even] );
+		b = ( i == 0 || i == N2 ? 0. : S[odd] );
 
-  myTWOPI = 8.*atan(1.);
-  myPI = 4.*atan(1.);
+		C[even] = hypot( a, b );
+		if ( C[even] == 0. )
+			phasediff = 0.;
+		else {
+			phasediff = ( phase = -atan2( b, a ) ) - lastphase[i];
+			lastphase[i] = phase;
+
+			while ( phasediff > PV_PI )	phasediff -= PV_2PI;
+			while ( phasediff < -PV_PI ) phasediff += PV_2PI;
+		}
+
+		C[odd] = phasediff*factor + i*fundamental;
+	}
+}
 
 
-    for ( i = 0; i <= N2; i++ ) {
-      imag = freq = ( real = amp = i<<1 ) + 1;
-      a = ( i == N2 ? S[1] : S[real] );
-      b = ( i == 0 || i == N2 ? 0. : S[imag] );
+void unconvert(float  *C, float *S, int N2, float *lastphase, float fundamental,  float factor )
+{
+	int i,even,odd;
+	float mag,phase;
 
-      C[amp] = hypot( a, b );
-      if ( C[amp] == 0. )
-	phasediff = 0.;
-      else {
-	phasediff = ( phase = -atan2( b, a ) ) - lastphase[i];
-	lastphase[i] = phase;
-	
-	while ( phasediff > myPI )
-	  phasediff -= myTWOPI;
-	while ( phasediff < -myPI )
-	  phasediff += myTWOPI;
-      }
-      C[freq] = phasediff*factor + i*fundamental;
-      /*
-      if( i > 8 && i < 12 ) {
-	fprintf(stderr,"convert freq %d: %f\n",i, C[freq]);
-      }
-      */
-    }
+	for ( i = 0; i <= N2; i++ ) {
+		odd = ( even = i<<1 ) + 1;
+
+		mag = C[even];
+		lastphase[i] += C[odd] - i*fundamental;
+		phase = lastphase[i]*factor;
+
+		if(i != N2) {
+			S[even] = mag*cos( phase );
+			S[odd] = -mag*sin( phase );
+		}
+		else
+			S[1] = mag*cos( phase );
+	}
 }

@@ -49,10 +49,12 @@ V swinger::Transform(I _N2,S *const *in)
 		// replace signal one's phases with those of signal two 
 		const F a1 = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
 		const F b1 = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
+		// amplitude only
 		const F amp = hypot( a1, b1 );
 
 		const F a2 = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
 		const F b2 = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
+		// phase only
 		const F ph = -atan2( b2, a2 );
 
 		_buffer1[even] = amp * cos( ph );

@@ -42,10 +42,12 @@ shapee::shapee(I argc,const t_atom *argv):
 			post("%s - Quality must be a boolean value - set to %0i",thisName(),_qual?1:0);
 	}
 
-	if(_qual)
-		_mult = 4,_flags |= F_WINDOW;
+	if(_qual) {
+		Mult(4);
+		_flags |= F_BALANCED;
+	}
 	else
-		_mult = 2;
+		Mult(2);
 
 	AddInSignal("Messages and frequency reference signal");
 	AddInSignal("Amplitude reference signal");

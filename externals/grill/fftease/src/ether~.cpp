@@ -46,7 +46,7 @@ V ether::setup(t_classid c)
 
 
 ether::ether(I argc,const t_atom *argv):
-	fftease(2,F_STEREO|F_BITSHUFFLE),
+	fftease(2,F_STEREO|F_BITSHUFFLE|F_CONVERT),
 	_qual(false),_threshMult(0),_invert(false)
 {
 	/* parse and set object's options given */
@@ -57,8 +57,8 @@ ether::ether(I argc,const t_atom *argv):
 			post("%s - Quality must be a boolean value - set to %0i",thisName(),_qual?1:0);
 	}
 
-	_mult = _qual?4:2;
-	if(_qual) _flags |= F_WINDOW;
+	Mult(_qual?4:2);
+	if(_qual) _flags |= F_BALANCED;
 
 	AddInSignal("Messages and input signal");
 	AddInSignal("Reference signal");
@@ -68,36 +68,21 @@ ether::ether(I argc,const t_atom *argv):
 
 V ether::Transform(I _N2,S *const *in)
 {
-	F threshMult = _threshMult;
-	if (threshMult == 0. )  threshMult = 1;
+	const I _N = _N2*2;
+	const BL inv = _invert;
+	const F threshMult = _threshMult?_threshMult:1;
 
-	for (I i = 0; i <= _N2; i++ ) {
-		const I even = i*2,odd = even + 1;
+	for (I i = 0; i <= _N; i += 2) {
+		F &amp1 = _channel1[i];
+		F &phase1 = _channel1[i+1];
 
-		// convert to polar coordinates from complex values 
-		register F a,b;
-
-		a = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
-
-		F amp1 = hypot( a, b );
-		F phase1 = -atan2( b, a );
-
-		a = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
-
-		F amp2 = hypot( a, b );
-		F phase2 = -atan2( b, a );
+		F &amp2 = _channel2[i];
+		F &phase2 = _channel2[i+1];
 
 		// use simple threshold for inverse compositing 
 
-		if(_invert?(amp1 > amp2*threshMult):(amp1 < amp2*threshMult) ) amp1 = amp2;
+		if(inv?(amp1 > amp2*threshMult):(amp1 < amp2*threshMult) ) amp1 = amp2;
 		if (phase1 == 0. ) phase1 = phase2;
-
-
-		// convert back to complex form, read for the inverse fft 
-		_buffer1[even] = amp1 * cos(phase1);
-		if(i != _N2) _buffer1[odd] = -amp1 * sin(phase1);
 	}
 }
 

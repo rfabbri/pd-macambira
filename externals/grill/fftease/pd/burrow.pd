@@ -1,31 +1,32 @@
-#N canvas 398 240 590 356 12;
+#N canvas 398 240 594 360 12;
 #X msg 17 161 getattributes;
-#X obj 304 235 print A;
+#X obj 391 278 print A;
 #X obj 161 210 burrow~ -30 -18 0;
-#X obj 17 78 tgl 20 1 empty empty enable_dsp 0 -6 32 10 -225271 -1
--1 0 1;
+#X obj 17 78 tgl 20 1 empty empty enable_dsp 0 -6 0 10 -225271 -1 -1
+1 1;
 #X msg 17 103 enable \$1;
-#X obj 184 78 tgl 20 0 empty empty inverse_filtering 0 -6 32 10 -225271
--1 -1 0 1;
+#X obj 184 78 tgl 20 0 empty empty inverse_filtering 0 -6 0 10 -225271
+-1 -1 1 1;
 #X msg 184 102 invert \$1;
 #X obj 373 78 nbx 5 18 -100 0 0 0 empty empty filtering_threshold(dB)
-0 -6 32 10 -225271 -1 -1 -3 256;
+0 -6 0 10 -225271 -1 -1 -82 256;
 #X msg 373 100 thresh \$1;
 #X obj 374 145 nbx 5 18 -100 0 0 0 empty empty filter_multiplier(dB)
-0 -6 32 10 -225271 -1 -1 0 256;
+0 -6 0 10 -225271 -1 -1 -12 256;
 #X msg 374 167 mult \$1;
-#X obj 162 275 *~;
-#X obj 203 280 hsl 128 15 0.001 1 1 1 empty empty volume -2 -6 32 10
--261681 -1 -1 0 1;
-#X obj 151 312 dac~;
+#X obj 161 275 *~;
+#X obj 202 280 hsl 128 15 0.001 10 1 1 empty empty volume -2 -6 0 10
+-261681 -1 -1 8000 1;
+#X obj 150 312 dac~;
 #X obj 162 162 adc~ 1;
-#X text 303 254 print attributes;
+#X text 390 297 print attributes;
 #X text 15 143 list attributes;
-#X obj 292 162 adc~ 2;
-#X obj 16 8 cnv 15 550 40 empty empty burrow~ 10 22 32 24 -260818 -1
+#X obj 16 8 cnv 15 550 40 empty empty burrow~ 10 22 0 24 -260818 -1
 0;
 #X text 188 8 FFTease (C)Lyon \, Penrose (for Max/MSP);
 #X text 188 28 flext port by Thomas Grill;
+#X obj 292 162 adc~ 2;
+#X text 222 231 threshold \, multiplier \, invert;
 #X connect 0 0 2 0;
 #X connect 2 0 11 0;
 #X connect 2 1 1 0;
@@ -41,4 +42,4 @@
 #X connect 11 0 13 1;
 #X connect 12 0 11 1;
 #X connect 14 0 2 0;
-#X connect 17 0 2 1;
+#X connect 20 0 2 1;

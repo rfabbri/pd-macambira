@@ -13,7 +13,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 fftease::fftease(I mult,I flags):
-	_mult(mult),_flags(flags),
+	_mult(mult),_flags(flags),_N(0),
 	_inCount(0),
 	blsz(0),smprt(0)
 {}
@@ -38,6 +38,7 @@ V fftease::m_dsp(I n,S *const *in,S *const *out)
 	if(_D != blsz || sr != smprt) {
 		blsz = _D;
 		smprt = sr;
+		MakeVar();
 
 		Delete();
 		Set();
@@ -48,7 +49,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 {
 	/* declare working variables */
 	I i; 
-	const I _D = n,_N = _D*Mult(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = n,_N = get_N(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
 	_inCount += _D;
@@ -132,7 +133,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 void fftease::Set()
 {
 	/* preset the objects data */
-	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2;
 
 	_inCount = -_Nw;
 
@@ -156,7 +157,7 @@ void fftease::Set()
 	_Hwin = new F[_Nw];
 	_Wanal = new F[_Nw];
 	_Wsyn = new F[_Nw];
-	if(_flags&F_WINDOW)
+	if(_flags&F_BALANCED)
 		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
 	else
 		makehanning( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0,0);

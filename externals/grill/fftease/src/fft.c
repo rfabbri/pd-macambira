@@ -1,8 +1,6 @@
 #include "pv.h"
 
 
-/* float TWOPI; */
-
 /* If forward is true, rfft replaces 2*N real data points in x with
    N complex values representing the positive frequency half of their
    Fourier spectrum, with x[1] replaced with the real part of the Nyquist
@@ -11,6 +9,8 @@
    2*N real values.  N MUST be a power of 2. */
 static void 
 bitreverse( float *x, int N );
+
+static float sqr(float x) { return x*x; }
 
 void rfft( float *x, int N, int forward )
 {
@@ -26,15 +26,12 @@ void rfft( float *x, int N, int forward )
 		i1,i2,i3,i4,
 		N2p1;
   static int 	first = 1;
-float PI, TWOPI;
 
-PI = 3.141592653589793115997963468544185161590576171875;
-TWOPI = 6.28318530717958623199592693708837032318115234375;
-    if ( first ) {
+  if ( first ) {
 
 	first = 0;
     }
-    theta = PI/N;
+    theta = PV_PI/N;
     wr = 1.;
     wi = 0.;
     c1 = 0.5;
@@ -50,7 +47,7 @@ TWOPI = 6.28318530717958623199592693708837032318115234375;
 	xi = 0.;
 	x[1] = 0.;
     }
-    wpr = -2.*pow( sin( 0.5*theta ), 2. );
+    wpr = -2.*sqr( sin( 0.5*theta ));
     wpi = sin( theta );
     N2p1 = (N<<1) + 1;
     for ( i = 0; i <= N>>1; i++ ) {
@@ -104,14 +101,13 @@ void cfft( float *x, int NC, int forward )
 		m,
 		i,j,
 		delta;
-float TWOPI;
-TWOPI = 6.28318530717958623199592693708837032318115234375;
-    ND = NC<<1;
+
+	ND = NC<<1;
     bitreverse( x, ND );
     for ( mmax = 2; mmax < ND; mmax = delta ) {
 	delta = mmax<<1;
-	theta = TWOPI/( forward? mmax : -mmax );
-	wpr = -2.*pow( sin( 0.5*theta ), 2. );
+	theta = PV_2PI/( forward? mmax : -mmax );
+	wpr = -2.*sqr( sin( 0.5*theta ));
 	wpi = sin( theta );
 	wr = 1.;
 	wi = 0.;

@@ -30,8 +30,8 @@ protected:
     F _thresh_dB,_mult_dB;
 
 private:
-	V ms_thresh(F v) { _threshold = (float) (pow( 10., ((_thresh_dB = v) * .05))); }
-	V ms_mult(F v) { _multiplier = (float) (pow( 10., ((_mult_dB = v) * .05))); }
+	V ms_thresh(F v) { _threshold = FromdB(_thresh_dB = v); }
+	V ms_mult(F v) { _multiplier = FromdB(_mult_dB = v); }
 
 
 	static V setup(t_classid c);
@@ -55,7 +55,7 @@ V burrow::setup(t_classid c)
 
 
 burrow::burrow(I argc,const t_atom *argv):
-	fftease(4,F_STEREO|F_WINDOW|F_BITSHUFFLE),
+	fftease(4,F_STEREO|F_BALANCED|F_BITSHUFFLE|F_CONVERT),
 	_thresh_dB(-30),_mult_dB(-18),
 	_invert(false)
 {
@@ -90,31 +90,18 @@ burrow::burrow(I argc,const t_atom *argv):
 
 V burrow::Transform(I _N2,S *const *in)
 {
-	for (I i = 0; i <= _N2; i++ ) {
-		const I even = i*2,odd = even+1;
+	const I _N = _N2*2;
+	register const F thr = _threshold,mul = _multiplier;
 
-		/* convert to polar coordinates from complex values */
-		register F a,b;
+	// use simple threshold from second signal to trigger filtering 
+	// transform does not need phase of signal 2 (-> optimize it!)
 
-		a = ( i == _N2 ? _buffer1[1] : _buffer1[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _buffer1[odd] );
-
-		F amp1 = hypot( a, b );
-		F phase1 = -atan2( b, a );
-
-		a = ( i == _N2 ? _buffer2[1] : _buffer2[even] );
-		b = ( i == 0 || i == _N2 ? 0. : _buffer2[odd] );
-
-		F amp2 = hypot( a, b );
-
-		/* use simple threshold from second signal to trigger filtering */
-		if (_invert?(amp2 < _threshold):(amp2 > _threshold) )
-			amp1 *= _multiplier;
-
-		/* convert back to complex form, read for the inverse fft */
-		_buffer1[even] = amp1 * cos(phase1);
-		if ( i != _N2 )	_buffer1[odd] = -amp1 * sin(phase1);
-	}
+	if(_invert)
+		for (I i = 0; i <= _N; i += 2) 
+			if(_channel2[i] < thr) _channel1[i] *= mul;
+	else
+		for (I i = 0; i <= _N; i += 2)
+			if(_channel2[i] > thr) _channel1[i] *= mul;
 }
 
 
