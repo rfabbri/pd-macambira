@@ -25,7 +25,7 @@ typedef void (*t_xxx)(void);
 
 static char sys_dllextent[] = 
 #ifdef __FreeBSD__
-    ".pd_freebsd";
+    ".pd_linux";
 #endif
 #ifdef IRIX
 #ifdef N32

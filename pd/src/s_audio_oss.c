@@ -5,7 +5,18 @@
 
 /* this file inputs and outputs audio using the OSS API available on linux. */
 
+#ifdef __linux__
 #include <linux/soundcard.h>
+#endif
+
+#ifdef __FreeBSD__
+#include <sys/soundcard.h>
+#include <sys/mman.h>
+#endif
+
+
+
+
 
 #include "m_pd.h"
 #include "s_stuff.h"

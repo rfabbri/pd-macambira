@@ -1,24 +1,69 @@
-# Makefile for PD on MSW
+VPATH = ../obj:./
+OBJ_DIR = ../obj
+BIN_DIR = ../bin
+PDEXEC = $(BIN_DIR)/pd
+EXT= pd_linux
+GUINAME= pd-gui
 
-all: pd gui ..\bin\pd.tk ..\bin\pdsend.exe ..\bin\pdreceive.exe
+INSTALL_PREFIX = /usr/local
+GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
-VC = "C:\Program Files\Microsoft Visual Studio\VC98"
-#VC="\Program Files\DevStudio\Vc"
-INCLUDE = -I.\ -I..\Tcl\include -I$(VC)\include
+# there should be a better way to do this...
+prefix = /usr/local
+MANDIR = ${prefix}/man
 
-LDIR = $(VC)\lib
+# ALSA compilation
 
-LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames  /NODEFAULTLIB:kernel \
-    /NODEFAULTLIB:uuid \
-    $(LDIR)\libc.lib $(LDIR)\oldnames.lib $(LDIR)\kernel32.lib \
-    $(LDIR)\wsock32.lib $(LDIR)\winmm.lib ..\bin\pthreadVC.lib
+SOUND_ALSA = 
 
-GLIB =  $(LIB) ..\bin\tcl83.lib ..\bin\tk83.lib
-CFLAGS = /nologo /W3 /DMSW /DNT /DPD /DPD_INTERNAL /DWIN32 /DWINDOWS /Ox \
-	-DPA_LITTLE_ENDIAN -DUSEAPI_MMIO -DUSEAPI_PORTAUDIO 
-LFLAGS = /nologo
+DEFINES = 
+MORECFLAGS = -DDL_OPEN  -DUSEAPI_OSS
 
-SYSSRC = s_audio_pa.c s_audio_mmio.c s_midi_pm.c
+INCLUDE = -I.
+GINCLUDE = $(INCLUDE)  -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4 -I/usr/X11R6/include -I/usr/local/include
+GLIB =  -lX11 -L/usr/X11R6/lib -ltcl84 -ltk84 -L/usr/local/lib
+
+LDFLAGS = -Wl,-export-dynamic -L/usr/local/lib -L/usr/local/lib/pth -lpthread
+LIB =   -lm
+
+#select either the DBG and OPT compiler flags below:
+OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+WARN_CFLAGS = -Wall -W -Wstrict-prototypes  -Werror \
+    -Wno-unused -Wno-parentheses -Wno-switch
+ARCH_CFLAGS = -DPD -DUNIX 
+
+CFLAGS = $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(DEFINES) $(MORECFLAGS)
+
+# you might want ALSA linked in non-shared because
+# many Linux machines don't have the ALSA shared library.  To link
+# ALSA non-shared, move the # sign below.
+
+ifeq (${SOUND_ALSA},yes)
+CFLAGS += -DPA_USE_ALSA -DUSEAPI_ALSA
+SYSSRC += s_audio_alsa.c \
+    ../portaudio/pa_linux_alsa/callback_thread.c \
+    ../portaudio/pa_linux_alsa/pa_linux_alsa.c \
+    ../portaudio/pa_linux_alsa/blocking_calls.c
+endif
+
+# Which system
+
+SYSTEM = $(shell uname -m)
+
+ifeq (${SYSTEM},alpha)
+#LIB += -lffm -lm
+CFLAGS += -mieee -mcpu=ev56
+endif
+
+# Which compiler
+
+ifeq (${CC},ccc)
+CFLAGS += -g3 -D__COMPAQC__ -arch host
+endif
+
+# the sources
+
+SYSSRC += s_midi_oss.c s_audio_oss.c 
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -35,97 +80,143 @@ SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     x_time.c x_acoustics.c x_net.c x_qlist.c x_gui.c d_soundfile.c \
     $(SYSSRC)
 
-PADIR = ..\portaudio
-INCPA = -I$(PADIR) -I$(PADIR)\pa_common -I$(PADIR)\pablio -I..\lib\asio
-SRCPA = $(PADIR)/pa_common/pa_lib.c $(PADIR)/pa_common/pa_trace.c \
-	$(PADIR)/pablio/pablio_pd.c $(PADIR)/pablio/ringbuffer_pd.c
-SRCASIO = $(PADIR)/pa_asio/pa_asio.cpp 
 
-ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib $(LDIR)\comdlg32.lib \
-$(LDIR)\advapi32.lib $(LDIR)\shell32.lib $(LDIR)\ole32.lib $(LDIR)\oleaut32.lib $(LDIR)\uuid.lib \
-$(LDIR)\odbc32.lib $(LDIR)\odbccp32.lib ..\lib\asio\asiolib.lib
-
-
-PAOBJ = pa_lib.obj pa_trace.obj pablio_pd.obj ringbuffer_pd.obj pa_asio.obj
-
-PMDIR = ..\portmidi
-INCPM = -I$(PMDIR)\pm_common -I$(PMDIR)\pm_win -I$(PMDIR)\porttime
-SRCPM = \
-        $(PMDIR)/pm_common/portmidi.c     \
-        $(PMDIR)/pm_common/pmutil.c       \
-        $(PMDIR)/pm_win/pmwin.c           \
-        $(PMDIR)/pm_win/pmwinmm.c         \
-        $(PMDIR)/porttime/porttime.c         \
-        $(PMDIR)/porttime/ptwinmm.c         \
-
-PMOBJ = portmidi.obj pmutil.obj pmwin.obj pmwinmm.obj porttime.obj ptwinmm.obj
-
-OBJC = $(SRC:.c=.obj) $(PAOBJ) $(PMOBJ)
+OBJ = $(SRC:.c=.o) 
+EXTERNS = ../extra/*/*.$(EXT)
 
 GSRC =  t_main.c t_tkcmd.c
 
-GOBJ = $(GSRC:.c=.obj)
-.PHONY: pd gui
+GOBJ = $(GSRC:.c=.o)
 
-ALLCF = $(CFLAGS)  $(INCLUDE) $(INCASIO) $(INCPA) $(INCPM) /D_WINDOWS /DPA_NO_DS
+#
+#  ------------------ targets ------------------------------------
+#
 
-.c.obj:
-	cl /c $(ALLCF) /Tc$*.c
+.PHONY: pd gui externs all
 
-pd: ..\bin\pd.exe
+all: $(PDEXEC) $(BIN_DIR)/pd-watchdog $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
+    $(BIN_DIR)/pdreceive  $(BIN_DIR)/pd.tk externs
 
-gui: ..\bin\pdtcl.dll
+bin: $(PDEXEC) $(BIN_DIR)/pd-watchdog $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
+    $(BIN_DIR)/pdreceive  $(BIN_DIR)/pd.tk
 
-..\bin\pd.exe: s_entry.obj ..\bin\pd.lib
-	link $(LFLAGS) /out:..\bin\pd.exe /INCREMENTAL:NO s_entry.obj \
-	    ..\bin\pd.lib $(LIB) $(ASIOLIB)
+$(OBJ) : %.o : %.c
+	$(CC) $(CFLAGS) $(GFLAGS) $(INCLUDE) -c -o $(OBJ_DIR)/$*.o $*.c 
 
-..\bin\pd.dll ..\bin\pd.lib: $(OBJC) $(OBJASIO)
-	link $(LFLAGS) /dll /export:sys_main /out:..\bin\pd.dll $(OBJC) \
-	    $(OBJASIO) $(LIB) $(ASIOLIB)
+$(GOBJ) : %.o : %.c
+	$(CC) $(CFLAGS) $(GFLAGS) $(GINCLUDE) -c -o $(OBJ_DIR)/$*.o $*.c 
 
-..\bin\pdtcl.dll: t_tkcmd.obj
-	link $(LFLAGS) /dll /export:Pdtcl_Init /out:..\bin\pdtcl.dll \
-	    t_tkcmd.obj $(GLIB)
+pd: $(PDEXEC)
 
-..\bin\pd.tk: u_main.tk; copy u_main.tk ..\bin\pd.tk
+gui: $(BIN_DIR)/$(GUINAME)
 
-..\bin\pdsend.exe: u_pdsend.obj
-	link $(LFLAGS) /out:..\bin\pdsend.exe /INCREMENTAL:NO u_pdsend.obj \
-	    $(LIB)
+pd-watchdog: $(BIN_DIR)/pd-watchdog
 
-..\bin\pdreceive.exe: u_pdreceive.obj
-	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO u_pdreceive.obj \
-	    $(LIB)
+$(BIN_DIR)/pd-watchdog: s_watchdog.c
+	cc -O2 $(STRIPFLAG) -o $(BIN_DIR)/pd-watchdog s_watchdog.c
 
-# explicit rules to compile portaudio and portmidi sources:
-pa_lib.obj: $(PADIR)\pa_common\pa_lib.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_lib.c
-pa_trace.obj: $(PADIR)\pa_common\pa_trace.c
-	cl /c $(ALLCF) $(PADIR)\pa_common\pa_trace.c
-pablio_pd.obj: $(PADIR)\pablio\pablio_pd.c
-	cl /c $(ALLCF) $(PADIR)\pablio\pablio_pd.c
-ringbuffer_pd.obj: $(PADIR)\pablio\ringbuffer_pd.c
-	cl /c $(ALLCF) $(PADIR)\pablio\ringbuffer_pd.c
+$(BIN_DIR)/pdsend: u_pdsend.c
+	cc $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdsend u_pdsend.c
 
-pa_asio.obj: $(PADIR)\pa_asio\pa_asio.cpp
-	cl /c $(ALLCF) $(PADIR)\pa_asio\pa_asio.cpp
+$(BIN_DIR)/pdreceive: u_pdreceive.c
+	cc $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
 
-portmidi.obj: $(PMDIR)\pm_common\portmidi.c
-	cl /c $(ALLCF) $(PMDIR)\pm_common\portmidi.c
-pmutil.obj: $(PMDIR)\pm_common\pmutil.c
-	cl /c $(ALLCF) $(PMDIR)\pm_common\pmutil.c
-pmwin.obj: $(PMDIR)\pm_win\pmwin.c
-	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwin.c
-pmwinmm.obj: $(PMDIR)\pm_win\pmwinmm.c
-	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwinmm.c
-porttime.obj: $(PMDIR)\porttime\porttime.c
-	cl /c $(ALLCF) $(PMDIR)\porttime\porttime.c
-ptwinmm.obj: $(PMDIR)\porttime\ptwinmm.c
-	cl /c $(ALLCF) $(PMDIR)\porttime\ptwinmm.c
+$(PDEXEC): $(OBJ) 
+	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
+	$(LIB)
 
-# the following should also clean up "bin" but it doesn't because "bin" holds
-# precious stuff from elsewhere.
-clean:
-	del *.obj
+$(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
+	cd ../obj; $(CC) $(INCLUDE) -o $(BIN_DIR)/$(GUINAME) $(GOBJ) \
+	$(GLIB)
+
+$(BIN_DIR)/pd.tk: u_main.tk
+	echo set pd_nt 0 > $(BIN_DIR)/pd.tk
+	grep -v "set pd_nt" < u_main.tk >> $(BIN_DIR)/pd.tk
+
+#this is for Max OSX only...
+$(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)
+	cd ../obj; libtool -dynamic -o $(BIN_DIR)/pdtcl $(GOBJ) \
+	/Library/Frameworks/Tk.framework/Versions/Current/Tk \
+	/Library/Frameworks/Tcl.framework/Versions/Current/Tcl \
+	/usr/lib/libSystem.B.dylib
+
+externs: 
+	cd ../extra/bonk~;make 
+	cd ../extra/choice;make 
+	cd ../extra/expr~;make 
+	cd ../extra/fiddle~;make 
+	cd ../extra/loop~;make 
+	cd ../extra/lrshift~;make 
+	cd ../extra/pique;make 
+
+INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
+MANINSTDIR = $(DESTDIR)/$(MANDIR)
+
+install:  all
+	install -d $(INSTDIR)/lib/pd/bin
+	install $(BIN_DIR)/$(GUINAME) $(INSTDIR)/lib/pd/bin/$(GUINAME)
+	install $(BIN_DIR)/pd-watchdog $(INSTDIR)/lib/pd/bin/pd-watchdog
+	install -m644 $(BIN_DIR)/pd.tk $(INSTDIR)/lib/pd/bin/pd.tk
+	install -d $(INSTDIR)/bin
+	install -m755 $(PDEXEC) $(INSTDIR)/bin/pd
+	install -m 755 $(BIN_DIR)/pdsend $(INSTDIR)/bin/pdsend
+	install -m 755 $(BIN_DIR)/pdreceive $(INSTDIR)/bin/pdreceive 
+	install -d $(INSTDIR)/lib/pd/extra
+	install -d $(INSTDIR)/lib/pd/externs
+	install -m 644 $(EXTERNS) $(INSTDIR)/lib/pd/extra
+	cp -r ../doc $(INSTDIR)/lib/pd/
+	install -d $(INSTDIR)/include
+	install -m644 m_pd.h $(INSTDIR)/include/m_pd.h
+	install -d $(MANINSTDIR)/man1
+	gzip < ../man/pd.1 >  $(MANINSTDIR)/man1/pd.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pd.1.gz
+	gzip < ../man/pdsend.1 >  $(MANINSTDIR)/man1/pdsend.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pdsend.1.gz
+	gzip < ../man/pdreceive.1 >  $(MANINSTDIR)/man1/pdreceive.1.gz
+	chmod 644 $(MANINSTDIR)/man1/pdreceive.1.gz
+
+local-clean:
+	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
+	    $(BIN_DIR)/pdreceive $(BIN_DIR)/pd-watchdog m_stamp.c
+	-rm -f *~
+	-rm -f $(BIN_DIR)/pdsend $(BIN_DIR)/pdreceive
+	-(cd ../doc/6.externs; rm -f *.pd_linux)
+	-rm -f makefile.dependencies
+	touch makefile.dependencies
+	chmod 666 makefile.dependencies
+
+extra-clean:
+	-rm -f `find ../extra/ -name "*.pd_*"`
+	-rm -f tags
+
+clean: extra-clean local-clean
+
+distclean: clean
+	-rm config.cache config.log config.status makefile tags
+	echo all: > makefile
+	echo -e  "\t./configure" >> makefile
+	echo -e "\tmake" >> makefile
+
+tags: $(SRC) $(GSRC); ctags *.[ch]
+
+depend: 
+	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
+
+uninstall:
+	-rm -r $(INSTDIR)/lib/pd
+	-rm $(INSTDIR)/bin/pd
+	-rm $(INSTDIR)/bin/pdsend
+	-rm $(INSTDIR)/bin/pdreceive
+	-rm $(INSTDIR)/include/m_pd.h
+	-rm $(MANINSTDIR)/man/man1/pd.1.gz
+	-rm $(MANINSTDIR)/man/man1/pdsend.1.gz
+	-rm $(MANINSTDIR)/man/man1/pdreceive.1.gz
+
+include makefile.dependencies
+
+
+
+
+
+
 

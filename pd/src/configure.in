@@ -80,7 +80,87 @@ AC_CHECK_LIB(X11, XCreateWindow, LIBS="$LIBS -lX11 -L$x_libraries",
 
 dnl look for tcl 8.x... do I really have to go through all this!?
 
-AC_CHECK_HEADER(tcl.h,, echo "no tcl/tk header found" || exit 1)
+#AC_CHECK_HEADER(tcl.h,, echo "no tcl/tk header found" || exit 1)
+
+
+foundit=no
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl.h,foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.7/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.7";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.7/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.7 -I/usr/local/include/tk8.7";LIBS="$LIBS -ltcl87 -ltk87";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.6/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.6";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.6/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.6 -I/usr/local/include/tk8.6";LIBS="$LIBS -ltcl86 -ltk86";foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.5/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.5";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.5/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.5 -I/usr/local/include/tk8.5";LIBS="$LIBS -ltcl85 -ltk85";foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.4/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.4";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.4/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4";LIBS="$LIBS -ltcl84 -ltk84";foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.3/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.3";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.3/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.3 -I/usr/local/include/tk8.3";LIBS="$LIBS -ltcl83 -ltk83";foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(tcl8.2/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/include/tcl8.2";foundit=yes,)
+fi
+if test $foundit == "no";
+then
+    AC_CHECK_HEADER(/usr/local/include/tcl8.2/tcl.h,
+    	GUIFLAGS="$GUIFLAGS -I/usr/local/include/tcl8.2 -I/usr/local/include/tk8.2";LIBS="$LIBS -ltcl82 -ltk82";foundit=yes,)
+fi
+
+if test $foundit == "no";
+then
+    echo no tcl header found
+    exit -1
+fi
+
+
 
 AC_CHECK_LIB(tcl8.7, main,,
     AC_CHECK_LIB(tcl8.6, main,,
@@ -135,6 +215,28 @@ then
     fi
     OSNUMBER=0
 fi
+
+dnl FreeBSD hack
+if test `uname -s` = FreeBSD;
+then
+    LDFLAGS="-Wl,-export-dynamic -L/usr/local/lib -L/usr/local/lib/pth -lpthread"
+	LIBS="$LIBS -L/usr/local/lib"
+    EXT=pd_linux
+    MORECFLAGS="-DDL_OPEN  -DUSEAPI_OSS"
+    CFLAGS="$CFLAGS -I/usr/local/include"
+    SYSSRC="s_midi_oss.c s_audio_oss.c "
+    STRIPFLAG=-s
+    GUINAME="pd-gui"
+	GUIFLAGS="$GUIFLAGS -I/usr/X11R6/include -I/usr/local/include"
+    if test $USE_OPT_CFLAGS == "YES";
+    then
+	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
+    else
+	OPT_CFLAGS="-g"
+    fi
+    OSNUMBER=0
+fi
+
 
 dnl **** note -- SGI/IRIX code is broken here!!! ***
 

@@ -135,6 +135,10 @@ void sys_setvirtualalarm( void);
 #define API_DEFAULT API_OSS
 #define API_DEFSTRING "OSS"
 #endif
+#ifdef __FreeBSD__
+#define API_DEFAULT API_OSS
+#define API_DEFSTRING "OSS"
+#endif
 #ifdef MSW
 #define API_DEFAULT API_MMIO
 #define API_DEFSTRING "MMIO"
