@@ -60,12 +60,26 @@ inline bool sc_add (flext::AtomList a)
 
 inline float sc_getfloatarg (flext::AtomList a,int i)
 {
-    if (a.Count() >0 || a.Count() <i)
+    if (a.Count() > 0 && a.Count() > i)
 	return flext::GetAFloat(a[i]);
     else 
 	return 0;
 }
 
+inline bool sc_ar(flext::AtomList a)
+{
+    for (int i = 0; i!=a.Count();++i)
+    {
+	if ( flext::IsSymbol(a[i]) )
+	{
+	    const char * teststring; 
+	    teststring = flext::GetString(a[i]);
+	    if((strcmp(teststring,"ar"))==0)
+		return true;
+	}
+    }
+    return false;
+}
 
 // macros to put rgen state in registers
 #define RGET \

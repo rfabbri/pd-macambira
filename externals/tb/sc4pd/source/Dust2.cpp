@@ -129,7 +129,7 @@ public:
 protected:
     void m_set(float f);
     Timer Dust2_timer;
-    void m_doit();
+    void m_doit(void*);
     
 private:
     float m_density, m_scale;
@@ -172,7 +172,7 @@ void Dust2_kr::m_set(float f)
     Dust2_timer.Delay(mtbt * 0.002 * rgen.frand());
 }
 
-void Dust2_kr::m_doit()
+void Dust2_kr::m_doit(void*)
 {
     ToOutFloat(0,2*rgen.frand() - 1 );
 

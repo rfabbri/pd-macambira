@@ -49,9 +49,9 @@ void sc4pd_library_setup()
     post("version "SC4PD_VERSION);
     post("compiled on "__DATE__);
     post("contains: Dust(~), MantissaMask(~), Hasher(~), Median(~), "
-	 "BrownNoise(~),");
-    post("          ClipNoise(~), GrayNoise(~), Dust2(~), WhiteNoise(~), "
-	 "PinkNoise(~)\n");
+	 "BrownNoise(~),\n"
+	 "          ClipNoise(~), GrayNoise(~), Dust2(~), WhiteNoise(~), "
+	 "PinkNoise(~), \n          Crackle(~), Rand(~)\n");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -86,6 +86,10 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(Crackle_ar);
     FLEXT_SETUP(Crackle_kr);
+
+    FLEXT_DSP_SETUP(Rand_ar);
+    FLEXT_SETUP(Rand_kr);
+
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);
