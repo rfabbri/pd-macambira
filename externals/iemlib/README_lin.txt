@@ -21,11 +21,8 @@ see also LICENCE.txt, GnuLGPL.txt and README.txt.
 5.) copy pd-abstractions-folder
  "shell">  cp -r /usr/local/src/iemlib_R1.15/iemabs /usr/local/lib/pd
 
-6.a) copy pd-help-files-folder (pd-0.36-0)
+6.) copy pd-help-files-folder
  "shell">  cp -r /usr/local/src/iemlib_R1.15/iemhelp /usr/local/lib/pd/doc/5.reference/
-
-6.b) copy pd-help-files (pd-0.37-0)
- "shell">  cp /usr/local/src/iemlib_R1.15/iemhelp/*.* /usr/local/lib/pd/iemabs/
 
 7.) add to your pd_start_script, or into your pd-resource-file ~/.pdrc,
  the following configuration-options:

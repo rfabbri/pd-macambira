@@ -62,7 +62,7 @@ static t_int *sigpeakenv_perform(t_int *w)
 		*out++ = peak;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(peak))
+	if(IEM_DENORMAL(peak))
 		peak = 0.0f;
 	x->x_old_peak = peak;
 	return(w+5);

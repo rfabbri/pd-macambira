@@ -119,7 +119,7 @@ static void sigrvu_tick_metro(t_sigrvu *x)
 
 	cur_rms = (1.0f - c1)*x->x_sum_rms*x->x_rcp + c1*x->x_old_rms;
 	/* NAN protect */
-	if(PD_BADFLOAT(cur_rms))
+	if(IEM_DENORMAL(cur_rms))
 		cur_rms = 0.0f;
 
 	if(cur_rms <= 0.0000000001f)

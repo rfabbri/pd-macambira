@@ -176,9 +176,9 @@ static t_int *sigpara_bp2_perform(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->wn1 = wn1;
@@ -231,9 +231,9 @@ static t_int *sigpara_bp2_perf8(t_int *w)
 		wn[1] = wn[9];
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn[0]))
+	if(IEM_DENORMAL(wn[0]))
 		wn[0] = 0.0f;
-	if(PD_BADFLOAT(wn[1]))
+	if(IEM_DENORMAL(wn[1]))
 		wn[1] = 0.0f;
 
 	x->wn1 = wn[1];
@@ -302,7 +302,7 @@ static void sigpara_bp2_print(t_sigpara_bp2 *x)
 	x->x_at[2].a_w.w_float = x->a0;
 	x->x_at[3].a_w.w_float = x->a1;
 	x->x_at[4].a_w.w_float = x->a2;
-	outlet_list(x->x_debug_outlet, &s_list, 5, x->x_at);	post("fb1 = %g, fb2 = %g, ff1 = %g, ff2 = %g, ff3 = %g", x->b1, x->b2, x->a0, x->a1, x->a2);
+	outlet_list(x->x_debug_outlet, &s_list, 5, x->x_at);
 }
 
 static void sigpara_bp2_dsp(t_sigpara_bp2 *x, t_signal **sp)

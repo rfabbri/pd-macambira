@@ -351,9 +351,9 @@ static t_int *sigfilter_perform_2o(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->wn1 = wn1;
@@ -406,9 +406,9 @@ static t_int *sigfilter_perf8_2o(t_int *w)
 		wn[1] = wn[9];
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn[0]))
+	if(IEM_DENORMAL(wn[0]))
 		wn[0] = 0.0f;
-	if(PD_BADFLOAT(wn[1]))
+	if(IEM_DENORMAL(wn[1]))
 		wn[1] = 0.0f;
 
 	x->wn1 = wn[1];
@@ -434,7 +434,7 @@ static t_int *sigfilter_perform_1o(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->wn1 = wn1;
@@ -474,7 +474,7 @@ static t_int *sigfilter_perf8_1o(t_int *w)
 		wn[0] = wn[8];
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn[0]))
+	if(IEM_DENORMAL(wn[0]))
 		wn[0] = 0.0f;
 
 	x->wn1 = wn[0];

@@ -160,7 +160,7 @@ static void sigprvu_tick_metro(t_sigprvu *x)
 
 	x->x_old_peak *= c1;
 	/* NAN protect */
-	if(PD_BADFLOAT(x->x_old_peak))
+	if(IEM_DENORMAL(x->x_old_peak))
 		x->x_old_peak = 0.0f;
 
 	if(x->x_cur_peak > x->x_old_peak)
@@ -191,7 +191,7 @@ static void sigprvu_tick_metro(t_sigprvu *x)
 
 	cur_rms = (1.0f - c1)*x->x_sum_rms*x->x_rcp + c1*x->x_old_rms;
 	/* NAN protect */
-	if(PD_BADFLOAT(cur_rms))
+	if(IEM_DENORMAL(cur_rms))
 		cur_rms = 0.0f;
 
 	if(cur_rms <= 0.0000000001f)

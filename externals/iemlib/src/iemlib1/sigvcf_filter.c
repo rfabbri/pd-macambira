@@ -110,9 +110,9 @@ static t_int *sigvcf_filter_perform_lp2(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->x_wn1 = wn1;
@@ -165,9 +165,9 @@ static t_int *sigvcf_filter_perform_bp2(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->x_wn1 = wn1;
@@ -220,9 +220,9 @@ static t_int *sigvcf_filter_perform_rbp2(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->x_wn1 = wn1;
@@ -275,9 +275,9 @@ static t_int *sigvcf_filter_perform_hp2(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->x_wn1 = wn1;

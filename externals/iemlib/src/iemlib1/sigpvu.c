@@ -129,7 +129,7 @@ static void sigpvu_tick(t_sigpvu *x)
 
 	x->x_old_peak *= x->x_c1;
 	/* NAN protect */
-	if(PD_BADFLOAT(x->x_old_peak))
+	if(IEM_DENORMAL(x->x_old_peak))
 		x->x_old_peak = 0.0f;
 
 	if(x->x_cur_peak > x->x_old_peak)

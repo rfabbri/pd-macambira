@@ -95,4 +95,6 @@ union tabfudge
     int32 tf_i[2];
 };
 
+#define IEM_DENORMAL(f) !(*(unsigned int*)&(f))&0x60000000
+
 #endif

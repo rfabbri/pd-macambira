@@ -77,7 +77,7 @@ static t_int *siglp1_t_perform(t_int *w)
 		yn1 = yn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(yn1))
+	if(IEM_DENORMAL(yn1))
 		yn1 = 0.0f;
 	x->yn1 = yn1;
 	return(w+5);
@@ -115,7 +115,7 @@ static t_int *siglp1_t_perf8(t_int *w)
 		yn[0] = yn[8];
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(yn[0]))
+	if(IEM_DENORMAL(yn[0]))
 		yn[0] = 0.0f;
 
 	x->yn1 = yn[0];

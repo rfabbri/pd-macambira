@@ -3,7 +3,7 @@ all: ..\..\lib\iem_mp3.dll
 
 VIS_CPP_PATH = "C:\Programme\Microsoft Visual Studio\Vc98"
 
-PD_INST_PATH = "C:\Programme\pd"
+PD_INST_PATH = "C:\Programme\pd-0.37-3"
 
 PD_WIN_INCLUDE_PATH = /I. /I$(PD_INST_PATH)\src /I$(VIS_CPP_PATH)\include
 

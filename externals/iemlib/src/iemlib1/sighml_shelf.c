@@ -288,9 +288,9 @@ static t_int *sighml_shelf_perform(t_int *w)
 		wn1 = wn0;
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn2))
+	if(IEM_DENORMAL(wn2))
 		wn2 = 0.0f;
-	if(PD_BADFLOAT(wn1))
+	if(IEM_DENORMAL(wn1))
 		wn1 = 0.0f;
 
 	x->wn1 = wn1;
@@ -343,9 +343,9 @@ static t_int *sighml_shelf_perf8(t_int *w)
 		wn[1] = wn[9];
 	}
 	/* NAN protect */
-	if(PD_BADFLOAT(wn[0]))
+	if(IEM_DENORMAL(wn[0]))
 		wn[0] = 0.0f;
-	if(PD_BADFLOAT(wn[1]))
+	if(IEM_DENORMAL(wn[1]))
 		wn[1] = 0.0f;
 
 	x->wn1 = wn[1];
