@@ -1,5 +1,5 @@
 #N canvas 96 237 669 433 10;
-#X obj 168 41 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 168 41 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X floatatom 63 184 7 0 0 3 Y-axis - -;
 #X floatatom 9 184 7 0 0 3 X-axis - -;
@@ -35,17 +35,17 @@ btn_9;
 #X obj 2 2 cnv 15 650 20 empty empty [joystick] 2 11 1 18 -233017 -66577
 0;
 #X msg 215 43 open 1;
-#X msg 220 62 open 2;
-#X msg 225 81 open 3;
 #X text 1 382 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 218 396 released under the GNU GPL;
 #X text 414 396 $Author: eighthave $;
-#X text 414 383 $Revision: 1.2 $;
+#X text 414 383 $Revision: 1.3 $;
 #X obj 526 350 all_about_hid;
 #X text 417 351 For more info:;
 #X floatatom 225 184 5 0 0 0 - - -;
 #X floatatom 268 184 5 0 0 0 - - -;
+#X msg 220 62 open 3;
+#X msg 225 81 open 4;
 #X connect 0 0 14 0;
 #X connect 9 0 3 0;
 #X connect 9 1 4 0;
@@ -61,12 +61,12 @@ btn_9;
 #X connect 14 1 1 0;
 #X connect 14 2 7 0;
 #X connect 14 3 8 0;
-#X connect 14 4 31 0;
-#X connect 14 5 32 0;
+#X connect 14 4 29 0;
+#X connect 14 5 30 0;
 #X connect 14 6 19 0;
 #X connect 14 6 9 0;
 #X connect 19 0 17 0;
 #X connect 19 1 18 0;
 #X connect 22 0 14 0;
-#X connect 23 0 14 0;
-#X connect 24 0 14 0;
+#X connect 31 0 14 0;
+#X connect 32 0 14 0;

@@ -1,0 +1,24 @@
+#N canvas 11 255 460 423 10;
+#X obj 5 2 cnv 15 450 20 empty empty buttongate] 2 11 1 18 -233017
+-66577 0;
+#X obj 98 306 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 98 149 loadbang;
+#X msg 98 169 1;
+#X obj 98 197 metro 150;
+#X text 27 380 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 394 released under the GNU GPL;
+#X obj 327 332 all_about_hid;
+#X text 218 333 For more info:;
+#X text 17 38 [buttongate] is a simple gate controlled by a HID button.
+You must specify the device and the button which controls the gate.
+The left inlet takes the data to be gated. The right inlet is for sending
+optional control messages to the HID.;
+#X obj 98 242 buttongate 0 btn_0;
+#X text 18 119 The first button on the first device controls this gate:
+;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 10 0;
+#X connect 10 0 1 0;

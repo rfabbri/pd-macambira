@@ -77,13 +77,6 @@ Darwin
 
 
 ==============================================================================
-= ditch x_devname in hid_linux.c
-
-- use sprintf(arg,"/dev/input/event%d",x_ddevice_number); instead
-
-
-
-==============================================================================
 =  consistent console output 
 
 void hid_post(const char *format, const char *);
@@ -96,14 +89,13 @@ void hid_post(const char *format, const char *);
 ==============================================================================
 = event name changes
 
-- make key/button Type ev_btn rather than ev_key
+- make key/button Type btn rather than key (undecided on this one)
 
-- perhaps remove the "ev_" prefix on event Types for efficiency and clarity
 
 ==============================================================================
 = mapping object ideas
 
-- [mousefilter]-like object to easily control things with a button
+
 
 ______________________________________________________________________________
 ------------------------------------------------------------------------------

@@ -72,17 +72,17 @@ char *convertEventsFromDarwinToLinux(pRecElement element);
  *==============================================================================
  */
 
-void convertAxis(pRecElement element, char *linux_type, char *linux_code, char axis) 
+void convertAxis(pRecElement element, char *linux_type, char *linux_code, char *axis) 
 {
 	if (element->relative) 
 	{ 
 		sprintf(linux_type,"rel"); 
-		sprintf(linux_code,"rel_%c",axis); 
+		sprintf(linux_code,"rel_%s",axis); 
 	}
 	else 
 	{ 
 		sprintf(linux_type,"abs"); 
-		sprintf(linux_code,"abs_%c",axis); 
+		sprintf(linux_code,"abs_%s",axis); 
 	}
 }
 
@@ -103,12 +103,12 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 		case kHIDPage_GenericDesktop:
 			switch (element->usage)
 			{
-				case kHIDUsage_GD_X: convertAxis(element, linux_type, linux_code, 'x'); break;
-				case kHIDUsage_GD_Y: convertAxis(element, linux_type, linux_code, 'y'); break;
-				case kHIDUsage_GD_Z: convertAxis(element, linux_type, linux_code, 'z'); break;
-				case kHIDUsage_GD_Rx: convertAxis(element, linux_type, linux_code, 'x'); break;
-				case kHIDUsage_GD_Ry: convertAxis(element, linux_type, linux_code, 'y'); break;
-				case kHIDUsage_GD_Rz: convertAxis(element, linux_type, linux_code, 'z'); break;
+				case kHIDUsage_GD_X: convertAxis(element, linux_type, linux_code, "x"); break;
+				case kHIDUsage_GD_Y: convertAxis(element, linux_type, linux_code, "y"); break;
+				case kHIDUsage_GD_Z: convertAxis(element, linux_type, linux_code, "z"); break;
+				case kHIDUsage_GD_Rx: convertAxis(element, linux_type, linux_code, "rx"); break;
+				case kHIDUsage_GD_Ry: convertAxis(element, linux_type, linux_code, "ry"); break;
+				case kHIDUsage_GD_Rz: convertAxis(element, linux_type, linux_code, "rz"); break;
 				case kHIDUsage_GD_Wheel: 
 					sprintf(linux_type,"rel");sprintf(linux_code,"rel_wheel");break;
 			}
@@ -172,7 +172,7 @@ t_int hid_build_element_list(t_hid *x)
 	
 	DEBUG(post("[hid] found %d elements:",numElements););
 	
-	post("-----------------------------------------------------------");
+	post("");
 	post("  TYPE\t\tCODE\tEVENT NAME");
 	post("-----------------------------------------------------------");
 	for(i=0; i<numElements; i++)
@@ -184,7 +184,7 @@ t_int hid_build_element_list(t_hid *x)
 
 		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeInput);
 	}
-	post("-----------------------------------------------------------");
+	post("");
 
 	return (0);	
 }

@@ -6,11 +6,11 @@
 #X floatatom 140 218 5 0 0 3 wheel - -;
 #X floatatom 85 218 7 0 0 3 Y - -;
 #X floatatom 31 218 7 0 0 3 X - -;
-#X obj 193 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 193 285 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 238 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 238 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 284 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 283 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X msg 175 43 open 0;
 #X msg 180 62 open 1;
@@ -55,29 +55,31 @@
 #X obj 130 111 mouse 1;
 #X obj 211 191 unpack symbol float;
 #X text 282 234 buttons;
-#X obj 193 264 route btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7 btn_8
-;
-#X obj 330 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 329 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 376 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 374 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 421 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 419 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 467 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 465 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 513 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 510 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X obj 2 2 cnv 15 650 20 empty empty [mouse] 2 11 1 18 -233017 -66577
 0;
-#X obj 559 287 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 555 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X text 1 372 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 218 386 released under the GNU GPL;
 #X text 414 386 $Author: eighthave $;
-#X text 414 373 $Revision: 1.4 $;
+#X text 414 373 $Revision: 1.5 $;
 #X obj 526 340 all_about_hid;
 #X text 417 341 For more info:;
+#X obj 601 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 193 264 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
+btn_8;
 #X connect 1 0 18 0;
 #X connect 9 0 18 0;
 #X connect 10 0 18 0;
@@ -90,15 +92,16 @@
 #X connect 18 1 4 0;
 #X connect 18 2 3 0;
 #X connect 18 3 19 0;
-#X connect 18 3 21 0;
+#X connect 18 3 35 0;
 #X connect 19 0 0 0;
 #X connect 19 1 2 0;
-#X connect 21 0 6 0;
-#X connect 21 1 7 0;
-#X connect 21 2 8 0;
-#X connect 21 3 22 0;
-#X connect 21 4 23 0;
-#X connect 21 5 24 0;
-#X connect 21 6 25 0;
-#X connect 21 7 26 0;
-#X connect 21 8 28 0;
+#X connect 35 0 6 0;
+#X connect 35 1 7 0;
+#X connect 35 2 8 0;
+#X connect 35 3 21 0;
+#X connect 35 4 22 0;
+#X connect 35 5 23 0;
+#X connect 35 6 24 0;
+#X connect 35 7 25 0;
+#X connect 35 8 27 0;
+#X connect 35 9 34 0;

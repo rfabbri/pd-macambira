@@ -1,0 +1,27 @@
+#N canvas 367 43 501 384 10;
+#X obj 224 82 hid \$1;
+#X obj 224 24 inlet;
+#X obj 224 107 route key;
+#X obj 224 137 route \$2;
+#X obj 104 26 inlet;
+#X obj 104 245 outlet;
+#X obj 104 214 spigot;
+#X text 9 278 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 226 292 released under the GNU GPL;
+#X text 16 329 $Author: eighthave $;
+#X text 16 346 $Date: 2004-11-15 04:05:39 $;
+#X text 16 312 $Revision: 1.1 $;
+#X obj 319 21 loadbang;
+#X msg 319 42 1;
+#X obj 224 170 unpack f f;
+#X text 5 6 [buttongate];
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 14 0;
+#X connect 4 0 6 0;
+#X connect 6 0 5 0;
+#X connect 12 0 13 0;
+#X connect 13 0 0 0;
+#X connect 14 0 6 1;
