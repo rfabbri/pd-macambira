@@ -629,9 +629,9 @@ void random_tw_rand_seed (t_random_tw *x, unsigned int a, unsigned int b, unsign
     x->x_mask1 = zf << (32-x->x_k1);
     x->x_mask2 = zf << (32-x->x_k2);
     x->x_mask3 = zf << (32-x->x_k3);
-    if (a > (1<<x->x_shft1)) x->x_s1 = a;
-    if (b > (1<<x->x_shft2)) x->x_s2 = b;
-    if (c > (1<<x->x_shft3)) x->x_s3 = c;
+    if (a > (unsigned int)(1<<x->x_shft1)) x->x_s1 = a;
+    if (b > (unsigned int)(1<<x->x_shft2)) x->x_s2 = b;
+    if (c > (unsigned int)(1<<x->x_shft3)) x->x_s3 = c;
     //    rand();
 }
 
@@ -717,7 +717,7 @@ static void random_tw_seed(t_random_tw *x, float f, float glob)
 {
   //x->x_state = f;
   // questionable .. dont quite get how this one's seeded ..
-  random_tw_rand_seed(x, f, (f*0.455777), f);
+  random_tw_rand_seed(x, (int)f, (int)(f*0.455777), (int)f);
 }
 
 static void random_tw_help(t_random_tw *x)

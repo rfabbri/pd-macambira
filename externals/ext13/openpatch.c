@@ -1,8 +1,11 @@
 #include "ext13.h"
-#include "m_pd.h"
+//#include "m_pd.h"
+#include "m_imp.h"
 #include <sys/stat.h>
 #include <stdio.h>
+#ifndef NT
 #include <unistd.h>
+#endif
 #include <string.h>
 
 #ifdef NT

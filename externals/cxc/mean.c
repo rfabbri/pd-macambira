@@ -94,7 +94,7 @@ void cxmean_setup(void)
 			       sizeof(t_cxmean),
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
-  class_addcreator(cxmean_new,gensym("cx.mean"),A_DEFSYM, 0);
+  class_addcreator((t_newmethod)cxmean_new,gensym("cx.mean"),A_DEFSYM, 0);
   
   class_addmethod(cxmean_class, (t_method)cxmean_set,
 		  gensym("set"), A_DEFSYM, 0);
@@ -199,7 +199,7 @@ void cxavgdev_setup(void)
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
 
-  class_addcreator(cxavgdev_new,gensym("cx.avgdev"),A_DEFSYM, 0);
+  class_addcreator((t_newmethod)cxavgdev_new,gensym("cx.avgdev"),A_DEFSYM, 0);
   class_addmethod(cxavgdev_class, (t_method)cxavgdev_set,
 		  gensym("set"), A_DEFSYM, 0);
 /*   class_addmethod(cxavgdev_class, (t_method)cxavgdev_mean, */
@@ -303,7 +303,7 @@ void cxstddev_setup(void)
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
 
-  class_addcreator(cxstddev_new,gensym("cx.stddev"),A_DEFSYM, 0);
+  class_addcreator((t_newmethod)cxstddev_new,gensym("cx.stddev"),A_DEFSYM, 0);
   class_addmethod(cxstddev_class, (t_method)cxstddev_set,
 		  gensym("set"), A_DEFSYM, 0);
 /*   class_addmethod(cxstddev_class, (t_method)cxstddev_mean, */

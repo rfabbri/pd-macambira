@@ -150,7 +150,6 @@ static t_int *streamout13_perform(t_int *w)
 {
   t_streamout13* x = (t_streamout13*) (w[1]);
   int n = (int)(w[2]);
-  t_float *in[x->x_n];
   int i,j,res = 0;
   int offset = 3;
   int sent = 0;
@@ -158,8 +157,11 @@ static t_int *streamout13_perform(t_int *w)
   char* buf = (char *)(w[2]); 
   short* cibuf;
   char* bp;
-
- 
+#ifndef NT
+  t_float *in[x->x_n];
+#else
+  t_float** in = (t_float**) malloc(x->x_n * sizeof(t_float*));
+#endif
 
    for (i=0;i < x->x_n;i++) {
       in[i] = (t_float *)(w[offset+i]);
@@ -262,6 +264,9 @@ static t_int *streamout13_perform(t_int *w)
      }  
   }
  // post ("b-s-s:%d, length:%d, last:%d, prev:%d",x->blockssincesend,length,*cibuf,prev);
+#ifdef NT
+  free(in);
+#endif
   return (w + 2 + i * 2);
 }
 

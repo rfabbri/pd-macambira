@@ -8,6 +8,8 @@
 #include "m_pd.h"
 
 #ifdef NT
+#define inline __inline
+#define M_PI 3.14159265358979323846
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif

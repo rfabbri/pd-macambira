@@ -84,7 +84,7 @@ void ascseq_anything(t_ascseq *x, t_symbol* s, t_int argc, t_atom* argv)
 
 void ascseq_symbol(t_ascseq *x, t_symbol *s)
 {
-  t_atom* a;
+  t_atom* a = NULL;
   ascseq_anything(x, s, 0, a);
 }
 

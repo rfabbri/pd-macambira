@@ -4,7 +4,11 @@
  */
 
 #include <m_pd.h>
+#ifdef NT
+#include <windows.h>
+#else
 #include <sys/time.h>
+#endif
 #include <time.h>
 
 /* ----------------------- utime --------------------- */
@@ -25,6 +29,7 @@ static void *utime_new(t_symbol *s, int argc, t_atom *argv) {
   return (x);
 }
 
+#ifndef NT
 static void utime_bang(t_utime *x)
 {
   struct timeval myutime;
@@ -34,6 +39,23 @@ static void utime_bang(t_utime *x)
   outlet_float(x->x_outlet2, (t_float)myutime.tv_usec);
   outlet_float(x->x_outlet1, (t_float)myutime.tv_sec);
 }
+#else
+static void utime_bang(t_utime *x)
+{
+  FILETIME myfiletime;
+  ULARGE_INTEGER ulfiletime, ulSec, uluSec;
+
+  GetSystemTimeAsFileTime(&myfiletime);
+  ulfiletime.LowPart = myfiletime.dwLowDateTime;
+  ulfiletime.HighPart = myfiletime.dwHighDateTime;
+  ulfiletime.QuadPart -= 116444736000000000; // number of 100ns ticks from 1601-01-01 to 1970-01-01
+  ulSec.QuadPart = ulfiletime.QuadPart / (10 * 1000 * 1000);  // FILETIME uses 100ns ticks
+  uluSec.QuadPart = (ulfiletime.QuadPart - ulSec.QuadPart * 10 * 1000 * 1000) / 10;  // FILETIME uses 100ns ticks
+
+  outlet_float(x->x_outlet2, (t_float)(__int64)ulSec.QuadPart );
+  outlet_float(x->x_outlet1, (t_float)(__int64)uluSec.QuadPart);
+}
+#endif
 
 static void help_utime(t_utime *x)
 {

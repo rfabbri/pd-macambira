@@ -221,7 +221,7 @@ static t_int *sfwrite13_perform(t_int *w)
 	       for (i=0;i<c;i++)  {
                     *x->cbufptr++ = (short)(*(in[i])++ * 32768.);
 	       }
-	       if ((x->cbufptr - x->cbuf) > (x->bufsize )) {sfwrite13_dowrite(x);}
+	       if ((x->cbufptr - x->cbuf) > (int)(x->bufsize )) {sfwrite13_dowrite(x);}
 	  }
      }
 
@@ -282,7 +282,7 @@ static void *sfwrite13_new(t_floatarg chan)
     return (x);
 }
 
-static void *sfwrite13_buffersize(t_sfwrite13 *x,t_floatarg s){
+static void sfwrite13_buffersize(t_sfwrite13 *x,t_floatarg s){
    sfwrite13_tempbuf(x,(int)s);
 }
 

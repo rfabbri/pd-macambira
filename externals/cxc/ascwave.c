@@ -59,9 +59,17 @@ void ascwave_ft1(t_ascwave *x, t_floatarg g)
   int sz = x->x_julp;
   int lchr = x->x_chr;
   int schr = 32;
+  int i = 0;
+#ifndef NT
   char xip[sz+1];
   char xap[sz+1];
-  int i = 0;
+#else
+  char* xip;
+  char* xap;
+  xip = (char*)malloc((sz+1)*sizeof(char));
+  xap = (char*)malloc((sz+1)*sizeof(char));
+#endif
+
   for (i = 0;i <= sz; ++i) {
     if (i == sz-1) {
       xip[i] = lchr;
@@ -92,6 +100,11 @@ void ascwave_ft1(t_ascwave *x, t_floatarg g)
   if (g > 1)
     outlet_symbol(x->t_ob.ob_outlet, gensym(xip));
   x->x_jodel = g;
+
+#ifdef NT
+  free(xip);
+  free(xap);
+#endif
 }
 
 static void ascwave_width(t_ascwave *x, t_floatarg g)

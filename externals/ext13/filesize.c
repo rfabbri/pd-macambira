@@ -2,7 +2,9 @@
 #include "m_pd.h"
 #include <sys/stat.h>
 #include <stdio.h>
+#ifndef NT
 #include <unistd.h>
+#endif
 
 #ifdef NT
 #pragma warning( disable : 4244 )

@@ -14,7 +14,7 @@
 #include <unistd.h>
 #define SOCKET_ERROR -1
 #else
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 
@@ -92,8 +92,11 @@ static int streamin13_listen(t_streamin13 *x,int portno)
     int sockfd;
     static int on = 1;
     
-
+#ifndef NT
     shutdown(x->x_connectsocket,SHUT_RDWR);
+#else
+    shutdown(x->x_connectsocket,SD_BOTH);
+#endif
     sys_closesocket(x->x_connectsocket);
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -132,7 +135,7 @@ static int streamin13_listen(t_streamin13 *x,int portno)
         streamin13_tempbuf(x,64);
     }
 
-
+	return(0);
 }
 
 static void *streamin13_new(t_floatarg fportno ,t_floatarg xn)
@@ -166,13 +169,18 @@ static t_int *streamin13_perform(t_int *w)
   t_streamin13* x = (t_streamin13*) (w[1]);
   int offset = 3;
   int i,j;
-  t_float *out[x->x_n];
   int n = (int)(w[2]);
   struct timeval timeout;
   int packsize;
   int ret;
   int length;
   short* cbuf;
+
+#ifndef NT
+  t_float *out[x->x_n];
+#else
+  t_float **out = (t_float**) malloc(x->x_n * sizeof(t_float*));
+#endif
 
 #ifndef NT
      fd_set fdset;
@@ -203,7 +211,7 @@ static t_int *streamin13_perform(t_int *w)
 	            }
 	         }
 	       }
-	      
+	 free(out);	      
 	 return (w+offset+1+i);
 	     } else {
 	        x->x_ndone++;
@@ -266,6 +274,9 @@ static t_int *streamin13_perform(t_int *w)
 	              break;
 	     }
      }
+#ifdef NT
+	free(out);
+#endif 
      return (w+offset+1+i);
 }
 	

@@ -115,6 +115,7 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
       case A_CANT:
       default:
 	// just fall though
+		  ;	// empty statement to keep VC++ happy
       }
     }
     // default -- sprinkler anything else with 'pd_forwardmess'

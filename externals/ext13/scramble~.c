@@ -2,12 +2,14 @@
 #include "ext13.h"
 #include <sys/types.h>
 #include <string.h>
-#include <sys/errno.h>
-#include <sys/socket.h>
+#ifndef NT
 #include <netinet/in.h>
 #include <netdb.h>
-
-
+#include <sys/errno.h>
+#include <sys/socket.h>
+#else
+#include <stdlib.h>
+#endif
 
 /* ------------------------ scramble_tilde~ ----------------------------- */
 
@@ -109,9 +111,13 @@ t_int *scramble_tilde_perform(t_int *w)
     int erg=0;
     int n;
     t_float val, valL, valR, killval;
-
+#ifndef NT
     t_float* out[x->x_channels];
     t_float* in[x->x_channels];
+#else
+    t_float** out = (t_float**)malloc(x->x_channels*sizeof(t_float*));
+    t_float** in = (t_float**)malloc(x->x_channels*sizeof(t_float*));
+#endif
 
     float n_factor, frac,  a,  b,  c,  d, cminusb;
     int index;
@@ -442,6 +448,10 @@ t_int *scramble_tilde_perform(t_int *w)
           *out[1]++ = 0;
      }/*end if play */
    }/*end while n-- */
+#ifdef NT
+   free(in);
+   free(out);
+#endif
    return (w + x->x_channels * 2 + 3);
 }
 
@@ -529,7 +539,7 @@ static void *scramble_tilde_new(t_floatarg c,t_floatarg b)
     return (x);
 }
 
-void *scramble_tilde_float(t_scramble_tilde* x, t_float n){
+void scramble_tilde_float(t_scramble_tilde* x, t_float n){
   x->play = n;
   if (x->playmode == 2) {
     x->n_grain = (int)n - 1;
@@ -537,12 +547,12 @@ void *scramble_tilde_float(t_scramble_tilde* x, t_float n){
   }
 }
 
-void *scramble_tilde_buffer(t_scramble_tilde* x, t_float n){
+void scramble_tilde_buffer(t_scramble_tilde* x, t_float n){
   if (n > 64) x->x_n = (int)n;
 //  post ("buffersize now:%d",x->x_n);
 }
 
-void *scramble_tilde_threshold(t_scramble_tilde* x, t_float t){
+void scramble_tilde_threshold(t_scramble_tilde* x, t_float t){
     if (t >0) {
       x->lowborder = t;
       x->autofollow = 0;
@@ -552,7 +562,7 @@ void *scramble_tilde_threshold(t_scramble_tilde* x, t_float t){
     
 }
 
-void *scramble_tilde_grains(t_scramble_tilde* x, t_float g){
+void scramble_tilde_grains(t_scramble_tilde* x, t_float g){
     if ((g > 1) && (g < 2048) ) x->newgrains = (int)g;
     else post ("scramble~: minimum # of grains must be 2 an maximum # is 2048");
 }
