@@ -1,6 +1,5 @@
-# change this!!!
-CXX=g++
-CFLAGS=-O6 -mcpu=pentiumpro -g -ggdb
+CFLAGS=-O3 -g -ggdb
+#CFLAGS=-O3 -march=athlon-xp -g -ggdb
 FLAGS=-DPD
 
 FLEXTPATH=/usr/local/lib/pd/externs/flext
