@@ -32,8 +32,19 @@ o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh"
 
 ----------------------------------------------------------------------------
 
+BUGS:
+-----
+
+- deletion of subcanvases and objects therein is crashy
+
+
 CHANGES:
 --------
+
+0.0.3:
+- cleaner message-based object creation
+- also messages and comments can be created now
+- handle sub-canvases
 
 0.0.2:
 - give the dyn~ subcanvas a name (hard to access - for the wild scripters out there),
