@@ -1,23 +1,21 @@
-#N canvas 15 6 542 640 10;
+#N canvas 353 86 570 640 10;
 #X text 31 576 This document was updated for PD version 0.35 test 24
 by Dave Sabine as part of a project called pddp proposed by Krzysztof
 Czaja to build comprehensive documentation for PD.;
 #X obj 55 12 symbol;
-#X text 98 13 - STORE A SYMBOL;
 #X obj 28 259 symbol;
 #X msg 28 112 bang;
 #X text 60 112 "Bang" will force the object to output its value.;
-#X symbolatom 28 314 10 0 0;
-#X obj 28 333 print;
+#X symbolatom 28 310 10 0 0 0 - - -;
+#X obj 28 329 print;
 #X text 22 41 The symbol object stores a symbol (which is set either
 by its creation argument or by the right inlet) and then outputs that
 symbol when it receives a "bang" message or a new symbol in its left
 inlet.;
-#X text 26 394 IMPORTANT NOTE;
-#X obj 165 414 symbol;
-#X symbolatom 290 429 10 0 0;
-#X text 32 447 Please do not get them confused.;
-#X text 75 332 For this example \, I have used the symbol atom to display
+#X text 23 381 IMPORTANT NOTE;
+#X obj 71 410 symbol;
+#X symbolatom 63 449 10 0 0 0 - - -;
+#X text 75 328 For this example \, I have used the symbol atom to display
 the value that was stored in the symbol object and also printed the
 value to the terminal window.;
 #X text 74 253 The symbols are stored here. When banged \, the symbol
@@ -30,38 +28,42 @@ is outputted through the outlet. Note that a creation argument is optional.
 #X msg 82 217 symbol pig;
 #X text 75 139 Sending a symbol to its left inlet will store AND output
 the value.;
-#X text 24 487 RELATED OBJECTS;
+#X text 23 490 RELATED OBJECTS;
 #X obj 26 513 int;
-#X obj 52 513 float;
-#X obj 89 513 f;
-#X obj 115 513 select;
-#X obj 164 513 makefilename;
+#X obj 58 513 float;
+#X obj 102 513 f;
+#X obj 134 513 select;
+#X obj 188 513 makefilename;
 #X text 153 179 Sending new symbols to its right inlet will store the
 values. These values can later be sent via "bang" to its left inlet.
 Note that these symbols are preceded by the word "symbol" to indicate
 the appropriate data type.;
-#X text 31 414 Symbol - the OBJECT -;
-#X text 31 429 is very different than symbol - the ATOM -;
-#N canvas 0 0 454 230 related_objects_from_other_libraries 0;
-#X obj 150 28 makesymbol;
-#X obj 110 29 index;
+#N canvas 0 22 462 238 related_objects_from_other_libraries 0;
+#X obj 160 28 makesymbol;
+#X obj 118 28 index;
 #X obj 16 27 ftos;
-#X obj 52 28 unsymbol;
+#X obj 52 27 unsymbol;
+#X text 10 129 The best places to find information about PD's libraries
+is:;
+#X text 13 159 www.pure-data.org and click on "Downloads" then "Software"
+;
+#X text 14 172 or;
+#X text 15 186 iem.kug.ac.at/pdb/;
+#X obj 243 28 lister;
 #X text 17 58 These objects are offered in PD only if you have downloaded
 and properly installed the appropriate library. These objects may or
-may not exist in a single library.;
-#X text 16 107 The best places to find information about PD's libraries
-is:;
-#X text 13 129 www.pure-data.org and click on "Downloads" then "Software"
-;
-#X text 14 145 or;
-#X text 15 159 iem.kug.ac.at/pdb/;
+may not exist in a single library. These objects usually included in
+the installers.;
 #X restore 25 536 pd related_objects_from_other_libraries;
-#X connect 3 0 6 0;
-#X connect 4 0 3 0;
-#X connect 6 0 7 0;
-#X connect 15 0 3 0;
-#X connect 16 0 3 0;
-#X connect 17 0 3 1;
-#X connect 18 0 3 1;
-#X connect 19 0 3 1;
+#X text 31 395 Symbol - the OBJECT:;
+#X text 31 431 is very different than symbol - the ATOM:;
+#X text 29 466 Careful not to get them confused.;
+#X text 109 13 STORE A SYMBOL;
+#X connect 2 0 5 0;
+#X connect 3 0 2 0;
+#X connect 5 0 6 0;
+#X connect 13 0 2 0;
+#X connect 14 0 2 0;
+#X connect 15 0 2 1;
+#X connect 16 0 2 1;
+#X connect 17 0 2 1;
