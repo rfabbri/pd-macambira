@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="Docutils 0.2.8: http://docutils.sourceforge.net/" />
@@ -76,12 +76,15 @@ version of angriff is this: A nearly empty patch with a noise~ object
 inside, saved under the name &quot;angriff-01.pd&quot;.</p>
 <div class="figure">
 <p><img alt="angriff-01.png" src="angriff-01.png" /></p>
-<p class="caption">angriff-01.pd, an unusable first version.</p>
+<p class="caption"><a class="reference" href="angriff-01.pd">angriff-01.pd</a>, an unusable first version.</p>
 </div>
 <p>Even this can be used as an object. Just create a new, empty patch 
 (with &quot;Ctrl-n&quot;), put an object in it and call it &quot;angriff-01&quot;, i.e. the 
 name of our first drum patch without the .pd-suffix.</p>
-<p>Using the unusable angriff-01.pd in another patch.</p>
+<div class="figure">
+<p><img alt="using_angriff-1.png" src="using_angriff-1.png" /></p>
+<p class="caption">Using the unusable angriff-01.pd in another patch. <a class="reference" href="using_angriff-1.pd">using_angriff-1.pd</a></p>
+</div>
 <p>PD searches for something that matches the object &quot;angriff-01&quot; in 
 several places: in the list of builtin objects like &quot;noise~&quot;, in 
 external libraries or in its path for abstractions. If angriff-01.pd 
@@ -107,7 +110,7 @@ builtin envelope generator in PD is line~. drumcenter-01.pd show the
 noise, the envelope and both multiplied together.</p>
 <div class="figure">
 <p><img alt="drumcenter-01.png" src="drumcenter-01.png" /></p>
-<p class="caption">Enveloped noise, drumcenter-01.pd</p>
+<p class="caption">Enveloped noise, <a class="reference" href="drumcenter-01.pd">drumcenter-01.pd</a></p>
 </div>
 <p>If you listen to this patch, it already sounds a bit like a snare, 
 doesn't it? To make this sound a bit more variable we can use filtered 
@@ -116,7 +119,7 @@ both, so lets use them. Her's the noise filtered with the lop~ filter
 at a cutoff frequency of 400 Hertz:</p>
 <div class="figure">
 <p><img alt="drumcenter-02.png" src="drumcenter-02.png" /></p>
-<p class="caption">Lowpass filtered and enveloped noise, drumcenter-02.pd</p>
+<p class="caption">Lowpass filtered and enveloped noise, <a class="reference" href="drumcenter-02.pd">drumcenter-02.pd</a></p>
 </div>
 <p>Now our patch is beginning to get a bit crammed and chaotic, so let's 
 replace some chords with &quot;send&quot; and &quot;receive&quot; pairs, abbreviated &quot;s&quot; and &quot;r&quot;. 
@@ -132,7 +135,7 @@ are a full part of the surrounding patch. The special objects <tt class="literal
 the surroundig patch and the subpatch. They work with abstractions as well.</p>
 <div class="figure">
 <p><img alt="drumcenter-03.png" src="drumcenter-03.png" /></p>
-<p class="caption">Cleaning up in the house, drumcenter-03.pd</p>
+<p class="caption">Cleaning up in the house, <a class="reference" href="drumcenter-03.pd">drumcenter-03.pd</a></p>
 </div>
 </div>
 <div class="section" id="let-it-swing">
@@ -145,7 +148,7 @@ simulate this behaviour, we use PD's <tt class="literal"><span class="pre">[osc~
 frequency envelope as show in drumcenter-04.pd:</p>
 <div class="figure">
 <p><img alt="drumcenter-04.png" src="drumcenter-04.png" /></p>
-<p class="caption">Percussive oscillator, drumcenter-04.pd</p>
+<p class="caption">Percussive oscillator, <a class="reference" href="drumcenter-04.pd">drumcenter-04.pd</a></p>
 </div>
 <p>The right inlet of <tt class="literal"><span class="pre">[osc~]</span></tt> is used here to set the start phase of the 
 oscillator. If we wouldn't set it, it would be different everytime we 
@@ -172,7 +175,7 @@ around 1.45 msecs at a sampling rate of 44100 Hertz. A bit too long
 for the short attack times used in drum synths.</p>
 <div class="figure">
 <p><img alt="fastline.png" src="fastline.png" /></p>
-<p class="caption">Two line~ segments started with delay, fastline.pd</p>
+<p class="caption">Two line~ segments started with delay, <a class="reference" href="fastline.pd">fastline.pd</a></p>
 </div>
 <p>This problem isn't trivial at all and it appears everywhere, one wants 
 to contol messages in PD quicker than the signal blocksize allows, for 
@@ -186,6 +189,11 @@ floating-point number which specifies the delay in ms after which,
 counting from the current tick, the trigger should go off.&quot; We will now 
 use the T3 break point envelope generator <tt class="literal"><span class="pre">[t3_bpe]</span></tt> to generate faster 
 envelopes.</p>
+<div class="figure">
+<p><img alt="t3-fastline.png" src="t3-fastline.png" /></p>
+<p class="caption">Two line~ segments started with delay, <a class="reference" href="t3-fastline.pd">t3-fastline.pd</a></p>
+</div>
+<p><em>to be continued...</em></p>
 </div>
 </div>
 </body>

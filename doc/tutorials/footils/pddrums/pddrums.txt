@@ -4,12 +4,13 @@ Building Drums in PD
 
 :Autor: Frank Barknecht
 :Contact: fbar@footils.org
+
 :Abstract: 
 	This quicktoot describes how PD can be used to build a simple drum 
 	synthesizer with graphical controls and a step sequencer. 
 
 
-.. contents::
+.. contents:: 
 
 
 Small is beautiful
@@ -58,13 +59,19 @@ inside, saved under the name "angriff-01.pd".
 
 .. figure:: angriff-01.png
 
-   angriff-01.pd, an unusable first version.
+   angriff-01.pd_, an unusable first version.
+
+.. _angriff-01.pd: angriff-01.pd
 
 Even this can be used as an object. Just create a new, empty patch 
 (with "Ctrl-n"), put an object in it and call it "angriff-01", i.e. the 
 name of our first drum patch without the .pd-suffix.
 
-Using the unusable angriff-01.pd in another patch.
+.. figure:: using_angriff-1.png
+
+   Using the unusable angriff-01.pd in another patch. using_angriff-1.pd_
+
+.. _using_angriff-1.pd: using_angriff-1.pd
 
 PD searches for something that matches the object "angriff-01" in 
 several places: in the list of builtin objects like "noise~", in 
@@ -93,7 +100,9 @@ noise, the envelope and both multiplied together.
 
 .. figure:: drumcenter-01.png
 
-	Enveloped noise, drumcenter-01.pd
+  Enveloped noise, drumcenter-01.pd_
+
+.. _drumcenter-01.pd: drumcenter-01.pd 
 
 If you listen to this patch, it already sounds a bit like a snare, 
 doesn't it? To make this sound a bit more variable we can use filtered 
@@ -103,7 +112,9 @@ at a cutoff frequency of 400 Hertz:
 
 .. figure:: drumcenter-02.png
             
-	    Lowpass filtered and enveloped noise, drumcenter-02.pd
+	    Lowpass filtered and enveloped noise, drumcenter-02.pd_
+
+.. _drumcenter-02.pd: drumcenter-02.pd
 
 Now our patch is beginning to get a bit crammed and chaotic, so let's 
 replace some chords with "send" and "receive" pairs, abbreviated "s" and "r". 
@@ -120,7 +131,10 @@ the surroundig patch and the subpatch. They work with abstractions as well.
 
 .. figure:: drumcenter-03.png
 	
-	Cleaning up in the house, drumcenter-03.pd
+	Cleaning up in the house, drumcenter-03.pd_
+
+.. _drumcenter-03.pd: drumcenter-03.pd
+
 
 Let It Swing
 ------------------
@@ -134,7 +148,9 @@ frequency envelope as show in drumcenter-04.pd:
 
 .. figure:: drumcenter-04.png
             
-	    Percussive oscillator, drumcenter-04.pd
+	    Percussive oscillator, drumcenter-04.pd_
+
+.. _drumcenter-04.pd: drumcenter-04.pd
 
 The right inlet of ``[osc~]`` is used here to set the start phase of the 
 oscillator. If we wouldn't set it, it would be different everytime we 
@@ -163,7 +179,9 @@ for the short attack times used in drum synths.
 
 .. figure:: fastline.png
 
-  Two line~ segments started with delay, fastline.pd
+  Two line~ segments started with delay, fastline.pd_
+
+.. _fastline.pd: fastline.pd
 
 This problem isn't trivial at all and it appears everywhere, one wants 
 to contol messages in PD quicker than the signal blocksize allows, for 
@@ -178,3 +196,10 @@ counting from the current tick, the trigger should go off." We will now
 use the T3 break point envelope generator ``[t3_bpe]`` to generate faster 
 envelopes. 
 
+.. figure:: t3-fastline.png
+
+  Two line~ segments started with delay, t3-fastline.pd_
+
+.. _t3-fastline.pd: t3-fastline.pd
+
+*to be continued...*

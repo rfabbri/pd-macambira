@@ -120,7 +120,7 @@ div.document {
 /* Again, "be nice to Opera 5". */
 body>#Menu {width:140px;}
 
-div."contents topic" {
+#contents {
 	position:absolute;
 	top:120px;
 	left:10px;
@@ -133,14 +133,14 @@ div."contents topic" {
 	width:140px;
 	}
 /* Again, "be nice to Opera 5". */
-body>#"contents topic" {width:140px;}
+body>#contents {width:140px;}
 
 
 /*
 :Author: David Goodger
 :Contact: goodger@users.sourceforge.net
-:date: $Date: 2003-04-28 16:33:34 $
-:version: $Revision: 1.1 $
+:date: $Date: 2003-04-29 09:19:26 $
+:version: $Revision: 1.2 $
 :copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
