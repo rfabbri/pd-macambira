@@ -4,9 +4,10 @@ current: darwin_mpkg
 #
 # Fetch the versions of the various included packages
 
-PD_MAJOR_VERSION = $(shell grep PD_MAJOR_VERSION ../../pd/src/m_pd.h | cut -d ' ' -f 3)
-PD_MINOR_VERSION = $(shell grep PD_MINOR_VERSION ../../pd/src/m_pd.h | cut -d ' ' -f 3)
-PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION)
+PD_MAJOR_VERSION = $(shell grep 'Pd version' s_main.c | cut -d '\\' -f 1 | cut -d ' ' -f 6 | cut -d '.' -f 1)
+PD_MINOR_VERSION = $(shell grep 'Pd version' s_main.c | cut -d '\\' -f 1 | cut -d ' ' -f 6 | cut -d '.' -f 2)
+PD_BUGFIX_VERSION = $(shell grep 'Pd version' s_main.c | cut -d '\\' -f 1 | cut -d ' ' -f 6 | cut -d '.' -f 3)
+PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 CYCLONE_MAJOR_VERSION = $(shell grep CYCLONE_VERSION ../../externals/miXed/cyclone/build_counter | cut -d ' ' -f 3 | cut -d '"' -f 2)
 CYCLONE_RELEASE = $(shell grep CYCLONE_RELEASE ../../externals/miXed/cyclone/build_counter | cut -d ' ' -f 3 | cut -d '"' -f 2)
@@ -14,6 +15,8 @@ CYCLONE_BUILD = $(shell grep CYCLONE_BUILD ../../externals/miXed/cyclone/build_c
 CYCLONE_VERSION = $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
 FLEXT_VERSION = $(shell grep PROJECT_NUMBER ../../externals/grill/flext/flext.doxy | cut -d '"' -f2 | cut -d ' ' -f2)
+
+MAXLIB_VERSION = $(shell grep "#define VERSION" ../../externals/maxlib/maxlib.c | cut -d '"' -f 2)
 
 ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
@@ -39,7 +42,7 @@ WELCOME_FILE = Welcome.html
 README_FILE = ReadMe.html
 INFO_FILE = $(PACKAGE_PREFIX).info
 
-clean: darwin_mpkg_clean darwin_mpkg_clean 
+clean: darwin_dmg_clean darwin_mpkg_clean 
 	-cd ../../pd/src && make clean
 	cd ../../externals/miXed/cyclone && make clean
 	cd ../../externals/build/darwin && make clean
@@ -50,7 +53,7 @@ clean: darwin_mpkg_clean darwin_mpkg_clean
 	-cd ../../externals/sprinkler && make distclean
 	cd ../../nqpoly && make clean
 
-darwin_pkg_clean:
+darwin_dmg_clean:
 	-sudo rm -Rf installroot
 	-sudo rm -Rf "$(DMG_PREFIX)"*
 	-rm -f "$(README_FILE)" *.dmg *~
@@ -123,6 +126,7 @@ darwin_mpkg_readme:
 	echo "<LI>pure data: $(PD_VERSION) " >> $(README_FILE)
 	echo "<LI>cyclone: $(CYCLONE_VERSION)" >> $(README_FILE)
 	echo "<LI>flext: $(FLEXT_VERSION)" >> $(README_FILE)
+	echo "<LI>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
 	echo "<LI>pd-abstractions: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<LI>pd-doc: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<LI>pd-externals: `date +20%y.%m.%d`" >> $(README_FILE)
