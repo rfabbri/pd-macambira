@@ -1,9 +1,9 @@
 //
-// readvf.c
+// vf2fs.c
 // used to display vframe objects
 //
 // 1st argument is name of shared memory
-// to struct vframeimage (see Externals\vframe.h)
+// to struct vframeimage (see Patches\vframe.h)
 //
 
 #include <memory.h>

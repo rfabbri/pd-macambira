@@ -1,9 +1,9 @@
 //
-// writevf.c
+// fs2vf.c
 // put image data to vframe
 //
 // 1st argument is name of shared memory
-// to struct vframeimage (see Externals\vframe.h)
+// to struct vframeimage (see Patches\vframe.h)
 //
 
 #include <memory.h>
