@@ -13,41 +13,23 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 class burrow:
-	public flext_dsp
+	public fftease
 {
-	FLEXT_HEADER_S(burrow,flext_dsp,setup)
+	FLEXT_HEADER_S(burrow,fftease,setup)
 	
 public:
 	burrow(I argc,const t_atom *argv);
-	~burrow();
 
 protected:
 
-	virtual V m_dsp(I n,S *const *in,S *const *out);
-	virtual V m_signal(I n,S *const *in,S *const *out);
+	virtual V Transform(I _N2,S *const *in);
 
-	I blsz;
     BL _invert;
 
     F _threshold,_multiplier;
     F _thresh_dB,_mult_dB;
 
-    F *_input1,*_input2;
-    F *_buffer1,*_buffer2;
-    F *_channel1,*_channel2;
-    F *_output;
-    F *_trigland;
-    I *_bitshuffle;
-    F *_Wanal,*_Wsyn,*_Hwin;
-
-    I _inCount;
-
 private:
-	enum { _MULT_ = 4 };
-
-	V Clear();
-	V Delete();
-	
 	V ms_thresh(F v) { _threshold = (float) (pow( 10., ((_thresh_dB = v) * .05))); }
 	V ms_mult(F v) { _multiplier = (float) (pow( 10., ((_mult_dB = v) * .05))); }
 
@@ -73,9 +55,9 @@ V burrow::setup(t_classid c)
 
 
 burrow::burrow(I argc,const t_atom *argv):
+	fftease(4,true,true,true),
 	_thresh_dB(-30),_mult_dB(-18),
-	_invert(false),
-	blsz(0)
+	_invert(false)
 {
 	/* parse and set object's options given */
 	if(argc >= 1) {
@@ -100,113 +82,15 @@ burrow::burrow(I argc,const t_atom *argv):
 	ms_thresh(_thresh_dB);
 	ms_mult(_mult_dB);
 
-	Clear();
-
 	AddInSignal("Messages and input signal");
 	AddInSignal("Reference signal");
 	AddOutSignal("Transformed signal");
 }
 
-burrow::~burrow()
+
+V burrow::Transform(I _N2,S *const *in)
 {
-	Delete();
-}
-
-V burrow::Clear()
-{
-	_bitshuffle = NULL;
-	_trigland = NULL;
-	_input1 = _input2 = NULL;
-	_Hwin = NULL;
-	_Wanal = _Wsyn = NULL;
-	_buffer1 = _buffer2 = NULL;
-	_channel1 = _channel2 = NULL;
-	_output = NULL;
-}
-
-V burrow::Delete() 
-{
-	if(_bitshuffle) delete[] _bitshuffle;
-	if(_trigland) delete[] _trigland;
-	if(_input1) delete[] _input1;
-	if(_input2) delete[] _input2;
-	if(_Hwin) delete[] _Hwin;
-	if(_Wanal) delete[] _Wanal;
-	if(_Wsyn) delete[] _Wsyn;
-	if(_buffer1) delete[] _buffer1;
-	if(_buffer2) delete[] _buffer2;
-	if(_channel1) delete[] _channel1;
-	if(_channel2) delete[] _channel2;
-	if(_output) delete[] _output;
-}
-
-
-
-V burrow::m_dsp(I n,S *const *,S *const *)
-{
-	const I _D = n;
-	if(_D != blsz) {
-		blsz = _D;
-
-		Delete();
-
-		/* preset the objects data */
-		const I _N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
-
-		_inCount = -_Nw;
-
-		/* assign memory to the buffers */
-		_input1 = new F[_Nw];
-		_input2 = new F[_Nw];
-		_buffer1 = new F[_N];
-		_buffer2 = new F[_N];
-		_channel1 = new F[_N+2];
-		_channel2 = new F[_N+2];
-		_output = new F[_Nw];
-
-		_bitshuffle = new I[_N*2];
-		_trigland = new F[_N*2];
-
-		_Hwin = new F[_Nw];
-		_Wanal = new F[_Nw];
-		_Wsyn = new F[_Nw];
-
-		/* initialize pv-lib functions */
-		init_rdft( _N, _bitshuffle, _trigland);
-		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
-	}
-}
-
-V burrow::m_signal(I n,S *const *in,S *const *out)
-{
-	/* declare working variables */
-	I i, j; 
-	const I _D = n,_N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
-
-	/* fill our retaining buffers */
-	_inCount += _D;
-
-	for(i = 0; i < _N-_D ; i++ ) {
-		_input1[i] = _input1[i+_D];
-		_input2[i] = _input2[i+_D];
-	}
-	for(j = 0; i < _N; i++,j++) {
-		_input1[i] = in[0][j];
-		_input2[i] = in[1][j];
-	}
-
-	/* apply hamming window and fold our window buffer into the fft buffer */
-	fold( _input1, _Wanal, _Nw, _buffer1, _N, _inCount );
-	fold( _input2, _Wanal, _Nw, _buffer2, _N, _inCount );
-
-	/* do an fft */
-	rdft( _N, 1, _buffer1, _bitshuffle, _trigland );
-	rdft( _N, 1, _buffer2, _bitshuffle, _trigland );
-
-
-	// ---- BEGIN --------------------------------
-
-	for ( i = 0; i <= _N2; i++ ) {
+	for (I i = 0; i <= _N2; i++ ) {
 		const I even = i<<1,odd = even+1;
 
 		/* convert to polar coordinates from complex values */
@@ -233,26 +117,6 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 		if ( i != _N2 )
 			_buffer1[odd] = -_channel1[even] * sin( _channel1[odd] );
 	}
-
-
-	// ---- END --------------------------------
-
-
-	/* do an inverse fft */
-	rdft( _N, -1, _buffer1, _bitshuffle, _trigland );
-
-	/* dewindow our result */
-	overlapadd( _buffer1, _N, _Wsyn, _output, _Nw, _inCount);
-
-	/* set our output and adjust our retaining output buffer */
-	const F mult = 1./_N;
-	for ( j = 0; j < _D; j++ )
-		out[0][j] = _output[j] * mult;
-
-	for ( j = 0; j < _N-_D; j++ )
-		_output[j] = _output[j+_D];
-	for (; j < _N; j++ )
-		_output[j] = 0.;
 }
 
 

@@ -409,6 +409,10 @@ SOURCE=".\ori.max\xsyn-opt~.c"
 # End Group
 # Begin Source File
 
+SOURCE=.\src\fftease.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\main.cpp
 # End Source File
 # Begin Source File
