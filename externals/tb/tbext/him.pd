@@ -1,0 +1,42 @@
+#N canvas 0 0 680 378 10;
+#X obj 48 338 dac~;
+#X msg 117 142 output \$1;
+#X obj 117 120 hradio 15 1 0 6 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X msg 125 191 regtime \$1;
+#X obj 125 169 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 51 15 hsl 128 15 1e-04 1 1 0 empty empty dt -2 -6 0 8 -262144
+-1 -1 0 0;
+#X msg 48 37 dt \$1;
+#X msg 80 84 e \$1;
+#X obj 83 65 hsl 128 15 -1 0 0 0 empty empty etilde -2 -6 0 8 -262144
+-1 -1 0 0;
+#X floatatom 122 85 5 0 0 0 - - -;
+#X floatatom 106 40 5 0 0 0 - - -;
+#X msg 158 224 reset;
+#X msg 179 258 state;
+#X obj 48 309 him~ -0.3;
+#X text 216 123 switch beween mu \, muv \, nu \, nuv \, x and y;
+#X text 224 66 set the etilde of the system if it's positive \, the
+electron will leave the atom;
+#X text 194 13 set the timesteps for the 4th order runge-kutta approximation
+;
+#X text 215 190 use the real or the regulated time;
+#X text 218 223 randomize new values (warning! this may click!!!);
+#X text 231 257 returns the state of the system;
+#X text 128 308 the optional argument is the etilde of the system;
+#X connect 1 0 13 0;
+#X connect 2 0 1 0;
+#X connect 3 0 13 0;
+#X connect 4 0 3 0;
+#X connect 5 0 6 0;
+#X connect 5 0 10 0;
+#X connect 6 0 13 0;
+#X connect 7 0 13 0;
+#X connect 8 0 7 0;
+#X connect 8 0 9 0;
+#X connect 11 0 13 0;
+#X connect 12 0 13 0;
+#X connect 13 0 0 0;
+#X connect 13 0 0 1;

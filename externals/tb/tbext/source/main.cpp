@@ -40,7 +40,7 @@
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.04"
+#define TBEXT_VERSION "0.05"
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
 #error upgrade your flext version!!!!!!
@@ -52,11 +52,10 @@ void ttbext_setup()
   post("version "TBEXT_VERSION);
   post("compiled on "__DATE__);
   post("contains: tbroute(~), tbsig~, tbpow~, tbfft1~, tbfft2~, bufline~, fftgrrev~");
-  post("          fftgrsort~, fftgrshuf~, rfftw~, rifftw~");
+  post("          fftgrsort~, fftgrshuf~, him~");
 
   FLEXT_SETUP(tbroute);
   FLEXT_DSP_SETUP(tbsroute);
-  //  FLEXT_DSP_SETUP(tbssel);
   FLEXT_DSP_SETUP(tbsig);
   FLEXT_DSP_SETUP(tbpow);
   //  FLEXT_DSP_SETUP(tbg7xx);
@@ -66,12 +65,8 @@ void ttbext_setup()
   FLEXT_DSP_SETUP(fftgrsort);
   FLEXT_DSP_SETUP(fftgrshuf);
   FLEXT_DSP_SETUP(fftgrrev);
+  FLEXT_DSP_SETUP(him);
 
-
-#if (FFTW == 1)
-  FLEXT_DSP_SETUP(rfftw);
-  FLEXT_DSP_SETUP(rifftw);
-#endif
 
 
 }

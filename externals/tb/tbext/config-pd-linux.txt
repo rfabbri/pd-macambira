@@ -10,7 +10,7 @@ PD=/usr/lib/pd
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDINC=/home/tim/pd/pd/src
+PDINC=/home/tim/pd/pd-0.37-1test3/src
 #PDINC=/home/tim/pd/devel_0_36/pd/src
 
 # where do the flext libraries reside?
@@ -29,12 +29,8 @@ HELPDIR=${PD}/doc/5.reference
 
 # additional compiler flags
 # (check whether they fit to your system!)
-UFLAGS=-g -xW -tpp7 -ip -ipo_obj    # icc
+UFLAGS=-xN -tpp7 -ip -ipo_obj    # icc
 # UFLAGS=-mcpu=pentium4 -mmmx -msse2 -msse -mfpmath=sse  # gcc 3.2 
-
-#compile support for the fftw3 library 
-#make sure that you compiled fftw3 for single precision floats!!!
-FFTW=1
 
 # define to link against shared flext library (flext version >= 0.5.0)
 FLEXT_SHARED=1
