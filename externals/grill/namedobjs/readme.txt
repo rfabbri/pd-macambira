@@ -1,0 +1,46 @@
+namedobjs - retrieve named objects in a patcher
+
+Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+For information on usage and redistribution, and for a DISCLAIMER OF ALL
+WARRANTIES, see the file, "license.txt," in this distribution.  
+
+Donations for further development of the package are highly appreciated.
+
+----------------------------------------------------------------------------
+
+You will need the flext C++ layer for PD and Max/MSP externals to compile this.
+
+
+Package files:
+- readme.txt: this one
+- gpl.txt,license.txt: GPL license stuff
+- main.cpp: all the stuff
+
+----------------------------------------------------------------------------
+
+The package should at least compile (and is tested) with the following compilers:
+
+- Max/MSP - MacOS:
+o CodeWarrior Pro: edit "namedobjs.cw" project file 
+o MPW-PR: edit "namedobjs.mpw" project file 
+
+----------------------------------------------------------------------------
+
+Description:
+
+1) send a bang to the left inlet 
+2) for each named object in the patcher a message [class name pos-left pos-top] is output at the left outlet
+3) after the last message a bang is output at the right outlet
+
+----------------------------------------------------------------------------
+
+Version history:
+
+0.0.1:
+- first release
+
+
+---------------------------------------------------------------------------
+
+
+TODO list:

@@ -1,0 +1,72 @@
+# idelay~ - interpolating delay using flext layer
+# Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ darwin
+#
+# usage: make -f makefile.pd-darwin
+#
+# ---------------------------------------------
+
+NAME=idelay~
+
+# where to build
+TARGDIR=./pd-darwin
+
+# where to install	### EDIT! ###
+INSTDIR=/usr/local/pd/extra
+
+#
+PD=/usr/local/pd/bin/pd
+
+# flext stuff  ### EDIT! ###
+FLEXTPATH=/usr/local/pd/flext
+FLEXTLIB=$(FLEXTPATH)/flext.a
+
+# compiler+linker stuff	### EDIT! ###
+INCLUDES=/usr/local/pd/src
+FLAGS=-DPD -Dunix 
+CFLAGS=-O6 -maltivec -W -Wshadow -Wno-unused -Wno-parentheses -Wno-switch
+LDFLAGS=-bundle # -undefined suppress -flat_namespace
+LIBS=m
+
+
+# the rest can stay untouched
+# ----------------------------------------------
+
+# all the source files from the package
+SRCS=delay.cpp 
+HDRS=delay.h
+
+TARGET=$(TARGDIR)/$(NAME).pd_darwin
+
+# default target
+all: $(TARGDIR) $(TARGET)
+
+$(SRCS): $(HDRS)
+	touch $@
+
+$(TARGDIR):
+	mkdir $(TARGDIR)
+
+$(TARGDIR)/%.o : %.cpp
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-l%,$(LIBS)) -bundle_loader $(PD) -o $@ 
+	chmod 755 $@
+ 
+$(INSTDIR):
+	mkdir $(INSTDIR)
+
+install:: $(INSTDIR)
+
+install:: $(TARGET)  
+	cp $^ $(INSTDIR)
+	chown root.root $(patsubst %,$(INSTDIR)/%,$(notdir $^))
+
+.PHONY: clean
+clean:
+	rm -f $(TARGDIR)/*.o $(TARGET)
+	
+
+
