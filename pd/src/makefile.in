@@ -147,7 +147,6 @@ externs:
 	cd ../extra/fiddle~;make @EXTERNTARGET@
 	cd ../extra/loop~;make @EXTERNTARGET@
 	cd ../extra/lrshift~;make @EXTERNTARGET@
-	cd ../extra/paf~;make @EXTERNTARGET@
 	cd ../extra/pique;make @EXTERNTARGET@
 
 INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
