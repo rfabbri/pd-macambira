@@ -56,6 +56,7 @@ filesize.c
 ftos.c
 fwarp.c
 gauss.c
+gcanvas.c
 gestalt.c
 getenv.c
 henon.c
@@ -170,6 +171,7 @@ shuffle.c
 sinh.c
 sl.c
 slider.c
+sliderh.c
 speedlim.c
 split.c
 sprinkler.c
