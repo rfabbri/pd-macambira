@@ -1,4 +1,4 @@
-#N canvas 305 189 713 458 10;
+#N canvas 305 189 717 462 10;
 #X obj 125 38 inlet;
 #X obj 5 346 outlet;
 #X obj 110 346 outlet;
@@ -16,7 +16,6 @@
 #X obj 187 37 loadbang;
 #X obj 5 283 autoscale -1 1;
 #X obj 110 283 autoscale -1 1;
-#X obj 220 284 autoscale -1 1;
 #X obj 67 233 route rel_x rel_y rel_wheel;
 #X obj 271 258 print MOUSE_UNIMPLEMENTED_EVENT;
 #X text 343 139 this is for once this feature is implemented;
@@ -27,8 +26,8 @@
 ;
 #X text 218 436 released under the GNU GPL;
 #X text 414 436 $Author: eighthave $;
-#X text 414 423 $Revision: 1.3 $;
-#X connect 0 0 21 0;
+#X text 414 423 $Revision: 1.4 $;
+#X connect 0 0 20 0;
 #X connect 6 0 5 0;
 #X connect 7 0 6 0;
 #X connect 8 0 7 0;
@@ -36,10 +35,9 @@
 #X connect 14 0 13 0;
 #X connect 15 0 1 0;
 #X connect 16 0 2 0;
-#X connect 17 0 3 0;
-#X connect 18 0 15 0;
-#X connect 18 1 16 0;
-#X connect 18 2 17 0;
-#X connect 21 0 22 0;
-#X connect 22 0 18 0;
-#X connect 22 1 4 0;
+#X connect 17 0 15 0;
+#X connect 17 1 16 0;
+#X connect 17 2 3 0;
+#X connect 20 0 21 0;
+#X connect 21 0 17 0;
+#X connect 21 1 4 0;

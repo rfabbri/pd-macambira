@@ -115,11 +115,30 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 					sprintf(linux_type,"abs");sprintf(linux_code,"abs_throttle");break;
 			}
 			break;
+		case kHIDPage_KeyboardOrKeypad:
+			sprintf(linux_type, "key"); 
+			/* temporary kludge until I feel like writing the translation table */
+			sprintf(linux_code, "key_%ld", element->usage); 
+			break;
 		case kHIDPage_Button:
 			sprintf(linux_type, "key"); 
 			/* HID Manager button numbers start at 1, [hid] start at 0 */
 			sprintf(linux_code, "btn_%ld", element->usage - 1); 
 			break;
+		case kHIDPage_LEDs:
+			/* temporary kludge until I feel like writing the translation table */
+			sprintf(linux_type, "led"); 
+			sprintf(linux_code, "led_%ld", element->usage - 1); 
+			break;
+		case kHIDPage_PID:
+			/* temporary kludge until I feel like writing the translation table */
+			sprintf(linux_type, "ff"); 
+			sprintf(linux_code, "ff_%ld", element->usage - 1); 
+			break;
+		default:
+			/* temporary kludge until I feel like writing the translation table */
+			sprintf(linux_type, "not_implemented"); 
+			sprintf(linux_code, "notimp_%ld", element->usage - 1); 
 	}
 }
 

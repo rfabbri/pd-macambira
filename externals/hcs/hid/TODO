@@ -160,3 +160,19 @@ Because of the currnently implementation of the conversion of the MacOS X
 style event to the Linux style event, an event with a value of zero is output
 on the unchanged axis when the hatswitch is moved in along the X or Y axis (as
 opposed to diagonally).
+
+
+______________________________________________________________________________
+- BUG: on MacOS X, mouse axis data is limited by the screen dimensions
+
+- the axes data stops outputting when the mouse pointer reaches the edge of
+  the screen.  Hopefully the HID Manager API will allow raw mouse data
+  access.  It must since its used with games.
+
+_________________________________________________________________________________________
+- BUG: on MacOS X, two keyboard key codes are reported as hatswitches
+
+  abs   abs_hat0x       Button Input, Keyboard Usage 0x39
+  abs   abs_hat0y       Button Input, Keyboard Usage 0x39
+
+I am pretty sure this is just a display problem, but it might not be.
