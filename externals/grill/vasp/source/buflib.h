@@ -26,8 +26,8 @@ namespace BufLib
 
 	BufEntry *NewImm(I fr,BL zero = true);
 
-	V IncRef(t_symbol *s);
-	V DecRef(t_symbol *s);
+	V IncRef(const t_symbol *s);
+	V DecRef(const t_symbol *s);
 
 	BufEntry *Resize(BufEntry *e,I fr,BL keep = false,BL zero = true); 
 }

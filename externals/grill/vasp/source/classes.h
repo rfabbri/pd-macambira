@@ -106,7 +106,7 @@ protected:
 
 	BL detach;	// detached operation?
 	I prior;  // thread priority
-	thrid_t thrid;
+//	thrid_t thrid; 
 #else
 	FLEXT_CALLBACK(m_bang)
 
@@ -256,8 +256,8 @@ protected:																		\
 	virtual Vasp *tx_work()														\
 	{																			\
 		OpParam p(thisName(),0);												\
-		CVasp cdst(dst);														\
-		return VaspOp::m_##op(p,CVasp(ref),&cdst);								\
+		CVasp cdst(dst),cref(ref);												\
+		return VaspOp::m_##op(p,cref,&cdst);									\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
@@ -275,8 +275,8 @@ protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\
 		OpParam p(thisName(),1);												\
-		CVasp cdst(dst);														\
-		return VaspOp::m_##op(p,CVasp(ref),arg,&cdst);							\
+		CVasp cdst(dst),cref(ref);												\
+		return VaspOp::m_##op(p,cref,arg,&cdst);								\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\
@@ -294,8 +294,8 @@ protected:																		\
 	virtual Vasp *tx_work(const Argument &arg)									\
 	{																			\
 		OpParam p(thisName(),args);												\
-		CVasp cdst(dst);														\
-		return VaspOp::m_##op(p,CVasp(ref),arg,&cdst);							\
+		CVasp cdst(dst),cref(ref);												\
+		return VaspOp::m_##op(p,cref,arg,&cdst);								\
 	}																			\
 	virtual V m_help() { post("%s - " help,thisName()); }						\
 };																				\

@@ -169,8 +169,8 @@ public:
 	vasp_soffset(I argc,t_atom *argv): vasp_search(argc,argv) {}
 	virtual Vasp *do_work(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_soffset(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_soffset(p,cref,arg,&cdst); 
 	}
 };																				
 FLEXT_LIB_V("vasp, vasp.offset= vasp.o=",vasp_soffset)
@@ -184,8 +184,8 @@ public:
 	vasp_sframes(I argc,t_atom *argv): vasp_search(argc,argv) {}
 	virtual Vasp *do_work(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_sframes(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_sframes(p,cref,arg,&cdst); 
 	}
 };																				
 FLEXT_LIB_V("vasp, vasp.frames= vasp.f=",vasp_sframes)

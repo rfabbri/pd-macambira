@@ -224,8 +224,8 @@ public:
 
 	virtual Vasp *do_shift(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_tilt(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_tilt(p,cref,arg,&cdst); 
 	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
@@ -261,8 +261,8 @@ public:
 
 	virtual Vasp *do_shift(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_xtilt(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_xtilt(p,cref,arg,&cdst); 
 	}
 		
 	virtual V m_help() { post("%s - Resamples buffer data symmetrically (in two halves)",thisName()); }

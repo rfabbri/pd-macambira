@@ -16,7 +16,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class VSymbol
 {
 public:
-	VSymbol(t_symbol *s = NULL): sym(s) { Inc(); }
+	VSymbol(const t_symbol *s = NULL): sym(s) { Inc(); }
 	VSymbol(const VSymbol &s): sym(s.sym) { Inc(); }
 	~VSymbol() { Dec(); }
 	
@@ -28,7 +28,6 @@ public:
 	
 	VSymbol &operator =(const VSymbol &s) { Dec(); sym = s.sym; Inc(); return *this; }
 	
-	t_symbol *Symbol() { return sym; }
 	const t_symbol *Symbol() const { return sym; }
 	const C *Name() const { return flext::GetAString(Symbol()); }
 	
@@ -36,7 +35,7 @@ protected:
 	V Inc();
 	V Dec();
 
-	t_symbol *sym;
+	const t_symbol *sym;
 };
 
 class VBuffer

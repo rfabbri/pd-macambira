@@ -148,8 +148,8 @@ public:
 
 	virtual Vasp *do_peaks(OpParam &p) 
 	{ 
-		CVasp cdst(dst); 
-		return VaspOp::m_peaks(p,CVasp(ref),&cdst); 
+		CVasp cdst(dst),cref(ref); 
+		return VaspOp::m_peaks(p,cref,&cdst); 
 	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
@@ -180,8 +180,8 @@ public:
 	vasp_valleys(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
 	virtual Vasp *do_peaks(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_valleys(p,CVasp(ref),&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_valleys(p,cref,&cdst); 
 	}
 };																				
 FLEXT_LIB_V("vasp, vasp.valleys",vasp_valleys)
@@ -195,8 +195,8 @@ public:
 	vasp_rpeaks(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
 	virtual Vasp *do_peaks(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_rpeaks(p,CVasp(ref),&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_rpeaks(p,cref,&cdst); 
 	}
 };																				
 FLEXT_LIB_V("vasp, vasp.rpeaks",vasp_rpeaks)
@@ -210,8 +210,8 @@ public:
 	vasp_rvalleys(I argc,const t_atom *argv): vasp_peaks(argc,argv) {}
 	virtual Vasp *do_peaks(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_rvalleys(p,CVasp(ref),&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_rvalleys(p,cref,&cdst); 
 	}
 };																				
 FLEXT_LIB_V("vasp, vasp.rvalleys",vasp_rvalleys)

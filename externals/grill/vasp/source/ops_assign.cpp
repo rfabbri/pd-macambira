@@ -69,7 +69,7 @@ public:
 
 	virtual V m_to(I,const t_atom *) { post("s - destination vasp is ignored!",thisName()); }
 
-	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { return VaspOp::m_copy(p,CVasp(ref),dst); }
+	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { CVasp cref(ref); return VaspOp::m_copy(p,cref,dst); }
 		
 	virtual Vasp *tx_work(const Argument &arg) 
 	{ 
@@ -100,7 +100,7 @@ public:
 	
 	vasp_ccopy(I argc,const t_atom *argv): vasp_copy(argc,argv) {}
 
-	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { return VaspOp::m_ccopy(p,CVasp(ref),dst); }
+	virtual Vasp *do_copy(OpParam &p,CVasp &dst) { CVasp cref(ref); return VaspOp::m_ccopy(p,cref,dst); }
 
 	virtual V m_help() { post("%s - Copies complex pairs of the triggering vasp to the argument vasp",thisName()); }
 };																				

@@ -116,8 +116,8 @@ public:
 
 	virtual Vasp *do_shift(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_shift(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_shift(p,cref,arg,&cdst); 
 	}
 		
 	virtual Vasp *tx_work(const Argument &arg) 
@@ -150,8 +150,8 @@ public:
 
 	virtual Vasp *do_shift(OpParam &p) 
 	{ 
-		CVasp cdst(dst);
-		return VaspOp::m_xshift(p,CVasp(ref),arg,&cdst); 
+		CVasp cdst(dst),cref(ref);
+		return VaspOp::m_xshift(p,cref,arg,&cdst); 
 	}
 		
 	virtual V m_help() { post("%s - Shifts buffer data symmetrically (in two halves)",thisName()); }

@@ -87,8 +87,8 @@ BL vasp_base::ToOutVasp(I oix,Vasp &v)
 
 vasp_op::vasp_op(BL op)
 #ifdef FLEXT_THREADS
-	:detach(false),prior(-2),
-	thrid(0)
+	:detach(false),prior(-2)
+//	,thrid(0)
 #endif
 {
 	FLEXT_ADDBANG(0,m_dobang);
@@ -183,7 +183,7 @@ V vasp_tx::m_bang()
 	Lock(); 
 
 #ifdef FLEXT_THREADS
-//	RelPriority(prior);
+	if(!IsSystemThread()) RelPriority(prior);
 #endif
 
 	if(ref.Check()) 
@@ -211,7 +211,7 @@ V vasp_tx::m_bang()
 	}
 
 #ifdef FLEXT_THREADS
-	thrid = 0;
+//	thrid = 0; 
 #endif
 
 	Unlock();
