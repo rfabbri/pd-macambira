@@ -31,7 +31,7 @@
      SuperCollider by James McCartney
          http://www.audiosynth.com
      
-   Coded while listening to: 
+   Coded while listening to: Bernhard Lang: Differenz / Wiederholung 2
    
 */
 
@@ -40,9 +40,9 @@
 /* ------------------------ PitchShift~ -----------------------------*/
 
 class PitchShift_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(PitchShift_ar,flext_dsp);
+    FLEXT_HEADER(PitchShift_ar,sc4pd_dsp);
 
 public:
     PitchShift_ar(int argc,t_atom * argv);
@@ -54,11 +54,6 @@ protected:
     }
     
     virtual void m_dsp(int n, t_sample *const *in, t_sample *const *out);
-
-    void m_set_windowsize(float f)
-    {
-	m_windowsize = f;
-    }
 
     void m_set_pitchratio (float f)
     {
@@ -76,7 +71,7 @@ protected:
     }
 
 private:
-    float m_windowsize, m_pitchratio,m_pitchdispersion,m_timedispersion;
+    float m_windowsize,m_pitchratio,m_pitchdispersion,m_timedispersion;
     RGen rgen;
 
 
@@ -93,7 +88,6 @@ private:
     DEFSIGFUN(m_signal_);
     DEFSIGFUN(m_signal_z);
     
-    FLEXT_CALLBACK_F(m_set_windowsize);
     FLEXT_CALLBACK_F(m_set_pitchratio);
     FLEXT_CALLBACK_F(m_set_pitchdispersion);
     FLEXT_CALLBACK_F(m_set_timedispersion);
@@ -103,7 +97,6 @@ FLEXT_LIB_DSP_V("PitchShift~",PitchShift_ar);
 
 PitchShift_ar::PitchShift_ar(int argc,t_atom * argv)
 {
-    FLEXT_ADDMETHOD_(0,"windowSize",m_set_windowsize);
     FLEXT_ADDMETHOD_(0,"pitchRatio",m_set_pitchratio);
     FLEXT_ADDMETHOD_(0,"pitchDispersion",m_set_pitchdispersion);
     FLEXT_ADDMETHOD_(0,"timeDispersion",m_set_timedispersion);
@@ -115,6 +108,7 @@ PitchShift_ar::PitchShift_ar(int argc,t_atom * argv)
 	post("4 arguments needed");
 	return;
     }
+
     m_windowsize = sc_getfloatarg(Args,0);
     m_pitchratio = sc_getfloatarg(Args,1);
     m_pitchdispersion = sc_getfloatarg(Args,2);
@@ -132,17 +126,16 @@ void PitchShift_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
     /* initialization from PitchShift_Ctor(PitchShift *unit) */
 
     long delaybufsize;
-    float /* *out, *in,*/ *dlybuf;
-    float winsize, pchratio;
+    float *dlybuf;
+    float pchratio;
     float fdelaylen, slope;
     long framesize, last;
     
     //out = ZOUT(0);
     //in = ZIN(0);
     pchratio = m_pitchratio;
-    winsize = m_windowsize;
 	
-    delaybufsize = (long)ceil(winsize * SAMPLERATE * 3.f + 3.f);
+    delaybufsize = (long)ceil(m_windowsize * SAMPLERATE * 3.f + 3.f);
     fdelaylen = delaybufsize - 3;
 
     delaybufsize = delaybufsize + BUFLENGTH;
@@ -159,7 +152,7 @@ void PitchShift_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
     m_numoutput = 0;
     m_mask = last = (delaybufsize - 1);
 	
-    m_framesize = framesize = ((long)(winsize * SAMPLERATE) + 2) & ~3;
+    m_framesize = framesize = ((long)(m_windowsize * SAMPLERATE) + 2) & ~3;
     m_slope = slope = 2.f / framesize;
     m_stage = 3;
     m_counter = framesize >> 2;
@@ -197,7 +190,7 @@ void PitchShift_ar::m_signal_z(int n, t_sample *const *in,
     float dsamp3, dsamp3_slope, ramp3, ramp3_slope;
     float dsamp4, dsamp4_slope, ramp4, ramp4_slope;
     float fdelaylen, d1, d2, frac, slope, samp_slope, startpos, 
-	winsize, pchdisp, timedisp;
+	pchdisp, timedisp;
     long remain, nsmps, idelaylen, irdphase, irdphaseb, iwrphase;
     long mask, idsamp;
     long counter, stage, framesize, numoutput;
@@ -208,10 +201,9 @@ void PitchShift_ar::m_signal_z(int n, t_sample *const *in,
     nin = *in;
     
     pchratio = m_pitchratio;
-    winsize = m_windowsize;
     pchdisp = m_pitchdispersion;
     timedisp = m_timedispersion;
-    timedisp = sc_clip(timedisp, 0.f, winsize) * SAMPLERATE;
+    timedisp = sc_clip(timedisp, 0.f, m_windowsize) * SAMPLERATE;
 	
     dlybuf = m_dlybuf;
     fdelaylen = m_fdelaylen;
@@ -466,7 +458,7 @@ void PitchShift_ar::m_signal_(int n, t_sample *const *in,
     float dsamp3, dsamp3_slope, ramp3, ramp3_slope;
     float dsamp4, dsamp4_slope, ramp4, ramp4_slope;
     float fdelaylen, d1, d2, frac, slope, samp_slope, startpos, 
-	winsize, pchdisp, timedisp;
+	pchdisp, timedisp;
     long remain, nsmps, idelaylen, irdphase, irdphaseb, iwrphase, mask, idsamp;
     long counter, stage, framesize;
     
@@ -476,11 +468,10 @@ void PitchShift_ar::m_signal_(int n, t_sample *const *in,
     nin = *in;
     
     pchratio = m_pitchratio;
-    winsize = m_windowsize;
     pchdisp = m_pitchdispersion;
     timedisp = m_timedispersion;
     
-    timedisp = sc_clip(timedisp, 0.f, winsize) * SAMPLERATE;
+    timedisp = sc_clip(timedisp, 0.f, m_windowsize) * SAMPLERATE;
     
     dlybuf = m_dlybuf;
     fdelaylen = m_fdelaylen;
@@ -635,4 +626,4 @@ void PitchShift_ar::m_signal_(int n, t_sample *const *in,
 }
     
 
-/* todo: does a control rate PitchShift make sense? */
+/* a control rate PitchShift doesn't make sense */

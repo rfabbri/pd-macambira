@@ -41,9 +41,9 @@
 /* ------------------------ Impulse~ -------------------------------*/
 
 class Impulse_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Impulse_ar,flext_dsp);
+    FLEXT_HEADER(Impulse_ar,sc4pd_dsp);
     
 public:
     Impulse_ar(int argc, t_atom *argv);

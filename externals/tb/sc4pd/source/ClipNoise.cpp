@@ -41,9 +41,9 @@
 /* ------------------------ ClipNoise~ -------------------------------*/
 
 class ClipNoise_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(ClipNoise_ar,flext_dsp);
+    FLEXT_HEADER(ClipNoise_ar,sc4pd_dsp);
     
 public:
     ClipNoise_ar(int argc, t_atom *argv);

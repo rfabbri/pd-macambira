@@ -40,9 +40,9 @@
 /* ------------------------ PinkNoise~ -------------------------------*/
 
 class PinkNoise_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(PinkNoise_ar,flext_dsp);
+    FLEXT_HEADER(PinkNoise_ar,sc4pd_dsp);
     
 public:
     PinkNoise_ar(int argc, t_atom *argv);

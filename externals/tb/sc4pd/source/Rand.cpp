@@ -41,9 +41,9 @@
 /* ------------------------ Rand~ -------------------------------*/
 
 class Rand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Rand_ar,flext_dsp);
+    FLEXT_HEADER(Rand_ar,sc4pd_dsp);
     
 public:
     Rand_ar(int argc, t_atom *argv);

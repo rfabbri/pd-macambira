@@ -40,9 +40,9 @@
 /* ------------------------ Crackle~ -------------------------------*/
 
 class Crackle_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Crackle_ar,flext_dsp);
+    FLEXT_HEADER(Crackle_ar,sc4pd_dsp);
     
 public:
     Crackle_ar(int argc, t_atom *argv);

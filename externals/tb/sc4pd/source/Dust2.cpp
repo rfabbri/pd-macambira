@@ -40,9 +40,9 @@
 /* ------------------------ Dust2~ -------------------------------------*/
 
 class Dust2_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Dust2_ar,flext_dsp);
+    FLEXT_HEADER(Dust2_ar,sc4pd_dsp);
 
 public:
     Dust2_ar(int argc, t_atom *argv);

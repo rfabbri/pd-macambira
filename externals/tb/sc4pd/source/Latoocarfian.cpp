@@ -41,9 +41,9 @@
 /* ------------------------ Latoocarfian~ -------------------------------*/
 
 class Latoocarfian_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Latoocarfian_ar,flext_dsp);
+    FLEXT_HEADER(Latoocarfian_ar,sc4pd_dsp);
     
 public:
     Latoocarfian_ar(int argc, t_atom *argv);

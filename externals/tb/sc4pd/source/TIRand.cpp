@@ -41,9 +41,9 @@
 /* ------------------------ TIRand~ -------------------------------*/
 
 class TIRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(TIRand_ar,flext_dsp);
+    FLEXT_HEADER(TIRand_ar,sc4pd_dsp);
     
 public:
     TIRand_ar(int argc, t_atom *argv);

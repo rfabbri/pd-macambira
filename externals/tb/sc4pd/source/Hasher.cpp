@@ -35,14 +35,14 @@
    
 */
 
-#include "support.hpp"
+#include "sc4pd.hpp"
 
 /* ------------------------ Hasher~ -----------------------------------*/
 
 class Hasher_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Hasher_ar,flext_dsp);
+    FLEXT_HEADER(Hasher_ar,sc4pd_dsp);
 
 public:
     Hasher_ar();

@@ -39,9 +39,9 @@
 /* ------------------------ Dust~ -------------------------------------*/
 
 class Dust_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Dust_ar,flext_dsp);
+    FLEXT_HEADER(Dust_ar,sc4pd_dsp);
 
 public:
     Dust_ar(int argc, t_atom *argv);

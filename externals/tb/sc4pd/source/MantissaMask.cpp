@@ -35,14 +35,14 @@
    
 */
 
-#include "support.hpp"
+#include "sc4pd.hpp"
 
 /* ------------------------ MantissaMask~ -----------------------------*/
 
 class MantissaMask_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(MantissaMask_ar,flext_dsp);
+    FLEXT_HEADER(MantissaMask_ar,sc4pd_dsp);
 
 public:
     MantissaMask_ar(int argc,t_atom * argv);

@@ -41,9 +41,9 @@
 /* ------------------------ Logistic~ -------------------------------*/
 
 class Logistic_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(Logistic_ar,flext_dsp);
+    FLEXT_HEADER(Logistic_ar,sc4pd_dsp);
     
 public:
     Logistic_ar(int argc, t_atom *argv);

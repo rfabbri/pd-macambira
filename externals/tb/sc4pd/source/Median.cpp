@@ -107,9 +107,9 @@ inline float median_shared::Insert(float value)
 /* ------------------------ Median~ -----------------------------------*/
 
 class Median_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Median_ar,flext_dsp);
+    FLEXT_HEADER(Median_ar,sc4pd_dsp);
     
 public:
     Median_ar(int argc, t_atom * argv);
@@ -166,9 +166,9 @@ void Median_ar::m_signal(int n, t_sample *const *in, t_sample *const *out)
 /* ------------------------ Median ------------------------------------*/
 
 class Median_kr
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Median_kr,flext_dsp);
+    FLEXT_HEADER(Median_kr,sc4pd_dsp);
     
 public:
     Median_kr(int argc, t_atom * argv);

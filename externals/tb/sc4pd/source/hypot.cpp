@@ -41,9 +41,9 @@
 /* ------------------------ hypot~ -----------------------------*/
 
 class hypot_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(hypot_ar,flext_dsp);
+    FLEXT_HEADER(hypot_ar,sc4pd_dsp);
 
 public:
     hypot_ar(int argc,t_atom * argv);

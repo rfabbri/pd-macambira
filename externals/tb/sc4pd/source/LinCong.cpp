@@ -41,9 +41,9 @@
 /* ------------------------ LinCong~ -------------------------------*/
 
 class LinCong_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(LinCong_ar,flext_dsp);
+    FLEXT_HEADER(LinCong_ar,sc4pd_dsp);
     
 public:
     LinCong_ar(int argc, t_atom *argv);

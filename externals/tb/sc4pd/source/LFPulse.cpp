@@ -41,9 +41,9 @@
 /* ------------------------ LFPulse~ -------------------------------*/
 
 class LFPulse_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(LFPulse_ar,flext_dsp);
+    FLEXT_HEADER(LFPulse_ar,sc4pd_dsp);
     
 public:
     LFPulse_ar(int argc, t_atom *argv);

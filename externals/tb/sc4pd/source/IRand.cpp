@@ -40,9 +40,9 @@
 /* ------------------------ IRand~ -------------------------------*/
 
 class IRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(IRand_ar,flext_dsp);
+    FLEXT_HEADER(IRand_ar,sc4pd_dsp);
     
 public:
     IRand_ar(int argc, t_atom *argv);

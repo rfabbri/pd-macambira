@@ -41,9 +41,9 @@
 /* ------------------------ TRand~ -------------------------------*/
 
 class TRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(TRand_ar,flext_dsp);
+    FLEXT_HEADER(TRand_ar,sc4pd_dsp);
     
 public:
     TRand_ar(int argc, t_atom *argv);

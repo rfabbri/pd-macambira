@@ -41,9 +41,9 @@
 /* ------------------------ amclip~ -----------------------------*/
 
 class amclip_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(amclip_ar,flext_dsp);
+    FLEXT_HEADER(amclip_ar,sc4pd_dsp);
 
 public:
     amclip_ar(int argc,t_atom * argv);

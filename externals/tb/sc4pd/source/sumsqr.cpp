@@ -47,9 +47,9 @@ inline float sc_sumsqr (float a, float b)
 /* ------------------------ sumsqr~ -----------------------------*/
 
 class sumsqr_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(sumsqr_ar,flext_dsp);
+    FLEXT_HEADER(sumsqr_ar,sc4pd_dsp);
 
 public:
     sumsqr_ar(int argc,t_atom * argv);

@@ -48,9 +48,9 @@ inline float sc_absdif (float a, float b)
 /* ------------------------ absdif~ -----------------------------*/
 
 class absdif_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(absdif_ar,flext_dsp);
+    FLEXT_HEADER(absdif_ar,sc4pd_dsp);
 
 public:
     absdif_ar(int argc,t_atom * argv);

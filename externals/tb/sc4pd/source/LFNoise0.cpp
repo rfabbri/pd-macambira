@@ -41,9 +41,9 @@
 /* ------------------------ LFNoise0~ -------------------------------*/
 
 class LFNoise0_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(LFNoise0_ar,flext_dsp);
+    FLEXT_HEADER(LFNoise0_ar,sc4pd_dsp);
     
 public:
     LFNoise0_ar(int argc, t_atom *argv);

@@ -41,9 +41,9 @@
 /* ------------------------ LFSaw~ -------------------------------*/
 
 class LFSaw_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(LFSaw_ar,flext_dsp);
+    FLEXT_HEADER(LFSaw_ar,sc4pd_dsp);
     
 public:
     LFSaw_ar(int argc, t_atom *argv);

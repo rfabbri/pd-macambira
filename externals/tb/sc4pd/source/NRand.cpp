@@ -41,9 +41,9 @@
 /* ------------------------ NRand~ -------------------------------*/
 
 class NRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(NRand_ar,flext_dsp);
+    FLEXT_HEADER(NRand_ar,sc4pd_dsp);
     
 public:
     NRand_ar(int argc, t_atom *argv);

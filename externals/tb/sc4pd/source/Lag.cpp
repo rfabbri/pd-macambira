@@ -40,9 +40,9 @@
 /* ------------------------ Lag~ -----------------------------*/
 
 class Lag_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Lag_ar,flext_dsp);
+    FLEXT_HEADER(Lag_ar,sc4pd_dsp);
 
 public:
     Lag_ar(int argc,t_atom * argv);

@@ -47,9 +47,9 @@ inline float sc_difsqr (float a, float b)
 /* ------------------------ difsqr~ -----------------------------*/
 
 class difsqr_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(difsqr_ar,flext_dsp);
+    FLEXT_HEADER(difsqr_ar,sc4pd_dsp);
 
 public:
     difsqr_ar(int argc,t_atom * argv);

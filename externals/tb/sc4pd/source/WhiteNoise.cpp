@@ -41,9 +41,9 @@
 /* ------------------------ WhiteNoise~ -------------------------------*/
 
 class WhiteNoise_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(WhiteNoise_ar,flext_dsp);
+    FLEXT_HEADER(WhiteNoise_ar,sc4pd_dsp);
     
 public:
     WhiteNoise_ar(int argc, t_atom *argv);

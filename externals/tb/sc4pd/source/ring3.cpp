@@ -46,9 +46,9 @@ inline float sc_ring3 (float a, float b)
 /* ------------------------ ring3~ -----------------------------*/
 
 class ring3_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(ring3_ar,flext_dsp);
+    FLEXT_HEADER(ring3_ar,sc4pd_dsp);
 
 public:
     ring3_ar(int argc,t_atom * argv);

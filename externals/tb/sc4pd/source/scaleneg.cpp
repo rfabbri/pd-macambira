@@ -41,9 +41,9 @@
 /* ------------------------ scaleneg~ -----------------------------*/
 
 class scaleneg_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(scaleneg_ar,flext_dsp);
+    FLEXT_HEADER(scaleneg_ar,sc4pd_dsp);
 
 public:
     scaleneg_ar(int argc,t_atom * argv);

@@ -41,9 +41,9 @@
 /* ------------------------ TExpRand~ -------------------------------*/
 
 class TExpRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(TExpRand_ar,flext_dsp);
+    FLEXT_HEADER(TExpRand_ar,sc4pd_dsp);
     
 public:
     TExpRand_ar(int argc, t_atom *argv);

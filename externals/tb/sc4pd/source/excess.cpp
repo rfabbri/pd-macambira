@@ -40,9 +40,9 @@
 /* ------------------------ excess~ -----------------------------*/
 
 class excess_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(excess_ar,flext_dsp);
+    FLEXT_HEADER(excess_ar,sc4pd_dsp);
 
 public:
     excess_ar(int argc,t_atom * argv);

@@ -48,9 +48,9 @@ inline float sc_sqrdif (float a, float b)
 /* ------------------------ sqrdif~ -----------------------------*/
 
 class sqrdif_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(sqrdif_ar,flext_dsp);
+    FLEXT_HEADER(sqrdif_ar,sc4pd_dsp);
 
 public:
     sqrdif_ar(int argc,t_atom * argv);

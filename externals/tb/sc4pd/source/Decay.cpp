@@ -41,9 +41,9 @@
 /* ------------------------ Decay~ -----------------------------*/
 
 class Decay_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Decay_ar,flext_dsp);
+    FLEXT_HEADER(Decay_ar,sc4pd_dsp);
 
 public:
     Decay_ar(int argc,t_atom * argv);

@@ -40,9 +40,9 @@
 /* ------------------------ ExpRand~ -------------------------------*/
 
 class ExpRand_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(ExpRand_ar,flext_dsp);
+    FLEXT_HEADER(ExpRand_ar,sc4pd_dsp);
     
 public:
     ExpRand_ar(int argc, t_atom *argv);

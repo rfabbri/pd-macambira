@@ -40,9 +40,9 @@
 /* ------------------------ Integrator~ -----------------------------*/
 
 class Integrator_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(Integrator_ar,flext_dsp);
+    FLEXT_HEADER(Integrator_ar,sc4pd_dsp);
 
 public:
     Integrator_ar(int argc,t_atom * argv);

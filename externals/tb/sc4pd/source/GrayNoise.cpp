@@ -40,9 +40,9 @@
 /* ------------------------ GrayNoise~ -------------------------------*/
 
 class GrayNoise_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(GrayNoise_ar,flext_dsp);
+    FLEXT_HEADER(GrayNoise_ar,sc4pd_dsp);
     
 public:
     GrayNoise_ar(int argc, t_atom *argv);

@@ -35,7 +35,6 @@
 */
 
 #ifndef _SC4PD_HPP
-#define _SC$PD_HPP
 
 #include <flext.h>
 
@@ -63,8 +62,6 @@
 #undef BUFLENGTH
 #define BUFLENGTH Blocksize()
 
-
-
 /* to make sure the behaviour is consistent: */
 
 #undef ZXP
@@ -72,6 +69,60 @@
 
 
 
+class sc4pd_dsp 
+    : public flext_dsp
+{
+    FLEXT_HEADER(sc4pd_dsp,flext_dsp);
 
 
+/* some initialisation functions, adapted from SC_Rate.cpp*/
+
+    inline float sc_sampledur()
+    {
+	return 1 / Samplerate();
+    }
+    
+    inline float sc_radianspersample()
+    {
+	return twopi / Samplerate();
+    }
+    
+    inline float sc_bufduration()
+    {
+	return Blocksize() / Samplerate();
+    }
+    
+    inline float sc_bufrate()
+    {
+	return 1 / sc_bufduration();
+    }
+    
+    inline float sc_slopefactor()
+    {
+	return 1 / Blocksize();
+    }
+    
+    inline float sc_filterloops()
+    {
+	return Blocksize() / 3;
+    }
+    
+    inline float sc_filterremain()
+    {
+	return Blocksize() % 3;
+    }
+    
+    inline float sc_filterslope()
+    {
+	float f = sc_filterloops();
+	if (f == 0)
+	    return 0;
+	else
+	    return 1. / f;
+    }
+
+};
+
+    
+#define _SC$PD_HPP
 #endif

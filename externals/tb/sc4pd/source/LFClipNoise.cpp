@@ -41,9 +41,9 @@
 /* ------------------------ LFClipNoise~ -------------------------------*/
 
 class LFClipNoise_ar:
-    public flext_dsp
+    public sc4pd_dsp
 {
-    FLEXT_HEADER(LFClipNoise_ar,flext_dsp);
+    FLEXT_HEADER(LFClipNoise_ar,sc4pd_dsp);
     
 public:
     LFClipNoise_ar(int argc, t_atom *argv);

@@ -48,9 +48,9 @@ inline float sc_sqrsum (float a, float b)
 /* ------------------------ sqrsum~ -----------------------------*/
 
 class sqrsum_ar
-    :public flext_dsp
+    :public sc4pd_dsp
 {
-    FLEXT_HEADER(sqrsum_ar,flext_dsp);
+    FLEXT_HEADER(sqrsum_ar,sc4pd_dsp);
 
 public:
     sqrsum_ar(int argc,t_atom * argv);

@@ -37,9 +37,11 @@
 
 #include "sc4pd.hpp"
 
-class DelayUnit_ar : public flext_dsp
+class DelayUnit_ar 
+    : public sc4pd_dsp
 {
-    FLEXT_HEADER(DelayUnit_ar, flext_dsp);
+    FLEXT_HEADER(DelayUnit_ar,sc4pd_dsp);
+    
 public:
     /* functions */
     void DelayUnit_AllocDelayLine();
