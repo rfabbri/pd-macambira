@@ -1,13 +1,13 @@
 # change this!!!
-CXX=g++-3.0
+# CXX=g++ # -3.2
 CFLAGS=-O6 -mcpu=pentium -g
 #CFLAGS=-O6  -g -march=athlon
 FLAGS=-DPD
 
-FLEXTPATH=../flext
+FLEXTPATH=../../grill/flext/source
 
 INCLUDES=/usr/lib/pd/include $(FLEXTPATH)
-FLEXTLIB=$(FLEXTPATH)/pd-linux/flext.a
+FLEXTLIB=$(FLEXTPATH)/../pd-linux/flext.a
 LIBS=m
 
 PDEXTRA=/usr/lib/pd/extra

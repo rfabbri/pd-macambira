@@ -8,11 +8,11 @@
 
 include config-pd-linux.txt
 
-FLEXTLIB=$(FLEXTPATH)/flext_t.a  # take threaded library for all
+FLEXTLIB=$(FLEXTPATH)/../pd-linux/flext_t.a  # take threaded library for all
 
 
 # compiler+linker stuff	### EDIT! ###
-CXX=g++-3.2
+#CXX=g++ #-3.2
 INCLUDES=$(PDPATH)/src
 LIBPATH=
 FLAGS=-DPD -DFLEXT_THREADS

@@ -7,7 +7,7 @@
 PDPATH=/usr/include
 
 # where do the flext libraries reside?
-FLEXTPATH=/usr/lib/pd/flext
+FLEXTPATH=../../grill/flext/source
 
 # where should the examples be built? (relative path)
 OUTPATH=./pd-linux
