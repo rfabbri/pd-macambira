@@ -34,6 +34,9 @@
    
 */
 
+#ifndef _SC4PD_HPP
+#define _SC$PD_HPP
+
 #include <flext.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
@@ -51,8 +54,24 @@
 #define CALCSLOPE(next,prev) ((next - prev) * 1/ Blocksize())
 
 
+
+//#define SAMPLERATE (unit->mRate->mSampleRate)
+#undef SAMPLERATE
+#define SAMPLERATE Samplerate()
+
+//#define BUFLENGTH (unit->mBufLength)
+#undef BUFLENGTH
+#define BUFLENGTH Blocksize()
+
+
+
 /* to make sure the behaviour is consistent: */
 
 #undef ZXP
 #define ZXP(z) (*(z)++)
 
+
+
+
+
+#endif

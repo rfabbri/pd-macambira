@@ -1,4 +1,5 @@
 /* sc4pd 
+   public class for several delay objects
 
    Copyright (c) 2004 Tim Blechmann.
 
@@ -35,3 +36,23 @@
 */
 
 #include "sc4pd.hpp"
+
+class DelayUnit_ar : public flext_dsp
+{
+    FLEXT_HEADER(DelayUnit_ar, flext_dsp);
+public:
+    /* functions */
+    void DelayUnit_AllocDelayLine();
+    void DelayUnit_Reset(float maxdelaytime, float delaytime);  
+    float CalcDelay(float delaytime);
+    void DelayUnit_Dtor();
+
+    /* data */
+    float *m_dlybuf;
+    float m_dsamp, m_fdelaylen;
+    float m_delaytime, m_maxdelaytime;
+    long m_iwrphase, m_idelaylen, m_mask;
+    long m_numoutput;
+};
+
+/* todo: a delay for control messages? */

@@ -1,4 +1,5 @@
 /* sc4pd 
+   public class for several delay objects
 
    Copyright (c) 2004 Tim Blechmann.
 
@@ -30,8 +31,47 @@
      SuperCollider by James McCartney
          http://www.audiosynth.com
      
-   Coded while listening to:
-   
+   Coded while listening to: 
+
+
 */
 
 #include "sc4pd.hpp"
+#include "DelayUnit.hpp"
+
+void DelayUnit_ar::DelayUnit_AllocDelayLine()
+{
+    long delaybufsize = (long)ceil(m_maxdelaytime * Samplerate() + 1.f);
+    delaybufsize = delaybufsize + Blocksize();
+    delaybufsize = NEXTPOWEROFTWO(delaybufsize);  // round up to next power of two
+    m_fdelaylen = m_idelaylen = delaybufsize;
+    
+    delete m_dlybuf;
+    m_dlybuf = new float[delaybufsize] ;
+    m_mask = delaybufsize - 1;
+}
+
+void DelayUnit_ar::DelayUnit_Dtor()
+{
+    delete m_dlybuf;
+}
+
+float DelayUnit_ar::CalcDelay(float delaytime)
+{
+	float next_dsamp = delaytime * Samplerate();
+	return sc_clip(next_dsamp, 1.f, m_fdelaylen);
+}
+
+void DelayUnit_ar::DelayUnit_Reset(float f, float g)
+{
+    m_maxdelaytime = f;
+    m_delaytime = g;
+    m_dlybuf = 0;
+    
+    DelayUnit_AllocDelayLine();
+    
+    m_dsamp = CalcDelay(m_delaytime);	
+    
+    m_numoutput = 0;
+    m_iwrphase = 0;
+}
