@@ -17,7 +17,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.2
 #endif
 
-#define DYN_VERSION "0.0.1"
+#define DYN_VERSION "0.0.3"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
@@ -71,6 +71,7 @@ protected:
 	void FromCanvas(t_object *o);
 
 	virtual bool m_method_(int n,const t_symbol *s,int argc,const t_atom *argv);
+	virtual void m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs);
 	virtual void m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs);
 
 	// proxy object
@@ -202,25 +203,26 @@ load it.. if there is no canvas, PD currently crashes.
 
 
 How to create the canvas:
-
 1) via direct call to canvas_new()
 2) a message to pd_canvasmaker
 	con: does not return a pointer for the created canvas
 
-
 There are two possibilities for the canvas
-
 1) make a sub canvas to the one where dyn~ resides:
 	pro: no problems with environment (abstractions are found and loaded correctly)
-	con: canvas must be manually added to the list of canvases so that it gets DSP 
-			(the respective functions must be exported from PD)
 2) make a root canvas:
 	pro: it will be in the canvas list per default, hence DSP is processed
 	con: canvas environment must be created manually 
 			(is normally done by pd_canvasmaker if there is a directory set, which is again done somewhere else)
 
+Enabling DSP on the subcanvas
+1) send it a "dsp" message (see rabin~ by K.Czaja)... but, which signal vector should be taken?
+	-> answer: NONE!  (just send NULL)
+2) add it to the list of _root_ canvases (these will be DSP-processed per default)
+	(for this the canvas_addtolist and canvas_takefromlist functions are used)
+	however, it's not clear if this can lead to problems since it is no root-canvas!
 
-In both cases the 1)s have been chosen as the cleaner solution
+In all cases the 1)s have been chosen as the cleaner solution
 */
 
 dyn::dyn(int argc,const t_atom *argv):
@@ -241,25 +243,18 @@ dyn::dyn(int argc,const t_atom *argv):
 
 	int i;
 
-#ifdef ROOT_CANVAS
-	// set NULL for creation of a root canvas
-	// so that DSP is called without connections to dyn~ canvas
-	canvas_setcurrent(NULL); 
-#endif
+	// make a sub-canvas for dyn~
+	t_atom arg[6];
+	SetInt(arg[0],0);	// xpos
+	SetInt(arg[1],0);	// ypos
+	SetInt(arg[2],700);	// xwidth 
+	SetInt(arg[3],520);	// xwidth 
+	SetString(arg[4]," dyn~-canvas ");	// canvas name
+	SetInt(arg[5],0);	// visible
 
-	// make a canvas for dyn~
-	canvas = canvas_new(NULL, gensym("canvas"), 0, NULL);
-
-#ifndef ROOT_CANVAS
-	canvas_addtolist(canvas);
-#endif
-
+	canvas = canvas_new(NULL, NULL, 6, arg);
 	// must do that....
 	canvas_unsetcurrent(canvas);
-
-#ifdef ROOT_CANVAS
-	canvas_unsetcurrent(NULL);
-#endif
 
 	pxin = new proxyin *[s_inlets+m_inlets];
 	for(i = 0; i < s_inlets+m_inlets; ++i) {
@@ -267,7 +262,7 @@ dyn::dyn(int argc,const t_atom *argv):
 		pxin[i] = (proxyin *)object_new(sig?pxins_class:pxin_class);
 		pxin[i]->init(this,sig);
 		t_binbuf *b = binbuf_new();
-		binbuf_text(b,"dyn-in~",7);
+		binbuf_text(b,sig?"dyn-in~":"dyn-in",7);
 		ToCanvas(&pxin[i]->obj,b,i*100,10); // place them left-to-right 
 	}
 
@@ -277,7 +272,7 @@ dyn::dyn(int argc,const t_atom *argv):
 		pxout[i] = (proxyout *)object_new(sig?pxouts_class:pxout_class);
 		pxout[i]->init(this,i,sig);
 		t_binbuf *b = binbuf_new();
-		binbuf_text(b,"dyn-out~",8);
+		binbuf_text(b,sig?"dyn-out~":"dyn-out",8);
 		ToCanvas(&pxout[i]->obj,b,i*100,500); // place them left-to-right 
 	}
 
@@ -304,9 +299,6 @@ dyn::~dyn()
 	}
 
 	if(canvas) {
-#ifndef ROOT_CANVAS
-		canvas_takeofflist(canvas);
-#endif
 		pd_free((t_pd *)canvas);
 	}
 }
@@ -328,7 +320,7 @@ void dyn::Add(const t_symbol *n,t_object *ob)
 
 void dyn::ToCanvas(t_object *o,t_binbuf *b,int x,int y)
 {
-	// add object to the glist.... this is needed to use canvas_deletelinesfor
+	// add object to the glist.... this is needed for graphical representation
 	// which is needed to have all connections be properly deleted
 	
 	o->te_binbuf = b; 
@@ -402,6 +394,7 @@ void dyn::m_newobj(int _argc_,const t_atom *_argv_)
 			// send message to object maker
 			binbuf_eval(b,&pd_objectmaker,0,NULL);
 
+			// look for latest created object
 			t_object *x = (t_object *)pd_newest();
 			if(x) {
 				// place it
@@ -410,8 +403,15 @@ void dyn::m_newobj(int _argc_,const t_atom *_argv_)
 				Add(name,x);
 
 				// send loadbang (if it is an abstraction)
-				if(pd_class(&x->te_g.g_pd) == canvas_class)
+				if(pd_class(&x->te_g.g_pd) == canvas_class) {
+					// loadbang the abstraction
 					pd_vmess((t_pd *)x,gensym("loadbang"),"");			
+
+					// for an abstraction dsp must be restarted 
+					// that's necessary because ToCanvas is called manually
+					// (may also be necessary for normal objects in a later PD version)
+					canvas_update_dsp();
+				}
 			}
 			else {
 				post("%s - new: Could not create object",thisName());
@@ -612,6 +612,14 @@ void dyn::proxyout::init(dyn *t,int o,bool s)
 }
 
 
+void dyn::m_dsp(int n,t_signalvec const *insigs,t_signalvec const *outsigs)
+{
+	// add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
+    mess1((t_pd *)canvas, gensym("dsp"),NULL);
+
+	flext_dsp::m_dsp(n,insigs,outsigs);
+}
+    
 void dyn::m_signal(int n,t_sample *const *insigs,t_sample *const *outsigs)
 {
 	int i;

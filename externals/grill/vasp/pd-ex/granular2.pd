@@ -1,4 +1,4 @@
-#N canvas 30 24 706 558 10;
+#N canvas 30 24 708 560 10;
 #N canvas 0 0 450 300 graph34 0;
 #X array insert 128 float 0;
 #X coords 0 1 127 -1 200 140 1;
@@ -6,7 +6,7 @@
 #N canvas 339 256 523 452 player 0;
 #X obj 228 372 tabplay~ schnipparray;
 #X obj 228 396 throw~ toex;
-#X obj 208 45 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 208 45 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X obj 208 76 spigot;
 #X obj 104 330 s \$0-part;
@@ -67,11 +67,11 @@
 #X obj 204 403 dac~;
 #X floatatom 51 318 0 0 0 0 - - -;
 #X obj 51 278 nbx 5 14 -1e+037 1e+037 0 1 empty empty empty 0 -6 0
-10 -24198 -1 -1 18.13 256;
+10 -24198 -1 -1 80.13 256;
 #X text 51 260 density;
 #X obj 51 340 s \$0-density;
 #X obj 204 275 tgl 15 0 empty empty start/stop 0 -6 0 8 -24198 -1 -1
-0 1;
+1 1;
 #X floatatom 241 430 0 0 0 0 - - -;
 #X obj 241 407 env~ 32768;
 #N canvas 202 187 293 232 inside 0;
@@ -256,7 +256,7 @@
 #X connect 4 0 1 0;
 #X connect 5 0 2 0;
 #X restore 41 95 pd init;
-#N canvas 409 43 522 372 create_schnippl 0;
+#N canvas 409 43 526 376 create_schnippl 0;
 #X msg 155 114 vasp insert;
 #X obj 155 182 vasp.u;
 #X obj 155 138 vasp.osc 6.4;
@@ -275,8 +275,11 @@
 #X obj 273 251 vasp.osc 2;
 #X obj 273 271 vasp.*xwindow hamming;
 #X obj 355 230 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -24198 -1 -1 28 256;
+10 -24198 -1 -1 3 256;
 #X text 56 71 create various slices to insert;
+#X msg 405 113 vasp insert;
+#X obj 405 161 vasp.u;
+#X obj 405 137 vasp.= 0;
 #X connect 0 0 2 0;
 #X connect 2 0 12 0;
 #X connect 3 0 11 0;
@@ -290,10 +293,12 @@
 #X connect 15 0 16 0;
 #X connect 16 0 14 0;
 #X connect 17 0 15 1;
+#X connect 19 0 21 0;
+#X connect 21 0 20 0;
 #X restore 40 47 pd create_schnippl;
 #X restore 53 489 pd inside;
 #X obj 322 271 vsl 15 100 0 1 0 1 empty empty volume 0 -8 0 8 -24198
--1 -1 3400 1;
+-1 -1 4400 1;
 #X obj 204 374 *~ 0.2;
 #X text 332 464 needs the zexy library and vasp;
 #X obj 51 297 * 0.0001;

@@ -1,4 +1,4 @@
-#N canvas 62 0 628 493 10;
+#N canvas 62 0 630 495 10;
 #N canvas 0 0 450 300 graph34 0;
 #X array insert 128 float 1;
 #A 0 1 0.995185 0.980785 0.95694 0.92388 0.881921 0.83147 0.77301 0.707107
@@ -73,7 +73,6 @@
 #X obj 76 333 s \$0-density;
 #X obj 204 275 tgl 15 0 empty empty start/stop 0 -6 0 8 -24198 -1 -1
 1 1;
-#X text 319 80 this array is insertet at triggering points;
 #X obj 76 290 * 0.001;
 #X floatatom 241 429 0 0 0 0 - - -;
 #X obj 241 407 env~ 32768;
@@ -329,13 +328,14 @@
 -1 -1 600 1;
 #X obj 204 374 *~ 0.2;
 #X text 387 445 needs the zexy library and vasp;
-#X connect 2 0 15 0;
+#X text 319 80 this array is inserted at triggering points;
+#X connect 2 0 14 0;
 #X connect 4 0 7 0;
-#X connect 5 0 10 0;
+#X connect 5 0 9 0;
 #X connect 8 0 1 0;
-#X connect 10 0 4 0;
-#X connect 12 0 11 0;
-#X connect 14 0 15 1;
-#X connect 15 0 3 0;
-#X connect 15 0 3 1;
-#X connect 15 0 12 0;
+#X connect 9 0 4 0;
+#X connect 11 0 10 0;
+#X connect 13 0 14 1;
+#X connect 14 0 3 0;
+#X connect 14 0 3 1;
+#X connect 14 0 11 0;
