@@ -29,6 +29,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "flinternal.h"
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4091 4244)
