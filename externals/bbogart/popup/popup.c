@@ -52,6 +52,7 @@ typedef struct _popup
      int x_height;
      int x_width;
 	 
+     int current_selection;
      int x_num_options;	 
      t_symbol* x_colour;
      t_symbol* x_name;
@@ -138,17 +139,26 @@ static void create_widget(t_popup *x, t_glist *glist)
 
   char text[MAXPDSTRING];
   int len,i;
+  t_symbol* temp_name;
   t_canvas *canvas=glist_getcanvas(glist);
   x->x_rect_width = x->x_width;
   x->x_rect_height =  x->x_height+2;
   
   /* Create menubutton and empty menu widget -- maybe the menu should be created elseware?*/
 
+  /* draw using the last name if it was selected otherwise use default name. */
+  if(x->current_selection < 0)
+  {
+    temp_name = x->x_name;
+  } else {
+    temp_name = x->x_options[x->current_selection];
+  }
+
   /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
   sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
 
   sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
-		x,canvas,x,x,x->x_colour->s_name,x->x_name->s_name,x,x);
+		x,canvas,x,x,x->x_colour->s_name,temp_name->s_name,x,x);
 
   for(i=0 ; i<x->x_num_options ; i++)
   {
@@ -182,6 +192,7 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
      //     draw_handle(x, glist, firsttime);
 
   // Output a bang to first outlet when we're ready to receive float messages the first time!. 
+  // Too bad this is NOT always the first time... window shading makes the bang go out again. :(
   if(firsttime) {outlet_bang(x->x_obj.ob_outlet);}
 
   DEBUG(post("drawme end");)
@@ -337,6 +348,7 @@ static void popup_output(t_popup* x, t_floatarg popup_index)
 {
   DEBUG(post("output start");)
 
+  x->current_selection = popup_index;
   outlet_symbol(x->out2, x->x_options[(int)popup_index]);
   outlet_float(x->x_obj.ob_outlet, popup_index); 
 }
@@ -412,6 +424,7 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 	{
 		sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
 			glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
+
 	} else {
 		post("popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options, i);
 	}
@@ -477,8 +490,8 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_glist = (t_glist*)NULL;
 
-    
     x->x_height = 25;
+    x->current_selection = -1;
 	
 	if (argc < 5)
 	{
@@ -518,10 +531,10 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("symbol"), gensym(""));
     outlet_new(&x->x_obj, &s_float);
     x->out2 = outlet_new(&x->x_obj, &s_symbol);
+
+DEBUG(post("popup new end");)
+
     return (x);
-
-    DEBUG(post("popup new end");)
-
 }
 
 void popup_setup(void) {
@@ -570,7 +583,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.10 $ $Date: 2005-01-14 20:12:00 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.11 $ $Date: 2005-01-17 21:06:59 $");
 }
 
 

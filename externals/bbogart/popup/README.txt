@@ -39,9 +39,8 @@ Methods:
 BUGS:
 - Do not use a loadbang to set a patch-default value. Will cause a segfault.
   The left outlet will send a "bang" message when we're ready to set values,
-  see example patch on how to use this to set a default value.
-
-- If you change virtual desktops or "shade" the patcher window the selection 
-  visible on the popup will be reset to the popup-name.
+  see example patch on how to use this to set a default value. Unfortunatly 
+  this bang message is actually set on un-minimization and un-shading as 
+  well as on load.
 
 Have Fun.
