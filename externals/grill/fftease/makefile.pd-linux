@@ -54,7 +54,10 @@ $(TARGDIR):
 $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
+$(TARGDIR)/%.co : $(DIR)/%.c
+	$(CC) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(TARGET) : $(patsubst %.c,$(TARGDIR)/%.co,$(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))) $(FLEXTLIB) 
 	$(CXX) -shared $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
 	chmod 755 $@
 
