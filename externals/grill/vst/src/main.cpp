@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <direct.h>
 #include <io.h>
 
-#define VST_VERSION "0.1.0pre4"
+#define VST_VERSION "0.1.0pre5"
 
 #if 0
 /* ----- MFC stuff ------------- */
@@ -58,6 +58,7 @@ protected:
 
     V ms_edit(BL on);
     V mg_edit(BL &ed) { ed = plug && plug->Edited(); }
+    V mg_editor(BL &ed) { ed = plug && plug->HasEditor(); }
     V ms_vis(BL vis);
 
     V mg_winx(I &x) const { x = plug?plug->getX():0; }
@@ -83,8 +84,10 @@ protected:
 //    V m_control(const S *ctrl_name,I ctrl_value);
     V m_pitchbend(I ctrl_value);
     V m_programchange(I ctrl_value);
+    V m_aftertouch(I ctrl_value);
     V m_ctrlchange(I control,I ctrl_value);
     V m_note(I note,I vel);
+    inline V m_noteoff(I note) { m_note(note,0); }
 
     V ms_param(I pnum,F val);
     V mg_param(I pnum);
@@ -115,11 +118,13 @@ private:
     FLEXT_CALLVAR_V(mg_plug,ms_plug)
 
     FLEXT_CALLVAR_B(mg_edit,ms_edit)
+    FLEXT_CALLGET_B(mg_editor)
     FLEXT_CALLSET_B(ms_vis)
     FLEXT_ATTRGET_B(visible)
 
 //    FLEXT_CALLBACK_2(m_control,t_symptr,int)
     FLEXT_CALLBACK_I(m_pitchbend)
+    FLEXT_CALLBACK_I(m_aftertouch)
     FLEXT_CALLBACK_I(m_programchange)
     FLEXT_CALLBACK_II(m_ctrlchange)
 
@@ -130,6 +135,7 @@ private:
     FLEXT_CALLBACK_I(m_ptext)
 
     FLEXT_CALLBACK_II(m_note)
+    FLEXT_CALLBACK_I(m_noteoff)
 
     FLEXT_ATTRVAR_B(echoparam)
     FLEXT_CALLVAR_I(mg_winx,ms_winx)
@@ -163,12 +169,15 @@ V vst::Setup(t_classid c)
 
 	FLEXT_CADDATTR_VAR(c,"plug",mg_plug,ms_plug);
 	FLEXT_CADDATTR_VAR(c,"edit",mg_edit,ms_edit);
+	FLEXT_CADDATTR_GET(c,"editor",mg_editor);
 	FLEXT_CADDATTR_VAR(c,"vis",visible,ms_vis);
 	FLEXT_CADDMETHOD_(c,0,"print",m_print);
 
 	FLEXT_CADDMETHOD_II(c,0,"note",m_note);
+	FLEXT_CADDMETHOD_I(c,0,"noteoff",m_noteoff);
 //	FLEXT_CADDMETHOD_2(c,0,"control",m_control,t_symptr,int);
 	FLEXT_CADDMETHOD_(c,0,"pbend",m_pitchbend);
+	FLEXT_CADDMETHOD_(c,0,"atouch",m_aftertouch);
 	FLEXT_CADDMETHOD_II(c,0,"ctlchg",m_ctrlchange);
 
 	FLEXT_CADDMETHOD_(c,0,"progchg",m_programchange);
@@ -314,10 +323,11 @@ BL vst::ms_plug(I argc,const A *argv)
     // to help deal with spaces we assume ALL of the args make 
 	// up the filename 
 	bool lf = false;
+    int loaderr = VSTINSTANCE_NO_ERROR;
 
 	// try loading the dll from the raw filename 
-	if (plug->Instance(plugname) == VSTINSTANCE_NO_ERROR) {
-		//post( "it loaded fine ");
+	if ((loaderr = plug->Instance(plugname)) == VSTINSTANCE_NO_ERROR) {
+		FLEXT_LOG("raw filename loaded fine");
 		lf = true;
 	}
 
@@ -327,14 +337,17 @@ BL vst::ms_plug(I argc,const A *argv)
 	    if(fd > 0) close(fd);
 	    else name = NULL;
 
-	    // if dir is current working directory... name points to dir
-	    if(dir == name) strcpy(dir,".");
+        if(name) {
+    		FLEXT_LOG("found VST dll on the PD path");
+	        // if dir is current working directory... name points to dir
+	        if(dir == name) strcpy(dir,".");
         
-        CString dllname(dir);
-        dllname += "\\";
-        dllname += name;
+            CString dllname(dir);
+            dllname += "\\";
+            dllname += name;
 
-	    lf = plug->Instance(dllname) == VSTINSTANCE_NO_ERROR;
+	        lf = (loaderr = plug->Instance(dllname)) == VSTINSTANCE_NO_ERROR;
+        }
     }
 
     if(!lf) { // try finding it on the VST path
@@ -344,6 +357,7 @@ BL vst::ms_plug(I argc,const A *argv)
 		if(dllname.Find(".dll") == -1) dllname += ".dll";			
 
 		if(vst_path) {
+    		FLEXT_LOG("found VST_PATH env variable");
             char* tok_path = new C[strlen( vst_path)+1];
             strcpy( tok_path , vst_path);
 			char *tok = strtok( tok_path , ";" );
@@ -351,14 +365,16 @@ BL vst::ms_plug(I argc,const A *argv)
 				CString abpath( tok );
 				if( abpath.Right( 1 ) != _T("\\") ) abpath += "\\";
 
+        		FLEXT_LOG1("trying VST_PATH %s",(const C *)abpath);
+
 				const char * realpath = findFilePath( abpath , dllname );				
 				//post( "findFilePath( %s , %s ) = %s\n" , abpath , dllname , realpath );
 				if ( realpath != NULL ) {
 				    CString rpath( realpath );
-					rpath += _T("\\") + plugname;
-					post( "trying %s " , rpath );
-					if(plug->Instance( rpath ) == VSTINSTANCE_NO_ERROR ) {
-//						post("%s - plugin '%s' loaded ",thisName(),plug->GetName());
+					rpath += plugname;
+            		FLEXT_LOG1("trying %s",(const C *)rpath);
+					if((loaderr = plug->Instance( rpath )) == VSTINSTANCE_NO_ERROR ) {
+                		FLEXT_LOG("plugin loaded via VST_PATH");
 						lf = true;
 						break;
 					}
@@ -373,7 +389,7 @@ BL vst::ms_plug(I argc,const A *argv)
 	}
 
     if(!lf) { // failed - don't make any ins or outs
-		post("%s - unable to load plugin '%s'",thisName(),plugname);
+		post("%s - unable to load plugin '%s', load error %i",thisName(),plugname,loaderr);
 		ClearPlug();
 	}
 
@@ -469,6 +485,11 @@ V vst::m_control(const S *ctrl_name,I ctrl_value)
 V vst::m_pitchbend(I ctrl_value)     
 {
 	if(plug) plug->AddPitchBend(ctrl_value );    
+}
+
+V vst::m_aftertouch(I ctrl_value)     
+{
+	if(plug) plug->AddAftertouch(ctrl_value );    
 }
 
 V vst::m_programchange(I ctrl_value)     
