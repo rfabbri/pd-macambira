@@ -109,22 +109,22 @@ standard functionality.;
 #X obj 336 3 r \$0-vel;
 #X obj 415 12 r \$0-adsr-OSC;
 #X obj 482 194 s \$0-adsr-OSC-out;
-#X obj 82 35 rrad.adsr~ \$1-adsr;
 #X obj 334 248 throw~ \$0-index;
-#X obj 247 35 rrad.adsr~ \$1-index;
 #X msg 432 212 \$1 20;
 #X obj 327 200 *~;
 #X obj 374 203 line~;
 #X obj 8 49 nbx 5 14 -1e+37 1e+37 0 0 \$0-car \$0-car car 0 -6 1 10
--241291 -1 -1 5 256;
+-241291 -1 -1 1 256;
 #X obj 8 81 nbx 5 14 -1e+37 1e+37 0 0 \$0-mod \$0-mod mod 0 -6 1 10
--262131 -1 -1 1 256;
+-262131 -1 -1 2 256;
 #X obj 8 111 hsl 64 15 0 127 0 0 \$0-ind \$0-ind index -2 -6 1 8 -262135
--1 -1 4800 1;
+-1 -1 2400 1;
 #X obj 496 238 r \$0-ind;
 #X obj 428 191 / 32;
+#X obj 82 35 rrad.adsr4~ \$1-adsr;
 #X obj 83 37 cnv 15 150 15 empty empty \$1-adsr 20 8 1 12 -228904 -66577
 0;
+#X obj 247 35 rrad.adsr4~ \$1-index;
 #X obj 248 37 cnv 15 150 15 empty empty \$1-index 20 8 1 12 -228904
 -66577 0;
 #X connect 1 0 2 1;
@@ -135,17 +135,17 @@ standard functionality.;
 #X connect 11 0 13 0;
 #X connect 11 0 9 0;
 #X connect 11 1 14 0;
-#X connect 15 0 22 0;
-#X connect 17 0 22 1;
-#X connect 19 0 24 0;
-#X connect 20 0 24 1;
-#X connect 22 0 16 0;
-#X connect 22 1 18 0;
-#X connect 24 0 26 0;
-#X connect 24 1 21 0;
-#X connect 25 0 27 0;
-#X connect 26 0 23 0;
-#X connect 27 0 26 1;
-#X connect 31 0 32 0;
-#X connect 32 0 25 0;
+#X connect 15 0 31 0;
+#X connect 17 0 31 1;
+#X connect 19 0 33 0;
+#X connect 20 0 33 1;
+#X connect 23 0 25 0;
+#X connect 24 0 22 0;
+#X connect 25 0 24 1;
+#X connect 29 0 30 0;
+#X connect 30 0 23 0;
+#X connect 31 0 16 0;
+#X connect 31 1 18 0;
+#X connect 33 0 24 0;
+#X connect 33 1 21 0;
 #X coords 0 0 1 1 403 170 1;
