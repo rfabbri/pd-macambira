@@ -1,0 +1,18 @@
+Title PACKAGE_PREFIX
+Version PD_VERSION PACKAGE_VERSION
+Description The pure data real time music and multimedia environment.
+DefaultLocation /
+DeleteWarning 
+NeedsAuthorization YES
+Required NO
+Relocatable NO
+RequiresReboot NO
+UseUserMask NO
+OverwritePermissions NO
+InstallFat NO
+rootVolumeOnly NO
+AllowBackRev YES
+LongFilenames YES
+LibrarySubdirectory Standard
+InstallOnly NO
+PackageLocation ../Packages
