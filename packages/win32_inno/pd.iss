@@ -78,7 +78,8 @@ Source: ..\..\pd\tcl\*.*; DestDir: {app}\tcl; Flags: ignoreversion
 Source: ..\..\pd\tcl\include\*.*; DestDir: {app}\tcl\include; Flags: ignoreversion
 Source: ..\..\pd\tcl\include\X11\*.*; DestDir: {app}\tcl\include\X11; Flags: ignoreversion
 ; put pdsend.exe and pdreceive.exe in the system folder so they are in the path
-Source: ..\..\pd\bin\pd????*.exe; DestDir: {sys}; Flags: confirmoverwrite
+Source: ..\..\pd\bin\pdsend.exe; DestDir: {sys}; Flags: confirmoverwrite
+Source: ..\..\pd\bin\pdreceive.exe; DestDir: {sys}; Flags: confirmoverwrite
 ;-----------------------------------------------------------------------------
 ; packages\win32_inno
 Source: pdpatch.ico; DestDir: {app}\lib
