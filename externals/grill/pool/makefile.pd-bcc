@@ -21,7 +21,7 @@ LIBPATH=-L$(BCCPATH)\lib -L$(PDPATH)\lib
 LIBS=cw32.lib import32.lib C0D32.OBJ 
 
 # compiler definitions and flags
-DEFS=-DPD -DNT 
+DEFS=-DFLEXT_SYS=2 
 CFLAGS=-6 -O2 -OS -ff -tWD 
 
 
@@ -64,6 +64,8 @@ $(OUTPATH)\pd.lib: $(PDPATH)\bin\pd.dll
 
 $(OUTPATH)\$(NAME).def:
 	@echo EXPORTS $(SETUPFUNCTION) = _$(SETUPFUNCTION) > $<
+# this next line fixes a strange problem with implib - lacking underscore?!
+	@echo IMPORTS _rtext_retext=PD.rtext_retext >> $<
 
 $(OUTPATH)\$(NAME).dll :: $(OUTPATH) $(OUTPATH)\$(NAME).def $(OUTPATH)\pd.lib 
 
@@ -75,6 +77,3 @@ $(OUTPATH)\$(NAME).dll :: $(OBJS)
 	@-if not exist $(INSTPATH) mkdir $(INSTPATH)
 	copy $< $(INSTPATH) >nul
 !endif
-
-
-	

@@ -1,7 +1,7 @@
 # pool - hierarchical storage object for PD and Max/MSP
 # Copyright (C) 2002 Thomas Grill (xovo@gmx.net)
 #
-# Makefile for MSVC++ 6
+# Makefile for MSVC++ 6 and 7
 #
 # usage:
 # to build run "make -f makefile.pd-msvc"
@@ -15,9 +15,9 @@ LIBPATH=/LIBPATH:"$(MSVCPATH)\lib" /LIBPATH:"$(PDPATH)\bin" /LIBPATH:"$(FLEXTPAT
 LIBS=pd.lib flext-pdwin.lib
 
 # compiler definitions and flags
-DEFS=/DPD /DNT 
+DEFS=/DFLEXT_SYS=2
 
-CFLAGS=/GR- /GX- /GD /G6 /Ox /ML
+CFLAGS=/G6 /Ox /ML /EHsc
 
 # the rest can stay untouched
 # ----------------------------------------------
