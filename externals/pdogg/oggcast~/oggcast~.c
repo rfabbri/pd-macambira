@@ -60,9 +60,11 @@
 
 #ifdef UNIX
 #define     sys_closesocket close
+#define     pdogg_strdup(s) strdup(s)
 #endif
 #ifdef NT
 #define     sys_closesocket closesocket
+#define     pdogg_strdup(s) _strdup(s)
 #endif
 
 /************************* oggcast~ object ******************************/
@@ -808,7 +810,7 @@ static void *oggcast_child_main(void *zz)
 				{
 						/* get the time for the DATE comment */
 					now=time(NULL);
-					x->x_bcdate = ctime(&now);
+					x->x_bcdate = pdogg_strdup(ctime(&now)); /*--moo*/
 					x->x_pages = 0;
 					clock_delay(x->x_clock_pages, 0);
 						/* initialise the encoder */
@@ -1054,16 +1056,16 @@ static void *oggcast_new(t_floatarg fnchannels, t_floatarg fbufsize)
     x->x_br_nom = 128;
     x->x_br_min = 96;
 	x->x_pages = x->x_lastpages = 0;
-	x->x_bcname = "ogg/vorbis stream";
-	x->x_bcurl = "http://www.akustische-kunst.org/puredata/";
-	x->x_bcgenre = "experimental";
-	x->x_bcdescription = "ogg/vorbis stream emitted from pure-data with oggcast~";
-	x->x_bcartist = "Pd and oggcast~ v0.2";
-	x->x_bclocation = x->x_bcurl;
-	x->x_bccopyright = "";
-	x->x_bcperformer = "";
-	x->x_bccontact = "";
-	x->x_bcdate = "";
+	x->x_bcname = pdogg_strdup("ogg/vorbis stream"); /*--moo: added strdup() */
+	x->x_bcurl = pdogg_strdup("http://www.akustische-kunst.org/puredata/");
+	x->x_bcgenre = pdogg_strdup("experimental");
+	x->x_bcdescription = pdogg_strdup("ogg/vorbis stream emitted from pure-data with oggcast~");
+	x->x_bcartist = pdogg_strdup("Pd and oggcast~ v0.2");
+	x->x_bclocation = pdogg_strdup(x->x_bcurl);
+	x->x_bccopyright = pdogg_strdup("");
+	x->x_bcperformer = pdogg_strdup("");
+	x->x_bccontact = pdogg_strdup("");
+	x->x_bcdate = pdogg_strdup("");
 	x->x_bcpublic = 1;
 	x->x_mountpoint = "puredata.ogg";
 	x->x_servertype = 1;			/* HTTP/1.0 protocol for Icecast2 */
@@ -1255,47 +1257,56 @@ static void oggcast_comment(t_oggcast *x, t_symbol *s, t_int argc, t_atom* argv)
     pthread_mutex_lock(&x->x_mutex);
     if(strstr(s->s_name, "ARTIST"))
 	{
-		strcpy(x->x_bcartist, comment);
+		if (x->x_bcartist) free(x->x_bcartist);
+		x->x_bcartist = pdogg_strdup(comment); /*-- moo: added strdup() */
 		post("oggcast~: ARTIST = %s", x->x_bcartist);
 	}
 	else if(strstr(s->s_name, "GENRE"))
 	{
-		strcpy(x->x_bcgenre, comment);
+	        free(x->x_bcgenre);
+		x->x_bcgenre = pdogg_strdup(comment);
 		post("oggcast~: GENRE = %s", x->x_bcgenre);
 	}
 	else if(strstr(s->s_name, "TITLE"))
 	{
-		strcpy(x->x_bcname, comment);
+	        free(x->x_bcname);
+		x->x_bcname = pdogg_strdup(comment);
 		post("oggcast~: TITLE = %s", x->x_bcname);
 	}
 	else if(strstr(s->s_name, "PERFORMER"))
 	{
-		strcpy(x->x_bcperformer, comment);
-		post("oggcast~: PERFORMER = %s", x->x_bcperformer);
+	        free(x->x_bcperformer);
+		x->x_bcperformer = pdogg_strdup(comment);
+		post("oggcast~: PERFORMER = %s",x->x_bcperformer);
 	}
 	else if(strstr(s->s_name, "LOCATION"))
 	{
-		strcpy(x->x_bclocation, comment);
-		post("oggcast~: LOCATION = %s", x->x_bclocation);
+	        free(x->x_bclocation);
+		x->x_bclocation = pdogg_strdup(comment);
+		post("oggcast~: LOCATION = %s",x->x_bclocation);
 	}
 	else if(strstr(s->s_name, "COPYRIGHT"))
 	{
-		strcpy(x->x_bccopyright, comment);
+	        free(x->x_bccopyright);
+		x->x_bccopyright = pdogg_strdup(comment);
 		post("oggcast~: COPYRIGHT = %s", x->x_bccopyright);
 	}
 	else if(strstr(s->s_name, "CONTACT"))
 	{
-		strcpy(x->x_bccontact, comment);
+	        free(x->x_bccontact);
+		x->x_bccontact = pdogg_strdup(comment);
 		post("oggcast~: CONTACT = %s", x->x_bccontact);
 	}
 	else if(strstr(s->s_name, "DESCRIPTION"))
 	{
-		strcpy(x->x_bcdescription, comment);
+	        free(x->x_bcdescription);
+		x->x_bcdescription = pdogg_strdup(comment);
 		post("oggcast~: DESCRIPTION = %s", x->x_bcdescription);
 	}
 	else if(strstr(s->s_name, "DATE"))
 	{
-		strcpy(x->x_bcdate, comment);
+	        free(x->x_bcdate);
+		x->x_bcdate = pdogg_strdup(comment);
 		post("oggcast~: DATE = %s", x->x_bcdate);
 	}
 	else post("oggcast~: no method for %s", s->s_name);
@@ -1423,6 +1434,18 @@ static void oggcast_free(t_oggcast *x)
 	freebytes(x->x_outvec, x->x_ninlets*sizeof(t_sample *));
 	clock_free(x->x_clock_connect);
 	clock_free(x->x_clock_pages);
+
+	/*-- moo: free dynamically allocated comment strings --*/
+	free(x->x_bcname);
+	free(x->x_bcurl);
+	free(x->x_bcgenre);
+	free(x->x_bcdescription);
+	free(x->x_bcartist);
+	free(x->x_bclocation);
+	free(x->x_bccopyright);
+	free(x->x_bcperformer);
+	free(x->x_bccontact);
+	free(x->x_bcdate);
 }
 
 void oggcast_tilde_setup(void)
