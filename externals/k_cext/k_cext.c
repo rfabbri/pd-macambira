@@ -25,8 +25,8 @@
 #include <ctype.h>
 
 static char *version = 
-"k_cext v0.3.0, written by Kjetil S. Matheussen, k.s.matheussen@notam02.no\n"
-"Windows-port by Olaf Matthes.";
+"k_cext v0.3.1, written by Kjetil S. Matheussen, k.s.matheussen@notam02.no\n"
+"Windows-port by Olaf Matthes. Contributors: Thomas Grill and Tim Blechmann.";
 
 int instancenumber=0; // Can not be static because of the win-port.
 
