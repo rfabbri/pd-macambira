@@ -113,6 +113,7 @@ PyObject* pyext::pyext_getattr(PyObject *,PyObject *args)
 		ERRINTERNAL();
     }
 
+#ifdef FLEXT_THREADS
     if(PyString_Check(name)) {
 	    char* sname = PyString_AS_STRING(name);
 		if(sname) {
@@ -124,6 +125,7 @@ PyObject* pyext::pyext_getattr(PyObject *,PyObject *args)
 //			post("pyext::getattr %s",sname);
 		}
 	}
+#endif
 
 	if(!ret) { 
 #if PY_VERSION_HEX >= 0x02020000
@@ -231,9 +233,10 @@ PyObject *pyext::pyext_stop(PyObject *,PyObject *args)
     }
 	else {
 		pyext *ext = GetThis(self);
-		int cnt = 0;
+		int cnt;
 		t_atom at;
-		if(val >= 0) flext::SetInt(at,val);
+		if(val >= 0) cnt = 1,flext::SetInt(at,val);
+        else cnt = 0;
 		ext->m_stop(cnt,&at);
 	}
 
