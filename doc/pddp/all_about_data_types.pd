@@ -1,5 +1,5 @@
-#N canvas 290 43 848 640 10;
-#X obj 434 530 route;
+#N canvas 106 77 861 642 10;
+#X obj 434 490 route;
 #X obj 213 411 symbol;
 #X obj 153 432 int;
 #X floatatom 91 286 5 0 0 0 - - -;
@@ -34,7 +34,7 @@ messages \, or casting messages as a specific data type \, sometimes
 converting from one data type to another. The right inlet on these
 objects is stores that value \, which can be later output using a bang.
 ;
-#N canvas 770 126 474 324 Related_Objects 0;
+#N canvas 770 126 478 328 Related_Objects 0;
 #X obj 32 54 ftos;
 #X obj 68 54 list2symbol;
 #X text 23 22 data type conversion;
@@ -50,7 +50,7 @@ objects is stores that value \, which can be later output using a bang.
 #X obj 158 159 symbol2list;
 #X obj 247 138 l2s;
 #X obj 247 158 s2l;
-#X restore 680 577 pd Related_Objects;
+#X restore 678 536 pd Related_Objects;
 #X text 10 240 Data types are known as 'atoms' in Pd. float and symbol
 atoms have 'atom boxes'for realtime display and control from within
 a patch.;
@@ -58,30 +58,30 @@ a patch.;
 -1;
 #X obj 404 594 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 411 279 Many objects cast the data they receive when they output
+#X text 411 239 Many objects cast the data they receive when they output
 it:;
-#X text 530 376 Some objects do not cast the data:;
-#X obj 428 347 trigger anything;
-#X msg 428 322 this is a list without a cast;
-#X obj 428 370 print;
-#X text 414 420 Some objects need to have the data explicitly declared
+#X text 530 336 Some objects do not cast the data:;
+#X obj 428 307 trigger anything;
+#X msg 428 282 this is a list without a cast;
+#X obj 428 330 print;
+#X text 414 380 Some objects need to have the data explicitly declared
 in order to handle it. These are mostly symbol handling objects.;
-#X text 414 487 Objects which route data generally can handle explicitly
+#X text 414 447 Objects which route data generally can handle explicitly
 or implicitly defined data.;
-#X obj 480 530 trigger;
-#X obj 538 530 niagara;
-#X obj 430 463 select;
+#X obj 480 490 trigger;
+#X obj 538 490 niagara;
+#X obj 430 423 select;
 #X text 411 41 symbols need to be declared explicitly \, floats do
 not \, but can be:;
 #X obj 213 434 lister;
-#X obj 4 -3 cnv 15 750 20 empty empty all_about_data_types 20 10 1
+#X obj 4 -3 cnv 15 850 20 empty empty all_about_data_types 20 10 1
 18 -233017 -66577 0;
-#X obj 719 -1 pddp;
+#X obj 820 -2 pddp;
 #X text 17 604 by Hans-Christoph Steiner <hans@at.or.at>;
 #X text 12 81 the "anything" data type allows anything to pass through
 unchanged.;
 #X text 17 470 examples of casting:;
-#X text 424 557 click on these for more info:;
+#X text 424 517 click on these for more info:;
 #X text 629 606 updated for Pd version 0.37.1;
 #X text 82 49 anything bang float list pointer scalar symbol;
 #X text 6 34 data types (atoms):;
@@ -104,7 +104,9 @@ unchanged.;
 #X obj 172 507 fromsymbol;
 #X obj 255 506 list2symbol;
 #X obj 259 548 ftos;
-#X obj 445 577 all_about_lists_vs_anythings;
+#X obj 425 537 all_about_lists_vs_anythings;
+#X obj 424 564 all_about_symbol_construction;
+#X obj 640 564 all_about_data_structures;
 #X connect 8 0 9 0;
 #X connect 10 0 9 0;
 #X connect 11 0 8 0;
