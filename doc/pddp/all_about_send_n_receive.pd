@@ -1,0 +1,82 @@
+#N canvas 144 2 596 637 12;
+#X text 24 16 GETTING YOUR MESSAGE ACROSS;
+#X text 36 45 The [send] and [receive] objects are useful for linking
+objects and subroutines together in a single canvas or throughout multiple
+patches. Understanding these objects will help 'clean up' your patches
+and allow you to communicate messages between various modules that
+you build or between objects where patch cords are not possible.;
+#X text 36 147 In the [send] and [receive] help files \, you will see
+message sent within a single patch - from a [send] object to a [receive]
+object in the same patch. But the functionality of these objects goes
+far beyond the scope of a single patch.;
+#X text 36 232 A [send] object is a little like a radio station...it
+broadcasts information throughout PD \, for all the [receives] to hear!
+A [receive] object is a little like your own AM/FM tuner...it will
+receive messages from all the [send] objects that it is 'tuned' to.
+Hence \, naming your [send] and [receive] objects becomes very important.
+A [receive] object named "dave" (as in [receive dave]) will pick up
+all messages from [send dave] \, regardless of which patch it is in.
+In this manner \, you can get messages across multiple patches \, or
+into abstractions or subpatches -- without patch cords.;
+#X text 35 415 However \, controlling the 'scope' of a [send] or [receive]
+object is important if you want to ensure that a message is only transmitted
+within a single patch \, or within a single abstraction. Check out
+the following information about 'scope' and 'locality'.;
+#X obj 36 516 all_about_scope_and_locality and inheritance;
+#X text 35 549 hmm...also see;
+#N canvas 0 123 827 456 special-send-and-receives 0;
+#X text 19 10 SPECIAL OBJECTS;
+#X obj 28 41 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 28 66 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 28 91 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X obj 28 117 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 0 1;
+#X obj 21 386 hdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X obj 154 119 vdl 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1 -1
+0;
+#X obj 24 343 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 59 208 vu 15 120 empty empty -1 -8 0 8 -66577 -1 1 0;
+#X obj 175 20 cnv 15 100 60 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 46 40 bng;
+#X text 46 65 toggle;
+#X text 85 89 number 2;
+#X text 15 167 Vertical Slider;
+#X text 147 166 Vertical Dial;
+#X text 40 356 Horizontal Slider;
+#X text 42 401 Horizontal Dial;
+#X text 101 260 VU Meter;
+#X text 202 39 canvas;
+#X text 296 55 The objects in this patch \, and likely many more which
+I have not included \, include their own send and receive functionality.
+This functionality can be accessed by right-clicking on the object
+and choosing "Properties" from the menu that appears.;
+#X text 289 149 EXAMPLE;
+#X text 303 170 In other words \, these objects can send and/or receive
+messages without attaching a separate [send] or [receive] object to
+them with a patch cord.;
+#X text 290 232 THE OL'FASHION WAY;
+#X floatatom 296 256 5 0 0 0 - - -;
+#X floatatom 350 283 5 0 0 0 - - -;
+#X obj 296 280 s a;
+#X obj 350 255 r a;
+#X text 290 315 USING THESE OBJECTS' INTERNAL SEND AND RECEIVE FUNCTIONALITY
+;
+#X text 405 259 As you see here \, these number boxes are linked together
+with send and receives objects.;
+#X obj 301 337 nbx 5 14 -1e+037 1e+037 0 0 b empty empty 0 -6 128 10
+-262144 -1 -1 0 256;
+#X obj 363 337 nbx 5 14 -1e+037 1e+037 0 0 empty b empty 0 -6 64 10
+-262144 -1 -1 0 256;
+#X text 310 360 These number boxes are linked together via their 'send'
+or 'receive' property.;
+#X text 298 8 Some objects in PD contain their own internal send and
+receive functionality.;
+#X connect 23 0 25 0;
+#X connect 26 0 24 0;
+#X restore 157 547 pd special-send-and-receives;
