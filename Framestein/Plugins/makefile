@@ -2,7 +2,9 @@ all:	noize colortv subtract xbend bend gol shuffle green \
 	tile rgbcopy copyvert black rgb hist setbits xshred \
 	sonogram vf2fs fs2vf swap 2colors plot makesliders \
 	convolution compare darken deinterlace difference interlace lighten \
-	multiply overlay screen shadowcaster softlight
+	multiply overlay screen shadowcaster softlight \
+	rgbseek modgain traffic constrain eclipse eclipse02 eclipse03 \
+	cga keyscreen rene cutout fromage rgbavg rgbavg02
 
 	dir *.dll
 
@@ -128,4 +130,54 @@ softlight:
 
 #
 # </PixelPack>
+#
+
+#
+# PeRColate
+#
+
+rgbseek:
+	cl rgbseek.c $(FLAGS) /link $(EFFECT)
+
+modgain:
+	cl modgain.c $(FLAGS) /link $(EFFECT)
+
+traffic:
+	cl traffic.c $(FLAGS) /link $(EFFECT)
+
+constrain:
+	cl constrain.c $(FLAGS) /link $(EFFECT)
+
+eclipse:
+	cl eclipse.c $(FLAGS) /link $(EFFECT)
+
+eclipse02:
+	cl eclipse02.c $(FLAGS) /link $(COPY)
+
+eclipse03:
+	cl eclipse03.c $(FLAGS) /link $(EFFECT)
+
+cga:
+	cl cga.c $(FLAGS) /link $(EFFECT)
+
+keyscreen:
+	cl keyscreen.c $(FLAGS) /link $(COPY)
+
+rene:
+	cl rene.c $(FLAGS) /link $(COPY)
+
+cutout:
+	cl cutout.c $(FLAGS) /link $(COPY)
+
+fromage:
+	cl fromage.c $(FLAGS) /link $(COPY)
+
+rgbavg:
+	cl rgbavg.c $(FLAGS) /link $(EFFECT)
+
+rgbavg02:
+	cl rgbavg02.c $(FLAGS) /link $(COPY)
+
+#
+# </PeRColate>
 #
