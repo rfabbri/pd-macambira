@@ -1,0 +1,21 @@
+#N canvas 506 519 493 438 12;
+#X obj 104 320 n2m;
+#X obj 95 378 print;
+#X text 32 13 n2m - note to midi;
+#X text 32 36 by mark williamson (http://www.junklight.com);
+#X text 33 75 n2m converts note names in the form <note name><octave>
+to a midi number. It copes with single notes or chords.;
+#X msg 109 174 note C5 d#7 c3;
+#X msg 67 128 note c6;
+#X msg 146 220 note D;
+#X msg 182 270 note 7;
+#X text 174 129 output note C6;
+#X text 271 174 output a chord;
+#X text 244 218 Octave defaults to 4;
+#X text 266 268 note defaults to C;
+#X text 189 326 its not case sensitive;
+#X connect 0 0 1 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
