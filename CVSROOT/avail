@@ -8,17 +8,18 @@ unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
 
 # ACLs at Yves Degoyon's request
-unavail |  | gem2pdp
-avail | sevyves,eighthave | gem2pdp
-unavail |  | pidip
-avail | sevyves,eighthave | pidip
-unavail |  | unauthorized
-avail | sevyves,eighthave | unauthorized
+unavail |  | externals/gem2pdp,externals/pidip,externals/unauthorized
+avail | sevyves,eighthave | externals/gem2pdp,externals/pidip,externals/unauthorized
 
 # T. Grill's cvs automatically syncs with the SourceForge
 # so changes here wouldn't make it to his CVS.
-unavail |  | grill
-avail | xovo | grill
+unavail |  | externals/grill
+avail | xovo | externals/grill
+
+# this code was imported by Hans and not maintained in CVS
+# so changes here would have to be merged
+unavail |  | externals/maxlib,externals/iemlib
+avail | eighthave | externals/maxlib,externals/iemlib
 
 # restrict the MAIN branch of "pd" to prevent accidental 
 # commits that should go to devel_0_37 or impd_0_37
