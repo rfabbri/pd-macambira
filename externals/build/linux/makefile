@@ -12,11 +12,14 @@ all: $(EXTERNALS:.c=.pd_linux)
 
 .SUFFIXES: .pd_linux
 
+# cross-platform default
+CPU_FLAGS = -O2
+
 # AMD Athlon XP K7
 #CPU_FLAGS = -O3 -march=athlon-xp -m3dnow -msse -mfpmath=sse
 
-# Generic i386 (tune for 686, since that's about the bottom these days)
-CPU_FLAGS =  -O2 -mcpu=i686
+# Generic x86 (tune for 686, since that's most common these days)
+# CPU_FLAGS =  -O2 -mcpu=i686
 # Pentium III or better
 #CPU_FLAGS = -O3 -march=pentium3
 # Pentium 4 or better
