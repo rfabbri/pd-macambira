@@ -14,8 +14,8 @@ AFLAGS =
 LFLAGS = -export_dynamic  -shared
 WFLAGS =
 
-DEBUG = -DDEBUG -g
-# DEBUG = 
+# DEBUG = -DDEBUG -g
+DEBUG = 
 
 VERSION = \"$(shell cat VERSION)\"
 

@@ -4,8 +4,13 @@ for win32:   port also the command line utilities (send, dump)
 -pd object hierarchy extract and automatic address construction
  a la [/hostname]/pd/patchname/subpatch/test ?
 
+-dynamic space allocation for message buffers.
+
 
 changelog:
+
+20020903: refixed MAXPDARG vs. MAX_ARGS bug causind sendOSC to crash
+          with msgs longer than 5 argmuents. ?
 
 20020305: -typetags in send and receive
            sendOSC by default now send typetagged msgs
