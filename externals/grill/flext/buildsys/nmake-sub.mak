@@ -18,44 +18,22 @@
 !endif
 
 ##############################
-
-!ifndef TARGETMODE
-!ifdef DEBUG
-TARGETMODE=debug
-!else
-TARGETMODE=release
-!endif
-!endif
-
-!ifndef TARGETTYPE
-!ifdef SHARED
-TARGETTYPE=shared
-!else
-!ifdef THREADED
-TARGETTYPE=multi
-!else
-TARGETTYPE=single
-!endif
-!endif
-!endif
-
-##############################
 # flext-specific definitions
 
-!include $(BUILDPATH)nmake-$(BUILDCLASS).inc
-
 !include $(BUILDPATH)nmake.inc
+
+!include $(BUILDPATH)nmake-$(BUILDCLASS).inc
 
 ##############################
 # platform-specific make stuff
 
-!include $(BUILDPATH)$(PLATFORM)\$(RTSYS)\nmake-$(COMPILER)-$(BUILDCLASS).inc
-
 !include $(BUILDPATH)$(PLATFORM)\$(RTSYS)\nmake-$(COMPILER).inc
+
+!include $(BUILDPATH)$(PLATFORM)\$(RTSYS)\nmake-$(COMPILER)-$(BUILDCLASS).inc
 
 ##############################
 # general make stuff
 
-!include $(BUILDPATH)$(PLATFORM)\nmake-$(COMPILER)-$(BUILDCLASS).inc
-
 !include $(BUILDPATH)$(PLATFORM)\nmake-$(COMPILER).inc
+
+!include $(BUILDPATH)$(PLATFORM)\nmake-$(COMPILER)-$(BUILDCLASS).inc

@@ -5,24 +5,21 @@ LIBPATH=$(LIBPATH) /LIBPATH:$(MSVCPATH)\lib
 
 ##############################################
 
-TARGETPATH=$(OUTPATH)\$(OUTSUB)
+OBJPATH=$(OUTPATH)\$(OUTSUB)
+TARGETPATH=$(OBJPATH)
 TARGET=$(TARGETPATH)\$(OUTNAME).$(EXT)
 
 ##############################################
 # use precompiled headers (automatic mode)
 
-!ifndef PRECOMPILE
-CFLAGS=$(CFLAGS) /YXflext.h
-!else
-CFLAGS=$(CFLAGS) /YX$(PRECOMPILE)
+!ifdef PRECOMPILE
+CFLAGS=$(CFLAGS) /YX$(PRECOMPILE) /Fp$(OBJPATH)\precompiled.pch
 !endif
-# location of precompiled file
-CFLAGS=$(CFLAGS) /Fp$(TARGETPATH)\precompiled.pch
 
 ##############################################
 
 # create code for DLL
-CFLAGS=$(CFLAGS) /LD /GD
+CFLAGS=$(CFLAGS) /LD
 
 # enable exception handling
 CFLAGS=$(CFLAGS) /GX

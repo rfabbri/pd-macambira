@@ -1,16 +1,16 @@
 # where is PD?
-PDPATH=c:/programme/audio/pd
+PDPATH="%ProgramFiles%\pd"
 
 ###############################################################
 
 # where do/should the flext headers reside/be built?
-FLEXTINC=$(PDPATH)/flext
+FLEXTINC=$(PDPATH)\flext
 
 # where do/should the flext static libraries reside/be built?
 FLEXTLIB=$(FLEXTINC)
 
 # where do/should the flext shared libraries reside/be built?
-FLEXTSHLIB=$(FLEXTINC)
+FLEXTSHLIB=$(PDPATH)\bin
 
 ###############################################################
 
@@ -18,10 +18,12 @@ FLEXTSHLIB=$(FLEXTINC)
 OUTPATH=pd-mingw
 
 # where should the external be installed?
-INSTPATH=$(PDPATH)/extra
+INSTPATH=$(PDPATH)\extra
 
 ###############################################################
 
 # user defined compiler flags
 # (check if they match your system!)
-OFLAGS=-O2 -march=pentium4 -msse
+OFLAGS=-O2
+# optimizations for Pentium 4
+#OFLAGS += -march=pentium4 -msse

@@ -12,7 +12,9 @@ ifndef PKGINFO
 PKGINFO=package.txt
 endif
 
+ifneq ($(PKGINFO),)
 include $(PKGINFO)
+endif
 
 ###############################################
 # check variables
@@ -31,13 +33,13 @@ endif
 
 ##############################
 
-ifndef TARGETMODE
-	TARGETMODE=$(BUILDMODE)
-endif
+#ifndef TARGETMODE
+#TARGETMODE=$(BUILDMODE)
+#endif
 
-ifndef TARGETTYPE
-	TARGETTYPE=$(BUILDTYPE)
-endif
+#ifndef TARGETTYPE
+#TARGETTYPE=$(BUILDTYPE)
+#endif
 
 ###############################################
 

@@ -13,7 +13,7 @@ Donations for further development of the package are highly appreciated.
 
 Version history:
 
-0.4.8:
+0.5.0:
 - fixes for 64 bit builds (size_t is integer type of pointer size)
 - finally added a autoconf system (many many thanks to Tim Blechmann)
 - more character escapes for attribute editor
@@ -321,16 +321,10 @@ Porting to new compilers/platforms:
 
 TODO list:
 
-for 0.4.8:
-- SIMD for gcc
-- Max/MSP MachO support
-
-for 0.5.0:
 - optimizations for object initialization and messaging
+- SIMD for gcc
 
 bugs:
-- recreation of object with different argument line forgets about eventually present attributes
-
 - can't use MFC libraries because of global new and delete overloadings
 
 TEST:

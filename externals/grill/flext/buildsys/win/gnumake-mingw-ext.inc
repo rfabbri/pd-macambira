@@ -2,7 +2,12 @@
 
 INCPATH += -I$(FLEXTINC)
 LIBPATH += -L$(FLEXTLIB) -L$(FLEXTSHLIB)
+
+ifdef SHARED
+LIBS += $(FLEXTSHLIB)/lib$(FLEXTNAME).dll
+else
 LIBS += -l$(FLEXTNAME)
+endif
 
 ##############################################
 
@@ -13,10 +18,10 @@ _build_: $(TARGET)
 #	touch $@
 
 $(OUTPATH):
-	-mkdir $(subst /,\,$@)
+	-cmd /c "mkdir $(subst /,\,$@)"
 
 $(TARGETPATH): $(OUTPATH)
-	-mkdir $(subst /,\,$@)
+	-cmd /c "mkdir $(subst /,\,$@)"
 
 $(TARGETPATH)/%.opp : $(SRCDIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(DEFS) $(INCPATH) $< -o $@
@@ -28,16 +33,18 @@ $(TARGET) :: $(TARGETPATH)
 
 $(TARGET) :: $(COBJS) $(CPPOBJS)
 	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ $(COBJS) $(CPPOBJS) $(LIBS)
+	-strip --strip-unneeded $@
 
 ##############################################
 
 _clean_:
-	-del $(subst /,\,$(COBJS) $(CPPOBJS) $(TARGET))
+	-cmd /c "del /q $(subst /,\,$(TARGETPATH)/*.*)" > nul
+	-cmd /c "rmdir /q $(subst /,\,$(TARGETPATH))" > nul
 
 ##############################################
 
 $(INSTPATH):
-	-mkdir $(subst /,\,$@)
+	-cmd /c "mkdir $(subst /,\,$@)"
 
 _install_: $(INSTPATH)
-	copy $(subst /,\,$(TARGET) $(INSTPATH))
+	cmd /c "copy $(subst /,\,$(TARGET) $(INSTPATH))"

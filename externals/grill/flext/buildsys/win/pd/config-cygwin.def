@@ -1,5 +1,5 @@
 # where is PD?
-PDPATH=/cygdrive/c/programme/audio/pd
+PDPATH=/cygdrive/c/programme/pd
 
 ###############################################################
 
@@ -10,7 +10,7 @@ FLEXTINC=$(PDPATH)/flext
 FLEXTLIB=$(FLEXTINC)
 
 # where do/should the flext shared libraries reside/be built?
-FLEXTSHLIB=$(FLEXTINC)
+FLEXTSHLIB=$(PDPATH)/bin
 
 ###############################################################
 
@@ -24,4 +24,6 @@ INSTPATH=$(PDPATH)/extra
 
 # user defined compiler flags
 # (check if they match your system!)
-OFLAGS=-O2 -march=pentium4 -msse
+OFLAGS=-O2
+# optimizations for Pentium 4
+#OFLAGS += -march=pentium4 -msse

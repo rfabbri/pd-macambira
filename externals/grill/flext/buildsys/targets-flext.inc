@@ -1,29 +1,50 @@
 build-default-default: build-all-all
 
+build-all-default: build-all-all
+
+build-release-default: build-release-all
+
+build-debug-default: build-debug-all
+
+build-default-all: build-all-all
+
+build-default-single: build-all-single
+
+build-default-multi: build-all-multi
+
+build-default-shared: build-all-shared
+
+
 install-default-default: install-all-all
+
+install-all-default: install-all-all
+
+install-release-default: install-release-all
+
+install-debug-default: install-debug-all
+
+install-default-all: install-all-all
+
+install-default-single: install-all-single
+
+install-default-multi: install-all-multi
+
+install-default-shared: install-all-shared
+
 
 clean-default-default: clean-all-all
 
-###################################################
+clean-all-default: clean-all-all
 
-build-all-all: build-release-all build-debug-all
+clean-release-default: clean-release-all
 
-build-release-all: build-release-single build-release-multi build-release-shared
+clean-debug-default: clean-debug-all
 
-build-debug-all: build-debug-single build-debug-multi build-debug-shared
+clean-default-all: clean-all-all
 
-###################################################
+clean-default-single: clean-all-single
 
-install-all-all: install-release-all install-debug-all
+clean-default-multi: clean-all-multi
 
-install-release-all: install-release-single install-release-multi install-release-shared
+clean-default-shared: clean-all-shared
 
-install-debug-all: install-debug-single install-debug-multi install-debug-shared
-
-###################################################
-
-clean-all-all: clean-release-all clean-debug-all
-
-clean-release-all: clean-release-single clean-release-multi clean-release-shared
-
-clean-debug-all: clean-debug-single clean-debug-multi clean-debug-shared
