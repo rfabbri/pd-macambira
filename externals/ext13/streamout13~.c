@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifdef unix
+#ifdef UNIX
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,7 +23,7 @@
 
 static void sys_sockerror(char *s)
 {
-#ifdef unix
+#ifdef UNIX
     int err = errno;
 #else
     int err = WSAGetLastError();
