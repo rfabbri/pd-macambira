@@ -46,55 +46,57 @@
 
 #ifndef __APPLE_CC__
 #include "Carbon_Include.h"
-#endif
+#endif  /* #ifndef __APPLE_CC__ */
 
 #include <HID_Utilities.h>
-#endif
+#endif  /* #ifdef __APPLE__ */
 
 #include "linuxhid.h"
 #include "input_arrays.h"
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
 static t_class *hid_class;
 
-typedef struct _hid {
+typedef struct _hid 
+{
   t_object            x_obj;
   t_int               x_fd;
   t_symbol            *x_devname;
   t_clock             *x_clock;
-  int                 x_read_ok;
-  int                 x_started;
-  int                 x_delay;
+  t_int               x_read_ok;
+  t_int               x_started;
+  t_int               x_delay;
 #ifdef __gnu_linux__
   struct input_event  x_input_event; 
 #elif defined (__APPLE__)
   IOHIDEventStruct event;
 #endif
-  t_outlet            *x_input_event_time_outlet;
-  t_outlet            *x_input_event_type_outlet;
-  t_outlet            *x_input_event_code_outlet;
-  t_outlet            *x_input_event_value_outlet;
+  t_outlet            *x_event_outlet;
 }t_hid;
+
 
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
-void hid_stop(t_hid* x) {
+void hid_stop(t_hid* x) 
+{
   DEBUG(post("hid_stop"););
   
-  if (x->x_fd >= 0 && x->x_started) { 
+  if (x->x_fd >= 0 && x->x_started) 
+  { 
 	  clock_unset(x->x_clock);
 	  post("hid: polling stopped");
 	  x->x_started = 0;
   }
 }
 
-static int hid_close(t_hid *x) {
+static t_int hid_close(t_hid *x) 
+{
 	DEBUG(post("hid_close"););
 
 /* just to be safe, stop it first */
@@ -107,8 +109,12 @@ static int hid_close(t_hid *x) {
    return 1;
 }
 
-static int hid_open(t_hid *x, t_symbol *s) {
-  int eventType, eventCode, buttons, rel_axes, abs_axes, ff;
+static t_int hid_open(t_hid *x, t_symbol *s) 
+{
+	t_int eventType, eventCode;
+	char *eventTypeName = "";
+	/* counts for various event types */
+	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
 #ifdef __gnu_linux__
   unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 #endif
@@ -125,118 +131,144 @@ static int hid_open(t_hid *x, t_symbol *s) {
   
 #ifdef __gnu_linux__
   /* open device */
-  if (x->x_devname) {
+  if (x->x_devname) 
+  {
 	  /* open the device read-only, non-exclusive */
 	  x->x_fd = open (x->x_devname->s_name, O_RDONLY | O_NONBLOCK);
 	  /* test if device open */
-	  if (x->x_fd < 0 ) { 
-		  post("[hid] open %s failed",x->x_devname->s_name);
+	  if (x->x_fd < 0 ) 
+	  { 
+		  error("[hid] open %s failed",x->x_devname->s_name);
 		  x->x_fd = -1;
 		  return 0;
 	  }
   } else return 1;
   
   /* read input_events from the HID_DEVICE stream 
-   * It seems that is just there to flush the event input buffer?
+   * It seems that is just there to flush the input event queue
    */
   while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1);
   
   /* get name of device */
   ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
-  post ("Configuring %s on %s",devicename,x->x_devname->s_name);
+  post ("\nConfiguring %s on %s",devicename,x->x_devname->s_name);
 
-  /* get bitmask representing supported events (axes, buttons, etc.) */
+  /* get bitmask representing supported events (axes, keys, etc.) */
   memset(bitmask, 0, sizeof(bitmask));
   ioctl(x->x_fd, EVIOCGBIT(0, EV_MAX), bitmask[0]);
   post("\nSupported events:");
     
-  rel_axes = 0;
-  abs_axes = 0;
-  buttons = 0;
-  ff = 0;
+/* init all count vars */
+  synCount=keyCount=relCount=absCount=mscCount=ledCount=0;
+  sndCount=repCount=ffCount=pwrCount=ff_statusCount=0;
     
   /* cycle through all possible event types */
   for (eventType = 0; eventType < EV_MAX; eventType++) 
   {
-    if (test_bit(eventType, bitmask[0])) 
-	 {
-		 post(" %s (type %d) ", ev[eventType] ? ev[eventType] : "?", eventType);
-		 //	post("Event type %d",eventType);
+	  if (test_bit(eventType, bitmask[0])) 
+	  {
+		  /* make pretty names for event types */
+		  switch(eventType)
+		  {
+			  case EV_SYN: eventTypeName = "Synchronization"; break;
+			  case EV_KEY: eventTypeName = "Keys/Buttons"; break;
+			  case EV_REL: eventTypeName = "Relative Axes"; break;
+			  case EV_ABS: eventTypeName = "Absolute Axes"; break;
+			  case EV_MSC: eventTypeName = "Miscellaneous"; break;
+			  case EV_LED: eventTypeName = "LEDs"; break;
+			  case EV_SND: eventTypeName = "System Sounds"; break;
+			  case EV_REP: eventTypeName = "Autorepeat Values"; break;
+			  case EV_FF:  eventTypeName = "Force Feedback"; break;
+			  case EV_PWR: eventTypeName = "Power"; break;
+			  case EV_FF_STATUS: eventTypeName = "Force Feedback Status"; break;
+		  }
+		  post("  %s (%s/type %d) ", eventTypeName, ev[eventType] ? ev[eventType] : "?", eventType);
 		 
-		 /* get bitmask representing supported button types */
-		 ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
+		  /* get bitmask representing supported button types */
+		  ioctl(x->x_fd, EVIOCGBIT(eventType, KEY_MAX), bitmask[eventType]);
 		 
-		 /* cycle through all possible event codes (axes, keys, etc.) 
-		  * testing to see which are supported  
-		  */
-		 for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
-			 if (test_bit(eventCode, bitmask[eventType])) 
-			 {
-				 post("    Event code %s (%d)", event_names[eventType] ? (event_names[eventType][eventCode] ? event_names[eventType][eventCode] : "?") : "?", eventCode);
+		  /* cycle through all possible event codes (axes, keys, etc.) 
+			* testing to see which are supported  
+			*/
+		  for (eventCode = 0; eventCode < KEY_MAX; eventCode++) 
+		  {
+			  if (test_bit(eventCode, bitmask[eventType])) 
+			  {
+				  post("    %s (%d)", event_names[eventType] ? (event_names[eventType][eventCode] ? event_names[eventType][eventCode] : "?") : "?", eventCode);
 /* 	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?"); */
 				
-				switch(eventType) {
-// the API changed at some point...
+				  switch(eventType) {
+/* 
+ * the API changed at some point...  EV_SYN seems to be the new name
+ * from "Reset" events to "Syncronization" events
+ */
 #ifdef EV_RST
-					case EV_RST:
-						break;
+					  case EV_RST: synCount++; break;
 #else 
-					case EV_SYN:
-						break;
+					  case EV_SYN: synCount++; break;
 #endif
-					case EV_KEY:
-						buttons++;
-						break;
-					case EV_REL:
-						rel_axes++;
-						break;
-					case EV_ABS:
-						abs_axes++;
-						break;
-					case EV_MSC:
-						break;
-					case EV_LED:
-						break;
-					case EV_SND:
-						break;
-					case EV_REP:
-						break;
-					case EV_FF:
-						ff++;
-						break;
-				}
-			}
-    }        
+					  case EV_KEY: keyCount++; break;
+					  case EV_REL: relCount++; break;
+					  case EV_ABS: absCount++; break;
+					  case EV_MSC: mscCount++; break;
+					  case EV_LED: ledCount++; break;
+					  case EV_SND: sndCount++; break;
+					  case EV_REP: repCount++; break;
+					  case EV_FF:  ffCount++;  break;
+					  case EV_PWR: pwrCount++; break;
+					  case EV_FF_STATUS: ff_statusCount++; break;
+				  }
+			  }
+		  }
+	  }        
   }
     
-  post ("\nUsing %d relative axes, %d absolute axes, and %d buttons.", rel_axes, abs_axes, buttons);
-  if (ff > 0) post ("Detected %d force feedback types",ff);
-  post ("\nWARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
-  post ("This object is under development!  The interface could change at anytime!");
-  post ("As I write cross-platform versions, the interface might have to change.");
-  post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING\n");
-#endif
+  post("\nDetected:");
+  if (synCount > 0) post ("  %d Sync types",synCount);
+  if (keyCount > 0) post ("  %d Key/Button types",keyCount);
+  if (relCount > 0) post ("  %d Relative Axis types",relCount);
+  if (absCount > 0) post ("  %d Absolute Axis types",absCount);
+  if (mscCount > 0) post ("  %d Misc types",mscCount);
+  if (ledCount > 0) post ("  %d LED types",ledCount);
+  if (sndCount > 0) post ("  %d System Sound types",sndCount);
+  if (repCount > 0) post ("  %d Key Repeat types",repCount);
+  if (ffCount > 0) post ("  %d Force Feedback types",ffCount);
+  if (pwrCount > 0) post ("  %d Power types",pwrCount);
+  if (ff_statusCount > 0) post ("  %d Force Feedback types",ff_statusCount);
+
+  post("\nWARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
+  post("This object is under development!  The interface could change at anytime!");
+  post("As I write cross-platform versions, the interface might have to change.");
+  post("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
+  post("================================= [hid] =================================\n");
+#endif /* #ifdef __gnu_linux__ */
   
   return 1;
 }
 
-static int hid_read(t_hid *x,int fd) 
+static t_int hid_read(t_hid *x,int fd) 
 {
-	if (x->x_fd < 0) return 0;
+	t_atom event_data[5];
+	char *eventType;
+	char *eventCode;
 
 #ifdef __gnu_linux__
-	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) {
-		outlet_float (x->x_input_event_value_outlet, (int)x->x_input_event.value);
-		outlet_symbol (x->x_input_event_code_outlet, gensym(event_names[x->x_input_event.type][x->x_input_event.code]));
-		outlet_symbol (x->x_input_event_type_outlet, gensym(ev[x->x_input_event.type]));
-		/* input_event.time is a timeval struct from <sys/time.h> */
-		/*   outlet_float (x->x_input_event_time_outlet, x->x_input_event.time); */
+	if (x->x_fd < 0) return 0;
+
+	while (read (x->x_fd, &(x->x_input_event), sizeof(struct input_event)) > -1) 
+	{
+		/* build event_data list from event data */
+		SETSYMBOL(event_data, gensym(ev[x->x_input_event.type]));
+		SETSYMBOL(event_data + 1, gensym(event_names[x->x_input_event.type][x->x_input_event.code]));
+		SETFLOAT(event_data + 2, (t_float)x->x_input_event.value);
+		SETFLOAT(event_data + 3, (t_float)(x->x_input_event.time).tv_sec);
+		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
 	}
-#endif
+#endif /* #ifdef__gnu_linux__ */
 #ifdef __APPLE__
 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow);
-	pRecElement pCurrentHIDElement = GetSetCurrentElement (gWindow);
-	
+	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow);
+	r/l
 	// if we have a good device and element which is not a collecion
 	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection))
 	{
@@ -244,8 +276,8 @@ static int hid_read(t_hid *x,int fd)
 		SInt32 valueCal = HIDCalibrateValue (value, pCurrentHIDElement);
 		SInt32 valueScale = HIDScaleValue (valueCal, pCurrentHIDElement);
 	 }
-#endif
-  
+#endif  /* #ifdef __APPLE__ */
+
 	if (x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
@@ -255,57 +287,73 @@ static int hid_read(t_hid *x,int fd)
 }
 
 /* Actions */
-static void hid_float(t_hid* x) {
-    DEBUG(post("hid_float");)
-   
-}
-
-void hid_delay(t_hid* x, t_float f)  {
+void hid_delay(t_hid* x, t_float f)  
+{
 	DEBUG(post("hid_DELAY %f",f);)
 		
 /*	if the user sets the delay less than zero, reset to default */
-	if ( f > 0 ) {	
-		x->x_delay = (int)f;
-	} else {
+	if ( f > 0 ) 
+	{	
+		x->x_delay = (t_int)f;
+	} 
+	else 
+	{
 		x->x_delay = DEFAULT_DELAY;
 	}
 }
 
-void hid_start(t_hid* x) {
+void hid_start(t_hid* x) 
+{
 	DEBUG(post("hid_start"););
   
-   if (x->x_fd >= 0 && !x->x_started) {
+   if (x->x_fd >= 0 && !x->x_started) 
+	{
 		clock_delay(x->x_clock, DEFAULT_DELAY);
 		post("hid: polling started");
 		x->x_started = 1;
-	} else {
-		post("You need to set a input device (i.e /dev/input/event0)");
+	} 
+	else 
+	{
+		error("You need to set a input device (i.e /dev/input/event0)");
 	}
 }
 
-/* setup functions */
-static void hid_free(t_hid* x) {
-  DEBUG(post("hid_free");)
-    
-  if (x->x_fd < 0) return;
-
-  hid_stop(x);
-  clock_free(x->x_clock);
-  close (x->x_fd);
+static void hid_float(t_hid* x, t_floatarg f) 
+{
+	DEBUG(post("hid_float"););
+   
+	if(f == 1) 
+		hid_start(x);
+	else if(f == 0) 
+		hid_stop(x);
 }
 
-static void *hid_new(t_symbol *s) {
-  int i;
+/* setup functions */
+static void hid_free(t_hid* x) 
+{
+	DEBUG(post("hid_free"););
+	
+	if (x->x_fd < 0) return;
+	
+	hid_stop(x);
+	clock_free(x->x_clock);
+	close (x->x_fd);
+}
+
+static void *hid_new(t_symbol *s) 
+{
+  t_int i;
   t_hid *x = (t_hid *)pd_new(hid_class);
 
-  DEBUG(post("hid_new");)
+  DEBUG(post("hid_new"););
 
+  post("================================= [hid] =================================");
   post("[hid] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
 #ifndef __linux__
-	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
-	post("     This is a dummy, since this object only works with a Linux kernel!");
-	post("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
-#endif
+	error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+	error("     This is a dummy, since this object only works with a Linux kernel!");
+	error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
+#endif  /* __linux__ */
 
   /* init vars */
   x->x_fd = -1;
@@ -315,12 +363,9 @@ static void *hid_new(t_symbol *s) {
   x->x_devname = gensym("/dev/input/event0");
 
   x->x_clock = clock_new(x, (t_method)hid_read);
-  
-  /* create outlets for each axis */
-  x->x_input_event_time_outlet = outlet_new(&x->x_obj, &s_float);
-  x->x_input_event_type_outlet = outlet_new(&x->x_obj, &s_float);
-  x->x_input_event_code_outlet = outlet_new(&x->x_obj, &s_float);
-  x->x_input_event_value_outlet = outlet_new(&x->x_obj, &s_float);
+
+  /* create anything outlet */ 
+  outlet_new(&x->x_obj, 0);
   
   /* set to the value from the object argument, if that exists */
   if (s != &s_)
@@ -333,24 +378,27 @@ static void *hid_new(t_symbol *s) {
   return (x);
 }
 
-void hid_setup(void) {
-  DEBUG(post("hid_setup");)
-  hid_class = class_new(gensym("hid"), 
-			     (t_newmethod)hid_new, 
-			     (t_method)hid_free,
-			     sizeof(t_hid),0,A_DEFSYM,0);
-
-  /* add inlet datatype methods */
-  class_addfloat(hid_class,(t_method) hid_float);
-  class_addbang(hid_class,(t_method) hid_read);
-
-  /* add inlet message methods */
-  class_addmethod(hid_class,(t_method) hid_delay,gensym("delay"),A_DEFFLOAT,0);
-  class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFSYM,0);
-  class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
-  class_addmethod(hid_class,(t_method) hid_start,gensym("start"),0);
-  class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),0);
-  class_addmethod(hid_class,(t_method) hid_stop,gensym("stop"),0);
-  class_addmethod(hid_class,(t_method) hid_stop,gensym("nopoll"),0);
+void hid_setup(void) 
+{
+	DEBUG(post("hid_setup"););
+	hid_class = class_new(gensym("hid"), 
+								 (t_newmethod)hid_new, 
+								 (t_method)hid_free,
+								 sizeof(t_hid),
+								 CLASS_DEFAULT,
+								 A_DEFSYM,0);
+	
+	/* add inlet datatype methods */
+	class_addfloat(hid_class,(t_method) hid_float);
+	class_addbang(hid_class,(t_method) hid_read);
+	
+	/* add inlet message methods */
+	class_addmethod(hid_class,(t_method) hid_delay,gensym("delay"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFSYM,0);
+	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
+	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),0);
+	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),0);
+	class_addmethod(hid_class,(t_method) hid_stop,gensym("stop"),0);
+	class_addmethod(hid_class,(t_method) hid_stop,gensym("nopoll"),0);
 }
 
