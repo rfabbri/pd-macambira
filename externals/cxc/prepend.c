@@ -7,7 +7,7 @@
 /* this is taken from ggee, where the file was hanging around but the object was not
    funtional. i keep it here for reference since i dont wnat to fix it over and over ;)
    but its not included in the makefile to avoid namespace clash with ggee.prepend
-   anyhow, i ll just rename it cxc.prepend
+   anyhow, i ll just rename it cxc_prepend
 */
 
 /* ------------------------ prepend ----------------------------- */
@@ -100,7 +100,7 @@ static void *prepend_new(t_symbol* s)
     if (s != &s_)
 	 x->x_s = s;
     else
-	 x->x_s = gensym("cxc.prepend");
+	 x->x_s = gensym("cxc_prepend");
     return (x);
 }
 
@@ -111,7 +111,7 @@ static void prepend_set(t_prepend *x, t_symbol *s)
 
 void prepend_setup(void)
 {
-    prepend_class = class_new(gensym("cxc.prepend"), (t_newmethod)prepend_new, 0,
+    prepend_class = class_new(gensym("cxc_prepend"), (t_newmethod)prepend_new, 0,
 				sizeof(t_prepend), 0,A_DEFSYM,NULL);
     class_addlist(prepend_class, prepend_list);
     class_addanything(prepend_class,prepend_anything);

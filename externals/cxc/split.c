@@ -143,7 +143,7 @@ static void *split_new(t_symbol* s)
     if (s != &s_)
 	 x->x_splitter = s;
     else
-	 x->x_splitter = gensym("cxc.split");
+	 x->x_splitter = gensym("cxc_split");
     return (x);
 }
 
@@ -165,7 +165,7 @@ static void split_set(t_split *x, t_symbol *s)
 
 void split_setup(void)
 {
-    split_class = class_new(gensym("cxc.split"), (t_newmethod)split_new, 0,
+    split_class = class_new(gensym("cxc_split"), (t_newmethod)split_new, 0,
 				sizeof(t_split), 0,A_DEFSYM,NULL);
     // class_addlist(split_class, split_list);
     class_addanything(split_class,split_anything);

@@ -49,10 +49,10 @@ cloned out of markex so i dont need to load gem to have these
 reson:
 same as above
 
-cxc.prepend:
+cxc_prepend:
 prepend stuff with another symbol
 
-cxc.split:
+cxc_split:
 split incoming string at specified delimiter
 
 utime:
