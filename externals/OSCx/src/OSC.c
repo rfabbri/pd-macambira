@@ -47,8 +47,8 @@ OSC_API void OSC_version (t_OSC *x) {
   // EnterCallback();
   post("OSC4PD Version " VERSION
        "\n ¯\\    original code by matt wright. pd-fication jdl@xdv.org\n"
-       "   ·   Win32-port raf@interaccess.com    Darwin cleanup hans@at.or.at\n"
-		 "		 \\_ Compiled " __TIME__ " " __DATE__);
+       "   ·   Win32-port raf@interaccess.com   unified versions hans@at.or.at\n"
+		 "      \\_ Compiled " __TIME__ " " __DATE__);
   // ExitCallback();
 }
 

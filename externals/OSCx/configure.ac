@@ -6,6 +6,9 @@ AC_INIT(OSCxpd, 0.2, jdl@xdv.org)
 AC_CONFIG_SRCDIR([libOSC/OSC-client.h])
 AC_CONFIG_HEADER([config.h])
 
+# get system type
+AC_CANONICAL_HOST
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
@@ -24,12 +27,6 @@ echo "default flags"
 echo cflags "$CFLAGS"
 echo ldflags "$LDFLAGS"
 
-dnl ------------------------------------------
-dnl ----  do some magic to gues the host opsys
-dnl ----  taken from libvorbis configure.in
-dnl ------------------------------------------
-AC_CANONICAL_HOST
-
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lc':
 AC_CHECK_LIB([c], [main])
@@ -38,7 +35,7 @@ AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h sys/prctl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -60,8 +57,8 @@ dnl  for each of the *-*-host's in the following, do the checking and then set y
 dnl  CFLAGS get set for C code, CPPFLAGS for c++ code.  LDFLAGS is the linking flags for both c and c++
 dnl ------------------------------------------
 
-INCLUDES="-I../libOSC -I../../../pd/src"
-LDFLAGS="$LDFLAGS -L/usr/local/lib -ldl"
+INCLUDES="-I../libOSC -I../../pd/src -I../../../pd/src -I."
+LIBOSC=libOSC.a
 if test -z "$GCC"; then
         case $host in 
         *-*-irix*)
@@ -73,46 +70,52 @@ if test -z "$GCC"; then
 		;;
         sparc-sun-solaris*)
                 CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
-		;;
+					 ;;
         *)
                 CFLAGS="-O" 
-		;;
+					 ;;
         esac
 else
-
         case $host in 
         *86-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O2"
-		LDFLAGS="$LDFLAGS -shared"
-		dnl we could test for bad glibc here, but don't
-		pd_suffix=pd_linux
-		;;
+					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 dnl we could test for bad glibc here, but don't
+					 pd_suffix=pd_linux
+					 ;;
         powerpc-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-		LDFLAGS="$LDFLAGS -shared"
-		pd_suffix=pd_linux
-		;;
+					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 pd_suffix=pd_linux
+					 ;;
         *-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-		LDFLAGS="$LDFLAGS -shared"
-		INCLUDES="$INCLUDES"
-		pd_suffix=pd_linux
-		;;
+					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 INCLUDES="$INCLUDES"
+					 pd_suffix=pd_linux
+					 ;;
         sparc-sun-*)
-		echo "YOU HAVE A SPARC STATION,	not setting any flags, not supported yet"
-		;;
+		          echo "YOU HAVE A SPARC STATION,	not setting any flags, not supported yet"
+			       ;;
+        *-*-cygwin*)
+                CFLAGS="$CPFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
+					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 INCLUDES="$INCLUDES -I../../../pd/bin"
+					 LIBOSC=libOSC.lib
+					 pd_suffix=dll
+					 ;;
         *-*-darwin*)
                 CFLAGS="$CPFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
-		# LDFLAGS="$LDFLAGS -bundle -bundle_loader ../../../pd/bin/pd -undefined suppress -flat_namespace"
-		LDFLAGS="$LDFLAGS -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace"
-		pd_suffix=pd_darwin
-		;;
+					 # LDFLAGS=" -bundle -bundle_loader ../../../pd/bin/pd -undefined suppress -flat_namespace"
+					 LDFLAGS=" -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace "
+					 pd_suffix=pd_darwin
+					 ;;
         *)
-		dnl assume unix
+					 dnl assume unix
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
-		LDFLAGS="$LDFLAGS -shared"
-		pd_suffix=pd_linux
-		;;
+					 LDFLAGS="-Wl,-export_dynamic -shared"
+					 pd_suffix=pd_linux
+					 ;;
         esac
 fi
 
@@ -149,8 +152,10 @@ AC_CHECK_HEADER(m_pd.h, [have_pd_hdr=yes ], [
 	])
 
 
+AC_SUBST(LIBOSC)
 AC_SUBST(pd_suffix)
 AC_SUBST(INCLUDES)
+AC_SUBST(CFLAGS)
 
 AC_CONFIG_FILES([src/Makefile
                  libOSC/Makefile

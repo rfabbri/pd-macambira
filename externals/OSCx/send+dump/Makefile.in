@@ -1,9 +1,8 @@
 LIBOSCDIR = ../libOSC
 LIBOSC = ${LIBOSCDIR}/libOSC.a
-# for eg. linux
-# DEFS= -Dunix
 
-CFLAGS= @CFLAGS@
+# strange bug requires this...
+CFLAGS= @CFLAGS@ @INCLUDES@
 # INCLUDES= @INCLUDES@
 
 DUMPOBJS=dumpOSC.o
