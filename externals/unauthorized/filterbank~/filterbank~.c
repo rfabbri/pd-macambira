@@ -35,7 +35,6 @@
 
 #ifdef NT
 #include <io.h>
-#define random rand
 #else
 #include <unistd.h>
 #endif
@@ -46,7 +45,7 @@
 #define FILTERBANK_OUTLET_WIDTH 5
 #define FILTERBANK_HEIGHT 16
 
-static char   *filterbank_version = "filterbank : responses from a set of band-pass filters, version 0.1 (ydegoyon@free.fr)";
+static char   *filterbank_version = "filterbank : responses from a set of band-pass filters, version 0.3 (ydegoyon@free.fr)";
 
 t_widgetbehavior filterbank_widgetbehavior;
 static t_class *filterbank_class_tilde;
@@ -132,34 +131,34 @@ static void filterbank_draw_new(t_filterbank_tilde *x, t_glist *glist)
 
       SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xFILTERBANK\n",
              canvas, 
-             x->x_obj.te_xpix, 
-             x->x_obj.te_ypix,
-             x->x_obj.te_xpix + x->x_width,
-             x->x_obj.te_ypix + x->x_height,
+             text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist),
+             text_xpix(&x->x_obj, glist) + x->x_width,
+             text_ypix(&x->x_obj, glist) + x->x_height,
              x);
 
       SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #000000 -tags %xSIN\n",
              canvas, 
-             x->x_obj.te_xpix, 
-             x->x_obj.te_ypix-1,
-             x->x_obj.te_xpix+7,
-             x->x_obj.te_ypix,
+             text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist)-1,
+             text_xpix(&x->x_obj, glist)+7,
+             text_ypix(&x->x_obj, glist),
              x);
 
       for ( fi=0; fi<x->x_nbfilters; fi++ ) 
       {
         char color[8];
 
-         sprintf( color, "#%.2x%.2x%.2x", random() % 256, random() % 256, random() % 256 );
+         sprintf( color, "#%.2x%.2x%.2x", (int)random() % 256, (int)random() % 256, (int)random() % 256 );
 
          SYS_VGUI11(".x%x.c create polygon %d %d %d %d %d %d -outline #000000 -fill %s -tags %xFILTER%d\n",
              canvas,
-             x->x_obj.te_xpix + fi*x->x_width/x->x_nbfilters,
-             x->x_obj.te_ypix,
-             x->x_obj.te_xpix + fi*x->x_width/x->x_nbfilters + x->x_width/(2*x->x_nbfilters),
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + (fi+1)*x->x_width/x->x_nbfilters,
-             x->x_obj.te_ypix,
+             text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters,
+             text_ypix(&x->x_obj, glist),
+             text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters + x->x_width/(2*x->x_nbfilters),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + (fi+1)*x->x_width/x->x_nbfilters,
+             text_ypix(&x->x_obj, glist),
              color, x, fi);
        }
     }
@@ -174,30 +173,30 @@ static void filterbank_draw_move(t_filterbank_tilde *x, t_glist *glist)
 
     SYS_VGUI7(".x%x.c coords %xFILTERBANK %d %d %d %d\n",
              canvas, x, 
-             x->x_obj.te_xpix, 
-             x->x_obj.te_ypix,
-             x->x_obj.te_xpix + x->x_width,
-             x->x_obj.te_ypix + x->x_height
+             text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist),
+             text_xpix(&x->x_obj, glist) + x->x_width,
+             text_ypix(&x->x_obj, glist) + x->x_height
              );
 
     SYS_VGUI7(".x%x.c coords %xSIN %d %d %d %d\n",
              canvas, x, 
-             x->x_obj.te_xpix, 
-             x->x_obj.te_ypix-1,
-             x->x_obj.te_xpix+7,
-             x->x_obj.te_ypix
+             text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist)-1,
+             text_xpix(&x->x_obj, glist)+7,
+             text_ypix(&x->x_obj, glist)
              );
 
     for ( fi=0; fi<x->x_nbfilters; fi++ )
     {
          SYS_VGUI10(".x%x.c coords %xFILTER%d %d %d %d %d %d %d\n",
              canvas, x, fi,
-             x->x_obj.te_xpix + fi*x->x_width/x->x_nbfilters,
-             x->x_obj.te_ypix,
-             x->x_obj.te_xpix + fi*x->x_width/x->x_nbfilters + x->x_width/(2*x->x_nbfilters),
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + (fi+1)*x->x_width/x->x_nbfilters,
-             x->x_obj.te_ypix
+             text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters,
+             text_ypix(&x->x_obj, glist),
+             text_xpix(&x->x_obj, glist) + fi*x->x_width/x->x_nbfilters + x->x_width/(2*x->x_nbfilters),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + (fi+1)*x->x_width/x->x_nbfilters,
+             text_ypix(&x->x_obj, glist)
              );
     }
 
@@ -241,10 +240,10 @@ static void filterbank_getrect(t_gobj *z, t_glist *owner,
 {
    t_filterbank_tilde* x = (t_filterbank_tilde*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, owner);
+   *yp1 = text_ypix(&x->x_obj, owner);
+   *xp2 = text_xpix(&x->x_obj, owner)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
 static void filterbank_save(t_gobj *z, t_binbuf *b)
@@ -253,7 +252,7 @@ static void filterbank_save(t_gobj *z, t_binbuf *b)
   t_int ii;
 
    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("filterbank~"), x->x_lowfreq, x->x_highfreq,
                 x->x_nbfilters );
    binbuf_addv(b, ";");
@@ -380,14 +379,14 @@ static void filterbank_delete(t_gobj *z, t_glist *glist)
 static void filterbank_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
   t_filterbank_tilde *x = (t_filterbank_tilde *)z;
-  int xold = x->x_obj.te_xpix;
-  int yold = x->x_obj.te_ypix;
+  int xold = text_xpix(&x->x_obj, glist);
+  int yold = text_ypix(&x->x_obj, glist);
 
     // post( "filterbank_displace dx=%d dy=%d", dx, dy );
 
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
-    if(xold != x->x_obj.te_xpix || yold != x->x_obj.te_ypix)
+    if(xold != text_xpix(&x->x_obj, glist) || yold != text_ypix(&x->x_obj, glist) )
     {
 	filterbank_draw_move(x, x->x_glist);
     }
@@ -655,18 +654,14 @@ void filterbank_tilde_setup(void)
     filterbank_widgetbehavior.w_deletefn =     filterbank_delete;
     filterbank_widgetbehavior.w_visfn =        filterbank_vis;
     filterbank_widgetbehavior.w_clickfn =      NULL;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(filterbank_class_tilde, filterbank_properties);
+    class_setsavefn(filterbank_class_tilde, filterbank_save);
+#else
     filterbank_widgetbehavior.w_propertiesfn = filterbank_properties;
     filterbank_widgetbehavior.w_savefn =       filterbank_save;
-#else
-	 class_setsavefn(filterbank_class_tilde, &filterbank_save);
-	 class_setpropertiesfn(filterbank_class_tilde, &filterbank_properties);
 #endif
     class_setwidget(filterbank_class_tilde, &filterbank_widgetbehavior);
+    class_sethelpsymbol(filterbank_class_tilde, gensym("filterbank~.pd"));
 }

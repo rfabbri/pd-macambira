@@ -141,7 +141,7 @@ circular );
 #X connect 44 0 46 0;
 #X restore 694 150 pd modifications;
 #X obj 298 73 tabplay~ \$0-sonosample;
-#X obj 106 329 sonogram~ 215 0;
+#X obj 106 329 sonogram~ 256 0;
 #X text 538 54 When the sonogram is RED (updating) \,;
 #X text 537 43 VERY IMPORTANT NOTE :;
 #X text 591 116 Step 4 : modify parts of the sonogram ... and send

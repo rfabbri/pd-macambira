@@ -36,24 +36,14 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef __APPLE__
-#include <sys/malloc.h>
-#else
 #include <malloc.h>
-#endif
-
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
 #include <unistd.h>
 #endif
 #ifdef NT
-#include <windows.h>
-int usleep (unsigned int us) {
-  Sleep((long)(us/1000.));
-  return 0;
-}
+#define M_PI 3.14159265358979323846
 #endif
 #include <math.h>
 
@@ -116,7 +106,7 @@ static int ignorevisible=1; // ignore visible test
 #define COOLED_DEFAULT_WIDTH 400
 #define COOLED_DEFAULT_HEIGHT 200
 
-static char   *cooled_version = "cooled~: version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *cooled_version = "cooled~: version 0.13, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *cooled_class;
 t_widgetbehavior cooled_widgetbehavior;
@@ -252,10 +242,10 @@ static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
 
 static void cooled_erase_block(t_cooled *x, t_glist *glist, t_int sample )
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    t_int hi;
-    t_float fspectrum=0.0;
-    char fillColor[ 16 ];
+  t_canvas *canvas=glist_getcanvas(glist);
+  t_int hi;
+  t_float fspectrum=0.0;
+  char fillColor[ 16 ];
 
      for ( hi=0; hi<x->x_height; hi++)
      {
@@ -275,10 +265,11 @@ static void cooled_erase_block(t_cooled *x, t_glist *glist, t_int sample )
 
 static void *cooled_do_update_part(void *tdata)
 {
-   t_cooled *x = (t_cooled*) tdata;
-   t_int si;
-   t_int nbpoints = 0;
-   t_float percentage = 0, opercentage = 0;
+ t_cooled *x = (t_cooled*) tdata;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+ t_int si;
+ t_int nbpoints = 0;
+ t_float percentage = 0, opercentage = 0;
 
    // loose synchro
    usleep( THREAD_SLEEP_TIME );
@@ -324,16 +315,16 @@ static void *cooled_do_update_part(void *tdata)
    if ( glist_isvisible( x->x_glist ) )
    {
       SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
-               glist_getcanvas( x->x_glist ), x);
+               canvas, x);
       if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
       {
          SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(int)(x->x_readstart*(x->x_width)/100 ),
+                     canvas, x->x_xpos+(int)(x->x_readstart*(x->x_width)/100 ),
                           x->x_ypos, x->x_xpos+(int)(x->x_readend*(x->x_width)/100 ), 
                           x->x_ypos+x->x_height*x->x_zoom, x );
       }
       // set borders in black
-      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #000000\n", glist_getcanvas(x->x_glist), x);
+      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #000000\n", canvas, x);
    }
 
    post("cooled~ : child thread %d ended", (int)x->x_updatechild );
@@ -344,8 +335,8 @@ static void *cooled_do_update_part(void *tdata)
 static void cooled_update_part(t_cooled *x, t_glist *glist, t_int bstart, t_int bend, 
                                  t_int erase, t_int redraw, t_int keepframe)
 {
-   pthread_attr_t update_child_attr;
-   t_canvas *canvas=glist_getcanvas(x->x_glist);
+  pthread_attr_t update_child_attr;
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if ( x->x_updatechild != 0 )
     {
@@ -368,8 +359,8 @@ static void cooled_update_part(t_cooled *x, t_glist *glist, t_int bstart, t_int 
     {
       if ( ( bstart == 0 ) && ( bend == x->x_width-1 ) && !keepframe )
       {
-        SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", glist_getcanvas(glist), x );
-        SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", glist_getcanvas(glist), x );
+        SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", canvas, x );
+        SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", canvas, x );
         SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
 	     canvas, x->x_xpos, x->x_ypos,
 	     x->x_xpos + x->x_width*x->x_zoom, 
@@ -382,18 +373,18 @@ static void cooled_update_part(t_cooled *x, t_glist *glist, t_int bstart, t_int 
              x->x_ypos + x->x_height*x->x_zoom,
 	     x);
         SYS_VGUI2("image delete COOLEDIMAGE%x\n", x );
-        SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", glist_getcanvas(glist), x );
+        SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", canvas, x );
         SYS_VGUI4("image create photo COOLEDIMAGE%x -format gif -width %d -height %d\n", 
                           x, x->x_width*x->x_zoom, x->x_height*x->x_zoom );
         SYS_VGUI2("COOLEDIMAGE%x blank\n", x );
         SYS_VGUI6(".x%x.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), 
+                          canvas, 
                           x->x_xpos+(x->x_width*x->x_zoom)/2, 
                           x->x_ypos+(x->x_height*x->x_zoom)/2, x, x );
-        canvas_fixlinesfor( glist_getcanvas(x->x_glist), (t_text*)x );
+        canvas_fixlinesfor( canvas, (t_text*)x );
       }
       // set borders in red
-      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #FF0000\n", glist_getcanvas(glist), x);
+      SYS_VGUI3(".x%x.c itemconfigure %xCOOLED -outline #FF0000\n", canvas, x);
     }
 
     // launch update thread
@@ -420,14 +411,11 @@ static void cooled_update_part(t_cooled *x, t_glist *glist, t_int bstart, t_int 
  
 static void cooled_draw_new(t_cooled *x, t_glist *glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
-   if ( x->x_xpos == -1 )
-   {
-      x->x_xpos=x->x_obj.te_xpix;
-      x->x_ypos=x->x_obj.te_ypix;
-      x->x_xdraw=x->x_obj.te_xpix;
-   }
+   x->x_xpos=text_xpix(&x->x_obj, glist);
+   x->x_ypos=text_ypix(&x->x_obj, glist);
+   x->x_xdraw=text_xpix(&x->x_obj, glist);
    SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xCOOLEDR\n",
 	     canvas, x->x_xpos, x->x_ypos,
 	     x->x_xpos + x->x_width*x->x_zoom, 
@@ -443,7 +431,7 @@ static void cooled_draw_new(t_cooled *x, t_glist *glist)
                           x, x->x_width*x->x_zoom, x->x_height*x->x_zoom );
     SYS_VGUI2("COOLEDIMAGE%x blank\n", x );
     SYS_VGUI6(".x%x.c create image %d %d -image COOLEDIMAGE%x -tags ICOOLEDIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), 
+                          canvas, 
                           x->x_xpos+(x->x_width*x->x_zoom)/2, 
                           x->x_ypos+(x->x_height*x->x_zoom)/2, x, x );
     if ( x->x_draw) cooled_update_part(x, x->x_glist, 0, x->x_width-1, 0, 1, 0);
@@ -452,24 +440,26 @@ static void cooled_draw_new(t_cooled *x, t_glist *glist)
 
 static void cooled_draw_delete(t_cooled *x, t_glist *glist)
 {
+ t_canvas *canvas=glist_getcanvas(glist);
+
     if ( glist_isvisible( glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", glist_getcanvas( glist ), x );
+       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
-          SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n", glist_getcanvas( glist ), x);
+          SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n", canvas, x);
        }
-       SYS_VGUI3( ".x%x.c delete line %xINSERTHERE\n", glist_getcanvas( glist ), x);
-       SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", glist_getcanvas( glist ), x );
+       SYS_VGUI3( ".x%x.c delete line %xINSERTHERE\n", canvas, x);
+       SYS_VGUI3(".x%x.c delete %xCOOLEDR\n", canvas, x );
+       SYS_VGUI3(".x%x.c delete %xCOOLEDL\n", canvas, x );
+       SYS_VGUI3(".x%x.c delete ICOOLEDIMAGE%x\n", canvas, x );
        SYS_VGUI2("image delete COOLEDIMAGE%x\n", x );
     }
 }
 
 static void cooled_draw_move(t_cooled *x, t_glist *glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
    if ( glist_isvisible( x->x_glist ) )
    {
@@ -509,7 +499,7 @@ static void cooled_draw_move(t_cooled *x, t_glist *glist)
 
 static void cooled_draw_select(t_cooled* x,t_glist* glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
    if ( glist_isvisible( x->x_glist ) )
    {
@@ -534,6 +524,7 @@ static void cooled_draw_select(t_cooled* x,t_glist* glist)
 static void cooled_readstart(t_cooled *x, t_floatarg fstart)
 {
   t_float startpoint = fstart;
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (startpoint < 0) startpoint = 0;
     if (startpoint > 100) startpoint = 100;
@@ -544,11 +535,11 @@ static void cooled_readstart(t_cooled *x, t_floatarg fstart)
     if ( glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
-              glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
           SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(int)(x->x_readstart*x->x_width*x->x_zoom/100 ),
+                      canvas, x->x_xpos+(int)(x->x_readstart*x->x_width*x->x_zoom/100 ),
                           x->x_ypos, x->x_xpos+(int)(x->x_readend*x->x_width*x->x_zoom/100 ), 
                           x->x_ypos+x->x_height*x->x_zoom, x );
        }
@@ -560,6 +551,7 @@ static void cooled_readstart(t_cooled *x, t_floatarg fstart)
 static void cooled_readend(t_cooled *x, t_floatarg fend)
 {
   t_float endpoint = fend;
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (endpoint < 0) endpoint = 0;
     if (endpoint > 100) endpoint = 100;
@@ -570,11 +562,11 @@ static void cooled_readend(t_cooled *x, t_floatarg fend)
     if ( glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete rectangle %xCLIPZONE\n",
-               glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        if ( ( x->x_readstart != 0 ) || ( x->x_readend != 100 ) )
        {
           SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #FF0000 -tags %xCLIPZONE -width 2\n",
-               glist_getcanvas( x->x_glist ), 
+               canvas, 
                x->x_xpos+(int)(x->x_readstart*x->x_width*x->x_zoom/100 ),
                x->x_ypos, x->x_xpos+(int)(x->x_readend*x->x_width*x->x_zoom/100 ), 
                x->x_ypos+x->x_height*x->x_zoom, x );
@@ -586,7 +578,7 @@ static void cooled_readend(t_cooled *x, t_floatarg fend)
 static void cooled_getrect(t_gobj *z, t_glist *owner,
 			    int *xp1, int *yp1, int *xp2, int *yp2)
 {
-   t_cooled* x = (t_cooled*)z;
+ t_cooled* x = (t_cooled*)z;
 
    *xp1 = x->x_xpos;
    *yp1 = x->x_ypos;
@@ -596,7 +588,7 @@ static void cooled_getrect(t_gobj *z, t_glist *owner,
 
 static void cooled_save(t_gobj *z, t_binbuf *b)
 {
-   t_cooled *x = (t_cooled *)z;
+ t_cooled *x = (t_cooled *)z;
 
    binbuf_addv(b, "ssiisiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_xpos, (t_int)x->x_ypos,
@@ -606,7 +598,7 @@ static void cooled_save(t_gobj *z, t_binbuf *b)
 
 static void cooled_select(t_gobj *z, t_glist *glist, int selected)
 {
-   t_cooled *x = (t_cooled *)z;
+ t_cooled *x = (t_cooled *)z;
 
    x->x_selected = selected;
    cooled_draw_select( x, glist );
@@ -614,8 +606,8 @@ static void cooled_select(t_gobj *z, t_glist *glist, int selected)
 
 static void cooled_vis(t_gobj *z, t_glist *glist, int vis)
 {
-   t_cooled *x = (t_cooled *)z;
-   t_rtext *y;
+ t_cooled *x = (t_cooled *)z;
+ t_rtext *y;
 
    if (vis)
    {
@@ -635,9 +627,9 @@ static void cooled_delete(t_gobj *z, t_glist *glist)
 
 static void cooled_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
-    t_cooled *x = (t_cooled *)z;
-    int xold = x->x_xpos;
-    int yold = x->x_ypos;
+  t_cooled *x = (t_cooled *)z;
+  t_int xold = x->x_xpos;
+  t_int yold = x->x_ypos;
 
     x->x_xpos += dx;
     x->x_ypos += dy;
@@ -835,8 +827,9 @@ static void cooled_dialog(t_cooled *x, t_symbol *s, int argc, t_atom *argv)
 static int cooled_click(t_gobj *z, struct _glist *glist,
 			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
-    t_cooled* x = (t_cooled *)z;
-    t_int pipos;
+ t_cooled* x = (t_cooled *)z;
+ t_int pipos;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     // post( "cooled_click : x=%d y=%d doit=%d alt=%d, shift=%d", xpix, ypix, doit, alt, shift );
     if ( doit )
@@ -867,9 +860,9 @@ static int cooled_click(t_gobj *z, struct _glist *glist,
          if ( glist_isvisible( x->x_glist ) )
          {
             SYS_VGUI3( ".x%x.c delete line %xINSERTHERE\n",
-               glist_getcanvas( x->x_glist ), x);
+                        canvas, x);
             SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #00FFFF -tags %xINSERTHERE -width 2\n",
-               glist_getcanvas( x->x_glist ), x->x_xdraw,
+                        canvas, x->x_xdraw,
                x->x_ypos, x->x_xdraw,
                x->x_ypos+x->x_height*x->x_zoom, x );
           }
@@ -1373,13 +1366,9 @@ void cooled_tilde_setup(void)
     cooled_widgetbehavior.w_deletefn =     cooled_delete;
     cooled_widgetbehavior.w_visfn =        cooled_vis;
     cooled_widgetbehavior.w_clickfn =      cooled_click;
-#if PD_MINOR_VERSION >= 37
+
     class_setpropertiesfn(cooled_class, cooled_properties);
     class_setsavefn(cooled_class, cooled_save);
-#else
-    cooled_widgetbehavior.w_propertiesfn = cooled_properties;
-    cooled_widgetbehavior.w_savefn =       cooled_save;
-#endif
 
     CLASS_MAINSIGNALIN( cooled_class, t_cooled, x_f );
     class_addmethod(cooled_class, (t_method)cooled_dsp, gensym("dsp"), A_NULL);

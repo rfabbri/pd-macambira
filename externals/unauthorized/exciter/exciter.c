@@ -37,8 +37,8 @@
 #include <math.h>
 #include <ctype.h>
 #include <time.h>
-#include <m_pd.h>
-
+#include <sys/time.h>
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -46,10 +46,7 @@
 
 #ifdef NT
 #include <io.h>
-#include <winsock2.h>
-#include <sys/timeb.h>
 #else
-#include <sys/time.h>
 #include <unistd.h>
 #endif
 
@@ -65,7 +62,7 @@ void canvas_startmotion(t_canvas *x);
 
 #define EXCITER_PIXEL_GRAIN 5
 
-static char   *exciter_version = "exciter: a bang-events sequencer, version 0.2 (ydegoyon@free.fr)"; 
+static char   *exciter_version = "exciter: a bang-events sequencer, version 0.4 (ydegoyon@free.fr)"; 
 
 t_widgetbehavior exciter_widgetbehavior;
 static t_class *exciter_class;
@@ -120,14 +117,14 @@ static void exciter_draw_gem(t_exciter *x, t_glist *glist, t_int ix, t_int iy)
 
     SYS_VGUI13(".x%x.c create polygon %d %d %d %d %d %d %d %d -outline #000000 -fill #FFFFFF -tags %xEVENT%.4d%.4d\n",
 	     canvas, 
-             x->x_obj.te_xpix + ix*EXCITER_PIXEL_GRAIN, 
-             x->x_obj.te_ypix + x->x_height - (iy+1)*x->x_height/x->x_nbevents + 2*polyray,
-             x->x_obj.te_xpix + ix*EXCITER_PIXEL_GRAIN + polyray, 
-             x->x_obj.te_ypix + x->x_height - (iy+1)*x->x_height/x->x_nbevents + polyray,
-             x->x_obj.te_xpix + ix*EXCITER_PIXEL_GRAIN + 2*polyray, 
-             x->x_obj.te_ypix + x->x_height - (iy+1)*x->x_height/x->x_nbevents,
-             x->x_obj.te_xpix + ix*EXCITER_PIXEL_GRAIN + polyray, 
-             x->x_obj.te_ypix + x->x_height - (iy+1)*x->x_height/x->x_nbevents - polyray,
+             text_xpix(&x->x_obj, glist) + ix*EXCITER_PIXEL_GRAIN, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (iy+1)*x->x_height/x->x_nbevents + 2*polyray,
+             text_xpix(&x->x_obj, glist) + ix*EXCITER_PIXEL_GRAIN + polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (iy+1)*x->x_height/x->x_nbevents + polyray,
+             text_xpix(&x->x_obj, glist) + ix*EXCITER_PIXEL_GRAIN + 2*polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (iy+1)*x->x_height/x->x_nbevents,
+             text_xpix(&x->x_obj, glist) + ix*EXCITER_PIXEL_GRAIN + polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (iy+1)*x->x_height/x->x_nbevents - polyray,
 	     x, ix, iy);
 }
 
@@ -166,39 +163,39 @@ static void exciter_draw_new(t_exciter *x, t_glist *glist)
   t_int ei;
 
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #902181 -tags %xLINE\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height,
 	     x);
     SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0 s\" -tags %xLOWERCAPTION\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height + 10, x );
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height + 10, x );
     SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%.2f s\" -tags %xHIGHERCAPTION\n",
-	     canvas, x->x_obj.te_xpix + x->x_width, x->x_obj.te_ypix + x->x_height + 10, 
+	     canvas, text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height + 10, 
              x->x_width/EXCITER_PIXEL_GRAIN*x->x_timegrain , x);
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN\n",
-	     canvas, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix - 2,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix ,
+	     canvas, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) - 2,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist) ,
 	     x);
     if ( x->x_nbevents > 1 )
     {
       for ( ei=0; ei<x->x_nbevents; ei++ )
       {
          SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
-	     canvas, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
-             x->x_obj.te_ypix + x->x_height + 2,
+	     canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
 	     x, ei);
       }
     }
     else
     {
        SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
-	     canvas, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix + x->x_height + 2,
+	     canvas, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
 	     x, 0);
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
@@ -211,38 +208,38 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
   t_int ei, gi;
 
     SYS_VGUI7(".x%x.c coords %xLINE %d %d %d %d \n",
-	     canvas, x, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height
+	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height
 	     );
     SYS_VGUI5(".x%x.c coords %xLOWERCAPTION %d %d\n",
-	     canvas, x, x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height + 10 );
+	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height + 10 );
     SYS_VGUI5(".x%x.c coords %xHIGHERCAPTION %d %d\n",
-	     canvas, x, x->x_obj.te_xpix + x->x_width, x->x_obj.te_ypix + x->x_height + 10);
+	     canvas, x, text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height + 10);
     SYS_VGUI7(".x%x.c coords %xIN %d %d %d %d\n",
-	     canvas, x, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix - 2,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix
+	     canvas, x, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) - 2,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist)
 	     );
     if ( x->x_nbevents > 1 )
     {
       for ( ei=0; ei<x->x_nbevents; ei++ )
       {
          SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
-	     canvas, x, ei, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
-             x->x_obj.te_ypix + x->x_height + 2
+	     canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1), 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbevents-1) + 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
 	     );
       }
     }
     else
     {
        SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
-	     canvas, x, 0, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix + x->x_height + 2
+	     canvas, x, 0, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
 	     );
     }
     for ( ei=0; ei<x->x_nbevents; ei++ )
@@ -251,14 +248,14 @@ static void exciter_draw_move(t_exciter *x, t_glist *glist)
       {
          SYS_VGUI13(".x%x.c coords %xEVENT%.4d%.4d %d %d %d %d %d %d %d %d\n",
 	     canvas, x, gi, ei,  
-             x->x_obj.te_xpix + gi*EXCITER_PIXEL_GRAIN, 
-             x->x_obj.te_ypix + x->x_height - (ei+1)*x->x_height/x->x_nbevents + 2*polyray,
-             x->x_obj.te_xpix + gi*EXCITER_PIXEL_GRAIN + polyray, 
-             x->x_obj.te_ypix + x->x_height - (ei+1)*x->x_height/x->x_nbevents + polyray,
-             x->x_obj.te_xpix + gi*EXCITER_PIXEL_GRAIN + 2*polyray, 
-             x->x_obj.te_ypix + x->x_height - (ei+1)*x->x_height/x->x_nbevents,
-             x->x_obj.te_xpix + gi*EXCITER_PIXEL_GRAIN + polyray, 
-             x->x_obj.te_ypix + x->x_height - (ei+1)*x->x_height/x->x_nbevents - polyray
+             text_xpix(&x->x_obj, glist) + gi*EXCITER_PIXEL_GRAIN, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (ei+1)*x->x_height/x->x_nbevents + 2*polyray,
+             text_xpix(&x->x_obj, glist) + gi*EXCITER_PIXEL_GRAIN + polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (ei+1)*x->x_height/x->x_nbevents + polyray,
+             text_xpix(&x->x_obj, glist) + gi*EXCITER_PIXEL_GRAIN + 2*polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (ei+1)*x->x_height/x->x_nbevents,
+             text_xpix(&x->x_obj, glist) + gi*EXCITER_PIXEL_GRAIN + polyray, 
+             text_ypix(&x->x_obj, glist) + x->x_height - (ei+1)*x->x_height/x->x_nbevents - polyray
 	     );
        }
     }
@@ -294,13 +291,13 @@ static void exciter_draw_select(t_exciter* x,t_glist* glist)
     if(x->x_selected)
     {
         /* sets the main item in blue */
-	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #0000FF\n", glist_getcanvas(glist), x);
+	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #0000FF\n", canvas, x);
 
     }
     else
     {
         /* sets the main item in black */
-	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #000000\n", glist_getcanvas(glist), x);
+	SYS_VGUI3(".x%x.c itemconfigure %xLINE -outline #000000\n", canvas, x);
     }
 }
 
@@ -312,10 +309,10 @@ static void exciter_getrect(t_gobj *z, t_glist *owner,
 {
    t_exciter* x = (t_exciter*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, owner);
+   *yp1 = text_ypix(&x->x_obj, owner);
+   *xp2 = text_xpix(&x->x_obj, owner)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
 static void exciter_save(t_gobj *z, t_binbuf *b)
@@ -324,7 +321,7 @@ static void exciter_save(t_gobj *z, t_binbuf *b)
    int ei,gi;
 
    binbuf_addv(b, "ssiisiiifii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("exciter"), x->x_width, x->x_height,
 		x->x_nbevents, x->x_timegrain,
                 x->x_loop, x->x_save 
@@ -367,10 +364,9 @@ static void exciter_select(t_gobj *z, t_glist *glist, int selected)
 
 static void exciter_vis(t_gobj *z, t_glist *glist, int vis)
 {
-   t_exciter *x = (t_exciter *)z;
-   t_rtext *y;
+  t_exciter *x = (t_exciter *)z;
 
-   // post("exciter_vis : %d", vis );
+   post("exciter_vis : %d", vis );
    if (vis)
    {
       exciter_draw_new( x, glist );
@@ -496,17 +492,17 @@ static void exciter_delete(t_gobj *z, t_glist *glist)
 
 static void exciter_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
-    t_exciter *x = (t_exciter *)z;
-    int xold = x->x_obj.te_xpix;
-    int yold = x->x_obj.te_ypix;
+  t_exciter *x = (t_exciter *)z;
+  t_int xold = text_xpix(&x->x_obj, glist);
+  t_int yold = text_ypix(&x->x_obj, glist);
 
     // post( "exciter_displace dx=%d dy=%d", dx, dy );
 
     x->x_obj.te_xpix += dx;
     x->x_obj.te_ypix += dy;
-    if(xold != x->x_obj.te_xpix || yold != x->x_obj.te_ypix)
+    if(xold != text_xpix(&x->x_obj, glist) || yold != text_ypix(&x->x_obj, glist))
     {
-	exciter_draw_move(x, x->x_glist);
+	exciter_draw_move(x, glist);
     }
 }
 
@@ -514,14 +510,13 @@ static int exciter_click(t_gobj *z, struct _glist *glist,
 			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
   t_exciter* x = (t_exciter *)z;
-  t_canvas *canvas=glist_getcanvas(glist);
   t_int nevent, npix;
 
     if ( doit) 
     {
       nevent = ( 1 - ( ( ypix - ( (float)x->x_height / (float) x->x_nbevents / 2 ) 
-                   - x->x_obj.te_ypix) / (float)x->x_height ) )*(x->x_nbevents-1);
-      npix = ( xpix - 1  - x->x_obj.te_xpix) / EXCITER_PIXEL_GRAIN;
+                   - text_ypix(&x->x_obj, glist)) / (float)x->x_height ) )*(x->x_nbevents-1);
+      npix = ( xpix - 1  - text_xpix(&x->x_obj, glist)) / EXCITER_PIXEL_GRAIN;
       // post( "exciter : selected event (%d,%d)", nevent, npix );
       // set or unset event
       {
@@ -542,13 +537,14 @@ static int exciter_click(t_gobj *z, struct _glist *glist,
 
 static t_exciter *exciter_new(t_symbol *s, int argc, t_atom *argv)
 {
-    int bi, i, ei, gi;
-    t_exciter *x;
-    t_pd *x2;
+  int bi, i, ei, gi;
+  t_exciter *x;
+  t_pd *x2;
  
     // post( "exciter_new : create : %s argc =%d", s->s_name, argc );
 
     x = (t_exciter *)pd_new(exciter_class);
+    x->x_glist = (t_glist *) canvas_getcurrent();
     // new exciter created from the gui 
     if ( argc != 0 )
     {
@@ -600,7 +596,6 @@ static t_exciter *exciter_new(t_symbol *s, int argc, t_atom *argv)
     x->x_plooptime = 0L;	
     x->x_gindex = -1;	
     x->x_looplength = x->x_timegrain * x->x_width * 1000 / EXCITER_PIXEL_GRAIN;
-    x->x_glist = (t_glist *) canvas_getcurrent();
 
     x->x_bangs = (t_outlet **) getbytes( x->x_nbevents*sizeof(t_outlet **) );
     for ( bi=0; bi<x->x_nbevents; bi++ )
@@ -622,7 +617,7 @@ static t_exciter *exciter_new(t_symbol *s, int argc, t_atom *argv)
            ai += 2;
        }
     }
-    // post( "exciter_new width: %d height : %d", x->x_width, x->x_height );
+    post( "exciter_new width: %d height : %d", x->x_width, x->x_height );
 
     return (x);
 }
@@ -685,30 +680,20 @@ static void exciter_reset(t_exciter *x)
 
 static t_int *exciter_perform(t_int *w)
 {
-    t_int ei, gi;
-    t_int gstart, gend;
-    t_exciter* x = (t_exciter*)(w[1]);
-#ifdef NT
-    time_t et;
-    struct _timeb tv;
-#else
-    struct timeval tv;
-    struct timezone tz;
-#endif
-    long long looptime = 0L; 
-    double preltime = x->x_reltime;
+  t_int ei, gi;
+  t_int gstart, gend;
+  t_exciter* x = (t_exciter*)(w[1]);
+  struct timeval tv;
+  struct timezone tz;
+  long long looptime = 0L; 
+  double preltime = x->x_reltime;
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if ( x->x_started )
     {
        // get current time in ms
-#ifdef NT
-      time( &et );
-      _ftime( &tv );
-      looptime = et*1000 + tv.millitm;
-#else
-      gettimeofday( &tv, &tz );
-      looptime = tv.tv_sec*1000 + tv.tv_usec/1000;      
-#endif
+       gettimeofday( &tv, &tz );
+       looptime = tv.tv_sec*1000 + tv.tv_usec/1000;
        if ( x->x_plooptime == 0L )
        {
           x->x_plooptime = looptime;
@@ -749,7 +734,7 @@ static t_int *exciter_perform(t_int *w)
              {
                 outlet_bang( x->x_bangs[ ei ] );
 	        SYS_VGUI5(".x%x.c itemconfigure %xEVENT%.4d%.4d -fill #00FF00\n", 
-                          glist_getcanvas(x->x_glist), x, gi, ei);
+                          canvas, x, gi, ei);
              }
            }
          }
@@ -764,7 +749,7 @@ static t_int *exciter_perform(t_int *w)
              if ( *(x->x_sbangs+ei*(x->x_width/EXCITER_PIXEL_GRAIN)+gi ) == 1 )
              {
 	        SYS_VGUI5(".x%x.c itemconfigure %xEVENT%.4d%.4d -fill #FFFFFF\n", 
-                          glist_getcanvas(x->x_glist), x, gi, ei);
+                          canvas, x, gi, ei);
              }
            }
          }
@@ -790,7 +775,7 @@ static void exciter_free(t_exciter *x)
    {
       for ( ei=0; ei<x->x_nbevents; ei++ )
       {
-          outlet_free( x->x_bangs[ei] );
+         outlet_free( x->x_bangs[ei] );
       }
       freebytes( x->x_bangs, x->x_nbevents*sizeof(t_outlet*) );
    }
@@ -822,45 +807,15 @@ void exciter_setup(void)
     exciter_widgetbehavior.w_deletefn =     exciter_delete;
     exciter_widgetbehavior.w_visfn =        exciter_vis;
     exciter_widgetbehavior.w_clickfn =      exciter_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(exciter_class, exciter_properties);
+    class_setsavefn(exciter_class, exciter_save);
+#else
     exciter_widgetbehavior.w_propertiesfn = exciter_properties;
     exciter_widgetbehavior.w_savefn =       exciter_save;
-#else
-	 class_setsavefn(exciter_class, &exciter_save);
-	 class_setpropertiesfn(exciter_class, &exciter_properties);
 #endif
+
     class_setwidget(exciter_class, &exciter_widgetbehavior);
+    class_sethelpsymbol(exciter_class, gensym("exciter.pd"));
 }
-
-/* OPTIONAL */
-    /* callback caught by canvas class for the creation of a exciter */
-/*
-void canvas_exciter(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
-{
-    t_atom at;
-    t_binbuf *b = binbuf_new();
-    int xval, yval;
-    int i;
-
-    pd_vmess(&gl->gl_pd, gensym("editmode"), "i", 1);
-    glist_noselect(gl);
-    if ( argc == 0 )
-    {
-       SETSYMBOL(&at, gensym("exciter"));
-    }
-    else
-    {
-       SETSYMBOL(&at, argv[1].a_w.w_symbol);
-    }
-    binbuf_restore(b, 1, &at);
-    glist_getnextxy(gl, &xval, &yval);
-    canvas_objtext(gl, xval, yval, 1, b);
-    canvas_startmotion(glist_getcanvas(gl));
-}
-*/

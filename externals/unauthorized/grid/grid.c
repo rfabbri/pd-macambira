@@ -35,7 +35,7 @@ static int gridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *grid_version = "grid: version 0.5, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *grid_version = "grid: version 0.6, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define GRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -60,8 +60,8 @@ static char   *grid_version = "grid: version 0.5, written by Yves Degoyon (ydego
 /* drawing functions */
 static void grid_draw_update(t_grid *x, t_glist *glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    t_int xpoint=x->x_current, ypoint=x->y_current;
+ t_canvas *canvas=glist_getcanvas(glist);
+ t_int xpoint=x->x_current, ypoint=x->y_current;
 
     // later : try to figure out what's this test for ??  
     // if (glist_isvisible(glist))
@@ -72,12 +72,12 @@ static void grid_draw_update(t_grid *x, t_glist *glist)
           GRID_SYS_VGUI3(".x%x.c delete %xPOINT\n", canvas, x);
        }
         
-       if ( x->x_current < x->x_obj.te_xpix ) xpoint = x->x_obj.te_xpix;
-       if ( x->x_current > x->x_obj.te_xpix + x->x_width - pointsize ) 
-			xpoint = x->x_obj.te_xpix + x->x_width - pointsize;
-       if ( x->y_current < x->x_obj.te_ypix ) ypoint = x->x_obj.te_ypix;
-       if ( x->y_current > x->x_obj.te_ypix + x->x_height - pointsize ) 
-			ypoint = x->x_obj.te_ypix + x->x_height - pointsize;
+       if ( x->x_current < text_xpix(&x->x_obj, glist) ) xpoint = text_xpix(&x->x_obj, glist);
+       if ( x->x_current > text_xpix(&x->x_obj, glist) + x->x_width - pointsize ) 
+			xpoint = text_xpix(&x->x_obj, glist) + x->x_width - pointsize;
+       if ( x->y_current < text_ypix(&x->x_obj, glist) ) ypoint = text_ypix(&x->x_obj, glist);
+       if ( x->y_current > text_ypix(&x->x_obj, glist) + x->x_height - pointsize ) 
+			ypoint = text_ypix(&x->x_obj, glist) + x->x_height - pointsize;
        // draw the selected point
        GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FF0000 -tags %xPOINT\n",
 	     canvas, xpoint, ypoint, xpoint+pointsize, ypoint+pointsize, x);
@@ -91,44 +91,44 @@ static void grid_draw_update(t_grid *x, t_glist *glist)
 
 static void grid_draw_new(t_grid *x, t_glist *glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    char *tagRoot;
+  t_canvas *canvas=glist_getcanvas(glist);
+  char *tagRoot;
 
     rtext_new(glist, (t_text *)x );
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
     GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #124392 -tags %xGRID\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix + x->x_width, x->x_obj.te_ypix + x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
 	     x);
     GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so0\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
-	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
+	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2,
 	     tagRoot);
     GRID_SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %so1\n",
-	     canvas, x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2,
+	     canvas, text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2,
 	     tagRoot);
 
     if ( x->x_grid ) 
     {
-       int xlpos = x->x_obj.te_xpix+x->x_width/x->x_xlines;
-       int ylpos = x->x_obj.te_ypix+x->x_height/x->x_ylines;
+       int xlpos = text_xpix(&x->x_obj, glist)+x->x_width/x->x_xlines;
+       int ylpos = text_ypix(&x->x_obj, glist)+x->x_height/x->x_ylines;
        int xcount = 1;
        int ycount = 1;
-       while ( xlpos < x->x_obj.te_xpix+x->x_width )
+       while ( xlpos < text_xpix(&x->x_obj, glist)+x->x_width )
        {
          GRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
-	     canvas, xlpos, x->x_obj.te_ypix,
-	     xlpos, x->x_obj.te_ypix+x->x_height,
+	     canvas, xlpos, text_ypix(&x->x_obj, glist),
+	     xlpos, text_ypix(&x->x_obj, glist)+x->x_height,
 	     x, xcount, 0 );
          xlpos+=x->x_width/x->x_xlines;
          xcount++;
        }
-       while ( ylpos < x->x_obj.te_ypix+x->x_height )
+       while ( ylpos < text_ypix(&x->x_obj, glist)+x->x_height )
        {
          GRID_SYS_VGUI9(".x%x.c create line %d %d %d %d -fill #FFFFFF -tags %xLINE%d%d\n",
-	     canvas, x->x_obj.te_xpix, ylpos,
-	     x->x_obj.te_xpix+x->x_width, ylpos,
+	     canvas, text_xpix(&x->x_obj, glist), ylpos,
+	     text_xpix(&x->x_obj, glist)+x->x_width, ylpos,
 	     x, 0, ycount);
          ylpos+=x->x_height/x->x_ylines;
          ycount++;
@@ -139,45 +139,45 @@ static void grid_draw_new(t_grid *x, t_glist *glist)
 
 static void grid_draw_move(t_grid *x, t_glist *glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    char *tagRoot;
+  t_canvas *canvas=glist_getcanvas(glist);
+  char *tagRoot;
 
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x)); 
     GRID_SYS_VGUI7(".x%x.c coords %xGRID %d %d %d %d\n",
 	     canvas, x,
-	     x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height);
+	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height);
     GRID_SYS_VGUI7(".x%x.c coords %so0 %d %d %d %d\n",
 	     canvas, tagRoot,
-	     x->x_obj.te_xpix, x->x_obj.te_ypix + x->x_height+1,
-	     x->x_obj.te_xpix+7, x->x_obj.te_ypix + x->x_height+2 );
+	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist) + x->x_height+1,
+	     text_xpix(&x->x_obj, glist)+7, text_ypix(&x->x_obj, glist) + x->x_height+2 );
     GRID_SYS_VGUI7(".x%x.c coords %so1 %d %d %d %d\n",
 	     canvas, tagRoot,
-	     x->x_obj.te_xpix+x->x_width-7, x->x_obj.te_ypix + x->x_height+1,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix + x->x_height+2 );
+	     text_xpix(&x->x_obj, glist)+x->x_width-7, text_ypix(&x->x_obj, glist) + x->x_height+1,
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist) + x->x_height+2 );
     if ( x->x_point ) 
     {
        grid_draw_update(x, glist);
     }
     if ( x->x_grid ) 
     {
-       int xlpos = x->x_obj.te_xpix+x->x_width/x->x_xlines;
-       int ylpos = x->x_obj.te_ypix+x->x_height/x->x_ylines;
+       int xlpos = text_xpix(&x->x_obj, glist)+x->x_width/x->x_xlines;
+       int ylpos = text_ypix(&x->x_obj, glist)+x->x_height/x->x_ylines;
        int xcount = 1;
        int ycount = 1;
-       while ( xlpos < x->x_obj.te_xpix+x->x_width )
+       while ( xlpos < text_xpix(&x->x_obj, glist)+x->x_width )
        {
          GRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
-	     canvas, x, xcount, 0, xlpos, x->x_obj.te_ypix,
-	     xlpos, x->x_obj.te_ypix + x->x_height);
+	     canvas, x, xcount, 0, xlpos, text_ypix(&x->x_obj, glist),
+	     xlpos, text_ypix(&x->x_obj, glist) + x->x_height);
          xlpos+=x->x_width/x->x_xlines;
          xcount++;
        }
-       while ( ylpos < x->x_obj.te_ypix+x->x_height )
+       while ( ylpos < text_ypix(&x->x_obj, glist)+x->x_height )
        {
          GRID_SYS_VGUI9(".x%x.c coords %xLINE%d%d %d %d %d %d\n",
-	     canvas, x, 0, ycount, x->x_obj.te_xpix, ylpos,
-	     x->x_obj.te_xpix + x->x_width, ylpos);
+	     canvas, x, 0, ycount, text_xpix(&x->x_obj, glist), ylpos,
+	     text_xpix(&x->x_obj, glist) + x->x_width, ylpos);
          ylpos+=x->x_height/x->x_ylines;
          ycount++;
        }
@@ -187,9 +187,9 @@ static void grid_draw_move(t_grid *x, t_glist *glist)
 
 static void grid_draw_erase(t_grid* x,t_glist* glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    int i;
-    char *tagRoot;
+  t_canvas *canvas=glist_getcanvas(glist);
+  int i;
+  char *tagRoot;
 
     tagRoot = rtext_gettag(glist_findrtext(glist,(t_text *)x));
     GRID_SYS_VGUI3(".x%x.c delete %xGRID\n", canvas, x);
@@ -216,7 +216,7 @@ static void grid_draw_erase(t_grid* x,t_glist* glist)
 
 static void grid_draw_select(t_grid* x,t_glist* glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
+  t_canvas *canvas=glist_getcanvas(glist);
 
     if(x->x_selected)
     {
@@ -236,14 +236,14 @@ static void grid_output_current(t_grid* x)
   t_float xvalue, yvalue;
   t_float xmodstep, ymodstep;
 
-    xvalue = x->x_min + (x->x_current - x->x_obj.te_xpix) * (x->x_max-x->x_min) / x->x_width ;
+    xvalue = x->x_min + (x->x_current - text_xpix(&x->x_obj, x->x_glist)) * (x->x_max-x->x_min) / x->x_width ;
     if (xvalue < x->x_min ) xvalue = x->x_min;
     if (xvalue > x->x_max ) xvalue = x->x_max;
     xmodstep = ((float)((int)(xvalue*10000) % (int)(x->x_xstep*10000))/10000.);
     xvalue = xvalue - xmodstep;
     outlet_float( x->x_xoutlet, xvalue );
 
-    yvalue = x->y_max - (x->y_current - x->x_obj.te_ypix ) * (x->y_max-x->y_min) / x->x_height ;
+    yvalue = x->y_max - (x->y_current - text_ypix(&x->x_obj, x->x_glist) ) * (x->y_max-x->y_min) / x->x_height ;
     if (yvalue < x->y_min ) yvalue = x->y_min;
     if (yvalue > x->y_max ) yvalue = x->y_max;
     ymodstep = ((float)((int)(yvalue*10000) % (int)(x->x_ystep*10000))/10000.);
@@ -259,10 +259,10 @@ static void grid_getrect(t_gobj *z, t_glist *owner,
 {
    t_grid* x = (t_grid*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, x->x_glist);
+   *yp1 = text_ypix(&x->x_obj, x->x_glist);
+   *xp2 = text_xpix(&x->x_obj, x->x_glist)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, x->x_glist)+x->x_height;
 }
 
 static void grid_save(t_gobj *z, t_binbuf *b)
@@ -271,7 +271,7 @@ static void grid_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving grid : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiffiffiffiiff", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("grid"), x->x_name, x->x_width, x->x_min,
 		x->x_max, x->x_height,
                 x->y_min, x->y_max,
@@ -361,8 +361,8 @@ static void grid_delete(t_gobj *z, t_glist *glist)
 static void grid_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
     t_grid *x = (t_grid *)z;
-    int xold = x->x_obj.te_xpix;
-    int yold = x->x_obj.te_ypix;
+    int xold = text_xpix(&x->x_obj, glist);
+    int yold = text_ypix(&x->x_obj, glist);
 
     // post( "grid_displace dx=%d dy=%d", dx, dy );
 
@@ -370,7 +370,7 @@ static void grid_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     x->x_current += dx;
     x->x_obj.te_ypix += dy;
     x->y_current += dy;
-    if(xold != x->x_obj.te_xpix || yold != x->x_obj.te_ypix)
+    if(xold != text_xpix(&x->x_obj, glist) || yold != text_ypix(&x->x_obj, glist))
     {
 	grid_draw_move(x, x->x_glist);
     }
@@ -422,8 +422,8 @@ static void grid_goto(t_grid *x, t_floatarg newx, t_floatarg newy)
 
     // post( "grid_set x=%f y=%f", newx, newy );
 
-    x->x_current = newx + x->x_obj.te_xpix;
-    x->y_current = newy + x->x_obj.te_ypix;
+    x->x_current = newx + text_xpix(&x->x_obj, x->x_glist);
+    x->y_current = newy + text_ypix(&x->x_obj, x->x_glist);
     if(xold != x->x_current || yold != x->y_current)
     {
         grid_output_current(x);
@@ -439,12 +439,12 @@ static void grid_values(t_grid* x, t_floatarg xvalue, t_floatarg yvalue)
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  x->x_current = x->x_obj.te_xpix + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+  x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
 
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
-  x->y_current =  x->x_obj.te_ypix + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+  x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
 
   if(xold != x->x_current || yold != x->y_current) {
         grid_output_current(x);
@@ -460,12 +460,12 @@ static void grid_xvalues(t_grid* x, t_floatarg xvalue, t_floatarg yvalue)
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  x->x_current = x->x_obj.te_xpix + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+  x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
 
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
-  x->y_current =  x->x_obj.te_ypix + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+  x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
 
   if(xold != x->x_current || yold != x->y_current) {
         grid_draw_update(x, x->x_glist);
@@ -478,11 +478,11 @@ static void grid_valuemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
   int yold = x->y_current;
   t_float xvalue, yvalue;
 
-  xvalue = x->x_min + (x->x_current - x->x_obj.te_xpix) * (x->x_max-x->x_min) / x->x_width ;
+  xvalue = x->x_min + (x->x_current - text_xpix(&x->x_obj, x->x_glist)) * (x->x_max-x->x_min) / x->x_width ;
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  yvalue = x->y_max - (x->y_current - x->x_obj.te_ypix ) * (x->y_max-x->y_min) / x->x_height ;
+  yvalue = x->y_max - (x->y_current - text_ypix(&x->x_obj, x->x_glist) ) * (x->y_max-x->y_min) / x->x_height ;
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
@@ -492,12 +492,12 @@ static void grid_valuemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  x->x_current = x->x_obj.te_xpix + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+  x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
 
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
-  x->y_current =  x->x_obj.te_ypix + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+  x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
 
   if(xold != x->x_current || yold != x->y_current) {
         grid_output_current(x);
@@ -511,11 +511,11 @@ static void grid_xvaluemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
   int yold = x->y_current;
   t_float xvalue, yvalue;
 
-  xvalue = x->x_min + (x->x_current - x->x_obj.te_xpix) * (x->x_max-x->x_min) / x->x_width ;
+  xvalue = x->x_min + (x->x_current - text_xpix(&x->x_obj, x->x_glist)) * (x->x_max-x->x_min) / x->x_width ;
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  yvalue = x->y_max - (x->y_current - x->x_obj.te_ypix ) * (x->y_max-x->y_min) / x->x_height ;
+  yvalue = x->y_max - (x->y_current - text_ypix(&x->x_obj, x->x_glist) ) * (x->y_max-x->y_min) / x->x_height ;
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
@@ -525,12 +525,12 @@ static void grid_xvaluemotion(t_grid* x, t_floatarg dx, t_floatarg dy)
   if (xvalue < x->x_min ) xvalue = x->x_min;
   if (xvalue > x->x_max ) xvalue = x->x_max;
 
-  x->x_current = x->x_obj.te_xpix + ((xvalue - x->x_min) / x->x_max) * x->x_width;
+  x->x_current = text_xpix(&x->x_obj, x->x_glist) + ((xvalue - x->x_min) / x->x_max) * x->x_width;
 
   if (yvalue < x->y_min ) yvalue = x->y_min;
   if (yvalue > x->y_max ) yvalue = x->y_max;
 
-  x->y_current =  x->x_obj.te_ypix + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
+  x->y_current =  text_ypix(&x->x_obj, x->x_glist) + (1 - ((yvalue - x->y_min) / x->y_max)) * x->x_height;
 
   if(xold != x->x_current || yold != x->y_current) {
         grid_draw_update(x, x->x_glist);

@@ -37,25 +37,14 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef __APPLE__
-#include <sys/malloc.h>
-#else
 #include <malloc.h>
-#endif
-
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
 #include <unistd.h>
 #endif
 #ifdef NT
-#define random rand
-#include <windows.h>
-static int usleep (unsigned int us) {
-  Sleep((long)(us/1000.));
-  return 0;
-}
+#define M_PI 3.14159265358979323846
 #endif
 #include <math.h>
 
@@ -382,10 +371,12 @@ static void sonogram_erase_block(t_sonogram *x, t_glist *glist, t_int bnumber )
 
 static void *sonogram_do_update_part(void *tdata)
 {
-   t_sonogram *x = (t_sonogram*) tdata;
-   t_int si;
-   t_int nbpoints = 0;
-   t_float percentage = 0, opercentage = 0;
+ t_sonogram *x = (t_sonogram*) tdata;
+ t_int si;
+ t_int nbpoints = 0;
+ t_float percentage = 0, opercentage = 0;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+ 
 
    // loose synchro
    usleep( THREAD_SLEEP_TIME );
@@ -429,10 +420,10 @@ static void *sonogram_do_update_part(void *tdata)
    }
 
    // set borders in black
-   SYS_VGUI3(".x%x.c itemconfigure %xSONOGRAM -outline #000000\n", glist_getcanvas(x->x_glist), x);
+   SYS_VGUI3(".x%x.c itemconfigure %xSONOGRAM -outline #000000\n", canvas, x);
    if ( x->x_phaso )
    {
-      SYS_VGUI3(".x%x.c itemconfigure %xPHASOGRAM -outline #000000\n", glist_getcanvas(x->x_glist), x);
+      SYS_VGUI3(".x%x.c itemconfigure %xPHASOGRAM -outline #000000\n", canvas, x);
    }
 
    // post("sonogram~ : child thread %d ended (nb_updated=%d)", (int)x->x_updatechild, x->x_nbupdated );
@@ -443,7 +434,8 @@ static void *sonogram_do_update_part(void *tdata)
 static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_int bend, 
                                  t_int erase, t_int redraw, t_int keepframe)
 {
-   pthread_attr_t update_child_attr;
+ pthread_attr_t update_child_attr;
+ t_canvas *canvas=glist_getcanvas(glist);
 
    if ( x->x_graphic )
    {
@@ -467,44 +459,44 @@ static void sonogram_update_part(t_sonogram *x, t_glist *glist, t_int bstart, t_
     // recreate the square if needed
     if ( ( bstart == 0 ) && ( bend == x->x_size-1 ) && !keepframe )
     {
-      SYS_VGUI3(".x%x.c delete %xSONOGRAM\n", glist_getcanvas(glist), x );
+      SYS_VGUI3(".x%x.c delete %xSONOGRAM\n", canvas, x );
       SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
 	     glist_getcanvas(glist), x->x_xpos-1, x->x_ypos-1,
 	     x->x_xpos + x->x_size*x->x_zoom+1, 
              x->x_ypos + x->x_blocksize/2*x->x_zoom+1,
 	     x);
       SYS_VGUI2("image delete SONIMAGE%x\n", x );
-      SYS_VGUI3(".x%x.c delete ISONIMAGE%x\n", glist_getcanvas(glist), x );
+      SYS_VGUI3(".x%x.c delete ISONIMAGE%x\n", canvas, x );
       SYS_VGUI4("image create photo SONIMAGE%x -format gif -width %d -height %d\n", 
                           x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
       SYS_VGUI2("SONIMAGE%x blank\n", x);
       SYS_VGUI6(".x%x.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), x->x_xpos+((x->x_size*x->x_zoom)/2), 
+                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
                           (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
       if ( x->x_phaso )
       {
-          SYS_VGUI3(".x%x.c delete %xPHASOGRAM\n", glist_getcanvas(glist), x );
+          SYS_VGUI3(".x%x.c delete %xPHASOGRAM\n", canvas, x );
           SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
-	     glist_getcanvas(glist), x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
+	     canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
 	     x->x_xpos + x->x_size*x->x_zoom +1, 
              x->x_ypos + x->x_blocksize*x->x_zoom + 3,
 	     x);
           SYS_VGUI2("image delete FAZIMAGE%x\n", x );
-          SYS_VGUI3(".x%x.c delete IFAZIMAGE%x\n", glist_getcanvas(glist), x );
+          SYS_VGUI3(".x%x.c delete IFAZIMAGE%x\n", canvas, x );
           SYS_VGUI4("image create photo FAZIMAGE%x -format gif -width %d -height %d\n", 
                           x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
           SYS_VGUI2("FAZIMAGE%x blank\n", x);
           SYS_VGUI6(".x%x.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), x->x_xpos+((x->x_size*x->x_zoom)/2), 
+                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
                           x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
       }
-      canvas_fixlinesfor( glist_getcanvas(x->x_glist), (t_text*)x );
+      canvas_fixlinesfor( canvas, (t_text*)x );
     }
     // set borders in red
-    SYS_VGUI3(".x%x.c itemconfigure %xSONOGRAM -outline #FF0000\n", glist_getcanvas(glist), x);
+    SYS_VGUI3(".x%x.c itemconfigure %xSONOGRAM -outline #FF0000\n", canvas, x);
     if ( x->x_phaso )
     {
-       SYS_VGUI3(".x%x.c itemconfigure %xPHASOGRAM -outline #FF0000\n", glist_getcanvas(glist), x);
+       SYS_VGUI3(".x%x.c itemconfigure %xPHASOGRAM -outline #FF0000\n", canvas, x);
     }
 
     // launch update thread
@@ -616,14 +608,16 @@ static void sonogram_paste( t_sonogram* x)
     /* paste phase at the drawing point */
 static void sonogram_paste_phase( t_sonogram* x)
 {
-    t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom; 
-    t_int pystart = (x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2; 
-    t_int cxs,cxe,cys,cye,si,fi;
-    t_float fspectrum, fdestspectrum;
-    t_float fphase, fdestphase;
-    t_float *icopy;
-    t_float *rcopy;
-    t_int   copynd;
+ t_int pxstart = (x->x_xdraw-x->x_xpos)/x->x_zoom; 
+ t_int pystart = (x->x_ypos+x->x_blocksize/2*x->x_zoom+1-x->x_ydraw)/x->x_zoom+x->x_blocksize/2; 
+ t_int cxs,cxe,cys,cye,si,fi;
+ t_float fspectrum, fdestspectrum;
+ t_float fphase, fdestphase;
+ t_float *icopy;
+ t_float *rcopy;
+ t_int   copynd;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
 
     if ( x->x_xstartcapture > x->x_xendcapture ) {
               fi = x->x_xstartcapture;
@@ -700,7 +694,7 @@ static void sonogram_paste_phase( t_sonogram* x)
 
     sonogram_update_part(x, x->x_glist, pxstart, pxstart+(si-1)-cxs, 0, 1, 1);
     // start a new capture
-    SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", glist_getcanvas( x->x_glist ), x );
+    SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
     x->x_xstartcapture = x->x_xdraw; 
     x->x_ystartcapture = x->x_ydraw; 
     x->x_xendcapture = x->x_xdraw; 
@@ -710,13 +704,10 @@ static void sonogram_paste_phase( t_sonogram* x)
 
 static void sonogram_draw_new(t_sonogram *x, t_glist *glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
-   if ( x->x_xpos == -1 )
-   {
-      x->x_xpos=x->x_obj.te_xpix;
-      x->x_ypos=x->x_obj.te_ypix;
-   }
+   x->x_xpos=text_xpix(&x->x_obj, glist);
+   x->x_ypos=text_ypix(&x->x_obj, glist);
    if ( x->x_graphic )
    {
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xSONOGRAM\n",
@@ -728,12 +719,12 @@ static void sonogram_draw_new(t_sonogram *x, t_glist *glist)
                           x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
     SYS_VGUI2("SONIMAGE%x blank\n", x);
     SYS_VGUI6(".x%x.c create image %d %d -image SONIMAGE%x -tags ISONIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), x->x_xpos+((x->x_size*x->x_zoom)/2), 
+                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
                           (x->x_ypos+((x->x_blocksize/2*x->x_zoom)/2)), x, x );
     if ( x->x_phaso )
     {
           SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #FFFFFF -tags %xPHASOGRAM\n",
-	     glist_getcanvas(glist), x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
+	     canvas, x->x_xpos-1, x->x_ypos+x->x_blocksize/2*x->x_zoom+2,
 	     x->x_xpos + x->x_size*x->x_zoom +1, 
              x->x_ypos + x->x_blocksize*x->x_zoom + 3,
 	     x);
@@ -741,7 +732,7 @@ static void sonogram_draw_new(t_sonogram *x, t_glist *glist)
                           x, x->x_size*x->x_zoom, x->x_blocksize/2*x->x_zoom );
           SYS_VGUI2("FAZIMAGE%x blank\n", x);
           SYS_VGUI6(".x%x.c create image %d %d -image FAZIMAGE%x -tags IFAZIMAGE%x\n", 
-                          glist_getcanvas( x->x_glist ), x->x_xpos+((x->x_size*x->x_zoom)/2), 
+                          canvas, x->x_xpos+((x->x_size*x->x_zoom)/2), 
                           x->x_ypos+3*((x->x_blocksize/2*x->x_zoom)/2)+2, x, x );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
@@ -750,20 +741,22 @@ static void sonogram_draw_new(t_sonogram *x, t_glist *glist)
 
 static void sonogram_draw_delete(t_sonogram *x, t_glist *glist)
 {
+ t_canvas *canvas=glist_getcanvas(glist);
+
     if ( x->x_graphic && glist_isvisible( glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3( ".x%x.c delete line %xREADSTART\n", glist_getcanvas( glist ), x);
-       SYS_VGUI3( ".x%x.c delete line %xREADEND\n", glist_getcanvas( glist ), x);
-       SYS_VGUI3( ".x%x.c delete line %xMODSTART\n", glist_getcanvas( glist ), x);
-       SYS_VGUI3( ".x%x.c delete line %xMODEND\n", glist_getcanvas( glist ), x);
-       SYS_VGUI3(".x%x.c delete %xSONOGRAM\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3(".x%x.c delete %xPHASOGRAM\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3(".x%x.c delete %xISONIMAGE\n", glist_getcanvas( glist ), x );
+       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
+       SYS_VGUI3( ".x%x.c delete line %xREADSTART\n", canvas, x);
+       SYS_VGUI3( ".x%x.c delete line %xREADEND\n", canvas, x);
+       SYS_VGUI3( ".x%x.c delete line %xMODSTART\n", canvas, x);
+       SYS_VGUI3( ".x%x.c delete line %xMODEND\n", canvas, x);
+       SYS_VGUI3(".x%x.c delete %xSONOGRAM\n", canvas, x );
+       SYS_VGUI3(".x%x.c delete %xPHASOGRAM\n", canvas, x );
+       SYS_VGUI3(".x%x.c delete %xISONIMAGE\n", canvas, x );
        SYS_VGUI2("image delete SONIMAGE%x\n", x );
        if ( x->x_phaso ) 
        {
-          SYS_VGUI3(".x%x.c delete %xIFAZIMAGE\n", glist_getcanvas( glist ), x );
+          SYS_VGUI3(".x%x.c delete %xIFAZIMAGE\n", canvas, x );
           SYS_VGUI2("image delete FAZIMAGE%x\n", x );
        }
     }
@@ -771,7 +764,7 @@ static void sonogram_draw_delete(t_sonogram *x, t_glist *glist)
 
 static void sonogram_draw_move(t_sonogram *x, t_glist *glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
    if ( x->x_graphic && glist_isvisible( x->x_glist ) )
    {
@@ -802,7 +795,7 @@ static void sonogram_draw_move(t_sonogram *x, t_glist *glist)
 
 static void sonogram_draw_select(t_sonogram* x,t_glist* glist)
 {
-   t_canvas *canvas=glist_getcanvas(glist);
+ t_canvas *canvas=glist_getcanvas(glist);
 
    if ( x->x_graphic && glist_isvisible( x->x_glist ) )
    {
@@ -958,7 +951,8 @@ static void sonogram_modify_point_phase( t_sonogram* x, t_int sample, t_int freq
 
 static void sonogram_motion(t_sonogram *x, t_floatarg dx, t_floatarg dy)
 {
- int fdraw=0, sdraw=0;
+ t_int fdraw=0, sdraw=0;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
    // post( "sonogram_motion @ [%d,%d] dx=%f dy=%f alt=%d", x->x_xdraw, x->x_ydraw, dx, dy, x->x_alted );
    if ( ( x->x_shifted || (x->x_alted==4) ) )
@@ -996,18 +990,19 @@ static void sonogram_motion(t_sonogram *x, t_floatarg dx, t_floatarg dy)
         (x->x_yendcapture+dy) <= x->x_ypos+x->x_blocksize*x->x_zoom ) { 
         x->x_yendcapture += dy; 
        }
-       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", glist_getcanvas( x->x_glist ), x );
+       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
        SYS_VGUI7( ".x%x.c create rectangle %d %d %d %d -outline #0000FF -tags %xCAPTURE\n",
-               glist_getcanvas( x->x_glist ), x->x_xstartcapture,
-                          x->x_ystartcapture, x->x_xendcapture, x->x_yendcapture, x );
+                   canvas, x->x_xstartcapture, x->x_ystartcapture, x->x_xendcapture, x->x_yendcapture, x );
    }
 }
 
 static int sonogram_click(t_gobj *z, struct _glist *glist,
 			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
-    t_sonogram* x = (t_sonogram *)z;
-    int si,fi;
+ t_sonogram* x = (t_sonogram *)z;
+ t_int si,fi;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
 
     // post( "sonogram_click : x=%d y=%d doit=%d alt=%d, shift=%d", xpix, ypix, doit, alt, shift );
     if ( x->x_aftermousedown == 1 && doit == 0) 
@@ -1090,7 +1085,7 @@ static int sonogram_click(t_gobj *z, struct _glist *glist,
                       (x->x_xendcapture-x->x_xpos)/x->x_zoom, 0, 1, 1);
        } 
        // start a new capture
-       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", glist_getcanvas( x->x_glist ), x );
+       SYS_VGUI3( ".x%x.c delete %xCAPTURE\n", canvas, x );
        x->x_xstartcapture = xpix; 
        x->x_ystartcapture = ypix; 
        x->x_xendcapture = xpix; 
@@ -1369,7 +1364,8 @@ static void sonogram_play(t_sonogram *x)
     /* setting the starting point for reading ( in percent ) */
 static void sonogram_readstart(t_sonogram *x, t_floatarg fstart)
 {
-  t_float startpoint = fstart;
+ t_float startpoint = fstart;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (startpoint < 0) startpoint = 0;
     if (startpoint > 100) startpoint = 100;
@@ -1380,9 +1376,9 @@ static void sonogram_readstart(t_sonogram *x, t_floatarg fstart)
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete line %xREADSTART\n",
-               glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xREADSTART -width 3\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(x->x_readstart*(x->x_size)/100 ),
+                   canvas, x->x_xpos+(x->x_readstart*(x->x_size)/100 ),
                           x->x_ypos, x->x_xpos+(x->x_readstart*(x->x_size)/100 ), 
                           x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
@@ -1391,7 +1387,8 @@ static void sonogram_readstart(t_sonogram *x, t_floatarg fstart)
     /* setting the starting point for modification ( in percent ) */
 static void sonogram_modstart(t_sonogram *x, t_floatarg fstart)
 {
-  t_float startpoint = fstart;
+ t_float startpoint = fstart;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (startpoint < 0) startpoint = 0;
     if (startpoint > 100) startpoint = 100;
@@ -1404,9 +1401,9 @@ static void sonogram_modstart(t_sonogram *x, t_floatarg fstart)
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete line %xMODSTART\n",
-               glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #11E834 -tags %xMODSTART -width 3\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(x->x_modstart*(x->x_size)/100 ),
+                   canvas, x->x_xpos+(x->x_modstart*(x->x_size)/100 ),
                           x->x_ypos, x->x_xpos+(x->x_modstart*(x->x_size)/100 ), 
                           x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
@@ -1433,7 +1430,8 @@ static void sonogram_enhancemode(t_sonogram *x, t_floatarg fenhancemode)
     /* setting the ending point for reading ( in percent ) */
 static void sonogram_readend(t_sonogram *x, t_floatarg fend)
 {
-  t_float endpoint = fend;
+ t_float endpoint = fend;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (endpoint < 0) endpoint = 0;
     if (endpoint > 100) endpoint = 100;
@@ -1444,9 +1442,9 @@ static void sonogram_readend(t_sonogram *x, t_floatarg fend)
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete line %xREADEND\n",
-               glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xREADEND -width 3\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(x->x_readend*(x->x_size)/100 ),
+                   canvas, x->x_xpos+(x->x_readend*(x->x_size)/100 ),
                           x->x_ypos, x->x_xpos+(x->x_readend*(x->x_size)/100 ), 
                           x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }
@@ -1455,7 +1453,8 @@ static void sonogram_readend(t_sonogram *x, t_floatarg fend)
     /* setting the ending point for modification ( in percent ) */
 static void sonogram_modend(t_sonogram *x, t_floatarg fend)
 {
-  t_float endpoint = fend;
+ t_float endpoint = fend;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     if (endpoint < 0) endpoint = 0;
     if (endpoint > 100) endpoint = 100;
@@ -1468,9 +1467,9 @@ static void sonogram_modend(t_sonogram *x, t_floatarg fend)
     if ( x->x_graphic && glist_isvisible( x->x_glist ) )
     {
        SYS_VGUI3( ".x%x.c delete line %xMODEND\n",
-               glist_getcanvas( x->x_glist ), x);
+                   canvas, x);
        SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #11E834 -tags %xMODEND -width 3\n",
-               glist_getcanvas( x->x_glist ), x->x_xpos+(x->x_modend*(x->x_size)/100 ),
+                   canvas, x->x_xpos+(x->x_modend*(x->x_size)/100 ),
                           x->x_ypos, x->x_xpos+(x->x_modend*(x->x_size)/100 ), 
                           x->x_ypos+x->x_blocksize*x->x_zoom, x );
     }

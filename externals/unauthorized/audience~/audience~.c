@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
-
 #include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
@@ -66,7 +65,7 @@
 // a pixel is 0.1 meter
 #define PIXELSIZE 0.1
 
-static char   *audience_version = "audience : 2d audience simulation, version 0.5 (ydegoyon@free.fr)";
+static char   *audience_version = "audience : 2d audience simulation, version 0.6 (ydegoyon@free.fr)";
 
 t_widgetbehavior audience_widgetbehavior;
 static t_class *audience_class_tilde;
@@ -115,46 +114,46 @@ static void audience_draw_update(t_audience_tilde *x, t_glist *glist)
     {
        SYS_VGUI6(".x%x.c coords %xISPEAKER%d %d %d\n",
              canvas, x, ei, 
-             x->x_obj.te_xpix + x->x_inputs_x[ei],
-             x->x_obj.te_ypix + x->x_inputs_y[ei]
+             text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
+             text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei]
              );
        SYS_VGUI6(".x%x.c coords %xSPEAKERNUM%d %d %d\n",
           canvas, x, ei, 
-          x->x_obj.te_xpix + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
-          x->x_obj.te_ypix + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
+          text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
+          text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
           );
     }
     for ( ei=0; ei<x->x_nboutputs; ei++ )
     {
        SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
              canvas, x, ei, 
-             x->x_obj.te_xpix + x->x_outputs_x[ei],
-             x->x_obj.te_ypix + x->x_outputs_y[ei]
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei]
              );
        SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, ei, 
-             x->x_obj.te_xpix + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
-             x->x_obj.te_ypix + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
              );
     }
 }
 
 static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    int ei;
+  t_canvas *canvas=glist_getcanvas(glist);
+  int ei;
 
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -fill #EAF1E2 -tags %xAAUDIENCE\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix + x->x_width, x->x_obj.te_ypix + x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist) + x->x_width, text_ypix(&x->x_obj, glist) + x->x_height,
 	     x);
     // create captions 
     SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0m\" -tags %xBLCAPTION\n",
-             canvas, x->x_obj.te_xpix - 10 , x->x_obj.te_ypix + x->x_height + 10, x );
+             canvas, text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10, x );
     SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xBRCAPTION\n",
-             canvas, x->x_obj.te_xpix + x->x_width + 10 , x->x_obj.te_ypix + x->x_height + 10, x->x_width, x );
+             canvas, text_xpix(&x->x_obj, glist) + x->x_width + 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10, x->x_width, x );
     SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%dm\" -tags %xULCAPTION\n",
-             canvas, x->x_obj.te_xpix - 10 , x->x_obj.te_ypix, x->x_height, x );
+             canvas, text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist), x->x_height, x );
 
     // draw all outlets
     if ( x->x_nboutputs > 1 )
@@ -162,30 +161,30 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
       for ( ei=0; ei<x->x_nboutputs; ei++ )
       {
          SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
-             canvas, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
-             x->x_obj.te_ypix + x->x_height + 2,
+             canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
              x, ei);
       }
     }
     else
     {
        SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT%d\n",
-             canvas, x->x_obj.te_xpix,
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + 5,
-             x->x_obj.te_ypix + x->x_height + 2,
+             canvas, text_xpix(&x->x_obj, glist),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
              x, 0);
     }
     // draw all inlets
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
          SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN%d\n",
-             canvas, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
-             x->x_obj.te_ypix - 2,
-             x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
-             x->x_obj.te_ypix,
+             canvas, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
+             text_ypix(&x->x_obj, glist) - 2,
+             text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
+             text_ypix(&x->x_obj, glist),
              x, ei);
     }
     // create speaker images
@@ -195,12 +194,12 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
                     x, ei, SPEAKER_WIDTH, SPEAKER_HEIGHT );
       SYS_VGUI8(".x%x.c create image %d %d -image %xSPEAKER%d -tags %xISPEAKER%d\n",
                           canvas, 
-                          x->x_obj.te_xpix + x->x_inputs_x[ei],
-                          x->x_obj.te_ypix + x->x_inputs_y[ei],
+                          text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
+                          text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei],
                           x, ei, x, ei );
       SYS_VGUI7(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"s%d\" -tags %xSPEAKERNUM%d\n",
-             canvas, x->x_obj.te_xpix + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
-             x->x_obj.te_ypix + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2, ei+1, x, ei );
+             canvas, text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
+             text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2, ei+1, x, ei );
     }
    // create listener images
     for ( ei=0; ei<x->x_nboutputs; ei++ )
@@ -209,55 +208,55 @@ static void audience_draw_new(t_audience_tilde *x, t_glist *glist)
                  x, ei, LISTENER_WIDTH, LISTENER_HEIGHT );
       SYS_VGUI8(".x%x.c create image %d %d -image %xLISTENER%d -tags %xILISTENER%d\n",
                           canvas, 
-                          x->x_obj.te_xpix + x->x_outputs_x[ei],
-                          x->x_obj.te_ypix + x->x_outputs_y[ei],
+                          text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
+                          text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei],
                           x, ei, x, ei );
       SYS_VGUI7(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"l%d\" -tags %xLISTENERNUM%d\n",
-             canvas, x->x_obj.te_xpix + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
-             x->x_obj.te_ypix + x->x_outputs_y[ei] + LISTENER_HEIGHT/2, ei+1, x, ei );
+             canvas, text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2, ei+1, x, ei );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
 }
 
 static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    t_int ei;
+  t_canvas *canvas=glist_getcanvas(glist);
+  t_int ei;
 
     SYS_VGUI7(".x%x.c coords %xAAUDIENCE %d %d %d %d\n",
 	     canvas, x,
-	     x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height);
+	     text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height);
     SYS_VGUI5(".x%x.c coords %xBLCAPTION %d %d\n",
 	     canvas, x,
-             x->x_obj.te_xpix - 10 , x->x_obj.te_ypix + x->x_height + 10);
+             text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10);
     SYS_VGUI5(".x%x.c coords %xBRCAPTION %d %d\n",
 	     canvas, x,
-             x->x_obj.te_xpix + x->x_width + 10 , x->x_obj.te_ypix + x->x_height + 10 );
+             text_xpix(&x->x_obj, glist) + x->x_width + 10 , text_ypix(&x->x_obj, glist) + x->x_height + 10 );
     SYS_VGUI5(".x%x.c coords %xULCAPTION %d %d\n",
 	     canvas, x,
-             x->x_obj.te_xpix - 10 , x->x_obj.te_ypix );
+             text_xpix(&x->x_obj, glist) - 10 , text_ypix(&x->x_obj, glist) );
 
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
          SYS_VGUI8(".x%x.c coords %xIN%d %d %d %d %d\n",
-             canvas, x, ei, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
-             x->x_obj.te_ypix - 2,
-             x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
-             x->x_obj.te_ypix 
+             canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs),
+             text_ypix(&x->x_obj, glist) - 2,
+             text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nbinputs) + 5,
+             text_ypix(&x->x_obj, glist) 
              );
     }
     for ( ei=0; ei<x->x_nbinputs+1; ei++ )
     {
         SYS_VGUI6(".x%x.c coords %xISPEAKER%d %d %d\n",
           canvas, x, ei, 
-          x->x_obj.te_xpix + x->x_inputs_x[ei],
-          x->x_obj.te_ypix + x->x_inputs_y[ei]
+          text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei],
+          text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei]
           );
         SYS_VGUI6(".x%x.c coords %xSPEAKERNUM%d %d %d\n",
           canvas, x, ei, 
-          x->x_obj.te_xpix + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
-          x->x_obj.te_ypix + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
+          text_xpix(&x->x_obj, glist) + x->x_inputs_x[ei] - SPEAKER_WIDTH/2, 
+          text_ypix(&x->x_obj, glist) + x->x_inputs_y[ei] - SPEAKER_HEIGHT/2
           );
     }
     if ( x->x_nboutputs > 1 )
@@ -265,40 +264,40 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
       for ( ei=0; ei<x->x_nboutputs; ei++ )
       {
          SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
-             canvas, x, ei, x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
-             x->x_obj.te_ypix + x->x_height + 2
+             canvas, x, ei, text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + ( ei * (x->x_width - 5) )/ (x->x_nboutputs-1) + 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
              );
          SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
              canvas, x, ei, 
-             x->x_obj.te_xpix + x->x_outputs_x[ei],
-             x->x_obj.te_ypix + x->x_outputs_y[ei]
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei],
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei]
              );
          SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, ei, 
-             x->x_obj.te_xpix + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
-             x->x_obj.te_ypix + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[ei] + LISTENER_WIDTH/2, 
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[ei] + LISTENER_HEIGHT/2
              );
       }
     }
     else
     {
          SYS_VGUI8(".x%x.c coords %xOUT%d %d %d %d %d\n",
-             canvas, x, 0, x->x_obj.te_xpix,
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + 5,
-             x->x_obj.te_ypix + x->x_height + 2
+             canvas, x, 0, text_xpix(&x->x_obj, glist),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
              );
          SYS_VGUI6(".x%x.c coords %xILISTENER%d %d %d\n",
              canvas, x, 0, 
-             x->x_obj.te_xpix + x->x_outputs_x[0],
-             x->x_obj.te_ypix + x->x_outputs_y[0]
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[0],
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[0]
              );
          SYS_VGUI6(".x%x.c coords %xLISTENERNUM%d %d %d\n",
              canvas, x, 0, 
-             x->x_obj.te_xpix + x->x_outputs_x[0] + LISTENER_WIDTH/2, 
-             x->x_obj.te_ypix + x->x_outputs_y[0] + LISTENER_HEIGHT/2
+             text_xpix(&x->x_obj, glist) + x->x_outputs_x[0] + LISTENER_WIDTH/2, 
+             text_ypix(&x->x_obj, glist) + x->x_outputs_y[0] + LISTENER_HEIGHT/2
              );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
@@ -306,8 +305,8 @@ static void audience_draw_move(t_audience_tilde *x, t_glist *glist)
 
 static void audience_draw_erase(t_audience_tilde* x,t_glist* glist)
 {
-    t_canvas *canvas=glist_getcanvas(glist);
-    int ei;
+  t_canvas *canvas=glist_getcanvas(glist);
+  int ei;
 
     SYS_VGUI3(".x%x.c delete %xAAUDIENCE\n", canvas, x);
     SYS_VGUI3(".x%x.c delete %xBLCAPTION\n", canvas, x);
@@ -355,10 +354,10 @@ static void audience_getrect(t_gobj *z, t_glist *owner,
 {
    t_audience_tilde* x = (t_audience_tilde*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, owner);
+   *yp1 = text_ypix(&x->x_obj, owner);
+   *xp2 = text_xpix(&x->x_obj, owner)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
 static void audience_save(t_gobj *z, t_binbuf *b)
@@ -367,7 +366,7 @@ static void audience_save(t_gobj *z, t_binbuf *b)
   t_int ii;
 
    binbuf_addv(b, "ssiisiiiifi", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("audience~"), x->x_width, x->x_height,
                 x->x_nbinputs, x->x_nboutputs, x->x_attenuation, x->x_applydelay );
    for ( ii=0; ii<x->x_nbinputs; ii++ )
@@ -588,8 +587,8 @@ static void audience_delete(t_gobj *z, t_glist *glist)
 static void audience_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
   t_audience_tilde *x = (t_audience_tilde *)z;
-  int xold = x->x_obj.te_xpix;
-  int yold = x->x_obj.te_ypix;
+  int xold = text_xpix(&x->x_obj, glist);
+  int yold = text_ypix(&x->x_obj, glist);
 
     // post( "audience_displace dx=%d dy=%d", dx, dy );
 
@@ -637,8 +636,8 @@ static int audience_click(t_gobj *z, struct _glist *glist,
     // post( "audience_click doit=%d x=%d y=%d", doit, xpix, ypix );
     if ( doit) 
     {
-     t_int relx = xpix-x->x_obj.te_xpix;
-     t_int rely = ypix-x->x_obj.te_ypix;
+     t_int relx = xpix-text_xpix(&x->x_obj, glist);
+     t_int rely = ypix-text_ypix(&x->x_obj, glist);
 
       // post( "audience~ : relx : %d : rely : %d", relx, rely );
       x->x_type_selected = AUDIENCE_NONE;
@@ -1049,20 +1048,15 @@ void audience_tilde_setup(void)
     audience_widgetbehavior.w_deletefn =     audience_delete;
     audience_widgetbehavior.w_visfn =        audience_vis;
     audience_widgetbehavior.w_clickfn =      audience_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(audience_class_tilde, audience_properties);
+    class_setsavefn(audience_class_tilde, audience_save);
+#else
     audience_widgetbehavior.w_propertiesfn = audience_properties;
     audience_widgetbehavior.w_savefn =       audience_save;
-#else
-	 class_setsavefn(audience_class_tilde, &audience_save);
-	 class_setpropertiesfn(audience_class_tilde, &audience_properties);
 #endif
 
     class_setwidget(audience_class_tilde, &audience_widgetbehavior);
-    class_sethelpsymbol(audience_class_tilde, gensym("help-audience~.pd"));
+    class_sethelpsymbol(audience_class_tilde, gensym("audience~.pd"));
 }

@@ -40,7 +40,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
-#include <m_pd.h>
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"

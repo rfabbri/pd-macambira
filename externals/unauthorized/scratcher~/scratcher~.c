@@ -37,9 +37,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef MACOSX
 #include <malloc.h>
-#endif
 #include <ctype.h>
 #include <pthread.h>
 #include <time.h>
@@ -48,12 +46,11 @@
 #include <unistd.h>
 #endif
 #ifdef NT
-#include <winsock2.h>
-#include <sys/timeb.h>
+#define M_PI 3.14159265358979323846
 #endif
 #include <math.h>
 
-#include <m_pd.h>
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -113,7 +110,7 @@ static int ignorevisible=1; // ignore visible test
 #define SCRATCHER_NB_GROOVES 20  
 #define SCRATCHER_MOVE_TIMEOUT 20
 
-static char   *scratcher_version = "scratcher~: version 0.7, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *scratcher_version = "scratcher~: version 0.9, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *scratcher_class;
 t_widgetbehavior scratcher_widgetbehavior;
@@ -159,32 +156,32 @@ static void scratcher_draw_new(t_scratcher *x, t_glist *glist)
   t_int ci;
 
     SYS_VGUI7(".x%x.c create oval %d %d %d %d -fill #000000 -tags %xSCRATCHER\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix + x->x_width, 
-             x->x_obj.te_ypix + x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist) + x->x_width, 
+             text_ypix(&x->x_obj, glist) + x->x_height,
 	     x);
     for ( ci=0; ci<SCRATCHER_NB_GROOVES; ci ++)
     {
       SYS_VGUI8(".x%x.c create oval %d %d %d %d -outline #FFFFFF -tags %xGROOVE%d\n",
-	     canvas, x->x_obj.te_xpix + ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
-             x->x_obj.te_ypix + ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
-	     x->x_obj.te_xpix + x->x_width - ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
-             x->x_obj.te_ypix + x->x_height - ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
+	     canvas, text_xpix(&x->x_obj, glist) + ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
+             text_ypix(&x->x_obj, glist) + ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
+	     text_xpix(&x->x_obj, glist) + x->x_width - ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
+             text_ypix(&x->x_obj, glist) + x->x_height - ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
 	     x, ci);
     }
     if ( x->x_showspeed )
     {
        SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xSPEEDBAR -width 3\n",
-               canvas, x->x_obj.te_xpix+x->x_width/2,
-               x->x_obj.te_ypix+x->x_height/2,
-               x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
-               x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
+               canvas, text_xpix(&x->x_obj, glist)+x->x_width/2,
+               text_ypix(&x->x_obj, glist)+x->x_height/2,
+               text_xpix(&x->x_obj, glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
+               text_ypix(&x->x_obj, glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
                x );
     }
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -tags %xFSCRATCHER\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix + x->x_width, 
-             x->x_obj.te_ypix + x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist) + x->x_width, 
+             text_ypix(&x->x_obj, glist) + x->x_height,
 	     x);
     canvas_fixlinesfor( canvas, (t_text*)x );
 }
@@ -192,15 +189,16 @@ static void scratcher_draw_new(t_scratcher *x, t_glist *glist)
 static void scratcher_draw_delete(t_scratcher *x, t_glist *glist)
 {
   t_int ci;
+  t_canvas *canvas=glist_getcanvas(glist);
 
     if ( glist_isvisible( glist ) )
     {
-       SYS_VGUI3( ".x%x.c delete %xSCRATCHER\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3( ".x%x.c delete %xFSCRATCHER\n", glist_getcanvas( glist ), x );
-       SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", glist_getcanvas( glist ), x );
+       SYS_VGUI3( ".x%x.c delete %xSCRATCHER\n", canvas, x );
+       SYS_VGUI3( ".x%x.c delete %xFSCRATCHER\n", canvas, x );
+       SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", canvas, x );
        for ( ci=0; ci<SCRATCHER_NB_GROOVES; ci ++)
        {
-          SYS_VGUI4( ".x%x.c delete %xGROOVE%d\n", glist_getcanvas( glist ), x, ci );
+          SYS_VGUI4( ".x%x.c delete %xGROOVE%d\n", canvas, x, ci );
        }
     }
 }
@@ -214,32 +212,32 @@ static void scratcher_draw_move(t_scratcher *x, t_glist *glist)
    {
     SYS_VGUI7(".x%x.c coords %xSCRATCHER %d %d %d %d\n",
 	     canvas, x,
-	     x->x_obj.te_xpix-1, x->x_obj.te_ypix-1,
-	     x->x_obj.te_xpix+x->x_width+1, 
-             x->x_obj.te_ypix+x->x_height+1);
+	     text_xpix(&x->x_obj, glist)-1, text_ypix(&x->x_obj, glist)-1,
+	     text_xpix(&x->x_obj, glist)+x->x_width+1, 
+             text_ypix(&x->x_obj, glist)+x->x_height+1);
     SYS_VGUI7(".x%x.c coords %xFSCRATCHER %d %d %d %d\n",
 	     canvas, x,
-	     x->x_obj.te_xpix-1, x->x_obj.te_ypix-1,
-	     x->x_obj.te_xpix+x->x_width+1, 
-             x->x_obj.te_ypix+x->x_height+1);
+	     text_xpix(&x->x_obj, glist)-1, text_ypix(&x->x_obj, glist)-1,
+	     text_xpix(&x->x_obj, glist)+x->x_width+1, 
+             text_ypix(&x->x_obj, glist)+x->x_height+1);
     if ( x->x_showspeed )
     {
        SYS_VGUI7( ".x%x.c coords %xSPEEDBAR %d %d %d %d\n",
                canvas, x,
-               x->x_obj.te_xpix+x->x_width/2,
-               x->x_obj.te_ypix+x->x_height/2,
-               x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
-               x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
+               text_xpix(&x->x_obj, glist)+x->x_width/2,
+               text_ypix(&x->x_obj, glist)+x->x_height/2,
+               text_xpix(&x->x_obj, glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
+               text_ypix(&x->x_obj, glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
                );
     }
     for ( ci=0; ci<SCRATCHER_NB_GROOVES; ci ++)
     {
       SYS_VGUI8(".x%x.c coords %xGROOVE%d %d %d %d %d\n",
 	     canvas, x, ci,
-             x->x_obj.te_xpix + ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
-             x->x_obj.te_ypix + ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
-	     x->x_obj.te_xpix + x->x_width - ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
-             x->x_obj.te_ypix + x->x_height - ci*x->x_height/(2*SCRATCHER_NB_GROOVES)
+             text_xpix(&x->x_obj, glist) + ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
+             text_ypix(&x->x_obj, glist) + ci*x->x_height/(2*SCRATCHER_NB_GROOVES),
+	     text_xpix(&x->x_obj, glist) + x->x_width - ci*x->x_width/(2*SCRATCHER_NB_GROOVES), 
+             text_ypix(&x->x_obj, glist) + x->x_height - ci*x->x_height/(2*SCRATCHER_NB_GROOVES)
 	     );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
@@ -269,10 +267,10 @@ static void scratcher_getrect(t_gobj *z, t_glist *owner,
 {
    t_scratcher* x = (t_scratcher*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, owner);
+   *yp1 = text_ypix(&x->x_obj, owner);
+   *xp2 = text_xpix(&x->x_obj, owner)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
 static void scratcher_save(t_gobj *z, t_binbuf *b)
@@ -280,7 +278,7 @@ static void scratcher_save(t_gobj *z, t_binbuf *b)
    t_scratcher *x = (t_scratcher *)z;
 
    binbuf_addv(b, "ssiisiiiiff", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("scratcher~"), x->x_size, x->x_width, x->x_height, 
                 x->x_sensibility, x->x_maxspeed, x->x_inertia );
    binbuf_addv(b, ";");
@@ -326,13 +324,9 @@ static void scratcher_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 
 static void scratcher_motion(t_scratcher *x, t_floatarg dx, t_floatarg dy)
 {
-#ifdef NT
-    time_t et;
-    struct _timeb tv;
-#else
   struct timeval tv;
   struct timezone tz;
-#endif
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
    // post( "scratcher_motion dx=%f dy=%f", dx, dy );
 
@@ -340,24 +334,18 @@ static void scratcher_motion(t_scratcher *x, t_floatarg dx, t_floatarg dy)
 
    x->x_mousemoved = 1;
    // get current time in ms
-#ifdef NT
-      time( &et );
-      _ftime( &tv );
-      x->x_lastmovetime = et*1000 + tv.millitm;
-#else
    gettimeofday( &tv, &tz );
    x->x_lastmovetime = tv.tv_sec*1000 + tv.tv_usec/1000;
-#endif
    // post( "scratcher~ : move time : %ld", x->x_lastmovetime );
 
    if ( x->x_showspeed )
    {
       SYS_VGUI7( ".x%x.c coords %xSPEEDBAR %d %d %d %d\n",
-              glist_getcanvas( x->x_glist ), x,
-              x->x_obj.te_xpix+x->x_width/2,
-              x->x_obj.te_ypix+x->x_height/2,
-              x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
-              x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
+              canvas, x,
+              text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+              text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+              text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
+              text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
               );
    }
 }
@@ -396,15 +384,17 @@ static void scratcher_dialog(t_scratcher *x, t_symbol *s, int argc, t_atom *argv
     /* reset reading speed */
 static void scratcher_reset(t_scratcher *x)
 {
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
    x->x_readspeed=1.;
    if ( x->x_showspeed )
    {
       SYS_VGUI7( ".x%x.c coords %xSPEEDBAR %d %d %d %d\n",
-              glist_getcanvas( x->x_glist ), x,
-              x->x_obj.te_xpix+x->x_width/2,
-              x->x_obj.te_ypix+x->x_height/2,
-              x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
-              x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
+              canvas, x,
+              text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+              text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+              text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
+              text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
               );
    }
 }
@@ -412,7 +402,8 @@ static void scratcher_reset(t_scratcher *x)
 static int scratcher_click(t_gobj *z, struct _glist *glist,
 			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
-  t_scratcher* x = (t_scratcher *)z;
+ t_scratcher* x = (t_scratcher *)z;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     // post( "scratcher_click : x=%d y=%d doit=%d alt=%d, shift=%d", xpix, ypix, doit, alt, shift );
     if ( doit )
@@ -425,11 +416,11 @@ static int scratcher_click(t_gobj *z, struct _glist *glist,
       if ( x->x_showspeed )
       {
         SYS_VGUI7( ".x%x.c coords %xSPEEDBAR %d %d %d %d\n",
-              glist_getcanvas( x->x_glist ), x,
-              x->x_obj.te_xpix+x->x_width/2,
-              x->x_obj.te_ypix+x->x_height/2,
-              x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
-              x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
+              canvas, x,
+              text_xpix(&x->x_obj, glist)+x->x_width/2,
+              text_ypix(&x->x_obj, glist)+x->x_height/2,
+              text_xpix(&x->x_obj, glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
+              text_ypix(&x->x_obj, glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
               );
       }
     }
@@ -485,18 +476,14 @@ static t_int scratcher_reallocate(t_scratcher *x, t_int ioldsize, t_int inewsize
     /* records or playback the scratcher */
 static t_int *scratcher_perform(t_int *w)
 {
-    t_float *in = (t_float *)(w[1]);
-    t_float *out = (t_float *)(w[2]);
-    t_int n = (int)(w[3]);                      /* number of samples */
-    t_scratcher *x = (t_scratcher *)(w[4]);
-#ifdef NT
-    time_t et;
-    struct _timeb tv;
-#else
-    struct timeval tv;
-    struct timezone tz;
-#endif
-    long long perftime = 0L;
+  t_float *in = (t_float *)(w[1]);
+  t_float *out = (t_float *)(w[2]);
+  t_int n = (int)(w[3]);                      /* number of samples */
+  t_scratcher *x = (t_scratcher *)(w[4]);
+  struct timeval tv;
+  struct timezone tz;
+  long long perftime = 0L;
+  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     x->x_readspeed += x->x_speedinc;
     if ( x->x_readspeed > x->x_maxspeed )
@@ -514,14 +501,8 @@ static t_int *scratcher_perform(t_int *w)
     if ( x->x_mousemoved )
     {
        // get current time in ms
-#ifdef NT
-      time( &et );
-      _ftime( &tv );
-      perftime = et*1000 + tv.millitm;
-#else
-      gettimeofday( &tv, &tz );
-      perftime = tv.tv_sec*1000 + tv.tv_usec/1000;
-#endif
+       gettimeofday( &tv, &tz );
+       perftime = tv.tv_sec*1000 + tv.tv_usec/1000;
        if ( perftime - x->x_lastmovetime > SCRATCHER_MOVE_TIMEOUT )
        {
           // post( "scratcher~ : mouse timeout (m=%ld)", perftime );
@@ -545,11 +526,11 @@ static t_int *scratcher_perform(t_int *w)
           if ( x->x_showspeed )
           {
             SYS_VGUI7( ".x%x.c coords %xSPEEDBAR %d %d %d %d\n",
-               glist_getcanvas( x->x_glist ), x,
-               x->x_obj.te_xpix+x->x_width/2,
-               x->x_obj.te_ypix+x->x_height/2,
-               x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
-               x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
+               canvas, x,
+               text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+               text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+               text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1 )),
+               text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1 ))
                );
           }
         }
@@ -591,18 +572,20 @@ static void scratcher_dsp(t_scratcher *x, t_signal **sp)
     /* play the sound */
 static void scratcher_play(t_scratcher *x)
 {
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
    x->x_play=1;
    // reset read position
    x->x_readpos=0;
    x->x_readspeed=1.;
    if ( x->x_showspeed )
    {
-     SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", glist_getcanvas( x->x_glist ), x );
+     SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", canvas, x );
      SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xSPEEDBAR -width 3\n",
-             glist_getcanvas( x->x_glist ), x->x_obj.te_xpix+x->x_width/2,
-             x->x_obj.te_ypix+x->x_height/2,
-             x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
-             x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
+             canvas, text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+             text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+             text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
+             text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
              x );
    }
 }
@@ -610,18 +593,20 @@ static void scratcher_play(t_scratcher *x)
     /* stop playing   */
 static void scratcher_stop(t_scratcher *x)
 {
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
    x->x_play=0;
    // reset read position
    x->x_readpos=0;
    x->x_readspeed=0.;
    if ( x->x_showspeed )
    {
-     SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", glist_getcanvas( x->x_glist ), x );
+     SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", canvas, x );
      SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xSPEEDBAR -width 3\n",
-             glist_getcanvas( x->x_glist ), x->x_obj.te_xpix+x->x_width/2,
-             x->x_obj.te_ypix+x->x_height/2,
-             x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
-             x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
+             canvas, text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+             text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+             text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
+             text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
              x );
    }
 }
@@ -685,19 +670,21 @@ static void scratcher_inertia(t_scratcher *x, t_floatarg finertia )
     /* toggle speed line */
 static void scratcher_showspeed(t_scratcher *x, t_floatarg fshowspeed )
 {
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+
     if (fshowspeed == 0) {
       x->x_showspeed = 0;
-      SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", glist_getcanvas( x->x_glist ), x );
+      SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", canvas, x );
     }
     else
     {
       x->x_showspeed = 1;
-      SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", glist_getcanvas( x->x_glist ), x );
+      SYS_VGUI3( ".x%x.c delete %xSPEEDBAR\n", canvas, x );
       SYS_VGUI7( ".x%x.c create line %d %d %d %d -fill #FF0000 -tags %xSPEEDBAR -width 3\n",
-               glist_getcanvas( x->x_glist ), x->x_obj.te_xpix+x->x_width/2,
-               x->x_obj.te_ypix+x->x_height/2,
-               x->x_obj.te_xpix+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
-               x->x_obj.te_ypix+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
+               canvas, text_xpix(&x->x_obj, x->x_glist)+x->x_width/2,
+               text_ypix(&x->x_obj, x->x_glist)+x->x_height/2,
+               text_xpix(&x->x_obj, x->x_glist)+x->x_width/2 + (int)(x->x_width/2*cos( x->x_readspeed - 1. )),
+               text_ypix(&x->x_obj, x->x_glist)+x->x_height/2 - (int)(x->x_width/2*sin( x->x_readspeed - 1. )), 
                x );
     }
 }
@@ -791,6 +778,7 @@ void scratcher_tilde_setup(void)
 #include "scratcher~.tk2c"
     scratcher_class = class_new(gensym("scratcher~"), (t_newmethod)scratcher_new, (t_method)scratcher_free,
                     sizeof(t_scratcher), 0, A_GIMME, 0);
+    class_sethelpsymbol( scratcher_class, gensym("scratcher~.pd") );
 
     // set callbacks
     scratcher_widgetbehavior.w_getrectfn =    scratcher_getrect;
@@ -800,18 +788,13 @@ void scratcher_tilde_setup(void)
     scratcher_widgetbehavior.w_deletefn =     scratcher_delete;
     scratcher_widgetbehavior.w_visfn =        scratcher_vis;
     scratcher_widgetbehavior.w_clickfn =      scratcher_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(scratcher_class, scratcher_properties);
+    class_setsavefn(scratcher_class, scratcher_save);
+#else
     scratcher_widgetbehavior.w_propertiesfn = scratcher_properties;
     scratcher_widgetbehavior.w_savefn =       scratcher_save;
-#else
-	 class_setpropertiesfn(scratcher_class, &scratcher_properties);
-	 class_setsavefn(scratcher_class, &scratcher_save);
 #endif
 
     CLASS_MAINSIGNALIN( scratcher_class, t_scratcher, x_f );

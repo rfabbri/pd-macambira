@@ -1,3 +1,4 @@
+/* ---------------------------------------------------------------------------- */
 /* Copyright (c) 2002 Yves Degoyon.                                             */
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL     */
 /* WARRANTIES, see the file, "LICENSE.txt," in this distribution.               */
@@ -35,7 +36,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
-#include <m_pd.h>
+#include "m_pd.h"
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -43,7 +44,6 @@
 
 #ifdef NT
 #include <io.h>
-#define random rand
 #else
 #include <unistd.h>
 #endif
@@ -54,7 +54,7 @@
 #define DEFAULT_PROBALIZER_NBOCCURRENCES 100
 #define DEFAULT_PROB_VALUE 10
 
-static char   *probalizer_version = "probalizer : outputs integer values according to a drawn probability curve , version 0.1 (ydegoyon@free.fr)"; 
+static char   *probalizer_version = "probalizer : outputs integer values according to a drawn probability curve , version 0.3 (ydegoyon@free.fr)"; 
 
 t_widgetbehavior probalizer_widgetbehavior;
 static t_class *probalizer_class;
@@ -105,43 +105,43 @@ static void probalizer_draw_new(t_probalizer *x, t_glist *glist)
   t_int ei;
 
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #6790E2 -tags %xPROBALIZER\n",
-	     canvas, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height,
+	     canvas, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height,
 	     x);
     SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"0\" -tags %xLTCAPTION\n",
-             canvas, x->x_obj.te_xpix-15, x->x_obj.te_ypix + x->x_height, x );
+             canvas, text_xpix(&x->x_obj, glist)-15, text_ypix(&x->x_obj, glist) + x->x_height, x );
     SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%d\" -tags %xLBCAPTION\n",
-             canvas, x->x_obj.te_xpix-15, x->x_obj.te_ypix, x->x_noccurrences, x );
+             canvas, text_xpix(&x->x_obj, glist)-15, text_ypix(&x->x_obj, glist), x->x_noccurrences, x );
     SYS_VGUI5(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"1\" -tags %xBLCAPTION\n",
-             canvas, x->x_obj.te_xpix+2, x->x_obj.te_ypix + x->x_height + 10, x );
+             canvas, text_xpix(&x->x_obj, glist)+2, text_ypix(&x->x_obj, glist) + x->x_height + 10, x );
     SYS_VGUI6(".x%x.c create text %d %d -font -*-courier-bold--normal--10-* -text \"%d\" -tags %xBRCAPTION\n",
-             canvas, x->x_obj.te_xpix + x->x_width-5, x->x_obj.te_ypix + x->x_height + 10, x->x_nvalues, x );
+             canvas, text_xpix(&x->x_obj, glist) + x->x_width-5, text_ypix(&x->x_obj, glist) + x->x_height + 10, x->x_nvalues, x );
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xIN\n",
-             canvas, x->x_obj.te_xpix,
-             x->x_obj.te_ypix - 2,
-             x->x_obj.te_xpix + 5,
-             x->x_obj.te_ypix ,
+             canvas, text_xpix(&x->x_obj, glist),
+             text_ypix(&x->x_obj, glist) - 2,
+             text_xpix(&x->x_obj, glist) + 5,
+             text_ypix(&x->x_obj, glist) ,
              x);
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT\n",
-             canvas, x->x_obj.te_xpix,
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + 5,
-             x->x_obj.te_ypix + x->x_height + 2,
+             canvas, text_xpix(&x->x_obj, glist),
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
              x);
     SYS_VGUI7(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #000000 -tags %xOUT2\n",
-             canvas, x->x_obj.te_xpix + x->x_width -5,
-             x->x_obj.te_ypix + x->x_height,
-             x->x_obj.te_xpix + x->x_width,
-             x->x_obj.te_ypix + x->x_height + 2,
+             canvas, text_xpix(&x->x_obj, glist) + x->x_width -5,
+             text_ypix(&x->x_obj, glist) + x->x_height,
+             text_xpix(&x->x_obj, glist) + x->x_width,
+             text_ypix(&x->x_obj, glist) + x->x_height + 2,
              x);
     for ( ei=0; ei<x->x_nvalues; ei++ )
     {
          SYS_VGUI8(".x%x.c create rectangle %d %d %d %d -outline #000000 -fill #118373 -tags %xPROB%d\n",
 	     canvas, 
-             x->x_obj.te_xpix + ei * x->x_width/x->x_nvalues, 
-             x->x_obj.te_ypix + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
-	     x->x_obj.te_xpix + (ei+1) * x->x_width/x->x_nvalues, 
-             x->x_obj.te_ypix + x->x_height,
+             text_xpix(&x->x_obj, glist) + ei * x->x_width/x->x_nvalues, 
+             text_ypix(&x->x_obj, glist) + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
+	     text_xpix(&x->x_obj, glist) + (ei+1) * x->x_width/x->x_nvalues, 
+             text_ypix(&x->x_obj, glist) + x->x_height,
 	     x, ei);
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
@@ -156,10 +156,10 @@ static void probalizer_draw_update(t_probalizer *x)
     {
        SYS_VGUI8(".x%x.c coords %xPROB%d %d %d %d %d\n",
            canvas, x, ei,
-           x->x_obj.te_xpix + ei * x->x_width / x->x_nvalues, 
-           x->x_obj.te_ypix + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
-           x->x_obj.te_xpix + (ei+1) * x->x_width / x->x_nvalues, 
-           x->x_obj.te_ypix + x->x_height );
+           text_xpix(&x->x_obj, x->x_glist) + ei * x->x_width / x->x_nvalues, 
+           text_ypix(&x->x_obj, x->x_glist) + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
+           text_xpix(&x->x_obj, x->x_glist) + (ei+1) * x->x_width / x->x_nvalues, 
+           text_ypix(&x->x_obj, x->x_glist) + x->x_height );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
 }
@@ -170,51 +170,51 @@ static void probalizer_draw_move(t_probalizer *x, t_glist *glist)
   t_int ei;
 
     SYS_VGUI7(".x%x.c coords %xPROBALIZER %d %d %d %d \n",
-	     canvas, x, x->x_obj.te_xpix, x->x_obj.te_ypix,
-	     x->x_obj.te_xpix+x->x_width, x->x_obj.te_ypix+x->x_height
+	     canvas, x, text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist),
+	     text_xpix(&x->x_obj, glist)+x->x_width, text_ypix(&x->x_obj, glist)+x->x_height
 	     );
     SYS_VGUI7(".x%x.c coords %xIN %d %d %d %d\n",
-	     canvas, x, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix - 2,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix
+	     canvas, x, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) - 2,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist)
 	     );
     SYS_VGUI7(".x%x.c coords %xOUT %d %d %d %d\n",
-	     canvas, x, x->x_obj.te_xpix, 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + 5, 
-             x->x_obj.te_ypix + x->x_height + 2
+	     canvas, x, text_xpix(&x->x_obj, glist), 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
 	     );
     SYS_VGUI7(".x%x.c coords %xOUT2 %d %d %d %d\n",
-	     canvas, x, x->x_obj.te_xpix + x->x_width - 5, 
-             x->x_obj.te_ypix + x->x_height,
-	     x->x_obj.te_xpix + x->x_width, 
-             x->x_obj.te_ypix + x->x_height + 2
+	     canvas, x, text_xpix(&x->x_obj, glist) + x->x_width - 5, 
+             text_ypix(&x->x_obj, glist) + x->x_height,
+	     text_xpix(&x->x_obj, glist) + x->x_width, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 2
 	     );
     SYS_VGUI5(".x%x.c coords %xLTCAPTION %d %d\n",
-	     canvas, x, x->x_obj.te_xpix-15, 
-             x->x_obj.te_ypix + x->x_height
+	     canvas, x, text_xpix(&x->x_obj, glist)-15, 
+             text_ypix(&x->x_obj, glist) + x->x_height
 	     );
     SYS_VGUI5(".x%x.c coords %xLBCAPTION %d %d\n",
-	     canvas, x, x->x_obj.te_xpix-15, 
-             x->x_obj.te_ypix 
+	     canvas, x, text_xpix(&x->x_obj, glist)-15, 
+             text_ypix(&x->x_obj, glist) 
 	     );
     SYS_VGUI5(".x%x.c coords %xBLCAPTION %d %d\n",
-	     canvas, x,  x->x_obj.te_xpix+2, 
-             x->x_obj.te_ypix + x->x_height + 10
+	     canvas, x,  text_xpix(&x->x_obj, glist)+2, 
+             text_ypix(&x->x_obj, glist) + x->x_height + 10
 	     );
     SYS_VGUI5(".x%x.c coords %xBRCAPTION %d %d\n",
-	     canvas, x,  x->x_obj.te_xpix + x->x_width - 5,
-             x->x_obj.te_ypix + x->x_height + 10
+	     canvas, x,  text_xpix(&x->x_obj, glist) + x->x_width - 5,
+             text_ypix(&x->x_obj, glist) + x->x_height + 10
 	     );
     for ( ei=0; ei<x->x_nvalues; ei++ )
     {
          SYS_VGUI8(".x%x.c coords %xPROB%d %d %d %d %d\n",
 	     canvas, x, ei,
-             x->x_obj.te_xpix + ei * x->x_width / x->x_nvalues, 
-             x->x_obj.te_ypix + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
-	     x->x_obj.te_xpix + (ei+1) * x->x_width / x->x_nvalues, 
-             x->x_obj.te_ypix + x->x_height );
+             text_xpix(&x->x_obj, glist) + ei * x->x_width / x->x_nvalues, 
+             text_ypix(&x->x_obj, glist) + x->x_height - ( *(x->x_probs+ei) * x->x_height / x->x_noccurrences ),
+	     text_xpix(&x->x_obj, glist) + (ei+1) * x->x_width / x->x_nvalues, 
+             text_ypix(&x->x_obj, glist) + x->x_height );
     }
     canvas_fixlinesfor( canvas, (t_text*)x );
 }
@@ -263,10 +263,10 @@ static void probalizer_getrect(t_gobj *z, t_glist *owner,
 {
    t_probalizer* x = (t_probalizer*)z;
 
-   *xp1 = x->x_obj.te_xpix;
-   *yp1 = x->x_obj.te_ypix;
-   *xp2 = x->x_obj.te_xpix+x->x_width;
-   *yp2 = x->x_obj.te_ypix+x->x_height;
+   *xp1 = text_xpix(&x->x_obj, owner);
+   *yp1 = text_ypix(&x->x_obj, owner);
+   *xp2 = text_xpix(&x->x_obj, owner)+x->x_width;
+   *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
 static void probalizer_save(t_gobj *z, t_binbuf *b)
@@ -275,7 +275,7 @@ static void probalizer_save(t_gobj *z, t_binbuf *b)
    int ei,gi;
 
    binbuf_addv(b, "ssiisiiiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
+		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
 		gensym("probalizer"), x->x_width, x->x_height,
 		x->x_nvalues, x->x_noccurrences, x->x_save );
    if ( x->x_save ) 
@@ -397,8 +397,8 @@ static void probalizer_delete(t_gobj *z, t_glist *glist)
 static void probalizer_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
     t_probalizer *x = (t_probalizer *)z;
-    int xold = x->x_obj.te_xpix;
-    int yold = x->x_obj.te_ypix;
+    int xold = text_xpix(&x->x_obj, glist);
+    int yold = text_ypix(&x->x_obj, glist);
 
     // post( "probalizer_displace dx=%d dy=%d", dx, dy );
 
@@ -422,8 +422,8 @@ static int probalizer_click(t_gobj *z, struct _glist *glist,
        int nevent;
        int newvalue;
 
-         nevent = ((float)( xpix - x->x_obj.te_xpix ))/((float)x->x_width/(float)x->x_nvalues);
-         newvalue = ((float)(x->x_obj.te_ypix + x->x_height - ypix))/( (float)x->x_height/(float)x->x_noccurrences);
+         nevent = ((float)( xpix - text_xpix(&x->x_obj, glist) ))/((float)x->x_width/(float)x->x_nvalues);
+         newvalue = ((float)(text_ypix(&x->x_obj, glist) + x->x_height - ypix))/( (float)x->x_height/(float)x->x_noccurrences);
 
          // post( "changed %d to %d", nevent, newvalue );
 
@@ -688,18 +688,15 @@ void probalizer_setup(void)
     probalizer_widgetbehavior.w_deletefn =     probalizer_delete;
     probalizer_widgetbehavior.w_visfn =        probalizer_vis;
     probalizer_widgetbehavior.w_clickfn =      probalizer_click;
-	 /* 
-	  * <hans@eds.org>: As of 0.37, pd does not have these last 
-	  * two elements in t_widgetbehavoir anymore.
-	  * see pd/src/notes.txt:
-	  *           savefunction and dialog into class structure
-	  */
-#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
+
+#if PD_MINOR_VERSION >= 37
+    class_setpropertiesfn(probalizer_class, probalizer_properties);
+    class_setsavefn(probalizer_class, probalizer_save);
+#else
     probalizer_widgetbehavior.w_propertiesfn = probalizer_properties;
     probalizer_widgetbehavior.w_savefn =       probalizer_save;
-#else
-	 class_setsavefn(probalizer_class, &probalizer_save);
-	 class_setpropertiesfn(probalizer_class, &probalizer_properties);
 #endif
+
     class_setwidget(probalizer_class, &probalizer_widgetbehavior);
+    class_sethelpsymbol(probalizer_class, gensym("probalizer.pd"));
 }
