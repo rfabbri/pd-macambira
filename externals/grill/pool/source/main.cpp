@@ -305,7 +305,8 @@ V pool::setup(t_classid c)
 }
 
 pool::pool(I argc,const A *argv):
-	absdir(true),echo(false),pl(NULL),
+	absdir(true),echo(false),
+    pl(NULL),priv(false),
 	clip(NULL),
 	vcnt(VCNT),dcnt(DCNT)
 {

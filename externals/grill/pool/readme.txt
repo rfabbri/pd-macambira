@@ -92,6 +92,7 @@ Version history:
 - more inlined functions and better symbol handling
 - added "seti" message to set elements at index
 - added "clri" message to erase elements at index
+- fixed bad bug: pool::priv was not initialized
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)

@@ -1,4 +1,4 @@
-#N canvas 4 3 939 709 12;
+#N canvas 4 3 943 713 12;
 #X msg 296 105 set 1 2 3;
 #X obj 238 631 print K;
 #X msg 607 211 getall;
@@ -7,7 +7,7 @@
 #X obj 287 605 print D;
 #X msg 296 164 set A l m;
 #X msg 297 195 set 2 34;
-#X msg 427 307 clr A;
+#X msg 427 297 clr A;
 #X msg 429 105 get A;
 #X msg 429 130 get 2;
 #X msg 31 132 echodir \$1;
@@ -16,7 +16,7 @@
 #X obj 31 213 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X msg 31 234 absdir \$1;
-#X text 426 287 clear value;
+#X text 426 277 clear value;
 #X text 425 83 get value;
 #X obj 336 576 print C;
 #X text 408 576 command;
@@ -189,7 +189,7 @@ the folder containing the current patcher will be used.;
 #X connect 23 0 26 0;
 #X restore 716 606 pd clip;
 #X text 715 439 more commands:;
-#X obj 298 389 r \$0-pool;
+#X obj 237 444 r \$0-pool;
 #X text 174 517 data is shared among pool objects with the same name
 ;
 #X obj 26 10 cnv 15 850 45 empty empty pool 10 22 0 24 -260818 -1 0
@@ -232,7 +232,7 @@ Grill;
 #X text 426 185 get indexed element;
 #X obj 427 205 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
 10 -262144 -1 -1 0 256;
-#X text 297 309 set but don't replace;
+#X text 297 323 set but don't replace;
 #X text 294 256 set value at index;
 #X msg 295 276 seti 3 Uhu;
 #X text 424 343 clear value at index;
