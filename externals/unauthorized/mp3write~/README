@@ -32,7 +32,7 @@ COPYRIGHT of MP3 music:
 
 	using mp3write~ external for Pure Data
 
-Open the test-mp3write~.pd to understand how it works.
+Open the help-mp3write~.pd to understand how it works.
 In this patch, you must send the messages to mp3write~ 
 in the following order :
 

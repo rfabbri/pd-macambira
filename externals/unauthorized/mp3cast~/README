@@ -34,7 +34,7 @@ COPYRIGHT of MP3 music:
 
 	using mp3cast~ external for Pure Data
 
-Open the test-mp3cast~.pd to understand how it works.
+Open the help-mp3cast~.pd to understand how it works.
 In this patch, you must send the messages to mp3cast~ 
 in the following order :
 
