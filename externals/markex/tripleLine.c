@@ -126,7 +126,7 @@ void tripleLine_setup(void)
     class_addmethod(tripleLine_class, (t_method)setLineParameters,
     	    &s_list, A_GIMME, A_NULL); 
 
-	 #if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(tripleLine_class, gensym("tripleLine-help.pd"));
 #endif
 }

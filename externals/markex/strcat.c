@@ -59,7 +59,7 @@ void strcat_setup(void)
     class_addfloat(strcat_class, (t_method)strcat_float);
     class_addbang(strcat_class, (t_method)strcat_bang);
 
-	 #if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(strcat_class, gensym("strcat-help.pd"));
 #endif
 }

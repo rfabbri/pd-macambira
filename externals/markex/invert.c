@@ -37,7 +37,7 @@ void invert_setup(void)
     	    	    	sizeof(t_invert), 0, A_NULL);
     class_addfloat(invert_class, (t_method)invert_float);
 
-	 #if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(invert_class, gensym("invert-help.pd"));
 #endif
 }

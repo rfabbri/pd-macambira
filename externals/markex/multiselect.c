@@ -93,7 +93,7 @@ void multiselect_setup(void)
     class_addmethod(multiselect_class, (t_method)multiselect_params,
     	    gensym("params"), A_GIMME, A_NULL); 
 
-	#if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(multiselect_class, gensym("multiselect-help.pd"));
 #endif
 }

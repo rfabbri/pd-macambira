@@ -73,7 +73,7 @@ void alternate_setup(void)
     class_addmethod(alternate_class, (t_method)alternate_list,
     	    gensym("list"), A_GIMME, A_NULL); 
 
-	 #if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(alternate_class, gensym("alternate-help.pd"));
 #endif
 }

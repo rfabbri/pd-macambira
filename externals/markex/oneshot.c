@@ -1,4 +1,4 @@
-/*
+`/*
  * Copyright (c) 1997-1999 Mark Danks.
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "GEM.LICENSE.TERMS" in this distribution.
@@ -56,7 +56,7 @@ void oneshot_setup(void)
     class_addfloat(oneshot_class, (t_method)oneshot_float);
     class_addbang(oneshot_class, (t_method)oneshot_bang);
     class_addmethod(oneshot_class, (t_method)oneshot_clear, gensym("clear"), A_NULL);
-	#if PD_MINOR_VERSION < 37 
+#if PD_MINOR_VERSION < 37 
 	class_sethelpsymbol(oneshot_class, gensym("oneshot-help.pd"));
 #endif
 }

@@ -1,6 +1,34 @@
-#N canvas 0 22 454 304 10;
+#N canvas 320 324 484 381 10;
 #X text 13 14 [multiselect] is part of MarkEx \, which was formerly
-in GEM;
-#X obj 171 121 multiselect;
-#X text 29 209 Unfortunately \, this is undocumented \, so someone
-should write a help page for it!;
+in GEM \, and was written by Mark Danks.;
+#X text 16 52 [multiselect] is like [select] \, except that you send
+a list of numbers into the right inlet to change the selection values
+instead of only one number as with [select].;
+#X text 16 94 If you send more values than there are outlets (i.e.
+\, more values that you created the object with) \, the extra numbers
+are ignored.;
+#X text 19 291 One use for [multiselect] is to filter notes so that
+they fit a particular scale and the notes in that scale can be changed
+on the fly.;
+#X obj 92 345 select;
+#X text 21 346 see also:;
+#X floatatom 155 209 0 0 0 0 - - -;
+#X msg 219 167 1;
+#X msg 185 167 54;
+#X msg 155 167 23;
+#X obj 155 239 multiselect 23 54 1;
+#X obj 155 259 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 283 260 5 0 0 0 - - -;
+#X obj 197 259 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 240 259 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X connect 6 0 10 0;
+#X connect 7 0 6 0;
+#X connect 8 0 6 0;
+#X connect 9 0 6 0;
+#X connect 10 0 11 0;
+#X connect 10 1 13 0;
+#X connect 10 2 14 0;
+#X connect 10 3 12 0;
