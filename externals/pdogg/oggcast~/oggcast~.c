@@ -38,7 +38,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef unix 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>

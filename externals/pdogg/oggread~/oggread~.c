@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
-#ifdef UNIX
+#ifdef unix
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -290,7 +290,7 @@ static void oggread_open(t_oggread *x, t_symbol *filename)
 		post("oggread~: previous file closed");
 	}
 		/* open file for reading */
-#ifdef UNIX
+#ifdef unix
     if((x->x_file = fopen(filename->s_name, "r")) < 0)
 #else
 	if((x->x_file = fopen(filename->s_name, "rb")) < 0)
