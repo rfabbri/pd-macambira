@@ -32,7 +32,7 @@
          http://www.audiosynth.com
      
    Coded while listening to:
-   
+
 */
 
 #include "sc4pd.hpp"
@@ -54,8 +54,7 @@ protected:
     virtual void m_dsp(int n, t_sample *const *in, t_sample *const *out)
     {
 	changed = false;
-	DelayUnit_Reset(m_maxdelaytime, m_delaytime);
-	post("start");
+	DelayUnit_Reset();
     }
 
     void m_set(float f)

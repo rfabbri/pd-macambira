@@ -1,7 +1,7 @@
 # config file for sc4pd, adapted from Thomas Grill's xsample makefile
 
 # your c++ compiler (if not g++)
- CXX=icc
+# CXX=icc
 
 
 # where does the PD installation reside?

@@ -46,26 +46,24 @@ void DelayUnit_ar::DelayUnit_AllocDelayLine()
     delaybufsize = NEXTPOWEROFTWO(delaybufsize);  // round up to next power of two
     m_fdelaylen = m_idelaylen = delaybufsize;
     
-    delete m_dlybuf;
+    delete[] m_dlybuf;
     m_dlybuf = new float[delaybufsize] ;
     m_mask = delaybufsize - 1;
 }
 
 void DelayUnit_ar::DelayUnit_Dtor()
 {
-    delete m_dlybuf;
+    delete[] m_dlybuf;
 }
 
 float DelayUnit_ar::CalcDelay(float delaytime)
 {
-	float next_dsamp = delaytime * Samplerate();
-	return sc_clip(next_dsamp, 1.f, m_fdelaylen);
+    float next_dsamp = delaytime * Samplerate();
+    return sc_clip(next_dsamp, 1.f, m_fdelaylen);
 }
 
-void DelayUnit_ar::DelayUnit_Reset(float f, float g)
+void DelayUnit_ar::DelayUnit_Reset()
 {
-    m_maxdelaytime = f;
-    m_delaytime = g;
     m_dlybuf = 0;
     
     DelayUnit_AllocDelayLine();
@@ -74,4 +72,11 @@ void DelayUnit_ar::DelayUnit_Reset(float f, float g)
     
     m_numoutput = 0;
     m_iwrphase = 0;
+}
+
+void FeedbackDelay_ar::FeedbackDelay_Reset()
+{
+    DelayUnit_Reset();
+    
+    m_feedbk = CalcFeedback(m_delaytime, m_decaytime);
 }

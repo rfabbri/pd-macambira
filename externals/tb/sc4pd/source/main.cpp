@@ -58,8 +58,9 @@ void sc4pd_library_setup()
 	 "          ring2(~), ring3(~), ring4(~), difsqr(~), sumsqr(~), "
 	 "sqrdif(~),\n"
 	 "          sqrsum(~), absdif(~), LFSaw(~), LFPulse(~), Impulse(~),\n"
-	 "          Integrator(~), Decay~, Decay2~, Lag~, Lag2~, LinExp(~)"
-	 "DelayN~\n"
+	 "          Integrator(~), Decay~, Decay2~, Lag~, Lag2~, LinExp(~), "
+	 "DelayN~,\n"
+	 "          DelayL~, DelayC~"
 	 );
 
     //initialize objects
@@ -208,6 +209,10 @@ void sc4pd_library_setup()
     FLEXT_SETUP(LinExp_kr);
 
     FLEXT_DSP_SETUP(DelayN_ar); 
+
+    FLEXT_DSP_SETUP(DelayL_ar); 
+
+    FLEXT_DSP_SETUP(DelayC_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

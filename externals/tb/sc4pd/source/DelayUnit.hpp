@@ -43,7 +43,7 @@ class DelayUnit_ar : public flext_dsp
 public:
     /* functions */
     void DelayUnit_AllocDelayLine();
-    void DelayUnit_Reset(float maxdelaytime, float delaytime);  
+    void DelayUnit_Reset();  
     float CalcDelay(float delaytime);
     void DelayUnit_Dtor();
 
@@ -56,3 +56,10 @@ public:
 };
 
 /* todo: a delay for control messages? */
+
+class FeedbackDelay_ar : public DelayUnit_ar
+{
+    FLEXT_HEADER(FeedbackDelay_ar,DelayUnit_ar);
+    float m_feedbk, m_decaytime;
+    void FeedbackDelay_Reset();
+};
