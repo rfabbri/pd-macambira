@@ -20,6 +20,9 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "flbase.h"
 #include "flsupport.h"
 
+#include <map>
+#include <set>
+#include <list>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4786)
@@ -573,33 +576,33 @@ protected:
 
 	public:
 
-	class attritem;
+	class AttrItem;
 
-	class item {
+	class Item {
 	public:
-		item(const t_symbol *t,int inl,attritem *a);
-		virtual ~item();
+		Item(const t_symbol *t,int inl,AttrItem *a);
+		virtual ~Item();
 		
 		bool IsAttr() const { return attr != NULL; }
 
 		const t_symbol *tag;
 		int inlet;
-		attritem *attr;
-		item *nxt;
+		AttrItem *attr;
+		Item *nxt;
 	};
 
     //! This class holds hashed item entries
-	class itemarr {
+	class ItemCont {
 	public:
-		itemarr();
-		~itemarr();
+		ItemCont();
+		~ItemCont();
 
         //! Add an entry
-		void Add(item *it);
+		void Add(Item *it);
         //! Remove an entry
-		bool Remove(item *it);
-        //! Find an entry in the item array
-		item *Find(const t_symbol *tag,int inlet = 0) const;
+		bool Remove(Item *it);
+        //! Find an entry in the Item array
+		Item *Find(const t_symbol *tag,int inlet = 0) const;
 
         //! Create hash table out of the preliminary linked lists
 		void Finalize();
@@ -612,22 +615,22 @@ protected:
 		int Size() const { return bits?1<<bits:0; }
 
         //! Get an array slot
-		item *Item(int ix) { return arr[ix]; }
+		Item *GetItem(int ix) { return arr[ix]; }
 	
 	protected:		
         //! Calculate a hash value
 		static int Hash(const t_symbol *,int inlet,int bits);
 	
-		item **arr;
+		Item **arr;
 		int cnt,bits;
 	};
 
 	//! \brief This represents an item of the method list
-	class methitem:
-		public item { 
+	class MethItem:
+		public Item { 
 	public:
-		methitem(int inlet,const t_symbol *tg,attritem *conn = NULL);
-		virtual ~methitem();
+		MethItem(int inlet,const t_symbol *tg,AttrItem *conn = NULL);
+		virtual ~MethItem();
 		
 		void SetArgs(methfun fun,int argc,metharg *args);
 
@@ -637,28 +640,49 @@ protected:
 	};
 	
 	//! \brief This represents an item of the attribute list
-	class attritem:
-		public item { 
+	class AttrItem:
+		public Item { 
 	public:
-		attritem(const t_symbol *tag,metharg tp,methfun fun,int flags);
-		virtual ~attritem();
+		AttrItem(const t_symbol *tag,metharg tp,methfun fun,int flags);
+		virtual ~AttrItem();
 
 		enum { 
 			afl_getset = 0x01, afl_get = 0x00, afl_set = 0x01,
 			afl_bothexist = 0x02,
-			afl_save = 0x04
+			afl_save = 0x04,afl_init = 0x08,afl_inited = 0x10
 		};
 
 		bool IsGet() const { return (flags&afl_getset) == afl_get; }
 		bool IsSet() const { return (flags&afl_getset) == afl_set; }
 		bool BothExist() const { return (flags&afl_bothexist) != 0; }
-		void SetSave(bool s) { if(s) flags  |= afl_save; else flags &= ~afl_save; }
-		bool IsSaved() const { return (flags&afl_save) != 0; }
 
 		int flags;
 		metharg argtp;
 		methfun fun;
 	};
+
+	//! Represent a data value of an attribute
+	class AttrData 
+	{
+	public:
+		enum { afl_save = 0x01,afl_init = 0x02,afl_inited = 0x04 };
+
+		void SetSave(bool s) { if(s) flags  |= afl_save; else flags &= ~afl_save; }
+		bool IsSaved() const { return (flags&afl_save) != 0; }
+		void SetInit(bool s) { if(s) flags  |= afl_init; else flags &= ~afl_init; }
+		bool IsInit() const { return (flags&afl_init) != 0; }
+		void SetInitValue(int argc,const t_atom *argv) { init(argc,argv); flags |= afl_inited; }
+		void SetInitValue(const AtomList &l) { SetInitValue(l.Count(),l.Atoms()); }
+		bool IsInitValue() const { return (flags&afl_inited) != 0; }
+		const AtomList &GetInitValue() const { return init; }
+
+		AtomList init;
+		int flags;
+	};
+
+	typedef std::map<const t_symbol *,AttrData> AttrDataCont;
+	typedef std::pair<const t_symbol *,AttrData> AttrDataPair;
+
 
 	// these outlet functions don't check for thread but send directly to the real-time system
 	void ToSysBang(int n) const; 
@@ -674,11 +698,12 @@ private:
 public:
 
 	//! \brief This represents an item of the symbol-bound method list
-	class binditem:
-		public item { 
+	class BindItem
+		:public Item 
+	{ 
 	public:
-		binditem(int inlet,const t_symbol *sym,bool (*f)(flext_base *,t_symbol *s,int,t_atom *,void *),pxbnd_object *px);
-		virtual ~binditem();
+		BindItem(int inlet,const t_symbol *sym,bool (*f)(flext_base *,t_symbol *s,int,t_atom *,void *),pxbnd_object *px);
+		virtual ~BindItem();
 		
 		bool (*fun)(flext_base *,t_symbol *s,int,t_atom *,void *);
         pxbnd_object *px;
@@ -686,15 +711,15 @@ public:
 	
 //!		@} FLEXT_CLASS
 
-	itemarr *ThMeths() { return methhead; }
-	static itemarr *ClMeths(t_classid c) { return GetClassArr(c,0); }
+	ItemCont *ThMeths() { return methhead; }
+	static ItemCont *ClMeths(t_classid c) { return GetClassArr(c,0); }
 
-	static void AddMethod(itemarr *ma,int inlet,const char *tag,methfun fun,metharg tp,...); 
+	static void AddMethod(ItemCont *ma,int inlet,const char *tag,methfun fun,metharg tp,...); 
 
-	itemarr *ThAttrs() { return attrhead; }
-	static itemarr *ClAttrs(t_classid c) { return GetClassArr(c,1); }
+	ItemCont *ThAttrs() { return attrhead; }
+	static ItemCont *ClAttrs(t_classid c) { return GetClassArr(c,1); }
 
-	static void AddAttrib(itemarr *aa,itemarr *ma,const char *attr,metharg tp,methfun gfun,methfun sfun);
+	static void AddAttrib(ItemCont *aa,ItemCont *ma,const char *attr,metharg tp,methfun gfun,methfun sfun);
 	void AddAttrib(const char *attr,metharg tp,methfun gfun,methfun sfun);
 	static void AddAttrib(t_classid c,const char *attr,metharg tp,methfun gfun,methfun sfun);
 
@@ -732,33 +757,32 @@ private:
 	typedef bool (*methfun_4)(flext_base *c,t_any &,t_any &,t_any &,t_any &);
 	typedef bool (*methfun_5)(flext_base *c,t_any &,t_any &,t_any &,t_any &,t_any &);
 
-	static itemarr *GetClassArr(t_classid,int ix);
+	static ItemCont *GetClassArr(t_classid,int ix);
 
-	itemarr *methhead,*clmethhead;
-	itemarr *bindhead;
+	ItemCont *methhead,*clmethhead;
+	ItemCont *bindhead;
 	
-	bool CallMeth(const methitem &m,int argc,const t_atom *argv);
+	bool CallMeth(const MethItem &m,int argc,const t_atom *argv);
 	bool FindMeth(int inlet,const t_symbol *s,int argc,const t_atom *argv);
-	bool TryMethTag(const methitem *m,int inlet,const t_symbol *t,int argc,const t_atom *argv);
-	bool TryMethSym(const methitem *m,int inlet,const t_symbol *t,const t_symbol *s);
-	bool TryMethAny(const methitem *m,int inlet,const t_symbol *t,const t_symbol *s,int argc,const t_atom *argv);
+	bool TryMethTag(const MethItem *m,int inlet,const t_symbol *t,int argc,const t_atom *argv);
+	bool TryMethSym(const MethItem *m,int inlet,const t_symbol *t,const t_symbol *s);
+	bool TryMethAny(const MethItem *m,int inlet,const t_symbol *t,const t_symbol *s,int argc,const t_atom *argv);
 
-	itemarr *attrhead,*clattrhead;
+	ItemCont *attrhead,*clattrhead;
+	AttrDataCont *attrdata;
 
-	attritem *FindAttrib(const t_symbol *tag,bool get,bool msg = false) const;
+	AttrItem *FindAttrib(const t_symbol *tag,bool get,bool msg = false) const;
 
 	static int CheckAttrib(int argc,const t_atom *argv);
 	bool InitAttrib(int argc,const t_atom *argv);
 
 	bool ListMethods(int inlet = 0) const;
 	bool ListAttrib() const;
-	bool GetAttrib(attritem *a);
-	bool GetAttrib(attritem *a,AtomList &l) const;
+	bool GetAttrib(AttrItem *a);
+	bool GetAttrib(AttrItem *a,AtomList &l) const;
 	bool SetAttrib(const t_symbol *s,int argc,const t_atom *argv);
-	bool SetAttrib(attritem *a,int argc,const t_atom *argv);
-
-	void SetAttribSave(attritem *a,bool save);
-	bool GetAttribSave(attritem *a) const { return a->IsSaved(); }
+	bool SetAttrib(AttrItem *a,int argc,const t_atom *argv);
+	bool SetAttrib(AttrItem *a,const AtomList &l) { return SetAttrib(a,l.Count(),l.Atoms()); }
 
 	static bool cb_ListMethods(flext_base *c,int argc,const t_atom *argv);
 	static bool cb_ListAttrib(flext_base *c) { return c->ListAttrib(); }
@@ -839,10 +863,10 @@ private:
     public:
 		t_object obj;			// MUST reside at memory offset 0
 		flext_base *base;
-		binditem *item;
+		BindItem *item;
         void *data;
 
-		void init(flext_base *b,binditem *it,void *d) { base = b; item = it; data = d; }
+		void init(flext_base *b,BindItem *it,void *d) { base = b; item = it; data = d; }
 		static void px_method(pxbnd_object *c,const t_symbol *s,int argc,t_atom *argv);
 	};
 	
