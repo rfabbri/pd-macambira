@@ -1,3 +1,9 @@
+pd-externals (0.5-1) unstable; urgency=low
+
+  * added the missing single externals
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue, 10 Jun 2003 22:29:41 +0200
+ 
 pd-externals (0.4-1) unstable; urgency=low
 
   * Update, included pdp 
