@@ -52,6 +52,9 @@ o CodeWarrior: edit "pool.cw" and build
 
 Version history:
 
+0.1.1:
+- attributes (pool,private,echodir,absdir)
+
 0.1.0:
 - first public release
 
@@ -61,5 +64,6 @@ TODO list:
 
 general:
 - speed up the database
+- what is output as value if it is key only? (Max->nothing!)
 
 

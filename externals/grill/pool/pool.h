@@ -11,6 +11,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __POOL_H
 #define __POOL_H
 
+#define FLEXT_ATTRIBUTES 1
+
 #include <flext.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)

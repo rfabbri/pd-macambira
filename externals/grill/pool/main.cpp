@@ -10,7 +10,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "pool.h"
 
-#define POOL_VERSION "0.1.0"
+#define POOL_VERSION "0.1.1"
 
 class pool:
 	public flext_base
@@ -28,15 +28,11 @@ public:
 protected:
 
 	// switch to other pool
-	V m_pool(I argc,const A *argv);
+	V ms_pool(const AtomList &l);
+	V mg_pool(AtomList &l);
 
 	// clear all data in pool
 	V m_reset();
-
-	// output absolute directory paths?
-	V m_absdir(BL abs) { absdir = abs; }
-	// always output current directory
-	V m_echodir(BL e) { echo = e; }
 
 	// handle directories
 	V m_getdir();
@@ -119,10 +115,14 @@ private:
 	static pooldata *GetPool(const S *s);
 	static V RmvPool(pooldata *p);
 
-	FLEXT_CALLBACK_V(m_pool)
+	FLEXT_CALLVAR_V(mg_pool,ms_pool)
+	FLEXT_ATTRVAR_B(absdir)
+	FLEXT_ATTRVAR_B(echo)
+	FLEXT_ATTRGET_B(priv)
+//	FLEXT_ATTRGET_B(curdir)
+
 	FLEXT_CALLBACK(m_reset)
-	FLEXT_CALLBACK_B(m_absdir)
-	FLEXT_CALLBACK_B(m_echodir)
+
 	FLEXT_CALLBACK(m_getdir)
 	FLEXT_CALLBACK_V(m_mkdir)
 	FLEXT_CALLBACK_V(m_chdir)
@@ -191,13 +191,14 @@ pool::pool(I argc,const A *argv):
 	AddOutList();
 	AddOutAnything();
 
-	FLEXT_ADDMETHOD_(0,"pool",m_pool);
+	FLEXT_ADDATTR_VAR("pool",mg_pool,ms_pool);
+	FLEXT_ADDATTR_VAR1("absdir",absdir);
+	FLEXT_ADDATTR_VAR1("echodir",echo);
+	FLEXT_ADDATTR_GET("private",priv);
 
+	FLEXT_ADDMETHOD_(0,"reset",m_reset);
 	FLEXT_ADDMETHOD_(0,"set",m_set);
 	FLEXT_ADDMETHOD_(0,"add",m_add);
-	FLEXT_ADDMETHOD_(0,"reset",m_reset);
-	FLEXT_ADDMETHOD_(0,"absdir",m_absdir);
-	FLEXT_ADDMETHOD_(0,"echodir",m_echodir);
 	FLEXT_ADDMETHOD_(0,"getdir",m_getdir);
 	FLEXT_ADDMETHOD_(0,"mkdir",m_mkdir);
 	FLEXT_ADDMETHOD_(0,"chdir",m_chdir);
@@ -272,16 +273,22 @@ V pool::FreePool()
 	if(clip) { delete clip; clip = NULL; }
 }
 
-V pool::m_pool(I argc,const A *argv) 
+V pool::ms_pool(const AtomList &l) 
 {
 	const S *s = NULL;
-	if(argc > 0) {
-		if(argc > 1) post("%s - pool: superfluous arguments ignored",thisName());
-		s = GetASymbol(argv[0]);
+	if(l.Count()) {
+		if(l.Count() > 1) post("%s - pool: superfluous arguments ignored",thisName());
+		s = GetASymbol(l[0]);
 		if(!s) post("%s - pool: invalid pool name, pool set to private",thisName());
 	}
 
 	SetPool(s);
+}
+
+V pool::mg_pool(AtomList &l)
+{
+	if(priv) l();
+	else { l(1); SetSymbol(l[0],pl->sym); }
 }
 
 V pool::m_reset() 
@@ -548,6 +555,7 @@ I pool::getsub(const S *tag,I level,BL cntonly,const AtomList &rdir)
 				ToOutAnything(3,tag,0,NULL);
 				ToOutList(2,curdir);
 				ToOutList(1,ndir);
+				ToOutBang(0);
 			}
 
 			if(level != 0)
