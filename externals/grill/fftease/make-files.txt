@@ -1,3 +1,7 @@
+NAME=fftease
+
+SRCDIR=src
+
 # all the source files from the package
 SRCS= \
 	makewindows.c fold.c convert.c leanconvert.c fft4.c fft.c \

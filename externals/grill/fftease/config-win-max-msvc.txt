@@ -1,0 +1,12 @@
+# FFTease - A set of Live Spectral Processors
+# Originally written by Eric Lyon and Christopher Penrose for the Max/MSP platform
+# 
+# Copyright (c)Thomas Grill (gr@grrrr.org)
+# For information on usage and redistribution, and for a DISCLAIMER OF ALL
+# WARRANTIES, see the file, "license.txt," in this distribution.  
+#
+#
+# Your settings are defined in the file
+# ..\flext\build\config-win-max-msvc.txt
+#
+# You can override them here.
