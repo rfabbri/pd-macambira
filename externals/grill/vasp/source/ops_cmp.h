@@ -38,8 +38,8 @@ namespace VecOp {
     inline BL d_maxq(OpParam &p) { return D__rop<S,f_maxq<S> >(p); }
     inline BL d_rminq(OpParam &p) { return d__cop<S,f_minq<S> >(p); }
     inline BL d_rmaxq(OpParam &p) { return d__cop<S,f_maxq<S> >(p); }
-    inline BL d_aminq(OpParam &p) { return F__rop<S,f_aminq<S> >(p); }
-    inline BL d_amaxq(OpParam &p) { return F__rop<S,f_amaxq<S> >(p); }
+    inline BL d_aminq(OpParam &p) { return d__rop<S,f_aminq<S> >(p); }
+    inline BL d_amaxq(OpParam &p) { return d__rop<S,f_amaxq<S> >(p); }
 
     inline BL d_gate(OpParam &p) { return D__rbin<S,f_gate<S> >(p); }
     inline BL d_igate(OpParam &p) { return d__rbin<S,f_igate<S> >(p); }

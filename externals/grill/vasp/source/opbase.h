@@ -101,11 +101,11 @@ namespace VaspOp {
 	// -------- transformations -----------------------------------
 
 	// unary functions
-	Vasp *m_run(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun *fun); // real unary (one vec or real)
-	Vasp *m_cun(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun *fun); // complex unary (one vec or complex)
+	Vasp *m_run(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun); // real unary (one vec or real)
+	Vasp *m_cun(OpParam &p,CVasp &src,CVasp *dst,VecOp::opfun fun); // complex unary (one vec or complex)
 	// binary functions
-	Vasp *m_rbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun *fun); // real binary (one vec or real)
-	Vasp *m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun *fun); // complex binary (one vec or complex)
+	Vasp *m_rbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun fun); // real binary (one vec or real)
+	Vasp *m_cbin(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,VecOp::opfun fun); // complex binary (one vec or complex)
 }
 
 #endif

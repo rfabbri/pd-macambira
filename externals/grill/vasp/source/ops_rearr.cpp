@@ -73,11 +73,11 @@ BL VecOp::d_shift(OpParam &p)
 	// do shift
 	if(cnt > 0) {
 		if(p.rss == 1 && p.rds == 1) 
-			_D_LOOP(i,cnt) *(dd++) = *(sd++); _E_LOOP
+			_DE_LOOP(i,cnt, ( *(dd++) = *(sd++) ) )
 		else if(p.rss == -1 && p.rds == -1) 
-			_D_LOOP(i,cnt) *(dd--) = *(sd--); _E_LOOP
+			_DE_LOOP(i,cnt, ( *(dd--) = *(sd--) ) )
 		else 
-			_D_LOOP(i,cnt) *dd = *sd,sd += p.rss,dd += p.rds; _E_LOOP
+			_DE_LOOP(i,cnt, ( *dd = *sd,sd += p.rss,dd += p.rds ) )
 	}
 
 	// fill spaces
@@ -85,11 +85,11 @@ BL VecOp::d_shift(OpParam &p)
 		S vfill = p.sh.fill == 1?0:dd[-p.rds];
 		I aish = abs(ish);
 		if(p.rds == 1) 
-			_D_LOOP(i,aish) *(dd++) = vfill; _E_LOOP
+			_DE_LOOP(i,aish, ( *(dd++) = vfill ) )
 		else if(p.rds == -1) 
-			_D_LOOP(i,aish) *(dd--) = vfill; _E_LOOP
+			_DE_LOOP(i,aish, ( *(dd--) = vfill ) )
 		else 
-			_D_LOOP(i,aish) *dd = vfill,dd += p.rds; _E_LOOP
+			_DE_LOOP(i,aish, ( *dd = vfill,dd += p.rds ) )
 	}
 
 	return true;
@@ -217,19 +217,14 @@ BL VecOp::d_mirr(OpParam &p)
 	
 	if(p.rsdt == p.rddt) {
 		S *dl = p.rddt,*du = p.rddt+(p.frames-1)*p.rds;
-		_D_WHILE(dl < du)
-			register S t;
-			t = *dl; *dl = *du; *du = t;
-			dl += p.rds,du -= p.rds;
-		_E_WHILE
+		register S t;
+		_DE_WHILE(dl < du, ( t = *dl, *dl = *du, *du = t, dl += p.rds,du -= p.rds ) )
 	}
 	else {
 		I i;
 		const S *ds = p.rsdt;
 		S *dd = p.rddt+(p.frames-1)*p.rds;
-		_D_LOOP(i,p.frames) 
-		*dd = *ds,ds += p.rss,dd -= p.rds;
-		_E_LOOP
+		_DE_LOOP(i,p.frames, ( *dd = *ds,ds += p.rss,dd -= p.rds ) )
 	}
 	return true; 
 }

@@ -13,7 +13,43 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "opdefs.h"
 
+
 namespace VecOp {
+
+    // multi-layer templates
+
+    template<class T,V FUN(T &v,T a),I N>
+    static V vec_un(T *v,const T *a,I n = 0) { 
+        const I _n = N?N:n;
+        for(I i = 0; i < _n; ++i) FUN(v[i],a[i]); 
+    }
+
+    template<class T,V FUN(T &v,T a),I N>
+    static V vec_un(T *v,T a,I n = 0) { 
+        const I _n = N?N:n;
+        for(I i = 0; i < _n; ++i) FUN(v[i],a); 
+    }
+
+    template<class T,V FUN(T &v,T a,T b),I N>
+    static V vec_bin(T *v,const T *a,const T *b,I n = 0) { 
+        const I _n = N?N:n;
+        for(I i = 0; i < _n; ++i) FUN(v[i],a[i],b[i]); 
+    }
+
+    template<class T,V FUN(T &v,T a,T b),I N>
+    static V vec_bin(T *v,const T *a,T b,I n = 0) { 
+        const I _n = N?N:n;
+        for(I i = 0; i < _n; ++i) FUN(v[i],a[i],b); 
+    }
+
+
+    template<class T,class CL,I N>
+    static V cvec_un(T *v,const T *a,I n = 0) { vec_un<T,CL::run,N>(v,a,n); }
+
+    template<class T,class CL,I N>
+    static V cvec_bin(T *v,const T *a,const T *b,I n = 0) { vec_bin<T,n,CL::rbin>(v,a,b,n); }
+
+
 
     // assignment
 
@@ -61,7 +97,7 @@ namespace VecOp {
 
         static V cbin(T &rv,T &iv,T ra,T ia,T rb,T ib) 
         { 
-	        register const R den = sqabs(rb,ib);
+	        register const T den = sqabs(rb,ib);
 	        rv = (ra*rb+ia*ib)/den;
 	        iv = (ia*rb-ra*ib)/den;
         }
@@ -73,7 +109,7 @@ namespace VecOp {
 
         static V cbin(T &rv,T &iv,T ra,T ia,T rb,T ib)
         { 
-	        register const R den = sqabs(ra,ia);
+	        register const T den = sqabs(ra,ia);
 	        rv = (rb*ra+ib*ia)/den;
 	        iv = (ib*ra-rb*ia)/den;
         }
@@ -114,7 +150,7 @@ namespace VecOp {
         static V cop(T &rv,T &iv,T ra,T ia,OpParam &p) 
         { 
 	        register const I powi = p.ibin.arg;
-            register S rt,it; f_sqr<T>::cun(rt,it,ra,ia);
+            register T rt,it; f_sqr<T>::cun(rt,it,ra,ia);
             for(I i = 2; i < powi; ++i) f_mul<T>::cbin(rt,it,rt,it,ra,ia);
 	        rv = rt,iv = it;
         } 
@@ -126,9 +162,9 @@ namespace VecOp {
 
         static V cbin(T &rv,T &iv,T ra,T ia,T rb,T) 
         { 
-	        register const R _abs = sqrt(sqabs(ra,ia));
+	        register const T _abs = sqrt(sqabs(ra,ia));
 	        if(_abs) {
-		        register const R _p = pow(_abs,rb)/_abs;
+		        register const T _p = pow(_abs,rb)/_abs;
 		        rv = _p*ra,iv = _p*ia;
 	        }
 	        else
@@ -270,17 +306,23 @@ namespace VecOp {
         } 
     };
 
-    template<class T> V f_aminq(T &,T ra,OpParam &p) 
-    { 
-	    register T s = fabs(ra); 
-	    if(s < p.norm.minmax) p.norm.minmax = s; 
-    } 
+    template<class T> class f_aminq {
+    public: 
+        static V rop(T &,T ra,OpParam &p) 
+        { 
+	        register T s = fabs(ra); 
+	        if(s < p.norm.minmax) p.norm.minmax = s; 
+        } 
+    };
 
-    template<class T> V f_amaxq(T &,T ra,OpParam &p) 
-    { 
-	    register T s = fabs(ra); 
-	    if(s > p.norm.minmax) p.norm.minmax = s; 
-    } 
+    template<class T> class f_amaxq {
+    public: 
+        static V rop(T &,T ra,OpParam &p) 
+        { 
+	        register T s = fabs(ra); 
+	        if(s > p.norm.minmax) p.norm.minmax = s; 
+        } 
+    };
 
 
     // gating
@@ -342,8 +384,8 @@ namespace VecOp {
     public:
         static V cbin(T &rv,T &iv,T ra,T ia,T rb,T) 
         { 
-	        register const R _abs = sqrt(sqabs(ra,ia))+rb;
-	        register const R _phi = arg(ra,ia);
+	        register const T _abs = sqrt(sqabs(ra,ia))+rb;
+	        register const T _phi = arg(ra,ia);
 
 	        rv = _abs*cos(_phi),iv = _abs*sin(_phi);
         } 
@@ -366,7 +408,7 @@ namespace VecOp {
 	        else {
 		        // denormal bashing (doesn't propagate to the next stage)
 
-		        static const F anti_denormal = 1e-18F;
+		        static const T anti_denormal = (T)1.e-18;
 		        a += anti_denormal;
 		        a -= anti_denormal;
 		        v = a; 
@@ -374,5 +416,29 @@ namespace VecOp {
         } 
     };
 }
+
+
+template<class T>
+class VecFun {
+public:
+    // strided real data
+    static BL r_add(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_add<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_sub(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_sub<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_subr(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_subr<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_mul(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_mul<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_div(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_div<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_divr(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_divr<T>::rbin>(sr,rss,dr,rds,len); }
+    static BL r_mod(I len,register T *dr,register const T *sr,I rds = 1,I rss = 1) { return VecOp::V__rbin<T,VecOp::f_mod<T>::rbin>(sr,rss,dr,rds,len); }
+
+    // multi-layer data (non-strided)
+    static BL v_add(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_add<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_sub(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_sub<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_subr(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_subr<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_mul(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_mul<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_div(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_div<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_divr(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_divr<T>::rbin>(layers,sr,dr,ar,len); }
+    static BL v_mod(I len,I layers,register T *dr,register const T *sr,register const T *ar) { return VecOp::V__vbin<T,VecOp::f_mod<T>::rbin>(layers,sr,dr,ar,len); }
+};
+
 
 #endif

@@ -3,6 +3,7 @@ Version history:
 0.1.3:
 - CHANGE: exchanged #defines for templates in vector calculation loops
 - FIX: bug for binary operations of complex vasps
+- ADD: implemented (factor-4) loop unrolling for vector calculation loops
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument

@@ -37,7 +37,7 @@ void permutation1(OpParam &p,int (*origination)(int pos, int sz,OpParam &p))
 		const T *sdt = p.rsdt;
 		const I ss = p.rss;
 		I i;
-		_D_LOOP(i,sz) ddt[origination(i,sz,p)*ds] = sdt[i*ss]; _E_LOOP
+		_DE_LOOP(i,sz, ( ddt[origination(i,sz,p)*ds] = sdt[i*ss] ) )
 	}
 	else {
 		// in place 
@@ -86,9 +86,9 @@ void permutation2(OpParam &p,int (*origination)(int pos, int sz,OpParam &p))
 			const I ss = p.rss;
 			I i;
 			if(ss == 1 && rds == 1)
-				_D_LOOP(i,sz) *(rddt++) = *(sdt++); _E_LOOP
+				_DE_LOOP(i,sz, ( *(rddt++) = *(sdt++) ) )
 			else
-				_D_LOOP(i,sz) *rddt = *sdt,rddt += rds,sdt += ss; _E_LOOP
+				_DE_LOOP(i,sz, ( *rddt = *sdt,rddt += rds,sdt += ss ) )
 			rddt = p.rddt;
 		}
 		else permutation1<T>(p,origination);
@@ -98,9 +98,9 @@ void permutation2(OpParam &p,int (*origination)(int pos, int sz,OpParam &p))
 			const I ss = p.iss;
 			I i;
 			if(ss == 1 && ids == 1)
-				_D_LOOP(i,sz) *(iddt++) = *(sdt++); _E_LOOP
+				_DE_LOOP(i,sz, ( *(iddt++) = *(sdt++) ) )
 			else
-				_D_LOOP(i,sz) *iddt = *sdt,iddt += ids,sdt += ss; _E_LOOP
+				_DE_LOOP(i,sz, ( *iddt = *sdt,iddt += ids,sdt += ss ) )
 			iddt = p.iddt;
 		}
 		else {
