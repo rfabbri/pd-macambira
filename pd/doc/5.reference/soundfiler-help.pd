@@ -29,15 +29,14 @@ prefers.;
 #X text 575 124 -maxsize <maximum number of samples we can resize to>
 ;
 #X text 560 226 Flags for writing:;
-#X text 575 247 -wave \, -nextstep \, -aiff;
-#X text 576 266 -big \, -little (nextstep only!);
-#X text 575 288 -skip <number of sample frames to skip in array>;
-#X text 576 310 -nframes <maximum number to write>;
-#X text 577 354 -normalize;
-#X text 576 332 -bytes <2 \, 3 \, or 4>;
+#X text 578 247 -wave \, -nextstep \, -aiff;
+#X text 579 266 -big \, -little (nextstep only!);
+#X text 578 288 -skip <number of sample frames to skip in array>;
+#X text 579 310 -nframes <maximum number to write>;
+#X text 580 354 -normalize;
+#X text 579 332 -bytes <2 \, 3 \, or 4>;
 #X floatatom 11 337 0 0 0 0 - - -;
 #X msg 15 175 read -resize ../sound/bell.aiff array2;
-#X text 751 539 updated for Pd version 0.29;
 #X msg 17 288 write -nextstep -bytes 4 /tmp/foo3 array1 array2;
 #X msg 16 265 write -wave -nframes 10000 /tmp/foo2 array2;
 #X text 287 150 read a file;
@@ -45,7 +44,7 @@ prefers.;
 #X text 225 217 ...or even overriding everything;
 #X text 283 240 write a file;
 #X text 352 309 write stereo;
-#X text 560 385 The number of channels is limited to 64;
+#X text 557 398 The number of channels is limited to 64;
 #X text 612 433 see also:;
 #X obj 606 456 tabwrite~;
 #X obj 607 480 tabread4~;
@@ -58,10 +57,12 @@ or 4 byte floating point samples in wave \, aiff \, or next formats
 (no floating point aiff \, though.). The number of channels of the
 soundfile need not match the number of arrays given (extras are dropped
 and unsupplied channels are zeroed out.);
+#X text 579 374 -rate <sample rate>;
+#X text 751 539 updated for Pd version 0.37;
 #X connect 2 0 22 0;
 #X connect 3 0 2 0;
 #X connect 4 0 2 0;
 #X connect 5 0 2 0;
 #X connect 23 0 2 0;
+#X connect 24 0 2 0;
 #X connect 25 0 2 0;
-#X connect 26 0 2 0;

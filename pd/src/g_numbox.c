@@ -375,7 +375,7 @@ static void my_numbox_getrect(t_gobj *z, t_glist *glist,
 static void my_numbox_save(t_gobj *z, t_binbuf *b)
 {
     t_my_numbox *x = (t_my_numbox *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
@@ -387,16 +387,14 @@ static void my_numbox_save(t_gobj *z, t_binbuf *b)
 	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 
     }
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiiffiisssiiiiiiifi", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
 		gensym("nbx"), x->x_gui.x_w, x->x_gui.x_h,
 		(float)x->x_min, (float)x->x_max,
-		x->x_lin0_log1, (*ip1)&IEM_INIT_ARGS_ALL,
+		x->x_lin0_log1, iem_symargstoint(&x->x_gui.x_isa),
 		srl[0], srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
 		bflcol[0], bflcol[1], bflcol[2],
 		x->x_val, x->x_log_height);
     binbuf_addv(b, ";");
@@ -758,11 +756,9 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int w=5, h=14;
     int lilo=0, f=0, ldx=0, ldy=-6;
-    int fs=10, iinit=0, ifstyle=0;
+    int fs=10;
     int log_height=256;
     double min=-1.0e+37, max=1.0e+37,v=0.0;
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
     srl[0] = gensym("empty");
@@ -785,7 +781,7 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
 	min = (double)atom_getfloatarg(2, argc, argv);
 	max = (double)atom_getfloatarg(3, argc, argv);
 	lilo = (int)atom_getintarg(4, argc, argv);
-	iinit = (int)atom_getintarg(5, argc, argv);
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(5, argc, argv));
 	srl[0] = atom_getsymbolarg(6, argc, argv);
 	srl[1] = atom_getsymbolarg(7, argc, argv);
 	srl[2] = atom_getsymbolarg(8, argc, argv);
@@ -812,7 +808,7 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	ldx = (int)atom_getintarg(9, argc, argv);
 	ldy = (int)atom_getintarg(10, argc, argv);
-	ifstyle = (int)atom_getintarg(11, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(11, argc, argv));
 	fs = (int)atom_getintarg(12, argc, argv);
 	bflcol[0] = (int)atom_getintarg(13, argc, argv);
 	bflcol[1] = (int)atom_getintarg(14, argc, argv);
@@ -824,12 +820,9 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
         log_height = (int)atom_getintarg(17, argc, argv);
     }
     x->x_gui.x_draw = (t_iemfunptr)my_numbox_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
     if(x->x_gui.x_isa.x_loadinit)
 	x->x_val = v;
     else
@@ -839,14 +832,13 @@ static void *my_numbox_new(t_symbol *s, int argc, t_atom *argv)
     if(log_height < 10)
         log_height = 10;
     x->x_log_height = log_height;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
     x->x_gui.x_unique_num = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     iemgui_first_dollararg2sym(&x->x_gui, srl);
     if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
     x->x_gui.x_snd = srl[0];
@@ -938,8 +930,8 @@ void g_numbox_setup(void)
     my_numbox_widgetbehavior.w_deletefn =     iemgui_delete;
     my_numbox_widgetbehavior.w_visfn =        iemgui_vis;
     my_numbox_widgetbehavior.w_clickfn =      my_numbox_newclick;
-    my_numbox_widgetbehavior.w_propertiesfn = my_numbox_properties;;
-    my_numbox_widgetbehavior.w_savefn =       my_numbox_save;
     class_setwidget(my_numbox_class, &my_numbox_widgetbehavior);
     class_sethelpsymbol(my_numbox_class, gensym("numbox2"));
+    class_setsavefn(my_numbox_class, my_numbox_save);
+    class_setpropertiesfn(my_numbox_class, my_numbox_properties);
 }

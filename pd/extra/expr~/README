@@ -1,8 +1,37 @@
 
-You can get more inofrmation on the expr object at
+You can get more information on the expr object at
 http://www.crca.ucsd.edu/~yadegari/expr.html
 
 -----------
+
+New if Version 0.4
+
+-access to variables (made by value object)
+-multiple expression separated by ;
+-added the following shorthands:
+	$y or $y1 = $y1[-1] and $y2 = $y2[-1]
+-new functions:
+	if - conditional evaluation
+	cbrt - cube root
+	erf - error function
+	erfc - complementary error function
+	expm1 - exponential minus 1,
+	log1p - logarithm of 1 plus
+	isinf - is the value infinite,
+	finite - is the value finite
+	isnan -- is the resut a nan (Not a number)
+	copysign - copy sign of a number
+	ldexp  -  multiply floating-point number by integral power of 2
+	imodf -	get signed integral value from floating-point number
+	modf - get signed fractional value from floating-point number
+	drem - floating-point remainder function
+
+   Thanks to Orm Finnendahl for adding the following functions:
+	fmod - floating-point remainder function
+	ceil - ceiling function: smallest integral value not less than argument 
+	floor - largest integral value not greater than argument
+
+------------
 
 New in Version 0.3
 -Full function functionality
@@ -57,11 +86,12 @@ $x#[n]: the sample from inlet # indexed by n, where n has to
 	satisfy 0 => n >= -vector size,
 	($x# is a shorthand for $x#[0], specifying the current sample)
 
-$y[n]: the output value indexed by n, where n has to
+$y#[n]: the output value indexed by n, where n has to
 	satisfy 0 > n >= -vector size,
+	$y[n] is a shorthand for $y1[n]
 
 
 I'll appreciate hearing about bugs, comments, suggestions, ...
 
 Shahrokh Yadegari (sdy@ucsd.edu)
-1/29/02
+7/10/02

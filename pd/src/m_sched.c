@@ -12,10 +12,15 @@
     rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
 #define TIMEUNITPERSEC (32.*441000.)
 
+
+/* T.Grill - enable PD global thread locking - sys_lock, sys_unlock, sys_trylock functions */
+#define THREAD_LOCKING  
+#include "pthread.h"
+
+
 static int sys_quit;
 static double sys_time;
 static double sys_time_per_msec = TIMEUNITPERSEC / 1000.;
-static double sys_time_per_dsp_tick;
 
 int sys_schedblocksize = DEFDACBLKSIZE;
 int sys_usecsincelastsleep(void);
@@ -128,7 +133,7 @@ static int sys_bin[] = {0, 2, 5, 10, 20, 30, 50, 100, 1000};
 #define NHIST 10
 static int sys_histogram[NHIST][NBIN];
 static double sys_histtime;
-static int sched_diddsp, sched_didmidi, sched_didpoll, sched_didnothing;
+static int sched_diddsp, sched_didpoll, sched_didnothing;
 
 static void sys_clearhist( void)
 {
@@ -136,7 +141,7 @@ static void sys_clearhist( void)
     for (i = 0; i < NHIST; i++)
     	for (j = 0; j < NBIN; j++) sys_histogram[i][j] = 0;
     sys_histtime = sys_getrealtime();
-    sched_diddsp = sched_didmidi = sched_didpoll = sched_didnothing = 0;
+    sched_diddsp = sched_didpoll = sched_didnothing = 0;
 }
 
 void sys_printhist( void)
@@ -159,8 +164,8 @@ void sys_printhist( void)
     	    	sys_histogram[i][7]);
     	}
     }
-    post("dsp %d, midi %d, poll %d, nothing %d",
-    	sched_diddsp, sched_didmidi, sched_didpoll, sched_didnothing);
+    post("dsp %d, pollgui %d, nothing %d",
+    	sched_diddsp, sched_didpoll, sched_didnothing);
 }
 
 static int sys_histphase;
@@ -238,7 +243,8 @@ void sys_log_error(int type)
     oss_resync[oss_resyncphase].r_error = type;
     oss_nresync++;
     if (++oss_resyncphase == NRESYNC) oss_resyncphase = 0;
-    if (type != ERR_NOTHING && !sched_diored)
+    if (type != ERR_NOTHING && !sched_diored &&
+    	(sched_diddsp >= sched_dioredtime))
     {
     	sys_vgui("pdtk_pd_dio 1\n");
 	sched_diored = 1;
@@ -322,13 +328,42 @@ void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
 
 void dsp_tick(void);
 
-static int m_nodacs = 0;
+static int sched_usedacs = 1;
+static double sched_referencerealtime, sched_referencelogicaltime;
+static double sys_time_per_dsp_tick;
 
-    /* this must be called earlier than any patches are loaded */
-void m_schedsetsr( void)
+void sched_set_using_dacs(int flag)
 {
-    sys_time_per_dsp_tick =
-    	(TIMEUNITPERSEC) * ((double)sys_schedblocksize) / sys_dacsr;
+    sched_usedacs = flag;
+    if (!flag)
+    {
+    	sched_referencerealtime = sys_getrealtime();
+	sched_referencelogicaltime = clock_getlogicaltime();
+    }
+    sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
+    	((double)sys_schedblocksize) / sys_dacsr;
+}
+
+    /* take the scheduler forward one DSP tick, also handling clock timeouts */
+static void sched_tick(double next_sys_time)
+{
+    int countdown = 5000;
+    while (clock_setlist && clock_setlist->c_settime < next_sys_time)
+    {
+    	t_clock *c = clock_setlist;
+    	sys_time = c->c_settime;
+    	clock_unset(clock_setlist);
+	outlet_setstacklim();
+    	(*c->c_fn)(c->c_owner);
+	if (!countdown--)
+	{
+	    countdown = 5000;
+	    sys_pollgui();
+	}
+    }
+    sys_time = next_sys_time;
+    dsp_tick();
+    sched_diddsp++;
 }
 
 /*
@@ -339,26 +374,30 @@ lower priority than the rest.
 
 The time source is normally the audio I/O subsystem via the "sys_send_dacs()"
 call.  This call returns true if samples were transferred; false means that
-the audio I/O system is still bussy with previous transfers.
-The sys_send_dacs call is OS dependent and is variously implemented in
-s_linux.c, s_nt.c, and s_sgi.c.  
+the audio I/O system is still busy with previous transfers.
 */
 
 void sys_pollmidiqueue( void);
 void sys_initmidiqueue( void);
 
-int m_scheduler(int nodacs)
+int m_scheduler( void)
 {
-    int lasttimeforward = SENDDACS_YES;
     int idlecount = 0;
-    double lastdactime = 0;
     sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
     	((double)sys_schedblocksize) / sys_dacsr;
+
+#ifdef THREAD_LOCKING
+    /* T.Grill - lock mutex */
+	sys_lock();
+#endif
+
     sys_clearhist();
-    m_nodacs = nodacs;
     if (sys_sleepgrain < 1000)
-    	sys_sleepgrain = (sys_schedadvance >= 4000? 
-    	    (sys_schedadvance >> 2) : 1000);
+    	sys_sleepgrain = sys_schedadvance/4;
+    if (sys_sleepgrain < 100)
+    	sys_sleepgrain = 100;
+    else if (sys_sleepgrain > 5000)
+    	sys_sleepgrain = 5000;
     sys_initmidiqueue();
     while (1)
     {
@@ -366,23 +405,14 @@ int m_scheduler(int nodacs)
     	int timeforward;
 
     	sys_addhist(0);
-    	if (m_nodacs)
-    	{
-    	    double elapsed = sys_getrealtime() - lastdactime;
-    	    static double next = 0;
-    	    if (elapsed > next)
-    	    {
-    	    	timeforward = SENDDACS_YES;
-    	    	next += (double)sys_schedblocksize / sys_dacsr;
-    	    }
-    	    else timeforward = SENDDACS_NO;
-    	}
-    	else
+    waitfortick:
+    	if (sched_usedacs)
     	{
     	    timeforward = sys_send_dacs();
 
     		/* if dacs remain "idle" for 1 sec, they're hung up. */
-    	    if (timeforward != 0) idlecount = 0;
+    	    if (timeforward != 0)
+	    	idlecount = 0;
     	    else
     	    {
     		idlecount++;
@@ -396,42 +426,26 @@ int m_scheduler(int nodacs)
     	    	    else if (sys_getrealtime() - idletime > 1.)
     	    	    {
     	    		post("audio I/O stuck... closing audio\n");
-    	    		m_nodacs = 1;
     	    		sys_close_audio();
-    	    		lastdactime = sys_getrealtime();
+			sched_set_using_dacs(0);
+			goto waitfortick;
     	    	    }
     	    	}
     	    }
     	}
+    	else
+    	{
+    	    if (1000. * (sys_getrealtime() - sched_referencerealtime)
+	    	> clock_gettimesince(sched_referencelogicaltime))
+            	    timeforward = SENDDACS_YES;
+    	    else timeforward = SENDDACS_NO;
+    	}
     	sys_setmiditimediff(0, 1e-6 * sys_schedadvance);
-	lasttimeforward = timeforward;
     	sys_addhist(1);
     	if (timeforward != SENDDACS_NO)
-    	{
-    	    /* time has moved forward.  Check MIDI and clocks */
-    	    
-    	    double next_sys_time = sys_time + sys_time_per_dsp_tick;
-	    int countdown = 5000;
-    	    while (clock_setlist && clock_setlist->c_settime < next_sys_time)
-    	    {
-    	    	t_clock *c = clock_setlist;
-    	    	sys_time = c->c_settime;
-    	    	clock_unset(clock_setlist);
-		outlet_setstacklim();
-    	    	(*c->c_fn)(c->c_owner);
-		if (!countdown--)
-		{
-		    countdown = 5000;
-		    sys_pollgui();
-		}
-    	    }
-    	    sys_time = next_sys_time;
-    	    if (sys_quit) break;
-    	    dsp_tick();
-    	    if (timeforward != SENDDACS_SLEPT)
-	    	didsomething = 1;
-	    sched_diddsp++;
-    	}
+	    sched_tick(sys_time + sys_time_per_dsp_tick);
+    	if (timeforward == SENDDACS_YES)
+	    didsomething = 1;
 
     	sys_addhist(2);
     	sys_pollmidiqueue();
@@ -445,15 +459,72 @@ int m_scheduler(int nodacs)
 	    /* test for idle; if so, do graphics updates. */
     	if (!didsomething)
     	{
-	    sched_pollformeters();
-	    sys_reportidle();
+    	    sched_pollformeters();
+    	    sys_reportidle();
+
+#ifdef THREAD_LOCKING
+            /* T.Grill - enter idle phase -> unlock thread lock */
+            sys_unlock();
+#endif
     	    if (timeforward != SENDDACS_SLEPT)
-	    	sys_microsleep(sys_sleepgrain);
+    	    	sys_microsleep(sys_sleepgrain);
+#ifdef THREAD_LOCKING
+            /* T.Grill - leave idle phase -> lock thread lock */
+	    sys_lock();
+#endif
+
     	    sys_addhist(5);
-	    sched_didnothing++;
+    	    sched_didnothing++;
+
     	}
     }
+
+#ifdef THREAD_LOCKING
+    /* T.Grill - done */
+    sys_unlock();
+#endif
+
     return (0);
 }
 
 
+/* ------------ thread locking ------------------- */
+/* added by Thomas Grill */
+
+#ifdef THREAD_LOCKING
+static pthread_mutex_t sys_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void sys_lock(void)
+{
+    pthread_mutex_lock(&sys_mutex);
+}
+
+void sys_unlock(void)
+{
+    pthread_mutex_unlock(&sys_mutex);
+}
+
+int sys_trylock(void)
+{
+    return pthread_mutex_trylock(&sys_mutex);
+}
+
+#else
+
+void sys_lock(void) {}
+void sys_unlock(void) {}
+int sys_trylock(void) {}
+
+#endif
+
+
+/* ------------ soft quit ------------------- */
+/* added by Thomas Grill - 
+	just set the quit flag for the scheduler loop
+	this is useful for applications using the PD shared library to signal the scheduler to terminate
+*/
+
+void sys_exit(void)
+{
+	sys_quit = 1;
+}

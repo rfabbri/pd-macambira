@@ -1,20 +1,23 @@
+#N struct template1 float x float y float z float q;
 #N canvas 363 11 579 461 12;
 #N canvas 13 22 297 180 data 1;
+#X scalar template1 50 100 30 9 \;;
+#X scalar template1 150 100 -20 900 \;;
 #X restore 60 347 pd data;
 #N canvas 10 274 550 324 template1 1;
 #X obj 60 46 filledpolygon 244 q 5 0 0 20 z 40 0;
-#X obj 60 21 template float x float y float z float q;
-#X text 3 67 This subpatch acts as a template which describes the data
-structure. The "template" specifies four floating point values named
-x \, y \, z \, and q. The "filledpolygon" is a drawing instruction.
-Templates should have only one template object but may have any number
-of drawing instructions.;
 #X text 4 164 The filledpolygon's arguments are interior color \, border
 color \, border width \, and then the points of the polygon. Arguments
 which are symbols ("q" and "z" in this case) mean to take the values
 from the data structure. Other values are constant. The position of
 the object is automatically controlled by fields named "x" and "y".
 ;
+#X obj 60 21 struct template1 float x float y float z float q;
+#X text 3 67 This subpatch acts as a template which describes the data
+structure. The "struct" specifies four floating point values named
+x \, y \, z \, and q. The "filledpolygon" is a drawing instruction.
+Templates should have only one template object but may have any number
+of drawing instructions.;
 #X restore 60 371 pd template1;
 #N canvas 0 0 440 292 stuff 0;
 #X obj 235 185 pointer;

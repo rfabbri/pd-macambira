@@ -133,8 +133,6 @@
 #X text 399 79 4: high frequency damping \, 0-100;
 #X text 400 62 3: crossover frequency in Hz. (3000 default);
 #X text 400 45 2: liveness \, 0-100 \, usually between 85 and 100;
-#X floatatom 437 260 5 0 0 0 - - -;
-#X floatatom 711 332 5 0 0 0 - - -;
 #X connect 0 0 9 0;
 #X connect 0 0 7 0;
 #X connect 1 0 38 0;
@@ -188,7 +186,6 @@
 #X connect 28 0 72 0;
 #X connect 29 0 16 0;
 #X connect 30 0 17 0;
-#X connect 30 0 80 0;
 #X connect 31 0 49 0;
 #X connect 34 0 30 0;
 #X connect 35 0 34 0;

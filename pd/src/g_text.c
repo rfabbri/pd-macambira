@@ -457,14 +457,19 @@ static t_symbol *gatom_realizedollar(t_gatom *x, t_symbol *s)
 
 static void gatom_set(t_gatom *x, t_symbol *s, int argc, t_atom *argv)
 {
+    t_atom oldatom = x->a_atom;
+    int update = 0;
     if (!argc) return;
     if (x->a_atom.a_type == A_FLOAT)
-    	x->a_atom.a_w.w_float = atom_getfloat(argv);
+    	x->a_atom.a_w.w_float = atom_getfloat(argv),
+	    update = (x->a_atom.a_w.w_float != oldatom.a_w.w_float);
     else if (x->a_atom.a_type == A_SYMBOL)
-    	x->a_atom.a_w.w_symbol = atom_getsymbol(argv);
+    	x->a_atom.a_w.w_symbol = atom_getsymbol(argv),
+	    update = (x->a_atom.a_w.w_symbol != oldatom.a_w.w_symbol);
     binbuf_clear(x->a_text.te_binbuf);
     binbuf_add(x->a_text.te_binbuf, 1, &x->a_atom);
-    glist_retext(x->a_glist, &x->a_text);
+    if (update)
+    	glist_retext(x->a_glist, &x->a_text);
     x->a_buf[0] = 0;
 }
 
@@ -1010,7 +1015,7 @@ static int text_click(t_gobj *z, struct _glist *glist,
     else return (0);
 }
 
-static void text_save(t_gobj *z, t_binbuf *b)
+void text_save(t_gobj *z, t_binbuf *b)
 {
     t_text *x = (t_text *)z;
     if (x->te_type == T_OBJECT)
@@ -1076,8 +1081,6 @@ t_widgetbehavior text_widgetbehavior =
     text_delete,
     text_vis,
     text_click,
-    text_save,
-    0,
 };
 
 static t_widgetbehavior gatom_widgetbehavior =
@@ -1089,8 +1092,6 @@ static t_widgetbehavior gatom_widgetbehavior =
     text_delete,
     gatom_vis,
     text_click,
-    text_save,
-    gatom_properties,
 };
 
 /* -------------------- the "text" class  ------------ */
@@ -1305,6 +1306,7 @@ void g_text_setup(void)
     class_addmethod(gatom_class, (t_method)gatom_param, gensym("param"),
     	A_GIMME, 0);
     class_setwidget(gatom_class, &gatom_widgetbehavior);
+    class_setpropertiesfn(gatom_class, gatom_properties);
 }
 
 

@@ -54,12 +54,18 @@ extern int sys_sleepgrain;
 void sys_open_audio(int naudioindev, int *audioindev,
     int nchindev, int *chindev,
     int naudiooutdev, int *audiooutdev, int nchoutdev, int *choutdev,
-    int srate); /* IOhannes */
+    int srate, int advance, int enable);
 void sys_close_audio(void);
 
-void sys_open_midi(int nmidiin, int *midiinvec,
+    /* s_midi.c */
+void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec);
+
+    /* implemented in the system dependent MIDI code (s_midi_pm.c, etc. ) */
+void sys_do_open_midi(int nmidiin, int *midiinvec,
     int nmidiout, int *midioutvec);
 void sys_close_midi(void);
+void midi_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int maxndev, int devdescsize);
 
 int sys_send_dacs(void);
 void sys_reportidle(void);
@@ -90,6 +96,7 @@ EXTERN void sys_log_error(int type);
 #define ERR_DACSLEPT 2
 #define ERR_RESYNC 3
 #define ERR_DATALATE 4
+void sched_set_using_dacs(int flag);
 
 /* s_inter.c */
 
@@ -122,6 +129,7 @@ void sys_setvirtualalarm( void);
 #define API_OSS 2
 #define API_MMIO 3
 #define API_PORTAUDIO 4
+#define API_JACK 5
 
 #ifdef __linux__
 #define API_DEFAULT API_OSS
@@ -135,9 +143,19 @@ void sys_setvirtualalarm( void);
 #define API_DEFAULT API_PORTAUDIO
 #define API_DEFSTRING "portaudio"
 #endif
-#define DEFAULTAUDIODEV -1
+#define DEFAULTAUDIODEV 0
 
-#define DEFMIDIDEV -1
+#define MAXAUDIOINDEV 4
+#define MAXAUDIOOUTDEV 4
+
+#define DEFMIDIDEV 0
+
+#define DEFAULTSRATE 44100
+#ifdef MSW
+#define DEFAULTADVANCE 70
+#else
+#define DEFAULTADVANCE 50
+#endif
 
 int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
     t_sample *soundout, int framesperbuf, int nbuffers,
@@ -146,6 +164,9 @@ void pa_close_audio(void);
 int pa_send_dacs(void);
 void sys_reportidle(void);
 void pa_listdevs(void);
+void pa_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize);
 
 int oss_open_audio(int naudioindev, int *audioindev, int nchindev,
     int *chindev, int naudiooutdev, int *audiooutdev, int nchoutdev,
@@ -153,13 +174,25 @@ int oss_open_audio(int naudioindev, int *audioindev, int nchindev,
 void oss_close_audio(void);
 int oss_send_dacs(void);
 void oss_reportidle(void);
-void oss_listdevs(void);
+void oss_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize);
 
-int alsa_open_audio(int wantinchans, int wantoutchans, int srate);
+int alsa_open_audio(int naudioindev, int *audioindev, int nchindev,
+    int *chindev, int naudiooutdev, int *audiooutdev, int nchoutdev,
+    int *choutdev, int rate);
 void alsa_close_audio(void);
 int alsa_send_dacs(void);
 void alsa_reportidle(void);
-void alsa_listdevs(void);
+void alsa_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize);
+
+int jack_open_audio(int wantinchans, int wantoutchans, int srate);
+void jack_close_audio(void);
+int jack_send_dacs(void);
+void jack_reportidle(void);
+void jack_listdevs(void);
 
 void mmio_open_audio(int naudioindev, int *audioindev,
     int nchindev, int *chindev, int naudiooutdev, int *audiooutdev,
@@ -167,13 +200,16 @@ void mmio_open_audio(int naudioindev, int *audioindev,
 void mmio_close_audio( void);
 void mmio_reportidle(void);
 int mmio_send_dacs(void);
-void mmio_listdevs(void);
+void mmio_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize);
 
 void sys_listmididevs(void);
-void sys_set_sound_api(int whichapi);
+void sys_set_audio_api(int whichapi);
+void sys_get_audio_apis(char *buf);
 extern int sys_audioapi;
+void sys_set_audio_state(int onoff);
 
 /* API dependent audio flags and settings */
 void oss_set32bit( void);
 void linux_alsa_devname(char *devname);
-

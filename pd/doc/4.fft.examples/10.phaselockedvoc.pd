@@ -91,10 +91,10 @@
 #X obj 516 515 tabread4~ sample;
 #X obj 145 422 -~;
 #X obj 249 385 r lock;
-#X obj 162 291 ../../extra/lrshift~ 1;
-#X obj 154 315 ../../extra/lrshift~ -1;
-#X obj 227 339 ../../extra/lrshift~ 1;
-#X obj 219 363 ../../extra/lrshift~ -1;
+#X obj 162 291 lrshift~ 1;
+#X obj 154 315 lrshift~ -1;
+#X obj 227 339 lrshift~ 1;
+#X obj 219 363 lrshift~ -1;
 #X obj 210 432 -~;
 #X obj 161 397 *~ 0;
 #X obj 226 408 *~ 0;

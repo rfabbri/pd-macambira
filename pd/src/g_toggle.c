@@ -202,20 +202,18 @@ static void toggle_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *x
 static void toggle_save(t_gobj *z, t_binbuf *b)
 {
     t_toggle *x = (t_toggle *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiisssiiiiiiiff", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix,
 		(t_int)x->x_gui.x_obj.te_ypix,
 		gensym("tgl"), x->x_gui.x_w,
-		(*ip1)&IEM_INIT_ARGS_ALL,
+		iem_symargstoint(&x->x_gui.x_isa),
 		srl[0], srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
 		bflcol[0], bflcol[1], bflcol[2], x->x_on, x->x_nonzero);
     binbuf_addv(b, ";");
 }
@@ -367,12 +365,12 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, f=0;
     int ldx=0, ldy=-6;
-    int fs=8, iinit=0, ifstyle=0;
+    int fs=8;
     float on=0.0, nonzero=1.0;
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
+    iem_inttosymargs(&x->x_gui.x_isa, 0);
+    iem_inttofstyle(&x->x_gui.x_fsf, 0);
     srl[0] = gensym("empty");
     srl[1] = gensym("empty");
     srl[2] = gensym("empty");
@@ -387,7 +385,7 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
        &&IS_A_FLOAT(argv,10)&&IS_A_FLOAT(argv,11)&&IS_A_FLOAT(argv,12))
     {
 	a = (int)atom_getintarg(0, argc, argv);
-	iinit = (int)atom_getintarg(1, argc, argv);
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(1, argc, argv));
 	if(IS_A_SYMBOL(argv,2))
 	    srl[0] = atom_getsymbolarg(2, argc, argv);
 	else if(IS_A_FLOAT(argv,2))
@@ -411,7 +409,7 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	ldx = (int)atom_getintarg(5, argc, argv);
 	ldy = (int)atom_getintarg(6, argc, argv);
-	ifstyle = (int)atom_getintarg(7, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(7, argc, argv));
 	fs = (int)atom_getintarg(8, argc, argv);
 	bflcol[0] = (int)atom_getintarg(9, argc, argv);
 	bflcol[1] = (int)atom_getintarg(10, argc, argv);
@@ -421,21 +419,17 @@ static void *toggle_new(t_symbol *s, int argc, t_atom *argv)
     if((argc == 14)&&IS_A_FLOAT(argv,13))
 	nonzero = (float)atom_getfloatarg(13, argc, argv);
     x->x_gui.x_draw = (t_iemfunptr)toggle_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
 
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
     x->x_gui.x_unique_num = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     x->x_nonzero = (nonzero!=0.0)?nonzero:1.0;
     if(x->x_gui.x_isa.x_loadinit)
 	x->x_on = (on!=0.0)?nonzero:0.0;
@@ -498,8 +492,8 @@ void g_toggle_setup(void)
     toggle_widgetbehavior.w_deletefn = iemgui_delete;
     toggle_widgetbehavior.w_visfn = iemgui_vis;
     toggle_widgetbehavior.w_clickfn = toggle_newclick;
-    toggle_widgetbehavior.w_propertiesfn = toggle_properties;
-    toggle_widgetbehavior.w_savefn = toggle_save;
     class_setwidget(toggle_class, &toggle_widgetbehavior);
     class_sethelpsymbol(toggle_class, gensym("toggle"));
+    class_setsavefn(toggle_class, toggle_save);
+    class_setpropertiesfn(toggle_class, toggle_properties);
 }

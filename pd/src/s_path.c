@@ -212,32 +212,15 @@ int open_via_path(const char *dir, const char *name, const char* ext,
     return (-1);
 }
 
-    /* LATER make this use open_via_path above. */
-void open_via_helppath(const char *name, const char *dir)
+static int do_open_via_helppath(const char *realname, t_namelist *listp)
 {
-    t_namelist *nl, thislist, *listp;
+    t_namelist *nl;
     int fd = -1;
-    char dirresult[MAXPDSTRING], realdir[MAXPDSTRING], dirbuf2[MAXPDSTRING],
-    	realname[MAXPDSTRING];
-
-    	/* if directory is supplied, put it at head of search list. */
-    if (*dir)
-    {
-        thislist.nl_string = dirbuf2;
-	thislist.nl_next = pd_helppath;
-	strncpy(dirbuf2, dir, MAXPDSTRING);
-	dirbuf2[MAXPDSTRING-1] = 0;
-	sys_unbashfilename(dirbuf2, dirbuf2);
-	listp = &thislist;
-    }
-    else listp = pd_helppath;
-    strcpy(realname, "help-");
-    strncat(realname, name, MAXPDSTRING-5);
-    realname[MAXPDSTRING-1] = 0;
+    char dirresult[MAXPDSTRING], realdir[MAXPDSTRING];
     for (nl = listp; nl; nl = nl->nl_next)
     {
 	strcpy(dirresult, nl->nl_string);
-	strcpy(realdir,dirresult);
+	strcpy(realdir, dirresult);
 	if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
 	       strcat(dirresult, "/");
 	strcat(dirresult, realname);
@@ -267,7 +250,7 @@ void open_via_helppath(const char *name, const char *dir)
 		sys_unbashfilename(dirresult, dirresult);
 		close (fd);
 		glob_evalfile(0, gensym((char*)realname), gensym(realdir));
-		return;
+		return (1);
 	    }
 	}
 	else
@@ -275,12 +258,54 @@ void open_via_helppath(const char *name, const char *dir)
 	    if (sys_verbose) post("tried %s and failed", dirresult);
 	}
     }
-    post("sorry, couldn't find help for \"%s\"", name);
+    return (0);
+}
+
+    /* LATER make this use open_via_path above.  We expect the ".pd"
+    suffix here, even though we have to tear it back off for one of the
+    search attempts. */
+void open_via_helppath(const char *name, const char *dir)
+{
+    t_namelist *nl, thislist, *listp;
+    int fd = -1;
+    char dirbuf2[MAXPDSTRING], realname[MAXPDSTRING];
+
+    	/* if directory is supplied, put it at head of search list. */
+    if (*dir)
+    {
+        thislist.nl_string = dirbuf2;
+	thislist.nl_next = pd_helppath;
+	strncpy(dirbuf2, dir, MAXPDSTRING);
+	dirbuf2[MAXPDSTRING-1] = 0;
+	sys_unbashfilename(dirbuf2, dirbuf2);
+	listp = &thislist;
+    }
+    else listp = pd_helppath;
+    	/* 1. "objectname-help.pd" */
+    strncpy(realname, name, MAXPDSTRING-10);
+    realname[MAXPDSTRING-10] = 0;
+    if (strlen(realname) > 3 && !strcmp(realname+strlen(realname)-3, ".pd"))
+    	realname[strlen(realname)-3] = 0;
+    strcat(realname, "-help.pd");
+    if (do_open_via_helppath(realname, listp))
+    	return;
+    	/* 2. "help-objectname.pd" */
+    strcpy(realname, "help-");
+    strncat(realname, name, MAXPDSTRING-10);
+    realname[MAXPDSTRING-1] = 0;
+    if (do_open_via_helppath(realname, listp))
+    	return;
+    	/* 3. "objectname.pd" */
+    if (do_open_via_helppath(name, listp))
+    	return;
+    post("sorry, couldn't find help patch for \"%s\"", name);
     return;
 }
 
 
-/* Startup file reading for linux and MACOSX */
+/* Startup file reading for linux and MACOSX.  This should be replaced by
+a better mechanism.  This should be integrated with the audio, MIDI, and
+path dialog system. */
 
 #ifdef UNIX
 
@@ -297,13 +322,13 @@ int sys_rcfile(void)
     int rcargc;
     char* rcargv[NUMARGS];
     char* buffer;
-    char  fname[MAXPDSTRING], buf[1000];
+    char  fname[MAXPDSTRING], buf[1000], *home = getenv("HOME");
 
     /* parse a startup file */
     
     *fname = '\0'; 
 
-    strncat(fname, getenv("HOME"), MAXPDSTRING-10);
+    strncat(fname, home? home : ".", MAXPDSTRING-10);
     strcat(fname, "/");
 
     strcat(fname, STARTUPNAME);
@@ -351,5 +376,35 @@ int sys_rcfile(void)
     return (0);
 }
 #endif /* UNIX */
+
+    /* start an audio settings dialog window */
+void glob_start_path_dialog(t_pd *dummy, t_floatarg flongform)
+{
+    char buf[MAXPDSTRING];
+    int i;
+    t_namelist *nl;
+    
+    for (nl = pd_path, i = 0; nl && i < 10; nl = nl->nl_next, i++)
+	sys_vgui("pd_set pd_path%d \"%s\"\n", i, nl->nl_string);
+    for (; i < 10; i++)
+	sys_vgui("pd_set pd_path%d \"\"\n", i);
+
+    sprintf(buf, "pdtk_path_dialog %%s\n");
+    gfxstub_new(&glob_pdobject, glob_start_path_dialog, buf);
+}
+
+    /* new values from dialog window */
+void glob_path_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
+{
+    int i;
+    namelist_free(pd_path);
+    pd_path = 0;
+    for (i = 0; i < argc; i++)
+    {
+    	t_symbol *s = atom_getsymbolarg(i, argc, argv);
+	if (*s->s_name)
+    	    sys_addpath(s->s_name);
+    }
+}
 
 

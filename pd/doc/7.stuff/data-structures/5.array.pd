@@ -1,20 +1,26 @@
+#N struct template5 float x float y float z float q array bazoo template5-element
+;
+#N struct template5-element float y;
 #N canvas 67 294 709 456 12;
 #X obj 235 323 pointer;
-#X floatatom 232 183 0 0 0;
+#X floatatom 232 183 0 0 0 0 - - -;
 #X msg 235 300 bang;
-#X floatatom 15 200 0 0 0;
-#X floatatom 17 350 0 0 0;
-#X floatatom 235 369 0 0 0;
-#X floatatom 451 276 0 0 0;
+#X floatatom 15 200 0 0 0 0 - - -;
+#X floatatom 17 350 0 0 0 0 - - -;
+#X floatatom 235 369 0 0 0 0 - - -;
+#X floatatom 451 276 0 0 0 0 - - -;
 #X obj 451 229 pointer;
 #X obj 318 163 pointer;
 #X msg 449 194 bang;
 #N canvas 0 0 384 196 data5 1;
+#X scalar template5 50 150 30 9 \; 0 \; 0 \; 0 \; 0 \; 0 \; 3 \; 0
+\; 0 \; 0 \; 7 \; -30 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0
+\; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \;
+0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 43 \; 0
+\; 0 \; 0 \; 0 \; \;;
 #X restore 508 314 pd data5;
-#N canvas 5 272 431 226 template5 0;
+#N canvas 5 272 646 260 template5 1;
 #X obj 8 91 filledpolygon 244 q 3 0 0 20 z 40 0;
-#X obj 6 8 template float x float y float z float q array bazoo template5-element
-;
 #X obj 8 113 plot bazoo 700 3 30 10 4;
 #X text 6 44 this declares an array named "bazoo" whose elements are
 described by "template5-element." Array declarations take three arguments
@@ -24,13 +30,15 @@ while "float" declarations take only two.;
 spaced 4 apart.;
 #X text 7 186 You can also do (x \, y) plots and/or make the line thickness
 variable---see the help window for "plot".;
+#X obj 6 8 struct template5 float x float y float z float q array bazoo
+template5-element;
 #X restore 508 337 pd template5;
-#N canvas 65 248 442 101 template5-element 0;
-#X obj 35 11 template float y;
+#N canvas 65 248 568 128 template5-element 0;
 #X text 12 36 This says that array elements will have a single floating-point
 number named "y". The variable name "y" is automatically assumed to
 control screen height \; if you don't have at least that variable you
 can't plot the array..;
+#X obj 35 11 struct template5-element float y;
 #X restore 508 360 pd template5-element;
 #N canvas 515 84 589 429 stuff 0;
 #X obj 354 163 pointer;
@@ -45,8 +53,8 @@ can't plot the array..;
 #X obj 137 23 loadbang;
 #X msg 134 140 50 150 30 9;
 #X obj 134 191 t b b p;
-#X floatatom 68 327 0 0 0;
-#X floatatom 14 332 0 0 0;
+#X floatatom 68 327 0 0 0 0 - - -;
+#X floatatom 14 332 0 0 0 0 - - -;
 #X obj 14 376 set template5-element y;
 #X obj 68 350 element template5 bazoo;
 #X obj 20 303 unpack;

@@ -288,7 +288,6 @@ static t_scalar *template_conformscalar(t_template *tfrom, t_template *tto,
     	/* possibly replace the scalar */
     if (scfrom->sc_template == tfrom->t_sym)
     {
-    	post("match");
     	    /* see scalar_new() for comment about the gpointer. */
 	gpointer_init(&gp);
 	x = (t_scalar *)getbytes(sizeof(t_scalar) +
@@ -435,10 +434,10 @@ void template_conform(t_template *tfrom, t_template *tto)
     if (doit)
     {
     	t_glist *gl;
-    	post("conforming template '%s' to new structure",
+    	/* post("conforming template '%s' to new structure",
 	    tfrom->t_sym->s_name);
 	for (i = 0; i < nto; i++)
-	    post("... %d", conformaction[i]);
+	    post("... %d", conformaction[i]); */
     	for (gl = canvas_list; gl; gl = gl->gl_next)
     	    template_conformglist(tfrom, tto, gl, conformaction);
     }

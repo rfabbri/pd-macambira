@@ -74,18 +74,6 @@ int gobj_click(t_gobj *x, struct _glist *glist,
     else return (0);
 }
 
-void gobj_save(t_gobj *x, t_binbuf *b)
-{
-    if (x->g_pd->c_wb && x->g_pd->c_wb->w_savefn)
-    	(*x->g_pd->c_wb->w_savefn)(x, b);
-}
-
-void gobj_properties(t_gobj *x, struct _glist *glist)
-{
-    if (x->g_pd->c_wb && x->g_pd->c_wb->w_propertiesfn)
-    	(*x->g_pd->c_wb->w_propertiesfn)(x, glist);
-}
-
 /* ------------------------ managing the selection ----------------- */
 
 void glist_selectline(t_glist *x, t_outconnect *oc, int index1,
@@ -794,7 +782,7 @@ static t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
 static void canvas_rightclick(t_canvas *x, int xpos, int ypos, t_gobj *y)
 {
     int canprop, canopen;
-    canprop = (!y || (y && y->g_pd->c_wb && y->g_pd->c_wb->w_propertiesfn));
+    canprop = (!y || (y && class_getpropertiesfn(pd_class(&y->g_pd))));
     canopen = (y && zgetfn(&y->g_pd, gensym("menu-open")));
     sys_vgui("pdtk_canvas_popup .x%x %d %d %d %d\n",
     	x, xpos, ypos, canprop, canopen);
@@ -906,9 +894,9 @@ static void canvas_done_popup(t_canvas *x, float which, float xpos, float ypos)
 	{
     	    if (which == 0) 	/* properties */
 	    {
-		if (!y->g_pd->c_wb || !y->g_pd->c_wb->w_propertiesfn)
+		if (!class_getpropertiesfn(pd_class(&y->g_pd)))
 		    continue;
-		gobj_properties(y, x);
+    	    	(*class_getpropertiesfn(pd_class(&y->g_pd)))(y, x);
 		return;
 	    }
 	    else if (which == 1)    /* open */
@@ -1576,7 +1564,6 @@ static void canvas_menufont(t_canvas *x)
 static int canvas_find_index1, canvas_find_index2;
 static t_binbuf *canvas_findbuf;
 int binbuf_match(t_binbuf *inbuf, t_binbuf *searchbuf);
-t_gobj *canvas_selectme; /* HACK */
 
     /* find an atom or string of atoms */
 static int canvas_dofind(t_canvas *x, int *myindex1p)
@@ -1600,33 +1587,9 @@ static int canvas_dofind(t_canvas *x, int *myindex1p)
 			canvas_find_index1 = myindex1;
 			canvas_find_index2 = myindex2;
 			glist_noselect(x);
-			if (glist_isvisible(x))
-			{
-#ifdef MSW
-    	    	    	    	/* For windows canvas_vis() does something
-				special so here we explicitly invis
-				the window and proceed as in the "invis"
-				case below. */
- 			    canvas_vis(x, 0);
-			    canvas_selectme = y;
- 			    canvas_vis(x, 1);
-#else
-			    canvas_vis(x, 1);
-		    	    canvas_editmode(x, 1.);
-			    glist_select(x, y);
-#endif
-			}
-			else
-			{
-			    /* LATER fix so we can select it right here.
-			    ERight now, HACK it so that canvas_map selects it.
-			    We can't select earlier because the rtexts aren't
-			    created in time.  Should create the rtexts in
-			    canvas_vis() but we don't so that yet. */
-
-			    canvas_selectme = y;
-			    canvas_vis(x, 1);
-    	    	    	}
+			canvas_vis(x, 1);
+		    	canvas_editmode(x, 1.);
+			glist_select(x, y);
 			return (1);
 		    }
 		}
@@ -1701,9 +1664,7 @@ static int glist_dofinderror(t_glist *gl, void *error_object)
 	    glist_noselect(gl);
 	    canvas_vis(glist_getcanvas(gl), 1);
 	    canvas_editmode(glist_getcanvas(gl), 1.);
-	    /* we can't just select here ala glist_select(gl, g); instead,
-	    as in "find", set "selectme" for when "map" function is called. */
-	    canvas_selectme = g;
+	    glist_select(gl, g);
 	    return (1);
 	}
     	else if (g->g_pd == canvas_class)
@@ -2160,7 +2121,6 @@ void canvas_editmode(t_canvas *x, t_floatarg fyesplease)
     }
     sys_vgui("pdtk_canvas_editval .x%x %d\n",
     	glist_getcanvas(x), x->gl_edit);
-    if (yesplease) canvas_dirty(x, 1);
 }
 
     /* called by canvas_font below */

@@ -481,11 +481,12 @@ static void voutlet_dsp(t_voutlet *x, t_signal **sp)
 	time to copy the samples out to the containing object's outlets.
 	If we aren't reblocking, there's nothing to do here.  */
 void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
-		       int myvecsize, int phase, int period, int frequency, int downsample, int upsample /* IOhannes */, int reblock,
-    	int switched)
+    int myvecsize, int phase, int period, int frequency, int downsample,
+    int upsample /* IOhannes */, int reblock, int switched)
 {
     if (!x->x_buf) return;  /* this shouldn't be necesssary... */
-    x->x_updown.downsample=downsample;  x->x_updown.upsample=upsample; /* IOhannes */
+    x->x_updown.downsample=downsample;
+    x->x_updown.upsample=upsample; /* IOhannes */
     if (reblock)
     {
 	t_signal *insig, *outsig;

@@ -254,7 +254,7 @@ static t_int *vline_tilde_perform(t_int *w)
 	    }
 	}
 	if (x->x_targettime <= timenext)
-	    f = x->x_target, inc = 0;
+	    f = x->x_target, inc = x->x_inc = 0, x->x_targettime = 1e20;
 	*out++ = f;
 	f = f + inc;
 	timenow = timenext;
@@ -271,6 +271,8 @@ static void vline_tilde_stop(t_vline *x)
     x->x_list = 0;
     x->x_inc = 0;
     x->x_inlet1 = x->x_inlet2 = 0;
+    x->x_target = x->x_value;
+    x->x_targettime = 1e20;
 }
 
 static void vline_tilde_float(t_vline *x, t_float f)
@@ -279,18 +281,18 @@ static void vline_tilde_float(t_vline *x, t_float f)
     float inlet1 = (x->x_inlet1 < 0 ? 0 : x->x_inlet1);
     float inlet2 = x->x_inlet2;
     double starttime = timenow + inlet2;
-    t_vseg *s1, *s2, *deletefrom = 0,
-    	*snew = (t_vseg *)t_getbytes(sizeof(*snew));
+    t_vseg *s1, *s2, *deletefrom = 0, *snew;
     if (PD_BADFLOAT(f))
 	f = 0;
 
     	/* negative delay input means stop and jump immediately to new value */
     if (inlet2 < 0)
     {
-    	vline_tilde_stop(x);
 	x->x_value = f;
+    	vline_tilde_stop(x);
 	return;
     }
+    snew = (t_vseg *)t_getbytes(sizeof(*snew));
     	/* check if we supplant the first item in the list.  We supplant
 	an item by having an earlier starttime, or an equal starttime unless
 	the equal one was instantaneous and the new one isn't (in which case
@@ -350,6 +352,7 @@ static void *vline_tilde_new(void)
     x->x_referencetime = clock_getlogicaltime();
     x->x_list = 0;
     x->x_samppermsec = 0;
+    x->x_targettime = 1e20;
     return (x);
 }
 

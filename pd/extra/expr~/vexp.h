@@ -94,6 +94,7 @@
 #define	OP_LB		((long)(14<<16|25))		/* [ */
 #define	OP_RP		((long)(14<<16|26))		/* ) */
 #define	OP_LP		((long)(14<<16|27))		/* ( */
+#define OP_STORE	((long)(15<<16|28))		/* = */
 #define	HI_PRE		((long)(100<<16))	/* infinite precedence */
 #define	PRE_MASK	((long)0xffff0000)	/* precedence level mask */
 
@@ -121,28 +122,30 @@ struct ex_ex {
 #define	exNULL	((struct ex_ex *)0)
 
 /* defines for ex_type */
-#define	ET_INT		0x1		/* an int */
-#define	ET_FLT		0x2		/* a float */
-#define ET_OP		0x3		/* operator */
-#define	ET_STR		0x4		/* string */
-#define ET_TBL		0x5		/* a table, the content is a pointer */
-#define	ET_FUNC		0x6		/* a function */
-#define	ET_SYM		0x7		/* symbol ("string") */
-#define	ET_VSYM		0x8		/* variable symbol ("$s?") */
+#define	ET_INT		1		/* an int */
+#define	ET_FLT		2		/* a float */
+#define ET_OP		3		/* operator */
+#define	ET_STR		4		/* string */
+#define ET_TBL		5		/* a table, the content is a pointer */
+#define	ET_FUNC		6		/* a function */
+#define	ET_SYM		7		/* symbol ("string") */
+#define	ET_VSYM		8		/* variable symbol ("$s?") */
 				/* we treat parenthesis and brackets */
 				/* special to keep a pointer to their */
 				/* match in the content */
-#define	ET_LP		0x9		/* left parenthesis */
-#define	ET_LB		0x10		/* left bracket */
-#define	ET_II		0x11		/* and integer inlet */
-#define	ET_FI		0x12		/* float inlet */
-#define	ET_SI		0x13		/* string inlet */
-#define	ET_VI		0x14		/* signal inlet */
-#define	ET_VEC		0x15		/* allocated signal vector */
+#define	ET_LP		9		/* left parenthesis */
+#define	ET_LB		10		/* left bracket */
+#define	ET_II		11		/* and integer inlet */
+#define	ET_FI		12		/* float inlet */
+#define	ET_SI		13		/* string inlet */
+#define	ET_VI		14		/* signal inlet */
+#define	ET_VEC		15		/* allocated signal vector */
 				/* special types for fexpr~ */
-#define	ET_VO		0x16		/* vector output for fexpr~ */
-#define	ET_XI		0x17		/* vector input for fexpr~ */
-#define	ET_XI0		0x18		/* shorthand for $x?[0] */
+#define	ET_YO		16		/* vector output for fexpr~ */
+#define	ET_YOM1		17		/* shorthand for $y?[-1] */
+#define	ET_XI		18		/* vector input for fexpr~ */
+#define	ET_XI0		20		/* shorthand for $x?[0] */
+#define	ET_VAR		21		/* variable */
 
 /* defines for ex_flags */
 #define EF_TYPE_MASK	0x07	/* first three bits define the type of expr */
@@ -151,6 +154,7 @@ struct ex_ex {
 #define EF_FEXPR_TILDE	0x04	/* fexpr~ filter expression */
 
 #define	EF_STOP		0x08	/* is it stopped used for expr~ and fexpr~ */
+#define	EF_VERBOSE	0x10	/* verbose mode */
 
 #define	IS_EXPR(x)	  ((((x)->exp_flags&EF_TYPE_MASK)|EF_EXPR) == EF_EXPR)
 #define	IS_EXPR_TILDE(x)  \
@@ -177,6 +181,7 @@ struct ex_ex {
 #define	EE_BI_OUTPUT	0x02	/* Bad output index */
 #define	EE_BI_INPUT	0x04	/* Bad input index */
 #define	EE_NOTABLE	0x08	/* NO TABLE */
+#define	EE_NOVAR	0x10	/* NO VARIABLE */
 
 typedef struct expr {
 #ifdef PD
@@ -186,19 +191,22 @@ typedef struct expr {
 #endif
 	int	exp_flags;		/* are we expr~, fexpr~, or expr */
 	int	exp_error;		/* reported errors */
-	t_outlet *exp_outlet;
+	int	exp_nexpr;		/* number of expressions */
+	char	*exp_string;		/* the full expression string */
+	char	*exp_str;		/* current parsing position */
+	t_outlet *exp_outlet[MAX_VARS];
 #ifdef PD
 	struct _exprproxy *exp_proxy;
 #else /* MAX */
 	void *exp_proxy[MAX_VARS];
 	long exp_proxy_id;
 #endif
-	struct ex_ex *exp_stack;
+	struct ex_ex *exp_stack[MAX_VARS];
 	struct ex_ex exp_var[MAX_VARS];
-	struct ex_ex exp_res;		/* the evluation result */
+	struct ex_ex exp_res[MAX_VARS];	/* the evluation result */
 	t_float *exp_p_var[MAX_VARS];
-	t_float *exp_p_res;		/* the previous evaluation result */
-	t_float *exp_tmpres;		/* temporty result for fexpr~ */
+	t_float *exp_p_res[MAX_VARS];	/* the previous evaluation result */
+	t_float *exp_tmpres[MAX_VARS];		/* temporty result for fexpr~ */
 	int exp_vsize;			/* the size of the signal vector */
 	int exp_nivec;			/* # of vector inlets */
 	float exp_f;   		/* control value to be transformed to signal */
@@ -214,6 +222,7 @@ typedef struct ex_funcs {
 /* function prototypes for pd-related functions called withing vexp.h */
 
 extern int max_ex_tab(struct expr *expr, t_symbol *s, struct ex_ex *arg, struct ex_ex *optr);
+extern int max_ex_var(struct expr *expr, t_symbol *s, struct ex_ex *optr);
 extern int ex_getsym(char *p, t_symbol **s);
 extern const char *ex_symname(t_symbol *s);
 void ex_mkvector(t_float *fp, t_float x, int size);
@@ -224,6 +233,8 @@ extern void ex_Sum(t_expr *expr, long int argc, struct ex_ex *argv,									stru
 extern void ex_avg(t_expr *expr, long int argc, struct ex_ex *argv,									struct ex_ex *optr);
 extern void ex_Avg(t_expr *expr, long int argc, struct ex_ex *argv,									struct ex_ex *optr);
 extern void ex_store(t_expr *expr, long int argc, struct ex_ex *argv,									struct ex_ex *optr);
+
+int value_getonly(t_symbol *s, t_float *f);
 
 #ifdef NT
 #pragma warning (disable: 4305 4244)

@@ -735,8 +735,6 @@ t_widgetbehavior garray_widgetbehavior =
     garray_delete,
     garray_vis,
     garray_click,
-    garray_save,
-    0
 };
 
 /* ----------------------- public functions -------------------- */
@@ -1362,6 +1360,7 @@ void g_array_setup(void)
     	gensym("normalize"), A_DEFFLOAT, 0);
     class_addmethod(garray_class, (t_method)garray_arraydialog,
     	gensym("arraydialog"), A_SYMBOL, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
+    class_setsavefn(garray_class, garray_save);
 }
 
 

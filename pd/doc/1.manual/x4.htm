@@ -1,20 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
 <HTML>
-<HEAD>
-<TITLE>Pd Documentation</TITLE>
-</HEAD>
-<BODY bgcolor="#ffffff">
-<SMALL>
-<div style="width:6.5in; margin-left:.5in">
+  <HEAD>
+	 <TITLE>Pd Documentation 4</TITLE>
+    <meta http-equiv="Content-Type" content="text/html">
+	 <link rel="stylesheet" type="text/css" href="pdmanual.css" media="screen">
+  </HEAD>
 
-<CENTER> <B>
-Pd Documentation chapter 4: writing Pd objects in C
-</B> </CENTER>
-<BR>
-<H5> <A href=index.htm#s4> back to table of contents </A></H5> 
- <BR><BR>
+
+<BODY>
+
+<H2>Pd Documentation chapter 4: writing Pd objects in C</H2>
+
 <P>
+<A href="index.htm#s4"> back to table of contents </A>
+<BR><BR>
+</P> 
 
-You can write your own objects that you and others can use in their Pd
+<P>You can write your own objects that you and others can use in their Pd
 applications.  You can write them in C or (if you're smart and brave) in C++ or
 FORTRAN. 
 
@@ -27,7 +30,7 @@ first in the directory containing the patch, then in directories in its
 "path."  Pd will then add whatever object is defined there to its "class list,"
 which is the set of all Pd classes you can use.  If all this works, Pd then
 attempts again to create the object you asked for, this time perhaps
-sucessfully.  There is no difference between an object defined this way and an
+successfully.  There is no difference between an object defined this way and an
 object built into Pd.
 
 <P> Once you load a new object into Pd, it's there for the duration of your Pd
@@ -53,7 +56,6 @@ your externs won't compile against Pd; you'll get an error about "disk full
 or bad DLL."  Simply recompile Pd under 5.x and the problem goes away.  Externs
 compiled under 5.x and 6.x are binary compatible; it's just the compilation
 that's sensitive.
-
 
 </BODY>
 </HTML>

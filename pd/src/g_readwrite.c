@@ -571,7 +571,8 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
     	    (t_int)(x->gl_screeny1),
     	    (t_int)(x->gl_screenx2 - x->gl_screenx1),
     	    (t_int)(x->gl_screeny2 - x->gl_screeny1),
-    	    	 x->gl_name, x->gl_mapped);
+    	    (*x->gl_name->s_name ? x->gl_name: gensym("(subpatch)")),
+	    x->gl_mapped);
     }
 	/* root or abstraction */
     else binbuf_addv(b, "ssiiiii;", gensym("#N"), gensym("canvas"),

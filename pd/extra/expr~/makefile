@@ -1,5 +1,6 @@
 
-current: expr.pd_linux expr~.pd_linux fexpr~.pd_linux
+current: expr.pd_linux expr~.pd_linux fexpr~.pd_linux \
+     ../expr.pd_linux ../expr~.pd_linux ../fexpr~.pd_linux
 
 install: install_linux
 
@@ -18,20 +19,20 @@ NTOBJ =  vexp.obj vexp_fun.obj vexp_if.obj
 PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
 VC="C:\Program Files\Microsoft Visual Studio\Vc98"
 
-PDNTINCLUDE = /I. /I\tcl\include /I\ftp\pd\src /I$(VC)\include
+PDNTINCLUDE = /I. /I..\..\src /I$(VC)\include
 
 PDNTLDIR = $(VC)\lib
 PDNTLIB = $(PDNTLDIR)\libc.lib \
 	$(PDNTLDIR)\oldnames.lib \
 	$(PDNTLDIR)\kernel32.lib \
-	\ftp\pd\bin\pd.lib 
+	..\..\bin\pd.lib 
 
 .c.obj:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
 
 expr.dll: $(NTOBJ)
 	link /dll /export:expr_setup /export:expr_tilde_setup \
-	    /export:fexpr_tilde_setup  $(NTOBJ) $(PDNTLIB)
+	    /export:fexpr_tilde_setup $(NTOBJ) $(PDNTLIB)
 	ren vexp.dll expr.dll
 	copy expr.dll ..\expr.dll
 	copy expr.dll ..\expr~.dll
@@ -90,30 +91,36 @@ LINUXINCLUDE =  -I../../src
 expr.pd_linux: $(LINUXOBJ)
 	ld -export_dynamic  -shared -o expr.pd_linux $(LINUXOBJ) -lc -lm
 	strip --strip-unneeded expr.pd_linux
-	rm -f ../expr.pd_linux
-	ln -s expr~/expr.pd_linux ..
 
 expr~.pd_linux: expr.pd_linux
-	ln -s expr.pd_linux expr~.pd_linux
-	ln -s expr~/expr~.pd_linux ..
-	
+	-ln -s expr.pd_linux expr~.pd_linux
+
 fexpr~.pd_linux: expr.pd_linux
-	ln -s expr.pd_linux fexpr~.pd_linux
-	ln -s expr~/fexpr~.pd_linux ..
+	-ln -s expr.pd_linux fexpr~.pd_linux
+
+../expr.pd_linux: expr.pd_linux
+	-ln -s expr~/expr.pd_linux ../expr.pd_linux
+
+../expr~.pd_linux: expr.pd_linux
+	-ln -s expr~/expr.pd_linux ../expr~.pd_linux
+
+../fexpr~.pd_linux: expr.pd_linux
+	-ln -s expr~/expr.pd_linux ../fexpr~.pd_linux
 
 install_linux:
 	install expr.pd_linux $(PDEXTERN)
 	rm -f $(PDEXTERN)/expr~.pd_linux
 	rm -f $(PDEXTERN)/fexpr~.pd_linux
 	cd $(PDEXTERN); \
-	ln -s expr.pd_linux expr~.pd_linux; \
-	ln -s expr.pd_linux fexpr~.pd_linux
+	-ln -s expr.pd_linux expr~.pd_linux
+	-ln -s expr.pd_linux fexpr~.pd_linux
+
 
 linux_clean:
 	rm -f *.pd_linux_o *.o
 
 linux_clobber: clean
-	rm -f expr.pd_linux expr.pd_irix6
+	rm -f expr.pd_linux
 
 # ----------------------- MAC OSX -----------------------
 
@@ -133,28 +140,29 @@ expr.pd_darwin: $(MACOSXOBJ)
 	cc -bundle -undefined suppress  -flat_namespace \
 		-o expr.pd_darwin $(MACOSXOBJ)  -lm
 	rm -f ../expr.pd_darwin
-	ln -s expr~/expr.pd_darwin ..
+	-ln -s expr~/expr.pd_darwin ..
 
 expr~.pd_darwin: expr.pd_darwin
-	ln -s expr.pd_darwin expr~.pd_darwin
+	-ln -s expr.pd_darwin expr~.pd_darwin
 	rm -f ../expr~.pd_darwin
-	ln -s expr~/expr~.pd_darwin ..
+	-ln -s expr~/expr~.pd_darwin ..
 
 fexpr~.pd_darwin: expr.pd_darwin
-	ln -s expr.pd_darwin fexpr~.pd_darwin
+	-ln -s expr.pd_darwin fexpr~.pd_darwin
 	rm -f ../fexpr~.pd_darwin
-	ln -s expr~/fexpr~.pd_darwin ..
+	-ln -s expr~/fexpr~.pd_darwin ..
 
 install_darwin:
 	install expr.pd_darwin $(PDEXTERN)
 	rm -f $(PDEXTERN)/expr~.pd_darwin
 	rm -f $(PDEXTERN)/fexpr~.pd_darwin
 	cd $(PDEXTERN); \
-	ln -s expr.pd_darwin expr~.pd_darwin; \
-	ln -s expr.pd_darwin fexpr~.pd_darwin
+	-ln -s expr.pd_darwin expr~.pd_darwin; \
+	-ln -s expr.pd_darwin fexpr~.pd_darwin
 
 darwin_clean:
 	rm -f *.pd_darwin_o *.o
 
 darwin_clobber: clean
-	rm -f expr.pd_darwin expr.pd_irix6
+	rm -f expr.pd_darwin
+

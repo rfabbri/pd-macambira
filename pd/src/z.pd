@@ -1,9 +1,0 @@
-#N canvas 0 0 450 300 10;
-#X obj 111 114 +~;
-#X obj 112 56 +~;
-#N canvas 281 44 450 300 foo 1;
-#X obj 111 114 +~;
-#X obj 112 56 +~;
-#X connect 1 0 0 0;
-#X restore 206 67 pd foo;
-#X connect 1 0 0 0;

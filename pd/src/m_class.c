@@ -86,6 +86,7 @@ static void pd_defaultsymbol(t_pd *x, t_symbol *s)
 }
 
 void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv);
+static void class_nosavefn(t_gobj *z, t_binbuf *b);
 
     /* handle "list" messages to Pds without explicit list methods defined. */
 static void pd_defaultlist(t_pd *x, t_symbol *s, int argc, t_atom *argv)
@@ -141,6 +142,7 @@ static void pd_defaultlist(t_pd *x, t_symbol *s, int argc, t_atom *argv)
     how this is handled.  */
 
 extern t_widgetbehavior text_widgetbehavior;
+extern void text_save(t_gobj *z, t_binbuf *b);
 
 t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     size_t size, int flags, t_atomtype type1, ...)
@@ -205,6 +207,7 @@ t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     c->c_drawcommand = 0;
     c->c_floatsignalin = 0;
     c->c_externdir = class_extern_dir;
+    c->c_savefn = (typeflag == CLASS_PATCHABLE ? text_save : class_nosavefn);
 #if 0 
     post("class: %s", c->c_name->s_name);
 #endif
@@ -417,6 +420,30 @@ char *class_gethelpdir(t_class *c)
     return (c->c_externdir->s_name);
 }
 
+static void class_nosavefn(t_gobj *z, t_binbuf *b)
+{
+    bug("save function called but not defined");
+}
+
+void class_setsavefn(t_class *c, t_savefn f)
+{
+    c->c_savefn = f;
+}
+
+t_savefn class_getsavefn(t_class *c)
+{
+    return (c->c_savefn);
+}
+
+void class_setpropertiesfn(t_class *c, t_propertiesfn f)
+{
+    c->c_propertiesfn = f;
+}
+
+t_propertiesfn class_getpropertiesfn(t_class *c)
+{
+    return (c->c_propertiesfn);
+}
 
 /* ---------------- the symbol table ------------------------ */
 

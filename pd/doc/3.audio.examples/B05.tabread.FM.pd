@@ -77,10 +77,8 @@
 #X connect 27 0 21 0;
 #X restore 153 305 pd output;
 #X msg 229 278 MUTE;
-#X text 521 439 updated for Pd version 0.34;
 #X floatatom 153 95 4 0 0 0 - - -;
 #X text 153 69 frequency;
-#X text 33 8 MORE ON FREQUENCY MODULATION;
 #X floatatom 195 206 4 0 0 0 - - -;
 #X text 155 50 modulation;
 #X obj 152 157 *~;
@@ -92,16 +90,18 @@
 #X obj 152 237 osc~;
 #X obj 153 122 tabosc4~ pitchmod14;
 #X text 254 194 carrier;
-#X text 47 356 This patch is like the original FM patch except in having
-a settable wavetable for the modulation oscillator. Try changing the
-waveform as well as the three familiar parameters.;
+#X text 33 8 FREQUENCY MODULATION BY WAVETABLE;
+#X text 47 356 This tabosc4~ controls the pitch of a sinusoidal oscillator
+(osc~). Try changing the waveform as well as the three familiar parameters.
+;
+#X text 520 438 updated for Pd version 0.37;
 #X connect 1 0 2 1;
 #X connect 2 0 1 0;
 #X connect 3 0 2 2;
-#X connect 5 0 17 0;
-#X connect 8 0 14 1;
-#X connect 10 0 14 0;
-#X connect 13 0 10 1;
-#X connect 14 0 16 0;
-#X connect 16 0 2 0;
-#X connect 17 0 10 0;
+#X connect 4 0 15 0;
+#X connect 6 0 12 1;
+#X connect 8 0 12 0;
+#X connect 11 0 8 1;
+#X connect 12 0 14 0;
+#X connect 14 0 2 0;
+#X connect 15 0 8 0;

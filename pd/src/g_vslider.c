@@ -206,20 +206,18 @@ static void vslider_getrect(t_gobj *z, t_glist *glist,
 static void vslider_save(t_gobj *z, t_binbuf *b)
 {
     t_vslider *x = (t_vslider *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiiffiisssiiiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
 		gensym("vsl"), x->x_gui.x_w, x->x_gui.x_h,
 		(float)x->x_min, (float)x->x_max,
-		x->x_lin0_log1, (*ip1)&IEM_INIT_ARGS_ALL,
+		x->x_lin0_log1, iem_symargstoint(&x->x_gui.x_isa),
 		srl[0], srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
 		bflcol[0], bflcol[1], bflcol[2],
 		x->x_val, x->x_steady);
     binbuf_addv(b, ";");
@@ -510,12 +508,12 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int w=IEM_GUI_DEFAULTSIZE, h=IEM_SL_DEFAULTSIZE;
     int lilo=0, f=0, ldx=0, ldy=-8;
-    int fs=8, iinit=0, ifstyle=0, v=0, steady=1;
+    int fs=8, v=0, steady=1;
     double min=0.0, max=(double)(IEM_SL_DEFAULTSIZE-1);
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
+    iem_inttosymargs(&x->x_gui.x_isa, 0);
+    iem_inttofstyle(&x->x_gui.x_fsf, 0);
     srl[0] = gensym("empty");
     srl[1] = gensym("empty");
     srl[2] = gensym("empty");
@@ -536,7 +534,7 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
 	min = (double)atom_getfloatarg(2, argc, argv);
 	max = (double)atom_getfloatarg(3, argc, argv);
 	lilo = (int)atom_getintarg(4, argc, argv);
-	iinit = (int)atom_getintarg(5, argc, argv);
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(5, argc, argv));
 	srl[0] = atom_getsymbolarg(6, argc, argv);
 	srl[1] = atom_getsymbolarg(7, argc, argv);
 	srl[2] = atom_getsymbolarg(8, argc, argv);
@@ -563,7 +561,7 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	ldx = (int)atom_getintarg(9, argc, argv);
 	ldy = (int)atom_getintarg(10, argc, argv);
-	ifstyle = (int)atom_getintarg(11, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(11, argc, argv));
 	fs = (int)atom_getintarg(12, argc, argv);
 	bflcol[0] = (int)atom_getintarg(13, argc, argv);
 	bflcol[1] = (int)atom_getintarg(14, argc, argv);
@@ -573,12 +571,9 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
     if((argc == 18)&&IS_A_FLOAT(argv,17))
 	steady = (int)atom_getintarg(17, argc, argv);
     x->x_gui.x_draw = (t_iemfunptr)vslider_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
     if(x->x_gui.x_isa.x_loadinit)
 	x->x_val = v;
     else
@@ -588,14 +583,13 @@ static void *vslider_new(t_symbol *s, int argc, t_atom *argv)
     x->x_lin0_log1 = lilo;
     if(steady != 0) steady = 1;
     x->x_steady = steady;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
     x->x_gui.x_unique_num = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     iemgui_first_dollararg2sym(&x->x_gui, srl);
     if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
     x->x_gui.x_snd = srl[0];
@@ -658,8 +652,8 @@ void g_vslider_setup(void)
     vslider_widgetbehavior.w_deletefn =     iemgui_delete;
     vslider_widgetbehavior.w_visfn =        iemgui_vis;
     vslider_widgetbehavior.w_clickfn =      vslider_newclick;
-    vslider_widgetbehavior.w_propertiesfn = vslider_properties;;
-    vslider_widgetbehavior.w_savefn =       vslider_save;
     class_setwidget(vslider_class, &vslider_widgetbehavior);
     class_sethelpsymbol(vslider_class, gensym("vslider"));
+    class_setsavefn(vslider_class, vslider_save);
+    class_setpropertiesfn(vslider_class, vslider_properties);
 }

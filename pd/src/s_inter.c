@@ -109,7 +109,9 @@ double nt_tixtotime(LARGE_INTEGER *dumbass)
 #endif
 #endif /* MSW */
 
-double sys_getrealtime(void)	/* get "real time" in seconds */
+    /* get "real time" in seconds; take the
+    first time we get called as a reference time of zero. */
+double sys_getrealtime(void)	
 {
 #ifdef UNIX
     static struct timeval then;
@@ -843,6 +845,7 @@ int sys_startgui(const char *guidir)
 
     if (!sys_nogui)
     {
+    	char buf[256];
 	if (sys_verbose)
     	    fprintf(stderr, "Waiting for connection request... \n");
 	if (listen(xsock, 5) < 0) sys_sockerror("listen");
@@ -861,8 +864,8 @@ int sys_startgui(const char *guidir)
 	    /* here is where we start the pinging. */
 	if (sys_hipriority)
     	    sys_gui("pdtk_watchdog\n");
-
-	sys_vgui("pdtk_pd_startup {%s}\n", pd_version); 
+    	sys_get_audio_apis(buf);
+	sys_vgui("pdtk_pd_startup {%s} %s\n", pd_version, buf); 
     }
     return (0);
 
@@ -894,8 +897,9 @@ void sys_bail(int n)
 	sys_close_midi();
 	fprintf(stderr, "... done.\n");
 #endif
+	exit(1);
     }
-    _exit(n);
+    else _exit(n);
 }
 
 void glob_quit(void *dummy)

@@ -317,3 +317,7 @@ EXTERN int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *arg
 EXTERN int canvas_getdollarzero(void);
 EXTERN void canvas_getargs(int *argcp, t_atom **argvp);
 
+EXTERN void iem_inttosymargs(t_iem_init_symargs *symargp, int n);
+EXTERN int iem_symargstoint(t_iem_init_symargs *symargp);
+EXTERN void iem_inttofstyle(t_iem_fstyle_flags *fstylep, int n);
+EXTERN int iem_fstyletoint(t_iem_fstyle_flags *fstylep);

@@ -28,6 +28,19 @@
 /* "expr~" and "fexpr~" conversion by Shahrokh Yadegari c. 1999,2000 */
 
 /*
+ * Feb 2002 -	added access to variables
+ *           	multiple expression support
+ *	     	new short hand forms for fexpr~
+ *			now $y or $y1 = $y1[-1] and $y2 = $y2[-1]
+ *		--sdy
+ *
+ * July 2002
+ * 		fixed bugs introduced in last changes in store and ET_EQ
+ * 		--sdy
+ * 		
+ */
+
+/*
  * vexp.c -- a variable expression evaluator
  *
  * This modules implements an expression evaluator using the
@@ -56,17 +69,13 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "vexp.h" 
+#ifdef MSP
+#undef isdigit
+#define isdigit(x)	(x >= '0' && x <= '9')
+#endif
 
-#ifndef MSP
-#ifndef MACOSX
-/*
- *stdlib.h produces a redefinition of _alloca()
- * why, I do not know?
- */
-#include "stdlib.h"
-#endif
-#endif
 char *atoif(char *s, long int *value, long int *type);
 
 static struct ex_ex *ex_lex(struct expr *exp, long int *n);
@@ -80,6 +89,10 @@ int expr_donew(struct expr *expr, int ac, t_atom *av);
 struct ex_ex *eval_func(struct expr *exp,struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
 struct ex_ex *eval_tab(struct expr *exp, struct ex_ex *eptr,
+						struct ex_ex *optr, int i);
+struct ex_ex *eval_var(struct expr *exp, struct ex_ex *eptr,
+						struct ex_ex *optr, int i);
+struct ex_ex *eval_store(struct expr *exp, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
 struct ex_ex *eval_sigidx(struct expr *exp, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
@@ -192,6 +205,7 @@ expr_donew(struct expr *expr, int ac, t_atom *av)
 	char *exp_string;
 	int exp_strlen;
 	t_binbuf *b;
+	int i;
 
 	memset(expr->exp_var, 0, MAX_VARS * sizeof (*expr->exp_var));
 #ifdef PD
@@ -200,7 +214,7 @@ expr_donew(struct expr *expr, int ac, t_atom *av)
 	binbuf_gettext(b, &exp_string, &exp_strlen);
 
 #else /* MSP */
-{
+ {
     char *buf = getbytes(0), *newbuf;
     int length = 0;
     char string[250];
@@ -230,32 +244,45 @@ expr_donew(struct expr *expr, int ac, t_atom *av)
     }
     exp_string = buf;
     exp_strlen  = length;
-}
+ }
 #endif
 	exp_string = (char *)t_resizebytes(exp_string, exp_strlen,exp_strlen+1);
 	exp_string[exp_strlen] = 0;
-	set_tokens(exp_string);
-	list = ex_lex(expr, &max_node);
-	set_tokens((char *)0);
-	if (!list) {		/* syntax error */
-		return (1);
+	expr->exp_string = exp_string;
+	expr->exp_str = exp_string;
+	expr->exp_nexpr = 0;
+	ret = (struct ex_ex *) 0;
+	/*
+	 * if ret == 0 it means that we have no expression
+	 * so we let the pass go through to build a single null stack
+	 */
+	while (*expr->exp_str || !ret) {
+		list = ex_lex(expr, &max_node);
+		if (!list) {		/* syntax error */
+			goto error;
+		}
+		expr->exp_stack[expr->exp_nexpr] =
+		  (struct ex_ex *)fts_malloc(max_node * sizeof (struct ex_ex));
+		expr->exp_nexpr++;
+		ret = ex_match(list, (long)0);
+		if (!ret)		/* syntax error */
+			goto error;
+		ret = ex_parse(expr,
+			list, expr->exp_stack[expr->exp_nexpr - 1], (long *)0);
+		if (!ret)
+			goto error;
 	}
-	expr->exp_stack = (struct ex_ex *)fts_malloc(max_node *
-							sizeof (struct ex_ex));
-	ret = ex_match(list, (long)0);
-	if (!ret)		/* syntax error */
-		goto error;
-	ret = ex_parse(expr, list, expr->exp_stack, (long *)0);
-	if (ret) {
-		*ret = nullex;
-		/* print the stack that been built */
-		t_freebytes(exp_string, exp_strlen+1);
-		return (0);
-	}
+	*ret = nullex;
+	t_freebytes(exp_string, exp_strlen+1);
+	return (0);
 error:
-	fts_free(expr->exp_stack);
-	expr->exp_stack = 0;
-	fts_free(list);
+	for (i = 0; i < expr->exp_nexpr; i++) {
+		fts_free(expr->exp_stack[i]);
+		expr->exp_stack[i] = 0;
+	}
+	expr->exp_nexpr = 0;
+	if (list)
+		fts_free(list);
 	t_freebytes(exp_string, exp_strlen+1);
 	return (1);
 }
@@ -342,7 +369,10 @@ ex_match(struct ex_ex *eptr, long int op)
 		case ET_VI:
 		case ET_SYM:
 		case ET_VSYM:
-		case ET_VO:
+			continue;
+		case ET_YO:
+			if (eptr[1].ex_type != ET_OP || eptr[1].ex_op != OP_LB)
+				eptr->ex_type = ET_YOM1;
 			continue;
 		case ET_XI:
 			if (eptr[1].ex_type != ET_OP || eptr[1].ex_op != OP_LB)
@@ -401,10 +431,6 @@ ex_match(struct ex_ex *eptr, long int op)
 			}
 			continue;
 		case ET_STR:
-			if (eptr[1].ex_type != ET_OP) {
-				post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
-				return (exNULL);
-			}
 			if (eptr[1].ex_op == OP_LB) {
 				char *tmp;
 
@@ -426,8 +452,20 @@ ex_match(struct ex_ex *eptr, long int op)
 				eptr->ex_type = ET_FUNC;
 				eptr->ex_ptr = (char *) fun;
 			} else {
-				post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
-				return (exNULL);
+				char *tmp;
+
+				if (eptr[1].ex_type && eptr[1].ex_type!=ET_OP){
+					post("expr: syntax error: bad string '%s'\n", eptr->ex_ptr);
+					return (exNULL);
+				}
+				/* it is a variable */
+				eptr->ex_type = ET_VAR;
+				tmp = eptr->ex_ptr;
+				if (ex_getsym(tmp,
+						(t_symbol **)&(eptr->ex_ptr))) {
+					post("expr: variable '%s' not found",tmp);
+					return (exNULL);
+				}
 			}
 			continue;
 		default:
@@ -490,14 +528,16 @@ ex_parse(struct expr *x, struct ex_ex *iptr, struct ex_ex *optr, long int *argc)
 		case ET_II:
 		case ET_FI:
 		case ET_XI0:
+		case ET_YOM1:
 		case ET_VI:
+		case ET_VAR:
 			if (!count && !eptr[1].ex_type) {
 				*optr++ = *eptr;
 				return (optr);
 			}
 			break;
 		case ET_XI:
-		case ET_VO:
+		case ET_YO:
 		case ET_SI:
 		case ET_TBL:
 			if (eptr[1].ex_type != ET_LB) {
@@ -1016,6 +1056,8 @@ abort();
 		}
 		return(++eptr);
 	case ET_XI0:
+		/* short hand for $x?[0] */
+
 		/* SDY delete the following check */
 		if (!IS_FEXPR_TILDE(exp) || optr->ex_type==ET_VEC) {
 			post("%d:exp->exp_flags = %d", __LINE__,exp->exp_flags);
@@ -1024,7 +1066,21 @@ abort();
 		optr->ex_type = ET_FLT;
 		optr->ex_flt = exp->exp_var[eptr->ex_int].ex_vec[idx];
 		return(++eptr);
-	case ET_VO:
+	case ET_YOM1:
+		/*
+		 * short hand for $y?[-1]
+		 * if we are calculating the first sample of the vector
+		 * we need to look at the previous results buffer
+		 */
+		optr->ex_type = ET_FLT;
+		if (idx == 0)
+			optr->ex_flt =
+			exp->exp_p_res[eptr->ex_int][exp->exp_vsize - 1];
+		else
+			optr->ex_flt=exp->exp_tmpres[eptr->ex_int][idx-1];
+		return(++eptr);
+		
+	case ET_YO:
 	case ET_XI:
 		/* SDY delete the following */
 		if (!IS_FEXPR_TILDE(exp) || optr->ex_type==ET_VEC) {
@@ -1038,6 +1094,8 @@ abort();
 		return (eval_tab(exp, eptr, optr, idx));
 	case ET_FUNC:
 		return (eval_func(exp, eptr, optr, idx));
+	case ET_VAR:
+		return (eval_var(exp, eptr, optr, idx));
 	case ET_OP:
 		break;
 	case ET_STR:
@@ -1060,6 +1118,8 @@ abort();
 	}
 
 	switch((eptr++)->ex_op) {
+	case OP_STORE:
+		return (eval_store(exp, eptr, optr, idx));
 	case OP_NOT:
 		EVAL_UNARY(!, +);
 	case OP_NEG:
@@ -1130,12 +1190,6 @@ abort();
 	}
 
 
-/* SDY 
-all the returns in the function need to be changed to come here
-to make sure that we are freeing any allocated buffer pointed to
-by left and right vectors
-*/
-
 	/*
 	 * the left and right nodes could have been transformed to vectors
 	 * down the chain
@@ -1187,8 +1241,70 @@ eval_func(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	return (eptr);
 }
 
+
 /*
- * eval_tab --
+ * eval_store --  evaluate the '=' operator, 
+ *		  make sure the first operator is a legal left operator
+ *		  and call ex_eval on the right operator
+ */
+struct ex_ex *
+eval_store(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+/* the expr object data pointer */
+/* the operation stack */
+/* the result pointer */
+{
+	struct ex_ex arg;
+	int isvalue;
+	char *tbl = (char *) 0;
+	char *var = (char *) 0;
+	int badleft = 0;
+
+post("store called\n");
+ex_print(eptr);
+eptr = ex_eval(exp, ++eptr, optr, idx);
+return (eptr);
+
+#ifdef notdef /* SDY */
+	arg.ex_type = ET_INT;
+	arg.ex_int = 0;
+	if (eptr->ex_type == ET_VAR) {
+		var = (char *) eptr->ex_ptr;
+
+		eptr = ex_eval(exp, ++eptr, &arg, idx);
+		(void)max_ex_var_store(exp, (t_symbol *)var, &arg, optr);
+		if (arg.ex_type == ET_VEC)
+			fts_free(arg.ex_vec);
+	}
+
+
+	if (eptr->ex_type == ET_SI) {
+		eptr++;
+		if (eptr->ex_type =
+	}
+
+	/* the left operator should either be a value or a array member */
+	switch (eptr->ex_type) {
+	case ET_SI:
+		if ((eptr + 1)->ex_type == OP_LB) {
+		}
+		if (!exp->exp_var[eptr->ex_int].ex_ptr) {
+				if (!(exp->exp_error & EE_NOTABLE)) {
+					post("expr: syntax error: no string for inlet %d", eptr->ex_int + 1);
+					post("expr: No more table errors will be reported");
+					post("expr: till the next reset");
+					exp->exp_error |= EE_NOTABLE;
+				}
+				badleft++;
+		} else
+			tbl = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
+		break;
+	case ET_TBL:
+	}
+#endif /* SDY */
+}
+
+/*
+ * eval_tab -- evaluate a table operation
  */
 struct ex_ex *
 eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
@@ -1230,7 +1346,52 @@ eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	optr->ex_int = 0;
 	if (!notable)
 		(void)max_ex_tab(exp, (t_symbol *)tbl, &arg, optr);
+	if (arg.ex_type == ET_VEC)
+		fts_free(arg.ex_vec);
 	return (eptr);
+}
+
+/*
+ * eval_var -- evaluate a variable
+ */
+struct ex_ex *
+eval_var(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+/* the expr object data pointer */
+/* the operation stack */
+/* the result pointer */
+{
+	struct ex_ex arg;
+	char *var = (char *) 0;
+	int novar = 0;
+	
+	if (eptr->ex_type == ET_SI) {
+		if (!exp->exp_var[eptr->ex_int].ex_ptr) {
+/* SDY post_error() does not work in MAX/MSP yet
+post_error((fts_object_t *) exp,
+"expr: syntax error: no string for inlet %d\n", eptr->ex_int + 1);
+*/
+				if (!(exp->exp_error & EE_NOVAR)) {
+					post("expr: syntax error: no string for inlet %d", eptr->ex_int + 1);
+					post("expr: No more table errors will be reported");
+					post("expr: till the next reset");
+					exp->exp_error |= EE_NOVAR;
+				}
+				novar++;
+		} else
+			var = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
+	} else if (eptr->ex_type == ET_VAR)
+		var = (char *) eptr->ex_ptr;
+	else {
+		post_error((fts_object_t *) exp, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
+		novar++;
+
+	}
+
+	optr->ex_type = ET_INT;
+	optr->ex_int = 0;
+	if (!novar)
+		(void)max_ex_var(exp, (t_symbol *)var, optr);
+	return (++eptr);
 }
 
 /*
@@ -1298,7 +1459,7 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	/*
 	 * indexing an output vector
 	 */
-	} else if (eptr->ex_type == ET_VO) {
+	} else if (eptr->ex_type == ET_YO) {
 		/* for output vectors index of zero is not legal */
 		if (fi >= 0) {
 			if (!(exp->exp_error & EE_BI_OUTPUT)) {
@@ -1308,10 +1469,17 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 				post("fexpr~: no error report till next reset");
 				post("fexpr~: index assumed to be = -1");
 			}
-			i = 0;
+			i = -1;
+		}
+		if (eptr->ex_int >= exp->exp_nexpr) {
+			post("fexpr~: $y%d illegal: not that many exprs",
+								eptr->ex_int);
+			optr->ex_flt = 0;
+			return (reteptr);
 		}
 		if (cal_sigidx(optr, i, rem_i, idx, exp->exp_vsize,
-					     exp->exp_tmpres, exp->exp_p_res)) {
+			     exp->exp_tmpres[eptr->ex_int],
+		     				exp->exp_p_res[eptr->ex_int])) {
 			if (!(exp->exp_error & EE_BI_OUTPUT)) {
 				exp->exp_error |= EE_BI_OUTPUT;
 				post("fexpr~: bad output index, (%f)", fi);
@@ -1380,16 +1548,6 @@ cal_sigidx(struct ex_ex *optr,	/* The output value */
 	return (1);
 }
 
-static char *exp_str;
-/*
- * set_tokens -- set a new string for reading tokens
- */
-
-void
-set_tokens(char *s)
-{
-	exp_str = s;
-}
 /*
  * getoken -- return 1 on syntax error otherwise 0
  */
@@ -1399,18 +1557,25 @@ getoken(struct expr *exp, struct ex_ex *eptr)
 	char *p;
 	long i;
 
-	if (!exp_str) {
+
+	if (!exp->exp_str) {
 		post("expr: getoken: expression string not set\n");
 		return (0);
 	}
 retry:
-	if (!*exp_str) {
+	if (!*exp->exp_str) {
+		eptr->ex_type = 0;
+		eptr->ex_int = 0;
+		return (0);
+	}
+	if (*exp->exp_str == ';') {
+		exp->exp_str++;
 		eptr->ex_type = 0;
 		eptr->ex_int = 0;
 		return (0);
 	}
 	eptr->ex_type = ET_OP;
-	switch (*exp_str++) {
+	switch (*exp->exp_str++) {
 	case '\\':
 	case ' ':
 	case '\t':
@@ -1456,21 +1621,21 @@ retry:
 		eptr->ex_op = OP_LB;
 		break;
 	case '!':
-		if (*exp_str == '=') {
+		if (*exp->exp_str == '=') {
 			eptr->ex_op = OP_NE;
-			exp_str++;
+			exp->exp_str++;
 		} else
 			eptr->ex_op = OP_NOT;
 		break;
 	case '<':
-		switch (*exp_str) {
+		switch (*exp->exp_str) {
 		case '<':
 			eptr->ex_op = OP_SL;
-			exp_str++;
+			exp->exp_str++;
 			break;
 		case '=':
 			eptr->ex_op = OP_LE;
-			exp_str++;
+			exp->exp_str++;
 			break;
 		default:
 			eptr->ex_op = OP_LT;
@@ -1478,14 +1643,14 @@ retry:
 		}
 		break;
 	case '>':
-		switch (*exp_str) {
+		switch (*exp->exp_str) {
 		case '>':
 			eptr->ex_op = OP_SR;
-			exp_str++;
+			exp->exp_str++;
 			break;
 		case '=':
 			eptr->ex_op = OP_GE;
-			exp_str++;
+			exp->exp_str++;
 			break;
 		default:
 			eptr->ex_op = OP_GT;
@@ -1493,30 +1658,39 @@ retry:
 		}
 		break;
 	case '=':
-		if (*exp_str++ != '=') {
+		if (*exp->exp_str++ != '=') {
 			post("expr: syntax error: =\n");
 			return (1);
 		}
 		eptr->ex_op = OP_EQ;
 		break;
+/* do not allow the store till the function is fixed
+		if (*exp->exp_str != '=')
+			eptr->ex_op = OP_STORE;
+		else {
+			exp->exp_str++;
+			eptr->ex_op = OP_EQ;
+		}
+		break;
+*/
 
 	case '&':
-		if (*exp_str == '&') {
-			exp_str++;
+		if (*exp->exp_str == '&') {
+			exp->exp_str++;
 			eptr->ex_op = OP_LAND;
 		} else
 			eptr->ex_op = OP_AND;
 		break;
 
 	case '|':
-		if ((*exp_str == '|')) {
-			exp_str++;
+		if ((*exp->exp_str == '|')) {
+			exp->exp_str++;
 			eptr->ex_op = OP_LOR;
 		} else
 			eptr->ex_op = OP_OR;
 		break;
 	case '$':
-		switch (*exp_str++) {
+		switch (*exp->exp_str++) {
 		case 'I':
 		case 'i':
 			eptr->ex_type = ET_II;
@@ -1536,36 +1710,44 @@ retry:
 				break;
 			}
 			post("$v? works only for expr~");
-			post("expr: syntax error: %s\n", &exp_str[-2]);
+			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
 			return (1);
 		case 'X':
 		case 'x':
 			if (IS_FEXPR_TILDE(exp)) {
 				eptr->ex_type = ET_XI;
-				break;
+				if (isdigit(*exp->exp_str))
+					break;
+				/* for $x[] is a shorhand for $x1[] */
+				eptr->ex_int = 0;
+				goto noinletnum;
 			}
 			post("$x? works only for fexpr~");
-			post("expr: syntax error: %s\n", &exp_str[-2]);
+			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
 			return (1);
 		case 'y':
 		case 'Y':
 			if (IS_FEXPR_TILDE(exp)) {
-				eptr->ex_type = ET_VO;
+				eptr->ex_type = ET_YO;
 				/*$y takes no number */
+				if (isdigit(*exp->exp_str))
+					break;
+				/* for $y[] is a shorhand for $y1[] */
+				eptr->ex_int = 0;
 				goto noinletnum;
 			}
 			post("$y works only for fexpr~");
 		default:
-			post("expr: syntax error: %s\n", &exp_str[-2]);
+			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
 			return (1);
 		}
-		p = atoif(exp_str, &eptr->ex_op, &i);
+		p = atoif(exp->exp_str, &eptr->ex_op, &i);
 		if (!p) {
-			post("expr: syntax error: %s\n", &exp_str[-2]);
+			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
 			return (1);
 		}
 		if (i != ET_INT) {
-			post("expr: syntax error: %s\n", exp_str);
+			post("expr: syntax error: %s\n", exp->exp_str);
 			return (1);
 		}
 		/*
@@ -1573,39 +1755,46 @@ retry:
 		 * therefore we decrement the number that user has supplied
 		 */
 		if (!eptr->ex_op || (eptr->ex_op)-- > MAX_VARS) {
-			post("expr: syntax error: inlet out of range: %s\n",
-								     exp_str);
+		 post("expr: syntax error: inlet or outlet out of range: %s\n",
+							     exp->exp_str);
 			return (1);
 		}
 
-/*
- * until we can change the input type of inlets on the fly (at pd_new()
- * time) the first input to expr~ is always a vectore and $f1 or $i1 is
- * illegal for fexr~
- */
-if (eptr->ex_op == 0 &&
-   (IS_FEXPR_TILDE(exp) ||  IS_EXPR_TILDE(exp)) &&
-   (eptr->ex_type==ET_II || eptr->ex_type==ET_FI || eptr->ex_type==ET_SI)) {
-	post("first inlet of expr~ for fexpr~ can only be a vector");
-	return (1);
-}
-		/* record the inlet type and check for consistency */
-		if (!exp->exp_var[eptr->ex_op].ex_type)
+		/*
+		 * until we can change the input type of inlets on
+		 * the fly (at pd_new()
+		 * time) the first input to expr~ is always a vectore
+		 * and $f1 or $i1 is
+		 * illegal for fexr~
+		 */
+		if (eptr->ex_op == 0 &&
+		   (IS_FEXPR_TILDE(exp) ||  IS_EXPR_TILDE(exp)) &&
+		   (eptr->ex_type==ET_II || eptr->ex_type==ET_FI ||
+		   					eptr->ex_type==ET_SI)) {
+		       post("first inlet of expr~/fexpr~ can only be a vector");
+		       return (1);
+		}
+		/* record the inlet or outlet type and check for consistency */
+		if (eptr->ex_type == ET_YO ) {
+			/* it is an outlet  for fexpr~*/
+			/* no need to do anything */
+			;
+		} else if (!exp->exp_var[eptr->ex_op].ex_type)
 			exp->exp_var[eptr->ex_op].ex_type = eptr->ex_type;
 		else if (exp->exp_var[eptr->ex_op].ex_type != eptr->ex_type) {
-			post("expr: syntax error: inlets can only have one type: %s\n", exp_str);
+			post("expr: syntax error: inlets can only have one type: %s\n", exp->exp_str);
 			return (1);
 		}
-		exp_str = p;
+		exp->exp_str = p;
 noinletnum:
 		break;
 	case '"':
 		{
 			struct ex_ex ex;
 
-			p = exp_str;
-			if (!*exp_str || *exp_str == '"') {
-				post("expr: syntax error: empty symbol: %s\n", --exp_str);
+			p = exp->exp_str;
+			if (!*exp->exp_str || *exp->exp_str == '"') {
+				post("expr: syntax error: empty symbol: %s\n", --exp->exp_str);
 				return (1);
 			}
 			if (getoken(exp, &ex))
@@ -1626,7 +1815,7 @@ noinletnum:
 				post("expr: syntax error: bad symbol name: %s\n", p);
 				return (1);
 			}
-			if (*exp_str++ != '"') {
+			if (*exp->exp_str++ != '"') {
 				post("expr: syntax error: missing '\"'\n");
 				return (1);
 			}
@@ -1643,10 +1832,10 @@ noinletnum:
 	case '7':
 	case '8':
 	case '9':
-		p = atoif(--exp_str, &eptr->ex_int, &eptr->ex_type);
+		p = atoif(--exp->exp_str, &eptr->ex_int, &eptr->ex_type);
 		if (!p)
 			return (1);
-		exp_str = p;
+		exp->exp_str = p;
 		break;
 
 	default:
@@ -1654,17 +1843,17 @@ noinletnum:
 		 * has to be a string, it should either be a 
 		 * function or a table 
 		 */
-		p = --exp_str;
+		p = --exp->exp_str;
 		for (i = 0; name_ok(*p); i++)
 			p++;
 		if (!i) {
-			post("expr: syntax error: %s\n", exp_str);
+			post("expr: syntax error: %s\n", exp->exp_str);
 			return (1);
 		}
 		eptr->ex_ptr = (char *)fts_malloc(i + 1);
-		strncpy(eptr->ex_ptr, exp_str, (int) i);
+		strncpy(eptr->ex_ptr, exp->exp_str, (int) i);
 		(eptr->ex_ptr)[i] = 0;
-		exp_str = p;
+		exp->exp_str = p;
 		/*
 		 * we mark this as a string and later we will change this
 		 * to either a function or a table
@@ -1798,6 +1987,7 @@ ex_print(struct ex_ex *eptr)
 			post("%s ", eptr->ex_ptr);
 			break;
 		case ET_TBL:
+		case ET_VAR:
 			post("%s ", ex_symname((fts_symbol_t )eptr->ex_ptr));
 			break;
 		case ET_SYM:
@@ -1841,8 +2031,9 @@ ex_print(struct ex_ex *eptr)
 		case ET_VEC:
 			post("vec = %ld ", eptr->ex_vec);
 			break;
-		case ET_VO:
-			post("$y");
+		case ET_YOM1:
+		case ET_YO:
+			post("$y%d", eptr->ex_int + 1);
 			break;
 		case ET_XI:
 		case ET_XI0:
@@ -1906,6 +2097,9 @@ ex_print(struct ex_ex *eptr)
 				break;
 			case OP_EQ:
 				post("%s", "==");
+				break;
+			case OP_STORE:
+				post("%s", "=");
 				break;
 			case OP_NE:
 				post("%s", "!=");

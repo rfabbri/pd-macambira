@@ -1,90 +1,50 @@
-#N canvas 173 105 609 433 12;
-#X floatatom 96 358 0 0 100;
-#N canvas 448 68 641 420 output 0;
-#X obj 430 203 t b;
-#X obj 430 143 f;
-#X obj 430 83 inlet;
-#X obj 430 233 f;
-#X msg 541 225 0;
-#X msg 430 113 bang;
-#X obj 430 173 moses 1;
-#X obj 496 151 moses 1;
-#X obj 107 174 dbtorms;
-#X obj 496 121 r master-lvl;
-#X obj 107 56 r master-lvl;
-#X obj 430 263 s master-lvl;
-#X obj 36 202 inlet~;
-#X obj 251 229 inlet;
-#X obj 269 257 s master-lvl;
-#X msg 119 85 set \$1;
-#X obj 119 115 outlet;
-#X msg 251 283 \; pd dsp 1;
-#X obj 107 236 line~;
-#X obj 36 258 *~;
-#X obj 36 290 dac~;
-#X obj 107 204 pack 0 50;
-#X text 23 179 audio in;
-#X text 2 313 out both channels;
-#X obj 36 231 hip~ 1;
-#X obj 541 194 t b;
-#X connect 0 0 3 0;
-#X connect 1 0 6 0;
-#X connect 2 0 5 0;
-#X connect 3 0 11 0;
-#X connect 4 0 11 0;
-#X connect 5 0 1 0;
-#X connect 6 0 0 0;
-#X connect 6 1 25 0;
-#X connect 7 1 3 1;
-#X connect 8 0 21 0;
-#X connect 9 0 1 1;
-#X connect 9 0 7 0;
-#X connect 10 0 8 0;
-#X connect 10 0 15 0;
-#X connect 12 0 24 0;
-#X connect 13 0 14 0;
-#X connect 13 0 17 0;
-#X connect 15 0 16 0;
-#X connect 18 0 19 1;
-#X connect 19 0 20 0;
-#X connect 19 0 20 1;
-#X connect 21 0 18 0;
-#X connect 24 0 19 0;
-#X connect 25 0 4 0;
-#X restore 58 391 pd output;
-#X msg 134 359 MUTE;
-#X msg 247 180 bang;
-#X msg 328 180 bang;
-#X text 244 152 attack;
-#X text 325 150 release;
-#X obj 247 281 line~;
-#X msg 328 254 0 500;
-#X text 134 10 ENVELOPE GENERATORS;
-#X obj 58 246 phasor~ 50;
-#X obj 58 301 *~;
-#X obj 58 328 wrap~;
-#X msg 247 248 1 2500;
-#X obj 58 275 -~ 0.5;
-#X msg 179 247 10 200;
-#X obj 247 221 del 200;
-#X text 349 405 updated for Pd version 0.34;
-#X text 39 35 This patch uses an envelope generator to control a sound.
+#N canvas 173 105 567 576 12;
+#X text 246 260 attack;
+#X text 317 261 release;
+#X obj 248 397 line~;
+#X msg 318 355 0 500;
+#X text 126 7 ENVELOPE GENERATORS;
+#X obj 65 369 phasor~ 50;
+#X obj 65 417 *~;
+#X obj 65 465 wrap~;
+#X msg 247 355 1 2500;
+#X obj 65 393 -~ 0.5;
+#X msg 182 331 10 200;
+#X obj 247 331 del 200;
+#X text 26 22 This patch uses an envelope generator to control a sound.
 When you hit "attack" two things happen. First \, the line~ object
 rises to 10 in 200 milliseconds. Then after a "delay" of the same 200
 msec \, the second message sends the line~ back down to 1 over another
 2500 msec. The "release" just ramps us down to zero at the end.;
-#X connect 0 0 1 1;
-#X connect 1 0 0 0;
-#X connect 2 0 1 2;
-#X connect 3 0 15 0;
-#X connect 3 0 16 0;
-#X connect 4 0 8 0;
-#X connect 7 0 11 1;
-#X connect 8 0 7 0;
-#X connect 10 0 14 0;
-#X connect 11 0 12 0;
-#X connect 12 0 1 0;
-#X connect 13 0 7 0;
-#X connect 14 0 11 0;
+#X obj 65 513 output~;
+#X text 311 550 updated for Pd version 0.37;
+#X obj 65 441 +~ 0.5;
+#X obj 65 489 hip~ 5;
+#X obj 247 280 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 318 281 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 257 308 stop;
+#X text 28 121 You can hit the "attack" and/or "release" while something
+is still going on from a previous attack or release \, and the envelope
+generator does the ``right thing". In particular \, the release button
+sends a "stop" to the "del" object \, in case it is still scheduled
+to go off from a previous attack.;
+#X text 27 218 The synthesis method is a form of waveshaping \, which
+is the subject of a later chapter.;
+#X connect 2 0 6 1;
+#X connect 3 0 2 0;
+#X connect 5 0 9 0;
+#X connect 6 0 15 0;
+#X connect 7 0 16 0;
+#X connect 8 0 2 0;
+#X connect 9 0 6 0;
+#X connect 10 0 2 0;
+#X connect 11 0 8 0;
 #X connect 15 0 7 0;
 #X connect 16 0 13 0;
+#X connect 17 0 11 0;
+#X connect 17 0 10 0;
+#X connect 18 0 3 0;
+#X connect 18 0 19 0;
+#X connect 19 0 11 0;

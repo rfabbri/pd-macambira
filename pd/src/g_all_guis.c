@@ -880,3 +880,79 @@ int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv)
     iemgui_verify_snd_ne_rcv(iemgui);
     return(oldsndrcvable);
 }
+
+void iem_inttosymargs(t_iem_init_symargs *symargp, int n)
+{
+    memset(symargp, 0, sizeof(*symargp));
+    symargp->x_loadinit = (n >>  0);
+    symargp->x_rcv_arg_tail_len = (n >>  1);
+    symargp->x_snd_arg_tail_len = (n >>  7);
+    symargp->x_rcv_is_arg_num = (n >> 13);
+    symargp->x_snd_is_arg_num = (n >> 19);
+    symargp->x_scale = (n >>  20);
+    symargp->x_flashed = (n >> 21);
+    symargp->x_locked = (n >> 22);
+    symargp->x_reverse = (n >> 23);
+    symargp->dummy = (n >> 24);
+}
+
+int iem_symargstoint(t_iem_init_symargs *symargp)
+{
+    return (
+	((symargp->x_loadinit <<  0) |
+	(symargp->x_rcv_arg_tail_len <<  1) |
+	(symargp->x_snd_arg_tail_len <<  7) |
+	(symargp->x_rcv_is_arg_num << 13) |
+	(symargp->x_snd_is_arg_num << 19) |
+	(symargp->x_scale <<  20) |
+	(symargp->x_flashed << 21) |
+	(symargp->x_locked << 22) |
+	(symargp->x_reverse << 23) |
+	(symargp->dummy << 24)) & IEM_INIT_ARGS_ALL
+    );
+}
+
+void iem_inttofstyle(t_iem_fstyle_flags *fstylep, int n)
+{
+    memset(fstylep, 0, sizeof(*fstylep));
+    fstylep->x_font_style = (n >> 0);
+    fstylep->x_rcv_able = (n >> 6);
+    fstylep->x_snd_able = (n >> 7);
+    fstylep->x_lab_is_unique = (n >> 8);
+    fstylep->x_rcv_is_unique = (n >> 9);
+    fstylep->x_snd_is_unique = (n >> 10);
+    fstylep->x_lab_arg_tail_len = (n >> 11);
+    fstylep->x_lab_is_arg_num = (n >> 17);
+    fstylep->x_shiftdown = (n >> 23);
+    fstylep->x_selected = (n >> 24);
+    fstylep->x_finemoved = (n >> 25);
+    fstylep->x_put_in2out = (n >> 26);
+    fstylep->x_change = (n >> 27);
+    fstylep->x_thick = (n >> 28);
+    fstylep->x_lin0_log1 = (n >> 29);
+    fstylep->x_steady = (n >> 30);
+    fstylep->dummy = (n >> 31);
+}
+
+int iem_fstyletoint(t_iem_fstyle_flags *fstylep)
+{
+    return (
+	((fstylep->x_font_style << 0) |
+	(fstylep->x_rcv_able << 6) |
+	(fstylep->x_snd_able << 7) |
+	(fstylep->x_lab_is_unique << 8) |
+	(fstylep->x_rcv_is_unique << 9) |
+	(fstylep->x_snd_is_unique << 10) |
+	(fstylep->x_lab_arg_tail_len << 11) |
+	(fstylep->x_lab_is_arg_num << 17) |
+	(fstylep->x_shiftdown << 23) |
+	(fstylep->x_selected << 24) |
+	(fstylep->x_finemoved << 25) |
+	(fstylep->x_put_in2out << 26) |
+	(fstylep->x_change << 27) |
+	(fstylep->x_thick << 28) |
+	(fstylep->x_lin0_log1 << 29) |
+	(fstylep->x_steady << 30) |
+	(fstylep->dummy << 31)) & IEM_FSTYLE_FLAGS_ALL
+    );
+}

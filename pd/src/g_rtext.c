@@ -229,7 +229,13 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     		sys_vgui(".x%x.c select from %s %d\n", canvas, 
     	    	    x->x_tag, x->x_selstart);
     		sys_vgui(".x%x.c select to %s %d\n", canvas, 
-    	    	    x->x_tag, x->x_selend);
+    	    	    x->x_tag, x->x_selend
+#if defined (MSW) || defined(MACOSX)
+    	    /* Why is linux selecting text differently from MSW and OSX???
+	    	Just adjust it here... LATER revisit this one */
+			-1
+#endif
+			);
 	    	sys_vgui(".x%x.c focus \"\"\n", canvas);	
     	    }
 	    else
@@ -385,18 +391,23 @@ void rtext_key(t_rtext *x, int keynum, t_symbol *keysym)
     {
     	int n = keynum;
 	if (n == '\r') n = '\n';
-	if (n == '\b')
+	if (n == '\b')	/* backspace */
 	{
-    	    if ((!x->x_selstart) && (x->x_selend == x->x_bufsize))
+	    	    /* LATER delete the box if all text is selected...
+		    this causes reentrancy problems now. */
+    	    /* if ((!x->x_selstart) && (x->x_selend == x->x_bufsize))
     	    {
-	    	    /* LATER delete the box... this causes reentrancy
-		    problems now. */
-    		/* glist_delete(x->x_glist, &x->x_text->te_g); */
-    		return;
-    	    }
-    	    else if (x->x_selstart && (x->x_selstart == x->x_selend))
+    		....
+    	    } */
+    	    if (x->x_selstart && (x->x_selstart == x->x_selend))
 		x->x_selstart--;
 	}
+	else if (n == 127)	/* delete */
+    	{
+	    if (x->x_selend < x->x_bufsize && (x->x_selstart == x->x_selend))
+		x->x_selend++;
+	}
+	
 	ndel = x->x_selend - x->x_selstart;
 	for (i = x->x_selend; i < x->x_bufsize; i++)
     	    x->x_buf[i- ndel] = x->x_buf[i];

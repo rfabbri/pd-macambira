@@ -39,7 +39,7 @@
 #define fsqrt sqrt
 #endif
 
-char fiddle_version[] = "fiddle version 1.1 TEST3";
+char fiddle_version[] = "fiddle version 1.1 TEST4";
 
 #ifdef JMAX
 #include "fts.h"
@@ -319,6 +319,7 @@ void sigfiddle_vibrato(t_sigfiddle *x, t_floatarg vibtime, t_floatarg
 vibdepth);
 void sigfiddle_npartial(t_sigfiddle *x, double npartial);
 void sigfiddle_auto(t_sigfiddle *x, t_floatarg f);
+void sigfiddle_setnpoints(t_sigfiddle *x, t_floatarg f);
 int sigfiddle_doinit(t_sigfiddle *x, long npoints, long npitch, long
 npeakanal, long npeakout);
 static t_int *fiddle_perform(t_int *w);
@@ -693,11 +694,11 @@ void sigfiddle_doit(t_sigfiddle *x)
 
     for (npitch = 0; npitch < x->x_npitch; npitch++)
     {
-	int index;
+	int indx;
 	float best;
 	if (npitch)
 	{
-	    for (best = 0, index = -1, j=1; j < maxbin-1; j++)
+	    for (best = 0, indx = -1, j=1; j < maxbin-1; j++)
 	    {
 		if (histogram[j] > best && histogram[j] > histogram[j-1] &&
 		    histogram[j] > histogram[j+1])
@@ -717,7 +718,7 @@ void sigfiddle_doit(t_sigfiddle *x)
 			if (histogram[j + sigfiddle_intpartialonset[k]]
 			    > histogram[j]) goto peaknogood;
 		    }
-		    index = j;
+		    indx = j;
 		    best = histogram[j];
 		}
 	    peaknogood: ;
@@ -725,13 +726,13 @@ void sigfiddle_doit(t_sigfiddle *x)
 	}
 	else
 	{
-	    for (best = 0, index = -1, j=0; j < maxbin; j++)
+	    for (best = 0, indx = -1, j=0; j < maxbin; j++)
 		if (histogram[j] > best)
-		    index = j,  best = histogram[j];
+		    indx = j,  best = histogram[j];
 	}
-	if (index < 0) break;
+	if (indx < 0) break;
 	histvec[npitch].h_value = best;
-	histvec[npitch].h_index = index;
+	histvec[npitch].h_index = indx;
     }
 #if 1
     if (x->x_nprint)
@@ -1003,6 +1004,7 @@ void sigfiddle_debug(t_sigfiddle *x)
 
 void sigfiddle_print(t_sigfiddle *x)
 {
+    post("npoints %d,",  2 * x->x_hop);
     post("amp-range %f %f,",  x->x_amplo, x->x_amphi);
     post("reattack %d %f,",  x->x_attacktime, x->x_attackthresh);
     post("vibrato %d %f",  x->x_vibtime, x->x_vibdepth);
@@ -1051,16 +1053,70 @@ void sigfiddle_auto(t_sigfiddle *x, t_floatarg f)
     x->x_auto = (f != 0);
 }
 
+static void sigfiddle_freebird(t_sigfiddle *x)
+{
+    if (x->x_inbuf)
+    {
+    	freebytes(x->x_inbuf, sizeof(float) * x->x_hop);
+    	x->x_inbuf = 0;
+    }
+    if (x->x_lastanalysis)
+    {
+    	freebytes(x->x_lastanalysis,
+	    sizeof(float) * (2 * x->x_hop + 4 * FILTSIZE));
+    	x->x_lastanalysis = 0;
+    }
+    if (x->x_spiral)
+    {
+    	freebytes(x->x_spiral, sizeof(float) * 2 * x->x_hop);
+    	x->x_spiral = 0;
+    }
+    x->x_hop = 0;
+}
+
+int sigfiddle_setnpoints(t_sigfiddle *x, t_floatarg fnpoints)
+{
+    int i, npoints = fnpoints;
+    sigfiddle_freebird(x);
+    if (npoints < MINPOINTS || npoints > MAXPOINTS)
+    {
+    	error("fiddle~: npoints out of range; using %d",
+	    npoints = DEFAULTPOINTS);
+    }
+    if (npoints != (1 << sigfiddle_ilog2(npoints)))
+    {
+    	error("fiddle~: npoints not a power of 2; using %d", 
+	    npoints = (1 << sigfiddle_ilog2(npoints)));
+    }
+    x->x_hop = npoints >> 1;
+    if (!(x->x_inbuf = (float *)getbytes(sizeof(float) * x->x_hop)))
+    	goto fail;
+    if (!(x->x_lastanalysis = (float *)getbytes(
+    	sizeof(float) * (2 * x->x_hop + 4 * FILTSIZE))))
+	    goto fail;
+    if (!(x->x_spiral = (float *)getbytes(sizeof(float) * 2 * x->x_hop)))
+    	goto fail;
+    for (i = 0; i < x->x_hop; i++)
+    	x->x_inbuf[i] = 0;
+    for (i = 0; i < npoints + 4 * FILTSIZE; i++)
+    	x->x_lastanalysis[i] = 0;
+    for (i = 0; i < x->x_hop; i++)
+	x->x_spiral[2*i] =    cos((3.14159*i)/(npoints)),
+	x->x_spiral[2*i+1] = -sin((3.14159*i)/(npoints));
+    x->x_phase = 0;
+    return (1);
+fail:
+    sigfiddle_freebird(x);
+    return (0);
+}
+
 int sigfiddle_doinit(t_sigfiddle *x, long npoints, long npitch,
     long npeakanal, long npeakout)
 {
     float *buf1, *buf2,  *buf3;
     t_peakout *buf4;
-    int i, hop;
+    int i;
 
-    if (npoints < MINPOINTS || npoints > MAXPOINTS) npoints = DEFAULTPOINTS;
-    npoints = 1 << sigfiddle_ilog2(npoints);
-    hop = npoints>>1;
     if (!npeakanal && !npeakout) npeakanal = DEFNPEAK, npeakout = 0;
     if (!npeakanal < 0) npeakanal = 0;
     else if (npeakanal > MAXPEAK) npeakanal = MAXPEAK;
@@ -1070,50 +1126,25 @@ int sigfiddle_doinit(t_sigfiddle *x, long npoints, long npitch,
     else if (npitch > MAXNPITCH) npitch = MAXNPITCH;
     if (npeakanal && !npitch) npitch = 1;
 
-
-    if (!(buf1 = (float *)getbytes(sizeof(float) * hop)))
+    if (!sigfiddle_setnpoints(x, npoints))
     {
-	error("fiddle~: out of memory");
-	return (0);
-    }
-    if (!(buf2 = (float *)getbytes(sizeof(float) * (npoints + 4 * FILTSIZE))))
-    {
-	freebytes(buf1, sizeof(float) * hop);
-	error("fiddle~: out of memory");
-	return (0);
-    }
-    if (!(buf3 = (float *)getbytes(sizeof(float) * npoints)))
-    {
-	freebytes(buf1, sizeof(float) * hop);
-	freebytes(buf2, sizeof(float) * (npoints + 4 * FILTSIZE));
 	error("fiddle~: out of memory");
 	return (0);
     }
     if (!(buf4 = (t_peakout *)getbytes(sizeof(*buf4) * npeakout)))
     {
-	freebytes(buf1, sizeof(float) * hop);
-	freebytes(buf2, sizeof(float) * (npoints + 4 * FILTSIZE));
-	freebytes(buf3, sizeof(float) * npoints);
+    	sigfiddle_freebird(x);
 	error("fiddle~: out of memory");
 	return (0);
     }
-    for (i = 0; i < hop; i++) buf1[i] = 0;
-    for (i = 0; i < npoints + 4 * FILTSIZE; i++) buf2[i] = 0;
-    for (i = 0; i < hop; i++)
-	buf3[2*i] =    cos((3.14159*i)/(npoints)),
-	buf3[2*i+1] = -sin((3.14159*i)/(npoints));
     for (i = 0; i < npeakout; i++)
 	buf4[i].po_freq = buf4[i].po_amp = 0;
-    x->x_inbuf = buf1;
-    x->x_lastanalysis = buf2;
-    x->x_spiral = buf3;
     x->x_peakbuf = buf4;
 
     x->x_npeakout = npeakout;
     x->x_npeakanal = npeakanal;
     x->x_phase = 0;
     x->x_histphase = 0;
-    x->x_hop = npoints>>1;
     x->x_sr = 44100;		/* this and the next are filled in later */
     for (i = 0; i < MAXNPITCH; i++)
     {
@@ -1364,6 +1395,8 @@ static t_int *fiddle_perform(t_int *w)
     int n = (int)(w[3]);
     int count;
     float *fp;
+    if (!x->x_hop)
+    	goto nono;
     for (count = 0, fp = x->x_inbuf + x->x_phase; count < n; count++)
     	*fp++ = *in++;
     if (fp == x->x_inbuf + x->x_hop)
@@ -1374,6 +1407,7 @@ static t_int *fiddle_perform(t_int *w)
 	if (x->x_nprint) x->x_nprint--;
     }
     else x->x_phase += n;
+nono:
     return (w+4);
 }
 
@@ -1469,6 +1503,8 @@ void fiddle_tilde_setup(void)
     	gensym("dsp"), 0);
     class_addmethod(sigfiddle_class, (t_method)sigfiddle_debug,
     	gensym("debug"), 0);
+    class_addmethod(sigfiddle_class, (t_method)sigfiddle_setnpoints,
+    	gensym("npoints"), A_FLOAT, 0);
     class_addmethod(sigfiddle_class, (t_method)sigfiddle_amprange,
     	gensym("amp-range"), A_FLOAT, A_FLOAT, 0);
     class_addmethod(sigfiddle_class, (t_method)sigfiddle_reattack,
@@ -1632,8 +1668,7 @@ void sigfiddle_dsp(t_sigfiddle *x, t_signal **sp)
 {
      if (sp[0]->s_n > x->x_hop) {
     	x->x_downsample = sp[0]->s_n / x->x_hop;
-    	post("* warning: fiddle~: will downsample input by
-%ld",x->x_downsample);
+    	post("* warning: fiddle~: will downsample input by %ld",x->x_downsample);
     	x->x_sr = sp[0]->s_sr / x->x_downsample;
     } else {
     	x->x_downsample = 1;
@@ -1644,8 +1679,7 @@ void sigfiddle_dsp(t_sigfiddle *x, t_signal **sp)
     dsp_add(fiddle_perform, 3, sp[0]->s_vec, x, sp[0]->s_n);
 }
 
-void sigfiddle_tick(t_sigfiddle *x)	/* callback function for the clock
-MSP*/
+void sigfiddle_tick(t_sigfiddle *x)	/* callback function for the clock MSP*/
 {
     int i;
     t_pitchhist *ph;
@@ -1762,6 +1796,7 @@ A_DEFLONG, A_DEFLONG, 0);
 	addmess((method)sigfiddle_dsp, 		"dsp",
 	A_CANT, 0);
     addmess((method)sigfiddle_debug, 	"debug", 		0);
+    addmess((method)sigfiddle_setnpoints, "npoints", 	A_FLOAT, 0);
     addmess((method)sigfiddle_amprange, "amp-range",	A_FLOAT, A_FLOAT, 0);
     addmess((method)sigfiddle_reattack, "reattack", 	A_FLOAT, A_FLOAT, 0);
     addmess((method)sigfiddle_vibrato, 	"vibrato", 		A_FLOAT,

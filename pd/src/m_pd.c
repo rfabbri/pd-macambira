@@ -39,6 +39,13 @@ void pd_free(t_pd *x)
     if (c->c_size) t_freebytes(x, c->c_size);
 }
 
+void gobj_save(t_gobj *x, t_binbuf *b)
+{
+    t_class *c = x->g_pd;
+    if (c->c_savefn)
+    	(c->c_savefn)(x, b);
+}
+
 /* deal with several objects bound to the same symbol.  If more than one, we
 actually bind a collection object to the symbol, which forwards messages sent
 to the symbol.  */

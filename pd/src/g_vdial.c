@@ -234,22 +234,20 @@ static void vradio_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *x
 static void vradio_save(t_gobj *z, t_binbuf *b)
 {
     t_vradio *x = (t_vradio *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiiiisssiiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix,
 		(t_int)x->x_gui.x_obj.te_ypix,
 		(pd_class(&x->x_gui.x_obj.ob_pd) == vradio_old_class ?
 		    gensym("vdl") : gensym("vradio")),
 		x->x_gui.x_w,
-		x->x_change, (*ip1)&IEM_INIT_ARGS_ALL, x->x_number,
+		x->x_change, iem_symargstoint(&x->x_gui.x_isa), x->x_number,
 		srl[0], srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
 		bflcol[0], bflcol[1], bflcol[2], x->x_on);
     binbuf_addv(b, ";");
 }
@@ -547,10 +545,8 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
     t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
     int ldx=0, ldy=-6, chg=1, num=8;
-    int fs=8, iinit=0, ifstyle=0;
+    int fs=8;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
     /* post("new %s %d", s->s_name, old); */
@@ -569,7 +565,7 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
     {
 	a = (int)atom_getintarg(0, argc, argv);
 	chg = (int)atom_getintarg(1, argc, argv);
-	iinit = (int)atom_getintarg(2, argc, argv);
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(2, argc, argv));
 	num = (int)atom_getintarg(3, argc, argv);
 	if(IS_A_SYMBOL(argv,4))
 	    srl[0] = atom_getsymbolarg(4, argc, argv);
@@ -594,7 +590,7 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 	}
 	ldx = (int)atom_getintarg(7, argc, argv);
 	ldy = (int)atom_getintarg(8, argc, argv);
-	ifstyle = (int)atom_getintarg(9, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(9, argc, argv));
 	fs = (int)atom_getintarg(10, argc, argv);
 	bflcol[0] = (int)atom_getintarg(11, argc, argv);
 	bflcol[1] = (int)atom_getintarg(12, argc, argv);
@@ -602,19 +598,15 @@ static void *vradio_donew(t_symbol *s, int argc, t_atom *argv, int old)
 	on = (int)atom_getintarg(14, argc, argv);
     }
     x->x_gui.x_draw = (t_iemfunptr)vradio_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     x->x_gui.x_unique_num = 0;
     if(num < 1)
 	num = 1;
@@ -713,10 +705,10 @@ void g_vradio_setup(void)
     vradio_widgetbehavior.w_deletefn = iemgui_delete;
     vradio_widgetbehavior.w_visfn = iemgui_vis;
     vradio_widgetbehavior.w_clickfn = vradio_newclick;
-    vradio_widgetbehavior.w_propertiesfn = vradio_properties;
-    vradio_widgetbehavior.w_savefn = vradio_save;
     class_setwidget(vradio_class, &vradio_widgetbehavior);
     class_sethelpsymbol(vradio_class, gensym("vradio"));
+    class_setsavefn(vradio_class, vradio_save);
+    class_setpropertiesfn(vradio_class, vradio_properties);
 
     	/* obsolete version (0.34-0.35) */
     vradio_old_class = class_new(gensym("vdl"), (t_newmethod)vdial_new,

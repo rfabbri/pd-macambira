@@ -132,18 +132,16 @@ static void my_canvas_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int
 static void my_canvas_save(t_gobj *z, t_binbuf *b)
 {
     t_my_canvas *x = (t_my_canvas *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiiisssiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
 		gensym("cnv"), x->x_gui.x_w, x->x_vis_w, x->x_vis_h,
 		srl[0], srl[1], srl[2], x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
-		bflcol[0], bflcol[2], (*ip1)&IEM_INIT_ARGS_ALL);
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
+		bflcol[0], bflcol[2], iem_symargstoint(&x->x_gui.x_isa));
     binbuf_addv(b, ";");
 }
 
@@ -266,11 +264,11 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int a=IEM_GUI_DEFAULTSIZE, w=100, h=60;
     int ldx=20, ldy=12, f=2, i=0;
-    int fs=14, iinit=0, ifstyle=0;
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
+    int fs=14;
     char str[144];
 
+    iem_inttosymargs(&x->x_gui.x_isa, 0);
+    iem_inttofstyle(&x->x_gui.x_fsf, 0);
     srl[0] = gensym("empty");
     srl[1] = gensym("empty");
     srl[2] = gensym("empty");
@@ -327,24 +325,21 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	ldx = (int)atom_getintarg(i+4, argc, argv);
 	ldy = (int)atom_getintarg(i+5, argc, argv);
-	ifstyle = (int)atom_getintarg(i+6, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(i+6, argc, argv));
 	fs = (int)atom_getintarg(i+7, argc, argv);
 	bflcol[0] = (int)atom_getintarg(i+8, argc, argv);
 	bflcol[2] = (int)atom_getintarg(i+9, argc, argv);
     }
     if((argc == 13)&&IS_A_FLOAT(argv,i+10))
     {
-	iinit = (int)(atom_getintarg(i+10, argc, argv));
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(i+10, argc, argv));
     }
     x->x_gui.x_draw = (t_iemfunptr)my_canvas_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
-    fstyle->x_snd_able = 1;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 1;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
-    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(!strcmp(srl[0]->s_name, "empty")) x->x_gui.x_fsf.x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
     x->x_gui.x_unique_num = 0;
     if(a < 1)
 	a = 1;
@@ -356,11 +351,10 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
     if(h < 1)
 	h = 1;
     x->x_vis_h = h;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     iemgui_first_dollararg2sym(&x->x_gui, srl);
     if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
     x->x_gui.x_snd = srl[0];
@@ -410,8 +404,8 @@ void g_mycanvas_setup(void)
     my_canvas_widgetbehavior.w_deletefn = iemgui_delete;
     my_canvas_widgetbehavior.w_visfn = iemgui_vis;
     my_canvas_widgetbehavior.w_clickfn = NULL;
-    my_canvas_widgetbehavior.w_propertiesfn = my_canvas_properties;
-    my_canvas_widgetbehavior.w_savefn = my_canvas_save;
     class_setwidget(my_canvas_class, &my_canvas_widgetbehavior);
     class_sethelpsymbol(my_canvas_class, gensym("my_canvas"));
+    class_setsavefn(my_canvas_class, my_canvas_save);
+    class_setpropertiesfn(my_canvas_class, my_canvas_properties);
 }

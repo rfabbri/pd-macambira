@@ -27,23 +27,22 @@
 /* "expr" was written by Shahrokh Yadegari c. 1989. -msp */
 /* "expr~" and "fexpr~" conversion by Shahrokh Yadegari c. 1999,2000 */
 
+/*
+ * Feb 2002 - added access to variables
+ *            multiple expression support
+ *	      new short hand forms for fexpr~
+ *		now $y or $y1 = $y1[-1] and $y2 = $y2[-1]
+ * --sdy
+ */
+
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 
 #include "vexp.h"
-#ifndef MSP
-#ifndef MACOSX
-/*
- * the compiler on mac seems not to like this, perhaps we could get away with
- * not having it at all.
- */
-#include "stdlib.h"
-#endif
-#endif
-#include "string.h"
 
-static char *exp_version = "0.3";
+static char *exp_version = "0.4";
 
 extern struct ex_ex *ex_eval(struct expr *exp, struct ex_ex *eptr,
 						struct ex_ex *optr, int n);
@@ -149,6 +148,7 @@ static void
 expr_ff(t_expr *x)
 {
 	t_exprproxy *y;
+	int i;
 	
 	y = x->exp_proxy;
 	while (y)
@@ -162,20 +162,32 @@ expr_ff(t_expr *x)
 #endif
 		y = x->exp_proxy;
 	}
-	if (x->exp_stack)
-		fts_free(x->exp_stack);
+	for (i = 0 ; i < x->exp_nexpr; i++);
+		if (x->exp_stack[i])
+			fts_free(x->exp_stack[i]);
 /*
  * SDY free all the allocated buffers here for expr~ and fexpr~
+ * check to see if there are others
  */
+	for (i = 0; i < MAX_VARS; i++) {
+		if (x->exp_p_var[i])
+			fts_free(x->exp_p_var[i]);
+		if (x->exp_p_res[i])
+			fts_free(x->exp_p_res[i]);
+		if (x->exp_tmpres[i])
+			fts_free(x->exp_tmpres[i]);
+	}
+
+
 }
 
 static void
 expr_bang(t_expr *x)
 {
+	int i;
 
 #ifdef EXPR_DEBUG
 	{
-		int i;
 		struct ex_ex *eptr;
 
 		for (i = 0, eptr = x->exp_var;  ; eptr++, i++)
@@ -202,28 +214,30 @@ expr_bang(t_expr *x)
 	if (!IS_EXPR(x))
 		return;
 
-	if (!ex_eval(x, x->exp_stack, &x->exp_res, 0))
-	{
-		/*       fprintf(stderr,"expr_bang(error evaluation)\n"); */
-		return;
-	}
+	for (i = x->exp_nexpr - 1; i > -1 ; i--) {
+		if (!ex_eval(x, x->exp_stack[i], &x->exp_res[i], 0)) {
+			/*fprintf(stderr,"expr_bang(error evaluation)\n"); */
+		/*  SDY now that we have mutiple ones, on error we should
+		 * continue
+			return;
+		 */
+		}
+		switch(x->exp_res[i].ex_type) {
+		case ET_INT:
+			outlet_float(x->exp_outlet[i], 
+					(t_float) x->exp_res[i].ex_int);
+			break;
 
+		case ET_FLT:
+			outlet_float(x->exp_outlet[i],  x->exp_res[i].ex_flt);
+			break;
 
-	switch(x->exp_res.ex_type)
-	{
-	case ET_INT:
-		outlet_float(x->exp_outlet,  (t_float) x->exp_res.ex_int);
-		break;
+		case ET_SYM:
+			/* CHANGE this will have to be taken care of */
 
-	case ET_FLT:
-		outlet_float(x->exp_outlet,  x->exp_res.ex_flt);
-		break;
-
-	case ET_SYM:
-		/* CHANGE this will have to be taken care of */
-
-	default:
-		post("expr: bang: unrecognized result %ld\n", x->exp_res.ex_type);
+		default:
+			post("expr: bang: unrecognized result %ld\n", x->exp_res[i].ex_type);
+		}
 	}
 }
 
@@ -280,19 +294,21 @@ Nexpr_new(t_symbol *s, int ac, t_atom *av)
 	/*
 	 * initialize the newly allocated object
 	 */
-	x->exp_stack = (struct ex_ex *)0;
 	x->exp_proxy = 0;
 	x->exp_nivec = 0;
+	x->exp_nexpr = 0;
 	x->exp_error = 0;
-	x->exp_outlet = (t_outlet *)0;
-	x->exp_res.ex_type = 0;
-	x->exp_res.ex_int = 0;
-	x->exp_p_res = (t_float *)0;
-	x->exp_tmpres = (t_float *)0;
 	for (i = 0; i < MAX_VARS; i++) {
+		x->exp_stack[i] = (struct ex_ex *)0;
+		x->exp_outlet[i] = (t_outlet *)0;
+		x->exp_res[i].ex_type = 0;
+		x->exp_res[i].ex_int = 0;
+		x->exp_p_res[i] = (t_float *)0;
 		x->exp_var[i].ex_type = 0;
 		x->exp_var[i].ex_int = 0;
 		x->exp_p_var[i] = (t_float *)0;
+		x->exp_tmpres[i] = (t_float *)0;
+		x->exp_vsize = 0;
 	}
 	x->exp_f = 0; /* save the control value to be transformed to signal */
 		
@@ -369,15 +385,25 @@ SDY the following coredumps why?
 		}
 	}
 	if (IS_EXPR(x)) {
-		x->exp_outlet = outlet_new(&x->exp_ob, 0);
+		for (i = 0; i < x->exp_nexpr; i++)
+			x->exp_outlet[i] = outlet_new(&x->exp_ob, 0);
 	} else {
-#ifdef PD
-		x->exp_outlet = outlet_new(&x->exp_ob,  gensym("signal"));
-#else /* MSP */
-		x->exp_outlet = outlet_new(&x->exp_ob,  "signal");
-#endif
+		for (i = 0; i < x->exp_nexpr; i++)
+			x->exp_outlet[i] = outlet_new(&x->exp_ob,
+							gensym("signal"));
 		x->exp_nivec = dsp_index;
 	}
+	/*
+	 * for now assume a 64 sample size block but this may change once
+	 * expr_dsp is called
+	 */
+	x->exp_vsize = 64;
+	for (i = 0; i < x->exp_nexpr; i++) {
+		x->exp_p_res[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
+		x->exp_tmpres[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
+	}
+	for (i = 0; i < MAX_VARS; i++)
+		x->exp_p_var[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
 
 	return (x);
 }
@@ -385,7 +411,7 @@ SDY the following coredumps why?
 t_int *
 expr_perform(t_int *w)
 {
-	int i;
+	int i, j;
 	t_expr *x = (t_expr *)w[1];
 	struct ex_ex res;
 	int n;
@@ -397,34 +423,54 @@ expr_perform(t_int *w)
 	}
 
 	if (x->exp_flags & EF_STOP) {
-		memset(x->exp_res.ex_vec, 0, x->exp_vsize * sizeof (float));
+		for (i = 0; i < x->exp_nexpr; i++)
+			memset(x->exp_res[i].ex_vec, 0,
+					x->exp_vsize * sizeof (float));
 		return (w + 2);
 	}
 
 	if (IS_EXPR_TILDE(x)) {
-		ex_eval(x, x->exp_stack, &x->exp_res, 0);
+		/*
+		 * if we have only one expression, we can right on
+		 * on the output directly, otherwise we have to copy
+		 * the data because, outputs could be the same buffer as
+		 * inputs
+		 */
+		if ( x->exp_nexpr == 1)
+			ex_eval(x, x->exp_stack[0], &x->exp_res[0], 0);
+		else {
+			res.ex_type = ET_VEC;
+			for (i = 0; i < x->exp_nexpr; i++) {
+				res.ex_vec = x->exp_tmpres[i];
+				ex_eval(x, x->exp_stack[i], &res, 0);
+			}
+			n = x->exp_vsize * sizeof(t_float);
+			for (i = 0; i < x->exp_nexpr; i++)
+				memcpy(x->exp_res[i].ex_vec, x->exp_tmpres[i],
+									n);
+		}
 		return (w + 2);
 	}
 
 	if (!IS_FEXPR_TILDE(x)) {
 		post("expr_perform: bad x->exp_flags = %d - expecting fexpr",
 								x->exp_flags);
-		abort();
+		return (w + 2);
 	}
 	/*
 	 * since the output buffer could be the same as one of the inputs
 	 * we need to keep the output in  a different buffer
 	 */
-	for (i = 0; i < x->exp_vsize; i++) {
+	for (i = 0; i < x->exp_vsize; i++) for (j = 0; j < x->exp_nexpr; j++) {
 		res.ex_type = 0;
 		res.ex_int = 0;
-		ex_eval(x, x->exp_stack, &res, i);
+		ex_eval(x, x->exp_stack[j], &res, i);
 		switch (res.ex_type) {
 		case ET_INT:
-			x->exp_tmpres[i] = (t_float) res.ex_int;
+			x->exp_tmpres[j][i] = (t_float) res.ex_int;
 			break;
 		case ET_FLT:
-			x->exp_tmpres[i] = res.ex_flt;
+			x->exp_tmpres[j][i] = res.ex_flt;
 			break;
 		default:
 			post("expr_perform: bad result type %d", res.ex_type);
@@ -439,8 +485,10 @@ expr_perform(t_int *w)
 	for (i = 0; i < MAX_VARS; i++)
 		if (x->exp_var[i].ex_type == ET_XI)
 			memcpy(x->exp_p_var[i], x->exp_var[i].ex_vec, n);
-	memcpy(x->exp_p_res, x->exp_tmpres, n);
-	memcpy(x->exp_res.ex_vec, x->exp_tmpres, n);
+	for (i = 0; i < x->exp_nexpr; i++) {
+		memcpy(x->exp_p_res[i], x->exp_tmpres[i], n);
+		memcpy(x->exp_res[i].ex_vec, x->exp_tmpres[i], n);
+	}
 	return (w + 2);
 }
 
@@ -453,8 +501,10 @@ expr_dsp(t_expr *x, t_signal **sp)
 	x->exp_error = 0;		/* reset all errors */
 	newsize = (x->exp_vsize !=  sp[0]->s_n);
 	x->exp_vsize = sp[0]->s_n;	/* record the vector size */
-	x->exp_res.ex_type = ET_VEC;
-	x->exp_res.ex_vec =  sp[x->exp_nivec]->s_vec; 
+	for (i = 0; i < x->exp_nexpr; i++) {
+		x->exp_res[i].ex_type = ET_VEC;
+		x->exp_res[i].ex_vec =  sp[x->exp_nivec + i]->s_vec; 
+	}
 	for (i = 0, nv = 0; i < MAX_VARS; i++)
 		/*
 		 * the first inlet is always a signal
@@ -481,24 +531,52 @@ expr_dsp(t_expr *x, t_signal **sp)
 
 	dsp_add(expr_perform, 1, (t_int *) x);
 
+	/*
+	 * The buffer are now being allocated for expr~ and fexpr~
+	 * because if we have more than one expression we need the
+	 * temporary buffers, The save buffers are not really needed
 	if (!IS_FEXPR_TILDE(x))
 		return;
-	if (x->exp_p_res) {
+	 */
+	/*
+	 * if we have already allocated the buffers and we have a 
+	 * new size free all the buffers
+	 */
+	if (x->exp_p_res[0]) {
 		if (!newsize)
 			return;
 		/*
 		 * if new size, reallocate all the previous buffers for fexpr~
 		 */
-		fts_free(x->exp_p_res);
-		fts_free(x->exp_tmpres);
+		for (i = 0; i < x->exp_nexpr; i++) {
+			fts_free(x->exp_p_res[i]);
+			fts_free(x->exp_tmpres[i]);
+		}
 		for (i = 0; i < MAX_VARS; i++)
 			fts_free(x->exp_p_var[i]);
 
 	}
-	x->exp_p_res = fts_calloc(x->exp_vsize, sizeof (t_float));
-	x->exp_tmpres = fts_calloc(x->exp_vsize, sizeof (t_float));
+	for (i = 0; i < x->exp_nexpr; i++) {
+		x->exp_p_res[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
+		x->exp_tmpres[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
+	}
 	for (i = 0; i < MAX_VARS; i++)
 		x->exp_p_var[i] = fts_calloc(x->exp_vsize, sizeof (t_float));
+}
+
+/*
+ * expr_verbose -- toggle the verbose switch
+ */
+static void
+expr_verbose(t_expr *x)
+{
+	if (x->exp_flags & EF_VERBOSE) {
+		x->exp_flags &= ~EF_VERBOSE;
+		post ("verbose off");
+	} else {
+		x->exp_flags |= EF_VERBOSE;
+		post ("verbose on");
+	}
 }
 
 /*
@@ -517,6 +595,195 @@ static void
 expr_stop(t_expr *x)
 {
 	x->exp_flags |= EF_STOP;
+}
+static void
+fexpr_set_usage(void)
+{
+	post("fexpr~: set val ...");
+	post("fexpr~: set {xy}[#] val ...");
+}
+
+/*
+ * fexpr_tilde_set -- set previous values of the buffers
+ * 		set val val ... - sets the first elements of output buffers
+ * 		set x val ...   - sets the elements of the first input buffer
+ * 		set x# val ...  - sets the elements of the #th input buffers
+ * 		set y val ...   - sets the elements of the first output buffer
+ * 		set y# val ...  - sets the elements of the #th output buffers
+ */
+static void
+fexpr_tilde_set(t_expr *x, t_symbol *s, int argc, t_atom *argv)
+{
+	t_symbol *sx;
+	int vecno;
+	int i, nargs;
+
+	if (!argc)
+		return;
+	sx = atom_getsymbolarg(0, argc, argv);
+	switch(sx->s_name[0]) {
+	case 'x':
+		if (!sx->s_name[1])
+			vecno = 0;
+		else {
+			vecno = atoi(sx->s_name + 1);
+			if (!vecno) {
+				post("fexpr~.set: bad set x vector number");
+				fexpr_set_usage();
+				return;
+			}
+			if (vecno >= MAX_VARS) {
+				post("fexpr~.set: no more than %d inlets",
+								      MAX_VARS);
+				return;
+			}
+			vecno--;
+		}
+		if (x->exp_var[vecno].ex_type != ET_XI) {
+			post("fexpr~-set: no signal at inlet %d", vecno + 1);
+			return;
+		}
+		nargs = argc - 1;
+		if (!nargs) {
+			post("fexpr~-set: no argument to set");
+			return;
+		}
+		if (nargs > x->exp_vsize) {
+		   post("fexpr~.set: %d set values larger than vector size(%d)",
+							nargs,  x->exp_vsize);
+		   post("fexpr~.set: only the first %d values will be set",
+				   				x->exp_vsize);
+		   nargs = x->exp_vsize;
+		}
+		for (i = 0; i < nargs; i++) {
+			x->exp_p_var[vecno][x->exp_vsize - i - 1] =
+					atom_getfloatarg(i + 1, argc, argv);
+		}
+		return;
+	case 'y':
+		if (!sx->s_name[1])
+			vecno = 0;
+		else {
+			vecno = atoi(sx->s_name + 1);
+			if (!vecno) {
+				post("fexpr~.set: bad set y vector number");
+				fexpr_set_usage();
+				return;
+			}
+			vecno--;
+		}
+		if (vecno >= x->exp_nexpr) {
+			post("fexpr~.set: only %d outlets", x->exp_nexpr);
+			return;
+		}
+		nargs = argc - 1;
+		if (!nargs) {
+			post("fexpr~-set: no argument to set");
+			return;
+		}
+		if (nargs > x->exp_vsize) {
+		   post("fexpr~-set: %d set values larger than vector size(%d)",
+							nargs,  x->exp_vsize);
+		   post("fexpr~.set: only the first %d values will be set",
+				   				x->exp_vsize);
+		   nargs = x->exp_vsize;
+		}
+		for (i = 0; i < nargs; i++) {
+			x->exp_p_res[vecno][x->exp_vsize - i - 1] =
+					atom_getfloatarg(i + 1, argc, argv);
+		}
+		return;
+	case 0:
+		if (argc >  x->exp_nexpr) {
+			post("fexpr~.set: only %d outlets available",
+								x->exp_nexpr);
+			post("fexpr~.set: the extra set values are ignored");
+		}
+		for (i = 0; i < x->exp_nexpr && i < argc; i++)
+			x->exp_p_res[i][x->exp_vsize - 1] =
+					atom_getfloatarg(i, argc, argv);
+		return;
+	default:
+		fexpr_set_usage();
+		return;
+	}
+	return;
+}
+
+/*
+ * fexpr_tilde_clear - clear the past buffers
+ */
+static void
+fexpr_tilde_clear(t_expr *x, t_symbol *s, int argc, t_atom *argv)
+{
+	t_symbol *sx;
+	int vecno;
+	int i, nargs;
+
+	/*
+	 *  if no arguement clear all input and output buffers
+	 */
+	if (!argc) {
+		for (i = 0; i < x->exp_nexpr; i++)
+			memset(x->exp_p_res[i], 0, x->exp_vsize*sizeof(float));
+		for (i = 0; i < MAX_VARS; i++)
+			if (x->exp_var[i].ex_type == ET_XI)
+				memset(x->exp_p_var[i], 0,
+						x->exp_vsize*sizeof(float));
+		return;
+	}
+	if (argc > 1) {
+		post("fexpr~ usage: 'clear' or 'clear {xy}[#]'");
+		return;
+	}
+
+	sx = atom_getsymbolarg(0, argc, argv);
+	switch(sx->s_name[0]) {
+	case 'x':
+		if (!sx->s_name[1])
+			vecno = 0;
+		else {
+			vecno = atoi(sx->s_name + 1);
+			if (!vecno) {
+				post("fexpr~.clear: bad clear x vector number");
+				return;
+			}
+			if (vecno >= MAX_VARS) {
+				post("fexpr~.clear: no more than %d inlets",
+								      MAX_VARS);
+				return;
+			}
+			vecno--;
+		}
+		if (x->exp_var[vecno].ex_type != ET_XI) {
+			post("fexpr~-clear: no signal at inlet %d", vecno + 1);
+			return;
+		}
+		memset(x->exp_p_var[vecno], 0, x->exp_vsize*sizeof(float));
+		return;
+	case 'y':
+		if (!sx->s_name[1])
+			vecno = 0;
+		else {
+			vecno = atoi(sx->s_name + 1);
+			if (!vecno) {
+				post("fexpr~.clear: bad clear y vector number");
+				return;
+			}
+			vecno--;
+		}
+		if (vecno >= x->exp_nexpr) {
+			post("fexpr~.clear: only %d outlets", x->exp_nexpr);
+			return;
+		}
+		memset(x->exp_p_res[vecno], 0, x->exp_vsize*sizeof(float));
+		return;
+		return;
+	default:
+		post("fexpr~ usage: 'clear' or 'clear {xy}[#]'");
+		return;
+	}
+	return;
 }
 
 #ifdef PD
@@ -542,7 +809,7 @@ expr_setup(void)
 	class_addmethod(expr_tilde_class, nullfn, gensym("signal"), 0);
 	CLASS_MAINSIGNALIN(expr_tilde_class, t_expr, exp_f);
 	class_addmethod(expr_tilde_class,(t_method)expr_dsp, gensym("dsp"), 0);
-
+    	class_sethelpsymbol(expr_tilde_class, gensym("expr"));
 	/*
 	 * fexpr~ initialization
 	 */
@@ -555,6 +822,15 @@ expr_setup(void)
 							gensym("stop"), 0);
 
 	class_addmethod(fexpr_tilde_class,(t_method)expr_dsp,gensym("dsp"), 0);
+	class_addmethod(fexpr_tilde_class, (t_method)fexpr_tilde_set,
+	                gensym("set"), A_GIMME, 0);
+	class_addmethod(fexpr_tilde_class, (t_method)fexpr_tilde_clear,
+	                gensym("clear"), A_GIMME, 0);
+	class_addmethod(fexpr_tilde_class,(t_method)expr_verbose,
+							gensym("verbose"), 0);
+    	class_sethelpsymbol(fexpr_tilde_class, gensym("expr"));
+
+
 
 	post("expr, expr~, fexpr~ version %s under GNU General Public License ", exp_version);
 
@@ -586,7 +862,8 @@ main(void)
 /* -- the following functions use Pd internals and so are in the "if" file. */
 
 
-int ex_getsym(char *p, fts_symbol_t *s)
+int
+ex_getsym(char *p, fts_symbol_t *s)
 {
 	*s = gensym(p);
 	return (0);
@@ -622,7 +899,7 @@ max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
 	    !garray_getfloatarray(garray, &size, &vec))
 	{
 		optr->ex_type = ET_FLT;
-		optr->ex_int = 0;
+		optr->ex_flt = 0;
 		pd_error(exp, "no such table '%s'", s->s_name);
 		return (1);
 	}
@@ -652,6 +929,19 @@ max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
 	optr->ex_type = ET_FLT;
 	optr->ex_flt = 0;
 #endif	
+	return (0);
+}
+
+int
+max_ex_var(struct expr *exp, fts_symbol_t var, struct ex_ex *optr)
+{
+	optr->ex_type = ET_FLT;
+	if (value_getfloat(var, &(optr->ex_flt))) {
+		optr->ex_type = ET_FLT;
+		optr->ex_flt = 0;
+		pd_error(exp, "no such var '%s'", var->s_name);
+		return (1);
+	}
 	return (0);
 }
 

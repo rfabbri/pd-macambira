@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.37 TEST 4\n";
+char pd_version[] = "Pd version 0.37.0\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -36,8 +36,7 @@ int sys_argparse(int argc, char **argv);
 void sys_findprogdir(char *progname);
 int sys_startgui(const char *guipath);
 int sys_rcfile(void);
-int m_scheduler(int nodacs);
-void m_schedsetsr( void);
+int m_scheduler(void);
 void sys_addhelppath(char *p);
 
 int sys_debuglevel;
@@ -58,8 +57,28 @@ int sys_nmidiin = 0;
 #else
 int sys_nmidiin = 1;
 #endif
-int sys_midiindevlist[MAXMIDIINDEV] = {DEFMIDIDEV};
-int sys_midioutdevlist[MAXMIDIOUTDEV] = {DEFMIDIDEV};
+int sys_midiindevlist[MAXMIDIINDEV] = {1};
+int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
+
+static int sys_main_srate = DEFAULTSRATE;
+static int sys_main_advance = DEFAULTADVANCE;
+
+/* IOhannes { */
+
+    /* here the "-1" counts signify that the corresponding vector hasn't been
+    specified in command line arguments; sys_open_audio will detect this
+    and fill things in. */
+int sys_nsoundin = -1;
+int sys_nsoundout = -1;
+int sys_soundindevlist[MAXAUDIOINDEV];
+int sys_soundoutdevlist[MAXAUDIOOUTDEV];
+
+int sys_nchin = -1;
+int sys_nchout = -1;
+int sys_chinlist[MAXAUDIOINDEV];
+int sys_choutlist[MAXAUDIOOUTDEV];
+/* } IOhannes */
+
 
 typedef struct _fontinfo
 {
@@ -132,25 +151,6 @@ int sys_defaultfont;
 #else
 #define DEFAULTFONT 10
 #endif
-
-
-static int inchannels = -1, outchannels = -1;
-static int srate = 44100;
-
-/* IOhannes { */
-#define MAXSOUNDINDEV 4
-#define MAXSOUNDOUTDEV 4
-
-int sys_nsoundin = -1;
-int sys_nsoundout = -1;
-int sys_soundindevlist[MAXSOUNDINDEV] = {-1};
-int sys_soundoutdevlist[MAXSOUNDOUTDEV] = {-1};
-
-int sys_nchin = -1;
-int sys_nchout = -1;
-int sys_chinlist[MAXSOUNDINDEV] = {-1};
-int sys_choutlist[MAXSOUNDOUTDEV] = {-1};
-/* } IOhannes */
 
 static void openit(const char *dirname, const char *filename)
 {
@@ -248,19 +248,17 @@ int sys_main(int argc, char **argv)
     	pd_version, pd_compiletime, pd_compiledate);
     if (sys_version)	/* if we were just asked our version, exit here. */
     	return (0);
+    if (sys_startgui(sys_guidir->s_name))	/* start the gui */
+    	return(1);
     	    /* open audio and MIDI */
     sys_open_midi(sys_nmidiin, sys_midiindevlist,
     	sys_nmidiout, sys_midioutdevlist);
     sys_open_audio(sys_nsoundin, sys_soundindevlist, sys_nchin, sys_chinlist,
-    	sys_nsoundout, sys_soundoutdevlist, sys_nchout, sys_choutlist, srate);
-
-    	    /* tell scheduler the sample rate */ 
-    m_schedsetsr();
-    if (sys_startgui(sys_guidir->s_name))	/* start the gui */
-    	return(1);
+    	sys_nsoundout, sys_soundoutdevlist, sys_nchout, sys_choutlist,
+	    sys_main_srate, sys_main_advance, 1);
 
     	    /* run scheduler until it quits */
-    return (m_scheduler(!(inchannels || outchannels)));
+    return (m_scheduler());
 }
 
 static char *(usagemessage[]) = {
@@ -288,19 +286,24 @@ static char *(usagemessage[]) = {
 
 #ifdef USEAPI_ALSA
 "-alsa            -- use ALSA audio API\n",
-"-alsadev <n>     ----- ALSA device # (count from 1) or name: default hw:0,0\n",
+"-alsadev <n>     ----- obsolete: use -audiodev\n",
+#endif
+
+#ifdef USEAPI_JACK
+"-jack            -- use JACK audio API\n",
 #endif
 
 #ifdef USEAPI_PORTAUDIO
 #ifdef MSW
-"-pa              -- use Portaudio API (for ASIO)\n",
+"-asio            -- use ASIO audio driver (via Portaudio)\n",
+"-pa              -- synonym for -asio\n",
 #else
 "-pa              -- use Portaudio API\n",
 #endif
 #endif
 
 #ifdef USEAPI_MMIO
-"-mmio     	  -- use MMIO audio API\n",
+"-mmio     	  -- use MMIO audio API (default for Windows)\n",
 #endif
 "      (default audio API for this platform:  ", API_DEFSTRING, ")\n\n",
 
@@ -329,7 +332,7 @@ static char *(usagemessage[]) = {
 "-rt or -realtime -- use real-time priority (needs root privilege)\n",
 #endif
 };
- 
+
 static void sys_parsedevlist(int *np, int *vecp, int max, char *str)
 {
     int n = 0;
@@ -363,7 +366,7 @@ static int sys_getmultidevchannels(int n, int *devlist)
 
     /* this routine tries to figure out where to find the auxilliary files
     Pd will need to run.  This is either done by looking at the command line
-    invokation for Pd, or if htat fails, by consulting the variable
+    invokation for Pd, or if that fails, by consulting the variable
     INSTALL_PREFIX.  In MSW, we don't try to use INSTALL_PREFIX. */
 void sys_findprogdir(char *progname)
 {
@@ -458,19 +461,25 @@ void sys_findprogdir(char *progname)
 int sys_argparse(int argc, char **argv)
 {
     char sbuf[MAXPDSTRING];
+    int i;
+#ifdef MSW
+    int mmio = 1;
+#else
+    int mmio = 0;
+#endif
     argc--; argv++;
     while ((argc > 0) && **argv == '-')
     {
     	if (!strcmp(*argv, "-r") && argc > 1 &&
-    	    sscanf(argv[1], "%d", &srate) >= 1)
+    	    sscanf(argv[1], "%d", &sys_main_srate) >= 1)
     	{
     	    argc -= 2;
     	    argv += 2;
     	}
     	else if (!strcmp(*argv, "-inchannels"))
-	  { /* IOhannes */
-	  sys_parsedevlist(&sys_nchin, sys_chinlist, MAXSOUNDINDEV, argv[1]);
-	  inchannels=sys_getmultidevchannels(sys_nchin, sys_chinlist);
+	{ /* IOhannes */
+	    sys_parsedevlist(&sys_nchin,
+	    	sys_chinlist, MAXAUDIOINDEV, argv[1]);
 
 	  if (!sys_nchin)
 	      goto usage;
@@ -478,9 +487,9 @@ int sys_argparse(int argc, char **argv)
 	  argc -= 2; argv += 2;
     	}
     	else if (!strcmp(*argv, "-outchannels"))
-	  { /* IOhannes */
-	  sys_parsedevlist(&sys_nchout, sys_choutlist,MAXSOUNDOUTDEV, argv[1]);
-	  outchannels=sys_getmultidevchannels(sys_nchout, sys_choutlist);
+	{ /* IOhannes */
+	    sys_parsedevlist(&sys_nchout, sys_choutlist,
+	    	MAXAUDIOOUTDEV, argv[1]);
 
 	  if (!sys_nchout)
 	    goto usage;
@@ -489,12 +498,10 @@ int sys_argparse(int argc, char **argv)
     	}
     	else if (!strcmp(*argv, "-channels"))
 	{
-	    sys_parsedevlist(&sys_nchin, sys_chinlist,MAXSOUNDINDEV,
+	    sys_parsedevlist(&sys_nchin, sys_chinlist,MAXAUDIOINDEV,
 	    	argv[1]);
-	    inchannels = sys_getmultidevchannels(sys_nchin, sys_chinlist);
-	    sys_parsedevlist(&sys_nchout, sys_choutlist,MAXSOUNDOUTDEV,
+	    sys_parsedevlist(&sys_nchout, sys_choutlist,MAXAUDIOOUTDEV,
 	    	argv[1]);
-	    outchannels = sys_getmultidevchannels(sys_nchout, sys_choutlist);
 
 	    if (!sys_nchout)
 	      goto usage;
@@ -503,7 +510,7 @@ int sys_argparse(int argc, char **argv)
     	}
     	else if (!strcmp(*argv, "-soundbuf") || !strcmp(*argv, "-audiobuf"))
     	{
-    	    sys_audiobuf(atoi(argv[1]));
+    	    sys_main_advance = atoi(argv[1]);
     	    argc -= 2; argv += 2;
     	}
     	else if (!strcmp(*argv, "-blocksize"))
@@ -520,32 +527,29 @@ int sys_argparse(int argc, char **argv)
 	{ /* IOhannes */
 	    sys_nsoundout=0;
 	    sys_nchout = 0;
-	    outchannels  =0;
 	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-noadc"))
 	{ /* IOhannes */
 	    sys_nsoundin=0;
 	    sys_nchin = 0;
-	    inchannels  =0;
 	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-nosound") || !strcmp(*argv, "-noaudio"))
 	{ /* IOhannes */
 	    sys_nsoundin=sys_nsoundout = 0;
 	    sys_nchin = sys_nchout = 0;
-	    inchannels  =outchannels    =0;
 	    argc--; argv++;
     	}
 #ifdef USEAPI_OSS
     	else if (!strcmp(*argv, "-oss"))
     	{
-    	    sys_set_sound_api(API_OSS);
+    	    sys_set_audio_api(API_OSS);
     	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-32bit"))
     	{
-    	    sys_set_sound_api(API_OSS);
+    	    sys_set_audio_api(API_OSS);
     	    oss_set32bit();
     	    argc--; argv++;
     	}
@@ -553,33 +557,51 @@ int sys_argparse(int argc, char **argv)
 #ifdef USEAPI_ALSA
     	else if (!strcmp(*argv, "-alsa"))
     	{
-    	    sys_set_sound_api(API_ALSA);
+    	    sys_set_audio_api(API_ALSA);
     	    argc--; argv++;
     	}
+	    /* obsolete flag for setting ALSA device number or name */
 	else if (!strcmp(*argv, "-alsadev"))
 	{
+	    int devno = 0;
 	    if (argv[1][0] >= '1' && argv[1][0] <= '9')
-	    {
-	    	char buf[80];
-		sprintf(buf, "hw:%d,0", atoi(argv[1]) - 1);
-		linux_alsa_devname(buf);
-	    }
-	    else linux_alsa_devname(argv[1]);
-    	    sys_set_sound_api(API_ALSA);
+	    	devno = 1 + 2 * (atoi(argv[1]) - 1);
+	    else if (!strncmp(argv[1], "hw:", 3))
+    	    	devno = 1 + 2 * atoi(argv[1]+3);
+	    else if (!strncmp(argv[1], "plughw:", 7))
+    	    	devno = 2 + 2 * atoi(argv[1]+7);
+	    else goto usage;
+	    post("devno %d", devno);
+	    sys_nsoundin = sys_nsoundout = 1;
+	    sys_soundindevlist[0] = sys_soundoutdevlist[0] = devno;
+    	    sys_set_audio_api(API_ALSA);
 	    argc -= 2; argv +=2;
 	}
 #endif
-#ifdef USEAPI_PORTAUDIO
-    	else if (!strcmp(*argv, "-pa") || !strcmp(*argv, "-portaudio"))
+#ifdef USEAPI_JACK
+    	else if (!strcmp(*argv, "-jack"))
     	{
-    	    sys_set_sound_api(API_PORTAUDIO);
+    	    sys_set_audio_api(API_JACK);
+    	    argc--; argv++;
+    	}
+#endif
+#ifdef USEAPI_PORTAUDIO
+    	else if (!strcmp(*argv, "-pa") || !strcmp(*argv, "-portaudio")
+#ifdef MSW
+    	    || !strcmp(*argv, "-asio")
+#endif
+	    )
+    	{
+    	    sys_set_audio_api(API_PORTAUDIO);
+	    mmio = 0;
     	    argc--; argv++;
     	}
 #endif
 #ifdef USEAPI_MMIO
     	else if (!strcmp(*argv, "-mmio"))
     	{
-    	    sys_set_sound_api(API_MMIO);
+    	    sys_set_audio_api(API_MMIO);
+	    mmio = 1;
     	    argc--; argv++;
     	}
 #endif
@@ -702,7 +724,7 @@ int sys_argparse(int argc, char **argv)
 	    !strcmp(*argv, "-audioindev"))
 	  { /* IOhannes */
 	  sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
-	      MAXSOUNDINDEV, argv[1]);
+	      MAXAUDIOINDEV, argv[1]);
 	  if (!sys_nsoundin)
 	    goto usage;
 	  argc -= 2; argv += 2;
@@ -711,7 +733,7 @@ int sys_argparse(int argc, char **argv)
 	    !strcmp(*argv, "-audiooutdev"))
 	  { /* IOhannes */
 	  sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
-	      MAXSOUNDOUTDEV, argv[1]);
+	      MAXAUDIOOUTDEV, argv[1]);
 	  if (!sys_nsoundout)
 	    goto usage;
     	    argc -= 2; argv += 2;
@@ -719,9 +741,9 @@ int sys_argparse(int argc, char **argv)
     	else if (!strcmp(*argv, "-sounddev") || !strcmp(*argv, "-audiodev"))
 	{
 	  sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
-	      MAXSOUNDINDEV, argv[1]);
+	      MAXAUDIOINDEV, argv[1]);
 	  sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
-	      MAXSOUNDOUTDEV, argv[1]);
+	      MAXAUDIOOUTDEV, argv[1]);
 	  if (!sys_nsoundout)
 	    goto usage;
     	    argc -= 2; argv += 2;
@@ -739,6 +761,22 @@ int sys_argparse(int argc, char **argv)
     	sys_defaultfont = DEFAULTFONT;
     for (; argc > 0; argc--, argv++) 
     	sys_openlist = namelist_append(sys_openlist, *argv);
+
+    	/* correct to make audio and MIDI device lists zero based.  On
+	MMIO, however, "1" really means the second device (the first one
+	is "mapper" which is was not included when the command args were
+	set up, so we leave it that way for compatibility. */
+    if (!mmio)
+    {
+    	for (i = 0; i < sys_nsoundin; i++)
+    	    sys_soundindevlist[i]--;
+    	for (i = 0; i < sys_nsoundout; i++)
+    	    sys_soundoutdevlist[i]--;
+    }
+    for (i = 0; i < sys_nmidiin; i++)
+    	sys_midiindevlist[i]--;
+    for (i = 0; i < sys_nmidiout; i++)
+    	sys_midioutdevlist[i]--;
 
     return (0);
 }

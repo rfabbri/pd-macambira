@@ -31,7 +31,8 @@ static void oss_midiout(int fd, int n)
 
 #define O_MIDIFLAG O_NDELAY
 
-void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
+void sys_do_open_midi(int nmidiin, int *midiinvec,
+    int nmidiout, int *midioutvec)
 {
     int i;
     for (i = 0; i < nmidiout; i++)
@@ -41,13 +42,13 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	int fd = -1, j, outdevindex = -1;
 	char namebuf[80];
 	int devno = midiinvec[i];
-	
+
 	for (j = 0; j < nmidiout; j++)
 	    if (midioutvec[j] == midiinvec[i])
 	    	outdevindex = j;
 	
 	    /* try to open the device for read/write. */
-	if (devno == 1 && fd < 0 && outdevindex >= 0)
+	if (devno == 0 && fd < 0 && outdevindex >= 0)
 	{
     	    sys_setalarm(1000000);
 	    fd = open("/dev/midi", O_RDWR | O_MIDIFLAG);
@@ -60,7 +61,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0 && outdevindex >= 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%2.2d", devno-1);
+	    sprintf(namebuf, "/dev/midi%2.2d", devno);
 	    fd = open(namebuf, O_RDWR | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr,
@@ -72,7 +73,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0 && outdevindex >= 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%d", devno-1);
+	    sprintf(namebuf, "/dev/midi%d", devno);
 	    fd = open(namebuf, O_RDWR | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr, "device %d: tried %s READ/WRITE; returned %d\n",
@@ -91,7 +92,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%2.2d", devno-1);
+	    sprintf(namebuf, "/dev/midi%2.2d", devno);
 	    fd = open(namebuf, O_RDONLY | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr, "device %d: tried %s READONLY; returned %d\n",
@@ -100,7 +101,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%d", devno-1);
+	    sprintf(namebuf, "/dev/midi%d", devno);
 	    fd = open(namebuf, O_RDONLY | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr, "device %d: tried %s READONLY; returned %d\n",
@@ -126,7 +127,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%2.2d", devno-1);
+	    sprintf(namebuf, "/dev/midi%2.2d", devno);
 	    fd = open(namebuf, O_WRONLY | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr, "device %d: tried %s WRITEONLY; returned %d\n",
@@ -135,7 +136,7 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     	if (fd < 0)
 	{
     	    sys_setalarm(1000000);
-	    sprintf(namebuf, "/dev/midi%d", devno-1);
+	    sprintf(namebuf, "/dev/midi%d", devno);
 	    fd = open(namebuf, O_WRONLY | O_MIDIFLAG);
 	    if (sys_verbose)
 	    	fprintf(stderr, "device %d: tried %s WRITEONLY; returned %d\n",
@@ -149,6 +150,8 @@ void sys_open_midi(int nmidiin, int *midiinvec, int nmidiout, int *midioutvec)
     if (oss_nmidiin < nmidiin || oss_nmidiout < nmidiout || sys_verbose)
     	post("opened %d MIDI input device(s) and %d MIDI output device(s).",
 	    oss_nmidiin, oss_nmidiout);
+
+    sys_setalarm(0);
 }
 
 #define md_msglen(x) (((x)<0xC0)?2:((x)<0xE0)?1:((x)<0xF0)?2:\
@@ -263,7 +266,94 @@ void sys_close_midi()
     oss_nmidiin = oss_nmidiout = 0;
 }
 
-void sys_listmididevs(void)     
+#define NSEARCH 10
+static int oss_nmidiindevs, oss_nmidioutdevs, oss_initted;
+
+void midi_oss_init(void)     
 {
-    /* LATER figure out how to detect MIDI devs */
+    int i;
+    if (oss_initted)
+    	return;
+    oss_initted = 1;
+    for (i = 0; i < NSEARCH; i++)
+    {
+    	int fd;
+	char namebuf[80];
+	
+    	oss_nmidiindevs = i;
+	    /* try to open the device for reading */
+	if (i == 0)
+	{
+	    fd = open("/dev/midi", O_RDONLY | O_NDELAY);
+	    if (fd >= 0)
+	    {
+	    	close(fd);
+		continue;
+	    }
+	}
+	sprintf(namebuf, "/dev/midi%2.2d", i);
+	fd = open(namebuf, O_RDONLY | O_NDELAY);
+	if (fd >= 0)
+	{
+	    close(fd);
+	    continue;
+	}
+	sprintf(namebuf, "/dev/midi%d", i);
+	fd = open(namebuf, O_RDONLY | O_NDELAY);
+	if (fd >= 0)
+	{
+	    close(fd);
+	    continue;
+	}
+	break;
+    }
+    for (i = 0; i < NSEARCH; i++)
+    {
+    	int fd;
+	char namebuf[80];
+	
+    	oss_nmidioutdevs = i;
+	    /* try to open the device for writing */
+	if (i == 0)
+	{
+	    fd = open("/dev/midi", O_WRONLY | O_NDELAY);
+	    if (fd >= 0)
+	    {
+	    	close(fd);
+		continue;
+	    }
+	}
+	sprintf(namebuf, "/dev/midi%2.2d", i);
+	fd = open(namebuf, O_WRONLY | O_NDELAY);
+	if (fd >= 0)
+	{
+	    close(fd);
+	    continue;
+	}
+	sprintf(namebuf, "/dev/midi%d", i);
+	fd = open(namebuf, O_WRONLY | O_NDELAY);
+	if (fd >= 0)
+	{
+	    close(fd);
+	    continue;
+	}
+	break;
+    }
+}
+
+void midi_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int maxndev, int devdescsize)
+{
+    int i, ndev;
+    if ((ndev = oss_nmidiindevs) > maxndev)
+    	ndev = maxndev;
+    for (i = 0; i < ndev; i++)
+    	sprintf(indevlist + i * devdescsize, "OSS MIDI device #%d", i+1);
+    *nindevs = ndev;
+
+    if ((ndev = oss_nmidioutdevs) > maxndev)
+    	ndev = maxndev;
+    for (i = 0; i < ndev; i++)
+    	sprintf(outdevlist + i * devdescsize, "OSS MIDI device #%d", i+1);
+    *noutdevs = ndev;
 }

@@ -171,7 +171,7 @@ static void adc_free(t_adc *x)
 static void adc_setup(void)
 {
     adc_class = class_new(gensym("adc~"), (t_newmethod)adc_new,
-    	(t_method)adc_free, sizeof(t_adc), CLASS_NOINLET, A_GIMME, 0);
+    	(t_method)adc_free, sizeof(t_adc), 0, A_GIMME, 0);
     class_addmethod(adc_class, (t_method)adc_dsp, gensym("dsp"), A_CANT, 0);
     class_sethelpsymbol(adc_class, gensym("adc~_dac~"));
 }

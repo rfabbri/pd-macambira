@@ -1,15 +1,29 @@
-vline object
-arrow keys in text objs for mac
-
 ---------------- dolist --------------------
-vline~ help window
-writesf help window, support 32 bit wav files, and fix sample rate writing
-check that latency is actually set (esp. in windows)
-windows escape from control-C
-dialogs for a/d/a, midi, path
-ALSA deglitch back in
-bug: resizing grow-upward patches leaves line traces around
 
+fix for 0.37:
+don't prepend help- if sethalpname is called
+Tom schouten: $HOME undefined crashes Pd
+update 'getting pd to run' to start in with dialog panels
+MIDI on windows?
+
+0.38:
+message dialog not to disappear
+sprout inlets/outlets on objects whose creation failed.
+portaudio_pd files into src
+GOP bounding box object
+pd $1 bug ($1 is saved as it was evaluated, not as '$1')
+why does changing the name of an explode in jupiter patch take so long?
+close-subwindows menu item
+trouble typing into number boxes
+abstraction reload doesn't have to vis everyone??
+check MIDI device numbering on MSW
+show results of opening audio and MIDI on dialogs
+settings saver
+latency testing
+windows escape from control-C
+add standard bindings (ctl-o, etc) to dialogs
+
+settable netsend and netreceive port numbers
 suspend/resume graphics updates
 scheduler to handle callbacks
 scheduler to do DSP computations even if no audio
@@ -22,6 +36,7 @@ try again to fix the font scene
 addcomma message to message
 pasting should look at current mouse location
 open/save panel to take messages to init directory
+look at prctl(2) for FP exception handling
 
 problems:
 arrays of non-existent templates crash
@@ -36,14 +51,11 @@ deal with spaces in iemgui labels and send/receive names
 get rid of messages causing renaming; try to prevent patches closing themselves.
 Krzysztof's qlist_next reentrancy bug
 dac~/ adc~/ block~ incompatibility
-is ALSA really checking /proc!?
 scofo reports error on reading score1.txt
 data copy/paste doesn't check templates aren't changed
 rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
-soundfile writing gets wrong sample rate; see /* lie */ in d_soundfile.c
 
 data:
-doesn't redraw when changing draw commands?
 vget, vset traversal objects
 cursor to show (x, y) location
 better hit detection (getrect is too greedy)
@@ -55,6 +67,7 @@ sublists should display on parent if desired?
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
+figure out why Pd sometimes crashes when you close example after adding fields
 
 features:
 command line flag to defeat loading objects
@@ -72,15 +85,10 @@ think about x and y scale preservation when changing between graph and object
 show outlines of objects even when graph is "open"
 make graph labels persistent and add to dialog
 array click protection (Krzysztof's suggestion)
-Alsa in data late should carefuly reset DAC/ADC fill&empty pointers
 increase MIDIQSIZE to at least 1024 in s_unix.c
 add nonblock to linux open calls instead of using alarm
-make a hook so objects can specify help windows to open (for scheme object)
 graph_vis() to decorate graphs when they're toplevel (parent_glist == 0)
 get graphs to expand to hold their contents
-writing FLOAT wav files
-make "table" rescalable vertically
--compat34 flag to save files so that 0.34 can read them
 suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html -- MIDI file reader
 in glist_delete, consider why this can't be just "vis 0" -- why do we need it?
 abstraction auto-reload
@@ -89,10 +97,8 @@ switching between dac and gettimeofday timing on dsp_start/stop
 check that -blocksize really reflects in audiobuf calc for Hammerfall
 -version to print version and exit; usage() also to print version
 NT and OSX: opening HTML files?
-message to change block~ sizes dynamically
 MIDI file reading/writing?
 makefile to have make install depend on make local.
-borrow arrow keys from IEMLIB
 pd messages to close and reopen sound driver
 Float method for random
 figure out list, message objects
@@ -139,7 +145,6 @@ vreadsf~
 benchmarking
 flash menu when accelerator hits?
 fix edit mode menu item
-"undo"
 fancier text editing
 tools (reassigns meaning of primary click)
 get gui to notice early EOF

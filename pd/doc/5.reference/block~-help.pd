@@ -1,0 +1,75 @@
+#N canvas 322 48 653 647 12;
+#X text 411 630 updated for Pd version 0.37;
+#X obj 48 10 block~;
+#X text 112 11 (and switch~) - block size and on/off control for DSP
+;
+#X text 44 40 The block~ and switch~ objects set the block size \,
+overlap \, and up/down-sampling ratio for the window. (The overlap
+and resampling ratio are relative to the super-patch.);
+#X text 137 332 INTERACTIONS WITH OTHER OBJECTS:;
+#X text 45 230 You may have at most one block~/switch~ object in any
+window.;
+#X text 45 176 A switch~ with no arguments does not reblock audio computation
+-- in other words \, block size and sample rate are as in the parent
+patch.;
+#X text 46 353 Dac~ and adc~ don't work correctly if reblocked \, nor
+if a parent window is reblocked \, even if the window containing the
+dac~ or adc~ is reblocked back to the default block size and sample
+rate.;
+#X text 48 573 see also:;
+#X obj 136 573 fft~;
+#X text 47 599 ... and the control.blocksize and up.downsampling audio
+example patches.;
+#X text 180 295 <--- example usage in subpatch;
+#N canvas 351 51 695 365 /SUBPATCH/ 1;
+#X obj 258 238 bang~;
+#X obj 258 264 t b b;
+#X obj 258 290 timer;
+#X floatatom 258 319 5 0 0 0 - - -;
+#X obj 54 30 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X msg 78 53 set 4096 1 1;
+#X msg 78 108 set 4096 2 1;
+#X msg 78 79 set 8192 1 1;
+#X msg 81 138 set 4096 1 0.5;
+#X msg 81 165 set 4096 1 2;
+#X obj 52 192 switch~ 4096 1 1;
+#X obj 258 347 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 94 25 <--- switch this subpatch on and off;
+#X text 209 53 <--- block size 4096 \, no overlap \, no resampling
+;
+#X text 206 81 <--- bigger block size;
+#X text 208 109 <--- double overlap;
+#X text 219 142 <--- downsampled by factor of 2;
+#X text 218 167 <--- upsampled by factor of 2;
+#X text 206 194 <--- creation arguments (if any) initialize blocking
+;
+#X text 317 317 <--- measured time (msec) between blocks;
+#X text 245 209 (args are blocksize \, overlap \, up/downsampling)
+;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 1 2 1;
+#X connect 2 0 3 0;
+#X connect 3 0 11 0;
+#X connect 4 0 10 0;
+#X connect 5 0 10 0;
+#X connect 6 0 10 0;
+#X connect 7 0 10 0;
+#X connect 8 0 10 0;
+#X connect 9 0 10 0;
+#X restore 140 295 pd;
+#X text 47 501 Patches using send~/receive~ or throw~/catch~ to intercommunicate
+must have the same blocking -- and if their parents are blocked bigger
+than they are \, there might be wierdness.;
+#X text 45 420 If using send~ or delwrite~ from a switched-off patch
+\, the output of corresponding receive~ and delread~ objects in other
+\, running patches will cycle old input (and sound like garbage). Throw~
+may be switched with impunity \, but not catch~.;
+#X text 43 92 Switch~ \, in addition \, allows you to switch DSP on
+and off for the window. All subwindows are also switched. (If a subwindow
+of a switched window is also switched \, both switches must be on for
+the subwindow's audio DSP to run. Pd's global DSP must also be on.)
+;
+#X text 44 269 Pd's default block size is 64 samples.;

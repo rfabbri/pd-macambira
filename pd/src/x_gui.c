@@ -48,19 +48,15 @@ void gfxstub_new(t_pd *owner, void *key, const char *cmd)
     char namebuf[80];
     t_gfxstub *x;
     t_symbol *s;
-    	/* if any exists with matching key, no need to make a
-	new one; just tell tk to send it front. */
+    	/* if any exists with matching key, burn it. */
     for (x = gfxstub_list; x; x = x->x_next)
-    {
     	if (x->x_key == key)
-	{
-	    sys_vgui("raise .gfxstub%x\n", x);
-	    sys_vgui("focus .gfxstub%x\n", x);
-	    return;
-	}
-    }
-    if (strlen(cmd) + 84 > MAXPDSTRING)
+    	    gfxstub_deleteforkey(key);
+    if (strlen(cmd) + 50 > MAXPDSTRING)
+    {
+	bug("audio dialog too long");
     	return;
+    }
     x = (t_gfxstub *)pd_new(gfxstub_class);
     sprintf(namebuf, ".gfxstub%x", (t_int)x);
 

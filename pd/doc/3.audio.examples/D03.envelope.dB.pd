@@ -1,9 +1,6 @@
-#N canvas 112 44 674 673 12;
+#N canvas 158 69 674 673 12;
 #X obj 32 80 r trigger;
 #X text 85 8 USING ADSR'S OUTPUT AS dB;
-#X text 34 28 For natural sounding amplitude control \, you will want
-to use the ADSR's output as log amplitude. In practice this is best
-done using a lookup table:;
 #X obj 32 131 tabread4~ dbtorms;
 #N canvas 0 0 450 300 graph1 0;
 #X array dbtorms 123 float 1;
@@ -39,10 +36,10 @@ done using a lookup table:;
 #X obj 141 227 dbtorms;
 #X obj 152 162 t f f;
 #X obj 97 259 tabwrite dbtorms;
-#X floatatom 435 103 0 0 0;
-#X floatatom 435 186 0 0 0;
+#X floatatom 435 103 0 0 0 0 - - -;
+#X floatatom 435 186 0 0 0 0 - - -;
 #X obj 435 157 tabread4 dbtorms;
-#X floatatom 331 183 0 0 0;
+#X floatatom 331 183 0 0 0 0 - - -;
 #X obj 331 154 dbtorms;
 #X text 35 12 bang to recalculate the table;
 #X text 268 62 check accuracy of reading table against;
@@ -67,92 +64,37 @@ done using a lookup table:;
 #X connect 12 0 16 0;
 #X connect 14 0 13 0;
 #X connect 16 0 15 0;
-#X restore 288 328 pd make-table;
-#X text 258 299 here's the patch I used to make the table:;
-#X obj 48 156 osc~ 440;
+#X restore 266 351 pd make-table;
+#X text 257 327 here's the patch I used to make the table:;
+#X obj 53 157 osc~ 440;
 #X text 589 176 0;
 #X text 590 77 10;
 #X text 406 186 ------ 123 samples ------;
-#X floatatom 61 204 0 0 0;
-#N canvas 159 26 532 285 output 0;
-#X obj 338 160 t b;
-#X obj 338 110 f;
-#X obj 338 60 inlet;
-#X text 344 29 mute;
-#X obj 338 185 f;
-#X msg 425 178 0;
-#X msg 338 85 bang;
-#X obj 338 135 moses 1;
-#X obj 397 117 moses 1;
-#X obj 83 148 dbtorms;
-#X obj 397 92 r master-lvl;
-#X obj 83 42 r master-lvl;
-#X obj 338 210 s master-lvl;
-#X obj 22 181 inlet~;
-#X obj 199 41 inlet;
-#X text 199 18 level;
-#X obj 199 100 s master-lvl;
-#X msg 96 65 set \$1;
-#X obj 96 89 outlet;
-#X msg 214 64 \; pd dsp 1;
-#X obj 83 194 line~;
-#X obj 22 212 *~;
-#X obj 22 241 dac~;
-#X obj 83 171 pack 0 50;
-#X text 20 158 audio;
-#X text 93 110 show level;
-#X obj 425 153 t b;
-#X connect 0 0 4 0;
-#X connect 1 0 7 0;
-#X connect 2 0 6 0;
-#X connect 4 0 12 0;
-#X connect 5 0 12 0;
-#X connect 6 0 1 0;
-#X connect 7 0 0 0;
-#X connect 7 1 26 0;
-#X connect 8 1 4 1;
-#X connect 9 0 23 0;
-#X connect 10 0 1 1;
-#X connect 10 0 8 0;
-#X connect 11 0 9 0;
-#X connect 11 0 17 0;
-#X connect 13 0 21 0;
-#X connect 14 0 16 0;
-#X connect 14 0 19 0;
-#X connect 17 0 18 0;
-#X connect 20 0 21 1;
-#X connect 21 0 22 0;
-#X connect 21 0 22 1;
-#X connect 23 0 20 0;
-#X connect 26 0 5 0;
-#X restore 32 232 pd output;
-#X msg 108 205 MUTE;
-#X text 149 204 <-- output amplitude;
-#X text 112 276 <-- attack;
-#X text 113 333 <-- release;
-#X msg 32 319 \; pd dsp 1 \; trigger 0;
+#X text 117 306 <-- attack;
+#X text 116 362 <-- release;
+#X msg 31 347 \; pd dsp 1 \; trigger 0;
 #X obj 32 182 *~;
-#X msg 31 264 \; pd dsp 1 \; trigger 1;
-#X text 29 431 Notice how the attack sounds different when you retrigger
-than when you start from zero. This is because if you go from the steady
-state you only rise 30 dB instead of 100 \, so it sounds slower.;
+#X msg 30 292 \; pd dsp 1 \; trigger 1;
 #X obj 32 106 adsr 100 100 200 70 300;
-#X text 29 381 The table is indexed from 1 to 120 so that 1 gives a
+#X text 28 409 The table is indexed from 1 to 120 so that 1 gives a
 true zero out and 120 gives 10 (a 20 dB boost.) The extra 20 dB are
 for headroom.;
-#X text 28 498 If this is a problem you have at least 2 ways of dealing
-with it. The best might be to adjust the attack time inside the abstraction
-using snapshot~ to find out where you're slewing from \, as demonstrated
-in the next patch.;
-#X text 406 631 updated for Pd version 0.35;
-#X text 28 568 There's also a "real" dbtorms~ object... but it's almost
+#X text 25 459 (There's also a "real" dbtorms~ object... but it's almost
 certainly much more compute-intensive than tabread4~ \, since it has
-to call a library "exp" function.;
-#X connect 0 0 21 0;
-#X connect 3 0 18 0;
-#X connect 7 0 18 1;
-#X connect 11 0 12 1;
-#X connect 12 0 11 0;
-#X connect 13 0 12 2;
-#X connect 18 0 12 0;
-#X connect 21 0 3 0;
+to call a library "exp" function.);
+#X text 26 518 Notice how the attack sounds different when you retrigger
+than when you start from zero. This is because if you go from the steady
+state you only rise 30 dB instead of 100 \, so it sounds slower...
+a slur effect. If you don't want this \, you might try increasing the
+amplitude of retriggered notes in comparison to isolated ones.;
+#X text 34 28 For more natural sounding amplitude control \, you can
+use the ADSR's output as log amplitude. In practice this is best done
+using a lookup table:;
+#X obj 31 211 output~;
+#X text 406 631 updated for Pd version 0.37;
+#X connect 0 0 15 0;
+#X connect 2 0 13 0;
+#X connect 6 0 13 1;
+#X connect 13 0 20 0;
+#X connect 13 0 20 1;
+#X connect 15 0 2 0;

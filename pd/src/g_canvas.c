@@ -599,8 +599,6 @@ void canvas_dirty(t_canvas *x, t_int n)
     }
 }
 
-extern t_gobj *canvas_selectme; /* HACK */
-
     /* the window becomes "mapped" (visible and not miniaturized) or
     "unmapped" (either miniaturized or just plain gone.)  This should be
     called from the GUI after the fact to "notify" us that we're mapped. */
@@ -623,12 +621,6 @@ void canvas_map(t_canvas *x, t_floatarg f)
     	    for (sel = x->gl_editor->e_selection; sel; sel = sel->sel_next)
 	    	gobj_select(sel->sel_what, x, 1);
     	    x->gl_mapped = 1;
-	    if (canvas_selectme)
-	    {
-	    	glist_noselect(x);
-		glist_select(x, canvas_selectme);
-	    	canvas_selectme = 0;
-	    }
     	    canvas_drawlines(x);
 	    	/* simulate a mouse up so u_main will calculate scrollbars...
 		    ugly! */
@@ -639,8 +631,13 @@ void canvas_map(t_canvas *x, t_floatarg f)
     {
 	if (glist_isvisible(x))
 	{
+	    	/* just clear out the whole canvas... */
+	    sys_vgui(".x%x.c delete all\n", x);
+	    	/* alternatively, we could have erased them one by one...
     	    for (y = x->gl_list; y; y = y->g_next)
 	    	gobj_vis(y, x, 0);
+	    	    ... but we should go through and erase the lines as well
+		    if we do it that way. */
     	    x->gl_mapped = 0;
 	}
     }
@@ -756,7 +753,7 @@ void canvas_vis(t_canvas *x, t_floatarg f)
     	if (!x->gl_havewindow)
 	{
 	    	/* bug workaround -- a graph in a visible patch gets "invised"
-		when the patch is closed, and must lost the editor here.  It's
+		when the patch is closed, and must lose the editor here.  It's
 		probably not the natural place to do this.  Other cases like
 		subpatches fall here too but don'd need the editor freed, so
 		we check if it exists. */
@@ -1303,9 +1300,15 @@ void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv)
     {
     	newstate = atom_getintarg(0, argc, argv);
     	if (newstate && !canvas_dspstate)
+	{
     	    canvas_start_dsp();
+	    sys_set_audio_state(1);
+	}
     	else if (!newstate && canvas_dspstate)
+	{
     	    canvas_stop_dsp();
+	    sys_set_audio_state(0);
+	}
     }
     else post("dsp state %d", canvas_dspstate);
 }
@@ -1341,63 +1344,9 @@ static void glist_redrawall(t_glist *gl)
 void canvas_redrawallfortemplate(t_canvas *templatecanvas)
 {
     t_canvas *x;
-    if (!templatecanvas->gl_imatemplate) return;
     	/* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
     	glist_redrawall(x);
-}
-
-    /* Same as above but just zap them.  Call this if a template
-    is changed by adding or removing a field.  LATER we'll just
-    modify all the items appropriately.  */
-static void glist_zapall(t_glist *gl)
-{
-    t_gobj *g;
-    for (g = gl->gl_list; g; g = g->g_next)
-    {
-    	t_class *cl;
-    	if (g->g_pd == canvas_class)
-    	    glist_zapall((t_glist *)g);
-    }
-    	/* do we have any scalars? */
-    for (g = gl->gl_list; g; g = g->g_next)
-    {
-    	if (g->g_pd == scalar_class)
-    	    break;
-    }
-    if (!g) return;
-    	/* delete all the scalars.  This is inefficient if for some reason
-    	 you've mixed scalars with other items in a single glist. */
-    while (1)
-    {
-    	for (g = gl->gl_list; g; g = g->g_next)
-    	{
-    	    if (g->g_pd == scalar_class)
-    	    {
-    	    	glist_delete(gl, g);
-    	    	break;
-    	    }
-    	}
-    	if (!g) break;
-    }
-}
-
-    /* public interface for above */
-void canvas_zapallfortemplate(t_canvas *templatecanvas)
-{
-    t_canvas *x;
-    if (!templatecanvas->gl_imatemplate) return;
-    	/* find all root canvases */
-    for (x = canvas_list; x; x = x->gl_next)
-    	glist_zapall(x);
-}
-
-    /* warn a canvas that some datum has used it as a template.  If a
-    canvas has no data associated with it (at load time, for instance)
-    we don't have to search through the world for instances as it changes. */
-void canvas_setusedastemplate(t_canvas *x)
-{
-    x->gl_imatemplate = 1;
 }
 
 /* ------------------------------- setup routine ------------------------ */
@@ -1427,6 +1376,7 @@ extern void glist_scalar(t_glist *canvas, t_symbol *s, int argc, t_atom *argv);
 void g_graph_setup(void);
 void g_editor_setup(void);
 void g_readwrite_setup(void);
+extern void graph_properties(t_gobj *z, t_glist *owner);
 
 void g_canvas_setup(void)
 {
@@ -1497,6 +1447,7 @@ void g_canvas_setup(void)
     	gensym("menu-open"), A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_map,
     	gensym("map"), A_FLOAT, A_NULL);
+    class_setpropertiesfn(canvas_class, graph_properties);
 
 /* ---------------------- list handling ------------------------ */
     class_addmethod(canvas_class, (t_method)glist_clear, gensym("clear"),

@@ -851,6 +851,13 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 	    }
 	    if (!strcmp(first, "#P"))
 	    {
+	    	    /* drop initial "hidden" flag */
+	    	if (!strcmp(second, "hidden"))
+		{
+		    nextmess++;
+		    natom--;
+		    second = (nextmess+1)->a_w.w_symbol->s_name;
+		}
 	    	if (natom >= 7 && !strcmp(second, "newobj")
 		    && (ISSYMBOL(&nextmess[6], "patcher") ||
 		    	ISSYMBOL(&nextmess[6], "p")))
@@ -919,6 +926,9 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		}
 		else if (!strcmp(second, "slider"))
 		{
+		    float inc = atom_getfloatarg(7, natom, nextmess);
+		    if (inc <= 0)
+		    	inc = 1;
 		    binbuf_addv(newb, "ssffsffffffsssfffffffff;",
 			gensym("#X"), gensym("obj"),
 			atom_getfloatarg(2, natom, nextmess),
@@ -926,10 +936,9 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			gensym("vsl"),
 			atom_getfloatarg(4, natom, nextmess),
 			atom_getfloatarg(5, natom, nextmess),
-			atom_getfloatarg(7, natom, nextmess),
-			atom_getfloatarg(7, natom, nextmess)
-			    + (atom_getfloatarg(5, natom, nextmess) - 1)
-			      * atom_getfloatarg(6, natom, nextmess),
+			atom_getfloatarg(6, natom, nextmess),
+			atom_getfloatarg(6, natom, nextmess)
+			    + (atom_getfloatarg(5, natom, nextmess) - 1) * inc,
 		    	0., 0.,
 			gensym("empty"), gensym("empty"), gensym("empty"),
 			0., -8., 0., 8., -262144., -1., -1., 0., 1.);
@@ -960,6 +969,15 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			atom_getfloatarg(2, natom, nextmess),
 			atom_getfloatarg(3, natom, nextmess),
 			gensym((natom > 5 ? "outlet~" : "outlet"))); 
+		    nobj++;
+		}
+	    	else if (!strcmp(second, "user"))
+		{
+		    binbuf_addv(newb, "ssffs;",
+			gensym("#X"), gensym("obj"),
+			atom_getfloatarg(3, natom, nextmess),
+			atom_getfloatarg(4, natom, nextmess),
+			atom_getsymbolarg(2, natom, nextmess)); 
 		    nobj++;
 		}
 		else if (!strcmp(second, "connect")||

@@ -1,75 +1,85 @@
-<HTML>
-<HEAD>
-<TITLE>Pd Documentation</TITLE>
-</HEAD>
-<BODY bgcolor="#ffffff">
-<SMALL>
-<div style="width:6.5in; margin-left:.5in">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<CENTER> <B>
-Pd Documentation chapter 2: theory of operation
-</B> </CENTER>
-<BR>
-<A href=index.htm#s2> back to table of contents</A>
- <BR><BR>
+<HTML>
+  <HEAD>
+	 <TITLE>Pd Documentation 2</TITLE>
+    <meta http-equiv="Content-Type" content="text/html">
+	 <link rel="stylesheet" type="text/css" href="pdmanual.css" media="screen">
+  </HEAD>
+  
+
+<BODY>
+
+<H2>Pd Documentation chapter 2: theory of operation</H2>
+
+<P>
+<A href="index.htm#s2"> back to table of contents</A>
+<BR><BR>
+</P>
+
 <P>
 
 <P> The purpose of this chapter is to describe Pd's design and how it is
 supposed to work.  Practical details about how to obtain, install, and run Pd 
 are described in the next chapter.  To learn digital audio processing basics
-such as how to generate time-varying sounds that don't click or fold over, a
-good reference is Dodge and Jerse, <I> Computer Music </I>.
+such as how to generate time-varying sounds that don't click or fold over, try
+the on-line book,
+<A HREF="http://www.crca.ucsd.edu/~msp/techniques.htm"
+<I> Theory and Techniques of Electronic Music </I>.
 
-<H4> <A name=s1> 2.1 overview </A> </H4>
+<H3> <A name=s1> 2.1 overview </A> </H3>
 
-Pd is a real-time graphical programming environment for audio and graphical
+<P>Pd is a real-time graphical programming environment for audio and graphical
 processing.  It resembles the Max/MSP system but is much simpler and more
 portable; also Pd has two features not (yet) showing up in Max/MSP: first,
 via Mark Dank's GEM package, Pd can be used for simultaneous computer
 animation and computer audio.  Second, an experimental facility is provided
 for defining and accessing data structures.
 
-<H4> <A name=s1.1> 2.1.1. the main window, canvases, and printout </A> </H4>
+<H3> <A name=s1.1> 2.1.1. the main window, canvases, and printout </A> </H3>
 
-When Pd is running, you'll see a main "Pd" window, and possibly one or more
+<P>When Pd is running, you'll see a main "Pd" window, and possibly one or more
 "canvases" or "patches".   The main Pd window looks like this:
 
-<P><CENTER>
-    <IMG src="fig1.1.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig1.1.png" ALT="pd window">
+</P></CENTER>
 
 <P> There are peak level and clip indicators for audio input and output; these
 report peak levels over all input and all output channels.  Note that DC
 shows up as an input level; many cards have DC levels which show up in the
-50s.  To see an RMS audio level, select "test audio and MIDI" from the help
-window.  The main window display is intended only to help you avoid clipping
+50s.  To see an RMS audio level, select "test audio and MIDI" from the Media
+menu.  The main window display is intended only to help you avoid clipping
 on input and output.  You can turn the peak meters on and off using the
 control at bottom left.
 
-<P>  At bottom right is a control to turn audio processing on and off globally. 
-Turning audio off does not relinquish the audio devices, it just stops the
-computation.  The "audio" menu is also provided, with accelerators "Control-."
-to turn audio computation off and "Control-/" to turn it on.  When audio is
-on, Pd is computing audio samples in real time according to whatever patches
-you have open (visible or not.)  
+<P>  At bottom right is a control to turn audio processing on and off
+globally.  Turning audio off stops the computation and relinquishes any audio
+devices Pd is using.  The "Media" menu is also provided, with accelerators
+"Control-." to turn audio computation off and "Control-/" to turn it on.  When
+audio is on, Pd is computing audio samples in real time according to whatever
+patches you have open (whether they are visible or not).  
 
 <P> The DIO (Digital I/O) error indicator flashes if there is a synchronization
-error for audio input or output.  Click there to see a list of recent errors.
-This indicator is normally red at startup, and will turn red whenever the
+error for audio input or output.  (But note that on some platforms Pd doesn't
+find out about them.  If you never see red, you're probably not seeing the
+truth.)
+Click the "DIO errors" button to see a list of recent errors.
+This indicator should turn red whenever the
 computation runs late (so that the DAC FIFOs fill and/or the ADC FIFOs empty)
 or if audio input and output are not running at the same rate.  See
 <a href="x3.htm#s2"> audio and MIDI support </A>.
 
 <P> Pd documents are called "patches" or "canvases."
 Each open document has one main window and any number of
-subwindows.  The subwindows can be opened and closed but are always running
+sub-windows.  The sub-windows can be opened and closed but are always running
 whether you can see them or not.  Here is a simple Pd patch:
 
-<P><CENTER>
-    <IMG src="fig1.2.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig1.2.jpg" ALT="hello world patch">
+</P></CENTER>
 
-There are four <I> text boxes </I> in this patch: a number box (showing zero),
+<P>There are four <I> text boxes </I> in this patch: a number box (showing zero),
 an object box showing "print," and two comments.  The number box and the object
 box are connected, the number box's output to the print box's input.  Boxes may
 have zero or more inputs and/or outputs, with the inputs on top and the outputs
@@ -80,7 +90,7 @@ Pd's printout appears on its standard output.  Normally, you'll run Pd in a
 "shell" or "terminal" window which you'll keep open to see any printout or
 error messages.
 
-<H4> <A name=s1.2> 2.1.2. object boxes </A> </H4>
+<H3> <A name="s1.2"> 2.1.2. object boxes </A> </H3>
 <P>  Pd patches can have four types of boxes: <I> object, message, GUI, </I>
 and <I> comment </I>.
 
@@ -89,29 +99,39 @@ divided into <I> atoms </I> separated by white space.  The first atom specifies
 what type of object Pd will make, and the other atoms, called <I> creation
 arguments </I>, tell Pd how to initialize the object.  If you type for example,
 
-<P><CENTER>
-    <IMG src="fig1.3.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig1.3.jpg" ALT="object">
+</P></CENTER>
 
-the "+" specifies the <I> class </I> of the object.
+<P>the "+" specifies the <I> class </I> of the object.
 In this case the object will be the kind that carries out addition,
-and the "13" initializes the amount to add.  Atoms are either numbers or <I>
-symbols </I> like "+".
+and the "13" initializes the amount to add.
 
-The text you type into an object box determines how
+<P> Atoms are either numbers or <I>
+symbols </I> like "+".  Anything that is not a valid number os considered a
+symbol.   Valid numbers may or may not have a decimal point (for instance, 12,
+15.6, -.456), or may be
+written in exponential notation (such as "4.5e6", which means "4.5 multiplied
+by 10 six times, i.e., 4500000).  Negative exponentials divide by 10 (so
+that 1.23e-5 comes to 0.0000123).
+
+<P> Non-valid numbers which are read as symbols
+include things like "+5" and "0..6" as well as words and names such as "Zack"
+or "cat".  The symbols "gore", "Gore", and "GORE" are all distinct.
+
+<P> The text you type into an object box determines how
 many and what kinds of inlets and outlets the object will have.  Some
 classes (like "+" always have a fixed arrangement of inlets and outlets, 
 and in the case of other classes, the inlets and outlets will depend on the
 creation arguments.
 
-<P>
-Here for example is a simple MIDI synthesizer:
+<P>Here for example is a simple MIDI synthesizer:
 
-<P><CENTER>
-    <IMG src="fig1.4.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig1.4.png" ALT="simple MIDI synthesizer">
+</P></CENTER>
 
-This patch mixes <I> control </I> objects (notein, stripnote, and ftom) with
+<P>This patch mixes <I> control </I> objects (notein, stripnote, and ftom) with
 <I> tilde </I> objects osc~, *~, and dac~.  The control objects carry out their
 function sporadically, as a result of one or more type of <I> event </I>. In
 this case, incoming MIDI note messages set off the control computation.  The
@@ -125,53 +145,71 @@ acting as the interface between the two regimes, in that it takes control
 messages to set its frequency but talks to "*~" using an audio signal.  Audio
 signals aren't sporadic; they are continuous streams of numbers.  As a result
 tilde objects act under very different rules from control objects.  The audio
-portion of the patch is always running, whether MIDI messages arrive or not;
-the function of control computations is to insert calculations between the
-audio computation which may change audio computation parameters such as
-the frequency of an oscillator.
+portion of the patch is always running, whether MIDI messages arrive or not. On
+the other hand, the function of control computations is to insert calculations
+between the audio computation which may change audio computation parameters
+such as the frequency of an oscillator.
 
-<H4> <A name=s1.3> 2.1.3. message and GUI boxes </A> </H4>
+<P> The connections in the patch (the lines between the boxes) are also of two
+types: control and signal.  The type of connection depends on the outlet it
+comes from.  Signal connections are represented by thicker lines than control
+connections; in the patch above, the two bottom conections are signal and the
+others are control.  In general, a control connection may be made to a signal
+inlet; if numbers are sent over it they are automatially converted to
+signals.  Signal connections may not be made to control inlets; some sort
+of explicit conversion must be specified.
 
-The border of a box tells you how its text is interpreted and how the box
-functions.  Object boxes use the text to create objects when you load a
-patch.  <I> Message </I> boxes interpret the text as a message to send whenever
-the box is activated (by an incoming message or with the mouse.)  In the example
-below the message box, when clicked, sends the message "21" to an object
+<H3> <A name="s1.3"> 2.1.3. message and GUI boxes </A> </H3>
+
+<P>The border of a box tells you how its text is interpreted and how the box
+functions.  Object boxes (as in the previous example) use the text to create
+objects when you load a patch or type text onto a new one.  If you retype the
+text in an object box, the old one is discarded and a new one is created, using
+the new creation arguments.  The contents of an object box describe a message
+which is sent to Pd to create the object.
+
+<P> <I> Message </I> boxes interpret the text as a message to send whenever
+the box is activated (by an incoming message or with the mouse.)  The message
+may be sent many times while the patch is running (as opposed to object boxes
+whose message is used once to create the object).  Instead of going straight
+to Pd, the message box's message (or messages) go either to the box's outlet
+or to other specified receiving objects.  In the example
+below, the message box, when clicked, sends the message "21" to an object
 box which adds 13 to it.
 
-<P><CENTER>
-    <IMG src="fig1.5.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig1.5.jpg" ALT="[message( --> [object] -> [number]">
+</P></CENTER>
 
-The third box shown is a GUI box.  GUI boxes come in many forms including 
-number boxes (as in this example), toggles, sliders, and so on. Whereas the
-appearance of an object or message box is static when a patch is running, a
-number box's contents (the text) changes to reflect the current value held by
-the box.  You can also use a number box as a control by clicking and dragging
-up and down, or by typing values in it.  (There are also shift- and alt-click
-actions; see <A href="x2.htm#s2.7"> getting help </A> to find out how to look
-this up).
+<P> The third box shown is a <I> GUI </I> ("graphical user interface") box.  GUI
+boxes come in many forms including number boxes (as in this example), toggles,
+sliders, and so on. Whereas the appearance of an object or message box is
+static when a patch is running, a number box's contents (the text) changes to
+reflect the current value held by the box.  You can also use a number box as a
+control by clicking and dragging up and down, or by typing values in it. 
+(There are also shift- and alt-click actions; see <A href="x2.htm#s2.7">
+getting help </A> to find out how to look this up).
 
 <P> You can also create a "symbol" box which is like a number box but deals
 in symbols like "cat."  You can type your own strings in (followed by "enter")
 or use it to display strings which arrive as messages to its inlet.
 
-<H4> <A name=s1.4> 2.1.4. patches and files </A> </H4>
+<H3> <A name="s1.4"> 2.1.4. patches and files </A> </H3>
 
-When you save a patch to a file, Pd doesn't save the entire state of all the
+<P>When you save a patch to a file, Pd doesn't save the entire state of all the
 objects in the patch, but only what you see: the objects' creation arguments
 and their interconnections.  Certain data-storage objects have functions for
 reading and writing other files to save and restore their internal state.
 
-Pd finds files using a <I> path </I> which can be specified as part of Pd's
+<P>Pd finds files using a <I> path </I> which can be specified as part of Pd's
 startup arguments.  The path specifies one or more directories, separated by
 colons (semicolons if you're using windows.)  Most objects which can read files
 search for them along the search path, but when Pd writes files they go to
 the directory where the patch was found.
 
-<H4> <A name=s2> 2.2. editing Pd patches </A> </H4>
+<H3> <A name=s2> 2.2. editing Pd patches </A> </H3>
 
-<H4> <A name=s2.1> 2.2.1. edit and run mode </A> </H4>
+<H3> <A name=s2.1> 2.2.1. edit and run mode </A> </H3>
 
 <P> A patch can be in edit or run mode; this really only affects how mouse
 clicks affect the patch.  In edit mode, clicking and dragging selects and
@@ -180,7 +218,7 @@ them messages which they react to in different ways.  In run mode, number and
 message boxes can be used as controls.  Normally, when you are in a performance
 you will stay in run mode; to change the patch you go to edit mode.
 
-<H4> <A name=s2.2> 2.2.2. creating boxes </A> </H4>
+<H3> <A name=s2.2> 2.2.2. creating boxes </A> </H3>
 
 <P> You can create boxes (objects, messages, GUIs, and comments) using the
 "put" menu.   Note the handy accelerators.  Object and message boxes are empty
@@ -192,34 +230,37 @@ place them.
 (in the Edit menu) than to use the "Put" menu.  If you select and duplicate
 several items, any connections between them will be duplicated as well.
 
-<H4> <A name=s2.3> 2.2.3. the selection </A> </H4>
+<H3> <A name=s2.3> 2.2.3. the selection </A> </H3>
 
-Boxes in a Pd window may be selected by clicking on them.  To select more
-than one object you may use shift-click or click "outside" and select all
-objects within a rectangle.  You can't select lines, only boxes.
+<P>Boxes in a Pd window may be selected by clicking on them.  To select more
+than one object you may use shift-click or click on a blank portion of
+the window and drag the cursor to select all objects within a rectangle.
 
-Clicking on an unselected object, message, or comment box makes the text
-active, i.e., ready to be text edited.  If you select using the rectangle
-method, the text isn't activated. This affects whether further clicks will
-displace teh object or select text within it.
+<P>Clicking on an unselected object, message, or comment box makes the text
+active, i.e., ready to be text edited.  (If you select using the rectangle
+method, the text isn't activated.)  Once you've activated a text box, you
+may type into it (replacing the selected text) or use the mouse to change the
+selection.
 
-<H4> <A name=s2.4> 2.2.4. deleting, cutting, and pasting </A> </H4>
+<P> You may also select a single connection (patch cord) by clicking on it.
+You can't have connections and boxes selected simultaneously.
 
-If you select a box but don't activate the text in it, you can "delete" it
-by hitting the backspace key.  You can "cut" "copy" and "paste" using menu
-items.  Notice that pasting puts the new object(s) right down on top of the
-old ones.
+<H3> <A name=s2.4> 2.2.4. deleting, cutting, and pasting </A> </H3>
 
-The "duplicate" menu item performs a copy and paste with a small offset so you
-can see the new boxes.  You can drag them together to a new place on the 
-screen.
+<P>If you select a box, a connection, or several boxes, and if you haven't made
+any text active, you can "delete" the selection by hitting the backspace or
+delete key.  You can also "cut" "copy" and "paste" using menu items.  Notice
+that pasting puts the new object(s) right down on top of the old ones.
 
-You can cut and paste between windows within Pd but cut/paste isn't
-integrated with the OS in any way.  Cut/copy/paste for text strings isn't
-implemented yet, although in Linux and Irix at least you can "X-paste" into
-and out of "text" dialogs (created with the "edit text" menu item.)
+<P>The "duplicate" menu item performs a copy and paste with a small offset so you
+can see the new boxes.  You can drag them together to a new place on the  screen.
 
-<H4> <A name=s2.5> 2.2.5. changing the text </A> </H4>
+<P>You can cut and paste between windows within Pd but cut/paste isn't
+integrated with the OS in any way.  Cut/copy/paste for activated text in boxes
+isn't implemented yet, although in Linux and Irix at least you can "X-paste"
+into and out of "text" dialogs (created with the "edit text" menu item.)
+
+<H3> <A name=s2.5> 2.2.5. changing the text </A> </H3>
 
 <P> To change a text item, you can select it and then edit the text.  If you
 only click once, the entire text is selected and your typing will replace
@@ -234,45 +275,56 @@ one box in sequence if you want.
 
 <P> If you click a box and move the mouse without releasing the button this
 displaces the entire box.  If you wish to displace a box which is already
-sepected, first deselect the box by clicking outside it; otherwise you will be
+selected, first de-select the box by clicking outside it; otherwise you will be
 selecting text instead of moving the box. 
 
-<P> <I> The updated text only becomes part of the patch when you deselect the
-object. </I>  Changing the text in an "object" box actually deletes the old
+<P> <I> The updated text only becomes part of the patch when you de-select the
+object. </I>  Changing the text in an "object" box deletes the old
 object and creates a new one; the internal state of the old one is lost.
 
-<H4> <A name=s2.6> 2.2.6. connecting and disconnecting boxes </A> </H4>
+<H3> <A name=s2.6> 2.2.6. connecting and disconnecting boxes </A> </H3>
 
-To make a connection between two boxes, click on any outlet of the first
-one, drag toward an inlet of the second one, and release.  You can actually
+<P>To make a connection between two boxes, click on any outlet of the first
+one, drag toward an inlet of the second one, and release.  You can 
 release the mouse button anywhere within the target object and the connection
 will be made to the nearest inlet.
 
-Connections are broken simply by clicking on them (the cursor changes to an
-"X" when appropriate.)
+<P>Connections are broken by selecting them and using "cut" or the backspace
+or delete key.
 
-<H4> <A name=s2.7> 2.2.7. Properties and help </A> </H4>
+<H3> <A name=s2.7> 2.2.7. popup menu for properties, open, and help </A> </H3>
 
-<P> all the "clicking" mentioned above is done with the left mouse button.
-The right button, instead, gives a popup menu for "properties" and "help".
-Properties are enabled for number boxes and graphs (and in the future may
-be available for other things as well.)  Selecting "help" on an object gets
-a Pd patch that demonstrates how to use it.  "Help for the canvas as a whole
-(click outsize any object) gives a list of all built-in objects.
+<P> All the "clicking" mentioned above is done with the left mouse button.
+The right button, instead, gives a popup menu offering "properties," "open,"
+and "help".
+(For Macintosh users who may only have one button on their mouse,
+double-clicking is mapped to right-click.)
 
-<H4> <A name=s2.7> 2.2.8. miscellaneous </A> </H4>
+<P> Selecting "help" on an object gets
+a Pd patch that demonstrates how to use it.  "Help" for the canvas as a whole
+(right-clicking outside any object) gives a list of all built-in objects.
+
+<P> The "open" menu item is only enabled if you right-click on a subpatch
+(see below) and causes Pd to open it.  Ordinary subpatches may also be opened
+by clicking on them, but for "graph-on-parent" ones, this is the only way to
+do it.
+
+<P> The "properties" dialog allows you to change certain settings of GUI
+objects, or of the patch itself (by clicking outside any box.)
+
+<H3> <A name=s2.7> 2.2.8. miscellaneous </A> </H3>
 
 <P> Control-q "quits" Pd, but asks you to comfirm the quit.  To quit without
 having to confirm, use command-shift-Q.
 
-<H4> <A name=s3> 2.3. messages </A> </H4>
+<H3> <A name="s3"> 2.3. messages </A> </H3>
 
 <P> In Pd, objects intercommunicate by sending messages and/or audio signals.
 Pd messages are sporadic, like MIDI messages or music N "Note cards."
 
-<H4> <A name=s3.1> 2.3.1. anatomy of a message </A> </H4>
+<H3> <A name="s3.1"> 2.3.1. anatomy of a message </A> </H3>
 
-Messages contain a selector followed by
+<P>Messages contain a selector followed by
 any number of arguments.  The selector is a symbol, which appears in the patch
 as a non-numeric string with no white space, semicolons, or commas.  The
 arguments may be symbols or numbers.  Numbers in Pd are kept in 32-bit floating
@@ -286,13 +338,13 @@ is checked against the receiver.  If the receiver recognizes messages of that
 selector, it carries out some corresponding action.  For instance, here is a
 "float" object:
 
-<P><CENTER>
-    <IMG src="fig3.1.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.1.jpg" ALT="float object">
+</P></CENTER>
 
 <P> The two rectangles at the top are usually both called "inlets" but
 the one at the left directs incoming messages to the "float" object itself,
-whereas the one at the right directs messages to an auxilliary "inlet"
+whereas the one at the right directs messages to an auxiliary "inlet"
 object.  The float object proper (represented by the left-hand inlet) accepts
 messages with selector "float" and "bang".  The right-hand inlet takes only
 the message selector "float".  These two selectors, along with "symbol" and
@@ -304,16 +356,16 @@ which cannot be used as a selector.  A single number is always given the
 "float" selector automatically, and a message with a number followed by other
 arguments is given the selector "list".
 
-<H4> <A name=s3.2> 2.3.2. depth first message passing </A> </H4>
+<H3> <A name="s3.2"> 2.3.2. depth first message passing </A> </H3>
 
 <P> In Pd whenever a message is initiated, the receiver may then send out
 further messages in turn, and the receivers of those messages can send yet
 others.  So each message sets off a tree of consequent messages.  This tree is
 executed in depth first fashion.  For instance in the patch below:
 
-<P><CENTER>
-    <IMG src="fig3.2.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.2.jpg" ALT="depth first message passing">
+</P></CENTER>
 
 <P> the order of arrival of messages is either A-B-C-D or A-C-D-B.  The "C"
 message is not done until the "D" one is also, and the "A" is not done until
@@ -323,9 +375,9 @@ sorted right to left).
 
 <P> Message-passing can give rise to infinite loops of the sort shown here:
 
-<P><CENTER>
-    <IMG src="fig3.3.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.3.jpg" ALT="infinite message passing loop">
+</P></CENTER>
 
 <P> Here the left-hand "+" can't finish processing until the right-hand one has
 been sent the result "2", which can't finish processing that until the
@@ -333,26 +385,26 @@ left-hand one has been sent "3", and so on.  Pd will print an error message
 reporting a "stack overflow" if this happens.
 
 <P> However, it is legal to make a loop if there is a "delay" object somewhere
-in it.  When the "delay" receives a message it schedules a messsage for the
+in it.  When the "delay" receives a message it schedules a message for the
 future (even if the time delay is 0) and is then "finished;" Pd's internal
 scheduler will wake the delay back up later.
 
-<H4> <A name=s3.3>
-2.3.3. hot and cold inlets and right to left outlet order </A> </H4>
+<H3> <A name="s3.3">
+2.3.3. hot and cold inlets and right to left outlet order </A> </H3>
 
 <P> With few exceptions (notably "timer"), objects treat their leftmost
 inlet as "hot" in the sense that messages to right inlets can result in output
 messages.  So the following is a legal (and reasonable) loop construct:
 
-<P><CENTER>
-    <IMG src="fig3.4.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.4.jpg" ALT="hot and cold inlets">
+</P></CENTER>
 
-Here the "f" is an abbreviation for "float".  Note that the "+ 1" output is
+<P>Here the "f" is an abbreviation for "float".  Note that the "+ 1" output is
 connected to the right-hand inlet of "f".  This "cold" inlet merely stores the
 value for the next time the "f" is sent the "bang" message.
 
-It is frequently desirable to send messages to two or more inlets of an object
+<P>It is frequently desirable to send messages to two or more inlets of an object
 to specify its action.  For instance, you can use "+" to add two numbers; but
 to do it correctly you must make sure the right hand inlet gets its value
 first.  Otherwise, when the left hand side value comes in, "+" will carry out
@@ -365,9 +417,9 @@ single object. In this case it is indeterminate which order the two inlets will
 receive their messages.  Suppose for example you wish to use "+" to double a
 number.  The following is incorrect:
 
-<P><CENTER>
-    <IMG src="fig3.5.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.5.jpg" ALT="incorrect inlet connection">
+</P></CENTER>
 
 <P> Here, I connected the left inlet before connecting the right hand one (although
 this is not evident in the appearance of the patch.)  The "+" thus adds the
@@ -380,9 +432,9 @@ you connect these to inlets of a second object without crossing wires, the
 second object will get its leftmost inlet last, which is usually what you
 want.  Here is how to use "trigger" to disambiguate the previous example:
 
-<P><CENTER>
-    <IMG src="fig3.6.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.6.jpg" ALT="trigger to disambiguate">
+</P></CENTER>
 
 <P> "Cold" (non-leftmost) inlets are almost universally used to store single
 values (either numbers or symbols.)  With the exception of "line" and "line~",
@@ -394,28 +446,29 @@ the order in which two messages are sent to a single "cold" inlet.  In this
 situation, since the messages are merged, the last value to be received is
 the value that is used in the computation.
 
-<H4> <A name=s3.4> 2.3.4. message boxes </A> </H4>
+<H3> <A name="s3.4"> 2.3.4. message boxes </A> </H3>
 
 Message boxes are text boxes in which you type a message.  When the message
 box is activated, either by clicking on it or sending something to its inlet,
 the message or messages are sent, either to the message box's outlet or
 elsewhere as specified.
 
-<P><CENTER>
-    <IMG src="fig3.7.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.7.jpg" ALT="message boxes">
+</P></CENTER>
 
-The first of the message boxes above contains the single number 1.5; this
+<P>The first of the message boxes above contains the single number 1.5; this
 message has an implicit selector of "float."  The second is a list with three
 numbers in it, and in the third, the selector is "my" and the two arguments are
 the number 5 and the symbol "toes."
 
 <P> Multiple messages may be separated by commas as shown:
 
-<P><CENTER>
-    <IMG src="fig3.8.jpg">
-</CENTER><P>
-Here the three messages are the numbers 1, 2, and 3, and they are sent in
+<CENTER><P>
+    <IMG src="fig3.8.jpg" ALT="multiple messages in one box">
+</P></CENTER>
+
+<P>Here the three messages are the numbers 1, 2, and 3, and they are sent in
 sequence (with no intervening time between them, as with the "trigger" object,
 and having depth-first consequences so that whatever chain of actions depending
 on "1" takes place before anything depending on "2" and so on.)
@@ -430,27 +483,27 @@ semicolon immediately redirects messages from the outlet to an object named
 to "sue."
 
 
-<P><CENTER>
-    <IMG src="fig3.9.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.9.jpg" ALT="semicolons to send messages">
+</P></CENTER>
 
-Certain other objects (Pd windows, for example, and arrays) have Pd names and
+<P>Certain other objects (Pd windows, for example, and arrays) have Pd names and
 can be sent messages this way.  Also, the special object "pd" is defined to
 which you may send messages to start and stop DSP.
 
 <P> You can put variables in message boxes as shown below:
 
-<P><CENTER>
-    <IMG src="fig3.10.jpg">
-</CENTER><P>
+<CENTER><P>
+    <IMG src="fig3.10.jpg" ALT="variables in message boxes">
+</P></CENTER>
 
-Here, "$1", etc., refer to the arguments of the arriving message (and aren't
+<P>Here, "$1", etc., refer to the arguments of the arriving message (and aren't
 defined if you send a "bang" message or if you click on the message box to
 activate it.)  Dollar sign variables are either numbers or symbols depending
 on the incoming message; if symbols, you may even use them to specify variable
 message selectors or destinations.
 
-<H4> <A name=s4> 2.4. audio signals </A> </H4>
+<H3> <A name="s4"> 2.4. audio signals </A> </H3>
 
 <P>
 Using Pd you can build audio patches which can synthesize musical sounds,
@@ -458,31 +511,25 @@ analyze incoming sounds, process incoming sounds to produce transformed
 audio outputs, or integrate audio processing with other media.  This section
 describes how Pd treats audio signals.
 
-<H4> <A name=s4.1> 2.4.1. sample rate and format </A> </H4>
+<H3> <A name="s4.1"> 2.4.1. sample rate and format </A> </H3>
 
 <P>
 Pd's audio signals are internally kept as 32-bit floating point numbers, so
 you have all the dynamic range you could want.  However, depending on your
 hardware, audio I/O is usually limited to 16 or 24 bits.  Inputs all appear
 between the values of -1 and 1; and output values will be clipped to that range.
-
-<P>
-Pd assumes a sample rate of 44100 unless you override this in Pd's command line.
-Pd doesn't check that this matches the sample rate of audio input or output,
-nor does Pd attempt to set your computer's audio sample rate to its own.  If
-the audio system is running at the wrong sample rate, audio output will
-be transposed (you can check this using the "test audio and MIDI" patch; see
-the help menu).
+Pd assumes a sample rate of 44100 unless you override this (
+in Pd's command line or in the "audio setup" dialog).
 
 <P>
 Pd can read or write samples to files either in 16-bit or 24-bit fixed point
 or in 32-bit floating point, in WAV, AIFF, or AU format, via the soundfiler,
 readsf, and writesf objects.
 
-<H4> <A name=s4.2> 2.4.2. tilde objects and audio connections </A> </H4>
+<H3> <A name="s4.2"> 2.4.2. tilde objects and audio connections </A> </H3>
 
-Audio computations in Pd are carried out by "tilde objects" such as "osc~"
-whoswe names conventionally end in a tilde character to warn you what they
+<P>Audio computations in Pd are carried out by "tilde objects" such as "osc~"
+whose names conventionally end in a tilde character to warn you what they
 are.  Tilde objects can intercommunicate via audio connections.  When audio
 computation is turned on, or when you change the audio network while audio is
 on, Pd sorts all the tilde objects into a linear order for running; then this
@@ -493,9 +540,7 @@ the audio network runs every 1.45 milliseconds.
 an error to connect an audio outlet to a non-audio inlet or vice versa; usually
 these errors are detected at "sort time" when audio is started or the network
 changed with audio running.  An object's leftmost inlet may accept both audio
-and messages; any other inlet is either one or the other.  There is no quick
-way to tell whether an inlet or output is for audio or messages; consult the
-help window for the object.
+and messages; any other inlet is either one or the other. 
 
 <P>
 The audio network, that is, the tilde objects and their interconnections,
@@ -508,7 +553,7 @@ nonlocal signal connections.
 Your subpatches can have audio inlets and outlets via the inlet~ and outlet~
 objects.
 
-<H4> <A name=s4.3> 2.4.3. converting audio to and from messages </A> </H4>
+<H3> <A name=s4.3> 2.4.3. converting audio to and from messages </A> </H3>
 
 <P> If you want to use a control value as a signal, you can use the sig~ object
 to convert it.  The +~, -~, *~, /~, osc~, and phasor~ objects can be configured
@@ -520,9 +565,9 @@ but you can also sample a signal with tabwrite~ and then get access it via
 tabread or tabread4 (note the missing tildes!).  There are also analysis
 objects, the simplest of which is "env~", the envelope follower.
 
-<H4> <A name=s4.4> 2.4.4. switching and blocking </A> </H4>
+<H3> <A name=s4.4> 2.4.4. switching and blocking </A> </H3>
 
-You can use the switch~ or block~ objects to turn portions of your audio
+<P>You can use the switch~ or block~ objects to turn portions of your audio
 computation on and off and to control the block size of computation.  There
 may be only one switch~ or block~ object in any window; it acts on the entire
 window and all of its subwindows, which may still have their own nested
@@ -541,20 +586,20 @@ interaction, or to reduce "block delay" in feedback algorithms.  At the
 own recursive filters.
 
 <P> You can use switch~ to budget your DSP computations; for instance you might
-want to be able to switch between two synthesis algorithms.  Put each algorithm
-in its own subpatch (which can have sub-sub patches in turn, for a voice bank
-for instance), and switch each one off as you switch the other one on.  Beware
-of clicks; if you have a line~ controlling output level, give it time to ramp to
-zero before you switch it off or it will be stuck at a nonzero value for the
-next time it comes back on.
+want to be able to switch between two synthesis algorithms.  To do this, put
+each algorithm in its own subpatch (which can have sub-sub patches in turn, for
+a voice bank for instance), and switch each one off as you switch the other one
+on.  Beware of clicks; if you have a line~ controlling output level, give it
+time to ramp to zero before you switch it off or it will be stuck at a nonzero
+value for the next time it comes back on.
 
-<P> When a subpatch is switched off its audio outputs generate zeros; this costs a
-fairly small overhead; a cheaper way to get outputs is to use throw~ inside
-the switched module and catch~ outside it.
+<P> When a subpatch is switched off its audio outputs generate zeros; this
+costs a fairly small overhead; a cheaper way to get outputs is to use throw~
+inside the switched module and catch~ outside it.
 
-<H4> <A name=s4.5> 2.4.5. nonlocal signal connections </A> </H4>
+<H3> <A name=s4.5> 2.4.5. nonlocal signal connections </A> </H3>
 
-You may wish to pass signals nonlocally, either to get from one window to another, or
+<P>You may wish to pass signals non-locally, either to get from one window to another, or
 to feed a signal back to your algorithm's input.  This can be done using
 throw~/catch~, send~/receive~, or delwrite~/delread~ pairs.  Throw~ and catch~
 implement a summing bus; throw~ adds into the bus and catch~ reads out the
@@ -580,15 +625,15 @@ sorted after your delwrite~.  The only way to ensure this is to create the
 delread~ after you created the delwrite~; if things get out of whack, just
 delete and re-create the delread~.
 
-<H4> <A name=s5> 2.5. scheduling </A> </H4>
+<H3> <A name=s5> 2.5. scheduling </A> </H3>
 
-Pd uses 64-bit floating point numbers to represent time, providing sample
+<P>Pd uses 64-bit floating point numbers to represent time, providing sample
 accuracy and essentially never overflowing.  Time appears to the user
 in milliseconds.
 
-<H4> <A name=s5.1> 2.5.1. audio and messages </A> </H4>
+<H3> <A name=s5.1> 2.5.1. audio and messages </A> </H3>
 
-Audio and message processing are interleaved in Pd.  Audio processing is
+<P>Audio and message processing are interleaved in Pd.  Audio processing is
 scheduled every 64 samples at Pd's sample rate; at 44100 Hz. this gives a
 period of 1.45 milliseconds.  You may turn DSP computation on and off by
 sending the "pd" object the messages "dsp 1" and "dsp 0."
@@ -605,7 +650,7 @@ simultaneously.
 of zero.  This delayed cascade happens after the present cascade has finished,
 but at the same logical time.
 
-<H4> <A name=s5.2> 2.5.2. computation load </A> </H4>
+<H3> <A name=s5.2> 2.5.2. computation load </A> </H3>
 
 <P> The Pd scheduler maintains a (user-specified) lead on its computations;
 that is, it tries to keep ahead of real time by a small amount in order to be
@@ -615,7 +660,7 @@ href="x3.htm" name=s3>getting Pd to run </A>).
 
 <P>  If Pd gets late with respect to real time, gaps (either occasional or
 frequent) will appear in both the input and output audio streams.  On the
-other hand, disk strewaming objects will work correctly, so that you may use
+other hand, disk streaming objects will work correctly, so that you may use
 Pd as a batch program with soundfile input and/or output.  The "-nogui"
 and "-send" startup flags are provided to aid in doing this.
 
@@ -623,13 +668,13 @@ and "-send" startup flags are provided to aid in doing this.
 runs as a separate process.  A flow control mechanism will be provided someday
 to prevent this from causing trouble, but it is in any case wise to avoid
 having too much drawing going on while Pd is trying to make sound.  If a
-subwindow is closed, Pd suspends sending the GUI update messages for it;
+sub-window is closed, Pd suspends sending the GUI update messages for it;
 but not so for miniaturized windows as of version 0.32.  You should really
 close them when you aren't using them.
 
-<H4> <A name=s5.3> 2.5.3. determinism </A> </H4>
+<H3> <A name=s5.3> 2.5.3. determinism </A> </H3>
 
-All message cascades that are scheduled (via "delay" and
+<P>All message cascades that are scheduled (via "delay" and
 its relatives) to happen before a given audio tick will happen as scheduled
 regardless of whether Pd as a whole is running on time; in other words,
 calculation is never reordered for any real-time considerations.  This is done
@@ -640,7 +685,7 @@ it. These time tags are guaranteed to be consistent with the times at which
 timeouts are scheduled and DSP ticks are computed; i.e., time never decreases.
 (However, either Pd or a hardware driver may lie about the physical time an
 input arrives; this depends on the operating system.)  "Timer" objects which
-meaure time intervals measure them in terms of the logical time stamps of the
+measure time intervals measure them in terms of the logical time stamps of the
 message cascades, so that timing a "delay" object always gives exactly the
 theoretical value.  (There is, however, a "realtime" object that measures real
 time, with nondeterministic results.)
@@ -648,12 +693,12 @@ time, with nondeterministic results.)
 <P> If two message cascades are scheduled for the same logical time, they are
 carried out in the order they were scheduled.
 
-<H4> <A name=s6> 2.6. semantics </A> </H4>
+<H3> <A name=s6> 2.6. semantics </A> </H3>
 
 This section describes how objects in Pd are created, how they store data and
 how object and other boxes pass messages among themselves.
 
-<H4> <A name=s6.1> 2.6.1. creation of objects </A> </H4>
+<H3> <A name=s6.1> 2.6.1. creation of objects </A> </H3>
 
 The text in a box has a different function depending on whether it is a message,
 atom (number/symbol), or object box.  In message boxes the text specifies the
@@ -669,12 +714,12 @@ destroyed and the message is used to create the new one.
 
 <P> The selector of the message (the first word in the message) is a selector
 which Pd interprets to mean which type of object to create.  Any message
-arguments (called "creation arguments") are used to parametrize the object
+arguments (called "creation arguments") are used to parameterize the object
 being created.  Thus in "makenote 64 250" the selector "makenote" determines
 the class of object to create and the creation arguments 64 and 250 become the
 initial velocity and duration.
 
-<H4> <A name=s6.2> 2.6.2. persistence of data </A> </H4>
+<H3> <A name=s6.2> 2.6.2. persistence of data </A> </H3>
 
 Among the design principles of Pd is that patches should be printable, in the
 sense that the appearance of a patch should fully determine its functionality. 
@@ -696,7 +741,7 @@ changed.
 if you are going to override them later; this is confusing to anyone who tries
 to understand the patch.
 
-<H4> <A name=s6.3> 2.6.3. message passing </A> </H4>
+<H3> <A name=s6.3> 2.6.3. message passing </A> </H3>
 
 Messages in Pd consist of a selector (a symbol) and zero or more arguments
 (which may be symbols or numbers).  To pass a message to an object, Pd first
@@ -711,7 +756,7 @@ determined by the selector of the creation message, i.e., the first atom of the
 creation message which is usually a symbol.
 
 <P> Each class comes with a fixed collection of messages it may be sent.  For
-esxample, the "float" or "f" object takes "bang" and "float."  These messages
+example, the "float" or "f" object takes "bang" and "float."  These messages
 are sent to "float" objects (objects whose class is float) via the leftmost,
 hot inlet.  (The right inlet is a separate, auxiliary object.)  Objects of
 class "float" respond to the message "bang" by outputting their current value,
@@ -722,7 +767,7 @@ messages by setting their value and then outputting it.
 to messages it is sent, and may take "float" and "bang" messages, or others
 in addition or instead of them.
 
-<H4> <A name=s6.4> 2.6.4. inlets and lists </A> </H4>
+<H3> <A name=s6.4> 2.6.4. inlets and lists </A> </H3>
 
 The leftmost connection point at the top of most objects represents the object
 itself.  Any other dark rectangle is a separate object called an "inlet"
@@ -736,7 +781,7 @@ to the "list" message by distributing the arguments of the message to their
 inlets, except for the first argument which is passed as a "float" or
 "symbol" message to the object proper. 
 
-<H4> <A name=s6.5> 2.6.5. dollar signs </A> </H4>
+<H3> <A name=s6.5> 2.6.5. dollar signs </A> </H3>
 
 In message or object boxes, message arguments starting with a dollar sign
 and a number (like "$1" or "$3-bazoo") are variables which are substituted
@@ -747,14 +792,14 @@ or other) that the message box is responding to.  Thus, if a message box gets
 "23 skidoo" and if it contains the text, "$2 until $1," out comes the message,
 "skidoo until 23."
 
-<P> Object boxes contain text wwhich forms a message to be sent to Pd to create
+<P> Object boxes contain text which forms a message to be sent to Pd to create
 and initialize the object.  Here, $1, etc., are taken from the context in which
 the patch was loaded.  When the patch is a new document or opened from a file
 the "$" variables are undefined.  But if the patch is an abstraction (see the
 next section) they are
-taked from the abstractions' creation arguments.
+taken from the abstractions' creation arguments.
 
-<P>  Constructions such as "$1-x" are expanded by string concatentation.  This
+<P>  Constructions such as "$1-x" are expanded by string concatenation.  This
 is the mechanism for making local variables.  In particular, $0 in an abstraction
 is a counter which is guaranteed to be unique to that abstraction, so sends and
 receives with names like "$0-bear" can be used as local send/receive pairs.
@@ -764,20 +809,26 @@ beginning of the symbol; so, for instance, "rats-$1" will not be expanded.
 Occasionally you may want to have double or triple substitutions; this can
 be done one stage at a time by nesting abstractions (with each subpatch
 adding its own $-variable to the beginning of a symbol and passing that on
-as argument to a further anstraction.)
+as argument to a further abstraction.)
 
-<H4> <A name=s7> 2.7. subpatches </A> </H4>
+<P> For example, if you want to get dog-food, dog-ears, and cat-food, for
+example,   have an abstraction  "a1" that invokes an abstraction "a2" twice, as
+"a2   $1-food" and "a2 $1-ears", and then in a third patch call a1 twice,   as
+"a1 cat" and "a1 dog".  Inside the four "a2" copioes,   $1 will evaluate to
+"dog-food", "cat-food", "dog-ears", and "cat-ears".
+
+<H3> <A name="s7"> 2.7. subpatches </A> </H3>
 
 Pd offers two mechanisms for making subpatches, called "one-off subpatches"
 and "abstractions."  In either case the subpatch appears as an object box
 in a patch.  If you type "pd" or "pd my-name" into an object box, this creates
 a one-off subpatch.  For instance, in this fragment:
 
-<P><CENTER>  <IMG src="fig7.1.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.1.jpg" ALT="subpatch">  </P></CENTER>
 
 the box in the middle, if clicked on, opens the sub-patch shown here:
 
-<P><CENTER>  <IMG src="fig7.2.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.2.jpg" ALT="open subpatch window">  </P></CENTER>
 
 <P> The contents of the subpatch are saved as part of the parent patch, in
 one file.  If you make several copies of a subpatch you may change them
@@ -791,17 +842,17 @@ messages and audio in a subpatch inlet or outlet; they must be one or the other
 exclusively.  Inlets and outlets appear on the invoking box in the same left-to-right
 order as they appear in the subpatch.
 
-<H4> <A name=s7.1> 2.7.1. abstractions </A> </H4>
+<H3> <A name="s7.1"> 2.7.1. abstractions </A> </H3>
 
 <P> To make an abstraction, save a patch with a name such as "abstraction1.pd"
 and then invoke it as "abstraction1" in an object box:
 
-<P><CENTER>  <IMG src="fig7.3.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.3.jpg" ALT="abstraction">  </P></CENTER>
 
 <P> Here we're invoking a separate file, "abstraction1.pd", which holds the
 patch shown here (the border is the same as for the subpatch above):
 
-<P><CENTER>  <IMG src="fig7.4.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.4.jpg" ALT="abstraction example">  </P></CENTER>
 
 You may create many instances of "abstraction1" or invoke it from several
 different patches; and changing the contents of "abstraction1" will affect all
@@ -830,17 +881,17 @@ a different time in an object box than in a message box.  In an object box, the
 "$" argument is expanded at creation time, and in a message box, at message
 time.
 
-<H4> <A name=s7.2> 2.7.2. Graph-on-parent subpatches </A> </H4>
+<H3> <A name="s7.2"> 2.7.2. Graph-on-parent subpatches </A> </H3>
 
 If you open the "properties" dialog for a subpatch or an abstraction, you can
 check the "graph on parent" box to have the controls of the subpatch/abstraction
 appear on the parent.  For instance, here is an invocation of "abstraction2":
 
-<P><CENTER>  <IMG src="fig7.5.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.5.jpg" ALT="graph-on-parent abstraction">  </P></CENTER>
 
 where the patch "abstraction2.pd" contains:
 
-<P><CENTER>  <IMG src="fig7.6.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig7.6.jpg" ALT="inside graph-on-parent abstraction">  </P></CENTER>
 
 Here, the number box in the abstraction shows up on the box that invoked
 the abstraction.  The "graph on parent" flag is set in the abstraction
@@ -857,7 +908,7 @@ are sent to visible controls and/or arrays.
 instead; so the number box in the sub-patch in the example above is the same
 one as you see in the box.  Only controls are made visible in this way
 
-<H4> <A name=s8> 2.8. numeric arrays </A> </H4>
+<H3> <A name=s8> 2.8. numeric arrays </A> </H3>
 
 Linear arrays of numbers recur throughout the computer musician's bag of tricks,
 beginning with the wavetable oscillator.  The wavetable oscillator later was
@@ -880,7 +931,7 @@ two or more channels, use a separate array for each channel.
 <P> Arrays are also useful as transfer functions, for example for nonlinear
 distortion of an audio signal, or to map a control onto a synthesis parameter.
 In situations like this one typically uses much shorter arrays, of no more
-than a few hundered elements.  They are also useful for storing measured
+than a few hundred elements.  They are also useful for storing measured
 spectra derived from the fft~ objects, and probably for many other uses.
 
 <P> Arrays usually appear within subpatches created to house them, whether
@@ -888,17 +939,17 @@ in "graph on parent" form (so that you see them within a rectangle drawn on
 the containing patch), or as a regular subpatch (which you see as a text box.)
 In the "graph on parent" form, an array appears as shown:
 
-<P><CENTER>  <IMG src="fig8.1.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.1.jpg" ALT="array">  </P></CENTER>
 
 <P> Arrays are indexed from 0 to N-1 where N is the number of points in the
 array.  You can read an array value using the tabread object:
 
-<P><CENTER>  <IMG src="fig8.2.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.2.jpg" ALT="array indexing">  </P></CENTER>
 
 Here we see that the third point of the array (index 2) has the value 0.4.
 To write into the array you can use the tabwrite object:
 
-<P><CENTER>  <IMG src="fig8.3.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.3.jpg" ALT="setting an value in an array">  </P></CENTER>
 
 In this example, sending the message sets the third element to 0.5.  (You
 may also send the two numbers to the two inlets separately.)
@@ -907,7 +958,7 @@ may also send the two numbers to the two inlets separately.)
 and to arrays.  These may also be done using audio signals.  For example,
 the patch below creates a 440 Hz. tone with "array1" as a waveform:
 
-<P><CENTER>  <IMG src="fig8.4.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.4.jpg" ALT="setting an array with a waveform">  </P></CENTER>
 
 Here phasor~'s outputs a sawtooth wave, repeating 440 times per second, whose
 output range is from 0 to 1.  The multiplier and adder adjust the range from
@@ -924,7 +975,7 @@ and/or changed later using the "properties" dialog.
 <P>  If you select "properties" on an array in a graph, you two dialogs, one
 for the array and one for the graph.  The array dialog looks like this:
 
-<P><CENTER>  <IMG src="fig8.5.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.5.jpg" ALT="array properties window">  </P></CENTER>
 
 You may use this to change the name and size, in addition to another property,
 "save contents".  If "save contents" is selected, the array's values are stored
@@ -934,13 +985,13 @@ probably not wish to store them in the patch but as separate soundfiles.  This
 will be more efficient, and you may also then use a sound editor to modify them
 outside Pd.
 
-<P> If you check "delete me" and then "OK", the array wil be deleted.  This is
+<P> If you check "delete me" and then "OK", the array will be deleted.  This is
 an odd interface for deleting an object, and is only provided because Pd
 lacks a mechanism for selecting arrays (so that "cut" could serve).
 
 <P> The graph dialog (which also pops up) is shown here:
 
-<P><CENTER>  <IMG src="fig8.6.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig8.6.jpg" ALT="graph properties">  </P></CENTER>
 
 <P> The X bounds initially range from 0 to the number of points in the table
 minus one (this is a good choice for arrays, although graphs holding other
@@ -951,9 +1002,9 @@ range from 0 to 20,000.  Finally, you choose the screen size of the graph,
 width and height, in screen pixels.
 
 <P> Many other operations are defined for arrays; see the related patches
-in the tutorial (starting at 2.control/15.array.pd) for more possibliities.
+in the tutorial (starting at 2.control/15.array.pd) for more possibilities.
 
-<H4> <A name=s9> 2.9. Data structures </A> </H4>
+<H3> <A name=s9> 2.9. Data structures </A> </H3>
 (Note: this section is adapted from an article submitted to ICMC 2002.)
 
 <P>  The original idea in developing Pd was to make a real-time computer music
@@ -982,7 +1033,7 @@ streams.
 Here is one simple
 example of a very short musical sketch realized using Pd:
 
-<P><CENTER>  <IMG src="fig9.1.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig9.1.jpg" ALT="graphical score">  </P></CENTER>
 
 The example, which only lasts a few seconds, is a polyphonic collection of
 time-varying  noise bands. The graphical ``score" consists of six objects, each
@@ -1006,7 +1057,7 @@ mechanism.
 <P> Here is the template associated with the graphical objects 
 shown above:
 
-<P><CENTER>  <IMG src="fig9.2.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig9.2.jpg" ALT="template for graphical score">  </P></CENTER>
 
 Templates consist of a data structure definition (the "struct" object) and
 zero or more drawing instructions ("filledpolygon" and "plot"). The "struct"
@@ -1039,14 +1090,14 @@ color is given as 0, or black.  The second one plots "pitch" using the color
 "voiceno" slot in the data structure, so that color will vary according to its
 "voiceno" slot.
 
-<H4> <A name=s9.1> 2.9.1. Traversal </A> </H4>
+<H3> <A name="s9.1"> 2.9.1. Traversal </A> </H3>
 
 <P> Pd objects are provided to traverse lists and arrays, and to address
 elements of data structures for getting and setting.  Here is a patch showing
 how these facilities could be used, for example, to sequence the graphical
 score shown above:
 
-<P><CENTER>  <IMG src="fig9.3.jpg">  </CENTER><P>
+<CENTER><P>  <IMG src="fig9.3.jpg" ALT="traversal example patch">  </P></CENTER>
 
 <P> Pd has no built-in sequencer, nor even any notion that "x" values should be
 used as a time axis.  (However, a "sort" function is provided, which reorders
@@ -1055,7 +1106,7 @@ data collections as x-ordered sequences.)  Recording sequences of events into
 lists, and/or playing the lists back as sequences, are functionalities that the
 user is expected to supply on top of Pd's offerings, which, it is hoped, would
 allow those functionalities within a much larger range of possibilities, to
-include random reorderings of events, score following, self-modifying scores,
+include random re-orderings of events, score following, self-modifying scores,
 reactive improvisation, and perhaps much more.
 
 <P> Traversal of data is made possible by adding a new type of atom, "pointer",
@@ -1116,10 +1167,10 @@ Finally, the voice abstraction puts its audio output on a summing bus.
 of objects (having different templates).  In this way, an arbitrarily rich
 personal "score language" can be developed and sequenced.
 
-<H4> <A name=s9.2> 2.9.2. Accessing and changing data </A> </H4>
+<H3> <A name=s9.2> 2.9.2. Accessing and changing data </A> </H3>
 
 <P>  In general, accessing or changing data is done via "pointers" to
-"scalars".  Numbers and symbols withing scalars are accessed using the
+"scalars".  Numbers and symbols within scalars are accessed using the
 "get" object and changed, in the same way, using "set".  Since lists
 and arrays are composed of scalars, every actual number or symbol in a data
 heap will be a number or symbol element of some scalar.  To access them, it
@@ -1134,7 +1185,7 @@ a number, chases down the numbered, scalar, element of the named array field.
 
 <P>  To alter "float" or "symbol" elements of scalars is straightforward
 using the "set" object, but arrays and lists can't be set by assignment;
-there is no suitable data type available withing messages.  Lists could
+there is no suitable data type available within messages.  Lists could
 possibly be "settable" by passing pointers to other lists, but permitting this
 would have required either automatically doing deep copies of data structures
 to carry out the assignments, or else implementing a garbage collecting memory
@@ -1154,7 +1205,7 @@ Deletion is less flexible; the only operation is to delete an entire list.
 it's not clear how to protect against stale pointers efficiently, except by
 voiding the entire collection of pointers into a list.)
 
-<H4> <A name=s9.3> 2.9.3. Editing </A> </H4>
+<H3> <A name=s9.3> 2.9.3. Editing </A> </H3>
 
 <P>  The graphical score shown above can be edited by dragging breakpoints, or
 by adding and deleting them, using mouse clicks.  Also, entire objects or
@@ -1184,7 +1235,7 @@ previously existing ones are assumed to be new and are initialized.
 <P>  It can happen that two "struct" objects compete to define the same data
 structure, or that the user reads in data from a file which expects a different
 version of the structure, or alternatively, that the "struct" object for
-existing data objects disappears.  For this reasn, Pd maintains a private
+existing data objects disappears.  For this reason, Pd maintains a private
 representation of the last active version of a "struct" until all
 similarly named "structs," as well as all data using that "struct", have
 disappeared. If the user introduces a new version of the "struct" and only
@@ -1195,7 +1246,7 @@ up belonging to two or more structures of the same name.  The worst that can
 happen is that data may lose their drawing instructions, in which case Pd
 supplies a simple default shape.
 
-<H4> <A name=s9.4> 2.9.4. Limitations </A> </H4>
+<H3> <A name=s9.4> 2.9.4. Limitations </A> </H3>
 
 <P>  When examples get more complicated and/or dense than the one shown here, it
 becomes difficult to see and select specific features of a data collection;
@@ -1220,3 +1271,4 @@ handling primitives and the graphical presentation and editing functions.
 
 </BODY>
 </HTML>
+ 

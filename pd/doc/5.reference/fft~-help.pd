@@ -1,8 +1,8 @@
 #N canvas 22 7 886 436 12;
 #X text 85 158 frequency;
-#X floatatom 16 173 0 0 0;
+#X floatatom 16 173 0 0 0 0 - - -;
 #X obj 16 120 * 44100;
-#X floatatom 16 94 0 0 0;
+#X floatatom 16 94 0 0 0 0 - - -;
 #X text 88 92 frequency;
 #X text 91 111 in bins;
 #X text 85 175 in Hz.;
@@ -35,16 +35,16 @@
 by an IFFT has a gain of N.;
 #X text 346 343 See the FFT examples to see how to use these in practice.
 ;
-#X text 346 112 The FFT objects do Fourier analyses and resyntheses
-of incoming real or complex signals. Complex signals are handled as
-pairs of signals (real and imaginary part.) The analysis size is one
-block (you can use the block~ or switch~ obejcts to control block size).
-;
 #X text 347 205 The real FFT outputs N/2+1 real parts and N/2-1 imaginary
 parts. The other outputs are zero. At DC and at the Nyquist there is
 no imaginary part \, but the second through Nth output is as a real
 and imaginary pair \, which can be thought of as the cosine and sin
 component strengths.;
+#X text 346 112 The FFT objects do Fourier analyses and resyntheses
+of incoming real or complex signals. Complex signals are handled as
+pairs of signals (real and imaginary part.) The analysis size is one
+block (you can use the block~ or switch~ objects to control block size).
+;
 #X connect 1 0 7 0;
 #X connect 2 0 15 0;
 #X connect 3 0 2 0;

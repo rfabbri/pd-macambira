@@ -14,7 +14,10 @@
 #include "portaudio.h"
 #include "pablio_pd.h"
 
-#ifdef MACOSX
+    /* LATER try to figure out how to handle default devices in portaudio;
+    the way s_audio.c handles them isn't going to work here. */
+
+#if defined(MACOSX) || defined(MSW)
 #define Pa_GetDefaultInputDevice Pa_GetDefaultInputDeviceID
 #define Pa_GetDefaultOutputDevice Pa_GetDefaultOutputDeviceID
 #endif
@@ -35,7 +38,8 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
 {
     PaError err;
     static int initialized;
-    
+    int j, devno, pa_indev = 0, pa_outdev = 0;
+
     if (!initialized)
     {
 	/* Initialize PortAudio  */
@@ -53,9 +57,6 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
     /* post("in %d out %d rate %d device %d", inchans, outchans, rate, deviceno); */
     if (inchans != 0 && outchans != 0 && inchans != outchans)
     	error("portaudio: number of input and output channels must match");
-    if (sys_verbose)
-	post("portaudio: opening for %d channels in, %d out",
-		inchans, outchans);
     if (inchans > MAX_PA_CHANS)
     {
 	post("input channels reduced to maximum %d", MAX_PA_CHANS);
@@ -66,25 +67,59 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
 	post("output channels reduced to maximum %d", MAX_PA_CHANS);
 	outchans = MAX_PA_CHANS;
     }
-    if (indeviceno < 0)
-    	indeviceno = Pa_GetDefaultInputDevice();
-    if (outdeviceno < 0)
-    	outdeviceno = Pa_GetDefaultOutputDevice();
-	
-    fprintf(stderr, "input device %d, output device %d\n",
-    	indeviceno, outdeviceno);
+    
+    if (inchans > 0)
+    {
+	for (j = 0, devno = 0; j < Pa_CountDevices(); j++)
+	{
+	    const PaDeviceInfo *info = Pa_GetDeviceInfo(j);
+	    if (info->maxInputChannels > 0)
+	    {
+		if (devno == indeviceno)
+		{
+		    pa_indev = j;
+		    break;
+		}
+		devno++;
+	    }
+	}
+    }	
+    
+    if (outchans > 0)
+    {
+	for (j = 0, devno = 0; j < Pa_CountDevices(); j++)
+	{
+	    const PaDeviceInfo *info = Pa_GetDeviceInfo(j);
+	    if (info->maxOutputChannels > 0)
+	    {
+		if (devno == outdeviceno)
+		{
+		    pa_outdev = j;
+		    break;
+		}
+		devno++;
+	    }
+	}
+    }	
+
+    if (sys_verbose)
+    {
+	post("input device %d, channels %d", pa_indev, inchans);
+	post("output device %d, channels %d", pa_outdev, outchans);
+        post("framesperbuf %d, nbufs %d", framesperbuf, nbuffers);
+    }
     if (inchans && outchans)
     	err = OpenAudioStream( &pa_stream, rate, paFloat32,
 	    PABLIO_READ_WRITE, inchans, framesperbuf, nbuffers,
-	    	indeviceno, outdeviceno);
+	    	pa_indev, pa_outdev);
     else if (inchans)
     	err = OpenAudioStream( &pa_stream, rate, paFloat32,
 	    PABLIO_READ, inchans, framesperbuf, nbuffers,
-	    	indeviceno, outdeviceno);
+	    	pa_indev, pa_outdev);
     else if (outchans)
     	err = OpenAudioStream( &pa_stream, rate, paFloat32,
 	    PABLIO_WRITE, outchans, framesperbuf, nbuffers,
-	    	indeviceno, outdeviceno);
+	    	pa_indev, pa_outdev);
     else err = 0;
     if ( err != paNoError ) 
     {
@@ -117,9 +152,36 @@ int pa_send_dacs(void)
     double timebefore;
     
     timebefore = sys_getrealtime();
+    if ((pa_inchans && GetAudioStreamReadable(pa_stream) < DEFDACBLKSIZE) ||
+        (pa_outchans && GetAudioStreamWriteable(pa_stream) < DEFDACBLKSIZE))
+    {
+        if (pa_inchans && pa_outchans)
+        {
+            int synced = 0;
+            while (GetAudioStreamWriteable(pa_stream) > 2*DEFDACBLKSIZE)
+            {
+                for (j = 0; j < pa_outchans; j++)
+                    for (i = 0, fp2 = samples + j; i < DEFDACBLKSIZE; i++,
+                        fp2 += pa_outchans)
+                {
+                    *fp2 = 0;
+                }
+                synced = 1;
+                WriteAudioStream(pa_stream, samples, DEFDACBLKSIZE);
+            }
+            while (GetAudioStreamReadable(pa_stream) > 2*DEFDACBLKSIZE)
+            {
+                synced = 1;
+                ReadAudioStream(pa_stream, samples, DEFDACBLKSIZE);
+            }
+            /* if (synced)
+                post("sync"); */
+        }
+        return (SENDDACS_NO);
+    }
     if (pa_inchans)
     {
-    	ReadAudioStream(pa_stream, samples, DEFDACBLKSIZE);
+	ReadAudioStream(pa_stream, samples, DEFDACBLKSIZE);
     	for (j = 0, fp1 = pa_soundin; j < pa_inchans; j++, fp1 += DEFDACBLKSIZE)
     	    for (i = 0, fp2 = samples + j; i < DEFDACBLKSIZE; i++,
 	    	fp2 += pa_inchans)
@@ -127,6 +189,18 @@ int pa_send_dacs(void)
 	    fp1[i] = *fp2;
 	}
     }
+#if 0 
+	{
+		static int nread;
+		if (nread == 0)
+		{
+			post("it's %f %f %f %f",
+			pa_soundin[0], pa_soundin[1], pa_soundin[2], 					pa_soundin[3]);
+			nread = 1000;
+		}
+		nread--;
+	}
+#endif
     if (pa_outchans)
     {
     	for (j = 0, fp1 = pa_soundout; j < pa_outchans; j++,
@@ -141,7 +215,10 @@ int pa_send_dacs(void)
     }
 
     if (sys_getrealtime() > timebefore + 0.002)
+    {
+        /* post("slept"); */
     	return (SENDDACS_SLEPT);
+    }
     else return (SENDDACS_YES);
 }
 
@@ -183,4 +260,32 @@ error:
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
 
+}
+
+    /* scanning for devices */
+void pa_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize)
+{
+    int i, nin = 0, nout = 0, ndev;
+    *canmulti = 1;  /* one dev each for input and output */
+
+    Pa_Initialize();
+    ndev = Pa_CountDevices();
+    for (i = 0; i < ndev; i++)
+    {
+	const PaDeviceInfo *pdi = Pa_GetDeviceInfo(i);
+	if (pdi->maxInputChannels > 0 && nin < maxndev)
+	{
+	    strcpy(indevlist + nin * devdescsize, pdi->name);
+	    nin++;
+	}
+	if (pdi->maxOutputChannels > 0 && nout < maxndev)
+	{
+	    strcpy(outdevlist + nout * devdescsize, pdi->name);
+	    nout++;
+	}
+    }
+    *nindevs = nin;
+    *noutdevs = nout;
 }

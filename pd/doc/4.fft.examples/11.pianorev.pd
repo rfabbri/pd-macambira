@@ -92,13 +92,13 @@
 #X text 138 147 stronger than;
 #X text 140 159 old one;
 #X obj 245 130 -~;
-#X obj 259 105 ../../extra/lrshift~ 1;
+#X obj 259 105 lrshift~ 1;
 #X obj 245 178 clip~ 0 1;
 #X obj 245 156 *~ 1e+20;
 #X obj 421 130 -~;
 #X obj 421 178 clip~ 0 1;
 #X obj 421 156 *~ 1e+20;
-#X obj 435 105 ../../extra/lrshift~ -1;
+#X obj 435 105 lrshift~ -1;
 #X obj 64 214 *~;
 #X obj 64 243 *~;
 #X connect 0 0 2 0;

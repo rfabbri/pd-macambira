@@ -38,7 +38,7 @@ extern "C" {
 
     /* and depending on the compiler, hidden data structures are
     declared differently: */
-#if defined( __GNUC__) || defined( __BORLANDC__ )
+#if defined( __GNUC__) || defined( __BORLANDC__ ) || defined( __MWERKS__ )
 #define EXTERN_STRUCT struct
 #else
 #define EXTERN_STRUCT extern struct
@@ -419,6 +419,15 @@ EXTERN void class_domainsignalin(t_class *c, int onset);
 #define CLASS_MAINSIGNALIN(c, type, field) \
     class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
 
+    	 /* prototype for functions to save Pd's to a binbuf */
+typedef void (*t_savefn)(t_gobj *x, t_binbuf *b);
+EXTERN void class_setsavefn(t_class *c, t_savefn f);
+EXTERN t_savefn class_getsavefn(t_class *c);
+    	/* prototype for functions to open properties dialogs */
+typedef void (*t_propertiesfn)(t_gobj *x, struct _glist *glist);
+EXTERN void class_setpropertiesfn(t_class *c, t_propertiesfn f);
+EXTERN t_propertiesfn class_getpropertiesfn(t_class *c);
+
 #ifndef PD_CLASS_DEF
 #define class_addbang(x, y) class_addbang((x), (t_method)(y))
 #define class_addpointer(x, y) class_addpointer((x), (t_method)(y))
@@ -456,6 +465,15 @@ EXTERN int open_via_path(const char *name, const char *ext, const char *dir,
     char *dirresult, char **nameresult, unsigned int size, int bin);
 EXTERN int sched_geteventno(void);
 EXTERN double sys_getrealtime(void);
+
+
+/* ------------  threading ------------------- */
+/* T.Grill - see m_sched.c */
+ 
+EXTERN void sys_lock(void);
+EXTERN void sys_unlock(void);
+EXTERN int sys_trylock(void);
+
 
 /* --------------- signals ----------------------------------- */
 
@@ -577,8 +595,11 @@ EXTERN int value_setfloat(t_symbol *s, t_float f);
 EXTERN void sys_vgui(char *fmt, ...);
 EXTERN void sys_gui(char *s);
 
+    /* dialog window creation and destruction */
 EXTERN void gfxstub_new(t_pd *owner, void *key, const char *cmd);
 EXTERN void gfxstub_deleteforkey(void *key);
+
+extern t_class *glob_pdobject;	/* object to send "pd" messages */
 
 /*-------------  Max 0.26 compatibility --------------------*/
 

@@ -78,24 +78,36 @@ static char ossdsp[] = "/dev/dsp%d";
 #define FMAX 0x7ffff000
 #define CLIP32(x) (((x)>FMAX)?FMAX:((x) < -FMAX)?-FMAX:(x))
 
+/* ---------------- public routines ----------------------- */
 
-/* ------------- private routines for all APIS ------------------- */
+static int oss_ndev = 0; 
 
-static void linux_flush_all_underflows_to_zero(void)
+    /* find out how many OSS devices we have.  Since this has to
+    open the devices to find out if they're there, we have
+    to be called before audio is actually started up.  So we
+    cache the results, which in effect are the number of available
+    devices.  */
+void oss_init(void)
 {
-/*
-    TODO: Implement similar thing for linux (GGeiger) 
-
-    One day we will figure this out, I hope, because it 
-    costs CPU time dearly on Intel  - LT
-  */
-     /*    union fpc_csr f;
-	   f.fc_word = get_fpc_csr();
-	   f.fc_struct.flush = 1;
-	   set_fpc_csr(f.fc_word);
-     */
+    int fd, i;
+    static int countedthem = 0;
+    if (countedthem)
+    	return;
+    for (i = 0; i < 10; i++)
+    {
+    	char devname[100];
+	if (i == 0)
+	    strcpy(devname, "/dev/dsp");
+	else sprintf(devname, "/dev/dsp%d", i);
+	if ( (fd = open(devname, O_WRONLY|O_NONBLOCK)) != -1)
+	{
+    	    oss_ndev++;
+	    close(fd);
+	}
+	else break;
+    }
+    countedthem = 1;
 }
-
 
 void oss_set32bit( void)
 {
@@ -172,11 +184,12 @@ void oss_configure(t_oss_dev *dev, int srate, int dac, int skipblocksize)
     {
     	int fragbytes, logfragsize, nfragment;
     	    /* setting fragment count and size.  */
+	linux_fragsize = sys_blocksize;
 	if (!linux_fragsize)
 	{
 	    linux_fragsize = OSS_DEFFRAGSIZE;
 	    while (linux_fragsize > DEFDACBLKSIZE
-		&& linux_fragsize * 4 > sys_advance_samples)
+		&& linux_fragsize * 6 > sys_advance_samples)
 		    linux_fragsize = linux_fragsize/2;
 	}
 	    /* post("adv_samples %d", sys_advance_samples); */
@@ -239,14 +252,14 @@ static int oss_setchannels(int fd, int wantchannels, char *devname)
 { /* IOhannes */
     int param = wantchannels;
 
-    while (param>1) {
-      int save = param;
-      if (ioctl(fd, SNDCTL_DSP_CHANNELS, &param) == -1) {
-	error("OSS: SNDCTL_DSP_CHANNELS failed %s",devname);
-      } else {
-	if (param == save) return (param);
-      }
-      param=save-1;
+    while (param > 1)
+    {
+	int save = param;
+	if (ioctl(fd, SNDCTL_DSP_CHANNELS, &param) == -1)
+	    error("OSS: SNDCTL_DSP_CHANNELS failed %s",devname);
+	else if (param == save) 
+	    return (param);
+        param = save - 1;
     }
 
     return (0);
@@ -268,11 +281,9 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     audio_buf_info ainfo;
 
     linux_nindevs = linux_noutdevs = 0;
-
-
-    	/* mark input devices unopened */
+    	/* mark devices unopened */
     for (i = 0; i < OSS_MAXDEV; i++)
-    	linux_adcs[i].d_fd = -1;
+    	linux_adcs[i].d_fd = linux_dacs[i].d_fd = -1;
 
     /* open output devices */
     wantmore=0;
@@ -282,16 +293,15 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     for (n = 0; n < noutdev; n++)
     {
 	int gotchans, j, inindex = -1;
-	int thisdevice = (outdev[n] >= 0 ? outdev[n] : n-1);
+	int thisdevice = (outdev[n] >= 0 ? outdev[n] : 0);
 	int wantchannels = (nchout>n) ? chout[n] : wantmore;
     	fd = -1;
 	if (!wantchannels)
 	    goto end_out_loop;
 
-	if (thisdevice > 1)
-	    sprintf(devname, "/dev/dsp%d", thisdevice-1);
+	if (thisdevice > 0)
+	    sprintf(devname, "/dev/dsp%d", thisdevice);
 	else sprintf(devname, "/dev/dsp");
-    	
 	    /* search for input request for same device.  Succeed only
 	    if the number of channels matches. */
 	for (j = 0; j < nindev; j++)
@@ -369,14 +379,14 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     for (n = 0; n < nindev; n++)
     {
 	int gotchans=0;
-	int thisdevice = (indev[n] >= 0 ? indev[n] : n-1);
+	int thisdevice = (indev[n] >= 0 ? indev[n] : 0);
     	int wantchannels = (nchin>n)?chin[n]:wantmore;
 	int alreadyopened = 0;
 	if (!wantchannels)
 	    goto end_in_loop;
 
-	if (thisdevice > 1)
-	    sprintf(devname, "/dev/dsp%d", thisdevice - 1);
+	if (thisdevice > 0)
+	    sprintf(devname, "/dev/dsp%d", thisdevice);
 	else sprintf(devname, "/dev/dsp");
 
 	sys_setalarm(1000000);
@@ -399,12 +409,13 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 	    	post("opened %s for reading only\n", devname);
     	}
 	linux_adcs[linux_nindevs].d_fd = fd;
+
 	gotchans = oss_setchannels(fd,
 	    (wantchannels>OSS_MAXCHPERDEV)?OSS_MAXCHPERDEV:wantchannels,
 	    	devname);
 	if (sys_verbose)
-	post("opened audio input device %s; got %d channels",
-	     devname, gotchans);
+	    post("opened audio input device %s; got %d channels",
+	     	devname, gotchans);
 
 	if (gotchans < 1)
 	{
@@ -441,6 +452,17 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 	    	linux_adcs[0].d_nchannels * DEFDACBLKSIZE);
     	if (sys_verbose)
 	    fprintf(stderr, "...done.\n");
+    }
+    	/* now go and fill all the output buffers. */
+    for (i = 0; i < linux_noutdevs; i++)
+    {
+    	int j;
+    	memset(buf, 0, linux_dacs[i].d_bytespersamp *
+	    	linux_dacs[i].d_nchannels * DEFDACBLKSIZE);
+	for (j = 0; j < sys_advance_samples/DEFDACBLKSIZE; j++)
+	    write(linux_dacs[i].d_fd, buf,
+	    	linux_dacs[i].d_bytespersamp *
+	    	    linux_dacs[i].d_nchannels * DEFDACBLKSIZE);
     }
     sys_setalarm(0);
     return (0);
@@ -765,8 +787,18 @@ int oss_send_dacs(void)
      return (rtnval);
 }
 
-void oss_listdevs( void)
+void oss_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize)
 {
-    post("device listing not implemented in OSS yet\n");
+    int i, ndev;
+    *canmulti = 2;  /* supports multiple devices */
+    if ((ndev = oss_ndev) > maxndev)
+    	ndev = maxndev;
+    for (i = 0; i < ndev; i++)
+    {
+    	sprintf(indevlist + i * devdescsize, "OSS device #%d", i+1);
+    	sprintf(outdevlist + i * devdescsize, "OSS device #%d", i+1);
+    }
+    *nindevs = *noutdevs = ndev;
 }
-

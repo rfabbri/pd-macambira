@@ -128,6 +128,22 @@ static void pdsymbol_anything(t_pdsymbol *x, t_symbol *s, int ac, t_atom *av)
     outlet_symbol(x->x_obj.ob_outlet, x->x_s = s);
 }
 
+    /* For "list" message don't just output "list"; if empty, we want to
+    bang the symbol and if it starts with a symbol, we output that.
+    Otherwise it's not clear what we should do so we just go for the
+    "anything" method.  LATER figure out if there are other places where
+    empty lists aren't equivalent to "bang"???  Should Pd's message passer
+    always check and call the more specific method, or should it be the 
+    object's responsibility?  Dunno... */
+static void pdsymbol_list(t_pdsymbol *x, t_symbol *s, int ac, t_atom *av)
+{
+    if (!ac)
+    	pdsymbol_bang(x);
+    else if (av->a_type == A_SYMBOL)
+    	pdsymbol_symbol(x, av->a_w.w_symbol);
+    else pdsymbol_anything(x, s, ac, av);
+}
+
 void pdsymbol_setup(void)
 {
     pdsymbol_class = class_new(gensym("symbol"), (t_newmethod)pdsymbol_new, 0,
@@ -1215,6 +1231,11 @@ static void makefilename_symbol(t_makefilename *x, t_symbol *s)
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 
+static void makefilename_set(t_makefilename *x, t_symbol *s)
+{
+    x->x_format = s;
+}
+
 static void makefilename_setup(void)
 {
     makefilename_class = class_new(gensym("makefilename"),
@@ -1222,6 +1243,8 @@ static void makefilename_setup(void)
     	sizeof(t_makefilename), 0, A_DEFSYM, 0);
     class_addfloat(makefilename_class, makefilename_float);
     class_addsymbol(makefilename_class, makefilename_symbol);
+    class_addmethod(makefilename_class, (t_method)makefilename_set,
+    	gensym("set"), A_SYMBOL, 0);
 }
 
 /* -------------------------- swap ------------------------------ */

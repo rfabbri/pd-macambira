@@ -397,19 +397,18 @@ static void vu_getrect(t_gobj *z, t_glist *glist,
 static void vu_save(t_gobj *z, t_binbuf *b)
 {
     t_vu *x = (t_vu *)z;
-    int bflcol[3], *ip1, *ip2;
+    int bflcol[3];
     t_symbol *srl[3];
 
     iemgui_save(&x->x_gui, srl, bflcol);
-    ip1 = (int *)(&x->x_gui.x_isa);
-    ip2 = (int *)(&x->x_gui.x_fsf);
     binbuf_addv(b, "ssiisiissiiiiiiii", gensym("#X"),gensym("obj"),
 		(t_int)x->x_gui.x_obj.te_xpix, (t_int)x->x_gui.x_obj.te_ypix,
 		gensym("vu"), x->x_gui.x_w, x->x_gui.x_h,
 		srl[1], srl[2],
 		x->x_gui.x_ldx, x->x_gui.x_ldy,
-		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
-		bflcol[0], bflcol[2], x->x_scale, (*ip1)&IEM_INIT_ARGS_ALL);
+		iem_fstyletoint(&x->x_gui.x_fsf), x->x_gui.x_fontsize,
+		bflcol[0], bflcol[2], x->x_scale,
+		iem_symargstoint(&x->x_gui.x_isa));
     binbuf_addv(b, ";");
 }
 
@@ -611,12 +610,11 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
     t_symbol *srl[3];
     int w=IEM_GUI_DEFAULTSIZE, h=IEM_VU_STEPS*IEM_VU_DEFAULTSIZE;
     int ldx=-1, ldy=-8, f=0, fs=8, scale=1;
-    int iinit=0, ifstyle=0;
     int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
-    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
-    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
     char str[144];
 
+    iem_inttosymargs(&x->x_gui.x_isa, 0);
+    iem_inttofstyle(&x->x_gui.x_fsf, 0);
     srl[0] = gensym("empty");
     srl[1] = gensym("empty");
     srl[2] = gensym("empty");
@@ -646,29 +644,25 @@ static void *vu_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	ldx = (int)atom_getintarg(4, argc, argv);
 	ldy = (int)atom_getintarg(5, argc, argv);
-	ifstyle = (int)atom_getintarg(6, argc, argv);
+	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(6, argc, argv));
 	fs = (int)atom_getintarg(7, argc, argv);
 	bflcol[0] = (int)atom_getintarg(8, argc, argv);
 	bflcol[2] = (int)atom_getintarg(9, argc, argv);
 	scale = (int)atom_getintarg(10, argc, argv);
     }
     if((argc == 12)&&IS_A_FLOAT(argv,11))
-	iinit = (int)atom_getintarg(11, argc, argv);
+	iem_inttosymargs(&x->x_gui.x_isa, atom_getintarg(11, argc, argv));
     x->x_gui.x_draw = (t_iemfunptr)vu_draw;
-    iinit &= IEM_INIT_ARGS_ALL;
-    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
 
-    fstyle->x_snd_able = 0;
-    fstyle->x_rcv_able = 1;
+    x->x_gui.x_fsf.x_snd_able = 0;
+    x->x_gui.x_fsf.x_rcv_able = 1;
     x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
-    x->x_gui.x_isa = *init;
-    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) x->x_gui.x_fsf.x_rcv_able = 0;
     x->x_gui.x_unique_num = 0;
-    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
-    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
-    else { fstyle->x_font_style = 0;
+    if(x->x_gui.x_fsf.x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(x->x_gui.x_fsf.x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { x->x_gui.x_fsf.x_font_style = 0;
 	strcpy(x->x_gui.x_font, "courier"); }
-    x->x_gui.x_fsf = *fstyle;
     iemgui_first_dollararg2sym(&x->x_gui, srl);
     if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
     x->x_gui.x_snd = srl[0];
@@ -729,8 +723,8 @@ void g_vumeter_setup(void)
     vu_widgetbehavior.w_deletefn =     iemgui_delete;
     vu_widgetbehavior.w_visfn =        iemgui_vis;
     vu_widgetbehavior.w_clickfn =      NULL;
-    vu_widgetbehavior.w_propertiesfn = vu_properties;
-    vu_widgetbehavior.w_savefn =       vu_save;
     class_setwidget(vu_class,&vu_widgetbehavior);
     class_sethelpsymbol(vu_class, gensym("vu"));
+    class_setsavefn(vu_class, vu_save);
+    class_setpropertiesfn(vu_class, vu_properties);
 }

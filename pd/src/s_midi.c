@@ -403,3 +403,197 @@ void sys_pollmidiqueue( void)
     sys_pollmidioutqueue();
     sys_pollmidiinqueue();
 }
+
+/******************** dialog window and device listing ********************/
+
+#ifdef USEAPI_OSS
+void midi_oss_init( void);
+#endif
+
+    /* last requested parameters */
+static int midi_nmidiindev;
+static int midi_midiindev[MAXMIDIINDEV];
+static int midi_nmidioutdev;
+static int midi_midioutdev[MAXMIDIOUTDEV];
+
+static void sys_get_midi_params(int *pnmidiindev, int *pmidiindev,
+    int *pnmidioutdev, int *pmidioutdev)
+{
+    int i;
+    *pnmidiindev = midi_nmidiindev;
+    for (i = 0; i < MAXMIDIINDEV; i++)
+    	pmidiindev[i] = midi_midiindev[i]; 
+    *pnmidioutdev = midi_nmidioutdev;
+    for (i = 0; i < MAXMIDIOUTDEV; i++)
+    	pmidioutdev[i] = midi_midioutdev[i]; 
+}
+
+static void sys_save_midi_params(
+    int nmidiindev, int *midiindev,
+    int nmidioutdev, int *midioutdev)
+{
+    int i;
+    midi_nmidiindev = nmidiindev;
+    for (i = 0; i < MAXMIDIINDEV; i++)
+    	midi_midiindev[i] = midiindev[i]; 
+    midi_nmidioutdev = nmidioutdev;
+    for (i = 0; i < MAXMIDIOUTDEV; i++)
+    	midi_midioutdev[i] = midioutdev[i]; 
+}
+
+void sys_open_midi(int nmidiindev, int *midiindev,
+    int nmidioutdev, int *midioutdev)
+{
+#ifdef USEAPI_OSS
+    midi_oss_init();
+#endif
+    sys_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
+    sys_save_midi_params(nmidiindev, midiindev,
+    	nmidioutdev, midioutdev);
+}
+
+    /* open midi using whatever parameters were last used */
+void sys_reopen_midi( void)
+{
+    int nmidiindev, midiindev[MAXMIDIINDEV];
+    int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
+    sys_get_midi_params(&nmidiindev, midiindev, &nmidioutdev, midioutdev);
+    sys_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
+}
+
+#define MAXNDEV 20
+#define DEVDESCSIZE 80
+
+#ifdef MSW
+#define DEVONSET 0  /* microsoft device list starts at 0 (the "mapper"). */
+#else	    	    /* (see also MSW ifdef in sys_parsedevlist(), s_main.c)  */
+#define DEVONSET 1  /* To agree with command line flags, normally start at 1 */
+#endif
+
+void sys_listmididevs(void )
+{
+    char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
+    int nindevs = 0, noutdevs = 0, i;
+
+    midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs,
+	MAXNDEV, DEVDESCSIZE);
+
+    if (!nindevs)
+    	post("no midi input devices found");
+    else
+    {
+    	post("input devices:");
+	for (i = 0; i < nindevs; i++)
+    	    post("%d. %s", i+1, indevlist + i * DEVDESCSIZE);
+    }
+    if (!noutdevs)
+    	post("no midi output devices found");
+    else
+    {
+    	post("output devices:");
+	for (i = 0; i < noutdevs; i++)
+    	    post("%d. %s", i+DEVONSET, outdevlist + i * DEVDESCSIZE);
+    }
+}
+
+extern t_class *glob_pdobject;
+
+    /* start an midi settings dialog window */
+void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
+{
+    char buf[1024 + 2 * MAXNDEV*(DEVDESCSIZE+4)];
+    	/* these are the devices you're using: */
+    int nindev, midiindev[MAXMIDIINDEV];
+    int noutdev, midioutdev[MAXMIDIOUTDEV];
+    int midiindev1, midiindev2, midiindev3, midiindev4,
+	midioutdev1, midioutdev2, midioutdev3, midioutdev4;
+
+    	/* these are all the devices on your system: */
+    char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
+    int nindevs = 0, noutdevs = 0, i;
+
+    char indevliststring[MAXNDEV*(DEVDESCSIZE+4)+80],
+    	outdevliststring[MAXNDEV*(DEVDESCSIZE+4)+80];
+
+    midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs,
+	MAXNDEV, DEVDESCSIZE);
+
+    strcpy(indevliststring, "{ {none} ");
+    for (i = 0; i < nindevs; i++)
+    {
+    	strcat(indevliststring, "\"");
+	strcat(indevliststring, indevlist + i * DEVDESCSIZE);
+    	strcat(indevliststring, "\" ");
+    }
+    strcat(indevliststring, "}");
+
+    strcpy(outdevliststring, "{ {none} ");
+    for (i = 0; i < noutdevs; i++)
+    {
+    	strcat(outdevliststring, "\"");
+	strcat(outdevliststring, outdevlist + i * DEVDESCSIZE);
+    	strcat(outdevliststring, "\" ");
+    }
+    strcat(outdevliststring, "}");
+
+    sys_get_midi_params(&nindev, midiindev, &noutdev, midioutdev);
+
+    if (nindev > 1 || noutdev > 1)
+    	flongform = 1;
+
+    midiindev1 = (nindev > 0 &&  midiindev[0]>= 0 ? midiindev[0]+1 : 0);
+    midiindev2 = (nindev > 1 &&  midiindev[1]>= 0 ? midiindev[1]+1 : 0);
+    midiindev3 = (nindev > 2 &&  midiindev[2]>= 0 ? midiindev[2]+1 : 0);
+    midiindev4 = (nindev > 3 &&  midiindev[3]>= 0 ? midiindev[3]+1 : 0);
+    midioutdev1 = (noutdev > 0 && midioutdev[0]>=0 ? midioutdev[0]+1 : 0);  
+    midioutdev2 = (noutdev > 1 && midioutdev[1]>=0 ? midioutdev[1]+1 : 0);  
+    midioutdev3 = (noutdev > 2 && midioutdev[2]>=0 ? midioutdev[2]+1 : 0);  
+    midioutdev4 = (noutdev > 3 && midioutdev[3]>=0 ? midioutdev[3]+1 : 0);  
+
+    sprintf(buf,
+"pdtk_midi_dialog %%s \
+%s %d %d %d %d %s %d %d %d %d \
+%d\n",
+	indevliststring,
+	midiindev1, midiindev2, midiindev3, midiindev4, 
+	outdevliststring,
+	midioutdev1, midioutdev2, midioutdev3, midioutdev4,
+	(flongform != 0));
+    gfxstub_deleteforkey(0);
+    gfxstub_new(&glob_pdobject, glob_midi_properties, buf);
+}
+
+    /* new values from dialog window */
+void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
+{
+    int nmidiindev, midiindev[MAXMIDIINDEV];
+    int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
+    int i, nindev, noutdev;
+    int newmidiindev[4], newmidioutdev[4];
+
+    for (i = 0; i < 4; i++)
+    {
+    	newmidiindev[i] = atom_getintarg(i, argc, argv);
+    	newmidioutdev[i] = atom_getintarg(i+4, argc, argv);
+    }
+
+    for (i = 0, nindev = 0; i < 4; i++)
+    {
+    	if (newmidiindev[i] > 0)
+	{
+	    newmidiindev[nindev] = newmidiindev[i]-1;
+	    nindev++;
+	}
+    }
+    for (i = 0, noutdev = 0; i < 4; i++)
+    {
+    	if (newmidioutdev[i] > 0)
+	{
+	    newmidioutdev[noutdev] = newmidioutdev[i]-1;
+	    noutdev++;
+	}
+    }
+
+    sys_close_midi();
+    sys_open_midi(nindev, newmidiindev, noutdev, newmidioutdev);
+}

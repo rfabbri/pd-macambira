@@ -43,10 +43,13 @@ static void *sighip_new(t_floatarg f)
 
 static void sighip_ft1(t_sighip *x, t_floatarg f)
 {
-    if (f < 0.001) f = 10;
+    if (f < 0) f = 0;
     x->x_hz = f;
     x->x_ctl->c_coef = 1 - f * (2 * 3.14159) / x->x_sr;
-    if (x->x_ctl->c_coef < 0) x->x_ctl->c_coef = 0;
+    if (x->x_ctl->c_coef < 0)
+    	x->x_ctl->c_coef = 0;
+    else if (x->x_ctl->c_coef > 1)
+    	x->x_ctl->c_coef = 1;
 }
 
 static t_int *sighip_perform(t_int *w)
@@ -58,15 +61,24 @@ static t_int *sighip_perform(t_int *w)
     int i;
     float last = c->c_x;
     float coef = c->c_coef;
-    for (i = 0; i < n; i++)
+    if (coef < 1)
     {
-	float new = *in++ + coef * last;
-	*out++ = new - last;
-	last = new;
+	for (i = 0; i < n; i++)
+	{
+	    float new = *in++ + coef * last;
+	    *out++ = new - last;
+	    last = new;
+	}
+    	if (PD_BADFLOAT(last))
+	    last = 0; 
+    	c->c_x = last;
     }
-    if (PD_BADFLOAT(last))
-	last = 0; 
-    c->c_x = last;
+    else
+    {
+    	for (i = 0; i < n; i++)
+    	    *out++ = *in++;
+	c->c_x = 0;
+    }
     return (w+5);
 }
 
@@ -133,10 +145,13 @@ static void *siglop_new(t_floatarg f)
 
 static void siglop_ft1(t_siglop *x, t_floatarg f)
 {
-    if (f < 0.001) f = 10;
+    if (f < 0) f = 0;
     x->x_hz = f;
     x->x_ctl->c_coef = f * (2 * 3.14159) / x->x_sr;
-    if (x->x_ctl->c_coef > 1) x->x_ctl->c_coef = 1;
+    if (x->x_ctl->c_coef > 1)
+    	x->x_ctl->c_coef = 1;
+    else if (x->x_ctl->c_coef < 0)
+    	x->x_ctl->c_coef = 0;
 }
 
 static void siglop_clear(t_siglop *x, t_floatarg q)

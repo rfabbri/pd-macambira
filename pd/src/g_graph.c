@@ -626,8 +626,6 @@ void glist_redraw(t_glist *x)
     }
 }
 
-t_class *graph_class;
-
 /* --------------------------- widget behavior  ------------------- */
 
 extern t_widgetbehavior text_widgetbehavior;
@@ -1021,15 +1019,20 @@ static int graph_click(t_gobj *z, struct _glist *glist,
     }
 }
 
-static void graph_save(t_gobj *z, t_binbuf *b)
-{
-    t_glist *x = (t_glist *)z;
-    text_widgetbehavior.w_savefn(z, b);
-}
-
 void garray_properties(t_garray *x);
 
-static void graph_properties(t_gobj *z, t_glist *owner)
+t_widgetbehavior graph_widgetbehavior =
+{
+    graph_getrect,
+    graph_displace,
+    graph_select,
+    graph_activate,
+    graph_delete,
+    graph_vis,
+    graph_click,
+};
+
+void graph_properties(t_gobj *z, t_glist *owner)
 {
     t_glist *x = (t_glist *)z;
     {
@@ -1045,19 +1048,6 @@ static void graph_properties(t_gobj *z, t_glist *owner)
 		garray_properties((t_garray *)y);
     }
 }
-
-t_widgetbehavior graph_widgetbehavior =
-{
-    graph_getrect,
-    graph_displace,
-    graph_select,
-    graph_activate,
-    graph_delete,
-    graph_vis,
-    graph_click,
-    graph_save,
-    graph_properties,
-};
 
     /* find the graph most recently added to this glist;
     	if none exists, return 0. */

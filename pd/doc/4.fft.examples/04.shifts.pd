@@ -13,8 +13,8 @@
 #X text 93 23 This is a test of the "lrshift~" object \, which can be used for calculations that compare neighboring bins of an FFT. The "tabreceive~" picks up the contents of "array1' (consisting of 0 \, 1 \, 0 \, 0 \, ...) and the three print~ objects show the input and the two outputs.;
 #X text 155 224 shift left;
 #X text 182 260 shift right;
-#X obj 128 240 ../../extra/lrshift~ 1;
-#X obj 149 276 ../../extra/lrshift~ -1;
+#X obj 128 240 lrshift~ 1;
+#X obj 149 276 lrshift~ -1;
 #X msg 49 131 \; pd dsp 1 \; array1 1 1;
 #X text 223 5 SAMPLE SHIFTS;
 #X connect 0 0 1 0;

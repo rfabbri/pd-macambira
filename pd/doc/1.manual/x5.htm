@@ -1,26 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+
 <HTML>
-<HEAD>
-<TITLE>Pd Documentation</TITLE>
-</HEAD>
-<BODY bgcolor="#ffffff">
-<SMALL>
-<div style="width:6.5in; margin-left:.5in">
+  <HEAD>
+	 <TITLE>Pd Documentation 5</TITLE>
+    <meta http-equiv="Content-Type" content="text/html">
+	 <link rel="stylesheet" type="text/css" href="pdmanual.css" media="screen">
+  </HEAD>
+  
+<BODY>
 
-<CENTER> <B>
-Pd Documentation chapter 5. current status
-</B> </CENTER>
+<H2>Pd Documentation chapter 5. current status</H2>
+
 <P>
-This section tracks changes in Pd's current implementation.
-<BR>
-<H5> <A href=index.htm#s5> back to table of contents </A></H5> 
+<A href="index.htm#s5"> back to table of contents </A>
+<BR><BR>
+</P> 
 
-<H4> <A name=s2> 5.1. release notes </A> </H4>
+<P>This section tracks changes in Pd's current implementation.</P>
+
+<H3> <A name="s2"> 5.1. release notes </A> </H3>
+
+<P> ------------------ 0.37 --------------------------
+
+<P> Pd is finally fixed so that it can open and close audio and MIDI devices
+on-the-fly (previously it opened them once at startup and hogged them until
+Pd quit).  Starting DSP causes audio devices to be opened, and 
+stopping it closes them.
+There are dialog panels in the "Media" menu (which used to be called 
+"Audio") for choosing audio and MIDI settings.  The "path" also can be changed
+on the fly via a dialog in the "File" menu.
+
+<P> A "vline" object acts like "line" but to sub-sample accuracy.  See
+the audio example, C04.control.to.signal.pd (and/or chapter 3 of
+<A HREF="http://www.crca.ucsd.edu/~msp/techniques.htm"
+<I> Theory and Techniques of Electronic Music </I> ).
+ 
+<P> The block~/switch~ object now takes a "set" message to dynamically change
+block size, etc.
+
+<P> The makefilename object takes a "set" message to set the "pattern".  You
+can use this to kludge multiple substitutions (as shown in the help file).
+
+<P> The writesf~ object got an update and a better help window.  It now should
+be able to write 32bit floating-point WAV soundfiles.  The file's sample rate
+is now set "correctly".
+
+<P>  Various improvements were made in audio I/O to improve stability and
+reduce latency.
+
+<P>  Jack support should work for Mac OSX (it appears as a separate API).
+Linux is offering experimental portaudio V19 support (but Mac and Window/ASIO
+are still based on PA V18.)
+
+<P>  The fiddle~ object (in extra) has an "npoints" method to set the analysis
+window size dynamically.
+
+<P> (windows) Pd is now distributed as a self-extracting archive.
+
+<P> (windows) url files in the help directories are opened correctly.
+
+<P> (Mac) the arrow keys should now be fixed.
+
+<P> (linux) The "configure" script should be better at finding TK in various
+distributions (debian users previously had to use a special configure script.)
+
+<P> (developers) Pd now exits cleanly from its main loop instead of bailing
+out.  A mutex protects Pd's data so it can be accessed from other threads. 
+(Thomas Grill's improvements.)
+
+<P> (developers) The "savefunction" and "dialog" widget behaviors
+were replaced by a better mechanism (class_setsavefn() and
+class_setpropertiesfn()).  THey're declared in m_pd.h so you don't have to
+include the (unstable) g_canvas.h to get them.
+
+<P> (developers) Better flag handling in the IEM GUIs (g_toggle.c, etc) should
+compile with fewer warnings and be more portable.
+
 
 <P> ------------------ 0.37-test 1 --------------------------
 
 <P> The MacOSX version now prioritizes itself effectively (thanks to
 gert@test.at (v93r)) via Adam Lindsay).  Adam has made a proper MacOSX
-"package" for Pd; see <A href=http://homepage.mac.com/atl/sw>
+"package" for Pd; see <A href="http://homepage.mac.com/atl/sw">
 http://homepage.mac.com/atl/sw</A>.
 
 <P> A bug was fixed in readsf~/writesf~ (things were coming out in the wrong
@@ -49,8 +110,6 @@ See the way "extras" is organized.
 <P>  When you save any patch, Pd looks for all invocations of that patch
 as an abstraction and reloads them.  This unfortunately has the side effect of
 making all the containing windows visible, but it's better than nothing.
-
-
 
 <P> ------------------ 0.36-1 -------------------------------
 
@@ -106,7 +165,7 @@ be fixed.
 
 <P> An experimental new feature called graph-on-parent allows subpatches and abstractions to show
 GUI features; so, for instance, you can make an oscillator with a number box to
-control the frewuency.  This is described in section 2.7.2 of the HTML
+control the frequency.  This is described in section 2.7.2 of the HTML
 documentation and an example is shown in 7.stuff/synth1/.
 
 <P> Spaces are allowed in pathnames to Pd and to patches; however, the "path"
@@ -128,7 +187,7 @@ all conformed to the next-oldest one, and so on.  You can alter the contents of
 a "struct" and all the associated data will be modified to fit the new
 structure definition.  Data are persistent, i.e., saved with the containing
 patch.  You can copy and paste data between patches.  If you save data to a file
-explicityly, you can read it into another patch and the data are conformed
+explicitly, you can read it into another patch and the data are conformed
 automatically to the new data structures.
 
 <P> A new version of Thomas Musil's GUI objects was merged in.
@@ -154,7 +213,7 @@ up the HTML documentation.  This doesn't work in Windows or Mac land yet.
 
 <P> In Linux, the "-32bit" flag was added, which you must now use if 
 running Guenter's OSS RME Hammerfall driver.  (This was necessary because
-OSS went and used the same "bit" for a different purpose, so taht Pd tried
+OSS went and used the same "bit" for a different purpose, so that Pd tried
 to open some other cards in 32bit mode inappropriately.)
 
 <P> In Linux, MIDI is now opened "-NODELAY" ... this makes the OSS Creative
@@ -178,13 +237,13 @@ MMIO.  If "resync" is on, whenever the audio input and output seem out
 of whack the audio driver resynchronizes all input and output devices;
 otherwise the situation is simply ignored.  "Noresync" is probably best for
 consumer stereo cards (and is the default if you're running only 2 channels in
-and out).  If you're runnimg more than 2 channels in either direction, the
+and out).  If you're running more than 2 channels in either direction, the
 default is "resync".
 
 <P> In soundfiler's read method, if you specify "-maxsize", that implies
 "-resize" (as it ought to.)
 
-<P> You can use $1-stlye names for arays and tables.
+<P> You can use $1-style names for arrays and tables.
 
 <P> Pd will now refuse to make duplicate connections between objects.
 
@@ -251,8 +310,8 @@ the Pd release so Thomas won't have to publish patches to Pd anymore.  I
 didn't take the graphical inlets and outlets for reasons explained elsewhere,
 but Thomas might decide to continue supplying them on a patch basis.
 
-<P> Many new examples were added to the "2.control" amd expecially
-"3.audio" example patches.  A list of differences batween Max/MSP and Pd
+<P> Many new examples were added to the "2.control" and especially
+"3.audio" example patches.  A list of differences between Max/MSP and Pd
 now appears at the end of this section.
 
 <P> Finally, I fixed Pd to notice window iconification and suspend graphical
@@ -265,13 +324,13 @@ updates for iconified windows.
 
 <P> I incorporated Krzysztof Czaja's menuclose bug fix in g_canvas.c.
 
-<P> (lunix) the configure script is more rational.
+<P> (Linux) the configure script is more rational.
 
 <P> the qlist and pack objects were fixed to handle reentrancy correctly.
 
 <P> Pd now complains about running out of memory (before it dies.)  I intend
 to provide advance warning and automatically back out of loading patches that
-woudl run out of memory, but that's not in place yet.
+would run out of memory, but that's not in place yet.
 
 <P> Typing into a message box sometimes left you with lines from the output
 pointing to the wrong location.  Fixed.
@@ -297,19 +356,19 @@ port, 17-32 the second one, and so on.  The midiin, sysexin, midiout objects
 give you a separate inlet to specify which of the open MIDI port numbers
 you want.
 
-<P> (linux only) By default, Pd now reads and write audio in "block mode."
+<P> (Linux only) By default, Pd now reads and write audio in "block mode."
 Previously you have to specify "-frags" and/or "-fragsize" to get this.
 As of this version you have to specify "-streammode" to get the opposite,
 streaming mode.  This mode seems only to work with a small number of sound
 cards, notably Ensoniq ens1370 and ens1371.
 
-<P> (linux only) Also, "-fragsize" is replaced with a more convenient
+<P> (Linux only) Also, "-fragsize" is replaced with a more convenient
 "-blocksize" which you specify in sample frames.  It defaults to 64 which is
 Pd's audio computation block size but may be larger or smaller.  Typically you
 would specify "-audiobuf" and "-blocksize" and Pd will  compute "-frags" for
 you; but you can also specify "-frags" explicitly.
 
-<P> (linux only) OSS and ALSA audio support are improved.  You can now talk to
+<P> (Linux only) OSS and ALSA audio support are improved.  You can now talk to
 RME9652 using Guenter's OSS driver; this is different from the "-RME" support
 which uses Winfried's older driver.  Other multichannel OSS drivers might now
 work as well.  Pd also seems to work with ALSA 0.9 Beta 4; I've tested this
@@ -334,8 +393,8 @@ question of how a reduced-accuracy version should be named.
 window.  The phase vocoder example doesn't use framp~ and I had forgotten
 what it did until Guenter dug it back up.
 
-<P> (linux only) I finally got around to incorporating Guenter's autoconf
-stuff, and learned about rpms.  Major new linux releases will probably be
+<P> (Linux only) I finally got around to incorporating Guenter's autoconf
+stuff, and learned about RPM.  Major new Linux releases will probably be
 in .tar.gz and .rpm formats; "test" releases will probably just be in .tar.gz.
 I also fixed it so that the installation prefix is overridden if you invoke
 pd by its full pathname, so that you can still use compilations with
@@ -345,7 +404,7 @@ installation prefixes before you actually install them.
 by Ross Bencina and Phil Burk.  I couldn't discover any way this would ever
 outperform the old "multimedia" API Pd uses.  So the release contains the sources,
 but you have to recompile Pd to use directX.  Use "makefile.nt.portaudio".  Only
-1 or 2 channels of audio are supported.  THe interesting thing is that the same
+1 or 2 channels of audio are supported.  The interesting thing is that the same
 code will run on Macintosh.  There are a couple of other obstacles to a
 MacOS port of Pd though; it's hard to predict when this will be feasible.
 
@@ -391,7 +450,7 @@ if Pd is run "-verbose".
 <BR> <BR> 
 <P> ------------------ 0.32 PATCH 2, 3, 4 -------------------
 
-<P> Hassled more with font size differnces between NT and Linux, and updated
+<P> Hassled more with font size differences between NT and Linux, and updated
 many help files.  Minor bug fixes here and there.
 
 <P> the table object now takes a second argument to set size in points.
@@ -440,7 +499,7 @@ MIDI I/O.  Otherwise, MIDI I/O jitter is limited by the audio buffer size.
 
 <P> -noloadbang: cancels loadbangs.
 
-<P> -nogui: supress starting the GUI.  You can then still talk to Pd using,
+<P> -nogui: suppress starting the GUI.  You can then still talk to Pd using,
 perhaps among other possibilities, the new network connection programs now
 included in the release.
 
@@ -469,7 +528,7 @@ the soundfile name on the command line.
 <P>  <strong> in general: </strong> 
 
 <P> In Linux the treatment of MIDI input is now much more efficient.  Also,
-bugs were fixed in notin and (for SGI) bendin.
+bugs were fixed in notein and (for SGI) bendin.
 
 <P> You can "select all" from the Edit menu.
 
@@ -763,7 +822,7 @@ A "Font bomb" feature is provided for resizing fonts and stretching and
 contracting patches to fit.
 
 <P>
-Pds now bind themselves to the symbol pd-<window-name).
+Pds now bind themselves to the symbol pd-&lt;window-name).
 
 <P>
 IN Linux, if Pd is called as root it tries to promote its run-time
@@ -974,7 +1033,7 @@ notable new objects:
 <P>
 - an experimental facility for array of floats is included. You can make a new
 array (from the "put" menu) which will be given a name such as "array1".  You
-can then send it "read <file>", "write <file>", "resize <N>", and "print"
+can then send it "read &lt;file&gt;", "write &lt;file&gt;", "resize &lt;N&gt;", and "print"
 messages.  File reading and writing is in ascii.  "resize" changes the size of
 the array, and "print" prints its vital signs.  You can then use "tabread4~"
 to do a 4-point interpolating table lookup, and tabwrite~ to write audio
@@ -1191,7 +1250,7 @@ The following max-like objects are included:
     send, receive.
 <P> -----------------------------------------
 
-<H4> <A name=s2> 5.2. known bugs </A> </H4>
+<H3> <A name="s2"> 5.2. known bugs </A> </H3>
 
 <P> In the list below, starred items are still things needing attention...
 
@@ -1239,7 +1298,7 @@ uses of block~ or switch~ objects that change block size frmo the default of
 read/write delay lines or use send~/receive~, or throw~/catch~, between
 windows with different block sizes.
 
-<H4> <A name=s3> 5.3. differences from Max/MSP </A> </H4>
+<H3> <A name="s3"> 5.3. differences from Max/MSP </A> </H3>
 
 <P> It wasn't anyone's intention to make Pd a Max/MSP clone, but on the
 other hand, if there's no reason for a feature to appear differently in
@@ -1259,7 +1318,7 @@ kind of personalized compatibility library.
 <P> There are, however, differences in semantics you'll want to know about;
 a partial list follows.
 
-<P> <bold> abstraction arguments. </bold>
+<P> <b> abstraction arguments. </b>
 In Pd you can edit instantiations of abstractions and save the result back
 to the file of the abstraction.  This isn't possible in Max, because the
 instantiations are different from the abstraction itself in that "#1", etc.,

@@ -26,7 +26,8 @@ static void postflags(void);
 #define DEFAULTSRATE 44100
 #define SAMPSIZE 2
 
-#define REALDACBLKSIZE (4 * DEFDACBLKSIZE) /* larger underlying bufsize */
+int nt_realdacblksize;
+#define DEFREALDACBLKSIZE (4 * DEFDACBLKSIZE) /* larger underlying bufsize */
 
 #define MAXBUFFER 100   /* number of buffers in use at maximum advance */
 #define DEFBUFFER 30	/* default is about 30x6 = 180 msec! */
@@ -83,7 +84,7 @@ static void wave_prep(t_sbuf *bp)
 
     if (!(bp->hData =
 	GlobalAlloc(GMEM_MOVEABLE | GMEM_SHARE,
-	    (DWORD) (CHANNELS_PER_DEVICE * REALDACBLKSIZE * SAMPSIZE)))) 
+	    (DWORD) (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize)))) 
 	    	printf("alloc 1 failed\n");
 
     if (!(bp->lpData =
@@ -100,12 +101,12 @@ static void wave_prep(t_sbuf *bp)
 	(WAVEHDR *) GlobalLock(bp->hWaveHdr))) 
 	    printf("lock 2 failed\n");
 
-    for (i = CHANNELS_PER_DEVICE * REALDACBLKSIZE,
+    for (i = CHANNELS_PER_DEVICE * nt_realdacblksize,
     	sp = (short *)bp->lpData; i--; )
     	    *sp++ = 0;
 
     wh->lpData = bp->lpData;
-    wh->dwBufferLength = (CHANNELS_PER_DEVICE * REALDACBLKSIZE * SAMPSIZE);
+    wh->dwBufferLength = (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize);
     wh->dwFlags = 0;
     wh->dwLoops = 0L;
     wh->lpNext = 0;
@@ -273,7 +274,7 @@ static void nt_midisync(void)
     if (initsystime == -1) nt_resetmidisync();
     jittersec = (nt_dacjitterbufsallowed > nt_adcjitterbufsallowed ?
     	nt_dacjitterbufsallowed : nt_adcjitterbufsallowed)
-    	    * REALDACBLKSIZE / sys_getsr();
+    	    * nt_realdacblksize / sys_getsr();
     diff = sys_getrealtime() - 0.001 * clock_gettimesince(initsystime);
     if (diff > nt_hibuftime) nt_hibuftime = diff;
     if (diff < nt_hibuftime - jittersec)
@@ -436,7 +437,7 @@ static void nt_resyncaudio(void)
     		    outwavehdr, sizeof(WAVEHDR)); 
 	    outwavehdr->dwFlags = 0L;
 	    memset((char *)(ntsnd_outvec[nda][phase].lpData),
-	    	0, (CHANNELS_PER_DEVICE * REALDACBLKSIZE * SAMPSIZE));
+	    	0, (CHANNELS_PER_DEVICE * SAMPSIZE * nt_realdacblksize));
 	    waveOutPrepareHeader(ntsnd_outdev[nda], outwavehdr,
 	    	sizeof(WAVEHDR)); 
 	    mmresult = waveOutWrite(ntsnd_outdev[nda], outwavehdr,
@@ -598,7 +599,7 @@ int mmio_send_dacs(void)
     }
 
     nt_fill = nt_fill + DEFDACBLKSIZE;
-    if (nt_fill == REALDACBLKSIZE)
+    if (nt_fill == nt_realdacblksize)
     {
     	nt_fill = 0;
 
@@ -692,11 +693,12 @@ void mmio_open_audio(int naudioindev, int *audioindev,
 {
     int nbuf;
 
-    nbuf = sys_advance_samples/REALDACBLKSIZE;
+    nt_realdacblksize = (sys_blocksize ? sys_blocksize : DEFREALDACBLKSIZE);
+    nbuf = sys_advance_samples/nt_realdacblksize;
     if (nbuf >= MAXBUFFER)
     {
     	fprintf(stderr, "pd: audio buffering maxed out to %d\n",
-    	    (int)(MAXBUFFER * ((REALDACBLKSIZE * 1000.)/44100.)));
+    	    (int)(MAXBUFFER * ((nt_realdacblksize * 1000.)/44100.)));
     	nbuf = MAXBUFFER;
     }
     else if (nbuf < 4) nbuf = 4;
@@ -710,13 +712,9 @@ void mmio_open_audio(int naudioindev, int *audioindev,
     nt_nwavein = sys_inchannels / 2;
     nt_nwaveout = sys_outchannels / 2;
     nt_whichadc = (naudioindev < 1 ?
-    	(nt_nwavein > 1 ? WAVE_MAPPER : -1) :
-	    (audioindev[0] == DEFAULTAUDIODEV ? WAVE_MAPPER :
-	    	audioindev[0] - 1));
+    	(nt_nwavein > 1 ? WAVE_MAPPER : -1) : audioindev[0]);
     nt_whichdac = (naudiooutdev < 1 ?
-    	(nt_nwaveout > 1 ? WAVE_MAPPER : -1) :
-	    (audiooutdev[0] == DEFAULTAUDIODEV ? WAVE_MAPPER :
-	    	audiooutdev[0] - 1));
+    	(nt_nwaveout > 1 ? WAVE_MAPPER : -1) : audiooutdev[0]);
     if (naudiooutdev > 1 || naudioindev > 1)
  post("separate audio device choice not supported; using sequential devices.");
     mmio_do_open_audio();
@@ -727,7 +725,7 @@ void mmio_reportidle(void)
 {
 }
 
-
+#if 0
 /* list the audio and MIDI device names */
 void mmio_listdevs(void)
 {
@@ -754,5 +752,36 @@ void mmio_listdevs(void)
         if (wRtn) nt_waveouterror("waveOutGetDevCaps: %s\n", wRtn);
     	else fprintf(stderr,
     	    "audio output device #%d: %s\n", i+1, wocap.szPname);
+    }
+}
+#endif
+
+void mmio_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+    	int maxndev, int devdescsize)
+{
+    int  wRtn, ndev, i;
+
+    *canmulti = 2;  /* supports multiple devices */
+    ndev = waveInGetNumDevs();
+    if (ndev > maxndev)
+    	ndev = maxndev;
+    *nindevs = ndev;
+    for (i = 0; i < ndev; i++)
+    {
+    	WAVEINCAPS wicap;
+    	wRtn = waveInGetDevCaps(i, (LPWAVEINCAPS) &wicap, sizeof(wicap));
+	sprintf(indevlist + i * devdescsize, (wRtn ? "???" : wicap.szPname));
+    }
+
+    ndev = waveOutGetNumDevs();
+    if (ndev > maxndev)
+    	ndev = maxndev;
+    *noutdevs = ndev;
+    for (i = 0; i < ndev; i++)
+    {
+    	WAVEOUTCAPS wocap;
+    	wRtn = waveOutGetDevCaps(i, (LPWAVEOUTCAPS) &wocap, sizeof(wocap));
+	sprintf(outdevlist + i * devdescsize, (wRtn ? "???" : wocap.szPname));
     }
 }
