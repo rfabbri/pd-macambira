@@ -452,15 +452,38 @@ ALSA.
 
 <H3> <A name="s1.3"> 3.3. Installing Pd in Macintosh OSX </A> </H3>
 
-<P>Pd version 0.35 and up support Macintosh OSX, although there are still some
-problems.  You can always just download 
+<P>Pd version 0.35 and up support Macintosh OSX.  You need the Jaguar
+distribution (10.2) of OSX.
+
+<P> To install Pd you can always just download 
 the sources and compile them yourself, or (easier) 
 find a MacOSX-style "package".  The first package was put together by Adam 
-Lindsay and can be found on 
-<A href="http://homepage.mac.com/atl/sw"> 
-http://homepage.mac.com/atl/sw</A>.  The package simply installs itself 
+Lindsay; the most current one seems to be the one by Hans
+on
+<A href="http://www.pure-data.org/Members/hans/">
+http://www.pure-data.org/Members/hans/</A>.
+The package simply installs itself 
 and you needn't follow the directions below. 
 </P>
+
+<H4> To install on OSX from the binary tarball: </H4>
+
+<P> The binary tarballs on 
+<A HREF="http://www.crca.ucsd.edu/~msp/software.html">
+http://www.crca.ucsd.edu/~msp/software.html</A>
+take more steps to install but are more "official".  To install them:
+
+<P> If you haven't already, first download and install Tcl/Tk; there are pointers on
+Hans's page, or try:
+<A href="http://prdownloads.sourceforge.net/tcltkaqua/">
+http://prdownloads.sourceforge.net/tcltkaqua/</A>.  Double click on what you
+get (a disk image opens) and then double click on the "package" icon, and the
+installer should tell you how to proceed from there.
+
+<P>  Then download a tarball like pd-0.37-0.mac.tar.gz, and expand it
+(I think that's done just by clicking on the thing in OSX.)  You can install
+it into your home directory for example.  Then start a shell window and
+type "~/pd/bin/pd" to it, and pd should start.
 
 <H4> To install on OSX from source: </H4>
 

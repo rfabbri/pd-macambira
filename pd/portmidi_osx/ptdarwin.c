@@ -3,7 +3,7 @@
  *
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: ptdarwin.c,v 1.1.1.2 2004-02-02 11:28:02 ggeiger Exp $
+ * $Id: ptdarwin.c,v 1.2 2004-02-22 16:21:47 ggeiger Exp $
  */
 
 #include <stdio.h>

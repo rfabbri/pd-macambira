@@ -51,7 +51,7 @@ SGICFLAGS5 = -o32 -DPD -DSGI -O2
 SGIINCLUDE =  -I/usr/people/msp/pd/pd/src
 
 .c.pd_irix5:
-	cc $(SGICFLAGS5) $(SGIINCLUDE) -o $*.o -c $*.c
+	$(CC) $(SGICFLAGS5) $(SGIINCLUDE) -o $*.o -c $*.c
 	ld -elf -shared -rdata_shared -o $*.pd_irix5 $*.o
 	rm $*.o
 
@@ -70,7 +70,7 @@ SGICFLAGS5 = -DPD -O2 -DSGI
 SGIINCLUDE =  -I/usr/people/msp/pd/pd/src
 
 .c.pd_irix6:
-	cc $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
+	$(CC) $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
 	ld -elf -shared -rdata_shared -o $*.pd_irix6 $*.o
 	rm $*.o
 
@@ -86,7 +86,7 @@ LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
 LINUXINCLUDE =  -I../../src
 
 .c.pd_linux_o:
-	cc -g $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.pd_linux_o -c $*.c
+	$(CC) -g $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.pd_linux_o -c $*.c
 
 expr.pd_linux: $(LINUXOBJ)
 	ld -export_dynamic  -shared -o expr.pd_linux $(LINUXOBJ) -lc -lm
@@ -134,10 +134,10 @@ MACOSXCFLAGS = -DMACOSX -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 MACOSXINCLUDE =  -I../../src
 
 .c.pd_darwin_o:
-	cc -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_darwin_o -c $*.c
+	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_darwin_o -c $*.c
 
 expr.pd_darwin: $(MACOSXOBJ)
-	cc -bundle -undefined suppress  -flat_namespace \
+	$(CC) -bundle -undefined suppress  -flat_namespace \
 		-o expr.pd_darwin $(MACOSXOBJ)  -lm
 	rm -f ../expr.pd_darwin
 	-ln -s expr~/expr.pd_darwin ..

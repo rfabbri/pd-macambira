@@ -36,7 +36,7 @@ SGICFLAGS5 = -o32 -DPD -DUNIX -DIRIX -O2
 SGIINCLUDE =  -I../../src
 
 .c.pd_irix5:
-	cc $(SGICFLAGS5) $(SGIINCLUDE) -o $*.o -c $*.c
+	$(CC) $(SGICFLAGS5) $(SGIINCLUDE) -o $*.o -c $*.c
 	ld -elf -shared -rdata_shared -o $*.pd_irix5 $*.o
 	rm $*.o
 
@@ -51,7 +51,7 @@ SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
 	-Ofast=ip32
 
 .c.pd_irix6:
-	cc $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
+	$(CC) $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
 	ld -n32 -IPA -shared -rdata_shared -o $*.pd_irix6 $*.o
 	rm $*.o
 
@@ -83,8 +83,8 @@ DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 .c.pd_darwin:
-	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
 	rm -f $*.o
 
 # ----------------------------------------------------------
