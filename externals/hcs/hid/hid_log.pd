@@ -1,7 +1,7 @@
 #N canvas 252 423 377 303 10;
 #X obj 84 32 inlet;
 #X obj 84 249 outlet;
-#X text 132 32 input range: -1 to 1;
+#X text 132 32 input range: 0 to 1;
 #X text 140 249 output range: 0 to 1;
 #X text 9 5 [hid_log];
 #X obj 84 134 * 1.71828;

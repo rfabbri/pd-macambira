@@ -1,0 +1,29 @@
+#N canvas 593 306 465 308 10;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_invert] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 284 released under the GNU GPL;
+#X text 30 38 Converts relative axis data into an absolute position.
+;
+#X obj 205 125 mouse;
+#X msg 223 82 open 1;
+#X msg 234 100 open 2;
+#X obj 187 84 tgl 25 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+;
+#X floatatom 142 216 5 0 0 0 - - -;
+#X floatatom 183 216 5 0 0 0 - - -;
+#X floatatom 282 217 5 0 0 0 - - -;
+#X floatatom 241 217 5 0 0 0 - - -;
+#X obj 282 183 hid_rel2abs 0 100;
+#X obj 103 184 hid_rel2abs -10 10;
+#X connect 5 0 10 0;
+#X connect 5 0 14 0;
+#X connect 5 1 12 0;
+#X connect 5 1 13 0;
+#X connect 6 0 5 0;
+#X connect 7 0 5 0;
+#X connect 8 0 5 0;
+#X connect 13 0 11 0;
+#X connect 14 0 9 0;

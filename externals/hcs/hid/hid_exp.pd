@@ -1,7 +1,7 @@
 #N canvas 76 444 487 313 10;
 #X obj 72 38 inlet;
 #X obj 86 263 outlet;
-#X text 120 38 input range: -1 to 1;
+#X text 120 38 input range: 0 to 1;
 #X text 142 263 output range: 0 to 1;
 #X text 7 9 [hid_exp];
 #X obj 86 178 pow;
