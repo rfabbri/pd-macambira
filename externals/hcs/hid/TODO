@@ -52,6 +52,7 @@ by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 
 - this is probably unnecessary since the t_clock seems to run well at 1ms delay
 
+- at standard block size (64 samples), one block = ~1.5ms
 
 ==============================================================================
 = function return values
