@@ -48,7 +48,7 @@ void perform_effect(struct frame f, struct args a)
 			switch(f.pixelformat)
 			{
 				case 16:
-					*c16 = scanline16(f, y);
+					c16 = scanline16(f, y);
 					redpix = r16(c16[x]);
 					greenpix = g16(c16[x]);
 					bluepix = b16(c16[x]);
