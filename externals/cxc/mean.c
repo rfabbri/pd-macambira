@@ -88,12 +88,14 @@ static void cxmean_mean(t_cxmean *x)
 
 void cxmean_setup(void)
 {
-  cxmean_class = class_new(gensym("cx.mean"),
+  cxmean_class = class_new(gensym("cxmean"),
 			       (t_newmethod)cxmean_new,
 			       0,
 			       sizeof(t_cxmean),
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
+  class_addcreator(cxmean_new,gensym("cx.mean"),A_DEFSYM, 0);
+  
   class_addmethod(cxmean_class, (t_method)cxmean_set,
 		  gensym("set"), A_DEFSYM, 0);
   class_addmethod(cxmean_class, (t_method)cxmean_mean,
@@ -190,12 +192,14 @@ static void cxavgdev_float(t_cxavgdev *x, t_float f)
 
 void cxavgdev_setup(void)
 {
-  cxavgdev_class = class_new(gensym("cx.avgdev"),
+  cxavgdev_class = class_new(gensym("cxavgdev"),
 			       (t_newmethod)cxavgdev_new,
 			       0,
 			       sizeof(t_cxavgdev),
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
+
+  class_addcreator(cxavgdev_new,gensym("cx.avgdev"),A_DEFSYM, 0);
   class_addmethod(cxavgdev_class, (t_method)cxavgdev_set,
 		  gensym("set"), A_DEFSYM, 0);
 /*   class_addmethod(cxavgdev_class, (t_method)cxavgdev_mean, */
@@ -292,12 +296,14 @@ static void cxstddev_float(t_cxstddev *x, t_float f)
 
 void cxstddev_setup(void)
 {
-  cxstddev_class = class_new(gensym("cx.stddev"),
+  cxstddev_class = class_new(gensym("cxstddev"),
 			       (t_newmethod)cxstddev_new,
 			       0,
 			       sizeof(t_cxstddev),
 			       CLASS_DEFAULT,
 			       A_DEFSYM, 0);
+
+  class_addcreator(cxstddev_new,gensym("cx.stddev"),A_DEFSYM, 0);
   class_addmethod(cxstddev_class, (t_method)cxstddev_set,
 		  gensym("set"), A_DEFSYM, 0);
 /*   class_addmethod(cxstddev_class, (t_method)cxstddev_mean, */

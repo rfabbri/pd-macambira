@@ -23,7 +23,7 @@ that are in the CVS.
 Every external (the source code) is linked into the "src" directory.
 In order to be platform independent this is done via c-includes.
 
-Then the build system just tries to build every exeternal that it 
+Then the build system just tries to build every external that it 
 finds in "src".
 
 Problems with this approach:

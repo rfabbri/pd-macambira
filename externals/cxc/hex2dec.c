@@ -37,7 +37,7 @@ static void hex2dec_symbol(t_hex2dec *x, t_symbol *s)
     outlet_symbol(x->x_obj.ob_outlet, gensym(buf));
 }
 
-static void hex2dec_setup(void)
+void hex2dec_setup(void)
 {
     hex2dec_class = class_new(gensym("hex2dec"),
     (t_newmethod)hex2dec_new, 0,
