@@ -1,0 +1,5 @@
+0.2
+  fixed : could set event nnumber to one
+  do not set "started" at initialization
+0.1
+  basic bang-events sequencer
