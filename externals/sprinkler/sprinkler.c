@@ -120,6 +120,7 @@ static void sprinkler_anything(t_sprinkler *x, t_symbol *dst, int argc, t_atom *
       case A_GIMME:
       case A_CANT:
       default:
+	break;
 	// just fall though
       }
     }
