@@ -1,61 +1,27 @@
-# ----------------------- NT -----------------------
+prefix=../../..
 
+EXTERNALS = $(shell ls ../src)
 
-EXTERNALS=\
-#!IF ![f exist filelist.inc del filelist.inc & for %i in (*.c) do @echo %i \>> filelist.inc]
-!INCLUDE filelist.inc
-#!ENDIF
-
-all: filelist.inc link.stamp $(EXTERNALS:.c=.dll)
+all: $(EXTERNALS:.c=.dll)
 
 .SUFFIXES: .dll
 
-PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
-VC="C:\Program Files\Microsoft Visual Studio\Vc98"
-OGGPATH="C:\oggvorbis-win32sdk-1.0"
-SRCPATH=..\src
-PDPATH=..\..\..\pd
+CFLAGS = -DPD -DWINDOWS -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
-PDNTINCLUDE = /I. /I.. /I..\..\..\pd\src /I$(VC)\include \
-	/I..\..\creb\include /I$(OGGPATH)/include
+INCLUDE = -I. -I.. -I../include
 
-PDNTLDIR = $(VC)\lib
-PDNTLIB = $(PDNTLDIR)\libc.lib \
-	$(PDNTLDIR)\oldnames.lib \
-	$(PDNTLDIR)\kernel32.lib \
-	$(PDNTLDIR)\uuid.lib \
-	$(PDNTLDIR)\ws2_32.lib \
-	$(PDPATH)\bin\pthreadVC.lib \
-	$(PDPATH)\bin\pd.lib \
-	$(OGGPATH)\lib\vorbis.lib \
-	$(OGGPATH)\lib\vorbisenc.lib \
-	$(OGGPATH)\lib\vorbisfile.lib \
-	$(OGGPATH)\lib\ogg.lib
-
-.c.dll:
-	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-	link /dll /export:$(*:~=_tilde)_setup $(*).obj $(PDNTLIB)
-	del $*.obj $*.lib $*.exp
-
-filelist.inc:
-	if exist filelist.inc del filelist.inc
-#	for %i in ($(SRCPATH)\*.c) do @echo %~ni%~xi \>> filelist.inc
-	for %i in ($(SRCPATH)\*.c) do @echo %~ni%~xi \>> filelist.inc
-
-transfer:
-	copy $(SRCPATH)\*.c .
-
-link.stamp: filelist.inc
-	copy $(SRCPATH)\*.c .
-	copy /y nul link.stamp
-	nmake
-
+%.dll: ../src/%.c
+	$(CC) $(CFLAGS) $(INCLUDE) -o "$*.o" -c "../src/$*.c"
+	gcc -shared -o "$*.dll" "$*.o" $(prefix)/bin/pd.dll \
+	`test -f $*.libs && cat $*.libs`
 clean:
-# don't delete filelist.inc at the moment, as some externals can't be compiled
-# on win32
-	-del link.stamp
-	-del *.c	
-	-del *.obj
-	-del *.lib
-	-del *.exp
-	-del *.dll
+	-rm *.a *.def *.dll *.o
+
+install-doc:
+	@test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
+	cp -r ../doc/* $(prefix)/doc/5.reference
+
+install: install-doc
+	@test -d $(prefix)/extra || mkdir -p $(prefix)/extra
+	install *.dll $(prefix)/extra
