@@ -16,7 +16,7 @@
  *        
  *
  * copyleft:forum::für::umläute:2004
-*/
+ */
 
 #include <conio.h>
 
@@ -53,69 +53,69 @@ static void memPIO_help(void)
 }
 
 static void memPIO_bang(t_memPIO*x){
-	int port=3;
+  int port=3;
 
-	x->pio->UpdateCache ();
+  x->pio->UpdateCache ();
 
-	while(port--){
-		if (!x->input[port]){
-			long l=x->pio->CachedPort [port+1];
-			outlet_float(x->outlet[port], l);
-		}
-	}
+  while(port--){
+    if (!x->input[port]){
+      long l=x->pio->CachedPort [port+1];
+      outlet_float(x->outlet[port], l);
+    }
+  }
 }
 
 
 static void memPIO_mode(t_memPIO*x, t_symbol *s, int argc, t_atom*argv){
-	MEMXLib::IO dir;
-	bool out;
+  MEMXLib::IO dir;
+  bool out;
 
-	switch(argc){
-	default:
-		error("memPIO: \"mode\" message needs 1 or 3 arguments, have %d", argc);
-		return;
-	case 1:
-		out=(atom_getfloat(argv)>0.f);
-		dir=(out)?MEMXLib::DirOut:MEMXLib::DirIn;
-		x->pio->DirPort1 =dir; x->input[0]=out;
-		x->pio->DirPort2 =dir; x->input[1]=out;
-		x->pio->DirPort3H=dir; x->input[2]=out;
-		x->pio->DirPort3L=dir;
-		break;
-	case 3:
-		out=(atom_getfloat(argv+0)>0.f);
-		x->pio->DirPort1 =(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[0]=out;
-		out=(atom_getfloat(argv+1)>0.f);
-		x->pio->DirPort2 =(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[1]=out;
-		out=(atom_getfloat(argv+2)>0.f);
-		x->pio->DirPort3H=(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[2]=out;
-		x->pio->DirPort3L=(out)?MEMXLib::DirOut:MEMXLib::DirIn;
-	}
+  switch(argc){
+  default:
+    error("memPIO: \"mode\" message needs 1 or 3 arguments, have %d", argc);
+    return;
+  case 1:
+    out=(atom_getfloat(argv)>0.f);
+    dir=(out)?MEMXLib::DirOut:MEMXLib::DirIn;
+    x->pio->DirPort1 =dir; x->input[0]=out;
+    x->pio->DirPort2 =dir; x->input[1]=out;
+    x->pio->DirPort3H=dir; x->input[2]=out;
+    x->pio->DirPort3L=dir;
+    break;
+  case 3:
+    out=(atom_getfloat(argv+0)>0.f);
+    x->pio->DirPort1 =(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[0]=out;
+    out=(atom_getfloat(argv+1)>0.f);
+    x->pio->DirPort2 =(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[1]=out;
+    out=(atom_getfloat(argv+2)>0.f);
+    x->pio->DirPort3H=(out)?MEMXLib::DirOut:MEMXLib::DirIn; x->input[2]=out;
+    x->pio->DirPort3L=(out)?MEMXLib::DirOut:MEMXLib::DirIn;
+  }
 }
 
 
 static void memPIO_set(t_memPIO*x, t_symbol*s, int argc, t_atom*argv){
-	int port=3;
+  int port=3;
 
-	char val[4]={0,0,0,0};
+  unsigned char val[4]={0,0,0,0};
 	
-	switch(argc){
-	case 1:
-		val[0]=val[1]=val[2]=val[3]=atom_getfloat(argv);
-		break;
-	case 3:
-		val[0]=atom_getfloat(argv+0);
-		val[1]=atom_getfloat(argv+1);
-		val[2]=atom_getfloat(argv+2);
-		break;
-	default:
-		break;
-	}
+  switch(argc){
+  case 1:
+    val[0]=val[1]=val[2]=val[3]=atom_getfloat(argv);
+    break;
+  case 3:
+    val[0]=atom_getfloat(argv+0);
+    val[1]=atom_getfloat(argv+1);
+    val[2]=atom_getfloat(argv+2);
+    break;
+  default:
+    break;
+  }
 
-	while(port--)
-		if(x->input[port]){
-			x->pio->port[port+1]=val[port];
-		}
+  while(port--)
+    if(x->input[port]){
+      x->pio->port[port+1]=val[port];
+    }
 	
 }
 
@@ -144,25 +144,25 @@ void *memPIO_new(void)
   found=false;
   // search until the highest-possible Card-ID
   for(i = 0; i < x->pio->LastAttached; i++)
-  {
-    // select a device
-    x->pio->CardId = i+1;
-    // if selected device is attached, return
-    if (x->pio->Attached){
-		found=true;
-		break;
-	}
-  }
+    {
+      // select a device
+      x->pio->CardId = i+1;
+      // if selected device is attached, return
+      if (x->pio->Attached){
+	found=true;
+	break;
+      }
+    }
   i++;
   if(!found){
-	  memPIO_free(x);
-	  return 0;
+    memPIO_free(x);
+    return 0;
   }
 
   /* these are all outputs */
   for (int n=0; n<3; n++) {
     x->outlet[n] = outlet_new(&x->x_obj, 0);
-	x->input[n]=0;
+    x->input[n]=0;
   }
 
   return (void *)x;
@@ -175,10 +175,10 @@ void memPIO_setup(void)
   post("\t  compiled:  "__DATE__"");
   
   memPIO_class = class_new(gensym("memPIO"), 
-						(t_newmethod)memPIO_new, 
-						(t_method)memPIO_free,
-						sizeof(t_memPIO), 
-						0, A_NULL);
+			   (t_newmethod)memPIO_new, 
+			   (t_method)memPIO_free,
+			   sizeof(t_memPIO), 
+			   0, A_NULL);
   class_addmethod(memPIO_class, (t_method)memPIO_help, gensym("help"), A_NULL);
   class_addmethod(memPIO_class, (t_method)memPIO_mode, gensym("mode"), A_GIMME, A_NULL);
   class_addmethod(memPIO_class, (t_method)memPIO_set,  gensym("set"),  A_GIMME, A_NULL);
