@@ -172,13 +172,61 @@ FLEXT_NEW_V("pool",pool);
 pooldata *pool::head,*pool::tail;
 
 
-V pool::setup(t_class *)
+V pool::setup(t_class *c)
 {
 	post("");
 	post("pool %s - hierarchical storage object, (C)2002 Thomas Grill",POOL_VERSION);
 	post("");
 
 	head = tail = NULL;
+
+	FLEXT_CADDATTR_VAR(c,"pool",mg_pool,ms_pool);
+	FLEXT_CADDATTR_VAR1(c,"absdir",absdir);
+	FLEXT_CADDATTR_VAR1(c,"echodir",echo);
+	FLEXT_CADDATTR_GET(c,"private",priv);
+
+	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
+	FLEXT_CADDMETHOD_(c,0,"set",m_set);
+	FLEXT_CADDMETHOD_(c,0,"add",m_add);
+	FLEXT_CADDMETHOD_(c,0,"getdir",m_getdir);
+	FLEXT_CADDMETHOD_(c,0,"mkdir",m_mkdir);
+	FLEXT_CADDMETHOD_(c,0,"chdir",m_chdir);
+	FLEXT_CADDMETHOD_(c,0,"rmdir",m_rmdir);
+	FLEXT_CADDMETHOD_(c,0,"updir",m_updir);
+	FLEXT_CADDMETHOD_(c,0,"mksub",m_mksub);
+	FLEXT_CADDMETHOD_(c,0,"chsub",m_chsub);
+	FLEXT_CADDMETHOD_(c,0,"rmsub",m_rmsub);
+
+	FLEXT_CADDMETHOD_(c,0,"set",m_set);
+	FLEXT_CADDMETHOD_(c,0,"clr",m_clr);
+	FLEXT_CADDMETHOD_(c,0,"clrall",m_clrall);
+	FLEXT_CADDMETHOD_(c,0,"clrrec",m_clrrec);
+	FLEXT_CADDMETHOD_(c,0,"clrsub",m_clrsub);
+	FLEXT_CADDMETHOD_(c,0,"get",m_get);
+	FLEXT_CADDMETHOD_(c,0,"geti",m_geti);
+	FLEXT_CADDMETHOD_(c,0,"getall",m_getall);
+	FLEXT_CADDMETHOD_(c,0,"getrec",m_getrec);
+	FLEXT_CADDMETHOD_(c,0,"getsub",m_getsub);
+	FLEXT_CADDMETHOD_(c,0,"cntall",m_cntall);
+	FLEXT_CADDMETHOD_(c,0,"cntrec",m_cntrec);
+	FLEXT_CADDMETHOD_(c,0,"cntsub",m_cntsub);
+
+	FLEXT_CADDMETHOD_(c,0,"paste",m_paste);
+	FLEXT_CADDMETHOD_(c,0,"pasteadd",m_pasteadd);
+	FLEXT_CADDMETHOD_(c,0,"clrclip",m_clrclip);
+	FLEXT_CADDMETHOD_(c,0,"cut",m_cut);
+	FLEXT_CADDMETHOD_(c,0,"copy",m_copy);
+	FLEXT_CADDMETHOD_(c,0,"cutall",m_cutall);
+	FLEXT_CADDMETHOD_(c,0,"copyall",m_copyall);
+	FLEXT_CADDMETHOD_(c,0,"cutrec",m_cutrec);
+	FLEXT_CADDMETHOD_(c,0,"copyrec",m_copyrec);
+
+	FLEXT_CADDMETHOD_(c,0,"load",m_load);
+	FLEXT_CADDMETHOD_(c,0,"save",m_save);
+	FLEXT_CADDMETHOD_(c,0,"lddir",m_lddir);
+	FLEXT_CADDMETHOD_(c,0,"ldrec",m_ldrec);
+	FLEXT_CADDMETHOD_(c,0,"svdir",m_svdir);
+	FLEXT_CADDMETHOD_(c,0,"svrec",m_svrec);
 }
 
 pool::pool(I argc,const A *argv):
@@ -192,54 +240,6 @@ pool::pool(I argc,const A *argv):
 	AddOutAnything();
 	AddOutList();
 	AddOutAnything();
-
-	FLEXT_ADDATTR_VAR("pool",mg_pool,ms_pool);
-	FLEXT_ADDATTR_VAR1("absdir",absdir);
-	FLEXT_ADDATTR_VAR1("echodir",echo);
-	FLEXT_ADDATTR_GET("private",priv);
-
-	FLEXT_ADDMETHOD_(0,"reset",m_reset);
-	FLEXT_ADDMETHOD_(0,"set",m_set);
-	FLEXT_ADDMETHOD_(0,"add",m_add);
-	FLEXT_ADDMETHOD_(0,"getdir",m_getdir);
-	FLEXT_ADDMETHOD_(0,"mkdir",m_mkdir);
-	FLEXT_ADDMETHOD_(0,"chdir",m_chdir);
-	FLEXT_ADDMETHOD_(0,"rmdir",m_rmdir);
-	FLEXT_ADDMETHOD_(0,"updir",m_updir);
-	FLEXT_ADDMETHOD_(0,"mksub",m_mksub);
-	FLEXT_ADDMETHOD_(0,"chsub",m_chsub);
-	FLEXT_ADDMETHOD_(0,"rmsub",m_rmsub);
-
-	FLEXT_ADDMETHOD_(0,"set",m_set);
-	FLEXT_ADDMETHOD_(0,"clr",m_clr);
-	FLEXT_ADDMETHOD_(0,"clrall",m_clrall);
-	FLEXT_ADDMETHOD_(0,"clrrec",m_clrrec);
-	FLEXT_ADDMETHOD_(0,"clrsub",m_clrsub);
-	FLEXT_ADDMETHOD_(0,"get",m_get);
-	FLEXT_ADDMETHOD_(0,"geti",m_geti);
-	FLEXT_ADDMETHOD_(0,"getall",m_getall);
-	FLEXT_ADDMETHOD_(0,"getrec",m_getrec);
-	FLEXT_ADDMETHOD_(0,"getsub",m_getsub);
-	FLEXT_ADDMETHOD_(0,"cntall",m_cntall);
-	FLEXT_ADDMETHOD_(0,"cntrec",m_cntrec);
-	FLEXT_ADDMETHOD_(0,"cntsub",m_cntsub);
-
-	FLEXT_ADDMETHOD_(0,"paste",m_paste);
-	FLEXT_ADDMETHOD_(0,"pasteadd",m_pasteadd);
-	FLEXT_ADDMETHOD_(0,"clrclip",m_clrclip);
-	FLEXT_ADDMETHOD_(0,"cut",m_cut);
-	FLEXT_ADDMETHOD_(0,"copy",m_copy);
-	FLEXT_ADDMETHOD_(0,"cutall",m_cutall);
-	FLEXT_ADDMETHOD_(0,"copyall",m_copyall);
-	FLEXT_ADDMETHOD_(0,"cutrec",m_cutrec);
-	FLEXT_ADDMETHOD_(0,"copyrec",m_copyrec);
-
-	FLEXT_ADDMETHOD_(0,"load",m_load);
-	FLEXT_ADDMETHOD_(0,"save",m_save);
-	FLEXT_ADDMETHOD_(0,"lddir",m_lddir);
-	FLEXT_ADDMETHOD_(0,"ldrec",m_ldrec);
-	FLEXT_ADDMETHOD_(0,"svdir",m_svdir);
-	FLEXT_ADDMETHOD_(0,"svrec",m_svrec);
 }
 
 pool::~pool()
@@ -453,11 +453,14 @@ V pool::m_get(I argc,const A *argv)
 			ToOutList(2,curdir);
 		else
 			ToOutList(2,0,NULL);
-		ToOutAtom(1,r->key);
-		if(r)
+		if(r) {
+			ToOutAtom(1,r->key);
 			ToOutList(0,*r->data);
-		else
+		}
+		else {
+			ToOutBang(1);
 			ToOutBang(0);
+		}
 	}
 
 	echodir();

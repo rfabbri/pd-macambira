@@ -26,7 +26,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_channel:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_channel,vasp_tx)
+	FLEXT_HEADER_S(vasp_channel,vasp_tx,Setup)
 
 public:
 	vasp_channel(I argc,t_atom *argv):
@@ -39,9 +39,12 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything();
+	}
 
-		FLEXT_ADDMETHOD(1,m_ix);
-		FLEXT_ADDATTR_VAR("index",ix,m_ix);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_ix);
+		FLEXT_CADDATTR_VAR(c,"index",ix,m_ix);
 	}
 
 	V m_ix(I i) { ix = i; }
@@ -90,7 +93,6 @@ public:
 	{
 		AddInAnything();
 		AddOutInt();
-		SetupInOut();
 	}
 
 	virtual V m_bang() 

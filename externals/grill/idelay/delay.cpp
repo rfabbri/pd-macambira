@@ -16,8 +16,8 @@ Watch out for Doppler effects!
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
-#error You need at least flext version 0.4.0 
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
+#error You need at least flext version 0.4.1 
 #endif
 
 // template class for delay line
@@ -51,7 +51,6 @@ idelay::idelay(F maxmsec)
 
 	AddInSignal(2);  // audio in & delay signals
 	AddOutSignal();  // audio out
-	SetupInOut();  // set up inlets and outlets
 }
 
 idelay::~idelay()

@@ -95,7 +95,7 @@ FLEXT_LIB_V("vasp, vasp.split",vasp_split)
 class vasp_join:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_join,vasp_tx)
+	FLEXT_HEADER_S(vasp_join,vasp_tx,Setup)
 
 public:
 	vasp_join(I argc,t_atom *argv):
@@ -115,11 +115,14 @@ public:
 
 		AddInAnything(cnt);
 		AddOutAnything();
-
-		FLEXT_ADDMETHOD_(0,"reset",m_reset);
 	}
 
 	~vasp_join()	{ if(vi) delete[] vi; }
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
+	}
 
 	virtual Vasp *x_work() { 
 		CVasp *ret = new CVasp(ref);
@@ -231,7 +234,7 @@ FLEXT_LIB_V("vasp, vasp.spit",vasp_spit)
 class vasp_gather:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_gather,vasp_tx)
+	FLEXT_HEADER_S(vasp_gather,vasp_tx,Setup)
 
 public:
 	vasp_gather(I argc,t_atom *argv)
@@ -246,12 +249,13 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything();
-
-		FLEXT_ADDMETHOD_(0,"reset",m_reset);
-		FLEXT_ADDMETHOD_(1,"vasp",m_add);
 	}
 
-	~vasp_gather()	{ }
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
+		FLEXT_CADDMETHOD_(c,1,"vasp",m_add);
+	}
 
 	virtual Vasp *x_work() 
 	{ 

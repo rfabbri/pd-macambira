@@ -201,15 +201,18 @@ Vasp *VaspOp::m_tilt(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL sym
 class vasp_tilt:
 	public vasp_anyop
 {																				
-	FLEXT_HEADER(vasp_tilt,vasp_anyop)
+	FLEXT_HEADER_S(vasp_tilt,vasp_anyop,Setup)
 public:			
 	
 	vasp_tilt(I argc,t_atom *argv): 
 		vasp_anyop(argc,argv,VASP_ARG_R(1),true),
 		fill(xtf_zero),inter(xti_4p)
+	{}
+
+	static V Setup(t_class *c)
 	{
-		FLEXT_ADDATTR_VAR1_E("fill",fill);
-		FLEXT_ADDATTR_VAR1_E("inter",inter);
+		FLEXT_CADDATTR_VAR1_E(c,"fill",fill);
+		FLEXT_CADDATTR_VAR1_E(c,"inter",inter);
 	}
 
 	enum xt_fill {

@@ -10,16 +10,16 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 202)
-#error You need at least flext version 0.2.2 
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
+#error You need at least flext version 0.4.1
 #endif
 
-#define PREPEND_VERSION "0.0.2"
+#define PREPEND_VERSION "0.0.3"
 
 class prepend: 
 	public flext_base
 {
-	FLEXT_HEADER(prepend, flext_base)
+	FLEXT_HEADER_S(prepend, flext_base, Setup)
 
 public:
 	prepend(int argc,t_atom *argv);
@@ -33,6 +33,8 @@ protected:
 	virtual void m_help();
 
 private:	
+
+	static void Setup(t_class *c);
 
 	class reg_t 
 	{ 
@@ -49,12 +51,12 @@ private:
 	} reg[2];
 
 	FLEXT_CALLBACK(m_bang)
-	FLEXT_CALLBACK_G(m_set)
+	FLEXT_CALLBACK_V(m_set)
 	FLEXT_CALLBACK_A(m_any0)
 	FLEXT_CALLBACK_A(m_any1)
 };
 
-FLEXT_NEW_G("prepend",prepend)
+FLEXT_NEW_V("prepend",prepend)
 
 
 
@@ -62,16 +64,17 @@ prepend::prepend(int argc,t_atom *argv)
 {
 	AddInAnything(2);  
 	AddOutAnything();   
-	SetupInOut();     // set up inlets and outlets
-
-	FLEXT_ADDMETHOD_(0,"bang",m_bang);
-//	FLEXT_ADDMETHOD_(0,"set",m_set);
-	FLEXT_ADDMETHOD(0,m_any0);
-	FLEXT_ADDMETHOD(1,m_any1);
 
 	m_set(argc,argv);
 }
 
+void prepend::Setup(t_class *c)
+{
+	FLEXT_CADDMETHOD_(c,0,"bang",m_bang);
+//	FLEXT_CADDMETHOD_(c,0,"set",m_set);
+	FLEXT_CADDMETHOD(c,0,m_any0);
+	FLEXT_CADDMETHOD(c,1,m_any1);
+}
 
 void prepend::reg_t::Store(const t_symbol *s,int argc,t_atom *argv)
 {

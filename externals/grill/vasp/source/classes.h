@@ -18,7 +18,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_base:
 	public flext_base
 {
-	FLEXT_HEADER_S(vasp_base,flext_base,setup)
+	FLEXT_HEADER_S(vasp_base,flext_base,Setup)
 
 public:
 	enum xs_unit {
@@ -54,7 +54,7 @@ protected:
 	BL ToOutVasp(I outlet,Vasp &v);
 
 private:
-	static V setup(t_class *);
+	static V Setup(t_class *);
 
 	FLEXT_CALLBACK_V(m_radio)
 
@@ -67,7 +67,7 @@ private:
 class vasp_op:
 	public vasp_base
 {
-	FLEXT_HEADER(vasp_op,vasp_base)
+	FLEXT_HEADER_S(vasp_op,vasp_base,Setup)
 
 protected:
 	vasp_op(BL withto = false);
@@ -128,6 +128,8 @@ protected:
 #endif
 
 private:
+	static V Setup(t_class *);
+
 	virtual V m_bang() = 0;						// do! and output current Vasp
 };
 
@@ -173,7 +175,7 @@ protected:
 class vasp_binop:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_binop,vasp_tx)
+	FLEXT_HEADER_S(vasp_binop,vasp_tx,Setup)
 
 protected:
 	vasp_binop(I argc,const t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
@@ -199,6 +201,8 @@ protected:
 	V m_getarg(AtomList &l) { arg.MakeList(l); }
 
 private:
+	static V Setup(t_class *);
+
 	FLEXT_CALLBACK_V(a_list)
 	FLEXT_CALLBACK_V(a_vasp)
 	FLEXT_CALLBACK_V(a_env)
@@ -218,7 +222,7 @@ private:
 class vasp_anyop:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_anyop,vasp_tx)
+	FLEXT_HEADER_S(vasp_anyop,vasp_tx,Setup)
 
 protected:
 	vasp_anyop(I argc,const t_atom *argv,const Argument &def = Argument(),BL withto = false,UL outcode = 0);
@@ -237,6 +241,8 @@ protected:
 	V m_getarg(AtomList &l) { arg.MakeList(l); }
 
 private:
+	static V Setup(t_class *);
+
 	FLEXT_CALLBACK_V(a_list)
 	FLEXT_CALLBACK_V(a_radio)
 

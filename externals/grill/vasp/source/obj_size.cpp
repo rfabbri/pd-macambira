@@ -30,7 +30,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_size:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_size,vasp_tx)
+	FLEXT_HEADER_S(vasp_size,vasp_tx,Setup)
 
 public:
 	vasp_size(I argc,t_atom *argv,BL abs = true):
@@ -45,9 +45,13 @@ public:
 		AddInFloat();
 		AddOutAnything();
 
-		FLEXT_ADDMETHOD(1,m_arg);
 		if(abs) FLEXT_ADDATTR_VAR("frames",size,m_arg);
-		FLEXT_ADDATTR_VAR1("keep",keep);
+	}
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_arg);
+		FLEXT_CADDATTR_VAR1(c,"keep",keep);
 	}
 
 	virtual V m_arg(F s) 
@@ -129,14 +133,18 @@ FLEXT_LIB_V("vasp, vasp.size+ vasp.s+",vasp_dsize)
 class vasp_msize:
 	public vasp_size
 {
-	FLEXT_HEADER(vasp_msize,vasp_size)
+	FLEXT_HEADER_S(vasp_msize,vasp_size,Setup)
 
 public:
 	vasp_msize(I argc,t_atom *argv): 
 		vasp_size(argc,argv,false) 
 	{
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
-		FLEXT_ADDATTR_VAR("factor",factor,m_arg);
+	}
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDATTR_VAR(c,"factor",factor,m_arg);
 	}
 
 	virtual Vasp *x_work() 

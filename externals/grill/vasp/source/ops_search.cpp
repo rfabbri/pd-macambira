@@ -128,15 +128,18 @@ Vasp *VaspOp::m_search(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL s
 class vasp_search:
 	public vasp_anyop
 {																				
-	FLEXT_HEADER(vasp_search,vasp_anyop)
+	FLEXT_HEADER_S(vasp_search,vasp_anyop,Setup)
 public:			
 	
 	vasp_search(I argc,t_atom *argv): 
 		vasp_anyop(argc,argv,VASP_ARG_R(0),false,XletCode(xlet::tp_float,0)),
 		slope(0),dir(0)
+	{}
+
+	static V Setup(t_class *c)
 	{
-		FLEXT_ADDATTR_VAR1("dir",dir);
-		FLEXT_ADDATTR_VAR1("slope",slope);
+		FLEXT_CADDATTR_VAR1(c,"dir",dir);
+		FLEXT_CADDATTR_VAR1(c,"slope",slope);
 	}
 
 	virtual Vasp *do_work(OpParam &p) = 0;

@@ -29,7 +29,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_frames:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_frames,vasp_tx)
+	FLEXT_HEADER_S(vasp_frames,vasp_tx,Setup)
 
 public:
 	vasp_frames(I argc,t_atom *argv,BL abs = true):
@@ -45,8 +45,12 @@ public:
 		AddInFloat();
 		AddOutAnything();
 
-		FLEXT_ADDMETHOD(1,m_arg);
 		if(abs) FLEXT_ADDATTR_VAR("frames",frms,m_arg);
+	}
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_arg);
 	}
 
 	virtual V m_arg(F f) 
@@ -127,14 +131,18 @@ FLEXT_LIB_V("vasp, vasp.frames+ vasp.f+",vasp_dframes)
 class vasp_mframes:
 	public vasp_frames
 {
-	FLEXT_HEADER(vasp_mframes,vasp_frames)
+	FLEXT_HEADER_S(vasp_mframes,vasp_frames,Setup)
 
 public:
 	vasp_mframes(I argc,t_atom *argv): 
 		vasp_frames(argc,argv,false) 
 	{
 		if(argc && CanbeFloat(argv[0])) m_arg(GetAFloat(argv[0]));
-		FLEXT_ADDATTR_VAR("factor",factor,m_arg);
+	}
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDATTR_VAR(c,"factor",factor,m_arg);
 	}
 
 	virtual Vasp *x_work() 
@@ -221,7 +229,6 @@ public:
 	{
 		AddInAnything();
 		AddOutInt();
-		SetupInOut();
 	}
 
 	virtual V m_bang() { ToOutInt(0,ref.ChkFrames()); }	//! \todo unit processing

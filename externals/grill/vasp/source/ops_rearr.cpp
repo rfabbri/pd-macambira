@@ -99,14 +99,17 @@ BL VecOp::d_shift(OpParam &p)
 class vasp_shift:
 	public vasp_anyop
 {																				
-	FLEXT_HEADER(vasp_shift,vasp_anyop)
+	FLEXT_HEADER_S(vasp_shift,vasp_anyop,Setup)
 public:			
 	
 	vasp_shift(I argc,const t_atom *argv): 
 		vasp_anyop(argc,argv,VASP_ARG_I(0),true),
 		fill(xsf_zero)
+	{}
+
+	static V Setup(t_class *c)
 	{
-		FLEXT_ADDATTR_VAR1_E("fill",fill);
+		FLEXT_CADDATTR_VAR1_E(c,"fill",fill);
 	}
 
 	enum xs_fill {

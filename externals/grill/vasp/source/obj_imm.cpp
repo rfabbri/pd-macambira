@@ -34,7 +34,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_imm:
 	public vasp_op
 {
-	FLEXT_HEADER(vasp_imm,vasp_op)
+	FLEXT_HEADER_S(vasp_imm,vasp_op,Setup)
 
 public:
 	vasp_imm(I argc,t_atom *argv):
@@ -48,9 +48,12 @@ public:
 		AddInAnything();
 		AddInInt();
 		AddOutAnything();
+	}
 
-		FLEXT_ADDMETHOD(1,m_frames);
-		FLEXT_ADDATTR_VAR("frames",frms,m_frames);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_frames);
+		FLEXT_CADDATTR_VAR(c,"frames",frms,m_frames);
 	}
 
 	V m_frames(I n) { frms = n; }

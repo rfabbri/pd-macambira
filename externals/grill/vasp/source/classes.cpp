@@ -24,7 +24,7 @@ const t_symbol *vasp_base::sym_double;
 const t_symbol *vasp_base::sym_complex;
 const t_symbol *vasp_base::sym_vector;
 
-V vasp_base::setup(t_class *)
+V vasp_base::Setup(t_class *c)
 {
 	sym_radio = MakeSymbol("radio");
 	sym_vasp = MakeSymbol("vasp");
@@ -32,21 +32,21 @@ V vasp_base::setup(t_class *)
 	sym_double = MakeSymbol("double");
 	sym_complex = MakeSymbol("complex");
 	sym_vector = MakeSymbol("vector");
+
+	FLEXT_CADDMETHOD_(c,0,"radio",m_radio);
+
+// LATER!
+/*
+	FLEXT_CADDATTR_VAR1(c,"argchk",argchk);
+	FLEXT_CADDATTR_VAR1(c,"loglvl",loglvl);
+	FLEXT_CADDATTR_VAR1_E(c,"unit",unit);
+*/
 }
 
 vasp_base::vasp_base():
 	refresh(false),argchk(false),
 	unit(xsu_sample),loglvl(0)
-{
-	FLEXT_ADDMETHOD_(0,"radio",m_radio);
-
-// LATER!
-/*
-	FLEXT_ADDATTR_VAR1("argchk",argchk);
-	FLEXT_ADDATTR_VAR1("loglvl",loglvl);
-	FLEXT_ADDATTR_VAR1_E("unit",unit);
-*/
-}
+{}
 
 vasp_base::~vasp_base() {}
 
@@ -91,20 +91,24 @@ vasp_op::vasp_op(BL op)
 //	,thrid(0)
 #endif
 {
-	FLEXT_ADDBANG(0,m_dobang);
-	FLEXT_ADDMETHOD_(0,"vasp",m_vasp);
-	FLEXT_ADDMETHOD_(0,"set",m_set);
-
-	FLEXT_ADDATTR_VAR("ref",m_getref,m_setref);
 	if(op) FLEXT_ADDATTR_VAR("to",m_getto,m_setto);
+}
 
-	FLEXT_ADDMETHOD_(0,"stop",m_stop);
+V vasp_op::Setup(t_class *c)
+{
+	FLEXT_CADDBANG(c,0,m_dobang);
+	FLEXT_CADDMETHOD_(c,0,"vasp",m_vasp);
+	FLEXT_CADDMETHOD_(c,0,"set",m_set);
 
-	FLEXT_ADDATTR_VAR("update",m_getupd,m_setupd);
+	FLEXT_CADDATTR_VAR(c,"ref",m_getref,m_setref);
+
+	FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
+
+	FLEXT_CADDATTR_VAR(c,"update",m_getupd,m_setupd);
 	
 #ifdef FLEXT_THREADS
-	FLEXT_ADDATTR_VAR1("detach",detach);
-	FLEXT_ADDATTR_VAR1("prior",prior);
+	FLEXT_CADDATTR_VAR1(c,"detach",detach);
+	FLEXT_CADDATTR_VAR1(c,"prior",prior);
 #endif
 }
 
@@ -252,18 +256,21 @@ vasp_binop::vasp_binop(I argc,const t_atom *argv,const Argument &def,BL op,UL ou
 	AddInAnything(2);
 	AddOutAnything(1);
 	AddOutlets(outcode);
+}
 
-	FLEXT_ADDMETHOD(1,a_list);
-	FLEXT_ADDMETHOD_(1,"vasp",a_vasp);
-	FLEXT_ADDMETHOD_(1,"env",a_env);
-	FLEXT_ADDMETHOD_(1,"float",a_float);
-	FLEXT_ADDMETHOD_(1,"double",a_double);
-	FLEXT_ADDMETHOD_(1,"int",a_int);
-	FLEXT_ADDMETHOD_(1,"complex",a_complex);
-	FLEXT_ADDMETHOD_(1,"vector",a_vector);
-	FLEXT_ADDMETHOD_(1,"radio",a_radio);
+V vasp_binop::Setup(t_class *c)
+{
+	FLEXT_CADDMETHOD(c,1,a_list);
+	FLEXT_CADDMETHOD_(c,1,"vasp",a_vasp);
+	FLEXT_CADDMETHOD_(c,1,"env",a_env);
+	FLEXT_CADDMETHOD_(c,1,"float",a_float);
+	FLEXT_CADDMETHOD_(c,1,"double",a_double);
+	FLEXT_CADDMETHOD_(c,1,"int",a_int);
+	FLEXT_CADDMETHOD_(c,1,"complex",a_complex);
+	FLEXT_CADDMETHOD_(c,1,"vector",a_vector);
+	FLEXT_CADDMETHOD_(c,1,"radio",a_radio);
 
-	FLEXT_ADDATTR_VAR("arg",m_getarg,m_setarg);
+	FLEXT_CADDATTR_VAR(c,"arg",m_getarg,m_setarg);
 }
 
 V vasp_binop::a_list(I argc,const t_atom *argv) 
@@ -374,12 +381,15 @@ vasp_anyop::vasp_anyop(I argc,const t_atom *argv,const Argument &def,BL op,UL ou
 	AddInAnything(2);
 	AddOutAnything(1);
 	AddOutlets(outcode);
+}
 
-	FLEXT_ADDMETHOD(1,a_list);
-	FLEXT_ADDMETHOD_(1,"vasp",a_list);
-	FLEXT_ADDMETHOD_(1,"radio",a_radio);
+V vasp_anyop::Setup(t_class *c)
+{
+	FLEXT_CADDMETHOD(c,1,a_list);
+	FLEXT_CADDMETHOD_(c,1,"vasp",a_list);
+	FLEXT_CADDMETHOD_(c,1,"radio",a_radio);
 
-	FLEXT_ADDATTR_VAR("arg",m_getarg,m_setarg);
+	FLEXT_CADDATTR_VAR(c,"arg",m_getarg,m_setarg);
 }
 
 V vasp_anyop::a_list(I argc,const t_atom *argv) 

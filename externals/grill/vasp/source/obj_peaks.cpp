@@ -31,7 +31,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_qpeaks:
 	public vasp_op
 {
-	FLEXT_HEADER(vasp_qpeaks,vasp_op)
+	FLEXT_HEADER_S(vasp_qpeaks,vasp_op,Setup)
 
 public:
 	vasp_qpeaks(I argc,t_atom *argv):
@@ -45,9 +45,12 @@ public:
 		AddInAnything();
 		AddInInt();
 		AddOutAnything(2);
+	}
 
-		FLEXT_ADDMETHOD(1,m_peaks);
-		FLEXT_ADDATTR_VAR("peaks",peaks,m_peaks);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_peaks);
+		FLEXT_CADDATTR_VAR(c,"peaks",peaks,m_peaks);
 	}
 
 	V m_peaks(I n) { peaks = n;	}

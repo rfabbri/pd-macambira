@@ -27,7 +27,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_radio:
 	public flext_base
 {
-	FLEXT_HEADER(vasp_radio,flext_base)
+	FLEXT_HEADER_S(vasp_radio,flext_base,Setup)
 
 public:
 
@@ -35,8 +35,11 @@ public:
 	{
 		AddInAnything();
 		AddOutAnything(2);
+	}
 
-		FLEXT_ADDMETHOD(0,m_any);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,0,m_any);
 	}
 
 	virtual V m_any(const t_symbol *s,I argc,t_atom *argv);

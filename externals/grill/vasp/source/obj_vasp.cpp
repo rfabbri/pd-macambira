@@ -32,7 +32,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_v:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_v,vasp_tx)
+	FLEXT_HEADER_S(vasp_v,vasp_tx,Setup)
 
 public:
 
@@ -42,12 +42,15 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything();
+	}
 
-		FLEXT_ADDMETHOD_(0,"list",m_vasp);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD_(c,0,"list",m_vasp);
 
-		FLEXT_ADDMETHOD_(1,"list",m_set);
-		FLEXT_ADDMETHOD_(1,"vasp",m_set);
-		FLEXT_ADDMETHOD_(1,"radio",a_radio);
+		FLEXT_CADDMETHOD_(c,1,"list",m_set);
+		FLEXT_CADDMETHOD_(c,1,"vasp",m_set);
+		FLEXT_CADDMETHOD_(c,1,"radio",a_radio);
 	}
 
 	V a_radio(I,t_atom *) {}

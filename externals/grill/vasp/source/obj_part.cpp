@@ -31,7 +31,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_part:
 	public vasp_op
 {
-	FLEXT_HEADER(vasp_part,vasp_op)
+	FLEXT_HEADER_S(vasp_part,vasp_op,Setup)
 
 public:
 	vasp_part(I argc,t_atom *argv):
@@ -41,12 +41,15 @@ public:
 
 		AddInAnything(2);
 		AddOutAnything(2);
-
-		FLEXT_ADDMETHOD_(1,"list",m_part);
-		FLEXT_ADDATTR_VAR("parts",m_getpart,m_setpart);
 	}
 
 	~vasp_part() { if(part) delete[] part; }
+
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD_(c,1,"list",m_part);
+		FLEXT_CADDATTR_VAR(c,"parts",m_getpart,m_setpart);
+	}
 
 	V m_part(I argc,const t_atom *argv) 
 	{ 

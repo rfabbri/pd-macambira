@@ -30,7 +30,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 class vasp_offset:
 	public vasp_tx
 {
-	FLEXT_HEADER(vasp_offset,vasp_tx)
+	FLEXT_HEADER_S(vasp_offset,vasp_tx,Setup)
 
 public:
 	vasp_offset(I argc,t_atom *argv):
@@ -44,9 +44,12 @@ public:
 		AddInAnything();
 		AddInFloat();
 		AddOutAnything();
+	}
 
-		FLEXT_ADDMETHOD(1,m_offs);
-		FLEXT_ADDATTR_VAR("frames",offs,m_offs);
+	static V Setup(t_class *c)
+	{
+		FLEXT_CADDMETHOD(c,1,m_offs);
+		FLEXT_CADDATTR_VAR(c,"frames",offs,m_offs);
 	}
 
 	V m_offs(F o) 
