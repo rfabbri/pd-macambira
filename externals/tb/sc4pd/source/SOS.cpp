@@ -143,13 +143,13 @@ SOS_ar::SOS_ar(int argc, t_atom *argv)
     
     if(sc_ar(Args))
     {
+	AddInSignal();
+	AddInSignal();
+	AddInSignal();
+	AddInSignal();
+	AddInSignal();
+	AddInSignal();
 	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_ar));
-	AddInSignal();
-	AddInSignal();
-	AddInSignal();
-	AddInSignal();
-	AddInSignal();
-	AddInSignal();
     }
     else // if not given, use control rate
 	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_kr)); 
@@ -190,15 +190,15 @@ void SOS_ar::m_signal_ar(int n, t_sample *const *in,
 	y1 = ZXP(nin) + ZXP(b1) * y2 + ZXP(b2) * y0; 
 	ZXP(nout) = ZXP(a0) * y1 + ZXP(a1) * y2 + ZXP(a2) * y0;
     }
-
-    for (int i = 0; i!= mFilterLoops;++i)
+    
+    for (int i = 0; i!= mFilterRemain;++i)
     {
 	y0 = ZXP(nin) + ZXP(b1) * y1 + ZXP(b2) * y2; 
 	ZXP(nout) = ZXP(a0) * y0 + ZXP(a1) * y1 + ZXP(a2) * y2;
 	y2 = y1; 
 	y1 = y0;
     }
-    
+
     m_y1 = zapgremlins(y1);
     m_y2 = zapgremlins(y2);
     
@@ -243,7 +243,7 @@ void SOS_ar::m_signal_kr(int n, t_sample *const *in,
 	b2 += b2_slope;
     }
 
-    for (int i = 0; i!= mFilterLoops;++i)
+    for (int i = 0; i!= mFilterRemain;++i)
     {
 	y0 = ZXP(nin) + b1 * y1 + b2 * y2; 
 	ZXP(nout) = a0 * y0 + a1 * y1 + a2 * y2;

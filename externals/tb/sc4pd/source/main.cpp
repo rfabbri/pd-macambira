@@ -64,7 +64,7 @@ void sc4pd_library_setup()
 	 "AllpassL~,\n"
 	 "          AllpassC~, PitchShift~, Resonz~, OnePole(~), OneZero(~), "
 	 "TwoPole~, \n"
-	 "          TwoZero~, FOS(~), SOS~"
+	 "          TwoZero~, FOS(~), SOS~, RLPF~, RHPF~, LPF~, HPF~"
 	 "\n"
 	 );
 
@@ -249,6 +249,14 @@ void sc4pd_library_setup()
     FLEXT_SETUP(FOS_kr); 
 
     FLEXT_DSP_SETUP(SOS_ar); 
+
+    FLEXT_DSP_SETUP(RLPF_ar); 
+
+    FLEXT_DSP_SETUP(RHPF_ar); 
+
+    FLEXT_DSP_SETUP(LPF_ar); 
+
+    FLEXT_DSP_SETUP(HPF_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

@@ -122,5 +122,14 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #define SIGFUN(FUN) &thisType::FUN
 
+#undef F
+#undef D
+#undef I
+#undef L
+#undef C
+#undef V
+#undef BL
+#undef S
+
 
 #endif
