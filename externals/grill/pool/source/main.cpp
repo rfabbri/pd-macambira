@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -226,7 +226,7 @@ pooldata *pool::head,*pool::tail;
 V pool::setup(t_classid c)
 {
 	post("");
-	post("pool %s - hierarchical storage object, (C)2002-2003 Thomas Grill",POOL_VERSION);
+	post("pool %s - hierarchical storage object, (C)2002-2004 Thomas Grill",POOL_VERSION);
 	post("");
 
 	head = tail = NULL;
@@ -327,14 +327,22 @@ BL pool::Init()
 
 V pool::SetPool(const S *s)
 {
-	if(pl) FreePool();
-
 	if(s) {
 		priv = false;
+		if(pl)
+			// check if new symbol equals the current one
+			if(pl->sym == s) 
+				return;
+			else
+				FreePool();
 		pl = GetPool(s);
 	}
 	else {
+		// if already private no need to allocate new storage
+		if(priv) return;
+
 		priv = true;
+		if(pl) FreePool();
 		pl = new pooldata(NULL,vcnt,dcnt);
 	}
 }
@@ -368,7 +376,7 @@ V pool::ms_pool(const AtomList &l)
 
 V pool::mg_pool(AtomList &l)
 {
-	if(priv) l();
+	if(priv || !pl) l();
 	else { l(1); SetSymbol(l[0],pl->sym); }
 }
 

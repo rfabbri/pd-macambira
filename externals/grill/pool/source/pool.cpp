@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2004 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -842,18 +842,20 @@ static void indent(ostream &s,I cnt)
 
 BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 {
-    if(dir.Count()) {
-        indent(os,ind);
-        os << "<dir>" << endl;
-        indent(os,ind+1);
-        os << "<key>";
-        WriteAtom(os,dir[dir.Count()-1]);
-        os << "</key>" << endl;
-    }
+	int i,lvls = ind?(dir.Count()?1:0):dir.Count();
+
+	for(i = 0; i < lvls; ++i) {
+		indent(os,ind+i);
+		os << "<dir>" << endl;
+		indent(os,ind+i+1);
+		os << "<key>";
+		WriteAtom(os,dir[i]);
+		os << "</key>" << endl;
+	}
 
 	for(I vi = 0; vi < vsize; ++vi) {
 		for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
-            indent(os,ind+1);
+            indent(os,ind+lvls);
             os << "<value><key>";
 			WriteAtom(os,ix->key);
             os << "</key><data>";
@@ -866,15 +868,15 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 		I nd = depth > 0?depth-1:-1;
 		for(I di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
-				ix->SvDirXML(os,nd,AtomList(dir).Append(ix->dir),ind+1);
+				ix->SvDirXML(os,nd,AtomList(dir).Append(ix->dir),ind+lvls);
 			}
 		}
 	}
 
-    if(dir.Count()) {
-        indent(os,ind);
-        os << "</dir>" << endl;
-    }
+	for(i = lvls-1; i >= 0; --i) {
+		indent(os,ind+i);
+		os << "</dir>" << endl;
+	}
 	return true;
 }
 

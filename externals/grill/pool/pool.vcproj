@@ -92,6 +92,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\max\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
+				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
 				UsePrecompiledHeader="2"
@@ -108,11 +109,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="pd.lib flext_d-pdwin.lib"
+				AdditionalDependencies="pd.lib"
 				OutputFile=".\pd-msvc/d/pool.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin,f:\prog\max\flext\pd-msvc"
+				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/pool.pdb"
 				ImportLibrary=".\pd-msvc/d/pool.lib"

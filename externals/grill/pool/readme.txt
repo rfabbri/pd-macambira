@@ -71,6 +71,7 @@ Version history:
 - relative file names will be based on the folder of the current patcher
 - added printall, printrec, printroot messages for console printout
 - added mkchdir, mkchsub to create and change to directories at once
+- change storage object only when name has changed
 
 0.1.0:
 - first public release
