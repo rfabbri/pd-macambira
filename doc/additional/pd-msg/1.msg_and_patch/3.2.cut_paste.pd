@@ -1,14 +1,14 @@
-#N canvas 175 194 409 473 10;
-#N canvas 591 210 328 290 testing 0;
+#N canvas 138 75 413 477 10;
+#N canvas 591 210 348 310 testing 0;
 #X obj 95 10 loadbang;
 #X msg 95 35 0;
 #X obj 12 37 random 127;
-#X floatatom 66 93 0 0 0;
+#X floatatom 66 93 0 0 0 0 - - -;
 #X msg 12 11 bang;
 #X obj 95 10 loadbang;
 #X msg 95 35 0;
 #X obj 12 37 random 127;
-#X floatatom 66 93 0 0 0;
+#X floatatom 66 93 0 0 0 0 - - -;
 #X msg 12 11 bang;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
@@ -22,16 +22,14 @@
 #X obj 20 438 s pd-testing;
 #X obj 248 211 pack f f;
 #X text 7 40 Start here;
-#X floatatom 279 149 0 0 0;
-#X floatatom 248 148 0 0 0;
+#X floatatom 279 149 0 0 0 0 - - -;
+#X floatatom 248 148 0 0 0 0 - - -;
 #X obj 259 183 t b f;
 #X text 7 374 Stop here;
 #X text 17 11 This example will show you how to use the motion msg.
 ;
 #X msg 194 322 cut;
 #X msg 194 348 duplicate;
-#X msg 20 60 vis 1 \, editmode 1 \, click 5 5 0 0 \, mouseup 200 200
-0;
 #X msg 20 399 motion 15 15 \, editmode0 \, vis 0;
 #X text 50 81 show and select what's in the patch;
 #X text 151 419 close all;
@@ -39,9 +37,11 @@
 #X text 66 125 and then here to copy and here to move;
 #X msg 31 256 mouseup 200 200 0;
 #X text 49 236 to acheive the pasting;
-#X msg 37 146 copy \, paste \, click 15 15 0 0;
 #X msg 248 235 motion \$1 \$2 0;
-#X connect 2 0 20 0;
+#X msg 20 60 vis 1 \, editmode 1 \, mouse 5 5 0 0 \, mouseup 200 200
+0;
+#X msg 37 146 copy \, paste \, mouse 15 15 0 0;
+#X connect 2 0 18 0;
 #X connect 4 0 6 0;
 #X connect 5 0 2 0;
 #X connect 6 0 2 0;
@@ -49,7 +49,7 @@
 #X connect 9 0 1 0;
 #X connect 10 0 1 0;
 #X connect 11 0 1 0;
-#X connect 12 0 1 0;
-#X connect 17 0 1 0;
+#X connect 16 0 1 0;
+#X connect 18 0 1 0;
 #X connect 19 0 1 0;
 #X connect 20 0 1 0;
