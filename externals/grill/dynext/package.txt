@@ -1,0 +1,7 @@
+NAME=dyn~
+
+SRCDIR=src
+
+SRCS= main.cpp
+HDRS= 
+

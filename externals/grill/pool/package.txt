@@ -1,0 +1,6 @@
+NAME=pool
+
+SRCDIR=source
+
+SRCS= main.cpp data.cpp pool.cpp
+HDRS= pool.h
