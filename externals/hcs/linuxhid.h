@@ -1,10 +1,3 @@
-#include <m_pd.h>
-
-#ifdef PD_MAJOR_VERSION
-#include "s_stuff.h"
-#else 
-#include "m_imp.h"
-#endif
 
 #ifdef __gnu_linux__
 #include <linux/input.h>

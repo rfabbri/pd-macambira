@@ -1,8 +1,10 @@
+#include <m_pd.h>
+
 #include "linuxhid.h"
 
 #define LINUXJOYSTICK_AXES     6
 
-static char *version = "$Revision: 1.6 $";
+static char *version = "$Revision: 1.7 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

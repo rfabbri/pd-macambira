@@ -1,9 +1,17 @@
+#include <m_pd.h>
+
+#ifdef PD_MAJOR_VERSION
+#include "s_stuff.h"
+#else 
+#include "m_imp.h"
+#endif
+
 #include "linuxhid.h"
 
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
 #define LINUXMOUSE_AXES     3
 
-static char *version = "$Revision: 1.6 $";
+static char *version = "$Revision: 1.7 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

@@ -1,8 +1,10 @@
+#include <m_pd.h>
+
 #include "linuxhid.h"
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.8 $";
+static char *version = "$Revision: 1.9 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -118,10 +120,13 @@ static int linuxevent_open(t_linuxevent *x, t_symbol *s) {
 	  post("    Event code %d (%s)", eventCode, names[eventType] ? (names[eventType][eventCode] ? names[eventType][eventCode] : "?") : "?");
 
 	  switch(eventType) {
+// the API changed at some point...
 #ifdef EV_RST
 	  case EV_RST:
-	    break;
+#else 
+	  case EV_SYN:
 #endif
+	    break;
 	  case EV_KEY:
 	    buttons++;
 	    break;
