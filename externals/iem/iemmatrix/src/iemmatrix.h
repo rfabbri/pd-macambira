@@ -65,6 +65,23 @@ typedef struct _matrix
   t_canvas *x_canvas;
 } t_matrix;
 
+typedef struct _mtx_binscalar
+{
+  t_object x_obj;
+
+  t_matrix m; // the output matrix
+  t_float f;  // the second input
+} t_mtx_binscalar;
+
+typedef struct _mtx_binmtx
+{
+  t_object x_obj;
+
+  t_matrix m;  // the output matrix
+  t_matrix m2; // the second input
+} t_mtx_binmtx;
+
+
 void matrix_free(t_matrix*x);
 
 /* utility function */
@@ -91,5 +108,14 @@ void matrix_diegg(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 void matrix_row(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 void matrix_col(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
 void matrix_element(t_matrix *x, t_symbol *s, int argc, t_atom *argv);
+
+
+void mtx_bin_matrix2(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv);
+void mtx_binmtx_bang(t_mtx_binmtx *x);
+void mtx_binmtx_free(t_mtx_binmtx *x);
+void mtx_binscalar_bang(t_mtx_binscalar *x);
+void mtx_binscalar_free(t_mtx_binscalar *x);
+
+
 
 #endif
