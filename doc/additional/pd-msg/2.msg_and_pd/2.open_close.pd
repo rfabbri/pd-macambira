@@ -1,9 +1,12 @@
-#N canvas 189 280 494 273 10;
+#N canvas 485 101 510 289 10;
 #X text 10 4 open and close an abstraction;
-#X text 23 85 (you have to put a corect name & valid path);
-#X text 25 114 close;
+#X text 21 96 (you have to put a corect name & valid path);
+#X text 24 164 close;
 #X text 26 30 open;
-#X msg 25 50 \; pd open your_abs.pd ./your_path \;;
-#X msg 26 135 \; pd pd-your_abs.pd menuclose \;;
-#X text 23 171 (you have to put a corect name & valid path);
-#X text 64 197 Those last 2 tricks came from Miller \, but i didn't succed to make them work. hope somebody will be more lucky.;
+#X text 22 221 (you have to put a corect name & valid path);
+#X obj 396 17 abstraction;
+#X msg 25 185 \; pd-abstraction.pd menuclose \;;
+#X msg 25 50 \; pd open abstraction.pd /usr/local/lib/pd/doc/7.stuff/pd-msg/2.msg_and_pd/
+;
+#X text 25 127 Sometimes you can get "." to work as a path \, but usually
+it doesn't work. I don't know why...;
