@@ -11,8 +11,8 @@
 	<Configurations>
 		<Configuration
 			Name="PD Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="./pd-msvc/sd"
+			IntermediateDirectory="./pd-msvc/sd"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;DYN_EXPORTS;NT;PD"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -37,9 +37,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../../debug/dyn.dll"
+				OutputFile="$(outdir)/dyn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\Debug/dyn.pdb"
 				ImportLibrary=".\Debug/dyn.lib"
@@ -75,8 +76,8 @@
 		</Configuration>
 		<Configuration
 			Name="PD Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="./pd-msvc/sr"
+			IntermediateDirectory="./pd-msvc/sr"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -85,7 +86,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;DYN_EXPORTS,PD,NT"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -103,10 +104,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="pd.lib"
-				OutputFile="../../Release/dyn.dll"
+				OutputFile="./pd-msvc/dyn.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="../..\api\lib"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
 				ProgramDatabaseFile=".\Release/dyn.pdb"
 				ImportLibrary="..\..\api\lib\dyn.lib"
 				TargetMachine="1"/>
