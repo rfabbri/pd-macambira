@@ -5,7 +5,8 @@
 # your c++ compiler (define only if it's different than g++)
 # CXX=g++
 
-PDPATH=/c/program/pd
+# where is PD?
+PDPATH=c:\programme\audio\pd
 
 # where do the flext libraries reside?
 FLEXTPATH=$(PDPATH)/flext
