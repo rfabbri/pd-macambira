@@ -58,8 +58,8 @@
 
 #include "hid.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+//#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
@@ -81,17 +81,28 @@ EventLoopTimerRef gTimer = NULL;
  * FUNCTION PROTOTYPES
  *==============================================================================
  */
+
+/* conversion functions */
 char *convertEventsFromDarwinToLinux(pRecElement element);
+
+/* IOKit HID Utilities functions from SC_HID.cpp */
+void releaseHIDDevices(void);
+int prHIDBuildElementList(t_hid *x);
+int prHIDBuildDeviceList(void);
+int prHIDGetValue(void);
+void PushQueueEvents_RawValue(void);
+void PushQueueEvents_CalibratedValue(void);
+int prHIDReleaseDeviceList(void);
+//int prHIDRunEventLoop(void);
+//int prHIDStopEventLoop(void);
 
 /*==============================================================================
  * EVENT TYPE/CODE CONVERSION FUNCTIONS
  *==============================================================================
  */
 
-char *convertDarwinToLinuxType(IOHIDElementType type)
+void convertDarwinToLinuxType(IOHIDElementType type, char *returnType)
 {
-	char *returnType = "";
-
 	switch (type)
 	{
 		case kIOHIDElementTypeInput_Misc:
@@ -119,10 +130,94 @@ char *convertDarwinToLinuxType(IOHIDElementType type)
 			HIDReportErrorNum("Unknown element type : ", type);
 			sprintf(returnType, "unknown");
 	}
-
-	return(returnType);
 }
 
+void convertAxis(pRecElement element, char *linux_type, char *linux_code, char axis) 
+{
+	if (element->relative) 
+	{ 
+		sprintf(linux_type,"ev_rel"); 
+		sprintf(linux_code,"rel_%c",axis); 
+	}
+	else 
+	{ 
+		sprintf(linux_type,"ev_abs"); 
+		sprintf(linux_code,"abs_%c",axis); 
+	}
+}
+
+void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, char *linux_code) 
+{
+	t_int button_offset = 0;
+
+	switch(element->type)
+	{
+		case kIOHIDElementTypeInput_Button:
+			sprintf(linux_type, "ev_key");
+			break;
+	}
+
+	switch (element->usagePage)
+	{
+		case kHIDPage_GenericDesktop:
+			switch (element->usage)
+			{
+				case kHIDUsage_GD_X: convertAxis(element, linux_type, linux_code, 'x'); break;
+				case kHIDUsage_GD_Y: convertAxis(element, linux_type, linux_code, 'y'); break;
+				case kHIDUsage_GD_Z: convertAxis(element, linux_type, linux_code, 'z'); break;
+				case kHIDUsage_GD_Rx: convertAxis(element, linux_type, linux_code, 'x'); break;
+				case kHIDUsage_GD_Ry: convertAxis(element, linux_type, linux_code, 'y'); break;
+				case kHIDUsage_GD_Rz: convertAxis(element, linux_type, linux_code, 'z'); break;
+			}
+			break;
+		case kHIDPage_Button:
+			sprintf(linux_type, "ev_key"); 
+			sprintf(linux_code, "btn_%ld", element->usage); 
+			break;
+	}
+}
+
+
+/* ============================================================================== */
+/* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
+/* ============================================================================== */
+
+t_int hid_build_element_list(t_hid *x)
+{
+	DEBUG(post("hid_build_element_list"););
+
+	UInt32 i;
+	pRecElement	devElement;
+	pRecDevice pCurrentHIDDevice;
+	UInt32 numElements;
+	char cstrElementName[256];
+
+	// look for the right device using locID 
+	pCurrentHIDDevice = HIDGetFirstDevice ();
+	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID != x->x_locID))
+		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
+	if(!pCurrentHIDDevice) return (1);
+	
+	devElement = HIDGetFirstDeviceElement(pCurrentHIDDevice, kHIDElementTypeInput);
+	numElements = HIDCountDeviceElements(pCurrentHIDDevice, kHIDElementTypeInput);
+	
+	post("[hid] found %d elements:",numElements);
+	
+	for(i=0; i<numElements; i++)
+	{
+		//type
+		HIDGetTypeName((IOHIDElementType) devElement->type, cstrElementName);
+		post("  Type: %s  %d  0x%x",cstrElementName,devElement->type,devElement->type);
+		convertDarwinToLinuxType((IOHIDElementType) devElement->type, cstrElementName);
+		post("  Type: %s  %d  0x%x",cstrElementName,devElement->type,devElement->type);
+		//usage
+		HIDGetUsageName (devElement->usagePage, devElement->usage, cstrElementName);
+		post("    Usage/Code: %s  %d  0x%x",cstrElementName,devElement->usage,devElement->usage);
+		
+		devElement = HIDGetNextDeviceElement (devElement, kHIDElementTypeInput);
+	}
+	return (0);	
+}
 
 /* ============================================================================== */
 /* Pd [hid] FUNCTIONS */
@@ -135,9 +230,14 @@ t_int hid_output_events(t_hid *x)
 	SInt32 value;
 	pRecDevice  pCurrentHIDDevice;
 	pRecElement pCurrentHIDElement;
-//	char *type = "";
-//	char *code = "";
+	IOHIDEventStruct event;
+	char type[256];
+	char code[256];
+	char event_output_string[256];
 	t_atom event_data[4];
+
+	int event_counter = 0;
+	Boolean result;
 
 	// look for the right device: 
 	pCurrentHIDDevice = HIDGetFirstDevice ();
@@ -145,41 +245,80 @@ t_int hid_output_events(t_hid *x)
 		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
 	if(!pCurrentHIDDevice) return (1);
 
-
-	/* get the first element */
-	pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO);
-	/* cycle thru all elements */
-	while (pCurrentHIDElement)
+//	result = HIDGetEvent(pCurrentHIDDevice, (void*) &event);
+//	if(result) 
+	while( (HIDGetEvent(pCurrentHIDDevice, (void*) &event)) && (event_counter < 64) ) 
 	{
-		value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement);
-		
-		if (pCurrentHIDElement)
-		{
-			value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement);
-			// if it's not a button and it's not a hatswitch then calibrate
-/* 			if(( pCurrentHIDElement->type != kIOHIDElementTypeInput_Button ) && */
-/* 				( pCurrentHIDElement->usagePage == 0x01 && pCurrentHIDElement->usage != kHIDUsage_GD_Hatswitch))  */
-/* 				value = HIDCalibrateValue ( value, pCurrentHIDElement ); */
+		value = event.value;
+		//post("found event: %d",value);
+		IOHIDElementCookie cookie = (IOHIDElementCookie) event.elementCookie;
 
-			/* type */
-//			HIDGetTypeName(pCurrentHIDElement->type,type);
-//			SETSYMBOL(event_data, gensym(type));
-			/* code */
-//			HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, code);
-//			SETSYMBOL(event_data + 1, gensym(code));
-			/* value */
-//			SETFLOAT(event_data + 2, (t_float)value);
-			/* time */
-			// TODO temp space filler for testing, got to find where I get the event time
-//			SETFLOAT(event_data + 3, (t_float)value);
-//			SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
-//			outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
-		}
-		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
+		// find the pRecElement using the cookie
+		pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO); 
+		while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
+			pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
+		
+//		convertDarwinToLinuxType((IOHIDElementType) pCurrentHIDElement->type, event_output_string);
+		HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, event_output_string);
+
+		HIDGetElementNameFromVendorProductCookie(
+			pCurrentHIDDevice->vendorID, pCurrentHIDDevice->productID,
+			(long) pCurrentHIDElement->cookie, event_output_string);
+		
+		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
+		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
+		SETSYMBOL(event_data, gensym(type));
+		/* code */
+		SETSYMBOL(event_data + 1, gensym(code));
+		/* value */
+		SETFLOAT(event_data + 2, (t_float)value);
+		/* time */
+		// TODO: convert this to a common time format, i.e. Linux struct timeval
+		SETFLOAT(event_data + 3, (t_float)(event.timestamp).lo); 
+
+		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1);
+		
+		++event_counter;
 	}
+	DEBUG(
+	if(event_counter)
+		post("output %d events",event_counter);
+	);
+/* 	/\* get the first element *\/ */
+/* 	pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO); */
+/* 	/\* cycle thru all elements *\/ */
+/* 	while (pCurrentHIDElement) */
+/* 	{ */
+/* 		//value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement); */
+		
+/* 		if (pCurrentHIDElement) */
+/* 		{ */
+/* 			value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement); */
+/* 			post("current value: %d", value); */
+/* 			// if it's not a button and it's not a hatswitch then calibrate */
+/* /\* 			if(( pCurrentHIDElement->type != kIOHIDElementTypeInput_Button ) && *\/ */
+/* /\* 				( pCurrentHIDElement->usagePage == 0x01 && pCurrentHIDElement->usage != kHIDUsage_GD_Hatswitch))  *\/ */
+/* /\* 				value = HIDCalibrateValue ( value, pCurrentHIDElement ); *\/ */
+
+/* 			/\* type *\/ */
+/* 			//HIDGetTypeName(pCurrentHIDElement->type,type); */
+/* 			convertDarwinToLinuxType((IOHIDElementType) pCurrentHIDElement->type, event_output_string); */
+/* 			SETSYMBOL(event_data, gensym(event_output_string)); */
+/* 			/\* code *\/ */
+/* 			HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, event_output_string); */
+/* 			SETSYMBOL(event_data + 1, gensym(event_output_string)); */
+/* 			/\* value *\/ */
+/* 			SETFLOAT(event_data + 2, (t_float)value); */
+/* 			/\* time *\/ */
+/* 			// TODO temp space filler for testing, got to find where I get the event time */
+/* 			SETFLOAT(event_data + 3, (t_float)value); */
+/* //			SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec); */
+/* 			outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1);  */
+/* 		} */
+/* 		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO); */
+/* 	} */
 	return (0);	
 }
-
 
 
 t_int hid_open_device(t_hid *x, t_int device_number)
@@ -215,11 +354,14 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 		currentDevice = HIDGetNextDevice(currentDevice);
 
 	x->x_locID = currentDevice->locID;
-// TODO: buildElementList(), outputting text to console
-// TODO: queue all elements except absolute axes
 
 	post("[hid] opened device %d: %s %s",
 		  device_number, currentDevice->manufacturer, currentDevice->product);
+
+	hid_build_element_list(x);
+
+	HIDQueueDevice(currentDevice);
+// TODO: queue all elements except absolute axes
 
 	return (0);
 }
@@ -229,8 +371,10 @@ t_int hid_close_device(t_hid *x)
 {
 	DEBUG(post("hid_close_device"););
 
-	post("close_device %d",x->x_device_number);
-	releaseHIDDevices();
+	post("[hid] close_device %d",x->x_device_number);
+	HIDReleaseAllDeviceQueues();
+	HIDReleaseDeviceList();
+	gNumberOfHIDDevices = 0;
 
 	return (0);
 }
@@ -240,7 +384,7 @@ t_int hid_devicelist_refresh(t_hid *x)
 	DEBUG(post("hid_devicelist_refresh"););
 
 	/* the device list should be refreshed here */
-	if ( (prHIDBuildDeviceList()) && (prHIDBuildElementList()) )
+	if ( (prHIDBuildDeviceList()) && (prHIDBuildElementList(x)) )
 		return (0);
 	else
 		return (1);
@@ -249,7 +393,7 @@ t_int hid_devicelist_refresh(t_hid *x)
 
 
 /*==============================================================================
- *  HID UTILIES FUNCTIONS
+ *  HID UTILIES FUNCTIONS FROM SC_HID.cpp
  *==============================================================================
  */
 
@@ -267,12 +411,11 @@ void releaseHIDDevices (void)
 	gNumberOfHIDDevices = 0;
 }
 
-int prHIDBuildElementList(void)
+int prHIDBuildElementList(t_hid *x)
 {
 	DEBUG(post("prHIDBuildElementList"););
 
 	int locID = NULL;
-	int cookieNum = NULL;
 	UInt32 i;
 	pRecElement	devElement;
 	pRecDevice pCurrentHIDDevice;
@@ -284,7 +427,7 @@ int prHIDBuildElementList(void)
 
 	// look for the right device using locID 
 	pCurrentHIDDevice = HIDGetFirstDevice ();
-	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
+	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID != x->x_locID))
 		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
 	if(!pCurrentHIDDevice) return (1);
 	
@@ -305,10 +448,8 @@ int prHIDBuildElementList(void)
 			//devstring = newPyrString(g->gc, cstrElementName, 0, true);
 			//SetObject(devElementArray->slots+devElementArray->size++, devstring);
 			//g->gc->GCWrite(devElementArray, (PyrObject*) devstring);
-		//cookie
-		post("Cookie: %d %d %d",devElement->cookie,devElement->min,devElement->max);
 		
-		devElement =  HIDGetNextDeviceElement (devElement, kHIDElementTypeInput);
+		devElement = HIDGetNextDeviceElement (devElement, kHIDElementTypeInput);
 	}
 	return (0);	
 }
@@ -536,112 +677,6 @@ void callback  (void * target, IOReturn result, void * refcon, void * sender)
 /* 	return (0);	 */
 /* } */
 
-
-int prHIDQueueDevice(void)
-{
-	DEBUG(post("prHIDQueueDevice"););
-
-	int locID = NULL;
-	int cookieNum = NULL;
-	
-	//PyrSlot *a = g->sp - 1; //class
-	//PyrSlot *b = g->sp; //locID device
-	//int err = slotIntVal(b, &locID);
-	//if (err) return err;
-	//look for the right device: 
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
-	if(!pCurrentHIDDevice) return (1);
-	HIDQueueDevice(pCurrentHIDDevice);
-	return (0);	
-}
-
-
-int prHIDQueueElement(void)
-{
-	DEBUG(post("prHIDQueueElement"););
-
-	int locID = NULL;
-	int cookieNum = NULL;
-	
-	//PyrSlot *a = g->sp - 2; //class
-	//PyrSlot *b = g->sp - 1; //locID device
-	//PyrSlot *c = g->sp; //element cookie
-	//int err = slotIntVal(b, &locID);
-	//if (err) return err;
-	//err = slotIntVal(c, &cookieNum);
-	//if (err) return err;
-	IOHIDElementCookie cookie = (IOHIDElementCookie) cookieNum;
-	//look for the right device: 
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
-	if(!pCurrentHIDDevice) return (1);
-	//look for the right element:
-	pRecElement pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO);
-	// use gElementCookie to find current element
-	while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
-		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
-	if(!pCurrentHIDElement) return (1);
-	HIDQueueElement(pCurrentHIDDevice, pCurrentHIDElement);
-	return (0);	
-}
-
-
-int prHIDDequeueElement(void)
-{
-	DEBUG(post("prHIDDequeueElement"););
-
-	int locID = NULL;
-	int cookieNum = NULL;
-	
-	//PyrSlot *a = g->sp - 2; //class
-	//PyrSlot *b = g->sp - 1; //locID device
-	//PyrSlot *c = g->sp; //element cookie
-	//int err = slotIntVal(b, &locID);
-	//if (err) return err;
-	//err = slotIntVal(c, &cookieNum);
-	//if (err) return err;
-	IOHIDElementCookie cookie = (IOHIDElementCookie) cookieNum;
-	//look for the right device: 
-    pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-        pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
-	if(!pCurrentHIDDevice) return (1);
-	//look for the right element:
-	pRecElement pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO);
-    while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
-        pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
-	if(!pCurrentHIDElement) return (1);
-	HIDDequeueElement(pCurrentHIDDevice, pCurrentHIDElement);
-	return (0);	
-}
-
-
-int prHIDDequeueDevice(void)
-{
-	DEBUG(post("prHIDDequeueDevice"););
-
-	int locID = NULL;
-	int cookieNum = NULL;
-	
-	/*
-	PyrSlot *a = g->sp - 1; //class
-	PyrSlot *b = g->sp; //locID device
-	int err = slotIntVal(b, &locID);
-	if (err) return err;
-	*/
-	//look for the right device: 
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	while (pCurrentHIDDevice && (pCurrentHIDDevice->locID !=locID))
-		pCurrentHIDDevice = HIDGetNextDevice (pCurrentHIDDevice);
-	if(!pCurrentHIDDevice) return (1);
-	HIDDequeueDevice(pCurrentHIDDevice);
-	return (0);	
-}
-
-
 /* int prHIDStopEventLoop(void) */
 /* { */
 /* 	DEBUG(post("prHIDStopEventLoop");); */
@@ -653,19 +688,6 @@ int prHIDDequeueDevice(void)
 /* } */
 
 /* this is just a rough sketch */
-
-/* getEvents(t_hid *x) { */
-/* 	pRecDevice pCurrentHIDDevice = GetSetCurrentDevice (gWindow); */
-/* 	pRecElement pCurrentHIDElement = GetSetCurrenstElement (gWindow); */
-
-/* 	// if we have a good device and element which is not a collecion */
-/* 	if (pCurrentHIDDevice && pCurrentHIDElement && (pCurrentHIDElement->type != kIOHIDElementTypeCollection)) */
-/* 	{ */
-/* 		SInt32 value = HIDGetElementValue (pCurrentHIDDevice, pCurrentHIDElement); */
-/* 		SInt32 valueCal = HIDCalibrateValue (value, pCurrentHIDElement); */
-/* 		SInt32 valueScale = HIDScaleValue (valueCal, pCurrentHIDElement); */
-/* 	 } */
-/* } */
 
 
 //void HIDGetUsageName (const long valueUsagePage, const long valueUsage, char * cstrName)

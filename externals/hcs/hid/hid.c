@@ -35,6 +35,18 @@
 #define DEFAULT_DELAY 5
 
 /*------------------------------------------------------------------------------
+ * FUNCTION PROTOTYPES
+ */
+
+void hid_start(t_hid *x);
+void hid_stop(t_hid *x);
+t_int hid_open(t_hid *x, t_float f);
+t_int hid_close(t_hid *x);
+t_int hid_read(t_hid *x,int fd);
+void hid_delay(t_hid *x, t_float f);
+static void hid_float(t_hid* x, t_floatarg f);
+
+/*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
 
@@ -68,6 +80,9 @@ t_int hid_close(t_hid *x)
 t_int hid_open(t_hid *x, t_float f) 
 {
 	DEBUG(post("hid_open"););
+
+/* store running state so that it can be restored after the device has been opened */
+	t_int started = x->x_started;
 	
 	hid_close(x);
 
@@ -82,9 +97,14 @@ t_int hid_open(t_hid *x, t_float f)
   if (hid_open_device(x,x->x_device_number)) 
   {
 	  error("[hid] can not open device %d",x->x_device_number);
-  post("\\================================ [hid] ================================/\n");
+	  post("\\================================ [hid] ================================/\n");
 	  return (1);
   }
+
+/* restore the polling state so that when I [tgl] is used to start/stop [hid],
+ * the [tgl]'s state will continue to accurately reflect [hid]'s state 
+ */
+  hid_float(x,started);
 
   post("\\================================ [hid] ================================/\n");
   return (0);
