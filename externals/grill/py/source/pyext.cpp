@@ -20,6 +20,15 @@ void pyext::Setup(t_classid c)
 {
     sym_get = flext::MakeSymbol("get");
     
+	FLEXT_CADDMETHOD_(c,0,"doc",m_doc);
+	FLEXT_CADDMETHOD_(c,0,"dir",m_dir);
+#ifdef FLEXT_THREADS
+	FLEXT_CADDATTR_VAR1(c,"detach",detach);
+	FLEXT_CADDMETHOD_(c,0,"stop",m_stop);
+#endif
+
+	FLEXT_CADDMETHOD_(c,0,"help",m_help);
+
 	FLEXT_CADDMETHOD_(c,0,"reload",m_reload_);
     FLEXT_CADDMETHOD_(c,0,"reload.",m_reload);
 	FLEXT_CADDMETHOD_(c,0,"doc+",m_doc_);
@@ -95,16 +104,28 @@ void pyext::SetThis()
 PyObject *pyext::class_obj = NULL;
 PyObject *pyext::class_dict = NULL;
 
-pyext::pyext(int argc,const t_atom *argv):
+pyext::pyext(int argc,const t_atom *argv,bool sig):
 	pyobj(NULL),pythr(NULL),
 	inlets(-1),outlets(-1),
+    siginlets(0),sigoutlets(0),
 	methname(NULL)
 { 
-    int apre = 0;
+#ifdef FLEXT_THREADS
+    FLEXT_ADDTIMER(stoptmr,tick);
+    // launch thread worker
+    FLEXT_CALLMETHOD(threadworker);
+#endif
 
+    int apre = 0;
     if(argc >= apre+2 && CanbeInt(argv[apre]) && CanbeInt(argv[apre+1])) {
         inlets = GetAInt(argv[apre]);
         outlets = GetAInt(argv[apre+1]);
+        apre += 2;
+    }
+
+    if(sig && argc >= apre+2 && CanbeInt(argv[apre]) && CanbeInt(argv[apre+1])) {
+        siginlets = GetAInt(argv[apre]);
+        sigoutlets = GetAInt(argv[apre+1]);
         apre += 2;
     }
 
@@ -162,38 +183,46 @@ pyext::pyext(int argc,const t_atom *argv):
 
 	if(argc > apre) args(argc-apre,argv+apre);
 
-	if(methname) {
-		MakeInstance();
-
-        if(pyobj) 
-            InitInOut(inlets,outlets);
-	}
-    else 
-        inlets = outlets = 0;
-
 	PyUnlock(state);
-	
-    if(inlets < 0 || outlets < 0)
-        InitProblem();
-    else {
-    	AddInAnything(1+inlets);  
-	    AddOutAnything(outlets);  
-    }
-
-	if(!pyobj)
-		InitProblem();
 }
 
-pyext::~pyext()
+bool pyext::Init()
 {
 	PyThreadState *state = PyLock();
 
-    DoExit();
+	if(methname) {
+		MakeInstance();
+        if(pyobj) InitInOut(inlets,outlets);
+	}
+    else
+        inlets = outlets = 0;
 
+    if(inlets < 0 || outlets < 0)
+        InitProblem();
+    else {
+   	    AddInSignal(siginlets);  
+        AddInAnything((siginlets?0:1)+inlets);  
+        AddOutSignal(sigoutlets);
+	    AddOutAnything(outlets);  
+    }
+
+	PyUnlock(state);
+
+    return pyobj && flext_dsp::Init();
+}
+
+void pyext::Exit() 
+{ 
+    pybase::Exit(); // exit threads
+
+	PyThreadState *state = PyLock();
+    DoExit();
     Unregister("_pyext");
 	UnimportModule();
 
 	PyUnlock(state);
+
+    flext_dsp::Exit(); 
 }
 
 bool pyext::DoInit()
@@ -230,13 +259,15 @@ void pyext::DoExit()
         // try to run del to clean up the class instance
         PyObject *objdel = PyObject_GetAttrString(pyobj,"_del");
         if(objdel) {
-            PyObject *args = PyTuple_New(0);
-            PyObject *ret = PyObject_Call(objdel,args,NULL);
-            if(!ret)
-                post("%s - Could not call _del method",thisName());
-            else 
+            Py_INCREF(emptytuple);
+            PyObject *ret = PyObject_Call(objdel,emptytuple,NULL);
+            if(ret)
                 Py_DECREF(ret);
-            Py_DECREF(args);
+#ifdef FLEXT_DEBUG
+            else 
+                post("%s - Could not call _del method",thisName());
+#endif
+            Py_DECREF(emptytuple);
             Py_DECREF(objdel);
         }
         else
@@ -269,7 +300,7 @@ void pyext::InitInOut(int &inl,int &outl)
 
     if(inl < 0) {
 		// get number of inlets
-		inl = 1;
+		inl = inlets;
 		PyObject *res = PyObject_GetAttrString(pyobj,"_inlets"); // get ref
 		if(res) {
 			if(PyCallable_Check(res)) {
@@ -286,7 +317,7 @@ void pyext::InitInOut(int &inl,int &outl)
     }
     if(outl < 0) {
         // get number of outlets
-        outl = 1;
+        outl = outlets;
 		PyObject *res = PyObject_GetAttrString(pyobj,"_outlets"); // get ref
 		if(res) {
 			if(PyCallable_Check(res)) {
@@ -436,14 +467,12 @@ void pyext::m_set(int argc,const t_atom *argv)
 }
 
 
-bool pyext::m_method_(int n,const t_symbol *s,int argc,const t_atom *argv)
+bool pyext::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
 {
-    bool ret = false;
 	if(pyobj && n >= 1)
-		ret = work(n,s,argc,argv);
+		return work(n,s,argc,argv);
     else
-		post("%s - no method for type '%s' into inlet %i",thisName(),GetString(s),n);
-    return ret;
+        return flext_dsp::CbMethodResort(n,s,argc,argv);
 }
 
 
@@ -522,6 +551,10 @@ bool pyext::work(int n,const t_symbol *s,int argc,const t_atom *argv)
 
     bool isfloat = s == sym_float && argc == 1;
 
+    // offset inlet index by signal inlets
+    // \note first one is shared with messages!
+    if(siginlets) n += siginlets-1;
+
 	// if float equals an integer, try int_* method
     if(isfloat && GetAFloat(argv[0]) == GetAInt(argv[0])) {
 		sprintf(str,"int_%i",n);
@@ -584,4 +617,19 @@ bool pyext::work(int n,const t_symbol *s,int argc,const t_atom *argv)
 
     Respond(ret);
 	return ret;
+}
+
+PyObject *pyext::GetSig(int ix,bool in) { return NULL; }
+
+void pyext::CbClick() { pybase::OpenEditor(); }
+bool pyext::CbDsp() { return false; }
+
+void pyext::DumpOut(const t_symbol *sym,int argc,const t_atom *argv)
+{
+    ToOutAnything(GetOutAttr(),sym?sym:thisTag(),argc,argv);
+}
+
+bool pyext::thrcall(void *data)
+{ 
+    return FLEXT_CALLMETHOD_X(work_wrapper,data);
 }
