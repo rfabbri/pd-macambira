@@ -20,6 +20,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.1
 #endif
 
+#if defined(_MSC_VER) && !defined(FLEXT_DEBUG)
+// switch off warnings for the release build
+#pragma warning(disable: 4244)
+#endif
+
 
 #include <typeinfo>
 #include <stdlib.h>

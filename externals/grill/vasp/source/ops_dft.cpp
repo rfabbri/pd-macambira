@@ -79,7 +79,7 @@ static BL fft_fwd_real_any(I cnt,F *rsdt,I _rss,F *rddt,I _rds)
 #endif
 	}
 	if(ret) {
-		const F nrm = 1./sqrt(cnt);
+		const F nrm = 1./sqrt((F)cnt);
 		const I n2 = cnt/2;
 
 #ifndef VASP_COMPACT
@@ -158,7 +158,7 @@ static BL fft_inv_real_any(I cnt,F *rsdt,I _rss,F *rddt,I _rds)
 #endif
 	}
 	if(ret) {
-		const F nrm = 1./sqrt(cnt);
+		const F nrm = 1./sqrt((F)cnt);
 #ifndef VASP_COMPACT
 		if(rds == 1)
 			for(i = 0; i < cnt; ++i) 
@@ -230,7 +230,7 @@ static BL fft_fwd_complex_any(I cnt,F *rsdt,I _rss,F *isdt,I _iss,F *rddt,I _rds
 #endif
 	}
 	if(ret) {
-		const F nrm = 1./sqrt(cnt);
+		const F nrm = 1./sqrt((F)cnt);
 
 #ifdef VASP_COMPACT
 		for(i = 0; i < cnt; ++i) {
@@ -359,7 +359,7 @@ static BL fft_complex_radix2(I cnt,F *rsdt,I _rss,F *isdt,I _iss,F *rddt,I _rds,
 	BL ret = fft_bidir_complex_radix2(cnt,rtmp,itmp,dir);
 
 	if(ret) {
-		const F nrm = 1./sqrt(cnt);
+		const F nrm = 1./sqrt((F)cnt);
 
 #ifndef VASP_COMPACT
 		if(rtmp == rddt)
@@ -426,7 +426,7 @@ BL fft_fwd_real_radix2(I cnt,F *src,I _sstr,F *dst,I _dstr)
 
 	register I i;
 	const I n2 = cnt/2;
-	const F fn = (F)(1./sqrt(cnt));
+	const F fn = (F)(1./sqrt((F)cnt));
 	F *stmp;
 	if(!dst || src == dst) {
 		// in-place
@@ -502,7 +502,7 @@ BL fft_inv_real_radix2(I cnt,F *src,I _sstr,F *dst,I _dstr)
 
 	register I i;
 	const I n2 = cnt/2;
-	const F fn = (F)(1./sqrt(cnt));
+	const F fn = (F)(1./sqrt((F)cnt));
 	F *stmp;
 	if(!dst || src == dst) {
 		// in-place

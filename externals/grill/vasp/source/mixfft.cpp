@@ -177,7 +177,7 @@ static void factorize(int n, int *nFact, int fact[])
     }
     if (n>1)
     {
-        for (k=2; k<sqrt(n)+1; k++)
+        for (k=2; k<sqrt((double)n)+1; k++)
             while ((n % k) == 0)
             {
                 n=n / k;
@@ -575,7 +575,7 @@ bool mixfft(int n, REAL *xRe, REAL *xIm,REAL *yRe, REAL *yIm)
     int   nFactor;
     int   count;
 
-    pi = 4*atan(1);    
+    pi = 4*atan(1.);    
 
     if(!transTableSetup(sofarRadix, actualRadix, remainRadix, &nFactor, &n)) return false;
     permute(n, nFactor, actualRadix, remainRadix, xRe, xIm, yRe, yIm);

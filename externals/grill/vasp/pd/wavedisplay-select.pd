@@ -1,6 +1,6 @@
-#N canvas 212 260 300 120 10;
-#N canvas 166 101 669 345 inside 0;
-#N canvas 149 25 652 578 positions 0;
+#N canvas 212 260 305 123 10;
+#N canvas 166 101 671 347 inside 0;
+#N canvas 149 25 654 580 positions 0;
 #N canvas 74 268 410 336 setpositions 0;
 #X obj 60 102 inlet;
 #X obj 220 102 inlet;
@@ -85,8 +85,8 @@
 #X obj 197 61 r \$0-sel_rb;
 #X obj 145 174 r \$0-nboxls;
 #X obj 347 184 r \$0-nboxrs;
-#X floatatom 162 201 5 0 0;
-#X floatatom 360 211 5 0 0;
+#X floatatom 162 201 5 0 0 0 - - -;
+#X floatatom 360 211 5 0 0 0 - - -;
 #X text 174 31 (from sliderhandling);
 #X text 310 384 right border of sel;
 #X text 79 340 leftborder of sel;
@@ -189,7 +189,7 @@
 #X obj 124 82 table \$1 44100;
 #X restore 91 211 pd wavetable;
 #X text 186 210 contains the sample;
-#N canvas 228 148 445 446 loadsample 0;
+#N canvas 228 148 447 448 loadsample 0;
 #X obj 39 199 soundfiler;
 #X obj 39 66 openpanel;
 #X text 229 39 load a (new) sample to a table;
@@ -214,7 +214,7 @@
 #X connect 11 1 9 0;
 #X restore 91 188 pd loadsample;
 #X text 198 187 load a new sample;
-#N canvas 46 30 520 602 drawdisplay 0;
+#N canvas 46 30 522 604 drawdisplay 0;
 #X obj 193 422 vasp.frames 20;
 #X obj 193 449 vasp.offset 0;
 #X msg 83 83 bang;
@@ -224,26 +224,27 @@
 #X obj 168 252 *;
 #X text 45 80 start;
 #X text 262 215 (reset);
-#X obj 193 470 vasp.max?;
-#X obj 193 496 vasp.min?;
+#X obj 255 500 vasp.max?;
+#X obj 163 497 vasp.min?;
 #X obj 325 275 t f f;
 #X obj 168 281 t b b f;
 #X obj 76 129 until 1;
 #X obj 76 108 300;
-#X obj 276 518 tabwrite \$0+;
-#X obj 242 564 tabwrite \$0-;
+#X obj 256 545 tabwrite \$0+;
+#X obj 163 545 tabwrite \$0-;
 #X msg 193 336 vasp \$1;
 #X obj 193 308 symbol \$1;
 #X obj 83 46 r \$2-draw_display;
 #X obj 325 229 r \$2-sample-length;
 #X obj 325 254 / 300;
-#X obj 276 495 clip -1 1;
-#X obj 242 539 clip -1 1;
+#X obj 256 522 clip -1 1;
+#X obj 163 520 clip -1 1;
 #X obj 168 162 moses 299;
 #X msg 242 217 0;
 #X obj 217 196 t f b;
 #X connect 0 0 1 0;
 #X connect 1 0 9 0;
+#X connect 1 0 10 0;
 #X connect 2 0 14 0;
 #X connect 3 0 5 0;
 #X connect 3 0 24 0;
@@ -252,9 +253,8 @@
 #X connect 4 2 16 1;
 #X connect 5 0 3 1;
 #X connect 6 0 12 0;
-#X connect 9 0 10 0;
-#X connect 9 1 22 0;
-#X connect 10 1 23 0;
+#X connect 9 0 22 0;
+#X connect 10 0 23 0;
 #X connect 11 0 6 1;
 #X connect 11 1 0 1;
 #X connect 12 1 18 0;
@@ -276,9 +276,9 @@
 #X connect 26 1 25 0;
 #X restore 91 234 pd drawdisplay;
 #X text 200 233 draws the large display;
-#N canvas 123 371 417 309 sliderhandling 0;
-#X floatatom 112 145 5 0 0;
-#X floatatom 220 143 5 0 0;
+#N canvas 123 371 419 311 sliderhandling 0;
+#X floatatom 112 145 5 0 0 0 - - -;
+#X floatatom 220 143 5 0 0 0 - - -;
 #N canvas 83 38 570 521 keyinput_s 0;
 #X obj 186 25 keyname;
 #X obj 84 446 spigot;
@@ -337,7 +337,7 @@
 #X connect 23 0 12 0;
 #X connect 24 0 23 0;
 #X restore 206 117 pd keyinput_s;
-#N canvas 49 247 417 326 spacehandling 0;
+#N canvas 49 247 419 328 spacehandling 0;
 #X obj 60 26 inlet;
 #X obj 164 26 inlet;
 #X obj 138 119 0;
@@ -378,7 +378,7 @@
 #X connect 17 1 2 0;
 #X connect 17 2 12 0;
 #X restore 80 178 pd spacehandling;
-#N canvas 523 338 360 357 s_handling 0;
+#N canvas 523 338 362 359 s_handling 0;
 #X obj 85 27 inlet;
 #X obj 85 305 s \$0-sliderr;
 #X msg 85 279 set \$1;
@@ -386,7 +386,7 @@
 #X obj 85 202 -;
 #X obj 85 225 t b f;
 #X obj 171 264 s \$0-shiftsel;
-#X floatatom 200 295 5 0 0;
+#X floatatom 200 295 5 0 0 0 - - -;
 #X obj 204 28 inlet;
 #X text 146 48 first position after hit is ref;
 #X obj 173 116 spigot;
@@ -413,10 +413,10 @@
 #X connect 15 1 10 0;
 #X restore 206 179 pd s_handling;
 #X obj 80 33 r \$0-sliders;
-#X floatatom 124 58 5 0 0;
-#N canvas 578 111 637 561 keyinput_space2 0;
+#X floatatom 124 58 5 0 0 0 - - -;
+#N canvas 578 111 639 563 keyinput_space2 0;
 #X obj 82 464 spigot;
-#X floatatom 94 498 5 0 0;
+#X floatatom 94 498 5 0 0 0 - - -;
 #X msg 141 414 1;
 #X msg 114 414 0;
 #X obj 114 435 s \$0-spig1;
@@ -497,7 +497,7 @@
 #X text 186 124 receiving inputs \, conversions and settings of slider-
 and graphic-positions;
 #X text 233 96 the slider sets curser and borders...;
-#N canvas 217 166 683 484 drawselection 0;
+#N canvas 217 166 685 486 drawselection 0;
 #X obj 445 186 t b f;
 #X obj 61 221 t b f;
 #X obj 223 187 -;
@@ -589,7 +589,7 @@ and graphic-positions;
 #X restore 332 83 pd inside;
 #X obj 399 96 outlet;
 #X obj 3 0 hsl 300 120 0 299 0 0 \$0-sliders \$0-sliderr empty -2 -6
-1728 8 -262144 -1 -1 14500 0;
+1728 8 -262144 -1 -1 10500 0;
 #X obj 0 0 cnv 15 305 120 empty empty empty 20 12 0 14 -262144 -66577
 0;
 #X obj 2 0 cnv 15 300 120 empty empty empty 20 12 0 14 -225271 -66577

@@ -147,7 +147,7 @@ BL VecOp::d_phasor(OpParam &p)
 	register R ph = p.gen.ph,phinc = p.gen.phinc;
 	if(p.revdir) ph -= (p.frames-1)*(phinc = -phinc);
 
-	for(; p.frames--; ph += phinc,p.rddt += p.rds) *p.rddt = fmod(ph,1.F);
+	for(; p.frames--; ph += phinc,p.rddt += p.rds) *p.rddt = fmod((F)ph,1.F);
 	return true;
 }
 
@@ -158,7 +158,7 @@ BL VecOp::d_mphasor(OpParam &p)
 	register R ph = p.gen.ph,phinc = p.gen.phinc;
 	if(p.revdir) ph -= (p.frames-1)*(phinc = -phinc);
 
-	for(; p.frames--; ph += phinc,p.rddt += p.rds,p.rsdt += p.rss) *p.rddt = *p.rsdt * fmod(ph,1.F);
+	for(; p.frames--; ph += phinc,p.rddt += p.rds,p.rsdt += p.rss) *p.rddt = *p.rsdt * fmod((F)ph,1.F);
 	return true;
 }
 

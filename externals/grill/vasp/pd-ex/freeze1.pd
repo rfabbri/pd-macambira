@@ -1,47 +1,49 @@
-#N canvas 14 73 985 521 12;
-#N canvas 387 42 591 680 freeze 0;
-#X obj 26 130 vasp.split 2;
-#X obj 30 459 vasp.join 2;
+#N canvas 4 72 956 500 12;
+#N canvas 293 9 609 698 freeze 1;
+#X obj 27 137 vasp.split 2;
+#X obj 30 463 vasp.join 2;
 #X obj 27 74 vasp.cfft @detach 1;
-#X obj 30 516 vasp.c!fft @detach 1;
+#X obj 32 519 vasp.c!fft @detach 1;
 #X obj 25 13 inlet;
 #X obj 32 617 outlet;
 #X obj 91 230 * 0.01;
 #X obj 302 17 inlet;
-#X obj 26 100 vasp.polar @detach 1;
-#X obj 30 487 vasp.rect @detach 1;
-#X obj 29 316 vasp.gate @detach 1;
+#X obj 26 107 vasp.polar @detach 1;
+#X obj 32 490 vasp.rect @detach 1;
+#X obj 29 321 vasp.gate @detach 1;
 #X obj 95 374 vasp.noise @detach 1;
-#X obj 29 426 vasp.sync;
+#X obj 29 434 vasp.sync;
 #X obj 91 208 vasp.max? @detach 1;
 #X obj 381 17 inlet;
 #X obj 167 619 outlet;
 #X obj 32 591 vasp.opt;
-#N canvas 238 212 466 316 non0 0;
+#N canvas 238 212 472 322 non0 0;
 #X obj 58 254 outlet;
 #X obj 60 158 / 1;
-#X obj 26 21 inlet;
-#X obj 26 49 t a a;
+#X obj 26 11 inlet;
+#X obj 26 39 t a a;
 #X obj 234 77 vasp.f?;
-#X obj 26 80 vasp.!= 0 @detach 1;
-#X obj 27 109 vasp.sum?;
+#X obj 46 98 vasp.!= 0 @detach 1;
+#X obj 27 124 vasp.sum?;
 #X obj 60 195 rmstodb;
 #X obj 60 225 - 100;
+#X obj 47 71 vasp.!;
 #X connect 1 0 7 0;
 #X connect 2 0 3 0;
-#X connect 3 0 5 0;
+#X connect 3 0 6 0;
 #X connect 3 1 4 0;
 #X connect 4 0 1 1;
 #X connect 5 0 6 0;
 #X connect 6 1 1 0;
 #X connect 7 0 8 0;
 #X connect 8 0 0 0;
+#X connect 9 0 5 0;
 #X restore 164 553 pd non0;
 #X obj 32 564 vasp.n 0;
 #X obj 302 45 + 100;
 #X obj 326 117 expr pow(2. \, -$f1/1200);
 #X obj 300 76 dbtorms;
-#N canvas 445 282 478 328 cplx 0;
+#N canvas 445 282 482 332 cplx 0;
 #X obj 19 229 vasp.join;
 #X obj 19 73 t a b a;
 #X obj 149 137 vasp.f?;
@@ -63,42 +65,41 @@
 #X connect 10 0 0 0;
 #X connect 10 1 0 1;
 #X restore 27 43 pd cplx;
-#X text 280 159 resample;
+#X text 281 166 resample;
 #X text 146 230 find spectral peak;
-#X text 191 315 gate spectrum below threshold;
-#X text 110 426 wait for threads to finish;
-#X obj 95 399 vasp.* 3.14159 @detach 1;
+#X text 203 320 gate spectrum below threshold;
+#X text 106 435 wait for threads to finish;
 #X text 193 75 FFT;
 #X text 195 100 -> polar;
 #X text 191 487 -> cartesian;
 #X text 201 515 inverse FFT;
 #X text 266 371 randomize complex arguments;
 #X text 228 551 get spectral density;
-#X obj 25 156 vasp.xtilt 1 @detach 1 @inter 2;
-#X obj 30 345 vasp.pow @detach 1;
+#X obj 28 168 vasp.xtilt 1 @detach 1 @inter 2;
+#X obj 30 347 vasp.pow @detach 1;
 #X obj 441 21 inlet;
-#X text 184 344 treat spectrum exponentially;
+#X text 194 347 treat spectrum exponentially;
 #X obj 398 444 loadbang;
 #X msg 398 469 detach 1;
 #X text 105 591 normalize result;
 #X text 391 490 no attributes yet;
-#X obj 26 179 t a a;
+#X obj 28 238 t a a;
 #X obj 28 288 vasp;
 #X obj 89 257 t b f;
-#X connect 0 0 34 0;
+#X obj 95 399 vasp.* 3.14159 @detach 1;
+#X connect 0 0 33 0;
 #X connect 0 1 11 0;
 #X connect 1 0 9 0;
 #X connect 2 0 8 0;
 #X connect 3 0 18 0;
 #X connect 4 0 22 0;
-#X connect 6 0 44 0;
+#X connect 6 0 43 0;
 #X connect 7 0 19 0;
 #X connect 8 0 0 0;
 #X connect 9 0 3 0;
-#X connect 10 0 35 0;
-#X connect 11 0 27 0;
+#X connect 10 0 34 0;
+#X connect 11 0 44 0;
 #X connect 12 0 1 0;
-#X connect 12 0 17 0;
 #X connect 12 1 1 1;
 #X connect 13 0 6 0;
 #X connect 14 0 20 0;
@@ -106,23 +107,24 @@
 #X connect 17 0 15 0;
 #X connect 18 0 16 0;
 #X connect 19 0 21 0;
-#X connect 20 0 34 1;
+#X connect 20 0 33 1;
 #X connect 21 0 6 1;
 #X connect 22 0 2 0;
-#X connect 27 0 12 1;
-#X connect 34 0 42 0;
-#X connect 35 0 12 0;
-#X connect 36 0 35 1;
-#X connect 38 0 39 0;
-#X connect 39 0 16 0;
-#X connect 42 0 13 0;
-#X connect 42 1 43 1;
-#X connect 43 0 10 0;
-#X connect 44 0 43 0;
-#X connect 44 1 10 1;
+#X connect 33 0 41 0;
+#X connect 34 0 12 0;
+#X connect 34 0 17 0;
+#X connect 35 0 34 1;
+#X connect 37 0 38 0;
+#X connect 38 0 16 0;
+#X connect 41 0 13 0;
+#X connect 41 1 42 1;
+#X connect 42 0 10 0;
+#X connect 43 0 42 0;
+#X connect 43 1 10 1;
+#X connect 44 0 12 1;
 #X restore 18 331 pd freeze;
-#X obj 104 214 nbx 6 18 -100 0 0 1 empty empty noise_rejection(dB)
-0 -8 0 12 -225271 -1 -1 -13 256;
+#X obj 104 214 nbx 6 18 -100 0 0 1 empty empty spectral_gate(dB) 0
+-8 0 12 -225271 -1 -1 -20 256;
 #X obj 104 257 nbx 7 18 -10000 10000 0 1 empty empty transpose(cents)
 0 -8 0 12 -225271 -1 -1 0 256;
 #X obj 448 278 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -181,8 +183,8 @@
 #X restore 448 250 pd open;
 #X msg 381 222 stop;
 #N canvas 0 0 450 300 graph10 0;
-#X array src 4e+006 float 0;
-#X coords 0 1 4e+006 -1 600 150 1;
+#X array src 165888 float 0;
+#X coords 0 1 165887 -1 600 150 1;
 #X restore 322 20 graph;
 #X msg 447 222 new;
 #X msg 482 222 again;
@@ -194,10 +196,10 @@
 #X text 128 13 make static sound;
 #X obj 18 108 bng 25 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
 -1;
-#X obj 105 115 nbx 12 18 0 1e+008 0 1 empty empty length(frames) 0
--8 0 12 -225271 -1 -1 4e+006 256;
-#X obj 85 368 nbx 9 14 -1e+037 1e+037 0 0 empty empty spectral_density
-0 -6 0 10 -262131 -1 -1 0.00090725 256;
+#X obj 107 115 nbx 12 18 0 1e+008 0 1 empty empty length(frames) 0
+-8 0 12 -225271 -1 -1 1e+006 256;
+#X obj 85 368 nbx 9 14 -1e+037 1e+037 0 0 empty empty spectral_density(dB)
+0 -6 0 10 -262131 -1 -1 -65.3592 256;
 #X obj 332 197 cnv 15 100 20 empty empty play_src 5 8 0 10 -261681
 -66577 0;
 #X obj 447 197 cnv 15 100 20 empty empty read_src 5 8 0 10 -261681
@@ -205,14 +207,14 @@
 #X obj 727 197 cnv 15 100 20 empty empty write_dst 5 8 0 10 -261681
 -66577 0;
 #N canvas 0 0 450 300 graph10 0;
-#X array dst 4e+006 float 0;
-#X coords 0 1 4e+006 -1 600 150 1;
+#X array dst 1e+006 float 0;
+#X coords 0 1 999999 -1 600 150 1;
 #X restore 325 304 graph;
 #X msg 663 223 stop;
 #X msg 614 223 play;
 #X obj 614 198 cnv 15 100 20 empty empty play_dst 5 8 0 10 -261681
 -66577 0;
-#N canvas 0 0 501 353 playsrc 0;
+#N canvas 0 0 503 355 playsrc 0;
 #X obj 18 245 dac~;
 #X obj 19 21 inlet;
 #X obj 17 49 route play;
@@ -261,7 +263,7 @@
 #X connect 3 0 0 1;
 #X connect 3 1 4 0;
 #X restore 614 251 pd playdst;
-#N canvas 249 202 537 480 copy 0;
+#N canvas 249 202 547 490 copy 0;
 #X obj 27 26 inlet;
 #X obj 27 51 t b b;
 #X obj 316 19 inlet;
@@ -312,9 +314,9 @@
 #X restore 18 159 pd copy;
 #X text 85 160 copy and resize;
 #X obj 323 170 hsl 600 15 0 1 0 1 \$0-r2 empty empty -2 -6 1152 8 -262131
--1 -1 15700 1;
+-1 -1 52000 1;
 #X obj 323 5 hsl 600 15 0 1 0 1 \$0-r1 empty empty -2 -6 1152 8 -262131
--1 -1 13000 1;
+-1 -1 28800 1;
 #N canvas 148 330 301 261 sel 0;
 #X obj 30 25 r \$0-r1;
 #X obj 110 25 r \$0-r2;
@@ -349,6 +351,10 @@
 #X text 76 412 update graphics;
 #X obj 28 381 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
+#X obj 331 277 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 613 277 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
 #X connect 0 0 37 0;
 #X connect 0 1 18 0;
 #X connect 1 0 0 1;
@@ -365,6 +371,10 @@
 #X connect 17 0 28 1;
 #X connect 23 0 27 0;
 #X connect 24 0 27 0;
+#X connect 26 0 40 0;
+#X connect 27 0 41 0;
 #X connect 28 0 0 0;
 #X connect 35 0 0 3;
 #X connect 39 0 37 0;
+#X connect 40 0 13 0;
+#X connect 41 0 24 0;
