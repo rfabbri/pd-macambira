@@ -33,6 +33,13 @@ glist has its own window, even if miniaturized.
 
 */
 
+/* NOTE: this file describes Pd implementation details which may change
+in future releases.  The public (stable) API is in m_pd.h. */  
+
+#if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
+extern "C" {
+#endif
+
 /* --------------------- geometry ---------------------------- */
 #define IOWIDTH 7   	/* width of an inlet/outlet in pixels */
 #define IOMIDDLE ((IOWIDTH-1)/2)
@@ -190,9 +197,11 @@ typedef struct _dataslot
     t_symbol *ds_arraytemplate;	    /* filled in for arrays only */
 } t_dataslot;
 
+
+/* T.Grill - changed t_pd member to t_pdobj to avoid name clashed */
 typedef struct _template
 {
-    t_pd t_pd;	    	    	/* header */
+    t_pd t_pdobj;	    	/* header */
     struct _gtemplate *t_list;	/* list of "struct"/gtemplate objects */
     t_symbol *t_sym;	    	/* name */
     int t_n;	    	    	/* number of dataslots (fields) */
@@ -280,27 +289,27 @@ doesn't work on array elements... LATER reconsider this */
 
     	/* bounding rectangle: */
 typedef void (*t_parentgetrectfn)(t_gobj *x, struct _glist *glist,
-    t_word *data, t_template *template, float basex, float basey,
+    t_word *data, t_template *tmpl, float basex, float basey,
     int *x1, int *y1, int *x2, int *y2);
     	/* displace it */
 typedef void (*t_parentdisplacefn)(t_gobj *x, struct _glist *glist, 
-    t_word *data, t_template *template, float basex, float basey,
+    t_word *data, t_template *tmpl, float basex, float basey,
     int dx, int dy);
     	/* change color to show selection */
 typedef void (*t_parentselectfn)(t_gobj *x, struct _glist *glist,
-    t_word *data, t_template *template, float basex, float basey,
+    t_word *data, t_template *tmpl, float basex, float basey,
     int state);
     	/* change appearance to show activation/deactivation: */
 typedef void (*t_parentactivatefn)(t_gobj *x, struct _glist *glist,
-    t_word *data, t_template *template, float basex, float basey,
+    t_word *data, t_template *tmpl, float basex, float basey,
     int state);
     	/*  making visible or invisible */
 typedef void (*t_parentvisfn)(t_gobj *x, struct _glist *glist,
-    t_word *data, t_template *template, float basex, float basey,
+    t_word *data, t_template *tmpl, float basex, float basey,
     int flag);
     	/*  field a mouse click */
 typedef int (*t_parentclickfn)(t_gobj *x, struct _glist *glist,
-    t_scalar *sc, t_template *template, float basex, float basey,
+    t_scalar *sc, t_template *tmpl, float basex, float basey,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
 struct _parentwidgetbehavior
@@ -411,10 +420,11 @@ EXTERN int text_shouldvis(t_text *x, t_glist *glist);
 #define RTEXT_DBL 3
 #define RTEXT_SHIFT 4
 
-EXTERN t_rtext *rtext_new(t_glist *glist, t_text *who, t_rtext *next,
-    int sendipup);
-EXTERN t_rtext *rtext_remove(t_rtext *first, t_rtext *x);
+EXTERN t_rtext *rtext_new(t_glist *glist, t_text *who);
 EXTERN t_rtext *glist_findrtext(t_glist *gl, t_text *who);
+EXTERN void rtext_draw(t_rtext *x);
+EXTERN void rtext_erase(t_rtext *x);
+EXTERN t_rtext *rtext_remove(t_rtext *first, t_rtext *x);
 EXTERN int rtext_height(t_rtext *x);
 EXTERN void rtext_displace(t_rtext *x, int dx, int dy);
 EXTERN void rtext_select(t_rtext *x, int state);
@@ -444,8 +454,8 @@ EXTERN t_inlet *canvas_addinlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rminlet(t_canvas *x, t_inlet *ip);
 EXTERN t_outlet *canvas_addoutlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rmoutlet(t_canvas *x, t_outlet *op);
-EXTERN void canvas_redrawallfortemplate(t_canvas *template);
-EXTERN void canvas_zapallfortemplate(t_canvas *template);
+EXTERN void canvas_redrawallfortemplate(t_canvas *tmpl);
+EXTERN void canvas_zapallfortemplate(t_canvas *tmpl);
 EXTERN void canvas_setusedastemplate(t_canvas *x);
 EXTERN t_canvas *canvas_getcurrent(void);
 EXTERN void canvas_setcurrent(t_canvas *x);
@@ -485,6 +495,17 @@ EXTERN void canvas_setundo(t_canvas *x, t_undofn undofn, void *buf,
 EXTERN void canvas_noundo(t_canvas *x);
 EXTERN int canvas_getindex(t_canvas *x, t_gobj *y);
 
+/* T.Grill - made public for dynamic object creation */
+/* in g_editor.c */
+EXTERN void canvas_connect(t_canvas *x,
+    t_floatarg fwhoout, t_floatarg foutno,t_floatarg fwhoin, t_floatarg finno);
+EXTERN void canvas_disconnect(t_canvas *x,
+    float index1, float outno, float index2, float inno);
+EXTERN int canvas_isconnected (t_canvas *x,
+    t_text *ob1, int n1, t_text *ob2, int n2);
+EXTERN void canvas_selectinrect(t_canvas *x, int lox, int loy, int hix, int hiy);
+
+
 /* ---- functions on canvasses as objects  --------------------- */
 
 EXTERN void canvas_fattenforscalars(t_canvas *x,
@@ -511,10 +532,10 @@ EXTERN int tscalar_click(t_tscalar *x, int xpix, int ypix, int shift,
 EXTERN t_template *garray_template(t_garray *x);
 
 /* -------------------- arrays --------------------- */
-EXTERN t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *template,
+EXTERN t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *tmpl,
     t_floatarg f, t_floatarg saveit);
 EXTERN t_array *array_new(t_symbol *templatesym, t_gpointer *parent);
-EXTERN void array_resize(t_array *x, t_template *template, int n);
+EXTERN void array_resize(t_array *x, t_template *tmpl, int n);
 EXTERN void array_free(t_array *x);
 
 /* --------------------- gpointers and stubs ---------------- */
@@ -523,8 +544,8 @@ EXTERN void gstub_cutoff(t_gstub *gs);
 EXTERN void gpointer_setglist(t_gpointer *gp, t_glist *glist, t_scalar *x);
 
 /* --------------------- scalars ------------------------- */
-EXTERN void word_init(t_word *wp, t_template *template, t_gpointer *gp);
-EXTERN void word_restore(t_word *wp, t_template *template,
+EXTERN void word_init(t_word *wp, t_template *tmpl, t_gpointer *gp);
+EXTERN void word_restore(t_word *wp, t_template *tmpl,
     int argc, t_atom *argv);
 EXTERN t_scalar *scalar_new(t_glist *owner,
     t_symbol *templatesym);
@@ -563,7 +584,7 @@ EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
 
 EXTERN t_template *gtemplate_get(t_gtemplate *x);
 EXTERN t_template *template_findbyname(t_symbol *s);
-EXTERN t_canvas *template_findcanvas(t_template *template);
+EXTERN t_canvas *template_findcanvas(t_template *tmpl);
 
 EXTERN t_float template_getfloat(t_template *x, t_symbol *fieldname,
     t_word *wp, int loud);
@@ -581,3 +602,7 @@ EXTERN void guiconnect_notarget(t_guiconnect *x, double timedelay);
 /* ------------- IEMGUI routines used in other g_ files ---------------- */
 EXTERN t_symbol *iemgui_raute2dollar(t_symbol *s);
 EXTERN t_symbol *iemgui_dollar2raute(t_symbol *s);
+
+#if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
+}
+#endif

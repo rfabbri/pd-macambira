@@ -23,17 +23,17 @@
 #include <sys/time.h>
 #include <errno.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <winsock.h>
 #include <io.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast double to float */
 #pragma warning( disable : 4101 )  /* unused local variables */
 #endif
 
-#ifdef NT
+#ifdef MSW
 #include "tk.h"
 #endif
 
@@ -66,7 +66,7 @@ void pdgui_sethost(char *name)
 
 static void pdgui_sockerror(char *s)
 {
-#ifdef NT
+#ifdef MSW
     int err = WSAGetLastError();
 #endif
 #ifdef UNIX
@@ -173,7 +173,7 @@ void pdgui_setupsocket(void)
 #else
     int retry = 1;
 #endif
-#ifdef NT
+#ifdef MSW
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
 
@@ -345,16 +345,16 @@ void pdgui_startup(Tcl_Interp *interp)
 
 
     	/* add our own TK commands */
-    Tcl_CreateCommand(interp, "pd",  pdCmd, (ClientData)NULL, 
+    Tcl_CreateCommand(interp, "pd",  (Tcl_CmdProc*)pdCmd, (ClientData)NULL, 
 	(Tcl_CmdDeleteProc *)NULL); 
 #ifndef UNIX
-    Tcl_CreateCommand(interp, "pd_pollsocket",  pd_pollsocketCmd,
+    Tcl_CreateCommand(interp, "pd_pollsocket",(Tcl_CmdProc*)  pd_pollsocketCmd,
     	(ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
 #endif
     pdgui_setupsocket();
     
 	/* read in the startup file */
-#if !defined(NT) && !defined(MACOSX)
+#if !defined(MSW) && !defined(MACOSX)
     pdgui_evalfile("pd.tk");
 #endif
 }

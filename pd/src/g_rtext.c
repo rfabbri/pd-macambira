@@ -10,7 +10,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "m_imp.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 #include "g_canvas.h"
 #include "t_tk.h"
 
@@ -22,9 +23,6 @@
 #define SEND_FIRST 1
 #define SEND_UPDATE 2
 #define SEND_CHECK 0
-
-static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
-    int *indexp);
 
 struct _rtext
 {
@@ -43,7 +41,7 @@ struct _rtext
     struct _rtext *x_next;
 };
 
-t_rtext *rtext_new(t_glist *glist, t_text *who, t_rtext *next, int senditup)
+t_rtext *rtext_new(t_glist *glist, t_text *who)
 {
     t_rtext *x = (t_rtext *)getbytes(sizeof *x);
     int w = 0, h = 0, indx;
@@ -57,24 +55,13 @@ t_rtext *rtext_new(t_glist *glist, t_text *who, t_rtext *next, int senditup)
     glist->gl_editor->e_rtext = x;
     sprintf(x->x_tag, ".x%x.t%x", (t_int)glist_getcanvas(x->x_glist),
     	(t_int)x);
-    if (senditup)
-    	rtext_senditup(x, SEND_FIRST, &w, &h, &indx);
     return (x);
-}
-
-/* iemlib version (now incorporated into rtext_new() via the "senditup" arg) */
-
-t_rtext *rtext_new_without_senditup(t_glist *glist, t_text *who, t_rtext *next)
-{
-    return (rtext_new(glist, who, next, 0));
 }
 
 static t_rtext *rtext_entered;
 
 void rtext_free(t_rtext *x)
 {
-    sys_vgui(".x%x.c delete %s\n", glist_getcanvas(x->x_glist),
-    	x->x_tag);
     if (x->x_glist->gl_editor->e_textedfor == x)
     	x->x_glist->gl_editor->e_textedfor = 0;
     if (x->x_glist->gl_editor->e_rtext == x)
@@ -337,6 +324,17 @@ int rtext_height(t_rtext *x)
     int w = 0, h = 0, indx;
     rtext_senditup(x, SEND_CHECK, &w, &h, &indx);
     return (h);
+}
+
+void rtext_draw(t_rtext *x)
+{
+    int w = 0, h = 0, indx;
+    rtext_senditup(x, SEND_FIRST, &w, &h, &indx);
+}
+
+void rtext_erase(t_rtext *x)
+{
+    sys_vgui(".x%x.c delete %s\n", glist_getcanvas(x->x_glist), x->x_tag);
 }
 
 void rtext_displace(t_rtext *x, int dx, int dy)

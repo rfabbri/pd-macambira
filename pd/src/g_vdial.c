@@ -11,7 +11,7 @@ put out a "float" as in sliders, toggles, etc. */
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "m_imp.h"
+#include "m_pd.h"
 #include "g_canvas.h"
 #include "t_tk.h"
 #include "g_all_guis.h"
@@ -356,7 +356,12 @@ static void vradio_bang(t_vradio *x)
 	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
 	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
     }
-    else outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on);
+    else
+    {
+    	outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_float(x->x_gui.x_snd->s_thing, x->x_on);
+    }
 }
 
 static void vradio_fout(t_vradio *x, t_floatarg f)
@@ -393,6 +398,8 @@ static void vradio_fout(t_vradio *x, t_floatarg f)
     else
     {
     	outlet_float(x->x_gui.x_obj.ob_outlet, x->x_on = i);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_float(x->x_gui.x_snd->s_thing, x->x_on);
 	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 	x->x_on_old = x->x_on;
     }

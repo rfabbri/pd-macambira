@@ -10,8 +10,8 @@ inputs to int and their outputs back to float. */
 #include <math.h>
 
 
-/* NT and OSX don't appear to have single-precision ANSI math */
-#if defined(NT) || defined(MACOSX)
+/* MSW and OSX don't appear to have single-precision ANSI math */
+#if defined(MSW) || defined(MACOSX)
 #define sinf sin
 #define cosf cos
 #define atanf atan
@@ -636,7 +636,7 @@ static void *exp_new(void)
 static void exp_float(t_object *x, t_float f)
 {
     float g;
-#ifdef NT
+#ifdef MSW
     char buf[10];
 #endif
     if (f > MAXLOG) f = MAXLOG;
@@ -665,7 +665,6 @@ static t_class *clip_class;
 typedef struct _clip
 {
     t_object x_ob;
-    t_outlet *x_out2;
     float x_f1;
     float x_f2;
 } t_clip;
@@ -676,7 +675,6 @@ static void *clip_new(t_floatarg f1, t_floatarg f2)
     floatinlet_new(&x->x_ob, &x->x_f1);
     floatinlet_new(&x->x_ob, &x->x_f2);
     outlet_new(&x->x_ob, &s_float);
-    x->x_out2 = outlet_new(&x->x_ob, &s_float);
     x->x_f1 = f1;
     x->x_f2 = f2;
     return (x);

@@ -35,10 +35,10 @@ For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "LICENSE.txt," included in the Pd distribution.
 (Note that tcl/tk, expr, and some other files are copyrighted separately).
 
-ACKNOWLEDGEMENTS.  Thanks to Harry Castle, Mark Danks, Christian Feldbauer,
-Guenter Geiger, Kerry Hagan, Trevor Johnson, Fernando Lopez-Lezcano, Karl
-MacMillan, Thomas Musil, Toshinori Ohkouchi, Winfried Ritsch, Vibeke Sorensen,
-Rand Steiger, Shahrokh Yadegari, David Zicarelli, Iohannes Zmoelnig, and
-probably many others for contributions of code, documentation, ideas, and
-expertise.  This work has received generous support from the Intel Research
-Council.
+ACKNOWLEDGEMENTS.  Thanks to Harry Castle, Krzysztof Czaja, Mark Danks,
+Christian Feldbauer, Guenter Geiger, Kerry Hagan, Trevor Johnson, Fernando
+Lopez-Lezcano, Adam Lindsay, Karl MacMillan, Thomas Musil, Toshinori Ohkouchi,
+Winfried Ritsch, Vibeke Sorensen, Rand Steiger, Shahrokh Yadegari, David
+Zicarelli, Iohannes Zmoelnig, and probably many others for contributions of
+code, documentation, ideas, and expertise.  This work has received generous
+support from the Intel Research Council.

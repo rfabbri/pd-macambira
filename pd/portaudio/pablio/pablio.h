@@ -7,7 +7,7 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: pablio.h,v 1.1.1.1 2002-07-29 17:06:17 ggeiger Exp $
+ * $Id: pablio.h,v 1.1.1.2 2003-05-09 16:03:59 ggeiger Exp $
  * PABLIO.h
  * Portable Audio Blocking read/write utility.
  *
@@ -96,8 +96,9 @@ long GetAudioStreamReadable( PABLIO_Stream *aStream );
  *
  * flags parameter can be an ORed combination of:
  *    PABLIO_READ, PABLIO_WRITE, or PABLIO_READ_WRITE,
+ *    and either PABLIO_MONO or PABLIO_STEREO
  */
-PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
+PaError OpenAudioStream( PABLIO_Stream **aStreamPtr, double sampleRate,
                          PaSampleFormat format, long flags );
 
 PaError CloseAudioStream( PABLIO_Stream *aStream );

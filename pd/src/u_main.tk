@@ -14,19 +14,26 @@ set pd_nt 0
 #
 # all this changes are labeled with #######iemlib##########
 
+# Tearoff is set to true by default:
+set pd_tearoff 1
+
 if {$pd_nt == 1} {
     global pd_guidir
+    global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
     regsub -all \\\\ $pd_gui2 / pd_gui3
     set pd_guidir $pd_gui3/..
     load $pd_guidir/bin/pdtcl
+    set pd_tearoff 1
 }
 
 if {$pd_nt == 2} {
     global pd_guidir
+    global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
     set pd_guidir $pd_gui2/..
     load $pd_guidir/bin/pdtcl
+    set pd_tearoff 0
 }
 
 # it's unfortunate but we seem to have to turn off global bindings
@@ -40,22 +47,27 @@ bind Text <Control-s> {}
 # puts stderr [bind all]
 
 ################## set up main window #########################
-frame .mbar -relief raised -bd 2
-canvas .dummy -height 1c -width 1c
+menu .mbar
+canvas .dummy -height 2p -width 9c
+
 frame .controls
-pack .mbar .controls .dummy -side top -fill x
-menubutton .mbar.file -text File -menu .mbar.file.menu
-menubutton .mbar.find -text Find -menu .mbar.find.menu
-menubutton .mbar.windows -text Windows -menu .mbar.windows.menu
-menubutton .mbar.audio -text Audio -menu .mbar.audio.menu
-menubutton .mbar.help -text Help -menu .mbar.help.menu
-pack .mbar.file .mbar.find .mbar.windows .mbar.audio -side left 
-pack .mbar.help -side right
-menu .mbar.file.menu
-menu .mbar.find.menu
-menu .mbar.windows.menu -postcommand [concat pdtk_fixwindowmenu]
-menu .mbar.audio.menu
-menu .mbar.help.menu
+pack .controls .dummy -side top -fill x
+menu .mbar.file -tearoff $pd_tearoff
+.mbar add cascade -label "File" -menu .mbar.file
+menu .mbar.find -tearoff $pd_tearoff
+.mbar add cascade -label "Find" -menu .mbar.find
+menu .mbar.windows -postcommand [concat pdtk_fixwindowmenu] -tearoff $pd_tearoff
+menu .mbar.audio -tearoff $pd_tearoff
+if {$pd_nt != 2} {
+    .mbar add cascade -label "Windows" -menu .mbar.windows
+    .mbar add cascade -label "Audio" -menu .mbar.audio
+} else {
+# Perhaps this is silly, but Mac HIG want "Window  Help" as the last menus
+    .mbar add cascade -label "Audio" -menu .mbar.audio
+    .mbar add cascade -label "Window" -menu .mbar.windows
+}
+menu .mbar.help -tearoff $pd_tearoff
+.mbar add cascade -label "Help" -menu .mbar.help
 
 set ctrls_audio_on 0
 set ctrls_meter_on 0
@@ -75,28 +87,34 @@ checkbutton .controls.switches.meterbutton -text {peak meters} \
 
 pack .controls.switches.meterbutton .controls.switches.audiobutton -side left
 
-frame .controls.in
-label .controls.in.label -text IN
-entry .controls.in.level -textvariable ctrls_inlevel -width 3
-button .controls.in.clip -text {CLIP} -state disabled
-pack .controls.in.label .controls.in.level .controls.in.clip -side top
+frame .controls.inout
+frame .controls.inout.in
+label .controls.inout.in.label -text IN
+entry .controls.inout.in.level -textvariable ctrls_inlevel -width 3
+button .controls.inout.in.clip -text {CLIP} -state disabled
+pack .controls.inout.in.label .controls.inout.in.level \
+      .controls.inout.in.clip -side top -pady 2
 
-frame .controls.out
-label .controls.out.label -text OUT
-entry .controls.out.level -textvariable ctrls_outlevel -width 3
-button .controls.out.clip -text {CLIP} -state disabled
-pack .controls.out.label .controls.out.level .controls.out.clip -side top
+frame .controls.inout.out
+label .controls.inout.out.label -text OUT
+entry .controls.inout.out.level -textvariable ctrls_outlevel -width 3
+button .controls.inout.out.clip -text {CLIP} -state disabled
+pack .controls.inout.out.label .controls.inout.out.level \
+      .controls.inout.out.clip -side top -pady 2
 
 button .controls.dio -text "DIO\nerrors" \
     -command {pd [concat pd audiostatus \;]}
 
-pack .controls.switches -side bottom
-pack .controls.in .controls.out -side left
-pack .controls.dio -side right
+pack .controls.switches -side bottom -pady 12
+pack .controls.inout.in .controls.inout.out -side left -padx 6
+pack .controls.inout -side left -padx 14
+pack .controls.dio -side right -padx 20
 
 bind . <Control-Key> {pdtk_pd_ctrlkey %W %K 0}
 bind . <Control-Shift-Key> {pdtk_pd_ctrlkey %W %K 1}
 
+wm title . "Pd"
+. configure -menu .mbar -width 200 -height 150
 
 ############### set up global variables ################################
 
@@ -136,12 +154,32 @@ set menu_windowlist {}
 
 proc pdtk_fixwindowmenu {} {
     global menu_windowlist
-    .mbar.windows.menu delete 0 end
+    .mbar.windows delete 0 end
     foreach i $menu_windowlist {
-	.mbar.windows.menu add command -label [lindex $i 0] \
+	.mbar.windows add command -label [lindex $i 0] \
 	    -command [concat menu_domenuwindow [lindex $i 1]]
+        menu_fixwindowmenu [lindex $i 1]
     }
 }
+
+####### Odd little function to make better Mac accelerators #####
+
+proc accel_munge {acc} {
+    global pd_nt
+
+    if {$pd_nt == 2} {
+	if [string is upper [string index $acc end]] {
+	    return [format "%s%s" "Shift+" \
+			[string toupper [string map {Ctrl Meta} $acc] end]]
+	} else {
+	    return [string toupper [string map {Ctrl Meta} $acc] end]
+	}
+    } else {
+	return $acc
+    }
+}
+
+
 
 ###############  the "New" menu command  ########################
 proc menu_new {} {
@@ -248,6 +286,10 @@ proc menu_documentation {} {
 	    	exec sh -c \
 		    [format "mozilla file:%s || netscape file:%s &\n" \
 		    	 $filename $filename]
+            } elseif {$pd_nt == 2} {
+		puts stderr [format "open %s" $filename]
+                exec sh -c \
+		    [format "open %s" $filename]
 	    } else {
 	    tk_messageBox -message \
 	    	{sorry -- can't open htm files yet; open this manually} \
@@ -278,33 +320,35 @@ proc menu_doc_open {subdir basename} {
 }
 
 #################### the "File" menu for the Pd window ##############
-.mbar.file.menu add command -label New -command {menu_new} \
-    -accelerator "Ctrl+n"
-.mbar.file.menu add command -label Open -command {menu_open} \
-    -accelerator "Ctrl+o"
-.mbar.file.menu add command -label Message -command {menu_send} \
-    -accelerator "Ctrl+m"
-.mbar.file.menu add  separator
-.mbar.file.menu add command -label Quit -command {menu_quit} \
-    -accelerator "Ctrl+q"
+
+.mbar.file add command -label New -command {menu_new} \
+    -accelerator [accel_munge "Ctrl+n"]
+.mbar.file add command -label Open -command {menu_open} \
+    -accelerator [accel_munge "Ctrl+o"]
+.mbar.file add  separator
+.mbar.file add command -label Message -command {menu_send} \
+    -accelerator [accel_munge "Ctrl+m"]
+.mbar.file add  separator
+.mbar.file add command -label Quit -command {menu_quit} \
+    -accelerator [accel_munge "Ctrl+q"]
 
 #################### the "Find" menu for the Pd window ##############
-.mbar.find.menu add command -label {last error?} -command {menu_finderror} 
+.mbar.find add command -label {last error?} -command {menu_finderror} 
 
 #################### the "Audio" menu for the Pd window ##############
-.mbar.audio.menu add command -label On -accelerator "Ctrl+/" \
+.mbar.audio add command -label On -accelerator [accel_munge "Ctrl+/"] \
     -command {menu_audio 1} 
-.mbar.audio.menu add command -label Off -accelerator "Ctrl+." \
+.mbar.audio add command -label Off -accelerator [accel_munge "Ctrl+."] \
     -command {menu_audio 0} 
 
 #################### the "Help" menu for the Pd window ##############
-.mbar.help.menu add command -label {About Pd} \
+.mbar.help add command -label {About Pd} \
     -command {menu_doc_open doc/1.manual 1.introduction.txt} 
-.mbar.help.menu add command -label {Test Audio and MIDI} \
+.mbar.help add command -label {Test Audio and MIDI} \
     -command {menu_doc_open doc/7.stuff/tools testtone.pd} 
-.mbar.help.menu add command -label {Load Meter} \
+.mbar.help add command -label {Load Meter} \
     -command {menu_doc_open doc/7.stuff/tools load-meter.pd} 
-.mbar.help.menu add command -label {Pure Documentation...} \
+.mbar.help add command -label {Pure Documentation...} \
     -command {menu_documentation} 
 
 ###########  functions for menu functions on document windows ########
@@ -320,7 +364,13 @@ proc menu_saveas {name} {
 }
 
 proc menu_print {name} {
-    $name.c postscript -file x.ps
+    set filename [tk_getSaveFile -initialfile pd.ps \
+       -defaultextension .ps \
+       -filetypes { {{postscript} {.ps}} }]
+
+    if {$filename != ""} {
+    	$name.c postscript -file $filename
+    }
 }
 
 proc menu_close {name} {
@@ -456,15 +506,16 @@ proc menu_fixeditmenu {name} {
     global pd_undocanvas
 #    puts stderr [concat menu_fixeditmenu $name $pd_undocanvas $pd_undoaction]
     if {$name == $pd_undocanvas && $pd_undoaction != "no"} {
-	$name.m.edit.m entryconfigure "Undo*" -state normal \
+	$name.m.edit entryconfigure "Undo*" -state normal \
 	    -label [concat "Undo " $pd_undoaction]
     } else {
-	$name.m.edit.m entryconfigure "Undo*" -state disabled -label "Undo"
+	$name.m.edit entryconfigure "Undo*" -state disabled -label "Undo"
     }
     if {$name == $pd_undocanvas && $pd_redoaction != "no"} {
-	$name.m.edit.m entryconfigure "Redo" -state normal
+	$name.m.edit entryconfigure "Redo*" -state normal\
+            -label [concat "Redo " $pd_redoaction]
     } else {
-	$name.m.edit.m entryconfigure "Redo" -state disabled
+	$name.m.edit entryconfigure "Redo*" -state disabled
     }
 }
 
@@ -477,6 +528,10 @@ proc pdtk_undomenu {name undoaction redoaction} {
     set pd_undocanvas $name
     set pd_undoaction $undoaction
     set pd_redoaction $redoaction
+    if {$name != "nobody"} {
+#    unpleasant way of avoiding a more unpleasant bug situation --atl 2002.11.25
+        menu_fixeditmenu $name
+    }
 }
 
 proc menu_windowparent {name} {
@@ -497,10 +552,15 @@ proc menu_domenuwindow {i} {
 
 proc menu_fixwindowmenu {name} {
     global menu_windowlist
-    $name.m.windows.m add command
-    $name.m.windows.m delete 4 end
+    global pd_tearoff
+    $name.m.windows add command
+    if $pd_tearoff {
+	$name.m.windows delete 4 end
+    } else {
+	$name.m.windows delete 3 end
+    }
     foreach i $menu_windowlist {
-	$name.m.windows.m add command -label [lindex $i 0] \
+	$name.m.windows add command -label [lindex $i 0] \
 	    -command [concat menu_domenuwindow [lindex $i 1]]
     }
 }
@@ -564,9 +624,10 @@ proc menu_findobject {canvas} {
 ############# pdtk_canvas_new -- create a new canvas ###############
 proc pdtk_canvas_new {name width height geometry editable} {
     global pd_opendir
-    
-    toplevel $name
-    frame $name.m -relief raised -bd 2
+    global pd_tearoff
+    global pd_nt
+
+    toplevel $name -menu $name.m
 #    puts stderr [concat geometry: $geometry]
     wm geometry $name $geometry
     canvas $name.c -width $width -height $height -background white \
@@ -578,7 +639,6 @@ proc pdtk_canvas_new {name width height geometry editable} {
     scrollbar $name.scrollhort -command "$name.c xview" \
     	-orient horizontal
 
-    pack $name.m -side top -fill x
     pack $name.scrollhort -side bottom -fill x
     pack $name.scrollvert -side right -fill y
     pack $name.c -side left -expand 1 -fill both
@@ -586,209 +646,222 @@ proc pdtk_canvas_new {name width height geometry editable} {
     wm geometry $name $geometry
 # the file menu
 
-    menubutton $name.m.file -text File -menu $name.m.file.m
-    pack $name.m.file -side left
-    menu $name.m.file.m
+    menu $name.m
+    menu $name.m.file -tearoff $pd_tearoff
+    $name.m add cascade -label File -menu $name.m.file
 
-    $name.m.file.m add command -label New -command {menu_new} \
-	-accelerator "Ctrl+n"
+    $name.m.file add command -label New -command {menu_new} \
+	-accelerator [accel_munge "Ctrl+n"]
 
-    $name.m.file.m add command -label Open -command {menu_open} \
-	-accelerator "Ctrl+o"
+    $name.m.file add command -label Open -command {menu_open} \
+	-accelerator [accel_munge "Ctrl+o"]
 
-    $name.m.file.m add command -label Message -command {menu_send} \
-	-accelerator "Ctrl+m"
+    $name.m.file add  separator
+    $name.m.file add command -label Message -command {menu_send} \
+	-accelerator [accel_munge "Ctrl+m"]
 
-    $name.m.file.m add  separator
-    $name.m.file.m add command -label Save -command [concat menu_save $name] \
-	-accelerator "Ctrl+s"
-
-    $name.m.file.m add command -label Close \
+    $name.m.file add  separator
+    $name.m.file add command -label Close \
     	-command [concat menu_close $name] \
-	-accelerator "Ctrl+w"
+	-accelerator [accel_munge "Ctrl+w"]
 
-    $name.m.file.m add command -label "Save as..." \
+    $name.m.file add command -label Save -command [concat menu_save $name] \
+	-accelerator [accel_munge "Ctrl+s"]
+
+    $name.m.file add command -label "Save as..." \
     	-command [concat menu_saveas $name] \
-	-accelerator "Ctrl+S"
+	-accelerator [accel_munge "Ctrl+S"]
 
-    $name.m.file.m add command -label Print -command [concat menu_print $name] \
-	-accelerator "Ctrl+p"
+    $name.m.file add command -label Print -command [concat menu_print $name] \
+	-accelerator [accel_munge "Ctrl+p"]
 
-    $name.m.file.m add separator
+    $name.m.file add separator
 
-    $name.m.file.m add command -label Quit -command {menu_quit} \
-	-accelerator "Ctrl+q"
+    $name.m.file add command -label Quit -command {menu_quit} \
+	-accelerator [accel_munge "Ctrl+q"]
 
 # the edit menu
-    menubutton $name.m.edit -text Edit -menu $name.m.edit.m
-    pack $name.m.edit -side left
-    menu $name.m.edit.m -postcommand [concat menu_fixeditmenu $name]
+    menu $name.m.edit -postcommand [concat menu_fixeditmenu $name] -tearoff $pd_tearoff
+    $name.m add cascade -label Edit -menu $name.m.edit
     
-    $name.m.edit.m add command -label Undo -command [concat menu_undo $name] \
-	-accelerator "Ctrl+z"
+    $name.m.edit add command -label Undo -command [concat menu_undo $name] \
+	-accelerator [accel_munge "Ctrl+z"]
 
-    $name.m.edit.m add command -label Redo -command [concat menu_redo $name] \
-	-accelerator "Ctrl+Z"
+    $name.m.edit add command -label Redo -command [concat menu_redo $name] \
+	-accelerator [accel_munge "Ctrl+Z"]
 
-    $name.m.edit.m add separator
+    $name.m.edit add separator
 
-    $name.m.edit.m add command -label Cut -command [concat menu_cut $name] \
-	-accelerator "Ctrl+x"
+    $name.m.edit add command -label Cut -command [concat menu_cut $name] \
+	-accelerator [accel_munge "Ctrl+x"]
 
-    $name.m.edit.m add command -label Copy -command [concat menu_copy $name] \
-	-accelerator "Ctrl+c"
+    $name.m.edit add command -label Copy -command [concat menu_copy $name] \
+	-accelerator [accel_munge "Ctrl+c"]
 
-    $name.m.edit.m add command -label Paste \
+    $name.m.edit add command -label Paste \
     	-command [concat menu_paste $name] \
-	-accelerator "Ctrl+v"
+	-accelerator [accel_munge "Ctrl+v"]
 
-    $name.m.edit.m add command -label Duplicate \
+    $name.m.edit add command -label Duplicate \
     	-command [concat menu_duplicate $name] \
-	-accelerator "Ctrl+d"
+	-accelerator [accel_munge "Ctrl+d"]
 
-    $name.m.edit.m add command -label {Select all} \
+    $name.m.edit add command -label {Select all} \
     	-command [concat menu_selectall $name] \
-	-accelerator "Ctrl+a"
+	-accelerator [accel_munge "Ctrl+a"]
 
-    $name.m.edit.m add command -label {Text Editor} \
+    $name.m.edit add separator
+
+    $name.m.edit add command -label {Text Editor} \
     	-command [concat menu_texteditor $name] \
-	-accelerator "Ctrl+t"
+	-accelerator [accel_munge "Ctrl+t"]
 
-    $name.m.edit.m add command -label Font \
+    $name.m.edit add command -label Font \
     	-command [concat menu_font $name] 
 
-    $name.m.edit.m add command -label {Tidy Up} \
+    $name.m.edit add command -label {Tidy Up} \
     	-command [concat menu_tidyup $name]
 
-    $name.m.edit.m add separator
+    $name.m.edit add separator
     
 ############iemlib##################
 # instead of "red = #BC3C60" we take "grey85", so there is no difference,
 # if widget is selected or not.
 
-    $name.m.edit.m add checkbutton -label "Edit mode" \
+    $name.m.edit add checkbutton -label "Edit mode" \
     	-indicatoron true -selectcolor grey85 \
     	-command [concat menu_editmode $name] \
-	-accelerator "Ctrl+e"	
+	-accelerator [accel_munge "Ctrl+e"]	
 
     if { $editable == 0 } {
-            $name.m.edit.m entryconfigure "Edit mode" -indicatoron false }
+            $name.m.edit entryconfigure "Edit mode" -indicatoron false }
 	
 ############iemlib##################
 
 # the put menu
-    menubutton $name.m.put -text Put -menu $name.m.put.m
-    pack $name.m.put -side left
-    menu $name.m.put.m
+    menu $name.m.put -tearoff $pd_tearoff
+    $name.m add cascade -label Put -menu $name.m.put
 
-    $name.m.put.m add command -label Object \
+    $name.m.put add command -label Object \
     	-command [concat menu_object $name 0] \
-	-accelerator "Ctrl+1"
+	-accelerator [accel_munge "Ctrl+1"]
 
-    $name.m.put.m add command -label Message \
+    $name.m.put add command -label Message \
     	-command [concat menu_message $name 0] \
-	-accelerator "Ctrl+2"
+	-accelerator [accel_munge "Ctrl+2"]
 
-    $name.m.put.m add command -label Number \
+    $name.m.put add command -label Number \
     	-command [concat menu_floatatom $name 0] \
-	-accelerator "Ctrl+3"
+	-accelerator [accel_munge "Ctrl+3"]
 
-    $name.m.put.m add command -label Symbol \
+    $name.m.put add command -label Symbol \
     	-command [concat menu_symbolatom $name 0] \
-	-accelerator "Ctrl+4"
+	-accelerator [accel_munge "Ctrl+4"]
 
-    $name.m.put.m add command -label Comment \
+    $name.m.put add command -label Comment \
     	-command [concat menu_comment $name 0] \
-	-accelerator "Ctrl+5"
+	-accelerator [accel_munge "Ctrl+5"]
+
+    $name.m.put add separator
 	
 ############iemlib##################
 
-    $name.m.put.m add command -label Bang \
+    $name.m.put add command -label Bang \
     	-command [concat menu_bng $name 0] \
-	-accelerator "Alt+b"
+	-accelerator [accel_munge "Alt+b"]
     
-    $name.m.put.m add command -label Toggle \
+    $name.m.put add command -label Toggle \
     	-command [concat menu_toggle $name 0] \
-	-accelerator "Alt+t"
+	-accelerator [accel_munge "Alt+t"]
     
-    $name.m.put.m add command -label Number2 \
+    $name.m.put add command -label Number2 \
     	-command [concat menu_numbox $name 0] \
-	-accelerator "Alt+n"
+	-accelerator [accel_munge "Alt+n"]
     
-    $name.m.put.m add command -label Vslider \
+    $name.m.put add command -label Vslider \
     	-command [concat menu_vslider $name 0] \
-	-accelerator "Alt+v"
+	-accelerator [accel_munge "Alt+v"]
     
-    $name.m.put.m add command -label Hslider \
+    $name.m.put add command -label Hslider \
     	-command [concat menu_hslider $name 0] \
-	-accelerator "Alt+h"
+	-accelerator [accel_munge "Alt+h"]
     
-    $name.m.put.m add command -label Vradio \
+    $name.m.put add command -label Vradio \
     	-command [concat menu_vradio $name 0] \
-	-accelerator "Alt+d"
+	-accelerator [accel_munge "Alt+d"]
     
-    $name.m.put.m add command -label Hradio \
+    $name.m.put add command -label Hradio \
     	-command [concat menu_hradio $name 0] \
-	-accelerator "Alt+i"
+	-accelerator [accel_munge "Alt+i"]
     
-    $name.m.put.m add command -label VU \
+    $name.m.put add command -label VU \
     	-command [concat menu_vumeter $name 0] \
-	-accelerator "Alt+u"
+	-accelerator [accel_munge "Alt+u"]
     
-    $name.m.put.m add command -label Canvas \
+    $name.m.put add command -label Canvas \
     	-command [concat menu_mycnv $name 0] \
-	-accelerator "Alt+c"
+	-accelerator [accel_munge "Alt+c"]
 
 ############iemlib##################
     
-    $name.m.put.m add command -label Graph \
+    $name.m.put add separator
+	
+    $name.m.put add command -label Graph \
     	-command [concat menu_graph $name] 
 
-    $name.m.put.m add command -label Array \
+    $name.m.put add command -label Array \
     	-command [concat menu_array $name] 
 
 
 
 # the find menu
-    menubutton $name.m.find -text Find -menu $name.m.find.m
-    pack $name.m.find -side left
-    menu $name.m.find.m
-    $name.m.find.m add command -label {Find...} -accelerator "Ctrl+f" \
+    menu $name.m.find -tearoff $pd_tearoff
+    $name.m add cascade -label Find -menu $name.m.find
+
+    $name.m.find add command -label {Find...} \
+	-accelerator [accel_munge "Ctrl+f"] \
     	-command [concat menu_findobject $name] 
-    $name.m.find.m add command -label {Find Again} -accelerator "Ctrl+g" \
+    $name.m.find add command -label {Find Again} \
+	-accelerator [accel_munge "Ctrl+g"] \
     	-command [concat menu_findagain $name] 
-    $name.m.find.m add command -label {Find last error} \
+    $name.m.find add command -label {Find last error} \
     	-command [concat menu_finderror] 
     
 # the window menu
-    menubutton $name.m.windows -text Windows -menu $name.m.windows.m
-    pack $name.m.windows -side left
-    menu $name.m.windows.m -postcommand [concat menu_fixwindowmenu $name]
-    $name.m.windows.m add command -label {parent window}\
+    menu $name.m.windows -postcommand [concat menu_fixwindowmenu $name] \
+	-tearoff $pd_tearoff
+
+    $name.m.windows add command -label {parent window}\
     	-command [concat menu_windowparent $name] 
-    $name.m.windows.m add command -label {Pd window} -command menu_pop_pd
-    $name.m.windows.m add separator
+    $name.m.windows add command -label {Pd window} -command menu_pop_pd
+    $name.m.windows add separator
 
 # the audio menu
-    menubutton $name.m.audio -text Audio -menu $name.m.audio.m
-    pack $name.m.audio -side left
-    menu $name.m.audio.m
-    $name.m.audio.m add command -label On -accelerator "Ctrl+/" \
+    menu $name.m.audio -tearoff $pd_tearoff
+
+    $name.m.audio add command -label On -accelerator [accel_munge "Ctrl+/"] \
 	-command {menu_audio 1} 
-    $name.m.audio.m add command -label Off -accelerator "Ctrl+." \
+    $name.m.audio add command -label Off -accelerator [accel_munge "Ctrl+."] \
 	-command {menu_audio 0} 
 
+    if {$pd_nt != 2} {
+        $name.m add cascade -label Windows -menu $name.m.windows
+        $name.m add cascade -label Audio -menu $name.m.audio
+    } else {
+        $name.m add cascade -label Audio -menu $name.m.audio
+        $name.m add cascade -label Window -menu $name.m.windows
+    }
+
 # the help menu
-    menubutton $name.m.help -text Help -menu $name.m.help.m
-    pack $name.m.help -side right
-    menu $name.m.help.m
-    $name.m.help.m add command -label {Getting Started} \
+    menu $name.m.help -tearoff $pd_tearoff
+    $name.m add cascade -label Help -menu $name.m.help
+    $name.m.help add command -label {Getting Started} \
 	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
-    $name.m.help.m add command -label {Test Audio and MIDI} \
+    $name.m.help add command -label {Test Audio and MIDI} \
 	-command {menu_doc_open doc/7.stuff/tools testtone.pd} 
-    $name.m.help.m add command -label {Load Meter} \
+    $name.m.help add command -label {Load Meter} \
 	-command {menu_doc_open doc/7.stuff/tools load-meter.pd} 
-    $name.m.help.m add command -label {Pure Documentation} \
+    $name.m.help add command -label {Pure Documentation} \
 	-command {menu_documentation} 
 
 # the popup menu
@@ -813,13 +886,20 @@ proc pdtk_canvas_new {name width height geometry editable} {
 
     bind $name.c <Button> {pdtk_canvas_click %W %x %y %b 0}
     bind $name.c <Shift-Button> {pdtk_canvas_click %W %x %y %b 1}
-    bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 2}
     bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
     bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
     bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
     bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
     bind $name.c <Alt-Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 7}
-    bind $name.c <Button-3> {pdtk_canvas_click %W %x %y %b 8}
+    global pd_nt
+    if {$pd_nt == 2} {
+        bind $name.c <Button-2> {pdtk_canvas_click %W %x %y %b 8}
+        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 8}
+    } else {
+        bind $name.c <Button-3> {pdtk_canvas_click %W %x %y %b 8}
+        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 2}
+    } 
+# change mac to right-click, not middle click -atl 2002.09.02
 
     bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
     bind $name.c <Control-Key> {pdtk_canvas_ctrlkey %W %K 0}
@@ -2460,9 +2540,9 @@ proc pdtk_data_dialog {name stuff} {
 #####################iemlib#######################
 proc pdtk_canvas_editval {name value} {
     if { $value } {
-	$name.m.edit.m entryconfigure "Edit mode" -indicatoron true
+	$name.m.edit entryconfigure "Edit mode" -indicatoron true
     } else {                          
-        $name.m.edit.m entryconfigure "Edit mode" -indicatoron false
+        $name.m.edit entryconfigure "Edit mode" -indicatoron false
     }                                                 
 }
 #####################iemlib#######################
@@ -2551,15 +2631,15 @@ proc pdtk_pd_meters {indb outdb inclip outclip} {
     global ctrls_inlevel ctrls_outlevel
     set ctrls_inlevel $indb
     if {$inclip == 1} {
-    	.controls.in.clip configure -background red
+	.controls.inout.in.clip configure -background red
     } else {
-    	.controls.in.clip configure -background grey
+	.controls.inout.in.clip configure -background grey
     }
     set ctrls_outlevel $outdb
     if {$outclip == 1} {
-    	.controls.out.clip configure -background red
+	.controls.inout.out.clip configure -background red
     } else {
-    	.controls.out.clip configure -background grey
+	.controls.inout.out.clip configure -background grey
     }
     
 }

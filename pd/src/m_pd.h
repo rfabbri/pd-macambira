@@ -2,21 +2,31 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#ifndef __m_pd_h_
+
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 extern "C" {
 #endif
 
-#define PD_VERSION 0.36
+#define PD_VERSION 0.37     /* oops, don't use this... */  */
+#define PD_MAJOR_VERSION 0  /* ... use these two instead. */
+#define PD_MINOR_VERSION 37   
 
-#ifdef NT
+/* old name for "MSW" flag -- we have to take it for the sake of many old
+"nmakefiles" for externs, which will define NT and not MSW */
+#if defined(NT) && !defined(MSW)
+#define MSW
+#endif
+
+#ifdef MSW
 // #pragma warning( disable : 4091 ) 
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
 #pragma warning( disable : 4101 )  /* unused automatic variables */
-#endif /* NT */
+#endif /* MSW */
 
-    /* the external storage class is "extern" in UNIX; in NT it's ugly. */
-#ifdef NT
+    /* the external storage class is "extern" in UNIX; in MSW it's ugly. */
+#ifdef MSW
 #ifdef PD_INTERNAL
 #define EXTERN __declspec(dllexport) extern
 #else
@@ -24,7 +34,7 @@ extern "C" {
 #endif /* PD_INTERNAL */
 #else
 #define EXTERN extern
-#endif /* NT */
+#endif /* MSW */
 
     /* and depending on the compiler, hidden data structures are
     declared differently: */
@@ -227,7 +237,8 @@ EXTERN void pd_vmess(t_pd *x, t_symbol *s, char *fmt, ...);
 #define mess3(x, s, a,b,c) ((*getfn((x), (s)))((x), (a),(b),(c)))
 #define mess4(x, s, a,b,c,d) ((*getfn((x), (s)))((x), (a),(b),(c),(d)))
 #define mess5(x, s, a,b,c,d,e) ((*getfn((x), (s)))((x), (a),(b),(c),(d),(e)))
-void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv);
+EXTERN void obj_list(t_object *x, t_symbol *s, int argc, t_atom *argv);
+EXTERN t_pd *pd_newest(void);
 
 /* --------------- memory management -------------------- */
 EXTERN void *getbytes(size_t nbytes);
@@ -443,7 +454,7 @@ EXTERN void sys_bashfilename(const char *from, char *to);
 EXTERN void sys_unbashfilename(const char *from, char *to);
 EXTERN int open_via_path(const char *name, const char *ext, const char *dir,
     char *dirresult, char **nameresult, unsigned int size, int bin);
-EXTERN int sys_geteventno(void);
+EXTERN int sched_geteventno(void);
 EXTERN double sys_getrealtime(void);
 
 /* --------------- signals ----------------------------------- */
@@ -600,3 +611,6 @@ test this just now. */
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)
 }
 #endif
+
+#define __m_pd_h_
+#endif /* __m_pd_h_ */

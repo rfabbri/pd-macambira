@@ -18,7 +18,7 @@
 #define LOWOFFSET 1    /* word offset to find LSB */
 #define int32 long  /* a data type that has 32 bits */
 #else
-#ifdef NT
+#ifdef MSW
     /* little-endian; most significant byte is at highest address */
 #define HIOFFSET 1
 #define LOWOFFSET 0
@@ -63,7 +63,7 @@
 
 #endif /* MACOSX */
 #endif /* __linux__ */
-#endif /* NT */
+#endif /* MSW */
 #endif /* SGI */
 
 union tabfudge

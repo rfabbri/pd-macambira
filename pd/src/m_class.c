@@ -3,12 +3,14 @@
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 #define PD_CLASS_DEF
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 #include <stdlib.h>
 #ifdef UNIX
 #include <unistd.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #endif
 
@@ -20,6 +22,8 @@ static void pd_defaultfloat(t_pd *x, t_float f);
 static void pd_defaultlist(t_pd *x, t_symbol *s, int argc, t_atom *argv);
 t_pd pd_objectmaker; 	/* factory for creating "object" boxes */
 t_pd pd_canvasmaker; 	/* factory for creating canvases */
+
+static t_symbol *class_extern_dir = &s_;
 
 static void pd_defaultanything(t_pd *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -200,6 +204,7 @@ t_class *class_new(t_symbol *s, t_newmethod newmethod, t_method freemethod,
     c->c_gobj = (typeflag >= CLASS_GOBJ);
     c->c_drawcommand = 0;
     c->c_floatsignalin = 0;
+    c->c_externdir = class_extern_dir;
 #if 0 
     post("class: %s", c->c_name->s_name);
 #endif
@@ -402,6 +407,17 @@ void class_domainsignalin(t_class *c, int onset)
     c->c_floatsignalin = onset;
 }
 
+void class_set_extern_dir(t_symbol *s)
+{
+    class_extern_dir = s;
+}
+
+char *class_gethelpdir(t_class *c)
+{
+    return (c->c_externdir->s_name);
+}
+
+
 /* ---------------- the symbol table ------------------------ */
 
 #define HASHSIZE 1024
@@ -533,6 +549,13 @@ void mess_init(void)
 }
 
 t_pd *newest;
+
+/* This is externally available, but note that it might later disappear; the
+whole "newest" thing is a hack which needs to be redesigned. */
+t_pd *pd_newest(void)
+{
+    return (newest);
+}
 
     /* horribly, we need prototypes for each of the artificial function
     calls in typedmess(), to keep the compiler quiet. */

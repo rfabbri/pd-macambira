@@ -4,7 +4,8 @@
 
 /* network */
 
-#include "m_imp.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 
 #include <sys/types.h>
 #include <string.h>

@@ -2,8 +2,11 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* Pd side of the Pd/Pd-gui interface. */
+/* Pd side of the Pd/Pd-gui interface.  Also, some system interface routines
+that didn't really belong anywhere. */
 
+#include "m_pd.h"
+#include "s_stuff.h"
 #include "m_imp.h"
 #ifdef UNIX
 #include <unistd.h>
@@ -13,11 +16,12 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 #endif
 #ifdef HAVE_BSTRING_H
 #include <bstring.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #include <fcntl.h>
 #include <process.h>
@@ -35,9 +39,13 @@ typedef int pid_t;
 #ifdef MACOSX
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #else
 #include <stdlib.h>
 #endif
+
+#define DEBUG_MESSUP 1	    /* messages up from pd to pd-gui */
+#define DEBUG_MESSDOWN 2    /* messages down from pd-gui to pd */
 
 extern char pd_version[];
 
@@ -70,9 +78,58 @@ static t_binbuf *inbinbuf;
 static t_socketreceiver *sys_socketreceiver;
 extern int sys_addhist(int phase);
 
+#ifdef MSW
+static LARGE_INTEGER nt_inittime;
+static double nt_freq = 0;
+
+static void sys_initntclock(void)
+{
+    LARGE_INTEGER f1;
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    if (!QueryPerformanceFrequency(&f1))
+    {
+          fprintf(stderr, "pd: QueryPerformanceFrequency failed\n");
+          f1.QuadPart = 1;
+    }
+    nt_freq = f1.QuadPart;
+    nt_inittime = now;
+}
+
+#if 0
+    /* this is a version you can call if you did the QueryPerformanceCounter
+    call yourself.  Necessary for time tagging incoming MIDI at interrupt
+    level, for instance; but we're not doing that just now. */
+
+double nt_tixtotime(LARGE_INTEGER *dumbass)
+{
+    if (nt_freq == 0) sys_initntclock();
+    return (((double)(dumbass->QuadPart - nt_inittime.QuadPart)) / nt_freq);
+}
+#endif
+#endif /* MSW */
+
+double sys_getrealtime(void)	/* get "real time" in seconds */
+{
+#ifdef UNIX
+    static struct timeval then;
+    struct timeval now;
+    gettimeofday(&now, 0);
+    if (then.tv_sec == 0 && then.tv_usec == 0) then = now;
+    return ((now.tv_sec - then.tv_sec) +
+    	(1./1000000.) * (now.tv_usec - then.tv_usec));
+#endif
+#ifdef MSW
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    if (nt_freq == 0) sys_initntclock();
+    return (((double)(now.QuadPart - nt_inittime.QuadPart)) / nt_freq);
+#endif
+}
+
 void sys_sockerror(char *s)
 {
-#ifdef NT
+#ifdef MSW
     int err = WSAGetLastError();
     if (err == 10054) return;
     else if (err == 10044)
@@ -320,7 +377,7 @@ void sys_closesocket(int fd)
 #ifdef UNIX
     close(fd);
 #endif
-#ifdef NT
+#ifdef MSW
     closesocket(fd);
 #endif
 }
@@ -431,6 +488,34 @@ void sys_setalarm(int microsec)
 
 #endif
 
+#ifdef __linux
+
+#if defined(_POSIX_PRIORITY_SCHEDULING) || defined(_POSIX_MEMLOCK)
+#include <sched.h>
+#endif
+
+void sys_set_priority(int higher) 
+{
+#ifdef _POSIX_PRIORITY_SCHEDULING
+    struct sched_param par;
+    int p1 ,p2, p3;
+    p1 = sched_get_priority_min(SCHED_FIFO);
+    p2 = sched_get_priority_max(SCHED_FIFO);
+    p3 = (higher ? p2 - 1 : p2 - 3);
+    par.sched_priority = p3;
+    if (sched_setscheduler(0,SCHED_FIFO,&par) != -1)
+       fprintf(stderr, "priority %d scheduling enabled.\n", p3);
+#endif
+
+#ifdef _POSIX_MEMLOCK
+    if (mlockall(MCL_FUTURE) != -1) 
+    	fprintf(stderr, "memory locking enabled.\n");
+#endif
+
+}
+
+#endif /* __linux */
+
 static int sys_watchfd;
 
 void glob_ping(t_pd *dummy)
@@ -456,7 +541,7 @@ int sys_startgui(const char *guidir)
     int len = sizeof(server);
     int ntry = 0, portno = FIRSTPORTNUM;
     int xsock = -1;
-#ifdef NT
+#ifdef MSW
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
 #endif
@@ -485,7 +570,7 @@ int sys_startgui(const char *guidir)
     signal(SIGSTKFLT, sys_exithandler);
 #endif
 #endif
-#ifdef NT
+#ifdef MSW
     if (WSAStartup(version, &nobby)) sys_sockerror("WSAstartup");
 #endif
 
@@ -495,7 +580,7 @@ int sys_startgui(const char *guidir)
 	    skip starting the GUI up. */
     	t_atom zz[19];
 	int i;
-#ifdef NT
+#ifdef MSW
     	if (GetCurrentDirectory(MAXPDSTRING, cmdbuf) == 0)
 	    strcpy(cmdbuf, ".");
 #endif
@@ -511,12 +596,16 @@ int sys_startgui(const char *guidir)
     }
     else
     {
-#ifdef NT
+#ifdef MSW
     	char scriptbuf[MAXPDSTRING+30], wishbuf[MAXPDSTRING+30], portbuf[80];
     	int spawnret;
 
 #endif
+#ifdef MSW
+	char intarg;
+#else
     	int intarg;
+#endif
 
 	/* create a socket */
 	xsock = socket(AF_INET, SOCK_STREAM, 0);
@@ -546,7 +635,7 @@ int sys_startgui(const char *guidir)
 	/* name the socket */
 	while (bind(xsock, (struct sockaddr *)&server, sizeof(server)) < 0)
 	{
-#ifdef NT
+#ifdef MSW
     	    int err = WSAGetLastError();
 #endif
 #ifdef UNIX
@@ -638,8 +727,8 @@ int sys_startgui(const char *guidir)
     	}
 #endif /* UNIX */
 
-#ifdef NT
-    	    /* in NT land "guipath" is unused; we just do everything from
+#ifdef MSW
+    	    /* in MSW land "guipath" is unused; we just do everything from
 	    the libdir. */
     	fprintf(stderr, "%s\n", sys_libdir->s_name);
     	
@@ -662,10 +751,10 @@ int sys_startgui(const char *guidir)
     	    exit(1);
     	}
 
-#endif /* NT */
+#endif /* MSW */
     }
 
-#ifdef UNIX
+#ifdef __linux__
     	/* now that we've spun off the child process we can promote
 	our process's priority, if we happen to be root.  */
     if (sys_hipriority)
@@ -733,12 +822,24 @@ int sys_startgui(const char *guidir)
     }
 
     seteuid(getuid());  	/* lose setuid priveliges */
-#endif /* UNIX */
+#endif /* __linux__ */
 
-#ifdef NT
+#ifdef MSW
     if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
         fprintf(stderr, "pd: couldn't set high priority class\n");
 #endif
+#ifdef MACOSX
+    {
+	struct sched_param param;
+	int policy = SCHED_RR;
+	int err;
+	param.sched_priority = 80; // adjust 0 : 100
+
+	err = pthread_setschedparam(pthread_self(), policy, &param);
+	if (err)
+	    post("warning: high priority scheduling failed\n");
+    }
+#endif /* MACOSX */
 
     if (!sys_nogui)
     {
@@ -786,8 +887,13 @@ void sys_bail(int n)
     if (!reentered)
     {
     	reentered = 1;
+#ifndef __linux  /* sys_close_audio() hangs if you're in a signal? */
+	fprintf(stderr, "closing audio...\n");
     	sys_close_audio();
+	fprintf(stderr, "closing MIDI...\n");
 	sys_close_midi();
+	fprintf(stderr, "... done.\n");
+#endif
     }
     _exit(n);
 }

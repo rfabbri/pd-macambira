@@ -10,14 +10,14 @@ Here is an approximate table of contents...
     frequency and pitch
     FM
 
-2. wavetable synthesis
+2. wavetable synthesis and sampling
 
 3. synthetic waveforms, classic and modern
     pulses
     rectangles and sawtooth waves
     additive synthesis
 
-4. sampling
+4. more sampling
 
 5. envelopes
     two flavors of ADSR envelope

@@ -269,8 +269,8 @@ static t_int *sigvd_perform(t_int *w)
     	a = bp[0];
     	cminusb = c-b;
     	*out++ = b + frac * (
-	    cminusb - 0.5f * (frac-1.) * (
-		(a - d + 3.0f * cminusb) * frac + (b - a - cminusb)
+	    cminusb - 0.1666667f * (1.-frac) * (
+		(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b)
 	    )
 	);
     }

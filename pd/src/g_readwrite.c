@@ -10,7 +10,7 @@ scalars into a file and reload them; also, support is included here for
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "m_imp.h"
+#include "m_pd.h"
 #include "g_canvas.h"
 #include <string.h>
 
@@ -662,6 +662,8 @@ static void canvas_savetemplatesto(t_canvas *x, t_binbuf *b, int wholething)
     }
 }
 
+void canvas_reload(t_symbol *name, t_symbol *dir, t_gobj *except);
+
     /* save a "root" canvas to a file; cf. canvas_saveto() which saves the
     body (and which is called recursively.) */
 static void canvas_savetofile(t_canvas *x, t_symbol *filename, t_symbol *dir)
@@ -677,9 +679,7 @@ static void canvas_savetofile(t_canvas *x, t_symbol *filename, t_symbol *dir)
 	    canvas_rename(x, filename, dir);
 	post("saved to: %s/%s", dir->s_name, filename->s_name);
     	canvas_dirty(x, 0);
-#if 0	    /* not yet written */
-	canvas_reload(filename, dir);
-#endif
+	canvas_reload(filename, dir, &x->gl_gobj);
     }
     binbuf_free(b);
 }

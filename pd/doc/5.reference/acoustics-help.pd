@@ -1,0 +1,40 @@
+#N canvas 163 25 582 408 12;
+#X obj 15 269 ftom;
+#X obj 8 10 mtof;
+#X obj 15 217 mtof;
+#X floatatom 15 189 0 0 0;
+#X floatatom 15 244 0 0 0;
+#X obj 64 10 ftom;
+#X floatatom 15 293 0 0 0;
+#X obj 120 11 dbtorms;
+#X obj 196 11 rmstodb;
+#X obj 275 11 dbtopow;
+#X obj 352 11 powtodb;
+#X text 21 53 The mtof object transposes a midi value into a frequency
+in Hertz \, so that "69" goes to "440". You can specify microtonal
+pitches as in "69.5" (a quarter tone higher than 69). Ftom does the
+reverse.;
+#X floatatom 147 185 0 0 0;
+#X floatatom 147 240 0 0 0;
+#X floatatom 147 289 0 0 0;
+#X obj 147 213 dbtorms;
+#X obj 147 265 rmstodb;
+#X floatatom 261 186 0 0 0;
+#X floatatom 261 241 0 0 0;
+#X floatatom 261 290 0 0 0;
+#X obj 261 214 dbtopow;
+#X obj 261 266 powtodb;
+#X text 27 336 Overflows and underflows are clipped.;
+#X text 300 376 updated for pd version 0.33;
+#X connect 0 0 6 0;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 12 0 15 0;
+#X connect 13 0 16 0;
+#X connect 15 0 13 0;
+#X connect 16 0 14 0;
+#X connect 17 0 20 0;
+#X connect 18 0 21 0;
+#X connect 20 0 18 0;
+#X connect 21 0 19 0;

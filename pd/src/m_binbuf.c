@@ -16,7 +16,7 @@
 #ifdef UNIX
 #include <unistd.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #endif
 #include <fcntl.h>
@@ -599,7 +599,7 @@ broken:
 static int binbuf_doopen(char *s, int mode)
 {
     char namebuf[MAXPDSTRING];
-#ifdef NT
+#ifdef MSW
     mode |= O_BINARY;
 #endif
     sys_bashfilename(s, namebuf);
@@ -903,19 +903,45 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 		else if (!strcmp(second, "button"))
 		{
 		    binbuf_addv(newb, "ssffs;",
-			gensym("#X"), gensym("msg"),
+			gensym("#X"), gensym("obj"),
 			atom_getfloatarg(2, natom, nextmess),
 			atom_getfloatarg(3, natom, nextmess),
-			gensym("bang"));
+			gensym("bng"));
 		    nobj++;
 		}
-		else if (!strcmp(second, "slider") || !strcmp(second, "number")
-	    	    || !strcmp(second, "flonum") || !strcmp(second, "toggle"))
+		else if (!strcmp(second, "number") || !strcmp(second, "flonum"))
 		{
 		    binbuf_addv(newb, "ssff;",
 			gensym("#X"), gensym("floatatom"),
 			atom_getfloatarg(2, natom, nextmess),
 			atom_getfloatarg(3, natom, nextmess));
+		    nobj++;
+		}
+		else if (!strcmp(second, "slider"))
+		{
+		    binbuf_addv(newb, "ssffsffffffsssfffffffff;",
+			gensym("#X"), gensym("obj"),
+			atom_getfloatarg(2, natom, nextmess),
+			atom_getfloatarg(3, natom, nextmess),
+			gensym("vsl"),
+			atom_getfloatarg(4, natom, nextmess),
+			atom_getfloatarg(5, natom, nextmess),
+			atom_getfloatarg(7, natom, nextmess),
+			atom_getfloatarg(7, natom, nextmess)
+			    + (atom_getfloatarg(5, natom, nextmess) - 1)
+			      * atom_getfloatarg(6, natom, nextmess),
+		    	0., 0.,
+			gensym("empty"), gensym("empty"), gensym("empty"),
+			0., -8., 0., 8., -262144., -1., -1., 0., 1.);
+		    nobj++;
+		}
+		else if (!strcmp(second, "toggle"))
+		{
+		    binbuf_addv(newb, "ssffs;",
+			gensym("#X"), gensym("obj"),
+			atom_getfloatarg(2, natom, nextmess),
+			atom_getfloatarg(3, natom, nextmess),
+			gensym("tgl"));
 		    nobj++;
 		}
 		else if (!strcmp(second, "inlet"))
@@ -1014,6 +1040,30 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
 			    atom_getfloatarg(2, natom, nextmess),
 			    atom_getfloatarg(3, natom, nextmess),
 			    15., 1.);
+		    else if (classname == gensym("bng"))
+		    	binbuf_addv(newb, "ssffff;", gensym("#P"),
+			    gensym("button"),
+			    atom_getfloatarg(2, natom, nextmess),
+			    atom_getfloatarg(3, natom, nextmess),
+			    atom_getfloatarg(5, natom, nextmess), 0.);
+		    else if (classname == gensym("tgl"))
+		    	binbuf_addv(newb, "ssffff;", gensym("#P"),
+			    gensym("toggle"),
+			    atom_getfloatarg(2, natom, nextmess),
+			    atom_getfloatarg(3, natom, nextmess),
+			    atom_getfloatarg(5, natom, nextmess), 0.);
+		    else if (classname == gensym("vsl"))
+		    	binbuf_addv(newb, "ssffffff;", gensym("#P"),
+			    gensym("slider"),
+			    atom_getfloatarg(2, natom, nextmess),
+			    atom_getfloatarg(3, natom, nextmess),
+			    atom_getfloatarg(5, natom, nextmess),
+			    atom_getfloatarg(6, natom, nextmess),
+			    (atom_getfloatarg(8, natom, nextmess) -
+			    	atom_getfloatarg(7, natom, nextmess)) /
+				    (atom_getfloatarg(6, natom, nextmess) == 1? 1 :
+				    	 atom_getfloatarg(6, natom, nextmess) - 1),
+			    atom_getfloatarg(7, natom, nextmess));
 		    else
 		    {
 	    	    	SETSYMBOL(outmess, gensym("#P"));
@@ -1069,7 +1119,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
     }
     if (!maxtopd)
     	binbuf_addv(newb, "ss;", gensym("#P"), gensym("pop"));
-#if 1
+#if 0
     binbuf_write(newb, "import-result.pd", "/tmp", 0);
 #endif
     return (newb);

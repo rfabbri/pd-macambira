@@ -6,7 +6,7 @@
 
 /* LATER make tabread4 and tabread~ */
 
-#include "m_imp.h"
+#include "m_pd.h"
 
 
 /* ------------------------- tabwrite~ -------------------------- */
@@ -432,8 +432,8 @@ static t_int *tabread4_tilde_perform(t_int *w)
 	    post("fp = %lx,  shit = %lx,  b = %f",  fp, buf->b_shit,  b); */
 	cminusb = c-b;
 	*out++ = b + frac * (
-	    cminusb - 0.5f * (frac-1.) * (
-		(a - d + 3.0f * cminusb) * frac + (b - a - cminusb)
+	    cminusb - 0.1666667f * (1.-frac) * (
+		(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b)
 	    )
 	);
     }
@@ -501,7 +501,7 @@ static void tabread4_tilde_setup(void)
 #define LOWOFFSET 1    /* word offset to find LSB */
 #define int32 long  /* a data type that has 32 bits */
 #else
-#ifdef NT
+#ifdef MSW
     /* little-endian; most significant byte is at highest address */
 #define HIOFFSET 1
 #define LOWOFFSET 0
@@ -545,7 +545,7 @@ static void tabread4_tilde_setup(void)
 
 #endif /* MACOSX */
 #endif /* __linux__ */
-#endif /* NT */
+#endif /* MSW */
 #endif /* SGI */
 
 union tabfudge
@@ -616,8 +616,8 @@ static t_int *tabosc4_tilde_perform(t_int *w)
 	d = addr[3];
 	cminusb = c-b;
 	*out++ = b + frac * (
-	    cminusb - 0.5f * (frac-1.) * (
-		(a - d + 3.0f * cminusb) * frac + (b - a - cminusb)
+	    cminusb - 0.1666667f * (1.-frac) * (
+		(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b)
 	    )
 	);
     }
@@ -944,8 +944,8 @@ static void tabread4_float(t_tabread4 *x, t_float f)
 	d = fp[2];
 	cminusb = c-b;
 	outlet_float(x->x_obj.ob_outlet, b + frac * (
-	    cminusb - 0.5f * (frac-1.) * (
-		(a - d + 3.0f * cminusb) * frac + (b - a - cminusb))));
+	    cminusb - 0.1666667f * (1.-frac) * (
+		(d - a - 3.0f * cminusb) * frac + (d + 2.0f*a - 3.0f*b))));
     }
 }
 

@@ -88,7 +88,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-    /* the following is needed only to declare pd_fft() as exportable in NT */
+    /* the following is needed only to declare pd_fft() as exportable in MSW */
 #include "m_pd.h"
 
 /* some basic definitions */

@@ -81,11 +81,20 @@ void array_resize(t_array *x, t_template *template, int n)
     }
 }
 
+void word_free(t_word *wp, t_template *template);
+
 void array_free(t_array *x)
 {
+    int i;
+    t_template *scalartemplate = template_findbyname(x->a_templatesym);
 	/* we don't unset our gpointer here since it was never "set." */
     /* gpointer_unset(&x->a_gp); */
     gstub_cutoff(x->a_stub);
+    for (i = 0; i < x->a_n; i++)
+    {
+    	t_word *wp = (t_word *)(x->a_vec + x->a_elemsize * i);
+	word_free(wp, scalartemplate);
+    }
     freebytes(x->a_vec, x->a_elemsize * x->a_n);
     freebytes(x, sizeof *x);
 }

@@ -7,7 +7,9 @@
 /* all changes are labeled with      iemlib      */
 
 #include <stdlib.h>
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 #include "t_tk.h"
 #include "g_canvas.h"
 #include <stdio.h>
@@ -921,8 +923,9 @@ static void text_select(t_gobj *z, t_glist *glist, int state)
     t_text *x = (t_text *)z;
     t_rtext *y = glist_findrtext(glist, x);
     rtext_select(y, state);
-    sys_vgui(".x%x.c itemconfigure %sR -fill %s\n", glist, 
-    	rtext_gettag(y), (state? "blue" : "black"));
+    if (glist_isvisible(glist) && text_shouldvis(x, glist))
+	sys_vgui(".x%x.c itemconfigure %sR -fill %s\n", glist, 
+    	    rtext_gettag(y), (state? "blue" : "black"));
 }
 
 static void text_activate(t_gobj *z, t_glist *glist, int state)
@@ -954,20 +957,22 @@ static void text_vis(t_gobj *z, t_glist *glist, int vis)
     {
 	if (text_shouldvis(x, glist))
 	{
-    	    t_rtext *y = rtext_new(glist, x, glist->gl_editor->e_rtext, 1);
+    	    t_rtext *y = glist_findrtext(glist, x);
     	    if (x->te_type == T_ATOM)
 	    	glist_retext(glist, x);
     	    text_drawborder(x, glist, rtext_gettag(y),
 		rtext_width(y), rtext_height(y), 1);
+	    rtext_draw(y);
 	}
-	else rtext_new(glist, x, glist->gl_editor->e_rtext, 0);
     }
     else
     {
     	t_rtext *y = glist_findrtext(glist, x);
 	if (text_shouldvis(x, glist))
+	{
     	    text_eraseborder(x, glist, rtext_gettag(y));
-    	rtext_free(y);
+	    rtext_erase(y);
+	}
     }
 }
 

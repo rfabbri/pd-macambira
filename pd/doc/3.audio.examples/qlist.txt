@@ -1,4 +1,4 @@
-# This is a qlist for patch number 60, which demonstrates an oscillator
+# This is a qlist for patch number 68, which demonstrates an oscillator
 bank.
 ;
 # comments start with a "#" which must be followed by a space.  The comment

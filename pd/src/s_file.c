@@ -6,7 +6,8 @@
  * this file contains file-handling routines.
  */
 
-#include "m_imp.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -29,7 +30,7 @@ void sys_bashfilename(const char *from, char *to)
     char c;
     while (c = *from++)
     {
-#ifdef NT
+#ifdef MSW
     	if (c == '/') c = '\\';
 #endif
     	*to++ = c;
@@ -44,7 +45,7 @@ void sys_unbashfilename(const char *from, char *to)
     char c;
     while (c = *from++)
     {
-#ifdef NT
+#ifdef MSW
     	if (c == '\\') c = '/';
 #endif
     	*to++ = c;

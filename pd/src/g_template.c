@@ -6,7 +6,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "m_imp.h"  	/* for sys_hostfontsize */
+#include "m_pd.h"
+#include "s_stuff.h"  	/* for sys_hostfontsize */
 #include "g_canvas.h"
 
 /*
@@ -14,6 +15,9 @@ This file contains text objects you would put in a canvas to define a
 template.  Templates describe objects of type "array" (g_array.c) and
 "scalar" (g_scalar.c).
 */
+
+/* T.Grill - changed the _template.t_pd member to t_pdobj to avoid name clashes
+with the t_pd type */
 
     /* the structure of a "struct" object (also the obsolete "gtemplate"
     you get when using the name "template" in a box.) */
@@ -122,7 +126,7 @@ t_template *template_new(t_symbol *templatesym, int argc, t_atom *argv)
     if (templatesym->s_name)
     {
     	x->t_sym = templatesym;
-    	pd_bind(&x->t_pd, x->t_sym);
+    	pd_bind(&x->t_pdobj, x->t_sym);
     }
     else x->t_sym = templatesym;
     return (x);
@@ -496,11 +500,11 @@ static void *template_usetemplate(void *dummy, t_symbol *s,
 	    {
 	    	    /* conform everyone to the new template */
 		template_conform(x, y);
-		pd_free(&x->t_pd);
+		pd_free(&x->t_pdobj);
 	    	template_new(templatesym, argc, argv);
 	    }
 	}
-	pd_free(&y->t_pd);
+	pd_free(&y->t_pdobj);
     }
     	/* otherwise, just make one. */
     else template_new(templatesym, argc, argv);
@@ -511,7 +515,7 @@ static void *template_usetemplate(void *dummy, t_symbol *s,
 void template_free(t_template *x)
 {
     if (*x->t_sym->s_name)
-    	pd_unbind(&x->t_pd, x->t_sym);
+    	pd_unbind(&x->t_pdobj, x->t_sym);
     t_freebytes(x->t_vec, x->t_n * sizeof(*x->t_vec));
 }
 
@@ -572,10 +576,10 @@ static void *gtemplate_donew(t_symbol *sym, int argc, t_atom *argv)
 	    {
 	    	    /* conform everyone to the new template */
 		template_conform(t, y);
-		pd_free(&t->t_pd);
+		pd_free(&t->t_pdobj);
 	    	t = template_new(sym, argc, argv);
 	    }
-	    pd_free(&y->t_pd);
+	    pd_free(&y->t_pdobj);
     	    t->t_list = x;
 	}
     }
@@ -630,8 +634,8 @@ static void gtemplate_free(t_gtemplate *x)
 		first-on-list and replace teh existing template with it. */
 	    t_template *z = template_new(&s_, x->x_argc, x->x_argv);
 	    template_conform(t, z);
-	    pd_free(&t->t_pd);
-	    pd_free(&z->t_pd);
+	    pd_free(&t->t_pdobj);
+	    pd_free(&z->t_pdobj);
 	    z = template_new(x->x_sym, x->x_argc, x->x_argv);
 	    z->t_list = x->x_next;
 	}
@@ -1668,7 +1672,7 @@ void g_template_setup(void)
 {
     template_setup();
     gtemplate_setup();
-    template_float.t_pd = template_class;
+    template_float.t_pdobj = template_class;
     curve_setup();
     plot_setup();
     drawnumber_setup();

@@ -11,9 +11,8 @@ OR IMPLIED, IN CONNECTION WITH THIS SOFTWARE!
 Note that "expr" is under the GPL, which is more restrictive than Pd's own
 license agreement.
 
-This package should run under linux, NT, or IRIX, except for
-"bilge" which is for NT only.  You can additionally compile fiddle~. bonk~,
-and paf~ for Max/MSP.
+This package should run in Pd under linux, MSW, or Mac OSX.
+You can additionally compile fiddle~. bonk~, and paf~ for Max/MSP.
 
 contents:
 
@@ -24,12 +23,11 @@ choose - find the "best fit" of incoming vector with stored profiles
 paf~ -- phase aligned formant generator
 loop~ -- sample looper
 expr -- arithmetic expression evaluation (Shahrokh Yadegari)
-bilge (NT only) - play audio CDs through the regular PC sound system
 
 abstractions:
 hilbert~ - Hilbert transform for SSB modulation
 complex-mod~ - ring modulation for complex (real+imaginary) audio signals
-rev1~ - reverberator
+rev1~ - experimental reverberator
 
 These objects are part of the regular Pd distribution as of Pd version
 0.30.  Macintosh versions of fiddle~, bonk~, and paf~ are available

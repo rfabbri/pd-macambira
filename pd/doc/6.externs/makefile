@@ -5,28 +5,34 @@ clean: ; rm -f *.pd_linux *.o
 
 # ----------------------- NT -----------------------
 
-pd_nt: foo1.dll foo2.dll dspobj~.dll
+pd_nt: obj1.dll obj2.dll obj3.dll obj4.dll obj5.dll dspobj~.dll
 
-.SUFFIXES: .dll
+.SUFFIXES: .obj .dll
 
 PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
 VC="C:\Program Files\Microsoft Visual Studio\Vc98"
 
-PDNTINCLUDE = /I. /I\tcl\include /I\ftp\pd\src /I$(VC)\include
+PDNTINCLUDE = /I. /I\tcl\include /I..\..\src /I$(VC)\include
 
 PDNTLDIR = $(VC)\lib
 PDNTLIB = $(PDNTLDIR)\libc.lib \
 	$(PDNTLDIR)\oldnames.lib \
 	$(PDNTLDIR)\kernel32.lib \
-	\ftp\pd\bin\pd.lib 
+	..\..\bin\pd.lib 
 
 .c.dll:
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
 	link /dll /export:$*_setup $*.obj $(PDNTLIB)
 
+# override explicitly for tilde objects like this:
+dspobj~.dll: dspobj~.c; 
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
+	link /dll /export:dspobj_tilde_setup $*.obj $(PDNTLIB)
+
 # ----------------------- IRIX 5.x -----------------------
 
-pd_irix5: foo1.pd_irix5 foo2.pd_irix5 dspobj~.pd_irix5
+pd_irix5: obj1.pd_irix5 obj2.pd_irix5 \
+    obj3.pd_irix5 obj4.pd_irix5 obj5.pd_irix5 dspobj~.pd_irix5
 
 .SUFFIXES: .pd_irix5
 
@@ -40,24 +46,10 @@ SGIINCLUDE =  -I../../src/
 	ld -elf -shared -rdata_shared -o $*.pd_irix5 $*.o
 	rm $*.o
 
-# ----------------------- IRIX 6.x -----------------------
-
-pd_irix6: foo1.pd_irix6 foo2.pd_irix6 dspobj~.pd_irix6
-
-.SUFFIXES: .pd_irix6
-
-SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
-	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
-	-Ofast=ip32
-
-.c.pd_irix6:
-	cc $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
-	ld -IPA -n32 -shared -rdata_shared -o $*.pd_irix6 $*.o
-	rm $*.o
-
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: foo1.pd_linux foo2.pd_linux dspobj~.pd_linux
+pd_linux: obj1.pd_linux obj2.pd_linux obj3.pd_linux obj4.pd_linux \
+    obj5.pd_linux dspobj~.pd_linux
 
 .SUFFIXES: .pd_linux
 
@@ -72,4 +64,19 @@ LINUXINCLUDE =  -I../../src
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
+
+# ----------------------- Mac OSX -----------------------
+
+pd_darwin: obj1.pd_darwin obj2.pd_darwin \
+     obj3.pd_darwin obj4.pd_darwin obj5.pd_darwin dspobj~.pd_darwin
+
+.SUFFIXES: .pd_darwin
+
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	rm -f $*.o
 

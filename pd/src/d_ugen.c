@@ -23,14 +23,11 @@
 
 
 #include "m_pd.h"
+#include "m_imp.h"
 #include <stdlib.h>
 #include <stdarg.h>
 
 extern t_class *vinlet_class, *voutlet_class, *canvas_class;
-int obj_nsiginlets(t_object *x);
-int obj_siginletindex(t_object *x, int m);
-int obj_nsigoutlets(t_object *x);
-int obj_sigoutletindex(t_object *x, int m);
 t_sample *obj_findsignalscalar(t_object *x, int m);
 static int ugen_loud;
 EXTERN_STRUCT _vinlet;

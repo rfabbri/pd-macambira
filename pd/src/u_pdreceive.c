@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     int portno;
     struct sockaddr_in server;
     int nretry = 10;
-#ifdef NT
+#ifdef MSW
     short version = MAKEWORD(2, 0);
     WSADATA nobby;
 #endif
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	else goto usage;
     }
     else protocol = SOCK_STREAM;
-#ifdef NT
+#ifdef MSW
     if (WSAStartup(version, &nobby)) sockerror("WSAstartup");
 #endif
     sockfd = socket(AF_INET, protocol, 0);
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
 #ifdef IRIX
     	/* this seems to work only in IRIX but is unnecessary in
-	Linux.  Not sure what NT needs in place of this. */
+	Linux.  Not sure what MSW needs in place of this. */
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, 0, 0) < 0)
     	post("setsockopt failed\n");
 #endif
@@ -299,7 +299,7 @@ static void dopoll(void)
 
 static void sockerror(char *s)
 {
-#ifdef NT
+#ifdef MSW
     int err = WSAGetLastError();
     if (err == 10054) return;
     else if (err == 10044)
@@ -319,7 +319,7 @@ static void x_closesocket(int fd)
 #ifdef UNIX
     close(fd);
 #endif
-#ifdef NT
+#ifdef MSW
     closesocket(fd);
 #endif
 }

@@ -10,13 +10,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "m_imp.h"
+#include "m_pd.h"
 #include "g_canvas.h"
 #include "t_tk.h"
 #include "g_all_guis.h"
 #include <math.h>
 
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #else
 #include <unistd.h>
@@ -770,19 +770,11 @@ void iemgui_delete(t_gobj *z, t_glist *glist)
 void iemgui_vis(t_gobj *z, t_glist *glist, int vis)
 {
     t_iemguidummy *x = (t_iemguidummy *)z;
-    t_rtext *y;
 
-    if(vis)
-    {
-	y = rtext_new_without_senditup(glist, (t_text *)z, glist->gl_editor->e_rtext);
+    if (vis)
 	(*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_NEW);
-    }
     else
-    {
-	y = glist_findrtext(glist, (t_text *)z);
 	(*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_ERASE);
-	rtext_free(y);
-    }
 }
 
 void iemgui_save(t_iemgui *iemgui, t_symbol **srl, int *bflcol)

@@ -17,7 +17,7 @@ for Windows if someone were willing to find a Pthreads package for it. */
 #include <fcntl.h>
 #endif
 #include <pthread.h>
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #endif
 #include <stdio.h>
@@ -69,7 +69,7 @@ typedef struct _wave
     char  w_waveid[4];	    	    /* wave chunk id 'WAVE'       */
     char  w_fmtid[4];	    	    /* format chunk id 'fmt '     */
     uint32 w_fmtchunksize;   	    /* format chunk size          */
-    uint16  w_fmttag;	    	    /* format tag, 1 for PCM      */
+    uint16  w_fmttag;	    	    /* format tag (WAV_INT etc)   */
     uint16  w_nchannels;    	    /* number of channels         */
     uint32 w_samplespersec;  	    /* sample rate in hz          */
     uint32 w_navgbytespersec; 	    /* average bytes per second   */
@@ -94,6 +94,9 @@ typedef struct _wavechunk	    /* ... and the last two items */
     char  wc_id[4]; 	    	    /* data chunk id, e.g., 'data' or 'fmt ' */
     uint32 wc_size;         	    /* length of data chunk       */
 } t_wavechunk;
+
+#define WAV_INT 1
+#define WAV_FLOAT 3
 
 /* the AIFF header.  I'm assuming AIFC is compatible but don't really know
     that. */
@@ -141,7 +144,7 @@ typedef struct _aiff
 
 #define OBUFSIZE MAXPDSTRING  /* assume MAXPDSTRING is bigger than headers */
 
-#ifdef NT
+#ifdef MSW
 #include <fcntl.h>
 #define BINCREATE _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY
 #else
@@ -541,10 +544,15 @@ static int soundfiler_writeargparse(void *obj, int *p_argc, t_atom **p_argv,
 	}
 	else goto usage;
     }
-    	/* only NextStep handles floating point samples */
+    	/* don't handle AIFF floating point samples */
     if (bytespersamp == 4)
-    	filetype = FORMAT_NEXT;
-
+    {
+    	if (filetype == FORMAT_AIFF)
+	{
+	    pd_error(obj, "AIFF floating-point file format unavailable");
+	    goto usage;
+    	}
+    }
     	/* for WAVE force little endian; for nextstep use machine native */
     if (filetype == FORMAT_WAVE)
     {
@@ -647,7 +655,8 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
     	strncpy(wavehdr->w_waveid, "WAVE", 4);
     	strncpy(wavehdr->w_fmtid, "fmt ", 4);
     	wavehdr->w_fmtchunksize = swap4(16, swap);
-    	wavehdr->w_fmttag = swap2(1, swap);
+    	wavehdr->w_fmttag =
+	    swap2((bytespersamp == 4 ? WAV_FLOAT : WAV_INT), swap);
     	wavehdr->w_nchannels = swap2(nchannels, swap);
     	wavehdr->w_samplespersec = swap4(44100, swap);
     	wavehdr->w_navgbytespersec = swap4(44100 * nchannels * bytespersamp, swap);
@@ -1191,7 +1200,7 @@ static void soundfiler_setup(void)
 /* READSF uses the Posix threads package; for the moment we're Linux
 only although this should be portable to the other platforms.
 
-Each instance of readsf~ owns a "child" thread for doing the UNIX (NT?) file
+Each instance of readsf~ owns a "child" thread for doing the UNIX (MSW?) file
 reading.  The parent thread signals the child each time:
     (1) a file wants opening or closing;
     (2) we've eaten another 1/16 of the shared buffer (so that the
@@ -1753,18 +1762,15 @@ static void readsf_free(t_readsf *x)
     void *threadrtn;
     pthread_mutex_lock(&x->x_mutex);
     x->x_requestcode = REQUEST_QUIT;
-    post("stopping readsf thread...");
     sfread_cond_signal(&x->x_requestcondition);
     while (x->x_requestcode != REQUEST_NOTHING)
     {
-    	post("signalling...");
 	sfread_cond_signal(&x->x_requestcondition);
     	sfread_cond_wait(&x->x_answercondition, &x->x_mutex);
     }
     pthread_mutex_unlock(&x->x_mutex);
     if (pthread_join(x->x_childthread, &threadrtn))
     	error("readsf_free: join failed");
-    post("... done.");
     
     pthread_cond_destroy(&x->x_requestcondition);
     pthread_cond_destroy(&x->x_answercondition);

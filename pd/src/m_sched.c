@@ -4,7 +4,9 @@
 
 /*  scheduling stuff  */
 
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 
     /* LATER consider making this variable.  It's now the LCM of all sample
     rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
@@ -12,9 +14,10 @@
 
 static int sys_quit;
 static double sys_time;
+static double sys_time_per_msec = TIMEUNITPERSEC / 1000.;
 static double sys_time_per_dsp_tick;
-static double sys_time_per_msec;
 
+int sys_schedblocksize = DEFDACBLKSIZE;
 int sys_usecsincelastsleep(void);
 int sys_sleepgrain;
 
@@ -192,9 +195,6 @@ static int oss_resyncphase = 0;
 static int oss_nresync = 0;
 static t_resync oss_resync[NRESYNC];
 
-#ifdef __linux__
-void linux_audiostatus(void);
-#endif
 
 static char *(oss_errornames[]) = {
 "unknown",
@@ -207,9 +207,6 @@ static char *(oss_errornames[]) = {
 void glob_audiostatus(void)
 {
     int dev, nresync, nresyncphase, i;
-#ifdef __linux__
-    linux_audiostatus();
-#endif
     nresync = (oss_nresync >= NRESYNC ? NRESYNC : oss_nresync);
     nresyncphase = oss_resyncphase - 1;
     post("audio I/O error history:");
@@ -225,7 +222,7 @@ void glob_audiostatus(void)
 	
 	post("%9.2f\t%s",
 	    (sched_diddsp - oss_resync[nresyncphase].r_ntick)
-	    	* ((double)DACBLKSIZE) / sys_dacsr,
+	    	* ((double)sys_schedblocksize) / sys_dacsr,
 	    oss_errornames[errtype]);
     	nresyncphase--;
     }
@@ -247,7 +244,7 @@ void sys_log_error(int type)
 	sched_diored = 1;
     }
     sched_dioredtime =
-    	sched_diddsp + (int)(sys_dacsr /(double)DACBLKSIZE);
+    	sched_diddsp + (int)(sys_dacsr /(double)sys_schedblocksize);
 }
 
 static int sched_lastinclip, sched_lastoutclip,
@@ -268,7 +265,7 @@ static void sched_pollformeters( void)
     	glob_ping(0);
 	    /* ping every 2 seconds */
 	sched_nextpingtime = sched_diddsp +
-	    2 * (int)(sys_dacsr /(double)DACBLKSIZE);
+	    2 * (int)(sys_dacsr /(double)sys_schedblocksize);
     }
 #endif
 
@@ -303,7 +300,7 @@ static void sched_pollformeters( void)
 	sched_lastoutdb = outdb;
     }
     sched_nextmeterpolltime =
-    	sched_diddsp + (int)(sys_dacsr /(double)DACBLKSIZE);
+    	sched_diddsp + (int)(sys_dacsr /(double)sys_schedblocksize);
 }
 
 void glob_meters(void *dummy, float f)
@@ -315,7 +312,7 @@ void glob_meters(void *dummy, float f)
 	-1;
 }
 
-#if 1
+#if 0
 void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     if (argc) sys_clearhist();
@@ -331,9 +328,7 @@ static int m_nodacs = 0;
 void m_schedsetsr( void)
 {
     sys_time_per_dsp_tick =
-    	(TIMEUNITPERSEC) * ((double)DACBLKSIZE) / sys_dacsr;
-    sys_time_per_msec =
-    	TIMEUNITPERSEC / 1000.;
+    	(TIMEUNITPERSEC) * ((double)sys_schedblocksize) / sys_dacsr;
 }
 
 /*
@@ -357,6 +352,8 @@ int m_scheduler(int nodacs)
     int lasttimeforward = SENDDACS_YES;
     int idlecount = 0;
     double lastdactime = 0;
+    sys_time_per_dsp_tick = (TIMEUNITPERSEC) *
+    	((double)sys_schedblocksize) / sys_dacsr;
     sys_clearhist();
     m_nodacs = nodacs;
     if (sys_sleepgrain < 1000)
@@ -376,7 +373,7 @@ int m_scheduler(int nodacs)
     	    if (elapsed > next)
     	    {
     	    	timeforward = SENDDACS_YES;
-    	    	next += (double)DACBLKSIZE / sys_dacsr;
+    	    	next += (double)sys_schedblocksize / sys_dacsr;
     	    }
     	    else timeforward = SENDDACS_NO;
     	}

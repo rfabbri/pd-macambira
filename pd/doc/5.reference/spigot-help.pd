@@ -1,0 +1,21 @@
+#N canvas 349 223 586 335 12;
+#X msg 25 157 0.5 1000;
+#X floatatom 74 242 1 0 0;
+#X obj 25 267 spigot;
+#X obj 25 300 print;
+#X msg 38 210 walk the cat;
+#X msg 31 182 bang;
+#X obj 35 11 spigot;
+#X text 100 12 - pass or block messages;
+#X text 99 242 control: nonzero to pass messages \, zero to stop them
+;
+#X text 333 303 updated for Pd version 0.33;
+#X text 35 63 Spigot passes messages from its left inlet to its outlet
+\, as long as a nonzero number is sent to its right inlet. When its
+right inlet gets zero \, incoming messages are "blocked \, " i.e. \,
+ignored.;
+#X connect 0 0 2 0;
+#X connect 1 0 2 1;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 5 0 2 0;

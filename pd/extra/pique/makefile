@@ -70,8 +70,7 @@ LINUXINCLUDE =  -I../../src
 	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
-	rm -f $*.o ../$*.pd_linux
-	ln -s $*/$*.pd_linux ..
+	rm -f $*.o
 
 # ----------------------- Mac OSX -----------------------
 
@@ -84,9 +83,8 @@ DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -bundle -undefined suppress  -flat_namespace -o $*.pd_darwin $*.o 
-	rm -f $*.o ../$*.pd_darwin
-	ln -s $*/$*.pd_darwin ..
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	rm -f $*.o
 
 # ----------------------------------------------------------
 

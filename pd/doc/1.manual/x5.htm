@@ -16,6 +16,55 @@ This section tracks changes in Pd's current implementation.
 
 <H4> <A name=s2> 5.1. release notes </A> </H4>
 
+<P> ------------------ 0.37-test 1 --------------------------
+
+<P> The MacOSX version now prioritizes itself effectively (thanks to
+gert@test.at (v93r)) via Adam Lindsay).  Adam has made a proper MacOSX
+"package" for Pd; see <A href=http://homepage.mac.com/atl/sw>
+http://homepage.mac.com/atl/sw</A>.
+
+<P> A bug was fixed in readsf~/writesf~ (things were coming out in the wrong
+number of channels.)
+
+<P> A problem compiling Pd with TK8.4 (the latest version) was fixed.
+
+<P> Large numbers of GUI improvements by Adam Lindsay, especially relevant
+to Mac OSX.
+
+<P> For externs, the binary may now be included in a subdirectory of the
+same name (e.g., "choice/choice.pd_linux" and "choice\choice.dll").  So
+now you can pack multiple binaries for the same extern, along with the
+source, in one convenient place.  (Note that
+"expr~" is an exception, since it goes by three different names, so this
+trick fails for that example.)
+
+<P>  "Help" files renamed "help-xxx.pd", so that help files are now possible
+for abstractions.  The "help path" feature from CVS (I forgot who contributed
+that) is also included but should now not be needed: Pd remembers where it got
+externs and abstractions and looks back in the same directory for a help file. 
+See the way "extras" is organized.
+
+<P>  Pd refuses to connect signal outlets to non-signal inlets.
+
+<P>  When you save any patch, Pd looks for all invocations of that patch
+as an abstraction and reloads them.  This unfortunately has the side effect of
+making all the containing windows visible, but it's better than nothing.
+
+
+
+<P> ------------------ 0.36-1 -------------------------------
+
+<P> "print" now queries you for a file to save the postscript to.
+
+<P> "expr" brought up to date (0.4) -- a bug was fixed involving expresions
+like "max($f1, 100)" which had erroneously output an integer.
+
+<P> a bug fix in the 4-point interpolation formula, which affects tabosc4~,
+tabread4~, tabread4, and vd~.  These should have significantly lower
+distortion than before.
+
+<P> bug fix: vradio, hradio "send symbol" feature didn't work
+
 <P> ------------------ 0.36 -------------------------------
 
 <P> There's now an "undo" for most editing operations.  Undoing is only

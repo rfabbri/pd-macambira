@@ -13,7 +13,7 @@ Pd Documentation chapter 3: Getting Pd to run
 <A href=index.htm#s3> back to table of contents </A>
 <BR><BR>
 
-Pd runs under Irix, Windows, and Linux.  
+Pd runs under Irix, Microsoft Windows, Linux, and Mac OS 10.2 (Jaguar).  
 How to get Pd up and running depends on your operating system,
 but the overall strategy is the same.
 You must first get and install it, and
@@ -60,6 +60,11 @@ third, try starting Pd up with ADCs disabled.
 operating systems it runs on: IRIX, MS Windows, Linux, and Max OSX.
 
 <H4> <A name=s1.1> 3.1. IRIX (SGI machines) </A> </H4>
+
+<P> (NOTE: as of release 0.35 I haven't had an IRIX machine to compile
+Pd on.  Soeren Bovbjerg has kindly compiled 0.35 and 0.36 for IRIX;
+you can find these at
+<A href=http://www.cvmt.dk/~sb/> http://www.cvmt.dk/~sb/. </A>)
 
 <P> Download Pd, which will be a "tar.Z" file.  You can unpack this by
 typing "zcat [name].tar.Z | tar xf -" to a shell.  This creates a directory
@@ -251,8 +256,9 @@ output in W95; see the command line arguments below.
 
 <P> What to do depends on which flavor of Linux you are running (e.g., Debian
 or Red Hat). The instructions here should work for Pd 0.33 and up regardless of
-your situation, but if you have any trouble just mail msp@ucsd.edu and I'll try
-to figure out what's wrong and update the instructions accordingly.
+your situation.  (If not, you can read the Pd mailing list archives for
+recent problems; if you have found a new problem you're welcome to post it
+to the list.)
 
 <P> Before you start, you might want to check that you have the resources Pd
 needs.  The main things you need are the C compiler, X windows (including
@@ -316,21 +322,6 @@ to "pd/src" and type
 <P> Alternatively, as superuser, you can run "make install" after "make depend"
 and then anyone on your system can just type "pd" to run it.
 
-<H5> TK support trouble </H5>
-
-Some people have reported a problem with Pd findind the shared libraries,
-"libtcl.so" and "libtk.so".  I don't know what causes this, but apparently you
-can fix it, as root, by linking /usr/lib/libtcl8.3.so to /usr/lib/libtcl.so and
-similarly for tk:
-
-<PRE>
-
-# cd /usr/lib
-# ln -s libtk8.3.so libtk.so
-# ln -s libtcl8.3.so libtcl.so
-
-</PRE>
-
 <H5> Testing audio and MIDI. </H5>
 
 <P>
@@ -366,12 +357,7 @@ audio latency your audio system can handle.
 <P>
 Be forewarned: installing and testing audio and MIDI drivers in Linux can take
 days or weeks.  There apears to be no single place where you can get detailed
-information on Linux audio.  In addition to the information here, you should
-see what's posted on Guenter's page, 
-
-    <a href="http://gige.epy.co.at/">
-    http://gige.epy.co.at/</A> .
-
+information on Linux audio.  
 
 <P>
 Depending on your hardware and software, you might or might not be able to
@@ -473,10 +459,8 @@ Alsa comes in a "finished" version (0.5.x) and a
 different, redesigned, "beta" version, 0.9.   Installing ALSA can be tricky
 and/or confusing.
 
-<P> As of version 0.33 Pd works with either 0.5.x or 0.9.x versions.
-The RPM version of Pd is compiled for 0.9.x.  If you're starting from the
-".tar.gz" version, you have to "./configure --enable-alsa" to get it; see
-the "INSTALL.txt" file in the installation.
+<P> As of version 0.37 Pd works only with 0.9.x versions.
+The RPM version of Pd is compiled for 0.9.x.
 
 <P> By default, Pd uses OSS.  If you are running ALSA, Pd will use ALSA's OSS
 emulation.  To make Pd use ALSA "natively", i.e., the way ALSA is designed
@@ -491,47 +475,6 @@ one.  You can also specify it the ALSA way: "-alsadev hw:3,0".
 <P>
 Here's a rundown on my experiences with sound cards so far.  See
 also the Pd mailing list archives.
-
-<H6> opl3sa </H6>
-
-This is the old ISA "Yamaha" audio system.  It comes on many Dell machines and
-seems to offer reasonable consumer quality audio, at least under NT.  I
-believe the current version of OSS can get full duplex operation out of an
-OPL3sa audio system.
-This is an ISA ("plug and play" device and you have to deal with I/O
-addresses and all that.
-
-<H6> cs4232 </H6>
-
-The 1999 vintage dual-processor Dell machines have "cs4232" audio, which I
-couldn't get working.
-
-<H6> es1370 (old Creative PCI128s; Ensoniq AudioPCI) </H6>
-
-<P>
-The audio inputs and outputs on my PCI128 aren't clearly labelled and various
-documents give them inconsistent names.  On my card there are 4 stereo
-mini jacks and a joystick port, in this order:
-
-<PRE>
-joystick    black            green       red       blue
-            bidirectional    line-out    mic-in    line-in
-</PRE>
-
-<P>  It used to be possilbe to get quadraphonic audio in and out
-of this card, but I haven't tried this in years. 
-
-<H6> Creative SBLive </H6>
-
-This seems to work fine either with ALSA or OSS as of Pd version 0.35; earlier
-versions of Pd didn't see MIDI input under OSS (the driver's fault, not Pd's,
-but I figured out a workaround.)
-
-<H6> Sonorus Stud I/O </H6>
-
-This $1000 card is supposed to do multichannel digital I/O
-in Linux, via a beta version of a commercial OSS driver ($40). 
-I don't know if anyone has used it with Pd.
 
 <H6> RME 9652 (Hammerfall) </H6>
 
@@ -548,10 +491,6 @@ RedHat 7.1 and up).  You have to download and compile it:
 
 <P>  You must then run Pd using the "-32bit' flag, because this uses a
 non-standard extension of OSS to 32 bit samples.
-
-<P> There's an older driver by Winfried Ritsch, invoked using the "-rme"
-flag to Pd.  This only works on 2.2 kernels, and you probably shouldn't
-try it.  It will probably be discontinued after Pd version 0.35.
 
 <P> Hammerfalls now have an ALSA driver; from what I hear
 it won't work yet with Pd.  I was unable to install the ALSA driver on the
@@ -574,50 +513,60 @@ In RedHat 7.0, motherboards with native i810 audio systems don't work in
 full duplex (they crash linux).  Either run Pd -noadc or else (better) install
 ALSA.
 
-<H6> Yamaha YMF724 </H6>
-
-The OSS driver for this card appears not to support MIDI.  I haven't
-tried with ALSA.
-
-<H6> ES1371 </H6>
-
-In OSS, audio and MIDI seem both to work fine with this chipset.
-
 <H4> <A name=s1.4> 3.4. Macintosh OSX </A> </H4>
 
-Pd version 0.35 supports Macintosh OSX, although there are still various
-problems.  You can either download Pd with Mac OSX binaries, or just download
-the sources and compile it yourself.
+Pd version 0.35 and up support Macintosh OSX, although there are still some
+problems.  You can always just download
+the sources and compile it yourself, or (easier)
+find a MacOSX-style "package".  The first package was put together by Adam 
+Lindsay and can be found on
+<A href=http://homepage.mac.com/atl/sw>
+http://homepage.mac.com/atl/sw</A>.  The package simply installs itself
+and you needn't follow the directions below.
 
-<H5> To install the binary OSX release: </H5>
+<H5> To install on OSX from source: </H5>
 
+
+Whether you've downloaded the source or the "package" you can
+always compile Pd for yourself, whether to make your own improvements, or
+possibly so that you can get the newest version before it shows up compiled for
+Mac OS X.
+
+<P> To be able to compile Pd, you must have installed Tcl/Tk
+specifically in
+/Applications/Wish Shell.app
+and /Library/Frameworks/Tk.framework and /Library/Frameworks/Tcl.framework.
 <P> First download and install TK for OSX
 (http://sourceforge.net/projects/tcl/).  Get a recent one compiled for
-OSX, by chasing through "Mac OS X Tk Snapshots."  I got
-version 8.4a4-2, in a file named "MacOSXTk8.4a4-2.tar.gz ".  Unpacking this
-yields three directories: ./Applications/Wish Shell.app, 
-./Library/Frameworks/Tcl.framework,
-and ./Library/Frameworks/Tk.framework.  These must be moved, either to:
-<pre>
-    ~/Applications/Wish Shell.app
-    ~/Library/Frameworks/Tcl.framework
-    ~/Library/Frameworks/Tk.framework
-</pre>
-or, if you wish to make them available to other users (or make it possible to
-recompile Pd), in /Applications and /Library instead.
+OSX, by chasing through "latest file releases", and finding a "download"
+link for TCL.  Then download "TclTkAqua-8.4.1-Jaguar.dmg" (the version
+number may change).  Click on this file and a "folder" will open.  Click
+on the "package" icon in that folder and an auto-installer will put Tcl/Tk
+on your system.
 
-<P> Then download and unpack the Pd binary distribution for OS X.  This will
-create a directory with a name like ~/Desktop/pd-0.35-test22.  You can move
-this elsewhere if you wish (to ~/pd, for example).  To a shell window, type
-either "~/Desktop/pd-0.35-test22/bin/pd" or, if you moved it as suggested,
-"~/pd/bin/pd" .  If you wish you can put the line,
+<P> For old versions of Tcl/Tk you also had to get the "h" files from XFree86
+and put them in
+/usr/X11R6/include. You can download just the H files from:
+<pre>
+    http://www.crca.ucsd.edu/~msp/x.tgz
+</pre>
+(the individual files seem to have adequate copyright notices so that
+I can just redistribute them.)  ((I hope this is no longer necessary but I
+notice people keep downloading these files anyway, so I'll leave them there
+a while longer until I'm sure they're not needed.))
+
+<P> Then, just as for linux, just unload pd-whatever.tar.gz into a directory
+such as ~/pd-0.35-test17 , cd to pd-0.36-0/src, type "./configure"
+and "make".  Then type ~/pd-0.36-0/bin/pd to a shell and enjoy!
+
+<P> If you wish you can put the line,
 
 <pre>
     alias pd ~/pd/bin/pd
 </pre>
 
 in the file, ~/.tcshrc, so that you can later just type "pd" to a shell.  (The
-shell only reads the ~/.tcshrc file onstartup, so this won't take effect in
+shell only reads the ~/.tcshrc file on startup, so this won't take effect in
 any existing shells unless you specially type
 <pre>
     source ~/.tcshrc
@@ -638,47 +587,7 @@ I think you just download the OSX driver and follow directions.
     pd -midiindev 1 -midioutdev 2
 </pre>
 
-to get MIDI working.  At the moment, using a midiman Midisport 2x2, I'm getting
-several lines of debugging printout for each incoming MIDI message; it seems to
-be the driver printing it out. I don't know how to turn this off.
-
-<P> To get Pd running at high priority, so that you'll get fewer skips in the
-audio input and output, you must "renice" it.  The easiest way to do this is
-to make it SETUID and use the "-rt" flag.  To do this, become root (you might
-have to add a root account to do this) and type:
-
-<pre>
-    chown root ~ferguson/pd/bin/pd
-    chmod 4755 ~ferguson/pd/bin/pd
-</pre>
-(assuming your username is "ferguson").
-
-<H5> To compile your own Pd in OSX: </H5>
-
-Whether you've downloaded the source or the OSX binary distribution you can
-always Pd for yourself, whether to make your own improvements, or possibly
-so that you can get the newest version before it shows up compiled
-for Mac OS X.
-
-<P> To be able to compile Pd, you must have installed Tcl/Tk
- specifically in
-/Applications/Wish Shell.app
-and /Library/Frameworks/Tk.framework and /Library/Frameworks/Tcl.framework.
-
-You must also get the "h" files from XFree86 and put them in
-/usr/X11R6/include. You can download just the H files from:
-<pre>
-    http://www.crca.ucsd.edu/~msp/x.tgz
-</pre>
-(the individual files seem to have adequate copyright notices so that
-I can just redistribute them.)
-
-Then, just as for linux, just unload pd-whatever.tar.gz into a directory
-such as ~/pd-0.35-test17 , cd to pd-0.35-test17/src, type "./configure"
-and "make".
-
-then type ~/pd-0.35-test17/bin/pd to a shell and enjoy!
-
+to get MIDI working. 
 
 <H4> <A name=s3> 3.5. graphics rendering using GEM </A> </H4>
 

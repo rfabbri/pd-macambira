@@ -7,7 +7,7 @@
 #ifdef UNIX
 #include <unistd.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #endif
 

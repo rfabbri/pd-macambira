@@ -1,0 +1,46 @@
+#N canvas 0 365 726 512 12;
+#X msg 88 13 message boxes;
+#X text 55 36 Message boxes hold one or more message. Anytime the message
+box receives any message at all \, the messages in the box are all
+sent to their destinations.;
+#X obj 178 301 print;
+#X msg 178 241 60 64;
+#X msg 178 271 pitch \$1 \, velocity \$2;
+#X msg 49 378 123 \; my-receiver-name 858 \; another-receiver -45;
+#X text 55 84 Clicking on a message also sends it \, so you can use
+messsage boxes for push buttins. For instance \, click here while watching
+the printout window:;
+#X msg 164 141 walk the dog;
+#X obj 164 170 print;
+#X text 281 141 <--- message;
+#X text 265 167 <--- object (different border);
+#X text 35 200 You can separate multiple messages by commas. Also \,
+you can use "$1" \, "$2" \, etc. to make variable messages:;
+#X text 14 323 Finally \, if you separate messages by a semicolon instead
+of a comma \, the following message(s) are re-routed to named objects
+such as "receives":;
+#X obj 49 433 print;
+#X obj 253 378 receive my-receiver-name;
+#X floatatom 253 402 0 0 0;
+#X floatatom 252 449 0 0 0;
+#X obj 252 425 receive another-receiver;
+#X msg 559 349 dog bird monkey \; monkey \;;
+#X msg 559 229 set dog;
+#X msg 567 252 set cat;
+#X text 593 189 this is;
+#X text 592 206 arcane:;
+#X msg 576 303 add monkey;
+#X msg 581 327 add2 bird;
+#X msg 573 277 set;
+#X text 415 479 updated for Pd version 0.34;
+#X connect 3 0 4 0;
+#X connect 4 0 2 0;
+#X connect 5 0 13 0;
+#X connect 7 0 8 0;
+#X connect 14 0 15 0;
+#X connect 17 0 16 0;
+#X connect 19 0 18 0;
+#X connect 20 0 18 0;
+#X connect 23 0 18 0;
+#X connect 24 0 18 0;
+#X connect 25 0 18 0;

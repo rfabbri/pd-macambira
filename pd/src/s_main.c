@@ -7,11 +7,13 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.36-0\n";
+char pd_version[] = "Pd version 0.37 TEST 4\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <limits.h>
@@ -23,7 +25,7 @@ char pd_compiledate[] = __DATE__;
 #ifdef UNIX
 #include <unistd.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #include <windows.h>
 #include <winbase.h>
@@ -36,6 +38,7 @@ int sys_startgui(const char *guipath);
 int sys_rcfile(void);
 int m_scheduler(int nodacs);
 void m_schedsetsr( void);
+void sys_addhelppath(char *p);
 
 int sys_debuglevel;
 int sys_verbose;
@@ -50,16 +53,13 @@ static t_namelist *sys_messagelist;
 static int sys_version;
 
 int sys_nmidiout = 1;
-#ifdef NT
+#ifdef MSW
 int sys_nmidiin = 0;
-#define DEFMIDIOUTDEV 0	/* For output, in NT, default to "midi_mapper" */
 #else
 int sys_nmidiin = 1;
-#define DEFMIDIOUTDEV 1	/* in other OSes, default to first MIDI device */
 #endif
-#define DEFMIDIINDEV 1	/* for NT this isn't used since sys_nmidiin is 0. */
-int sys_midiindevlist[MAXMIDIINDEV] = {DEFMIDIINDEV};
-int sys_midioutdevlist[MAXMIDIOUTDEV] = {DEFMIDIOUTDEV};
+int sys_midiindevlist[MAXMIDIINDEV] = {DEFMIDIDEV};
+int sys_midioutdevlist[MAXMIDIOUTDEV] = {DEFMIDIDEV};
 
 typedef struct _fontinfo
 {
@@ -80,7 +80,7 @@ static t_fontinfo sys_fontlist[] = {
 #define NFONT (sizeof(sys_fontlist)/sizeof(*sys_fontlist))
 
 /* here are the actual font size structs on msp's systems:
-NT:
+MSW:
 font 8 5 9 8 5 11
 font 10 7 13 10 6 13
 font 12 9 16 14 8 16
@@ -127,7 +127,7 @@ int sys_fontheight(int fontsize)
 }
 
 int sys_defaultfont;
-#ifdef NT
+#ifdef MSW
 #define DEFAULTFONT 12
 #else
 #define DEFAULTFONT 10
@@ -228,6 +228,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 }
 
 static void sys_addextrapath(void);
+static void sys_addreferencepath(void);
 
 /* this is called from main() in s_entry.c */
 int sys_main(int argc, char **argv)
@@ -237,11 +238,12 @@ int sys_main(int argc, char **argv)
 #endif
     pd_init();    	    	    	    	/* start the message system */
     sys_findprogdir(argv[0]);	    	    	/* set sys_progname, guipath */
-#ifdef __linux__
+#ifdef UNIX
     sys_rcfile();                               /* parse the startup file */
 #endif
     if (sys_argparse(argc, argv)) return (1);	/* parse cmd line */
     sys_addextrapath();
+    sys_addreferencepath();
     if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
     	pd_version, pd_compiletime, pd_compiledate);
     if (sys_version)	/* if we were just asked our version, exit here. */
@@ -265,13 +267,11 @@ static char *(usagemessage[]) = {
 "usage: pd [-flags] [file]...\n",
 "\naudio configuration flags:\n",
 "-r <n>           -- specify sample rate\n",
-#if defined(__linux__) || defined(NT)
-"-inchannels ...  -- number of audio in channels (by device, like \"2\" or \"16,8\")\n",
-"-outchannels ... -- number of audio out channels (by device)\n",
-#else
-"-inchannels <n>  -- number of audio input channels\n",
-"-outchannels <n> -- number of audio output channels\n",
-#endif
+"-audioindev ...  -- audio in devices; e.g., \"1,3\" for first and third\n",
+"-audiooutdev ... -- audio out devices (same)\n",
+"-audiodev ...    -- specify input and output together\n",
+"-inchannels ...  -- audio input channels (by device, like \"2\" or \"16,8\")\n",
+"-outchannels ... -- number of audio out channels (same)\n",
 "-channels ...    -- specify both input and output channels\n",
 "-audiobuf <n>    -- specify size of audio buffer in msec\n",
 "-blocksize <n>   -- specify audio I/O block size in sample frames\n",
@@ -279,37 +279,30 @@ static char *(usagemessage[]) = {
 "-nodac           -- suppress audio output\n",
 "-noadc           -- suppress audio input\n",
 "-noaudio         -- suppress audio input and output (-nosound is synonym) \n",
-"-listdev          -- list audio and MIDI devices\n",
+"-listdev         -- list audio and MIDI devices\n",
 
-#ifdef __linux__
-"-frags <n>       -- specify number of audio fragments (defeats audiobuf)\n",
-"-fragsize <n>    -- specify log of fragment size ('blocksize' is better...)\n",
-"-stream          -- use stream mode audio (e.g., for es1370 audio cards)\n",
-"-32bit     	  -- allow 32 bit OSS audio transfers (for RME Hammerfall)\n",
+#ifdef USEAPI_OSS
+"-oss     	  -- use OSS audio API\n",
+"-32bit     	  ----- allow 32 bit OSS audio (for RME Hammerfall)\n",
 #endif
 
-#ifdef ALSA99
-"-alsa            -- use ALSA audio drivers\n",
-"-alsadev <n>     -- specify ALSA I/O device number (counting from 1)\n",
+#ifdef USEAPI_ALSA
+"-alsa            -- use ALSA audio API\n",
+"-alsadev <n>     ----- ALSA device # (count from 1) or name: default hw:0,0\n",
 #endif
 
-#ifdef ALSA01
-"-alsa            -- use ALSA audio drivers\n",
-"-alsadev <n>     -- ALSA device # (counting from 1) or name: default hw:0,0\n",
+#ifdef USEAPI_PORTAUDIO
+#ifdef MSW
+"-pa              -- use Portaudio API (for ASIO)\n",
+#else
+"-pa              -- use Portaudio API\n",
+#endif
 #endif
 
-#ifdef RME_HAMMERFALL
-"-rme             -- use Ritsch's RME 9652 audio driver\n",
+#ifdef USEAPI_MMIO
+"-mmio     	  -- use MMIO audio API\n",
 #endif
-"-audioindev ...  -- sound in device list; e.g., \"2,1\" for second and first\n",
-"-audiooutdev ... -- sound out device list, same as above \n",
-"-audiodev ...    -- specify both -audioindev and -audiooutdev together\n",
-
-#ifdef NT
-"-resync           -- resynchronize audio (default if more than 2 channels)\n",
-"-noresync         -- never resynchronize audio I/O (default for stereo)\n",
-"-asio             -- use ASIO audio driver (and not the 'MMIO' default)\n",
-#endif
+"      (default audio API for this platform:  ", API_DEFSTRING, ")\n\n",
 
 "\nMIDI configuration flags:\n",
 "-midiindev ...   -- midi in device list; e.g., \"1,3\" for first and third\n",
@@ -319,8 +312,9 @@ static char *(usagemessage[]) = {
 "-nomidiout       -- suppress MIDI output\n",
 "-nomidi          -- suppress MIDI input and output\n",
 
-"\ngeneral flags:\n",
+"\nother flags:\n",
 "-path <path>     -- add to file search path\n",
+"-helppath <path> -- add to help file search path\n",
 "-open <file>     -- open file(s) on startup\n",
 "-lib <file>      -- load object library(s)\n",
 "-font <n>        -- specify default font size in points\n",
@@ -331,7 +325,7 @@ static char *(usagemessage[]) = {
 "-nogui           -- suppress starting the GUI\n",
 "-guicmd \"cmd...\" -- substitute another GUI program (e.g., rsh)\n",
 "-send \"msg...\"   -- send a message at startup (after patches are loaded)\n",
-#ifdef UNIX
+#ifdef __linux__
 "-rt or -realtime -- use real-time priority (needs root privilege)\n",
 #endif
 };
@@ -359,18 +353,18 @@ static void sys_parsedevlist(int *np, int *vecp, int max, char *str)
 
 static int sys_getmultidevchannels(int n, int *devlist)
 {
-  int sum = 0;
-  if (n<0)return(-1);
-  if (n==0)return 0;
-  while(n--)sum+=*devlist++;
-  return sum;
+    int sum = 0;
+    if (n<0)return(-1);
+    if (n==0)return 0;
+    while(n--)sum+=*devlist++;
+    return sum;
 }
 
 
     /* this routine tries to figure out where to find the auxilliary files
     Pd will need to run.  This is either done by looking at the command line
     invokation for Pd, or if htat fails, by consulting the variable
-    INSTALL_PREFIX.  In NT, we don't try to use INSTALL_PREFIX. */
+    INSTALL_PREFIX.  In MSW, we don't try to use INSTALL_PREFIX. */
 void sys_findprogdir(char *progname)
 {
     char sbuf[MAXPDSTRING], sbuf2[MAXPDSTRING], *sp;
@@ -380,11 +374,11 @@ void sys_findprogdir(char *progname)
 #endif
 
     /* find out by what string Pd was invoked; put answer in "sbuf". */
-#ifdef NT
+#ifdef MSW
     GetModuleFileName(NULL, sbuf2, sizeof(sbuf2));
     sbuf2[MAXPDSTRING-1] = 0;
     sys_unbashfilename(sbuf2, sbuf);
-#endif /* NT */
+#endif /* MSW */
 #ifdef UNIX
     strncpy(sbuf, progname, MAXPDSTRING);
     sbuf[MAXPDSTRING-1] = 0;
@@ -424,7 +418,7 @@ void sys_findprogdir(char *progname)
 	    .../lib/pd/bin/pd-gui
 	    .../lib/pd/doc
     	To decide which, we stat .../lib/pd; if that exists, we assume it's
-	the complicated layout.  In NT, it's the "simple" layout, but
+	the complicated layout.  In MSW, it's the "simple" layout, but
 	the gui program is straight wish80:
 	    .../bin/pd
 	    .../bin/wish80.exe
@@ -455,18 +449,15 @@ void sys_findprogdir(char *progname)
     	sys_guidir = gensym(sbuf);
     }
 #endif
-#ifdef NT
+#ifdef MSW
     sys_libdir = gensym(sbuf2);
-    sys_guidir = &s_;	/* in NT the guipath just depends on the libdir */
+    sys_guidir = &s_;	/* in MSW the guipath just depends on the libdir */
 #endif
 }
 
 int sys_argparse(int argc, char **argv)
 {
     char sbuf[MAXPDSTRING];
-#ifdef NT
-    int resync = -1;
-#endif
     argc--; argv++;
     while ((argc > 0) && **argv == '-')
     {
@@ -526,26 +517,72 @@ int sys_argparse(int argc, char **argv)
     	    argc -= 2; argv += 2;
     	}
     	else if (!strcmp(*argv, "-nodac"))
-	  { /* IOhannes */
-	  sys_nsoundout=0;
-	  sys_nchout = 0;
-	  outchannels  =0;
-	  argc--; argv++;
+	{ /* IOhannes */
+	    sys_nsoundout=0;
+	    sys_nchout = 0;
+	    outchannels  =0;
+	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-noadc"))
-	  { /* IOhannes */
-	  sys_nsoundin=0;
-	  sys_nchin = 0;
-	  inchannels  =0;
-	  argc--; argv++;
+	{ /* IOhannes */
+	    sys_nsoundin=0;
+	    sys_nchin = 0;
+	    inchannels  =0;
+	    argc--; argv++;
     	}
     	else if (!strcmp(*argv, "-nosound") || !strcmp(*argv, "-noaudio"))
-	  { /* IOhannes */
-	  sys_nsoundin=sys_nsoundout = 0;
-	  sys_nchin = sys_nchout = 0;
-	  inchannels  =outchannels    =0;
-	  argc--; argv++;
+	{ /* IOhannes */
+	    sys_nsoundin=sys_nsoundout = 0;
+	    sys_nchin = sys_nchout = 0;
+	    inchannels  =outchannels    =0;
+	    argc--; argv++;
     	}
+#ifdef USEAPI_OSS
+    	else if (!strcmp(*argv, "-oss"))
+    	{
+    	    sys_set_sound_api(API_OSS);
+    	    argc--; argv++;
+    	}
+    	else if (!strcmp(*argv, "-32bit"))
+    	{
+    	    sys_set_sound_api(API_OSS);
+    	    oss_set32bit();
+    	    argc--; argv++;
+    	}
+#endif
+#ifdef USEAPI_ALSA
+    	else if (!strcmp(*argv, "-alsa"))
+    	{
+    	    sys_set_sound_api(API_ALSA);
+    	    argc--; argv++;
+    	}
+	else if (!strcmp(*argv, "-alsadev"))
+	{
+	    if (argv[1][0] >= '1' && argv[1][0] <= '9')
+	    {
+	    	char buf[80];
+		sprintf(buf, "hw:%d,0", atoi(argv[1]) - 1);
+		linux_alsa_devname(buf);
+	    }
+	    else linux_alsa_devname(argv[1]);
+    	    sys_set_sound_api(API_ALSA);
+	    argc -= 2; argv +=2;
+	}
+#endif
+#ifdef USEAPI_PORTAUDIO
+    	else if (!strcmp(*argv, "-pa") || !strcmp(*argv, "-portaudio"))
+    	{
+    	    sys_set_sound_api(API_PORTAUDIO);
+    	    argc--; argv++;
+    	}
+#endif
+#ifdef USEAPI_MMIO
+    	else if (!strcmp(*argv, "-mmio"))
+    	{
+    	    sys_set_sound_api(API_MMIO);
+    	    argc--; argv++;
+    	}
+#endif
     	else if (!strcmp(*argv, "-nomidiin"))
     	{
     	    sys_nmidiin = 0;
@@ -590,6 +627,11 @@ int sys_argparse(int argc, char **argv)
     	else if (!strcmp(*argv, "-path"))
     	{
     	    sys_addpath(argv[1]);
+    	    argc -= 2; argv += 2;
+    	}
+    	else if (!strcmp(*argv, "-helppath"))
+    	{
+    	    sys_addhelppath(argv[1]);
     	    argc -= 2; argv += 2;
     	}
     	else if (!strcmp(*argv, "-open") && argc > 1)
@@ -650,79 +692,11 @@ int sys_argparse(int argc, char **argv)
     	    argc--; argv++;
     	}
 #ifdef UNIX
-    	else if (!strcmp(*argv, "-rt"))
+    	else if (!strcmp(*argv, "-rt") || !strcmp(*argv, "-realtime"))
     	{
     	    sys_hipriority = 1;
     	    argc--; argv++;
     	}
-    	else if (!strcmp(*argv, "-realtime"))
-    	{
-    	    sys_hipriority = 1;
-    	    argc--; argv++;
-    	}
-#endif
-#ifdef __linux__
-    	else if (!strcmp(*argv, "-frags"))
-    	{
-    	    linux_setfrags(atoi(argv[1]));
-    	    argc -= 2; argv += 2;
-    	}
-    	else if (!strcmp(*argv, "-fragsize"))
-    	{
-	    post("pd: -fragsize argument is obsolete; use '-blocksize %d'\n",
-	    	(1 << atoi(argv[1])));
-    	    sys_setblocksize(1 << atoi(argv[1]));
-    	    argc -= 2; argv += 2;
-    	}
-    	else if (!strcmp(*argv, "-stream"))
-    	{
-    	    linux_streammode();
-    	    argc--; argv++;
-    	}
-    	else if (!strcmp(*argv, "-32bit"))
-    	{
-    	    linux_32bit();
-    	    argc--; argv++;
-    	}
-#ifdef ALSA01
-    	else if (!strcmp(*argv, "-alsa"))
-    	{
-    	    linux_set_sound_api(API_ALSA);
-    	    argc--; argv++;
-    	}
-	else if (!strcmp(*argv, "-alsadev"))
-	{
-	    if (argv[1][0] >= '1' && argv[1][0] <= '9')
-	    {
-	    	char buf[80];
-		sprintf(buf, "hw:%d,0", atoi(argv[1]) - 1);
-		linux_alsa_devname(buf);
-	    }
-	    else linux_alsa_devname(argv[1]);
-    	    linux_set_sound_api(API_ALSA);
-	    argc -= 2; argv +=2;
-	}
-#endif
-#ifdef ALSA99
-    	else if (!strcmp(*argv, "-alsa"))
-    	{
-    	    linux_set_sound_api(API_ALSA);
-    	    argc--; argv++;
-    	}
-	else if (!strcmp(*argv, "-alsadev"))
-	{
-	    linux_alsa_devno(atoi(argv[1]));
-    	    linux_set_sound_api(API_ALSA);
-	    argc -= 2; argv +=2;
-	}
-#endif
-#ifdef RME_HAMMERFALL
-    	else if (!strcmp(*argv, "-rme"))
-    	{
-    	    linux_set_sound_api(API_RME);
-    	    argc--; argv++;
-    	}
-#endif
 #endif
     	else if (!strcmp(*argv, "-soundindev") ||
 	    !strcmp(*argv, "-audioindev"))
@@ -752,24 +726,6 @@ int sys_argparse(int argc, char **argv)
 	    goto usage;
     	    argc -= 2; argv += 2;
     	}
-#ifdef NT
-    	else if (!strcmp(*argv, "-asio"))
-	{
-    	    nt_set_sound_api(API_PORTAUDIO);
-    	    argc--; argv++;
-    	}
-    	else if (!strcmp(*argv, "-noresync"))
-	{
-    	    resync = 0;
-    	    argc--; argv++;
-    	}
-    	else if (!strcmp(*argv, "-resync"))
-	{
-    	    resync = 1;
-    	    argc--; argv++;
-    	}
-
-#endif /* NT */
     	else
     	{
 	    unsigned int i;
@@ -779,25 +735,17 @@ int sys_argparse(int argc, char **argv)
     	    return (1);
     	}
     }
-#ifdef NT
-    	/* resynchronization is on by default for mulltichannel, otherwise
-	    off. */
-    if (resync == -1)
-	resync =  (inchannels > 2 || outchannels > 2);
-    if (!resync)
-    	nt_noresync();
-#endif
-    if (!sys_defaultfont) sys_defaultfont = DEFAULTFONT;
+    if (!sys_defaultfont)
+    	sys_defaultfont = DEFAULTFONT;
     for (; argc > 0; argc--, argv++) 
     	sys_openlist = namelist_append(sys_openlist, *argv);
-
 
     return (0);
 }
 
 int sys_getblksize(void)
 {
-    return (DACBLKSIZE);
+    return (DEFDACBLKSIZE);
 }
 
 static void sys_addextrapath(void)
@@ -810,3 +758,12 @@ static void sys_addextrapath(void)
     sys_addpath(sbuf);
 }
 
+static void sys_addreferencepath(void)
+{
+    char sbuf[MAXPDSTRING];
+	    /* add "doc/5.reference" library to helppath */
+    strncpy(sbuf, sys_libdir->s_name, MAXPDSTRING-30);
+    sbuf[MAXPDSTRING-30] = 0;
+    strcat(sbuf, "/doc/5.reference");
+    sys_addhelppath(sbuf);
+}

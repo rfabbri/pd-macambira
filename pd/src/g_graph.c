@@ -25,6 +25,7 @@ static void graph_getrect(t_gobj *z, t_glist *glist,
 
 void glist_add(t_glist *x, t_gobj *y)
 {
+    t_object *ob;
     y->g_next = 0;
     if (!x->gl_list) x->gl_list = y;
     else
@@ -33,6 +34,8 @@ void glist_add(t_glist *x, t_gobj *y)
     	for (y2 = x->gl_list; y2->g_next; y2 = y2->g_next);
     	y2->g_next = y;
     }
+    if (x->gl_editor && (ob = pd_checkobject(&y->g_pd)))
+    	rtext_new(x, ob);
     if (glist_isvisible(x))
     	gobj_vis(y, x, 1);
     if (class_isdrawcommand(y->g_pd)) 
@@ -53,14 +56,14 @@ int canvas_setdeleting(t_canvas *x, int flag)
 void glist_delete(t_glist *x, t_gobj *y)
 {
     t_gobj *g;
+    t_object *ob;
     t_gotfn chkdsp = zgetfn(&y->g_pd, gensym("dsp"));
     t_canvas *canvas = glist_getcanvas(x);
     int drawcommand = class_isdrawcommand(y->g_pd);
     int wasdeleting;
     
     wasdeleting = canvas_setdeleting(canvas, 1);
-    	/*  LATER decide whether all visible glists must have an editor? */
-    if (glist_isvisible(canvas) && x->gl_editor)
+    if (x->gl_editor)
     {
     	if (x->gl_editor->e_grab == y) x->gl_editor->e_grab = 0;
     	if (glist_isselected(x, y)) glist_deselect(x, y);
@@ -88,7 +91,10 @@ void glist_delete(t_glist *x, t_gobj *y)
 	}
     }
     gobj_delete(y, x);
-    if (glist_isvisible(canvas)) gobj_vis(y, x, 0);
+    if (glist_isvisible(canvas))
+    	gobj_vis(y, x, 0);
+    if (x->gl_editor && (ob = pd_checkobject(&y->g_pd)))
+    	rtext_new(x, ob);
     if (x->gl_list == y) x->gl_list = y->g_next;
     else for (g = x->gl_list; g; g = g->g_next)
     	if (g->g_next == y)
@@ -640,14 +646,12 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     	text_widgetbehavior.w_visfn(gr, parent_glist, vis);
 	return;
     }
-    
-    if (vis)
-    	rtext_new(parent_glist, &x->gl_obj,
-	    parent_glist->gl_editor->e_rtext, 
-	    canvas_showtext(x));
+
+    if (vis && canvas_showtext(x))
+    	rtext_draw(glist_findrtext(parent_glist, &x->gl_obj));
     graph_getrect(gr, parent_glist, &x1, &y1, &x2, &y2);
     if (!vis)
-    	rtext_free(glist_findrtext(parent_glist, &x->gl_obj));
+    	rtext_erase(glist_findrtext(parent_glist, &x->gl_obj));
 
     sprintf(tag, "graph%x", (int)x);
     if (vis)

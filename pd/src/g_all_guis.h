@@ -46,7 +46,7 @@
 #define IEM_GUI_MINSIZE 8
 #define IEM_GUI_MAXSIZE 1000
 #define IEM_SL_DEFAULTSIZE 128
-#define IEM_SL_MINSIZE 20
+#define IEM_SL_MINSIZE 2
 #define IEM_FONT_MINSIZE 4
 
 #define IEM_BNG_DEFAULTHOLDFLASHTIME 250
@@ -314,7 +314,6 @@ EXTERN void iemgui_save(t_iemgui *iemgui, t_symbol **srl, int *bflcol);
 EXTERN void iemgui_properties(t_iemgui *iemgui, t_symbol **srl);
 EXTERN int iemgui_dialog(t_iemgui *iemgui, t_symbol **srl, int argc, t_atom *argv);
 
-EXTERN t_rtext *rtext_new_without_senditup(t_glist *glist, t_text *who, t_rtext *next);
 EXTERN int canvas_getdollarzero(void);
 EXTERN void canvas_getargs(int *argcp, t_atom **argvp);
 

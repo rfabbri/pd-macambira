@@ -2,6 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
+#include "m_pd.h"
 #include "m_imp.h"
 
 static t_class *pdclass;
@@ -19,47 +20,17 @@ void glob_audiostatus(void *dummy);
 void glob_finderror(t_pd *dummy);
 void glob_ping(t_pd *dummy);
 
-#if 0	    /* this doesn't work for OSS or for ALSA...  discouraged... */
-
-#ifdef UNIX
-#include <unistd.h>
-#endif
-
-void glob_restart_audio(t_pd *dummy)
-{
-    int inchans = sys_get_inchannels();
-    int outchans = sys_get_outchannels();
-    post("1");
-    sys_close_audio();
-    post("2");
-#ifdef UNIX
-    sleep(2);
-#endif
-    post("3");
-    sys_open_audio(1, 0, 1, 0, /* IOhannes */
-		   1, &inchans, 1, &outchans, sys_dacsr);
-     post("4");
-}
-#endif
-
 void alsa_resync( void);
 
 
-#ifdef ALSA01
-void glob_restart_alsa(t_pd *dummy)
-{
-    alsa_resync();
-}
-#endif
-
-#ifdef NT
+#ifdef MSW
 void glob_audio(void *dummy, t_floatarg adc, t_floatarg dac);
 #endif
 
 /* a method you add for debugging printout */
 void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv);
 
-#if 0
+#if 1
 void glob_foo(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     *(int *)1 = 3;
@@ -107,14 +78,6 @@ void glob_init(void)
     	gensym("finderror"), 0);
 #ifdef UNIX
     class_addmethod(pdclass, (t_method)glob_ping, gensym("ping"), 0);
-#endif
-#ifdef NT
-    class_addmethod(pdclass, (t_method)glob_audio, gensym("audio"),
-    	A_DEFFLOAT, A_DEFFLOAT, 0);
-#endif
-#ifdef ALSA01
-    class_addmethod(pdclass, (t_method)glob_restart_alsa,
-    	gensym("restart-audio"), 0);
 #endif
     class_addanything(pdclass, max_default);
     pd_bind(&pdclass, gensym("pd"));

@@ -85,6 +85,19 @@ void word_restore(t_word *wp, t_template *template,
     	post("warning: word_restore: extra arguments");
 }
 
+void word_free(t_word *wp, t_template *template)
+{
+    int i;
+    t_dataslot *dt;
+    for (dt = template->t_vec, i = 0; i < template->t_n; i++, dt++)
+    {
+    	if (dt->ds_type == DT_ARRAY)
+    	    array_free(wp[i].w_array);
+    	else if (dt->ds_type == DT_LIST)
+    	    canvas_free(wp[i].w_list);
+    }
+}
+
     /* make a new scalar and add to the glist.  We create a "gp" here which
     will be used for array items to point back here.  This gp doesn't do
     reference counting or "validation" updates though; the parent won't go away
@@ -350,13 +363,7 @@ static void scalar_free(t_scalar *x)
     	error("scalar: couldn't find template %s", templatesym->s_name);
 	return;
     }
-    for (dt = template->t_vec, i = 0; i < template->t_n; i++, dt++)
-    {
-    	if (dt->ds_type == DT_ARRAY)
-    	    array_free(x->sc_vec[i].w_array);
-    	else if (dt->ds_type == DT_LIST)
-    	    canvas_free(x->sc_vec[i].w_list);
-    }
+    word_free(x->sc_vec, template);
     gfxstub_deleteforkey(x);
     	/* the "size" field in the class is zero, so Pd doesn't try to free
 	us automatically (see pd_free()) */

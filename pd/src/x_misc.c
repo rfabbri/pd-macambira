@@ -4,7 +4,8 @@
 
 /* misc. */
 
-#include "m_imp.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,7 +15,7 @@
 #include <sys/times.h>
 #include <sys/param.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <wtypes.h>
 #include <time.h>
 #endif
@@ -140,7 +141,7 @@ static void namecanvas_setup(void)
 	    sizeof(t_namecanvas), CLASS_NOINLET, A_DEFSYM, 0);
 }
 
-/* ---------------serial ports (NT only -- hack) ------------------------- */
+/* ---------------serial ports (MSW only -- hack) ------------------------- */
 #define MAXSERIAL 100
 
 static t_class *serial_class;
@@ -192,7 +193,7 @@ typedef struct _cputime
 #ifdef UNIX
     struct tms x_setcputime;
 #endif
-#ifdef NT
+#ifdef MSW
     LARGE_INTEGER x_kerneltime;
     LARGE_INTEGER x_usertime;
     int x_warned;
@@ -204,7 +205,7 @@ static void cputime_bang(t_cputime *x)
 #ifdef UNIX
     times(&x->x_setcputime);
 #endif
-#ifdef NT
+#ifdef MSW
     FILETIME ignorethis, ignorethat;
     BOOL retval;
     retval = GetProcessTimes(GetCurrentProcess(), &ignorethis, &ignorethat,
@@ -231,7 +232,7 @@ static void cputime_bang2(t_cputime *x)
 	    x->x_setcputime.tms_utime - x->x_setcputime.tms_stime) / HZ;
     outlet_float(x->x_obj.ob_outlet, elapsedcpu);
 #endif
-#ifdef NT
+#ifdef MSW
     float elapsedcpu;
     FILETIME ignorethis, ignorethat;
     LARGE_INTEGER usertime, kerneltime;
@@ -254,7 +255,7 @@ static void *cputime_new(void)
     outlet_new(&x->x_obj, gensym("float"));
 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("bang"), gensym("bang2"));
-#ifdef NT
+#ifdef MSW
     x->x_warned = 0;
 #endif
     cputime_bang(x);

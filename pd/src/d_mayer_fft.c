@@ -48,7 +48,7 @@
 * of work.  -msp
 */
 
-#ifdef NT
+#ifdef MSW
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast double to float */
 #pragma warning( disable : 4101 )  /* unused local variables */

@@ -1,0 +1,148 @@
+/* Copyright (c) 1998 The Regents of the University of California.  The
+contents of this file are free for any use, but BOTH THE AUTHOR AND UCSD
+DISCLAIM ALL WARRANTIES related to it.  Although not written in Java, this
+still should not be used to control any machinery containing a sharp blade or
+combustible materiel, or as part of any life support system or weapon. */
+
+#include "m_pd.h"
+#include <math.h>
+
+static t_class *pique_class;
+
+typedef struct _pique
+{
+    t_object x_obj;
+} t_pique;
+
+static void *pique_new(void)
+{
+    t_pique *x = (t_pique *)pd_new(pique_class);
+    return (x);
+}
+
+    	    /* we aren't measuring phase yet */
+static void pique_doit(int npts, t_float *fpreal, t_float *fpimag,
+    int npeak, t_float *fpfreq, t_float *fpamp)
+{
+    float srate = sys_getsr();	    /* not sure how to get this correctly */
+    float oneovern = 1.0/ (float)npts;
+    float fperbin = srate * oneovern;
+    float pow1, pow2 = 0, pow3 = 0, pow4 = 0, pow5 = 0;
+    float re1, re2 = 0, re3 = *fpreal;
+    float im1, im2 = 0, im3 = 0, powthresh;
+    int count, peakcount = 0, n2 = (npts >> 1);
+    float *fp1, *fp2;
+    for (count = n2, fp1 = fpreal, fp2 = fpimag, powthresh = 0;
+    	count--; fp1++, fp2++)
+    	    powthresh += (*fp1) * (*fp1) + (*fp2) * (*fp2) ; 
+    powthresh *= 0.00001;
+    for (count = 1; count < n2; count++)
+    {
+    	float windreal, windimag, pi = 3.14159;
+    	float detune, pidetune, ampcorrect, freqout, ampout;
+    	float rpeak, rpeaknext, rpeakprev;
+    	float ipeak, ipeaknext, ipeakprev;
+    	fpreal++;
+    	fpimag++;
+    	re1 = re2;
+    	re2 = re3;
+    	re3 = *fpreal;
+    	im1 = im2;
+    	im2 = im3;
+    	im3 = *fpimag;
+    	if (count < 2) continue;
+    	pow1 = pow2;
+    	pow2 = pow3;
+    	pow3 = pow4;
+    	pow4 = pow5;
+    	    /* get Hanning-windowed spectrum by convolution */
+    	windreal = re2 - 0.5 * (re1 + re3);
+    	windimag = im2 - 0.5 * (im1 + im3);
+    	pow5 = windreal * windreal + windimag * windimag;
+    	/* if (count < 30) post("power %f", pow5); */
+    	if (count < 5) continue;
+    	    /* check for a peak.  The actual bin is count-3. */
+    	if (pow3 <= pow2 || pow3 <= pow4 || pow3 <= pow1 || pow3 <= pow5
+    	    || pow3 < powthresh)
+    	    	continue;
+    	    /* go back for the raw FFT values around the peak. */
+    	rpeak = fpreal[-3];
+    	rpeaknext = fpreal[-2];
+    	rpeakprev = fpreal[-4];
+    	ipeak = fpimag[-3];
+    	ipeaknext = fpimag[-2];
+    	ipeakprev = fpimag[-4];
+    	
+    	detune = ((rpeakprev - rpeaknext) *
+    	    (2.0 * rpeak - rpeakprev - rpeaknext) +
+    	    	(ipeakprev - ipeaknext) *
+    	    	    (2.0 * ipeak - ipeakprev - ipeaknext)) /
+    	    	    	(4.0 * pow3);
+    	/* if (count < 30) post("detune %f", detune); */
+    	if (detune > 0.7 || detune < -0.7) continue;
+    	    /* the frequency is the sum of the bin frequency and detuning */ 
+    	freqout = fperbin * ((float)(count-3) + detune);
+    	*fpfreq++ = freqout;
+    	pidetune = pi * detune;
+    	if (pidetune < 0.01 && pidetune > -0.01) ampcorrect = 1;
+    	else ampcorrect = 1.0 / (sin(pidetune)/pidetune + 0.5 *
+    	    (sin(pidetune + pi)/(pidetune+pi) +
+    	    	sin(pidetune-pi)/(pidetune-pi)));
+    	    /* amplitude is peak height, corrected for Hanning window shape.
+    	    	Multiply by 2 to get real-sinusoid peak amplitude  */
+    	ampout = 2. * oneovern * sqrt(pow3) * ampcorrect;
+    	*fpamp++ = ampout;
+    	/* post("peak %f %f", freqout, ampout); */
+    	if (++peakcount == npeak) break;
+    }
+    while (peakcount < npeak)
+    {
+    	*fpfreq++ = 0;
+    	*fpamp++ = 0;
+    	peakcount++;
+    }
+}
+
+static void pique_list(t_pique *x, t_symbol *s, int argc, t_atom *argv)
+{
+    int npts = atom_getintarg(0, argc, argv);
+    t_symbol *symreal = atom_getsymbolarg(1, argc, argv);
+    t_symbol *symimag = atom_getsymbolarg(2, argc, argv);
+    int npeak = atom_getintarg(3, argc, argv);
+    t_symbol *symfreq = atom_getsymbolarg(4, argc, argv);
+    t_symbol *symamp = atom_getsymbolarg(5, argc, argv);
+    t_garray *a, *afreq, *aamp;
+    int n;
+    t_float *fpreal, *fpimag, *fpfreq, *fpamp, *fpphase;
+    if (npts < 8 || npeak < 1) error("pique: bad npoints or npeak");
+    else if (!(a = (t_garray *)pd_findbyclass(symreal, garray_class)) ||
+    	!garray_getfloatarray(a, &n, &fpreal) ||
+    	    n < npts)
+    	    	error("%s: missing or bad array", symreal->s_name);
+    else if (!(a = (t_garray *)pd_findbyclass(symimag, garray_class)) ||
+    	!garray_getfloatarray(a, &n, &fpimag) ||
+    	    n < npts)
+    	    	error("%s: missing or bad array", symimag->s_name);
+    else if (!(afreq = (t_garray *)pd_findbyclass(symfreq, garray_class)) ||
+    	!garray_getfloatarray(afreq, &n, &fpfreq) ||
+    	    n < npeak)
+    	    	error("%s: missing or bad array", symfreq->s_name);
+    else if (!(aamp = (t_garray *)pd_findbyclass(symamp, garray_class)) ||
+    	!garray_getfloatarray(aamp, &n, &fpamp) ||
+    	    n < npeak)
+    	    	error("%s: missing or bad array", symamp->s_name);
+    else
+    {
+    	pique_doit(npts, fpreal, fpimag, npeak, fpfreq, fpamp);
+    	garray_redraw(afreq);
+    	garray_redraw(aamp);
+    }
+}
+
+void pique_setup(void)
+{
+    pique_class = class_new(gensym("pique"), pique_new, 0,
+    	sizeof(t_pique), 0, 0);
+    class_addlist(pique_class, pique_list);
+}
+

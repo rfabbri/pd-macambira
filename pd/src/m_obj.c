@@ -6,6 +6,7 @@
 can interconnect via inlets and outlets; also, the (terse) generic
 behavior for "gobjs" appears at the end of this file.  */
 
+#include "m_pd.h"
 #include "m_imp.h"
 
 union inletunion
@@ -607,6 +608,20 @@ int obj_siginletindex(t_object *x, int m)
     	n++;
     }
     return (-1);
+}
+
+int obj_issignalinlet(t_object *x, int m)
+{
+    t_inlet *i;
+    if (x->ob_pd->c_firstin)
+    {
+    	if (!m)
+	    return (x->ob_pd->c_firstin && x->ob_pd->c_floatsignalin);
+    	else m--;
+    }
+    for (i = x->ob_inlet; i && m; i = i->i_next, m--)
+    	;
+    return (i && (i->i_symfrom == &s_signal));
 }
 
 int obj_nsigoutlets(t_object *x)

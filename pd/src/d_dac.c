@@ -5,7 +5,8 @@
 /*  The dac~ and adc~ routines.
 */
 
-#include "m_imp.h"
+#include "m_pd.h"
+#include "s_stuff.h"
 
 /* ----------------------------- dac~ --------------------------- */
 static t_class *dac_class;
@@ -47,11 +48,11 @@ static void dac_dsp(t_dac *x, t_signal **sp)
     for (i = x->x_n, ip = x->x_vec, sp2 = sp; i--; ip++, sp2++)
     {
     	int ch = *ip - 1;
-    	if ((*sp2)->s_n != DACBLKSIZE)
+    	if ((*sp2)->s_n != DEFDACBLKSIZE)
     	    error("dac~: bad vector size");
     	else if (ch >= 0 && ch < sys_get_outchannels())
-    	    dsp_add(plus_perform, 4, sys_soundout + DACBLKSIZE*ch,
-    	    	(*sp2)->s_vec, sys_soundout + DACBLKSIZE*ch, DACBLKSIZE);
+    	    dsp_add(plus_perform, 4, sys_soundout + DEFDACBLKSIZE*ch,
+    	    	(*sp2)->s_vec, sys_soundout + DEFDACBLKSIZE*ch, DEFDACBLKSIZE);
     }    
 }
 
@@ -153,12 +154,12 @@ static void adc_dsp(t_adc *x, t_signal **sp)
     for (i = x->x_n, ip = x->x_vec, sp2 = sp; i--; ip++, sp2++)
     {
     	int ch = *ip - 1;
-    	if ((*sp2)->s_n != DACBLKSIZE)
+    	if ((*sp2)->s_n != DEFDACBLKSIZE)
     	    error("adc~: bad vector size");
     	else if (ch >= 0 && ch < sys_get_inchannels())
-    	    dsp_add_copy(sys_soundin + DACBLKSIZE*ch,
-    	    	(*sp2)->s_vec, DACBLKSIZE);
-    	else dsp_add_zero((*sp2)->s_vec, DACBLKSIZE);
+    	    dsp_add_copy(sys_soundin + DEFDACBLKSIZE*ch,
+    	    	(*sp2)->s_vec, DEFDACBLKSIZE);
+    	else dsp_add_zero((*sp2)->s_vec, DEFDACBLKSIZE);
     }    
 }
 
@@ -170,7 +171,7 @@ static void adc_free(t_adc *x)
 static void adc_setup(void)
 {
     adc_class = class_new(gensym("adc~"), (t_newmethod)adc_new,
-    	(t_method)adc_free, sizeof(t_adc), 0, A_GIMME, 0);
+    	(t_method)adc_free, sizeof(t_adc), CLASS_NOINLET, A_GIMME, 0);
     class_addmethod(adc_class, (t_method)adc_dsp, gensym("dsp"), A_CANT, 0);
     class_sethelpsymbol(adc_class, gensym("adc~_dac~"));
 }

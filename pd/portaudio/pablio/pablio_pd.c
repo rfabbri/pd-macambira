@@ -1,5 +1,5 @@
 /*
- * $Id: pablio_pd.c,v 1.1.1.1 2002-07-29 17:06:17 ggeiger Exp $
+ * $Id: pablio_pd.c,v 1.1.1.2 2003-05-09 16:03:59 ggeiger Exp $
  * pablio.c
  * Portable Audio Blocking Input/Output utility.
  *
@@ -54,7 +54,9 @@
 
 static int blockingIOCallback( void *inputBuffer, void *outputBuffer,
                                unsigned long framesPerBuffer,
-                               PaTimestamp outTime, void *userData );
+                               const PaStreamCallbackTimeInfo *outTime, 
+                               PaStreamCallbackFlags myflags, 
+			       void *userData );
 static PaError PABLIO_InitFIFO( RingBuffer *rbuf, long numFrames, long bytesPerFrame );
 static PaError PABLIO_TermFIFO( RingBuffer *rbuf );
 
@@ -67,7 +69,9 @@ static PaError PABLIO_TermFIFO( RingBuffer *rbuf );
  */
 static int blockingIOCallback( void *inputBuffer, void *outputBuffer,
                                unsigned long framesPerBuffer,
-                               PaTimestamp outTime, void *userData )
+                               const PaStreamCallbackTimeInfo *outTime, 
+                               PaStreamCallbackFlags myflags, 
+			       void *userData )
 {
     PABLIO_Stream *data = (PABLIO_Stream*)userData;
     long numBytes = data->bytesPerFrame * framesPerBuffer;
@@ -198,6 +202,7 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
     long   doWrite = 0;
     PaError err;
     PABLIO_Stream *aStream;
+    PaStreamParameters instreamparams, outstreamparams;  /* MSP */
     long   minNumBuffers;
     long   numFrames;
 
@@ -208,16 +213,16 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
 
     if (indeviceno < 0)  /* MSP... */
     {
-	indeviceno = Pa_GetDefaultInputDeviceID();
+	indeviceno = Pa_GetDefaultInputDevice();
 	fprintf(stderr, "using default input device number: %d\n", indeviceno);
     }
     if (outdeviceno < 0)
     {
-	outdeviceno = Pa_GetDefaultOutputDeviceID();
+	outdeviceno = Pa_GetDefaultOutputDevice();
 	fprintf(stderr, "using default output device number: %d\n", outdeviceno);
     }
     nbuffers = RoundUpToNextPowerOf2(nbuffers);
-    fprintf(stderr, "nchan %d, flags %d, bufs %d, framesperbuf %d\n",
+    fprintf(stderr, "nchan %d, flags %ld, bufs %d, framesperbuf %d\n",
 	    nchannels, flags, nbuffers, framesperbuf);
     	/* ...MSP */
 
@@ -236,19 +241,22 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
     aStream->samplesPerFrame = nchannels;  /* MSP */
     aStream->bytesPerFrame = bytesPerSample * aStream->samplesPerFrame;
 
-    /* Initialize PortAudio  */
-    err = Pa_Initialize();
-    if( err != paNoError ) goto error;
 
-/* Warning: numFrames must be larger than amount of data processed per
-  interrupt inside PA to prevent glitches. */  /* MSP */
-    minNumBuffers = Pa_GetMinNumBuffers(framesperbuf, sampleRate);
-    if (minNumBuffers > nbuffers)
-	fprintf(stderr,
-	"warning: number of buffers %d less than recommended minimum %d\n",
-	    (int)nbuffers, (int)minNumBuffers);
     numFrames = nbuffers * framesperbuf;
 
+    instreamparams.device = indeviceno;   /* MSP */
+    instreamparams.channelCount = nchannels;
+    instreamparams.sampleFormat = format;
+    instreamparams.suggestedLatency = nbuffers*framesperbuf/sampleRate;
+    instreamparams.hostApiSpecificStreamInfo = 0;
+    
+    outstreamparams.device = outdeviceno;
+    outstreamparams.channelCount = nchannels;
+    outstreamparams.sampleFormat = format;
+    outstreamparams.suggestedLatency = nbuffers*framesperbuf/sampleRate;
+    outstreamparams.hostApiSpecificStreamInfo = 0;
+    
+    
     /* Initialize Ring Buffers */
     doRead = ((flags & PABLIO_READ) != 0);
     doWrite = ((flags & PABLIO_WRITE) != 0);
@@ -271,17 +279,10 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
      * audio drivers. */
     err = Pa_OpenStream(
               &aStream->stream,
-              (doRead ? indeviceno : paNoDevice),  /* MSP */
-              (doRead ? aStream->samplesPerFrame : 0 ),
-              format,
-              NULL,
-              (doWrite ? outdeviceno : paNoDevice),  /* MSP */
-              (doWrite ? aStream->samplesPerFrame : 0 ),
-              format,
-              NULL,
+              (doRead ? &instreamparams : 0),  /* MSP */
+              (doWrite ? &outstreamparams : 0),  /* MSP */
               sampleRate,
 	      framesperbuf,  /* MSP */
-	      nbuffers,      /* MSP */
 	      paNoFlag,      /* MSP -- portaudio will clip for us */
               blockingIOCallback,
               aStream );

@@ -7,7 +7,6 @@ to be different but are now unified except for some fossilized names.) */
 
 /* changes by Thomas Musil IEM KUG Graz Austria 2001 */
 
-/* improvement: line-delete-protection, look for "protect" */
 /* bug-fix: canvas_menuclose(): by Krzysztof Czaja */
 /* bug-fix: table_new(): I reversed the y-bounds  */
 
@@ -21,7 +20,9 @@ to be different but are now unified except for some fossilized names.) */
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 #include "g_canvas.h"
 #include <string.h>
 #include "g_all_guis.h"
@@ -104,7 +105,8 @@ void canvas_updatewindowlist( void)
     	/* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
     	glist_doupdatewindowlist(x, sbuf);
-    strcat(sbuf, "}\n");
+    /* next line updates the window menu state before -postcommand tries it */
+    strcat(sbuf, "}\npdtk_fixwindowmenu\n");
     sys_gui(sbuf);
 }
 
@@ -681,18 +683,31 @@ static void editor_free(t_editor *x, t_glist *y)
 void canvas_create_editor(t_glist *x, int createit)
 {
     t_gobj *y;
+    t_object *ob;
     if (createit)
     {
     	if (x->gl_editor)
 	    bug("canvas_create_editor");
-    	else x->gl_editor = editor_new(x);
+    	else
+	{
+	    x->gl_editor = editor_new(x);
+	    for (y = x->gl_list; y; y = y->g_next)
+		if (ob = pd_checkobject(&y->g_pd))
+	    	    rtext_new(x, ob);
+	}
     }
     else
     {
     	if (!x->gl_editor)
 	    bug("canvas_create_editor");
-    	else editor_free(x->gl_editor, x);
-	x->gl_editor = 0;
+    	else
+	{
+	    for (y = x->gl_list; y; y = y->g_next)
+		if (ob = pd_checkobject(&y->g_pd))
+	    	    rtext_free(glist_findrtext(x, ob));
+	    editor_free(x->gl_editor, x);
+	    x->gl_editor = 0;
+	}
     }
     for (y = x->gl_list; y; y = y->g_next)
     	if (pd_class(&y->g_pd) == canvas_class &&
@@ -712,7 +727,7 @@ void canvas_vis(t_canvas *x, t_floatarg f)
     	    /* test if we're already visible and toplevel */
     	if (glist_isvisible(x) && !x->gl_isgraph)
 	{	    /* just put us in front */
-#ifdef NT
+#ifdef MSW
     	    canvas_vis(x, 0);
 	    canvas_vis(x, 1);
 #else
@@ -756,7 +771,7 @@ void canvas_vis(t_canvas *x, t_floatarg f)
    	sys_vgui("destroy .x%x\n", x);
     	for (i = 1, x2 = x; x2; x2 = x2->gl_next, i++)
 	    ;
-    	sys_vgui(".mbar.find.menu delete %d\n", i);
+    	sys_vgui(".mbar.find delete %d\n", i);
 	    /* if we're a graph on our parent, and if the parent exists
 	       and is visible, show ourselves on parent. */
 	if (glist_isgraph(x) && x->gl_owner)
@@ -819,7 +834,6 @@ void canvas_free(t_canvas *x)
 {
     t_gobj *y;
     int dspstate = canvas_suspend_dsp();
-
     canvas_noundo(x);
     if (canvas_editing == x)
     	canvas_editing = 0;
@@ -1019,7 +1033,7 @@ void canvas_loadbang(t_canvas *x)
     you gave it to open it; perhaps there's a 1-pixel border all around it
     or something.  Anyway, we just add the 2 pixels back here: */
 
-#ifdef NT
+#ifdef MSW
 #define HORIZBORDER 2
 #define VERTBORDER 2
 #else
@@ -1199,10 +1213,6 @@ void ugen_connect(t_dspcontext *dc, t_object *x1, int outno,
     t_object *x2, int inno);
 void ugen_done_graph(t_dspcontext *dc);
 
-int obj_issignaloutlet(t_object *x, int outno);
-int obj_nsiginlets(t_object *x);
-int obj_nsigoutlets(t_object *x);
-
     /* schedule one canvas for DSP.  This is called below for all "root"
     canvases, but is also called from the "dsp" method for sub-
     canvases, which are treated almost like any other tilde object.  */
@@ -1328,10 +1338,10 @@ static void glist_redrawall(t_glist *gl)
 }
 
     /* public interface for above */
-void canvas_redrawallfortemplate(t_canvas *template)
+void canvas_redrawallfortemplate(t_canvas *templatecanvas)
 {
     t_canvas *x;
-    if (!template->gl_imatemplate) return;
+    if (!templatecanvas->gl_imatemplate) return;
     	/* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
     	glist_redrawall(x);
@@ -1373,10 +1383,10 @@ static void glist_zapall(t_glist *gl)
 }
 
     /* public interface for above */
-void canvas_zapallfortemplate(t_canvas *template)
+void canvas_zapallfortemplate(t_canvas *templatecanvas)
 {
     t_canvas *x;
-    if (!template->gl_imatemplate) return;
+    if (!templatecanvas->gl_imatemplate) return;
     	/* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
     	glist_zapall(x);
@@ -1511,5 +1521,4 @@ void g_canvas_setup(void)
     g_graph_setup();
     g_editor_setup();
     g_readwrite_setup();
-
 }

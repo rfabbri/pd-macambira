@@ -19,16 +19,18 @@ void readsf_banana( void);    /* debugging */
 #include <unistd.h>
 #include <sys/stat.h>
 #endif
-#ifdef NT
+#ifdef MSW
 #include <io.h>
 #endif
 
 #include <string.h>
+#include "m_pd.h"
 #include "m_imp.h"
+#include "s_stuff.h"
 #include <stdio.h>
 #include <fcntl.h>
 
-static t_namelist *pd_path;
+static t_namelist *pd_path, *pd_helppath;
 
 /* Utility functions */
 
@@ -51,7 +53,7 @@ static const char* strtokcpy(char *to, const char *from, int delim)
 
 /* add a colon-separated list of names to a namelist */
 
-#ifdef NT
+#ifdef MSW
 #define SEPARATOR ';'
 #else
 #define SEPARATOR ':'
@@ -110,15 +112,20 @@ void sys_addpath(const char *p)
      pd_path = namelist_append(pd_path, p);
 }
 
-#ifdef NT
-#define NTOPENFLAG (bin ? _O_BINARY : _O_TEXT)
+void sys_addhelppath(const char *p)
+{
+     pd_helppath = namelist_append(pd_helppath, p);
+}
+
+#ifdef MSW
+#define MSWOPENFLAG(bin) (bin ? _O_BINARY : _O_TEXT)
 #else
-#define NTOPENFLAG 0
+#define MSWOPENFLAG(bin) 0
 #endif
 
 /* search for a file in a specified directory, then along the globally
 defined search path, using ext as filename extension.  Exception:
-if the 'name' starts with a slash or a letter, colon, and slash in NT,
+if the 'name' starts with a slash or a letter, colon, and slash in MSW,
 there is no search and instead we just try to open the file literally.  The
 fd is returned, the directory ends up in the "dirresult" which must be at
 least "size" bytes.  "nameresult" is set to point to the filename, which
@@ -132,7 +139,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
     char listbuf[MAXPDSTRING];
 
     if (name[0] == '/' 
-#ifdef NT
+#ifdef MSW
     	|| (name[1] == ':' && name[2] == '/')
 #endif
     	    )
@@ -149,6 +156,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
 	listbuf[MAXPDSTRING-1] = 0;
 	sys_unbashfilename(listbuf, listbuf);
     }
+
     for (nl = &thislist; nl; nl = nl->nl_next)
     {
     	if (strlen(nl->nl_string) + strlen(name) + strlen(ext) + 4 >
@@ -163,7 +171,7 @@ int open_via_path(const char *dir, const char *name, const char* ext,
 
 	DEBUG(post("looking for %s",dirresult));
 	    /* see if we can open the file for reading */
-	if ((fd=open(dirresult,O_RDONLY | NTOPENFLAG)) >= 0)
+	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(bin))) >= 0)
 	{
 	    	/* in UNIX, further check that it's not a directory */
 #ifdef UNIX
@@ -204,9 +212,77 @@ int open_via_path(const char *dir, const char *name, const char* ext,
     return (-1);
 }
 
-/* Startup file reading for linux */
+    /* LATER make this use open_via_path above. */
+void open_via_helppath(const char *name, const char *dir)
+{
+    t_namelist *nl, thislist, *listp;
+    int fd = -1;
+    char dirresult[MAXPDSTRING], realdir[MAXPDSTRING], dirbuf2[MAXPDSTRING],
+    	realname[MAXPDSTRING];
 
-#ifdef __linux__
+    	/* if directory is supplied, put it at head of search list. */
+    if (*dir)
+    {
+        thislist.nl_string = dirbuf2;
+	thislist.nl_next = pd_helppath;
+	strncpy(dirbuf2, dir, MAXPDSTRING);
+	dirbuf2[MAXPDSTRING-1] = 0;
+	sys_unbashfilename(dirbuf2, dirbuf2);
+	listp = &thislist;
+    }
+    else listp = pd_helppath;
+    strcpy(realname, "help-");
+    strncat(realname, name, MAXPDSTRING-5);
+    realname[MAXPDSTRING-1] = 0;
+    for (nl = listp; nl; nl = nl->nl_next)
+    {
+	strcpy(dirresult, nl->nl_string);
+	strcpy(realdir,dirresult);
+	if (*dirresult && dirresult[strlen(dirresult)-1] != '/')
+	       strcat(dirresult, "/");
+	strcat(dirresult, realname);
+	sys_bashfilename(dirresult, dirresult);
+
+	DEBUG(post("looking for %s",dirresult));
+	    /* see if we can open the file for reading */
+	if ((fd=open(dirresult,O_RDONLY | MSWOPENFLAG(0))) >= 0)
+	{
+	    	/* in UNIX, further check that it's not a directory */
+#ifdef UNIX
+    	    struct stat statbuf;
+	    int ok =  ((fstat(fd, &statbuf) >= 0) &&
+	    	!S_ISDIR(statbuf.st_mode));
+	    if (!ok)
+	    {
+	    	if (sys_verbose) post("tried %s; stat failed or directory",
+		    dirresult);
+	    	close (fd);
+		fd = -1;
+    	    }
+	    else
+#endif
+    	    {
+	    	char *slash;
+		if (sys_verbose) post("tried %s and succeeded", dirresult);
+		sys_unbashfilename(dirresult, dirresult);
+		close (fd);
+		glob_evalfile(0, gensym((char*)realname), gensym(realdir));
+		return;
+	    }
+	}
+	else
+	{
+	    if (sys_verbose) post("tried %s and failed", dirresult);
+	}
+    }
+    post("sorry, couldn't find help for \"%s\"", name);
+    return;
+}
+
+
+/* Startup file reading for linux and MACOSX */
+
+#ifdef UNIX
 
 #define STARTUPNAME ".pdrc"
 #define NUMARGS 1000
@@ -274,6 +350,6 @@ int sys_rcfile(void)
     }
     return (0);
 }
-#endif /* __linux__ */
+#endif /* UNIX */
 
 

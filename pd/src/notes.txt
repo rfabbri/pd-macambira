@@ -1,18 +1,29 @@
-done for 0.36:
+vline object
+arrow keys in text objs for mac
 
 ---------------- dolist --------------------
+vline~ help window
+writesf help window, support 32 bit wav files, and fix sample rate writing
+check that latency is actually set (esp. in windows)
+windows escape from control-C
+dialogs for a/d/a, midi, path
+ALSA deglitch back in
+bug: resizing grow-upward patches leaves line traces around
 
-pddp doc
+suspend/resume graphics updates
+scheduler to handle callbacks
 scheduler to do DSP computations even if no audio
 hook to scheduler to let others get called for DSP I/O
 figure out how to avoid "dac freeze" if nosound
-
+new: mline~, msnapshot~, abs~
+flags to defeat adding specified classes from libraries
+incorporate pddp doc
 try again to fix the font scene
 addcomma message to message
 pasting should look at current mouse location
+open/save panel to take messages to init directory
 
 problems:
-messages & comments don't come up with text activated?
 arrays of non-existent templates crash
 don't draw in/outlets on gui objects in graphs
 Alsa degradation after several hours running on soundblaster
@@ -20,7 +31,6 @@ font size should depend on subpatch/abstraction
 moving a bang toward top of window creates problem
 figure out O_NDELAY for linux audio?
 missed Thomas's multi-dialog trick???
-fix iemguis not to bash symbol names
 check what happens when going back and forth between graph-on-parent
 deal with spaces in iemgui labels and send/receive names
 get rid of messages causing renaming; try to prevent patches closing themselves.
@@ -47,6 +57,7 @@ scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
 
 features:
+command line flag to defeat loading objects
 signal inlets with initialized values...
 Pd to open html help on windows/mac
 flag to hide array names 
@@ -56,14 +67,11 @@ if there's just one array, don't do stringent hit check.
 netsend separate thread
 netreceive (and netsend?) message to set port number
 delete-in-rectangle message to Pds
-"regular" numbers/symbols to do send/receive thing ala IEMGUI
 make selecting text grab keyboard focus
 think about x and y scale preservation when changing between graph and object
 show outlines of objects even when graph is "open"
 make graph labels persistent and add to dialog
 array click protection (Krzysztof's suggestion)
-Pd support for jack audio system: http://home.t-online.de/home/pdq808/jack-patch
-offer audiooutdev 1,3 feature on Windows
 Alsa in data late should carefuly reset DAC/ADC fill&empty pointers
 increase MIDIQSIZE to at least 1024 in s_unix.c
 add nonblock to linux open calls instead of using alarm
