@@ -48,9 +48,7 @@
 // calculate a slope for control rate interpolation to audio rate.
 //#define CALCSLOPE(next,prev) ((next - prev) * unit->mRate->mSlopeFactor)
 #undef CALCSLOPE
-#define CALCSLOPE(next,prev) ((next - prev) * 1/Blocksize())
-
-
+#define CALCSLOPE(next,prev) ((next - prev) * 1/ Blocksize())
 
 
 /* to make sure the behaviour is consistent: */

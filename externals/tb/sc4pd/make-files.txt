@@ -9,4 +9,4 @@ SRCS= \
 	Logistic.cpp Latoocarfian.cpp LinCong.cpp amclip.cpp scaleneg.cpp \
 	excess.cpp hypot.cpp ring1.cpp ring2.cpp ring3.cpp ring4.cpp \
 	difsqr.cpp sumsqr.cpp sqrdif.cpp sqrsum.cpp absdif.cpp LFSaw.cpp \
-	LFPulse.cpp Impulse.cpp Integrator.cpp Decay.cpp Decay2.cpp
+	LFPulse.cpp Impulse.cpp Integrator.cpp Decay.cpp Decay2.cpp Lag.cpp 

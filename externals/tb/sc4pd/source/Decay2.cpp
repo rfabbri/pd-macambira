@@ -146,6 +146,7 @@ void Decay2_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
 					   (m_decayTime * Samplerate()));
     m_b1b = m_attackTime == 0.f ? 0.f : exp(log001 / 
 					    (m_attackTime * Samplerate()));
+    changed = false;
 }
 
 /* todo: does it make sense to implement a message-based Decay2? 
