@@ -25,6 +25,12 @@ Description: Open Sound Control Support for PD
  Open Sound Control is a protocol designed for remote controlling
  sound applications.
 
+Package: pd-footils
+Architecture: any
+Depends: pd, ${shlibs:Depends}
+Description: Footils externals
+  Externals built using the flext library.
+
 Package: pd-externals
 Architecture: any
 Depends: pd, ${shlibs:Depends}

@@ -1,3 +1,9 @@
+pd-externals (0.3-1) unstable; urgency=low
+
+  * Update  
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 19 Mar 2003 12:35:13 +0100
+ 
 pd-externals (0.2-1) unstable; urgency=low
 
   * Initial Release.

@@ -25,7 +25,7 @@ configure-stamp:
 	touch configure-stamp
 
 orig:
-	cd ..;tar --exclude=CVS -czvf pd-externals_0.2.orig.tar.gz externals
+	cd ..;tar --exclude=CVS -czvf pd-externals_0.3.orig.tar.gz externals
 	
 
 
@@ -45,8 +45,14 @@ build-stamp: configure-stamp
 
 	# Build flext
 	
-	(cd grill/flext; $(MAKE) -f makefile.pd-linux)
-	
+	(cd grill/flext; $(MAKE) -f makefile.pd-linux STK=/usr/include/stk)
+
+	# Flext externals
+	#
+	 
+	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
+	FLEXTINC=../../grill/flext/source)
+
 	# OSC
 
 	(cd OSCx/libOSC;$(MAKE))
@@ -67,6 +73,8 @@ clean:
 	(cd zexy/src; $(MAKE) -f makefile.linux  clean)
 
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux clean)
+	
+	(cd footils; make clean)
 
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
@@ -86,6 +94,9 @@ install: build
 				      PDLIBDIR=lib/pd )
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux install INSTDIR=$(CURDIR)/debian/tmp/usr/lib/pd/flext)
 
+	(cd footils; make install DESTDIR=$(CURDIR)/debian/tmp/ \
+	INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra)
+		
 	# Install OSC
 
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
