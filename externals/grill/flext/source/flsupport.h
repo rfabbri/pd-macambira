@@ -521,6 +521,11 @@ public:
     static bool Forward(const t_symbol *sym,AtomAnything &args) { return Forward(sym,args.Header(),args.Count(),args.Atoms()); }
     static bool Forward(const char *sym,AtomAnything &args) { return Forward(MakeSymbol(sym),args.Header(),args.Count(),args.Atoms()); }
 
+    static bool Forward(const t_symbol *sym,int argc,const t_atom *argv) { return Forward(sym,sym_list,argc,argv); }
+
+    static bool Forward(const t_symbol *sym,AtomList &args) { return Forward(sym,args.Count(),args.Atoms()); }
+    static bool Forward(const char *sym,AtomList &args) { return Forward(MakeSymbol(sym),args.Count(),args.Atoms()); }
+
 //!		@} FLEXT_S_MSG
 
     
@@ -881,6 +886,8 @@ public:
 		bool Delay(double tm,void *data = NULL);
 		//! Trigger a periodic interval
 		bool Periodic(double tm,void *data = NULL);
+		//! Trigger immediately
+        bool Now(void *data = NULL) { return Delay(0,data); }
 
 		//! Worker function, called on every timer event
 		virtual void Work();
