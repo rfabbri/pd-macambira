@@ -382,6 +382,11 @@ the audio I/O system is still busy with previous transfers.
 void sys_pollmidiqueue( void);
 void sys_initmidiqueue( void);
 
+ /* sys_idlehook is a hook the user can fill in to grab idle time.  Return
+nonzero if you actually used the time; otherwise we're really really idle and
+will now sleep. */
+int (*sys_idlehook)(void);
+
 int m_scheduler( void)
 {
     int idlecount = 0;
@@ -468,8 +473,13 @@ int m_scheduler( void)
             /* T.Grill - enter idle phase -> unlock thread lock */
             sys_unlock();
 #endif
-            if (timeforward != SENDDACS_SLEPT)
-                sys_microsleep(sys_sleepgrain);
+                /* call externally installed idle function if any. */
+            if (!sys_idlehook || !sys_idlehook())
+            {
+                    /* if even that had nothing to do, sleep. */
+                if (timeforward != SENDDACS_SLEPT)
+                    sys_microsleep(sys_sleepgrain);
+            }
 #ifdef THREAD_LOCKING
             /* T.Grill - leave idle phase -> lock thread lock */
             sys_lock();

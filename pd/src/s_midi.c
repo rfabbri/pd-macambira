@@ -603,7 +603,7 @@ void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
         midioutdev1, midioutdev2, midioutdev3, midioutdev4,
         (flongform != 0));
     gfxstub_deleteforkey(0);
-    gfxstub_new(&glob_pdobject, glob_midi_properties, buf);
+    gfxstub_new(&glob_pdobject, (void *)glob_midi_properties, buf);
 }
 
     /* new values from dialog window */

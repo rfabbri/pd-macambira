@@ -250,7 +250,6 @@ void vinlet_dspprolog(t_vinlet *x, t_signal **parentsigs,
     }
 }
 
-//static void *vinlet_newsig(void)
 static void *vinlet_newsig(t_symbol *s)
 {
     t_vinlet *x = (t_vinlet *)pd_new(vinlet_class);
@@ -421,7 +420,6 @@ static t_int *voutlet_doepilog(t_int *w)
 static t_int *voutlet_doepilog_resampling(t_int *w)
 {
     t_voutlet *x = (t_voutlet *)(w[1]);
-    //    t_float *dummy = (t_float *)(w[2]);
     int n = (int)(w[2]);
     t_float *in  = x->x_empty;
     t_float *out = x->x_updown.s_vec; /* IOhannes */
@@ -505,12 +503,10 @@ void voutlet_dspepilog(t_voutlet *x, t_signal **parentsigs,
             parentvecsize = 1;
             re_parentvecsize = 1;
         }
-        //      bigperiod = (downsample * myvecsize)/(upsample * parentvecsize); /* IOhannes */
         bigperiod = myvecsize/re_parentvecsize; /* IOhannes */
         if (!bigperiod) bigperiod = 1;
         epilogphase = phase & (bigperiod - 1);
         blockphase = (phase + period - 1) & (bigperiod - 1) & (- period);
-        //      bufsize = parentvecsize * upsample; /* IOhannes */
         bufsize = re_parentvecsize; /* IOhannes */
         if (bufsize < myvecsize) bufsize = myvecsize;
         if (bufsize != (oldbufsize = x->x_bufsize))

@@ -14,14 +14,14 @@ permission is granted to use this file for any purpose.
 typedef t_symbol *fts_symbol_t;
 
 #ifdef MSP
-#define	t_atom		Atom
-#define	t_symbol	Symbol
-#define	pd_new(x)	newobject(x);
-#define pd_free(x)	freeobject(x);
-#define t_outlet	void
-#define t_binbuf	void
-typedef t_class		*t_pd;
-typedef float		t_floatarg;
+#define t_atom          Atom
+#define t_symbol        Symbol
+#define pd_new(x)       newobject(x);
+#define pd_free(x)      freeobject(x);
+#define t_outlet        void
+#define t_binbuf        void
+typedef t_class         *t_pd;
+typedef float           t_floatarg;
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -21,7 +21,7 @@ dnl other defaults
 
 dnl check for features
 
-AC_ARG_ENABLE(alsa,     [  --disable-alsa          disable ALSA],
+AC_ARG_ENABLE(alsa,     [  --disable-alsa          force disabling ALSA],
     alsa="no")
 AC_ARG_ENABLE(jack,     [  --enable-jack           jack audio server],
     jack="yes")

@@ -94,8 +94,7 @@ $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
 	$(GLIB)
 
 $(BIN_DIR)/pd.tk: u_main.tk
-	echo set pd_nt @OSNUMBER@ > $(BIN_DIR)/pd.tk
-	grep -v "set pd_nt" < u_main.tk >> $(BIN_DIR)/pd.tk
+	cp u_main.tk $(BIN_DIR)/pd.tk
 
 #this is for Max OSX only...
 $(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)

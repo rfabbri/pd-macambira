@@ -109,7 +109,6 @@ static void canvas_objtext(t_glist *gl, int xpix, int ypix, int selected,
     else x = 0;
     if (!x)
     {
-            
             /* LATER make the color reflect this */
         x = (t_text *)pd_new(text_class);
     }
@@ -1159,21 +1158,21 @@ void text_drawborder(t_text *x, t_glist *glist,
     height = y2 - y1;
     if (x->te_type == T_OBJECT)
     {
-    	char *pattern = ((pd_class(&x->te_pd) == text_class) ? "-" : "\"\"");
+        char *pattern = ((pd_class(&x->te_pd) == text_class) ? "-" : "\"\"");
         if (firsttime)
             sys_vgui(".x%lx.c create line\
  %d %d %d %d %d %d %d %d %d %d -dash %s -tags %sR\n",
                 glist_getcanvas(glist),
                     x1, y1,  x2, y1,  x2, y2,  x1, y2,  x1, y1,  pattern, tag);
         else
-	{
+        {
             sys_vgui(".x%lx.c coords %sR\
  %d %d %d %d %d %d %d %d %d %d\n",
                 glist_getcanvas(glist), tag,
                     x1, y1,  x2, y1,  x2, y2,  x1, y2,  x1, y1);
-    	    sys_vgui(".x%lx.c itemconfigure -dash %s\n",
-	    	glist_getcanvas(glist), pattern);
-	}
+            sys_vgui(".x%lx.c itemconfigure %sR -dash %s\n",
+                glist_getcanvas(glist), tag, pattern);
+        }
     }
     else if (x->te_type == T_MESSAGE)
     {

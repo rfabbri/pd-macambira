@@ -113,10 +113,22 @@ void glist_delete(t_glist *x, t_gobj *y)
 void glist_clear(t_glist *x)
 {
     t_gobj *y, *y2;
-    int dspstate = canvas_suspend_dsp();
+    int dspstate = 0, suspended = 0;
+    t_symbol *dspsym = gensym("dsp");
     while (y = x->gl_list)
+    {
+            /* to avoid unnecessary DSP resorting, we suspend DSP
+            only if we hit a patchable object. */
+        if (!suspended && pd_checkobject(&y->g_pd) && zgetfn(&y->g_pd, dspsym))
+        {
+            dspstate = canvas_suspend_dsp();
+            suspended = 1;
+        }
+            /* here's the real deletion. */
         glist_delete(x, y);
-    canvas_resume_dsp(dspstate);
+    }
+    if (suspended)
+        canvas_resume_dsp(dspstate);
 }
 
 void glist_retext(t_glist *glist, t_text *y)
@@ -618,7 +630,7 @@ void glist_redraw(t_glist *x)
                     glist_getcanvas(x), oc,
                         t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2);
         }
-        if (x->gl_owner)
+        if (x->gl_owner && glist_isvisible(x->gl_owner))
         {
             graph_vis(&x->gl_gobj, x->gl_owner, 0); 
             graph_vis(&x->gl_gobj, x->gl_owner, 1);

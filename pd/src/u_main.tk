@@ -1,8 +1,16 @@
 #!/usr/bin/wish
 
-set pd_nt 0
-# (The above is 0 for unix, 1 for microsoft, and 2 for Mac OSX.  The first
-# line is automatically munged by the relevant makefiles.)
+# set pd_nt (bad name) 0 for unix, 1 for microsoft, and 2 for Mac OSX.
+if { $tcl_platform(platform) == "windows" }  {
+         set pd_nt 1
+         puts stderr {Configuring for Windows}
+} elseif { $tcl_platform(os) == "Darwin" } {  
+         set pd_nt 2
+         puts stderr {Configuring for MacOS X}
+} else { 
+         set pd_nt 0
+         puts stderr {Configuring for UNIX}
+}        
 
 # Copyright (c) 1997-1999 Miller Puckette.
 # For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -25,11 +33,13 @@ if {$pd_nt == 1} {
     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
     regsub -all \\\\ $pd_gui2 / pd_gui3
     set pd_guidir $pd_gui3/..
-    load $pd_guidir/bin/pdtcl
+    load $pd_guidir/bin/pdtcl.dll
     set pd_tearoff 1
 }
 
 if {$pd_nt == 2} {
+# turn on James Tittle II's fast drawing (wait until I can test this...):
+#   set tk::mac::useCGDrawing 1
     global pd_guidir
     global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
@@ -315,10 +325,17 @@ proc menu_documentation {} {
     global help_directory
     global pd_nt
 
-    set filename [tk_getOpenFile -defaultextension .pd \
-    -filetypes { {{documentation} {.pd .txt .htm}} } \
-    -initialdir $help_directory]
-
+    if {$pd_nt == 2} {
+    	exec rm -rf /tmp/pd-documentation
+    	exec cp -pr $help_directory /tmp/pd-documentation
+	set filename [tk_getOpenFile -defaultextension .pd \
+	-filetypes { {{documentation} {.pd .txt .htm}} } \
+	-initialdir /tmp/pd-documentation]
+    } else {
+	set filename [tk_getOpenFile -defaultextension .pd \
+	-filetypes { {{documentation} {.pd .txt .htm}} } \
+	-initialdir $help_directory]
+    }    
     if {$filename != ""} {
     	if {[string first .txt $filename] >= 0} {
     	    menu_opentext $filename
@@ -1652,9 +1669,9 @@ proc pdtk_graph_dialog {id x1 y1 x2 y2 xpix ypix} {
     pdtk_standardkeybindings $id.xrangef.x1
     pdtk_standardkeybindings $id.xrangef.x2
     pdtk_standardkeybindings $id.xrangef.xpix
-    pdtk_standardkeybindings $id.xrangef.y1
-    pdtk_standardkeybindings $id.xrangef.y2
-    pdtk_standardkeybindings $id.xrangef.ypix
+    pdtk_standardkeybindings $id.yrangef.y1
+    pdtk_standardkeybindings $id.yrangef.y2
+    pdtk_standardkeybindings $id.yrangef.ypix
     $id.xrangef.x2 select from 0
     $id.xrangef.x2 select adjust end
     focus $id.xrangef.x2

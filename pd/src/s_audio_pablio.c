@@ -1,5 +1,5 @@
 /*
- * $Id: s_audio_pablio.c,v 1.1 2004-09-06 20:20:35 millerpuckette Exp $
+ * $Id: s_audio_pablio.c,v 1.2 2004-11-06 16:07:34 millerpuckette Exp $
  * pablio.c
  * Portable Audio Blocking Input/Output utility.
  *
@@ -98,14 +98,14 @@ static int blockingIOCallback( void *inputBuffer, void *outputBuffer,
     if( inputBuffer != NULL )
     {
         RingBuffer_Write( &data->inFIFO, inputBuffer,
-	    data->inbytesPerFrame * framesPerBuffer );
+            data->inbytesPerFrame * framesPerBuffer );
     }
     if( outputBuffer != NULL )
     {
         int i;
-	int numBytes = data->outbytesPerFrame * framesPerBuffer;
+        int numBytes = data->outbytesPerFrame * framesPerBuffer;
         int numRead = RingBuffer_Read( &data->outFIFO, outputBuffer,
-	    numBytes);
+            numBytes);
         /* Zero out remainder of buffer if we run out of data. */
         for( i=numRead; i<numBytes; i++ )
         {
@@ -214,7 +214,7 @@ static unsigned long RoundUpToNextPowerOf2( unsigned long n )
  */
 PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
                          PaSampleFormat format, int inchannels,
-			 int outchannels, int framesperbuf, int nbuffers,
+                         int outchannels, int framesperbuf, int nbuffers,
                          int indeviceno, int outdeviceno) /* MSP */
 {
     long   bytesPerSample;
@@ -310,14 +310,14 @@ PaError OpenAudioStream( PABLIO_Stream **rwblPtr, double sampleRate,
     if(doRead)
     {
         err = PABLIO_InitFIFO( &aStream->inFIFO, numFrames,
-	    aStream->inbytesPerFrame );
+            aStream->inbytesPerFrame );
         if( err != paNoError ) goto error;
     }
     if(doWrite)
     {
         long numBytes;
         err = PABLIO_InitFIFO( &aStream->outFIFO, numFrames,
-	    aStream->outbytesPerFrame );
+            aStream->outbytesPerFrame );
         if( err != paNoError ) goto error;
         /* Make Write FIFO appear full initially. */
         numBytes = RingBuffer_GetWriteAvailable( &aStream->outFIFO );

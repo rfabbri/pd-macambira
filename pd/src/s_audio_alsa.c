@@ -30,6 +30,11 @@
 #define DEBUG(x) x
 #define DEBUG2(x) {x;}
 
+/* needed for alsa 0.9 compatibility: */
+#if (SND_LIB_MAJOR < 1)
+#define ALSAAPI9
+#endif
+
 static void alsa_checkiosync( void);
 static void alsa_numbertoname(int iodev, char *devname, int nchar);
 
@@ -83,7 +88,7 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
 
     if (sys_verbose)
     {
-    	if (out)
+        if (out)
             post("configuring sound output...");
         else post("configuring sound input...");
     }
@@ -134,7 +139,8 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
     dev->a_channels = *channels;
 
         /* set the sampling rate */
-    err = snd_pcm_hw_params_set_rate_min(dev->a_handle, hw_params, rate, 0);
+    err = snd_pcm_hw_params_set_rate_min(dev->a_handle, hw_params, 
+        (unsigned int *)rate, 0);
     check_error(err, "snd_pcm_hw_params_set_rate_min (input)");
 #if 0
     err = snd_pcm_hw_params_get_rate(hw_params, &subunitdir);
@@ -144,21 +150,37 @@ static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,
         /* set the period - ie frag size */
         /* LATER try this to get a recommended period size...
          right now, it trips an assertion failure in ALSA lib */
+
+#ifdef ALSAAPI9
+    err = snd_pcm_hw_params_set_period_size_near(dev->a_handle,
+        hw_params, (snd_pcm_uframes_t)frag_size, 0);
+#else
     tmp_snd_pcm_uframes = frag_size;
     err = snd_pcm_hw_params_set_period_size_near(dev->a_handle,
         hw_params, &tmp_snd_pcm_uframes, 0);
+#endif
     check_error(err, "snd_pcm_hw_params_set_period_size_near (input)");
     
         /* set the number of periods - ie numfrags */
+#ifdef ALSAAPI9
+    err = snd_pcm_hw_params_set_periods_near(dev->a_handle,
+        hw_params, nfrags, 0);
+#else
     tmp_uint = nfrags;
     err = snd_pcm_hw_params_set_periods_near(dev->a_handle,
         hw_params, &tmp_uint, 0);
+#endif
     check_error(err, "snd_pcm_hw_params_set_periods_near (input)");
 
         /* set the buffer size */
+#ifdef ALSAAPI9
+    err = snd_pcm_hw_params_set_buffer_size_near(dev->a_handle,
+        hw_params, nfrags * frag_size);
+#else
     tmp_snd_pcm_uframes = nfrags * frag_size;
     err = snd_pcm_hw_params_set_buffer_size_near(dev->a_handle,
         hw_params, &tmp_snd_pcm_uframes);
+#endif
     check_error(err, "snd_pcm_hw_params_set_buffer_size_near (input)");
 
     err = snd_pcm_hw_params(dev->a_handle, hw_params);
@@ -347,8 +369,6 @@ void alsa_close_audio(void)
     }
     alsa_nindev = alsa_noutdev = 0;
 }
-
-// #define DEBUG_ALSA_XFER
 
 int alsa_send_dacs(void)
 {

@@ -895,7 +895,7 @@ static void tabread_setup(void)
         A_SYMBOL, 0);
 }
 
-/* ---------- tabread4: control, non-interpolating ------------------------ */
+/* ---------- tabread4: control, 4-point interpolation --------------- */
 
 static t_class *tabread4_class;
 

@@ -484,7 +484,7 @@ void glob_start_path_dialog(t_pd *dummy)
         sys_vgui("pd_set pd_path%d \"\"\n", i);
 
     sprintf(buf, "pdtk_path_dialog %%s %d %d\n", sys_usestdpath, sys_verbose);
-    gfxstub_new(&glob_pdobject, glob_start_path_dialog, buf);
+    gfxstub_new(&glob_pdobject, (void *)glob_start_path_dialog, buf);
 }
 
     /* new values from dialog window */
@@ -517,7 +517,7 @@ void glob_start_startup_dialog(t_pd *dummy)
 
     sprintf(buf, "pdtk_startup_dialog %%s %d \"%s\"\n", sys_defeatrt,
         sys_flags->s_name);
-    gfxstub_new(&glob_pdobject, glob_start_startup_dialog, buf);
+    gfxstub_new(&glob_pdobject, (void *)glob_start_startup_dialog, buf);
 }
 
     /* new values from dialog window */

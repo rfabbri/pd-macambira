@@ -239,8 +239,7 @@ static void hradio_save(t_gobj *z, t_binbuf *b)
 
     iemgui_save(&x->x_gui, srl, bflcol);
     binbuf_addv(b, "ssiisiiiisssiiiiiiii", gensym("#X"),gensym("obj"),
-                (int)text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist),
-                (int)text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist),
+                (int)x->x_gui.x_obj.te_xpix, (int)x->x_gui.x_obj.te_ypix,
                 (pd_class(&x->x_gui.x_obj.ob_pd) == hradio_old_class ?
                     gensym("hdl") : gensym("hradio")),
                 x->x_gui.x_w,

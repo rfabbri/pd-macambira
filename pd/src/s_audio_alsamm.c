@@ -31,6 +31,10 @@
 #include <sched.h>
 #include "s_audio_alsa.h"
 
+/* needed for alsa 0.9 compatibility: */
+#if (SND_LIB_MAJOR < 1)
+#define ALSAAPI9
+#endif
 /* sample type magic ... 
    Hammerfall/HDSP/DSPMADI cards always 32Bit where lower 8Bit not used (played) in AD/DA, 
    but can have some bits set (subchannel coding)
@@ -421,6 +425,7 @@ void alsamm_close_audio(void)
 /* ------- PCM INITS --------------------------------- */
 static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
 {
+#ifndef ALSAAPI9
   unsigned int rrate;
   int err, dir;
   int channels_allocated = 0;
@@ -488,11 +493,13 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
   { 
     int maxchs,minchs,channels = *chs;
 
-    if((err = snd_pcm_hw_params_get_channels_max(params,&maxchs)) < 0){
+    if((err = snd_pcm_hw_params_get_channels_max(params,
+        (unsigned int *)&maxchs)) < 0){
       check_error(err,"Getting channels_max not available");
       return err;
     }
-    if((err = snd_pcm_hw_params_get_channels_min(params,&minchs)) < 0){
+    if((err = snd_pcm_hw_params_get_channels_min(params,
+        (unsigned int *)&minchs)) < 0){
       check_error(err,"Getting channels_min not available");
       return err;
     }
@@ -523,7 +530,7 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
   }
 
   /* testing for channels */
-  if((err = snd_pcm_hw_params_get_channels(params,chs)) < 0)
+  if((err = snd_pcm_hw_params_get_channels(params,(unsigned int *)chs)) < 0)
     check_error(err,"Get channels not available");
 #ifdef ALSAMM_DEBUG
   else
@@ -542,7 +549,8 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
 
     alsamm_buffer_size = alsamm_buffersize;
 
-    err = snd_pcm_hw_params_set_buffer_size_near(handle, params, &alsamm_buffer_size);
+    err = snd_pcm_hw_params_set_buffer_size_near(handle, params, 
+        (unsigned long *)&alsamm_buffer_size);
     if (err < 0) {
       check_error(err,"Unable to set max buffer size");
       return err;
@@ -559,14 +567,16 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
            (unsigned int) (alsamm_buffertime*0.001) );
 #endif
 
-    err = snd_pcm_hw_params_set_buffer_time_near(handle, params, &alsamm_buffertime, &dir);
+    err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
+        &alsamm_buffertime, &dir);
     if (err < 0) {
       check_error(err,"Unable to set max buffer time");
       return err;
     }
   }
 
-  err = snd_pcm_hw_params_get_buffer_time(params, &alsamm_buffertime, &dir);
+  err = snd_pcm_hw_params_get_buffer_time(params, 
+    (unsigned int *)&alsamm_buffertime, &dir);
   if (err < 0) {
     check_error(err,"Unable to get buffer time");
     return err;
@@ -578,7 +588,8 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
          (float) (alsamm_buffertime*0.001));
 #endif
 
-  err = snd_pcm_hw_params_get_buffer_size(params, &alsamm_buffer_size);
+  err = snd_pcm_hw_params_get_buffer_size(params, 
+    (unsigned long *)&alsamm_buffer_size);
   if (err < 0) {
     check_error(err,"Unable to get buffer size");
     return err;
@@ -589,7 +600,8 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
     post("hw_params: got  buffersize to %d samples",(int) alsamm_buffer_size);
 #endif
 
-  err = snd_pcm_hw_params_get_period_size(params, &alsamm_period_size, &dir);
+  err = snd_pcm_hw_params_get_period_size(params, 
+    (unsigned long *)&alsamm_period_size, &dir);
   if (err > 0) {
     check_error(err,"Unable to get period size");
     return err;
@@ -644,11 +656,13 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,int *chs)
     check_error(err,"Unable to set hw params");
     return err;
   }
+#endif /* ALSAAPI9 */
   return 0;
 }
 
 static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int playback)
 {
+#ifndef ALSAAPI9
   int err;
   snd_pcm_uframes_t ps,ops;
   snd_pcm_uframes_t bs,obs;
@@ -759,7 +773,10 @@ static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int pl
 #ifdef ALSAMM_DEBUG
   if(sys_verbose)
     post("set sw finished");
+#else
+  post("alsa: need version 1.0 or above for mmap operation");
 #endif
+#endif /* ALSAAPI9 */
   return 0;
 }
 
@@ -1173,7 +1190,8 @@ int alsamm_send_dacs(void)
 
       oframes = size;
 
-      err =  alsamm_get_channels(out, &oframes, &ooffset,ochannels,dev->a_addr);
+      err =  alsamm_get_channels(out, (unsigned long *)&oframes, 
+        (unsigned long *)&ooffset,ochannels,dev->a_addr);
 
 #ifdef ALSAMM_DEBUG
       if(dac_send < WATCH_PERIODS){
@@ -1283,7 +1301,8 @@ int alsamm_send_dacs(void)
       int chn;
       snd_pcm_sframes_t iframes = size;
 
-      err =  alsamm_get_channels(in, &iframes, &ioffset,ichannels,dev->a_addr);
+      err =  alsamm_get_channels(in, 
+        (unsigned long *)&iframes, (unsigned long *)&ioffset,ichannels,dev->a_addr);
       if (err < 0){
         if ((err = xrun_recovery(in, err)) < 0) {
           check_error(err,"MMAP begins avail error");

@@ -106,9 +106,9 @@ int pa_open_audio(int inchans, int outchans, int rate, t_sample *soundin,
         post("framesperbuf %d, nbufs %d", framesperbuf, nbuffers);
     }
     if (inchans || outchans)
-    	err = OpenAudioStream( &pa_stream, rate, paFloat32,
+        err = OpenAudioStream( &pa_stream, rate, paFloat32,
             inchans, outchans, framesperbuf, nbuffers,
-            	pa_indev, pa_outdev);
+                pa_indev, pa_outdev);
     else err = 0;
     if ( err != paNoError ) 
     {

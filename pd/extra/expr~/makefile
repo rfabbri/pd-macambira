@@ -81,7 +81,7 @@ LINUXOBJ =  vexp.pd_linux_o vexp_fun.pd_linux_o vexp_if.pd_linux_o
 
 LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
+    -Wno-unused -Wno-parentheses -Wno-switch 
 
 LINUXINCLUDE =  -I../../src
 

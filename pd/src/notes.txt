@@ -28,6 +28,9 @@ put in Wini's RME ALSA code; there are still bugs...
 portaudio fixed for inchans != outchans, e.g., emi emagic (2/6)
 sprout inlets/outlets on objects whose creation failed.
 uploaded to CVS
+bug fix: click on minaturized subpatch fails to "vis" it
+bug fix: CK on Oct. 4 (crash changing font size)
+sched_idle hook
 
 doc:
 document env~ second argument (and why is it no less than 1/10 of first???)
@@ -35,7 +38,7 @@ update 0.intro.pd
 vibrato example
 
 problems:
-click on minaturized subpatch fails to "vis" it
+--enable-alsa actually disables it???
 startup flags need to handle spaces, duh.
 test MIDI I/O on all platforms, inc. sysex...
 '[' in numbox label breaks it (Yury Sept. 3)

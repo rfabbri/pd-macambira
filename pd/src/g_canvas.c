@@ -84,7 +84,7 @@ static void glist_doupdatewindowlist(t_glist *gl, char *sbuf)
             {
                 char tbuf[1024];
                 sprintf(tbuf, "{%s .x%lx} ", gl->gl_name->s_name,
-		    (t_int)canvas);
+                    (t_int)canvas);
                 strcat(sbuf, tbuf);
             }
         }
@@ -723,8 +723,11 @@ void canvas_vis(t_canvas *x, t_floatarg f)
     int flag = (f != 0);
     if (flag)
     {
+        /* post("havewindow %d, isgraph %d, isvisible %d  editor %d",
+            x->gl_havewindow, x->gl_isgraph, glist_isvisible(x),
+                (x->gl_editor != 0)); */
             /* test if we're already visible and toplevel */
-        if (glist_isvisible(x) && !x->gl_isgraph)
+        if (x->gl_editor)
         {           /* just put us in front */
 #ifdef MSW
             canvas_vis(x, 0);
@@ -1114,6 +1117,14 @@ static void canvas_rename_method(t_canvas *x, t_symbol *s, int ac, t_atom *av)
 {
     if (ac && av->a_type == A_SYMBOL)
         canvas_rename(x, av->a_w.w_symbol, 0);
+    else if (ac && av->a_type == A_DOLLSYM)
+    {
+        t_canvasenvironment *e = canvas_getenv(x);
+        canvas_setcurrent(x);
+        canvas_rename(x, binbuf_realizedollsym(av->a_w.w_symbol,
+            e->ce_argc, e->ce_argv, 1), 0); 
+        canvas_unsetcurrent(x);
+    }
     else canvas_rename(x, gensym("Pd"), 0);
 }
 

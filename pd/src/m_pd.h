@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 #ifdef MSW
-// #pragma warning( disable : 4091 ) 
+/* #pragma warning( disable : 4091 ) */
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
 #pragma warning( disable : 4101 )  /* unused automatic variables */
@@ -451,6 +451,7 @@ EXTERN int open_via_path(const char *name, const char *ext, const char *dir,
     char *dirresult, char **nameresult, unsigned int size, int bin);
 EXTERN int sched_geteventno(void);
 EXTERN double sys_getrealtime(void);
+EXTERN int (*sys_idlehook)(void);   /* hook to add idle time computation */
 
 
 /* ------------  threading ------------------- */

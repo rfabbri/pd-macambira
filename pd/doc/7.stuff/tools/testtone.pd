@@ -56,7 +56,7 @@ started" in the Help menu.;
 #X connect 21 0 20 0;
 #X restore 236 308 pd midi;
 #X floatatom 139 185 3 0 0 0 - - -;
-#X floatatom 172 185 3 0 0 0 - - -;
+#X floatatom 171 185 3 0 0 0 - - -;
 #X text 24 341 PD is COPYRIGHT 1997-2002 by Miller Puckette and others
 but is free for you to use for any reasonable purpose. See the file
 \, LICENSE.txt in the distribution.;
@@ -100,17 +100,29 @@ but is free for you to use for any reasonable purpose. See the file
 1 1;
 #X obj 260 117 tgl 20 0 tone-ch6 tone-ch6 6 5 -8 0 12 -262144 -1 -1
 1 1;
-#X obj 294 108 bng 15 250 50 0 tone-all empty ALL 20 8 0 12 -262144
+#X obj 331 108 bng 15 250 50 0 tone-all empty ALL 20 8 0 12 -262144
 -1 -1;
-#X obj 294 129 bng 15 250 50 0 tone-none empty NONE 20 8 0 12 -262144
+#X obj 331 129 bng 15 250 50 0 tone-none empty NONE 20 8 0 12 -262144
 -1 -1;
-#X floatatom 205 185 3 0 0 0 - - -;
-#X floatatom 238 185 3 0 0 0 - - -;
-#X floatatom 271 186 3 0 0 0 - - -;
-#X floatatom 305 186 3 0 0 0 - - -;
+#X floatatom 204 185 3 0 0 0 - - -;
+#X floatatom 237 185 3 0 0 0 - - -;
+#X floatatom 269 186 3 0 0 0 - - -;
+#X floatatom 302 186 3 0 0 0 - - -;
 #X text 154 210 AUDIO INPUT (RMS dB);
 #X text 45 62 TEST;
-#N canvas 162 353 903 462 -------audio---- 0;
+#X text 72 174 noise;
+#X text 71 191 tone;
+#X text 44 80 SIGNAL;
+#X text 131 78 test signal channels:;
+#X obj 52 174 vradio 15 1 0 2 tone-type tone-type-set empty 0 -6 0
+8 -262144 -1 -1 1;
+#X obj 51 104 vradio 15 1 0 3 tone-radio tone-radio-set empty 0 -6
+0 8 -262144 -1 -1 2;
+#X obj 379 220 adc~;
+#X obj 379 256 print~;
+#X obj 438 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#N canvas 162 353 903 462 -------audio----------- 0;
 #X obj 186 95 hip~ 5;
 #X obj 194 172 outlet;
 #X obj 194 146 int;
@@ -284,6 +296,36 @@ but is free for you to use for any reasonable purpose. See the file
 #X connect 27 0 20 0;
 #X connect 28 0 16 0;
 #X restore 24 68 pd tone-generator;
+#X obj 899 96 hip~ 5;
+#X obj 907 173 outlet;
+#X obj 907 147 int;
+#X obj 907 121 env~ 8192;
+#X obj 909 196 r~ tone-mon;
+#X obj 918 331 line~;
+#X obj 899 221 *~;
+#X obj 918 304 pack 0 50;
+#X obj 909 251 r~ tone-osc;
+#X obj 909 356 *~;
+#X obj 899 386 +~;
+#X obj 907 69 r tone-hip;
+#X obj 1019 95 hip~ 5;
+#X obj 1027 172 outlet;
+#X obj 1027 146 int;
+#X obj 1027 120 env~ 8192;
+#X obj 1029 195 r~ tone-mon;
+#X obj 1038 330 line~;
+#X obj 1019 220 *~;
+#X obj 1038 303 pack 0 50;
+#X obj 1029 250 r~ tone-osc;
+#X obj 1029 355 *~;
+#X obj 1019 385 +~;
+#X obj 1027 68 r tone-hip;
+#X obj 918 278 r tone-ch5;
+#X obj 1038 277 r tone-ch6;
+#X obj 899 43 adc~ 7;
+#X obj 1019 42 adc~ 8;
+#X obj 899 411 dac~ 7;
+#X obj 1019 410 dac~ 8;
 #X connect 0 0 7 0;
 #X connect 0 0 3 0;
 #X connect 2 0 1 0;
@@ -373,19 +415,41 @@ but is free for you to use for any reasonable purpose. See the file
 #X connect 91 0 57 0;
 #X connect 92 0 69 0;
 #X connect 93 0 81 0;
-#X restore 139 159 pd -------audio----;
-#X text 72 174 noise;
-#X text 71 191 tone;
-#X text 44 80 SIGNAL;
-#X text 131 78 test signal channels:;
-#X obj 52 174 vradio 15 1 0 2 tone-type tone-type-set empty 0 -6 0
-8 -262144 -1 -1 1;
-#X obj 51 104 vradio 15 1 0 3 tone-radio tone-radio-set empty 0 -6
-0 8 -262144 -1 -1 2;
-#X obj 379 220 adc~;
-#X obj 379 256 print~;
-#X obj 438 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
+#X connect 99 0 105 0;
+#X connect 99 0 102 0;
+#X connect 101 0 100 0;
+#X connect 102 0 101 0;
+#X connect 103 0 105 1;
+#X connect 104 0 108 1;
+#X connect 105 0 109 0;
+#X connect 106 0 104 0;
+#X connect 107 0 108 0;
+#X connect 108 0 109 1;
+#X connect 109 0 127 0;
+#X connect 110 0 99 1;
+#X connect 111 0 117 0;
+#X connect 111 0 114 0;
+#X connect 113 0 112 0;
+#X connect 114 0 113 0;
+#X connect 115 0 117 1;
+#X connect 116 0 120 1;
+#X connect 117 0 121 0;
+#X connect 118 0 116 0;
+#X connect 119 0 120 0;
+#X connect 120 0 121 1;
+#X connect 121 0 128 0;
+#X connect 122 0 111 1;
+#X connect 123 0 106 0;
+#X connect 124 0 118 0;
+#X connect 125 0 99 0;
+#X connect 126 0 111 0;
+#X restore 139 159 pd -------audio-----------;
+#X floatatom 335 186 3 0 0 0 - - -;
+#X floatatom 368 186 3 0 0 0 - - -;
+#X obj 283 117 tgl 20 0 tone-ch7 tone-ch7 7 5 -8 0 12 -262144 -1 -1
+0 1;
+#X obj 308 117 tgl 20 0 tone-ch8 tone-ch8 8 5 -8 0 12 -262144 -1 -1
+0 1;
 #X connect 1 0 2 0;
 #X connect 1 1 2 1;
 #X connect 2 0 3 0;
@@ -393,11 +457,13 @@ but is free for you to use for any reasonable purpose. See the file
 #X connect 9 0 8 0;
 #X connect 9 1 7 0;
 #X connect 16 0 10 0;
-#X connect 35 0 11 0;
-#X connect 35 1 12 0;
-#X connect 35 2 29 0;
-#X connect 35 3 30 0;
-#X connect 35 4 31 0;
-#X connect 35 5 32 0;
-#X connect 42 0 43 0;
-#X connect 44 0 43 0;
+#X connect 41 0 42 0;
+#X connect 43 0 42 0;
+#X connect 44 0 11 0;
+#X connect 44 1 12 0;
+#X connect 44 2 29 0;
+#X connect 44 3 30 0;
+#X connect 44 4 31 0;
+#X connect 44 5 32 0;
+#X connect 44 6 45 0;
+#X connect 44 7 46 0;

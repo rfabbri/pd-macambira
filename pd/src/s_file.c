@@ -84,9 +84,9 @@ static void sys_initloadpreferences( void)
 
 static int sys_getpreference(const char *key, char *value, int size)
 {
+    char searchfor[80], *where, *whereend;
     if (!sys_prefbuf)
         return (0);
-    char searchfor[80], *where, *whereend;
     sprintf(searchfor, "\n%s:", key);
     where = strstr(sys_prefbuf, searchfor);
     if (!where)
@@ -157,7 +157,7 @@ static void sys_initloadpreferences( void)
 
 static int sys_getpreference(const char *key, char *value, int size)
 {
-    HKEY *hkey;
+    HKEY **hkey;
     DWORD bigsize = size;
     char *val2 = value;
     LONG err = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
@@ -192,7 +192,7 @@ static void sys_initsavepreferences( void)
 
 static void sys_putpreference(const char *key, const char *value)
 {
-    HKEY *hkey;
+    HKEY **hkey;
     LONG err = RegCreateKeyEx(HKEY_LOCAL_MACHINE,
         "Software\\Pd", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE,
         NULL, &hkey, NULL);
@@ -223,7 +223,7 @@ static int sys_getpreference(const char *key, char *value, int size)
 {
     char cmdbuf[256];
     int nread = 0, nleft = size;
-    snprintf(cmdbuf, 256, "defaults read com.ucsd.pd %s 2> /dev/null\n", key);
+    snprintf(cmdbuf, 256, "defaults read org.puredata.pd %s 2> /dev/null\n", key);
     FILE *fp = popen(cmdbuf, "r");
     while (nread < size)
     {
@@ -233,11 +233,13 @@ static int sys_getpreference(const char *key, char *value, int size)
         nread += newread;
     }
     pclose(fp);
-    if (!nread)
+    if (nread < 1)
         return (0);
     if (nread >= size)
         nread = size-1;
     value[nread] = 0;
+    if (value[nread-1] == '\n')     /* remove newline character at end */
+        value[nread-1] = 0;
     return(1);
 }
 
@@ -253,7 +255,7 @@ static void sys_putpreference(const char *key, const char *value)
 {
     char cmdbuf[MAXPDSTRING];
     snprintf(cmdbuf, MAXPDSTRING, 
-        "defaults write com.ucsd.pd %s \"%s\" 2> /dev/null\n", key, value);
+        "defaults write org.puredata.pd %s \"%s\" 2> /dev/null\n", key, value);
     system(cmdbuf);
 }
 

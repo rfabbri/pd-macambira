@@ -420,6 +420,8 @@ t_atom *binbuf_getvec(t_binbuf *x)
 
 int canvas_getdollarzero( void);
 
+/* LATER remove the dependence on the current canvas for $0; should be another
+argument. */
 t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
 {
     int argno = atol(s->s_name), lastnum;

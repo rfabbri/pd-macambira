@@ -437,7 +437,7 @@ static void pd_startfromgui( void)
         fprintf(stderr, "Waiting for connection request... \n");
 #endif
     if (listen(xsock, 5) < 0) pd_sockerror("listen");
-    sockfd = accept(xsock, (struct sockaddr *) &server, &len);
+    sockfd = accept(xsock, (struct sockaddr *) &server, (unsigned int *)&len);
     if (sockfd < 0) pd_sockerror("accept");
 #ifdef DEBUGCONNECT
         fprintf(stderr, "... connected\n");

@@ -1064,12 +1064,12 @@ typedef struct _spigot
     float x_state;
 } t_spigot;
 
-static void *spigot_new(void)
+static void *spigot_new(t_floatarg f)
 {
     t_spigot *x = (t_spigot *)pd_new(spigot_class);
     floatinlet_new(&x->x_obj, &x->x_state);
     outlet_new(&x->x_obj, 0);
-    x->x_state = 0;
+    x->x_state = f;
     return (x);
 }
 
@@ -1106,7 +1106,7 @@ static void spigot_anything(t_spigot *x, t_symbol *s, int argc, t_atom *argv)
 static void spigot_setup(void)
 {
     spigot_class = class_new(gensym("spigot"), (t_newmethod)spigot_new, 0,
-        sizeof(t_spigot), 0, A_DEFSYM, 0);
+        sizeof(t_spigot), 0, A_DEFFLOAT, 0);
     class_addbang(spigot_class, spigot_bang);
     class_addpointer(spigot_class, spigot_pointer);
     class_addfloat(spigot_class, spigot_float);

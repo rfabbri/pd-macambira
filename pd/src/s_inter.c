@@ -28,6 +28,7 @@ that didn't really belong anywhere. */
 #include <process.h>
 #include <winsock.h>
 typedef int pid_t;
+typedef int socklen_t;
 #define EADDRINUSE WSAEADDRINUSE
 #endif
 #include <stdarg.h>
@@ -611,7 +612,7 @@ void sys_vgui(char *fmt, ...)
         sys_guibufsize = GUI_ALLOCCHUNK;
         sys_guibufhead = sys_guibuftail = 0;
     }
-    if (sys_guibufhead > sys_guibufsize - 50)
+    if (sys_guibufhead > sys_guibufsize - (GUI_ALLOCCHUNK/2))
         sys_trytogetmoreguibuf(sys_guibufsize + GUI_ALLOCCHUNK);
     va_start(ap, fmt);
     msglen = vsnprintf(sys_guibuf + sys_guibufhead,
@@ -619,16 +620,18 @@ void sys_vgui(char *fmt, ...)
     va_end(ap);
     if (msglen >= sys_guibufsize - sys_guibufhead)
     {
-        int newsize = sys_guibufsize + 1 +
+        int msglen2, newsize = sys_guibufsize + 1 +
             (msglen > GUI_ALLOCCHUNK ? msglen : GUI_ALLOCCHUNK);
         sys_trytogetmoreguibuf(newsize);
 
         va_start(ap, fmt);
-        msglen = vsnprintf(sys_guibuf + sys_guibufhead,
-            sys_guibufsize + 1 - sys_guibufhead, fmt, ap);
+        msglen2 = vsnprintf(sys_guibuf + sys_guibufhead,
+            sys_guibufsize - sys_guibufhead, fmt, ap);
         va_end(ap);
+        if (msglen2 != msglen)
+            bug("sys_vgui");
         if (msglen >= sys_guibufsize - sys_guibufhead)
-            msglen = sys_guibufsize - sys_guibufhead - 1;
+            msglen = sys_guibufsize - sys_guibufhead;
     }
     if (sys_debuglevel & DEBUG_MESSUP)
         fprintf(stderr, "%s",  sys_guibuf + sys_guibufhead);
@@ -1145,7 +1148,7 @@ int sys_startgui(const char *guidir)
         struct sched_param param;
         int policy = SCHED_RR;
         int err;
-        param.sched_priority = 80; // adjust 0 : 100
+        param.sched_priority = 80; /* adjust 0 : 100 */
 
         err = pthread_setschedparam(pthread_self(), policy, &param);
         if (err)
@@ -1159,7 +1162,8 @@ int sys_startgui(const char *guidir)
             fprintf(stderr, "Waiting for connection request... \n");
         if (listen(xsock, 5) < 0) sys_sockerror("listen");
 
-        sys_guisock = accept(xsock, (struct sockaddr *) &server, &len);
+        sys_guisock = accept(xsock, (struct sockaddr *) &server, 
+            (socklen_t *)&len);
 #ifdef OOPS
         close(xsock);
 #endif

@@ -687,7 +687,7 @@ void glob_audio_properties(t_pd *dummy, t_floatarg flongform)
         audiooutchan1, audiooutchan2, audiooutchan3, audiooutchan4, 
         rate, advance, canmulti, (flongform != 0));
     gfxstub_deleteforkey(0);
-    gfxstub_new(&glob_pdobject, glob_audio_properties, buf);
+    gfxstub_new(&glob_pdobject, (void *)glob_audio_properties, buf);
 }
 
     /* new values from dialog window */

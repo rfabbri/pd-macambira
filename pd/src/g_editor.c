@@ -1342,8 +1342,9 @@ void canvas_mouseup(t_canvas *x,
                 gobj_activate(x->gl_editor->e_selection->sel_what,
                     x, 1);
     }
-    else if (x->gl_editor->e_onmotion == MA_PASSOUT)
-        x->gl_editor->e_onmotion = 0;
+    if (x->gl_editor->e_onmotion != MA_NONE)
+        sys_vgui("pdtk_canvas_getscroll .x%lx.c\n", x);
+
     x->gl_editor->e_onmotion = MA_NONE;
 }
 
@@ -1813,7 +1814,6 @@ static void canvas_copy(t_canvas *x)
         canvas_textcopybuf = (char *)getbytes(bufsize);
         memcpy(canvas_textcopybuf, buf, bufsize);
         canvas_textcopybufsize = bufsize;
-        post("buf size %d", bufsize);
 #else /* UNIX */
             /* otherwise just copy the text to the clipboard here */
         sys_vgui("clipboard clear\n", bufsize, buf);
@@ -1846,7 +1846,6 @@ static void canvas_doclear(t_canvas *x)
     t_gobj *y, *y2;
     int dspstate;
 
-    post("doclear");
     dspstate = canvas_suspend_dsp();
     if (x->gl_editor->e_selectedline)
     {
@@ -2033,19 +2032,19 @@ void canvas_connect(t_canvas *x, t_floatarg fwhoout, t_floatarg foutno,
     for (sink = x->gl_list; whoin; sink = sink->g_next, whoin--)
         if (!sink->g_next) goto bad;
     
-    	/* check they're both patchable objects */
+        /* check they're both patchable objects */
     if (!(objsrc = pd_checkobject(&src->g_pd)) ||
         !(objsink = pd_checkobject(&sink->g_pd)))
             goto bad;
     
-    	/* if object creation failed, make dummy inlets or outlets
-	as needed */ 
+        /* if object creation failed, make dummy inlets or outlets
+        as needed */ 
     if (pd_class(&src->g_pd) == text_class && objsrc->te_type == T_OBJECT)
-    	while (outno >= obj_noutlets(objsrc))
-	    outlet_new(objsrc, &s_);
+        while (outno >= obj_noutlets(objsrc))
+            outlet_new(objsrc, &s_);
     if (pd_class(&sink->g_pd) == text_class && objsink->te_type == T_OBJECT)
-    	while (inno >= obj_ninlets(objsink))
-	    inlet_new(objsink, &objsink->ob_pd, &s_, &s_);
+        while (inno >= obj_ninlets(objsink))
+            inlet_new(objsink, &objsink->ob_pd, &s_, &s_);
 
     if (!(oc = obj_connect(objsrc, outno, objsink, inno))) goto bad;
     if (glist_isvisible(x))
