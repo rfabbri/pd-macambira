@@ -1,65 +1,57 @@
 /*
-Copyright (c) 1996,1997.  The Regents of the University of California (Regents).
-All Rights Reserved.
-
-Permission to use, copy, modify, and distribute this software and its
-documentation for educational, research, and not-for-profit purposes, without
-fee and without a signed licensing agreement, is hereby granted, provided that
-the above copyright notice, this paragraph and the following two paragraphs
-appear in all copies, modifications, and distributions.  Contact The Office of
-Technology Licensing, UC Berkeley, 2150 Shattuck Avenue, Suite 510, Berkeley,
-CA 94720-1620, (510) 643-7201, for commercial licensing opportunities.
-
 Written by Matt Wright, The Center for New Music and Audio Technologies,
-University of California, Berkeley.
+University of California, Berkeley.  Copyright (c) 1996,97,98,99,2000,01,02,03
+The Regents of the University of California (Regents).  
 
-     IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
-     SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-     ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
-     REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Permission to use, copy, modify, distribute, and distribute modified versions
+of this software and its documentation without fee and without a signed
+licensing agreement, is hereby granted, provided that the above copyright
+notice, this paragraph and the following two paragraphs appear in all copies,
+modifications, and distributions.
 
-     REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
-     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-     FOR A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING
-     DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS".
-     REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-     ENHANCEMENTS, OR MODIFICATIONS.
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
+OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 */
+
+
 
 /* sendOSC.c
 
     Matt Wright, 6/3/97
-   based on sendOSC.c, which was based on a version by Adrian Freed
+    based on sendOSC.c, which was based on a version by Adrian Freed
 
     Text-based OpenSoundControl client.  User can enter messages via command
     line arguments or standard input.
 
     Version 0.1: "play" feature
-   Version 0.2: Message type tags.
+    Version 0.2: Message type tags.
    
-
-
-   pd
-   -------------
-   -- added bundle stuff to send. jdl 20020416
-   -- tweaks for Win32    www.zeggz.com/raf	13-April-2002
-   -- ost_at_test.at + i22_at_test.at, 2000-2002
-      modified to compile as pd externel
-
+    pd version branched from http://www.cnmat.berkeley.edu/OpenSoundControl/src/sendOSC/sendOSC.c
+    -------------
+    -- added bundle stuff to send. jdl 20020416
+    -- tweaks for Win32    www.zeggz.com/raf	13-April-2002
+    -- ost_at_test.at + i22_at_test.at, 2000-2002
+       modified to compile as pd externel
 */
 
 #if HAVE_CONFIG_H 
 #include <config.h> 
 #endif
 
-//#define VERSION "http://cnmat.berkeley.edu/OpenSoundControl/sendOSC-0.1.html"
 #define MAX_ARGS 2000
 #define SC_BUFFER_SIZE 64000
 
-/*
-compiling:
-        cc -o sendOSC sendOSC.c htmsocket.c OpenSoundControl.c OSC_timeTag.c
-*/
 #include "m_pd.h"
 
 #include "OSC-common.h"
@@ -71,19 +63,17 @@ compiling:
 #include <stdlib.h>
 
 #ifdef WIN32
-	#include <winsock2.h>	
-	#include <io.h>    
-	#include <errno.h>
-	#include <fcntl.h>
-	#include <sys/stat.h>
+#include <winsock2.h>	
+#include <io.h>    
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #else
-	//#include "x_osc.h"
-
-	#include <stdio.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <netdb.h>
-	#include <ctype.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <ctype.h>
 #endif
 
 ///////////////////////
@@ -100,7 +90,7 @@ typedef struct {
 } typedArg;
 
 void CommandLineMode(int argc, char *argv[], void *htmsocket);
-//void InteractiveMode(void *htmsocket);
+
 OSCTimeTag ParseTimeTag(char *s);
 void ParseInteractiveLine(OSCbuf *buf, char *mesg);
 typedArg ParseToken(char *token);
@@ -260,7 +250,8 @@ void sendOSC_senduntyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 }
 
 //////////////////////////////////////////////////////////////////////
-// this is the real and only sending routine now, for both typed and undtyped mode.
+// this is the real and only sending routine now, for both typed and
+// undtyped mode.
 
 static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 {

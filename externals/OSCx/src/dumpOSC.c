@@ -1,31 +1,30 @@
 /*
-Copyright (c) 1992,1993,1994,1995,1996,1997,2000.  
-The Regents of the University of California (Regents).
-All Rights Reserved.
+Written by Matt Wright and Adrian Freed, The Center for New Music and
+Audio Technologies, University of California, Berkeley.  Copyright (c)
+1992,93,94,95,96,97,98,99,2000,01,02,03,04 The Regents of the University of
+California (Regents).
 
-Permission to use, copy, modify, and distribute this software and its
-documentation for educational, research, and not-for-profit purposes, without
-fee and without a signed licensing agreement, is hereby granted, provided that
-the above copyright notice, this paragraph and the following two paragraphs
-appear in all copies, modifications, and distributions.  Contact The Office of
-Technology Licensing, UC Berkeley, 2150 Shattuck Avenue, Suite 510, Berkeley,
-CA 94720-1620, (510) 643-7201, for commercial licensing opportunities.
+Permission to use, copy, modify, distribute, and distribute modified versions
+of this software and its documentation without fee and without a signed
+licensing agreement, is hereby granted, provided that the above copyright
+notice, this paragraph and the following two paragraphs appear in all copies,
+modifications, and distributions.
 
-Written by Matt Wright and Adrian Freed, The Center for New Music and Audio
-Technologies, University of California, Berkeley.
+IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
+OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-     IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
-     SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS,
-     ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF
-     REGENTS HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-     REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT
-     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-     FOR A PARTICULAR PURPOSE. THE SOFTWARE AND ACCOMPANYING
-     DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED "AS IS".
-     REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-     ENHANCEMENTS, OR MODIFICATIONS.
+
+The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 */
+
 
   /* 
 
@@ -57,9 +56,13 @@ Technologies, University of California, Berkeley.
 
 	    Clean up to separate OSC parsing code from socket/select stuff
 
-	pd
+	pd: branched from http://www.cnmat.berkeley.edu/OpenSoundControl/src/dumpOSC/dumpOSC.c
 	-------------
-		-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
+	-- added pd functions
+	-- socket is made differently than original via pd mechanisms
+	-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
+	-- the OSX changes from cnmat didnt make it here yet but this compiles
+	   on OSX anyway.
 	
 */
 
@@ -70,7 +73,6 @@ Technologies, University of California, Berkeley.
 #include "m_pd.h"
 //#include "m_imp.h"
 #include "s_stuff.h"
-//#include "x_osc.h"
 
 /* declarations */
 
@@ -207,6 +209,7 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
   //struct sockaddr_in x->x_server;
   //while( (n = recvfrom(sockfd, mbuf, MAXMESG, 0, &cl_addr, &clilen)) >0) 
   //  while((
+
 	#ifdef WIN32
 	if ((n = recvfrom(sockfd, mbuf, MAXMESG, 0, (SOCKADDR*)&x->x_server, &clilen)) >0)
 	#else

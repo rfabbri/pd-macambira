@@ -1,9 +1,7 @@
 /*
-Copyright © 1998. The Regents of the University of California (Regents). 
-All Rights Reserved.
-
 Written by Matt Wright, The Center for New Music and Audio Technologies,
-University of California, Berkeley.
+University of California, Berkeley.  Copyright (c) 1998,99,2000,01,02,03,04
+The Regents of the University of California (Regents).  
 
 Permission to use, copy, modify, distribute, and distribute modified versions
 of this software and its documentation without fee and without a signed
@@ -25,7 +23,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 The OpenSound Control WWW page is 
     http://www.cnmat.berkeley.edu/OpenSoundControl
 */
-
 
 /*
  OSC_timeTag.h: library for manipulating OSC time tags

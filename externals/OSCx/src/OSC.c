@@ -1,9 +1,10 @@
 /*
-
-	pd
+	OpenSoundControl for PD
 	-------------
+	   -- init jdl at xdv dot org
 		-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
 		-- smoothed out build, clean up for Darwin  <hans@at.or.at> 2004.04.04
+		-- shoutz: miller and the others
 */
 
 #if HAVE_CONFIG_H 
