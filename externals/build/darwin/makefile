@@ -62,7 +62,7 @@ link: link.stamp
 
 link.stamp:
 	cp ../src/*.c .
-	rm vst.c 
+#	rm vst.c 
 # MacOSX exceptions that don't work just yet
 	rm ogg* ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
 	rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
