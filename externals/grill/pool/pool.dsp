@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib pd.lib flext-pdwin.lib /nologo /dll /machine:I386 /libpath:"c:\programme\audio\pd\bin" /libpath:"f:\prog\max\flext\pd-msvc"
+# ADD LINK32 kernel32.lib user32.lib pd.lib flext-pdwin.lib /nologo /dll /machine:I386 /out:"pd-msvc/pool.dll" /libpath:"c:\programme\audio\pd\bin" /libpath:"f:\prog\max\flext\pd-msvc"
 
 !ELSEIF  "$(CFG)" == "pool - Win32 Debug"
 
@@ -89,6 +89,10 @@ LINK32=link.exe
 # Name "pool - Win32 Debug"
 # Begin Source File
 
+SOURCE=.\data.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
@@ -98,6 +102,10 @@ SOURCE=.\pool.cpp
 # Begin Source File
 
 SOURCE=.\pool.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\readme.txt
 # End Source File
 # End Target
 # End Project

@@ -10,6 +10,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "pool.h"
 
+#define POOL_VERSION "0.1.0"
+
 class pool:
 	public flext_base
 {
@@ -188,6 +190,8 @@ pool::pool(I argc,const A *argv):
 	AddOutAnything();
 	AddOutList();
 	AddOutAnything();
+
+	FLEXT_ADDMETHOD_(0,"pool",m_pool);
 
 	FLEXT_ADDMETHOD_(0,"set",m_set);
 	FLEXT_ADDMETHOD_(0,"add",m_add);

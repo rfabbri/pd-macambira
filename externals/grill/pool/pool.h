@@ -17,8 +17,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.4.0
 #endif
 
-#define POOL_VERSION "0.0.5"
-
 #include <iostream.h>
 
 typedef void V;
@@ -44,28 +42,36 @@ public:
 	poolval *nxt;
 };
 
-	class pooldir:
+class pooldir:
 	public flext
 {
 public:
-	pooldir(const A &dir);
+	pooldir(const A &dir,pooldir *parent);
 	~pooldir();
 
 	V Clear(BL rec,BL dironly = false);
+	BL Empty() const { return !dirs && !vals; }
+	BL HasDirs() const { return dirs != NULL; }
+	BL HasVals() const { return vals != NULL; }
 
 	pooldir *GetDir(I argc,const A *argv,BL cut = false);
 	pooldir *GetDir(const AtomList &d,BL cut = false) { return GetDir(d.Count(),d.Atoms(),cut); }
-	BL DelDir(const AtomList &d);
+	BL DelDir(I argc,const A *argv);
+	BL DelDir(const AtomList &d) { return DelDir(d.Count(),d.Atoms()); }
 	pooldir *AddDir(I argc,const A *argv);
 	pooldir *AddDir(const AtomList &d) { return AddDir(d.Count(),d.Atoms()); }
 
 	V SetVal(const A &key,AtomList *data,BL over = true);
 	V ClrVal(const A &key) { SetVal(key,NULL); }
+	AtomList *PeekVal(const A &key);
 	AtomList *GetVal(const A &key,BL cut = false);
 	I CntAll();
 	I GetAll(A *&keys,AtomList *&lst,BL cut = false);
-	I GetSub(const t_atom **&dirs);
+	I GetKeys(AtomList &keys);
+	I GetSub(const A **&dirs);
 
+	poolval *RefVal(const A &key);
+	
 	BL Paste(const pooldir *p,I depth,BL repl,BL mkdir);
 	BL Copy(pooldir *p,I depth,BL cur);
 
@@ -75,11 +81,11 @@ public:
 	A dir;
 	pooldir *nxt;
 
-	pooldir *dirs;
+	pooldir *parent,*dirs;
 	poolval *vals;
 };
 
-	class pooldata:
+class pooldata:
 	public flext
 {
 public:
@@ -97,6 +103,7 @@ public:
 	BL Set(const AtomList &d,const A &key,AtomList *data,BL over = true);
 	BL Clr(const AtomList &d,const A &key);
 	BL ClrAll(const AtomList &d,BL rec,BL dironly = false);
+	AtomList *Peek(const AtomList &d,const A &key);
 	AtomList *Get(const AtomList &d,const A &key);
 	I CntAll(const AtomList &d);
 	I GetAll(const AtomList &d,A *&keys,AtomList *&lst);
@@ -118,7 +125,7 @@ public:
 	pooldir root;
 
 private:
-	static t_atom nullatom;
+	static const A nullatom;
 };
 
 #endif

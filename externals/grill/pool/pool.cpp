@@ -78,8 +78,8 @@ poolval *poolval::Dup() const
 }
 
 
-pooldir::pooldir(const A &d):
-	dirs(NULL),vals(NULL),nxt(NULL)
+pooldir::pooldir(const A &d,pooldir *p):
+	parent(p),dirs(NULL),vals(NULL),nxt(NULL)
 {
 	CopyAtom(&dir,&d);
 }
@@ -108,7 +108,7 @@ pooldir *pooldir::AddDir(I argc,const A *argv)
 	}
 
 	if(c || !ix) {
-		pooldir *nd = new pooldir(argv[0]);
+		pooldir *nd = new pooldir(argv[0],this);
 		nd->nxt = ix;
 
 		if(prv) prv->nxt = nd;
@@ -147,9 +147,9 @@ pooldir *pooldir::GetDir(I argc,const A *argv,BL rmv)
 	}
 }
 
-BL pooldir::DelDir(const AtomList &d)
+BL pooldir::DelDir(I argc,const A *argv)
 {
-	pooldir *pd = GetDir(d,true);
+	pooldir *pd = GetDir(argc,argv,true);
 	if(pd && pd != this) {
 		delete pd;
 		return true;
@@ -193,6 +193,24 @@ V pooldir::SetVal(const A &key,AtomList *data,BL over)
 	}
 }
 
+poolval *pooldir::RefVal(const A &key)
+{
+	I c = 1;
+	poolval *ix = vals;
+	for(; ix; ix = ix->nxt) {
+		c = compare(key,ix->key);
+		if(c <= 0) break;
+	}
+
+	return c || !ix?NULL:ix;
+}
+
+flext::AtomList *pooldir::PeekVal(const A &key)
+{
+	poolval *ix = RefVal(key);
+	return ix?ix->data:NULL;
+}
+
 flext::AtomList *pooldir::GetVal(const A &key,BL cut)
 {
 	I c = 1;
@@ -225,6 +243,18 @@ I pooldir::CntAll()
 	I cnt = 0;
 	poolval *ix = vals;
 	for(; ix; ix = ix->nxt,++cnt) {}
+	return cnt;
+}
+
+I pooldir::GetKeys(AtomList &keys)
+{
+	I cnt = CntAll();
+	keys(cnt);
+
+	poolval *ix = vals;
+	for(I i = 0; ix; ++i,ix = ix->nxt) 
+		SetAtom(keys[i],ix->key);
+
 	return cnt;
 }
 
@@ -456,190 +486,5 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
 }
 
 
-
-
-pooldata::pooldata(const S *s):
-	sym(s),nxt(NULL),refs(0),
-	root(nullatom)
-{
-	LOG1("new pool %s",sym?flext_base::GetString(sym):"<private>");
-}
-
-pooldata::~pooldata()
-{
-	LOG1("free pool %s",sym?flext_base::GetString(sym):"<private>");
-}
-
-t_atom pooldata::nullatom = { A_NULL };
-
-
-V pooldata::Reset()
-{
-	root.Clear(true);
-}
-
-BL pooldata::MkDir(const AtomList &d)
-{
-	root.AddDir(d);
-	return true;
-}
-
-BL pooldata::ChkDir(const AtomList &d)
-{
-	return root.GetDir(d) != NULL;
-}
-
-BL pooldata::RmDir(const AtomList &d)
-{
-	return root.DelDir(d);
-}
-
-BL pooldata::Set(const AtomList &d,const A &key,AtomList *data,BL over)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->SetVal(key,data,over);
-	return true;
-}
-
-BL pooldata::Clr(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->ClrVal(key);
-	return true;
-}
-
-BL pooldata::ClrAll(const AtomList &d,BL rec,BL dironly)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->Clear(rec,dironly);
-	return true;
-}
-
-flext::AtomList *pooldata::Get(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->GetVal(key):NULL;
-}
-
-I pooldata::CntAll(const AtomList &d)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->CntAll():0;
-}
-
-I pooldata::GetAll(const AtomList &d,A *&keys,AtomList *&lst)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd)
-		return pd->GetAll(keys,lst);
-	else {
-		keys = NULL; lst = NULL;
-		return 0;
-	}
-}
-
-I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd)
-		return pd->GetSub(dirs);
-	else {
-		dirs = NULL;
-		return 0;
-	}
-}
-
-
-BL pooldata::Paste(const AtomList &d,const pooldir *clip,I depth,BL repl,BL mkdir)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd)
-		return pd->Paste(clip,depth,repl,mkdir);
-	else
-		return false;
-}
-
-pooldir *pooldata::Copy(const AtomList &d,const A &key,BL cut)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd) {
-		AtomList *val = pd->GetVal(key,cut);
-		if(val) {
-			pooldir *ret = new pooldir(nullatom);
-			ret->SetVal(key,val);
-			return ret;
-		}
-		else
-			return NULL;
-	}
-	else
-		return NULL;
-}
-
-pooldir *pooldata::CopyAll(const AtomList &d,I depth,BL cut)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd) {
-		pooldir *ret = new pooldir(nullatom);
-		if(pd->Copy(ret,depth,cut))
-			return ret;
-		else {
-			delete ret;
-			return NULL;
-		}
-	}
-	else
-		return NULL;
-}
-
-
-static const C *CnvFlnm(C *dst,const C *src,I sz)
-{
-#if defined(PD) && defined(NT)
-	I cnt = strlen(src);
-	if(cnt >= sz-1) return NULL;
-	for(I i = 0; i < cnt; ++i)
-		dst[i] = src[i] != '/'?src[i]:'\\';
-	dst[i] = 0;
-	return dst;
-#else
-	return src;
-#endif
-}
-
-BL pooldata::LdDir(const AtomList &d,const C *flnm,I depth,BL mkdir)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
-		if(t) {
-			ifstream fl(t);
-			return fl.good() && pd->LdDir(fl,depth,mkdir);
-		}
-		else return false;
-	}
-	else
-		return false;
-}
-
-BL pooldata::SvDir(const AtomList &d,const C *flnm,I depth,BL absdir)
-{
-	pooldir *pd = root.GetDir(d);
-	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
-		if(t) {
-			ofstream fl(t);
-			return fl.good() && pd->SvDir(fl,depth,absdir?d:AtomList());
-		}
-		else return false;
-	}
-	else
-		return false;
-}
 
 
