@@ -56,7 +56,8 @@ void sc4pd_library_setup()
 	 "          ClipNoise(~), GrayNoise(~), Dust2(~), WhiteNoise(~), "
 	 "PinkNoise(~), \n          Crackle(~), Rand(~), TRand(~), "
 	 "TExpRand(~), IRand(~), TIRand(~),\n          CoinGate, "
-	 "LinRand(~), NRand(~), ExpRand(~)\n");
+	 "LinRand(~), NRand(~), ExpRand(~), LFClipNoise(~),\n"
+	 "          LFNoise0(~)\n");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -117,6 +118,12 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(ExpRand_ar);
     FLEXT_SETUP(ExpRand_kr);
+
+    FLEXT_DSP_SETUP(LFClipNoise_ar);
+    FLEXT_SETUP(LFClipNoise_kr);
+
+    FLEXT_DSP_SETUP(LFNoise0_ar);
+    FLEXT_SETUP(LFNoise0_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

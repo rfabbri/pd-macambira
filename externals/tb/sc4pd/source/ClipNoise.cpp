@@ -134,10 +134,10 @@ ClipNoise_kr::ClipNoise_kr(int argc, t_atom *argv)
     
     rgen.init(timeseed());
 
-    AddOutFloat();
+    AddOutInt();
 }
 
 void ClipNoise_kr::m_perform()
 {
-    ToOutFloat(0,rgen.fcoin());
+    ToOutInt(0,rgen.fcoin());
 }

@@ -5,4 +5,4 @@ SRCS= \
 	BrownNoise.cpp ClipNoise.cpp GrayNoise.cpp WhiteNoise.cpp \
 	PinkNoise.cpp Dust2.cpp Crackle.cpp Rand.cpp TRand.cpp TExpRand.cpp \
 	IRand.cpp TIRand.cpp CoinGate.cpp support.cpp LinRand.cpp NRand.cpp\
-	
+	ExpRand.cpp LFClipNoise.cpp LFNoise0.cpp

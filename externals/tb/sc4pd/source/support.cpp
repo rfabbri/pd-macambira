@@ -35,14 +35,13 @@
 */
 
 #include <flext.h>
+#include <flsupport.h>
 #include "SC_PlugIn.h"
 
-#include <sys/time.h>
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
 #error You need at least FLEXT version 0.4.6
 #endif
-
 
 bool sc_add (flext::AtomList a)
 {
@@ -96,7 +95,16 @@ bool sc_ar(flext::AtomList a)
 int32 timeseed()
 {
 	static int32 count = 0;
-	struct timeval tv;
-	gettimeofday(&tv, 0);
-	return (int32)tv.tv_sec ^ (int32)tv.tv_usec ^ count--;
+
+	double time = flext::GetOSTime();
+	
+	double sec = trunc(time);
+	double usec = (time-sec)*1e6;
+	
+	time_t tsec = sec;
+	suseconds_t tusec =usec;       /* not exacty the way, it's calculated
+					  in SuperCollider, but it's only 
+					  the seed */
+	
+	return (int32)tsec ^ (int32)tusec ^ count--;
 }

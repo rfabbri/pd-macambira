@@ -1,5 +1,5 @@
 /* sc4pd 
-   ExpRand, ExpRand~
+   LFClipNoise, LFClipNoise~
 
    Copyright (c) 2004 Tim Blechmann.
 
@@ -31,7 +31,7 @@
      SuperCollider by James McCartney
          http://www.audiosynth.com
      
-   Coded while listening to: Jim O'Rourke & Loren Mazzacane Connors: In Bern
+   Coded while listening to: Elliott Sharp: Revenge Of The Stuttering Child
    
 */
 
@@ -45,15 +45,15 @@
 #endif
 
 
-/* ------------------------ ExpRand~ -------------------------------*/
+/* ------------------------ LFClipNoise~ -------------------------------*/
 
-class ExpRand_ar:
+class LFClipNoise_ar:
     public flext_dsp
 {
-    FLEXT_HEADER(ExpRand_ar,flext_dsp);
+    FLEXT_HEADER(LFClipNoise_ar,flext_dsp);
     
 public:
-    ExpRand_ar(int argc, t_atom *argv);
+    LFClipNoise_ar(int argc, t_atom *argv);
     
 protected:
     virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
@@ -63,106 +63,140 @@ protected:
     {
 	rgen.init(i);
     }
+
+    void m_set(float f)
+    {
+	m_freq = f;
+    }
     
 private:
-    float m_sample;
-    float lo;
-    float hi;
-    int sc_n;
     RGen rgen;
+    float m_freq;
+    float m_level;
+    int m_counter;
+    int m_sr;
     FLEXT_CALLBACK_I(m_seed);
+    FLEXT_CALLBACK_F(m_set);
 };
 
-FLEXT_LIB_DSP_V("ExpRand~",ExpRand_ar);
+FLEXT_LIB_DSP_V("LFClipNoise~",LFClipNoise_ar);
 
-ExpRand_ar::ExpRand_ar(int argc, t_atom *argv)
+LFClipNoise_ar::LFClipNoise_ar(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"seed",m_seed);
+    FLEXT_ADDMETHOD_(0,"set",m_set);
 
+    //parse arguments
     AtomList Args(argc,argv);
 
-    if (Args.Count() != 2)
-    {
-	post("not enough arguments");
-	return;
-    }
-    lo=sc_getfloatarg(Args,0);
-    hi=sc_getfloatarg(Args,1);
+    m_freq = sc_getfloatarg(Args,0);
     
+    m_counter=0;
+    m_level=0;
+
     rgen.init(timeseed());
 
     AddOutSignal();
-}
+}    
 
-void ExpRand_ar::m_dsp(int n, t_sample *const *in, t_sample *const *out)
+void LFClipNoise_ar::m_dsp(int n, t_sample *const *in, 
+			   t_sample *const *out)
 {
-    float ratio = hi / lo;
-    m_sample = pow(ratio,rgen.frand()) * lo;
+    m_sr = Samplerate();
 }
 
 
-void ExpRand_ar::m_signal(int n, t_sample *const *in, 
-		       t_sample *const *out)
+void LFClipNoise_ar::m_signal(int n, t_sample *const *in, 
+			       t_sample *const *out)
 {
     t_sample *nout = *out;
-    
-    float sample = m_sample;
-    
-    for (int i = 0; i!= n;++i)
+
+    float level = m_level;
+    int32 counter = m_counter;
+
+    RGET;
+
+    int remain = n;
+    do
     {
-	(*(nout)++) = sample;
+	if (counter<=0) 
+	{
+	    counter = (int)(m_sr / sc_max(m_freq, .001f));
+	    counter = sc_max(1, counter);
+	    level = fcoin(s1,s2,s3);
+	}
+	int nsmps = sc_min(remain, counter);
+	remain -= nsmps;
+	counter -= nsmps;
+	
+	for (int i = 0; i!= nsmps;++i)
+	{
+	    (*(nout)++)=level;
+	}
     }
+    while(remain);
+
+    m_level = level;
+    m_counter = counter;
+    
+    RPUT;
 }
 
 
-/* ------------------------ ExpRand ---------------------------------*/
+/* ------------------------ LFClipNoise ---------------------------------*/
 
-class ExpRand_kr:
+class LFClipNoise_kr:
     public flext_base
 {
-    FLEXT_HEADER(ExpRand_kr,flext_base);
+    FLEXT_HEADER(LFClipNoise_kr,flext_base);
 
 public:
-    ExpRand_kr(int argc, t_atom *argv);
+    LFClipNoise_kr(int argc, t_atom *argv);
     
 protected:
-    void m_loadbang();
-
+    void m_perform();
+    
     void m_seed(int i)
     {
 	rgen.init(i);
     }
-
+ 
+    void m_set(float f)
+    {
+	double dt = sc_min(1/f, .001f);
+	m_timer.Reset();
+	m_timer.Periodic(1000*dt);
+    }
+   
 private:
-    float lo;
-    float hi;
-    int sc_n;
     RGen rgen;
+    Timer m_timer;
     FLEXT_CALLBACK_I(m_seed);
+    FLEXT_CALLBACK_T(m_perform);
+    FLEXT_CALLBACK_F(m_set);
 };
 
-FLEXT_LIB_V("ExpRand",ExpRand_kr);
+FLEXT_LIB_V("LFClipNoise",LFClipNoise_kr);
 
-ExpRand_kr::ExpRand_kr(int argc, t_atom *argv)
+LFClipNoise_kr::LFClipNoise_kr(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"seed",m_seed);
-
+    FLEXT_ADDMETHOD_(0,"set",m_set);
+    FLEXT_ADDTIMER(m_timer,m_perform);
+    
+    //parse arguments
     AtomList Args(argc,argv);
-    if (Args.Count() != 2)
-    {
-	post("not enough arguments");
-	return;
-    }
-    lo=sc_getfloatarg(Args,0);
-    hi=sc_getfloatarg(Args,1);
+    
+    double dt = sc_min(1/sc_getfloatarg(Args,0), .001f);
     
     rgen.init(timeseed());
+
+    m_timer.Periodic(1000*dt);
 
     AddOutFloat();
 }
 
-void ExpRand_kr::m_loadbang()
+void LFClipNoise_kr::m_perform()
 {
-    float ratio = hi / lo;
-    ToOutFloat(0,pow(ratio,rgen.frand()) * lo);
+    ToOutFloat(0,rgen.fcoin());
 }
