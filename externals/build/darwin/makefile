@@ -71,12 +71,13 @@ darwin_pkg_clean:
 darwin_pkg: all darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
 # set up installroot dir
 	test -d installroot/pd/doc/5.reference/ || mkdir -p installroot/pd/doc/5.reference/
-	cp -r ../doc/* installroot/pd/doc/5.reference
+	cp -R ../doc/* installroot/pd/doc/5.reference
 	test -d installroot/pd/extra || mkdir -p installroot/pd/extra
 	install -m644 --group=staff *.pd_darwin installroot/pd/extra
 	cp -f pd-externals.info $(PACKAGE_NAME).info
 # delete cruft
 	-find installroot -name .DS_Store -delete
+	-sudo rm -Rf installroot/*/*/CVS installroot/*/*/*/CVS installroot/*/*/*/*/CVS 
 	-rm -f 1
 # set proper permissions
 	sudo chown -R root:staff installroot
@@ -97,7 +98,8 @@ darwin_altpkg: all darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
 		 | sed -e 's/MSP standard paths/MacOS X-style Paths/' \
 		 > $(PACKAGE_NAME)-alt.info
  # delete cruft
-	-find installroot -name .DS_Store -delete
+	-sudo find installroot -name .DS_Store -delete
+	-sudo rm -Rf installroot/*/*/CVS installroot/*/*/*/CVS installroot/*/*/*/*/CVS 
 	-rm -f 1
  # set proper permissions
 	sudo chown -R root:staff installroot
