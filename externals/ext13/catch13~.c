@@ -24,13 +24,29 @@
     return (x);
 }
 
-
- t_int *sigcatch13_perform(t_int *w)
+t_int *sigcatch13_perform(t_int *w)
 {
     t_float *in = (t_float *)(w[1]);
     t_float *out = (t_float *)(w[2]);
     int n = (int)(w[3]);
     while (n--) *out++ = *in, *in++ = 0; 
+    return (w+4);
+}
+
+/* tb: vectorized */
+t_int *sigcatch13_perf8(t_int *w)
+{
+    t_float *in = (t_float *)(w[1]);
+    t_float *out = (t_float *)(w[2]);
+    int n = (int)(w[3]);
+    for (; n; n -= 8, in += 8, out += 8)
+    {
+	out[0] = in[0]; out[1] = in[1]; out[2] = in[2]; out[3] = in[3]; 
+	out[4] = in[4]; out[5] = in[5]; out[6] = in[6]; out[7] = in[7]; 
+    
+	in[0] = 0; in[1] = 0; in[2] = 0; in[3] = 0; 
+	in[4] = 0; in[5] = 0; in[6] = 0; in[7] = 0; 
+    }
     return (w+4);
 }
 
@@ -44,7 +60,12 @@
  void sigcatch13_dsp(t_sigcatch13 *x, t_signal **sp)
 {
     if (x->x_n == sp[0]->s_n)
-    	dsp_add(sigcatch13_perform, 3, x->x_vec, sp[0]->s_vec, sp[0]->s_n);
+    {
+	if(sp[0]->s_n&7)
+	    dsp_add(sigcatch13_perform, 3, x->x_vec, sp[0]->s_vec, sp[0]->s_n);
+	else
+	    dsp_add(sigcatch13_perf8, 3, x->x_vec, sp[0]->s_vec, sp[0]->s_n);
+    }
     else error("sigcatch13 %s: unexpected vector size", x->x_sym->s_name);
 }
 
