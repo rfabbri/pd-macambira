@@ -25,12 +25,13 @@ DMG_PREFIX = Pure Data Installer
 DMG_NAME = $(DMG_PREFIX) $(PD_VERSION)-$(PACKAGE_VERSION)
 
 WELCOME_FILE = Welcome.html
-INFO_FILE = $(PACKAGE_PREFIX) $(PD_VERSION)-$(PACKAGE_VERSION).info
+INFO_FILE = $(PACKAGE_PREFIX).info
 
 clean: darwin_mpkg_clean
 
 darwin_mpkg_clean:
-	-sudo rm -Rf installroot "$(DMG_PREFIX)*"
+	-sudo rm -Rf installroot
+	-sudo rm -Rf "$(DMG_PREFIX)"*
 	-rm -f "$(WELCOME_FILE)" *.dmg *~
 	cd ../externals/build/darwin ; make darwin_pkg_clean
 	cd ../externals/zexy/src ; make -f makefile.darwin darwin_pkg_clean
@@ -42,7 +43,7 @@ darwin_mpkg_welcome:
 	echo $(CYCLONE_RELEASE)
 	-rm $(WELCOME_FILE)
 	echo "<HTML><BODY>" > $(WELCOME_FILE)
-	echo "<H2>Pure Data Installer$(PD_VERSION)-$(PACKAGE_VERSION)</H2>" >> $(WELCOME_FILE)
+	echo "<H2>Pure Data Installer $(PD_VERSION)-$(PACKAGE_VERSION)</H2>" >> $(WELCOME_FILE)
 	echo "<P>Pd is a free real-time computer music software package resembling Max.  It provides a patchable environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</P>" >> $(WELCOME_FILE)
 	echo "<P>It is written by Miller S. Puckette with many other contributors.</P>" >> $(WELCOME_FILE)
 	echo "<P>For more information, go to: http://www.pure-data.org</P>" >> $(WELCOME_FILE)
