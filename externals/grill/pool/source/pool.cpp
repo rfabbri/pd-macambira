@@ -231,7 +231,8 @@ V pooldir::SetVal(const A &key,AtomList *data,BL over)
 BL pooldir::SetVali(I rix,AtomList *data)
 {
     poolval *prv = NULL,*ix = NULL;
-	for(I vix = 0; vix < vsize; ++vix) 
+    int vix;
+	for(vix = 0; vix < vsize; ++vix) 
 		if(rix > vals[vix].cnt) rix -= vals[vix].cnt;
 		else {
 			ix = vals[vix].v;
