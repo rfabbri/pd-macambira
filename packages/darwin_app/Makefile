@@ -12,17 +12,21 @@ ABSTRACTIONS_DIR = $(PD_FILE_ROOT)/doc/abstractions
 EXTERNALS_DIR = $(PD_FILE_ROOT)/extra
 HELP_DIR = $(PD_FILE_ROOT)/doc
 
+# needed for PackageMaker.app since it needs absolute paths
+PWD = $(shell pwd)
 
 PD_MAJOR_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 1)
 PD_MINOR_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 2)
 PD_BUGFIX_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 3)
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
-PACKAGE_NAME = pd-$(PD_VERSION)
+# release version for this distro
+PACKAGE_VERSION = beta3
+PACKAGE_NAME = pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 DMG_NAME = $(PACKAGE_NAME)
 
 
-UNIX_PACKAGE_NAME = $(PD_APP_NAME)-UNIX-$(PD_VERSION)
+UNIX_PACKAGE_NAME = $(PD_APP_NAME)-UNIX-$(PD_VERSION)-$(PACKAGE_VERSION)
 UNIX_prefix = /usr/local
 UNIX_DESTDIR = pd-unix-root
 
@@ -338,7 +342,8 @@ darwin_app_externals_c++:
 #	cd ../../gridflow && ./configure && make
 
 
-darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
+#darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
+darwin_unix_pkg:
 # mk the unix dir
 	install -d $(UNIX_DESTDIR)$(UNIX_prefix)
 # copy stuff to UNIX dirs
@@ -346,24 +351,40 @@ darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
 		$(DESTDIR)$(INSTALL_PREFIX)/include \
 		$(DESTDIR)$(INSTALL_PREFIX)/man \
 		$(UNIX_DESTDIR)$(UNIX_prefix)
-	cd .. && install -p darwin_app/pd-unix.info $(UNIX_PACKAGE_NAME).info
-# 
-# the "package" script is deprecated, got to find out the new way...
-#
+#	cd .. && install -p darwin_app/pd-unix.info $(UNIX_PACKAGE_NAME).info
+# cp text for pkg
+	cp $(WELCOME_FILE) $(README_FILE) $(LICENSE_FILE) pkg
+# generate Description.plist
+	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Description.plist.template \
+		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+		> pkg/Description.plist
+# generate Info.plist
+	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Info.plist.template \
+		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+		> pkg/Info.plist
 # delete cruft
 	-find $(UNIX_DESTDIR) -name .DS_Store -delete
 	-rm -f 1
 # set proper permissions
 	sudo chown -R root:staff $(UNIX_DESTDIR)/$(UNIX_prefix)
-# 	/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
-# 		-build \
-# 		-p $(UNIX_PACKAGE_NAME).pkg \
-# 		-f $(UNIX_DESTDIR) \
-# 		-r . 
-#	cd .. && sudo package pd-unix-root $(UNIX_PACKAGE_NAME).info -d . -ignoreDSStore
+# build package
+	/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
+		-build \
+		-p $(PWD)/$(UNIX_PACKAGE_NAME).pkg \
+		-f $(PWD)/$(UNIX_DESTDIR) \
+		-r $(PWD)/pkg \
+		-i $(PWD)/pkg/Info.plist		\
+		-d $(PWD)/Description.plist
+# generate .info file
+	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/pd.info \
+		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+		> $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 # install pkg docs
-#	sudo install -m 644 $(LICENSE_FILE) ../$(UNIX_PACKAGE_NAME).pkg/Contents/Resources
-#	sudo chown -R root:staff ../$(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+#	sudo install -m 644 $(LICENSE_FILE) $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+#	sudo chown -R root:staff $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 
 
 darwin_unix_pkg_welcome:
