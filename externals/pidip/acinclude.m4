@@ -24,7 +24,7 @@ dnl At present there is no support for additional "MODULES" (see AM_PATH_GTK)
 dnl (shamelessly stolen from gtk.m4 and then hacked around a fair amount)
 dnl
 dnl @author Angus Lees <gusl@cse.unsw.edu.au>
-dnl @version $Id: acinclude.m4,v 1.1 2003-08-11 04:26:00 eighthave Exp $
+dnl @version $Id: acinclude.m4,v 1.2 2003-10-17 20:54:40 sevyves Exp $
 
 AC_DEFUN(AC_PATH_GENERIC,
 [dnl

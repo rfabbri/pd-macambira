@@ -28,7 +28,7 @@
 #include "pdp.h"
 #include <math.h>
 
-#define MAGIC_THRESHOLD 30
+#define MAGIC_THRESHOLD 5
 
 static unsigned int fastrand_val;
 #define inline_fastrand() (fastrand_val=fastrand_val*1103515245+12345)

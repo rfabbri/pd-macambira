@@ -1,3 +1,7 @@
+0.12.9
+  added pdp_shape : a shape recognition object (based on color, similar to color tracker ) 
+  added "fill" in pdp_pen 
+  ( on request from ben )
 0.12.8
   added pdp_pen : a free hand drawing object 
   ( on request from patrick/11h11.com )

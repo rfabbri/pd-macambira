@@ -203,7 +203,7 @@ static void pdp_canvas_drag(t_pdp_canvas *x, t_floatarg X, t_floatarg Y)
 {
   X = X*x->x_owidth;
   Y = Y*x->x_oheight;
-  // post( "pdp_canvas : drag %f %f", dx, dy );
+  // post( "pdp_canvas : drag %f %f", X, Y );
   if ( x->x_current != -1 )
   {
      x->x_xoffsets[ x->x_current ] += (X-x->x_xmouse);

@@ -30,6 +30,8 @@
 
 static char   *pdp_pen_version = "pdp_pen: version 0.1, free hand drawing object written by Yves Degoyon (ydegoyon@free.fr)";
 
+static t_int nbits=0; // number of recursive calls
+
 typedef struct pdp_pen_struct
 {
     t_object x_obj;
@@ -118,6 +120,168 @@ static void pdp_pen_draw(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
       }
     } 
   }
+}
+
+static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
+{
+ short int  *pbY, *pbU, *pbV;
+ short int  nX, nY;
+
+  nbits++;
+  // post( "pdp_pen_do_fill : X=%d, Y=%d stack=%d", (t_int)X, (t_int)Y, nbits );
+
+  pbY = x->x_bdata;
+  pbU = (x->x_bdata+x->x_vsize);
+  pbV = (x->x_bdata+x->x_vsize+(x->x_vsize>>2));
+
+  if ( ( (t_int)X < 0 ) || ( (t_int)X >= x->x_vwidth ) || 
+       ( (t_int)Y < 0 ) || ( (t_int)Y >= x->x_vheight ) )
+  {
+     nbits--;
+     return;
+  }
+
+  nX = (t_int) X; 
+  nY = (t_int) Y; 
+  if ( *(pbY+(t_int)Y*x->x_vwidth+(t_int)X) != 0 )
+  {
+     nbits--;
+     return;
+  }
+  else
+  {
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  }
+
+  nX = (t_int) X+1; 
+  nY = (t_int) Y; 
+  if ( (*(pbY+nY*x->x_vwidth+nX)) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X-1; 
+  nY = (t_int) Y; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X-1; 
+  nY = (t_int) Y-1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X; 
+  nY = (t_int) Y-1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X+1; 
+  nY = (t_int) Y-1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X-1; 
+  nY = (t_int) Y+1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X; 
+  nY = (t_int) Y+1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nX = (t_int) X+1; 
+  nY = (t_int) Y+1; 
+  if ( *(pbY+nY*x->x_vwidth+nX) == 0 )
+  {
+     pdp_pen_do_fill( x, nX, nY );
+     *(pbY+nY*x->x_vwidth+nX) = 
+        (yuv_RGBtoY( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))<<7;
+     *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoU( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+     *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) =
+        (yuv_RGBtoV( (x->x_blue << 16) + (x->x_green << 8) + x->x_red ))-128<<8;
+  } 
+
+  nbits--;
+}
+
+static void pdp_pen_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
+{
+  X = X*x->x_vwidth;
+  Y = Y*x->x_vheight;
+  // post( "pdp_pen : draw %f %f", X, Y );
+  if ( (X<0) || (X>x->x_vwidth) )
+  {
+     // post( "pdp_pen : fill : wrong X position : %f", X );
+     return;
+  }  
+  if ( (Y<0) || (Y>x->x_vheight) )
+  {
+     // post( "pdp_pen : fill : wrong Y position : %f", Y );
+     return;
+  }  
+
+  pdp_pen_do_fill( x, X, Y );
 }
 
 static void pdp_pen_clear(t_pdp_pen *x)
@@ -329,6 +493,7 @@ void pdp_pen_setup(void)
 
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_input_0, gensym("pdp"),  A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_draw, gensym("draw"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_pen_class, (t_method)pdp_pen_fill, gensym("fill"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_clear, gensym("clear"), A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_width, gensym("width"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_rgb, gensym("rgb"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);

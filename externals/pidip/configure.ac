@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
-PDP_PIDIP_VERSION=0.12.8
+PDP_PIDIP_VERSION=0.12.9
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
