@@ -57,6 +57,7 @@ typedef struct _wavinfo
     t_outlet *x_out1;
     t_outlet *x_out2;
     t_outlet *x_out3;
+    t_canvas* x_canvas;
 } t_wavinfo;
 
 
@@ -69,6 +70,7 @@ static void *wavinfo_new(t_symbol *s)
     x->x_out1 = outlet_new(&x->x_obj, &s_float);
     x->x_out2 = outlet_new(&x->x_obj, &s_float);
     x->x_out3 = outlet_new(&x->x_obj, &s_float); 
+    x->x_canvas =  canvas_getcurrent();
     return (x);
 }
 
@@ -85,7 +87,7 @@ static void wavinfo_symbol(t_wavinfo *x, t_symbol *filename)
    char fname[MAXPDSTRING];
    int ok=(stat(filename->s_name, &statbuf) >= 0);
    if (ok>0) {
-       canvas_makefilename(canvas_getcurrent(), filename->s_name,fname, MAXPDSTRING);
+       canvas_makefilename(x->x_canvas, filename->s_name,fname, MAXPDSTRING);
        if ((x->x_fd = open(fname,( O_NONBLOCK | O_RDONLY))) < 0)
        {
             error("can't open %s",fname);
