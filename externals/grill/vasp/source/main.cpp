@@ -12,11 +12,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre5";
+const C *VASP_VERSION = "0.1.3pre6";
 
 #include "opfuns.h"
 
-V lib_setup()
+static V vasp_main()
 {
 	post("");
 	post("-----------------------------------------");
@@ -207,7 +207,7 @@ V lib_setup()
 	VASP__SETUP(cifft)
 }
 
-FLEXT_LIB_SETUP(vasp,lib_setup)
+FLEXT_LIB_SETUP(vasp,vasp_main)
 
 
 

@@ -107,7 +107,7 @@ class ImmBuf:
 	public VBuffer
 {
 public:
-	ImmBuf(I len);
+	ImmBuf(I len,BL zero = true);
 	ImmBuf(BufEntry *e,I len = -1,I offs = 0);
 
 	virtual BL Ok() const { return entry != NULL; }

@@ -38,7 +38,7 @@ class vasp_imm:
 
 public:
 	vasp_imm(I argc,t_atom *argv):
-		frms(0)
+		frms(0),zero(true)
 	{
 		if(argc >= 1 && CanbeInt(argv[0]))
 			m_frames(GetAInt(argv[0]));
@@ -54,6 +54,7 @@ public:
 	{
 		FLEXT_CADDMETHOD(c,1,m_frames);
 		FLEXT_CADDATTR_VAR(c,"frames",frms,m_frames);
+		FLEXT_CADDATTR_VAR1(c,"zero",zero);
 	}
 
 	V m_frames(I n) { frms = n; }
@@ -67,7 +68,7 @@ public:
 			else 
 */
 			{
-				ImmBuf ibuf(frms);
+				ImmBuf ibuf(frms,zero);
 				Vasp ret(frms,Vasp::Ref(ibuf));
                 ToOutVasp(0,ret);
 			}
@@ -76,17 +77,27 @@ public:
 			post("%s - More than one vector in vasp!",thisName());
 		else {
 			VBuffer *buf = ref.Buffer(0);
-			I len = buf->Length(),chns = buf->Channels();
-			if(frms > len) len = frms; 
+			const I len = buf->Length(),chns = buf->Channels();
+
+			// size of memory reservation (at least frms samples)
+			const I rlen = frms > len?frms:len; 
 			
-			ImmBuf imm(len);
+			ImmBuf imm(rlen,false);
 
 			S *dst = imm.Pointer();
 			const S *src = buf->Pointer();
+
+//			post("!copy: src: %p,%i,%i -> dst: %p,%i",src,len,chns,dst,rlen);
+
 			register int i;
 			_DE_LOOP(i,len, ( dst[i] = *src,src += chns ) )
+			if(zero && rlen > len) ZeroSamples(dst+len,rlen-len);
 
-			Vasp ret(len,Vasp::Ref(imm));
+			Vasp::Ref vr(imm);
+
+//			post("!vr: %s,%i",vr.Ok()?vr.Symbol().Name():"***",vr.Offset());
+
+			Vasp ret(len,vr);
 			ToOutVasp(0,ret);
 		}
 	}
@@ -96,11 +107,13 @@ public:
 protected:
 
 	I frms;
+	BL zero;
 	
 private:
 	FLEXT_CALLBACK_I(m_frames)
 	FLEXT_CALLSET_I(m_frames);
 	FLEXT_ATTRGET_I(frms);
+	FLEXT_ATTRVAR_B(zero);
 };
 
 FLEXT_LIB_V("vasp, vasp.imm vasp.!",vasp_imm)

@@ -12,13 +12,18 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "buflib.h"
 #include <stdio.h>
 
-#define LIBTICK 100 // tick time in ms
-#define LIBTOL 2  // how many ticks till release
+#define LIBTICK 0.1 // tick time in s
+#define LIBTOL 3  // how many ticks till release
 
 #define REUSE_MAXLOSEREL 0.1  // max. fraction of lost buffer size 
 #define REUSE_MAXLOSEABS 10000 // max. lost buffer size
 
-#define LIBMAGIC 12349876L // magic number for s_thing data check
+
+#ifdef __MWERKS__
+#define STD	std
+#else
+#define STD
+#endif
 
 
 class FreeEntry
@@ -39,7 +44,6 @@ public:
 	V IncRef();
 	V DecRef();
 
-//	UL magic;
 	const t_symbol *sym;
 	I refcnt,tick;
 	BufEntry *nxt;
@@ -63,13 +67,11 @@ static V FreeLibSym(const t_symbol *s);
 
 
 BufEntry::BufEntry(const t_symbol *s,I fr,BL zero): 
-	sym(s), //magic(LIBMAGIC),
+	sym(s), 
 	alloc(fr),len(fr),data(new S[fr]),
 	refcnt(0),nxt(NULL) 
 {
 	if(zero) flext::ZeroMem(data,len*sizeof(*data));
-//	FLEXT_ASSERT(!flext_base::GetThing(sym));
-//	flext_base::SetThing(sym,this);
 }
 
 BufEntry::~BufEntry()
@@ -87,6 +89,18 @@ static BufEntry *FindInLib(const t_symbol *s)
 	for(e = libhead; e && e->sym != s; e = e->nxt) (void)0;
 	return e?e:NULL;
 }
+
+#ifdef FLEXT_DEBUG
+static V DumpLib() 
+{
+	post("Dump {");
+	BufEntry *e;
+	for(e = libhead; e; e = e->nxt) {
+		post("\t%s -> refs:%i, alloc:%i, len:%i -> %p",flext::GetString(e->sym),e->refcnt,e->alloc,e->len,e->data);
+	}
+	post("}");
+}
+#endif
 
 VBuffer *BufLib::Get(const VSymbol &s,I chn,I len,I offs)
 {
@@ -165,7 +179,8 @@ static V LibThr(flext::thr_params *)
 }
 #endif
 
-static t_clock *libclk = NULL;
+static flext::Timer *libclk = NULL;
+
 static V LibTick(V *)
 {
 #ifdef FLEXT_THREADS
@@ -175,8 +190,6 @@ static V LibTick(V *)
 #endif
 
 	++libtick;
-	clock_delay(libclk,LIBTICK);
-
 }
 
 static const t_symbol *GetLibSym()
@@ -193,19 +206,21 @@ static const t_symbol *GetLibSym()
 	else {
 		// allocate new symbol
 		char tmp[20];
-	#ifdef __MWERKS__
-		std::
-	#endif
-		sprintf(tmp,"vasp!%04i",libcnt); //! \todo what if libcnt has > 4 digits?
+		if(libcnt > 0xffff)
+			STD::sprintf(tmp,"vasp!%08x",libcnt); 
+		else // better hash lookup for 4 digits
+			STD::sprintf(tmp,"vasp!%04x",libcnt); 
 		libcnt++;
 		return gensym(tmp);
 	}
-
-	clock_delay(libclk,LIBTICK);
 }
 
 static V FreeLibSym(const t_symbol *sym)
 {
+#ifdef FLEXT_DEBUG
+//	post("free %s",flext::GetString(sym));
+#endif
+
 	FreeEntry *f = new FreeEntry(sym);
 	if(!freehead) freehead = f;
 	else freetail->nxt = f;
@@ -227,8 +242,9 @@ BufEntry *BufLib::NewImm(I fr,BL zero)
 	}
 #endif
 	if(!libclk) {
-		libclk = (t_clock *)clock_new(NULL,(t_method)LibTick);
-		clock_delay(libclk,LIBTICK);
+		libclk = new flext::Timer(true);
+		libclk->SetCallback(LibTick);
+		libclk->Periodic(LIBTICK);
 	}
 
 	const t_symbol *s = GetLibSym();
@@ -241,6 +257,10 @@ BufEntry *BufLib::NewImm(I fr,BL zero)
 	if(libtail) libtail->nxt = entry; 
 	else libhead = entry;
 	libtail = entry;
+
+#ifdef FLEXT_DEBUG
+//	DumpLib();
+#endif
 
 #ifdef FLEXT_THREADS
 	libmtx.Unlock();
@@ -278,9 +298,9 @@ BufEntry *BufLib::Resize(BufEntry *e,I fr,BL keep,BL zero)
 
 
 
-ImmBuf::ImmBuf(I len):
+ImmBuf::ImmBuf(I len,BL zero):
 	VBuffer(0,len),
-	entry(BufLib::NewImm(len))
+	entry(BufLib::NewImm(len,zero))
 {}
 
 ImmBuf::ImmBuf(BufEntry *e,I len,I offs): 

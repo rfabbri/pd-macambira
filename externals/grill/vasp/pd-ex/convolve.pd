@@ -1,4 +1,4 @@
-#N canvas 292 80 642 419 12;
+#N canvas 63 57 644 421 12;
 #X obj 60 241 bng 50 250 50 0 start_bang empty start 0 -6 128 8 -24198
 -1 -1;
 #X text 15 77 load/save/play etc.;
@@ -14,7 +14,7 @@
 #X obj 177 356 bng 15 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
 -1;
 #X obj 201 357 nbx 8 16 0 1e+008 0 0 len_arg empty empty 0 -8 128 12
--261689 -1 -1 3.21297e+006 256;
+-261689 -1 -1 1.50469e+006 256;
 #X obj 11 10 cnv 15 600 50 empty empty convolve 10 22 0 24 -260818
 -1 0;
 #X text 202 41 http://www.parasitaere-kapazitaeten.net;
@@ -23,9 +23,9 @@
 #X text 32 329 result buffer;
 #X text 140 121 source buffer;
 #X text 137 175 argument buffer;
-#N canvas 0 0 470 320 do 0;
+#N canvas 0 0 472 322 do 0;
 #X obj 29 215 vasp.u;
-#N canvas 406 75 399 494 convolve 0;
+#N canvas 406 75 401 496 convolve 0;
 #X obj 57 343 vasp.conv;
 #X obj 199 183 vasp.!;
 #X obj 108 191 vasp.f?;

@@ -10,6 +10,9 @@ Version history:
 - ADD: all objects: attribute "defer" to queue outgoing vasps  - to avoid stack faults for message loops
 - CHANGE: enable attributes "detach" and "prior" also for non-threaded builds to ensure patch compatibility
 - FIX: vasp.size - flext bug for @keep=1
+- FIX: vasp.imm - bug with memory reservation length
+- ADD: vasp.imm - attribute "zero" (default: true) - whether array should be cleared 
+- FIX: Max/MSP - freeing immediate buffers with overdrive is bogus -> using queued flext timer
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument
