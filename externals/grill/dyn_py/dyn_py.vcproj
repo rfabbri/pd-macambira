@@ -19,11 +19,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Programme\prog\Python23\include;../dyn;&quot;f:\prog\pd\pd-cvs\src&quot;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL"
+				AdditionalIncludeDirectories="C:\Programme\prog\Python24\include;../dyn;&quot;c:\data\prog\pd\pd-cvs\src&quot;;\data\prog\packs\pthreads;..\flext\source;..\py\source"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -33,10 +33,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="python23_d.lib pycxx.lib"
-				OutputFile="../../debug/dyn_d.pyd"
+				AdditionalDependencies="pycxx.lib pd.lib pthreadVC.lib"
+				OutputFile="c:\data\prog\pymodules/dyn_d.pyd"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;f:\prog\packs\Python-2.3.4\PCbuild&quot;;F:\prog\packs\pycxx_5_2_2\DLL\Debug"
+				AdditionalLibraryDirectories="&quot;c:\data\prog\packs\Python-2.4\PCbuild&quot;;c:\data\prog\packs\pycxx\DLL\Debug;&quot;c:\data\prog\pd\pd-cvs\bin&quot;"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				ImportLibrary="$(OutDir)/dyn_py.lib"
@@ -92,7 +92,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="python23.lib pycxx.lib pd.lib"
-				OutputFile="../../release/dyn.pyd"
+				OutputFile="c:\data\prog\pymodules/dyn.pyd"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="C:\Programme\prog\Python23\libs;F:\prog\packs\pycxx_5_2_2\DLL\Release;..\..\api\lib"

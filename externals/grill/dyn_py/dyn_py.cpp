@@ -1,12 +1,16 @@
 /* 
 dyn_py - Python interface to the dyn library
 
-Copyright (c)2004 Thomas Grill (gr@grrrr.org)
+Copyright (c)2004-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 */
 
-#include <Python.h>
+#define DYNPY_VERSION_MAJOR 0
+#define DYNPY_VERSION_MINOR 2
+
+#define DYNPY_VERSION (DYNPY_VERSION_MAJOR*100+DYNPY_VERSION_MINOR)
+
 
 #ifdef _MSC_VER
 #pragma warning(disable:4267)
@@ -16,7 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <CXX/Extensions.hxx>
 
 #include <dyn.h>
-#include <ctype.h>
+#include <pysymbol.h>
 
 using namespace Py;
 
@@ -26,28 +30,33 @@ static Object dynobject(const Tuple &a,dyn_id ident = DYN_ID_NONE);
 static Object dynmessage(const Tuple &a,dyn_id ident = DYN_ID_NONE); 
 
 
-static t_symbol *sym_list = gensym("list");
-static t_symbol *sym_float = gensym("float");
-static t_symbol *sym_symbol = gensym("symbol");
-
-
 /*! Convert a Python tuple to PD atoms
-    \not we don't need to check for $-arguments here... symbols will do
+    \note we don't need to check for $-arguments here... symbols will do
 */
-static int tuple2atoms(const Tuple &s,int offs,t_symbol *&hdr,t_atom *lst,int sz,bool listonly = false)
+static int tuple2atoms(const Tuple &s,int offs,const t_symbol *&hdr,t_atom *lst,int sz,bool listonly = false)
 {
-    hdr = listonly?sym_list:NULL;
+    hdr = listonly?flext::sym_list:NULL;
     int i = 0,len = s.length();
     for(int it = offs; it < len && i < sz; ++it) {
         const Object &o = s[it];
         if(o.isNumeric()) { 
-            if(!hdr) hdr = sym_list;
-            SETFLOAT(lst+i,(float)Float(o)); ++i; 
+            if(!hdr) hdr = flext::sym_list;
+            float f = (float)Float(o);
+            int fi = (int)f;
+            if(fi == f)
+                flext::SetInt(lst[i++],fi);
+            else
+                flext::SetFloat(lst[i++],f);
+        }
+        else if(pySymbol_Check(o.ptr())) {
+            const t_symbol *s = pySymbol_AS_SYMBOL(o.ptr());
+            if(!hdr) hdr = s;
+            else flext::SetSymbol(lst[i++],s);
         }
         else if(o.isString()) { 
-            t_symbol *s = gensym((char *)o.as_string().c_str());
+            const t_symbol *s = flext::MakeSymbol(o.as_string().c_str());
             if(!hdr) hdr = s;
-            else { SETSYMBOL(lst+i,s); ++i; }
+            else flext::SetSymbol(lst[i++],s);
         }
         else {
             hdr = NULL;
@@ -55,9 +64,10 @@ static int tuple2atoms(const Tuple &s,int offs,t_symbol *&hdr,t_atom *lst,int sz
         }
     }
 
-    if(hdr == sym_list && i == 1) { 
-        if(lst->a_type == A_FLOAT) hdr = sym_float;
-        else if(lst->a_type == A_SYMBOL) hdr = sym_symbol;
+    if(hdr == flext::sym_list && i == 1) { 
+        if(flext::IsFloat(*lst)) hdr = flext::sym_float;
+        else if(flext::IsInt(*lst)) hdr = flext::sym_int;
+        else if(flext::IsSymbol(*lst)) hdr = flext::sym_symbol;
     }
 
     return i;
@@ -65,16 +75,19 @@ static int tuple2atoms(const Tuple &s,int offs,t_symbol *&hdr,t_atom *lst,int sz
 
 static Tuple atoms2tuple(const t_symbol *sym,int argc,const t_atom *argv)
 {
-    bool hd = sym != sym_list && sym != sym_float;
+    bool hd = sym != flext::sym_list && sym != flext::sym_float;
     Tuple args(argc+hd?1:0);
     int o = 0;
-    if(hd) args[o++] = String(sym->s_name);
+    if(hd) args[o++] = String(flext::GetString(sym));
     for(int i = 0; i < argc; ++i,++o) {
-        switch(argv[i].a_type) {
-            case A_FLOAT: args[o] = Float(argv[i].a_w.w_float); break;
-            case A_SYMBOL: args[o] = String(argv[i].a_w.w_symbol->s_name); break;
-            default: args[o] = Nothing(); break;
-        }          
+        if(flext::IsFloat(argv[i]))
+            args[o] = Float(flext::GetFloat(argv[i]));
+        else if(flext::IsInt(argv[i]))
+            args[o] = Int(flext::GetInt(argv[i]));
+        else if(flext::IsSymbol(argv[i]))
+            args[o] = asObject(pySymbol_FromSymbol(flext::GetSymbol(argv[i])));
+        else
+            args[o] = Nothing();
     }
     return args;
 }
@@ -95,8 +108,8 @@ static void callback(dyn_id ident,int signal,void *data)
         }
     }
 
-#ifdef _DEBUG
-    post("dyn callback - signal %i, object %x",signal,ident);
+#ifdef FLEXT_DEBUG
+//    flext::post("dyn callback - signal %i, object %x",signal,ident);
 #endif
 }
 
@@ -114,11 +127,11 @@ public:
     	behaviors().name("ID");
         behaviors().doc("documentation for dyn::Ident" );
 
-	    add_varargs_method("Free", &dynIdent::f_free, "Free the dyn object");
-
 	    add_varargs_method("Patcher", &dynIdent::f_patcher, "Create a new sub patcher");
 	    add_varargs_method("Object", &dynIdent::f_object, "Create a new dyn object");
 	    add_varargs_method("Message", &dynIdent::f_message, "Create a new dyn message object");
+
+	    add_varargs_method("Free", &dynIdent::f_free, "Free the dyn object");
 
 	    add_varargs_method("Inlets", &dynIdent::f_inlets, "Get inlet count of a dyn object");
 	    add_varargs_method("Outlets", &dynIdent::f_outlets, "Get outlet count of a dyn object");
@@ -126,10 +139,10 @@ public:
 	    add_varargs_method("InletType", &dynIdent::f_inlettype, "Get type of an inlet");
 	    add_varargs_method("OutletType", &dynIdent::f_outlettype, "Get type of an outlet");
 
-	    add_varargs_method("Connect", &dynIdent::f_connect, "Connect two dyn objects");
+	    add_varargs_method("Connect", &dynIdent::f_connect, "Create a connection between two dyn objects");
 
 	    add_varargs_method("Send", &dynIdent::f_send, "Send a message to a dyn object");
-	    add_varargs_method("Listen", &dynIdent::f_listen, "Listen to messages of a dyn object");
+	    add_varargs_method("Listen", &dynIdent::f_listen, "Create a listener to messages of a dyn object");
     }
 
 private:
@@ -214,7 +227,7 @@ private:
             std::string msg(a[1].as_string());
             err = dyn_SendStr(DYN_SCHED_AUTO,ident,Int(a[0]),msg.c_str());
         }
-        else if(a.length() >= 2) {
+        else if(a.length() >= 1) {
             t_atom lst[256],*argv = lst;
             t_symbol *sym;
             int argc = tuple2atoms(a,1,sym,lst,256);
@@ -249,8 +262,8 @@ private:
 
     static void listener(dyn_id id,dyn_id oid,int outlet,const t_symbol *sym,int argc,const t_atom *argv,void *data)
     {
-    #ifdef _DEBUG
-        post("dyn listener - object %x, outlet %i, sym %s",oid,outlet,sym->s_name);
+    #ifdef FLEXT_DEBUG
+//        flext::post("dyn listener - object %x, outlet %i, sym %s",oid,outlet,sym->s_name);
     #endif
 
         Callable *func = (Callable *)data;
@@ -278,18 +291,22 @@ private:
 
 
 class dynModule 
-    : public ExtensionModule<dynModule>
+    : public flext
+    , public ExtensionModule<dynModule>
 {
 public:
 	dynModule()
-		: ExtensionModule<dynModule>( "dyn" )
+		: ExtensionModule<dynModule>("dyn")
 	{
+        flext::Setup();
+
 		dynIdent::init_type();
 
-	    add_varargs_method("Version", &dynModule::f_version, "Return version number");
         add_varargs_method("Patcher", &dynModule::f_patcher, "Create a new dyn patcher");
 	    add_varargs_method("Object", &dynModule::f_object, "Create a new dyn object");
 	    add_varargs_method("Message", &dynModule::f_message, "Create a new dyn message object");
+	    add_varargs_method("Version", &dynModule::f_version, "Return version number");
+	    add_varargs_method("DynVersion", &dynModule::f_dynversion, "Return dyn version number");
 
         // must be last
         initialize( "documentation for the dyn module" );
@@ -297,9 +314,14 @@ public:
 
 protected:
 
-	Object f_version(const Tuple &a) 
+	Object f_dynversion(const Tuple &a) 
     {
         return Int(DYN_VERSION);
+    }
+
+	Object f_version(const Tuple &a) 
+    {
+        return Int(DYNPY_VERSION);
     }
 
     Object f_patcher(const Tuple &a) { return dynpatcher(a); }
