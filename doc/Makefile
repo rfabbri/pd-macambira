@@ -1,20 +1,44 @@
-current: darwin_package
+# Created by Hans-Christoph Steiner <hans@eds.org> to generate MacOS X packages
+# This Makefile does not generate a PDDP pkg, PDDP has its own Makefile
+
+current: darwin_pkg
 
 clean:
 	-rm -Rf installroot *~ */*~ */*/*~ */*/*/*~
 
-darwin_package: 
-	chmod a-x */*/*/*.pd
-	test -d installroot/pd/doc/7.stuff || mkdir -p installroot/pd/doc/7.stuff
-	cp -a tutorials installroot/pd/doc/
-	cp -a additional/pd-msg installroot/pd/doc/7.stuff/
-	-rm -Rf installroot/pd/doc/*/CVS installroot/pd/doc/*/*/CVS 
-	-rm -Rf installroot/pd/doc/*/*/*/CVS
-	open darwin_package.pmsp
+PDDOC_VERSION = $(shell date +20%y.%m.%d)
+PACKAGE_NAME = pd-doc-$(PDDOC_VERSION)
 
-darwin_altpackage: 
-# this needs some figuring out, what goes where...
-	chmod a-x */*/*/*.pd
-	test -d installroot/Help || mkdir -p installroot/Help
-	open darwin_altpackage.pmsp
+darwin_pkg_license:
+  # generate HTML version of License
+# 	echo "<HTML><BODY><FONT SIZE="-1">" > License.html
+# 	cat ../../creb/COPYING | sed -e 's/^$$/\<P\>/g' >> License.html	
+# 	echo "</FONT></BODY></HTML>" >> License.html
+
+darwin_pkg_welcome:
+# generate Welcome.html from ../README.txt
+
+darwin_pkg_clean:
+	-sudo rm -Rf installroot/ pd-doc*.pkg/
+	-rm -f pd-doc-*.info 1 License.html Welcome.???*
+
+# install into MSP's default: /usr/local/lib
+
+darwin_pkg: darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
+# set up installroot dir
+	-chmod a-x */*/*.pd */*/*/*.pd */*/*/*/*.pd
+	test -d installroot/pd/doc/7.stuff || mkdir -p installroot/pd/doc/7.stuff
+	cp -R tutorials installroot/pd/doc/
+	cp -R additional/pd-msg installroot/pd/doc/7.stuff/
+	cp -f pd-doc.info $(PACKAGE_NAME).info
+# delete cruft
+	-find installroot -name .DS_Store -delete
+	-sudo rm -Rf installroot/*/*/*/CVS installroot/*/*/*/*/CVS  installroot/*/*/*/*/*/CVS
+	-rm -f 1
+# set proper permissions
+	sudo chown -R root:staff installroot
+	package installroot $(PACKAGE_NAME).info -d . -ignoreDSStore
+# install pkg docs
+#	install -m 644 License.html $(PACKAGE_NAME).pkg/Contents/Resources
+	sudo chown -R root:staff $(PACKAGE_NAME).pkg/Contents/Resources
 
