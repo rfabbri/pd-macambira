@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,7 +23,7 @@
 
 static void sys_sockerror(char *s)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     int err = errno;
 #else
     int err = WSAGetLastError();
@@ -36,7 +36,7 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     close(fd);
 #endif
 #ifdef NT

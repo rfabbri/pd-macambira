@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -67,7 +67,7 @@ static void sys_sockerror(char *s)
     int err = WSAGetLastError();
     if (err == 10054) return;
 #endif
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
@@ -75,7 +75,7 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd) {
 
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     close(fd);
 #endif
 #ifdef NT

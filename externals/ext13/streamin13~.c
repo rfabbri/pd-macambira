@@ -5,7 +5,7 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -31,7 +31,7 @@
 
 static void sys_sockerror(char *s)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     int err = errno;
 #else
     int err = WSAGetLastError();
@@ -43,7 +43,7 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd)
 {
-#ifdef UNIX
+#if defined(UNIX) || defined(unix)
     close(fd);
 #endif
 #ifdef NT
@@ -106,7 +106,7 @@ static int streamin13_listen(t_streamin13 *x,int portno)
         server.sin_family = AF_INET;
         server.sin_addr.s_addr = INADDR_ANY;
 
-    #ifdef UNIX
+    #if defined(UNIX) || defined(unix)
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
         post("setsockopt failed\n");
     #endif
