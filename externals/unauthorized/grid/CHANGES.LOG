@@ -1,0 +1,10 @@
+0.4
+  Added functions bang, values, valuemotion, xvalues, xvaluemotion made by Maurizio Umberto Puxeddu
+  Integrated patch from Joseph A. Sarlo for connections 
+0.3
+  Fixed "goto x y" message 
+  ( hall of shame contest : confusion between absolute and relative coordinates )
+0.2
+  Added "goto x y" message
+0.1
+  first implementation
