@@ -1,0 +1,39 @@
+PD externals build system
+=========================
+
+To build, cd to the platform directory:
+
+cd linux
+cd win
+cd darwin
+cd irix
+
+and type make.
+
+
+
+
+
+Build System Internals
+======================
+
+The build system is actually on top of the  different externals packages
+that are in the CVS.
+
+Every external (the source code) is linked into the "src" directory.
+In order to be platform independent this is done via c-includes.
+
+Then the build system just tries to build every exeternal that it 
+finds in "src".
+
+Problems with this approach:
+- it can't be applied to externals that use additional libraries.
+- it might be hard for externals that use several source files
+  (not always, look at src/ann.c)
+
+
+
+
+
+
+

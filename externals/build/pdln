@@ -1,0 +1,8 @@
+#!/bin/sh
+
+arg=$1
+
+echo linking $arg ../src/${arg##*/}
+echo \#include \"$arg\" > src/${arg##*/}
+
+
