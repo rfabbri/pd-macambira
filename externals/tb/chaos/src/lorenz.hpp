@@ -35,10 +35,10 @@ public:
 		m_data = new data_t[m_num_eq];
 
 		CHAOS_SYS_INIT(method,0);
-		CHAOS_SYS_INIT(dt,1);
+		CHAOS_SYS_INIT(dt,0.01);
 		CHAOS_SYS_INIT(x1,0.8);
-		CHAOS_SYS_INIT(x2,0.8);
-		CHAOS_SYS_INIT(x3,0.8);
+		CHAOS_SYS_INIT(x2,0.7);
+		CHAOS_SYS_INIT(x3,0.6);
 		CHAOS_SYS_INIT(sigma,16);
 		CHAOS_SYS_INIT(b,4);
 		CHAOS_SYS_INIT(r,40);
@@ -60,7 +60,7 @@ public:
 		
 		deriv[0] = CHAOS_PARAMETER(sigma) * (x2 - x1);
 		deriv[1] = - x1 * x3 + CHAOS_PARAMETER(r) * x1 - x2;
-		deriv[3] = x1 * x2 - CHAOS_PARAMETER(b) * x3;
+		deriv[2] = x1 * x2 - CHAOS_PARAMETER(b) * x3;
 	}
 
 	CHAOS_SYSVAR_FUNCS(x1, 0);

@@ -185,8 +185,7 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 }
 
 
-/* linear and cubic interpolation adapted from supercollider by James McCartney */
-
+/* linear interpolation adapted from supercollider by James McCartney */
 template <class system> 
 void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 								   t_sample *const *outsigs)
@@ -226,6 +225,7 @@ void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 }
 
 
+/* linear interpolation adapted from Numerical Recipes In C */
 template <class system> 
 void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 								   t_sample *const *outsigs)
@@ -253,10 +253,9 @@ void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 				m_nextmidpts[j] = (m_values[j] + value) * 0.5f;
 				
 				float fseglen = (float)phase;
-				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - fseglen * m_slopes[j]) 
+				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - 
+									 fseglen * m_slopes[j]) 
 					/ (fseglen * fseglen + fseglen);
-				
-				m_values[j] = value;
 			}
 		}
 		
