@@ -1,0 +1,19 @@
+#N canvas 132 108 604 504 10;
+#X text 124 68 GEM object;
+#X obj 136 234 unpack 0 0 0;
+#X floatatom 136 280 4 0 0 0 - - -;
+#X floatatom 175 280 4 0 0 0 - - -;
+#X floatatom 215 280 4 0 0 0 - - -;
+#X text 138 24 tripleRine;
+#X text 84 395 [tripleRand] generates three distinct random numbers
+at once within the range specified.;
+#X obj 136 184 tripleRand 5;
+#X floatatom 215 146 5 0 0 0 - - -;
+#X obj 136 134 bng 15 250 50 0 empty empty empty 0 -6 32 8 -262144
+-1 -1;
+#X connect 1 0 2 0;
+#X connect 1 1 3 0;
+#X connect 1 2 4 0;
+#X connect 7 0 1 0;
+#X connect 8 0 7 1;
+#X connect 9 0 7 0;
