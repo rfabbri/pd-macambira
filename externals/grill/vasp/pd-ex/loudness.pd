@@ -76,9 +76,9 @@
 #X restore 37 382 pd accum;
 #X text 129 174 loop over fragments;
 #X text 112 380 make average of fragments;
-#X msg 102 217 radio detach 1;
-#X obj 122 126 vasp.f?;
-#X obj 139 92 vasp.! @ref filter;
+#X msg 122 212 radio detach 1;
+#X obj 190 125 vasp.f?;
+#X obj 188 90 vasp.! @ref filter;
 #X obj 138 261 vasp.db2pow;
 #X obj 40 52 t b b;
 #N canvas 0 0 257 314 frag 0;
@@ -114,8 +114,8 @@
 #X connect 11 1 9 0;
 #X connect 12 0 4 0;
 #X restore 44 284 pd do;
-#X obj 44 348 nbx 5 18 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-14 -261689 -1 -1 0.699669 256;
+#X obj 44 348 nbx 5 18 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 14
+-261689 -1 -1 0 256;
 #N canvas 277 107 454 304 2db 0;
 #X obj 38 19 inlet;
 #X obj 40 58 powtodb;
