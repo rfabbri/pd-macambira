@@ -107,7 +107,8 @@ void flext_gui::setup(t_class *c)
 
 #if FLEXT_SYS == FLEXT_SYS_PD
 
-int flext_gui::evmask = evMotion|evMouseDown|evKeyDown|evKeyUp;
+// this event mask declares supported events
+int flext_gui::evmask = evMotion|evMouseDown|evMouseDrag|evKeyDown|evKeyUp|evKeyRepeat;
 int flext_gui::curmod = 0;
 flext_gui::pxkey_object *flext_gui::pxkey = NULL;
 flext_gui::guicanv *flext_gui::gcanv = NULL;
@@ -228,8 +229,25 @@ void flext_gui::pxkey_method(pxkey_object *obj,const t_symbol *s,int argc,t_atom
 //		post("Key down=%i c=%c mod=%i",down?1:0,code,curmod);
 
 		if(code || mod) {
+			// remember past keycodes for repetition detection
+			static int lastcode = 0,lastasc = 0,lastmod = 0;
+
 			// button is pressed
-			p.kind = down?evKeyDown:evKeyUp;
+			if(down) {
+				if(lastcode == code && lastmod == curmod) 
+					p.kind = evKeyRepeat;
+				else {
+					p.kind = evKeyDown;
+					lastcode = code;
+					lastasc = asc;
+					lastmod = curmod;
+				}
+			}
+			else {
+				p.kind = evKeyUp;
+				lastcode = lastasc = 0;
+			}
+
 			p.ext = true;
 			p.pKey.k = code; //lastkey;
 			p.pKey.a = asc;
@@ -438,7 +456,7 @@ void flext_gui::sg_vis(t_gobj *c, t_glist *, int vis)
 	}
 }
 
-int flext_gui::sg_click(t_gobj *c, t_glist *,int xpix, int ypix, int shift, int alt, int dbl, int doit)
+int flext_gui::sg_click(t_gobj *c, t_glist *gl,int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
 	flext_gui *g = thisObject(c);
 	CBParams p;
@@ -451,10 +469,13 @@ int flext_gui::sg_click(t_gobj *c, t_glist *,int xpix, int ypix, int shift, int 
 	if(doit) {
 		// button is pressed
 		p.kind = evMouseDown;
-		p.pMouseKey.x = x;
-		p.pMouseKey.y = y;
+		p.pMouseKey.x = g->xdrag = x;
+		p.pMouseKey.y = g->ydrag = y;
+		g->dxdrag = g->dydrag = 0;
 		p.pMouseKey.b = 1;
 		p.pMouseKey.mod = curmod; //mod;
+
+		glist_grab(gl,c,(t_glistmotionfn)sg_drag,0,xpix,ypix);
 	}
 	else {
 		// only mouse position change
@@ -465,6 +486,20 @@ int flext_gui::sg_click(t_gobj *c, t_glist *,int xpix, int ypix, int shift, int 
 	}
 	g->m_Method(p); 
 	return 1;
+}
+
+void flext_gui::sg_drag(t_gobj *c,t_floatarg dx,t_floatarg dy)
+{
+	flext_gui *g = thisObject(c);
+	CBParams p;
+	p.kind = evMouseDrag;
+	p.pMouseDrag.dx = (g->dxdrag += (int)dx);
+	p.pMouseDrag.dy = (g->dydrag += (int)dy);
+	p.pMouseDrag.x = g->xdrag+g->dxdrag;
+	p.pMouseDrag.y = g->ydrag+g->dydrag;;
+	p.pMouseDrag.b = 1;
+	p.pMouseDrag.mod = curmod; //mod;
+	g->m_Method(p); 
 }
 
 void flext_gui::sg_delete(t_gobj *c, t_glist *) 
@@ -505,6 +540,7 @@ bool flext_gui::sg_KeyUp(flext_base *c,int &keynum)
 
 #else // MAXMSP
 
+// this declared supported events
 int flext_gui::evmask = evMotion|evMouseDown|evKeyDown;
 
 static void dragfun()

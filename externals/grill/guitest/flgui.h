@@ -1,7 +1,7 @@
 #ifndef __FLEXT_GUI
 #define __FLEXT_GUI
 
-#define FLEXT_VIRT
+//#define FLEXT_VIRT
 #include <flext.h>
 
 #if FLEXT_SYS == FLEXT_SYS_PD
@@ -15,9 +15,9 @@ class GuiGroup;
 class GuiSingle;
 
 class flext_gui:
-	virtual public flext_base
+	public flext_base
 {
-	FLEXT_HEADER_S(flext_gui,flext_base,setup)
+	FLEXT_HEADER_S(flext_gui,flext_dsp,setup)
  
 public:
 	flext_gui(int xs,int ys);
@@ -29,8 +29,10 @@ public:
 		evMouseDown = 0x02,
 		evMouseUp = 0x04,
 		evMouseWheel = 0x08,
-		evKeyDown = 0x10, 
-		evKeyUp = 0x20
+		evMouseDrag = 0x10,
+		evKeyDown = 0x20, 
+		evKeyUp = 0x40,
+		evKeyRepeat = 0x80
 	};
 
 	class CBParams {
@@ -42,6 +44,7 @@ public:
 			struct { int x,y,mod; } pMotion;
 			struct { int x,y,b,mod; } pMouseKey;
 			struct { int x,y,mod,delta; } pMouseWheel;
+			struct { int x,y,dx,dy,b,mod; } pMouseDrag;
 			struct { int k,a,mod; } pKey;
 		};
 		bool ext;
@@ -146,6 +149,7 @@ private:
 #if FLEXT_SYS == FLEXT_SYS_PD
 	bool selected;
 	int xsize,ysize;
+	int xdrag,ydrag,dxdrag,dydrag;
 
 	static void sg_getrect(t_gobj *c, t_glist *,int *xp1, int *yp1, int *xp2, int *yp2);
 	static void sg_displace(t_gobj *c, t_glist *, int dx, int dy);
@@ -154,6 +158,7 @@ private:
 	static void sg_delete(t_gobj *c, t_glist *);
 	static void sg_vis(t_gobj *c, t_glist *, int vis); 
 	static int sg_click(t_gobj *c, t_glist *,int xpix, int ypix, int shift, int alt, int dbl, int doit);
+	static void sg_drag(t_gobj *x, t_floatarg dx, t_floatarg dy);
 	static void sg_properties(t_gobj *c, t_glist *);
 	static void sg_save(t_gobj *c, t_binbuf *b);
 //	static void sg_motion(void *c, float dx,float dy) { thisObject((t_gobj *)c)->g_Motion(dx,dy); }
@@ -210,7 +215,7 @@ public:
 	static t_class *px_class,*pxkey_class;
 	static void sg_tk(t_canvas *c,const t_symbol *s,int argc,t_atom *argv);
 
-#else
+#else // MAXMSP
 	int curx,cury,curmod;
 	bool created;
 	static t_clock clock;

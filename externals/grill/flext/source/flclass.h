@@ -2,7 +2,7 @@
 
 flext - C++ layer for Max/MSP and pd (pure data) externals
 
-Copyright (c) 2001,2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -20,6 +20,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "flbase.h"
 #include "flsupport.h"
 
+
 #ifdef _MSC_VER
 #pragma warning(disable: 4786)
 #endif
@@ -32,9 +33,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 
 // === flext_base ==================================================
-
-//class qmsg;
-//class thr_entry;
 
 /*! \brief Flext message only base object
 */
@@ -587,7 +585,8 @@ protected:
 
 		enum { 
 			afl_getset = 0x01, afl_get = 0x00, afl_set = 0x01,
-			afl_bothexist = 0x02
+			afl_bothexist = 0x02,
+			afl_save = 0x04
 		};
 
 		bool IsGet() const { return (flags&afl_getset) == afl_get; }
@@ -656,6 +655,9 @@ private:
 	bool TryMethAny(const methitem *m,int inlet,const t_symbol *t,const t_symbol *s,int argc,const t_atom *argv);
 
 	itemarr *attrhead,*clattrhead;
+
+	attritem *FindAttr(const t_symbol *tag,bool get) const;
+	int ListAttr(AtomList &a) const;
 
 	static int CheckAttrib(int argc,const t_atom *argv);
 	bool InitAttrib(int argc,const t_atom *argv);

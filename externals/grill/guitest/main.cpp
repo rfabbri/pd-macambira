@@ -21,7 +21,7 @@
 #define UL unsigned long
 
 class guitest:
-public flext_gui,virtual public flext_base
+public flext_gui //,virtual public flext_base
 {
 	FLEXT_HEADER(guitest,flext_gui)
  
@@ -29,7 +29,7 @@ public:
 	guitest(I argc,t_atom *argv);
 	~guitest();
 
-	virtual void m_bang() 
+	void m_bang() 
 	{ 
 		post("%s - bang!",thisName()); 
 	}
@@ -69,9 +69,11 @@ void guitest::g_Create()
 	delete[] p;
 
 	if(!BindEvent(*frame,g_Motion,evMotion)) post("Motion not supported");
+	if(!BindEvent(*frame,g_Motion,evMouseDrag)) post("MouseDrag not supported");
 	if(!BindEvent(*wave,g_MouseKey,evMouseDown)) post("MouseDown not supported");
 	if(!BindEvent(*wave,g_MouseKey,evKeyDown)) post("KeyDown not supported");
 	if(!BindEvent(*wave,g_MouseKey,evKeyUp)) post("KeyUp not supported");
+	if(!BindEvent(*wave,g_MouseKey,evKeyRepeat)) post("KeyRepeat not supported");
 }
 
 void guitest::g_Properties()
@@ -107,6 +109,9 @@ bool guitest::g_Motion(flext_gui &g,GuiSingle &obj,const CBParams &p)
 	if(p.kind == evMotion) {
 		post("Motion %s x:%i y:%i mod:%i",GetString(obj.Id()),p.pMotion.x,p.pMotion.y,p.pMotion.mod);
 	}
+	else if(p.kind == evMouseDrag) {
+		post("Drag %s x:%i y:%i dx:%i dy:%i b:%i mod:%i",GetString(obj.Id()),p.pMouseDrag.x,p.pMouseDrag.y,p.pMouseDrag.dx,p.pMouseDrag.dy,p.pMouseDrag.b,p.pMouseDrag.mod);
+	}
 	else
 		post("Motion");
 	return true;
@@ -122,6 +127,9 @@ bool guitest::g_MouseKey(flext_gui &g,GuiSingle &obj,const CBParams &p)
 	}
 	else if(p.kind == evKeyUp) {
 		post("KeyUp %s asc:%i key:%i mod:%i",GetString(obj.Id()),p.pKey.a,p.pKey.k,p.pKey.mod);
+	}
+	else if(p.kind == evKeyRepeat) {
+		post("KeyRepeat %s asc:%i key:%i mod:%i",GetString(obj.Id()),p.pKey.a,p.pKey.k,p.pKey.mod);
 	}
 	return true;
 }
