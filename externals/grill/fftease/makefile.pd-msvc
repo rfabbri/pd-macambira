@@ -22,7 +22,7 @@ LIBS=pd.lib flext-pdwin.lib
 # compiler definitions and flags
 DEFS=/DFLEXT_SYS=2 
 
-CFLAGS=/GR- /GX- /GD /Ox 
+CFLAGS=/GR- /GX- /GD /Ox
 
 # the rest can stay untouched
 # ----------------------------------------------

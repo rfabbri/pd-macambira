@@ -20,7 +20,7 @@ static V fftease_main()
 	post("FFTease - A set of Live Spectral Processors");
 	post("Originally written by Eric Lyon and Christopher Penrose for MAX/MSP");
 	post("");
-	post("flext port (version " FFTEASE_VERSION ") provided by Thomas Grill, (C)2003");
+	post("flext port (version " FFTEASE_VERSION ") provided by Thomas Grill, (C)2003-2004");
 	post("-------------------------------------------------------------------");
 	post("");
 
@@ -44,23 +44,6 @@ static V fftease_main()
 	FLEXT_DSP_SETUP(pvoc);
 
 */
-
-#if FLEXT_SYS == FLEXT_SYS_MAX
-	finder_addclass((C *)"FFTease",(C *)"burrow~");
-	finder_addclass((C *)"FFTease",(C *)"cross~");
-	finder_addclass((C *)"FFTease",(C *)"dentist~");
-	finder_addclass((C *)"FFTease",(C *)"disarray~");
-	finder_addclass((C *)"FFTease",(C *)"drown~");
-	finder_addclass((C *)"FFTease",(C *)"ether~");
-	finder_addclass((C *)"FFTease",(C *)"morphine~");
-	finder_addclass((C *)"FFTease",(C *)"scrape~");
-	finder_addclass((C *)"FFTease",(C *)"shapee~");
-	finder_addclass((C *)"FFTease",(C *)"swinger~");
-	finder_addclass((C *)"FFTease",(C *)"taint~");
-	finder_addclass((C *)"FFTease",(C *)"thresher~");
-	finder_addclass((C *)"FFTease",(C *)"vacancy~");
-	finder_addclass((C *)"FFTease",(C *)"xsyn~");
-#endif
 }
 
 // setup the library

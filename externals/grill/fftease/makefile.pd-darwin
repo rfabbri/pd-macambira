@@ -23,10 +23,11 @@ FLEXTLIB=${FLEXTPATH}/flext.a
 INCLUDES=${PDPATH} ${FLEXTPATH} 
 LIBPATH= 
 FLAGS=-DFLEXT_SYS=2 ${UFLAGS}
-CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions -fno-rtti
-LIBS=m 
+CFLAGS=-O2 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
+CPPFLAGS=-fno-exceptions -fno-rtti
+LIBS= 
 LDFLAGS=-bundle -bundle_loader ${PD}
-FRAMEWORKS=Carbon
+FRAMEWORKS=Carbon vecLib
 
 # ---------------------------------------------
 # the rest can stay untouched
@@ -51,7 +52,7 @@ $(TARGDIR):
 	-mkdir $(TARGDIR)
 
 $(TARGDIR)/%.o : $(DIR)/%.cpp
-	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
+	$(CXX) -c $(CPPFLAGS) $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
 
 $(TARGDIR)/%.co : $(DIR)/%.c
 	$(CC) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@

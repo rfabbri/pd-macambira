@@ -36,7 +36,7 @@ LIBS=$(LIBS) maxapi.lib maxaudio.lib
 # compiler definitions and flags
 DEFS=/DFLEXT_SYS=1 $(UFLAGS)
 
-CFLAGS=/ML /GR- /GD /Ox /GX
+CFLAGS=/ML /GR- /GD /Ox /GX /Zp2
 
 # the rest can stay untouched
 # ----------------------------------------------

@@ -35,10 +35,9 @@ V fftease::Exit()
 
 V fftease::m_dsp(I n,S *const *,S *const *)
 {
-	const I _D = n;
 	const F sr = Samplerate();
-	if(_D != blsz || sr != smprt) {
-		blsz = _D;
+	if(n != blsz || sr != smprt) {
+		blsz = n;
 		smprt = sr;
 		MakeVar();
 
@@ -51,15 +50,15 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 {
 	/* declare working variables */
 	I i; 
-	const I _D = n,_N = get_N(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2; 
+	const I _N = get_N(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
-	_inCount += _D;
+	_inCount += n;
 
 	if(_flags&F_STEREO) {
-		for(i = 0; i < _N-_D ; i++ ) {
-			_input1[i] = _input1[i+_D];
-			_input2[i] = _input2[i+_D];
+		for(i = 0; i < _N-n ; i++ ) {
+			_input1[i] = _input1[i+n];
+			_input2[i] = _input2[i+n];
 		}
 		for(I j = 0; i < _N; i++,j++) {
 			_input1[i] = in[0][j];
@@ -67,8 +66,8 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 		}
 	}
 	else {
-		for (i = 0 ; i < _N-_D ; i++ )
-			_input1[i] = _input1[i+_D];
+		for (i = 0 ; i < _N-n ; i++ )
+			_input1[i] = _input1[i+n];
 		for (I j = 0; i < _N; i++,j++ )
 			_input1[i] = in[0][j];
 	}
@@ -130,11 +129,11 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 
 	/* set our output and adjust our retaining output buffer */
 	const F mult = 1./_N;
-	for ( i = 0; i < _D; i++ )
+	for ( i = 0; i < n; i++ )
 		out[0][i] = _output[i] * mult;
 
-	for ( i = 0; i < _N-_D; i++ )
-		_output[i] = _output[i+_D];
+	for ( i = 0; i < _N-n; i++ )
+		_output[i] = _output[i+n];
 	for (; i < _N; i++ )
 		_output[i] = 0.;
 }
@@ -143,7 +142,7 @@ V fftease::m_signal(I n,S *const *in,S *const *out)
 void fftease::Set()
 {
 	/* preset the objects data */
-	const I _D = Blocksize(),_N = _D*Mult(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2;
+	const I n = Blocksize(),_N = n*Mult(),_Nw = _N,_N2 = _N/2; //,_Nw2 = _Nw/2;
 
 	_inCount = -_Nw;
 
@@ -175,7 +174,7 @@ void fftease::Set()
 			_c_lastphase_out = new F[_N2+1];
 			ZeroMem(_c_lastphase_out,(_N2+1)*sizeof(*_c_lastphase_out));
 
-			_c_factor_in = Samplerate()/(_D * PV_2PI);
+			_c_factor_in = Samplerate()/(n * PV_2PI);
 		}
 	}
 
@@ -192,9 +191,9 @@ void fftease::Set()
 	_Wanal = new F[_Nw];
 	_Wsyn = new F[_Nw];
 	if(_flags&F_BALANCED)
-		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0);
+		makewindows( _Hwin, _Wanal, _Wsyn, _Nw, _N, n, 0);
 	else
-		makehanning( _Hwin, _Wanal, _Wsyn, _Nw, _N, _D, 0,0);
+		makehanning( _Hwin, _Wanal, _Wsyn, _Nw, _N, n, 0,0);
 }
 
 void fftease::Clear()

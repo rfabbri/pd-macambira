@@ -49,8 +49,8 @@ void thresher::Set()
 {
 	fftease::Set();
 
-	const F _R = Samplerate();
-	const I _D = Blocksize(),_N = get_N(),_N2 = _N/2; 
+	const F rate = Samplerate();
+	const I n = Blocksize(),_N = get_N(),_N2 = _N/2; 
 
 	_compositeFrame = new F[_N+2];
 	_framesLeft = new I[_N2+1];
@@ -58,7 +58,7 @@ void thresher::Set()
 	_firstFrame = true;
 	_moveThreshold = .00001 ;
 	F _maxHoldTime = 5.0 ;
-	_maxHoldFrames = (I)(_maxHoldTime *_R/_D);
+	_maxHoldFrames = (I)(_maxHoldTime *rate/n);
 }
 
 void thresher::Clear()
