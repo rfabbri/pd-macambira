@@ -1,0 +1,37 @@
+#N canvas 184 90 489 296 10;
+#X obj 12 66 dsp;
+#X floatatom 12 93 5 0 0 0 - - -;
+#X obj 12 40 tgl 15 0 empty empty empty 8 -8 0 10 -262144 -1 -1 0 1
+;
+#X text 47 217 (c) musil@iem.kug.ac.at;
+#X text 89 230 IEM KUG;
+#X text 64 242 graz \, austria 2003;
+#X obj 92 131 iem_samplerate~;
+#X obj 92 106 osc~ 440;
+#X floatatom 92 163 7 0 0 0 - - -;
+#X text 143 163 Hz;
+#X obj 92 183 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 40 37 <- toggle here;
+#N canvas 383 167 452 302 down 0;
+#X obj 98 74 inlet~;
+#X obj 188 79 block~ 32 1 0.5;
+#X obj 98 132 iem_samplerate~;
+#X obj 98 161 outlet;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X restore 305 132 pd down;
+#X floatatom 305 162 7 0 0 0 - - -;
+#X text 356 162 Hz;
+#X obj 305 182 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 131 8 output the current samplerate of a window;
+#X text 11 6 iem_samplerate~;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
+#X connect 6 0 8 0;
+#X connect 7 0 6 0;
+#X connect 7 0 12 0;
+#X connect 8 0 10 0;
+#X connect 12 0 13 0;
+#X connect 13 0 15 0;
