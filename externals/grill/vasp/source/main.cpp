@@ -12,7 +12,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "classes.h"
 
 
-const C *VASP_VERSION = "0.1.3pre3";
+const C *VASP_VERSION = "0.1.3pre4";
 
 #include "opfuns.h"
 
@@ -98,6 +98,8 @@ V lib_setup()
 	VASP__SETUP(sign) 
 	VASP__SETUP(abs) 
 	VASP__SETUP(cabs) 
+
+	VASP_SETUP(qsum)
 
 	VASP__SETUP(lwr)
 	VASP__SETUP(gtr)

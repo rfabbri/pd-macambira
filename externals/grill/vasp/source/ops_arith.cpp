@@ -33,3 +33,47 @@ VASP_UNARY("vasp.ssqr",ssqr,true,"Calculates the square with preservation of the
 VASP_UNARY("vasp.sign",sign,true,"Calculates the sign (signum function)") 
 VASP_UNARY("vasp.abs",abs,true,"Calculates the absolute value") 
 
+
+
+/*! \class vasp_qsum
+	\remark \b vasp.sum?
+	\brief Get sum of sample values
+	\since 0.1.3
+	\param inlet vasp - is stored and output triggered
+	\param inlet bang - triggers output
+	\param inlet set - vasp to be stored 
+	\retval outlet float - sample value sum
+
+	\todo Should we provide a cmdln default vasp?
+	\todo Should we inhibit output for invalid vasps?
+	\remark Returns 0 for a vasp with 0 frames
+*/
+class vasp_qsum:
+	public vasp_unop
+{
+	FLEXT_HEADER(vasp_qsum,vasp_unop)
+
+public:
+	vasp_qsum(): vasp_unop(true,XletCode(xlet::tp_float,0)) {}
+
+	virtual Vasp *do_opt(OpParam &p) 
+	{ 
+		p.norm.minmax = 0;
+		CVasp cref(ref);
+		Vasp *ret = VaspOp::m_qsum(p,cref); 
+		return ret;
+	}
+		
+	virtual Vasp *tx_work() 
+	{ 
+		OpParam p(thisName(),0);													
+		Vasp *ret = do_opt(p);
+		ToOutFloat(1,p.norm.minmax);
+		return ret;
+	}
+
+	virtual V m_help() { post("%s - Get the sum of a vasp's sample values",thisName()); }
+};
+
+FLEXT_LIB("vasp, vasp.sum?",vasp_qsum)
+

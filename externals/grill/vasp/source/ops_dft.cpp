@@ -62,7 +62,7 @@ static BL fft_fwd_real_any(I cnt,F *rsdt,I _rss,F *rddt,I _rds)
 		rstmp = rsdt;
 
 	istmp = new F[cnt];
-	memset(istmp,0,cnt*sizeof(*istmp));
+    flext::ZeroMem(istmp,cnt*sizeof(*istmp));
 
 	F *rdtmp = rdt?new F[cnt]:rddt;
 	F *idtmp = new F[cnt];

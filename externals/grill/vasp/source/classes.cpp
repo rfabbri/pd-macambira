@@ -35,6 +35,8 @@ V vasp_base::Setup(t_classid c)
 
 	FLEXT_CADDMETHOD_(c,0,"radio",m_radio);
 
+	FLEXT_CADDATTR_VAR1(c,"defer",deferred);
+
 // LATER!
 /*
 	FLEXT_CADDATTR_VAR1(c,"argchk",argchk);
@@ -44,7 +46,7 @@ V vasp_base::Setup(t_classid c)
 }
 
 vasp_base::vasp_base():
-	refresh(false),argchk(false),
+	refresh(false),argchk(false),deferred(false),
 	unit(xsu_sample),loglvl(0)
 {}
 
@@ -74,7 +76,10 @@ BL vasp_base::ToOutVasp(I oix,Vasp &v)
 {
 	AtomList *lst = v.MakeList(false);
 	if(lst) {
-		ToOutAnything(oix,sym_vasp,lst->Count(),lst->Atoms());
+        if(deferred)
+		    ToQueueAnything(oix,sym_vasp,lst->Count(),lst->Atoms());
+        else
+		    ToOutAnything(oix,sym_vasp,lst->Count(),lst->Atoms());
 		delete lst;
 		return true;
 	}
@@ -86,8 +91,8 @@ BL vasp_base::ToOutVasp(I oix,Vasp &v)
 ///////////////////////////////////////////////////////////////////////////
 
 vasp_op::vasp_op(BL op)
-#ifdef FLEXT_THREADS
 	:detach(false),prior(-2)
+#ifdef FLEXT_THREADS
 //	,thrid(0)
 #endif
 {
@@ -106,10 +111,8 @@ V vasp_op::Setup(t_classid c)
 
 	FLEXT_CADDATTR_VAR(c,"update",m_getupd,m_setupd);
 	
-#ifdef FLEXT_THREADS
 	FLEXT_CADDATTR_VAR1(c,"detach",detach);
 	FLEXT_CADDATTR_VAR1(c,"prior",prior);
-#endif
 }
 
 V vasp_op::m_dobang()
@@ -194,12 +197,7 @@ V vasp_tx::m_bang()
 	{
 		Vasp *ret = x_work();
 		if(ret) {
-			AtomList *lst = ret->MakeList(false);
-			if(lst) {
-				ToOutAnything(0,sym_vasp,lst->Count(),lst->Atoms());
-				delete lst;
-			}
-			else
+			if(!ToOutVasp(0,*ret))
 				post("%s - empty list",thisName());
 			if(refresh) ret->Refresh();
 			delete ret;

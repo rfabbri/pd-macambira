@@ -81,7 +81,7 @@ public:
 			return;
 		}
 
-		I fr = ref.Frames(),o = 0;
+		I fr = ref.ChkFrames(),o = 0,f = 0;
 		for(I i = 0; i < parts && (fr < 0 || fr); ++i) {
 			I p = part[i];
 			if(fr >= 0) { p = min(p,fr); fr -= p; }

@@ -121,7 +121,7 @@ namespace VecOp {
     template<class T> class f_sqr {
     public: 
     	static I run_opt() { return 3; }
-        static V run(T &v,T a) { v = a*a; post("sq"); } 
+        static V run(T &v,T a) { v = a*a; } 
     	static I cun_opt() { return 1; }
         static V cun(T &rv,T &iv,T ra,T ia) { rv = ra*ra-ia*ia; iv = ra*ia*2; }
     };
@@ -132,6 +132,15 @@ namespace VecOp {
         static V run(T &v,T a) { v = a*fabs(a); } 
     };
 
+
+    template<class T> class f_sumq {
+    public: 
+    	static I rop_opt() { return 2; }
+        static V rop(T &,T ra,OpParam &p) 
+        { 
+	        p.norm.minmax += ra; 
+        } 
+    };
 
     // transcendent
 

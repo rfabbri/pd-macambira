@@ -2,7 +2,7 @@
 
 VASP modular - vector assembling signal processor / objects for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -29,6 +29,8 @@ DEFOP(S,d_ssqr,ssqr,run)
 DEFOP(S,d_sign,sign,run)
 DEFOP(S,d_abs,abs,run)
 
+DEFOP(S,d_sumq,sumq,rop)
+
 
 namespace VaspOp {
 
@@ -45,6 +47,8 @@ namespace VaspOp {
 
 	inline Vasp *m_sign(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_run(p,src,dst,VecOp::d_sign); }  // sign function 
 	inline Vasp *m_abs(OpParam &p,CVasp &src,CVasp *dst = NULL) { return m_run(p,src,dst,VecOp::d_abs); }  // absolute values
+
+	inline Vasp *m_qsum(OpParam &p,CVasp &src) { return m_run(p,src,NULL,VecOp::d_sumq); } // get sum of sample values
 }
 
 #endif

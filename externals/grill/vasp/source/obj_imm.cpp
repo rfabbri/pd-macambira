@@ -69,7 +69,7 @@ public:
 			{
 				ImmBuf ibuf(frms);
 				Vasp ret(frms,Vasp::Ref(ibuf));
-				ToOutVasp(0,ret);
+                ToOutVasp(0,ret);
 			}
 		}
 		else if(ref.Vectors() > 1) 

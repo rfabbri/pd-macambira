@@ -1,5 +1,5 @@
-#N canvas 33 61 975 511 12;
-#N canvas 387 42 567 656 freeze 0;
+#N canvas 33 61 977 513 12;
+#N canvas 387 42 569 658 freeze 0;
 #X obj 26 130 vasp.split 2;
 #X obj 27 404 vasp.join 2;
 #X obj 27 74 vasp.cfft @detach 1;
@@ -17,27 +17,27 @@
 #X obj 381 17 inlet;
 #X obj 162 591 outlet;
 #X obj 29 536 vasp.opt;
-#N canvas 0 0 456 306 non0 0;
-#X obj 26 162 outlet;
-#X obj 27 105 length;
-#X obj 28 133 / 1;
+#N canvas 238 212 458 308 non0 0;
+#X obj 58 187 outlet;
+#X obj 60 158 / 1;
 #X obj 26 21 inlet;
 #X obj 26 49 t a a;
-#X obj 179 80 vasp.f?;
-#X obj 26 80 vasp.?? @detach 1;
-#X connect 1 0 2 0;
-#X connect 2 0 0 0;
-#X connect 3 0 4 0;
-#X connect 4 0 6 0;
-#X connect 4 1 5 0;
-#X connect 5 0 2 1;
-#X connect 6 0 1 0;
+#X obj 234 77 vasp.f?;
+#X obj 26 80 vasp.!= 0 @detach 1;
+#X obj 27 109 vasp.sum?;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 5 0;
+#X connect 3 1 4 0;
+#X connect 4 0 1 1;
+#X connect 5 0 6 0;
+#X connect 6 1 1 0;
 #X restore 161 498 pd non0;
 #X obj 29 509 vasp.n 0;
 #X obj 302 45 + 100;
 #X obj 326 117 expr pow(2. \, -$f1/1200);
 #X obj 300 76 dbtorms;
-#N canvas 445 282 474 324 cplx 0;
+#N canvas 445 282 476 326 cplx 0;
 #X obj 19 229 vasp.join;
 #X obj 19 73 t a b a;
 #X obj 149 137 vasp.f?;
@@ -186,7 +186,7 @@
 #X obj 105 115 nbx 12 18 0 1e+008 0 1 empty empty length(frames) 0
 -8 0 12 -225271 -1 -1 1e+006 256;
 #X obj 85 368 nbx 9 14 -1e+037 1e+037 0 0 empty empty spectral_density
-0 -6 0 10 -262131 -1 -1 0.009812 256;
+0 -6 0 10 -262131 -1 -1 0 256;
 #X obj 332 197 cnv 15 100 20 empty empty play_src 5 8 0 10 -261681
 -66577 0;
 #X obj 447 197 cnv 15 100 20 empty empty read_src 5 8 0 10 -261681
@@ -250,7 +250,7 @@
 #X connect 3 0 0 1;
 #X connect 3 1 4 0;
 #X restore 614 251 pd playdst;
-#N canvas 249 202 527 470 copy 0;
+#N canvas 249 202 529 472 copy 0;
 #X obj 27 26 inlet;
 #X obj 27 51 t b b;
 #X obj 316 19 inlet;

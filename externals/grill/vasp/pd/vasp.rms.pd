@@ -1,0 +1,15 @@
+#N canvas 270 238 445 419 12;
+#X obj 42 81 vasp.!;
+#X obj 42 126 vasp.sqr;
+#X obj 43 215 sqrt;
+#X obj 42 26 inlet;
+#X obj 42 293 outlet;
+#X text 105 82 make temporary buffer;
+#X text 99 295 RMS;
+#X obj 42 164 vasp.qmean;
+#X text 132 166 mean value;
+#X connect 0 0 1 0;
+#X connect 1 0 7 0;
+#X connect 2 0 4 0;
+#X connect 3 0 0 0;
+#X connect 7 0 2 0;

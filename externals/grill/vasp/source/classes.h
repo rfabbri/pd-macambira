@@ -46,6 +46,7 @@ protected:
 */
 	BL refresh;  // immediate graphics refresh?
 	BL argchk;   // pre-operation argument feasibility check
+    BL deferred;    // queue outgoing vasp messages
 	xs_unit unit;  // time units
 	I loglvl;	// noise level for log messages
 
@@ -59,6 +60,7 @@ private:
 	FLEXT_CALLBACK_V(m_radio)
 
 	FLEXT_ATTRVAR_B(argchk)
+	FLEXT_ATTRVAR_B(deferred)
 	FLEXT_ATTRVAR_I(loglvl)
 	FLEXT_ATTRVAR_E(unit,xs_unit)
 };
@@ -104,8 +106,6 @@ protected:
 	V Lock() { runmtx.Lock(); }
 	V Unlock() { runmtx.Unlock(); }
 
-	BL detach;	// detached operation?
-	I prior;  // thread priority
 //	thrid_t thrid; 
 #else
 	FLEXT_CALLBACK(m_bang)
@@ -113,6 +113,9 @@ protected:
 	V Lock() {}
 	V Unlock() {}
 #endif
+	BL detach;	// detached operation?
+	I prior;  // thread priority
+
 	FLEXT_CALLBACK_V(m_vasp)
 	FLEXT_CALLBACK_V(m_set)
 
@@ -122,10 +125,8 @@ protected:
 	FLEXT_CALLBACK(m_stop)
 
 	FLEXT_CALLVAR_V(m_getupd,m_setupd)
-#ifdef FLEXT_THREADS
 	FLEXT_ATTRVAR_B(detach)
 	FLEXT_ATTRVAR_I(prior)
-#endif
 
 private:
 	static V Setup(t_classid);
@@ -271,7 +272,7 @@ FLEXT_LIB("vasp," name,vasp_##op)
 
 
 #define VASP_BINARY(name,op,to,def,help)										\
-class vasp_ ## op:																\
+class vasp_##op:																\
 	public vasp_binop															\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_binop)											\
@@ -290,7 +291,7 @@ FLEXT_LIB_V("vasp," name,vasp_##op)
 
 
 #define VASP_ANYOP(name,op,args,to,def,help)									\
-class vasp_ ## op:																\
+class vasp_##op:																\
 	public vasp_anyop															\
 {																				\
 	FLEXT_HEADER(vasp_##op,vasp_anyop)											\
