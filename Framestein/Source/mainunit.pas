@@ -16,7 +16,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ScktComp,
-  pluginunit, fsformunit, fsframeunit, fsmemounit,
+  pluginunit, fsformunit, fsframeunit,
   FastDIB,
   ExtCtrls, Menus, C2PhotoShopHost, Filez, ComCtrls, Buttons;
 
@@ -248,7 +248,6 @@ var
   fsbrowser: TFsBrowser;
   fsinfo: TFsInfo;
   fsavi: TFsAvi;
-  fsmemo: TFsMemo;
   f: TFsForm;
 begin
   if logstate then
@@ -320,17 +319,6 @@ begin
     fsavi.PdName := s2;
     fsavi.Name := CompName(s2);
     fsavi.Caption := s2;
-  end else
-  if S1='MEMO' then begin
-    FreeIfCompExists(CompName(s2));
-    fsmemo := TFsMemo.Create(Self);
-    fsmemo.PdName := s2;
-    fsmemo.Name := CompName(s2);
-    fsmemo.Caption := s2;
-    i := ItemCount('TFsMemo')-1;
-    fsmemo.Left := fsmemo.Width*(i div 4);
-    fsmemo.Top := fsmemo.Height*(i mod 4);
-    fsmemo.Show;
   end else
   if S1='MINIMIZEALL' then begin
     minimizeall;

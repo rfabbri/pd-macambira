@@ -18,8 +18,7 @@ uses
   pluginunit in 'pluginunit.pas',
   progressunit in 'progressunit.pas' {Progress},
   configureunit in 'configureunit.pas' {configure},
-  toolbarunit in 'toolbarunit.pas' {toolbar},
-  fsmemounit in 'fsmemounit.pas' {fsmemo};
+  toolbarunit in 'toolbarunit.pas' {toolbar};
 
 {$R *.RES}
 
@@ -31,7 +30,6 @@ begin
   Application.CreateForm(Tconfigure, configure);
   Application.CreateForm(Tlog, log);
   Application.CreateForm(Ttoolbar, toolbar);
-  Application.CreateForm(Tfsmemo, fsmemo);
   Application.Run;
 end.
 
