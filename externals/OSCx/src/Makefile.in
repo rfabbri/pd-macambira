@@ -24,7 +24,7 @@ CFLAGS = @CFLAGS@
 INCLUDES = @INCLUDES@
 LDFLAGS = @LDFLAGS@
 
-prefix=$(DESTDIR)/usr
+prefix=@prefix@
 
 SOURCES = OSC-pattern-match.c OSC.c dumpOSC.c htmsocket.c OSCroute.c sendOSC.c OSC-system-dependent.c
 TARGETS = $(SOURCES:.c=.o)

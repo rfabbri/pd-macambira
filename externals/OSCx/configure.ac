@@ -140,6 +140,11 @@ AC_ARG_WITH(pd_dir,
 	echo
 	])
 
+if test $prefix == NONE;
+then
+	prefix=/usr/local
+fi
+
 dnl ------------------------------------------
 dnl ---- check for PureData Header
 dnl ------------------------------------------
