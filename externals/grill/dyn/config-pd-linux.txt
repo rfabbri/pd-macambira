@@ -21,7 +21,7 @@ TARGDIR=./pd-linux
 
 # where should the external be installed?
 # (leave blank to omit installation)
-INSTPATH=/usr/local/lib/pd/extra
+#INSTPATH=/usr/local/lib/pd/extra
 
 
 # additional compiler flags

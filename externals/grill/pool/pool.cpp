@@ -46,7 +46,7 @@ static I compare(const A &a,const A &b)
 			return flext::GetPointer(a) == flext::GetPointer(b)?0:(flext::GetPointer(a) < flext::GetPointer(b)?-1:1);
 #endif
 		default:
-			LOG("pool - atom comparison: type not handled");
+			FLEXT_LOG("pool - atom comparison: type not handled");
 			return -1;
 		}
 	}

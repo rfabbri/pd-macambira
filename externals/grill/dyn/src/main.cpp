@@ -308,7 +308,8 @@ void dyn::obj::Add(obj *o) {	if(nxt) nxt->Add(o); else nxt = o; }
 
 dyn::obj *dyn::Find(const t_symbol *n)
 {
-	for(obj *o = root; o && o->name != n; o = o->nxt) {}
+	obj *o;
+	for(o = root; o && o->name != n; o = o->nxt) {}
 	return o;
 }
 

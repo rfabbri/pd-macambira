@@ -20,12 +20,12 @@ pooldata::pooldata(const S *s,I vcnt,I dcnt):
 	sym(s),nxt(NULL),refs(0),
 	root(nullatom,NULL,vcnt,dcnt)
 {
-	LOG1("new pool %s",sym?flext_base::GetString(sym):"<private>");
+	FLEXT_LOG1("new pool %s",sym?flext_base::GetString(sym):"<private>");
 }
 
 pooldata::~pooldata()
 {
-	LOG1("free pool %s",sym?flext_base::GetString(sym):"<private>");
+	FLEXT_LOG1("free pool %s",sym?flext_base::GetString(sym):"<private>");
 }
 
 
