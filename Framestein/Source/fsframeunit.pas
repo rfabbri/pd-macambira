@@ -720,13 +720,23 @@ begin
 end;
 
 procedure Tfsframe.Borders(const Yes: Boolean);
+var
+  w, h: Integer;
 begin
   _prefx;
   d1.Hide;
+
+  w := ClientWidth; // need to restore dimensions after changing border
+  h := ClientHeight;
+
   if Yes and (ParentWindow=0) then
     BorderStyle := bsSizeable
   else
     BorderStyle := bsNone;
+
+  ClientWidth := w;
+  ClientHeight := h;
+
   d1.Show;
   d1.Initialize;
   _postfx(fx1);

@@ -1,5 +1,5 @@
-#N canvas 438 30 549 595 12;
-#N canvas 148 3 738 667 vframe 0;
+#N canvas 438 30 551 597 12;
+#N canvas 148 3 740 669 vframe 0;
 #X obj 34 275 fs.frame;
 #X obj 55 377 vimport;
 #X obj 221 427 fs.frame;
@@ -258,7 +258,6 @@ quality..;
 #X restore 64 487 pd vframeread~;
 #X text 195 486 read image with a sync-signal;
 #X obj 339 57 init;
-#X text 65 530 vdrawarray is documented on example-vdrawarray.;
 #X text 21 21 Framestein v* family of video externals;
 #N canvas 239 28 735 584 vrgb~ 0;
 #X obj 389 140 vframe 320 240;
@@ -335,6 +334,8 @@ quality..;
 #X connect 30 0 29 0;
 #X connect 32 0 4 0;
 #X restore 64 440 pd vrgb~ and vcolor~;
+#X text 65 530 vdrawarray is documented on example-waveformdisplay.
+;
 #X connect 2 0 1 0;
 #X connect 2 0 12 0;
 #X connect 12 0 1 1;

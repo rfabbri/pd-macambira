@@ -15,6 +15,9 @@
 	// ar[i]	return i'th argument
 	...
 
+- added line width setting to fs.draw
+- fix: border_0 no longer alters frame dimensions
+
 0.31
 - added plugins by Olaf Matthes: PeRColate and PixelPack. Thanks, Olaf!
 - the console is back. It's good for printf():ing from plugins..

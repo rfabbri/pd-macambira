@@ -1,4 +1,4 @@
-#N canvas 106 10 878 657 12;
+#N canvas 106 10 880 659 12;
 #X obj 11 41 fs.main;
 #X msg 11 11 6001;
 #X msg 62 12 reset;
@@ -9,7 +9,7 @@
 #X msg 52 122 green;
 #X msg 66 148 colortv;
 #X msg 78 174 lightspeed 100;
-#X text 157 102 Plugins are short pieces of code written in C \, C++
+#X text 159 67 Plugins are short pieces of code written in C \, C++
 or ASM that manipulate one or more frames. Send the plugin name to
 fs.frame to execute it.;
 #X obj 87 290 fs.copy;
@@ -21,6 +21,8 @@ fs.frame to execute it.;
 operation.;
 #X msg 202 262 tile 3;
 #X msg 209 289 xbend 40 140;
+#X obj 321 359 init;
+#X obj 284 225 init;
 #X connect 1 0 0 0;
 #X connect 1 0 2 0;
 #X connect 2 0 0 1;
@@ -39,3 +41,5 @@ operation.;
 #X connect 16 0 14 0;
 #X connect 17 0 11 1;
 #X connect 17 0 14 0;
+#X connect 18 0 13 0;
+#X connect 19 0 5 0;

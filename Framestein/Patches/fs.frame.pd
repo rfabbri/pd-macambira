@@ -1,4 +1,4 @@
-#N canvas 44 16 907 631 12;
+#N canvas 44 16 911 635 12;
 #X text 346 170 "next" "prev" "random" "seek <number>" to show frames
 in video or buffered images.;
 #X text 347 211 "clear" to flush buffered images.;
@@ -140,6 +140,8 @@ you load a patch.;
 \, hidecursor_0;
 #X text 348 282 "320 x 240" to set image size "100 + 100" to set frame
 position "display 600 x 450" to set display size;
+#X text 348 573 title this is the main window;
+#X text 349 591 dock <window title> \, undock;
 #X connect 14 0 16 0;
 #X connect 15 0 14 0;
 #X connect 17 0 8 0;

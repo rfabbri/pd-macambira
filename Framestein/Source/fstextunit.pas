@@ -89,6 +89,10 @@ begin
     Canvas.Font.Name := Copy(S, Length(s1)+2, 255);
     Result := True;
   end else
+  if s1='WIDTH' then begin
+    Canvas.Pen.Width := MyStrToInt(ExtractWord(2, S, [' ']));
+    Result := True;
+  end else
 end;
 
 { Tfstext }

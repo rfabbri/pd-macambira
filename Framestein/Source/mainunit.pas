@@ -67,6 +67,7 @@ type
     { Private declarations }
     SocketMem: Pointer;
     fbmp: TFastDIB;
+
     procedure LoadRegSettings;
     procedure ParsePrim(const S: String);
     procedure FreeIfCompExists(const S: String);
