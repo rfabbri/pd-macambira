@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: bug-report.php,v 1.2 2004-10-19 15:16:29 ggeiger Exp $  -->
+<!-- $Id: bug-report.php,v 1.3 2004-10-19 15:47:33 ggeiger Exp $  -->
 
 <HTML>
 
@@ -65,6 +65,10 @@ e.g. from a CVS directory:
 <br>
 cvs diff -uBw > cool_feature.patch
 <br>
+The patches collection might also be useful for users, as it makes it possible
+to get the freshest bugfixes and new features that didn't make it into the  
+main distribution yet.
+<a href="http://sourceforge.net/tracker/?group_id=55736&atid=478072">Check out the patches</a>.
 
 <h2>Feature Requests</h2>
 
@@ -74,7 +78,8 @@ you are missing a functionality, but you don't know how to code it. This could
 be an additional external or functionality of the Pd core.
 </p>
 Click <a href="http://sourceforge.net/tracker/?func=add&group_id=55736&atid=478073">Add Feature Request</a> to add a new feature request.
-
+<br>
+<a href="http://sourceforge.net/tracker/?group_id=55736&atid=478073">Take a look at the feature requests"</a> that are already registered.
 <BR>
 <BR>
 <CENTER>
