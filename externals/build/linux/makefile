@@ -1,7 +1,7 @@
 
 prefix=$(DESTDIR)/usr
 
-EXTERNALS = $(shell cat make.src)
+EXTERNALS = $(shell ls ../src)
 STRIP = strip --strip-unneeded -R .note -R .comment
 
 
