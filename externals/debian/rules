@@ -24,6 +24,10 @@ configure-stamp:
 
 	touch configure-stamp
 
+orig:
+	cd ..;tar --exclude=CVS -czvf pd-externals_0.0.orig.tar.gz externals
+	
+
 
 build: build-stamp
 
