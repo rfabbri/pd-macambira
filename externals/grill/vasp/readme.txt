@@ -1,19 +1,19 @@
 VASP modular - vector assembling signal processor
 Object library for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 Donations for further development of the package are highly appreciated.
-Visit https://www.paypal.com/xclick/business=t.grill%40gmx.net&item_name=vasp&no_note=1&tax=0&currency_code=EUR
+Visit https://www.paypal.com/xclick/business=gr%40grrrr.org&item_name=vasp&no_note=1&tax=0&currency_code=EUR
 
 ----------------------------------------------------------------------------
 
 DOWNLOAD:
 =========
 
-http://www.parasitaere-kapazitaeten.net/vasp
+http://grrrr.org/vasp
 
 ----------------------------------------------------------------------------
 
@@ -25,7 +25,6 @@ Package files:
 - pd/*: VASP abstractions and documentation for PD
 - max-help/*: VASP help for Max/MSP (not present)
 - maxmsp/*: VASP abstractions for Max/MSP
-- config-*,build-*,makefile.*,*.cw: Build
 - source/*: VASP sources
 
 ----------------------------------------------------------------------------
@@ -70,27 +69,32 @@ and be renamed to "vasp".
 
 ----------------------------------------------------------------------------
 
-COMPILATION:
-============
+----------------------------------------------------------------------------
 
-You will need the flext C++ layer for PD and Max/MSP externals.
-see http://www.parasitaere-kapazitaeten.net/ext/flext
+BUILDING from source
+--------------------
+
+You will need the flext C++ layer for PD and Max/MSP externals to compile this.
+See http://grrrr.org/ext/flext
+Download, install and compile the package.
+Afterwards you can proceed with building this external.
 
 
-The package should at least compile (and is tested) with the following compilers:
+pd/Max - Windows - Microsoft Visual C, Borland C++, MinGW:
+----------------------------------------------------------
+Start a command shell with your eventual build environment
+(e.g. run vcvars32.bat for Microsoft Visual Studio)
 
-- PD @ Windows:
-o Microsoft Visual C++ 6: use vasp.dsp or edit "config-pd-msvc.txt" and run "sh build-pd-msvc.sh"
+then run
+ ..\flext\build.bat
+(you would have to substitute ..\flext with the respective path to the flext package)
 
-- PD @ linux:
-o GCC: edit "config-pd-linux.txt" and run "sh build-pd-linux.sh"
 
-- PD @ MacOSX:
-o GCC: edit "config-pd-darwin.txt" and run "sh build-pd-darwin.sh"
-
-- Max/MSP @ MacOS9:
-o Metrowerks CodeWarrior V6: edit vasp.cw project and build it
-
+pd/Max - OSX/Linux - GCC:
+-------------------------
+From a shell run
+bash ../flext/build.sh
+(you would have to substitute ../flext with the respective path to the flext package)
 
 ----------------------------------------------------------------------------
 
