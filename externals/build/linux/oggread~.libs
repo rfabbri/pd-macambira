@@ -1,1 +1,1 @@
--logg -lvorbis
+-logg -lvorbis -lvorbisenc -lvorbisfile

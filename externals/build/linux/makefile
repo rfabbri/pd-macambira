@@ -1,7 +1,9 @@
 
 prefix=$(DESTDIR)/usr
 
-EXTERNALS = $(shell ls ../src )
+EXTERNALS = $(shell cat make.src)
+STRIP = strip --strip-unneeded -R .note -R .comment
+
 
 all: $(EXTERNALS:.c=.pd_linux)
 
@@ -18,7 +20,7 @@ LINUXINCLUDE = -I. -I.. -I../include
 	ld -export_dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
 	`test -f $*.libs && cat $*.libs`
 	chmod a-x "$*.pd_linux"
-#	strip --strip-unneeded $*.pd_linux
+	$(STRIP) $*.pd_linux
 	rm -f "$*.o" 
 
 clean:
