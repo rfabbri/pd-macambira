@@ -28,6 +28,7 @@ Access the flexibility of the python language in PD and MaxMSP
 
 
 PD - Load it as i library with e.g. "pd -lib py -path scripts"
+
 Max/MSP - Wait for Windows or a Mach-O MacOSX version. MacOS9 doesn't want it.
 
 
@@ -43,8 +44,9 @@ You can send messages to named objects or receive (with pyext) with Python metho
 
 
 Known bugs:
-There are problems with importing the "time" module, experienced with Python 2.2.2 under OSX.
-Therefore, some help patches may not be functional.
+- The TCL/TK help patch is not usable under OSX.
+- With the standard PD distribution, threaded py scripts will cause "Stack overflows" under some circumstances
+	(the devel_0_37 cvs branch of PD contains the relevant fixes to avoid that)
 
 ----------------------------------------------------------------------------
 
@@ -54,23 +56,27 @@ It has been thoroughly tested with version 2.2 and 2.3
 
 The package should at least compile (and is tested) with the following compilers:
 
+
 PD @ Windows:
 -------------
 o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
 
 o Microsoft Visual C++ 6: usr "py.dsp" or edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
+
 PD @ linux:
 -----------
-Python doesn't provide a shared lib by default - static linking produces huge externals
-Ok, debian is an exception... the precompiled binary is for debian, therefore.
-
 o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh" 
+
 
 PD @ MacOSX:
 ---------------------
+You'll need to have Python installed as a framework. 
+This is the default with Panther - otherwise, all newer Python source distributions are buildable as a darwin framework 
+( ./configure --enable-framework=/System/Library/Frameworks && make && make installframework )
 
 o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
+
 
 ----------------------------------------------------------------------------
 
