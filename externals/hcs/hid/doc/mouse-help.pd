@@ -1,12 +1,11 @@
-#N canvas 127 178 668 433 10;
-#X symbolatom 211 183 0 0 0 0 - - -;
-#X obj 178 21 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#N canvas 138 201 676 441 10;
+#X symbolatom 233 198 0 0 0 0 - - -;
+#X obj 200 36 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
-#X floatatom 287 185 5 0 0 0 - - -;
-#X floatatom 168 184 5 0 0 3 wheel - -;
-#X floatatom 113 184 7 0 0 3 Y - -;
-#X floatatom 59 184 7 0 0 3 X - -;
-#X obj 178 76 mouse 4;
+#X floatatom 309 200 5 0 0 0 - - -;
+#X floatatom 190 199 5 0 0 3 wheel - -;
+#X floatatom 135 199 7 0 0 3 Y - -;
+#X floatatom 81 199 7 0 0 3 X - -;
 #X obj 28 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
 #X obj 108 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -27,18 +26,25 @@
 1;
 #X obj 268 295 route btn_side btn_extra btn_forward btn_back btn_task
 ;
-#X connect 1 0 6 0;
-#X connect 6 0 5 0;
-#X connect 6 1 4 0;
-#X connect 6 2 3 0;
-#X connect 6 3 0 0;
-#X connect 6 4 2 0;
-#X connect 10 0 7 0;
-#X connect 10 1 8 0;
-#X connect 10 2 9 0;
-#X connect 10 3 17 0;
-#X connect 17 0 12 0;
-#X connect 17 1 13 0;
-#X connect 17 2 14 0;
-#X connect 17 3 15 0;
-#X connect 17 4 16 0;
+#X msg 245 23 open 0;
+#X msg 250 42 open 1;
+#X msg 255 61 open 2;
+#X obj 200 91 mouse 1;
+#X connect 1 0 20 0;
+#X connect 9 0 6 0;
+#X connect 9 1 7 0;
+#X connect 9 2 8 0;
+#X connect 9 3 16 0;
+#X connect 16 0 11 0;
+#X connect 16 1 12 0;
+#X connect 16 2 13 0;
+#X connect 16 3 14 0;
+#X connect 16 4 15 0;
+#X connect 17 0 20 0;
+#X connect 18 0 20 0;
+#X connect 19 0 20 0;
+#X connect 20 0 5 0;
+#X connect 20 1 4 0;
+#X connect 20 2 3 0;
+#X connect 20 3 0 0;
+#X connect 20 4 2 0;

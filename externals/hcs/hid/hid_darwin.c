@@ -65,18 +65,6 @@
  *  GLOBAL VARS
  *======================================================================== */
 
-/* count of total number of devices found */
-int gNumberOfHIDDevices = 0;
-
-/* 
- *	an array of discovered devices, which is used for selecting the
- * current device, by #, type, or name
- */
-pRecDevice discoveredDevices[256];
-
-/* timer for element data updates */
-EventLoopTimerRef gTimer = NULL; 
-
 /*==============================================================================
  * FUNCTION PROTOTYPES
  *==============================================================================
@@ -86,15 +74,9 @@ EventLoopTimerRef gTimer = NULL;
 char *convertEventsFromDarwinToLinux(pRecElement element);
 
 /* IOKit HID Utilities functions from SC_HID.cpp */
-void releaseHIDDevices(void);
 int prHIDBuildElementList(t_hid *x);
 int prHIDBuildDeviceList(void);
 int prHIDGetValue(void);
-void PushQueueEvents_RawValue(void);
-void PushQueueEvents_CalibratedValue(void);
-int prHIDReleaseDeviceList(void);
-//int prHIDRunEventLoop(void);
-//int prHIDStopEventLoop(void);
 
 /*==============================================================================
  * EVENT TYPE/CODE CONVERSION FUNCTIONS
@@ -219,6 +201,32 @@ t_int hid_build_element_list(t_hid *x)
 	return (0);	
 }
 
+pRecDevice hid_get_device_by_number(t_int device_number)
+{
+	pRecDevice currentDevice;
+	t_int i, numdevs;
+
+/*
+ *	If the specified device is greater than the total number of devices, return
+ *	an error.
+ */
+	numdevs = (t_int) HIDCountDevices();
+	if (device_number >= numdevs) {
+		error("[hid]: no such device, \"%d\", only %d devices found\n",device_number,numdevs);
+		return (NULL);
+	}
+/*
+ *	The most recently discovered HID is the first element of the list here.  I
+ *	want the oldest to be number 0 rather than the newest, so I use (numdevs -
+ *	device_number - 1).
+ */
+	currentDevice = HIDGetFirstDevice();
+	for(i=0; i < numdevs - device_number - 1; ++i)
+		currentDevice = HIDGetNextDevice(currentDevice);
+
+	return currentDevice;
+}
+
 /* ============================================================================== */
 /* Pd [hid] FUNCTIONS */
 /* ============================================================================== */
@@ -257,13 +265,15 @@ t_int hid_output_events(t_hid *x)
 		pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO); 
 		while (pCurrentHIDElement && (pCurrentHIDElement->cookie != cookie))
 			pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
-		
+
+		DEBUG(
 //		convertDarwinToLinuxType((IOHIDElementType) pCurrentHIDElement->type, event_output_string);
 		HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, event_output_string);
 
 		HIDGetElementNameFromVendorProductCookie(
 			pCurrentHIDDevice->vendorID, pCurrentHIDDevice->productID,
 			(long) pCurrentHIDElement->cookie, event_output_string);
+		); //end DEBUG
 		
 		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
 		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
@@ -325,33 +335,14 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 {
 	DEBUG(post("hid_open_device"););
 
-	t_int i,err,result;
+	t_int err,result;
 	pRecDevice currentDevice = NULL;
 
 	result = HIDBuildDeviceList (NULL, NULL); 
 	// returns false if no device found
 	if(result) error("[hid]: no HID devices found\n");
 
-/*
- *	If the specified device is greater than the total number of devices, return
- *	an error.
- */
-	int numdevs = HIDCountDevices();
-	gNumberOfHIDDevices = numdevs;
-	if (device_number >= numdevs) {
-		error("[hid]: no such device, \"%d\", only %d devices found\n",device_number,numdevs);
-		return (1);
-	}
-	
-	currentDevice = HIDGetFirstDevice();
-
-/*
- *	The most recently discovered HID is the first element of the list here.  I
- *	want the oldest to be number 0 rather than the newest, so I use (numdevs -
- *	device_number - 1).
- */
-	for(i=0; i < numdevs - device_number - 1; ++i)
-		currentDevice = HIDGetNextDevice(currentDevice);
+	currentDevice = hid_get_device_by_number(device_number);
 
 	x->x_locID = currentDevice->locID;
 
@@ -371,12 +362,8 @@ t_int hid_close_device(t_hid *x)
 {
 	DEBUG(post("hid_close_device"););
 
-	post("[hid] close_device %d",x->x_device_number);
-	HIDReleaseAllDeviceQueues();
-	HIDReleaseDeviceList();
-	gNumberOfHIDDevices = 0;
-
-	return (0);
+	post("[hid] closing device %d",x->x_device_number);
+	return( HIDDequeueDevice( hid_get_device_by_number(x->x_device_number) ) );
 }
 
 t_int hid_devicelist_refresh(t_hid *x)
@@ -390,26 +377,16 @@ t_int hid_devicelist_refresh(t_hid *x)
 		return (1);
 }
 
-
+void hid_platform_specific_free(t_hid *x)
+{
+	HIDReleaseAllDeviceQueues();
+	HIDReleaseDeviceList();
+}
 
 /*==============================================================================
  *  HID UTILIES FUNCTIONS FROM SC_HID.cpp
  *==============================================================================
  */
-
-void releaseHIDDevices (void)
-{
-	DEBUG(post("releaseHIDDevices"););
-
-	if (gTimer)
-    {    
-		RemoveEventLoopTimer(gTimer);
-		gTimer = NULL;
-	}
-	HIDReleaseAllDeviceQueues();
-	HIDReleaseDeviceList();
-	gNumberOfHIDDevices = 0;
-}
 
 int prHIDBuildElementList(t_hid *x)
 {
@@ -474,7 +451,6 @@ int prHIDBuildDeviceList(void)
 	if(result) error("[hid]: no HID devices found\n");
 	
 	int numdevs = HIDCountDevices();
-	gNumberOfHIDDevices = numdevs;
 	// exit if no devices found
 	if(!numdevs) return (0);
 
@@ -482,7 +458,7 @@ int prHIDBuildDeviceList(void)
 	char cstrDeviceName [256];
 	
 	pCurrentHIDDevice = HIDGetFirstDevice();
-	for(i=gNumberOfHIDDevices - 1; i >= 0; --i)
+	for(i=numdevs - 1; i >= 0; --i)
 	{
 		post("Device %d: '%s' '%s' version %d",i,
 			  pCurrentHIDDevice->manufacturer,pCurrentHIDDevice->product,pCurrentHIDDevice->version);
@@ -545,150 +521,6 @@ int prHIDGetValue(void)
 	return (0);	
 	
 }
-
-
-void PushQueueEvents_RawValue(void)
-{
-	DEBUG(post("PushQueueEvents_RawValue"););
-
-	int i;
-	
-	IOHIDEventStruct event;
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	int numdevs = gNumberOfHIDDevices;
-	unsigned char result;
-	for(i=0; i< numdevs; i++)
-	{
-		result = HIDGetEvent(pCurrentHIDDevice, (void*) &event);
-		if(result) 
-		{
-			SInt32 value = event.value;
-			int vendorID = pCurrentHIDDevice->vendorID;
-			int productID = pCurrentHIDDevice->productID;			
-			int locID = pCurrentHIDDevice->locID;
-			IOHIDElementCookie cookie = (IOHIDElementCookie) event.elementCookie;
-			//set arguments: 
-//			++g->sp;SetInt(g->sp, vendorID); 
-//			++g->sp;SetInt(g->sp, productID); 			
-//			++g->sp;SetInt(g->sp, locID); 
-//			++g->sp;SetInt(g->sp, (int) cookie); 
-//			++g->sp;SetInt(g->sp, value); 
-		}
-		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
-	}
-}
-
-
-void PushQueueEvents_CalibratedValue(void)
-{
-	DEBUG(post("PushQueueEvents_CalibratedValue"););
-
-	int i;
-	
-	IOHIDEventStruct event;
-	pRecDevice  pCurrentHIDDevice = HIDGetFirstDevice ();
-	
-	int numdevs = gNumberOfHIDDevices;
-	unsigned char result;
-	for(i=0; i< numdevs; i++)
-	{
-
-		result = HIDGetEvent(pCurrentHIDDevice, (void*) &event);
-		if(result) 
-		{
-			SInt32 value = event.value;
-			int vendorID = pCurrentHIDDevice->vendorID;
-			int productID = pCurrentHIDDevice->productID;			
-			int locID = pCurrentHIDDevice->locID;
-			IOHIDElementCookie cookie = (IOHIDElementCookie) event.elementCookie;
-			pRecElement pCurrentHIDElement =  HIDGetFirstDeviceElement (pCurrentHIDDevice, kHIDElementTypeIO);
-	// use gElementCookie to find current element
-			while (pCurrentHIDElement && ( (pCurrentHIDElement->cookie) != cookie))
-				pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeIO);
-		
-			if (pCurrentHIDElement)
-			{
-			value = HIDCalibrateValue(value, pCurrentHIDElement);
-			//find element to calibrate
-			//set arguments: 
-//			++g->sp;SetInt(g->sp, vendorID); 
-//			++g->sp;SetInt(g->sp, productID); 			
-//			++g->sp;SetInt(g->sp, locID); 
-//			++g->sp;SetInt(g->sp, (int) cookie); 
-//			++g->sp;SetInt(g->sp, value); 
-			}
-		}
-		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
-	}
-}
-
-
-/* static pascal void IdleTimer(EventLoopTimerRef inTimer, void* userData) */
-/* { */
-/* 	DEBUG(post("IdleTimer");); */
-
-/* 	#pragma unused (inTimer, userData) */
-/* 	PushQueueEvents_CalibratedValue (); */
-/* } */
-
-
-int prHIDReleaseDeviceList(void)
-{
-	DEBUG(post("prHIDReleaseDeviceList"););
-
-	releaseHIDDevices();
-	return (0);	
-}
-
-
-/* static EventLoopTimerUPP GetTimerUPP(void) */
-/* { */
-/* 	DEBUG(post("GetTimerUPP");); */
-	
-/* 	static EventLoopTimerUPP sTimerUPP = NULL; */
-/* 	if (sTimerUPP == NULL) */
-/* 		sTimerUPP = NewEventLoopTimerUPP(IdleTimer); */
-	
-/* 	return sTimerUPP; */
-/* } */
-
-
-/*
-typedef void (*IOHIDCallbackFunction)
-              (void * target, IOReturn result, void * refcon, void * sender);
-
-*/
-/*
-void callback  (void * target, IOReturn result, void * refcon, void * sender);
-void callback  (void * target, IOReturn result, void * refcon, void * sender)
-{
-}
-*/
-
-/* int prHIDRunEventLoop(void) */
-/* { */
-/* 	DEBUG(post("prHIDRunEventLoop");); */
-
-/* 	//PyrSlot *a = g->sp - 1; //class */
-
-/* 	InstallEventLoopTimer(GetCurrentEventLoop(), 0, 0.001, GetTimerUPP (), 0, &gTimer); */
-
-/* 	//HIDSetQueueCallback(pCurrentHIDDevice, callback); */
-/* 	return (0);	 */
-/* } */
-
-/* int prHIDStopEventLoop(void) */
-/* { */
-/* 	DEBUG(post("prHIDStopEventLoop");); */
-
-/* 	if (gTimer) */
-/*         RemoveEventLoopTimer(gTimer); */
-/* 	gTimer = NULL; */
-/* 	return (0);	 */
-/* } */
-
-/* this is just a rough sketch */
-
 
 //void HIDGetUsageName (const long valueUsagePage, const long valueUsage, char * cstrName)
 char *convertEventsFromDarwinToLinux(pRecElement element)

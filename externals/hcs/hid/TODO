@@ -54,8 +54,10 @@ Darwin
 
 (in SC_HID.c its locID and cookie)
 
-it should probably just store the Pd arguments
+- it should probably just store the Pd arguments
 
+- this will have to be dealt with when the "mouse0", "joystick2" arguments are
+  implemented 
 
 
 ==============================================================================
@@ -69,13 +71,6 @@ it should probably just store the Pd arguments
 - absolute axes should be calibrated, so that the same positions on different
   devices map to the same value
 
-- but then, I could just create an [autocal] object in Pd, and have [hid]
-  output only raw values.  This would probably be best in keeping with the
-  idea of having [hid] giving as low level access as possible, then using
-  [mouse], [joystick], [tablet], etc. objects providing a nice, consistent
-  interface to the respective devices.
-
-
 
 ==============================================================================
 = pollfn for mouse-like devices
@@ -86,28 +81,6 @@ it should probably just store the Pd arguments
   the mouse data will go thru Pd's network port, triggering the pollfn.
 
 - this is probably unnecessary since the t_clock seems to run well at 1ms delay
-
-
-
-==============================================================================
-=  make generic functions for the basic actions
-
-    releaseDevices()
-    buildDeviceList()
-    buildElementList()
-    getEvent()
-
- - make Darwin HID Manager -> Linux input event convertor functions
-
-
-
-==============================================================================
-= [close( message might be totally frivolous.
-
-- what does Max's [hi] do with that?
-
-- when would you need to close a device, yet still have the object there?
-  [open( closes the previous device anyway.
 
 
 
@@ -129,8 +102,52 @@ it should probably just store the Pd arguments
 - are [start( and [stop( needed?  is 0/1 enough?
 
 
+==============================================================================
+= ditch x_devname in hid_linux.c
+
+- use sprintf(arg,"/dev/input/event%d",x_ddevice_number); instead
 
 
 
+==============================================================================
+=  consistent console output 
 
+void hid_post(const char *format, const char *);
+
+
+==============================================================================
+= if device is closed and obj is started, open device and start
+
+
+______________________________________________________________________________
+------------------------------------------------------------------------------
+BUGS
+______________________________________________________________________________
+------------------------------------------------------------------------------
+
+______________________________________________________________________________
+- BUG x->x_delay reset to default when device is opened
+
+______________________________________________________________________________
+- BUG: [mouse] and [joystick] arguments don't work to open device
+
+______________________________________________________________________________
+- BUG: [open('ing a device causes all other active [hid] objs to have their
+devices closed
+
+- this means only one [hid] object can have an open device at one time
+
+- I thought this was due to the hid_close_device() call in hid_open(), which releases
+  the device list, but this doesn't seem to be the case.
+
+______________________________________________________________________________
+- BUG: getting events from the queue doesn't output a 0 value event when the
+  motion stops, so when the mouse stops, the sound keeps playing.
+
+This is probably only a problem on relative axes.
+
+  This will probably have to be implemented on a platform-specific level:  
+
+  - On Darwin/MacOSX, I think that the HIDGetEvent() loop will have to be
+    followed by one call to HIDGetElementValue()
 

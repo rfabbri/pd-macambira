@@ -1,0 +1,44 @@
+#N canvas 182 322 672 437 10;
+#X symbolatom 339 141 0 0 0 0 - - -;
+#X obj 178 21 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+;
+#X floatatom 420 144 5 0 0 0 - - -;
+#X floatatom 93 184 7 0 0 3 Y - -;
+#X floatatom 39 184 7 0 0 3 X - -;
+#X obj 158 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 203 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 248 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 294 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 178 74 joystick 3;
+#X floatatom 153 184 5 0 0 0 - - -;
+#X floatatom 196 184 5 0 0 0 - - -;
+#X obj 158 271 route btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7 btn_8
+btn_9;
+#X obj 339 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 384 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 430 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 475 294 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 338 115 unpack s f;
+#X connect 1 0 9 0;
+#X connect 9 0 4 0;
+#X connect 9 1 3 0;
+#X connect 9 2 10 0;
+#X connect 9 3 11 0;
+#X connect 12 0 5 0;
+#X connect 12 1 6 0;
+#X connect 12 2 7 0;
+#X connect 12 3 8 0;
+#X connect 12 4 13 0;
+#X connect 12 5 14 0;
+#X connect 12 6 15 0;
+#X connect 12 7 16 0;
+#X connect 17 0 0 0;
+#X connect 17 1 2 0;

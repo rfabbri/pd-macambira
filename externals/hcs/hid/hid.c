@@ -38,12 +38,11 @@
  * FUNCTION PROTOTYPES
  */
 
-void hid_start(t_hid *x);
+void hid_start(t_hid *x, t_float f);
 void hid_stop(t_hid *x);
 t_int hid_open(t_hid *x, t_float f);
 t_int hid_close(t_hid *x);
 t_int hid_read(t_hid *x,int fd);
-void hid_delay(t_hid *x, t_float f);
 static void hid_float(t_hid* x, t_floatarg f);
 
 /*------------------------------------------------------------------------------
@@ -71,9 +70,13 @@ t_int hid_close(t_hid *x)
 /* just to be safe, stop it first */
 	hid_stop(x);
 
-	post("[hid] closed device number %d",x->x_device_number);
+	if(! hid_close_device(x)) 
+	{
+		post("[hid] closed device number %d",x->x_device_number);
+		return (0);
+	}
 
-	return (hid_close_device(x));
+	return (1);
 }
 
 
@@ -97,7 +100,7 @@ t_int hid_open(t_hid *x, t_float f)
   if (hid_open_device(x,x->x_device_number)) 
   {
 	  error("[hid] can not open device %d",x->x_device_number);
-	  post("\\================================ [hid] ================================/\n");
+	  post("\\=========================== [hid] ===========================/\n");
 	  return (1);
   }
 
@@ -106,7 +109,7 @@ t_int hid_open(t_hid *x, t_float f)
  */
   hid_float(x,started);
 
-  post("\\================================ [hid] ================================/\n");
+  post("\\=========================== [hid] ===========================/\n");
   return (0);
 }
 
@@ -120,33 +123,22 @@ t_int hid_read(t_hid *x,int fd)
 		clock_delay(x->x_clock, x->x_delay);
 	}
 	
-	return 1;  /* why is this 1? */
+	// TODO: why is this 1? 
+	return 1; 
 }
 
-/* Actions */
-void hid_delay(t_hid* x, t_float f)  
-{
-	DEBUG(post("hid_DELAY %f",f);)
-		
-/*	if the user sets the delay less than zero, reset to default */
-	if ( f > 0 ) 
-	{	
-		x->x_delay = (t_int)f;
-	} 
-	else 
-	{
-		x->x_delay = DEFAULT_DELAY;
-	}
-}
-
-void hid_start(t_hid* x) 
+void hid_start(t_hid* x, t_float f) 
 {
 	DEBUG(post("hid_start"););
   
+/*	if the user sets the delay less than one, ignore */
+	if ( f >= 1 ) 	
+		x->x_delay = (t_int)f;
+	
    if (!x->x_started) 
 	{
-		clock_delay(x->x_clock, DEFAULT_DELAY);
-		post("hid: polling started");
+		clock_delay(x->x_clock, x->x_delay);
+		post("[hid]: polling started");
 		x->x_started = 1;
 	} 
 }
@@ -154,11 +146,23 @@ void hid_start(t_hid* x)
 static void hid_float(t_hid* x, t_floatarg f) 
 {
 	DEBUG(post("hid_float"););
-   
-	if(f == 1) 
-		hid_start(x);
-	else if(f == 0) 
+
+/* values greater than 1 set the polling delay time */
+/* 1 and 0 for start/stop so you can use a [tgl] */
+	if(f > 1)
+	{
+		x->x_delay = (t_int)f;
+		hid_start(x,f);
+	}
+	else if(f == 1) 
+	{
+		if (! x->x_started)
+		hid_start(x,f);
+	}
+	else if(f == 0) 		
+	{
 		hid_stop(x);
+	}
 }
 
 /* setup functions */
@@ -167,7 +171,9 @@ static void hid_free(t_hid* x)
 	DEBUG(post("hid_free"););
 		
 	hid_close(x);
-
+	
+	hid_platform_specific_free(x);
+	
 	clock_free(x->x_clock);
 }
 
@@ -178,7 +184,7 @@ static void *hid_new(t_float f)
 
   DEBUG(post("hid_new"););
 
-  post("/================================ [hid] ================================\\");
+  post("/=========================== [hid] ===========================\\");
   post("[hid] %s, written by Hans-Christoph Steiner <hans@eds.org>",version);  
 #if !defined(__linux__) && !defined(__APPLE__)
   error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
@@ -187,7 +193,6 @@ static void *hid_new(t_float f)
 #endif
 
   /* init vars */
-  x->x_read_ok = 1;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
 
@@ -202,8 +207,8 @@ static void *hid_new(t_float f)
   /* Open the device and save settings.  If there is an error, return the object
    * anyway, so that the inlets and outlets are created, thus not breaking the
    * patch.   */
-/*   if (hid_open(x,f)) */
-/* 	  error("[hid] device %d did not open",(t_int)f); */
+  if (hid_open(x,f))
+	  error("[hid] device %d did not open",(t_int)f);
   
   return (x);
 }
@@ -223,12 +228,11 @@ void hid_setup(void)
 	class_addbang(hid_class,(t_method) hid_read);
 	
 	/* add inlet message methods */
-	class_addmethod(hid_class,(t_method) hid_delay,gensym("delay"),A_DEFFLOAT,0);
-	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_devicelist_refresh,gensym("refresh"),0);
+	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
-	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),0);
-	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),0);
+	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_stop,gensym("stop"),0);
 	class_addmethod(hid_class,(t_method) hid_stop,gensym("nopoll"),0);
 }
