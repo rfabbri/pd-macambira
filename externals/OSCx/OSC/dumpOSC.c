@@ -63,10 +63,14 @@ Technologies, University of California, Berkeley.
 	
 */
 
-
-#include "m_imp.h"
-//#include "m_pd.h"
+#include "m_pd.h"
 //#include "x_osc.h"
+
+/* declarations */
+
+typedef void (*t_fdpollfn)(void *ptr, int fd);
+void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
+
 
 #if defined(__sgi) || defined(__linux) || defined(WIN32)
 
