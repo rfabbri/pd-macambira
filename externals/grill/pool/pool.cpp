@@ -33,13 +33,13 @@ static I compare(const A &a,const A &b)
 		switch(flext::GetType(a)) {
 		case A_FLOAT:
 			return compare(flext::GetFloat(a),flext::GetFloat(b));
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 		case A_LONG:
 			return compare(flext::GetInt(a),flext::GetInt(b));
 #endif
 		case A_SYMBOL:
 			return compare(flext::GetSymbol(a),flext::GetSymbol(b));
-#ifdef PD
+#if FLEXT_SYS == FLEXT_SYS_PD
 		case A_POINTER:
 			return flext::GetPointer(a) == flext::GetPointer(b)?0:(flext::GetPointer(a) < flext::GetPointer(b)?-1:1);
 #endif
@@ -367,7 +367,7 @@ static C *ReadAtom(C *c,A *a)
 	if(a) {
 		switch(s) {
 		case 0: // integer
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 			flext::SetInt(*a,atoi(m));
 			break;
 #endif
@@ -413,7 +413,7 @@ static V WriteAtom(ostream &os,const A &a)
 	case A_FLOAT:
 		os << a.a_w.w_float;
 		break;
-#ifdef MAXMSP
+#if FLEXT_SYS == FLEXT_SYS_MAX
 	case A_LONG:
 		os << a.a_w.w_long;
 		break;
@@ -447,7 +447,7 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 				if(nd) {
 					nd->SetVal(k[0],v); v = NULL;
 				}
-	#ifdef _DEBUG
+	#ifdef FLEXT_DEBUG
 				else
 					post("pool - directory was not found",i);
 	#endif

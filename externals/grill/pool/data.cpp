@@ -162,7 +162,7 @@ pooldir *pooldata::CopyAll(const AtomList &d,I depth,BL cut)
 
 static const C *CnvFlnm(C *dst,const C *src,I sz)
 {
-#if defined(PD) && defined(NT)
+#if FLEXT_SYS == FLEXT_SYS_PD && FLEXT_OS == FLEXT_OS_WIN
 	I i,cnt = strlen(src);
 	if(cnt >= sz-1) return NULL;
 	for(i = 0; i < cnt; ++i)
