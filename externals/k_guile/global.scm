@@ -27,6 +27,7 @@
 (use-modules (ice-9 stack-catch))
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc. functions
 ;;
@@ -134,6 +135,10 @@
 ;; Backtrace (does not work properly)
 ;;
 ;;
+
+(define (pd-backtrace-eval string)
+  (eval-string string))
+
 (define (pd-display-errorfunc key . args)
   (let ((dasstack (make-stack #t)))
     (display-backtrace dasstack (current-output-port) #f #f)
@@ -147,6 +152,12 @@
 (define (pd-backtrace-run thunk)
   (stack-catch #t
 	       thunk
+	       pd-display-errorfunc))
+
+(define (pd-backtrace-runx func arg1) 
+  (stack-catch #t
+	       (lambda x
+		 (apply func x))
 	       pd-display-errorfunc))
 
 (define (pd-backtrace-run1 func arg1)
@@ -173,6 +184,6 @@
 		 (func arg1 arg2 arg3 arg4))
 	       pd-display-errorfunc))
 
-
 (pd-backtrace-run1 pd-load-if-exists "/etc/.k_guile.scm")
 (pd-backtrace-run1 pd-load-if-exists (string-append (getenv "HOME") "/.k_guile.scm"))
+

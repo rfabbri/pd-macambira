@@ -31,7 +31,6 @@
 
 #define MAKE_STRING(a) scm_mem2string(a,strlen(a))
 #define EVAL(a) scm_eval_string(MAKE_STRING(a))
-#define EVALINT(a) do{char tempstring[500];sprintf(tempstring,"%d",a);EVAL(tempstring);}while(0)
 
 #define MAKE_SYM(a) gensym(SCM_SYMBOL_CHARS(a))
 
@@ -91,11 +90,12 @@ typedef struct k_guile_workaround{
 
 
 static char *version = 
-"k_guile v0.0.1, written by Kjetil S. Matheussen, k.s.matheussen@notam02.no";
+"k_guile v0.0.2, written by Kjetil S. Matheussen, k.s.matheussen@notam02.no";
 
 static t_class *k_guile_class, *k_guile_workaroundclass;
 
 static SCM pd_backtrace_run;
+static SCM pd_backtrace_runx;
 static SCM pd_backtrace_run1;
 static SCM pd_backtrace_run2;
 static SCM pd_backtrace_run3;
@@ -215,18 +215,6 @@ static void k_guile_anything_first(t_k_guile *x,t_symbol *s, t_int argc, t_atom*
  *****************************************************************************************************
  *****************************************************************************************************/
 
-static SCM gpd_set_inlet_func(SCM instance,SCM func){
-  t_k_guile *x=GET_X(instance);
-  x->inlet_func=func;
-  scm_gc_protect_object(x->inlet_func);
-  RU_;
-}
-static SCM gpd_set_cleanup_func(SCM instance,SCM func){
-  t_k_guile *x=GET_X(instance);
-  x->cleanup_func=func;
-  scm_gc_protect_object(x->cleanup_func);
-  RU_;
-}
 static SCM gpd_inlets(SCM instance,SCM num_ins){
   int lokke;
   t_k_guile *x=GET_X(instance);
@@ -278,6 +266,7 @@ static SCM gpd_get_num_outlets(SCM instance){
   t_k_guile *x=GET_X(instance);
   return MAKE_INTEGER(x->num_outs);
 }
+
 
 
 /*****************************************************************************************************
@@ -441,8 +430,6 @@ static void k_guile_init(void){
   scm_c_define_gsubr("pd-c-inited?",1,0,0,gpd_inited_p);
   scm_c_define_gsubr("pd-c-get-num-inlets",1,0,0,gpd_get_num_inlets);
   scm_c_define_gsubr("pd-c-get-num-outlets",1,0,0,gpd_get_num_outlets);
-  scm_c_define_gsubr("pd-c-set-inlet-func",2,0,0,gpd_set_inlet_func);
-  scm_c_define_gsubr("pd-c-set-cleanup-func",2,0,0,gpd_set_cleanup_func);
   scm_c_define_gsubr("pd-c-bind",2,0,0,gpd_bind);
   scm_c_define_gsubr("pd-c-unbind",2,0,0,gpd_unbind);
   scm_c_define_gsubr("pd-c-outlet-number",3,0,0,gpd_outlet_number);
@@ -461,6 +448,9 @@ static void k_guile_init(void){
 
   pd_backtrace_run=EVAL("pd-backtrace-run");
   scm_permanent_object(pd_backtrace_run);
+
+  pd_backtrace_runx=EVAL("pd-backtrace-runx");
+  scm_permanent_object(pd_backtrace_runx);
 
   pd_backtrace_run1=EVAL("pd-backtrace-run1");
   scm_permanent_object(pd_backtrace_run1);
@@ -488,7 +478,8 @@ static void k_guile_init(void){
  *****************************************************************************************************/
 
 static bool k_guile_load(t_k_guile *x,char *filename){
-  bool ret=true;
+  SCM evalret;
+  bool ret=false;
   
   FILE *file=fopen(filename,"r");
   if(file==NULL){
@@ -497,24 +488,33 @@ static bool k_guile_load(t_k_guile *x,char *filename){
   }
 
 
-  // Let the file live in its own name-space, or something like that.
+  // Let the file live in its own name-space (or something like that).
   eval2("(define (pd-instance-func pd-instance)");
   eval2(
 #include "local_scm.txt"
 );
   eval_file(file);
-  eval2("  (pd-set-inlet-func)(pd-set-cleanup-func))");
+  eval2("  (cons pd-inlet-func pd-cleanup-func))");
   eval2("1");
 
-  if(
-     1!=GET_INTEGER(eval_do())
-     || 1!=GET_INTEGER(scm_call_2(pd_backtrace_run1,EVAL("pd-instance-func"),MAKE_POINTER(x)))
-     )
-    {
-      post("Failed.");
-      ret=false;
-    }
+  if(1!=GET_INTEGER(eval_do())){
+    post("Failed.");
+    goto exit;
+  }
 
+  evalret=scm_call_2(pd_backtrace_run1,EVAL("pd-instance-func"),MAKE_POINTER(x));
+  if(INTEGER_P(evalret)){
+    post("Failed.");
+    goto exit;
+  }
+  x->inlet_func=SCM_CAR(evalret);
+  x->cleanup_func=SCM_CDR(evalret);
+  scm_gc_protect_object(x->inlet_func);
+  scm_gc_protect_object(x->cleanup_func);
+
+  ret=true;
+
+ exit:
   fclose(file);
 
   return ret;
@@ -567,6 +567,7 @@ static void k_guile_eval(t_k_guile *x,t_symbol *s){
 //}
 
 
+
 /*****************************************************************************************************
  *****************************************************************************************************
  *    Das setup
@@ -581,8 +582,8 @@ void k_guile_setup(void){
 
   class_addanything(k_guile_class, (t_method)k_guile_anything_first);
   class_addmethod(k_guile_class, (t_method)k_guile_reload, gensym("reload"), 0);
-  class_addmethod(k_guile_class, (t_method)k_guile_eval, gensym("eval"), A_DEFSYM, 0);
-  //class_addmethod(k_guile_class, (t_method)k_guile_evalfile, gensym("evalfile"), A_DEFSYM, 0);
+  class_addmethod(k_guile_class, (t_method)k_guile_eval, gensym("eval"), A_DEFSYM,0);
+  //class_addmethod(k_guile_class, (t_method)k_guile_evalfile, gensym("evalfile"), A_DEFSYM,0);
   class_sethelpsymbol(k_guile_class, gensym("help-k_guile.pd"));
 
 

@@ -58,21 +58,19 @@
 (define pd-inlet-vector (make-vector 1 '()))
 (define pd-inlet-anyvector (make-vector 1 '()))
 
-(define (pd-set-inlet-func)
-  (pd-c-set-inlet-func pd-instance
-		       ;; This function is called from the C side when the object receives something on an inlet.
-		       (lambda (inlet-num symbol args)
-			 (let ((inlet-func (assq symbol 
-						 (vector-ref pd-inlet-vector
-							     inlet-num))))
-			   (if (not inlet-func)
-			       (begin
-				 (set! inlet-func (assq 'any
-							(vector-ref pd-inlet-vector inlet-num)))
-				 (set! args (cons symbol args))))
-			   (if inlet-func
-			       (apply (cadr inlet-func) args)
-			       (pd-display "No function defined for handling \'" symbol " to inlet " inlet-num))))))
+;; This function is called from the C side when the object receives something on an inlet.
+(define (pd-inlet-func inlet-num symbol args)
+  (let ((inlet-func (assq symbol 
+			  (vector-ref pd-inlet-vector
+				      inlet-num))))
+    (if (not inlet-func)
+	(begin
+	  (set! inlet-func (assq 'any
+				 (vector-ref pd-inlet-vector inlet-num)))
+	  (set! args (cons symbol args))))
+    (if inlet-func
+	(apply (cadr inlet-func) args)
+	(pd-display "No function defined for handling \'" symbol " to inlet " inlet-num))))
 
 (define (pd-inlet inlet-num symbol func)
   (if (not (procedure? func))
@@ -145,7 +143,11 @@
 (define (pd-unbind symbol)
   (set! pd-local-bindings (pd-unbind-do symbol pd-local-bindings)))
 
-
+(define (pd-unbind-all)
+  (if (not (null? pd-local-bindings))
+      (begin
+	(pd-unbind (car (car pd-local-bindings)))
+	(pd-unbind-all))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -158,19 +160,11 @@
       (pd-display "Wrong argument to pd-set-destroy-func: " thunk " is not a procedure.")
       (set! pd-destroy-func thunk)))
 
-(define (pd-cleanup)
+;; This func is called from the C-side.
+(define (pd-cleanup-func)
   (if pd-destroy-func
       (begin
 	(pd-destroy-func)
 	(set! pd-destroy-func #f)))
-  (if (not (null? pd-local-bindings))
-      (begin
-	(pd-unbind (car (car pd-local-bindings)))
-	(pd-cleanup))))
-
-;; This one also returns the return-value for the pd-instance-func function, which is 1 for success.
-(define (pd-set-cleanup-func)
-  (pd-c-set-cleanup-func pd-instance
-			 pd-cleanup)
-  1)
+  (pd-unbind-all))
 
