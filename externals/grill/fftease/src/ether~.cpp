@@ -61,7 +61,7 @@ FLEXT_LIB_DSP_V("fftease, ether~",ether)
 V ether::setup(t_classid c)
 {
 	FLEXT_CADDATTR_VAR1(c,"invert",_invert);
-	FLEXT_CADDATTR_VAR1(c,"thresh",_threshMult);
+	FLEXT_CADDATTR_VAR1(c,"index",_threshMult);
 }
 
 
@@ -131,9 +131,9 @@ V ether::Delete()
 }
 
 
-V ether::m_dsp(I n,S *const *in,S *const *out)
+V ether::m_dsp(I n,S *const *,S *const *)
 {
-	const I _D = Blocksize();
+	const I _D = n;
 	const F _R = Samplerate();
 
 	if(_D != blsz || _R != smprt) {
@@ -177,7 +177,7 @@ V ether::m_signal(I n,S *const *in,S *const *out)
 {
 	/* declare working variables */
 	I i, j; 
-	const I _D = blsz,_N = _D*_nmult,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = n,_N = _D*_nmult,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 	_inCount += _D;
 

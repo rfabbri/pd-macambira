@@ -8,7 +8,8 @@
 # WARRANTIES, see the file, "license.txt," in this distribution.  
 #
 
-# your c++ compiler (define only if not g++)
+# your c/c++ compilers (define only if not gcc/g++)
+# C=gcc
 # CXX=g++
 
 # where are the PD header files?

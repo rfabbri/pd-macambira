@@ -20,7 +20,7 @@ V lib_setup()
 	post("-----------------------------------------");
 	post("           VASP modular %s            ",VASP_VERSION);
 	post("   vector assembling signal processor    ");
-	post("          (C)2002 Thomas Grill           ");
+	post("       (C)2002-2003 Thomas Grill         ");
 #ifdef FLEXT_DEBUG
 	post("   DEBUG BUILD - " __DATE__ " " __TIME__);
 #endif

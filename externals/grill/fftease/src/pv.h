@@ -8,10 +8,11 @@
 
 #include <stdio.h>
 
-// -------------------------------------
-// modifications by Thomas Grill
+/* -------------------------------------
+ modifications by Thomas Grill
+*/
 
-//#include <fts/fts.h>
+/* #include <fts/fts.h> */
 #include <math.h>
 
 #ifdef _MSC_VER
@@ -24,7 +25,7 @@
 extern "C" {
 #endif
 
-// -------------------------------------
+/* ------------------------------------- */
 
 
 #define FORWARD 1
@@ -50,11 +51,11 @@ void convert(float *S, float *C, int N2, float *lastphase,  float fundamental, f
 void unconvert(float  *C, float *S, int N2, float *lastphase, float fundamental,  float factor );
 
 
-// -------------------------------------
+/* ------------------------------------- */
 
 #ifdef __cplusplus
 }
 #endif
 
-// -------------------------------------
+/* ------------------------------------- */
 

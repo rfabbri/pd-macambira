@@ -14,7 +14,7 @@ The package should at least compile (and is tested) with the following compilers
 
 pd - Windows:
 -------------
-o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
+OK o Microsoft Visual C++ 6: edit "config-pd-msvc.txt" & run "build-pd-msvc.bat" 
 
 o Borland C++ 5.5 (free): edit "config-pd-bcc.txt" & run "build-pd-bcc.bat" 
 
@@ -30,13 +30,13 @@ o GCC: edit "config-pd-linux.txt" & run "sh build-pd-linux.sh"
 
 pd - MacOSX:
 -----------
-o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
+OK o GCC: edit "config-pd-darwin.txt" & run "sh build-pd-darwin.sh" 
 	additional settings (e.g. target processor, compiler flags) can be made in makefile.pd-darwin
 
 
 Max/MSP - MacOS 9:
 ------------------
-o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
+OK o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
 
 You must have the following "Source Trees" defined:
 "flext" - Pointing to the flext main directory
@@ -46,7 +46,7 @@ You must have the following "Source Trees" defined:
 
 Max/MSP - MacOSX:
 ------------------
-o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
+OK o Metrowerks CodeWarrior V6: edit & use the "fftease.cw" project file
 
 You must have the following "Source Trees" defined:
 "OS X Volume" - Pointing to your OSX boot drive
@@ -59,15 +59,20 @@ You must have the following "Source Trees" defined:
 
 PORTING NOTES:
 
+- pv-lib:
+	- gcc (OSX) complains about _cfft being defined by pv-lib and pd.... any problems with that?
+
 - cross:
 	- what about the class members for "correction"?! (superfluous)
 
 - dentist:
 	- tooth count ("teeth") is preserved and checked on every reshuffle
 	- different knee correction
+	- BUG: crash beim Einstellen von teeth
 
 - disarray:
 	- different frequency correction
+	- TODO: check whether freq oder number of bins should be selectable
 
 - ether:
 	- possibility to change qual?

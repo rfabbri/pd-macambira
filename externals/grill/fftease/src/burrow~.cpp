@@ -142,9 +142,9 @@ V burrow::Delete()
 
 
 
-V burrow::m_dsp(I n,S *const *in,S *const *out)
+V burrow::m_dsp(I n,S *const *,S *const *)
 {
-	const I _D = Blocksize();
+	const I _D = n;
 	if(_D != blsz) {
 		blsz = _D;
 
@@ -181,7 +181,7 @@ V burrow::m_signal(I n,S *const *in,S *const *out)
 {
 	/* declare working variables */
 	I i, j; 
-	const I _D = blsz,_N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
+	const I _D = n,_N = _D*_MULT_,_Nw = _N,_N2 = _N/2,_Nw2 = _Nw/2; 
 
 	/* fill our retaining buffers */
 	_inCount += _D;

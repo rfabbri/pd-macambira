@@ -1,7 +1,7 @@
 #include "pv.h"
 
 
-//float TWOPI;
+/* float TWOPI; */
 
 /* If forward is true, rfft replaces 2*N real data points in x with
    N complex values representing the positive frequency half of their
