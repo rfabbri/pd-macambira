@@ -57,7 +57,7 @@ install-doc:
 
 install: install-doc
 	@test -d $(prefix)/lib/pd/extra || mkdir -p $(prefix)/lib/pd/extra
-	install -m644 *.pd_linux $(prefix)/lib/pd/extra
+	install -m644 *.@pd_suffix@ $(prefix)/lib/pd/extra
 
 clean:
 	rm -rf *.$(EXT) *.@pd_suffix@
