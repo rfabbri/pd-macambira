@@ -1,20 +1,20 @@
-#N canvas 354 179 662 416 10;
-#X symbolatom 211 218 6 0 0 1 code - -;
-#X obj 130 56 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
-;
-#X floatatom 339 218 5 0 0 1 value - -;
-#X floatatom 140 218 5 0 0 3 wheel - -;
-#X floatatom 85 218 7 0 0 3 Y - -;
-#X floatatom 31 218 7 0 0 3 X - -;
-#X obj 193 285 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#N canvas 53 201 666 460 10;
+#X symbolatom 211 268 6 0 0 1 code - -;
+#X obj 130 106 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
-#X obj 238 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X floatatom 339 268 5 0 0 1 value - -;
+#X floatatom 140 268 5 0 0 3 wheel - -;
+#X floatatom 85 268 7 0 0 3 Y - -;
+#X floatatom 31 268 7 0 0 3 X - -;
+#X obj 193 335 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 283 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 238 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X msg 175 43 open 0;
-#X msg 180 62 open 1;
-#X msg 185 81 open 2;
+#X obj 283 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X msg 175 93 open 0;
+#X msg 180 112 open 1;
+#X msg 185 131 open 2;
 #N canvas 462 248 632 542 mouse-noise 0;
 #X obj 100 25 inlet;
 #X obj 210 294 noise~;
@@ -45,41 +45,44 @@
 #X connect 10 1 5 0;
 #X connect 11 1 13 1;
 #X connect 13 0 4 1;
-#X restore 425 136 pd mouse-noise 1;
-#X msg 536 68 open 0;
-#X msg 541 87 open 1;
-#X msg 546 106 open 2;
-#X obj 425 69 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
-;
-#X text 308 45 turn this on to make some noise with the mouse;
-#X obj 130 111 mouse 1;
-#X obj 211 191 unpack symbol float;
-#X text 282 234 buttons;
-#X obj 329 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X restore 425 186 pd mouse-noise 1;
+#X msg 536 118 open 0;
+#X msg 541 137 open 1;
+#X msg 546 156 open 2;
+#X obj 425 119 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0
 1;
-#X obj 374 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X text 308 95 turn this on to make some noise with the mouse;
+#X obj 130 161 mouse 1;
+#X obj 211 241 unpack symbol float;
+#X text 282 284 buttons;
+#X obj 329 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 419 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 374 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 465 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 419 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 510 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 465 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+1;
+#X obj 510 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
 #X obj 2 2 cnv 15 650 20 empty empty [mouse] 2 11 1 18 -233017 -66577
 0;
-#X obj 555 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 555 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X text 1 372 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X text 11 422 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
-#X text 218 386 released under the GNU GPL;
-#X text 414 386 $Author: eighthave $;
-#X text 414 373 $Revision: 1.5 $;
-#X obj 526 340 all_about_hid;
-#X text 417 341 For more info:;
-#X obj 601 284 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X text 228 436 released under the GNU GPL;
+#X text 424 436 $Author: eighthave $;
+#X text 424 423 $Revision: 1.6 $;
+#X obj 526 382 all_about_hid;
+#X text 417 383 For more info:;
+#X obj 601 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 193 264 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
+#X obj 193 314 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8;
+#X text 12 36 Use a mouse device with Pd. This object auto-calibrates
+the output of axis data. Move the device around as fast as possible
+in each axis to calibrate it.;
 #X connect 1 0 18 0;
 #X connect 9 0 18 0;
 #X connect 10 0 18 0;

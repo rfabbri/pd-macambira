@@ -111,6 +111,8 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 				case kHIDUsage_GD_Rz: convertAxis(element, linux_type, linux_code, "rz"); break;
 				case kHIDUsage_GD_Wheel: 
 					sprintf(linux_type,"rel");sprintf(linux_code,"rel_wheel");break;
+				case kHIDUsage_GD_Slider:
+					sprintf(linux_type,"abs");sprintf(linux_code,"abs_throttle");break;
 			}
 			break;
 		case kHIDPage_Button:
@@ -121,6 +123,19 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 	}
 }
 
+/*
+ * Linux input events report hatswitches as absolute axes with -1, 0, 1 as
+ * possible values.  MacOS X HID Manager reports hatswitches as a specific
+ * hatswitch type with each direction represented by a unique number.  This
+ * function converts the unique number to the Linux style axes.
+ */
+void hid_convert_hatswitch_values(IOHIDEventStruct event, char *linux_type, char *linux_code)
+{
+	/* 
+	 * hmm, not sure how to implement this cleanly yet, so I left the code
+	 * inline in hid_get_events().
+	 */
+}
 
 /* ============================================================================== */
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
@@ -178,17 +193,30 @@ t_int hid_build_element_list(t_hid *x)
 	post("-----------------------------------------------------------");
 	for(i=0; i<numElements; i++)
 	{
-		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
 		HIDGetTypeName((IOHIDElementType) pCurrentHIDElement->type, type_name);
-		HIDGetUsageName(pCurrentHIDElement->usagePage, pCurrentHIDElement->usage, usage_name);
-		post("  %s\t%s\t%s, %s",type,code,type_name,usage_name);
+		HIDGetUsageName(pCurrentHIDElement->usagePage, 
+							 pCurrentHIDElement->usage, usage_name);
 
+		/* some events need more processing than others */
+		switch(pCurrentHIDElement->usage)
+		{
+			case kHIDUsage_GD_Hatswitch:
+				post("  %s\t%s\t%s, %s","abs","abs_hat0x",type_name,usage_name);
+				post("  %s\t%s\t%s, %s","abs","abs_hat0y",type_name,usage_name);
+				break;
+			default:
+				convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
+				post("  %s\t%s\t%s, %s",type,code,type_name,usage_name);
+		}
+		
 		pCurrentHIDElement = HIDGetNextDeviceElement (pCurrentHIDElement, kHIDElementTypeInput);
 	}
 	post("");
 
 	return (0);	
 }
+
+
 
 /* ============================================================================== */
 /* Pd [hid] FUNCTIONS */
@@ -235,11 +263,72 @@ t_int hid_get_events(t_hid *x)
 			(long) pCurrentHIDElement->cookie, event_output_string);
 		); //end DEBUG
 		
-		convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
+		/* some events need more processing than others */
+		switch(pCurrentHIDElement->usage)
+		{
+			case kHIDUsage_GD_Hatswitch:
+				sprintf(type,"abs");
+				switch (value)
+				{
+/*
+ * MacOS X represents this as one event, while [hid] represents it as two
+ * distinct axes.  So the conversion requires an added hid_output_event().
+ */
+					case 0: 
+						sprintf(code,"abs_hat0y");value = 1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 0;
+						break;
+					case 1: 
+						sprintf(code,"abs_hat0y");value = 1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 1;
+						break;
+					case 2: 
+						sprintf(code,"abs_hat0y");value = 0;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 1;
+						break;
+					case 3: 
+						sprintf(code,"abs_hat0y");value = -1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 1;
+						break;
+					case 4: 
+						sprintf(code,"abs_hat0y");value = -1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 0;
+						break;
+					case 5: 
+						sprintf(code,"abs_hat0y");value = -1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = -1;
+						break;
+					case 6: 
+						sprintf(code,"abs_hat0y");value = 0;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = -1;
+						break;
+					case 7: 
+						sprintf(code,"abs_hat0y");value = 1;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = -1;
+						break;
+					case 8: 
+						sprintf(code,"abs_hat0y");value = 0;
+						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						sprintf(code,"abs_hat0x");value = 0;
+						break;
+				}
+				hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+				break;
+			default:
+				convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
+				hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+		}
+
 //		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
 
-	// TODO: convert this to a common time format, i.e. Linux struct timeval
-		hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
 		
 		++event_counter;
 	}
@@ -336,6 +425,7 @@ t_int hid_build_device_list(t_hid *x)
 
 	char cstrDeviceName [256];
 	
+	post("");
    /* display device list in console */
 	for(i=0; i < numdevs; i++)
 	{
@@ -346,13 +436,12 @@ t_int hid_build_device_list(t_hid *x)
 		HIDGetUsageName (pCurrentHIDDevice->usagePage, 
 							  pCurrentHIDDevice->usage, 
 							  cstrDeviceName);
-		post("       vendorID: %d   productID: %d   locID: %d",
-			  pCurrentHIDDevice->vendorID,
-			  pCurrentHIDDevice->productID,
-			  pCurrentHIDDevice->locID);
-
-		// TODO: display all of the element types/codes for each device
+		DEBUG(post("       vendorID: %d   productID: %d   locID: %d",
+					  pCurrentHIDDevice->vendorID,
+					  pCurrentHIDDevice->productID,
+					  pCurrentHIDDevice->locID););
 	}
+	post("");
 	
 	return (0);
 }

@@ -85,12 +85,26 @@ void hid_post(const char *format, const char *);
 ==============================================================================
 = if device is closed and obj is started, open device and start
 
+==============================================================================
+= catalog Linux device behavior
+
+- more data needed to make the proper [hid] output for MacOS X
+
+- catalog hatswitch behavior
+
+- catalog axis directions: right/down positive?  left/up negative?
 
 ==============================================================================
 = event name changes
 
 - make key/button Type btn rather than key (undecided on this one)
 
+==============================================================================
+= make [macosxevent]
+
+- so much info is lost in the translation to a common event scheme that it
+  would be quite handy to have a [macosxevent] object.  This would give
+  access to the entire range of devices supported by HID Manager.
 
 ==============================================================================
 = device 0 gets events for all available devices
@@ -137,3 +151,10 @@ This is probably only a problem on relative axes.
   - On Darwin/MacOSX, I think that the HIDGetEvent() loop will have to be
     followed by one call to HIDGetElementValue()
 
+______________________________________________________________________________
+- BUG: hatswitches on MacOS X output an event without a change in value
+
+Because of the currnently implementation of the conversion of the MacOS X
+style event to the Linux style event, an event with a value of zero is output
+on the unchanged axis when the hatswitch is moved in along the X or Y axis (as
+opposed to diagonally).
