@@ -16,18 +16,30 @@
  *
  */
 /* 
- * $Id: rawjoystick.c,v 1.2 2003-08-20 16:20:43 eighthave Exp $
+ * $Id: rawjoystick.c,v 1.3 2003-10-12 16:26:39 eighthave Exp $
+ *
+ * TODO
+ * -make work with multiple joysticks (using SDL_JoyHatEvent.which)
+ * -figure out why it takes so long for [rawjoystick] to start
+ * -get throttle and twist working 
  */
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
-#include "SDL.h"
+#include <SDL/SDL.h>
+#include <m_pd.h>
 #include "m_imp.h"
 
-//#define DEBUG(x)
-#define DEBUG(x) x 
+#define DEBUG(x)
+/* #define DEBUG(x) x */
 
+/* total number of axes and buttons supported by this object */
+/* each axis gets a fixed outlet */
 #define RAWJOYSTICK_AXES     6
 #define RAWJOYSTICK_BUTTONS  9
+
+/* this is the outlet number for the hat switch */
+#define RAWJOYSTICK_HATX     3
+#define RAWJOYSTICK_HATY     4
 
 
 /*------------------------------------------------------------------------------
@@ -90,80 +102,114 @@ static int rawjoystick_open(t_rawjoystick *x)  {
 
   post ("   device has %i axes, %i hats, and %i buttons.\n",x->x_axes,x->x_hats,x->x_buttons);
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
-  post ("This object is under development!  The interface could change at anytime!");
-  post ("As I write cross-platform versions, the interface might have to change.");
+  post ("This object is under development!  The interface will change!");
+  post ("This means inlets, outlets, messages, etc. are not fixed!");
   post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
     
   return 1;
 }
 
-static int rawjoystick_read(t_rawjoystick *x,int fd)  {
-  SDL_Event           event; 
-
-  DEBUG(post("rawjoystick_READ"));   
-
-  if ( ! SDL_JoystickOpened(x->x_devnum) ) {
-    return 0;
-  }
-
-  post("Joystick read: %s",SDL_JoystickName(x->x_devnum));
+/* read the joystick, called through clock */
+static void *rawjoystick_read(t_rawjoystick *x) {	
+	SDL_Event           event; 
+	
+/* 	DEBUG(post("rawjoystick_READ"));    */
+	
+	if ( ! SDL_JoystickOpened(x->x_devnum) ) {
+		post ("Joystick not open, you need to open it first.");
+		return 0;
+	}
+	
+/*   DEBUG(post("Joystick read: %s",SDL_JoystickName(x->x_devnum));) */
 
   if ( SDL_PollEvent(&event) ) {
-    post("SDL_Event.type: %i",event.type);
-    post("SDL_JoyAxisEvent.value: %i",event.jaxis.value);
-    post("SDL_JoyButtonEvent.value: %i",event.jbutton.state);
-    switch (event.type) {
-    case SDL_JOYAXISMOTION:
-      outlet_float (x->x_axis_out[event.jaxis.axis], event.jaxis.value);	
-      break;
-    case SDL_JOYHATMOTION:
-      break;
-    case SDL_JOYBUTTONDOWN:
-      outlet_float (x->x_button_val_out, 1);
-      outlet_float (x->x_button_num_out, event.jaxis.axis);
-      break;
-    case SDL_JOYBUTTONUP:
-      outlet_float (x->x_button_val_out, 0);
-      outlet_float (x->x_button_num_out, event.jaxis.axis);
-      break;
-    default:
-      DEBUG(post("Unhandled event."));
-    }
+	  DEBUG(post("SDL_Event.type: %i",event.type);)
+	  DEBUG(post("SDL_JoyAxisEvent.value: %i",event.jaxis.value);)
+	  DEBUG(post("SDL_JoyButtonEvent.value: %i",event.jbutton.state);)
+	  switch (event.type) {
+		  case SDL_JOYAXISMOTION:
+/* 
+ * It might be a good idea to make a for{;;} loop to output the values of
+ * all of the axes everytime in right-to-left order.
+ */
+			  outlet_float (x->x_axis_out[event.jaxis.axis], event.jaxis.value);	
+			  break;
+		  case SDL_JOYHATMOTION:
+			  /* this object only supports the first hat switch */
+			  if (event.jhat.hat == 0) {
+				  /* X axis */
+				  if (event.jhat.value & SDL_HAT_LEFT) {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATX], -1);	
+				  } else if (event.jhat.value & SDL_HAT_RIGHT) {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATX], 1);	
+				  } else {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATX], 0);	
+				  }
+				  /* Y axis */
+				  if (event.jhat.value & SDL_HAT_UP) {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATY], -1);	
+				  } else if (event.jhat.value & SDL_HAT_DOWN) {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATY], 1);	
+				  } else {
+					  outlet_float (x->x_axis_out[RAWJOYSTICK_HATY], 0);	
+				  }
+			  }
+			  break;
+		  case SDL_JOYBUTTONDOWN:
+			  outlet_float (x->x_button_val_out, 1);
+			  outlet_float (x->x_button_num_out, (float)event.jbutton.button);
+			  break;
+		  case SDL_JOYBUTTONUP:
+			  outlet_float (x->x_button_val_out, 0);
+			  outlet_float (x->x_button_num_out, (float)event.jbutton.button);
+			  break;
+		  default:
+			  DEBUG(post("Unhandled event."));
+	  }
   }
-  return 1;    
+
+  if (x->started) 
+	  clock_delay(x->x_clock, x->x_delaytime);
+
+  return NULL;
 }
 
 /* Actions */
 
 static void rawjoystick_bang(t_rawjoystick* x)  {
-    DEBUG(post("rawjoystick_bang"));   
+    DEBUG(post("rawjoystick_bang"));
 }
 
 static void rawjoystick_float(t_rawjoystick* x)  {
-    DEBUG(post("rawjoystick_float"));   
+    DEBUG(post("rawjoystick_float"));
 }
 
-// DONE
 void rawjoystick_start(t_rawjoystick* x)
 {
   DEBUG(post("rawjoystick_START"));
 
   if ( ( SDL_JoystickOpened(x->x_devnum) ) && ( ! x->started ) ) {
-    sys_addpollfn(x->x_devnum, (t_fdpollfn)rawjoystick_read, x);
     x->started = 1;
+	 clock_delay(x->x_clock, 0);
   }
 }
 
 
-// DONE
 void rawjoystick_stop(t_rawjoystick* x)  {
   DEBUG(post("rawjoystick_STOP");)
-
+	  
   if ( ( SDL_JoystickOpened(x->x_devnum) ) && ( x->started ) ) {
-    sys_rmpollfn(x->x_devnum);
-    x->started = 0;
+	  x->started = 0;
+	  clock_unset(x->x_clock);
   }
 }
+
+void rawjoystick_delay(t_rawjoystick* x, t_float f)  {
+	DEBUG(post("rawjoystick_DELAY %f",f);)
+	  
+	  x->x_delaytime = f;
+}
+
 
 /* Misc setup functions */
 
@@ -177,6 +223,7 @@ static void rawjoystick_free(t_rawjoystick* x) {
     SDL_JoystickClose(x->x_joystick);
   
   SDL_Quit();
+  clock_free(x->x_clock);
 }
 
 static void *rawjoystick_new(t_float argument) {
@@ -191,6 +238,9 @@ static void *rawjoystick_new(t_float argument) {
   x->x_devnum = 0;
   x->read_ok = 1;
   x->started = 0;
+  x->x_delaytime = 5;
+  
+  x->x_clock = clock_new(x, (t_method)rawjoystick_read);
 
   /* INIT SDL using joystick layer  */  
   /* Note: Video is required to start Event Loop !! */
@@ -222,7 +272,6 @@ static void *rawjoystick_new(t_float argument) {
   x->x_button_val_out = outlet_new(&x->x_obj, &s_float);
   
   /* Open the device and save settings */
-  
   if ( ! rawjoystick_open(x) ) return x;
   
   return (x);
@@ -244,9 +293,12 @@ void rawjoystick_setup(void)
   /* add inlet message methods */
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_open,gensym("open"),0);
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_close,gensym("close"),0);
+
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_start,gensym("start"),0);
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_stop,gensym("stop"),0);
+
   class_addmethod(rawjoystick_class,(t_method) rawjoystick_read,gensym("read"),0);
-  
+
+  class_addmethod(rawjoystick_class,(t_method) rawjoystick_delay,gensym("delay"),A_FLOAT,0);
 }
 
