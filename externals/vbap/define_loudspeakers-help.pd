@@ -1,0 +1,20 @@
+#N canvas 413 238 598 438 10;
+#X text 113 179 In two dimensions \, only specify the azimuth. (for
+example "define_loudspeakers 2 -45 45 0 180";
+#X obj 15 276 define_loudspeakers 3 -45 0 45 0 0 45 180 45;
+#X msg 15 250 bang;
+#X obj 339 275 define_loudspeakers 2 -45 45 0 180;
+#X obj 290 359 vbap 0 0;
+#X text 113 39 [define_loudspeakers] works with;
+#X obj 345 39 vbap;
+#X obj 488 150 vbap;
+#X text 114 81 Use [define_loudspeakers] to list the speaker positions.
+The example here defines loudspeakers in three dimensions (the first
+parameter). For each speaker \, define its azimuth and elevation. Here
+we have speakers front left and right with no elevation (-45 0 45 0)
+and front and back with 45 degrees of elevation (0 45 180 45). Send
+the data to:;
+#X text 214 392 (see [vbap] for more details);
+#X connect 1 0 4 0;
+#X connect 2 0 1 0;
+#X connect 3 0 4 0;

@@ -101,7 +101,7 @@ LINUXINCLUDE =  -I../../src
 # ----------------------------------------------------------
 
 install:
-	cp help-*.pd ../../doc/5.reference
+	cp vbap-*.pd ../../doc/5.reference
 
 clean:
 	rm -f *.o *.pd_* so_locations
