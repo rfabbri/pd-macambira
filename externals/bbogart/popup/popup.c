@@ -44,6 +44,7 @@ typedef struct _popup
 
      t_glist * x_glist;
      t_outlet* out2;
+     t_inlet* in2;
      int x_rect_width;
      int x_rect_height;
      t_symbol*  x_sym;
@@ -62,7 +63,7 @@ typedef struct _popup
 /* widget helper functions */
 
 /* Append " x " to the following line to show debugging messages */
-#define DEBUG(x)
+#define DEBUG(x) 
 
 
 static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int nout)
@@ -96,14 +97,14 @@ static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int 
 	  if (firsttime)
 	       sys_vgui(".x%x.c create rectangle %d %d %d %d -tags {%xi%d %xi}\n",
 			glist_getcanvas(glist),
-			onset, text_ypix(&x->x_obj, glist),
-			     onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1,
+			onset, text_ypix(&x->x_obj, glist)-2,
+			     onset + IOWIDTH, text_ypix(&x->x_obj, glist)-1,
 			x, i, x);
 	  else
 	       sys_vgui(".x%x.c coords %xi%d %d %d %d %d\n",
 			glist_getcanvas(glist), x, i,
 			onset, text_ypix(&x->x_obj, glist),
-			onset + IOWIDTH, text_ypix(&x->x_obj, glist)+1);
+			onset + IOWIDTH, text_ypix(&x->x_obj, glist)-1);
 	  
      }
      DEBUG(post("draw inlet end");)
@@ -173,18 +174,17 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
               
      }     
      else {
-       sys_vgui(".x%x.c coords %xS \
-%d %d\n",
+       sys_vgui(".x%x.c coords %xS %d %d\n",
 		canvas, x,
 		text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist));
      }
-     draw_inlets(x, glist, firsttime, 2,1);
+     draw_inlets(x, glist, firsttime, 2,2);
      //     draw_handle(x, glist, firsttime);
 
-  DEBUG(post("drawme end");)
+  // Output a bang to first outlet when we're ready to receive float messages the first time!. 
+  if(firsttime) {outlet_bang(x->x_obj.ob_outlet);}
 
-// Output a bang to first outlet when we're ready to receive float messages the first time!. 
-if(firsttime) {outlet_bang(x->x_obj.ob_outlet);}
+  DEBUG(post("drawme end");)
 }
 
 
@@ -419,20 +419,27 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 	DEBUG(post("iselect end");)
 }
 
-/* Function to append symbols to popup list 
-static void popup_append(t_popup* x, t_symbol *item)
+/* Function to choose value via symbol name */
+static void popup_symselect(t_popup* x, t_symbol *s)
 {
-	// Add menu item
-        sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
-                x->x_glist, x, item->s_name, x->x_glist, x, item->s_name, x, (x->x_num_options-1) );
+	int i,match=0;
 
-	post("orig num_options: %d", x->x_num_options);
+	/* Compare inlet symbol to each option */
+	for(i=0; i<x->x_num_options; i++)
+	{
+	  if(x->x_options[i]->s_name == s->s_name)
+	  {
+	    sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
+                        glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
+	    match = 1;
+	    break;
+          }
+	}
 
-	// Incriment num_options
-	x->x_num_options++;
-
-	post("post  num_options: %d", x->x_num_options);
-} */
+	if(match != 1)
+	  post("popup: '%s' is not an available option.", s->s_name);
+	
+}
 
 /* Function to append symbols to popup list */
 void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
@@ -507,8 +514,10 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 	/* define proc in tcl/tk where "popup%p" is the receive, "output" is the method, and "$index" is an argument. */
     sys_vgui("proc popup_sel%x {index} {\n pd [concat popup%p output $index \\;]\n }\n",x,x); 
 
+    /* Add symbol inlet (hard to say how this actually works?? */
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("symbol"), gensym(""));
     outlet_new(&x->x_obj, &s_float);
-	x->out2 = outlet_new(&x->x_obj, &s_symbol);
+    x->out2 = outlet_new(&x->x_obj, &s_symbol);
     return (x);
 
     DEBUG(post("popup new end");)
@@ -547,14 +556,21 @@ void popup_setup(void) {
                                                                   A_GIMME,
                                                                   0);
 
+	class_addmethod(popup_class, (t_method)popup_symselect,
+                                                                  gensym(""),
+                                                                  A_DEFSYMBOL,
+                                                                  0);
+
 	class_doaddfloat(popup_class, (t_method)popup_iselect);
+
+//	class_addsymbol(popup_class, (t_method)popup_symselect);
 
     class_setwidget(popup_class,&popup_widgetbehavior);
 #if PD_MINOR_VERSION >= 37
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.9 $ $Date: 2004-12-13 23:56:59 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.10 $ $Date: 2005-01-14 20:12:00 $");
 }
 
 
