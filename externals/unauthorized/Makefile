@@ -1,7 +1,7 @@
 
 EXT=pd_$(shell uname -s | sed -e 's/L/l/' | sed -e 's/D/d/')
 
-CC=gcc-2.95
+CC=gcc
 
 # This is Miller's default install location
 INSTALL_PREFIX=/usr/local/lib/pd
@@ -35,6 +35,12 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
 # need to find a way to replace $(CSYM)
 #	link /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+
+# ----------------------- UNIX Common ---------------------
+
+.tk.tk2c:
+	./tk2c.bash < $*.tk > $*.tk2c
+
 
 # ----------------------- IRIX 5.x -----------------------
 
@@ -78,9 +84,6 @@ LINUXCFLAGS = -DPD -DUNIX -DICECAST -O2 -funroll-loops -fomit-frame-pointer \
 
 LINUXINCLUDE =  -I../../src -I../../pd/src
 
-.tk.tk2c:
-	./tk2c.bash < $*.tk > $*.tk2c
-
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
@@ -104,23 +107,11 @@ DARWINLINKFLAGS = -bundle -undefined suppress  -flat_namespace
 
 DARWININCLUDE =  -I../../src -I../../pd/src -I/sw/include
 
-.c.osx:
-	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
-
-.tk.tk2c:
-	./tk2c.bash < $*.tk > $*.tk2c
-
 .c.pd_darwin:
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
 	$(CC) $(DARWINLINKFLAGS) -o $*.pd_darwin $*.o
 	chmod a-x "$*.pd_darwin"
 	-rm $*.o
-
-# %.pd_darwin: %.c
-# 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o "$*.o" -c "$*.c"
-# 	$(CC) $(DARWINLINKFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm
-# 	chmod a-x "$*.pd_darwin"
-# 	rm -f "$*.o" 
 
 # added by Hans-Christoph Steiner <hans@eds.org>
 # to generate MacOS X packages
