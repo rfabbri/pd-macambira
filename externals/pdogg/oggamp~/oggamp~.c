@@ -97,16 +97,16 @@
 #define     STATE_STREAM 2                      /* streaming aund audio output */
 
 #define     READSIZE                65536       /* _encoded_ data we request from buffer */
-#define     READ                    4096        /* amount of data we pass on to decoder */
+#define     READ                    1024        /* amount of data we pass on to decoder */
 #define     DEFBUFPERCHAN           262144      /* audio output buffer default: 256k */
 #define     MINBUFSIZE              (4 * READSIZE)
 #define     MAXBUFSIZE              16777216 	/* arbitrary; just don't want to hang malloc */
 #define     STRBUF_SIZE             1024        /* char received from server on startup */
 #define     OBJWIDTH 			    68			/* width of buffer statis display */
 #define     OBJHEIGHT 			    10 			/* height of buffer statis display */
-#define		MAXSTREAMCHANS          2           /* maximum number of channels: restricted to 2 by Ogg specs */
+#define		MAXSTREAMCHANS          250         /* maximum number of channels */
 
-static char   *oggamp_version = "oggamp~: ogg/vorbis streaming client version 0.2f, written by Olaf Matthes";
+static char   *oggamp_version = "oggamp~: ogg/vorbis streaming client version 0.3, written by Olaf Matthes";
 
 static t_class *oggamp_class;
 
@@ -120,7 +120,7 @@ typedef struct _oggamp
     t_float *x_buf;    	    	    	    /* audio data buffer */
     t_int x_bufsize;  	    	    	    /* buffer size in bytes */
     t_int x_noutlets; 	    	    	    /* number of audio outlets */
-    t_sample *(x_outvec[MAXSTREAMCHANS]);	/* audio vectors */
+    t_sample **x_outvec;					/* audio vectors */
     t_int x_vecsize;  	    	    	    /* vector size for transfers */
     t_int x_state;    	    	    	    /* opened, running, or idle */
 
@@ -230,9 +230,9 @@ static int oggamp_vorbis_init(t_oggamp *x, int fd)
 	x->x_eos = 0;	/* indicate beginning of new stream */
 
 		/* submit a 4k block to libvorbis' ogg layer */
-    buffer = ogg_sync_buffer(&(x->x_oy),READ);
+    buffer = ogg_sync_buffer(&(x->x_oy),4096);
 	post("oggamp~: prebuffering...");
-	bytes = oggamp_child_receive(fd, buffer, READ);
+	bytes = oggamp_child_receive(fd, buffer, 4096);
 	ogg_sync_wrote(&(x->x_oy),bytes);
 	result = ogg_sync_pageout(&(x->x_oy),&(x->x_og));
 			
@@ -240,8 +240,8 @@ static int oggamp_vorbis_init(t_oggamp *x, int fd)
 	if(result == -1)
 	{
 		post("reading more...");
-		buffer = ogg_sync_buffer(&(x->x_oy),READ);
-		bytes = oggamp_child_receive(fd, buffer, READ);
+		buffer = ogg_sync_buffer(&(x->x_oy),4096);
+		bytes = oggamp_child_receive(fd, buffer, 4096);
 		ogg_sync_wrote(&(x->x_oy),bytes);
 		result = ogg_sync_pageout(&(x->x_oy),&(x->x_og));
 	}
@@ -323,34 +323,10 @@ static int oggamp_vorbis_init(t_oggamp *x, int fd)
 		post("oggamp~: bitstream is %d channels @ %ld Hz with %ldkbps", x->x_vi.channels, x->x_vi.rate, x->x_vi.bitrate_nominal / 1000);
 		x->x_streamchannels = x->x_vi.channels;
 		x->x_streamrate = x->x_vi.rate;
-	//	x->x_siginterval = 64 / x->x_vi.channels;	/* estimate interval in which we need to decode */
-		if(x->x_samplerate > x->x_streamrate)	/* upsampling */
-		{		/* we need to use upsampling */
-			if(x->x_samplerate % x->x_streamrate)
-			{
-				post("oggamp~: upsampling from %ld Hz to %ld Hz not supported !", x->x_vi.rate, x->x_samplerate);
-			}
-			else
-			{
-				post("oggamp~: upsampling from %ld Hz to %ld Hz", x->x_vi.rate, x->x_samplerate);
-				x->x_resample = x->x_samplerate / x->x_streamrate;
-			}
-		}
-		else if(x->x_samplerate < x->x_streamrate)
-		{		/* we need to use downsampling */
-			if(x->x_streamrate % x->x_samplerate)
-			{
-				post("oggamp~: downsampling from %ld Hz to %ld Hz not supported !", x->x_vi.rate, x->x_samplerate);
-			}
-			else
-			{
-				post("oggamp~: downsampling from %ld Hz to %ld Hz", x->x_vi.rate, x->x_samplerate);
-				x->x_resample = (t_float)x->x_samplerate / x->x_vi.rate;
-			}
-		}
-		else	/* no resampling */
-		{
-			x->x_resample = 1;
+		if(x->x_samplerate != x->x_streamrate)	/* upsampling */
+		{		/* we would need to use upsampling */
+			post("oggamp~: resampling from %ld Hz to %ld Hz not supported !", x->x_vi.rate, x->x_samplerate);
+			return (-1);
 		}
 		post("oggamp~: encoded by: %s", x->x_vc.vendor);
     }
@@ -407,6 +383,8 @@ static int oggamp_decode_input(t_oggamp *x, float *buf, int fifohead, int fifosi
 	int n = 0;      /* total number of samples returned by decoder at this call */
 	int bytes;		/* number of bytes submitted to decoder */
 	int position = fifohead;
+	int streamchannels = x->x_streamchannels;
+	int channels = x->x_noutlets;
 
 
 		/* the rest is just a straight decode loop until end of stream */
@@ -443,24 +421,44 @@ static int oggamp_decode_input(t_oggamp *x, float *buf, int fifohead, int fifosi
 					while((samples = vorbis_synthesis_pcmout(&(x->x_vd),&pcm))>0)
 					{
 						int     j;
-						int     clipflag = 0;
 
 							/* copy into our output buffer */
-						for(j = 0; j < samples; j++)
+						if(streamchannels >= channels)
 						{
-							for(i = 0; i < x->x_vi.channels; i++)
+							for(j = 0; j < samples; j++)
 							{
-								buf[position] = pcm[i][j];
-								position = (position + 1) % fifosize;
+								for(i = 0; i < channels; i++)
+								{
+									buf[position + i] = pcm[i][j];
+								}
+								position = (position + channels) % fifosize;
 							}
+							vorbis_synthesis_read(&(x->x_vd),samples);  /* tell libvorbis how
+																		many samples we
+																		actually consumed */
+							n += samples;	/* sum up the samples we got from decoder */
 						}
-	
-						if(clipflag)post("oggamp~: warning: clipping in frame %ld",(long)(x->x_vd.sequence));
-	
-						vorbis_synthesis_read(&(x->x_vd),samples);  /* tell libvorbis how
-																	many samples we
-																	actually consumed */
-						n += samples;	/* sum up the samples we got from decoder */
+						else
+						{
+							for(j = 0; j < samples; j++)
+							{
+									/* copy the channels we have */
+								for(i = 0; i < streamchannels; i++)
+								{
+									buf[position + i] = pcm[i][j];
+								}
+									/* fill rest of buffer with silence */
+								for(i = streamchannels; i < channels; i++)
+								{
+									buf[position + i] = 0.;
+								}
+								position = (position + channels) % fifosize;
+							}
+							vorbis_synthesis_read(&(x->x_vd),samples);  /* tell libvorbis how
+																		many samples we
+																		actually consumed */
+							n += samples;	/* sum up the samples we got from decoder */
+						}
 					}	    
 				}
 			}
@@ -828,7 +826,7 @@ static void *oggamp_child_main(void *zz)
     		sprintf(boo, "fifosize %d\n", 
     	    	x->x_fifosize);
     		pute(boo);
-			x->x_sigcountdown = x->x_sigperiod = (x->x_fifosize / (x->x_siginterval * x->x_streamchannels * x->x_vecsize));
+			x->x_sigcountdown = x->x_sigperiod = (x->x_fifosize / (x->x_siginterval * x->x_noutlets * x->x_vecsize));
 
     	    	/* in a loop, wait for the fifo to get hungry and feed it */
 			while (x->x_requestcode == REQUEST_BUSY)
@@ -900,7 +898,6 @@ static void *oggamp_child_main(void *zz)
 				fd = x->x_fd;
 				buf = x->x_buf;
 				fifohead = x->x_fifohead;
-	    		pthread_mutex_unlock(&x->x_mutex);
 
 					/* signal parent in case it's waiting for data */
 				oggamp_cond_signal(&x->x_answercondition);
@@ -1030,6 +1027,7 @@ static void *oggamp_new(t_floatarg fdographics, t_floatarg fnchannels, t_floatar
     x->x_noutlets = nchannels;
     x->x_connection = outlet_new(&x->x_obj, gensym("float"));
 	x->x_clock = clock_new(x, (t_method)oggamp_tick);
+	x->x_outvec = (t_sample **)getbytes(nchannels * sizeof(t_sample *));
 
     pthread_mutex_init(&x->x_mutex, 0);
     pthread_cond_init(&x->x_requestcondition, 0);
@@ -1071,10 +1069,7 @@ static t_int *oggamp_perform(t_int *w)
     t_oggamp *x = (t_oggamp *)(w[1]);
     t_int vecsize = x->x_vecsize, noutlets = x->x_noutlets, i, j, r;
     t_float *fp;
-	t_float *sp = x->x_buf;
 	t_float *buffer = x->x_buf;
-	t_float resample = x->x_resample;
-	t_int skip = (t_int)(1.0 / resample);
 
     if (x->x_state == STATE_STREAM)
     {
@@ -1084,8 +1079,7 @@ static t_int *oggamp_perform(t_int *w)
 
 			/* get 'getbytes' bytes from input buffer, convert them to 
 		       'wantbytes' which is the number of bytes after resampling */
-		getbytes = streamchannels * vecsize;		/* number of bytes we get after resampling */
-		wantbytes = (t_float)getbytes  / resample;	/* we need vecsize bytes per channel */
+		wantbytes = noutlets * vecsize;		/* number of bytes we get after resampling */
 		havebytes = x->x_fifobytes;
 
 			/* check for error */
@@ -1130,73 +1124,15 @@ static t_int *oggamp_perform(t_int *w)
 		}
 
 			/* output audio */
-		sp += x->x_fifotail;	/* go to actual audio position */
+		buffer += x->x_fifotail;	/* go to actual audio position */
 
-			/* resample if necessary */
-		if (resample > 1.0)	/* upsampling */
+		for(j = 0; j < vecsize; j++)
 		{
-			int parent = vecsize / resample;	/* how many samples to read from buffer */
-			for(j = 0; j < parent; j++)
+			for(i = 0; i < noutlets; i++)
 			{
-				for(i = 0; i < streamchannels; i++)
-				{		/* copy same sample several times */
-					for (r = 0; r < resample; r++)
-						*buffer++ = *sp;
-					sp++;	/* get next sample from stream */
-				}
+				x->x_outvec[i][j] = *buffer++;
 			}
 		}
-		else if (resample < 1.0)	/* downsampling */
-		{
-			int parent = vecsize * skip;/* how many samples to read from buffer */
-			for(j = 0; j < parent; j++)
-			{
-				for(i = 0; i < streamchannels; i++)
-				{
-					*buffer++ = *sp;	/* get one sample */
-					sp += skip;			/* skip next few samples in stream */
-				}
-			}
-		}
-		else if (resample == 1.0)	/* no resampling */
-		{		/* copy without any changes */
-			for(i = 0; i < getbytes; i++)*buffer++ = *sp++;
-		}
-		buffer -= getbytes;	/* reset to beginning of buffer */
-
-
-		if(noutlets == streamchannels)
-		{      /* normal output */
-			for(j = 0; j < vecsize; j++)
-			{
-				for(i = 0; i < noutlets; i++)
-				{
-					x->x_outvec[i][j] = *buffer++;
-				}
-			}
-		}
-		else if((noutlets / 2) == streamchannels)
-		{       /* mono to stereo conversion */
-			for(j = 0; j < vecsize; j++)
-			{
-				for(i = 0; i < noutlets; i++)
-				{
-					x->x_outvec[i][j] = *buffer;
-				}
-				buffer++;
-			}
-		}
-		else if((noutlets * 2) == streamchannels)
-		{      /* stereo to mono conversion */
-			for(j = 0; j < vecsize; j++)
-			{
-				for(i = 0; i < streamchannels; i++)
-				{
-					x->x_outvec[i/2][j] += (float) (*buffer++ * 0.5);
-				}
-			}
-		}
-		else goto idle;
 
 		
 		x->x_fifotail += wantbytes;
@@ -1473,6 +1409,7 @@ static void oggamp_free(t_oggamp *x)
     pthread_cond_destroy(&x->x_answercondition);
     pthread_mutex_destroy(&x->x_mutex);
     freebytes(x->x_buf, x->x_bufsize*sizeof(t_float));
+	freebytes(x->x_outvec, x->x_noutlets * sizeof(t_sample *));
 	clock_free(x->x_clock);
 }
 

@@ -1,5 +1,5 @@
 #ifndef VERSION
-#define VERSION "0.23"
+#define VERSION "0.25"
 #endif
 
 #include <m_pd.h>

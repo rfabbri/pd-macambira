@@ -1,5 +1,18 @@
 Version history of oggcast~ external for pure-data
 
+v 0.2k (29th Sept. 2003):
+- fixed a bug in multichannel support
+- fixed a memory leak in Icecast2 login
+
+v 0.2i (13th September 2003):
+- updated login scheme to work with latest Icecast2 server 
+  from CVS (tested on Windows and Debian Linux)
+- changed handling of comment tags: it's no longer necessarry
+  to replace spaces with underscores! Just use spaces for spaces.
+- fixed (no: avoided!) the bug that deleted underscores from 
+  the Pd patch
+- made Icecast2 login the default scheme
+
 v 0.2h (27th March 2003):
 - added HTTP base auth login for (alpha) Icecast2 server:
   message 'server 1' switches to Icecast2, 'server 0' back

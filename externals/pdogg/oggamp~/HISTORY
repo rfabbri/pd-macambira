@@ -1,5 +1,9 @@
 Version history of oggamp~ external for pure-data
 
+v 0.3 (2nd january 2004):
+- removed the crappy resampling to get rid of audio clicks
+- multichannel support
+
 v 0.2f (20st july 2002):
 - recompiled with the final 1.0 release of Ogg Vorbis
 
