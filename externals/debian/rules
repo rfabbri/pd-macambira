@@ -98,8 +98,8 @@ clean:
 
 	-(cd footils; make clean)
 
-	(cd OSCx/libOSC;$(MAKE) clean)
-	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
+	-(cd OSCx/libOSC;$(MAKE) clean)
+	-(cd OSCx/OSC; $(MAKE) pd_linux_clean)
 #
 #  Clean cyclone
 #
