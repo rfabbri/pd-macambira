@@ -21,7 +21,7 @@
 #X msg 357 139 stop;
 #X msg 442 170 open /dev/video;
 #X obj 252 167 pdp_yqt;
-#X obj 283 243 dac~;
+#X obj 280 215 dac~;
 #X obj 351 264 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 363 286 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
@@ -54,8 +54,8 @@
 #X connect 14 0 12 0;
 #X connect 15 0 11 0;
 #X connect 16 0 24 0;
-#X connect 16 3 17 0;
-#X connect 16 4 17 1;
+#X connect 16 4 17 0;
+#X connect 16 5 17 1;
 #X connect 18 0 24 1;
 #X connect 19 0 24 2;
 #X connect 20 0 24 3;

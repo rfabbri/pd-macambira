@@ -8,7 +8,7 @@
 #X obj 342 33 openpanel;
 #X obj 412 34 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X floatatom 303 69 5 0 0;
+#X floatatom 303 69 5 0 0 0 - - -;
 #X msg 212 35 stop;
 #X obj 216 84 metro 70;
 #X obj 18 245 pdp_v4l;
@@ -23,15 +23,15 @@
 #X text 432 167 Open a file before any operations;
 #X text 322 192 Start recording;
 #X msg 280 165 open /tmp/output.mov;
-#X floatatom 159 534 5 0 0;
-#X obj 217 111 pdp_yqt;
+#X floatatom 159 534 5 0 0 0 - - -;
+#X obj 213 124 pdp_yqt;
 #X text 328 621 using YUV420P color model ( hard-coded);
 #X text 112 621 it records in quicktime format;
 #X msg 283 347 jpeg \$1;
-#X floatatom 346 348 5 0 0;
+#X floatatom 346 348 5 0 0 0 - - -;
 #X text 395 346 JPEG quality factor ( if using jpeg compressor );
 #X msg 281 372 framerate \$1;
-#X floatatom 378 372 5 0 0;
+#X floatatom 378 372 5 0 0 0 - - -;
 #X text 427 371 Frame rate : if not set \, it will be calculated;
 #X text 388 325 Set a compressor supported by libquicktime ( 0.9.1
 );
@@ -47,7 +47,7 @@
 1;
 #X obj 832 551 pdp_control;
 #X msg 832 524 thread \$1;
-#X floatatom 832 612 5 0 0;
+#X floatatom 832 612 5 0 0 0 - - -;
 #X obj 832 583 route pdp_drop;
 #X text 113 605 pdp_rec~ : records video and audio output to file;
 #X obj 119 300 adc~;
@@ -65,7 +65,7 @@ at the samplerate of PD;
 #X msg 375 423 symbol raw;
 #X obj 159 505 pdp_rec~;
 #X obj 21 385 pdp_affine;
-#X floatatom 52 340 5 0 0;
+#X floatatom 52 340 5 0 0 0 - - -;
 #X obj 26 440 pdp_xv;
 #X connect 0 0 8 0;
 #X connect 1 0 21 0;
@@ -86,8 +86,8 @@ at the samplerate of PD;
 #X connect 19 0 56 0;
 #X connect 21 0 53 0;
 #X connect 21 0 56 0;
-#X connect 21 3 56 0;
-#X connect 21 4 56 1;
+#X connect 21 4 56 0;
+#X connect 21 5 56 1;
 #X connect 24 0 56 0;
 #X connect 25 0 24 0;
 #X connect 27 0 56 0;

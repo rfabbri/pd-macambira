@@ -27,7 +27,7 @@
 #X text 411 283 Mode;
 #X obj 250 171 pdp_yqt;
 #X floatatom 408 332 5 0 0 0 - - -;
-#X obj 278 231 dac~;
+#X obj 278 206 dac~;
 #X text 421 310 Snap time;
 #X text 456 331 Snap interval;
 #X obj 423 372 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
@@ -54,8 +54,8 @@
 #X connect 17 0 0 0;
 #X connect 18 0 17 1;
 #X connect 20 0 17 0;
-#X connect 20 3 22 0;
-#X connect 20 4 22 1;
+#X connect 20 4 22 0;
+#X connect 20 5 22 1;
 #X connect 21 0 17 3;
 #X connect 25 0 27 0;
 #X connect 26 0 28 0;

@@ -1,4 +1,3 @@
-# Generated automatically from Makefile.in by configure.
 current: all_modules
 
 include ../Makefile

@@ -50,6 +50,8 @@ typedef struct pdp_pen_struct
     t_int x_red;
     t_int x_green;
     t_int x_blue;
+    t_int x_xoffset;
+    t_int x_yoffset;
     
     t_int x_pwidth;
     t_int x_mode;  // 0=draw ( default), 1=erase
@@ -74,6 +76,8 @@ static void pdp_pen_draw(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
  short int  *pbY, *pbU, *pbV;
  t_int mx, Mx, my, My;
  t_int px, py;
+
+  if ( !x->x_bdata ) return;
 
   X = X*x->x_vwidth;
   Y = Y*x->x_vheight;
@@ -126,6 +130,8 @@ static void pdp_pen_do_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
 {
  short int  *pbY, *pbU, *pbV;
  short int  nX, nY;
+
+  if ( !x->x_bdata ) return;
 
   nbits++;
   // post( "pdp_pen_do_fill : X=%d, Y=%d stack=%d", (t_int)X, (t_int)Y, nbits );
@@ -286,6 +292,7 @@ static void pdp_pen_fill(t_pdp_pen *x, t_floatarg X, t_floatarg Y)
 
 static void pdp_pen_clear(t_pdp_pen *x)
 {
+  if ( !x->x_bdata ) return;
   if ( x->x_vsize > 0 )
   {
     memset( x->x_bdata, 0x00, (( x->x_vsize + (x->x_vsize>>1))<<1) );
@@ -298,6 +305,16 @@ static void pdp_pen_width(t_pdp_pen *x, t_floatarg width)
   {
     x->x_pwidth = (int) width;
   }
+}
+
+static void pdp_pen_xoffset(t_pdp_pen *x, t_floatarg xoffset)
+{
+  x->x_xoffset = (int) xoffset;
+}
+
+static void pdp_pen_yoffset(t_pdp_pen *x, t_floatarg yoffset)
+{
+  x->x_yoffset = (int) yoffset;
 }
 
 static void pdp_pen_mode(t_pdp_pen *x, t_floatarg mode)
@@ -372,13 +389,17 @@ static void pdp_pen_process_yv12(t_pdp_pen *x)
     {
       for(px=0; px<x->x_vwidth; px++) 
       {
-        if ( *(pbY+py*x->x_vwidth+px) != 0 )
+        if ( ( (px-x->x_xoffset)>=0 ) && ( (px-x->x_xoffset)<x->x_vwidth ) &&
+             ( (py-x->x_yoffset)>=0 ) && ( (py-x->x_yoffset)<x->x_vheight ) )
         {
-          *(pnY+py*x->x_vwidth+px) = *(pbY+py*x->x_vwidth+px);
-          *(pnU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
-                  *(pbU+(py>>1)*(x->x_vwidth>>1)+(px>>1));
-          *(pnV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
-                  *(pbV+(py>>1)*(x->x_vwidth>>1)+(px>>1));
+          if ( *(pbY+(py-x->x_yoffset)*x->x_vwidth+(px-x->x_xoffset)) != 0 )
+          {
+            *(pnY+py*x->x_vwidth+px) = *(pbY+(py-x->x_yoffset)*x->x_vwidth+(px-x->x_xoffset));
+            *(pnU+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
+                  *(pbU+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1));
+            *(pnV+(py>>1)*(x->x_vwidth>>1)+(px>>1)) =
+                  *(pbV+((py-x->x_yoffset)>>1)*(x->x_vwidth>>1)+((px-x->x_xoffset)>>1));
+          }
         }
       } 
     }
@@ -459,6 +480,8 @@ void *pdp_pen_new(void)
     t_pdp_pen *x = (t_pdp_pen *)pd_new(pdp_pen_class);
 
     x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("xoffset"));
+    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("yoffset"));
 
     x->x_packet0 = -1;
     x->x_packet1 = -1;
@@ -470,6 +493,8 @@ void *pdp_pen_new(void)
     x->x_red = 255;
     x->x_green = 255;
     x->x_blue = 255;
+    x->x_xoffset = 0;
+    x->x_yoffset = 0;
 
     x->x_pwidth = 3;
     x->x_mode = 0;
@@ -498,6 +523,8 @@ void pdp_pen_setup(void)
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_width, gensym("width"), A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_rgb, gensym("rgb"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_pen_class, (t_method)pdp_pen_mode, gensym("mode"), A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_pen_class, (t_method)pdp_pen_xoffset, gensym("xoffset"), A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_pen_class, (t_method)pdp_pen_yoffset, gensym("yoffset"), A_DEFFLOAT, A_NULL);
 
 }
 

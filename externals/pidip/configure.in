@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
-PDP_PIDIP_VERSION=0.12.10
+PDP_PIDIP_VERSION=0.12.12
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg
@@ -27,17 +27,6 @@ IMLIB_LIBS=`imlib2-config --libs`
 IMLIB_CFLAGS=`imlib2-config --cflags`
 AC_SUBST(IMLIB_LIBS)
 AC_SUBST(IMLIB_CFLAGS)
-
-AC_PATH_GENERIC(aalib, 1.0.0, [
-  AC_SUBST(AALIB_LIBS)
-  AC_SUBST(AALIB_CFLAGS) ],
-  AC_MSG_ERROR(Cannot find aalib: Is aalib-config in the path?) )
-
-dnl the above doesn't work for some reason :/
-AALIB_LIBS=`aalib-config --libs`
-AALIB_CFLAGS=`aalib-config --cflags`
-AC_SUBST(AALIB_LIBS)
-AC_SUBST(AALIB_CFLAGS)
 
 AC_CHECK_LIB(Magick, XWindowByProperty, , AC_MSG_ERROR(screen captures requires ImageMagick library!!), -I/usr/X11R6/include -L/usr/X11R6/lib )
 AC_CHECK_LIB(bz2, BZ2_bzBuffToBuffCompress, , AC_MSG_ERROR(streaming requires bz2 library!!))

@@ -9,7 +9,7 @@
 #X obj 369 20 openpanel;
 #X obj 354 3 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X floatatom 316 99 5 0 0;
+#X floatatom 316 99 5 0 0 0 - - -;
 #X msg 225 65 stop;
 #X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
@@ -22,16 +22,16 @@
 #X msg 442 170 open /dev/video;
 #X obj 212 314 pdp_quark;
 #X obj 252 167 pdp_yqt;
-#X obj 283 243 dac~;
+#X obj 283 215 dac~;
 #X obj 414 352 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 414 404 pdp_control;
 #X msg 414 377 thread \$1;
-#X floatatom 414 465 5 0 0;
+#X floatatom 414 465 5 0 0 0 - - -;
 #X obj 414 436 route pdp_drop;
-#X floatatom 290 282 5 0 0;
+#X floatatom 290 282 5 0 0 0 - - -;
 #X text 336 281 Number of frames;
-#X floatatom 302 302 5 0 0;
+#X floatatom 302 302 5 0 0 0 - - -;
 #X text 348 302 Tolerance;
 #X connect 1 0 10 0;
 #X connect 2 0 17 0;
@@ -50,8 +50,8 @@
 #X connect 15 0 11 0;
 #X connect 16 0 0 0;
 #X connect 17 0 16 0;
-#X connect 17 3 18 0;
-#X connect 17 4 18 1;
+#X connect 17 4 18 0;
+#X connect 17 5 18 1;
 #X connect 19 0 21 0;
 #X connect 20 0 23 0;
 #X connect 21 0 20 0;

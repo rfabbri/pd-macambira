@@ -26,6 +26,7 @@
 
 #include "pdp.h"
 #include "pdp_xwindow.h"
+#include <X11/extensions/XShm.h>
 #include <math.h>
 
 static char   *pdp_xcanvas_version = "pdp_xcanvas: version 0.1, display for several video sources, written by Yves Degoyon (ydegoyon@free.fr)";

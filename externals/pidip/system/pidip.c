@@ -44,7 +44,7 @@ extern "C"
     void pdp_form_setup(void);
     void pdp_compose_setup(void);
     void pdp_cmap_setup(void);
-    void pdp_aa_setup(void);
+    // void pdp_aa_setup(void);
     void pdp_ascii_setup(void);
     void pdp_ffmpeg_tilde_setup(void);
     void pdp_live_tilde_setup(void);
@@ -60,6 +60,7 @@ extern "C"
     void pdp_cache_setup(void);
     void pdp_canvas_setup(void);
     // void pdp_xcanvas_setup(void);
+    void pdp_ocanvas_setup(void);
     void pdp_pen_setup(void);
     void pdp_shape_setup(void);
 
@@ -105,7 +106,7 @@ void pidip_setup(void){
     pdp_form_setup();
     pdp_compose_setup();
     pdp_cmap_setup();
-    pdp_aa_setup();
+    // pdp_aa_setup();
     pdp_ascii_setup();
     pdp_ffmpeg_tilde_setup();
     pdp_live_tilde_setup();
@@ -121,6 +122,7 @@ void pidip_setup(void){
     pdp_cache_setup();
     pdp_canvas_setup();
     // pdp_xcanvas_setup();
+    pdp_ocanvas_setup();
     pdp_pen_setup();
     pdp_shape_setup();
 

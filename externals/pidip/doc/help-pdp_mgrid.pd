@@ -13,7 +13,7 @@
 #X msg 225 65 stop;
 #X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 283 243 dac~;
+#X obj 278 218 dac~;
 #X obj 257 135 metro 70;
 #X obj 215 350 pdp_mgrid;
 #X obj 252 167 pdp_yqt;
@@ -60,8 +60,8 @@
 #X connect 12 1 24 0;
 #X connect 12 2 25 0;
 #X connect 13 0 12 0;
-#X connect 13 3 10 0;
-#X connect 13 4 10 1;
+#X connect 13 4 10 0;
+#X connect 13 5 10 1;
 #X connect 14 0 12 0;
 #X connect 15 0 14 0;
 #X connect 16 0 15 0;

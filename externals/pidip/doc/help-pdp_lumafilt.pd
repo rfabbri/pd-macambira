@@ -13,7 +13,7 @@
 #X msg 225 65 stop;
 #X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 283 243 dac~;
+#X obj 279 199 dac~;
 #X obj 257 135 metro 70;
 #X obj 252 167 pdp_yqt;
 #X obj 421 166 pdp_v4l;
@@ -31,8 +31,8 @@
 #X text 56 407 pdp_lumafilt : luminosity filter;
 #X text 57 420 useful to isolate some objects;
 #X text 56 433 written by Yves Degoyon ( ydegoyon@free.fr );
-#X text 407 271 Filter this level of luminosity;
-#X floatatom 362 272 5 0 0 0 - - -;
+#X text 410 271 Filter this level of luminosity;
+#X floatatom 370 271 5 0 0 0 - - -;
 #X msg 283 296 filter \$1 0;
 #X floatatom 368 297 5 0 0 0 - - -;
 #X msg 284 270 filter \$1 1;
@@ -55,8 +55,8 @@
 #X connect 9 0 7 0;
 #X connect 11 0 12 0;
 #X connect 12 0 35 0;
-#X connect 12 3 10 0;
-#X connect 12 4 10 1;
+#X connect 12 4 10 0;
+#X connect 12 5 10 1;
 #X connect 13 0 35 0;
 #X connect 14 0 13 0;
 #X connect 15 0 14 0;

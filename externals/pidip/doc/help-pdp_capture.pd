@@ -25,7 +25,7 @@
 #X text 290 155 Upper left X position ( default : 0 );
 #X text 332 226 Height ( default : 240 );
 #X floatatom 174 109 5 0 0 0 - - -;
-#X msg 218 101 display 192.168.0.7:0;
+#X msg 218 101 display 158.37.56.31:0;
 #X connect 1 0 3 0;
 #X connect 2 0 5 0;
 #X connect 3 0 2 0;

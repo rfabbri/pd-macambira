@@ -1,3 +1,11 @@
+0.12.12
+  added offsets messages in pdp_pen
+0.12.11
+  added pdp_charcoal to the effect rack : charcoal effect using edge detection, blur, normalization and negate
+  ( it's an abstraction using basic pdp_objects )
+  fixed compilation problem with latest ffmpeg ( AVFMT_NOHEADER --> AVFMTCTX_NOHEADER )
+  commented pdp_aa : it introduces useless dependencies ( aalib ) and is not very good
+  added pdp_ocanvas : canvas with some overlay
 0.12.10
   fixed crashes and 'resize' bug in pdp_text
   added pdp_xcanvas : pdp_canvas + pdp_xv in one ( for performances reasons )

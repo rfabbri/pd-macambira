@@ -152,10 +152,10 @@ void yuv_Y122RGB( short int* packet, unsigned int *rgb, int width, int height )
         // post( "yuv_Y122RGB : X=%d Y=%d", X, Y );
         if ( (Y*width+X) < maxoffset ) 
             y=(packet[Y*width+X]>>7);
-        if( (uoffset+((Y>>1)*width+(X>>1))) < maxoffset )
-            u=(packet[uoffset+((Y>>1)*width+(X>>1))]>>8)+128;
-        if( (voffset+((Y>>1)*width+(X>>1))) < maxoffset )
-            v=(packet[voffset+((Y>>1)*width+(X>>1))]>>8)+128;
+        if( (uoffset+((Y>>1)*(width>>1)+(X>>1))) < maxoffset )
+            u=(packet[uoffset+((Y>>1)*(width>>1)+(X>>1))]>>8)+128;
+        if( (voffset+((Y>>1)*(width>>1)+(X>>1))) < maxoffset )
+            v=(packet[voffset+((Y>>1)*(width>>1)+(X>>1))]>>8)+128;
 
         rgb[Y*width+X] = yuv_YUVtoRGB( y, u, v );
      }

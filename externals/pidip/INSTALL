@@ -1,7 +1,6 @@
 first, install  :
 
 imlib2 ( http://sourceforge.net/project/showfiles.php?group_id=2 )
-aalib (http://aa-project.sourceforge.net/aalib/)
 Image Magick ( http://www.imagemagick.org ) 
  ---->  watchout !! configure with --enable-shared 
 and ffmpeg 
