@@ -102,7 +102,7 @@ int32 timeseed()
 	double usec = (time-sec)*1e6;
 	
 	time_t tsec = sec;
-	suseconds_t tusec =usec;       /* not exacty the way, it's calculated
+	useconds_t tusec =usec;       /* not exacty the way, it's calculated
 					  in SuperCollider, but it's only 
 					  the seed */
 	

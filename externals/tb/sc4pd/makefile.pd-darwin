@@ -15,7 +15,7 @@ include ${CONFIG}
 FLEXTLIB=$(FLEXTPATH)/libflext.a
 
 # compiler stuff
-INCLUDES=$(PDINC) ./headers/plugin_interface ./headers/common ./headers/server ./headers/app ./headers/lang
+INCLUDES=$(PDINC) ./headers/plugin_interface ./headers/common ./headers/server ./headers/app ./headers/lang /usr/include/machine/
 FLAGS=-DFLEXT_SYS=2
 CFLAGS=${UFLAGS} -dynamic -O2 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -funroll-loops -fmove-all-movables -frerun-loop-opt -fno-rtti -fno-exceptions  
 LIBS=m gcc
@@ -26,7 +26,7 @@ FRAMEWORKS=Carbon veclib
 # the rest can stay untouched
 # ----------------------------------------------
 
-NAME=sc4dp
+NAME=sc4pd
 
 include make-files.txt
 
