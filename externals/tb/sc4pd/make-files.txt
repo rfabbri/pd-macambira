@@ -6,4 +6,4 @@ SRCS= \
 	PinkNoise.cpp Dust2.cpp Crackle.cpp Rand.cpp TRand.cpp TExpRand.cpp \
 	IRand.cpp TIRand.cpp CoinGate.cpp support.cpp LinRand.cpp NRand.cpp\
 	ExpRand.cpp LFClipNoise.cpp LFNoise0.cpp LFNoise1.cpp LFNoise2.cpp \
-	Logistic.cpp Latoocarfian.cpp
+	Logistic.cpp Latoocarfian.cpp LinCong.cpp

@@ -58,7 +58,7 @@ void sc4pd_library_setup()
 	 "TExpRand(~), IRand(~), TIRand(~),\n          CoinGate, "
 	 "LinRand(~), NRand(~), ExpRand(~), LFClipNoise(~),\n"
 	 "          LFNoise0(~), LFNoise1(~), LFNoise2(~), Logistic(~), "
-	 "Latoocarfian(~)\n");
+	 "Latoocarfian(~), LinCong(~)\n");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -137,6 +137,9 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(Latoocarfian_ar);
     FLEXT_SETUP(Latoocarfian_kr);
+
+    FLEXT_DSP_SETUP(LinCong_ar);
+    FLEXT_SETUP(LinCong_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

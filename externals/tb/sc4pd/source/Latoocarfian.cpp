@@ -91,7 +91,7 @@ private:
 FLEXT_LIB_DSP_V("Latoocarfian~",Latoocarfian_ar);
 
 Latoocarfian_ar::Latoocarfian_ar(int argc, t_atom *argv)
-    :m_x(0.4),m_y(1)
+    :m_x(4),m_y(1)
 {
     FLEXT_ADDMETHOD_(0,"a",m_set_a);
     FLEXT_ADDMETHOD_(0,"b",m_set_b);
@@ -100,12 +100,10 @@ Latoocarfian_ar::Latoocarfian_ar(int argc, t_atom *argv)
 
     //parse arguments
     AtomList Args(argc,argv);
-
     if (Args.Count()!=4)
     {
 	post("4 arguments needed");
     }
-
     m_a = sc_getfloatarg(Args,0);
     m_b = sc_getfloatarg(Args,1);
     m_c = sc_getfloatarg(Args,2);
