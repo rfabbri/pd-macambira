@@ -16,14 +16,14 @@ PDINC=/home/tim/pd/pd-0.37-1test3/src
 # where do the flext libraries reside?
 FLEXTPATH=/usr/lib/flext
 
-# where should xsample objects be built?
+# where should tbext objects be built?
 TARGDIR=./pd-linux
 
-# where should xsample be installed?
+# where should tbext be installed?
 # (leave blank to omit installation)
 INSTDIR=${PD}/externs
 
-# where should the xsample help be installed?
+# where should the tbext help be installed?
 # (leave blank to omit installation)
 HELPDIR=${PD}/doc/5.reference
 
