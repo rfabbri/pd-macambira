@@ -1,53 +1,74 @@
-# change this!!!
-# CXX=g++ # -3.2
-CFLAGS=-O6 -mcpu=pentium -g
-FLAGS=-DPD
+# flext tutorial examples
+# Copyright (c) 2001-2003 Thomas Grill (xovo@gmx.net)
+#
+# Makefile for gcc @ linux
+#
+# usage: make -f makefile.pd-linux
+#
+# -----------------------------------------------------
 
-FLEXTPATH=../../grill/flext/source
-SNDOBJINC=/usr/local/include
+include config-pd-linux.txt
+
+FLEXTLIB=$(FLEXTPATH)/flext_t.a  # take threaded library for all
 
 
-INCLUDES=/usr/lib/pd/include $(SNDOBJINC) $(FLEXTPATH)
-FLEXTLIB=$(FLEXTPATH)/../pd-linux/flext.a
+# compiler+linker stuff	### EDIT! ###
+INCLUDES=$(PDPATH)/src $(SNDOBJ)
+LIBPATH=
+FLAGS=-DFLEXT_SYS=2 -DFLEXT_THREADS -DFLEXT_ATTRIBUTES
+CFLAGS=-O6 -fno-rtti 
+CFLAGS+=-mcpu=pentiumpro  # gcc 2.95
+# CFLAGS+=-mcpu=pentium3 -msse  # gcc 3.2
+LIBS=m
+LIBS+=sndobj
 
-LIBS=m sndobj
 
-PDEXTRA=/usr/lib/pd/extra
+# the rest can stay untouched
+# ----------------------------------------------
 
-TARGDIR=./
-TARGET=$(TARGDIR)/syncgrain~.pd_linux
+# all the source files from the package
 
-# source code:
-#SRCS=so_oscil.cpp MyPan.cpp Osc.cpp
-#SRCS=so_oscil.cpp Osc.cpp Ident.cpp
-#SRCS=so_oscil.cpp
-SRCS=syncgrain.cpp
+EXAMPLES=syncgrain~
+SRCS=buftable.cpp BufSyncGrain.cpp main.cpp
 
-all: $(TARGDIR) $(TARGET)
+#O_FILES = $(patsubst %,$(OUTPATH)/%.o,$(EXAMPLES)/$(SRCS))
 
-$(TARGDIR):
-	mkdir $(TARGDIR)
+TARGETS=$(patsubst %,$(OUTPATH)/%.pd_linux,$(EXAMPLES))
 
-$(TARGDIR)/%.o : %.cpp
-	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
+# default target
+all: $(OUTPATH) $(TARGETS)
 
-$(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) -shared $^ $(patsubst %,-l%,$(LIBS)) -o $@ 
-	strip $@
+
+$(OUTPATH)/%~.pd_linux : $(OUTPATH)/%.pd_linux
+	mv $^ $@
+
+$(SRCS): $(HDRS)
+	touch $@
+
+$(OUTPATH):
+	mkdir $(OUTPATH)
+
+$(OUTPATH)/%.o : $(EXAMPLES)/%.cpp
+	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
+
+$(OUTPATH)/%.pd_linux :  $(OUTPATH)/buftable.o $(OUTPATH)/BufSyncGrain.o $(OUTPATH)/main.o $(FLEXTLIB)
+	$(CXX) $(LDFLAGS) -shared $(patsubst %,-L%,$(LIBPATH)) $^ $(patsubst %,-l%,$(LIBS)) -o $@
 	chmod 755 $@
 
-install: $(TARGET)
-	chown root.root $^ 
-	cp $^ $(PDEXTRA)
 
 .PHONY: clean
 clean:
-	rm -f $(TARGDIR)*.o $(TARGET)
+	rm -f $(OUTPATH)/*.o $(TARGETS)
 	
 
+ifdef INSTPATH
+$(INSTPATH):
+	-mkdir $(INSTPATH)
 
+install:: $(INSTPATH)
+endif
 
-
-
-
-
+install:: $(patsubst %,$(OUTPATH)/%.pd_linux,$(EXAMPLES))
+	cp $^ $(INSTPATH)
+	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
+	chown root.users $(patsubst %,$(INSTPATH)/%,$(notdir $^))
