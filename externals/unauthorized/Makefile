@@ -30,7 +30,7 @@ WININCLUDE =  -I../../src -I../../pd/src
 
 .c.dll:
 	$(CC) $(WINCFLAGS) $(WININCLUDE) -o $*.o -c $*.c
-	gcc -shared -o $*.dll $*.o ../../bin/pd.dll -lpthreadGC
+	gcc -shared -o $*.dll $*.o ../../bin/pd.dll -lwsock32 -lmp3lame -lpthread
 	-rm $*.o
 
 # ----------------------- IRIX 5.x -----------------------
