@@ -1,0 +1,39 @@
+#N canvas 161 237 742 413 10;
+#X msg 68 150 bang;
+#X msg 44 213 stop;
+#X floatatom 301 269 5 0 0 0 - - -;
+#X floatatom 187 214 5 0 0 0 - - -;
+#X text 185 196 direction in degrees;
+#X floatatom 244 249 5 0 0 0 - - -;
+#X text 340 264 level \, range = [-1 \, 1];
+#X text 7 130 start the effect;
+#X text 12 146 with a;
+#X msg 131 77 delay 250;
+#X msg 131 48 interval 500;
+#X text 229 79 delay before starting;
+#X text 229 50 minimum time between triggers;
+#X obj 131 290 ff-constant 0 45 1000 0.5;
+#X text 107 314 arguments are inputdevice-number \, direction \, duration
+and level;
+#X msg 131 151 load;
+#X msg 131 175 unload;
+#X text 191 150 a load message \, uploads an effect to the stick;
+#X text 190 175 an unload message \, removes it;
+#X text 303 110 startlevel attack-duration (ms) endlevel decay-duration
+;
+#X msg 131 112 envelope 0 500 0.5 100;
+#X text 300 125 levels are in the range [0 \, 1].;
+#X text 109 352 the outlet gives the effect number on the device or
+-1 if it is not loaded.;
+#X text 241 221 duration in ms \, 0 is infinite \, this includes the
+attack/decay times;
+#X connect 0 0 13 0;
+#X connect 1 0 13 0;
+#X connect 2 0 13 3;
+#X connect 3 0 13 1;
+#X connect 5 0 13 2;
+#X connect 9 0 13 0;
+#X connect 10 0 13 0;
+#X connect 15 0 13 0;
+#X connect 16 0 13 0;
+#X connect 20 0 13 0;
