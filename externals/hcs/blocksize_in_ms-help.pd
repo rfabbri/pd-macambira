@@ -1,0 +1,16 @@
+#N canvas 256 153 461 330 10;
+#X obj 5 2 cnv 15 450 20 empty empty [blocksize_in_ms] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 284 released under the GNU GPL;
+#X obj 152 157 blocksize_in_ms;
+#X msg 152 115 bang;
+#X text 197 117 bang to recalculate;
+#X floatatom 152 210 7 0 0 1 ms - -;
+#X text 18 36 Output the current blocksize in ms rather than samples.
+This is currently set at a fixed blocksize of 64 \, but it will change
+dynamically in the future.;
+#X connect 4 0 7 0;
+#X connect 5 0 4 0;
