@@ -484,7 +484,7 @@ static C *ReadAtom(C *c,A *a)
 
     float fres;
     // first try float
-    if(sscanf(m,"%f",&fres)) {
+    if(sscanf(m,"%f",&fres) == 1) {
         if(a) {
             int ires = (int)fres; // try a cast
             if(fres == ires)

@@ -1,6 +1,11 @@
 NAME=pool
 
+BUILDCLASS=ext
+BUILDMODE=release
+BUILDTYPE=single
+
 SRCDIR=source
+PRECOMPILE=pool.h
 
 SRCS= main.cpp data.cpp pool.cpp
 HDRS= pool.h
