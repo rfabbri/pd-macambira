@@ -1,6 +1,10 @@
 NAME=vasp
 
-THREADED=1
+BUILDCLASS=ext
+BUILDMODE=release
+BUILDTYPE=multi
+
+PRECOMPILE=main.h
 
 SRCDIR=source
 
