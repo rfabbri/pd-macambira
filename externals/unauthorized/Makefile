@@ -1,3 +1,9 @@
+#
+# Currently you have to "make prep" before doing any other makes.
+# This is ugly and a bad hack and will change.  -Hans <hans@eds.org
+#
+# (I think I need to emulate ../build/darwin/makefile )
+
 EXT=pd_darwin
 
 INSTALL_PREFIX=/usr/local
