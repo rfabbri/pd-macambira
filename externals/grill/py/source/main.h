@@ -13,6 +13,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "pyprefix.h"
 #include "pysymbol.h"
+#include "pybuffer.h"
 #include <flcontainers.h>
 
 #if FLEXT_OS == FLEXT_LINUX || FLEXT_OS == FLEXT_IRIX
@@ -105,6 +106,12 @@ protected:
 #if FLEXT_SYS == FLEXT_SYS_PD
 	static PyObject *py_getvalue(PyObject *,PyObject *args);
 	static PyObject *py_setvalue(PyObject *,PyObject *args);
+#endif
+
+#ifdef PY_NUMARRAY
+    static void setupNumarray();
+	static PyObject *py_import(PyObject *,PyObject *args);
+	static PyObject *py_export(PyObject *,PyObject *args);
 #endif
 
 	// ----thread stuff ------------

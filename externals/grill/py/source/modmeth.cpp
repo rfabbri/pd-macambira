@@ -26,7 +26,6 @@ PyMethodDef py::func_tbl[] =
 	{ "_getvalue", py::py_getvalue, METH_VARARGS,"Get value of a 'value' object" },
 	{ "_setvalue", py::py_setvalue, METH_VARARGS,"Set value of a 'value' object" },
 #endif
-
 	{NULL, NULL, 0, NULL} // sentinel
 };
 
@@ -221,5 +220,3 @@ PyObject *py::py_setvalue(PyObject *self,PyObject *args)
     return Py_None;
 }
 #endif
-
-
