@@ -10,16 +10,17 @@ all: link.stamp $(EXTERNALS:.c=.pd_darwin)
 #PDEXECUTABLE = /usr/local/bin/pd
 PDEXECUTABLE = ../../../pd/bin/pd
 
-# Pentium III or better
-#CPU_FLAGS = -march=pentium3
-# PowerPC G3
-#CPU_FLAGS = -mpowerpc-gpopt
-# PowerPC G4 (gcc-3.3)
-#CPU_FLAGS = -fast -mcpu=G4
+## These generally need gcc-3.3
+# Generic PowerPC
+OPTIM_FLAGS = -mpowerpc-gpopt
+# PowerPC 750 (G3)
+#OPTIM_FLAGS = -mpowerpc-gpopt -mcpu=750
+# PowerPC 7400 (G4 <= 700Mhz)
+#OPTIM_FLAGS = -fast -fPIC -mcpu=7400 -faltivec
+# PowerPC 7450 (G4 >= 533MHz)
+#OPTIM_FLAGS = -fast -fPIC -mcpu=7450 -faltivec
 # PowerPC G5 (gcc-3.3)
-#CPU_FLAGS = -fast
-
-OPTIM_FLAGS = -O3 -funroll-loops -fomit-frame-pointer $(CPU_FLAGS)
+#OPTIM_FLAGS = -fast -fPIC -faltivec
 
 CFLAGS = -DPD -DUNIX -DMACOSX -Dunix $(OPTIM_FLAGS) \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
