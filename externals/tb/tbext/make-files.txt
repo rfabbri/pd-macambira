@@ -1,7 +1,7 @@
 # all the source files from the package
 SRCDIR = source
 SRCS= \
-        main.cpp tbroute.cpp tbsig~.cpp tbsroute~.cpp tbpow~.cpp tbfft1.cpp  # tbg7xx.cpp  tbstrg.cpp
+        main.cpp tbroute.cpp tbsig~.cpp tbsroute~.cpp tbpow~.cpp tbfft1.cpp tbfft2.cpp #fftbuf.cpp # tbg7xx.cpp  tbstrg.cpp
 	
               
 #HDRS= \
