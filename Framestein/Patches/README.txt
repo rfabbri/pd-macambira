@@ -1,1 +1,1 @@
-See externals-documentation.pd in this folder.
+Go thru the examples found in this folder.

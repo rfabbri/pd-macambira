@@ -1,6 +1,6 @@
-#N canvas 438 30 545 591 12;
+#N canvas 438 30 547 593 12;
 #X text 21 21 Externals for video:;
-#N canvas 148 3 734 663 vframe 0;
+#N canvas 148 3 736 665 vframe 0;
 #X obj 34 275 fs.frame;
 #X obj 55 377 vimport;
 #X obj 221 427 fs.frame;
@@ -14,20 +14,20 @@ a bang.;
 ;
 #X obj 150 331 vframe 640 480;
 #X msg 34 245 320x240 \, noize \, colortv;
-#X text 17 14 vframe holds memory for a single image and is the basis
-of Pure Data-externals-based image handling in Framestein.;
 #X text 26 553 Here \, vframe is bigger (640x480) than the two fs.frames
 (320x240). This is okay - as long as the fs.frames you import from
 and to are of the same size \, the image will be right. If you import
 to fs.frame of a different size than the fs.frame you imported from
 -> garbage.;
-#X text 17 109 vframe has no image loading and display functionality.
-Images can be imported to and from fs.frame:;
 #X msg 349 423 dock vframe \, 330+260;
-#X text 16 59 Initialization arguments determine the width and height
-of the image \, as in below. Defaults are 176 and 144;
 #X obj 34 220 init;
 #X obj 244 373 init;
+#X text 17 14 vframe works much like fs.frame \, except the image is
+in Pure Data's memory space. This allows converting images to signals
+\, for example.;
+#X text 16 74 args: width and height.;
+#X text 18 103 vframe has no image loading or display functionality.
+Images can be imported to and from fs.frame:;
 #X connect 0 0 1 0;
 #X connect 3 0 2 0;
 #X connect 4 0 9 0;
@@ -36,9 +36,9 @@ of the image \, as in below. Defaults are 176 and 144;
 #X connect 9 0 1 1;
 #X connect 9 0 2 0;
 #X connect 10 0 0 0;
-#X connect 14 0 2 0;
-#X connect 16 0 10 0;
-#X connect 17 0 3 0;
+#X connect 12 0 2 0;
+#X connect 13 0 10 0;
+#X connect 14 0 3 0;
 #X restore 64 216 pd vframe;
 #X obj 67 122 fs.main;
 #X msg 67 86 6001;

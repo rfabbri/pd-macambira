@@ -1,0 +1,96 @@
+#N canvas 230 1 792 686 10;
+#X obj 11 41 fs.main;
+#X msg 11 11 6001;
+#X msg 62 12 reset;
+#X obj 70 284 fs.frame;
+#X obj 70 566 fs.frame;
+#X obj 70 476 fs.copy;
+#X text 168 301 plugins can also be copy operations;
+#X text 69 590 note: 16 bit display is way faster than 24 or 32 in
+my machine \, so i recommend trying out which one performs best.;
+#X msg 70 61 virvezoom.jpg;
+#X obj 70 38 init;
+#X obj 199 520 init;
+#X msg 199 542 291 x 325 \, 0 + 370;
+#X msg 167 349 eclipse02 200 100 50 8 8;
+#X msg 178 148 traffic 1 0.8 0.9 0.75 0.51 0.2 0.12 0.1 0.7;
+#X msg 179 174 modgain 12 230 50;
+#X obj 608 108 r rgbseek_check;
+#X floatatom 608 129 5 0 0;
+#X text 197 15 PeRColate PLUGINS -- effects and copy operations;
+#X msg 178 231 eclipse 200 100 50 8 8;
+#X msg 179 61 cga 45 39 168;
+#X msg 179 198 rgbavg 12 230 50 1;
+#X msg 179 109 rgbseek 100 200 100 50 50 50 rgbseek_check;
+#X msg 90 528 virvezoom.jpg;
+#X msg 179 84 constrain 160 20 35 255 214 123;
+#X text 649 128 result of rgbseek;
+#X text 375 83 restrict image color to lie between boundaries;
+#X text 298 197 averaging of rgb values (rgbavg <r> <g> <b> <mode>)
+;
+#X text 299 210 mode :: 1 .. 12 (0 = bypass);
+#X text 319 231 produce colored 'patchwork carpet' \; -);
+#X text 319 246 (eclipse <r> <g> <b> <rows> <columns>);
+#X text 293 174 'modulo gain' :: add values to color and calc. mod
+255;
+#X text 438 107 seek for existance of color;
+#X text 197 125 (rgbseek <r> <g> <b> <rf> <gf> <bf> <rceivename>);
+#X text 449 148 tristimulus matrix operation;
+#X text 450 161 parameters: 9 matrix values (floats);
+#X msg 132 477 bang;
+#X msg 25 227 bang;
+#X msg 168 432 cutout 16 32 64 128 0;
+#X text 304 431 rectangular cutout (cutout <x> <y> <width> <hight>
+<flip>);
+#X text 164 475 bang fs.frame to get it processed..;
+#X text 375 263 (eclipse03 <r> <g> <b> <row> <column> <tint> <invert>
+<threshold>);
+#X msg 180 263 eclipse03 200 100 50 8 8 0 1 23;
+#X msg 168 402 rene 20 153 74 5 0 5 180 25 125;
+#X text 366 394 chroma keying with transparency;
+#X text 347 323 chroma keying (keyscreen <r> <g> <b> <red fuzz> <green
+fuzz> <blue fuzz>);
+#X text 364 408 (rene <r> <g> <b> <red fuzz> <green fuzz> <blue fuzz>
+<red floor> <green floor> <blue floor>);
+#X msg 168 323 keyscreen 20 153 74 50 50 80;
+#X msg 168 374 fromage 8 8 8 8 0;
+#X text 280 374 create 'prison bars';
+#X text 325 453 averaging of rgb values (rgbavg <r> <g> <b> <mode>)
+;
+#X text 326 466 mode :: 1 .. 12 (0 = bypass);
+#X text 64 644 get PeRColate at http://www.akustische-kunst.de/puredata/PeRColate
+;
+#X msg 206 454 rgbavg 12 230 50 9;
+#X connect 1 0 0 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 0 5 0;
+#X connect 5 0 4 0;
+#X connect 8 0 3 0;
+#X connect 9 0 8 0;
+#X connect 10 0 11 0;
+#X connect 11 0 4 0;
+#X connect 12 0 5 1;
+#X connect 12 0 35 0;
+#X connect 13 0 3 0;
+#X connect 14 0 3 0;
+#X connect 15 0 16 0;
+#X connect 18 0 3 0;
+#X connect 19 0 3 0;
+#X connect 20 0 3 0;
+#X connect 21 0 3 0;
+#X connect 22 0 4 0;
+#X connect 23 0 3 0;
+#X connect 35 0 3 0;
+#X connect 36 0 3 0;
+#X connect 37 0 5 1;
+#X connect 37 0 35 0;
+#X connect 41 0 3 0;
+#X connect 42 0 5 1;
+#X connect 42 0 35 0;
+#X connect 46 0 5 1;
+#X connect 46 0 35 0;
+#X connect 47 0 5 1;
+#X connect 47 0 35 0;
+#X connect 52 0 35 0;
+#X connect 52 0 5 1;
