@@ -22,7 +22,7 @@ CXXFLAGS = $(CFLAGS)
 
 #LIBS = -lc -lm 
 LIBS = -lpthread -lm -lc 
-SOURCES = ftos.c kalashnikov.c openpatch.c sfread.c streamin13~.c strippath.c send13~.c receive13~.c catch13~.c throw13~.c filesize.c messages.c pipewrite~.c piperead~.c streamout13~.c wavinfo.c mandelbrot.c mandelbrot~.c scramble~.c promiscous~.c ossmixer.c send13.c receive13.c cdplayer.c
+SOURCES = ftos.c kalashnikov.c openpatch.c sfread.c streamin13~.c strippath.c send13~.c receive13~.c catch13~.c throw13~.c filesize.c messages.c pipewrite~.c piperead~.c streamout13~.c wavinfo.c mandelbrot.c mandelbrot~.c scramble~.c promiscous~.c ossmixer.c send13.c receive13.c cdplayer.c sfwrite13~.c
 TARGETS = $(SOURCES:.c=.$(EXT)) 
 
 all: $(TARGETS) 

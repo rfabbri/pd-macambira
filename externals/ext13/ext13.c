@@ -36,6 +36,7 @@ void ossmixer_setup();
 void send13_setup();
 void receive13_setup();
 void cdplayer_setup();
+void sfwrite13_setup();
 
 static void* ext13_new(t_symbol* s) {
     t_ext13 *x = (t_ext13 *)pd_new(ext13_class);
@@ -68,6 +69,7 @@ void ext13_setup(void)
      send13_setup();
      receive13_setup();
      cdplayer_setup();
+     sfwrite13_setup();
 
      post("EXT13 by dieb13@klingt.org");
      post("EXT13: version: "VERSION);
