@@ -1,5 +1,12 @@
 # build class specific settings
 
+ifdef SHARED
+SONAME=$(OUTNAME).$(EXT)
+TARGET=$(TARGETPATH)/$(OUTNAME).$(PKGVERSION).$(EXT)
+else
+TARGET=$(TARGETPATH)/$(OUTNAME).$(EXT)
+endif
+
 ##############################################
 
 # default target
@@ -21,7 +28,7 @@ $(TARGET) :: $(TARGETPATH)
 
 $(TARGET) :: $(COBJS) $(CPPOBJS)
 ifdef SHARED
-	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ $(COBJS) $(CPPOBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ -Wl,-soname,$(SONAME) $(COBJS) $(CPPOBJS) $(LIBS)
 	chmod 755 $@
 ifndef DEBUG
 ifndef PROFILE
@@ -53,4 +60,7 @@ $(FLEXTLIBINST):
 
 _install_: $(FLEXTINC) $(FLEXTLIBINST)
 	install $(TARGET) $(FLEXTLIBINST)
+ifdef SHARED
+	ldconfig -l $(TARGET)
+endif
 	install $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTINC)

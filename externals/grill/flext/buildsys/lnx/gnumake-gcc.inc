@@ -2,11 +2,10 @@
 
 OBJPATH=$(OUTPATH)/$(OUTSUB)
 TARGETPATH=$(OBJPATH)
-TARGET=$(TARGETPATH)/$(OUTNAME).$(EXT)
 
 ##############################################
 
-CFLAGS += -pthread
+CFLAGS += -pthread -fPIC
 LDFLAGS += -pthread -shared -Wl,-x 
 
 ##############################################
