@@ -1,5 +1,5 @@
 #N canvas 159 71 136 70 10;
-#N canvas 0 0 1009 776 guts 0;
+#N canvas 108 9 1009 776 guts 0;
 #X msg 136 235 chdir;
 #N canvas 0 0 710 488 listdirs 0;
 #X obj 35 14 inlet;
@@ -142,6 +142,9 @@
 #X msg 567 696 rewind;
 #X text 122 365 list topdirs;
 #X text 538 208 list subdirs (presets!);
+#X obj 430 623 r \$0-loadfile;
+#X obj 323 616 inlet;
+#X obj 323 642 s \$0-loadfile;
 #X connect 0 0 40 0;
 #X connect 1 0 14 0;
 #X connect 1 2 40 0;
@@ -212,6 +215,8 @@
 #X connect 53 1 54 0;
 #X connect 53 2 34 0;
 #X connect 54 0 34 0;
+#X connect 57 0 52 0;
+#X connect 58 0 59 0;
 #X restore 23 4 pd guts;
 #X obj 13 28 bng 24 250 50 0 \$0-create \$0-create create 0 -6 0 8
 -24198 -1 -1;
@@ -220,5 +225,7 @@
 #X obj 98 29 bng 24 250 50 0 \$0-load \$0-load load 0 -6 0 8 -258699
 -1 -1;
 #X obj 49 49 outlet;
+#X obj 92 5 inlet;
 #X connect 0 0 4 0;
+#X connect 5 0 0 0;
 #X coords 0 0 1 1 120 60 1;
