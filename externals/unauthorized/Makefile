@@ -131,7 +131,7 @@ darwin_pkg: pd_darwin darwin_pkg_clean darwin_pkg_license
 	install -m644 --group=staff */*.pls installroot/pd/doc/5.reference
 	cp -Rf blinkenlights/blm  installroot/pd/doc/5.reference
 	test -d installroot/pd/extra || mkdir -p installroot/pd/extra
-	install -m644 */*.pd_darwin --group=staff installroot/pd/extra
+	install -m644  --group=staff */*.pd_darwin installroot/pd/extra
 	cp -f pd-unauthorized.info $(PACKAGE_NAME).info
 # delete cruft
 	-find installroot -name .DS_Store -delete
