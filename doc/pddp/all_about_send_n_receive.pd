@@ -1,15 +1,15 @@
-#N canvas 144 2 596 637 12;
-#X text 24 16 GETTING YOUR MESSAGE ACROSS;
-#X text 36 45 The [send] and [receive] objects are useful for linking
+#N canvas 281 92 859 544 10;
+#X text 9 28 GETTING YOUR MESSAGE ACROSS;
+#X text 10 43 The [send] and [receive] objects are useful for linking
 objects and subroutines together in a single canvas or throughout multiple
 patches. Understanding these objects will help 'clean up' your patches
 and allow you to communicate messages between various modules that
 you build or between objects where patch cords are not possible.;
-#X text 36 147 In the [send] and [receive] help files \, you will see
+#X text 10 175 In the [send] and [receive] help files \, you will see
 message sent within a single patch - from a [send] object to a [receive]
 object in the same patch. But the functionality of these objects goes
 far beyond the scope of a single patch.;
-#X text 36 232 A [send] object is a little like a radio station...it
+#X text 10 385 A [send] object is a little like a radio station...it
 broadcasts information throughout PD \, for all the [receives] to hear!
 A [receive] object is a little like your own AM/FM tuner...it will
 receive messages from all the [send] objects that it is 'tuned' to.
@@ -18,19 +18,19 @@ A [receive] object named "dave" (as in [receive dave]) will pick up
 all messages from [send dave] \, regardless of which patch it is in.
 In this manner \, you can get messages across multiple patches \, or
 into abstractions or subpatches -- without patch cords.;
-#X text 35 415 However \, controlling the 'scope' of a [send] or [receive]
+#X text 439 42 However \, controlling the 'scope' of a [send] or [receive]
 object is important if you want to ensure that a message is only transmitted
 within a single patch \, or within a single abstraction. Check out
 the following information about 'scope' and 'locality'.;
-#X obj 36 516 all_about_scope_and_locality and inheritance;
-#X text 35 549 hmm...also see;
+#X obj 466 121 all_about_scope_and_locality and inheritance;
+#X text 530 471 hmm...also see;
 #N canvas 0 123 827 456 special-send-and-receives 0;
 #X text 19 10 SPECIAL OBJECTS;
 #X obj 28 41 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 28 66 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
 ;
-#X obj 28 91 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0 10
+#X obj 28 91 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
 -262144 -1 -1 0 256;
 #X obj 28 117 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
 -1 -1 0 1;
@@ -69,14 +69,61 @@ them with a patch cord.;
 ;
 #X text 405 259 As you see here \, these number boxes are linked together
 with send and receives objects.;
-#X obj 301 337 nbx 5 14 -1e+037 1e+037 0 0 b empty empty 0 -6 128 10
--262144 -1 -1 0 256;
-#X obj 363 337 nbx 5 14 -1e+037 1e+037 0 0 empty b empty 0 -6 64 10
--262144 -1 -1 0 256;
+#X obj 301 337 nbx 5 14 -1e+37 1e+37 0 0 b empty empty 0 -6 0 10 -262144
+-1 -1 -14 256;
+#X obj 363 337 nbx 5 14 -1e+37 1e+37 0 0 empty b empty 0 -6 0 10 -262144
+-1 -1 -14 256;
 #X text 310 360 These number boxes are linked together via their 'send'
 or 'receive' property.;
 #X text 298 8 Some objects in PD contain their own internal send and
 receive functionality.;
 #X connect 23 0 25 0;
 #X connect 26 0 24 0;
-#X restore 157 547 pd special-send-and-receives;
+#X restore 639 471 pd special-send-and-receives;
+#X obj 4 4 cnv 15 850 20 empty empty all_about_send_n_receive 20 10
+1 18 -233017 -66577 0;
+#X obj 821 5 pddp;
+#X obj 16 290 send one_send;
+#X obj 16 334 receive one_send;
+#X obj 19 272 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 9500 0;
+#X obj 153 290 send one_send;
+#X obj 156 272 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 8600 0;
+#X obj 291 290 send one_send;
+#X obj 294 272 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 5000 0;
+#X obj 19 355 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 5000 1;
+#X obj 153 334 receive one_send;
+#X obj 156 355 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 5000 1;
+#X obj 291 334 receive one_send;
+#X obj 294 355 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 5000 1;
+#X text 7 317 All [receive]s of the same name will receive the "messages":
+;
+#X text 9 252 You can have multiple [send]s with the same name:;
+#N canvas 0 0 450 300 Related 1;
+#X obj 16 39 universal;
+#X obj 17 76 send13;
+#X obj 66 76 receive13;
+#X restore 639 497 pd Related Objects;
+#X floatatom 45 132 5 0 0 0 - - -;
+#X floatatom 99 152 5 0 0 0 - - -;
+#X obj 45 149 s aNum;
+#X obj 99 131 r aNum;
+#X obj 213 150 s aSymbol;
+#X msg 213 130 symbol hello;
+#X obj 310 130 r aSymbol;
+#X symbolatom 310 152 10 0 0 0 - - -;
+#X connect 11 0 17 0;
+#X connect 12 0 10 0;
+#X connect 14 0 13 0;
+#X connect 16 0 15 0;
+#X connect 18 0 19 0;
+#X connect 20 0 21 0;
+#X connect 25 0 27 0;
+#X connect 28 0 26 0;
+#X connect 30 0 29 0;
+#X connect 31 0 32 0;
