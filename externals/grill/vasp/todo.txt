@@ -35,10 +35,17 @@ objects:
 
 - vasp.state.... current vasp, operation, progress meter
 
+- vasp.ahead (vasp.a): abstraction head - set/bang/to handling, radio outlet, attribute processing (?)
+- vasp.print (vasp.p): print vasp messages
+
+- vasp.resmp: resampling with vasp argument, instead of vasp.tilt (?)
+
 bugs:
 ---------------------
 
 - vasp.join doesn't like length -1
+
+- immediate vasp garbage collection causes clicks.... do it in a separate thread!
 
 
 tests:
