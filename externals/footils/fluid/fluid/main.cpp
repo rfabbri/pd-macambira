@@ -95,6 +95,7 @@ class fluid:
 			FLEXT_CADDMETHOD_(c,0,"control", fluid_control_change);
 			FLEXT_CADDMETHOD_(c,0,"bend", fluid_pitch_bend);
 			FLEXT_CADDMETHOD_(c,0,"bank",  fluid_bank);
+			FLEXT_CADDMETHOD_(c,0,"gen",  fluid_gen);
 			
 			// list input calls fluid_note(...)
 			FLEXT_CADDMETHOD_(c,0, "list",  fluid_note);
@@ -130,6 +131,9 @@ class fluid:
 		
 		FLEXT_CALLBACK_V(fluid_bank)
 		void fluid_bank(int argc, t_atom *argv);
+		
+        FLEXT_CALLBACK_V(fluid_gen)
+		void fluid_gen(int argc, t_atom *argv);
 		
 		FLEXT_CALLBACK_V(fluid_init)
 		void fluid_init(int argc, t_atom *argv);
@@ -225,6 +229,21 @@ void fluid::fluid_bank(int argc, t_atom *argv)
 		fluid_synth_bank_select(synth, chan-1, bank);
 	}
 }
+
+void fluid::fluid_gen(int argc, t_atom *argv)
+{
+	if (synth == NULL) return;
+	if (argc == 3)
+	{	
+		int   chan, param;
+        float value;
+        chan  = GetAInt(argv[0]);
+		param = GetAInt(argv[1]);
+		value = GetAFloat(argv[2]);
+		fluid_synth_set_gen(synth, chan-1, param, value);
+	}
+}
+
 
 void fluid::fluid_init(int argc, t_atom *argv)
 {
