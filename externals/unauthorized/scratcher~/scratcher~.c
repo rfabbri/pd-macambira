@@ -778,13 +778,18 @@ void scratcher_tilde_setup(void)
     scratcher_widgetbehavior.w_deletefn =     scratcher_delete;
     scratcher_widgetbehavior.w_visfn =        scratcher_vis;
     scratcher_widgetbehavior.w_clickfn =      scratcher_click;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     scratcher_widgetbehavior.w_propertiesfn = scratcher_properties;
     scratcher_widgetbehavior.w_savefn =       scratcher_save;
-#endif
+#else
+	 class_setpropertiesfn(scratcher_class, &scratcher_properties);
+	 class_setsavefn(scratcher_class, &scratcher_save);
 #endif
 
     CLASS_MAINSIGNALIN( scratcher_class, t_scratcher, x_f );

@@ -742,14 +742,20 @@ void playlist_setup(void)
     playlist_widgetbehavior.w_deletefn =     playlist_delete;
     playlist_widgetbehavior.w_visfn =        playlist_vis;
     playlist_widgetbehavior.w_clickfn =      playlist_click;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     playlist_widgetbehavior.w_propertiesfn = playlist_properties;
     playlist_widgetbehavior.w_savefn =       playlist_save;
+#else
+	 class_setsavefn(playlist_class, &playlist_save);
+	 class_setpropertiesfn(playlist_class, &playlist_properties);
 #endif
-#endif
+
     class_setwidget(playlist_class, &playlist_widgetbehavior);
     class_sethelpsymbol(playlist_class, gensym("help-playlist.pd"));
 }

@@ -1365,11 +1365,18 @@ void cooled_tilde_setup(void)
     cooled_widgetbehavior.w_deletefn =     cooled_delete;
     cooled_widgetbehavior.w_visfn =        cooled_vis;
     cooled_widgetbehavior.w_clickfn =      cooled_click;
-#if PD_MAJOR_VERSION == 0 
-#if PD_MINOR_VERSION < 37 || !defined(PD_MINOR_VERSION)
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
+#if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     cooled_widgetbehavior.w_propertiesfn = cooled_properties;
     cooled_widgetbehavior.w_savefn =       cooled_save;
-#endif
+#else
+	 class_setsavefn(cooled_class, &cooled_save);
+	 class_setpropertiesfn(cooled_class, &cooled_properties);
 #endif
 
     CLASS_MAINSIGNALIN( cooled_class, t_cooled, x_f );

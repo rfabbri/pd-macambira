@@ -654,13 +654,18 @@ void filterbank_tilde_setup(void)
     filterbank_widgetbehavior.w_deletefn =     filterbank_delete;
     filterbank_widgetbehavior.w_visfn =        filterbank_vis;
     filterbank_widgetbehavior.w_clickfn =      NULL;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     filterbank_widgetbehavior.w_propertiesfn = filterbank_properties;
     filterbank_widgetbehavior.w_savefn =       filterbank_save;
-#endif
+#else
+	 class_setsavefn(filterbank_class_tilde, &filterbank_save);
+	 class_setpropertiesfn(filterbank_class_tilde, &filterbank_properties);
 #endif
     class_setwidget(filterbank_class_tilde, &filterbank_widgetbehavior);
     class_sethelpsymbol(filterbank_class_tilde, gensym("help-filterbank~.pd"));

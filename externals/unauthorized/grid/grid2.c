@@ -535,13 +535,18 @@ void grid_setup(void)
     grid_widgetbehavior.w_deletefn =     grid_delete;
     grid_widgetbehavior.w_visfn =        grid_vis;
     grid_widgetbehavior.w_clickfn =      grid_click;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     grid_widgetbehavior.w_propertiesfn = grid_properties;
     grid_widgetbehavior.w_savefn =       grid_save;
-#endif
+#else
+	 class_setsavefn(grid_class, &grid_save);
+	 class_setpropertiesfn(grid_class, &grid_properties);
 #endif
     class_setwidget(grid_class, &grid_widgetbehavior);
     class_sethelpsymbol(grid_class, gensym("help-grid.pd"));

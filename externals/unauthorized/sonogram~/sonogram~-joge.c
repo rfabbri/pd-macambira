@@ -1992,13 +1992,18 @@ void sonogram_tilde_setup(void)
     sonogram_widgetbehavior.w_deletefn =     sonogram_delete;
     sonogram_widgetbehavior.w_visfn =        sonogram_vis;
     sonogram_widgetbehavior.w_clickfn =      sonogram_click;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     sonogram_widgetbehavior.w_propertiesfn = NULL;
     sonogram_widgetbehavior.w_savefn =       sonogram_save;
-#endif
+#else
+	 class_setpropertiesfn(sonogram_class, NULL);
+	 class_setsavefn(sonogram_class, &sonogram_save);
 #endif
 
     CLASS_MAINSIGNALIN( sonogram_class, t_sonogram, x_f );

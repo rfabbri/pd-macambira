@@ -800,13 +800,18 @@ void pianoroll_setup(void)
     pianoroll_widgetbehavior.w_deletefn =     pianoroll_delete;
     pianoroll_widgetbehavior.w_visfn =        pianoroll_vis;
     pianoroll_widgetbehavior.w_clickfn =      pianoroll_click;
-	 /* As of 0.37, the last two elements of t_widgetbehavoir */
-	 /* have been removed.  <hans@eds.org> */
-#if PD_MAJOR_VERSION == 0 
+	 /* 
+	  * <hans@eds.org>: As of 0.37, pd does not have these last 
+	  * two elements in t_widgetbehavoir anymore.
+	  * see pd/src/notes.txt:
+	  *           savefunction and dialog into class structure
+	  */
 #if PD_MINOR_VERSION < 37  || !defined(PD_MINOR_VERSION)
     pianoroll_widgetbehavior.w_propertiesfn = pianoroll_properties;
     pianoroll_widgetbehavior.w_savefn =       pianoroll_save;
-#endif
+#else
+	 class_setsavefn(pianoroll_class, &pianoroll_save);
+	 class_setpropertiesfn(pianoroll_class, &pianoroll_properties);
 #endif
     class_setwidget(pianoroll_class, &pianoroll_widgetbehavior);
     class_sethelpsymbol(pianoroll_class, gensym("help-pianoroll.pd"));
