@@ -29,19 +29,19 @@ static I compare(const S *a,const S *b)
 
 static I compare(const A &a,const A &b) 
 {
-	if(a.a_type == b.a_type) {
-		switch(a.a_type) {
+	if(flext::GetType(a) == flext::GetType(b)) {
+		switch(flext::GetType(a)) {
 		case A_FLOAT:
-			return compare(a.a_w.w_float,b.a_w.w_float);
+			return compare(flext::GetFloat(a),flext::GetFloat(b));
 #ifdef MAXMSP
 		case A_LONG:
-			return compare((I)a.a_w.w_long,(I)b.a_w.w_long);
+			return compare(flext::GetInt(a),flext::GetInt(b));
 #endif
 		case A_SYMBOL:
-			return compare(a.a_w.w_symbol,b.a_w.w_symbol);
+			return compare(flext::GetSymbol(a),flext::GetSymbol(b));
 #ifdef PD
 		case A_POINTER:
-			return a.a_w.w_gpointer == b.a_w.w_gpointer?0:(a.a_w.w_gpointer < b.a_w.w_gpointer?-1:1);
+			return flext::GetPointer(a) == flext::GetPointer(b)?0:(flext::GetPointer(a) < flext::GetPointer(b)?-1:1);
 #endif
 		default:
 			LOG("pool - atom comparison: type not handled");
@@ -49,7 +49,7 @@ static I compare(const A &a,const A &b)
 		}
 	}
 	else
-		return a.a_type < b.a_type?-1:1;
+		return flext::GetType(a) < flext::GetType(b)?-1:1;
 }
 
 
@@ -368,18 +368,15 @@ static C *ReadAtom(C *c,A *a)
 		switch(s) {
 		case 0: // integer
 #ifdef MAXMSP
-			a->a_type = A_LONG;
-			a->a_w.w_long = atol(m);
+			flext::SetInt(*a,atoi(m));
 			break;
 #endif
 		case 1: // float
-			a->a_type = A_FLOAT;
-			a->a_w.w_float = (F)atof(m);
+			flext::SetFloat(*a,(F)atof(m));
 			break;
 		default: { // anything else is a symbol
 			C t = *c; *c = 0;
-			a->a_type = A_SYMBOL;
-			a->a_w.w_symbol = (S *)flext::MakeSymbol(m);
+			flext::SetString(*a,m);
 			*c = t;
 			break;
 		}
@@ -422,7 +419,7 @@ static V WriteAtom(ostream &os,const A &a)
 		break;
 #endif
 	case A_SYMBOL:
-		os << flext::GetString(a.a_w.w_symbol);
+		os << flext::GetString(flext::GetSymbol(a));
 		break;
 	}
 }
