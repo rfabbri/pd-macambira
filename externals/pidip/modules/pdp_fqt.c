@@ -49,13 +49,13 @@ typedef struct pdp_fqt_struct
     t_int x_cursec;
     t_int x_framescount;
 
-    unsigned char * qt_rows[3];
+    unsigned char *qt_rows[3];
 
-    unsigned char * qt_frame;
+    unsigned char *qt_frame;
     quicktime_t *qt;
     int qt_cmodel;
 
-    unsigned int** x_frames;
+    unsigned char **x_frames;
     t_int* x_fsizes;
 
 } t_pdp_fqt;
@@ -73,7 +73,7 @@ static void pdp_fqt_close(t_pdp_fqt *x)
         {
           if ( x->x_frames[fi] ) freebytes( x->x_frames[fi], x->x_fsizes[fi] );
         }
-        if ( x->x_frames ) freebytes( x->x_frames, x->x_length*sizeof(unsigned int*) );
+        if ( x->x_frames ) freebytes( x->x_frames, x->x_length*sizeof(unsigned char*) );
 	x->initialized = false;
     }
 
@@ -128,7 +128,7 @@ static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 
     // read all frames
     x->x_current_frame = 0;
-    x->x_frames = (unsigned int**) getbytes( x->x_length*sizeof(unsigned int*) );
+    x->x_frames = (unsigned char**) getbytes( x->x_length*sizeof(unsigned char*) );
     x->x_fsizes = (t_int*) getbytes( x->x_length*sizeof(t_int) );
     x->x_fsize = 0;
     if ( !x->x_frames )
@@ -141,9 +141,9 @@ static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 
     for ( fi=0; fi<x->x_length; fi++ )
     {
-       x->x_fsizes[fi] = ((x->x_size)+(x->x_size>>1))<<1;
+       x->x_fsizes[fi] = (x->x_size)+((x->x_vwidth>>1)*(x->x_vheight>>1)<<1);
        x->x_fsize += x->x_fsizes[fi];
-       x->x_frames[fi] = (unsigned int*) getbytes( x->x_fsizes[fi] );
+       x->x_frames[fi] = (unsigned char*) getbytes( x->x_fsizes[fi] );
        if ( !x->x_frames[fi] )
        {
          post("pdp_fqt: couldn't allocate memory for frames" );
@@ -156,8 +156,7 @@ static void pdp_fqt_open(t_pdp_fqt *x, t_symbol *name)
 
        switch(x->qt_cmodel){
        case BC_YUV420P:
-           pdp_llconv(x->qt_frame, RIF_YVU__P411_U8, x->x_frames[fi], RIF_YVU__P411_S16, 
-                            x->x_vwidth, x->x_vheight);
+           memcpy(x->x_frames[fi], x->qt_frame, x->x_fsizes[fi] );
            break;
 
        default:
@@ -180,26 +179,25 @@ static void pdp_fqt_bang(t_pdp_fqt *x)
   struct timeval etime;
 
     if (!(x->initialized)){
-	//post("pdp_fqt: no qt file opened");
+	post("pdp_fqt: no qt file opened");
 	return;
     }
 
-    object = pdp_packet_new_image_YCrCb( x->x_vwidth, x->x_vheight );
+    object = pdp_packet_new_bitmap_yv12( x->x_vwidth, x->x_vheight );
     header = pdp_packet_header(object);
     data = (short int *) pdp_packet_data(object);
 
-    header->info.image.encoding = PDP_IMAGE_YV12;
+    header->info.image.encoding = PDP_BITMAP_YV12;
     header->info.image.width = x->x_vwidth;
     header->info.image.height = x->x_vheight;
 
-    x->x_current_frame = ( x->x_current_frame + 1 ) % x->x_length;
-    // post( "pdp_fqt : current frame : %d", x->x_current_frame );
-
+    // post( "pdp_fqt : current frame : %d size : %d", 
+    //        x->x_current_frame, x->x_fsizes[x->x_current_frame] );
     memcpy( data, x->x_frames[x->x_current_frame], x->x_fsizes[x->x_current_frame] );
 
     if ( gettimeofday(&etime, NULL) == -1)
     {
-        post("pdp_fcqt : could not get time" );
+        post("pdp_fqt : could not get time" );
     }
     if ( etime.tv_sec != x->x_cursec )
     {
@@ -209,6 +207,7 @@ static void pdp_fqt_bang(t_pdp_fqt *x)
     }
     x->x_framescount++;
 
+    x->x_current_frame = ( x->x_current_frame + 1 ) % x->x_length;
     outlet_float(x->x_curframe, (float)x->x_current_frame);
     pdp_packet_pass_if_valid(x->x_outlet0, &object);
 
@@ -216,19 +215,16 @@ static void pdp_fqt_bang(t_pdp_fqt *x)
 
 static void pdp_fqt_frame_cold(t_pdp_fqt *x, t_floatarg frameindex)
 {
-    int frame = (int)frameindex;
-    int length;
-
+  int frame = (int)frameindex;
 
     if (!(x->initialized)) return;
 
-    length = quicktime_video_length(x->qt,0);
-
-    frame = (frame >= length) ? length-1 : frame;
+    frame = (frame >= x->x_length) ? x->x_length-1 : frame;
     frame = (frame < 0) ? 0 : frame;
 
     // post("pdp_fqt : frame cold : setting video position to : %d", frame );
-    quicktime_set_video_position(x->qt, frame, 0);
+    x->x_current_frame = frame;
+
 }
 
 static void pdp_fqt_frame(t_pdp_fqt *x, t_floatarg frameindex)

@@ -273,13 +273,11 @@ static void pdp_fcqt_frame_cold(t_pdp_fcqt *x, t_floatarg frameindex)
 
     if (!(x->initialized)) return;
 
-    length = quicktime_video_length(x->qt,0);
-
-    frame = (frame >= length) ? length-1 : frame;
+    frame = (frame >= x->x_length) ? x->x_length-1 : frame;
     frame = (frame < 0) ? 0 : frame;
 
     // post("pdp_fcqt : frame cold : setting video position to : %d", frame );
-    quicktime_set_video_position(x->qt, frame, 0);
+    x->x_current_frame = frame;
 }
 
 static void pdp_fcqt_frame(t_pdp_fcqt *x, t_floatarg frameindex)
