@@ -74,7 +74,7 @@ FLEXT_LIB_DSP_V("Crackle~",Crackle_ar);
 Crackle_ar::Crackle_ar(int argc, t_atom *argv)
     : m_y1(0.3f),m_y2(0.f)
 {
-    FLEXT_ADDMETHOD_(0,"set",m_set);
+    FLEXT_ADDMETHOD_(0,"parameter",m_set);
     //parse arguments
     AtomList Args(argc,argv);
     m_paramf=sc_getfloatarg(Args,0);
@@ -139,7 +139,7 @@ Crackle_kr::Crackle_kr(int argc, t_atom *argv)
     : m_y1(0.3f),m_y2(0.f)
 {
     FLEXT_ADDBANG(0,m_perform);
-    FLEXT_ADDMETHOD_(0,"set",m_set);
+    FLEXT_ADDMETHOD_(0,"parameter",m_set);
     
     //parse arguments
     AtomList Args(argc,argv);
