@@ -1,9 +1,11 @@
 ENV.c
 abs~.c
 aenv~.c
+allow.c
 ann.c
 ann_som.c
 arbran.c
+arraycopy.c
 arraysize.c
 ascseq.c
 ascwave.c
@@ -31,6 +33,7 @@ cxstddev.c
 define_loudspeakers.c
 delta.c
 delta~.c
+deny.c
 diag~.c
 dist.c
 dist_normal.c
@@ -75,6 +78,7 @@ kalashnikov.c
 knob.c
 lattice~.c
 lifo.c
+listfifo.c
 limit.c
 linear.c
 linuxevent.c
@@ -96,6 +100,7 @@ mixer~.c
 mlife.c
 moog~.c
 multi.c
+nchange.c
 netclient.c
 netdist.c
 netrec.c
@@ -180,6 +185,7 @@ strippath.c
 subst.c
 susloop~.c
 svf~.c
+sync.c
 system.c
 tabreadmix~.c
 temperature.c
