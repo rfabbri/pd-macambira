@@ -1,0 +1,8 @@
+0.5
+   Install images in /tmp
+0.4
+   Made delay optional and disabled by default
+0.2
+   Fixed audio computation
+0.1
+   First implementation
