@@ -171,14 +171,14 @@ public:
 	static t_atom *CopyList(int argc,const t_atom *argv);
 	//! Copy a memory region
 	static void CopyMem(void *dst,const void *src,int bytes);
+	//! Copy a sample array
 	static void CopySamples(t_sample *dst,const t_sample *src,int cnt);
 	//! Set a memory region
 	static void ZeroMem(void *dst,int bytes);
+	//! Set a sample array to a fixed value
 	static void SetSamples(t_sample *dst,int cnt,t_sample s);
+	//! Set a sample array to 0
 	static void ZeroSamples(t_sample *dst,int cnt) { SetSamples(dst,cnt,0); }	
-
-	//! Sleep for an amount of time
-	static void Sleep(double s);
 
 
 	//! Get a 32 bit hash value frm an atom
@@ -508,19 +508,6 @@ public:
 //!		@} FLEXT_S_ATOM
 
 
-// --- clock stuff ------------------------------------------------
-
-
-	/*!	\defgroup FLEXT_S_CLOCK Flext clock functions
-
-		At the moment there are none
-
-		@{ 
-	*/
-
-//!		@} 
-
-
 // --- thread stuff -----------------------------------------------
 
 #ifdef FLEXT_THREADS
@@ -632,6 +619,7 @@ public:
 	*/
 	static void ThrYield() { 
 #if FLEXT_THREADS == FLEXT_THR_POSIX
+		// for a preemptive system this should do nothing
 		sched_yield(); 
 #elif FLEXT_THREADS == FLEXT_THR_MP
 		MPYield();
@@ -673,24 +661,21 @@ public:
 	{
 	public:
 		//! Construct thread mutex
-		ThrMutex() /*: cnt(0)*/ { pthread_mutex_init(&mutex,NULL); }
+		ThrMutex() { pthread_mutex_init(&mutex,NULL); }
 		//! Destroy thread mutex
 		~ThrMutex() { pthread_mutex_destroy(&mutex); }
 
 		//! Lock thread mutex
-		bool Lock() { /*cnt = 1;*/ return pthread_mutex_lock(&mutex) == 0; }
-		//! Lock thread mutex
-		bool WaitForLock(float tm) { /*cnt = 1;*/ return pthread_mutex_lock(&mutex) == 0; }
+		bool Lock() { return pthread_mutex_lock(&mutex) == 0; }
+		/*! \brief Wait to lock thread mutex
+			\todo Implement!
+		*/
+		bool WaitForLock(double tm) { return pthread_mutex_lock(&mutex) == 0; }
 		//! Try to lock, but don't wait
 		bool TryLock() { return pthread_mutex_trylock(&mutex) == 0; }
 		//! Unlock thread mutex
-		bool Unlock() { /*cnt = 0;*/ return pthread_mutex_unlock(&mutex) == 0; }
-/*
-		//! Lock thread mutex (increase lock count by one)
-		void Push() { if(!cnt++) Lock(); }
-		//! Unlock thread mutex if lock count reaches zero
-		void Pop() { if(!--cnt) Unlock(); }
-*/		
+		bool Unlock() { return pthread_mutex_unlock(&mutex) == 0; }
+
 	protected:
 		pthread_mutex_t mutex;
 //		int cnt;
@@ -699,18 +684,18 @@ public:
 	{
 	public:
 		//! Construct thread mutex
-		ThrMutex() /*: cnt(0)*/ { MPCreateCriticalRegion(&crit); }
+		ThrMutex() { MPCreateCriticalRegion(&crit); }
 		//! Destroy thread mutex
 		~ThrMutex() { MPDeleteCriticalRegion(crit); }
 
 		//! Lock thread mutex
-		bool Lock() { /*cnt = 1;*/ return MPEnterCriticalRegion(crit,kDurationForever) == noErr; }
+		bool Lock() { return MPEnterCriticalRegion(crit,kDurationForever) == noErr; }
 		//! Wait to lock thread mutex
-		bool WaitForLock(float tm) { /*cnt = 1;*/ return MPEnterCriticalRegion(crit,tm*kDurationMicrosecond*1.e6) == noErr; }
+		bool WaitForLock(double tm) { return MPEnterCriticalRegion(crit,tm*kDurationMicrosecond*1.e6) == noErr; }
 		//! Try to lock, but don't wait
 		bool TryLock() { return MPEnterCriticalRegion(crit,kDurationImmediate) == noErr; }
 		//! Unlock thread mutex
-		bool Unlock() { /*cnt = 0;*/ return MPExitCriticalRegion(crit) == noErr; }
+		bool Unlock() { return MPExitCriticalRegion(crit) == noErr; }
 		
 	protected:
 		MPCriticalRegionID crit;
@@ -746,7 +731,7 @@ public:
 			\remark Depending on the implementation ftime may not be fractional. 
 			\remark So if ftime = 0 this may suck away your cpu if used in a signalled loop.
 		*/
-		bool TimedWait(float ftime) 
+		bool TimedWait(double ftime) 
 		{ 
 			timespec tm; 
 #if 0 // find out when the following is defined
@@ -792,7 +777,7 @@ public:
 		/*! \brief Wait for condition (for a certain time)
 			\param time Wait time in seconds
 		*/
-		bool TimedWait(float tm) { return MPWaitForEvent(ev,NULL,tm*kDurationMicrosecond*1.e6) == noErr; }
+		bool TimedWait(double tm) { return MPWaitForEvent(ev,NULL,tm*kDurationMicrosecond*1.e6) == noErr; }
 
 		//! Signal condition
 		bool Signal() { return MPSetEvent(ev,1) == noErr; } // one bit needs to be set at least
@@ -823,9 +808,108 @@ public:
 
 //!		@} FLEXT_S_THREAD
 
+
 #endif // FLEXT_THREADS
 
-//!		@} 
+
+// --- timer stuff -----------------------------------------------
+
+/*!	\defgroup FLEXT_S_TIMER Flext timer handling 
+		@{ 
+		
+	\remark The clock of the real-time system is used for most of these functions. 
+	\remark Since this clock can be synchronized to an external clock (or e.g. the audio card) 
+	\remark it may differ from the clock of the operating system
+*/
+	/*! \brief Get time since real-time system startup
+		\note This is not the time of the operating system but of the real-time system.
+		\note It depends on the time source the system is synchronized to.
+	*/
+	static double GetTime();
+	
+	/*! \brief Get time granularity of the GetTime function
+		\note This can be zero if not determined.
+	*/
+	static double GetTimeGrain();
+
+	/*! \brief Get operating system time since flext startup
+	*/
+	static double GetOSTime();
+	
+	/*! \brief Sleep for an amount of time 
+		\remark The OS clock is used for that 
+		\note Clearly in a real-time system this should only be used in a detached thread
+	*/
+	static void Sleep(double s);
+
+	/*! \brief Class encapsulating a timer with callback functionality
+		This class can either be used with FLEXT_ADDTIMER or used as a base class with an overloaded virtual Work function.
+	*/ 
+	class FLEXT_SHARE Timer
+	{
+	public:
+		Timer(bool queued = false);
+		~Timer();
+
+		//! Set timer callback function
+		void SetCallback(void (*cb)(void *data)) { clss = NULL,cback = cb; }
+		//! Set timer callback function (with class pointer)
+		void SetCallback(flext_base &th,bool (*cb)(flext_base *th,void *data)) { clss = &th,cback = (void (*)(void *))cb; }
+
+		//! Clear timer
+		bool Reset();
+		//! Trigger a one shot at an absolute time
+		bool At(double tm,void *data = NULL,bool dopast = true);
+		//! Trigger a one shot interval
+		bool Delay(double tm,void *data = NULL);
+		//! Trigger a periodic interval
+		bool Periodic(double tm,void *data = NULL);
+
+		//! Worker function, called on every timer event
+		virtual void Work();
+		
+	protected:
+		static void callback(Timer *tmr);
+	
+#if FLEXT_SYS == FLEXT_SYS_PD
+		t_clock *clk;
+#elif FLEXT_SYS == FLEXT_SYS_MAX
+		static void queuefun(Timer *tmr);
+		t_clock *clk;
+		t_qelem *qelem;
+#else
+#error Not implemented
+#endif
+
+		const bool queued;
+		void (*cback)(void *data);
+		flext_base *clss;
+		void *userdata;
+		double period;
+	};
+
+//!		@} FLEXT_S_TIMER
+
+// --- SIMD functionality -----------------------------------------------
+
+/*!	\defgroup FLEXT_S_SIMD Cross platform SIMD support for modern CPUs 
+		@{ 
+*/		
+		enum simd_type {
+			simd_none = 0,
+			simd_mmx = 0x01,
+			simd_3dnow = 0x02,
+			simd_sse = 0x04,
+			simd_sse2 = 0x08,
+			simd_altivec = 0x10
+		};
+		
+		static unsigned long GetSIMDCapabilities() { return simdcaps; }
+
+//!		@} FLEXT_S_SIMD
+
+		
+//!		@} FLEXT_SUPPORT
 
 protected:
 #ifdef __MRC__
@@ -834,6 +918,8 @@ protected:
 	static void Setup();
 
 	static bool chktilde(const char *objname);
+
+	static unsigned long simdcaps;
 };
 
 #endif

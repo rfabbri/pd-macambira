@@ -8,7 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
-/*! \file flext.h
+/*! \file flext.h 
     \brief This is the main flext include file.
     
     The basic definitions are set here and the necessary header files are included
@@ -23,10 +23,10 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 //! \brief flext version number
-#define FLEXT_VERSION 402
+#define FLEXT_VERSION 403
 
 //! \brief flext version string
-#define FLEXT_VERSTR "0.4.2"
+#define FLEXT_VERSTR "0.4.3pre"
 
 //! @}
 
