@@ -9,12 +9,12 @@
 
 #include "drone.h"
 
-drone :: drone(MY_FLOAT lowestFreq)
+drone :: drone(StkFloat lowestFreq)
 {
   length = (long) (SRATE / lowestFreq + 1);
-  loopGain = (MY_FLOAT) 0.999;
+  loopGain = (StkFloat) 0.999;
   loopFilt = new OneZero();
-  delayLine = new DLineA(length);
+  delayLine = new DelayA(0.5*length, length);
   envelope = new ADSR();
   noise = new Noise;
   envelope->setAllTimes(2.0,0.5,0.0,0.5);
@@ -35,21 +35,21 @@ void drone :: clear()
   delayLine->clear();
 }
 
-void drone :: setFreq(MY_FLOAT frequency)
+void drone :: setFreq(StkFloat frequency)
 {
-  MY_FLOAT delay;
+  StkFloat delay;
   delay = (SRATE / frequency);
   delayLine->setDelay(delay - 0.5);
-  loopGain = (MY_FLOAT) 0.997 + (frequency * (MY_FLOAT)  0.000002);
-  if (loopGain>1.0) loopGain = (MY_FLOAT) 0.99999;
+  loopGain = (StkFloat) 0.997 + (frequency * (StkFloat)  0.000002);
+  if (loopGain>1.0) loopGain = (StkFloat) 0.99999;
 }
 
-void drone :: pluck(MY_FLOAT amplitude)
+void drone :: pluck(StkFloat amplitude)
 {
   envelope->keyOn();
 }
 
-void drone :: noteOn(MY_FLOAT freq, MY_FLOAT amp)
+void drone :: noteOn(StkFloat freq, StkFloat amp)
 {
   this->setFreq(freq);
   this->pluck(amp);
@@ -58,20 +58,20 @@ void drone :: noteOn(MY_FLOAT freq, MY_FLOAT amp)
 #endif    
 }
 
-void drone :: noteOff(MY_FLOAT amp)
+void drone :: noteOff(StkFloat amp)
 {
-  loopGain = (MY_FLOAT) 1.0 - amp;
+  loopGain = (StkFloat) 1.0 - amp;
 #if defined(_debug_)        
   printf("drone : NoteOff: Amp=%lf\n",amp);
 #endif    
 }
 
-MY_FLOAT drone :: tick()
+StkFloat drone :: tick()
 {
   /* check this out */
   /* here's the whole inner loop of the instrument!!  */
-  lastOutput = delayLine->tick(loopFilt->tick((delayLine->lastOut() * loopGain))
+  lastOutput_ = delayLine->tick(loopFilt->tick((delayLine->lastOut() * loopGain))
 		+ (0.005 * envelope->tick() * noise->tick())); 
-  return lastOutput;
+  return lastOutput_;
 }
 

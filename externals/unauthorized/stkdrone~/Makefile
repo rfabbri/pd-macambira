@@ -1,6 +1,6 @@
 NAME=stkdrone~
 CSYM=stkdrone_tilde
-STK_HOME=/usr/local/stk-3.2
+STK_HOME=/usr/local/stk
 
 current: pd_linux
 
@@ -21,7 +21,7 @@ LINUXINCLUDE =  -I../../src -I/usr/local/include
 .cc.pd_linux: drone.o
 	g++ -O3 -Wall -D__OS_Linux_ -g -I$(STK_HOME)/include -c drone.cc
 	g++ $(LINUXCCFLAGS) $(LINUXINCLUDE) -I$(STK_HOME)/include -o $*.o -c $*.cc
-	ld -export_dynamic  -shared -o $*.pd_linux *.o $(STK_HOME)/src/stklib.a -lc -lm -lstdc++ -lg++
+	g++ -export_dynamic  -shared -o $*.pd_linux *.o $(STK_HOME)/src/libstk.a -lc -lm -lpthread
 	strip --strip-unneeded $*.pd_linux
 	rm -f *.o ../$*.pd_linux
 	ln -s $*/$*.pd_linux ..

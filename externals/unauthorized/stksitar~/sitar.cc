@@ -9,18 +9,13 @@
 
 #include "sitar.h"
 
-#ifndef MY_FLOAT
-#warning "weird : MY_FLOAT undefined"
-#define MY_FLOAT double
-#endif
-
-sitar :: sitar(MY_FLOAT lowestFreq)
+sitar :: sitar(StkFloat lowestFreq)
 {
   length = (long) (SRATE / lowestFreq + 1);
-  loopGain = (MY_FLOAT) 0.999;
+  loopGain = (StkFloat) 0.999;
   loopFilt = new OneZero();
-  loopFilt->setCoeff(0.01);
-  delayLine = new DLineA(length);
+  loopFilt->setZero(0.01);
+  delayLine = new DelayA(0.5 * length, length);
   delay = length/2;
   delayTarg = delay;
   envelope = new ADSR();
@@ -43,21 +38,21 @@ void sitar :: clear()
   delayLine->clear();
 }
 
-void sitar :: setFreq(MY_FLOAT frequency)
+void sitar :: setFreq(StkFloat frequency)
 {
   delayTarg = (SRATE / frequency);
   delay = delayTarg * (1.0 + (0.05 * noise->tick()));
   delayLine->setDelay(delay);
-  loopGain = (MY_FLOAT) 0.995 + (frequency * (MY_FLOAT)  0.000001);
-  if (loopGain>1.0) loopGain = (MY_FLOAT) 0.9995;
+  loopGain = (StkFloat) 0.995 + (frequency * (StkFloat)  0.000001);
+  if (loopGain>1.0) loopGain = (StkFloat) 0.9995;
 }
 
-void sitar :: pluck(MY_FLOAT amplitude)
+void sitar :: pluck(StkFloat amplitude)
 {
   envelope->keyOn();
 }
 
-void sitar :: noteOn(MY_FLOAT freq, MY_FLOAT amp)
+void sitar :: noteOn(StkFloat freq, StkFloat amp)
 {
   this->setFreq(freq);
   this->pluck(amp);
@@ -67,17 +62,17 @@ void sitar :: noteOn(MY_FLOAT freq, MY_FLOAT amp)
 #endif    
 }
 
-void sitar :: noteOff(MY_FLOAT amp)
+void sitar :: noteOff(StkFloat amp)
 {
-  loopGain = (MY_FLOAT) 1.0 - amp;
+  loopGain = (StkFloat) 1.0 - amp;
 #if defined(_debug_)        
   printf("sitar : NoteOff: Amp=%lf\n",amp);
 #endif    
 }
 
-MY_FLOAT sitar :: tick()
+StkFloat sitar :: tick()
 {
-  MY_FLOAT temp;
+  StkFloat temp;
 
   temp = delayLine->lastOut();
   if (fabs(temp) > 1.0) {
@@ -97,9 +92,9 @@ MY_FLOAT sitar :: tick()
     delayLine->setDelay(delay);
   }
 
-  lastOutput = delayLine->tick(loopFilt->tick(temp)
+  lastOutput_ = delayLine->tick(loopFilt->tick(temp)
                                + (amPluck * envelope->tick() * noise->tick()));
   
-  return lastOutput;
+  return lastOutput_;
 }
 

@@ -10,34 +10,33 @@
 #if !defined(__sitar_h)
 #define __sitar_h
 
-#include "Instrmnt.h" 
-#include "DLineA.h"
+#include "Instrmnt.h"
+#include "DelayA.h"
 #include "OneZero.h"
-#include "ADSR.h" 
-#include "Noise.h" 
-#include "Object.h" 
+#include "Noise.h"
+#include "ADSR.h"
 
 class sitar : public Instrmnt
 {
 protected:  
-  DLineA *delayLine;
+  DelayA *delayLine;
   OneZero *loopFilt;
   ADSR *envelope;
   Noise *noise;
   long length;
-  MY_FLOAT loopGain;
-  MY_FLOAT amPluck;
-  MY_FLOAT delay;
-  MY_FLOAT delayTarg;
+  StkFloat loopGain;
+  StkFloat amPluck;
+  StkFloat delay;
+  StkFloat delayTarg;
 public:
-  sitar(MY_FLOAT lowestFreq);
+  sitar(StkFloat lowestFreq);
   ~sitar();
   void clear();
-  virtual void setFreq(MY_FLOAT frequency);
-  void pluck(MY_FLOAT amplitude);
-  virtual void noteOn(MY_FLOAT freq, MY_FLOAT amp);
-  virtual void noteOff(MY_FLOAT amp);
-  virtual MY_FLOAT tick();
+  virtual void setFreq(StkFloat frequency);
+  void pluck(StkFloat amplitude);
+  virtual void noteOn(StkFloat freq, StkFloat amp);
+  virtual void noteOff(StkFloat amp);
+  virtual StkFloat tick();
 };
 
 #endif

@@ -49,7 +49,7 @@ static void stksitar_freq(t_stksitar* x, t_float ffreq)
        post("stksitar~ : wrong frequency" );
        return;
     }
-    x->x_stksitar->setFreq( (MY_FLOAT) ffreq );
+    x->x_stksitar->setFreq( (StkFloat) ffreq );
     x->x_freq = ffreq;
 }
 
@@ -60,7 +60,7 @@ static void stksitar_pluck(t_stksitar* x, t_float fpluck)
        post("stksitar~ : wrong pluck argument" );
        return;
     }
-    x->x_stksitar->pluck( (MY_FLOAT) fpluck );
+    x->x_stksitar->pluck( (StkFloat) fpluck );
     x->x_pluck = fpluck;
 }
 

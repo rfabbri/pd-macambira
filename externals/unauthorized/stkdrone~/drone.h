@@ -11,7 +11,7 @@
 #define __drone_h
 
 #include "Instrmnt.h" 
-#include "DLineA.h"
+#include "DelayA.h"
 #include "OneZero.h"
 #include "ADSR.h" 
 #include "Noise.h" 
@@ -19,7 +19,7 @@
 class drone : public Instrmnt
 {
 protected:  
-  DLineA *delayLine;
+  DelayA *delayLine;
   ADSR *envelope;
   Noise *noise;
   OneZero *loopFilt;
