@@ -15,7 +15,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include "m_pd.h"
+
+#ifndef PD_MAJOR_VERSION
+#include "s_stuff.h"
+#else 
 #include "m_imp.h"
+#endif
+
 #include "g_canvas.h"
 #include "t_tk.h"
 #include "g_all_guis.h"
