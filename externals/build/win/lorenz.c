@@ -1,1 +1,0 @@
-#include "../chaos/lorenz.c"
