@@ -24,6 +24,7 @@ all:
 			../../ext13/doc/*.pd \
 			../../ggee/*/*.pd \
 			../../gem2pdp/*.pd \
+			../../ff/*.pd \
 			../../hcs/*.pd \
 			../../markex/*.pd \
 			../../maxlib/help/*.* \
