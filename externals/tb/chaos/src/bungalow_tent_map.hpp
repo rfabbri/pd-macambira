@@ -33,14 +33,14 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class bungalow_tent:
-	protected map_base
+	public map_base
 {
 public:
 	bungalow_tent()
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		CHAOS_SYS_INIT(x, 0.5);
+		CHAOS_SYS_INIT(x, 0.6);
 		CHAOS_SYS_INIT(r, 0.5);
 	}
 
@@ -83,7 +83,7 @@ public:
 		return (f >= -1) && (f < 1);
 	}
 
-	CHAOS_SYSVAR_FUNCS_PRED(r, 0, m_pred_r);
+	CHAOS_SYSPAR_FUNCS_PRED(r, m_pred_r);
 	bool m_pred_r(t_float f)
 	{
 		return (f >= -0.5) && (f < 1);

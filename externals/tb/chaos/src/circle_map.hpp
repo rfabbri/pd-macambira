@@ -20,21 +20,23 @@
 
 #include "map_base.hpp"
 
-//  circle_map map: x[n+1] = x[n] * omega - r / (2*pi) * sin (2 * pi * x [n])
+#include <cmath>
+
+//  circle_map map: x[n+1] = x[n] + omega - r / (2*pi) * sin (2 * pi * x [n])
 // 
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class circle_map:
-	protected map_base
+	public map_base
 {
 public:
 	circle_map()
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
-		CHAOS_SYS_INIT(omega, 0.4);
-		CHAOS_SYS_INIT(r, 1);
-		CHAOS_SYS_INIT(x, 0.5);
+		CHAOS_SYS_INIT(omega, 0.1);
+		CHAOS_SYS_INIT(r, 3);
+		CHAOS_SYS_INIT(x, 0.4);
 	}
 
 	~circle_map()

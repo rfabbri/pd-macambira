@@ -25,18 +25,18 @@
 //            0 <= x[n] <  1
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class tent:
-	protected map_base
+class tent_map:
+	public map_base
 {
 public:
-	tent()
+	tent_map()
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
 		CHAOS_SYS_INIT(x, 0.5);
 	}
 
-	~tent()
+	~tent_map()
 	{
 		delete m_data;
 	}
@@ -59,12 +59,12 @@ public:
 };
 
 
-#define LOGISTIC_CALLBACKS						\
+#define TENT_MAP_CALLBACKS						\
 MAP_CALLBACKS									\
 CHAOS_SYS_CALLBACKS(x);
 
-#define LOGISTIC_ATTRIBUTES						\
+#define TENT_MAP_ATTRIBUTES						\
 MAP_ATTRIBUTES									\
 CHAOS_SYS_ATTRIBUTE(x);
-
+ 
 

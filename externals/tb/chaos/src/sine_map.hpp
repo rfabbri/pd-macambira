@@ -25,19 +25,19 @@
 //                     0 <= x[n] <=  1
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class sine:
-	protected map_base
+class sine_map:
+	public map_base
 {
 	
 public:
-	sine()
+	sine_map()
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
 		CHAOS_SYS_INIT(x,0);
 	}
 
-	~sine()
+	~sine_map()
 	{
 		delete m_data;
 	}
@@ -47,7 +47,7 @@ public:
 		m_data[0] = sin (M_PI * m_data[0]);
 	}
 
-	CHAOS_SYSVAR_FUNCS_PRED(x, m_pred);
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred);
 
 	bool m_pred(t_float f)
 	{
@@ -55,11 +55,11 @@ public:
 	}
 };
 
-#define SINE_CALLBACKS							\
+#define SINE_MAP_CALLBACKS						\
 MAP_CALLBACKS									\
 CHAOS_SYS_CALLBACKS(x);
 
-#define SINE_ATTRIBUTES							\
+#define SINE_MAP_ATTRIBUTES						\
 MAP_ATTRIBUTES									\
 CHAOS_SYS_ATTRIBUTE(x);
 

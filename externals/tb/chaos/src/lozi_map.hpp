@@ -25,11 +25,11 @@
 //            b != 0
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class lozi:
-	protected map_base
+class lozi_map:
+	public map_base
 {
 public:
-	lozi()
+	lozi_map()
 	{
 		m_num_eq = 2;
 		m_data = new data_t[1];
@@ -39,7 +39,7 @@ public:
 		CHAOS_SYS_INIT(b,0.3);
 	}
 
-	~lozi()
+	~lozi_map()
 	{
 		delete m_data;
 	}
@@ -71,14 +71,14 @@ public:
 };
 
 
-#define LOZI_CALLBACKS							\
+#define LOZI_MAP_CALLBACKS						\
 MAP_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(a);							\
 CHAOS_SYS_CALLBACKS(b);							\
 CHAOS_SYS_CALLBACKS(x);							\
 CHAOS_SYS_CALLBACKS(y);
 
-#define LOZI_ATTRIBUTES							\
+#define LOZI_MAP_ATTRIBUTES						\
 MAP_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(a);							\
 CHAOS_SYS_ATTRIBUTE(b);							\

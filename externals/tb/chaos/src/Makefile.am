@@ -1,9 +1,18 @@
 NAME = chaos
 
 BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp \
+	bernoulli_dsp.cpp bernoulli_msg.cpp \
+	bungalow_tent_dsp.cpp bungalow_tent_msg.cpp \
+	circle_map_dsp.cpp circle_map_msg.cpp \
+	gauss_map_dsp.cpp gauss_map_msg.cpp \
+	henon_map_dsp.cpp henon_map_msg.cpp \
+	ikeda_laser_map_dsp.cpp ikeda_laser_map_msg.cpp \
+	logistic_dsp.cpp logistic_msg.cpp \
 	lorenz_dsp.cpp lorenz_msg.cpp \
-	logistic_dsp.cpp logistic_msg.cpp
-
+	lozi_map_dsp.cpp lozi_map_msg.cpp \
+	sine_map_dsp.cpp sine_map_msg.cpp \
+	standard_map_dsp.cpp standard_map_msg.cpp \
+	tent_map_dsp.cpp tent_map_msg.cpp
 
 CXXFLAGS  = @CXXFLAGS@ \
 	@OPT_FLAGS@ \
@@ -37,6 +46,7 @@ all-local: $(OBJECTS)
 dist-hook:
 	rm -f ./*~
 	rm -f ./*.@OBJEXT@
+	rm ./Makefile
 
 clean-local:
 	rm -f ../$(TARGET)

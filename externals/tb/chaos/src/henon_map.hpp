@@ -26,7 +26,7 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class henon:
-	protected map_base
+	public map_base
 {
 public:
 	henon()

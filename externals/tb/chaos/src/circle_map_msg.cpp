@@ -18,54 +18,17 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "map_base.hpp"
+#include "circle_map.hpp"
+#include "chaos_msg.hpp"
 
-//  bernoulli map: x[n+1] = 2 * x[n] mod 1             
-//                 0 <= x[n] <  1
-//  taken from Willi-Hans Steeb: Chaos and Fractals
-
-class bernoulli:
-	public map_base
+class circle_map_msg:
+	public chaos_msg<circle_map>
 {
-public:
-	bernoulli()
-	{
-		m_num_eq = 1;
-		m_data = new data_t[1];
-		CHAOS_SYS_INIT(x,0.5);
-	}
+	CHAOS_MSG_INIT(circle_map, CIRCLE_MAP_ATTRIBUTES);
 
-	~bernoulli()
-	{
-		delete m_data;
-	}
-
-	virtual void m_step()
-	{
-		data_t x = m_data[0];
-		
-		if (x <= 0)
-			x = 0.00001;  //stability
-
-		if (x < 0.5f)
-			m_data[0] = 2.f * x;
-		else
-			m_data[0] = 2.f * x - 1.f;
-	}
-
-	CHAOS_SYSVAR_FUNCS_PRED(x,0,m_pred_x);
-	bool m_pred_x(t_float f)
-	{
-		return (f >= 0) && (f < 1);
-	}
+	CIRCLE_MAP_CALLBACKS;
 };
 
 
-#define BERNOULLI_CALLBACKS						\
-MAP_CALLBACKS;									\
-CHAOS_SYS_CALLBACKS(x);
 
-
-#define BERNOULLI_ATTRIBUTES					\
-MAP_ATTRIBUTES;									\
-CHAOS_SYS_ATTRIBUTE(x);
+FLEXT_LIB_V("circle_map", circle_map_msg);

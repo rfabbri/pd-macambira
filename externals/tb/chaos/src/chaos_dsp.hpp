@@ -75,14 +75,24 @@ SYSTEM##_dsp(int argc, t_atom* argv )			\
 												\
 	int size = m_system->get_num_eq();			\
 												\
-    for (int i = 0; i != size; ++i)				\
-        AddOutSignal();							\
-												\
 	m_values = new t_float[size];				\
 	m_slopes = new t_float[size];				\
 	m_nextvalues = new t_float[size];			\
 	m_nextmidpts = new t_float[size];			\
 	m_curves = new t_float[size];				\
+												\
+    /* create inlets and zero arrays*/ 			\
+    for (int i = 0; i != size; ++i)				\
+	{											\
+		AddOutSignal();							\
+		m_values[i] = 0;						\
+		m_slopes[i] = 0;						\
+		m_nextvalues[i] = 0;					\
+		m_nextmidpts[i] = 0;					\
+		m_curves[i] = 0;						\
+	}											\
+												\
+												\
 												\
     m_freq = GetAFloat(argv[0]);				\
 	m_method = (char)GetAFloat(argv[1]);		\
@@ -185,7 +195,7 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 }
 
 
-/* linear interpolation adapted from supercollider by James McCartney */
+/* linear and cubic interpolation adapted from supercollider by James McCartney */
 template <class system> 
 void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 								   t_sample *const *outsigs)
@@ -225,7 +235,6 @@ void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 }
 
 
-/* linear interpolation adapted from Numerical Recipes In C */
 template <class system> 
 void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 								   t_sample *const *outsigs)
@@ -250,7 +259,7 @@ void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 				m_nextvalues[j]= m_system->get_data(j);
 				
 				m_values[j] =  m_nextmidpts[j];
-				m_nextmidpts[j] = (m_values[j] + value) * 0.5f;
+				m_nextmidpts[j] = (m_nextvalues[j] + value) * 0.5f;
 				
 				float fseglen = (float)phase;
 				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - 

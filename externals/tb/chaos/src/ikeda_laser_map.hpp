@@ -31,11 +31,11 @@
 //
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class ikeda:
-	protected map_base
+class ikeda_laser_map:
+	public map_base
 {
 public:
-	ikeda()
+	ikeda_laser_map()
 	{
 		m_num_eq = 2;
 		m_data = new data_t[2];
@@ -47,7 +47,7 @@ public:
 		CHAOS_SYS_INIT(y,0.5);
 	}
 
-	~ikeda()
+	~ikeda_laser_map()
 	{
 		delete m_data;
 	}
@@ -70,15 +70,15 @@ public:
 	CHAOS_SYSVAR_FUNCS(x, 0);
 	CHAOS_SYSVAR_FUNCS(y, 1);
 	
-	CHAOS_PAR_FUNCS(c1);
-	CHAOS_PAR_FUNCS(c2);
-	CHAOS_PAR_FUNCS(c3);
-	CHAOS_PAR_FUNCS(roh);
+	CHAOS_SYSPAR_FUNCS(c1);
+	CHAOS_SYSPAR_FUNCS(c2);
+	CHAOS_SYSPAR_FUNCS(c3);
+	CHAOS_SYSPAR_FUNCS(roh);
 
 };
 
 
-#define IKEDA_CALLBACKS							\
+#define IKEDA_LASER_MAP_CALLBACKS				\
 MAP_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(c1);						\
 CHAOS_SYS_CALLBACKS(c2);						\
@@ -87,7 +87,7 @@ CHAOS_SYS_CALLBACKS(roh);						\
 CHAOS_SYS_CALLBACKS(x);							\
 CHAOS_SYS_CALLBACKS(y);
 
-#define IKEDA_ATTRIBUTES						\
+#define IKEDA_LASER_MAP_ATTRIBUTES				\
 MAP_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(c1);						\
 CHAOS_SYS_ATTRIBUTE(c2);						\

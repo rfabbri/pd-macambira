@@ -20,23 +20,25 @@
 
 #include "map_base.hpp"
 
+#include <cmath>
+
 //  gauss map: x[n+1] = 0              (for x[n] = 0)
-//                      fmod(1 / x[n]) (else)
+//                      fmod(1 / x[n], 1) (else)
 //             0 <= x[n] <  1
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class gauss:
-	protected map_base
+class gauss_map:
+	public map_base
 {
 public:
-	gauss()
+	gauss_map()
 	{
 		m_num_eq = 1;
 		m_data = new data_t[1];
 		CHAOS_SYS_INIT(x,0.5);
 	}
 
-	~gauss()
+	~gauss_map()
 	{
 		delete m_data;
 	}
@@ -46,9 +48,9 @@ public:
 		data_t data = m_data[0];
 
 		if (data == 0)
-			m_data[0] = 0;
+			m_data[0] = 0.001;
 		else
-			m_data[0] = fmod(1.f / data);
+			m_data[0] = fmod(1.f / data, 1);
 	}
 
 	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
@@ -58,11 +60,11 @@ public:
 	}
 };
 
-#define GAUSS_CALLBACKS							\
+#define GAUSS_MAP_CALLBACKS						\
 MAP_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(x);
 
-#define GAUSS_ATTRIBUTES						\
+#define GAUSS_MAP_ATTRIBUTES					\
 MAP_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(x);
 

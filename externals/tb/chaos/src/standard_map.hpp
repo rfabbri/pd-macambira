@@ -26,11 +26,11 @@
 //                0 <= theta <= 2*pi
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class standard:
-	protected map_base
+class standard_map:
+	public map_base
 {
 public:
-	standard()
+	standard_map()
 	{
 		m_num_eq = 2;
 		m_data = new data_t[2];
@@ -40,7 +40,7 @@ public:
 		CHAOS_SYS_INIT(k, 0.8);
 	}
 
-	~standard()
+	~standard_map()
 	{
 		delete m_data;
 	}
@@ -54,23 +54,23 @@ public:
 		m_data[0] = I + k * sin(theta);
 		theta = theta + I + k * sin(theta);
 
-		if (y > 2 * M_PI)
+		if (theta > 2 * M_PI)
 		{
 			do
 			{
-				y -= 2*M_PI;
+				theta -= 2*M_PI;
 			}
-			while (y > 2 * M_PI);
+			while (theta > 2 * M_PI);
 			goto put_data;
 		}
 		
-		if (y < 0)
+		if (theta < 0)
 		{
 			do
 			{
-				y += 2*M_PI;
+				theta += 2*M_PI;
 			}
-			while (y < 0);
+			while (theta < 0);
 		}
 		
 	put_data:
@@ -86,18 +86,18 @@ public:
 		return (f >= 0) && (f < 2*M_PI);
 	}
 
-	CHAOS_SYSPAR_FUNCS(I, 1);
+	CHAOS_SYSPAR_FUNCS(k);
 };
 
 
-#define STANDARD_CALLBACKS						\
+#define STANDARD_MAP_CALLBACKS					\
 MAP_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(I);							\
 CHAOS_SYS_CALLBACKS(theta);						\
 CHAOS_SYS_CALLBACKS(k);
 
 
-#define STANDARD_ATTRIBUTES						\
+#define STANDARD_MAP_ATTRIBUTES					\
 MAP_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(I);							\
 CHAOS_SYS_ATTRIBUTE(theta);						\
