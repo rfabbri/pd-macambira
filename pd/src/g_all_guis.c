@@ -375,7 +375,7 @@ void iemgui_receive(void *x, t_iemgui *iemgui, t_symbol *s)
     if(!strcmp(s->s_name, "empty")) rcvable = 0;
     rcv = iemgui_raute2dollar(s);
     iemgui->x_rcv_unexpanded = rcv;
-    iemgui->x_rcv = rcv = canvas_realizedollar(iemgui->x_glist, rcv);
+    rcv = canvas_realizedollar(iemgui->x_glist, rcv);
     if(rcvable)
     {
         if(strcmp(rcv->s_name, iemgui->x_rcv->s_name))
