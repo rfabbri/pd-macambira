@@ -24,8 +24,8 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
 LIBPATH=
-FLAGS=-DPD 
-CFLAGS=-O6 -mcpu=pentiumpro
+FLAGS=-DFLEXT_SYS=2 -fno-exceptions -fno-rtti ${UFLAGS}
+CFLAGS=-O6 
 #CFLAGS=-g
 LIBS=m util 
 
@@ -39,13 +39,14 @@ NAME=fftease
 # all the source files from the package
 include make-files.txt
 
+MAKEFILE=makefile.pd-linux
 TARGET=$(TARGDIR)/$(NAME).pd_linux
 DIR=src
 
 # default target
 all: $(TARGDIR) $(TARGET)
 
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(CONFIG)
+$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(FLEXTLIB) $(MAKEFILE) $(CONFIG)
 	touch $@
 
 $(TARGDIR):
@@ -58,7 +59,7 @@ $(TARGDIR)/%.co : $(DIR)/%.c
 	$(CC) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.c,$(TARGDIR)/%.co,$(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))) $(FLEXTLIB) 
-	$(CXX) -shared $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+	$(CXX) -shared $^ -Wl,-s $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):
