@@ -51,6 +51,8 @@ public:
 			AtomList lst(cnt);
 			for(I i = 0; i < cnt; ++i,++p) SetFloat(lst[i],*p);
 			ToOutList(0,lst);
+
+            delete buf;
 		}
 	}
 
@@ -110,6 +112,8 @@ public:
 				}
 			ToOutList(0,pos);
 			ToOutList(1,lst);
+
+            delete buf;
 		}
 	}
 

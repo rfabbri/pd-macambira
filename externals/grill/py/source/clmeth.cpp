@@ -122,9 +122,11 @@ PyObject* pyext::pyext_getattr(PyObject *,PyObject *args)
 
 	if(!ret) { 
 #if PY_VERSION_HEX >= 0x02020000
+        // \todo borrowed or new???
 		ret = PyObject_GenericGetAttr(self,name);
 #else
 		if(PyInstance_Check(self))
+            // borrowed reference
 			ret = PyDict_GetItem(((PyInstanceObject *)self)->in_dict,name);	
 #endif
 	}
@@ -135,48 +137,54 @@ PyObject* pyext::pyext_getattr(PyObject *,PyObject *args)
 PyObject *pyext::pyext_outlet(PyObject *,PyObject *args)
 {
 	BL ok = false;
-    if(PySequence_Check(args)) {
-		PyObject *self = PySequence_GetItem(args,0);
-		PyObject *outl = PySequence_GetItem(args,1);
-		if(
-			self && PyInstance_Check(self) && 
-			outl && PyInt_Check(outl)
-		) {
-			pyext *ext = GetThis(self);
 
-			I sz = PySequence_Size(args);
-			PyObject *val;
-			BL tp = sz == 3 && PySequence_Check(PySequence_GetItem(args,2));
+    // should always be a tuple!
+    FLEXT_ASSERT(PyTuple_Check(args));
 
-			if(tp)
-				val = PySequence_GetItem(args,2); // borrowed
-			else
-				val = PySequence_GetSlice(args,2,sz);  // new ref
+    // borrowed references!
+	PyObject *self = PyTuple_GetItem(args,0);
+	PyObject *outl = PyTuple_GetItem(args,1);
+	if(
+		self && PyInstance_Check(self) && 
+		outl && PyInt_Check(outl)
+	) {
+		pyext *ext = GetThis(self);
 
-			AtomList *lst = GetPyArgs(val);
-			if(lst) {
-				I o = PyInt_AsLong(outl);
-				if(o >= 1 && o <= ext->Outlets()) {
-					// by using the queue there is no immediate call of the next object
-					// deadlock would occur if this was another py/pyext object!
-					if(lst->Count() && IsSymbol((*lst)[0]))
-						ext->ToQueueAnything(o-1,GetSymbol((*lst)[0]),lst->Count()-1,lst->Atoms()+1);
+		I sz = PyTuple_Size(args);
+		PyObject *val;
+        
+        BL tp = 
+            sz == 3 && 
+            PySequence_Check(
+                val = PyTuple_GetItem(args,2) // borrow reference
+            );
+
+		if(!tp)
+			val = PySequence_GetSlice(args,2,sz);  // new ref
+
+		AtomList *lst = GetPyArgs(val);
+		if(lst) {
+			I o = PyInt_AsLong(outl);
+			if(o >= 1 && o <= ext->Outlets()) {
+				// by using the queue there is no immediate call of the next object
+				// deadlock would occur if this was another py/pyext object!
+				if(lst->Count() && IsSymbol((*lst)[0]))
+					ext->ToQueueAnything(o-1,GetSymbol((*lst)[0]),lst->Count()-1,lst->Atoms()+1);
 //						ext->ToOutAnything(o-1,GetSymbol((*lst)[0]),lst->Count()-1,lst->Atoms()+1);
-					else
-						ext->ToQueueList(o-1,*lst);
-//						ext->ToOutList(o-1,*lst);
-				}
 				else
-					post("pyext: outlet index out of range");
-
-				ok = true;
+					ext->ToQueueList(o-1,*lst);
+//						ext->ToOutList(o-1,*lst);
 			}
-			else 
-				post("py/pyext - No data to send");
-			if(lst) delete lst;
+			else
+				post("pyext: outlet index out of range");
 
-			if(!tp) Py_DECREF(val);
+			ok = true;
 		}
+		else 
+			post("py/pyext - No data to send");
+		if(lst) delete lst;
+
+		if(!tp) Py_DECREF(val);
 	}
 
 	if(!ok)	post("pyext - Syntax: _outlet(self,outlet,args...)");
@@ -245,40 +253,43 @@ PyObject *pyext::pyext_isthreaded(PyObject *,PyObject *)
 //! Send message to canvas
 PyObject *pyext::pyext_tocanvas(PyObject *,PyObject *args)
 {
+    FLEXT_ASSERT(PyTuple_Check(args));
+
 	BL ok = false;
-    if(PySequence_Check(args)) {
-		PyObject *self = PySequence_GetItem(args,0);
-		if(self && PyInstance_Check(self)) {
-			pyext *ext = GetThis(self);
+	PyObject *self = PyTuple_GetItem(args,0); // borrowed ref
+	if(self && PyInstance_Check(self)) {
+		pyext *ext = GetThis(self);
 
-			I sz = PySequence_Size(args);
-			PyObject *val;
-			BL tp = sz == 2 && PySequence_Check(PyTuple_GetItem(args,1));
+		I sz = PySequence_Size(args);
+		PyObject *val;
 
-			if(tp)
-				val = PySequence_GetItem(args,1); // borrowed
-			else
-				val = PySequence_GetSlice(args,1,sz);  // new ref
+        BL tp = 
+            sz == 2 && 
+            PySequence_Check(
+                val = PyTuple_GetItem(args,1) // borrowed ref
+            );
 
-			AtomList *lst = GetPyArgs(val);
-			if(lst) {
-				t_glist *gl = ext->thisCanvas(); //canvas_getcurrent();
-			    t_class **cl = (t_pd *)gl;
-				if(cl) {
-					pd_forwardmess(cl,lst->Count(),lst->Atoms());
-				}
-#ifdef FLEXT_DEBUG
-				else
-					post("pyext - no parent canvas?!");
-#endif
-				ok = true;
+		if(!tp)
+			val = PyTuple_GetSlice(args,1,sz);  // new ref
+
+		AtomList *lst = GetPyArgs(val);
+		if(lst) {
+			t_glist *gl = ext->thisCanvas(); //canvas_getcurrent();
+			t_class **cl = (t_pd *)gl;
+			if(cl) {
+				pd_forwardmess(cl,lst->Count(),lst->Atoms());
 			}
-			else 
-				post("py/pyext - No data to send");
-			if(lst) delete lst;
-
-			if(!tp) Py_DECREF(val);
+#ifdef FLEXT_DEBUG
+			else
+				post("pyext - no parent canvas?!");
+#endif
+			ok = true;
 		}
+		else 
+			post("py/pyext - No data to send");
+		if(lst) delete lst;
+
+		if(!tp) Py_DECREF(val);
 	}
 
 	if(!ok)	post("pyext - Syntax: _tocanvas(self,args...)");

@@ -79,12 +79,15 @@ BL VecOp::d_search(OpParam &p)
 Vasp *VaspOp::m_search(OpParam &p,CVasp &src,const Argument &arg,CVasp *dst,BL st) 
 { 
 	Vasp *ret = NULL;
-	if(src.Vectors() > 1) 
-		post("%s -  More than one vector in vasp!",p.opName());
+	if(src.Vectors() != 1) 
+		post("%s - Need exactly one vector in vasp!",p.opName());
 	else if(arg.CanbeFloat() || (arg.IsList() && arg.GetList().Count() >= 1)) {
 		I fr = src.Frames();
 		I o = src.Vector(0).Offset();
-		I sz = src.Buffer(0)->Frames();
+
+        VBuffer *buf = src.Buffer(0);
+        I sz = buf->Frames();
+        delete buf;
 
 		CVasp all(src);
 		if(st) {

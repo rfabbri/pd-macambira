@@ -98,6 +98,8 @@ public:
 			ToOutAnything(1,sym_list,pkfnd,lst);
 			delete[] pos;
 			delete[] lst;
+
+            delete buf;
 		}
 	}
 

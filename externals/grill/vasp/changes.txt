@@ -21,6 +21,8 @@ Version history:
 - ADD: [vasp.channels?] reports number of channels in the first vasp vector (buffer/array)
 - CHANGE: vasp.min?, vasp.max?, vasp.amin?, vasp.amax?, vasp.rmin?, vasp.rmax? no longer return the reference vasp / return a list of vector maxima/minima
 - CHANGE: inherited several classes from the flext class, so that new and delete use the RT-system functions
+- FIX: fixed memory leaks associated to VBuffer retrieval
+- FIX: fixed bug on vasp.search for vectors with 0 channels
 
 0.1.2:
 - FIX: bug in vasp.frames* ... wrong argument

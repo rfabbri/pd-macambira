@@ -99,6 +99,8 @@ public:
 
 			Vasp ret(len,vr);
 			ToOutVasp(0,ret);
+
+            delete buf;
 		}
 	}
 
