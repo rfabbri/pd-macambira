@@ -1,0 +1,18 @@
+#N canvas 328 264 466 318 12;
+#X floatatom 54 217 5 0 0;
+#X floatatom 54 132 5 0 0;
+#X floatatom 108 132 5 0 0;
+#X text 39 20 divide :: like '/' but calculates result;
+#X text 133 204 use creation arguments to set initial;
+#X text 133 220 values for inlets;
+#X msg 7 104 bang;
+#X text 53 103 calculate and output result now;
+#X obj 54 172 divide 8 6 4;
+#X text 118 58 allows for up to 32 inlets;
+#X floatatom 164 132 5 0 0;
+#X text 120 38 when leftmost or second inlet is changed;
+#X connect 1 0 8 0;
+#X connect 2 0 8 1;
+#X connect 6 0 8 0;
+#X connect 8 0 0 0;
+#X connect 10 0 8 2;
