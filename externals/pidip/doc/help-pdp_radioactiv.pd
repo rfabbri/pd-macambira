@@ -1,48 +1,40 @@
 #N canvas 237 21 712 664 10;
-#X obj 267 415 pdp_xv;
+#X obj 267 408 pdp_xv;
 #X obj 268 64 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X msg 123 136 loop \$1;
+#X msg 124 140 loop \$1;
 #X obj 124 114 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
 1;
 #X msg 370 44 open \$1;
 #X obj 369 20 openpanel;
 #X obj 354 3 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X floatatom 316 99 5 0 0;
+#X floatatom 317 95 5 0 0 0 - - -;
 #X msg 225 65 stop;
-#X obj 323 68 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 320 70 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 257 135 metro 70;
-#X floatatom 374 310 5 0 0;
-#X obj 346 203 pdp_v4l;
+#X obj 247 138 metro 70;
+#X floatatom 373 310 5 0 0 0 - - -;
+#X obj 351 209 pdp_v4l;
 #X obj 355 172 metro 70;
 #X obj 400 138 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 357 139 stop;
 #X msg 442 170 open /dev/video;
-#X obj 267 359 pdp_radioactiv;
-#X obj 341 285 hdl 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1 -1
+#X obj 267 358 pdp_radioactiv;
+#X obj 340 282 hdl 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1 -1
 0;
-#X text 412 283 Mode;
-#X obj 252 167 pdp_yqt;
-#X floatatom 408 332 5 0 0;
-#X obj 283 243 dac~;
+#X text 411 283 Mode;
+#X obj 250 171 pdp_yqt;
+#X floatatom 408 332 5 0 0 0 - - -;
+#X obj 278 231 dac~;
 #X text 421 310 Snap time;
-#X text 458 331 Snap interval;
-#X floatatom 374 310 5 0 0;
-#X obj 267 359 pdp_radioactiv;
-#X obj 341 285 hdl 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1 -1
-0;
-#X text 412 283 Mode;
-#X floatatom 408 332 5 0 0;
-#X text 421 310 Snap time;
-#X obj 423 373 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X text 456 331 Snap interval;
+#X obj 423 372 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 423 425 pdp_control;
-#X msg 423 398 thread \$1;
-#X floatatom 423 486 5 0 0;
-#X obj 423 457 route pdp_drop;
+#X obj 424 425 pdp_control;
+#X msg 423 397 thread \$1;
+#X floatatom 425 455 5 0 0 0 - - -;
 #X connect 1 0 10 0;
 #X connect 2 0 20 0;
 #X connect 3 0 2 0;
@@ -65,10 +57,6 @@
 #X connect 20 3 22 0;
 #X connect 20 4 22 1;
 #X connect 21 0 17 3;
-#X connect 25 0 26 2;
-#X connect 27 0 26 1;
-#X connect 29 0 26 3;
-#X connect 31 0 33 0;
-#X connect 32 0 35 0;
-#X connect 33 0 32 0;
-#X connect 35 0 34 0;
+#X connect 25 0 27 0;
+#X connect 26 0 28 0;
+#X connect 27 0 26 0;

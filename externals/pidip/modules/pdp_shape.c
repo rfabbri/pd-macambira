@@ -339,7 +339,7 @@ static void pdp_shape_pick(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 
    x->x_cursX = (t_int) (X*(t_float)x->x_vwidth);
    x->x_cursY = (t_int) (Y*(t_float)x->x_vheight);
-   post( "pdp_shape : pick color at : %d,%d", x->x_cursX, x->x_cursY );
+   // post( "pdp_shape : pick color at : %d,%d", x->x_cursX, x->x_cursY );
    if ( ( x->x_cursX >= 0 ) && ( x->x_cursX < x->x_vwidth )
         && ( x->x_cursY >= 0 ) && ( x->x_cursY < x->x_vheight ) )
    {
@@ -353,7 +353,7 @@ static void pdp_shape_pick(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
       x->x_red = yuv_YUVtoR( y, u, v );
       x->x_green = yuv_YUVtoG( y, u, v );
       x->x_blue = yuv_YUVtoB( y, u, v );
-      post( "pdp_shape : picked color set to : %d,%d,%d", x->x_red, x->x_green, x->x_blue );
+      // post( "pdp_shape : picked color set to : %d,%d,%d", x->x_red, x->x_green, x->x_blue );
    }
 }
 
@@ -381,7 +381,7 @@ static void pdp_shape_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
 
    wX = (t_int) (X*(t_float)x->x_vwidth);
    wY = (t_int) (Y*(t_float)x->x_vheight);
-   post( "pdp_shape : detect %d %d", wX, wY );
+   // post( "pdp_shape : detect %d %d", wX, wY );
    if ( (wX<0) || (wX>x->x_vwidth) )
    {
      // post( "pdp_shape : fill : wrong X position : %f", wX );
@@ -574,6 +574,7 @@ void pdp_shape_setup(void)
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_rgb, gensym("rgb"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_paint, gensym("paint"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_shape_class, (t_method)pdp_shape_luminosity, gensym("luminosity"), A_FLOAT, A_NULL);
 
 }
 

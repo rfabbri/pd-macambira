@@ -6,6 +6,7 @@ Image Magick ( http://www.imagemagick.org )
  ---->  watchout !! configure with --enable-shared 
 and ffmpeg 
  ----> watchout, it requires the cvs snapshot ! : http://ffmpeg.sourceforge.net/cvs
+ + don't forget to activate mp3 and vorbis support in ffmpeg : ./configure --enable-mp3lame --enable-vorbis
 
 you should also have installed libquicktime that is necessary for PDP 
 ( http://sourceforge.net/projects/libquicktime ).

@@ -1,3 +1,4 @@
+# Generated automatically from Makefile.in by configure.
 PD_DIR = /usr/local/pd
 PDP_DIR = /usr/local/pd/pdp
 FFMPEG_SOURCE_DIR = /SOURCES/ffmpeg
@@ -9,7 +10,7 @@ AALIB_CFLAGS = -I/usr/local/include
 AALIB_LIBS = -L/usr/local/lib -Wl,-rpath,/usr/local/lib -laa -lm -L/usr/X11R6/lib -lX11 -lgpm -lslang
 MAGICK_CFLAGS = -I/usr/X11R6/include -g -O2 -Wall 
 MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljasper -ljpeg -lpng -lXext -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -L/usr/local/lib -L/usr/X11R6/lib -L/usr/X11R6/lib -L/usr/local/lib
-PDP_PIDIP_VERSION = 0.12.9
+PDP_PIDIP_VERSION = 0.12.10
 
 PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)
 PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz

@@ -1,3 +1,7 @@
+0.12.10
+  added pdp_fqt : fast quicktime reader ( frames are cached in memory and no audio decoding )
+  added help patches for pdp_yqt and pdp_fqt
+  adaptations for newer autoconfs
 0.12.9
   fixed pdp_ripple
   added pdp_shape : a shape recognition object (based on color, similar to color tracker ) 
