@@ -14,7 +14,8 @@ INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 WISH_SHELL = /Volumes/TclTkAquaStandalone-8.?.*/Wish\ Shell.app
 WISH_SHELL_CONTENTS = $(WISH_SHELL)/Contents
 
-PD_FILE_ROOT = $(DESTDIR)$(INSTALL_PREFIX)/lib/pd
+LIB_DIR = $(DESTDIR)$(INSTALL_PREFIX)/lib
+PD_FILE_ROOT = $(LIB_DIR)/pd
 ABSTRACTIONS_DIR = $(PD_FILE_ROOT)/doc/abstractions
 EXTERNALS_DIR = $(PD_FILE_ROOT)/extra
 HELP_DIR = $(PD_FILE_ROOT)/doc
@@ -68,7 +69,7 @@ TOXY_VERSION = $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
 ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
-darwin_app: darwin_app_wrapper darwin_app_core darwin_app_externals \
+darwin_app: darwin_app_wrapper darwin_app_core darwin_unix_pkg darwin_app_externals \
 		darwin_app_docs darwin_app_abstractions
 
 
@@ -210,12 +211,17 @@ darwin_app_abstractions:
 	install -p -m0444	../../externals/creb/doc/examples/*.* $(ABSTRACTIONS_DIR)/creb
 #	cp -Rf footils timestretch vadsr~  $(ABSTRACTIONS_DIR)
 
-darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++
+darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
+
+darwin_app_externals_gem:
+	cd ../../Gem && pbxbuild
 
 darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
-	cd ../../externals/grill/build/darwin && make 
+	cd ../../externals/grill/flext && make -f makefile.pd-darwin
+	cd ../../externals/grill/flext/pd-darwin/ && cp libflext.a ../source
+	cd ../../externals/grill/flext/source && ranlib libflext.a
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
 	install -d $(HELP_DIR)/flext
@@ -224,30 +230,19 @@ darwin_app_externals_flext:
 		../../externals/grill/flext/license.txt  \
 		$(HELP_DIR)/flext
 # FLEXTERNALS
+#########
 # dyn
-#	install -p -m0444 ../../externals/grill/dyn/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+	cd ../../externals/grill/dyn && make -f makefile.pd-darwin
+	install -p -m0444 ../../externals/grill/dyn/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/dyn/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/dyn
 	install -p -m0444 ../../externals/grill/dyn/gpl.txt  \
 		../../externals/grill/dyn/readme.txt   \
 		../../externals/grill/dyn/license.txt  \
 		$(HELP_DIR)/dyn
-# fftease
-#	install -p -m0444 ../../externals/grill/fftease/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/fftease/pd/*.pd $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/fftease
-	install -p -m0444 ../../externals/grill/fftease/gpl.txt  \
-		../../externals/grill/fftease/readme.txt \
-		../../externals/grill/fftease/license.txt $(HELP_DIR)/fftease
-	cp -rp ../../externals/grill/fftease/media $(HELP_DIR)/fftease
-# idelay
-#	install -p -m0444 ../../externals/grill/idelay/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/idelay/pd/*.pd $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/idelay
-	install -p -m0444 ../../externals/grill/idelay/gpl.txt \
-		../../externals/grill/idelay/license.txt \
-		$(HELP_DIR)/idelay
+#########
 # pool
+	cd ../../externals/grill/pool && make -f makefile.pd-darwin
 	install -p -m0444 ../../externals/grill/pool/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/pool/help-pool.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pool
@@ -255,7 +250,9 @@ darwin_app_externals_flext:
 		../../externals/grill/pool/readme.txt   \
 		../../externals/grill/pool/license.txt \
 		$(HELP_DIR)/pool
+#########
 # py/pyext
+#	cd ../../externals/grill/py && make -f makefile.pd-darwin
 #	install -p -m0444 ../../externals/grill/py/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -d $(HELP_DIR)/py/examples
 	install -d $(HELP_DIR)/py/scripts
@@ -266,9 +263,11 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/py
 #	install -d $(INSTALL_PREFIX)/Library/Frameworks
 #	cp -R /Library/Frameworks/Python.framework $(INSTALL_PREFIX)/Library/Frameworks
+#########
 # vasp
 #  fails without the dir
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
+#	cd ../../externals/grill/vasp/ && make -f makefile.pd-darwin
 #	install -p -m0444 ../../externals/grill/vasp/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/vasp/pd-help/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/vasp
@@ -279,15 +278,9 @@ darwin_app_externals_flext:
 		../../externals/grill/vasp/todo.txt     \
 		$(HELP_DIR)/vasp
 	cp -rp ../../externals/grill/vasp/pd-ex $(HELP_DIR)/vasp
-# vst
-#	install -p -m0444 ../../externals/grill/vst/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/vst/pd/*.pd $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/vst
-	install -p -m0444 ../../externals/grill/vst/gpl.txt  \
-		../../externals/grill/vst/readme.txt \
-		../../externals/grill/vst/license.txt                \
-		$(HELP_DIR)/vst
+#########
 # xsample
+	cd ../../externals/grill/xsample && make -f makefile.pd-darwin
 	install -p -m0444 ../../externals/grill/xsample/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/xsample/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/xsample
@@ -295,6 +288,11 @@ darwin_app_externals_flext:
 		../../externals/grill/xsample/readme.txt \
 		../../externals/grill/xsample/license.txt \
 		$(HELP_DIR)/xsample
+########## FOOTILS #########
+# syncgrain
+	cd ../../externals/footils/syncgrain/ && make -f makefile.pd-darwin
+	install -p -m0444 ../../externals/footils/syncgrain/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+	install -p -m0444 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
 
 darwin_app_externals_standard:
 #----------------------------------------------------------------------------
@@ -375,8 +373,8 @@ darwin_app_externals_c++:
 #	cd ../../gridflow && ./configure && make
 
 
-#darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
-darwin_unix_pkg:
+darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
+#darwin_unix_pkg:
 # mk the unix dir
 	install -d $(UNIX_DESTDIR)$(UNIX_prefix)
 # copy stuff to UNIX dirs
@@ -403,7 +401,7 @@ darwin_unix_pkg:
 # set proper permissions
 	sudo chown -R root:staff $(UNIX_DESTDIR)/$(UNIX_prefix)
 # build package
-	/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
+	-/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
 		-build \
 		-p $(PWD)/$(UNIX_PACKAGE_NAME).pkg \
 		-f $(PWD)/$(UNIX_DESTDIR) \
@@ -450,3 +448,19 @@ darwin_app_clean:
 	-rm -f *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
 	cd patches && ./unpatch
+
+darwin_app_externals_gem_clean:
+	cd ../../Gem && pbxbuild clean
+
+darwin_app_externals_flext_clean:
+	-rm ../../externals/grill/flext/source/libflext.a
+	cd ../../externals/grill/flext && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/dyn && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/fftease && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/pool && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/py && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/vasp && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/vst && make -f makefile.pd-darwin clean
+	cd ../../externals/grill/xsample && make -f makefile.pd-darwin clean
+	cd ../../externals/footils/syncgrain && make -f makefile.pd-darwin clean
+

@@ -15,3 +15,8 @@
 
 - add externals/OSCx/send+dump/ dumpOSC and sendOSC to Pd-UNIX.pkg
 
+- redo menu system
+  		 - the menus are the same for all windows
+		 - instead of hiding menus, grey-out/disable menu items on Pd window
+		 - one method for creating all menus
+		 - Pd window has method which disables menus
