@@ -40,17 +40,17 @@ build-stamp: configure-stamp
 	(cd build/linux; $(MAKE))
 
         # Build zexy
-	
+
 	(cd zexy/src; $(MAKE) -f makefile.linux LINCLUDE="-I ../../build/include")
 
 	# Build flext
-	
+
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux PDPATH=../../build/include)
 
 	# Flext externals
 	#
 	 
-	(cd footils; make PD_DIR=../../build/include \
+	-(cd footils; make PD_DIR=../../build/include \
                           FLEXTPATH=../../grill/flext/pd-linux \
 	                  FLEXTINC=../../grill/flext/source \
                           FLUIDLIB=" -lfluidsynth")
@@ -61,9 +61,14 @@ build-stamp: configure-stamp
 	(cd OSCx/OSC; $(MAKE))
 
         # build PDP
-	
+
 	(cd pdp;autoconf;./configure;$(MAKE))
 	(cd pdp/scaf/;autoconf;./configure;$(MAKE))
+
+	# build cyclone
+	-mkdir miXed/bin
+	(cd miXed/cyclone; make PD_DIR='../../build/include')
+
 
 	touch build-stamp
 
@@ -80,7 +85,7 @@ clean:
 	-rm `find . -name "*.obj"` 
 
 	# fix up wrong permissions
-	
+
 	chmod 644 `find . -name "*.h"`
 	chmod 644 `find . -name "*.c"`
 	chmod 644 `find . -name "*.pd"`
@@ -91,8 +96,8 @@ clean:
 	(cd zexy/src; $(MAKE) -f makefile.linux  clean)
 
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux clean)
-	
-	(cd footils; make clean)
+
+	-(cd footils; make clean)
 
 	(cd OSCx/libOSC;$(MAKE) clean)
 	(cd OSCx/OSC; $(MAKE) pd_linux_clean)
@@ -105,7 +110,10 @@ clean:
 	            config.status \
 	            autom4te.cache \
 	            Makefile.config)
-		    
+#  Clean cyclone
+#
+	(cd miXed/cyclone; make clean)
+	-rm miXed/bin/cyclist
 
 	dh_clean
 
@@ -118,29 +126,39 @@ install: build
 	# Add here commands to install the package into debian/pd-externals.
 	(cd build/linux; $(MAKE) install DESTDIR=$(CURDIR)/debian/tmp)
 	(rm -r `find $(CURDIR)/debian/tmp/ -name CVS`)
-	
+
 	(cd zexy/src; $(MAKE) -f makefile.linux install DESTDIR=$(CURDIR)/debian/tmp \
 	                              INSTALL_PREFIX=/usr/ \
 				      PDLIBDIR=lib/pd )
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux install INSTDIR=$(CURDIR)/debian/tmp/usr/lib/pd/flext)
 
-	(cd footils; make FLEXTPATH=../../grill/flext/pd-linux \
+# Install footils ... this is quite messy still, have to find a better solution
+
+	-(cd footils; make -k  FLEXTPATH=../../grill/flext/pd-linux \
 	        FLEXTINC=../../grill/flext/source \
 		DESTDIR=$(CURDIR)/debian/tmp INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra install)
 	install -m 644 footils/fluid/pd/fluid.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-fluid.pd
 	install -m 644 footils/shabby/shaffy~-help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shaffy~.pd
 	install -m 644 footils/shabby/shabby~.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shabby~.pd
+	-rm $(CURDIR)/debian/tmp/usr/lib/pd/extra/fiiwu*
 
-		
+
 	# Install OSC
 
 	install OSCx/OSC/OSC.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/extra
 	install -m 644 OSCx/doc/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference
 
 	# install pdp (needs /usr/lib/extern)
-	
+
 	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs
 	(cd pdp;make prefix=$(CURDIR)/debian/tmp/usr/ install)
+
+	# Install cyclone
+
+	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone
+	install $(CURDIR)/miXed/bin/*.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/externs/cyclone/
+	mkdir $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
+	install -m 644  $(CURDIR)/miXed/test/cyclone/*.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/cyclone
 
 # Build architecture-independent files here.
 binary-indep: build install
