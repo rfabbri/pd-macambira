@@ -9,11 +9,11 @@
 -66577 0;
 #X obj 471 5 pddp;
 #X obj 12 304 ifeel;
-#X text 20 41 "Haptic" means relating to the sense of touch. Haptic
+#X text 20 33 "Haptic" means relating to the sense of touch. Haptic
 feedback relates to the sense of touch at the skin level \, and the
 feeling of forces in the muscles and joints. Vibrations stimulate the
 sense of touch while various forces stimulate the muscles.;
-#X text 20 118 There are many haptic devices available \, from a US$35
+#X text 20 110 There are many haptic devices available \, from a US$35
 Logitech iFeel mouse \, to the massive \, extremely expensive haptic
 devices used for remote control surgery. Immersion \, Inc. has almost
 a monopoly on this technology due to a number of patents. These objects
@@ -32,8 +32,10 @@ known as damping.;
 #X text 111 502 Periodic effects are forces controlled by waveforms
 of various shape \, strength \, and frequency;
 #X text 112 547 Apply a constant force in a specified direction;
-#X text 21 207 Numerous companies produce haptic game controllers:
+#X text 21 199 Numerous companies produce haptic game controllers:
 mice \, joysticks \, gamepads \, steering wheels. These objects work
 with game controllers. Belkin \, Logitech \, Microsoft \, Saitek \,
 and others make TouchSense game controllers.;
-#X text 21 269 Currently \, these objects only work on GNU/Linux.;
+#X text 21 261 Currently \, these objects only work on GNU/Linux. For
+info on how to get it working \, see: http://at.or.at/hans/haptics
+;
