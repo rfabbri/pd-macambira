@@ -106,6 +106,11 @@ do{ \
 #define INTSORT(a,b) qsort((void *)(a),b, sizeof (int), k_cext_intcompare);
 #define FLOATSORT(a,b) qsort((void *)(a),b, sizeof (float), k_cext_floatcompare);
 
+/* TB: values and bang outlets */
+#define VALUE(char) (*(value_get(gensym(char))))
+#define SETVALUE(char,float) value_setfloat(gensym(char),float)
+#define Ob(a) outlet_bang(x->outlets[a]);
+
 
 #define IF if(
 #define FOR for(
