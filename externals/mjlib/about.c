@@ -73,6 +73,6 @@ static void about_set_err( t_about *x, t_float f )
     	(t_method)about_free, sizeof(t_about), 0, A_DEFFLOAT , 0);    
     class_addfloat( about_class, about_float );
     class_addmethod(about_class, (t_method)about_set_err, gensym("error" ), A_FLOAT, 0);    	
-	class_sethelpsymbol(about_class, gensym("mjLib/about"));
+	
 }
 

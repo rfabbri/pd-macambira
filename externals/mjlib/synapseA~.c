@@ -113,6 +113,6 @@ static void *synapseA_tilde_new(t_floatarg prob , t_floatarg tick)
     CLASS_MAINSIGNALIN( synapseA_tilde_class, t_synapseA_tilde, x_f);
     class_addmethod(synapseA_tilde_class, (t_method) synapseA_tilde_dsp, gensym("dsp"), (t_atomtype)0);    	
 	class_addmethod(synapseA_tilde_class, (t_method) synapseA_tilde_threshold, gensym("threshold") , A_DEFFLOAT , (t_atomtype)0 );
-	class_sethelpsymbol(synapseA_tilde_class, gensym("mjLib/synapseA~"));
+	
 }
 

@@ -1,0 +1,63 @@
+#N canvas 153 22 644 746 12;
+#X obj 292 684 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 115 505 start;
+#X obj 219 680 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X obj 373 685 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 41 494 stop;
+#X obj 210 507 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X msg 353 526 1 2 1 1;
+#X msg 452 538 2000;
+#X msg 261 491 1 2 0 1;
+#X obj 219 611 monorhythm 2000 2 1 1;
+#X text 23 38 by mark williamson;
+#X text 25 13 monorhythm;
+#X text 23 62 (mark@junklight.com);
+#X text 28 97 The monorhythm object is designed to allow simple rythms
+to be generated. It is also constructed in such away so as to create
+more complex polyrhythms quickly and easily.;
+#X text 28 154 The monorhythm object is given a time interval and a
+rhythm pattern. It divides the interval into the number of beats in
+the pattern and outputs bangs as defined by the pattern. The performance
+time of the entire pattern is given by the time interval.;
+#X text 30 242 The pattern consists of strings of the symbols 0 \,
+1 and 2 0 is a rest \, 1 is a normal beat and 2 is an accented beat.
+A rest produces no output. A 1 produces a bang on the leftmost outlet.
+A 2 produces a bang on the left most outlet and a bang on the middle
+outlet (the accent outlet).;
+#X text 30 331 In order to synchronise multiple monorhythms there is
+a third outlet - the sync outlet. This does a bang at the start of
+every bar - which can be fed to the left most inlet of a second (or
+Nth) monorhythm.;
+#X text 29 412 for an example of a polyrhythm see:;
+#X obj 380 412 polyexample;
+#X text 199 701 beat;
+#X text 278 702 accent;
+#X text 362 704 sync;
+#X text 449 568 time interval;
+#X text 278 459 pattern;
+#X text 37 466 stop;
+#X text 104 467 start or bang;
+#X text 105 483 sets it going;
+#X msg 25 559 exclusive;
+#X msg 27 654 nonexclusive;
+#X text 22 590 beat and accent;
+#X text 21 607 bangs are mutually;
+#X text 20 622 exclusive;
+#X text 23 682 accent bang;
+#X text 23 697 supplements;
+#X text 22 715 the beat bang;
+#X connect 1 0 9 0;
+#X connect 4 0 9 0;
+#X connect 5 0 9 0;
+#X connect 6 0 9 1;
+#X connect 7 0 9 2;
+#X connect 8 0 9 1;
+#X connect 9 0 2 0;
+#X connect 9 1 0 0;
+#X connect 9 2 3 0;
+#X connect 27 0 9 0;
+#X connect 28 0 9 0;

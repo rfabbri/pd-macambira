@@ -1,4 +1,3 @@
-#include "m_pd.h"
 
 typedef struct _about
 {

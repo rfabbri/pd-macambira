@@ -65,7 +65,7 @@ static void n2m_notename(  t_n2m *x, t_symbol *s, int ac, t_atom *av )
 	 n2m_class = class_new(gensym("n2m"), (t_newmethod)n2m_new,
     	(t_method)n2m_free, sizeof(t_n2m), 0, 0);    
     class_addmethod(n2m_class, (t_method)n2m_notename, gensym("note" ), A_GIMME, 0);    	
-	class_sethelpsymbol(n2m_class, gensym("mjLib/n2m"));
+	
 }
 
 /**

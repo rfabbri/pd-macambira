@@ -138,6 +138,6 @@ static void prob_set_time( t_prob *x, t_float f )
 	class_addmethod(prob_class, (t_method)prob_bang, gensym("start"), 0);    
 	class_addmethod(prob_class, (t_method)prob_set_probability, gensym("probability" ), A_FLOAT, 0);    	
 	class_addmethod(prob_class, (t_method)prob_set_time, gensym("time" ), A_FLOAT, 0);    	
-	class_sethelpsymbol(prob_class, gensym("mjLib/prob"));
+	
 }
 

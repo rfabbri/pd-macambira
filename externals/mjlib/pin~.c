@@ -200,6 +200,6 @@ void pin_tilde_setup(void)
     class_addmethod(pin_tilde_class, (t_method) pin_tilde_dsp, gensym("dsp"), (t_atomtype)0);    	
 	class_addmethod(pin_tilde_class, (t_method) pin_tilde_ticktime, gensym("tick") , A_DEFFLOAT , (t_atomtype)0 );
 	class_addmethod(pin_tilde_class, (t_method) pin_tilde_prob, gensym("prob") , A_DEFFLOAT , (t_atomtype)0 );
-	class_sethelpsymbol(pin_tilde_class, gensym("mjLib/pin~"));
+	
 }
 

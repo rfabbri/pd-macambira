@@ -1,0 +1,111 @@
+#N canvas 68 34 884 712 12;
+#X obj 274 213 morse;
+#X obj 274 243 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 296 243 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 319 243 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 61 73 1;
+#X msg 121 47 stop;
+#X msg 303 165 msg this is a test message;
+#X obj 87 119 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 303 139 msg 1 2 3 4 8;
+#X obj 106 117 metro 100;
+#X obj 129 615 dac~;
+#X obj 137 574 *~;
+#X obj 165 549 hsl 128 22 0.01 1 1 0 empty empty volume 9 9 1 10 -262144
+-1 -1 10000 0;
+#X obj 137 524 *~;
+#X obj 62 297 osc~ 440;
+#X obj 65 269 hsl 128 22 10 6000 0 0 empty empty frequency 9 9 1 10
+-262144 -1 -1 1900 1;
+#X obj 183 484 line~;
+#X obj 197 390 delay 50;
+#X obj 197 370 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 286 392 5 0 0 0 - - -;
+#X floatatom 7 298 5 0 0 0 - - -;
+#X msg 62 241 906.1;
+#X obj 62 214 loadbang;
+#X obj 382 389 delay 50;
+#X obj 382 369 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 468 390 5 0 0 0 - - -;
+#X obj 355 657 writesf~ 2;
+#X msg 358 596 start;
+#X msg 421 596 stop;
+#X msg 428 627 open mouts.wav;
+#X msg 157 430 1 1;
+#X msg 197 430 0 1;
+#X msg 342 429 1 1;
+#X msg 384 429 0 1;
+#X obj 683 155 hsl 128 15 10 1000 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 513 1;
+#X text 714 129 speed;
+#X floatatom 681 185 5 0 0 0 - - -;
+#X obj 643 276 s dot;
+#X obj 735 276 s dash;
+#X obj 191 91 r dot;
+#X obj 272 364 r dot;
+#X obj 457 362 r dash;
+#X obj 735 224 * 3;
+#X msg 680 93 50;
+#X obj 680 64 loadbang;
+#X text 230 333 dot;
+#X text 387 337 dash;
+#X text 188 528 volume - don't forget to set!;
+#X msg 61 47 start;
+#X text 335 684 you can record to a file.;
+#X text 11 4 convert text to Morse Code;
+#X text 223 36 On UNIX and MacOS X systems \, its case-sensitive \,
+on Windows \, its not.;
+#X connect 0 0 1 0;
+#X connect 0 1 2 0;
+#X connect 0 2 3 0;
+#X connect 1 0 18 0;
+#X connect 2 0 24 0;
+#X connect 4 0 9 0;
+#X connect 5 0 9 0;
+#X connect 6 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 9 0 7 0;
+#X connect 11 0 10 0;
+#X connect 11 0 10 1;
+#X connect 11 0 26 0;
+#X connect 11 0 26 1;
+#X connect 12 0 11 1;
+#X connect 13 0 11 0;
+#X connect 14 0 13 0;
+#X connect 15 0 14 0;
+#X connect 15 0 20 0;
+#X connect 16 0 13 1;
+#X connect 17 0 31 0;
+#X connect 18 0 17 0;
+#X connect 18 0 30 0;
+#X connect 21 0 15 0;
+#X connect 22 0 21 0;
+#X connect 23 0 33 0;
+#X connect 24 0 23 0;
+#X connect 24 0 32 0;
+#X connect 27 0 26 0;
+#X connect 28 0 26 0;
+#X connect 29 0 26 0;
+#X connect 30 0 16 0;
+#X connect 31 0 16 0;
+#X connect 32 0 16 0;
+#X connect 33 0 16 0;
+#X connect 34 0 36 0;
+#X connect 36 0 37 0;
+#X connect 36 0 42 0;
+#X connect 39 0 9 1;
+#X connect 40 0 17 1;
+#X connect 40 0 19 0;
+#X connect 41 0 23 1;
+#X connect 41 0 25 0;
+#X connect 42 0 38 0;
+#X connect 43 0 34 0;
+#X connect 44 0 43 0;
+#X connect 48 0 4 0;

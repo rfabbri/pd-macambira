@@ -233,6 +233,6 @@ static void monorhythm_set_time( t_monorhythm *x, t_float f )
 	class_addmethod(monorhythm_class, (t_method)monorhythm_set_time, gensym("timeinterval" ), A_FLOAT, 0);    	
 	class_addmethod(monorhythm_class, (t_method)monorhythm_set_exclusive,gensym("exclusive"),0);
 	class_addmethod(monorhythm_class, (t_method)monorhythm_set_nonexclusive,gensym("nonexclusive"),0); 
-	class_sethelpsymbol(monorhythm_class, gensym("mjLib/monorhythm"));
+	
 }
 

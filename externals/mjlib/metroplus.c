@@ -172,6 +172,6 @@ static void metroplus_time_float( t_metroplus *x1, t_float f )
 	class_addmethod(metroplus_class, (t_method)metroplus_bang, gensym("start"), 0);    	
 	class_addmethod(metroplus_2_class, (t_method)metroplus_time_seq, gensym("list"),A_GIMME,0);
 	class_addmethod(metroplus_2_class, (t_method)metroplus_time_float ,gensym("float"),A_FLOAT,0);
-	class_sethelpsymbol(metroplus_class, gensym("mjLib/metroplus"));
+	
 }
 

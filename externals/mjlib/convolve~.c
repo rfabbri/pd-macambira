@@ -175,6 +175,6 @@ void convolve_tilde_setup(void)
     class_addmethod(convolve_tilde_class, (t_method) convolve_tilde_dsp, gensym("dsp"), (t_atomtype)0);    	
 	class_addmethod(convolve_tilde_class, (t_method) convolve_tilde_ticktime, gensym("tick") , A_DEFFLOAT , (t_atomtype)0 );
 	class_addmethod(convolve_tilde_class, (t_method) convolve_tilde_prob, gensym("prob") , A_DEFFLOAT , (t_atomtype)0 );
-	class_sethelpsymbol(convolve_tilde_class, gensym("mjLib/convolve~"));
+	
 }
 

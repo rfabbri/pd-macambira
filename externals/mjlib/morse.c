@@ -308,6 +308,6 @@ static char *morse_lookup( char c )
 	//class_addmethod(morse_class, (t_method)morse_set_time, gensym("timeinterval" ), A_FLOAT, 0);    	
 	class_addmethod(morse_class, (t_method)morse_rewind,gensym("rewind"),0);
 	//class_addmethod(morse_class, (t_method)morse_set_nonexclusive,gensym("nonexclusive"),0); 
-	class_sethelpsymbol(morse_class, gensym("mjLib/morse"));
+	
 }
 
