@@ -61,6 +61,18 @@ public:
 		m_data[1] = sin(x1*a) + tmp1*tmp1 + tmp2*tmp2*tmp2;
 	}
 
+	/* function has a fix point for x1 == x2 == 0 */
+	virtual void m_verify() 
+	{
+		for (int i = 0; i != get_num_eq(); ++i)
+		{
+#ifndef DOUBLE_PRECISION
+			if (PD_BIGORSMALL(m_data[i]))
+				m_data[i] = 0.01;
+#endif
+		}
+	};
+
 	CHAOS_SYSVAR_FUNCS(x1, 0);
 	CHAOS_SYSVAR_FUNCS(x2, 1);
 

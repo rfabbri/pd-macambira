@@ -56,7 +56,7 @@ public:
 	data_t * m_data;       // state of the system
 
 protected:
-	virtual void m_step();
+	virtual void m_step() = 0;
 	int m_num_eq;  // number of equations of the system
 };
 

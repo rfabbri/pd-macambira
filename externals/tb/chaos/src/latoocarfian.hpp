@@ -76,6 +76,18 @@ public:
 	{
 		return (f > -0.5) && (f < 1.5);
 	}
+	
+	/* function has a fix point for x1 == x2 == 0 */
+	virtual void m_verify() 
+	{
+		for (int i = 0; i != get_num_eq(); ++i)
+		{
+#ifndef DOUBLE_PRECISION
+			if (PD_BIGORSMALL(m_data[i]))
+				m_data[i] = 0.01;
+#endif
+		}
+	};
 };
 
 

@@ -22,6 +22,7 @@
 
 #define FLEXT_ATTRIBUTES 1
 
+#define _USE_MATH_DEFINES /* tg says: define this before including cmath */
 #include "flext.h"
 #include "chaos_defs.hpp"
 #include <cmath>

@@ -23,7 +23,8 @@
 
 void chaos_library_setup()
 {
-	post("chaos~ version "PACKAGE_VERSION"\n");
+	post("chaos~ version "PACKAGE_VERSION", compiled on "__DATE__" \n");
+
 
 	CHAOS_ADD(bernoulli);
 	CHAOS_ADD(bungalow_tent);

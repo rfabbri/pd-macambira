@@ -1,6 +1,6 @@
 NAME = chaos
 
-BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp \
+BUILT_SOURCES = main.cpp ode_base.cpp chaos_dsp.cpp \
 	bernoulli_dsp.cpp bernoulli_msg.cpp \
 	bungalow_tent_dsp.cpp bungalow_tent_msg.cpp \
 	circle_map_dsp.cpp circle_map_msg.cpp \
