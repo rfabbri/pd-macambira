@@ -1,5 +1,8 @@
 CFLAGS=  -O2 -Wall -fPIC
+# uncomment the following for linux/win
 DEFS= -Dunix
+# and this for osx
+# DEFS= -Dunix -DMACOSX
 LIB=libOSC.a
 
 LIBOBJS= ${LIB}(OSC-client.o) ${LIB}(OSC-timetag.o)
