@@ -1,0 +1,5 @@
+/* Define to 1 if you have ffmpeg source tree */
+#undef HAVE_PIDIP_FFMPEG
+
+/* Define to 1 if you have mpeg4ip source tree */
+#undef HAVE_PIDIP_MPEG4IP
