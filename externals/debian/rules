@@ -31,6 +31,11 @@ configure-stamp:
 
 build: build-stamp
 
+FOOBUILD = PD_DIR=../../build/include \
+                          FLEXTPATH=../../grill/flext/pd-linux \
+	                  FLEXTINC=../../grill/flext/source \
+                          FLUIDLIB=" -lfluidsynth"
+
 build-stamp: configure-stamp 
 	dh_testdir
 
@@ -49,12 +54,11 @@ build-stamp: configure-stamp
 
 	# Flext externals
 	#
-	 
-	-(cd footils; make PD_DIR=../../build/include \
-                          FLEXTPATH=../../grill/flext/pd-linux \
-	                  FLEXTINC=../../grill/flext/source \
-                          FLUIDLIB=" -lfluidsynth")
 
+	(make -C footils/fluid -k  $(FOOBUILD))
+	(make -C footils/shabby -k  $(FOOBUILD))
+	(make -C footils/syncgrain -k  $(FOOBUILD))
+ 
 	# OSC
 
 	(cd OSCx/libOSC;$(MAKE))
@@ -117,6 +121,10 @@ clean:
 
 	dh_clean
 
+FOOINSTALL = FLEXTPATH=../../grill/flext/pd-linux \
+	        FLEXTINC=../../grill/flext/source \
+		DESTDIR=$(CURDIR)/debian/tmp INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra
+
 install: build
 	dh_testdir
 	dh_testroot
@@ -130,13 +138,14 @@ install: build
 	(cd zexy/src; $(MAKE) -f makefile.linux install DESTDIR=$(CURDIR)/debian/tmp \
 	                              INSTALL_PREFIX=/usr/ \
 				      PDLIBDIR=lib/pd )
+	ln -s zexy $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-zexy
 	(cd grill/flext; $(MAKE) -f makefile.pd-linux install INSTDIR=$(CURDIR)/debian/tmp/usr/lib/pd/flext)
 
 # Install footils ... this is quite messy still, have to find a better solution
 
-	-(cd footils; make -k  FLEXTPATH=../../grill/flext/pd-linux \
-	        FLEXTINC=../../grill/flext/source \
-		DESTDIR=$(CURDIR)/debian/tmp INSTPATH=$(CURDIR)/debian/tmp/usr/lib/pd/extra install)
+	(make -C footils/fluid -k  $(FOOINSTALL) install)
+	(make -C footils/shabby -k  $(FOOINSTALL) install)
+	(make -C footils/syncgrain -k  $(FOOINSTALL) install)
 	install -m 644 footils/fluid/pd/fluid.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-fluid.pd
 	install -m 644 footils/shabby/shaffy~-help.pd $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shaffy~.pd
 	install -m 644 footils/shabby/shabby~.pd_linux $(CURDIR)/debian/tmp/usr/lib/pd/doc/5.reference/help-shabby~.pd
