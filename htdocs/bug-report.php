@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-<!-- $Id: bug-report.php,v 1.1 2004-10-19 14:59:32 ggeiger Exp $  -->
+<!-- $Id: bug-report.php,v 1.2 2004-10-19 15:16:29 ggeiger Exp $  -->
 
 <HTML>
 
@@ -71,7 +71,7 @@ cvs diff -uBw > cool_feature.patch
 <p>
 There is also a tracker for feature requests. A feature request can be sent if
 you are missing a functionality, but you don't know how to code it. This could
-be and additional external, or functionality of the Pd core.
+be an additional external or functionality of the Pd core.
 </p>
 Click <a href="http://sourceforge.net/tracker/?func=add&group_id=55736&atid=478073">Add Feature Request</a> to add a new feature request.
 
