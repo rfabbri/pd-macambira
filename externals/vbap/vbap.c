@@ -7,16 +7,16 @@ Unversity of California at Berkeley
 
 See copyright in file with name COPYRIGHT  */
 
-#ifdef NT
-#define sqrtf sqrt
-#endif
-
 #include <math.h>
 #include "m_pd.h"				/* you must include this - it contains the external object's link to pure data */
 
 #define RES_ID 9171 				/* resource ID for assistance (we'll add that later) */
 #define MAX_LS_SETS 100				/* maximum number of loudspeaker sets (triplets or pairs) allowed */
 #define MAX_LS_AMOUNT 55			/* maximum amount of loudspeakers, can be increased */
+
+#ifndef IRIX
+#define sqrtf sqrt
+#endif
 
 typedef struct vbap				/* This defines the object as an entity made up of other things */
 {
@@ -40,23 +40,23 @@ typedef struct vbap				/* This defines the object as an entity made up of other 
 
 /* Globals */
 
-void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3]);
-void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3]);
+static void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3]);
+static void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3]);
 static t_class *vbap_class;				
-void cross_prod(float v1[3], float v2[3],
+static void cross_prod(float v1[3], float v2[3],
                 float v3[3]);
-void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
-void vbap_bang(t_vbap *x);
-void vbap_int(t_vbap *x, t_float n);
-void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av);
-void vbap_in1(t_vbap *x, long n);
-void vbap_in2(t_vbap *x, long n);
-void vbap_in3(t_vbap *x, long n);
-void spread_it(t_vbap *x, float *final_gs);
+static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
+static void vbap_bang(t_vbap *x);
+static void vbap_int(t_vbap *x, t_float n);
+static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av);
+static void vbap_in1(t_vbap *x, long n);
+static void vbap_in2(t_vbap *x, long n);
+static void vbap_in3(t_vbap *x, long n);
+static void spread_it(t_vbap *x, float *final_gs);
 static void *vbap_new(t_symbol *s, int ac, t_atom *av); /* using A_GIMME - typed message list */
-void vbap(float g[3], long ls[3], t_vbap *x);
-void angle_to_cart(long azi, long ele, float res[3]);
-void cart_to_angle(float cvec[3], float avec[3]);
+static void vbap(float g[3], long ls[3], t_vbap *x);
+static void angle_to_cart(long azi, long ele, float res[3]);
+static void cart_to_angle(float cvec[3], float avec[3]);
 
 /* above are the prototypes for the methods/procedures/functions you will use */
 
@@ -82,7 +82,7 @@ void vbap_setup(void)
 }
 
 
-void angle_to_cart(long azi, long ele, float res[3])
+static void angle_to_cart(long azi, long ele, float res[3])
 /* converts angular coordinates to cartesian */
 { 
   float atorad = (2 * 3.1415927 / 360) ;
@@ -91,7 +91,7 @@ void angle_to_cart(long azi, long ele, float res[3])
   res[2] = sin((float) ele * atorad);
 }
 
-void cart_to_angle(float cvec[3], float avec[3])
+static void cart_to_angle(float cvec[3], float avec[3])
 /* converts cartesian coordinates to angular */
 {
   float tmp, tmp2, tmp3, tmp4;
@@ -126,7 +126,7 @@ void cart_to_angle(float cvec[3], float avec[3])
 }
 
 
-void vbap(float g[3], long ls[3], t_vbap *x)
+static void vbap(float g[3], long ls[3], t_vbap *x)
 {
   /* calculates gain factors using loudspeaker setup and given direction */
   float power;
@@ -229,7 +229,7 @@ void vbap(float g[3], long ls[3], t_vbap *x)
 }
 
 
-void cross_prod(float v1[3], float v2[3],
+static void cross_prod(float v1[3], float v2[3],
                 float v3[3]) 
 /* vector cross product */
 {
@@ -244,7 +244,7 @@ void cross_prod(float v1[3], float v2[3],
   v3[2] /= length;
 }
 
-void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
+static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
 /* calculates gains to be added to previous gains, used in
 // multiple direction panning (source spreading) */
 {
@@ -310,7 +310,7 @@ void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
 }
 
 
-void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3])
+static void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spread_base[3])
 /* subroutine for spreading */
 {
 	float beta,gamma;
@@ -341,7 +341,7 @@ void new_spread_dir(t_vbap *x, float spreaddir[3], float vscartdir[3], float spr
   	spreaddir[2] /= power;
 }
 
-void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
+static void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
 /* subroutine for spreading */
 {
 	float d;
@@ -359,7 +359,7 @@ void new_spread_base(t_vbap *x, float spreaddir[3], float vscartdir[3])
   	x->x_spread_base[2] /= power;
 }
 
-void spread_it(t_vbap *x, float *final_gs)
+static void spread_it(t_vbap *x, float *final_gs)
 /*
 // apply the sound signal to multiple panning directions
 // that causes some spreading.
@@ -435,7 +435,7 @@ void spread_it(t_vbap *x, float *final_gs)
 }	
 	
 
-void vbap_bang(t_vbap *x)			
+static void vbap_bang(t_vbap *x)			
 /* top level, vbap gains are calculated and outputted */
 {
 	t_atom at[MAX_LS_AMOUNT]; 
@@ -471,12 +471,12 @@ void vbap_bang(t_vbap *x)
 
 /*--------------------------------------------------------------------------*/
 
-void vbap_int(t_vbap *x, t_float n) /* x = the instance of the object, n = the int received in the right inlet */
+static void vbap_int(t_vbap *x, t_float n) /* x = the instance of the object, n = the int received in the right inlet */
 {
  /* do something if an int comes in the left inlet??? */
 }
 
-void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
+static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
 /* read in loudspeaker matrices */
 {
 	long counter;
@@ -570,14 +570,14 @@ void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
 	post("vbap: Loudspeaker setup configured!",0);
 }
 
-void vbap_in1(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
+static void vbap_in1(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
 /* panning angle azimuth */
 {
 	x->x_azi = n;							/* store n in a global variable */
 	
 }
 
-void vbap_in2(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
+static void vbap_in2(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
 /* panning angle elevation */
 {
 	x->x_ele = n;							/* store n in a global variable */
@@ -585,7 +585,7 @@ void vbap_in2(t_vbap *x, long n)				/* x = the instance of the object, n = the i
 }
 /*--------------------------------------------------------------------------*/
 
-void vbap_in3(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
+static void vbap_in3(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
 /* spread amount */
 {
 	if (n<0) n = 0;

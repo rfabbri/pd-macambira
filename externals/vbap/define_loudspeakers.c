@@ -17,7 +17,7 @@ See copyright in file with name COPYRIGHT  */
 #ifndef NT
 #define NULL 0L
 #endif
-#ifdef NT
+#ifndef IRIX
 #define fabsf fabs
 #endif
 
@@ -294,7 +294,7 @@ static void *def_ls_new(t_symbol *s, int ac, t_atom *av)	/* create new instance 
 		else {
 		 	post("define-loudspeakers: Error in loudspeaker data!",0);
 		 	 x->x_ls_read =0;
-		 	 return;
+		 	 return(0);
 		}
 		pointer++;
 		if(x->x_dimension == 3){  /* 3-D  */
@@ -306,7 +306,7 @@ static void *def_ls_new(t_symbol *s, int ac, t_atom *av)	/* create new instance 
 			 else {
 			 	post("define-loudspeakers: Error in loudspeaker data!",0);
 			 	x->x_ls_read =0;
-			 	return;
+			 	return(0);
 			 }
 			pointer++;
 		} else
