@@ -1,4 +1,4 @@
-#N canvas 149 83 442 564 10;
+#N canvas 180 287 446 568 10;
 #X obj 121 27 inlet~;
 #X obj 233 26 inlet;
 #X obj 30 443 *~;
@@ -17,7 +17,7 @@
 #X obj 46 418 line~;
 #X text 10 17 [linearpan~];
 #X obj 287 183 loadbang;
-#X floatatom 295 244 7 0 0 3 block_size_in_ms - -;
+#X floatatom 295 244 7 0 0 3 blocksize_in_ms - -;
 #X obj 270 184 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 196 337 t f b;
