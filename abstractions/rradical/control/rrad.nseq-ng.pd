@@ -109,7 +109,7 @@ standard functionality.;
 #X obj 93 97 r \$0-step;
 #X obj 342 217 r \$0-reset;
 #X obj 342 249 symbol \$1;
-#X msg 18 92 32;
+#X msg 18 92 26;
 #X obj 437 288 r \$0-parentstate;
 #X obj 437 309 s \$0-substate;
 #X msg 342 272 \$1/n* -1;
@@ -230,24 +230,24 @@ standard functionality.;
 #X obj 72 292 bng 15 250 50 0 \$0-reset empty reset 0 -6 0 8 -258699
 -1 -1;
 #X obj 76 34 nbx 2 14 0 1000 0 0 \$0-substate \$0-substate pre 0 -6
-0 8 -261689 -1 -1 32 256;
+0 8 -261689 -1 -1 26 256;
 #X obj 570 205 makefilename \$0-n%d;
 #X obj 593 270 symbol;
 #X obj 594 241 t s b;
 #X msg 593 292 \; \$1 color 0 -1 -1;
 #X msg 570 326 \; \$1 color 80 -1 -1;
 #X obj 10 26 nbx 3 14 -1 127 0 0 \$0-n0-s \$0-n0 n0 40 8 1 10 -262144
--1 -1 -1 256;
+-1 -1 0 256;
 #X obj 10 42 nbx 3 14 -1 127 0 0 \$0-n1-s \$0-n1 n1 40 8 1 10 -262144
 -1 -1 -1 256;
-#X obj 10 58 nbx 3 14 -1 127 0 0 \$0-n2-s \$0-n2 n2 40 8 1 10 -262144
+#X obj 10 58 nbx 3 14 -1 127 0 0 \$0-n2-s \$0-n2 n2 40 8 1 10 -195568
 -1 -1 -1 256;
 #X obj 10 74 nbx 3 14 -1 127 0 0 \$0-n3-s \$0-n3 n3 40 8 1 10 -262144
 -1 -1 -1 256;
-#X obj 10 90 nbx 3 14 -1 127 0 0 \$0-n4-s \$0-n4 n4 40 8 1 10 -195568
+#X obj 10 90 nbx 3 14 -1 127 0 0 \$0-n4-s \$0-n4 n4 40 8 1 10 -262144
 -1 -1 -1 256;
 #X obj 10 106 nbx 3 14 -1 127 0 0 \$0-n5-s \$0-n5 n5 40 8 1 10 -262144
--1 -1 -1 256;
+-1 -1 111 256;
 #X obj 10 122 nbx 3 14 -1 127 0 0 \$0-n6-s \$0-n6 n6 40 8 1 10 -262144
 -1 -1 -1 256;
 #X obj 10 138 nbx 3 14 -1 127 0 0 \$0-n7-s \$0-n7 n7 40 8 1 10 -262144
@@ -373,4 +373,4 @@ standard functionality.;
 #X connect 48 0 16 0;
 #X connect 49 0 19 0;
 #X connect 57 1 7 0;
-#X coords 0 0 1 1 108 360 1;
+#X coords 0 0 0.00952381 0.00275482 108 360 0;
