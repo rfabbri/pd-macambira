@@ -112,7 +112,7 @@ static int ignorevisible=1; // ignore visible test
 #define SCRATCHER_NB_GROOVES 20  
 #define SCRATCHER_MOVE_TIMEOUT 20
 
-static char   *scratcher_version = "scratcher~: version 0.6, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *scratcher_version = "scratcher~: version 0.7, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *scratcher_class;
 t_widgetbehavior scratcher_widgetbehavior;
