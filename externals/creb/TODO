@@ -1,0 +1,4 @@
+* fix nan/denorm problems in recursive filters
+* fix envelope probs
+* rewrite iir (c++) stuff -> filters.h
+
