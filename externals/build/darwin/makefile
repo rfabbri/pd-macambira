@@ -48,6 +48,16 @@ package:
 	directory. Then choose File -\> Create Package.
 	open Package.pmsp
 
+altpackage:
+	test -d root/Help || mkdir -p root/Help
+	cp -r ../doc/* root/Help
+	test -d root/Externals || mkdir -p root/Externals
+	install -m644 *.pd_darwin root/Externals
+	echo Now opening PackageMaker. Interact with that program now. \
+	Choose the Files tab, and correct the path to point to the newly-made ./root \
+	directory. Then choose File -\> Create Package.
+	open Altpackage.pmsp
+
 link: link.stamp
 
 link.stamp:
