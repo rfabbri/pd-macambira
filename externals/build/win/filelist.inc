@@ -32,11 +32,11 @@ limit.c \
 bandpass.c \
 kalashnikov.c \
 linear.c \
-bangfilt.c \
+#bangfilt.c \
 lowpass.c \
 lowshelf.c \
 lorenz.c \
-bangfilt2.c \
+#bangfilt2.c \
 mandelbrot.c \
 beat.c \
 mandelbrot~.c \
@@ -44,14 +44,14 @@ beta.c \
 microtime.c \
 bfilt.c \
 match.c \
-mean.c \
+#mean.c \
 bfilt2.c \
 mean~.c \
 minus.c \
 bilex.c \
 #netclient.c \
 mixer~.c \
-binshift.c \
+#binshift.c \
 mlife.c \
 moog~.c \
 borax.c \
@@ -68,3 +68,15 @@ notch.c \
 nroute.c \
 #oggread~.c \
 #cdplayer.c \
+alternate.c \
+gem_average.c \
+gem_change.c \
+gem_counter.c \
+invert.c \
+multiselect.c \
+oneshot.c \
+randomF.c \
+strcat.c \
+tripleLine.c \
+tripleRand.c \
+
