@@ -1,4 +1,6 @@
 #include <m_pd.h>
+#include <string.h>
+#include <math.h>
 #ifdef NT
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
@@ -28,6 +30,51 @@ void split_symbol(t_split *x, t_symbol *s)
   split_anything(x, s, 0, a);
 }
 
+
+// move these to generic location later on
+int split_string_isnum(char* s)
+{
+  // int isnum = 1;
+  char tc;
+  while((tc = *s++) != '\0') {
+    // tc= s;
+    switch(tc) {
+    case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
+      // post("yo numba: %c", tc);
+      break;
+    default:
+      return 0;
+      break;
+    }
+  }
+  return 1;
+}
+
+float split_string2float(char* s)
+{
+  // check for '.' ...
+  int isnum = 1, cnt = strlen(s) - 1;
+  char tc;
+  int iret = 0, itmp = 0;
+  double factor = 10.;
+  float fret;
+  while((tc = *s++) != '\0') {
+    // tc= s;
+    switch(tc) {
+    case 48: case 49: case 50: case 51: case 52: case 53: case 54: case 55: case 56: case 57:
+      itmp = (int)pow(factor, (double)cnt);
+      // post("tempchar: %c, iret: %d, itmp: %d", tc, iret, itmp);
+      iret = iret + ((tc - 48) * itmp);
+      // post("tempchar: %c, iret: %d, cnt: %d", tc, iret, cnt);
+      break;
+    default:
+      break;
+    }
+    cnt--;
+  }
+  return (float)iret;
+}
+
 void split_anything(t_split *x,t_symbol* s,t_int argc,t_atom* argv)
 {
      int i = argc; int j;
@@ -35,34 +82,54 @@ void split_anything(t_split *x,t_symbol* s,t_int argc,t_atom* argv)
      t_atom a_out[256];
      int    c_out = 0;
      t_atom* a = a_out;
-     char u[MAXPDSTRING]; char v[MAXPDSTRING];
+     // char *str;
+     char u[MAXPDSTRING];
+     char v[MAXPDSTRING];
+     // char *v;
      u[0] = '\0';
      v[0] = '\0';
      int isnum = 1;
+     float tf;
 
      for(j=0; j<strlen(s->s_name); j++) {
        u[0] = s->s_name[j];
        if(u[0] == x->x_splitter->s_name[0]) {
-	 // post("found split: %d", v);
-	 post("found split: %d", (int)v);
-/* 	 if(isnum) */
-/* 	   SETFLOAT(a, (int)v); */
-/* 	 else */
-	   SETSYMBOL(a, gensym(v));
-	 a++; c_out++;
-	 // reset stuff
-	 v[0] = '\0';
-	 isnum = 1;
+	 if(v[0] != '\0') {
+	   // check if string is digits only
+	   if(split_string_isnum(v)) {
+	     split_string2float(v);
+	     tf = split_string2float(v);
+	     SETFLOAT(a, tf);
+	     // tf = 0.0;
+	   }
+	   else {
+	     SETSYMBOL(a, gensym(v));
+	   }
+	   a++; c_out++;
+	   // reset stuff
+	   v[0] = '\0';
+	   isnum = 1;
+	 } // v[0] != '\0'
        } else {
-	 if(!(48 <= u[0] <= 57)) {
-	   isnum = 0;
-	 }
+/* 	   if(!(48 <= u[0] <= 57)) { */
+/* 	     isnum = 0; */
+/* 	   } */
 	 strncat(v, u, 1);
-       }
+       } // char matches splitter
      }
-     // post("found split: %s", v);
-     SETSYMBOL(a, gensym(v));
+
+     // have to do this again here, damn.
+     if(split_string_isnum(v)) {
+       split_string2float(v);
+       tf = split_string2float(v);
+       SETFLOAT(a, tf);
+       tf = 0.0;
+     }
+     else {
+       SETSYMBOL(a, gensym(v));
+     }
      a++, c_out++;
+
 
 /* #if 1 */
 /*      //     post("sym: %s",s->s_name); */
