@@ -17,11 +17,11 @@ FLEXTLIB=$(FLEXTPATH)/flext.a
 # compiler+linker stuff	
 INCLUDES=$(PDPATH) 
 LIBPATH=
-FLAGS=-DPD -Dunix -DMACOSX -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes # -maltivec
-CFLAGS=-O6 
-#CFLAGS=-g
+FLAGS=-DFLEXT_SYS=2 
+CFLAGS=-O6 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
 LIBS=m
 LDFLAGS=-bundle -bundle_loader $(PD)
+FRAMEWORKS=Carbon
 
 
 # ---------------------------------------------
@@ -51,7 +51,7 @@ $(TARGDIR)/%.o : $(DIR)/%.cpp
 	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES) $(FLEXTPATH)) $< -o $@
 
 $(TARGET) : $(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS)) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):

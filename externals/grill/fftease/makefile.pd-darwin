@@ -24,9 +24,9 @@ INCLUDES=${PDPATH} ${FLEXTPATH}
 LIBPATH= 
 FLAGS=-DFLEXT_SYS=2 ${UFLAGS}
 CFLAGS=-O6 -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes -fno-exceptions -fno-rtti
-#CFLAGS=-g
 LIBS=m 
 LDFLAGS=-bundle -bundle_loader ${PD}
+FRAMEWORKS=Carbon
 
 # ---------------------------------------------
 # the rest can stay untouched
@@ -57,7 +57,7 @@ $(TARGDIR)/%.co : $(DIR)/%.c
 	$(CC) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
 
 $(TARGET) : $(patsubst %.c,$(TARGDIR)/%.co,$(patsubst %.cpp,$(TARGDIR)/%.o,$(SRCS))) $(FLEXTLIB) 
-	$(CXX) $(LDFLAGS) $^ $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
+	$(CXX) $(LDFLAGS) $^ $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
 	chmod 755 $@
 
 $(INSTPATH):

@@ -16,12 +16,15 @@ PD=/usr/local/pd/bin/pd
 # where do the flext libraries reside?
 FLEXTPATH=/usr/local/pd/flext
 
-# where should flext libraries be built?
+# where should flext libraries be built? 
 TARGDIR=./pd-darwin
 
 # where should pool be installed?
 # (leave blank to omit installation)
 INSTPATH=/usr/local/pd/extra
 
+# additional compiler flags
+# (check if they match your system!)
+UFLAGS=-malign-power -maltivec
 
 
