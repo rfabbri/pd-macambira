@@ -1,4 +1,4 @@
-#N canvas 105 75 468 604 10;
+#N canvas 314 54 472 608 10;
 #X text 25 77 The PDDP was proposed initially in early 2002 by Krzysztof
 Czaja who suggested that Pure Data was in need of comprehensive documentation.
 ;
@@ -20,7 +20,7 @@ of "related native PD objects". The objects from other libraries are
 available only if you download those libraries from their respective
 authors and integrate them properly into your version of PD. We do
 not and cannot maintain a complete list of externals - but we try.
-For more info about externals and other objects \, see http://www.pure-data.org/
+For more info about externals and other objects \, see http://www.puredata.org/
 and the Pure Data Base at http://iem.kug.ac.at/pdb/;
 #X text 45 213 - Hans-Christoph Steiner;
 #X text 25 283 All comments \, corrections \, etc. regarding the PDDP
@@ -32,4 +32,4 @@ originally available at Dave's web site: http://www.davesabine.com/media/puredat
 #X obj 3 2 cnv 15 450 20 empty empty PDDP 2 12 1 18 -233017 -66577
 0;
 #X text 102 5 Pure Data Documentation Project;
-#X obj 31 42 table_of_contents;
+#X msg 26 44 \; pd open table_of_contents.pd ./;
