@@ -1,0 +1,21 @@
+Source: puredata
+Section: sound
+Priority: optional
+Maintainer: Guenter Geiger (Debian/GNU) <geiger@debian.org>
+Build-Depends: tcl8.4-dev, tk8.4-dev, libasound2-dev, debhelper, libjack-dev
+Standards-Version: 3.6.0
+
+Package: puredata
+Architecture: any
+Depends: xterm | x-terminal-emulator, ${shlibs:Depends}
+Replaces: pd-externals, pd
+Provides: pd
+Conflicts: pd
+Recommends: gem
+Description: realtime computer music and graphics system 
+ A real-time graphical programming environment for audio and graphics
+ analysis and rendering.  Pd's audio functions are built-in; graphical
+ computations require a separate package named GEM ("Graphics Environment for
+ Multimedia").  Pd and GEM are available for SGI machines, IBM PC compatibles
+ (running NT or W95) and Linux (PCs or Alpha machines).
+ 

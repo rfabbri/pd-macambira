@@ -1,0 +1,2 @@
+?package(puredata):needs=x11 section="Apps/Sound"\
+  title="PureData" command="x-terminal-emulator -e /usr/bin/pd"

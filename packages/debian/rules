@@ -1,0 +1,85 @@
+#!/usr/bin/make -f 
+#-*- makefile -*-
+# Made with the aid of dh_make, by Craig Small
+# Sample debian/rules that uses debhelper. GNU copyright 1997 by Joey Hess.
+# Some lines taken from debmake, by Christoph Lameter.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	# Add here commands to compile the package.
+	chmod a+x src/configure
+	cd src && ./configure --prefix=/usr
+	cd src && $(MAKE) 
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp install-stamp
+
+	# Add here commands to clean up after the build process.
+	chmod a+x src/configure
+	-cd src && ./configure
+	-cd src && $(MAKE) distclean
+	-rm src/makefile
+	-rm -r `find . -name CVS`
+	-rm `find . -name "*.pd_linux*"`
+	dh_clean
+
+install: install-stamp
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/tmp.
+	cd src && $(MAKE) install prefix=/usr/ DESTDIR=`pwd`/../debian/tmp
+	-rm -r `pwd`/debian/tmp/usr/man
+	touch install-stamp
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+#	dh_testversion
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	mv `pwd`/debian/tmp/usr/lib/pd/doc/1.manual/*.{jpg,htm} \
+`pwd`/debian/tmp/usr/share/doc/pd/html
+#	dh_dhelp
+	dh_installexamples
+	dh_installmenu
+#	dh_installemacsen
+#	dh_installinit
+	dh_installcron
+	dh_installman man/pd.1 man/pdsend.1  man/pdreceive.1
+#	dh_undocumented
+	dh_installchangelogs 
+#	dh_link
+	dh_strip 
+	dh_compress
+	dh_fixperms
+	# You may want to make some executables suid here
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_perl 
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+source diff:                                                                  
+	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

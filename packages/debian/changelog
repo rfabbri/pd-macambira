@@ -1,0 +1,273 @@
+puredata (0.37.cvs-5) unstable; urgency=low
+
+  * fixed problems with jack
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue,  7 Oct 2003 17:18:31 +0200
+
+puredata (0.37.cvs-4) unstable; urgency=low
+
+  * roll another one .. forgot to update pd.tk
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue,  5 Aug 2003 12:01:20 +0200
+
+puredata (0.37.cvs-3) unstable; urgency=low
+
+  * exchanged ld with cc in expr externals
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Sat,  2 Aug 2003 23:29:29 +0200
+
+puredata (0.37.cvs-2) unstable; urgency=low
+
+  * fixed build of extra -fPIC (closes: #203416)
+  * changed t_int to long in m_pd.h
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 30 Jul 2003 10:41:01 +0200
+
+puredata (0.37.cvs-1) unstable; urgency=low
+
+  * new upstream and renaming to puredata
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue, 08 Jul 2003 15:13:58 +0200
+
+pd (0.36.cvs-9) unstable; urgency=low
+
+  * makes -nosound option work (closes: #182888)
+  * remove -Werror, hopefully a quick fix for 64 bit architectures
+  * add -fPIC to external, fixed strip
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Fri, 28 Mar 2003 10:58:39 +0100
+
+pd (0.36.cvs-8) unstable; urgency=low
+
+  * I'm to stupid for this world, now I hope it really compiles (removed
+    sa_restorer and SIGSTKFTL in s_inter.c)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 26 Mar 2003 13:29:29 +0100
+ 
+pd (0.36.cvs-7) unstable; urgency=low
+
+  * removed handling of SIGSTKFLT
+  * fixed jack behaviour (DIO errors)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue, 25 Mar 2003 18:08:04 +0100
+ 
+pd (0.36.cvs-6) unstable; urgency=low
+
+  * New snapshot
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 17 Mar 2003 16:48:33 +0100
+ 
+pd (0.36.cvs-5) unstable; urgency=low
+
+  * Remove manpages from /usr/man (closes: 181190)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 17 Feb 2003 17:25:45 +0100
+ 
+pd (0.36.cvs-4) unstable; urgency=low
+
+  * Recompilation for new libjack 
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 12 Feb 2003 10:49:16 +0100
+ 
+pd (0.36.cvs-3) unstable; urgency=low
+
+  * Fixed compilation for Debian libjackX.XX.X-dev packages
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue,  7 Jan 2003 12:49:22 +0100
+ 
+pd (0.36.cvs-2) unstable; urgency=low
+
+  * Included patches for different Debian architectures (got lost somehow)
+    (closes: #173311)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 16 Dec 2002 16:57:03 +0100
+
+pd (0.36.cvs-1) unstable; urgency=low
+
+  * new upstream (closes: * #172085). pd now checks for jack, then alsa and
+    finally oss. This  doesnt fix the bug that is in ALSA OSS emulation, 
+    but it uses the ALSA native driver if available.
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue, 10 Dec 2002 10:50:55 +0100
+ 
+pd (0.36-1) unstable; urgency=low
+
+  * new upstream
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 25 Nov 2002 18:47:02 +0100
+ 
+pd (0.35.1-1) unstable; urgency=low
+
+  * new upstream, jack patched
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Fri, 26 Jul 2002 16:15:14 +0200
+
+pd (0.35.test23-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue,  7 May 2002 18:47:04 +0200
+ 
+pd (0.34.4-1) unstable; urgency=low
+
+  * new upstream release
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Tue,  7 May 2002 18:47:04 +0200
+ 
+pd (0.34.2-4) unstable; urgency=low
+
+  * SIGFLTK doesn exist on all platforms, remove handler for it.
+    (closes: #144081)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 22 Apr 2002 19:48:05 +0200
+
+pd (0.34.2-3) unstable; urgency=low
+
+  * added </PRE> tag in documentation (closes: #135911)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Thu, 18 Apr 2002 13:13:00 +0200
+
+pd (0.34.2-2) unstable; urgency=low
+
+  * FTBFS: build-depends, gcc errors, etc (hppa/unstable) patch applied LaMont
+    Jones <lamont@smallone.fc.hp.com> (closes: #143323)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 17 Apr 2002 16:44:32 +0200
+ 
+pd (0.34.2-1) unstable; urgency=low
+
+  * new upstream version, only compiles with libffm on Alpha if it  
+    is available (closes: #112232), added build depends
+  * added -fPIC to pd externals (closes: #124140)
+  * removed warning treated as errors flag (closes: #142635)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Fri,  2 Nov 2001 11:36:47 +0100
+
+pd (0.32p1-5) unstable; urgency=low
+
+  * fixed build on hurd (bstring.h) (closes: #108598)
+    man page link for pdsend, pdreceive (closes: #99566)
+    added jpeg files to html documentation (closes: #102171)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Wed, 15 Aug 2001 10:31:02 +0200
+
+pd (0.32p1-4) unstable; urgency=low
+
+  * don't set sa_restorer on any architecture .. it seems like this
+    field is only available for i386. (closes: #104984)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Mon, 16 Jul 2001 11:30:02 +0200
+
+pd (0.32p1-3) unstable; urgency=low
+
+  * make it clean the sources proberly (closes: #94525) 
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Fri, 20 Apr 2001 17:09:02 +0200
+
+pd (0.32p1-2) unstable; urgency=low
+
+  * make it compilable on sparc (SIGFLTK) (closes: #89274)
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Sat, 14 Mar 2001 10:37:02 +0100
+
+pd (0.32p1-1) unstable; urgency=low
+  
+  * folded table patches in, make the whole compilable on Alpha, added devfs compatibility
+
+ -- Guenter Geiger (Debian/GNU) <geiger@debian.org>  Sat, 12 Mar 2001 11:30:07 +0100
+
+pd (0.32-1) unstable; urgency=low
+
+  * new upstream (test) release
+
+ -- Guenter Geiger <geiger@debian.org>  Sat, 4 Nov 2000 12:30:07 +0100
+
+pd (0.31-3) unstable; urgency=low
+
+  * make it compileable with ccc under Alpha (extras)
+
+ -- Guenter Geiger <geiger@debian.org>  Fri, 13 Oct 2000 14:13:05 +0200
+
+pd (0.31-2) unstable; urgency=low
+
+  * improvments for nogui mode
+
+ -- Guenter Geiger <geiger@debian.org>  Tue, 12 Sep 2000 22:24:01 +0200
+
+pd (0.31-1) unstable; urgency=low
+
+  * new upstream
+
+ -- Guenter Geiger <geiger@debian.org>  Fri, 21 Jul 2000 18:34:45 +0200
+
+pd (0.30-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Guenter Geiger <geiger@debian.org>  Mon, 13 Mar 2000 13:45:01 +0100
+
+pd (0.28-4) unstable frozen; urgency=low
+
+  * applied patch for building on sparc from  Ben Collins <bmc@visi.net>, 
+    fixed bug in audio output with RME card
+
+ -- Guenter Geiger <geiger@debian.org>  Mon, 14 Feb 2000 13:34:01 +0100
+
+pd (0.28-3) unstable frozen; urgency=low
+
+  * now installs m_pd.h into /usr/include. Uses x-terminal-emulater to provide console.
+
+ -- Guenter Geiger <geiger@debian.org>  Tue, 25 Jan 2000 15:30:00 +0100
+
+pd (0.28-2) unstable; urgency=low
+
+  * changed permissions of configure script
+
+ -- Guenter Geiger <geiger@debian.org>  Fri, 14 Jan 1999 17:35:10 +0100
+
+pd (0.28-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Guenter Geiger <geiger@debian.org>  Mon, 22 Nov 1999 11:23:43 +0100
+
+pd (0.27-3) unstable; urgency=low
+
+  * minor bugfixes
+
+ -- Guenter Geiger <geiger@debian.org>  Wed, 13 Oct 1999 11:34:50 +0200
+
+pd (0.27-2) unstable; urgency=low
+
+  * added Gem recommendation , menu entry
+
+ -- Guenter Geiger <geiger@debian.org>  Wed, 15 Sep 1999 15:34:43 +0200
+
+pd (0.27-1) unstable; urgency=low
+
+  * new upstream version
+
+ -- Guenter Geiger <geiger@debian.org>  Mon, 6 Sep 1999  13:10:00 +0200
+
+pd (0.26-3) unstable; urgency=low
+
+  * added m_pd.h to the distribution
+
+ -- Guenter Geiger <geiger@debian.org>  Thu, 26 Aug 1999 16:45:48 +0200
+
+pd (0.26-2) unstable; urgency=low
+
+  * patched in the buggy sounddriver patch, fixed Bug#43379, cannot build from
+    source.
+
+ -- Guenter Geiger <geiger@debian.org>  Mon, 23 Aug 1999 17:21:34 +0200
+
+pd (0.26-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Guenter Geiger <geiger@debian.org>  Tue,  3 Aug 1999 14:33:26 +0200
+
+Local variables:
+mode: debian-changelog
+End:
