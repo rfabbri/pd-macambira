@@ -1,5 +1,3 @@
-<span style="font-size: small;">
 <b>Quote of the month</b><br />
-We've got to undo the MIDI revolution!
-</span>
-<br><em>MSP</em>
+Do you think the MIDI revolution was a step forward or backward?<br />
+MSP: <em> I think it was a huge step sideways. </em>
