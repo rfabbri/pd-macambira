@@ -715,7 +715,8 @@ static void *knob_new(t_symbol *s, int argc, t_atom *argv)
     x->x_steady = steady;
     if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
     if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
-    x->x_gui.x_unique_num = 0;
+    // gone in PD 0.37:
+	// x->x_gui.x_unique_num = 0;
     if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
     else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
     else { fstyle->x_font_style = 0;
