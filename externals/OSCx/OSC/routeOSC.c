@@ -79,6 +79,7 @@ typedef struct _OSCroute
   t_object x_obj;			// required header
   t_int x_num;				// Number of address prefixes we store
   t_int x_complainmode;			// Do we print a message if no match?
+  t_int x_sendmode;                     // use pd internal sends instead of outlets
   char *x_prefixes[MAX_NUM];
   void *x_outlets[MAX_NUM+1];
 } t_OSCroute;
