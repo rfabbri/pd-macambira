@@ -13,12 +13,16 @@
  */
 #include "iemmatrix.h"
 
+typedef struct _mtxprint
+{
+  t_object x_obj;
+  t_symbol *x_s;
+} t_mtxprint;
 
-#include "iemmatrix.h"
 
 /* mtx_print */
 static t_class *mtx_print_class;
-static void mtx_print(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
+static void mtx_print(t_mtxprint *x, t_symbol *s, int argc, t_atom *argv)
 {
   int col, row;
   if (argc<2){
@@ -31,7 +35,7 @@ static void mtx_print(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
     post("mtx_print : sparse matrices not yet supported : use \"mtx_check\"");
     return;
   }
-  post("matrix:");
+  post("%s:", x->x_s->s_name);
   while(row--){
     postatom(col, argv);
     argv+=col;
@@ -39,17 +43,16 @@ static void mtx_print(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   }
   endpost();
 }
-static void *mtx_print_new(void)
+static void *mtx_print_new(t_symbol*s)
 {
-  t_matrix *x = (t_matrix *)pd_new(mtx_print_class);
-  x->row = x->col = 0;
-  x->atombuffer   = 0;
+  t_mtxprint *x = (t_mtxprint *)pd_new(mtx_print_class);
+  x->x_s=(s&&s!=&s_)?s:gensym("matrix");
   return (x);
 }
 void mtx_print_setup(void)
 {
   mtx_print_class = class_new(gensym("mtx_print"), (t_newmethod)mtx_print_new, 
-			      0, sizeof(t_matrix), 0, 0, 0);
+			      0, sizeof(t_mtxprint), 0, A_DEFSYM, 0);
   class_addmethod  (mtx_print_class, (t_method)mtx_print, gensym("matrix"), A_GIMME, 0);
   class_sethelpsymbol(mtx_print_class, gensym("iemmatrix/matrix"));
 }
