@@ -55,7 +55,7 @@ compiling:
 /* #include <bstring.h> */
 #include <string.h>
 
-#ifdef unix
+#ifdef UNIX 
   #include <ctype.h>
   #include <netinet/in.h>
 #endif

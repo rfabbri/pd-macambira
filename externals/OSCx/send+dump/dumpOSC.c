@@ -60,7 +60,7 @@ Technologies, University of California, Berkeley.
 */
 
 
-#ifdef unix 
+#ifdef UNIX 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
