@@ -1,22 +1,23 @@
 ##############################################
 
-OBJPATH=$(OUTPATH)\$(OUTSUB)
+OBJPATH=$(OUTPATH)/$(OUTSUB)
 TARGETPATH=$(OBJPATH)
-TARGET=$(TARGETPATH)\$(OUTNAME).$(EXT)
+TARGET=$(TARGETPATH)/$(OUTNAME).$(EXT)
 
 ##############################################
 
-CFLAGS += 
-LDFLAGS += -shared
+CFLAGS +=
+LDFLAGS += -shared -Wl,-x 
 
 ##############################################
 
 ifdef DEBUG
 CFLAGS += -g
+LDFLAGS += -g
 else
 ifdef PROFILE
-CFLAGS += -g -pg
-LDFLAGS += -pg
+CFLAGS += -g -qp
+LDFLAGS += -g -qp
 else
 LDFLAGS += -Wl,-S
 endif
