@@ -21,9 +21,9 @@ MORECFLAGS = -DDL_OPEN  -DUSEAPI_OSS
 
 INCLUDE = -I.
 GINCLUDE = $(INCLUDE)  -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4 -I/usr/X11R6/include -I/usr/local/include
-GLIB =  -lX11 -L/usr/X11R6/lib -ltcl84 -ltk84 -L/usr/local/lib
+GLIB =  -lX11 -L/usr/X11R6/lib -L/usr/local/lib -ltcl84 -ltk84
 
-LDFLAGS = -Wl,-export-dynamic -L/usr/local/lib -L/usr/local/lib/pth -lpthread
+LDFLAGS = -Wl,-export-dynamic -L/usr/local/lib/pth -lpthread
 LIB =   -lm
 
 #select either the DBG and OPT compiler flags below:
