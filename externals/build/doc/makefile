@@ -39,6 +39,10 @@ all:
 			../../vst/*.pd \
 			../../zhzxh~/*.pd \
 			$(DOC_DIR)
+# remove help files for objects that are not included due to conflicts, etc.
+#   mjlib [prob] conflicts with cyclone's [prob]
+	rm prob.pd
+# make files read-only so people don't mistaken change their help files
 	chmod a-wx *.*
 
 # this is mildly dangerous, since it just deletes everything
