@@ -1,19 +1,15 @@
 #N canvas 185 28 660 552 12;
-#X floatatom 76 400 0 0 0;
-#X floatatom 189 401 0 0 0;
-#X floatatom 76 307 0 0 0;
-#X floatatom 553 161 0 0 0;
-#X floatatom 599 162 0 0 0;
+#X floatatom 76 400 0 0 0 0 - - -;
+#X floatatom 189 401 0 0 0 0 - - -;
+#X floatatom 76 307 0 0 0 0 - - -;
+#X floatatom 553 161 0 0 0 0 - - -;
+#X floatatom 599 162 0 0 0 0 - - -;
 #X obj 553 135 +;
-#X floatatom 553 105 0 0 0;
+#X floatatom 553 105 0 0 0 0 - - -;
 #X obj 599 136 +;
-#X text 114 16 In Pd \, most objects carry out their functions when
-they get messages in their rightmost inlets \, and their other inlets
-are for storing values that can modify the next action. Here \, the
-"+" object does its thing only when the left-hand input changes.;
-#X floatatom 26 109 0 0 0;
-#X floatatom 26 17 0 0 0;
-#X floatatom 48 41 0 0 0;
+#X floatatom 26 109 0 0 0 0 - - -;
+#X floatatom 26 17 0 0 0 0 - - -;
+#X floatatom 48 41 0 0 0 0 - - -;
 #X obj 26 85 +;
 #X text 3 64 hot;
 #X text 53 66 cold;
@@ -40,19 +36,23 @@ when all the data are good. The "bad adder" happens to receive its
 inputs in the wrong order and is perpetually doing its addition before
 all the data are in. There's an object that exists solely to allow
 you to control message order explicitly:;
-#X connect 2 0 22 0;
+#X text 114 16 In Pd \, most objects carry out their functions when
+they get messages in their leftmost inlets \, and their other inlets
+are for storing values that can modify the next action. Here \, the
+"+" object does its thing only when the left-hand input changes.;
+#X connect 2 0 21 0;
 #X connect 5 0 3 0;
 #X connect 6 0 7 0;
 #X connect 6 0 7 1;
 #X connect 6 0 5 1;
 #X connect 6 0 5 0;
 #X connect 7 0 4 0;
-#X connect 10 0 12 0;
-#X connect 11 0 12 1;
-#X connect 12 0 9 0;
-#X connect 18 0 0 0;
-#X connect 19 0 1 0;
-#X connect 22 0 18 0;
-#X connect 22 0 19 1;
-#X connect 22 1 18 1;
-#X connect 22 1 19 0;
+#X connect 9 0 11 0;
+#X connect 10 0 11 1;
+#X connect 11 0 8 0;
+#X connect 17 0 0 0;
+#X connect 18 0 1 0;
+#X connect 21 0 17 0;
+#X connect 21 0 18 1;
+#X connect 21 1 17 1;
+#X connect 21 1 18 0;

@@ -1,134 +1,146 @@
 ---------------- dolist --------------------
-
-fix for 0.37:
-read xx.txt in "bad" gives warnings
-mess with RME ALSA some more; ALSA readn doesn't work yet.
-test MIDI I/O on all platforms, inc. sysex...
-windows quit doesn't confirm on Windows?
-check Pd in OSX 10.3
-
-0.38:
-document env~ second argument (and why is it no less than 1/10 of first???)
-make watchdog work for MACOSX
-%x to %lx in all "tags" to make 64-bit safe
+done:
 plug-in support
-portaudio_pd files into src
-settings saver (registry in Windows; .pdrc in linux; defaults system in OSX?)
-text cut/copy/paste
-GOP bounding box object
-signal inlets to sense signals; fix +~ etc, vcf~, biquad~, and make a vcfb~
-
-makefile to set SETUID bit on install?
-loading e-mailed patches without removing headers crashes pd
-investigate gcc 3.3 warnings; try to reinstate -fstrict-aliasing
-message dialog not to disappear
-sprout inlets/outlets on objects whose creation failed.
-pd $1 bug ($1 is saved as it was evaluated, not as '$1')
-why does changing the name of an explode in jupiter patch take so long?
-close-subwindows menu item
-trouble typing into number boxes
-abstraction reload doesn't have to vis everyone??
-show results of opening audio and MIDI on dialogs
-windows escape from control-C
+atan2 inlets switched
+queued graphics updates for tables, number boxes
+cut/paste text (needs more testing)
 add standard bindings (ctl-o, etc) to dialogs
-settable netsend and netreceive port numbers
-suspend/resume graphics updates
-scheduler to handle callbacks
-scheduler to do DSP computations even if no audio
-hook to scheduler to let others get called for DSP I/O
-new: mline~, msnapshot~, abs~
-flags to defeat adding specified classes from libraries
-incorporate pddp doc
-try again to fix the font scene
-addcomma message to message
-pasting should look at current mouse location
-open/save panel to take messages to init directory
-look at prctl(2) for FP exception handling
+separate audio on/off from nchans
+setuid flag in configure script
+settings saver (registry in Windows; .pdrc in linux; defaults system in OSX?)
+    audio API
+    MIDI -- fix to read MIDI on startup (rest works?)
+    path
+    startup flags
+    libs
+better params:
+    extra flag for path
+    startup flags
+    startup libraries
+printout to pd window
+startup from GUI
+%x to %lx in all "tags" to make 64-bit safe
+portaudio_pd files into src
+t_int to int in binbuf_addv
+64-bit fix to externs makefiles
+new filter objects: cpole~, fpole~, etc.
+put in Wini's RME ALSA code; there are still bugs...
+portaudio fixed for inchans != outchans, e.g., emi emagic (2/6)
+sprout inlets/outlets on objects whose creation failed.
+
+doc:
+document env~ second argument (and why is it no less than 1/10 of first???)
+update 0.intro.pd
+vibrato example
 
 problems:
+click on minaturized subpatch fails to "vis" it
+startup flags need to handle spaces, duh.
+test MIDI I/O on all platforms, inc. sysex...
+'[' in numbox label breaks it (Yury Sept. 3)
+soundfiles with 3-byte samples buzz for the first readsf buffer (bug/x.pd)
+read xx.txt in "bad" gives warnings
+writesf -- "open" without "0" misses closing the previous file.
+Also writesf~ acts differently if DSP is off when "open" is sent?
 qlist - 'next 1' seems not to work
-arrays of non-existent templates crash
-don't draw in/outlets on gui objects in graphs
-Alsa degradation after several hours running on soundblaster
+Krzysztof's qlist_next reentrancy bug
+don't draw in/outlets on gui objects in graph-on-parent
 font size should depend on subpatch/abstraction
 moving a bang toward top of window creates problem
-figure out O_NDELAY for linux audio?
-missed Thomas's multi-dialog trick???
 check what happens when going back and forth between graph-on-parent
-deal with spaces in iemgui labels and send/receive names
 get rid of messages causing renaming; try to prevent patches closing themselves.
-Krzysztof's qlist_next reentrancy bug
 dac~/ adc~/ block~ incompatibility
 scofo reports error on reading score1.txt
-data copy/paste doesn't check templates aren't changed
 rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
+open_via_path() followed by close() fails in windows? [can't reproduce]
+loading e-mailed patches without removing headers crashes pd
+pd $1 bug ($1 is saved as it was evaluated, not as '$1')
+data copy/paste doesn't check templates aren't changed
+figure out why Pd sometimes crashes when you close example after adding fields
+
+next release:
+pixel font sizes
+pd to find running ones (pd -new to defeat)
+"enter" into object box to create new one (also, changing borders? forking?)
+tab to jump to a connected object (first one?) (shift-tab to back up?)
+portaudio v19?
+tables:
+    if there's just one array, don't do stringent hit check.
+    array click protection (Krzysztof's suggestion)
+    make graph labels persistent and add to dialog
+    object to get/set table size; random; quantile
+    flag to hide array names 
+queued graphics updates for IEMGUIs and scalars
+document tabwrite~_start
+think of a way to embed abstractions in a patch
+make watchdog work for MACOSX
+GOP bounding box object
+IEMGUIs better default font size
+search path to include both calling patch and abstraction, if different
+abstraction reload shouldn't have to vis everyone
+addcomma message to message
+pasting should look at current mouse location
+delete-in-rectangle message to Pds
+put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
+open/save panel to take messages to init directory, and to set extent list
+flags to defeat pre-loading specified classes
+expr to parse exponential notation
+
 
 data:
-allow field*2+5 etc. in drawing commands
+arrays of non-existent templates crash
+allow field(1,5,0,100) etc. in drawing commands
 vget, vset traversal objects
 cursor to show (x, y) location
-better hit detection (getrect is too greedy)
+better hit detection (getrect is too greedy; try tk's "current" tag for canvas)
 click on points of plot
-typing at drawnumbers
+typing & dragging drawnumbers
 fix templates to be loaded on demand and belong to a globally known patch
 test and debug list elements of templates
 sublists should display on parent if desired?
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
-figure out why Pd sometimes crashes when you close example after adding fields
 
-features:
-command line flag to defeat loading objects
-signal inlets with initialized values...
-flag to hide array names 
+more features:
+
+-Wno-unused to -Wno-unused-paramter and clean up unused automatic variables
+security module system in 2.6 - see the kernel module replacing jackstart
+signal inlets to sense signals; fix +~ etc, vcf~, biquad~, other filters
+mess with RME ALSA some more; ALSA readn doesn't work yet; use mmap?
+try to reduce startup time
+investigate gcc 3.3 warnings; try to reinstate -fstrict-aliasing
+message dialog not to disappear
+why does changing the name of an explode in jupiter patch take so long?
+close-subwindows menu item
+show results of opening audio and MIDI on dialogs
+windows escape from control-C
+settable netsend and netreceive port numbers
+new: abs~, nexttick~, extend threshold~ and snapshot~ (vthreshold~ etc)
+incorporate pddp doc
+try again to fix the font scene
+look at prctl(2) for FP exception handling
 ??? have a way to disambiguate externs from different libs???
-put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
-if there's just one array, don't do stringent hit check.
 netsend separate thread
 netreceive (and netsend?) message to set port number
-delete-in-rectangle message to Pds
-make selecting text grab keyboard focus
 think about x and y scale preservation when changing between graph and object
 show outlines of objects even when graph is "open"
-make graph labels persistent and add to dialog
-array click protection (Krzysztof's suggestion)
-increase MIDIQSIZE to at least 1024 in s_unix.c
-add nonblock to linux open calls instead of using alarm
 graph_vis() to decorate graphs when they're toplevel (parent_glist == 0)
 get graphs to expand to hold their contents
 suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html -- MIDI file reader
 in glist_delete, consider why this can't be just "vis 0" -- why do we need it?
-abstraction auto-reload
 closebang
-switching between dac and gettimeofday timing on dsp_start/stop
 check that -blocksize really reflects in audiobuf calc for Hammerfall
--version to print version and exit; usage() also to print version
-NT and OSX: opening HTML files?
-MIDI file reading/writing?
 makefile to have make install depend on make local.
-pd messages to close and reopen sound driver
 Float method for random
 figure out list, message objects
 separate control over alsaindev and alsaoutdev
-pd -version
-make "import"/export use IEMLIB objects
-object to get/set table size; random; quantile
 put in something for tilde order forcing
 extensible "toolbar" so people can add external GUI objects
-text cut and paste; see XStoreBytes
-new objects: nexttick~, extend threshold~ and snapshot~
 allow spaces in paths
-gem: try XSetBorderWidth, XMoveWindow, xcopyarea (/usr/share/doc/XF*)
-dialog for audio and MIDI settings
-prepend help to help filenames and add help search path
-read/writesf~ for NT
 variable send and receive -- check how max/MSP does it?
 number boxes to darken for typing and/or received messages
-delayed updates
-invisible toplevels
 dialog to change lib flag and path
-fastedit moves
 pique~ and fiddle~ unification (notice pique filtering is different!)
 new message box look
 figure out what to do when "pd sym" conflicts with window title as in Pluton?
@@ -137,8 +149,6 @@ MAX compatibilty:
 trigger 1 (on Pd, outputs 0; on Max?)
 
 LATER
-Hammerfall adapt to ALSA
-+~ 0 faster than +~ -- detect scalar input; also, order forcing inputs
 bonk~ file path handling
 unify arrays and garrays
 dialog to give values of $1, ... for the canvas

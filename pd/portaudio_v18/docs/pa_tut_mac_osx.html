@@ -30,13 +30,15 @@ Compiling for Macintosh OS X</h2>
 
 <blockquote>To compile a Macintosh OS X CoreAudio application with the
 PortAudio library you will use the following source files:
-<blockquote>pa_mac_core/pa_mac_core.c<br>
-pa_common/pa_lib.c<br>
-pa_common/portaudio.h<br>
-pa_common/pa_host.h<br>
-pa_common/pa_convert.c<br>
-pablio/ringbuffer.c<br>
-pablio/ringbuffer.h</blockquote>
+<blockquote>pa_mac_core/pa_mac_core.c
+<br>pa_common/pa_lib.c
+<br>pa_common/portaudio.h
+<br>pa_common/pa_host.h
+<br>pa_common/pa_convert.c
+<br>pa_common/pa_trace.c
+<br>pa_common/pa_trace.h
+<br>pablio/ringbuffer.c
+<br>pablio/ringbuffer.h</blockquote>
 </blockquote>
 
 <h3>
@@ -53,7 +55,7 @@ the simplest.</blockquote>
 <h3>
 Or Using Metrowerks CodeWarrior 8</h3>
 
-<blockquote>by James Vanlommel</blockquote>
+<blockquote>by James Van Lommel</blockquote>
 
 <blockquote>Create a new CodeWarrior project using Mac OS C++ Stationery.
 <br>Then choose Mac OS X Mach-O > Standard Console > C++ Console Mach-O.
@@ -61,19 +63,19 @@ Or Using Metrowerks CodeWarrior 8</h3>
 files from above to your Project.
 <p>Add a test file of your choosing, like
 <br>&nbsp;&nbsp; patests&nbsp;&nbsp;&nbsp; /patest_sine8.c
-<br>&nbsp;
-<br>Add the frameworks to the Frameworks tab using Project > Add Files...
+<p>Add the frameworks to the Frameworks tab using Project > Add Files...
 <br>&nbsp;&nbsp; CoreAudio
 <br>&nbsp;&nbsp; AudioToolbox
 <p>(The System framework should already be a part of the project.)
 <p>Open the current target's settings, and in Language Settings > C/C++
 Language, uncheck (disable) the "ANSI Strict" setting. (Do this for both
-Debug and Release projects, if necessary.)
+Debug and Release projects, if necessary.) You may also choose to disable
+RTTI and exceptions; the most important settings are 'Force C++ compilation'
+(enabled) and 'ANSI Strict' (disabled)."
 <p>Edit pa_mac_core.c:
 <br>&nbsp;&nbsp; On line 1546, cast the PaHost_AllocateFastMemory() result
 to a (char *) or you will get a compile error.
-<br>&nbsp;
-<br>Compile and run. (may need to run from a terminal window)
+<p>Compile and run. (may need to run from a terminal window)
 <p>I've successfully built patest_sine8.c this way using the CVS .tar version
 of portaudio (date: 2003-04-27). I get 17 warnings during compilation,
 all of which deal with unused variables or arguments.</blockquote>

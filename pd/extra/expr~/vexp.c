@@ -78,23 +78,23 @@
 
 char *atoif(char *s, long int *value, long int *type);
 
-static struct ex_ex *ex_lex(struct expr *exp, long int *n);
+static struct ex_ex *ex_lex(struct expr *expr, long int *n);
 struct ex_ex *ex_match(struct ex_ex *eptr, long int op);
-struct ex_ex *ex_parse(struct expr *exp, struct ex_ex *iptr,
+struct ex_ex *ex_parse(struct expr *expr, struct ex_ex *iptr,
 					struct ex_ex *optr, long int *argc);
-struct ex_ex *ex_eval(struct expr *exp, struct ex_ex *eptr,
+struct ex_ex *ex_eval(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
 
-int expr_donew(struct expr *expr, int ac, t_atom *av);
-struct ex_ex *eval_func(struct expr *exp,struct ex_ex *eptr,
+int expr_donew(struct expr *exprr, int ac, t_atom *av);
+struct ex_ex *eval_func(struct expr *expr,struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
-struct ex_ex *eval_tab(struct expr *exp, struct ex_ex *eptr,
+struct ex_ex *eval_tab(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
-struct ex_ex *eval_var(struct expr *exp, struct ex_ex *eptr,
+struct ex_ex *eval_var(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
-struct ex_ex *eval_store(struct expr *exp, struct ex_ex *eptr,
+struct ex_ex *eval_store(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
-struct ex_ex *eval_sigidx(struct expr *exp, struct ex_ex *eptr,
+struct ex_ex *eval_sigidx(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int i);
 static int cal_sigidx(struct ex_ex *optr,	/* The output value */
 	   int i, float rem_i,	    /* integer and fractinal part of index */
@@ -102,7 +102,7 @@ static int cal_sigidx(struct ex_ex *optr,	/* The output value */
 	   int vsize,				            /* vector size */
 	   float *curvec, float *prevec);   /* current and previous table */
 t_ex_func *find_func(char *s);
-void ex_dzdetect(struct expr *exp);
+void ex_dzdetect(struct expr *expr);
 
 #define	MAX_ARGS	10
 extern t_ex_func ex_funcs[];
@@ -110,7 +110,7 @@ extern t_ex_func ex_funcs[];
 struct ex_ex nullex;
 
 void set_tokens (char *s);
-int getoken (struct expr *exp, struct ex_ex *eptr);
+int getoken (struct expr *expr, struct ex_ex *eptr);
 void ex_print (struct ex_ex *eptr);
 #ifdef MSP
 void atom_string(t_atom *a, char *buf, unsigned int bufsize);
@@ -294,7 +294,7 @@ error:
  *	     It will also put the number of the nodes in *n.
  */
 struct ex_ex *
-ex_lex(struct expr *exp, long int *n)
+ex_lex(struct expr *expr, long int *n)
 {
 	struct ex_ex *list_arr;
 	struct ex_ex *exptr;
@@ -323,7 +323,7 @@ ex_lex(struct expr *exp, long int *n)
 			exptr = &(list_arr)[non];
 		}
 
-		if (getoken(exp, exptr)) {
+		if (getoken(expr, exptr)) {
 			fts_free(list_arr);
 			return ((struct ex_ex *)0);
 		}
@@ -684,7 +684,7 @@ ex_parse(struct expr *x, struct ex_ex *iptr, struct ex_ex *optr, long int *argc)
 #define DZC(ARG1,OPR,ARG2)	(ARG1 OPR ARG2)
 
 #define	EVAL(OPR); 							\
-eptr = ex_eval(exp, ex_eval(exp, eptr, &left, idx), &right, idx);	\
+eptr = ex_eval(expr, ex_eval(expr, eptr, &left, idx), &right, idx);	\
 switch (left.ex_type) {							\
 case ET_INT:								\
 	switch(right.ex_type) {						\
@@ -692,7 +692,7 @@ case ET_INT:								\
 		if (optr->ex_type == ET_VEC) {				\
 			op = optr->ex_vec;				\
 			scalar = (float)DZC(left.ex_int, OPR, right.ex_int); \
-			for (j = 0; j < exp->exp_vsize; j++)		\
+			for (j = 0; j < expr->exp_vsize; j++)		\
 				*op++ = scalar;				\
 		} else {						\
 			optr->ex_type = ET_INT;				\
@@ -703,7 +703,7 @@ case ET_INT:								\
 		if (optr->ex_type == ET_VEC) {				\
 			op = optr->ex_vec;				\
 			scalar = DZC(((float)left.ex_int), OPR, right.ex_flt);\
-			for (j = 0; j < exp->exp_vsize; j++)		\
+			for (j = 0; j < expr->exp_vsize; j++)		\
 				*op++ = scalar;				\
 		} else {						\
 			optr->ex_type = ET_FLT;				\
@@ -720,19 +720,19 @@ case ET_INT:								\
 			}						\
 			optr->ex_type = ET_VEC;				\
 			optr->ex_vec = (t_float *)			\
-			  fts_malloc(sizeof (t_float)*exp->exp_vsize);	\
+			  fts_malloc(sizeof (t_float)*expr->exp_vsize);	\
 		}							\
 		scalar = left.ex_int;					\
 		rp = right.ex_vec;					\
 		op = optr->ex_vec;					\
-		for (i = 0; i < exp->exp_vsize; i++) {			\
+		for (i = 0; i < expr->exp_vsize; i++) {			\
 			*op++ = DZC (scalar, OPR, *rp);			\
 			rp++;						\
 		}							\
 		break;							\
 	case ET_SYM:							\
 	default:							\
-		post_error((fts_object_t *) exp, 		   	\
+		post_error((fts_object_t *) expr, 		   	\
 		      "expr: ex_eval(%d): bad right type %ld\n",	\
 					      __LINE__, right.ex_type);	\
 		nullret = 1;						\
@@ -744,7 +744,7 @@ case ET_FLT:								\
 		if (optr->ex_type == ET_VEC) {				\
 			op = optr->ex_vec;				\
 			scalar = DZC((float) left.ex_flt, OPR, right.ex_int); \
-			for (j = 0; j < exp->exp_vsize; j++)		\
+			for (j = 0; j < expr->exp_vsize; j++)		\
 				*op++ = scalar;				\
 		} else {						\
 			optr->ex_type = ET_FLT;				\
@@ -755,7 +755,7 @@ case ET_FLT:								\
 		if (optr->ex_type == ET_VEC) {				\
 			op = optr->ex_vec;				\
 			scalar = DZC(left.ex_flt, OPR, right.ex_flt);	\
-			for (j = 0; j < exp->exp_vsize; j++)		\
+			for (j = 0; j < expr->exp_vsize; j++)		\
 				*op++ = scalar;				\
 		} else {						\
 			optr->ex_type = ET_FLT;				\
@@ -771,19 +771,19 @@ case ET_FLT:								\
 			}						\
 			optr->ex_type = ET_VEC;				\
 			optr->ex_vec = (t_float *)			\
-			  fts_malloc(sizeof (t_float)*exp->exp_vsize);	\
+			  fts_malloc(sizeof (t_float)*expr->exp_vsize);	\
 		}							\
 		scalar = left.ex_flt;					\
 		rp = right.ex_vec;					\
 		op = optr->ex_vec;					\
-		for (i = 0; i < exp->exp_vsize; i++) {			\
+		for (i = 0; i < expr->exp_vsize; i++) {			\
 			*op++ = DZC(scalar, OPR, *rp);			\
 			rp++;						\
 		}							\
 		break;							\
 	case ET_SYM:							\
 	default:							\
-		post_error((fts_object_t *) exp, 		   	\
+		post_error((fts_object_t *) expr, 		   	\
 		      "expr: ex_eval(%d): bad right type %ld\n",	\
 					      __LINE__, right.ex_type);	\
 		nullret = 1;						\
@@ -798,21 +798,21 @@ case ET_VI:								\
 		}							\
 		optr->ex_type = ET_VEC;					\
 		optr->ex_vec = (t_float *)				\
-		  fts_malloc(sizeof (t_float)*exp->exp_vsize);		\
+		  fts_malloc(sizeof (t_float)*expr->exp_vsize);		\
 	}								\
 	op = optr->ex_vec;						\
 	lp = left.ex_vec;						\
 	switch(right.ex_type) {						\
 	case ET_INT:							\
 		scalar = right.ex_int;					\
-		for (i = 0; i < exp->exp_vsize; i++) {			\
+		for (i = 0; i < expr->exp_vsize; i++) {			\
 			*op++ = DZC(*lp, OPR, scalar);			\
 			lp++;						\
 		}							\
 		break;                                                  \
 	case ET_FLT:							\
 		scalar = right.ex_flt;					\
-		for (i = 0; i < exp->exp_vsize; i++) {			\
+		for (i = 0; i < expr->exp_vsize; i++) {			\
 			*op++ = DZC(*lp, OPR, scalar);			\
 			lp++;						\
 		}							\
@@ -820,7 +820,7 @@ case ET_VI:								\
 	case ET_VEC:							\
 	case ET_VI:							\
 		rp = right.ex_vec;					\
-		for (i = 0; i < exp->exp_vsize; i++) {			\
+		for (i = 0; i < expr->exp_vsize; i++) {			\
 			/*						\
 			 * on a RISC processor one could copy		\
 			 * 8 times in each round to get a considerable	\
@@ -832,7 +832,7 @@ case ET_VI:								\
 		break;                                                  \
 	case ET_SYM:							\
 	default:							\
-		post_error((fts_object_t *) exp, 		   	\
+		post_error((fts_object_t *) expr, 		   	\
 		      "expr: ex_eval(%d): bad right type %ld\n",	\
 					      __LINE__, right.ex_type);	\
 		nullret = 1;						\
@@ -840,7 +840,7 @@ case ET_VI:								\
 	break;								\
 case ET_SYM:								\
 default:								\
-		post_error((fts_object_t *) exp, 		   	\
+		post_error((fts_object_t *) expr, 		   	\
 		      "expr: ex_eval(%d): bad left type %ld\n",		\
 					      __LINE__, left.ex_type);	\
 }									\
@@ -850,12 +850,12 @@ break;
  * evaluate a unary operator, TYPE is applied to float operands
  */
 #define EVAL_UNARY(OPR, TYPE) 						\
-	eptr = ex_eval(exp, eptr, &left, idx);				\
+	eptr = ex_eval(expr, eptr, &left, idx);				\
 	switch(left.ex_type) {						\
 	case ET_INT:							\
 		if (optr->ex_type == ET_VEC) {				\
 			ex_mkvector(optr->ex_vec,(float)(OPR left.ex_int),\
-							exp->exp_vsize);\
+							expr->exp_vsize);\
 			break;						\
 		}							\
 		optr->ex_type = ET_INT;					\
@@ -864,7 +864,7 @@ break;
 	case ET_FLT:							\
 		if (optr->ex_type == ET_VEC) {				\
 			ex_mkvector(optr->ex_vec, OPR (TYPE left.ex_flt),\
-							exp->exp_vsize);\
+							expr->exp_vsize);\
 			break;						\
 		}							\
 		optr->ex_type = ET_FLT;					\
@@ -872,20 +872,20 @@ break;
 		break;							\
 	case ET_VI:							\
 	case ET_VEC:							\
-		j = exp->exp_vsize;					\
+		j = expr->exp_vsize;					\
 		if (optr->ex_type != ET_VEC) {				\
 			optr->ex_type = ET_VEC;				\
 			optr->ex_vec = (t_float *)			\
-			  fts_malloc(sizeof (t_float)*exp->exp_vsize);	\
+			  fts_malloc(sizeof (t_float)*expr->exp_vsize);	\
 		}							\
 		op = optr->ex_vec;					\
 		lp = left.ex_vec;					\
-		j = exp->exp_vsize;					\
+		j = expr->exp_vsize;					\
 		for (i = 0; i < j; i++)					\
 			*op++ = OPR (TYPE *lp++);			\
 		break;							\
 	default:							\
-		post_error((fts_object_t *) exp,			\
+		post_error((fts_object_t *) expr,			\
 			"expr: ex_eval(%d): bad left type %ld\n",	\
 					      __LINE__, left.ex_type);	\
 		nullret++;						\
@@ -903,23 +903,23 @@ ex_mkvector(t_float *fp, t_float x, int size)
  * ex_dzdetect -- divide by zero detected
  */
 void
-ex_dzdetect(struct expr *exp)
+ex_dzdetect(struct expr *expr)
 {
 	char *etype;
 
-	if (!exp->exp_error & EE_DZ) {
-		if (IS_EXPR(exp))
+	if (!expr->exp_error & EE_DZ) {
+		if (IS_EXPR(expr))
 			etype = "expr";
-		else if (IS_EXPR_TILDE(exp))
+		else if (IS_EXPR_TILDE(expr))
 			etype = "expr~";
-		else if (IS_FEXPR_TILDE(exp))
+		else if (IS_FEXPR_TILDE(expr))
 			etype = "fexpr~";
 		else {
 			post ("expr -- ex_dzdetect internal error");
 			etype = "";
 		}
 		post ("%s divide by zero detected", etype);
-		exp->exp_error |= EE_DZ;
+		expr->exp_error |= EE_DZ;
 	}
 }
 		
@@ -938,7 +938,7 @@ need to be freed
 look into the variable nullret
 */
 struct ex_ex *
-ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+ex_eval(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -961,7 +961,7 @@ ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	case ET_INT:
 		if (optr->ex_type == ET_VEC)
 			ex_mkvector(optr->ex_vec, (float) eptr->ex_int,
-								exp->exp_vsize);
+								expr->exp_vsize);
 		else
 			*optr = *eptr;
 		return (++eptr);
@@ -969,14 +969,14 @@ ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	case ET_FLT:
 
 		if (optr->ex_type == ET_VEC)
-			ex_mkvector(optr->ex_vec, eptr->ex_flt, exp->exp_vsize);
+			ex_mkvector(optr->ex_vec, eptr->ex_flt, expr->exp_vsize);
 		else
 			*optr = *eptr;
 		return (++eptr);
 
 	case ET_SYM:
 		if (optr->ex_type == ET_VEC) {
-			post_error((fts_object_t *) exp,
+			post_error((fts_object_t *) expr,
 			      "expr: ex_eval: cannot turn string to vector\n");
 			return (exNULL);
 		}
@@ -984,55 +984,55 @@ ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 		return (++eptr);
 	case ET_II:
 		if (eptr->ex_int == -1) {
-			post_error((fts_object_t *) exp,
+			post_error((fts_object_t *) expr,
 			    "expr: ex_eval: inlet number not set\n");
 			return (exNULL);
 		}
 		if (optr->ex_type == ET_VEC) {
 			ex_mkvector(optr->ex_vec,
-			       (t_float)exp->exp_var[eptr->ex_int].ex_int,
-			       					exp->exp_vsize);
+			       (t_float)expr->exp_var[eptr->ex_int].ex_int,
+			       					expr->exp_vsize);
 		} else {
 			optr->ex_type = ET_INT;
-			optr->ex_int = exp->exp_var[eptr->ex_int].ex_int;
+			optr->ex_int = expr->exp_var[eptr->ex_int].ex_int;
 		}
 		return (++eptr);
 	case ET_FI:
 		if (eptr->ex_int == -1) {
-			post_error((fts_object_t *) exp,
+			post_error((fts_object_t *) expr,
 			    "expr: ex_eval: inlet number not set\n");
 			return (exNULL);
 		}
 		if (optr->ex_type == ET_VEC) {
 			ex_mkvector(optr->ex_vec,
-			     exp->exp_var[eptr->ex_int].ex_flt, exp->exp_vsize);
+			     expr->exp_var[eptr->ex_int].ex_flt, expr->exp_vsize);
 		} else {
 			optr->ex_type = ET_FLT;
-			optr->ex_flt = exp->exp_var[eptr->ex_int].ex_flt;
+			optr->ex_flt = expr->exp_var[eptr->ex_int].ex_flt;
 		}
 		return (++eptr);
 
 	case ET_VSYM:
 		if (optr->ex_type == ET_VEC) {
-			post_error((fts_object_t *) exp,
+			post_error((fts_object_t *) expr,
 			    "expr: IntErr. vsym in for vec out\n");
 			return (exNULL);
 		}
 		if (eptr->ex_int == -1) {
-			post_error((fts_object_t *) exp,
+			post_error((fts_object_t *) expr,
 				"expr: ex_eval: inlet number not set\n");
 			return (exNULL);
 		}
 		optr->ex_type = ET_SYM;
-		optr->ex_ptr = exp->exp_var[eptr->ex_int].ex_ptr;
+		optr->ex_ptr = expr->exp_var[eptr->ex_int].ex_ptr;
 		return(++eptr);
 
 	case ET_VI:
 		if (optr->ex_type != ET_VEC)
-			*optr = exp->exp_var[eptr->ex_int];
-		else if (optr->ex_vec != exp->exp_var[eptr->ex_int].ex_vec)
-			memcpy(optr->ex_vec, exp->exp_var[eptr->ex_int].ex_vec,
-					exp->exp_vsize * sizeof (t_float));
+			*optr = expr->exp_var[eptr->ex_int];
+		else if (optr->ex_vec != expr->exp_var[eptr->ex_int].ex_vec)
+			memcpy(optr->ex_vec, expr->exp_var[eptr->ex_int].ex_vec,
+					expr->exp_vsize * sizeof (t_float));
 		return(++eptr);
 	case ET_VEC:
 		if (optr->ex_type != ET_VEC) {
@@ -1042,7 +1042,7 @@ ex_eval(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 			eptr->ex_int = 0;
 		} else if (optr->ex_vec != eptr->ex_vec) {
 			memcpy(optr->ex_vec, eptr->ex_vec,
-					exp->exp_vsize * sizeof (t_float));
+					expr->exp_vsize * sizeof (t_float));
 /* do we need to free here? or can we free higher up */
 /* SDY  the next lines do not make sense */
 post("calling fts_free\n");
@@ -1059,12 +1059,12 @@ abort();
 		/* short hand for $x?[0] */
 
 		/* SDY delete the following check */
-		if (!IS_FEXPR_TILDE(exp) || optr->ex_type==ET_VEC) {
-			post("%d:exp->exp_flags = %d", __LINE__,exp->exp_flags);
+		if (!IS_FEXPR_TILDE(expr) || optr->ex_type==ET_VEC) {
+			post("%d:exp->exp_flags = %d", __LINE__,expr->exp_flags);
 			abort();
 		}
 		optr->ex_type = ET_FLT;
-		optr->ex_flt = exp->exp_var[eptr->ex_int].ex_vec[idx];
+		optr->ex_flt = expr->exp_var[eptr->ex_int].ex_vec[idx];
 		return(++eptr);
 	case ET_YOM1:
 		/*
@@ -1075,51 +1075,51 @@ abort();
 		optr->ex_type = ET_FLT;
 		if (idx == 0)
 			optr->ex_flt =
-			exp->exp_p_res[eptr->ex_int][exp->exp_vsize - 1];
+			expr->exp_p_res[eptr->ex_int][expr->exp_vsize - 1];
 		else
-			optr->ex_flt=exp->exp_tmpres[eptr->ex_int][idx-1];
+			optr->ex_flt=expr->exp_tmpres[eptr->ex_int][idx-1];
 		return(++eptr);
 		
 	case ET_YO:
 	case ET_XI:
 		/* SDY delete the following */
-		if (!IS_FEXPR_TILDE(exp) || optr->ex_type==ET_VEC) {
-			post("%d:exp->exp_flags = %d", __LINE__,exp->exp_flags);
+		if (!IS_FEXPR_TILDE(expr) || optr->ex_type==ET_VEC) {
+			post("%d:expr->exp_flags = %d", __LINE__,expr->exp_flags);
 			abort();
 		}
-		return (eval_sigidx(exp, eptr, optr, idx));
+		return (eval_sigidx(expr, eptr, optr, idx));
 			
 	case ET_TBL:
 	case ET_SI:
-		return (eval_tab(exp, eptr, optr, idx));
+		return (eval_tab(expr, eptr, optr, idx));
 	case ET_FUNC:
-		return (eval_func(exp, eptr, optr, idx));
+		return (eval_func(expr, eptr, optr, idx));
 	case ET_VAR:
-		return (eval_var(exp, eptr, optr, idx));
+		return (eval_var(expr, eptr, optr, idx));
 	case ET_OP:
 		break;
 	case ET_STR:
 	case ET_LP:
 	case ET_LB:
 	default:
-		post_error((fts_object_t *) exp,
+		post_error((fts_object_t *) expr,
 			"expr: ex_eval: unexpected type %d\n", eptr->ex_type);
 		return (exNULL);
 	}
 	if (!eptr[1].ex_type) {
-		post_error((fts_object_t *) exp,
+		post_error((fts_object_t *) expr,
 					"expr: ex_eval: not enough nodes 1\n");
 		return (exNULL);
 	}
 	if (!unary_op(eptr->ex_op) && !eptr[2].ex_type) {
-		post_error((fts_object_t *) exp,
+		post_error((fts_object_t *) expr,
 					"expr: ex_eval: not enough nodes 2\n");
 		return (exNULL);
 	}
 
 	switch((eptr++)->ex_op) {
 	case OP_STORE:
-		return (eval_store(exp, eptr, optr, idx));
+		return (eval_store(expr, eptr, optr, idx));
 	case OP_NOT:
 		EVAL_UNARY(!, +);
 	case OP_NEG:
@@ -1168,14 +1168,14 @@ abort();
  */
 #undef DZC
 #define DZC(ARG1,OPR,ARG2)	(((ARG2)?(((int)ARG1) OPR ((int)ARG2)) \
-							: (ex_dzdetect(exp),0)))
+							: (ex_dzdetect(expr),0)))
 	case OP_MOD:
 		EVAL(%);
 /*
  * define the divide by zero check for divide
  */
 #undef DZC
-#define DZC(ARG1,OPR,ARG2)	(((ARG2)?(ARG1 OPR ARG2):(ex_dzdetect(exp),0)))
+#define DZC(ARG1,OPR,ARG2)	(((ARG2)?(ARG1 OPR ARG2):(ex_dzdetect(expr),0)))
 	case OP_DIV:
 		EVAL(/);
 	case OP_LP:
@@ -1185,7 +1185,7 @@ abort();
 	case OP_COMMA:
 	case OP_SEMI:
 	default:
-		post_error((fts_object_t *) exp, "expr: ex_print: bad op 0x%x\n", eptr->ex_op);
+		post_error((fts_object_t *) expr, "expr: ex_print: bad op 0x%x\n", eptr->ex_op);
 		return (exNULL);
 	}
 
@@ -1210,7 +1210,7 @@ abort();
  *		 appropriate function
  */
 struct ex_ex *
-eval_func(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+eval_func(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -1224,16 +1224,16 @@ eval_func(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 		return (exNULL);
 	}
 	if (f->f_argc > MAX_ARGS) {
-		post_error((fts_object_t *) exp, "expr: eval_func: asking too many arguments\n");
+		post_error((fts_object_t *) expr, "expr: eval_func: asking too many arguments\n");
 		return (exNULL);
 	}
 
 	for (i = 0; i < f->f_argc; i++) {
 		args[i].ex_type = 0;
 		args[i].ex_int = 0;
-		eptr = ex_eval(exp, eptr, &args[i], idx);
+		eptr = ex_eval(expr, eptr, &args[i], idx);
 	}
-	(*f->f_func)(exp, f->f_argc, args, optr);
+	(*f->f_func)(expr, f->f_argc, args, optr);
 	for (i = 0; i < f->f_argc; i++) {
 		if (args[i].ex_type == ET_VEC)
 			fts_free(args[i].ex_vec);
@@ -1248,7 +1248,7 @@ eval_func(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
  *		  and call ex_eval on the right operator
  */
 struct ex_ex *
-eval_store(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+eval_store(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -1261,7 +1261,7 @@ eval_store(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 
 post("store called\n");
 ex_print(eptr);
-eptr = ex_eval(exp, ++eptr, optr, idx);
+eptr = ex_eval(expr, ++eptr, optr, idx);
 return (eptr);
 
 #ifdef notdef /* SDY */
@@ -1270,8 +1270,8 @@ return (eptr);
 	if (eptr->ex_type == ET_VAR) {
 		var = (char *) eptr->ex_ptr;
 
-		eptr = ex_eval(exp, ++eptr, &arg, idx);
-		(void)max_ex_var_store(exp, (t_symbol *)var, &arg, optr);
+		eptr = ex_eval(expr, ++eptr, &arg, idx);
+		(void)max_ex_var_store(expr, (t_symbol *)var, &arg, optr);
 		if (arg.ex_type == ET_VEC)
 			fts_free(arg.ex_vec);
 	}
@@ -1287,16 +1287,16 @@ return (eptr);
 	case ET_SI:
 		if ((eptr + 1)->ex_type == OP_LB) {
 		}
-		if (!exp->exp_var[eptr->ex_int].ex_ptr) {
-				if (!(exp->exp_error & EE_NOTABLE)) {
+		if (!expr->exp_var[eptr->ex_int].ex_ptr) {
+				if (!(expr->exp_error & EE_NOTABLE)) {
 					post("expr: syntax error: no string for inlet %d", eptr->ex_int + 1);
 					post("expr: No more table errors will be reported");
 					post("expr: till the next reset");
-					exp->exp_error |= EE_NOTABLE;
+					expr->exp_error |= EE_NOTABLE;
 				}
 				badleft++;
 		} else
-			tbl = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
+			tbl = (char *) expr->exp_var[eptr->ex_int].ex_ptr;
 		break;
 	case ET_TBL:
 	}
@@ -1307,7 +1307,7 @@ return (eptr);
  * eval_tab -- evaluate a table operation
  */
 struct ex_ex *
-eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+eval_tab(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -1317,35 +1317,35 @@ eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	int notable = 0;
 	
 	if (eptr->ex_type == ET_SI) {
-		if (!exp->exp_var[eptr->ex_int].ex_ptr) {
+		if (!expr->exp_var[eptr->ex_int].ex_ptr) {
 /* SDY post_error() does not work in MAX/MSP yet
-				post_error((fts_object_t *) exp,
+				post_error((fts_object_t *) expr,
 				     "expr: syntax error: no string for inlet %d\n", eptr->ex_int + 1);
 */
-				if (!(exp->exp_error & EE_NOTABLE)) {
+				if (!(expr->exp_error & EE_NOTABLE)) {
 					post("expr: syntax error: no string for inlet %d", eptr->ex_int + 1);
 					post("expr: No more table errors will be reported");
 					post("expr: till the next reset");
-					exp->exp_error |= EE_NOTABLE;
+					expr->exp_error |= EE_NOTABLE;
 				}
 				notable++;
 		} else
-			tbl = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
+			tbl = (char *) expr->exp_var[eptr->ex_int].ex_ptr;
 	} else if (eptr->ex_type == ET_TBL)
 		tbl = (char *) eptr->ex_ptr;
 	else {
-		post_error((fts_object_t *) exp, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
+		post_error((fts_object_t *) expr, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
 		notable++;
 
 	}
 	arg.ex_type = 0;
 	arg.ex_int = 0;
-	eptr = ex_eval(exp, ++eptr, &arg, idx);
+	eptr = ex_eval(expr, ++eptr, &arg, idx);
 
 	optr->ex_type = ET_INT;
 	optr->ex_int = 0;
 	if (!notable)
-		(void)max_ex_tab(exp, (t_symbol *)tbl, &arg, optr);
+		(void)max_ex_tab(expr, (t_symbol *)tbl, &arg, optr);
 	if (arg.ex_type == ET_VEC)
 		fts_free(arg.ex_vec);
 	return (eptr);
@@ -1355,7 +1355,7 @@ eval_tab(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
  * eval_var -- evaluate a variable
  */
 struct ex_ex *
-eval_var(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+eval_var(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -1365,24 +1365,24 @@ eval_var(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	int novar = 0;
 	
 	if (eptr->ex_type == ET_SI) {
-		if (!exp->exp_var[eptr->ex_int].ex_ptr) {
+		if (!expr->exp_var[eptr->ex_int].ex_ptr) {
 /* SDY post_error() does not work in MAX/MSP yet
-post_error((fts_object_t *) exp,
+post_error((fts_object_t *) expr,
 "expr: syntax error: no string for inlet %d\n", eptr->ex_int + 1);
 */
-				if (!(exp->exp_error & EE_NOVAR)) {
+				if (!(expr->exp_error & EE_NOVAR)) {
 					post("expr: syntax error: no string for inlet %d", eptr->ex_int + 1);
 					post("expr: No more table errors will be reported");
 					post("expr: till the next reset");
-					exp->exp_error |= EE_NOVAR;
+					expr->exp_error |= EE_NOVAR;
 				}
 				novar++;
 		} else
-			var = (char *) exp->exp_var[eptr->ex_int].ex_ptr;
+			var = (char *) expr->exp_var[eptr->ex_int].ex_ptr;
 	} else if (eptr->ex_type == ET_VAR)
 		var = (char *) eptr->ex_ptr;
 	else {
-		post_error((fts_object_t *) exp, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
+		post_error((fts_object_t *) expr, "expr: eval_tbl: bad type %ld\n", eptr->ex_type);
 		novar++;
 
 	}
@@ -1390,7 +1390,7 @@ post_error((fts_object_t *) exp,
 	optr->ex_type = ET_INT;
 	optr->ex_int = 0;
 	if (!novar)
-		(void)max_ex_var(exp, (t_symbol *)var, optr);
+		(void)max_ex_var(expr, (t_symbol *)var, optr);
 	return (++eptr);
 }
 
@@ -1398,7 +1398,7 @@ post_error((fts_object_t *) exp,
  * eval_sigidx -- evaluate the value of an indexed signal for fexpr~
  */
 struct ex_ex *
-eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
+eval_sigidx(struct expr *expr, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 /* the expr object data pointer */
 /* the operation stack */
 /* the result pointer */
@@ -1413,7 +1413,7 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 
 	arg.ex_type = 0;
 	arg.ex_int = 0;
-	reteptr = ex_eval(exp, eptr + 1, &arg, idx);
+	reteptr = ex_eval(expr, eptr + 1, &arg, idx);
 	if (arg.ex_type == ET_FLT) {
 		fi = arg.ex_flt;		/* float index */
 		i = (int) arg.ex_flt;		/* integer index */
@@ -1431,8 +1431,8 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	 */
 	if (eptr->ex_type == ET_XI) {
 		if (fi > 0) {
-			if (!(exp->exp_error & EE_BI_INPUT)) {
-				exp->exp_error |= EE_BI_INPUT;
+			if (!(expr->exp_error & EE_BI_INPUT)) {
+				expr->exp_error |= EE_BI_INPUT;
 			  post("expr: input vector index > 0, (vector x%d[%f])",
 					       eptr->ex_int + 1, i + rem_i);
 				post("fexpr~: index assumed to be = 0");
@@ -1443,15 +1443,15 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 			i = 0;
 			rem_i = 0;
 		}
-		if (cal_sigidx(optr, i, rem_i, idx, exp->exp_vsize,
-					exp->exp_var[eptr->ex_int].ex_vec,
-						exp->exp_p_var[eptr->ex_int])) {
-			if (!(exp->exp_error & EE_BI_INPUT)) {
-				exp->exp_error |= EE_BI_INPUT;
+		if (cal_sigidx(optr, i, rem_i, idx, expr->exp_vsize,
+					expr->exp_var[eptr->ex_int].ex_vec,
+						expr->exp_p_var[eptr->ex_int])) {
+			if (!(expr->exp_error & EE_BI_INPUT)) {
+				expr->exp_error |= EE_BI_INPUT;
 				post("expr: input vector index <  -VectorSize, (vector x%d[%f])", eptr->ex_int + 1, fi);
 				ex_print(eptr);
 				post("fexpr~: index assumed to be = -%d",
-					exp->exp_vsize);
+					expr->exp_vsize);
 				post("fexpr~: no error report till next reset");
 			}
 		}
@@ -1462,8 +1462,8 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 	} else if (eptr->ex_type == ET_YO) {
 		/* for output vectors index of zero is not legal */
 		if (fi >= 0) {
-			if (!(exp->exp_error & EE_BI_OUTPUT)) {
-				exp->exp_error |= EE_BI_OUTPUT;
+			if (!(expr->exp_error & EE_BI_OUTPUT)) {
+				expr->exp_error |= EE_BI_OUTPUT;
 				post("fexpr~: bad output index, (%f)", fi);
 				ex_print(eptr);
 				post("fexpr~: no error report till next reset");
@@ -1471,21 +1471,21 @@ eval_sigidx(struct expr *exp, struct ex_ex *eptr, struct ex_ex *optr, int idx)
 			}
 			i = -1;
 		}
-		if (eptr->ex_int >= exp->exp_nexpr) {
+		if (eptr->ex_int >= expr->exp_nexpr) {
 			post("fexpr~: $y%d illegal: not that many exprs",
 								eptr->ex_int);
 			optr->ex_flt = 0;
 			return (reteptr);
 		}
-		if (cal_sigidx(optr, i, rem_i, idx, exp->exp_vsize,
-			     exp->exp_tmpres[eptr->ex_int],
-		     				exp->exp_p_res[eptr->ex_int])) {
-			if (!(exp->exp_error & EE_BI_OUTPUT)) {
-				exp->exp_error |= EE_BI_OUTPUT;
+		if (cal_sigidx(optr, i, rem_i, idx, expr->exp_vsize,
+			     expr->exp_tmpres[eptr->ex_int],
+		     				expr->exp_p_res[eptr->ex_int])) {
+			if (!(expr->exp_error & EE_BI_OUTPUT)) {
+				expr->exp_error |= EE_BI_OUTPUT;
 				post("fexpr~: bad output index, (%f)", fi);
 				ex_print(eptr);
 				post("fexpr~: index assumed to be = -%d",
-					exp->exp_vsize);
+					expr->exp_vsize);
 			}
 		}
 	} else {
@@ -1552,30 +1552,30 @@ cal_sigidx(struct ex_ex *optr,	/* The output value */
  * getoken -- return 1 on syntax error otherwise 0
  */
 int
-getoken(struct expr *exp, struct ex_ex *eptr)
+getoken(struct expr *expr, struct ex_ex *eptr)
 {
 	char *p;
 	long i;
 
 
-	if (!exp->exp_str) {
+	if (!expr->exp_str) {
 		post("expr: getoken: expression string not set\n");
 		return (0);
 	}
 retry:
-	if (!*exp->exp_str) {
+	if (!*expr->exp_str) {
 		eptr->ex_type = 0;
 		eptr->ex_int = 0;
 		return (0);
 	}
-	if (*exp->exp_str == ';') {
-		exp->exp_str++;
+	if (*expr->exp_str == ';') {
+		expr->exp_str++;
 		eptr->ex_type = 0;
 		eptr->ex_int = 0;
 		return (0);
 	}
 	eptr->ex_type = ET_OP;
-	switch (*exp->exp_str++) {
+	switch (*expr->exp_str++) {
 	case '\\':
 	case ' ':
 	case '\t':
@@ -1621,21 +1621,21 @@ retry:
 		eptr->ex_op = OP_LB;
 		break;
 	case '!':
-		if (*exp->exp_str == '=') {
+		if (*expr->exp_str == '=') {
 			eptr->ex_op = OP_NE;
-			exp->exp_str++;
+			expr->exp_str++;
 		} else
 			eptr->ex_op = OP_NOT;
 		break;
 	case '<':
-		switch (*exp->exp_str) {
+		switch (*expr->exp_str) {
 		case '<':
 			eptr->ex_op = OP_SL;
-			exp->exp_str++;
+			expr->exp_str++;
 			break;
 		case '=':
 			eptr->ex_op = OP_LE;
-			exp->exp_str++;
+			expr->exp_str++;
 			break;
 		default:
 			eptr->ex_op = OP_LT;
@@ -1643,14 +1643,14 @@ retry:
 		}
 		break;
 	case '>':
-		switch (*exp->exp_str) {
+		switch (*expr->exp_str) {
 		case '>':
 			eptr->ex_op = OP_SR;
-			exp->exp_str++;
+			expr->exp_str++;
 			break;
 		case '=':
 			eptr->ex_op = OP_GE;
-			exp->exp_str++;
+			expr->exp_str++;
 			break;
 		default:
 			eptr->ex_op = OP_GT;
@@ -1658,39 +1658,39 @@ retry:
 		}
 		break;
 	case '=':
-		if (*exp->exp_str++ != '=') {
+		if (*expr->exp_str++ != '=') {
 			post("expr: syntax error: =\n");
 			return (1);
 		}
 		eptr->ex_op = OP_EQ;
 		break;
 /* do not allow the store till the function is fixed
-		if (*exp->exp_str != '=')
+		if (*expr->exp_str != '=')
 			eptr->ex_op = OP_STORE;
 		else {
-			exp->exp_str++;
+			expr->exp_str++;
 			eptr->ex_op = OP_EQ;
 		}
 		break;
 */
 
 	case '&':
-		if (*exp->exp_str == '&') {
-			exp->exp_str++;
+		if (*expr->exp_str == '&') {
+			expr->exp_str++;
 			eptr->ex_op = OP_LAND;
 		} else
 			eptr->ex_op = OP_AND;
 		break;
 
 	case '|':
-		if ((*exp->exp_str == '|')) {
-			exp->exp_str++;
+		if ((*expr->exp_str == '|')) {
+			expr->exp_str++;
 			eptr->ex_op = OP_LOR;
 		} else
 			eptr->ex_op = OP_OR;
 		break;
 	case '$':
-		switch (*exp->exp_str++) {
+		switch (*expr->exp_str++) {
 		case 'I':
 		case 'i':
 			eptr->ex_type = ET_II;
@@ -1705,32 +1705,32 @@ retry:
 			break;
 		case 'V':
 		case 'v':
-			if (IS_EXPR_TILDE(exp)) {
+			if (IS_EXPR_TILDE(expr)) {
 				eptr->ex_type = ET_VI;
 				break;
 			}
 			post("$v? works only for expr~");
-			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
+			post("expr: syntax error: %s\n", &expr->exp_str[-2]);
 			return (1);
 		case 'X':
 		case 'x':
-			if (IS_FEXPR_TILDE(exp)) {
+			if (IS_FEXPR_TILDE(expr)) {
 				eptr->ex_type = ET_XI;
-				if (isdigit(*exp->exp_str))
+				if (isdigit(*expr->exp_str))
 					break;
 				/* for $x[] is a shorhand for $x1[] */
 				eptr->ex_int = 0;
 				goto noinletnum;
 			}
 			post("$x? works only for fexpr~");
-			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
+			post("expr: syntax error: %s\n", &expr->exp_str[-2]);
 			return (1);
 		case 'y':
 		case 'Y':
-			if (IS_FEXPR_TILDE(exp)) {
+			if (IS_FEXPR_TILDE(expr)) {
 				eptr->ex_type = ET_YO;
 				/*$y takes no number */
-				if (isdigit(*exp->exp_str))
+				if (isdigit(*expr->exp_str))
 					break;
 				/* for $y[] is a shorhand for $y1[] */
 				eptr->ex_int = 0;
@@ -1738,16 +1738,16 @@ retry:
 			}
 			post("$y works only for fexpr~");
 		default:
-			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
+			post("expr: syntax error: %s\n", &expr->exp_str[-2]);
 			return (1);
 		}
-		p = atoif(exp->exp_str, &eptr->ex_op, &i);
+		p = atoif(expr->exp_str, &eptr->ex_op, &i);
 		if (!p) {
-			post("expr: syntax error: %s\n", &exp->exp_str[-2]);
+			post("expr: syntax error: %s\n", &expr->exp_str[-2]);
 			return (1);
 		}
 		if (i != ET_INT) {
-			post("expr: syntax error: %s\n", exp->exp_str);
+			post("expr: syntax error: %s\n", expr->exp_str);
 			return (1);
 		}
 		/*
@@ -1756,7 +1756,7 @@ retry:
 		 */
 		if (!eptr->ex_op || (eptr->ex_op)-- > MAX_VARS) {
 		 post("expr: syntax error: inlet or outlet out of range: %s\n",
-							     exp->exp_str);
+							     expr->exp_str);
 			return (1);
 		}
 
@@ -1768,7 +1768,7 @@ retry:
 		 * illegal for fexr~
 		 */
 		if (eptr->ex_op == 0 &&
-		   (IS_FEXPR_TILDE(exp) ||  IS_EXPR_TILDE(exp)) &&
+		   (IS_FEXPR_TILDE(expr) ||  IS_EXPR_TILDE(expr)) &&
 		   (eptr->ex_type==ET_II || eptr->ex_type==ET_FI ||
 		   					eptr->ex_type==ET_SI)) {
 		       post("first inlet of expr~/fexpr~ can only be a vector");
@@ -1779,25 +1779,25 @@ retry:
 			/* it is an outlet  for fexpr~*/
 			/* no need to do anything */
 			;
-		} else if (!exp->exp_var[eptr->ex_op].ex_type)
-			exp->exp_var[eptr->ex_op].ex_type = eptr->ex_type;
-		else if (exp->exp_var[eptr->ex_op].ex_type != eptr->ex_type) {
-			post("expr: syntax error: inlets can only have one type: %s\n", exp->exp_str);
+		} else if (!expr->exp_var[eptr->ex_op].ex_type)
+			expr->exp_var[eptr->ex_op].ex_type = eptr->ex_type;
+		else if (expr->exp_var[eptr->ex_op].ex_type != eptr->ex_type) {
+			post("expr: syntax error: inlets can only have one type: %s\n", expr->exp_str);
 			return (1);
 		}
-		exp->exp_str = p;
+		expr->exp_str = p;
 noinletnum:
 		break;
 	case '"':
 		{
 			struct ex_ex ex;
 
-			p = exp->exp_str;
-			if (!*exp->exp_str || *exp->exp_str == '"') {
-				post("expr: syntax error: empty symbol: %s\n", --exp->exp_str);
+			p = expr->exp_str;
+			if (!*expr->exp_str || *expr->exp_str == '"') {
+				post("expr: syntax error: empty symbol: %s\n", --expr->exp_str);
 				return (1);
 			}
-			if (getoken(exp, &ex))
+			if (getoken(expr, &ex))
 				return (1);
 			switch (ex.ex_type) {
 			case ET_STR:
@@ -1815,7 +1815,7 @@ noinletnum:
 				post("expr: syntax error: bad symbol name: %s\n", p);
 				return (1);
 			}
-			if (*exp->exp_str++ != '"') {
+			if (*expr->exp_str++ != '"') {
 				post("expr: syntax error: missing '\"'\n");
 				return (1);
 			}
@@ -1832,10 +1832,10 @@ noinletnum:
 	case '7':
 	case '8':
 	case '9':
-		p = atoif(--exp->exp_str, &eptr->ex_int, &eptr->ex_type);
+		p = atoif(--expr->exp_str, &eptr->ex_int, &eptr->ex_type);
 		if (!p)
 			return (1);
-		exp->exp_str = p;
+		expr->exp_str = p;
 		break;
 
 	default:
@@ -1843,17 +1843,17 @@ noinletnum:
 		 * has to be a string, it should either be a 
 		 * function or a table 
 		 */
-		p = --exp->exp_str;
+		p = --expr->exp_str;
 		for (i = 0; name_ok(*p); i++)
 			p++;
 		if (!i) {
-			post("expr: syntax error: %s\n", exp->exp_str);
+			post("expr: syntax error: %s\n", expr->exp_str);
 			return (1);
 		}
 		eptr->ex_ptr = (char *)fts_malloc(i + 1);
-		strncpy(eptr->ex_ptr, exp->exp_str, (int) i);
+		strncpy(eptr->ex_ptr, expr->exp_str, (int) i);
 		(eptr->ex_ptr)[i] = 0;
-		exp->exp_str = p;
+		expr->exp_str = p;
 		/*
 		 * we mark this as a string and later we will change this
 		 * to either a function or a table

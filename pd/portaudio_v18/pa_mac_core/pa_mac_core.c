@@ -1,5 +1,5 @@
 /*
- * $Id: pa_mac_core.c,v 1.8.4.12 2003/04/16 19:06:01 philburk Exp $
+ * $Id: pa_mac_core.c,v 1.8.4.13 2003/12/09 19:04:54 philburk Exp $
  * pa_mac_core.c
  * Implementation of PortAudio for Mac OS X Core Audio
  *
@@ -108,13 +108,17 @@
               Overlap creation and deletion of AudioConverters to prevent thread death when device rate changes.
  04.16.2003 - Phil Burk - Fixed input channel scrambling when numChannels != 2^N. Caused by alignment
               error when filling RingBuffer with 2^N zero bytes.
+ 04.26.2003 - Phil Burk - Removed code to turn up volume and unmute to prevent blown eardrums.
+ 12.08.2003 - Phil Burk - Move declaration of oldConverter to top of PAOSX_DevicePropertyListener()
+ 12.08.2003 - Phil Burk - Removed need for #include "pa_trace.h", just for debug
+ 12.09.2003 - Phil Burk - Only change sampleRate or numChannels if we need to improve over
+              current setting.
 */
 
 #include <CoreServices/CoreServices.h>
 #include <CoreAudio/CoreAudio.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <unistd.h>
 #include <AudioUnit/AudioUnit.h>
 #include <AudioToolbox/DefaultAudioOutput.h>
 #include <AudioToolbox/AudioConverter.h>
@@ -122,7 +126,6 @@
 
 #include "portaudio.h"
 #include "pa_host.h"
-#include "pa_trace.h"
 #include "ringbuffer.h"
 
 /************************************************* Configuration ********/
@@ -795,7 +798,6 @@ static OSStatus PaOSX_LoadAndProcess( internalPortAudioStream   *past,
         if( outputBuffer )
         {
             /* Clear remainder of audio buffer if we are waiting for stop. */
-            AddTraceMessage("PaOSX_LoadAndProcess: zero rest of wave buffer ", i );
             memset( outputBuffer, 0, pahsc->output.bytesPerUserNativeBuffer );
         }
     }
@@ -1218,11 +1220,13 @@ static PaError PaOSX_SetFormat( AudioDeviceID devID, Boolean isInput,
     originalRate = formatDesc.mSampleRate;
     originalChannels = formatDesc.mChannelsPerFrame;
         
-    // Is it already set to the correct format?
-    if( (originalRate != desiredRate) || (originalChannels != desiredNumChannels) )
+    // Changing the format can mess up other apps.
+    // So only change the format if the original format
+    // has a lower sample rate, or fewer channels, than the desired format.
+    if( (originalRate < desiredRate) || (originalChannels < desiredNumChannels) )
     {
-        DBUG(("PaOSX_SetFormat: try to change sample rate to %f.\n", desiredRate ));
-        DBUG(("PaOSX_SetFormat: try to set number of channels to %d\n", desiredNumChannels));
+        DBUG(("PaOSX_SetFormat: try to change sample rate from %f to %f.\n", originalRate, desiredRate ));
+        DBUG(("PaOSX_SetFormat: try to set number of channels %d to %d\n", originalChannels, desiredNumChannels));
 
         formatDesc.mSampleRate = desiredRate;
         formatDesc.mChannelsPerFrame = desiredNumChannels;
@@ -1254,76 +1258,6 @@ static PaError PaOSX_SetFormat( AudioDeviceID devID, Boolean isInput,
     }
     
     return result;
-}
-
-/*******************************************************************
- * Check volume level of device. If below threshold, then set to newLevel.
- * Using volume instead of decibels because decibel range varies by device.
- */
-static void PaOSX_FixVolumeScalars( AudioDeviceID devID, Boolean isInput,
-    int numChannels, double threshold, double newLevel )
-{
-    OSStatus err = noErr;
-    UInt32    dataSize;
-    int       iChannel;
-
-/* The master channel is 0. Left and right are channels 1 and 2. */
-/* Fix volume. */
-    for( iChannel = 0; iChannel<=numChannels; iChannel++ )
-    {
-        Float32   fdata32;
-        dataSize = sizeof( fdata32 );
-        err = AudioDeviceGetProperty( devID, iChannel, isInput, 
-            kAudioDevicePropertyVolumeScalar, &dataSize, &fdata32 );
-        if( err == noErr )
-        {
-            DBUG(("kAudioDevicePropertyVolumeScalar for channel %d = %f\n", iChannel, fdata32));
-            if( fdata32 <= (Float32) threshold )
-            {
-                dataSize = sizeof( fdata32 );
-                fdata32 = (Float32) newLevel;
-                err = AudioDeviceSetProperty( devID, 0, iChannel, isInput, 
-                    kAudioDevicePropertyVolumeScalar, dataSize, &fdata32 );
-                if( err != noErr )
-                {
-                    PRINT(("Warning: audio volume is very low and could not be turned up.\n"));
-                }
-                else
-                {
-                    PRINT(("Volume for audio channel %d was <= %4.2f so set to %4.2f by PortAudio!\n",
-                        iChannel, threshold, newLevel ));
-                }
-            }
-        }
-    }
-/* Unmute if muted. */
-    for( iChannel = 0; iChannel<=numChannels; iChannel++ )
-    {
-        UInt32    uidata32;
-        dataSize = sizeof( uidata32 );
-        err = AudioDeviceGetProperty( devID, iChannel, isInput, 
-            kAudioDevicePropertyMute, &dataSize, &uidata32 );
-        if( err == noErr )
-        {
-            DBUG(("mute for channel %d = %ld\n", iChannel, uidata32));
-            if( uidata32 == 1 ) // muted?
-            {
-                dataSize = sizeof( uidata32 );
-                uidata32 = 0; // unmute
-                err = AudioDeviceSetProperty( devID, 0, iChannel, isInput, 
-                    kAudioDevicePropertyMute, dataSize, &uidata32 );
-                if( err != noErr )
-                {
-                    PRINT(("Warning: audio is muted and could not be unmuted!\n"));
-                }
-                else
-                {
-                    PRINT(("Audio channel %d was unmuted by PortAudio!\n", iChannel ));
-                }
-            }
-        }
-    }
-
 }
 
 #if 0
@@ -1413,6 +1347,7 @@ static OSStatus PAOSX_DevicePropertyListener (AudioDeviceID					inDevice,
 	AudioStreamBasicDescription userStreamFormat, hardwareStreamFormat;
     PaHostInOut              *hostInOut;
 	AudioStreamBasicDescription *destFormatPtr, *srcFormatPtr;
+    AudioConverterRef         oldConverter = NULL; // PLB 20031208 - Declare here for standard 'C'.
 
     past = (internalPortAudioStream *) inClientData;
     pahsc = (PaHostSoundControl *) past->past_DeviceData;
@@ -1465,7 +1400,7 @@ static OSStatus PAOSX_DevicePropertyListener (AudioDeviceID					inDevice,
         
         // Don't delete old converter until we create new one so we don't pull
         // the rug out from under other audio threads.
-        AudioConverterRef oldConverter = hostInOut->converter;
+        oldConverter = hostInOut->converter;
         
         // Make converter to change sample rate.
         err = AudioConverterNew (
@@ -1595,8 +1530,6 @@ static PaError PaOSX_OpenCommonDevice( internalPortAudioStream   *past,
     OSStatus         err = noErr;
     Float64          deviceRate;
 
-    PaOSX_FixVolumeScalars( inOut->audioDeviceID, isInput,
-        inOut->numChannels, 0.1, 0.9 );
 
     // The HW device format changes are asynchronous.
     // So we don't know when or if the PAOSX_DevicePropertyListener() will

@@ -22,7 +22,7 @@ LIB =  @PDLIB@
 OPT_CFLAGS = @OPT_CFLAGS@
 WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
-ARCH_CFLAGS = -DPD -DUNIX 
+ARCH_CFLAGS = -DPD 
 
 CFLAGS = @CFLAGS@ $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
@@ -100,8 +100,8 @@ $(BIN_DIR)/pd.tk: u_main.tk
 #this is for Max OSX only...
 $(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)
 	cd ../obj; libtool -dynamic -o $(BIN_DIR)/pdtcl $(GOBJ) \
-	/Library/Frameworks/Tk.framework/Versions/Current/Tk \
-	/Library/Frameworks/Tcl.framework/Versions/Current/Tcl \
+	../../Frameworks/Tk.framework/Versions/Current/Tk \
+	../../Frameworks/Tcl.framework/Versions/Current/Tcl \
 	/usr/lib/libSystem.B.dylib
 
 externs: 
@@ -115,6 +115,7 @@ externs:
 
 INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
 MANINSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)/$(MANDIR)
+BINARYMODE=@binarymode@
 
 install:  all
 	install -d $(INSTDIR)/lib/pd/bin
@@ -122,9 +123,9 @@ install:  all
 	install $(BIN_DIR)/pd-watchdog $(INSTDIR)/lib/pd/bin/pd-watchdog
 	install -m644 $(BIN_DIR)/pd.tk $(INSTDIR)/lib/pd/bin/pd.tk
 	install -d $(INSTDIR)/bin
-	install -m755 $(PDEXEC) $(INSTDIR)/bin/pd
-	install -m 755 $(BIN_DIR)/pdsend $(INSTDIR)/bin/pdsend
-	install -m 755 $(BIN_DIR)/pdreceive $(INSTDIR)/bin/pdreceive 
+	install $(BINARYMODE) $(PDEXEC) $(INSTDIR)/bin/pd
+	install -m755 $(BIN_DIR)/pdsend $(INSTDIR)/bin/pdsend
+	install -m755 $(BIN_DIR)/pdreceive $(INSTDIR)/bin/pdreceive 
 	cp -pr ../doc ../extra $(INSTDIR)/lib/pd/
 	rm -f $(INSTDIR)/extra/*/*.o
 	install -d $(INSTDIR)/include
@@ -140,6 +141,7 @@ install:  all
 local-clean:
 	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
 	    $(BIN_DIR)/pdreceive $(BIN_DIR)/pd-watchdog m_stamp.c
+	-rm -f `find ../portaudio ../portaudio_v18 -name "*.o"` 
 	-rm -f *~
 	-(cd ../doc/6.externs; rm -f *.pd_linux)
 	-rm -f makefile.dependencies

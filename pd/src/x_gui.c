@@ -8,7 +8,7 @@ away before the panel does... */
 #include "m_pd.h"
 #include <stdio.h>
 #include <string.h>
-#ifdef UNIX
+#ifdef UNISTD
 #include <unistd.h>
 #endif
 
@@ -48,17 +48,17 @@ void gfxstub_new(t_pd *owner, void *key, const char *cmd)
     char namebuf[80];
     t_gfxstub *x;
     t_symbol *s;
-    	/* if any exists with matching key, burn it. */
+        /* if any exists with matching key, burn it. */
     for (x = gfxstub_list; x; x = x->x_next)
-    	if (x->x_key == key)
-    	    gfxstub_deleteforkey(key);
+        if (x->x_key == key)
+            gfxstub_deleteforkey(key);
     if (strlen(cmd) + 50 > MAXPDSTRING)
     {
-	bug("audio dialog too long");
-    	return;
+        bug("audio dialog too long");
+        return;
     }
     x = (t_gfxstub *)pd_new(gfxstub_class);
-    sprintf(namebuf, ".gfxstub%x", (t_int)x);
+    sprintf(namebuf, ".gfxstub%lx", (t_int)x);
 
     s = gensym(namebuf);
     pd_bind(&x->x_pd, s);
@@ -75,12 +75,12 @@ static void gfxstub_offlist(t_gfxstub *x)
 {
     t_gfxstub *y1, *y2;
     if (gfxstub_list == x)
-    	gfxstub_list = x->x_next;
+        gfxstub_list = x->x_next;
     else for (y1 = gfxstub_list; y2 = y1->x_next; y1 = y2)
-    	if (y2 == x) 
+        if (y2 == x) 
     {
-	y1->x_next = y2->x_next;
-	break;
+        y1->x_next = y2->x_next;
+        break;
     }
 }
 
@@ -93,18 +93,18 @@ void gfxstub_deleteforkey(void *key)
     int didit = 1;
     while (didit)
     {
-    	didit = 0;
-	for (y = gfxstub_list; y; y = y->x_next)
-	{
-    	    if (y->x_key == key)
-	    {
-		sys_vgui("destroy .gfxstub%x\n", y);
-		y->x_owner = 0;
-		gfxstub_offlist(y);
-		didit = 1;
-		break;
-	    }
-	}
+        didit = 0;
+        for (y = gfxstub_list; y; y = y->x_next)
+        {
+            if (y->x_key == key)
+            {
+                sys_vgui("destroy .gfxstub%lx\n", y);
+                y->x_owner = 0;
+                gfxstub_offlist(y);
+                didit = 1;
+                break;
+            }
+        }
     }
 }
 
@@ -129,7 +129,7 @@ static t_binbuf *gfxstub_binbuf;
 static void gfxstub_data(t_gfxstub *x, t_symbol *s, int argc, t_atom *argv)
 {
     if (!gfxstub_binbuf)
-    	gfxstub_binbuf = binbuf_new();
+        gfxstub_binbuf = binbuf_new();
     binbuf_add(gfxstub_binbuf, argc, argv);
     binbuf_addsemi(gfxstub_binbuf);
 }
@@ -137,7 +137,7 @@ static void gfxstub_data(t_gfxstub *x, t_symbol *s, int argc, t_atom *argv)
 static void gfxstub_end(t_gfxstub *x)
 {
     canvas_dataproperties((t_canvas *)x->x_owner,
-    	(t_scalar *)x->x_key, gfxstub_binbuf);
+        (t_scalar *)x->x_key, gfxstub_binbuf);
     binbuf_free(gfxstub_binbuf);
     gfxstub_binbuf = 0;
 }
@@ -147,7 +147,7 @@ static void gfxstub_end(t_gfxstub *x)
 static void gfxstub_anything(t_gfxstub *x, t_symbol *s, int argc, t_atom *argv)
 {
     if (x->x_owner)
-    	pd_typedmess(x->x_owner, s, argc, argv);
+        pd_typedmess(x->x_owner, s, argc, argv);
 }
 
 static void gfxstub_free(t_gfxstub *x)
@@ -158,17 +158,17 @@ static void gfxstub_free(t_gfxstub *x)
 static void gfxstub_setup(void)
 {
     gfxstub_class = class_new(gensym("gfxstub"), (t_newmethod)gfxstub_new,
-    	(t_method)gfxstub_free,
-    	sizeof(t_gfxstub), CLASS_PD, 0);
+        (t_method)gfxstub_free,
+        sizeof(t_gfxstub), CLASS_PD, 0);
     class_addanything(gfxstub_class, gfxstub_anything);
     class_addmethod(gfxstub_class, (t_method)gfxstub_signoff,
-    	gensym("signoff"), 0);
+        gensym("signoff"), 0);
     class_addmethod(gfxstub_class, (t_method)gfxstub_data,
-    	gensym("data"), A_GIMME, 0);
+        gensym("data"), A_GIMME, 0);
     class_addmethod(gfxstub_class, (t_method)gfxstub_end,
-    	gensym("end"), 0);
+        gensym("end"), 0);
     class_addmethod(gfxstub_class, (t_method)gfxstub_cancel,
-    	gensym("cancel"), 0);
+        gensym("cancel"), 0);
 }
 
 /* -------------------------- openpanel ------------------------------ */
@@ -185,7 +185,7 @@ static void *openpanel_new(void)
 {
     char buf[50];
     t_openpanel *x = (t_openpanel *)pd_new(openpanel_class);
-    sprintf(buf, "d%x", (t_int)x);
+    sprintf(buf, "d%lx", (t_int)x);
     x->x_s = gensym(buf);
     pd_bind(&x->x_obj.ob_pd, x->x_s);
     outlet_new(&x->x_obj, &s_symbol);
@@ -210,8 +210,8 @@ static void openpanel_free(t_openpanel *x)
 static void openpanel_setup(void)
 {
     openpanel_class = class_new(gensym("openpanel"),
-    	(t_newmethod)openpanel_new, (t_method)openpanel_free,
-    	sizeof(t_openpanel), 0, A_DEFFLOAT, 0);
+        (t_newmethod)openpanel_new, (t_method)openpanel_free,
+        sizeof(t_openpanel), 0, A_DEFFLOAT, 0);
     class_addbang(openpanel_class, openpanel_bang);
     class_addsymbol(openpanel_class, openpanel_symbol);
 }
@@ -230,7 +230,7 @@ static void *savepanel_new(void)
 {
     char buf[50];
     t_savepanel *x = (t_savepanel *)pd_new(savepanel_class);
-    sprintf(buf, "d%x", (t_int)x);
+    sprintf(buf, "d%lx", (t_int)x);
     x->x_s = gensym(buf);
     pd_bind(&x->x_obj.ob_pd, x->x_s);
     outlet_new(&x->x_obj, &s_symbol);
@@ -255,8 +255,8 @@ static void savepanel_free(t_savepanel *x)
 static void savepanel_setup(void)
 {
     savepanel_class = class_new(gensym("savepanel"),
-    	(t_newmethod)savepanel_new, (t_method)savepanel_free,
-    	sizeof(t_savepanel), 0, A_DEFFLOAT, 0);
+        (t_newmethod)savepanel_new, (t_method)savepanel_free,
+        sizeof(t_savepanel), 0, A_DEFFLOAT, 0);
     class_addbang(savepanel_class, savepanel_bang);
     class_addsymbol(savepanel_class, savepanel_symbol);
 }
@@ -342,21 +342,21 @@ static void keyname_free(t_keyname *x)
 static void key_setup(void)
 {
     key_class = class_new(gensym("key"),
-    	(t_newmethod)key_new, (t_method)key_free,
-    	sizeof(t_key), CLASS_NOINLET, 0);
+        (t_newmethod)key_new, (t_method)key_free,
+        sizeof(t_key), CLASS_NOINLET, 0);
     class_addfloat(key_class, key_float);
     key_sym = gensym("#key");
 
     keyup_class = class_new(gensym("keyup"),
-    	(t_newmethod)keyup_new, (t_method)keyup_free,
-    	sizeof(t_keyup), CLASS_NOINLET, 0);
+        (t_newmethod)keyup_new, (t_method)keyup_free,
+        sizeof(t_keyup), CLASS_NOINLET, 0);
     class_addfloat(keyup_class, keyup_float);
     keyup_sym = gensym("#keyup");
     class_sethelpsymbol(keyup_class, gensym("key"));
     
     keyname_class = class_new(gensym("keyname"),
-    	(t_newmethod)keyname_new, (t_method)keyname_free,
-    	sizeof(t_keyname), CLASS_NOINLET, 0);
+        (t_newmethod)keyname_new, (t_method)keyname_free,
+        sizeof(t_keyname), CLASS_NOINLET, 0);
     class_addlist(keyname_class, keyname_list);
     keyname_sym = gensym("#keyname");
     class_sethelpsymbol(keyname_class, gensym("key"));

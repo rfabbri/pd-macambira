@@ -8,34 +8,68 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#include "s_stuff.h"
 
-void post(char *fmt, ...)
+t_printhook sys_printhook;
+int sys_printtostderr;
+
+static void dopost(const char *s)
 {
+    if (sys_printhook)
+        (*sys_printhook)(s);
+    else if (sys_printtostderr)
+        fprintf(stderr, "%s", s);
+    else
+    {
+        char upbuf[MAXPDSTRING];
+        int ptin = 0, ptout = 0, len = strlen(s);
+        static int heldcr = 0;
+        if (heldcr)
+            upbuf[ptout++] = '\n', heldcr = 0;
+        for (; ptin < len && ptout < MAXPDSTRING-3;
+            ptin++, ptout++)
+        {
+            int c = s[ptin];
+            if (c == '\\' || c == '{' || c == '}' || c == ';')
+                upbuf[ptout++] = '\\';
+            upbuf[ptout] = s[ptin];
+        }
+        if (ptout && upbuf[ptout-1] == '\n')
+            upbuf[--ptout] = 0, heldcr = 1;
+        upbuf[ptout] = 0;
+        sys_vgui("pdtk_post {%s}\n", upbuf);
+    }
+}
+
+void post(const char *fmt, ...)
+{
+    char buf[MAXPDSTRING];
     va_list ap;
     t_int arg[8];
     int i;
     va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
     va_end(ap);
-    putc('\n', stderr);
+    strcat(buf, "\n");
+    dopost(buf);
 }
 
-void startpost(char *fmt, ...)
+void startpost(const char *fmt, ...)
 {
+    char buf[MAXPDSTRING];
     va_list ap;
     t_int arg[8];
     int i;
     va_start(ap, fmt);
-    
-    for (i = 0 ; i < 8; i++) arg[i] = va_arg(ap, t_int);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
     va_end(ap);
-    fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
-    	arg[4], arg[5], arg[6], arg[7]);
+    dopost(buf);
 }
 
-void poststring(char *s)
+void poststring(const char *s)
 {
-    fprintf(stderr, " %s", s);
+    dopost(" ");
+    dopost(s);
 }
 
 void postatom(int argc, t_atom *argv)
@@ -43,9 +77,9 @@ void postatom(int argc, t_atom *argv)
     int i;
     for (i = 0; i < argc; i++)
     {
-    	char buf[80];
-    	atom_string(argv+i, buf, 80);
-    	poststring(buf);
+        char buf[80];
+        atom_string(argv+i, buf, 80);
+        poststring(buf);
     }
 }
 
@@ -59,19 +93,21 @@ void postfloat(float f)
 
 void endpost(void)
 {
-    fprintf(stderr, "\n");
+    dopost("\n");
 }
 
-void error(char *fmt, ...)
+void error(const char *fmt, ...)
 {
+    char buf[MAXPDSTRING];
     va_list ap;
     t_int arg[8];
     int i;
+    dopost("error: ");
     va_start(ap, fmt);
-    fprintf(stderr, "error: ");
-    vfprintf(stderr, fmt, ap);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
     va_end(ap);
-    putc('\n', stderr);
+    strcat(buf, "\n");
+    dopost(buf);
 }
 
     /* here's the good way to log errors -- keep a pointer to the
@@ -82,62 +118,64 @@ static void *error_object;
 static char error_string[256];
 void canvas_finderror(void *object);
 
-void pd_error(void *object, char *fmt, ...)
+void pd_error(void *object, const char *fmt, ...)
 {
+    char buf[MAXPDSTRING];
     va_list ap;
     t_int arg[8];
     int i;
-    static int saidit = 0;
+    static int saidit;
+    dopost("error: ");
     va_start(ap, fmt);
-    vsprintf(error_string, fmt, ap);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "error: %s\n", error_string);
+    strcat(buf, "\n");
+    dopost(buf);
     error_object = object;
     if (!saidit)
     {
-    	post("... you might be able to track this down from the Find menu.");
-    	saidit = 1;
+        post("... you might be able to track this down from the Find menu.");
+        saidit = 1;
     }
 }
 
 void glob_finderror(t_pd *dummy)
 {
     if (!error_object)
-    	post("no findable error yet.");
+        post("no findable error yet.");
     else
     {
-    	post("last trackable error:");
-    	post("%s", error_string);
-    	canvas_finderror(error_object);
+        post("last trackable error:");
+        post("%s", error_string);
+        canvas_finderror(error_object);
     }
 }
 
-void bug(char *fmt, ...)
+void bug(const char *fmt, ...)
 {
+    char buf[MAXPDSTRING];
     va_list ap;
     t_int arg[8];
     int i;
+    dopost("consistency check failed: ");
     va_start(ap, fmt);
-    
-    for (i = 0 ; i < 8; i++) arg[i] = va_arg(ap, t_int);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
     va_end(ap);
-    fprintf(stderr, "Consistency check failed: ");
-    fprintf(stderr, fmt, arg[0], arg[1], arg[2], arg[3],
-    	arg[4], arg[5], arg[6], arg[7]);
-    putc('\n', stderr);
+    strcat(buf, "\n");
+    dopost(buf);
 }
 
     /* this isn't worked out yet. */
-static char *errobject;
-static char *errstring;
+static const char *errobject;
+static const char *errstring;
 
-void sys_logerror(char *object, char *s)
+void sys_logerror(const char *object, const char *s)
 {
     errobject = object;
     errstring = s;
 }
 
-void sys_unixerror(char *object)
+void sys_unixerror(const char *object)
 {
     errobject = object;
     errstring = strerror(errno);

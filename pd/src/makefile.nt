@@ -11,14 +11,16 @@ LDIR = $(VC)\lib
 LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames  /NODEFAULTLIB:kernel \
     /NODEFAULTLIB:uuid \
     $(LDIR)\libc.lib $(LDIR)\oldnames.lib $(LDIR)\kernel32.lib \
-    $(LDIR)\wsock32.lib $(LDIR)\winmm.lib ..\bin\pthreadVC.lib
+    $(LDIR)\wsock32.lib $(LDIR)\winmm.lib $(LDIR)\advapi32.lib \
+    ..\bin\pthreadVC.lib 
 
-GLIB =  $(LIB) ..\bin\tcl83.lib ..\bin\tk83.lib
+GLIB =  $(LIB) ..\bin\tcl84.lib ..\bin\tk84.lib
 CFLAGS = /nologo /W3 /DMSW /DNT /DPD /DPD_INTERNAL /DWIN32 /DWINDOWS /Ox \
-	-DPA_LITTLE_ENDIAN -DUSEAPI_MMIO -DUSEAPI_PORTAUDIO 
+	-DPA_LITTLE_ENDIAN -DUSEAPI_MMIO -DUSEAPI_PORTAUDIO -D__i386__
 LFLAGS = /nologo
 
-SYSSRC = s_audio_pa.c s_audio_mmio.c s_midi_mmio.c
+SYSSRC = s_audio_pa.c s_audio_pablio.c s_audio_paring.c \
+    s_audio_mmio.c s_midi_mmio.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -37,8 +39,7 @@ SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
 
 PADIR = ..\portaudio
 INCPA = -I$(PADIR) -I$(PADIR)\pa_common -I$(PADIR)\pablio -I..\lib\asio
-SRCPA = $(PADIR)/pa_common/pa_lib.c $(PADIR)/pa_common/pa_trace.c \
-	$(PADIR)/pablio/pablio_pd.c $(PADIR)/pablio/ringbuffer_pd.c
+SRCPA = $(PADIR)/pa_common/pa_lib.c $(PADIR)/pa_common/pa_trace.c
 SRCASIO = $(PADIR)/pa_asio/pa_asio.cpp 
 
 ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib $(LDIR)\comdlg32.lib \
@@ -46,7 +47,7 @@ $(LDIR)\advapi32.lib $(LDIR)\shell32.lib $(LDIR)\ole32.lib $(LDIR)\oleaut32.lib 
 $(LDIR)\odbc32.lib $(LDIR)\odbccp32.lib ..\lib\asio\asiolib.lib
 
 
-PAOBJ = pa_lib.obj pa_trace.obj pablio_pd.obj ringbuffer_pd.obj pa_asio.obj
+PAOBJ = pa_lib.obj pa_trace.obj pa_asio.obj
 
 
 OBJC = $(SRC:.c=.obj) $(PAOBJ)

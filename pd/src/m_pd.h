@@ -8,9 +8,8 @@
 extern "C" {
 #endif
 
-#define PD_VERSION 0.37     /* oops, don't use this... */  */
-#define PD_MAJOR_VERSION 0  /* ... use these two instead. */
-#define PD_MINOR_VERSION 37   
+#define PD_MAJOR_VERSION 0
+#define PD_MINOR_VERSION 38   
 
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
@@ -46,20 +45,17 @@ extern "C" {
 
 
 #if !defined(_SIZE_T) && !defined(_SIZE_T_)
-#include <stddef.h> 	/* just for size_t -- how lame! */
+#include <stddef.h>     /* just for size_t -- how lame! */
 #endif
 
-#define MAXPDSTRING 1000	/* use this for anything you want */
-#define MAXPDARG 5    	    	/* max number of args we can typecheck today */
+#define MAXPDSTRING 1000        /* use this for anything you want */
+#define MAXPDARG 5              /* max number of args we can typecheck today */
 
-    /* signed and unsigned integer types the size of a pointer:  */
-#ifdef __alpha__
+/* signed and unsigned integer types the size of a pointer:  */
+/* GG: long is the size of a pointer */
 typedef long t_int;
-#else
-typedef int t_int;
-#endif
 
-typedef float t_float;	/* a floating-point number at most the same size */
+typedef float t_float;  /* a floating-point number at most the same size */
 typedef float t_floatarg;  /* floating-point type for function calls */
 
 typedef struct _symbol
@@ -70,37 +66,37 @@ typedef struct _symbol
 } t_symbol;
 
 EXTERN_STRUCT _array;
-#define t_array struct _array 	    /* g_canvas.h */
+#define t_array struct _array       /* g_canvas.h */
 
 /* pointers to glist and array elements go through a "stub" which sticks
 around after the glist or array is freed.  The stub itself is deleted when
 both the glist/array is gone and the refcount is zero, ensuring that no
 gpointers are pointing here. */
 
-#define GP_NONE 0  	/* the stub points nowhere (has been cut off) */
-#define GP_GLIST 1  	/* the stub points to a glist element */
-#define GP_ARRAY 2  	/* ... or array */
+#define GP_NONE 0       /* the stub points nowhere (has been cut off) */
+#define GP_GLIST 1      /* the stub points to a glist element */
+#define GP_ARRAY 2      /* ... or array */
 
 typedef struct _gstub
 {
     union
     {
-    	struct _glist *gs_glist;    /* glist we're in */
-    	struct _array *gs_array;    /* array we're in */
+        struct _glist *gs_glist;    /* glist we're in */
+        struct _array *gs_array;    /* array we're in */
     } gs_un;
-    int gs_which;   	    	    /* GP_GLIST/GP_ARRAY */
-    int gs_refcount;   	    	    /* number of gpointers pointing here */
+    int gs_which;                   /* GP_GLIST/GP_ARRAY */
+    int gs_refcount;                /* number of gpointers pointing here */
 } t_gstub;
 
-typedef struct _gpointer 	   /* pointer to a gobj in a glist */
+typedef struct _gpointer           /* pointer to a gobj in a glist */
 {
     union
-    {	
-    	struct _scalar *gp_scalar;  /* scalar we're in (if glist) */
-    	union word *gp_w;  	    /* raw data (if array) */
+    {   
+        struct _scalar *gp_scalar;  /* scalar we're in (if glist) */
+        union word *gp_w;           /* raw data (if array) */
     } gp_un;
-    int gp_valid;   	    	    /* number which must match gpointee */
-    t_gstub *gp_stub;	    	    /* stub which points to glist/array */
+    int gp_valid;                   /* number which must match gpointee */
+    t_gstub *gp_stub;               /* stub which points to glist/array */
 } t_gpointer;
 
 typedef union word
@@ -129,7 +125,7 @@ typedef enum
     A_CANT
 }  t_atomtype;
 
-#define A_DEFSYMBOL A_DEFSYM	/* better name for this */
+#define A_DEFSYMBOL A_DEFSYM    /* better name for this */
 
 typedef struct _atom
 {
@@ -157,39 +153,39 @@ EXTERN_STRUCT _outconnect;
 
 EXTERN_STRUCT _glist;
 #define t_glist struct _glist
-#define t_canvas struct _glist	/* LATER lose this */
+#define t_canvas struct _glist  /* LATER lose this */
 
-typedef t_class *t_pd;	    /* pure datum: nothing but a class pointer */
+typedef t_class *t_pd;      /* pure datum: nothing but a class pointer */
 
-typedef struct _gobj	    /* a graphical object */
+typedef struct _gobj        /* a graphical object */
 {
-    t_pd g_pd;	    	    /* pure datum header (class) */
+    t_pd g_pd;              /* pure datum header (class) */
     struct _gobj *g_next;   /* next in list */
 } t_gobj;
 
-typedef struct _scalar	    /* a graphical object holding data */
+typedef struct _scalar      /* a graphical object holding data */
 {
-    t_gobj sc_gobj;	    /* header for graphical object */
+    t_gobj sc_gobj;         /* header for graphical object */
     t_symbol *sc_template;  /* template name (LATER replace with pointer) */
-    t_word sc_vec[1];	    /* indeterminate-length array of words */
+    t_word sc_vec[1];       /* indeterminate-length array of words */
 } t_scalar;
 
-typedef struct _text	    /* patchable object - graphical, with text */
+typedef struct _text        /* patchable object - graphical, with text */
 {
-    t_gobj te_g;	    	/* header for graphical object */
-    t_binbuf *te_binbuf;    	/* holder for the text */
-    t_outlet *te_outlet;    	/* linked list of outlets */
-    t_inlet *te_inlet;	    	/* linked list of inlets */
-    short te_xpix;	    	/* x&y location (within the toplevel) */
+    t_gobj te_g;                /* header for graphical object */
+    t_binbuf *te_binbuf;        /* holder for the text */
+    t_outlet *te_outlet;        /* linked list of outlets */
+    t_inlet *te_inlet;          /* linked list of inlets */
+    short te_xpix;              /* x&y location (within the toplevel) */
     short te_ypix;
-    short te_width;	    	/* requested width in chars, 0 if auto */
-    unsigned int te_type:2; 	/* from defs below */
+    short te_width;             /* requested width in chars, 0 if auto */
+    unsigned int te_type:2;     /* from defs below */
 } t_text;
 
-#define T_TEXT 0    	/* just a textual comment */
-#define T_OBJECT 1  	/* a MAX style patchable object */
-#define T_MESSAGE 2    	/* a MAX stype message */
-#define T_ATOM 3    	/* a cell to display a number or symbol */
+#define T_TEXT 0        /* just a textual comment */
+#define T_OBJECT 1      /* a MAX style patchable object */
+#define T_MESSAGE 2     /* a MAX stype message */
+#define T_ATOM 3        /* a cell to display a number or symbol */
 
 #define te_pd te_g.g_pd
 
@@ -208,8 +204,8 @@ typedef void *(*t_newmethod)( void);
 typedef void (*t_gotfn)(void *x, ...);
 
 /* ---------------- pre-defined objects and symbols --------------*/
-EXTERN t_pd pd_objectmaker; 	/* factory for creating "object" boxes */
-EXTERN t_pd pd_canvasmaker; 	/* factory for creating canvases */
+EXTERN t_pd pd_objectmaker;     /* factory for creating "object" boxes */
+EXTERN t_pd pd_canvasmaker;     /* factory for creating canvases */
 EXTERN t_symbol s_pointer;
 EXTERN t_symbol s_float;
 EXTERN t_symbol s_symbol;
@@ -336,11 +332,6 @@ EXTERN void gpointer_unset(t_gpointer *gp);
 EXTERN int gpointer_check(const t_gpointer *gp, int headok);
 
 /* ----------------- patchable "objects" -------------- */
-EXTERN_STRUCT _inlet;
-#define t_inlet struct _inlet
-EXTERN_STRUCT _outlet;
-#define t_outlet struct _outlet
-
 EXTERN t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1,
     t_symbol *s2);
 EXTERN t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp);
@@ -365,7 +356,7 @@ EXTERN t_object *pd_checkobject(t_pd *x);
 EXTERN void glob_setfilename(void *dummy, t_symbol *name, t_symbol *dir);
 
 EXTERN void canvas_setargs(int argc, t_atom *argv);
-EXTERN t_atom *canvas_getarg(int which);
+EXTERN void canvas_getargs(int *argcp, t_atom **argvp);
 EXTERN t_symbol *canvas_getcurrentdir(void);
 EXTERN t_glist *canvas_getcurrent(void);
 EXTERN void canvas_makefilename(t_glist *c, char *file,
@@ -386,7 +377,7 @@ EXTERN t_parentwidgetbehavior *pd_getparentwidget(t_pd *x);
 
 /* -------------------- classes -------------- */
 
-#define CLASS_DEFAULT 0 	/* flags for new classes below */
+#define CLASS_DEFAULT 0         /* flags for new classes below */
 #define CLASS_PD 1
 #define CLASS_GOBJ 2
 #define CLASS_PATCHABLE 3
@@ -419,11 +410,11 @@ EXTERN void class_domainsignalin(t_class *c, int onset);
 #define CLASS_MAINSIGNALIN(c, type, field) \
     class_domainsignalin(c, (char *)(&((type *)0)->field) - (char *)0)
 
-    	 /* prototype for functions to save Pd's to a binbuf */
+         /* prototype for functions to save Pd's to a binbuf */
 typedef void (*t_savefn)(t_gobj *x, t_binbuf *b);
 EXTERN void class_setsavefn(t_class *c, t_savefn f);
 EXTERN t_savefn class_getsavefn(t_class *c);
-    	/* prototype for functions to open properties dialogs */
+        /* prototype for functions to open properties dialogs */
 typedef void (*t_propertiesfn)(t_gobj *x, struct _glist *glist);
 EXTERN void class_setpropertiesfn(t_class *c, t_propertiesfn f);
 EXTERN t_propertiesfn class_getpropertiesfn(t_class *c);
@@ -438,23 +429,18 @@ EXTERN t_propertiesfn class_getpropertiesfn(t_class *c);
 #endif
 
 /* ------------   printing --------------------------------- */
-EXTERN void post(char *fmt, ...);
-EXTERN void startpost(char *fmt, ...);
-EXTERN void poststring(char *s);
+EXTERN void post(const char *fmt, ...);
+EXTERN void startpost(const char *fmt, ...);
+EXTERN void poststring(const char *s);
 EXTERN void postfloat(float f);
 EXTERN void postatom(int argc, t_atom *argv);
 EXTERN void endpost(void);
-EXTERN void error(char *fmt, ...);
-EXTERN void bug(char *fmt, ...);
-EXTERN void pd_error(void *object, char *fmt, ...);
-EXTERN void sys_logerror(char *object, char *s);
-EXTERN void sys_unixerror(char *object);
+EXTERN void error(const char *fmt, ...);
+EXTERN void bug(const char *fmt, ...);
+EXTERN void pd_error(void *object, const char *fmt, ...);
+EXTERN void sys_logerror(const char *object, const char *s);
+EXTERN void sys_unixerror(const char *object);
 EXTERN void sys_ouch(void);
-
-#ifdef __linux__
-EXTERN char* sys_get_path( void);
-#endif 
-EXTERN void sys_addpath(const char* p);
 
 
 /* ------------  system interface routines ------------------- */
@@ -483,14 +469,14 @@ typedef float t_sample;
 
 typedef struct _signal
 {
-    int s_n;	    	/* number of points in the array */
-    t_sample *s_vec;	/* the array */
-    float s_sr;     	/* sample rate */
-    int s_refcount; 	/* number of times used */
-    int s_isborrowed;	/* whether we're going to borrow our array */
-    struct _signal *s_borrowedfrom; 	/* signal to borrow it from */
-    struct _signal *s_nextfree; 	/* next in freelist */
-    struct _signal *s_nextused;     	/* next in used list */
+    int s_n;            /* number of points in the array */
+    t_sample *s_vec;    /* the array */
+    float s_sr;         /* sample rate */
+    int s_refcount;     /* number of times used */
+    int s_isborrowed;   /* whether we're going to borrow our array */
+    struct _signal *s_borrowedfrom;     /* signal to borrow it from */
+    struct _signal *s_nextfree;         /* next in freelist */
+    struct _signal *s_nextused;         /* next in used list */
 } t_signal;
 
 
@@ -565,7 +551,7 @@ EXTERN float dbtopow(float);
 
 EXTERN float q8_sqrt(float);
 EXTERN float q8_rsqrt(float);
-#ifndef N32 	
+#ifndef N32     
 EXTERN float qsqrt(float);  /* old names kept for extern compatibility */
 EXTERN float qrsqrt(float);
 #endif
@@ -592,14 +578,18 @@ EXTERN int value_getfloat(t_symbol *s, t_float *f);
 EXTERN int value_setfloat(t_symbol *s, t_float f);
 
 /* ------- GUI interface - functions to send strings to TK --------- */
+typedef void (*t_guicallbackfn)(t_gobj *client, t_glist *glist);
+
 EXTERN void sys_vgui(char *fmt, ...);
 EXTERN void sys_gui(char *s);
-
+EXTERN void sys_pretendguibytes(int n);
+EXTERN void sys_queuegui(void *client, t_glist *glist, t_guicallbackfn f);
+EXTERN void sys_unqueuegui(void *client);
     /* dialog window creation and destruction */
 EXTERN void gfxstub_new(t_pd *owner, void *key, const char *cmd);
 EXTERN void gfxstub_deleteforkey(void *key);
 
-extern t_class *glob_pdobject;	/* object to send "pd" messages */
+extern t_class *glob_pdobject;  /* object to send "pd" messages */
 
 /*-------------  Max 0.26 compatibility --------------------*/
 
@@ -623,13 +613,17 @@ defined, there is a "te_xpix" field in objects, not a "te_xpos" as before: */
 
 #define PD_USE_TE_XPIX
 
-/* a test for NANs and denormals.  Should only be necessary on i386. */
 
 #ifdef __i386__
+/* a test for NANs and denormals.  Should only be necessary on i386. */
 #define PD_BADFLOAT(f) ((((*(unsigned int*)&(f))&0x7f800000)==0) || \
     (((*(unsigned int*)&(f))&0x7f800000)==0x7f800000))
+/* more stringent test: anything not between 1e-19 and 1e19 in absolute val */
+#define PD_BIGORSMALL(f) ((((*(unsigned int*)&(f))&0x60000000)==0) || \
+    (((*(unsigned int*)&(f))&0x60000000)==0x60000000))
 #else
 #define PD_BADFLOAT(f) 0
+#define PD_BIGORSMALL(f) 0
 #endif
 
 #if defined(_LANGUAGE_C_PLUS_PLUS) || defined(__cplusplus)

@@ -33,25 +33,25 @@ static void msw_midisync(void)
     
     if (initsystime == -1) msw_resetmidisync();
     jittersec = (msw_dacjitterbufsallowed > msw_adcjitterbufsallowed ?
-    	msw_dacjitterbufsallowed : msw_adcjitterbufsallowed)
-    	    * REALDACBLKSIZE / sys_getsr();
+        msw_dacjitterbufsallowed : msw_adcjitterbufsallowed)
+            * REALDACBLKSIZE / sys_getsr();
     diff = sys_getrealtime() - 0.001 * clock_gettimesince(initsystime);
     if (diff > msw_hibuftime) msw_hibuftime = diff;
     if (diff < msw_hibuftime - jittersec)
     {
-    	post("jitter excess %d %f", dac, diff);
-    	msw_resetmidisync();
+        post("jitter excess %d %f", dac, diff);
+        msw_resetmidisync();
     }
 }
 
 static double msw_midigettimefor(LARGE_INTEGER timestamp)
 {
     /* this is broken now... used to work when "timestamp" was derived from
-    	QueryPerformanceCounter() instead of the gates approved 
-	    timeGetSystemTime() call in the MIDI callback routine below. */
+        QueryPerformanceCounter() instead of the gates approved 
+            timeGetSystemTime() call in the MIDI callback routine below. */
     return (msw_tixtotime(timestamp) - msw_hibuftime);
 }
-#endif	    /* MIDI_TIMESTAMP */
+#endif      /* MIDI_TIMESTAMP */
 
 
 /* ------------------------- MIDI output -------------------------- */
@@ -63,7 +63,7 @@ static void msw_midiouterror(char *s, int err)
 }
 
 static HMIDIOUT hMidiOut[MAXMIDIOUTDEV];    /* output device */
-static int msw_nmidiout;	    	    	    /* number of devices */
+static int msw_nmidiout;                            /* number of devices */
 
 static void msw_open_midiout(int nmidiout, int *midioutvec)
 {
@@ -72,30 +72,30 @@ static void msw_open_midiout(int nmidiout, int *midioutvec)
     int dev;
     MIDIOUTCAPS midioutcaps;
     if (nmidiout > MAXMIDIOUTDEV)
-    	nmidiout = MAXMIDIOUTDEV;
+        nmidiout = MAXMIDIOUTDEV;
 
     dev = 0;
 
     for (i = 0; i < nmidiout; i++)
     {
-    	MIDIOUTCAPS mocap;
-	int devno =  midioutvec[i];
-	result = midiOutOpen(&hMidiOut[dev], devno, 0, 0, 
-	    CALLBACK_NULL);
-    	wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap,
+        MIDIOUTCAPS mocap;
+        int devno =  midioutvec[i];
+        result = midiOutOpen(&hMidiOut[dev], devno, 0, 0, 
+            CALLBACK_NULL);
+        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap,
             sizeof(mocap));
-	if (result != MMSYSERR_NOERROR)
-	{
-	    fprintf(stderr,"midiOutOpen: %s\n",midioutcaps.szPname);
-	    msw_midiouterror("midiOutOpen: %s\n", result);
-	}
-	else
-	{
-	    if (sys_verbose)
-		fprintf(stderr,"midiOutOpen: Open %s as Port %d\n",
-		    midioutcaps.szPname, dev);
-	    dev++;
-	}
+        if (result != MMSYSERR_NOERROR)
+        {
+            fprintf(stderr,"midiOutOpen: %s\n",midioutcaps.szPname);
+            msw_midiouterror("midiOutOpen: %s\n", result);
+        }
+        else
+        {
+            if (sys_verbose)
+                fprintf(stderr,"midiOutOpen: Open %s as Port %d\n",
+                    midioutcaps.szPname, dev);
+            dev++;
+        }
     }
     msw_nmidiout = dev;
 }
@@ -105,8 +105,8 @@ static void msw_close_midiout(void)
     int i;
     for (i = 0; i < msw_nmidiout; i++)
     {
-    	midiOutReset(hMidiOut[i]);
-    	midiOutClose(hMidiOut[i]);
+        midiOutReset(hMidiOut[i]);
+        midiOutClose(hMidiOut[i]);
     }
     msw_nmidiout = 0;
 }
@@ -177,9 +177,9 @@ WORD FAR PASCAL GetEvent(LPCIRCULARBUFFER lpBuf, LPEVENT lpEvent);
 // Callback instance data pointers
 LPCALLBACKINSTANCEDATA lpCallbackInstanceData[MAXMIDIINDEV];
 
-UINT wNumDevices = 0;			 // Number of MIDI input devices opened
+UINT wNumDevices = 0;                    // Number of MIDI input devices opened
 BOOL bRecordingEnabled = 1;             // Enable/disable recording flag
-int  nNumBufferLines = 0;		 // Number of lines in display buffer
+int  nNumBufferLines = 0;                // Number of lines in display buffer
 RECT rectScrollClip;                    // Clipping rectangle for scrolling
 
 LPCIRCULARBUFFER lpInputBuffer;         // Input buffer structure
@@ -386,7 +386,7 @@ void FreeCircularBuffer(LPCIRCULARBUFFER lpBuf)
  */
 WORD FAR PASCAL GetEvent(LPCIRCULARBUFFER lpBuf, LPEVENT lpEvent)
 {
-    	/* If no event available, return */
+        /* If no event available, return */
     if (!wNumDevices || lpBuf->dwCount <= 0) return (0);
     
     /* Get the event.
@@ -542,7 +542,7 @@ void msw_open_midiin(int nmidiin, int *midiinvec)
             FreeCallbackInstanceData(lpCallbackInstanceData[ndev]);
             msw_midiinerror("midiInOpen: %s\n", wRtn);
         }
-	else ndev++;
+        else ndev++;
     }
 
     /* Start MIDI input.
@@ -564,9 +564,9 @@ static void msw_close_midiin(void)
     for (i=0; (i<wNumDevices) && (i<MAXMIDIINDEV); i++)
     {
         if (hMidiIn[i])
-	{
-    	    if (sys_verbose)
-    	    	post("closing MIDI input %d...", i);
+        {
+            if (sys_verbose)
+                post("closing MIDI input %d...", i);
             midiInStop(hMidiIn[i]);
             midiInReset(hMidiIn[i]);
             midiInClose(hMidiIn[i]);
@@ -577,10 +577,10 @@ static void msw_close_midiin(void)
     /* Free input buffer.
      */
     if (lpInputBuffer)
-    	FreeCircularBuffer(lpInputBuffer);
+        FreeCircularBuffer(lpInputBuffer);
 
     if (sys_verbose)
-    	post("...done");
+        post("...done");
     wNumDevices = 0;
 }
 
@@ -592,10 +592,10 @@ void sys_putmidimess(int portno, int a, int b, int c)
     MMRESULT res;
     if (portno >= 0 && portno < msw_nmidiout)
     {
-	foo = (a & 0xff) | ((b & 0xff) << 8) | ((c & 0xff) << 16);
-	res = midiOutShortMsg(hMidiOut[portno], foo);
-    	if (res != MMSYSERR_NOERROR)
-	    post("MIDI out error %d", res);
+        foo = (a & 0xff) | ((b & 0xff) << 8) | ((c & 0xff) << 16);
+        res = midiOutShortMsg(hMidiOut[portno], foo);
+        if (res != MMSYSERR_NOERROR)
+            post("MIDI out error %d", res);
     }
 }
 
@@ -604,9 +604,9 @@ void sys_putmidibyte(int portno, int byte)
     MMRESULT res;
     if (portno >= 0 && portno < msw_nmidiout)
     {
-    	res = midiOutShortMsg(hMidiOut[portno], byte);
-    	if (res != MMSYSERR_NOERROR)
-    	    post("MIDI out error %d", res);
+        res = midiOutShortMsg(hMidiOut[portno], byte);
+        if (res != MMSYSERR_NOERROR)
+            post("MIDI out error %d", res);
     }
 }
 
@@ -618,45 +618,45 @@ void sys_poll_midi(void)
 
     while (1)
     {
-    	if (!msw_isnextevent)
-    	{
-    	    if (!GetEvent(lpInputBuffer, &msw_nextevent)) break;
-    	    msw_isnextevent = 1;
+        if (!msw_isnextevent)
+        {
+            if (!GetEvent(lpInputBuffer, &msw_nextevent)) break;
+            msw_isnextevent = 1;
 #ifdef MIDI_TIMESTAMP
-    	    msw_nexteventtime = msw_midigettimefor(&foo.timestamp);
+            msw_nexteventtime = msw_midigettimefor(&foo.timestamp);
 #endif
-    	}
+        }
 #ifdef MIDI_TIMESTAMP
-    	if (0.001 * clock_gettimesince(initsystime) >= msw_nexteventtime)
+        if (0.001 * clock_gettimesince(initsystime) >= msw_nexteventtime)
 #endif
-    	{
-    	    int msgtype = ((msw_nextevent.data & 0xf0) >> 4) - 8;
-    	    int commandbyte = msw_nextevent.data & 0xff;
-    	    int byte1 = (msw_nextevent.data >> 8) & 0xff;
-    	    int byte2 = (msw_nextevent.data >> 16) & 0xff;
-    	    int portno = msw_nextevent.dwDevice;
-	    switch (msgtype)
-    	    {
-    	    case 0: 
-    	    case 1: 
-    	    case 2:
-    	    case 3:
-    	    case 6:
-		sys_midibytein(portno, commandbyte);
-		sys_midibytein(portno, byte1);
-		sys_midibytein(portno, byte2);
-		break; 
-    	    case 4:
-    	    case 5:
-		sys_midibytein(portno, commandbyte);
-		sys_midibytein(portno, byte1);
-		break;
-	    case 7:
-		sys_midibytein(portno, commandbyte);
-		break; 
-	    }
-    	    msw_isnextevent = 0;
-    	}
+        {
+            int msgtype = ((msw_nextevent.data & 0xf0) >> 4) - 8;
+            int commandbyte = msw_nextevent.data & 0xff;
+            int byte1 = (msw_nextevent.data >> 8) & 0xff;
+            int byte2 = (msw_nextevent.data >> 16) & 0xff;
+            int portno = msw_nextevent.dwDevice;
+            switch (msgtype)
+            {
+            case 0: 
+            case 1: 
+            case 2:
+            case 3:
+            case 6:
+                sys_midibytein(portno, commandbyte);
+                sys_midibytein(portno, byte1);
+                sys_midibytein(portno, byte2);
+                break; 
+            case 4:
+            case 5:
+                sys_midibytein(portno, commandbyte);
+                sys_midibytein(portno, byte1);
+                break;
+            case 7:
+                sys_midibytein(portno, commandbyte);
+                break; 
+            }
+            msw_isnextevent = 0;
+        }
     }
 }
 
@@ -664,14 +664,13 @@ void sys_do_open_midi(int nmidiin, int *midiinvec,
     int nmidiout, int *midioutvec)
 {
     if (nmidiout)
-    	msw_open_midiout(nmidiout, midioutvec);
+        msw_open_midiout(nmidiout, midioutvec);
     if (nmidiin)
     {
-    	post(
-	 "midi input enabled; warning, don't close the DOS window directly!");
-    	msw_open_midiin(nmidiin, midiinvec);
+        post(
+         "Warning: midi input is dangerous in Microsoft Windows; see Pd manual)");
+        msw_open_midiin(nmidiin, midiinvec);
     }
-    else post("not using MIDI input (use 'pd -midiindev 1' to override)");
 }
 
 void sys_close_midi( void)
@@ -688,28 +687,28 @@ void sys_listmididevs(void)
     unsigned int i;
 
     /* for MIDI and audio in and out, get the number of devices.
-    	Then get the capabilities of each device and print its description. */
+        Then get the capabilities of each device and print its description. */
 
     ndevices = midiInGetNumDevs();
     for (i = 0; i < ndevices; i++)
     {
-    	MIDIINCAPS micap;
-    	wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap,
+        MIDIINCAPS micap;
+        wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap,
             sizeof(micap));
         if (wRtn) msw_midiinerror("midiInGetDevCaps: %s\n", wRtn);
-    	else fprintf(stderr,
-    	    "MIDI input device #%d: %s\n", i+1, micap.szPname);
+        else fprintf(stderr,
+            "MIDI input device #%d: %s\n", i+1, micap.szPname);
     }
 
     ndevices = midiOutGetNumDevs();
     for (i = 0; i < ndevices; i++)
     {
-    	MIDIOUTCAPS mocap;
-    	wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap,
+        MIDIOUTCAPS mocap;
+        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap,
             sizeof(mocap));
         if (wRtn) msw_midiouterror("midiOutGetDevCaps: %s\n", wRtn);
-    	else fprintf(stderr,
-    	    "MIDI output device #%d: %s\n", i+1, mocap.szPname);
+        else fprintf(stderr,
+            "MIDI output device #%d: %s\n", i+1, mocap.szPname);
     }
 
 }
@@ -721,23 +720,23 @@ void midi_getdevs(char *indevlist, int *nindevs,
     int i, nin = midiInGetNumDevs(), nout = midiOutGetNumDevs();
     UINT  wRtn;
     if (nin > maxndev)
-    	nin = maxndev;
+        nin = maxndev;
     for (i = 0; i < nin; i++)
     {
-    	MIDIINCAPS micap;
-    	wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
-	strncpy(indevlist + i * devdescsize, 
-	    (wRtn ? "???" : micap.szPname), devdescsize);
+        MIDIINCAPS micap;
+        wRtn = midiInGetDevCaps(i, (LPMIDIINCAPS) &micap, sizeof(micap));
+        strncpy(indevlist + i * devdescsize, 
+            (wRtn ? "???" : micap.szPname), devdescsize);
         indevlist[(i+1) * devdescsize - 1] = 0;
     }
     if (nout > maxndev)
-    	nout = maxndev;
+        nout = maxndev;
     for (i = 0; i < nout; i++)
     {
-    	MIDIOUTCAPS mocap;
-    	wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
-	strncpy(outdevlist + i * devdescsize, 
-	    (wRtn ? "???" : mocap.szPname), devdescsize);
+        MIDIOUTCAPS mocap;
+        wRtn = midiOutGetDevCaps(i, (LPMIDIOUTCAPS) &mocap, sizeof(mocap));
+        strncpy(outdevlist + i * devdescsize, 
+            (wRtn ? "???" : mocap.szPname), devdescsize);
         outdevlist[(i+1) * devdescsize - 1] = 0;
     }
     *nindevs = nin;

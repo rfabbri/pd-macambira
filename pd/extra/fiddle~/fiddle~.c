@@ -1125,7 +1125,8 @@ int sigfiddle_doinit(t_sigfiddle *x, long npoints, long npitch,
     if (npitch <= 0) npitch = 0;
     else if (npitch > MAXNPITCH) npitch = MAXNPITCH;
     if (npeakanal && !npitch) npitch = 1;
-
+    if (!npoints)
+    	npoints = DEFAULTPOINTS;
     if (!sigfiddle_setnpoints(x, npoints))
     {
 	error("fiddle~: out of memory");

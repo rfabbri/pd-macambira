@@ -79,9 +79,9 @@ SGIINCLUDE =  -I/usr/people/msp/pd/pd/src
 LINUXOBJ =  vexp.pd_linux_o vexp_fun.pd_linux_o vexp_if.pd_linux_o
 .SUFFIXES: .pd_linux_o
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes  \
-    -Wno-unused -Wno-parentheses -Wno-switch
+LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
 
 LINUXINCLUDE =  -I../../src
 

@@ -21,7 +21,7 @@ control their appearances by adding stuff to draw.
 
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>  	/* for read/write to files */
+#include <stdio.h>      /* for read/write to files */
 #include "m_pd.h"
 #include "g_canvas.h"
 
@@ -33,20 +33,20 @@ void word_init(t_word *wp, t_template *template, t_gpointer *gp)
     t_dataslot *datatypes = template->t_vec;
     for (i = 0; i < nitems; i++, datatypes++, wp++)
     {
-    	int type = datatypes->ds_type;
-    	if (type == DT_FLOAT)
-    	    wp->w_float = 0; 
-    	else if (type == DT_SYMBOL)
-  	    wp->w_symbol = &s_symbol;
-    	else if (type == DT_ARRAY)
-	{
-    	    wp->w_array = array_new(datatypes->ds_arraytemplate, gp);
-    	}
-    	else if (type == DT_LIST)
-    	{
-    	    	/* LATER test this and get it to work */
-    	    wp->w_list = canvas_new(0, 0, 0, 0);
-    	}
+        int type = datatypes->ds_type;
+        if (type == DT_FLOAT)
+            wp->w_float = 0; 
+        else if (type == DT_SYMBOL)
+            wp->w_symbol = &s_symbol;
+        else if (type == DT_ARRAY)
+        {
+            wp->w_array = array_new(datatypes->ds_arraytemplate, gp);
+        }
+        else if (type == DT_LIST)
+        {
+                /* LATER test this and get it to work */
+            wp->w_list = canvas_new(0, 0, 0, 0);
+        }
     }
 }
 
@@ -57,32 +57,32 @@ void word_restore(t_word *wp, t_template *template,
     t_dataslot *datatypes = template->t_vec;
     for (i = 0; i < nitems; i++, datatypes++, wp++)
     {
-    	int type = datatypes->ds_type;
-    	if (type == DT_FLOAT)
-    	{
-    	    float f;
-    	    if (argc)
-    	    {
-    	    	f =  atom_getfloat(argv);
-    	    	argv++, argc--;
-    	    }
-    	    else f = 0;
-    	    wp->w_float = f; 
-    	}
-    	else if (type == DT_SYMBOL)
-    	{
-    	    t_symbol *s;
-    	    if (argc)
-    	    {
-    	    	s =  atom_getsymbol(argv);
-    	    	argv++, argc--;
-    	    }
-    	    else s = &s_;
-    	    wp->w_symbol = s;
-    	}
+        int type = datatypes->ds_type;
+        if (type == DT_FLOAT)
+        {
+            float f;
+            if (argc)
+            {
+                f =  atom_getfloat(argv);
+                argv++, argc--;
+            }
+            else f = 0;
+            wp->w_float = f; 
+        }
+        else if (type == DT_SYMBOL)
+        {
+            t_symbol *s;
+            if (argc)
+            {
+                s =  atom_getsymbol(argv);
+                argv++, argc--;
+            }
+            else s = &s_;
+            wp->w_symbol = s;
+        }
     }
     if (argc)
-    	post("warning: word_restore: extra arguments");
+        post("warning: word_restore: extra arguments");
 }
 
 void word_free(t_word *wp, t_template *template)
@@ -91,10 +91,10 @@ void word_free(t_word *wp, t_template *template)
     t_dataslot *dt;
     for (dt = template->t_vec, i = 0; i < template->t_n; i++, dt++)
     {
-    	if (dt->ds_type == DT_ARRAY)
-    	    array_free(wp[i].w_array);
-    	else if (dt->ds_type == DT_LIST)
-    	    canvas_free(wp[i].w_list);
+        if (dt->ds_type == DT_ARRAY)
+            array_free(wp[i].w_array);
+        else if (dt->ds_type == DT_LIST)
+            canvas_free(wp[i].w_list);
     }
 }
 
@@ -113,11 +113,11 @@ t_scalar *scalar_new(t_glist *owner, t_symbol *templatesym)
     template = template_findbyname(templatesym);
     if (!template)
     {
-    	error("scalar: couldn't find template %s", templatesym->s_name);
-    	return (0);
+        error("scalar: couldn't find template %s", templatesym->s_name);
+        return (0);
     }
     x = (t_scalar *)getbytes(sizeof(t_scalar) +
-    	(template->t_n - 1) * sizeof(*x->sc_vec));
+        (template->t_n - 1) * sizeof(*x->sc_vec));
     x->sc_gobj.g_pd = scalar_class;
     x->sc_template = templatesym;
     gpointer_setglist(&gp, owner, x);
@@ -135,15 +135,15 @@ void glist_scalar(t_glist *glist,
     t_symbol *classname, t_int argc, t_atom *argv)
 {
     t_symbol *templatesym =
-    	canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
+        canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
     t_binbuf *b;
     int natoms, nextmsg = 0;
     t_atom *vec;
     if (!template_findbyname(templatesym))
     {
-    	pd_error(glist, "%s: no such template",
-	    atom_getsymbolarg(0, argc, argv)->s_name);
-    	return;
+        pd_error(glist, "%s: no such template",
+            atom_getsymbolarg(0, argc, argv)->s_name);
+        return;
     }
 
     b = binbuf_new();
@@ -174,35 +174,35 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     t_gobj *y;
     float basex, basey;
     scalar_getbasexy(x, &basex, &basey);
-    	/* if someone deleted the template canvas, we're just a point */
+        /* if someone deleted the template canvas, we're just a point */
     if (!templatecanvas)
     {
-    	x1 = x2 = glist_xtopixels(owner, basex);
-    	y1 = y2 = glist_ytopixels(owner, basey);
+        x1 = x2 = glist_xtopixels(owner, basex);
+        y1 = y2 = glist_ytopixels(owner, basey);
     }
     else
     {
-    	int hit = 0;
-    	x1 = y1 = 0x7fffffff;
-	x2 = y2 = -0x7fffffff;
-    	for (y = templatecanvas->gl_list; y; y = y->g_next)
-	{
-	    t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-    	    int nx1, ny1, nx2, ny2;
-	    if (!wb) continue;
-	    (*wb->w_parentgetrectfn)(y, owner,
-		x->sc_vec, template, basex, basey,
-		&nx1, &ny1, &nx2, &ny2);
-	    if (hit)
-	    {
-		if (nx1 < x1) x1 = nx1;
-		if (ny1 < y1) y1 = ny1;
-		if (nx2 > x2) x2 = nx2;
-		if (ny2 > y2) y2 = ny2;
-	    }
-	    else x1 = nx1, y1 = ny1, x2 = nx2, y2 = ny2, hit = 1;
-	}
-	if (!hit) x1 = y1 = x2 = y2 = 0;
+        int hit = 0;
+        x1 = y1 = 0x7fffffff;
+        x2 = y2 = -0x7fffffff;
+        for (y = templatecanvas->gl_list; y; y = y->g_next)
+        {
+            t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+            int nx1, ny1, nx2, ny2;
+            if (!wb) continue;
+            (*wb->w_parentgetrectfn)(y, owner,
+                x->sc_vec, template, basex, basey,
+                &nx1, &ny1, &nx2, &ny2);
+            if (hit)
+            {
+                if (nx1 < x1) x1 = nx1;
+                if (ny1 < y1) y1 = ny1;
+                if (nx2 > x2) x2 = nx2;
+                if (ny2 > y2) y2 = ny2;
+            }
+            else x1 = nx1, y1 = ny1, x2 = nx2, y2 = ny2, hit = 1;
+        }
+        if (!hit) x1 = y1 = x2 = y2 = 0;
     }
     /* post("scalar x1 %d y1 %d x2 %d y2 %d", x1, y1, x2, y2); */
     *xp1 = x1;
@@ -218,15 +218,15 @@ static void scalar_select(t_gobj *z, t_glist *owner, int state)
     /* later */
     if (state)
     {
-    	int x1, y1, x2, y2;
-    	scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
-	x1--; x2++; y1--; y2++;
-    	sys_vgui(".x%x.c create line %d %d %d %d %d %d %d %d %d %d \
-	    -width 0 -fill blue -tags select%x\n",
-    	    	glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
-		x);
+        int x1, y1, x2, y2;
+        scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
+        x1--; x2++; y1--; y2++;
+        sys_vgui(".x%lx.c create line %d %d %d %d %d %d %d %d %d %d \
+            -width 0 -fill blue -tags select%lx\n",
+                glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
+                x);
     }
-    else sys_vgui(".x%x.c delete select%x\n", glist_getcanvas(owner), x);
+    else sys_vgui(".x%lx.c delete select%lx\n", glist_getcanvas(owner), x);
 }
 
 static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -238,26 +238,26 @@ static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     int xonset, yonset, xtype, ytype, gotx, goty;
     if (!template)
     {
-    	error("scalar: couldn't find template %s", templatesym->s_name);
-	return;
+        error("scalar: couldn't find template %s", templatesym->s_name);
+        return;
     }
     gotx = template_find_field(template, gensym("x"), &xonset, &xtype, &zz);
     if (gotx && (xtype != DT_FLOAT))
-    	gotx = 0;
+        gotx = 0;
     goty = template_find_field(template, gensym("y"), &yonset, &ytype, &zz);
     if (goty && (ytype != DT_FLOAT))
-    	goty = 0;
+        goty = 0;
     if (gotx)
-    	*(t_float *)(((char *)(x->sc_vec)) + xonset) +=
-	    dx * (glist_pixelstox(glist, 1) - glist_pixelstox(glist, 0));
+        *(t_float *)(((char *)(x->sc_vec)) + xonset) +=
+            dx * (glist_pixelstox(glist, 1) - glist_pixelstox(glist, 0));
     if (goty)
-    	*(t_float *)(((char *)(x->sc_vec)) + yonset) +=
-	    dy * (glist_pixelstoy(glist, 1) - glist_pixelstoy(glist, 0));
+        *(t_float *)(((char *)(x->sc_vec)) + yonset) +=
+            dy * (glist_pixelstoy(glist, 1) - glist_pixelstoy(glist, 0));
     glist_redrawitem(glist, z);
     if (glist_isselected(glist, z))
     {
-    	scalar_select(z, glist, 0);
-    	scalar_select(z, glist, 1);
+        scalar_select(z, glist, 0);
+        scalar_select(z, glist, 1);
     }
 }
 
@@ -280,26 +280,28 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
     t_gobj *y;
     float basex, basey;
     scalar_getbasexy(x, &basex, &basey);
-    	/* if we don't know how to draw it, make a small rectangle */
+        /* if we don't know how to draw it, make a small rectangle */
     if (!templatecanvas)
     {
-    	if (vis)
-	{
-	    int x1 = glist_xtopixels(owner, basex);
-	    int y1 = glist_ytopixels(owner, basey);
-    	    sys_vgui(".x%x.c create rectangle %d %d %d %d -tags scalar%x\n",
-    	    	glist_getcanvas(owner), x1-1, y1-1, x1+1, y1+1, x);
-    	}
-	else sys_vgui(".x%x.c delete scalar%x\n", glist_getcanvas(owner), x);
-    	return;
+        if (vis)
+        {
+            int x1 = glist_xtopixels(owner, basex);
+            int y1 = glist_ytopixels(owner, basey);
+            sys_vgui(".x%lx.c create rectangle %d %d %d %d -tags scalar%lx\n",
+                glist_getcanvas(owner), x1-1, y1-1, x1+1, y1+1, x);
+        }
+        else sys_vgui(".x%lx.c delete scalar%lx\n", glist_getcanvas(owner), x);
+        return;
     }
 
     for (y = templatecanvas->gl_list; y; y = y->g_next)
     {
-	t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-	if (!wb) continue;
-	(*wb->w_parentvisfn)(y, owner, x->sc_vec, template, basex, basey, vis);
+        t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+        if (!wb) continue;
+        (*wb->w_parentvisfn)(y, owner, x->sc_vec, template, basex, basey, vis);
     }
+    if (!vis)
+        sys_unqueuegui(x);
 }
 
 static int scalar_click(t_gobj *z, struct _glist *owner,
@@ -314,12 +316,12 @@ static int scalar_click(t_gobj *z, struct _glist *owner,
     scalar_getbasexy(x, &basex, &basey);
     for (y = templatecanvas->gl_list; y; y = y->g_next)
     {
-	t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-	if (!wb) continue;
-	if (hit = (*wb->w_parentclickfn)(y, owner,
-	    x, template, basex, basey,
-	    xpix, ypix, shift, alt, dbl, doit))
-	    	return (hit);
+        t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+        if (!wb) continue;
+        if (hit = (*wb->w_parentclickfn)(y, owner,
+            x, template, basex, basey,
+            xpix, ypix, shift, alt, dbl, doit))
+                return (hit);
     }
     return (0);
 }
@@ -379,13 +381,13 @@ static void scalar_free(t_scalar *x)
     t_template *template = template_findbyname(templatesym);
     if (!template)
     {
-    	error("scalar: couldn't find template %s", templatesym->s_name);
-	return;
+        error("scalar: couldn't find template %s", templatesym->s_name);
+        return;
     }
     word_free(x->sc_vec, template);
     gfxstub_deleteforkey(x);
-    	/* the "size" field in the class is zero, so Pd doesn't try to free
-	us automatically (see pd_free()) */
+        /* the "size" field in the class is zero, so Pd doesn't try to free
+        us automatically (see pd_free()) */
     freebytes(x, sizeof(t_scalar) + (template->t_n - 1) * sizeof(*x->sc_vec));
 }
 
@@ -394,7 +396,7 @@ static void scalar_free(t_scalar *x)
 void g_scalar_setup(void)
 {
     scalar_class = class_new(gensym("scalar"), 0, (t_method)scalar_free, 0,
-    	CLASS_GOBJ, 0);
+        CLASS_GOBJ, 0);
     class_setwidget(scalar_class, &scalar_widgetbehavior);
     class_setsavefn(scalar_class, scalar_save);
     class_setpropertiesfn(scalar_class, scalar_properties);

@@ -20,6 +20,49 @@
 
 <H3> <A name="s2"> 5.1. release notes </A> </H3>
 
+<P> ------------------ 0.37.3 --------------------------
+
+<P> Oops- added __i386__ macro to windows makefile so it would test for
+underflows correctly.  This affects only Microsoft Windows; the other
+two platformas are fine as 0.37.2.  Thanks to Thomas Musil...
+
+<P> ------------------ 0.37.2 --------------------------
+
+<P> fixed a bug in soundfile reading (soundfiles now default to wav better.)
+
+<P> fixed gfx update problem in hradio and vradio 
+
+<P> minor changes to built-in Max import feature (but you should
+still use cyclone's instead.)
+
+<P> colors for scalars fixed (probably never worked before!)
+
+<P> added a "set" message to the line object
+
+<P> aliased spaces to underscores in GUI labels so that at least they won't
+destroy the object.
+
+<P> ------------------ 0.37.1 --------------------------
+
+<P> fixed the apple key on OSX so it does key accelerators
+
+<P> fixed bug in -inchannels/-outchannels arg parsing
+
+<P> major editions to the IEM GUIs to fix bugs in how "$" variables are handled.
+The code still isn't pretty but hopefully at least works now.
+
+<P> bug fix in vd~ for very small delays
+
+<P> fixed MSW version not to make windows grow by 2 pixels on save/restore
+
+<P> added an "nrt" flag for OSX to defeat real-time priritization
+(useful when runnig Gem.)
+
+<P> on some platforms, audio open failures are handled more gracefully.
+
+<P> added a "changelog" file in the source directory to document source-level
+changes.
+
 <P> ------------------ 0.37 --------------------------
 
 <P> Pd is finally fixed so that it can open and close audio and MIDI devices

@@ -5,47 +5,79 @@ that externs can link back to functions defined in pd. */
 
 int sys_main(int argc, char **argv);
 
-	/* WINBASEAPI PVOID WINAPI AddVectoredExceptionHandler(
-    		ULONG FirstHandler,
-    		PVECTORED_EXCEPTION_HANDLER VectoredHandler ); */
-
 #ifdef MSW
-#if 0
-#incldue "winbase.h"
+#include <windows.h>
+#include <stdio.h>
+#include <malloc.h>
 
-LONG NTAPI VectoredExceptionHandler(void *PEXCEPTION_POINTERS)
+#define MAXARGS 1024
+#define MAXARGLEN 1024
+
+/* jsarlo { */
+int tokenizeCommandLineString(char *clString, char **tokens)
 {
-	fprintf(stderr, "caught exception\n");
-	return(EXCEPTION_CONTINUE_SEARCH);
+    int i, charCount = 0;
+    int tokCount= 0;
+    int quoteOpen = 0;
+
+    for (i = 0; i < (int)strlen(clString); i++)
+    {
+        if (clString[i] == '"')
+        {
+            quoteOpen = !quoteOpen;
+        }
+        else if (clString[i] == ' ' && !quoteOpen)
+        {
+            tokens[tokCount][charCount] = 0;
+            tokCount++;
+            charCount = 0;
+        }
+        else
+        {
+            tokens[tokCount][charCount] = clString[i];
+            charCount++;
+        }
+    }
+    tokens[tokCount][charCount] = 0;
+    tokCount++;
+    return tokCount;
 }
 
-
-int main(int argc, char **argv)
+int WINAPI WinMain(HINSTANCE hInstance, 
+                               HINSTANCE hPrevInstance,
+                               LPSTR lpCmdLine,
+                               int nCmdShow)
 {
-    printf("Pd entry point\n");
-    AddVectoredExceptionHandler(
-    ULONG FirstHandler,
-    PVECTORED_EXCEPTION_HANDLER VectoredHandler );
+    int i, argc;
+    char *argv[MAXARGS];
 
-
-#endif
-
-#if 1
-int main(int argc, char **argv)
-{
-    __try
+     __try
     {
+        for (i = 0; i < MAXARGS; i++)
+        {
+            argv[i] = (char *)malloc(MAXARGLEN * sizeof(char));
+        }
+        GetModuleFileName(NULL, argv[0], MAXARGLEN);
+        argc = tokenizeCommandLineString(lpCmdLine, argv + 1) + 1;
         sys_main(argc, argv);
+        for (i = 0; i < MAXARGS; i++)
+        {
+            free(argv[i]);
+        }
     }
     __finally
     {
         printf("caught an exception; stopping\n");
     }
 }
-#endif
+
+/* } jsarlo */
+
 #else /* not MSW */
 int main(int argc, char **argv)
 {
     return (sys_main(argc, argv));
 }
 #endif
+
+

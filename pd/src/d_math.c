@@ -41,10 +41,10 @@ static t_int *clip_perform(t_int *w)
     int n = (int)(w[4]);
     while (n--)
     {
-    	float f = *in++;
-    	if (f < x->x_lo) f = x->x_lo;
-    	if (f > x->x_hi) f = x->x_hi;
-    	*out++ = f;
+        float f = *in++;
+        if (f < x->x_lo) f = x->x_lo;
+        if (f > x->x_hi) f = x->x_hi;
+        *out++ = f;
     }
     return (w+5);
 }
@@ -57,7 +57,7 @@ static void clip_dsp(t_clip *x, t_signal **sp)
 static void clip_setup(void)
 {
     clip_class = class_new(gensym("clip~"), (t_newmethod)clip_new, 0,
-    	sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+        sizeof(t_clip), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(clip_class, t_clip, x_f);
     class_addmethod(clip_class, (t_method)clip_dsp, gensym("dsp"), 0);
 }
@@ -74,15 +74,15 @@ static void init_rsqrt(void)
     int i;
     for (i = 0; i < DUMTAB1SIZE; i++)
     {
-	float f;
-	long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
-	*(long *)(&f) = l;
-	rsqrt_exptab[i] = 1./sqrt(f);	
+        float f;
+        long l = (i ? (i == DUMTAB1SIZE-1 ? DUMTAB1SIZE-2 : i) : 1)<< 23;
+        *(long *)(&f) = l;
+        rsqrt_exptab[i] = 1./sqrt(f);   
     }
     for (i = 0; i < DUMTAB2SIZE; i++)
     {
-	float f = 1 + (1./DUMTAB2SIZE) * i;
-	rsqrt_mantissatab[i] = 1./sqrt(f);	
+        float f = 1 + (1./DUMTAB2SIZE) * i;
+        rsqrt_mantissatab[i] = 1./sqrt(f);      
     }
 }
 
@@ -93,7 +93,7 @@ float q8_rsqrt(float f)
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (rsqrt_exptab[(l >> 23) & 0xff] *
-	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(l >> 13) & 0x3ff]);
 }
 
 float q8_sqrt(float f)
@@ -101,7 +101,7 @@ float q8_sqrt(float f)
     long l = *(long *)(&f);
     if (f < 0) return (0);
     else return (f * rsqrt_exptab[(l >> 23) & 0xff] *
-	    rsqrt_mantissatab[(l >> 13) & 0x3ff]);
+            rsqrt_mantissatab[(l >> 13) & 0x3ff]);
 }
 
     /* the old names are OK unless we're in IRIX N32 */
@@ -134,16 +134,16 @@ static t_int *sigrsqrt_perform(t_int *w)
     float *in = *(t_float **)(w+1), *out = *(t_float **)(w+2);
     t_int n = *(t_int *)(w+3);
     while (n--)
-    {	
-	float f = *in;
-	long l = *(long *)(in++);
-	if (f < 0) *out++ = 0;
-	else
-	{
-	    float g = rsqrt_exptab[(l >> 23) & 0xff] *
-	    	rsqrt_mantissatab[(l >> 13) & 0x3ff];
-    	    *out++ = 1.5 * g - 0.5 * g * g * g * f;
-	}
+    {   
+        float f = *in;
+        long l = *(long *)(in++);
+        if (f < 0) *out++ = 0;
+        else
+        {
+            float g = rsqrt_exptab[(l >> 23) & 0xff] *
+                rsqrt_mantissatab[(l >> 13) & 0x3ff];
+            *out++ = 1.5 * g - 0.5 * g * g * g * f;
+        }
     }
     return (w + 4);
 }
@@ -157,8 +157,8 @@ void sigrsqrt_setup(void)
 {
     init_rsqrt();
     sigrsqrt_class = class_new(gensym("rsqrt~"), (t_newmethod)sigrsqrt_new, 0,
-    	sizeof(t_sigrsqrt), 0, 0);
-    	    /* an old name for it: */
+        sizeof(t_sigrsqrt), 0, 0);
+            /* an old name for it: */
     class_addcreator(sigrsqrt_new, gensym("q8_rsqrt~"), 0);
     CLASS_MAINSIGNALIN(sigrsqrt_class, t_sigrsqrt, x_f);
     class_addmethod(sigrsqrt_class, (t_method)sigrsqrt_dsp, gensym("dsp"), 0);
@@ -188,16 +188,16 @@ t_int *sigsqrt_perform(t_int *w)    /* not static; also used in d_fft.c */
     float *in = *(t_float **)(w+1), *out = *(t_float **)(w+2);
     t_int n = *(t_int *)(w+3);
     while (n--)
-    {	
-	float f = *in;
-	long l = *(long *)(in++);
-	if (f < 0) *out++ = 0;
-	else
-	{
-	    float g = rsqrt_exptab[(l >> 23) & 0xff] *
-	    	rsqrt_mantissatab[(l >> 13) & 0x3ff];
-    	    *out++ = f * (1.5 * g - 0.5 * g * g * g * f);
-	}
+    {   
+        float f = *in;
+        long l = *(long *)(in++);
+        if (f < 0) *out++ = 0;
+        else
+        {
+            float g = rsqrt_exptab[(l >> 23) & 0xff] *
+                rsqrt_mantissatab[(l >> 13) & 0x3ff];
+            *out++ = f * (1.5 * g - 0.5 * g * g * g * f);
+        }
     }
     return (w + 4);
 }
@@ -210,7 +210,7 @@ static void sigsqrt_dsp(t_sigsqrt *x, t_signal **sp)
 void sigsqrt_setup(void)
 {
     sigsqrt_class = class_new(gensym("sqrt~"), (t_newmethod)sigsqrt_new, 0,
-    	sizeof(t_sigsqrt), 0, 0);
+        sizeof(t_sigsqrt), 0, 0);
     class_addcreator(sigsqrt_new, gensym("q8_sqrt~"), 0);   /* old name */
     CLASS_MAINSIGNALIN(sigsqrt_class, t_sigsqrt, x_f);
     class_addmethod(sigsqrt_class, (t_method)sigsqrt_dsp, gensym("dsp"), 0);
@@ -239,11 +239,11 @@ static t_int *sigwrap_perform(t_int *w)
     float *in = *(t_float **)(w+1), *out = *(t_float **)(w+2);
     t_int n = *(t_int *)(w+3);
     while (n--)
-    {	
-	float f = *in++;
-	int k = f;
-	if (f > 0) *out++ = f-k;
-	else *out++ = f - (k-1);
+    {   
+        float f = *in++;
+        int k = f;
+        if (f > 0) *out++ = f-k;
+        else *out++ = f - (k-1);
     }
     return (w + 4);
 }
@@ -256,7 +256,7 @@ static void sigwrap_dsp(t_sigwrap *x, t_signal **sp)
 void sigwrap_setup(void)
 {
     sigwrap_class = class_new(gensym("wrap~"), (t_newmethod)sigwrap_new, 0,
-    	sizeof(t_sigwrap), 0, 0);
+        sizeof(t_sigwrap), 0, 0);
     CLASS_MAINSIGNALIN(sigwrap_class, t_sigwrap, x_f);
     class_addmethod(sigwrap_class, (t_method)sigwrap_dsp, gensym("dsp"), 0);
 }
@@ -285,13 +285,13 @@ static t_int *mtof_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= -1500) *out = 0;
-	else
-	{
-	    if (f > 1499) f = 1499;
-	    *out = 8.17579891564 * exp(.0577622650 * f);
-    	}
+        float f = *in;
+        if (f <= -1500) *out = 0;
+        else
+        {
+            if (f > 1499) f = 1499;
+            *out = 8.17579891564 * exp(.0577622650 * f);
+        }
     }
     return (w + 4);
 }
@@ -304,7 +304,7 @@ static void mtof_tilde_dsp(t_mtof_tilde *x, t_signal **sp)
 void mtof_tilde_setup(void)
 {
     mtof_tilde_class = class_new(gensym("mtof~"), (t_newmethod)mtof_tilde_new, 0,
-    	sizeof(t_mtof_tilde), 0, 0);
+        sizeof(t_mtof_tilde), 0, 0);
     CLASS_MAINSIGNALIN(mtof_tilde_class, t_mtof_tilde, x_f);
     class_addmethod(mtof_tilde_class, (t_method)mtof_tilde_dsp, gensym("dsp"), 0);
 }
@@ -333,8 +333,8 @@ static t_int *ftom_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; *in++, out++)
     {
-    	float f = *in;
-	*out = (f > 0 ? 17.3123405046 * log(.12231220585 * f) : -1500);
+        float f = *in;
+        *out = (f > 0 ? 17.3123405046 * log(.12231220585 * f) : -1500);
     }
     return (w + 4);
 }
@@ -347,7 +347,7 @@ static void ftom_tilde_dsp(t_ftom_tilde *x, t_signal **sp)
 void ftom_tilde_setup(void)
 {
     ftom_tilde_class = class_new(gensym("ftom~"), (t_newmethod)ftom_tilde_new, 0,
-    	sizeof(t_ftom_tilde), 0, 0);
+        sizeof(t_ftom_tilde), 0, 0);
     CLASS_MAINSIGNALIN(ftom_tilde_class, t_ftom_tilde, x_f);
     class_addmethod(ftom_tilde_class, (t_method)ftom_tilde_dsp, gensym("dsp"), 0);
 }
@@ -376,14 +376,14 @@ static t_int *dbtorms_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-    	    if (f > 485)
-		f = 485;
-	    *out = exp((LOGTEN * 0.05) * (f-100.));
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            if (f > 485)
+                f = 485;
+            *out = exp((LOGTEN * 0.05) * (f-100.));
+        }
     }
     return (w + 4);
 }
@@ -396,7 +396,7 @@ static void dbtorms_tilde_dsp(t_dbtorms_tilde *x, t_signal **sp)
 void dbtorms_tilde_setup(void)
 {
     dbtorms_tilde_class = class_new(gensym("dbtorms~"), (t_newmethod)dbtorms_tilde_new, 0,
-    	sizeof(t_dbtorms_tilde), 0, 0);
+        sizeof(t_dbtorms_tilde), 0, 0);
     CLASS_MAINSIGNALIN(dbtorms_tilde_class, t_dbtorms_tilde, x_f);
     class_addmethod(dbtorms_tilde_class, (t_method)dbtorms_tilde_dsp, gensym("dsp"), 0);
 }
@@ -425,13 +425,13 @@ static t_int *rmstodb_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-	    float g = 100 + 20./LOGTEN * log(f);
-	    *out = (g < 0 ? 0 : g);
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            float g = 100 + 20./LOGTEN * log(f);
+            *out = (g < 0 ? 0 : g);
+        }
     }
     return (w + 4);
 }
@@ -444,7 +444,7 @@ static void rmstodb_tilde_dsp(t_rmstodb_tilde *x, t_signal **sp)
 void rmstodb_tilde_setup(void)
 {
     rmstodb_tilde_class = class_new(gensym("rmstodb~"), (t_newmethod)rmstodb_tilde_new, 0,
-    	sizeof(t_rmstodb_tilde), 0, 0);
+        sizeof(t_rmstodb_tilde), 0, 0);
     CLASS_MAINSIGNALIN(rmstodb_tilde_class, t_rmstodb_tilde, x_f);
     class_addmethod(rmstodb_tilde_class, (t_method)rmstodb_tilde_dsp, gensym("dsp"), 0);
 }
@@ -473,14 +473,14 @@ static t_int *dbtopow_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-    	    if (f > 870)
-		f = 870;
-	    *out = exp((LOGTEN * 0.1) * (f-100.));
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            if (f > 870)
+                f = 870;
+            *out = exp((LOGTEN * 0.1) * (f-100.));
+        }
     }
     return (w + 4);
 }
@@ -493,7 +493,7 @@ static void dbtopow_tilde_dsp(t_dbtopow_tilde *x, t_signal **sp)
 void dbtopow_tilde_setup(void)
 {
     dbtopow_tilde_class = class_new(gensym("dbtopow~"), (t_newmethod)dbtopow_tilde_new, 0,
-    	sizeof(t_dbtopow_tilde), 0, 0);
+        sizeof(t_dbtopow_tilde), 0, 0);
     CLASS_MAINSIGNALIN(dbtopow_tilde_class, t_dbtopow_tilde, x_f);
     class_addmethod(dbtopow_tilde_class, (t_method)dbtopow_tilde_dsp, gensym("dsp"), 0);
 }
@@ -522,13 +522,13 @@ static t_int *powtodb_tilde_perform(t_int *w)
     t_int n = *(t_int *)(w+3);
     for (; n--; in++, out++)
     {
-	float f = *in;
-	if (f <= 0) *out = 0;
-	else
-	{
-	    float g = 100 + 10./LOGTEN * log(f);
-	    *out = (g < 0 ? 0 : g);
-	}
+        float f = *in;
+        if (f <= 0) *out = 0;
+        else
+        {
+            float g = 100 + 10./LOGTEN * log(f);
+            *out = (g < 0 ? 0 : g);
+        }
     }
     return (w + 4);
 }
@@ -541,7 +541,7 @@ static void powtodb_tilde_dsp(t_powtodb_tilde *x, t_signal **sp)
 void powtodb_tilde_setup(void)
 {
     powtodb_tilde_class = class_new(gensym("powtodb~"), (t_newmethod)powtodb_tilde_new, 0,
-    	sizeof(t_powtodb_tilde), 0, 0);
+        sizeof(t_powtodb_tilde), 0, 0);
     CLASS_MAINSIGNALIN(powtodb_tilde_class, t_powtodb_tilde, x_f);
     class_addmethod(powtodb_tilde_class, (t_method)powtodb_tilde_dsp, gensym("dsp"), 0);
 }

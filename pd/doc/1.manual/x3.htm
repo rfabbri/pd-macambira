@@ -246,7 +246,7 @@ to file such as "pd-linux-033.tar.gz".  Open a "shell"
 window, cd to
 the directory containing the file, and type the command,
 <PRE>
-    zcat pd-linux-033.tar.gz | tar xf -
+    tar xzf pd-linux-033.tar.gz
 </PRE>
 <P>which creates a directory named "pd".  I do this from my home directory.
 Next, compile it.  "CD" to pd and read the INSTALL.txt, or else just cd
@@ -262,10 +262,12 @@ to "pd/src" and type
 
 <PRE>
     To enable debugging (and losing code optimization) add "--enable-debug".
-    To enable ALSA 0.9x or up, add "--enable-alsa".
     To use Portaudio version 19 (experimental), add "--enable-portaudio".
     To put Pd in /usr/bin instead of /usr/local/bin, add "--prefix=/bin".
 </PRE>
+
+Alsa and Jack support should auto-configure, but "--enable-alsa" od
+"--enable-jack" will force their inclusion.
 
 <P> After "make", just type "~/pd/bin/pd" to run pd.
 
@@ -427,17 +429,14 @@ I/O ports and one SPDIF.  There is a "baby hammerfall" also, which I think is
 the "9632."  DO NOT CONFUSE THE 9652/9632 WITH OTHER RME BOARDS WHICH  MIGHT
 NOT WORK WITH PD.
 
-<P> Hammerfalls now have an ALSA driver; aapparently, it works well to install
-this and then run Pd using OSS emulation.  (Unfortunately, this will only give
-you 16 bit resolution.  Maybe the also "plug" device will work better; I
-haven't tried this.)
+<P> Word on the Pd mailing list is that the only way at present (7/04) to use 
+Hammerfall boards in Pd is via ALSA and jack.
 
 <H6> MIDIMAN </H6>
 
 <P>Midiman sells PCI devices (delta 44, 66, 1010, and 1010LT)
 with between 4 and 10 channels in and out, for
-which there are ALSA drivers.  
-I'm running mine in Alsa 0.9 beta 10.  The driver name is "ice1712".
+which there are ALSA drivers.  The driver name is "ice1712".
 
 <P> Alsa provides an "envy24control" program (in "utils".  You should run
 this and check that your ice1712's sync source is internal if you have no
@@ -452,16 +451,16 @@ ALSA.
 
 <H3> <A name="s1.3"> 3.3. Installing Pd in Macintosh OSX </A> </H3>
 
-<P>Pd version 0.35 and up support Macintosh OSX.  You need the Jaguar
-distribution (10.2) of OSX.
+<P>Pd version 0.35 and up support Macintosh OSX.  You need the OSX Jaguar
+distribution (10.2) or later.
 
 <P> To install Pd you can always just download 
 the sources and compile them yourself, or (easier) 
 find a MacOSX-style "package".  The first package was put together by Adam 
 Lindsay; the most current one seems to be the one by Hans
 on
-<A href="http://www.pure-data.org/Members/hans/">
-http://www.pure-data.org/Members/hans/</A>.
+<A href="http://www.pure-data.info/Members/hans/">
+http://www.pure-data.info/Members/hans/</A>.
 The package simply installs itself 
 and you needn't follow the directions below. 
 </P>
@@ -474,9 +473,9 @@ http://www.crca.ucsd.edu/~msp/software.html</A>
 take more steps to install but are more "official".  To install them:
 
 <P> If you haven't already, first download and install Tcl/Tk; there are pointers on
-Hans's page, or try:
-<A href="http://prdownloads.sourceforge.net/tcltkaqua/">
-http://prdownloads.sourceforge.net/tcltkaqua/</A>.  Double click on what you
+Hans's page, or try: http://tcltkaqua.sourceforge.net/
+<A href="http://tcltkaqua.sourceforge.net/">
+http://tcltkaqua.sourceforge.net/</A>.  Double click on what you
 get (a disk image opens) and then double click on the "package" icon, and the
 installer should tell you how to proceed from there.
 
@@ -498,31 +497,10 @@ specifically in
 /Applications/Wish Shell.app   
 and  /Library/Frameworks/Tk.framework and /Library/Frameworks/Tcl.framework.
 
-<P> First download and install TK for OSX
-(http://sourceforge.net/projects/tcl/).  Get a recent one compiled for
-OSX, by chasing through "latest file releases", and finding a "download"
-link for TCL.  Then download "TclTkAqua-8.4.1-Jaguar.dmg" (the version
-number may change).  Click on this file and a "folder" will open.  Click
-on the "package" icon in that folder and an auto-installer will put Tcl/Tk
-on your system.
-
-<P> For old versions of Tcl/Tk you also had to get the "h" files from XFree86
-and put them in
-/usr/X11R6/include. You can download just the H files from:
-
-<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<CODE>
-<A HREF="http://www.crca.ucsd.edu/~msp/x.tgz">http://www.crca.ucsd.edu/~msp/x.tgz</A>
-</CODE>
-
-<P>
-(the individual files seem to have adequate copyright notices so that
-I can just redistribute them.)  ((I hope this is no longer necessary but I
-notice people keep downloading these files anyway, so I'll leave them there
-a while longer until I'm sure they're not needed.))
+<P> First download and install TK for OSX as described above.
 
 <P> Then, just as for linux, just unload pd-whatever.tar.gz into a directory
-such as ~/pd-0.35-test17 , cd to pd-0.36-0/src, type "./configure"
+such as ~/pd-0.36-0, cd to pd-0.36-0/src, type "./configure"
 and "make".  Then type ~/pd-0.36-0/bin/pd to a shell and enjoy!
 
 <P> If you wish you can put a line such as,

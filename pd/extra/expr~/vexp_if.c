@@ -39,12 +39,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 #include "vexp.h"
 
 static char *exp_version = "0.4";
 
-extern struct ex_ex *ex_eval(struct expr *exp, struct ex_ex *eptr,
+extern struct ex_ex *ex_eval(struct expr *expr, struct ex_ex *eptr,
 						struct ex_ex *optr, int n);
 
 #ifdef PD
@@ -81,13 +80,15 @@ expr_list(t_expr *x, t_symbol *s, int argc, const fts_atom_t *argv)
 				x->exp_var[i].ex_flt = argv[i].a_w.w_float;
 			else if (x->exp_var[i].ex_type == ET_II)
 				x->exp_var[i].ex_int = argv[i].a_w.w_float;
-			else pd_error(x, "expr: type mismatch");
+			else if (x->exp_var[i].ex_type)
+			    pd_error(x, "expr: type mismatch");
 		}
 		else if (argv[i].a_type == A_SYMBOL)
 		{
 			if (x->exp_var[i].ex_type == ET_SI)
 				x->exp_var[i].ex_ptr = (char *)argv[i].a_w.w_symbol;
-			else pd_error(x, "expr: type mismatch");
+			else if (x->exp_var[i].ex_type)
+			    pd_error(x, "expr: type mismatch");
 		}
 	}
 	expr_bang(x);
@@ -888,7 +889,8 @@ ex_symname(fts_symbol_t s)
  *  the result pointer 
  */
 int
-max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
+max_ex_tab(struct expr *expr, fts_symbol_t s, struct ex_ex *arg,
+    struct ex_ex *optr)
 {
 #ifdef PD
 	t_garray *garray;
@@ -900,7 +902,7 @@ max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
 	{
 		optr->ex_type = ET_FLT;
 		optr->ex_flt = 0;
-		pd_error(exp, "no such table '%s'", s->s_name);
+		pd_error(expr, "no such table '%s'", s->s_name);
 		return (1);
 	}
 	optr->ex_type = ET_FLT;
@@ -915,7 +917,7 @@ max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
 		break;
 
 	default:	/* do something with strings */
-		pd_error(exp, "expr: bad argument for table '%s'\n", fts_symbol_name(s));
+		pd_error(expr, "expr: bad argument for table '%s'\n", fts_symbol_name(s));
 		indx = 0;
 	}
 	if (indx < 0) indx = 0;
@@ -933,13 +935,13 @@ max_ex_tab(struct expr *exp,fts_symbol_t s,struct ex_ex *arg,struct ex_ex *optr)
 }
 
 int
-max_ex_var(struct expr *exp, fts_symbol_t var, struct ex_ex *optr)
+max_ex_var(struct expr *expr, fts_symbol_t var, struct ex_ex *optr)
 {
 	optr->ex_type = ET_FLT;
 	if (value_getfloat(var, &(optr->ex_flt))) {
 		optr->ex_type = ET_FLT;
 		optr->ex_flt = 0;
-		pd_error(exp, "no such var '%s'", var->s_name);
+		pd_error(expr, "no such var '%s'", var->s_name);
 		return (1);
 	}
 	return (0);

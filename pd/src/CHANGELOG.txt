@@ -1,6 +1,17 @@
 This file describes implementation and API changes; stuff more visible to the
 user appears in the "release notes" instead.
 
+0.38.0
+
+fixed empty lists automatically to call "bang" method if one is supplied.
+
+rewrote the "namelist" stuff to facilitate preference saving (s_stuff.h,
+s_path.c, s_file.c, s_main.c)
+
+0.37.2
+
+expr() "exp" temporary variables renamed to avoid compilation problems
+
 0.37.1
 
 makefile.in: MANINSTDIR = $(DESTDIR)/$(MANDIR) changed to

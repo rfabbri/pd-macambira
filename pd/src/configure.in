@@ -4,6 +4,7 @@ AC_INIT(d_arithmetic.c)
 AC_SUBST(alsa, yes)
 AC_SUBST(jack, no)
 AC_SUBST(portaudio, no)
+AC_SUBST(binarymode, -m755)
 AC_SUBST(PDLIB)
 AC_SUBST(MORECFLAGS)
 AC_SUBST(EXT)
@@ -20,16 +21,18 @@ dnl other defaults
 
 dnl check for features
 
-AC_ARG_ENABLE(alsa,    [  --disable-alsa          disable ALSA],
+AC_ARG_ENABLE(alsa,     [  --disable-alsa          disable ALSA],
     alsa="no")
-AC_ARG_ENABLE(jack,    [  --enable-jack           jack audio server],
+AC_ARG_ENABLE(jack,     [  --enable-jack           jack audio server],
     jack="yes")
-AC_ARG_ENABLE(portaudio,    [  --enable-portaudio      portaudio],
+AC_ARG_ENABLE(portaudio,[  --enable-portaudio      portaudio],
     portaudio="yes")
-AC_ARG_ENABLE(debug,   [  --enable-debug          debugging support],
+AC_ARG_ENABLE(debug,    [  --enable-debug          debugging support],
     USE_OPT_CFLAGS="no")
 AC_ARG_ENABLE(static,   [  --enable-static         link statically],
     static=yes)
+AC_ARG_ENABLE(setuid,   [  --enable-setuid         install as setuid (linux)],
+    setuid=yes)
     
 dnl Checks for programs.
 AC_PROG_CC
@@ -159,22 +162,24 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
       LDFLAGS="$LDFLAGS -static"
     fi 
     EXT=pd_linux
-    MORECFLAGS="-DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN \
+    MORECFLAGS="-DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD\
     	 -DUSEAPI_OSS \
-        -I../portaudio/pa_common \
-        -I../portaudio/pablio -I../portaudio/portmidi-macosx \
+        -I../portaudio/pa_common -I../portaudio/pablio \
+        -I../portaudio/portmidi-macosx \
 	-fno-strict-aliasing"
     SYSSRC="s_midi_oss.c s_audio_oss.c"
     if test x$alsa == "xyes";
     then
-    	SYSSRC=$SYSSRC" s_audio_alsa.c"
+    	SYSSRC=$SYSSRC" s_audio_alsa.c s_audio_alsamm.c"
 	MORECFLAGS=$MORECFLAGS" -DPA_USE_ALSA -DUSEAPI_ALSA"
 	LDFLAGS=$LDFLAGS" -lasound"
     fi
     if test x$portaudio == "xyes";
     then
-    	MORECFLAGS="-DUSEAPI_PORTAUDIO "$MORECFLAGS
+    	MORECFLAGS="-DUSEAPI_PORTAUDIO -DPA19 "$MORECFLAGS
 	SYSSRC="s_audio_pa.c \
+    	s_audio_pablio.c     \
+	s_audio_paring.c     \
 	../portaudio/pa_common/pa_allocation.c  \
 	../portaudio/pa_common/pa_converters.c  \
 	../portaudio/pa_common/pa_cpuload.c     \
@@ -184,18 +189,18 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
 	../portaudio/pa_common/pa_skeleton.c    \
 	../portaudio/pa_common/pa_stream.c      \
 	../portaudio/pa_common/pa_trace.c       \
-    	../portaudio/pablio/pablio_pd.c         \
-	../portaudio/pablio/ringbuffer_pd.c     \
 	../portaudio/pa_unix/pa_unix_hostapis.c \
 	../portaudio/pa_unix/pa_unix_util.c     \
 	../portaudio/pa_unix_oss/pa_unix_oss.c "$SYSSRC
 	if test x$alsa == "xyes";
 	then
-	    SYSSRC=$SYSSRC" \
-    	    ../portaudio/pa_linux_alsa/callback_thread.c \
-    	    ../portaudio/pa_linux_alsa/pa_linux_alsa.c \
-    	    ../portaudio/pa_linux_alsa/blocking_calls.c "
+	    SYSSRC=$SYSSRC" ../portaudio/pa_linux_alsa/pa_linux_alsa.c"
+	    MORECFLAGS=$MORECFLAGS" -Wno-error"
     	fi
+    fi
+    if test x$setuid == "xyes";
+    then
+    	binarymode="-m4755"
     fi
     STRIPFLAG=-s
     GUINAME="pd-gui"
@@ -211,22 +216,21 @@ fi
 
 if test `uname -s` = Darwin;
 then
-    LDFLAGS="-Wl -framework Tcl -framework Tk -framework CoreAudio \
+    LDFLAGS="-Wl -framework CoreAudio \
         -framework AudioUnit -framework AudioToolbox \
         -framework Carbon -framework CoreMIDI"
     EXT=pd_darwin
-    MORECFLAGS="-DMACOSX -I/usr/X11R6/include \
-	 -I../portaudio_v18/pa_common \
-        -I../portaudio_v18/pablio \
+    MORECFLAGS="-DMACOSX -DUNISTD -I/usr/X11R6/include \
+	 -I../portaudio_v18/pa_common -I../portaudio_v18/pablio \
 	-I../portmidi_osx \
 	-Wno-error \
 	-DUSEAPI_PORTAUDIO -DPA_BIG_ENDIAN"
     SYSSRC="s_midi_pm.c s_audio_pa.c \
+    	s_audio_pablio.c     \
+	s_audio_paring.c     \
 	../portaudio_v18/pa_common/pa_lib.c \
 	../portaudio_v18/pa_common/pa_trace.c \
 	../portaudio_v18/pa_common/pa_convert.c \
-    	../portaudio_v18/pablio/pablio_pd.c \
-	../portaudio_v18/pablio/ringbuffer_pd.c \
 	../portaudio_v18/pa_mac_core/pa_mac_core.c \
         ../portmidi_osx/pmdarwin.c \
         ../portmidi_osx/pmmacosx.c \
@@ -235,10 +239,10 @@ then
         ../portmidi_osx/ptdarwin.c "
     STRIPFLAG=""
     GUINAME="pdtcl"
-    GUIFLAGS="-framework Tcl -framework Tk \
-        -I/Library/Frameworks/Tk.framework/Versions/Current/Headers \
-        -I/Library/Frameworks/Tcl.framework/Versions/Current/Headers \
-        -I/Library/Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
+    GUIFLAGS="-F../../Frameworks -framework Tcl -framework Tk \
+        -I../../Frameworks/Tk.framework/Versions/Current/Headers \
+        -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
+        -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
     if test x$USE_OPT_CFLAGS == "xyes";
     then
 	OPT_CFLAGS="-O2"
@@ -256,6 +260,7 @@ then
 fi
 
 # support for jack, on either linux or darwin:
+
 if test x$jack == "xyes";
 then
     MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"

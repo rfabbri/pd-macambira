@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-#ifdef UNIX 	/* in unix this only works first; in NT it only works last. */
+#ifndef MSW     /* in unix this only works first; in MSW it only works last. */
 #include "tk.h"
 #endif
 
@@ -12,16 +12,19 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#ifdef UNIX
+
+#ifndef MSW
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #ifdef HAVE_BSTRING_H
 #include <bstring.h>
 #endif
 #include <sys/time.h>
 #include <errno.h>
+#include <fcntl.h>
 #endif
 #ifdef MSW
 #include <winsock.h>
@@ -37,15 +40,30 @@
 #include "tk.h"
 #endif
 
+#ifdef MACOSX
+#define STARTGUI
+#endif
+
+#ifdef __linux__
+#define STARTGUI
+#endif
+
+#define FIRSTPORTNUM 5600
+
 void tcl_mess(char *s);
+static Tcl_Interp *tk_pdinterp;
+static int pd_portno = 0;
+
 
 /***************** the socket setup code ********************/
 
-static int portno = 5400;
+/* If this is reset by pdgui_setsock(), it's the port number Pd will try to
+connect to; but if zero, that means we should set it and start Pd ourselves. */
 
-    	/* some installations of linux don't know about "localhost" so give
-	the loopback address; NT, on the other hand, can't understand the
-	hostname "127.0.0.1". */
+
+        /* some installations of linux don't know about "localhost" so give
+        the loopback address; NT, on the other hand, can't understand the
+        hostname "127.0.0.1". */
 char hostname[100] =
 #ifdef __linux__
     "127.0.0.1";
@@ -55,9 +73,10 @@ char hostname[100] =
 
 void pdgui_setsock(int port)
 {
-    portno = port;
+    pd_portno = port;
 }
 
+    /* why is this here??? probably never used (see t_main.c). */
 void pdgui_sethost(char *name)
 {
     strncpy(hostname, name, 100);
@@ -69,7 +88,7 @@ static void pdgui_sockerror(char *s)
 #ifdef MSW
     int err = WSAGetLastError();
 #endif
-#ifdef UNIX
+#ifndef MSW
     int err = errno;
 #endif
 
@@ -80,14 +99,14 @@ static void pdgui_sockerror(char *s)
 
 static int sockfd;
 
-/* The "pd_suck" command, which polls the socket.
-    FIXME: if Pd sends something bigger than SOCKSIZE we're in trouble!
-    This has to be set bigger than any array update message for instance.
-*/
-#define SOCKSIZE 20000
+/* The "pd_suck" command, which polls the socket. */
 
-static char pd_tkbuf[SOCKSIZE+1];
-int pd_spillbytes = 0;
+#define CHUNKSIZE 20000 /* chunks to allocate memory for reading socket */
+#define READSIZE 10000  /* size of read to issue */
+
+static char *pd_tkbuf = 0;      /* buffer for reading */
+static int pd_tkbufsize = 0;    /* current buffer size */
+static int pd_tkgotbytes = 0;   /* number of bytes already in buffer */
 
 static void pd_readsocket(ClientData cd, int mask)
 {
@@ -102,59 +121,89 @@ static void pd_readsocket(ClientData cd, int mask)
     FD_ZERO(&exceptset);
     FD_SET(sockfd, &readset);
     FD_SET(sockfd, &exceptset);
-    
+    if (!pd_tkbuf)
+    {
+        if (!(pd_tkbuf = malloc(CHUNKSIZE)))
+        {
+            fprintf(stderr, "pd-gui: out of memory\n");
+            tcl_mess("exit\n");
+        }
+        pd_tkbufsize = CHUNKSIZE;
+    }
+    if (pd_tkgotbytes + READSIZE + 1 > pd_tkbufsize)
+    {   
+        int newsize = pd_tkbufsize + CHUNKSIZE;
+        char *newbuf = realloc(pd_tkbuf, newsize);
+        if (!newbuf)
+        {
+            fprintf(stderr, "pd-gui: out of memory\n");
+            tcl_mess("exit\n");
+        }
+        pd_tkbuf = newbuf;
+        pd_tkbufsize = newsize;     
+    }
     if (select(sockfd+1, &readset, &writeset, &exceptset, &timout) < 0)
-    	perror("select");
+        perror("select");
     if (FD_ISSET(sockfd, &exceptset) || FD_ISSET(sockfd, &readset))
     {
-	int ret;
-	ret = recv(sockfd, pd_tkbuf + pd_spillbytes,
-	    SOCKSIZE - pd_spillbytes, 0);
-	if (ret < 0) pdgui_sockerror("socket receive error");
-	else if (ret == 0)
-	{
-	    /* fprintf(stderr, "read %d\n", SOCKSIZE - pd_spillbytes); */
-    	    fprintf(stderr, "pd_gui: pd process exited\n");
-    	    tcl_mess("exit\n");
-	}
-	else
-	{
-	    char *lastcr = 0, *bp = pd_tkbuf, *ep = bp + (pd_spillbytes + ret);
-	    int brace = 0;
-	    char lastc = 0;
-	    while (bp < ep)
-	    {
-	    	char c = *bp;
-	    	if (c == '}' && brace) brace--;
-	    	else if (c == '{') brace++;
-	    	else if (!brace && c == '\n' && lastc != '\\') lastcr = bp;
-	    	lastc = c;
-	    	bp++;
-	    }
-	    if (lastcr)
-	    {
-	    	int xtra = pd_tkbuf + pd_spillbytes + ret - (lastcr+1);
-	    	char bashwas = lastcr[1];
-	    	lastcr[1] = 0;
-	    	tcl_mess(pd_tkbuf);
-	    	lastcr[1] = bashwas;
-	    	if (xtra)
-	    	{
-	    	    /* fprintf(stderr, "x %d\n", xtra); */
-	    	    memmove(pd_tkbuf, lastcr+1, xtra);
-	    	}
-	    	pd_spillbytes = xtra;
-	    }
-	    else
-	    {
-	    	pd_spillbytes += ret;
-	    }
-	}
+        int ret;
+        ret = recv(sockfd, pd_tkbuf + pd_tkgotbytes, READSIZE, 0);
+        if (ret < 0)
+            pdgui_sockerror("socket receive error");
+        else if (ret == 0)
+        {
+            /* fprintf(stderr, "read %d\n", SOCKSIZE - pd_tkgotbytes); */
+            fprintf(stderr, "pd_gui: pd process exited\n");
+            tcl_mess("exit\n");
+        }
+        else
+        {
+            char *lastcr = 0, *bp = pd_tkbuf, *ep = bp + (pd_tkgotbytes + ret);
+            int brace = 0;
+            char lastc = 0;
+                /* search for locations that terminate a complete TK
+                command.  These are carriage returns which are not inside
+                any braces.  Braces can be escaped with backslashes (but
+                backslashes themselves can't.) */
+            while (bp < ep)
+            {
+                char c = *bp;
+                if (c == '}' && brace)
+                    brace--;
+                else if (c == '{')
+                    brace++;
+                else if (!brace && c == '\n' && lastc != '\\')
+                    lastcr = bp;
+                lastc = c;
+                bp++;
+            }
+                /* if lastcr is set there is at least one complete TK
+                command in the buffer.  Execute it or them, and slide any
+                extra bytes to beginning of the buffer. */
+            if (lastcr)
+            {
+                int xtra = pd_tkbuf + pd_tkgotbytes + ret - (lastcr+1);
+                char bashwas = lastcr[1];
+                lastcr[1] = 0;
+                tcl_mess(pd_tkbuf);
+                lastcr[1] = bashwas;
+                if (xtra)
+                {
+                    /* fprintf(stderr, "x %d\n", xtra); */
+                    memmove(pd_tkbuf, lastcr+1, xtra);
+                }
+                pd_tkgotbytes = xtra;
+            }
+            else
+            {
+                pd_tkgotbytes += ret;
+            }
+        }
     }
 }
 
-#ifndef UNIX
-    /* if we aren't UNIX, we add a tcl command to poll the
+#ifdef MSW
+    /* if we're in Gatesland, we add a tcl command to poll the
     socket for data.  */
 static int pd_pollsocketCmd(ClientData cd, Tcl_Interp *interp,
     int argc, char **argv)
@@ -164,11 +213,28 @@ static int pd_pollsocketCmd(ClientData cd, Tcl_Interp *interp,
 }
 #endif
 
-void pdgui_setupsocket(void)
+static void pd_sockerror(char *s)
+{
+#ifdef MSW
+    int err = WSAGetLastError();
+    if (err == 10054) return;
+    else if (err == 10044)
+    {
+        fprintf(stderr,
+            "Warning: you might not have TCP/IP \"networking\" turned on\n");
+        fprintf(stderr, "which is needed for Pd to talk to its GUI layer.\n");
+    }
+#else
+    int err = errno;
+#endif
+    fprintf(stderr, "%s: %s (%d)\n", s, strerror(err), err);
+}
+
+static void pdgui_connecttosocket(void)
 {
     struct sockaddr_in server;
     struct hostent *hp;
-#ifdef UNIX
+#ifndef MSW
     int retry = 10;
 #else
     int retry = 1;
@@ -191,51 +257,217 @@ void pdgui_setupsocket(void)
 
     if (hp == 0)
     {
-	fprintf(stderr,
-	    "localhost not found (inet protocol not installed?)\n");
-	exit(1);
+        fprintf(stderr,
+            "localhost not found (inet protocol not installed?)\n");
+        exit(1);
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
 
     /* assign client port number */
-    server.sin_port = htons((unsigned short)portno);
+    server.sin_port = htons((unsigned short)pd_portno);
 
-	/* try to connect */
+        /* try to connect */
     while (1)
     {
-    	if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) >= 0)
-	    goto gotit;
-	retry--;
-	if (retry <= 0)
-	    break;
-    	  /* In UNIX there's a race condition; the child won't be
-	  able to connect before the parent (pd) has shed its
-	  setuid-ness.  In case this is the problem, sleep and
-	  retry. */
-    	else
-	{
-#ifdef UNIX
-    	    fd_set readset, writeset, exceptset;
-    	    struct timeval timout;
+        if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) >= 0)
+            goto gotit;
+        retry--;
+        if (retry <= 0)
+            break;
+          /* In unix there's a race condition; the child won't be
+          able to connect before the parent (pd) has shed its
+          setuid-ness.  In case this is the problem, sleep and
+          retry. */
+        else
+        {
+#ifndef MSW
+            fd_set readset, writeset, exceptset;
+            struct timeval timout;
 
-    	    timout.tv_sec = 0;
-    	    timout.tv_usec = 100000;
-    	    FD_ZERO(&writeset);
-    	    FD_ZERO(&readset);
-    	    FD_ZERO(&exceptset);
-	    fprintf(stderr, "retrying connect...\n");
-    	    if (select(1, &readset, &writeset, &exceptset, &timout) < 0)
-    		perror("select");
-#endif /* UNIX */
-    	}
+            timout.tv_sec = 0;
+            timout.tv_usec = 100000;
+            FD_ZERO(&writeset);
+            FD_ZERO(&readset);
+            FD_ZERO(&exceptset);
+            fprintf(stderr, "retrying connect...\n");
+            if (select(1, &readset, &writeset, &exceptset, &timout) < 0)
+                perror("select");
+#endif /* !MSW */
+        }
     }
     pdgui_sockerror("connecting stream socket");
 gotit: ;
-#ifdef UNIX
-    	/* in unix we ask TK to call us back.  In NT we have to poll. */
+#ifndef MSW
+        /* normally we ask TK to call us back; but in MSW we have to poll. */
     Tk_CreateFileHandler(sockfd, TK_READABLE | TK_EXCEPTION,
-    	pd_readsocket, 0);
-#endif /* UNIX */
+        pd_readsocket, 0);
+#endif /* !MSW */
+}
+
+#ifdef STARTGUI
+
+/* #define DEBUGCONNECT */
+
+#ifdef DEBUGCONNECT
+static FILE *debugfd;
+#endif
+
+
+static void pd_startfromgui( void)
+{
+    pid_t childpid;
+    char cmdbuf[1000], pdbuf[1000], *lastchar;
+    const char *arg0;
+    struct sockaddr_in server;
+    int msgsock;
+    int len = sizeof(server), nchar;
+    int ntry = 0, portno = FIRSTPORTNUM;
+    int xsock = -1;
+    char morebuf[256];
+#ifdef MSW
+    short version = MAKEWORD(2, 0);
+    WSADATA nobby;
+    char scriptbuf[1000], wishbuf[1000], portbuf[80];
+    int spawnret;
+    char intarg;
+#else
+    int intarg;
+#endif
+
+    arg0 = Tcl_GetVar(tk_pdinterp, "argv0", 0);
+    if (!arg0)
+    {
+        fprintf(stderr, "Pd-gui: can't get arg 0\n");
+        return;
+    }
+    lastchar = strrchr(arg0, '/');
+    if (lastchar)
+        snprintf(pdbuf, lastchar - arg0 + 1, "%s", arg0);
+    else strcpy(pdbuf, ".");
+    strcat(pdbuf, "/../bin/pd");
+#ifdef DEBUGCONNECT     
+    fprintf(stderr, "pdbuf is %s\n", pdbuf);
+#endif
+
+#ifdef MSW
+    if (WSAStartup(version, &nobby))
+        pd_sockerror("WSAstartup");
+#endif
+
+    /* create a socket */
+    xsock = socket(AF_INET, SOCK_STREAM, 0);
+    if (xsock < 0) pd_sockerror("socket");
+    intarg = 1;
+    if (setsockopt(xsock, IPPROTO_TCP, TCP_NODELAY,
+        &intarg, sizeof(intarg)) < 0)
+            fprintf(stderr, "setsockopt (TCP_NODELAY) failed\n");
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+
+    /* assign server port number */
+    server.sin_port =  htons((unsigned short)portno);
+
+        /* name the socket */
+    while (bind(xsock, (struct sockaddr *)&server, sizeof(server)) < 0)
+    {
+#ifdef MSW
+        int err = WSAGetLastError();
+#else
+        int err = errno;
+#endif
+        if ((ntry++ > 20) || (err != EADDRINUSE))
+        {
+            perror("bind");
+            fprintf(stderr,
+                "couldn't open GUI-to-pd network connection\n");
+            return;
+        }
+        portno++;
+        server.sin_port = htons((unsigned short)(portno));
+    }
+
+#ifdef DEBUGCONNECT     
+    fprintf(debugfd, "port %d\n", portno);
+        fflush(debugfd);
+#endif
+
+#ifdef UNISTD
+    childpid = fork();
+    if (childpid < 0)
+    {
+        if (errno) perror("sys_startgui");
+        else fprintf(stderr, "sys_startgui failed\n");
+        return;
+    }
+    else if (!childpid)                 /* we're the child */
+    {
+        sprintf(cmdbuf, "\"%s\" -guiport %d\n", pdbuf, portno);
+#ifdef DEBUGCONNECT     
+        fprintf(debugfd, "%s", cmdbuf);
+        fflush(debugfd);
+#endif
+        execl("/bin/sh", "sh", "-c", cmdbuf, 0);
+        perror("pd: exec");
+        _exit(1);
+    }
+#endif /* UNISTD */
+
+#ifdef MSW       
+
+#error not yet used.... sys_bashfilename() not filled in here
+
+    strcpy(cmdbuf, pdcmd);
+    strcat(cmdbuf, "/pd.exe");
+    sys_bashfilename(scriptbuf, scriptbuf);
+
+    sprintf(portbuf, "%d", portno);
+
+    spawnret = _spawnl(P_NOWAIT, cmdbuf, "pd.exe", "-port", portbuf, 0);
+    if (spawnret < 0)
+    {
+        perror("spawnl");
+        fprintf(stderr, "%s: couldn't start\n", cmdbuf);
+        return;
+    }
+
+#endif /* MSW */
+
+#ifdef DEBUGCONNECT
+        fprintf(stderr, "Waiting for connection request... \n");
+#endif
+    if (listen(xsock, 5) < 0) pd_sockerror("listen");
+    sockfd = accept(xsock, (struct sockaddr *) &server, &len);
+    if (sockfd < 0) pd_sockerror("accept");
+#ifdef DEBUGCONNECT
+        fprintf(stderr, "... connected\n");
+#endif
+
+#ifndef MSW
+        /* normally we ask TK to call us back; but in MSW we have to poll. */
+    Tk_CreateFileHandler(sockfd, TK_READABLE | TK_EXCEPTION,
+        pd_readsocket, 0);
+#endif /* !MSW */
+}
+
+#endif /* STARTGUI */
+
+static void pdgui_setupsocket(void)
+{
+#ifdef DEBUGCONNECT
+        debugfd = fopen("/Users/msp/bratwurst", "w");
+        fprintf(debugfd, "turning stderr back on\n");
+        fflush(debugfd);
+        dup2(fileno(debugfd), 2);
+        fprintf(stderr, "duped to stderr?\n");
+#endif
+#ifdef MSW
+        pdgui_connecttosocket();
+#else
+    if (pd_portno)
+        pdgui_connecttosocket();
+    else pd_startfromgui() ;
+#endif
 }
 
 /**************************** commands ************************/
@@ -250,70 +482,53 @@ static int pdCmd(ClientData cd, Tcl_Interp *interp, int argc,  char **argv)
 {
     if (argc == 2)
     {
-    	int n = strlen(argv[1]);
-	if (send(sockfd, argv[1], n, 0) < n)
-	{
-    	    perror("stdout");
-    	    tcl_mess("exit\n");
-	}
+        int n = strlen(argv[1]);
+        if (send(sockfd, argv[1], n, 0) < n)
+        {
+            perror("stdout");
+            tcl_mess("exit\n");
+        }
     }
     else
     {
-    	int i;
-    	char buf[MAXWRITE];
-    	buf[0] = 0;
-    	for (i = 1; i < argc; i++)
-    	{
-    	    if (strlen(argv[i]) + strlen(buf) + 2 > MAXWRITE)
-	    {
-		interp->result = "pd: arg list too long";
-		return (TCL_ERROR);	
-	    }
-	    if (i > 1) strcat(buf, " ");
-	    strcat(buf, argv[i]);
-	}
-	if (send(sockfd, buf, strlen(buf), 0) < 0)
-	{
-    	    perror("stdout");
-    	    tcl_mess("exit\n");
-	}
+        int i;
+        char buf[MAXWRITE];
+        buf[0] = 0;
+        for (i = 1; i < argc; i++)
+        {
+            if (strlen(argv[i]) + strlen(buf) + 2 > MAXWRITE)
+            {
+                interp->result = "pd: arg list too long";
+                return (TCL_ERROR);     
+            }
+            if (i > 1) strcat(buf, " ");
+            strcat(buf, argv[i]);
+        }
+        if (send(sockfd, buf, strlen(buf), 0) < 0)
+        {
+            perror("stdout");
+            tcl_mess("exit\n");
+        }
     }
     return (TCL_OK);
 }
 
 /***********  "c" level access to tk functions. ******************/
 
-static Tcl_Interp *tk_myinterp;
-
 void tcl_mess(char *s)
 {
     int result;
-    result = Tcl_Eval(tk_myinterp,  s);
+    result = Tcl_Eval(tk_pdinterp,  s);
     if (result != TCL_OK)
     {
-    	if (*tk_myinterp->result) printf("%s\n",  tk_myinterp->result);
+        if (*tk_pdinterp->result) printf("%s\n",  tk_pdinterp->result);
     }
 }
 
-/* LATER should do a bounds check -- but how do you get printf to do that? */
-void tcl_vmess(char *fmt, ...)
-{
-    int result, i;
-    char buf[MAXWRITE];
-    va_list ap;
-    
-    va_start(ap, fmt);
-
-    vsprintf(buf, fmt, ap);
-    result = Tcl_Eval(tk_myinterp, buf);
-    if (result != TCL_OK)
-    {
-    	if (*tk_myinterp->result) printf("%s\n",  tk_myinterp->result);
-    }
-    va_end(ap);
-}
-
-#ifdef UNIX
+    /* in linux, we load the tk code from here (in MSW and MACOS, this
+    is done by passing the name of the file as a startup argument to
+    the wish shell.) */
+#if !defined(MSW) && !defined(MACOSX)
 void pdgui_doevalfile(Tcl_Interp *interp, char *s)
 {
     char buf[GUISTRING];
@@ -324,42 +539,39 @@ void pdgui_doevalfile(Tcl_Interp *interp, char *s)
     strcat(buf, s);
     if (Tcl_EvalFile(interp, buf) != TCL_OK)
     {
-    	char buf2[1000];
-    	sprintf(buf2, "puts [concat tcl: %s: can't open script]\n",
-    	    buf);
-    	tcl_mess(buf2);
+        char buf2[1000];
+        sprintf(buf2, "puts [concat tcl: %s: can't open script]\n",
+            buf);
+        tcl_mess(buf2);
     }
 }
 
 void pdgui_evalfile(char *s)
 {
-    pdgui_doevalfile(tk_myinterp, s);
+    pdgui_doevalfile(tk_pdinterp, s);
 }
 #endif
 
 void pdgui_startup(Tcl_Interp *interp)
 {
+        /* save pointer to the main interpreter */
+    tk_pdinterp = interp;
 
-    	/* save pointer to the main interpreter */
-    tk_myinterp = interp;
-
-
-    	/* add our own TK commands */
+        /* add our own TK commands */
     Tcl_CreateCommand(interp, "pd",  (Tcl_CmdProc*)pdCmd, (ClientData)NULL, 
-	(Tcl_CmdDeleteProc *)NULL); 
-#ifndef UNIX
+        (Tcl_CmdDeleteProc *)NULL); 
+#ifdef MSW
     Tcl_CreateCommand(interp, "pd_pollsocket",(Tcl_CmdProc*)  pd_pollsocketCmd,
-    	(ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+        (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
 #endif
     pdgui_setupsocket();
-    
-	/* read in the startup file */
+        /* read in the startup file */
 #if !defined(MSW) && !defined(MACOSX)
     pdgui_evalfile("pd.tk");
 #endif
 }
 
-#ifdef UNIX
+#ifndef MSW
 void pdgui_setname(char *s)
 {
     char *t;
@@ -372,27 +584,34 @@ void pdgui_setname(char *s)
 
     strncpy(pdgui_path, str, n);
     while (strlen(pdgui_path) > 0 && pdgui_path[strlen(pdgui_path)-1] == '/')
-    	pdgui_path[strlen(pdgui_path)-1] = 0;
+        pdgui_path[strlen(pdgui_path)-1] = 0;
     if (t = strrchr(pdgui_path, '/'))
-    	*t = 0;
+        *t = 0;
 }
 #endif
 
+    /* this is called when an off-the-shelf "wish" has to "load" this module
+    at runtime.  In Linux, this module is linked in and Pdtcl_Init() is not
+    called; instead, the code in t_main.c calls pdgui_setsock() and
+    pdgui_startup(). */ 
+
 int Pdtcl_Init(Tcl_Interp *interp)
 {
-	const char *myvalue = Tcl_GetVar(interp, "argv", 0);
-	int myportno;
-	if (myvalue && (myportno = atoi(myvalue)) > 1)
-			pdgui_setsock(myportno);
-	tk_myinterp = interp;
-	pdgui_startup(interp); 
-	interp->result = "loaded pdtcl_init";
+    const char *argv = Tcl_GetVar(interp, "argv", 0);
+    int portno, argno = 0;
+    if (argv && (portno = atoi(argv)) > 1)
+        pdgui_setsock(portno);
+    tk_pdinterp = interp;
+    pdgui_startup(interp);
+    interp->result = "loaded pdtcl_init";
 
-	return (TCL_OK);
+    return (TCL_OK);
 }
 
+#if 0
 int Pdtcl_SafeInit(Tcl_Interp *interp) {
     fprintf(stderr, "Pdtcl_Safeinit 51\n");
-	return (TCL_OK);
+        return (TCL_OK);
 }
+#endif
 

@@ -19,26 +19,18 @@
 #include <stdlib.h>
 
 /*
- * The following variable is a special hack that is needed in order for
- * Sun shared libraries to be used for Tcl.
- */
-
-extern int matherr(void);
-int *tclDummyMathPtr = (int *) matherr;
-
-/*
  *----------------------------------------------------------------------
  *
  * main --
  *
- *	This is the main program for the application.
+ *      This is the main program for the application.
  *
  * Results:
- *	None: Tk_Main never returns here, so this procedure never
- *	returns either.
+ *      None: Tk_Main never returns here, so this procedure never
+ *      returns either.
  *
  * Side effects:
- *	Whatever the application does.
+ *      Whatever the application does.
  *
  *----------------------------------------------------------------------
  */
@@ -54,18 +46,18 @@ main(int argc, char **argv)
     pdgui_setname(argv[0]);
     if (argc >= 2)
     {
-    	pdgui_setsock(atoi(argv[1]));
-    	argc--; argv++;
-    	argv[0] = "Pd";
+        pdgui_setsock(atoi(argv[1]));
+        argc--; argv++;
+        argv[0] = "Pd";
     }
     if (argc >= 2)
     {
-    	pdgui_sethost(argv[1]);
-    	argc--; argv++;
-    	argv[0] = "Pd";
+        pdgui_sethost(argv[1]);
+        argc--; argv++;
+        argv[0] = "Pd";
     }
     Tk_Main(argc, argv, Tcl_AppInit);
-    return 0;			/* Needed only to prevent compiler warning. */
+    return 0;                   /* Needed only to prevent compiler warning. */
 }
 
 
@@ -74,16 +66,16 @@ main(int argc, char **argv)
  *
  * Tcl_AppInit --
  *
- *	This procedure performs application-specific initialization.
- *	Most applications, especially those that incorporate additional
- *	packages, will have their own version of this procedure.
+ *      This procedure performs application-specific initialization.
+ *      Most applications, especially those that incorporate additional
+ *      packages, will have their own version of this procedure.
  *
  * Results:
- *	Returns a standard Tcl completion code, and leaves an error
- *	message in interp->result if an error occurs.
+ *      Returns a standard Tcl completion code, and leaves an error
+ *      message in interp->result if an error occurs.
  *
  * Side effects:
- *	Depends on the startup script.
+ *      Depends on the startup script.
  *
  *----------------------------------------------------------------------
  */
@@ -91,15 +83,15 @@ main(int argc, char **argv)
 
 int
 Tcl_AppInit(interp)
-    Tcl_Interp *interp;		/* Interpreter for application. */
+    Tcl_Interp *interp;         /* Interpreter for application. */
 {
     Tk_Window mainwindow;
 
     if (Tcl_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
     if (Tk_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     /* setup specific to pd-gui: */
@@ -114,7 +106,7 @@ Tcl_AppInit(interp)
      */
 
 #if 0
-    tcl_RcFileName = "~/.pdrc";
+    tcl_RcFileName = "~/.apprc";
 #endif
 
     return TCL_OK;

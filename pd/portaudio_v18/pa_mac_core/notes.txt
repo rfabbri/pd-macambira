@@ -32,3 +32,5 @@ input, output or both.
 When we query devices, we first get a list of CoreAudio devices. Then 
 we scan the list and add a PortAudio device for each CoreAudio device 
 that supports input. Then we make a scan for output devices.
+
+(minor change to test CVS)

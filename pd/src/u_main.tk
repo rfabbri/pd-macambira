@@ -1,4 +1,6 @@
-set pd_nt 1
+#!/usr/bin/wish
+
+set pd_nt 0
 # (The above is 0 for unix, 1 for microsoft, and 2 for Mac OSX.  The first
 # line is automatically munged by the relevant makefiles.)
 
@@ -96,7 +98,7 @@ checkbutton .controls.switches.meterbutton -text {peak meters} \
     -anchor w \
     -command {pd [concat pd meters $ctrls_meter_on \;]}
 
-pack .controls.switches.meterbutton .controls.switches.audiobutton -side left
+pack .controls.switches.audiobutton .controls.switches.meterbutton -side top
 
 frame .controls.inout
 frame .controls.inout.in
@@ -116,18 +118,37 @@ pack .controls.inout.out.label .controls.inout.out.level \
 button .controls.dio -text "DIO\nerrors" \
     -command {pd [concat pd audiostatus \;]}
 
-pack .controls.switches -side bottom -pady 12
 pack .controls.inout.in .controls.inout.out -side left -padx 6
 pack .controls.inout -side left -padx 14
+pack .controls.switches -side right
 pack .controls.dio -side right -padx 20
 
-bind . <Control-Key> {pdtk_pd_ctrlkey %W %K 0}
-bind . <Control-Shift-Key> {pdtk_pd_ctrlkey %W %K 1}
-if {$pd_nt == 2} {
-    bind . <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
-    bind . <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+
+frame .printout
+text .printout.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
+    -yscrollcommand ".printout.scroll set" -width 80
+# .printout.text insert end "\n\n\n\n\n\n\n\n\n\n"
+scrollbar .printout.scroll -command ".printout.text yview"
+pack .printout.scroll -side right -fill y
+pack .printout.text -side left -fill both -expand 1
+pack .printout -side bottom -fill both -expand 1
+
+proc pdtk_post {stuff} {
+    .printout.text insert end $stuff
+    .printout.text yview end-2char
 }
 
+proc pdtk_standardkeybindings {id} {
+    global pd_nt
+    bind $id <Control-Key> {pdtk_pd_ctrlkey %W %K 0}
+    bind $id <Control-Shift-Key> {pdtk_pd_ctrlkey %W %K 1}
+    if {$pd_nt == 2} {
+	bind $id <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+	bind $id <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+    }
+}
+
+pdtk_standardkeybindings .
 
 wm title . "Pd"
 . configure -menu .mbar -width 200 -height 150
@@ -155,8 +176,12 @@ proc pdtk_debug {x} {
 }
 
 proc pdtk_watchdog {} {
-    pd [concat pd ping \;]
+    pd [concat pd watchdog \;]
     after 2000 {pdtk_watchdog}
+}
+
+proc pdtk_ping {} {
+    pd [concat pd ping \;]
 }
 
 proc pdtk_check {x message} {
@@ -241,8 +266,8 @@ proc menu_send {} {
     .sendpanel.entry select adjust end
     bind .sendpanel.entry <KeyPress-Return> {
     	pd [concat $send_textvariable \;]
-    	after 50 {destroy .sendpanel}
     }
+    pdtk_standardkeybindings .sendpanel.entry
     focus .sendpanel.entry
 }
 
@@ -377,6 +402,8 @@ proc menu_addstd {mbar} {
     -accelerator [accel_munge "Ctrl+m"]
 .mbar.file add command -label Path... \
     -command {pd pd start-path-dialog \;}
+.mbar.file add command -label Startup... \
+    -command {pd pd start-startup-dialog \;}
 .mbar.file add  separator
 .mbar.file add command -label Quit -command {menu_quit} \
     -accelerator [accel_munge "Ctrl+q"]
@@ -650,6 +677,7 @@ proc menu_findobject {canvas} {
     $name.entry select from 0
     $name.entry select adjust end
     bind $name.entry <KeyPress-Return> [ concat find_apply $name]
+    pdtk_standardkeybindings $name.entry
     focus $name.entry
 }
 
@@ -695,6 +723,9 @@ proc pdtk_canvas_new {name width height geometry editable} {
 
     $name.m.file add command -label Path... \
     	-command {pd pd start-path-dialog \;} 
+
+    $name.m.file add command -label Startup... \
+    	-command {pd pd start-startup-dialog \;} 
 
     $name.m.file add  separator
     $name.m.file add command -label Close \
@@ -915,14 +946,21 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
     bind $name.c <Alt-Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 7}
     global pd_nt
+# button 2 is the right button on Mac; on other platforms it's button 3.
     if {$pd_nt == 2} {
         bind $name.c <Button-2> {pdtk_canvas_click %W %x %y %b 8}
         bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 8}
     } else {
         bind $name.c <Button-3> {pdtk_canvas_click %W %x %y %b 8}
         bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 2}
-    } 
-# change mac to right-click, not middle click -atl 2002.09.02
+    }
+#on linux, button 2 "pastes" from the X windows clipboard
+    if {$pd_nt == 0} {
+    	bind $name.c <Button-2> {\
+	    pdtk_canvas_click %W %x %y %b 0;\
+	     pdtk_canvas_mouseup %W %x %y %b;\
+	     pdtk_pastetext}
+    }
 
     bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
     bind $name.c <Control-Key> {pdtk_canvas_ctrlkey %W %K 0}
@@ -1000,11 +1038,9 @@ set pdtk_canvas_mouseup_ymaxval 0
 proc pdtk_canvas_mouseup {name x y b} {
     pd [concat [canvastosym $name] mouseup [$name canvasx $x] \
     	[$name canvasy $y] $b \;]
+}
 
-# we use the mouseup event to update scrollbar ranges and recheck the
-# geometry of the window since I haven't taken the time to figure out
-# how to do it right.
-
+proc pdtk_canvas_getscroll {name} {
     global pdtk_canvas_mouseup_name
     global pdtk_canvas_mouseup_xminval
     global pdtk_canvas_mouseup_xmaxval
@@ -1456,6 +1492,9 @@ proc pdtk_gatom_dialog {id initwidth initlo inithi \
     bind $id.paramhi.entry <KeyPress-Return> [concat dogatom_ok $id]
     bind $id.paramlo.entry <KeyPress-Return> [concat dogatom_ok $id]
     bind $id.params.entry <KeyPress-Return> [concat dogatom_ok $id]
+    pdtk_standardkeybindings $id.paramhi.entry
+    pdtk_standardkeybindings $id.paramlo.entry
+    pdtk_standardkeybindings $id.params.entry
     $id.params.entry select from 0
     $id.params.entry select adjust end
     focus $id.params.entry
@@ -1610,6 +1649,12 @@ proc pdtk_graph_dialog {id x1 y1 x2 y2 xpix ypix} {
     bind $id.yrangef.y1 <KeyPress-Return> [concat graph_ok $id]
     bind $id.yrangef.y2 <KeyPress-Return> [concat graph_ok $id]
     bind $id.yrangef.ypix <KeyPress-Return> [concat graph_ok $id]
+    pdtk_standardkeybindings $id.xrangef.x1
+    pdtk_standardkeybindings $id.xrangef.x2
+    pdtk_standardkeybindings $id.xrangef.xpix
+    pdtk_standardkeybindings $id.xrangef.y1
+    pdtk_standardkeybindings $id.xrangef.y2
+    pdtk_standardkeybindings $id.xrangef.ypix
     $id.xrangef.x2 select from 0
     $id.xrangef.x2 select adjust end
     focus $id.xrangef.x2
@@ -1957,6 +2002,10 @@ proc iemgui_apply {id} {
        set hhhrcv [string replace $hhhrcv 0 0 #] }
     if {[string index $hhhgui_nam 0] == "$"} {
        set hhhgui_nam [string replace $hhhgui_nam 0 0 #] }
+    
+    set hhhsnd [string map {" " _} $hhhsnd]
+    set hhhrcv [string map {" " _} $hhhrcv]
+    set hhhgui_nam [string map {" " _} $hhhgui_nam]
     
     pd [concat $id dialog \
         [eval concat $$var_iemgui_wdt] \
@@ -2320,6 +2369,18 @@ proc pdtk_iemgui_dialog {id mainheader \
     bind $id.gnxy.y_ent <KeyPress-Return> [concat iemgui_ok $id]
     bind $id.gnfs.fs_ent <KeyPress-Return> [concat iemgui_ok $id]
     bind $id.cao.ok <KeyPress-Return> [concat iemgui_ok $id]
+    pdtk_standardkeybindings $id.dim.w_ent
+    pdtk_standardkeybindings $id.dim.h_ent
+    pdtk_standardkeybindings $id.rng.min_ent
+    pdtk_standardkeybindings $id.rng.max_ent
+    pdtk_standardkeybindings $id.para.num_ent
+    pdtk_standardkeybindings $id.snd.ent
+    pdtk_standardkeybindings $id.rcv.ent
+    pdtk_standardkeybindings $id.gnam.ent
+    pdtk_standardkeybindings $id.gnxy.x_ent
+    pdtk_standardkeybindings $id.gnxy.y_ent
+    pdtk_standardkeybindings $id.gnfs.fs_ent
+    pdtk_standardkeybindings $id.cao.ok
     
     $id.dim.w_ent select from 0
     $id.dim.w_ent select adjust end
@@ -2338,15 +2399,20 @@ proc array_apply {id} {
     global $var_array_n
     set var_array_saveit [concat array_saveit_$vid]
     global $var_array_saveit
+    set var_array_drawasrects [concat array_drawasrects_$vid]
+    global $var_array_drawasrects
     set var_array_otherflag [concat array_otherflag_$vid]
     global $var_array_otherflag
     set mofo [eval concat $$var_array_name]
     if {[string index $mofo 0] == "$"} {
        set mofo [string replace $mofo 0 0 #] }
 
+    set saveit [eval concat $$var_array_saveit]
+    set drawasrects [eval concat $$var_array_drawasrects]
+
     pd [concat $id arraydialog $mofo \
 	[eval concat $$var_array_n] \
-    	[eval concat $$var_array_saveit] \
+    	[expr $saveit + 2 * $drawasrects] \
 	[eval concat $$var_array_otherflag] \
 	\;]
 }
@@ -2361,7 +2427,7 @@ proc array_ok {id} {
     array_cancel $id
 }
 
-proc pdtk_array_dialog {id name n saveit newone} {
+proc pdtk_array_dialog {id name n flags newone} {
     set vid [string trimleft $id .]
 
     set var_array_name [concat array_name_$vid]
@@ -2370,12 +2436,15 @@ proc pdtk_array_dialog {id name n saveit newone} {
     global $var_array_n
     set var_array_saveit [concat array_saveit_$vid]
     global $var_array_saveit
+    set var_array_drawasrects [concat array_drawasrects_$vid]
+    global $var_array_drawasrects
     set var_array_otherflag [concat array_otherflag_$vid]
     global $var_array_otherflag
 
     set $var_array_name $name
     set $var_array_n $n
-    set $var_array_saveit $saveit
+    set $var_array_saveit [expr ( $flags & 1 ) != 0]
+    set $var_array_drawasrects [expr ( $flags & 2 ) != 0]
     set $var_array_otherflag 0
 
     toplevel $id
@@ -2397,6 +2466,17 @@ proc pdtk_array_dialog {id name n saveit newone} {
     checkbutton $id.saveme -text {save contents} -variable $var_array_saveit \
     	-anchor w
     pack $id.saveme -side top
+
+    frame $id.drawasrects
+    pack $id.drawasrects -side top
+    radiobutton $id.drawasrects.drawasrects0 -value 0 \
+	-variable $var_array_drawasrects \
+	-text "draw as polygon"
+    radiobutton $id.drawasrects.drawasrects1 -value 1 \
+	-variable $var_array_drawasrects \
+	-text "draw as points"
+    pack $id.drawasrects.drawasrects0 -side top -anchor w
+    pack $id.drawasrects.drawasrects1 -side top -anchor w
 
     if {$newone != 0} {
 	frame $id.radio
@@ -2428,6 +2508,8 @@ proc pdtk_array_dialog {id name n saveit newone} {
     
     bind $id.name.entry <KeyPress-Return> [concat array_ok $id]
     bind $id.n.entry <KeyPress-Return> [concat array_ok $id]
+    pdtk_standardkeybindings $id.name.entry
+    pdtk_standardkeybindings $id.n.entry
     $id.name.entry select from 0
     $id.name.entry select adjust end
     focus $id.name.entry
@@ -2519,6 +2601,8 @@ proc pdtk_canvas_dialog {id xscale yscale graphme stretch} {
 
     bind $id.xscale.entry <KeyPress-Return> [concat canvas_ok $id]
     bind $id.yscale.entry <KeyPress-Return> [concat canvas_ok $id]
+    pdtk_standardkeybindings $id.xscale.entry
+    pdtk_standardkeybindings $id.yscale.entry
     $id.xscale.entry select from 0
     $id.xscale.entry select adjust end
     focus $id.xscale.entry
@@ -2759,6 +2843,19 @@ proc pdtk_pd_texteditor {stuff} {
     bind $name.text <Control-s> {texteditor_send %W}
 }
 
+#  paste text into a text box
+proc pdtk_pastetext {} {
+    global pdtk_pastebuffer
+    set pdtk_pastebuffer ""
+    catch {global pdtk_pastebuffer; set pdtk_pastebuffer [selection get]}
+#    puts stderr [concat paste $pdtk_pastebuffer]
+    for {set i 0} {$i < [string length $pdtk_pastebuffer]} {incr i 1} {
+    	set cha [string index $pdtk_pastebuffer $i]
+    	scan $cha %c keynum
+    	pd [concat pd key 1 $keynum 0 \;]
+    }
+}
+
 ############# open and save dialogs for objects in Pd ##########
 
 proc pdtk_openpanel {target} {
@@ -2820,8 +2917,10 @@ if {$pd_nt == 1} {
 proc audio_apply {id} {
     global audio_indev1 audio_indev2 audio_indev3 audio_indev4 
     global audio_inchan1 audio_inchan2 audio_inchan3 audio_inchan4
+    global audio_inenable1 audio_inenable2 audio_inenable3 audio_inenable4
     global audio_outdev1 audio_outdev2 audio_outdev3 audio_outdev4 
     global audio_outchan1 audio_outchan2 audio_outchan3 audio_outchan4
+    global audio_outenable1 audio_outenable2 audio_outenable3 audio_outenable4
     global audio_sr audio_advance
 
     pd [concat pd audio-dialog \
@@ -2829,18 +2928,18 @@ proc audio_apply {id} {
     	$audio_indev2 \
     	$audio_indev3 \
     	$audio_indev4 \
-    	$audio_inchan1 \
-    	$audio_inchan2 \
-    	$audio_inchan3 \
-    	$audio_inchan4 \
+    	[expr $audio_inchan1 * ( $audio_inenable1 ? 1 : -1 ) ]\
+    	[expr $audio_inchan2 * ( $audio_inenable2 ? 1 : -1 ) ]\
+    	[expr $audio_inchan3 * ( $audio_inenable3 ? 1 : -1 ) ]\
+    	[expr $audio_inchan4 * ( $audio_inenable4 ? 1 : -1 ) ]\
     	$audio_outdev1 \
     	$audio_outdev2 \
     	$audio_outdev3 \
     	$audio_outdev4 \
-    	$audio_outchan1 \
-    	$audio_outchan2 \
-    	$audio_outchan3 \
-    	$audio_outchan4 \
+    	[expr $audio_outchan1 * ( $audio_outenable1 ? 1 : -1 ) ]\
+    	[expr $audio_outchan2 * ( $audio_outenable2 ? 1 : -1 ) ]\
+    	[expr $audio_outchan3 * ( $audio_outenable3 ? 1 : -1 ) ]\
+    	[expr $audio_outchan4 * ( $audio_outenable4 ? 1 : -1 ) ]\
 	$audio_sr \
 	$audio_advance \
 	\;]
@@ -2889,8 +2988,10 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 	outchan1 outchan2 outchan3 outchan4 sr advance multi longform} {
     global audio_indev1 audio_indev2 audio_indev3 audio_indev4 
     global audio_inchan1 audio_inchan2 audio_inchan3 audio_inchan4
+    global audio_inenable1 audio_inenable2 audio_inenable3 audio_inenable4
     global audio_outdev1 audio_outdev2 audio_outdev3 audio_outdev4
     global audio_outchan1 audio_outchan2 audio_outchan3 audio_outchan4
+    global audio_outenable1 audio_outenable2 audio_outenable3 audio_outenable4
     global audio_sr audio_advance
     global audio_indevlist audio_outdevlist
 
@@ -2898,18 +2999,30 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     set audio_indev2 $indev2
     set audio_indev3 $indev3
     set audio_indev4 $indev4
-    set audio_inchan1 $inchan1
-    set audio_inchan2 $inchan2
-    set audio_inchan3 $inchan3
-    set audio_inchan4 $inchan4
+
+    set audio_inchan1 [expr ( $inchan1 > 0 ? $inchan1 : -$inchan1 ) ]
+    set audio_inenable1 [expr $inchan1 > 0 ]
+    set audio_inchan2 [expr ( $inchan2 > 0 ? $inchan2 : -$inchan2 ) ]
+    set audio_inenable2 [expr $inchan2 > 0 ]
+    set audio_inchan3 [expr ( $inchan3 > 0 ? $inchan3 : -$inchan3 ) ]
+    set audio_inenable3 [expr $inchan3 > 0 ]
+    set audio_inchan4 [expr ( $inchan4 > 0 ? $inchan4 : -$inchan4 ) ]
+    set audio_inenable4 [expr $inchan4 > 0 ]
+
     set audio_outdev1 $outdev1
     set audio_outdev2 $outdev2
     set audio_outdev3 $outdev3
     set audio_outdev4 $outdev4
-    set audio_outchan1 $outchan1
-    set audio_outchan2 $outchan2
-    set audio_outchan3 $outchan3
-    set audio_outchan4 $outchan4
+
+    set audio_outchan1 [expr ( $outchan1 > 0 ? $outchan1 : -$outchan1 ) ]
+    set audio_outenable1 [expr $outchan1 > 0 ]
+    set audio_outchan2 [expr ( $outchan2 > 0 ? $outchan2 : -$outchan2 ) ]
+    set audio_outenable2 [expr $outchan2 > 0 ]
+    set audio_outchan3 [expr ( $outchan3 > 0 ? $outchan3 : -$outchan3 ) ]
+    set audio_outenable3 [expr $outchan3 > 0 ]
+    set audio_outchan4 [expr ( $outchan4 > 0 ? $outchan4 : -$outchan4 ) ]
+    set audio_outenable4 [expr $outchan4 > 0 ]
+
     set audio_sr $sr
     set audio_advance $advance
     set audio_indevlist $indevlist
@@ -2945,24 +3058,26 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.in1f
     pack $id.in1f -side top
 
-    label $id.in1f.l1 -text "input device 1:"
+    checkbutton $id.in1f.x0 -variable audio_inenable1 \
+    	-text {input device 1} -anchor e
     button $id.in1f.x1 -text [lindex $indevlist $audio_indev1] \
     	-command [list audio_popup $id $id.in1f.x1 audio_indev1 $indevlist]
     label $id.in1f.l2 -text "channels:"
     entry $id.in1f.x2 -textvariable audio_inchan1 -width 3
-    pack $id.in1f.l1 $id.in1f.x1 $id.in1f.l2 $id.in1f.x2 -side left
+    pack $id.in1f.x0 $id.in1f.x1 $id.in1f.l2 $id.in1f.x2 -side left
 
     	# input device 2
     if {$longform && $multi > 1 && [llength $indevlist] > 1} {
 	frame $id.in2f
 	pack $id.in2f -side top
 
-	label $id.in2f.l1 -text "input device 2:"
+    	checkbutton $id.in2f.x0 -variable audio_inenable2 \
+    	    -text {input device 2} -anchor e
 	button $id.in2f.x1 -text [lindex $indevlist $audio_indev2] \
     	    -command [list audio_popup $id $id.in2f.x1 audio_indev2 $indevlist]
 	label $id.in2f.l2 -text "channels:"
 	entry $id.in2f.x2 -textvariable audio_inchan2 -width 3
-	pack $id.in2f.l1 $id.in2f.x1 $id.in2f.l2 $id.in2f.x2 -side left
+	pack $id.in2f.x0 $id.in2f.x1 $id.in2f.l2 $id.in2f.x2 -side left
     }
 
     	# input device 3
@@ -2970,12 +3085,13 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 	frame $id.in3f
 	pack $id.in3f -side top
 
-	label $id.in3f.l1 -text "input device 3:"
+    	checkbutton $id.in3f.x0 -variable audio_inenable3 \
+    	    -text {input device 3} -anchor e
 	button $id.in3f.x1 -text [lindex $indevlist $audio_indev3] \
     	    -command [list audio_popup $id $id.in3f.x1 audio_indev3 $indevlist]
 	label $id.in3f.l2 -text "channels:"
 	entry $id.in3f.x2 -textvariable audio_inchan3 -width 3
-	pack $id.in3f.l1 $id.in3f.x1 $id.in3f.l2 $id.in3f.x2 -side left
+	pack $id.in3f.x0 $id.in3f.x1 $id.in3f.l2 $id.in3f.x2 -side left
     }
 
     	# input device 4
@@ -2983,23 +3099,25 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
 	frame $id.in4f
 	pack $id.in4f -side top
 
-	label $id.in4f.l1 -text "input device 4:"
+    	checkbutton $id.in4f.x0 -variable audio_inenable4 \
+    	    -text {input device 4} -anchor e
 	button $id.in4f.x1 -text [lindex $indevlist $audio_indev4] \
     	    -command [list audio_popup $id $id.in4f.x1 audio_indev4 $indevlist]
 	label $id.in4f.l2 -text "channels:"
 	entry $id.in4f.x2 -textvariable audio_inchan4 -width 3
-	pack $id.in4f.l1 $id.in4f.x1 $id.in4f.l2 $id.in4f.x2 -side left
+	pack $id.in4f.x0 $id.in4f.x1 $id.in4f.l2 $id.in4f.x2 -side left
     }
 
     	# output device 1
     frame $id.out1f
     pack $id.out1f -side top
 
+    checkbutton $id.out1f.x0 -variable audio_outenable1 -text {output device 1} \
+    	-anchor e
     if {$multi == 0} {
     	label $id.out1f.l1 \
-	    -text "(output device same as input device) ..............      "
+	    -text "(same as input device) ..............      "
     } else {
-    	label $id.out1f.l1 -text "output device 1:"
     	button $id.out1f.x1 -text [lindex $outdevlist $audio_outdev1] \
     	    -command \
 	    [list audio_popup $id $id.out1f.x1 audio_outdev1 $outdevlist]
@@ -3007,48 +3125,54 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     label $id.out1f.l2 -text "channels:"
     entry $id.out1f.x2 -textvariable audio_outchan1 -width 3
     if {$multi == 0} {
-    	pack $id.out1f.l1 $id.out1f.l2 $id.out1f.x2 -side left
+    	pack $id.out1f.x0 $id.out1f.l1 $id.out1f.x2 -side left
     } else {
-    	pack $id.out1f.l1 $id.out1f.x1 $id.out1f.l2 $id.out1f.x2 -side left
+    	pack $id.out1f.x0 $id.out1f.x1 $id.out1f.l2 $id.out1f.x2 -side left
     }
 
     	# output device 2
     if {$longform && $multi > 1 && [llength $indevlist] > 1} {
 	frame $id.out2f
 	pack $id.out2f -side top
-    	label $id.out2f.l1 -text "output device 2:"
+
+    	checkbutton $id.out2f.x0 -variable audio_outenable2 \
+    	    -text {output device 2} -anchor e
     	button $id.out2f.x1 -text [lindex $outdevlist $audio_outdev2] \
     	    -command \
 	    [list audio_popup $id $id.out2f.x1 audio_outdev2 $outdevlist]
 	label $id.out2f.l2 -text "channels:"
 	entry $id.out2f.x2 -textvariable audio_outchan2 -width 3
-    	pack $id.out2f.l1 $id.out2f.x1 $id.out2f.l2 $id.out2f.x2 -side left
+    	pack $id.out2f.x0 $id.out2f.x1 $id.out2f.l2 $id.out2f.x2 -side left
     }
 
     	# output device 3
     if {$longform && $multi > 1 && [llength $indevlist] > 2} {
 	frame $id.out3f
 	pack $id.out3f -side top
-    	label $id.out3f.l1 -text "output device 3:"
+
+    	checkbutton $id.out3f.x0 -variable audio_outenable3 \
+    	    -text {output device 3} -anchor e
     	button $id.out3f.x1 -text [lindex $outdevlist $audio_outdev3] \
     	    -command \
 	    [list audio_popup $id $id.out3f.x1 audio_outdev3 $outdevlist]
 	label $id.out3f.l2 -text "channels:"
 	entry $id.out3f.x2 -textvariable audio_outchan3 -width 3
-    	pack $id.out3f.l1 $id.out3f.x1 $id.out3f.l2 $id.out3f.x2 -side left
+    	pack $id.out3f.x0 $id.out3f.x1 $id.out3f.l2 $id.out3f.x2 -side left
     }
 
     	# output device 4
     if {$longform && $multi > 1 && [llength $indevlist] > 3} {
 	frame $id.out4f
 	pack $id.out4f -side top
-    	label $id.out4f.l1 -text "output device 4:"
+
+    	checkbutton $id.out4f.x0 -variable audio_outenable4 \
+    	    -text {output device 4} -anchor e
     	button $id.out4f.x1 -text [lindex $outdevlist $audio_outdev4] \
     	    -command \
 	    [list audio_popup $id $id.out4f.x1 audio_outdev4 $outdevlist]
 	label $id.out4f.l2 -text "channels:"
 	entry $id.out4f.x2 -textvariable audio_outchan4 -width 3
-    	pack $id.out4f.l1 $id.out4f.x1 $id.out4f.l2 $id.out4f.x2 -side left
+    	pack $id.out4f.x0 $id.out4f.x1 $id.out4f.l2 $id.out4f.x2 -side left
     }
 
     	# if not the "long form" but if "multi" is 2, make a button to
@@ -3064,9 +3188,14 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     bind $id.srf.x1 <KeyPress-Return> [concat audio_ok $id]
     bind $id.srf.x2 <KeyPress-Return> [concat audio_ok $id]
     bind $id.in1f.x2 <KeyPress-Return> [concat audio_ok $id]
+    bind $id.out1f.x2 <KeyPress-Return> [concat audio_ok $id]
     $id.srf.x1 select from 0
     $id.srf.x1 select adjust end
     focus $id.srf.x1
+    pdtk_standardkeybindings $id.srf.x1
+    pdtk_standardkeybindings $id.srf.x2
+    pdtk_standardkeybindings $id.in1f.x2
+    pdtk_standardkeybindings $id.out1f.x2
 }
 
 ####################### midi dialog ##################3
@@ -3253,13 +3382,16 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
 ############ pdtk_path_dialog -- dialog window for search path #########
 
 proc path_apply {id} {
+    global pd_extrapath pd_verbose
     global pd_path0 pd_path1 pd_path2 pd_path3 pd_path4 
     global pd_path5 pd_path6 pd_path7 pd_path8 pd_path9 
 
-    pd [concat pd path-dialog \
-    	$pd_path0 $pd_path1 $pd_path2 $pd_path3 $pd_path4 \
-    	$pd_path5 $pd_path6 $pd_path7 $pd_path8 $pd_path9 \
-	\;]
+    pd [concat pd path-dialog $pd_extrapath $pd_verbose \
+    [pdtk_enquote $pd_path0] [pdtk_enquote $pd_path1] \
+    [pdtk_enquote $pd_path2] [pdtk_enquote $pd_path3] \
+    [pdtk_enquote $pd_path4] [pdtk_enquote $pd_path5] \
+    [pdtk_enquote $pd_path6] [pdtk_enquote $pd_path7] \
+    [pdtk_enquote $pd_path8] [pdtk_enquote $pd_path9] \;]
 }
 
 proc path_cancel {id} {
@@ -3270,12 +3402,14 @@ proc path_ok {id} {
     path_apply $id
     path_cancel $id
 }
-set pd_path0 sdfgh
 
-proc pdtk_path_dialog {id} {
+proc pdtk_path_dialog {id extrapath verbose} {
+    global pd_extrapath pd_verbose
     global pd_path0 pd_path1 pd_path2 pd_path3 pd_path4 
     global pd_path5 pd_path6 pd_path7 pd_path8 pd_path9 
 
+    set pd_extrapath $extrapath
+    set pd_verbose $verbose
     toplevel $id
     wm title $id {PD search path for patches and other files}
     wm protocol $id WM_DELETE_WINDOW [concat path_cancel $id]
@@ -3292,10 +3426,21 @@ proc pdtk_path_dialog {id} {
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
     
+    frame $id.extraframe
+    pack $id.extraframe -side bottom -fill x -pady 2m
+    checkbutton $id.extraframe.extra -text {use standard extensions} \
+	-variable pd_extrapath -anchor w 
+    checkbutton $id.extraframe.verbose -text {verbose} \
+	-variable pd_verbose -anchor w 
+    button $id.extraframe.save -text {Save all settings}\
+    	-command "path_apply $id \; pd pd save-preferences \\;"
+    pack $id.extraframe.extra $id.extraframe.verbose $id.extraframe.save \
+    	-side left -expand 1
+    
     for {set x 0} {$x < 10} {incr x} {
-    	# input device 1
 	entry $id.f$x -textvariable pd_path$x -width 80
     	bind $id.f$x <KeyPress-Return> [concat path_ok $id]
+    	pdtk_standardkeybindings $id.f$x
 	pack $id.f$x -side top
     }
 
@@ -3305,4 +3450,84 @@ proc pdtk_path_dialog {id} {
 proc pd_set {var value} {
 	global $var
 	set $var $value
+}
+
+########## pdtk_startup_dialog -- dialog window for startup options #########
+
+proc startup_apply {id} {
+    global pd_nort pd_flags
+    global pd_startup0 pd_startup1 pd_startup2 pd_startup3 pd_startup4 
+    global pd_startup5 pd_startup6 pd_startup7 pd_startup8 pd_startup9 
+
+    pd [concat pd startup-dialog $pd_nort [pdtk_enquote $pd_flags] \
+    [pdtk_enquote $pd_startup0] [pdtk_enquote $pd_startup1] \
+    [pdtk_enquote $pd_startup2] [pdtk_enquote $pd_startup3] \
+    [pdtk_enquote $pd_startup4] [pdtk_enquote $pd_startup5] \
+    [pdtk_enquote $pd_startup6] [pdtk_enquote $pd_startup7] \
+    [pdtk_enquote $pd_startup8] [pdtk_enquote $pd_startup9] \;]
+
+}
+
+proc startup_cancel {id} {
+    pd [concat $id cancel \;]
+}
+
+proc startup_ok {id} {
+    startup_apply $id
+    startup_cancel $id
+}
+
+proc pdtk_startup_dialog {id nort flags} {
+    global pd_nort pd_nt pd_flags
+    global pd_startup0 pd_startup1 pd_startup2 pd_startup3 pd_startup4 
+    global pd_startup5 pd_startup6 pd_startup7 pd_startup8 pd_startup9 
+
+    set pd_nort $nort
+    set pd_flags $flags
+    toplevel $id
+    wm title $id {Pd binaries to load (on next startup)}
+    wm protocol $id WM_DELETE_WINDOW [concat startup_cancel $id]
+
+    frame $id.buttonframe
+    pack $id.buttonframe -side bottom -fill x -pady 2m
+    button $id.buttonframe.cancel -text {Cancel}\
+    	-command "startup_cancel $id"
+    button $id.buttonframe.apply -text {Apply}\
+    	-command "startup_apply $id"
+    button $id.buttonframe.ok -text {OK}\
+    	-command "startup_ok $id"
+    pack $id.buttonframe.cancel -side left -expand 1
+    pack $id.buttonframe.apply -side left -expand 1
+    pack $id.buttonframe.ok -side left -expand 1
+    
+    frame $id.flags
+    pack $id.flags -side bottom
+    label $id.flags.entryname -text {startup flags}
+    entry $id.flags.entry -textvariable pd_flags -width 80
+    bind $id.flags.entry <KeyPress-Return> [concat startup_ok $id]
+    pdtk_standardkeybindings $id.flags.entry
+    pack $id.flags.entryname $id.flags.entry -side left
+
+    frame $id.nortframe
+    pack $id.nortframe -side bottom -fill x -pady 2m
+    if {$pd_nt != 1} {
+    	checkbutton $id.nortframe.nort -text {defeat real-time scheduling} \
+	    -variable pd_nort -anchor w
+    }
+    button $id.nortframe.save -text {Save all settings}\
+    	-command "startup_apply $id \; pd pd save-preferences \\;"
+    if {$pd_nt != 1} {
+    	pack $id.nortframe.nort $id.nortframe.save -side left -expand 1
+    } else {
+    	pack $id.nortframe.save -side left -expand 1
+    }
+
+    for {set x 0} {$x < 10} {incr x} {
+	entry $id.f$x -textvariable pd_startup$x -width 80
+    	bind $id.f$x <KeyPress-Return> [concat startup_ok $id]
+    	pdtk_standardkeybindings $id.f$x
+	pack $id.f$x -side top
+    }
+
+    focus $id.f0
 }
