@@ -220,8 +220,6 @@ void speedlim_setup(void)
     class_addanything(speedlim_class, speedlim_anything);
     class_addmethod(speedlim_class, (t_method)speedlim_ft1, gensym("ft1"), A_FLOAT, 0);
 #ifndef MAXLIB
-    class_sethelpsymbol(speedlim_class, gensym("help-speedlim.pd"));
 #else
-    class_sethelpsymbol(speedlim_class, gensym("maxlib/help-speedlim.pd"));
 #endif
 }

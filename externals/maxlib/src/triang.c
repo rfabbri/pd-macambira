@@ -63,7 +63,6 @@ void triang_setup(void)
     rand_triang_class = class_new(gensym("triang"), (t_newmethod)rand_triang_new, 0,
     	sizeof(t_rand_triang), 0, A_DEFFLOAT, 0);
     class_addbang(rand_triang_class, rand_triang_bang);
-	class_sethelpsymbol(rand_triang_class, gensym("maxlib/help-triang.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

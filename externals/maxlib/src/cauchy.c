@@ -74,7 +74,6 @@ void cauchy_setup(void)
     rand_cauchy_class = class_new(gensym("cauchy"), (t_newmethod)rand_cauchy_new, 0,
     	sizeof(t_rand_cauchy), 0, A_DEFFLOAT, 0);
     class_addbang(rand_cauchy_class, rand_cauchy_bang);
-	class_sethelpsymbol(rand_cauchy_class, gensym("maxlib/help-cauchy.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

@@ -265,5 +265,4 @@ void dist_setup(void)
 	class_addmethod(dist_class, (t_method)dist_print, gensym("print"), 0);
 	class_addmethod(dist_class, (t_method)dist_send, gensym("send"), A_GIMME, 0);
     class_addanything(dist_class, dist_anything);
-	class_sethelpsymbol(dist_class, gensym("maxlib/help-dist.pd"));
 }

@@ -141,9 +141,7 @@ void rewrap_setup(void)
 	class_addmethod(rewrap_class, (t_method)rewrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(rewrap_class, (t_method)rewrap_b, gensym("b"), A_FLOAT, 0);
 #ifndef MAXLIB
-    class_sethelpsymbol(rewrap_class, gensym("help-rewrap.pd"));
 #else
-    class_sethelpsymbol(rewrap_class, gensym("maxlib/help-rewrap.pd"));
 #endif
 }
 

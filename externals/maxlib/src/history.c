@@ -252,6 +252,5 @@ void history_setup(void)
     class_addmethod(history_class, (t_method)history_weight, gensym("weight"), 0);
     class_addfloat(history_class, history_float);
 	class_addmethod(history_class, (t_method)history_time, gensym("time"), A_FLOAT, 0);
-    class_sethelpsymbol(history_class, gensym("maxlib/help-history.pd"));
 }
 

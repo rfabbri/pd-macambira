@@ -139,9 +139,7 @@ void timebang_setup(void)
 	class_addmethod(timebang_class, (t_method)timebang_set, gensym("set"), A_GIMME, 0);
 	class_addbang(timebang_class, (t_method)timebang_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(timebang_class, gensym("help-timebang.pd"));
 #else
-    class_sethelpsymbol(timebang_class, gensym("maxlib/help-timebang.pd"));
 #endif
 }
 

@@ -171,6 +171,5 @@ void tilt_setup(void)
 	class_addmethod(tilt_class, (t_method)tilt_hi_limit, gensym("hi"), A_FLOAT, 0);
 	class_addmethod(tilt_class, (t_method)tilt_low_limit, gensym("low"), A_FLOAT, 0);
 	class_addmethod(tilt_class, (t_method)tilt_trip_point, gensym("trip"), A_FLOAT, 0);
-    class_sethelpsymbol(tilt_class, gensym("maxlib/help-tilt.pd"));
 }
 

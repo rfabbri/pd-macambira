@@ -288,6 +288,6 @@ void score_setup(void)
     class_addmethod(score_class, (t_method)score_reset, gensym("reset"), A_GIMME, 0);
 	class_addmethod(score_class, (t_method)score_set, gensym("set"), A_SYMBOL, 0);
     class_addfloat(score_class, score_float);
-    class_sethelpsymbol(score_class, gensym("maxlib/help-score.pd"));
+
 }
 

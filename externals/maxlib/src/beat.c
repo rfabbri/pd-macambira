@@ -389,6 +389,5 @@ void beat_setup(void)
 	class_addmethod(beat_class, (t_method)beat_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addmethod(beat_class, (t_method)beat_reset, gensym("reset"), 0);
 	class_addmethod(beat_class, (t_method)beat_print, gensym("print"), 0);
-    class_sethelpsymbol(beat_class, gensym("maxlib/help-beat.pd"));
 }
 

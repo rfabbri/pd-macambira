@@ -75,7 +75,6 @@ void poisson_setup(void)
     rand_poisson_class = class_new(gensym("poisson"), (t_newmethod)rand_poisson_new, 0,
     	sizeof(t_rand_poisson), 0, A_DEFFLOAT, 0);
     class_addbang(rand_poisson_class, rand_poisson_bang);
-	class_sethelpsymbol(rand_poisson_class, gensym("maxlib/help-poisson.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

@@ -125,9 +125,7 @@ void scale_setup(void)
     class_addfloat(scale_class, scale_float);
     class_addbang(scale_class, scale_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(scale_class, gensym("help-scale.pd"));
 #else
-    class_sethelpsymbol(scale_class, gensym("maxlib/help-scale.pd"));
 #endif
 }
 

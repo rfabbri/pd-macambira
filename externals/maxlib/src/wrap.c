@@ -127,10 +127,5 @@ void wrap_setup(void)
     class_addfloat(wrap_class, wrap_float);
 	class_addmethod(wrap_class, (t_method)wrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(wrap_class, (t_method)wrap_b, gensym("b"), A_FLOAT, 0);
-#ifndef MAXLIB
-    class_sethelpsymbol(wrap_class, gensym("help-wrap.pd"));
-#else
-    class_sethelpsymbol(wrap_class, gensym("maxlib/help-wrap.pd"));
-#endif
 }
 

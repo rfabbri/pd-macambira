@@ -91,7 +91,6 @@ void beta_setup(void)
     rand_beta_class = class_new(gensym("beta"), (t_newmethod)rand_beta_new, 0,
     	sizeof(t_rand_beta), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addbang(rand_beta_class, rand_beta_bang);
-	class_sethelpsymbol(rand_beta_class, gensym("maxlib/help-beta.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

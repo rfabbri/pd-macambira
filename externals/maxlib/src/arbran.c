@@ -171,7 +171,6 @@ void arbran_setup(void)
     class_addbang(rand_arbran_class, rand_arbran_bang);
 	class_addmethod(rand_arbran_class, (t_method)rand_arbran_pdfscale, gensym("pdfscale"), 0);
 	class_addmethod(rand_arbran_class, (t_method)rand_arbran_setarrays, gensym("set"), A_SYMBOL, A_SYMBOL, 0);
-	class_sethelpsymbol(rand_arbran_class, gensym("maxlib/help-arbran.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

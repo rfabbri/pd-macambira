@@ -223,6 +223,6 @@ void borax_setup(void)
     class_addmethod(borax_class, (t_method)borax_ft1, gensym("ft1"), A_FLOAT, 0);
     class_addmethod(borax_class, (t_method)borax_reset, gensym("ft2"), A_GIMME, 0);
     class_addfloat(borax_class, borax_float);
-    class_sethelpsymbol(borax_class, gensym("maxlib/help-borax.pd"));
+
 }
 

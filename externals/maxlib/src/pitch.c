@@ -101,6 +101,5 @@ void pitch_setup(void)
     pitch_class = class_new(gensym("pitch"), (t_newmethod)pitch_new,
     	0, sizeof(t_pitch), 0, A_DEFFLOAT, 0);
     class_addfloat(pitch_class, pitch_float);
-    class_sethelpsymbol(pitch_class, gensym("maxlib/help-pitch.pd"));
 }
 

@@ -163,5 +163,4 @@ void step_setup(void)
 	class_addmethod(step_class, (t_method)step_ft2, gensym("ft2"), A_FLOAT, 0);
     class_addmethod(step_class, (t_method)step_stop, gensym("stop"), 0);
     class_addfloat(step_class, (t_method)step_float);
-	class_sethelpsymbol(step_class, gensym("maxlib/help-step.pd"));
 }

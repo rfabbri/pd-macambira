@@ -70,7 +70,6 @@ void expo_setup(void)
     rand_expo_class = class_new(gensym("expo"), (t_newmethod)rand_expo_new, 0,
     	sizeof(t_rand_expo), 0, A_DEFFLOAT, 0);
     class_addbang(rand_expo_class, rand_expo_bang);
-	class_sethelpsymbol(rand_expo_class, gensym("maxlib/help-expo.pd"));
 #ifndef MAXLIB
     post(version);
 #endif

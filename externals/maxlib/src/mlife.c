@@ -493,5 +493,4 @@ void mlife_setup(void)
 	class_addmethod(mlife_class, (t_method)ml_display, gensym("display"), 0);
     class_addfloat(mlife_class, ml_int);
 	class_addbang(mlife_class, ml_bang);
-    class_sethelpsymbol(mlife_class, gensym("maxlib/help-mlife.pd"));
 }

@@ -187,6 +187,5 @@ void average_setup(void)
     class_addmethod(average_class, (t_method)average_weight, gensym("weight"), 0);
     class_addfloat(average_class, average_float);
 	class_addmethod(average_class, (t_method)average_index, gensym("index"), A_FLOAT, 0);
-    class_sethelpsymbol(average_class, gensym("maxlib/help-average.pd"));
 }
 

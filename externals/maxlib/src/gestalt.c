@@ -104,6 +104,5 @@ void gestalt_setup(void)
     class_addfloat(gestalt_class, gestalt_float);
 	class_addmethod(gestalt_class, (t_method)gestalt_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addmethod(gestalt_class, (t_method)gestalt_ft2, gensym("ft2"), A_FLOAT, 0);
-    class_sethelpsymbol(gestalt_class, gensym("maxlib/help-gestalt.pd"));
 }
 

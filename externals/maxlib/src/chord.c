@@ -1797,6 +1797,5 @@ void chord_setup(void)
     	0, sizeof(t_chord), 0, A_DEFFLOAT, 0);
     class_addfloat(chord_class, chord_float);
     class_addmethod(chord_class, (t_method)chord_ft1, gensym("ft1"), A_FLOAT, 0);
-    class_sethelpsymbol(chord_class, gensym("maxlib/help-chord.pd"));
 }
 

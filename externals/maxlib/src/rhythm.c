@@ -324,6 +324,5 @@ void rhythm_setup(void)
 	class_addmethod(rhythm_class, (t_method)rhythm_model, gensym("model"), A_FLOAT, 0);
 	class_addmethod(rhythm_class, (t_method)rhythm_reset, gensym("reset"), 0);
 	class_addmethod(rhythm_class, (t_method)rhythm_print, gensym("print"), 0);
-    class_sethelpsymbol(rhythm_class, gensym("maxlib/help-rhythm.pd"));
 }
 

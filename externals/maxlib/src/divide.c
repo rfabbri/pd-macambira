@@ -95,6 +95,5 @@ void divide_setup(void)
     class_addfloat(divide_class, divide_float);
     class_addmethod(divide_class, (t_method)divide_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(divide_class, (t_method)divide_bang);
-    class_sethelpsymbol(divide_class, gensym("maxlib/help-divide.pd"));
 }
 

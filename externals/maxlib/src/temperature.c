@@ -104,6 +104,5 @@ void temperature_setup(void)
     class_addfloat(temperature_class, temperature_float);
 	class_addmethod(temperature_class, (t_method)temperature_time, gensym("time"), A_FLOAT, 0);
 	class_addanything(temperature_class, temperature_anything);
-    class_sethelpsymbol(temperature_class, gensym("maxlib/help-temperature.pd"));
 }
 

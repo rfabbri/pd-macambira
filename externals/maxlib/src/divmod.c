@@ -85,6 +85,5 @@ void divmod_setup(void)
     class_addfloat(divmod_class, divmod_float);
     class_addmethod(divmod_class, (t_method)divmod_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(divmod_class, (t_method)divmod_bang);
-    class_sethelpsymbol(divmod_class, gensym("maxlib/help-divmod.pd"));
 }
 

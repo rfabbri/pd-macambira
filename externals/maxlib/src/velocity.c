@@ -97,6 +97,5 @@ void velocity_setup(void)
     	(t_method)velocity_free, sizeof(t_velocity), 0, A_DEFFLOAT, 0);
     class_addfloat(velocity_class, velocity_float);
 	class_addbang(velocity_class, velocity_bang);
-    class_sethelpsymbol(velocity_class, gensym("maxlib/help-velocity.pd"));
 }
 

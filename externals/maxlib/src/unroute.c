@@ -163,8 +163,6 @@ void unroute_setup(void)
     class_addlist(unroute_class, unroute_list);
     class_addanything(unroute_class, unroute_any);
 #ifndef MAXLIB
-    class_sethelpsymbol(unroute_class, gensym("help-unroute.pd"));
 #else
-    class_sethelpsymbol(unroute_class, gensym("maxlib/help-unroute.pd"));
 #endif
 }

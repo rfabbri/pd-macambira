@@ -83,9 +83,7 @@ void split_setup(void)
     	0, sizeof(t_split), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(split_class, split_float);
 #ifndef MAXLIB
-    class_sethelpsymbol(split_class, gensym("help-split.pd"));
 #else
-    class_sethelpsymbol(split_class, gensym("maxlib/help-split.pd"));
 #endif
 }
 

@@ -137,8 +137,6 @@ void urn_setup(void)
     class_addmethod(urn_class, (t_method)urn_seed, gensym("seed"), A_FLOAT, 0);
 #ifndef MAXLIB
     post(version);
-	class_sethelpsymbol(urn_class, gensym("help-urn.pd"));
 #else
-	class_sethelpsymbol(urn_class, gensym("maxlib/help-urn.pd"));
 #endif
 }

@@ -82,5 +82,4 @@ void fifo_setup(void)
     	(t_method)fifo_free, sizeof(t_fifo), 0, A_DEFFLOAT, 0);
     class_addfloat(fifo_class, fifo_int);
 	class_addbang(fifo_class, fifo_bang);
-    class_sethelpsymbol(fifo_class, gensym("maxlib/help-fifo.pd"));
 }

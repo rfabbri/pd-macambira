@@ -91,5 +91,4 @@ void lifo_setup(void)
     class_addfloat(lifo_class, lifo_int);
 	class_addbang(lifo_class, lifo_bang);
 	class_addmethod(lifo_class, (t_method)lifo_clear, gensym("clear"), 0);
-    class_sethelpsymbol(lifo_class, gensym("maxlib/help-lifo.pd"));
 }

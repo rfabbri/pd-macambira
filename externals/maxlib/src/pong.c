@@ -320,8 +320,6 @@ void pong_setup(void)
     class_addfloat(pong_class, pong_onoff);
 	class_addbang(pong_class, pong_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(pong_class, gensym("help-pong.pd"));
 #else
-    class_sethelpsymbol(pong_class, gensym("maxlib/help-pong.pd"));
 #endif
 }

@@ -404,5 +404,4 @@ void subst_setup(void)
 	class_addmethod(subst_class, (t_method)subst_display, gensym("display"), 0);
 	class_addlist(subst_class, subst_list);
 	class_addbang(subst_class, subst_bang);
-    class_sethelpsymbol(subst_class, gensym("maxlib/help-subst.pd"));
 }

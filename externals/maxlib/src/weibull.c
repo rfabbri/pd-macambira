@@ -78,7 +78,6 @@ void weibull_setup(void)
     rand_weibull_class = class_new(gensym("weibull"), (t_newmethod)rand_weibull_new, 0,
     	sizeof(t_rand_weibull), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addbang(rand_weibull_class, rand_weibull_bang);
-	class_sethelpsymbol(rand_weibull_class, gensym("maxlib/help-weibull.pd"));
 #ifndef MAXLIB
     post(version);
 #endif
