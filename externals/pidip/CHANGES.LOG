@@ -1,4 +1,5 @@
 0.12.10
+  optimized pdp_canvas ( but overlapping has disappeared )
   added pdp_fqt : fast quicktime reader ( frames are cached in memory and no audio decoding )
   added pdp_fcqt : fast quicktime reader ( same as pdp_fqt but frames are compressed )
   added help patches for pdp_yqt, pdp_fqt and pdp_fcqt

@@ -46,8 +46,6 @@ typedef struct pdp_canvas_struct
     t_float x_xmouse;
     t_float x_ymouse;
 
-    t_int x_average;
-
     t_int *x_packets;
     t_int *x_widths;
     t_int *x_heights;
@@ -66,11 +64,12 @@ static void pdp_canvas_process_yv12(t_pdp_canvas *x)
 {
   t_int     px, py, ppx, ppy, ii, nbs;
   short int *pY, *pU, *pV;
-  short int *piY, *piU, *piV;
+  short int *ppY, *ppU, *ppV;
   t_pdp     *oheader;
-  short int *odata;
+  short int *odata, *pdata;
   t_pdp     *iheader;
   short int *idata;
+  t_int     mx, dx, my, dy;
 
   x->x_opacket = pdp_packet_new_image_YCrCb( x->x_owidth, x->x_oheight );
   oheader = pdp_packet_header(x->x_opacket);
@@ -85,46 +84,61 @@ static void pdp_canvas_process_yv12(t_pdp_canvas *x)
   pY = odata;
   pV = odata+x->x_osize;
   pU = odata+x->x_osize+(x->x_osize>>2);
-  for ( py=0; py<x->x_oheight; py++ )
+  for ( ii=0; ii<x->x_nbinputs; ii++)
   {
-    for ( px=0; px<x->x_owidth; px++ )
+    if ( x->x_packets[ii] != -1 )
     {
-       nbs=0;
-       for ( ii=0; ii<x->x_nbinputs; ii++)
-       {
-         if ( x->x_packets[ii] != -1 )
-         {
-            if ( (px >= (int)x->x_xoffsets[ii]) && ( px < (int)x->x_xoffsets[ii] + x->x_widths[ii] )
-                 && (py >= (int)x->x_yoffsets[ii]) && ( py < (int)x->x_yoffsets[ii] + x->x_heights[ii] )
-            ) 
-            {
-               nbs++;
-               idata = (short int *)pdp_packet_data(x->x_packets[ii]);
-               piY = idata;
-               piV = idata+x->x_sizes[ii];
-               piU = idata+x->x_sizes[ii]+(x->x_sizes[ii]>>2);
-               ppx = px-(int)x->x_xoffsets[ii];
-               ppy = py-(int)x->x_yoffsets[ii];
-               *(pY+py*x->x_owidth+px) += *(piY+ppy*x->x_widths[ii]+ppx);
-               if ( (px%2==0) && (py%2==0) )
-               {
-                 *(pU+(py>>1)*(x->x_owidth>>1)+(px>>1)) +=
-                         *(piU+(ppy>>1)*(x->x_widths[ii]>>1)+(ppx>>1));
-                 *(pV+(py>>1)*(x->x_owidth>>1)+(px>>1)) +=
-                         *(piV+(ppy>>1)*(x->x_widths[ii]>>1)+(ppx>>1));
-               }
-            }
-         }
-       }
-       if ( ( nbs != 0 ) && x->x_average )
-       {
-           *(pY+py*x->x_owidth+px) /= nbs;
-           if ( (px%2==0) && (py%2==0) )
-           {
-             *(pU+(py>>1)*(x->x_owidth>>1)+(px>>1)) /= nbs;
-             *(pV+(py>>1)*(x->x_owidth>>1)+(px>>1)) /= nbs;
-           }
-       }
+      if ( x->x_xoffsets[ii] < -x->x_widths[ii] ) continue; 
+      if ( x->x_xoffsets[ii] > x->x_owidth ) continue; 
+      if ( x->x_yoffsets[ii] < -x->x_heights[ii] ) continue; 
+      if ( x->x_yoffsets[ii] > x->x_oheight ) continue; 
+
+      pdata   = (short int *)pdp_packet_data(x->x_packets[ii]);
+      ppY = pdata;
+      ppV = pdata+x->x_sizes[ii];
+      ppU = pdata+x->x_sizes[ii]+(x->x_sizes[ii]>>2);
+
+      if ( x->x_xoffsets[ii] < 0 ) 
+      {
+        mx = -x->x_xoffsets[ii];
+        dx = x->x_widths[ii]+x->x_xoffsets[ii];
+      }
+      else if ( x->x_xoffsets[ii] > x->x_owidth - x->x_widths[ii] ) 
+      {
+        mx = 0;
+        dx = x->x_owidth-x->x_xoffsets[ii];
+      }
+      else
+      {
+        mx = 0;
+        dx = x->x_widths[ii];
+      }
+
+      if ( x->x_yoffsets[ii] < 0 ) 
+      {
+        my = -x->x_yoffsets[ii];
+        dy = x->x_heights[ii]+x->x_yoffsets[ii];
+      }
+      else if ( x->x_yoffsets[ii] > x->x_oheight - x->x_heights[ii] ) 
+      {
+        my = 0;
+        dy = x->x_oheight-x->x_yoffsets[ii];
+      }
+      else
+      {
+        my = 0;
+        dy = x->x_heights[ii];
+      }
+
+      for ( py=x->x_yoffsets[ii]+my; py<x->x_yoffsets[ii]+dy; py++)
+      {
+         memcpy( pY+(py*x->x_owidth)+(t_int)x->x_xoffsets[ii]+mx, 
+                     ppY+(py-(t_int)x->x_yoffsets[ii])*x->x_widths[ii]+mx, dx*sizeof(short int) );
+         memcpy( pU+((py>>1)*(x->x_owidth>>1))+((t_int)(x->x_xoffsets[ii]+mx)>>1), 
+                     ppU+((py-(t_int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), dx );
+         memcpy( pV+((py>>1)*(x->x_owidth>>1))+((t_int)(x->x_xoffsets[ii]+mx)>>1), 
+                     ppV+((py-(t_int)x->x_yoffsets[ii])>>1)*(x->x_widths[ii]>>1)+(mx>>1), dx );
+      }
     }
   }
 
@@ -216,14 +230,6 @@ static void pdp_canvas_drag(t_pdp_canvas *x, t_floatarg X, t_floatarg Y)
 static void pdp_canvas_unselect(t_pdp_canvas *x)
 {
   x->x_current = -1;
-}
-
-static void pdp_canvas_average(t_pdp_canvas *x, t_floatarg bvalue)
-{
-  if ( ( bvalue == 0.0 ) || ( bvalue == 1.0 ) )
-  {
-     x->x_average = (int) bvalue;
-  }
 }
 
 static void pdp_canvas_input(t_pdp_canvas *x, t_symbol *s, t_floatarg f, t_int ni)
@@ -393,7 +399,6 @@ void *pdp_canvas_new(t_symbol *s, int argc, t_atom *argv)
     x->x_yoffsets[ii] = 0.;
   }
   x->x_current = -1;
-  x->x_average = 0;
   x->x_outlet0 = outlet_new(&x->x_obj, &s_anything); 
 
   return (void *)x;
@@ -429,7 +434,6 @@ void pdp_canvas_setup(void)
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_select, gensym("select"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_drag, gensym("drag"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
   class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_unselect, gensym("unselect"), A_NULL);
-  class_addmethod(pdp_canvas_class, (t_method)pdp_canvas_average, gensym("average"), A_DEFFLOAT, A_NULL);
 
 }
 
