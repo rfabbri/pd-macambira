@@ -43,7 +43,7 @@ University of California, Berkeley.
 #include <sys/stat.h>
 #include <netinet/in.h>
 
-#include <rpc/rpc.h>
+// #include <rpc/rpc.h> l-osc: sendOSC, Date: Fri, 06 Feb 2004 05:02:42 +1100
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/times.h>
