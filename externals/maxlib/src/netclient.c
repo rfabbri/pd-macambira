@@ -25,8 +25,8 @@
 /* Changes: use circular message buffer for receive */
 /*          using pollfunction instead of clock (suggested by HCS) */
 
-#ifdef PD_0_37
 #include "m_pd.h"
+#if defined PD_MAJOR_VERSION && PD_MAJOR_VERSION==0 && PD_MINOR_VERSION==37
 #include "s_stuff.h"
 #endif
 #include "m_imp.h"
