@@ -467,24 +467,39 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 }
 
 
-static C *ReadAtom(C *c,A *a)
+static char *ReadAtom(char *c,A *a)
 {
-	// skip whitespace
+	// skip leading whitespace
 	while(*c && isspace(*c)) ++c;
 	if(!*c) return NULL;
 
-	const C *m = c; // remember position
-
+	char tmp[1024];
+    char *m = tmp; // write position
+    
     // go to next whitespace
-    // \todo recognize symbol escapes
-    for(; *c && !isspace(*c); ++c) {}
+    for(bool escaped = false;; ++c)
+        if(*c == '\\') {
+            if(escaped) {
+                *m++ = *c;
+                escaped = false;
+            }
+            else
+                escaped = true;
+        }
+        else if(!*c || (isspace(*c) && !escaped)) {
+                *m = 0;
+                break;
+        }
+        else {
+            *m++ = *c;
+            escaped = false;
+        }
 
     // save character and set delimiter
-    char t = *c; *c = 0;
 
     float fres;
     // first try float
-    if(sscanf(m,"%f",&fres) == 1) {
+    if(sscanf(tmp,"%f",&fres) == 1) {
         if(a) {
             int ires = (int)fres; // try a cast
             if(fres == ires)
@@ -495,11 +510,9 @@ static C *ReadAtom(C *c,A *a)
     }
     // no, it's a symbol
     else {
-        if(a) flext::SetString(*a,m);
+        if(a) flext::SetString(*a,tmp);
     }
 
-    // set back the saved character
-    *c = t;
 	return c;
 }
 
@@ -542,18 +555,22 @@ static V WriteAtom(ostream &os,const A &a)
 		os << a.a_w.w_long;
 		break;
 #endif
-	case A_SYMBOL:
-		os << flext::GetString(flext::GetSymbol(a));
+    case A_SYMBOL: {
+        const char *c = flext::GetString(flext::GetSymbol(a));
+        for(; *c; ++c) {
+            if(isspace(*c) || *c == '\\' || *c == ',')
+                os << '\\';
+	        os << *c;
+        }
 		break;
 	}
+    }
 }
 
 static V WriteAtoms(ostream &os,const flext::AtomList &l)
 {
 	for(I i = 0; i < l.Count(); ++i) {
-//        if(IsSymbol(l[i]) os << "\"";
 		WriteAtom(os,l[i]);
-//        if(IsSymbol(l[i]) os << "\"";
 		if(i < l.Count()-1) os << ' ';
 	}
 }

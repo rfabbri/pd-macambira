@@ -83,6 +83,7 @@ Version history:
 - added "clri" message to erase elements at index
 - fixed bad bug: pool::priv was not initialized
 - enhanced and optimized atom parsing
+- escaped symbols (with \) for whitespace support on store and load
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
@@ -102,14 +103,6 @@ Version history:
 
 ---------------------------------------------------------------------------
 
-BUGS:
-- pool does not handle symbols with spaces, colons or all digits
-
-
-TODO list:
-- check for invalid symbols (spaces, colons)
-
 general:
 - what is output as value if it is key only? (Max->nothing!)
 - XML format ok?
-

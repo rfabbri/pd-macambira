@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="f:\prog\pd\pd-cvs\src,f:\prog\max\flext\source"
+				AdditionalIncludeDirectories="c:\programme\audio\pd\bin\src,..\flext\source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
@@ -43,7 +43,7 @@
 				OutputFile="pd-msvc/pool.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="f:\prog\pd\pd-cvs\bin,f:\prog\max\flext\pd-msvc"
+				AdditionalLibraryDirectories="c:\programme\audio\pd\bin"
 				ProgramDatabaseFile=".\pd-msvc/r/pool.pdb"
 				ImportLibrary=".\pd-msvc/r/pool.lib"
 				TargetMachine="1"/>
@@ -87,7 +87,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;c:\data\prog\pd\pd-cvs\src&quot;;c:\data\prog\max\flext\source"
+				AdditionalIncludeDirectories="&quot;c:\data\pd\pd-cvs\src&quot;;..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"

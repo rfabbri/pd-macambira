@@ -232,7 +232,7 @@ pooldata *pool::head,*pool::tail;
 V pool::setup(t_classid c)
 {
 	post("");
-	post("pool %s - hierarchical storage object, (C)2002-2004 Thomas Grill",POOL_VERSION);
+	post("pool %s - hierarchical storage object, (C)2002-2005 Thomas Grill",POOL_VERSION);
 	post("");
 
 	head = tail = NULL;
