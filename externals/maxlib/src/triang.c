@@ -58,12 +58,23 @@ static void rand_triang_bang(t_rand_triang *x)
     outlet_float(x->x_obj.ob_outlet, 0.5*(u1+u2));
 }
 
+#ifndef MAXLIB
 void triang_setup(void)
 {
     rand_triang_class = class_new(gensym("triang"), (t_newmethod)rand_triang_new, 0,
     	sizeof(t_rand_triang), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_triang_setup(void)
+{
+    rand_triang_class = class_new(gensym("maxlib_triang"), (t_newmethod)rand_triang_new, 0,
+    	sizeof(t_rand_triang), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)rand_triang_new, gensym("triang"), A_DEFFLOAT, 0);
+#endif
     class_addbang(rand_triang_class, rand_triang_bang);
 #ifndef MAXLIB
+	class_sethelpsymbol(rand_triang_class, gensym("help-triang.pd"));
     post(version);
+#else
+	class_sethelpsymbol(rand_triang_class, gensym("maxlib/help-triang.pd"));
 #endif
 }

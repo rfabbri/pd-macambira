@@ -460,9 +460,6 @@ static void *ml_new(t_floatarg size, t_floatarg view_start, t_floatarg view_size
 	post("mlife: INTSIZE=%ld, LONGSIZE=%ld", (long)INTSIZE, (long)LONGSIZE);
 #endif
 
-#ifndef MAXLIB
-    post(version);
-#endif
 	post("mlife: defaults are: lo=%ld, hi=%ld, nset=%ld", (long)DEFAULT_DIE_LO, (long)DEFAULT_DIE_HI, DEFAULT_N_SIZE);
 
 	return(mlp);				// always return a copy of the created object 
@@ -479,6 +476,7 @@ static void ml_free(t_maxlife *mlp)
 		freeobject(mlp->out[i]); */
 }
 
+#ifndef MAXLIB
 void mlife_setup(void)
 {
     mlife_class = class_new(gensym("mlife"), (t_newmethod)ml_new,
@@ -493,4 +491,25 @@ void mlife_setup(void)
 	class_addmethod(mlife_class, (t_method)ml_display, gensym("display"), 0);
     class_addfloat(mlife_class, ml_int);
 	class_addbang(mlife_class, ml_bang);
+    class_sethelpsymbol(mlife_class, gensym("help-mlife.pd"));
+    post(version);
 }
+#else
+void maxlib_mlife_setup(void)
+{
+    mlife_class = class_new(gensym("maxlib_mlife"), (t_newmethod)ml_new,
+    	(t_method)ml_free, sizeof(t_maxlife), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)ml_new, gensym("mlife"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(mlife_class, (t_method)ml_randfill, gensym("randfill"), 0);
+	class_addmethod(mlife_class, (t_method)ml_fill, gensym("fill"), A_FLOAT, 0);
+    class_addmethod(mlife_class, (t_method)ml_set_die_lo, gensym("lo"), A_FLOAT, 0);
+    class_addmethod(mlife_class, (t_method)ml_set_die_hi, gensym("hi"), A_FLOAT, 0);
+    class_addmethod(mlife_class, (t_method)ml_set_neighbourhood, gensym("nset"), A_FLOAT, 0);
+    class_addmethod(mlife_class, (t_method)ml_randseed, gensym("randseed"), A_FLOAT, 0);
+	class_addmethod(mlife_class, (t_method)ml_seed, gensym("seed"), A_FLOAT, A_FLOAT, 0);
+	class_addmethod(mlife_class, (t_method)ml_display, gensym("display"), 0);
+    class_addfloat(mlife_class, ml_int);
+	class_addbang(mlife_class, ml_bang);
+    class_sethelpsymbol(mlife_class, gensym("maxlib/help-mlife.pd"));
+}
+#endif

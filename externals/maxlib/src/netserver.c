@@ -23,14 +23,11 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
-#include <m_pd.h>
-#if defined(PD_VERSION) &&  (PD_MAJOR_VERSION >= 0 && PD_MINOR_VERSION > 36)
-#include <m_imp.h>
-#include <s_stuff.h>
-#else
-#include <m_imp.h>
+#ifndef PD_0_36
+#include "m_pd.h"
+#include "s_stuff.h"
 #endif
-
+#include "m_imp.h"
 
 #include <sys/types.h>
 #include <stdarg.h>
@@ -40,7 +37,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -541,9 +538,7 @@ static void *netserver_new(t_floatarg fportno)
     x->x_connectsocket = sockfd;
     x->x_nconnections = 0;
 	for(i = 0; i < MAX_CONNECT; i++)x->x_fd[i] = -1;
-#ifndef MAXLIB
-    post(version);
-#endif
+
     return (x);
 }
 
@@ -563,6 +558,7 @@ static void netserver_free(t_netserver *x)
 	binbuf_free(inbinbuf);
 }
 
+#ifndef MAXLIB
 void netserver_setup(void)
 {
     netserver_class = class_new(gensym("netserver"),(t_newmethod)netserver_new, (t_method)netserver_free,
@@ -571,4 +567,19 @@ void netserver_setup(void)
 	class_addmethod(netserver_class, (t_method)netserver_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netserver_class, (t_method)netserver_client_send, gensym("client"), A_GIMME, 0);
 	class_addmethod(netserver_class, (t_method)netserver_broadcast, gensym("broadcast"), A_GIMME, 0);
+	class_sethelpsymbol(netserver_class, gensym("help-netserver.pd"));
+    post(version);
 }
+#else
+void maxlib_netserver_setup(void)
+{
+    netserver_class = class_new(gensym("maxlib_netserver"),(t_newmethod)netserver_new, (t_method)netserver_free,
+    	sizeof(t_netserver), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)netserver_new, gensym("netserver"), A_DEFFLOAT, 0);
+	class_addmethod(netserver_class, (t_method)netserver_print, gensym("print"), 0);
+	class_addmethod(netserver_class, (t_method)netserver_send, gensym("send"), A_GIMME, 0);
+	class_addmethod(netserver_class, (t_method)netserver_client_send, gensym("client"), A_GIMME, 0);
+	class_addmethod(netserver_class, (t_method)netserver_broadcast, gensym("broadcast"), A_GIMME, 0);
+	class_sethelpsymbol(netserver_class, gensym("maxlib/help-netserver.pd"));
+}
+#endif

@@ -82,12 +82,11 @@ static void *minus_new(t_symbol *s, t_int argc, t_atom* argv)
 		x->x_minusvalue[i] = atom_getfloatarg(i, argc, argv);
 	}
 	x->x_numvalues = i;
-#ifndef MAXLIB
-    post(version);
-#endif
+
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void minus_setup(void)
 {
     minus_class = class_new(gensym("minus"), (t_newmethod)minus_new,
@@ -95,5 +94,18 @@ void minus_setup(void)
     class_addfloat(minus_class, minus_float);
     class_addmethod(minus_class, (t_method)minus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(minus_class, (t_method)minus_bang);
+    class_sethelpsymbol(minus_class, gensym("help-minus.pd"));
+    post(version);
 }
-
+#else
+void maxlib_minus_setup(void)
+{
+    minus_class = class_new(gensym("maxlib_minus"), (t_newmethod)minus_new,
+    	0, sizeof(t_minus), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)minus_new, gensym("minus"), A_GIMME, 0);
+    class_addfloat(minus_class, minus_float);
+    class_addmethod(minus_class, (t_method)minus_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addbang(minus_class, (t_method)minus_bang);
+    class_sethelpsymbol(minus_class, gensym("maxlib/help-minus.pd"));
+}
+#endif

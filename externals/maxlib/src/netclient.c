@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -71,7 +71,7 @@ static void sys_sockerror(char *s)
     int err = WSAGetLastError();
     if (err == 10054) return;
 #endif
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
     int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
@@ -79,7 +79,7 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd) {
 
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
     close(fd);
 #endif
 #ifdef NT
@@ -334,6 +334,7 @@ static void netclient_free(t_netclient *x)
     clock_free(x->x_clock);
 }
 
+#ifndef MAXLIB
 void netclient_setup(void)
 {
     netclient_class = class_new(gensym("netclient"), (t_newmethod)netclient_new,
@@ -344,4 +345,21 @@ void netclient_setup(void)
     class_addmethod(netclient_class, (t_method)netclient_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("receive"), 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("rcv"), 0);
+    class_sethelpsymbol(netclient_class, gensym("help-netclient.pd"));
+	post(version);
 }
+#else
+void maxlib_netclient_setup(void)
+{
+    netclient_class = class_new(gensym("maxlib_netclient"), (t_newmethod)netclient_new,
+    	(t_method)netclient_free,
+    	sizeof(t_netclient), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)netclient_new, gensym("netclient"), A_DEFFLOAT, 0);
+    class_addmethod(netclient_class, (t_method)netclient_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(netclient_class, (t_method)netclient_disconnect, gensym("disconnect"), 0);
+    class_addmethod(netclient_class, (t_method)netclient_send, gensym("send"), A_GIMME, 0);
+	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("receive"), 0);
+	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("rcv"), 0);
+    class_sethelpsymbol(netclient_class, gensym("maxlib/help-netclient.pd"));
+}
+#endif

@@ -65,12 +65,22 @@ static void rand_expo_bang(t_rand_expo *x)
     outlet_float(x->x_obj.ob_outlet, -log(u)/l);
 }
 
+#ifndef MAXLIB
 void expo_setup(void)
 {
     rand_expo_class = class_new(gensym("expo"), (t_newmethod)rand_expo_new, 0,
     	sizeof(t_rand_expo), 0, A_DEFFLOAT, 0);
     class_addbang(rand_expo_class, rand_expo_bang);
-#ifndef MAXLIB
+	class_sethelpsymbol(rand_expo_class, gensym("help-expo.pd"));
     post(version);
-#endif
 }
+#else
+void maxlib_expo_setup(void)
+{
+    rand_expo_class = class_new(gensym("maxlib_expo"), (t_newmethod)rand_expo_new, 0,
+    	sizeof(t_rand_expo), 0, A_DEFFLOAT, 0);
+    class_addbang(rand_expo_class, rand_expo_bang);
+	class_addcreator((t_newmethod)rand_expo_new, gensym("expo"), A_DEFFLOAT, 0);
+	class_sethelpsymbol(rand_expo_class, gensym("maxlib/help-expo.pd"));
+}
+#endif

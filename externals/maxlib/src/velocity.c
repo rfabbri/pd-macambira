@@ -83,19 +83,30 @@ static void *velocity_new(t_floatarg f)
 {
     t_velocity *x = (t_velocity *)pd_new(velocity_class);
 	x->x_out = outlet_new(&x->x_ob, gensym("float"));
-#ifndef MAXLIB
-    post(version);
-#endif
 	x->x_lasttime = clock_getlogicaltime();
 
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void velocity_setup(void)
 {
     velocity_class = class_new(gensym("velocity"), (t_newmethod)velocity_new,
     	(t_method)velocity_free, sizeof(t_velocity), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_velocity_setup(void)
+{
+    velocity_class = class_new(gensym("maxlib_velocity"), (t_newmethod)velocity_new,
+    	(t_method)velocity_free, sizeof(t_velocity), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)velocity_new, gensym("velocity"), A_DEFFLOAT, 0);
+#endif
     class_addfloat(velocity_class, velocity_float);
 	class_addbang(velocity_class, velocity_bang);
+#ifndef MAXLIB
+    class_sethelpsymbol(velocity_class, gensym("help-velocity.pd"));
+    post(version);
+#else
+    class_sethelpsymbol(velocity_class, gensym("maxlib/help-velocity.pd"));
+#endif
 }
 

@@ -70,16 +70,27 @@ static void *fifo_new(t_floatarg n)
 	x->getal = (t_float *)getbytes(x->size * sizeof(t_float));
 	x->out = outlet_new(&x->d_ob, gensym("float"));
 		
-#ifndef MAXLIB
-    post(version);
-#endif
 	return (x);
 }
 
+#ifndef MAXLIB
 void fifo_setup(void)
 {
     fifo_class = class_new(gensym("fifo"), (t_newmethod)fifo_new,
     	(t_method)fifo_free, sizeof(t_fifo), 0, A_DEFFLOAT, 0);
     class_addfloat(fifo_class, fifo_int);
 	class_addbang(fifo_class, fifo_bang);
+    class_sethelpsymbol(fifo_class, gensym("help-fifo.pd"));
+    post(version);
 }
+#else
+void maxlib_fifo_setup(void)
+{
+    fifo_class = class_new(gensym("maxlib_fifo"), (t_newmethod)fifo_new,
+    	(t_method)fifo_free, sizeof(t_fifo), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)fifo_new, gensym("fifo"), A_DEFFLOAT, 0);
+    class_addfloat(fifo_class, fifo_int);
+	class_addbang(fifo_class, fifo_bang);
+    class_sethelpsymbol(fifo_class, gensym("maxlib/help-fifo.pd"));
+}
+#endif

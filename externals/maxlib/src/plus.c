@@ -82,12 +82,10 @@ static void *plus_new(t_symbol *s, t_int argc, t_atom* argv)
 	}
 	x->x_numvalues = i;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void plus_setup(void)
 {
     plus_class = class_new(gensym("plus"), (t_newmethod)plus_new,
@@ -95,5 +93,18 @@ void plus_setup(void)
     class_addfloat(plus_class, plus_float);
     class_addmethod(plus_class, (t_method)plus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(plus_class, (t_method)plus_bang);
+    class_sethelpsymbol(plus_class, gensym("help-plus.pd"));
+    post(version);
 }
-
+#else
+void maxlib_plus_setup(void)
+{
+    plus_class = class_new(gensym("maxlib_plus"), (t_newmethod)plus_new,
+    	0, sizeof(t_plus), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)plus_new, gensym("plus"), A_GIMME, 0);
+    class_addfloat(plus_class, plus_float);
+    class_addmethod(plus_class, (t_method)plus_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addbang(plus_class, (t_method)plus_bang);
+    class_sethelpsymbol(plus_class, gensym("maxlib/help-plus.pd"));
+}
+#endif

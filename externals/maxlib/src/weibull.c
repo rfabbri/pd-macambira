@@ -73,12 +73,23 @@ static void rand_weibull_bang(t_rand_weibull *x)
     outlet_float(x->x_obj.ob_outlet, x->x_s*pow(log(a), tinv));
 }
 
+#ifndef MAXLIB
 void weibull_setup(void)
 {
     rand_weibull_class = class_new(gensym("weibull"), (t_newmethod)rand_weibull_new, 0,
     	sizeof(t_rand_weibull), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addbang(rand_weibull_class, rand_weibull_bang);
+#else
+void maxlib_weibull_setup(void)
+{
+    rand_weibull_class = class_new(gensym("maxlib_weibull"), (t_newmethod)rand_weibull_new, 0,
+    	sizeof(t_rand_weibull), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addcreator((t_newmethod)rand_weibull_new, gensym("weibull"), A_DEFFLOAT, A_DEFFLOAT, 0);
+#endif
+	class_addbang(rand_weibull_class, rand_weibull_bang);
 #ifndef MAXLIB
+	class_sethelpsymbol(rand_weibull_class, gensym("help-weibull.pd"));
     post(version);
+#else
+	class_sethelpsymbol(rand_weibull_class, gensym("maxlib/help-weibull.pd"));
 #endif
 }

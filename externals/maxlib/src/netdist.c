@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -67,7 +67,7 @@ static void sys_sockerror(char *s)
     int err = WSAGetLastError();
     if (err == 10054) return;
 #endif
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
     int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
@@ -75,7 +75,7 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd) {
 
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
     close(fd);
 #endif
 #ifdef NT
@@ -98,10 +98,8 @@ static void *netdist_new(t_floatarg udpflag)
     for(i = 0; i < MAX_REC; i++)x->x_fd[i] = -1;
 	x->x_numconnect = -1;
     x->x_protocol = (udpflag != 0 ? SOCK_DGRAM : SOCK_STREAM);
-#ifndef MAXLIB
-    post(version);
-#endif
-		/* prepare child thread */
+
+	/* prepare child thread */
     if(pthread_attr_init(&x->x_threadattr) < 0)
        post("netdist: warning: could not prepare child thread" );
     if(pthread_attr_setdetachstate(&x->x_threadattr, PTHREAD_CREATE_DETACHED) < 0)
@@ -288,6 +286,7 @@ static void netdist_free(t_netdist *x)
     clock_free(x->x_clock);
 }
 
+#ifndef MAXLIB
 void netdist_setup(void)
 {
     netdist_class = class_new(gensym("netdist"), (t_newmethod)netdist_new,
@@ -297,7 +296,20 @@ void netdist_setup(void)
     class_addmethod(netdist_class, (t_method)netdist_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netdist_class, (t_method)netdist_clear, gensym("clear"), 0);
 	class_addmethod(netdist_class, (t_method)netdist_print, gensym("print"), 0);
+	class_sethelpsymbol(netdist_class, gensym("help-netdist.pd"));
+    post(version);
 }
-
-
-
+#else
+void maxlib_netdist_setup(void)
+{
+    netdist_class = class_new(gensym("maxlib_netdist"), (t_newmethod)netdist_new,
+    	(t_method)netdist_free, sizeof(t_netdist), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)netdist_new, gensym("netdist"), A_DEFFLOAT, 0);
+    class_addmethod(netdist_class, (t_method)netdist_connect, gensym("connect"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(netdist_class, (t_method)netdist_disconnect, gensym("disconnect"), A_SYMBOL, A_FLOAT, 0);
+    class_addmethod(netdist_class, (t_method)netdist_send, gensym("send"), A_GIMME, 0);
+	class_addmethod(netdist_class, (t_method)netdist_clear, gensym("clear"), 0);
+	class_addmethod(netdist_class, (t_method)netdist_print, gensym("print"), 0);
+	class_sethelpsymbol(netdist_class, gensym("maxlib/help-netdist.pd"));
+}
+#endif

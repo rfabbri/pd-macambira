@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 #define MAX_REC 64		            /* maximum number of receive objects */
-#define MAX_ARG 32		            /* maximum number of arguments to pass on */
+#define MAX_ARG 64		            /* maximum number of arguments to pass on */
 
 static char *version = "remote v0.2, written by Olaf Matthes <olaf.matthes@gmx.de>";
 
@@ -84,15 +84,25 @@ static void *remote_new(t_symbol *s)
 	if(x->x_prefix) x->x_prepend = 1;
 	else x->x_prepend = 0;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (x);
 }
 
+#ifndef MAXLIB
 void remote_setup(void)
 {
     remote_class = class_new(gensym("remote"), (t_newmethod)remote_new, 0,
     	sizeof(t_remote), 0, A_DEFSYM, 0);
     class_addanything(remote_class, remote_anything);
+	class_sethelpsymbol(remote_class, gensym("help-remote.pd"));
+    post(version);
 }
+#else
+void maxlib_remote_setup(void)
+{
+    remote_class = class_new(gensym("maxlib_remote"), (t_newmethod)remote_new, 0,
+    	sizeof(t_remote), 0, A_DEFSYM, 0);
+	class_addcreator((t_newmethod)remote_new, gensym("remote"), A_DEFSYM, 0);
+    class_addanything(remote_class, remote_anything);
+	class_sethelpsymbol(remote_class, gensym("maxlib/help-remote.pd"));
+}
+#endif

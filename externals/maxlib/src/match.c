@@ -29,11 +29,9 @@
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* LATER compare with match.c from max sdk */
 
 #include <string.h>
 #include "m_pd.h"
-// #include "hammer.h"
 
 #define MATCH_INISIZE  16  /* LATER rethink */
 
@@ -250,10 +248,18 @@ static void *match_new(t_symbol *s, int ac, t_atom *av)
     return (x);
 }
 
+#ifndef MAXLIB
 void match_setup(void)
 {
     match_class = class_new(gensym("match"), (t_newmethod)match_new,
 		(t_method)match_free, sizeof(t_match), 0, A_GIMME, 0);
+#else
+void maxlib_match_setup(void)
+{
+    match_class = class_new(gensym("maxlib_match"), (t_newmethod)match_new,
+		(t_method)match_free, sizeof(t_match), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)match_new, gensym("match"), A_GIMME, 0);
+#endif
     class_addfloat(match_class, match_float);
     class_addsymbol(match_class, match_symbol);
     class_addlist(match_class, match_list);
@@ -261,6 +267,8 @@ void match_setup(void)
     class_addmethod(match_class, (t_method)match_set, gensym("set"), A_GIMME, 0);
     class_addmethod(match_class, (t_method)match_clear, gensym("clear"), 0);
 #ifndef MAXLIB
+    class_sethelpsymbol(match_class, gensym("help-match.pd"));
 #else
+    class_sethelpsymbol(match_class, gensym("maxlib/help-match.pd"));
 #endif
 }

@@ -154,13 +154,11 @@ static void *tilt_new(t_floatarg f, t_floatarg f2)
 	x->x_hi_limit = x->x_low_limit = x->x_trip_point = 0;
 	clock_delay(x->x_clock, x->x_wait);	/* wait 4 sec and start calculation */
 
-#ifndef MAXLIB
-    post(version);
-#endif
 	post("tilt: set interval to %g msec", x->x_wait);
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void tilt_setup(void)
 {
     tilt_class = class_new(gensym("tilt"), (t_newmethod)tilt_new,
@@ -171,5 +169,21 @@ void tilt_setup(void)
 	class_addmethod(tilt_class, (t_method)tilt_hi_limit, gensym("hi"), A_FLOAT, 0);
 	class_addmethod(tilt_class, (t_method)tilt_low_limit, gensym("low"), A_FLOAT, 0);
 	class_addmethod(tilt_class, (t_method)tilt_trip_point, gensym("trip"), A_FLOAT, 0);
+    class_sethelpsymbol(tilt_class, gensym("help-tilt.pd"));
+    post(version);
 }
-
+#else
+void maxlib_tilt_setup(void)
+{
+    tilt_class = class_new(gensym("maxlib_tilt"), (t_newmethod)tilt_new,
+    	(t_method)tilt_free, sizeof(t_tilt), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)tilt_new, gensym("tilt"), A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addfloat(tilt_class, tilt_float);
+	class_addmethod(tilt_class, (t_method)tilt_intv, gensym("intv"), A_FLOAT, 0);
+	class_addmethod(tilt_class, (t_method)tilt_tilt, gensym("tilt"), A_FLOAT, 0);
+	class_addmethod(tilt_class, (t_method)tilt_hi_limit, gensym("hi"), A_FLOAT, 0);
+	class_addmethod(tilt_class, (t_method)tilt_low_limit, gensym("low"), A_FLOAT, 0);
+	class_addmethod(tilt_class, (t_method)tilt_trip_point, gensym("trip"), A_FLOAT, 0);
+    class_sethelpsymbol(tilt_class, gensym("maxlib/help-tilt.pd"));
+}
+#endif

@@ -72,18 +72,29 @@ static void *divmod_new(t_floatarg fl, t_floatarg fr)
 	x->x_rightvalue = fr;
 	x->x_leftvalue = fl;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void divmod_setup(void)
 {
     divmod_class = class_new(gensym("divmod"), (t_newmethod)divmod_new,
     	0, sizeof(t_divmod), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+#else
+void maxlib_divmod_setup(void)
+{
+    divmod_class = class_new(gensym("maxlib_divmod"), (t_newmethod)divmod_new,
+    	0, sizeof(t_divmod), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+#endif
     class_addfloat(divmod_class, divmod_float);
     class_addmethod(divmod_class, (t_method)divmod_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(divmod_class, (t_method)divmod_bang);
+#ifndef MAXLIB
+    class_sethelpsymbol(divmod_class, gensym("help-divmod.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)divmod_new, gensym("divmod"), A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_sethelpsymbol(divmod_class, gensym("maxlib/help-divmod.pd"));
+#endif
 }
 

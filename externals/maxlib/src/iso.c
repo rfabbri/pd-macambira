@@ -1,6 +1,27 @@
-/* iso.c ---- queue up pitch and attack point series */
-/*  by Charlie Baker (baker@foxtrot.ccmrc.ucsb.edu)  */
-/*  Pd port by Olaf Matthes <olaf.matthes@gmx.de>    */
+/* ---------------------------- iso ------------------------------------------- */
+/*                                                                              */
+/* Queue up pitch and attack point series.                                      */
+/* Written by Olaf Matthes (olaf.matthes@gmx.de)                                */
+/* Based on iso for Max by Charlie Baker (baker@foxtrot.ccmrc.ucsb.edu).        */
+/* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
+/*                                                                              */
+/* This program is free software; you can redistribute it and/or                */
+/* modify it under the terms of the GNU General Public License                  */
+/* as published by the Free Software Foundation; either version 2               */
+/* of the License, or (at your option) any later version.                       */
+/*                                                                              */
+/* This program is distributed in the hope that it will be useful,              */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/* GNU General Public License for more details.                                 */
+/*                                                                              */
+/* You should have received a copy of the GNU General Public License            */
+/* along with this program; if not, write to the Free Software                  */
+/* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.  */
+/*                                                                              */
+/* Based on PureData by Miller Puckette and others.                             */
+/*                                                                              */
+/* ---------------------------------------------------------------------------- */
 
 #include "m_pd.h"
 #include <stdio.h>
@@ -148,9 +169,7 @@ static void *iso_new(void) {
 	x->pitches[0] = 60;
 	x->atks[0] = 500;
 	x->duty = 1.0;
-#ifndef MAXLIB
-	post(version);
-#endif
+
 	return (x);					/* always return a copy of the created object */
 }
 
@@ -159,6 +178,7 @@ static void iso_free(t_iso *x) {
 	clock_free(x->iso_clock);
 }
 
+#ifndef MAXLIB
 void iso_setup(void) {
 
     iso_class = class_new(gensym("iso"), (t_newmethod)iso_new,
@@ -174,4 +194,26 @@ void iso_setup(void) {
     class_addmethod(iso_class, (t_method)iso_hook, gensym("hook"), A_FLOAT, 0);
     class_addbang(iso_class, iso_bang);
 	class_addlist(iso_class, iso_pitch);
+    class_sethelpsymbol(iso_class, gensym("help-iso.pd"));
+	post(version);
 }
+#else
+void maxlib_iso_setup(void) {
+
+    iso_class = class_new(gensym("maxlib_iso"), (t_newmethod)iso_new,
+    	(t_method)iso_free, sizeof(t_iso), 0, 0);
+	class_addcreator((t_newmethod)iso_new, gensym("iso"), 0);
+    class_addmethod(iso_class, (t_method)iso_duty, gensym("duty"), A_FLOAT, 0);
+	class_addmethod(iso_class, (t_method)iso_list, gensym("attack"), A_GIMME, 0);
+    class_addmethod(iso_class, (t_method)iso_start, gensym("start"), A_GIMME, 0);
+    class_addmethod(iso_class, (t_method)iso_stop, gensym("stop"), 0);
+    class_addmethod(iso_class, (t_method)iso_pause, gensym("pause"), 0);
+    class_addmethod(iso_class, (t_method)iso_loop, gensym("loop"), 0);
+    class_addmethod(iso_class, (t_method)iso_unloop, gensym("unloop"), 0);
+    class_addmethod(iso_class, (t_method)iso_resume, gensym("resume"), 0);
+    class_addmethod(iso_class, (t_method)iso_hook, gensym("hook"), A_FLOAT, 0);
+    class_addbang(iso_class, iso_bang);
+	class_addlist(iso_class, iso_pitch);
+    class_sethelpsymbol(iso_class, gensym("maxlib/help-iso.pd"));
+}
+#endif

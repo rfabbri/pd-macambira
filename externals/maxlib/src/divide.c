@@ -82,18 +82,29 @@ static void *divide_new(t_symbol *s, t_int argc, t_atom* argv)
 	}
 	x->x_numvalues = i;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void divide_setup(void)
 {
     divide_class = class_new(gensym("divide"), (t_newmethod)divide_new,
     	0, sizeof(t_divide), 0, A_GIMME, 0);
+#else
+void maxlib_divide_setup(void)
+{
+    divide_class = class_new(gensym("maxlib_divide"), (t_newmethod)divide_new,
+    	0, sizeof(t_divide), 0, A_GIMME, 0);
+#endif
     class_addfloat(divide_class, divide_float);
     class_addmethod(divide_class, (t_method)divide_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(divide_class, (t_method)divide_bang);
+#ifndef MAXLIB
+    class_sethelpsymbol(divide_class, gensym("help-divide.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)divide_new, gensym("divide"), A_GIMME, 0);
+    class_sethelpsymbol(divide_class, gensym("maxlib/help-divide.pd"));
+#endif
 }
 

@@ -366,9 +366,6 @@ static void *subst_new(t_symbol *s, int argc, t_atom *argv)
 	long i;
 	t_symbol *sym;
 	t_subst *x = (t_subst *)pd_new(subst_class);
-#ifndef MAXLIB
-    post(version);
-#endif
 	// read in order...
 	x->x_order = 3;
 	if(argc == 1)
@@ -391,8 +388,10 @@ static void *subst_new(t_symbol *s, int argc, t_atom *argv)
 
 static void subst_free(t_subst *x)
 {
+	/* nothing to do */
 }
 
+#ifndef MAXLIB
 void subst_setup(void)
 {
     subst_class = class_new(gensym("subst"), (t_newmethod)subst_new,
@@ -404,4 +403,22 @@ void subst_setup(void)
 	class_addmethod(subst_class, (t_method)subst_display, gensym("display"), 0);
 	class_addlist(subst_class, subst_list);
 	class_addbang(subst_class, subst_bang);
+    class_sethelpsymbol(subst_class, gensym("help-subst.pd"));
+    post(version);
 }
+#else
+void maxlib_subst_setup(void)
+{
+    subst_class = class_new(gensym("maxlib_subst"), (t_newmethod)subst_new,
+    	(t_method)subst_free, sizeof(t_subst), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)subst_new, gensym("subst"), A_GIMME, 0);
+    class_addmethod(subst_class, (t_method)subst_set_order, gensym("order"), A_FLOAT, 0);
+    class_addmethod(subst_class, (t_method)subst_intv, gensym("interval"), A_FLOAT, 0);
+	class_addmethod(subst_class, (t_method)subst_set, gensym("set"), A_SYMBOL, 0);
+	class_addmethod(subst_class, (t_method)subst_load, gensym("load"), A_SYMBOL, 0);
+	class_addmethod(subst_class, (t_method)subst_display, gensym("display"), 0);
+	class_addlist(subst_class, subst_list);
+	class_addbang(subst_class, subst_bang);
+    class_sethelpsymbol(subst_class, gensym("maxlib/help-subst.pd"));
+}
+#endif

@@ -71,19 +71,25 @@ static void *split_new(t_floatarg fmin, t_floatarg fmax)
 	x->x_min = fmin;
 	x->x_max = fmax;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void split_setup(void)
 {
     split_class = class_new(gensym("split"), (t_newmethod)split_new,
     	0, sizeof(t_split), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(split_class, split_float);
-#ifndef MAXLIB
-#else
-#endif
+    class_sethelpsymbol(split_class, gensym("help-split.pd"));
+    post(version);
 }
-
+#else
+void maxlib_split_setup(void)
+{
+    split_class = class_new(gensym("maxlib_split"), (t_newmethod)split_new,
+    	0, sizeof(t_split), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)split_new, gensym("split"), A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addfloat(split_class, split_float);
+    class_sethelpsymbol(split_class, gensym("maxlib/help-split.pd"));
+}
+#endif

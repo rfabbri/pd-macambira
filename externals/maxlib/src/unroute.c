@@ -142,19 +142,22 @@ static void *unroute_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	x->x_outlet = outlet_new(&x->x_obj, gensym("float"));
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void unroute_setup(void)
 {
     unroute_class = class_new(gensym("unroute"), (t_newmethod)unroute_new,
     	0, sizeof(t_unroute), 0, A_GIMME, 0);
-		
+#else
+void maxlib_unroute_setup(void)
+{
+    unroute_class = class_new(gensym("maxlib_unroute"), (t_newmethod)unroute_new,
+    	0, sizeof(t_unroute), 0, A_GIMME, 0);
+#endif
 		/* a class for the proxy inlet: */
-	proxy_class = class_new(gensym("proxy"), NULL, NULL, sizeof(t_proxy),
+	proxy_class = class_new(gensym("maxlib_unroute_proxy"), NULL, NULL, sizeof(t_proxy),
 		CLASS_PD|CLASS_NOINLET, A_NULL);
 
 	class_addanything(proxy_class, unroute_input);
@@ -163,6 +166,10 @@ void unroute_setup(void)
     class_addlist(unroute_class, unroute_list);
     class_addanything(unroute_class, unroute_any);
 #ifndef MAXLIB
+    class_sethelpsymbol(unroute_class, gensym("help-unroute.pd"));
+    post(version);
 #else
+	class_addcreator((t_newmethod)unroute_new, gensym("unroute"), A_GIMME, 0);
+    class_sethelpsymbol(unroute_class, gensym("maxlib/help-unroute.pd"));
 #endif
 }

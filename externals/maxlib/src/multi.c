@@ -81,12 +81,11 @@ static void *multi_new(t_symbol *s, t_int argc, t_atom* argv)
 		x->x_multivalue[i] = atom_getfloatarg(i, argc, argv);;
 	}
 	x->x_numvalues = i;
-#ifndef MAXLIB
-    post(version);
-#endif
+
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void multi_setup(void)
 {
     multi_class = class_new(gensym("multi"), (t_newmethod)multi_new,
@@ -94,5 +93,18 @@ void multi_setup(void)
     class_addfloat(multi_class, multi_float);
     class_addmethod(multi_class, (t_method)multi_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(multi_class, (t_method)multi_bang);
+    class_sethelpsymbol(multi_class, gensym("help-multi.pd"));
+    post(version);
 }
-
+#else
+void maxlib_multi_setup(void)
+{
+    multi_class = class_new(gensym("maxlib_multi"), (t_newmethod)multi_new,
+    	0, sizeof(t_multi), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)multi_new, gensym("multi"), A_GIMME, 0);
+    class_addfloat(multi_class, multi_float);
+    class_addmethod(multi_class, (t_method)multi_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addbang(multi_class, (t_method)multi_bang);
+    class_sethelpsymbol(multi_class, gensym("maxlib/help-multi.pd"));
+}
+#endif

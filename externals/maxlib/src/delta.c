@@ -110,18 +110,30 @@ static void *delta_new(t_floatarg f)
 		x->x_clearflag = 1;
 	x->x_delta = 0;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void delta_setup(void)
 {
     delta_class = class_new(gensym("delta"), (t_newmethod)delta_new,
     	0, sizeof(t_delta), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_delta_setup(void)
+{
+    delta_class = class_new(gensym("maxlib_delta"), (t_newmethod)delta_new,
+    	0, sizeof(t_delta), 0, A_DEFFLOAT, 0);
+#endif
     class_addfloat(delta_class, delta_float);
 	class_addbang(delta_class, (t_method)delta_bang);
 	class_addmethod(delta_class, (t_method)delta_clear, gensym("clear"), 0);
+    class_sethelpsymbol(delta_class, gensym("maxlib/help-delta.pd"));
+#ifndef MAXLIB
+    class_sethelpsymbol(delta_class, gensym("help-delta.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)delta_new, gensym("delta"), A_DEFFLOAT, 0);
+    class_sethelpsymbol(delta_class, gensym("maxlib/help-delta.pd"));
+#endif
 }
 

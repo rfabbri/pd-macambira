@@ -372,22 +372,32 @@ static void *beat_new(t_floatarg f)
 	x->x_band_percent = 4;	/* allow 4% 'jitter' by default */
 	if(f)x->x_band_percent = (t_int)f;
 
-#ifndef MAXLIB
-    post(version);
-#endif
 	post("beat: band percentage set to %d", x->x_band_percent);
 
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void beat_setup(void)
 {
     beat_class = class_new(gensym("beat"), (t_newmethod)beat_new,
     	(t_method)beat_free, sizeof(t_beat), 0, A_DEFFLOAT, 0);
-	class_addcreator((t_newmethod)beat_new, gensym("max.beat"), A_DEFFLOAT, 0);
+#else
+void maxlib_beat_setup(void)
+{
+    beat_class = class_new(gensym("maxlib_beat"), (t_newmethod)beat_new,
+    	(t_method)beat_free, sizeof(t_beat), 0, A_DEFFLOAT, 0);
+#endif
     class_addfloat(beat_class, beat_float);
 	class_addmethod(beat_class, (t_method)beat_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addmethod(beat_class, (t_method)beat_reset, gensym("reset"), 0);
 	class_addmethod(beat_class, (t_method)beat_print, gensym("print"), 0);
+#ifndef MAXLIB
+    class_sethelpsymbol(beat_class, gensym("help-beat.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)beat_new, gensym("beat"), A_DEFFLOAT, 0);
+    class_sethelpsymbol(beat_class, gensym("maxlib/help-beat.pd"));
+#endif
 }
 

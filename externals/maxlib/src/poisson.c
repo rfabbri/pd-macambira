@@ -70,12 +70,22 @@ static void rand_poisson_bang(t_rand_poisson *x)
     outlet_float(x->x_obj.ob_outlet, n);
 }
 
+#ifndef MAXLIB
 void poisson_setup(void)
 {
     rand_poisson_class = class_new(gensym("poisson"), (t_newmethod)rand_poisson_new, 0,
     	sizeof(t_rand_poisson), 0, A_DEFFLOAT, 0);
     class_addbang(rand_poisson_class, rand_poisson_bang);
-#ifndef MAXLIB
+	class_sethelpsymbol(rand_poisson_class, gensym("help-poisson.pd"));
     post(version);
-#endif
 }
+#else
+void maxlib_poisson_setup(void)
+{
+    rand_poisson_class = class_new(gensym("maxlib_poisson"), (t_newmethod)rand_poisson_new, 0,
+    	sizeof(t_rand_poisson), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)rand_poisson_new, gensym("poisson"), A_DEFFLOAT, 0);
+    class_addbang(rand_poisson_class, rand_poisson_bang);
+	class_sethelpsymbol(rand_poisson_class, gensym("maxlib/help-poisson.pd"));
+}
+#endif

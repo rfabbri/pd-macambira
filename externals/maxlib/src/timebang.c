@@ -29,7 +29,7 @@
 
 #define MAX_TIMES 256			/* maximum number of times to process */
 
-static char *version = "timebang v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
+static char *version = "timebang v0.2, written by Olaf Matthes <olaf.matthes@gmx.de>";
  
 typedef struct timebang
 {
@@ -76,6 +76,27 @@ static void timebang_tick(t_timebang *x)
 
 static void timebang_set(t_timebang *x, t_symbol *s, int ac, t_atom *av)
 {
+	int i;
+
+	if(ac == x->x_notimes * 3)
+	{
+		for(i = 0; i < ac; i += 3)
+		{
+			if (av[i].a_type == A_FLOAT) x->x_hour[x->x_notimes] = av[i].a_w.w_float;
+			else { post ("timebang: first argument must be (int) hours"); return; }
+			if (av[i+1].a_type == A_FLOAT) x->x_min[x->x_notimes] = av[i+1].a_w.w_float;
+			else { post ("timebang: second argument must be (int) minutes"); return; }
+			if (av[i+2].a_type == A_FLOAT) x->x_sec[x->x_notimes] = av[i+2].a_w.w_float;
+			else { post ("timebang: third argument must be (int) seconds"); return; }
+			x->x_over[i] = 0;
+		}
+		post("timebang: read in %d times of day:", x->x_notimes);
+		for(i = 0; i < x->x_notimes; i++)
+		{
+			post("          %02d:%02d:%02d", x->x_hour[i], x->x_min[i], x->x_sec[i]);
+		}
+	}
+	else post("timebang: wrong number of parameter");
 }
 
 static void timebang_bang(t_timebang *x)
@@ -94,9 +115,6 @@ static void *timebang_new(t_symbol *s, int ac, t_atom *av)
 
 	x->x_clock = clock_new(x, (t_method)timebang_tick);
 
-#ifndef MAXLIB
-    post(version);
-#endif
 	if(ac > MAX_TIMES * 3)
 	{
 		post("timebang: too many creation arguments");
@@ -132,14 +150,25 @@ static void timebang_free(t_timebang *x)
 	clock_free(x->x_clock);
 }
 
+#ifndef MAXLIB
 void timebang_setup(void)
 {
     timebang_class = class_new(gensym("timebang"), (t_newmethod)timebang_new,
     	(t_method)timebang_free, sizeof(t_timebang), 0, A_GIMME, 0);
+#else
+void maxlib_timebang_setup(void)
+{
+    timebang_class = class_new(gensym("maxlib_timebang"), (t_newmethod)timebang_new,
+    	(t_method)timebang_free, sizeof(t_timebang), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)timebang_new, gensym("timebang"), A_GIMME, 0);
+#endif
 	class_addmethod(timebang_class, (t_method)timebang_set, gensym("set"), A_GIMME, 0);
 	class_addbang(timebang_class, (t_method)timebang_bang);
 #ifndef MAXLIB
+    class_sethelpsymbol(timebang_class, gensym("help-timebang.pd"));
+    post(version);
 #else
+    class_sethelpsymbol(timebang_class, gensym("maxlib/help-timebang.pd"));
 #endif
 }
 

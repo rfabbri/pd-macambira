@@ -57,19 +57,26 @@ static void *edge_new(t_floatarg f)
 
 	x->x_lastval = f;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void edge_setup(void)
 {
     edge_class = class_new(gensym("edge"), (t_newmethod)edge_new,
     	0, sizeof(t_edge), 0, A_DEFFLOAT, 0);
     class_addfloat(edge_class, edge_float);
-#ifndef MAXLIB
-#else
-#endif
+    class_sethelpsymbol(edge_class, gensym("help-edge.pd"));
+    post(version);
 }
+#else
+void maxlib_edge_setup(void)
+{
+    edge_class = class_new(gensym("maxlib_edge"), (t_newmethod)edge_new,
+    	0, sizeof(t_edge), 0, A_DEFFLOAT, 0);
+    class_addfloat(edge_class, edge_float);
+	class_addcreator((t_newmethod)edge_new, gensym("edge"), A_DEFFLOAT, 0);
+    class_sethelpsymbol(edge_class, gensym("maxlib/help-edge.pd"));
+}
+#endif
 

@@ -164,14 +164,25 @@ static void *rand_arbran_new(t_symbol *s1, t_symbol *s2)
     return (x);
 }
 
+#ifndef MAXLIB
 void arbran_setup(void)
 {
     rand_arbran_class = class_new(gensym("arbran"), (t_newmethod)rand_arbran_new, 0,
     	sizeof(t_rand_arbran), 0, A_SYMBOL, A_SYMBOL, 0);
+#else
+void maxlib_arbran_setup(void)
+{
+    rand_arbran_class = class_new(gensym("maxlib_arbran"), (t_newmethod)rand_arbran_new, 0,
+    	sizeof(t_rand_arbran), 0, A_SYMBOL, A_SYMBOL, 0);
+#endif
     class_addbang(rand_arbran_class, rand_arbran_bang);
 	class_addmethod(rand_arbran_class, (t_method)rand_arbran_pdfscale, gensym("pdfscale"), 0);
 	class_addmethod(rand_arbran_class, (t_method)rand_arbran_setarrays, gensym("set"), A_SYMBOL, A_SYMBOL, 0);
 #ifndef MAXLIB
+	class_sethelpsymbol(rand_arbran_class, gensym("help-arbran.pd"));
     post(version);
+#else
+	class_addcreator((t_newmethod)rand_arbran_new, gensym("arbran"), A_SYMBOL, A_SYMBOL, 0);
+	class_sethelpsymbol(rand_arbran_class, gensym("maxlib/help-arbran.pd"));
 #endif
 }

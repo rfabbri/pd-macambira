@@ -22,14 +22,11 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
+#ifndef PD_0_36
 #include "m_pd.h"
-
-#if defined(PD_VERSION) &&  (PD_MAJOR_VERSION >= 0 && PD_MINOR_VERSION > 36)
-#include <m_imp.h>
-#include <s_stuff.h>
-#else
-#include "m_imp.h"
+#include "s_stuff.h"
 #endif
+#include "m_imp.h"
 
 #include <sys/types.h>
 #include <stdarg.h>
@@ -38,7 +35,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#if defined(UNIX) || defined(unix)
+#ifdef UNIX
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -416,9 +413,7 @@ static void *netrec_new(t_symbol *compatflag,
     x->x_nconnections = 0;
     x->x_udp = udp;
 	for(i = 0; i < MAX_CONNECT; i++)x->x_fd[i] = -1;
-#ifndef MAXLIB
-    post(version);
-#endif
+
     return (x);
 }
 
@@ -433,9 +428,22 @@ static void netrec_free(t_netrec *x)
 	binbuf_free(inbinbuf);
 }
 
+#ifndef MAXLIB
 void netrec_setup(void)
 {
     netrec_class = class_new(gensym("netrec"),(t_newmethod)netrec_new, (t_method)netrec_free,
     	sizeof(t_netrec), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
 	class_addmethod(netrec_class, (t_method)netrec_print, gensym("print"), 0);
+	class_sethelpsymbol(netrec_class, gensym("help-netrec.pd"));
+    post(version);
 }
+#else
+void maxlib_netrec_setup(void)
+{
+    netrec_class = class_new(gensym("maxlib_netrec"),(t_newmethod)netrec_new, (t_method)netrec_free,
+    	sizeof(t_netrec), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
+	class_addcreator((t_newmethod)netrec_new, gensym("netrec"), A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
+	class_addmethod(netrec_class, (t_method)netrec_print, gensym("print"), 0);
+	class_sethelpsymbol(netrec_class, gensym("maxlib/help-netrec.pd"));
+}
+#endif

@@ -255,9 +255,7 @@ static void *score_new(t_symbol *s, t_floatarg fskipindex, t_floatarg fskiptime)
     x->x_inreset = inlet_new(&x->x_ob, &x->x_ob.ob_pd, gensym("bang"), gensym("reset"));
 	x->x_outindex = outlet_new(&x->x_ob, gensym("float"));
 	x->x_outerror = outlet_new(&x->x_ob, gensym("float"));
-#ifndef MAXLIB
-    post(version);
-#endif
+
 	x->x_sym = s;				/* get name of array */
 	score_set(x,x->x_sym);      /* set array */
 	if(!fskipindex)fskipindex = 2;
@@ -276,6 +274,7 @@ static void *score_new(t_symbol *s, t_floatarg fskipindex, t_floatarg fskiptime)
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void score_setup(void)
 {
     score_class = class_new(gensym("score"), (t_newmethod)score_new,
@@ -288,6 +287,23 @@ void score_setup(void)
     class_addmethod(score_class, (t_method)score_reset, gensym("reset"), A_GIMME, 0);
 	class_addmethod(score_class, (t_method)score_set, gensym("set"), A_SYMBOL, 0);
     class_addfloat(score_class, score_float);
-
+    class_sethelpsymbol(score_class, gensym("help-score.pd"));
+    post(version);
 }
-
+#else
+void maxlib_score_setup(void)
+{
+    score_class = class_new(gensym("maxlib_score"), (t_newmethod)score_new,
+    	(t_method)score_free, sizeof(t_score), 0, A_SYMBOL, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)score_new, gensym("score"), A_SYMBOL, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(score_class, (t_method)score_reset, gensym("reset"), 0);
+	class_addmethod(score_class, (t_method)score_resume, gensym("resume"), 0);
+    class_addmethod(score_class, (t_method)score_start, gensym("start"), A_GIMME, 0);
+    class_addmethod(score_class, (t_method)score_stop, gensym("stop"), 0);
+    class_addmethod(score_class, (t_method)score_ft1, gensym("ft1"), A_FLOAT, 0);
+    class_addmethod(score_class, (t_method)score_reset, gensym("reset"), A_GIMME, 0);
+	class_addmethod(score_class, (t_method)score_set, gensym("set"), A_SYMBOL, 0);
+    class_addfloat(score_class, score_float);
+    class_sethelpsymbol(score_class, gensym("maxlib/help-score.pd"));
+}
+#endif

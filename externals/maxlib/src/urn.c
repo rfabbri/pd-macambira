@@ -127,16 +127,26 @@ notify:
 	outlet_bang(x->x_notify);
 }
 
+#ifndef MAXLIB
 void urn_setup(void)
 {
     urn_class = class_new(gensym("urn"), (t_newmethod)urn_new, 0,
     	sizeof(t_urn), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_urn_setup(void)
+{
+    urn_class = class_new(gensym("maxlib_urn"), (t_newmethod)urn_new, 0,
+    	sizeof(t_urn), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)urn_new, gensym("urn"), A_DEFFLOAT, 0);
+#endif
     class_addbang(urn_class, urn_bang);
 	class_addmethod(urn_class, (t_method)urn_f, gensym("f"), A_FLOAT, 0);
 	class_addmethod(urn_class, (t_method)urn_clear, gensym("clear"), 0);
     class_addmethod(urn_class, (t_method)urn_seed, gensym("seed"), A_FLOAT, 0);
 #ifndef MAXLIB
+	class_sethelpsymbol(urn_class, gensym("help-urn.pd"));
     post(version);
 #else
+	class_sethelpsymbol(urn_class, gensym("maxlib/help-urn.pd"));
 #endif
 }

@@ -65,17 +65,28 @@ static void *listfunnel_new(void)
     t_listfunnel *x = (t_listfunnel *)pd_new(listfunnel_class);
 	x->x_outlet = outlet_new(&x->x_ob, gensym("float"));
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void listfunnel_setup(void)
 {
     listfunnel_class = class_new(gensym("listfunnel"), (t_newmethod)listfunnel_new,
     	0, sizeof(t_listfunnel), 0, 0, 0);
     class_addfloat(listfunnel_class, listfunnel_float);
     class_addlist(listfunnel_class, listfunnel_list);
+    class_sethelpsymbol(listfunnel_class, gensym("help-listfunnel.pd"));
+    post(version);
 }
+#else
+void maxlib_listfunnel_setup(void)
+{
+    listfunnel_class = class_new(gensym("maxlib_listfunnel"), (t_newmethod)listfunnel_new,
+    	0, sizeof(t_listfunnel), 0, 0, 0);
+	class_addcreator((t_newmethod)listfunnel_new, gensym("listfunnel"), 0);
+    class_addfloat(listfunnel_class, listfunnel_float);
+    class_addlist(listfunnel_class, listfunnel_list);
+    class_sethelpsymbol(listfunnel_class, gensym("maxlib/help-listfunnel.pd"));
+}
+#endif
 

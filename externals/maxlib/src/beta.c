@@ -1,6 +1,6 @@
-/* ---------------------------- rand_beta ----------------------------------- */
+/* ---------------------------- rand_beta ------------------------------------- */
 /*                                                                              */
-/* rand_beta generates a beta distributed random variable.                  */
+/* rand_beta generates a beta distributed random variable.                      */
 /* Written by Olaf Matthes (olaf.matthes@gmx.de)                                */
 /* Based on code found in Dodge/Jerse "Computer Music"                          */
 /* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
@@ -86,12 +86,22 @@ static void rand_beta_bang(t_rand_beta *x)
     outlet_float(x->x_obj.ob_outlet, y1/sum);
 }
 
+#ifndef MAXLIB
 void beta_setup(void)
 {
     rand_beta_class = class_new(gensym("beta"), (t_newmethod)rand_beta_new, 0,
     	sizeof(t_rand_beta), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addbang(rand_beta_class, rand_beta_bang);
-#ifndef MAXLIB
+	class_sethelpsymbol(rand_beta_class, gensym("help-beta.pd"));
     post(version);
-#endif
 }
+#else
+void maxlib_beta_setup(void)
+{
+    rand_beta_class = class_new(gensym("maxlib_beta"), (t_newmethod)rand_beta_new, 0,
+    	sizeof(t_rand_beta), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addbang(rand_beta_class, rand_beta_bang);
+	class_addcreator((t_newmethod)rand_beta_new, gensym("beta"), A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_sethelpsymbol(rand_beta_class, gensym("maxlib/help-beta.pd"));
+}
+#endif

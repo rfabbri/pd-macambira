@@ -70,12 +70,22 @@ static void rand_bilex_bang(t_rand_bilex *x)
     outlet_float(x->x_obj.ob_outlet, s*log(u)/l);
 }
 
+#ifndef MAXLIB
 void bilex_setup(void)
 {
     rand_bilex_class = class_new(gensym("bilex"), (t_newmethod)rand_bilex_new, 0,
     	sizeof(t_rand_bilex), 0, A_DEFFLOAT, 0);
     class_addbang(rand_bilex_class, rand_bilex_bang);
-#ifndef MAXLIB
+	class_sethelpsymbol(rand_bilex_class, gensym("help-bilex.pd"));
     post(version);
-#endif
 }
+#else
+void maxlib_bilex_setup(void)
+{
+    rand_bilex_class = class_new(gensym("maxlib_bilex"), (t_newmethod)rand_bilex_new, 0,
+    	sizeof(t_rand_bilex), 0, A_DEFFLOAT, 0);
+    class_addbang(rand_bilex_class, rand_bilex_bang);
+	class_addcreator((t_newmethod)rand_bilex_new, gensym("bilex"), A_DEFFLOAT, 0);
+	class_sethelpsymbol(rand_bilex_class, gensym("maxlib/help-bilex.pd"));
+}
+#endif

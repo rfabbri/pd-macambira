@@ -297,9 +297,6 @@ static void *rhythm_new(t_floatarg f)
 
 	rhythm_reset(x);
 
-#ifndef MAXLIB
-    post(version);
-#endif
 	if(f == 1)
 	{
 		x->x_model = 1;		/* Toiviainen model */
@@ -314,15 +311,30 @@ static void *rhythm_new(t_floatarg f)
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void rhythm_setup(void)
 {
     rhythm_class = class_new(gensym("rhythm"), (t_newmethod)rhythm_new,
     	(t_method)rhythm_free, sizeof(t_rhythm), 0, A_DEFFLOAT, 0);
-	class_addcreator((t_newmethod)rhythm_new, gensym("max.rhythm"), A_DEFFLOAT, 0);
     class_addfloat(rhythm_class, rhythm_float);
 	class_addmethod(rhythm_class, (t_method)rhythm_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addmethod(rhythm_class, (t_method)rhythm_model, gensym("model"), A_FLOAT, 0);
 	class_addmethod(rhythm_class, (t_method)rhythm_reset, gensym("reset"), 0);
 	class_addmethod(rhythm_class, (t_method)rhythm_print, gensym("print"), 0);
+    class_sethelpsymbol(rhythm_class, gensym("help-rhythm.pd"));
+    post(version);
 }
-
+#else
+void maxlib_rhythm_setup(void)
+{
+    rhythm_class = class_new(gensym("maxlib_rhythm"), (t_newmethod)rhythm_new,
+    	(t_method)rhythm_free, sizeof(t_rhythm), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)rhythm_new, gensym("rhythm"), A_DEFFLOAT, 0);
+    class_addfloat(rhythm_class, rhythm_float);
+	class_addmethod(rhythm_class, (t_method)rhythm_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addmethod(rhythm_class, (t_method)rhythm_model, gensym("model"), A_FLOAT, 0);
+	class_addmethod(rhythm_class, (t_method)rhythm_reset, gensym("reset"), 0);
+	class_addmethod(rhythm_class, (t_method)rhythm_print, gensym("print"), 0);
+    class_sethelpsymbol(rhythm_class, gensym("maxlib/help-rhythm.pd"));
+}
+#endif

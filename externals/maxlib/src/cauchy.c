@@ -69,12 +69,21 @@ static void rand_cauchy_bang(t_rand_cauchy *x)
     outlet_float(x->x_obj.ob_outlet, x->x_alpha*tan(u));
 }
 
+#ifndef MAXLIB
 void cauchy_setup(void)
 {
     rand_cauchy_class = class_new(gensym("cauchy"), (t_newmethod)rand_cauchy_new, 0,
     	sizeof(t_rand_cauchy), 0, A_DEFFLOAT, 0);
     class_addbang(rand_cauchy_class, rand_cauchy_bang);
-#ifndef MAXLIB
+	class_sethelpsymbol(rand_cauchy_class, gensym("help-cauchy.pd"));
     post(version);
+#else
+void maxlib_cauchy_setup(void)
+{
+    rand_cauchy_class = class_new(gensym("maxlib_cauchy"), (t_newmethod)rand_cauchy_new, 0,
+    	sizeof(t_rand_cauchy), 0, A_DEFFLOAT, 0);
+    class_addbang(rand_cauchy_class, rand_cauchy_bang);
+	class_addcreator((t_newmethod)rand_cauchy_new, gensym("cauchy"), A_DEFFLOAT, 0);
+	class_sethelpsymbol(rand_cauchy_class, gensym("maxlib/help-cauchy.pd"));
 #endif
 }

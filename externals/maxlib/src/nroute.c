@@ -124,10 +124,6 @@ static void *nroute_new(t_symbol *s, int argc, t_atom *argv)
     t_nroute *x = (t_nroute *)pd_new(nroute_class);
 	t_proxy *inlet = (t_proxy *)pd_new(proxy_class);	/* for the proxy inlet */
 
-#ifndef MAXLIB
-    post(version);
-#endif
-
 	inlet->x = x;	/* make x visible to the proxy inlets */
 
 	x->pos = 1;
@@ -151,13 +147,22 @@ static void *nroute_new(t_symbol *s, int argc, t_atom *argv)
 	return (x);
 }
 
+#ifndef MAXLIB
 void nroute_setup(void)
 {
 	/* the object's class: */
     nroute_class = class_new(gensym("nroute"), (t_newmethod)nroute_new,
     	0, sizeof(t_nroute), 0, A_GIMME, 0);
+#else
+void maxlib_nroute_setup(void)
+{
+	/* the object's class: */
+    nroute_class = class_new(gensym("maxlib_nroute"), (t_newmethod)nroute_new,
+    	0, sizeof(t_nroute), 0, A_GIMME, 0);
+	class_addcreator((t_newmethod)nroute_new, gensym("nroute"), A_GIMME, 0);
+#endif
 	/* a class for the proxy inlet: */
-	proxy_class = class_new(gensym("proxy"), NULL, NULL, sizeof(t_proxy),
+	proxy_class = class_new(gensym("maxlib_nroute_proxy"), NULL, NULL, sizeof(t_proxy),
 		CLASS_PD|CLASS_NOINLET, A_NULL);
 
 	class_addmethod(nroute_class, (t_method)nroute_setpos, gensym("right"), A_FLOAT, 0);
@@ -166,6 +171,9 @@ void nroute_setup(void)
 	class_addanything(nroute_class, nroute_any);
 	class_addanything(proxy_class, nroute_setmatch);
 #ifndef MAXLIB
+    class_sethelpsymbol(nroute_class, gensym("help-nroute.pd"));
+    post(version);
 #else
+    class_sethelpsymbol(nroute_class, gensym("maxlib/help-nroute.pd"));
 #endif
 }

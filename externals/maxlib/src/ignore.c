@@ -24,9 +24,6 @@
 
 #include "m_pd.h"
 
-#define MAX_ARG  16                 /* maximum number of items to ignore */
-#define IN_SIZE  32                 /* size of array that stores the incoming values */
-
 static char *version = "ignore v0.1, written by Olaf Matthes <olaf.matthes@gmx.de>";
  
 typedef struct ignore
@@ -90,16 +87,13 @@ static void *ignore_new(t_floatarg f)
 	x->x_outfloat = outlet_new(&x->x_ob, gensym("float"));
     x->x_clock = clock_new(x, (t_method)ignore_tick);
 
-#ifndef MAXLIB
-    post(version);
-#endif
-
 	x->x_time = (t_int)f;
 	x->x_lastinput = 0;
 
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void ignore_setup(void)
 {
     ignore_class = class_new(gensym("ignore"), (t_newmethod)ignore_new,
@@ -107,5 +101,19 @@ void ignore_setup(void)
     class_addmethod(ignore_class, (t_method)ignore_reset, gensym("reset"), 0);
     class_addmethod(ignore_class, (t_method)ignore_time, gensym("time"), A_FLOAT, 0);
     class_addfloat(ignore_class, ignore_float);
+    class_sethelpsymbol(ignore_class, gensym("help-ignore.pd"));
+    post(version);
 }
+#else
+void maxlib_ignore_setup(void)
+{
+    ignore_class = class_new(gensym("maxlib_ignore"), (t_newmethod)ignore_new,
+    	(t_method)ignore_free, sizeof(t_ignore), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)ignore_new, gensym("ignore"), A_DEFFLOAT, 0);
+    class_addmethod(ignore_class, (t_method)ignore_reset, gensym("reset"), 0);
+    class_addmethod(ignore_class, (t_method)ignore_time, gensym("time"), A_FLOAT, 0);
+    class_addfloat(ignore_class, ignore_float);
+    class_sethelpsymbol(ignore_class, gensym("maxlib/help-ignore.pd"));
+}
+#endif
 

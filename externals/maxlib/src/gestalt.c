@@ -91,12 +91,10 @@ static void *gestalt_new(t_floatarg f)
 	x->x_reftime = f;
 	if(x->x_reftime < 1) x->x_reftime = 1;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void gestalt_setup(void)
 {
     gestalt_class = class_new(gensym("gestalt"), (t_newmethod)gestalt_new,
@@ -104,5 +102,19 @@ void gestalt_setup(void)
     class_addfloat(gestalt_class, gestalt_float);
 	class_addmethod(gestalt_class, (t_method)gestalt_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addmethod(gestalt_class, (t_method)gestalt_ft2, gensym("ft2"), A_FLOAT, 0);
+    class_sethelpsymbol(gestalt_class, gensym("help-gestalt.pd"));
+    post(version);
 }
+#else
+void maxlib_gestalt_setup(void)
+{
+    gestalt_class = class_new(gensym("maxlib_gestalt"), (t_newmethod)gestalt_new,
+    	0, sizeof(t_gestalt), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)gestalt_new, gensym("gestalt"), A_DEFFLOAT, 0);
+    class_addfloat(gestalt_class, gestalt_float);
+	class_addmethod(gestalt_class, (t_method)gestalt_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addmethod(gestalt_class, (t_method)gestalt_ft2, gensym("ft2"), A_FLOAT, 0);
+    class_sethelpsymbol(gestalt_class, gensym("maxlib/help-gestalt.pd"));
+}
+#endif
 

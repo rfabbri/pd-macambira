@@ -209,20 +209,30 @@ static void *borax_new(void)
 	x->x_timecount = 0;
 	x->x_timeval = 0;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void borax_setup(void)
 {
     borax_class = class_new(gensym("borax"), (t_newmethod)borax_new,
     	0, sizeof(t_borax), 0, 0);
+#else
+void maxlib_borax_setup(void)
+{
+    borax_class = class_new(gensym("maxlib_borax"), (t_newmethod)borax_new,
+    	0, sizeof(t_borax), 0, 0);
+#endif
     class_addmethod(borax_class, (t_method)borax_reset, gensym("reset"), 0);
     class_addmethod(borax_class, (t_method)borax_ft1, gensym("ft1"), A_FLOAT, 0);
     class_addmethod(borax_class, (t_method)borax_reset, gensym("ft2"), A_GIMME, 0);
     class_addfloat(borax_class, borax_float);
-
+#ifndef MAXLIB
+    class_sethelpsymbol(borax_class, gensym("help-borax.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)borax_new, gensym("borax"), 0);
+    class_sethelpsymbol(borax_class, gensym("maxlib/help-borax.pd"));
+#endif
 }
 

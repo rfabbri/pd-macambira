@@ -149,12 +149,10 @@ static void *step_new(t_floatarg f, t_floatarg step, t_floatarg grain)
     outlet_new(&x->x_obj, gensym("float"));
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("ft1"));
 	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("ft2"));
-#ifndef MAXLIB
-    post(version);
-#endif
     return (x);
 }
 
+#ifndef MAXLIB
 void step_setup(void)
 {
     step_class = class_new(gensym("step"), (t_newmethod)step_new,
@@ -163,4 +161,19 @@ void step_setup(void)
 	class_addmethod(step_class, (t_method)step_ft2, gensym("ft2"), A_FLOAT, 0);
     class_addmethod(step_class, (t_method)step_stop, gensym("stop"), 0);
     class_addfloat(step_class, (t_method)step_float);
+	class_sethelpsymbol(step_class, gensym("help-step.pd"));
+    post(version);
 }
+#else
+void maxlib_step_setup(void)
+{
+    step_class = class_new(gensym("maxlib_step"), (t_newmethod)step_new,
+    	(t_method)step_free, sizeof(t_step), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)step_new, gensym("step"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(step_class, (t_method)step_ft1, gensym("ft1"), A_FLOAT, 0);
+	class_addmethod(step_class, (t_method)step_ft2, gensym("ft2"), A_FLOAT, 0);
+    class_addmethod(step_class, (t_method)step_stop, gensym("stop"), 0);
+    class_addfloat(step_class, (t_method)step_float);
+	class_sethelpsymbol(step_class, gensym("maxlib/help-step.pd"));
+}
+#endif

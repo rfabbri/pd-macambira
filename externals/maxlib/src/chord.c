@@ -1785,17 +1785,28 @@ static void *chord_new(t_floatarg f)
 	if(x->x_split == 0)x->x_split = 128;
 	for(i = 0; i < MAX_POLY; i++)x->x_alloctable[i] = -1;
     
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void chord_setup(void)
 {
     chord_class = class_new(gensym("chord"), (t_newmethod)chord_new,
     	0, sizeof(t_chord), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_chord_setup(void)
+{
+    chord_class = class_new(gensym("maxlib_chord"), (t_newmethod)chord_new,
+    	0, sizeof(t_chord), 0, A_DEFFLOAT, 0);
+#endif
     class_addfloat(chord_class, chord_float);
     class_addmethod(chord_class, (t_method)chord_ft1, gensym("ft1"), A_FLOAT, 0);
+#ifndef MAXLIB
+    class_sethelpsymbol(chord_class, gensym("help-chord.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)chord_new, gensym("chord"), A_DEFFLOAT, 0);
+    class_sethelpsymbol(chord_class, gensym("maxlib/help-chord.pd"));
+#endif
 }
 

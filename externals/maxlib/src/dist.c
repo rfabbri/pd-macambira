@@ -243,16 +243,20 @@ static void *dist_new(t_symbol *s, int argc, t_atom *argv)
 		x->x_sym[i] = atom_getsymbolarg(i, argc, argv);
 		x->x_rec++;
 	}
-#ifndef MAXLIB
-    post(version);
-#endif
     return (x);
 }
 
+#ifndef MAXLIB
 void dist_setup(void)
 {
     dist_class = class_new(gensym("dist"), (t_newmethod)dist_new, 0,
     	sizeof(t_dist), 0, A_GIMME, 0);
+#else
+void maxlib_dist_setup(void)
+{
+    dist_class = class_new(gensym("maxlib_dist"), (t_newmethod)dist_new, 0,
+    	sizeof(t_dist), 0, A_GIMME, 0);
+#endif
     class_addcreator((t_newmethod)dist_new, gensym("d"), A_GIMME, 0);
     class_addbang(dist_class, dist_bang);
     class_addfloat(dist_class, dist_float);
@@ -265,4 +269,11 @@ void dist_setup(void)
 	class_addmethod(dist_class, (t_method)dist_print, gensym("print"), 0);
 	class_addmethod(dist_class, (t_method)dist_send, gensym("send"), A_GIMME, 0);
     class_addanything(dist_class, dist_anything);
+#ifndef MAXLIB
+	class_sethelpsymbol(dist_class, gensym("help-dist.pd"));
+    post(version);
+#else
+	class_addcreator((t_newmethod)dist_new, gensym("dist"), A_GIMME, 0);
+	class_sethelpsymbol(dist_class, gensym("maxlib/help-dist.pd"));
+#endif
 }

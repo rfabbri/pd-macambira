@@ -127,12 +127,10 @@ static void *rewrap_new(t_floatarg fmin, t_floatarg fmax)
 	x->x_min = fmin;
 	rewrap_b(x, fmax);
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void rewrap_setup(void)
 {
     rewrap_class = class_new(gensym("rewrap"), (t_newmethod)rewrap_new,
@@ -140,8 +138,18 @@ void rewrap_setup(void)
     class_addfloat(rewrap_class, rewrap_float);
 	class_addmethod(rewrap_class, (t_method)rewrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(rewrap_class, (t_method)rewrap_b, gensym("b"), A_FLOAT, 0);
-#ifndef MAXLIB
-#else
-#endif
+    class_sethelpsymbol(rewrap_class, gensym("help-rewrap.pd"));
+    post(version);
 }
-
+#else
+void maxlib_rewrap_setup(void)
+{
+    rewrap_class = class_new(gensym("maxlib_rewrap"), (t_newmethod)rewrap_new,
+    	0, sizeof(t_rewrap), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)rewrap_new, gensym("rewrap"), A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addfloat(rewrap_class, rewrap_float);
+	class_addmethod(rewrap_class, (t_method)rewrap_a, gensym("a"), A_FLOAT, 0);
+	class_addmethod(rewrap_class, (t_method)rewrap_b, gensym("b"), A_FLOAT, 0);
+    class_sethelpsymbol(rewrap_class, gensym("maxlib/help-rewrap.pd"));
+}
+#endif

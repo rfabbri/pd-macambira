@@ -27,16 +27,16 @@
 /* Based on PureData by Miller Puckette and others.                             */
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
+
 /* this is the original copyright notice: */
+
 /* Copyright (c) 1997-2002 Miller Puckette and others.
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* LATER 'clock' method */
 
 #include <string.h>
 #include "m_pd.h"
-// #include "hammer.h"
 
 #define SPEEDLIM_INISIZE   32  /* LATER rethink */
 #define SPEEDLIM_MAXSIZE  256  /* not used */
@@ -209,10 +209,18 @@ static void *speedlim_new(t_floatarg f)
     return (x);
 }
 
+#ifndef MAXLIB
 void speedlim_setup(void)
 {
     speedlim_class = class_new(gensym("speedlim"), (t_newmethod)speedlim_new,
 		(t_method)speedlim_free, sizeof(t_speedlim), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_speedlim_setup(void)
+{
+    speedlim_class = class_new(gensym("maxlib_speedlim"), (t_newmethod)speedlim_new,
+		(t_method)speedlim_free, sizeof(t_speedlim), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)speedlim_new, gensym("speedlim"), A_DEFFLOAT, 0);
+#endif
     class_addbang(speedlim_class, speedlim_bang);
     class_addfloat(speedlim_class, speedlim_float);
     class_addsymbol(speedlim_class, speedlim_symbol);
@@ -220,6 +228,8 @@ void speedlim_setup(void)
     class_addanything(speedlim_class, speedlim_anything);
     class_addmethod(speedlim_class, (t_method)speedlim_ft1, gensym("ft1"), A_FLOAT, 0);
 #ifndef MAXLIB
+    class_sethelpsymbol(speedlim_class, gensym("help-speedlim.pd"));
 #else
+    class_sethelpsymbol(speedlim_class, gensym("maxlib/help-speedlim.pd"));
 #endif
 }

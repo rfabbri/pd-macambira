@@ -90,12 +90,10 @@ static void *temperature_new(t_floatarg f)
 	}
 	x->x_index = 0;
 	clock_delay(x->x_clock, x->x_time);
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void temperature_setup(void)
 {
     temperature_class = class_new(gensym("temperature"), (t_newmethod)temperature_new,
@@ -104,5 +102,19 @@ void temperature_setup(void)
     class_addfloat(temperature_class, temperature_float);
 	class_addmethod(temperature_class, (t_method)temperature_time, gensym("time"), A_FLOAT, 0);
 	class_addanything(temperature_class, temperature_anything);
+    class_sethelpsymbol(temperature_class, gensym("help-temperature.pd"));
+    post(version);
 }
-
+#else
+void maxlib_temperature_setup(void)
+{
+    temperature_class = class_new(gensym("maxlib_temperature"), (t_newmethod)temperature_new,
+    	(t_method)temperature_free, sizeof(t_temperature), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)temperature_new, gensym("temperature"), A_DEFFLOAT, 0);
+    class_addmethod(temperature_class, (t_method)temperature_reset, gensym("reset"), 0);
+    class_addfloat(temperature_class, temperature_float);
+	class_addmethod(temperature_class, (t_method)temperature_time, gensym("time"), A_FLOAT, 0);
+	class_addanything(temperature_class, temperature_anything);
+    class_sethelpsymbol(temperature_class, gensym("maxlib/help-temperature.pd"));
+}
+#endif

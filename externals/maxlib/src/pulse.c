@@ -1,12 +1,34 @@
+/* --------------------------- pong  ------------------------------------------ */
+/*                                                                              */
+/* A more accurate replacement for the tempo object.                            */
+/* Written by Olaf Matthes <olaf.matthes@gmx.de>                                */
+/* Based on pulse for Max written by James McCartney.                           */
+/* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
+/*                                                                              */
+/* This program is free software; you can redistribute it and/or                */
+/* modify it under the terms of the GNU General Public License                  */
+/* as published by the Free Software Foundation; either version 2               */
+/* of the License, or (at your option) any later version.                       */
+/*                                                                              */
+/* This program is distributed in the hope that it will be useful,              */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/* GNU General Public License for more details.                                 */
+/*                                                                              */
+/* You should have received a copy of the GNU General Public License            */
+/* along with this program; if not, write to the Free Software                  */
+/* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.  */
+/*                                                                              */
+/* Based on PureData by Miller Puckette and others.                             */
+/*                                                                              */
+/* ---------------------------------------------------------------------------- */
+
 /* pulse.c ---- a more accurate replacement for the tempo object   */
 /*				updated for CW 68K / PPC summer 96 -RD             */
 /*              written for Max by James McCartney                 */
-/*              ported to Pd by Olaf Matthes <olaf.matthes@gmx.de> */
 
 #include "m_pd.h"
 #include <stdio.h>
-
-#define MAXSIZE 32
 
 static char *version = "pulse v0.1b, written by James McCartney for Max <james@clyde.as.utexas.edu>\n"
                        "             ported to Pd by Olaf Matthes <olaf.matthes@gmx.de>";
@@ -244,12 +266,11 @@ static void *pulse_new(t_floatarg t, t_floatarg n, t_floatarg d, t_floatarg b)
 	x->p_changenumer = 0;
 	x->p_changedenom = 0;
 	x->p_onoff = 0;
-#ifndef MAXLIB
-    post(version);
-#endif
+
 	return (x);					/* always return a copy of the created object */
 }
 
+#ifndef MAXLIB
 void pulse_setup(void)
 {
     pulse_class = class_new(gensym("pulse"), (t_newmethod)pulse_new,
@@ -260,5 +281,21 @@ void pulse_setup(void)
     class_addmethod(pulse_class, (t_method)pulse_tempo, gensym("tempo"), A_FLOAT, 0);
     class_addfloat(pulse_class, pulse_onoff);
     class_addbang(pulse_class, pulse_bang);
+    class_sethelpsymbol(pulse_class, gensym("help-pulse.pd"));
+    post(version);
 }
-
+#else
+void maxlib_pulse_setup(void)
+{
+    pulse_class = class_new(gensym("maxlib_pulse"), (t_newmethod)pulse_new,
+    	(t_method)pulse_free, sizeof(Pulse), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)pulse_new, gensym("pulse"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(pulse_class, (t_method)pulse_beat, gensym("beat"), A_FLOAT, 0);
+	class_addmethod(pulse_class, (t_method)pulse_denom, gensym("denom"), A_FLOAT, 0);
+    class_addmethod(pulse_class, (t_method)pulse_numer, gensym("numer"), A_FLOAT, 0);
+    class_addmethod(pulse_class, (t_method)pulse_tempo, gensym("tempo"), A_FLOAT, 0);
+    class_addfloat(pulse_class, pulse_onoff);
+    class_addbang(pulse_class, pulse_bang);
+    class_sethelpsymbol(pulse_class, gensym("maxlib/help-pulse.pd"));
+}
+#endif

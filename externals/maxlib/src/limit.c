@@ -98,20 +98,28 @@ static void *limit_new(t_floatarg fol, t_floatarg foh, t_floatarg fr)
 	x->x_ratio = fr;
 	x->x_f = 0;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void limit_setup(void)
 {
     limit_class = class_new(gensym("limit"), (t_newmethod)limit_new,
     	0, sizeof(t_limit), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+#else
+void maxlib_limit_setup(void)
+{
+    limit_class = class_new(gensym("maxlib_limit"), (t_newmethod)limit_new,
+    	0, sizeof(t_limit), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)limit_new, gensym("limit"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+#endif
     class_addfloat(limit_class, limit_float);
     class_addbang(limit_class, limit_bang);
 #ifndef MAXLIB
+    class_sethelpsymbol(limit_class, gensym("help-limit.pd"));
+    post(version);
 #else
+    class_sethelpsymbol(limit_class, gensym("maxlib/help-limit.pd"));
 #endif
 }
 

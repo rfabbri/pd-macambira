@@ -112,20 +112,27 @@ static void *scale_new(t_floatarg fil, t_floatarg fih, t_floatarg fol, t_floatar
 	x->x_logcoeff = flc;
 	x->x_f = 0;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void scale_setup(void)
 {
     scale_class = class_new(gensym("scale"), (t_newmethod)scale_new,
     	0, sizeof(t_scale), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(scale_class, scale_float);
     class_addbang(scale_class, scale_bang);
-#ifndef MAXLIB
+    class_sethelpsymbol(scale_class, gensym("help-scale.pd"));
+    post(version);
 #else
+void maxlib_scale_setup(void)
+{
+    scale_class = class_new(gensym("maxlib_scale"), (t_newmethod)scale_new,
+    	0, sizeof(t_scale), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)scale_new, gensym("scale"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addfloat(scale_class, scale_float);
+    class_addbang(scale_class, scale_bang);
+    class_sethelpsymbol(scale_class, gensym("maxlib/help-scale.pd"));
 #endif
 }
 

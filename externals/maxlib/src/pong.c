@@ -1,6 +1,6 @@
 /* --------------------------- pong  ------------------------------------------ */
 /*                                                                              */
-/* Route input according to Nth element.                                        */
+/* A virtual bouncing ball.                                                     */
 /* Written by Olaf Matthes <olaf.matthes@gmx.de>                                */
 /* Based on pong (for Max) version 1.5 written by Richard Dudas.                */
 /* Get source at http://www.akustische-kunst.org/puredata/maxlib/               */
@@ -253,10 +253,6 @@ static void *pong_new(t_floatarg n)
 {
     t_pong *x = (t_pong *)pd_new(pong_class);
 
-#ifndef MAXLIB
-    post(version);
-#endif
-
 	x->p_klok = clock_new(x, (t_method)pong_tick);
 	
 	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("dist"));	// distance
@@ -300,10 +296,18 @@ static void *pong_new(t_floatarg n)
 	return (x);
 }
 
+#ifndef MAXLIB
 void pong_setup(void)
 {
     pong_class = class_new(gensym("pong"), (t_newmethod)pong_new,
     	0, sizeof(t_pong), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_pong_setup(void)
+{
+    pong_class = class_new(gensym("maxlib_pong"), (t_newmethod)pong_new,
+    	0, sizeof(t_pong), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)pong_new, gensym("pong"), A_DEFFLOAT, 0);
+#endif
 		/* method handlers for inlets */
 	class_addmethod(pong_class, (t_method)pong_initdist, gensym("dist"), A_FLOAT, 0);
 	class_addmethod(pong_class, (t_method)pong_initvel, gensym("velo"), A_FLOAT, 0);
@@ -320,6 +324,9 @@ void pong_setup(void)
     class_addfloat(pong_class, pong_onoff);
 	class_addbang(pong_class, pong_bang);
 #ifndef MAXLIB
+    class_sethelpsymbol(pong_class, gensym("help-pong.pd"));
+    post(version);
 #else
+    class_sethelpsymbol(pong_class, gensym("maxlib/help-pong.pd"));
 #endif
 }

@@ -90,16 +90,25 @@ static void *pitch_new(t_floatarg f)
 
 	x->x_lastpitch = f;
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void pitch_setup(void)
 {
     pitch_class = class_new(gensym("pitch"), (t_newmethod)pitch_new,
     	0, sizeof(t_pitch), 0, A_DEFFLOAT, 0);
     class_addfloat(pitch_class, pitch_float);
+    class_sethelpsymbol(pitch_class, gensym("help-pitch.pd"));
+    post(version);
 }
-
+#else
+void maxlib_pitch_setup(void)
+{
+    pitch_class = class_new(gensym("maxlib_pitch"), (t_newmethod)pitch_new,
+    	0, sizeof(t_pitch), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)pitch_new, gensym("pitch"), A_DEFFLOAT, 0);
+    class_addfloat(pitch_class, pitch_float);
+    class_sethelpsymbol(pitch_class, gensym("maxlib/help-pitch.pd"));
+}
+#endif

@@ -114,18 +114,29 @@ static void *wrap_new(t_floatarg fmin, t_floatarg fmax)
 	x->x_min = fmin;
 	wrap_b(x, fmax);
 
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void wrap_setup(void)
 {
     wrap_class = class_new(gensym("wrap"), (t_newmethod)wrap_new,
     	0, sizeof(t_wrap), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+#else
+void maxlib_wrap_setup(void)
+{
+    wrap_class = class_new(gensym("maxlib_wrap"), (t_newmethod)wrap_new,
+    	0, sizeof(t_wrap), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)wrap_new, gensym("wrap"), A_DEFFLOAT, A_DEFFLOAT, 0);
+#endif
     class_addfloat(wrap_class, wrap_float);
 	class_addmethod(wrap_class, (t_method)wrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(wrap_class, (t_method)wrap_b, gensym("b"), A_FLOAT, 0);
+#ifndef MAXLIB
+    class_sethelpsymbol(wrap_class, gensym("help-wrap.pd"));
+    post(version);
+#else
+    class_sethelpsymbol(wrap_class, gensym("maxlib/help-wrap.pd"));
+#endif
 }
 

@@ -20,7 +20,7 @@
 /*                                                                              */
 /* Based on PureData by Miller Puckette and others.                             */
 /*                                                                              */
-/* Fifi-code based St. Rainstick fifi.c for Max,                                */
+/* Fifi-code based St. Rainstick fifo.c for Max,                                */
 /* copyright St. Rainstick, Amsterdam 1995                                      */
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
@@ -78,12 +78,11 @@ static void *lifo_new(t_floatarg n)
 	x->count = 0;
 	x->getal = (t_float *)getbytes(x->size * sizeof(t_float));
 	x->out = outlet_new(&x->d_ob, gensym("float"));
-#ifndef MAXLIB		
-    post(version);
-#endif
+
 	return (x);
 }
 
+#ifndef MAXLIB
 void lifo_setup(void)
 {
     lifo_class = class_new(gensym("lifo"), (t_newmethod)lifo_new,
@@ -91,4 +90,18 @@ void lifo_setup(void)
     class_addfloat(lifo_class, lifo_int);
 	class_addbang(lifo_class, lifo_bang);
 	class_addmethod(lifo_class, (t_method)lifo_clear, gensym("clear"), 0);
+    class_sethelpsymbol(lifo_class, gensym("help-lifo.pd"));
+    post(version);
 }
+#else
+void maxlib_lifo_setup(void)
+{
+    lifo_class = class_new(gensym("maxlib_lifo"), (t_newmethod)lifo_new,
+    	(t_method)lifo_free, sizeof(t_lifo), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)lifo_new, gensym("lifo"), A_DEFFLOAT, 0);
+    class_addfloat(lifo_class, lifo_int);
+	class_addbang(lifo_class, lifo_bang);
+	class_addmethod(lifo_class, (t_method)lifo_clear, gensym("clear"), 0);
+    class_sethelpsymbol(lifo_class, gensym("maxlib/help-lifo.pd"));
+}
+#endif

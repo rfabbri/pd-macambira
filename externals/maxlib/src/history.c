@@ -236,12 +236,11 @@ static void *history_new(t_floatarg f)
 	x->x_average = 0;
 	x->x_mode = 0;
 	clock_delay(x->x_clock, 0);
-#ifndef MAXLIB
-    post(version);
-#endif
+
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void history_setup(void)
 {
     history_class = class_new(gensym("history"), (t_newmethod)history_new,
@@ -252,5 +251,21 @@ void history_setup(void)
     class_addmethod(history_class, (t_method)history_weight, gensym("weight"), 0);
     class_addfloat(history_class, history_float);
 	class_addmethod(history_class, (t_method)history_time, gensym("time"), A_FLOAT, 0);
+    class_sethelpsymbol(history_class, gensym("help-history.pd"));
+    post(version);
 }
-
+#else
+void maxlib_history_setup(void)
+{
+    history_class = class_new(gensym("maxlib_history"), (t_newmethod)history_new,
+    	(t_method)history_free, sizeof(t_history), 0, A_DEFFLOAT, 0);
+	class_addcreator((t_newmethod)history_new, gensym("history"), A_DEFFLOAT, 0);
+    class_addmethod(history_class, (t_method)history_reset, gensym("reset"), 0);
+    class_addmethod(history_class, (t_method)history_linear, gensym("linear"), 0);
+    class_addmethod(history_class, (t_method)history_geometric, gensym("geometric"), 0);
+    class_addmethod(history_class, (t_method)history_weight, gensym("weight"), 0);
+    class_addfloat(history_class, history_float);
+	class_addmethod(history_class, (t_method)history_time, gensym("time"), A_FLOAT, 0);
+    class_sethelpsymbol(history_class, gensym("maxlib/help-history.pd"));
+}
+#endif

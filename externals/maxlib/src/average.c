@@ -171,21 +171,32 @@ static void *average_new(t_floatarg f)
 	x->x_inpointer = 0;
 	x->x_average = 0;
 	x->x_mode = 0;
-#ifndef MAXLIB
-    post(version);
-#endif
     return (void *)x;
 }
 
+#ifndef MAXLIB
 void average_setup(void)
 {
     average_class = class_new(gensym("average"), (t_newmethod)average_new,
     	(t_method)average_free, sizeof(t_average), 0, A_DEFFLOAT, 0);
+#else
+void maxlib_average_setup(void)
+{
+    average_class = class_new(gensym("maxlib_average"), (t_newmethod)average_new,
+    	(t_method)average_free, sizeof(t_average), 0, A_DEFFLOAT, 0);
+#endif
     class_addmethod(average_class, (t_method)average_reset, gensym("reset"), 0);
     class_addmethod(average_class, (t_method)average_linear, gensym("linear"), 0);
     class_addmethod(average_class, (t_method)average_geometric, gensym("geometric"), 0);
     class_addmethod(average_class, (t_method)average_weight, gensym("weight"), 0);
     class_addfloat(average_class, average_float);
 	class_addmethod(average_class, (t_method)average_index, gensym("index"), A_FLOAT, 0);
+#ifndef MAXLIB
+    post(version);
+    class_sethelpsymbol(average_class, gensym("help-average.pd"));
+#else
+	class_addcreator((t_newmethod)average_new, gensym("average"), A_DEFFLOAT, 0);
+    class_sethelpsymbol(average_class, gensym("maxlib/help-average.pd"));
+#endif
 }
 
