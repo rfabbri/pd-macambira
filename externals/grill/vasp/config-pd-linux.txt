@@ -33,3 +33,6 @@ HELPDIR=${PD}/doc/5.reference
 # (check if they fit to your system!)
 # UFLAGS=-mcpu=pentium3 -msse -mfpmath=sse -fprefetch-loop-arrays
 UFLAGS=-mcpu=pentiumpro
+
+# define to link against shared flext library (flext version >= 0.5.0)
+#FLEXT_SHARED=1
