@@ -21,18 +21,21 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 	@{
 */
 
+//! Key/Value type for AnyMap... must have size of pointer!
+typedef size_t AnyMapType;
+
 //! Base class for maps
 class AnyMap:
-    public std::map<unsigned int,unsigned int>
+    public std::map<AnyMapType,AnyMapType>
 {
-    typedef std::map<unsigned int,unsigned int> Parent;
+    typedef std::map<AnyMapType,AnyMapType> Parent;
 public:
     AnyMap();
     ~AnyMap();
-    iterator find(unsigned int k);
-    unsigned int &operator [](unsigned int k);
+    iterator find(AnyMapType k);
+    AnyMapType &operator [](AnyMapType k);
 
-    typedef std::pair<unsigned int,unsigned int> pair;
+    typedef std::pair<AnyMapType,AnyMapType> pair;
 };
 
 //! Specialized map class for any 32-bit key/value types
@@ -66,9 +69,9 @@ public:
         inline T &data() const { return *(T *)&second; }
 	};
 
-    inline iterator find(K k) { return AnyMap::find(*(unsigned int *)&k); }
-    inline T &operator [](K k) { return *(T *)&(AnyMap::operator [](*(unsigned int *)&k)); }
-    inline void erase(K k) { AnyMap::erase(*(unsigned int *)&k); }
+    inline iterator find(K k) { return AnyMap::find(*(AnyMapType *)&k); }
+    inline T &operator [](K k) { return *(T *)&(AnyMap::operator [](*(AnyMapType *)&k)); }
+    inline void erase(K k) { AnyMap::erase(*(AnyMapType *)&k); }
 };
 
 //! @} // FLEXT_SUPPORT

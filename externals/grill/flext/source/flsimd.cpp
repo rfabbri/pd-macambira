@@ -35,7 +35,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
         #include <xmmintrin.h> // SSE
         #include <emmintrin.h> // SSE2
         #include <mm3dnow.h> // 3DNow!
-    #elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__MWERKS__) && defined(__ALTIVEC__)
+    #elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__MWERKS__) && defined(__VEC__)
         #if FLEXT_OSAPI == FLEXT_OSAPI_MAC_MACH
             #include <sys/sysctl.h> 
             #include <vDSP.h>
@@ -47,7 +47,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
         #include <altivec.h>
         #include <vectorOps.h>
-    #elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__GNUG__) && defined(__ALTIVEC__)
+    #elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__GNUG__) && defined(__VEC__)
         #include <sys/sysctl.h> 
         #include <vecLib/vecLib.h>
     #endif
@@ -272,7 +272,6 @@ static unsigned long setsimdcaps()
     if(cpuinfo.os_support&_CPU_FEATURE_SSE) simdflags += flext::simd_sse;
     if(cpuinfo.os_support&_CPU_FEATURE_SSE2) simdflags += flext::simd_sse2;
 #elif FLEXT_CPU == FLEXT_CPU_PPC 
-
     #if FLEXT_OSAPI == FLEXT_OSAPI_MAC_MACH
 
     int selectors[2] = { CTL_HW, HW_VECTORUNIT }; 
@@ -297,7 +296,7 @@ static unsigned long setsimdcaps()
 }
 
 
-#if FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#if FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
 
 /* functions for misaligned vector data - taken from the Altivec tutorial of Ian Ollmann, Ph.D. */
 
@@ -386,8 +385,8 @@ void flext::CopySamples(t_sample *dst,const t_sample *src,int cnt)
             prefetcht0 [eax+32]
         }
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0) {
-            if((reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0) {
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0) {
                 // aligned src, aligned dst
                 __asm {
                     mov     eax,dword ptr [src]
@@ -435,7 +434,7 @@ loopau:
             }
         }
         else {
-            if((reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0) {
                 // unaligned src, aligned dst
                 __asm {
                     mov     eax,dword ptr [src]
@@ -509,7 +508,7 @@ zero:
 #endif
 }
 
-#if defined(FLEXT_USE_SIMD) && FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#if defined(FLEXT_USE_SIMD) && FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
 // because of some frame code Altivec stuff should be in seperate functions....
 
 static const vector float zero = (vector float)(0);
@@ -683,7 +682,7 @@ void flext::SetSamples(t_sample *dst,int cnt,t_sample s)
             shufps  xmm0,xmm0,0
         }
 
-        if((reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0) {
+        if((reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0) {
             // aligned version
             __asm {
                 mov     ecx,[n]
@@ -717,7 +716,7 @@ zero:
         while(cnt--) *(dst++) = s; 
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(dst)) 
         SetAltivec(dst,cnt,s);
     else
@@ -769,8 +768,8 @@ void flext::MulSamples(t_sample *dst,const t_sample *src,t_sample op,int cnt)
             shufps  xmm0,xmm0,0
         }
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0
-            && (reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0
+            && (reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0
         ) {
             // aligned version
             __asm {
@@ -842,7 +841,7 @@ zero:
         vsmul(src,1,&op,dst,1,cnt);
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(src) && IsVectorAligned(dst)) 
         MulAltivec(dst,src,op,cnt);
     else
@@ -905,10 +904,10 @@ void flext::MulSamples(t_sample *dst,const t_sample *src,const t_sample *op,int 
             prefetcht0 [ebx+32]
         }
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0
-            && (reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0
+            && (reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0
         ) {
-            if((reinterpret_cast<unsigned long>(op)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(op)&(__alignof(__m128)-1)) == 0) {
                 __asm {
                     mov     ecx,[n]
                     mov     eax,dword ptr [src]
@@ -986,7 +985,7 @@ void flext::MulSamples(t_sample *dst,const t_sample *src,const t_sample *op,int 
             }
         }
         else {
-            if((reinterpret_cast<unsigned long>(op)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(op)&(__alignof(__m128)-1)) == 0) {
                 __asm {
                     mov     ecx,[n]
                     mov     eax,dword ptr [src]
@@ -1072,7 +1071,7 @@ zero:
         vmul(src,1,op,1,dst,1,cnt);
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(src) && IsVectorAligned(op) && IsVectorAligned(dst)) 
         MulAltivec(dst,src,op,cnt);
     else
@@ -1135,8 +1134,8 @@ void flext::AddSamples(t_sample *dst,const t_sample *src,t_sample op,int cnt)
             shufps  xmm0,xmm0,0
         }
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0
-            && (reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0
+            && (reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0
         ) {
             // aligned version
                 __asm {
@@ -1202,7 +1201,7 @@ loopu:
         while(cnt--) *(dst++) = *(src++)+op; 
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(src) && IsVectorAligned(dst)) 
         AddAltivec(dst,src,op,cnt);
     else
@@ -1264,10 +1263,10 @@ void flext::AddSamples(t_sample *dst,const t_sample *src,const t_sample *op,int 
         int n = cnt>>4;
         cnt -= n<<4;
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0
-            && (reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0
+            && (reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0
         ) {
-            if((reinterpret_cast<unsigned long>(op)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(op)&(__alignof(__m128)-1)) == 0) {
                 __asm {
                     mov     ecx,dword ptr [n]
                     mov     eax,dword ptr [src]
@@ -1345,7 +1344,7 @@ void flext::AddSamples(t_sample *dst,const t_sample *src,const t_sample *op,int 
             }
         }
         else {
-            if((reinterpret_cast<unsigned long>(op)&(__alignof(__m128)-1)) == 0) {
+            if((reinterpret_cast<size_t>(op)&(__alignof(__m128)-1)) == 0) {
                 __asm {
                     mov     ecx,dword ptr [n]
                     mov     eax,dword ptr [src]
@@ -1430,7 +1429,7 @@ void flext::AddSamples(t_sample *dst,const t_sample *src,const t_sample *op,int 
         vadd(src,1,op,1,dst,1,cnt);
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(src) && IsVectorAligned(op) && IsVectorAligned(dst))
         AddAltivec(dst,src,op,cnt);
     else
@@ -1497,8 +1496,8 @@ void flext::ScaleSamples(t_sample *dst,const t_sample *src,t_sample opmul,t_samp
             shufps  xmm1,xmm1,0
         }
 
-        if((reinterpret_cast<unsigned long>(src)&(__alignof(__m128)-1)) == 0
-            && (reinterpret_cast<unsigned long>(dst)&(__alignof(__m128)-1)) == 0
+        if((reinterpret_cast<size_t>(src)&(__alignof(__m128)-1)) == 0
+            && (reinterpret_cast<size_t>(dst)&(__alignof(__m128)-1)) == 0
         ) {
             // aligned version
             __asm {
@@ -1572,7 +1571,7 @@ loopu:
         while(cnt--) *(dst++) = *(src++)*opmul+opadd; 
     }
     else
-#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__ALTIVEC__)
+#elif FLEXT_CPU == FLEXT_CPU_PPC && defined(__VEC__)
     if(GetSIMDCapabilities()&simd_altivec && IsVectorAligned(src) && IsVectorAligned(dst)) 
         ScaleAltivec(dst,src,opmul,opadd,cnt);
     else
