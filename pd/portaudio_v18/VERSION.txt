@@ -1,2 +1,0 @@
-Portaudio version 18.1, packaged 03.05.28, downloaded Aug. 1:
--rw-------    1 msp        550130 Aug  1 19:47 portaudio_v18_1.zip
