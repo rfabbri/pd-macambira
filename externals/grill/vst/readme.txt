@@ -54,14 +54,14 @@ Version history:
 
 ---------------------------------------------------------------------------
 
-features:
-- allow various window styles and window moving & titling
-- include necessary Steinberg license stuff
-
 BUGS:
 - Waveshell crashes on load
 - mouse interaction in editor can cause audio dropouts
+- crash when unloading plugin with open window
 
 TODO:
+- add VSTTimeInfo functionality
+- add Midi out functionality
+- include necessary Steinberg license stuff
 - do name scanning in the background
 - translate special characters in strings (like ° as param_label) into system-digestible form

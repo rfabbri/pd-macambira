@@ -13,14 +13,12 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <ctype.h>
 
-static VstTimeInfo _timeInfo;
-
 typedef AEffect *(VSTCALLBACK *PVSTMAIN)(audioMasterCallback audioMaster);
 
 
 VSTPlugin::VSTPlugin():
     h_dll(NULL),hwnd(NULL),_pEffect(NULL),
-    posx(0),posy(0),
+    posx(0),posy(0),caption(true),
 	_midichannel(0),queue_size(0),
     paramnamecnt(0)
 {}
@@ -32,7 +30,11 @@ VSTPlugin::~VSTPlugin()
  
 int VSTPlugin::Instance(const char *dllname)
 {
-	h_dll = LoadLibrary(dllname);
+#ifdef FLEXT_DEBUG
+        flext::post("New Plugin 1 - %x",this);
+#endif
+
+    h_dll = LoadLibrary(dllname);
 	if(!h_dll)
 		return VSTINSTANCE_ERR_NO_VALID_FILE;
 
@@ -88,10 +90,22 @@ int VSTPlugin::Instance(const char *dllname)
 		strcpy(_sProductName,str1.c_str());
 	}
 	
+    if(*_sProductName) {
+        char tmp[256];
+        sprintf(tmp,"vst~ - %s",_sProductName);
+        title = tmp;
+    }
+    else
+        title = "vst~";
+
 	*_sVendorName = 0;
 	Dispatch( effGetVendorString, 0, 0, &_sVendorName, 0.0f);
 
 	_sDllName = dllname;
+
+#ifdef FLEXT_DEBUG
+        flext::post("New Plugin 2 - %x",this);
+#endif
 
 	return VSTINSTANCE_NO_ERROR;
 }
@@ -131,9 +145,25 @@ void VSTPlugin::Free() // Called also in destruction
 		Dispatch(effMainsChanged, 0, 0);
 		Dispatch(effClose);
 
+#ifdef FLEXT_DEBUG
+        flext::post("Free Plugin 1 - %x",this);
+#endif
+
 		_pEffect = NULL;
+
+        // \TODO
+        // Here, we really have to wait until the editor thread has terminated
+        // otherwise WM_DESTROY etc. messages may still be pending
+        // in other words: this is a design flaw
+        // There should be a data stub accessible from the plugin object and the thread
+        // holding the necessary data, so that both can operate independently
+
         if(h_dll) { FreeLibrary(h_dll); h_dll = NULL; }
-	}
+
+#ifdef FLEXT_DEBUG
+        flext::post("Free Plugin 2 - %x",this);
+#endif
+    }
 }
 
 void VSTPlugin::DspInit(float samplerate,int blocksize)
@@ -246,8 +276,10 @@ void VSTPlugin::StartEditing(WHandle h)
 
 void VSTPlugin::StopEditing() 
 { 
-	Dispatch(effEditClose);					
-    hwnd = NULL; 
+    if(Is()) {
+	    Dispatch(effEditClose);					
+        hwnd = NULL; 
+    }
 }
 
 void VSTPlugin::Visible(bool vis)
@@ -359,12 +391,25 @@ void VSTPlugin::SetPos(int x,int y,bool upd)
     }
 }
 
+void VSTPlugin::SetCaption(bool c) 
+{
+    if(Is()) {
+        caption = c; 
+        if(IsEdited()) CaptionEditor(this,c);
+    }
+}
 
+void VSTPlugin::SetTitle(const char *t)
+{
+    if(Is()) {
+        title = t; 
+        if(IsEdited()) TitleEditor(this,t);
+    }
+}
 
 void VSTPlugin::processReplacing( float **inputs, float **outputs, long sampleframes )
 {
 	_pEffect->processReplacing( _pEffect , inputs , outputs , sampleframes );
-
 }
 
 void VSTPlugin::process( float **inputs, float **outputs, long sampleframes )
