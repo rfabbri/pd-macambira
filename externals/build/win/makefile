@@ -6,15 +6,15 @@ all: $(EXTERNALS:.c=.dll)
 
 .SUFFIXES: .dll
 
-CFLAGS = -DPD -DWINDOWS -Wall -W -Wshadow -Wstrict-prototypes \
+CFLAGS = -DPD -DMSW -DNT -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-INCLUDE = -I. -I.. -I../include
+INCLUDE = -I. -I.. -I../include -I/usr/local/include
 
 %.dll: ../src/%.c
 	$(CC) $(CFLAGS) $(INCLUDE) -o "$*.o" -c "../src/$*.c"
 	gcc -shared -o "$*.dll" "$*.o" $(prefix)/bin/pd.dll \
-	`test -f $*.libs && cat $*.libs`
+	`test -f $*.libs && cat $*.libs` -L/usr/local/lib
 clean:
 	-rm *.a *.def *.dll *.o
 
