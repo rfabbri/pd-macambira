@@ -1,3 +1,8 @@
+#
+# For docs, check:
+# http://sourceforge.net/docman/display_doc.php?docid=772&group_id=1#docscvsacls
+#
+
 # defunct gem directory
 unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
@@ -14,6 +19,11 @@ avail | sevyves,eighthave | unauthorized
 # so changes here wouldn't make it to his CVS.
 unavail |  | grill
 avail | xovo | grill
+
+# restrict the MAIN branch of "pd" to prevent accidental 
+# commits that should go to devel_0_37 or impd_0_37
+unavail |  | pd | MAIN
+avail | millerpuckette,ggeiger | pd | MAIN
 
 # this line ALWAYS needs to be the last line in this file
 # otherwise, its possible to lock everyone out of the CVS
