@@ -1,5 +1,5 @@
-#N canvas 526 230 658 456 10;
-#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#N canvas 248 419 666 464 10;
+#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X floatatom 63 234 7 0 0 3 Y-axis - -;
 #X floatatom 9 234 7 0 0 3 X-axis - -;
@@ -35,7 +35,7 @@
 ;
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;
-#X text 414 413 $Revision: 1.7 $;
+#X text 414 413 $Revision: 1.8 $;
 #X obj 239 375 all_about_hid;
 #X text 130 376 For more info:;
 #X floatatom 245 234 5 0 0 3 hat0X - -;
@@ -45,7 +45,7 @@
 btn_8 btn_9;
 #X msg 225 131 open 5;
 #X obj 168 154 joystick 0;
-#N canvas 674 327 430 481 joystick_noise 0;
+#N canvas 674 327 446 497 joystick_noise 0;
 #X obj 73 25 inlet;
 #X obj 219 426 dac~;
 #X obj 168 376 *~;
@@ -97,21 +97,24 @@ btn_8 btn_9;
 #X connect 20 0 2 1;
 #X connect 21 0 20 0;
 #X connect 22 0 5 0;
-#X restore 440 167 pd joystick_noise;
-#X obj 440 104 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
-1;
-#X text 333 85 Select your device and turn on to make noise:;
+#X restore 440 155 pd joystick_noise;
+#X obj 440 92 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+;
+#X text 333 73 Select your device and turn on to make noise:;
 #X obj 619 3 pddp;
-#X msg 503 137 open \$1;
-#X obj 503 117 hradio 15 1 1 8 \$0-device-number empty choose_a_device
-0 -6 1 9 -262144 -1 -1 3;
-#X obj 477 117 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
-0 -6 0 14 -166441 -1 -1 3 256;
+#X msg 503 125 open \$1;
+#X obj 503 105 hradio 15 1 1 8 \$0-device-number empty choose_a_device
+0 -6 1 9 -262144 -1 -1 0;
+#X obj 477 105 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
+0 -6 0 14 -166441 -1 -1 0 256;
 #X text 8 36 Use a joystick device with Pd. This object auto-calibrates
 the output of axis data. Move each element of the device thru its full
 range to calibrate it.;
 #X obj 335 215 unpack s f;
 #X obj 339 375 all_about_hid_mapping;
+#X text 422 177 (remember to calibrate all parts;
+#X text 430 190 of the joystick first);
+#X msg 394 120 print;
 #X connect 0 0 31 0;
 #X connect 19 0 31 0;
 #X connect 28 0 31 0;
@@ -139,3 +142,4 @@ range to calibrate it.;
 #X connect 37 0 36 0;
 #X connect 40 0 15 0;
 #X connect 40 1 16 0;
+#X connect 44 0 32 0;
