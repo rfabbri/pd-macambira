@@ -36,15 +36,30 @@ public:
 		return m_num_eq;
 	}
 
-	virtual void m_step()
+	void m_perform()
 	{
+		m_step();
+		m_verify();
 	}
 
+	virtual void m_verify() 
+	{
+		for (int i = 0; i != get_num_eq(); ++i)
+		{
+#ifndef DOUBLE_PRECISION
+			if (PD_BIGORSMALL(m_data[i]))
+				m_data[i] = 0;
+#endif
+		}
+	};
+	
 	data_t * m_data;       // state of the system
 
 protected:
+	virtual void m_step();
 	int m_num_eq;  // number of equations of the system
 };
+
 
 #define CHAOS_CALLBACKS							\
 public:											\

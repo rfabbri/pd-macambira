@@ -33,7 +33,7 @@ public:
 	standard_map()
 	{
 		m_num_eq = 2;
-		m_data = new data_t[2];
+		m_data = new data_t[m_num_eq];
 
 		CHAOS_SYS_INIT(I,0.1);
 		CHAOS_SYS_INIT(theta,0.2);

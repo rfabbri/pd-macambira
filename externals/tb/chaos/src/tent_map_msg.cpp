@@ -21,4 +21,4 @@
 #include "tent_map.hpp"
 #include "chaos_msg.hpp"
 
-CHAOS_MSG_CLASS_NAME(tent_map, TENT_MAP, "tent");
+CHAOS_MSG_CLASS_NAME(tent_map, TENT_MAP, tent);

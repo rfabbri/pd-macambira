@@ -32,7 +32,7 @@ public:
 
 	void m_bang()
 	{
-		m_system->m_step();
+		m_system->m_perform();
 		int outlets = m_system->get_num_eq();
 
 		while (outlets--)

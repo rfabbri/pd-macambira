@@ -26,7 +26,10 @@
 class map_base
 	: public chaos_base
 {
-	
+protected:
+	virtual void m_step()
+	{
+	}
 };
 
 #define MAP_CALLBACKS							\

@@ -21,4 +21,4 @@
 #include "lozi_map.hpp"
 #include "chaos_msg.hpp"
 
-CHAOS_MSG_CLASS_NAME(lozi_map, LOZI_MAP, "lozi");
+CHAOS_MSG_CLASS_NAME(lozi_map, LOZI_MAP, lozi);

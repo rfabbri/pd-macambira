@@ -22,5 +22,5 @@
 #include "chaos_dsp.hpp"
 
 
-CHAOS_DSP_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, "ikeda");
+CHAOS_DSP_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, ikeda~);
 

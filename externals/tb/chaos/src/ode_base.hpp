@@ -30,7 +30,20 @@ public:
 	void set_method(int i)
 	{
 		if (i >=0 && i <4)
+		{
 			m_method = (unsigned char) i;
+			switch (i)
+			{
+			case 0:
+				m_routine = &ode_base::rk1;
+				break;
+			case 1:
+				m_routine = &ode_base::rk2;
+				break;
+			case 2:
+				m_routine = &ode_base::rk4;
+			}
+		}
 		else
 			post("no such method");
 	}
@@ -47,7 +60,10 @@ public:
 		return (f >= 0);
 	}
 
-	virtual void m_step();
+	virtual void m_step()
+	{
+		(this->*m_routine)();
+	}
 	
 	void ode_base_alloc()
 	{
@@ -67,11 +83,11 @@ public:
 		{
 			delete m_k[i];
 		}
-
 		delete m_tmp;
 	}
 
 protected:
+	void (ode_base::*m_routine)();
 	unsigned char m_method; /* 0: rk1, 1: rk2, 3: rk4 */
 
 	data_t* m_k[3];         /* temporary arrays for runge kutta */

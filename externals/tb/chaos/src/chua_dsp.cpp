@@ -1,4 +1,4 @@
-// 
+//
 //  
 //  chaos~
 //  Copyright (C) 2004  Tim Blechmann
@@ -18,7 +18,7 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "lozi_map.hpp"
+#include "chua.hpp"
 #include "chaos_dsp.hpp"
 
-CHAOS_DSP_CLASS_NAME(lozi_map, LOZI_MAP, lozi~);
+CHAOS_DSP_CLASS(chua,CHUA);

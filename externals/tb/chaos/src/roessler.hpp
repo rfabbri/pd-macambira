@@ -41,6 +41,7 @@ public:
 		CHAOS_SYS_INIT(a,4);
 		CHAOS_SYS_INIT(b,4);
 		CHAOS_SYS_INIT(c,4);
+		CHAOS_SYS_INIT(dt,0.01);
 
 		ode_base_alloc();
 	}

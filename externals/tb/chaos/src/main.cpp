@@ -29,6 +29,7 @@ void chaos_library_setup()
 	CHAOS_ADD(bungalow_tent);
 	CHAOS_ADD(circle_map);
 	CHAOS_ADD(coupled_logistic);
+	CHAOS_ADD(chua);
 	CHAOS_ADD(driven_anharmonic);
 	CHAOS_ADD(driven_van_der_pol);
 	CHAOS_ADD(duffing_map);

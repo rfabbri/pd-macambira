@@ -23,4 +23,4 @@
 
 
 
-CHAOS_DSP_CLASS_NAME(tent_map, TENT_MAP, "tent~");
+CHAOS_DSP_CLASS_NAME(tent_map, TENT_MAP, tent~);

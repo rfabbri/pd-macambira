@@ -32,7 +32,7 @@ public:
 	lozi_map()
 	{
 		m_num_eq = 2;
-		m_data = new data_t[1];
+		m_data = new data_t[m_num_eq];
 		CHAOS_SYS_INIT(x,0);
 		CHAOS_SYS_INIT(y,0);
 		CHAOS_SYS_INIT(a,1.4);

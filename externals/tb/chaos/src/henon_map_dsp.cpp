@@ -21,4 +21,4 @@
 #include "henon_map.hpp"
 #include "chaos_dsp.hpp"
 
-CHAOS_DSP_CLASS_NAME(henon, HENON, "henon~");
+CHAOS_DSP_CLASS_NAME(henon, HENON, henon~);

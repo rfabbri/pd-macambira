@@ -20,10 +20,10 @@
 
 #include "map_base.hpp"
 
-//  tent map: x[n+1] = 2 * x[n]       (for 0 < x <= 0.5)
-//                     2 * (1 - x[n]) (else)
-//            0 <= x[n] <  1
-//  taken from Willi-Hans Steeb: Chaos and Fractals
+//  tent map: x[n+1] = 1 - 2*abs(x[n])
+//                     -1 < x[n] < 1
+//  taken from Julien C. Sprott, Strange Attractors: Creating Patterns in Chaos
+
 
 class tent_map:
 	public map_base
@@ -32,8 +32,8 @@ public:
 	tent_map()
 	{
 		m_num_eq = 1;
-		m_data = new data_t[1];
-		CHAOS_SYS_INIT(x, 0.5);
+		m_data = new data_t[m_num_eq];
+		CHAOS_SYS_INIT(x, 0.6);
 	}
 
 	~tent_map()
@@ -44,17 +44,14 @@ public:
 	virtual void m_step()
 	{
 		data_t data = m_data[0];
-
-		if (data < 0.5f)
-			m_data[0] = 2.f * data;
-		else
-			m_data[0] = 2.f * (1.f - data);
+		
+		m_data[0] = 1 - 2*CHAOS_ABS(data);
 	}
 
-	CHAOS_SYSPAR_FUNCS_PRED(x, m_pred_x);
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
 	bool m_pred_x(t_float f)
 	{
-		return (f >= 0) && (f < 1);
+		return (f > -1) && (f < 1);
 	}
 };
 

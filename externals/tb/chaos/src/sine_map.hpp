@@ -33,7 +33,7 @@ public:
 	sine_map()
 	{
 		m_num_eq = 1;
-		m_data = new data_t[1];
+		m_data = new data_t[m_num_eq];
 		CHAOS_SYS_INIT(x,0);
 	}
 

@@ -5,6 +5,7 @@ BUILT_SOURCES = main.cpp ode_base.cpp chaos_base.cpp chaos_dsp.cpp \
 	bungalow_tent_dsp.cpp bungalow_tent_msg.cpp \
 	circle_map_dsp.cpp circle_map_msg.cpp \
 	coupled_logistic_dsp.cpp coupled_logistic_msg.cpp \
+	chua_dsp.cpp chua_msg.cpp \
 	driven_anharmonic_dsp.cpp driven_anharmonic_msg.cpp \
 	driven_van_der_pol_dsp.cpp driven_van_der_pol_msg.cpp \
 	duffing_map_dsp.cpp duffing_map_msg.cpp \

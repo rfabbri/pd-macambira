@@ -38,7 +38,7 @@ public:
 	ikeda_laser_map()
 	{
 		m_num_eq = 2;
-		m_data = new data_t[2];
+		m_data = new data_t[m_num_eq];
 		CHAOS_SYS_INIT(c1,0.4);
 		CHAOS_SYS_INIT(c2,0.9);
 		CHAOS_SYS_INIT(c3,9);

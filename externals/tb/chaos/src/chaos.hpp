@@ -24,6 +24,7 @@
 
 #include "flext.h"
 #include "chaos_defs.hpp"
+#include <cmath>
 
 /* internal we can work with a higher precision than pd */
 #ifdef DOUBLE_PRECISION

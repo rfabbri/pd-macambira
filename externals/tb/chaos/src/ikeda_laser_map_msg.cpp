@@ -21,4 +21,4 @@
 #include "ikeda_laser_map.hpp"
 #include "chaos_msg.hpp"
 
-CHAOS_MSG_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, "ikeda~");
+CHAOS_MSG_CLASS_NAME(ikeda_laser_map, IKEDA_LASER_MAP, ikeda);

@@ -21,4 +21,4 @@
 #include "henon_map.hpp"
 #include "chaos_msg.hpp"
 
-CHAOS_MSG_CLASS_NAME(henon, HENON, "henon");
+CHAOS_MSG_CLASS_NAME(henon, HENON, henon);

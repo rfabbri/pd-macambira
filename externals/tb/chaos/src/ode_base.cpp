@@ -72,19 +72,3 @@ void ode_base::rk4()
 			/ 6.;
 }
 
-void ode_base::m_step()
-{
-	switch (m_method)
-	{
-	case 0:
-		rk1();
-		break;
-	case 1:
-		rk2();
-		break;
-	case 2:
-		rk4();
-		break;
-	}
-	
-}

@@ -32,7 +32,7 @@ public:
 	coupled_logistic()
 	{
 		m_num_eq = 2;
-		m_data = new data_t[2];
+		m_data = new data_t[m_num_eq];
 		CHAOS_SYS_INIT(e, 0.06);
 		CHAOS_SYS_INIT(r, 3.7);
 		CHAOS_SYS_INIT(x, 0.1);

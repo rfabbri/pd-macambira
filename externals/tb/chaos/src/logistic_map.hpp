@@ -21,7 +21,7 @@
 #include "map_base.hpp"
 
 //  logistic map: x[n+1] = alpha * x[n] * (1 - x[n])
-//                0 <= x[n]  <  1
+//                0 < x[n] <  1
 //                0 <= alpha <= 4
 
 class logistic:
@@ -43,9 +43,9 @@ public:
 
 	virtual void m_step()
 	{
-		data_t data = m_data[0];
+		data_t x = m_data[0];
 		data_t alpha = CHAOS_PARAMETER(alpha);
-		m_data[0] = alpha * data * (1.f - data);
+		m_data[0] = alpha * x * (1.f - x);
 	}
 
 	CHAOS_SYSPAR_FUNCS_PRED(alpha, m_pred_alpha);
@@ -59,6 +59,14 @@ public:
 	bool m_pred_x(t_float f)
 	{
 		return (f > 0) && (f < 1);
+	}
+
+	virtual void m_verify()
+	{
+		data_t x = m_data[0];
+		if (m_pred_x(x))
+			return;
+		m_data[0] = 0.5;
 	}
 };
 
