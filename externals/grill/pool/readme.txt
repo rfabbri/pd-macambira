@@ -61,6 +61,7 @@ Version history:
 - adapted source to flext 0.4.1 - register methods at class creation
 - extensive use of hashing for keys and directories
 - database can be saved/loaded as XML data
+- fixed bug with stored numbers starting with - or +
 
 0.1.0:
 - first public release
