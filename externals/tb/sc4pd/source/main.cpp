@@ -58,7 +58,12 @@ void sc4pd_library_setup()
 	 "TExpRand(~), IRand(~), TIRand(~),\n          CoinGate, "
 	 "LinRand(~), NRand(~), ExpRand(~), LFClipNoise(~),\n"
 	 "          LFNoise0(~), LFNoise1(~), LFNoise2(~), Logistic(~), "
-	 "Latoocarfian(~), LinCong(~)\n");
+	 "Latoocarfian(~),\n"
+	 "          LinCong(~), amclip(~), scaleneg(~), excess(~), hypot(~), "
+	 "ring1(~),\n"
+	 "          ring2(~), ring3(~), ring4(~), difsqr(~), sumsqr(~)\n"
+	 "sqrdif(~), sqrsum(~),\n"
+	 "          absdif(~)");
 
     //initialize objects
     FLEXT_DSP_SETUP(Dust_ar);
@@ -140,6 +145,45 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(LinCong_ar);
     FLEXT_SETUP(LinCong_kr);
+
+    FLEXT_DSP_SETUP(amclip_ar);
+    FLEXT_SETUP(amclip_kr);
+
+    FLEXT_DSP_SETUP(scaleneg_ar);
+    FLEXT_SETUP(scaleneg_kr);
+
+    FLEXT_DSP_SETUP(excess_ar);
+    FLEXT_SETUP(excess_kr);
+
+    FLEXT_DSP_SETUP(hypot_ar);
+    FLEXT_SETUP(hypot_kr);
+
+    FLEXT_DSP_SETUP(ring1_ar);
+    FLEXT_SETUP(ring1_kr);
+
+    FLEXT_DSP_SETUP(ring2_ar);
+    FLEXT_SETUP(ring2_kr);
+
+    FLEXT_DSP_SETUP(ring3_ar);
+    FLEXT_SETUP(ring3_kr);
+
+    FLEXT_DSP_SETUP(ring4_ar);
+    FLEXT_SETUP(ring4_kr);
+
+    FLEXT_DSP_SETUP(difsqr_ar);
+    FLEXT_SETUP(difsqr_kr);
+
+    FLEXT_DSP_SETUP(sumsqr_ar);
+    FLEXT_SETUP(sumsqr_kr);
+
+    FLEXT_DSP_SETUP(sqrsum_ar);
+    FLEXT_SETUP(sqrsum_kr);
+
+    FLEXT_DSP_SETUP(sqrdif_ar);
+    FLEXT_SETUP(sqrdif_kr);
+
+    FLEXT_DSP_SETUP(absdif_ar);
+    FLEXT_SETUP(absdif_kr);
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);
