@@ -1,0 +1,13 @@
+#N canvas 147 52 764 593 10;
+#X obj 94 453 netreceive 4567 0 old;
+#X obj 76 453 tgl 17 0 empty empty empty 0 -6 0 8 -4033 -1 -1 0 1;
+#X text 10 415 sends everything it receives into the global message
+space;
+#X text 12 508 You can send and receive messages to Pd from the command
+line using 'pdsend' and 'pdreceive'.;
+#X obj 4 -3 cnv 15 750 20 empty empty netreceive 20 10 1 18 -233017
+-66577 0;
+#X obj 719 -1 pddp;
+#X obj 612 537 help-netreceive;
+#X text 467 537 Miller's help patch:;
+#X connect 0 0 1 0;

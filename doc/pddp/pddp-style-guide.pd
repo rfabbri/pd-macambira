@@ -1,0 +1,12 @@
+#N canvas 323 116 596 539 10;
+#X text 33 38 Here are various text conventions for discussing various
+aspects of Pd in text:;
+#X text 36 88 atoms:;
+#X text 52 108 "anything" \, "bang" \, "float" \, "list" \, "pointer"
+\, "symbol";
+#X text 33 138 objects:;
+#X text 50 157 [route] \, [set] \, [float] \, [symbol] \, [trigger]
+\, etc.;
+#X text 34 191 messages:;
+#X text 49 214 [pd dsp 1 ( \, [set 0 ( \,;
+#X obj 37 450 standard_gui_elements;

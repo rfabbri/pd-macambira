@@ -1,0 +1,43 @@
+#N canvas 180 74 859 631 10;
+#X obj 0 2 cnv 15 850 20 empty empty all_about_symbol_construction
+20 10 1 18 -233017 -66577 0;
+#X obj 816 3 pddp;
+#X text 17 601 by Hans-Christoph Steiner <hans@at.or.at>;
+#X text 629 603 updated for Pd version 0.37.1;
+#X obj 452 550 sprintf;
+#X obj 751 550 makesymbol;
+#X obj 659 550 makefilename;
+#X obj 574 550 list2symbol;
+#X symbolatom 456 177 55 0 0 0 - - -;
+#X obj 456 151 list2symbol;
+#X symbolatom 528 129 6 0 0 0 - - -;
+#X msg 528 103 symbol -;
+#X msg 456 73 make these into one symbol with no spaces;
+#X text 445 35 By setting a symbol on the right inlet of [list2symbol]
+\, you can create symbols without spaces:;
+#X text 592 102 <- click here to use "-";
+#X text 613 115 instead of spaces;
+#X text 9 85 There are many different ways of constructing symbols
+from various parts. You can turn lists into symbols by replacing the
+spaces with other characters or you can use objects with "format strings"
+that allow you to create symbols with more flexibility;
+#X obj 510 550 tosymbol;
+#X text 442 211 [tosymbol] works in a very similar way:;
+#X text 9 40 Many times you need to dynamically create different symbols.
+For example \, if you are working with many files \, you might want
+to name them with a sequential number.;
+#X symbolatom 455 316 55 0 0 0 - - -;
+#X msg 455 232 make these into one symbol with no spaces;
+#X text 638 274 instead of spaces;
+#X obj 455 292 tosymbol;
+#X text 546 144 ^-- or type here and hit enter;
+#X text 446 523 Related objects:;
+#X msg 517 260 separator -|-;
+#X text 616 261 <- click here to use "-|-";
+#X connect 9 0 8 0;
+#X connect 10 0 9 1;
+#X connect 11 0 10 0;
+#X connect 12 0 9 0;
+#X connect 21 0 23 0;
+#X connect 23 0 20 0;
+#X connect 26 0 23 0;

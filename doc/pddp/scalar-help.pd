@@ -1,0 +1,30 @@
+#N canvas 351 60 461 532 10;
+#N canvas 0 22 454 304 scalar-window 0;
+#X restore 164 67 pd scalar-window;
+#X obj 2 2 cnv 15 450 20 empty empty "scalar" 2 11 1 18 -233017 -66577
+0;
+#X obj 418 3 pddp;
+#X obj 256 478 all_about_data_structures;
+#X text 221 461 for more info \, click on this:;
+#X text 29 307 - You can cut \, copy \, paste \, and duplicate "scalars".
+;
+#X text 29 212 - You can edit the contents of a "scalar" within the
+Properties panel. When you select 'Properties' \, Pd will open a text
+editor with the contents of that "scalar". When you are done editing
+it \, hit "OK" and your changes will take effect.;
+#X text 18 288 In edit mode:;
+#X text 29 323 - You can move "scalars" by clicking and dragging.;
+#X text 20 196 In any mode:;
+#X text 18 376 In run mode:;
+#X text 30 390 - You can resize breakpoints. The mouse cursor will
+change when you are resizing breakpoints.;
+#X text 30 417 - You can move breakpoints. Click near the breakpoint
+\, but not so close that the mouse cursor changes to the resize cursor.
+;
+#X text 29 338 - The blue rectangle is the "handle" for grabbing and
+moving the "scalar".;
+#X text 20 32 "scalar" is the basic graphical component of Pd's data
+structures.;
+#X text 305 512 updated for Pd 0.37.1;
+#X text 4 174 There are numerous ways to manually edit "scalars":;
+#X text 4 501 by Hans-Christoph Steiner <hans@at.or.at>;

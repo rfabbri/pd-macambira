@@ -1,0 +1,32 @@
+#N canvas 317 126 761 632 10;
+#X text 43 164 see also:;
+#X obj 84 219 template;
+#X obj 161 277 append;
+#X obj 54 187 getsize;
+#X obj 121 187 setsize;
+#X obj 149 219 element;
+#X obj 216 277 sublist;
+#X obj 35 277 pointer;
+#X obj 99 277 get;
+#X obj 37 377 drawnumber;
+#X obj 38 416 plot;
+#X obj 114 376 drawpolygon;
+#X obj 104 414 filledpolygon;
+#X obj 204 378 drawcurve;
+#X obj 203 414 filledcurve;
+#X text 34 339 drawing objects:;
+#X text 9 34 The original idea behind the creation of Pd was to make
+a Max-like environment that also had a means of graphically specifying
+a score. Pd's "data structures" are the system devised for this purpose.
+;
+#X text 33 257 for manipulating data structures:;
+#X obj 4 -3 cnv 15 750 20 empty empty all_about_data_structures 2 10
+1 18 -233017 -66577 0;
+#X obj 719 -1 pddp;
+#X obj 35 219 struct;
+#X obj 129 277 set;
+#N canvas 0 22 454 304 display 0;
+#X restore 321 581 pd display;
+#X text 9 98 "scalar" is the basic graphical component of Pd's data
+structures. When working with data structures \, all of the objects
+pertain to reading and editing "scalars".;

@@ -1,0 +1,59 @@
+#N canvas 118 146 866 595 10;
+#X msg 74 245 1 2 3;
+#X obj 134 276 route list;
+#X obj 134 297 print list;
+#X obj 209 297 print NOTlist;
+#X msg 183 224 list this is a list with a cast;
+#X msg 190 243 this is a list withOUT a cast;
+#X msg 41 225 list 1 2 3;
+#X msg 10 63 list;
+#X msg 17 83 list 5;
+#X msg 24 103 list pie;
+#X symbolatom 32 129 10 0 0 0 - - -;
+#X obj 4 2 cnv 15 850 20 empty empty all_about_lists_vs_anythings 20
+10 1 18 -233017 -66577 0;
+#X obj 821 3 pddp;
+#X text 20 558 by Hans-Christoph Steiner <hans@at.or.at>;
+#X obj 65 437 list2int;
+#X obj 129 436 l2i;
+#X obj 131 462 a2l;
+#X obj 64 463 any2list;
+#X obj 65 412 lister;
+#X obj 64 489 list2symbol;
+#X obj 64 510 symbol2list;
+#X obj 153 489 l2s;
+#X obj 153 509 s2l;
+#X obj 197 490 tosymbol;
+#X obj 197 509 fromsymbol;
+#X text 500 259 use [prepend]!!;
+#X obj 617 257 prepend;
+#X obj 680 326 drip;
+#X text 587 326 write about:;
+#X obj 560 460 glue;
+#X obj 621 487 pack;
+#X obj 620 461 list2symbol;
+#X obj 730 460 tosymbol;
+#X text 8 175 More than one "float" in a message is considered a "list".
+More than one "symbol" in a message is not implicitly considered a
+"list" \, only if you cast it.;
+#X text 87 104 A "list" of one "symbol" is translated into a "symbol".
+;
+#X text 72 83 A "list" of one "float" is translated into a "float".
+;
+#X text 50 63 An empty "list" is tranlated into a "bang".;
+#X text 7 39 SPECIAL CASES OF "LISTS".;
+#X text 496 214 working with "lists" and "anythings":;
+#X text 537 434 making "lists" from untyped inputs:;
+#X obj 10 148 print NOT-LISTS;
+#X obj 496 460 repack;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 1 3 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;
+#X connect 6 0 1 0;
+#X connect 7 0 40 0;
+#X connect 8 0 40 0;
+#X connect 9 0 10 0;
+#X connect 9 0 40 0;
+#X connect 31 0 30 0;

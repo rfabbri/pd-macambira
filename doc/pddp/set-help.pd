@@ -1,0 +1,40 @@
+#N struct help-set-template1 float x float y;
+#N canvas 346 46 655 535 12;
+#X msg 272 235 next;
+#X floatatom 19 265 5 0 0 2 X_value - -;
+#X floatatom 106 265 5 0 0 2 Y_value - -;
+#X obj 258 260 pointer;
+#X text 261 189 output first scalar in list;
+#X text 318 235 output next item;
+#X text 282 332 First argument selects template.;
+#X text 282 347 Remaining args are names of fields.;
+#X msg 258 211 traverse pd-help-set-data \, next;
+#N canvas 0 22 288 134 help-set-data 1;
+#X scalar help-set-template1 44 50 \;;
+#X scalar help-set-template1 99 73 \;;
+#X restore 377 409 pd help-set-data;
+#N canvas 164 72 425 146 help-set-template1 0;
+#X obj 41 87 filledpolygon 9 0 1 0 0 20 0 20 30 0 30;
+#X obj 60 21 template float x float y;
+#X restore 377 431 pd help-set-template1;
+#X text 86 10 -- set values in a scalar;
+#X obj 19 338 set help-set-template1 x y;
+#X text 359 497 updated for Pd version 0.35;
+#X text 6 72 [set] takes a pointer to a scalar in its rightmost inlet
+\; the remaining inlets set numeric values of fields. Only the leftmost
+inlet is "hot". You can't [set] "arrays" or "sublists". Instead \,
+you can get pointers into them using [element] and [sublist] (probably
+not working yet) and set individual items.;
+#X obj 29 432 all_about_data_structures;
+#X text 13 408 for more info \, open this patch:;
+#X obj 106 298 t b f;
+#X text 273 474 Miller's help patch:;
+#X obj 474 474 help-set;
+#X obj 21 10 set;
+#X connect 0 0 3 0;
+#X connect 1 0 12 0;
+#X connect 2 0 17 0;
+#X connect 3 0 12 2;
+#X connect 8 0 3 0;
+#X connect 17 0 1 0;
+#X connect 17 1 12 1;

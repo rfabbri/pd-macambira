@@ -1,0 +1,27 @@
+#N canvas 499 325 522 457 10;
+#X obj 310 194 f \$0;
+#X symbolatom 318 235 0 0 0 0 - - -;
+#X obj 310 213 makesymbol pd-%s-controlled;
+#N canvas 0 22 482 332 1024-controlled 0;
+#X restore 319 61 pd \$0-controlled;
+#N canvas 0 22 478 328 controlled 0;
+#X restore 68 61 pd controlled;
+#X msg 46 167 \; pd-controlled vis \$1;
+#X obj 46 123 tgl 40 0 empty empty open_close 0 -6 1 12 -217060 -1
+-1 1 1;
+#X msg 310 285 \; \$1 vis \$2;
+#X obj 310 256 pack symbol float;
+#X obj 310 170 t b f;
+#X obj 310 125 tgl 40 0 empty empty open_close 0 -6 1 12 -217060 -1
+-1 0 1;
+#X text 112 333 Since \$0 is only expanded if it starts the name \,
+it is necessary to use [makesymbol] in order to put the \$0 expansion
+into the middle of the name.;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X connect 2 0 8 0;
+#X connect 6 0 5 0;
+#X connect 8 0 7 0;
+#X connect 9 0 0 0;
+#X connect 9 1 8 1;
+#X connect 10 0 9 0;
