@@ -1,9 +1,9 @@
-#N canvas 289 81 857 641 10;
+#N canvas 360 67 857 641 10;
 #X msg 65 474 bang;
 #X msg 66 556 stop;
-#X msg 459 386 envelope 0 100 0 100;
+#X msg 453 340 envelope 0 100 0 100;
 #X text 85 71 period time in ms (defaults 1000 ms);
-#X text 477 407 startlevel attack-duration endlevel decay-duration
+#X text 471 361 startlevel attack-duration endlevel decay-duration
 ;
 #X text 188 204 waveform phase in degrees;
 #X text 10 458 start the effect;
@@ -64,26 +64,26 @@
 #X obj 85 375 symbol;
 #X text 8 244 waveform shape;
 #X symbolatom 85 408 9 0 0 0 current: - -;
-#X msg 459 354 envelope \$1 \$2 \$3 \$4;
-#X obj 589 275 hsl 150 17 0 1 0 0 empty empty end_level 25 8 1 12 -261689
+#X msg 453 308 envelope \$1 \$2 \$3 \$4;
+#X obj 583 229 hsl 150 17 0 1 0 0 empty empty end_level 25 8 1 12 -261689
 -1 -1 0 0;
-#X obj 462 233 hsl 150 17 0 1 0 0 empty empty start_level 25 8 1 12
+#X obj 456 187 hsl 150 17 0 1 0 0 empty empty start_level 25 8 1 12
 -261689 -1 -1 0 0;
-#X obj 459 316 nbx 3 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 1 10
+#X obj 453 270 nbx 3 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 1 10
 -233017 -1 -1 0 256;
-#X obj 459 333 pack float float float float;
-#X obj 586 316 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 129 10 -233017 -1 -1 0 256;
-#X obj 522 316 nbx 6 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 129 10 -233017 -1 -1 1027.59 256;
-#X obj 650 316 nbx 6 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
-0 -6 129 10 -233017 -1 -1 101.445 256;
-#X obj 525 254 hsl 180 17 5 5000 1 1 empty empty attack_duration 25
+#X obj 453 287 pack float float float float;
+#X obj 580 270 nbx 3 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 1 10 -233017 -1 -1 0 256;
+#X obj 516 270 nbx 6 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 1 10 -233017 -1 -1 1027.59 256;
+#X obj 644 270 nbx 6 14 -1e+37 1e+37 0 0 pack_bang_env empty empty
+0 -6 1 10 -233017 -1 -1 101.445 256;
+#X obj 519 208 hsl 180 17 5 5000 1 1 empty empty attack_duration 25
 9 1 12 -261681 -1 -1 13800 0;
-#X obj 653 296 hsl 180 17 5 5000 1 1 empty empty decay_duration 25
+#X obj 647 250 hsl 180 17 5 5000 1 1 empty empty decay_duration 25
 9 1 12 -261681 -1 -1 7800 0;
-#X obj 440 316 bng 15 250 50 0 empty pack_bang_env empty 0 -6 64 8
--262144 -1 -1;
+#X obj 434 270 bng 15 250 50 0 empty pack_bang_env empty 0 -6 0 8 -262144
+-1 -1;
 #X obj 3 2 cnv 15 850 30 empty empty [ff-periodic] 15 15 1 18 -261681
 -1 0;
 #X text 480 573 <-- arguments are: device# direction duration level
@@ -100,6 +100,10 @@ a waveform that can be a pulsing or a vibration depending on the "period".
 ;
 #X text 145 139 waveform offset from center [-1 \, 1];
 #X text 199 155 (defaults 0=centered);
+#X msg 441 392 load;
+#X msg 441 416 unload;
+#X text 492 391 a load message \, uploads an effect to the stick;
+#X text 491 416 an unload message \, removes it;
 #X connect 0 0 8 0;
 #X connect 1 0 8 0;
 #X connect 2 0 8 0;
@@ -146,3 +150,5 @@ a waveform that can be a pulsing or a vibration depending on the "period".
 #X connect 54 0 52 0;
 #X connect 55 0 53 0;
 #X connect 56 0 50 0;
+#X connect 68 0 8 0;
+#X connect 69 0 8 0;
