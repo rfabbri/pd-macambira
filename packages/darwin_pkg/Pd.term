@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>WindowSettings</key>
+	<array>
+		<dict>
+			<key>AutoFocus</key>
+			<string>YES</string>
+			<key>Autowrap</key>
+			<string>YES</string>
+			<key>Backwrap</key>
+			<string>YES</string>
+			<key>Bell</key>
+			<string>YES</string>
+			<key>BlinkCursor</key>
+			<string>NO</string>
+			<key>CleanCommands</key>
+			<string>rlogin;telnet;ssh;slogin</string>
+			<key>Columns</key>
+			<string>80</string>
+			<key>CursorShape</key>
+			<string>2</string>
+			<key>CustomTitle</key>
+			<string>pure data</string>
+			<key>DeleteKeySendsBackspace</key>
+			<string>NO</string>
+			<key>DisableAnsiColors</key>
+			<string>NO</string>
+			<key>DoubleBold</key>
+			<string>YES</string>
+			<key>DoubleColumnsForDoubleWide</key>
+			<string>NO</string>
+			<key>DoubleWideChars</key>
+			<string>YES</string>
+			<key>ExecutionString</key>
+			<string>/usr/local/bin/pd; exit</string>
+			<key>FontAntialiasing</key>
+			<string>YES</string>
+			<key>FontHeightSpacing</key>
+			<string>0.8</string>
+			<key>FontWidthSpacing</key>
+			<string>1</string>
+			<key>IsMiniaturized</key>
+			<string>NO</string>
+			<key>MacTermFunctionKeys</key>
+			<string>NO</string>
+			<key>Meta</key>
+			<string>27</string>
+			<key>NSFixedPitchFont</key>
+			<string>Courier</string>
+			<key>NSFixedPitchFontSize</key>
+			<real>12</real>
+			<key>Rows</key>
+			<string>24</string>
+			<key>SaveLines</key>
+			<string>-1</string>
+			<key>ScrollRegionCompat</key>
+			<string>NO</string>
+			<key>ScrollRows</key>
+			<string>0</string>
+			<key>Scrollback</key>
+			<string>YES</string>
+			<key>Shell</key>
+			<string>/bin/sh</string>
+			<key>ShellExitAction</key>
+			<string>1</string>
+			<key>StrictEmulation</key>
+			<string>NO</string>
+			<key>StringEncoding</key>
+			<string>5</string>
+			<key>TerminalOpaqueness</key>
+			<real>1</real>
+			<key>TextColors</key>
+			<string>0.000 0.000 0.000 1.000 1.000 1.000 1.000 0.797 0.000 1.000 0.797 0.000 1.000 1.000 1.000 0.000 0.000 0.000 0.000 0.084 1.000 0.383 1.000 1.000 </string>
+			<key>TitleBits</key>
+			<string>104</string>
+			<key>Translate</key>
+			<string>YES</string>
+			<key>UseCtrlVEscapes</key>
+			<string>NO</string>
+			<key>VisualBell</key>
+			<string>YES</string>
+			<key>WinLocULY</key>
+			<string>629</string>
+			<key>WinLocX</key>
+			<string>5</string>
+			<key>WinLocY</key>
+			<string>0</string>
+			<key>WindowCloseAction</key>
+			<string>0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

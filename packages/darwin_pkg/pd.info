@@ -10,7 +10,7 @@ RequiresReboot NO
 UseUserMask NO
 OverwritePermissions NO
 InstallFat NO
-rootVolumeOnly NO
+rootVolumeOnly YES
 AllowBackRev YES
 LongFilenames YES
 LibrarySubdirectory Standard
