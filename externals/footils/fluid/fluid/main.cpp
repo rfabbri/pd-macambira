@@ -156,7 +156,7 @@ void fluid::fluid_load(int argc, t_atom *argv)
 	if (argc >= 1 && IsSymbol(argv[0]))	
 	{
 		const char* filename = GetString(argv[0]);
-		if ( fluid_synth_sfload(synth, filename, 0) == 0)
+		if ( fluid_synth_sfload(synth, filename, 0) >= 0)
 		{
 			post("Loaded Soundfont: %s", filename);
 		}
