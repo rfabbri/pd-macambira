@@ -1,0 +1,12 @@
+#N canvas 257 57 322 271 10;
+#X obj 31 104 2.control.examples;
+#X obj 32 130 3.audio.examples;
+#X obj 31 155 4.fft.examples;
+#X obj 30 187 5.reference;
+#X obj 31 26 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 53 25 1.manual;
+#X obj 31 72 shell;
+#X msg 32 49 open ../lib/pd/doc/1.manual/index.htm;
+#X connect 4 0 7 0;
+#X connect 7 0 6 0;
