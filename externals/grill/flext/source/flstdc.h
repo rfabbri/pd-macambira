@@ -59,6 +59,10 @@ extern "C" {
 #pragma warning (pop)
 #endif
 
+#ifdef cabs
+#undef cabs // this is defined in m_pd.h (clashes with math.h)
+#endif
+
 typedef t_object t_sigobj;
 typedef t_gpointer *t_ptrtype;
 
@@ -78,10 +82,25 @@ typedef t_clock t_qelem;
 
 /* MaxMSP definitions start here */
 
+#ifndef __MRC__
+#define powerc
+#endif
+#define __MOTO__ 0
+
+
 // Include the relevant MaxMSP header files
+
+#include <MacTypes.h>
+
 extern "C"
 {
+
 #include "ext.h"
+/*
+#include "ext_prefix.h"
+#include "ext_mess.h"
+#include "ext_proto.h"
+*/
 //#include "ext_strings.h"  // clashes with MPW
 #include "ext_user.h"
 #include "z_dsp.h"
@@ -96,7 +115,11 @@ typedef t_symbol *t_symptr;
 typedef t_symbol *t_symtype;
 typedef t_object *t_thing;
 
+#ifdef MAC_VERSION
+typedef void t_qelem;
+#else
 typedef qelem t_qelem;
+#endif
 
 typedef method t_method;
 typedef method t_newmethod;
@@ -109,8 +132,16 @@ typedef void t_binbuf;
 #define clock_free(tick) freeobject((object *)tick)
 
 #define A_NULL A_NOTHING
-#define A_FLINT A_INT
+//#define A_FLINT A_INT
 #define A_DEFFLINT A_DEFLONG
+
+#ifndef A_INT
+#define A_INT A_LONG
+#endif
+
+#ifndef A_SYMBOL
+#define A_SYMBOL A_SYM
+#endif
 
 #endif
 

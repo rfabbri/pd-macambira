@@ -22,11 +22,14 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 class FLEXT_EXT flext {
+
+	/*!	\defgroup FLEXT_SUPPORT Flext support class
+		@{ 
+	*/
 public:
 // --- buffer/array stuff -----------------------------------------	
 
-	/*!	\defgroup FLEXT_N_BUFFER Flext buffer handling
-
+	/*!	\defgroup FLEXT_S_BUFFER Buffer handling
 		@{ 
 	*/
 
@@ -35,6 +38,7 @@ public:
 	{
 	public:
 		/*! \brief Construct buffer.
+			\param s: symbol name, can be NULL
 			\param delayed = true: only sets name, needs another Set(NULL) to really initialize the buffer 
 			\remark As externals can be created prior to the buffer objects they are pointing to, initialization should be done at loadbang!
 		*/
@@ -97,12 +101,34 @@ public:
 #endif
 	};
 
-//!		@} 
+//!		@} FLEXT_S_BUFFER
+
+// --- utilities --------------------------------------------------
+
+	/*!	\defgroup FLEXT_S_UTIL Utility functions
+		@{ 
+	*/
+
+	//! Copy an atom
+	static void CopyAtom(t_atom *dst,const t_atom *src) { *dst = *src; }
+
+	//! Print an atom
+	static void PrintAtom(const t_atom &a,char *buf);
+	//! Scan an atom
+	static bool ScanAtom(t_atom &a,const char *buf);
+
+	//! Copy a list of atoms
+	static t_atom *CopyList(int argc,const t_atom *argv);
+	//! Copy a memory region
+	static void CopyMem(void *dst,const void *src,int bytes);
+	//! Sleep for an amount of time
+	static void Sleep(float s);
+
+//!		@} FLEXT_S_UTIL
 
 // --- various symbols --------------------------------------------
 
-	/*!	\defgroup FLEXT_N_SYMBOL Flext atom/symbol handling 
-
+	/*!	\defgroup FLEXT_S_ATOM Atom/list handling
 		@{ 
 	*/
 
@@ -143,27 +169,6 @@ public:
 	//! Check for symbol and get string
 	static const char *GetAString(const t_symbol *s) { return s?s->s_name:""; }  
 
-//!		@} 
-
-// --- utilities --------------------------------------------------
-
-	/*!	\defgroup FLEXT_C_UTIL Flext utility functions
-
-		@{ 
-	*/
-
-	//! Copy an atom
-	static void CopyAtom(t_atom *dst,const t_atom *src) { *dst = *src; }
-
-	//! Copy a list of atoms
-	static t_atom *CopyList(int argc,const t_atom *argv);
-	//! Copy a memory region
-	static void CopyMem(void *dst,const void *src,int bytes);
-	//! Sleep for an amount of time
-	static void Sleep(float s);
-
-//!		@} 
-
 // --- atom stuff ----------------------------------------
 		
 	//! Set atom from another atom
@@ -185,12 +190,19 @@ public:
 
 	//! Check whether the atom is a symbol
 	static bool IsSymbol(const t_atom &a) { return a.a_type == A_SYMBOL; }
+#ifdef PD
 	//! Access the symbol value (without type check)
 	static t_symbol *GetSymbol(const t_atom &a) { return a.a_w.w_symbol; }
-	//! Check for a symbol and get its value 
-	static t_symbol *GetASymbol(const t_atom &a) { return IsSymbol(a)?GetSymbol(a):NULL; }  // NULL or empty symbol?
 	//! Set the atom to represent a symbol
 	static void SetSymbol(t_atom &a,const t_symbol *s) { a.a_type = A_SYMBOL; a.a_w.w_symbol = const_cast<t_symbol *>(s); }
+#else
+	//! Access the symbol value (without type check)
+	static t_symbol *GetSymbol(const t_atom &a) { return a.a_w.w_sym; }
+	//! Set the atom to represent a symbol
+	static void SetSymbol(t_atom &a,const t_symbol *s) { a.a_type = A_SYMBOL; a.a_w.w_sym = const_cast<t_symbol *>(s); }
+#endif
+	//! Check for a symbol and get its value 
+	static t_symbol *GetASymbol(const t_atom &a) { return IsSymbol(a)?GetSymbol(a):NULL; }  // NULL or empty symbol?
 
 	//! Check whether the atom is a string
 	static bool IsString(const t_atom &a) { return IsSymbol(a); }
@@ -204,6 +216,8 @@ public:
 	//! Check whether the atom can be represented as an integer
 	static bool CanbeInt(const t_atom &a) { return IsFloat(a) || IsInt(a); }
 
+	//! Set the atom to represent a boolean
+	static void SetBool(t_atom &a,bool v) { SetInt(a,v?1:0); }
 	//! Check whether the atom can be represented as a boolean
 	static bool CanbeBool(const t_atom &a) { return CanbeInt(a); }
 	//! Check for an boolean and get its value 
@@ -222,14 +236,16 @@ public:
 	//! Set the atom to represent a integer (depending on the system)
 	static void SetInt(t_atom &a,int v) { a.a_type = A_FLOAT; a.a_w.w_float = (float)v; }
 
-	//! Check whether the atom is a pointer
+	//! Check whether the atom strictly is a pointer
 	static bool IsPointer(const t_atom &a) { return a.a_type == A_POINTER; }
+	//! Check whether the atom can be a pointer
+	static bool CanbePointer(const t_atom &a) { return IsPointer(a); }
 	//! Access the pointer value (without type check)
 	static t_gpointer *GetPointer(const t_atom &a) { return a.a_w.w_gpointer; }
 	//! Check for a pointer and get its value 
-	static t_gpointer *GetAPointer(const t_atom &a) { return IsPointer(a)?GetPointer(a):NULL; }
+	static void *GetAPointer(const t_atom &a) { return IsPointer(a)?GetPointer(a):NULL; }
 	//! Set the atom to represent a pointer
-	static void SetPointer(t_atom &a,t_gpointer *p) { a.a_type = A_POINTER; a.a_w.w_gpointer = p; }
+	static void SetPointer(t_atom &a,void *p) { a.a_type = A_POINTER; a.a_w.w_gpointer = (t_gpointer *)p; }
 
 #elif defined(MAXMSP)
 	//! Check for a float and get its value 
@@ -240,25 +256,21 @@ public:
 	//! Access the integer value (without type check)
 	static int GetInt(const t_atom &a) { return a.a_w.w_long; }
 	//! Check for an integer and get its value 
-	static int GetAInt(const t_atom &a) { return IsInt(a)?GetInt(a):(IsFloat(a)?GetFloat(a):0); }
+	static int GetAInt(const t_atom &a) { return IsInt(a)?GetInt(a):(IsFloat(a)?(int)GetFloat(a):0); }
 	//! Set the atom to represent an integer
 	static void SetInt(t_atom &a,int v) { a.a_type = A_INT; a.a_w.w_long = v; }
 
-	//! Check whether the atom is a pointer
+	//! Check whether the atom strictly is a pointer
 	static bool IsPointer(const t_atom &) { return false; }
-	//! Access the pointer value (without type check)
-	static void *GetPointer(const t_atom &) { return NULL; }
+	//! Check whether the atom can be a pointer
+	static bool CanbePointer(const t_atom &a) { return IsInt(a); }
 	//! Check for a pointer and get its value 
-	static void *GetAPointer(const t_atom &) { return NULL; }
-//	void SetPointer(t_atom &,void *) {}
+	static void *GetAPointer(const t_atom &a) { return IsInt(a)?(void *)GetInt(a):NULL; }
+	//! Set the atom to represent a pointer
+	static void SetPointer(t_atom &a,void *p) { SetInt(a,(int)p); }
 #endif
 
 // --- atom list stuff -------------------------------------------
-
-	/*!	\defgroup FLEXT_N_ATOM Flext atom/list handling
-
-		@{ 
-	*/
 
 	//! Class representing a list of atoms
 	class AtomList
@@ -275,7 +287,12 @@ public:
 		AtomList &Clear() { return operator()(); }
 
 		//! Set list
-		AtomList &operator()(int argc = 0,const t_atom *argv = NULL);
+		AtomList &Set(int argc,const t_atom *argv,int offs = 0,bool resize = false);
+		//! Get list
+		int Get(t_atom *argv,int mxsz = -1) const;
+
+		//! Set list
+		AtomList &operator()(int argc = 0,const t_atom *argv = NULL) { return Set(argc,argv,0,true); }
 		//! Set list by another AtomList
 		AtomList &operator =(const AtomList &a) { return operator()(a.Count(),a.Atoms()); }
 
@@ -294,13 +311,13 @@ public:
 		//! Append an atom to the list
 		AtomList &Append(const t_atom &a);
 		//! Append an atom list to the list
-		AtomList &Append(int argc,const t_atom *argv);
+		AtomList &Append(int argc,const t_atom *argv = NULL);
 		//! Append an atom list to the list
 		AtomList &Append(const AtomList &a) { return Append(a.Count(),a.Atoms()); }
 		//! Prepend an atom to the list
 		AtomList &Prepend(const t_atom &a);
 		//! Prepend an atom list to the list
-		AtomList &Prepend(int argc,const t_atom *argv);
+		AtomList &Prepend(int argc,const t_atom *argv = NULL);
 		//! Prepend an atom list to the list
 		AtomList &Prepend(const AtomList &a) { return Prepend(a.Count(),a.Atoms()); }
 
@@ -321,17 +338,20 @@ public:
 	{
 	public:
 		//! Construct anything
-		AtomAnything(const t_symbol *h = NULL,int argc = 0,const t_atom *argv = NULL): AtomList(argc,argv),hdr(h) {}
+		AtomAnything(const t_symbol *h = NULL,int argc = 0,const t_atom *argv = NULL);
 		//! Construct anything
-		AtomAnything(const char *h,int argc = 0,const t_atom *argv = NULL): AtomList(argc,argv),hdr(MakeSymbol(h)) {}
+		AtomAnything(const char *h,int argc = 0,const t_atom *argv = NULL);
 		//! Construct anything
-		AtomAnything(const AtomAnything &a): AtomList(a),hdr(a.hdr) {}
+		AtomAnything(const AtomAnything &a);
 
 		//! Clear anything
 		AtomAnything &Clear() { return operator()(); }
 
 		//! Get header symbol of anything
 		const t_symbol *Header() const { return hdr; }
+
+		//! Set header symbol of anything
+		void Header(const t_symbol *h) { hdr = h; }
 		
 		//! Set anything
 		AtomAnything &operator()(const t_symbol *h = NULL,int argc = 0,const t_atom *argv = NULL)
@@ -347,12 +367,12 @@ public:
 		const t_symbol *hdr;
 	};
 
-//!		@} 
+//!		@} FLEXT_S_ATOM
 
 // --- clock stuff ------------------------------------------------
 
 
-	/*!	\defgroup FLEXT_N_CLOCK Flext clock functions
+	/*!	\defgroup FLEXT_S_CLOCK Flext clock functions
 
 		At the moment there are none
 
@@ -365,8 +385,7 @@ public:
 // --- thread stuff -----------------------------------------------
 
 #ifdef FLEXT_THREADS
-	/*!	\defgroup FLEXT_N_THREAD Flext thread handling 
-
+	/*!	\defgroup FLEXT_S_THREAD Flext thread handling 
 		@{ 
 	*/
 
@@ -428,10 +447,16 @@ public:
 	protected:
 		pthread_cond_t cond;
 	};
-//!		@} 
+//!		@} FLEXT_S_THREAD
+
 #endif // FLEXT_THREADS
 
+//!		@} 
+
 protected:
+#ifdef __MRC__
+	friend class flext_obj;
+#endif
 	static void Setup();
 };
 

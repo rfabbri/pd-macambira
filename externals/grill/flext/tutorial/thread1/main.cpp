@@ -10,15 +10,18 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 This shows an example of a method running as a thread
 */
 
-// define FLEXT_THREADS for thread usage. Flext must also have been compiled with that defined!
+/* define FLEXT_THREADS for thread usage. Flext must also have been compiled with that defined!
+	it's even better to define that as a compiler flag (-D FLEXT_THREADS) for all files of the
+	flext external
+*/
 #ifndef FLEXT_THREADS
 #define FLEXT_THREADS
 #endif
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 301)
-#error You need at least flext version 0.3.1
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#error You need at least flext version 0.4.0
 #endif
 
 
@@ -47,7 +50,6 @@ thread1::thread1()
 { 
 	AddInAnything();
 	AddOutInt(); 
-	SetupInOut();  // set up inlets and outlets
 
 	FLEXT_ADDBANG(0,m_start); // register method
 } 

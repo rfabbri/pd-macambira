@@ -14,13 +14,14 @@ This is an example of a simple object doing a float inversion
 #include <flext.h>
 
 // check for appropriate flext version
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 300)
-#error You need at least flext version 0.3.0
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#error You need at least flext version 0.4.0
 #endif
 
 
 // define the class that stands for a pd/Max object
 // Attention: the class name must be the same as the object name!! (without an eventual ~)
+// Special names are possible with the usage of libraries (see the lib1 tutorial example)
 
 class simple1:
 	// inherit from basic flext class
@@ -53,9 +54,6 @@ simple1::simple1()
 	// define outlets:
 	AddOutFloat();  // add one float outlet (has index 0)
 	
-	 // set up inlets and outlets - obligatory! 
-	SetupInOut(); 
-
 	// register methods
 	FLEXT_ADDMETHOD(0,m_float);  // register method (for float messages) "m_float" for inlet 0
 } 

@@ -14,61 +14,44 @@ WARRANTIES, see the file, "license.txt," in this distribution.
  
 #include "flext.h"
 
-//namespace flext {
 
 flext::AtomList::AtomList(int argc,const t_atom *argv):
-	lst(NULL),cnt(0)
+	cnt(0),lst(NULL)
 {
 	operator()(argc,argv);
 }
 
 flext::AtomList::AtomList(const AtomList &a):
-	lst(NULL),cnt(0)
+	cnt(0),lst(NULL)
 {
 	operator =(a);
 }
 
 flext::AtomList::~AtomList() {	Clear(); }
 
-flext::AtomList &flext::AtomList::operator()(int argc,const t_atom *argv)
+flext::AtomList &flext::AtomList::Set(int argc,const t_atom *argv,int offs,bool resize)
 {
-	if(lst && cnt != argc) { delete[] lst; lst = NULL; cnt = 0; }
+	int ncnt = argc+offs;
+	if(resize && lst && cnt != ncnt) { delete[] lst; lst = NULL; cnt = 0; }
 
-	if(argc) {
-		cnt = argc;
-		lst = new t_atom[cnt];
+	if(ncnt) {
+		if(!lst) lst = new t_atom[cnt = ncnt];
 
 		if(argv) {
-			for(int i = 0; i < argc; ++i) SetAtom(lst[i],argv[i]);
-/*			
-			{
-				switch(lst[i].a_type = argv[i].a_type) {
-				case A_FLOAT:
-					lst[i].a_w.w_float = argv[i].a_w.w_float;
-					break;
-#ifdef MAXMSP
-				case A_LONG:
-					lst[i].a_w.w_int = argv[i].a_w.w_int;
-					break;
-#endif
-				case A_SYMBOL:
-					lst[i].a_w.w_symbol = argv[i].a_w.w_symbol;
-					break;
-#ifdef PD
-				case A_POINTER:
-					lst[i].a_w.w_gpointer = argv[i].a_w.w_gpointer;
-					break;
-#endif
-				default:
-					post("AtomList - atom type (%i) not supported",lst[i].a_type);
-					lst[i].a_type = A_NULL;
-					break;
-				}
-			}
-*/
+			for(int i = 0; i < argc; ++i) SetAtom(lst[offs+i],argv[i]);
 		}
 	}
 	return *this;
+}
+
+int flext::AtomList::Get(t_atom *argv,int mxsz) const
+{
+	int argc = Count();
+	if(mxsz >= 0 && argc > mxsz) argc = mxsz;
+
+	for(int i = 0; i < argc; ++i) SetAtom(argv[i],lst[i]);
+
+	return argc;
 }
 
 
@@ -87,15 +70,17 @@ flext::AtomList &flext::AtomList::Append(const t_atom &a)
 
 flext::AtomList &flext::AtomList::Append(int argc,const t_atom *argv)
 {
-	t_atom *nlst = new t_atom[cnt+argc];
-	int i;
-	for(i = 0; i < cnt; ++i) SetAtom(nlst[i],lst[i]);
-	for(i = 0; i < argc; ++i) SetAtom(nlst[cnt+i],argv[i]);
-	
-	if(lst) delete[] lst;
-	lst = nlst;
-	cnt += argc;
-
+	if(argc) {
+		t_atom *nlst = new t_atom[cnt+argc];
+		int i;
+		for(i = 0; i < cnt; ++i) SetAtom(nlst[i],lst[i]);
+		if(argv) 
+			for(i = 0; i < argc; ++i) SetAtom(nlst[cnt+i],argv[i]);
+		
+		if(lst) delete[] lst;
+		lst = nlst;
+		cnt += argc;
+	}
 	return *this;
 }
 
@@ -114,15 +99,18 @@ flext::AtomList &flext::AtomList::Prepend(const t_atom &a)
 
 flext::AtomList &flext::AtomList::Prepend(int argc,const t_atom *argv)
 {
-	t_atom *nlst = new t_atom[cnt+argc];
-	int i;
-	for(i = 0; i < argc; ++i) SetAtom(nlst[i],argv[i]);
-	for(i = 0; i < cnt; ++i) SetAtom(nlst[argc+i],lst[i]);
-	
-	if(lst) delete[] lst;
-	lst = nlst;
-	cnt += argc;
+	if(argc) {
+		t_atom *nlst = new t_atom[cnt+argc];
+		int i;
 
+		if(argv) 
+			for(i = 0; i < argc; ++i) SetAtom(nlst[i],argv[i]);
+		for(i = 0; i < cnt; ++i) SetAtom(nlst[argc+i],lst[i]);
+		
+		if(lst) delete[] lst;
+		lst = nlst;
+		cnt += argc;
+	}
 	return *this;
 }
 
@@ -136,4 +124,17 @@ flext::AtomList flext::AtomList::GetPart(int offs,int len) const
 	return AtomList(len,Atoms()+offs);
 }
 
-//} // namespace flext
+
+flext::AtomAnything::AtomAnything(const t_symbol *h,int argc,const t_atom *argv): 
+	AtomList(argc,argv),hdr(h?h:MakeSymbol("")) 
+{}
+
+flext::AtomAnything::AtomAnything(const char *h,int argc,const t_atom *argv): 
+	AtomList(argc,argv),hdr(MakeSymbol(h)) 
+{}
+
+flext::AtomAnything::AtomAnything(const AtomAnything &a): 
+	AtomList(a),hdr(a.hdr) 
+{}
+
+

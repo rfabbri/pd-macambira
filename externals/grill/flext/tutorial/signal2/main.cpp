@@ -14,8 +14,8 @@ This is an object showing varous parameters of the pd audio system
 #include <flext.h>
 
 // check for appropriate flext version
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 300)
-#error You need at least flext version 0.3.0
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
+#error You need at least flext version 0.4.0
 #endif
 
 
@@ -37,7 +37,7 @@ protected:
 	void m_bang();  // method for bang
 
 	// this virtual function is obligatory for objects derived from flext_dsp
-	virtual void m_signal(int n, float *const *in, float *const *out);
+//	virtual void m_signal(int n, float *const *in, float *const *out);
 
 private:
 	FLEXT_CALLBACK(m_bang);  // callback for method "m_bang" 
@@ -57,9 +57,6 @@ signal2::signal2()
 	AddOutFloat(1);
 	AddOutInt(3); // although PD knows no int type, flext does!
 	
-	// set up inlets and outlets - obligatory! 
-	SetupInOut(); 
-
 	// register methods
 	FLEXT_ADDBANG(0,m_bang);  // register method "m_bang" for bang message into inlet 0
 } 
@@ -73,8 +70,8 @@ void signal2::m_bang()
 	ToOutInt(3,ChannelsOut()); 
 }
 
+/*
 void signal2::m_signal(int, float *const *, float *const *)
 {
-	// do no dsp work
 }
-
+*/

@@ -16,15 +16,23 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #ifndef __FLEXT_DEFS_H
 #define __FLEXT_DEFS_H
 
-#ifdef FLEXT_GUI
+/*!	\defgroup FLEXT_DEFS Definitions for basic flext functionality
+	@{ 
+*/
+
+/*! \brief Switch for compilation of derived virtual classes
+	\remark These need dynamic type casts (and RTTI, naturally)
+	\ingroup FLEXT_GLOBALS
+*/
+#ifdef FLEXT_VIRT
 #define FLEXT_CAST dynamic_cast
 #else
 #define FLEXT_CAST static_cast
 #endif
 
-/*!	\defgroup FLEXT_HEADER Flext class header
-	One (and only one!) of these definitions is compulsory for the class declaration. 
-	It has to be placed somewhere in the class definition (not necessarily in a public section).
+/*!	\defgroup FLEXT_D_HEADER Flext class header
+	\note One (and only one!) of these definitions is compulsory for the class declaration. 
+	\note It has to be placed somewhere in the class definition (not necessarily in a public section).
 
 	@{ 
 */
@@ -43,35 +51,38 @@ FLEXT_REALHDR(NEW_CLASS, PARENT_CLASS)
 	\param SETUPFUN setup function, of type "void (*setupfn)(t_class *)"
 
 	The setup function is called after class creation. It corresponds to the
-	original "object_setup" function, apart from the
-	fact that all necessary class initializations have already been taken care by flext. 
+	original PD "[object]_setup" function, apart from the
+	fact that all necessary class initializations have already been taken care of by flext. 
 	The setup function can e.g. be used for a message to the console upon first creation of an object.
-	The object's t_class* data can be accessed by the static function thisClass()
 */
 #define FLEXT_HEADER_S(NEW_CLASS, PARENT_CLASS, SETUPFUN)\
 \
 FLEXT_REALHDR_S(NEW_CLASS, PARENT_CLASS, SETUPFUN)    	    	
 
 
-//! @} 
+//! @} FLEXT_D_HEADER
 
 
 
 // ====================================================================================
 
-/*!	\defgroup FLEXT_NEW Flext class instantiation
-	Makes an actual instance of a class.
+/*!	\defgroup FLEXT_D_INSTANCE Class instantiation
 */
 
-/*!	\defgroup FLEXT_NEW_DSP Flext dsp class instantiation
+
+/*!	\defgroup FLEXT_D_NEW Stand-alone class instantiation
+	Makes an actual instance of a stand-alone class.
+*/
+
+/*!	\defgroup FLEXT_D_NEW_DSP Dsp class instantiation
 	Makes an actual instance of a dsp (aka "tilde") class (with signal processing).
 */
 
-/*!	\defgroup FLEXT_LIB Flext library class instantiation
+/*!	\defgroup FLEXT_D_LIB Library class instantiation
 	Makes an actual instance of a class	which is part of an object library (and not stand-alone).
 */
 
-/*!	\defgroup FLEXT_LIB_DSP Flext dsp library class instantiation
+/*!	\defgroup FLEXT_D_LIB_DSP Dsp library class instantiation
 	Makes an actual instance of a dsp (aka "tilde") class with signal processing
 	which is part of an object library (and not stand-alone).
 */
@@ -79,8 +90,8 @@ FLEXT_REALHDR_S(NEW_CLASS, PARENT_CLASS, SETUPFUN)
 // NO ARGUMENTS
 // ----------------------------------------
 
-/*! Implementation of a flext class with no arguments
-	\ingroup FLEXT_NEW
+/*! \brief Implementation of a flext class with no arguments
+	\ingroup FLEXT_D_NEW
 	\param NAME the object's actual name(s) as a string (like "*", "trigger", "noise~", etc.)
 	\param NEW_CLASS the object's C++ class name 
 */
@@ -88,22 +99,22 @@ FLEXT_REALHDR_S(NEW_CLASS, PARENT_CLASS, SETUPFUN)
 \
 REAL_NEW(NAME,NEW_CLASS,0,0)
 
-/*! Implementation of a flext dsp class with no arguments
-	\ingroup FLEXT_NEW_DSP
+/*! \brief Implementation of a flext dsp class with no arguments
+	\ingroup FLEXT_D_NEW_DSP
 */
 #define FLEXT_NEW_DSP(NAME,NEW_CLASS)	\
 \
 REAL_NEW(NAME,NEW_CLASS,1,0)
 
-/*! Implementation of a flext class (part of a library) with no arguments
-	\ingroup FLEXT_LIB
+/*! \brief Implementation of a flext class (part of a library) with no arguments
+	\ingroup FLEXT_D_LIB
 */
 #define FLEXT_LIB(NAME,NEW_CLASS) \
 \
 REAL_NEW(NAME,NEW_CLASS,0,1) 
 
-/*! Implementation of a flext dsp class (part of a library) with no arguments
-	\ingroup FLEXT_LIB_DSP
+/*! \brief Implementation of a flext dsp class (part of a library) with no arguments
+	\ingroup FLEXT_D_LIB_DSP
 */
 #define FLEXT_LIB_DSP(NAME,NEW_CLASS)	\
 \
@@ -113,93 +124,61 @@ REAL_NEW(NAME,NEW_CLASS,1,1)
 // VARIABLE ARGUMENT LIST
 // ----------------------------------------
 
-/*! Implementation of a flext class with a variable argument list
-	\ingroup FLEXT_NEW
+/*! \brief Implementation of a flext class with a variable argument list
+	\ingroup FLEXT_D_NEW
 */
 #define FLEXT_NEW_V(NAME,NEW_CLASS)			\
 \
 REAL_NEW_V(NAME,NEW_CLASS,0,0) \
 
-/*! Implementation of a flext tilde class with a variable argument list
-	\ingroup FLEXT_NEW_DSP
+/*! \brief Implementation of a flext dsp class with a variable argument list
+	\ingroup FLEXT_D_NEW_DSP
 */
 #define FLEXT_NEW_DSP_V(NAME,NEW_CLASS)	\
 \
 REAL_NEW_V(NAME,NEW_CLASS,1,0) \
 
-/*! Implementation of a flext class (part of a library) with a variable argument list
-	\ingroup FLEXT_LIB
+/*! \brief Implementation of a flext class (part of a library) with a variable argument list
+	\ingroup FLEXT_D_LIB
 */
 #define FLEXT_LIB_V(NAME,NEW_CLASS)			\
 \
 REAL_NEW_V(NAME,NEW_CLASS, 0,1) 
 
-/*! Implementation of a flext tilde class (part of a library) with a variable argument list
-	\ingroup FLEXT_LIB_DSP
+/*! \brief Implementation of a flext dsp class (part of a library) with a variable argument list
+	\ingroup FLEXT_D_LIB_DSP
 */
 #define FLEXT_LIB_DSP_V(NAME,NEW_CLASS)	\
 \
 REAL_NEW_V(NAME,NEW_CLASS, 1,1) 
 
 
-// OBJECT NAME + VARIABLE ARGUMENT LIST
-// ----------------------------------------
-
-/*! Implementation of a flext class with its name and a variable argument list
-	\ingroup FLEXT_NEW
-*/
-#define FLEXT_NEW_NV(NAME,NEW_CLASS)			\
-\
-REAL_NEW_NV(NAME,NEW_CLASS,0,0) \
-
-/*! Implementation of a flext tilde class with its name and a variable argument list
-	\ingroup FLEXT_NEW_DSP
-*/
-#define FLEXT_NEW_DSP_NV(NAME,NEW_CLASS)	\
-\
-REAL_NEW_NV(NAME,NEW_CLASS,1,0) \
-
-/*! Implementation of a flext class (part of a library) with its name and a variable argument list
-	\ingroup FLEXT_LIB
-*/
-#define FLEXT_LIB_NV(NAME,NEW_CLASS)			\
-\
-REAL_NEW_NV(NAME,NEW_CLASS, 0,1) 
-
-/*! Implementation of a flext tilde class (part of a library) with its name and a variable argument list
-	\ingroup FLEXT_LIB_DSP
-*/
-#define FLEXT_LIB_DSP_NV(NAME,NEW_CLASS)	\
-\
-REAL_NEW_NV(NAME,NEW_CLASS, 1,1) 
-
-
 // ONE ARGUMENT
 // ----------------------------------------
 
-/*! Implementation of a flext class with one argument
-	\ingroup FLEXT_NEW
+/*! \brief Implementation of a flext class with one argument
+	\ingroup FLEXT_D_NEW
 */
 #define FLEXT_NEW_1(NAME,NEW_CLASS, TYPE)		\
 \
 REAL_NEW_1(NAME,NEW_CLASS, 0, 0,TYPE) \
 
-/*! Implementation of a flext tilde class with one argument
-	\ingroup FLEXT_NEW_DSP
+/*! \brief Implementation of a flext dsp class with one argument
+	\ingroup FLEXT_D_NEW_DSP
 */
 #define FLEXT_NEW_DSP_1(NAME,NEW_CLASS, TYPE)	\
 \
 REAL_NEW_1(NAME,NEW_CLASS, 1, 0,TYPE) \
 
-/*! Implementation of a flext class (part of a library) with one argument
-	\ingroup FLEXT_LIB
+/*! \brief Implementation of a flext class (part of a library) with one argument
+	\ingroup FLEXT_D_LIB
 */
 #define FLEXT_LIB_1(NAME,NEW_CLASS, TYPE) \
 \
 REAL_NEW_1(NAME,NEW_CLASS, 0,1,TYPE)
 
-/*! Implementation of a flext tilde class (part of a library) with one argument
-	\ingroup FLEXT_LIB_DSP
+/*! \brief Implementation of a flext dsp class (part of a library) with one argument
+	\ingroup FLEXT_D_LIB_DSP
 */
 #define FLEXT_LIB_DSP_1(NAME,NEW_CLASS, TYPE)	\
 \
@@ -209,29 +188,29 @@ REAL_NEW_1(NAME,NEW_CLASS, 1,1, TYPE)
 // TWO ARGUMENTS
 // ----------------------------------------
 
-/*! Implementation of a flext class with 2 arguments
-	\ingroup FLEXT_NEW
+/*! \brief Implementation of a flext class with 2 arguments
+	\ingroup FLEXT_D_NEW
 */
 #define FLEXT_NEW_2(NAME,NEW_CLASS, TYPE1, TYPE2)			\
 \
 REAL_NEW_2(NAME,NEW_CLASS, 0,0, TYPE1, TYPE2) \
 
-/*! Implementation of a flext tilde class with 2 arguments
-	\ingroup FLEXT_NEW_DSP
+/*! \brief Implementation of a flext dsp class with 2 arguments
+	\ingroup FLEXT_D_NEW_DSP
 */
 #define FLEXT_NEW_DSP_2(NAME,NEW_CLASS, TYPE1, TYPE2)	\
 \
 REAL_NEW_2(NAME,NEW_CLASS, 1,0, TYPE1, TYPE2) \
 
-/*! Implementation of a flext class (part of a library) with 2 arguments
-	\ingroup FLEXT_LIB
+/*! \brief Implementation of a flext class (part of a library) with 2 arguments
+	\ingroup FLEXT_D_LIB
 */
 #define FLEXT_LIB_2(NAME,NEW_CLASS, TYPE1, TYPE2)		\
 \
 REAL_NEW_2(NAME,NEW_CLASS, 0,1, TYPE1, TYPE2)
 
-/*! Implementation of a flext tilde class (part of a library) with 2 arguments
-	\ingroup FLEXT_LIB_DSP
+/*! \brief Implementation of a flext dsp class (part of a library) with 2 arguments
+	\ingroup FLEXT_D_LIB_DSP
 */
 #define FLEXT_LIB_DSP_2(NAME,NEW_CLASS, TYPE1, TYPE2)	\
 \
@@ -241,29 +220,29 @@ REAL_NEW_2(NAME,NEW_CLASS, 1,1, TYPE1, TYPE2)
 // THREE ARGUMENTS
 // ----------------------------------------
 
-/*! Implementation of a flext class with 3 arguments
-	\ingroup FLEXT_NEW
+/*! \brief Implementation of a flext class with 3 arguments
+	\ingroup FLEXT_D_NEW
 */
 #define FLEXT_NEW_3(NAME,NEW_CLASS, TYPE1, TYPE2, TYPE3) \
 \
 REAL_NEW_3(NAME,NEW_CLASS, 0,0, TYPE1, TYPE2, TYPE3)  \
 
-/*! Implementation of a flext tilde class with 3 arguments
-	\ingroup FLEXT_NEW_DSP
+/*! \brief Implementation of a flext dsp class with 3 arguments
+	\ingroup FLEXT_D_NEW_DSP
 */
 #define FLEXT_NEW_DSP_3(NAME,NEW_CLASS, TYPE1, TYPE2, TYPE3)	\
 \
 REAL_NEW_3(NAME,NEW_CLASS, 1,0, TYPE1, TYPE2, TYPE3) \
 
-/*! Implementation of a flext class (part of a library) with 3 arguments
-	\ingroup FLEXT_LIB
+/*! \brief Implementation of a flext class (part of a library) with 3 arguments
+	\ingroup FLEXT_D_LIB
 */
 #define FLEXT_LIB_3(NAME,NEW_CLASS, TYPE1, TYPE2, TYPE3)		\
 \
 REAL_NEW_3(NAME,NEW_CLASS, 0,1,TYPE1, TYPE2, TYPE3)
 
-/*! Implementation of a flext tilde class (part of a library) with 3 arguments
-	\ingroup FLEXT_LIB_DSP
+/*! \brief Implementation of a flext dsp class (part of a library) with 3 arguments
+	\ingroup FLEXT_D_LIB_DSP
 */
 #define FLEXT_LIB_DSP_3(NAME,NEW_CLASS, TYPE1, TYPE2, TYPE3)	\
 \
@@ -290,12 +269,41 @@ REAL_NEW_3(NAME,NEW_CLASS, 1,1, TYPE1, TYPE2, TYPE3)
 
 
 
+/*!	\defgroup FLEXT_D_LIBRARY Definitions for library objects
+	@{ 
+*/
+
+/*! \brief Specify that to declare the library itself
+	\note If you have a library this is compulsory (to register all the objects of the library)
+*/
+#define FLEXT_LIB_SETUP(NAME,SETUPFUN) REAL_LIB_SETUP(NAME,SETUPFUN)
+
+/*! \brief Register an object in the library
+	\note This is used in the library setup function
+*/
+#define FLEXT_SETUP(cl) REAL_SETUP(cl,0)
+
+/*! \brief Register a DSP object in the library
+	\note This is used in the library setup function
+*/
+#define FLEXT_DSP_SETUP(cl) REAL_SETUP(cl,1)
+
+//! \deprecated
+#define FLEXT_TILDE_SETUP FLEXT_DSP_SETUP
+
+//! @} FLEXT_D_LIBRARY 
+
+
+//! @} FLEXT_D_INSTANCE
 
 // ====================================================================================
 
+/*!	\defgroup FLEXT_D_METHOD Declarations for flext methods
+	@{ 
+*/
 
-/*!	\defgroup FLEXT_CALLBACK Flext callbacks
 
+/*!	\defgroup FLEXT_D_CALLBACK Declare callbacks for class methods
 	@{ 
 */
 
@@ -306,7 +314,7 @@ static bool FLEXT_CALL_PRE(M_FUN)(flext_base *c) \
 
 //! Set up a method callback for an anything argument
 #define FLEXT_CALLBACK_A(M_FUN) \
-static bool FLEXT_CALL_PRE(M_FUN)(flext_base *c,const t_symbol *s,int argc,t_atom *argv) \
+static bool FLEXT_CALL_PRE(M_FUN)(flext_base *c,t_symbol *s,int argc,t_atom *argv) \
 { FLEXT_CAST<thisType *>(c)->M_FUN(s,argc,argv); return true; }
 
 //! Set up a method callback for a variable argument list
@@ -388,15 +396,14 @@ FLEXT_CALLBACK_3(M_FUN,int,int,int)
 FLEXT_CALLBACK_1(M_FUN,t_symptr)
 
 
-// deprecated
+//! \deprecated
 #define FLEXT_CALLBACK_G FLEXT_CALLBACK_V
 
-//! @} 
+//! @} FLEXT_D_CALLBACK
 
 
 
-/*!	\defgroup FLEXT_THREAD Flext threads
-
+/*!	\defgroup FLEXT_D_THREAD Declare threaded method callbacks
 	@{ 
 */
 
@@ -421,7 +428,7 @@ static void *FLEXT_THR_PRE(M_FUN)(thr_params *p) {  \
 
 //! Set up a threaded method callback for an anything argument
 #define FLEXT_THREAD_A(M_FUN) \
-static bool FLEXT_CALL_PRE(M_FUN)(flext_base *c,const t_symbol *s,int argc,t_atom *argv) {  \
+static bool FLEXT_CALL_PRE(M_FUN)(flext_base *c,t_symbol *s,int argc,t_atom *argv) {  \
 	thr_params *p = new thr_params(c); p->set_any(s,argc,argv); \
 	return StartThread(FLEXT_THR_PRE(M_FUN),p,#M_FUN); \
 } \
@@ -654,7 +661,7 @@ FLEXT_THREAD_1(M_FUN,t_symptr)
 
 #endif // FLEXT_THREAD
 
-//! @} 
+//! @} FLEXT_D_THREAD
 
 
 
@@ -662,9 +669,8 @@ FLEXT_THREAD_1(M_FUN,t_symptr)
 
 
 
-/*!	\defgroup FLEXT_ADDMETHOD Add flext methods
-	These should be the used in the class' constructor
-
+/*!	\defgroup FLEXT_D_ADDMETHOD Add flext methods
+	\note These can only be used at class construction time
 	@{ 
 */
 
@@ -765,13 +771,11 @@ FLEXT_ADDMETHOD_2(IX,M_TAG,M_FUN,int,int)
 \
 FLEXT_ADDMETHOD_3(IX,M_TAG,M_FUN,int,int,int)
 
-//! @} 
+//! @} FLEXT_D_ADDMETHOD
 
 
 
-/*!	\defgroup FLEXT_CALLMETHOD Call flext methods manually
-	These can only be used in class member functions!
-
+/*!	\defgroup FLEXT_D_CALLMETHOD Call flext methods manually
 	@{ 
 */
 
@@ -783,12 +787,12 @@ FLEXT_CALL_PRE(M_FUN)(this)
 //! Call a (already defined) method with variable list arguments
 #define FLEXT_CALLMETHOD_V(M_FUN,ARGC,ARGV) \
 \
-FLEXT_CALL_PRE(M_FUN)(this,ARGC,ARGV)
+FLEXT_CALL_PRE(M_FUN)(this,ARGC,(t_atom *)(ARGV))
 
 //! Call a (already defined) method with anything arguments
 #define FLEXT_CALLMETHOD_A(M_FUN,HDR,ARGC,ARGV) \
 \
-FLEXT_CALL_PRE(M_FUN)(this,HDR,ARGC,ARGV)
+FLEXT_CALL_PRE(M_FUN)(this,(t_symbol *)(HDR),ARGC,(t_atom *)(ARGV))
 
 //! Call a (already defined) method with a data package (void *)
 #define FLEXT_CALLMETHOD_X(M_FUN,DATA) \
@@ -825,88 +829,319 @@ FLEXT_CALL_PRE(M_FUN)(this,ARG1,ARG2,ARG3,ARG4)
 \
 FLEXT_CALL_PRE(M_FUN)(this,ARG1,ARG2,ARG3,ARG4,ARG5)
 
-//! @} 
+//! @} FLEXT_D_CALLMETHOD
 
 
+//! @} FLEXT_D_METHOD
 
-/*!	\defgroup FLEXT_DEFATTR flext functions for attribute definition
 
+/*!	\defgroup FLEXT_D_ATTRIB Attribute definition
+	\note These have to reside inside the class declaration
 	@{ 
 */
 
+/*! \brief Declare a attribute set function
+	\internal
+*/
 #define FLEXT_CALLSET_(FUN,TP) \
 static bool FLEXT_SET_PRE(FUN)(flext_base *c,TP &arg) \
 { FLEXT_CAST<thisType *>(c)->FUN(arg); return true; }
 
+/*! \brief Declare a attribute get function
+	\internal
+*/
 #define FLEXT_CALLGET_(FUN,TP) \
 static bool FLEXT_GET_PRE(FUN)(flext_base *c,TP &arg) \
 { FLEXT_CAST<thisType *>(c)->FUN(arg); return true; }
 
+/*! \brief Declare an implicite attribute set function
+	\internal
+*/
 #define FLEXT_ATTRSET_(VAR,TP) \
 static bool FLEXT_SET_PRE(VAR)(flext_base *c,TP &arg) \
 { FLEXT_CAST<thisType *>(c)->VAR = arg; return true; }
 
+/*! \brief Declare an implicite attribute get function
+	\internal
+*/
 #define FLEXT_ATTRGET_(VAR,TP) \
 static bool FLEXT_GET_PRE(VAR)(flext_base *c,TP &arg) \
-{ arg = FLEXT_CAST<thisType *>(c)->VAR; return true; }
+{ arg = (TP)FLEXT_CAST<thisType *>(c)->VAR; return true; }
 
-#define FLEXT_CALLSET_F(SFUN) FLEXT_CALLSET_(SFUN,float)
-#define FLEXT_CALLSET_I(SFUN) FLEXT_CALLSET_(SFUN,int)
-#define FLEXT_CALLSET_S(SFUN) FLEXT_CALLSET_(SFUN,t_symptr)
 
+/*!	\defgroup FLEXT_DA_CALLSET Definition of attribute set handlers
+	@{ 
+*/
+
+//! Declare a set function for a float attribute
+#define FLEXT_CALLSET_F(SFUN) \
+\
+FLEXT_CALLSET_(SFUN,float)
+
+//! Declare a set function for an integer attribute
+#define FLEXT_CALLSET_I(SFUN) \
+\
+FLEXT_CALLSET_(SFUN,int)
+
+//! Declare a set function for a boolean attribute
+#define FLEXT_CALLSET_B(FUN) \
+static bool FLEXT_SET_PRE(FUN)(flext_base *c,int &arg) \
+{ bool b = arg != 0; FLEXT_CAST<thisType *>(c)->FUN(b); return true; }
+
+//! Declare a set function for an enum attribute
+#define FLEXT_CALLSET_E(SFUN,TP) \
+\
+FLEXT_CALLSET_(SFUN,TP)
+
+//! Declare a set function for a symbol attribute
+#define FLEXT_CALLSET_S(FUN) \
+static bool FLEXT_SET_PRE(FUN)(flext_base *c,const t_symbol *&arg) \
+{ FLEXT_CAST<thisType *>(c)->FUN(arg); return true; }
+
+//! Declare a set function for a variable list attribute
 #define FLEXT_CALLSET_V(FUN) \
 static bool FLEXT_SET_PRE(FUN)(flext_base *c,AtomList *&arg) \
 { FLEXT_CAST<thisType *>(c)->FUN(*arg); return true; }
 
-#define FLEXT_CALLGET_F(GFUN) FLEXT_CALLGET_(GFUN,float)
-#define FLEXT_CALLGET_I(GFUN) FLEXT_CALLGET_(GFUN,int)
-#define FLEXT_CALLGET_S(GFUN) FLEXT_CALLGET_(GFUN,t_symptr)
+//! @} FLEXT_DA_CALLSET
 
+/*!	\defgroup FLEXT_DA_CALLGET Definition of attribute get handlers
+	@{ 
+*/
+
+//! Declare a get function for a float attribute
+#define FLEXT_CALLGET_F(GFUN) \
+\
+FLEXT_CALLGET_(GFUN,float)
+
+//! Declare a get function for an integer attribute
+#define FLEXT_CALLGET_I(GFUN) \
+\
+FLEXT_CALLGET_(GFUN,int)
+
+//! Declare a get function for a boolean attribute
+#define FLEXT_CALLGET_B(FUN) \
+static bool FLEXT_GET_PRE(FUN)(flext_base *c,int &arg) \
+{ bool b; FLEXT_CAST<thisType *>(c)->FUN(b); arg = b?1:0; return true; }
+
+//! Declare a get function for an enum attribute
+#define FLEXT_CALLGET_E(GFUN,TP) \
+\
+FLEXT_CALLGET_(GFUN,TP)
+
+//! Declare a get function for a symbol attribute
+#define FLEXT_CALLGET_S(FUN) \
+static bool FLEXT_GET_PRE(FUN)(flext_base *c,const t_symbol *&arg) \
+{ FLEXT_CAST<thisType *>(c)->FUN(arg); return true; }
+
+//! Declare a get function for a variable list attribute
 #define FLEXT_CALLGET_V(FUN) \
 static bool FLEXT_GET_PRE(FUN)(flext_base *c,AtomList *&arg) \
 { FLEXT_CAST<thisType *>(c)->FUN(*arg); return true; }
 
-#define FLEXT_CALLXFER_F(GFUN,SFUN) FLEXT_CALLGET_F(GFUN) FLEXT_CALLSET_F(SFUN) 
-#define FLEXT_CALLXFER_I(GFUN,SFUN) FLEXT_CALLGET_I(GFUN) FLEXT_CALLSET_I(SFUN) 
-#define FLEXT_CALLXFER_S(GFUN,SFUN) FLEXT_CALLGET_S(GFUN) FLEXT_CALLSET_S(SFUN) 
-#define FLEXT_CALLXFER_V(GFUN,SFUN) FLEXT_CALLGET_V(GFUN) FLEXT_CALLSET_V(SFUN) 
+//! @} FLEXT_DA_CALLGET
 
-#define FLEXT_ATTRSET_F(VAR) FLEXT_ATTRSET_(VAR,float)
-#define FLEXT_ATTRSET_I(VAR) FLEXT_ATTRSET_(VAR,int)
-#define FLEXT_ATTRSET_S(VAR) FLEXT_ATTRSET_(VAR,t_symptr)
 
+/*!	\defgroup FLEXT_DA_CALLVAR Definition of attribute transfer handlers (both get and set)
+	@{ 
+*/
+
+//! Declare both get and set functions for a float attribute
+#define FLEXT_CALLVAR_F(GFUN,SFUN) \
+\
+FLEXT_CALLGET_F(GFUN) FLEXT_CALLSET_F(SFUN) 
+
+//! Declare both get and set functions for an integer attribute
+#define FLEXT_CALLVAR_I(GFUN,SFUN) \
+\
+FLEXT_CALLGET_I(GFUN) FLEXT_CALLSET_I(SFUN) 
+
+//! Declare both get and set functions for a symbol attribute
+#define FLEXT_CALLVAR_S(GFUN,SFUN) \
+\
+FLEXT_CALLGET_S(GFUN) FLEXT_CALLSET_S(SFUN) 
+
+//! Declare both get and set functions for a boolean attribute
+#define FLEXT_CALLVAR_B(GFUN,SFUN) \
+\
+FLEXT_CALLGET_B(GFUN) FLEXT_CALLSET_B(SFUN) 
+
+//! Declare both get and set functions for an enum attribute
+#define FLEXT_CALLVAR_E(GFUN,SFUN,TP) \
+\
+FLEXT_CALLGET_E(GFUN,TP) FLEXT_CALLSET_E(SFUN,TP) 
+
+//! Declare both get and set functions for a variable list attribute
+#define FLEXT_CALLVAR_V(GFUN,SFUN) \
+\
+FLEXT_CALLGET_V(GFUN) FLEXT_CALLSET_V(SFUN) 
+
+//! @} FLEXT_DA_CALLVAR
+
+
+/*!	\defgroup FLEXT_DA_ATTRSET Definition of implicite attribute set handlers
+	@{ 
+*/
+
+//! Declare an implicite set function for a float attribute
+#define FLEXT_ATTRSET_F(VAR) \
+\
+FLEXT_ATTRSET_(VAR,float)
+
+//! Declare an implicite set function for an integer attribute
+#define FLEXT_ATTRSET_I(VAR) \
+\
+FLEXT_ATTRSET_(VAR,int)
+
+//! Declare an implicite set function for a symbol attribute
+#define FLEXT_ATTRSET_S(VAR) \
+\
+FLEXT_ATTRSET_(VAR,t_symptr)
+
+//! Declare an implicite set function for a boolean attribute
+#define FLEXT_ATTRSET_B(VAR) \
+static bool FLEXT_SET_PRE(VAR)(flext_base *c,int &arg) \
+{ FLEXT_CAST<thisType *>(c)->VAR = arg != 0; return true; }
+
+//! Declare an implicite set function for an enum attribute
+#define FLEXT_ATTRSET_E(VAR,TP) \
+\
+FLEXT_ATTRSET_(VAR,TP)
+
+//! Declare an implicite set function for a variable list attribute
 #define FLEXT_ATTRSET_V(VAR) \
 static bool FLEXT_SET_PRE(VAR)(flext_base *c,AtomList *&arg) \
 { FLEXT_CAST<thisType *>(c)->VAR = *arg; return true; }
 
-#define FLEXT_ATTRGET_F(VAR) FLEXT_ATTRGET_(VAR,float)
-#define FLEXT_ATTRGET_I(VAR) FLEXT_ATTRGET_(VAR,int)
-#define FLEXT_ATTRGET_S(VAR) FLEXT_ATTRGET_(VAR,t_symptr)
+//! @} FLEXT_DA_ATTRSET
 
+/*!	\defgroup FLEXT_DA_ATTRGET Definition of implicite attribute get handlers
+	@{ 
+*/
+
+//! Declare an implicite get function for a float attribute
+#define FLEXT_ATTRGET_F(VAR) \
+\
+FLEXT_ATTRGET_(VAR,float)
+
+//! Declare an implicite get function for an integer attribute
+#define FLEXT_ATTRGET_I(VAR) \
+\
+FLEXT_ATTRGET_(VAR,int)
+
+//! Declare an implicite get function for a symbol attribute
+#define FLEXT_ATTRGET_S(VAR) \
+\
+FLEXT_ATTRGET_(VAR,t_symptr)
+
+//! Declare an implicite get function for a boolean attribute
+#define FLEXT_ATTRGET_B(VAR) \
+static bool FLEXT_GET_PRE(VAR)(flext_base *c,int &arg) \
+{ arg = FLEXT_CAST<thisType *>(c)->VAR?1:0; return true; }
+
+//! Declare an implicite get function for an enum attribute
+#define FLEXT_ATTRGET_E(VAR,TP) \
+\
+FLEXT_ATTRGET_(VAR,TP)
+
+//! Declare an implicite get function for a variable list attribute
 #define FLEXT_ATTRGET_V(VAR) \
 static bool FLEXT_GET_PRE(VAR)(flext_base *c,AtomList *&arg) \
 { *arg = FLEXT_CAST<thisType *>(c)->VAR; return true; }
 
-#define FLEXT_ATTRXFER_F(VAR) FLEXT_ATTRGET_F(VAR) FLEXT_ATTRSET_F(VAR) 
-#define FLEXT_ATTRXFER_I(VAR) FLEXT_ATTRGET_I(VAR) FLEXT_ATTRSET_I(VAR) 
-#define FLEXT_ATTRXFER_S(VAR) FLEXT_ATTRGET_S(VAR) FLEXT_ATTRSET_S(VAR) 
-#define FLEXT_ATTRXFER_V(VAR) FLEXT_ATTRGET_V(VAR) FLEXT_ATTRSET_V(VAR) 
+//! @} FLEXT_DA_ATTRGET
 
-//! @} 
 
-/*!	\defgroup FLEXT_ADDATTR flext methods for defining attributes
-	These can only be used in class member functions!
-
+/*!	\defgroup FLEXT_DA_ATTRVAR Definition of implicite attribute transfer handlers (both get and set)
 	@{ 
 */
 
-#define	FLEXT_ADDATTR_GET(NAME,GFUN) AddAttrib(NAME,(FLEXT_GET_PRE(GFUN)),NULL)
-#define	FLEXT_ADDATTR_SET(NAME,SFUN) AddAttrib(NAME,NULL,(FLEXT_SET_PRE(SFUN)))
-#define	FLEXT_ADDATTRIB(NAME,FUN) AddAttrib(NAME,(FLEXT_GET_PRE(FUN)),(FLEXT_SET_PRE(FUN)))
+//! Declare both implicite get and set functions for a float attribute
+#define FLEXT_ATTRVAR_F(VAR) \
+\
+FLEXT_ATTRGET_F(VAR) FLEXT_ATTRSET_F(VAR) 
 
-//! @} 
+//! Declare both implicite get and set functions for an integer attribute
+#define FLEXT_ATTRVAR_I(VAR) \
+\
+FLEXT_ATTRGET_I(VAR) FLEXT_ATTRSET_I(VAR) 
+
+//! Declare both implicite get and set functions for a symbol attribute
+#define FLEXT_ATTRVAR_S(VAR) \
+\
+FLEXT_ATTRGET_S(VAR) FLEXT_ATTRSET_S(VAR) 
+
+//! Declare both implicite get and set functions for a boolean attribute
+#define FLEXT_ATTRVAR_B(VAR) \
+\
+FLEXT_ATTRGET_B(VAR) FLEXT_ATTRSET_B(VAR) 
+
+//! Declare both implicite get and set functions for an enum attribute
+#define FLEXT_ATTRVAR_E(VAR,TP) \
+\
+FLEXT_ATTRGET_(VAR,TP) FLEXT_ATTRSET_(VAR,TP) 
+
+//! Declare both implicite get and set functions for a variable list attribute
+#define FLEXT_ATTRVAR_V(VAR) \
+\
+FLEXT_ATTRGET_V(VAR) FLEXT_ATTRSET_V(VAR) 
 
 
+//! @} FLEXT_DA_ATTRVAR
 
+
+/*!	\defgroup FLEXT_D_ADDATTR Announce object attributes 
+	\note These can only be used at class construction time
+	@{ 
+*/
+
+//! Add handler for a gettable attribute
+#define	FLEXT_ADDATTR_GET(NAME,GFUN) \
+\
+AddAttrib(NAME,(FLEXT_GET_PRE(GFUN)),NULL)
+
+//! Add handler for a settable attribute
+#define	FLEXT_ADDATTR_SET(NAME,SFUN) \
+\
+AddAttrib(NAME,NULL,(FLEXT_SET_PRE(SFUN)))
+
+//! Add handlers for a both get- and settable attribute
+#define	FLEXT_ADDATTR_VAR(NAME,GFUN,SFUN) \
+\
+AddAttrib(NAME,(FLEXT_GET_PRE(GFUN)),(FLEXT_SET_PRE(SFUN)))
+
+//! Add handlers for a both get- and settable attribute
+#define	FLEXT_ADDATTR_VAR1(NAME,FUN) \
+\
+AddAttrib(NAME,(FLEXT_GET_PRE(FUN)),(FLEXT_SET_PRE(FUN)))
+
+
+//! Add handler for a gettable enum attribute
+#define	FLEXT_ADDATTR_GET_E(NAME,GFUN) \
+\
+AddAttrib(NAME,(bool (*)(flext_base *,int &))(FLEXT_GET_PRE(GFUN)),NULL)
+
+//! Add handler for a settable enum attribute
+#define	FLEXT_ADDATTR_SET_E(NAME,SFUN) \
+\
+AddAttrib(NAME,NULL,(bool (*)(flext_base *,int &))(FLEXT_SET_PRE(SFUN)))
+
+//! Add handlers for a both get- and settable enum attribute
+#define	FLEXT_ADDATTR_VAR_E(NAME,GFUN,SFUN) \
+\
+AddAttrib(NAME,(bool (*)(flext_base *,int &))(FLEXT_GET_PRE(GFUN)),(bool (*)(flext_base *,int &))(FLEXT_SET_PRE(SFUN)))
+
+//! Add handlers for a both get- and settable enum attribute
+#define	FLEXT_ADDATTR_VAR1_E(NAME,FUN) \
+\
+AddAttrib(NAME,(bool (*)(flext_base *,int &))(FLEXT_GET_PRE(FUN)),(bool (*)(flext_base *,int &))(FLEXT_SET_PRE(FUN)))
+
+//! @} FLEXT_D_ADDATTR
+
+
+//! @} FLEXT_D_ATTRIB
+
+
+//!	@}  FLEXT_DEFS
 
 #endif // __FLEXT_DEFS_H

@@ -331,16 +331,21 @@ flext_hdr *flext_obj::obj_new(const t_symbol *s,int _argc_,t_atom *argv)
 			flext_obj::m_holdname = NULL;
 			flext_obj::m_holdattr = false;
 
-			bool ok = obj->data ||
+			bool ok = obj->data &&
 				// check constructor exit flag
 				obj->data->InitOk();
 
-			if(ok && lo->attr && argc < _argc_) 
-				// set cmdline attributes (this is a flext_base function!)
-				ok = ((flext_base *)obj->data)->InitAttrib(_argc_-argc,argv+argc);
+			if(ok) {
+				// store creation args for attribute initialization (inside flext_base::Init())
+				flext_obj::m_holdaargc = _argc_-argc;
+				flext_obj::m_holdaargv = argv+argc;
 
-			if(ok) // call virtual init function 
+				// call virtual init function 
 				ok = obj->data->Init();
+
+				flext_obj::m_holdaargc = 0;
+				flext_obj::m_holdaargv = NULL;
+			}
 
 			if(!ok) { 
 				// there was some init error, free object
