@@ -2,7 +2,7 @@
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.6 $";
+static char *version = "$Revision: 1.7 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -14,9 +14,9 @@ typedef struct _linuxevent {
   t_int               x_fd;
   t_symbol            *x_devname;
   t_clock             *x_clock;
-  int                 read_ok;
-  int                 started;
-  int                 x_delaytime;
+  int                 x_read_ok;
+  int                 x_started;
+  int                 x_delay;
 #ifdef __gnu_linux__
   struct input_event  x_input_event; 
 #endif
@@ -33,10 +33,10 @@ typedef struct _linuxevent {
 void linuxevent_stop(t_linuxevent* x) {
   DEBUG(post("linuxevent_stop"););
   
-  if (x->x_fd >= 0 && x->started) { 
+  if (x->x_fd >= 0 && x->x_started) { 
 	  clock_unset(x->x_clock);
 	  post("linuxevent: polling stopped");
-	  x->started = 0;
+	  x->x_started = 0;
   }
 }
 
@@ -171,8 +171,8 @@ static int linuxevent_read(t_linuxevent *x,int fd) {
 	}
 #endif
   
-	if (x->started) {
-		clock_delay(x->x_clock, x->x_delaytime);
+	if (x->x_started) {
+		clock_delay(x->x_clock, x->x_delay);
 	}
 
 	return 1;    
@@ -189,19 +189,19 @@ void linuxevent_delay(t_linuxevent* x, t_float f)  {
 		
 /*	if the user sets the delay less than zero, reset to default */
 	if ( f > 0 ) {	
-		x->x_delaytime = (int)f;
+		x->x_delay = (int)f;
 	} else {
-		x->x_delaytime = 5;
+		x->x_delay = DEFAULT_DELAY;
 	}
 }
 
 void linuxevent_start(t_linuxevent* x) {
 	DEBUG(post("linuxevent_start"););
   
-   if (x->x_fd >= 0 && !x->started) {
-		clock_delay(x->x_clock, 5);
+   if (x->x_fd >= 0 && !x->x_started) {
+		clock_delay(x->x_clock, DEFAULT_DELAY);
 		post("linuxevent: polling started");
-		x->started = 1;
+		x->x_started = 1;
 	} else {
 		post("You need to set a input device (i.e /dev/input/event0)");
 	}
@@ -233,9 +233,9 @@ static void *linuxevent_new(t_symbol *s) {
 
   /* init vars */
   x->x_fd = -1;
-  x->read_ok = 1;
-  x->started = 0;
-  x->x_delaytime = 5;
+  x->x_read_ok = 1;
+  x->x_started = 0;
+  x->x_delay = DEFAULT_DELAY;
 
   x->x_clock = clock_new(x, (t_method)linuxevent_read);
   

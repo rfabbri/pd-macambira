@@ -3,7 +3,7 @@
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
 #define LINUXMOUSE_AXES     3
 
-static char *version = "$Revision: 1.4 $";
+static char *version = "$Revision: 1.5 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -14,8 +14,8 @@ typedef struct _linuxmouse {
   t_object            x_obj;
   t_int               x_fd;
   t_symbol            *x_devname;
-  int                 read_ok;
-  int                 started;
+  int                 x_read_ok;
+  int                 x_started;
 #ifdef __gnu_linux__
   struct input_event  x_input_event; 
 #endif
@@ -35,10 +35,10 @@ void linuxmouse_stop(t_linuxmouse* x) {
 	DEBUG(post("linuxmouse_stop"););
 
 #ifdef __gnu_linux__
-   if (x->x_fd >= 0 && x->started) { 
+   if (x->x_fd >= 0 && x->x_started) { 
 		sys_rmpollfn(x->x_fd);
 		post("[linuxmouse] stopped");
-		x->started = 0;
+		x->x_started = 0;
 	} 
 #endif
 }
@@ -210,10 +210,10 @@ void linuxmouse_start(t_linuxmouse* x) {
 	DEBUG(post("linuxmouse_start"););
 
 #ifdef __gnu_linux__
-   if (x->x_fd >= 0 && !x->started) {
+   if (x->x_fd >= 0 && !x->x_started) {
 		sys_addpollfn(x->x_fd, (t_fdpollfn)linuxmouse_read, x);
 		post("[linuxmouse] started");
-		x->started = 1;
+		x->x_started = 1;
 	} else {
 		post("You need to set a input device (i.e /dev/input/event0)");
 	}
@@ -244,8 +244,8 @@ static void *linuxmouse_new(t_symbol *s) {
 	
 	/* init vars */
 	x->x_fd = -1;
-	x->read_ok = 1;
-	x->started = 0;
+	x->x_read_ok = 1;
+	x->x_started = 0;
 	
 	/* create outlets for each axis */
 	for (i = 0; i < LINUXMOUSE_AXES; i++) 

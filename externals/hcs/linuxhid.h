@@ -23,6 +23,9 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
+
+#define DEFAULT_DELAY 5
+
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package
  */
