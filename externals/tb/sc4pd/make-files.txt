@@ -13,4 +13,4 @@ SRCS= \
 	Lag2.cpp Lag3.cpp LinExp.cpp DelayUnit.cpp DelayN.cpp DelayL.cpp \
 	DelayC.cpp CombN.cpp CombL.cpp CombC.cpp AllpassN.cpp AllpassL.cpp \
 	AllpassC.cpp PitchShift.cpp Resonz.cpp OnePole.cpp OneZero.cpp \
-	TwoPole.cpp
+	TwoPole.cpp TwoZero.cpp FOS.cpp SOS.cpp

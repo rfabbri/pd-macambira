@@ -35,7 +35,7 @@
 
 */
 
-// #include "sc4pd.hpp"
+#include "sc4pd.hpp"
 #include "DelayUnit.hpp"
 
 void DelayUnit_ar::DelayUnit_AllocDelayLine()

@@ -35,7 +35,7 @@
    
 */
 
-#include "sc4pd.hpp"
+//#include "sc4pd.hpp"
 
 class DelayUnit_ar 
     : public sc4pd_dsp
