@@ -14,17 +14,17 @@ MANDIR = ${prefix}/man
 
 # ALSA compilation
 
-SOUND_ALSA = 
+SOUND_ALSA = yes
 
 DEFINES = 
-MORECFLAGS = -DDL_OPEN  -DUSEAPI_OSS
+MORECFLAGS = -DDL_OPEN -DUSEAPI_PORTAUDIO -DPA_USE_OSS -DPA_LITTLE_ENDIAN     	 -DUSEAPI_OSS         -I../portaudio/pa_common         -I../portaudio/pablio -I../portaudio/portmidi-macosx -Werror
 
 INCLUDE = -I.
-GINCLUDE = $(INCLUDE)  -I/usr/local/include/tcl8.4 -I/usr/local/include/tk8.4 -I/usr/X11R6/include -I/usr/local/include
-GLIB =  -lX11 -L/usr/X11R6/lib -L/usr/local/lib -ltcl84 -ltk84
+GINCLUDE = $(INCLUDE)  -I/usr/include/tcl8.4
+GLIB = -ltk8.4 -ltcl8.4  -lX11 -L/usr/X11R6/lib -L/usr/local/lib
 
-LDFLAGS = -Wl,-export-dynamic -L/usr/local/lib/pth -lpthread
-LIB =   -lm
+LDFLAGS = -Wl,-export-dynamic
+LIB =   -ldl -lm -lpthread -lasound
 
 #select either the DBG and OPT compiler flags below:
 OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
@@ -63,7 +63,7 @@ endif
 
 # the sources
 
-SYSSRC += s_midi_oss.c s_audio_oss.c 
+SYSSRC += s_midi_oss.c s_audio_pa.c s_audio_oss.c 	../portaudio/pa_common/pa_allocation.c  	../portaudio/pa_common/pa_converters.c  	../portaudio/pa_common/pa_cpuload.c     	../portaudio/pa_common/pa_dither.c      	../portaudio/pa_common/pa_front.c       	../portaudio/pa_common/pa_process.c     	../portaudio/pa_common/pa_skeleton.c    	../portaudio/pa_common/pa_stream.c      	../portaudio/pa_common/pa_trace.c           	../portaudio/pablio/pablio_pd.c         	../portaudio/pablio/ringbuffer_pd.c     	../portaudio/pa_unix/pa_unix_hostapis.c 	../portaudio/pa_unix/pa_unix_util.c     	../portaudio/pa_unix_oss/pa_unix_oss.c 
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \

@@ -54,13 +54,13 @@ process (jack_nframes_t nframes, void *arg)
 		}
 		jack_filled -= nframes;
 	} else { /* PD could not keep up ! */
-	  if (jack_started) sys_log_error(ERR_RESYNC);
-		for (j = 0; j < sys_outchannels;  j++) {
-			out = jack_port_get_buffer (output_port[j], nframes);
-			memset(out, 0, sizeof (float) * nframes); 
-		}
-		memset(jack_outbuf,0,sizeof(jack_outbuf));
-		jack_filled = 0;
+	     if (jack_started) sys_log_error(ERR_RESYNC);
+	     for (j = 0; j < outport_count;  j++) {
+		  out = jack_port_get_buffer (output_port[j], nframes);
+		  memset(out, 0, sizeof (float) * nframes); 
+	     }
+	     memset(jack_outbuf,0,sizeof(jack_outbuf));
+	     jack_filled = 0;
 	}
 	pthread_cond_broadcast(&jack_sem);
 	return 0;

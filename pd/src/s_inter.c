@@ -520,6 +520,7 @@ void sys_set_priority(int higher)
 
 static int sys_watchfd;
 
+#ifdef __linux__
 void glob_ping(t_pd *dummy)
 {
     if (write(sys_watchfd, "\n", 1) < 1)
@@ -528,6 +529,7 @@ void glob_ping(t_pd *dummy)
 	sys_bail(1);
     }
 }
+#endif
 
 static int defaultfontshit[] = {
     8, 5, 9, 10, 6, 10, 12, 7, 13, 14, 9, 17, 16, 10, 19, 24, 15, 28,
@@ -625,7 +627,10 @@ int sys_startgui(const char *guidir)
 	intarg = 1;
 	if (setsockopt(xsock, IPPROTO_TCP, TCP_NODELAY,
     	    &intarg, sizeof(intarg)) < 0)
-    		post("setsockopt (TCP_NODELAY) failed\n");
+#ifndef MSW
+    		post("setsockopt (TCP_NODELAY) failed\n")
+#endif
+    	    	    ;
 	
 	
 	server.sin_family = AF_INET;
@@ -732,7 +737,7 @@ int sys_startgui(const char *guidir)
 #ifdef MSW
     	    /* in MSW land "guipath" is unused; we just do everything from
 	    the libdir. */
-    	fprintf(stderr, "%s\n", sys_libdir->s_name);
+    	/* fprintf(stderr, "%s\n", sys_libdir->s_name); */
     	
     	strcpy(scriptbuf, "\"");
     	strcat(scriptbuf, sys_libdir->s_name);
@@ -831,6 +836,7 @@ int sys_startgui(const char *guidir)
         fprintf(stderr, "pd: couldn't set high priority class\n");
 #endif
 #ifdef MACOSX
+    if (sys_hipriority)
     {
 	struct sched_param param;
 	int policy = SCHED_RR;
@@ -862,8 +868,10 @@ int sys_startgui(const char *guidir)
     	    fprintf(stderr, "... connected\n");
 
 	    /* here is where we start the pinging. */
+#ifdef __linux__
 	if (sys_hipriority)
     	    sys_gui("pdtk_watchdog\n");
+#endif
     	sys_get_audio_apis(buf);
 	sys_vgui("pdtk_pd_startup {%s} %s\n", pd_version, buf); 
     }
@@ -883,7 +891,13 @@ int sys_pollgui(void)
     return (sys_domicrosleep(0, 1) || sys_poll_togui());
 }
 
-/* LATER try to save dirty documents */
+/* T.Grill - import clean quit function */
+extern void sys_exit(void);
+
+/* This is called when something bad has happened, like a segfault.
+Call glob_quit() below to exit cleanly.
+LATER try to save dirty documents even in the bad case. */
+
 void sys_bail(int n)
 {
     static int reentered = 0;
@@ -897,7 +911,7 @@ void sys_bail(int n)
 	sys_close_midi();
 	fprintf(stderr, "... done.\n");
 #endif
-	exit(1);
+    	exit(1);
     }
     else _exit(n);
 }
@@ -906,7 +920,10 @@ void glob_quit(void *dummy)
 {
     sys_vgui("exit\n");
     if (!sys_nogui)
+    {
     	close(sys_guisock);
+	sys_rmpollfn(sys_guisock);
+    }
     sys_bail(0); 
 }
 

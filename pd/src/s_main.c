@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.37.0\n";
+char pd_version[] = "Pd version 0.37.1 TEST6 devel\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -38,6 +38,7 @@ int sys_startgui(const char *guipath);
 int sys_rcfile(void);
 int m_scheduler(void);
 void sys_addhelppath(char *p);
+void alsa_adddev(char *name);
 
 int sys_debuglevel;
 int sys_verbose;
@@ -227,8 +228,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     sys_messagelist = 0;
 }
 
-static void sys_addextrapath(void);
-static void sys_addreferencepath(void);
+static void sys_afterargparse(void);
 
 /* this is called from main() in s_entry.c */
 int sys_main(int argc, char **argv)
@@ -241,9 +241,9 @@ int sys_main(int argc, char **argv)
 #ifdef UNIX
     sys_rcfile();                               /* parse the startup file */
 #endif
-    if (sys_argparse(argc, argv)) return (1);	/* parse cmd line */
-    sys_addextrapath();
-    sys_addreferencepath();
+    if (sys_argparse(argc, argv))   	    /* parse cmd line */
+    	return (1);
+    sys_afterargparse();    	    	    /* post-argparse settings */
     if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
     	pd_version, pd_compiletime, pd_compiledate);
     if (sys_version)	/* if we were just asked our version, exit here. */
@@ -286,6 +286,7 @@ static char *(usagemessage[]) = {
 
 #ifdef USEAPI_ALSA
 "-alsa            -- use ALSA audio API\n",
+"-alsaadd <name>  -- add an ALSA device name to list\n",
 "-alsadev <n>     ----- obsolete: use -audiodev\n",
 #endif
 
@@ -328,8 +329,9 @@ static char *(usagemessage[]) = {
 "-nogui           -- suppress starting the GUI\n",
 "-guicmd \"cmd...\" -- substitute another GUI program (e.g., rsh)\n",
 "-send \"msg...\"   -- send a message at startup (after patches are loaded)\n",
-#ifdef __linux__
-"-rt or -realtime -- use real-time priority (needs root privilege)\n",
+#ifdef UNIX
+"-rt or -realtime -- use real-time priority\n",
+"-nrt             -- don't use real-time priority\n",
 #endif
 };
 
@@ -458,15 +460,16 @@ void sys_findprogdir(char *progname)
 #endif
 }
 
+#ifdef MSW
+static int sys_mmio = 1;
+#else
+static int sys_mmio = 0;
+#endif
+
 int sys_argparse(int argc, char **argv)
 {
     char sbuf[MAXPDSTRING];
     int i;
-#ifdef MSW
-    int mmio = 1;
-#else
-    int mmio = 0;
-#endif
     argc--; argv++;
     while ((argc > 0) && **argv == '-')
     {
@@ -560,6 +563,13 @@ int sys_argparse(int argc, char **argv)
     	    sys_set_audio_api(API_ALSA);
     	    argc--; argv++;
     	}
+    	else if (!strcmp(*argv, "-alsaadd"))
+    	{
+	    if (argc > 1)
+	    	alsa_adddev(argv[1]);
+	    else goto usage;
+	    argc -= 2; argv +=2;
+    	}
 	    /* obsolete flag for setting ALSA device number or name */
 	else if (!strcmp(*argv, "-alsadev"))
 	{
@@ -593,7 +603,7 @@ int sys_argparse(int argc, char **argv)
 	    )
     	{
     	    sys_set_audio_api(API_PORTAUDIO);
-	    mmio = 0;
+	    sys_mmio = 0;
     	    argc--; argv++;
     	}
 #endif
@@ -601,7 +611,7 @@ int sys_argparse(int argc, char **argv)
     	else if (!strcmp(*argv, "-mmio"))
     	{
     	    sys_set_audio_api(API_MMIO);
-	    mmio = 1;
+	    sys_mmio = 1;
     	    argc--; argv++;
     	}
 #endif
@@ -719,6 +729,11 @@ int sys_argparse(int argc, char **argv)
     	    sys_hipriority = 1;
     	    argc--; argv++;
     	}
+    	else if (!strcmp(*argv, "-nrt"))
+    	{
+    	    sys_hipriority = 0;
+    	    argc--; argv++;
+    	}
 #endif
     	else if (!strcmp(*argv, "-soundindev") ||
 	    !strcmp(*argv, "-audioindev"))
@@ -762,11 +777,36 @@ int sys_argparse(int argc, char **argv)
     for (; argc > 0; argc--, argv++) 
     	sys_openlist = namelist_append(sys_openlist, *argv);
 
+
+    return (0);
+}
+
+int sys_getblksize(void)
+{
+    return (DEFDACBLKSIZE);
+}
+
+    /* stuff to do, once, after calling sys_argparse() -- which may itself
+    be called twice because of the .pdrc hack. */
+static void sys_afterargparse(void)
+{
+    char sbuf[MAXPDSTRING];
+    int i;
+	    /* add "extra" library to path */
+    strncpy(sbuf, sys_libdir->s_name, MAXPDSTRING-30);
+    sbuf[MAXPDSTRING-30] = 0;
+    strcat(sbuf, "/extra");
+    sys_addpath(sbuf);
+	    /* add "doc/5.reference" library to helppath */
+    strncpy(sbuf, sys_libdir->s_name, MAXPDSTRING-30);
+    sbuf[MAXPDSTRING-30] = 0;
+    strcat(sbuf, "/doc/5.reference");
+    sys_addhelppath(sbuf);
     	/* correct to make audio and MIDI device lists zero based.  On
 	MMIO, however, "1" really means the second device (the first one
 	is "mapper" which is was not included when the command args were
 	set up, so we leave it that way for compatibility. */
-    if (!mmio)
+    if (!sys_mmio)
     {
     	for (i = 0; i < sys_nsoundin; i++)
     	    sys_soundindevlist[i]--;
@@ -777,31 +817,9 @@ int sys_argparse(int argc, char **argv)
     	sys_midiindevlist[i]--;
     for (i = 0; i < sys_nmidiout; i++)
     	sys_midioutdevlist[i]--;
-
-    return (0);
-}
-
-int sys_getblksize(void)
-{
-    return (DEFDACBLKSIZE);
-}
-
-static void sys_addextrapath(void)
-{
-    char sbuf[MAXPDSTRING];
-	    /* add "extra" library to path */
-    strncpy(sbuf, sys_libdir->s_name, MAXPDSTRING-30);
-    sbuf[MAXPDSTRING-30] = 0;
-    strcat(sbuf, "/extra");
-    sys_addpath(sbuf);
 }
 
 static void sys_addreferencepath(void)
 {
     char sbuf[MAXPDSTRING];
-	    /* add "doc/5.reference" library to helppath */
-    strncpy(sbuf, sys_libdir->s_name, MAXPDSTRING-30);
-    sbuf[MAXPDSTRING-30] = 0;
-    strcat(sbuf, "/doc/5.reference");
-    sys_addhelppath(sbuf);
 }

@@ -1434,6 +1434,8 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
 	SETSYMBOL(at+1, gotkeysym);
 	pd_list(keynamesym->s_thing, 0, 2, at);
     }
+    if (!x->gl_editor)	/* if that 'invis'ed the window, we'd better stop. */
+    	return;
     if (x && down)
     {
 	    /* if an object has "grabbed" keys just send them on */

@@ -476,6 +476,8 @@ int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
 	    	    linux_dacs[i].d_nchannels * DEFDACBLKSIZE);
     }
     sys_setalarm(0);
+    sys_inchannels = inchannels;
+    sys_outchannels = outchannels;
     return (0);
 }
 

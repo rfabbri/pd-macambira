@@ -540,7 +540,7 @@ static int soundfiler_writeargparse(void *obj, int *p_argc, t_atom **p_argv,
 	}
 	else if (!strcmp(flag, "little"))
 	{
-	    endianness = 1;
+	    endianness = 0;
 	    argc -= 1; argv += 1;
 	}
 	else if (!strcmp(flag, "r") || !strcmp(flag, "rate"))
@@ -670,7 +670,7 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
     	wavehdr->w_samplespersec = swap4(samplerate, swap);
     	wavehdr->w_navgbytespersec =
 	    swap4((int)(samplerate * nchannels * bytespersamp), swap);
-    	wavehdr->w_nblockalign = swap2(bytespersamp, swap);
+    	wavehdr->w_nblockalign = swap2(nchannels * bytespersamp, swap);
     	wavehdr->w_nbitspersample = swap2(8 * bytespersamp, swap);
     	strncpy(wavehdr->w_datachunkid, "data", 4);
     	wavehdr->w_datachunksize = swap4(datasize, swap);
@@ -728,6 +728,19 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
 	    mofo = swap4(nframes, swap);
     	    if (write(fd, (char *)(&mofo), 4) < 4)
     	    	goto baddonewrite;
+	}
+	if (filetype == FORMAT_NEXT)
+	{
+	    /* do it the lazy way: just set the size field to 'unknown size'*/
+	    uint32 nextsize = 0xffffffff;
+	    if (lseek(fd, 8, SEEK_SET) == 0)
+	    {
+	        goto baddonewrite;
+	    }
+	    if (write(fd, &nextsize, 4) < 4)
+	    {
+	        goto baddonewrite;
+	    }
 	}
     }
     return;

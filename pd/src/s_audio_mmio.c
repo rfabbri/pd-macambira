@@ -32,7 +32,6 @@ int nt_realdacblksize;
 #define MAXBUFFER 100   /* number of buffers in use at maximum advance */
 #define DEFBUFFER 30	/* default is about 30x6 = 180 msec! */
 static int nt_naudiobuffer = DEFBUFFER;
-
 float sys_dacsr = DEFAULTSRATE;
 
 static int nt_whichapi = API_MMIO;
@@ -113,16 +112,15 @@ static void wave_prep(t_sbuf *bp)
     wh->reserved = 0;
 }
 
-static int nt_inalloc[NAPORTS], nt_outalloc[NAPORTS];
 static UINT nt_whichdac = WAVE_MAPPER, nt_whichadc = WAVE_MAPPER;
 
 int mmio_do_open_audio(void)
 { 
     PCMWAVEFORMAT  form; 
-    int i;
+    int i, j;
     UINT mmresult;
     int nad, nda;
-
+    static int naudioprepped = 0, nindevsprepped = 0, noutdevsprepped = 0;
     if (sys_verbose)
     	post("%d devices in, %d devices out",
     	    nt_nwavein, nt_nwaveout);
@@ -136,6 +134,32 @@ int mmio_do_open_audio(void)
 
     if (nt_nwavein <= 1 && nt_nwaveout <= 1)
     	nt_noresync();
+
+    if (nindevsprepped < nt_nwavein)
+    {
+    	for (i = nindevsprepped; i < nt_nwavein; i++)
+    	    for (j = 0; j < nt_naudiobuffer; j++)
+	    	wave_prep(&ntsnd_invec[i][j]);
+    	nindevsprepped = nt_nwavein;
+    }
+    if (noutdevsprepped < nt_nwaveout)
+    {
+    	for (i = noutdevsprepped; i < nt_nwaveout; i++)
+    	    for (j = 0; j < nt_naudiobuffer; j++)
+	    	wave_prep(&ntsnd_outvec[i][j]);
+    	noutdevsprepped = nt_nwaveout;
+    }
+    if (naudioprepped < nt_naudiobuffer)
+    {
+    	for (j = naudioprepped; j < nt_naudiobuffer; j++)
+	{
+    	    for (i = 0; i < nt_nwavein; i++)
+	    	wave_prep(&ntsnd_invec[i][j]);
+    	    for (i = 0; i < nt_nwaveout; i++)
+	    	wave_prep(&ntsnd_outvec[i][j]);
+    	}
+	naudioprepped = nt_naudiobuffer;
+    }
     for (nad=0; nad < nt_nwavein; nad++)
     {
 	/* Open waveform device(s), sucessively numbered, for input */
@@ -154,12 +178,6 @@ int mmio_do_open_audio(void)
 	} 
 	else 
 	{
-	    if (!nt_inalloc[nad])
-	    {
-		for (i = 0; i < nt_naudiobuffer; i++)
-	    	    wave_prep(&ntsnd_invec[nad][i]);
-		nt_inalloc[nad] = 1;
-	    }
 	    for (i = 0; i < nt_naudiobuffer; i++)
 	    {
 		mmresult = waveInPrepareHeader(ntsnd_indev[nad],
@@ -174,12 +192,11 @@ int mmio_do_open_audio(void)
 	}
     }
     	/* quickly start them all together */
-    for(nad=0; nad < nt_nwavein; nad++)
+    for (nad = 0; nad < nt_nwavein; nad++)
     	waveInStart(ntsnd_indev[nad]);
 
-    for(nda=0; nda < nt_nwaveout; nda++)
-    {
-    	
+    for (nda = 0; nda < nt_nwaveout; nda++)
+    {	
     	    /* Open a waveform device for output in sucessiv device numbering*/
     	mmresult = waveOutOpen(&ntsnd_outdev[nda], nt_whichdac + nda,
     	    (WAVEFORMATEX *)(&form), 0L, 0L, CALLBACK_NULL);
@@ -193,19 +210,6 @@ int mmio_do_open_audio(void)
 	    fprintf(stderr,"Wave out open device %d + %d\n",nt_whichdac,nda);
             nt_waveouterror("waveOutOpen device: %s\n",  mmresult);
             nt_nwaveout = nda;
-    	}
-	else
-	{
-	    if (!(nt_outalloc[nda]))
-	    {
-	    	for (i = 0; i < nt_naudiobuffer; i++)
-	    	{
-    	    	    wave_prep(&ntsnd_outvec[nda][i]);
-	    	    	    /* set DONE flag as if we had queued them */
-    	    	    ntsnd_outvec[nda][i].lpWaveHdr->dwFlags = WHDR_DONE;
-    	    	}
-    	    	nt_outalloc[nda] = 1;
-	    }
     	}
     }
 

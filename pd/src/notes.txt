@@ -1,14 +1,17 @@
 ---------------- dolist --------------------
 
 fix for 0.37:
-don't prepend help- if sethalpname is called
-Tom schouten: $HOME undefined crashes Pd
-update 'getting pd to run' to start in with dialog panels
-MIDI on windows?
+read xx.txt in "bad" gives warnings
+mess with RME ALSA some more; ALSA readn doesn't work yet.
+test MIDI I/O on all platforms, inc. sysex...
+windows quit doesn't confirm on Windows?
+check Pd in OSX 10.3
 
 0.38:
-message dialog not to disappear
-sprout inlets/outlets on objects whose creation failed.
+document env~ second argument (and why is it no less than 1/10 of first???)
+make watchdog work for MACOSX
+%x to %lx in all "tags" to make 64-bit safe
+plug-in support
 portaudio_pd files into src
 GOP bounding box object
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')

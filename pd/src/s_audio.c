@@ -40,7 +40,13 @@ static float sys_outmax;    	/* max output amplitude */
     /* exported variables */
 int sys_schedadvance; 	/* scheduler advance in microseconds */
 float sys_dacsr;
+
+#ifdef MACOSX
+int sys_hipriority = 1;
+#else
 int sys_hipriority = 0;
+#endif
+
 t_sample *sys_soundout;
 t_sample *sys_soundin;
 
@@ -326,6 +332,8 @@ else
     }
     sys_save_audio_params(naudioindev, audioindev, chindev,
     	naudiooutdev, audiooutdev, choutdev, rate, advance);
+    if (sys_inchannels == 0 && sys_outchannels == 0)
+    	enable = 0;
     audio_state = enable;
     sys_vgui("set pd_whichapi %d\n",  (audio_isopen() ? sys_audioapi : 0));
     sched_set_using_dacs(enable);

@@ -265,7 +265,7 @@ static void sched_pollformeters( void)
 
     	/* if there's no GUI but we're running in "realtime", here is
 	where we arrange to ping the watchdog every 2 seconds. */
-#ifdef UNIX
+#ifdef __linux__
     if (sys_nogui && sys_hipriority && (sched_diddsp - sched_nextpingtime > 0))
     {
     	glob_ping(0);

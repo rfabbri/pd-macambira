@@ -316,13 +316,11 @@ static void *my_canvas_new(t_symbol *s, int argc, t_atom *argv)
        &&IS_A_FLOAT(argv,i+7)&&IS_A_FLOAT(argv,i+8)
        &&IS_A_FLOAT(argv,i+9))
     {
-	if(IS_A_SYMBOL(argv,i+3))
-	    srl[2] = atom_getsymbolarg(i+3, argc, argv);
-	else if(IS_A_FLOAT(argv,i+3))
-	{
-	    sprintf(str, "%d", (int)atom_getintarg(i+3, argc, argv));
-	    srl[2] = gensym(str);
-	}
+    	    /* disastrously, the "label" sits in a different part of the
+	    message.  So we have to track its location separately (in
+	    the slot x_labelbindex) and initialize it specially here. */
+    	iemgui_new_dogetname(&x->x_gui, i+3, argv);
+	x->x_gui.x_labelbindex = i+4;
 	ldx = (int)atom_getintarg(i+4, argc, argv);
 	ldy = (int)atom_getintarg(i+5, argc, argv);
 	iem_inttofstyle(&x->x_gui.x_fsf, atom_getintarg(i+6, argc, argv));

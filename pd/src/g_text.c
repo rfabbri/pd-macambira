@@ -492,7 +492,7 @@ static void gatom_bang(t_gatom *x)
     {
     	if (x->a_text.te_outlet)
     	    outlet_symbol(x->a_text.te_outlet, x->a_atom.a_w.w_symbol);
-	if (*x->a_symto->s_name && x->a_symto->s_thing)
+	if (*x->a_symto->s_name && x->a_expanded_to->s_thing)
 	{
 	    if (x->a_symto == x->a_symfrom)
 	    	pd_error(x,

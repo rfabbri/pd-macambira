@@ -663,6 +663,7 @@ void alsa_putzeros(int n)
 	    post("result %d", result);
 #endif
     }
+    /* post ("putzeros %d", n); */
 }
 
 void alsa_getzeros(int n)
@@ -676,6 +677,7 @@ void alsa_getzeros(int n)
 	    post("result %d", result);
 #endif
     }
+    /* post ("getzeros %d", n); */
 }
 
     /* call this only if both input and output are open */
@@ -713,7 +715,7 @@ static void alsa_checkiosync( void)
     		return;
 	    }
 	    defect = indelay + outdelay - alsa_buf_samps;
-	    if (defect < -DEFDACBLKSIZE)
+	    if (defect < -(3 * DEFDACBLKSIZE / 2) )
     	    {
 		checkit = 1;
     		alsa_putzeros(1);
@@ -727,13 +729,40 @@ static void alsa_checkiosync( void)
 		if (!alreadylogged)
 	    	    sys_log_error(ERR_RESYNC), alreadylogged = 1;
 	    }
+	    /* if (alreadylogged)
+	    	post("in %d out %d defect %d", indelay, outdelay, defect); */
     	}
     }
 }
 
-void alsa_listdevs( void)
+static int alsa_nnames = 0;
+static char **alsa_names = 0;
+
+void alsa_adddev(char *name)
 {
-    post("device listing not implemented in ALSA yet\n");
+    if (alsa_nnames)
+    	alsa_names = (char **)t_resizebytes(alsa_names,
+	    alsa_nnames * sizeof(char *),
+	    (alsa_nnames+1) * sizeof(char *));
+    else alsa_names = (char **)t_getbytes(sizeof(char *));
+    alsa_names[alsa_nnames] = gensym(name)->s_name;
+    alsa_nnames++;
+}
+
+static void alsa_numbertoname(int devno, char *devname, int nchar)
+{
+    int ndev = 0, cardno = -1;
+    while (!snd_card_next(&cardno) && cardno >= 0)
+    	ndev++;
+    if (devno < 2*ndev)
+    {
+    	if (devno & 1)
+    	    snprintf(devname, nchar, "plughw:%d", devno/2);
+    	else snprintf(devname, nchar, "hw:%d", devno/2);
+    }
+    else if (devno <2*ndev + alsa_nnames)
+    	snprintf(devname, nchar, "%s", alsa_names[devno - 2*ndev]);
+    else snprintf(devname, nchar, "???");
 }
 
     /* For each hardware card found, we list two devices, the "hard" and

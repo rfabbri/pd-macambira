@@ -97,7 +97,7 @@ void glob_init(void)
     	gensym("start-path-dialog"), A_DEFFLOAT, 0);
     class_addmethod(glob_pdobject, (t_method)glob_path_dialog,
     	gensym("path-dialog"), A_GIMME, 0);
-#ifdef UNIX
+#ifdef __linux__
     class_addmethod(glob_pdobject, (t_method)glob_ping, gensym("ping"), 0);
 #endif
     class_addanything(glob_pdobject, max_default);
