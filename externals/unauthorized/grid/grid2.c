@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <ctype.h>
+
+#include <m_pd.h>
+
 #include "m_imp.h"
 #include "g_canvas.h"
 #include "t_tk.h"
@@ -388,15 +391,15 @@ static void grid_motion(t_grid *x, t_floatarg dx, t_floatarg dy)
     }
 }
 
-static void grid_set(t_grid *x, t_floatarg x, t_floatarg y)
+static void grid_set(t_grid *x, t_floatarg dx, t_floatarg dy)
 {
     int xold = x->x_current;
     int yold = x->y_current;
 
     // post( "grid_set x=%f y=%f", x, y );
 
-    x->x_current = x;
-    x->y_current = y;
+    x->x_current = dx;
+    x->y_current = dy;
     if(xold != x->x_current || yold != x->y_current)
     {
         grid_output_current(x);
