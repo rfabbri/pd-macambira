@@ -395,9 +395,6 @@
 			</FileConfiguration>
 		</File>
 		<File
-			RelativePath="pool.dtd">
-		</File>
-		<File
 			RelativePath="pool.h">
 		</File>
 		<File

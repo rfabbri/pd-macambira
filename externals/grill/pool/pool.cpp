@@ -537,9 +537,10 @@ BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 {
 	for(I i = 1; !is.eof(); ++i) {
 		AtomList d,k,*v = new AtomList;
-		BL r = ReadAtoms(is,d,',');
-		r = r && ReadAtoms(is,k,',') && k.Count() == 1;
-		r = r && ReadAtoms(is,*v,'\n') && v->Count();
+		BL r = 
+            ReadAtoms(is,d,',') && 
+            ReadAtoms(is,k,',') && k.Count() == 1 && 
+            ReadAtoms(is,*v,'\n');
 
 		if(r) {
 			if(depth < 0 || d.Count() <= depth) {
@@ -593,40 +594,86 @@ public:
     enum { t_start,t_end,t_empty } type;
 };
 
-static bool gettag(istream &is,xmltag &t)
+static bool gettag(istream &is,xmltag &tag)
 {
-    while(isspace(is.peek())) is.get();
-    if(is.peek() == '<') {
-        is.get();
-        char tmp[256];
-        is.getline(tmp,sizeof tmp,'>');
-        char *tb = tmp,*te = tmp+strlen(tmp)-1,*tf;
+    static const char *commstt = "<!--",*commend = "-->";
 
-        for(; isspace(*tb); ++tb);
-        if(*tb == '/') {
-            t.type = xmltag::t_end;
-            for(++tb; isspace(*tb); ++tb);
+    for(;;) {
+        // eat whitespace
+        while(isspace(is.peek())) is.get();
+
+        // no tag begin -> break
+        if(is.peek() != '<') break;
+        is.get(); // swallow <
+
+        char tmp[1024],*t = tmp;
+
+        // parse for comment start
+        const char *c = commstt;
+        while(*++c) {
+            if(*c != is.peek()) break;
+            *(t++) = is.get();
+        }
+
+        if(!*c) { // is comment
+            char cmp[2] = {0,0};
+            for(int ic = 0; ; ic = (++ic)%2) {
+                char c = is.get();
+                if(c == '>') {
+                    for(int i = 0; i < 2 && cmp[(ic+i)%2] == commend[i]; ++i);
+                    if(i == 2) break; // comment end!
+                }
+                else
+                    cmp[ic] = c;
+            }
         }
         else {
-            for(; isspace(*te); --te);
-            if(*te == '/') {
-                for(--te; isspace(*te); --te);
-                t.type = xmltag::t_empty;
+            // parse until > with consideration of "s
+            bool intx = false;
+            for(;;) {
+                *t = is.get();
+                if(*t == '"') intx = !intx;
+                else if(*t == '>' && !intx) {
+                    *t = 0;
+                    break;
+                }
+                t++;
             }
-            else
-                t.type = xmltag::t_start;
-        }
 
-        for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf);
-        t.tag.assign(tb,tf-tb);
-        while(isspace(*tf)) ++tf;
-        t.attr.assign(tf,te-tf+1);
-        return true;
+            // look for tag slashes
+
+            char *tb = tmp,*te = t-1,*tf;
+
+            for(; isspace(*tb); ++tb);
+            if(*tb == '/') { 
+                // slash at the beginning -> end tag
+                tag.type = xmltag::t_end;
+                for(++tb; isspace(*tb); ++tb);
+            }
+            else {
+                for(; isspace(*te); --te);
+                if(*te == '/') { 
+                    // slash at the end -> empty tag
+                    for(--te; isspace(*te); --te);
+                    tag.type = xmltag::t_empty;
+                }
+                else 
+                    // no slash -> begin tag
+                    tag.type = xmltag::t_start;
+            }
+
+            // copy tag text without slashes
+            for(tf = tb; tf <= te && *tf && !isspace(*tf); ++tf);
+            tag.tag.assign(tb,tf-tb);
+            while(isspace(*tf)) ++tf;
+            tag.attr.assign(tf,te-tf+1);
+
+            return true;
+        }
     }
-    else {
-        t.Clear();
-        return false;
-    }
+
+    tag.Clear();
+    return false;
 }
 
 static void getvalue(istream &is,string &s)
@@ -647,6 +694,8 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
 {
     AtomList d,k,v;
     bool inpool = false,inval = false,inkey = false,indata = false;
+    const t_symbol *empty = MakeSymbol("");
+
 	while(!is.eof()) {
         xmltag tag;
         gettag(is,tag);
@@ -697,8 +746,12 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
         else if(inpool) {
             if(tag == "dir") {
                 if(tag.type == xmltag::t_start) {
+                    // warn if last directory key was not given
+                    if(d.Count() && GetSymbol(d[d.Count()-1]) == empty)
+                        post("pool - XML load: dir key must be given prior to subdirs, ignoring items");
+
                     // initialize dir key as empty
-                    t_atom at; SetString(at,"");
+                    t_atom at; SetSymbol(at,empty);
                     d.Append(at);
                 }
                 else if(tag.type == xmltag::t_end) {
@@ -716,14 +769,23 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
                 else if(tag.type == xmltag::t_end) {
         			if(depth < 0 || d.Count() <= depth) {
                         // NOW set value
-                        const char *ds = d.Count()?GetString(d[d.Count()-1]):NULL;
-                        if(!ds || !*ds)
-                            post("pool - XML load: dir key must be given prior to dir values");
+
+                        int fnd;
+                        for(fnd = d.Count()-1; fnd >= 0; --fnd)
+                            if(GetSymbol(d[fnd]) == empty) break;
+
+                        // look if last dir key has been given
+                        if(fnd >= 0) {
+                            if(fnd == d.Count()-1)
+                                post("pool - XML load: dir key must be given prior to values");
+
+                            // else: one directoy level has been left unintialized, ignore items
+                        }
                         else {
-				            pooldir *nd = mkdir?AddDir(d):GetDir(d);
-				            if(nd) {
-                                // only use first word of key
-                                if(k.Count() == 1)
+                            // only use first word of key
+                            if(k.Count() == 1) {
+		        		        pooldir *nd = mkdir?AddDir(d):GetDir(d);
+        				        if(nd) 
                                     nd->SetVal(k[0],new AtomList(v));
                                 else
                                     post("pool - XML load: value key must be exactly one word, value not stored");

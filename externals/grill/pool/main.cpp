@@ -43,12 +43,14 @@ protected:
 	// handle directories
 	V m_getdir();
 
-	V m_mkdir(I argc,const A *argv,BL abs = true);		// make and change to dir
+	V m_mkdir(I argc,const A *argv,BL abs = true,BL chg = false); // make (and change) to dir
+	V m_mkchdir(I argc,const A *argv) { m_mkdir(argc,argv,true,true); } // make and change to dir
 	V m_chdir(I argc,const A *argv,BL abs = true);		// change to dir
 	V m_rmdir(I argc,const A *argv,BL abs = true);		// remove dir
 	V m_updir(I argc,const A *argv);		// one or more levels up
 
 	V m_mksub(I argc,const A *argv) { m_mkdir(argc,argv,false); }
+	V m_mkchsub(I argc,const A *argv) { m_mkdir(argc,argv,false,true); }
 	V m_chsub(I argc,const A *argv) { m_chdir(argc,argv,false); }
 	V m_rmsub(I argc,const A *argv) { m_rmdir(argc,argv,false); }
 
@@ -162,10 +164,12 @@ private:
 	FLEXT_CALLBACK(m_getdir)
 	FLEXT_CALLBACK_V(m_mkdir)
 	FLEXT_CALLBACK_V(m_chdir)
+	FLEXT_CALLBACK_V(m_mkchdir)
 	FLEXT_CALLBACK_V(m_updir)
 	FLEXT_CALLBACK_V(m_rmdir)
 	FLEXT_CALLBACK_V(m_mksub)
 	FLEXT_CALLBACK_V(m_chsub)
+	FLEXT_CALLBACK_V(m_mkchsub)
 	FLEXT_CALLBACK_V(m_rmsub)
 
 	FLEXT_CALLBACK_V(m_set)
@@ -240,10 +244,12 @@ V pool::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"getdir",m_getdir);
 	FLEXT_CADDMETHOD_(c,0,"mkdir",m_mkdir);
 	FLEXT_CADDMETHOD_(c,0,"chdir",m_chdir);
+	FLEXT_CADDMETHOD_(c,0,"mkchdir",m_mkchdir);
 	FLEXT_CADDMETHOD_(c,0,"rmdir",m_rmdir);
 	FLEXT_CADDMETHOD_(c,0,"updir",m_updir);
 	FLEXT_CADDMETHOD_(c,0,"mksub",m_mksub);
 	FLEXT_CADDMETHOD_(c,0,"chsub",m_chsub);
+	FLEXT_CADDMETHOD_(c,0,"mkchsub",m_mkchsub);
 	FLEXT_CADDMETHOD_(c,0,"rmsub",m_rmsub);
 
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
@@ -380,17 +386,21 @@ V pool::getdir(const S *tag)
 
 V pool::m_getdir() { getdir(MakeSymbol("getdir")); }
 
-V pool::m_mkdir(I argc,const A *argv,BL abs)
+V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
 {
+    const char *nm = chg?"mkchdir":"mkdir";
 	if(!ValChk(argc,argv))
-		post("%s - mkdir: invalid directory name",thisName());
+		post("%s - %s: invalid directory name",thisName(),nm);
 	else {
 		AtomList ndir;
 		if(abs) ndir(argc,argv);
 		else (ndir = curdir).Append(argc,argv);
 		if(!pl->MkDir(ndir,vcnt,dcnt)) {
-			post("%s - mkdir: directory couldn't be created",thisName());
+			post("%s - %s: directory couldn't be created",thisName(),nm);
 		}
+        else if(chg) 
+            // change to newly created directory
+            curdir = ndir;
 	}
 
 	echodir();

@@ -279,8 +279,7 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 			if(absdir) tmp = d;
             if(fl.good()) {
                 fl << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;
-//                fl << "<!DOCTYPE pool SYSTEM \"http://www.parasitaere-kapazitaeten.net/ext/pool/pool.dtd\">" << endl;
-                fl << "<!DOCTYPE pool SYSTEM \"pool.dtd\">" << endl;
+                fl << "<!DOCTYPE pool SYSTEM \"http://www.parasitaere-kapazitaeten.net/ext/pool/pool-0.2.dtd\">" << endl;
                 fl << "<pool>" << endl;
                 BL ret = pd->SvDirXML(fl,depth,tmp);
                 fl << "</pool>" << endl;

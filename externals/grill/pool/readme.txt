@@ -65,6 +65,7 @@ Version history:
 - fixed bug with stored numbers starting with - or +
 - relative file names will be based on the folder of the current patcher
 - added printall, printrec, printroot messages for console printout
+- added mkchdir, mkchsub to create and change to directories at once
 
 0.1.0:
 - first public release
@@ -72,10 +73,11 @@ Version history:
 ---------------------------------------------------------------------------
 
 BUGS:
-- pool does not handle symbols with spaces or all digits
+- pool does not handle symbols with spaces, colons or all digits
 
 
 TODO list:
+- check for invalid symbols (spaces, colons)
 
 general:
 - what is output as value if it is key only? (Max->nothing!)
