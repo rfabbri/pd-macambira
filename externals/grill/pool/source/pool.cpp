@@ -475,51 +475,44 @@ static C *ReadAtom(C *c,A *a)
 
 	const C *m = c; // remember position
 
-	// check for word type (s = 0,1,2 ... int,float,symbol)
-	I s = 0;
-	for(; *c && !isspace(*c); ++c) {
-		if(!isdigit(*c))
-            if(!s && (*c == '-' || *c == '+')) {} // minus or plus is ok
+    // go to next whitespace
+    // \todo recognize symbol escapes
+    for(; *c && !isspace(*c); ++c) {}
+
+    // save character and set delimiter
+    char t = *c; *c = 0;
+
+    float fres;
+    // first try float
+    if(sscanf(m,"%f",&fres)) {
+        if(a) {
+            int ires = (int)fres; // try a cast
+            if(fres == ires)
+                flext::SetInt(*a,ires);
             else
-			    s = (*c != '.' || s == 1)?2:1;
-	}
+                flext::SetFloat(*a,fres);
+        }
+    }
+    // no, it's a symbol
+    else {
+        if(a) flext::SetString(*a,m);
+    }
 
-	if(a) {
-		switch(s) {
-		case 0: // integer
-#if FLEXT_SYS == FLEXT_SYS_MAX
-			flext::SetInt(*a,atoi(m));
-			break;
-#endif
-		case 1: // float
-			flext::SetFloat(*a,(F)atof(m));
-			break;
-		default: { // anything else is a symbol
-			C t = *c; *c = 0;
-			flext::SetString(*a,m);
-			*c = t;
-			break;
-		}
-		}
-	}
-
+    // set back the saved character
+    *c = t;
 	return c;
 }
 
 static BL ParseAtoms(C *tmp,flext::AtomList &l)
 {
-	I i,cnt;
-	C *t = tmp;
-	for(cnt = 0; ; ++cnt) {
-		t = ReadAtom(t,NULL);
-		if(!t) break;
-	}
-
-	l(cnt);
-	if(cnt) {
-		for(i = 0,t = tmp; i < cnt; ++i)
-			t = ReadAtom(t,&l[i]);
-	}
+    const int MAXATOMS = 1024;
+    int cnt = 0;
+    t_atom atoms[MAXATOMS];
+    for(char *t = tmp; *t && cnt < MAXATOMS; ++cnt) {
+		t = ReadAtom(t,&atoms[cnt]);
+        if(!t) break;
+    }
+    l(cnt,atoms);
 	return true;
 }
 

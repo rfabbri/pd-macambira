@@ -93,6 +93,7 @@ Version history:
 - added "seti" message to set elements at index
 - added "clri" message to erase elements at index
 - fixed bad bug: pool::priv was not initialized
+- enhanced and optimized atom parsing
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
