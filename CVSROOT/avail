@@ -8,8 +8,13 @@ unavail |  | gem
 avail | cclepper,dheck,ggeiger,tigital,zmoelnig | gem
 
 # ACLs at Yves Degoyon's request
-unavail |  | externals/gem2pdp,externals/pidip,externals/unauthorized | MAIN
-avail | sevyves,eighthave | externals/gem2pdp,externals/pidip,externals/unauthorized | MAIN
+unavail |  | externals/pidip,externals/unauthorized | MAIN
+avail | sevyves,eighthave | externals/pidip,externals/unauthorized | MAIN
+
+# added tigital in accordance to Yves
+unavail |  | externals/gem2pdp | MAIN
+avail | sevyves,tigital,eighthave | externals/gem2pdp | MAIN
+
 
 # T. Grill's cvs automatically syncs with the SourceForge
 # so changes here wouldn't make it to his CVS.
