@@ -1,4 +1,4 @@
-#include "m_pd.h"
+#include <m_pd.h>
 
 #ifdef PD_MAJOR_VERSION
 #include "s_stuff.h"
@@ -18,8 +18,8 @@
 #include <unistd.h>
 
 
-#define DEBUG(x)
-/*#define DEBUG(x) x */
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*------------------------------------------------------------------------------
  * from evtest.c from the ff-utils package

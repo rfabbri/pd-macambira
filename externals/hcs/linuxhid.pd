@@ -1,0 +1,12 @@
+#N canvas 618 332 428 305 10;
+#X obj 13 10 cnv 15 400 40 empty empty Linux_HID 20 12 1 18 -261689
+-66577 0;
+#X text 28 96 Raw access to the mouse output \, not tied to the sccreen
+borders.;
+#X text 22 169 Raw access to the joystick output with a fixed number
+of outlets.;
+#X text 22 239 Raw access to the output of the Linux Event system.
+;
+#X obj 16 75 linuxmouse;
+#X obj 18 219 linuxevent;
+#X obj 16 146 linuxjoystick;
