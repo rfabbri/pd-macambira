@@ -1,5 +1,5 @@
-#N canvas 2 1 615 610 12;
-#X obj 107 517 pddp;
+#N canvas 274 90 615 610 12;
+#X obj 107 541 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 74 This object does not accept arguments of any type.;
@@ -150,7 +150,9 @@ non-printing keys like shift or "F1".;
 #X text 111 362 Caveat -- this only works if Pd actually gets the key
 events which can depend on the stacking order of windows and/or the
 pointer location. This is dependent on the system.;
-#X text 155 518 - Dave Sabine \, July 11 \, 2003;
+#X text 155 542 - Dave Sabine \, July 11 \, 2003;
+#X obj 260 514 all_about_hid;
+#X text 105 515 for more on HIDs:;
 #X connect 17 0 18 0;
 #X connect 18 0 25 0;
 #X connect 19 0 26 0;

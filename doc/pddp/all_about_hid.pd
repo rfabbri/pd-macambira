@@ -1,0 +1,39 @@
+#N canvas 92 68 856 623 10;
+#X obj 0 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
+-66577 0;
+#X obj 816 3 pddp;
+#X text 17 601 by Hans-Christoph Steiner <hans@at.or.at>;
+#X text 629 603 updated for Pd version 0.37.1;
+#X text 10 36 "HID" stands for "Human Interface Device". A HID is any
+device that is meant to allow humans to interact with a computer. Usually
+\, HIDs are mice \, keyboards \, joysticks \, tablets \, gamepads \,
+etc. There a number of unusual HIDs \, like the Griffin PowerMate on
+the low end \, or the SensAble PHANTOM 6DOF on the high end.;
+#X text 11 124 When talking about HIDs \, "DOF" is often mentioned.
+"DOF" stands for "degrees of freedom". A degree of freedom is one dimension
+in which that HID can give information. A mouse generally had 2DOFs:
+X-axis and Y-axis \, though a wheel could be considered another DOF.
+The PHANTOM 6DOF has six degrees of freedom: X \, Y \, Z movement \;
+X \, Y \, Z rotation.;
+#X text 10 218 MICE;
+#X obj 24 243 MouseState;
+#X obj 110 243 linuxmouse;
+#X obj 191 243 gemmouse;
+#X text 9 306 JOYSTICKS;
+#X obj 258 243 rawmouse;
+#X obj 25 330 joystick;
+#X obj 98 330 linuxjoystick;
+#X obj 204 330 rawjoystick;
+#X text 9 484 GENERIC HID OBJECTS;
+#X obj 24 510 linuxevent;
+#X obj 24 270 mousefilter;
+#X text 10 367 KEYBOARDS;
+#X obj 25 396 key;
+#X obj 57 396 keyup;
+#X obj 159 396 gemkeyboard;
+#X obj 23 453 gemtablet;
+#X text 10 430 TABLETS;
+#X text 12 544 MISC;
+#X obj 24 568 gemorb;
+#X obj 247 396 gemkeyname;
+#X obj 102 396 keyname;
