@@ -1,5 +1,9 @@
 Change log for PD external 'sprinkler' (formerly 'forward')
 
+v0.04 Sun, 17 Aug 2003 13:23:54 +0200
+   + removed stale "VERSION" file
+   + tested with gcc-2.95.4 and pd-0.37-test8
+
 v0.03 Sun Sep  8 00:56:33 CEST 2002
    + renamed to 'sprinkler'
    + added 'configure' option --enable-forward to allow

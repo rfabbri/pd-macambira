@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl -- adapted from 'configure.in' in ggee distribution by Guenter Geiger
 AC_PREREQ(2.5)
-AC_INIT(sprinkler, [0.03], [moocow@ling.uni-potsdam.de])
+AC_INIT(sprinkler, [0.04], [moocow@ling.uni-potsdam.de])
 
 dnl
 dnl Programs, prefix
