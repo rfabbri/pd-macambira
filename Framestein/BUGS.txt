@@ -1,0 +1,37 @@
+LIST OF BUGS AND MISSING FEATURES
+
+
+- fs.multi: plugins that operate on several (more than two) fs.frames
+
+- gol-plugin is limited to 16bit displays
+
+- clipping the right-side of image in fs.copy is unconsistent with other edges
+
+- vframe.pd has initially a wrong path
+
+- playsound-feature to fs.frame?
+
+- changing borderstate resets canvas.pen / brushmode etc
+
+- FramesteinLib.DLL crashes when quitting pd
+
+- stayontop doesn't work anymore
+
+- fs.avi is unstable (and should compress frames on the fly)
+
+- fs.avi uses the old api with 2GB limit
+
+- color keying with treshhold missing
+
+- GEM compatibility (video signals, pixel effects)
+
+- mousewheel events to fs.event
+
+- better, editable fs.sonogram
+
+- bad arguments to fs.copy cause it to do nothing, they should be ignored
+
+- transfer images between vframe and arrays (expose...)
+
+- VIDEODEKKIKONTROLLI eli kuva jossa nappeja,
+	+ väriliuku, joka toimii slaiderina!
