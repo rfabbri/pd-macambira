@@ -4,11 +4,11 @@
 #X obj 125 122 tgl 15 1 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
 #X obj 51 15 hsl 128 15 1e-04 1 1 0 empty empty dt -2 -6 0 8 -262144
--1 -1 10400 0;
+-1 -1 5100 0;
 #X msg 48 37 dt \$1;
 #X msg 80 84 e \$1;
 #X obj 83 65 hsl 128 15 -1 0 0 0 empty empty etilde -2 -6 0 8 -262144
--1 -1 6000 0;
+-1 -1 7800 0;
 #X floatatom 122 85 5 0 0 0 - - -;
 #X floatatom 106 40 5 0 0 0 - - -;
 #X msg 158 177 reset;
@@ -31,6 +31,11 @@ models of an atom in a magnetic field...;
 #X msg 607 252 mu -1.43572 \;;
 #X obj 608 228 t b b;
 #X msg 608 318 \; pd dsp 1;
+#X obj 14 347 print~;
+#X obj 14 292 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 262 236 fiddle~;
+#X floatatom 263 273 5 0 0 0 - - -;
 #X connect 1 0 11 0;
 #X connect 2 0 1 0;
 #X connect 3 0 4 0;
@@ -42,6 +47,8 @@ models of an atom in a magnetic field...;
 #X connect 9 0 11 0;
 #X connect 10 0 11 0;
 #X connect 11 0 0 0;
+#X connect 11 0 24 0;
+#X connect 11 0 26 0;
 #X connect 11 1 0 1;
 #X connect 11 2 0 0;
 #X connect 11 3 0 1;
@@ -55,3 +62,5 @@ models of an atom in a magnetic field...;
 #X connect 22 1 21 0;
 #X connect 22 1 19 0;
 #X connect 22 1 20 0;
+#X connect 25 0 24 0;
+#X connect 26 3 27 0;

@@ -67,23 +67,17 @@ private:
   
   t_int bs; //blocksize
   t_int bs1; //bs+1
-  t_int counter;
 
   t_sample * data; //array with data
   t_sample * d1; //1. element in array with data
   t_sample * dend; //1 element after the last element
-  
-  t_sample * ins;
-  t_sample * outs;
-
-  
 };
 
 
 FLEXT_LIB_DSP_1("fftgrshuf~",fftgrshuf,int)
 
 fftgrshuf::fftgrshuf(int arg):
-  grains(1),offset(0),counter(1)
+  grains(1),offset(0)
 {
   bs=arg/2;
   grainsize=bs;
@@ -104,9 +98,8 @@ fftgrshuf::fftgrshuf(int arg):
 
 void fftgrshuf::m_signal(int n, t_float * const *in, t_float *const *out)
 {
-  ins = in[0];
-  outs = out[0];
-
+  t_sample * ins = in[0];
+  t_sample * outs = out[0];
 
   if (offset>0)
     {
@@ -124,7 +117,7 @@ void fftgrshuf::m_signal(int n, t_float * const *in, t_float *const *out)
   
   //grains
   
-  counter=1;
+  int counter=1;
   
   while (counter!=grains) 
     {
@@ -143,7 +136,6 @@ void fftgrshuf::set_offset(t_int o)
   if (o-bs<0 && o+bs>0)
     {
       offset=o;
-      post("offset %i",-o);
     }
   else
     post("offset out of range!");
