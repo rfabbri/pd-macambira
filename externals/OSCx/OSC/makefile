@@ -19,13 +19,13 @@ DARWINCFLAGS = -DPD -DUNIX -DMACOSX -O2 \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # where is your m_pd.h ???
-DARWININCLUDE =  -I../../build/include -I../../obj
+DARWININCLUDE =  -I../../../pd/src
 
 DARWINEXTERNALS = htmsocket.o OSC-pattern-match.o sendOSC.o dumpOSC.o routeOSC.o
 
 .c.pd_darwin:
 	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
-	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBS) $(LIBOSC)
+	cc -bundle -bundle_loader /usr/local/pd/bin/pd -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS) $(LIBS) $(LIBOSC)
 
 	rm -f $*.o ../$*.pd_darwin
 	ln -s $*/$*.pd_darwin ..
