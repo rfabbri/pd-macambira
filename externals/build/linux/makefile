@@ -19,11 +19,17 @@ CPU_FLAGS = -O2
 #CPU_FLAGS = -O3 -march=athlon-xp -m3dnow -msse -mfpmath=sse
 
 # Generic x86 (tune for 686, since that's most common these days)
-# CPU_FLAGS =  -O2 -mcpu=i686
-# Pentium III or better
-#CPU_FLAGS = -O3 -march=pentium3
-# Pentium 4 or better
-#CPU_FLAGS = -O3 -march=pentium4
+# CPU_FLAGS = -O2 -mcpu=i686
+# Pentium MMX
+#CPU_FLAGS = -march=pentium-mmx -mmmx
+# Pentium Pro
+#CPU_FLAGS = -march=pentiumpro -mmmx
+# Pentium II/Celeron
+#CPU_FLAGS = -mfpmath=sse -mmmx -msse -march=pentium2
+# Pentium III/Celeron2
+#CPU_FLAGS = -mfpmath=sse -mmmx -msse -march=pentium3
+# Pentium 4
+#CPU_FLAGS = -mfpmath=sse -mmmx -msse -msse2 -march=pentium4
 
 # PowerPC 750 (G3)
 #CPU_FLAGS = -O3 -mpowerpc-gpopt -mcpu=750
