@@ -1,0 +1,29 @@
+#N canvas 454 205 450 300 10;
+#X floatatom 254 231 5 0 0 3 code - -;
+#X floatatom 318 231 5 0 0 3 value - -;
+#X floatatom 190 231 4 0 0 3 type - -;
+#X floatatom 117 231 9 0 0 3 time - -;
+#X msg 177 104 start;
+#X msg 178 126 stop;
+#X obj 127 208 linuxevent /dev/input/event0;
+#X obj 127 63 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 147 63 bang to get an update;
+#X text 225 116 start/stop polling;
+#X obj 52 67 metro 20;
+#X msg 182 165 delay 20;
+#X text 249 165 time between polls (ms);
+#X obj 51 35 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 75 39 stop;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 3 0;
+#X connect 6 1 2 0;
+#X connect 6 2 0 0;
+#X connect 6 3 1 0;
+#X connect 7 0 6 0;
+#X connect 10 0 6 0;
+#X connect 11 0 6 0;
+#X connect 13 0 10 0;
+#X connect 14 0 10 0;
