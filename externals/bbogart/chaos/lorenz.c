@@ -25,20 +25,20 @@
 #include "m_pd.h"
 #include <math.h>
 
-t_class *myclass;
+t_class *lorenz_class;
 
-typedef struct thisismystruct
+typedef struct lorenz_struct
 {
-	t_object myobj;
-	double h,a,b,c,lx0,ly0,lz0;
+	t_object lorenz_obj;
+	double h, a, b, c, lx0, ly0, lz0;
 	t_outlet *y_outlet;
 	t_outlet *z_outlet;
-}	mystruct;
+}	lorenz_struct;
 
-static void calculate(mystruct *x)
+static void calculate(lorenz_struct *x)
 {
-	double lx0,ly0,lz0,lx1,ly1,lz1;
-	double h,a,b,c;
+	double lx0, ly0, lz0, lx1, ly1, lz1;
+	double h, a, b, c;
 
 	h = x->h;
 	a = x->a;
@@ -55,29 +55,29 @@ static void calculate(mystruct *x)
 	x->ly0 = ly1;
 	x->lz0 = lz1;
 
-	outlet_float(x->myobj.ob_outlet, (t_float)lx1);
+	outlet_float(x->lorenz_obj.ob_outlet, (t_float)lx1);
 	outlet_float(x->y_outlet, (t_float)ly1);
 	outlet_float(x->z_outlet, (t_float)lz1);
 }
 
-static void reset(mystruct *x)
+static void reset(lorenz_struct *x)
 {
 	x->lx0 = 0.1;
-        x->ly0 = 0;
-        x->lz0 = 0;
+	x->ly0 = 0;
+	x->lz0 = 0;
 }	
 
-static void param(mystruct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_floatarg c)
+static void param(lorenz_struct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_floatarg c)
 {
-        x->h = (double)h;
-        x->a = (double)a;
-        x->b = (double)b;
-        x->c = (double)c;
+	x->h = (double)h;
+	x->a = (double)a;
+	x->b = (double)b;
+	x->c = (double)c;
 }
 
 void *lorenz_new(void)
 {
-        mystruct *x = (mystruct *)pd_new(myclass);
+	lorenz_struct *x = (lorenz_struct *)pd_new(lorenz_class);
 	x->h = 0.01;
 	x->a = 10.0;
 	x->b = 28.0;
@@ -85,43 +85,40 @@ void *lorenz_new(void)
 	x->lx0 = 0.1;
 	x->ly0 = 0;
 	x->lz0 = 0;
-     
-        outlet_new(&x->myobj, &s_float);		/* Default float outlet */
-	x->y_outlet = outlet_new(&x->myobj, &s_float);  /* Two New Outlets */
-	x->z_outlet = outlet_new(&x->myobj, &s_float);
-        return (void *)x;
+    
+	outlet_new(&x->lorenz_obj, &s_float);					/* Default float outlet */
+	x->y_outlet = outlet_new(&x->lorenz_obj, &s_float);		/* Two New Outlets */
+	x->z_outlet = outlet_new(&x->lorenz_obj, &s_float);
+    
+	return (void *)x;
 }
 
 
 void lorenz_setup(void)
 {
-        post("-------------------------");              /* Copyright info */
-        post("Chaos PD Externals");
-        post("Copyright Ben Bogart 2002");
-        post("-------------------------");
+     
+	post("lorenz");
 
-	myclass = class_new(gensym("lorenz"),		/* symname is the symbolic name */
-	(t_newmethod)lorenz_new,			/* Constructor Function */
-	0,						/* Destructor Function */
-	sizeof(mystruct),				/* Size of the structure */
-	CLASS_DEFAULT,					/* Graphical Representation */
-	0);						/* 0 Terminates Argument List */
+	lorenz_class = class_new(gensym("lorenz"),		/* symname is the symbolic name */
+        (t_newmethod)lorenz_new,					/* Constructor Function */
+		0,											/* Destructor Function */
+		sizeof(lorenz_struct),						/* Size of the structure */
+		CLASS_DEFAULT,								/* Graphical Representation */
+		0);											/* 0 Terminates Argument List */
 
-	class_addbang(myclass, (t_method)calculate);
-	class_addmethod(myclass,
-			(t_method)reset,
-			gensym("reset"),
-			0);
+	class_addbang(lorenz_class, (t_method)calculate);
+	
+	class_addmethod(lorenz_class,
+		(t_method)reset,
+		gensym("reset"),
+		0);
 
-        class_addmethod(myclass,
-                        (t_method)param,
-                        gensym("param"),
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        0);
-
+	class_addmethod(lorenz_class,
+		(t_method)param,
+		gensym("param"),
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		0);
 }
-
-

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-/* Henon's Attractor PD External                                                 */
+/* Chaos Math PD Externals                                                       */
 /* Copyright Ben Bogart 2002                                                     */
 /* This program is distributed under the terms of the GNU General Public License */
 ///////////////////////////////////////////////////////////////////////////////////
@@ -22,86 +22,48 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA     */
 ///////////////////////////////////////////////////////////////////////////////////
 
+
 #include "m_pd.h"
-#include <math.h>
 
-t_class *henon_class;
 
-typedef struct henon_struct
+#ifndef __DATE__ 
+#define __DATE__ "without using a gnu compiler"
+#endif
+
+typedef struct _chaos
 {
-	t_object henon_obj;
-	double a, b, lx0, ly0;
-	t_outlet *y_outlet;
-}	henon_struct;
+     t_object x_obj;
+} t_chaos;
 
-static void calculate(henon_struct *x)
+static t_class* chaos_class;
+
+	/* objects */
+void henon_setup();
+void ikeda_setup();
+void lorenz_setup();
+void rossler_setup();
+
+static void* chaos_new(t_symbol* s)
 {
-	double lx0, ly0, lx1, ly1;
-	double a, b;
+    t_chaos *x = (t_chaos *)pd_new(chaos_class);
+    return (x);
+}
+
+void chaos_setup(void) 
+{
+	chaos_class = class_new(gensym("chaos"), (t_newmethod)chaos_new, 0,
+    	sizeof(t_chaos), 0,0);
+
+	post("-------------------------");              /* Copyright info */
+	post("Chaos PD Externals");
+	post("Copyright Ben Bogart 2002");
+	post("Win32 compilation by joge 2002");
+
+	henon_setup();
+	ikeda_setup();
+	lorenz_setup();
+	rossler_setup();
 	
-	a = x->a;
-	b = x->b;
-	lx0 = x->lx0;
-	ly0 = x->ly0;
-
-	lx1 = (ly0 + 1) - (a * pow(lx0,2));
-	ly1 = b * lx0;
-	x->lx0 = lx1;
-	x->ly0 = ly1;
-
-	outlet_float(x->henon_obj.ob_outlet, (t_float)lx1);
-	outlet_float(x->y_outlet, (t_float)ly1);
+	post("-------------------------");	
 }
 
-static void reset(henon_struct *x)
-{
-	x->lx0 = 1;
-	x->ly0 = 1;
-}
-
-static void param(henon_struct *x, t_floatarg a, t_floatarg b)
-{
-	x->a = (double)a;
-	x->b = (double)b;
-}
-
-void *henon_new(void)
-{
-	henon_struct *x = (henon_struct *)pd_new(henon_class);
-	x->a = 1.4;
-	x->b = 0.3;
-	x->lx0 = 1;
-	x->ly0 = 1;
-     
-	outlet_new(&x->henon_obj, &s_float);				/* Default float outlet */
-	x->y_outlet = outlet_new(&x->henon_obj, &s_float);  /* New Outlet */
-
-	return (void *)x;
-}
-
-
-void henon_setup(void)
-{
-	post("henon");
-
-	henon_class = class_new(gensym("henon"),		/* symname is the symbolic name */
-	(t_newmethod)henon_new,							/* Constructor Function */
-	0,												/* Destructor Function */
-	sizeof(henon_struct),							/* Size of the structure */
-	CLASS_DEFAULT,									/* Graphical Representation */
-	0);												/* 0 Terminates Argument List */
-
-	class_addbang(henon_class, (t_method)calculate);
-	
-	class_addmethod(henon_class,
-		(t_method)reset,
-		gensym("reset"),
-		0);
-
-	class_addmethod(henon_class,
-		(t_method)param,
-		gensym("param"),
-		A_DEFFLOAT,
-		A_DEFFLOAT,
-		0);
-}

@@ -26,19 +26,19 @@
 #include <math.h>
 
 
-t_class *myclass;
+t_class *ikeda_class;
 
-typedef struct thisismystruct
+typedef struct ikeda_struct
 {
-	t_object myobj;
-	double a,b,c,rho,lx0,ly0;
+	t_object ikeda_obj;
+	double a, b, c, rho, lx0, ly0;
 	t_outlet *y_outlet;
-}	mystruct;
+}	ikeda_struct;
 
-static void calculate(mystruct *x)
+static void calculate(ikeda_struct *x)
 {
-	double lx0,ly0,lx1,ly1;
-	double a,b,c,rho,tmp,cos_tmp,sin_tmp;
+	double lx0, ly0, lx1, ly1;
+	double a, b, c, rho, tmp, cos_tmp, sin_tmp;
 
 	a = x->a;
 	b = x->b;
@@ -57,27 +57,27 @@ static void calculate(mystruct *x)
 	x->lx0 = lx1;
 	x->ly0 = ly1;
 
-	outlet_float(x->myobj.ob_outlet, (t_float)lx1);
+	outlet_float(x->ikeda_obj.ob_outlet, (t_float)lx1);
 	outlet_float(x->y_outlet, (t_float)ly1);
 }
 
-static void reset(mystruct *x)
+static void reset(ikeda_struct *x)
 {
 	x->lx0 = 0.1;
-        x->ly0 = 0.1;
+	x->ly0 = 0.1;
 }
 
-static void param(mystruct *x, t_floatarg a, t_floatarg b, t_floatarg c, t_floatarg rho)
+static void param(ikeda_struct *x, t_floatarg a, t_floatarg b, t_floatarg c, t_floatarg rho)
 {
-        x->a = (double)a;
-        x->b = (double)b;
+	x->a = (double)a;
+	x->b = (double)b;
 	x->c = (double)c;
 	x->rho = (double)rho;
 }
 
 void *ikeda_new(void)
 {
-        mystruct *x = (mystruct *)pd_new(myclass);
+	ikeda_struct *x = (ikeda_struct *)pd_new(ikeda_class);
 	x->a = 0.4;
 	x->b = 0.9;
 	x->c = 6.0;
@@ -85,40 +85,37 @@ void *ikeda_new(void)
 	x->lx0 = 0.1;
 	x->ly0 = 0.1;
      
-        outlet_new(&x->myobj, &s_float);		/* Default float outlet */
-	x->y_outlet = outlet_new(&x->myobj, &s_float);  /* New Outlet */
-        return (void *)x;
+	outlet_new(&x->ikeda_obj, &s_float);				/* Default float outlet */
+	x->y_outlet = outlet_new(&x->ikeda_obj, &s_float);  /* New Outlet */
+
+	return (void *)x;
 }
 
 
 void ikeda_setup(void)
 {
-        post("-------------------------");              /* Copyright info */
-        post("Chaos PD Externals");
-        post("Copyright Ben Bogart 2002");
-        post("-------------------------");
+	post("ikeda");
 
-	myclass = class_new(gensym("ikeda"),		/* symname is the symbolic name */
-	(t_newmethod)ikeda_new,				/* Constructor Function */
-	0,						/* Destructor Function */
-	sizeof(mystruct),				/* Size of the structure */
-	CLASS_DEFAULT,					/* Graphical Representation */
-	0);						/* 0 Terminates Argument List */
+	ikeda_class = class_new(gensym("ikeda"),		/* symname is the symbolic name */
+	(t_newmethod)ikeda_new,							/* Constructor Function */
+	0,												/* Destructor Function */
+	sizeof(ikeda_struct),							/* Size of the structure */
+	CLASS_DEFAULT,									/* Graphical Representation */
+	0);												/* 0 Terminates Argument List */
 
-	class_addbang(myclass, (t_method)calculate);
-	class_addmethod(myclass,
-			(t_method)reset,
-			gensym("reset"),
-			0);
+	class_addbang(ikeda_class, (t_method)calculate);
 
-        class_addmethod(myclass,
-                        (t_method)param,
-                        gensym("param"),
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-			A_DEFFLOAT,
-			A_DEFFLOAT,
-                        0);
+	class_addmethod(ikeda_class,
+		(t_method)reset,
+		gensym("reset"),
+		0);
+
+	class_addmethod(ikeda_class,
+		(t_method)param,
+		gensym("param"),
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		0);
 }
-
-

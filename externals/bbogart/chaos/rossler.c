@@ -25,17 +25,17 @@
 #include "m_pd.h"
 #include <math.h>
 
-t_class *myclass;
+t_class *rossler_class;
 
-typedef struct thisismystruct
+typedef struct rossler_struct
 {
 	t_object myobj;
 	double h,a,b,c,lx0,ly0,lz0;
 	t_outlet *y_outlet;
 	t_outlet *z_outlet;
-}	mystruct;
+}	rossler_struct;
 
-static void calculate(mystruct *x)
+static void calculate(rossler_struct *x)
 {
 	double lx0,ly0,lz0,lx1,ly1,lz1;
 	double h,a,b,c;
@@ -60,14 +60,14 @@ static void calculate(mystruct *x)
 	outlet_float(x->z_outlet, (t_float)lz1);
 }
 
-static void reset(mystruct *x)
+static void reset(rossler_struct *x)
 {
-	x->lx0 = 0.1;
+		x->lx0 = 0.1;
         x->ly0 = 0;
         x->lz0 = 0;
 }
 
-static void param(mystruct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_floatarg c)
+static void param(rossler_struct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_floatarg c)
 {
         x->h = (double)h;
         x->a = (double)a;
@@ -77,7 +77,7 @@ static void param(mystruct *x, t_floatarg h, t_floatarg a, t_floatarg b, t_float
 
 void *rossler_new(void)
 {
-        mystruct *x = (mystruct *)pd_new(myclass);
+    rossler_struct *x = (rossler_struct *)pd_new(rossler_class);
 	x->h = 0.01;
 	x->a = 0.2;
 	x->b = 0.2;
@@ -86,7 +86,7 @@ void *rossler_new(void)
 	x->ly0 = 0;
 	x->lz0 = 0;
      
-        outlet_new(&x->myobj, &s_float);		/* Default float outlet */
+    outlet_new(&x->myobj, &s_float);				/* Default float outlet */
 	x->y_outlet = outlet_new(&x->myobj, &s_float);  /* Two new Outlets */
 	x->z_outlet = outlet_new(&x->myobj, &s_float);
         return (void *)x;
@@ -95,32 +95,28 @@ void *rossler_new(void)
 
 void rossler_setup(void)
 {
-        post("-------------------------");              /* Copyright info */
-        post("Chaos PD Externals");
-        post("Copyright Ben Bogart 2002");
-        post("-------------------------");
+    post("rossler");
+        
+	rossler_class = class_new(gensym("rossler"),	/* symname is the symbolic name */
+	(t_newmethod)rossler_new,						/* Constructor Function */
+	0,												/* Destructor Function */
+	sizeof(rossler_struct),							/* Size of the structure */
+	CLASS_DEFAULT,									/* Graphical Representation */
+	0);												/* 0 Terminates Argument List */
 
-	myclass = class_new(gensym("rossler"),		/* symname is the symbolic name */
-	(t_newmethod)rossler_new,			/* Constructor Function */
-	0,						/* Destructor Function */
-	sizeof(mystruct),				/* Size of the structure */
-	CLASS_DEFAULT,					/* Graphical Representation */
-	0);						/* 0 Terminates Argument List */
+	class_addbang(rossler_class, (t_method)calculate);
 
-	class_addbang(myclass, (t_method)calculate);
-	class_addmethod(myclass,
-			(t_method)reset,
-			gensym("reset"),
-			0);
+	class_addmethod(rossler_class,
+		(t_method)reset,
+		gensym("reset"),
+		0);
 
-        class_addmethod(myclass,
-                        (t_method)param,
-                        gensym("param"),
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        A_DEFFLOAT,
-                        0);
+	class_addmethod(rossler_class,
+		(t_method)param,
+		gensym("param"),
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		A_DEFFLOAT,
+		0);
 }
-
-

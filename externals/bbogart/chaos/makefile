@@ -1,75 +1,79 @@
-current:
-	echo make pd_linux, pd_nt, pd_irix5, or pd_irix6
+NAME=chaos
+CSYM=chaos
 
-clean: ; rm -f *.pd_linux *.o
+current: pd_nt pd_intel pd_linux pd_darwin
 
 # ----------------------- NT -----------------------
 
-pd_nt: lorenz.dll rossler.dll henon.dll ikeda.dll 
+pd_nt: $(NAME).dll
 
 .SUFFIXES: .dll
 
-PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
-VC="C:\Program Files\Microsoft Visual Studio\Vc98"
+PDNTCFLAGS = /W3 /WX /MD /O2 /G6 /DNT /DPD /DMAXLIB /nologo
+VC="C:\Programme\Microsoft Visual Studio\VC98"
 
-PDNTINCLUDE = /I. /I\tcl\include /I\ftp\pd\src /I$(VC)\include
+PDNTINCLUDE = /I. /Ic:\pd\tcl\include /Ic:\pd\src /I$(VC)\include /Iinclude
 
-PDNTLDIR = $(VC)\lib
-PDNTLIB = $(PDNTLDIR)\libc.lib \
+PDNTLDIR = $(VC)\Lib
+PDNTLIB = $(PDNTLDIR)\msvcrt.lib \
 	$(PDNTLDIR)\oldnames.lib \
 	$(PDNTLDIR)\kernel32.lib \
-	\ftp\pd\bin\pd.lib 
+	$(PDNTLDIR)\user32.lib \
+	$(PDNTLDIR)\uuid.lib \
+	$(PDNTLDIR)\ws2_32.lib \
+	$(PDNTLDIR)\pthreadVC.lib \
+	c:\pd\bin\pd.lib
+        
+PDNTEXTERNALS = lorenz.obj rossler.obj henon.obj ikeda.obj
 
 .c.dll:
-	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-	link /dll /export:$*_setup $*.obj $(PDNTLIB)
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c *.c
+	link /dll /export:$(CSYM)_setup $*.obj $(PDNTEXTERNALS) $(PDNTLIB)
 
-# ----------------------- IRIX 5.x -----------------------
+# ----------------------- Mac OS X (Darwin) -----------------------
 
-pd_irix5: lorenz.pd_irix5 rossler.pd_irix5 henon.pd_irix5 ikeda.pd_irix5
+pd_darwin: $(NAME).pd_darwin
 
-.SUFFIXES: .pd_irix5
+.SUFFIXES: .pd_darwin
 
-SGICFLAGS5 = -o32 -DPD -DUNIX -DIRIX -O2
+DARWINCFLAGS = -DPD -DMAXLIB -DUNIX -DMACOSX -O2 \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
+# where is your m_pd.h ???
+DARWININCLUDE =  -I../../src -I../../obj
 
-SGIINCLUDE =  -I../../src/
+DARWINEXTERNALS = lorenz.o rossler.o henon.o ikeda.o
 
-.c.pd_irix5:
-	cc $(SGICFLAGS5) $(SGIINCLUDE) -o $*.o -c $*.c
-	ld -elf -shared -rdata_shared -o $*.pd_irix5 $*.o
-	rm $*.o
-
-# ----------------------- IRIX 6.x -----------------------
-
-pd_irix6: lorenz.pd_irix6 rossler.pd_irix6 henon.pd_irix6 ikeda.pd_irix6
-
-.SUFFIXES: .pd_irix6
-
-SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
-	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
-	-Ofast=ip32
-
-.c.pd_irix6:
-	cc $(SGICFLAGS6) $(SGIINCLUDE) -o $*.o -c $*.c
-	ld -IPA -n32 -shared -rdata_shared -o $*.pd_irix6 $*.o
-	rm $*.o
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c *.c
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o $(DARWINEXTERNALS)
+	rm -f $*.o ../$*.pd_darwin
+	ln -s $*/$*.pd_darwin ..
 
 # ----------------------- LINUX i386 -----------------------
 
-pd_linux: lorenz.pd_linux rossler.pd_linux henon.pd_linux ikeda.pd_linux
+pd_linux: $(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE =  -I../../src
+# where is your m_pd.h ???
+LINUXINCLUDE =  -I/usr/local/include 
+
+LINUXEXTERNALS = lorenz.o rossler.o henon.o ikeda.o
 
 .c.pd_linux:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
-	strip --strip-unneeded $*.pd_linux
-	rm $*.o
+	cc -O2 -Wall -DPD -fPIC $(LINUXCFLAGS) $(LINUXINCLUDE) -c *.c 
+	ld -export_dynamic  -shared -o $*.pd_linux $*.o $(LINUXEXTERNALS) -lc 
+	strip --strip-unneeded $*.pd_linux 
 
+# ----------------------------------------------------------
+
+PDDIR=/usr/lib/pd
+
+clean:
+	rm -f *.o *.pd_* so_locations
