@@ -29,8 +29,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+
 /* some typedefs */
 #include "pdp_types.h"
+
+/* the list object */
+#include "pdp_list.h"
+
+
 
 /* PDP_IMAGE COMPONENTS */
 
@@ -54,98 +60,19 @@
 #include "pdp_bitmap.h"
 
 
+
 /* PDP_MATRIX COMPONENTS */
 #include "pdp_matrix.h"
 
 
-// packet class
-#include "pdp_list.h"
-
-typedef struct _pdp_list* (*t_pdp_attribute_method)(int, struct _pdp_list*);
-
-/* packet class attribute (method) */
-typedef struct _pdp_attribute
-{
-    t_pdp_symbol *name;
-    t_pdp_attribute_method method;
-
-    /* problem: do we support argument type checking ??
-       this seems to be better solved in a "spec doc" or a central place
-       where "reserved" methods can be defined. */
-
-    /* if null this means the input or output list can be anything */
-    struct _pdp_list *in_spec;      // template for the input list (including default arguments)
-    struct _pdp_list *out_spec;     // template for the output list
-} t_pdp_attribute;
-
-
-/* packet class header */
-typedef struct _pdp_class
-{
-    /* packet manips: non-pure data packets (using external resources) must define these */
-    t_pdp_packet_method1 reinit;     /* reuse method for pdp_packet_new() */
-    t_pdp_packet_method2 clone;      /* init from template for pdp_packet_clone_rw() */
-    t_pdp_packet_method2 copy;       /* init & copy from template for pdp_packet_copy_rw() */
-    t_pdp_packet_method1 cleanup;    /* free packet's resources (to be used by the garbage collector) */
-
-    t_pdp_symbol *type;              /* type template for packet class */
-    struct _pdp_list *attributes;    /* list of attributes (packet methods) */
-}t_pdp_class;
-
-
-/* packet object header */
-struct _pdp
-{
-    /* meta info */
-    unsigned int type;             /* main datatype of this object */
-    t_pdp_symbol *desc;            /* high level type description (sort of a mime type) */
-    unsigned int size;             /* datasize including header */
-    unsigned int flags;            /* packet flags */
-
-    /* reference count */
-    unsigned int users;            /* nb users of this object, readonly if > 1 */
-    unsigned int *refloc;          /* location of reference to packet for passing packets */
-
-    /* class object */
-    t_pdp_class *pclass;            /* if zero, the packet is a pure packet (just data, no member functions) */
-
-    /* class */
-    //struct _pdp_class *class;    /* the packet class */
-
-    u32 pad[9];                    /* reserved to provide binary compatibility for future extensions */
-
-    union                          /* each packet type has a unique subheader */
-    {
-	t_raw    raw;              /* raw subheader (for extensions unkown to pdp core system) */
-	t_image  image;            /* (nonstandard internal) 16 bit signed planar bitmap image format */
-	t_bitmap bitmap;           /* (standard) bitmap image (fourcc coded) */
-	//t_ca     ca;             /* cellular automaton state data */
-	//t_ascii  ascii;          /* ascii packet */
-    } info;
-
-};
-
-
-/* pdp data packet type id */
-#define PDP_IMAGE                 1  /* 16bit signed planar scanline encoded image packet */
-//RESERVED: #define PDP_CA        2  /* 1bit toroidial shifted scanline encoded cellular automaton */
-//RESERVED: #define PDP_ASCII     3  /* ascii packet */
-//RESERVED: #define PDP_TEXTURE   4  /* opengl texture object */
-//RESERVED: #define PDP_3DCONTEXT 5  /* opengl render context */
-#define PDP_BITMAP                6  /* 8bit image packet (fourcc coded??) */
-//RESERVED: #define PDP_MATRIX    7  /* floating point/double matrix/vector packet (from gsl) */
-
-/* PACKET FLAGS */
-
-#define PDP_FLAG_DONOTCOPY (1<<0)   /* don't copy the packet on register_rw, instead return an invalid packet */
 
 
 /* PDP SYSTEM COMPONENTS */
 
-/* packet class and pool manager */
+/* packet pool stuff */
 #include "pdp_packet.h"
 
-/* processing queue manager */
+/* processing queue object */
 #include "pdp_queue.h"
 
 /* several communication helper methods (pd specific) */
