@@ -23,7 +23,14 @@
 /*                                                                              */
 /* ---------------------------------------------------------------------------- */
 
-#include "m_imp.h"
+#include <m_pd.h>
+#if defined(PD_VERSION) &&  (PD_MAJOR_VERSION >= 0 && PD_MINOR_VERSION > 36)
+#include <m_imp.h>
+#include <s_stuff.h>
+#else
+#include <m_imp.h>
+#endif
+
 
 #include <sys/types.h>
 #include <stdarg.h>
