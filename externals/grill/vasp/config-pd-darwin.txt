@@ -31,3 +31,7 @@ INSTDIR=${PD}/extra
 # (leave blank to omit installation)
 # a subfolder "vasp" will be created for the files
 HELPDIR=${PD}/doc/5.reference
+
+# additional compiler flags
+# (check if they fit to your system!)
+UFLAGS=-malign-power -maltivec

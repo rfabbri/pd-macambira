@@ -9,7 +9,7 @@
 PD=/usr/local/lib/pd
 
 # where are the PD header files?
-# leave it blank if it is a system directory (like /usr/local/include), 
+# leave it blank if it is a system directory (like /usr/local/include),
 # 	since gcc 3.2 complains about it
 PDINC=
 
