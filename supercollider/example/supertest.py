@@ -2,7 +2,9 @@
 
 
 import pyext,os,traceback
-from supercollider import *
+import supercollider
+
+sc=supercollider
 
 
 class supertest(pyext._class):
@@ -11,8 +13,8 @@ class supertest(pyext._class):
 
     def start_1(self,arg):
         try:
-            self.buffer=BufferRead(self.server,arg)
-            self.bsynth=Synth(self.server,"fileplayer",["bufnum",self.buffer.id])
+            self.buffer=sc.BufferRead(arg)
+            self.bsynth=sc.Synth("fileplayer",["bufnum",self.buffer.id])
         except:
             traceback.print_exc()
 
@@ -36,9 +38,9 @@ class supertest(pyext._class):
                 
     def __init__(self):
         try:
-            self.server=localServer;
-            self.server.dumpOSC(3)
-            self.server.evalSynth("fileplayer");
+            server=sc.localServer
+            server.dumpOSC(3)
+            server.evalSynth("fileplayer");
         except:
             traceback.print_exc()
 
