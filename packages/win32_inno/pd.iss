@@ -131,6 +131,16 @@ Source: ..\..\Gem\examples\99.games\*.*; DestDir: {app}\doc\gem\99.games
 Source: ..\..\Gem\examples\data\*.*; DestDir: {app}\doc\gem\data
 Source: ..\..\Gem\manual\*.*; DestDir: {app}\doc\gem\00.manual
 Source: ..\..\Gem\manual\index.html; DestDir: {app}\doc\gem\00.manual
+;-----------------------------------------------------------------------------
+; non CVS files
+;extras
+Source: noncvs\extra\*.dll; DestDir: {app}\extra
+;docs
+Source: noncvs\doc\5.reference\*.*; DestDir: {app}\doc\5.reference; Flags: ignoreversion
+Source: noncvs\doc\5.reference\iemhelp\*.*; DestDir: {app}\doc\5.reference\iemhelp; Flags: ignoreversion
+;abstractions
+Source: noncvs\abstractions\xp4pd\*.*; DestDir: {app}\abstractions\xp4pd
+Source: noncvs\abstractions\iemabs\*.*; DestDir: {app}\abstractions\iemabs
 
 [INI]
 Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://www.pure-data.org

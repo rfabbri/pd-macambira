@@ -38,7 +38,11 @@ installer.  In order to use this to compile/assemble Pd and externals.
    +-abstractions
    |
    +-packages-|
-   |          +-win32_inno
+   |          +-win32_inno-|
+   |                       +-noncvs-|
+   |                                +-extra
+   |                                +-doc-|
+   |                                      +-5.reference
    |
    +-doc-|
    |     +-additional
@@ -70,6 +74,22 @@ The recommended way to do this is (these are probably somewhat wrong):
          cvs checkout externals
          cd packages/win32_inno
 		 make clean && make
+
+Binary Sources I Used (I haven't tested them all, I just downloaded them):
+
+cyclone: http://suita.chopin.edu.pl/~czaja/miXed/externs/cyclone.html
+freeverb~: http://www.akustische-kunst.org/puredata/freeverb/index.html
+iemlibs: http://iem.kug.ac.at/~musil/iemlib/
+maxlib: http://www.akustische-kunst.org/puredata/maxlib/index.html
+OSC: http://barely.a.live.fm/pd/OSC/
+percolate: http://www.akustische-kunst.org/puredata/percolate/index.html
+toxy: http://suita.chopin.edu.pl/~czaja/miXed/externs/toxy.html
+xeq: http://suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html
+zexy: ftp://iem.kug.ac.at/pd/Externals/ZEXY
+
+all of T.Grill's code: http://www.parasitaere-kapazitaeten.net/ext/
+
+
 
 
 -Hans-Christoph Steiner <hans@at.or.at>
