@@ -1,6 +1,6 @@
 /*
- *   Pure Data Packet module.
- *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+ *   PiDiP module.
+ *   Copyright (c) by Yves Degoyon (ydegoyon@free.fr)
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ typedef struct pdp_ffmpeg_struct
 
     t_outlet *x_outlet_streaming;  // indicates the action of streaming
     t_outlet *x_outlet_nbframes;   // number of frames emitted
+    t_outlet *x_outlet_framerate;  // real framerate
     t_outlet *x_outlet_nbframes_dropped; // number of frames dropped
 
     char  *x_feedname;
@@ -310,7 +311,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
     short int *data   = (short int *)pdp_packet_data(x->x_packet0);
     t_pdp     *newheader = 0;
     short int *newdata = 0;
-    t_int     newpacket = -1, i;
+    t_int     newpacket = -1, i, j;
     short int *pY, *pU, *pV;
     uint8_t     *pnY, *pnU, *pnV;
     t_int     px, py;
@@ -348,14 +349,11 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
             for(px=0; px<x->x_vwidth; px++)
             {
                *pnY = (uint8_t) (*(pY++)>>7); 
-               if ( *pnY > 255 ) *pnY=255;
                pnY++;
                if ( (px%2==0) && (py%2==0) )
                {
                    *pnV = (uint8_t) (((*(pV++))>>8)+128); 
-                   if ( *pnV > 255 ) *pnV=255;
                    *pnU = (uint8_t) (((*(pU++))>>8)+128); 
-                   if ( *pnU > 255 ) *pnU=255;
                    pnU++;pnV++;
                }
             }
@@ -387,12 +385,20 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
              if ( etime.tv_sec != x->x_cursec )
              {
                 x->x_cursec = etime.tv_sec;
-                x->x_secondcount[ svideoindex ] = 0;
+                outlet_float( x->x_outlet_framerate, x->x_secondcount[ svideoindex ] );
+                for (j=0; j<x->x_nbvideostreams; j++)
+                {
+                   x->x_secondcount[ j ] = 0;
+                }
              }
-             if ( x->x_secondcount[ svideoindex ] >= x->x_avcontext->streams[i]->codec.frame_rate/10000 )
+             if ( x->x_secondcount[ svideoindex ] >= (x->x_avcontext->streams[i]->codec.frame_rate/10000) )
              {
-                 x->x_nbframes_dropped++;
-                 continue;
+                // post("pdp_ffmpeg : index=%d actual : %d, nominal : %d", 
+                //                    svideoindex,
+                //                    x->x_secondcount[ svideoindex ],
+                //                    (x->x_avcontext->streams[i]->codec.frame_rate/10000) );
+                x->x_nbframes_dropped++;
+                continue;
              }
 
              if ( x->x_avcontext->streams[i]->codec.pix_fmt != PIX_FMT_YUV420P )
@@ -463,14 +469,14 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                x->x_final_picture = x->x_formatted_picture;
              }
 
-               // encode and send the picture
+             // encode and send the picture
              {
                AVFrame aframe;
                t_int fsize, ret;
                 
                  memset(&aframe, 0, sizeof(AVFrame));
                  *(AVPicture*)&aframe= *x->x_final_picture;
-  
+                 aframe.pts = etime.tv_sec*1000000 + etime.tv_usec;
                  aframe.quality = x->x_avcontext->streams[i]->quality;
   
                  fsize = avcodec_encode_video(&x->x_avcontext->streams[i]->codec,
@@ -484,7 +490,9 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                  else
                  {
                     x->x_nbframes++;
-                    x->x_secondcount[ svideoindex++ ]++;
+                    x->x_secondcount[ svideoindex ]++;
+                    // post ("pdp_ffmpeg~ : index=%d count=%d", svideoindex, x->x_secondcount[ svideoindex ] );
+                    svideoindex++;
                  }
              }
            } 
@@ -583,7 +591,7 @@ static t_int *pdp_ffmpeg_perform(t_int *w)
        x->x_audioin_position=(x->x_audioin_position+1)%(2*MAX_AUDIO_PACKET_SIZE); 
        if ( x->x_audioin_position == 2*MAX_AUDIO_PACKET_SIZE-1 ) 
        {
-          post( "pdp_ffmpeg~ : reaching end of audio buffer" );
+          // post( "pdp_ffmpeg~ : reaching end of audio buffer" );
        }
        fsample=*(in2++); 
        if (fsample > 1.0) { fsample = 1.0; }
@@ -686,6 +694,7 @@ void *pdp_ffmpeg_new(void)
     x->x_outlet_streaming = outlet_new(&x->x_obj, &s_float);
     x->x_outlet_nbframes = outlet_new(&x->x_obj, &s_float);
     x->x_outlet_nbframes_dropped = outlet_new(&x->x_obj, &s_float);
+    x->x_outlet_framerate = outlet_new(&x->x_obj, &s_float);
 
     x->x_packet0 = -1;
     x->x_queue_id = -1;

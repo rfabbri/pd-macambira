@@ -1,8 +1,8 @@
-#N canvas 19 12 986 661 10;
+#N canvas 4 0 986 675 10;
 #X obj 230 7 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
 #X msg 150 44 loop \$1;
-#X obj 151 22 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 0 1
+#X obj 151 22 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 1 1
 ;
 #X msg 86 45 open \$1;
 #X obj 78 21 openpanel;
@@ -18,29 +18,29 @@
 -1;
 #X msg 376 8 stop;
 #X msg 441 41 open /dev/video;
-#X obj 130 99 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X obj 48 111 pdp_spigot;
+#X obj 131 106 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 49 118 pdp_spigot;
 #X text 7 20 Load;
 #X text 436 7 Live;
-#X obj 272 101 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 272 108 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 190 113 pdp_spigot;
-#X floatatom 46 167 5 0 0 0 - - -;
-#X floatatom 93 168 5 0 0 0 - - -;
-#X obj 46 141 pdp_aging;
-#X obj 190 140 pdp_baltan;
-#X floatatom 190 162 10 0 0 0 - - -;
-#X obj 403 102 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 190 120 pdp_spigot;
+#X floatatom 47 174 5 0 0 0 - - -;
+#X floatatom 94 175 5 0 0 0 - - -;
+#X obj 47 148 pdp_aging;
+#X obj 190 147 pdp_baltan;
+#X floatatom 190 169 10 0 0 0 - - -;
+#X obj 401 109 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 321 114 pdp_spigot;
-#X obj 320 141 pdp_edge;
-#X obj 518 104 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 319 121 pdp_spigot;
+#X obj 318 148 pdp_edge;
+#X obj 525 108 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X obj 436 116 pdp_spigot;
-#X msg 436 165 bang;
-#X floatatom 476 166 5 0 0 0 - - -;
-#X obj 436 141 pdp_intrusion;
+#X obj 443 120 pdp_spigot;
+#X msg 443 169 bang;
+#X floatatom 483 170 5 0 0 0 - - -;
+#X obj 443 145 pdp_intrusion;
 #X obj 648 106 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 566 118 pdp_spigot;
@@ -215,7 +215,7 @@
 #X floatatom 845 629 5 0 0 0 - - -;
 #X obj 845 600 route pdp_drop;
 #X msg 568 588 framerate 10;
-#X obj 225 93 dac~;
+#X obj 246 93 dac~;
 #X floatatom 312 21 5 0 0 0 - - -;
 #X obj 754 432 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
@@ -248,6 +248,10 @@
 #X obj 519 444 pdp_spigot;
 #X obj 518 467 pdp_charcoal;
 #X floatatom 613 468 5 0 0 0 - - -;
+#X obj 45 82 pdp_scale 320 240;
+#X msg 355 646 pos 0 0;
+#X msg 418 645 dim 1024 768;
+#X floatatom 197 93 5 0 0 0 - - -;
 #X connect 0 0 8 0;
 #X connect 1 0 9 0;
 #X connect 2 0 1 0;
@@ -257,10 +261,11 @@
 #X connect 6 0 8 1;
 #X connect 7 0 8 0;
 #X connect 8 0 9 0;
-#X connect 9 0 16 0;
-#X connect 9 3 169 0;
-#X connect 9 4 169 1;
-#X connect 10 0 16 0;
+#X connect 9 0 199 0;
+#X connect 9 3 202 0;
+#X connect 9 4 169 0;
+#X connect 9 5 169 1;
+#X connect 10 0 199 0;
 #X connect 11 0 10 0;
 #X connect 12 0 11 0;
 #X connect 13 0 11 0;
@@ -457,17 +462,17 @@
 #X connect 183 0 182 1;
 #X connect 184 0 53 2;
 #X connect 185 0 189 0;
-#X connect 185 0 190 0;
 #X connect 185 0 193 0;
 #X connect 186 0 185 1;
 #X connect 187 0 185 2;
 #X connect 188 0 193 0;
 #X connect 189 0 116 0;
-#X connect 191 0 190 0;
-#X connect 192 0 190 0;
 #X connect 194 0 193 0;
 #X connect 195 0 196 1;
 #X connect 196 0 122 0;
 #X connect 196 1 197 0;
 #X connect 197 0 122 0;
 #X connect 198 0 197 1;
+#X connect 199 0 16 0;
+#X connect 200 0 193 0;
+#X connect 201 0 193 0;

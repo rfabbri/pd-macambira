@@ -98,8 +98,8 @@ static void pdp_imgloader_load(t_pdp_imgloader *x, t_symbol *filename, t_floatar
    x->x_iwidth = imlib_image_get_width();
    x->x_iheight = imlib_image_get_height();
    post( "pdp_imgloader : loaded : %s (%dx%d)", filename->s_name, x->x_iwidth, x->x_iheight );
-   x->x_xoffset = (int) fx;
-   x->x_yoffset = (int) fy;
+   if ( fx!= 0.) x->x_xoffset = (int) fx;
+   if ( fy!= 0.) x->x_yoffset = (int) fy;
 }
 
 static void pdp_imgloader_xoffset(t_pdp_imgloader *x, t_floatarg fx )

@@ -1,29 +1,37 @@
-first, install  :
+a/ first, install  :
 
-imlib2 ( http://sourceforge.net/project/showfiles.php?group_id=2 )
-Image Magick ( http://www.imagemagick.org ) 
- ---->  watchout !! configure with --enable-shared 
-and ffmpeg 
- ----> watchout, it requires the cvs snapshot ! : http://ffmpeg.sourceforge.net/cvs
- + don't forget to activate mp3 and vorbis support in ffmpeg : ./configure --enable-mp3lame --enable-vorbis
+MANDATORY ::
+============
+***** PD sources 	: http://www-crca.ucsd.edu/~msp/software.html
+***** PDP and its deps  : http://zwizwa.fartit.com/pd/pdp/
+***** imlib2 		: http://sourceforge.net/project/showfiles.php?group_id=2
+***** Image Magick 	: http://www.imagemagick.org
+                          ---->  watchout !! configure with --enable-shared 
 
-you should also have installed libquicktime that is necessary for PDP 
-( http://sourceforge.net/projects/libquicktime ).
+OPTIONALLY ::
+=============
+***** ffmpeg		: http://ffmpeg.sourceforge.net/cvs 
+( --enable-ffmpeg )       ----> watchout, it requires the cvs snapshot !
+                          + don't forget to activate mp3 and vorbis support in ffmpeg : 
+                          ./configure --enable-mp3lame --enable-vorbis
+OR
 
-gone through it ?? yeh, i know it's a lot.
-ok, first stage reached )
+***** mpeg4ip		: http://mpeg4ip.sourceforge.net/ ( download mpeg4ip v1.0 )
+( --enable-mpeg4ip )    
 
-fix PD, PDP and FFMPEG paths in configure.ac
+b/ fix PD, PDP and FFMPEG/MPEG4IP paths in configure.ac
 
-autoconf 
+c/ autoconf 
 
-./configure 
+d/ ./configure [--enable-ffmpeg] OR [--enable-mpeg4ip] ( not both )
 
-make clean 
+e/ make clean 
 
-make
+f/ make
 
-as root, make install
+g/ as root, make install
+
+h/ modify your pd start-up script :
 
 pidip is a library, it should be loaded
 with the "-lib <path>/pidip" command line option

@@ -18,7 +18,8 @@
  *
  */
 
-/*  This object is an object allowing juxtaposition of frames from two inlets
+/*  This object is a video canvas which is also handling the graphical operations
+ *  ( no need to plug it in pdp_xv )
  *  Written by Yves Degoyon                                 
  */
 

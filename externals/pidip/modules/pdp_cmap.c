@@ -22,6 +22,7 @@
  */
 
 #include "pdp.h"
+#include "g_canvas.h"
 #include "yuv.h"
 #include <math.h>
 #include <stdio.h>
@@ -118,7 +119,7 @@ static void pdp_cmap_r(t_pdp_cmap *x, t_floatarg fr )
       x->x_colors[x->x_current].y = (yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB ))<<7;
       x->x_colors[x->x_current].u = (yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
       x->x_colors[x->x_current].v = (yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
-      pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
+      if (glist_isvisible(x->x_canvas))  pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
    }
 }
 
@@ -130,7 +131,7 @@ static void pdp_cmap_g(t_pdp_cmap *x, t_floatarg fg )
       x->x_colors[x->x_current].y = (yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB ))<<7;
       x->x_colors[x->x_current].u = (yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
       x->x_colors[x->x_current].v = (yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
-      pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
+      if (glist_isvisible(x->x_canvas)) pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
    }
 }
 
@@ -142,7 +143,7 @@ static void pdp_cmap_b(t_pdp_cmap *x, t_floatarg fb )
       x->x_colors[x->x_current].y = (yuv_RGBtoY( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB ))<<7;
       x->x_colors[x->x_current].u = (yuv_RGBtoU( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
       x->x_colors[x->x_current].v = (yuv_RGBtoV( (x->x_colorR << 16) + (x->x_colorG << 8) + x->x_colorB )-128)<<8;
-      pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
+      if (glist_isvisible(x->x_canvas)) pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
    }
 }
 
@@ -280,7 +281,7 @@ static void pdp_cmap_pick(t_pdp_cmap *x)
       x->x_colorR = yuv_YUVtoR( y, u, v );
       x->x_colorG = yuv_YUVtoG( y, u, v );
       x->x_colorB = yuv_YUVtoB( y, u, v );
-      pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
+      if (glist_isvisible(x->x_canvas)) pdp_cmap_draw_color( x, x->x_colorR, x->x_colorG, x->x_colorB );
       x->x_colors[x->x_current].y = 255;
       x->x_colors[x->x_current].u = 255;
       x->x_colors[x->x_current].v = 255;

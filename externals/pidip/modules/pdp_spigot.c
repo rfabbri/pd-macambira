@@ -1,6 +1,6 @@
 /*
- *   Pure Data Packet module.
- *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+ *   PiDiP module.
+ *   Copyright (c) by Yves Degoyon (ydegoyon@free.fr)
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include  "pdp.h"
+#include  "pidip_config.h"
 
 
 /* all symbols are C style */
@@ -46,8 +47,6 @@ extern "C"
     void pdp_cmap_setup(void);
     // void pdp_aa_setup(void);
     void pdp_ascii_setup(void);
-    void pdp_ffmpeg_tilde_setup(void);
-    void pdp_live_tilde_setup(void);
     void pdp_segsnd_tilde_setup(void);
     void pdp_noquark_setup(void);
     void pdp_juxta_setup(void);
@@ -63,7 +62,17 @@ extern "C"
     void pdp_ocanvas_setup(void);
     void pdp_pen_setup(void);
     void pdp_shape_setup(void);
+    void pdp_spotlight_setup(void);
 
+#ifdef HAVE_PIDIP_FFMPEG
+    void pdp_ffmpeg_tilde_setup(void);
+    void pdp_live_tilde_setup(void);
+#endif
+
+#ifdef HAVE_PIDIP_MPEG4IP
+    void pdp_mp4live_tilde_setup(void);
+    void pdp_mp4player_tilde_setup(void);
+#endif
 
 /* library setup routine */
 void pidip_setup(void){
@@ -108,8 +117,6 @@ void pidip_setup(void){
     pdp_cmap_setup();
     // pdp_aa_setup();
     pdp_ascii_setup();
-    pdp_ffmpeg_tilde_setup();
-    pdp_live_tilde_setup();
     pdp_segsnd_tilde_setup();
     pdp_noquark_setup();
     pdp_juxta_setup();
@@ -125,7 +132,17 @@ void pidip_setup(void){
     pdp_ocanvas_setup();
     pdp_pen_setup();
     pdp_shape_setup();
+    pdp_spotlight_setup();
 
+#ifdef HAVE_PIDIP_FFMPEG
+    pdp_ffmpeg_tilde_setup();
+    pdp_live_tilde_setup();
+#endif
+
+#ifdef HAVE_PIDIP_MPEG4IP
+    pdp_mp4live_tilde_setup();
+    pdp_mp4player_tilde_setup();
+#endif
 }
 
 #ifdef __cplusplus

@@ -4,22 +4,22 @@
 #X msg 34 125 loop \$1;
 #X obj 35 103 tgl 15 0 empty empty empty 20 8 0 8 -262144 -1 -1 1 1
 ;
-#X msg 244 41 open \$1;
-#X obj 243 17 openpanel;
-#X obj 228 0 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+#X msg 27 56 open \$1;
+#X obj 26 32 openpanel;
+#X obj 11 15 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X floatatom 190 96 5 0 0 0 - - -;
+#X floatatom 168 83 5 0 0 0 - - -;
 #X msg 99 62 stop;
-#X obj 197 65 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 175 52 hsl 300 15 0 1000 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X obj 131 132 metro 70;
 #X obj 126 164 pdp_yqt;
-#X obj 242 152 pdp_v4l;
-#X obj 251 122 metro 70;
-#X obj 296 88 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+#X obj 245 134 pdp_v4l;
+#X obj 254 104 metro 70;
+#X obj 299 70 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
 -1;
-#X msg 253 89 stop;
-#X msg 338 120 open /dev/video;
+#X msg 256 71 stop;
+#X msg 341 102 open /dev/video;
 #X obj 567 476 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X obj 567 528 pdp_control;
@@ -28,30 +28,30 @@
 #X obj 567 560 route pdp_drop;
 #X text 85 514 written by Yves Degoyon ( ydegoyon@free.fr );
 #X obj 127 417 pdp_xv;
-#X msg 292 303 rgb \$1 \$2 \$3;
-#X obj 391 303 pack f f f;
-#X floatatom 573 302 5 0 0 0 - - -;
-#X text 584 321 R;
-#X floatatom 622 303 5 0 0 0 - - -;
-#X floatatom 670 304 5 0 0 0 - - -;
-#X text 681 321 B;
-#X obj 522 303 t b f;
-#X text 631 321 G;
-#X obj 474 303 t b f;
+#X msg 326 273 rgb \$1 \$2 \$3;
+#X obj 425 273 pack f f f;
+#X floatatom 607 272 5 0 0 0 - - -;
+#X text 618 291 R;
+#X floatatom 656 273 5 0 0 0 - - -;
+#X floatatom 700 273 5 0 0 0 - - -;
+#X text 711 290 B;
+#X obj 556 273 t b f;
+#X text 662 291 G;
+#X obj 508 273 t b f;
 #X obj 128 467 route press drag release;
-#X msg 292 187 pick \$1 \$2;
-#X text 383 186 Pick the color of the shape;
-#X msg 291 215 detect \$1 \$2;
-#X text 389 215 Detect a shape of that color;
-#X msg 292 240 tolerance \$1;
-#X floatatom 389 242 5 0 0 0 - - -;
+#X msg 271 171 pick \$1 \$2;
+#X text 362 170 Pick the color of the shape;
+#X msg 291 194 detect \$1 \$2;
+#X text 389 194 Detect a shape of that color;
+#X msg 304 218 tolerance \$1;
+#X floatatom 401 220 5 0 0 0 - - -;
 #X text 86 498 pdp_shape : shape recognition object;
-#X text 433 242 Set tolerance ( default = 20 );
-#X text 294 323 Set the color of the shape;
-#X msg 293 270 paint \$1;
-#X obj 363 271 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X text 445 220 Set tolerance ( default = 20 );
+#X text 328 293 Set the color of the shape;
+#X msg 317 247 paint \$1;
+#X obj 387 248 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X text 388 270 Paint option ( default = off );
+#X text 412 247 Paint option ( default = off );
 #X floatatom 325 399 5 0 0 0 - - -;
 #X floatatom 286 417 5 0 0 0 - - -;
 #X floatatom 375 399 5 0 0 0 - - -;
@@ -61,11 +61,18 @@
 #X text 259 416 Y1;
 #X text 259 439 Y2;
 #X text 332 426 Coordinates of detected shape;
-#X obj 397 346 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 440 311 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X msg 295 346 luminosity \$1;
-#X text 425 345 Use luminosity ( default = on );
+#X msg 338 311 luminosity \$1;
+#X text 468 310 Use luminosity ( default = on );
 #X obj 127 361 pdp_shape;
+#X msg 45 401 cursor 1;
+#X obj 431 339 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X msg 352 337 shape \$1;
+#X text 459 338 Draw shape option ( default = on );
+#X obj 504 369 loadbang;
+#X msg 469 370 1;
 #X connect 0 0 9 0;
 #X connect 1 0 10 0;
 #X connect 2 0 1 0;
@@ -111,3 +118,9 @@
 #X connect 58 2 47 0;
 #X connect 58 3 48 0;
 #X connect 58 4 49 0;
+#X connect 59 0 22 0;
+#X connect 60 0 61 0;
+#X connect 61 0 58 0;
+#X connect 63 0 64 0;
+#X connect 64 0 55 0;
+#X connect 64 0 60 0;

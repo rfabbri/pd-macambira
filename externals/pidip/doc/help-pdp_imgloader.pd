@@ -39,7 +39,7 @@
 #X text 27 241 load <name> <x offset> <y offset>;
 #X text 28 228 Load an image ( types supported by imlib2 );
 #X obj 469 279 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
+-1 -1 10200 1;
 #X text 468 262 Blending factor;
 #X text 491 364 Unhide <index>;
 #X text 439 340 Hide <x1> <y1> <x2> <y2> <x3> <y3>;

@@ -1,6 +1,6 @@
 /*
- *   Pure Data Packet module.
- *   Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+ *   PiDiP module.
+ *   Copyright (c) by Yves Degoyon (ydegoyon@free.fr)
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -38,14 +38,22 @@
 
 #define VIDEO_BUFFER_SIZE (1024*1024)
 #define MAX_AUDIO_PACKET_SIZE (128 * 1024)
-#define MIN_AUDIO_SIZE (64 * 1024)
+#define MIN_AUDIO_SIZE (512)
 #define AUDIO_PACKET_SIZE (2*1152)
 
 #define DEFAULT_CHANNELS 1
-#define DEFAULT_FRAME_RATE 25
 #define DEFAULT_WIDTH 320
 #define DEFAULT_HEIGHT 240
+#define DEFAULT_FRAME_RATE 25
+#define END_OF_STREAM 20
+#define MIN_PRIORITY -20
 #define DEFAULT_PRIORITY 0
+#define MAX_PRIORITY 20
+
+/* a trick to cope with ffmpeg versions */
+#ifndef AVFMT_NOHEADER
+#define AVFMT_NOHEADER AVFMTCTX_NOHEADER
+#endif
 
 static char   *pdp_live_version = "pdp_live~: version 0.1, a video stream decoder ( ydegoyon@free.fr).";
 
@@ -68,6 +76,8 @@ typedef struct pdp_live_struct
     t_outlet *x_outlet_right;      // right audio output
     t_outlet *x_outlet_streaming;  // indicates the action of streaming
     t_outlet *x_outlet_nbframes;   // number of frames emitted
+    t_outlet *x_outlet_framerate;  // real framerate
+    t_outlet *x_outlet_endofstream;// for signaling the end of the stream
 
     pthread_t x_connectchild;      // thread used for connecting to a stream
     pthread_t x_decodechild;       // stream decoding thread
@@ -76,22 +86,28 @@ typedef struct pdp_live_struct
 
     char  *x_url;
     t_int x_streaming;      // streaming flag
+    t_int x_nopackets;      // no packet to decode
+    t_int x_endofstream;    // end of the stream reached
     t_int x_nbframes;       // number of frames emitted
     t_int x_framerate;      // framerate
     t_int x_samplerate;     // audio sample rate
     t_int x_audiochannels;  // audio channels
     t_int x_audioon;        // enough audio data to start playing
+    t_int x_blocksize;      // audio block size
     struct timeval x_starttime; // streaming starting time
     t_int x_cursec;         // current second
     t_int x_secondcount;    // number of frames received in the current second
     t_int x_nbvideostreams; // number of video streams
     t_int x_nbaudiostreams; // number of audio streams
+    t_int x_videoindex;     // index of the first video stream
 
       /* AV data structures */
     AVFormatContext  *x_avcontext;
     AVFormatParameters x_avparameters; // unused but the call is necessary to allocate structures
     AVPacket x_pkt;                    // packet received on the stream
     AVPicture x_picture_decoded;
+    long long int x_pts;               // presentation time stamp
+    long long int x_previouspts;       // previous presentation time stamp
     t_int x_newpicture;
 
       /* audio structures */
@@ -105,7 +121,10 @@ typedef struct pdp_live_struct
 
 static void pdp_live_priority(t_pdp_live *x, t_floatarg fpriority )
 {
-   x->x_priority = (int)fpriority;
+   if ( ( x->x_priority >= MIN_PRIORITY ) && ( x->x_priority <= MAX_PRIORITY ) )
+   {
+     x->x_priority = (int)fpriority;
+   }
 }
 
 static void pdp_live_threadify(t_pdp_live *x, t_floatarg fusethread )
@@ -131,24 +150,32 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
   AVFrame frame;
   uint8_t *pcktptr;
   struct timeval etime;
+  struct timespec mwait;
 
    if ( !x->x_streaming )
    {
       return -1;
    }
 
+   // post( "pdp_live~ : trying to read packet" );
    // read new packet on the stream
    if (av_read_packet(x->x_avcontext, &x->x_pkt) < 0) 
    {
-      // post( "pdp_live~ : decoding thread : nothing to decode" );
+      x->x_nopackets++;
+      // post( "pdp_live~ : decoding thread : nothing to decode : no packets :%d", x->x_nopackets );
+      if ( x->x_nopackets > END_OF_STREAM )
+      {
+        x->x_endofstream = 1;
+      }
       return -1;
    }
    // post( "pdp_live~ : read packet ( size=%d )", x->x_pkt.size );
+   x->x_nopackets = 0;
 
    if (x->x_pkt.stream_index >= x->x_avcontext->nb_streams)
    {
       post("pdp_live~ : stream received out of range !! ");
-      return 0;
+      return -1;
    }
 
    length = x->x_pkt.size;
@@ -211,8 +238,9 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     else
                     {
                       post( "pdp_live~ : audio overflow : packet ignored...");
+                      x->x_audioin_position = 0;
                     }
-                    if ( ( x->x_audioin_position > MIN_AUDIO_SIZE ) && (!x->x_audioon) )
+                    if ( ( x->x_audioin_position > x->x_blocksize ) && (!x->x_audioon) )
                     {
                        x->x_audioon = 1;
                        // post( "pdp_live~ : audio on" );
@@ -224,19 +252,19 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     imagesize = (x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width * 
                                  x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height * 3) / 2; // yuv planar
 
-                    // do not believe the declared framerate
-                    // x->x_framerate = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.frame_rate / 10000;
+                    x->x_framerate = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.frame_rate / 10000;
+                    x->x_videoindex = x->x_pkt.stream_index; 
 
                     // calculate actual frame rate
-                    if ( gettimeofday(&etime, NULL) == -1)
-                    {
-                       post("pdp_live~ : could not read time" );
-                    }
-                    if ( ( etime.tv_sec - x->x_starttime.tv_sec ) > 0 )
-                    {
-                       x->x_framerate = x->x_nbframes / ( etime.tv_sec - x->x_starttime.tv_sec );
-                    }
-                    if ( x->x_framerate == 0 ) x->x_framerate = 1;
+                    // if ( gettimeofday(&etime, NULL) == -1)
+                    // {
+                    //    post("pdp_live~ : could not read time" );
+                    // }
+                    // if ( ( etime.tv_sec - x->x_starttime.tv_sec ) > 0 )
+                    // {
+                    //    x->x_framerate = x->x_nbframes / ( etime.tv_sec - x->x_starttime.tv_sec );
+                    // }
+                    // if ( x->x_framerate == 0 ) x->x_framerate = 1;
                     // post ("pdp_live~ : frame rate is %d", x->x_framerate );
 
                     chunksize = avcodec_decode_video(
@@ -276,9 +304,31 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     else
                     {  
                         x->x_newpicture=1;
+                        x->x_previouspts = x->x_pts;
+                        x->x_pts = frame.pts;
+                        // post( "pdp_live : frame pts : %ld", x->x_pts );
                         x->x_vwidth = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width;
                         x->x_vheight = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height;
                         x->x_vsize = x->x_vwidth*x->x_vheight;
+
+                        if ( x->x_previouspts != -1 )
+                        {
+                           mwait.tv_sec = 0; 
+                           mwait.tv_nsec = (x->x_pts - x->x_previouspts)*1000;
+
+                           if ( ( x->x_pts == 0 ) )
+                           {
+                              // post("pdp_live~ : no presentation time stamp, using framerate :%d", 
+                              //                    x->x_framerate );
+                              mwait.tv_sec = 0;
+                              mwait.tv_nsec = 1000000000/((x->x_framerate+5)); // the +5 is experimental
+                                                    // it comes from the time used in decoding
+                           }
+
+                           nanosleep( &mwait, NULL ); // wait between the two successive frames
+                                                      // i know, cheap flow control
+                        }
+
                     }
                     break;
          }
@@ -335,6 +385,7 @@ static void *pdp_decode_stream_from_url(void *tdata)
       {
          nanosleep( &twait, NULL ); // nothing to read, just wait
       }
+
     }
 
     post( "pdp_live~ : decoding thread %d exiting....", x->x_decodechild );
@@ -353,6 +404,7 @@ static void *pdp_live_connect_to_url(void *tdata)
     x->x_avparameters.channels = DEFAULT_CHANNELS;
     x->x_avparameters.frame_rate = DEFAULT_FRAME_RATE;
     x->x_avparameters.width = DEFAULT_WIDTH;
+    if ( x->x_framerate = 0 ) x->x_framerate = DEFAULT_FRAME_RATE;
     x->x_avparameters.height = DEFAULT_HEIGHT;
     x->x_avparameters.image_format = PIX_FMT_YUV420P;
 
@@ -452,6 +504,8 @@ static void *pdp_live_connect_to_url(void *tdata)
        post("pdp_live~ : could not set start time" );
     }
     x->x_streaming = 1;
+    x->x_nopackets = 0;
+    x->x_endofstream = 0;
     x->x_nbframes = 0;
 
     x->x_connectchild = 0;
@@ -490,7 +544,7 @@ static void pdp_live_disconnect(t_pdp_live *x)
  struct timespec twait;
 
    twait.tv_sec = 0; 
-   twait.tv_nsec = 100000000; // 100 ms
+   twait.tv_nsec = 10000000; // 10 ms
 
    if (!x->x_streaming)
    {
@@ -520,6 +574,8 @@ static void pdp_live_disconnect(t_pdp_live *x)
    outlet_float( x->x_outlet_streaming, x->x_streaming );
    x->x_nbframes = 0;
    outlet_float( x->x_outlet_nbframes, x->x_nbframes );
+   x->x_framerate = 0;
+   outlet_float( x->x_outlet_framerate, x->x_framerate );
 
    if (x->x_audio_resample_ctx) 
    {
@@ -583,10 +639,12 @@ static t_int *pdp_live_perform(t_int *w)
   t_int sn;
 
     // decode a packet if not in thread mode
-    if ( !x->x_usethread )
+    if ( !x->x_usethread && x->x_streaming )
     {
       pdp_live_decode_packet( x );
     }
+
+    x->x_blocksize = n;
 
     // just read the buffer
     if ( x->x_audioon )
@@ -609,8 +667,8 @@ static t_int *pdp_live_perform(t_int *w)
         out1++;
         out2++;
       }
-      x->x_audioin_position-=sn;
       memcpy( &x->x_audio_in[0], &x->x_audio_in[sn], 4*MAX_AUDIO_PACKET_SIZE-sn );
+      x->x_audioin_position-=sn;
       // post( "pdp_live~ : audio in position : %d", x->x_audioin_position );
       if ( x->x_audioin_position <= sn )
       {
@@ -636,6 +694,7 @@ static t_int *pdp_live_perform(t_int *w)
     if ( etime.tv_sec != x->x_cursec )
     {
        x->x_cursec = etime.tv_sec;
+       if (x->x_streaming) outlet_float( x->x_outlet_framerate, x->x_framerate );
        x->x_secondcount = 0;
     }
     if ( x->x_secondcount >= x->x_framerate )
@@ -680,13 +739,14 @@ static t_int *pdp_live_perform(t_int *w)
        pdp_packet_pass_if_valid(x->x_pdp_out, &x->x_packet0);
 
        // update streaming status
-       outlet_float( x->x_outlet_streaming, x->x_streaming );
        x->x_nbframes++;
        x->x_secondcount++;
        outlet_float( x->x_outlet_nbframes, x->x_nbframes );
 
        x->x_newpicture = 0;
     }
+    outlet_float( x->x_outlet_streaming, x->x_streaming );
+    outlet_float( x->x_outlet_endofstream, x->x_endofstream );
 
     return (w+5);
 }
@@ -730,22 +790,32 @@ void *pdp_live_new(void)
 
     x->x_outlet_streaming = outlet_new(&x->x_obj, &s_float);
     x->x_outlet_nbframes = outlet_new(&x->x_obj, &s_float);
+    x->x_outlet_framerate = outlet_new(&x->x_obj, &s_float);
+    x->x_outlet_endofstream = outlet_new(&x->x_obj, &s_float);
 
     x->x_packet0 = -1;
     x->x_connectchild = 0;
     x->x_decodechild = 0;
     x->x_usethread = 1;
     x->x_priority = DEFAULT_PRIORITY;
-    x->x_nbframes = 0;
     x->x_framerate = DEFAULT_FRAME_RATE;
+    x->x_nbframes = 0;
+    x->x_framerate = 0;
     x->x_samplerate = 0;
     x->x_audiochannels = 0;
     x->x_cursec = 0;
     x->x_secondcount = 0;
     x->x_audio_resample_ctx = NULL;
     x->x_nbvideostreams = 0;
+    x->x_videoindex = 0;
     x->x_audioin_position = 0;
     x->x_newpicture = 0;
+    x->x_endofstream = 0;
+    x->x_nopackets = 0;
+    x->x_blocksize = MIN_AUDIO_SIZE;
+
+    x->x_pts = -1;
+    x->x_previouspts = -1;
 
     x->x_avcontext = av_mallocz(sizeof(AVFormatContext));
     if ( !x->x_avcontext )
@@ -776,11 +846,12 @@ void pdp_live_tilde_setup(void)
     pdp_live_class = class_new(gensym("pdp_live~"), (t_newmethod)pdp_live_new,
     	(t_method)pdp_live_free, sizeof(t_pdp_live), 0, A_NULL);
 
-    class_addmethod(pdp_live_class, (t_method)pdp_live_dsp, gensym("dsp"), 0);
+    class_addmethod(pdp_live_class, (t_method)pdp_live_dsp, gensym("dsp"), A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_connect, gensym("connect"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_disconnect, gensym("disconnect"), A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_priority, gensym("priority"), A_FLOAT, A_NULL);
     class_addmethod(pdp_live_class, (t_method)pdp_live_audio, gensym("audio"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_live_class, (t_method)pdp_live_threadify, gensym("thread"), A_FLOAT, A_NULL);
     class_sethelpsymbol( pdp_live_class, gensym("pdp_live~.pd") );
 
 }

@@ -1,4 +1,18 @@
+0.12.14 ( codename Naveen's Ethiopian Cafe )
+  added pdp_mp4player~ : a quicktime stream picker ( compiled against meg4ip v1.0 )
+0.12.13 ( codename Gollum Club Riereta )
+  improved decoding in pdp_live~, in particular for audio/video synchronization
+  added a "end of stream" outlet in pdp_live~ ( when reaching the end of a file )
+  added frame rates in pdp_ffmpeg~, pdp_live~
+  added pdp_spotlight : a spotlight, for cabaret (for pep')
+  added pdp_cabaret patch : a patch to track someone with a spotlight ( poursuite )
+  added pdp_ieee1394 : firewire capture object for OSX based on pix_video ( OSX only )
 0.12.12
+  added pdp_mp4live~ : mpeg4ip streaming object to stream to a darwin server
+  note : now, building of streaming objects is optional 
+         ( with --enable-ffmpeg OR --enable-mpeg4ip : warning, you can't enable both, they are conflicting )
+  fixed some crashes when objects like pdp_ctrack, pdp_cmap, pdp_compose were in a sub-patch 
+         ( problem reported by Mark Widmer )
   added offsets messages in pdp_pen
 0.12.11
   added pdp_charcoal to the effect rack : charcoal effect using edge detection, blur, normalization and negate
