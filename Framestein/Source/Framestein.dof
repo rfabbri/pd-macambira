@@ -31,7 +31,7 @@ UnitAliases=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=
 [Linker]
 MapFile=0
 OutputObjs=0
-ConsoleApp=1
+ConsoleApp=0
 DebugInfo=0
 RemoteSymbols=0
 MinStackSize=16384
@@ -43,7 +43,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=\lab\common;C:\lab\common\DelphiX2000_0717-2\Source;\lab\common\fastlib;\lab\common\pshost;C:\lab\common\G32
+SearchPath=g:\lab\common;g:\lab\common\DelphiX2000_0717-2\Source;g:\lab\common\fastlib;g:\lab\common\pshost;g:\lab\common\G32;g:\lab\common\fastlib
 Packages=Vcl50;Vclx50;VclSmp50;Qrpt50;Vcldb50;Vclbde50;ibevnt50;vcldbx50;TeeUI50;TeeDB50;Tee50;TeeQR50;VCLIB50;vclie50;Inetdb50;Inet50;NMFast50;dclocx50;dclaxserver50;temppak;janDrawPack;pdpak
 Conditionals=
 DebugSourceDirs=
@@ -61,7 +61,7 @@ AutoIncBuild=1
 MajorVer=0
 MinorVer=1
 Release=1
-Build=77
+Build=79
 Debug=0
 PreRelease=1
 Special=0
@@ -72,7 +72,7 @@ CodePage=1252
 [Version Info Keys]
 CompanyName=
 FileDescription=
-FileVersion=0.1.1.77
+FileVersion=0.1.1.79
 InternalName=
 LegalCopyright=
 LegalTrademarks=
@@ -84,8 +84,5 @@ Comments=
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=4
-Item0=\lab\common;C:\lab\common\DelphiX2000_0717-2\Source;\lab\common\fastlib;\lab\common\pshost;C:\lab\common\G32
-Item1=\lab\common;C:\lab\common\DelphiX2000_0717-2\Source;\lab\common\fastlib;\lab\common\pshost
-Item2=\lab\common;C:\lab\common\DelphiX2000_0717-2\Source;\lab\common\fastlib
-Item3=\lab\common;C:\lab\common\DelphiX2000_0717-2\Source
+Count=1
+Item0=g:\lab\common;g:\lab\common\DelphiX2000_0717-2\Source;g:\lab\common\fastlib;g:\lab\common\pshost;g:\lab\common\G32;g:\lab\common\fastlib

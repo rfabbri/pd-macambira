@@ -4,7 +4,7 @@ object log: Tlog
   Width = 603
   Height = 666
   BorderStyle = bsSizeToolWin
-  Caption = 'Console / Log'
+  Caption = 'Debug log'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -86,6 +86,7 @@ object log: Tlog
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 1
+    Visible = False
   end
   object Panel3: TPanel
     Left = 0
@@ -96,5 +97,6 @@ object log: Tlog
     BevelOuter = bvLowered
     Caption = 'Console'
     TabOrder = 3
+    Visible = False
   end
 end

@@ -103,8 +103,8 @@ type
   end;
 
 const
-  STARTMSG = 'Framestein 0.30 running...';
-  MCAPTION = 'Framestein 0.30';
+  STARTMSG = 'Framestein 0.31 running...';
+  MCAPTION = 'Framestein 0.31';
   SocketBufferSize = 100000;
 
 var
@@ -477,8 +477,8 @@ end;
 
 procedure Tmain.Post(const S: String);
 begin
-//  Writeln(TimeToStr(Time), ' ', S);
-  REConsole.Lines.Add(TimeToStr(Time)+' '+S);
+  Writeln(TimeToStr(Time), ' ', S);
+//  REConsole.Lines.Add(TimeToStr(Time)+' '+S);
 end;
 
 procedure Tmain.Reset;
