@@ -19,6 +19,13 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #define BIG 1.e10
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
 
 template<class T>
 inline V swap(T &a,T &b) { T c = a; a = b; b = c; }

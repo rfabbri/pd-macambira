@@ -1,0 +1,7 @@
+# VASP - vector assembling signal processor
+# Copyright (c) 2002-2004 Thomas Grill (gr@grrrr.org)
+#
+# Your settings are defined in the file
+# ..\flext\build\config-win-pd-msvc.txt
+#
+# You can override them here.
