@@ -95,7 +95,7 @@ Changes
 v0.0.1->v0.0.2:
 -Loads /etc/.k_guile.scm and $HOME/.k_guile.scm at
  startup.
--An inlet can spesify 'any as type, and will then
+-An inlet can specify 'any as type, and will then
  receive anything.
 -The k_guile object can receive "eval" messages to evaluate
  scheme code.
