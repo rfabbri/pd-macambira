@@ -1,4 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<!-- $Id: download.php,v 1.1 2003-03-14 21:55:18 eighthave Exp $  -->
+
 <HTML>
 
 <HEAD>
@@ -12,21 +15,10 @@
 
 <div id="Menu">
 
-| <a href="index.html" title=""><b>Introduction</b></a><br>
-| <a href="download.html" title=""><b>Download</b></a><br>
-| <a href="documentation.html" title=""><b>Documentation</b></a><br>
-| <a href="developer.html" title=""><b>Developers</b></a><br>
-| <a href="contact.html" title=""><b>Contact</b></a><br>
-
+<?php include('menu.inc'); ?>
 <br>
 <br>
-<span style="font-size: xx-small">
-<b>Quote of the month</b><br />
-I think it is certainly true that the open-source movement is a very powerful
-source toward higher-quality software, and I would turn the question around and
-ask if open-source music wouldn t also be a very good thing. 
-</span>
-<br><em>MSP</em>
+<?php include('quote.inc'); ?>
 
 </div>
 <div id="Content">
@@ -34,7 +26,7 @@ ask if open-source music wouldn t also be a very good thing.
 
 <h2>Download</h2>
 
-We are aiming to make this page the one stop for all of your pd downloads.
+We are aiming to make this page the one stop for all of your Pd downloads.
 
 <h3>Pure Data</h3>
 
@@ -42,7 +34,7 @@ We are aiming to make this page the one stop for all of your pd downloads.
 <p>Miller Puckette's distribution.  You can also get it from <a href="http://crca.ucsd.edu/~msp" >his site</a>.</p>
 
 <h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D145993" >pd-extended</a></h4>
-<p>The pd developers community have added a few extensions to the core of MSP,
+<p>The Pd developers community have added a few extensions to the core of MSP,
 like colored audio cords, GUI glitch prevention, and more.  The pd-extended
 distribtution includes these patches.</p>
 
@@ -54,15 +46,23 @@ distribtution includes these patches.</p>
 do not depend on other libraries.</p>
 
 <h4>pd-flext</h4>
-<p>flext is a C++ layer for cross-platform development of Max/MSP and pd
+<p>flext is a C++ layer for cross-platform development of Max/MSP and Pd
 externals.  Package is coming soon... look <a href="http://www.parasitaere-kapazitaeten.net/Pd/ext/flext/" >here</a> in the meantime.</p>
 
 <h4><a href="http://sourceforge.net/project/showfiles.php?group_id%3D55736%26release_id%3D146087" >pd-gem</a></h4>
-<p>GEM is an OpenGL and video extension for pd.</p>
+<p>GEM is an OpenGL and video extension for Pd.</p>
 
 <h4>pd-osc</h4>
 <p>This is <a href="http://cnmat.cnmat.berkeley.edu/OSC/"
-target="osc">OpenSoundControl</a> for pd.  Package is coming soon... look <a href="http://barely.a.live.fm/pd/OSC/" >here</a> in the meantime.</p>
+target="osc">OpenSoundControl</a> for Pd.  Package is coming soon... look <a href="http://barely.a.live.fm/pd/OSC/" >here</a> in the meantime.</p>
+
+<BR>
+<BR>
+<CENTER>
+<?php include('webring.inc'); ?>
+</CENTER>
+<BR>
+<?php include('lastmodified.inc'); ?>
 
 </div>
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-FILES="*.html *.css"
+FILES="*.css *.php *.inc"
 
 
 NAME=`cat CVS/Root | sed  y/:/" "/ | sed y/@/" "/ | awk '{print $2}'`

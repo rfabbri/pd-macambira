@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <HTML>
 <HEAD>
 <TITLE>Pure Data External Repository</TITLE>
@@ -11,21 +11,11 @@
 
 <div id="Menu">
 
-| <a href="index.html" title=""><b>Introduction</b></a></br>
-| <a href="download.html" title=""><b>Download</b></a></br>
-| <a href="documentation.html" title=""><b>Documentation</b></a></br>
-| <a href="developer.html" title=""><b>Developers</b></a></br>
-| <a href="contact.html" title=""><b>Contact</b></a></br>
+<?php include('menu.inc'); ?>
+<br>
+<br>
+<?php include('quote.inc'); ?>
 
-<br />
-<br />
-<span style="font-size: 0.8em;">
-<b>Quote of the month</b><br />
-I think it is certainly true that the open-source movement is a very powerful
-source toward higher-quality software, and I would turn the question around and
-ask if open-source music wouldn t also be a very good thing. 
-</span>
-<br><em>MSP</em>
 
 </div>
 <div id="Content">
@@ -249,30 +239,10 @@ operations.
 Turns the input signal into a staticky, distorted mess. Comes with tone
 control.
 
+<BR>
+<BR>
 <center>
-<form action="http://pd.klingt.org/webring/" method="post">
-<input type="hidden" name="base_url" value="">
-<input type="hidden" name="description" value="CVS Repository at SourceForge">
-
-<table width=260 height=75 cellpadding=0 cellspacing=0 border=0 bgcolor="#FFFFFF">
-  <tr>
-    <td width=55 height=25 align="middle">
-      <input type="image" name="next" src="http://pd.klingt.org/webring/next.gif" border=0 width=55 height=25 align="middle"></td>
-    <td width=62 height=25 align="middle">
-      <input type="image" name="list" src="http://pd.klingt.org/webring/list.gif" border=0 width=62 height=25 align="middle"></td>
-    <td width=63 height=25 align="middle">
-      <input type="image" name="random" src="http://pd.klingt.org/webring/random.gif" border=0 width=63 height=25 align="middle"></td>
-    <td width=80 height=25 align="middle">
-      <input type="image" name="previous" src="http://pd.klingt.org/webring/previous.gif" border=0 width=80 height=25 align="middle"></td>
-  </tr>
-  <tr>
-    <td colspan=4 width=260 height=50 align="middle">
-      <a href="http://pd.klingt.org/webring/info.html">
-      <img src="http://pd.klingt.org/webring/webring.gif" border=0 width=260 height=50 align="middle"></a>
-    </td>
-  </tr>
-</table>
-</form>
+<?php include('webring.inc'); ?>
 <br clear="all">
 
 <!-- REMOVE CMNTS AT PUBLISHING: -->
@@ -282,5 +252,8 @@ control.
 
 </center>
 </td></tr></table>
+<?php include('lastmodified.inc'); ?>
+
+</div>
 
 </BODY></HTML>

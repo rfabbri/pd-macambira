@@ -86,6 +86,9 @@ P.small {
 	padding: 5px;
 }
 
+UL {
+	list-style-type: circle;
+}
 
 #Content>p {margin:0px;}
 #Content>p+p {text-indent:30px;}
