@@ -5,19 +5,21 @@ mark williamson
 mailto:mark@junklight.com
 http://www.junklight.com
 
-The code is free for anyone to use provided you mention me somewhere - its not 
-like its going to cost you anything :-). If you need support you can try
-mailing me at the address above - I can be quite busy but I will try and 
-deal with any queries.
+The code is free for anyone to use under the GNU GPL.  But if you use it, 
+please mention me somewhere - its not like its going to cost you anything 
+:-). If you need support you can try mailing me at the address above - I 
+can be quite busy but I will try and deal with any queries.
 
-Linux
 
-It is built under windows but I have included the various build files needed 
-for linux - delete the file "makefile" and use the configure script to 
-make a new one for linux. The files needed by autoconf are there anyway 
-if that doesn't work. I can't run PD on the linux machine I have got 
-access to (only telnet access) so I am not sure about installing it but all the 
-stuff should be there. 
+GNU/Linux
+
+Run: "make -f makefile.linux" and all of the objects will be compiled individually.
+
+
+MacOS X
+
+Run: "make -f makefile.darwin" and all of the objects will be compiled individually.
+
 
 Windows 
 
@@ -34,6 +36,7 @@ and copy the contents of doc\mjLib  into
 	[pd home]\docs\5.reference\mjLib 
 	
 that should be you done.
+
 
 General notes
 
@@ -55,6 +58,11 @@ January 2002
 ___________________________________________________________
 
 history: 
+
+6th April 2004
+
+<hans@at.or.at> added code to the Pd CVS and made all of the objects compile on
+MacOS X and GNU/Linux.
 
 1st February release 2
 

@@ -2,9 +2,10 @@
 #include "stdafx.h"
 #include <io.h>
 #endif
+
 #include "m_pd.h"
 #include <stdlib.h>
-#include<time.h>
+#include <time.h>
 #include "about.h"
 
 /**

@@ -120,11 +120,21 @@ static int midilookup( char* note , int octave )
 	int nnum = 4;
 	for( i = 0 ; i < 12 ; i++ )
 	{
+#ifdef NT
+/* stricmp() is not an ANSI or ISO standard C function */
 		if ( stricmp( note , notes_up[i]) == 0)
 		{
 			nnum = i;
 			break;
 		}
+#else
+/* replacing with a ANSI function, but it'll now be case sensitive */
+		if ( strcmp( note , notes_up[i]) == 0)
+		{
+			nnum = i;
+			break;
+		}
+#endif
 	}
 	return octaveoffset[octave + 1 ] + nnum;
 }

@@ -2,9 +2,11 @@
 #include "stdafx.h"
 #include <io.h>
 #endif
+
 #include "m_pd.h"
 #include <stdlib.h>
-#include<time.h>
+#include <time.h>
+#include <string.h>
 #include "morse.h"
 
 /**
@@ -210,7 +212,15 @@ static void morse_message( t_morse *x, t_symbol *s, int ac, t_atom *av )
 		{
 			atom_string( &av[i] , buf, 255 );						
 			l = strlen( buf );
+#ifdef NT			
+/* this is not part of ANSI or ISO standard C, 
+	only Microsoft and Borland use it. */
 			strlwr( buf );
+#else
+/* Probably needs a loop using tolower(char c) from ctype.h 
+ * This way it'll just be case sensitive
+ */
+#endif
 			for( j = 0 ; j < l ; j++ )
 			{
 				morse_add_msg_part( x , morse_lookup( buf[j] ));
