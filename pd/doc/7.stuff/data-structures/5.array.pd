@@ -13,15 +13,15 @@
 #X obj 318 163 pointer;
 #X msg 449 194 bang;
 #N canvas 0 0 384 196 data5 1;
-#X scalar template5 50 150 30 9 \; 0 \; 0 \; 0 \; 0 \; 0 \; 3 \; 0
-\; 0 \; 0 \; 7 \; -30 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0
-\; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \;
-0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 0 \; 43 \; 0
-\; 0 \; 0 \; 0 \; \;;
+#X scalar template5 50 150 30 9 \; 6 \; 10 \; 12 \; 14 \; 20 \; 26
+\; 32 \; 31 \; 26 \; 26 \; 23 \; 19 \; 15 \; 11 \; 7 \; 5 \; -55 \;
+-56 \; -58 \; -1 \; -1 \; -6 \; -7 \; -8 \; -10 \; -11.3333 \; -12.6667
+\; -14 \; -18 \; -20 \; -22 \; -24 \; -26 \; -28 \; -31 \; -35 \; -37
+\; -37 \; -37 \; -37 \; -38 \; -39 \; -40 \; -41 \; -42 \; -43 \; -47
+\; -49 \; -51 \; -52 \; \;;
 #X restore 508 314 pd data5;
-#N canvas 5 272 646 260 template5 1;
+#N canvas 90 339 646 260 template5 1;
 #X obj 8 91 filledpolygon 244 q 3 0 0 20 z 40 0;
-#X obj 8 113 plot bazoo 700 3 30 10 4;
 #X text 6 44 this declares an array named "bazoo" whose elements are
 described by "template5-element." Array declarations take three arguments
 while "float" declarations take only two.;
@@ -32,6 +32,7 @@ spaced 4 apart.;
 variable---see the help window for "plot".;
 #X obj 6 8 struct template5 float x float y float z float q array bazoo
 template5-element;
+#X obj 8 113 plot bazoo 700 3 30 10 4 1;
 #X restore 508 337 pd template5;
 #N canvas 65 248 568 128 template5-element 0;
 #X text 12 36 This says that array elements will have a single floating-point

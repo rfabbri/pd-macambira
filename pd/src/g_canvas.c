@@ -5,19 +5,6 @@
 /* this file defines the "glist" class, also known as "canvas" (the two used
 to be different but are now unified except for some fossilized names.) */
 
-/* changes by Thomas Musil IEM KUG Graz Austria 2001 */
-
-/* bug-fix: canvas_menuclose(): by Krzysztof Czaja */
-/* bug-fix: table_new(): I reversed the y-bounds  */
-
-/* IOhannes :
- * changed the canvas_restore, so that it might accept $args as well
- * (like "pd $0_test")
- * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
- * changes marked with    IOhannes
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "m_pd.h"
@@ -950,7 +937,7 @@ void canvas_objfor(t_glist *gl, t_text *x, int argc, t_atom *argv);
 
 
 void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
-{ /* IOhannes */
+{
     t_pd *z;
         /* this should be unnecessary, but sometimes the canvas's name gets
         out of sync with the owning box's argument; this fixes that */
@@ -1355,7 +1342,7 @@ static void glist_redrawall(t_glist *gl)
 }
 
     /* public interface for above */
-void canvas_redrawallfortemplate(t_canvas *templatecanvas)
+void canvas_redrawallfortemplate( t_template *template)
 {
     t_canvas *x;
         /* find all root canvases */

@@ -5,33 +5,36 @@ array array2 help-plot-array2-template array array3 help-plot-array3-template
 #N struct help-plot-array2-template float x float y;
 #N struct help-plot-array3-template float y float w;
 #N canvas 398 0 516 229 12;
-#N canvas 173 285 626 539 help-plot-template 1;
-#X text 29 34 creation arguments:;
-#X text 48 71 - RGB color (0=black \, 999=white \, 900=red \, 90=green
+#N canvas 288 75 606 588 help-plot-template 1;
+#X text 35 30 creation arguments:;
+#X text 51 48 - RGB color (0=black \, 999=white \, 900=red \, 90=green
 \, 9=blue \, 555=grey \, etc.);
-#X text 47 52 - OPTIONAL word "curve" to specify bezier;
-#X text 46 98 - line width;
-#X text 46 114 - relative x and y location;
-#X text 47 130 - x spacing;
-#X obj 39 217 plot curve array2 70 3 100 0;
-#X obj 30 308 plot curve array3 9 1 120 50 20;
-#X obj 45 12 plot array1 500 1 10 15 20;
-#X text 29 147 This first example plots the red trace (500) \, width
+#X text 50 97 - relative x and y location;
+#X text 50 114 - x spacing;
+#X text 40 150 This first example plots the red trace (500) \, width
 1 \, at point (10 \, 15) \, with horizontal spacing 20 The black diamonds
 come from the template of the array1 element itself.;
-#X text 62 239 This is the green spiral (color 70 \, line width 3 \,
-location (100 \, 0). Since the template for array2 contains an "x"
-cariable \, play ignores x spacing requests and takes x from the data
-itself.;
-#X text 50 328 If a "w" variable is present in the template as for
+#X text 44 327 If a "w" variable is present in the template as for
 array3 \, it is added to the line width.;
-#X obj 27 501 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
-#X text 27 454 To see the data itself \, select "properties" for the
+#X obj 37 493 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
+#X text 34 454 To see the data itself \, select "properties" for the
 scalar by right clicking on the purple square.;
-#X obj 24 387 struct help-plot-template float x float y array array1
+#X obj 36 390 struct help-plot-template float x float y array array1
 help-plot-array1-template array array2 help-plot-array2-template array
 array3 help-plot-array3-template;
-#X text 33 366 here's the "struct" for all this:;
+#X text 45 369 here's the "struct" for all this:;
+#X obj 51 8 plot array1 500 1 10 15 20 1;
+#X obj 39 217 plot array2 70 3 100 0 0 2;
+#X text 30 542 obsolete feature: the arguments can be preceded by the
+word "curve" to specify bezier curves. This will be phased out.;
+#X text 52 80 - line width in pixels;
+#X text 51 130 - style (0 for points \, 1 for polygon \, 2 for Bezier
+curve);
+#X text 40 236 This is the green spiral (color 70 \, line width 3 \,
+location (100 \, 0). Since the template for array2 contains an "x"
+cariable \, play ignores x spacing requests and takes x from the data
+itself. The style is 2 for a Bezier curve.;
+#X obj 43 309 plot array3 9 1 120 50 20 1;
 #X restore 243 78 pd help-plot-template;
 #N canvas 196 292 273 120 help-plot-array1-template 0;
 #X obj 30 71 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;

@@ -712,14 +712,6 @@ void canvas_reload(t_symbol *name, t_symbol *dir, t_gobj *except)
 
 /* ------------------------ event handling ------------------------ */
 
-#define CURSOR_RUNMODE_NOTHING 0
-#define CURSOR_RUNMODE_CLICKME 1
-#define CURSOR_RUNMODE_THICKEN 2
-#define CURSOR_RUNMODE_ADDPOINT 3
-#define CURSOR_EDITMODE_NOTHING 4
-#define CURSOR_EDITMODE_CONNECT 5
-#define CURSOR_EDITMODE_DISCONNECT 6
-
 static char *cursorlist[] = {
 #ifdef MSW
     "right_ptr",        /* CURSOR_RUNMODE_NOTHING */
@@ -1021,8 +1013,9 @@ void canvas_doclick(t_canvas *x, int xpos, int ypos, int which,
                 /* check if the object wants to be clicked */
             if (canvas_hitbox(x, y, xpos, ypos, &x1, &y1, &x2, &y2)
                 && (clickreturned = gobj_click(y, x, xpos, ypos,
-                    shiftmod, altmod, 0, doit)))
-                        break;
+                    shiftmod, ((mod & CTRLMOD) && (!x->gl_edit)) || altmod,
+                        0, doit)))
+                            break;
         }
         if (!doit)
         {

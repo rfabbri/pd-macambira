@@ -2,15 +2,6 @@
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* upsampling/downsampling methods for inlet~/outlet~
- *
- * mfg.gfd.uil
- * IOhannes
- *
- * 2509:forum::für::umläute:2001
- */
-
-
 
 #include "m_pd.h"
 

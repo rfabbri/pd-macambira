@@ -11,16 +11,6 @@
     interconnections.
 */
 
-/* hacked to run subpatches with different samplerates
- * only samplerates that are a power_of_2-multiple of the 
- *
- * mfg.gfd.uil
- * IOhannes
- *
- * edited lines are marked with "IOhannes"
- *
- */
-
 
 #include "m_pd.h"
 #include "m_imp.h"
@@ -34,14 +24,14 @@ EXTERN_STRUCT _vinlet;
 EXTERN_STRUCT _voutlet;
 
 void vinlet_dspprolog(struct _vinlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency, int downsample, int upsample /* IOhannes */,  int reblock,
-    int switched);
+    int myvecsize, int phase, int period, int frequency,
+    int downsample, int upsample,  int reblock, int switched);
 void voutlet_dspprolog(struct _voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency, int downsample, int upsample /* IOhannes */, int reblock,
-    int switched);
+    int myvecsize, int phase, int period, int frequency,
+    int downsample, int upsample, int reblock, int switched);
 void voutlet_dspepilog(struct _voutlet *x, t_signal **parentsigs,
-    int myvecsize, int phase, int period, int frequency, int downsample, int upsample /* IOhannes */, int reblock,
-    int switched);
+    int myvecsize, int phase, int period, int frequency,
+    int downsample, int upsample, int reblock, int switched);
 
 t_int *zero_perform(t_int *w)   /* zero out a vector */
 {
@@ -125,8 +115,8 @@ typedef struct _block
     char x_switched;    /* true if we're acting as a a switch */
     char x_switchon;    /* true if we're switched on */
     char x_reblock;     /* true if inlets and outlets are reblocking */
-    int x_upsample;     /* IOhannes: upsampling-factor */
-    int x_downsample;   /* IOhannes: downsampling-factor */
+    int x_upsample;     /* upsampling-factor */
+    int x_downsample;   /* downsampling-factor */
 
 } t_block;
 
@@ -134,7 +124,7 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
     t_floatarg fupsample);
 
 static void *block_new(t_floatarg fvecsize, t_floatarg foverlap,
-                       t_floatarg fupsample)  /* IOhannes */
+                       t_floatarg fupsample)
 {
     t_block *x = (t_block *)pd_new(block_class);
     x->x_phase = 0;
@@ -149,7 +139,7 @@ static void *block_new(t_floatarg fvecsize, t_floatarg foverlap,
 static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
     t_floatarg fupsample)
 {
-    int upsample, downsample; /* IOhannes */
+    int upsample, downsample;
     int vecsize = fvecsize;
     int overlap = foverlap;
     int dspstate = canvas_suspend_dsp();
@@ -158,16 +148,17 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
     if (vecsize < 0)
         vecsize = 0;    /* this means we'll get it from parent later. */
 
-    /* IOhannes { */
-    if (fupsample <= 0) upsample = downsample = 1;
+    if (fupsample <= 0)
+        upsample = downsample = 1;
     else if (fupsample >= 1) {
-      upsample = fupsample;
-      downsample   = 1;
-    } else {
-      downsample = 1.0 / fupsample;
-      upsample   = 1;
+        upsample = fupsample;
+        downsample   = 1;
     }
-    /* } IOhannes */
+    else
+    {
+        downsample = 1.0 / fupsample;
+        upsample   = 1;
+    }
 
     if (vecsize && (vecsize != (1 << ilog2(vecsize))))
     {
@@ -179,7 +170,6 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
         pd_error(x, "block~: overlap not a power of 2");
         overlap = 1;
     }
-    /* IOhannes { */
     if (downsample != (1 << ilog2(downsample)))
     {
         pd_error(x, "block~: downsampling not a power of 2");
@@ -190,22 +180,18 @@ static void block_set(t_block *x, t_floatarg fvecsize, t_floatarg foverlap,
         pd_error(x, "block~: upsampling not a power of 2");
         upsample = 1;
     }
-    /* } IOhannes */
-
 
     x->x_vecsize = vecsize;
     x->x_overlap = overlap;
-    /* IOhannes { */
     x->x_upsample = upsample;
     x->x_downsample = downsample;
-    /* } IOhannes */
     canvas_resume_dsp(dspstate);
 }
 
 static void *switch_new(t_floatarg fvecsize, t_floatarg foverlap,
-                        t_floatarg fupsample) /* IOhannes */
+                        t_floatarg fupsample)
 {
-    t_block *x = (t_block *)(block_new(fvecsize, foverlap, fupsample)); /* IOhannes */
+    t_block *x = (t_block *)(block_new(fvecsize, foverlap, fupsample));
     x->x_switched = 1;
     x->x_switchon = 0;
     return (x);
@@ -840,7 +826,7 @@ void ugen_done_graph(t_dspcontext *dc)
     int chainblockend;      /* and after block epilog code */
     int chainafterall;      /* and after signal outlet epilog */
     int reblock = 0, switched;
-    int downsample = 1, upsample = 1; /* IOhannes */
+    int downsample = 1, upsample = 1;
     /* debugging printout */
     
     if (ugen_loud)
@@ -890,18 +876,16 @@ void ugen_done_graph(t_dspcontext *dc)
             vecsize = parent_vecsize;
         realoverlap = blk->x_overlap;
         if (realoverlap > vecsize) realoverlap = vecsize;
-        /* IOhannes { */
         downsample = blk->x_downsample;
         upsample   = blk->x_upsample;
-        if (downsample > parent_vecsize) downsample=parent_vecsize;
+        if (downsample > parent_vecsize)
+            downsample = parent_vecsize;
         period = (vecsize * downsample)/
             (parent_vecsize * realoverlap * upsample);
         frequency = (parent_vecsize * realoverlap * upsample)/
             (vecsize * downsample);
-        /* } IOhannes*/
         phase = blk->x_phase;
         srate = parent_srate * realoverlap * upsample / downsample;
-            /* IOhannes */
         if (period < 1) period = 1;
         if (frequency < 1) frequency = 1;
         blk->x_frequency = frequency;
@@ -909,7 +893,7 @@ void ugen_done_graph(t_dspcontext *dc)
         blk->x_phase = dsp_phase & (period - 1);
         if (! parent_context || (realoverlap != 1) ||
             (vecsize != parent_vecsize) || 
-                (downsample != 1) || (upsample != 1)) /* IOhannes */
+                (downsample != 1) || (upsample != 1))
           reblock = 1;
         switched = blk->x_switched;
     }
@@ -917,7 +901,7 @@ void ugen_done_graph(t_dspcontext *dc)
     {
         srate = parent_srate;
         vecsize = parent_vecsize;
-        downsample = upsample = 1;/* IOhannes */
+        downsample = upsample = 1;
         period = frequency = 1;
         phase = 0;
         if (!parent_context) reblock = 1;
@@ -972,13 +956,11 @@ void ugen_done_graph(t_dspcontext *dc)
         if (pd_class(zz) == vinlet_class)
             vinlet_dspprolog((struct _vinlet *)zz, 
                 dc->dc_iosigs, vecsize, dsp_phase, period, frequency,
-                    downsample, upsample, /* IOhannes */
-                    reblock, switched);
+                    downsample, upsample, reblock, switched);
         else if (pd_class(zz) == voutlet_class)
             voutlet_dspprolog((struct _voutlet *)zz, 
                 outsigs, vecsize, dsp_phase, period, frequency,
-                    downsample, upsample, /* IOhannes */
-                    reblock, switched);
+                    downsample, upsample, reblock, switched);
     }    
     chainblockbegin = dsp_chainsize;
 
@@ -1051,8 +1033,7 @@ void ugen_done_graph(t_dspcontext *dc)
             if (iosigs) iosigs += dc->dc_ninlets;
             voutlet_dspepilog((struct _voutlet *)zz, 
                 iosigs, vecsize, dsp_phase, period, frequency,
-                    downsample, upsample,  /* IOhannes */
-                    reblock, switched);
+                    downsample, upsample, reblock, switched);
         }
     }
 
@@ -1115,9 +1096,9 @@ t_signal *ugen_getiosig(int index, int inout)
 void d_ugen_setup(void)  /* really just block_setup */
 {
     block_class = class_new(gensym("block~"), (t_newmethod)block_new, 0,
-            sizeof(t_block), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT/*IOhannes*/, 0);
+            sizeof(t_block), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addcreator((t_newmethod)switch_new, gensym("switch~"),
-        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT/*IOhannes*/, 0);
+        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(block_class, (t_method)block_set, gensym("set"), 
         A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addmethod(block_class, (t_method)block_dsp, gensym("dsp"), 0);

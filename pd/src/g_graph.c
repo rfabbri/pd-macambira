@@ -39,7 +39,8 @@ void glist_add(t_glist *x, t_gobj *y)
     if (glist_isvisible(x))
         gobj_vis(y, x, 1);
     if (class_isdrawcommand(y->g_pd)) 
-        canvas_redrawallfortemplate(glist_getcanvas(x));
+        canvas_redrawallfortemplate(template_findbyname(canvas_makebindsym(
+            glist_getcanvas(x)->gl_name)));
 }
 
     /* this is to protect against a hairy problem in which deleting
@@ -104,7 +105,9 @@ void glist_delete(t_glist *x, t_gobj *y)
     }
     pd_free(&y->g_pd);
     if (chkdsp) canvas_update_dsp();
-    if (drawcommand) canvas_redrawallfortemplate(canvas);
+    if (drawcommand)
+        canvas_redrawallfortemplate(template_findbyname(canvas_makebindsym(
+            glist_getcanvas(x)->gl_name)));
     canvas_setdeleting(canvas, wasdeleting);
     x->gl_valid = ++glist_valid;
 }

@@ -167,7 +167,6 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     int inchans, outchans;
     int realinchans[MAXAUDIOINDEV], realoutchans[MAXAUDIOOUTDEV];
 
-    /* jsarlo { (*/
     if (sys_externalschedlib)
     {
         return;
@@ -176,7 +175,6 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     if (sys_inchannels || sys_outchannels)
         sys_close_audio();
 
-    /* } jsarlo */
     if (rate < 1)
         rate = DEFAULTSRATE;
     if (advance <= 0)
@@ -354,12 +352,10 @@ else
 
 void sys_close_audio(void)
 {
-    /* jsarlo { (*/
     if (sys_externalschedlib)
     {
         return;
     }
-    /* } jsarlo */
     if (!audio_isopen())
         return;
 #ifdef USEAPI_PORTAUDIO

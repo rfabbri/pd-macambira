@@ -3,13 +3,6 @@
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 
-/* IOhannes :
- * changed the canvas_restore in "g_canvas.c", so that it might accept $args as well (like "pd $0_test")
- * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
- * change marked with    IOhannes
- */
-
 #include <stdlib.h>
 #include "m_pd.h"
 #include "s_stuff.h"
@@ -1199,7 +1192,7 @@ void binbuf_evalfile(t_symbol *name, t_symbol *dir)
         }
         binbuf_eval(b, 0, 0, 0);
     }
-    glob_setfilename(0, &s_, &s_);      /* bug fix by Krzysztof Czaja */
+    glob_setfilename(0, &s_, &s_);
     binbuf_free(b);
     canvas_resume_dsp(dspstate);
 }

@@ -541,7 +541,7 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
         close (fd);
         if (!pd_setloadingabstraction(s))
         {
-            canvas_setargs(argc, argv); /* bug fix by Krzysztof Czaja */
+            canvas_setargs(argc, argv);
             binbuf_evalfile(gensym(nameptr), gensym(dirbuf));
             if (s__X.s_thing != current)
                 canvas_popabstraction((t_canvas *)(s__X.s_thing));

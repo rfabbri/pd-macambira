@@ -24,6 +24,13 @@ if { $tcl_platform(platform) == "windows" }  {
 # Tearoff is set to true by default:
 set pd_tearoff 1
 
+# jsarlo
+set pd_array_listview_pagesize 1000
+set pd_array_listview_id(0) 0
+set pd_array_listview_entry(0) 0
+set pd_array_listview_page(0) 0
+# end jsarlo
+
 if {$pd_nt == 1} {
     global pd_guidir
     global pd_tearoff
@@ -830,6 +837,210 @@ proc pdtk_canvas_new {name width height geometry editable} {
 	
 ############iemlib##################
 
+#### jsarlo #####
+proc pdtk_array_listview_setpage {arrayName page} {
+    global pd_array_listview_page
+    set pd_array_listview_page($arrayName) $page
+}
+
+proc pdtk_array_listview_changepage {arrayName np} {
+    global pd_array_listview_page
+    pdtk_array_listview_setpage \
+      $arrayName [expr $pd_array_listview_page($arrayName) + $np]
+    pdtk_array_listview_fillpage $arrayName
+}
+
+proc pdtk_array_listview_fillpage {arrayName} {
+    global pd_array_listview_page
+    global pd_array_listview_id
+    set windowName [format ".%sArrayWindow" $arrayName]
+    if {[winfo exists $windowName]} {
+      set cmd "$pd_array_listview_id($arrayName) \
+               arrayviewlistfillpage \
+               $pd_array_listview_page($arrayName)"
+      pd [concat $cmd \;]
+    }
+}
+
+proc pdtk_array_listview_new {id arrayName page} {
+    global pd_nt
+    global pd_array_listview_page
+    global pd_array_listview_id
+    set pd_array_listview_page($arrayName) $page
+    set pd_array_listview_id($arrayName) $id
+    set windowName [format ".%sArrayWindow" $arrayName]
+    if [winfo exists $windowName] then [destroy $windowName]
+    toplevel $windowName
+    wm protocol $windowName WM_DELETE_WINDOW \
+      "pdtk_array_listview_close $id $arrayName"
+    wm title $windowName [concat $arrayName "(list view)"]
+    # FIXME
+    set font 12
+    set $windowName.lb [listbox $windowName.lb -height 20 -width 25\
+                        -selectmode extended \
+                        -relief solid -background white -borderwidth 1 \
+                        -font [format -*-courier-bold--normal--%d-* \
+                               $font] \
+                        -yscrollcommand "$windowName.lb.sb set"]
+    set $windowName.lb.sb [scrollbar $windowName.lb.sb \
+                           -command "$windowName.lb yview" -orient vertical]
+    place configure $windowName.lb.sb -relheight 1 -relx 0.9 -relwidth 0.1
+    pack $windowName.lb
+    bind $windowName.lb <Double-ButtonPress-1> \
+         "pdtk_array_listview_edit $arrayName $page $font"
+    # handle copy/paste
+    if {$pd_nt == 0} {
+      selection handle $windowName.lb \
+            "pdtk_array_listview_lbselection $arrayName"
+    } else {
+      if {$pd_nt == 1} {
+        bind $windowName.lb <ButtonPress-3> \
+           "pdtk_array_listview_popup $arrayName"
+      } 
+    }
+    set $windowName.prevBtn [button $windowName.prevBtn -text "<-" \
+        -command "pdtk_array_listview_changepage $arrayName -1"]
+    set $windowName.nextBtn [button $windowName.nextBtn -text "->" \
+        -command "pdtk_array_listview_changepage $arrayName 1"]
+    pack $windowName.prevBtn -side left -ipadx 20 -pady 10
+    pack $windowName.nextBtn -side right -ipadx 20 -pady 10
+    focus $windowName
+}
+
+proc pdtk_array_listview_lbselection {arrayName off size} {
+    set windowName [format ".%sArrayWindow" $arrayName]
+    set itemNums [$windowName.lb curselection]
+    set cbString ""
+    for {set i 0} {$i < [expr [llength $itemNums] - 1]} {incr i} {
+      set listItem [$windowName.lb get [lindex $itemNums $i]]
+      append cbString [string range $listItem \
+                        [expr [string first ") " $listItem] + 2] \
+                        end]
+      append cbString "\n"
+    }
+    set listItem [$windowName.lb get [lindex $itemNums $i]]
+    append cbString [string range $listItem \
+                      [expr [string first ") " $listItem] + 2] \
+                      end]
+    set last $cbString
+}
+
+# Win32 uses a popup menu for copy/paste
+proc pdtk_array_listview_popup {arrayName} {
+    set windowName [format ".%sArrayWindow" $arrayName]
+    if [winfo exists $windowName.popup] then [destroy $windowName.popup]
+    menu $windowName.popup -tearoff false
+    $windowName.popup add command -label {Copy} \
+        -command "pdtk_array_listview_copy $arrayName; \
+                  destroy $windowName.popup"
+    $windowName.popup add command -label {Paste} \
+        -command "pdtk_array_listview_paste $arrayName; \
+                  destroy $windowName.popup"
+    tk_popup $windowName.popup [winfo pointerx $windowName] \
+             [winfo pointery $windowName] 0
+}
+
+proc pdtk_array_listview_copy {arrayName} {
+    set windowName [format ".%sArrayWindow" $arrayName]
+    set itemNums [$windowName.lb curselection]
+    set cbString ""
+    for {set i 0} {$i < [expr [llength $itemNums] - 1]} {incr i} {
+      set listItem [$windowName.lb get [lindex $itemNums $i]]
+      append cbString [string range $listItem \
+                        [expr [string first ") " $listItem] + 2] \
+                        end]
+      append cbString "\n"
+    }
+    set listItem [$windowName.lb get [lindex $itemNums $i]]
+    append cbString [string range $listItem \
+                      [expr [string first ") " $listItem] + 2] \
+                      end]
+    clipboard clear
+    clipboard append $cbString
+}
+
+proc pdtk_array_listview_paste {arrayName} {
+    global pd_array_listview_page
+    global pd_array_listview_pagesize
+    set cbString [selection get -selection CLIPBOARD]
+    set lbName [format ".%sArrayWindow.lb" $arrayName]
+    set itemNum [lindex [$lbName curselection] 0]
+    set splitChars ", \n"
+    set itemString [split $cbString $splitChars]
+    set flag 1
+    for {set i 0; set counter 0} {$i < [llength $itemString]} {incr i} {
+      if {[lindex $itemString $i] != {}} {
+        pd [concat $arrayName [expr $itemNum + \
+           [expr $counter + \
+           [expr $pd_array_listview_pagesize \
+                 * $pd_array_listview_page($arrayName)]]] \
+           [lindex $itemString $i] \;]
+        incr counter
+        set flag 0
+      }
+    }
+}
+
+proc pdtk_array_listview_edit {arrayName page font} {
+    global pd_array_listview_entry
+    global pd_nt
+    if {$pd_nt == 0} {
+      set font [expr $font - 2]
+    }
+    set lbName [format ".%sArrayWindow.lb" $arrayName]
+    if {[winfo exists $lbName.entry]} {
+      pdtk_array_listview_update_entry \
+        $arrayName $pd_array_listview_entry($arrayName)
+      unset pd_array_listview_entry($arrayName)
+    }
+    set itemNum [$lbName index active]
+    set pd_array_listview_entry($arrayName) $itemNum
+    set bbox [$lbName bbox $itemNum]
+    set y [expr [lindex $bbox 1] - 4]
+    set $lbName.entry [entry $lbName.entry \
+                       -font [format -*-courier-bold--normal--%d-* $font]]
+    $lbName.entry insert 0 []
+    place configure $lbName.entry -relx 0 -y $y -relwidth 1
+    lower $lbName.entry
+    focus $lbName.entry
+    bind $lbName.entry <Return> \
+         "pdtk_array_listview_update_entry $arrayName $itemNum;"
+}
+
+proc pdtk_array_listview_update_entry {arrayName itemNum} {
+    global pd_array_listview_page
+    global pd_array_listview_pagesize
+    set lbName [format ".%sArrayWindow.lb" $arrayName]
+    set splitChars ", \n"
+    set itemString [split [$lbName.entry get] $splitChars]
+    set flag 1
+    for {set i 0; set counter 0} {$i < [llength $itemString]} {incr i} {
+      if {[lindex $itemString $i] != {}} {
+        pd [concat $arrayName [expr $itemNum + \
+           [expr $counter + \
+           [expr $pd_array_listview_pagesize \
+                 * $pd_array_listview_page($arrayName)]]] \
+           [lindex $itemString $i] \;]
+        incr counter
+        set flag 0
+      }
+    }
+    pdtk_array_listview_fillpage $arrayName
+    destroy $lbName.entry
+}
+
+proc pdtk_array_listview_closeWindow {arrayName} {
+    set windowName [format ".%sArrayWindow" $arrayName]
+    destroy $windowName
+}
+
+proc pdtk_array_listview_close {id arrayName} {
+    pdtk_array_listview_closeWindow $arrayName
+    set cmd [concat $id "arrayviewclose" \;]
+    pd $cmd
+}
+##### end jsarlo #####
+
 # the put menu
     menu $name.m.put -tearoff $pd_tearoff
     $name.m add cascade -label Put -menu $name.m.put
@@ -1014,6 +1225,7 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
     bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
     bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
+    bind $name.c <Control-Motion> {pdtk_canvas_motion %W %x %y 2}
     if {$pd_nt == 2} {
         bind $name.c <Option-Motion> {pdtk_canvas_motion %W %x %y 4}
     } else { 
@@ -2460,6 +2672,12 @@ proc array_apply {id} {
 	\;]
 }
 
+# jsarlo
+proc array_viewlist {id name page} {
+    pd [concat $id arrayviewlistnew\;]
+}
+# end jsarlo
+
 proc array_cancel {id} {
     set cmd [concat $id cancel \;]
     pd $cmd
@@ -2514,12 +2732,16 @@ proc pdtk_array_dialog {id name n flags newone} {
     pack $id.drawasrects -side top
     radiobutton $id.drawasrects.drawasrects0 -value 0 \
 	-variable $var_array_drawasrects \
-	-text "draw as polygon"
+	-text "draw as points"
     radiobutton $id.drawasrects.drawasrects1 -value 1 \
 	-variable $var_array_drawasrects \
-	-text "draw as points"
+	-text "polygon"
+    radiobutton $id.drawasrects.drawasrects2 -value 2 \
+	-variable $var_array_drawasrects \
+	-text "bezier curve"
     pack $id.drawasrects.drawasrects0 -side top -anchor w
     pack $id.drawasrects.drawasrects1 -side top -anchor w
+    pack $id.drawasrects.drawasrects2 -side top -anchor w
 
     if {$newone != 0} {
 	frame $id.radio
@@ -2537,6 +2759,13 @@ proc pdtk_array_dialog {id name n flags newone} {
 	    -variable $var_array_otherflag -anchor w
 	pack $id.deleteme -side top
     }
+    # jsarlo
+    if {$newone == 0} {
+      button $id.listview -text {View list}\
+        -command "array_viewlist $id $name 0"
+      pack $id.listview -side left
+    }
+    # end jsarlo
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\

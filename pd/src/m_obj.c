@@ -9,10 +9,6 @@ behavior for "gobjs" appears at the end of this file.  */
 #include "m_pd.h"
 #include "m_imp.h"
 
-/* T.Grill - define for a modified, more portable method to detect stack overflows */
-#define NEWSTACKMETH
-
-
 union inletunion
 {
     t_symbol *iu_symto;
@@ -260,14 +256,8 @@ void obj_init(void)
 
 /* --------------------------- outlets ------------------------------ */
 
-#ifdef NEWSTACKMETH
-/* T.Grill - count iterations rather than watch the stack pointer */
 static int stackcount = 0; /* iteration counter */
 #define STACKITER 1000 /* maximum iterations allowed */
-#else
-static char *stacklimit, *topstack;
-#define STACKSIZE 1000000
-#endif
 
 static int outlet_eventno;
 
@@ -277,11 +267,6 @@ static int outlet_eventno;
         
 void outlet_setstacklim(void)
 {
-#ifndef NEWSTACKMETH
-    char c;
-    topstack = &c;
-    stacklimit = (&c) - STACKSIZE;
-#endif
     outlet_eventno++;
 }
 
@@ -324,128 +309,76 @@ t_outlet *outlet_new(t_object *owner, t_symbol *s)
 static void outlet_stackerror(t_outlet *x)
 {
     pd_error(x->o_owner, "stack overflow");
-#ifndef NEWSTACKMETH
-    stacklimit = topstack;
-#endif    
 }
 
 void outlet_bang(t_outlet *x)
 {
     t_outconnect *oc;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else 
     for (oc = x->o_connections; oc; oc = oc->oc_next)
         pd_bang(oc->oc_to);
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
 void outlet_pointer(t_outlet *x, t_gpointer *gp)
 {
     t_outconnect *oc;
     t_gpointer gpointer;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else
     {
-#if 0
-        gpointer_copy(gp, &gpointer);
-        for (oc = x->o_connections; oc; oc = oc->oc_next)
-            pd_pointer(oc->oc_to, &gpointer);
-        gpointer_unset(&gpointer);
-#else
         gpointer = *gp;
         for (oc = x->o_connections; oc; oc = oc->oc_next)
             pd_pointer(oc->oc_to, &gpointer);
-#endif
     }
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
 void outlet_float(t_outlet *x, t_float f)
 {
     t_outconnect *oc;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else
     for (oc = x->o_connections; oc; oc = oc->oc_next)
         pd_float(oc->oc_to, f);
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
 void outlet_symbol(t_outlet *x, t_symbol *s)
 {
     t_outconnect *oc;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else
     for (oc = x->o_connections; oc; oc = oc->oc_next)
         pd_symbol(oc->oc_to, s);
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
 void outlet_list(t_outlet *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_outconnect *oc;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else
     for (oc = x->o_connections; oc; oc = oc->oc_next)
         pd_list(oc->oc_to, s, argc, argv);
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
 void outlet_anything(t_outlet *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_outconnect *oc;
-#ifdef NEWSTACKMETH
     if(++stackcount >= STACKITER)
-#else
-    char c;    
-    if (&c < stacklimit)
-#endif
         outlet_stackerror(x);
     else
     for (oc = x->o_connections; oc; oc = oc->oc_next)
         typedmess(oc->oc_to, s, argc, argv);
-#ifdef NEWSTACKMETH
     --stackcount;
-#endif    
 }
 
     /* get the outlet's declared symbol */

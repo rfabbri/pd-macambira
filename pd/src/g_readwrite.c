@@ -81,7 +81,7 @@ static void glist_readatoms(t_glist *x, int natoms, t_atom *vec,
                     /* empty line terminates array */
                 if (!nline)
                     break;
-                array_resize(a, arraytemplate, nitems + 1);
+                array_resize(a, nitems + 1);
                 element = (t_word *)(((char *)a->a_vec) +
                     nitems * elemsize);
                 glist_readatoms(x, natoms, vec, p_nextmsg, arraytemplatesym,

@@ -37,16 +37,16 @@ typedef struct _sigdelwrite
     /* routine to check that all delwrites/delreads/vds have same vecsize */
 static void sigdelwrite_checkvecsize(t_sigdelwrite *x, int vecsize)
 {
-    /*
-        LATER this should really check sample rate and blocking, once that is
-        supported.  Probably we don't actually care about vecsize.
-        For now just suppress this check... */
-#if 0
     if (x->x_rsortno != ugen_getsortno())
     {
         x->x_vecsize = vecsize;
         x->x_rsortno = ugen_getsortno();
     }
+    /*
+        LATER this should really check sample rate and blocking, once that is
+        supported.  Probably we don't actually care about vecsize.
+        For now just suppress this check. */
+#if 0
     else if (vecsize != x->x_vecsize)
         pd_error(x, "delread/delwrite/vd vector size mismatch");
 #endif

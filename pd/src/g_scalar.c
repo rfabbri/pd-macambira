@@ -6,18 +6,7 @@
 "gobj".  Scalars have templates which describe their structures, which
 can contain numbers, sublists, and arrays.
 
-Also, the "tscalar" object, an ordinary text object that owns a single "scalar"
-and draws it on the parent.  This is intended as a way that abstractions can
-control their appearances by adding stuff to draw.
 */
-
-/* IOhannes :
- * changed the canvas_restore, so that it might accept $args as well (like "pd $0_test")
- * so you can make multiple & distinguishable templates
- * 1511:forum::für::umläute:2001
- * changes marked with    IOhannes
- * added Krzysztof Czajas fix to avoid crashing...
- */
 
 #include <stdlib.h>
 #include <string.h>
@@ -304,26 +293,35 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
         sys_unqueuegui(x);
 }
 
-static int scalar_click(t_gobj *z, struct _glist *owner,
-    int xpix, int ypix, int shift, int alt, int dbl, int doit)
+int scalar_doclick(t_word *data, t_template *template, t_scalar *sc,
+    t_array *ap, struct _glist *owner,
+    float xloc, float yloc, int xpix, int ypix,
+    int shift, int alt, int dbl, int doit)
 {
-    t_scalar *x = (t_scalar *)z;
     int hit = 0;
-    t_template *template = template_findbyname(x->sc_template);
     t_canvas *templatecanvas = template_findcanvas(template);
     t_gobj *y;
-    float basex, basey;
-    scalar_getbasexy(x, &basex, &basey);
+    float basex = template_getfloat(template, gensym("x"), data, 0);
+    float basey = template_getfloat(template, gensym("y"), data, 0);
     for (y = templatecanvas->gl_list; y; y = y->g_next)
     {
         t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
         if (!wb) continue;
         if (hit = (*wb->w_parentclickfn)(y, owner,
-            x, template, basex, basey,
+            data, template, sc, ap, basex + xloc, basey + yloc,
             xpix, ypix, shift, alt, dbl, doit))
                 return (hit);
     }
     return (0);
+}
+
+static int scalar_click(t_gobj *z, struct _glist *owner,
+    int xpix, int ypix, int shift, int alt, int dbl, int doit)
+{
+    t_scalar *x = (t_scalar *)z;
+    t_template *template = template_findbyname(x->sc_template);
+    return (scalar_doclick(x->sc_vec, template, x, 0,
+        owner, 0, 0, xpix, ypix, shift, alt, dbl, doit));
 }
 
 void canvas_writescalar(t_symbol *templatesym, t_word *w, t_binbuf *b,

@@ -49,7 +49,6 @@ typedef int socklen_t;
 #define DEBUG_MESSUP 1      /* messages up from pd to pd-gui */
 #define DEBUG_MESSDOWN 2    /* messages down from pd-gui to pd */
 
-/* T.Grill - make it a _little_ more adaptable... */
 #ifndef PDBINDIR
 #define PDBINDIR "bin/"
 #endif
@@ -1190,8 +1189,6 @@ int sys_startgui(const char *guidir)
 
 }
 
-
-/* T.Grill - import clean quit function */
 extern void sys_exit(void);
 
 /* This is called when something bad has happened, like a segfault.

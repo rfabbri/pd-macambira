@@ -34,10 +34,27 @@ sched_idle hook
 fixed startup flags, path, etc. so that spaces, "," chars, etc., are allowed
 configure script fixed to handle enable- and disable- correctly
 
+0.39:
+arrays are now first-class data
+array elements can be clicked on, etc
+
+
+bug bandaids:
+d_delay.c confusion
+'$' and help broken in OSX?
+
+garray change:
+make a gobj_redraw that schedules the redraw
+put two radio button banks side by side
+re-range tables when arrays change size (again)
+array_resize etc., should redraw the array directly?  Or should "setsize"
+    and "garray_resize" do it instead?  check it's queued correctly.
+
+
 doc:
 document env~ second argument (and why is it no less than 1/10 of first???)
-update 0.intro.pd
 vibrato example
+block resampling arguments
 
 problems:
 '[' in numbox label breaks it (Yury Sept. 3)
@@ -63,6 +80,7 @@ figure out why Pd sometimes crashes when you close example after adding fields
 check if _vsnprintf with zero argument in windows works any better...
 
 next release:
+fix copyright notices
 update portmusic to latest
 IEM guis to use queued updates
 pixel font sizes
@@ -98,14 +116,14 @@ allow field(1,5,0,100) etc. in drawing commands
 vget, vset traversal objects
 cursor to show (x, y) location
 better hit detection (getrect is too greedy; try tk's "current" tag for canvas)
-click on points of plot
-typing & dragging drawnumbers
-fix templates to be loaded on demand and belong to a globally known patch
+typing at drawnumbers
 test and debug list elements of templates
-sublists should display on parent if desired?
+sublists should display on parent if desired? (new drawing instruction)
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
+when last drawing instruction leaves, glist_redrawitem() fails to erase it;
+    perhaps scalar_vis(...0) should just delete for the tag, itself?
 
 more features:
 

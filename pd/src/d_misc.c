@@ -79,96 +79,6 @@ static void print_setup(void)
     class_addfloat(print_class, print_float);
 }
 
-/* ------------------------- scope~ -------------------------- */
-/* this has been replaced by arrays; to be deleted later */
- 
-#include "g_canvas.h"
-
-static t_class *scope_class;
-
-#define SCOPESIZE 256
-
-typedef struct _scope
-{
-    t_object x_obj;
-    t_sample x_samps[SCOPESIZE];
-    int x_phase;
-    int x_drawn;
-    void *x_canvas;
-} t_scope;
-
-static t_int *scope_perform(t_int *w)
-{
-    t_scope *x = (t_scope *)(w[1]);
-    t_float *in = (t_float *)(w[2]);
-    int n = (int)(w[3]), phase = x->x_phase;
-    while (n--)
-    {
-        x->x_samps[phase] = *in++;
-        phase = (phase + 1) & (SCOPESIZE-1);
-    }
-    x->x_phase = phase;
-    return (w+4);
-}
-
-static void scope_dsp(t_scope *x, t_signal **sp)
-{
-    dsp_add(scope_perform, 3, x, sp[0]->s_vec, sp[0]->s_n);
-}
-
-static void scope_erase(t_scope *x)
-{
-    if (x->x_drawn) sys_vgui(".x%lx.c delete gumbo\n", x->x_canvas);
-}
-
-#define X1 10.
-#define X2 20.
-#define YC 5.
-static void scope_bang(t_scope *x)
-{
-    int n, phase;
-    char hugebuf[10000], *s = hugebuf;
-    scope_erase(x);
-    sys_vgui(".x%lx.c create line 10c 5c 20c 5c -tags gumbo\n", x->x_canvas);
-    sprintf(s, ".x%lx.c create line ", (t_int)x->x_canvas);
-    s += strlen(s);
-    for (n = 0, phase = x->x_phase;
-        n < SCOPESIZE; phase = ((phase+1) & (SCOPESIZE-1)), n++)
-    {
-        sprintf(s, "%fc %fc ", X1 + (X2 - X1) * (float)n * (1./SCOPESIZE),
-            YC - 5 * x->x_samps[phase]);
-        s += strlen(s);
-        /* post("phase %d", phase); */
-    }
-    sprintf(s, "-tags gumbo\n");
-    sys_gui(hugebuf);
-    x->x_drawn = 1;
-}
-
-static void scope_free(t_scope *x)
-{
-    scope_erase(x);
-}
-
-static void *scope_new(t_symbol *s)
-{
-    t_scope *x = (t_scope *)pd_new(scope_class);
-    error("scope: this is now obsolete; use arrays and tabwrite~ instead");
-    x->x_phase = 0;
-    x->x_drawn = 0;
-    x->x_canvas = canvas_getcurrent();
-    return (x);
-}
-
-static void scope_setup(void)
-{
-    scope_class = class_new(gensym("scope~"), (t_newmethod)scope_new, 
-        (t_method)scope_free, sizeof(t_scope), 0, A_DEFSYM, 0);
-    class_addmethod(scope_class, nullfn, gensym("signal"), 0);
-    class_addmethod(scope_class, (t_method)scope_dsp, gensym("dsp"), 0);
-    class_addbang(scope_class, scope_bang);
-}
-
 /* ------------------------ bang~ -------------------------- */
 
 static t_class *bang_tilde_class;
@@ -250,7 +160,6 @@ static void samplerate_tilde_setup(void)
 void d_misc_setup(void)
 {
     print_setup();
-    scope_setup();
     bang_tilde_setup();
     samplerate_tilde_setup();
 }

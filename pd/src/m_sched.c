@@ -12,8 +12,6 @@
     rates we expect to see: 32000, 44100, 48000, 88200, 96000. */
 #define TIMEUNITPERSEC (32.*441000.)
 
-
-/* T.Grill - enable PD global thread locking - sys_lock, sys_unlock, sys_trylock functions */
 #define THREAD_LOCKING  
 #include "pthread.h"
 
@@ -394,7 +392,6 @@ int m_scheduler( void)
         ((double)sys_schedblocksize) / sys_dacsr;
 
 #ifdef THREAD_LOCKING
-    /* T.Grill - lock mutex */
         sys_lock();
 #endif
 
@@ -470,8 +467,7 @@ int m_scheduler( void)
             sys_reportidle();
 
 #ifdef THREAD_LOCKING
-            /* T.Grill - enter idle phase -> unlock thread lock */
-            sys_unlock();
+            sys_unlock();   /* unlock while we idle */
 #endif
                 /* call externally installed idle function if any. */
             if (!sys_idlehook || !sys_idlehook())
@@ -481,7 +477,6 @@ int m_scheduler( void)
                     sys_microsleep(sys_sleepgrain);
             }
 #ifdef THREAD_LOCKING
-            /* T.Grill - leave idle phase -> lock thread lock */
             sys_lock();
 #endif
 
@@ -492,7 +487,6 @@ int m_scheduler( void)
     }
 
 #ifdef THREAD_LOCKING
-    /* T.Grill - done */
     sys_unlock();
 #endif
 
@@ -501,7 +495,6 @@ int m_scheduler( void)
 
 
 /* ------------ thread locking ------------------- */
-/* added by Thomas Grill */
 
 #ifdef THREAD_LOCKING
 static pthread_mutex_t sys_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -528,13 +521,6 @@ void sys_unlock(void) {}
 int sys_trylock(void) {}
 
 #endif
-
-
-/* ------------ soft quit ------------------- */
-/* added by Thomas Grill - 
-        just set the quit flag for the scheduler loop
-        this is useful for applications using the PD shared library to signal the scheduler to terminate
-*/
 
 void sys_exit(void)
 {

@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 #define PD_MAJOR_VERSION 0
-#define PD_MINOR_VERSION 38   
+#define PD_MINOR_VERSION 39   
 
 /* old name for "MSW" flag -- we have to take it for the sake of many old
 "nmakefiles" for externs, which will define NT and not MSW */
@@ -454,9 +454,7 @@ EXTERN double sys_getrealtime(void);
 EXTERN int (*sys_idlehook)(void);   /* hook to add idle time computation */
 
 
-/* ------------  threading ------------------- */
-/* T.Grill - see m_sched.c */
- 
+/* ------------  threading ------------------- */ 
 EXTERN void sys_lock(void);
 EXTERN void sys_unlock(void);
 EXTERN int sys_trylock(void);
@@ -516,7 +514,7 @@ EXTERN int canvas_suspend_dsp(void);
 EXTERN void canvas_resume_dsp(int oldstate);
 EXTERN void canvas_update_dsp(void);
 
-/* IOhannes { (up/downsampling) */
+/*   up/downsampling */
 typedef struct _resample
 {
   int method;       /* up/downsampling method ID */
@@ -540,7 +538,6 @@ EXTERN void resample_free(t_resample *x);
 EXTERN void resample_dsp(t_resample *x, t_sample *in, int insize, t_sample *out, int outsize, int method);
 EXTERN void resamplefrom_dsp(t_resample *x, t_sample *in, int insize, int outsize, int method);
 EXTERN void resampleto_dsp(t_resample *x, t_sample *out, int insize, int outsize, int method);
-/* } IOhannes */
 
 /* ----------------------- utility functions for signals -------------- */
 EXTERN float mtof(float);

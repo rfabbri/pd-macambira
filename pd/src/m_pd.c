@@ -293,6 +293,7 @@ void mess_init(void);
 void obj_init(void);
 void conf_init(void);
 void glob_init(void);
+void garray_init(void);
 
 void pd_init(void)
 {
@@ -300,5 +301,6 @@ void pd_init(void)
     obj_init();
     conf_init();
     glob_init();
+    garray_init();
 }
 

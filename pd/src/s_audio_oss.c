@@ -138,17 +138,12 @@ int oss_reset(int fd) {
 #endif
 
 void oss_configure(t_oss_dev *dev, int srate, int dac, int skipblocksize)
-{ /* IOhannes */
+{
     int orig, param, nblk, fd = dev->d_fd, wantformat;
     int nchannels = dev->d_nchannels;
     int advwas = sys_schedadvance;
 
     audio_buf_info ainfo;
-
-    /* IOhannes : 
-     * pd is very likely to crash if different formats are used on
-     multiple soundcards
-     */
 
         /* set resolution - first try 4 byte samples */
     if (oss_32bit && (ioctl(fd,SNDCTL_DSP_GETFMTS,&param) >= 0) &&
@@ -249,7 +244,7 @@ void oss_configure(t_oss_dev *dev, int srate, int dac, int skipblocksize)
 }
 
 static int oss_setchannels(int fd, int wantchannels, char *devname)
-{ /* IOhannes */
+{
     int param = wantchannels;
 
     while (param > 1)
@@ -269,7 +264,7 @@ static int oss_setchannels(int fd, int wantchannels, char *devname)
 
 int oss_open_audio(int nindev,  int *indev,  int nchin,  int *chin,
     int noutdev, int *outdev, int nchout, int *chout, int rate)
-{ /* IOhannes */
+{
     int capabilities = 0;
     int inchannels = 0, outchannels = 0;
     char devname[20];

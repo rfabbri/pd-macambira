@@ -696,7 +696,7 @@ idle:
 
 void mmio_open_audio(int naudioindev, int *audioindev,
     int nchindev, int *chindev, int naudiooutdev, int *audiooutdev,
-    int nchoutdev, int *choutdev, int rate) /* IOhannes */
+    int nchoutdev, int *choutdev, int rate)
 {
     int nbuf;
 

@@ -196,8 +196,6 @@ typedef struct _dataslot
     t_symbol *ds_arraytemplate;     /* filled in for arrays only */
 } t_dataslot;
 
-
-/* T.Grill - changed t_pd member to t_pdobj to avoid name clashed */
 typedef struct _template
 {
     t_pd t_pdobj;               /* header */
@@ -215,7 +213,7 @@ struct _array
     t_symbol *a_templatesym;    /* template for elements */
     int a_valid;        /* protection against stale pointers into array */
     t_gpointer a_gp;    /* pointer to scalar or array element we're in */
-    t_gstub *a_stub;
+    t_gstub *a_stub;    /* stub for pointing into this array */
 };
 
     /* structure for traversing all the connections in a glist */
@@ -302,7 +300,8 @@ typedef void (*t_parentvisfn)(t_gobj *x, struct _glist *glist,
     int flag);
         /*  field a mouse click */
 typedef int (*t_parentclickfn)(t_gobj *x, struct _glist *glist,
-    t_scalar *sc, t_template *tmpl, float basex, float basey,
+    t_word *data, t_template *tmpl, t_scalar *sc, t_array *ap,
+    float basex, float basey,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
 struct _parentwidgetbehavior
@@ -330,6 +329,10 @@ extern t_canvas *canvas_whichfind;  /* last canvas we did a find in */
 extern t_canvas *canvas_list;       /* list of all root canvases */
 extern t_class *vinlet_class, *voutlet_class;
 extern int glist_valid;         /* incremented when pointers might be stale */
+
+#define PLOTSTYLE_POINTS 0     /* plotting styles for arrays */
+#define PLOTSTYLE_POLY 1
+#define PLOTSTYLE_BEZ 2
 
 /* ------------------- functions on any gobj ----------------------------- */
 EXTERN void gobj_getrect(t_gobj *x, t_glist *owner, int *x1, int *y1,
@@ -450,7 +453,7 @@ EXTERN t_inlet *canvas_addinlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rminlet(t_canvas *x, t_inlet *ip);
 EXTERN t_outlet *canvas_addoutlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rmoutlet(t_canvas *x, t_outlet *op);
-EXTERN void canvas_redrawallfortemplate(t_canvas *tmpl);
+EXTERN void canvas_redrawallfortemplate( t_template *tmpl);
 EXTERN void canvas_zapallfortemplate(t_canvas *tmpl);
 EXTERN void canvas_setusedastemplate(t_canvas *x);
 EXTERN t_canvas *canvas_getcurrent(void);
@@ -491,8 +494,6 @@ EXTERN void canvas_setundo(t_canvas *x, t_undofn undofn, void *buf,
 EXTERN void canvas_noundo(t_canvas *x);
 EXTERN int canvas_getindex(t_canvas *x, t_gobj *y);
 
-/* T.Grill - made public for dynamic object creation */
-/* in g_editor.c */
 EXTERN void canvas_connect(t_canvas *x,
     t_floatarg fwhoout, t_floatarg foutno,t_floatarg fwhoin, t_floatarg finno);
 EXTERN void canvas_disconnect(t_canvas *x,
@@ -531,7 +532,7 @@ EXTERN t_template *garray_template(t_garray *x);
 EXTERN t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *tmpl,
     t_floatarg f, t_floatarg saveit);
 EXTERN t_array *array_new(t_symbol *templatesym, t_gpointer *parent);
-EXTERN void array_resize(t_array *x, t_template *tmpl, int n);
+EXTERN void array_resize(t_array *x, int n);
 EXTERN void array_free(t_array *x);
 
 /* --------------------- gpointers and stubs ---------------- */
@@ -545,10 +546,11 @@ EXTERN void word_restore(t_word *wp, t_template *tmpl,
     int argc, t_atom *argv);
 EXTERN t_scalar *scalar_new(t_glist *owner,
     t_symbol *templatesym);
+EXTERN void word_free(t_word *wp, t_template *template);
 EXTERN void scalar_getbasexy(t_scalar *x, float *basex, float *basey);
 
 /* ------helper routines for "garrays" and "plots" -------------- */
-EXTERN int array_doclick(t_array *array, t_glist *glist, t_gobj *gobj,
+EXTERN int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
     float linewidth, float xloc, float xinc, float yloc,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);

@@ -195,7 +195,7 @@ void pa_getdevs(char *indevlist, int *nindevs,
 
 int oss_open_audio(int naudioindev, int *audioindev, int nchindev,
     int *chindev, int naudiooutdev, int *audiooutdev, int nchoutdev,
-    int *choutdev, int rate); /* IOhannes */
+    int *choutdev, int rate);
 void oss_close_audio(void);
 int oss_send_dacs(void);
 void oss_reportidle(void);

@@ -482,7 +482,6 @@ t_int *over_perf8(t_int *w)
     return (w+5);
 }
 
-/* T.Grill - added check for zero */
 t_int *scalarover_perform(t_int *w)
 {
     t_float *in = (t_float *)(w[1]);

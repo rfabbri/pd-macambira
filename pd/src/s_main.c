@@ -2,12 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* IOhannes :
- * hacked the code to add advanced multidevice-support
- * 1311:forum::für::umläute:2001
- */
-
-char pd_version[] = "Pd version 0.38 TEST10\n";
+char pd_version[] = "Pd version 0.39 TEST 0\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -68,15 +63,11 @@ int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 static int sys_main_srate;
 static int sys_main_advance;
 
-/* jsarlo { */
 int sys_externalschedlib;
 char sys_externalschedlibname[MAXPDSTRING];
 int sys_extraflags;
 char sys_extraflagsstring[MAXPDSTRING];
-/* } jsarlo */
 
-
-/* IOhannes { */
 
     /* here the "-1" counts signify that the corresponding vector hasn't been
     specified in command line arguments; sys_open_audio will detect this
@@ -90,9 +81,7 @@ static int sys_nchin = -1;
 static int sys_nchout = -1;
 static int sys_chinlist[MAXAUDIOINDEV];
 static int sys_choutlist[MAXAUDIOOUTDEV];
-/* } IOhannes */
 
-/* jsarlo { */
 t_sample* get_sys_soundout() { return sys_soundout; }
 t_sample* get_sys_soundin() { return sys_soundin; }
 int* get_sys_main_advance() { return &sys_main_advance; }
@@ -102,9 +91,6 @@ double* get_sys_time() { return &sys_time; }
 float* get_sys_dacsr() { return &sys_dacsr; }
 int* get_sys_sleepgrain() { return &sys_sleepgrain; }
 int* get_sys_schedadvance() { return &sys_schedadvance; }
-/* } jsarlo */
-
-
 
 typedef struct _fontinfo
 {
@@ -257,10 +243,8 @@ static void sys_afterargparse(void);
 /* this is called from main() in s_entry.c */
 int sys_main(int argc, char **argv)
 {
-    /* jsarlo { */
     sys_externalschedlib = 0;
     sys_extraflags = 0;
-    /* } jsarlo */
 #ifdef PD_DEBUG
     fprintf(stderr, "Pd: COMPILED FOR DEBUGGING\n");
 #endif
@@ -279,7 +263,6 @@ int sys_main(int argc, char **argv)
         return (0);
     if (sys_startgui(sys_guidir->s_name))       /* start the gui */
         return(1);
-    /* jsarlo { */
     if (sys_externalschedlib)
     {
 #ifdef MSW
@@ -311,7 +294,6 @@ int sys_main(int argc, char **argv)
             /* run scheduler until it quits */
         return (m_scheduler());
     }
-    /* } jsarlo */
 }
 
 static char *(usagemessage[]) = {
@@ -535,7 +517,7 @@ int sys_argparse(int argc, char **argv)
             argv += 2;
         }
         else if (!strcmp(*argv, "-inchannels"))
-        { /* IOhannes */
+        {
             sys_parsedevlist(&sys_nchin,
                 sys_chinlist, MAXAUDIOINDEV, argv[1]);
 
@@ -545,7 +527,7 @@ int sys_argparse(int argc, char **argv)
           argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-outchannels"))
-        { /* IOhannes */
+        {
             sys_parsedevlist(&sys_nchout, sys_choutlist,
                 MAXAUDIOOUTDEV, argv[1]);
 
@@ -582,19 +564,19 @@ int sys_argparse(int argc, char **argv)
             argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-nodac"))
-        { /* IOhannes */
+        {
             sys_nsoundout=0;
             sys_nchout = 0;
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-noadc"))
-        { /* IOhannes */
+        {
             sys_nsoundin=0;
             sys_nchin = 0;
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-nosound") || !strcmp(*argv, "-noaudio"))
-        { /* IOhannes */
+        {
             sys_nsoundin=sys_nsoundout = 0;
             sys_nchin = sys_nchout = 0;
             argc--; argv++;
@@ -765,7 +747,6 @@ int sys_argparse(int argc, char **argv)
         else if (!strcmp(*argv, "-stderr"))
         {
             sys_printtostderr = 1;
-            fprintf(stderr, "set it\n");
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-guicmd") && argc > 1)
@@ -783,7 +764,6 @@ int sys_argparse(int argc, char **argv)
             sys_listdevs();
             argc--; argv++;
         }
-        /* jsarlo { */
         else if (!strcmp(*argv, "-schedlib"))
         {
             sys_externalschedlib = 1;
@@ -798,7 +778,6 @@ int sys_argparse(int argc, char **argv)
             argv += 2;
             argc -= 2;
         }
-        /* } jsarlo */
 #ifdef UNISTD
         else if (!strcmp(*argv, "-rt") || !strcmp(*argv, "-realtime"))
         {
@@ -813,30 +792,30 @@ int sys_argparse(int argc, char **argv)
 #endif
         else if (!strcmp(*argv, "-soundindev") ||
             !strcmp(*argv, "-audioindev"))
-          { /* IOhannes */
-          sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
-              MAXAUDIOINDEV, argv[1]);
-          if (!sys_nsoundin)
-            goto usage;
-          argc -= 2; argv += 2;
+        {
+            sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
+                MAXAUDIOINDEV, argv[1]);
+            if (!sys_nsoundin)
+                goto usage;
+            argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-soundoutdev") ||
             !strcmp(*argv, "-audiooutdev"))
-          { /* IOhannes */
-          sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
-              MAXAUDIOOUTDEV, argv[1]);
-          if (!sys_nsoundout)
-            goto usage;
+        {
+            sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
+                MAXAUDIOOUTDEV, argv[1]);
+            if (!sys_nsoundout)
+                goto usage;
             argc -= 2; argv += 2;
         }
         else if (!strcmp(*argv, "-sounddev") || !strcmp(*argv, "-audiodev"))
         {
-          sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
-              MAXAUDIOINDEV, argv[1]);
-          sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
-              MAXAUDIOOUTDEV, argv[1]);
-          if (!sys_nsoundout)
-            goto usage;
+            sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
+                MAXAUDIOINDEV, argv[1]);
+            sys_parsedevlist(&sys_nsoundout, sys_soundoutdevlist,
+                MAXAUDIOOUTDEV, argv[1]);
+            if (!sys_nsoundout)
+                goto usage;
             argc -= 2; argv += 2;
         }
         else
