@@ -1,0 +1,15 @@
+#N canvas 345 114 641 488 12;
+#X obj 11 40 fs.main;
+#X msg 11 12 6001;
+#X msg 62 12 reset;
+#X obj 26 133 fs.framed example-docking2;
+#X msg 229 161 365 + 203;
+#X obj 240 133 init;
+#X text 24 78 Used this way the frame position is saved with the patch
+automatically. Try moving the frame around!;
+#X connect 1 0 0 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 2 4 0;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;

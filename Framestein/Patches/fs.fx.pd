@@ -1,0 +1,21 @@
+#N canvas 275 32 645 476 12;
+#X obj 22 171 outlet;
+#X obj 22 138 inlet;
+#X text 114 91 - effects:;
+#X text 130 115 mosaic <value>;
+#X text 129 265 saturation <value>;
+#X text 129 290 addition <r> <g> <b>;
+#X text 130 313 gamma <r> <g> <b>;
+#X text 130 337 contrast <r> <g> <b>;
+#X text 130 361 lightness <r> <g> <b>;
+#X text 130 235 without parameters: invert \, soft \, sharp \, emboss
+;
+#X text 129 139 rotate <degrees counterwise>;
+#X text 130 163 rotozoom <degrees counterwise> <zoom val (65536=none)>
+;
+#X text 130 190 "smooth_1" and "smooth_0" sets smoothing on/off for
+rotate and rotozoom (default is on).;
+#X text 9 34 (you can send these commands directly to fs.frame \, but
+using fs.fx might make your patches more clear);
+#X text 10 6 Yeah \, quite an abstraction!;
+#X connect 1 0 0 0;

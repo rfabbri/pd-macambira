@@ -1,0 +1,57 @@
+#N canvas 5 47 1010 514 10;
+#X obj 12 52 fs.main;
+#X msg 10 23 6001;
+#X msg 56 23 reset;
+#X msg 210 190 597 + 108;
+#X msg 495 188 815 + 109;
+#X msg 343 365 696 + 342;
+#X floatatom 227 272 4 0 0;
+#X obj 150 273 fs.blend;
+#X obj 235 38 fps 0;
+#X floatatom 193 38 4 0 0;
+#X msg 286 96 next \, bang;
+#X msg 207 94 next \, bang;
+#X obj 220 167 init;
+#X obj 503 163 init;
+#X obj 353 335 init;
+#X text 166 419 note: fs.blend initializes this frame to flip_manual.
+;
+#X text 174 441 in manual mode \, you need to send "flip" to update
+the display after changing the image. the default mode is "flip_auto".
+;
+#X text 239 246 blend amount \, 0 - 255;
+#X text 682 44 drag and drop your videos here;
+#X text 748 291 the result;
+#X msg 299 290 127;
+#X obj 236 65 t b b;
+#X text 196 14 frame rate. start with something modest \, like 1;
+#X obj 731 257 hsl 128 15 255 0 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 21 189 fs.framed blending;
+#X obj 306 187 fs.framed blending;
+#X obj 150 363 fs.framed blending;
+#X connect 1 0 0 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 0 24 0;
+#X connect 4 0 25 0;
+#X connect 5 0 26 0;
+#X connect 6 0 7 2;
+#X connect 7 0 26 0;
+#X connect 8 0 21 0;
+#X connect 9 0 8 0;
+#X connect 10 0 25 0;
+#X connect 11 0 24 0;
+#X connect 12 0 3 0;
+#X connect 13 0 4 0;
+#X connect 14 0 5 0;
+#X connect 14 0 20 0;
+#X connect 20 0 6 0;
+#X connect 21 0 11 0;
+#X connect 21 1 10 0;
+#X connect 23 0 6 0;
+#X connect 24 0 7 0;
+#X connect 24 2 3 0;
+#X connect 25 0 7 1;
+#X connect 25 2 4 0;
+#X connect 26 2 5 0;

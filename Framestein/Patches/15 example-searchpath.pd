@@ -1,0 +1,28 @@
+#N canvas 309 76 603 483 12;
+#X obj 16 42 fs.main;
+#X msg 16 16 6001;
+#X msg 67 16 reset;
+#X obj 270 314 fs.framed searchpath;
+#X msg 435 314 35 + 148;
+#X msg 163 60 path /framestein \, path /fsrel/framestein;
+#X text 162 32 use "path <dir>" to tell where to search for images
+;
+#X msg 276 186 harmon.jpg;
+#X msg 296 216 virvezoom.jpg;
+#X msg 311 247 yska320x240.jpg;
+#X msg 259 159 head.avi;
+#X text 68 380 The dir where Framestein.exe was started from is always
+in the search path.;
+#X obj 435 290 init;
+#X text 260 131 .. to make it easy to load them:;
+#X connect 1 0 0 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;
+#X connect 3 2 4 0;
+#X connect 4 0 3 0;
+#X connect 5 0 0 1;
+#X connect 7 0 3 0;
+#X connect 8 0 3 0;
+#X connect 9 0 3 0;
+#X connect 10 0 3 0;
+#X connect 12 0 4 0;

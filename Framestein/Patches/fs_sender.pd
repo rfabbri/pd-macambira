@@ -1,0 +1,7 @@
+#N canvas 595 435 271 174 12;
+#X obj 37 13 inlet;
+#X obj 37 77 s fs_main;
+#X obj 93 42 print sender;
+#X obj 37 43 l2s;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;

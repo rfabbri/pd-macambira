@@ -1,0 +1,24 @@
+#N canvas 61 76 511 375 12;
+#X obj 92 199 fs.frame;
+#X obj 263 129 symbol \$1;
+#X obj 92 91 inlet;
+#X obj 92 291 outlet;
+#X msg 263 155 dock \$1;
+#X text 9 5 fs.framed - docked fs.frame;
+#X obj 151 291 outlet;
+#X obj 186 129 symbol \$2;
+#X obj 186 93 t b b;
+#X obj 209 291 outlet;
+#X obj 186 68 reset;
+#X text 35 30 usage: fs.framed <substring of windowtitle> <position>
+;
+#X connect 0 0 3 0;
+#X connect 0 1 6 0;
+#X connect 0 2 9 0;
+#X connect 1 0 4 0;
+#X connect 2 0 0 0;
+#X connect 4 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 8 1 1 0;
+#X connect 10 0 8 0;

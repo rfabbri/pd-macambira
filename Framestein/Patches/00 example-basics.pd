@@ -1,0 +1,38 @@
+#N canvas 228 3 648 661 12;
+#X obj 5 31 fs.main;
+#X msg 5 7 6001;
+#X msg 56 7 reset;
+#X text 32 103 fs.main connects pure data and Framestein. Only one
+at a time!;
+#X text 33 143 1st inlet: re-establish connection to given port number
+;
+#X text 33 159 2nd inlet: "reset" will re-create all fs.*-objects;
+#X obj 36 206 fs.frame;
+#X text 119 206 -- load images and video \, perform effects \, run
+plugins \, photoshop-filters \, and more ...;
+#X text 120 273 some commands are listed here;
+#X obj 358 273 fs.fx;
+#X text 120 304 1st outlet: fs.frame ID. Connect this to other fs.*-objects
+\, like fs.copy \, fs.info \, fs.event etc.;
+#X text 120 344 2nd outlet: reports mouse movement in the frame when
+mousetrack_1 is set. See example-docking.pd!;
+#X text 119 384 3rd outlet: report the window position when docked
+\, see example-docking2.pd!;
+#X obj 45 442 fs.copy;
+#X text 121 442 -- connect two fs.frames to copy pixels by built-in
+copy operations \, plugins or photoshop-filters.;
+#X text 122 486 1st inlet: connect the first outlet of fs.frame here.
+;
+#X text 122 505 2nd inlet: name of the copy operation \, or other parameter.
+See inside fs.copy for list of built-ins. See example-plugins.pd and
+example-photoshopfilters.pd.;
+#X text 123 557 1st outlet: connect to the fs.frame to copy to.;
+#X text 31 70 The central objects to get started with:;
+#X text 49 602 Have fun!;
+#X text 119 253 1st inlet: for a list of commands \, look inside the
+patch.;
+#X obj 344 320 fs.info;
+#X obj 416 320 fs.event;
+#X connect 1 0 0 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 1;

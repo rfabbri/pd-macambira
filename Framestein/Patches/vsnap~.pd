@@ -1,0 +1,18 @@
+#N canvas 86 302 458 308 12;
+#X obj 164 170 vsnapshot~;
+#X obj 239 80 reset;
+#X obj 239 131 vframe \$1 \$2;
+#X obj 164 211 outlet;
+#X obj 120 80 inlet~;
+#X obj 179 80 inlet~;
+#X text 13 6 wrapper for vsnapshot~;
+#X text 67 45 video signal | sync signal;
+#X text 170 242 outlet to fs.frame;
+#X obj 253 108 bng 15 250 50 0 empty empty empty 20 8 0 8 -262144 -1
+-1;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 2;
+#X connect 4 0 0 0;
+#X connect 5 0 0 1;
+#X connect 9 0 2 0;

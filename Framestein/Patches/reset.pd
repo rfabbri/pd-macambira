@@ -1,0 +1,8 @@
+#N canvas 365 282 350 242 12;
+#X obj 44 34 loadbang;
+#X obj 130 34 r fs_reset;
+#X obj 60 100 outlet;
+#X msg 130 60 bang;
+#X connect 0 0 2 0;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;

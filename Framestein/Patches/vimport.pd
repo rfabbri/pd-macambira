@@ -1,0 +1,11 @@
+#N canvas 257 346 509 298 12;
+#X obj 46 39 inlet;
+#X obj 313 41 inlet;
+#X text 21 12 fs.frame to import from;
+#X text 292 14 vframe to import to;
+#X obj 179 122 pack s f;
+#X text 329 192 import plugin;
+#X msg 179 182 \; \$1inlet fs2vf \$2;
+#X connect 0 0 4 0;
+#X connect 1 0 4 1;
+#X connect 4 0 6 0;

@@ -1,0 +1,9 @@
+#N canvas 361 230 591 286 12;
+#X obj 44 177 outlet;
+#X obj 44 81 reset;
+#X text 14 10 use init to set parameters at load time;
+#X msg 44 152 bang;
+#X obj 44 126 pipe 1000;
+#X connect 1 0 4 0;
+#X connect 3 0 0 0;
+#X connect 4 0 3 0;
