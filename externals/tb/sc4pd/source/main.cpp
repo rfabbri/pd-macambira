@@ -62,7 +62,9 @@ void sc4pd_library_setup()
 	 "DelayN~,\n"
 	 "          DelayL~, DelayC~, CombN~, CombL~, CombC~, AllpassN~, "
 	 "AllpassL~,\n"
-	 "          AllpassC~, PitchShift~, Resonz~, OnePole(~)"
+	 "          AllpassC~, PitchShift~, Resonz~, OnePole(~), OneZero(~)"
+	 "TwoPole~"
+
 	 "\n"
 	 );
 
@@ -235,6 +237,11 @@ void sc4pd_library_setup()
 
     FLEXT_DSP_SETUP(OnePole_ar); 
     FLEXT_SETUP(OnePole_kr); 
+
+    FLEXT_DSP_SETUP(OneZero_ar); 
+    FLEXT_SETUP(OneZero_kr); 
+
+    FLEXT_DSP_SETUP(TwoPole_ar); 
 }
 
 FLEXT_LIB_SETUP(sc4pd,sc4pd_library_setup);

@@ -102,12 +102,12 @@ class sc4pd_dsp
 	return 1 / Blocksize();
     }
     
-    inline float sc_filterloops()
+    inline int sc_filterloops()
     {
 	return Blocksize() / 3;
     }
     
-    inline float sc_filterremain()
+    inline int sc_filterremain()
     {
 	return Blocksize() % 3;
     }

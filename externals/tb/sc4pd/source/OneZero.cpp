@@ -1,5 +1,5 @@
 /* sc4pd 
-   OnePole, OnePole~
+   OneZero, OneZero~
 
    Copyright (c) 2004 Tim Blechmann.
 
@@ -37,21 +37,18 @@
 
 #include "sc4pd.hpp"
 
-/* ------------------------ OnePole~ -------------------------------*/
+/* ------------------------ OneZero~ -------------------------------*/
 
-class OnePole_ar:
+class OneZero_ar:
     public sc4pd_dsp
 {
-    FLEXT_HEADER(OnePole_ar,sc4pd_dsp);
+    FLEXT_HEADER(OneZero_ar,sc4pd_dsp);
     
 public:
-    OnePole_ar(int argc, t_atom *argv);
+    OneZero_ar(int argc, t_atom *argv);
     
 protected:
-    virtual void m_signal(int n, t_sample *const *in, t_sample *const *out)
-    {
-	m_signal_fun(n,in,out);
-    }
+    virtual void m_signal(int n, t_sample *const *in, t_sample *const *out);
 
     void m_set(float f)
     {
@@ -59,84 +56,38 @@ protected:
 	changed = true;
     }
     
-    void m_ar()
-    {
-	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_ar));
-    }
-
-    void m_kr()
-    {
-	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_kr));
-    }
-    
 private:
-    float m_b1, m_y1;
+    float m_b1, m_x1;
     float n_b1;
     bool changed;
     
-    DEFSIGCALL (m_signal_fun);
-    DEFSIGFUN (m_signal_ar);
-    DEFSIGFUN (m_signal_kr);
-    
     FLEXT_CALLBACK_F(m_set);
-    FLEXT_CALLBACK(m_ar);
-    FLEXT_CALLBACK(m_kr);
 };
 
-FLEXT_LIB_DSP_V("OnePole~",OnePole_ar);
+FLEXT_LIB_DSP_V("OneZero~",OneZero_ar);
 
-OnePole_ar::OnePole_ar(int argc, t_atom *argv)
+OneZero_ar::OneZero_ar(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD_(0,"coef",m_set);
-    FLEXT_ADDMETHOD_(0,"ar",m_ar);
-    FLEXT_ADDMETHOD_(0,"kr",m_kr);
 
     //parse arguments
     AtomList Args(argc,argv);
     
     m_b1 = sc_getfloatarg(Args,0);
     
-    if(sc_ar(Args))
-    {
-	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_ar));
-	AddInSignal();
-	AddInSignal();
-    }
-    else // if not given, use control rate
-	SETSIGFUN(m_signal_fun,SIGFUN(m_signal_kr)); 
-    
     AddOutSignal();
     
-    m_y1 = 0.f;
+    m_x1 = 0.f;
 }    
 
-void OnePole_ar::m_signal_ar(int n, t_sample *const *in, 
-	 		   t_sample *const *out)
-{
-    t_sample *nin = *in;
-    t_sample *nout = *out;
-    float *b1p = *(in+1);
-    
-    float y1 = m_y1;
-
-    for (int i = 0; i!= n;++i)
-    {
-	float y0 = ZXP(nin); 
-	float b1 = ZXP(b1p); 
-	ZXP(nout) = y1 = y0 + b1 * (y1 - y0);
-    }
-    m_y1 = zapgremlins(y1);
-}
-
-
-void OnePole_ar::m_signal_kr(int n, t_sample *const *in, 
-			   t_sample *const *out)
+void OneZero_ar::m_signal(int n, t_sample *const *in, 
+			  t_sample *const *out)
 {
     t_sample *nin = *in;
     t_sample *nout = *out;
     
     float b1 = m_b1;
-    float y1 = m_y1;
+    float x1 = m_x1;
 
     if (changed)
     {
@@ -146,8 +97,9 @@ void OnePole_ar::m_signal_kr(int n, t_sample *const *in,
 	{
 	    for (int i = 0; i!= n;++i)
 	    {
-		float y0 = ZXP(nin); 
-		ZXP(nout) = y1 = y0 + b1 * (y1 - y0);
+		float x0 = ZXP(nin); 
+		ZXP(nout) = x0 + b1 * (x1 - x0);
+		x1 = x0;
 		b1 += b1_slope;
 	    }
 	} 
@@ -155,8 +107,9 @@ void OnePole_ar::m_signal_kr(int n, t_sample *const *in,
 	{
 	    for (int i = 0; i!= n;++i)
 	    {
-		float y0 = ZXP(nin); 
-		ZXP(nout) = y1 = y0 + b1 * (y1 + y0);
+		float x0 = ZXP(nin); 
+		ZXP(nout) = x0 + b1 * (x1 + x0);
+		x1 = x0;
 		b1 += b1_slope;
 	    }
 	}
@@ -164,8 +117,9 @@ void OnePole_ar::m_signal_kr(int n, t_sample *const *in,
 	{
 	    for (int i = 0; i!= n;++i)
 	    {
-		float y0 = ZXP(nin); 
-		ZXP(nout) = y1 = (1.f - fabs(b1)) * y0 + b1 * y1;
+		float x0 = ZXP(nin); 
+		ZXP(nout) = (1.f - fabs(b1)) * x0 + b1 * x1;
+		x1 = x0;
 		b1 += b1_slope;
 	    }
 	}
@@ -177,33 +131,34 @@ void OnePole_ar::m_signal_kr(int n, t_sample *const *in,
 	{
 	    for (int i = 0; i!= n;++i)
 	    {
-		float y0 = ZXP(nin); 
-		ZXP(nout) = y1 = y0 + b1 * (y1 - y0);
+		float x0 = ZXP(nin); 
+		ZXP(nout) = x0 + b1 * (x1 - x0);
+		x1 = x0;
 	    }
 	}
 	else
 	{
 	    for (int i = 0; i!= n;++i)
 	    {
-		float y0 = ZXP(nin); 
-		ZXP(nout) = y1 = y0 + b1 * (y1 + y0);
+		float x0 = ZXP(nin); 
+		ZXP(nout) = x0 + b1 * (x1 + x0);
+		x1 = x0;
 	    }
 	}
-
     }
-    m_y1 = zapgremlins(y1);
+    m_x1 = x1;
 }
 
-/* ------------------------ OnePole ---------------------------------*/
+/* ------------------------ OneZero ---------------------------------*/
 
 
-class OnePole_kr:
+class OneZero_kr:
     public flext_base
 {
-    FLEXT_HEADER(OnePole_kr,flext_base);
+    FLEXT_HEADER(OneZero_kr,flext_base);
 
 public:
-    OnePole_kr(int argc, t_atom *argv);
+    OneZero_kr(int argc, t_atom *argv);
     
 protected:
     void m_perform(float f);
@@ -214,16 +169,16 @@ protected:
     }
 
 private:
-    float m_b1, m_y1;
+    float m_b1, m_x1;
 
     FLEXT_CALLBACK_F(m_set);
     FLEXT_CALLBACK_F(m_perform);
 };
 
 
-FLEXT_LIB_V("OnePole",OnePole_kr);
+FLEXT_LIB_V("OneZero",OneZero_kr);
 
-OnePole_kr::OnePole_kr(int argc, t_atom *argv)
+OneZero_kr::OneZero_kr(int argc, t_atom *argv)
 {
     FLEXT_ADDMETHOD(0,m_perform);
     FLEXT_ADDMETHOD_(0,"set",m_set);
@@ -235,11 +190,11 @@ OnePole_kr::OnePole_kr(int argc, t_atom *argv)
 
     m_b1 = sc_getfloatarg(Args,0);
     
-    m_y1=0;
+    m_x1=0;
 }
 
-void OnePole_kr::m_perform(float f)
+void OneZero_kr::m_perform(float f)
 {
-    m_y1= ((1-abs(m_b1))*f)+m_b1*m_y1;
-    ToOutFloat(0,m_y1);
+    ToOutFloat(0,((1-abs(m_b1))*f)+m_b1*m_x1);
+    m_x1=f;
 }

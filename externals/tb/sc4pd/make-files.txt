@@ -12,4 +12,5 @@ SRCS= \
 	LFPulse.cpp Impulse.cpp Integrator.cpp Decay.cpp Decay2.cpp Lag.cpp \
 	Lag2.cpp Lag3.cpp LinExp.cpp DelayUnit.cpp DelayN.cpp DelayL.cpp \
 	DelayC.cpp CombN.cpp CombL.cpp CombC.cpp AllpassN.cpp AllpassL.cpp \
-	AllpassC.cpp PitchShift.cpp Resonz.cpp OnePole.cpp
+	AllpassC.cpp PitchShift.cpp Resonz.cpp OnePole.cpp OneZero.cpp \
+	TwoPole.cpp
