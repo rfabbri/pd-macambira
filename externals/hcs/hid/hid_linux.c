@@ -38,23 +38,39 @@
  */
 
 
-/* ============================================================================== */
+/* ------------------------------------------------------------------------------ */
 /* LINUX-SPECIFIC SUPPORT FUNCTIONS */
-/* ============================================================================== */
+/* ------------------------------------------------------------------------------ */
+
+void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
+{
+	if(linux_code >= 0x100) 
+	{
+		if(linux_code < BTN_MOUSE)   
+			sprintf(hid_code,"btn_%d",linux_code - BTN_MISC);  /* numbered buttons */
+		else if(linux_code < BTN_JOYSTICK)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_MOUSE);  /* mouse buttons */
+		else if(linux_code < BTN_GAMEPAD)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_JOYSTICK);  /* joystick buttons */
+		else if(linux_code < BTN_DIGI)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_GAMEPAD);  /* gamepad buttons */
+		else if(linux_code < BTN_WHEEL)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
+		else if(linux_code < KEY_OK)
+			sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
+	}
+}
+
 
 void hid_print_element_list(t_hid *x)
 {
 	unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
-	char devicename[256] = "Unknown";
+	char device_name[256] = "Unknown";
+	char dev_handle_name[20] = "/dev/input/event0";
 	t_int event_type, event_code;
 	char *event_type_name = "";
 	/* counts for various event types */
 	t_int synCount,keyCount,relCount,absCount,mscCount,ledCount,sndCount,repCount,ffCount,pwrCount,ff_statusCount;
-
-  /* get name of device */
-  ioctl(x->x_fd, EVIOCGNAME(sizeof(devicename)), devicename);
-  post ("\nConfiguring device %d as %s (%s)",
-		  x->x_device_number,devicename,device_name);
 
   /* get bitmask representing supported events (axes, keys, etc.) */
   memset(bitmask, 0, sizeof(bitmask));
@@ -111,7 +127,7 @@ void hid_print_element_list(t_hid *x)
 							 event_names[event_type] ? (event_names[event_type][event_code] ? event_names[event_type][event_code] : "?") : "?");
 				  }
 				  else
-					  post("  %s\t\t%s\t%s",
+					  post("  %s\t%s\t%s",
 							 ev[event_type] ? ev[event_type] : "?", 
 							 event_names[event_type] ? (event_names[event_type][event_code] ? event_names[event_type][event_code] : "?") : "?", 
 							 event_type_name);
@@ -162,16 +178,16 @@ void hid_print_device_list(void)
 {
 	int i,fd;
 	char device_output_string[256] = "Unknown";
-	char device_name[20] = "/dev/input/event0";
+	char dev_handle_name[20] = "/dev/input/event0";
 
 	post("");
 	for (i=0;i<128;++i) 
 	{
-		sprintf(device_name,"/dev/input/event%d",i);
-		if (device_name) 
+		sprintf(dev_handle_name,"/dev/input/event%d",i);
+		if (dev_handle_name) 
 		{
 			/* open the device read-only, non-exclusive */
-			fd = open (device_name, O_RDONLY | O_NONBLOCK);
+			fd = open (dev_handle_name, O_RDONLY | O_NONBLOCK);
 			/* test if device open */
 			if (fd < 0 ) 
 			{ 
@@ -181,7 +197,7 @@ void hid_print_device_list(void)
 			{
 				/* get name of device */
 				ioctl(fd, EVIOCGNAME(sizeof(device_output_string)), device_output_string);
-				post("Device %d: '%s' on '%s'", i, device_output_string, device_name);
+				post("Device %d: '%s' on '%s'", i, device_output_string, dev_handle_name);
 			  
 				close (fd);
 			}
@@ -190,28 +206,9 @@ void hid_print_device_list(void)
 	post("");	
 }
 
-void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
-{
-	if(linux_code >= 0x100) 
-	{
-		if(linux_code < BTN_MOUSE)   
-			sprintf(hid_code,"btn_%d",linux_code - BTN_MISC);  /* numbered buttons */
-		else if(linux_code < BTN_JOYSTICK)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_MOUSE);  /* mouse buttons */
-		else if(linux_code < BTN_GAMEPAD)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_JOYSTICK);  /* joystick buttons */
-		else if(linux_code < BTN_DIGI)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_GAMEPAD);  /* gamepad buttons */
-		else if(linux_code < BTN_WHEEL)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
-		else if(linux_code < KEY_OK)
-			sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
-	}
-}
-
-/* ============================================================================== */
+/* ------------------------------------------------------------------------------ */
 /* Pd [hid] FUNCTIONS */
-/* ============================================================================== */
+/* ------------------------------------------------------------------------------ */
 
 t_int hid_get_events(t_hid *x)
 {
@@ -265,6 +262,7 @@ t_int hid_get_events(t_hid *x)
 void hid_print(t_hid* x)
 {
 	hid_print_device_list();
+	hid_print_element_list(x);
 }
 
 
@@ -272,22 +270,23 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 {
 	DEBUG(post("hid_open_device"););
 
-	char device_name[20];
+	char device_name[256] = "Unknown";
+	char dev_handle_name[20] = "/dev/input/event0";
 	struct input_event hid_input_event;
 
 	x->x_fd = -1;
   
 	x->x_device_number = device_number;
-	sprintf(device_name,"/dev/input/event%d",x->x_device_number);
+	sprintf(dev_handle_name,"/dev/input/event%d",x->x_device_number);
 
-  if (device_name) 
+  if (dev_handle_name) 
   {
 	  /* open the device read-only, non-exclusive */
-	  x->x_fd = open(device_name, O_RDONLY | O_NONBLOCK);
+	  x->x_fd = open(dev_handle_name, O_RDONLY | O_NONBLOCK);
 	  /* test if device open */
 	  if (x->x_fd < 0 ) 
 	  { 
-		  error("[hid] open %s failed",device_name);
+		  error("[hid] open %s failed",dev_handle_name);
 		  x->x_fd = -1;
 		  return 1;
 	  }
@@ -297,6 +296,11 @@ t_int hid_open_device(t_hid *x, t_int device_number)
    * It seems that is just there to flush the input event queue
    */
   while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1);
+
+  /* get name of device */
+  ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
+  post ("[hid] opened device %d (%s): %s",
+		  x->x_device_number,dev_handle_name,device_name);
 
   return (0);
 }
