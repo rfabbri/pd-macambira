@@ -294,7 +294,8 @@ void fluid::m_signal(int n, float *const *in, float *const *out)
 	
 	float *left  = out[0];
 	float *right = out[1];
-	
+	left[0] = 1;
+	right[0] = 1;
 	fluid_synth_write_float(synth, n, left, 0, 1, right, 0, 1); 
 	
 }  // end m_signal
