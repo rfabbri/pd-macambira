@@ -40,7 +40,7 @@
 
 
 #include <flext.h>
-#define TBEXT_VERSION "0.02"
+#define TBEXT_VERSION "0.03"
 
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 400)
 #error upgrade your flext version!!!!!!
@@ -62,7 +62,9 @@ void ttbext_setup()
   FLEXT_DSP_SETUP(tbfft1);
   FLEXT_DSP_SETUP(tbfft2);
   FLEXT_DSP_SETUP(fftbuf);
-
+  FLEXT_DSP_SETUP(fftgrsort);
+  FLEXT_DSP_SETUP(fftgrshuf);
+  FLEXT_DSP_SETUP(fftgrrev);
 }
 
 FLEXT_LIB_SETUP(tbext,ttbext_setup)
