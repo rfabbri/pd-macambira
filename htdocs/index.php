@@ -47,8 +47,9 @@ still agree that your external becomes part of the repository, just <A
 HREF="mailto:geiger@xdv.org">send an email </A> with the information how to
 download your code.</p>
 
-<p>Another drawback is that your code has to be GPL'd. If this is a problem for
-you, let <a href="mailto:pd-dev@iem.kug.ac.at">us</a> know.</p>
+<p>A lot of the externals here are currently GPL'd, but the only requirement we have is, that
+you code has an Open Source license. 
+</p>
 
 <br>
 <br>
