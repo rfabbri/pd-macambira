@@ -59,7 +59,7 @@ extern "C"
     void pdp_imgsaver_setup(void);
     void pdp_cache_setup(void);
     void pdp_canvas_setup(void);
-    void pdp_xcanvas_setup(void);
+    // void pdp_xcanvas_setup(void);
     void pdp_pen_setup(void);
     void pdp_shape_setup(void);
 
@@ -120,7 +120,7 @@ void pidip_setup(void){
     pdp_imgsaver_setup();
     pdp_cache_setup();
     pdp_canvas_setup();
-    pdp_xcanvas_setup();
+    // pdp_xcanvas_setup();
     pdp_pen_setup();
     pdp_shape_setup();
 
