@@ -546,7 +546,7 @@ EXTERN void word_restore(t_word *wp, t_template *tmpl,
     int argc, t_atom *argv);
 EXTERN t_scalar *scalar_new(t_glist *owner,
     t_symbol *templatesym);
-EXTERN void word_free(t_word *wp, t_template *template);
+EXTERN void word_free(t_word *wp, t_template *tmpl);
 EXTERN void scalar_getbasexy(t_scalar *x, float *basex, float *basey);
 
 /* ------helper routines for "garrays" and "plots" -------------- */
