@@ -2,7 +2,7 @@
 
 pool - hierarchical storage object for PD and Max/MSP
 
-Copyright (c) 2002-2004 Thomas Grill
+Copyright (c) 2002-2005 Thomas Grill
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -32,92 +32,6 @@ pooldata::~pooldata()
 
 const A pooldata::nullatom = { A_NULL };
 
-/*
-V pooldata::Reset()
-{
-	root.Reset();
-}
-
-BL pooldata::MkDir(const AtomList &d,I vcnt,I dcnt)
-{
-	root.AddDir(d,vcnt,dcnt);
-	return true;
-}
-
-
-BL pooldata::ChkDir(const AtomList &d)
-{
-	return root.GetDir(d) != NULL;
-}
-
-BL pooldata::RmDir(const AtomList &d)
-{
-	return root.DelDir(d);
-}
-
-BL pooldata::Set(const AtomList &d,const A &key,AtomList *data,BL over)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->SetVal(key,data,over);
-	return true;
-}
-
-BL pooldata::Clr(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->ClrVal(key);
-	return true;
-}
-
-V pooldata::Clri(const AtomList &d,I ix)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->ClrVali(ix);
-	return true;
-}
-
-BL pooldata::ClrAll(const AtomList &d,BL rec,BL dironly)
-{
-	pooldir *pd = root.GetDir(d);
-	if(!pd) return false;
-	pd->Clear(rec,dironly);
-	return true;
-}
-
-flext::AtomList *pooldata::Peek(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->PeekVal(key):NULL;
-}
-
-poolval *pooldata::Ref(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->RefVal(key):NULL;
-}
-
-poolval *pooldata::Refi(const AtomList &d,I ix)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->RefVali(ix):NULL;
-}
-
-flext::AtomList *pooldata::Get(const AtomList &d,const A &key)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->GetVal(key):NULL;
-}
-
-I pooldata::CntAll(const AtomList &d)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->CntAll():0;
-}
-*/
-
 I pooldata::GetAll(const AtomList &d,A *&keys,AtomList *&lst)
 {
 	pooldir *pd = root.GetDir(d);
@@ -137,14 +51,6 @@ I pooldata::PrintAll(const AtomList &d)
     strcat(tmp," , ");
 	return pd?pd->PrintAll(tmp,sizeof tmp):0;
 }
-
-/*
-I pooldata::CntSub(const AtomList &d)
-{
-	pooldir *pd = root.GetDir(d);
-	return pd?pd->CntSub():0;
-}
-*/
 
 I pooldata::GetSub(const AtomList &d,const t_atom **&dirs)
 {
@@ -199,10 +105,10 @@ pooldir *pooldata::CopyAll(const AtomList &d,I depth,BL cut)
 }
 
 
-static const C *CnvFlnm(C *dst,const C *src,I sz)
+static const char *CnvFlnm(char *dst,const char *src,int sz)
 {
 #if FLEXT_SYS == FLEXT_SYS_PD && FLEXT_OS == FLEXT_OS_WIN
-	I i,cnt = strlen(src);
+	int i,cnt = strlen(src);
 	if(cnt >= sz-1) return NULL;
 	for(i = 0; i < cnt; ++i)
 		dst[i] = src[i] != '/'?src[i]:'\\';
@@ -213,15 +119,15 @@ static const C *CnvFlnm(C *dst,const C *src,I sz)
 #endif
 }
 
-BL pooldata::LdDir(const AtomList &d,const C *flnm,I depth,BL mkdir)
+bool pooldata::LdDir(const AtomList &d,const char *flnm,int depth,bool mkdir)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd) {
-		C tmp[1024];
-		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
+		char tmp[1024];
+		const char *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
-			ifstream fl(t);
-			return fl.good() && pd->LdDir(fl,depth,mkdir);
+			ifstream file(t);
+			return file.good() && pd->LdDir(file,depth,mkdir);
 		}
 		else return false;
 	}
@@ -236,10 +142,10 @@ BL pooldata::SvDir(const AtomList &d,const C *flnm,I depth,BL absdir)
 		C tmp[1024];
 		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
-			ofstream fl(t);
+			ofstream file(t);
 			AtomList tmp;
 			if(absdir) tmp = d;
-			return fl.good() && pd->SvDir(fl,depth,tmp);
+			return file.good() && pd->SvDir(file,depth,tmp);
 		}
 		else return false;
 	}
@@ -254,10 +160,10 @@ BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
 		C tmp[1024];
 		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
-			ifstream fl(t);
-            BL ret = fl.good() != 0;
+			ifstream file(t);
+            BL ret = file.good() != 0;
             if(ret) {
-                fl.getline(tmp,sizeof tmp);
+                file.getline(tmp,sizeof tmp);
                 ret = !strncmp(tmp,"<?xml",5);
             }
 /*
@@ -268,7 +174,7 @@ BL pooldata::LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir)
             }
 */
             if(ret)
-                ret = pd->LdDirXML(fl,depth,mkdir);
+                ret = pd->LdDirXML(file,depth,mkdir);
             return ret;
 		}
 	}
@@ -283,15 +189,15 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 		C tmp[1024];
 		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
-			ofstream fl(t);
+			ofstream file(t);
 			AtomList tmp;
 			if(absdir) tmp = d;
-            if(fl.good()) {
-                fl << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;
-                fl << "<!DOCTYPE pool SYSTEM \"http://www.parasitaere-kapazitaeten.net/ext/pool/pool-0.2.dtd\">" << endl;
-                fl << "<pool>" << endl;
-                BL ret = pd->SvDirXML(fl,depth,tmp);
-                fl << "</pool>" << endl;
+            if(file.good()) {
+                file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;
+                file << "<!DOCTYPE pool SYSTEM \"http://grrrr.org/ext/pool/pool-0.2.dtd\">" << endl;
+                file << "<pool>" << endl;
+                BL ret = pd->SvDirXML(file,depth,tmp);
+                file << "</pool>" << endl;
                 return ret;
             }
 		}

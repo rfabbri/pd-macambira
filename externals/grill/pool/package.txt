@@ -1,9 +1,5 @@
 NAME=pool
 
-BUILDCLASS=ext
-BUILDMODE=release
-BUILDTYPE=single
-
 SRCDIR=source
 PRECOMPILE=pool.h
 
