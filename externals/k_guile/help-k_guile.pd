@@ -1,4 +1,4 @@
-#N canvas 372 11 707 547 10;
+#N canvas 481 303 707 547 10;
 #X obj 101 135 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
 -262144 -1 -1 0 256;
 #X obj 101 162 k_guile add.scm;
@@ -43,6 +43,15 @@ outlets by sending reload .;
 #X msg 409 95 we 3 2;
 #X msg 512 286 eval (newline);
 #X msg 512 309 eval (display(environ));
+#X obj 65 487 k_guile any.scm;
+#X msg 25 448 reload;
+#X obj 193 448 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X msg 149 446 gakk;
+#X obj 261 446 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 289 447 list 2 3 4;
+#X msg 90 446 we 3 2;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 3 0 1 1;
@@ -66,3 +75,9 @@ outlets by sending reload .;
 #X connect 29 0 7 0;
 #X connect 30 0 24 0;
 #X connect 31 0 24 0;
+#X connect 33 0 32 0;
+#X connect 34 0 32 0;
+#X connect 35 0 32 0;
+#X connect 36 0 32 0;
+#X connect 37 0 32 0;
+#X connect 38 0 32 0;

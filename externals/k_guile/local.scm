@@ -56,6 +56,7 @@
 ;;
 ;;
 (define pd-inlet-vector (make-vector 1 '()))
+(define pd-inlet-anyvector (make-vector 1 '()))
 
 (define (pd-set-inlet-func)
   (pd-c-set-inlet-func pd-instance
@@ -64,6 +65,11 @@
 			 (let ((inlet-func (assq symbol 
 						 (vector-ref pd-inlet-vector
 							     inlet-num))))
+			   (if (not inlet-func)
+			       (begin
+				 (set! inlet-func (assq 'any
+							(vector-ref pd-inlet-vector inlet-num)))
+				 (set! args (cons symbol args))))
 			   (if inlet-func
 			       (apply (cadr inlet-func) args)
 			       (pd-display "No function defined for handling \'" symbol " to inlet " inlet-num))))))
@@ -73,7 +79,10 @@
       (pd-display "Wrong argument to pd-inlet: " func " is not a procedure")
       (if (and (pd-check-number inlet-num "pd-inlet")
 	       (pd-legalinlet inlet-num))
-	  (let ((inlet-funcs (vector-ref pd-inlet-vector inlet-num)))
+	  (let ((inlet-funcs (vector-ref (if (eq? symbol 'any)
+					     pd-inlet-anyvector
+					     pd-inlet-vector)
+					 inlet-num)))
 	    (vector-set! pd-inlet-vector 
 			 inlet-num
 			 (cons (list symbol func)
