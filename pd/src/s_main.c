@@ -7,7 +7,7 @@
  * 1311:forum::für::umläute:2001
  */
 
-char pd_version[] = "Pd version 0.38 TEST9\n";
+char pd_version[] = "Pd version 0.38 TEST10\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -765,6 +765,7 @@ int sys_argparse(int argc, char **argv)
         else if (!strcmp(*argv, "-stderr"))
         {
             sys_printtostderr = 1;
+            fprintf(stderr, "set it\n");
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-guicmd") && argc > 1)

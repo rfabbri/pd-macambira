@@ -10,14 +10,14 @@ GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
 MANDIR = ${prefix}/man
 
-MORECFLAGS = -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portaudio/portmidi-macosx 	-fno-strict-aliasing
+MORECFLAGS = -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portaudio/portmidi-macosx 	-fno-strict-aliasing -DPA_USE_ALSA -DUSEAPI_ALSA
 
 INCLUDE = -I.
 GINCLUDE = $(INCLUDE) 
 GLIB = -ltk8.4 -ltcl8.4  -lX11 -L/usr/X11R6/lib -lrt
 
-LDFLAGS = -Wl,-export-dynamic
-LIB =   -ldl -lpthread
+LDFLAGS = -Wl,-export-dynamic -lasound
+LIB =   -ldl -lpthread -lasound
 
 OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
 WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
@@ -28,7 +28,7 @@ CFLAGS = -Werror $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 
-SYSSRC += s_midi_oss.c s_audio_oss.c
+SYSSRC += s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \

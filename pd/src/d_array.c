@@ -792,6 +792,7 @@ typedef struct _tabreceive
 {
     t_object x_obj;
     float *x_vec;
+    int x_vecsize;
     t_symbol *x_arrayname;
 } t_tabreceive;
 
@@ -801,7 +802,15 @@ static t_int *tabreceive_perform(t_int *w)
     t_float *out = (t_float *)(w[2]);
     int n = w[3];
     t_float *from = x->x_vec;
-    if (from) while (n--) *out++ = *from++;
+    if (from)
+    {
+        int vecsize = x->x_vecsize;
+        while (vecsize--)
+            *out++ = *from++;
+        vecsize = n - x->x_vecsize;
+        while (vecsize--)
+            *out++ = 0;
+    }
     else while (n--) *out++ = 0;
     return (w+4);
 }
@@ -809,21 +818,19 @@ static t_int *tabreceive_perform(t_int *w)
 static void tabreceive_dsp(t_tabreceive *x, t_signal **sp)
 {
     t_garray *a;
-    int vecsize;
-    
     if (!(a = (t_garray *)pd_findbyclass(x->x_arrayname, garray_class)))
     {
         if (*x->x_arrayname->s_name)
             pd_error(x, "tabsend~: %s: no such array", x->x_arrayname->s_name);
     }
-    else if (!garray_getfloatarray(a, &vecsize, &x->x_vec))
+    else if (!garray_getfloatarray(a, &x->x_vecsize, &x->x_vec))
         pd_error(x, "%s: bad template for tabreceive~", x->x_arrayname->s_name);
     else 
     {
-        int n = sp[0]->s_n;
-        if (n < vecsize) vecsize = n;
+        if (x->x_vecsize > sp[0]->s_n)
+            x->x_vecsize = sp[0]->s_n;
         garray_usedindsp(a);
-        dsp_add(tabreceive_perform, 3, x, sp[0]->s_vec, vecsize);
+        dsp_add(tabreceive_perform, 3, x, sp[0]->s_vec, sp[0]->s_n);
     }
 }
 

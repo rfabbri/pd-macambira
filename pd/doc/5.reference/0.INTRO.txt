@@ -82,8 +82,10 @@ dac~ -      audio output
 adc~ -      audio input
 sig~ -      convert numbers to audio signals
 line~ -     generate audio ramps
+vline~ -    deluxe line~
 threshold~  detect signal thresholds
 snapshot~ - sample a signal (convert it back to a number)
+vsnapshot~  deluxe snapshot~
 bang~ -     send a bang message after each DSP block
 samplerate~ get the sample rate
 send~ -     nonlocal signal connection with fanout
@@ -102,6 +104,7 @@ tabwrite~ - write to a table
 tabplay~ -  play back from a table (non-transposing)
 tabread~ -  non-interpolating table read
 tabread4~ - four-point interpolating table read
+tabosc4~ -  wavetable oscillator
 tabsend~ -  write one block continuously to a table
 tabreceive~ read one block continuously from a table
 -------------------- AUDIO FILTERS ------------------------
@@ -114,17 +117,22 @@ bp~ -       band pass filter
 biquad~ -   raw filter
 samphold~ - sample and hold unit
 print~ -    print out one or more "blocks"
+rpole~ -    raw real-valued one-pole filter
+rzero~ -    raw real-valued one-zero filter
+rzero_rev~  rzero~, time-reversed
+cpole~, czero~, czero_rev - corresponding complex-valued filters
 -------------------- AUDIO DELAY ------------------------
 delwrite~ - write to a delay line
 delread~ -  read from a delay line
 vd~ -       read from a delay line at a variable delay time
 ------------------------------ SUBWINDOWS ----------------------------------
 pd -      define a subwindow
+table -   array of numbers in a subwindow
 inlet -   add an inlet to a pd
 outlet -  add an outlet to a pd
-table -   array of numbers in a subwindow
+inlet~, outlet~ - signal versions of inlet, outlet
 ------------------------------ DATA TEMPLATES -----------------------------
-template - define the fields in a template
+struct -     define a data structure
 drawcurve, filledcurve - draw a curve
 drawpolygon, filledpolygon - draw a polygon
 plot -       plot an array field
@@ -142,3 +150,4 @@ scalar -  draw a scalar on parent
 ------------------------------ OBSOLETE ----------------------------
 scope~ (use tabwrite~ now)
 namecanvas
+template (use struct now)

@@ -3,13 +3,10 @@
 # set pd_nt (bad name) 0 for unix, 1 for microsoft, and 2 for Mac OSX.
 if { $tcl_platform(platform) == "windows" }  {
          set pd_nt 1
-         puts stderr {Configuring for Windows}
 } elseif { $tcl_platform(os) == "Darwin" } {  
          set pd_nt 2
-         puts stderr {Configuring for MacOS X}
 } else { 
          set pd_nt 0
-         puts stderr {Configuring for UNIX}
 }        
 
 # Copyright (c) 1997-1999 Miller Puckette.
@@ -969,10 +966,20 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Button> {pdtk_canvas_click %W %x %y %b 0}
     bind $name.c <Shift-Button> {pdtk_canvas_click %W %x %y %b 1}
     bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
-    bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
-    bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
-    bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
-    bind $name.c <Alt-Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 7}
+    # Alt key is called Option on the Mac
+    if {$pd_nt == 2} {
+    	bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
+    	bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+    	bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+    	bind $name.c <Option-Control-Shift-Button> \
+	    {pdtk_canvas_click %W %x %y %b 7}
+    } else {
+    	bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
+    	bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+    	bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+    	bind $name.c <Alt-Control-Shift-Button> \
+	    {pdtk_canvas_click %W %x %y %b 7}
+    }
     global pd_nt
 # button 2 is the right button on Mac; on other platforms it's button 3.
     if {$pd_nt == 2} {
@@ -993,7 +1000,11 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
     bind $name.c <Control-Key> {pdtk_canvas_ctrlkey %W %K 0}
     bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
-    bind $name.c <Alt-Key> {pdtk_canvas_altkey %W %K %A}
+    if {$pd_nt == 2} {
+    	bind $name.c <Option-Key> {pdtk_canvas_altkey %W %K %A}
+    } else {
+    	bind $name.c <Alt-Key> {pdtk_canvas_altkey %W %K %A}
+    }
 #    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
     if {$pd_nt == 2} {
 	bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
@@ -1003,7 +1014,11 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
     bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
     bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
-    bind $name.c <Alt-Motion> {pdtk_canvas_motion %W %x %y 4}
+    if {$pd_nt == 2} {
+        bind $name.c <Option-Motion> {pdtk_canvas_motion %W %x %y 4}
+    } else { 
+        bind $name.c <Alt-Motion> {pdtk_canvas_motion %W %x %y 4}
+    }   
     bind $name.c <Map> {pdtk_canvas_map %W}
     bind $name.c <Unmap> {pdtk_canvas_unmap %W}
     focus $name.c
