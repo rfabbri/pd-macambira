@@ -1,0 +1,35 @@
+#N struct help-drawnumber-template float x float y float cat float
+dog;
+#N canvas 369 6 538 189 12;
+#X text 15 103 see also:;
+#X obj 18 7 drawnumber;
+#X obj 204 132 plot;
+#X obj 100 131 drawpolygon;
+#X obj 22 130 template;
+#X text 114 7 -- draw numeric fields from data structures;
+#N canvas 14 10 297 129 help-drawnumber-data 1;
+#X scalar help-drawnumber-template 50 100 23 43 \;;
+#X scalar help-drawnumber-template 150 50 3.14 -1.618 \;;
+#X restore 273 71 pd help-drawnumber-data;
+#N canvas 57 283 580 439 help-drawnumber-template 1;
+#X text 24 316 This object defines the fields for this template. Their
+values are initialized in the "works" subwindow. You can see them by
+right-clicking on the object in the "data" window and selecting "properties."
+;
+#X text 44 104 - RGB color (0=black \, 999=white \, 900=red \, 90=green
+\, 9=blue \, 555=grey \, etc.);
+#X obj 11 294 template float x float y float cat float dog;
+#X text 22 166 Any of these can be numbers or field names \, like "dog"
+and "cat" here.;
+#X text 22 202 When not in "edit" mode \, you can click and drag vertically
+on the numbers to change their values. (In edit mode you can move \,
+cut \, copy \, and paste the objects.);
+#X text 24 251 Keyboard entry isn't supported yet.;
+#X obj 24 15 drawnumber cat 0 0 0 cat=;
+#X obj 259 16 drawnumber dog 0 -15 900 dog=;
+#X text 44 136 - an optional label ("cat=" for instance);
+#X text 26 44 drawnumber takes arguments specifying:;
+#X text 44 84 - an (x \, y) pair giving relative coordinates \;;
+#X text 44 64 - the number to draw;
+#X restore 273 45 pd help-drawnumber-template;
+#X text 275 159 updated for Pd version 0.35;

@@ -1,0 +1,43 @@
+This is the second of three tutorial series on Pd. The first one shows how to
+use Pd to do "control" computations.  This one shows the time-domain audio
+processing features.
+
+Here is an approximate table of contents...
+
+1. sinusoids
+    oscillators
+    amplitudes
+    frequency and pitch
+    FM
+
+2. wavetable synthesis
+
+3. synthetic waveforms, classic and modern
+    pulses
+    rectangles and sawtooth waves
+    additive synthesis
+
+4. sampling
+
+5. envelopes
+    two flavors of ADSR envelope
+    log/linear conversion
+
+6. control structures
+    analog-style sequencing
+    monophonic keyboard synthesizer
+    sample and hold
+    envelope following
+
+7. processing
+    filters
+    modulation
+    delays
+
+8. formant synthesis
+
+9. strategies
+    quartic curves in envelopes
+    triggering notes from qlists
+    order of execution and block size
+    

@@ -1,0 +1,14 @@
+#N canvas 163 135 216 211 10;
+#X obj 112 91 inlet;
+#X obj 54 93 inlet~;
+#X obj 55 117 *~;
+#X obj 54 142 outlet~;
+#X text 54 76 audio in;
+#X text 49 173 audio out;
+#X text 117 59 modulation;
+#X text 117 72 frequency;
+#X obj 112 112 osc~;
+#X connect 0 0 8 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 8 0 2 1;

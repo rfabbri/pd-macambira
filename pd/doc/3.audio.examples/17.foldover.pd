@@ -1,0 +1,112 @@
+#N canvas 17 89 590 637 12;
+#X graph graph1 0 -1.02 130 1.02 295 415 553 285;
+#X array table17 131 float 1;
+#A 0 -0.399997 0 0.399997 0.107489 0.0789648 0.218247 0.115563 0.169861
+0.178655 0.138352 0.235708 0.164533 0.125264 0.214359 0.169042 0.134156
+0.0997789 0.118172 0.270954 0.293566 0.289833 0.12888 -0.215992 -0.0145419
+0.203984 -0.159792 -0.11901 0.135321 -0.0665301 -0.0776689 0.0247374
+-0.0222149 0.0755675 4.97363e-06 -0.049046 0.232851 0.2132 -0.0357245
+-0.101696 -0.125624 -0.0530428 0.0608632 0.111596 0.0910138 -0.0326553
+0.100844 0.22303 -0.0649953 0.00678476 0.247437 -0.0319972 -0.064833
+0.141408 0.00354245 -0.0891558 -0.227284 -0.293046 0.100474 0.173878
+-0.071401 0.0482414 0.0773852 -0.0590095 0.00509727 0.0421473 2.40106e-06
+-0.0421444 -0.00510817 0.0590137 -0.0773699 -0.0482621 0.0714097 -0.173852
+-0.100516 0.293024 0.227308 0.0891607 -0.0035225 -0.141411 0.0648073
+0.0320313 -0.247433 -0.00682219 0.0650219 -0.223015 -0.100872 0.0326609
+-0.0910026 -0.1116 -0.0608712 0.0530287 0.125624 0.101698 0.035742
+-0.213174 -0.232876 0.0490274 1.49209e-05 -0.0755759 0.0222125 -0.024735
+0.0776516 0.066554 -0.135321 0.118972 0.159827 -0.203967 0.0144949
+0.216008 -0.128842 -0.289832 -0.293563 -0.270967 -0.118185 -0.0997734
+-0.134155 -0.169034 -0.214362 -0.125272 -0.164519 -0.235713 -0.138359
+-0.178646 -0.169872 -0.115556 -0.218244 -0.0789868 -0.107456 -0.399993
+-7.20319e-05 0.4;
+#X pop;
+#X floatatom 73 385 0 0 100;
+#N canvas 159 26 532 285 output 0;
+#X obj 338 160 t b;
+#X obj 338 110 f;
+#X obj 338 60 inlet;
+#X text 344 29 mute;
+#X obj 338 185 f;
+#X msg 426 180 0;
+#X msg 338 85 bang;
+#X obj 338 135 moses 1;
+#X obj 397 110 moses 1;
+#X obj 83 148 dbtorms;
+#X obj 397 85 r master-lvl;
+#X obj 83 42 r master-lvl;
+#X obj 338 210 s master-lvl;
+#X obj 20 182 inlet~;
+#X obj 199 41 inlet;
+#X text 199 18 level;
+#X obj 199 105 s master-lvl;
+#X msg 96 65 set \$1;
+#X obj 96 90 outlet;
+#X msg 214 65 \; pd dsp 1;
+#X obj 83 198 line~;
+#X obj 20 207 *~;
+#X obj 20 232 dac~;
+#X obj 83 173 pack 0 50;
+#X text 20 159 audio;
+#X text 96 114 show level;
+#X obj 426 155 t b;
+#X connect 0 0 4 0;
+#X connect 1 0 7 0;
+#X connect 2 0 6 0;
+#X connect 4 0 12 0;
+#X connect 5 0 12 0;
+#X connect 6 0 1 0;
+#X connect 7 0 0 0;
+#X connect 7 1 26 0;
+#X connect 8 1 4 1;
+#X connect 9 0 23 0;
+#X connect 10 0 1 1;
+#X connect 10 0 8 0;
+#X connect 11 0 9 0;
+#X connect 11 0 17 0;
+#X connect 13 0 21 0;
+#X connect 14 0 16 0;
+#X connect 14 0 19 0;
+#X connect 17 0 18 0;
+#X connect 20 0 21 1;
+#X connect 21 0 22 0;
+#X connect 21 0 22 1;
+#X connect 23 0 20 0;
+#X connect 26 0 5 0;
+#X restore 35 413 pd output;
+#X msg 111 386 MUTE;
+#X text 343 617 updated for Pd version 0.34;
+#X msg 310 531 \; table17 const 0;
+#X text 362 513 CLEAR;
+#X obj 35 356 tabosc4~ table17;
+#X obj 35 329 line~;
+#X text 229 3 FOLDOVER;
+#X msg 28 532 \; table17 const 0 \, 0 1 1 1 1 1;
+#X msg 28 443 \; table17 sinesum 128 1 1 1 1 0 0 0 0 1 0 0 0 0 0 0
+1 0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 1 \, normalize
+0.4;
+#X msg 35 278 500 \, 1423 4000;
+#X text 26 26 WARNING: THIS IS REALLY OBNOXIOUS--TURN YOUR AMP DOWN!
+;
+#X floatatom 43 303 5 0 0;
+#X text 25 125 Foldover occurs when you synthesize frequencies greater
+than the Nyquist frequency (half the sample rate). In this example
+\, the fundamental only reaches 1423 \, but the tables contain high
+partials. As the partials sweep upward you hear them reflect off the
+Nyquist frequency. Also \, partials can come into contact with each
+other causing beating. The value of 1423 was chosen to make the beating
+effect especially strong \, but it's clearly audible even for a 440-Hz.
+sawtooth wave \, for example.;
+#X text 25 58 Use this patch sparingly... it's probably bad for your
+ears. Don't amuse yourself by playing this as part of your club act
+unless you want your country's health department to inquire.;
+#X text 16 572 Synthesis techniques vary in their tendency to make
+foldover. For higher pitched sounds you'll want to try out relatively
+folvover-resistant ones.;
+#X connect 1 0 2 1;
+#X connect 2 0 1 0;
+#X connect 3 0 2 2;
+#X connect 7 0 2 0;
+#X connect 8 0 7 0;
+#X connect 12 0 8 0;
+#X connect 14 0 8 0;

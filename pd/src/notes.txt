@@ -1,0 +1,264 @@
+---------------- dolist --------------------
+++portno wierdness in gcc 3 worked around (Burton)
+non-power-of-2 channel counts in ASIO (Olaf Matthes)
+Bug, David McCallum, Jul. 13 -- find last error crashes
+
+
+last-minute bug fixes:
+add flag to select MIDI open to use select()?
+check top-of-window problem in OSX
+denormal protection
+
+doc:
+fix readme file and recopy to web page (add to README in dist instructions)
+
+problems:
+don't draw in/outlets on gui objects in graphs
+Alsa degradation after several hours running on soundblaster
+font size should depend on subpatch/abstraction
+moving a bang toward top of window creates problem
+figure out O_NDELAY for linux audio?
+missed Thomas's multi-dialog trick???
+fix iemguis not to bash symbol names
+check what happens when going back and forth between graph-on-parent
+deal with spaces in iemgui labels and send/receive names
+David McCallum, table crashes in 98?
+font hack (pix@test.at, 30 Nov 2001
+    perl -pi -e 's/-[*%a-z0-9-]*\*[*%a-z0-9-]*/fixed/' u_main.tk
+get rid of messages causing renaming; try to prevent patches closing themselves.
+Krzysztof's qlist_next reentrancy bug
+dac~/ adc~/ block~ incompatibility
+is ALSA really checking /proc!?
+scofo reports error on reading score1.txt
+data copy/paste doesn't check templates aren't changed
+rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
+soundfile writing gets wrong sample rate; see /* lie */ in d_soundfile.c
+
+data:
+vget, vset traversal objects
+cursor to show (x, y) location
+better hit detection (getrect is too greedy)
+click on points of plot
+typing at drawnumbers
+fix templates to be loaded on demand and belong to a globally known patch
+test and debug list elements of templates
+sublists should display on parent if desired?
+sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
+scalar hook to catch the mouse
+protect against "plots" going away while you drag on them
+
+features:
+Pd to open html help on windows/mac
+flag to hide array names 
+??? have a way to disambiguate externs from different libs???
+put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
+if there's just one array, don't do stringent hit check.
+netsend separate thread
+netreceive (and netsend?) message to set port number
+delete-in-rectangle message to Pds
+pasting should look at current mouse location
+"regular" numbers/symbols to do send/receive thing ala IEMGUI
+make selecting text grab keyboard focus
+think about x and y scale preservation when changing between graph and object
+show outlines of objects even when graph is "open"
+make graph labels persistent and add to dialog
+array click protection (Krzysztof's suggestion)
+Pd support for jack audio system: http://home.t-online.de/home/pdq808/jack-patch
+offer audiooutdev 1,3 feature on Windows
+Alsa in data late should carefuly reset DAC/ADC fill&empty pointers
+increase MIDIQSIZE to at least 1024 in s_unix.c
+add nonblock to linux open calls instead of using alarm
+make a hook so objects can specify help windows to open (for scheme object)
+graph_vis() to decorate graphs when they're toplevel (parent_glist == 0)
+get graphs to expand to hold their contents
+writing FLOAT wav files
+make "table" rescalable vertically
+-compat34 flag to save files so that 0.34 can read them
+suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html -- MIDI file reader
+in glist_delete, consider why this can't be just "vis 0" -- why do we need it?
+abstraction auto-reload
+closebang
+switching between dac and gettimeofday timing on dsp_start/stop
+check that -blocksize really reflects in audiobuf calc for Hammerfall
+-version to print version and exit; usage() also to print version
+NT and OSX: opening HTML files?
+message to change block~ sizes dynamically
+MIDI file reading/writing?
+makefile to have make install depend on make local.
+borrow arrow keys from IEMLIB
+pd messages to close and reopen sound driver
+Float method for random
+figure out list, message objects
+separate control over alsaindev and alsaoutdev
+pd -version
+make "import"/export use IEMLIB objects
+object to get/set table size; random; quantile
+put in something for tilde order forcing
+extensible "toolbar" so people can add external GUI objects
+text cut and paste; see XStoreBytes
+new objects: nexttick~, extend threshold~ and snapshot~
+allow spaces in paths
+gem: try XSetBorderWidth, XMoveWindow, xcopyarea (/usr/share/doc/XF*)
+dialog for audio and MIDI settings
+prepend help to help filenames and add help search path
+read/writesf~ for NT
+variable send and receive -- check how max/MSP does it?
+number boxes to darken for typing and/or received messages
+delayed updates
+invisible toplevels
+dialog to change lib flag and path
+fastedit moves
+pique~ and fiddle~ unification (notice pique filtering is different!)
+new message box look
+figure out what to do when "pd sym" conflicts with window title as in Pluton?
+
+
+LATER
+Hammerfall adapt to ALSA
++~ 0 faster than +~ -- detect scalar input; also, order forcing inputs
+bonk~ file path handling
+unify arrays and garrays
+dialog to give values of $1, ... for the canvas
+bang at end of line~, tabwrite~, etc.
+recording to part of a table
+printout to main window
+should sys_bail kill all "threads" on the way out?
+check a_valid usage
+allow backslashes (or else really disallow them)
+icon & desktop integration
+vreadsf~
+benchmarking
+flash menu when accelerator hits?
+fix edit mode menu item
+"undo"
+fancier text editing
+tools (reassigns meaning of primary click)
+get gui to notice early EOF
+rewrite t_getbytes properly
+obj_new should do a longjmp on out-of-memory
+
+--------------------- source notes --------------------------
+
+0.  structure definition roadmap.  First, the containment tree of things
+that can be sent messages ("pure data").  (note that t_object and t_text,
+and t_graph and t_canvas, should be unified...)
+
+------------ BFFORE 0.35: ---------
+m_pd.h	    t_pd    	    	    anything with a class
+    	    	t_gobj	    	    "graphic object"
+    	    	    t_text  	    text object
+g_canvas.h  
+    	    	    t_glist 	    list of graphic objects
+g_canvas.c  	    	t_canvas    Pd "document"
+
+------------ AFTER 0.35: ---------
+m_pd.h	    t_pd    	    	    anything with a class
+    	    	t_gobj	    	    "graphic object"
+    	    	    t_text  	    patchable object, AKA t_object
+g_canvas.h     	    	t_glist     list of graphic objects, AKA t_canvas
+
+... and other structures:
+g_canvas.h  t_selection -- linked list of gobjs
+    	    t_editor -- editor state, allocated for visible glists
+m_imp.h     t_methodentry -- method handler
+    	    t_widgetbehavior -- class-dependent editing behavior for gobjs
+    	    t_parentwidgetbehavior -- objects' behavior on parent window
+    	    t_class -- method definitions, instance size, flags, etc.
+
+
+1.  C coding style.  The source should pass most "warnings" of C compilers
+(-Wall on linux, for instance; see the makefile.)  Some informalities
+are intentional, for instance the loose use of function prototypes (see
+below) and uncast conversions from longer to shorter numerical formats.
+The code doesn't respect "const" yet.
+
+1.1.  Prefixes in structure elements.  The names of structure elements always
+have a K&R-style prefix, as in ((t_atom)x)->a_type, where the "a_" prefix
+indicates "atom."  This is intended to enhance readability (although the
+convention arose from a limitation of early C compilers.)  Common prefixes are
+"w_" (word), "a_" (atom), "s_" (symbol), "ob_" (object), "te_" (text object),
+"g_" (graphical object), and "gl_" (glist, a list of graphical objects).  Also,
+global symbols sometimes get prefixes, as in "s_float" (the symbol whose string
+is "float).  Typedefs are prefixed by "t_".  Most _private_ structures, i.e.,
+structures whose definitions appear in a ".c" file, are prefixed by "x_".
+
+1.2.   Function arguments.  Many functions take as their first
+argument a pointer named "x", which is a pointer to a structure suggested
+by the function prefix; e.g., canvas_dirty(x, n) where "x" points to a canvas
+(t_canvas *x).
+
+1.3.  Function Prototypes.  Functions which are used in at least two different
+files (besides where they originate) are prototyped in the appropriate include
+file. Functions which are provided in one file and used in one other are
+prototyped right where they are used.  This is just to keep the size of the
+".h" files down for readability's sake.
+
+1.4.  Whacko private terminology.  Some terms are lifted from other historically
+relevant programs, notably "ugen" (which is just a tilde object; see d_ugen.c.)
+
+1.5.  Spacing.  Tabs are 8 spaces; indentation is 4 spaces.  Indenting
+curly brackets are by themselves on their own lines, as in:
+
+    if (x)
+    {
+	x = 0;
+    }
+
+Lines should fit within 80 spaces.
+
+2.  Max patch-level compatibility.  "Import" and "Export" functions are
+provided which aspire to strict compatibility with 0.26 patches (ISPW version),
+but which don't get anywhere close to that yet.  Where possible, features
+appearing on the Mac will comeday also be provided; for instance, the connect
+message on the Mac offers segmented patch cords; these will devolve into
+straight lines in Pd.  Many, many UI objects in Opcode Max will not appear in
+Pd, at least at first.
+
+3.  Compatibility with Max 0.26 "externs", i.e., source-level compatibility. Pd
+objects follow the style of 0.26 objects as closely as possible, making
+exceptions in cases where the 0.26 model is clearly deficient.  These are:
+
+3.1.  Anything involving the MacIntosh "Handle" data type is changed to use
+char * or void * instead.
+
+3.2.  Pd passes true single-precision floating-point arguments to methods;
+Max uses double.
+Typedefs are provided:
+    t_floatarg, t_intarg for arguments passed by the message system
+    t_float, t_int for the "word" union (in atoms, for example.)
+
+3.3.  Badly-named entities got name changes:
+
+    w_long --> w_int (in the "union word" structure)
+
+3.4.  Many library functions are renamed and have different arguments;
+I hope to provide an include file to alias them when compiling Max externs.
+
+4.  Function name prefixes.
+Many function names have prefixes which indicate what "package" they belong
+to.  The exceptions are:
+    typedmess, vmess, getfn, gensym (m_class.c)
+    getbytes, freebytes, resizebytes (m_memory.c)
+    post, error, bug (s_print.c)
+which are all frequently called and which don't fit into simple categories.
+Important packages are:
+(pd-gui:)   pdgui -- everything
+(pd:)	    pd -- functions common to all "pd" objects
+    	    obj -- fuctions common to all "patchable" objects ala Max
+    	    sys -- "system" level functions
+    	    binbuf -- functions manipulating binbufs
+    	    class -- functions manipulating classes
+    	    (other) -- functions common to the named Pd class
+
+5. Source file prefixes. 
+PD:
+s    system interface
+m    message system
+g    graphics stuff
+d    DSP objects
+x    control objects
+z    other
+
+PD-GUI:
+t    TK front end
+

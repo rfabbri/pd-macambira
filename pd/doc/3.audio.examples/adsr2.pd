@@ -1,0 +1,110 @@
+#N canvas 207 5 728 714 12;
+#X obj 101 90 inlet;
+#X obj 328 115 inlet;
+#X text 101 69 trigger;
+#X obj 101 126 sel 0;
+#X obj 309 321 f \$1;
+#X obj 394 117 inlet;
+#X obj 474 385 line~;
+#X obj 456 242 f \$4;
+#X obj 474 334 pack 0 \$3;
+#X obj 461 117 inlet;
+#X obj 537 118 inlet;
+#X obj 616 117 inlet;
+#X msg 76 150 stop;
+#X obj 594 311 pack 0 \$5;
+#X text 328 94 level;
+#X obj 456 281 * \$1;
+#X text 309 377 ATTACK;
+#X obj 474 408 outlet~;
+#X text 44 125 release;
+#X text 54 47 This patch is used as an abstraction in 27.envelope.slew.pd
+;
+#X obj 295 421 snapshot~;
+#X obj 259 135 t b b;
+#X text 587 333 RELEASE;
+#X obj 181 261 * -1;
+#X text 480 353 DECAY;
+#X text 180 71 attack;
+#X text 2 238 correct the attack;
+#X text 12 254 multiplying by;
+#X text 5 275 (target-current)/;
+#X text 83 289 target;
+#X text 8 321 which is the;
+#X text 8 341 relative amount;
+#X text 8 361 of slew in the attack.;
+#X text 20 468 This version of the adsr envelope generator maintains
+a constant rate of climb in the attact portion rather than a constant
+attack time as the previous one did.;
+#X obj 174 290 / \$1;
+#X obj 174 313 * \$2;
+#X obj 309 355 pack;
+#X obj 181 238 - \$1;
+#X obj 174 336 abs;
+#X text 8 401 current value is greater than;
+#X text 6 421 the target.;
+#X text 8 381 The "abs" is in case the;
+#X text 19 519 The "attack time" input here controls the time needed
+to rist from 0 to the output level. When we get an attack \, we take
+a snapshot~ of ouy current output level and adjust the attack time
+accordingly.;
+#X obj 183 89 moses;
+#X text 267 106 from;
+#X text 269 118 here;
+#X obj 174 136 t b b;
+#X text 182 107 from;
+#X text 184 119 zero;
+#X msg 223 136 0;
+#X text 19 584 Another feature: if you give a negative number for the
+trigger \, the output jumps to zero and slews from there \, instead
+of slewing from the current level. This is often appropriate for pitch
+envelopes.;
+#X obj 456 305 * 0.01;
+#X text 457 679 updated for Pd version 0.34;
+#X obj 455 217 del;
+#X text 391 95 attack;
+#X text 458 93 decay;
+#X text 55 4 adsr2 - arguments: level \, attack time \, decay time
+\, sustain percentage \, release time;
+#X text 533 91 sustain;
+#X text 609 93 release;
+#X connect 0 0 3 0;
+#X connect 1 0 4 1;
+#X connect 1 0 15 1;
+#X connect 1 0 34 1;
+#X connect 1 0 37 1;
+#X connect 3 0 12 0;
+#X connect 3 0 13 0;
+#X connect 3 1 43 0;
+#X connect 4 0 36 0;
+#X connect 5 0 35 1;
+#X connect 6 0 17 0;
+#X connect 6 0 20 0;
+#X connect 7 0 15 0;
+#X connect 8 0 6 0;
+#X connect 9 0 8 1;
+#X connect 10 0 7 1;
+#X connect 11 0 13 1;
+#X connect 12 0 53 0;
+#X connect 13 0 6 0;
+#X connect 15 0 51 0;
+#X connect 20 0 37 0;
+#X connect 21 0 4 0;
+#X connect 21 0 53 0;
+#X connect 21 1 20 0;
+#X connect 23 0 34 0;
+#X connect 34 0 35 0;
+#X connect 35 0 38 0;
+#X connect 36 0 6 0;
+#X connect 37 0 23 0;
+#X connect 38 0 36 1;
+#X connect 38 0 53 1;
+#X connect 43 0 46 0;
+#X connect 43 1 21 0;
+#X connect 46 0 4 0;
+#X connect 46 0 53 0;
+#X connect 46 1 49 0;
+#X connect 49 0 6 0;
+#X connect 49 0 37 0;
+#X connect 51 0 8 0;
+#X connect 53 0 7 0;

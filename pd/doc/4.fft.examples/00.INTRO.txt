@@ -1,0 +1,65 @@
+These patches demonstrate how to use Pd's short-time Fourier transform objects,
+rfft~ and rifft~, to do a variety of things.  The patches can be quite
+expensive; the phase vocoder, for instance, requires a 300MHz Pentium 2 to run
+at 44100 Hz.  By default Pd runs at 44100 Hz, but you can specify a different
+sample rate on the command line, for instance:
+
+pd -r 16000 09.pvoc.pd
+
+On SGI, Pd will check whether your audio system is running at the correct
+sample rate and will print out a warning if not.  In NT or W95, Pd's behavior
+will depend on your audio driver.  In Linux Pd usually tries to set the rate
+of the conversion hardware.
+
+Included in this directory are:
+
+01.fftanalysis.pd -- does a windowed FFT analysis and resynthesis of a sine
+tone, showing how to specify block size and overlap.
+
+02.noisefft.pd -- Fourier analysis of white noise.  This patch also shows how
+you can average power spectra over time.
+
+03.denoise.pd -- using the technique from the previous patch, finds the noise
+floor in a recorded sample and attempts to scrub it away.
+
+04.shifts.pd -- tests the leftshift and rightshift "externs" used in the next
+patch.
+
+05.sheepgoat.pd -- tries to discriminate between "pitched" and "unpitched"
+components of a sound.
+
+06.sheepgoat2.pd -- another attempt at the same thing.
+
+07.tinbell.pd -- a spectral flattener, which can make the sound of a large bell
+turn into the sound of a tamtam.
+
+08.convobros.pd -- spectral cross synthesis between two sounds
+
+09.pvoc.pd -- phase vocoder
+
+---------- after this point, the patches haven't been cleaned up -----------
+
+10.phaselockedvoc.pd -- phase locked vocoder; see Laroche&Dolson in ICMC97 for
+a discussion of something that works better than this.
+
+11.pianorev.pd -- an attempt at a phase-coherent reverberation algorithm to
+imitate the "piano reverb" obtained by putting a speaker under the sound board
+of a piano and picking up the sympathetic vibrations.
+
+12.sinedecomposer.pd -- estimate the frequencies and amplitudes of the
+components of a sound
+
+13.tracemaker.pd -- show how to use Pd to combine snapshots of a spectrum into
+continuous spectral traces.
+
+14.partialtracer.pd -- sinusoidal analysis/resynthesis of a time-verying sound.
+
+15.waveformgrab.pd -- bash a sample into phase-coherent windows and make a
+pitched resynthesis.
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+#N canvas 682 208 558 499 10;
+#X obj 225 80 inlet;
+#X obj 119 198 outlet;
+#X obj 109 160 hsl 128 15 0 127 0 0 empty empty empty 20 8 0 8 -262144
+-1 -1 0 1;
+#X floatatom 495 43 5 0 0;
+#N canvas 0 0 450 300 foo3 0;
+#X restore 82 78 pd foo3;
+#X obj 54 151 print;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X coords 0 0 1 1 200 140 1;

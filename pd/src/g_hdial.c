@@ -1,0 +1,675 @@
+/* Copyright (c) 1997-1999 Miller Puckette.
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution. */
+
+/* g_7_guis.c written by Thomas Musil (c) IEM KUG Graz Austria 2000-2001 */
+/* thanks to Miller Puckette, Guenther Geiger and Krzystof Czaja */
+
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "m_imp.h"
+#include "g_canvas.h"
+#include "t_tk.h"
+#include "g_all_guis.h"
+#include <math.h>
+
+#ifdef NT
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+/* ------------- hdl     gui-horicontal dial ---------------------- */
+
+t_widgetbehavior hdial_widgetbehavior;
+static t_class *hdial_class;
+
+/* widget helper functions */
+
+void hdial_draw_update(t_hdial *x, t_glist *glist)
+{
+    if(glist_isvisible(glist))
+    {
+	t_canvas *canvas=glist_getcanvas(glist);
+
+	sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
+		 canvas, x, x->x_on_old,
+		 x->x_gui.x_bcol, x->x_gui.x_bcol);
+	sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n",
+		 canvas, x, x->x_on,
+		 x->x_gui.x_fcol, x->x_gui.x_fcol);
+    }
+}
+
+void hdial_draw_new(t_hdial *x, t_glist *glist)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int n=x->x_number, i, dx=x->x_gui.x_w, s4=dx/4;
+    int yy11=text_ypix(&x->x_gui.x_obj, glist), yy12=yy11+dx;
+    int yy21=yy11+s4, yy22=yy12-s4;
+    int xx11b=text_xpix(&x->x_gui.x_obj, glist), xx11=xx11b, xx21=xx11b+s4;
+    int xx22=xx11b+dx-s4;
+
+
+    for(i=0; i<n; i++)
+    {
+	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -tags %xBASE%d\n",
+		 canvas, xx11, yy11, xx11+dx, yy12,
+		 x->x_gui.x_bcol, x, i);
+	sys_vgui(".x%x.c create rectangle %d %d %d %d -fill #%6.6x -outline #%6.6x -tags %xBUT%d\n",
+		 canvas, xx21, yy21, xx22, yy22,
+		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
+		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol, x, i);
+	xx11 += dx;
+	xx21 += dx;
+	xx22 += dx;
+    }
+    sys_vgui(".x%x.c create text %d %d -text {%s} -anchor w \
+	     -font {%s %d bold} -fill #%6.6x -tags %xLABEL\n",
+	     canvas, xx11b+x->x_gui.x_ldx, yy11+x->x_gui.x_ldy,
+	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"",
+	     x->x_gui.x_font, x->x_gui.x_fontsize,
+	     x->x_gui.x_lcol, x);
+    if(!x->x_gui.x_fsf.x_snd_able)
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+	     canvas, xx11b, yy12-1, xx11b + IOWIDTH, yy12, x, 0);
+    if(!x->x_gui.x_fsf.x_rcv_able)
+	sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+	     canvas, xx11b, yy11, xx11b + IOWIDTH, yy11+1, x, 0);
+
+}
+
+void hdial_draw_move(t_hdial *x, t_glist *glist)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int n=x->x_number, i, dx=x->x_gui.x_w, s4=dx/4;
+    int yy11=text_ypix(&x->x_gui.x_obj, glist), yy12=yy11+dx;
+    int yy21=yy11+s4, yy22=yy12-s4;
+    int xx11b=text_xpix(&x->x_gui.x_obj, glist), xx11=xx11b, xx21=xx11b+s4;
+    int xx22=xx11b+dx-s4;
+
+    xx11 = xx11b;
+    xx21=xx11b+s4;
+    xx22=xx11b+dx-s4;
+    for(i=0; i<n; i++)
+    {
+	sys_vgui(".x%x.c coords %xBASE%d %d %d %d %d\n",
+		 canvas, x, i, xx11, yy11, xx11+dx, yy12);
+	sys_vgui(".x%x.c coords %xBUT%d %d %d %d %d\n",
+		 canvas, x, i, xx21, yy21, xx22, yy22);
+	xx11 += dx;
+	xx21 += dx;
+	xx22 += dx;
+    }
+    sys_vgui(".x%x.c coords %xLABEL %d %d\n",
+	     canvas, x, xx11b+x->x_gui.x_ldx, yy11+x->x_gui.x_ldy);
+    if(!x->x_gui.x_fsf.x_snd_able)
+        sys_vgui(".x%x.c coords %xOUT%d %d %d %d %d\n",
+	     canvas, x, 0, xx11b, yy12-1, xx11b + IOWIDTH, yy12);
+    if(!x->x_gui.x_fsf.x_rcv_able)
+	sys_vgui(".x%x.c coords %xIN%d %d %d %d %d\n",
+	     canvas, x, 0, xx11b, yy11, xx11b + IOWIDTH, yy11+1);
+}
+
+void hdial_draw_erase(t_hdial* x, t_glist* glist)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int n=x->x_number, i;
+
+    for(i=0; i<n; i++)
+    {
+	sys_vgui(".x%x.c delete %xBASE%d\n", canvas, x, i);
+	sys_vgui(".x%x.c delete %xBUT%d\n", canvas, x, i);
+    }
+    sys_vgui(".x%x.c delete %xLABEL\n", canvas, x);
+    if(!x->x_gui.x_fsf.x_snd_able)
+	sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
+    if(!x->x_gui.x_fsf.x_rcv_able)
+    sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+}
+
+void hdial_draw_config(t_hdial* x, t_glist* glist)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int n=x->x_number, i;
+
+    sys_vgui(".x%x.c itemconfigure %xLABEL -font {%s %d bold} -fill #%6.6x -text {%s} \n",
+	     canvas, x, x->x_gui.x_font, x->x_gui.x_fontsize,
+	     x->x_gui.x_fsf.x_selected?IEM_GUI_COLOR_SELECTED:x->x_gui.x_lcol,
+	     strcmp(x->x_gui.x_lab->s_name, "empty")?x->x_gui.x_lab->s_name:"");
+    for(i=0; i<n; i++)
+    {
+	sys_vgui(".x%x.c itemconfigure %xBASE%d -fill #%6.6x\n", canvas, x, i,
+		 x->x_gui.x_bcol);
+	sys_vgui(".x%x.c itemconfigure %xBUT%d -fill #%6.6x -outline #%6.6x\n", canvas, x, i,
+		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol,
+		 (x->x_on==i)?x->x_gui.x_fcol:x->x_gui.x_bcol);
+    }
+}
+
+void hdial_draw_io(t_hdial* x, t_glist* glist, int old_snd_rcv_flags)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int xpos=text_xpix(&x->x_gui.x_obj, glist);
+    int ypos=text_ypix(&x->x_gui.x_obj, glist);
+
+    if((old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && !x->x_gui.x_fsf.x_snd_able)
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xOUT%d\n",
+		 canvas,
+		 xpos, ypos + x->x_gui.x_w-1,
+		 xpos + IOWIDTH, ypos + x->x_gui.x_w,
+		 x, 0);
+    if(!(old_snd_rcv_flags & IEM_GUI_OLD_SND_FLAG) && x->x_gui.x_fsf.x_snd_able)
+        sys_vgui(".x%x.c delete %xOUT%d\n", canvas, x, 0);
+    if((old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && !x->x_gui.x_fsf.x_rcv_able)
+        sys_vgui(".x%x.c create rectangle %d %d %d %d -tags %xIN%d\n",
+		 canvas,
+		 xpos, ypos,
+		 xpos + IOWIDTH, ypos+1, x, 0);
+    if(!(old_snd_rcv_flags & IEM_GUI_OLD_RCV_FLAG) && x->x_gui.x_fsf.x_rcv_able)
+	sys_vgui(".x%x.c delete %xIN%d\n", canvas, x, 0);
+}
+
+void hdial_draw_select(t_hdial* x, t_glist* glist)
+{
+    t_canvas *canvas=glist_getcanvas(glist);
+    int n=x->x_number, i;
+
+    if(x->x_gui.x_fsf.x_selected)
+    {
+	pd_bind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
+	for(i=0; i<n; i++)
+	{
+	    sys_vgui(".x%x.c itemconfigure %xBASE%d -outline #%6.6x\n", canvas, x, i,
+		     IEM_GUI_COLOR_SELECTED);
+	}
+	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x, IEM_GUI_COLOR_SELECTED);
+    }
+    else
+    {
+	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
+	for(i=0; i<n; i++)
+	{
+	    sys_vgui(".x%x.c itemconfigure %xBASE%d -outline #%6.6x\n", canvas, x, i,
+		     IEM_GUI_COLOR_NORMAL);
+	}
+	sys_vgui(".x%x.c itemconfigure %xLABEL -fill #%6.6x\n", canvas, x,
+		 x->x_gui.x_lcol);
+    }
+}
+
+void hdial_draw(t_hdial *x, t_glist *glist, int mode)
+{
+    if(mode == IEM_GUI_DRAW_MODE_UPDATE)
+	hdial_draw_update(x, glist);
+    else if(mode == IEM_GUI_DRAW_MODE_MOVE)
+	hdial_draw_move(x, glist);
+    else if(mode == IEM_GUI_DRAW_MODE_NEW)
+	hdial_draw_new(x, glist);
+    else if(mode == IEM_GUI_DRAW_MODE_SELECT)
+	hdial_draw_select(x, glist);
+    else if(mode == IEM_GUI_DRAW_MODE_ERASE)
+	hdial_draw_erase(x, glist);
+    else if(mode == IEM_GUI_DRAW_MODE_CONFIG)
+	hdial_draw_config(x, glist);
+    else if(mode >= IEM_GUI_DRAW_MODE_IO)
+	hdial_draw_io(x, glist, mode - IEM_GUI_DRAW_MODE_IO);
+}
+
+/* ------------------------ hdl widgetbehaviour----------------------------- */
+
+static void hdial_getrect(t_gobj *z, t_glist *glist, int *xp1, int *yp1, int *xp2, int *yp2)
+{
+    t_hdial *x = (t_hdial *)z;
+
+    *xp1 = text_xpix(&x->x_gui.x_obj, glist);
+    *yp1 = text_ypix(&x->x_gui.x_obj, glist);
+    *xp2 = *xp1 + x->x_gui.x_w*x->x_number;
+    *yp2 = *yp1 + x->x_gui.x_h;
+}
+
+static void hdial_save(t_gobj *z, t_binbuf *b)
+{
+    t_hdial *x = (t_hdial *)z;
+    int bflcol[3], *ip1, *ip2;
+    t_symbol *srl[3];
+
+    iemgui_save(&x->x_gui, srl, bflcol);
+    ip1 = (int *)(&x->x_gui.x_isa);
+    ip2 = (int *)(&x->x_gui.x_fsf);
+    binbuf_addv(b, "ssiisiiiisssiiiiiiii", gensym("#X"),gensym("obj"),
+		(t_int)text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist), (t_int)text_ypix(&x->x_gui.x_obj, x->x_gui.x_glist),
+		gensym("hdl"), x->x_gui.x_w,
+		x->x_change, (*ip1)&IEM_INIT_ARGS_ALL, x->x_number,
+		srl[0], srl[1], srl[2],
+		x->x_gui.x_ldx, x->x_gui.x_ldy,
+		(*ip2)&IEM_FSTYLE_FLAGS_ALL, x->x_gui.x_fontsize,
+		bflcol[0], bflcol[1], bflcol[2], x->x_on);
+    binbuf_addv(b, ";");
+}
+
+static void hdial_properties(t_gobj *z, t_glist *owner)
+{
+    t_hdial *x = (t_hdial *)z;
+    char buf[800];
+    t_symbol *srl[3];
+
+    iemgui_properties(&x->x_gui, srl);
+    sprintf(buf, "pdtk_iemgui_dialog %%s HDIAL \
+	    ----------dimensions(pix):----------- %d %d size: 0 0 empty \
+	    empty 0.0 empty 0.0 empty %d \
+	    %d new-only new&old %d %d number: %d \
+	    %s %s \
+	    %s %d %d \
+	    %d %d \
+	    %d %d %d\n",
+	    x->x_gui.x_w, IEM_GUI_MINSIZE,
+	    0,/*no_schedule*/
+	    x->x_change, x->x_gui.x_isa.x_loadinit, -1, x->x_number,
+	    srl[0]->s_name, srl[1]->s_name,
+	    srl[2]->s_name, x->x_gui.x_ldx, x->x_gui.x_ldy,
+	    x->x_gui.x_fsf.x_font_style, x->x_gui.x_fontsize,
+	    0xffffff & x->x_gui.x_bcol, 0xffffff & x->x_gui.x_fcol, 0xffffff & x->x_gui.x_lcol);
+    gfxstub_new(&x->x_gui.x_obj.ob_pd, x, buf);
+}
+
+static void hdial_dialog(t_hdial *x, t_symbol *s, int argc, t_atom *argv)
+{
+    t_symbol *srl[3];
+    int a = (int)atom_getintarg(0, argc, argv);
+    int chg = (int)atom_getintarg(4, argc, argv);
+    int num = (int)atom_getintarg(6, argc, argv);
+    int sr_flags;
+
+    if(chg != 0) chg = 1;
+    x->x_change = chg;
+    sr_flags = iemgui_dialog(&x->x_gui, srl, argc, argv);
+    x->x_gui.x_w = iemgui_clip_size(a);
+    x->x_gui.x_h = x->x_gui.x_w;
+    if(x->x_number != num)
+    {
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_ERASE);
+	x->x_number = num;
+	if(x->x_on >= x->x_number)
+	{
+	    x->x_on = x->x_number - 1;
+	    x->x_on_old = x->x_on;
+	}
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_NEW);
+    }
+    else
+    {
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_CONFIG);
+        (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_IO + sr_flags);
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
+	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    }
+
+}
+
+static void hdial_set(t_hdial *x, t_floatarg f)
+{
+    int i=(int)f;
+    int old=x->x_on_old;
+
+    if(i < 0)
+	i = 0;
+    if(i >= x->x_number)
+	i = x->x_number-1;
+    if(x->x_on != x->x_on_old)
+    {
+	old = x->x_on_old;
+	x->x_on_old = x->x_on;
+	x->x_on = i;
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+	x->x_on_old = old;
+    }
+    else
+    {
+	x->x_on = i;
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+    }
+}
+
+static void hdial_bang(t_hdial *x)
+{
+    if((x->x_change)&&(x->x_on != x->x_on_old))
+    {
+        SETFLOAT(x->x_at, (float)x->x_on_old);
+	SETFLOAT(x->x_at+1, 0.0);
+	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+    }
+    x->x_on_old = x->x_on;
+    SETFLOAT(x->x_at, (float)x->x_on);
+    SETFLOAT(x->x_at+1, 1.0);
+    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+}
+
+static void hdial_fout(t_hdial *x, t_floatarg f)
+{
+    int i=(int)f;
+
+    if(i < 0)
+	i = 0;
+    if(i >= x->x_number)
+	i = x->x_number-1;
+
+    if((x->x_change)&&(i != x->x_on_old))
+    {
+	SETFLOAT(x->x_at, (float)x->x_on_old);
+	SETFLOAT(x->x_at+1, 0.0);
+	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+    }
+    if(x->x_on != x->x_on_old)
+	x->x_on_old = x->x_on;
+    x->x_on = i;
+    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+    x->x_on_old = x->x_on;
+    SETFLOAT(x->x_at, (float)x->x_on);
+    SETFLOAT(x->x_at+1, 1.0);
+    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+}
+
+static void hdial_float(t_hdial *x, t_floatarg f)
+{
+    int i=(int)f;
+
+    if(i < 0)
+	i = 0;
+    if(i >= x->x_number)
+	i = x->x_number-1;
+
+    if((x->x_change)&&(i != x->x_on_old))
+    {
+	if(x->x_gui.x_fsf.x_put_in2out)
+	{
+            SETFLOAT(x->x_at, (float)x->x_on_old);
+	    SETFLOAT(x->x_at+1, 0.0);
+	    outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	    if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+		pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+	}
+    }
+    if(x->x_on != x->x_on_old)
+	x->x_on_old = x->x_on;
+    x->x_on = i;
+    (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
+    x->x_on_old = x->x_on;
+    if(x->x_gui.x_fsf.x_put_in2out)
+    {
+	SETFLOAT(x->x_at, (float)x->x_on);
+        SETFLOAT(x->x_at+1, 1.0);
+	outlet_list(x->x_gui.x_obj.ob_outlet, &s_list, 2, x->x_at);
+	if(x->x_gui.x_fsf.x_snd_able && x->x_gui.x_snd->s_thing)
+	    pd_list(x->x_gui.x_snd->s_thing, &s_list, 2, x->x_at);
+    }
+}
+
+static void hdial_click(t_hdial *x, t_floatarg xpos, t_floatarg ypos, t_floatarg shift, t_floatarg ctrl, t_floatarg alt)
+{
+    int xx = (int)xpos - (int)text_xpix(&x->x_gui.x_obj, x->x_gui.x_glist);
+
+    hdial_fout(x, (float)(xx / x->x_gui.x_w));
+}
+
+static int hdial_newclick(t_gobj *z, struct _glist *glist, int xpix, int ypix, int shift, int alt, int dbl, int doit)
+{
+    if(doit)
+	hdial_click((t_hdial *)z, (t_floatarg)xpix, (t_floatarg)ypix, (t_floatarg)shift, 0, (t_floatarg)alt);
+    return (1);
+}
+
+static void hdial_loadbang(t_hdial *x)
+{
+    if(!sys_noloadbang && x->x_gui.x_isa.x_loadinit)
+	hdial_bang(x);
+}
+
+static void hdial_number(t_hdial *x, t_floatarg num)
+{
+    int n=(int)num;
+
+    if(n < 1)
+	n = 1;
+    if(n > IEM_RADIO_MAX)
+	n = IEM_RADIO_MAX;
+    if(n != x->x_number)
+    {
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_ERASE);
+	x->x_number = n;
+	if(x->x_on >= x->x_number)
+	    x->x_on = x->x_number - 1;
+	x->x_on_old = x->x_on;
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_NEW);
+    }
+}
+
+static void hdial_size(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{
+    x->x_gui.x_w = iemgui_clip_size((int)atom_getintarg(0, ac, av));
+    x->x_gui.x_h = x->x_gui.x_w;
+    iemgui_size((void *)x, &x->x_gui);
+}
+
+static void hdial_delta(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{iemgui_delta((void *)x, &x->x_gui, s, ac, av);}
+
+static void hdial_pos(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{iemgui_pos((void *)x, &x->x_gui, s, ac, av);}
+
+static void hdial_color(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{iemgui_color((void *)x, &x->x_gui, s, ac, av);}
+
+static void hdial_send(t_hdial *x, t_symbol *s)
+{iemgui_send(x, &x->x_gui, s);}
+
+static void hdial_receive(t_hdial *x, t_symbol *s)
+{iemgui_receive(x, &x->x_gui, s);}
+
+static void hdial_label(t_hdial *x, t_symbol *s)
+{iemgui_label((void *)x, &x->x_gui, s);}
+
+static void hdial_label_pos(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{iemgui_label_pos((void *)x, &x->x_gui, s, ac, av);}
+
+static void hdial_label_font(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{iemgui_label_font((void *)x, &x->x_gui, s, ac, av);}
+
+static void hdial_init(t_hdial *x, t_floatarg f)
+{
+    x->x_gui.x_isa.x_loadinit = (f==0.0)?0:1;
+}
+
+static void hdial_double_change(t_hdial *x)
+{x->x_change = 1;}
+
+static void hdial_single_change(t_hdial *x)
+{x->x_change = 0;}
+
+static void hdial_list(t_hdial *x, t_symbol *s, int ac, t_atom *av)
+{
+    int l=iemgui_list((void *)x, &x->x_gui, s, ac, av);
+
+    if(l < 0)
+    {
+	if(IS_A_FLOAT(av,0))
+	    hdial_float(x, atom_getfloatarg(0, ac, av));
+    }
+    else if(l > 0)
+    {
+	(*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_MOVE);
+	canvas_fixlinesfor(glist_getcanvas(x->x_gui.x_glist), (t_text*)x);
+    }
+}
+
+static void *hdial_new(t_symbol *s, int argc, t_atom *argv)
+{
+    t_hdial *x = (t_hdial *)pd_new(hdial_class);
+    int bflcol[]={-262144, -1, -1};
+    t_symbol *srl[3];
+    int a=IEM_GUI_DEFAULTSIZE, on=0, f=0;
+    int ldx=0, ldy=-6, chg=1, num=8;
+    int fs=8, iinit=0, ifstyle=0;
+    int ftbreak=IEM_BNG_DEFAULTBREAKFLASHTIME, fthold=IEM_BNG_DEFAULTHOLDFLASHTIME;
+    t_iem_init_symargs *init=(t_iem_init_symargs *)(&iinit);
+    t_iem_fstyle_flags *fstyle=(t_iem_fstyle_flags *)(&ifstyle);
+    char str[144];
+
+    srl[0] = gensym("empty");
+    srl[1] = gensym("empty");
+    srl[2] = gensym("empty");
+
+    if((argc == 15)&&IS_A_FLOAT(argv,0)&&IS_A_FLOAT(argv,1)&&IS_A_FLOAT(argv,2)
+       &&IS_A_FLOAT(argv,3)
+       &&(IS_A_SYMBOL(argv,4)||IS_A_FLOAT(argv,4))
+       &&(IS_A_SYMBOL(argv,5)||IS_A_FLOAT(argv,5))
+       &&(IS_A_SYMBOL(argv,6)||IS_A_FLOAT(argv,6))
+       &&IS_A_FLOAT(argv,7)&&IS_A_FLOAT(argv,8)
+       &&IS_A_FLOAT(argv,9)&&IS_A_FLOAT(argv,10)&&IS_A_FLOAT(argv,11)
+       &&IS_A_FLOAT(argv,12)&&IS_A_FLOAT(argv,13)&&IS_A_FLOAT(argv,14))
+    {
+	a = (int)atom_getintarg(0, argc, argv);
+	chg = (int)atom_getintarg(1, argc, argv);
+	iinit = (int)atom_getintarg(2, argc, argv);
+	num = (int)atom_getintarg(3, argc, argv);
+	if(IS_A_SYMBOL(argv,4))
+	    srl[0] = atom_getsymbolarg(4, argc, argv);
+	else if(IS_A_FLOAT(argv,4))
+	{
+	    sprintf(str, "%d", (int)atom_getintarg(4, argc, argv));
+	    srl[0] = gensym(str);
+	}
+	if(IS_A_SYMBOL(argv,5))
+	    srl[1] = atom_getsymbolarg(5, argc, argv);
+	else if(IS_A_FLOAT(argv,5))
+	{
+	    sprintf(str, "%d", (int)atom_getintarg(5, argc, argv));
+	    srl[1] = gensym(str);
+	}
+	if(IS_A_SYMBOL(argv,6))
+	    srl[2] = atom_getsymbolarg(6, argc, argv);
+	else if(IS_A_FLOAT(argv,6))
+	{
+	    sprintf(str, "%d", (int)atom_getintarg(6, argc, argv));
+	    srl[2] = gensym(str);
+	}
+	ldx = (int)atom_getintarg(7, argc, argv);
+	ldy = (int)atom_getintarg(8, argc, argv);
+	ifstyle = (int)atom_getintarg(9, argc, argv);
+	fs = (int)atom_getintarg(10, argc, argv);
+	bflcol[0] = (int)atom_getintarg(11, argc, argv);
+	bflcol[1] = (int)atom_getintarg(12, argc, argv);
+	bflcol[2] = (int)atom_getintarg(13, argc, argv);
+	on = (int)atom_getintarg(14, argc, argv);
+    }
+    x->x_gui.x_draw = (t_iemfunptr)hdial_draw;
+    iinit &= IEM_INIT_ARGS_ALL;
+    ifstyle &= IEM_FSTYLE_FLAGS_ALL;
+    fstyle->x_snd_able = 1;
+    fstyle->x_rcv_able = 1;
+    x->x_gui.x_glist = (t_glist *)canvas_getcurrent();
+    x->x_gui.x_isa = *init;
+    if(!strcmp(srl[0]->s_name, "empty")) fstyle->x_snd_able = 0;
+    if(!strcmp(srl[1]->s_name, "empty")) fstyle->x_rcv_able = 0;
+    if(fstyle->x_font_style == 1) strcpy(x->x_gui.x_font, "helvetica");
+    else if(fstyle->x_font_style == 2) strcpy(x->x_gui.x_font, "times");
+    else { fstyle->x_font_style = 0;
+	strcpy(x->x_gui.x_font, "courier"); }
+    x->x_gui.x_fsf = *fstyle;
+    x->x_gui.x_unique_num = 0;
+    if(num < 1)
+	num = 1;
+    if(num > IEM_RADIO_MAX)
+	num = IEM_RADIO_MAX;
+    x->x_number = num;
+    if(on < 0)
+	on = 0;
+    if(on >= x->x_number)
+	on = x->x_number - 1;
+    if(x->x_gui.x_isa.x_loadinit)
+	x->x_on = on;
+    else
+	x->x_on = 0;
+    x->x_on_old = x->x_on;
+    x->x_change = (chg==0)?0:1;
+    iemgui_first_dollararg2sym(&x->x_gui, srl);
+    if(x->x_gui.x_fsf.x_rcv_able) pd_bind(&x->x_gui.x_obj.ob_pd, srl[1]);
+    x->x_gui.x_snd = srl[0];
+    x->x_gui.x_rcv = srl[1];
+    x->x_gui.x_lab = srl[2];
+    x->x_gui.x_ldx = ldx;
+    x->x_gui.x_ldy = ldy;
+    if(fs < 4)
+	fs = 4;
+    x->x_gui.x_fontsize = fs;
+    x->x_gui.x_w = iemgui_clip_size(a);
+    x->x_gui.x_h = x->x_gui.x_w;
+    iemgui_verify_snd_ne_rcv(&x->x_gui);
+    iemgui_all_colfromload(&x->x_gui, bflcol);
+    outlet_new(&x->x_gui.x_obj, &s_list);
+    return (x);
+}
+
+static void hdial_ff(t_hdial *x)
+{
+    if(x->x_gui.x_fsf.x_selected)
+	pd_unbind(&x->x_gui.x_obj.ob_pd, iemgui_key_sym);
+    if(x->x_gui.x_fsf.x_rcv_able)
+	pd_unbind(&x->x_gui.x_obj.ob_pd, x->x_gui.x_rcv);
+    gfxstub_deleteforkey(x);
+}
+
+void g_hdial_setup(void)
+{
+    hdial_class = class_new(gensym("hdl"), (t_newmethod)hdial_new,
+			    (t_method)hdial_ff, sizeof(t_hdial), 0, A_GIMME, 0);
+    class_addcreator((t_newmethod)hdial_new, gensym("rdb"), A_GIMME, 0);
+    class_addcreator((t_newmethod)hdial_new, gensym("radiobut"), A_GIMME, 0);
+    class_addcreator((t_newmethod)hdial_new, gensym("radiobutton"), A_GIMME, 0);
+    class_addbang(hdial_class, hdial_bang);
+    class_addfloat(hdial_class, hdial_float);
+    class_addlist(hdial_class, hdial_list);
+    class_addmethod(hdial_class, (t_method)hdial_click, gensym("click"),
+		    A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, 0);
+    class_addmethod(hdial_class, (t_method)hdial_dialog, gensym("dialog"),
+		    A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_loadbang, gensym("loadbang"), 0);
+    class_addmethod(hdial_class, (t_method)hdial_set, gensym("set"), A_FLOAT, 0);
+    class_addmethod(hdial_class, (t_method)hdial_size, gensym("size"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_delta, gensym("delta"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_pos, gensym("pos"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_color, gensym("color"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_send, gensym("send"), A_DEFSYM, 0);
+    class_addmethod(hdial_class, (t_method)hdial_receive, gensym("receive"), A_DEFSYM, 0);
+    class_addmethod(hdial_class, (t_method)hdial_label, gensym("label"), A_DEFSYM, 0);
+    class_addmethod(hdial_class, (t_method)hdial_label_pos, gensym("label_pos"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_label_font, gensym("label_font"), A_GIMME, 0);
+    class_addmethod(hdial_class, (t_method)hdial_init, gensym("init"), A_FLOAT, 0);
+    class_addmethod(hdial_class, (t_method)hdial_number, gensym("number"), A_FLOAT, 0);
+    class_addmethod(hdial_class, (t_method)hdial_single_change, gensym("single_change"), 0);
+    class_addmethod(hdial_class, (t_method)hdial_double_change, gensym("double_change"), 0);
+    if(!iemgui_key_sym)
+	iemgui_key_sym = gensym("#keyname");
+    hdial_widgetbehavior.w_getrectfn = hdial_getrect;
+    hdial_widgetbehavior.w_displacefn = iemgui_displace;
+    hdial_widgetbehavior.w_selectfn = iemgui_select;
+    hdial_widgetbehavior.w_activatefn = NULL;
+    hdial_widgetbehavior.w_deletefn = iemgui_delete;
+    hdial_widgetbehavior.w_visfn = iemgui_vis;
+    hdial_widgetbehavior.w_clickfn = hdial_newclick;
+    hdial_widgetbehavior.w_propertiesfn = hdial_properties;
+    hdial_widgetbehavior.w_savefn = hdial_save;
+    class_setwidget(hdial_class, &hdial_widgetbehavior);
+    class_sethelpsymbol(hdial_class, gensym("hdial"));
+}

@@ -1,0 +1,8 @@
+#N canvas 223 88 626 431 12;
+#N canvas 0 0 450 300 numbox 0;
+#X obj 125 47 loadbang;
+#X msg 124 75 123.456;
+#X floatatom 124 99 3 0 0;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X restore 212 48 pd numbox;

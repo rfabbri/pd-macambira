@@ -1,0 +1,12 @@
+PortMidi for MacOS X / Darwin
+Jon Parise <jparise@cmu.edu>
+$Date: 2002-07-29 17:06:16 $
+
+This is the MacOS X / Darwin port of the PortMidi library from the Carnegie
+Mellon Computer Music Group.  It is based on the Apple CoreAudio MIDI
+interface.
+
+This port was finished in early 2002.  At this point, I consider the code
+base complete.
+
+- Jon

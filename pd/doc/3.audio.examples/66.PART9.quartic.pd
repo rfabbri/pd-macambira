@@ -1,0 +1,140 @@
+#N canvas 57 35 614 650 12;
+#X graph graph1 0 0 40 1 151 551 551 301;
+#X array array-ampdb 41 float 1;
+#A 0 0.01 0.0112202 0.0125893 0.0141254 0.0158489 0.0177828 0.0199526
+0.0223872 0.0251189 0.0281838 0.0316228 0.0354813 0.0398107 0.0446684
+0.0501187 0.0562341 0.0630957 0.0707946 0.0794328 0.0891251 0.1 0.112202
+0.125893 0.141254 0.158489 0.177828 0.199526 0.223872 0.251189 0.281838
+0.316228 0.354813 0.398107 0.446684 0.501187 0.562341 0.630957 0.707946
+0.794328 0.891251 1;
+#X array array-dbdb 41 float 1;
+#A 0 0 0.025 0.05 0.075 0.1 0.125 0.15 0.175 0.2 0.225 0.25 0.275 0.3
+0.325 0.35 0.375 0.4 0.425 0.45 0.475 0.5 0.525 0.55 0.575 0.6 0.625
+0.65 0.675 0.7 0.725 0.75 0.775 0.8 0.825 0.85 0.875 0.9 0.925 0.95
+0.975 1;
+#X array array-4thpow 41 float 1;
+#A 0 0 3.90624e-07 6.25001e-06 3.16406e-05 1e-04 0.000244141 0.00050625
+0.000937891 0.0016 0.00256289 0.00390625 0.00571914 0.0081 0.0111566
+0.0150063 0.0197754 0.0256 0.0326254 0.0410062 0.0509067 0.0625 0.0759691
+0.0915063 0.109313 0.1296 0.152588 0.178506 0.207594 0.2401 0.276282
+0.316406 0.36075 0.4096 0.46325 0.522006 0.586182 0.6561 0.732094 0.814506
+0.903688 1;
+#X pop;
+#N canvas 293 37 890 657 otherstuff 0;
+#X obj 42 438 loadbang;
+#X msg 259 94 bang;
+#X obj 259 123 t b b;
+#X obj 337 192 f;
+#X obj 375 192 + 1;
+#X msg 353 162 0;
+#X obj 259 152 until;
+#X obj 263 329 dbtorms;
+#X obj 339 227 t f f;
+#X msg 51 101 bang;
+#X obj 51 130 t b b;
+#X obj 129 199 f;
+#X obj 167 199 + 1;
+#X msg 145 169 0;
+#X obj 51 159 until;
+#X obj 131 234 t f f;
+#X obj 59 339 tabwrite array-dbdb;
+#X obj 263 355 tabwrite array-ampdb;
+#X msg 505 98 bang;
+#X obj 505 127 t b b;
+#X obj 583 196 f;
+#X obj 621 196 + 1;
+#X msg 599 166 0;
+#X obj 505 156 until;
+#X obj 585 231 t f f;
+#X obj 559 432 expr $f1 * $f1 * $f1 * $f1;
+#X obj 559 341 expr 1 + $f2 * ($f1 - 1);
+#X obj 705 253 loadbang;
+#X floatatom 703 309 0 0 0;
+#X msg 705 281 1;
+#X obj 559 385 max 0;
+#X obj 561 464 tabwrite array-4thpow;
+#X obj 263 274 + 100;
+#X obj 51 232 sel 40;
+#X obj 258 221 sel 40;
+#X obj 503 226 sel 40;
+#X obj 559 300 / 40;
+#X obj 263 302 - 40;
+#X obj 93 303 / 40;
+#X msg 43 465 \; graph1 xlabel -0.03 0 10 20 30 40 \; graph1 ylabel
+-2 0.25 0.5 0.75 1;
+#X text 53 27 (here's how I computed the three transfer functions...)
+;
+#X connect 0 0 39 0;
+#X connect 1 0 2 0;
+#X connect 2 0 6 0;
+#X connect 2 1 5 0;
+#X connect 3 0 4 0;
+#X connect 3 0 8 0;
+#X connect 3 0 34 0;
+#X connect 4 0 3 1;
+#X connect 5 0 3 1;
+#X connect 6 0 3 0;
+#X connect 7 0 17 0;
+#X connect 8 0 32 0;
+#X connect 8 1 17 1;
+#X connect 9 0 10 0;
+#X connect 10 0 14 0;
+#X connect 10 1 13 0;
+#X connect 11 0 12 0;
+#X connect 11 0 15 0;
+#X connect 11 0 33 0;
+#X connect 12 0 11 1;
+#X connect 13 0 11 1;
+#X connect 14 0 11 0;
+#X connect 15 0 38 0;
+#X connect 15 1 16 1;
+#X connect 18 0 19 0;
+#X connect 19 0 23 0;
+#X connect 19 1 22 0;
+#X connect 20 0 21 0;
+#X connect 20 0 24 0;
+#X connect 20 0 35 0;
+#X connect 21 0 20 1;
+#X connect 22 0 20 1;
+#X connect 23 0 20 0;
+#X connect 24 0 36 0;
+#X connect 24 1 31 1;
+#X connect 25 0 31 0;
+#X connect 26 0 30 0;
+#X connect 27 0 29 0;
+#X connect 28 0 26 1;
+#X connect 29 0 28 0;
+#X connect 30 0 25 0;
+#X connect 32 0 37 0;
+#X connect 33 0 14 1;
+#X connect 34 0 6 1;
+#X connect 35 0 23 1;
+#X connect 36 0 26 0;
+#X connect 37 0 7 0;
+#X connect 38 0 16 0;
+#X restore 53 608 pd otherstuff;
+#X text 292 403 linear;
+#X text 279 509 decibels;
+#X text 387 518 quartic;
+#X text 45 5 QUARTIC CURVES AS THE IDEAL AMPLITUDE AND FREQUENCY SCALERS
+;
+#X text 346 611 updated for Pd version 0.34;
+#X text 246 578 units-->;
+#X text 45 447 amplitude;
+#X text 79 429 |;
+#X text 79 420 |;
+#X text 79 410 |;
+#X text 79 402 |;
+#X text 78 398 ^;
+#X text 38 149 The graph below shows that a simple quartic curve \,
+x-to-the-fourth-power \, twists like decibels but--unlike decibels--actually
+hits zero at left. You get the best of both worlds. Moreover \, raising
+something to the fourth power is very cheap: just two multiplications--whereas
+\, if you're computing envelopes in dB \, eventually you'll have to
+exponentiate \, sample by sample \, to get to linear units.;
+#X text 36 34 It's an old saw that we perceive amplitude and frequency
+logarithmically. But using decibels as a unit for controlling amplitude
+and frequency gets ugly for two reasons. First \, it's expensive to
+do the conversion. Second and more profoundly \, decibels grow by shifting
+\, and things should grow by scaling \, so that \, for example \, zero
+really means "nothing.";

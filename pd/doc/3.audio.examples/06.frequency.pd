@@ -1,0 +1,123 @@
+#N canvas 8 17 693 642 12;
+#X graph graph1 0 -1.02 4410 1.02 473 297 673 167;
+#X array osc-output 4410 float 0;
+#X pop;
+#X obj 128 259 tabwrite~ osc-output;
+#X floatatom 53 294 0 0 100;
+#N canvas 331 136 786 621 output 0;
+#X obj 455 510 t b;
+#X obj 455 450 f;
+#X obj 455 390 inlet;
+#X obj 455 540 f;
+#X msg 566 532 0;
+#X msg 455 420 bang;
+#X obj 455 480 moses 1;
+#X obj 566 502 t b f;
+#X obj 521 458 moses 1;
+#X obj 107 174 dbtorms;
+#X obj 521 428 r master-lvl;
+#X obj 107 56 r master-lvl;
+#X obj 455 570 s master-lvl;
+#X obj 36 228 inlet~;
+#X obj 251 229 inlet;
+#X obj 269 257 s master-lvl;
+#X msg 119 85 set \$1;
+#X obj 119 115 outlet;
+#X msg 251 283 \; pd dsp 1;
+#X obj 107 236 line~;
+#X obj 36 258 *~;
+#X obj 36 290 dac~;
+#X obj 107 204 pack 0 50;
+#X text 23 205 audio in;
+#X text 2 313 out both channels;
+#X text 246 157 Level input. Send to master-lvl and start DSP (we infer
+that if you're changing the level you want to hear the network.) If
+you start DSP when it's already running there's no effect.;
+#X text 59 542 here is the previous nonzero master-lvl -->;
+#X text 98 451 recall previous value of master-lvl -->;
+#X text 239 482 test if less than 1 -->;
+#X text 203 510 if true convert to bang -->;
+#X text 218 351 Mute control. If the master level is zero \, restore
+to the last nonzero one \, otherwise zero it.;
+#X text 182 114 <-- update the number box to show new level;
+#X connect 0 0 3 0;
+#X connect 1 0 6 0;
+#X connect 2 0 5 0;
+#X connect 3 0 12 0;
+#X connect 4 0 12 0;
+#X connect 5 0 1 0;
+#X connect 6 0 0 0;
+#X connect 6 1 7 0;
+#X connect 7 0 4 0;
+#X connect 8 1 3 1;
+#X connect 9 0 22 0;
+#X connect 10 0 1 1;
+#X connect 10 0 8 0;
+#X connect 11 0 9 0;
+#X connect 11 0 16 0;
+#X connect 13 0 20 0;
+#X connect 14 0 15 0;
+#X connect 14 0 18 0;
+#X connect 16 0 17 0;
+#X connect 19 0 20 1;
+#X connect 20 0 21 0;
+#X connect 20 0 21 1;
+#X connect 22 0 19 0;
+#X restore 15 327 pd output;
+#X msg 91 295 MUTE;
+#X msg 128 230 bang;
+#X floatatom 280 66 0 0 0;
+#X text 177 229 <-- click to graph;
+#X obj 15 206 r frequency;
+#X obj 15 232 osc~ 0;
+#X msg 280 37 set \$1;
+#X floatatom 6 66 0 0 0;
+#X obj 6 8 r frequency;
+#X msg 6 37 set \$1;
+#X obj 19 90 s frequency;
+#X obj 280 8 r pitch;
+#X obj 289 90 s pitch;
+#X obj 280 116 mtof;
+#X obj 280 145 s frequency;
+#X obj 6 145 s pitch;
+#X obj 6 116 ftom;
+#X text 105 66 <-- set frequency;
+#X text 372 65 <-- set MIDI pitch;
+#X text 15 429 Frequency and pitch are converted using the "ftom" and
+"mtof" objects. Frequency refers to the number of cycles per second.
+Pitch is "60" for Middle C \, 61 for C sharp \, 72 for the next C up
+\, and so on.;
+#X text 476 308 ---- 0.1 seconds ----;
+#X text 447 6 FREQUENCY AND PITCH;
+#X text 16 363 The osc~ object \, if you give it an argument \, expects
+floating-point messages to set its frequency. Without arguments \,
+its frequency is controlled by connecting an audio signal to its input.
+;
+#X text 14 496 Mtof and ftom work fine for microtones (non-integral
+"MIDI pitch" ) and don't have MIDI's range restriction-- for example
+\, MIDI -36 is about 1 Hz.;
+#X text 15 553 Note also the "set" messages going to the number boxes
+so that they can each update the other without bringing on an infinite
+loop. (get help on number boxes for details.);
+#X text 437 619 updated for Pd version 0.34;
+#X text 141 295 <-- output level;
+#X text 51 116 <-- convert frequency;
+#X text 106 134 to "MIDI" pitch;
+#X text 327 117 <-- convert "MIDI" pitch to frequency;
+#X connect 2 0 3 1;
+#X connect 3 0 2 0;
+#X connect 4 0 3 2;
+#X connect 5 0 1 0;
+#X connect 6 0 16 0;
+#X connect 6 0 17 0;
+#X connect 8 0 9 0;
+#X connect 9 0 1 0;
+#X connect 9 0 3 0;
+#X connect 10 0 6 0;
+#X connect 11 0 14 0;
+#X connect 11 0 20 0;
+#X connect 12 0 13 0;
+#X connect 13 0 11 0;
+#X connect 15 0 10 0;
+#X connect 17 0 18 0;
+#X connect 20 0 19 0;

@@ -1,0 +1,58 @@
+#N struct help-plot-template float x float y array array1 help-plot-array1-template
+array array2 help-plot-array2-template array array3 help-plot-array3-template
+;
+#N struct help-plot-array1-template float y;
+#N struct help-plot-array2-template float x float y;
+#N struct help-plot-array3-template float y float w;
+#N canvas 398 0 516 229 12;
+#N canvas 89 309 626 539 help-plot-template 1;
+#X text 29 34 creation arguments:;
+#X text 48 71 - RGB color (0=black \, 999=white \, 900=red \, 90=green
+\, 9=blue \, 555=grey \, etc.);
+#X obj 24 387 template float x float y array array1 help-plot-array1-template
+array array2 help-plot-array2-template array array3 help-plot-array3-template
+;
+#X text 47 52 - OPTIONAL word "curve" to specify bezier;
+#X text 46 98 - line width;
+#X text 46 114 - relative x and y location;
+#X text 47 130 - x spacing;
+#X obj 39 217 plot curve array2 70 3 100 0;
+#X obj 30 308 plot curve array3 9 1 120 50 20;
+#X obj 45 12 plot array1 500 1 10 15 20;
+#X text 29 147 This first example plots the red trace (500) \, width
+1 \, at point (10 \, 15) \, with horizontal spacing 20 The black diamonds
+come from the template of the array1 element itself.;
+#X text 62 239 This is the green spiral (color 70 \, line width 3 \,
+location (100 \, 0). Since the template for array2 contains an "x"
+cariable \, play ignores x spacing requests and takes x from the data
+itself.;
+#X text 50 328 If a "w" variable is present in the template as for
+array3 \, it is added to the line width.;
+#X text 33 366 here's the template for all this:;
+#X obj 27 501 filledpolygon 509 509 0 -10 -10 10 -10 10 10 -10 10;
+#X text 27 454 To see the data itself \, select "properties" for the
+scalar by right clicking on the purple square.;
+#X restore 243 78 pd help-plot-template;
+#N canvas 196 292 273 120 help-plot-array1-template 0;
+#X obj 30 71 filledpolygon 0 0 0 -5 0 0 5 5 0 0 -5;
+#X obj 32 27 template float y;
+#X restore 242 101 pd help-plot-array1-template;
+#N canvas 161 163 273 120 help-plot-array2-template 0;
+#X obj 32 26 template float x float y;
+#X restore 243 123 pd help-plot-array2-template;
+#N canvas 0 0 411 207 help-plot-data 1;
+#X scalar help-plot-template 39 73 \; 0 \; 20 \; 0 \; 30 \; 0 \; \;
+0 0 \; 0 10 \; 20 0 \; 0 -30 \; -40 0 \; 0 50 \; 60 0 \; \; 0 0 \;
+10 10 \; 0 10 \; 0 1 \; 20 1 \; 20 10 \; 20 1 \; \;;
+#X restore 242 57 pd help-plot-data;
+#X text 23 139 see also:;
+#X obj 30 184 drawnumber;
+#X obj 29 163 template;
+#X obj 35 22 plot;
+#X text 87 21 -- draw array elements of scalars;
+#X obj 29 206 drawpolygon;
+#N canvas 161 163 273 120 help-plot-array3-template 0;
+#X obj 43 32 template float y float w;
+#X restore 242 144 pd help-plot-array3-template;
+#X text 8 79 explanation is in here-->;
+#X text 264 203 updated for Pd version 0.35;
