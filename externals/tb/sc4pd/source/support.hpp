@@ -95,9 +95,3 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define SIGFUN(FUN) &thisType::FUN
 
 
-/* this macro has to be redefined to work with flext */
-
-// calculate a slope for control rate interpolation to audio rate.
-//#define CALCSLOPE(next,prev) ((next - prev) * unit->mRate->mSlopeFactor)
-#undef CALCSLOPE
-#define CALCSLOPE(next,prev) ((next - prev) * 1/Blocksize())

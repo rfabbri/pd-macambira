@@ -35,14 +35,7 @@
    
 */
 
-#include <flext.h>
 #include "support.hpp"
-#include "SC_PlugIn.h"
-
-
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
-#error You need at least FLEXT version 0.4.6
-#endif
 
 /* ------------------------ MantissaMask~ -----------------------------*/
 

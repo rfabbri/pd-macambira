@@ -34,13 +34,7 @@
    Coded while listening to: Assif Tsahar & Tatsuya Nakatani: Come Sunday
 */
 
-#include <flext.h>
-#include "SC_PlugIn.h"
-#include "support.hpp"
-
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
-#error You need at least FLEXT version 0.4.6
-#endif
+#include "sc4pd.hpp"
 
 /* ------------------------ Dust~ -------------------------------------*/
 
