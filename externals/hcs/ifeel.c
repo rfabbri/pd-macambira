@@ -18,6 +18,13 @@
  * based on ifeel_send.c from the linux iFeel driver:
  * http://sourceforge.net/projects/tactile
  *
+ * there is a difference in the naming schemes of the ifeel driver and this 
+ * object.  The ifeel driver uses strength, delay, and count.  This object 
+ * uses level, interval, and count.
+ *
+ * strength/level - the strength of the pulse (I am searching for a better word)
+ * delay/interval - the interval in between each pulse
+ * count          - the total number of pulses to do
  */
 
 #include "m_pd.h"
@@ -30,8 +37,13 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include "ifeel.h"
+
+
+#define DEBUG(x)
+/*#define DEBUG(x) x */
 
 
 #define IFEEL_DEVICE    "/dev/input/ifeel0"
@@ -47,76 +59,96 @@ typedef struct _ifeel {
 
 
 /******************************************************************************
-general ff methods
+support functions
 ******************************************************************************/
 
-void ifeel_start(t_ifeel *x)
-{
-  post("ifeel_start");
-  
+void ifeel_playcommand(t_ifeel *x) {
+/*   const struct timespec *requested_time; */
+/*   struct timespec *remaining; */
+
   if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
-    printf("ERROR %s\n", strerror(errno));
-  }  
+    post("x->x_fd: %d",x->x_fd);
+    post("level: %d   interval: %d   count: %d",x->x_ifeel_command.strength,x->x_ifeel_command.delay,x->x_ifeel_command.count);
+    post("ERROR %s", strerror(errno));
+    close(x->x_fd);  
+  }
+
+  DEBUG(
+  post("level: %d   interval: %d   count: %d",x->x_ifeel_command.strength,x->x_ifeel_command.delay,x->x_ifeel_command.count);
+  post("");)
 }
 
-void ifeel_stop(t_ifeel *x)
-{
-  post("ifeel_stop");
+
+/******************************************************************************
+input/control functions
+******************************************************************************/
+void ifeel_start(t_ifeel *x) {
+  DEBUG(post("ifeel_start");)
+
+  /* 
+   * since ifeel_stop sets everything to zero, we need to
+   * read the inlets again to get current values 
+   */
   
+  ifeel_playcommand(x);
+}
+
+void ifeel_stop(t_ifeel *x) {
+  DEBUG(post("ifeel_stop");)
+  
+  /* 
+   * there is no 'stop' ioctl, so set everything to zero 
+   * to achieve the same effect                          
+   */
   x->x_ifeel_command.strength = 0;
   x->x_ifeel_command.delay = 0;
   x->x_ifeel_command.count = 0;
-  if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
-    printf("ERROR %s\n", strerror(errno));
-  }  
+
+  ifeel_playcommand(x);
 }
 
-void ifeel_level(t_ifeel *x, t_floatarg level)
-{
-  post("ifeel_level");
+void ifeel_level(t_ifeel *x, t_floatarg level) {
+  DEBUG(post("ifeel_level");)
   
-  /* make sure its in the proper range */
+  /* 
+   * make sure its in the proper range 
+   * this object takes floats 0-1
+   * the ifeel driver takes ints 0-255
+   */
   level = level * 255;
   level = (level > 255 ? 255 : level);
   level = (level < 0 ? 0 : level);
 
   x->x_ifeel_command.strength  = (unsigned int)level;
-
-  if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
-    printf("ERROR %s\n", strerror(errno));
-  }  
-  
 }
 
-void ifeel_interval(t_ifeel *x, t_floatarg interval)
-{
-  post("ifeel_interval");
+void ifeel_interval(t_ifeel *x, t_floatarg interval) {
+  DEBUG(post("ifeel_interval");)
   
   interval = (interval < 0 ? 0 : interval);
 
   x->x_ifeel_command.delay  = (unsigned int)interval;
-
-  if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
-    printf("ERROR %s\n", strerror(errno));
-  }  
 }
 
-void ifeel_count(t_ifeel *x, t_floatarg count )
-{
-  post("ifeel_count");
+void ifeel_count(t_ifeel *x, t_floatarg count ) {
+  DEBUG(post("ifeel_count");)
   
-  count = (count < 0 ? 0 : count);
+  count = (count < 0 ? 0 : count);  
 
   x->x_ifeel_command.count  = (unsigned int)count;
-
-  if (ioctl(x->x_fd, USB_IFEEL_BUZZ_IOCTL, &x->x_ifeel_command) < 0) {
-    printf("ERROR %s\n", strerror(errno));
-  }  
 }
+
+static int ifeel_open(t_ifeel *x) {
+  return 1;
+}
+
+/******************************************************************************
+  init/free functions
+******************************************************************************/
 
 void ifeel_free(t_ifeel *x)
 {
-  post("ifeel_free");
+  DEBUG(post("ifeel_free");)
   
   /* stop effect */
   ifeel_stop(x);
@@ -125,11 +157,18 @@ void ifeel_free(t_ifeel *x)
   close(x->x_fd);
 }
 
-void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_floatarg count)
-{
-  post("ifeel_new");
-  
+void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_floatarg count) {
+  DEBUG(post("ifeel_new");)
+
   t_ifeel *x = (t_ifeel *)pd_new(ifeel_class);
+  
+  post("iFeel mouse, by Hans-Christoph Steiner <hans@eds.org>");
+  post("");
+  post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
+  post ("This object is under development!  The interface could change at anytime!");
+  post ("As I write cross-platform versions, the interface might have to change.");
+  post ("WARNING * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING");
+  post("");
   
   /* 
    * init to zero so I can use the ifeel_* methods to set the 
@@ -142,7 +181,7 @@ void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_float
   inlet_new(&x->x_obj,
 	    &x->x_obj.ob_pd,
 	    gensym("float"),
-	    gensym("direction"));
+	    gensym("interval"));
   inlet_new(&x->x_obj,
 	    &x->x_obj.ob_pd,
 	    gensym("float"),
@@ -156,15 +195,16 @@ void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_float
     post("Using %s",device->s_name);
     
     /* x->x_fd = open(IFEEL_DEVICE, O_RDWR); */
-    /*   x->x_fd = open((char *) device->s_name, O_RDWR); */
     if ((x->x_fd = open((char *) device->s_name, O_RDWR | O_NONBLOCK, 0)) <= 0) {
       printf("ERROR %s\n", strerror(errno)); 
+      return 0;
     }
-    
-    ifeel_level(x,level);
-    ifeel_interval(x,interval);
-    ifeel_count(x,count);
+
+/*     ifeel_level(x,level); */
+/*     ifeel_interval(x,interval); */
+/*     ifeel_count(x,count); */
   }
+
   else {
     post("ifeel: You need to set an ifeel device (i.e /dev/input/ifeel0)");
   }
@@ -172,13 +212,9 @@ void *ifeel_new(t_symbol *device, t_floatarg level, t_floatarg interval, t_float
   return (void*)x;
 }
 
-/******************************************************************************
-   initialisation functions
-******************************************************************************/
-
 void ifeel_setup(void)
 {
-  post("ifeel_setup");
+  DEBUG(post("ifeel_setup");)
   
   ifeel_class = class_new(gensym("ifeel"),
 			  (t_newmethod)ifeel_new,
@@ -193,7 +229,7 @@ void ifeel_setup(void)
   
   class_addbang(ifeel_class,ifeel_start);
 
-  class_addmethod(ifeel_class, (t_method)ifeel_stop,gensym("start"),0);
+  class_addmethod(ifeel_class, (t_method)ifeel_start,gensym("start"),0);
   class_addmethod(ifeel_class, (t_method)ifeel_stop,gensym("stop"),0);
   
   class_addmethod(ifeel_class, (t_method)ifeel_level,  gensym("level"), A_DEFFLOAT,0);  

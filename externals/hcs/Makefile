@@ -13,7 +13,7 @@ LINUXCFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
 LINUXINCLUDE =  -I/usr/local/lib/pd/include -I../../pd/src
 
 .c.pd_linux:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	gcc-3.2 $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
