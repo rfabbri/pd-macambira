@@ -10,11 +10,26 @@ proc playlist_apply {id} {
      global $var_graph_width
      set var_graph_height [concat graph_height$vid]
      global $var_graph_height
+     set var_graph_font [concat graph_font$vid]
+     global $var_graph_font
+     set var_graph_bgcolor [concat graph_bgcolor$vid]
+     global $var_graph_bgcolor
+     set var_graph_sbcolor [concat graph_sbcolor$vid]
+     global $var_graph_sbcolor
+     set var_graph_fgcolor [concat graph_fgcolor$vid]
+     global $var_graph_fgcolor
+     set var_graph_secolor [concat graph_secolor$vid]
+     global $var_graph_secolor
  
      set cmd [concat $id dialog \
      	[eval concat $$var_graph_extension] \
      	[eval concat $$var_graph_width] \
      	[eval concat $$var_graph_height] \
+     	[eval concat $$var_graph_font] \
+     	[eval concat $$var_graph_bgcolor] \
+     	[eval concat $$var_graph_sbcolor] \
+     	[eval concat $$var_graph_fgcolor] \
+     	[eval concat $$var_graph_secolor] \
  	\;]
      #puts stderr $cmd
      pd $cmd
@@ -31,7 +46,7 @@ proc playlist_ok {id} {
      playlist_cancel $id
 }
  
-proc pdtk_playlist_dialog {id extension width height} {
+proc pdtk_playlist_dialog {id extension width height font bgcolor sbcolor fgcolor secolor} {
      set vid [string trimleft $id .]
      set var_graph_extension [concat graph_extension_$vid]
      global $var_graph_extension
@@ -39,10 +54,25 @@ proc pdtk_playlist_dialog {id extension width height} {
      global $var_graph_width
      set var_graph_height [concat graph_height$vid]
      global $var_graph_height
+     set var_graph_font [concat graph_font$vid]
+     global $var_graph_font
+     set var_graph_bgcolor [concat graph_bgcolor$vid]
+     global $var_graph_bgcolor
+     set var_graph_sbcolor [concat graph_sbcolor$vid]
+     global $var_graph_sbcolor
+     set var_graph_fgcolor [concat graph_fgcolor$vid]
+     global $var_graph_fgcolor
+     set var_graph_secolor [concat graph_secolor$vid]
+     global $var_graph_secolor
  
      set $var_graph_extension $extension
-     set $var_graph_width $width
-     set $var_graph_height $height
+     set $var_graph_width   $width
+     set $var_graph_height  $height
+     set $var_graph_font    $font
+     set $var_graph_bgcolor $bgcolor
+     set $var_graph_sbcolor $sbcolor
+     set $var_graph_fgcolor $fgcolor
+     set $var_graph_secolor $secolor
  
      toplevel $id
      wm title $id {playlist}
@@ -81,9 +111,44 @@ proc pdtk_playlist_dialog {id extension width height} {
      entry $id.3rangef.height -textvariable $var_graph_height -width 7
      pack $id.3rangef.lheight $id.3rangef.height -side left
  
+     frame $id.3_5rangef
+     pack $id.3_5rangef -side top
+     label $id.3_5rangef.lfont -text "Font :"
+     entry $id.3_5rangef.font -textvariable $var_graph_font -width 30
+     pack $id.3_5rangef.lfont $id.3_5rangef.font -side left
+ 
+     frame $id.4rangef
+     pack $id.4rangef -side top
+     label $id.4rangef.lbgcolor -text "Background Color :"
+     entry $id.4rangef.bgcolor -textvariable $var_graph_bgcolor -width 7
+     pack $id.4rangef.lbgcolor $id.4rangef.bgcolor -side left
+ 
+     frame $id.5rangef
+     pack $id.5rangef -side top
+     label $id.5rangef.lsbcolor -text "Scroll Bar Color :"
+     entry $id.5rangef.sbcolor -textvariable $var_graph_sbcolor -width 7
+     pack $id.5rangef.lsbcolor $id.5rangef.sbcolor -side left
+ 
+     frame $id.6rangef
+     pack $id.6rangef -side top
+     label $id.6rangef.lfgcolor -text "Foreground Color :"
+     entry $id.6rangef.fgcolor -textvariable $var_graph_fgcolor -width 7
+     pack $id.6rangef.lfgcolor $id.6rangef.fgcolor -side left
+ 
+     frame $id.7rangef
+     pack $id.7rangef -side top
+     label $id.7rangef.lsecolor -text "Selection Color :"
+     entry $id.7rangef.secolor -textvariable $var_graph_secolor -width 7
+     pack $id.7rangef.lsecolor $id.7rangef.secolor -side left
+ 
      bind $id.1rangef.extension <KeyPress-Return> [concat playlist_ok $id]
-     bind $id.2rangef.width <KeyPress-Return> [concat playlist_ok $id]
-     bind $id.3rangef.height <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.2rangef.width   <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.3rangef.height  <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.3_5rangef.font  <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.4rangef.bgcolor <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.5rangef.sbcolor <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.6rangef.fgcolor <KeyPress-Return> [concat playlist_ok $id]
+     bind $id.7rangef.secolor <KeyPress-Return> [concat playlist_ok $id]
 }
 
 ############ playlist procedures END -- ydegoyon@free.fr     #########

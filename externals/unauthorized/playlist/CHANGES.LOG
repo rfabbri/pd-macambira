@@ -1,3 +1,9 @@
+0.8
+  added colors and font properties 
+  added a "font" message
+  added a "sort" message ( using alphabetical or creation order )
+0.7
+  adapted for pd 0.37
 0.6
   added properties menu
 0.5
