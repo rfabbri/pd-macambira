@@ -2,31 +2,26 @@
 
 deljoin - join a list with delimiter
 
-Copyright (c) 2002-2003 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2005 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 */
 
+#define FLEXT_ATTRIBUTES 1
+
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 401)
-#error You need at least flext version 0.4.1
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
+#error You need at least flext version 0.5.0
 #endif
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#define I int
-#define L long
-#define F float
-#define D double
-#define V void
-#define C char
-#define BL bool
 
-#define VERSION "0.1.2"
+#define VERSION "0.1.4"
 
 #ifdef __MWERKS__
 #define STD std
@@ -41,91 +36,110 @@ class deljoin:
 	FLEXT_HEADER_S(deljoin,flext_base,Setup)
 
 public:
-	deljoin(I argc,const t_atom *argv);
+	deljoin(int argc,const t_atom *argv);
 
 protected:
-	V m_list(const t_symbol *s,int argc,const t_atom *argv);
-	V m_del(const t_symbol *s);
-	
+	void m_list(const t_symbol *s,int argc,const t_atom *argv);
+    void m_del(const t_symbol *s,int argc,const t_atom *argv);	
+
 	const t_symbol *delim;
 	
-	virtual void m_help();
-		
 private:
-	static V Setup(t_classid c);
+	static void Setup(t_classid c);
 
+	static const t_symbol *sym__space;
+	
 	FLEXT_CALLBACK_A(m_list)
-	FLEXT_CALLBACK_S(m_del)
+	FLEXT_CALLBACK_A(m_del)
+    FLEXT_ATTRVAR_S(delim)
 };
 
 FLEXT_NEW_V("deljoin",deljoin)
 
 
-V deljoin::Setup(t_classid c)
+const t_symbol *deljoin::sym__space = NULL;
+
+void deljoin::Setup(t_classid c)
 {
+    sym__space = MakeSymbol(" ");
+
 	FLEXT_CADDMETHOD(c,0,m_list);
 	FLEXT_CADDMETHOD(c,1,m_del);
+	FLEXT_CADDATTR_VAR1(c,"del",delim);
 }
 
-deljoin::deljoin(I argc,const t_atom *argv):
-	delim(NULL)
+deljoin::deljoin(int argc,const t_atom *argv):
+	delim(sym__)
 { 
 	AddInAnything("Anything in - triggers output");
-	AddInSymbol("Set the Delimiter");
+	AddInAnything("Set the Delimiter");
 	AddOutSymbol("A symbol representing the joined list");
 
-	if(argc && IsSymbol(argv[0])) delim = GetSymbol(argv[0]);
+    m_del(sym_list,argc,argv);
 }
 
-V deljoin::m_help()
-{
-	post("%s version " VERSION " (using flext " FLEXT_VERSTR "), (C) 2002 Thomas Grill",thisName());
+void deljoin::m_del(const t_symbol *s,int argc,const t_atom *argv) 
+{	
+    delim = NULL;
+    if(s == sym_symbol) {
+        FLEXT_ASSERT(argc == 1 && IsSymbol(argv[0]));
+        delim = GetSymbol(argv[0]);
+    }
+    else if(s == sym_list) {
+        if(argc == 0)
+            delim = sym__space;
+        else if(argc >= 1) {
+            if(IsSymbol(argv[0]))
+                delim = GetSymbol(argv[0]);
+            else if(IsFloat(argv[0]) || IsInt(argv[0]))
+                delim = sym__;
+        }
+    }
+    else if(s == sym_bang || s == sym_float || s == sym_int)
+        delim = sym__;
+
+    if(!delim) {
+        post("%s - Argument must be a symbol, list or int/float/bang",thisName());
+        delim = sym__;
+    }
 }
 	
 /** \brief convert incoming list to a concatenated string
 	
 	Handles symbols, integers and floats
 */
-V deljoin::m_list(const t_symbol *s,int argc,const t_atom *argv)
+void deljoin::m_list(const t_symbol *s,int argc,const t_atom *argv)
 {
-	if(delim) {
-		C tmp[1024],*t = tmp;
-		const C *sdel = GetString(delim);
-		I ldel = strlen(sdel);
-		
-		if(s && s != sym_list && s != sym_float && s != sym_int) {
-			strcpy(t,GetString(s));		
-			t += strlen(t);
-		}
-		
-		for(int i = 0; i < argc; ++i) {
-			if(t != tmp) {
-				strcpy(t,sdel);		
-				t += ldel;
-			}
-		
-			const t_atom &a = argv[i];
-			if(IsSymbol(a))
-				strcpy(t,GetString(a));
-			else if(IsInt(a)) {
-				STD::sprintf(t,"%i",GetInt(a),10);
-			}
-			else if(IsFloat(a)) {
-				STD::sprintf(t,"%f",GetFloat(a),10);
-			}
-	//		else do nothing
-				
-			t += strlen(t);
-		}
-		
-		ToOutString(0,tmp);
+    FLEXT_ASSERT(delim);
+
+	char tmp[1024],*t = tmp;
+	const char *sdel = GetString(delim);
+	int ldel = strlen(sdel);
+	
+	if(s && s != sym_list && s != sym_float && s != sym_int) {
+		strcpy(t,GetString(s));		
+		t += strlen(t);
 	}
-	else
-		post("%s - No delimiter defined",thisName());
+	
+	for(int i = 0; i < argc; ++i) {
+		if(t != tmp) {
+			strcpy(t,sdel);		
+			t += ldel;
+		}
+	
+		const t_atom &a = argv[i];
+		if(IsSymbol(a))
+			strcpy(t,GetString(a));
+		else if(IsInt(a)) {
+			STD::sprintf(t,"%i",GetInt(a),10);
+		}
+		else if(IsFloat(a)) {
+			STD::sprintf(t,"%f",GetFloat(a),10);
+		}
+//		else do nothing
+			
+		t += strlen(t);
+	}
+	
+	ToOutString(0,tmp);
 }
-
-V deljoin::m_del(const t_symbol *s)
-{
-	delim = s;
-}
-
