@@ -1,17 +1,43 @@
 
 To compile a standalone Pd.app, you need this stuff:
 
+______________________________
 Tcl/Tk Standalone .app
+------------------------------
 
-  1. download TclTkAquaStandalone-8.?.?.dmg from http://tcltkaqua.sourceforge.net/
-  	  (I used 8.4.7)		  
+  1. download TclTkAquaStandalone-8.4.*.dmg from http://tcltkaqua.sourceforge.net/
+  	  (I used 8.4.9)		  
   2. mount the dmg
   3. the Makefile will find what it needs in the mounted .dmg
 
-
+Tcl/Tk Frameworks
+  1. download TclTkAqua-8.4.*.dmg from http://tcltkaqua.sourceforge.net/ 
+     (I used 8.4.9)
+  2. install Tcl/Tk.pkg in the standard location
+  	  
+______________________________
 JackOSX 
+______________________________
 
   1. download latest JackOSX from http://www.jackosx.com/download.html 
-  	  (I used version 0.4.1)
-  2. install the .pkg
-  3. 
+  	  (I used version 0.6.1)
+  2. install the .pkg in the standard location
+
+______________________________
+You will need all this stuff from CVS:
+------------------------------
+	 mkdir pure-data && chdir pure-data
+	 CVSROOT = :pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data
+	 cvs co abstractions
+	 cvs co doc
+	 cvs co externals
+	 cvs co packages
+	 
+______________________________
+making the Pd.app
+------------------------------
+
+    In packages/darwin_app/Makefile, on line 177, you'll need to choose wheter
+    you compiling from MSP source or CVS.
+
+

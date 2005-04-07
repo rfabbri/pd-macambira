@@ -1,22 +1,33 @@
 
-- fix socket.patch and s_audio_jack.patch
-
-- add context to all patches
-
 - include auto-.pdrc script in package somewhere...
 
-- convert from -DMACOSX to -D__APPLE__ where ever possible (check out
-  __gnu_linux__) while I am at it
-
 - make a web page that has stuff that can't be included due to license issues:
-  (percolate, OSC?)
+  (percolate)
 
-- add m_pd.h to /usr/local/include to Pd-UNIX.pkg
-
-- add externals/OSCx/send+dump/ dumpOSC and sendOSC to Pd-UNIX.pkg
+- create Tcl script called from Prefs that creates links for the standard unix
+- locations for files that are in bin, include, man inside $(PD_FILE_ROOT)
 
 - redo menu system
   		 - the menus are the same for all windows
 		 - instead of hiding menus, grey-out/disable menu items on Pd window
 		 - one method for creating all menus
 		 - Pd window has method which disables menus
+
+- make Cmd-Delete also delete, as well as just Delete, so that my Finder key
+  command habits work in Pd as well
+
+- make Cmd-H and Alt-Cmd-H work when the Alt key is spec'ed
+
+- write sed script to set help-patch font size to 10 point from 12 point on
+  all help patches.
+
+- add file browser and cascasing menus to Help menu
+
+- create --enable-cpu and --enable-arch in pd/src/configure.in
+
+- create general optimization flag system
+
+- convert from -DMACOSX to -D__APPLE__ where ever possible (check out
+  __gnu_linux__) while I am at it
+
+- add context to all patches

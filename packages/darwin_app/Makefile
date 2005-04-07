@@ -8,14 +8,15 @@ PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
 # source for the Wish Shell.app used to build Pd
-# download TclTkAquaStandalone-8.?.?.dmg from http://tcltkaqua.sourceforge.net/
+# download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
 # and mount it.  The files will be copied from the mounted .dmg image.
 #WISH_SHELL = /Applications/Utilities/Wish\ Shell.app
-WISH_SHELL = /Volumes/TclTkAquaStandalone-8.?.*/Wish\ Shell.app
+TCLTK = $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -1|sed 's/\.dmg//')
+WISH_SHELL = /Volumes/$(TCLTK)/Wish\ Shell.app
 WISH_SHELL_CONTENTS = $(WISH_SHELL)/Contents
 
-LIB_DIR = $(DESTDIR)$(INSTALL_PREFIX)/lib
-PD_FILE_ROOT = $(LIB_DIR)/pd
+LIB_DIR = $(DESTDIR)$(INSTALL_PREFIX)
+PD_FILE_ROOT = $(LIB_DIR)
 ABSTRACTIONS_DIR = $(PD_FILE_ROOT)/doc/abstractions
 EXTERNALS_DIR = $(PD_FILE_ROOT)/extra
 HELP_DIR = $(PD_FILE_ROOT)/doc
@@ -33,10 +34,13 @@ PACKAGE_VERSION = beta4
 PACKAGE_NAME = pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 DMG_NAME = $(PACKAGE_NAME)
 
-
-UNIX_PACKAGE_NAME = $(PD_APP_NAME)-UNIX-$(PD_VERSION)-$(PACKAGE_VERSION)
-UNIX_prefix = /usr/local
-UNIX_DESTDIR = pd-unix-root
+# in retrospect, I think this is a bad way to do it.
+# instead, I plan on making a including Tcl script
+# which creates links to the stuff inside of the Pd.app.
+# That script will then be called by a GUI menu item or pref.
+#UNIX_PACKAGE_NAME = $(PD_APP_NAME)-UNIX-$(PD_VERSION)-$(PACKAGE_VERSION)
+#UNIX_prefix = /usr/local
+#UNIX_DESTDIR = pd-unix-root
 
 
 WELCOME_FILE = Welcome.html
@@ -69,17 +73,17 @@ TOXY_VERSION = $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
 ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
-darwin_app: darwin_app_wrapper darwin_app_core darwin_unix_pkg darwin_app_externals \
-		darwin_app_docs darwin_app_abstractions
+darwin_app: darwin_app_wrapper darwin_patch_pd darwin_app_core \
+	darwin_app_externals darwin_app_docs darwin_app_abstractions
 
 
 darwin_app_license:
   # generate HTML version of License
-	echo "<HTML><BODY>" > $(LICENSE_FILE)
-	echo "<H3>(Parts of this package can be used under the Pd/BSD license)</H3>" >> $(LICENSE_FILE)
-	echo "<FONT SIZE=\"-1\">" >> $(LICENSE_FILE)
+	echo "<html><body>" > $(LICENSE_FILE)
+	echo "<h3>(Parts of this package can be used under the Pd/BSD license)</h3>" >> $(LICENSE_FILE)
+	echo "<font size=\"-1\">" >> $(LICENSE_FILE)
 	cat ../../externals/creb/COPYING | sed -e 's/^$$/\<P\>/g' >> $(LICENSE_FILE)	
-	echo "</FONT></BODY></HTML>" >> $(LICENSE_FILE)
+	echo "</font></body></html>" >> $(LICENSE_FILE)
 
 
 darwin_app_readme:
@@ -133,8 +137,11 @@ darwin_app_readme:
 	echo "(this package was built on `date`) <BR>" >> $(README_FILE)
 	echo "</body></html>" >> $(README_FILE)
 
+darwin_mount_tcltk:
+# it should automatically mount the most recent TclTkStandalone here	
 
 darwin_app_wrapper:
+	hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
@@ -154,35 +161,40 @@ darwin_app_wrapper:
 # set up app wrapper
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(DESTDIR)$(PD_APP_CONTENTS)"
-	#install -m0644 -p Pd.term "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p *.icns  "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
-# using the shell script hack until AppMain.tcl works
-	install -m0644 -p AppMain.tcl "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
-	#  install -m0755 -p Pd "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
+# pd/src/u_main.tk now acts as the AppMain.tcl
+#	install -m0644 -p AppMain.tcl "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 # rename the Wish Shell executable to "Pd"
 	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
+	diskutil eject /Volumes/$(TCLTK)
 
+darwin_patch_pd:
+# apply some patches 
+#	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/socket.patch
+#	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/u_main.tk.patch
+	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/darwin_build-0.38.patch
 
 darwin_app_core:
-# apply some patches 
-# with CVS version, next line causes: s_inter.c:645: error: parse error before "if"
-#	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/socket.patch
-	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/makefile.in.patch
-	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/u_main.tk.patch
-	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/configure.jackosx.patch
-# this patch isn't applied properly, so pd doesn't compile
-#	cd ../../pd/src/ && patch -p0<../../packages/darwin_app/patches/s_audio_jack.patch
 # pd core
-	cd ../../pd/src/ && ./configure --enable-jack &&\
-		make install \
-			DESTDIR=../../packages/darwin_app/$(DESTDIR) \
-			prefix=$(INSTALL_PREFIX)
-# The last line above needs to be changed based on which version
-# of the pd core source you are compiling:
-#        INSTALL_PREFIX=$(INSTALL_PREFIX) is for pd-MSP 0.37.1
-#        prefix=$(INSTALL_PREFIX) is for pd-CVS 0.37
+	cd ../../pd/src/ && \
+		./configure --enable-jack --prefix=$(INSTALL_PREFIX) && make
+	cp -R -p ../../pd/bin ../../pd/doc ../../pd/extra ../../pd/man  \
+		$(PD_FILE_ROOT)
+# AppMain.tcl
+	cd "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts" && \
+		ln -s ../bin/pd.tk AppMain.tcl
+# Headers
+	install -d -m0755 $(PD_FILE_ROOT)/include
+	install -m0444 ../../pd/src/*.h $(PD_FILE_ROOT)/include
 
 darwin_app_docs:
+#----------------------------------------------------------------------------
+# set the font to 10pt on all help patches
+	cd $(HELP_DIR) && \
+		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' */*.pd
+# the BSD/Darwin version of sed must create a backup file when doing 
+# in-place replacement, so delete the unneeded backup files
+	rm */*.pd.bak
 #----------------------------------------------------------------------------
 # DOC
 	install -d $(HELP_DIR)/5.reference
@@ -192,7 +204,7 @@ darwin_app_docs:
 #----------------------------------------------------------------------------
 # PDDP
 	install -m644 --group=staff ../../doc/pddp/*.pd $(HELP_DIR)/5.reference
-
+#----------------------------------------------------------------------------
 # DOC menus
 	install -d $(HELP_DIR)/menus
 	cp -p ./doc-menu.pd $(HELP_DIR)/menus
@@ -211,7 +223,8 @@ darwin_app_abstractions:
 	install -p -m0444	../../externals/creb/doc/examples/*.* $(ABSTRACTIONS_DIR)/creb
 #	cp -Rf footils timestretch vadsr~  $(ABSTRACTIONS_DIR)
 
-darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
+darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
+#darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
 
 darwin_app_externals_gem:
 	cd ../../Gem && pbxbuild
@@ -309,19 +322,24 @@ darwin_app_externals_standard:
 	install -p -m0444 ../../Gem/manual/*.* $(HELP_DIR)/gem/00.manual
 	cp -Rfp ../../Gem/examples/*.* ../../Gem/examples/data $(HELP_DIR)/gem
 #----------------------------------------------------------------------------
+# hcs
+	cd ../../externals/hcs/hid && make
+	install -p -m0444 ../../externals/hcs/hid/hid.pd_darwin $(EXTERNALS_DIR)
+	install -p -m0444 ../../externals/hcs/hid/ev*-list.pd $(HELP_DIR)/5.reference
+	install -p -m0444 ../../externals/hcs/hid/*-help.pd $(HELP_DIR)/5.reference
+#----------------------------------------------------------------------------
 # miXed
 	cd ../../externals/miXed/toxy && make
 	cd ../../externals/miXed/cyclone && make
-	install -p -m444 ../../externals/miXed/bin/*.pd_darwin $(EXTERNALS_DIR)
-	sudo install -p -m555 ../../externals/miXed/bin/cyclist $(UNIX_DESTDIR)$(UNIX_prefix)/bin
+	install -d -m755 $(EXTERNALS_DIR)/cyclone
+	install -p -m444 ../../externals/miXed/bin/*.pd_darwin $(EXTERNALS_DIR)/cyclone
+	sudo install -p -m555 ../../externals/miXed/bin/cyclist $(PD_FILE_ROOT)/bin
 	install -p -m0444 ../../externals/miXed/test/*/*.*    \
 		../../externals/miXed/doc/*/*/*.*   \
-		$(HELP_DIR)/5.reference
+		$(HELP_DIR)/5.reference/cyclone
 #----------------------------------------------------------------------------
 # OSC
 	cd ../../externals/OSCx && ./configure && make
-	install -d  $(UNIX_DESTDIR)/$(UNIX_prefix)/bin
-	sudo install -p -m0755 ../../externals/OSCx/send+dump/????OSC $(UNIX_DESTDIR)$(UNIX_prefix)/bin
 	install -p -m0444 ../../externals/OSCx/doc/*.* $(HELP_DIR)/5.reference
 	install -p -m0444 ../../externals/OSCx/src/*.pd_darwin $(EXTERNALS_DIR)
 #----------------------------------------------------------------------------
@@ -373,65 +391,64 @@ darwin_app_externals_c++:
 #	cd ../../gridflow && ./configure && make
 
 
-darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
-#darwin_unix_pkg:
-# mk the unix dir
-	install -d $(UNIX_DESTDIR)$(UNIX_prefix)
-# copy stuff to UNIX dirs
-	sudo cp -Rp $(DESTDIR)$(INSTALL_PREFIX)/bin \
-		$(DESTDIR)$(INSTALL_PREFIX)/include \
-		$(DESTDIR)$(INSTALL_PREFIX)/man \
-		$(UNIX_DESTDIR)$(UNIX_prefix)
-#	cd .. && install -p darwin_app/pd-unix.info $(UNIX_PACKAGE_NAME).info
-# cp text for pkg
-	cp $(WELCOME_FILE) $(README_FILE) $(LICENSE_FILE) pkg
-# generate Description.plist
-	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Description.plist.template \
-		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
-		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
-		> pkg/Description.plist
-# generate Info.plist
-	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Info.plist.template \
-		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
-		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
-		> pkg/Info.plist
-# delete cruft
-	-find $(UNIX_DESTDIR) -name .DS_Store -delete
-	-rm -f 1
-# set proper permissions
-	sudo chown -R root:staff $(UNIX_DESTDIR)/$(UNIX_prefix)
-# build package
-	-/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
-		-build \
-		-p $(PWD)/$(UNIX_PACKAGE_NAME).pkg \
-		-f $(PWD)/$(UNIX_DESTDIR) \
-		-r $(PWD)/pkg \
-		-i $(PWD)/pkg/Info.plist		\
-		-d $(PWD)/Description.plist
-# generate .info file
-#	 sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/pd.info \
+#darwin_unix_pkg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
+##darwin_unix_pkg:
+## mk the unix dir
+#	install -d $(UNIX_DESTDIR)$(UNIX_prefix)
+## copy stuff to UNIX dirs
+#	sudo cp -Rp $(DESTDIR)$(INSTALL_PREFIX)/bin \
+#		$(DESTDIR)$(INSTALL_PREFIX)/include \
+#		$(DESTDIR)$(INSTALL_PREFIX)/man \
+#		$(UNIX_DESTDIR)$(UNIX_prefix)
+##	cd .. && install -p darwin_app/pd-unix.info $(UNIX_PACKAGE_NAME).info
+## cp text for pkg
+#	cp $(WELCOME_FILE) $(README_FILE) $(LICENSE_FILE) pkg
+## generate Description.plist
+#	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Description.plist.template \
 #		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
 #		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
-#		> $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
-# install pkg docs
-#	sudo install -m 644 $(LICENSE_FILE) $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
-#	sudo chown -R root:staff $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+#		> pkg/Description.plist
+## generate Info.plist
+#	sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/Info.plist.template \
+#		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+#		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+#		> pkg/Info.plist
+## delete cruft
+#	-find $(UNIX_DESTDIR) -name .DS_Store -delete
+#	-rm -f 1
+## set proper permissions
+#	sudo chown -R root:staff $(UNIX_DESTDIR)/$(UNIX_prefix)
+## build package
+#	-/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker \
+#		-build \
+#		-p $(PWD)/$(UNIX_PACKAGE_NAME).pkg \
+#		-f $(PWD)/$(UNIX_DESTDIR) \
+#		-r $(PWD)/pkg \
+#		-i $(PWD)/pkg/Info.plist		\
+#		-d $(PWD)/Description.plist
+## generate .info file
+##	 sed -e 's/PACKAGE_PREFIX/$(PACKAGE_PREFIX)/' pkg/pd.info \
+##		| sed -e 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/' \
+##		| sed -e 's/PD_VERSION/$(PD_VERSION)/' \
+##		> $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+## install pkg docs
+##	sudo install -m 644 $(LICENSE_FILE) $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
+##	sudo chown -R root:staff $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 
 
-darwin_unix_pkg_welcome:
-	echo "<html><body><p><p>" > $(WELCOME_FILE)
-	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
-	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
-	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
-	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
-	echo "<p>`grep -A9 ACKNOWLEDG ../../pd/README.txt`</p>" >> $(WELCOME_FILE)
-	echo "</FONT>" >> $(WELCOME_FILE)
-	echo "</body></html>" >> $(WELCOME_FILE)
+#darwin_unix_pkg_welcome:
+#	echo "<html><body><p><p>" > $(WELCOME_FILE)
+#	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
+#	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
+#	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
+#	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
+#	echo "<p>`grep -A9 ACKNOWLEDG ../../pd/README.txt`</p>" >> $(WELCOME_FILE)
+#	echo "</FONT>" >> $(WELCOME_FILE)
+#	echo "</body></html>" >> $(WELCOME_FILE)
 
 
-dmg: 
+dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
 	install -d "$(DMG_NAME)"
-#	mv $(UNIX_PACKAGE_NAME).pkg "$(DMG_NAME)"
 	cd $(DESTDIR)/Applications && mv $(PD_APP_NAME).app "../../$(DMG_NAME)"
 	install -p -m0444 ../../pd/LICENSE.txt "$(DMG_NAME)/PD LICENSE.txt"
 	install -p -m0444  pd-16.png $(LICENSE_FILE) $(README_FILE) \
@@ -440,14 +457,20 @@ dmg:
 	/bin/sh mkdmg "$(DMG_NAME)"
 
 
-clean: darwin_app_clean
+clean: darwin_app_clean darwin_unpatch_pd
 
 
 darwin_app_clean:
 	-sudo rm -Rf $(DESTDIR) $(UNIX_DESTDIR) "$(DMG_NAME)" $(UNIX_PACKAGE_NAME) 
 	-rm -f *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
-	cd patches && ./unpatch
+
+darwin_unpatch_pd:
+	cd ../../pd/src/ && patch -R -p0 < ../../packages/darwin_app/patches/darwin_build-0.38.patch
+
+darwin_app_externals_standard_clean:
+	cd ../../externals/build/darwin && make clean
+	cd ../../externals/hcs/hid && make clean
 
 darwin_app_externals_gem_clean:
 	cd ../../Gem && pbxbuild clean
