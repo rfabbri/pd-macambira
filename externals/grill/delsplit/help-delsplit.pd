@@ -1,0 +1,17 @@
+#N canvas 300 90 458 286 12;
+#X msg 264 133 symbol -;
+#X msg 232 57 list;
+#X msg 242 84 list +;
+#X obj 105 229 print;
+#X obj 43 69 tosymbol;
+#X msg 42 42 ask+asd-ssds;
+#X symbolatom 251 111 10 0 0 0 - - -;
+#X obj 105 203 delsplit;
+#X text 273 54 space;
+#X connect 0 0 7 1;
+#X connect 1 0 7 1;
+#X connect 2 0 7 1;
+#X connect 4 0 7 0;
+#X connect 5 0 4 0;
+#X connect 6 0 7 1;
+#X connect 7 0 3 0;
