@@ -1,12 +1,5 @@
 # build class specific settings
 
-ifdef SHARED
-SONAME=$(OUTNAME).$(EXT)
-TARGET=$(TARGETPATH)/$(OUTNAME).$(PKGVERSION).$(EXT)
-else
-TARGET=$(TARGETPATH)/$(OUTNAME).$(EXT)
-endif
-
 ##############################################
 
 # default target
@@ -28,7 +21,7 @@ $(TARGET) :: $(TARGETPATH)
 
 $(TARGET) :: $(COBJS) $(CPPOBJS)
 ifdef SHARED
-	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ -Wl,-soname,$(SONAME) $(COBJS) $(CPPOBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ -Wl,-soname,$(TARGETNAME) $(COBJS) $(CPPOBJS) $(LIBS)
 	chmod 755 $@
 ifndef DEBUG
 ifndef PROFILE
@@ -46,21 +39,24 @@ _clean_:
 
 ##############################################
 
+$(FLEXTINC) $(FLEXTLIB) $(FLEXTSYS) $(FLEXTBIN):
+	-mkdir -p $@
+
+_install_: $(FLEXTINC) $(FLEXTLIB) $(FLEXTSYS) $(FLEXTBIN)
+	install $(TARGET) $(FLEXTLIB)
+ifdef VERNAME
 ifdef SHARED
-FLEXTLIBINST=$(FLEXTSHLIB)
+	/sbin/ldconfig -l $(FLEXTLIB)/$(VERNAME)
 else
-FLEXTLIBINST=$(FLEXTLIB)
+	-ln -sf $(FLEXTLIB)/$(VERNAME) $(FLEXTLIB)/$(TARGETNAME)
 endif
-
-$(FLEXTINC):
-	-mkdir -p $@
-
-$(FLEXTLIBINST):
-	-mkdir -p $@
-
-_install_: $(FLEXTINC) $(FLEXTLIBINST)
-	install $(TARGET) $(FLEXTLIBINST)
-ifdef SHARED
-	/sbin/ldconfig -l $(TARGET)
 endif
 	install $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTINC)
+# transfer build system
+	cp -rf buildsys $(FLEXTSYS)
+	install build.sh $(FLEXTSYS)
+	chmod -R a+rx $(FLEXTSYS)
+# make convenience script
+	echo bash $(FLEXTSYS)/build.sh $$\* > $(FLEXTBIN)/flext-build.sh
+	chmod a+rx $(FLEXTBIN)/flext-build.sh
+	

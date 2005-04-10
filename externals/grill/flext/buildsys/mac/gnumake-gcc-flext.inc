@@ -1,7 +1,12 @@
 # build class specific settings
 
 ifdef SHARED
-#LDFLAGS += -dylib_install_name $(FLEXTSHLIB)/$(OUTNAME).$(EXT)
+LDFLAGS += -install_name $(FLEXTLIB)/$(TARGETNAME)
+# PKGVERSION must be in the 0.0.0 format
+LDFLAGS += -current_version $(PKGVERSION)
+# strip last number
+LDFLAGS += -compatibility_version $(basename $(PKGVERSION))
+LDFLAGS += -preload -seg1addr 0xd0000000
 endif
 
 ##############################################
@@ -56,22 +61,46 @@ _clean_:
 
 ##############################################
 
-ifdef SHARED
-FLEXTLIBINST=$(FLEXTSHLIB)
-else
-FLEXTLIBINST=$(FLEXTLIB)
-endif
-
 $(FLEXTINC):
 	-mkdir -p $@
 
-$(FLEXTLIBINST):
+$(FLEXTLIB):
 	-mkdir -p $@
 
-_install_: $(FLEXTINC) $(FLEXTLIBINST)
-	install $(TARGET) $(FLEXTLIBINST)
+_install_: $(FLEXTINC) $(FLEXTLIB)
+ifdef FLEXTFRAMEWORK
+# --- install as framework ---
+ifndef PKGVERSION
+$(error Need package version)
+endif
+	mkdir -p $(FLEXTFRAMEWORK)/Versions/$(basename $(PKGVERSION))/Headers
+	ln -sfh ./$(basename $(PKGVERSION)) $(FLEXTFRAMEWORK)/Versions/Current
+	ln -sfh ./Versions/Current/Headers $(FLEXTFRAMEWORK)/Headers
+	install $(TARGET) $(FLEXTFRAMEWORK)/Versions/Current
+ifdef SHARED
+	# make link without lib... and extension
+	ln -sf ./Versions/Current/$(VERNAME) $(FLEXTFRAMEWORK)/$(patsubst lib%,%,$(basename $(TARGETNAME)))
+else
+	ranlib $(FRAMEWORK)/Versions/Current/$(VERNAME) 
+	ln -sf ./Versions/Current/$(VERNAME) $(FLEXTFRAMEWORK)/$(TARGETNAME)
+endif
+	install $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTFRAMEWORK)/Headers
+else
+# --- install as dynamic library ---
+	install $(TARGET) $(FLEXTLIB)
 ifndef SHARED
 # have to rerun ranlib at install dir ?!
-	ranlib $(FLEXTLIBINST)/$(notdir $(TARGET))  
+	ranlib $(FLEXTLIB)/$(VERNAME)  
+endif
+ifdef VERNAME
+	ln -sf $(FLEXTLIB)/$(VERNAME) $(FLEXTLIB)/$(TARGETNAME)
 endif
 	install $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTINC)
+endif
+# transfer build system
+	cp -rf buildsys $(FLEXTSYS)
+	install build.sh $(FLEXTSYS)
+	chmod -R a+rx $(FLEXTSYS)
+# make convenience script
+	echo bash $(FLEXTSYS)/build.sh $$\* > $(FLEXTBIN)/flext-build.sh
+	chmod a+rx $(FLEXTBIN)/flext-build.sh
