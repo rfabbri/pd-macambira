@@ -15,43 +15,47 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #if defined(PY_NUMERIC)
     #define PY_ARRAYS 1
-
-    #if FLEXT_OS == FLEXT_OS_MAC
-    #include <Python/Numeric/arrayobject.h>
-    #else
-    #include <Numeric/arrayobject.h>
-    #endif
 #elif defined(PY_NUMARRAY)
     #define PY_ARRAYS 1
     #define NA
+#endif
+
+#ifdef PY_ARRAYS
 
 #ifdef NA
     #if FLEXT_OS == FLEXT_OS_MAC
-    #include <Python/numarray/numarray.h>
+    #include <Python/numarray/libnumarray.h>
     #else
-    #include <numarray/numarray.h>
+    #include <numarray/libnumarray.h>
     #endif
+
+static NumarrayType numtype = tAny;
+inline bool arrsupport() { return numtype != tAny; }
+
 #else
     #if FLEXT_OS == FLEXT_OS_MAC
     #include <Python/numarray/arrayobject.h>
     #else
     #include <numarray/arrayobject.h>
     #endif
-#endif
-#endif
 
-
-#ifdef PY_ARRAYS
-
-#ifdef NA
-static NumarrayType numtype = tAny;
-inline bool arrsupport() { return numtype != tAny; }
-#else
 static PyArray_TYPES numtype = PyArray_NOTYPE;
 inline bool arrsupport() { return numtype != PyArray_NOTYPE; }
 #endif
-
 #endif
+
+
+PyObject *pybase::py_arraysupport(PyObject *self,PyObject *args)
+{
+	PyObject *ret;
+#ifdef PY_ARRAYS
+	ret = Py_True;
+#else
+	ret = Py_False;
+#endif
+	Py_INCREF(ret);
+	return ret;
+}
 
 
 // PD defines a T_OBJECT symbol
@@ -408,13 +412,13 @@ static PyObject *buffer_repeat(pySamplebuffer *self,int rep)
 
 
 static PySequenceMethods buffer_as_seq = {
-	(inquiry)buffer_length,			/* inquiry sq_length;             /* __len__ */
+	(inquiry)buffer_length,			/* inquiry sq_length;             __len__ */
 	(binaryfunc)buffer_concat,          /* __add__ */
 	(intargfunc)buffer_repeat,          /* __mul__ */
-	(intargfunc)buffer_item,			/* intargfunc sq_item;            /* __getitem__ */
-	(intintargfunc)buffer_slice,		 /* intintargfunc sq_slice;        /* __getslice__ */
-	(intobjargproc)buffer_ass_item,		/* intobjargproc sq_ass_item;     /* __setitem__ */
-	(intintobjargproc)buffer_ass_slice,	/* intintobjargproc sq_ass_slice; /* __setslice__ */
+	(intargfunc)buffer_item,			/* intargfunc sq_item;            __getitem__ */
+	(intintargfunc)buffer_slice,		 /* intintargfunc sq_slice;        __getslice__ */
+	(intobjargproc)buffer_ass_item,		/* intobjargproc sq_ass_item;     __setitem__ */
+	(intintobjargproc)buffer_ass_slice,	/* intintobjargproc sq_ass_slice; __setslice__ */
 };
 
 static PyObject *buffer_iter(PyObject *obj)
