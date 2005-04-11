@@ -1,3 +1,19 @@
 
 - include mp3 externals from iem_mp3 and unauthorized and make mp3*.libs files
 
+- put objects with conflicting names into a directory namespace
+
+  		maxlib/scale
+		Gem/scale
+		iem/prepend
+		cxc/prepend
+		flext/prepend
+
+- move .libs files to externals/build/src from externals/build/PLATFORM.  The
+  platform-specific makefiles copy them before compiling.  If a
+  platform-specific .libs file is needed, create it in the
+  externals/build/PLATFORM directory.  The makefiles will use both:
+  `test -f $*.libs && cat $*.libs` `test -f ../src/$*.libs && cat ../src/$*.libs`
+
+- make MinGW makefile for "win" so that the GNU Makefile method will be
+  standard on all platforms.

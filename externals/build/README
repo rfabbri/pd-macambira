@@ -21,22 +21,52 @@ The build system is actually on top of the  different externals packages
 that are in the CVS.
 
 Every external (the source code) is linked into the "src" directory.
-In order to be platform independent this is done via c-includes.
+In order for the paths to be platform independent, this is done via c-includes.
 
 Then the build system just tries to build every external that it 
 finds in "src".
 
-Problems with this approach:
-- it can't be applied to externals that use additional libraries.
+
+Externals That Need Libraries
+=============================
+
+In order to add an external that needs libraries to this build system, create
+a "libs" file with the exact same name as the source file (i.e. oggread~.c and
+oggread~.libs).  If the .libs file has cross-platforms library options, it
+should go into externals/build/src.  .libs files for platform-specific library
+options go in externals/build/PLATFORM (see TODO, this is totally implemented). 
+
+
+Externals That Are Built From Multiple Files
+============================================
+
+In the externals/build/src/*. file, #include the other files that need to be
+compiled and linked in.  See how the chaos externals are included:
+
+attract1.c:#include "../../bbogart/chaos/lyapunov.c"
+attract1.c:#include "../../bbogart/chaos/attract1.c"
+
+base.c:#include "../../bbogart/chaos/lyapunov.c"
+base.c:#include "../../bbogart/chaos/base.c"
+
+base3.c:#include "../../bbogart/chaos/lyapunov.c"
+base3.c:#include "../../bbogart/chaos/base3.c"
+
+dejong.c:#include "../../bbogart/chaos/lyapunov.c"
+dejong.c:#include "../../bbogart/chaos/dejong.c"
+
+
+
+Problems with this approach
+===========================
+- no way to use autoconf/automake
+
 - it might be hard for externals that use several source files
-  (not always, look at src/ann.c)
+
 - I could not find a way how this should work on windows with nmake ..
-  for now I just put the windows links in build/win/*.c ...
-
-Guenter
-
-
-
+  for now I just put the windows links in build/win/*.c.  This should be
+  converted to a MinGW GNU Makefile, then it would work the same as on the
+  other platforms.
 
 
 
