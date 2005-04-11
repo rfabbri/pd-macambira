@@ -3,7 +3,8 @@
  *
  *  Holds the contents of a PDP packet and introduce it in the GEM rendering chain
  *
- *  Copyright (c) 2003 Yves Degoyon
+ *  Copyright (c) 2003-2005 Yves Degoyon
+ *  Copyright (c) 2004-2005 James Tittle
  *
  */
 
@@ -30,7 +31,7 @@ class GEM_EXTERN pdp2gem : public GemBase
   CPPEXTERN_HEADER(pdp2gem, GemBase)
     
  public:
-  pdp2gem(void);
+  pdp2gem(t_symbol *colorspace);
 
  protected:
   virtual ~pdp2gem(void);
@@ -40,8 +41,14 @@ class GEM_EXTERN pdp2gem : public GemBase
   virtual void postrender(GemState *state);
   virtual void startRendering(void);
   virtual void stopRendering(void) {}
-  static void pdpCallback(void *data, t_symbol *action, t_floatarg fpcktno);
-  void pdpMess(t_symbol *action, t_int fpcktno);
+  void pdpMess(t_symbol *action, int fpcktno);
+  
+  ////////// 
+  // colorspace-message
+  virtual void	csMess(char* format);
+  
+  t_symbol *colorspace;
+  int m_colorspace;
 	
   unsigned char *m_data;
   pixBlock    	m_pixBlock;
@@ -56,6 +63,10 @@ class GEM_EXTERN pdp2gem : public GemBase
   t_int         m_dropped;
   t_pdp         *m_header;
   short int     *m_pdpdata;
+  
+  private:
+    static void pdpCallback(void *data, t_symbol *action, t_floatarg fpcktno);
+    static void csMessCallback(void *data, t_symbol *colorspace);
 };
 
 #endif	// for header file
