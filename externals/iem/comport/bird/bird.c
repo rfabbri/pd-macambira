@@ -1,15 +1,20 @@
-/***********************************************************************
-************************************************************************
-bird.c        - controls and parses one flock of bird out of a comport
-                    
-Author: W. Ritsch 16.01.97
-Desc.:  put the object in a correct parse state and send commands
+/*
 
-first input: where data from bird is thrown in (eg.from comport)
-first output: a list of data which size is dependen on the parse mode
-second output: to control the bird eg connect to a comport in
+ bird.c   - PD externals, that controls and parses one flock of bird out of a comport
+         
+ Date:  16.01.97          
+ Author: Winfried Ritsch (see LICENCE.txt)
+ 
+ Institute for Electronic Music - Graz
+
+ Desc.:  put the object in a correct parse state and send commands
+
+  first input: where data from bird is thrown in (eg.from comport)
+  first output: a list of data which size is dependen on the parse mode
+  second output: to control the bird eg connect to a comport in
 
 */
+
 
 #ifdef NT
 #pragma warning( disable : 4244 )
