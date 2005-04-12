@@ -389,6 +389,7 @@ void pdp2gem :: csMess(char* format)
     post("pdp2gem: using default colorspace:  YUV");
     m_csize = 2;
     m_colorspace = GL_YCBCR_422_GEM;
+    m_format = GL_YUV422_GEM;
     createBuffer();
     }
 }
