@@ -1,7 +1,6 @@
 1.0RC1 - (12.4.2005)
 
  first check in pure-data.sourceforge.net 
- added print feature and USB devices from posted by Marc Boon 
 
 0.9beta2  (somedate before 2004)
 

@@ -1,4 +1,4 @@
-comport - PD External for the serial Ports
+bird - PD External for interfacing the flock of birds tracker.
 
 Institute for Electronic Music and Acoustics
 Copyright (C) 1998-2005 Winfried Ritsch
