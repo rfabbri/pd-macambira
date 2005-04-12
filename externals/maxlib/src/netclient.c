@@ -26,9 +26,7 @@
 /*          using pollfunction instead of clock (suggested by HCS) */
 
 #include "m_pd.h"
-#if defined PD_MAJOR_VERSION && PD_MAJOR_VERSION==0 && PD_MINOR_VERSION==37
 #include "s_stuff.h"
-#endif
 #include "m_imp.h"
 
 #include <sys/types.h>
