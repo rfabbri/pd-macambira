@@ -49,8 +49,8 @@
 #include <winsock.h>
 #endif
 
-#include <speex.h>        /* speex decoder stuff */
-#include <speex_bits.h>   /* speex decoder stuff */
+#include <speex/speex.h>        /* speex decoder stuff */
+#include <speex/speex_bits.h>   /* speex decoder stuff */
 
 #ifdef NT
 #pragma warning( disable : 4244 )

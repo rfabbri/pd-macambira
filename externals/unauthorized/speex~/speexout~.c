@@ -62,8 +62,8 @@
 #include <windef.h>
 #endif
 
-#include <speex.h>        /* speex codec stuff */ 
-#include <speex_bits.h>   /* speex codec stuff */ 
+#include <speex/speex.h>        /* speex codec stuff */ 
+#include <speex/speex_bits.h>   /* speex codec stuff */ 
 
 #include "m_pd.h"            /* standard pd stuff */
 

@@ -2,7 +2,7 @@ import glob
 import os
 import re
 Import('env prefix')
-env.Append(CPPPATH = '/usr/include/speex')
+#env.Append(CPPPATH = '/usr/include/speex')
 
 for tk in glob.glob('*/*.tk'):
     (dir, file) = os.path.split(tk)
