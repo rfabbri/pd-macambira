@@ -14,5 +14,5 @@ env.Alias('install', env.Install(os.path.join(prefix, 'doc/5.reference'), glob.g
 
 # libraries
 Export('env prefix')
-for subdir in Split('../miXed ../zexy'):
-    SConscript (subdir + '/SConscript')
+for subdir in Split('miXed pmpd unauthorized zexy'):
+    SConscript ('../' + subdir + '/SConscript')
