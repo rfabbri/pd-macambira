@@ -9,6 +9,7 @@ env = Environment(CPPPATH = Split(prefix + '/src /usr/local/include . src'), CPP
 for extra in glob.glob('src/*.c'):
     external = env.SharedLibrary(re.sub("\.c$","",os.path.basename(extra)), extra)
     env.Alias('install', env.Install(os.path.join(prefix, 'extra'), external))
+    Default(external)
 env.Alias('install', env.Install(os.path.join(prefix, 'doc/5.reference'), glob.glob('doc/*.pd')))
 
 # libraries
