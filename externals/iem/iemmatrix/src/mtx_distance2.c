@@ -4,11 +4,11 @@
  *  objects for manipulating simple matrices
  *  mostly refering to matlab/octave matrix functions
  *
- * (c) IOhannes m zmölnig, forum::für::umläute
- * 
- * IEM, Graz
+ * Copyright (c) IOhannes m zmölnig, forum::für::umläute
+ * IEM, Graz, Austria
  *
- * this code is published under the LGPL
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  *
  */
 #include "iemmatrix.h"
@@ -98,7 +98,7 @@ void mtx_distance2_setup(void)
   class_addmethod(mtx_distance2_class, (t_method)mtx_bin_matrix2, gensym(""), A_GIMME, 0);
   class_addbang  (mtx_distance2_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_distance2_class, gensym("iemmatrix/mtx_distasnce2"));
+  class_sethelpsymbol(mtx_distance2_class, gensym("iemmatrix/mtx_distance2"));
 }
 
 void iemtx_distance2_setup(void)
