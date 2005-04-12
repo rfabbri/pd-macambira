@@ -1,0 +1,17 @@
+import glob
+import os
+import re
+location   = "/usr/local/lib/pd"
+IncludePaths = Split(location + '/src /usr/local/include . include')
+
+Source = glob.glob('src/*.c')
+extras = glob.glob('*.pd_linux')
+helpfiles = glob.glob('doc/*.pd')
+
+env = Environment(CPPPATH = IncludePaths, CPPDEFINES=['PD', 'UNIX'], SHLIBPREFIX = '', SHLIBSUFFIX = '.pd_linux', CCFLAGS = '-pipe -O2')
+
+env.Alias('install', env.Install(os.path.join(location, 'extra'), extras))
+env.Alias('install', env.Install(os.path.join(location, 'doc/5.reference'), helpfiles))
+
+for extra in Source:
+    env.SharedLibrary(re.sub("\.c$","",os.path.basename(extra)), extra)
