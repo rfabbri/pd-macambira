@@ -4,11 +4,11 @@
  *  objects for manipulating simple matrices
  *  mostly refering to matlab/octave matrix functions
  *
- * (c) IOhannes m zmölnig, forum::für::umläute
- * 
- * IEM, Graz
+ * Copyright (c) IOhannes m zmölnig, forum::für::umläute
+ * IEM, Graz, Austria
  *
- * this code is published under the LGPL
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  *
  */
 #include "iemmatrix.h"
@@ -28,6 +28,7 @@ void mtx_check_setup();
 void mtx_print_setup();
 void mtx_ones_setup();
 void mtx_pivot_setup();
+void mtx_semipivot_setup();
 void mtx_rand_setup();
 void mtx_resize_setup();
 void mtx_roll_setup();
@@ -55,6 +56,7 @@ void iemtx_setup(){
   mtx_print_setup();
   mtx_ones_setup();
   mtx_pivot_setup();
+  mtx_semipivot_setup();
   mtx_rand_setup();
   mtx_resize_setup();
   mtx_roll_setup();

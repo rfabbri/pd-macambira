@@ -4,11 +4,11 @@
  *  objects for manipulating simple matrices
  *  mostly refering to matlab/octave matrix functions
  *
- * (c) IOhannes m zmölnig, forum::für::umläute
- * 
- * IEM, Graz
+ * Copyright (c) IOhannes m zmölnig, forum::für::umläute
+ * IEM, Graz, Austria
  *
- * this code is published under the LGPL
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  *
  */
 #include "iemmatrix.h"
@@ -80,7 +80,7 @@ static void mtx_pivot_matrix(t_mtx_pivot *x, t_symbol *s, int argc, t_atom *argv
 
   for (k=0; k<min_rowcol; k++){
     // 1. find max_element
-    t_matrixfloat tmp = fabsf(buffer[k*(1+col)]);
+    t_float tmp = fabsf(buffer[k*(1+col)]);
     pivot_row = pivot_col = k;
 
     for(i=k; i<row; i++){
@@ -88,7 +88,7 @@ static void mtx_pivot_matrix(t_mtx_pivot *x, t_symbol *s, int argc, t_atom *argv
 
       j=col-k;
       while(j--){
-	t_matrixfloat f = fabsf(*buf++);
+	t_float f = fabsf(*buf++);
 	if ((ascending && f>tmp) || (!ascending && f<tmp)) {
 	  tmp=f;
 	  pivot_row = i;

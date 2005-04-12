@@ -4,11 +4,11 @@
  *  objects for manipulating simple matrices
  *  mostly refering to matlab/octave matrix functions
  *
- * (c) IOhannes m zmölnig, forum::für::umläute
- * 
- * IEM, Graz
+ * Copyright (c) IOhannes m zmölnig, forum::für::umläute
+ * IEM, Graz, Austria
  *
- * this code is published under the LGPL
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
  *
  */
 

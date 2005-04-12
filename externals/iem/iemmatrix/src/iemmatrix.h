@@ -4,20 +4,24 @@
 /*  objects for simple matrix operations */
 /* ************************************* */
 
-/* IEMMATRIX is a runtime-library for miller s. puckette's realtime-computermusic-software "pure data"
+/*
+ * IEMMATRIX is a runtime-library 
+ * for miller s. puckette's realtime-computermusic-software "pure data"
  * therefore you NEED "pure data" to make any use of the IEMMATRIX external
  * (except if you want to use the code for other things)
- * download "pure data" at
  *
- * http://pd.iem.at
- * ftp://iem.at/pd
+ * you can get "pure data" at
+ *   http://pd.iem.at
+ *   ftp://iem.at/pd
+ */
+
+/*
+ * Copyright (c) IOhannes m zmölnig, forum::für::umläute
+ * IEM, Graz, Austria
  *
- * 
- * IEMMATRIX is published under the Lesser GNU GeneralPublicLicense (LGPL),
- * that must be shipped with IEMMATRIX.
- * if you are using Debian GNU/linux, 
- * the lesser GNU-GPL can be found under /usr/share/common-licenses/LGPL
- * if you still haven't found a copy of the lesser GNU-GPL, have a look at http://www.gnu.org
+ * For information on usage and redistribution, and for a DISCLAIMER OF ALL
+ * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
+ *
  *
  * "pure data" has it's own license, that comes shipped with "pure data".
  *
@@ -115,7 +119,5 @@ void mtx_binmtx_bang(t_mtx_binmtx *x);
 void mtx_binmtx_free(t_mtx_binmtx *x);
 void mtx_binscalar_bang(t_mtx_binscalar *x);
 void mtx_binscalar_free(t_mtx_binscalar *x);
-
-
 
 #endif
