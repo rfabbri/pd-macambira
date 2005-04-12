@@ -7,10 +7,11 @@ env = Environment(CPPPATH = Split(prefix + '/src /usr/local/include . src'), CPP
 
 # C sources in src/
 for extra in glob.glob('src/*.c'):
-    env.SharedLibrary(re.sub("\.c$","",os.path.basename(extra)), extra)
-env.Alias('install', env.Install(os.path.join(prefix, 'extra'), glob.glob('*.pd_linux')))
+    external = env.SharedLibrary(re.sub("\.c$","",os.path.basename(extra)), extra)
+    env.Alias('install', env.Install(os.path.join(prefix, 'extra'), external))
 env.Alias('install', env.Install(os.path.join(prefix, 'doc/5.reference'), glob.glob('doc/*.pd')))
 
 # libraries
-for subdir in Split('../grill ../miXed ../zexy'):
+Export('env prefix')
+for subdir in Split('../miXed ../zexy'):
     SConscript (subdir + '/SConscript')
