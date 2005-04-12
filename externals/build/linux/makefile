@@ -46,12 +46,13 @@ CFLAGS = -fPIC -DPD -DUNIX $(OPTIM_FLAGS)  \
     -Wall -W -Wshadow -Wstrict-prototypes  \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-INCLUDES = -I. -I.. -I../include
+INCLUDES = -I. -I.. -I../../../pd/src -I../include
 
 %.pd_linux: ../src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
 	gcc -Wl,-export_dynamic  -shared -o "$*.pd_linux" "$*.o" -lc -lm \
-	`test -f $*.libs && cat $*.libs`
+		`test -f $*.libs && cat $*.libs` \
+		`test -f ../src/$*.libs && cat ../src/$*.libs`
 	chmod a-x "$*.pd_linux"
 	$(STRIP) $*.pd_linux
 	rm -f "$*.o" 

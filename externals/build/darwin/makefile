@@ -24,13 +24,14 @@ OPTIM_FLAGS = -mpowerpc-gpopt
 
 CFLAGS = -DPD -DUNIX -DMACOSX -Dunix $(OPTIM_FLAGS) \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
-INCLUDES = -I. -I.. -I../include
-LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) 
+INCLUDES = -I. -I.. -I../../../pd/src -I../include -I/sw/include
+LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) -L/sw/lib
 
 %.pd_darwin: ../src/%.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
 	$(CC) $(LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm \
-#	`test -f $*.libs && cat $*.libs`
+		`test -f $*.libs && cat $*.libs`	\
+		`test -f ../src/$*.libs && cat ../src/$*.libs`
 	chmod a-x "$*.pd_darwin"
 	rm -f "$*.o" 
 
@@ -60,7 +61,7 @@ link.stamp:
 	cp ../src/*.c .
 #	rm vst.c 
 # MacOSX exceptions that don't work just yet
-	-rm ogg* ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
+	-rm ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
 	-rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
 	touch link.stamp
 	make
