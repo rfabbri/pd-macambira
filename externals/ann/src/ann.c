@@ -31,7 +31,7 @@ void *ann_new(void)
   return (void *)x;
 }
 
-void ann_som_setup();
+void ann_som_setup(void);
 
 /*
   waiting to be released in near future:

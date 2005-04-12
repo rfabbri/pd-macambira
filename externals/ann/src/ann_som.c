@@ -105,12 +105,12 @@ static void som_makedist(t_som *x)
   x->dist = (t_float **)getbytes(x->num_neurons * sizeof(t_float *));
 
   for (i=0; i<x->num_neurons; i++) {
-    int x1 = (i%x->num_neurX), y1 = (i/x->num_neurX);
+    int X1 = (i%x->num_neurX), Y1 = (i/x->num_neurX);
     x->dist[i]=(t_float *)getbytes(x->num_neurons * sizeof(t_float));
 
     for (j=0; j<x->num_neurons; j++) {
-      int x2 = (j%x->num_neurX), y2 = (j/x->num_neurX);
-      x->dist[i][j] = sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+      int X2 = (j%x->num_neurX), Y2 = (j/x->num_neurX);
+      x->dist[i][j] = sqrt((X1-X2)*(X1-X2)+(Y1-Y2)*(Y1-Y2));
     }
   }
 }
@@ -179,7 +179,7 @@ static void som_createnewsom(t_som *x, int sens, int nx, int ny)
 
 /* ----------------- public functions ---------------------- */
 
-static void som_list(t_som *x, t_symbol *s, int argc, t_atom *argv)
+static void som_list(t_som *x, t_symbol *sl, int argc, t_atom *argv)
 { /* present the data */
   int i = x->num_sensors;
   //  t_float *data = (t_float *)getbytes(sizeof(t_float) * i);
