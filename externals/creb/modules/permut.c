@@ -19,13 +19,10 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
+#include <m_pd.h>
 #include <math.h>
+#include "../include/extlib_util.h"
 #include <stdlib.h>
-//#include "m_pd.h"
-#include "extlib_util.h"
-                               
-
 
 typedef struct permutctl
 {

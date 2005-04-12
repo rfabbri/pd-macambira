@@ -17,7 +17,9 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "extlib_util.h"
+#include <m_pd.h>
+#include <math.h>
+#include "../include/extlib_util.h"
 
 /* pointer to */
 t_class *ead_class;

@@ -26,8 +26,10 @@ add more diffuse feedback matrix (hadamard)
 check filtering code
 
 */
+#include <m_pd.h>
+#include <math.h>
+#include "../include/extlib_util.h"
 
-#include "extlib_util.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
