@@ -1,0 +1,78 @@
+#N canvas 0 0 823 885 10;
+#X obj 51 13 cnv 15 610 305 empty empty CREATION 20 12 0 14 -262131
+-66577 0;
+#X msg 68 42 reset;
+#X text 238 73 Add a mass;
+#X text 324 74 \$1 : Id (symbol);
+#X text 323 94 \$2 : fixed or mobile (0/1);
+#X text 323 112 \$3 : mass;
+#X text 323 150 \$1 : Id (symbol);
+#X text 235 150 Add a link;
+#X text 322 170 \$2 : creation No of mass1;
+#X text 322 188 \$3 : creation No of mass2;
+#X text 321 206 \$4 : rigidity;
+#X text 240 43 Delete all masses and links;
+#X text 321 224 \$5 : viscosity;
+#X text 321 241 \$6 : damping;
+#X obj 51 323 cnv 15 610 60 empty empty COMPUTATION 20 12 0 14 -261689
+-66577 0;
+#X msg 71 352 bang;
+#X text 224 352 Compute new masses positions;
+#X obj 50 387 cnv 15 610 220 empty empty DYNAMIC_SETTING 20 12 0 14
+-262131 -66577 0;
+#X msg 158 409 setD \$1 \$2;
+#X text 343 427 \$1 : Id (symbol);
+#X text 343 445 \$2 : New value;
+#X msg 76 409 setK \$1 \$2;
+#X text 339 481 \$1 : Id (symbol);
+#X text 339 499 \$2 : New value;
+#X text 337 538 \$1 : Id (symbol);
+#X text 337 556 \$2 : New value;
+#X msg 76 461 posX \$1 \$2;
+#X text 339 463 Set position of mass(es);
+#X text 336 521 Add force on mass(es);
+#X msg 74 520 forceX \$1 \$2;
+#X msg 244 409 setD2 \$1 \$2;
+#X text 343 409 Set rigidity \, viscosity or damping of link(s);
+#X obj 49 616 cnv 15 610 198 empty empty GET_ATTRIBUTES 20 12 0 14
+-261689 -66577 0;
+#X msg 135 643 massePosL;
+#X msg 135 671 masseForcesL;
+#X text 236 643 output all masses positions in a list on outlet No
+1;
+#X text 235 672 output all masses forces in a list on outlet No 1;
+#X msg 134 709 get \$1 \$2;
+#X text 237 710 Get specific attribute;
+#X text 237 735 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
+/ linksPos );
+#X text 237 772 \$2 : Id (symbol or creations numbers);
+#X msg 65 150 link \$1 \$2 \$3 \$4 \$5 \$6;
+#X msg 64 257 deleteMass \$1;
+#X text 229 259 Delete a mass and associated links;
+#X text 319 276 \$1 : Creation No of mass;
+#X msg 63 293 deleteLink \$1;
+#X text 228 295 Delete a link;
+#X text 329 295 \$1 : Creation No of link;
+#X msg 132 792 infosL;
+#X text 235 792 Get infos on all masses and links on outlet No 2;
+#X text 336 592 \$1 : Value;
+#X obj 22 820 msd2D;
+#X msg 169 519 forceY \$1 \$2;
+#X msg 158 461 posY \$1 \$2;
+#X msg 68 73 mass \$1 \$2 \$3 \$4 \$5;
+#X text 323 130 \$4 \, \$5 : position;
+#X msg 73 572 Xmin \$1 \, Xmax \$1 \, Ymin \$1 \, Ymax \$1;
+#X text 336 575 Set minimimum and maximum of masses positions;
+#X connect 1 0 51 0;
+#X connect 15 0 51 0;
+#X connect 21 0 51 0;
+#X connect 26 0 51 0;
+#X connect 29 0 51 0;
+#X connect 33 0 51 0;
+#X connect 34 0 51 0;
+#X connect 37 0 51 0;
+#X connect 41 0 51 0;
+#X connect 42 0 51 0;
+#X connect 45 0 51 0;
+#X connect 48 0 51 0;
+#X connect 54 0 51 0;

@@ -1,0 +1,2 @@
+NAME=msd3D
+SRCS=main.cpp
