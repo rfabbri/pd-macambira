@@ -1,0 +1,92 @@
+#N canvas 489 48 887 847 10;
+#X obj 53 15 loadbang;
+#X obj 299 517 print msd;
+#X obj 52 490 msd --------------------------------;
+#X obj 52 243 tgl 25 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X text 83 242 ON / OFF;
+#X obj 45 305 cnv 15 700 60 empty empty empty 20 12 0 14 -261689 -66577
+0;
+#X obj 52 312 metro 50;
+#X text 474 328 COMPUTE AND GET MASSES POSITIONS;
+#X obj 151 28 cnv 15 595 270 empty empty empty 20 12 0 14 -262131 -66577
+0;
+#X obj 167 274 t a;
+#X obj 167 33 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262131 -1
+-1;
+#X msg 253 78 reset;
+#X msg 218 153 mass mob 1 \$1 \$2;
+#X msg 201 181 Xmax 100 \, Xmin 0;
+#X msg 235 104 mass fix 0 100 80;
+#X msg 218 129 100 65 \, 100 50 \, 100 35 \, 100 20;
+#X obj 46 380 cnv 15 700 90 empty empty empty 20 12 0 14 -262131 -66577
+0;
+#X msg 176 385 setD souple 0.01;
+#X msg 66 384 setK souple 1;
+#X msg 176 407 setD souple 1;
+#X msg 66 406 setK souple 2;
+#X text 455 399 SET RIGIDITY AND VISCOSITY OF LINKS;
+#X text 455 438 ADD FORCE ON ALL MOBILE MASSES;
+#X msg 184 153 0;
+#X obj 45 576 cnv 15 300 200 empty empty empty 20 12 0 14 -261689 -66577
+0;
+#X obj 88 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
+-1 -1 8228 1;
+#X obj 111 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
+-1 -1 6323 1;
+#X obj 66 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
+-1 -1 10160 1;
+#X msg 52 736 posX fix \$1;
+#X obj 156 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
+-1 -1 2513 1;
+#X obj 134 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
+-1 -1 4418 1;
+#X text 199 638 MOVE FIRST SLIDER;
+#X text 182 662 TO MOVE THE FIXED MASS;
+#X msg 66 438 forceX mob 300;
+#X msg 180 438 forceX mob -300;
+#X obj 167 55 t b b b b b b;
+#X text 205 34 RESET;
+#X obj 52 523 route massesPosL;
+#X msg 52 335 bang \, massesPosL;
+#X obj 52 545 unpack f f f f f;
+#X msg 184 223 iLink inter fix mob 10 2.5 0.5;
+#X text 490 126 CREATION : 5 MASSES \, 1 iLINK;
+#X connect 0 0 35 0;
+#X connect 2 0 37 0;
+#X connect 2 1 1 0;
+#X connect 3 0 6 0;
+#X connect 6 0 38 0;
+#X connect 9 0 2 0;
+#X connect 10 0 35 0;
+#X connect 11 0 9 0;
+#X connect 12 0 9 0;
+#X connect 13 0 9 0;
+#X connect 14 0 9 0;
+#X connect 15 0 12 0;
+#X connect 17 0 2 0;
+#X connect 18 0 2 0;
+#X connect 19 0 2 0;
+#X connect 20 0 2 0;
+#X connect 23 0 3 0;
+#X connect 27 0 28 0;
+#X connect 28 0 2 0;
+#X connect 33 0 2 0;
+#X connect 34 0 2 0;
+#X connect 35 0 33 0;
+#X connect 35 0 3 0;
+#X connect 35 1 23 0;
+#X connect 35 1 40 0;
+#X connect 35 2 13 0;
+#X connect 35 3 15 0;
+#X connect 35 4 14 0;
+#X connect 35 5 11 0;
+#X connect 37 0 39 0;
+#X connect 37 1 1 0;
+#X connect 38 0 2 0;
+#X connect 39 0 27 0;
+#X connect 39 1 25 0;
+#X connect 39 2 26 0;
+#X connect 39 3 30 0;
+#X connect 39 4 29 0;
+#X connect 40 0 9 0;

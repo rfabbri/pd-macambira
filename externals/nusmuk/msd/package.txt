@@ -1,0 +1,2 @@
+NAME=msd
+SRCS=main.cpp
