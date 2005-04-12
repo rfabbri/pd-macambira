@@ -5,6 +5,14 @@ prefix = "/usr/local/lib/pd"
 
 env = Environment(CPPPATH = Split(prefix + '/src /usr/local/include . src'), CPPDEFINES=['PD', 'UNIX'], SHLIBPREFIX = '', SHLIBSUFFIX = '.pd_linux', CCFLAGS = '-pipe -O2')
 
+########### delete when namespace conflict issue is finally resolved
+delete = """
+test -f src/prepend.c && rm src/urn.* && rm src/match.* && rm src/prepend.* && rm src/sinh.c && rm src/delta~.c && rm src/reson~.c && rm src/abs~.c &&rm src/svf~.c &&rm src/matrix~.c &&rm src/atan2~.c && rm src/avg~.c && echo "poof...no more conflicting externals..!!"
+"""
+print os.popen(delete).read()
+###########
+
+
 # C sources in src/
 for extra in glob.glob('src/*.c'):
     external = env.SharedLibrary(re.sub("\.c$","",os.path.basename(extra)), extra)
