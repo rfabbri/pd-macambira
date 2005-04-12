@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
-GEM2PDP_VERSION=0.5
+GEM2PDP_VERSION=0.6
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 GEM_DIR=/usr/local/pd/gem
