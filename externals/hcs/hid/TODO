@@ -99,6 +99,24 @@ void hid_post(const char *format, const char *);
 
 
 ==============================================================================
+= figure out whole degree issue
+
+- BUG: zexy's 3D conversion objects just pass through Z rather than converting
+  it to elevation in rad/deg.
+
+- make [hid_polar] output 0 to 1 for angle rather than -pi to pi
+
+- [hid2rad], [hid2deg], [rad2hid], [deg2hid]
+
+- should degree conversion also change rotation direction and 0 point?  The
+  degrees on a compass rotate the opposite direction of radians.  The 0 point
+  of a compass is due north, with radians, its right/due east.
+
+- [hid_polar] should take an argument (in degrees?) which specifies where the
+  0 is on the circle
+
+
+==============================================================================
 = mapping object ideas
 
 [hid2midi] [midi2hid]
@@ -113,6 +131,8 @@ median average object
 non-linear one-to-many mapping object (one curve spans the whole range of the
 movement, the other curve kicks in at a specifable point.  Arguments could be
 start-point and start-value.
+
+[infinitepot] for use with a [knob] or any single axis that could be infinite.
 
 
  /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\

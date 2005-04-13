@@ -1,4 +1,4 @@
-#N canvas 577 303 460 463 10;
+#N canvas 577 303 464 467 10;
 #X floatatom 26 85 5 0 0 0 - - -;
 #X floatatom 26 160 0 0 0 0 - - -;
 #X obj 2 2 cnv 15 450 20 empty empty [notescale] 2 11 1 18 -233017
@@ -12,11 +12,11 @@
 #X text 234 407 released under the GNU GPL;
 #X floatatom 150 160 0 0 0 0 - - -;
 #X floatatom 297 160 0 0 0 0 - - -;
-#X obj 213 83 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 213 83 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -225271
 -1 -1 0 0;
-#X text 17 426 $Revision: 1.1 $$Date: 2004-11-28 20:57:26 $;
+#X text 17 426 $Revision: 1.2 $$Date: 2005-04-13 03:47:19 $;
 #X text 18 439 $Author: eighthave $;
-#X obj 140 244 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 140 244 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262131
 -1 -1 0 0;
 #X obj 26 130 notescale 30 60;
 #X floatatom 137 347 5 0 0 0 - - -;

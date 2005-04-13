@@ -1,0 +1,40 @@
+#N canvas 601 232 478 451 10;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_polar] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 244 411 released under the GNU GPL;
+#X floatatom 100 248 5 0 0 0 - - -;
+#X floatatom 100 335 7 0 0 0 radius-> - -;
+#X text 175 375 For more info:;
+#X obj 279 373 all_about_hid_mapping;
+#X obj 100 295 hid_polar;
+#X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X obj 101 161 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
+-1 -1 6350 0;
+#X obj 157 103 vsl 15 128 0 1 0 0 empty empty y-axis -6 -9 1 10 -261681
+-1 -1 6350 0;
+#X floatatom 159 335 7 0 0 1 <-angle - -;
+#X floatatom 158 248 5 0 0 0 - - -;
+#X obj 157 265 t b f;
+#X obj 334 335 polar-joystick;
+#X text 275 273 related objects:;
+#X text 273 334 example:;
+#X msg 97 86 0.5;
+#X text 43 86 center:;
+#X text 17 29 Converts cartesian coordinates(x \, y) to polar coordinates
+(radius \, angle). The angle is in radians (-pi to pi). The angle 0
+is at cartesian (1 \, 0.5) or to the right.;
+#X obj 361 293 hid_spiral;
+#X obj 245 293 hid2rad;
+#X obj 303 293 hid2deg;
+#X connect 3 0 7 0;
+#X connect 7 0 4 0;
+#X connect 7 1 11 0;
+#X connect 9 0 3 0;
+#X connect 10 0 12 0;
+#X connect 12 0 13 0;
+#X connect 13 0 3 0;
+#X connect 13 1 7 1;
+#X connect 17 0 9 0;
+#X connect 17 0 10 0;

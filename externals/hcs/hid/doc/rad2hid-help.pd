@@ -1,0 +1,24 @@
+#N canvas 147 313 467 307 10;
+#X obj 5 2 cnv 15 450 20 empty empty [rad2hid] 2 11 1 18 -233017 -66577
+0;
+#X obj 422 3 pddp;
+#X text 254 269 released under the GNU GPL;
+#X text 185 228 For more info:;
+#X obj 289 226 all_about_hid_mapping;
+#X text 40 254 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 300 168 related objects:;
+#X obj 273 184 rad2hid;
+#X obj 332 184 deg2hid;
+#X obj 391 184 hid2deg;
+#X floatatom 69 195 5 0 0 1 hid - -;
+#X obj 72 95 hsl 128 15 -3.14159 3.14159 0 0 empty empty radians 6
+7 1 10 -262131 -1 -1 0 0;
+#X floatatom 95 125 9 0 0 0 - - -;
+#X obj 69 160 rad2hid;
+#X text 21 35 This object converts numbers from radians (-pi to pi)
+to the [hid] range (0 to 1) with the 0's lining up in the same place.
+;
+#X connect 11 0 12 0;
+#X connect 11 0 13 0;
+#X connect 13 0 10 0;
