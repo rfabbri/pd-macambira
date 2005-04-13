@@ -28,7 +28,6 @@ void mtx_check_setup();
 void mtx_print_setup();
 void mtx_ones_setup();
 void mtx_pivot_setup();
-void mtx_semipivot_setup();
 void mtx_rand_setup();
 void mtx_resize_setup();
 void mtx_roll_setup();
@@ -56,7 +55,6 @@ void iemtx_setup(){
   mtx_print_setup();
   mtx_ones_setup();
   mtx_pivot_setup();
-  mtx_semipivot_setup();
   mtx_rand_setup();
   mtx_resize_setup();
   mtx_roll_setup();
