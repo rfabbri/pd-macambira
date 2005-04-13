@@ -3,11 +3,24 @@ import os
 import re
 prefix = "/usr/local/lib/pd"
 
-env = Environment(CPPPATH = Split(prefix + '/src /usr/local/include . src'), CPPDEFINES=['PD', 'UNIX'], SHLIBPREFIX = '', SHLIBSUFFIX = '.pd_linux', CCFLAGS = '-pipe -O2')
+platform = os.uname()[0]
+
+if re.match("Linux", platform) != None:
+    OSdefine = 'UNIX'
+    extSuffix = '.pd_linux'
+elif re.match("MINGW", platform) != None:
+    OSdefine = 'NT'
+    extSuffix = '.dll'
+elif re.match("Darwin", platform) != None:
+    OSdefine = 'UNIX'
+    extSuffix = '.pd_darwin'
+
+env = Environment(CPPPATH = Split(prefix + '/src /usr/include /usr/local/include . ../../pd/src ../../src src'), CPPDEFINES=['PD', OSdefine], SHLIBPREFIX = '', SHLIBSUFFIX = extSuffix, CCFLAGS = '-pipe -O2')
 
 ########### delete when namespace conflict issue is finally resolved
+##(cyclone has all of these, the other versions are from all over the place)
 delete = """
-test -f src/prepend.c && rm src/urn.* && rm src/match.* && rm src/prepend.* && rm src/sinh.c && rm src/delta~.c && rm src/reson~.c && rm src/abs~.c &&rm src/svf~.c &&rm src/matrix~.c &&rm src/atan2~.c && rm src/avg~.c && echo "poof...no more conflicting externals..!!"
+cd src && test -f prepend.c && rm urn.* match.* prepend.* sinh.c delta~.c reson~.c abs~.c svf~.c matrix~.c atan2~.c avg~.c pmpd.c && echo "poof...no more conflicting externals..!!"
 """
 print os.popen(delete).read()
 ###########
