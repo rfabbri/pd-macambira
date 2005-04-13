@@ -652,8 +652,15 @@ static void mtx_div_setup(void)
   class_sethelpsymbol(mtx_divscalar_class, gensym("iemmatrix/mtx_binops"));
 }
 
-
 /* mtx_pow */
+#ifdef __APPLE__
+/* there is no such thing like powf on apple... */
+static inline float powf (float v, float p)
+{
+	return (float) pow((double)v, (double) p);
+}
+#endif /* __APPLE__ */
+
 static t_class *mtx_powelement_class, *mtx_powscalar_class;
 
 static void mtx_powelement_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
