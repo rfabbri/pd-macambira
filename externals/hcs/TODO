@@ -1,0 +1,7 @@
+
+ifeel.c
+------------------------------------------------------------------------
+- make default device be /dev/input/ifeel0 when there are no arguments
+
+- add abort command ( http://moore.cx/dan/out/ifeel/
+  http://inebriated-innovation.org/ifeel/ )
