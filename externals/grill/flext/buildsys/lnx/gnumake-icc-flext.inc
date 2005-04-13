@@ -1,5 +1,14 @@
 # build class specific settings
 
+CMPNAME=$(OUTNAME).$(EXT).$(FLEXTMAJOR).$(FLEXTMINOR)
+VERNAME=$(CMPNAME).$(FLEXTMICRO)
+TARGET=$(TARGETPATH)/$(VERNAME)
+INSTTARGET=$(TARGET)
+
+ifdef SHARED
+LDFLAGS += -Wl,-soname,$(CMPNAME) 
+endif
+
 ##############################################
 
 # default target
@@ -44,12 +53,11 @@ $(FLEXTINC) $(FLEXTLIB) $(FLEXTSYS) $(FLEXTBIN):
 
 _install_: $(FLEXTINC) $(FLEXTLIB) $(FLEXTSYS) $(FLEXTBIN)
 	install $(TARGET) $(FLEXTLIB)
-ifdef VERNAME
 ifdef SHARED
 	/sbin/ldconfig -l $(FLEXTLIB)/$(VERNAME)
+	-ln -sf $(CMPNAME) $(FLEXTLIB)/$(OUTNAME).$(EXT)
 else
-	-ln -sf $(FLEXTLIB)/$(VERNAME) $(FLEXTLIB)/$(TARGETNAME)
-endif
+	-ln -sf $(VERNAME) $(FLEXTLIB)/$(TARGETNAME)
 endif
 	install $(patsubst %,$(SRCDIR)/%,$(HDRS)) $(FLEXTINC)
 # transfer build system
