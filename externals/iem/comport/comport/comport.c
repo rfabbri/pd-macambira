@@ -752,29 +752,31 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
   test.baud = fbaud;
   fd = open_serial(com_nr,&test);
 
-  if(fd == INVALID_HANDLE_VALUE ){
-    /* postings in open routine */
-    return 0;
-  }
 
   /* Now  nothing really bad could happen so we create the class */
 
   x = (t_comport *)pd_new(comport_class);
 
-  x->comport = com_nr;
-  x->baud = test.baud;
-  x->comhandle = fd;           /* holds the comport handle */
+  if(fd == INVALID_HANDLE_VALUE ){
+    /* postings in open routine */
+    x->comport = com_nr;
+    x->baud = test.baud;
+    x->comhandle = fd;           /* holds the comport handle */
+  }
+  else {
+    x->comport = com_nr;
+    x->baud = test.baud;
+    x->comhandle = fd;           /* holds the comport handle */
 
 #ifdef NT
-
   memcpy(&(test.dcb_old),&(x->dcb_old),sizeof(DCB));    // save the old com config 
   memcpy(&(test.dcb),&(x->dcb),sizeof(DCB));       // for the new com config 
-
 #else  
   /* save the old com and new com config */
   bcopy(&(test.oldcom_termio),&(x->oldcom_termio),sizeof(struct termios));    
   bcopy(&(test.com_termio),&(x->com_termio),sizeof(struct termios));       
 #endif
+  }
 
   x->rxerrors = 0;             /* holds the rx line errors */
 
@@ -785,7 +787,7 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
   x->x_clock = clock_new(x, (t_method)comport_tick);
 
   clock_delay(x->x_clock, x->x_deltime);
-
+  
   return x;
 }
 
@@ -943,12 +945,9 @@ void comport_setup(void)
   
   /*
     class_addbang(comport_class, comport_bang
-  */
-
-  
+  */  
   class_addmethod(comport_class, (t_method)comport_baud, gensym("baud"), 
-		  A_FLOAT, 0);
-  
+		  A_FLOAT, 0); 
   
   class_addmethod(comport_class, (t_method)comport_bits, gensym("bits"), 
 		  A_FLOAT, 0);
