@@ -19,3 +19,7 @@
 
 - make MinGW makefile for "win" so that the GNU Makefile method will be
   standard on all platforms.
+
+- do symlink aliases in externals/build/src/makefile.common
+
+- write externals/build/doc/standardize-help.sh

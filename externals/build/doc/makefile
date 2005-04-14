@@ -32,6 +32,7 @@ all:
 			../../hcs/hid/*-help.pd \
 			../../hcs/hid/ev*-list.pd \
 			../../hcs/pan/*-help.pd \
+			../../iem/comport/*/*-help.pd \
 			../../markex/*.pd \
 			../../maxlib/help/*.* \
 			../../mjlib/doc/*.pd \
@@ -54,8 +55,6 @@ all:
 # its best not to change the objects
 	install -d -m0755 $(DOC_DIR)/iemhelp
 	cp -p ../../iemlib/iemhelp/*.* $(DOC_DIR)/iemhelp
-# comport
-	cp -p ../../iem/comport/comport/testcomport.pd $(DOC_DIR)/comport-help.pd
 #----------------------------------------------------------------------------
 # zexy uses its own dir
 	cp -Rp ../../zexy/examples $(DOC_DIR)/zexy
