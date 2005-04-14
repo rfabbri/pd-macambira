@@ -15,8 +15,10 @@
 CPPEXTERN_NEW_WITH_ONE_ARG(pdp2gem, t_symbol *, A_DEFSYM)
 
 pdp2gem :: pdp2gem(t_symbol *colorspace)
-		 : m_colorspace(GL_YUV422_GEM)
+		 : m_colorspace(GL_YUV422_GEM), m_data(NULL), m_xsize(0), m_ysize(0),
+		 m_mutex(NULL), m_packet0(-1), m_dropped(0), m_pdpdata(NULL)
 {
+  
   // csMess allows us to select what colorspace to convert
   //  the YV12 pixels into while handing it over to GEM
   csMess(colorspace->s_name);
@@ -64,14 +66,6 @@ pdp2gem :: pdp2gem(t_symbol *colorspace)
   }else{
 	post("pdp2gem:  needs to know what colorspace to import to:  YUV, RGB, RGBA, or Gray");
   }
-  
-  m_data = NULL;
-  m_packet0 = -1;
-  m_xsize = 0;
-  m_ysize = 0;
-  m_dropped = 0;
-  m_pdpdata = NULL;
-  m_mutex = NULL;
 
   m_mutex = (pthread_mutex_t*) malloc(sizeof(pthread_mutex_t));
   if ( pthread_mutex_init(m_mutex, NULL) < 0 )
@@ -126,7 +120,7 @@ void pdp2gem :: createBuffer()
 
   m_pixBlock.image.data = m_data;
 
-  post("pdp2gem : created buffer %dx%d", m_xsize, m_ysize );
+  post("pdp2gem : created buffer %d x %d", m_xsize, m_ysize );
 }
 
 void pdp2gem :: pdpMess(t_symbol *action, int pcktno)
