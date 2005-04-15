@@ -3,6 +3,7 @@
 /* 
  msd3D - mass spring damper model for Pure Data or Max/MSP
 
+ Copyright (C) 2005  Nicolas Montgermont
  Written by Nicolas Montgermont for a Master's train in Acoustic,
  Signal processing and Computing Applied to Music (ATIAM, Paris 6) 
  at La Kitchen supervised by Cyrille Henry.
@@ -15,31 +16,29 @@
  Contact : Nicolas Montgermont, montgermont@la-kitchen.fr
 	   Cyrille Henry, Cyrille.Henry@la-kitchen.fr
 
- This program is free software; you can redistribute it and/or                
- modify it under the terms of the GNU General Public License                  
- as published by the Free Software Foundation; either version 2               
- of the License, or (at your option) any later version.                       
-                                                                             
- This program is distributed in the hope that it will be useful,              
- but WITHOUT ANY WARRANTY; without even the implied warranty of               
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                
- GNU General Public License for more details.                           
-                                                                              
- You should have received a copy of the GNU General Public License           
- along with this program; if not, write to the Free Software                  
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
 
- Version 0.01, 12.04.2005
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+ Version 0.02 -- 15.04.2005
 */
 
 // include flext header
 #include <flext.h>
-
 #include <math.h>
 
 // define constants
-#define MSD3D_VERSION 0.01
+#define MSD3D_VERSION 0.02
 #define nb_max_link   4000
 #define nb_max_mass   4000
 #define Id_length   20
@@ -72,7 +71,6 @@ typedef struct _mass {
 	t_float posZ2;
 	t_float forceZ;
 	t_float out_forceZ;
-	char Id_string[Id_length];
 } t_mass;
 
 typedef struct _link {
@@ -83,7 +81,6 @@ typedef struct _link {
 	t_float K1, D1, D2;
 	t_float longx, longy, longz, longueur;
 	t_float distance_old;
-	char Id_string[Id_length];
 } t_link;
 
 class msd3D:
@@ -121,7 +118,7 @@ protected:
 		for (i=0; i<nb_link; i++)	{
 			delete link[i];
 			}
-		ToOutAnything(1,gensym("Reset"),0,sortie);
+		ToOutAnything(1,S_Reset,0,sortie);
 		nb_link = 0;
 		nb_mass = 0;
 		id_mass = 0;
@@ -197,152 +194,122 @@ protected:
 	// Id, nbr, mobile, invM, speedX, posX, forceX
 	{
 		t_atom sortie[7], aux[2];
-		int M;
+		t_float M;
 
 		mass[nb_mass] = new t_mass;			// new pointer
-		mass[nb_mass]->Id = GetASymbol(argv[0]);	// Id
-		mass[nb_mass]->mobile = GetAInt(argv[1]);	// mobile
-		if (GetAInt(argv[2])==0)
+		mass[nb_mass]->Id = GetSymbol(argv[0]);	// Id
+		mass[nb_mass]->mobile = GetInt(argv[1]);	// mobile
+		if (GetFloat(argv[2])==0)
 			M=1;
-		else M = GetAInt(argv[2]);			
-		mass[nb_mass]->invM = 1/((float)M);		// invM
+		else M = GetFloat(argv[2]);			
+		mass[nb_mass]->invM = 1/(M);		// invM
 		mass[nb_mass]->speedX = 0;			// vx[n]
-		mass[nb_mass]->posX = GetAInt(argv[3]);		// x(n]
-		mass[nb_mass]->posX2 = GetAInt(argv[3]);	// x[n-1]
+		mass[nb_mass]->posX = GetFloat(argv[3]);		// x(n]
+		mass[nb_mass]->posX2 = GetFloat(argv[3]);	// x[n-1]
 		mass[nb_mass]->forceX = 0;			// Fx[n]
 		mass[nb_mass]->speedY = 0;			// vy[n]
-		mass[nb_mass]->posY = GetAInt(argv[4]);		// y[n]
-		mass[nb_mass]->posY2 = GetAInt(argv[4]);	// y[n-1]
+		mass[nb_mass]->posY = GetFloat(argv[4]);		// y[n]
+		mass[nb_mass]->posY2 = GetFloat(argv[4]);	// y[n-1]
 		mass[nb_mass]->forceY = 0;			// Fz[n]
 		mass[nb_mass]->speedZ = 0;			// vz[n]
-		mass[nb_mass]->posZ = GetAInt(argv[5]);		// z[n]
-		mass[nb_mass]->posZ2 = GetAInt(argv[5]);	// z[n-1]
+		mass[nb_mass]->posZ = GetFloat(argv[5]);		// z[n]
+		mass[nb_mass]->posZ2 = GetFloat(argv[5]);	// z[n-1]
 		mass[nb_mass]->forceZ = 0;			// Fz[n]
 		mass[nb_mass]->nbr = id_mass;			// id_nbr
-		SETSYMBOL(aux,GetASymbol(argv[0]));
-		atom_string(aux,mass[nb_mass]->Id_string,Id_length);
 		nb_mass++ ;
 		id_mass++;
 		nb_mass = min ( nb_max_mass -1, nb_mass );
-		SETFLOAT(&(sortie[0]),id_mass-1);
-		SETSYMBOL(&(sortie[1]),GetASymbol(argv[0]));
-		SETFLOAT(&(sortie[2]),mass[nb_mass-1]->mobile);
-		SETFLOAT(&(sortie[3]),M);
-		SETFLOAT(&(sortie[4]),mass[nb_mass-1]->posX);
-		SETFLOAT(&(sortie[5]),mass[nb_mass-1]->posY);
-		SETFLOAT(&(sortie[6]),mass[nb_mass-1]->posZ);
-		ToOutAnything(1,gensym("Mass "),7,sortie);
+		SetFloat((sortie[0]),id_mass-1);
+		SetSymbol((sortie[1]),GetSymbol(argv[0]));
+		SetFloat((sortie[2]),mass[nb_mass-1]->mobile);
+		SetFloat((sortie[3]),M);
+		SetFloat((sortie[4]),mass[nb_mass-1]->posX);
+		SetFloat((sortie[5]),mass[nb_mass-1]->posY);
+		SetFloat((sortie[6]),mass[nb_mass-1]->posZ);
+		ToOutAnything(1,S_Mass ,7,sortie);
 	}
 
 	void m_forceX(int argc,t_atom *argv) 
 	{
 	// add a force to mass(es) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_mass;i++)
 		{
-			aux = strcmp(buffer,mass[i]->Id_string);
-			if (aux == 0)
-				mass[i]->forceX += GetAFloat(argv[1]);
+			if (sym == mass[i]->Id)
+				mass[i]->forceX += GetFloat(argv[1]);
 		}
 	}
 
 	void m_forceY(int argc,t_atom *argv) 
 	{
 	// add a force to mass(es) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_mass;i++)
 		{
-			aux = strcmp(buffer,mass[i]->Id_string);
-			if (aux == 0)
-				mass[i]->forceY += GetAFloat(argv[1]);
+			if (sym == mass[i]->Id)
+				mass[i]->forceY += GetFloat(argv[1]);
 		}
 	}
 
 	void m_forceZ(int argc,t_atom *argv) 
 	{
 	// add a force to mass(es) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_mass;i++)
 		{
-			aux = strcmp(buffer,mass[i]->Id_string);
-			if (aux == 0)
-				mass[i]->forceZ += GetAFloat(argv[1]);
+			if (sym == mass[i]->Id)
+				mass[i]->forceZ += GetFloat(argv[1]);
 		}
 	}
 
 	void m_posX(int argc,t_atom *argv) 
 	{
 	// displace mass(es) named Id to a certain position
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		if (GetAFloat(argv[1]) < Xmax && GetAFloat(argv[1]) > Xmin)
-		{
-			SETSYMBOL(atom,GetASymbol(argv[0]));
-			atom_string(atom, buffer, Id_length);
+		if (GetFloat(argv[1]) < Xmax && GetFloat(argv[1]) > Xmin)
 			for (i=0; i<nb_mass;i++)
 			{
-				aux = strcmp(buffer,mass[i]->Id_string);
-				if (aux == 0)
-					mass[i]->posX = GetAFloat(argv[1]);
+				if (sym == mass[i]->Id)
+					mass[i]->posX = GetFloat(argv[1]);
 			}
-		}
 	}
 
 	void m_posY(int argc,t_atom *argv) 
 	{
 	// displace mass(es) named Id to a certain position
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		if (GetAFloat(argv[1]) < Ymax && GetAFloat(argv[1]) > Ymin)
-		{
-			SETSYMBOL(atom,GetASymbol(argv[0]));
-			atom_string(atom, buffer, Id_length);
+		if (GetFloat(argv[1]) < Ymax && GetFloat(argv[1]) > Ymin)
 			for (i=0; i<nb_mass;i++)
 			{
-				aux = strcmp(buffer,mass[i]->Id_string);
-				if (aux == 0)
-					mass[i]->posY = GetAFloat(argv[1]);
+				if (sym == mass[i]->Id)
+					mass[i]->posY = GetFloat(argv[1]);
 			}
-		}
+		
 	}
 
 	void m_posZ(int argc,t_atom *argv) 
 	{
 	// displace mass(es) named Id to a certain position
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		if (GetAFloat(argv[1]) < Zmax && GetAFloat(argv[1]) > Zmin)
-		{
-			SETSYMBOL(atom,GetASymbol(argv[0]));
-			atom_string(atom, buffer, Id_length);
+		if (GetFloat(argv[1]) < Zmax && GetFloat(argv[1]) > Zmin)
 			for (i=0; i<nb_mass;i++)
 			{
-				aux = strcmp(buffer,mass[i]->Id_string);
-				if (aux == 0)
-					mass[i]->posZ = GetAFloat(argv[1]);
+				if (sym == mass[i]->Id)
+					mass[i]->posZ = GetFloat(argv[1]);
 			}
-		}
+		
 	}
 
 	void m_set_mobile(int argc,t_atom *argv) 
@@ -350,7 +317,7 @@ protected:
 	// set mass No to mobile
 		t_int i,aux;
 		
-		aux = GetAInt(argv[0]);	
+		aux = GetInt(argv[0]);	
 		for (i=0; i<nb_mass;i++)
 			{
 				if (mass[i]->nbr == aux)
@@ -364,7 +331,7 @@ protected:
 	// set mass No to fixed
 		t_int i,aux;
 		
-		aux = GetAInt(argv[0]);	
+		aux = GetInt(argv[0]);	
 		for (i=0; i<nb_mass;i++)
 			{
 				if (mass[i]->nbr == aux)
@@ -380,8 +347,8 @@ protected:
 	t_atom sortie[7], aux[nb_link];
 	
 	for (i=0; i<nb_link;i++)	{
-		if (link[i]->mass1->nbr == GetAInt(argv[0]) || link[i]->mass2->nbr == GetAInt(argv[0]))	{
-			SETFLOAT(&(aux[nb_link_delete]),link[i]->nbr);
+		if (link[i]->mass1->nbr == GetInt(argv[0]) || link[i]->mass2->nbr == GetInt(argv[0]))	{
+			SetFloat((aux[nb_link_delete]),link[i]->nbr);
 			nb_link_delete++;
 		}
 	}
@@ -391,18 +358,18 @@ protected:
 
 
 	for (i=0; i<nb_mass;i++)
-		if (mass[i]->nbr == GetAInt(argv[0]))	{
-			SETFLOAT(&(sortie[0]),mass[i]->nbr);
-			SETSYMBOL(&(sortie[1]),mass[i]->Id);
-			SETFLOAT(&(sortie[2]),mass[i]->mobile);
-			SETFLOAT(&(sortie[3]),1/mass[i]->invM);
-			SETFLOAT(&(sortie[4]),mass[i]->posX);
-			SETFLOAT(&(sortie[5]),mass[i]->posY);
-			SETFLOAT(&(sortie[6]),mass[i]->posZ);
+		if (mass[i]->nbr == GetInt(argv[0]))	{
+			SetFloat((sortie[0]),mass[i]->nbr);
+			SetSymbol((sortie[1]),mass[i]->Id);
+			SetFloat((sortie[2]),mass[i]->mobile);
+			SetFloat((sortie[3]),1/mass[i]->invM);
+			SetFloat((sortie[4]),mass[i]->posX);
+			SetFloat((sortie[5]),mass[i]->posY);
+			SetFloat((sortie[6]),mass[i]->posZ);
 			delete mass[i];
 			mass[i] = mass[nb_mass-1];
 			nb_mass--;
-			ToOutAnything(1,gensym("Mass deleted"),7,sortie);
+			ToOutAnything(1,S_Mass_deleted,7,sortie);
 			break;
 		}
 	}
@@ -411,37 +378,37 @@ protected:
 	void m_Xmax(int argc,t_atom *argv) 
 	{
 	// set maximum X of all masses
-	Xmax = GetAFloat(argv[0]);
+	Xmax = GetFloat(argv[0]);
 	}
 
 	void m_Ymax(int argc,t_atom *argv) 
 	{
 	// set maximum Y of all masses
-	Ymax = GetAFloat(argv[0]);
+	Ymax = GetFloat(argv[0]);
 	}
 
 	void m_Zmax(int argc,t_atom *argv) 
 	{
 	// set maximum Z of all masses
-	Zmax = GetAFloat(argv[0]);
+	Zmax = GetFloat(argv[0]);
 	}
 
 	void m_Xmin(int argc,t_atom *argv) 
 	{
 	// set minimum X of all masses
-	Xmin = GetAFloat(argv[0]);
+	Xmin = GetFloat(argv[0]);
 	}
 
 	void m_Ymin(int argc,t_atom *argv) 
 	{
 	// set minimum Y of all masses
-	Ymin = GetAFloat(argv[0]);
+	Ymin = GetFloat(argv[0]);
 	}
 
 	void m_Zmin(int argc,t_atom *argv) 
 	{
 	// set minimum Z of all masses
-	Zmin = GetAFloat(argv[0]);
+	Zmin = GetFloat(argv[0]);
 	}
 // --------------------------------------------------------------  LINKS 
 
@@ -453,34 +420,32 @@ protected:
 		t_int i;
 
 		link[nb_link] = new t_link;
-		link[nb_link]->Id = GetASymbol(argv[0]);
+		link[nb_link]->Id = GetSymbol(argv[0]);
 		for (i=0; i<nb_mass;i++)
-			if (mass[i]->nbr==GetAInt(argv[1]))
+			if (mass[i]->nbr==GetInt(argv[1]))
 				link[nb_link]->mass1 = mass[i];
-			else if(mass[i]->nbr==GetAInt(argv[2]))
+			else if(mass[i]->nbr==GetInt(argv[2]))
 				link[nb_link]->mass2 = mass[i];
-		link[nb_link]->K1 = GetAFloat(argv[3]);
-		link[nb_link]->D1 = GetAFloat(argv[4]);
-		link[nb_link]->D2 = GetAFloat(argv[5]);
+		link[nb_link]->K1 = GetFloat(argv[3]);
+		link[nb_link]->D1 = GetFloat(argv[4]);
+		link[nb_link]->D2 = GetFloat(argv[5]);
 		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;
 		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;
 		link[nb_link]->longz = link[nb_link]->mass1->posZ - link[nb_link]->mass2->posZ;
 		link[nb_link]->longueur = sqrt( pow(link[nb_link]->longx,2) + pow(link[nb_link]->longy,2) + pow(link[nb_link]->longz,2));
 		link[nb_link]->nbr = id_link;
 		link[nb_link]->distance_old = link[nb_link]->longueur;
-		SETSYMBOL(aux,GetASymbol(argv[0]));
-		atom_string(aux,(link[nb_link]->Id_string),Id_length);
 		nb_link++;
 		id_link++;
 		nb_link = min ( nb_max_link -1, nb_link );
-		SETFLOAT(&(sortie[0]),id_link-1);
-		SETSYMBOL(&(sortie[1]),link[nb_link-1]->Id);
-		SETFLOAT(&(sortie[2]),GetAInt(argv[1]));
-		SETFLOAT(&(sortie[3]),GetAInt(argv[2]));
-		SETFLOAT(&(sortie[4]),link[nb_link-1]->K1);
-		SETFLOAT(&(sortie[5]),link[nb_link-1]->D1);
-		SETFLOAT(&(sortie[6]),link[nb_link-1]->D2);
-		ToOutAnything(1,gensym("Link "),7,sortie);
+		SetFloat((sortie[0]),id_link-1);
+		SetSymbol((sortie[1]),link[nb_link-1]->Id);
+		SetFloat((sortie[2]),GetInt(argv[1]));
+		SetFloat((sortie[3]),GetInt(argv[2]));
+		SetFloat((sortie[4]),link[nb_link-1]->K1);
+		SetFloat((sortie[5]),link[nb_link-1]->D1);
+		SetFloat((sortie[6]),link[nb_link-1]->D2);
+		ToOutAnything(1,S_Link ,7,sortie);
 	}
 
 	void m_ilink(int argc,t_atom *argv) 
@@ -488,23 +453,20 @@ protected:
 	// Id, nbr, Id masses1, Id masses2, K1, D1
 	{
 		t_atom aux[2], arglist[6];
-		t_int i,j, strvalue, strvalue2, imass1[nb_mass], nbmass1=0, imass2[nb_mass], nbmass2=0;
-		char buffer[Id_length], buffer2[Id_length];
+		t_int i,j, imass1[nb_mass], nbmass1=0, imass2[nb_mass], nbmass2=0;
+		t_symbol *Id1, *Id2;
 
-		ToOutAnything(1,gensym("iLink"),0,aux);
-		SETSYMBOL(aux,GetASymbol(argv[1]));
-		atom_string(aux, buffer, Id_length);
-		SETSYMBOL(aux,GetASymbol(argv[2]));
-		atom_string(aux, buffer2, Id_length);
+		Id1 = GetSymbol(argv[1]);
+		Id2 = GetSymbol(argv[2]);
+		ToOutAnything(1,S_iLink,0,aux);
+
 
 		for (i=0;i<nb_mass;i++)	{
-			strvalue=strcmp(buffer,mass[i]->Id_string);
-			strvalue2=strcmp(buffer2,mass[i]->Id_string);
-			if (strvalue ==0)	{
+			if (Id1 == mass[i]->Id)	{
 				imass1[nbmass1]=i;
 				nbmass1++;
 			}
-			if (strvalue2 ==0)	{
+			if (Id2 == mass[i]->Id)	{
 				imass2[nbmass2]=i;
 				nbmass2++;
 			}
@@ -513,12 +475,12 @@ protected:
 		for(i=0;i<nbmass1;i++)
 			for(j=0;j<nbmass2;j++)	
 				if (imass1[i] != imass2[j])	{
-					SETSYMBOL(&(arglist[0]),GetASymbol(argv[0]));
-					SETFLOAT(&(arglist[1]),mass[imass1[i]]->nbr);
-					SETFLOAT(&(arglist[2]),mass[imass2[j]]->nbr);
-					SETFLOAT(&(arglist[3]),GetAInt(argv[3]));
-					SETFLOAT(&(arglist[4]),GetAFloat(argv[4]));
-					SETFLOAT(&(arglist[5]),GetAFloat(argv[5]));
+					SetSymbol((arglist[0]),GetSymbol(argv[0]));
+					SetFloat((arglist[1]),mass[imass1[i]]->nbr);
+					SetFloat((arglist[2]),mass[imass2[j]]->nbr);
+					SetFloat((arglist[3]),GetFloat(argv[3]));
+					SetFloat((arglist[4]),GetFloat(argv[4]));
+					SetFloat((arglist[5]),GetFloat(argv[5]));
 					m_link(6,arglist);
 				}
 	}
@@ -526,51 +488,39 @@ protected:
 	void m_setK(int argc,t_atom *argv) 
 	{
 	// set rigidity of link(s) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_link;i++)
 		{
-			aux = strcmp(buffer,link[i]->Id_string);
-			if (aux == 0)
-				link[i]->K1 = GetAFloat(argv[1]);
+			if (sym == link[i]->Id)
+				link[i]->K1 = GetFloat(argv[1]);
 		}
 	}
 
 	void m_setD(int argc,t_atom *argv) 
 	{
 	// set damping of link(s) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_link;i++)
 		{
-			aux = strcmp(buffer,link[i]->Id_string);
-			if (aux == 0)
-				link[i]->D1 = GetAFloat(argv[1]);
+			if (sym == link[i]->Id)
+				link[i]->D1 = GetFloat(argv[1]);
 		}
 	}
 
 	void m_setD2(int argc,t_atom *argv) 
 	{
 	// set damping of link(s) named Id
-		t_int i,aux;
-		t_atom atom[2];
-		char buffer[Id_length];
+		t_int i;
+		const t_symbol *sym = GetSymbol(argv[0]);
 
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, Id_length);
 		for (i=0; i<nb_link;i++)
 		{
-			aux = strcmp(buffer,link[i]->Id_string);
-			if (aux == 0)
-				link[i]->D2 = GetAFloat(argv[1]);
+			if (sym == link[i]->Id)
+				link[i]->D2 = GetFloat(argv[1]);
 		}
 	}
 
@@ -581,18 +531,18 @@ protected:
 	t_atom sortie[7];
 
 	for (i=0; i<nb_link;i++)
-		if (link[i]->nbr == GetAInt(argv[0]))	{
-			SETFLOAT(&(sortie[0]),link[i]->nbr);
-			SETSYMBOL(&(sortie[1]),link[i]->Id);
-			SETFLOAT(&(sortie[2]),link[i]->mass1->nbr);
-			SETFLOAT(&(sortie[3]),link[i]->mass2->nbr);
-			SETFLOAT(&(sortie[4]),link[i]->K1);
-			SETFLOAT(&(sortie[5]),link[i]->D1);
-			SETFLOAT(&(sortie[6]),link[i]->D2);
+		if (link[i]->nbr == GetInt(argv[0]))	{
+			SetFloat((sortie[0]),link[i]->nbr);
+			SetSymbol((sortie[1]),link[i]->Id);
+			SetFloat((sortie[2]),link[i]->mass1->nbr);
+			SetFloat((sortie[3]),link[i]->mass2->nbr);
+			SetFloat((sortie[4]),link[i]->K1);
+			SetFloat((sortie[5]),link[i]->D1);
+			SetFloat((sortie[6]),link[i]->D2);
 			delete link[i];
 			link[i]=link[nb_link-1];
 			nb_link--;
-			ToOutAnything(1,gensym("Link deleted"),7,sortie);
+			ToOutAnything(1,S_Link_deleted,7,sortie);
 			break;
 		}
 	}
@@ -603,161 +553,147 @@ protected:
 	void m_get(int argc,t_atom *argv)
 	// get attributes
 	{
-		t_int i,j, auxstring1, auxstring2, auxstring3, aux;
-		t_symbol *auxarg;
-		t_atom sortie[6],atom[2];
-		char buffer[Id_length],masses[]="massesPos",buffer2[Id_length], forces[] = "massesForces", links[] = "linksPos";
-
-		SETSYMBOL(atom,GetASymbol(argv[0]));
-		atom_string(atom, buffer, 20);
-		auxstring1 = strcmp(buffer,masses);	//auxstring1 : 0 masses, 1 else
-		auxstring2 = strcmp(buffer,forces);	//auxstring2 : 0 forces, 1 else
-		auxstring3 = strcmp(buffer,links);	//auxstring3 : 0 links, 1 else
+		t_int i,j;
+		t_symbol *auxarg,*auxarg2, *auxtype;
+		t_atom sortie[6];
+		auxtype = GetSymbol(argv[0]);
 		auxarg = GetASymbol(argv[1]);		//auxarg : & symbol, 0 else
+
 		if (argc == 1)
 		{
-			if (auxstring1 == 0)// get all masses positions
+			if (auxtype == S_massesPos)// get all masses positions
 				for (i=0; i<nb_mass; i++)
 				{
-					SETFLOAT(&sortie[0],mass[i]->posX);
-					SETFLOAT(&sortie[1],mass[i]->posY);
-					SETFLOAT(&sortie[2],mass[i]->posZ);
-					ToOutAnything(0,gensym("massesPos"),3,sortie);
+					SetFloat(sortie[0],mass[i]->posX);
+					SetFloat(sortie[1],mass[i]->posY);
+					SetFloat(sortie[2],mass[i]->posZ);
+					ToOutAnything(0,S_massesPos,3,sortie);
 				}
-			else if (auxstring2 == 0)// get all masses forces
+			else if (auxtype == S_massesForces)// get all masses forces
 				for (i=0; i<nb_mass; i++)
 				{
-					SETFLOAT(&sortie[0],mass[i]->out_forceX);
-					SETFLOAT(&sortie[1],mass[i]->out_forceY);
-					SETFLOAT(&sortie[2],mass[i]->out_forceZ);
-					ToOutAnything(0,gensym("massesForces"),3,sortie);
+					SetFloat(sortie[0],mass[i]->out_forceX);
+					SetFloat(sortie[1],mass[i]->out_forceY);
+					SetFloat(sortie[2],mass[i]->out_forceZ);
+					ToOutAnything(0,S_massesForces,3,sortie);
 				}
-			else if (auxstring3 == 0)// get all links positions
+			else if (auxtype == S_linksPos)// get all links positions
 				for (i=0; i<nb_link; i++)
 				{
-					SETFLOAT(&sortie[0],link[i]->mass1->posX);
-					SETFLOAT(&sortie[1],link[i]->mass1->posY);
-					SETFLOAT(&sortie[2],link[i]->mass1->posZ);
-					SETFLOAT(&sortie[3],link[i]->mass2->posX);
-					SETFLOAT(&sortie[4],link[i]->mass2->posY);
-					SETFLOAT(&sortie[5],link[i]->mass2->posZ);
-					ToOutAnything(0,gensym("linksPos"),6,sortie);
+					SetFloat(sortie[0],link[i]->mass1->posX);
+					SetFloat(sortie[1],link[i]->mass1->posY);
+					SetFloat(sortie[2],link[i]->mass1->posZ);
+					SetFloat(sortie[3],link[i]->mass2->posX);
+					SetFloat(sortie[4],link[i]->mass2->posY);
+					SetFloat(sortie[5],link[i]->mass2->posZ);
+					ToOutAnything(0,S_linksPos,6,sortie);
 				}
 			else 		// get all masses speeds
 				for (i=0; i<nb_mass; i++)
 				{
-					SETFLOAT(&sortie[0],mass[i]->speedX);
-					SETFLOAT(&sortie[1],mass[i]->speedY);
-					SETFLOAT(&sortie[2],mass[i]->speedZ);
-					ToOutAnything(0,gensym("massesSpeeds"),3,sortie);
+					SetFloat(sortie[0],mass[i]->speedX);
+					SetFloat(sortie[1],mass[i]->speedY);
+					SetFloat(sortie[2],mass[i]->speedZ);
+					ToOutAnything(0,S_massesSpeeds,3,sortie);
 				}
 		}
-		else if (auxstring1 == 0) // get mass positions
+		else if (auxtype == S_massesPos) // get mass positions
 		{
 			if (auxarg == 0) // No
 			{
 				for (j = 1; j<argc; j++)
 					for (i=0;i<nb_mass;i++)
-						if (mass[i]->nbr==GetAInt(argv[j]))
+						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SETFLOAT(&sortie[0],mass[i]->posX);
-							SETFLOAT(&sortie[1],mass[i]->posY);
-							SETFLOAT(&sortie[2],mass[i]->posZ);
-							ToOutAnything(0,gensym("massesPosNo"),3,sortie);
+							SetFloat(sortie[0],mass[i]->posX);
+							SetFloat(sortie[1],mass[i]->posY);
+							SetFloat(sortie[2],mass[i]->posZ);
+							ToOutAnything(0,S_massesPosNo,3,sortie);
 						}
 			}
-			else 		//string
+			else 		//symbol
 			{
 				for (j = 1; j<argc; j++)
 				{
-					SETSYMBOL(&atom[1],GetASymbol(argv[j]));
-					atom_string(&atom[1], buffer2, Id_length);
+					auxarg2 = GetSymbol(argv[j]);
 					for (i=0;i<nb_mass;i++)	
 					{
-						
-						aux = strcmp(buffer2,mass[i]->Id_string);
-						if (aux==0)
+						if (auxarg2==mass[i]->Id)
 						{
-							SETFLOAT(&sortie[0],mass[i]->posX);
-							SETFLOAT(&sortie[1],mass[i]->posY);
-							SETFLOAT(&sortie[2],mass[i]->posZ);
-							ToOutAnything(0,gensym("massesPosId"),3,sortie);
+							SetFloat(sortie[0],mass[i]->posX);
+							SetFloat(sortie[1],mass[i]->posY);
+							SetFloat(sortie[2],mass[i]->posZ);
+							ToOutAnything(0,S_massesPosId,3,sortie);
 						}
 					}
 				}
 			}
 		}
-		else if (auxstring2 == 0)			 // get mass forces
+		else if (auxtype == S_massesForces)			 // get mass forces
 		{
 			if (auxarg == 0) // No
 			{
 				for (j = 1; j<argc; j++)
 					for (i=0;i<nb_mass;i++)
-						if (mass[i]->nbr==GetAInt(argv[j]))
+						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SETFLOAT(&sortie[0],mass[i]->out_forceX);
-							SETFLOAT(&sortie[1],mass[i]->out_forceY);
-							SETFLOAT(&sortie[2],mass[i]->out_forceZ);
-							ToOutAnything(0,gensym("massesForcesNo"),3,sortie);
+							SetFloat(sortie[0],mass[i]->out_forceX);
+							SetFloat(sortie[1],mass[i]->out_forceY);
+							SetFloat(sortie[2],mass[i]->out_forceZ);
+							ToOutAnything(0,S_massesForcesNo,3,sortie);
 						}
 			}
-			else 		//string
+			else 		//symbol
 			{
 				for (j = 1; j<argc; j++)
 				{
-					SETSYMBOL(&atom[1],GetASymbol(argv[j]));
-					atom_string(&atom[1], buffer2, Id_length);
+					auxarg2 = GetSymbol(argv[j]);
 					for (i=0;i<nb_mass;i++)	
 					{
-		
-						aux = strcmp(buffer2,mass[i]->Id_string);
-						if (aux==0)
+						if (auxarg2==mass[i]->Id)
 						{
-							SETFLOAT(&sortie[0],mass[i]->out_forceX);
-							SETFLOAT(&sortie[1],mass[i]->out_forceY);
-							SETFLOAT(&sortie[2],mass[i]->out_forceZ);
-							ToOutAnything(0,gensym("massesForcesId"),3,sortie);
+							SetFloat(sortie[0],mass[i]->out_forceX);
+							SetFloat(sortie[1],mass[i]->out_forceY);
+							SetFloat(sortie[2],mass[i]->out_forceZ);
+							ToOutAnything(0,S_massesForcesId,3,sortie);
 						}
 					}
 				}
 			}
 		}
-		else if (auxstring3 == 0)			 // get links positions
+		else if (auxtype == S_linksPos)			 // get links positions
 		{
 			if (auxarg == 0) // No
 			{
 				for (j = 1; j<argc; j++)
 					for (i=0;i<nb_link;i++)
-						if (link[i]->nbr==GetAInt(argv[j]))
+						if (link[i]->nbr==GetInt(argv[j]))
 						{
-							SETFLOAT(&sortie[0],link[i]->mass1->posX);
-							SETFLOAT(&sortie[1],link[i]->mass1->posY);
-							SETFLOAT(&sortie[2],link[i]->mass1->posZ);
-							SETFLOAT(&sortie[3],link[i]->mass2->posX);
-							SETFLOAT(&sortie[4],link[i]->mass2->posY);
-							SETFLOAT(&sortie[5],link[i]->mass2->posZ);
-							ToOutAnything(0,gensym("linksPosNo"),6,sortie);
+							SetFloat(sortie[0],link[i]->mass1->posX);
+							SetFloat(sortie[1],link[i]->mass1->posY);
+							SetFloat(sortie[2],link[i]->mass1->posZ);
+							SetFloat(sortie[3],link[i]->mass2->posX);
+							SetFloat(sortie[4],link[i]->mass2->posY);
+							SetFloat(sortie[5],link[i]->mass2->posZ);
+							ToOutAnything(0,S_linksPosNo,6,sortie);
 						}
 			}
-			else 		//string
+			else 		//symbol
 			{
 				for (j = 1; j<argc; j++)
 				{
-					SETSYMBOL(&atom[1],GetASymbol(argv[j]));
-					atom_string(&atom[1], buffer2, Id_length);
+					auxarg2 = GetSymbol(argv[j]);
 					for (i=0;i<nb_link;i++)	
 					{
-		
-						aux = strcmp(buffer2,link[i]->Id_string);
-						if (aux==0)
+						if (auxarg2==link[i]->Id)
 						{
-							SETFLOAT(&sortie[0],link[i]->mass1->posX);
-							SETFLOAT(&sortie[1],link[i]->mass1->posY);
-							SETFLOAT(&sortie[2],link[i]->mass1->posZ);
-							SETFLOAT(&sortie[3],link[i]->mass2->posX);
-							SETFLOAT(&sortie[4],link[i]->mass2->posY);
-							SETFLOAT(&sortie[5],link[i]->mass2->posZ);
-							ToOutAnything(0,gensym("linksPosId"),6,sortie);
+							SetFloat(sortie[0],link[i]->mass1->posX);
+							SetFloat(sortie[1],link[i]->mass1->posY);
+							SetFloat(sortie[2],link[i]->mass1->posZ);
+							SetFloat(sortie[3],link[i]->mass2->posX);
+							SetFloat(sortie[4],link[i]->mass2->posY);
+							SetFloat(sortie[5],link[i]->mass2->posZ);
+							ToOutAnything(0,S_linksPosId,6,sortie);
 						}
 					}
 				}
@@ -769,30 +705,27 @@ protected:
 			{
 				for (j = 1; j<argc; j++)
 					for (i=0;i<nb_mass;i++)
-						if (mass[i]->nbr==GetAInt(argv[j]))
+						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SETFLOAT(&sortie[0],mass[i]->speedX);
-							SETFLOAT(&sortie[1],mass[i]->speedY);
-							SETFLOAT(&sortie[2],mass[i]->speedZ);
-							ToOutAnything(0,gensym("massesSpeedsNo"),3,sortie);
+							SetFloat(sortie[0],mass[i]->speedX);
+							SetFloat(sortie[1],mass[i]->speedY);
+							SetFloat(sortie[2],mass[i]->speedZ);
+							ToOutAnything(0,S_massesSpeedsNo,3,sortie);
 						}
 			}
-			else 		//string
+			else 		//symbol
 			{
 				for (j = 1; j<argc; j++)
 				{
-					SETSYMBOL(&atom[1],GetASymbol(argv[j]));
-					atom_string(&atom[1], buffer2, Id_length);
+					auxarg2 = GetSymbol(argv[j]);
 					for (i=0;i<nb_mass;i++)	
 					{
-		
-						aux = strcmp(buffer2,mass[i]->Id_string);
-						if (aux==0)
+						if (auxarg2==mass[i]->Id)
 						{
-							SETFLOAT(&sortie[0],mass[i]->speedX);
-							SETFLOAT(&sortie[1],mass[i]->speedY);
-							SETFLOAT(&sortie[2],mass[i]->speedZ);
-							ToOutAnything(0,gensym("massesSpeedsId"),3,sortie);
+							SetFloat(sortie[0],mass[i]->speedX);
+							SetFloat(sortie[1],mass[i]->speedY);
+							SetFloat(sortie[2],mass[i]->speedZ);
+							ToOutAnything(0,S_massesSpeedsId,3,sortie);
 						}
 					}
 				}
@@ -809,11 +742,11 @@ protected:
 		t_int i;
 	
 		for (i=0; i<nb_mass; i++)	{
-			SETFLOAT(&(sortie[3*i]),mass[i]->posX);
-			SETFLOAT(&(sortie[3*i+1]),mass[i]->posY);
-			SETFLOAT(&(sortie[3*i+2]),mass[i]->posZ);
+			SetFloat((sortie[3*i]),mass[i]->posX);
+			SetFloat((sortie[3*i+1]),mass[i]->posY);
+			SetFloat((sortie[3*i+2]),mass[i]->posZ);
 		}
-		ToOutAnything(0, gensym("massesPosL"), 3*nb_mass, sortie);
+		ToOutAnything(0, S_massesPosL, 3*nb_mass, sortie);
 	}
 
 	void m_force_dumpl()
@@ -823,24 +756,11 @@ protected:
 		t_int i;
 	
 		for (i=0; i<nb_mass; i++)	{
-			SETFLOAT(&(sortie[3*i]),mass[i]->out_forceX);
-			SETFLOAT(&(sortie[3*i+1]),mass[i]->out_forceY);
-			SETFLOAT(&(sortie[3*i+2]),mass[i]->out_forceZ);
+			SetFloat((sortie[3*i]),mass[i]->out_forceX);
+			SetFloat((sortie[3*i+1]),mass[i]->out_forceY);
+			SetFloat((sortie[3*i+2]),mass[i]->out_forceZ);
 		}
-		ToOutAnything(0, gensym("massesForcesL"), 3*nb_mass, sortie);
-	}
-
-	void m_link_dumpl()
-	// List of masses positions on first outlet
-	{	
-		t_atom sortie[3*nb_link];
-		t_int i;
-	
-		for (i=0; i<nb_link; i++)	{
-			SETFLOAT(&(sortie[2*i]),link[i]->mass1->nbr);
-			SETFLOAT(&(sortie[2*i+1]),link[i]->mass2->nbr);
-		}
-		ToOutAnything(0, gensym("linksMassesL"), 2*nb_link, sortie);
+		ToOutAnything(0, S_massesForcesL, 3*nb_mass, sortie);
 	}
 
 	void m_info_dumpl()
@@ -850,25 +770,25 @@ protected:
 		t_int i;
 	
 		for (i=0; i<nb_mass; i++)	{
-			SETFLOAT(&(sortie[0]),mass[i]->nbr);
-			SETSYMBOL(&(sortie[1]),mass[i]->Id);
-			SETFLOAT(&(sortie[2]),mass[i]->mobile);
-			SETFLOAT(&(sortie[3]),1/mass[i]->invM);
-			SETFLOAT(&(sortie[4]),mass[i]->posX);
-			SETFLOAT(&(sortie[5]),mass[i]->posY);
-			SETFLOAT(&(sortie[6]),mass[i]->posZ);
-		ToOutAnything(1, gensym("Mass"), 7, sortie);
+			SetFloat((sortie[0]),mass[i]->nbr);
+			SetSymbol((sortie[1]),mass[i]->Id);
+			SetFloat((sortie[2]),mass[i]->mobile);
+			SetFloat((sortie[3]),1/mass[i]->invM);
+			SetFloat((sortie[4]),mass[i]->posX);
+			SetFloat((sortie[5]),mass[i]->posY);
+			SetFloat((sortie[6]),mass[i]->posZ);
+		ToOutAnything(1, S_Mass, 7, sortie);
 		}
 
 		for (i=0; i<nb_link; i++)	{
-			SETFLOAT(&(sortie[0]),link[i]->nbr);
-			SETSYMBOL(&(sortie[1]),link[i]->Id);
-			SETFLOAT(&(sortie[2]),link[i]->mass1->nbr);
-			SETFLOAT(&(sortie[3]),link[i]->mass2->nbr);
-			SETFLOAT(&(sortie[4]),link[i]->K1);
-			SETFLOAT(&(sortie[5]),link[i]->D1);
-			SETFLOAT(&(sortie[6]),link[i]->D2);
-		ToOutAnything(1, gensym("Link"), 7, sortie);
+			SetFloat((sortie[0]),link[i]->nbr);
+			SetSymbol((sortie[1]),link[i]->Id);
+			SetFloat((sortie[2]),link[i]->mass1->nbr);
+			SetFloat((sortie[3]),link[i]->mass2->nbr);
+			SetFloat((sortie[4]),link[i]->K1);
+			SetFloat((sortie[5]),link[i]->D1);
+			SetFloat((sortie[6]),link[i]->D2);
+		ToOutAnything(1, S_Link, 7, sortie);
 		}
 
 	}
@@ -884,9 +804,32 @@ protected:
 
 private:
 
+	const static t_symbol *S_Reset;
+	const static t_symbol *S_Mass;
+	const static t_symbol *S_Link;
+	const static t_symbol *S_iLink;
+	const static t_symbol *S_Mass_deleted;
+	const static t_symbol *S_Link_deleted;
+	const static t_symbol *S_massesPos;
+	const static t_symbol *S_massesPosNo;
+	const static t_symbol *S_massesPosId;
+	const static t_symbol *S_linksPos;
+	const static t_symbol *S_linksPosNo;
+	const static t_symbol *S_linksPosId;
+	const static t_symbol *S_massesForces;
+	const static t_symbol *S_massesForcesNo;
+	const static t_symbol *S_massesForcesId;
+	const static t_symbol *S_massesSpeeds;
+	const static t_symbol *S_massesSpeedsNo;
+	const static t_symbol *S_massesSpeedsId;
+	const static t_symbol *S_massesPosL;
+	const static t_symbol *S_massesForcesL;
+
 	static void setup(t_classid c)
 	{
-		// --- set up meth(i=0; i<nb_link;i++)ods (class scope) ---
+
+		// --- set up methods (class scope) ---
+
 
 		// register a bang method to the default inlet (0)
 		FLEXT_CADDBANG(c,0,m_bang);
@@ -918,7 +861,6 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"deleteMass",m_delete_mass);
 		FLEXT_CADDMETHOD_(c,0,"massesPosL",m_mass_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"infosL",m_info_dumpl);
-		FLEXT_CADDMETHOD_(c,0,"linksMassesL",m_link_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"massesForcesL",m_force_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"setMobile",m_set_mobile);
 		FLEXT_CADDMETHOD_(c,0,"setFixed",m_set_fixe);
@@ -929,7 +871,6 @@ private:
 	FLEXT_CALLBACK(m_mass_dumpl)
 	FLEXT_CALLBACK(m_info_dumpl)
 	FLEXT_CALLBACK(m_force_dumpl)
-	FLEXT_CALLBACK(m_link_dumpl)
 	FLEXT_CALLBACK(m_reset)
 	FLEXT_CALLBACK_V(m_mass)
 	FLEXT_CALLBACK_V(m_link)
@@ -955,6 +896,27 @@ private:
 	FLEXT_CALLBACK_V(m_set_mobile)
 	FLEXT_CALLBACK_V(m_set_fixe)
 };
+
+	const t_symbol *msd3D::S_Reset = MakeSymbol("Reset");
+	const t_symbol *msd3D::S_Mass = MakeSymbol("Mass");
+	const t_symbol *msd3D::S_Link = MakeSymbol("Link");
+	const t_symbol *msd3D::S_iLink = MakeSymbol("iLink");
+	const t_symbol *msd3D::S_Mass_deleted = MakeSymbol("Mass deleted");
+	const t_symbol *msd3D::S_Link_deleted = MakeSymbol("Link deleted");
+	const t_symbol *msd3D::S_massesPos = MakeSymbol("massesPos");
+	const t_symbol *msd3D::S_massesPosNo = MakeSymbol("massesPosNo");
+	const t_symbol *msd3D::S_massesPosId = MakeSymbol("massesPosId");
+	const t_symbol *msd3D::S_linksPos = MakeSymbol("linksPos");
+	const t_symbol *msd3D::S_linksPosNo = MakeSymbol("linksPosNo");
+	const t_symbol *msd3D::S_linksPosId = MakeSymbol("linksPosId");
+	const t_symbol *msd3D::S_massesForces = MakeSymbol("massesForces");
+	const t_symbol *msd3D::S_massesForcesNo = MakeSymbol("massesForcesNo");
+	const t_symbol *msd3D::S_massesForcesId = MakeSymbol("massesForcesId");
+	const t_symbol *msd3D::S_massesSpeeds = MakeSymbol("massesSpeeds");
+	const t_symbol *msd3D::S_massesSpeedsNo = MakeSymbol("massesSpeedsNo");
+	const t_symbol *msd3D::S_massesSpeedsId = MakeSymbol("massesSpeedsId");
+	const t_symbol *msd3D::S_massesPosL = MakeSymbol("massesPosL");
+	const t_symbol *msd3D::S_massesForcesL = MakeSymbol("massesForcesL");
 
 // instantiate the class (constructor has a variable argument list)
 FLEXT_NEW_V("msd3D",msd3D)
