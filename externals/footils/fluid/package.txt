@@ -1,0 +1,3 @@
+NAME=fluid~
+SRCS=fluid/main.cpp
+LIBS=-lfluidsynth
