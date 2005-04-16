@@ -1,3 +1,6 @@
 NAME=fluid~
-SRCS=fluid/main.cpp
-LIBS=-lfluidsynth
+
+BUILDDIR=build
+
+SRCDIR=fluid
+SRCS=main.cpp
