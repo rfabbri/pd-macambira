@@ -45,7 +45,7 @@ public:
 	dyn(int argc,const t_atom *argv);
 	virtual ~dyn();
 
-	void m_reset();
+    void m_reset() { DoExit(); DoInit(); }
 	void m_reload(); // refresh objects/abstractions
 	void m_newobj(int argc,const t_atom *argv);
 	void m_newmsg(int argc,const t_atom *argv);
@@ -63,26 +63,40 @@ protected:
 
     static const t_symbol *k_obj,*k_msg,*k_text;
 
-	class obj {
+	class Obj {
 	public:
-		obj(unsigned long i,t_gobj *o): id(i),object(o),nxt(NULL) {}
+		Obj(t_glist *gl,t_gobj *o): glist(gl),object(o) {}
 
-		void Add(obj *o);
+        t_glist *AsGlist() const 
+        { 
+            return pd_class(&object->g_pd) == canvas_class?(t_glist *)object:NULL; 
+        }
 
-		unsigned long id;
+        t_glist *glist;
 		t_gobj *object;
-		obj *nxt;
-	} *root;
+	};
+    
+    typedef TablePtrMapOwned<const t_symbol *,Obj *> ObjMap;
+    ObjMap root;
 
+    typedef TablePtrMap<Obj *,const t_symbol *> GObjMap;
+    typedef TablePtrMapOwned<t_glist *,GObjMap *> GLstMap;
+    GLstMap groot;
 
-	obj *Find(const t_symbol *n);
+    Obj *Find(const t_symbol *n) { return root.find(n); }
     t_glist *FindCanvas(const t_symbol *n);
-	void Add(const t_symbol *n,t_gobj *o);
+
+    Obj *Remove(const t_symbol *n);
+    bool Add(const t_symbol *n,t_glist *gl,t_gobj *o);
 
     t_gobj *New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add = true);
-	void Delete(t_gobj *o);
 
 	void ConnDis(bool conn,int argc,const t_atom *argv);
+
+    void DoInit();
+    void DoExit();
+    void NewProxies();
+    void DelProxies();
 
     virtual bool CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv);
 	virtual bool CbDsp();
@@ -291,7 +305,6 @@ In all cases the 1)s have been chosen as the cleaner solution
 */
 
 dyn::dyn(int argc,const t_atom *argv):
-	root(NULL),
 	canvas(NULL),
 	pxin(NULL),pxout(NULL),
     stripext(false)
@@ -307,8 +320,6 @@ dyn::dyn(int argc,const t_atom *argv):
 	s_outlets = GetAInt(argv[2]);
 	m_outlets = GetAInt(argv[3]);
 
-	int i;
-
 	// --- make a sub-canvas for dyn~ ------
 
 	t_atom arg[6];
@@ -323,8 +334,45 @@ dyn::dyn(int argc,const t_atom *argv):
 	// must do that....
 	canvas_unsetcurrent(canvas);
 
-	// --- create inlet proxies ------
+    DoInit();
 
+	AddInSignal("Messages (newobj,newmsg,newtext,del,conn,dis)");
+	AddInSignal(s_inlets);
+	AddInAnything(m_inlets);
+	AddOutSignal(s_outlets);
+	AddOutAnything(m_outlets);
+}
+
+dyn::~dyn()
+{
+	DoExit();
+
+	if(canvas) pd_free((t_pd *)canvas);
+}
+
+void dyn::DoInit()
+{
+    // add to list of canvases
+    groot.insert(canvas,new GObjMap);
+
+    NewProxies();
+}
+
+void dyn::DoExit()
+{
+    // delete proxies
+    DelProxies();
+    // remove all objects
+    glist_clear(canvas);
+    // remove all names
+    groot.clear();
+    root.clear();
+}
+
+void dyn::NewProxies()
+{
+	// --- create inlet proxies ------
+    int i;
 	pxin = new proxyin *[s_inlets+m_inlets];
 	for(i = 0; i < s_inlets+m_inlets; ++i) {
 		bool sig = i < s_inlets;
@@ -366,33 +414,15 @@ dyn::dyn(int argc,const t_atom *argv):
             error("%s - Error creating outlet proxy",thisName());
         }
     }
-
-	AddInSignal("Messages (newobj,newmsg,newtext,del,conn,dis)");
-	AddInSignal(s_inlets);
-	AddInAnything(m_inlets);
-	AddOutSignal(s_outlets);
-	AddOutAnything(m_outlets);
 }
 
-dyn::~dyn()
+void dyn::DelProxies()
 {
-	m_reset();
-
-	if(canvas) pd_free((t_pd *)canvas);
-
+    int i;
+	for(i = 0; i < s_inlets+m_inlets; ++i) glist_delete(canvas,(t_gobj *)pxin[i]);
 	if(pxin) delete[] pxin;
+	for(i = 0; i < s_outlets+m_outlets; ++i) glist_delete(canvas,(t_gobj *)pxout[i]);
 	if(pxout) delete[] pxout;
-}
-
-
-void dyn::obj::Add(obj *o) {	if(nxt) nxt->Add(o); else nxt = o; }
-
-dyn::obj *dyn::Find(const t_symbol *n)
-{
-    unsigned long id = *(unsigned long *)n;
-	obj *o;
-	for(o = root; o && o->id != id; o = o->nxt) {}
-	return o;
 }
 
 t_glist *dyn::FindCanvas(const t_symbol *n)
@@ -400,24 +430,10 @@ t_glist *dyn::FindCanvas(const t_symbol *n)
     if(n == sym_dot) 
         return canvas;
     else {
-        obj *o = Find(n);
-        if(o && pd_class(&o->object->g_pd) == canvas_class) 
-            return (t_glist *)o->object;
-        else 
-            return NULL;
+        Obj *o = Find(n);
+        t_glist *gl = o->AsGlist();
+        return gl && groot.find(gl)?(t_glist *)o->object:NULL;
     }
-}
-
-void dyn::Add(const t_symbol *n,t_gobj *ob)
-{
-    unsigned long id = *(unsigned long *)n;
-	obj *o = new obj(id,ob);
-	if(root) root->Add(o); else root = o;
-}
-
-void dyn::Delete(t_gobj *o)
-{
-	glist_delete(canvas,o);
 }
 
 static t_gobj *GetLast(t_glist *gl)
@@ -433,42 +449,40 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 {
     t_gobj *newest = NULL;
     const char *err = NULL;
-	int argc = 0;
-	t_atom *argv = NULL;
     const t_symbol *name = NULL,*canv = NULL;
     t_glist *glist = NULL;
+
+    AtomListStatic<16> args;
 
 	if(_argc_ >= 4 && CanbeInt(_argv_[0]) && CanbeInt(_argv_[1]) && IsSymbol(_argv_[2]) && IsSymbol(_argv_[3])) {
         canv = GetSymbol(_argv_[2]);
         name = GetSymbol(_argv_[3]);
 
-        argc = _argc_-2;
-        argv = new t_atom[argc];
-		SetInt(argv[0],GetAInt(_argv_[0]));
-		SetInt(argv[1],GetAInt(_argv_[1]));
-        for(int i = 0; i < argc-2; ++i) SetAtom(argv[i+2],_argv_[i+4]);
+        args(_argc_-2);
+		SetInt(args[0],GetAInt(_argv_[0]));
+		SetInt(args[1],GetAInt(_argv_[1]));
+        for(int i = 0; i < _argc_; ++i) SetAtom(args[i+2],_argv_[i+4]);
 	}
 	else if(_argc_ >= 3 && IsSymbol(_argv_[0]) && IsSymbol(_argv_[1])) {
         canv = GetSymbol(_argv_[0]);
         name = GetSymbol(_argv_[1]);
 
-        argc = _argc_;
-        argv = new t_atom[argc];
+        args(_argc_);
 		// random position if not given
-		SetInt(argv[0],rand()%600);
-		SetInt(argv[1],50+rand()%400);
-        for(int i = 0; i < argc-2; ++i) SetAtom(argv[i+2],_argv_[i+2]);
+		SetInt(args[0],rand()%600);
+		SetInt(args[1],50+rand()%400);
+        for(int i = 0; i < _argc_-2; ++i) SetAtom(args[i+2],_argv_[i+2]);
 	}
 
-	if(argv) {
-		if(add && (!name || name == sym_dot || Find(name))) 
-			err = "Object name is already present";
+	if(args.Count()) {
+        if(name == sym_dot)
+			err = ". cannot be redefined";
         else if(!canv || !(glist = FindCanvas(canv)))
 			err = "Canvas could not be found";
         else {
             // convert abstraction filenames
-            if(stripext && kind == k_obj && argc >= 3 && IsSymbol(argv[2])) {
-                const char *c = GetString(argv[2]);
+            if(stripext && kind == k_obj && args.Count() >= 3 && IsSymbol(args[2])) {
+                const char *c = GetString(args[2]);
                 int l = strlen(c);
                 // check end of string for .pd file extension
                 if(l >= 4 && !memcmp(c+l-3,".pd",4)) {
@@ -476,7 +490,7 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
                     char tmp[64],*t = tmp;
                     if(l > sizeof tmp-1) t = new char[l+1];
                     memcpy(tmp,c,l-3); tmp[l-3] = 0;
-                    SetString(argv[2],tmp);
+                    SetString(args[2],tmp);
                     if(tmp != t) delete[] t;
                 }
             }
@@ -485,7 +499,7 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 			canvas_setcurrent(glist); 
 
             t_gobj *last = GetLast(glist);
-            pd_typedmess((t_pd *)glist,(t_symbol *)kind,argc,argv);
+            pd_typedmess((t_pd *)glist,(t_symbol *)kind,args.Count(),args.Atoms());
             newest = GetLast(glist);
 
             if(kind == k_obj) {
@@ -509,7 +523,10 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 			// look for latest created object
 			if(newest) {
 				// add to database
-				if(add) Add(name,newest);
+                if(add) {
+                    bool ok = Add(name,glist,newest);
+                    FLEXT_ASSERT(ok);
+                }
 
 				// send loadbang (if it is an abstraction)
 				if(pd_class(&newest->g_pd) == canvas_class) {
@@ -529,8 +546,6 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 			// pop the current canvas 
 			canvas_unsetcurrent(glist); 
 		}
-
-        delete[] argv;
 	}
 	else 
         if(!err) err = "new name object [args]";
@@ -540,17 +555,62 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
     return newest;
 }
 
-
-void dyn::m_reset()
+dyn::Obj *dyn::Remove(const t_symbol *n)
 {
-	obj *o = root;
-	while(o) {
-		Delete(o->object);
-		obj *n = o->nxt;
-		delete o; 
-		o = n;
-	}
-	root = NULL; 
+    // see if there's already an object of the same name
+    Obj *prv = root.remove(n);
+    if(prv) {
+        t_glist *pl = prv->glist;
+        // get canvas map
+        GObjMap *gm = groot.find(pl);
+        FLEXT_ASSERT(gm);
+        // remove object from canvas map
+        gm->erase(prv);
+
+        // non-NULL if object itself is a glist
+        t_glist *gl = prv->AsGlist();
+        if(gl) {
+            GObjMap *gm = groot.remove(gl);
+            // if it's a loaded abstraction it need not be in our list
+            if(gm) {
+                // remove all objects in canvas map
+                for(GObjMap::iterator it(*gm); it; ++it) {
+                    Obj *r = Remove(it.data());
+                    FLEXT_ASSERT(r);
+                    delete r;
+                }
+                // delete canvas map
+                delete gm;
+            }
+        }
+    }
+    return prv;
+}
+
+bool dyn::Add(const t_symbol *n,t_glist *gl,t_gobj *o) 
+{ 
+    // remove previous name entry
+    Obj *prv = Remove(n);
+    if(prv) delete prv;
+
+    // get canvas map
+    GObjMap *gm = groot.find(gl);
+    // if none existing create one
+    if(!gm) return false;
+
+    // insert object to canvas map
+    Obj *obj = new Obj(gl,o);
+    gm->insert(obj,n);
+    // insert object to object map
+    root.insert(n,obj); 
+
+    t_glist *nl = obj->AsGlist();
+    if(nl) {
+        FLEXT_ASSERT(!groot.find(nl));
+        groot.insert(nl,new GObjMap);
+    }
+
+    return true;
 }
 
 void dyn::m_reload()
@@ -593,18 +653,12 @@ void dyn::m_newtext(int argc,const t_atom *argv)
 
 void dyn::m_del(const t_symbol *n)
 {
-	unsigned long id = *(unsigned long *)n;
-
-    obj *p = NULL,*o = root;
-	for(; o && o->id != id; p = o,o = o->nxt) {}
-
-	if(o) {
-		if(p) p->nxt = o->nxt; else root = o->nxt;
-
-		Delete(o->object);
-		delete o;
-	}
-	else
+    Obj *obj = Remove(n);
+    if(obj) {
+        glist_delete(obj->glist,obj->object);
+        delete obj;
+    }
+    else
 		post("%s - del: object not found",thisName());
 }
 
@@ -644,13 +698,15 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 	}
 
 	t_text *s_obj,*d_obj;
+    t_glist *s_cnv,*d_cnv;
 	if(s_n) {
-		obj *s_o = Find(s_n);
+		Obj *s_o = Find(s_n);
 		if(!s_o) { 
 			post("%s - connect: source \"%s\" not found",thisName(),GetString(s_n));
 			return;
 		}
 		s_obj = (t_text *)s_o->object;
+        s_cnv = s_o->glist;
 	}
 	else if(s_x < 0 && s_x >= s_inlets+m_inlets) {
 		post("%s - connect: inlet %i out of range (0..%i)",thisName(),s_x,s_inlets+m_inlets-1);
@@ -658,16 +714,18 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 	}
 	else {
 		s_obj = &pxin[s_x]->obj;
+        s_cnv = canvas;
 		s_x = 0; // always 0 for proxy
 	}
 
 	if(d_n) {
-		obj *d_o = Find(d_n);
+		Obj *d_o = Find(d_n);
 		if(!d_o) { 
 			post("%s - connect: destination \"%s\" not found",thisName(),GetString(d_n));
 			return;
 		}
 		d_obj = (t_text *)d_o->object;
+        d_cnv = d_o->glist;
 	}
 	else if(d_x < 0 && d_x >= s_outlets+m_outlets) {
 		post("%s - connect: outlet %i out of range (0..%i)",thisName(),d_x,s_outlets+m_outlets-1);
@@ -675,21 +733,27 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 	}
 	else  {
 		d_obj = &pxout[d_x]->obj;
+        d_cnv = canvas;
 		d_x = 0; // always 0 for proxy
 	}
 
+    if(s_cnv != d_cnv) {
+        post("%s - connect: objects \"%s\" and \"%s\" are not on same canvas",thisName(),GetString(s_n),GetString(d_n));
+        return;
+    }
+
 #ifndef NO_VIS
-	int s_oix = canvas_getindex(canvas,&s_obj->te_g);
-	int d_oix = canvas_getindex(canvas,&d_obj->te_g);
+	int s_oix = canvas_getindex(s_cnv,&s_obj->te_g);
+	int d_oix = canvas_getindex(d_cnv,&d_obj->te_g);
 #endif
 
     if(conn) {
-		if(!canvas_isconnected(canvas,(t_text *)s_obj,s_x,(t_text *)d_obj,d_x)) {
+		if(!canvas_isconnected(s_cnv,(t_text *)s_obj,s_x,(t_text *)d_obj,d_x)) {
 #ifdef NO_VIS
 			if(!obj_connect(s_obj, s_x, d_obj, d_x))
 				post("%s - connect: connection could not be made",thisName());
 #else
-			canvas_connect(canvas,s_oix,s_x,d_oix,d_x);
+			canvas_connect(s_cnv,s_oix,s_x,d_oix,d_x);
 #endif
 		}
 	}
@@ -697,9 +761,11 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 #ifdef NO_VIS
 		obj_disconnect(s_obj, s_x, d_obj, d_x);
 #else
-		canvas_disconnect(canvas,s_oix,s_x,d_oix,d_x);
+		canvas_disconnect(s_cnv,s_oix,s_x,d_oix,d_x);
 #endif
 	}
+
+//    canvas_fixlinesfor(s_cnv,(t_text *)s_x);
 }
 
 
@@ -721,7 +787,7 @@ void dyn::m_send(int argc,const t_atom *argv)
 	if(argc < 2 || !IsSymbol(argv[0])) 
 		post("%s - Syntax: send name message [args]",thisName());
 	else {
-		obj *o = Find(GetSymbol(argv[0]));
+		Obj *o = Find(GetSymbol(argv[0]));
 		if(!o)
 			post("%s - send: object \"%s\" not found",thisName(),GetString(argv[0]));
 		else
