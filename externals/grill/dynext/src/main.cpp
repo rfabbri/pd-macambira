@@ -76,12 +76,33 @@ protected:
 		t_gobj *object;
 	};
     
-    typedef TablePtrMapOwned<const t_symbol *,Obj *> ObjMap;
-    ObjMap root;
+    class ObjMap
+        :public TablePtrMap<const t_symbol *,Obj *>
+    {
+    public:
+        virtual ~ObjMap() { clear(); }
+            
+        virtual void clear()
+        {
+            for(iterator it(*this); it; ++it) delete it.data();
+            TablePtrMap<const t_symbol *,Obj *>::clear();
+        }
+    } root;
 
     typedef TablePtrMap<Obj *,const t_symbol *> GObjMap;
-    typedef TablePtrMapOwned<t_glist *,GObjMap *> GLstMap;
-    GLstMap groot;
+
+    class GLstMap
+        :public TablePtrMap<t_glist *,GObjMap *>
+    {
+    public:
+        virtual ~GLstMap() { clear(); }
+            
+        virtual void clear()
+        {
+            for(iterator it(*this); it; ++it) delete it.data();
+            TablePtrMap<t_glist *,GObjMap *>::clear();
+        }
+    } groot;
 
     Obj *Find(const t_symbol *n) { return root.find(n); }
     t_glist *FindCanvas(const t_symbol *n);
@@ -113,7 +134,12 @@ protected:
 		t_sample *buf;
 		t_sample defsig;
 
-		void init(dyn *t);
+		void init(dyn *t)
+        { 
+	        th = t; 
+	        n = 0,buf = NULL;
+	        defsig = 0;
+        }
 
         static void px_exit(proxy *px) { if(px->buf) FreeAligned(px->buf); }
 	};
@@ -171,7 +197,7 @@ protected:
 
     int m_inlets,s_inlets,m_outlets,s_outlets;
 	t_canvas *canvas;
-    bool stripext;
+    bool stripext,canvasmsg,symreuse;
 
 private:
 	static void setup(t_classid c);
@@ -189,6 +215,8 @@ private:
 //	FLEXT_CALLBACK(m_refresh)
 
 	FLEXT_ATTRVAR_B(stripext)
+	FLEXT_ATTRVAR_B(symreuse)
+	FLEXT_ATTRVAR_B(canvasmsg)
 
     static const t_symbol *sym_dot,*sym_dynsin,*sym_dynsout,*sym_dynin,*sym_dynout,*sym_dyncanvas;
     static const t_symbol *sym_vis,*sym_loadbang,*sym_dsp;
@@ -260,6 +288,8 @@ void dyn::setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"send",m_send);
 	FLEXT_CADDATTR_VAR(c,"vis",mg_vis,ms_vis);
     FLEXT_CADDATTR_VAR1(c,"stripext",stripext);
+    FLEXT_CADDATTR_VAR1(c,"symreuse",symreuse);
+    FLEXT_CADDATTR_VAR1(c,"canvasmsg",canvasmsg);
 
     // set up symbols
     k_obj = MakeSymbol("obj"); 
@@ -307,7 +337,7 @@ In all cases the 1)s have been chosen as the cleaner solution
 dyn::dyn(int argc,const t_atom *argv):
 	canvas(NULL),
 	pxin(NULL),pxout(NULL),
-    stripext(false)
+    stripext(false),symreuse(true),canvasmsg(false)
 {
 	if(argc < 4) { 
 		post("%s - Syntax: dyn~ sig-ins msg-ins sig-outs msg-outs",thisName());
@@ -445,6 +475,64 @@ static t_gobj *GetLast(t_glist *gl)
     return go;
 }
 
+bool dyn::Add(const t_symbol *n,t_glist *gl,t_gobj *o) 
+{ 
+    // remove previous name entry
+    Obj *prv = Remove(n);
+    if(prv) delete prv;
+
+    // get canvas map
+    GObjMap *gm = groot.find(gl);
+    // if none existing create one
+    if(!gm) return false;
+
+    // insert object to canvas map
+    Obj *obj = new Obj(gl,o);
+    gm->insert(obj,n);
+    // insert object to object map
+    root.insert(n,obj); 
+
+    t_glist *nl = obj->AsGlist();
+    if(nl) {
+        FLEXT_ASSERT(!groot.find(nl));
+        groot.insert(nl,new GObjMap);
+    }
+
+    return true;
+}
+
+dyn::Obj *dyn::Remove(const t_symbol *n)
+{
+    // see if there's already an object of the same name
+    Obj *prv = root.remove(n);
+    if(prv) {
+        t_glist *pl = prv->glist;
+        // get canvas map
+        GObjMap *gm = groot.find(pl);
+        FLEXT_ASSERT(gm);
+        // remove object from canvas map
+        gm->remove(prv);
+
+        // non-NULL if object itself is a glist
+        t_glist *gl = prv->AsGlist();
+        if(gl) {
+            GObjMap *gm = groot.remove(gl);
+            // if it's a loaded abstraction it need not be in our list
+            if(gm) {
+                // remove all objects in canvas map
+                for(GObjMap::iterator it(*gm); it; ++it) {
+                    Obj *r = Remove(it.data());
+                    FLEXT_ASSERT(r);
+                    delete r;
+                }
+                // delete canvas map
+                delete gm;
+            }
+        }
+    }
+    return prv;
+}
+
 t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 {
     t_gobj *newest = NULL;
@@ -477,6 +565,8 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
 	if(args.Count()) {
         if(name == sym_dot)
 			err = ". cannot be redefined";
+        else if(!symreuse && root.find(name))
+			err = "Name already in use";
         else if(!canv || !(glist = FindCanvas(canv)))
 			err = "Canvas could not be found";
         else {
@@ -553,64 +643,6 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
     if(err) throw err;
 
     return newest;
-}
-
-dyn::Obj *dyn::Remove(const t_symbol *n)
-{
-    // see if there's already an object of the same name
-    Obj *prv = root.remove(n);
-    if(prv) {
-        t_glist *pl = prv->glist;
-        // get canvas map
-        GObjMap *gm = groot.find(pl);
-        FLEXT_ASSERT(gm);
-        // remove object from canvas map
-        gm->erase(prv);
-
-        // non-NULL if object itself is a glist
-        t_glist *gl = prv->AsGlist();
-        if(gl) {
-            GObjMap *gm = groot.remove(gl);
-            // if it's a loaded abstraction it need not be in our list
-            if(gm) {
-                // remove all objects in canvas map
-                for(GObjMap::iterator it(*gm); it; ++it) {
-                    Obj *r = Remove(it.data());
-                    FLEXT_ASSERT(r);
-                    delete r;
-                }
-                // delete canvas map
-                delete gm;
-            }
-        }
-    }
-    return prv;
-}
-
-bool dyn::Add(const t_symbol *n,t_glist *gl,t_gobj *o) 
-{ 
-    // remove previous name entry
-    Obj *prv = Remove(n);
-    if(prv) delete prv;
-
-    // get canvas map
-    GObjMap *gm = groot.find(gl);
-    // if none existing create one
-    if(!gm) return false;
-
-    // insert object to canvas map
-    Obj *obj = new Obj(gl,o);
-    gm->insert(obj,n);
-    // insert object to object map
-    root.insert(n,obj); 
-
-    t_glist *nl = obj->AsGlist();
-    if(nl) {
-        FLEXT_ASSERT(!groot.find(nl));
-        groot.insert(nl,new GObjMap);
-    }
-
-    return true;
 }
 
 void dyn::m_reload()
@@ -790,18 +822,13 @@ void dyn::m_send(int argc,const t_atom *argv)
 		Obj *o = Find(GetSymbol(argv[0]));
 		if(!o)
 			post("%s - send: object \"%s\" not found",thisName(),GetString(argv[0]));
-		else
+		else if(!canvasmsg && o->AsGlist())
+			post("%s - send: object \"%s\" is an abstraction, please create proxy",thisName(),GetString(argv[0]));
+        else
 			pd_forwardmess((t_pd *)o->object,argc-1,(t_atom *)argv+1);
 	}
 }
 
-
-void dyn::proxy::init(dyn *t) 
-{ 
-	th = t; 
-	n = 0,buf = NULL;
-	defsig = 0;
-}
 
 void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
 {
@@ -861,4 +888,3 @@ void dyn::CbSignal()
 		if(pxout[i]->buf)
 		    CopySamples(out[i],pxout[i]->buf,n);
 }
-

@@ -31,7 +31,9 @@ CHANGES:
 - made vis an attribute (visibility can now be queried)
 - fixed connecting objects in subpatchers
 - use TablePtrMap type to store named objects
-- allow reuse of names, more stable
+- allow reuse of names (can be disabled with "symreuse" attribute)
+- guard against messages to canvases ("canvasmsg" attribute)
+- more stable
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality
