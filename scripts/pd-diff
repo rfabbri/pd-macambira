@@ -1,0 +1,48 @@
+#!/bin/sh
+
+DATE=`date '+%Y-%m-%d_%H.%M.%S'`
+TMPDIR=/tmp/pd-diff
+
+#------------------------------------------------------------------------------
+# FUNCTIONS	 
+generate_tmp_filename () {
+	 echo $TMPDIR/`echo $1 | sed -e 's|/|_|g'`-$DATE
+}
+
+prep_for_diff () {
+	 TMPFILE=`generate_tmp_filename "$1"`
+	 cat "$1" | \
+		  tail +2 | \
+		  grep -v '#X connect ' | \
+		  sed 's/\(#[XN] [a-z]+\) [0-9]+ [0-9]+/\1/' \
+		  > $TMPFILE
+}
+
+#------------------------------------------------------------------------------
+# THE PROGRAM
+
+if [ $# -ne 2 ]; then
+	 echo "ERROR: Invalid number of arguments ($#)"
+	 echo "Usage: $0 FILE FILE"
+else
+	 if [ ! -d $TMPDIR ]; then
+		  mkdir $TMPDIR
+	 fi
+	 
+	 
+	 TMP1=`generate_tmp_filename "$1"`
+	 TMP2=`generate_tmp_filename "$2"`
+	 
+	 prep_for_diff "$1" 
+	 prep_for_diff "$2" 
+
+# diff of everything except "#X connect"'s
+	 diff -uw "$TMP1" "$TMP2"
+
+	file1count=`grep -v '#X connect ' "$1" | wc -l`
+	file2count=`grep -v '#X connect ' "$2" | wc -l`
+	if [ $file1count -ne $file2count ]; then 
+		 echo "---------------------------------------------------------"
+		 echo Connections differ: $file1count vs. $file2count
+	fi
+fi	 

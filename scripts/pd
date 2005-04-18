@@ -1,0 +1,88 @@
+#!/bin/bash -e
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/pd
+NAME=pd
+DESC="Pure Data"
+
+test -x $DAEMON || exit 0
+
+
+function start() {
+	 /bin/su - arw -c "/usr/bin/pd -nogui" > /tmp/pd-`date +20%y-%m-%d_%H.%M.%S`.log 2>&1 &
+}
+
+function stop() {
+	 echo "quit;quit;quit;" | /usr/bin/pdsend 5555
+	 sleep 5
+	 /usr/bin/killall -KILL pd || echo "Warning: $DESC was not running"
+}
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: $NAME"
+	start
+	#start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+	#	--exec $DAEMON
+	echo "."
+	;;
+  stop)
+	echo -n "Stopping $DESC: $NAME "
+	stop
+	#start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+	#	--exec $DAEMON
+	echo "."
+	;;
+  #reload)
+	#
+	#	If the daemon can reload its config files on the fly
+	#	for example by sending it SIGHUP, do it here.
+	#
+	#	If the daemon responds to changes in its config file
+	#	directly anyway, make this a do-nothing entry.
+	#
+	# echo -n "Reloading $DESC configuration..."
+	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
+	#	/var/run/$NAME.pid --exec $DAEMON
+	# echo "done."
+  #;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: $NAME"
+	stop
+	#start-stop-daemon --stop --quiet --pidfile \
+	#	/var/run/$NAME.pid --exec $DAEMON
+	sleep 5
+	start
+	#start-stop-daemon --start --quiet --pidfile \
+	#	/var/run/$NAME.pid --exec $DAEMON
+	echo "."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
