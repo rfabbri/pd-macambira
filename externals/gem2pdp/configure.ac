@@ -2,9 +2,32 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
 GEM2PDP_VERSION=0.6
-PD_DIR=/usr/local/pd
-PDP_DIR=/usr/local/pd/pdp
-GEM_DIR=/usr/local/pd/gem
+
+if test -f /usr/local/pd; then
+	PD_DIR=/usr/local/pd
+elif test -f ../../pd; then
+	PD_DIR=../../pd
+elif
+   echo "Pd sources not found"
+fi
+
+if test -f /usr/local/pd/pdp; then
+	PDP_DIR=/usr/local/pd/pdp
+elif test -f ../pdp; then
+	PDP_DIR=../pdp
+elif
+   echo "PdP sources not found"
+fi
+
+if test -f /usr/local/pd/gem; then
+   GEM_DIR=/usr/local/pd/gem
+elif test -f ../../Gem; then
+	GEM_DIR=../../Gem
+elif  test -f ../gem/Gem; then
+	GEM_DIR=../gem/Gem
+elif
+   echo "Gem sources not found"
+fi
 
 AC_ISC_POSIX
 AC_PROG_CC
