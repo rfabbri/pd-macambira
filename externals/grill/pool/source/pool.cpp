@@ -475,7 +475,15 @@ static char *ReadAtom(char *c,A *a)
 
 	char tmp[1024];
     char *m = tmp; // write position
-    
+
+    bool issymbol;
+    if(*c == '"') {
+        issymbol = true;
+        ++c;
+    }
+    else
+        issymbol = false;
+
     // go to next whitespace
     for(bool escaped = false;; ++c)
         if(*c == '\\') {
@@ -486,9 +494,16 @@ static char *ReadAtom(char *c,A *a)
             else
                 escaped = true;
         }
+        else if(*c == '"' && issymbol && !escaped) {
+            // end of string
+            ++c;
+            FLEXT_ASSERT(!*c || isspace(*c));
+            *m = 0;
+            break;
+        }
         else if(!*c || (isspace(*c) && !escaped)) {
-                *m = 0;
-                break;
+            *m = 0;
+            break;
         }
         else {
             *m++ = *c;
@@ -499,7 +514,7 @@ static char *ReadAtom(char *c,A *a)
 
     float fres;
     // first try float
-    if(sscanf(tmp,"%f",&fres) == 1) {
+    if(!issymbol && sscanf(tmp,"%f",&fres) == 1) {
         if(a) {
             int ires = (int)fres; // try a cast
             if(fres == ires)
@@ -557,11 +572,13 @@ static V WriteAtom(ostream &os,const A &a)
 #endif
     case A_SYMBOL: {
         const char *c = flext::GetString(flext::GetSymbol(a));
+        os << '"';
         for(; *c; ++c) {
             if(isspace(*c) || *c == '\\' || *c == ',')
                 os << '\\';
 	        os << *c;
         }
+        os << '"';
 		break;
 	}
     }

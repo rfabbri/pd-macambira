@@ -110,7 +110,7 @@
 				OutputFile=".\pd-msvc/d/pool.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="c:\data\prog\pd\pd-cvs\bin"
+				AdditionalLibraryDirectories="c:\data\pd\pd-cvs\bin"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\pd-msvc/d/pool.pdb"
 				ImportLibrary=".\pd-msvc/d/pool.lib"

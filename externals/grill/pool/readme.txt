@@ -84,6 +84,7 @@ Version history:
 - fixed bad bug: pool::priv was not initialized
 - enhanced and optimized atom parsing
 - escaped symbols (with \) for whitespace support on store and load
+- escape symbols also with "" to help the load routine
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
