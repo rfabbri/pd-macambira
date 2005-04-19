@@ -87,14 +87,18 @@ pd_darwin: $(TARGETS)
 
 # I added these defines since Darwin doesn't have this signals.  I do
 # not know whether the objects will work, but they will compile.
-#     -D__APPLE__ -DMSG_NOSIGNAL=0 -DSOL_TCP=0
+#     -DMSG_NOSIGNAL=0 -DSOL_TCP=0
 # I got this from here: http://www.holwegner.com/forum/viewtopic.php?t=4
 # <hans@eds.org>
-DARWINCFLAGS = -DPD -DUNIX -DMACOSX -DICECAST \
-	-D__APPLE__ -DMSG_NOSIGNAL=0  -DSOL_TCP=0 \
-	-O2 -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused -Wno-parentheses -Wno-switch
+DARWINCFLAGS = -DPD -DUNIX -DICECAST -DMSG_NOSIGNAL=0  -DSOL_TCP=0 \
+	-O2 -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused -Wno-parentheses \
+	-Wno-switch
 
-DARWINLINKFLAGS = -bundle -undefined suppress  -flat_namespace
+##  if you point the linker to the pd binary, then it can check the symbols,
+## and therefore allow for a two-level namespace, and that makes Darwin happy
+## but this doesn't work for some of the files yet.
+#DARWINLINKFLAGS = -bundle -bundle_loader ../../pd/bin/pd
+DARWINLINKFLAGS = -bundle -undefined suppress -flat_namespace
 
 DARWININCLUDE =  -I../../src -I../../pd/src -I/sw/include
 

@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef MACOSX
+#ifndef __APPLE__
 #include <malloc.h>
 #endif
 #include <ctype.h>
