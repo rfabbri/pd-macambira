@@ -9,7 +9,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 */
 
 /*! \file flmap.h
-	\brief special map class for all 32-bit key/value-pairs   
+	\brief special map class (faster and less memory-consuming than std::map)   
 */
 
 #ifndef __FLMAP_H
@@ -37,13 +37,13 @@ protected:
 
     TableAnyMap(TableAnyMap *p,Data *dt)
         : data(dt)
-        , parent(p),left(NULL),right(NULL) 
+        , parent(p),left(0),right(0) 
         , n(0)
     {}
 
     virtual ~TableAnyMap();
 
-#if 0
+#if 0 // set 1 for asserting the map structure (very cpu-intensive!)
     void check(int tsize) { if(n) _check(tsize); }
 #else
     void check(int tsize) {}
@@ -56,22 +56,27 @@ protected:
             r = _set(tsize,k,t);
         else {
             data[n++](k,t);
-            r = NULL;
+            r = 0;
         }
         check(tsize);
         return r;
     }
 
-    void *find(int tsize,size_t k) const { return n?_find(tsize,k):NULL; }
+    void *find(int tsize,size_t k) const { return n?_find(tsize,k):0; }
 
-    void *remove(int tsize,size_t k) { void *r = n?_remove(tsize,k):NULL; check(tsize); return r; }
+    void *remove(int tsize,size_t k) 
+	{ 
+		void *r = n?_remove(tsize,k):0; 
+		check(tsize); 
+		return r; 
+	}
 
     virtual void clear();
 
     class FLEXT_SHARE iterator
     {
     public:
-        iterator(): map(NULL) {}
+        iterator(): map(0) {}
         iterator(const TableAnyMap &m): map(&m),ix(0) { leftmost(); }
         iterator(iterator &it): map(it.map),ix(it.ix) {}
     
@@ -90,11 +95,12 @@ protected:
         {
             // search smallest branch (go left as far as possible)
             const TableAnyMap *nmap;
-            while((nmap = map->left) != NULL) map = nmap;
+            while((nmap = map->left) != 0) map = nmap;
         }
 
         void forward();
 
+		// pointers to map and index within
         const TableAnyMap *map;
         int ix;
     };
@@ -109,7 +115,7 @@ private:
             return left->_set(tsize,k,t);
         else {
             (left = _newmap(this))->_init(k,t);
-            return NULL;
+            return 0;
         }
     }
 
@@ -119,7 +125,7 @@ private:
             return right->_set(tsize,k,t);
         else {
             (right = _newmap(this))->_init(k,t);
-            return NULL;
+            return 0;
         }
     }
 
@@ -136,30 +142,25 @@ private:
 
     Data *const data;
     TableAnyMap *parent,*left,*right;
-    short n;
+    int n;
 
     //! return index of data item with key <= k
     //! \note index can point past the last item!
-    int _tryix(size_t k) const
+    unsigned int _tryix(size_t k) const
     {
-        int ix = 0;
-        {
-            int b = n;
-            while(ix != b) {
-                const int c = (ix+b)/2;
-                const size_t dk = data[c].key;
-                if(k == dk)
-                    return c;
-                else if(k < dk)
-                    b = c;
-                else if(ix < c)
-                    ix = c;
-                else {
-                    ix = b;
-                    break;
-                }
-            }
-        }
+        unsigned int ix = 0,b = n;
+		while(ix != b) {
+			const unsigned int c = (ix+b)>>1;
+			const size_t dk = data[c].key;
+			if(k == dk)
+				return c;
+			else if(k < dk)
+				b = c;
+			else if(ix < c)
+				ix = c;
+			else
+				return b;
+		}
         return ix;
     }
 
@@ -167,7 +168,7 @@ private:
     {
         if(!b->n) { 
             // remove empty branch
-            _delmap(b); b = NULL; 
+            _delmap(b); b = 0; 
         }
     }
 
@@ -180,7 +181,7 @@ class TablePtrMap
     : TableAnyMap
 {
 public:
-    TablePtrMap(): TableAnyMap(NULL,slots),count(0) {}
+    TablePtrMap(): TableAnyMap(0,slots),count(0) {}
     virtual ~TablePtrMap() { clear(); }
 
     virtual void clear() { TableAnyMap::clear(); count = 0; }
