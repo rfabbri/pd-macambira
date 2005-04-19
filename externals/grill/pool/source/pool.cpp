@@ -574,7 +574,7 @@ static V WriteAtom(ostream &os,const A &a)
         const char *c = flext::GetString(flext::GetSymbol(a));
         os << '"';
         for(; *c; ++c) {
-            if(isspace(*c) || *c == '\\' || *c == ',')
+            if(isspace(*c) || *c == '\\' || *c == ',' || *c == '"')
                 os << '\\';
 	        os << *c;
         }
