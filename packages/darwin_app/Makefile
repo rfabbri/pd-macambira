@@ -74,8 +74,10 @@ ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' '
 
 
 darwin_app: darwin_app_wrapper darwin_patch_pd darwin_app_core \
-	darwin_app_externals darwin_app_docs darwin_app_abstractions
+	 darwin_app_docs darwin_app_externals darwin_app_abstractions
 
+darwin_prebuilt_app: darwin_app_externals darwin_app_docs \
+	 darwin_app_abstractions darwin_app_doc_format
 
 darwin_app_license:
   # generate HTML version of License
@@ -137,11 +139,11 @@ darwin_app_readme:
 	echo "(this package was built on `date`) <BR>" >> $(README_FILE)
 	echo "</body></html>" >> $(README_FILE)
 
-darwin_mount_tcltk:
-# it should automatically mount the most recent TclTkStandalone here	
 
+# check here for a reference on how to do this:
+# http://cvs.sourceforge.net/viewcvs.py/tkcvs/tkcvs-proj/PackApp?rev=1.4
 darwin_app_wrapper:
-	hdiutil mount $(TCLTK).dmg
+	-hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
@@ -162,23 +164,24 @@ darwin_app_wrapper:
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(DESTDIR)$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
-# pd/src/u_main.tk now acts as the AppMain.tcl
-#	install -m0644 -p AppMain.tcl "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 # rename the Wish Shell executable to "Pd"
 	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
-	diskutil eject /Volumes/$(TCLTK)
+#	diskutil eject /Volumes/$(TCLTK)
 
 darwin_patch_pd:
 # apply some patches 
 #	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/socket.patch
 #	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/u_main.tk.patch
 	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/darwin_build-0.38.patch
+	rm ../../pd/src/configure  ../../pd/src/makefile
+	cd  ../../pd/src/ && autoconf
 
-darwin_app_core:
+darwin_app_core: darwin_app_wrapper
 # pd core
-	cd ../../pd/src/ && \
-		./configure --enable-jack --prefix=$(INSTALL_PREFIX) && make
-	cp -R -p ../../pd/bin ../../pd/doc ../../pd/extra ../../pd/man  \
+#	cd ../../pd/src/ && \
+#		./configure --enable-jack --prefix=$(INSTALL_PREFIX) && make
+	cd ../../pd/src/ && ./configure --enable-jack && make
+	cp -Rp ../../pd/bin ../../pd/doc ../../pd/extra ../../pd/man  \
 		$(PD_FILE_ROOT)
 # AppMain.tcl
 	cd "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts" && \
@@ -187,14 +190,21 @@ darwin_app_core:
 	install -d -m0755 $(PD_FILE_ROOT)/include
 	install -m0444 ../../pd/src/*.h $(PD_FILE_ROOT)/include
 
-darwin_app_docs:
+darwin_app_doc_format:
 #----------------------------------------------------------------------------
+# clean out cruft files
+	-find $(PD_FILE_ROOT) -name .DS_Store -delete
+	-rm -Rf `find $(PD_FILE_ROOT) -name CVS`
 # set the font to 10pt on all help patches
 	cd $(HELP_DIR) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' */*.pd
 # the BSD/Darwin version of sed must create a backup file when doing 
 # in-place replacement, so delete the unneeded backup files
-	rm */*.pd.bak
+	-rm */*.pd.bak
+# run script to move help-*.pd files to *-help.pd according to the standard
+	../../scripts/convert-help-to-standard.sh
+
+darwin_app_docs:
 #----------------------------------------------------------------------------
 # DOC
 	install -d $(HELP_DIR)/5.reference
@@ -217,13 +227,15 @@ darwin_app_abstractions:
 #----------------------------------------------------------------------------
 # ABSTRACTIONS
 	install -d $(ABSTRACTIONS_DIR)
-	install -p -m0644	../../externals/creb/abs/*.pd $(ABSTRACTIONS_DIR)
-	cd $(ABSTRACTIONS_DIR) && rm count.pd
+# creb
+	install -p -m0444	../../externals/creb/abs/*.pd $(ABSTRACTIONS_DIR)
+	cd $(ABSTRACTIONS_DIR) && rm -f count.pd
 	install -d $(ABSTRACTIONS_DIR)/creb
 	install -p -m0444	../../externals/creb/doc/examples/*.* $(ABSTRACTIONS_DIR)/creb
+
 #	cp -Rf footils timestretch vadsr~  $(ABSTRACTIONS_DIR)
 
-darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
+darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++
 #darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
 
 darwin_app_externals_gem:
@@ -323,42 +335,49 @@ darwin_app_externals_standard:
 	cp -Rfp ../../Gem/examples/*.* ../../Gem/examples/data $(HELP_DIR)/gem
 #----------------------------------------------------------------------------
 # hcs
+	install -p -m0444 $(shell ls -1 ../../externals/hcs/*.pd | \
+			 grep -v '\-help.pd') $(EXTERNALS_DIR)
+# hid
 	cd ../../externals/hcs/hid && make
 	install -p -m0444 ../../externals/hcs/hid/hid.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/hcs/hid/ev*-list.pd $(HELP_DIR)/5.reference
-	install -p -m0444 ../../externals/hcs/hid/*-help.pd $(HELP_DIR)/5.reference
+	install -p -m0444 $(shell ls -1 ../../externals/hcs/hid/*.pd | \
+			 grep -v '\-help.pd'| grep -v '\-list.pd') $(EXTERNALS_DIR)
+# pan
+	install -p -m0444 $(shell ls -1 ../../externals/hcs/pan/*.pd | \
+			 grep -v '\-help.pd') $(EXTERNALS_DIR)
+#----------------------------------------------------------------------------
+# IEMlib
+	cp -Rp ../../externals/iemlib/iemabs $(EXTERNALS_DIR)
+	install -d -m0755 $(HELP_DIR)/5.reference/iemabs
+	mv  $(EXTERNALS_DIR)/iemabs/help-*.pd $(HELP_DIR)/5.reference/iemabs
 #----------------------------------------------------------------------------
 # miXed
 	cd ../../externals/miXed/toxy && make
 	cd ../../externals/miXed/cyclone && make
-	install -d -m755 $(EXTERNALS_DIR)/cyclone
-	install -p -m444 ../../externals/miXed/bin/*.pd_darwin $(EXTERNALS_DIR)/cyclone
-	sudo install -p -m555 ../../externals/miXed/bin/cyclist $(PD_FILE_ROOT)/bin
+	install -d -m755 $(EXTERNALS_DIR)
+	install -p -m444 ../../externals/miXed/bin/*.pd_darwin $(EXTERNALS_DIR)
+	install -p -m555 ../../externals/miXed/bin/cyclist $(PD_FILE_ROOT)/bin
+	install -d -m755 $(HELP_DIR)/5.reference/cyclone
 	install -p -m0444 ../../externals/miXed/test/*/*.*    \
-		../../externals/miXed/doc/*/*/*.*   \
 		$(HELP_DIR)/5.reference/cyclone
+	install -p -m0444 ../../externals/miXed/doc/*/*/*.*  \
+		$(HELP_DIR)/5.reference
 #----------------------------------------------------------------------------
 # OSC
 	cd ../../externals/OSCx && ./configure && make
 	install -p -m0444 ../../externals/OSCx/doc/*.* $(HELP_DIR)/5.reference
 	install -p -m0444 ../../externals/OSCx/src/*.pd_darwin $(EXTERNALS_DIR)
 #----------------------------------------------------------------------------
-# PDP
-	cd ../../externals/pdp && ./configure && make
-	install -p -m0444 ../../externals/pdp/*.pd_darwin $(EXTERNALS_DIR)
+# PdP
+#	cd ../../externals/pdp && ./configure && make
+#	install -p -m0444 ../../externals/pdp/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/pdp/doc/objects/*.* $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pdp/introduction
 	install -p -m0444 ../../externals/pdp/doc/introduction/*.* $(HELP_DIR)/pdp/introduction
 	install -d $(HELP_DIR)/pdp/examples
 	install -p -m0444 ../../externals/pdp/doc/examples/*.* $(HELP_DIR)/pdp/examples
 	install -p -m0444 ../../externals/pdp/doc/reference.txt $(HELP_DIR)/pdp
-#----------------------------------------------------------------------------
-# PMPD
-	cd ../../externals/pmpd/src && make pd_darwin
-	install -p -m0444 ../../externals/pmpd/src/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/pmpd/help/*.pd $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/pmpd
-	install -p -m0444 ../../externals/pmpd/exemples/*.pd $(HELP_DIR)/pmpd
+# libs for PdP
 #----------------------------------------------------------------------------
 # unauthorized
 	cd ../../externals/unauthorized && make 
@@ -368,12 +387,19 @@ darwin_app_externals_standard:
 	install -p -m0444 ../../externals/unauthorized/*/*.pls $(HELP_DIR)/5.reference
 	cp -Rfp ../../externals/unauthorized/blinkenlights/blm  $(HELP_DIR)/5.reference
 #----------------------------------------------------------------------------
-# zexy
-	cd ../../externals/zexy/src && make -f makefile.darwin
-	install -p -m0444 ../../externals/zexy/src/*.pd_darwin $(EXTERNALS_DIR)
+# zexy 
+# new build system doesn't work with CVS layout, and most of zexy is
+# included in the extrnals build system now anyway
+#	cd ../../externals/zexy/src && autoconf && ./configure && make
+	-install -p -m0444 ../../externals/zexy/src/*.pd_darwin $(EXTERNALS_DIR)
+	install -p -m0444 \
+		$(shell ls -1 ../../externals/zexy/abs/*.pd | \
+			grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
+		$(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/zexy/zexy.pd  $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/help-zexy
 	install -p -m0444 ../../externals/zexy/examples/*.* $(HELP_DIR)/help-zexy
+	install -p -m0444	../../externals/zexy/abs/*-help.pd $(HELP_DIR)/5.reference
 
 
 darwin_app_externals_c++:
@@ -446,6 +472,9 @@ darwin_app_externals_c++:
 #	echo "</FONT>" >> $(WELCOME_FILE)
 #	echo "</body></html>" >> $(WELCOME_FILE)
 
+darwin_app_perms:
+	chmod a-x $(HELP_DIR)/*/*.pd $(HELP_DIR)/*/*/*.pd $(HELP_DIR)/*/*/*/*.pd
+	chmod -R a-w $(HELP_DIR)
 
 dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
 	install -d "$(DMG_NAME)"
@@ -457,7 +486,7 @@ dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
 	/bin/sh mkdmg "$(DMG_NAME)"
 
 
-clean: darwin_app_clean darwin_unpatch_pd
+clean: darwin_app_clean
 
 
 darwin_app_clean:

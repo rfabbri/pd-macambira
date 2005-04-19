@@ -1,4 +1,25 @@
 
+- create old-style Help->Pure Documentation link on Help menu.  It should use a
+  symlink to the "doc" dir internal to that particular Pd.app.  The symlink is
+  named after the complete path to the "doc" dir, like:
+     /tmp/.Applications_Pd-0.38-4.app_Contents_Resources_doc
+
+- make Help menu generator recursive
+
+- check up on zexy in packages/darwin_app/Makefile and
+  externals/build/doc/makefile now that its been added to the build system
+
+- follow AppMain.tcl instructions:
+  http://wiki.tcl.tk/12987
+http://www.wordtech-software.com/tcl-bundle-tutorial.html
+
+- try this for the Pref Pane:
+ kAEShowPreferences ::tk::mac::ShowPreferences
+
+- research Tcl "auto_path"
+
+- research Tk + "Custom MDEF" for menus
+
 - include auto-.pdrc script in package somewhere...
 
 - make a web page that has stuff that can't be included due to license issues:
@@ -20,8 +41,6 @@
 
 - write sed script to set help-patch font size to 10 point from 12 point on
   all help patches.
-
-- add file browser and cascasing menus to Help menu
 
 - create --enable-cpu and --enable-arch in pd/src/configure.in
 
