@@ -37,8 +37,10 @@ all:
 			../../maxlib/help/*.* \
 			../../mjlib/doc/*.pd \
 			../../motex/*.pd \
+			../../nusmuk/line3/*.pd\
 			../../pdogg/*/*.pd \
 			../../plugin~/*.pd \
+			../../pmpd/help/*.pd\
 			../../rhythm_estimator/*.p? \
 			../../susloop~/*.pd \
 			../../svf~/*.pd \
@@ -55,6 +57,11 @@ all:
 # its best not to change the objects
 	install -d -m0755 $(DOC_DIR)/iemhelp
 	cp -p ../../iemlib/iemhelp/*.* $(DOC_DIR)/iemhelp
+#----------------------------------------------------------------------------
+# pmpd exemples files has to go in an other directory
+	cp -Rp ../../pmpd/exemples $(DOC_DIR)/pmpd
+# pmpd documentation
+	cp -Rp ../../pmpd/doc $(DOC_DIR)/pmpd/doc
 #----------------------------------------------------------------------------
 # zexy uses its own dir
 	cp -Rp ../../zexy/examples $(DOC_DIR)/zexy
@@ -75,4 +82,5 @@ all:
 # this is mildly dangerous, since it just deletes everything
 clean:
 	rm -f *.pd *.ps *.txt test.som *~
-	rm -Rf iemhelp zexy
+	rm -Rf iemhelp zexy pmpd
+
