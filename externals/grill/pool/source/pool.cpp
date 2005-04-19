@@ -514,7 +514,14 @@ static char *ReadAtom(char *c,A *a)
 
     float fres;
     // first try float
+#if 0
     if(!issymbol && sscanf(tmp,"%f",&fres) == 1) {
+#else
+    char *endp;
+    // see if it's a float - thanks to Frank Barknecht
+    fres = (float)strtod(tmp,&endp);   
+    if(!issymbol && !*endp && endp != tmp) { 
+#endif
         if(a) {
             int ires = (int)fres; // try a cast
             if(fres == ires)
