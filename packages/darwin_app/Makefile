@@ -30,7 +30,7 @@ PD_BUGFIX_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 # release version for this distro
-PACKAGE_VERSION = beta4
+PACKAGE_VERSION = hcs0
 PACKAGE_NAME = pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 DMG_NAME = $(PACKAGE_NAME)
 
@@ -76,6 +76,9 @@ ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' '
 darwin_app: darwin_app_wrapper darwin_patch_pd darwin_app_core \
 	 darwin_app_docs darwin_app_externals darwin_app_abstractions
 
+# this target is for when you already have a pre-built Pd.app and you
+# just want to fill it with goodies from CVS.  To do so, place your 
+# Pd.app in installroot/Applications/Pd.app
 darwin_prebuilt_app: darwin_app_externals darwin_app_docs \
 	 darwin_app_abstractions darwin_app_doc_format
 
@@ -96,7 +99,7 @@ darwin_app_readme:
 	echo "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=iso-8859-1\" />" >> $(README_FILE)
 	echo "</head>" >> $(README_FILE)
 	echo "<body>" >> $(README_FILE)
-	echo "<h2><IMG SRC=\"pd-16.png\">&nbsp;Pure Data $(PD_VERSION)-$(PACKAGE_VERSION)</h2>" 	>> $(README_FILE)
+	echo "<h2>Pure Data $(PD_VERSION)-$(PACKAGE_VERSION)</h2>" 	>> $(README_FILE)
 	echo "<p>Pd is a free real-time computer music software package resembling Max.  It provides a patchable environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</p>" >> $(README_FILE)
 	echo "<p>For more information, go to: http://www.puredata.org</p>" >> $(README_FILE)
 	echo "<h3>Installation</h3>" >> $(README_FILE)	
@@ -196,18 +199,22 @@ darwin_app_doc_format:
 	-find $(PD_FILE_ROOT) -name .DS_Store -delete
 	-rm -Rf `find $(PD_FILE_ROOT) -name CVS`
 # set the font to 10pt on all help patches
-	cd $(HELP_DIR) && \
-		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' */*.pd
 # the BSD/Darwin version of sed must create a backup file when doing 
 # in-place replacement, so delete the unneeded backup files
-	-rm */*.pd.bak
+	cd $(HELP_DIR) && \
+		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' */*.pd && \
+		rm -f */*.pd.bak	
 # run script to move help-*.pd files to *-help.pd according to the standard
-	../../scripts/convert-help-to-standard.sh
+	cd $(HELP_DIR) && ../../../../../../../../scripts/convert-help-to-standard.sh
 
 darwin_app_docs:
 #----------------------------------------------------------------------------
-# DOC
+# externals help patches
 	install -d $(HELP_DIR)/5.reference
+	cd ../../externals/build/doc && make
+	cp -Rp ../../externals/build/doc/* $(HELP_DIR)/5.reference
+#----------------------------------------------------------------------------
+# DOC
 	install -d $(HELP_DIR)/7.stuff
 	cp -Rp ../../doc/tutorials $(HELP_DIR)
 	cp -Rp ../../doc/additional/pd-msg $(HELP_DIR)/7.stuff/
@@ -382,7 +389,7 @@ darwin_app_externals_standard:
 # unauthorized
 	cd ../../externals/unauthorized && make 
 	install -p -m0444 ../../externals/unauthorized/*/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/unauthorized/*/*.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/unauthorized/*/*.pd $(HELP_DIR)/5.reference
 	install -p -m0444 ../../externals/unauthorized/*/*.txt $(HELP_DIR)/5.reference
 	install -p -m0444 ../../externals/unauthorized/*/*.pls $(HELP_DIR)/5.reference
 	cp -Rfp ../../externals/unauthorized/blinkenlights/blm  $(HELP_DIR)/5.reference
@@ -396,9 +403,6 @@ darwin_app_externals_standard:
 		$(shell ls -1 ../../externals/zexy/abs/*.pd | \
 			grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
 		$(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/zexy/zexy.pd  $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/help-zexy
-	install -p -m0444 ../../externals/zexy/examples/*.* $(HELP_DIR)/help-zexy
 	install -p -m0444	../../externals/zexy/abs/*-help.pd $(HELP_DIR)/5.reference
 
 
@@ -480,9 +484,8 @@ dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
 	install -d "$(DMG_NAME)"
 	cd $(DESTDIR)/Applications && mv $(PD_APP_NAME).app "../../$(DMG_NAME)"
 	install -p -m0444 ../../pd/LICENSE.txt "$(DMG_NAME)/PD LICENSE.txt"
-	install -p -m0444  pd-16.png $(LICENSE_FILE) $(README_FILE) \
-		$(WELCOME_FILE) $(LICENSE_FILE) \
-		"$(DMG_NAME)"
+	install -p -m0444 $(LICENSE_FILE) $(README_FILE) \
+		$(WELCOME_FILE) $(LICENSE_FILE)   "$(DMG_NAME)"
 	/bin/sh mkdmg "$(DMG_NAME)"
 
 

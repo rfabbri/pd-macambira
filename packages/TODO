@@ -1,0 +1,11 @@
+
+- global versioning system
+  		the package releases should have versions of there own which apply to
+  		all packages, regardless of format or OS.  This will make for easy and
+  		seemless cross-platform work.
+
+- global optimization flags
+  		ideally, you would use a version of Pd that is fully optimized for your
+  		CPU.  In order to do this, a system of optimization flags needs to be
+  		developed so that you can specific the target CPU in one place and have
+  		everything compile for that CPU.
