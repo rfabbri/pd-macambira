@@ -101,6 +101,7 @@ public:
 protected:
 
 // ---------------------------------------------------------------  RESET 
+// ----------------------------------------------------------------------
 
 	void m_reset() 
 	{ 
@@ -121,6 +122,7 @@ protected:
 	}
 
 // --------------------------------------------------------------  COMPUTE 
+// -----------------------------------------------------------------------
 
 	void m_bang()
 	{
@@ -131,57 +133,58 @@ protected:
 		for (i=0; i<nb_link; i++)	{
 		// compute link forces
 			distance = sqrt(pow(link[i]->mass1->posX-link[i]->mass2->posX,2) + 
-				pow(link[i]->mass1->posY-link[i]->mass2->posY,2));
-			F  = link[i]->K1 * (distance - link[i]->longueur) ;	// F = k1(x1-x2)
-			F += link[i]->D1 * (distance - link[i]->distance_old) ;	// F = F + D1(v1-v2)
+				pow(link[i]->mass1->posY-link[i]->mass2->posY,2));		// L[n] = sqrt( (x1-x2)² +(y1-y2)²)
+			F  = link[i]->K1 * (distance - link[i]->longueur) ;			// F[n] = k1 (L[n] - L[0])
+			F += link[i]->D1 * (distance - link[i]->distance_old) ;			// F[n] = F[n] + D1 (L[n] - L[n-1])
 			if (distance != 0) 	{
-				Fx = F * (link[i]->mass1->posX - link[i]->mass2->posX)/distance;
-				Fy = F * (link[i]->mass1->posY - link[i]->mass2->posY)/distance;
+				Fx = F * (link[i]->mass1->posX - link[i]->mass2->posX)/distance; // Fx = F * Lx[n]/L[n]
+				Fy = F * (link[i]->mass1->posY - link[i]->mass2->posY)/distance; // Fy = F * Ly[n]/L[n]
 			}
-			link[i]->mass1->forceX -= Fx;
-			link[i]->mass1->forceX -= link[i]->D2*link[i]->mass1->speedX;
-			link[i]->mass2->forceX += Fx;
-			link[i]->mass2->forceX -= link[i]->D2*link[i]->mass2->speedX;
-			link[i]->mass1->forceY -= Fy;
-			link[i]->mass1->forceY -= link[i]->D2*link[i]->mass1->speedY;
-			link[i]->mass2->forceY += Fy;
-			link[i]->mass2->forceY -= link[i]->D2*link[i]->mass2->speedY;
-			link[i]->distance_old = distance;
+			link[i]->mass1->forceX -= Fx;					// Fx1[n] = -Fx
+			link[i]->mass1->forceX -= link[i]->D2*link[i]->mass1->speedX;	// Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+			link[i]->mass2->forceX += Fx;					// Fx2[n] = Fx
+			link[i]->mass2->forceX -= link[i]->D2*link[i]->mass2->speedX;	// Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+			link[i]->mass1->forceY -= Fy;					// Fy1[n] = -Fy
+			link[i]->mass1->forceY -= link[i]->D2*link[i]->mass1->speedY;	// Fy1[n] = Fy1[n] - D2 * vy1[n-1]
+			link[i]->mass2->forceY += Fy;					// Fy2[n] = Fy
+			link[i]->mass2->forceY -= link[i]->D2*link[i]->mass2->speedY;	// Fy1[n] = Fy1[n] - D2 * vy1[n-1]
+			link[i]->distance_old = distance;				// L[n-1] = L[n]
 		}
 
 		for (i=0; i<nb_mass; i++)
 		// compute new masses position only if mobile = 1
 			if (mass[i]->mobile == 1)  		{
-				X_new = mass[i]->forceX * mass[i]->invM + 2*mass[i]->posX - mass[i]->posX2;
-				mass[i]->posX2 = mass[i]->posX;
-				mass[i]->posX = max(min(X_new,Xmax),Xmin);			// x = x + v
-				mass[i]->speedX = mass[i]->posX - mass[i]->posX2;	// v = v + F/M
-				Y_new = mass[i]->forceY * mass[i]->invM + 2*mass[i]->posY - mass[i]->posY2;
-				mass[i]->posY2 = mass[i]->posY;
-				mass[i]->posY = max(min(Y_new,Ymax),Ymin);			// x = x + v
-				mass[i]->speedY = mass[i]->posY - mass[i]->posY2;	// v = v + F/M
+				X_new = mass[i]->forceX * mass[i]->invM + 2*mass[i]->posX - mass[i]->posX2; // x[n] =Fx[n]/M+2x[n]-x[n-1] 
+				mass[i]->posX2 = mass[i]->posX;				// x[n-2] = x[n-1]
+				mass[i]->posX = max(min(X_new,Xmax),Xmin);		// x[n-1] = x[n]
+				mass[i]->speedX = mass[i]->posX - mass[i]->posX2;	// vx[n] = x[n] - x[n-1]
+				Y_new = mass[i]->forceY * mass[i]->invM + 2*mass[i]->posY - mass[i]->posY2; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+				mass[i]->posY2 = mass[i]->posY;				// x[n-2] = x[n-1]
+				mass[i]->posY = max(min(Y_new,Ymax),Ymin);		// x[n-1] = x[n]
+				mass[i]->speedY = mass[i]->posY - mass[i]->posY2;	// vx[n] = x[n] - x[n-1]
 				}
 
 		for (i=0; i<nb_mass; i++)	{
 		// clear forces
 			mass[i]->out_forceX = mass[i]->forceX;
-			mass[i]->forceX = 0;
+			mass[i]->forceX = 0;						// Fx[n] = 0
 			mass[i]->out_forceY = mass[i]->forceY;
-			mass[i]->forceY = 0;
+			mass[i]->forceY = 0;						// Fy[n] = 0
 		}
 	}
 
 // --------------------------------------------------------------  MASSES
+// ----------------------------------------------------------------------
 
 	void m_mass(int argc,t_atom *argv) 
 	// add a mass
-	// Id, nbr, mobile, invM, speedX, posX, forceX
+	// Id, nbr, mobile, invM, speedX Y, posX Y, forceX Y
 	{
 		t_atom sortie[6], aux[2];
 		t_float M;
 
-		mass[nb_mass] = new t_mass;			// new pointer
-		mass[nb_mass]->Id = GetSymbol(argv[0]);	// ID
+		mass[nb_mass] = new t_mass;			// new mass
+		mass[nb_mass]->Id = GetSymbol(argv[0]);		// ID
 		mass[nb_mass]->mobile = GetInt(argv[1]);	// mobile
 		if (GetFloat(argv[2])==0)
 			M=1;
@@ -195,7 +198,7 @@ protected:
 		mass[nb_mass]->posY = GetFloat(argv[4]);	// y[n]
 		mass[nb_mass]->posY2 = GetFloat(argv[4]);	// y[n-1]
 		mass[nb_mass]->forceY = 0;			// Fy[n]
-		mass[nb_mass]->nbr = id_mass;			// id_nbr
+		mass[nb_mass]->nbr = id_mass;			// id number
 		nb_mass++ ;
 		id_mass++;
 		nb_mass = min ( nb_max_mass -1, nb_mass );
@@ -297,6 +300,7 @@ protected:
 	t_int i,nb_link_delete=0;
 	t_atom sortie[6], aux[nb_link];
 	
+	// Delete associated links
 	for (i=0; i<nb_link;i++)	{
 		if (link[i]->mass1->nbr == GetInt(argv[0]) || link[i]->mass2->nbr == GetInt(argv[0]))	{
 			SetFloat((aux[nb_link_delete]),link[i]->nbr);
@@ -307,7 +311,7 @@ protected:
 	for (i=0; i<nb_link_delete;i++)
 		m_delete_link(1,&aux[i]);
 
-
+	// delete mass
 	for (i=0; i<nb_mass;i++)
 		if (mass[i]->nbr == GetAInt(argv[0]))	{
 			SetFloat((sortie[0]),mass[i]->nbr);
@@ -327,29 +331,30 @@ protected:
 
 	void m_Xmax(int argc,t_atom *argv) 
 	{
-	// set damping of link(s) named Id
+	// set X max
 	Xmax = GetFloat(argv[0]);
 	}
 
 	void m_Ymax(int argc,t_atom *argv) 
 	{
-	// set damping of link(s) named Id
+	// set Y max
 	Ymax = GetFloat(argv[0]);
 	}
 
 	void m_Xmin(int argc,t_atom *argv) 
 	{
-	// set damping of link(s) named Id
+	// set X min
 	Xmin = GetFloat(argv[0]);
 	}
 
 	void m_Ymin(int argc,t_atom *argv) 
 	{
-	// set damping of link(s) named Id
+	// set Y min
 	Ymin = GetFloat(argv[0]);
 	}
 
 // --------------------------------------------------------------  LINKS 
+// ---------------------------------------------------------------------
 
 	void m_link(int argc,t_atom *argv) 
 	// add a link
@@ -358,21 +363,21 @@ protected:
 		t_atom sortie[7], aux[2];
 		t_int i;
 
-		link[nb_link] = new t_link;
+		link[nb_link] = new t_link;			// new link
 		link[nb_link]->Id = GetSymbol(argv[0]);
 		for (i=0; i<nb_mass;i++)
-			if (mass[i]->nbr==GetAInt(argv[1]))
+			if (mass[i]->nbr==GetAInt(argv[1]))	// pointer on mass 1
 				link[nb_link]->mass1 = mass[i];
-			else if(mass[i]->nbr==GetAInt(argv[2]))
+			else if(mass[i]->nbr==GetAInt(argv[2]))	// pointer on mass 2
 				link[nb_link]->mass2 = mass[i];
-		link[nb_link]->K1 = GetFloat(argv[3]);
-		link[nb_link]->D1 = GetFloat(argv[4]);	
-		link[nb_link]->D2 = GetFloat(argv[5]);
-		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;
-		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;
-		link[nb_link]->longueur = sqrt( pow(link[nb_link]->longx,2) + pow(link[nb_link]->longy,2));
-		link[nb_link]->nbr = id_link;
-		link[nb_link]->distance_old = link[nb_link]->longueur;
+		link[nb_link]->K1 = GetFloat(argv[3]);		// K1
+		link[nb_link]->D1 = GetFloat(argv[4]);		// D1
+		link[nb_link]->D2 = GetFloat(argv[5]);		// D2
+		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;		// Lx[0]
+		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;		// Ly[0]
+		link[nb_link]->longueur = sqrt( pow(link[nb_link]->longx,2) + pow(link[nb_link]->longy,2)); // L[0] = sq( Lx[0]²+Ly[0]²)
+		link[nb_link]->nbr = id_link;			// id number
+		link[nb_link]->distance_old = link[nb_link]->longueur;// L[n-1]
 		nb_link++;
 		id_link++;
 		nb_link = min ( nb_max_link -1, nb_link );
@@ -415,7 +420,7 @@ protected:
 					SetSymbol((arglist[0]),GetSymbol(argv[0]));
 					SetFloat((arglist[1]),mass[imass1[i]]->nbr);
 					SetFloat((arglist[2]),mass[imass2[j]]->nbr);
-					SetFloat((arglist[3]),GetAInt(argv[3]));
+					SetFloat((arglist[3]),GetFloat(argv[3]));
 					SetFloat((arglist[4]),GetFloat(argv[4]));
 					SetFloat((arglist[5]),GetFloat(argv[5]));
 					m_link(6,arglist);
@@ -437,7 +442,7 @@ protected:
 
 	void m_setD(int argc,t_atom *argv) 
 	{
-	// set damping of link(s) named Id
+	// set viscosity of link(s) named Id
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
 
@@ -477,7 +482,7 @@ protected:
 			SetFloat((sortie[5]),link[i]->D1);
 			SetFloat((sortie[6]),link[i]->D2);
 			delete link[i];
-			link[i]=link[nb_link-1];
+			link[i]=link[nb_link-1];	// copy last link instead
 			nb_link--;
 			ToOutAnything(1,S_Link_deleted,7,sortie);
 			break;
@@ -486,7 +491,7 @@ protected:
 
 
 // --------------------------------------------------------------  GET 
-
+// -------------------------------------------------------------------
 	void m_get(int argc,t_atom *argv)
 	// get attributes
 	{
@@ -498,21 +503,21 @@ protected:
 
 		if (argc == 1)
 		{
-			if (auxtype == S_massesPos)// get all masses positions
+			if (auxtype == S_massesPos)		// get all masses positions
 				for (i=0; i<nb_mass; i++)
 				{
 					SetFloat(sortie[0],mass[i]->posX);
 					SetFloat(sortie[1],mass[i]->posY);
 					ToOutAnything(0,S_massesPos,2,sortie);
 				}
-			else if (auxtype == S_massesForces)// get all masses forces
+			else if (auxtype == S_massesForces)	// get all masses forces
 				for (i=0; i<nb_mass; i++)
 				{
 					SetFloat(sortie[0],mass[i]->out_forceX);
 					SetFloat(sortie[1],mass[i]->out_forceY);
 					ToOutAnything(0,S_massesForces,2,sortie);
 				}
-			else if (auxtype == S_linksPos)// get all links positions
+			else if (auxtype == S_linksPos)		// get all links positions
 				for (i=0; i<nb_link; i++)
 				{
 					SetFloat(sortie[0],link[i]->mass1->posX);
@@ -521,7 +526,7 @@ protected:
 					SetFloat(sortie[3],link[i]->mass2->posY);
 					ToOutAnything(0,S_linksPos,4,sortie);
 				}
-			else 		// get all masses speeds
+			else 					// get all masses speeds
 				for (i=0; i<nb_mass; i++)
 				{
 					SetFloat(sortie[0],mass[i]->speedX);
@@ -529,7 +534,7 @@ protected:
 					ToOutAnything(0,S_massesSpeeds,2,sortie);
 				}
 		}
-		else if (auxtype == S_massesPos) // get mass positions
+		else if (auxtype == S_massesPos) 		// get mass positions
 		{
 			if (auxarg == 0) // No
 			{
@@ -559,7 +564,7 @@ protected:
 				}
 			}
 		}
-		else if (auxtype == S_massesForces)			 // get mass forces
+		else if (auxtype == S_massesForces)		// get mass forces
 		{
 			if (auxarg == 0) // No
 			{
@@ -589,7 +594,7 @@ protected:
 				}
 			}
 		}
-		else if (auxtype == S_linksPos)			 // get links positions
+		else if (auxtype == S_linksPos)			// get links positions
 		{
 			if (auxarg == 0) // No
 			{
@@ -623,7 +628,7 @@ protected:
 				}
 			}
 		}
-		else 			 // get mass speeds
+		else 			 			// get mass speeds
 		{
 			if (auxarg == 0) // No
 			{
@@ -671,7 +676,7 @@ protected:
 	}
 
 	void m_force_dumpl()
-	// List of masses positions on first outlet
+	// List of masses forces on first outlet
 	{	
 		t_atom sortie[2*nb_mass];
 		t_int i;
@@ -684,7 +689,7 @@ protected:
 	}
 
 	void m_info_dumpl()
-	// List of masses positions on first outlet
+	// List of infos on masses and links on  first outlet
 	{	
 		t_atom sortie[7];
 		t_int i;
@@ -713,6 +718,7 @@ protected:
 	}
 
 // --------------------------------------------------------------  GLOBAL VARIABLES 
+// --------------------------------------------------------------------------------
 
 	t_link * link[nb_max_link];
 	t_mass * mass[nb_max_mass];
@@ -720,9 +726,11 @@ protected:
 	int nb_link, nb_mass, id_mass, id_link;
 
 // --------------------------------------------------------------  SETUP
+// ---------------------------------------------------------------------
 
 private:
 
+	// static symbols
 	const static t_symbol *S_Reset;
 	const static t_symbol *S_Mass;
 	const static t_symbol *S_Link;
