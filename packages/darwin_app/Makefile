@@ -251,9 +251,8 @@ darwin_app_externals_gem:
 darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
-	cd ../../externals/grill/flext && make -f makefile.pd-darwin
-	cd ../../externals/grill/flext/pd-darwin/ && cp libflext.a ../source
-	cd ../../externals/grill/flext/source && ranlib libflext.a
+	cd ../../externals/grill/flext && bash build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/flext/pd-darwin/release-shared/libflext-pd.dylib $(EXTERNALS_DIR)
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
 	install -d $(HELP_DIR)/flext
@@ -263,19 +262,19 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/flext
 # FLEXTERNALS
 #########
-# dyn
-	cd ../../externals/grill/dyn && make -f makefile.pd-darwin
-	install -p -m0444 ../../externals/grill/dyn/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/dyn/pd/*.pd $(HELP_DIR)/5.reference
-	install -d $(HELP_DIR)/dyn
-	install -p -m0444 ../../externals/grill/dyn/gpl.txt  \
-		../../externals/grill/dyn/readme.txt   \
-		../../externals/grill/dyn/license.txt  \
-		$(HELP_DIR)/dyn
+# dyn~
+	cd ../../externals/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
+	install -p -m0444 ../../externals/grill/dynext/pd/*.pd $(HELP_DIR)/5.reference
+	install -d $(HELP_DIR)/dynext
+	install -p -m0444 ../../externals/grill/dynext/gpl.txt  \
+		../../externals/grill/dynext/readme.txt   \
+		../../externals/grill/dynext/license.txt  \
+		$(HELP_DIR)/dynext
 #########
 # pool
-	cd ../../externals/grill/pool && make -f makefile.pd-darwin
-	install -p -m0444 ../../externals/grill/pool/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+	cd ../../externals/grill/pool && bash ../flext/build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/pool/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/pool/help-pool.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pool
 	install -p -m0444 ../../externals/grill/pool/gpl.txt \
@@ -284,8 +283,8 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/pool
 #########
 # py/pyext
-#	cd ../../externals/grill/py && make -f makefile.pd-darwin
-#	install -p -m0444 ../../externals/grill/py/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+#	cd ../../externals/grill/py && bash ../flext/build.sh pd gcc build-release-shared
+#	install -p -m0444 ../../externals/grill/py/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -d $(HELP_DIR)/py/examples
 	install -d $(HELP_DIR)/py/scripts
 	install -p -m0444 ../../externals/grill/py/pd/*.pd $(HELP_DIR)/py/examples
@@ -299,8 +298,8 @@ darwin_app_externals_flext:
 # vasp
 #  fails without the dir
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-#	cd ../../externals/grill/vasp/ && make -f makefile.pd-darwin
-#	install -p -m0444 ../../externals/grill/vasp/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+	cd ../../externals/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/vasp/pd-help/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/vasp
 	install -p -m0444 ../../externals/grill/vasp/gpl.txt  \
@@ -312,8 +311,8 @@ darwin_app_externals_flext:
 	cp -rp ../../externals/grill/vasp/pd-ex $(HELP_DIR)/vasp
 #########
 # xsample
-	cd ../../externals/grill/xsample && make -f makefile.pd-darwin
-	install -p -m0444 ../../externals/grill/xsample/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+	cd ../../externals/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/grill/xsample/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/xsample
 	install -p -m0444 ../../externals/grill/xsample/gpl.txt \
@@ -325,6 +324,7 @@ darwin_app_externals_flext:
 	cd ../../externals/footils/syncgrain/ && make -f makefile.pd-darwin
 	install -p -m0444 ../../externals/footils/syncgrain/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
+
 
 darwin_app_externals_standard:
 #----------------------------------------------------------------------------
