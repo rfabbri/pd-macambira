@@ -30,7 +30,7 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- Version 0.02 -- 15.04.2005
+ Version 0.03 -- 21.04.2005
 */
 
 // include flext header
@@ -38,7 +38,7 @@
 #include <math.h>
 
 // define constants
-#define MSD2D_VERSION 0.02
+#define MSD2D_VERSION 0.03
 #define nb_max_link   4000
 #define nb_max_mass   4000
 #define Id_length   20
@@ -74,7 +74,7 @@ typedef struct _link {
 	t_mass *mass1;
 	t_mass *mass2;
 	t_float K1, D1, D2;
-	t_float longx, longy, longueur;
+	t_float longx, longy, longueur, long_min, long_max;
 	t_float distance_old;
 } t_link;
 
@@ -134,11 +134,17 @@ protected:
 		// compute link forces
 			distance = sqrt(pow(link[i]->mass1->posX-link[i]->mass2->posX,2) + 
 				pow(link[i]->mass1->posY-link[i]->mass2->posY,2));		// L[n] = sqrt( (x1-x2)² +(y1-y2)²)
-			F  = link[i]->K1 * (distance - link[i]->longueur) ;			// F[n] = k1 (L[n] - L[0])
-			F += link[i]->D1 * (distance - link[i]->distance_old) ;			// F[n] = F[n] + D1 (L[n] - L[n-1])
-			if (distance != 0) 	{
-				Fx = F * (link[i]->mass1->posX - link[i]->mass2->posX)/distance; // Fx = F * Lx[n]/L[n]
-				Fy = F * (link[i]->mass1->posY - link[i]->mass2->posY)/distance; // Fy = F * Ly[n]/L[n]
+			if (distance < link[i]->long_min || distance > link[i]->long_max)	{	
+				Fx = 0;
+				Fy = 0;
+			}
+			else	{
+				F  = link[i]->K1 * (distance - link[i]->longueur) ;		// F[n] = k1 (L[n] - L[0])
+				F += link[i]->D1 * (distance - link[i]->distance_old) ;		// F[n] = F[n] + D1 (L[n] - L[n-1])
+				if (distance != 0) 	{
+					Fx = F * (link[i]->mass1->posX - link[i]->mass2->posX)/distance; // Fx = F * Lx[n]/L[n]
+					Fy = F * (link[i]->mass1->posY - link[i]->mass2->posY)/distance; // Fy = F * Ly[n]/L[n]
+				}
 			}
 			link[i]->mass1->forceX -= Fx;					// Fx1[n] = -Fx
 			link[i]->mass1->forceX -= link[i]->D2*link[i]->mass1->speedX;	// Fx1[n] = Fx1[n] - D2 * vx1[n-1]
@@ -183,6 +189,9 @@ protected:
 		t_atom sortie[6], aux[2];
 		t_float M;
 
+		if (argc != 5)
+			error("mass : Id mobile mass X Y");
+
 		mass[nb_mass] = new t_mass;			// new mass
 		mass[nb_mass]->Id = GetSymbol(argv[0]);		// ID
 		mass[nb_mass]->mobile = GetInt(argv[1]);	// mobile
@@ -217,6 +226,9 @@ protected:
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
 
+		if (argc != 2)
+			error("forceX : Idmass value");
+
 		for (i=0; i<nb_mass;i++)
 		{
 			if (sym == mass[i]->Id)
@@ -230,6 +242,9 @@ protected:
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
 
+		if (argc != 2)
+			error("forceY : Idmass value");
+
 		for (i=0; i<nb_mass;i++)
 		{
 			if (sym == mass[i]->Id)
@@ -242,6 +257,9 @@ protected:
 	// displace mass(es) named Id to a certain position
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
+
+		if (argc != 2)
+			error("posX : Idmass value");
 
 		if (GetFloat(argv[1]) < Xmax && GetFloat(argv[1]) > Xmin)
 			for (i=0; i<nb_mass;i++)
@@ -257,6 +275,9 @@ protected:
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
 
+		if (argc != 2)
+			error("posY : Idmass value");
+
 		if (GetFloat(argv[1]) < Ymax && GetFloat(argv[1]) > Ymin)
 			for (i=0; i<nb_mass;i++)
 			{
@@ -270,8 +291,11 @@ protected:
 	{
 	// set mass No to mobile
 		t_int i,aux;
+	
+		if (argc != 1)
+			error("setMobile : Idmass");
 		
-		aux = GetAInt(argv[0]);	
+		aux = GetInt(argv[0]);	
 		for (i=0; i<nb_mass;i++)
 			{
 				if (mass[i]->nbr == aux)
@@ -285,6 +309,9 @@ protected:
 	// set mass No to fixed
 		t_int i,aux;
 		
+		if (argc != 1)
+			error("setFixed : Idmass");
+		
 		aux = GetAInt(argv[0]);	
 		for (i=0; i<nb_mass;i++)
 			{
@@ -297,60 +324,70 @@ protected:
 	void m_delete_mass(int argc,t_atom *argv) 
 	{
 	// Delete mass
-	t_int i,nb_link_delete=0;
-	t_atom sortie[6], aux[nb_link];
+		t_int i,nb_link_delete=0;
+		t_atom sortie[6], aux[nb_link];
+
+		if (argc != 1)
+			error("deleteMass : Nomass");
 	
-	// Delete associated links
-	for (i=0; i<nb_link;i++)	{
-		if (link[i]->mass1->nbr == GetInt(argv[0]) || link[i]->mass2->nbr == GetInt(argv[0]))	{
-			SetFloat((aux[nb_link_delete]),link[i]->nbr);
-			nb_link_delete++;
+		// Delete associated links
+		for (i=0; i<nb_link;i++)	{
+			if (link[i]->mass1->nbr == GetInt(argv[0]) || link[i]->mass2->nbr == GetInt(argv[0]))	{
+				SetFloat((aux[nb_link_delete]),link[i]->nbr);
+				nb_link_delete++;
+			}
 		}
-	}
 
-	for (i=0; i<nb_link_delete;i++)
-		m_delete_link(1,&aux[i]);
+		for (i=0; i<nb_link_delete;i++)
+			m_delete_link(1,&aux[i]);
 
-	// delete mass
-	for (i=0; i<nb_mass;i++)
-		if (mass[i]->nbr == GetAInt(argv[0]))	{
-			SetFloat((sortie[0]),mass[i]->nbr);
-			SetSymbol((sortie[1]),mass[i]->Id);
-			SetFloat((sortie[2]),mass[i]->mobile);
-			SetFloat((sortie[3]),1/mass[i]->invM);
-			SetFloat((sortie[4]),mass[i]->posX);
-			SetFloat((sortie[5]),mass[i]->posY);
-			delete mass[i];
-			mass[i] = mass[nb_mass-1];
-			nb_mass--;
-			ToOutAnything(1,S_Mass_deleted,6,sortie);
-			break;
-		}
+		// delete mass
+		for (i=0; i<nb_mass;i++)
+			if (mass[i]->nbr == GetAInt(argv[0]))	{
+				SetFloat((sortie[0]),mass[i]->nbr);
+				SetSymbol((sortie[1]),mass[i]->Id);
+				SetFloat((sortie[2]),mass[i]->mobile);
+				SetFloat((sortie[3]),1/mass[i]->invM);
+				SetFloat((sortie[4]),mass[i]->posX);
+				SetFloat((sortie[5]),mass[i]->posY);
+				delete mass[i];
+				mass[i] = mass[nb_mass-1];
+				nb_mass--;
+				ToOutAnything(1,S_Mass_deleted,6,sortie);
+				break;
+			}
 	}
 
 
 	void m_Xmax(int argc,t_atom *argv) 
 	{
 	// set X max
-	Xmax = GetFloat(argv[0]);
-	}
-
-	void m_Ymax(int argc,t_atom *argv) 
-	{
-	// set Y max
-	Ymax = GetFloat(argv[0]);
+		if (argc != 1)
+			error("Xmax : Value");
+		Xmax = GetFloat(argv[0]);
 	}
 
 	void m_Xmin(int argc,t_atom *argv) 
 	{
 	// set X min
-	Xmin = GetFloat(argv[0]);
+		if (argc != 1)
+			error("Xmin : Value");
+		Xmin = GetFloat(argv[0]);
+	}
+	void m_Ymax(int argc,t_atom *argv) 
+	{
+	// set Y max
+		if (argc != 1)
+			error("Ymax : Value");
+		Ymax = GetFloat(argv[0]);
 	}
 
 	void m_Ymin(int argc,t_atom *argv) 
 	{
 	// set Y min
-	Ymin = GetFloat(argv[0]);
+		if (argc != 1)
+			error("Ymin : Value");
+		Ymin = GetFloat(argv[0]);
 	}
 
 // --------------------------------------------------------------  LINKS 
@@ -358,33 +395,51 @@ protected:
 
 	void m_link(int argc,t_atom *argv) 
 	// add a link
-	// Id, nbr, *mass1, *mass2, K1, D1
+	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
 	{
 		t_atom sortie[7], aux[2];
 		t_int i;
 
-		link[nb_link] = new t_link;			// new link
-		link[nb_link]->Id = GetSymbol(argv[0]);
+		if (argc < 6 || argc > 8)
+			error("link : Id Nomass1 Nomass2 K D1 D2 (Lmin Lmax)");
+		link[nb_link] = new t_link;			// New pointer
+		link[nb_link]->Id = GetSymbol(argv[0]);		// ID
 		for (i=0; i<nb_mass;i++)
-			if (mass[i]->nbr==GetAInt(argv[1]))	// pointer on mass 1
+			if (mass[i]->nbr==GetAInt(argv[1]))	// pointer to mass1
 				link[nb_link]->mass1 = mass[i];
-			else if(mass[i]->nbr==GetAInt(argv[2]))	// pointer on mass 2
+			else if(mass[i]->nbr==GetAInt(argv[2]))	// pointer to mass2
 				link[nb_link]->mass2 = mass[i];
 		link[nb_link]->K1 = GetFloat(argv[3]);		// K1
 		link[nb_link]->D1 = GetFloat(argv[4]);		// D1
 		link[nb_link]->D2 = GetFloat(argv[5]);		// D2
-		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;		// Lx[0]
-		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;		// Ly[0]
-		link[nb_link]->longueur = sqrt( pow(link[nb_link]->longx,2) + pow(link[nb_link]->longy,2)); // L[0] = sq( Lx[0]²+Ly[0]²)
+		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;	// Lx[0]
+		if (link[nb_link]->longx < 0)
+			link[nb_link]->longueur = -link[nb_link]->longx;
+		else
+			link[nb_link]->longueur = link[nb_link]->longx ;// L[0]
 		link[nb_link]->nbr = id_link;			// id number
-		link[nb_link]->distance_old = link[nb_link]->longueur;// L[n-1]
+		link[nb_link]->distance_old = link[nb_link]->longueur;	// L[n-1]
+		switch (argc)	{
+			case 6 :	
+				link[nb_link]->long_max = 32768;
+				link[nb_link]->long_min = 0;
+				break;
+			case 7 :	
+				link[nb_link]->long_min = GetFloat(argv[6]);
+				link[nb_link]->long_max = 32768;
+				break;
+			case 8 :	
+				link[nb_link]->long_min = GetFloat(argv[6]);
+				link[nb_link]->long_max = GetFloat(argv[7]);
+				break;	
+		}
 		nb_link++;
 		id_link++;
 		nb_link = min ( nb_max_link -1, nb_link );
 		SetFloat((sortie[0]),id_link-1);
 		SetSymbol((sortie[1]),link[nb_link-1]->Id);
-		SetFloat((sortie[2]),GetAInt(argv[1]));
-		SetFloat((sortie[3]),GetAInt(argv[2]));
+		SetFloat((sortie[2]),GetInt(argv[1]));
+		SetFloat((sortie[3]),GetInt(argv[2]));
 		SetFloat((sortie[4]),link[nb_link-1]->K1);
 		SetFloat((sortie[5]),link[nb_link-1]->D1);
 		SetFloat((sortie[6]),link[nb_link-1]->D2);
@@ -393,11 +448,14 @@ protected:
 
 	void m_ilink(int argc,t_atom *argv) 
 	// add interactor link
-	// Id, nbr, Id masses1, Id masses2, K1, D1
+	// Id, Id masses1, Id masses2, K1, D1, D2, (Lmin, Lmax)
 	{
-		t_atom aux[2], arglist[6];
+		t_atom aux[2], arglist[8];
 		t_int i,j, imass1[nb_mass], nbmass1=0, imass2[nb_mass], nbmass2=0;
 		t_symbol *Id1, *Id2;
+
+		if (argc < 6 || argc > 8)
+			error("ilink : Id Idmass1 Idmass2 K D1 D2 (Lmin Lmax)");
 
 		Id1 = GetSymbol(argv[1]);
 		Id2 = GetSymbol(argv[2]);
@@ -423,7 +481,16 @@ protected:
 					SetFloat((arglist[3]),GetFloat(argv[3]));
 					SetFloat((arglist[4]),GetFloat(argv[4]));
 					SetFloat((arglist[5]),GetFloat(argv[5]));
-					m_link(6,arglist);
+					switch (argc)	{
+						case 7 :	
+							SetFloat(arglist[6],GetFloat(argv[6]));
+							break;
+						case 8 :	
+							SetFloat(arglist[6],GetFloat(argv[6]));
+							SetFloat(arglist[7],GetFloat(argv[7]));
+							break;	
+					}
+					m_link(argc,arglist);
 				}
 	}
 
@@ -432,6 +499,9 @@ protected:
 	// set rigidity of link(s) named Id
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
+
+		if (argc != 2)
+			error("setK : IdLink Value");
 
 		for (i=0; i<nb_link;i++)
 		{
@@ -442,9 +512,12 @@ protected:
 
 	void m_setD(int argc,t_atom *argv) 
 	{
-	// set viscosity of link(s) named Id
+	// set damping of link(s) named Id
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
+
+		if (argc != 2)
+			error("setD : IdLink Value");
 
 		for (i=0; i<nb_link;i++)
 		{
@@ -459,6 +532,9 @@ protected:
 		t_int i;
 		const t_symbol *sym = GetSymbol(argv[0]);
 
+		if (argc != 2)
+			error("setD2 : IdLink Value");
+
 		for (i=0; i<nb_link;i++)
 		{
 			if (sym == link[i]->Id)
@@ -469,23 +545,26 @@ protected:
 	void m_delete_link(int argc,t_atom *argv) 
 	{
 	// Delete link
-	t_int i;
-	t_atom sortie[7];
+		t_int i;
+		t_atom sortie[7];
 
-	for (i=0; i<nb_link;i++)
-		if (link[i]->nbr == GetInt(argv[0]))	{
-			SetFloat((sortie[0]),link[i]->nbr);
-			SetSymbol((sortie[1]),link[i]->Id);
-			SetFloat((sortie[2]),link[i]->mass1->nbr);
-			SetFloat((sortie[3]),link[i]->mass2->nbr);
-			SetFloat((sortie[4]),link[i]->K1);
-			SetFloat((sortie[5]),link[i]->D1);
-			SetFloat((sortie[6]),link[i]->D2);
-			delete link[i];
-			link[i]=link[nb_link-1];	// copy last link instead
-			nb_link--;
-			ToOutAnything(1,S_Link_deleted,7,sortie);
-			break;
+		if (argc != 1)
+			error("deleteLink : NoLink");
+
+		for (i=0; i<nb_link;i++)
+			if (link[i]->nbr == GetInt(argv[0]))	{
+				SetFloat((sortie[0]),link[i]->nbr);
+				SetSymbol((sortie[1]),link[i]->Id);
+				SetFloat((sortie[2]),link[i]->mass1->nbr);
+				SetFloat((sortie[3]),link[i]->mass2->nbr);
+				SetFloat((sortie[4]),link[i]->K1);
+				SetFloat((sortie[5]),link[i]->D1);
+				SetFloat((sortie[6]),link[i]->D2);
+				delete link[i];
+				link[i]=link[nb_link-1];	// copy last link instead
+				nb_link--;
+				ToOutAnything(1,S_Link_deleted,7,sortie);
+				break;
 		}
 	}
 

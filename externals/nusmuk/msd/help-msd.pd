@@ -1,5 +1,5 @@
 #N canvas 367 274 570 449 10;
-#N canvas 271 52 742 843 masses 1;
+#N canvas 271 52 742 843 masses 0;
 #X obj 33 821 msd;
 #X obj 62 154 cnv 15 610 180 empty empty CREATION 20 12 0 14 -262131
 -66577 0;
@@ -73,17 +73,17 @@ their;
 #X restore 281 323 pd masses;
 #N canvas 222 83 808 841 links 0;
 #X obj 33 821 msd;
-#X obj 62 250 cnv 15 610 305 empty empty CREATION 20 12 0 14 -262131
+#X obj 62 192 cnv 15 610 360 empty empty CREATION 20 12 0 14 -262131
 -66577 0;
-#X msg 79 279 reset;
-#X text 338 308 \$1 : Id (symbol);
-#X text 250 308 Add a link;
-#X text 337 328 \$2 : creation No of mass1;
-#X text 337 346 \$3 : creation No of mass2;
-#X text 336 364 \$4 : rigidity;
-#X text 251 280 Delete all masses and links;
-#X text 336 382 \$5 : viscosity;
-#X text 336 399 \$6 : damping;
+#X msg 79 221 reset;
+#X text 402 247 \$1 : Id (symbol);
+#X text 314 247 Add a link;
+#X text 401 267 \$2 : creation No of mass1;
+#X text 401 285 \$3 : creation No of mass2;
+#X text 400 303 \$4 : rigidity;
+#X text 251 222 Delete all masses and links;
+#X text 400 321 \$5 : viscosity;
+#X text 400 338 \$6 : damping;
 #X obj 61 561 cnv 15 610 82 empty empty DYNAMIC_SETTING 20 12 0 14
 -262131 -66577 0;
 #X msg 172 583 setD \$1 \$2;
@@ -99,29 +99,27 @@ their;
 #X text 237 705 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
 / linksPos );
 #X text 237 742 \$2 : Id (symbol or creations numbers);
-#X msg 78 308 link \$1 \$2 \$3 \$4 \$5 \$6;
-#X msg 74 532 deleteLink \$1;
-#X text 239 534 Delete a link;
-#X text 340 534 \$1 : Creation No of link;
+#X msg 74 533 deleteLink \$1;
+#X text 239 535 Delete a link;
+#X text 340 535 \$1 : Creation No of link;
 #X msg 73 762 infosL;
 #X text 236 762 Get infos on all masses and links on outlet No 2;
-#X msg 73 423 iLink \$1 \$2 \$3 \$4 \$5 \$6;
-#X text 338 308 \$1 : Id (symbol);
-#X text 250 308 Add a link;
-#X text 337 328 \$2 : creation No of mass1;
-#X text 337 346 \$3 : creation No of mass2;
-#X text 336 364 \$4 : rigidity;
-#X text 336 382 \$5 : viscosity;
-#X text 336 399 \$6 : damping;
-#X text 410 422 \$1 : Id (symbol);
-#X text 409 478 \$4 : rigidity;
-#X text 409 496 \$5 : viscosity;
-#X text 409 513 \$6 : damping;
-#X text 410 422 \$1 : Id (symbol);
-#X text 409 478 \$4 : rigidity;
-#X text 409 496 \$5 : viscosity;
-#X text 409 513 \$6 : damping;
-#X text 248 423 Add an interactor link;
+#X text 402 247 \$1 : Id (symbol);
+#X text 314 247 Add a link;
+#X text 401 267 \$2 : creation No of mass1;
+#X text 401 285 \$3 : creation No of mass2;
+#X text 400 303 \$4 : rigidity;
+#X text 400 321 \$5 : viscosity;
+#X text 400 338 \$6 : damping;
+#X text 463 392 \$1 : Id (symbol);
+#X text 462 448 \$4 : rigidity;
+#X text 462 466 \$5 : viscosity;
+#X text 462 483 \$6 : damping;
+#X text 463 392 \$1 : Id (symbol);
+#X text 462 448 \$4 : rigidity;
+#X text 462 466 \$5 : viscosity;
+#X text 462 483 \$6 : damping;
+#X text 301 393 Add an interactor link;
 #X text 94 52 LINKS :;
 #X text 71 91 parameters : length \, rigidity \, viscosity and damping.
 ;
@@ -130,23 +128,29 @@ their;
 #X text 70 134 the two masses at the creation.;
 #X text 71 120 message. The lenght is initialised to the distance between
 ;
-#X text 71 106 Rigidity \, viscosity and damping are defined by the
+#X text 71 107 Rigidity \, viscosity and damping are defined by the
 creation;
-#X text 409 442 \$2 : Id (symbol) of masses type 1;
-#X text 409 460 \$3 : Id (symbol) of masses type 2;
 #X text 70 148 Interactor links are links between mutiples masses \,
 instead;
 #X text 70 161 of creation number \, the masses linked are defined
 with;
 #X text 69 175 their Id.;
+#X text 397 356 ($7) : minimum lenght of link;
+#X text 397 373 ($8) : maximum lenght of link;
+#X msg 78 247 link \$1 \$2 \$3 \$4 \$5 \$6 ($7 \$8);
+#X text 462 412 \$2 : Id (symbol) of masses 1;
+#X text 462 430 \$3 : Id (symbol) of masses 2;
+#X msg 73 393 iLink \$1 \$2 \$3 \$4 \$5 \$6 ($7 \$8);
+#X text 458 500 ($7) : minimum lenght of links;
+#X text 458 517 ($8) : maximum lenght of links;
 #X connect 2 0 0 0;
 #X connect 15 0 0 0;
 #X connect 19 0 0 0;
 #X connect 23 0 0 0;
-#X connect 24 0 0 0;
-#X connect 27 0 0 0;
-#X connect 29 0 0 0;
-#X restore 283 353 pd links;
+#X connect 26 0 0 0;
+#X connect 55 0 0 0;
+#X connect 58 0 0 0;
+#X restore 284 353 pd links;
 #X text 135 323 HELP on masses --->;
 #X text 134 354 HELP on links --->;
 #X text 154 34 MSD : mass - spring - damper model;
