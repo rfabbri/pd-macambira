@@ -482,10 +482,9 @@ protected:
 		link[nb_link]->D1 = GetFloat(argv[4]);		// D1
 		link[nb_link]->D2 = GetFloat(argv[5]);		// D2
 		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;	// Lx[0]
-		if (link[nb_link]->longx < 0)
-			link[nb_link]->longueur = -link[nb_link]->longx;
-		else
-			link[nb_link]->longueur = link[nb_link]->longx ;// L[0]
+		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;	// Ly[0]
+		link[nb_link]->longz = link[nb_link]->mass1->posZ - link[nb_link]->mass2->posZ;	// Lz[0]
+		link[nb_link]->longueur = sqrt(pow(link[nb_link]->longx,2)+pow(link[nb_link]->longy,2)+pow(link[nb_link]->longz,2));//L[0]
 		link[nb_link]->nbr = id_link;			// id number
 		link[nb_link]->distance_old = link[nb_link]->longueur;	// L[n-1]
 		switch (argc)	{
