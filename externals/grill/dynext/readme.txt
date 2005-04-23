@@ -34,6 +34,7 @@ CHANGES:
 - allow reuse of names (can be disabled with "symreuse" attribute)
 - guard against messages to canvases ("canvasmsg" attribute)
 - more stable
+- make connections visible
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality

@@ -219,7 +219,7 @@ private:
 	FLEXT_ATTRVAR_B(canvasmsg)
 
     static const t_symbol *sym_dot,*sym_dynsin,*sym_dynsout,*sym_dynin,*sym_dynout,*sym_dyncanvas;
-    static const t_symbol *sym_vis,*sym_loadbang,*sym_dsp;
+    static const t_symbol *sym_vis,*sym_loadbang,*sym_dsp,*sym_pop;
 };
 
 FLEXT_NEW_DSP_V("dyn~",dyn)
@@ -242,6 +242,7 @@ const t_symbol *dyn::sym_dyncanvas = NULL;
 const t_symbol *dyn::sym_vis = NULL;
 const t_symbol *dyn::sym_loadbang = NULL;
 const t_symbol *dyn::sym_dsp = NULL;
+const t_symbol *dyn::sym_pop = NULL;
 
 
 void dyn::setup(t_classid c)
@@ -299,6 +300,7 @@ void dyn::setup(t_classid c)
     sym_vis = MakeSymbol("vis");
     sym_loadbang = MakeSymbol("loadbang");
     sym_dsp = MakeSymbol("dsp");
+    sym_pop = MakeSymbol("pop");
 }
 
 
@@ -361,8 +363,9 @@ dyn::dyn(int argc,const t_atom *argv):
 	SetInt(arg[5],0);	// visible
 
 	canvas = canvas_new(NULL, NULL, 6, arg);
-	// must do that....
-	canvas_unsetcurrent(canvas);
+    // pop canvas (must do that...)
+    SetInt(arg[0],0);
+    pd_typedmess((t_pd *)canvas,(t_symbol *)sym_pop,1,arg);
 
     DoInit();
 
@@ -393,7 +396,7 @@ void dyn::DoExit()
     // delete proxies
     DelProxies();
     // remove all objects
-    glist_clear(canvas);
+    if(canvas) glist_clear(canvas);
     // remove all names
     groot.clear();
     root.clear();
@@ -449,10 +452,14 @@ void dyn::NewProxies()
 void dyn::DelProxies()
 {
     int i;
-	for(i = 0; i < s_inlets+m_inlets; ++i) glist_delete(canvas,(t_gobj *)pxin[i]);
-	if(pxin) delete[] pxin;
-	for(i = 0; i < s_outlets+m_outlets; ++i) glist_delete(canvas,(t_gobj *)pxout[i]);
-	if(pxout) delete[] pxout;
+    if(pxin) {
+	    for(i = 0; i < s_inlets+m_inlets; ++i) glist_delete(canvas,(t_gobj *)pxin[i]);
+	    delete[] pxin;
+    }
+    if(pxout) {
+	    for(i = 0; i < s_outlets+m_outlets; ++i) glist_delete(canvas,(t_gobj *)pxout[i]);
+	    delete[] pxout;
+    }
 }
 
 t_glist *dyn::FindCanvas(const t_symbol *n)
@@ -796,8 +803,6 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 		canvas_disconnect(s_cnv,s_oix,s_x,d_oix,d_x);
 #endif
 	}
-
-//    canvas_fixlinesfor(s_cnv,(t_text *)s_x);
 }
 
 
