@@ -166,7 +166,6 @@ namespace eval ::ix {
 	if {[winfo exists $path.filter] != 1} {
 	    canvas $path.filter -bg $bg -width $w -height $h
 	    pack $path.filter -side left
-	    update
 	    bind $path.filter <Motion> "::ix::filter_motion %W $target %x %y"
 #	    bind $path.filter <ButtonRelease> "::ix::filter_resp $path $target"
 	    bind $path.filter <Leave> {
@@ -214,7 +213,6 @@ namespace eval ::ix {
 		$path.filter bind $a <3> $b4
 		$path.filter bind $a <B3-Motion> $b3
 		$path.filter bind $a <B1-Motion> $b1
-		$path.filter bind $a <Shift-1> $b2
 	    }
 	    filter_move $path $target $fn $px $py
 	}	
@@ -282,7 +280,7 @@ namespace eval ::ix {
 #> filter frame
 #. -bd 3 #w 384 #h 144 #bg gray90 #div 6 #n 3
 #. #log 1 #rate 44100
-#. @div  ::ix::gridlines .- .| .#1
+#. @div  ::ix::filter_gridlines .- .| .#1
 #. @params ::ix::filter_lp .- .| .#args
 puts "filter .- .|"
 ::ix::filter_new .- .| .#w .#h .#bg .#div .#log .#rate .#n

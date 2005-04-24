@@ -41,10 +41,9 @@ bind .- <Shift-MouseWheel> {.- xview scroll [expr {- (%D / 120) * 4}] units}
 bind .- <ButtonPress-3> {}
 bind .- <Button3-Leave> {dnd drag %W}
 dnd bindtarget .- text/plain <Drop> {
-    foreach l [split %D "\n"] {.- insert end $l}
-
+    foreach l [split %D "\n"] {.- insert end [regsub -- {^file:[/]+} $l "/"]}
 }
-dnd bindtarget .- text/uri-list <Drop> {foreach d %D {.- insert end $d}}
+dnd bindtarget .- text/uri-list <Drop> {foreach d %D {.- insert end [regsub -- {^file:[/]+} $d "/"]}}
 dnd bindsource .- text/uri-list {
     set sel [.- curselection]
     if {$sel ne ""} {

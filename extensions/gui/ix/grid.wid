@@ -18,12 +18,12 @@ namespace eval ::ix {
 	    place $path.grid -anchor nw -relwidth 1 -relheight 1
 	    $path.grid create $shape 0 0 0 0 -fill $fg -tags ${target}sqr
 	    grid_click $path.grid $target 1 0.5 0.5 $h $w $size
-	    gridlines $path.grid $target $div $w $h $ln
+	    grid_lines $path.grid $target $div $w $h $ln
 	    bind $path.grid <1> "::ix::grid_click %W $target 0 %y %x $h $w $size"
 	    bind $path.grid <B1-Motion> "::ix::grid_click %W $target 0 %y %x $h $w $size"
 	}
     }
-    proc gridlines {w target lines ww hw color} {
+    proc grid_lines {w target lines ww hw color} {
 	$w delete gridlines
 	for {set x 1} {$x <= $lines} {incr x} {
 	    if {$lines < 64} {

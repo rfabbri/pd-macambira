@@ -1,19 +1,19 @@
 #N canvas 265 374 607 366 12;
-#X obj 135 73 widget tile t1 #e rows -colwidth -13 -rows 12 -cols 16
+#X obj 135 73 widget tile t1 #e non -colwidth -13 -rows 12 -cols 16
 -width 16 -height 12 -rowheight -13 -bd 1 -bg red;
-#X msg 118 46 redefine;
-#X msg 93 39 clr;
-#X msg 49 50 #e \$1;
-#X obj 23 8 widget dm #items #items .(rows columns non.) #arrows 0
-;
+#X msg 80 87 redefine;
+#X msg 198 53 clr;
+#X msg 100 54 #e \$1;
+#X obj 137 46 widget dm #items #items .(rows columns non.) #arrows
+0 -bg pink;
 #X floatatom 428 3 2 0 64 0 - - -;
 #X floatatom 271 14 5 0 0 0 - - -;
-#X floatatom 237 30 5 0 0 0 - - -;
+#X floatatom 271 -2 5 0 0 0 - - -;
 #X obj 459 9 * -1;
 #X msg 419 27 -colwidth \$1 \, -rowheight \$1;
 #X msg 271 30 -cols \$1 \, -width \$1 \, clr;
 #X msg 270 49 -rows \$1 \, -height \$1 \, clr;
-#X obj 175 0 bng 55 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+#X obj 199 -10 bng 55 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
 -1;
 #X obj 441 277 osc~ 440;
 #X obj 462 165 mtof;

@@ -1,0 +1,160 @@
+namespace eval ::ix {
+    proc random_int {} {
+	return [expr "int(floor(rand()*16))"]
+    }
+    proc random_clr {} {
+        return [format "\#%1X%1X%1X%1X%1X%1X" [random_int] [random_int] [random_int] [random_int] [random_int] [random_int]]
+    }
+    variable _
+    proc ngrid_new {path target w h bg ln div move spread radius max} {
+	variable _
+	if {[winfo exists $path.ngrid] != 1} {
+	    canvas $path.ngrid -bg $bg -width $w -height $h
+	    pack $path.ngrid -side left
+	    bind $path.ngrid <1> "::ix::ngrid_click $path $target %x %y"
+	    bind $path.ngrid <B1-Motion> [bind $path.ngrid <1>]
+	    ngrid_gridlines $path $target $ln $div
+	    set bd [expr {[$path cget -bd] * 2}]
+	    $path configure -bg $bg -width [expr [winfo width $path.ngrid] + $bd] -height [expr [winfo height $path.ngrid] + $bd]
+	}
+	set _($target:recent) 0
+	set _($target:n) 0
+	set _($target:move) $move
+	set _($target:spread) $spread
+	set _($target:radius) $radius
+	set _($target:max) $max
+    }
+    proc ngrid_pos {which path target what where} {
+	variable _
+	array set dm {x width y height}
+	for {set n 0 } {$n <= $_($target:n)} {incr n} {
+	    foreach xy {x y} {
+		if {[info exists _($target:box$n:$xy)] && [lindex $_($target:box$n:$xy) 0] eq $what} {
+		    set x [expr [lindex [$path.ngrid coords sqr_$n] 0] + $_($target:radius)]
+		    set y [expr [lindex [$path.ngrid coords sqr_$n] 1] + $_($target:radius)]
+		    set $xy  [expr ($where - [lindex $_($target:box$n:$xy) 1 ].0) / ([lindex $_($target:box$n:$xy) 2] - [lindex $_($target:box$n:$xy) 1 ].0) * [winfo $dm($xy) $path.ngrid]]
+		    switch $which {
+			setpos {$path.ngrid coords sqr_$n [expr $x - $_($target:radius)] [expr $y - $_($target:radius)] [expr $x + $_($target:radius)] [expr $y + $_($target:radius)]}
+			pos { 
+			    set _($target:recent) $n
+			    ngrid_click $path $target $x $y 
+			}
+		    }
+		}
+	    }
+	}
+    }
+    proc ngrid_vset {path target what where} {
+	variable _
+	set _($target:$what) $where
+    }
+    proc ngrid_add {path target name cur min max} {
+	variable _
+	set fill [random_clr]
+	set n $_($target:n)
+	set ni 0
+	while {$ni <= $n} {
+	    foreach xy {x y} {if {[$path.ngrid itemcget name_${xy}_$ni -text] eq $name} {return}}
+	    incr ni}
+	if {[$path.ngrid itemcget name_x_$n -text] eq ""} {
+	    set _($target:box$n:x) [list $name $min $max $fill]
+	    $path.ngrid create oval 0 0 0 0 -tags sqr_$n -fill $fill -outline white -width 2
+	    $path.ngrid create line 0 0 0 0 -tags hist_$n -fill $fill
+	    $path.ngrid create text 0 [expr 5 + $n * 8.0] -tags name_y_$n -fill $fill -font {{Bitstream Vera Sans} 8} -text "" -anchor w -justify left
+	    $path.ngrid create text [winfo width $path.ngrid] [expr 5 + $n * 8.0] -tags name_x_$n -fill $fill -font {{Bitstream Vera Sans} 8} -text "$name" -anchor e -justify right    
+	    $path.ngrid lower name_x_$n
+	    $path.ngrid lower name_y_$n
+	    set b1 "set ::ix::_($target:recent) $n; ::ix::ngrid_click $path $target %x %y"
+	    $path.ngrid bind sqr_$n <1> $b1
+	    $path.ngrid bind sqr_$n <B1-Motion> $b1
+	    foreach el [list sqr_$n name_x_$n name_y_$n] {
+		$path.ngrid bind $el <Enter> "::ix::ngrid_highlight $path $target $n grey96"
+		$path.ngrid bind $el <Leave> "::ix::ngrid_highlight $path $target $n -"
+	    }
+	    ngrid_move $path $target $n [expr ($cur - $min) / ($max - $min.0) * [winfo width $path.ngrid]] [expr rand() * [winfo height $path.ngrid]]
+	} else {
+	    set _($target:box$n:y) [list $name $min $max]
+	    $path.ngrid itemconfigure name_y_$n -text "$name"
+	    ngrid_move $path $target $n [expr [lindex [$path.ngrid coords sqr_$n] 0] + $_($target:radius)] [expr ($cur - $min.0) / ($max - $min) * [winfo height $path.ngrid]]
+	    incr _($target:n)
+	}
+    }
+    proc ngrid_highlight {path target n color} {
+	variable _
+	foreach el [list name_y_$n name_x_$n sqr_$n] {
+	    if {$color eq "-"} {
+		set color [lindex $_($target:box$n:x) 3]
+	    }
+	    $path.ngrid itemconfigure $el -fill $color
+	    set _($target:recent) $n
+	}
+    }
+    proc ngrid_click {path target x y} {
+	variable _
+	switch  $_($target:move) {
+	    swarm {
+		for {set n 0} {$n <= $_($target:n)} {incr n} {
+		    ngrid_move $path $target $n [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $x] [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $y]
+		}
+	    }
+	    trails {
+		for {set n 0} {$n <= $_($target:n)} {incr n} {
+		    if {[expr rand() > 0.96] == 1} {
+			ngrid_move $path $target $n [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $x] [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $y]
+		    }
+		}
+	    }
+	    error {
+		ngrid_move $path $target $_($target:recent) [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $x] [expr rand() * $_($target:spread) - [expr $_($target:spread) / 2.0] + $y]
+	    }
+	    default {ngrid_move $path $target $_($target:recent) $x $y}
+	}
+    }
+    proc ngrid_move {path target n px py} {
+	variable _
+	$path.ngrid coords sqr_$n [expr $px - $_($target:radius)] [expr $py - $_($target:radius)] [expr $px + $_($target:radius)] [expr $py + $_($target:radius)]	
+	set h [winfo height $path.ngrid]
+	set w [winfo width $path.ngrid]
+	foreach xy {x y} {
+	    if {[info exists _($target:box$n:$xy)]} {
+		set l $_($target:box$n:$xy)
+		set name [lindex $l 0]
+		set min [lindex $l 1]
+		set max [lindex $l 2]
+		if {[expr $min == 0] && [expr $max == 0]} {set max  $_($target:max)}
+		pd "$target.rp _cb [pdtk_enquote $name] [expr ($max - $min) * [set p$xy] / $w.0 + $min] \;"
+	    }
+	}
+    }
+    proc ngrid_gridlines {path target ln lines} {
+	variable _
+	puts "gridlines $ln $lines"
+	set w $path.ngrid
+	$w delete gridlines
+	set gh [winfo height $w]
+	set gw [winfo width $w]
+	for {set x 1} {$x <= $lines} {incr x} {
+	    if {$lines < 16 && $lines > 0} {
+		set oh [expr $gh.0 * $x.0 / $lines.0]
+		set ow [expr $gw.0 * $x.0 / $lines.0]
+	      	$w create line $ow 0 $ow $gh -fill $ln -tags gridlines
+	      	$w create line 0 $oh $gw $oh -fill $ln -tags gridlines
+		set fontsize [expr int(80.0/$lines.0)]
+	    }
+	}
+    }
+}
+#> ngrid frame
+#. -bd 3 #w 384 #h 144 #bg gray10 #ln gray35 #div 6 #n 3
+#. #move normal #spread 96 #radius 9 #max 1
+#. @list  ::ix::ngrid_add .- .| {.#1} .#2 .#3 .#4
+#. @add  ::ix::ngrid_add .- .| {.#1} .#2 .#3 .#4
+#. @pos ::ix::ngrid_pos pos .- .| {.#1} .#2
+#. @setpos ::ix::ngrid_pos setpos .- .| {.#1} .#2
+#. @clear ::ix::ngrid_clear .- .| all
+#. @radius ::ix::ngrid_vset .- .| radius .#1
+#. @spread ::ix::ngrid_vset .- .| spread .#1
+#. @move ::ix::ngrid_vset .- .| move .#1
+#. @max ::ix::ngrid_vset .- .| max .#1
+puts "ngrid .- .|"
+::ix::ngrid_new .- .| .#w .#h .#bg .#ln .#div .#move .#spread .#radius .#max
