@@ -15,7 +15,6 @@
 #X text 235 367 Compute new masses positions;
 #X obj 61 403 cnv 15 610 210 empty empty DYNAMIC_SETTING 20 12 0 14
 -262131 -66577 0;
-#X text 350 449 \$1 : Id (symbol);
 #X text 350 467 \$2 : New value;
 #X text 348 503 \$1 : Id (symbol);
 #X text 348 521 \$2 : New value;
@@ -58,19 +57,20 @@ their;
 #X text 345 578 Change mobile parameter;
 #X text 345 594 \$1 : Creation No of mass;
 #X text 334 271 \$4 : initial position;
+#X text 350 449 \$1 : Id (symbol) or No;
 #X connect 2 0 0 0;
 #X connect 9 0 0 0;
-#X connect 16 0 0 0;
-#X connect 19 0 0 0;
+#X connect 15 0 0 0;
+#X connect 18 0 0 0;
+#X connect 20 0 0 0;
 #X connect 21 0 0 0;
-#X connect 22 0 0 0;
-#X connect 25 0 0 0;
+#X connect 24 0 0 0;
+#X connect 28 0 0 0;
 #X connect 29 0 0 0;
-#X connect 30 0 0 0;
-#X connect 33 0 0 0;
-#X connect 35 0 0 0;
-#X connect 44 0 0 0;
-#X restore 281 323 pd masses;
+#X connect 32 0 0 0;
+#X connect 34 0 0 0;
+#X connect 43 0 0 0;
+#X restore 282 323 pd masses;
 #N canvas 222 83 808 841 links 0;
 #X obj 33 821 msd;
 #X obj 62 192 cnv 15 610 360 empty empty CREATION 20 12 0 14 -262131

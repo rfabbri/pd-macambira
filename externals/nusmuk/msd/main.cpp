@@ -222,17 +222,26 @@ protected:
 	{
 	// displace mass(es) named Id to a certain position
 		t_int i;
-		const t_symbol *sym = GetSymbol(argv[0]);
+		const t_symbol *sym = GetASymbol(argv[0]);
 
 		if (argc != 2)
-			error("posX : Idmass value");
+			error("posX : Id/Nomass value");
 
 		if (GetFloat(argv[1]) < Xmax && GetFloat(argv[1]) > Xmin)
-			for (i=0; i<nb_mass;i++)
-			{
-				if (sym == mass[i]->Id)
-					mass[i]->posX = GetAFloat(argv[1]);
-			}
+			if (sym ==0)	
+				for (i=0; i<nb_mass;i++)
+				{
+					if (GetInt(argv[0]) == mass[i]->nbr)	{
+						mass[i]->posX = GetFloat(argv[1]);
+						break;
+					}
+				}
+			else
+				for (i=0; i<nb_mass;i++)
+				{
+					if (sym == mass[i]->Id)
+						mass[i]->posX = GetFloat(argv[1]);
+				}
 	}
 
 	void m_set_mobile(int argc,t_atom *argv) 
