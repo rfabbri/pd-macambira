@@ -59,10 +59,10 @@ link: link.stamp
 
 link.stamp:
 	cp ../src/*.c .
-#	rm vst.c 
-# MacOSX exceptions that don't work just yet
-	-rm ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c 
-	-rm serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_*
+# MacOSX exceptions that don't work just yet (if ever)
+	-rm ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c \
+		serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_* \
+		piperead~.c pipewrite~.c
 	touch link.stamp
 	make
 
