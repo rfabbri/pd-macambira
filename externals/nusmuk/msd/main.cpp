@@ -51,6 +51,14 @@
 #define max(a,b) ( ((a) > (b)) ? (a) : (b) ) 
 #define min(a,b) ( ((a) < (b)) ? (a) : (b) )
 
+#ifdef _MSC_VER
+#define NEWARR(type,var,size) type *var = new type[size]
+#define DELARR(var) delete[] var
+#else
+#define NEWARR(type,var,size) type var[size]
+#define DELARR(var) ((void)0)
+#endif
+
 typedef struct _mass {
 	t_symbol *Id;
 	t_int nbr;
@@ -72,7 +80,6 @@ typedef struct _link {
 	t_float longx, longueur, long_min, long_max;
 	t_float distance_old;
 } t_link;
-
 
 
 class msd:
@@ -105,7 +112,7 @@ protected:
 	void m_reset() 
 	{ 
 		t_int i;
-		t_atom sortie[0];
+//		t_atom sortie;
 
 		for (i=0; i<nb_mass; i++)	{
 			delete mass[i];
@@ -113,7 +120,7 @@ protected:
 		for (i=0; i<nb_link; i++)	{
 			delete link[i];
 			}
-		ToOutAnything(1,S_Reset,0,sortie);
+		ToOutAnything(1,S_Reset,0,NULL);
 		nb_link = 0;
 		nb_mass = 0;
 		id_mass = 0;
@@ -282,7 +289,8 @@ protected:
 	{
 	// Delete mass
 		t_int i,nb_link_delete=0;
-		t_atom sortie[5], aux[nb_link];
+		t_atom sortie[5];
+		NEWARR(t_atom,aux,nb_link);
 	
 		if (argc != 1)
 			error("deleteMass : Nomass");
@@ -312,6 +320,8 @@ protected:
 				ToOutAnything(1,S_Mass_deleted,5,sortie);
 				break;
 		}
+
+		DELARR(aux);
 	}
 
 
@@ -392,7 +402,9 @@ protected:
 	// Id, Id masses1, Id masses2, K1, D1, D2, (Lmin, Lmax)
 	{
 		t_atom aux[2], arglist[8];
-		t_int i,j, imass1[nb_mass], nbmass1=0, imass2[nb_mass], nbmass2=0;
+		t_int i,j,nbmass1=0,nbmass2=0;
+		NEWARR(t_int,imass1,nb_mass);
+		NEWARR(t_int,imass2,nb_mass);
 		t_symbol *Id1, *Id2;
 
 		if (argc < 6 || argc > 8)
@@ -433,6 +445,9 @@ protected:
 					}
 					m_link(argc,arglist);
 				}
+
+		DELARR(imass1);
+		DELARR(imass2);
 	}
 
 	void m_setK(int argc,t_atom *argv) 
@@ -656,7 +671,7 @@ protected:
 					{
 						if (auxarg2==mass[i]->Id)
 						{
-							SETFLOAT(&sortie[0],mass[i]->speedX);
+							SetFloat(sortie[0],mass[i]->speedX);
 							ToOutAnything(0,S_massesSpeedsId,1,sortie);
 						}
 					}
@@ -670,25 +685,27 @@ protected:
 	void m_mass_dumpl()
 	// List of masses positions on first outlet
 	{	
-		t_atom sortie[nb_mass];
+		NEWARR(t_atom,sortie,nb_mass);
 		t_int i;
 	
 		for (i=0; i<nb_mass; i++)	{
 			SetFloat((sortie[i]),mass[i]->posX);
 		}
 		ToOutAnything(0, S_massesPosL, nb_mass, sortie);
+		DELARR(sortie);
 	}
 
 	void m_force_dumpl()
 	// List of masses forces on first outlet
 	{	
-		t_atom sortie[nb_mass];
+		NEWARR(t_atom,sortie,nb_mass);
 		t_int i;
 	
 		for (i=0; i<nb_mass; i++)	{
 			SetFloat((sortie[i]),mass[i]->out_forceX);
 		}
 		ToOutAnything(0, S_massesForcesL, nb_mass, sortie);
+		DELARR(sortie);
 	}
 
 	void m_info_dumpl()
