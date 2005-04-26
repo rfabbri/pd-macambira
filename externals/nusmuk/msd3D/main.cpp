@@ -30,7 +30,7 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- Version 0.03 -- 21.04.2005
+ Version 0.04 -- 26.04.2005
 */
 
 // include flext header
@@ -38,7 +38,7 @@
 #include <math.h>
 
 // define constants
-#define MSD3D_VERSION 0.03
+#define MSD3D_VERSION 0.04
 #define nb_max_link   4000
 #define nb_max_mass   4000
 #define Id_length   20
@@ -480,50 +480,64 @@ protected:
 	{
 		t_atom sortie[7], aux[2];
 		t_int i;
+        	t_mass *mass1 = NULL;
+        	t_mass *mass2 = NULL;
+        	
+        	if (argc < 6 || argc > 8)
+        	    error("link : Id Nomass1 Nomass2 K D1 D2 (Lmin Lmax)");
+			
+        	// check for existence of link masses:
+        	for (i=0; i<nb_mass;i++)
+				if (mass[i]->nbr==GetInt(argv[1]))	// pointer to mass1
+					// we found mass1
+        	        mass1 = mass[i];
+				else if (mass[i]->nbr==GetInt(argv[2]))	// pointer to mass2
+					// ... and mass2
+        	        mass2 = mass[i];
 
-		if (argc < 6 || argc > 8)
-			error("link : Id Nomass1 Nomass2 K D1 D2 (Lmin Lmax)");
-		link[nb_link] = new t_link;			// New pointer
-		link[nb_link]->Id = GetSymbol(argv[0]);		// ID
-		for (i=0; i<nb_mass;i++)
-			if (mass[i]->nbr==GetAInt(argv[1]))	// pointer to mass1
-				link[nb_link]->mass1 = mass[i];
-			else if(mass[i]->nbr==GetAInt(argv[2]))	// pointer to mass2
-				link[nb_link]->mass2 = mass[i];
-		link[nb_link]->K1 = GetFloat(argv[3]);		// K1
-		link[nb_link]->D1 = GetFloat(argv[4]);		// D1
-		link[nb_link]->D2 = GetFloat(argv[5]);		// D2
-		link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;	// Lx[0]
-		link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;	// Ly[0]
-		link[nb_link]->longz = link[nb_link]->mass1->posZ - link[nb_link]->mass2->posZ;	// Lz[0]
-		link[nb_link]->longueur = sqrt(pow(link[nb_link]->longx,2)+pow(link[nb_link]->longy,2)+pow(link[nb_link]->longz,2));//L[0]
-		link[nb_link]->nbr = id_link;			// id number
-		link[nb_link]->distance_old = link[nb_link]->longueur;	// L[n-1]
-		switch (argc)	{
-			case 6 :	
-				link[nb_link]->long_max = 32768;
-				link[nb_link]->long_min = 0;
-				break;
-			case 7 :	
-				link[nb_link]->long_min = GetFloat(argv[6]);
-				link[nb_link]->long_max = 32768;
-				break;
-			case 8 :	
-				link[nb_link]->long_min = GetFloat(argv[6]);
-				link[nb_link]->long_max = GetFloat(argv[7]);
-				break;	
-		}
-		nb_link++;
-		id_link++;
-		nb_link = min ( nb_max_link -1, nb_link );
-		SetFloat((sortie[0]),id_link-1);
-		SetSymbol((sortie[1]),link[nb_link-1]->Id);
-		SetFloat((sortie[2]),GetInt(argv[1]));
-		SetFloat((sortie[3]),GetInt(argv[2]));
-		SetFloat((sortie[4]),link[nb_link-1]->K1);
-		SetFloat((sortie[5]),link[nb_link-1]->D1);
-		SetFloat((sortie[6]),link[nb_link-1]->D2);
-		ToOutAnything(1,S_Link,7,sortie);
+        	if (mass1 and mass2)
+        	{
+			link[nb_link] = new t_link;			// New pointer
+			link[nb_link]->Id = GetSymbol(argv[0]);		// ID
+			link[nb_link]->mass1 = mass1; // pointer to mass1
+			link[nb_link]->mass2 = mass2; // pointer to mass2
+			link[nb_link]->K1 = GetFloat(argv[3]);		// K1
+			link[nb_link]->D1 = GetFloat(argv[4]);		// D1
+			link[nb_link]->D2 = GetFloat(argv[5]);		// D2
+			link[nb_link]->longx = link[nb_link]->mass1->posX - link[nb_link]->mass2->posX;	// Lx[0]
+			link[nb_link]->longy = link[nb_link]->mass1->posY - link[nb_link]->mass2->posY;	// Ly[0]
+			link[nb_link]->longz = link[nb_link]->mass1->posZ - link[nb_link]->mass2->posZ;	// Lz[0]
+			link[nb_link]->longueur = sqrt(pow(link[nb_link]->longx,2)+pow(link[nb_link]->longy,2)+pow(link[nb_link]->longz,2));//L[0]
+			link[nb_link]->nbr = id_link;			// id number
+			link[nb_link]->distance_old = link[nb_link]->longueur;	// L[n-1]
+			switch (argc)	{
+				case 6 :	
+					link[nb_link]->long_max = 32768;
+					link[nb_link]->long_min = 0;
+					break;
+				case 7 :	
+					link[nb_link]->long_min = GetFloat(argv[6]);
+					link[nb_link]->long_max = 32768;
+					break;
+				case 8 :	
+					link[nb_link]->long_min = GetFloat(argv[6]);
+					link[nb_link]->long_max = GetFloat(argv[7]);
+					break;	
+			}
+			nb_link++;
+			id_link++;
+			nb_link = min ( nb_max_link -1, nb_link );
+			SetFloat((sortie[0]),id_link-1);
+			SetSymbol((sortie[1]),link[nb_link-1]->Id);
+			SetFloat((sortie[2]),GetInt(argv[1]));
+			SetFloat((sortie[3]),GetInt(argv[2]));
+			SetFloat((sortie[4]),link[nb_link-1]->K1);
+			SetFloat((sortie[5]),link[nb_link-1]->D1);
+			SetFloat((sortie[6]),link[nb_link-1]->D2);
+			ToOutAnything(1,S_Link,7,sortie);
+        	}
+        	else
+            		error("link : Cannot create link: Not all masses for this link have been created yet.");
 	}
 
 	void m_ilink(int argc,t_atom *argv) 
@@ -660,7 +674,7 @@ protected:
 	{
 		t_int i,j;
 		t_symbol *auxarg,*auxarg2, *auxtype;
-		t_atom sortie[6];
+		t_atom sortie[7];
 		auxtype = GetSymbol(argv[0]);
 		auxarg = GetASymbol(argv[1]);		//auxarg : & symbol, 0 else
 
@@ -669,37 +683,41 @@ protected:
 			if (auxtype == S_massesPos)// get all masses positions
 				for (i=0; i<nb_mass; i++)
 				{
-					SetFloat(sortie[0],mass[i]->posX);
-					SetFloat(sortie[1],mass[i]->posY);
-					SetFloat(sortie[2],mass[i]->posZ);
-					ToOutAnything(0,S_massesPos,3,sortie);
+					SetFloat(sortie[0],mass[i]->nbr);
+					SetFloat(sortie[1],mass[i]->posX);
+					SetFloat(sortie[2],mass[i]->posY);
+					SetFloat(sortie[3],mass[i]->posZ);
+					ToOutAnything(0,S_massesPos,4,sortie);
 				}
 			else if (auxtype == S_massesForces)// get all masses forces
 				for (i=0; i<nb_mass; i++)
 				{
-					SetFloat(sortie[0],mass[i]->out_forceX);
-					SetFloat(sortie[1],mass[i]->out_forceY);
-					SetFloat(sortie[2],mass[i]->out_forceZ);
-					ToOutAnything(0,S_massesForces,3,sortie);
+					SetFloat(sortie[0],mass[i]->nbr);
+					SetFloat(sortie[1],mass[i]->out_forceX);
+					SetFloat(sortie[2],mass[i]->out_forceY);
+					SetFloat(sortie[3],mass[i]->out_forceZ);
+					ToOutAnything(0,S_massesForces,4,sortie);
 				}
 			else if (auxtype == S_linksPos)// get all links positions
 				for (i=0; i<nb_link; i++)
 				{
-					SetFloat(sortie[0],link[i]->mass1->posX);
-					SetFloat(sortie[1],link[i]->mass1->posY);
-					SetFloat(sortie[2],link[i]->mass1->posZ);
-					SetFloat(sortie[3],link[i]->mass2->posX);
-					SetFloat(sortie[4],link[i]->mass2->posY);
-					SetFloat(sortie[5],link[i]->mass2->posZ);
-					ToOutAnything(0,S_linksPos,6,sortie);
+					SetFloat(sortie[0],link[i]->nbr);
+					SetFloat(sortie[1],link[i]->mass1->posX);
+					SetFloat(sortie[2],link[i]->mass1->posY);
+					SetFloat(sortie[3],link[i]->mass1->posZ);
+					SetFloat(sortie[4],link[i]->mass2->posX);
+					SetFloat(sortie[5],link[i]->mass2->posY);
+					SetFloat(sortie[6],link[i]->mass2->posZ);
+					ToOutAnything(0,S_linksPos,7,sortie);
 				}
 			else 		// get all masses speeds
 				for (i=0; i<nb_mass; i++)
 				{
-					SetFloat(sortie[0],mass[i]->speedX);
-					SetFloat(sortie[1],mass[i]->speedY);
-					SetFloat(sortie[2],mass[i]->speedZ);
-					ToOutAnything(0,S_massesSpeeds,3,sortie);
+					SetFloat(sortie[0],mass[i]->nbr);
+					SetFloat(sortie[1],mass[i]->speedX);
+					SetFloat(sortie[2],mass[i]->speedY);
+					SetFloat(sortie[3],mass[i]->speedZ);
+					ToOutAnything(0,S_massesSpeeds,4,sortie);
 				}
 		}
 		else if (auxtype == S_massesPos) // get mass positions
@@ -710,10 +728,11 @@ protected:
 					for (i=0;i<nb_mass;i++)
 						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SetFloat(sortie[0],mass[i]->posX);
-							SetFloat(sortie[1],mass[i]->posY);
-							SetFloat(sortie[2],mass[i]->posZ);
-							ToOutAnything(0,S_massesPosNo,3,sortie);
+							SetFloat(sortie[0],mass[i]->nbr);
+							SetFloat(sortie[1],mass[i]->posX);
+							SetFloat(sortie[2],mass[i]->posY);
+							SetFloat(sortie[3],mass[i]->posZ);
+							ToOutAnything(0,S_massesPosNo,4,sortie);
 						}
 			}
 			else 		//symbol
@@ -725,10 +744,11 @@ protected:
 					{
 						if (auxarg2==mass[i]->Id)
 						{
-							SetFloat(sortie[0],mass[i]->posX);
-							SetFloat(sortie[1],mass[i]->posY);
-							SetFloat(sortie[2],mass[i]->posZ);
-							ToOutAnything(0,S_massesPosId,3,sortie);
+							SetSymbol(sortie[0],mass[i]->Id);
+							SetFloat(sortie[1],mass[i]->posX);
+							SetFloat(sortie[2],mass[i]->posY);
+							SetFloat(sortie[3],mass[i]->posZ);
+							ToOutAnything(0,S_massesPosId,4,sortie);
 						}
 					}
 				}
@@ -742,10 +762,11 @@ protected:
 					for (i=0;i<nb_mass;i++)
 						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SetFloat(sortie[0],mass[i]->out_forceX);
-							SetFloat(sortie[1],mass[i]->out_forceY);
-							SetFloat(sortie[2],mass[i]->out_forceZ);
-							ToOutAnything(0,S_massesForcesNo,3,sortie);
+							SetFloat(sortie[0],mass[i]->nbr);
+							SetFloat(sortie[1],mass[i]->out_forceX);
+							SetFloat(sortie[2],mass[i]->out_forceY);
+							SetFloat(sortie[3],mass[i]->out_forceZ);
+							ToOutAnything(0,S_massesForcesNo,4,sortie);
 						}
 			}
 			else 		//symbol
@@ -757,10 +778,11 @@ protected:
 					{
 						if (auxarg2==mass[i]->Id)
 						{
-							SetFloat(sortie[0],mass[i]->out_forceX);
-							SetFloat(sortie[1],mass[i]->out_forceY);
-							SetFloat(sortie[2],mass[i]->out_forceZ);
-							ToOutAnything(0,S_massesForcesId,3,sortie);
+							SetSymbol(sortie[0],mass[i]->Id);
+							SetFloat(sortie[1],mass[i]->out_forceX);
+							SetFloat(sortie[2],mass[i]->out_forceY);
+							SetFloat(sortie[3],mass[i]->out_forceZ);
+							ToOutAnything(0,S_massesForcesId,4,sortie);
 						}
 					}
 				}
@@ -774,13 +796,14 @@ protected:
 					for (i=0;i<nb_link;i++)
 						if (link[i]->nbr==GetInt(argv[j]))
 						{
-							SetFloat(sortie[0],link[i]->mass1->posX);
-							SetFloat(sortie[1],link[i]->mass1->posY);
-							SetFloat(sortie[2],link[i]->mass1->posZ);
-							SetFloat(sortie[3],link[i]->mass2->posX);
-							SetFloat(sortie[4],link[i]->mass2->posY);
-							SetFloat(sortie[5],link[i]->mass2->posZ);
-							ToOutAnything(0,S_linksPosNo,6,sortie);
+							SetFloat(sortie[0],link[i]->nbr);
+							SetFloat(sortie[1],link[i]->mass1->posX);
+							SetFloat(sortie[2],link[i]->mass1->posY);
+							SetFloat(sortie[3],link[i]->mass1->posZ);
+							SetFloat(sortie[4],link[i]->mass2->posX);
+							SetFloat(sortie[5],link[i]->mass2->posY);
+							SetFloat(sortie[6],link[i]->mass2->posZ);
+							ToOutAnything(0,S_linksPosNo,7,sortie);
 						}
 			}
 			else 		//symbol
@@ -792,13 +815,14 @@ protected:
 					{
 						if (auxarg2==link[i]->Id)
 						{
-							SetFloat(sortie[0],link[i]->mass1->posX);
-							SetFloat(sortie[1],link[i]->mass1->posY);
-							SetFloat(sortie[2],link[i]->mass1->posZ);
-							SetFloat(sortie[3],link[i]->mass2->posX);
-							SetFloat(sortie[4],link[i]->mass2->posY);
-							SetFloat(sortie[5],link[i]->mass2->posZ);
-							ToOutAnything(0,S_linksPosId,6,sortie);
+							SetSymbol(sortie[0],link[i]->Id);
+							SetFloat(sortie[1],link[i]->mass1->posX);
+							SetFloat(sortie[2],link[i]->mass1->posY);
+							SetFloat(sortie[3],link[i]->mass1->posZ);
+							SetFloat(sortie[4],link[i]->mass2->posX);
+							SetFloat(sortie[5],link[i]->mass2->posY);
+							SetFloat(sortie[6],link[i]->mass2->posZ);
+							ToOutAnything(0,S_linksPosId,7,sortie);
 						}
 					}
 				}
@@ -812,10 +836,11 @@ protected:
 					for (i=0;i<nb_mass;i++)
 						if (mass[i]->nbr==GetInt(argv[j]))
 						{
-							SetFloat(sortie[0],mass[i]->speedX);
-							SetFloat(sortie[1],mass[i]->speedY);
-							SetFloat(sortie[2],mass[i]->speedZ);
-							ToOutAnything(0,S_massesSpeedsNo,3,sortie);
+							SetFloat(sortie[0],mass[i]->nbr);
+							SetFloat(sortie[1],mass[i]->speedX);
+							SetFloat(sortie[2],mass[i]->speedY);
+							SetFloat(sortie[3],mass[i]->speedZ);
+							ToOutAnything(0,S_massesSpeedsNo,4,sortie);
 						}
 			}
 			else 		//symbol
@@ -827,10 +852,11 @@ protected:
 					{
 						if (auxarg2==mass[i]->Id)
 						{
-							SetFloat(sortie[0],mass[i]->speedX);
-							SetFloat(sortie[1],mass[i]->speedY);
-							SetFloat(sortie[2],mass[i]->speedZ);
-							ToOutAnything(0,S_massesSpeedsId,3,sortie);
+							SetSymbol(sortie[0],mass[i]->Id);
+							SetFloat(sortie[1],mass[i]->speedX);
+							SetFloat(sortie[2],mass[i]->speedY);
+							SetFloat(sortie[3],mass[i]->speedZ);
+							ToOutAnything(0,S_massesSpeedsId,4,sortie);
 						}
 					}
 				}

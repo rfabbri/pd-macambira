@@ -31,7 +31,6 @@
 #X obj 266 140 - 4;
 #X obj 320 118 / 12.5;
 #X obj 320 141 - 4;
-#X obj 93 69 unpack f f f f f f;
 #X obj 197 117 / 12.5;
 #X obj 197 142 - 4;
 #X obj 123 194 pack f f f;
@@ -40,34 +39,35 @@
 #X obj 371 141 - 4;
 #X obj 266 189 pack f f f;
 #X msg 266 212 \$1 \$2 \$3;
-#X connect 0 0 14 0;
+#X obj 93 69 unpack f f f f f f f;
+#X connect 0 0 22 0;
 #X connect 1 0 2 0;
 #X connect 2 0 8 0;
 #X connect 3 0 4 0;
-#X connect 4 0 17 1;
+#X connect 4 0 16 1;
 #X connect 5 0 7 1;
 #X connect 6 0 9 0;
 #X connect 7 0 6 0;
 #X connect 8 0 7 0;
-#X connect 8 1 17 0;
+#X connect 8 1 16 0;
 #X connect 10 0 11 0;
-#X connect 11 0 21 0;
+#X connect 11 0 20 0;
 #X connect 12 0 13 0;
-#X connect 13 0 21 1;
-#X connect 14 0 1 0;
-#X connect 14 1 3 0;
-#X connect 14 2 15 0;
-#X connect 14 3 10 0;
-#X connect 14 4 12 0;
-#X connect 14 5 19 0;
-#X connect 15 0 16 0;
-#X connect 16 0 17 2;
-#X connect 17 0 18 0;
-#X connect 18 0 9 1;
-#X connect 19 0 20 0;
-#X connect 20 0 21 2;
-#X connect 21 0 22 0;
-#X connect 22 0 9 2;
+#X connect 13 0 20 1;
+#X connect 14 0 15 0;
+#X connect 15 0 16 2;
+#X connect 16 0 17 0;
+#X connect 17 0 9 1;
+#X connect 18 0 19 0;
+#X connect 19 0 20 2;
+#X connect 20 0 21 0;
+#X connect 21 0 9 2;
+#X connect 22 1 1 0;
+#X connect 22 2 3 0;
+#X connect 22 3 14 0;
+#X connect 22 4 10 0;
+#X connect 22 5 12 0;
+#X connect 22 6 18 0;
 #X restore 33 666 pd linkrender;
 #X obj 33 616 msd3D --------------------------------;
 #X msg 62 559 forceZ mob 200;
@@ -90,7 +90,7 @@
 #X msg 466 646 view 4 0 0.5 0 0 0 0 0 1;
 #X obj 312 479 f;
 #X floatatom 333 456 5 0 0 0 - - -;
-#X obj 312 403 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 312 403 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 312 504 forceZ mob \$1;
 #X obj 312 423 metro 65;
@@ -101,9 +101,9 @@
 #X msg 184 82 mass fix 0 100 30 30 40 \, mass fix 0 100 30 70 40 \,
 mass fix 0 100 70 30 40 \, mass fix 0 100 70 70 40;
 #X msg 527 543 posZ fix \$1;
-#X obj 527 402 vsl 15 128 0 70 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 3000 1;
-#X text 573 463 Change altitude of corners;
+#X obj 527 402 vsl 15 128 0 70 0 0 empty empty empty 0 -8 0 8 -262131
+-1 -1 0 1;
+#X text 559 457 Change altitude of corners;
 #X obj 33 427 t b b b;
 #X text 385 455 Amplitude;
 #X text 362 619 Create window;
