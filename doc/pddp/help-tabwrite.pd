@@ -31,7 +31,7 @@
 #X restore 114 508 pd Related_Objects;
 #N canvas 80 0 661 319 More_Info 0;
 #X text 28 257 Also See:;
-#X obj 107 257 all_about_arrays;
+#X obj 107 257 pddp_open all_about_arrays;
 #X text 26 21 In this help document \, the [tabwrite] object is set
 to write values to one of the two arrays you see on your screen. The
 [tabwrite] will just as easily write values to tables buried in the

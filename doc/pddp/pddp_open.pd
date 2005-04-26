@@ -1,0 +1,29 @@
+#N canvas 177 350 518 386 10;
+#X obj 110 4 inlet;
+#X obj 140 168 pwd;
+#X msg 89 227 \; pd open \$1.pd \$2;
+#X obj 89 194 pack s s;
+#X obj 89 139 symbol;
+#X obj 111 113 t a b;
+#X obj 4 2 bng 18 250 50 0 empty empty empty 0 -6 0 8 -44926 -1 -1
+;
+#X obj 3 63 symbol \$1;
+#X obj 61 42 symbol;
+#X text 316 348 released under the GNU GPL;
+#X text 99 334 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 93 65 <-- store the last value so that the GOP bang will open
+it;
+#X text 26 282 This patch opens a patch either from the first argument
+or sent in as a message.;
+#X connect 0 0 5 0;
+#X connect 0 0 8 0;
+#X connect 1 0 3 1;
+#X connect 3 0 2 0;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
+#X connect 5 1 1 0;
+#X connect 6 0 7 0;
+#X connect 7 0 5 0;
+#X connect 8 0 7 1;
+#X coords 0 0 1 1 20 18 1;

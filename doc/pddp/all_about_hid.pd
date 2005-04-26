@@ -1,4 +1,4 @@
-#N canvas 136 163 868 598 10;
+#N canvas 22 63 872 602 10;
 #X obj 5 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
 -66577 0;
 #X obj 821 3 pddp;
@@ -19,9 +19,9 @@ the low end \, or the SensAble PHANTOM 6DOF on the high end.;
 #X text 16 557 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 233 571 released under the GNU GPL;
-#X text 429 558 $Revision: 1.4 $$Date: 2005-04-18 00:33:26 $;
+#X text 429 558 $Revision: 1.5 $$Date: 2005-04-26 05:34:40 $;
 #X text 430 571 $Author: eighthave $;
-#N canvas 0 22 647 451 deprecated 0;
+#N canvas 0 22 663 467 deprecated 0;
 #X text 35 38 The use of these objects is deprecated since the functionality
 that they provide is available in the [hid] object \, which is a unified
 \, cross-platform approach.;
@@ -48,7 +48,7 @@ many different sources. Here are a bunch whose functionality is available
 in the [hid] object \, so it is recommended that you do not use these
 objects any more.;
 #X text 436 176 device type;
-#X text 712 160 latency;
+#X text 674 160 latency;
 #X text 765 176 (Hz);
 #X text 685 176 (ms);
 #X text 435 186 --------------------------------------------------------
@@ -126,3 +126,4 @@ to the 'printing' characters. [keyname] reports Shift \, Ctrl \, Alt
 #X text 435 216 USB mice on Windows or MacOS X;
 #X obj 85 527 darwinhid;
 #X obj 166 527 windowshid;
+#X text 742 160 refresh rate;

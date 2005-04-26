@@ -43,7 +43,7 @@ synonymous.;
 see the help documentation in: doc/2.control.examples/15.arrays.pd
 and doc/5.reference/table.pd;
 #X text 44 487 Also See:;
-#X obj 123 487 all_about_arrays;
+#X obj 123 487 pddp_open all_about_arrays;
 #X text 66 195 3 When you create a table \, an array of 100 elements
 is automatically created inside that table. The name of the table and
 the name of the array are stored separately. This means \, that although

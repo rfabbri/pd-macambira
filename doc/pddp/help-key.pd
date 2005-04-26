@@ -150,7 +150,7 @@ non-printing keys like shift or "F1".;
 events which can depend on the stacking order of windows and/or the
 pointer location. This is dependent on the system.;
 #X text 155 542 - Dave Sabine \, July 11 \, 2003;
-#X obj 281 514 all_about_hid;
+#X obj 281 514 pddp_open all_about_hid;
 #X text 105 515 for more on HIDs:;
 #X connect 17 0 18 0;
 #X connect 18 0 25 0;

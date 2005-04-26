@@ -1,4 +1,4 @@
-#N canvas 252 88 510 630 10;
+#N canvas 252 88 514 634 10;
 #X obj 12 346 ff-gain;
 #X obj 12 385 ff-autocenter;
 #X obj 12 425 ff-spring;
@@ -19,8 +19,7 @@ devices used for remote control surgery. Immersion \, Inc. has almost
 a monopoly on this technology due to a number of patents. These objects
 all work with Immersion technology \, generally known as "TouchSense".
 ;
-#X text 17 584 by Hans-Christoph Steiner <hans@at.or.at>;
-#X text 293 604 updated for Pd version 0.37.1;
+#X text 15 606 updated for Pd version 0.37.1;
 #X text 107 301 Control the pulses and vibrations of a TouchSense (aka
 iFeel) mouse;
 #X text 110 349 Set the overall gain for all force effects;
@@ -39,3 +38,6 @@ and others make TouchSense game controllers.;
 #X text 21 261 Currently \, these objects only work on GNU/Linux. For
 info on how to get it working \, see: http://at.or.at/hans/haptics
 ;
+#X text 88 585 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 305 599 released under the GNU GPL;

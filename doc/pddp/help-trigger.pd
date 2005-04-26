@@ -187,8 +187,8 @@ is:;
 #X restore 477 435 pd related_objects_from_other_libraries;
 #X obj 940 5 pddp;
 #X text 472 463 MORE INFO;
-#X obj 479 490 all_about_data_types;
-#X obj 480 516 all_about_lists_vs_anythings;
+#X obj 479 490 pddp_open all_about_data_types;
+#X obj 480 516 pddp_open all_about_lists_vs_anythings;
 #X obj 822 157 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X text 17 138 "float" = f;

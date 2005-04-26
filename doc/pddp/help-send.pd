@@ -31,7 +31,7 @@
 #X text 188 177 [send13~];
 #X restore 117 499 pd Related_Objects;
 #N canvas 90 1 655 636 More_Info 0;
-#X obj 44 576 all_about_send_n_receive;
+#X obj 44 576 pddp_open all_about_send_n_receive;
 #X text 27 511 There is a lot of information available about [send]
 and [receive] \, but that means there's lots to know! Open the abstraction
 below to learn more...;

@@ -1,7 +1,2 @@
 
-- auto-generate table_of_contents.pd from all all_about_*.pd patches
-
-- make a Pd patch to launch table_of_contents.pd to solve recursive problem
-
-- make [pddp] a patch that opens the filename given as an argument using an
-  internal GOP bang.  For example: [[]pddp all_about_hid].
+- change [pwd] to whatever the object is finally called.

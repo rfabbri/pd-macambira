@@ -30,7 +30,7 @@
 #X obj 350 54 value;
 #X restore 117 499 pd Related_Objects;
 #N canvas 57 0 649 630 More_Info 0;
-#X obj 44 576 all_about_send_n_receive;
+#X obj 44 576 pddp_open all_about_send_n_receive;
 #X text 25 18 MESSAGES AND DATA TYPES;
 #X text 40 41 PD's [send] and [receive] objects can communicate any
 data type that is supported by PD: floats \, anythings \, lists \,

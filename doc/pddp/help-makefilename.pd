@@ -1,10 +1,10 @@
-#N canvas 2 0 609 604 12;
+#N canvas 22 93 613 608 12;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 463 PD Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 85 2 593 608 More_Info 1;
+#N canvas 523 37 597 612 More_Info 0;
 #X text 17 24 COMMON USES;
 #X text 15 417 INNOVATIVE USES;
 #X text 47 47 I believe that this object was developed first to allow
@@ -21,7 +21,7 @@ to disk.;
 #X obj 87 161 + 1;
 #X obj 54 187 makefilename file-%d.aif;
 #X text 20 280 LIMITATIONS;
-#N canvas 175 3 583 599 spaces_and_multiple_variables 0;
+#N canvas 175 22 583 599 spaces_and_multiple_variables 0;
 #X text 25 19 Instead of using spaces \, an underscore will often produce
 a tolerable compromise.;
 #X obj 210 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -106,7 +106,7 @@ which operates 24 hours per day \, every day.;
 #X connect 35 0 17 0;
 #X connect 36 0 25 0;
 #X restore 47 445 pd spaces_and_multiple_variables;
-#N canvas 175 4 503 605 help_with_interfaces 1;
+#N canvas 175 22 507 609 help_with_interfaces 0;
 #X text 17 16 Building user interfaces in PD is a difficult balance
 between usability and performance. PD is not winning any awards for
 usability - let's face it: it's powerful \, it's cool \, and that's
@@ -116,17 +116,16 @@ provide mixed with a few of the conveniences that a graphic environment
 affords.;
 #X obj 17 269 cnv 15 450 300 empty empty empty 20 12 0 14 -261681 -66577
 0;
-#X obj 45 379 tgl 15 0 s_dsp empty DSP 18 7 128 8 -262144 -1 -1 0 1
-;
-#X obj 45 424 vsl 15 128 0 127 0 0 v_slider empty Volume 18 7 128 8
--262144 -1 -1 0 1;
-#X obj 45 401 bng 15 250 50 0 b_panel empty Open_File 18 7 128 8 -262144
+#X obj 45 379 tgl 15 0 s_dsp empty DSP 18 7 0 8 -262144 -1 -1 0 1;
+#X obj 45 424 vsl 15 128 0 127 0 0 v_slider empty Volume 18 7 0 8 -262144
+-1 -1 0 1;
+#X obj 45 401 bng 15 250 50 0 b_panel empty Open_File 18 7 0 8 -262144
 -1 -1;
-#X obj 40 280 cnv 15 400 20 empty d_canvas DSP 20 12 64 8 -233017 -66577
+#X obj 40 280 cnv 15 400 20 empty d_canvas DSP 20 12 0 8 -233017 -66577
 0;
-#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN 20 12 64 8 -233017
+#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN 20 12 0 8 -233017
 -66577 0;
-#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME 20 12 64 8 -233017
+#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME 20 12 0 8 -233017
 -66577 0;
 #X text 187 361 The grey canvases above could;
 #X text 189 383 be used like "status bars" to;
@@ -135,7 +134,7 @@ affords.;
 #X text 188 484 the information in a meaningful;
 #X text 189 505 way.;
 #X text 187 426 the screen.;
-#N canvas 217 9 470 320 look_inside 0;
+#N canvas 217 22 470 320 look_inside 0;
 #X obj 199 14 r b_panel;
 #X obj 235 166 r v_slider;
 #X obj 36 236 s d_canvas;
@@ -190,14 +189,14 @@ ingenuity and compromise -- see below.;
 #X connect 7 0 4 1;
 #X connect 8 0 5 0;
 #X restore 104 513 pd More_Info;
-#N canvas 85 2 393 242 Related_Objects 0;
+#N canvas 85 22 397 246 Related_Objects 0;
 #X text 25 8 Native PD Objects;
 #X text 25 92 Externals and other object libraries;
-#X text 35 125 [strcat];
 #X obj 42 46 symbol;
 #X obj 112 46 int;
 #X obj 156 46 openpanel;
-#X text 34 151 [makesymbol];
+#X obj 31 126 strcat;
+#X obj 32 155 makesymbol;
 #X restore 104 487 pd Related_Objects;
 #X text 38 53 INLETS:;
 #X text 15 197 ARGUMENTS:;

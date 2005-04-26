@@ -31,7 +31,7 @@
 #X restore 114 508 pd Related_Objects;
 #N canvas 80 0 659 614 More_Info 0;
 #X text 46 564 Also See:;
-#X obj 125 564 all_about_arrays;
+#X obj 125 564 pddp_open all_about_arrays;
 #X text 21 8 WHAT IS INTERPOLATION?;
 #X text 38 34 "Interpolation" is a word which described a sophisticated
 way to "connect-the-dots". (This is over simplified \, but effective

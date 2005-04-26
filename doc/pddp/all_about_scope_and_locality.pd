@@ -1,11 +1,11 @@
-#N canvas 129 2 606 486 12;
-#X text 19 14 WHAT IS THIS ALL ABOUT?;
-#X text 31 40 Depending on the complexity of your patches \, you may
+#N canvas 166 111 516 471 10;
+#X text 9 34 WHAT IS THIS ALL ABOUT?;
+#X text 21 60 Depending on the complexity of your patches \, you may
 need to control whether or not messages will be used by only ONE patch
 \, or throughout all open patches. The scope of a message is considered
 either 'local' or 'global'.;
 #N canvas 146 223 606 389 GLOBAL_SCOPE 0;
-#N canvas 0 0 254 169 example_a 0;
+#N canvas 0 22 254 169 example_a 0;
 #X obj 18 9 r foo;
 #X floatatom 18 34 5 0 0 0 - - -;
 #X obj 24 96 r a-foo;
@@ -55,8 +55,8 @@ only have to be active.;
 #X connect 7 0 10 0;
 #X connect 8 0 11 0;
 #X connect 9 0 12 0;
-#X restore 21 137 pd GLOBAL_SCOPE;
-#N canvas 146 2 618 662 LOCAL_SCOPE 0;
+#X restore 11 157 pd GLOBAL_SCOPE;
+#N canvas 146 22 618 662 LOCAL_SCOPE 0;
 #X text 4 9 LOCAL SCOPE -send and receive messages within a SINGLE
 PATCH;
 #X text 13 37 There are many cases where you may want messages to be
@@ -105,7 +105,7 @@ you should see:;
 #X connect 8 0 7 0;
 #X connect 10 0 14 0;
 #X connect 13 0 11 0;
-#X restore 21 166 pd LOCAL_SCOPE;
+#X restore 11 186 pd LOCAL_SCOPE;
 #N canvas 145 31 610 615 INHERITANCE 0;
 #X text 20 18 The word "Inherit" means to "receive a characteristic
 from one's parent".;
@@ -157,14 +157,17 @@ or "inheritance-foo".;
 #X connect 15 0 18 0;
 #X connect 16 0 20 0;
 #X connect 19 0 17 0;
-#X restore 21 197 pd INHERITANCE;
-#X text 26 265 From section 2.6.5 of the PD manual \, Miller Puckette
+#X restore 11 217 pd INHERITANCE;
+#X text 16 285 From section 2.6.5 of the PD manual \, Miller Puckette
 says:;
-#X text 49 296 "Note that the expansion of variables such as \$0 and
+#X text 39 316 "Note that the expansion of variables such as \$0 and
 \$1 only works at the beginning of the symbol. So \, for instance \,
 [rats-$1] will not be expanded. Occasionally you may want to have double
 or triple sustitutions. This can be done one stage at a time by nesting
 abstractions (with each subpatch adding its own $-variable to the begining
 of a symbol and passing that on as agrument to a further abstraction."
 ;
-#X text 17 241 MILLER'S WISDOM;
+#X text 7 261 MILLER'S WISDOM;
+#X obj 4 4 cnv 15 500 20 empty empty all_about_scope_and_locality 20
+10 1 18 -233017 -66577 0;
+#X obj 471 5 pddp;
