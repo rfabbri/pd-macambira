@@ -9,7 +9,7 @@
 #X text 27 470 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 484 released under the GNU GPL;
-#X obj 223 417 all_about_hid;
+#X obj 223 417 pddp_open all_about_hid;
 #X text 114 418 For more info:;
 #X text 17 38 [buttongate] is a simple gate controlled by a HID button.
 You must specify the device and the button which controls the gate.

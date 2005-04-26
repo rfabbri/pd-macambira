@@ -24,7 +24,7 @@ screen size.;
 #X obj 419 10 pddp;
 #X text 178 417 For more info on HIDs:;
 #X text 10 441 by Hans-Christoph Steiner <hans@at.or.at>;
-#X obj 340 417 all_about_hid;
+#X obj 340 417 pddp_open all_about_hid;
 #X text 24 325 Rather than polling like the other HID objects \, [linuxmouse]
 uses a pollfn so it receives events as they happen. A pollfn listens
 to a network socket \, and takes action upon activity. Since all mouse

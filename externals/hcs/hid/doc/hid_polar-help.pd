@@ -6,7 +6,7 @@
 #X floatatom 100 248 5 0 0 0 - - -;
 #X floatatom 100 335 7 0 0 0 radius-> - -;
 #X text 175 375 For more info:;
-#X obj 279 373 all_about_hid_mapping;
+#X obj 279 373 pddp_open all_about_hid_mapping;
 #X obj 100 295 hid_polar;
 #X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
 ;

@@ -14,8 +14,8 @@
 ;
 #X text 218 446 released under the GNU GPL;
 #X text 414 446 $Author: eighthave $;
-#X text 414 433 $Revision: 1.2 $;
-#X obj 348 402 all_about_hid;
+#X text 414 433 $Revision: 1.3 $;
+#X obj 348 402 pddp_open all_about_hid;
 #X text 239 403 For more info:;
 #X msg 220 112 open 3;
 #X msg 225 131 open 5;

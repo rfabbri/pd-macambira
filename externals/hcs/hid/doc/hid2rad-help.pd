@@ -4,7 +4,7 @@
 #X obj 422 3 pddp;
 #X text 254 269 released under the GNU GPL;
 #X text 185 228 For more info:;
-#X obj 289 226 all_about_hid_mapping;
+#X obj 289 226 pddp_open all_about_hid_mapping;
 #X text 40 254 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 300 168 related objects:;

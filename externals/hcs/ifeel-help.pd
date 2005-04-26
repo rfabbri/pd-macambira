@@ -25,7 +25,7 @@
 has a tendency to crash the whole machine. I suspect a bug in the kernel
 module ifeel.o.;
 #X text 13 449 by Hans-Christoph Steiner <hans@at.or.at>;
-#X obj 324 416 all_about_haptics;
+#X obj 324 416 pddp_open all_about_haptics;
 #X text 201 417 For more info:;
 #X msg 251 168 strength 0.56;
 #X msg 234 124 interval 73;

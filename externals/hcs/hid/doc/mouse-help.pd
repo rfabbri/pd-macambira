@@ -113,8 +113,8 @@
 ;
 #X text 228 436 released under the GNU GPL;
 #X text 424 436 $Author: eighthave $;
-#X text 424 423 $Revision: 1.10 $;
-#X obj 526 382 all_about_hid;
+#X text 424 423 $Revision: 1.11 $;
+#X obj 526 382 pddp_open all_about_hid;
 #X text 417 383 For more info:;
 #X obj 601 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;

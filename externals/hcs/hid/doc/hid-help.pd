@@ -51,7 +51,7 @@
 #X text 49 588 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 266 602 released under the GNU GPL;
-#X text 472 589 $Revision: 1.14 $$Date: 2004-11-28 04:59:46 $;
+#X text 472 589 $Revision: 1.15 $$Date: 2005-04-26 03:50:24 $;
 #X text 473 602 $Author: eighthave $;
 #X floatatom 192 439 7 0 0 0 - - -;
 #X msg 428 185 poll 20;
@@ -307,7 +307,7 @@ btn_8 btn_9;
 #X msg 118 121 1;
 #X msg 118 141 0;
 #X obj 868 3 pddp;
-#X obj 716 530 all_about_hid;
+#X obj 716 530 pddp_open all_about_hid;
 #X msg 366 145 print;
 #X obj 247 223 hid 0;
 #X text 429 125 close the device;

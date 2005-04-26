@@ -14,7 +14,7 @@
 -1 -1 0 1;
 #X text 27 43 Inverts the stream of numbers.;
 #X text 98 233 For more info:;
-#X obj 202 231 all_about_hid_mapping;
+#X obj 202 231 pddp_open all_about_hid_mapping;
 #X connect 4 0 6 0;
 #X connect 5 0 8 0;
 #X connect 6 0 5 0;

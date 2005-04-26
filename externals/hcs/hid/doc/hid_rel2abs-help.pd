@@ -19,7 +19,7 @@
 #X obj 252 174 hid_rel2abs 0 100;
 #X obj 73 175 hid_rel2abs -10 10;
 #X text 98 240 For more info:;
-#X obj 202 238 all_about_hid_mapping;
+#X obj 202 238 pddp_open all_about_hid_mapping;
 #X msg 73 129 reset;
 #X msg 284 129 reset;
 #X connect 5 0 10 0;

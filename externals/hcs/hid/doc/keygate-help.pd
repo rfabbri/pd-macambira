@@ -9,7 +9,7 @@
 #X text 33 416 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 250 430 released under the GNU GPL;
-#X obj 237 369 all_about_hid;
+#X obj 237 369 pddp_open all_about_hid;
 #X text 128 370 For more info:;
 #X text 15 207 data to be gated -->;
 #X obj 281 258 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1

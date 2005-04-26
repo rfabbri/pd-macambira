@@ -244,7 +244,7 @@ Devices \, like mice \, joysticks \, tablets \, etc.;
 #X floatatom 220 493 3 0 0 3 hat-Y - -;
 #X floatatom 124 493 5 0 0 3 twist - -;
 #X floatatom 263 492 5 0 0 3 throttle - -;
-#X obj 418 567 all_about_hid;
+#X obj 418 567 pddp_open all_about_hid;
 #X text 309 566 for more info:;
 #X text 13 554 detailed info:;
 #X text 14 605 by Hans-Christoph Steiner <hans@at.or.at>;

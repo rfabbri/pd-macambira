@@ -21,7 +21,7 @@
 #X text 15 126 center:;
 #X obj 323 324 spiral-joystick;
 #X obj 70 335 hid_spiral;
-#X obj 279 406 all_about_hid_mapping;
+#X obj 279 406 pddp_open all_about_hid_mapping;
 #X obj 362 271 hid_polar;
 #X text 24 32 Converts cartesian coordinates(x \, y) to spiral in polar
 coordinates (radius \, angle). The angle is from 0 to 1 The angle 0

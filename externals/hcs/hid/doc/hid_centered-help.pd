@@ -6,7 +6,7 @@
 ;
 #X text 244 334 released under the GNU GPL;
 #X text 98 291 For more info:;
-#X obj 202 289 all_about_hid_mapping;
+#X obj 202 289 pddp_open all_about_hid_mapping;
 #X obj 102 234 hid_centered;
 #X obj 137 105 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1
 1;

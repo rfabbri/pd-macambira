@@ -1,0 +1,23 @@
+#N canvas 320 291 462 312 10;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_average] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 284 released under the GNU GPL;
+#X floatatom 153 104 5 0 0 0 - - -;
+#X floatatom 153 180 5 0 0 0 - - -;
+#X obj 156 85 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 156 197 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 98 233 For more info:;
+#X obj 202 231 pddp_open all_about_hid_mapping;
+#X obj 153 150 hid_average;
+#X text 18 36 Smooths a stream of numbers using weighted averaging.
+By default \, the average is the last 10 values. You can set this using
+an argument or the right inlet.;
+#X connect 4 0 10 0;
+#X connect 5 0 7 0;
+#X connect 6 0 4 0;
+#X connect 10 0 5 0;
