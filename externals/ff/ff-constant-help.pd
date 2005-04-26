@@ -62,7 +62,7 @@
 -1 -1;
 #X obj 3 3 cnv 15 850 30 empty empty [ff-constant] 15 15 1 18 -262131
 -1 0;
-#X obj 642 111 all_about_haptics;
+#X obj 642 111 pddp_open all_about_haptics;
 #X text 530 110 For more info:;
 #X text 394 556 <-- arguments are: device# direction duration level
 ;

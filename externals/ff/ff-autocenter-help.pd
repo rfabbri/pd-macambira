@@ -11,7 +11,7 @@ controlled used [ff-gain].;
 #X text 19 102 creation arguments are device number (i.e. 0 for /dev/input/event0)
 and autocenter amount. This effects all effects for that device;
 #X obj 77 277 ff-autocenter 0 0;
-#X obj 303 323 all_about_haptics;
+#X obj 303 323 pddp_open all_about_haptics;
 #X text 190 325 For more info:;
 #X msg 77 197 0.5;
 #X connect 1 0 6 0;

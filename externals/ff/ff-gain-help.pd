@@ -5,7 +5,7 @@
 #X obj 3 3 cnv 15 450 30 empty empty [ff-gain] 4 12 1 18 -261689 -1
 0;
 #X obj 123 254 ff-gain 0 0.5;
-#X obj 320 326 all_about_haptics;
+#X obj 320 326 pddp_open all_about_haptics;
 #X text 214 326 For more info:;
 #X msg 123 178 0.9;
 #X text 24 102 Creation arguments are device number (i.e. 0 for /dev/input/event0)

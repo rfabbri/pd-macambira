@@ -92,7 +92,7 @@
 -1 if it is not loaded.;
 #X floatatom 319 603 5 0 0 0 - - -;
 #X text 554 107 For more info:;
-#X obj 663 106 all_about_haptics;
+#X obj 663 106 pddp_open all_about_haptics;
 #X text 300 335 minimum time;
 #X text 300 350 between triggers;
 #X text 422 56 [ff-periodic] generates a periodic force \, basically

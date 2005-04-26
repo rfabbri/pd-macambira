@@ -98,7 +98,7 @@ the parameters for each direction.;
 -233017 -1 -1 19996.7 256;
 #X obj 3 3 cnv 15 850 30 empty empty [ff-spring] 15 15 1 18 -257472
 -1 0;
-#X obj 568 135 all_about_haptics;
+#X obj 568 135 pddp_open all_about_haptics;
 #X text 456 134 For more info:;
 #X text 415 599 arguments are: device# duration right- left- up- down-level
 ;
