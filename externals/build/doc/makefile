@@ -9,7 +9,8 @@ DOC_DIR = .
 all:
 #----------------------------------------------------------------------------
 # all standard objs' help files
-	cp -p ../../OSCx/doc/*.pd \
+	install -p -m0644 \
+			 ../../OSCx/doc/*.pd \
 			../../control/*/*.pd \
 			../../signal/*/*.pd \
 			../../aenv~/*.pd \
@@ -56,15 +57,21 @@ all:
 # IEMlib uses its own dir and since its not maintained in CVS
 # its best not to change the objects
 	install -d -m0755 $(DOC_DIR)/iemhelp
-	cp -p ../../iemlib/iemhelp/*.* $(DOC_DIR)/iemhelp
+	install -p -m0644 ../../iemlib/iemhelp/*.* $(DOC_DIR)/iemhelp
 #----------------------------------------------------------------------------
+# PMDP examples
+	install -d -m0755  $(DOC_DIR)/pmpd
 # pmpd exemples files has to go in an other directory
-	cp -Rp ../../pmpd/exemples $(DOC_DIR)/pmpd
+	install -p -m0644 ../../pmpd/exemples/*.pd $(DOC_DIR)/pmpd
 # pmpd documentation
 	cp -Rp ../../pmpd/doc $(DOC_DIR)/pmpd/doc
 #----------------------------------------------------------------------------
 # zexy uses its own dir
-	cp -Rp ../../zexy/examples $(DOC_DIR)/zexy
+	install -d -m0755 $(DOC_DIR)/zexy
+	install -p -m0444 ../../zexy/zexy.pd  $(DOC_DIR)
+	install -p -m0644 ../../zexy/examples/*.* $(DOC_DIR)/zexy
+
+
 #----------------------------------------------------------------------------
 # remove help files for objects that are not included due to conflicts, etc.
 #
@@ -74,8 +81,8 @@ all:
 	rm help-split.pd
 #----------------------------------------------------------------------------
 # no need to have pd patches executable or writable
-	chmod a-x *.pd
-	chmod -R a-w *
+	chmod a-x *.pd */*.pd
+	chmod a-w ????*/*.* *.pd *.txt
 
 
 #----------------------------------------------------------------------------
