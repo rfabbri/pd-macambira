@@ -134,6 +134,12 @@ start-point and start-value.
 
 [infinitepot] for use with a [knob] or any single axis that could be infinite.
 
+[hid_debounce]
+
+peak finder object
+
+"kalman filters"
+
 
  /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
