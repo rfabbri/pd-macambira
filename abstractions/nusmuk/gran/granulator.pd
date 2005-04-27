@@ -115,8 +115,8 @@
 #X obj 51 837 outlet~;
 #X text 228 42 table \, taille de la table \, position (0 \, 1) \,
 aleat \, taille du grain \, aleat \, freq relative \, aleat;
-#X obj 411 819 print granulator;
-#X msg 411 796 buffer overflow : please add some more grain!;
+#X obj 411 820 print granulator;
+#X msg 411 797 buffer overflow : please add some more grain!;
 #N canvas 0 0 450 300 ch_grain 0;
 #X obj 160 657 line~;
 #X msg 64 415 set \$1;
@@ -6897,8 +6897,10 @@ aleat \, taille du grain \, aleat \, freq relative \, aleat \, amplitude
 #X connect 16 1 17 0;
 #X connect 17 0 1 0;
 #X connect 17 1 18 0;
+#X connect 18 0 1 0;
 #X connect 18 1 19 0;
 #X connect 19 0 1 0;
+#X connect 19 1 28 0;
 #X connect 20 0 1 0;
 #X connect 20 1 13 0;
 #X connect 21 0 1 0;
