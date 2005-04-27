@@ -50,7 +50,7 @@
 # define fabsf fabs
 #endif
 
-typedef long double t_matrixfloat;
+typedef double t_matrixfloat;
 
 
 /* the main class...*/
