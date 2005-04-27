@@ -1,4 +1,4 @@
-#N canvas 304 56 896 578 10;
+#N canvas 304 56 900 582 10;
 #N canvas 0 22 450 300 graph1 0;
 #X array cuberoot 100 float 0;
 #X coords 0 1 99 0 100 100 1;
@@ -113,7 +113,7 @@ scale;
 #X text 22 530 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 239 544 released under the GNU GPL;
-#X text 445 531 $Revision: 1.6 $$Date: 2005-04-18 00:33:26 $;
+#X text 445 531 $Revision: 1.7 $$Date: 2005-04-27 20:22:20 $;
 #X text 446 544 $Author: eighthave $;
 #X obj 88 167 hid_average;
 #X text 1 83 SCALING AND RANGING;
@@ -128,9 +128,8 @@ scale;
 #X text 371 473 - pitch is perceived on logarithmic scale;
 #X text 371 496 - many sensors work best on other curves;
 #X text 1 286 POLAR COORDINATES;
-#X obj 84 303 hid_degrees;
 #X obj 9 303 hid_polar;
-#X obj 174 303 hid_spiral;
+#X obj 80 303 hid_spiral;
 #X obj 10 350 hid2rad;
 #X obj 130 350 hid2deg;
 #X obj 70 350 rad2hid;

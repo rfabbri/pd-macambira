@@ -1,64 +1,48 @@
-#N canvas 59 5 829 645 10;
-#X msg 28 525 bang;
-#X obj 25 13 until;
-#X obj 28 546 until;
-#X text 59 525 start;
-#X obj 28 568 f;
-#X obj 57 568 + 1;
-#X obj 103 570 sel 0;
-#X obj 28 612 print;
-#X obj 57 590 mod 10;
-#X text 19 42 Every modern programming language will have various "looping"
+#N canvas 272 105 879 604 10;
+#X obj 13 49 until;
+#X text 7 78 Every modern programming language will have various "looping"
 mechanisms: either in the form of an object \, or as a data structure.
 For example in Visual Basic:;
-#X text 30 100 DO UNTIL i = 100;
-#X text 30 114 i = i + 1;
-#X text 31 85 i = 0;
-#X text 30 129 LOOP;
-#X text 15 210 And now PD's version of the above programming structures:
+#X text 18 145 DO UNTIL i = 100;
+#X text 18 159 i = i + 1;
+#X text 19 130 i = 0;
+#X text 18 174 LOOP;
+#X text 3 285 And now PD's version of the above programming structures:
 ;
-#X obj 24 257 until;
-#X msg 24 237 100;
-#X obj 24 277 print i;
-#X text 17 304 If you start [until] with a "bang" \, it will begin
-an infinite loop! Please plan ahead in this case so that there is a
-mechanism in place to stop the loop - otherwise PD will effectively
-freeze.;
-#X text 17 361 HOW TO FREEZE PD;
-#X msg 25 384 bang;
-#X obj 25 404 until;
-#X obj 25 424 print;
-#X text 63 384 DO NOT CLICK. DO NOT CLICK. DO NOT CLICK.;
-#X text 66 404 If you click \, click the "close window" (X) button
-on PD's terminal window - or reboot the computer.;
-#X text 17 145 OR:;
-#X text 29 161 FOR i = 0 TO 100;
-#X text 28 187 NEXT;
-#X text 29 175 ' do something;
-#X text 26 493 The example below includes a method to stop the loop
-to prevent PD from looping infinitely.;
-#X text 434 44 If you start [until] with a number \, it iterates that
+#X obj 12 332 until;
+#X msg 12 312 100;
+#X obj 12 352 print i;
+#X text 5 379 If you start [until] with a "bang" \, it will begin an
+infinite loop! Please plan ahead in this case so that there is a mechanism
+in place to stop the loop - otherwise PD will effectively freeze.;
+#X text 5 446 HOW TO FREEZE PD;
+#X msg 13 469 bang;
+#X obj 13 489 until;
+#X obj 13 509 print;
+#X text 51 469 DO NOT CLICK. DO NOT CLICK. DO NOT CLICK.;
+#X text 5 200 OR:;
+#X text 17 226 FOR i = 0 TO 100;
+#X text 16 252 NEXT;
+#X text 17 240 ' do something;
+#X text 439 240 If you start [until] with a number \, it iterates that
 number of times. The [uzi] object in MAX works the same way.;
-#X obj 441 131 until;
-#X msg 441 84 100;
-#X obj 441 151 print i;
-#X msg 469 91 3;
-#X msg 497 98 42;
-#X text 26 451 The [until] object's left inlet starts a loop in which
+#X obj 496 328 until;
+#X msg 496 281 100;
+#X obj 496 348 print i;
+#X msg 524 288 3;
+#X msg 552 295 42;
+#X text 14 536 The [until] object's left inlet starts a loop in which
 it outputs "bang" until its right inlet gets a "bang" which stops it.
 ;
-#X obj 413 17 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 418 44 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 413 605 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 418 571 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 67 13 - LOOPing mechanism;
-#X text 442 580 This document was updated for PD version 0.35 test
-26 by Dave Sabine as part of a project called pddp proposed by Krzysztof
-Czaja to build comprehensive documentation for PD.;
-#X text 436 185 RELATED OBJECTS;
-#X text 441 204 ?? This author does not know of any other native looping
+#X text 55 49 - LOOPing mechanism;
+#X text 441 381 RELATED OBJECTS;
+#X text 446 400 ?? This author does not know of any other native looping
 mechanisms in PD.;
-#N canvas 0 0 452 302 related_objects_from_other_libraries 0;
+#N canvas 0 22 452 302 related_objects_from_other_libraries 0;
 #X text 27 63 These objects are offered in PD only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
@@ -72,21 +56,40 @@ is:;
 #X obj 90 32 counter;
 #X obj 150 32 gem_counter;
 #X obj 250 32 modulo_counter;
-#X restore 449 244 pd related_objects_from_other_libraries;
-#X connect 0 0 2 0;
-#X connect 2 0 4 0;
-#X connect 4 0 5 0;
-#X connect 4 0 7 0;
-#X connect 5 0 8 0;
-#X connect 6 0 2 1;
-#X connect 8 0 4 1;
-#X connect 8 0 6 0;
-#X connect 15 0 17 0;
-#X connect 16 0 15 0;
-#X connect 20 0 21 0;
-#X connect 21 0 22 0;
-#X connect 31 0 33 0;
-#X connect 32 0 31 0;
-#X connect 34 0 31 0;
-#X connect 35 0 31 0;
-#X connect 37 0 38 0;
+#X restore 454 440 pd related_objects_from_other_libraries;
+#X obj 486 513 pddp_open all_about_looping;
+#X text 450 490 For more info:;
+#X msg 496 110 bang;
+#X obj 496 131 until;
+#X text 527 110 start;
+#X obj 496 153 f;
+#X obj 525 153 + 1;
+#X obj 571 155 sel 0;
+#X obj 496 197 print;
+#X obj 525 175 mod 10;
+#X text 444 58 The example below includes a method to stop the loop
+to prevent PD from looping infinitely.;
+#X text 54 489 If you click \, kill Pd or reboot the computer.;
+#X text 447 546 This document was updated for PD version 0.35 test
+26 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for PD.;
+#X obj 2 2 cnv 15 870 20 empty empty [until] 20 10 1 18 -233017 -66577
+0;
+#X obj 821 3 pddp;
+#X connect 7 0 9 0;
+#X connect 8 0 7 0;
+#X connect 12 0 13 0;
+#X connect 13 0 14 0;
+#X connect 21 0 23 0;
+#X connect 22 0 21 0;
+#X connect 24 0 21 0;
+#X connect 25 0 21 0;
+#X connect 27 0 28 0;
+#X connect 35 0 36 0;
+#X connect 36 0 38 0;
+#X connect 38 0 39 0;
+#X connect 38 0 41 0;
+#X connect 39 0 42 0;
+#X connect 40 0 36 1;
+#X connect 42 0 38 1;
+#X connect 42 0 40 0;
