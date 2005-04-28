@@ -337,55 +337,55 @@ t_int hid_get_events(t_hid *x)
  */
 					case 0: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 					case 1: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 2: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 3: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 4: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 					case 5: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 6: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 7: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 8: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+						hid_output_event(x,type,code,(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 				}
-				hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+				hid_output_event(x,type,code,(t_float)value);
 				break;
 			default:
 				convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
-				hid_output_event(x,type,code,(t_float)value,(t_float)(event.timestamp).lo);
+				hid_output_event(x,type,code,(t_float)value);
 		}
 
 //		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
