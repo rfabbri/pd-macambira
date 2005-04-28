@@ -1,0 +1,14 @@
+#N canvas 38 95 466 565 10;
+#X obj 2 2 cnv 15 450 20 empty empty glossary 2 11 1 18 -233017 -66577
+0;
+#X obj 418 3 pddp;
+#X text 6 63 "atom";
+#X text 9 88 "bang";
+#X text 15 111 "float";
+#X text 11 223 "symbol";
+#X text 11 210 "selector";
+#X text 11 153 "list";
+#X text 8 45 "anything";
+#X text 11 190 "pointer";
+#X text 8 131 "inlet";
+#X text 12 171 "outlet";

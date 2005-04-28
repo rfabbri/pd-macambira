@@ -1,0 +1,98 @@
+#N canvas 2 1 650 610 12;
+#X obj 114 560 pddp;
+#X obj 8 3 cnv 15 90 578 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 14 223 ARGUMENTS:;
+#X text 20 303 EXAMPLES:;
+#X text 22 471 SEE ALSO:;
+#N canvas 58 0 407 256 Related_Objects 0;
+#X text 25 11 Native Pd Objects;
+#X text 16 166 Externals and other object libraries;
+#X obj 16 41 tabread~;
+#X obj 90 41 tabread4;
+#X obj 240 41 tabwrite~;
+#X obj 16 67 tabsend~;
+#X obj 92 67 tabreceive~;
+#X obj 192 67 tabplay~;
+#X obj 269 67 table;
+#X text 15 124 [array];
+#X obj 16 94 soundfiler;
+#X text 78 124 and fft objects.;
+#X text 21 187 [tabdump];
+#X obj 112 94 tabread4~;
+#X text 20 207 [tabenv];
+#X obj 203 94 getsize;
+#X obj 274 94 setsize;
+#X text 238 207 [arraysize];
+#X text 238 186 [score];
+#X text 114 186 [linear_path];
+#X text 114 207 [plot];
+#X obj 165 41 tabread;
+#X restore 114 508 pd Related_Objects;
+#N canvas 80 0 661 319 More_Info 0;
+#X text 28 257 Also See:;
+#X obj 107 257 pddp_open all_about_arrays;
+#X text 26 21 In this help document \, the [tabwrite] object is set
+to write values to one of the two arrays you see on your screen. The
+[tabwrite] will just as easily write values to tables buried in the
+[table] object. This terminology is somewhat confusing \, but the objects
+"array" and "table" exist separately because they offer different speeds
+of performance.;
+#X text 25 150 For example \, the;
+#X obj 163 150 tabread;
+#X text 229 150 documentation shows similar;
+#X text 24 169 functionality using [table] instead of array. In this
+particular document \, I chose to sacrifice speed for the sake of visually
+displaying the effectiveness of [tabwrite].;
+#X restore 114 534 pd More_Info;
+#X obj 32 10 tabread;
+#X floatatom 303 407 0 0 99 1 index - -;
+#X text 29 278 OUTLETS:;
+#X text 107 303 Open the tables and use your mouse to draw new values
+in the arrays - otherwise [tabread] will always output "0".;
+#X text 39 34 INLETS:;
+#X text 112 470 doc/2.control.examples/15.arrays.pd;
+#X text 113 489 doc/2.control.examples/16.more.arrays.pd;
+#X text 111 10 - WRITE NUMBERS TO A TABLE;
+#X text 38 50 - LEFT:;
+#X text 107 51 Float - A float at the left inlet will become the new
+value of the chosen index (whichever index is currently selected at
+the right inlet).;
+#X text 105 101 List - The left inlet also accepts pairs of floats
+(longer lists will be truncated). A number pair represents "value"
+and "index" - corresponding to "left" and "right" inlets.;
+#X text 105 151 Set - the "set <arrayname>" message allows you to write
+to dynamic locations. You can change the table at any time using the
+"set" message.;
+#X text 158 561 - Dave Sabine \, April 29 \, 2003;
+#X text 29 203 - RIGHT:;
+#X text 104 203 Float - selects which index in which to write the new
+value.;
+#X text 105 223 One - the argument informs [tabwrite] which array to
+write to. The array must exist in an open Pd patch/canvas or an error
+message will appear in the terminal window.;
+#X text 104 277 None.;
+#X obj 161 437 tabwrite davids_array;
+#X msg 220 375 set another_array;
+#X msg 204 346 set davids_array;
+#X floatatom 148 381 0 0 0 0 value - -;
+#N canvas 0 0 450 300 graph12 0;
+#X array davids_array 100 float 1;
+#A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.75 0 0 0 0 0
+0 0 0;
+#X coords 0 1 99 -1 100 70 1;
+#X restore 528 343 graph;
+#N canvas 0 0 450 300 graph12 0;
+#X array another_array 100 float 1;
+#A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 -0.67 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0;
+#X coords 0 1 99 -1 100 70 1;
+#X restore 528 417 graph;
+#X connect 8 0 24 1;
+#X connect 25 0 24 0;
+#X connect 26 0 24 0;
+#X connect 27 0 24 0;

@@ -10,7 +10,7 @@ message sent within a single patch - from a [send] object to a [receive]
 object in the same patch. But the functionality of these objects goes
 far beyond the scope of a single patch.;
 #X text 10 385 A [send] object is a little like a radio station...it
-broadcasts information throughout PD \, for all the [receives] to hear!
+broadcasts information throughout Pd \, for all the [receives] to hear!
 A [receive] object is a little like your own AM/FM tuner...it will
 receive messages from all the [send] objects that it is 'tuned' to.
 Hence \, naming your [send] and [receive] objects becomes very important.
@@ -75,7 +75,7 @@ with send and receives objects.;
 -1 -1 0 256;
 #X text 310 360 These number boxes are linked together via their 'send'
 or 'receive' property.;
-#X text 298 8 Some objects in PD contain their own internal send and
+#X text 298 8 Some objects in Pd contain their own internal send and
 receive functionality.;
 #X connect 23 0 25 0;
 #X connect 26 0 24 0;

@@ -1,0 +1,50 @@
+#N canvas 39 7 462 531 10;
+#X obj 22 294 metro 500;
+#X obj 37 13 metro;
+#X floatatom 71 271 4 0 0;
+#X msg 22 176 1;
+#X text 67 185 nonzero number or "bang" to start;
+#X msg 39 223 0;
+#X msg 28 199 bang;
+#X msg 39 245 stop;
+#X text 111 270 right inlet sets the rate in msec per tick.;
+#X text 76 13 -- send "bang" periodically ala metronome.;
+#X text 19 89 [metro]'s left inlet accepts four different messages:
+;
+#X text 22 105 - "bang": starts the metro/turns it on.;
+#X text 22 118 - "stop": stops the metro/turns it off.;
+#X obj 22 317 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 21 45 The metro object sends a series of bangs at a constant
+rate which is defined in milliseconds at the right inlet or in the
+creation argument.;
+#X text 22 131 - Non-Zero number: starts the metro/turns it on.;
+#X text 22 143 - 0 (zero): stops the metro/turns it off.;
+#X text 78 233 zero or "stop" to stop;
+#X text 90 293 optional creation argument initializes rate in msec
+;
+#X text 19 348 RELATED OBJECTS;
+#N canvas 0 0 454 304 related_objects_from_other_libraries 0;
+#X obj 35 27 metroplus;
+#X obj 102 27 t3_metro;
+#X obj 164 27 pulse;
+#X text 18 56 These objects are offered in Pd only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 17 105 The best places to find information about Pd's libraries
+is:;
+#X text 14 127 www.puredata.org and click on "Downloads" then "Software"
+;
+#X text 15 143 or;
+#X text 16 157 iem.kug.ac.at/pdb/;
+#X obj 210 25 exciter;
+#X restore 23 372 pd related_objects_from_other_libraries;
+#X text 18 402 This document was updated for Pd version 0.35 test 28
+by Dave Sabine as part of a project called pddp proposed to build comprehensive
+documentation for Pd.;
+#X connect 0 0 13 0;
+#X connect 2 0 0 1;
+#X connect 3 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;

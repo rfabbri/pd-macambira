@@ -6,7 +6,7 @@ to be "a sequence of objects all of which have the same variable type"
 wherein each object is called an element and the elements are numbered
 in a row 0 \, 1 \, 2 \, 3 \, etc. These numbers are called indices.
 Each index holds a corresponding value.;
-#X text 46 222 Arrays in PD look like this:;
+#X text 46 222 Arrays in Pd look like this:;
 #N canvas 0 0 450 300 graph18 0;
 #X array example_array 100 float 0;
 #X coords 0 1 99 -1 200 140 1;
@@ -17,18 +17,18 @@ called "array".;
 #X text 64 543 2 Then right-click again on the array and select "Help"
 from the menu. The window that opens is the table.pd help document.
 ;
-#X text 45 148 All of this is true in PD \, except that arrays in PD
-can only hold floating point data. (other data types in PD are called
+#X text 45 148 All of this is true in Pd \, except that arrays in Pd
+can only hold floating point data. (other data types in Pd are called
 "lists" or "anythings" and require different tools to manipulate them.)
 ;
 #X text 45 378 The array above is actually only the horizontal line!
 The rectangle surrounding the array is called a "graph". These two
-objects are separate \, but PD creates both simoultaneously for purposes
+objects are separate \, but Pd creates both simoultaneously for purposes
 of convenience. These two objects together are called a "table". To
 see what I mean by all of this:;
 #X restore 43 42 pd What_is_an_array_in_PD;
 #N canvas 118 1 608 615 How_to_manipulate_arrays_in_PD 0;
-#X text 13 5 HOW TO MANIPULATE ARRAYS IN PD;
+#X text 13 5 HOW TO MANIPULATE ARRAYS IN Pd;
 #N canvas 0 0 452 302 graph28 0;
 #X array exampleArray 67 float 0;
 #X coords 0 2 67 -2 200 140 1;
@@ -149,7 +149,7 @@ with the contents of exampleArray and concatArray.;
 #X text 29 37 In some other programming environments \, including Visual
 Basic and Java (among others) \, there are functions which join all
 elements of an array into a list. This example shows how this functionality
-can be duplicated in PD. This example uses the elements of exampleArray
+can be duplicated in Pd. This example uses the elements of exampleArray
 from the previous help window. The list can either be printed to the
 terminal window \, or it can be saved to a text file.;
 #X obj 23 214 t f b;
@@ -182,9 +182,9 @@ terminal window \, or it can be saved to a text file.;
 #N canvas 2 29 719 337 Getting_the_size_of_an_array 0;
 #X text 15 11 GETTING THE SIZE OF AN ARRAY;
 #X text 34 34 If you deal with arrays often \, you will want to download
-the [arraysize] external written by PIX. PD lacks a native object for
+the [arraysize] external written by PIX. Pd lacks a native object for
 this purpose and I'm afraid that without this external this functionality
-is impossible in PD.;
+is impossible in Pd.;
 #X obj 38 127 arraysize exampleArray;
 #X obj 38 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -425,17 +425,17 @@ element of the array and return its value. This is opposite of the
 #X connect 45 0 43 0;
 #X connect 46 0 9 1;
 #X restore 24 449 pd Shifting_an_array;
-#X text 25 32 Arrays in PD are different than the arrays in other languages
-primarily because \, in PD \, they are designed to be displayed graphically
+#X text 25 32 Arrays in Pd are different than the arrays in other languages
+primarily because \, in Pd \, they are designed to be displayed graphically
 on screen. This is due to the nature of audio synthesis - we want to
 see our wave forms and visually understand the data. That's why arrays
-in PD are complicated by other objects like tables \, graphs and widgets.
+in Pd are complicated by other objects like tables \, graphs and widgets.
 PD uses these objects to provide a graphic representation of the array
 data. If you're not interested in seeing the array data within your
 PD patch \, you can use the [table] object to store the array and corresponding
 table in a sub-window. Note that [table]s are more CPU friendly than
 their graphical counterpart.;
-#X text 26 230 Like all programming languages \, PD provides numerous
+#X text 26 230 Like all programming languages \, Pd provides numerous
 tools to manipulate arrays and their data.;
 #N canvas 3 32 718 310 Setting_a_constant_array_value 0;
 #X floatatom 26 151 0 0 0 0 - - -;
@@ -443,7 +443,7 @@ tools to manipulate arrays and their data.;
 #X msg 26 215 \; exampleArray const \$1;
 #X text 18 16 SETTING A CONSTANT ARRAY VALUE;
 #X text 27 46 By default \, all array element values are zero. However
-\, PD allows you to change that using the "CONST" message.;
+\, Pd allows you to change that using the "CONST" message.;
 #X text 26 88 This feature is useful to reset all values in an array
 \, or with a little creativity can be used to "delete" a slice \, or
 create silence in audio samples.;
@@ -467,7 +467,7 @@ will be normalized);
 #X msg 40 210 \; exampleArray sinesum 64 1;
 #X text 26 7 SINE WAVES;
 #X text 29 30 comment;
-#X text 45 29 When the "sinesum" message is sent to the array \, PD
+#X text 45 29 When the "sinesum" message is sent to the array \, Pd
 will want to know two things:;
 #X text 58 65 1 How many samples (array elements) should be used? The
 higher the number is \, the higher the resolution of the wave form.
@@ -484,12 +484,12 @@ these wave forms as analog instruments do.;
 #X restore 7 42 pd sine_waves;
 #X text 141 26 Audio signals in a digital realm are created using a
 series of samples. It is digitally possible to create extremely angular
-wave forms using PD arrays \, but the aural result is sometimes distorted
+wave forms using Pd arrays \, but the aural result is sometimes distorted
 and unpleasant. Hence \, higher math functions help our digital tools
 to produce data which can effectively be converted to analog signals
 similar to those of our electronic and mechanical predecessors. The
 first and one of the most important mathematic functions in digital
-synthesis is undoubtebly "sinesum". PD provides an easy method for
+synthesis is undoubtebly "sinesum". Pd provides an easy method for
 us to integrate these higher math functions in our arrays.;
 #N canvas 0 195 750 302 cosine_waves 0;
 #X text 11 22 Cosinesum;
@@ -503,7 +503,7 @@ us to integrate these higher math functions in our arrays.;
 #X restore 6 73 pd cosine_waves;
 #X text 222 257 To normalize an audio signal means to alter the average
 amplitude of the signal. For the sake of clear \, undistored sounds
-\, PD would like all of your audio signals to never exceed 1 or -1
+\, Pd would like all of your audio signals to never exceed 1 or -1
 The first step in achieving this is "normalization" \, but can be assisted
 by more drastic tools like compressors \, limiters \, gain multipliers
 \, etc.;
@@ -520,10 +520,10 @@ by more drastic tools like compressors \, limiters \, gain multipliers
 #X obj 475 89 openpanel;
 #X msg 475 113 \; exampleArray read \$1;
 #X text 26 29 Using text files can be helpful in saving or loading
-arrays in PD. Note that the "read" message does not resize your array
+arrays in Pd. Note that the "read" message does not resize your array
 automatically.;
 #X text 29 160 Audio files can be treated in similar ways by incorporating
-the [soundfiler] object. The soundfiler object provides PD with tools
+the [soundfiler] object. The soundfiler object provides Pd with tools
 to automatically resize arrays \, and read/write audio files in a variety
 of formats.;
 #X obj 77 231 openpanel;
@@ -575,7 +575,7 @@ of formats.;
 #X restore 24 526 pd Files_and_arrays;
 #N canvas 0 0 719 423 Additional_tools 0;
 #X text 18 14 ADDITIONAL TOOLS;
-#X text 29 38 The "array" object in PD accepts special messages to
+#X text 29 38 The "array" object in Pd accepts special messages to
 alter the appearance of the array on screen.;
 #X text 19 81 Arrays can be renamed:;
 #X msg 203 78 \; exampleArray rename george;
@@ -599,7 +599,7 @@ Give a y value and a bunch of x values or vice versa:;
 #X restore 24 553 pd Additional_tools;
 #N canvas 4 29 717 375 Populating_an_array 0;
 #X text 27 12 POPULATING AN ARRAY;
-#X text 41 37 An array in PD is primarily a storage device for numbers.
+#X text 41 37 An array in Pd is primarily a storage device for numbers.
 The result is a series of numbers that you can do with whatever you
 wish...but how does one populate an array?;
 #X text 53 185 list element 1 = array[0];
@@ -618,7 +618,7 @@ than your list \, then your list will be truncated.;
 #X restore 41 173 pd How_to_manipulate_arrays_in_PD;
 #N canvas 132 0 587 609 How_to_create_an_array_in_PD 0;
 #X text 22 9 1 Select "array" from the "Put" menu above.;
-#X text 21 288 4 If you want PD to create a new graph for this array
+#X text 21 288 4 If you want Pd to create a new graph for this array
 \, then select "in new graph". If you have another location in mind
 -- for example if you want to overlap two arrays in a single graph
 \, then select "in last graph".;
@@ -643,7 +643,7 @@ small arrays...larger arrays should be saved to either a text file
 \, or an audio file.;
 #X restore 42 106 pd How_to_create_an_array_in_PD;
 #N canvas 133 1 646 607 Common_uses_for_arrays_in_PD 0;
-#X text 27 26 COMMON USES FOR ARRAYS IN PD;
+#X text 27 26 COMMON USES FOR ARRAYS IN Pd;
 #X text 49 60 Arrays are versatile. Their simple structure make them
 useful in countless situations. This page discusses perhaps the most
 common applications.;
@@ -653,12 +653,12 @@ common applications.;
 range \, such as pitch benders.;
 #X text 50 306 3 Envelopes: an array with four elements can be used
 effectively as an ADSR enveloper. There are numerous examples of this
-in other PD help documents.;
+in other Pd help documents.;
 #X text 53 377 4 Math and conversion tables: arrays are an excellent
 visual tool when performing fourier analysis and other higher mathematic
 functions.;
 #X text 54 450 5 Wave editing: with proper manipulation of array data
-\, PD can be fully functional wave editor \, complete with mouse-clickable
+\, Pd can be fully functional wave editor \, complete with mouse-clickable
 cut-n-paste \, pitch-shift \, time expansion \, down/upsampling \,
 and other tools typically found in commercial wave editors.;
 #X text 49 128 1 Audio sample data: when an array's values are limited
@@ -670,7 +670,7 @@ text.;
 #X text 39 309 NOTE: I strongly recommend that you download the [arraysize]
 external to your "pd/extra" folder before continuing. Some of these
 examples are impossible without it -- I personally feel that [arraysize]
-should be considered for permanent inclusion in future PD distributions.
+should be considered for permanent inclusion in future Pd distributions.
 Check the CVS Repository or Pure-data.org for [arraysize].;
 #X text 40 459 This document is meant to supplement the help documentation
 for [table] \, [tabread] \, [tabwrite] \, [soundfiler] \, [tabsend~]

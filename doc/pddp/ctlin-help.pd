@@ -1,0 +1,86 @@
+#N canvas 261 0 448 656 10;
+#N canvas 240 135 476 472 other_midi_objects 0;
+#X obj 55 31 ctlin;
+#X obj 97 31 pgmin;
+#X obj 140 30 bendin;
+#X obj 191 29 touchin;
+#X obj 252 29 polytouchin;
+#X obj 337 29 midiin;
+#X obj 388 28 sysexin;
+#X obj 6 85 noteout;
+#X obj 63 84 ctlout;
+#X obj 161 85 touchout;
+#X obj 225 84 polytouchout;
+#X obj 314 84 midiout;
+#X obj 113 84 pgmout;
+#X obj 11 153 makenote;
+#X text 10 194 MIDI notes deconstruction:;
+#X text 8 128 MIDI note construction:;
+#X text 8 58 MIDI output:;
+#X text 8 2 MIDI input:;
+#X obj 15 226 stripnote;
+#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+by Olaf Matthes);
+#X obj 148 297 chord;
+#X obj 109 296 borax;
+#X obj 54 296 score o;
+#X obj 13 296 pitch;
+#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X obj 16 359 midiformat;
+#X obj 172 359 midiflush;
+#X obj 98 359 midiparse;
+#X text 15 386 and xeq \, from the same developer;
+#X obj 16 411 xeq;
+#X text 41 402 an experimental MIDI sequencer;
+#X obj 8 31 midiin;
+#X restore 88 534 pd other_midi_objects;
+#X obj 280 562 pddp_open all_about_midi_flags;
+#X text 18 562 for an explanation of MIDI usage in Pd see:;
+#X obj 28 18 ctlin;
+#X obj 19 226 ctlin;
+#X floatatom 19 252 5 0 0;
+#X floatatom 33 272 5 0 0;
+#X floatatom 49 290 5 0 0;
+#X text 17 127 Arguments (optional): 1st argument (or only argument)
+indicates the controller number to process. The second argument \,
+if present \, indicates the channel number on which the controller
+is to be processed. If the second argument is absent [ctlin] reads
+all channels. If no arguments are preent [ctlin] reads all controller
+data on all channels.;
+#X text 66 221 Inlets: none. Reads data directly from the MIDI port
+;
+#X text 66 235 Outlets:;
+#X text 116 249 1st (leftmost): Controller value;
+#X text 118 265 Middle: controller number;
+#X text 118 285 rightmost: Channel number;
+#X text 17 317 If one comment is given (ctl. number) [ctlin] provides
+the user with only 2 outlets: ctl. value and channel no. If 2 arguments
+are given (ctl. no. & chan. no.) only one outlet (ctl. value) is given:
+;
+#X obj 24 383 ctlin 64;
+#X floatatom 24 417 5 0 0;
+#X floatatom 74 407 5 0 0;
+#X text 97 382 Process only controller no. 64 on all channels;
+#X text 7 430 ctl. value;
+#X text 83 420 Chan. no.;
+#X obj 25 455 ctlin 64 1;
+#X text 102 456 Process only controller 64 on channel 1;
+#X floatatom 25 481 5 0 0;
+#X text 22 496 ctl. value;
+#X obj 21 534 ctlout;
+#X text 18 515 See also:;
+#X text 13 51 The [ctlin] object reads control change messages directly
+from the MIDI port. See a MIDI-specification chart near you for control
+change message numbers and their meannings (MIDI implementation documents
+are freely available on the internet in c=various forms).;
+#X text 69 18 - read incoming Control Change messages;
+#X text 19 586 This document was updated for Pd version 0.35 by Michal
+Seta as part of a project called pddp proposed by Krzysztof Czaja \,
+managed and edited by Dave Sabine \, to build comprehensive documentation
+for Pd.;
+#X connect 4 0 5 0;
+#X connect 4 1 6 0;
+#X connect 4 2 7 0;
+#X connect 15 0 16 0;
+#X connect 15 1 17 0;
+#X connect 21 0 23 0;

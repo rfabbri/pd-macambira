@@ -1,0 +1,132 @@
+#N canvas 1 2 640 638 12;
+#X obj 117 554 pddp;
+#X obj 8 3 cnv 15 90 578 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 37 44 INLETS:;
+#X text 29 170 OUTLETS:;
+#X text 14 115 ARGUMENTS:;
+#X text 19 213 EXAMPLES:;
+#X text 23 369 SEE ALSO:;
+#N canvas 109 3 419 268 Related_Objects 0;
+#X text 25 11 Native Pd Objects;
+#X text 22 148 Externals and other object libraries;
+#X obj 11 53 receive~;
+#X obj 95 54 send~;
+#X obj 220 54 throw~;
+#X obj 285 54 catch~;
+#X obj 21 103 tabreceive~;
+#X obj 129 103 tabsend~;
+#X obj 211 103 netsend;
+#X obj 287 103 netreceive;
+#X text 189 199 [dist];
+#X text 191 221 [netdist];
+#X text 309 177 [remote];
+#X obj 350 54 value;
+#X obj 150 53 receive;
+#X text 28 175 [streamout~];
+#X text 29 197 [sendlocal];
+#X text 290 227 [system];
+#X text 29 219 [shoutcast~];
+#X text 287 200 [sendOSC];
+#X text 188 177 [send13~];
+#X restore 117 499 pd Related_Objects;
+#N canvas 90 1 655 636 More_Info 0;
+#X obj 44 576 pddp_open all_about_send_n_receive;
+#X text 27 511 There is a lot of information available about [send]
+and [receive] \, but that means there's lots to know! Open the abstraction
+below to learn more...;
+#X text 34 18 SEND USING [SEND] OR MESSAGE? DYNAMIC SEND?;
+#X text 42 52 Consider this:;
+#X floatatom 172 53 5 0 0 0 - - -;
+#X floatatom 237 53 5 0 0 0 - - -;
+#X obj 172 79 s dave;
+#X obj 237 79 s hans;
+#X obj 371 57 r dave;
+#X obj 447 56 r hans;
+#X floatatom 371 84 5 0 0 0 - - -;
+#X floatatom 447 85 5 0 0 0 - - -;
+#X text 41 136 Now consider this:;
+#X floatatom 200 138 5 0 0 0 - - -;
+#X floatatom 269 139 5 0 0 0 - - -;
+#X msg 200 166 \; dave \$1;
+#X msg 269 166 \; hans \$1;
+#X text 43 278 And to complicate things a little more \, and offer
+some interesting functionality \, consider the following:;
+#X obj 371 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 447 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 64 322 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 188 321 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 64 346 symbol dave;
+#X obj 188 345 symbol hans;
+#X msg 67 394 \; \$1 42;
+#X text 143 384 In this example \, I have created a single routine
+which acts as a 'dynamic' send object. The variable ($1) in this message
+box is replaced by the incoming 'symbol'.;
+#X text 135 213 In this example \, the message box contains a Pd command
+which effectively sends the value of the variable ($1) to either 'dave'
+or 'hans'.;
+#X connect 4 0 6 0;
+#X connect 5 0 7 0;
+#X connect 8 0 10 0;
+#X connect 9 0 11 0;
+#X connect 10 0 18 0;
+#X connect 11 0 19 0;
+#X connect 13 0 15 0;
+#X connect 14 0 16 0;
+#X connect 20 0 22 0;
+#X connect 21 0 23 0;
+#X connect 22 0 24 0;
+#X connect 23 0 24 0;
+#X restore 117 528 pd More_Info;
+#X obj 116 250 s;
+#X floatatom 116 226 5 0 0 0 - - -;
+#X floatatom 218 255 5 0 0 0 - - -;
+#X obj 218 226 r;
+#X floatatom 273 255 5 0 0 0 - - -;
+#X obj 273 226 r;
+#X floatatom 324 255 5 0 0 0 - - -;
+#X obj 324 226 r;
+#X floatatom 120 309 5 0 0 0 - - -;
+#X floatatom 375 335 5 0 0 0 - - -;
+#X floatatom 446 335 5 0 0 0 - - -;
+#X floatatom 521 335 5 0 0 0 - - -;
+#X text 119 289 with creation argument;
+#X obj 120 333 s dave;
+#X obj 375 306 r dave;
+#X obj 446 306 r dave;
+#X floatatom 220 310 5 0 0 0 - - -;
+#X text 104 45 None. Data can be inputted to the [receive] object using
+the [send] object or by creating a Pd 'send' command in a message box.
+The [receive] object accepts any atom type as input.;
+#X obj 521 306 r hans;
+#X obj 220 334 s hans;
+#X text 114 386 doc/1.manual/x5.htm;
+#X text 114 369 doc/1.manual/x2.htm;
+#X text 114 403 doc/2.control.examples/09.send_receive.pd;
+#X text 114 419 doc/2.control.examples/10.more.messages.pd;
+#X text 115 435 doc/2.control.examples/11.review.pd;
+#X text 115 452 doc/2.control.examples/13.locality.pd;
+#X text 115 470 doc/5.reference/help-message.pd;
+#X obj 56 18 send;
+#X text 109 18 - SEND MESSAGES WITHOUT PATCH CORDS - abbreviation:
+;
+#X obj 551 18 s;
+#X text 107 171 None - sends messages to a corresponding [receive]
+of the same name.;
+#X text 105 115 One - [send] accepts a single argument (text \, not
+numbers) which is a 'name'. A [send] object corresponds to all [receive]
+objects of the same name.;
+#X text 161 555 - Dave Sabine \, September 12 \, 2003;
+#X connect 10 0 9 0;
+#X connect 12 0 11 0;
+#X connect 14 0 13 0;
+#X connect 16 0 15 0;
+#X connect 17 0 22 0;
+#X connect 23 0 18 0;
+#X connect 24 0 19 0;
+#X connect 25 0 28 0;
+#X connect 27 0 20 0;

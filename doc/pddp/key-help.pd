@@ -1,0 +1,161 @@
+#N canvas 274 90 707 580 12;
+#X obj 107 541 pddp;
+#X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 104 74 This object does not accept arguments of any type.;
+#N canvas 85 22 597 608 More_Info 0;
+#X text 31 23 OBJECT OUTLETS;
+#N canvas 176 22 575 461 reacting_to_user_input 0;
+#X text 27 18 REACTING TO USER INPUT;
+#X text 41 49 Most \, if not all \, programming environments provide
+us with tools to capture 'user initiated' events from the operating
+system. Keyboard input \, mouse clicks \, and mouse movements are the
+most common events in this 'user event' category.;
+#X text 41 125 Pd's [key] \, [keyup] \, and [keyname] are complimented
+by the externals such as [gemmouse] and [nimouse] to provide us with
+a full range of tools to gleen a user's activities at the computer.
+;
+#X text 42 201 It's interesting to note that \, with these tools \,
+PD can mimic some of the functions in other languages - Javascript
+for example has:;
+#X text 55 272 onKeyUp;
+#X text 55 253 onKeyDown;
+#X text 55 291 onKeyPress;
+#X text 42 322 hmmm...wouldn't it be great if Pd also gave us onChange
+\, onBlur \, onFocus \, onClick \, onDblClick \, onDragDrop \, onLoad
+\, onMouseDown \, onMouseOver \, onMouseOut \, onMouseMove \, onUnload...?
+;
+#X restore 47 506 pd reacting_to_user_input;
+#X obj 37 61 key;
+#X obj 16 135 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 37 118 5 0 0 0 - - -;
+#X obj 31 268 keyup;
+#X obj 18 323 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 39 306 5 0 0 0 - - -;
+#X text 88 208 Also note that key combinations \, such as SHIFT+7 produce
+a different result than SHIFT or 7 alone.;
+#X text 88 323 The [key] and [keyup] objects can mimic the functionality
+of the [noteon] and [noteoff] objects. A key combination such as SHIFT+7
+could be considered a 'chord'!;
+#X text 89 54 The number at this outlet represents the numeric "ID"
+of a key on the computer's keyboard. This event occurs when the key
+is pressed down. Only one event is captured at a time.;
+#X text 88 267 The number at this outlets represents the numeric "ID"
+of a key on the computer's keyboard. This even occurs when the key
+is released. Only one event is captured at a time.;
+#X text 89 119 Some keys \, such as SHIFT or the F1-F12 series all
+produce a zero \, but we can see by the [bng] that the event is not
+ignored completely...but the numeric "ID" of the key is not captured
+successfully. (This may produce different results on different systems.)
+;
+#X obj 21 392 keyname;
+#X obj 21 449 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 70 480 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X symbolatom 76 458 10 0 0 0 - - -;
+#X floatatom 18 421 5 0 0 0 - - -;
+#X text 90 388 This object captures both the "keydown" and "keyup"
+events. The left inlet produces a 1 when a key goes down \, and a zero
+when the key goes up. The right outlet produces a symbol which represents
+the name of the key.;
+#N canvas 174 22 571 511 some_keyboard_fun 0;
+#X obj 52 75 loadbang;
+#X msg 23 16 bang;
+#X obj 33 158 qlist;
+#X floatatom 33 185 5 0 0 0 - - -;
+#X obj 388 30 r keyboard_fun;
+#X msg 52 105 read keyboard_fun.txt;
+#X msg 45 51 rewind;
+#X obj 388 112 symbol add2;
+#X obj 388 83 t b s;
+#X obj 388 138 pack s s;
+#X obj 388 164 route list;
+#X msg 47 245 set;
+#X msg 47 278;
+#X obj 388 57 symbol;
+#X text 71 17 Click here to start...;
+#X msg 62 131 tempo 0.8;
+#X obj 47 217 loadbang;
+#X connect 0 0 5 0;
+#X connect 0 0 15 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 4 0 13 0;
+#X connect 5 0 2 0;
+#X connect 6 0 2 0;
+#X connect 7 0 9 0;
+#X connect 8 0 7 0;
+#X connect 8 1 9 1;
+#X connect 9 0 10 0;
+#X connect 10 0 12 0;
+#X connect 11 0 12 0;
+#X connect 13 0 8 0;
+#X connect 15 0 2 0;
+#X connect 16 0 11 0;
+#X restore 47 532 pd some_keyboard_fun;
+#X connect 2 0 3 0;
+#X connect 2 0 4 0;
+#X connect 5 0 7 0;
+#X connect 5 0 6 0;
+#X connect 13 0 17 0;
+#X connect 13 1 16 0;
+#X connect 16 0 15 0;
+#X connect 17 0 14 0;
+#X restore 107 491 pd More_Info;
+#N canvas 85 22 397 246 Related_Objects 0;
+#X text 25 8 Native Pd Objects;
+#X text 25 92 Externals and other object libraries;
+#X obj 61 129 gemkeyboard;
+#X obj 62 159 gemkeyname;
+#X restore 107 465 pd Related_Objects;
+#X text 35 53 INLETS:;
+#X text 6 75 ARGUMENTS:;
+#X text 26 94 OUTLETS:;
+#X text 17 170 EXAMPLES:;
+#X text 18 463 SEE ALSO:;
+#X obj 8 8 cnv 15 180 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 28 14 key;
+#X obj 63 14 keyup;
+#X obj 114 14 keyname;
+#X text 195 15 - GRAB KEYBOARD;
+#X text 104 53 None;
+#X text 104 94 Please see the following sub-patch called "More_Info"
+for detailed information about the objects' outlets. The outlets of
+this 'object group' provide Pd with information about keystrokes on
+your computer's keyboard.;
+#X obj 108 174 key;
+#X floatatom 108 201 3 0 0 0 - - -;
+#X floatatom 147 200 3 0 0 0 - - -;
+#X obj 147 174 keyup;
+#X floatatom 201 200 3 0 0 0 - - -;
+#X obj 201 174 keyname;
+#X symbolatom 252 199 10 0 0 0 - - -;
+#X text 109 248 To see this example in action \, simply type something
+on your keyboard.;
+#X obj 108 225 bng 15 50 10 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 147 225 bng 15 50 10 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 201 225 bng 15 50 10 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 110 291 [key] and [keyup] report the (system dependent) numbers
+of "printing" keys of the keyboard. [keyname] gives the symbolic name
+of the key \, with a 1 if it's up or 0 if it's down \, and works with
+non-printing keys like shift or "F1".;
+#X text 111 362 Caveat -- this only works if Pd actually gets the key
+events which can depend on the stacking order of windows and/or the
+pointer location. This is dependent on the system.;
+#X text 155 542 - Dave Sabine \, July 11 \, 2003;
+#X obj 281 514 pddp_open all_about_hid;
+#X text 105 515 for more on HIDs:;
+#X connect 17 0 18 0;
+#X connect 18 0 25 0;
+#X connect 19 0 26 0;
+#X connect 20 0 19 0;
+#X connect 21 0 27 0;
+#X connect 22 0 21 0;
+#X connect 22 1 23 0;

@@ -49,7 +49,7 @@ cyberspace from send objects of the same name! Hence \, if you name
 a [send] something like "foo" \, then all [receive] objects in open
 patches named "foo" will 'hear' those messages. Also note that the
 term 'open patches' includes all sub-patches \, abstractions and patches
-that are currently open in PD - they don't have to be VISIBLE...they
+that are currently open in Pd - they don't have to be VISIBLE...they
 only have to be active.;
 #X connect 5 0 4 0;
 #X connect 7 0 10 0;
@@ -84,9 +84,9 @@ These two agruments are now available in this patch by using \$1 or
 'Inheritance'.;
 #X text 13 267 In the examples above I have used a variable ($1) to
 name these [send] and [receive] objects. The value of this variable
-is assigned either by PD (randomly for each abstraction or patch) \,
+is assigned either by Pd (randomly for each abstraction or patch) \,
 or by me with the use of arguments.;
-#X text 11 335 If you would like PD to assign the value of your local
+#X text 11 335 If you would like Pd to assign the value of your local
 variable at random \, use \$0. This will ensure that your local variables
 will always be 'local' and won't ever correspond with variables in
 other open patches or abstractions.;
@@ -109,7 +109,7 @@ you should see:;
 #N canvas 145 31 610 615 INHERITANCE 0;
 #X text 20 18 The word "Inherit" means to "receive a characteristic
 from one's parent".;
-#X text 19 59 In PD \, all abstracions and subpatches have 'parents'
+#X text 19 59 In Pd \, all abstracions and subpatches have 'parents'
 -- the parent is the main patch which created the instance of the abstraction
 or subpatch.;
 #X text 18 117 We can use 'arguments' when creating an abstraction
@@ -127,7 +127,7 @@ this abstraction and all of its subpatches!;
 #X symbolatom 146 356 0 0 0 0 - - -;
 #X obj 146 327 symbol \$2;
 #X text 24 388 So \, if a [send] object is named "$1-foo" or "$2-foo"
-inside this abstraction \, PD identifies that [send] object as "and-foo"
+inside this abstraction \, Pd identifies that [send] object as "and-foo"
 or "inheritance-foo".;
 #X obj 47 466 s and-foo;
 #X obj 47 516 s \$1-foo;
@@ -158,7 +158,7 @@ or "inheritance-foo".;
 #X connect 16 0 20 0;
 #X connect 19 0 17 0;
 #X restore 11 217 pd INHERITANCE;
-#X text 16 285 From section 2.6.5 of the PD manual \, Miller Puckette
+#X text 16 285 From section 2.6.5 of the Pd manual \, Miller Puckette
 says:;
 #X text 39 316 "Note that the expansion of variables such as \$0 and
 \$1 only works at the beginning of the symbol. So \, for instance \,

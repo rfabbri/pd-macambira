@@ -1,0 +1,228 @@
+#N canvas 69 230 1009 667 10;
+#X floatatom 19 530 0 0 0 0 - - -;
+#X msg 83 488 1;
+#X msg 49 488 54;
+#X msg 19 488 23;
+#X msg 52 126 6;
+#X obj 19 165 select 6;
+#X msg 19 125 234;
+#X floatatom 19 147 0 0 0 0 - - -;
+#X obj 19 560 select 23 54 1;
+#X obj 46 10 select;
+#X text 91 9 - compare numbers or symbols;
+#X text 19 38 This object can be abbreviated as;
+#X obj 271 37 sel;
+#X text 19 55 In its simplest form shown below \, [select] checks its
+input agains the constant "6" (which is defined by the creation argument).
+If they match \, the first outlet gives "bang" \; otherwise the input
+is simply sent through to the second outlet.;
+#X obj 19 187 print match;
+#X obj 98 187 print NO_match;
+#X text 21 217 Note that when the input to [select] matches one of
+its creation arguments \, then a "bang" is sent to the outlet \, NOT
+the original message.;
+#X obj 19 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 45 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 71 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 98 579 5 0 0 0 - - -;
+#X text 53 516 If you click-n-drag this number box \, you'll notice
+how all numbers except "23" \, "54" \, and "1" are simply sent through
+to the rightmost outlet.;
+#X text 23 416 Several creation arguments can be defined. In effect
+you can use [select] to test the input for many different values. You
+will see an outlet for each test value and finally an outlet for values
+which match none of them (the rightmost outlet).;
+#X obj 635 303 print NO_match;
+#X obj 508 302 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 539 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 571 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 603 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 511 92 symbol dog;
+#X msg 516 111 symbol cat;
+#X msg 524 129 symbol foo;
+#X msg 531 149 symbol earth;
+#X msg 540 168 symbol 400;
+#X obj 508 282 select dog cat foo 400;
+#X msg 536 218 400;
+#X obj 639 580 print NO_match;
+#X obj 512 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 543 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 575 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 607 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 508 377 symbol dog;
+#X msg 520 404 symbol cat;
+#X msg 528 423 symbol foo;
+#X msg 535 442 symbol earth;
+#X msg 543 463 symbol 400;
+#X msg 564 496 400;
+#X obj 512 560 select 400 dog cat foo;
+#X text 612 160 Notice that "400" here is defined as a symbol data
+type and the [select] object can successfully match it to the creation
+argment.;
+#X text 563 206 Notice that "400" here is a number and the [select]
+object cannot successfully match it to the creation argument. That
+is because this [select] expects symbols - not numbers.;
+#X obj 486 631 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 486 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 508 320 However \, in this case below \, you'll notice that
+the FIRST creation argument is a number. Therefore \, this [select]
+object expects numbers and will ignore the "symbol" data type.;
+#X text 547 264 FIRST CREATION ARGUMENT IS A SYMBOL;
+#X text 555 543 FIRST CREATION ARGUMENT IS A NUMBER;
+#X text 511 9 [select] can also be used to match symbols like the example
+in the upper-right of this patch. It important to note that the FIRST
+creation argument indicates to the [select] object which data type
+to expect. If your first creation argument is a symbol \, like "dog"
+\, then the object will test only symbols and numbers will be ignored!
+;
+#X text 592 490 Notice that "400" here is a number and the [select]
+object can successfully match it to the creation argument.;
+#X text 612 457 Notice that "400" here is a symbol and the [select]
+object cannot successfully match it to the creation argument.;
+#X obj 23 373 sel 42;
+#X msg 23 330 42;
+#X obj 23 392 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 54 392 5 0 0 0 - - -;
+#X floatatom 31 349 5 0 0 0 - - -;
+#X floatatom 80 351 5 0 0 0 - - -;
+#X text 325 686 This document was updated for Pd version 0.35 test
+24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+Czaja to build comprehensive documentation for Pd.;
+#X obj 514 639 route;
+#X text 513 618 RELATED OBJECTS;
+#X text 22 614 A WORD ABOUT CONDITIONAL OBJECTS;
+#N canvas 245 41 580 582 more 0;
+#X text 22 16 Using the [select] object \, and others listed below
+\, Pd users can emulate the "conditional" statements of other programming
+environments.;
+#X text 21 62 Consider the following: (Visual Basic Script);
+#X text 60 80 IF input = 1 THEN;
+#X text 59 91 response.write("Hello");
+#X text 59 104 ELSEIF input = 2 THEN;
+#X text 59 116 response.write("GoodBye");
+#X text 59 130 ELSEIF (input = 3 AND input < 10) THEN;
+#X text 59 153 ELSE;
+#X text 58 177 END IF;
+#X text 23 195 Now the Pd equivalent:;
+#X msg 37 218 1;
+#X msg 67 218 2;
+#X floatatom 123 221 5 0 0 0 - - -;
+#X obj 37 286 sel 1 2;
+#X msg 27 418 symbol Hello;
+#X msg 48 388 symbol GoodBye;
+#X symbolatom 288 428 20 0 0 0 - - -;
+#X obj 33 505 ==;
+#X obj 61 505 !=;
+#X obj 88 505 >;
+#X obj 114 505 <;
+#X obj 141 505 >=;
+#X obj 168 505 <=;
+#X text 28 482 OTHER CONDITIONAL/RELATIONAL OBJECTS IN Pd;
+#X text 58 164 response.write("No_match_for_me..."& input);
+#X text 59 142 response.write("This_is_cool.");
+#X obj 74 309 moses 3;
+#X msg 84 351 symbol This_is_cool.;
+#X obj 111 328 moses 10;
+#X obj 220 349 makefilename No_match_for_me...%d;
+#X connect 10 0 13 0;
+#X connect 11 0 13 0;
+#X connect 12 0 13 0;
+#X connect 13 0 14 0;
+#X connect 13 1 15 0;
+#X connect 13 2 26 0;
+#X connect 14 0 16 0;
+#X connect 15 0 16 0;
+#X connect 26 1 28 0;
+#X connect 27 0 16 0;
+#X connect 28 0 27 0;
+#X connect 28 1 29 0;
+#X connect 29 0 16 0;
+#X restore 24 632 pd more;
+#N canvas 0 22 456 306 related_objects_from_other_libraries 0;
+#X obj 28 15 multiselect;
+#X text 19 53 These objects are offered in Pd only if you have downloaded
+and properly installed the appropriate library. These objects may or
+may not exist in a single library.;
+#X text 18 102 The best places to find information about Pd's libraries
+is:;
+#X text 15 124 www.puredata.org and click on "Downloads" then "Software"
+;
+#X text 16 140 or;
+#X text 17 154 iem.kug.ac.at/pdb/;
+#X restore 555 639 pd related_objects_from_other_libraries;
+#X obj 233 397 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 196 332 symbol word;
+#X msg 196 351 symbol other;
+#X msg 313 350 symbol other;
+#X obj 233 377 select word;
+#X obj 305 397 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 305 332 symbol word;
+#X obj -316 311;
+#X text 21 260 Also note that in the example above \, there is a second
+inlet. This is used to reset the argument's value like below. This
+feature is available only on [select] objects with only ONE creation
+argument -- in other example in this patch you'll notice that this
+second inlet is absent.;
+#X connect 0 0 8 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 7 0;
+#X connect 5 0 14 0;
+#X connect 5 1 15 0;
+#X connect 6 0 7 0;
+#X connect 7 0 5 0;
+#X connect 8 0 17 0;
+#X connect 8 1 18 0;
+#X connect 8 2 19 0;
+#X connect 8 3 20 0;
+#X connect 28 0 33 0;
+#X connect 29 0 33 0;
+#X connect 30 0 33 0;
+#X connect 31 0 33 0;
+#X connect 32 0 33 0;
+#X connect 33 0 24 0;
+#X connect 33 1 25 0;
+#X connect 33 2 26 0;
+#X connect 33 3 27 0;
+#X connect 33 4 23 0;
+#X connect 34 0 33 0;
+#X connect 40 0 46 0;
+#X connect 41 0 46 0;
+#X connect 42 0 46 0;
+#X connect 43 0 46 0;
+#X connect 44 0 46 0;
+#X connect 45 0 46 0;
+#X connect 46 0 36 0;
+#X connect 46 1 37 0;
+#X connect 46 2 38 0;
+#X connect 46 3 39 0;
+#X connect 46 4 35 0;
+#X connect 50 0 49 0;
+#X connect 57 0 59 0;
+#X connect 57 1 60 0;
+#X connect 58 0 57 0;
+#X connect 61 0 57 0;
+#X connect 62 0 57 1;
+#X connect 70 0 73 0;
+#X connect 71 0 73 0;
+#X connect 72 0 73 1;
+#X connect 73 0 69 0;
+#X connect 73 1 74 0;
+#X connect 75 0 73 1;

@@ -1,0 +1,67 @@
+#N canvas 290 -2 492 552 10;
+#X obj 27 16 pgmin;
+#X text 26 47 The [pgmin] object reads incoming program change messages.
+;
+#X text 26 69 Arguments: (optional) int represents the channel number
+to ilsten to. With no argument \, [pgmin] accepts all channels.;
+#X text 26 105 Inlets: none. Receives directly from the MIDI port.
+;
+#X obj 27 142 pgmin;
+#X floatatom 27 182 5 0 0;
+#X floatatom 57 164 5 0 0;
+#X text 101 139 Outlets:;
+#X text 119 156 Right - channel number;
+#X text 28 308 See also:;
+#X obj 29 335 pgmout;
+#X obj 26 215 pgmin 2;
+#X floatatom 26 237 5 0 0;
+#X text 25 258 With one argument (the MIDI channel number) [pgmin]
+creates only one outlet (for program change number received). The channel
+cannot be changed dynamically.;
+#N canvas 240 135 476 472 other_midi_objects 0;
+#X obj 7 29 ctlin;
+#X obj 49 29 pgmin;
+#X obj 92 28 bendin;
+#X obj 143 27 touchin;
+#X obj 204 27 polytouchin;
+#X obj 289 27 midiin;
+#X obj 340 26 sysexin;
+#X obj 6 85 noteout;
+#X obj 63 84 ctlout;
+#X obj 160 84 bendout;
+#X obj 217 83 touchout;
+#X obj 281 82 polytouchout;
+#X obj 370 82 midiout;
+#X obj 113 84 pgmout;
+#X obj 11 153 makenote;
+#X text 10 194 MIDI notes deconstruction:;
+#X text 8 128 MIDI note construction:;
+#X text 8 58 MIDI output:;
+#X text 8 2 MIDI input:;
+#X obj 15 226 stripnote;
+#X text 11 266 Additional useful objects for MIDI processing (Maxlib
+by Olaf Matthes);
+#X obj 148 297 chord;
+#X obj 109 296 borax;
+#X obj 54 296 score o;
+#X obj 13 296 pitch;
+#X text 15 336 Also \, from cyclone (alpha) by Krzysztof Czaja:;
+#X obj 16 359 midiformat;
+#X obj 172 359 midiflush;
+#X obj 98 359 midiparse;
+#X text 15 386 and xeq \, from the same developer;
+#X obj 16 411 xeq;
+#X text 41 402 an experimental MIDI sequencer;
+#X restore 105 333 pd other_midi_objects;
+#X obj 298 380 pddp_open all_about_midi_flags;
+#X text 25 379 for an explanation of MIDI usage in Pd see:;
+#X text 120 180 Left - program change number;
+#X text 66 17 - read incoming program change messages from the MIDI
+port;
+#X text 22 453 This document was updated for Pd version 0.35 by Michal
+Seta as part of a project called pddp proposed by Krzysztof Czaja \,
+managed and edited by Dave Sabine \, to build comprehensive documentation
+for Pd.;
+#X connect 4 0 5 0;
+#X connect 4 1 6 0;
+#X connect 11 0 12 0;

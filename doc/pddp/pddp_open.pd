@@ -4,7 +4,7 @@
 #X obj 86 192 pack s s;
 #X obj 86 137 symbol;
 #X obj 108 111 t a b;
-#X obj 0 0 bng 18 250 50 0 \$0- \$0- empty 0 -6 0 8 -44926 -1 -1;
+#X obj 46 0 bng 18 250 50 0 \$0- \$0- empty 0 -6 0 8 -44926 -1 -1;
 #X obj 0 61 symbol \$1;
 #X obj 58 40 symbol;
 #X text 313 346 released under the GNU GPL;
@@ -14,7 +14,7 @@
 it;
 #X text 20 287 This patch opens a patch either from the first argument
 or sent in as a message.;
-#X obj 19 0 cnv 16 45 18 empty empty open: 6 9 0 14 -233017 -1 0;
+#X obj 0 0 cnv 16 45 18 empty empty open: 6 9 0 14 -233017 -1 0;
 #X text 279 176 GOP: 168x18;
 #X obj 137 166 getdir;
 #X connect 0 0 4 0;

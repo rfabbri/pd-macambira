@@ -1,4 +1,4 @@
-#N canvas 282 141 518 637 10;
+#N canvas 282 141 522 641 10;
 #X obj 3 2 cnv 15 500 20 empty empty pddp 2 12 1 18 -233017 -66577
 0;
 #X obj 9 572 pddp_open;
@@ -19,7 +19,6 @@
 #X msg 10 490 dynamic_sends;
 #X msg 10 520 time_measurements;
 #X text 170 121 comment;
-#X text 170 141 comment;
 #X text 170 181 comment;
 #X text 170 321 comment;
 #X text 170 341 comment;
@@ -53,21 +52,22 @@
 #X text 22 35 TABLE OF CONTENTS;
 #X text 7 56 pddp provides a number of overview patches called "all_about_"
 patches. Here is a listing of them:;
-#X connect 2 0 24 0;
-#X connect 3 0 24 0;
-#X connect 4 0 24 0;
-#X connect 5 0 24 0;
-#X connect 6 0 24 0;
-#X connect 7 0 24 0;
-#X connect 8 0 24 0;
-#X connect 9 0 24 0;
-#X connect 10 0 24 0;
-#X connect 11 0 24 0;
-#X connect 12 0 24 0;
-#X connect 13 0 24 0;
-#X connect 14 0 24 0;
+#X text 170 141 cyclone is the Max/MSP compatibility library;
+#X connect 2 0 23 0;
+#X connect 3 0 23 0;
+#X connect 4 0 23 0;
+#X connect 5 0 23 0;
+#X connect 6 0 23 0;
+#X connect 7 0 23 0;
+#X connect 8 0 23 0;
+#X connect 9 0 23 0;
+#X connect 10 0 23 0;
+#X connect 11 0 23 0;
+#X connect 12 0 23 0;
+#X connect 13 0 23 0;
+#X connect 14 0 23 0;
 #X connect 15 0 1 0;
 #X connect 16 0 1 0;
 #X connect 17 0 1 0;
-#X connect 24 0 1 0;
-#X connect 30 0 24 0;
+#X connect 23 0 1 0;
+#X connect 29 0 23 0;

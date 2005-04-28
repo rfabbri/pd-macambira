@@ -1,0 +1,77 @@
+#N canvas 91 99 882 611 10;
+#X obj 4 2 cnv 15 850 20 empty empty all_about_atom_conversion 20 10
+1 18 -233017 -66577 0;
+#X obj 821 3 pddp;
+#X obj 47 364 list2int;
+#X obj 111 363 l2i;
+#X obj 113 389 a2l;
+#X obj 46 390 any2list;
+#X obj 46 340 lister;
+#X obj 46 416 list2symbol;
+#X obj 46 437 symbol2list;
+#X obj 135 416 l2s;
+#X obj 135 436 s2l;
+#X obj 179 417 tosymbol;
+#X obj 179 436 fromsymbol;
+#X obj 548 410 glue;
+#X obj 609 437 pack;
+#X obj 608 411 list2symbol;
+#X obj 718 410 tosymbol;
+#X text 525 384 making "lists" from untyped inputs:;
+#X obj 484 410 repack;
+#X obj 47 318 list;
+#X obj 46 293 any;
+#X obj 75 293 pipe;
+#X text 499 46 a set that is not a "list" has an undefined type:;
+#X obj 528 138 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
+-1;
+#X obj 574 138 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+-1;
+#X obj 622 138 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+-1 -1;
+#X msg 526 73 list this is a set with a cast;
+#X msg 533 92 this is a set withOUT a cast;
+#X obj 527 117 route bang float symbol list;
+#X obj 670 138 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+-1;
+#X obj 718 138 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 10 63 list;
+#X symbolatom 32 129 10 0 0 0 - - -;
+#X text 7 39 SPECIAL CASES OF "LISTS".;
+#X msg 17 83 list 25;
+#X msg 24 103 list foo;
+#X obj 10 171 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 57 170 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 105 169 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 153 170 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 201 169 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 10 148 route bang float symbol list;
+#X text 87 104 A "list" of one "symbol" is converted to a "symbol"
+;
+#X text 72 83 A "list" of one "float" is converted to a "float";
+#X text 50 63 An empty "list" is converted to a "bang";
+#X obj 513 560 pddp_open all_about_data_types;
+#X obj 513 517 pddp_open all_about_lists_vs_anythings;
+#X connect 15 0 14 0;
+#X connect 26 0 28 0;
+#X connect 27 0 28 0;
+#X connect 28 0 23 0;
+#X connect 28 1 24 0;
+#X connect 28 2 25 0;
+#X connect 28 3 29 0;
+#X connect 28 4 30 0;
+#X connect 31 0 41 0;
+#X connect 34 0 41 0;
+#X connect 35 0 32 0;
+#X connect 35 0 41 0;
+#X connect 41 0 36 0;
+#X connect 41 1 37 0;
+#X connect 41 2 38 0;
+#X connect 41 3 39 0;
+#X connect 41 4 40 0;

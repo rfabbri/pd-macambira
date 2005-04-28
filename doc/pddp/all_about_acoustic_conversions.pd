@@ -6,7 +6,7 @@
 #X text 47 82 -- MIDI note number to frequency converter.;
 #N canvas 37 22 899 659 understanding_mtof 0;
 #X text 20 13 [mtof] will convert MIDI note numbers to Wave Freqeuency.
-This object exists in PD for the sake of convenience and speed of processing.
+This object exists in Pd for the sake of convenience and speed of processing.
 ;
 #X obj 37 165 mtof;
 #X floatatom 37 143 5 0 0 0 - - -;
@@ -113,10 +113,10 @@ This object exists in PD for the sake of convenience and speed of processing.
 -1;
 #X obj 477 12 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 496 123 The examples at the botton left are PD structures which
+#X text 496 123 The examples at the botton left are Pd structures which
 emulate the source code of the [mtof] object. In one case \, I have
 used the [expr] object to perform the necessary calculation. In the
-other case \, I used PD's Arithmetic objects to perform the calculation.
+other case \, I used Pd's Arithmetic objects to perform the calculation.
 ;
 #X text 498 291 Secondly \, the incoming MIDI note number is translated
 into a frequency value by the simple equation:;
@@ -135,11 +135,11 @@ methods.;
 #X msg 408 403 8.1758;
 #X text 504 12 THE ALTERNATIVE EXPLAINED;
 #X text 499 33 The [mtof] object is really just a function defined
-in PD's source code - which is programmed in "C".;
+in Pd's source code - which is programmed in "C".;
 #X text 497 67 As such \, it operates very quickly. If a similar function
-were to be created using PD's arithmetic objects \, the process would
+were to be created using Pd's arithmetic objects \, the process would
 be quite a bit slower. How much slower?;
-#X text 498 409 As well \, notice that RESULT C (the output from PD's
+#X text 498 409 As well \, notice that RESULT C (the output from Pd's
 basic arithmetic objects) is not as accurate as the other two methods:
 [mtof] and/or [expr]. This is because the message boxes and the [*]
 object round off the operands because they cannot handle enough decimal
@@ -150,7 +150,7 @@ is the filtering out of all numbers less than -1500 and greater than
 and underflows are clipped" as Miller Puckette stated in the original
 documentation for this object.;
 #X text 22 62 MIDI notes usually range between 0 and 127 from an incoming
-MIDI controller. However \, in PD negative numbers to -1500 and positive
+MIDI controller. However \, in Pd negative numbers to -1500 and positive
 numbers to 1499 are also supported and decimal places can be used to
 achive microtonal pitches.;
 #X text 11 125 CONVENIENT? YES!;
@@ -208,11 +208,11 @@ achive microtonal pitches.;
 #X text 9 318 RESULT A;
 #X text 534 12 THE ALTERNATIVE EXPLAINED;
 #X text 527 67 As such \, it operates very quickly. If a similar function
-were to be created using PD's arithmetic objects \, the process would
+were to be created using Pd's arithmetic objects \, the process would
 be quite a bit slower. How much slower?;
 #X text 12 68 CONVENIENT? YES!;
 #X text 22 14 [ftom] will convert Wave/Signal Frequency to MIDI note
-numbers. This object exists in PD for the sake of convenience and speed
+numbers. This object exists in Pd for the sake of convenience and speed
 of processing.;
 #X text 78 85 Select a Frequency: (i.e. 440 hz is an "A" above middle
 C);
@@ -222,11 +222,11 @@ C);
 #X text 76 232 Select a FREQUENCY here.;
 #X obj 33 276 ftom;
 #X text 529 33 The [ftom] object is really just a function defined
-in PD's source code - which is programmed in "C".;
-#X text 526 123 The examples at the botton left are PD structures which
+in Pd's source code - which is programmed in "C".;
+#X text 526 123 The examples at the botton left are Pd structures which
 emulate the source code of the [ftom] object. In one case \, I have
 used the [expr] object to perform the necessary calculation. In the
-other case \, I used PD's Arithmetic objects to perform the calculation.
+other case \, I used Pd's Arithmetic objects to perform the calculation.
 ;
 #X obj 64 256 moses 0;
 #X msg 64 277 -1500;
@@ -249,7 +249,7 @@ other case \, I used PD's Arithmetic objects to perform the calculation.
 #X text 189 520 Arithmetic is __?__ milliseconds slower than [mtof].
 ;
 #X text 156 556 [expr] is __?__ milliseconds slower than [mtof].;
-#X text 528 200 Firstly \, the PD source code "clips" overflows and
+#X text 528 200 Firstly \, the Pd source code "clips" overflows and
 underflows. This means simply that frequencies LESS THAN zero cannot
 be tranlated into a MIDI note value - so they're ignored completely
 and the object responds with "-1500".;
@@ -260,7 +260,7 @@ MIDI_note;
 #X text 528 355 For curiosity's sake \, I included a timer to show
 how much faster the [ftom] object is compared to the two alternative
 methods.;
-#X text 528 409 As well \, notice that RESULT C (the output from PD's
+#X text 528 409 As well \, notice that RESULT C (the output from Pd's
 basic arithmetic objects) is not as accurate as the other two methods:
 [ftom] and/or [expr]. This is because the message boxes and the [*]
 object round off the operands because they cannot handle enough decimal
@@ -328,12 +328,12 @@ performed on electrical flow. It is used to measure voltage or current.
 It is important to note however \, that it does NOT measure "power".
 It's also important to recognize that our ears perceive changes in
 amplitude (decibels) more than we perceive changes in RMS levels.;
-#X text 23 133 In the digital realm \, i.e. PD! \, RMS is better defined
+#X text 23 133 In the digital realm \, i.e. Pd! \, RMS is better defined
 as "a measurement of a signal taken by squaring data points along the
 curve \, finding the mean \, and then determining the square root of
 that mean value.;
 #X restore 39 47 pd What_does_RMS_mean?;
-#X text 19 80 [dbtorms] in PD performs the following equation to convert
+#X text 19 80 [dbtorms] in Pd performs the following equation to convert
 the data: Note that incoming values less than 0 or greater than 485
 are considered overflow or underflow and are clipped/ignored.;
 #X text 22 241 Example:;
@@ -396,7 +396,7 @@ performed on electrical flow. It is used to measure voltage or current.
 It is important to note however \, that it does NOT measure "power".
 It's also important to recognize that our ears perceive changes in
 amplitude (decibels) more than we perceive changes in RMS levels.;
-#X text 23 133 In the digital realm \, i.e. PD! \, RMS is better defined
+#X text 23 133 In the digital realm \, i.e. Pd! \, RMS is better defined
 as "a measurement of a signal taken by squaring data points along the
 curve \, finding the mean \, and then determining the square root of
 that mean value.;
@@ -406,7 +406,7 @@ that mean value.;
 #X floatatom 24 422 0 0 0 0 - - -;
 #X floatatom 151 354 0 0 0 0 - - -;
 #X msg 68 278 0;
-#X text 19 80 [rmstodb] in PD performs the following equation to convert
+#X text 19 80 [rmstodb] in Pd performs the following equation to convert
 the data: Note that incoming values less than 0 is consider underflow
 and is clipped/ignored.;
 #X text 18 178 On a scale of zero to 1 decibels \, the [rmstodb] produces
@@ -455,15 +455,15 @@ not an acoustician.;
 #X floatatom 148 242 0 0 0 0 - - -;
 #N canvas 0 22 442 244 What_does_power_mean? 0;
 #X text 30 25 What does power mean? I really don't know? I can't determine
-from my own research or from PD's documentation why or how this data
-is used. All that I do know \, is that PD provides these objects for
+from my own research or from Pd's documentation why or how this data
+is used. All that I do know \, is that Pd provides these objects for
 a good reason -- I just don't know the reason.;
 #X text 27 103 Having said that \, I would enjoy learning from somebody
 who DOES know more about these objects and their usage. All that I
 can offer is an explanation of the equation used to perform these conversions.
 ;
 #X restore 39 47 pd What_does_power_mean?;
-#X text 18 80 [dbtopow] in PD performs the following equation to convert
+#X text 18 80 [dbtopow] in Pd performs the following equation to convert
 the data: Note that incoming values less than 0 or greater than 870
 are considered overflow or underflow and are clipped/ignored.;
 #X obj 148 222 dbtopow;
@@ -502,15 +502,15 @@ not an acoustician.;
 #X floatatom 149 298 0 0 0 0 - - -;
 #N canvas 0 22 442 244 What_does_power_mean? 0;
 #X text 30 25 What does power mean? I really don't know? I can't determine
-from my own research or from PD's documentation why or how this data
-is used. All that I do know \, is that PD provides these objects for
+from my own research or from Pd's documentation why or how this data
+is used. All that I do know \, is that Pd provides these objects for
 a good reason -- I just don't know the reason.;
 #X text 27 103 Having said that \, I would enjoy learning from somebody
 who DOES know more about these objects and their usage. All that I
 can offer is an explanation of the equation used to perform these conversions.
 ;
 #X restore 39 47 pd What_does_power_mean?;
-#X text 17 81 [powtodb] in PD performs the following equation to convert
+#X text 17 81 [powtodb] in Pd performs the following equation to convert
 the data: Note that incoming values less than 0 are considered underflow
 and are clipped/ignored.;
 #X text 17 149 (100 + ((10/2.302585092994) * log(POWER_value))) = Debibels
@@ -542,10 +542,10 @@ and are clipped/ignored.;
 #X obj 150 40 t3_sig~;
 #X obj 205 40 m2f~;
 #X obj 249 41 tmtof;
-#X text 18 96 These objects are offered in PD only if you have downloaded
+#X text 18 96 These objects are offered in Pd only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
-#X text 17 145 The best places to find information about PD's libraries
+#X text 17 145 The best places to find information about Pd's libraries
 is:;
 #X text 14 167 www.puredata.org and click on "Downloads" then "Software"
 ;

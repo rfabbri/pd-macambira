@@ -1,0 +1,147 @@
+#N canvas 1 2 636 634 12;
+#X obj 117 554 pddp;
+#X obj 8 3 cnv 15 90 578 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 37 44 INLETS:;
+#X text 29 170 OUTLETS:;
+#X text 14 115 ARGUMENTS:;
+#X text 19 213 EXAMPLES:;
+#X text 23 369 SEE ALSO:;
+#N canvas 109 3 415 264 Related_Objects 0;
+#X text 25 11 Native Pd Objects;
+#X text 22 148 Externals and other object libraries;
+#X obj 25 53 receive~;
+#X obj 109 54 send~;
+#X obj 171 54 send;
+#X obj 220 54 throw~;
+#X obj 285 54 catch~;
+#X obj 21 103 tabreceive~;
+#X obj 129 103 tabsend~;
+#X obj 211 103 netsend;
+#X obj 287 103 netreceive;
+#X text 28 175 [streamin~];
+#X text 29 197 [receivelocal];
+#X text 29 219 [shoutamp~];
+#X text 188 177 [receive13~];
+#X text 189 199 [dist];
+#X text 191 221 [netdist];
+#X text 309 177 [remote];
+#X text 287 200 [receiveOSC];
+#X obj 350 54 value;
+#X restore 117 499 pd Related_Objects;
+#N canvas 57 0 649 630 More_Info 0;
+#X obj 44 576 pddp_open all_about_send_n_receive;
+#X text 25 18 MESSAGES AND DATA TYPES;
+#X text 40 41 Pd's [send] and [receive] objects can communicate any
+data type that is supported by Pd: floats \, anythings \, lists \,
+symbols \, and bangs. However \, you will need to plan ahead in your
+patch to ensure that a symbol doesn't accidently arrive at a [float]
+object \, or that a list doesn't arrive at a [symbol] object. Consider
+the following I have been very careful to keep [send] and [receive]
+groups isolated to specific data types - and in the last case \, I
+have incorporated a [route] object to properly receive the various
+data types at a single [receive] object.;
+#X floatatom 32 221 5 0 0 0 - - -;
+#X floatatom 73 332 5 0 0 0 - - -;
+#X obj 74 278 s a_float;
+#X obj 73 306 r a_float;
+#X obj 74 249 s whatever;
+#X obj 263 248 s whatever;
+#X obj 264 277 s a_symbol;
+#X obj 264 311 r a_symbol;
+#X symbolatom 197 220 10 0 0 0 - - -;
+#X text 75 220 click-n-drag;
+#X text 282 220 type something;
+#X text 473 217 click this;
+#X obj 475 324 s whatever;
+#X obj 452 294 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 476 353 s a_bang;
+#X text 494 296 click this too;
+#X obj 476 387 r a_bang;
+#X obj 476 415 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 153 345 r whatever;
+#X floatatom 153 481 5 0 0 0 - - -;
+#X symbolatom 207 459 10 0 0 0 - - -;
+#X obj 269 416 print;
+#X obj 317 398 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X symbolatom 264 340 10 0 0 0 - - -;
+#X obj 262 439 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 27 511 There is a lot of information available about [send]
+and [receive] \, but that means there's lots to know! Open the abstraction
+below to learn more...;
+#X msg 450 234 \; whatever 1 2 3 4 \;;
+#X obj 153 370 route float symbol list bang;
+#X connect 3 0 5 0;
+#X connect 3 0 7 0;
+#X connect 6 0 4 0;
+#X connect 10 0 26 0;
+#X connect 11 0 9 0;
+#X connect 11 0 8 0;
+#X connect 16 0 15 0;
+#X connect 16 0 17 0;
+#X connect 19 0 20 0;
+#X connect 21 0 30 0;
+#X connect 30 0 22 0;
+#X connect 30 1 23 0;
+#X connect 30 2 24 0;
+#X connect 30 2 27 0;
+#X connect 30 3 25 0;
+#X restore 117 528 pd More_Info;
+#X obj 30 18 receive;
+#X obj 551 18 r;
+#X obj 116 250 s;
+#X floatatom 116 226 5 0 0 0 - - -;
+#X floatatom 218 255 5 0 0 0 - - -;
+#X obj 218 226 r;
+#X floatatom 273 255 5 0 0 0 - - -;
+#X obj 273 226 r;
+#X floatatom 324 255 5 0 0 0 - - -;
+#X obj 324 226 r;
+#X floatatom 120 309 5 0 0 0 - - -;
+#X floatatom 375 335 5 0 0 0 - - -;
+#X floatatom 446 335 5 0 0 0 - - -;
+#X floatatom 521 335 5 0 0 0 - - -;
+#X text 119 289 with creation argument;
+#X obj 120 333 s dave;
+#X obj 375 306 r dave;
+#X obj 446 306 r dave;
+#X text 105 115 One - [receive] accepts a single argument (text \,
+not numbers) which is a 'name'. All [receive]s of the same name correspond
+to a [send] object of that name.;
+#X floatatom 220 310 5 0 0 0 - - -;
+#X text 107 171 One - outputs the message(s) that are sent from a corresponding
+[send] of the same name.;
+#X text 109 18 - RECEIVE MESSAGES WITHOUT PATCH CORDS - abbreviation:
+;
+#X text 104 45 None. Data can be inputted to the [receive] object using
+the [send] object or by creating a Pd 'send' command in a message box.
+The [receive] object accepts any atom type as input.;
+#X floatatom 442 235 5 0 0 0 - - -;
+#X msg 442 258 \; dave \$1;
+#X floatatom 520 233 5 0 0 0 - - -;
+#X msg 520 258 \; hans \$1;
+#X obj 521 306 r hans;
+#X obj 220 334 s hans;
+#X text 114 386 doc/1.manual/x5.htm;
+#X text 114 369 doc/1.manual/x2.htm;
+#X text 114 403 doc/2.control.examples/09.send_receive.pd;
+#X text 114 419 doc/2.control.examples/10.more.messages.pd;
+#X text 115 435 doc/2.control.examples/11.review.pd;
+#X text 115 452 doc/2.control.examples/13.locality.pd;
+#X text 115 470 doc/5.reference/help-message.pd;
+#X text 161 555 - Dave Sabine \, September 9 \, 2003;
+#X connect 12 0 11 0;
+#X connect 14 0 13 0;
+#X connect 16 0 15 0;
+#X connect 18 0 17 0;
+#X connect 19 0 24 0;
+#X connect 25 0 20 0;
+#X connect 26 0 21 0;
+#X connect 28 0 37 0;
+#X connect 32 0 33 0;
+#X connect 34 0 35 0;
+#X connect 36 0 22 0;
