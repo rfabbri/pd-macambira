@@ -28,6 +28,8 @@ namespace eval ::ix {
 #. -selectmode extended -font {{Bitstream Vera Sans} 8} -exportselection 0
 #. -relief flat -borderwidth 0 -selectborderwidth 0 -bg "#ccffcc" -fg black
 #. @list foreach x [list .#args] {.- insert end $x}
+#. @add .- insert end [join [lrange [list .#args] 0 end] " "]
+#. @scroll .- yview scroll .#1 units .: puts "scrollin .#1"
 #. @symbol .- insert end {.#1}
 #. @float ::ix::qi .- .| .#1
 #. @clear .- delete 0 end
@@ -36,7 +38,8 @@ namespace eval ::ix {
 #. @cmd eval ".- .#args"
 bind .- <Enter> {focus .-}
 bind .- <Leave> {focus .^.c}
-bind .- <MouseWheel> {.- yview scroll [expr {- (%D / 120) * 4}] units}
+bind .- <4> { pd [concat .|.rp _cb scroll -5 \;]}
+bind .- <5> { pd [concat .|.rp _cb scroll 5 \;]}
 bind .- <Shift-MouseWheel> {.- xview scroll [expr {- (%D / 120) * 4}] units}
 bind .- <ButtonPress-3> {}
 bind .- <Button3-Leave> {dnd drag %W}
