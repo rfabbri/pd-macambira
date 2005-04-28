@@ -1,0 +1,38 @@
+#N canvas 427 177 464 315 10;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_one2four] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 284 released under the GNU GPL;
+#X floatatom 82 110 5 0 0 0 - - -;
+#X floatatom 23 186 5 0 0 0 - - -;
+#X obj 85 91 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 26 203 hsl 75 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 98 243 For more info:;
+#X obj 202 241 pddp_open all_about_hid_mapping;
+#X text 18 28 Simple one-to-three mapping object. The first inlet is
+passed thru \, the range of the output data on the other inlet starts
+at the points in the input range specified as arugments.;
+#X obj 82 145 hid_one2four 0.3 0.6 0.9;
+#X floatatom 113 186 5 0 0 0 - - -;
+#X obj 116 203 hsl 75 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 203 186 5 0 0 0 - - -;
+#X obj 206 203 hsl 75 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 293 186 5 0 0 0 - - -;
+#X obj 296 203 hsl 75 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X connect 4 0 11 0;
+#X connect 5 0 7 0;
+#X connect 6 0 4 0;
+#X connect 11 0 5 0;
+#X connect 11 1 12 0;
+#X connect 11 2 14 0;
+#X connect 11 3 16 0;
+#X connect 12 0 13 0;
+#X connect 14 0 15 0;
+#X connect 16 0 17 0;
