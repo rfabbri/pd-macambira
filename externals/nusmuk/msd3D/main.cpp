@@ -333,56 +333,84 @@ protected:
 	{
 	// displace mass(es) named Id to a certain position
 		t_int i;
-		const t_symbol *sym = GetSymbol(argv[0]);
+		const t_symbol *sym = GetASymbol(argv[0]);
 		t_mass **mi;
 
 		if (argc != 2)
-			error("posX : Idmass value");
+			error("posX : Id/Nomass value");
 
 		if (GetFloat(argv[1]) < Xmax && GetFloat(argv[1]) > Xmin)
-			for (i=0, mi=mass; i<nb_mass;mi++, i++)
-			{
-				if (sym == (*mi)->Id)
-					(*mi)->posX = GetAFloat(argv[1]);
-			}
+			if (sym ==0)	
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+				{
+					if (GetInt(argv[0]) == (*mi)->nbr)	{
+						(*mi)->posX = GetFloat(argv[1]);
+						(*mi)->posX2 = GetFloat(argv[1]);
+						break;
+					}
+				}
+			else
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+					if (sym == (*mi)->Id)	{
+						(*mi)->posX = GetFloat(argv[1]);
+						(*mi)->posX2 = GetFloat(argv[1]);
+					}
 	}
 
 	void m_posY(int argc,t_atom *argv) 
 	{
 	// displace mass(es) named Id to a certain position
 		t_int i;
-		const t_symbol *sym = GetSymbol(argv[0]);
+		const t_symbol *sym = GetASymbol(argv[0]);
 		t_mass **mi;
 
 		if (argc != 2)
-			error("posY : Idmass value");
+			error("posY : Id/Nomass value");
 
 		if (GetFloat(argv[1]) < Ymax && GetFloat(argv[1]) > Ymin)
-			for (i=0, mi=mass; i<nb_mass;mi++, i++)
-			{
-				if (sym == (*mi)->Id)
-					(*mi)->posY = GetFloat(argv[1]);
-			}
-		
+			if (sym ==0)	
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+				{
+					if (GetInt(argv[0]) == (*mi)->nbr)	{
+						(*mi)->posY = GetFloat(argv[1]);
+						(*mi)->posY2 = GetFloat(argv[1]);
+						break;
+					}
+				}
+			else
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+					if (sym == (*mi)->Id)	{
+						(*mi)->posY = GetFloat(argv[1]);
+						(*mi)->posY2 = GetFloat(argv[1]);
+					}
 	}
 
 	void m_posZ(int argc,t_atom *argv) 
 	{
 	// displace mass(es) named Id to a certain position
 		t_int i;
-		const t_symbol *sym = GetSymbol(argv[0]);
+		const t_symbol *sym = GetASymbol(argv[0]);
 		t_mass **mi;
 
 		if (argc != 2)
-			error("posZ : Idmass value");
+			error("posY : Id/Nomass value");
 
 		if (GetFloat(argv[1]) < Zmax && GetFloat(argv[1]) > Zmin)
-			for (i=0, mi=mass; i<nb_mass;mi++, i++)
-			{
-				if (sym == (*mi)->Id)
-					(*mi)->posZ = GetFloat(argv[1]);
-			}
-		
+			if (sym ==0)	
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+				{
+					if (GetInt(argv[0]) == (*mi)->nbr)	{
+						(*mi)->posZ = GetFloat(argv[1]);
+						(*mi)->posZ2 = GetFloat(argv[1]);
+						break;
+					}
+				}
+			else
+				for (i=0, mi=mass; i<nb_mass; mi++, i++)
+					if (sym == (*mi)->Id)	{
+						(*mi)->posZ = GetFloat(argv[1]);
+						(*mi)->posZ2 = GetFloat(argv[1]);
+					}
 	}
 
 	void m_set_mobile(int argc,t_atom *argv) 

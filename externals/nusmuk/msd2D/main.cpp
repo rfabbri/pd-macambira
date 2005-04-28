@@ -299,15 +299,16 @@ protected:
 				{
 					if (GetInt(argv[0]) == (*mi)->nbr)	{
 						(*mi)->posX = GetFloat(argv[1]);
+						(*mi)->posX2 = GetFloat(argv[1]);
 						break;
 					}
 				}
 			else
 				for (i=0, mi=mass; i<nb_mass; mi++, i++)
-				{
-					if (sym == (*mi)->Id)
+					if (sym == (*mi)->Id)	{
 						(*mi)->posX = GetFloat(argv[1]);
-				}
+						(*mi)->posX2 = GetFloat(argv[1]);
+					}
 	}
 
 	void m_posY(int argc,t_atom *argv) 
@@ -326,15 +327,16 @@ protected:
 				{
 					if (GetInt(argv[0]) == (*mi)->nbr)	{
 						(*mi)->posY = GetFloat(argv[1]);
+						(*mi)->posY2 = GetFloat(argv[1]);
 						break;
 					}
 				}
 			else
 				for (i=0, mi=mass; i<nb_mass; mi++, i++)
-				{
-					if (sym == (*mi)->Id)
+					if (sym == (*mi)->Id)	{
 						(*mi)->posY = GetFloat(argv[1]);
-				}
+						(*mi)->posY2 = GetFloat(argv[1]);
+					}
 	}
 
 	void m_set_mobile(int argc,t_atom *argv) 
