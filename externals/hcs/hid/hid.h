@@ -14,7 +14,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 5
 
-static char *version = "$Revision: 1.13 $";
+static char *version = "$Revision: 1.14 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -56,8 +56,7 @@ t_int hid_instance_count;
  */
 
 /* support functions */
-void hid_output_event(t_hid *x,
-							  char *type, char *code, t_float value, t_float timestamp);
+void hid_output_event(t_hid *x, char *type, char *code, t_float value);
 
 /* generic, cross-platform functions */
 t_int hid_open_device(t_hid *x, t_int device_number);

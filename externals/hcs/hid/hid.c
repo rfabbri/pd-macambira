@@ -48,17 +48,15 @@ static void hid_float(t_hid* x, t_floatarg f);
  * SUPPORT FUNCTIONS
  */
 
-void hid_output_event(t_hid *x, 
-							  char *type, char *code, t_float value, t_float timestamp)
+void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 {
 	t_atom event_data[4];
 	
 	SETSYMBOL(event_data, gensym(type));	   /* type */
 	SETSYMBOL(event_data + 1, gensym(code));	/* code */
 	SETFLOAT(event_data + 2, value);	         /* value */
-	SETFLOAT(event_data + 3, timestamp); 	   /* timestamp */
 
-	outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1);
+	outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),2,event_data+1);
 }
 
 void hid_set_from_float(t_hid *x, t_floatarg f)

@@ -268,7 +268,9 @@ t_int hid_get_events(t_hid *x)
 	t_int i;
 	DEBUG(t_int event_counter = 0;);
 	t_int read_bytes;
-	t_atom event_data[4];
+	t_atom event_data[3];
+
+	char hid_code[7];
 
 /* this will go into the generic read function declared in hid.h and
  * implemented in hid_linux.c 
@@ -279,26 +281,18 @@ t_int hid_get_events(t_hid *x)
 
 	while (read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1)
 	{
-		/* build event_data list from event data */
-		/* type */
-		SETSYMBOL(event_data, gensym(ev[hid_input_event.type]));
-		/* code */
 		if (hid_input_event.type == EV_KEY)
 		{
-			char hid_code[7];
 			hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
-      hid_convert_linux_keys(hid_input_event.code,hid_code);
-			SETSYMBOL(event_data + 1, 
-						 gensym(hid_code));
+			hid_convert_linux_keys(hid_input_event.code,hid_code);
 		}
 		else
-			SETSYMBOL(event_data + 1, 
-						 gensym(event_names[hid_input_event.type][hid_input_event.code]));
-		/* value */
-		SETFLOAT(event_data + 2, (t_float)hid_input_event.value);
-		/* time */
-		SETFLOAT(event_data + 3, (t_float)(hid_input_event.time).tv_sec);
-		outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),3,event_data+1); 
+		{
+			strcpy(hid_code, event_names[hid_input_event.type][hid_input_event.code]);
+		}
+		
+		hid_output_event(x, ev[hid_input_event.type], hid_code, 
+							  (t_float)hid_input_event.value);
 		DEBUG(++event_counter;);
 	}
 	DEBUG(
