@@ -12,22 +12,22 @@
 #N canvas 721 124 605 590 massrender 0;
 #X obj 127 22 inlet;
 #X obj 48 203 translateXYZ;
-#X obj 64 114 gemhead;
 #X obj 48 177 separator;
 #X obj 48 153 any;
 #X obj 127 136 t b f;
 #X obj 127 57 unpack f f f;
 #X obj 48 283 cuboid 0.065 0.065 0.07;
-#X connect 0 0 6 0;
-#X connect 1 0 7 0;
-#X connect 2 0 4 1;
-#X connect 3 0 1 0;
+#X obj 64 114 gemhead 45;
+#X connect 0 0 5 0;
+#X connect 1 0 6 0;
+#X connect 2 0 1 0;
+#X connect 3 0 2 0;
 #X connect 4 0 3 0;
+#X connect 4 1 1 1;
 #X connect 5 0 4 0;
-#X connect 5 1 1 1;
-#X connect 6 0 5 0;
-#X connect 6 1 1 2;
-#X connect 6 2 7 3;
+#X connect 5 1 1 2;
+#X connect 5 2 6 3;
+#X connect 7 0 3 1;
 #X restore 265 625 pd massrender;
 #X msg 203 83 symbol reset;
 #X text 793 205 Select view;
@@ -67,7 +67,7 @@
 #X msg 63 718 get massesPos \$1;
 #X obj 602 334 rotateXYZ;
 #X obj 651 450 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 0 1;
+-1 -1 1400 1;
 #X obj 670 450 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
 -1 -1 0 1;
 #X obj 689 450 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
@@ -104,7 +104,7 @@ z is asked to the 1D model.;
 test synchronization between msd objects;
 #X obj 33 537 unpack f f f;
 #X obj 443 546 unpack f f;
-#X obj 173 598 f;
+#X obj 173 597 f;
 #X obj 33 574 t b f;
 #X connect 0 0 12 0;
 #X connect 2 0 1 0;

@@ -117,6 +117,7 @@
 #X obj 116 38 t b b b b;
 #X obj 442 294 t b;
 #X text 310 286 Create window;
+#X text 416 489 NOT UPDATED FOR MSD VERSION 0.04;
 #X connect 0 0 25 0;
 #X connect 3 0 2 0;
 #X connect 4 0 5 0;

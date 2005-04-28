@@ -168,6 +168,7 @@ mass fix 0 100 70 30 20 \, mass fix 0 100 70 70 20;
 #X msg 429 544 view 0 3 0 0 0 0 0 0 1;
 #X msg 429 523 view 0 0 1 0 0 0 0 1 0;
 #X msg 429 500 view 3 0 0.5 0 0 0 0 0 1;
+#X text 287 627 NOT UPDATED FOR MSD VERSION 0.04;
 #X connect 0 0 26 0;
 #X connect 3 0 2 0;
 #X connect 4 0 5 0;
