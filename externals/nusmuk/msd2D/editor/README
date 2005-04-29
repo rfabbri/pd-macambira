@@ -1,0 +1,10 @@
+msd2d-editor
+------------
+
+patched by Frank Barknecht <fbar@footils.org> with a big hand from Nicolas
+Montgermont <montgermont@la-kitchen.fr> who wrote the msd2D external required
+for using this patch. GEM is used to provide an alternative visualization, but
+it is not required for the patch to work. 
+Thanks Nicolas for a great external colletion.
+
+msd2d-editor.pd is the patch to open, further documentation is inside.
