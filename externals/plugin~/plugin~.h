@@ -1,52 +1,6 @@
-/* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
-   Copyright (C) 2000 Jarno Seppänen
-   $Id: plugin~.h,v 1.2 2003-01-23 12:32:04 ggeiger Exp $
-
-   This file is part of plugin~.
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2
-   of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. */
-
-#ifndef __PLUGIN_TILDE_H__
-#define __PLUGIN_TILDE_H__
-
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#include "config.h"
-
-/* Pd header */
-#ifndef MAXPDSTRING /* lame */
+#include "ladspa.h"
 #include "m_pd.h"
-#endif /* MAXPDSTRING */
 
-#if 0
-#if PLUGIN_TILDE_USE_LADSPA
-#include "plugin~_ladspa.h"
-#endif
-#if PLUGIN_TILDE_USE_VST
-#include "plugin~_vst.h"
-#endif
-#endif /* 0 */
-/*
- * Now I've moved the following two plug-in-architecture-specific structures
- * here because having them in plugin~_ladspa.h and plugin~_vst.h proper will
- * result in a cyclical header dependency
- */
-#if PLUGIN_TILDE_USE_LADSPA
-#include "ladspa/ladspa.h"
 typedef struct
 {
     const LADSPA_Descriptor*	type;
@@ -70,40 +24,19 @@ typedef struct
     unsigned long	sample_rate;
 
 } Plugin_Tilde_Ladspa;
-#endif /* PLUGIN_TILDE_USE_LADSPA */
-
-#if PLUGIN_TILDE_USE_VST
-#include "vst/AEffect.h"
-typedef struct
-{
-    AEffect*		instance;
-
-    /* audio wire buffer information */
-    float**		audio_inputs;
-    float**		audio_outputs;
-    unsigned long	num_samples;
-
-    int			editor_open;
-
-} Plugin_Tilde_Vst;
-#endif /* PLUGIN_TILDE_USE_VST */
 
 typedef struct
 {
     /* Pd's way of object-oriented programming */
     t_object		x_obj;
-    t_clock*		x_clock;
 
     /* Access to LADSPA/VST plugins */
     void*		plugin_library;
     const char*		plugin_library_filename; /* only for diagnostics */
     union {
-#if PLUGIN_TILDE_USE_LADSPA
+
 	Plugin_Tilde_Ladspa	ladspa;
-#endif
-#if PLUGIN_TILDE_USE_VST
-	Plugin_Tilde_Vst	vst;
-#endif
+
     }			plugin;
 
     /* Plugin information */
@@ -127,7 +60,6 @@ typedef struct
 void		plugin_tilde_setup (void);
 static void*	plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name);
 static void	plugin_tilde_free (Pd_Plugin_Tilde* x);
-static void	plugin_tilde_tick (Pd_Plugin_Tilde* x);
 
 /* DSP callbacks */
 static void	plugin_tilde_dsp (Pd_Plugin_Tilde* x, t_signal** sp);
@@ -145,8 +77,10 @@ static void	plugin_tilde_control (Pd_Plugin_Tilde* x,
 				      t_float ctrl_value);
 
 /* First inlet message callback for "control" messages */
-static void	plugin_tilde_print (Pd_Plugin_Tilde* x);
-
+static void	plugin_tilde_list (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_info (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_plug (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_bypass (Pd_Plugin_Tilde* x);
 /* First inlet message callback for "reset" messages */
 static void	plugin_tilde_reset (Pd_Plugin_Tilde* x);
 
@@ -173,13 +107,46 @@ static void	plugin_tilde_set_control_input_by_name (Pd_Plugin_Tilde* x,
 static void	plugin_tilde_set_control_input_by_index (Pd_Plugin_Tilde* x,
 						unsigned index_,
 						float value);
-/*static float	plugin_tilde_get_control_input (Pd_Plugin_Tilde* x,
-						unsigned int index);*/
-static void	plugin_tilde_update_gui (Pd_Plugin_Tilde* x);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+/* subroutines to wrap the LADSPA interface */
+const char*	plugin_tilde_ladspa_search_plugin (Pd_Plugin_Tilde* x,
+						   const char* name);
+int	plugin_tilde_ladspa_open_plugin (Pd_Plugin_Tilde* x,
+					 const char* name,
+					 const char* lib_name,
+					 unsigned long sample_rate);
+void	plugin_tilde_ladspa_close_plugin (Pd_Plugin_Tilde* x);
+void	plugin_tilde_ladspa_apply_plugin (Pd_Plugin_Tilde* x);
 
-#endif /* __PLUGIN_TILDE_H__ */
-/* EOF */
+void	plugin_tilde_ladspa_reset (Pd_Plugin_Tilde* x);
+
+void	plugin_tilde_ladspa_connect_audio (Pd_Plugin_Tilde* x,
+					   float** audio_inputs,
+					   float** audio_outputs,
+					   unsigned long num_samples);
+void	plugin_tilde_ladspa_set_control_input_by_name (Pd_Plugin_Tilde* x,
+					       const char* name,
+					       float value);
+void	plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
+					       unsigned index_,
+					       float value);
+/*float	plugin_tilde_ladspa_get_control_input (Pd_Plugin_Tilde* x,
+					       const char* name);*/
+/* Control output is handled with plugin_tilde_emit_control_output() callback */
+
+/* Local subroutines */
+static void plugin_tilde_describe (const char* full_filename,
+							    void* plugin_handle,
+							    LADSPA_Descriptor_Function descriptor_function,
+							    Pd_Plugin_Tilde* x);
+static void	plugin_tilde_ladspa_search_plugin_callback (const char* full_filename,
+							    void* plugin_handle,
+							    LADSPA_Descriptor_Function descriptor_function,
+							    void* user_data);
+static void	plugin_tilde_ladspa_count_ports (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_ladspa_connect_control_ports (Pd_Plugin_Tilde* x);
+
+static int	plugin_tilde_ladspa_alloc_outofplace_memory (Pd_Plugin_Tilde* x, unsigned long buflen);
+static void	plugin_tilde_ladspa_free_outofplace_memory (Pd_Plugin_Tilde* x);
+static int	plugin_tilde_ladspa_alloc_control_memory (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_ladspa_free_control_memory (Pd_Plugin_Tilde* x);

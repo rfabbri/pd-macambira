@@ -17,7 +17,7 @@
 
 /*****************************************************************************/
 
-#include "ladspa/ladspa.h"
+#include "ladspa.h"
 #include "jutils.h"
 
 /*****************************************************************************/
@@ -103,10 +103,8 @@ LADSPAPluginSearch(LADSPAPluginSearchCallbackFunction fCallbackFunction,
 
   pcLADSPAPath = getenv("LADSPA_PATH");
   if (!pcLADSPAPath) {
-    fprintf(stderr,
-	    "Warning: You do not have a LADSPA_PATH "
-	    "environment variable set.\n");
-    return;
+    fprintf(stderr, "Warning: no LADSPA_PATH, assuming /usr/lib/ladspa:/usr/local/lib/ladspa\n");
+    pcLADSPAPath = "/usr/lib/ladspa:/usr/local/lib/ladspa";
   }
   
   pcStart = pcLADSPAPath;
@@ -127,6 +125,7 @@ LADSPAPluginSearch(LADSPAPluginSearchCallbackFunction fCallbackFunction,
       pcStart++;
   }
 }
+
 
 /*****************************************************************************/
 
