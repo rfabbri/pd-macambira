@@ -93,6 +93,8 @@ typedef struct _link {
 	t_float distance_old;
 } t_link;
 
+inline t_float sqr(t_float x) { return x*x; }
+
 class msd3D:
 	public flext_base
 {
@@ -140,69 +142,56 @@ protected:
 // -----------------------------------------------------------------------
 	void m_bang()
 	{
-		t_float F=0,Fx=0,Fy=0, Fz=0,distance,vitesse, X_new, Y_new, Z_new;
-		t_int i;
-		t_mass **mi;
-		t_link **li;
-	
-		for (i=0, li=link; i<nb_link;li++, i++)	{
+		t_int i;	
+		for (i=0; i<nb_link; i++)	{
+			t_link *li = link[i];
+			t_mass *m1 = li->mass1,*m2 = li->mass2;
 		// compute link forces
-			distance = sqrt(pow((*li)->mass1->posX-(*li)->mass2->posX,2) + pow((*li)->mass1->posY
-				-(*li)->mass2->posY,2) + pow((*li)->mass1->posZ-(*li)->mass2->posZ,2));	// L[n]
-			if (distance < (*li)->long_min || distance > (*li)->long_max)	{	
-				Fx = 0;
-				Fy = 0;
-				Fz = 0;
-			}
+			t_float distance = sqrt(sqr(m1->posX-m2->posX) + sqr(m1->posY-m2->posY) + sqr(m1->posZ-m2->posZ));	// L[n]
+			t_float Fx,Fy,Fz;
+			if (distance < li->long_min || distance > li->long_max || distance == 0)	
+				Fx = Fy = Fz = 0;
 			else	{
-				F  = (*li)->K1 * (distance - (*li)->longueur) ;			// F = K1(L[n] - L[0])
-				F += (*li)->D1 * (distance - (*li)->distance_old) ;			// F = F + D1(L[n] - L[n-1])
-				if (distance != 0) 	{
-					Fx = F * ((*li)->mass1->posX - (*li)->mass2->posX)/distance;	// Fx[n] = F * Lx[n]/L[n]
-					Fy = F * ((*li)->mass1->posY - (*li)->mass2->posY)/distance;	// Fy[n] = F * Ly[n]/L[n]
-					Fz = F * ((*li)->mass1->posZ - (*li)->mass2->posZ)/distance;	// Fy[n] = F * Lz[n]/L[n]
-				}
+				t_float F = (li->K1 * (distance - li->longueur) + li->D1 * (distance - li->distance_old))/distance ;			//F = K1(L[n] - L[0])/L[n] + D1(L[n] - L[n-1])/L[n]
+				Fx = F * (m1->posX - m2->posX);	// Fx[n] = F * Lx[n]
+				Fy = F * (m1->posY - m2->posY);	// Fy[n] = F * Ly[n]
+				Fz = F * (m1->posZ - m2->posZ);	// Fy[n] = F * Lz[n]
 			}
-			(*li)->mass1->forceX -= Fx;					// Fx1[n] = -Fx
-			(*li)->mass1->forceX -= (*li)->D2*(*li)->mass1->speedX;	// Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-			(*li)->mass2->forceX += Fx;					// Fx2[n] = Fx
-			(*li)->mass2->forceX -= (*li)->D2*(*li)->mass2->speedX;	// Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-			(*li)->mass1->forceY -= Fy;					// Fy1[n] = -Fy
-			(*li)->mass1->forceY -= (*li)->D2*(*li)->mass1->speedY;	// Fy1[n] = Fy1[n] - D2 * vy1[n-1]
-			(*li)->mass2->forceY += Fy;					// Fy2[n] = Fy
-			(*li)->mass2->forceY -= (*li)->D2*(*li)->mass2->speedY;	// Fy2[n] = Fy2[n] - D2 * vy2[n-1]
-			(*li)->mass1->forceZ -= Fz;					// Fz1[n] = -Fz
-			(*li)->mass1->forceZ -= (*li)->D2*(*li)->mass1->speedZ;	// Fz1[n] = Fz1[n] - D2 * vz1[n-1]
-			(*li)->mass2->forceZ += Fz;					// Fz2[n] = Fz
-			(*li)->mass2->forceZ -= (*li)->D2*(*li)->mass2->speedZ;	// Fz2[n] = Fz2[n] - D2 * vz2[n-1]
-			(*li)->distance_old = distance;				// L[n-1] = L[n]
+			m1->forceX -= Fx + li->D2*m1->speedX;	// Fx1[n] = -Fx,Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+			m2->forceX += Fx - li->D2*m2->speedX;	//Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+			m1->forceY -= Fy + li->D2*m1->speedY;	// Fy1[n] = -Fy,Fy1[n] = Fy1[n] - D2 * vy1[n-1]
+			m2->forceY += Fy - li->D2*m2->speedY;	// Fy2[n] = Fy,Fy2[n] = Fy2[n] - D2 * vy2[n-1]
+			m1->forceZ -= Fz + li->D2*m1->speedZ;	// Fz1[n] = -Fz,Fz1[n] = Fz1[n] - D2 * vz1[n-1]
+			m2->forceZ += Fz - li->D2*m2->speedZ;	// Fz2[n] = Fz,Fz2[n] = Fz2[n] - D2 * vz2[n-1]
+			li->distance_old = distance;				// L[n-1] = L[n]
 		}
 
-		for (i=0, mi=mass; i<nb_mass;mi++, i++)
+		for (i=0; i<nb_mass; i++) {
+			t_mass *mi = mass[i];
 		// compute new masses position only if mobile = 1
-			if ((*mi)->mobile == 1)  		{
-				X_new = (*mi)->forceX * (*mi)->invM + 2*(*mi)->posX - (*mi)->posX2; // x[n] =Fx[n]/M+2x[n]-x[n-1]
-				(*mi)->posX2 = (*mi)->posX;				// x[n-2] = x[n-1]
-				(*mi)->posX = max(min(X_new,Xmax),Xmin);		// x[n-1] = x[n]	
-				(*mi)->speedX = (*mi)->posX - (*mi)->posX2;	// vx[n] = x[n] - x[n-1]
-				Y_new = (*mi)->forceY * (*mi)->invM + 2*(*mi)->posY - (*mi)->posY2; // y[n] =Fy[n]/M+2y[n]-y[n-1]
-				(*mi)->posY2 = (*mi)->posY;				// y[n-2] = y[n-1]
-				(*mi)->posY = max(min(Y_new,Ymax),Ymin);		// y[n-1] = y[n]	
-				(*mi)->speedY = (*mi)->posY - (*mi)->posY2;	// vy[n] = y[n] - y[n-1]
-				Z_new = (*mi)->forceZ * (*mi)->invM + 2*(*mi)->posZ - (*mi)->posZ2; // x[n] =Fx[n]/M+2x[n]-x[n-1]
-				(*mi)->posZ2 = (*mi)->posZ;				// z[n-2] = z[n-1]
-				(*mi)->posZ = max(min(Z_new,Zmax),Zmin);		// z[n-1] = z[n]	
-				(*mi)->speedZ = (*mi)->posZ - (*mi)->posZ2;	// vz[n] = z[n] - z[n-1]
-				}
+			if (mi->mobile == 1) {
+				t_float X_new = mi->forceX * mi->invM + 2*mi->posX - mi->posX2; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+				mi->posX2 = mi->posX;				// x[n-2] = x[n-1]
+				mi->posX = max(min(X_new,Xmax),Xmin);		// x[n-1] = x[n]	
+				mi->speedX = mi->posX - mi->posX2;	// vx[n] = x[n] - x[n-1]
+				t_float Y_new = mi->forceY * mi->invM + 2*mi->posY - mi->posY2; // y[n] =Fy[n]/M+2y[n]-y[n-1]
+				mi->posY2 = mi->posY;				// y[n-2] = y[n-1]
+				mi->posY = max(min(Y_new,Ymax),Ymin);		// y[n-1] = y[n]	
+				mi->speedY = mi->posY - mi->posY2;	// vy[n] = y[n] - y[n-1]
+				t_float Z_new = mi->forceZ * mi->invM + 2*mi->posZ - mi->posZ2; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+				mi->posZ2 = mi->posZ;				// z[n-2] = z[n-1]
+				mi->posZ = max(min(Z_new,Zmax),Zmin);		// z[n-1] = z[n]	
+				mi->speedZ = mi->posZ - mi->posZ2;	// vz[n] = z[n] - z[n-1]
+			}
+		}
 
-		for (i=0, mi=mass; i<nb_mass;mi++, i++)	{
+		for (i=0; i<nb_mass; i++)	{
+			t_mass *mi = mass[i];
 		// clear forces
-			(*mi)->out_forceX = (*mi)->forceX;
-			(*mi)->forceX = 0;
-			(*mi)->out_forceY = (*mi)->forceY;
-			(*mi)->forceY = 0;
-			(*mi)->out_forceZ = (*mi)->forceZ;
-			(*mi)->forceZ = 0;
+			mi->out_forceX = mi->forceX;
+			mi->out_forceY = mi->forceY;
+			mi->out_forceZ = mi->forceZ;
+			mi->forceX = mi->forceY = mi->forceZ = 0;
 		}
 	}
 

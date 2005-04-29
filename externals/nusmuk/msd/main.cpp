@@ -36,6 +36,7 @@
 // include flext header
 #include <flext.h>
 #include <math.h>
+#include <string.h>
 
 // define constants
 #define MSD_VERSION  0.05
@@ -133,45 +134,42 @@ protected:
 
 	void m_bang()
 	{
-		t_float F=0,Fx=0,distance,vitesse, X_new;
 		t_int i;
-		t_mass **mi;
-		t_link **li;
-
-
-		for (i=0, li=link; i<nb_link; li++,i++)	{
+		for (i=0; i<nb_link; i++)	{
 		// compute link forces
-			distance = (*li)->mass1->posX-(*li)->mass2->posX;		// L[n] = x1 - x2
-			if (distance < 0)
-				distance = -distance;					// |L[n]|
-			if (distance < (*li)->long_min || distance > (*li)->long_max)	
+			t_link *li = link[i];
+			t_mass *m1 = li->mass1,*m2 = li->mass2;
+			t_float distance = fabs(m1->posX-m2->posX);		// L[n] = |x1 - x2|
+			
+			t_float Fx;
+			if (distance < li->long_min || distance > li->long_max || distance == 0)	
 				Fx = 0;
-			else 	{								// Lmin < L < Lmax
-				F  = (*li)->K1 * (distance - (*li)->longueur) ;		// F[n] = k1 (L[n] - L[0])
-				F += (*li)->D1 * (distance - (*li)->distance_old) ;		// F[n] = F[n] + D1 (L[n] - L[n-1])
-				if (distance != 0) 	
-					Fx = F * ((*li)->mass1->posX - (*li)->mass2->posX)/distance; // Fx = F * Lx[n]/L[n]
+			else {								// Lmin < L < Lmax
+				t_float F  = (li->K1 * (distance - li->longueur) + li->D1 * (distance - li->distance_old))/distance ;		// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
+				Fx = F * (m1->posX - m2->posX); // Fx = F * Lx[n]/L[n]
 			}
-				(*li)->mass1->forceX -= Fx;					// Fx1[n] = -Fx
-				(*li)->mass1->forceX -= (*li)->D2*(*li)->mass1->speedX; 	// Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-				(*li)->mass2->forceX += Fx;					// Fx2[n] = Fx
-				(*li)->mass2->forceX -= (*li)->D2*(*li)->mass2->speedX; 	// Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-				(*li)->distance_old = distance;				// L[n-1] = L[n]			
+			
+			m1->forceX -= Fx + li->D2 * m1->speedX; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+			m2->forceX += Fx - li->D2 * m2->speedX; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+			li->distance_old = distance;				// L[n-1] = L[n]			
 		}
 
-		for (i=0, mi=mass; i<nb_mass; mi++, i++)
+		for (i=0; i<nb_mass; i++) {
+			t_mass *mi = mass[i];
 		// compute new masses position only if mobile = 1
-			if ((*mi)->mobile == 1)  		{
-				X_new = (*mi)->forceX * (*mi)->invM + 2*(*mi)->posX - (*mi)->posX2; // x[n] =Fx[n]/M+2x[n]-x[n-1] 
-				(*mi)->posX2 = (*mi)->posX;				// x[n-2] = x[n-1]
-				(*mi)->posX = max(min(X_new,Xmax),Xmin);		// x[n-1] = x[n]	
-				(*mi)->speedX = (*mi)->posX - (*mi)->posX2;	// vx[n] = x[n] - x[n-1]
+			if (mi->mobile == 1)  		{
+				t_float X_new = mi->forceX * mi->invM + 2*mi->posX - mi->posX2; // x[n] =Fx[n]/M+2x[n]-x[n-1] 
+				mi->posX2 = mi->posX;				// x[n-2] = x[n-1]
+				mi->posX = max(min(X_new,Xmax),Xmin);		// x[n-1] = x[n]	
+				mi->speedX = mi->posX - mi->posX2;	// vx[n] = x[n] - x[n-1]
 				}
+		}
 
-		for (i=0, mi=mass; i<nb_mass; mi++, i++)	{
+		for (i=0; i<nb_mass; i++)	{
+			t_mass *mi = mass[i];
 		// clear forces
-			(*mi)->out_forceX = (*mi)->forceX;
-			(*mi)->forceX = 0;						// Fx[n] = 0
+			mi->out_forceX = mi->forceX;
+			mi->forceX = 0;						// Fx[n] = 0
 		}
 	}
 
@@ -613,14 +611,17 @@ protected:
 		{
 			if (auxarg == 0) // No
 			{
-				for (j = 1; j<argc; j++)
+				for (j = 1; j<argc; j++) 
+				{
+					int arg = GetInt(argv[j]);
 					for (i=0, mi=mass; i<nb_mass; mi++, i++)
-						if ((*mi)->nbr==GetInt(argv[j]))
+						if ((*mi)->nbr==arg)
 						{
 							SetFloat(sortie[0],(*mi)->nbr);
 							SetFloat(sortie[1],(*mi)->posX);
 							ToOutAnything(0,S_massesPosNo,2,sortie);
 						}
+				}
 			}
 			else 		//symbol
 			{
@@ -643,14 +644,17 @@ protected:
 		{
 			if (auxarg == 0) // No
 			{
-				for (j = 1; j<argc; j++)
+				for (j = 1; j<argc; j++) 
+				{
+					int arg = GetInt(argv[j]);
 					for (i=0, mi=mass; i<nb_mass; mi++, i++)
-						if ((*mi)->nbr==GetInt(argv[j]))
+						if ((*mi)->nbr==arg)
 						{
 							SetFloat(sortie[0],(*mi)->nbr);
 							SetFloat(sortie[1],(*mi)->out_forceX);
 							ToOutAnything(0,S_massesForcesNo,2,sortie);
 						}
+				}
 			}
 			else 		//string
 			{
@@ -674,14 +678,17 @@ protected:
 			if (auxarg == 0) // No
 			{
 				for (j = 1; j<argc; j++)
+				{
+					int arg = GetInt(argv[j]);
 					for (i=0, li=link; i<nb_link; li++,i++)
-						if ((*li)->nbr==GetInt(argv[j]))
+						if ((*li)->nbr==arg)
 						{
 							SetFloat(sortie[0],(*li)->nbr);
 							SetFloat(sortie[1],(*li)->mass1->posX);
 							SetFloat(sortie[2],(*li)->mass2->posX);
 							ToOutAnything(0,S_linksPosNo,3,sortie);
 						}
+				}
 			}
 			else 		//symbol
 			{
@@ -706,13 +713,16 @@ protected:
 			if (auxarg == 0) // No
 			{
 				for (j = 1; j<argc; j++)
+				{
+					int arg = GetInt(argv[j]);
 					for (i=0, mi=mass; i<nb_mass; mi++, i++)
-						if ((*mi)->nbr==GetInt(argv[j]))
+						if ((*mi)->nbr==arg)
 						{
 							SetFloat(sortie[0],(*mi)->nbr);
 							SetFloat(sortie[1],(*mi)->speedX);
 							ToOutAnything(0,S_massesSpeedsNo,2,sortie);
 						}
+				}
 			}
 			else 		//symbol
 			{
