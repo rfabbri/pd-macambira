@@ -6,24 +6,24 @@
 #X msg 132 203 1;
 #X obj 216 212 t b p;
 #X obj 90 257 route \$1;
-#X obj 147 227 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 147 227 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
-#X obj 251 73 r mypointer;
 #X obj 90 165 r linkspositions;
 #X text 81 137 lid \, x1 \, y1 \, x2 \, y2;
 #X obj 251 131 get liaison lid;
 #X text 261 220 Select pointer with lid matching \$1;
 #X obj 90 349 set liaison x1 y1 x2 y2;
+#X obj 251 73 r myliapointer;
 #X connect 0 0 1 0;
 #X connect 1 0 5 0;
-#X connect 2 0 11 0;
+#X connect 2 0 10 0;
 #X connect 2 1 0 1;
 #X connect 3 0 6 0;
 #X connect 4 0 3 1;
 #X connect 4 0 7 0;
 #X connect 5 0 4 0;
-#X connect 5 1 13 4;
-#X connect 6 0 13 0;
-#X connect 8 0 2 0;
-#X connect 9 0 3 0;
-#X connect 11 0 0 0;
+#X connect 5 1 12 4;
+#X connect 6 0 12 0;
+#X connect 8 0 3 0;
+#X connect 10 0 0 0;
+#X connect 13 0 2 0;
