@@ -79,7 +79,7 @@ static void	plugin_tilde_control (Pd_Plugin_Tilde* x,
 /* First inlet message callback for "control" messages */
 static void	plugin_tilde_list (Pd_Plugin_Tilde* x);
 static void	plugin_tilde_info (Pd_Plugin_Tilde* x);
-static void	plugin_tilde_plug (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_plug (Pd_Plugin_Tilde* x,  t_symbol* plug_name);
 static void	plugin_tilde_bypass (Pd_Plugin_Tilde* x);
 /* First inlet message callback for "reset" messages */
 static void	plugin_tilde_reset (Pd_Plugin_Tilde* x);
@@ -135,10 +135,10 @@ void	plugin_tilde_ladspa_set_control_input_by_index (Pd_Plugin_Tilde* x,
 /* Control output is handled with plugin_tilde_emit_control_output() callback */
 
 /* Local subroutines */
-static void plugin_tilde_describe (const char* full_filename,
+static void plugin_tilde_ladspa_describe (const char* full_filename,
 							    void* plugin_handle,
 							    LADSPA_Descriptor_Function descriptor_function,
-							    Pd_Plugin_Tilde* x);
+							    void* user_data);
 static void	plugin_tilde_ladspa_search_plugin_callback (const char* full_filename,
 							    void* plugin_handle,
 							    LADSPA_Descriptor_Function descriptor_function,

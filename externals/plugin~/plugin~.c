@@ -1,9 +1,7 @@
 /* plugin~, a Pd tilde object for hosting LADSPA/VST plug-ins
    Copyright (C) 2000 Jarno Seppänen
-   remIXed 2005 Carmen Rocco
-   $Id: plugin~.c,v 1.3 2005-04-29 00:43:36 ix9 Exp $
-
-   This file is part of plugin~.
+   remIXed 2005
+   $Id: plugin~.c,v 1.4 2005-04-30 07:38:55 ix9 Exp $
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -53,8 +51,8 @@ void plugin_tilde_setup (void)
     class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_control,gensym ("control"),A_DEFSYM, A_DEFFLOAT, 0);
     class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_info,gensym ("info"),0);
     class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_list,gensym ("listplugins"),0);
-    class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_plug,gensym ("plug"),0);
-    class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_bypass,gensym ("bypass"),0);
+    class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_plug,gensym ("plug"),A_DEFSYM,0);
+    class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_bypass,gensym ("bypass"),A_DEFFLOAT,0);
     class_addmethod (plugin_tilde_class,(t_method)plugin_tilde_reset,gensym ("reset"),0);
     class_addmethod (plugin_tilde_class,nullfn,gensym ("signal"),0);
 }
@@ -74,36 +72,30 @@ static void* plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name)
     x->num_audio_inputs = 2;
     x->num_audio_outputs = 2;
     x->num_control_inputs = 1;
-    x->num_control_outputs = 0;
+    x->num_control_outputs = 1;
     x->audio_inlets = NULL;
     x->audio_outlets = NULL;
     x->control_outlet = NULL;
     x->dsp_vec = NULL;
     x->dsp_vec_length = 0;
-
+    
     if (s_lib_name != NULL) {
       if (s_lib_name->s_name == NULL || strlen (s_lib_name->s_name) == 0) {
-	/* Search for the plugin library */
 	x->plugin_library_filename = plugin_tilde_search_plugin (x, s_name->s_name);
 	if (x->plugin_library_filename == NULL) {
 	  post("plugin~: plugin not found in any library");
-	  goto PLUGIN_TILDE_NEW_RETURN_NULL;
 	}
       }
       else {
-	/* Search in the given plugin library */
 	x->plugin_library_filename = strdup (s_lib_name->s_name);
       }
-      /* Load LADSPA/VST plugin */
       if (plugin_tilde_open_plugin (x,
 				    s_name->s_name,
 				    x->plugin_library_filename,
-				    (unsigned long)sys_getsr ())) {
+				    (unsigned long)sys_getsr ()))
 	post("plugin~: Unable to open plugin");
-	goto PLUGIN_TILDE_NEW_RETURN_NULL;
-      }
     }
-
+    
     /* Create in- and outlet(s) */
 
     /* Allocate memory for in- and outlet pointers */
@@ -135,13 +127,6 @@ static void* plugin_tilde_new (t_symbol* s_name, t_symbol* s_lib_name)
     assert (x->dsp_vec != NULL);
 
     return x;
- PLUGIN_TILDE_NEW_RETURN_NULL:
-    if (x->plugin_library_filename != NULL) {
-        free ((void*)x->plugin_library_filename);
-        x->plugin_library_filename = NULL;
-    }
-    return NULL; /* Indicate error to Pd */
-
 }
 
 static void plugin_tilde_free (Pd_Plugin_Tilde* x)
@@ -225,7 +210,7 @@ static t_int* plugin_tilde_perform (t_int* w)
 
     /* precondition(s) */
     assert (w != NULL);
-
+ 
     /* Unpack DSP parameter vector */
     x = (Pd_Plugin_Tilde*)(w[1]);
     num_samples = (int)(w[2]);
@@ -279,11 +264,11 @@ static void plugin_tilde_control (Pd_Plugin_Tilde* x,
 }
 
 static void plugin_tilde_info (Pd_Plugin_Tilde* x) {
-    assert (x != NULL);
     unsigned port_index = 0;
-    unsigned input_count = 0;
-    unsigned output_count = 0;
     t_atom at[5];
+    LADSPA_PortDescriptor port_type;
+    LADSPA_PortRangeHintDescriptor iHintDescriptor;
+
     at[0].a_type = A_SYMBOL;
     at[1].a_type = A_SYMBOL;
     at[2].a_type = A_SYMBOL;
@@ -291,8 +276,6 @@ static void plugin_tilde_info (Pd_Plugin_Tilde* x) {
     at[4].a_type = A_FLOAT;
 
     for (port_index = 0; port_index < x->plugin.ladspa.type->PortCount; port_index++) {
-	LADSPA_PortDescriptor port_type;
-	LADSPA_PortRangeHintDescriptor iHintDescriptor;
 	port_type = x->plugin.ladspa.type->PortDescriptors[port_index];
 	iHintDescriptor = x->plugin.ladspa.type->PortRangeHints[port_index].HintDescriptor;
 
@@ -316,20 +299,23 @@ static void plugin_tilde_info (Pd_Plugin_Tilde* x) {
 
 	outlet_anything (x->control_outlet, gensym ("port"), 5, at);
     }
-
 }
 
 static void plugin_tilde_list (Pd_Plugin_Tilde* x) {
-  post("listing plugins\n");
-  LADSPAPluginSearch(plugin_tilde_describe,x);
+  void* user_data[1];
+  user_data[0] = x;
+  LADSPAPluginSearch(plugin_tilde_ladspa_describe,(void*)user_data);
 }
 
-static void plugin_tilde_describe(const char * pcFullFilename, 
+static void plugin_tilde_ladspa_describe(const char * pcFullFilename, 
 		      void * pvPluginHandle,
-				  LADSPA_Descriptor_Function fDescriptorFunction, Pd_Plugin_Tilde* x) {
+				  LADSPA_Descriptor_Function fDescriptorFunction, void* user_data) {
+
+  Pd_Plugin_Tilde* x = (((void**)user_data)[0]);
   t_atom at[1];
   const LADSPA_Descriptor * psDescriptor;
   long lIndex;
+
   
   at[0].a_type = A_SYMBOL;
   at[0].a_w.w_symbol = gensym ((char*)pcFullFilename); 
@@ -356,9 +342,15 @@ static void plugin_tilde_describe(const char * pcFullFilename,
 static void plugin_tilde_bypass (Pd_Plugin_Tilde* x) {
 }
 
-static void plugin_tilde_plug (Pd_Plugin_Tilde* x) {
+static void plugin_tilde_plug (Pd_Plugin_Tilde* x, t_symbol* plug_name) {
+  plugin_tilde_ladspa_close_plugin(x);
+  x->plugin_library_filename = NULL;
+  x->plugin_library_filename = plugin_tilde_search_plugin (x, plug_name->s_name);
+  if (x->plugin_library_filename == NULL)
+    post("plugin~: plugin not found in any library");
+  if (plugin_tilde_open_plugin (x, plug_name->s_name, x->plugin_library_filename,(unsigned long)sys_getsr ()))
+    post("plugin~: Unable to open plugin");
 }
-
 
 static void plugin_tilde_reset (Pd_Plugin_Tilde* x)
 {
