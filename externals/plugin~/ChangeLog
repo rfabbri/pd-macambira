@@ -1,12 +1,14 @@
 2005-05-00	Carmen Rocco	<user@whats-your.name>
 
 	* VST support is gone, actually, it was never here, but removed some stuff to clean it up, VST? detour to /externals/grill/vst/
-
+	* you can create the plugin without arguments, it will default to 2 channels
+	
 	new methods:
+	* active: enable or disable the plugin
 	* listplugins: lists all your LADSPA plugins...
 	* info: info on the current plugin, like assignable params, etc.
 	* plug: load a new plug
-
+	
 2001-04-04  Jarno Seppänen  <jams@cs.tut.fi (Jarno Seppanen)>
 
 	* Released version 0.2

@@ -53,6 +53,7 @@ typedef struct
     /* Pd's way of passing parameters to the DSP routine */
     t_int*		dsp_vec;
     unsigned		dsp_vec_length;
+    unsigned dsp_active;
 
 } Pd_Plugin_Tilde;
 
@@ -80,7 +81,7 @@ static void	plugin_tilde_control (Pd_Plugin_Tilde* x,
 static void	plugin_tilde_list (Pd_Plugin_Tilde* x);
 static void	plugin_tilde_info (Pd_Plugin_Tilde* x);
 static void	plugin_tilde_plug (Pd_Plugin_Tilde* x,  t_symbol* plug_name);
-static void	plugin_tilde_bypass (Pd_Plugin_Tilde* x);
+static void	plugin_tilde_active (Pd_Plugin_Tilde* x,  t_float active);
 /* First inlet message callback for "reset" messages */
 static void	plugin_tilde_reset (Pd_Plugin_Tilde* x);
 
