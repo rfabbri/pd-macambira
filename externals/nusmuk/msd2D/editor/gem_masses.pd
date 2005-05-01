@@ -1,8 +1,8 @@
 #N canvas 308 314 667 612 10;
 #X obj 141 31 inlet;
-#X obj 150 361 translateXYZ;
+#X obj 150 424 translateXYZ;
 #X obj 107 205 gemhead;
-#X obj 150 330 separator;
+#X obj 150 393 separator;
 #X obj 150 298 any;
 #X obj 180 162 t b f;
 #X obj 220 124 - 250;
@@ -12,12 +12,16 @@
 #X msg 47 325 draw line;
 #X obj 48 300 loadbang;
 #X obj 141 61 unpack 0 0 0;
-#X obj 150 390 circle 0.05;
+#X obj 150 453 circle 0.05;
+#X obj 240 311 inlet;
+#X obj 150 362 spigot;
+#X msg 239 289 1;
+#X obj 239 264 loadbang;
 #X connect 0 0 12 0;
 #X connect 1 0 13 0;
 #X connect 2 0 4 1;
 #X connect 3 0 1 0;
-#X connect 4 0 3 0;
+#X connect 4 0 15 0;
 #X connect 5 0 4 0;
 #X connect 5 1 1 1;
 #X connect 6 0 9 0;
@@ -28,3 +32,7 @@
 #X connect 11 0 10 0;
 #X connect 12 1 7 0;
 #X connect 12 2 6 0;
+#X connect 14 0 15 1;
+#X connect 15 0 3 0;
+#X connect 16 0 15 1;
+#X connect 17 0 16 0;
