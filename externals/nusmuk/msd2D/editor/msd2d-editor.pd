@@ -2,68 +2,27 @@
 mid2 float lid;
 #N struct mass float x float y float mid float mob;
 #N canvas 130 52 866 562 10;
-#N canvas 646 78 617 552 data 1;
-#X scalar liaison 386 335 554.217 315.951 5 4 0 \;;
-#X scalar liaison 386 335 483.451 302.088 5 3 1 \;;
-#X scalar liaison 386 335 542.942 397.172 5 2 2 \;;
-#X scalar liaison 386 335 471.048 384.162 5 1 3 \;;
-#X scalar liaison 386 335 510.362 348.227 5 0 4 \;;
-#X scalar liaison 483.451 302.088 554.217 315.951 3 4 5 \;;
-#X scalar liaison 542.942 397.172 554.217 315.951 2 4 6 \;;
-#X scalar liaison 542.942 397.172 483.451 302.088 2 3 7 \;;
-#X scalar liaison 471.048 384.162 554.217 315.951 1 4 8 \;;
-#X scalar liaison 471.048 384.162 483.451 302.088 1 3 9 \;;
-#X scalar liaison 471.048 384.162 542.942 397.172 1 2 10 \;;
-#X scalar liaison 510.362 348.227 554.217 315.951 0 4 11 \;;
-#X scalar liaison 510.362 348.227 483.451 302.088 0 3 12 \;;
-#X scalar liaison 510.362 348.227 542.942 397.172 0 2 13 \;;
-#X scalar liaison 510.362 348.227 471.048 384.162 0 1 14 \;;
-#X scalar mass 510.362 348.227 0 0 \;;
-#X scalar mass 471.048 384.162 1 0 \;;
-#X scalar mass 542.942 397.172 2 0 \;;
-#X scalar mass 483.451 302.088 3 0 \;;
-#X scalar mass 554.217 315.951 4 0 \;;
-#X scalar liaison 386 335 282.685 380.849 5 9 15 \;;
-#X scalar liaison 386 335 226.466 325.267 5 8 16 \;;
-#X scalar liaison 386 335 232.252 383.194 5 7 17 \;;
-#X scalar liaison 386 335 277.513 320.772 5 6 18 \;;
-#X scalar mass 386 335 5 900 \;;
-#X scalar liaison 226.466 325.267 282.685 380.849 8 9 19 \;;
-#X scalar liaison 232.252 383.194 282.685 380.849 7 9 20 \;;
-#X scalar liaison 232.252 383.194 226.466 325.267 7 8 21 \;;
-#X scalar liaison 277.513 320.772 282.685 380.849 6 9 22 \;;
-#X scalar liaison 277.513 320.772 226.466 325.267 6 8 23 \;;
-#X scalar liaison 277.513 320.772 232.252 383.194 6 7 24 \;;
-#X scalar mass 277.513 320.772 6 0 \;;
-#X scalar mass 232.252 383.194 7 0 \;;
-#X scalar mass 226.466 325.267 8 0 \;;
-#X scalar mass 282.685 380.849 9 0 \;;
-#X scalar liaison 492.618 194.572 547 192 17 18 25 \;;
-#X scalar liaison 448.193 194.961 492.618 194.572 16 17 26 \;;
-#X scalar liaison 372.637 195.077 448.193 194.961 15 16 27 \;;
-#X scalar liaison 306.912 195.418 372.637 195.077 14 15 28 \;;
-#X scalar liaison 250.927 195.237 306.912 195.418 13 14 29 \;;
-#X scalar liaison 164.149 186.68 250.927 195.237 12 13 30 \;;
-#X scalar liaison 108.003 172.599 164.149 186.68 11 12 31 \;;
-#X scalar liaison 53 173 108.003 172.599 10 11 32 \;;
-#X scalar mass 53 173 10 900 \;;
-#X scalar mass 108.003 172.599 11 0 \;;
-#X scalar mass 164.149 186.68 12 0 \;;
-#X scalar mass 250.927 195.237 13 0 \;;
-#X scalar mass 306.912 195.418 14 0 \;;
-#X scalar mass 372.637 195.077 15 0 \;;
-#X scalar mass 448.193 194.961 16 0 \;;
-#X scalar mass 492.618 194.572 17 0 \;;
-#X scalar mass 547 192 18 900 \;;
-#X restore 106 64 pd data;
-#X obj 274 105 keyup;
-#X obj 274 150 select 108;
-#X text 354 151 "L";
-#X obj 274 126 spigot;
-#X obj 311 82 tgl 20 0 empty empty add_links_with_L 0 -6 0 8 -24198
--1 -1 0 1;
+#N canvas 610 84 617 552 data 1;
+#X scalar liaison 473.44 182.541 548 179 7 8 0 \;;
+#X scalar liaison 391.87 183.337 473.44 182.541 6 7 1 \;;
+#X scalar liaison 313.233 178.369 391.87 183.337 5 6 2 \;;
+#X scalar liaison 260.779 172.377 313.233 178.369 4 5 3 \;;
+#X scalar liaison 196.229 164.351 260.779 172.377 3 4 4 \;;
+#X scalar liaison 137.18 159.608 196.229 164.351 2 3 5 \;;
+#X scalar liaison 79.9374 158.402 137.18 159.608 1 2 6 \;;
+#X scalar liaison 36 159 79.9374 158.402 0 1 7 \;;
+#X scalar mass 36 159 0 900 \;;
+#X scalar mass 79.9374 158.402 1 0 \;;
+#X scalar mass 137.18 159.608 2 0 \;;
+#X scalar mass 196.229 164.351 3 0 \;;
+#X scalar mass 260.779 172.377 4 0 \;;
+#X scalar mass 313.233 178.369 5 0 \;;
+#X scalar mass 391.87 183.337 6 0 \;;
+#X scalar mass 473.44 182.541 7 0 \;;
+#X scalar mass 548 179 8 900 \;;
+#X restore 735 71 pd data;
 #X obj 56 517 structures;
-#X msg 54 138 \; pd-data clear;
+#X msg 152 72 \; pd-data clear;
 #X obj 60 298 bng 24 250 50 0 empty \$0-generate generate 0 -6 0 8
 -24198 -1 -1;
 #X text 57 493 Data Struct Definitions;
@@ -96,8 +55,8 @@ mid2 float lid;
 #X connect 10 0 11 0;
 #X connect 11 0 5 0;
 #X coords 0 0 1 1 102 44 1;
-#X restore 55 88 pd save;
-#X text 31 61 Edit here:;
+#X restore 723 150 pd save;
+#X text 728 46 Edit here:;
 #N canvas 564 255 781 748 generator 0;
 #N canvas 210 99 931 555 getter 0;
 #X obj 244 89 inlet;
@@ -467,7 +426,6 @@ turn and crashed the car and left the toilet seat open.;
 #X obj 233 284 msd2D;
 #X obj 233 215 r \$0-msd;
 #X msg 317 213 infosL;
-#X obj 263 325 print msd-attr;
 #X msg 300 256 get linksPos;
 #X obj 233 449 gem_masses;
 #X obj 313 445 gem_links;
@@ -485,7 +443,7 @@ turn and crashed the car and left the toilet seat open.;
 #X obj 279 301 s \$0-msd-attr;
 #X obj 233 510 s masspositions;
 #X obj 313 488 s linkspositions;
-#X obj 167 69 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 167 69 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X obj 233 421 spigot;
 #X obj 313 421 spigot;
@@ -508,56 +466,54 @@ turn and crashed the car and left the toilet seat open.;
 #X obj 167 92 metro 20;
 #X obj 413 395 r \$0-gem-masses-on;
 #X obj 413 417 r \$0-gem-links-on;
-#X connect 0 0 9 0;
-#X connect 0 0 14 0;
-#X connect 0 1 17 0;
+#X connect 0 0 8 0;
+#X connect 0 0 13 0;
+#X connect 0 1 16 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
-#X connect 4 0 0 0;
-#X connect 7 0 0 0;
-#X connect 8 0 24 0;
-#X connect 9 0 18 0;
-#X connect 9 0 21 0;
-#X connect 9 1 19 0;
-#X connect 9 1 22 0;
-#X connect 11 0 10 0;
-#X connect 12 0 10 0;
-#X connect 13 0 0 0;
-#X connect 15 0 11 0;
-#X connect 15 1 12 0;
-#X connect 16 0 15 0;
-#X connect 16 0 21 1;
-#X connect 16 0 22 1;
-#X connect 16 0 36 0;
-#X connect 20 0 35 0;
-#X connect 20 0 39 0;
+#X connect 3 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 23 0;
+#X connect 8 0 17 0;
+#X connect 8 0 20 0;
+#X connect 8 1 18 0;
+#X connect 8 1 21 0;
+#X connect 10 0 9 0;
+#X connect 11 0 9 0;
+#X connect 12 0 0 0;
+#X connect 14 0 10 0;
+#X connect 14 1 11 0;
+#X connect 15 0 14 0;
+#X connect 15 0 20 1;
+#X connect 15 0 21 1;
+#X connect 15 0 35 0;
+#X connect 19 0 34 0;
+#X connect 19 0 38 0;
+#X connect 20 0 4 0;
 #X connect 21 0 5 0;
-#X connect 22 0 6 0;
-#X connect 24 0 7 0;
-#X connect 24 1 25 0;
-#X connect 26 0 34 0;
-#X connect 27 0 31 0;
-#X connect 28 0 39 1;
-#X connect 29 0 30 0;
-#X connect 30 0 20 0;
-#X connect 31 0 16 0;
-#X connect 31 1 29 0;
-#X connect 32 0 33 0;
-#X connect 33 0 16 0;
-#X connect 34 0 20 0;
-#X connect 34 1 32 0;
+#X connect 23 0 6 0;
+#X connect 23 1 24 0;
+#X connect 25 0 33 0;
+#X connect 26 0 30 0;
+#X connect 27 0 38 1;
+#X connect 28 0 29 0;
+#X connect 29 0 19 0;
+#X connect 30 0 15 0;
+#X connect 30 1 28 0;
+#X connect 31 0 32 0;
+#X connect 32 0 15 0;
+#X connect 33 0 19 0;
+#X connect 33 1 31 0;
+#X connect 34 0 36 0;
 #X connect 35 0 37 0;
-#X connect 36 0 38 0;
-#X connect 39 0 24 0;
+#X connect 38 0 23 0;
+#X connect 39 0 4 1;
 #X connect 40 0 5 1;
-#X connect 41 0 6 1;
 #X restore 61 414 pd activate;
 #X obj 61 378 tgl 24 0 empty empty GEM 0 -6 0 8 -233017 -1 -1 0 1;
 #X obj 97 378 tgl 24 0 empty empty Graphical_Datastructures 0 -6 0
-8 -1 -262144 -1 0 1;
-#X text 426 173 "L" is only active \, if the green toggle is set to
-on. Otherwise use the yellow "link" bang.;
-#X text 263 306 Press "generate" to generate messages to msd2D and
+8 -1 -262144 -1 1 1;
+#X text 275 306 Press "generate" to generate messages to msd2D and
 create the physical model inside.;
 #N canvas 0 0 751 433 ignore 0;
 #X obj 102 264 print ToMSD;
@@ -571,81 +527,57 @@ create the physical model inside.;
 #X obj 281 267 print FromMSD;
 #X obj 281 212 r \$0-msd-out;
 #N canvas 0 0 578 686 setter 0;
-#X obj 547 192 mass-set 18;
-#X obj 494 195 mass-set 17;
-#X obj 451 195 mass-set 16;
-#X obj 377 195 mass-set 15;
-#X obj 313 195 mass-set 14;
-#X obj 259 198 mass-set 13;
-#X obj 174 193 mass-set 12;
-#X obj 119 184 mass-set 11;
-#X obj 67 193 mass-set 10;
-#X obj 278 397 mass-set 9;
-#X obj 233 332 mass-set 8;
-#X obj 228 390 mass-set 7;
-#X obj 284 337 mass-set 6;
-#X obj 388 371 mass-set 5;
-#X obj 552 329 mass-set 4;
-#X obj 480 325 mass-set 3;
-#X obj 552 411 mass-set 2;
-#X obj 479 408 mass-set 1;
-#X obj 513 367 mass-set 0;
+#X obj 452 168 mass-set 8;
+#X obj 393 207 mass-set 7;
+#X obj 317 227 mass-set 6;
+#X obj 290 156 mass-set 5;
+#X obj 243 172 mass-set 4;
+#X obj 185 152 mass-set 3;
+#X obj 129 151 mass-set 2;
+#X obj 76 155 mass-set 1;
+#X obj 36 159 mass-set 0;
 #X restore 305 122 pd setter;
 #N canvas 0 0 822 675 lsetter 0;
-#X obj 67 193 link-set 32;
-#X obj 119 184 link-set 31;
-#X obj 174 193 link-set 30;
-#X obj 259 198 link-set 29;
-#X obj 313 195 link-set 28;
-#X obj 377 195 link-set 27;
-#X obj 451 195 link-set 26;
-#X obj 494 195 link-set 25;
-#X obj 284 337 link-set 24;
-#X obj 284 337 link-set 23;
-#X obj 284 337 link-set 22;
-#X obj 228 390 link-set 21;
-#X obj 228 390 link-set 20;
-#X obj 233 332 link-set 19;
-#X obj 388 371 link-set 18;
-#X obj 388 371 link-set 17;
-#X obj 388 371 link-set 16;
-#X obj 388 371 link-set 15;
-#X obj 513 367 link-set 14;
-#X obj 513 367 link-set 13;
-#X obj 513 367 link-set 12;
-#X obj 513 367 link-set 11;
-#X obj 479 408 link-set 10;
-#X obj 479 408 link-set 9;
-#X obj 479 408 link-set 8;
-#X obj 552 411 link-set 7;
-#X obj 552 411 link-set 6;
-#X obj 480 325 link-set 5;
-#X obj 388 371 link-set 4;
-#X obj 388 371 link-set 3;
-#X obj 388 371 link-set 2;
-#X obj 388 371 link-set 1;
-#X obj 388 371 link-set 0;
+#X obj 36 159 link-set 7;
+#X obj 76 155 link-set 6;
+#X obj 129 151 link-set 5;
+#X obj 185 152 link-set 4;
+#X obj 243 172 link-set 3;
+#X obj 290 156 link-set 2;
+#X obj 317 227 link-set 1;
+#X obj 393 207 link-set 0;
 #X restore 304 145 pd lsetter;
 #X text 288 98 Automatic scripting targets;
 #X text 65 66 You can ignore this stuff here \, unless something goes
 wrong.;
+#X obj 407 239 spigot;
+#X obj 444 186 tgl 15 0 empty empty debug 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 407 212 r \$0-msd-attr;
+#X obj 407 270 print AttrMSD;
+#X obj 532 270 s \$0-msd;
+#X msg 532 249 infosL;
 #X connect 1 0 0 0;
 #X connect 2 0 1 1;
 #X connect 3 0 1 0;
 #X connect 4 0 6 0;
 #X connect 5 0 4 1;
 #X connect 7 0 4 0;
+#X connect 12 0 15 0;
+#X connect 13 0 12 1;
+#X connect 14 0 12 0;
+#X connect 17 0 16 0;
 #X restore 149 517 pd ignore this;
 #X floatatom 133 385 5 10 1000 1 frequency - -;
-#X text 260 364 Visualization is done using either a GEM OpenGL window
+#X text 272 364 Visualization is done using either a GEM OpenGL window
 \, or just animate the data structure alone. Better don't use both
 at the same time. In GDS-mode you can set the frequency of the internal
 metro \, to accelerate or slow down the simulation.;
-#X text 429 53 First create structure inside [pd data] using msd_append.
+#X text 274 23 First create structure inside [pd data] using msd_append.
 Add mobile masses with black bang \, add fixed masses with the red
 bang.;
-#X obj 166 88 msd_append;
-#X text 429 102 Links are created by selecting at least two masses
+#X obj 57 24 msd_append;
+#X text 273 110 Links are created by selecting at least two masses
 in edit mode \, then press "L" to connect those with a link. If you
 select more than two masses \, then all possible links between those
 masses will get created. Use this to mass-connect masses. :);
@@ -679,15 +611,15 @@ masses will get created. Use this to mass-connect masses. :);
 #X connect 10 0 1 0;
 #X connect 11 0 2 0;
 #X restore 60 457 pd forces;
-#X obj 274 518 tgl 15 0 \$0-gem-masses-on empty gem_m 0 -6 0 8 -233017
+#X obj 286 518 tgl 15 0 \$0-gem-masses-on empty gem_m 0 -6 0 8 -233017
 -1 -1 0 1;
-#X obj 316 518 tgl 15 0 \$0-gem-links-on empty gem_l 0 -6 0 8 -233017
+#X obj 328 518 tgl 15 0 \$0-gem-links-on empty gem_l 0 -6 0 8 -233017
 -1 -1 0 1;
-#N canvas 183 333 450 300 props 0;
+#N canvas 84 573 450 300 props 0;
 #X obj 117 204 s \$0-msd;
 #X obj 117 46 vsl 15 64 0 10 0 0 empty empty D 0 -8 0 8 -262144 -1
 -1 0 1;
-#X obj 141 46 vsl 15 64 0 10 0 0 empty empty D2 0 -8 0 8 -262144 -1
+#X obj 141 46 vsl 15 64 0 1 0 0 empty empty D2 0 -8 0 8 -262144 -1
 -1 0 1;
 #X obj 90 46 vsl 15 64 0 100 0 0 empty empty K 0 -8 0 8 -262144 -1
 -1 0 1;
@@ -702,23 +634,23 @@ masses will get created. Use this to mass-connect masses. :);
 #X connect 5 0 0 0;
 #X connect 6 0 0 0;
 #X restore 134 458 pd props;
-#X text 357 515 Toggle display of masses and links in GEM.;
-#X text 261 445 In edit mode and while visualization is active \, you
+#X text 369 515 Toggle display of masses and links in GEM.;
+#X text 273 445 In edit mode and while visualization is active \, you
 can move around the masses. The red masses will not receive any other
 forces from the model. Use the "forces" and "props" subpatches to change
 parameters of links and send forces.;
-#X obj 51 196 morelinks;
-#X text 262 219 More ways to create links: left-to-right connects masses
+#X obj 56 114 morelinks;
+#X text 271 219 More ways to create links: left-to-right connects masses
 from left to right. one2many will connect one mass to many others.
 First select the first mass \, the set the toggle to 1 \, after that
 select the other masses and set toggle to 0;
-#X connect 1 0 4 0;
-#X connect 2 0 22 2;
-#X connect 4 0 2 0;
-#X connect 5 0 4 1;
-#X connect 8 0 12 0;
-#X connect 13 0 14 0;
-#X connect 13 1 15 0;
-#X connect 14 0 13 0;
-#X connect 15 0 13 1;
-#X connect 19 0 13 2;
+#X text 150 47 Clear all:;
+#X text 270 181 "L" is only active \, if the green toggle "Key:L" is
+set to on. Otherwise use the yellow "link" bang.;
+#X text 705 123 Save network to disk:;
+#X connect 3 0 7 0;
+#X connect 8 0 9 0;
+#X connect 8 1 10 0;
+#X connect 9 0 8 0;
+#X connect 10 0 8 1;
+#X connect 13 0 8 2;
