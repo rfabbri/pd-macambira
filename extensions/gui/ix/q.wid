@@ -29,7 +29,7 @@ namespace eval ::ix {
 #. -relief flat -borderwidth 0 -selectborderwidth 0 -bg "#ccffcc" -fg black
 #. @list foreach x [list .#args] {.- insert end $x}
 #. @add .- insert end [join [lrange [list .#args] 0 end] " "]
-#. @scroll .- yview scroll .#1 units .: puts "scrollin .#1"
+#. @scroll .- yview scroll .#1 units
 #. @symbol .- insert end {.#1}
 #. @float ::ix::qi .- .| .#1
 #. @clear .- delete 0 end
