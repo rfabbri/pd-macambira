@@ -103,6 +103,7 @@ public:
 		nb_mass = 0;
 		id_mass = 0;
 		id_link = 0;
+		mouse_grab=0;
 
 		// --- define inlets and outlets ---
 		AddInAnything("bang, reset, etc."); 	// default inlet
@@ -444,6 +445,51 @@ protected:
 		Ymin = GetFloat(argv[0]);
 	}
 
+	void m_grab_mass(int argc,t_atom *argv) 
+	{
+	// grab nearest mass X Y
+		t_mass **mi;
+		t_float aux, distance;
+ 		t_int i;
+
+		// if click
+		if (GetInt(argv[2])==1 && nb_mass>0)	{
+
+			if (argc != 3)
+				error("grabMass : X Y click");
+			// first time we grab this mass?Find nearest mass
+			if (mouse_grab == 0)	{
+				aux = pow(mass[0]->posX-GetFloat(argv[0]),2) + pow(mass[0]->posY-GetFloat(argv[1]),2);
+				nearest_mass = 0;	
+				for (i=1, mi=(mass+1); i<nb_mass; mi++, i++)	{
+					distance = pow((*mi)->posX-GetFloat(argv[0]),2) + pow((*mi)->posY-GetFloat(argv[1]),2);
+					if (distance<aux)	{
+						aux = distance;
+						nearest_mass = i;
+					}
+				}
+			}
+			
+			// Set fixed if mobile
+			i = mass[nearest_mass]->mobile;
+			mass[nearest_mass]->mobile = 0;
+
+			// Set XY
+			mass[nearest_mass]->posX = GetFloat(argv[0]);
+			mass[nearest_mass]->posX2 = GetFloat(argv[0]);
+			mass[nearest_mass]->posY = GetFloat(argv[1]);
+			mass[nearest_mass]->posY2 = GetFloat(argv[1]);
+
+			// Set mobile
+			mass[nearest_mass]->mobile = i;
+			
+			// Current grabbing on
+			mouse_grab = 1;
+		}
+		else
+			// Grabing off
+			mouse_grab =0;
+	}
 // --------------------------------------------------------------  LINKS 
 // ---------------------------------------------------------------------
 
@@ -898,7 +944,7 @@ protected:
 	t_link * link[nb_max_link];
 	t_mass * mass[nb_max_mass];
 	t_float Xmin, Xmax, Ymin, Ymax;
-	int nb_link, nb_mass, id_mass, id_link;
+	t_int nb_link, nb_mass, id_mass, id_link, mouse_grab, nearest_mass;
 
 // --------------------------------------------------------------  SETUP
 // ---------------------------------------------------------------------
@@ -961,6 +1007,7 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"massesForcesL",m_force_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"setMobile",m_set_mobile);
 		FLEXT_CADDMETHOD_(c,0,"setFixed",m_set_fixe);
+		FLEXT_CADDMETHOD_(c,0,"grabMass",m_grab_mass);
 	}
 
 	// for every registered method a callback has to be declared
@@ -988,6 +1035,7 @@ private:
 	FLEXT_CALLBACK_V(m_get)
 	FLEXT_CALLBACK_V(m_delete_link)
 	FLEXT_CALLBACK_V(m_delete_mass)
+	FLEXT_CALLBACK_V(m_grab_mass)
 };
 
 	const t_symbol *msd2D::S_Reset = MakeSymbol("Reset");
