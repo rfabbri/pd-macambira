@@ -215,11 +215,20 @@ public:
 
 
 template <typename T>
+inline T bitrev(T k) 
+{
+	T r = 0;
+	for(int i = 0; i < sizeof(k)*4; ++i) r = (r<<1)|(k&1),k >>= 1;
+	return r;
+}
+
+// use bit-reversed key to pseudo-balance the map tree
+template <typename T>
 class IndexMap
-	: public TablePtrMap<int,T,16>
+	: TablePtrMap<unsigned int,T,16>
 {
 public:
-	typedef TablePtrMap<int,T,16> Parent;
+	typedef TablePtrMap<unsigned int,T,16> Parent;
 	
     virtual ~IndexMap() { reset(); }
 
@@ -229,7 +238,23 @@ public:
 		for(typename Parent::iterator it(*this); it; ++it) delete it.data();
 		Parent::clear(); 
 	}
+	
+	inline size_t size() const { return Parent::size(); }
 
+	inline T insert(unsigned int k,T v) { return Parent::insert(bitrev(k),v); }	
+
+	inline T find(unsigned int k) { return Parent::find(bitrev(k)); }
+
+	inline T remove(unsigned int k) { return Parent::remove(bitrev(k)); }
+	
+	class iterator
+		: public Parent::iterator
+	{
+	public:
+		iterator() {}
+		iterator(IndexMap &m): Parent::iterator(m) {}
+		inline unsigned int key() const { return bitrev(Parent::key()); }
+	};
 };
 
 template <typename T>
@@ -321,7 +346,7 @@ protected:
 	IDMap<t_mass *> massids;		// masses by name
 	
 	t_float limit[N][2];			// Limit values
-	int id_mass, id_link;
+	unsigned int id_mass, id_link;
 
 // ---------------------------------------------------------------  RESET 
 // ----------------------------------------------------------------------
