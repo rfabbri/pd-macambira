@@ -1,9 +1,9 @@
-#N canvas 862 152 86 80 10;
+#N canvas 862 152 84 110 10;
 #X obj 2 16 cnv 15 80 60 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 13 29 bng 15 250 50 0 empty empty mass 0 -6 0 8 -1 -262144 -1
+#X obj 16 29 bng 15 250 50 0 empty empty mass 0 -6 0 8 -1 -262144 -1
 ;
-#X obj 46 29 bng 15 250 50 0 empty empty fix 0 -6 0 8 -258699 -1 -1
+#X obj 54 29 bng 15 250 50 0 empty empty fix 0 -6 0 8 -258699 -1 -1
 ;
 #N canvas 355 457 863 719 guts 0;
 #X obj 252 139 pointer;
@@ -15,9 +15,8 @@
 #X obj 385 351 + 1;
 #X obj 355 291 r \$0-counter-bng;
 #X obj 355 393 s \$0-nextmass;
-#X obj 144 200 r \$0-nextmass;
+#X obj 145 153 r \$0-nextmass;
 #X obj 70 97 s \$0-counter-bng;
-#X obj 66 231 append mass x y mid mob;
 #X obj 70 71 t b b b b b f b;
 #X msg 70 47 0;
 #X text 111 24 mobile;
@@ -30,37 +29,54 @@
 #X obj 296 425 s \$0-counter-in;
 #X obj 66 203 + 20;
 #X obj 105 148 + 20;
-#X connect 0 0 11 4;
-#X connect 1 0 22 0;
+#X obj 192 177 r \$0-M;
+#X obj 68 231 append mass x y mid mob M;
+#X obj 553 175 f \$1;
+#X obj 553 199 select 0;
+#X obj 553 254 s \$0-M;
+#X msg 552 224 100;
+#X obj 558 152 loadbang;
+#X connect 0 0 24 5;
+#X connect 1 0 21 0;
 #X connect 2 0 0 0;
-#X connect 3 0 23 0;
-#X connect 4 0 13 0;
-#X connect 5 0 16 0;
-#X connect 6 0 17 1;
-#X connect 7 0 17 0;
-#X connect 9 0 11 2;
-#X connect 12 0 10 0;
-#X connect 12 1 1 0;
-#X connect 12 3 3 0;
-#X connect 12 5 11 3;
-#X connect 12 6 2 0;
-#X connect 13 0 12 0;
-#X connect 16 0 12 0;
-#X connect 17 0 6 0;
-#X connect 17 0 8 0;
-#X connect 17 0 20 0;
-#X connect 18 0 17 0;
-#X connect 19 0 17 0;
-#X connect 20 0 21 0;
-#X connect 22 0 11 0;
-#X connect 23 0 11 1;
-#X restore 119 47 pd guts;
+#X connect 3 0 22 0;
+#X connect 4 0 12 0;
+#X connect 5 0 15 0;
+#X connect 6 0 16 1;
+#X connect 7 0 16 0;
+#X connect 9 0 24 2;
+#X connect 11 0 10 0;
+#X connect 11 1 1 0;
+#X connect 11 3 3 0;
+#X connect 11 5 24 3;
+#X connect 11 6 2 0;
+#X connect 12 0 11 0;
+#X connect 15 0 11 0;
+#X connect 16 0 6 0;
+#X connect 16 0 8 0;
+#X connect 16 0 19 0;
+#X connect 17 0 16 0;
+#X connect 18 0 16 0;
+#X connect 19 0 20 0;
+#X connect 21 0 24 0;
+#X connect 22 0 24 1;
+#X connect 23 0 24 4;
+#X connect 25 0 26 0;
+#X connect 26 0 28 0;
+#X connect 26 1 27 0;
+#X connect 28 0 27 0;
+#X connect 29 0 25 0;
+#X restore 105 79 pd guts;
 #X obj 126 6 inlet;
 #X obj 169 5 inlet;
-#X obj 16 59 nbx 5 14 -1e+37 1e+37 0 0 \$0-counter \$0-counter-in next
-0 -6 0 10 -262144 -1 -1 0 256;
+#X obj 25 59 nbx 5 14 -1e+37 1e+37 0 0 \$0-counter \$0-counter-in id
+-22 8 0 10 -262144 -1 -1 8 256;
+#X obj 2 77 cnv 15 80 30 empty empty empty 10 10 0 10 -195568 -1 0
+;
+#X obj 26 85 nbx 5 14 -1e+37 1e+37 0 0 \$0-M \$0-M M -12 8 0 10 -225271
+-1 -1 0 256;
 #X connect 1 0 3 0;
 #X connect 2 0 3 1;
 #X connect 4 0 3 0;
 #X connect 5 0 3 1;
-#X coords 0 0 1 1 82 80 1;
+#X coords 0 0 1 1 82 100 1;
