@@ -1,2 +1,4 @@
 NAME=msd2D
 SRCS=main.cpp
+HDRS=../msd.h
+
