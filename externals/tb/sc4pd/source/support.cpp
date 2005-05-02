@@ -39,7 +39,7 @@
 #include <flsupport.h>
 
 
-bool sc_add (flext::AtomList a)
+bool sc_add (flext::AtomList& a)
 {
     for (int i = 0; i!=a.Count();++i)
     {
@@ -54,7 +54,7 @@ bool sc_add (flext::AtomList a)
     return false;
 }
 
-float sc_getfloatarg (flext::AtomList a,int i)
+float sc_getfloatarg (flext::AtomList& a,int i)
 {
     if (a.Count() > 0 && a.Count() > i)
 	return flext::GetAFloat(a[i]);
@@ -62,7 +62,7 @@ float sc_getfloatarg (flext::AtomList a,int i)
 	return 0;
 }
 
-bool sc_ar(flext::AtomList a)
+bool sc_ar(flext::AtomList& a)
 {
     for (int i = 0; i!=a.Count();++i)
     {
@@ -77,7 +77,7 @@ bool sc_ar(flext::AtomList a)
     return false;
 }
 
-bool sc_inv(flext::AtomList a)
+bool sc_inv(flext::AtomList& a)
 {
     for (int i = 0; i!=a.Count();++i)
     {

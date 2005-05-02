@@ -47,10 +47,10 @@
 
 
 /* for argument parsing */
-bool sc_add (flext::AtomList a);
-float sc_getfloatarg (flext::AtomList a,int i);
-bool sc_ar(flext::AtomList a);
-bool sc_inv(flext::AtomList a);
+bool sc_add (flext::AtomList& a);
+float sc_getfloatarg (flext::AtomList& a,int i);
+bool sc_ar(flext::AtomList& a);
+bool sc_inv(flext::AtomList& a);
 
 
 /* for rngs */
