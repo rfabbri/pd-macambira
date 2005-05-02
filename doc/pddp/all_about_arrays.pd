@@ -1,5 +1,5 @@
-#N canvas 0 0 653 613 12;
-#N canvas 132 0 591 609 What_is_an_array_in_PD 0;
+#N canvas 299 68 516 572 10;
+#N canvas 132 22 591 609 What_is_an_array_in_PD 0;
 #X text 27 17 WHAT IS AN ARRAY IN PURE DATA?;
 #X text 45 42 Arrays \, in most programming environments \, are considered
 to be "a sequence of objects all of which have the same variable type"
@@ -7,7 +7,7 @@ wherein each object is called an element and the elements are numbered
 in a row 0 \, 1 \, 2 \, 3 \, etc. These numbers are called indices.
 Each index holds a corresponding value.;
 #X text 46 222 Arrays in Pd look like this:;
-#N canvas 0 0 450 300 graph18 0;
+#N canvas 0 22 450 300 graph18 0;
 #X array example_array 100 float 0;
 #X coords 0 1 99 -1 200 140 1;
 #X restore 277 225 graph;
@@ -27,9 +27,9 @@ objects are separate \, but Pd creates both simoultaneously for purposes
 of convenience. These two objects together are called a "table". To
 see what I mean by all of this:;
 #X restore 43 42 pd What_is_an_array_in_PD;
-#N canvas 118 1 608 615 How_to_manipulate_arrays_in_PD 0;
+#N canvas 148 160 612 619 How_to_manipulate_arrays_in_PD 0;
 #X text 13 5 HOW TO MANIPULATE ARRAYS IN Pd;
-#N canvas 0 0 452 302 graph28 0;
+#N canvas 0 22 452 302 graph28 0;
 #X array exampleArray 67 float 0;
 #X coords 0 2 67 -2 200 140 1;
 #X restore 369 451 graph;
@@ -55,14 +55,14 @@ of the array.;
 #X text 19 10 This example assumes that we already know the size of
 the two arrays which will be concatenated. This process will fill NewArray
 with the contents of exampleArray and concatArray.;
-#N canvas 0 0 450 300 graph33 0;
+#N canvas 0 22 450 300 graph33 0;
 #X array concatArray 15 float 1;
 #A 0 -0.700355 -0.371783 -0.443212 -0.700355 -0.714641 -0.386069 0.0425035
 0.399647 0.513933 0.399647 0.128218 -0.128925 -0.21464 -0.0289252 -0.700355
 ;
 #X coords 0 1 14 -1 200 140 1;
 #X restore 492 25 graph;
-#N canvas 0 0 450 300 graph34 0;
+#N canvas 0 22 450 300 graph34 0;
 #X array NewArray 82 float 0;
 #X coords 0 1 81 -1 300 140 1;
 #X restore 389 267 graph;
@@ -573,7 +573,7 @@ of formats.;
 #X connect 25 0 21 0;
 #X connect 26 0 21 1;
 #X restore 24 526 pd Files_and_arrays;
-#N canvas 0 0 719 423 Additional_tools 0;
+#N canvas 0 22 719 423 Additional_tools 0;
 #X text 18 14 ADDITIONAL TOOLS;
 #X text 29 38 The "array" object in Pd accepts special messages to
 alter the appearance of the array on screen.;
@@ -597,26 +597,71 @@ tick).;
 #X text 17 325 Arrays can be given labels to describe the x and y axis.
 Give a y value and a bunch of x values or vice versa:;
 #X restore 24 553 pd Additional_tools;
-#N canvas 4 29 717 375 Populating_an_array 0;
+#N canvas 375 65 671 598 Populating_an_array 0;
 #X text 27 12 POPULATING AN ARRAY;
 #X text 41 37 An array in Pd is primarily a storage device for numbers.
 The result is a series of numbers that you can do with whatever you
 wish...but how does one populate an array?;
-#X text 53 185 list element 1 = array[0];
-#X text 53 201 list element 2 = array[1];
+#X msg 39 333 \; exampleArray 0 -1 1 -1 0.5 -0.5 0.5 -0.2 0.2 -0.2
+0.1 -0.1 0;
+#X text 39 522 Note that if your array is larger than your list \,
+then only the first elements will be effected. If your array is smaller
+than your list \, then your list will be truncated.;
+#X msg 38 381 \; exampleArray 9 -1 1 -1 0.5 -0.5 0.5 -0.2 0.2 -0.2
+0.1 -0.1 0;
+#X msg 38 430 \; exampleArray 55 -1 1 -1 0.5 -0.5 0.5 -0.2 0.2 0.2
+0.1 -0.1 0;
+#N canvas 225 194 487 361 clearExampleArray 0;
+#X obj 199 91 arraysize exampleArray;
+#X obj 153 189 moses;
+#X obj 124 149 +;
+#X obj 162 149 f;
+#X msg 162 123 0;
+#X msg 123 123 1;
+#X obj 153 220 t b b f;
+#X obj 184 276 tabwrite exampleArray;
+#X msg 184 248 0;
+#X obj 55 170 bang;
+#X msg 33 92 0;
+#X obj 33 67 trigger bang bang;
+#X obj 234 168 bang;
+#X obj 33 26 inlet;
+#X connect 0 0 1 1;
+#X connect 1 0 6 0;
+#X connect 1 1 12 0;
+#X connect 2 0 3 0;
+#X connect 2 0 1 0;
+#X connect 3 0 2 1;
+#X connect 4 0 3 0;
+#X connect 5 0 2 0;
+#X connect 6 0 9 0;
+#X connect 6 1 8 0;
+#X connect 6 2 7 1;
+#X connect 8 0 7 0;
+#X connect 9 0 5 0;
+#X connect 10 0 2 0;
+#X connect 11 0 10 0;
+#X connect 11 1 0 0;
+#X connect 12 0 4 0;
+#X connect 13 0 11 0;
+#X restore 441 483 pd clearExampleArray;
+#X obj 419 483 bng 19 250 50 0 empty empty empty 0 -6 0 8 -62784 -1
+-1;
 #X text 39 94 Advanced techniques using text or audio files is described
 later \, but for now it's important to know that you can send an array
 a list. Each element in the list will be assigned to the corresponding
-element in the array. Note that the first index in an array is always
+element in the array. Note that the first position in an array is always
 zero!;
-#X msg 39 303 \; exampleArray 0 -1 1 -1 0.5 -0.5 0.5 -0.2 0.2 -0.2
-0.1 -0.1 0;
-#X text 37 232 Note that if your array is larger than your list \,
-then only the first elements will be effected. If your array is smaller
-than your list \, then your list will be truncated.;
+#X text 39 235 These messages below populate exampleArray on the parent
+patch with some values. The first element is the name of the array
+to populate. The second element is the position to start at. The rest
+of the elements are values to add to the array sequentially.;
+#X text 53 185 first position in array = array[0];
+#X text 53 201 second position in array = array[1];
+#X connect 7 0 6 0;
 #X restore 24 295 pd Populating_an_array;
 #X restore 41 173 pd How_to_manipulate_arrays_in_PD;
-#N canvas 132 0 587 609 How_to_create_an_array_in_PD 0;
+#N canvas 132 22 587 609 How_to_create_an_array_in_PD 0;
 #X text 22 9 1 Select "array" from the "Put" menu above.;
 #X text 21 288 4 If you want Pd to create a new graph for this array
 \, then select "in new graph". If you have another location in mind
@@ -642,7 +687,7 @@ each time you open this patch. This is recommended only for relatively
 small arrays...larger arrays should be saved to either a text file
 \, or an audio file.;
 #X restore 42 106 pd How_to_create_an_array_in_PD;
-#N canvas 133 1 646 607 Common_uses_for_arrays_in_PD 0;
+#N canvas 133 22 646 607 Common_uses_for_arrays_in_PD 0;
 #X text 27 26 COMMON USES FOR ARRAYS IN Pd;
 #X text 49 60 Arrays are versatile. Their simple structure make them
 useful in countless situations. This page discusses perhaps the most
@@ -675,3 +720,7 @@ Check the CVS Repository or Pure-data.org for [arraysize].;
 #X text 40 459 This document is meant to supplement the help documentation
 for [table] \, [tabread] \, [tabwrite] \, [soundfiler] \, [tabsend~]
 \, [tabreceive~] \, [tabplay~] \, etc.;
+#X obj 4 4 cnv 15 500 20 empty empty all_about_arrays 20 10 1 18 -233017
+-66577 0;
+#X obj 471 5 pddp;
+#X text 316 528 updated for Pd 0.38-2;
