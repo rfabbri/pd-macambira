@@ -92,8 +92,7 @@ class Mass {
 public:
 	t_int nbr;
 	const t_symbol *Id;
-	bool mobile;
-	t_float invM;
+	t_float M,invM;
 	t_float speed[N];
 	t_float pos[N];
 	t_float pos2[N];
@@ -103,9 +102,10 @@ public:
 	
 	Mass(t_int n,const t_symbol *id,bool mob,t_float m,t_float p[N])
 		: nbr(n),Id(id)
-		, mobile(mob)
-		, invM(m?1.f/m:1)
+		, M(m)
 	{
+		if(mob) setMobile(); else setFixed();
+	
 		for(int i = 0; i < N; ++i) {
 			pos[i] = pos2[i] = p[i];
 			force[i] = speed[i] = 0;
@@ -126,21 +126,33 @@ public:
 		for(int i = 0; i < N; ++i) setPos(i,p[i]);
 	}
 	
+	inline bool getMobile() const { return invM != 0; }
+	
+	inline void setMobile() { invM = M?1.f/M:1.; }
+	inline void setFixed() { invM = 0; }
+	
 	inline void compute(t_float limit[N][2])
 	{
-		// compute new masses position only if mobile = 1
-		if(mobile)  {
-			for(int i = 0; i < N; ++i) {
-				t_float pold = pos[i];
-				t_float pnew = force[i] * invM + 2*pold - pos2[i]; // x[n] =Fx[n]/M+2x[n]-x[n-1]
-				if(pnew < limit[i][0]) pnew = limit[i][0]; else if(pnew > limit[i][1]) pnew = limit[i][1];
-				speed[i] = (pos[i] = pnew) - (pos2[i] = pold);	// x[n-2] = x[n-1], x[n-1] = x[n],vx[n] = x[n] - x[n-1]
-			}
-		}
-		// clear forces
 		for(int i = 0; i < N; ++i) {
+			t_float pold = pos[i];
+			t_float pnew = force[i] * invM + 2*pold - pos2[i]; // x[n] =Fx[n]/M+2x[n]-x[n-1]
+			if(pnew < limit[i][0]) pnew = limit[i][0]; else if(pnew > limit[i][1]) pnew = limit[i][1];
+			speed[i] = (pos[i] = pnew) - (pos2[i] = pold);	// x[n-2] = x[n-1], x[n-1] = x[n],vx[n] = x[n] - x[n-1]
+
+			// clear forces
 			out_force[i] = force[i];
 			force[i] = 0;						// Fx[n] = 0
+		}
+	}
+
+	static t_float dist(const Mass &m1,const Mass &m2) 
+	{
+		if(N == 1) 
+			return fabs(m1.pos[0]-m2.pos[0]);		// L[n] = |x1 - x2|
+		else {
+			t_float distance = 0;
+			for(int i = 0; i < N; ++i) distance += sqr(m1.pos[i]-m2.pos[i]);
+			return sqrt(distance);
 		}
 	}
 };
@@ -155,27 +167,13 @@ public:
 	t_float longueur, long_min, long_max;
 	t_float distance_old;
 	
-	inline t_float compdist() const 
-	{
-		const Mass<N> *m1 = mass1,*m2 = mass2; // cache locally
-		t_float distance;
-		if(N == 1) 
-			distance = fabs(m1->pos[0]-m2->pos[0]);		// L[n] = |x1 - x2|
-		else {
-			distance = 0;
-			for(int i = 0; i < N; ++i) distance += sqr(m1->pos[i]-m2->pos[i]);
-			distance = sqrt(distance);
-		}
-		return distance;
-	}
-
 	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1,t_float d2,t_float lmin,t_float lmax)
 		: nbr(n),Id(id)
 		, mass1(m1),mass2(m2)
 		, K1(k1),D1(d1),D2(d2)
 		, long_min(lmin),long_max(lmax)
 	{
-		distance_old = longueur = compdist(); // L[n-1]
+		distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
 
 		mass1->links.insert(this);
 		mass2->links.insert(this);
@@ -191,8 +189,7 @@ public:
 	inline void compute() 
 	{
 		Mass<N> *m1 = mass1,*m2 = mass2; // cache locally
-		t_float distance = compdist();
-		
+		t_float distance = Mass<N>::dist(*m1,*m2); 
 		if (distance < long_min || distance > long_max || distance == 0) {
 			for(int i = 0; i < N; ++i) {
 				m1->force[i] -= D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
@@ -224,10 +221,10 @@ inline T bitrev(T k)
 // use bit-reversed key to pseudo-balance the map tree
 template <typename T>
 class IndexMap
-	: TablePtrMap<unsigned int,T,16>
+	: TablePtrMap<unsigned int,T,64>
 {
 public:
-	typedef TablePtrMap<unsigned int,T,16> Parent;
+	typedef TablePtrMap<unsigned int,T,64> Parent;
 	
     virtual ~IndexMap() { reset(); }
 
@@ -258,13 +255,13 @@ public:
 
 template <typename T>
 class IDMap
-	: TablePtrMap<const t_symbol *,TablePtrMap<T,T,4> *>
+	: TablePtrMap<const t_symbol *,TablePtrMap<T,T,4> *,4>
 {
 public:
 	// that's the container holding the data items (masses, links) of one ID
 	typedef TablePtrMap<T,T,4> Container;
 	// that's the map for the key ID (symbol,int) relating to the data items
-	typedef TablePtrMap<const t_symbol *,Container *> Parent;
+	typedef TablePtrMap<const t_symbol *,Container *,4> Parent;
 
 	typedef typename Container::iterator iterator;
 
@@ -459,7 +456,8 @@ protected:
 	
 		t_mass *m = mass.find(GetAInt(argv[0]));
 		if(m) 
-			m->mobile = mob;
+			if(mob) m->setMobile(); 
+			else m->setFixed();
 		else
 			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 	}
@@ -849,8 +847,8 @@ private:
 		t_atom sortie[4+N];
 		SetInt((sortie[0]),m->nbr);
 		SetSymbol((sortie[1]),m->Id);
-		SetBool((sortie[2]),m->mobile);
-		SetFloat((sortie[3]),1.f/m->invM);
+		SetBool((sortie[2]),m->getMobile());
+		SetFloat((sortie[3]),m->M);
 		for(int i = 0; i < N; ++i) SetFloat((sortie[4+i]),m->pos[i]);
 		ToOutAnything(1,s,4+N,sortie);
 	}
