@@ -145,7 +145,7 @@ public:
 		}
 	}
 
-	static t_float dist(const Mass &m1,const Mass &m2) 
+	static inline t_float dist(const Mass &m1,const Mass &m2) 
 	{
 		if(N == 1) 
 			return fabs(m1.pos[0]-m2.pos[0]);		// L[n] = |x1 - x2|
@@ -366,7 +366,7 @@ protected:
 	void m_mass(int argc,t_atom *argv) 
 	{
 		if(argc != 3+N) {
-			error("mass : Id mobile mass X");
+			error("mass : Id mobile mass X%s%s",N >= 2?" Y":"",N >= 3?" Z":"");
 			return;
 		}
 		
