@@ -39,7 +39,6 @@
 #include <math.h>
 #include <string.h>
 #include <vector>
-#include <map>
 
 // define constants
 #define MSD_VERSION  0.05
@@ -218,7 +217,7 @@ template <typename T>
 inline T bitrev(T k) 
 {
 	T r = 0;
-	for(int i = 0; i < sizeof(k)*4; ++i) r = (r<<1)|(k&1),k >>= 1;
+	for(int i = 0; i < sizeof(k)*8; ++i) r = (r<<1)|(k&1),k >>= 1;
 	return r;
 }
 
@@ -239,7 +238,7 @@ public:
 		Parent::clear(); 
 	}
 	
-	inline size_t size() const { return Parent::size(); }
+	inline int size() const { return Parent::size(); }
 
 	inline T insert(unsigned int k,T v) { return Parent::insert(bitrev(k),v); }	
 
@@ -259,13 +258,13 @@ public:
 
 template <typename T>
 class IDMap
-	: std::map<const t_symbol *,TablePtrMap<T,T,4> *>
+	: TablePtrMap<const t_symbol *,TablePtrMap<T,T,4> *>
 {
 public:
 	// that's the container holding the data items (masses, links) of one ID
 	typedef TablePtrMap<T,T,4> Container;
 	// that's the map for the key ID (symbol,int) relating to the data items
-	typedef std::map<const t_symbol *,Container *> Parent;
+	typedef TablePtrMap<const t_symbol *,Container *> Parent;
 
 	typedef typename Container::iterator iterator;
 
@@ -275,38 +274,32 @@ public:
 	
 	void reset() 
 	{
-        typename Parent::iterator it;
-        for(it = Parent::begin(); it != Parent::end(); ++it) 
-            delete it->second;
+        typename Parent::iterator it(*this);
+        for(; it; ++it) delete it.data();
 		Parent::clear();
 	}
 	
 	void insert(T item)
 	{
-		typename Parent::iterator it = Parent::find(item->Id);
-        Container *c;
-        if(it == Parent::end())
-            Parent::operator[](item->Id) = c = new Container;
-        else
-            c = it->second;
+		Container *c = Parent::find(item->Id);
+        if(!c)
+            Parent::insert(item->Id,c = new Container);
         c->insert(item,item);
 	}
 	
 	iterator find(const t_symbol *key)
 	{
-		typename Parent::iterator it = Parent::find(key);
-		if(it == Parent::end())
-			return iterator();
-        else {
-            Container *c = it->second;
+		Container *c = Parent::find(key);
+		if(c)
 			return iterator(*c);
-        }
+        else
+			return iterator();
 	}
 	
 	void erase(T item)
 	{
-		typename Parent::iterator it = Parent::find(item->Id);
-		if(it != Parent::end()) it->second->remove(item);
+		Container *c = Parent::find(item->Id);
+		if(c) c->remove(item);
 	}
 };
 
