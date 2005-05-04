@@ -1,5 +1,5 @@
 #N canvas 0 0 478 397 10;
-#N canvas 271 52 742 843 masses 0;
+#N canvas 289 25 787 879 masses 0;
 #X obj 62 154 cnv 15 610 180 empty empty CREATION 20 12 0 14 -262131
 -66577 0;
 #X msg 79 183 reset;
@@ -20,23 +20,23 @@
 #X text 350 431 Set position of mass(es);
 #X text 347 486 Add force on mass(es);
 #X msg 85 485 forceX \$1 \$2;
-#X obj 61 617 cnv 15 610 198 empty empty GET_ATTRIBUTES 20 12 0 14
+#X obj 61 617 cnv 15 610 230 empty empty GET_ATTRIBUTES 20 12 0 14
 -261689 -66577 0;
 #X msg 147 644 massePosL;
-#X msg 147 672 masseForcesL;
+#X msg 147 694 masseForcesL;
 #X text 248 644 output all masses positions in a list on outlet No
 1;
-#X text 247 673 output all masses forces in a list on outlet No 1;
-#X msg 146 710 get \$1 \$2;
-#X text 249 711 Get specific attribute;
-#X text 249 736 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
+#X text 247 695 output all masses forces in a list on outlet No 1;
+#X msg 146 732 get \$1 \$2;
+#X text 249 733 Get specific attribute;
+#X text 249 758 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
 / linksPos );
-#X text 249 773 \$2 : Id (symbol or creations numbers);
+#X text 249 795 \$2 : Id (symbol or creations numbers);
 #X msg 79 290 deleteMass \$1;
 #X text 248 292 Delete a mass and associated links;
 #X text 338 309 \$1 : Creation No of mass;
-#X msg 144 793 infosL;
-#X text 247 793 Get infos on all masses and links on outlet No 2;
+#X msg 144 815 infosL;
+#X text 247 815 Get infos on all masses and links on outlet No 2;
 #X text 347 555 \$1 : Value;
 #X text 73 22 MASSES :;
 #X text 66 69 They got only one physical parameter \, the value of
@@ -60,6 +60,10 @@ their;
 #X text 334 271 \$4 \, \$5 : initial position;
 #X text 350 449 \$1 : Id (symbol) or No;
 #X text 348 503 \$1 : Id (symbol) or No;
+#X msg 68 668 massePosXL;
+#X msg 147 669 massePosYL;
+#X text 248 669 output all masses x/y position in a list on outlet
+No 1;
 #X connect 1 0 44 0;
 #X connect 8 0 44 0;
 #X connect 13 0 44 0;
@@ -72,7 +76,8 @@ their;
 #X connect 38 0 44 0;
 #X connect 41 0 44 0;
 #X connect 46 0 44 0;
-#X restore 221 312 pd masses;
+#X connect 50 0 44 0;
+#X restore 222 312 pd masses;
 #X text 75 312 HELP on masses --->;
 #X text 74 343 HELP on links --->;
 #X text 13 117 There are 4 types of messages for msd :;

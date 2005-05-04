@@ -7,11 +7,10 @@
  Written by Nicolas Montgermont for a Master's train in Acoustic,
  Signal processing and Computing Applied to Music (ATIAM, Paris 6) 
  at La Kitchen supervised by Cyrille Henry.
-
+ 
+ ptimized by Thomas Grill for Flext
  Based on Pure Data by Miller Puckette and others
- Use FLEXT C++ Layer by Thomas Grill (xovo@gmx.net)
  Based on pmpd by Cyrille Henry 
-
 
  Contact : Nicolas Montgermont, montgermont@la-kitchen.fr
 	   Cyrille Henry, Cyrille.Henry@la-kitchen.fr
@@ -336,7 +335,7 @@ protected:
 	IDMap<t_mass *> massids;		// masses by name
 	
 	t_float limit[N][2];			// Limit values
-	unsigned int id_mass, id_link;
+	unsigned int id_mass, id_link, mouse_grab, nearest_mass;
 
 // ---------------------------------------------------------------  RESET 
 // ----------------------------------------------------------------------
@@ -504,6 +503,59 @@ protected:
 	inline void m_Xmax(int argc,t_atom *argv) { m_limit(argc,argv,0,1); }
 	inline void m_Ymax(int argc,t_atom *argv) { m_limit(argc,argv,1,1); }
 	inline void m_Zmax(int argc,t_atom *argv) { m_limit(argc,argv,2,1); }
+
+	void m_grab_mass(int argc,t_atom *argv) 
+	{
+	// grab nearest mass X Y
+		t_mass **mi;
+		t_float aux, distance;
+		t_atom aux2[2];
+ 		bool mobil;
+
+		// if click
+		if (GetInt(argv[2])==1 && mass.size()>0)	{
+
+			if (argc != 3)
+				error("grabMass : X Y click");
+			// first time we grab this mass?Find nearest mass
+			if (mouse_grab == 0)	{
+				t_mass *m = mass.find(0);
+				aux = sqr(m->pos[0]-GetFloat(argv[0])) + sqr(m->pos[1]-GetFloat(argv[1]));
+				nearest_mass = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
+					distance = sqr(mit.data()->pos[0]-GetFloat(argv[0])) + sqr(mit.data()->pos[1]-GetFloat(argv[1]));
+					if (distance<aux)	{
+						aux = distance;
+						nearest_mass = mit.data()->nbr;
+					}
+				}
+	
+
+			}
+			
+			// Set fixed if mobile
+			mobil = mass.find(nearest_mass)->M;
+			SetInt(aux2[0],nearest_mass);
+			if (mobil != 0)
+				m_set_fixe(1,aux2);
+
+			// Set XY
+			SetFloat(aux2[1],GetFloat(argv[0]));
+			m_posX(2,aux2);
+			SetFloat(aux2[1],GetFloat(argv[1]));
+			m_posY(2,aux2);
+
+			// Set mobile
+			if(mobil != 0)
+				m_set_mobile(1,aux2);		
+			
+			// Current grabbing on
+			mouse_grab = 1;
+		}
+		else
+			// Grabing off
+			mouse_grab = 0;
+	}
 
 // --------------------------------------------------------------  LINKS 
 // ---------------------------------------------------------------------
@@ -794,6 +846,41 @@ protected:
 		ToOutAnything(0, S_massesPosL, sz*N, sortie);
 		DELARR(sortie);
 	}
+	// List of masses x positions on first outlet
+	void m_mass_dump_xl()
+	{	
+		int sz = mass.size();
+		NEWARR(t_atom,sortie,sz);
+		t_atom *s = sortie;
+		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+			SetFloat(*(s++),mit.data()->pos[0]);
+		ToOutAnything(0, S_massesPosXL, sz, sortie);
+		DELARR(sortie);
+	}
+
+	// List of masses y positions on first outlet
+	void m_mass_dump_yl()
+	{	
+		int sz = mass.size();
+		NEWARR(t_atom,sortie,sz);
+		t_atom *s = sortie;
+		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+			SetFloat(*(s++),mit.data()->pos[1]);
+		ToOutAnything(0, S_massesPosYL, sz, sortie);
+		DELARR(sortie);
+	}
+
+	// List of masses z positions on first outlet
+	void m_mass_dump_zl()
+	{	
+		int sz = mass.size();
+		NEWARR(t_atom,sortie,sz);
+		t_atom *s = sortie;
+		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+			SetFloat(*(s++),mit.data()->pos[2]);
+		ToOutAnything(0, S_massesPosZL, sz, sortie);
+		DELARR(sortie);
+	}
 
 	// List of masses forces on first outlet
 	void m_force_dumpl()
@@ -831,7 +918,7 @@ private:
 		massids.reset();
 		mass.reset();
 		
-		id_mass = id_link = 0;
+		id_mass = id_link = mouse_grab = 0;
 	}
 	
 	void deletelink(t_link *l)
@@ -887,6 +974,9 @@ private:
 	const static t_symbol *S_massesSpeedsNo;
 	const static t_symbol *S_massesSpeedsId;
 	const static t_symbol *S_massesPosL;
+	const static t_symbol *S_massesPosXL;
+	const static t_symbol *S_massesPosYL;
+	const static t_symbol *S_massesPosZL;
 	const static t_symbol *S_massesForcesL;
 
 	static void setup(t_classid c)
@@ -910,6 +1000,9 @@ private:
 		S_massesSpeedsNo = MakeSymbol("massesSpeedsNo");
 		S_massesSpeedsId = MakeSymbol("massesSpeedsId");
 		S_massesPosL = MakeSymbol("massesPosL");
+		S_massesPosXL = MakeSymbol("massesPosXL");
+		S_massesPosYL = MakeSymbol("massesPosYL");
+		S_massesPosZL = MakeSymbol("massesPosZL");
 		S_massesForcesL = MakeSymbol("massesForcesL");
 
 		// --- set up methods (class scope) ---
@@ -926,17 +1019,22 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"posX",m_posX);
 		FLEXT_CADDMETHOD_(c,0,"Xmax",m_Xmax);
 		FLEXT_CADDMETHOD_(c,0,"Xmin",m_Xmin);
+		FLEXT_CADDMETHOD_(c,0,"massesPosL",m_mass_dumpl);
+		FLEXT_CADDMETHOD_(c,0,"massesPosXL",m_mass_dump_xl);
 		if(N >= 2) {
 			FLEXT_CADDMETHOD_(c,0,"forceY",m_forceY);
 			FLEXT_CADDMETHOD_(c,0,"posY",m_posY);
 			FLEXT_CADDMETHOD_(c,0,"Ymax",m_Ymax);
 			FLEXT_CADDMETHOD_(c,0,"Ymin",m_Ymin);
+			FLEXT_CADDMETHOD_(c,0,"massesPosYL",m_mass_dump_yl);
+			FLEXT_CADDMETHOD_(c,0,"grabMass",m_grab_mass);
 		}
 		if(N >= 3) {
 			FLEXT_CADDMETHOD_(c,0,"forceZ",m_forceZ);
 			FLEXT_CADDMETHOD_(c,0,"posZ",m_posZ);
 			FLEXT_CADDMETHOD_(c,0,"Zmax",m_Zmax);
 			FLEXT_CADDMETHOD_(c,0,"Zmin",m_Zmin);
+			FLEXT_CADDMETHOD_(c,0,"massesPosZL",m_mass_dump_zl);
 		}
 		
 		FLEXT_CADDMETHOD_(c,0,"setMobile",m_set_mobile);
@@ -950,7 +1048,6 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"get",m_get);
 		FLEXT_CADDMETHOD_(c,0,"deleteLink",m_delete_link);
 		FLEXT_CADDMETHOD_(c,0,"deleteMass",m_delete_mass);
-		FLEXT_CADDMETHOD_(c,0,"massesPosL",m_mass_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"infosL",m_info_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"massesForcesL",m_force_dumpl);
 	}
@@ -958,6 +1055,9 @@ private:
 	// for every registered method a callback has to be declared
 	FLEXT_CALLBACK(m_bang)
 	FLEXT_CALLBACK(m_mass_dumpl)
+	FLEXT_CALLBACK(m_mass_dump_xl)
+	FLEXT_CALLBACK(m_mass_dump_yl)
+	FLEXT_CALLBACK(m_mass_dump_zl)
 	FLEXT_CALLBACK(m_info_dumpl)
 	FLEXT_CALLBACK(m_force_dumpl)
 	FLEXT_CALLBACK(m_reset)
@@ -984,6 +1084,7 @@ private:
 	FLEXT_CALLBACK_V(m_get)
 	FLEXT_CALLBACK_V(m_delete_link)
 	FLEXT_CALLBACK_V(m_delete_mass)
+	FLEXT_CALLBACK_V(m_grab_mass)
 };
 // -------------------------------------------------------------- STATIC VARIABLES
 // -------------------------------------------------------------------------------
@@ -997,7 +1098,8 @@ const t_symbol \
 	*msdN<N>::S_linksPos,*msdN<N>::S_linksPosNo,*msdN<N>::S_linksPosId, \
 	*msdN<N>::S_massesForces,*msdN<N>::S_massesForcesNo,*msdN<N>::S_massesForcesId, \
 	*msdN<N>::S_massesSpeeds,*msdN<N>::S_massesSpeedsNo,*msdN<N>::S_massesSpeedsId, \
-	*msdN<N>::S_massesPosL,*msdN<N>::S_massesForcesL; \
+	*msdN<N>::S_massesPosL,*msdN<N>::S_massesPosXL,*msdN<N>::S_massesPosYL, \
+	*msdN<N>::S_massesPosZL,*msdN<N>::S_massesForcesL; \
 \
 typedef msdN<N> CLASS; \
 FLEXT_NEW_V(NAME,CLASS)

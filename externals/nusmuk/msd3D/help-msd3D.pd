@@ -1,43 +1,43 @@
-#N canvas 0 0 467 396 10;
-#N canvas 271 52 742 843 masses 0;
-#X obj 62 154 cnv 15 610 180 empty empty CREATION 20 12 0 14 -262131
+#N canvas 369 233 467 396 10;
+#N canvas 271 52 742 855 masses 0;
+#X obj 62 132 cnv 15 610 180 empty empty CREATION 20 12 0 14 -262131
 -66577 0;
-#X msg 79 183 reset;
-#X text 249 214 Add a mass;
-#X text 335 215 \$1 : Id (symbol);
-#X text 334 235 \$2 : fixed or mobile (0/1);
-#X text 334 253 \$3 : mass;
-#X text 251 184 Delete all masses and links;
-#X obj 62 338 cnv 15 610 60 empty empty COMPUTATION 20 12 0 14 -261689
+#X msg 79 161 reset;
+#X text 249 192 Add a mass;
+#X text 335 193 \$1 : Id (symbol);
+#X text 334 213 \$2 : fixed or mobile (0/1);
+#X text 334 231 \$3 : mass;
+#X text 251 162 Delete all masses and links;
+#X obj 62 316 cnv 15 610 60 empty empty COMPUTATION 20 12 0 14 -261689
 -66577 0;
-#X msg 82 367 bang;
-#X text 235 367 Compute new masses positions;
-#X obj 61 403 cnv 15 610 210 empty empty DYNAMIC_SETTING 20 12 0 14
+#X msg 82 345 bang;
+#X text 235 345 Compute new masses positions;
+#X obj 61 381 cnv 15 610 210 empty empty DYNAMIC_SETTING 20 12 0 14
 -262131 -66577 0;
-#X text 350 467 \$2 : New value;
-#X text 348 521 \$2 : New value;
-#X msg 87 429 posX \$1 \$2;
-#X text 350 431 Set position of mass(es);
-#X text 347 486 Add force on mass(es);
-#X msg 82 480 forceX \$1 \$2;
-#X obj 61 617 cnv 15 610 198 empty empty GET_ATTRIBUTES 20 12 0 14
+#X text 350 445 \$2 : New value;
+#X text 348 499 \$2 : New value;
+#X msg 87 407 posX \$1 \$2;
+#X text 350 409 Set position of mass(es);
+#X text 347 464 Add force on mass(es);
+#X msg 82 458 forceX \$1 \$2;
+#X obj 61 595 cnv 15 610 245 empty empty GET_ATTRIBUTES 20 12 0 14
 -261689 -66577 0;
-#X msg 147 644 massePosL;
-#X msg 147 672 masseForcesL;
-#X text 248 644 output all masses positions in a list on outlet No
+#X msg 147 622 massePosL;
+#X msg 146 696 masseForcesL;
+#X text 248 622 output all masses positions in a list on outlet No
 1;
-#X text 247 673 output all masses forces in a list on outlet No 1;
-#X msg 146 710 get \$1 \$2;
-#X text 249 711 Get specific attribute;
-#X text 249 736 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
+#X text 246 697 output all masses forces in a list on outlet No 1;
+#X msg 145 734 get \$1 \$2;
+#X text 248 735 Get specific attribute;
+#X text 248 760 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
 / linksPos );
-#X text 249 773 \$2 : Id (symbol or creations numbers);
-#X msg 79 290 deleteMass \$1;
-#X text 248 292 Delete a mass and associated links;
-#X text 338 309 \$1 : Creation No of mass;
-#X msg 144 793 infosL;
-#X text 247 793 Get infos on all masses and links on outlet No 2;
-#X text 347 555 \$1 : Value;
+#X text 248 797 \$2 : Id (symbol or creations numbers);
+#X msg 79 268 deleteMass \$1;
+#X text 248 270 Delete a mass and associated links;
+#X text 338 287 \$1 : Creation No of mass;
+#X msg 143 817 infosL;
+#X text 246 817 Get infos on all masses and links on outlet No 2;
+#X text 347 533 \$1 : Value;
 #X text 73 22 MASSES :;
 #X text 66 69 They got only one physical parameter \, the value of
 their;
@@ -48,21 +48,26 @@ their;
 #X text 66 97 applied on them automatically \, by links \, or manually
 \, by;
 #X text 67 112 messages \, don't do anything.;
-#X msg 81 578 setMobile \$1 \, setFixed \$1;
-#X text 345 578 Change mobile parameter;
-#X text 345 594 \$1 : Creation No of mass;
-#X msg 166 429 posY \$1 \$2;
-#X msg 174 480 forceY \$1 \$2;
-#X text 347 538 Set minimimum and maximum X \, Y of masses;
-#X msg 83 525 Xmin \$1 \, Xmax \$1 \, Ymin \$1 \, Ymax \$1;
-#X msg 79 214 mass \$1 \$2 \$3 \$4 \$5 \$6;
-#X text 334 271 \$4 \, \$5 \, \$6 : initial position;
-#X msg 246 429 posZ \$1 \$2;
-#X msg 83 503 forceZ \$1 \$2;
-#X msg 83 548 Zmin \$1 \, Zmax \$1;
+#X msg 81 556 setMobile \$1 \, setFixed \$1;
+#X text 345 556 Change mobile parameter;
+#X text 345 572 \$1 : Creation No of mass;
+#X msg 166 407 posY \$1 \$2;
+#X msg 174 458 forceY \$1 \$2;
+#X text 347 516 Set minimimum and maximum X \, Y of masses;
+#X msg 83 503 Xmin \$1 \, Xmax \$1 \, Ymin \$1 \, Ymax \$1;
+#X msg 79 192 mass \$1 \$2 \$3 \$4 \$5 \$6;
+#X text 334 249 \$4 \, \$5 \, \$6 : initial position;
+#X msg 246 407 posZ \$1 \$2;
+#X msg 83 481 forceZ \$1 \$2;
+#X msg 83 526 Zmin \$1 \, Zmax \$1;
 #X obj 33 821 msd3D;
-#X text 350 449 \$1 : Id (symbol) or No;
-#X text 348 503 \$1 : Id (symbol) or No;
+#X text 350 427 \$1 : Id (symbol) or No;
+#X text 348 481 \$1 : Id (symbol) or No;
+#X text 247 648 output all masses x/y/z positions in a list on outlet
+No 1;
+#X msg 146 648 massePosYL;
+#X msg 147 670 massePosZL;
+#X msg 67 648 massePosXL;
 #X connect 1 0 50 0;
 #X connect 8 0 50 0;
 #X connect 13 0 50 0;
@@ -75,7 +80,10 @@ their;
 #X connect 38 0 50 0;
 #X connect 44 0 50 0;
 #X connect 45 0 50 0;
-#X restore 158 305 pd masses;
+#X connect 54 0 50 0;
+#X connect 55 0 50 0;
+#X connect 56 0 50 0;
+#X restore 159 305 pd masses;
 #X text 12 305 HELP on masses --->;
 #X text 11 336 HELP on links --->;
 #X text -50 110 There are 4 types of messages for msd :;
