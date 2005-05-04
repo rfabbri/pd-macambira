@@ -8,7 +8,7 @@
  Signal processing and Computing Applied to Music (ATIAM, Paris 6) 
  at La Kitchen supervised by Cyrille Henry.
  
- ptimized by Thomas Grill for Flext
+ Optimized by Thomas Grill for Flext
  Based on Pure Data by Miller Puckette and others
  Based on pmpd by Cyrille Henry 
 
@@ -742,7 +742,7 @@ protected:
 					typename IDMap<t_mass *>::iterator mit;
 					for(mit = massids.find(GetSymbol(argv[j])); mit; ++mit) {
 						SetSymbol(sortie[0],mit.data()->Id);
-						for(int i = 0; i < N; ++i) SetFloat(sortie[1],mit.data()->pos[i]);
+						for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->pos[i]);
 						ToOutAnything(0,S_massesPosId,1+N,sortie);
 					}
 				}
@@ -750,7 +750,7 @@ protected:
 					t_mass *m = mass.find(GetAInt(argv[j]));
 					if(m) {
 						SetInt(sortie[0],m->nbr);
-						for(int i = 0; i < N; ++i) SetFloat(sortie[1],m->pos[i]);
+						for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],m->pos[i]);
 						ToOutAnything(0,S_massesPosNo,1+N,sortie);
 					}
 //					else

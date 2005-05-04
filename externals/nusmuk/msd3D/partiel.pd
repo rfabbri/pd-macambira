@@ -8,9 +8,11 @@
 #X obj 260 170 mtof;
 #X msg 174 167 \$1 50;
 #X msg 131 60 \$2;
-#X obj 131 83 / 10;
-#X obj 182 112 + 10;
-#X obj 172 84 * 5;
+#X obj 131 119 / 2;
+#X obj 131 88 abs;
+#X obj 174 86 abs;
+#X obj 177 108 * 5;
+#X obj 187 136 + 10;
 #X connect 0 0 8 0;
 #X connect 0 0 5 0;
 #X connect 2 0 3 1;
@@ -19,7 +21,9 @@
 #X connect 5 0 11 0;
 #X connect 6 0 4 0;
 #X connect 7 0 2 0;
-#X connect 8 0 9 0;
+#X connect 8 0 10 0;
 #X connect 9 0 7 0;
-#X connect 10 0 6 0;
-#X connect 11 0 10 0;
+#X connect 10 0 9 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 13 0 6 0;
