@@ -92,12 +92,18 @@ static void jack_transport_bang(jack_transport_t * x)
 	float f;
 	if (!x->x_jack_client)
 		return;
-
-	jack_transport_query(x->x_jack_client,x->x_pos);
 	
-	f = x->x_pos->frame;
+	f = (float)jack_get_current_transport_frame(x->x_jack_client);
 	
 	outlet_float(x->x_outlet, f);
+}
+
+static void jack_transport_float(jack_transport_t * x, float f)
+{
+	if (!x->x_jack_client)
+		return;
+	
+	jack_transport_locate(x->x_jack_client, (jack_nframes_t)f);
 }
 
 
@@ -112,5 +118,6 @@ void jack_transport_setup(void)
 	class_addmethod(jack_transport_class, (t_method)jack_transport_stoper,
 					gensym("stop"),0,0);
 	class_addbang(jack_transport_class, (t_method)jack_transport_bang);
+	class_addfloat(jack_transport_class, (t_method)jack_transport_float);
 
 }
