@@ -12,8 +12,6 @@
 #X obj 109 364 spigot;
 #X msg 247 300 1;
 #X obj 247 275 loadbang;
-#X obj 161 111 scale4gem;
-#X obj 255 140 scale4gem;
 #X connect 0 0 8 0;
 #X connect 1 0 3 1;
 #X connect 2 0 5 0;
@@ -22,15 +20,11 @@
 #X connect 4 1 6 0;
 #X connect 6 0 5 1;
 #X connect 7 0 5 2;
-#X connect 8 1 13 0;
-#X connect 8 2 13 1;
-#X connect 8 3 14 0;
-#X connect 8 4 14 1;
+#X connect 8 1 4 0;
+#X connect 8 2 6 1;
+#X connect 8 3 7 0;
+#X connect 8 4 7 1;
 #X connect 9 0 10 1;
 #X connect 10 0 2 0;
 #X connect 11 0 10 1;
 #X connect 12 0 11 0;
-#X connect 13 0 4 0;
-#X connect 13 1 6 1;
-#X connect 14 0 7 0;
-#X connect 14 1 7 1;
