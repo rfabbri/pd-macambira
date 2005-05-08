@@ -1,9 +1,9 @@
 #N canvas 862 152 84 110 10;
 #X obj 2 16 cnv 15 80 60 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 16 29 bng 15 250 50 0 empty empty mass 0 -6 0 8 -1 -262144 -1
+#X obj 6 29 bng 15 250 50 0 empty empty mass 0 -6 0 8 -1 -262144 -1
 ;
-#X obj 54 29 bng 15 250 50 0 empty empty fix 0 -6 0 8 -258699 -1 -1
+#X obj 34 29 bng 15 250 50 0 empty empty fix 0 -6 0 8 -258699 -1 -1
 ;
 #N canvas 355 457 863 719 guts 0;
 #X obj 252 139 pointer;
@@ -36,6 +36,8 @@
 #X obj 553 254 s \$0-M;
 #X msg 552 224 100;
 #X obj 558 152 loadbang;
+#X obj 21 135 r \$0-geos;
+#X obj 252 77 r \$0-start-traverse;
 #X connect 0 0 24 5;
 #X connect 1 0 21 0;
 #X connect 2 0 0 0;
@@ -66,15 +68,114 @@
 #X connect 26 1 27 0;
 #X connect 28 0 27 0;
 #X connect 29 0 25 0;
+#X connect 30 0 24 0;
+#X connect 31 0 2 0;
 #X restore 105 79 pd guts;
 #X obj 126 6 inlet;
 #X obj 169 5 inlet;
 #X obj 25 59 nbx 5 14 -1e+37 1e+37 0 0 \$0-counter \$0-counter-in id
--22 8 0 10 -262144 -1 -1 8 256;
+-22 8 0 10 -262144 -1 -1 0 256;
 #X obj 2 77 cnv 15 80 30 empty empty empty 10 10 0 10 -195568 -1 0
 ;
 #X obj 26 85 nbx 5 14 -1e+37 1e+37 0 0 \$0-M \$0-M M -12 8 0 10 -225271
--1 -1 0 256;
+-1 -1 100 256;
+#N canvas 379 246 663 624 geos 0;
+#X obj 93 96 make_rect 100 100 30 30 10 10;
+#X obj 123 162 s \$0-geos;
+#X obj 93 188 s \$0-counter-bng;
+#X obj 48 33 r \$0-make-rect;
+#X msg 93 67 bang;
+#N canvas 449 480 450 300 1016-geos 1;
+#X obj 48 82 bng 24 250 50 0 \$0-make-rect empty make-rect 0 -6 0 8
+-24198 -1 -1;
+#X floatatom 151 76 5 0 0 0 x0 - #0-x0;
+#X floatatom 151 92 5 0 0 0 y0 - #0-y0;
+#X floatatom 227 75 5 0 0 0 xgap - #0-xgap;
+#X floatatom 227 91 5 0 0 0 ygap - #0-ygap;
+#X floatatom 322 74 5 0 0 0 xsteps - #0-xsteps;
+#X floatatom 322 90 5 0 0 0 ysteps - #0-ysteps;
+#X text 46 18 Add various geometric forms;
+#X text 38 46 Rectangle Networks:;
+#X text 37 137 Circles:;
+#X obj 52 172 bng 24 250 50 0 \$0-make-circ empty make-circ 0 -6 0
+8 -24198 -1 -1;
+#X floatatom 145 166 5 0 0 0 x0 - #0-x0-circ;
+#X floatatom 145 182 5 0 0 0 y0 - #0-y0-circ;
+#X floatatom 251 166 5 0 0 0 radius - #0-radius;
+#X floatatom 251 184 5 0 0 0 masses_# - #0-masses-circ;
+#X text 107 266 All coords as used by data structs.;
+#X restore 518 165 pd \$0-geos;
+#X msg 519 125 \; \$1 vis 1;
+#X obj 518 96 makefilename pd-%s;
+#X obj 520 68 symbol \$0-geos;
+#X msg 516 22 bang;
+#X obj 48 66 t b b;
+#X obj 78 226 s \$0-start-traverse;
+#N canvas 0 0 930 534 1016-sixpack 0;
+#X obj 250 282 r \$0-x0;
+#X text 452 208 Args;
+#X obj 320 310 sixpack --------------------;
+#X obj 296 237 r \$0-y0;
+#X obj 336 206 r \$0-xgap;
+#X obj 376 185 r \$0-ygap;
+#X obj 412 164 r \$0-xsteps;
+#X obj 448 143 r \$0-ysteps;
+#X obj 326 342 outlet;
+#X connect 0 0 2 0;
+#X connect 2 0 8 0;
+#X connect 3 0 2 1;
+#X connect 4 0 2 2;
+#X connect 5 0 2 3;
+#X connect 6 0 2 4;
+#X connect 7 0 2 5;
+#X restore 291 40 pd \$0-sixpack;
+#X obj 93 128 t b a;
+#X obj 524 45 r \$0-show-geos;
+#X obj 63 322 r \$0-make-circ;
+#N canvas 0 0 930 534 1016-fourpack 0;
+#X text 452 208 Args;
+#X obj 320 310 sixpack --------------------;
+#X obj 319 390 outlet;
+#X msg 319 349 \$1 \$2 \$3 \$4;
+#X obj 252 282 r \$0-x0-circ;
+#X obj 296 237 r \$0-y0-circ;
+#X obj 376 185 r \$0-masses-circ;
+#X obj 336 206 r \$0-radius;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 1;
+#X connect 6 0 1 3;
+#X connect 7 0 1 2;
+#X restore 219 327 pd \$0-fourpack;
+#X obj 136 441 s \$0-geos;
+#X obj 106 467 s \$0-counter-bng;
+#X obj 63 345 t b b;
+#X obj 93 505 s \$0-start-traverse;
+#X obj 106 407 t b a;
+#X obj 63 370 make_circ 300 300 100 8;
+#X connect 0 0 13 0;
+#X connect 3 0 10 0;
+#X connect 4 0 0 0;
+#X connect 7 0 6 0;
+#X connect 8 0 7 0;
+#X connect 9 0 8 0;
+#X connect 10 0 0 0;
+#X connect 10 1 11 0;
+#X connect 12 0 0 1;
+#X connect 13 0 2 0;
+#X connect 13 1 1 0;
+#X connect 14 0 8 0;
+#X connect 15 0 19 0;
+#X connect 16 0 22 1;
+#X connect 19 0 22 0;
+#X connect 19 1 20 0;
+#X connect 21 0 18 0;
+#X connect 21 1 17 0;
+#X connect 22 0 21 0;
+#X restore 113 41 pd geos;
+#X obj 59 29 bng 15 250 50 0 \$0-show-geos \$0-show-geos geos 0 -6
+0 8 -225271 -1 -1;
 #X connect 1 0 3 0;
 #X connect 2 0 3 1;
 #X connect 4 0 3 0;
