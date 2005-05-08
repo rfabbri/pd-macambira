@@ -236,13 +236,12 @@ turn and crashed the car and left the toilet seat open.;
 #X obj 287 21 r \$0-stack-delay;
 #X obj 219 307 ds-next;
 #X msg 260 281 next;
-#X obj 74 351 print set-lid;
 #X obj 238 51 del 0;
 #X connect 0 0 2 0;
 #X connect 2 0 10 0;
 #X connect 3 0 2 1;
 #X connect 4 0 2 1;
-#X connect 5 0 21 0;
+#X connect 5 0 20 0;
 #X connect 6 1 4 0;
 #X connect 6 2 9 0;
 #X connect 6 3 3 0;
@@ -255,10 +254,9 @@ turn and crashed the car and left the toilet seat open.;
 #X connect 11 0 19 0;
 #X connect 11 1 14 0;
 #X connect 14 0 15 0;
-#X connect 14 0 20 0;
-#X connect 17 0 21 1;
+#X connect 17 0 20 1;
 #X connect 19 0 7 0;
-#X connect 21 0 6 0;
+#X connect 20 0 6 0;
 #X restore 148 322 pd set-lid;
 #X text 238 322 Correct lids to match what msd2D tells us;
 #X obj 146 446 table \$0-mid2msdid 4000;
@@ -752,9 +750,9 @@ from left to right. one2many will connect one mass to many others.
 First select the first mass \, then set the toggle to 1 \, after that
 select the other masses and set toggle to 0;
 #X obj 707 106 tgl 15 0 \$0-poll-ds \$0-poll-ds poll-ds 0 -6 0 8 -225280
--1 -1 1 1;
+-1 -1 0 1;
 #X obj 765 106 tgl 15 0 \$0-set-ds \$0-set-ds set-ds 0 -6 0 8 -225271
--1 -1 1 1;
+-1 -1 0 1;
 #X text 669 75 Data struct anim ON/OFF:;
 #N canvas 504 489 531 315 TODO 0;
 #X text 146 11 TODO :: IDEAS;
