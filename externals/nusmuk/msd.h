@@ -335,7 +335,7 @@ protected:
 	IDMap<t_mass *> massids;		// masses by name
 	
 	t_float limit[N][2];			// Limit values
-	unsigned int id_mass, id_link, mouse_grab, nearest_mass;
+	unsigned int id_mass, id_link, mouse_grab, nearest_mass, link_deleted, mass_deleted;
 
 // ---------------------------------------------------------------  RESET 
 // ----------------------------------------------------------------------
@@ -472,15 +472,16 @@ protected:
 			return;
 		}
 		
-		t_mass *m = mass.remove(GetAInt(argv[0]));
+		t_mass *m = mass.find(GetAInt(argv[0]));
 		if(m) {
 			// Delete all associated links 
-			for(typename std::vector<t_link *>::iterator it = m->links.begin(); it != m->links.end(); ++it)
+			for(typename std::vector<t_link *>::iterator it = m->links.begin(); it < m->links.end(); ++it)
 				deletelink(*it);
 			outmass(S_Mass_deleted,m);
 			massids.erase(m);
 			mass.remove(m->nbr);
 			delete m;
+			mass_deleted = 1;
 		}
 		else
 			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
@@ -677,8 +678,10 @@ protected:
 		}
 		
 		t_link *l = link.find(GetAInt(argv[0]));
-		if(l)
+		if(l)	{
 			deletelink(l);
+			link_deleted = 1;
+		}
 		else {
 			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
 			return;
@@ -837,61 +840,82 @@ protected:
 
 	// List of masses positions on first outlet
 	void m_mass_dumpl()
-	{	
-		int sz = mass.size();
-		NEWARR(t_atom,sortie,sz*N);
-		t_atom *s = sortie;
-		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
-			for(int i = 0; i < N; ++i) SetFloat(*(s++),mit.data()->pos[i]);
-		ToOutAnything(0, S_massesPosL, sz*N, sortie);
-		DELARR(sortie);
+	{
+		if (mass_deleted ==0)	{
+			int sz = mass.size();
+			NEWARR(t_atom,sortie,sz*N);
+			t_atom *s = sortie;
+			for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+				for(int i = 0; i < N; ++i) SetFloat(s[mit.data()->nbr*N+i],mit.data()->pos[i]);
+			ToOutAnything(0, S_massesPosL, sz*N, sortie);
+			DELARR(sortie);
+		}
+		else
+			error("%s - %s : Message Forbidden when deletion is used",thisName(),GetString(thisTag()));
 	}
+
 	// List of masses x positions on first outlet
 	void m_mass_dump_xl()
 	{	
-		int sz = mass.size();
-		NEWARR(t_atom,sortie,sz);
-		t_atom *s = sortie;
-		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
-			SetFloat(*(s++),mit.data()->pos[0]);
-		ToOutAnything(0, S_massesPosXL, sz, sortie);
-		DELARR(sortie);
+		if (mass_deleted ==0)	{
+			int sz = mass.size();
+			NEWARR(t_atom,sortie,sz);
+			t_atom *s = sortie;
+			for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+				SetFloat(s[mit.data()->nbr],mit.data()->pos[0]);
+			ToOutAnything(0, S_massesPosXL, sz, sortie);
+			DELARR(sortie);
+		}
+		else
+			error("%s - %s : Message Forbidden when deletion is used",thisName(),GetString(thisTag()));
 	}
 
 	// List of masses y positions on first outlet
 	void m_mass_dump_yl()
 	{	
-		int sz = mass.size();
-		NEWARR(t_atom,sortie,sz);
-		t_atom *s = sortie;
-		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
-			SetFloat(*(s++),mit.data()->pos[1]);
-		ToOutAnything(0, S_massesPosYL, sz, sortie);
-		DELARR(sortie);
+		if (mass_deleted ==0)	{
+			int sz = mass.size();
+			NEWARR(t_atom,sortie,sz);
+			t_atom *s = sortie;
+			for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+				SetFloat(s[mit.data()->nbr],mit.data()->pos[1]);
+			ToOutAnything(0, S_massesPosYL, sz, sortie);
+			DELARR(sortie);
+		}
+		else
+			error("%s - %s : Message Forbidden when deletion is used",thisName(),GetString(thisTag()));
 	}
 
 	// List of masses z positions on first outlet
 	void m_mass_dump_zl()
 	{	
-		int sz = mass.size();
-		NEWARR(t_atom,sortie,sz);
-		t_atom *s = sortie;
-		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
-			SetFloat(*(s++),mit.data()->pos[2]);
-		ToOutAnything(0, S_massesPosZL, sz, sortie);
-		DELARR(sortie);
+		if (mass_deleted ==0)	{
+			int sz = mass.size();
+			NEWARR(t_atom,sortie,sz);
+			t_atom *s = sortie;
+			for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+				SetFloat(s[mit.data()->nbr],mit.data()->pos[2]);
+			ToOutAnything(0, S_massesPosZL, sz, sortie);
+			DELARR(sortie);
+		}
+		else
+			error("%s - %s : Message Forbidden when deletion is used",thisName(),GetString(thisTag()));
 	}
 
 	// List of masses forces on first outlet
 	void m_force_dumpl()
 	{	
-		int sz = mass.size();
-		NEWARR(t_atom,sortie,sz*N);
-		t_atom *s = sortie;
-		for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
-			for(int i = 0; i < N; ++i) SetFloat(*(s++),mit.data()->out_force[i]);
-		ToOutAnything(0, S_massesForcesL, sz*N, sortie);
-		DELARR(sortie);
+		if (mass_deleted ==0)	{
+			int sz = mass.size();
+			NEWARR(t_atom,sortie,sz*N);
+			t_atom *s = sortie;
+			for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit)
+				for(int i = 0; i < N; ++i) SetFloat(s[mit.data()->nbr*N+i],mit.data()->out_force[i]);
+			ToOutAnything(0, S_massesForcesL, sz*N, sortie);
+			DELARR(sortie);
+		}
+		else
+			error("%s - %s : Message Forbidden when deletion is used",thisName(),GetString(thisTag()));
 	}
 
 	// List of masses and links infos on second outlet
@@ -918,7 +942,7 @@ private:
 		massids.reset();
 		mass.reset();
 		
-		id_mass = id_link = mouse_grab = 0;
+		id_mass = id_link = mouse_grab = mass_deleted = link_deleted = 0;
 	}
 	
 	void deletelink(t_link *l)

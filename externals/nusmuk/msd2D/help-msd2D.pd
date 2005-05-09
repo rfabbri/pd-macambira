@@ -22,8 +22,6 @@
 #X msg 85 485 forceX \$1 \$2;
 #X obj 61 617 cnv 15 610 260 empty empty GET_ATTRIBUTES 20 12 0 14
 -261689 -66577 0;
-#X msg 147 644 massePosL;
-#X msg 147 694 masseForcesL;
 #X text 248 644 output all masses positions in a list on outlet No
 1;
 #X text 247 695 output all masses forces in a list on outlet No 1;
@@ -60,27 +58,31 @@ their;
 #X text 334 271 \$4 \, \$5 : initial position;
 #X text 350 449 \$1 : Id (symbol) or No;
 #X text 348 503 \$1 : Id (symbol) or No;
-#X msg 68 668 massePosXL;
-#X msg 147 669 massePosYL;
 #X text 248 669 output all masses x/y position in a list on outlet
 No 1;
 #X msg 112 838 grabMass \$1 \$2 \$3;
 #X text 247 838 Get nearest mass and grab it;
 #X text 112 857 \$1 \, \$2 : X \, Y position of mouse;
 #X text 357 857 \$3 : grab or not (left click);
-#X connect 1 0 44 0;
-#X connect 8 0 44 0;
-#X connect 13 0 44 0;
-#X connect 16 0 44 0;
-#X connect 18 0 44 0;
-#X connect 19 0 44 0;
-#X connect 22 0 44 0;
-#X connect 26 0 44 0;
-#X connect 29 0 44 0;
-#X connect 38 0 44 0;
-#X connect 41 0 44 0;
-#X connect 46 0 44 0;
-#X connect 50 0 44 0;
+#X msg 147 644 massesPosL;
+#X msg 147 669 massesPosYL;
+#X msg 147 694 massesForcesL;
+#X msg 68 669 massesPosXL;
+#X text 66 131 Be careful: if masses are deleted \, lists messages
+won't work;
+#X connect 1 0 42 0;
+#X connect 8 0 42 0;
+#X connect 13 0 42 0;
+#X connect 16 0 42 0;
+#X connect 20 0 42 0;
+#X connect 24 0 42 0;
+#X connect 27 0 42 0;
+#X connect 36 0 42 0;
+#X connect 39 0 42 0;
+#X connect 44 0 42 0;
+#X connect 53 0 42 0;
+#X connect 55 0 42 0;
+#X connect 56 0 42 0;
 #X restore 221 312 pd masses;
 #X text 75 312 HELP on masses --->;
 #X text 74 343 HELP on links --->;

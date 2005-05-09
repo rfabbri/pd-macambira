@@ -23,8 +23,6 @@
 #X msg 85 485 forceX \$1 \$2;
 #X obj 61 617 cnv 15 610 198 empty empty GET_ATTRIBUTES 20 12 0 14
 -261689 -66577 0;
-#X msg 147 644 massePosL;
-#X msg 147 672 masseForcesL;
 #X text 248 644 output all masses positions in a list on outlet No
 1;
 #X text 247 673 output all masses forces in a list on outlet No 1;
@@ -47,7 +45,7 @@
 their;
 #X text 67 83 mass. They can be mobile or fixed \, in this case forces
 ;
-#X text 67 54 The msd masses are the principals objects of the model.
+#X text 66 54 The msd masses are the principals objects of the model.
 ;
 #X text 66 97 applied on them automatically \, by links \, or manually
 \, by;
@@ -58,18 +56,22 @@ their;
 #X text 334 271 \$4 : initial position;
 #X text 350 449 \$1 : Id (symbol) or No;
 #X text 348 503 \$1 : Id (symbol) or No;
+#X msg 147 644 massesPosL;
+#X msg 147 672 massesForcesL;
+#X text 66 128 Be careful : if masses are deleted \, lists messages
+won't work;
 #X connect 2 0 0 0;
 #X connect 9 0 0 0;
 #X connect 14 0 0 0;
 #X connect 17 0 0 0;
-#X connect 19 0 0 0;
-#X connect 20 0 0 0;
-#X connect 23 0 0 0;
-#X connect 27 0 0 0;
-#X connect 28 0 0 0;
+#X connect 21 0 0 0;
+#X connect 25 0 0 0;
+#X connect 26 0 0 0;
+#X connect 29 0 0 0;
 #X connect 31 0 0 0;
-#X connect 33 0 0 0;
-#X connect 42 0 0 0;
+#X connect 40 0 0 0;
+#X connect 46 0 0 0;
+#X connect 47 0 0 0;
 #X restore 282 323 pd masses;
 #N canvas 222 83 808 841 links 0;
 #X obj 33 821 msd;

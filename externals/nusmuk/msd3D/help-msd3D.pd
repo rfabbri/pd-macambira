@@ -22,8 +22,6 @@
 #X msg 82 458 forceX \$1 \$2;
 #X obj 61 595 cnv 15 610 245 empty empty GET_ATTRIBUTES 20 12 0 14
 -261689 -66577 0;
-#X msg 147 622 massePosL;
-#X msg 146 696 masseForcesL;
 #X text 248 622 output all masses positions in a list on outlet No
 1;
 #X text 246 697 output all masses forces in a list on outlet No 1;
@@ -38,16 +36,16 @@
 #X msg 143 817 infosL;
 #X text 246 817 Get infos on all masses and links on outlet No 2;
 #X text 347 533 \$1 : Value;
-#X text 73 22 MASSES :;
-#X text 66 69 They got only one physical parameter \, the value of
+#X text 73 9 MASSES :;
+#X text 64 45 They got only one physical parameter \, the value of
 their;
-#X text 67 83 mass. They can be mobile or fixed \, in this case forces
+#X text 65 59 mass. They can be mobile or fixed \, in this case forces
 ;
-#X text 67 54 The msd masses are the principals objects of the model.
+#X text 64 30 The msd masses are the principals objects of the model.
 ;
-#X text 66 97 applied on them automatically \, by links \, or manually
+#X text 64 73 applied on them automatically \, by links \, or manually
 \, by;
-#X text 67 112 messages \, don't do anything.;
+#X text 65 88 messages \, don't do anything.;
 #X msg 81 556 setMobile \$1 \, setFixed \$1;
 #X text 345 556 Change mobile parameter;
 #X text 345 572 \$1 : Creation No of mass;
@@ -65,24 +63,28 @@ their;
 #X text 348 481 \$1 : Id (symbol) or No;
 #X text 247 648 output all masses x/y/z positions in a list on outlet
 No 1;
-#X msg 146 648 massePosYL;
-#X msg 147 670 massePosZL;
-#X msg 67 648 massePosXL;
-#X connect 1 0 50 0;
-#X connect 8 0 50 0;
-#X connect 13 0 50 0;
-#X connect 16 0 50 0;
-#X connect 18 0 50 0;
-#X connect 19 0 50 0;
-#X connect 22 0 50 0;
-#X connect 26 0 50 0;
-#X connect 29 0 50 0;
-#X connect 38 0 50 0;
-#X connect 44 0 50 0;
-#X connect 45 0 50 0;
-#X connect 54 0 50 0;
-#X connect 55 0 50 0;
-#X connect 56 0 50 0;
+#X msg 147 622 massesPosL;
+#X msg 146 648 massesPosYL;
+#X msg 147 670 massesPosZL;
+#X msg 146 696 massesForcesL;
+#X msg 67 648 massesPosXL;
+#X text 64 103 Be careful : if masses are deleted \, lists messages
+won't work;
+#X connect 1 0 48 0;
+#X connect 8 0 48 0;
+#X connect 13 0 48 0;
+#X connect 16 0 48 0;
+#X connect 20 0 48 0;
+#X connect 24 0 48 0;
+#X connect 27 0 48 0;
+#X connect 36 0 48 0;
+#X connect 42 0 48 0;
+#X connect 43 0 48 0;
+#X connect 52 0 48 0;
+#X connect 53 0 48 0;
+#X connect 54 0 48 0;
+#X connect 55 0 48 0;
+#X connect 56 0 48 0;
 #X restore 159 305 pd masses;
 #X text 12 305 HELP on masses --->;
 #X text 11 336 HELP on links --->;
