@@ -16,8 +16,8 @@
  */
 
 /*
- * Copyright (c) IOhannes m zmölnig, forum::für::umläute
- * IEM, Graz, Austria
+ * Copyright (c) Thomas Musil; IEM KUG, Graz, Austria; 2001-2005
+ * Copyright (c) IOhannes m zmölnig (forum::für::umläute), IEM KUG, Graz, Austria; 2001-2005
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -31,14 +31,27 @@
 #ifndef INCLUDE_IEMMATRIX_H__
 #define INCLUDE_IEMMATRIX_H__
 
+
+#ifdef __WIN32__
+/* MinGW automaticaly defines __WIN32__
+ * other windos compilers might have to define it by hand
+ */
+
+/* m_pd.h expexts MSW rather than __WIN32__ */
+# ifndef MSW
+#  define MSW
+# endif
+
+# pragma warning( disable : 4244 )
+# pragma warning( disable : 4305 )
+
+#endif /* __WIN32__ */
+
+
 #include "m_pd.h"
 
 #define VERSION "0.1"
 
-#ifdef NT
-# pragma warning( disable : 4244 )
-# pragma warning( disable : 4305 )
-#endif
 
 #include <math.h>
 #include <stdio.h>
@@ -46,8 +59,9 @@
 #include <string.h>
 #include <memory.h>
 
-#ifdef NT
+#ifdef __WIN32__
 # define fabsf fabs
+# define sqrtf sqrt
 #endif
 
 typedef double t_matrixfloat;
