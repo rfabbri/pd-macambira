@@ -85,7 +85,7 @@ if test `uname | sed -e 's/^MINGW.*/NT/'` = NT;
 then
   LD=gcc
   INCLUDES="-I@prefix@/src"
-  DFLAGS="-DMSW -DNT"
+  DFLAGS="-D__WIN32__"
   LFLAGS="-shared @prefix@/bin/pd.dll"
   EXT=dll
 else
