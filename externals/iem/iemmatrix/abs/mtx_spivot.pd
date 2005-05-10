@@ -1,14 +1,14 @@
 #N canvas 835 313 564 462 10;
-#X obj 154 247 mtx;
-#X obj 154 338 mtx_*;
+#X obj 154 166 mtx;
+#X obj 154 208 mtx_*;
 #X obj 115 78 inlet;
-#X obj 115 115 t a a;
-#X obj 154 398 mtx_*;
-#X obj 154 368 t a a;
-#X obj 115 144 mtx_pivot \$1;
-#X obj 154 420 outlet pivoted;
-#X obj 260 421 outlet pivoter;
-#X obj 154 196 t b a a;
+#X obj 115 99 t a a;
+#X obj 154 248 mtx_*;
+#X obj 154 228 t a a;
+#X obj 115 119 mtx_pivot \$1;
+#X obj 154 270 outlet pivoted;
+#X obj 260 271 outlet pivoter;
+#X obj 154 139 t b a a;
 #N canvas 118 188 669 439 resizer 0;
 #X obj 322 204 mtx_size;
 #X obj 236 283 mtx_eye;
@@ -47,7 +47,12 @@ from a big I-matrix) and add them together;
 #X connect 10 0 4 0;
 #X connect 11 0 0 0;
 #X connect 16 0 12 0;
-#X restore 154 274 pd resizer;
+#X restore 154 187 pd resizer;
+#X text 72 316 (c) 2005 by IOhannes m zmoelnig \, IEM KUG \, graz austria
+;
+#X text 72 333 for license-details see LICENSE.txt that must come with
+iemmatrix.;
+#X text 62 38 semi-pivotize a matrix;
 #X connect 0 0 10 0;
 #X connect 1 0 5 0;
 #X connect 2 0 3 0;
