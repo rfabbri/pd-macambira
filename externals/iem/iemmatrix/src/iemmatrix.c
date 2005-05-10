@@ -37,6 +37,7 @@ void mtx_roll_setup();
 void mtx_row_setup();
 void mtx_scroll_setup();
 void mtx_size_setup();
+void mtx_sum_setup();
 void mtx_trace_setup();
 void mtx_transpose_setup();
 void mtx_zeros_setup();
@@ -67,6 +68,7 @@ void iemtx_setup(){
   mtx_row_setup();
   mtx_scroll_setup();
   mtx_size_setup();
+  mtx_sum_setup();
   mtx_trace_setup();
   mtx_transpose_setup();
   mtx_zeros_setup();
