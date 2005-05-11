@@ -71,7 +71,7 @@ public:
 		m_t += m_dt;
 		
 		if (m_t > 2 * M_PI)
-			m_t = fmod(m_t, (data_t)2*M_PI);
+			m_t = fmod(m_t, (data_t)(M_PI*2));
 	}
 	
 	data_t m_t;
