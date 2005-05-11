@@ -17,7 +17,7 @@
 static t_class *mtx_inverse_class;
 
 
-t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol){
+t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*error){
   /*
    * row==col==rowclo
    * input=t_matrixfloat[row*col]
@@ -30,10 +30,15 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol){
 
   int col=rowcol, row=rowcol, row2=row*col;
   t_matrixfloat *original=input;
+  t_matrixfloat *inverted = 0;
 
-  // 1a reserve space for the inverted matrix
-  t_matrixfloat *inverted = (t_matrixfloat *)getbytes(sizeof(t_matrixfloat)*row2);
-  // 1b make an eye-shaped float-buf for B
+  if(input==0)return 0;
+
+  /* 1a reserve space for the inverted matrix */
+  inverted=(t_matrixfloat *)getbytes(sizeof(t_matrixfloat)*row2);
+  if(inverted==0)return 0;
+
+  /* 1b make an eye-shaped float-buf for B */
   i=row2;
   b1=inverted;
   while(i--)*b1++=0;
@@ -41,9 +46,9 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol){
   b1=inverted;
   while(i--)b1[i*(row+1)]=1;
 
-  // 2. do the Gauss-Jordan
+  /* 2. do the Gauss-Jordan */
   for (k=0;k<row;k++) {
-    // 2. adjust current row
+    /* adjust current row */
     t_matrixfloat diagel = original[k*(col+1)];
     t_matrixfloat i_diagel = diagel?1./diagel:0;
     if (!diagel)ok++;
@@ -56,8 +61,8 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol){
       *a2++*=i_diagel;
       *b2++*=i_diagel;
     }
-    /* eliminate the k-th element in each row by adding the weighted normalized row */
 
+    /* eliminate the k-th element in each row by adding the weighted normalized row */
     a2=original+k*row;
     b2=inverted+k*row;
     for(i=0;i<row;i++)
@@ -72,8 +77,8 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol){
         }
       }
   }
-
   if (ok)post("mtx_inverse: couldn't really invert the matrix !!! %d error%c", ok, (ok-1)?'s':0);
+  if(error!=0)*error=ok;
 
   return inverted;
 }
@@ -91,34 +96,43 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
     return;
   }
 
-  // 1 extract values of A to float-buf
-  original=matrix2float(argv);
-
-  // reserve memory for outputting afterwards
+  /* reserve memory for outputting afterwards */
   adjustsize(x, col, row);
 
-  if (row!=col){
-    // we'll have to do the pseudo-inverse:
-    // P=A'*inv(A*A');
-    t_matrixfloat*transposed=mtx_doTranspose(original, row, col);
-    t_matrixfloat*invertee  =mtx_doMultiply(row, original, col, transposed, row);
-    inverted=mtx_doMultiply(col, transposed, row, mtx_doInvert(invertee, row), row);
+  /* 1. extract values of A to float-buf */
+  original=matrix2float(argv);
 
-    freebytes(transposed, sizeof(t_matrixfloat)*col*row);
-    freebytes(invertee  , sizeof(t_matrixfloat)*row*row);
-    
+  if (row==col){
+    /* fine, the matrix is square */
+    inverted=mtx_doInvert(original, row, 0);
   } else {
-    inverted=mtx_doInvert(original, row);
+    /* we'll have to do the pseudo-inverse:
+     * P=A'*inv(A*A') if row<col
+     * P=inv(A'*A)*A' if col<row 
+     */
+    t_matrixfloat*transposed, *invertee;
+    int inverteeCol=0;
+    transposed=mtx_doTranspose(original, row, col);
+    if(row>col){
+      inverteeCol=col;
+      invertee  =mtx_doMultiply(col, transposed, row, original, col);
+      inverted  =mtx_doMultiply(col, mtx_doInvert(invertee, col, 0), col, transposed, row);
+    } else {
+      inverteeCol=row;
+      invertee  =mtx_doMultiply(row, original, col, transposed, row);
+      inverted  =mtx_doMultiply(col, transposed, row, mtx_doInvert(invertee, row, 0), row);
+    }
+    freebytes(transposed, sizeof(t_matrixfloat)*col*row);
+    freebytes(invertee  , sizeof(t_matrixfloat)*inverteeCol*inverteeCol);
   }
 
-  // 3. output the matrix
-  // 3a convert the floatbuf to an atombuf;
+  /* 3. output the matrix */
+  /* 3a convert the floatbuf to an atombuf; */
   float2matrix(x->atombuffer, inverted);
-  // 3b destroy the buffers
+  /* 3b destroy the buffers */
   freebytes(original, sizeof(t_matrixfloat)*row*col);
-  freebytes(inverted, sizeof(t_matrixfloat)*row*row);
 
-  // 3c output the atombuf;
+  /* 3c output the atombuf; */
   matrix_bang(x);
 }
 
