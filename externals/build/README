@@ -1,7 +1,7 @@
 PD externals build system
 =========================
 
-To build, cd to the platform directory:
+To build with GNU make, cd to the platform directory:
 
 cd linux
 cd win
@@ -10,9 +10,10 @@ cd irix
 
 and type make.
 
+To build with SCons:
 
-
-
+    scons
+    scons install
 
 Build System Internals
 ======================
