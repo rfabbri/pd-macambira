@@ -13,7 +13,11 @@
  */
 #include "iemmatrix.h"
 
-void mtx_binops_setup();
+void mtx_mul_setup();
+void mtx_div_setup();
+void mtx_add_setup();
+void mtx_sub_setup();
+void mtx_pow_setup();
 void mtx_col_setup();
 void mtx_cholesky_setup();
 void mtx_diag_setup();
@@ -44,7 +48,11 @@ void mtx_zeros_setup();
 void mtx_mul_tilde_setup();
 
 void iemtx_setup(){
-  mtx_binops_setup();
+  mtx_mul_setup();
+  mtx_div_setup();
+  mtx_add_setup();
+  mtx_sub_setup();
+  mtx_pow_setup();
   mtx_col_setup();
   mtx_cholesky_setup();
   mtx_diag_setup();

@@ -134,4 +134,14 @@ void mtx_binmtx_free(t_mtx_binmtx *x);
 void mtx_binscalar_bang(t_mtx_binscalar *x);
 void mtx_binscalar_free(t_mtx_binscalar *x);
 
+
+/* some math */
+
+/*  invert a square matrix (row=col=rowcol) */
+t_matrixfloat*mtx_doInvert(t_matrixfloat*input, int rowcol);
+/*  transpose a matrix */
+t_matrixfloat*mtx_doTranspose(t_matrixfloat*output, int row, int col);
+/*  multiply matrix A=[rowA*colA] with matrix B=[rowB*colB]; C=A*B; colA=rowB=colArowB */
+t_matrixfloat*mtx_doMultiply(int rowA, t_matrixfloat*A, int colArowB, t_matrixfloat*B, int colB);
+
 #endif

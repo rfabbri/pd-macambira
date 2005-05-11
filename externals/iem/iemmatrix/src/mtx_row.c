@@ -114,7 +114,7 @@ void mtx_row_setup(void)
 }
 
 
-void iemmtx_row_setup(void)
+void iemtx_row_setup(void)
 {
   mtx_row_setup();
 }

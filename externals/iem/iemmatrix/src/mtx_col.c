@@ -123,7 +123,7 @@ void mtx_col_setup(void)
   class_sethelpsymbol(mtx_col_class, gensym("iemmatrix/mtx_element"));
 }
 
-void iemmtx_col_setup(void)
+void iemtx_col_setup(void)
 {
   mtx_col_setup();
 }

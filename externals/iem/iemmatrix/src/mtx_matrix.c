@@ -597,7 +597,7 @@ void matrix_setup(void)
   class_sethelpsymbol(matrix_class, gensym("iemmatrix/matrix"));
 }
 
-void iemmtx_matrix_setup(void){
+void iemtx_matrix_setup(void){
   matrix_setup();
 }
 

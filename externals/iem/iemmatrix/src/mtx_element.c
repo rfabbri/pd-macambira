@@ -112,7 +112,7 @@ void mtx_element_setup(void)
 }
 
 
-void iemmtx_element_setup(void)
+void iemtx_element_setup(void)
 {
   mtx_element_setup();
 }

@@ -51,6 +51,6 @@ void mtx_zeros_setup(void)
 
   class_sethelpsymbol(mtx_zeros_class, gensym("iemmatrix/mtx_special"));
 }
-void iemmtx_zeros_setup(void){
+void iemtx_zeros_setup(void){
   mtx_zeros_setup();
 }

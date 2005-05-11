@@ -87,7 +87,7 @@ void mtx_rand_setup(void)
   class_sethelpsymbol(mtx_rand_class, gensym("iemmatrix/mtx_rand"));
 }
 
-void iemmtx_rand_setup(void){
+void iemtx_rand_setup(void){
   mtx_rand_setup();
 }
 

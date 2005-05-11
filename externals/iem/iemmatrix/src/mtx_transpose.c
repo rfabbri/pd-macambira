@@ -16,6 +16,18 @@
 /* mtx_transpose */
 static t_class *mtx_transpose_class;
 
+t_matrixfloat*mtx_doTranspose(t_matrixfloat*transposee, int row, int col){
+  int r,c;
+  t_matrixfloat*transposed=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*row*col);
+  r=row;
+  while(r--){
+    c=col;
+    while(c--)
+      transposed[c*row+r]=transposee[r*col+c];
+  }
+  return transposed;
+}
+
 static void mtx_transpose_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
 {
   int row=atom_getfloat(argv++);
