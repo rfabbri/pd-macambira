@@ -138,7 +138,8 @@ void mtx_binscalar_free(t_mtx_binscalar *x);
 /* some math */
 
 /*  invert a square matrix (row=col=rowcol) */
-t_matrixfloat*mtx_doInvert(t_matrixfloat*input, int rowcol);
+/* if "error" is non-NULL, it's content will be set to 0 if the matrix was invertable, else to non-0 */
+t_matrixfloat*mtx_doInvert(t_matrixfloat*input, int rowcol, int*error);
 /*  transpose a matrix */
 t_matrixfloat*mtx_doTranspose(t_matrixfloat*output, int row, int col);
 /*  multiply matrix A=[rowA*colA] with matrix B=[rowB*colB]; C=A*B; colA=rowB=colArowB */
