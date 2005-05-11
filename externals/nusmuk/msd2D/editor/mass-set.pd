@@ -1,7 +1,7 @@
 #N canvas 471 153 686 707 10;
 #X obj 251 159 pack 0 p;
 #X obj 251 187 route \$1;
-#X obj 130 347 set mass x y;
+#X obj 118 383 set mass x y;
 #X obj 251 100 t p p;
 #X obj 251 131 get mass mid;
 #X text 261 220 Select pointer with mid matching \$1;
@@ -29,8 +29,9 @@
 ;
 #X msg 307 536 posX \$2 \$3;
 #X msg 327 562 posY \$2 \$4;
-#X obj 51 319 scale-msd2ds;
+#X obj 39 355 scale-msd2ds;
 #X obj 337 422 scale-ds2msd;
+#X msg 95 323 \$1 \$2;
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;
 #X connect 3 0 4 0;
@@ -44,7 +45,7 @@
 #X connect 8 1 2 2;
 #X connect 8 1 14 1;
 #X connect 9 0 6 0;
-#X connect 11 0 27 2;
+#X connect 11 0 29 0;
 #X connect 13 0 3 0;
 #X connect 14 0 22 0;
 #X connect 16 1 11 0;
@@ -64,3 +65,4 @@
 #X connect 27 2 2 0;
 #X connect 28 0 21 2;
 #X connect 28 1 21 3;
+#X connect 29 0 27 2;
