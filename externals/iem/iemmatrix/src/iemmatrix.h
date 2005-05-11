@@ -80,7 +80,8 @@ typedef struct _matrix
   int     current_row, current_col;  /* this makes things easy for the mtx_row & mtx_col...*/
   t_float f;
 
-  t_canvas *x_canvas;
+  t_canvas *x_canvas; /* needed for file-reading */
+  t_outlet *x_outlet; /* just in case somebody wants an outlet */
 } t_matrix;
 
 typedef struct _mtx_binscalar
