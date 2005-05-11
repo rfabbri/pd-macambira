@@ -18,7 +18,9 @@ static t_class *mtx_transpose_class;
 
 t_matrixfloat*mtx_doTranspose(t_matrixfloat*transposee, int row, int col){
   int r,c;
-  t_matrixfloat*transposed=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*row*col);
+  t_matrixfloat*transposed=0;
+  if(!transposee||!row||!col)return 0;
+  transposed=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*row*col);
   r=row;
   while(r--){
     c=col;
