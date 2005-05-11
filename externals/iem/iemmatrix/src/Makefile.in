@@ -7,10 +7,12 @@ INSTALL_DOC=$(PREFIX)/@REFERENCEPATH@$(LIBNAME)
 
 EXT = @EXT@ 
 DEFS = @DFLAGS@
-IFLAGS = -I. @INCLUDES@
+IFLAGS = -I. @INCLUDES@ $(INCLUDES)
 
 CC = @CC@
 LD = @LD@
+STRIP = @STRIP@
+
 AFLAGS = 
 LFLAGS = @LFLAGS@
 WFLAGS =
@@ -19,11 +21,9 @@ TARNAME =  $(LIBNAME)-@IEMMATRIX_VERSION@.tgz
 
 .SUFFIXES: .$(EXT)
 
-PDCFLAGS = -g -O2 $(DEFS) $(IFLAGS) $(WFLAGS) $(LFLAGS) $(AFLAGS)
-CFLAGS = -g -O2 $(DEFS) $(IFLAGS) $(WFLAGS)
+CFLAGS = -g -O2 $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@
 
 LIBS = @LIBS@
-#LIBS = -lpthread -lm -lc 
 include Make.source
 TARGETS = $(SOURCES:.c=.o)
 
@@ -33,16 +33,7 @@ all: $(LIBNAME)
 
 $(LIBNAME): $(TARGETS)
 	$(LD) $(LFLAGS) -o $(LIBNAME).$(EXT) *.o $(LIBS)
-	strip @STRIPFLAGS@ $(LIBNAME).$(EXT)
-
-.c.o:
-	$(CC) -c -o $@ $(CFLAGS) -DPD $*.c
-
-# cp $@ $*_stat.o
-
-.o.$(EXT):
-	$(CC) -o $@ $(PDCFLAGS) -DPD $*.o
-
+	$(STRIP) @STRIPFLAGS@ $(LIBNAME).$(EXT)
 
 clean:
 	-rm -f *.$(EXT) *.o 
