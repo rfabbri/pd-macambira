@@ -1,8 +1,0 @@
-
-# use UNIX symbolic links to create aliases for objects with 
-# more than one name
-
-alias-links:
-	grep addcreator `find ../../ -name '*.c'` | sed -re 's|.*/(.*\.c):.*class_addcreator\(.*gensym\("(.*)"\).*|\1 \2|'
-
-#then use ($foreach )
