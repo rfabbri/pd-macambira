@@ -1,0 +1,81 @@
+package require tkpath
+namespace eval ::ix {
+    proc random_int {} {return [expr "int(floor(rand()*16))"]}
+    proc random_clr {} {
+        return [format "\#%1X%1X%1X%1X%1X%1X" [random_int] [random_int] [random_int] [random_int] [random_int] [random_int]]
+    }
+    variable _
+
+    proc mat_click {what p t x y} {
+	variable _
+	switch $what {
+	    motion {
+		foreach xy {x y} {
+		    set mv [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
+		    foreach ab {a b} {
+			set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mv]
+		    }
+		    mat_gridlines $p $t
+		}
+	    }
+	}
+	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
+    }
+    proc mat_tr {p t d inv v} {
+	variable _
+	array set dm {x width y height}
+	switch $inv {
+	    t {return [expr ($v - $_($t:${d}a)) / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
+	    i {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0) + $_($t:${d}a)]}
+	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
+	}
+    }
+    proc mat_new {path target w h bg ln Xa Xb Ya Yb qXv qYv} {
+	variable _
+	set _($target:ln) $ln
+	set _($target:qxv) $qXv
+	set _($target:qyv) $qYv
+	set _($target:ya) $Ya
+	set _($target:xa) $Xa
+	set _($target:yb) $Yb
+	set _($target:xb) $Xb
+	if {[winfo exists $path.m] != 1} {
+	    canvas $path.m -bg $bg -width $w -height $h
+	    pack $path.m -side left
+	    bind $path.m <1> "::ix::mat_click first $path $target %x %y"
+	    bind $path.m <B1-Motion> "::ix::mat_click motion $path $target %x %y"
+	    bind $path.m <ButtonRelease-1> "::ix::mat_click release $path $target %x %y"
+	    mat_gridlines $path $target
+	    set bd [expr {[$path cget -bd] * 2}]
+            $path configure -bg gray -width [expr [winfo width $path.m] + $bd] \
+		-height [expr [winfo height $path.m] + $bd]}}
+    
+    proc mat_gridlines {path target} {
+	variable _
+#	puts gridlines
+	set w $path.m
+	$w delete gridlines
+	set gh [winfo height $w]
+	set gw [winfo width $w]
+	foreach item [$path.m find withtag gridline] {$path.m delete $item}
+	foreach xy {x y} {
+	    array set ta {x n y w}
+	    array set tj {x center y left}
+	    array set igx {y width x height}
+	    for {set x [expr int($_($target:${xy}a) / ($_($target:q${xy}v) + 0.0) + 1)*($_($target:q${xy}v) + 0.0)]} {$x <= $_($target:${xy}b)} {set x [expr $x + $_($target:q${xy}v)]} {
+		set og [mat_tr $path $target $xy t $x]
+		set invgeo [winfo $igx($xy) $path.m]
+		switch $xy {y {set coords [concat M 0 $og L $invgeo $og]}
+		    x {set coords [concat M $og 0 L $og $invgeo]}}
+		$w create path $coords -stroke $_($target:ln) -strokedasharray 2 -tags gridline -strokewidth 1
+		$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
+		    -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline}}
+    }
+}
+#> mat frame
+#. -bd 3 #w 384 #h 144 #bg white #ln purple
+#. #Xa 123 #Xb 2000 #Ya 0 #Yb 127 #qXv 125 #qYv 1
+#. @list  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
+#. @add  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
+puts "mat .- .|"
+::ix::mat_new .- .| .#w .#h .#bg .#ln .#Xa .#Xb .#Ya .#Yb .#qXv .#qYv

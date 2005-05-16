@@ -1,0 +1,18 @@
+#N canvas 25 203 920 777 12;
+#X obj 30 0 widget mat n1 #w 881 #bg white #divX 8 #divY 5 #h 740 #Yb
+7;
+#X msg 1080 -23 -height 26 -width 26 -bg gray95;
+#X msg 32 -22 redefine;
+#X msg 242 -21 #w \$1;
+#X msg 206 -22 #h \$1;
+#X floatatom 172 -23 5 0 0 0 - - -;
+#X floatatom 140 -21 5 0 0 0 - - -;
+#X msg 329 -20 #Yb \$1;
+#X floatatom 380 -18 5 0 0 0 - - -;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 3 0;
+#X connect 6 0 4 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
