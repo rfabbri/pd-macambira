@@ -1,41 +1,15 @@
-#N canvas 33 84 866 562 10;
-#N canvas 0 64 1222 870 data 0;
-#X restore 719 42 pd data;
-#X obj 24 523 structures;
-#X obj 30 314 bng 24 250 50 0 empty \$0-generate generate 0 -6 0 8
--24198 -1 -1;
-#X text 25 499 Data Struct Definitions;
-#N canvas 460 399 104 45 save 0;
-#X obj 2 3 cnv 15 100 40 empty empty empty 20 12 0 14 -228992 -66577
+#N canvas 32 40 419 640 10;
+#X obj 9 50 cnv 15 400 200 empty empty EDIT 20 12 1 14 -233017 -66577
 0;
-#X obj 4 17 bng 20 250 50 0 empty empty load 0 -6 0 8 -258699 -1 -1
-;
-#X obj 34 17 bng 20 250 50 0 empty empty saveas 0 -6 0 8 -24198 -1
--1;
-#X obj 101 60 savepanel;
-#X obj 50 168 s pd-data;
-#X msg 101 115 write \$1;
-#X obj 20 91 openpanel;
-#X msg 20 115 read \$1;
-#X obj 20 138 t b a;
-#X obj 20 195 s \$0-generate;
-#X obj 79 17 bng 20 250 50 0 empty empty save 0 -6 0 8 -241291 -1 -1
-;
-#X obj 100 91 symbol;
-#X connect 1 0 6 0;
-#X connect 2 0 3 0;
-#X connect 3 0 11 0;
-#X connect 5 0 4 0;
-#X connect 6 0 7 0;
-#X connect 6 0 11 1;
-#X connect 7 0 8 0;
-#X connect 8 0 9 0;
-#X connect 8 1 4 0;
-#X connect 10 0 11 0;
-#X connect 11 0 5 0;
-#X coords 0 0 1 1 102 44 1;
-#X restore 703 139 pd save;
-#X text 712 17 Edit here:;
+#X obj 9 256 cnv 15 400 60 empty empty CREATE 20 12 1 14 -195568 -66577
+0;
+#X obj 10 321 cnv 15 400 140 empty empty CONTROL 20 12 1 14 -233017
+-66577 0;
+#N canvas 0 64 1222 870 data 0;
+#X restore 21 191 pd data;
+#X obj 21 219 structures;
+#X obj 221 276 bng 24 250 50 0 \$0-generate \$0-generate generate 0
+-6 0 8 -24198 -1 -1;
 #N canvas 257 131 781 748 generator 0;
 #N canvas 311 93 877 551 getter 0;
 #X obj 244 89 inlet;
@@ -337,7 +311,6 @@ from the #define in msd sources.;
 #X connect 22 0 16 0;
 #X restore 112 428 pd make-setters;
 #X obj 181 344 r pointer2msd;
-#X obj 112 91 inlet;
 #X msg 131 324 link ml \$1 \$2 \$3 \$4 \$5;
 #X msg 189 275 mass id \$4 \$5 \$1 \$2;
 #N canvas 382 305 870 520 set-min-max 0;
@@ -431,24 +404,25 @@ from the #define in msd sources.;
 #X restore 189 246 pd demux;
 #X obj 240 219 r MSD-TYPE;
 #X msg 341 275 mass id \$4 \$5 \$1 \$2 0;
-#X connect 0 0 8 0;
-#X connect 0 1 14 0;
+#X obj 112 93 r \$0-generate;
+#X connect 0 0 7 0;
+#X connect 0 1 13 0;
 #X connect 2 0 3 0;
-#X connect 4 0 12 0;
+#X connect 4 0 11 0;
 #X connect 4 1 0 0;
 #X connect 4 3 2 0;
-#X connect 5 0 10 0;
+#X connect 5 0 9 0;
 #X connect 6 0 1 0;
-#X connect 7 0 4 0;
+#X connect 7 0 1 0;
 #X connect 8 0 1 0;
-#X connect 9 0 1 0;
+#X connect 11 0 5 0;
 #X connect 12 0 5 0;
-#X connect 13 0 5 0;
-#X connect 14 0 9 0;
-#X connect 14 1 16 0;
-#X connect 15 0 14 1;
-#X connect 16 0 1 0;
-#X restore 30 343 pd generator;
+#X connect 13 0 8 0;
+#X connect 13 1 15 0;
+#X connect 14 0 13 1;
+#X connect 15 0 1 0;
+#X connect 16 0 4 0;
+#X restore 287 276 pd generator;
 #N canvas 0 0 718 819 activate 0;
 #X obj 233 238 r \$0-msd;
 #X obj 233 453 gem_masses;
@@ -456,8 +430,8 @@ from the #define in msd sources.;
 #X msg 167 216 bang \, get massesPos \, get linksPos;
 #X obj 177 125 gemhead;
 #X obj 233 396 route massesPos linksPos;
-#X obj 97 670 gemwin;
-#X msg 97 643 0 \, destroy;
+#X obj 97 710 gemwin;
+#X msg 97 683 0 \, destroy;
 #X obj 249 354 s \$0-msd-out;
 #X obj 97 597 select 1 0;
 #X obj 97 569 tgl 24 0 empty empty GEM 0 -6 0 8 -262144 -1 -1 0 1;
@@ -588,9 +562,12 @@ from the #define in msd sources.;
 #X connect 10 0 2 0;
 #X connect 10 1 6 0;
 #X restore 233 308 pd msd;
-#X msg 97 619 reset \, lighting 1 \, create \, 1;
 #X obj 357 676 gemhead;
 #X obj 357 699 world_light;
+#X obj 147 617 r \$0-fullscreen;
+#X obj 97 634 f 0;
+#X msg 97 659 reset \, lighting 1 \, fullscreen \$1 \, create \, 1
+;
 #X connect 0 0 43 0;
 #X connect 0 0 44 0;
 #X connect 3 0 44 0;
@@ -600,7 +577,7 @@ from the #define in msd sources.;
 #X connect 5 1 16 0;
 #X connect 5 1 40 0;
 #X connect 7 0 6 0;
-#X connect 9 0 45 0;
+#X connect 9 0 48 0;
 #X connect 9 1 7 0;
 #X connect 10 0 9 0;
 #X connect 10 0 15 1;
@@ -639,182 +616,21 @@ from the #define in msd sources.;
 #X connect 44 0 8 0;
 #X connect 44 0 5 0;
 #X connect 44 1 11 0;
-#X connect 45 0 6 0;
-#X connect 46 0 47 0;
-#X restore 29 420 pd activate;
-#X obj 29 384 tgl 24 0 empty empty GEM 0 -6 0 8 -233017 -1 -1 0 1;
-#X obj 65 384 tgl 24 0 empty empty Graphical_Datastructures 0 -6 0
-8 -1 -262144 -1 0 1;
-#N canvas 334 329 751 433 ignore 0;
-#X obj 46 264 print ToMSD;
-#X obj 46 234 spigot;
-#X obj 83 181 tgl 15 0 empty empty debug_ToMSD 0 -6 0 8 -262144 -1
+#X connect 45 0 46 0;
+#X connect 47 0 48 1;
+#X connect 48 0 49 0;
+#X connect 49 0 6 0;
+#X restore 31 397 pd activate;
+#X obj 31 362 tgl 24 0 empty empty GEM 0 -6 0 8 -195568 -1 -1 0 1;
+#X obj 67 362 tgl 24 0 empty empty Datastructures 0 -6 0 8 -1 -262144
 -1 0 1;
-#X obj 46 207 r \$0-msd;
-#X obj 147 237 spigot;
-#X obj 184 184 tgl 15 0 empty empty debug_FromMSD 0 -6 0 8 -262144
--1 -1 0 1;
-#X obj 147 265 print FromMSD;
-#X obj 147 210 r \$0-msd-out;
-#N canvas 0 0 578 686 setter 0;
-#X restore 521 67 pd setter;
-#N canvas 0 0 822 675 lsetter 0;
-#X restore 520 90 pd lsetter;
-#X text 504 43 Automatic scripting targets;
-#X text 23 46 You can ignore this stuff here \, unless something goes
-wrong.;
-#X obj 269 233 spigot;
-#X obj 306 180 tgl 15 0 empty empty debug_AttrMSD 0 -6 0 8 -262144
--1 -1 0 1;
-#X obj 269 206 r \$0-msd-attr;
-#X obj 269 264 print AttrMSD;
-#X obj 532 270 s \$0-msd;
-#X msg 544 247 infosL;
-#X obj 143 363 spigot;
-#X obj 180 310 tgl 15 0 empty empty global-send 0 -6 0 8 -262144 -1
--1 0 1;
-#X obj 143 336 r \$0-msd-out;
-#X obj 143 391 s MSD-OUT-GLOBAL;
-#X msg 532 223 massesPosL;
-#X obj 532 199 metro 40;
-#X obj 532 177 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
-1;
-#X floatatom 585 178 5 0 0 0 - - -;
-#X obj 280 365 spigot;
-#X obj 317 312 tgl 15 0 empty empty global-receive 0 -6 0 8 -262144
--1 -1 1 1;
-#X obj 280 338 r MSD-IN-GLOBAL;
-#X obj 280 393 s \$0-msd;
-#X obj 630 201 metro 40;
-#X obj 630 179 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
-1;
-#X floatatom 683 180 5 0 0 0 - - -;
-#X obj 630 273 s \$0-msd;
-#X obj 531 322 metro 40;
-#X obj 531 300 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
-1;
-#X floatatom 584 301 5 0 0 0 - - -;
-#X obj 531 394 s \$0-msd;
-#X msg 625 70 clear;
-#X obj 625 97 s pd-setter;
-#X obj 625 117 s pd-lsetter;
-#X msg 531 346 massesForcesL;
-#X msg 630 225 massesPosYL;
-#N canvas 0 0 450 300 msd-type 0;
-#X obj 94 78 r MSD-TYPE;
-#X obj 89 201 s \$0-MSD-TYPE;
-#X obj 98 136 select 0;
-#X msg 89 168 label 2-D;
-#X msg 185 170 label 3-D;
-#X connect 0 0 2 0;
-#X connect 2 0 3 0;
-#X connect 2 1 4 0;
-#X connect 3 0 1 0;
-#X connect 4 0 1 0;
-#X restore 524 126 pd msd-type;
-#N canvas 244 458 450 300 camera 0;
-#X obj 183 185 camera;
-#X obj 179 45 gemhead;
-#X obj 162 82 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X obj 185 63 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X obj 234 108 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
-1;
-#X obj 260 86 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X msg 234 124 left \$1;
-#X msg 260 102 right \$1;
-#X obj 75 120 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X obj 101 98 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
-;
-#X msg 101 114 up \$1;
-#X msg 75 136 down \$1;
-#X msg 267 58 reset;
-#X msg 185 80 forward \$1;
-#X msg 162 98 reverse \$1;
-#X msg 66 252 speed \$1;
-#X floatatom 66 234 5 0 0 0 - - -;
-#X floatatom 67 195 5 0 0 0 - - -;
-#X msg 379 150 lookX \$1;
-#X msg 379 187 lookY \$1;
-#X msg 379 223 lookZ \$1;
-#X floatatom 379 134 5 0 0 0 - - -;
-#X floatatom 379 207 5 0 0 0 - - -;
-#X floatatom 379 170 5 0 0 0 - - -;
-#X msg 67 213 distance \$1;
-#X connect 1 0 0 0;
-#X connect 2 0 14 0;
-#X connect 3 0 13 0;
-#X connect 4 0 6 0;
-#X connect 5 0 7 0;
-#X connect 6 0 0 0;
-#X connect 7 0 0 0;
-#X connect 8 0 11 0;
-#X connect 9 0 10 0;
-#X connect 10 0 0 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 0;
-#X connect 13 0 0 0;
-#X connect 14 0 0 0;
-#X connect 15 0 0 0;
-#X connect 16 0 15 0;
-#X connect 17 0 24 0;
-#X connect 18 0 0 0;
-#X connect 19 0 0 0;
-#X connect 20 0 0 0;
-#X connect 21 0 18 0;
-#X connect 22 0 20 0;
-#X connect 23 0 19 0;
-#X connect 24 0 0 0;
-#X restore 416 83 pd camera;
-#X connect 1 0 0 0;
-#X connect 2 0 1 1;
-#X connect 3 0 1 0;
-#X connect 4 0 6 0;
-#X connect 5 0 4 1;
-#X connect 7 0 4 0;
-#X connect 12 0 15 0;
-#X connect 13 0 12 1;
-#X connect 14 0 12 0;
-#X connect 17 0 16 0;
-#X connect 18 0 21 0;
-#X connect 19 0 18 1;
-#X connect 20 0 18 0;
-#X connect 22 0 16 0;
-#X connect 23 0 22 0;
-#X connect 24 0 23 0;
-#X connect 25 0 23 1;
-#X connect 26 0 29 0;
-#X connect 27 0 26 1;
-#X connect 28 0 26 0;
-#X connect 30 0 42 0;
-#X connect 31 0 30 0;
-#X connect 32 0 30 1;
-#X connect 34 0 41 0;
-#X connect 35 0 34 0;
-#X connect 36 0 34 1;
-#X connect 38 0 39 0;
-#X connect 38 0 40 0;
-#X connect 41 0 37 0;
-#X connect 42 0 33 0;
-#X restore 117 523 pd ignore this;
-#X floatatom 101 391 5 10 1000 1 frequency - -;
-#X text 240 370 Visualization is done using either a GEM OpenGL window
-\, or just animate the data structure alone. Better don't use both
-at the same time. In GDS-mode you can set the frequency of the internal
-metro \, to accelerate or slow down the simulation.;
-#X text 241 116 Links are created by selecting at least two masses
-in edit mode \, then press "L" to connect those with a link. If you
-select more than two masses \, then all possible links between those
-masses will get created. Use this to mass-connect masses. :);
+#X floatatom 103 377 5 10 1000 2 frequency - -;
 #N canvas 405 181 584 687 forces 0;
 #X obj 295 415 s \$0-msd;
 #X obj 394 355 hsl 128 24 -5 5 0 1 empty empty empty -2 -6 0 8 -262144
 -1 -1 6350 1;
 #X obj 295 230 vsl 24 128 -5 5 0 1 empty empty empty 0 -8 0 8 -262144
--1 -1 6650 1;
+-1 -1 4350 1;
 #X msg 295 388 forceY id \$1;
 #X msg 391 388 forceX id \$1;
 #X obj 295 174 tgl 24 0 empty empty constant? 0 -6 0 8 -262144 -1 -1
@@ -880,44 +696,27 @@ masses will get created. Use this to mass-connect masses. :);
 #X connect 31 0 34 0;
 #X connect 32 0 31 0;
 #X connect 34 0 33 0;
-#X restore 28 463 pd forces;
-#X obj 254 524 tgl 15 0 \$0-gem-masses-on empty gem_m 0 -6 0 8 -225280
--1 -1 0 1;
-#X obj 296 524 tgl 15 0 \$0-gem-links-on empty gem_l 0 -6 0 8 -225271
--1 -1 0 1;
+#X restore 176 429 pd forces;
 #N canvas 113 581 450 300 props 0;
-#X obj 117 204 s \$0-msd;
-#X obj 117 46 vsl 15 64 0 10 0 0 empty empty D 0 -8 0 8 -262144 -1
--1 3000 1;
-#X obj 141 46 vsl 15 64 0 10 0 0 empty empty D2 0 -8 0 8 -262144 -1
--1 3800 1;
-#X obj 90 46 vsl 15 64 0 100 0 0 empty empty K 0 -8 0 8 -262144 -1
--1 1000 1;
-#X msg 90 175 setK ml \$1;
-#X msg 117 151 setD ml \$1;
-#X msg 141 122 setD2 ml \$1;
-#X text 192 47 Edit properties of Links.;
-#X connect 1 0 5 0;
-#X connect 2 0 6 0;
-#X connect 3 0 4 0;
-#X connect 4 0 0 0;
-#X connect 5 0 0 0;
-#X connect 6 0 0 0;
-#X restore 102 464 pd props;
-#X text 337 521 Toggle display of masses and links in GEM.;
-#X text 241 451 In edit mode and while visualization is active \, you
-can move around the masses. The red masses will not receive any other
-forces from the model. Use the "forces" and "props" subpatches to change
-parameters of links and send forces.;
-#X text 685 122 Save network to disk:;
-#X obj 24 120 morelinks;
-#X text 242 29 First create structure inside [pd data] using msd_append.
-Add mobile masses with black bang \, add fixed masses with the red
-bang. Set weight of mass with the "M" number box.;
-#X obj 120 92 s pd-data;
-#X msg 120 52 clear;
-#X msg 120 72 sort;
-#X text 118 27 Clear or sort:;
+#X obj 121 232 s \$0-msd;
+#X msg 94 203 setK ml \$1;
+#X msg 121 179 setD ml \$1;
+#X msg 145 150 setD2 ml \$1;
+#X text 244 59 Edit properties of Links.;
+#X obj 77 36 inlet;
+#X obj 123 36 inlet;
+#X obj 169 36 inlet;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 5 0 1 0;
+#X connect 6 0 2 0;
+#X connect 7 0 3 0;
+#X restore 294 431 pd props;
+#X obj 115 57 morelinks;
+#X obj 261 231 s pd-data;
+#X msg 297 203 clear;
+#X msg 261 203 sort;
 #N canvas 702 626 136 139 minmax 0;
 #X obj 2 15 cnv 15 130 120 empty empty Min/Max 10 10 0 10 -195568 -1
 0;
@@ -950,48 +749,57 @@ bang. Set weight of mass with the "M" number box.;
 #X connect 5 0 8 0;
 #X restore 82 19 pd l;
 #X coords 0 0 1 1 132 135 1;
-#X restore 703 259 pd minmax;
-#X text 696 409 Data structs and;
-#X text 696 423 GEM like different;
-#X text 696 437 coordinate systems.;
-#X text 696 461 Set the mapping;
-#X text 696 475 between both here.;
-#X text 238 187 The keyboard shortcut "L" is only active \, if the
-green toggle "Key:L" is set to on. Otherwise use the yellow "link"
-bang.;
-#X text 239 235 More ways to create links: left-to-right connects masses
-from left to right. one2many will connect one mass to many others.
-First select the first mass \, then set the toggle to 1 \, after that
-select the other masses and set toggle to 0;
-#X obj 707 97 tgl 15 0 \$0-poll-ds \$0-poll-ds poll-ds 0 -6 0 8 -225280
+#X restore 261 57 pd minmax;
+#X obj 178 276 tgl 24 0 MSD-TYPE \$0-MSD-TYPE 2-D 0 -6 0 8 -233017
 -1 -1 0 1;
-#X obj 765 97 tgl 15 0 \$0-set-ds \$0-set-ds set-ds 0 -6 0 8 -225271
+#X obj 21 80 msd_append;
+#X obj 10 547 cnv 15 400 80 empty empty DOC 20 12 1 14 -233017 -66577
+0;
+#X obj 182 362 tgl 15 0 \$0-gem-masses-on empty gem_m 0 -6 0 8 -225280
+-1 -1 1 1;
+#X obj 218 362 tgl 15 0 \$0-gem-links-on empty gem_l 0 -6 0 8 -225271
 -1 -1 0 1;
-#X text 669 66 Data struct anim ON/OFF:;
-#N canvas 504 489 531 315 TODO 0;
-#X text 146 11 TODO :: IDEAS;
-#X text 41 92 Make symbolic ids of new masses/links editable. For this
-I need to add new fields \, probably called "sym" \, to masses and
-links. They have to be floats for now (symbols in DS don't work yet).
-Then [makefilename] symbolic ids of this.;
-#X text 41 48 Save/load of MSD messages: Route [r \$0-msd] to a [textfile]
-or [qlist];
-#X text 41 164 Related to that the props and forces subpatches should
-be dynamic as well \, so that users can send messages to groups of
-masses/links using the different symbolic names.;
-#X text 42 232 msd3D-editor: edit both kinds of mass/spring networks.
+#X obj 182 397 tgl 15 0 \$0-poll-ds \$0-poll-ds poll-ds -10 -6 0 8
+-225280 -1 -1 0 1;
+#X obj 218 397 tgl 15 0 \$0-set-ds \$0-set-ds set-ds 0 -6 0 8 -225271
+-1 -1 0 1;
+#X text 29 286 MSD-TYPE (2D or 3D):;
+#X obj 9 9 cnv 15 400 30 empty empty MSD-EDITOR 20 14 1 14 -128992
+-262144 0;
+#X obj 10 466 cnv 15 400 75 empty empty PERSIST 20 12 1 14 -195568
+-66577 0;
+#N canvas 460 399 104 45 save 0;
+#X obj 2 3 cnv 15 100 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 4 17 bng 20 250 50 0 empty empty load 0 -6 0 8 -258699 -1 -1
 ;
-#X restore 777 529 pd TODO;
-#N canvas 307 452 509 305 NEWS 0;
-#X text 32 24 RecentChanges;
-#X text 39 90 Geos: Now it's possible to add masses in geometric formations:
-rectangles (2d-networks) and circles (set center point \, radius and
-number of masses).;
-#X text 43 51 I think I now really have fixed the "stack overflows"
-when creating lots of masses.;
-#X restore 777 508 pd NEWS;
+#X obj 34 17 bng 20 250 50 0 empty empty saveas 0 -6 0 8 -24198 -1
+-1;
+#X obj 101 60 savepanel;
+#X obj 50 168 s pd-data;
+#X msg 101 115 write \$1;
+#X obj 20 91 openpanel;
+#X msg 20 115 read \$1;
+#X obj 20 138 t b a;
+#X obj 20 195 s \$0-generate;
+#X obj 79 17 bng 20 250 50 0 empty empty save 0 -6 0 8 -241291 -1 -1
+;
+#X obj 100 91 symbol;
+#X connect 1 0 6 0;
+#X connect 2 0 3 0;
+#X connect 3 0 11 0;
+#X connect 5 0 4 0;
+#X connect 6 0 7 0;
+#X connect 6 0 11 1;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;
+#X connect 8 1 4 0;
+#X connect 10 0 11 0;
+#X connect 11 0 5 0;
+#X coords 0 0 1 1 102 44 1;
+#X restore 124 470 pd save;
 #N canvas 0 0 84 49 save 0;
-#X obj 2 3 cnv 15 75 40 empty empty empty 20 12 0 14 -257472 -66577
+#X obj 2 3 cnv 15 75 40 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X obj 37 18 bng 20 250 50 0 empty empty saveas 0 -6 0 8 -24198 -1
 -1;
@@ -1044,21 +852,253 @@ when creating lots of masses.;
 #X connect 22 0 19 0;
 #X connect 22 1 2 0;
 #X coords 0 0 1 1 77 44 1;
-#X restore 703 208 pd save;
-#X text 683 188 Save MSD messages:;
-#X obj 92 315 tgl 24 0 MSD-TYPE \$0-MSD-TYPE 3-D 0 -6 0 8 -233017 -1
+#X restore 266 470 pd save;
+#X text 124 524 Save DS to disk;
+#X text 266 524 Save MSD messages;
+#X obj 319 353 vsl 15 64 0 10 0 0 empty empty D 0 -8 0 8 -195568 -1
+-1 300 1;
+#X obj 345 353 vsl 15 64 0 10 0 0 empty empty D2 0 -8 0 8 -195568 -1
+-1 0 1;
+#X obj 294 353 vsl 15 64 0 100 0 0 empty empty K 0 -8 0 8 -195568 -1
+-1 300 1;
+#N canvas 504 489 531 315 TODO 0;
+#X text 146 11 TODO :: IDEAS;
+#X text 39 50 Make symbolic ids of new masses/links editable. For this
+I need to add new fields \, probably called "sym" \, to masses and
+links. They have to be floats for now (symbols in DS don't work yet).
+Then [makefilename] symbolic ids of this.;
+#X text 39 122 Related to that the props and forces subpatches should
+be dynamic as well \, so that users can send messages to groups of
+masses/links using the different symbolic names.;
+#X text 42 178 Prepare for retirement of D2;
+#X restore 178 582 pd TODO;
+#N canvas 307 452 509 305 NEWS 0;
+#X text 32 24 RecentChanges;
+#X text 43 51 msd-editor now also can be used for msd3D objects.;
+#X text 41 77 Cosmetic overhaul;
+#X restore 117 582 pd NEWS;
+#N canvas 334 329 751 433 ignore 0;
+#X obj 46 264 print ToMSD;
+#X obj 46 234 spigot;
+#X obj 83 181 tgl 15 0 empty empty debug_ToMSD 0 -6 0 8 -262144 -1
+-1 0 1;
+#X obj 46 207 r \$0-msd;
+#X obj 147 237 spigot;
+#X obj 184 184 tgl 15 0 empty empty debug_FromMSD 0 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 147 265 print FromMSD;
+#X obj 147 210 r \$0-msd-out;
+#N canvas 0 0 578 686 setter 0;
+#X restore 521 67 pd setter;
+#N canvas 0 0 822 675 lsetter 0;
+#X restore 520 90 pd lsetter;
+#X text 504 43 Automatic scripting targets;
+#X text 23 46 You can ignore this stuff here \, unless something goes
+wrong.;
+#X obj 269 233 spigot;
+#X obj 306 180 tgl 15 0 empty empty debug_AttrMSD 0 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 269 206 r \$0-msd-attr;
+#X obj 269 264 print AttrMSD;
+#X obj 532 270 s \$0-msd;
+#X msg 544 247 infosL;
+#X obj 143 363 spigot;
+#X obj 180 310 tgl 15 0 empty empty global-send 0 -6 0 8 -262144 -1
 -1 1 1;
-#X text 120 320 MSD-TYPE;
-#X obj 25 14 msd_append;
-#X text 240 304 Press "generate" to generate messages to the msd object
+#X obj 143 336 r \$0-msd-out;
+#X obj 143 391 s MSD-OUT-GLOBAL;
+#X msg 532 223 massesPosL;
+#X obj 532 199 metro 40;
+#X obj 532 177 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X floatatom 585 178 5 0 0 0 - - -;
+#X obj 280 365 spigot;
+#X obj 317 312 tgl 15 0 empty empty global-receive 0 -6 0 8 -262144
+-1 -1 1 1;
+#X obj 280 338 r MSD-IN-GLOBAL;
+#X obj 280 393 s \$0-msd;
+#X obj 630 201 metro 40;
+#X obj 630 179 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X floatatom 683 180 5 0 0 0 - - -;
+#X obj 630 273 s \$0-msd;
+#X obj 531 322 metro 40;
+#X obj 531 300 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X floatatom 584 301 5 0 0 0 - - -;
+#X obj 531 394 s \$0-msd;
+#X msg 625 70 clear;
+#X obj 625 97 s pd-setter;
+#X obj 625 117 s pd-lsetter;
+#X msg 531 346 massesForcesL;
+#X msg 630 225 massesPosYL;
+#N canvas 0 0 450 300 msd-type 0;
+#X obj 94 78 r MSD-TYPE;
+#X obj 89 201 s \$0-MSD-TYPE;
+#X obj 98 136 select 0;
+#X msg 89 168 label 2-D;
+#X msg 185 170 label 3-D;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 1 4 0;
+#X connect 3 0 1 0;
+#X connect 4 0 1 0;
+#X restore 524 126 pd msd-type;
+#N canvas 673 282 553 343 camera 0;
+#X obj 183 185 camera;
+#X obj 179 45 gemhead;
+#X obj 162 82 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 185 63 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 234 108 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 260 86 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X msg 234 124 left \$1;
+#X msg 260 102 right \$1;
+#X obj 75 120 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 101 98 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X msg 101 114 up \$1;
+#X msg 75 136 down \$1;
+#X msg 267 58 reset;
+#X msg 185 80 forward \$1;
+#X msg 162 98 reverse \$1;
+#X msg 66 252 speed \$1;
+#X floatatom 66 232 5 0 0 0 - - -;
+#X floatatom 67 195 5 0 0 0 - - -;
+#X msg 379 150 lookX \$1;
+#X msg 379 187 lookY \$1;
+#X msg 379 223 lookZ \$1;
+#X floatatom 379 134 5 0 0 0 - - -;
+#X floatatom 379 207 5 0 0 0 - - -;
+#X floatatom 379 170 5 0 0 0 - - -;
+#X msg 67 213 distance \$1;
+#X obj 114 182 f 4;
+#X obj 181 237 +;
+#X connect 1 0 0 0;
+#X connect 2 0 14 0;
+#X connect 3 0 13 0;
+#X connect 4 0 6 0;
+#X connect 5 0 7 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 11 0;
+#X connect 9 0 10 0;
+#X connect 10 0 0 0;
+#X connect 11 0 0 0;
+#X connect 12 0 0 0;
+#X connect 13 0 0 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
+#X connect 16 0 15 0;
+#X connect 17 0 24 0;
+#X connect 18 0 0 0;
+#X connect 19 0 0 0;
+#X connect 20 0 0 0;
+#X connect 21 0 18 0;
+#X connect 22 0 20 0;
+#X connect 23 0 19 0;
+#X connect 24 0 0 0;
+#X connect 25 0 24 0;
+#X restore 416 83 pd camera;
+#X connect 1 0 0 0;
+#X connect 2 0 1 1;
+#X connect 3 0 1 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 1;
+#X connect 7 0 4 0;
+#X connect 12 0 15 0;
+#X connect 13 0 12 1;
+#X connect 14 0 12 0;
+#X connect 17 0 16 0;
+#X connect 18 0 21 0;
+#X connect 19 0 18 1;
+#X connect 20 0 18 0;
+#X connect 22 0 16 0;
+#X connect 23 0 22 0;
+#X connect 24 0 23 0;
+#X connect 25 0 23 1;
+#X connect 26 0 29 0;
+#X connect 27 0 26 1;
+#X connect 28 0 26 0;
+#X connect 30 0 42 0;
+#X connect 31 0 30 0;
+#X connect 32 0 30 1;
+#X connect 34 0 41 0;
+#X connect 35 0 34 0;
+#X connect 36 0 34 1;
+#X connect 38 0 39 0;
+#X connect 38 0 40 0;
+#X connect 41 0 37 0;
+#X connect 42 0 33 0;
+#X restore 241 582 pd ignore this;
+#N canvas 0 0 489 250 help 0;
+#N canvas 0 0 450 300 visualize? 0;
+#X text 18 91 Visualization is done using either a GEM OpenGL window
+\, or just animate the data structure alone. Better don't use both
+at the same time. In GDS-mode you can set the frequency of the internal
+metro \, to accelerate or slow down the simulation.;
+#X text 19 172 In edit mode and while visualization is active \, you
+can move around the masses. The red masses will not receive any other
+forces from the model. Use the "forces" and "props" subpatches to change
+parameters of links and send forces.;
+#X text 56 39 Help on Visualization;
+#X restore 301 169 pd visualize?;
+#N canvas 0 0 450 300 append? 0;
+#X text 36 72 First create structure inside [pd data] using msd_append.
+Add mobile masses with black bang \, add fixed masses with the red
+bang. Set weight of mass with the "M" number box.;
+#X text 29 29 Help on Mass creation;
+#X text 34 122 Use the greenish "geos" bang to open a subwindow for
+creating masses in geometric formations: circles and rectangles.;
+#X restore 303 70 pd append?;
+#N canvas 0 0 537 336 links? 0;
+#X text 47 77 Links are created by selecting at least two masses in
+edit mode \, then press "L" to connect those with a link. If you select
+more than two masses \, then all possible links between those masses
+will get created. Use this to mass-connect masses. :);
+#X text 32 26 Help on Link Creation;
+#X text 44 148 The keyboard shortcut "L" is only active \, if the green
+toggle "Keys" is set to on. Otherwise use the yellow "link" bang.;
+#X text 45 196 More ways to create links: left-to-right connects masses
+from left to right. The keyboard shortcut for this is "R" (for "Right"
+\, as "L" is for "Links"). one2many will connect one mass to many others
+and has no shortcuts. First select the first mass \, then set the toggle
+to 1 \, after that select the other masses and set toggle to 0;
+#X restore 302 94 pd links?;
+#N canvas 0 0 450 300 generate? 0;
+#X text 19 98 Press "generate" to generate messages to the msd object
 and create the physical model inside. You can select which type of
 msd* to use as well: msd2D or msd3D. With 3-D \, the Z-coordinate will
 default to a value of zero.;
-#X connect 2 0 6 0;
+#X text 31 38 Help on MSD generation;
+#X restore 302 144 pd generate?;
+#N canvas 0 0 215 157 minmax? 0;
+#X text 38 35 Data structs and;
+#X text 38 49 GEM like different;
+#X text 38 63 coordinate systems.;
+#X text 38 87 Set the mapping;
+#X text 38 101 between both here.;
+#X restore 302 118 pd minmax?;
+#X text 39 18 HELP / USAGE;
+#X text 143 71 How to create masses:;
+#X text 143 94 How to create links:;
+#X text 102 118 Coordinates in MSD-Editor:;
+#X text 109 146 Generate the MSD-Network:;
+#X text 17 170 Visualize the network using GEM or DS:;
+#X restore 53 582 pd help;
+#X obj 32 431 tgl 16 0 \$0-fullscreen \$0-fullscreen fullscreen 0 -6
+0 8 -195568 -1 -1 0 1;
 #X connect 7 0 8 0;
 #X connect 7 1 9 0;
 #X connect 8 0 7 0;
 #X connect 9 0 7 1;
-#X connect 11 0 7 2;
-#X connect 24 0 23 0;
-#X connect 25 0 23 0;
+#X connect 10 0 7 2;
+#X connect 15 0 14 0;
+#X connect 16 0 14 0;
+#X connect 32 0 12 1;
+#X connect 33 0 12 2;
+#X connect 34 0 12 0;

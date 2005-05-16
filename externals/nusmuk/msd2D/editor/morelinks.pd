@@ -86,14 +86,13 @@ to right and create links between two neighbor masses like:;
 #X connect 14 0 13 1;
 #X connect 15 0 5 0;
 #X restore 143 95 pd one-to-many;
-#X obj 10 76 tgl 15 0 empty empty one2many-Ends 20 8 0 8 -262131 -1
+#X obj 10 76 tgl 15 0 empty empty one2many-Start 20 8 0 8 -262131 -1
 -1 0 1;
 #X obj 10 31 bng 15 250 50 0 empty empty all_selected 20 8 0 8 -241291
 -1 -1;
-#X obj 107 30 tgl 15 0 empty empty Key:L -3 -6 0 8 -24198 -1 -1 0 1
+#X obj 109 30 tgl 15 0 empty empty Keys -3 -6 0 8 -24198 -1 -1 0 1
 ;
 #X obj 211 6 keyup;
-#X obj 211 48 select 108;
 #X obj 211 27 spigot;
 #X obj 2 101 cnv 15 130 80 empty empty Link_Params 10 10 0 10 -195568
 -1 0;
@@ -180,12 +179,14 @@ masses like iLink.;
 #X connect 10 0 1 0;
 #X connect 11 0 0 0;
 #X restore 137 46 pd ilinker;
+#X obj 210 47 select 108 114;
 #X connect 2 0 0 0;
 #X connect 3 0 4 0;
 #X connect 4 0 3 0;
-#X connect 5 0 15 0;
-#X connect 6 0 9 1;
-#X connect 7 0 9 0;
+#X connect 5 0 14 0;
+#X connect 6 0 8 1;
+#X connect 7 0 8 0;
 #X connect 8 0 15 0;
-#X connect 9 0 8 0;
+#X connect 15 0 14 0;
+#X connect 15 1 0 0;
 #X coords 0 0 1 1 132 180 1;
