@@ -8,7 +8,14 @@ namespace eval ::ix {
 
     proc mat_click {button action p t x y} {
 	variable _
+	set clicked [$p.m find overlapping $x $y $x $y]
 	switch $action {
+	    first {
+#		if {$clicked ne ""} {
+		    set _($t:cl) $clicked
+#		}
+		foreach xy {x y}  {set _($t:f$xy) [set $xy]}
+	    }
 	    motion {
 		set mx [expr $x - $_($t:cx)]
 		set my [expr $y - $_($t:cy)]
@@ -28,7 +35,13 @@ namespace eval ::ix {
 		}
 		switch $button {
 		    1 {			    
-			foreach item [$p.m find withtag item] {
+			if {$clicked ne ""} {
+			    set items $clicked
+			} else {
+			    set items [$p.m find withtag item] 			   
+			    mat_gridlines $p $t
+			}
+			foreach item $items {
 			    set m [$p.m itemcget $item -matrix]
 			    set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mx] [expr [lindex [lindex $m 2] 1] + $my]]]
 			    $p.m itemconfigure $item -matrix $m
@@ -40,12 +53,22 @@ namespace eval ::ix {
 			    set px [mat_tr $p $t x t [lindex $_($t:items:$id) 0]]
 			    set py [mat_tr $p $t y t [lindex $_($t:items:$id) 1]]
 			    set sx [mat_tr $p $t x id [expr [lindex $_($t:items:$id) 2] - [lindex $_($t:items:$id) 0]]]
-			    set sy [mat_tr $p $t y id [expr [lindex $_($t:items:$id) 3] - [lindex $_($t:items:$id) 1]]]
+#			    set sy [mat_tr $p $t y id [expr [lindex $_($t:items:$id) 3] - [lindex $_($t:items:$id) 1]]]
+			    set sy [mat_tr $p $t y id 1]
 			    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
 			}
+			mat_gridlines $p $t
 		    }
-		}				
-		mat_gridlines $p $t
+		    3 {
+			set velo [expr ($x - $_($t:fx)) / 100.0]
+			foreach item $_($t:cl) {
+			    set vel [expr $velo + [$p.m itemcget $item -fillopacity]]
+			    if {$vel > 1} {set vel 1}
+			    if {$vel < 0} {set vel 0}
+			    $p.m itemconfigure $item -fillopacity $vel
+			}
+		    }
+		}			
 	    }
 	}
 	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
@@ -55,17 +78,25 @@ namespace eval ::ix {
 	variable _
 	switch $action {
 	    motion {
-		$p.m coords drawing [::tkpath::coords rect $_($t:cx) $_($t:cy) [expr $x -  $_($t:cx)] [expr $y -  $_($t:cy)] -rx 3 -ry 3]
+		if {$x >= $_($t:cx)} {
+		    set xa $_($t:cx)
+		    set xb $x
+		} else {
+		    set xa $x
+		    set xb $_($t:cx)
+		}
+		$p.m coords drawing [::tkpath::coords rect $xa $y [expr $xb - $xa] [mat_tr $p $t y id 1] -rx 3 -ry 3]
+		set yi [mat_tr $p $t y i $y]
+		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $xa] $yi [mat_tr $p $t x i $xb] $yi 0 0 0]
+		pd [concat $t.rp _cb note $yi \;]
 	    }
 	    first {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
 		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 3 -ry 3] -tags drawing -fill green -fillopacity 0.8
-		$p.m bind drawing <1> 
 	    }
 	    release {
 		$p.m itemconfigure drawing -tags [list item $_($t:i)] -matrix {{1.0 0.0} {0.0 1.0} {0.0 0.0}}
-		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $_($t:cx)] [mat_tr $p $t y i $_($t:cy)] [mat_tr $p $t x i $x] [mat_tr $p $t y i $y]]
-		incr _($t:i)
+		incr _($t:i) 2
 	    }
 	}
 
@@ -112,6 +143,9 @@ namespace eval ::ix {
 	    bind $path.m <Double-2> "::ix::mat_zoomReset $path $target" 
 	    bind $path.m <B2-Motion> "::ix::mat_click 2 motion $path $target %x %y"
 	    bind $path.m <ButtonRelease-2> "::ix::mat_click 2 release $path $target %x %y"
+	    bind $path.m <3> "::ix::mat_click 3 first $path $target %x %y"
+	    bind $path.m <B3-Motion> "::ix::mat_click 3 motion $path $target %x %y"
+	    bind $path.m <ButtonRelease-3> "::ix::mat_click 3 release $path $target %x %y"
 	    bind $path.m <Control-1> "::ix::mat_draw first $path $target %x %y"
 	    bind $path.m <Control-B1-Motion> "::ix::mat_draw motion $path $target %x %y"
 	    bind $path.m <Control-ButtonRelease-1> "::ix::mat_draw release $path $target %x %y"
