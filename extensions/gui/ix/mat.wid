@@ -10,37 +10,47 @@ namespace eval ::ix {
 	variable _
 	switch $action {
 	    motion {
+		set mx [expr $x - $_($t:cx)]
+		set my [expr $y - $_($t:cy)]
 		foreach xy {x y} {
-		    set mv [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
+		    set mvt [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
 		    switch $button {
 			1 {
 			    foreach ab {a b} {
-				set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mv]   
-			    }
-			    foreach item [$p.m find withtag item] {
-				set m [$p.m itemcget $item -matrix]
-				switch $xy {
-				    y {
-					set m [list [lindex $m 0] [lindex $m 1] [list [lindex [lindex $m 2] 0] [expr [lindex [lindex $m 2] 1] + $mv]]]
-				    }
-				    x {
-					set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mv] [expr [lindex [lindex $m 2] 1]]]]
-				    }
-				}
-				$p.m itemconfigure $item -matrix $m
+				set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mvt]   
 			    }
 			}
 			2 {
-			    set _($t:${xy}a) [expr $_($t:${xy}a) - $mv]
-			    set _($t:${xy}b) [expr $_($t:${xy}b) + $mv]
+			    set _($t:${xy}a) [expr $_($t:${xy}a) - $mvt]
+			    set _($t:${xy}b) [expr $_($t:${xy}b) + $mvt]
 			}
 		    }
-		    mat_gridlines $p $t
 		}
+		switch $button {
+		    1 {			    
+			foreach item [$p.m find withtag item] {
+			    set m [$p.m itemcget $item -matrix]
+			    set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mx] [expr [lindex [lindex $m 2] 1] + $my]]]
+			    $p.m itemconfigure $item -matrix $m
+			}
+		    }
+		    2 {
+			foreach item [$p.m find withtag item] {
+			    set id [lindex [$p.m itemcget $item -tags] 1]
+			    set px [mat_tr $p $t x t [lindex $_($t:items:$id) 0]]
+			    set py [mat_tr $p $t y t [lindex $_($t:items:$id) 1]]
+			    set sx [mat_tr $p $t x id [expr [lindex $_($t:items:$id) 2] - [lindex $_($t:items:$id) 0]]]
+			    set sy [mat_tr $p $t y id [expr [lindex $_($t:items:$id) 3] - [lindex $_($t:items:$id) 1]]]
+			    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
+			}
+		    }
+		}				
+		mat_gridlines $p $t
 	    }
 	}
 	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
     }
+    
     proc mat_draw {action p t x y} {
 	variable _
 	switch $action {
@@ -49,11 +59,12 @@ namespace eval ::ix {
 	    }
 	    first {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
-		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 3 -ry 3] -tags drawing -fill green
+		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 3 -ry 3] -tags drawing -fill green -fillopacity 0.8
 		$p.m bind drawing <1> 
 	    }
 	    release {
-		$p.m itemconfigure drawing -tags [list item item$_($t:i)] -matrix {{1.0 0.0} {0.0 1.0} {0.0 0.0}}
+		$p.m itemconfigure drawing -tags [list item $_($t:i)] -matrix {{1.0 0.0} {0.0 1.0} {0.0 0.0}}
+		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $_($t:cx)] [mat_tr $p $t y i $_($t:cy)] [mat_tr $p $t x i $x] [mat_tr $p $t y i $y]]
 		incr _($t:i)
 	    }
 	}
@@ -66,11 +77,11 @@ namespace eval ::ix {
 	    t {return [expr ($v - $_($t:${d}a)) / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
 	    i {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0) + $_($t:${d}a)]}
 	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
+	    id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
 	}
     }
     proc mat_zoomReset {p t} {
 	variable _
-	puts "resetting zoom"
 	set _($t:ya) $_($t:yao)
 	set _($t:yb) $_($t:ybo)
 	set _($t:xa) $_($t:xao)
@@ -104,11 +115,12 @@ namespace eval ::ix {
 	    bind $path.m <Control-1> "::ix::mat_draw first $path $target %x %y"
 	    bind $path.m <Control-B1-Motion> "::ix::mat_draw motion $path $target %x %y"
 	    bind $path.m <Control-ButtonRelease-1> "::ix::mat_draw release $path $target %x %y"
-
-	    mat_gridlines $path $target
 	    set bd [expr {[$path cget -bd] * 2}]
             $path configure -bg gray -width [expr [winfo width $path.m] + $bd] \
-		-height [expr [winfo height $path.m] + $bd]}}
+		-height [expr [winfo height $path.m] + $bd]
+	    update
+	    mat_gridlines $path $target
+	}}
     
     proc mat_gridlines {path target} {
 	variable _
@@ -127,9 +139,9 @@ namespace eval ::ix {
 		set invgeo [winfo $igx($xy) $path.m]
 		switch $xy {y {set coords [concat M 0 $og L $invgeo $og]}
 		    x {set coords [concat M $og 0 L $og $invgeo]}}
-		$w create path $coords -stroke $_($target:ln) -strokedasharray 2 -tags gridline -strokewidth 1
-		$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
-		    -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline}}
+		$w lower [$w create path $coords -stroke $_($target:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
+		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
+			      -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline]}}
     }
 }
 #> mat frame
