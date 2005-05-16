@@ -6,20 +6,58 @@ namespace eval ::ix {
     }
     variable _
 
-    proc mat_click {what p t x y} {
+    proc mat_click {button action p t x y} {
 	variable _
-	switch $what {
+	switch $action {
 	    motion {
 		foreach xy {x y} {
 		    set mv [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
-		    foreach ab {a b} {
-			set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mv]
+		    switch $button {
+			1 {
+			    foreach ab {a b} {
+				set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mv]   
+			    }
+			    foreach item [$p.m find withtag item] {
+				set m [$p.m itemcget $item -matrix]
+				switch $xy {
+				    y {
+					set m [list [lindex $m 0] [lindex $m 1] [list [lindex [lindex $m 2] 0] [expr [lindex [lindex $m 2] 1] + $mv]]]
+				    }
+				    x {
+					set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mv] [expr [lindex [lindex $m 2] 1]]]]
+				    }
+				}
+				$p.m itemconfigure $item -matrix $m
+			    }
+			}
+			2 {
+			    set _($t:${xy}a) [expr $_($t:${xy}a) - $mv]
+			    set _($t:${xy}b) [expr $_($t:${xy}b) + $mv]
+			}
 		    }
 		    mat_gridlines $p $t
 		}
 	    }
 	}
 	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
+    }
+    proc mat_draw {action p t x y} {
+	variable _
+	switch $action {
+	    motion {
+		$p.m coords drawing [::tkpath::coords rect $_($t:cx) $_($t:cy) [expr $x -  $_($t:cx)] [expr $y -  $_($t:cy)] -rx 3 -ry 3]
+	    }
+	    first {
+		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
+		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 3 -ry 3] -tags drawing -fill green
+		$p.m bind drawing <1> 
+	    }
+	    release {
+		$p.m itemconfigure drawing -tags [list item item$_($t:i)] -matrix {{1.0 0.0} {0.0 1.0} {0.0 0.0}}
+		incr _($t:i)
+	    }
+	}
+
     }
     proc mat_tr {p t d inv v} {
 	variable _
@@ -30,8 +68,18 @@ namespace eval ::ix {
 	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
 	}
     }
+    proc mat_zoomReset {p t} {
+	variable _
+	puts "resetting zoom"
+	set _($t:ya) $_($t:yao)
+	set _($t:yb) $_($t:ybo)
+	set _($t:xa) $_($t:xao)
+	set _($t:xb) $_($t:xbo)
+	mat_gridlines $p $t
+    }
     proc mat_new {path target w h bg ln Xa Xb Ya Yb qXv qYv} {
 	variable _
+	set _($target:i) 0
 	set _($target:ln) $ln
 	set _($target:qxv) $qXv
 	set _($target:qyv) $qYv
@@ -39,12 +87,24 @@ namespace eval ::ix {
 	set _($target:xa) $Xa
 	set _($target:yb) $Yb
 	set _($target:xb) $Xb
+	set _($target:yao) $Ya
+	set _($target:xao) $Xa
+	set _($target:ybo) $Yb
+	set _($target:xbo) $Xb
 	if {[winfo exists $path.m] != 1} {
 	    canvas $path.m -bg $bg -width $w -height $h
 	    pack $path.m -side left
-	    bind $path.m <1> "::ix::mat_click first $path $target %x %y"
-	    bind $path.m <B1-Motion> "::ix::mat_click motion $path $target %x %y"
-	    bind $path.m <ButtonRelease-1> "::ix::mat_click release $path $target %x %y"
+	    bind $path.m <1> "::ix::mat_click 1 first $path $target %x %y"
+	    bind $path.m <B1-Motion> "::ix::mat_click 1 motion $path $target %x %y"
+	    bind $path.m <ButtonRelease-1> "::ix::mat_click 1 release $path $target %x %y"
+	    bind $path.m <2> "::ix::mat_click 2 first $path $target %x %y"
+	    bind $path.m <Double-2> "::ix::mat_zoomReset $path $target" 
+	    bind $path.m <B2-Motion> "::ix::mat_click 2 motion $path $target %x %y"
+	    bind $path.m <ButtonRelease-2> "::ix::mat_click 2 release $path $target %x %y"
+	    bind $path.m <Control-1> "::ix::mat_draw first $path $target %x %y"
+	    bind $path.m <Control-B1-Motion> "::ix::mat_draw motion $path $target %x %y"
+	    bind $path.m <Control-ButtonRelease-1> "::ix::mat_draw release $path $target %x %y"
+
 	    mat_gridlines $path $target
 	    set bd [expr {[$path cget -bd] * 2}]
             $path configure -bg gray -width [expr [winfo width $path.m] + $bd] \
