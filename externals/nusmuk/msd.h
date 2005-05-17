@@ -29,7 +29,7 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- Version 0.05 -- 28.04.2005
+ Version 0.07 -- 17.05.2005
 */
 
 // include flext header
@@ -40,8 +40,8 @@
 #include <vector>
 
 // define constants
-#define MSD_VERSION  0.05
-
+#define MSD_VERSION  0.07
+#define PI  3.1415926535
 
 // check for appropriate flext version
 #if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
@@ -69,7 +69,7 @@ class LinkList
 public:
 	void insert(Link<N> *l) 
 	{
-		for(typename LinkList::iterator it = begin(); it != end(); ++it)
+		for(typename LinkList<N>::iterator it = this->begin(); it != this->end(); ++it)
 			if(*it == l) return;
 		// not found -> add
 		push_back(l);
@@ -77,7 +77,7 @@ public:
 	
 	void erase(Link<N> *l)
 	{
-		for(typename LinkList::iterator it = begin(); it != end(); ++it)
+		for(typename LinkList<N>::iterator it = this->begin(); it != this->end(); ++it)
 			if(*it == l) { 
 				// found
 				std::vector<Link<N> *>::erase(it); 
@@ -165,15 +165,64 @@ public:
 	t_float K1, D1, D2;
 	t_float longueur, long_min, long_max;
 	t_float distance_old;
+	t_float puissance;
+	t_int oriented; //0 : no, 1 : tangential, 2 : normal
+	t_float tdirection1[3], tdirection2[3];
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1,t_float d2,t_float lmin,t_float lmax)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float xa=0, t_float ya=0, t_float za=0,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10)
 		: nbr(n),Id(id)
 		, mass1(m1),mass2(m2)
-		, K1(k1),D1(d1),D2(d2)
+		, K1(k1),D1(d1),D2(0),oriented(o),puissance(pow)
 		, long_min(lmin),long_max(lmax)
 	{
-		distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
-
+		for (int i=0; i<3; i++)	{
+			tdirection1[i] = 0;
+			tdirection2[i] = 0;
+			}
+		if (oriented == 0)
+			distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
+		else if (oriented == 1)	{			// TANGENTIAL LINK
+			const t_float norme = sqrt(sqr(xa)+sqr(ya)+sqr(za));
+			tdirection1[0] = xa/norme;
+			tdirection1[1] = ya/norme;
+			tdirection1[2] = za/norme;
+			distance_old = 0;
+			for(int i = 0; i < N; ++i)	
+				distance_old += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
+			distance_old  = sqrt(distance_old);
+			longueur = distance_old;
+		}
+		else if (oriented == 2)	{			// NORMAL LINK 2D
+			if (N >= 2)	{
+				const t_float norme = sqrt(sqr(xa)+sqr(ya));
+				tdirection1[0]=ya/norme;
+				tdirection1[1]=xa/norme;
+				distance_old = 0;
+				for(int i = 0; i < N; ++i)	
+					distance_old += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
+				if (N == 3)	{			// NORMAL LINK 3D
+					if (xa == 0 && ya==0 && za!= 0)	{	// Special case
+						tdirection1[0]=1;
+						tdirection1[1]=0;
+						tdirection1[2]=0;
+						tdirection2[0]=0;
+						tdirection2[1]=1;
+						tdirection2[2]=0;
+					}
+					else	{				// Normal case
+						const t_float norme2 = sqrt(sqr(xa*ya +za*xa)+sqr(xa*ya+za*ya)+sqr(sqr(xa)+sqr(ya)));
+						tdirection2[0] = (xa*za+xa*ya)/norme2;
+						tdirection2[1] = (xa*ya+za*ya)/norme2;
+						tdirection2[2] = (sqr(xa)+sqr(ya))/norme2;
+					}
+					distance_old = 0;
+					for(int i = 0; i < N; ++i)	
+						distance_old += sqr((m1->pos[i]-m2->pos[i])*(tdirection1[i]+tdirection2[i]));
+				}
+				distance_old  = sqrt(distance_old);
+				longueur = distance_old;			
+			}
+		}	
 		mass1->links.insert(this);
 		mass2->links.insert(this);
 	}
@@ -187,21 +236,52 @@ public:
 	// compute link forces
 	inline void compute() 
 	{
+		t_float distance=0;
+		t_float F;
 		Mass<N> *m1 = mass1,*m2 = mass2; // cache locally
-		t_float distance = Mass<N>::dist(*m1,*m2); 
-		if (distance < long_min || distance > long_max || distance == 0) {
-			for(int i = 0; i < N; ++i) {
-				m1->force[i] -= D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-				m2->force[i] += D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-			}
+		if (oriented == 0)	
+			distance = Mass<N>::dist(*m1,*m2); 
+		else if (oriented == 1) {
+			for(int i = 0; i < N; ++i)	
+				distance += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
+			distance = sqrt(distance);
 		}
-		else {								// Lmin < L < Lmax
-			const t_float F  = (K1 * (distance - longueur) + D1 * (distance - distance_old))/distance ;		// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
-			for(int i = 0; i < N; ++i) {
-				const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
-				m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-				m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-			}
+		else if (oriented == 2) {
+			for(int i = 0; i < N; ++i)	
+				distance += sqr((m1->pos[i]-m2->pos[i])*(tdirection1[i] +tdirection2[i]));
+			distance = sqrt(distance);
+		}
+
+		if (distance < long_min || distance > long_max || distance == 0) {
+//			for(int i = 0; i < N; ++i) {
+	//			m1->force[i] -= D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+	//			m2->force[i] += D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+	//		}
+		}
+		else {	// Lmin < L < Lmax
+			// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
+			if ((distance - longueur)>0)
+				F  = (K1 * pow(distance - longueur,puissance) + D1 * (distance - distance_old))/distance ;
+			else
+				F  = (-K1 * pow(longueur - distance,puissance) + D1 * (distance - distance_old))/distance ;
+			if (oriented == 0)	
+				for(int i = 0; i < N; ++i) {
+					const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
+					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+				}
+			else if (oriented == 1 || (oriented == 2 && N == 2))
+				for(int i = 0; i < N; ++i) {
+					const t_float Fn = F * (m1->pos[i] - m2->pos[i])*tdirection1[i]; // Fx = F * Lx[n]/L[n]
+					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+				}
+			else if (oriented == 2 && N == 3)
+				for(int i = 0; i < N; ++i) {
+					const t_float Fn = F * (m1->pos[i] - m2->pos[i])*(tdirection1[i] +tdirection2[i]); // Fx = F * Lx[n]/L[n]
+					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+				}
 		}
 		
 		distance_old = distance;				// L[n-1] = L[n]			
@@ -449,16 +529,26 @@ protected:
 	void m_set_mobile(int argc,t_atom *argv,bool mob = true) 
 	{
 		if (argc != 1) {
-			error("%s - %s Syntax : Idmass",thisName(),GetString(thisTag()));
+			error("%s - %s Syntax : Id/Nomass",thisName(),GetString(thisTag()));
 			return;
 		}
-	
-		t_mass *m = mass.find(GetAInt(argv[0]));
-		if(m) 
-			if(mob) m->setMobile(); 
-			else m->setFixed();
-		else
-			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_mass *>::iterator it;
+			if(mob)
+				for(it = massids.find(GetSymbol(argv[0])); it; ++it)
+					it.data()->setMobile();
+			else
+				for(it = massids.find(GetSymbol(argv[0])); it; ++it)
+					it.data()->setFixed();
+		}
+		else {	
+			t_mass *m = mass.find(GetAInt(argv[0]));
+			if(m) 
+				if(mob) m->setMobile(); 
+				else m->setFixed();
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
 	}
 
 	// set mass No to fixed
@@ -530,12 +620,10 @@ protected:
 						nearest_mass = mit.data()->nbr;
 					}
 				}
-	
-
 			}
 			
 			// Set fixed if mobile
-			mobil = mass.find(nearest_mass)->M;
+			mobil = mass.find(nearest_mass)->invM;
 			SetInt(aux2[0],nearest_mass);
 			if (mobil != 0)
 				m_set_fixe(1,aux2);
@@ -565,41 +653,107 @@ protected:
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
 	void m_link(int argc,t_atom *argv) 
 	{
-		if (argc < 6 || argc > 8) {
-			error("%s - %s Syntax : Id Nomass1 Nomass2 K D1 D2 (Lmin Lmax)",thisName(),GetString(thisTag()));
+		if (argc < 5 || argc > 8) {
+			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 K D1 (pow Lmin Lmax)",thisName(),GetString(thisTag()));
 			return;
 		}
-		
-		t_mass *mass1 = mass.find(GetAInt(argv[1]));
-		t_mass *mass2 = mass.find(GetAInt(argv[2]));
- 
-      	if(!mass1 || !mass2) {
-			error("%s - %s : Index not found",thisName(),GetString(thisTag()));
-			return;
+		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
+			typename IDMap<t_mass *>::iterator it1,it2,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(; it1; ++it1) {
+				for(it = it2; it; ++it) {
+					t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						it1.data(),it.data(), // pointer to mass1, mass2
+						GetAFloat(argv[3]), // K1
+						GetAFloat(argv[4]), // D1
+						0,0,0,0,
+						argc >= 6?GetFloat(argv[5]):1, // power
+						argc >= 7?GetFloat(argv[6]):0,
+						argc >= 8?GetFloat(argv[7]):1e10
+					);
+					linkids.insert(l);
+					link.insert(id_link++,l);
+					outlink(S_iLink,l);
+				}
+			}
 		}
+		else if (IsSymbol(argv[1])==0 && IsSymbol(argv[2]))	{	// No & ID
+			typename IDMap<t_mass *>::iterator it2,it;
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(it = it2; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					mass1,it.data(), // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					0,0,0,0,
+					argc >= 6?GetFloat(argv[5]):1, // power
+					argc >= 7?GetFloat(argv[6]):0,
+					argc >= 8?GetFloat(argv[7]):1e10
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_iLink,l);
+			}
+		}
+		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
+			typename IDMap<t_mass *>::iterator it1,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+	 		t_mass *mass2 = mass.find(GetAInt(argv[2]));
+			for(it = it1; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					it.data(),mass2, // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					0,0,0,0,
+					argc >= 6?GetFloat(argv[5]):1, // power
+					argc >= 7?GetFloat(argv[6]):0,
+					argc >= 8?GetFloat(argv[7]):1e10
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_iLink,l);
+			}
+		}
+		else	{										// No & No
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			t_mass *mass2 = mass.find(GetAInt(argv[2]));
+ 	
+   			if(!mass1 || !mass2) {
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+				return;
+			}
+	
+			t_link *l = new t_link(
+				id_link,
+				GetSymbol(argv[0]), // ID
+				mass1,mass2, // pointer to mass1, mass2
+				GetAFloat(argv[3]), // K1
+				GetAFloat(argv[4]), // D1
+				0,0,0,0,
+				argc >= 6?GetFloat(argv[5]):1, // power
+				argc >= 7?GetFloat(argv[6]):0,	// Lmin
+				argc >= 8?GetFloat(argv[7]):1e10// Lmax
+			);
 
-		t_link *l = new t_link(
-			id_link,
-			GetSymbol(argv[0]), // ID
-			mass1,mass2, // pointer to mass1, mass2
-			GetAFloat(argv[3]), // K1
-			GetAFloat(argv[4]), // D1
-			GetAFloat(argv[5]), // D2
-			argc >= 7?GetFloat(argv[6]):0,
-			argc >= 8?GetFloat(argv[7]):32768
-		);
-
-		linkids.insert(l);
-		link.insert(id_link++,l);
-		outlink(S_Link,l);
+			linkids.insert(l);
+			link.insert(id_link++,l);
+			outlink(S_Link,l);
+		}
 	}
-
 	// add interactor link
 	// Id, Id masses1, Id masses2, K1, D1, D2, (Lmin, Lmax)
 	void m_ilink(int argc,t_atom *argv) 
 	{
 		if (argc < 6 || argc > 8) {
-			error("%s - %s Syntax : Id Idmass1 Idmass2 K D1 D2 (Lmin Lmax)",thisName(),GetString(thisTag()));
+			error("%s - %s Syntax : Id Idmass1 Idmass2 K D1 (pow Lmin Lmax)",thisName(),GetString(thisTag()));
 			return;
 		}
 
@@ -615,44 +769,305 @@ protected:
 					it1.data(),it.data(), // pointer to mass1, mass2
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
-					GetAFloat(argv[5]), // D2
+					0,0,0,0,
+					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
-					argc >= 8?GetFloat(argv[7]):32768
+					argc >= 8?GetFloat(argv[7]):1e10
 				);
 
 				linkids.insert(l);
 				link.insert(id_link++,l);
-				outlink(S_Link,l);
+				outlink(S_iLink,l);
 			}
 		}
 	}
 
-	// set rigidity of link(s) named Id
+	// add a tangential link
+	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
+	void m_tlink(int argc,t_atom *argv) 
+	{
+		if (argc < 5+N || argc > 8+N) {
+			error("%s - %s Syntax : Id Nomass1 Nomass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
+			return;
+		}
+
+		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
+			typename IDMap<t_mass *>::iterator it1,it2,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(; it1; ++it1) {
+				for(it = it2; it; ++it) {
+					t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						it1.data(),it.data(), // pointer to mass1, mass2
+						GetAFloat(argv[3]), // K1
+						GetAFloat(argv[4]), // D1
+						1,					// tangential
+						GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+						(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+						(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+						(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+
+					);
+					linkids.insert(l);
+					link.insert(id_link++,l);
+					outlink(S_iLink,l);
+				}
+			}
+		}
+		else if (IsSymbol(argv[1])==0 && IsSymbol(argv[2]))	{	// No & ID
+			typename IDMap<t_mass *>::iterator it2,it;
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(it = it2; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					mass1,it.data(), // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					1,					// tangential
+					GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+					(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+					(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+					(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_iLink,l);
+			}
+		}
+		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
+			typename IDMap<t_mass *>::iterator it1,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+	 		t_mass *mass2 = mass.find(GetAInt(argv[2]));
+			for(it = it1; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					it.data(),mass2, // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					1,					// tangential
+					GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+					(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+					(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+					(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_iLink,l);
+			}
+		}
+		else	{										// No & No
+			t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			t_mass *mass2 = mass.find(GetAInt(argv[2]));
+ 
+   			if(!mass1 || !mass2) {
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+				return;
+			}
+			t_link *l = new t_link(
+				id_link,
+				GetSymbol(argv[0]), // ID
+				mass1,mass2, // pointer to mass1, mass2
+				GetAFloat(argv[3]), // K1
+				GetAFloat(argv[4]), // D1
+				1,					// tangential
+				GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+				(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+				(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+				(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+			);
+			linkids.insert(l);
+			link.insert(id_link++,l);
+			outlink(S_tLink,l);
+		}
+	}
+
+	// add a normal link
+	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
+	void m_nlink(int argc,t_atom *argv) 
+	{
+		if (argc < 5+N || argc > 8+N) {
+			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
+			return;
+		}
+
+		if (N==1)	{
+			error("%s - %s : No normal Link in 1D",thisName(),GetString(thisTag()));
+			return;
+		}
+		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
+			typename IDMap<t_mass *>::iterator it1,it2,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(; it1; ++it1) {
+				for(it = it2; it; ++it) {
+					t_link *l = new t_link(
+						id_link,
+						GetSymbol(argv[0]), // ID
+						it1.data(),it.data(), // pointer to mass1, mass2
+						GetAFloat(argv[3]), // K1
+						GetAFloat(argv[4]), // D1
+						2,					// normal
+						GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
+						(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
+						(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
+						(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
+					);
+					linkids.insert(l);
+					link.insert(id_link++,l);
+					outlink(S_nLink,l);
+				}
+			}
+		}
+		else if (IsSymbol(argv[1])==0 && IsSymbol(argv[2]))	{	// No & ID
+			typename IDMap<t_mass *>::iterator it2,it;
+	 		t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			it2 = massids.find(GetSymbol(argv[2]));
+			for(it = it2; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					mass1,it.data(), // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					2,					// normal
+					GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
+					(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
+					(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
+					(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_nLink,l);
+			}
+		}
+		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
+			typename IDMap<t_mass *>::iterator it1,it;
+			it1 = massids.find(GetSymbol(argv[1]));
+	 		t_mass *mass2 = mass.find(GetAInt(argv[2]));
+			for(it = it1; it; ++it) {
+				t_link *l = new t_link(
+					id_link,
+					GetSymbol(argv[0]), // ID
+					it.data(),mass2, // pointer to mass1, mass2
+					GetAFloat(argv[3]), // K1
+					GetAFloat(argv[4]), // D1
+					2,					// normal
+					GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
+					(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
+					(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
+					(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
+				);
+				linkids.insert(l);
+				link.insert(id_link++,l);
+				outlink(S_nLink,l);
+			}
+		}
+		else	{										// No & No
+			t_mass *mass1 = mass.find(GetAInt(argv[1]));
+			t_mass *mass2 = mass.find(GetAInt(argv[2]));
+ 	
+   			if(!mass1 || !mass2) {
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+				return;
+			}
+
+			t_link *l = new t_link(
+				id_link,
+				GetSymbol(argv[0]), // ID
+				mass1,mass2, // pointer to mass1, mass2
+				GetAFloat(argv[3]), // K1
+				GetAFloat(argv[4]), // D1
+				2,					// normal
+				GetAFloat(argv[5]),GetAFloat(argv[6]),N >= 3?GetAFloat(argv[7]):0,	// vector
+				(N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1),	// pow
+				(N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0),	// Lmin
+				(N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10)// Lmax
+			);
+			linkids.insert(l);
+			link.insert(id_link++,l);
+			outlink(S_nLink,l);
+		}
+	}
+
+	// set rigidity of link(s) named Id or number No
 	void m_setK(int argc,t_atom *argv) 
 	{
 		if (argc != 2) {
-			error("%s - %s Syntax : IdLink Value",thisName(),GetString(thisTag()));
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
 		}
 
-		t_float k1 = GetAFloat(argv[1]);
-		typename IDMap<t_link *>::iterator it;
-		for(it = linkids.find(GetSymbol(argv[0])); it; ++it)
-			it.data()->K1 = k1;
+		const t_float k1 = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it)
+				it.data()->K1 = k1;
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l)
+				l->K1 = k1;
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
 	}
 
-	// set damping of link(s) named Id
+	// set damping of link(s) named Id or number No
 	void m_setD(int argc,t_atom *argv) 
 	{
 		if (argc != 2) {
-			error("%s - %s Syntax : IdLink Value",thisName(),GetString(thisTag()));
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
 			return;
 		}
 
-		t_float d1 = GetAFloat(argv[1]);
-		typename IDMap<t_link *>::iterator it;
-		for(it = linkids.find(GetSymbol(argv[0])); it; ++it)
-			it.data()->D1 = d1;
+		const t_float d1 = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it)
+				it.data()->D1 = d1;
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l)
+				l->D1 = d1;
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+
+	// set initial lenght of link(s) named Id or number No
+	void m_setL(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : Id/NoLink Value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		const t_float lon = GetAFloat(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it) {
+				it.data()->longueur = lon;
+				it.data()->distance_old = lon;
+			}
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l) {
+				l->longueur = lon;
+				l->distance_old = lon;
+			}
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
 	}
 
 	// set damping of link(s) named Id
@@ -673,7 +1088,7 @@ protected:
 	void m_delete_link(int argc,t_atom *argv) 
 	{
 		if (argc != 1) {
-			error("%s - %s Syntax : NoLink",thisName(),GetString(thisTag()));
+			error("%s - %s Syntax : NtLink",thisName(),GetString(thisTag()));
 			return;
 		}
 		
@@ -941,7 +1356,7 @@ private:
 
 		massids.reset();
 		mass.reset();
-		
+		// Reset state variables 		
 		id_mass = id_link = mouse_grab = mass_deleted = link_deleted = 0;
 	}
 	
@@ -966,15 +1381,49 @@ private:
 	
 	void outlink(const t_symbol *s,const t_link *l)
 	{
-		t_atom sortie[7];
+		t_atom sortie[15];
+		int size=6;
 		SetInt((sortie[0]),l->nbr);
 		SetSymbol((sortie[1]),l->Id);
 		SetInt((sortie[2]),l->mass1->nbr);
 		SetInt((sortie[3]),l->mass2->nbr);
 		SetFloat((sortie[4]),l->K1);
 		SetFloat((sortie[5]),l->D1);
-		SetFloat((sortie[6]),l->D2);
-		ToOutAnything(1,s,7,sortie);
+
+		if (l->oriented == 1 ||(l->oriented == 2 && N ==2))	{
+			for (int i=0; i<N; i++)
+				SetFloat((sortie[6+i]),l->tdirection1[i]);
+//			ToOutAnything(1,s,6+N,sortie);
+			size = 6+N;
+		}
+		else if (l->oriented == 2 && N==3)	{
+			for (int i=0; i<N; i++)	{
+				SetFloat((sortie[6+i]),l->tdirection1[i]);
+				SetFloat((sortie[6+i+N]),l->tdirection2[i]);	
+			}			
+//			ToOutAnything(1,s,6+2*N,sortie);
+			size = 6+2*N;
+		}
+
+		if(l->long_max != 1e10)	{
+			SetFloat((sortie[size]),l->puissance);
+			size++;
+			SetFloat((sortie[size]),l->long_min);
+			size++;
+			SetFloat((sortie[size]),l->long_max);
+			size++;
+		}
+		else if(l->long_min != 0) {
+			SetFloat((sortie[size]),l->puissance);
+			size++;
+			SetFloat((sortie[size]),l->long_min);
+			size++;
+		}
+		else if(l->puissance != 1)	{
+			SetFloat((sortie[size]),l->puissance);
+			size++;
+		}
+		ToOutAnything(1,s,size,sortie);
 	}
 	
 
@@ -983,6 +1432,8 @@ private:
 	const static t_symbol *S_Mass;
 	const static t_symbol *S_Link;
 	const static t_symbol *S_iLink;
+	const static t_symbol *S_tLink;
+	const static t_symbol *S_nLink;
 	const static t_symbol *S_Mass_deleted;
 	const static t_symbol *S_Link_deleted;
 	const static t_symbol *S_massesPos;
@@ -1009,6 +1460,8 @@ private:
 		S_Mass = MakeSymbol("Mass");
 		S_Link = MakeSymbol("Link");
 		S_iLink = MakeSymbol("iLink");
+		S_tLink = MakeSymbol("tLink");
+		S_nLink = MakeSymbol("nLink");
 		S_Mass_deleted = MakeSymbol("Mass deleted");
 		S_Link_deleted = MakeSymbol("Link deleted");
 		S_massesPos = MakeSymbol("massesPos");
@@ -1065,10 +1518,13 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"setFixed",m_set_fixe);
 		FLEXT_CADDMETHOD_(c,0,"setK",m_setK);
 		FLEXT_CADDMETHOD_(c,0,"setD",m_setD);
+		FLEXT_CADDMETHOD_(c,0,"setL",m_setL);
 		FLEXT_CADDMETHOD_(c,0,"setD2",m_setD2);
 		FLEXT_CADDMETHOD_(c,0,"mass",m_mass);
 		FLEXT_CADDMETHOD_(c,0,"link",m_link);
 		FLEXT_CADDMETHOD_(c,0,"iLink",m_ilink);
+		FLEXT_CADDMETHOD_(c,0,"tLink",m_tlink);
+		FLEXT_CADDMETHOD_(c,0,"nLink",m_nlink);
 		FLEXT_CADDMETHOD_(c,0,"get",m_get);
 		FLEXT_CADDMETHOD_(c,0,"deleteLink",m_delete_link);
 		FLEXT_CADDMETHOD_(c,0,"deleteMass",m_delete_mass);
@@ -1090,6 +1546,8 @@ private:
 	FLEXT_CALLBACK_V(m_mass)
 	FLEXT_CALLBACK_V(m_link)
 	FLEXT_CALLBACK_V(m_ilink)
+	FLEXT_CALLBACK_V(m_tlink)
+	FLEXT_CALLBACK_V(m_nlink)
 	FLEXT_CALLBACK_V(m_Xmax)
 	FLEXT_CALLBACK_V(m_Xmin)
 	FLEXT_CALLBACK_V(m_forceX)
@@ -1104,6 +1562,7 @@ private:
 	FLEXT_CALLBACK_V(m_posZ)
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
+	FLEXT_CALLBACK_V(m_setL)
 	FLEXT_CALLBACK_V(m_setD2)
 	FLEXT_CALLBACK_V(m_get)
 	FLEXT_CALLBACK_V(m_delete_link)
@@ -1116,7 +1575,7 @@ private:
 #define MSD(NAME,CLASS,N) \
 const t_symbol \
 	*msdN<N>::S_Reset,*msdN<N>::S_Mass, \
-	*msdN<N>::S_Link,*msdN<N>::S_iLink, \
+	*msdN<N>::S_Link,*msdN<N>::S_iLink,*msdN<N>::S_tLink,*msdN<N>::S_nLink, \
 	*msdN<N>::S_Mass_deleted,*msdN<N>::S_Link_deleted, \
 	*msdN<N>::S_massesPos,*msdN<N>::S_massesPosNo,*msdN<N>::S_massesPosId, \
 	*msdN<N>::S_linksPos,*msdN<N>::S_linksPosNo,*msdN<N>::S_linksPosId, \

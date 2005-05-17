@@ -27,16 +27,16 @@
 #X obj 45 576 cnv 15 300 200 empty empty empty 20 12 0 14 -261689 -66577
 0;
 #X obj 88 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
--1 -1 12166 1;
+-1 -1 6955 1;
 #X obj 111 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
--1 -1 7166 1;
+-1 -1 5050 1;
 #X obj 66 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
--1 -1 9960 1;
+-1 -1 8860 1;
 #X msg 52 736 posX fix \$1;
 #X obj 156 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
--1 -1 2370 1;
+-1 -1 1240 1;
 #X obj 134 590 vsl 15 128 0 100 0 0 empty empty empty 0 -8 0 8 -261689
--1 -1 12700 1;
+-1 -1 3145 1;
 #X text 199 638 MOVE FIRST SLIDER;
 #X text 182 662 TO MOVE THE FIXED MASS;
 #X msg 66 438 forceX mob 300;
@@ -51,7 +51,7 @@
 #X msg 66 406 setK inter 2;
 #X msg 176 385 setD inter 0.01;
 #X msg 176 407 setD inter 1;
-#X msg 184 223 iLink inter fix mob 10 2.5 0.5 5;
+#X msg 184 223 link inter fix mob 10 10;
 #X connect 0 0 31 0;
 #X connect 2 0 33 0;
 #X connect 2 1 1 0;
