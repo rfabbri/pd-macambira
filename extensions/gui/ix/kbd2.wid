@@ -1,0 +1,36 @@
+namespace eval ::ix {
+    proc kbd2_play {b x y} {
+	array set rs {0 sunken 1 raised} ; array set sr {0 $rs(1) 1 $rs(0)}
+	array set v {0 0 1 {($y - [winfo rooty $w]) / ([winfo height $w] + 0.0)}}
+	set w [winfo containing $x $y]
+	if {[$w cget -relief] eq $rs($b)} {
+	    eval $w config -relief $sr($b)
+	    pd "[winfo name [winfo parent [winfo parent $w]]].rp _cb  [winfo name $w] [eval expr $v($b)] \;"}}
+
+    proc kbd2 {path target octaves b f} {
+	if {![winfo exists $path.f0]} {
+	    $path config -width [expr $octaves * 66]
+	    set bw {0 1 0 1 0 0 1 0 1 0 1 0} ; set npl {0 1 1 2 2 3 4 4 5 5 6 6}
+	    array set bg "0 $b 1 $f"
+	    array set fg {1 $bg(0) 0 $bg(1)}
+	    array set rw {0 {[expr 1 / 7.]} 1 {[expr 1 / 10.]}}
+	    array set rh {0 {[expr 1.]} 1 {[expr 6 / 10.]}}
+	    array set an {0 ";lower $wk" 1 "-anchor n"}
+	    for {set o 0} {$o < $octaves} {incr o} {
+		set w $path.f$o
+		frame $w -bd 0 -height 66 -width 66
+		for {set on 0} {$on < 12} {incr on} {
+		    set wk $w.[expr $o * 12 + $on]
+		    set n [lindex $bw $on]
+		    eval label $wk -bg $bg($n) -fg $fg($n) -bd 1 -relief raised 
+		    eval place $wk -relx [expr [lindex $npl $on] / 7.] -y 0 -relwidth $rw($n) -relheight $rh($n) $an($n)
+		    bind $wk <1> {::ix::kbd2_play 1 %X %Y}; bind $wk <B1-Motion> [bind $wk <1>]
+		    bind $wk <ButtonRelease-1> {::ix::kbd2_play 0 %X %Y}; bind $wk <Leave> [bind $wk <ButtonRelease-1>]}
+		place $w -y 0 -relheight 1.0 -relx [expr $o / $octaves.0] -relwidth [expr 1 / $octaves.0]}}}}
+
+#> kbd2 frame
+#. -height 100 -width 60
+#. #octaves 6 #bg black #fg white
+
+#@ new
+::ix::kbd2 .- .| .#octaves .#bg .#fg
