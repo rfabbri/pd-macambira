@@ -1,1 +1,1 @@
-#include "../zexy/src/avg_tilde.c"
+#include "../zexy/src/avg~.c"
