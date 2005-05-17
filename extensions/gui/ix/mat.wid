@@ -5,11 +5,23 @@ namespace eval ::ix {
         return [format "\#%1X%1X%1X%1X%1X%1X" [random_int] [random_int] [random_int] [random_int] [random_int] [random_int]]
     }
     variable _
-
+    proc mat_note {p t item} {
+	set id [lindex [$p.m itemcget $item -tags] 1]
+	set len [expr [lindex $_($t:items:$id) 2] - [lindex $_($t:items:$id) 0]]
+	set vel [$p.m itemcget $item -fillopacity]
+	pd [concat $t.rp _cb note [lindex $_($t:items:$id) 1] $vel $len \;]
+    }
     proc mat_click {button action p t x y} {
 	variable _
 	set clicked [$p.m find overlapping $x $y $x $y]
 	switch $action {
+	    hover {
+		foreach item $clicked {
+		    if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} {
+			mat_note $p $t $item
+		    }
+		}
+	    }
 	    first {
 #		if {$clicked ne ""} {
 		    set _($t:cl) $clicked
@@ -60,7 +72,7 @@ namespace eval ::ix {
 			mat_gridlines $p $t
 		    }
 		    3 {
-			set velo [expr ($x - $_($t:fx)) / 100.0]
+			set velo [expr ($x - $_($t:cx)) / 100.0]
 			foreach item $_($t:cl) {
 			    set vel [expr $velo + [$p.m itemcget $item -fillopacity]]
 			    if {$vel > 1} {set vel 1}
@@ -87,8 +99,8 @@ namespace eval ::ix {
 		}
 		$p.m coords drawing [::tkpath::coords rect $xa $y [expr $xb - $xa] [mat_tr $p $t y id 1] -rx 3 -ry 3]
 		set yi [mat_tr $p $t y i $y]
-		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $xa] $yi [mat_tr $p $t x i $xb] $yi 0 0 0]
-		pd [concat $t.rp _cb note $yi \;]
+		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $xa] $yi [mat_tr $p $t x i $xb] $yi]
+#		pd [concat $t.rp _cb note $yi \;]
 	    }
 	    first {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
@@ -108,7 +120,8 @@ namespace eval ::ix {
 	    t {return [expr ($v - $_($t:${d}a)) / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
 	    i {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0) + $_($t:${d}a)]}
 	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
-	    id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
+#	    id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
+	    id {return [expr abs($v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m])]}
 	}
     }
     proc mat_zoomReset {p t} {
@@ -136,6 +149,7 @@ namespace eval ::ix {
 	if {[winfo exists $path.m] != 1} {
 	    canvas $path.m -bg $bg -width $w -height $h
 	    pack $path.m -side left
+	    bind $path.m <Motion> "::ix::mat_click 0 hover $path $target %x %y"
 	    bind $path.m <1> "::ix::mat_click 1 first $path $target %x %y"
 	    bind $path.m <B1-Motion> "::ix::mat_click 1 motion $path $target %x %y"
 	    bind $path.m <ButtonRelease-1> "::ix::mat_click 1 release $path $target %x %y"
@@ -168,7 +182,8 @@ namespace eval ::ix {
 	    array set ta {x n y w}
 	    array set tj {x center y left}
 	    array set igx {y width x height}
-	    for {set x [expr int($_($target:${xy}a) / ($_($target:q${xy}v) + 0.0) + 1)*($_($target:q${xy}v) + 0.0)]} {$x <= $_($target:${xy}b)} {set x [expr $x + $_($target:q${xy}v)]} {
+	    if {$_($target:${xy}a) > $_($target:${xy}b)} {set oa ">=";set ob "-"} {set oa "<=";set ob "+"}
+	    for {set x [expr int($_($target:${xy}a) / ($_($target:q${xy}v) + 0.0) + 1)*($_($target:q${xy}v) + 0.0)]} {[expr $x $oa $_($target:${xy}b)]} {set x [expr $x $ob $_($target:q${xy}v)]} {
 		set og [mat_tr $path $target $xy t $x]
 		set invgeo [winfo $igx($xy) $path.m]
 		switch $xy {y {set coords [concat M 0 $og L $invgeo $og]}
