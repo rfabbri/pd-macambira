@@ -784,10 +784,11 @@ static t_object *xmlrpc_new(t_floatarg p)
 /*! \brief Library setup routine
     \note Must be exported from shared library
 */
-extern "C" 
+extern "C" { 
 #ifdef NT
 __declspec(dllexport)
 #endif
+	
 void xmlrpc_setup()
 {
     // post some message to the console
@@ -803,3 +804,6 @@ void xmlrpc_setup()
 	xmlrpc_class = class_new(gensym("xmlrpc"),(t_newmethod)xmlrpc_new,NULL,sizeof(t_object),CLASS_NOINLET, A_FLOAT,A_NULL);
 }
 
+void iemxmlrpc_setup() { xmlrpc_setup(); }
+
+}
