@@ -7,6 +7,7 @@
  * Description: This is it all
  *
  * Author: Thomas Grill t.grill [at] gmx.net
+ *         Winfried Ritsch some changes
  *
 # License LGPL see LICENSE.txt
 # IEM - Institute of Electronic Music and Acoustics, Graz
@@ -15,11 +16,11 @@
 #
 # CHANGES: 
 # V 0.1.3b, LICENSES added, post error removed.
-#
+# V 0.2 setup routine doubled for use as xmlrpc and iemxmlrpc
 #************************************************************/
 
 //! Version number of this external
-#define __XMLRPC_VERSION "0.1.3b"
+#define __IEMXMLRPC_VERSION "0.2"
 
 // prevent MSVC "extern" warning
 #ifdef _MSC_VER
@@ -141,7 +142,7 @@ void bind_proxy::px_method(bind_proxy *obj,const t_symbol *s,int argc,const t_at
         for(int i = 0; i < argc; ++i) {
             if(!Atom2Val(argv[i],obj->value[i+hdr]))
 #ifdef _DEBUG
-                error("XMLRPC: Internal error - version %s, file %s, line %i",__XMLRPC_VERSION,__FILE__,__LINE__);
+                error("XMLRPC: Internal error - version %s, file %s, line %i",__IEMXMLRPC_VERSION,__FILE__,__LINE__);
 #else
             {}
 #endif
@@ -716,7 +717,7 @@ static void *xmlrpc_worker(void *)
     XmlRpc::setVerbosity(1);
 
     if(!xmlrpc_server)
-        error("XMLRPC: Internal error - version %s, file %s, line %i",__XMLRPC_VERSION,__FILE__,__LINE__);
+        error("XMLRPC: Internal error - version %s, file %s, line %i",__IEMXMLRPC_VERSION,__FILE__,__LINE__);
     else 
 #endif
     {
@@ -792,7 +793,7 @@ __declspec(dllexport)
 void xmlrpc_setup()
 {
     // post some message to the console
-	post("IEMXMLRPC, version " __XMLRPC_VERSION ", (C)2003 IEM Graz");
+	post("IEMXMLRPC, version " __IEMXMLRPC_VERSION ", (C)2003 IEM Graz");
 	post("");
 
     // register the proxy class for binding symbols
