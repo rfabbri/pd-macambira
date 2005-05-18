@@ -10,6 +10,9 @@ current: all
 # make sure that the "m_pd.h" is somehow available either by putting it into this
 # directory, by adding it's path to the INCLUDE-path or by putting it into an
 # already included path, e.g. "/usr/local/include/"
+# download fann libraries from http://fann.sourceforge.net
+# and install from source
+# make sure that fann.h is available
 
 #these are the user adjustables : adjust them to fit into your system
 # PD will install to $(DESTDIR)$(INSTALLL_PREFIX)$(PDLIBDIR), which is /usr/local/lib/pd
@@ -22,6 +25,8 @@ PDLIBDIR = /lib/pd
 
 TARGETS = ann \
 	ann_som \
+	ann_mlp	\
+	ann_td \
 
 
 # ----------------------- LINUX ----------------------------
