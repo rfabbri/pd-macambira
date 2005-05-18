@@ -110,6 +110,24 @@ void error(const char *fmt, ...)
     dopost(buf);
 }
 
+void verbose(int level, const char *fmt, ...)
+{
+    char buf[MAXPDSTRING];
+    va_list ap;
+    t_int arg[8];
+    int i;
+    if(level>sys_verbose)return;
+    dopost("verbose(");
+    postfloat((float)level);
+    dopost("):");
+    
+    va_start(ap, fmt);
+    vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
+    va_end(ap);
+    strcat(buf, "\n");
+    dopost(buf);
+}
+
     /* here's the good way to log errors -- keep a pointer to the
     offending or offended object around so the user can search for it
     later. */

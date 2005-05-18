@@ -10,6 +10,7 @@ to this file... */
 #include "m_pd.h"
 #include "t_tk.h"
 #include "g_canvas.h"
+#include "s_stuff.h"    /* for sys_hostfontsize */
 #include <stdio.h>
 #include <string.h>
 
@@ -40,7 +41,7 @@ void glist_add(t_glist *x, t_gobj *y)
         gobj_vis(y, x, 1);
     if (class_isdrawcommand(y->g_pd)) 
         canvas_redrawallfortemplate(template_findbyname(canvas_makebindsym(
-            glist_getcanvas(x)->gl_name)));
+            glist_getcanvas(x)->gl_name)), 0);
 }
 
     /* this is to protect against a hairy problem in which deleting
@@ -91,6 +92,11 @@ void glist_delete(t_glist *x, t_gobj *y)
             }
         }
     }
+        /* if we're a drawing command, erase all scalars now, before deleting
+        it; we'll redraw them once it's deleted below. */
+    if (drawcommand)
+        canvas_redrawallfortemplate(template_findbyname(canvas_makebindsym(
+            glist_getcanvas(x)->gl_name)), 2);
     gobj_delete(y, x);
     if (glist_isvisible(canvas))
         gobj_vis(y, x, 0);
@@ -107,7 +113,7 @@ void glist_delete(t_glist *x, t_gobj *y)
     if (chkdsp) canvas_update_dsp();
     if (drawcommand)
         canvas_redrawallfortemplate(template_findbyname(canvas_makebindsym(
-            glist_getcanvas(x)->gl_name)));
+            glist_getcanvas(x)->gl_name)), 1);
     canvas_setdeleting(canvas, wasdeleting);
     x->gl_valid = ++glist_valid;
 }
@@ -644,6 +650,8 @@ void glist_redraw(t_glist *x)
 /* --------------------------- widget behavior  ------------------- */
 
 extern t_widgetbehavior text_widgetbehavior;
+t_symbol *garray_getname(t_garray *x);
+
 
     /* Note that some code in here would also be useful for drawing
     graph decorations in toplevels... */
@@ -694,13 +702,26 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
     {
         int i;
         float f;
-
+        t_gobj *g;
+        t_symbol *arrayname;
             /* draw a rectangle around the graph */
         sys_vgui(".x%lx.c create line\
             %d %d %d %d %d %d %d %d %d %d -tags %s\n",
             glist_getcanvas(x->gl_owner),
             x1, y1, x1, y2, x2, y2, x2, y1, x1, y1, tag);
-
+        
+            /* if there's just one "garray" in the graph, write its name
+                along the top */
+        if ((g = x->gl_list) && !g->g_next && (g->g_pd == garray_class))
+        {
+            int ymin = (y1 < y2 ? y1 : y2);
+            t_symbol *s = garray_getname((t_garray *)g);
+            sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor sw\
+             -font -*-courier-bold--normal--%d-* -tags %s\n",
+                (long)glist_getcanvas(x),  x1, ymin, s->s_name,
+                sys_hostfontsize(glist_getfont(x)), tag);
+        }
+        
             /* draw ticks on horizontal borders.  If lperb field is
             zero, this is disabled. */
         if (x->gl_xtick.k_lperb)

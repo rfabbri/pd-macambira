@@ -73,6 +73,9 @@ EXTERN_STRUCT _tscalar;
 EXTERN_STRUCT _canvasenvironment;
 #define t_canvasenvironment struct _canvasenvironment 
 
+EXTERN_STRUCT _fielddesc;
+#define t_fielddesc struct _fielddesc
+
 typedef struct _selection
 {
     t_gobj *sel_what;
@@ -453,7 +456,8 @@ EXTERN t_inlet *canvas_addinlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rminlet(t_canvas *x, t_inlet *ip);
 EXTERN t_outlet *canvas_addoutlet(t_canvas *x, t_pd *who, t_symbol *sym);
 EXTERN void canvas_rmoutlet(t_canvas *x, t_outlet *op);
-EXTERN void canvas_redrawallfortemplate( t_template *tmpl);
+EXTERN void canvas_redrawallfortemplate(t_template *tmpl, int action);
+EXTERN void canvas_redrawallfortemplatecanvas(t_canvas *x, int action);
 EXTERN void canvas_zapallfortemplate(t_canvas *tmpl);
 EXTERN void canvas_setusedastemplate(t_canvas *x);
 EXTERN t_canvas *canvas_getcurrent(void);
@@ -553,16 +557,19 @@ EXTERN void scalar_getbasexy(t_scalar *x, float *basex, float *basey);
 EXTERN int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
     float linewidth, float xloc, float xinc, float yloc,
+    t_fielddesc *xfield, t_fielddesc *yfield, t_fielddesc *wfield,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
 EXTERN void array_getcoordinate(t_glist *glist,
     char *elem, int xonset, int yonset, int wonset, int indx,
     float basex, float basey, float xinc,
+    t_fielddesc *xfielddesc, t_fielddesc *yfielddesc, t_fielddesc *wfielddesc,
     float *xp, float *yp, float *wp);
 
 EXTERN int array_getfields(t_symbol *elemtemplatesym,
     t_canvas **elemtemplatecanvasp,
     t_template **elemtemplatep, int *elemsizep,
+    t_fielddesc *xfielddesc, t_fielddesc *yfielddesc, t_fielddesc *wfielddesc, 
     int *xonsetp, int *yonsetp, int *wonsetp);
 
 /* --------------------- templates ------------------------- */
@@ -583,6 +590,8 @@ EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
 EXTERN t_template *gtemplate_get(t_gtemplate *x);
 EXTERN t_template *template_findbyname(t_symbol *s);
 EXTERN t_canvas *template_findcanvas(t_template *tmpl);
+EXTERN void template_notify(t_template *template,
+    t_symbol *s, int argc, t_atom *argv);
 
 EXTERN t_float template_getfloat(t_template *x, t_symbol *fieldname,
     t_word *wp, int loud);
@@ -592,6 +601,13 @@ EXTERN t_symbol *template_getsymbol(t_template *x, t_symbol *fieldname,
     t_word *wp, int loud);
 EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
     t_word *wp, t_symbol *s, int loud);
+EXTERN t_float fielddesc_getcoord(t_fielddesc *f, t_template *template,
+    t_word *wp, int loud);
+EXTERN void fielddesc_setcoord(t_fielddesc *f, t_template *template,
+    t_word *wp, float pix, int loud);
+EXTERN t_float fielddesc_cvttocoord(t_fielddesc *f, float val);
+EXTERN float fielddesc_cvtfromcoord(t_fielddesc *f, float coord);
+
 
 /* ----------------------- guiconnects, g_guiconnect.c --------- */
 EXTERN t_guiconnect *guiconnect_new(t_pd *who, t_symbol *sym);

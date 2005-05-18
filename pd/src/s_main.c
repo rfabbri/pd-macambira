@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-char pd_version[] = "Pd version 0.39 TEST 0\n";
+char pd_version[] = "Pd version 0.39 TEST 2\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -60,6 +60,7 @@ int sys_nmidiin = 1;
 int sys_midiindevlist[MAXMIDIINDEV] = {1};
 int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 
+char sys_font[] = "courier"; /* tb: font name */
 static int sys_main_srate;
 static int sys_main_advance;
 
@@ -254,7 +255,7 @@ int sys_main(int argc, char **argv)
 #ifndef MSW
     sys_rcfile();                               /* parse the startup file */
 #endif
-    if (sys_argparse(argc, argv))           /* parse cmd line */
+    if (sys_argparse(argc-1, argv+1))           /* parse cmd line */
         return (1);
     sys_afterargparse();                    /* post-argparse settings */
     if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
@@ -358,6 +359,7 @@ static char *(usagemessage[]) = {
 "-open <file>     -- open file(s) on startup\n",
 "-lib <file>      -- load object library(s)\n",
 "-font <n>        -- specify default font size in points\n",
+"-typeface <name> -- specify default font (default: courier)\n",
 "-verbose         -- extra printout on startup and when searching for files\n",
 "-version         -- don't run Pd; just print out which version it is \n",
 "-d <n>           -- specify debug level\n",
@@ -507,7 +509,6 @@ int sys_argparse(int argc, char **argv)
 {
     char sbuf[MAXPDSTRING];
     int i;
-    argc--; argv++;
     while ((argc > 0) && **argv == '-')
     {
         if (!strcmp(*argv, "-r") && argc > 1 &&
@@ -712,9 +713,17 @@ int sys_argparse(int argc, char **argv)
             argc -= 2;
             argv += 2;
         }
+                /* tb: font name { */
+        else if (!strcmp(*argv, "-typeface") && argc > 1)
+        {
+                        strcpy(sys_font,*(argv+1));
+                        argc -= 2;
+                        argv += 2;
+                }
+                /* } tb */
         else if (!strcmp(*argv, "-verbose"))
         {
-            sys_verbose = 1;
+            sys_verbose++;
             argc--; argv++;
         }
         else if (!strcmp(*argv, "-version"))

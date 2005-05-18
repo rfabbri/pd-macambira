@@ -134,8 +134,18 @@ int sys_load_lib(char *dirname, char *classname)
             return 0;
         }
         ret = NSLinkModule( image, filename, 
-               NSLINKMODULE_OPTION_BINDNOW + NSLINKMODULE_OPTION_PRIVATE); 
-
+               NSLINKMODULE_OPTION_BINDNOW |
+               //NSLINKMODULE_OPTION_PRIVATE |
+               NSLINKMODULE_OPTION_RETURN_ON_ERROR);
+               
+        if (ret == NULL) {
+                int err;
+                const char *fname, *errt;
+                NSLinkEditErrors c;
+                NSLinkEditError(&c, &err, &fname, &errt);
+                post("link error %d %s %s", err, fname, errt);
+                return 0;
+        }
         s = NSLookupSymbolInModule(ret, symname); 
 
         if (s)

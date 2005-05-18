@@ -412,8 +412,18 @@ int m_scheduler( void)
     waitfortick:
         if (sched_usedacs)
         {
+#ifdef THREAD_LOCKING
+            /* T.Grill - send_dacs may sleep -> 
+                unlock thread lock make that time available 
+                - could messaging do any harm while sys_send_dacs is running?
+            */
+            sys_unlock();
+#endif
             timeforward = sys_send_dacs();
-
+#ifdef THREAD_LOCKING
+            /* T.Grill - done */
+            sys_unlock();
+#endif
                 /* if dacs remain "idle" for 1 sec, they're hung up. */
             if (timeforward != 0)
                 idlecount = 0;

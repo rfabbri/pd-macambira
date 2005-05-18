@@ -337,6 +337,7 @@ EXTERN t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1,
 EXTERN t_inlet *pointerinlet_new(t_object *owner, t_gpointer *gp);
 EXTERN t_inlet *floatinlet_new(t_object *owner, t_float *fp);
 EXTERN t_inlet *symbolinlet_new(t_object *owner, t_symbol **sp);
+EXTERN t_inlet *signalinlet_new(t_object *owner, t_float f);
 EXTERN void inlet_free(t_inlet *x);
 
 EXTERN t_outlet *outlet_new(t_object *owner, t_symbol *s);
@@ -436,6 +437,7 @@ EXTERN void postfloat(float f);
 EXTERN void postatom(int argc, t_atom *argv);
 EXTERN void endpost(void);
 EXTERN void error(const char *fmt, ...);
+EXTERN void verbose(int level, const char *fmt, ...);
 EXTERN void bug(const char *fmt, ...);
 EXTERN void pd_error(void *object, const char *fmt, ...);
 EXTERN void sys_logerror(const char *object, const char *s);

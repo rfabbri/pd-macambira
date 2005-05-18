@@ -156,7 +156,6 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
     t_scalar *x = (t_scalar *)z;
-    int hit = 0;
     t_template *template = template_findbyname(x->sc_template);
     t_canvas *templatecanvas = template_findcanvas(template);
     int x1 = 0x7fffffff, x2 = -0x7fffffff, y1 = 0x7fffffff, y2 = -0x7fffffff;
@@ -171,7 +170,6 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
     }
     else
     {
-        int hit = 0;
         x1 = y1 = 0x7fffffff;
         x2 = y2 = -0x7fffffff;
         for (y = templatecanvas->gl_list; y; y = y->g_next)
@@ -182,16 +180,13 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
             (*wb->w_parentgetrectfn)(y, owner,
                 x->sc_vec, template, basex, basey,
                 &nx1, &ny1, &nx2, &ny2);
-            if (hit)
-            {
-                if (nx1 < x1) x1 = nx1;
-                if (ny1 < y1) y1 = ny1;
-                if (nx2 > x2) x2 = nx2;
-                if (ny2 > y2) y2 = ny2;
-            }
-            else x1 = nx1, y1 = ny1, x2 = nx2, y2 = ny2, hit = 1;
+            if (nx1 < x1) x1 = nx1;
+            if (ny1 < y1) y1 = ny1;
+            if (nx2 > x2) x2 = nx2;
+            if (ny2 > y2) y2 = ny2;
         }
-        if (!hit) x1 = y1 = x2 = y2 = 0;
+        if (x2 < x1 || y2 < y1)
+            x1 = y1 = x2 = y2 = 0;
     }
     /* post("scalar x1 %d y1 %d x2 %d y2 %d", x1, y1, x2, y2); */
     *xp1 = x1;
@@ -208,6 +203,17 @@ static void scalar_select(t_gobj *z, t_glist *owner, int state)
     if (state)
     {
         int x1, y1, x2, y2;
+        t_symbol *templatesym = x->sc_template;
+        t_template *tmpl;
+        t_atom at;
+        t_gpointer gp;
+        gpointer_init(&gp);
+        gpointer_setglist(&gp, owner, x);
+        SETPOINTER(&at, &gp);
+        if (tmpl = template_findbyname(templatesym))
+            template_notify(tmpl, gensym("select"), 1, &at);
+        gpointer_unset(&gp);
+        
         scalar_getrect(z, owner, &x1, &y1, &x2, &y2);
         x1--; x2++; y1--; y2++;
         sys_vgui(".x%lx.c create line %d %d %d %d %d %d %d %d %d %d \

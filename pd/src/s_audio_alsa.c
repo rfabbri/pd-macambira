@@ -63,19 +63,28 @@ static void check_error(int err, const char *why)
 static int alsaio_canmmap(t_alsa_dev *dev)
 {
     snd_pcm_hw_params_t *hw_params;
-    int err;
+    int err1, err2;
     
     snd_pcm_hw_params_alloca(&hw_params);
 
-    err = snd_pcm_hw_params_any(dev->a_handle, hw_params);
-    if (err < 0) {
-      check_error(err,"Broken configuration: no configurations available"); 
+    err1 = snd_pcm_hw_params_any(dev->a_handle, hw_params);
+    if (err1 < 0) {
+      check_error(err1,"Broken configuration: no configurations available"); 
       return (0);
     }
-
-    err = snd_pcm_hw_params_set_access(dev->a_handle,
-        hw_params, SND_PCM_ACCESS_MMAP_NONINTERLEAVED);
-    return (err >= 0);
+    err1 = snd_pcm_hw_params_set_access(dev->a_handle,
+        hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
+    if (err1 < 0)
+    {
+        err2 = snd_pcm_hw_params_set_access(dev->a_handle,
+            hw_params, SND_PCM_ACCESS_MMAP_NONINTERLEAVED);
+    }
+    else err2 = -1;
+#if 0
+    post("err 1 %d (%s), err2 %d (%s)", err1, snd_strerror(err1),
+         err2, snd_strerror(err2));
+#endif
+    return ((err1 < 0) && (err2 >= 0));
 }
 
 static int alsaio_setup(t_alsa_dev *dev, int out, int *channels, int *rate,

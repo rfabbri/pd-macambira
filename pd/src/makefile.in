@@ -162,7 +162,9 @@ distclean: clean
 
 tags: $(SRC) $(GSRC); ctags *.[ch]
 
-depend: 
+depend: makefile.dependencies
+
+makefile.dependencies: makefile
 	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
 
 uninstall:

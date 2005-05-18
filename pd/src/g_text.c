@@ -752,12 +752,10 @@ static void gatom_vis(t_gobj *z, t_glist *glist, int vis)
                 sys_hostfontsize(glist_getfont(glist)),
                 "black");
         }
-        else
-        {
-            sys_vgui(".x%lx.c delete %lx.l\n", glist_getcanvas(glist), x);
-            sys_unqueuegui(x);
-        }
+        else sys_vgui(".x%lx.c delete %lx.l\n", glist_getcanvas(glist), x);
     }
+    if (!vis)
+        sys_unqueuegui(x);
 }
 
 void canvas_atom(t_glist *gl, t_atomtype type,

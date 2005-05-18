@@ -1,4 +1,4 @@
-#N canvas 182 142 581 402 12;
+#N canvas 99 78 581 402 12;
 #X floatatom 83 307 3 0 0 0 - - -;
 #X obj 33 257 notein;
 #X obj 33 283 stripnote;
@@ -61,9 +61,9 @@ started" in the Help menu.;
 but is free for you to use for any reasonable purpose. See the file
 \, LICENSE.txt in the distribution.;
 #X obj 135 117 tgl 20 0 tone-ch1 tone-ch1 1 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 160 117 tgl 20 0 tone-ch2 tone-ch2 2 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 236 282 tgl 20 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
 1;
 #X obj 394 110 tgl 20 0 tone-monitor set-tone-monitor monitor 25 10
@@ -93,13 +93,13 @@ but is free for you to use for any reasonable purpose. See the file
 #X obj 393 148 tgl 20 0 tone-hipass set-tone-hipass input-hipass 25
 10 0 12 -262144 -1 -1 0 1;
 #X obj 185 117 tgl 20 0 tone-ch3 tone-ch3 3 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 210 117 tgl 20 0 tone-ch4 tone-ch4 4 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 235 117 tgl 20 0 tone-ch5 tone-ch5 5 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 260 117 tgl 20 0 tone-ch6 tone-ch6 6 5 -8 0 12 -262144 -1 -1
-1 1;
+0 1;
 #X obj 331 108 bng 15 250 50 0 tone-all empty ALL 20 8 0 12 -262144
 -1 -1;
 #X obj 331 129 bng 15 250 50 0 tone-none empty NONE 20 8 0 12 -262144
@@ -122,7 +122,7 @@ but is free for you to use for any reasonable purpose. See the file
 #X obj 379 256 print~;
 #X obj 438 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#N canvas 162 353 903 462 -------audio----------- 0;
+#N canvas 0 114 903 462 -------audio----------- 0;
 #X obj 186 95 hip~ 5;
 #X obj 194 172 outlet;
 #X obj 194 146 int;
@@ -161,18 +161,18 @@ but is free for you to use for any reasonable purpose. See the file
 #X obj 28 165 s tone-hip;
 #X obj 28 114 r tone-hipass;
 #N canvas 499 63 548 519 glue+loadbang 0;
-#X obj 171 21 loadbang;
-#X obj 171 176 r tone-all;
-#X msg 171 204 \; tone-ch1 1 \; tone-ch2 1 \; tone-ch3 1 \; tone-ch4
-1 \; tone-ch5 1 \; tone-ch6 1;
-#X obj 168 323 r tone-none;
-#X msg 168 352 \; tone-ch1 0 \; tone-ch2 0 \; tone-ch3 0 \; tone-ch4
-0 \; tone-ch5 0 \; tone-ch6 0;
-#X msg 171 49 \; pd dsp 1 \; tone-pitch 69 \; tone-radio 2 \; tone-radio-set
+#X obj 8 20 loadbang;
+#X obj 175 18 r tone-all;
+#X obj 285 16 r tone-none;
+#X msg 8 48 \; pd dsp 1 \; tone-pitch 69 \; tone-radio 2 \; tone-radio-set
 2 \; tone-type 1 \; tone-type-set 1 \; tone-all 1 \;;
-#X connect 0 0 5 0;
-#X connect 1 0 2 0;
-#X connect 3 0 4 0;
+#X msg 175 46 \; tone-ch1 1 \; tone-ch2 1 \; tone-ch3 1 \; tone-ch4
+1 \; tone-ch5 1 \; tone-ch6 1 \; tone-ch7 1 \; tone-ch8 1;
+#X msg 285 47 \; tone-ch1 0 \; tone-ch2 0 \; tone-ch3 0 \; tone-ch4
+0 \; tone-ch5 0 \; tone-ch6 0 \; tone-ch7 0 \; tone-ch8 0;
+#X connect 0 0 3 0;
+#X connect 1 0 4 0;
+#X connect 2 0 5 0;
 #X restore 22 332 pd glue+loadbang;
 #X obj 428 96 hip~ 5;
 #X obj 436 173 outlet;
@@ -320,12 +320,12 @@ but is free for you to use for any reasonable purpose. See the file
 #X obj 1029 355 *~;
 #X obj 1019 385 +~;
 #X obj 1027 68 r tone-hip;
-#X obj 918 278 r tone-ch5;
-#X obj 1038 277 r tone-ch6;
 #X obj 899 43 adc~ 7;
 #X obj 1019 42 adc~ 8;
 #X obj 899 411 dac~ 7;
 #X obj 1019 410 dac~ 8;
+#X obj 918 278 r tone-ch7;
+#X obj 1038 277 r tone-ch8;
 #X connect 0 0 7 0;
 #X connect 0 0 3 0;
 #X connect 2 0 1 0;
@@ -425,7 +425,7 @@ but is free for you to use for any reasonable purpose. See the file
 #X connect 106 0 104 0;
 #X connect 107 0 108 0;
 #X connect 108 0 109 1;
-#X connect 109 0 127 0;
+#X connect 109 0 125 0;
 #X connect 110 0 99 1;
 #X connect 111 0 117 0;
 #X connect 111 0 114 0;
@@ -437,12 +437,12 @@ but is free for you to use for any reasonable purpose. See the file
 #X connect 118 0 116 0;
 #X connect 119 0 120 0;
 #X connect 120 0 121 1;
-#X connect 121 0 128 0;
+#X connect 121 0 126 0;
 #X connect 122 0 111 1;
-#X connect 123 0 106 0;
-#X connect 124 0 118 0;
-#X connect 125 0 99 0;
-#X connect 126 0 111 0;
+#X connect 123 0 99 0;
+#X connect 124 0 111 0;
+#X connect 127 0 106 0;
+#X connect 128 0 118 0;
 #X restore 139 159 pd -------audio-----------;
 #X floatatom 335 186 3 0 0 0 - - -;
 #X floatatom 368 186 3 0 0 0 - - -;

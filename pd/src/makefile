@@ -19,7 +19,7 @@ GLIB = -ltk8.4 -ltcl8.4  -lX11 -L/usr/X11R6/lib -lrt
 LDFLAGS = -Wl,-export-dynamic -lasound
 LIB =   -ldl -lpthread -lasound
 
-OPT_CFLAGS = -g
+OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
 WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 ARCH_CFLAGS = -DPD 
@@ -162,7 +162,9 @@ distclean: clean
 
 tags: $(SRC) $(GSRC); ctags *.[ch]
 
-depend: 
+depend: makefile.dependencies
+
+makefile.dependencies: makefile
 	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
 
 uninstall:

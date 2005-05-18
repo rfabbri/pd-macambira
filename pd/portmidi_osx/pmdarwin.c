@@ -2,7 +2,7 @@
  * PortMidi OS-dependent interface for Darwin (MacOS X)
  * Jon Parise <jparise@cmu.edu>
  *
- * $Id: pmdarwin.c,v 1.7 2004-11-28 21:20:42 millerpuckette Exp $
+ * $Id: pmdarwin.c,v 1.8 2005-05-18 04:28:50 millerpuckette Exp $
  *
  * CHANGE LOG:
  * 03Jul03 - X. J. Scott (xjs):

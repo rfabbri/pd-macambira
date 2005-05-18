@@ -402,6 +402,11 @@ void iemgui_label(void *x, t_iemgui *iemgui, t_symbol *s)
     int pargc, tail_len, nth_arg;
     t_atom *pargv;
 
+        /* tb: fix for empty label { */
+        if (s == gensym(""))
+                s = gensym("empty");
+        /* tb } */
+
     lab = iemgui_raute2dollar(s);
     iemgui->x_lab_unexpanded = lab;
     iemgui->x_lab = lab = canvas_realizedollar(iemgui->x_glist, lab);

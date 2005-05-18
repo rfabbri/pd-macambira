@@ -549,10 +549,11 @@ t_class *sigrpole_class;
 static void *sigrpole_new(t_float f)
 {
     t_sigrpole *x = (t_sigrpole *)pd_new(sigrpole_class);
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+    pd_float(
+        (t_pd *)inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal),
+            f);
     outlet_new(&x->x_obj, &s_signal);
     x->x_last = 0;
-    x->x_f = f;
     return (x);
 }
 
@@ -571,6 +572,8 @@ static t_int *sigrpole_perform(t_int *w)
         float coef = *in2++;
         *out++ = last = coef * last + next;
     }
+    if (PD_BIGORSMALL(last))
+        last = 0;
     x->x_last = last;
     return (w+6);
 }
@@ -619,10 +622,11 @@ t_class *sigrzero_class;
 static void *sigrzero_new(t_float f)
 {
     t_sigrzero *x = (t_sigrzero *)pd_new(sigrzero_class);
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+    pd_float(
+        (t_pd *)inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal),
+            f);
     outlet_new(&x->x_obj, &s_signal);
     x->x_last = 0;
-    x->x_f = f;
     return (x);
 }
 
@@ -690,10 +694,11 @@ t_class *sigrzero_rev_class;
 static void *sigrzero_rev_new(t_float f)
 {
     t_sigrzero_rev *x = (t_sigrzero_rev *)pd_new(sigrzero_rev_class);
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
+    pd_float(
+        (t_pd *)inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal),
+            f);
     outlet_new(&x->x_obj, &s_signal);
     x->x_last = 0;
-    x->x_f = f;
     return (x);
 }
 
@@ -800,6 +805,10 @@ static t_int *sigcpole_perform(t_int *w)
         lastim = *outim++ = nextim + lastre * coefim + lastim * coefre;
         lastre = tempre;
     }
+    if (PD_BIGORSMALL(lastre))
+        lastre = 0;
+    if (PD_BIGORSMALL(lastim))
+        lastim = 0;
     x->x_lastre = lastre;
     x->x_lastim = lastim;
     return (w+9);
@@ -975,8 +984,10 @@ static t_int *sigczero_rev_perform(t_int *w)
         float nextim = *inim1++;
         float coefre = *inre2++;
         float coefim = *inim2++;
-        *outre++ = lastre - nextre * coefre + nextim * coefim;
-        *outim++ = lastim - nextre * coefim - nextim * coefre;
+            /* transfer function is (A bar) - Z^-1, for the same
+            frequency response as 1 - AZ^-1 from czero_tilde. */
+        *outre++ = lastre - nextre * coefre - nextim * coefim;
+        *outim++ = lastim - nextre * coefim + nextim * coefre;
         lastre = nextre;
         lastim = nextim;
     }

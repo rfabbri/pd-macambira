@@ -27,6 +27,7 @@ that didn't really belong anywhere. */
 #include <fcntl.h>
 #include <process.h>
 #include <winsock.h>
+#include <windows.h>
 typedef int pid_t;
 typedef int socklen_t;
 #define EADDRINUSE WSAEADDRINUSE
@@ -85,6 +86,7 @@ struct _socketreceiver
 
 extern char pd_version[];
 extern int sys_guisetportnumber;
+extern char sys_font[]; /* tb: typeface */
 
 static int sys_nfdpoll;
 static t_fdpoll *sys_fdpoll;
@@ -162,6 +164,11 @@ static int sys_domicrosleep(int microsec, int pollem)
         FD_ZERO(&exceptset);
         for (fp = sys_fdpoll, i = sys_nfdpoll; i--; fp++)
             FD_SET(fp->fdp_fd, &readset);
+#ifdef MSW
+        if (sys_maxfd == 0)
+                Sleep(microsec/1000);
+        else
+#endif
         select(sys_maxfd+1, &readset, &writeset, &exceptset, &timout);
         for (i = 0; i < sys_nfdpoll; i++)
             if (FD_ISSET(sys_fdpoll[i].fdp_fd, &readset))
@@ -173,6 +180,11 @@ static int sys_domicrosleep(int microsec, int pollem)
     }
     else
     {
+#ifdef MSW
+        if (sys_maxfd == 0)
+              Sleep(microsec/1000);
+        else
+#endif
         select(0, 0, 0, 0, &timout);
         return (0);
     }
@@ -617,6 +629,11 @@ void sys_vgui(char *fmt, ...)
     msglen = vsnprintf(sys_guibuf + sys_guibufhead,
         sys_guibufsize - sys_guibufhead, fmt, ap);
     va_end(ap);
+    if(msglen < 0) 
+    {
+        fprintf(stderr, "Pd: buffer space wasn't sufficient for long GUI string\n");
+        return;
+    }
     if (msglen >= sys_guibufsize - sys_guibufhead)
     {
         int msglen2, newsize = sys_guibufsize + 1 +
@@ -777,7 +794,7 @@ void sys_unqueuegui(void *client)
         if (gq2->gq_client == client)
     {
         gq->gq_next = gq2->gq_next;
-        t_freebytes(gq, sizeof(*gq));
+        t_freebytes(gq2, sizeof(*gq2));
         break;
     }
 }
@@ -1183,7 +1200,8 @@ int sys_startgui(const char *guidir)
              sys_gui("pdtk_watchdog\n");
 #endif
          sys_get_audio_apis(buf);
-         sys_vgui("pdtk_pd_startup {%s} %s\n", pd_version, buf); 
+         sys_vgui("pdtk_pd_startup {%s} %s {%s}\n", pd_version, buf, 
+                                  sys_font); 
     }
     return (0);
 

@@ -152,38 +152,30 @@ static void sys_donesavepreferences( void)
 
 static void sys_initloadpreferences( void)
 {
-                fprintf(stderr, "here 1\n");
 }
 
 static int sys_getpreference(const char *key, char *value, int size)
 {
-    HKEY **hkey;
+    HKEY hkey;
     DWORD bigsize = size;
-    char *val2 = value;
     LONG err = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
         "Software\\Pd", 0,  KEY_QUERY_VALUE, &hkey);
     if (err != ERROR_SUCCESS)
     {
-                fprintf(stderr, "here 3\n");
-            return (0);
+        return (0);
     }
     err = RegQueryValueEx(hkey, key, 0, 0, value, &bigsize);
     if (err != ERROR_SUCCESS)
     {
-                fprintf(stderr, "here 4\n");
-                RegCloseKey(hkey);
+        RegCloseKey(hkey);
         return (0);
     }
-        fprintf(stderr, "here 5\n");
-    if (val2 != value)
-        fprintf(stderr, "string moved for registry key %s",  key);
-        RegCloseKey(hkey);
+    RegCloseKey(hkey);
     return (1);
 }
 
 static void sys_doneloadpreferences( void)
 {
-                fprintf(stderr, "here 2\n");
 }
 
 static void sys_initsavepreferences( void)
@@ -192,7 +184,7 @@ static void sys_initsavepreferences( void)
 
 static void sys_putpreference(const char *key, const char *value)
 {
-    HKEY **hkey;
+    HKEY hkey;
     LONG err = RegCreateKeyEx(HKEY_LOCAL_MACHINE,
         "Software\\Pd", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE,
         NULL, &hkey, NULL);
@@ -362,11 +354,11 @@ void sys_loadpreferences( void)
     if (sys_getpreference("defeatrt", prefbuf, MAXPDSTRING))
         sscanf(prefbuf, "%d", &sys_defeatrt);
     if (sys_getpreference("flags", prefbuf, MAXPDSTRING))
-        {
-                if (strcmp(prefbuf, "."))
-                        sys_flags = gensym(prefbuf);
+    {
+        if (strcmp(prefbuf, "."))
+            sys_flags = gensym(prefbuf);
     }
-        sys_doflags();
+    sys_doflags();
 
     if (sys_defeatrt)
         sys_hipriority = 0;

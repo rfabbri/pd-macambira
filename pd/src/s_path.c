@@ -359,12 +359,12 @@ void open_via_helppath(const char *name, const char *dir)
 /* Startup file reading for linux and MACOSX.  As of 0.38 this will be
 deprecated in favor of the "settings" mechanism */
 
+int sys_argparse(int argc, char **argv);
+
 #ifndef MSW
 
 #define STARTUPNAME ".pdrc"
 #define NUMARGS 1000
-
-int sys_argparse(int argc, char **argv);
 
 int sys_rcfile(void)
 {
@@ -420,7 +420,7 @@ int sys_rcfile(void)
         }
         else post("no RC file arguments found");
     }
-    if (sys_argparse(rcargc, rcargv))
+    if (sys_argparse(rcargc-1, rcargv+1))
     {
         post("error parsing RC arguments");
         return (1);
@@ -434,13 +434,12 @@ void sys_doflags( void)
     int i, beginstring = 0, state = 0, len = strlen(sys_flags->s_name);
     int rcargc = 0;
     char *rcargv[MAXPDSTRING];
-
     if (len > MAXPDSTRING)
     {
         post("flags: %s: too long", sys_flags->s_name);
         return;
     }
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len+1; i++)
     {
         int c = sys_flags->s_name[i];
         if (state == 0)
@@ -464,11 +463,12 @@ void sys_doflags( void)
                 rcargc++;
                 if (rcargc >= MAXPDSTRING)
                     break;
+                state = 0;
             }
         }
     }
     if (sys_argparse(rcargc, rcargv))
-        post("error parsing RC arguments");
+        post("error parsing startup arguments");
 }
 
 /* undo pdtl_encodedialog.  This allows dialogs to send spaces, commas,
@@ -480,7 +480,7 @@ t_symbol *sys_decodedialog(t_symbol *s)
     if (*sp != '+')
         bug("sys_decodedialog: %s", sp);
     else sp++;
-    for (i = 0; i < MAXPDSTRING-1; i++)
+    for (i = 0; i < MAXPDSTRING-1; i++, sp++)
     {
         if (!sp[0])
             break;
@@ -497,8 +497,8 @@ t_symbol *sys_decodedialog(t_symbol *s)
             else if (sp[1] == 'd')
                 buf[i] = '$', sp++;
             else buf[i] = sp[0];
-            sp++;
         }
+        else buf[i] = sp[0];
     }
     buf[i] = 0;
     return (gensym(buf));

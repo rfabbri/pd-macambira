@@ -20,6 +20,62 @@
 
 <H3> <A name="s2"> 5.1. release notes </A> </H3>
 
+<P> ------------------ 0.38.1 --------------------------
+
+Fixed two bugs that crashed Pd when deleting number boxes in certain
+situations.
+
+<P> ------------------ 0.38.0 --------------------------
+
+<P> The big change is queued graphics updates, which apply (so far)
+to tables and number/symbol boxes.  The IEM GUIS aren't enqueued yet.
+This along with a better graphics update buffering scheme makes Pd's
+graphics run much better.
+
+<P> Support for cutting/copying/pasting text between boxes and between Pd and
+other applications.
+
+<P> Dialogs for setting and saving path, libs-to-load-on-startup, and some
+other things.  This and the audio settings can be saved automatically to
+the appropriate repository (.pdsettings on linux; registry on MS windows;
+"Preferences" on Mac.)
+
+<P> "Print" printout goes to the Pd window by default.  You can revert to
+the old (standard error) behavior with the "-stderr" startup flag.
+
+<P> The "gui" TK script can now start Pd up (previously Pd had to be
+started first.)  This is needed for Pd to work as an "App" on Mac.
+
+<P> new filter objects: cpole~, fpole~, etc... these will get used in the
+upcoming Techniques chapter 8.
+
+<P> Objects whose creation failed get a distinctive outline; if they are
+already inside a patch they sprout inlets and outlets as necessary to
+preserve connections.
+
+<P> Filenames in the "search path", etc., now may contain spaces, commas,
+and semicolons.
+
+<P> bug fix: click on minaturized subpatch failed to "vis" it
+
+<P> bug fix: font size change crash reported by CK
+
+<P> Key bindings like control-Q now work even from within most dialogs.
+
+<P> The audio settings dialog now permits turning audio input and/or output
+off without forgetting how many channels it should be when on.
+
+<P> RME Hammerfall ALSA support from Winfried -- but specify the number of
+channels correctly or else Pd crashes.
+
+<P> portaudio (e.g., Mac) audio support fixed for inchans != outchans,
+so the emi emagic can now be used 2-in. 6-out, for example.
+
+<P> (linux) The configure script can set the setuid flag on "make install".
+The "-enable" flags to ./configure should now work correctly too.
+
+<P> atan2 had its inlets switched to conform to standard usage
+
 <P> ------------------ 0.37.3 --------------------------
 
 <P> Oops- added __i386__ macro to windows makefile so it would test for

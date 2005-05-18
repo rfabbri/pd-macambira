@@ -218,6 +218,8 @@ int alsamm_open_audio(int rate)
     alsa_indev[i].a_synced=alsa_outdev[i].a_synced=0;
     alsa_indev[i].a_channels=alsa_outdev[i].a_channels=0;
   }
+  alsamm_inchannels = 0;
+  alsamm_outchannels = 0;
 
   /* opening alsa debug channel */
   err = snd_output_stdio_attach(&alsa_stdout, stdout, 0);
@@ -251,8 +253,6 @@ int alsamm_open_audio(int rate)
 
   for(i=0;i<alsa_noutdev;i++)
   {  
-      
-  
         /*   post("open audio out %d, of %lx, %d",i,&alsa_device[i],
                    alsa_outdev[i].a_handle); */
       if((err = set_hwparams(alsa_outdev[i].a_handle, hw_params,
@@ -356,6 +356,8 @@ int alsamm_open_audio(int rate)
 
   fflush(stdout);
 #endif
+
+  sys_setchsr(alsamm_inchannels,  alsamm_outchannels, alsamm_sr);
 
   alsamm_start();
 
@@ -773,9 +775,9 @@ static int set_swparams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams, int pl
 #ifdef ALSAMM_DEBUG
   if(sys_verbose)
     post("set sw finished");
+#endif
 #else
   post("alsa: need version 1.0 or above for mmap operation");
-#endif
 #endif /* ALSAAPI9 */
   return 0;
 }

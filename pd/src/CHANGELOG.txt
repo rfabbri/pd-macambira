@@ -3,6 +3,29 @@ user appears in the "release notes" instead.
 
 0.38.0
 
+finally figured out how to do "-enable-", etc., flags in the configure
+script correctly.
+
+The scheduler now has a hook (set_so you can add polling routines) :
+    sys_idlehook().
+
+I'm now uploading directly to CVS repository ("main" and "stable_0_38"
+branches.)  There are still problems keeping CVS's and my versions of
+portaudio the same (CVS bashes the "ident" lines).
+
+t_int to int in binbuf_addv prototype
+
+64-bit fix to externs makefiles
+
+Pd now uses portaudio out-of-the-box; customized files are moved to
+"src" directory.
+
+All "tags" are printf'd as %lx to make 64-bit safe.  
+
+GUI queueing mechanism added: sys_queuegui() etc. 
+
+massive rewrite of array code to unify arrays and scalars.
+
 fixed empty lists automatically to call "bang" method if one is supplied.
 
 rewrote the "namelist" stuff to facilitate preference saving (s_stuff.h,

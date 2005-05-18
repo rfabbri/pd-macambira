@@ -1,62 +1,31 @@
 ---------------- dolist --------------------
-done:
-plug-in support
-atan2 inlets switched
-queued graphics updates for tables, number boxes
-cut/paste text (needs more testing)
-add standard bindings (ctl-o, etc) to dialogs
-separate audio on/off from nchans
-setuid flag in configure script
-settings saver (registry in Windows; .pdrc in linux; defaults system in OSX?)
-    audio API
-    MIDI -- fix to read MIDI on startup (rest works?)
-    path
-    startup flags
-    libs
-better params:
-    extra flag for path
-    startup flags
-    startup libraries
-printout to pd window
-startup from GUI
-%x to %lx in all "tags" to make 64-bit safe
-portaudio_pd files into src
-t_int to int in binbuf_addv
-64-bit fix to externs makefiles
-new filter objects: cpole~, fpole~, etc.
-put in Wini's RME ALSA code; there are still bugs...
-portaudio fixed for inchans != outchans, e.g., emi emagic (2/6)
-sprout inlets/outlets on objects whose creation failed.
-uploaded to CVS
-bug fix: click on minaturized subpatch fails to "vis" it
-bug fix: CK on Oct. 4 (crash changing font size)
-sched_idle hook
-fixed startup flags, path, etc. so that spaces, "," chars, etc., are allowed
-configure script fixed to handle enable- and disable- correctly
-
-0.39:
+done for 0.39:
 arrays are now first-class data
 array elements can be clicked on, etc
+fixed array onset bug
 
+At the source level, "regular" arrays and arrays withing data structures
+are now the same thing.  The main user-visible effect of this is that now
+"arrays" may be graphed as "bezier curves".
 
-bug bandaids:
-d_delay.c confusion
-'$' and help broken in OSX?
+------------ 0.39 ---------
 
 garray change:
 make a gobj_redraw that schedules the redraw
 put two radio button banks side by side
-re-range tables when arrays change size (again)
 array_resize etc., should redraw the array directly?  Or should "setsize"
     and "garray_resize" do it instead?  check it's queued correctly.
-
 
 doc:
 document env~ second argument (and why is it no less than 1/10 of first???)
 vibrato example
 block resampling arguments
+document tabwrite~_start
 
 problems:
+check if there's a problem loading libs on startup if superuser
+tk errors for large tables?
+wierdly small hotspot on lines
 '[' in numbox label breaks it (Yury Sept. 3)
 soundfiles with 3-byte samples buzz for the first readsf buffer (bug/x.pd)
 read xx.txt in "bad" gives warnings
@@ -65,21 +34,21 @@ Also writesf~ acts differently if DSP is off when "open" is sent?
 qlist - 'next 1' seems not to work
 Krzysztof's qlist_next reentrancy bug
 don't draw in/outlets on gui objects in graph-on-parent
+reasonable font size default for GUIs
 font size should depend on subpatch/abstraction
-moving a bang toward top of window creates problem
+moving a bang toward top of window creates problem (invisible label)
 check what happens when going back and forth between graph-on-parent
 get rid of messages causing renaming; try to prevent patches closing themselves.
 dac~/ adc~/ block~ incompatibility
 scofo reports error on reading score1.txt
 rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
-open_via_path() followed by close() fails in windows? [can't reproduce]
 loading e-mailed patches without removing headers crashes pd
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')
-data copy/paste doesn't check templates aren't changed
-figure out why Pd sometimes crashes when you close example after adding fields
 check if _vsnprintf with zero argument in windows works any better...
 
-next release:
+features:
+flag to suppress printing array name above graph
+rename windowname-pd instead of pd-windowname
 fix copyright notices
 update portmusic to latest
 IEM guis to use queued updates
@@ -94,7 +63,6 @@ tables:
     object to get/set table size; random; quantile
     flag to hide array names 
 queued graphics updates for IEMGUIs and scalars
-document tabwrite~_start
 think of a way to embed abstractions in a patch
 make watchdog work for MACOSX
 GOP bounding box object
@@ -111,6 +79,8 @@ expr to parse exponential notation
 
 
 data:
+data copy/paste doesn't check templates aren't changed
+figure out why Pd sometimes crashes when you close example after adding fields
 arrays of non-existent templates crash
 allow field(1,5,0,100) etc. in drawing commands
 vget, vset traversal objects
@@ -157,7 +127,6 @@ check that -blocksize really reflects in audiobuf calc for Hammerfall
 makefile to have make install depend on make local.
 Float method for random
 figure out list, message objects
-separate control over alsaindev and alsaoutdev
 put in something for tilde order forcing
 extensible "toolbar" so people can add external GUI objects
 allow spaces in paths

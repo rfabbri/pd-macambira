@@ -62,6 +62,13 @@ t_inlet *inlet_new(t_object *owner, t_pd *dest, t_symbol *s1, t_symbol *s2)
     return (x);
 }
 
+t_inlet *signalinlet_new(t_object *owner, t_float f)
+{
+    t_inlet *x = inlet_new(owner, &owner->ob_pd, &s_signal, &s_signal);
+    x->i_un.iu_floatsignalvalue = f;
+    return (x);
+}
+
 static void inlet_wrong(t_inlet *x, t_symbol *s)
 {
     pd_error(x->i_owner, "inlet: expected '%s' but got '%s'",

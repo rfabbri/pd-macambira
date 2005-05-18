@@ -245,6 +245,12 @@ static t_array *garray_getarray_floatonly(t_garray *x,
     return (a);
 }
 
+    /* get the array's name */
+t_symbol *garray_getname(t_garray *x)
+{
+    return (x->x_name);
+}
+
         /* if there is one garray in a graph, reset the graph's coordinates
             to fit a new size and style for the garray */
 static void garray_fittograph(t_garray *x, int n, int style)
@@ -553,6 +559,7 @@ void array_redraw(t_array *a, t_glist *glist)
 void array_getcoordinate(t_glist *glist,
     char *elem, int xonset, int yonset, int wonset, int indx,
     float basex, float basey, float xinc,
+    t_fielddesc *xfielddesc, t_fielddesc *yfielddesc, t_fielddesc *wfielddesc,
     float *xp, float *yp, float *wp)
 {
     float xval, yval, ypix, wpix;
@@ -562,25 +569,29 @@ void array_getcoordinate(t_glist *glist,
     if (yonset >= 0)
         yval = *(float *)(elem + yonset);
     else yval = 0;
-    ypix = glist_ytopixels(glist, basey + yval);
+    ypix = glist_ytopixels(glist, basey +
+        fielddesc_cvttocoord(yfielddesc, yval));
     if (wonset >= 0)
     {
             /* found "w" field which controls linewidth. */
         float wval = *(float *)(elem + wonset);
-        wpix = glist_ytopixels(glist, basey + yval + wval) - ypix;
+        wpix = glist_ytopixels(glist, basey + 
+            fielddesc_cvttocoord(yfielddesc, yval) +
+                fielddesc_cvttocoord(wfielddesc, wval)) - ypix;
         if (wpix < 0)
             wpix = -wpix;
     }
     else wpix = 1;
-    *xp = glist_xtopixels(glist, basex + xval);
+    *xp = glist_xtopixels(glist, basex +
+        fielddesc_cvttocoord(xfielddesc, xval));
     *yp = ypix;
     *wp = wpix;
 }
 
 static float array_motion_xcumulative;
 static float array_motion_ycumulative;
-static t_symbol *array_motion_xfield;
-static t_symbol *array_motion_yfield;
+static t_fielddesc *array_motion_xfield;
+static t_fielddesc *array_motion_yfield;
 static t_glist *array_motion_glist;
 static t_scalar *array_motion_scalar;
 static t_array *array_motion_array;
@@ -602,25 +613,23 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
 {
     array_motion_xcumulative += dx * array_motion_xperpix;
     array_motion_ycumulative += dy * array_motion_yperpix;
-    if (*array_motion_xfield->s_name)
+    if (array_motion_xfield)
     {
             /* it's an x, y plot; can drag many points at once */
         int i;
-        char *charword = (char *)array_motion_wp;
         for (i = 0; i < array_motion_npoints; i++)
         {
-            t_word *thisword = (t_word *)(charword + i * array_motion_elemsize);
-            if (*array_motion_xfield->s_name)
+            t_word *thisword = (t_word *)(((char *)array_motion_wp) +
+                i * array_motion_elemsize);
+            float xwas = fielddesc_getcoord(array_motion_xfield, 
+                array_motion_template, thisword, 1);
+            float ywas = (array_motion_yfield ?
+                fielddesc_getcoord(array_motion_yfield, 
+                    array_motion_template, thisword, 1) : 0);
+            fielddesc_setcoord(array_motion_xfield,
+                array_motion_template, thisword, xwas + dx, 1);
+            if (array_motion_yfield)
             {
-                float xwas = template_getfloat(array_motion_template,
-                    array_motion_xfield, thisword, 1);
-                template_setfloat(array_motion_template,
-                    array_motion_xfield, thisword, xwas + dx, 1);
-            }
-            if (*array_motion_yfield->s_name)
-            {
-                float ywas = template_getfloat(array_motion_template,
-                    array_motion_yfield, thisword, 1);
                 if (array_motion_fatten)
                 {
                     if (i == 0)
@@ -628,30 +637,30 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
                         float newy = ywas + dy * array_motion_yperpix;
                         if (newy < 0)
                             newy = 0;
-                        template_setfloat(array_motion_template,
-                            array_motion_yfield, thisword, newy, 1);
+                        fielddesc_setcoord(array_motion_yfield,
+                            array_motion_template, thisword, newy, 1);
                     }
                 }
                 else
                 {
-                    template_setfloat(array_motion_template,
-                        array_motion_yfield, thisword,
+                    fielddesc_setcoord(array_motion_yfield,
+                        array_motion_template, thisword,
                             ywas + dy * array_motion_yperpix, 1);
                 }
             }
         }
     }
-    else
+    else if (array_motion_yfield)
     {
             /* a y-only plot. */
-        int thisx = array_motion_initx +
-            array_motion_xcumulative, x2;
+        int thisx = array_motion_initx + array_motion_xcumulative, x2;
         int increment, i, nchange;
-        char *charword = (char *)array_motion_wp;
         float newy = array_motion_ycumulative,
-            oldy = template_getfloat(
-            array_motion_template, array_motion_yfield,
-            (t_word *)(charword + array_motion_elemsize * array_motion_lastx), 1);
+            oldy = fielddesc_getcoord(array_motion_yfield,
+                array_motion_template,
+                    (t_word *)(((char *)array_motion_wp) +
+                        array_motion_elemsize * array_motion_lastx),
+                            1);
         float ydiff = newy - oldy;
         if (thisx < 0) thisx = 0;
         else if (thisx >= array_motion_npoints)
@@ -661,10 +670,10 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
 
         for (i = 0, x2 = thisx; i < nchange; i++, x2 += increment)
         {
-            template_setfloat(array_motion_template,
-                array_motion_yfield,
-                    (t_word *)(charword + array_motion_elemsize * x2),
-                        newy, 1);
+            fielddesc_setcoord(array_motion_yfield,
+                array_motion_template,
+                    (t_word *)(((char *)array_motion_wp) +
+                        array_motion_elemsize * x2), newy, 1);
             if (nchange > 1)
                 newy -= ydiff * (1./(nchange - 1));
          }
@@ -688,6 +697,7 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
     float linewidth, float xloc, float xinc, float yloc,
+    t_fielddesc *xfield, t_fielddesc *yfield, t_fielddesc *wfield,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
     t_canvas *elemtemplatecanvas;
@@ -697,8 +707,9 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     if (elemtemplatesym == &s_float)
         return (0);
     if (array_getfields(elemtemplatesym, &elemtemplatecanvas,
-        &elemtemplate, &elemsize, &xonset, &yonset, &wonset))
-            return (0);
+        &elemtemplate, &elemsize, xfield, yfield, wfield,
+            &xonset, &yonset, &wonset))
+                return (0);
         /* if it has more than 2000 points, just check 300 of them. */
     if (array->a_n < 2000)
         incr = 1;
@@ -714,10 +725,12 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     return (0);
 }
 
-    /* LATER move this and others back into plot parentwidget code. */
+    /* LATER move this and others back into plot parentwidget code, so
+    they can be static (look in g_canvas.h for candidates). */
 int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
     float linewidth, float xloc, float xinc, float yloc,
+    t_fielddesc *xfield, t_fielddesc *yfield, t_fielddesc *wfield,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
     t_canvas *elemtemplatecanvas;
@@ -725,7 +738,8 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     int elemsize, yonset, wonset, xonset, i;
 
     if (!array_getfields(elemtemplatesym, &elemtemplatecanvas,
-        &elemtemplate, &elemsize, &xonset, &yonset, &wonset))
+        &elemtemplate, &elemsize, xfield, yfield, wfield,
+        &xonset, &yonset, &wonset))
     {
         float best = 100;
         int incr;
@@ -738,7 +752,7 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
             float pxpix, pypix, pwpix, dx, dy;
             array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
                 xonset, yonset, wonset, i, xloc, yloc, xinc,
-                &pxpix, &pypix, &pwpix);
+                xfield, yfield, wfield, &pxpix, &pypix, &pwpix);
             if (pwpix < 4)
                 pwpix = 4;
             dx = pxpix - xpix;
@@ -763,15 +777,16 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
         }
         if (best > 8)
             return (array_doclick_element(array, glist, sc, ap,
-                elemtemplatesym, linewidth,
-                    xloc, xinc, yloc, xpix, ypix, shift, alt, dbl, doit));
+                elemtemplatesym, linewidth, xloc, xinc, yloc,
+                    xfield, yfield, wfield,
+                    xpix, ypix, shift, alt, dbl, doit));
         best += 0.001;  /* add truncation error margin */
         for (i = 0; i < array->a_n; i += incr)
         {
             float pxpix, pypix, pwpix, dx, dy, dy2, dy3;
             array_getcoordinate(glist, (char *)(array->a_vec) + i * elemsize,
                 xonset, yonset, wonset, i, xloc, yloc, xinc,
-                &pxpix, &pypix, &pwpix);
+                xfield, yfield, wfield, &pxpix, &pypix, &pwpix);
             if (pwpix < 4)
                 pwpix = 4;
             dx = pxpix - xpix;
@@ -827,15 +842,16 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
                     }
                     if (xonset >= 0)
                     {
-                        array_motion_xfield = gensym("x");
+                        array_motion_xfield = xfield;
                         array_motion_xcumulative = 
-                            *(float *)((elem + elemsize * i) + xonset);
+                            fielddesc_getcoord(xfield, array_motion_template,
+                                (t_word *)(elem + i * elemsize), 1);
                         array_motion_wp = (t_word *)(elem + i * elemsize);
                         array_motion_npoints = array->a_n - i;
                     }
                     else
                     {
-                        array_motion_xfield = &s_;
+                        array_motion_xfield = 0;
                         array_motion_xcumulative = 0;
                         array_motion_wp = (t_word *)elem;
                         array_motion_npoints = array->a_n;
@@ -846,20 +862,23 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
                     }
                     if (array_motion_fatten)
                     {
-                        array_motion_yfield = gensym("w");
+                        array_motion_yfield = wfield;
                         array_motion_ycumulative = 
-                            *(float *)((elem + elemsize * i) + wonset);
-                        array_motion_yperpix *= array_motion_fatten;
+                            fielddesc_getcoord(wfield, array_motion_template,
+                                (t_word *)(elem + i * elemsize), 1);
+                        array_motion_yperpix *= -array_motion_fatten;
                     }
                     else if (yonset >= 0)
                     {
-                        array_motion_yfield = gensym("y");
+                        array_motion_yfield = yfield;
                         array_motion_ycumulative = 
-                            *(float *)((elem + elemsize * i) + yonset);
+                            fielddesc_getcoord(yfield, array_motion_template,
+                                (t_word *)(elem + i * elemsize), 1);
+                            /* *(float *)((elem + elemsize * i) + yonset); */
                     }
                     else
                     {
-                        array_motion_yfield = &s_;
+                        array_motion_yfield = 0;
                         array_motion_ycumulative = 0;
                     }
                     glist_grab(glist, 0, array_motion, 0, xpix, ypix);
@@ -887,7 +906,7 @@ static void array_getrect(t_array *array, t_glist *glist,
     int elemsize, yonset, wonset, xonset, i;
 
     if (!array_getfields(array->a_templatesym, &elemtemplatecanvas,
-        &elemtemplate, &elemsize, &xonset, &yonset, &wonset))
+        &elemtemplate, &elemsize, 0, 0, 0, &xonset, &yonset, &wonset))
     {
         int incr;
             /* if it has more than 2000 points, just check 300 of them. */
@@ -900,6 +919,7 @@ static void array_getrect(t_array *array, t_glist *glist,
             array_getcoordinate(glist, (char *)(array->a_vec) +
                 i * elemsize,
                 xonset, yonset, wonset, i, 0, 0, 1,
+                0, 0, 0,
                 &pxpix, &pypix, &pwpix);
             if (pwpix < 2)
                 pwpix = 2;
@@ -1267,7 +1287,7 @@ static void garray_list(t_garray *x, t_symbol *s, int argc, t_atom *argv)
             if (argc <= 0) return;
         }
         for (i = 0; i < argc; i++)
-            *((float *)(array->a_vec + elemsize * i) + yonset)
+            *((float *)(array->a_vec + elemsize * (i + firstindex)) + yonset)
                 = atom_getfloat(argv + i);
     }
     garray_redraw(x);
@@ -1403,6 +1423,8 @@ void garray_resize(t_garray *x, t_floatarg f)
         template_findbyname(x->x_scalar->sc_template),
             gensym("style"), x->x_scalar->sc_vec, 1));
     array_resize_and_redraw(array, x->x_glist, n);
+    if (x->x_usedindsp)
+        canvas_update_dsp();
 }
 
 static void garray_print(t_garray *x)

@@ -519,7 +519,7 @@ int glist_isgraph(t_glist *x)
 static void canvas_setbounds(t_canvas *x, int x1, int y1, int x2, int y2)
 {
     int heightwas = y2 - y1;
-    int heightchange = y2 - y1 - (x->gl_screeny2 - x->gl_screeny1);
+    int heightchange = y2 - y1 - (x->gl_screeny2 - x->gl_screeny1);    
     if (x->gl_screenx1 == x1 && x->gl_screeny1 == y1 &&
         x->gl_screenx2 == x2 && x->gl_screeny2 == y2)
             return;
@@ -527,7 +527,6 @@ static void canvas_setbounds(t_canvas *x, int x1, int y1, int x2, int y2)
     x->gl_screeny1 = y1;
     x->gl_screenx2 = x2;
     x->gl_screeny2 = y2;
-    /* post("set bounds %d %d %d %d", x1, y1, x2, y2); */
     if (!glist_isgraph(x) && (x->gl_y2 < x->gl_y1)) 
     {
             /* if it's flipped so that y grows upward,
@@ -753,6 +752,7 @@ void canvas_vis(t_canvas *x, t_floatarg f)
                 canvas_create_editor(x, 0);
             return;
         }
+        sys_vgui("pdtk_canvas_getscroll .x%lx.c\n", x);
         glist_noselect(x);
         if (glist_isvisible(x))
             canvas_map(x, 0);
@@ -1326,8 +1326,8 @@ void glist_redrawitem(t_glist *owner, t_gobj *gobj)
 
     /* redraw all "scalars" (do this if a drawing command is changed.) 
     LATER we'll use the "template" information to select which ones we
-    redraw.  */
-static void glist_redrawall(t_glist *gl)
+    redraw.   Action = 0 for redraw, 1 for draw only, 2 for erase. */
+static void glist_redrawall(t_glist *gl, int action)
 {
     t_gobj *g;
     int vis = glist_isvisible(gl);
@@ -1335,19 +1335,55 @@ static void glist_redrawall(t_glist *gl)
     {
         t_class *cl;
         if (vis && g->g_pd == scalar_class)
-            glist_redrawitem(gl, g);
+        {
+            if (action == 1)
+            {
+                if (glist_isvisible(gl))
+                    gobj_vis(g, gl, 1);
+            }
+            else if (action == 2)
+            {
+                if (glist_isvisible(gl))
+                    gobj_vis(g, gl, 0);
+            }
+            else glist_redrawitem(gl, g);
+        }
         else if (g->g_pd == canvas_class)
-            glist_redrawall((t_glist *)g);
+            glist_redrawall((t_glist *)g, action);
     }
 }
 
-    /* public interface for above */
-void canvas_redrawallfortemplate( t_template *template)
+    /* public interface for above. */
+void canvas_redrawallfortemplate(t_template *template, int action)
 {
     t_canvas *x;
         /* find all root canvases */
     for (x = canvas_list; x; x = x->gl_next)
-        glist_redrawall(x);
+        glist_redrawall(x, action);
+}
+
+    /* find the template defined by a canvas, and redraw all elements
+    for that */
+void canvas_redrawallfortemplatecanvas(t_canvas *x, int action)
+{
+    t_gobj *g;
+    t_template *tmpl;
+    t_symbol *s1 = gensym("struct");
+    for (g = x->gl_list; g; g = g->g_next)
+    {
+        t_object *ob = pd_checkobject(&g->g_pd);
+        t_atom *argv;
+        if (!ob || ob->te_type != T_OBJECT ||
+            binbuf_getnatom(ob->te_binbuf) < 2)
+            continue;
+        argv = binbuf_getvec(ob->te_binbuf);
+        if (argv[0].a_type != A_SYMBOL || argv[1].a_type != A_SYMBOL
+            || argv[0].a_w.w_symbol != s1)
+                continue;
+        tmpl = template_findbyname(argv[1].a_w.w_symbol);
+        canvas_redrawallfortemplate(tmpl, action);
+    }
+    canvas_redrawallfortemplate(0, action);
 }
 
 /* ------------------------------- setup routine ------------------------ */

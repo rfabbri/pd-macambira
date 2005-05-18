@@ -54,6 +54,9 @@
 #pragma warning( disable : 4101 )  /* unused local variables */
 #endif
 
+/* the following is needed only to declare pd_fft() as exportable in MSW */
+#include "m_pd.h"
+
 #define REAL float
 #define GOOD_TRIG
 

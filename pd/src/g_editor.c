@@ -1911,6 +1911,7 @@ static void canvas_cut(t_canvas *x)
             canvas_undo_set_cut(x, UCUT_CUT), "cut");
         canvas_copy(x);
         canvas_doclear(x);
+        sys_vgui("pdtk_canvas_getscroll .x%lx.c\n", x);
     }
 }
 
@@ -1949,6 +1950,7 @@ static void canvas_dopaste(t_canvas *x, t_binbuf *b)
     paste_canvas = 0;
     canvas_resume_dsp(dspstate);
     canvas_dirty(x, 1);
+    sys_vgui("pdtk_canvas_getscroll .x%lx.c\n", x);
     glist_donewloadbangs(x);
 }
 

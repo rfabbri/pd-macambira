@@ -50,6 +50,18 @@ if {$pd_nt == 2} {
     set pd_guidir $pd_gui2/..
     load $pd_guidir/bin/pdtcl
     set pd_tearoff 0
+
+	 # tk::mac::OpenDocument is called with the filenames put into the 
+	 # var args whenever docs are either dropped on the Pd.app icon or 
+	 # opened from the Finder.
+	 # It uses menu_doc_open so it can handles numerous file types.
+	 proc tk::mac::OpenDocument {args} {
+		  foreach file $args {
+				pd [concat pd open [pdtk_enquote [file tail $file]] \
+						  [pdtk_enquote  [file dirname $file]] \;]
+				menu_doc_open [file dirname $file] [file tail $file]
+		  }
+	 }
 }
 
 # hack so you can easily test-run this script in linux... define pd_guidir
@@ -74,6 +86,8 @@ bind Text <Control-s> {}
 # puts stderr [bind all]
 
 ################## set up main window #########################
+# the menus are instantiated here for the main window
+# for the patch windows, they are created by pdtk_canvas_new
 menu .mbar
 canvas .dummy -height 2p -width 6c
 
@@ -88,13 +102,25 @@ menu .mbar.audio -tearoff $pd_tearoff
 if {$pd_nt != 2} {
     .mbar add cascade -label "Windows" -menu .mbar.windows
     .mbar add cascade -label "Media" -menu .mbar.audio
+# a menu on the main menubar named $whatever.help while be treated
+# as a special menu with specific behaviors on different platforms.
+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
+	 menu .mbar.help -tearoff $pd_tearoff
+	 .mbar add cascade -label "Help" -menu .mbar.help
 } else {
-# Perhaps this is silly, but Mac HIG want "Window  Help" as the last menus
+	 menu .mbar.apple -tearoff 0
+	 .mbar add cascade -label "Apple" -menu .mbar.apple 
+# arrange menus according to Apple HIG
     .mbar add cascade -label "Media" -menu .mbar.audio
-    .mbar add cascade -label "Windows" -menu .mbar.windows
+    .mbar add cascade -label "Window" -menu .mbar.windows
+# a menu on the main menubar named "$whatever.help" while be treated
+# as a special menu with specific behaviors on different platforms.
+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
+# Apple doesn't allow cascading menus in their Help so I had to call this 
+# one $mbar.docs # <hans@at.or.at>
+	 menu .mbar.docs -tearoff $pd_tearoff
+	 .mbar add cascade -label "Help" -menu .mbar.docs
 }
-menu .mbar.help -tearoff $pd_tearoff
-.mbar add cascade -label "Help" -menu .mbar.help
 
 set ctrls_audio_on 0
 set ctrls_meter_on 0
@@ -263,22 +289,26 @@ proc menu_new {} {
 
 proc menu_open {} {
     global pd_opendir
-
     set filename [tk_getOpenFile -defaultextension .pd \
     	-filetypes { {{pd files} {.pd}} {{max files} {.pat}}} \
         -initialdir $pd_opendir]
+    if {$filename != ""} {open_file $filename}
+}
 
-    if {$filename != ""} {
-    	set directory [string range $filename 0 \
-    	    [expr [string last / $filename ] - 1]]
-    	set pd_opendir $directory
-    	set basename [string range $filename \
-    	    [expr [string last / $filename ] + 1] end]
+proc open_file {filename} {
+    global pd_opendir
+    set directory [string range $filename 0 [expr [string last / $filename] - 1]]
+    set pd_opendir $directory
+    set basename [string range $filename [expr [string last / $filename] + 1] end]
+    if {[string last .pd $filename] >= 0} {
+        pd "pd open [pdtk_enquote $basename] [pdtk_enquote $directory] ;"
+    }
+}
 
-#    	 pd_debug [concat file $filename base $basename dir $directory]
-
-    	pd [concat pd open [pdtk_enquote $basename] \
-		[pdtk_enquote $directory]\;]
+catch {
+    package require tkdnd
+    dnd bindtarget . text/uri-list <Drop> {
+	foreach file %D {open_file $file}
     }
 }
 
@@ -311,13 +341,15 @@ proc menu_audio {flag} {pd [concat pd dsp $flag \;]}
 
 set doc_number 1
 
+# open text docs in a Pd window
 proc menu_opentext {filename} {
     global doc_number
     global pd_guidir
     global pd_myversion
+	global pd_font3
     set name [format ".help%d" $doc_number]
     toplevel $name
-    text $name.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
+    text $name.text -relief raised -bd 2 -font $pd_font3 \
     	-yscrollcommand "$name.scroll set" -background white
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
@@ -334,15 +366,34 @@ proc menu_opentext {filename} {
     set doc_number [expr $doc_number + 1] 
 }
 
+# open HTML docs from the menu using the OS-default HTML viewer
+proc menu_openhtml {filename} {
+    global pd_nt	 
+
+    if {$pd_nt == 0} {
+        exec sh -c \
+            [format "firefox file:%s || mozilla file:%s &\n" \
+                $filename $filename]
+    } elseif {$pd_nt == 2} {
+        puts stderr [format "open %s" $filename]
+            exec sh -c [format "open %s" $filename]
+    } else {
+        exec rundll32 url.dll,FileProtocolHandler \
+            [format "file:%s" $filename] &
+    }
+}
+
 set help_directory $pd_guidir/doc
+set help_top_directory $pd_guidir/doc
 
 proc menu_documentation {} {
     global help_directory
     global pd_nt
+    global pd_guidir
 
     if {$pd_nt == 2} {
     	exec rm -rf /tmp/pd-documentation
-    	exec cp -pr $help_directory /tmp/pd-documentation
+    	exec cp -pr $pd_guidir/doc /tmp/pd-documentation
 	set filename [tk_getOpenFile -defaultextension .pd \
 	-filetypes { {{documentation} {.pd .txt .htm}} } \
 	-initialdir /tmp/pd-documentation]
@@ -355,18 +406,7 @@ proc menu_documentation {} {
     	if {[string first .txt $filename] >= 0} {
     	    menu_opentext $filename
     	} elseif {[string first .htm $filename] >= 0} {
-	    if {$pd_nt == 0} {
-	    	exec sh -c \
-		    [format "mozilla file:%s || netscape file:%s &\n" \
-		    	 $filename $filename]
-            } elseif {$pd_nt == 2} {
-		puts stderr [format "open %s" $filename]
-                exec sh -c \
-		    [format "open %s" $filename]
-	    } else {
-     	    	exec rundll32 url.dll,FileProtocolHandler \
-		    [format "file:%s" $filename] &
-    	    }
+				menu_openhtml $filename
 	} else {
 	    set help_directory [string range $filename 0 \
     		[expr [string last / $filename ] - 1]]
@@ -383,18 +423,43 @@ proc menu_doc_open {subdir basename} {
  
     set dirname $pd_guidir/$subdir
 
-    if {[string first .txt $basename] >= 0} {
+    if {[regexp ".*\.(txt|c)$" $basename]} {
     	menu_opentext $dirname/$basename
+    } elseif {[regexp ".*\.html?$" $basename]} {
+		  menu_openhtml $dirname/$basename
     } else {
     	pd [concat pd open [pdtk_enquote $basename] \
 		[pdtk_enquote $dirname] \;]
     }
 }
 
-############# routine to add audio and help menus ###############
+proc doc_submenu {helpmenu subdir} {
+	 global help_top_directory pd_tearoff
+
+	 set menudir $help_top_directory/$subdir
+
+    regsub -all "\\\." $subdir "" submenu
+
+	 menu $helpmenu.$submenu -tearoff $pd_tearoff
+    regsub -all "\\\." $subdir " " submenuname
+	 $helpmenu add cascade -label $submenuname \
+		  -menu $helpmenu.$submenu
+    catch {
+# use this glob pattern to exclude the supporting files
+#	 foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
+	 foreach file [ lsort [ glob -dir $menudir * ] ] {
+		  set filename ""
+		  regsub {.*/(.*\..+$)} $file {\1} filename
+		  $helpmenu.$submenu add command -label $filename \
+				-command "menu_doc_open doc/$subdir $filename"
+	 }
+    }
+}
+
+############# routine to add media, help, and apple menu items ###############
 
 proc menu_addstd {mbar} {
-    global pd_apilist
+    global pd_apilist pd_nt pd_tearoff
 #          the "Audio" menu
     $mbar.audio add command -label {audio ON} -accelerator [accel_munge "Ctrl+/"] \
 	-command {menu_audio 1} 
@@ -406,21 +471,66 @@ proc menu_addstd {mbar} {
 	    	-value [lindex [lindex $pd_apilist $x] 1]\
 		-command {pd [concat pd audio-setapi $pd_whichapi \;]}
     }
+	 if {$pd_nt != 2} {
     $mbar.audio add command -label {Audio settings...} \
 	-command {pd pd audio-properties \;}
-
     $mbar.audio add command -label {MIDI settings...} \
 	-command {pd pd midi-properties \;}
+	 }
+	 
     $mbar.audio add command -label {Test Audio and MIDI} \
 	-command {menu_doc_open doc/7.stuff/tools testtone.pd} 
     $mbar.audio add command -label {Load Meter} \
 	-command {menu_doc_open doc/7.stuff/tools load-meter.pd} 
 
+#       the MacOS X app menu
+
+# The menu on the main menubar named $whatever.apple while be treated
+# as a special menu on MacOS X.  Tcl/Tk assigns the $whatever.apple menu
+# to the app-specific menu in MacOS X that is named after the app,
+# so in our case, the Pd menu.  <hans@at.or.at>
+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
+	 if {$pd_nt == 2} {
+		  $mbar.apple add command -label "About Pd..." -command \
+				{menu_doc_open doc/1.manual 1.introduction.txt} 
+		  menu $mbar.apple.preferences -tearoff 0
+		  $mbar.apple add cascade -label "Preferences" -menu $mbar.apple.preferences
+		  $mbar.apple.preferences add command -label "Path..." \
+				-command {pd pd start-path-dialog \;}
+		  $mbar.apple.preferences add command -label "Startup..." \
+				-command {pd pd start-startup-dialog \;}
+		  $mbar.apple.preferences add command -label "Audio Settings..." \
+				-command {pd pd audio-properties \;}
+		  $mbar.apple.preferences add command -label "MIDI settings..." \
+				-command {pd pd midi-properties \;}
+	 }
+
+
 #          the "Help" menu
+	 if {$pd_nt != 2} {
+# a menu on the main menubar named "$whatever.help" while be treated
+# as a special menu with specific behaviors on different platforms.
+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
     $mbar.help add command -label {About Pd} \
 	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
     $mbar.help add command -label {Pure Documentation...} \
 	-command {menu_documentation} 
+		  # add menu items for each section instead of using Pd patches
+		  $mbar.help add separator
+		  set helpmenuname help
+	 } else {
+# Apple doesn't allow cascading menus in their Help so I had to call this 
+# one "docs"  <hans@at.or.at>
+		  set helpmenuname docs
+	 }
+
+	 $mbar.$helpmenuname add command -label {1 manual...} \
+		  -command {menu_doc_open doc/1.manual index.htm} 
+	 doc_submenu $mbar.$helpmenuname 2.control.examples
+	 doc_submenu $mbar.$helpmenuname 3.audio.examples
+	 doc_submenu $mbar.$helpmenuname 4.fft.examples
+	 doc_submenu $mbar.$helpmenuname 5.reference
+	 doc_submenu $mbar.$helpmenuname 6.externs
 }
 
 #################### the "File" menu for the Pd window ##############
@@ -432,16 +542,20 @@ proc menu_addstd {mbar} {
 .mbar.file add  separator
 .mbar.file add command -label Message -command {menu_send} \
     -accelerator [accel_munge "Ctrl+m"]
+# On MacOS X, these are in the standard HIG locations
+# i.e. the Preferences menu under "Pd"
+if {$pd_nt != 2} {
 .mbar.file add command -label Path... \
     -command {pd pd start-path-dialog \;}
 .mbar.file add command -label Startup... \
     -command {pd pd start-startup-dialog \;}
+}
 .mbar.file add  separator
 .mbar.file add command -label Quit -command {menu_quit} \
     -accelerator [accel_munge "Ctrl+q"]
 
 #################### the "Find" menu for the Pd window ##############
-.mbar.find add command -label {last error?} -command {menu_finderror} 
+.mbar.find add command -label {Find last error} -command {menu_finderror} 
 
 ###########  functions for menu functions on document windows ########
 
@@ -466,6 +580,7 @@ proc menu_print {name} {
 }
 
 proc menu_close {name} {
+    pdtk_canvas_checkgeometry $name
     pd [concat $name menuclose \;]
 }
 
@@ -721,8 +836,22 @@ proc pdtk_canvas_new {name width height geometry editable} {
     global pd_nt
 
     toplevel $name -menu $name.m
-#    puts stderr [concat geometry: $geometry]
-    wm geometry $name $geometry
+
+# slide offscreen windows into view
+    set geometry [split $geometry +]
+    set i 1
+    foreach geo {width height} {
+	set screen($geo) [winfo screen$geo .]
+	if {[expr [lindex $geometry $i] + [set $geo]] > $screen($geo)} {
+	    set pos($geo) [expr $screen($geo) - [set $geo]]
+	    if {$pos($geo) < 0} {set pos($geo) 0}
+	    lset geometry $i $pos($geo)
+	}
+	incr i
+    }
+    set geometry [join $geometry +] 
+
+   wm geometry $name $geometry
     canvas $name.c -width $width -height $height -background white \
     	-yscrollcommand "$name.scrollvert set" \
     	-xscrollcommand "$name.scrollhort set" \
@@ -739,6 +868,9 @@ proc pdtk_canvas_new {name width height geometry editable} {
     wm geometry $name $geometry
 # the file menu
 
+# The menus are instantiated here for the patch windows.
+# For the main window, they are created on load, at the 
+# top of this file.
     menu $name.m
     menu $name.m.file -tearoff $pd_tearoff
     $name.m add cascade -label File -menu $name.m.file
@@ -753,11 +885,15 @@ proc pdtk_canvas_new {name width height geometry editable} {
     $name.m.file add command -label Message -command {menu_send} \
 	-accelerator [accel_munge "Ctrl+m"]
 
+	 # arrange menus according to Apple HIG
+	 # these are now part of Preferences...
+	 if {$pd_nt != 2 } {
     $name.m.file add command -label Path... \
     	-command {pd pd start-path-dialog \;} 
 
     $name.m.file add command -label Startup... \
     	-command {pd pd start-startup-dialog \;} 
+	 }
 
     $name.m.file add  separator
     $name.m.file add command -label Close \
@@ -823,6 +959,18 @@ proc pdtk_canvas_new {name width height geometry editable} {
 
     $name.m.edit add separator
     
+# Apple, Microsoft, and others put find functions in the Edit menu.
+    $name.m.edit add command -label {Find...} \
+		  -accelerator [accel_munge "Ctrl+f"] \
+		  -command [concat menu_findobject $name] 
+    $name.m.edit add command -label {Find Again} \
+		  -accelerator [accel_munge "Ctrl+g"] \
+		  -command [concat menu_findagain $name] 
+    $name.m.edit add command -label {Find last error} \
+		  -command [concat menu_finderror] 
+
+    $name.m.edit add separator
+
 ############iemlib##################
 # instead of "red = #BC3C60" we take "grey85", so there is no difference,
 # if widget is selected or not.
@@ -834,8 +982,241 @@ proc pdtk_canvas_new {name width height geometry editable} {
 
     if { $editable == 0 } {
             $name.m.edit entryconfigure "Edit mode" -indicatoron false }
+
 	
 ############iemlib##################
+
+
+# the put menu
+    menu $name.m.put -tearoff $pd_tearoff
+    $name.m add cascade -label Put -menu $name.m.put
+
+    $name.m.put add command -label Object \
+    	-command [concat menu_object $name 0] \
+	-accelerator [accel_munge "Ctrl+1"]
+
+    $name.m.put add command -label Message \
+    	-command [concat menu_message $name 0] \
+	-accelerator [accel_munge "Ctrl+2"]
+
+    $name.m.put add command -label Number \
+    	-command [concat menu_floatatom $name 0] \
+	-accelerator [accel_munge "Ctrl+3"]
+
+    $name.m.put add command -label Symbol \
+    	-command [concat menu_symbolatom $name 0] \
+	-accelerator [accel_munge "Ctrl+4"]
+
+    $name.m.put add command -label Comment \
+    	-command [concat menu_comment $name 0] \
+	-accelerator [accel_munge "Ctrl+5"]
+
+    $name.m.put add separator
+	
+############iemlib##################
+
+    $name.m.put add command -label Bang \
+    	-command [concat menu_bng $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+b"]
+    
+    $name.m.put add command -label Toggle \
+    	-command [concat menu_toggle $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+t"]
+    
+    $name.m.put add command -label Number2 \
+    	-command [concat menu_numbox $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+n"]
+    
+    $name.m.put add command -label Vslider \
+    	-command [concat menu_vslider $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+v"]
+    
+    $name.m.put add command -label Hslider \
+    	-command [concat menu_hslider $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+h"]
+    
+    $name.m.put add command -label Vradio \
+    	-command [concat menu_vradio $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+d"]
+    
+    $name.m.put add command -label Hradio \
+    	-command [concat menu_hradio $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+i"]
+    
+    $name.m.put add command -label VU \
+    	-command [concat menu_vumeter $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+u"]
+    
+    $name.m.put add command -label Canvas \
+    	-command [concat menu_mycnv $name 0] \
+	-accelerator [accel_munge "Shift+Ctrl+c"]
+
+############iemlib##################
+    
+    $name.m.put add separator
+	
+    $name.m.put add command -label Graph \
+    	-command [concat menu_graph $name] 
+
+    $name.m.put add command -label Array \
+    	-command [concat menu_array $name] 
+
+# the find menu
+# Apple, Microsoft, and others put find functions in the Edit menu.
+# But in order to move these items to the Edit menu, the Find menu
+# handling needs to be dealt with, including this line in g_canvas.c:
+#         sys_vgui(".mbar.find delete %d\n", i);
+# <hans@at.or.at>
+    menu $name.m.find -tearoff $pd_tearoff
+    $name.m add cascade -label Find -menu $name.m.find
+
+    $name.m.find add command -label {Find...} \
+	-accelerator [accel_munge "Ctrl+f"] \
+    	-command [concat menu_findobject $name] 
+    $name.m.find add command -label {Find Again} \
+	-accelerator [accel_munge "Ctrl+g"] \
+    	-command [concat menu_findagain $name] 
+    $name.m.find add command -label {Find last error} \
+    	-command [concat menu_finderror] 
+    
+# the window menu
+    menu $name.m.windows -postcommand [concat menu_fixwindowmenu $name] \
+	-tearoff $pd_tearoff
+
+    $name.m.windows add command -label {parent window}\
+    	-command [concat menu_windowparent $name] 
+    $name.m.windows add command -label {Pd window} -command menu_pop_pd
+    $name.m.windows add separator
+
+# the audio menu
+    menu $name.m.audio -tearoff $pd_tearoff
+
+    if {$pd_nt != 2} {
+        $name.m add cascade -label Windows -menu $name.m.windows
+        $name.m add cascade -label Media -menu $name.m.audio
+    } else {
+        $name.m add cascade -label Media -menu $name.m.audio
+        $name.m add cascade -label Window -menu $name.m.windows
+# the MacOS X app menu
+		  menu $name.m.apple -tearoff $pd_tearoff
+		  $name.m add cascade -label "Apple" -menu $name.m.apple 
+    }
+
+# the help menu
+
+# a menu on the main menubar named "$whatever.help" while be treated
+# as a special menu with specific behaviors on different platforms.
+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
+	 if {$pd_nt != 2} {
+    menu $name.m.help -tearoff $pd_tearoff
+    $name.m add cascade -label Help -menu $name.m.help
+	 } else {
+		  # Apple doesn't allow cascading menus in their Help
+		  # so I had to call this one "docs". <hans@at.or.at>
+		  menu $name.m.docs -tearoff $pd_tearoff
+		  $name.m add cascade -label Help -menu  $name.m.docs
+	 }
+
+    menu_addstd $name.m
+
+# the popup menu
+    menu $name.popup -tearoff false
+    $name.popup add command -label {Properties} \
+	-command [concat popup_action $name 0] 
+    $name.popup add command -label {Open} \
+	-command [concat popup_action $name 1] 
+    $name.popup add command -label {Help} \
+	-command [concat popup_action $name 2] 
+
+# WM protocol
+    wm protocol $name WM_DELETE_WINDOW [concat menu_close $name]
+
+# bindings.
+# this is idiotic -- how do you just sense what mod keys are down and
+# pass them on? I can't find it anywhere.
+# Here we encode shift as 1, control 2, alt 4, in agreement
+# with definitions in g_canvas.c.  The third button gets "8" but we don't
+# bother with modifiers there.
+# We don't handle multiple clicks yet.
+
+    bind $name.c <Button> {pdtk_canvas_click %W %x %y %b 0}
+    bind $name.c <Shift-Button> {pdtk_canvas_click %W %x %y %b 1}
+    bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
+    # Alt key is called Option on the Mac
+    if {$pd_nt == 2} {
+    	bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
+    	bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+    	bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+    	bind $name.c <Option-Control-Shift-Button> \
+	    {pdtk_canvas_click %W %x %y %b 7}
+    } else {
+    	bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
+    	bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+    	bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+    	bind $name.c <Alt-Control-Shift-Button> \
+	    {pdtk_canvas_click %W %x %y %b 7}
+    }
+    global pd_nt
+# button 2 is the right button on Mac; on other platforms it's button 3.
+    if {$pd_nt == 2} {
+        bind $name.c <Button-2> {pdtk_canvas_click %W %x %y %b 8}
+        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 8}
+    } else {
+        bind $name.c <Button-3> {pdtk_canvas_click %W %x %y %b 8}
+        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 2}
+    }
+#on linux, button 2 "pastes" from the X windows clipboard
+    if {$pd_nt == 0} {
+    	bind $name.c <Button-2> {\
+	    pdtk_canvas_click %W %x %y %b 0;\
+	     pdtk_canvas_mouseup %W %x %y %b;\
+	     pdtk_pastetext}
+    }
+
+    bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
+    bind $name.c <Control-Key> {pdtk_canvas_ctrlkey %W %K 0}
+    bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+#    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
+    if {$pd_nt == 2} {
+	bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+	bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+    }
+    bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
+    bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
+    bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
+    bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
+    bind $name.c <Control-Motion> {pdtk_canvas_motion %W %x %y 2}
+    if {$pd_nt == 2} {
+        bind $name.c <Option-Motion> {pdtk_canvas_motion %W %x %y 4}
+    } else { 
+        bind $name.c <Alt-Motion> {pdtk_canvas_motion %W %x %y 4}
+    }   
+    bind $name.c <Map> {pdtk_canvas_map %W}
+    bind $name.c <Unmap> {pdtk_canvas_unmap %W}
+    focus $name.c
+
+    switch $pd_nt { 0 {
+	bind $name.c <Button-4>  "pdtk_canvas_scroll $name.c y -1"
+    	bind $name.c <Button-5>  "pdtk_canvas_scroll $name.c y +1"
+	bind $name.c <Shift-Button-4>  "pdtk_canvas_scroll $name.c x -1"
+    	bind $name.c <Shift-Button-5>  "pdtk_canvas_scroll $name.c x +1"
+    } default {
+	bind $name.c  <MouseWheel> \
+	    "pdtk_canvas_scroll $name.c y \[expr -abs(%D)/%D\]"
+	bind $name.c  <Shift-MouseWheel> \
+	    "pdtk_canvas_scroll $name.c x \[expr -abs(%D)/%D\]"
+    }}
+
+    catch {
+	dnd bindtarget $name.c text/uri-list <Drop> \
+	    "pdtk_canvas_makeobjs $name %D %x %y"
+    }
+
+#    puts stderr "all done"
+#   after 1 [concat raise $name]
+    global pdtk_canvas_mouseup_name
+    set pdtk_canvas_mouseup_name ""
+}
 
 #### jsarlo #####
 proc pdtk_array_listview_setpage {arrayName page} {
@@ -1041,203 +1422,6 @@ proc pdtk_array_listview_close {id arrayName} {
 }
 ##### end jsarlo #####
 
-# the put menu
-    menu $name.m.put -tearoff $pd_tearoff
-    $name.m add cascade -label Put -menu $name.m.put
-
-    $name.m.put add command -label Object \
-    	-command [concat menu_object $name 0] \
-	-accelerator [accel_munge "Ctrl+1"]
-
-    $name.m.put add command -label Message \
-    	-command [concat menu_message $name 0] \
-	-accelerator [accel_munge "Ctrl+2"]
-
-    $name.m.put add command -label Number \
-    	-command [concat menu_floatatom $name 0] \
-	-accelerator [accel_munge "Ctrl+3"]
-
-    $name.m.put add command -label Symbol \
-    	-command [concat menu_symbolatom $name 0] \
-	-accelerator [accel_munge "Ctrl+4"]
-
-    $name.m.put add command -label Comment \
-    	-command [concat menu_comment $name 0] \
-	-accelerator [accel_munge "Ctrl+5"]
-
-    $name.m.put add separator
-	
-############iemlib##################
-
-    $name.m.put add command -label Bang \
-    	-command [concat menu_bng $name 0] \
-	-accelerator [accel_munge "Alt+b"]
-    
-    $name.m.put add command -label Toggle \
-    	-command [concat menu_toggle $name 0] \
-	-accelerator [accel_munge "Alt+t"]
-    
-    $name.m.put add command -label Number2 \
-    	-command [concat menu_numbox $name 0] \
-	-accelerator [accel_munge "Alt+n"]
-    
-    $name.m.put add command -label Vslider \
-    	-command [concat menu_vslider $name 0] \
-	-accelerator [accel_munge "Alt+v"]
-    
-    $name.m.put add command -label Hslider \
-    	-command [concat menu_hslider $name 0] \
-	-accelerator [accel_munge "Alt+h"]
-    
-    $name.m.put add command -label Vradio \
-    	-command [concat menu_vradio $name 0] \
-	-accelerator [accel_munge "Alt+d"]
-    
-    $name.m.put add command -label Hradio \
-    	-command [concat menu_hradio $name 0] \
-	-accelerator [accel_munge "Alt+i"]
-    
-    $name.m.put add command -label VU \
-    	-command [concat menu_vumeter $name 0] \
-	-accelerator [accel_munge "Alt+u"]
-    
-    $name.m.put add command -label Canvas \
-    	-command [concat menu_mycnv $name 0] \
-	-accelerator [accel_munge "Alt+c"]
-
-############iemlib##################
-    
-    $name.m.put add separator
-	
-    $name.m.put add command -label Graph \
-    	-command [concat menu_graph $name] 
-
-    $name.m.put add command -label Array \
-    	-command [concat menu_array $name] 
-
-# the find menu
-    menu $name.m.find -tearoff $pd_tearoff
-    $name.m add cascade -label Find -menu $name.m.find
-
-    $name.m.find add command -label {Find...} \
-	-accelerator [accel_munge "Ctrl+f"] \
-    	-command [concat menu_findobject $name] 
-    $name.m.find add command -label {Find Again} \
-	-accelerator [accel_munge "Ctrl+g"] \
-    	-command [concat menu_findagain $name] 
-    $name.m.find add command -label {Find last error} \
-    	-command [concat menu_finderror] 
-    
-# the window menu
-    menu $name.m.windows -postcommand [concat menu_fixwindowmenu $name] \
-	-tearoff $pd_tearoff
-
-    $name.m.windows add command -label {parent window}\
-    	-command [concat menu_windowparent $name] 
-    $name.m.windows add command -label {Pd window} -command menu_pop_pd
-    $name.m.windows add separator
-
-# the audio menu
-    menu $name.m.audio -tearoff $pd_tearoff
-
-    if {$pd_nt != 2} {
-        $name.m add cascade -label Windows -menu $name.m.windows
-        $name.m add cascade -label Media -menu $name.m.audio
-    } else {
-        $name.m add cascade -label Media -menu $name.m.audio
-        $name.m add cascade -label Window -menu $name.m.windows
-    }
-
-# the help menu
-    menu $name.m.help -tearoff $pd_tearoff
-    $name.m add cascade -label Help -menu $name.m.help
-
-    menu_addstd $name.m
-
-# the popup menu
-    menu $name.popup -tearoff false
-    $name.popup add command -label {Properties} \
-	-command [concat popup_action $name 0] 
-    $name.popup add command -label {Open} \
-	-command [concat popup_action $name 1] 
-    $name.popup add command -label {Help} \
-	-command [concat popup_action $name 2] 
-
-# WM protocol
-    wm protocol $name WM_DELETE_WINDOW [concat menu_close $name]
-
-# bindings.
-# this is idiotic -- how do you just sense what mod keys are down and
-# pass them on? I can't find it anywhere.
-# Here we encode shift as 1, control 2, alt 4, in agreement
-# with definitions in g_canvas.c.  The third button gets "8" but we don't
-# bother with modifiers there.
-# We don't handle multiple clicks yet.
-
-    bind $name.c <Button> {pdtk_canvas_click %W %x %y %b 0}
-    bind $name.c <Shift-Button> {pdtk_canvas_click %W %x %y %b 1}
-    bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
-    # Alt key is called Option on the Mac
-    if {$pd_nt == 2} {
-    	bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
-    	bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
-    	bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
-    	bind $name.c <Option-Control-Shift-Button> \
-	    {pdtk_canvas_click %W %x %y %b 7}
-    } else {
-    	bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
-    	bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
-    	bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
-    	bind $name.c <Alt-Control-Shift-Button> \
-	    {pdtk_canvas_click %W %x %y %b 7}
-    }
-    global pd_nt
-# button 2 is the right button on Mac; on other platforms it's button 3.
-    if {$pd_nt == 2} {
-        bind $name.c <Button-2> {pdtk_canvas_click %W %x %y %b 8}
-        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 8}
-    } else {
-        bind $name.c <Button-3> {pdtk_canvas_click %W %x %y %b 8}
-        bind $name.c <Control-Button> {pdtk_canvas_click %W %x %y %b 2}
-    }
-#on linux, button 2 "pastes" from the X windows clipboard
-    if {$pd_nt == 0} {
-    	bind $name.c <Button-2> {\
-	    pdtk_canvas_click %W %x %y %b 0;\
-	     pdtk_canvas_mouseup %W %x %y %b;\
-	     pdtk_pastetext}
-    }
-
-    bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
-    bind $name.c <Control-Key> {pdtk_canvas_ctrlkey %W %K 0}
-    bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
-    if {$pd_nt == 2} {
-    	bind $name.c <Option-Key> {pdtk_canvas_altkey %W %K %A}
-    } else {
-    	bind $name.c <Alt-Key> {pdtk_canvas_altkey %W %K %A}
-    }
-#    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
-    if {$pd_nt == 2} {
-	bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
-	bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
-    }
-    bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
-    bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
-    bind $name.c <KeyRelease> {pdtk_canvas_keyup %W %K %A}
-    bind $name.c <Motion> {pdtk_canvas_motion %W %x %y 0}
-    bind $name.c <Control-Motion> {pdtk_canvas_motion %W %x %y 2}
-    if {$pd_nt == 2} {
-        bind $name.c <Option-Motion> {pdtk_canvas_motion %W %x %y 4}
-    } else { 
-        bind $name.c <Alt-Motion> {pdtk_canvas_motion %W %x %y 4}
-    }   
-    bind $name.c <Map> {pdtk_canvas_map %W}
-    bind $name.c <Unmap> {pdtk_canvas_unmap %W}
-    focus $name.c
-#    puts stderr "all done"
-#   after 1 [concat raise $name]
-}
-
 #################### event binding procedures ################
 
 #get the name of the toplevel window for a canvas; this is also
@@ -1376,49 +1560,11 @@ proc pdtk_canvas_keyup {name key iso} {
     }
 }
 
-proc pdtk_canvas_altkey {name key iso} {
-#   puts stderr [concat alt-key $iso]
-############iemlib##################
-    set topname [string trimright $name .c]
-    if {$key == "b" || $key == "B"} {menu_bng $topname 1}
-    if {$key == "t" || $key == "T"} {menu_toggle $topname 1}
-    if {$key == "n" || $key == "N"} {menu_numbox $topname 1}
-    if {$key == "v" || $key == "V"} {menu_vslider $topname 1}
-    if {$key == "h" || $key == "H"} {menu_hslider $topname 1}
-    if {$key == "i" || $key == "I"} {menu_hradio $topname 1}
-    if {$key == "d" || $key == "D"} {menu_vradio $topname 1}
-    if {$key == "u" || $key == "U"} {menu_vumeter $topname 1}
-    if {$key == "c" || $key == "C"} {menu_mycnv $topname 1}
-############iemlib##################
-}
-
 proc pdtk_canvas_ctrlkey {name key shift} {
 # first get rid of ".c" suffix; we'll refer to the toplevel instead
     set topname [string trimright $name .c]
 #   puts stderr [concat ctrl-key $key $topname]
 
-    if {$key == "n" || $key == "N"} {menu_new}
-    if {$key == "o" || $key == "O"} {menu_open}
-    if {$key == "m" || $key == "M"} {menu_send}
-    if {$key == "q" || $key == "Q"}  {
-     	if {$shift == 1} {menu_really_quit} else {menu_quit}
-    }
-    if {$key == "s" || $key == "S"} {
-      	if {$shift == 1} {menu_saveas $topname} else {menu_save $topname}
-    }
-    if {$key == "z" || $key == "Z"} {
-      	if {$shift == 1} {menu_redo $topname} else {menu_undo $topname}
-    }
-    if {$key == "w" || $key == "W"} {menu_close $topname}
-    if {$key == "p" || $key == "P"} {menu_print $topname}
-    if {$key == "x" || $key == "X"} {menu_cut $topname}
-    if {$key == "c" || $key == "C"} {menu_copy $topname}
-    if {$key == "v" || $key == "V"} {menu_paste $topname}
-    if {$key == "d" || $key == "D"} {menu_duplicate $topname}
-    if {$key == "a" || $key == "A"} {menu_selectall $topname}
-    if {$key == "t" || $key == "T"} {menu_texteditor $topname}
-    if {$key == "f" || $key == "F"} {menu_findobject $topname}
-    if {$key == "g" || $key == "G"} {menu_findagain $topname}
     if {$key == "1"} {menu_object $topname 1}
     if {$key == "2"} {menu_message $topname 1}
     if {$key == "3"} {menu_floatatom $topname 1}
@@ -1426,7 +1572,42 @@ proc pdtk_canvas_ctrlkey {name key shift} {
     if {$key == "5"} {menu_comment $topname 1}
     if {$key == "slash"} {menu_audio 1}
     if {$key == "period"} {menu_audio 0}
-    if {$key == "e" || $key == "E"} {menu_editmode $topname}
+    if {$shift == 1} {
+        if {$key == "q" || $key == "Q"} {menu_really_quit}
+        if {$key == "s" || $key == "S"} {menu_saveas $topname}
+        if {$key == "z" || $key == "Z"} {menu_redo $topname}
+        if {$key == "b" || $key == "B"} {menu_bng $topname 1}
+        if {$key == "t" || $key == "T"} {menu_toggle $topname 1}
+        if {$key == "n" || $key == "N"} {menu_numbox $topname 1}
+        if {$key == "v" || $key == "V"} {menu_vslider $topname 1}
+        if {$key == "h" || $key == "H"} {menu_hslider $topname 1}
+        if {$key == "i" || $key == "I"} {menu_hradio $topname 1}
+        if {$key == "d" || $key == "D"} {menu_vradio $topname 1}
+        if {$key == "u" || $key == "U"} {menu_vumeter $topname 1}
+        if {$key == "c" || $key == "C"} {menu_mycnv $topname 1}
+    } else {
+        if {$key == "e" || $key == "E"} {menu_editmode $topname}
+        if {$key == "q" || $key == "Q"} {menu_quit}
+        if {$key == "s" || $key == "S"} {menu_save $topname}
+        if {$key == "z" || $key == "Z"} {menu_undo $topname}
+        if {$key == "n" || $key == "N"} {menu_new}
+        if {$key == "o" || $key == "O"} {menu_open}
+        if {$key == "m" || $key == "M"} {menu_send}
+        if {$key == "w" || $key == "W"} {menu_close $topname}
+        if {$key == "p" || $key == "P"} {menu_print $topname}
+        if {$key == "x" || $key == "X"} {menu_cut $topname}
+        if {$key == "c" || $key == "C"} {menu_copy $topname}
+        if {$key == "v" || $key == "V"} {menu_paste $topname}
+        if {$key == "d" || $key == "D"} {menu_duplicate $topname}
+        if {$key == "a" || $key == "A"} {menu_selectall $topname}
+        if {$key == "t" || $key == "T"} {menu_texteditor $topname}
+        if {$key == "f" || $key == "F"} {menu_findobject $topname}
+        if {$key == "g" || $key == "G"} {menu_findagain $topname}
+    }
+}
+
+proc pdtk_canvas_scroll {canvas xy distance} {
+    $canvas [list $xy]view scroll $distance units
 }
 
 proc pdtk_canvas_motion {name x y mods} {
@@ -1445,6 +1626,16 @@ proc pdtk_canvas_map {name} {
 proc pdtk_canvas_unmap {name} {
 #   puts stderr [concat unmap $name]
     pd [canvastosym $name] map 0 \;
+}
+
+proc pdtk_canvas_makeobjs {name files x y} {
+    set c 0
+    for {set n 0} {$n < [llength $files]} {incr n} {
+	if {[regexp {.*/(.+).pd$} [lindex $files $n] file obj] == 1} {
+	    pd $name obj $x [expr $y + ($c * 30)] [pdtk_enquote $obj] \;
+	    incr c
+	}
+    } 
 }
 
 set saveas_dir nowhere
@@ -2908,7 +3099,7 @@ proc dodata_ok {name} {
 }
 
 proc pdtk_data_dialog {name stuff} {
-    
+    global pd_font3
     toplevel $name
     wm title $name {Atom}
     wm protocol $name WM_DELETE_WINDOW [concat dodata_cancel $name]
@@ -2923,7 +3114,7 @@ proc pdtk_data_dialog {name stuff} {
     pack $name.buttonframe.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 40 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font -*-courier-bold--normal--12-*
+    	-yscrollcommand "$name.scroll set" -font pd_font3
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -2948,8 +3139,20 @@ proc pdtk_canvas_editval {name value} {
 proc pdtk_text_new {canvasname myname x y text font color} {
 #    if {$font < 13} {set fontname [format -*-courier-bold----%d-* $font]}
 #    if {$font >= 13} {set fontname [format -*-courier-----%d-* $font]}
+
+	global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7 
+	switch -- $font {
+		8  { set typeface $pd_font1 }
+		10 { set typeface $pd_font2 }
+		12 { set typeface $pd_font3 }
+		14 { set typeface $pd_font4 }
+		16 { set typeface $pd_font5 }
+		24 { set typeface $pd_font6 }
+		36 { set typeface $pd_font7 }
+	}
+
     $canvasname create text $x $y \
-    	-font [format -*-courier-bold--normal--%d-* $font] \
+    	-font $typeface \
     	-tags $myname -text $text -fill $color  -anchor nw 
 #    pd [concat $myname size [$canvasname bbox $myname] \;]
 }
@@ -2980,31 +3183,36 @@ proc pdtk_pd_ctrlkey {name key shift} {
 # asked pd to open something.  Also, get character width and height for
 # font sizes 8, 10, 12, 14, 16, and 24.
 
-proc pdtk_pd_startup {version apilist} {
+# tb: user defined typefaces
+proc pdtk_pd_startup {version apilist fontname} {
+#    puts stderr [concat $version $apilist $fontname]
     global pd_myversion pd_apilist
     set pd_myversion $version
     set pd_apilist $apilist
+	global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7
 
-    set width1 [font measure  -*-courier-bold--normal--8-* x]
-    set height1 [lindex [font metrics -*-courier-bold--normal--8-*] 5]
+	set pd_font1 [format -*-%s-bold--normal--8-* $fontname]
+	set pd_font2 [format -*-%s-bold--normal--10-* $fontname]
+ 	set pd_font3 [format -*-%s-bold--normal--12-* $fontname]
+ 	set pd_font4 [format -*-%s-bold--normal--14-* $fontname]
+	set pd_font5 [format -*-%s-bold--normal--16-* $fontname]
+	set pd_font6 [format -*-%s-bold--normal--24-* $fontname]
+	set pd_font7 [format -*-%s-bold--normal--36-* $fontname]
 
-    set width2 [font measure  -*-courier-bold--normal--10-* x]
-    set height2 [lindex [font metrics -*-courier-bold--normal--10-*] 5]
-
-    set width3 [font measure  -*-courier-bold--normal--12-* x]
-    set height3 [lindex [font metrics -*-courier-bold--normal--12-*] 5]
-
-    set width4 [font measure  -*-courier-bold--normal--14-* x]
-    set height4 [lindex [font metrics -*-courier-bold--normal--14-*] 5]
-
-    set width5 [font measure  -*-courier-bold--normal--16-* x]
-    set height5 [lindex [font metrics -*-courier-bold--normal--16-*] 5]
-
-    set width6 [font measure  -*-courier-bold--normal--24-* x]
-    set height6 [lindex [font metrics -*-courier-bold--normal--24-*] 5]
-
-    set width7 [font measure  -*-courier-bold--normal--36-* x]
-    set height7 [lindex [font metrics -*-courier-bold--normal--36-*] 5]
+    set width1 [font measure  $pd_font1 x]
+    set height1 [lindex [font metrics $pd_font1] 5]
+    set width2 [font measure  $pd_font2 x]
+    set height2 [lindex [font metrics $pd_font2] 5]
+    set width3 [font measure  $pd_font3 x]
+    set height3 [lindex [font metrics $pd_font3] 5]
+    set width4 [font measure  $pd_font4 x]
+    set height4 [lindex [font metrics $pd_font4] 5]
+    set width5 [font measure  $pd_font5 x]
+    set height5 [lindex [font metrics $pd_font5] 5]
+    set width6 [font measure  $pd_font6 x]
+    set height6 [lindex [font metrics $pd_font6] 5]
+    set width7 [font measure  $pd_font7 x]
+    set height7 [lindex [font metrics $pd_font7] 5]
 
     set tclpatch [info patchlevel]
     if {$tclpatch == "8.3.0" || \
@@ -3088,7 +3296,7 @@ proc texteditor_ok {name} {
 
 
 proc pdtk_pd_texteditor {stuff} {
-    global edit_number
+    global edit_number pd_font3
     set name [format ".text%d" $edit_number]
     set edit_number [expr $edit_number + 1]
 
@@ -3105,7 +3313,7 @@ proc pdtk_pd_texteditor {stuff} {
     pack $name.buttons.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 12 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font -*-courier-bold--normal--12-*
+    	-yscrollcommand "$name.scroll set" -font $pd_font3
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
