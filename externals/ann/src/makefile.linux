@@ -71,6 +71,17 @@ all: $(TARGETS:%.c=%.pd_linux)
 	$(CC) $(CFLAGS) $(INCLUDE) $(LDFLAGS) -o "$*.pd_linux" "$*.c" $(LIBS)
 	$(STRIP) $(STRIPFLAGS) "$*.pd_linux"
 
+
+ann: $(TARGETS:%.c=%.o)
+	$(CC) $(CFLAGS) $(INCLUDE) -o ann.o -c ann.c
+	$(CC) $(LDFLAGS) -o ann.pd_linux *.o $(LIBS)
+	$(STRIP) $(STRIPFLAGS) ann.pd_linux
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDE) -o "$*.o" -c "$*.c"
+
+
+
 everything: clean all install distclean
 
 distclean:
