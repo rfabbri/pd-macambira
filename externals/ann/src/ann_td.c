@@ -277,7 +277,6 @@ void run_the_net(t_ann_td *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;
 	unsigned j=0;
-	unsigned k=0;
 	//fann_type input[MAXINPUT];	
 	fann_type *calc_out;
 	t_atom lista[MAXOUTPUT];

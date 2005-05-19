@@ -329,9 +329,6 @@ static void som_dump(t_som *x, t_float nf){
   outlet_list(x->x_obj.ob_outlet, &s_list, x->num_sensors, ap);
 
   freebytes(ap, x->num_sensors*sizeof(t_atom));
-  
-
-
 }
 
 static void som_makenewsom(t_som *x, t_symbol *s, int argc, t_atom *argv)
@@ -756,6 +753,8 @@ static void som_setup(void)
 
   class_addmethod(som_class, (t_method)som_read, gensym("read"), A_GIMME, 0);
   class_addmethod(som_class, (t_method)som_write, gensym("write"), A_GIMME, 0);
+
+  class_addmethod(som_class, (t_method)som_dump, gensym("dump"), A_FLOAT, 0);
 
   class_addmethod(som_class, (t_method)som_print, gensym("print"), 0);
   class_addmethod(som_class, (t_method)som_help, gensym("help"), 0);
