@@ -1,5 +1,5 @@
-#N canvas 117 93 838 448 12;
-#N canvas 181 295 623 324 creation 0;
+#N canvas 99 68 846 456 12;
+#N canvas 181 295 627 328 creation 0;
 #X obj 52 235 outlet;
 #X msg 49 10 create;
 #X msg 72 68 create 2 1;
@@ -20,7 +20,7 @@
 #X connect 4 0 0 0;
 #X connect 5 0 0 0;
 #X restore 93 68 pd creation examples;
-#N canvas 136 60 724 352 run 0;
+#N canvas 136 60 728 356 run 0;
 #X obj 90 219 outlet;
 #X msg 123 69 0 1;
 #X msg 124 92 1 0;
@@ -150,7 +150,7 @@ don't use the same output for 2 meanings \, use 2 outputs intead \,
 #X text 270 353 an interface to fann classes (http://fann.sourceforge.net)
 ;
 #X text 272 371 by Davide Morelli - info@davidemorelli.it;
-#N canvas 468 204 572 403 train 0;
+#N canvas 468 204 580 411 train 0;
 #X obj 32 241 outlet;
 #N canvas 0 0 458 308 train 0;
 #N canvas 8 48 990 509 build 0;
@@ -303,17 +303,16 @@ ready \, write to a file \, edit the file adding a line at the beginning
 #X obj 56 139 outlet;
 #X connect 1 0 4 0;
 #X restore 79 103 pd train you net using a train file;
-#N canvas 100 44 884 550 train 0;
-#X obj 57 397 outlet;
+#N canvas 120 72 892 558 train 0;
+#X obj 55 487 outlet;
 #X msg 60 31 train;
 #X text 126 33 1- set the train mode;
-#X text 116 81 2- build a list with inputs and desired output;
-#X text 139 101 be shure you provide the correct numbers of inputs
+#X text 192 120 be shure you provide the correct numbers of inputs
 and outputs;
 #X obj 168 202 pack s f f f;
 #X obj 197 248 pack f f f;
 #X obj 168 225 unpack s f f f;
-#X msg 192 374 run;
+#X msg 190 464 run;
 #X obj 198 170 tgl 15 0 empty empty in1 0 -6 0 8 -262144 -1 -1 0 1
 ;
 #X obj 228 170 tgl 15 0 empty empty in2 0 -6 0 8 -262144 -1 -1 0 1
@@ -322,27 +321,63 @@ and outputs;
 1;
 #X obj 148 169 bng 15 250 50 0 empty empty train! 0 -6 0 8 -262144
 -1 -1;
-#X text 299 183 set inputs and output value \, then send the list clicking
+#X text 312 160 set inputs and output value \, then send the list clicking
 on the "train!" bang;
 #X msg 316 261 create 2 1;
-#X text 229 374 3- when you are ready switch again to run mode before
+#X text 227 464 3- when you are ready switch again to run mode before
 exiting;
 #X text 315 226 NOTE1: before training with this example you should
 have created a nn with 2 ins and 1 out with a command like:;
-#X text 311 291 NOTE2: while training the right outlet gives you the
-mean square error after each training pattern.;
-#X connect 1 0 0 0;
-#X connect 5 0 7 0;
+#N canvas 255 158 517 436 autotrain 0;
+#X obj 89 286 outlet;
+#X obj 85 87 metro 10;
+#X obj 85 38 tgl 15 0 empty empty toggle_training 0 -6 0 8 -262144
+-1 -1 0 1;
+#X msg 101 192 0 0 0;
+#X msg 126 215 0 1 1;
+#X msg 82 168 1 0 1;
+#X msg 150 244 1 1 1;
+#X obj 82 112 random 4;
+#X obj 83 138 sel 0 1 2 3;
+#X obj 226 125 f 0;
+#X obj 256 124 + 1;
+#X floatatom 226 149 8 0 0 0 - - -;
+#X text 113 36 <--train OR untile mse is low enough;
+#X text 143 51 (you must be in train mode);
+#X connect 1 0 7 0;
+#X connect 1 0 9 0;
+#X connect 2 0 1 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
 #X connect 6 0 0 0;
-#X connect 7 1 6 0;
-#X connect 7 2 6 1;
-#X connect 7 3 6 2;
-#X connect 8 0 0 0;
-#X connect 9 0 5 1;
-#X connect 10 0 5 2;
-#X connect 11 0 5 3;
-#X connect 12 0 5 0;
-#X connect 14 0 0 0;
+#X connect 7 0 8 0;
+#X connect 8 0 5 0;
+#X connect 8 1 3 0;
+#X connect 8 2 4 0;
+#X connect 8 3 6 0;
+#X connect 9 0 10 0;
+#X connect 9 0 11 0;
+#X connect 10 0 9 1;
+#X restore 224 363 pd autotrain OR;
+#X text 172 101 2a)- build a list with inputs and desired output;
+#X text 336 291 NOTE2: while training the right outlet gives you the
+mean square error after each training pattern. continue training until
+mse is low enough.;
+#X text 221 383 2b) use autotrain for the OR function;
+#X connect 1 0 0 0;
+#X connect 4 0 6 0;
+#X connect 5 0 0 0;
+#X connect 6 1 5 0;
+#X connect 6 2 5 1;
+#X connect 6 3 5 2;
+#X connect 7 0 0 0;
+#X connect 8 0 4 1;
+#X connect 9 0 4 2;
+#X connect 10 0 4 3;
+#X connect 11 0 4 0;
+#X connect 13 0 0 0;
+#X connect 16 0 0 0;
 #X restore 68 50 pd train it on the fly;
 #X text 62 5 there are 2 ways to train your net;
 #X text 253 47 on the fly is simpler;
