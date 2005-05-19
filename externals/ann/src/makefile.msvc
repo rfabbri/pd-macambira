@@ -13,7 +13,7 @@ FANNLIB="H:\PureData\FANN\fann-1.2.0\fann-1.2.0\MSVC++\Release"
 
 current: clean pd_nt
 
-pd_nt: ann.dll ann_som.dll ann_mlp.dll ann_td.dll
+pd_nt: ann_som.dll ann_mlp.dll ann_td.dll ann.dll 
 
 .SUFFIXES: .dll
 
