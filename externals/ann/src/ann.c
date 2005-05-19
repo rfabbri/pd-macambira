@@ -32,6 +32,10 @@ void *ann_new(void)
 }
 
 void ann_som_setup(void);
+void ann_mlp_setup(void);
+void ann_td_setup(void);
+
+
 
 /*
   waiting to be released in near future:
@@ -48,6 +52,8 @@ void ann_som_setup(void);
 void ann_setup(void) 
 {
   ann_som_setup();
+  ann_mlp_setup();
+  ann_td_setup();
 
   
   /* ************************************** */
