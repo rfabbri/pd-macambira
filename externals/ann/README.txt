@@ -1,8 +1,8 @@
 ann: Artificial Neural Networks
 
 Authors: 
-forum::für::umläute
-Davide Morelli - info@davidemorelli.it
+ IOhannes m zmölnig - forum::für::umläute
+ Davide Morelli - www.davidemorelli.it
 
 this software is under the GnuGPL that is provided with these files
 

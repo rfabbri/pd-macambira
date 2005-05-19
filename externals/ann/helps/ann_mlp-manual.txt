@@ -1,6 +1,6 @@
 -----------------ann_mlp manual 
 
-by davide morelli - info@davidemorelli.it
+by davide morelli - www.davidemorelli.it
 
 
 -----------What is a neural network?
@@ -134,4 +134,4 @@ http://fann.sourceforge.net/
 
 -----------
 
-questions and suggestions to info@davidemorelli.it
+questions and suggestions to info(a)davidemorelli.it
