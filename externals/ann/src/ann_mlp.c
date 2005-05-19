@@ -11,7 +11,7 @@
 #include "fann.h"
 
 
-#define VERSION "0.03"
+#define VERSION "0.03"
 #ifndef __DATE__ 
 #define __DATE__ ""
 #endif
