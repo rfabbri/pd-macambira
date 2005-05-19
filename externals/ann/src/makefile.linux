@@ -1,6 +1,3 @@
-current: all
-
-
 # the ANN-EXTERNAL-makefile
 # everything is GnuGPL that should come with the ann.tgz
 # NO WARRANTIES FOR ANYTHING
@@ -20,14 +17,20 @@ current: all
 DESTDIR =
 INSTALL_PREFIX = /usr/local
 PDLIBDIR = /lib/pd
+
+# the *.dll-files go into $(DESTDIR)$(INSTALLL_PREFIX)$(PDLIBDIR)$(LIBRARY_DIR)
+LIBRARY_DIR=/extra
+# the reference-files go into $(DESTDIR)$(INSTALLL_PREFIX)$(PDLIBDIR)$(REFERENCE_DIR)
+#REFERENCE_DIR=/doc/5.reference/ann
+REFERENCE_DIR=/extra/help-ann
+
 #these were the user adjustables
+#---------------------------------
 
 
-TARGETS = ann \
-	ann_som \
-	ann_mlp	\
-	ann_td \
-
+TARGETS = ann_som.c \
+	ann_mlp.c   \
+	ann_td.c    \
 
 # ----------------------- LINUX ----------------------------
 .SUFFIXES: .pd_linux
@@ -37,45 +40,48 @@ LINUXOBJECTS = $(TARGETS:%=%.o)
 ARCH = $(shell uname --machine)
 
 PD_DIR = $(DESTDIR)$(INSTALL_PREFIX)$(PDLIBDIR)
+PD_INSTALLDIR_LIB = $(PD_DIR)$(LIBRARY_DIR)
+PD_INSTALLDIR_REF = $(PD_DIR)$(REFERENCE_DIR)
 
 ifeq (${ARCH},alpha)
-AFLAGS = -mieee  -mcpu=ev56
+AFLAGS = -mieee	 -mcpu=ev56
 endif
+
+
+STRIP=strip
+STRIPFLAGS=--strip-unneeded
+
 
 LINCLUDE =
 
-$(LINUXOBJECTS): *.h
+OPTIMIZE_FLAGS = -O2 -O6 -funroll-loops -march=pentium3
+DEFS = -DPD
 
 #CFLAGS = -O2 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
-CFLAGS = -O2 -O6 -funroll-loops -march=pentium3 -fomit-frame-pointer -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS) 
+CFLAGS = $(OPTIMIZE_FLAGS) -fomit-frame-pointer -fPIC -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS) $(DEFS)
+
+LDFLAGS = -Wl,-export_dynamic -shared
+LIBS = -lc -lm -lfann
+
+# here come the targets
+
+all: $(TARGETS:%.c=%.pd_linux)
+
+%.pd_linux: %.c
+	$(CC) $(CFLAGS) $(INCLUDE) $(LDFLAGS) -o "$*.pd_linux" "$*.c" $(LIBS)
+	$(STRIP) $(STRIPFLAGS) "$*.pd_linux"
 
 everything: clean all install distclean
 
 distclean:
-	touch dummy.o
-	touch dummy.pd_linux
-	touch dummy~
-	rm *.o *.pd_linux *~
+	-rm *.o *.pd_linux *~
 
 clean:
-	touch dummy.o
-	touch dummy.pd_linux
-	rm *.o *.pd_linux
-
-all: $(LINUXOBJECTS)
-
-	@echo :: $(LINUXOBJECTS)
-
-	ld -export_dynamic  -shared -o ann.pd_linux *.o -lc -lm
-	strip --strip-unneeded ann.pd_linux
-
-.c.pd_linux:
-	cc $(CFLAGS) -O2 -DPD -fPIC $(INCLUDE) -c -o $*.o $*.c
-
+	-rm *.o *.pd_linux
 
 install: installdocs
-	install -m 644 ann.pd_linux $(PD_DIR)/externs
+	install -m 644 ann*.pd_linux $(PD_INSTALLDIR_LIB)
 
 installdocs:
-	install -d $(PD_DIR)/doc/5.reference/ann
-	install -m644 ../examples/* $(PD_DIR)/doc/5.reference/ann
+	install -d $(PD_INSTALLDIR_REF)
+	install -m644 ../examples/* $(PD_INSTALLDIR_REF)
