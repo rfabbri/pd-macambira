@@ -36,7 +36,7 @@ typedef struct _ann_mlp {
 	t_outlet *l_out, *f_out;
 } t_ann_mlp;
 
-void help(t_ann_mlp *x)
+static void help(t_ann_mlp *x)
 {
 	post("");
 	post("ann_mlp: neural nets for PD");
@@ -48,7 +48,7 @@ void help(t_ann_mlp *x)
 
 }
 
-void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	unsigned int num_input = 2;
 	unsigned int num_output = 1;
@@ -108,7 +108,7 @@ void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	}
 }
 
-void print_status(t_ann_mlp *x)
+static void print_status(t_ann_mlp *x)
 {
 		if (x->mode == TRAIN)
 			post("nn:training");
@@ -116,7 +116,7 @@ void print_status(t_ann_mlp *x)
 			post("nn:running");
 }
 
-void train(t_ann_mlp *x)
+static void train(t_ann_mlp *x)
 {
 	x->mode=TRAIN;
 	if (x->ann == 0)
@@ -128,13 +128,13 @@ void train(t_ann_mlp *x)
 	print_status(x);
 }
 
-void run(t_ann_mlp *x)
+static void run(t_ann_mlp *x)
 {
 	x->mode=RUN;
 	print_status(x);
 }
 
-void set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc<1)
 	{
@@ -149,7 +149,7 @@ void set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 
 
 
-void train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (x->ann == 0)
 	{
@@ -174,7 +174,7 @@ void train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	post("nn: finished training on file %s", x->filenametrain->s_name);
 }
 
-void set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	float desired_error = (float)0.001;
 	if (0<argc)
@@ -188,7 +188,7 @@ void set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	}
 }
 
-void set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	unsigned int max_iterations = 500000;
 	if (argc>0)
@@ -202,7 +202,7 @@ void set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	}
 }
 
-void set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	
 	unsigned int iterations_between_reports = 1000;
@@ -221,7 +221,7 @@ void set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc, t_atom
 
 // run the ann using floats in list passed to the inlet as input values
 // and send result to outlet as list of float
-void run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;
 	fann_type input[MAXINPUT];	
@@ -275,7 +275,7 @@ void run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	
 }
 
-void train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;
 	fann_type input[MAXINPUT];	
@@ -334,7 +334,7 @@ void train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 
 }
 
-void manage_list(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void manage_list(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (x->mode)
 		run_the_net(x, sl, argc, argv);
@@ -344,7 +344,7 @@ void manage_list(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	}
 }
 
-void set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -355,7 +355,7 @@ void set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	post("nn:filename set to %s", x->filename->s_name);
 }
 
-void load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -367,7 +367,7 @@ void load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 		post("nn:ann loaded fom file %s", x->filename->s_name);
 }
 
-void save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -383,7 +383,7 @@ void save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 }
 
 // functions for training algo:
-void set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
+static void set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -394,7 +394,7 @@ void set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_INCREMENTAL");
 	}
 }
-void set_FANN_TRAIN_BATCH(t_ann_mlp *x)
+static void set_FANN_TRAIN_BATCH(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -405,7 +405,7 @@ void set_FANN_TRAIN_BATCH(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_BATCH");
 	}
 }
-void set_FANN_TRAIN_RPROP(t_ann_mlp *x)
+static void set_FANN_TRAIN_RPROP(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -416,7 +416,7 @@ void set_FANN_TRAIN_RPROP(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_RPROP");
 	}
 }
-void set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
+static void set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -428,7 +428,7 @@ void set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
 	}
 }
 
-void set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	t_symbol *parametro = 0;
 	int funzione = 0;
@@ -464,7 +464,7 @@ void set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc, t_atom
 
 }
 
-void print_ann_details(t_ann_mlp *x)
+static void print_ann_details(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -490,7 +490,7 @@ void print_ann_details(t_ann_mlp *x)
 }
 
 
-void *nn_new(t_symbol *s, int argc, t_atom *argv)
+static void *nn_new(t_symbol *s, int argc, t_atom *argv)
 {
 	t_ann_mlp *x = (t_ann_mlp *)pd_new(ann_mlp_class);
 	x->l_out = outlet_new(&x->x_obj, &s_list);
