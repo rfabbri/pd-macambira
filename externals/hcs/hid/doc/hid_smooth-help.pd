@@ -1,0 +1,28 @@
+#N canvas 388 256 475 392 10;
+#X text 27 340 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 354 released under the GNU GPL;
+#X floatatom 102 195 5 0 0 0 - - -;
+#X floatatom 102 251 5 0 0 0 - - -;
+#X text 98 303 For more info:;
+#X obj 202 301 pddp_open all_about_hid_mapping;
+#X obj 103 131 noise4hidhelp;
+#X obj 105 268 hsl 250 15 0 1 0 0 empty empty empty 22 8 1 12 -262144
+-1 -1 16106 1;
+#X obj 105 164 hsl 250 15 0 1 0 0 empty empty empty 22 8 1 12 -262144
+-1 -1 16509 1;
+#X obj 5 2 cnv 15 450 20 empty empty [hid_smooth] 2 11 1 18 -233017
+-66577 0;
+#X obj 422 3 pddp;
+#X obj 102 221 hid_smooth;
+#X text 18 36 Smooths a stream of numbers using weighted averaging
+of the last 10 values. This object is an shortcut for [hid_average]
+with the default settings.;
+#X obj 103 94 tgl 30 0 empty empty start 1 15 1 12 -90049 -1 -1 1 1
+;
+#X connect 2 0 11 0;
+#X connect 3 0 7 0;
+#X connect 6 0 8 0;
+#X connect 8 0 2 0;
+#X connect 11 0 3 0;
+#X connect 13 0 6 0;
