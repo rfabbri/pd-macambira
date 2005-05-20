@@ -14,7 +14,6 @@ all:
 			../../control/*/*.pd \
 			../../signal/*/*.pd \
 			../../aenv~/*.pd \
-			../../ann/examples/*.* \
 			../../arraysize/*.pd \
 			../../beatpipe/*.pd \
 			../../build/*.pd \
@@ -29,6 +28,7 @@ all:
 			../../gem2pdp/*.pd \
 			../../ff/*.pd \
 			../../hcs/*-help.pd \
+			../../hcs/*/doc/*.pd \
 			../../hcs/hid/examples/*.pd \
 			../../hcs/hid/*-help.pd \
 			../../hcs/hid/ev*-list.pd \
