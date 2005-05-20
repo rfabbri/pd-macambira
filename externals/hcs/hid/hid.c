@@ -140,6 +140,7 @@ t_int hid_open(t_hid *x, t_float f)
  * therefore ignore the redundant open request.  To reopen the same device,
  * send a [close( msg, then an [open( msg. */
 	if (! x->x_device_open) 
+	{
 		if (hid_open_device(x,x->x_device_number))
 		{
 			error("[hid] can not open device %d",x->x_device_number);
@@ -149,6 +150,8 @@ t_int hid_open(t_hid *x, t_float f)
 		{
 			x->x_device_open = 1;
 		}
+	}
+	
 
 /* restore the polling state so that when I [tgl] is used to start/stop [hid],
  * the [tgl]'s state will continue to accurately reflect [hid]'s state  */

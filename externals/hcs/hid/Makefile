@@ -26,13 +26,12 @@ pd_darwin: hid.pd_darwin
 
 endif
 
-# ----------------------- GENERAL -----------------------
+# ----------------------- GENERAL ---------------------------------------------
 
 PDEXECUTABLE = ../../../pd/bin/pd
 
 CFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+    -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused
 
 INCLUDE =  -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 
