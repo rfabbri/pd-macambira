@@ -21,7 +21,7 @@ TARNAME =  $(LIBNAME)-@IEMMATRIX_VERSION@.tgz
 
 .SUFFIXES: .$(EXT)
 
-CFLAGS = -g -O2 $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@
+CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@ 
 
 LIBS = @LIBS@
 include Make.source

@@ -76,6 +76,7 @@ dnl
 if test `uname -s` = Linux; 
 then
   LFLAGS="-export_dynamic  -shared"
+  CFLAGS="-fPIC $CFLAGS"
   EXT=pd_linux	
   STRIPFLAGS="--strip-unneeded"
 fi
