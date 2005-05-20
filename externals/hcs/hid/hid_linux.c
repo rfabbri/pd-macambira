@@ -1,3 +1,4 @@
+/* this code only works for Linux kernels */
 #ifdef __linux__
 
 
