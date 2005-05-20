@@ -23,8 +23,8 @@ diff -w -r1.7 configure.in
 <         -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
 <         -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
 ---
+> #
 > # find the Tcl/Tk Frameworks
-> 	 TCLTK_STANDALONE=`/bin/ls -1dr /Volumes/TclTkAquaStandalone-8.4.* | head -1`
 > 	 if test -d "../../Frameworks";
 >     then
 >         # Miller's location
