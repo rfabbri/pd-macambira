@@ -10,8 +10,10 @@
 #include "m_pd.h"
 #include "fann.h"
 
+#ifndef VERSION 
+#define VERSION "0.2"
+#endif
 
-#define VERSION "0.03"
 #ifndef __DATE__ 
 #define __DATE__ ""
 #endif
@@ -36,7 +38,7 @@ typedef struct _ann_mlp {
 	t_outlet *l_out, *f_out;
 } t_ann_mlp;
 
-static void help(t_ann_mlp *x)
+static void ann_mlp_help(t_ann_mlp *x)
 {
 	post("");
 	post("ann_mlp: neural nets for PD");
@@ -48,7 +50,7 @@ static void help(t_ann_mlp *x)
 
 }
 
-static void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	unsigned int num_input = 2;
 	unsigned int num_output = 1;
@@ -77,13 +79,13 @@ static void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 
 	if (num_input>MAXINPUT)
 	{
-		error("too many inputs, maximum allowed is %d",MAXINPUT);
+		error("too many inputs, maximum allowed is MAXINPUT");
 		return;
 	}
 
 	if (num_output>MAXOUTPUT)
 	{
-		error("too many outputs, maximum allowed is %d", MAXOUTPUT);
+		error("too many outputs, maximum allowed is MAXOUTPUT");
 		return;
 	}
 
@@ -108,7 +110,7 @@ static void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	}
 }
 
-static void print_status(t_ann_mlp *x)
+static void ann_mlp_print_status(t_ann_mlp *x)
 {
 		if (x->mode == TRAIN)
 			post("nn:training");
@@ -116,7 +118,7 @@ static void print_status(t_ann_mlp *x)
 			post("nn:running");
 }
 
-static void train(t_ann_mlp *x)
+static void ann_mlp_train(t_ann_mlp *x)
 {
 	x->mode=TRAIN;
 	if (x->ann == 0)
@@ -125,16 +127,16 @@ static void train(t_ann_mlp *x)
 		return;
 	}
 	fann_reset_MSE(x->ann);
-	print_status(x);
+	ann_mlp_print_status(x);
 }
 
-static void run(t_ann_mlp *x)
+static void ann_mlp_run(t_ann_mlp *x)
 {
 	x->mode=RUN;
-	print_status(x);
+	ann_mlp_print_status(x);
 }
 
-static void set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc<1)
 	{
@@ -143,13 +145,13 @@ static void set_mode(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	else	
 	{	
 		x->mode = atom_getint(argv++);
-		print_status(x);
+		ann_mlp_print_status(x);
 	}
 }
 
 
 
-static void train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (x->ann == 0)
 	{
@@ -171,10 +173,10 @@ static void train_on_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	fann_train_on_file(x->ann, x->filenametrain->s_name, x->max_iterations,
 		x->iterations_between_reports, x->desired_error);
 	
-	post("nn: finished training on file %s", x->filenametrain->s_name);
+	post("ann_mlp: finished training on file %s", x->filenametrain->s_name);
 }
 
-static void set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	float desired_error = (float)0.001;
 	if (0<argc)
@@ -188,7 +190,7 @@ static void set_desired_error(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv
 	}
 }
 
-static void set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	unsigned int max_iterations = 500000;
 	if (argc>0)
@@ -202,7 +204,7 @@ static void set_max_iterations(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *arg
 	}
 }
 
-static void set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	
 	unsigned int iterations_between_reports = 1000;
@@ -221,7 +223,7 @@ static void set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, int argc,
 
 // run the ann using floats in list passed to the inlet as input values
 // and send result to outlet as list of float
-static void run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;
 	fann_type input[MAXINPUT];	
@@ -275,7 +277,7 @@ static void run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	
 }
 
-static void train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;
 	fann_type input[MAXINPUT];	
@@ -334,17 +336,17 @@ static void train_on_the_fly(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 
 }
 
-static void manage_list(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_manage_list(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (x->mode)
-		run_the_net(x, sl, argc, argv);
+		ann_mlp_run_the_net(x, sl, argc, argv);
 	else
 	{
-		train_on_the_fly(x, sl, argc, argv);
+		ann_mlp_train_on_the_fly(x, sl, argc, argv);
 	}
 }
 
-static void set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -355,7 +357,7 @@ static void set_filename(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	post("nn:filename set to %s", x->filename->s_name);
 }
 
-static void load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -367,7 +369,7 @@ static void load_ann_from_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *arg
 		post("nn:ann loaded fom file %s", x->filename->s_name);
 }
 
-static void save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	if (argc>0) {
     x->filename = atom_gensym(argv);
@@ -383,7 +385,7 @@ static void save_ann_to_file(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 }
 
 // functions for training algo:
-static void set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
+static void ann_mlp_set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -394,7 +396,7 @@ static void set_FANN_TRAIN_INCREMENTAL(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_INCREMENTAL");
 	}
 }
-static void set_FANN_TRAIN_BATCH(t_ann_mlp *x)
+static void ann_mlp_set_FANN_TRAIN_BATCH(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -405,7 +407,7 @@ static void set_FANN_TRAIN_BATCH(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_BATCH");
 	}
 }
-static void set_FANN_TRAIN_RPROP(t_ann_mlp *x)
+static void ann_mlp_set_FANN_TRAIN_RPROP(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -416,7 +418,7 @@ static void set_FANN_TRAIN_RPROP(t_ann_mlp *x)
 		post("nn:training algorithm set to FANN_TRAIN_RPROP");
 	}
 }
-static void set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
+static void ann_mlp_set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
@@ -428,7 +430,7 @@ static void set_FANN_TRAIN_QUICKPROP(t_ann_mlp *x)
 	}
 }
 
-static void set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	t_symbol *parametro = 0;
 	int funzione = 0;
@@ -464,33 +466,33 @@ static void set_activation_function_output(t_ann_mlp *x, t_symbol *sl, int argc,
 
 }
 
-static void print_ann_details(t_ann_mlp *x)
+static void ann_mlp_print_ann_details(t_ann_mlp *x)
 {
 	if (x->ann == 0)
 	{
-		post("nn:ann is not initialized");
+		post("ann_mlp:ann is not initialized");
 	} else
 	{
-		post("nn:follows a description of the current ann:");
-		post("nn:num_input=%i", x->ann->num_input);
-		post("nn:num_output=%i", x->ann->num_output);
-		post("nn:learning_rate=%f", x->ann->learning_rate);
-		post("nn:connection_rate=%f", x->ann->connection_rate);
-		post("nn:total_neurons=%i", x->ann->total_neurons);
-		post("nn:total_connections=%i", x->ann->total_connections);
-		post("nn:last error=%i", x->ann->errstr);
+		post("follows a description of the current ann:");
+		post("num_input=%i", x->ann->num_input);
+		post("num_output=%i", x->ann->num_output);
+		post("learning_rate=%f", x->ann->learning_rate);
+		post("connection_rate=%f", x->ann->connection_rate);
+		post("total_neurons=%i", x->ann->total_neurons);
+		post("total_connections=%i", x->ann->total_connections);
+		post("last error=%i", x->ann->errstr);
 		if (x->filename == 0)
 		{
-			post("nn:filename not set");
+			post("ann_mlp:filename not set");
 		} else
 		{
-			post("nn:filename=%s", x->filename->s_name);
+			post("filename=%s", x->filename->s_name);
 		}
 	}
 }
 
 
-static void *nn_new(t_symbol *s, int argc, t_atom *argv)
+static void *ann_mlp_new(t_symbol *s, int argc, t_atom *argv)
 {
 	t_ann_mlp *x = (t_ann_mlp *)pd_new(ann_mlp_class);
 	x->l_out = outlet_new(&x->x_obj, &s_list);
@@ -503,20 +505,8 @@ static void *nn_new(t_symbol *s, int argc, t_atom *argv)
 
 	if (argc>0) {
 		x->filename = atom_gensym(argv);
-		load_ann_from_file(x, NULL , 0, NULL);
+		ann_mlp_load_ann_from_file(x, NULL , 0, NULL);
 	}
-	return (void *)x;
-}
-
-// free resources
-static void nn_free(t_ann_mlp *x)
-{
-  struct fann *ann = x->ann;
-  fann_destroy(ann);
-  // TODO: free other resources!
-}
-
-void ann_mlp_setup(void) {
 
 	post("");
 	post("ann_mlp: neural nets for PD");
@@ -525,38 +515,51 @@ void ann_mlp_setup(void) {
 	post("author: Davide Morelli");
 	post("contact: info@davidemorelli.it www.davidemorelli.it");
 
+	return (void *)x;
+}
+
+// free resources
+static void ann_mlp_free(t_ann_mlp *x)
+{
+  struct fann *ann = x->ann;
+  fann_destroy(ann);
+  // TODO: free other resources!
+}
+
+void ann_mlp_setup(void) {
+
 	ann_mlp_class = class_new(gensym("ann_mlp"),
-		(t_newmethod)nn_new,
-		(t_method)nn_free, sizeof(t_ann_mlp),
+		(t_newmethod)ann_mlp_new,
+		(t_method)ann_mlp_free, sizeof(t_ann_mlp),
 		CLASS_DEFAULT, A_GIMME, 0);
 
 	// general..
-	class_addmethod(ann_mlp_class, (t_method)help, gensym("help"), 0);
-	class_addmethod(ann_mlp_class, (t_method)createFann, gensym("create"), A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)train, gensym("train"), 0);
-	class_addmethod(ann_mlp_class, (t_method)run, gensym("run"), 0);
-	class_addmethod(ann_mlp_class, (t_method)set_mode, gensym("setmode"), A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)train_on_file, gensym("train-on-file"), A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)manage_list, gensym("data"), A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)set_filename, gensym("filename"), A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)load_ann_from_file, gensym("load"),A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)save_ann_to_file, gensym("save"),A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)print_ann_details, gensym("details"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_help, gensym("help"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_createFann, gensym("create"), A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_train, gensym("train"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_run, gensym("run"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_mode, gensym("setmode"), A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_train_on_file, gensym("train-on-file"), A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_manage_list, gensym("data"), A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_filename, gensym("filename"), A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_load_ann_from_file, gensym("load"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_save_ann_to_file, gensym("save"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_print_ann_details, gensym("details"), 0);
 	
 	// change training parameters
-	class_addmethod(ann_mlp_class, (t_method)set_desired_error, gensym("desired_error"),A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)set_max_iterations, gensym("max_iterations"),A_GIMME, 0);
-	class_addmethod(ann_mlp_class, (t_method)set_iterations_between_reports, gensym("iterations_between_reports"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_desired_error, gensym("desired_error"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_max_iterations, gensym("max_iterations"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_iterations_between_reports, gensym("iterations_between_reports"),A_GIMME, 0);
 
 	// change training  and activation algorithms
-	class_addmethod(ann_mlp_class, (t_method)set_FANN_TRAIN_INCREMENTAL, gensym("FANN_TRAIN_INCREMENTAL"), 0);
-	class_addmethod(ann_mlp_class, (t_method)set_FANN_TRAIN_BATCH, gensym("FANN_TRAIN_BATCH"), 0);
-	class_addmethod(ann_mlp_class, (t_method)set_FANN_TRAIN_RPROP, gensym("FANN_TRAIN_RPROP"), 0);
-	class_addmethod(ann_mlp_class, (t_method)set_FANN_TRAIN_QUICKPROP, gensym("FANN_TRAIN_QUICKPROP"), 0);
-	class_addmethod(ann_mlp_class, (t_method)set_activation_function_output, gensym("set_activation_function_output"),A_GIMME, 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_FANN_TRAIN_INCREMENTAL, gensym("FANN_TRAIN_INCREMENTAL"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_FANN_TRAIN_BATCH, gensym("FANN_TRAIN_BATCH"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_FANN_TRAIN_RPROP, gensym("FANN_TRAIN_RPROP"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_FANN_TRAIN_QUICKPROP, gensym("FANN_TRAIN_QUICKPROP"), 0);
+	class_addmethod(ann_mlp_class, (t_method)ann_mlp_set_activation_function_output, gensym("set_activation_function_output"),A_GIMME, 0);
 	
 	// the most important one: running the ann
-	class_addlist(ann_mlp_class, (t_method)manage_list);
+	class_addlist(ann_mlp_class, (t_method)ann_mlp_manage_list);
 
 	// help patch
 	class_sethelpsymbol(ann_mlp_class, gensym("help-ann_mlp"));
