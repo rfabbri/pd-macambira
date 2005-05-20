@@ -19,8 +19,8 @@
 #define TRAIN 0
 #define RUN  1
 
-#define MAXINPUT 100
-#define MAXOUTPUT 100
+#define MAXINPUT 256
+#define MAXOUTPUT 256
 
 static t_class *ann_mlp_class;
 
@@ -75,15 +75,15 @@ static void createFann(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
 	if (argc>5)
 		learning_rate = atom_getfloat(argv++);
 
-	if (num_input>=MAXINPUT)
+	if (num_input>MAXINPUT)
 	{
-		error("too many inputs, maximum allowed is MAXINPUT");
+		error("too many inputs, maximum allowed is %d",MAXINPUT);
 		return;
 	}
 
-	if (num_output>=MAXOUTPUT)
+	if (num_output>MAXOUTPUT)
 	{
-		error("too many outputs, maximum allowed is MAXOUTPUT");
+		error("too many outputs, maximum allowed is %d", MAXOUTPUT);
 		return;
 	}
 
