@@ -14,6 +14,12 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
+#
+# This is a SysV-style startup script for Pd.  It has been used on Debian
+# extensively but should work on other SysV platforms.
+#
+# .hc <hans@at.or.at>
+#
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/pd
