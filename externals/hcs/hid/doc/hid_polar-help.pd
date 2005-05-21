@@ -1,19 +1,19 @@
-#N canvas 601 232 478 451 10;
+#N canvas 601 232 482 455 10;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_polar] 2 11 1 18 -233017
 -66577 0;
 #X obj 422 3 pddp;
 #X text 244 411 released under the GNU GPL;
 #X floatatom 100 248 5 0 0 0 - - -;
 #X floatatom 100 335 7 0 0 0 radius-> - -;
-#X text 175 375 For more info:;
-#X obj 279 373 pddp_open all_about_hid_mapping;
+#X text 124 370 For more info:;
+#X obj 228 368 pddp_open all_about_hid_mapping;
 #X obj 100 295 hid_polar;
 #X text 27 397 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X obj 101 161 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
--1 -1 6350 0;
+-1 -1 0 0;
 #X obj 157 103 vsl 15 128 0 1 0 0 empty empty y-axis -6 -9 1 10 -261681
--1 -1 6350 0;
+-1 -1 0 0;
 #X floatatom 159 335 7 0 0 1 <-angle - -;
 #X floatatom 158 248 5 0 0 0 - - -;
 #X obj 157 265 t b f;

@@ -1,5 +1,5 @@
-#N canvas 248 419 666 464 10;
-#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
+#N canvas 31 125 670 468 10;
+#X obj 168 91 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
 ;
 #X floatatom 63 234 7 0 0 3 Y-axis - -;
 #X floatatom 9 234 7 0 0 3 X-axis - -;
@@ -35,15 +35,13 @@
 ;
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;
-#X text 414 413 $Revision: 1.9 $;
+#X text 414 413 $Revision: 1.10 $;
 #X obj 239 375 pddp_open all_about_hid;
 #X text 130 376 For more info:;
 #X floatatom 245 234 5 0 0 3 hat0X - -;
 #X floatatom 288 234 5 0 0 3 hat0Y - -;
-#X msg 220 112 open 3;
 #X obj 212 291 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8 btn_9;
-#X msg 225 131 open 5;
 #X obj 168 154 joystick 0;
 #N canvas 674 327 446 497 joystick_noise 0;
 #X obj 73 25 inlet;
@@ -98,48 +96,50 @@ btn_8 btn_9;
 #X connect 21 0 20 0;
 #X connect 22 0 5 0;
 #X restore 440 155 pd joystick_noise;
-#X obj 440 92 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 1 1
+#X obj 440 92 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X text 333 73 Select your device and turn on to make noise:;
 #X obj 619 3 pddp;
 #X msg 503 125 open \$1;
 #X obj 503 105 hradio 15 1 1 8 \$0-device-number empty choose_a_device
-0 -6 1 9 -262144 -1 -1 0;
+0 -6 1 9 -262144 -1 -1 2;
 #X obj 477 105 nbx 1 14 -1e+37 1e+37 0 0 empty \$0-device-number empty
-0 -6 0 14 -166441 -1 -1 0 256;
+0 -6 0 14 -166441 -1 -1 2 256;
 #X text 8 36 Use a joystick device with Pd. This object auto-calibrates
 the output of axis data. Move each element of the device thru its full
 range to calibrate it.;
 #X obj 335 215 unpack s f;
-#X obj 339 375 pddp_open all_about_hid_mapping;
+#X obj 407 375 pddp_open all_about_hid_mapping;
 #X text 422 177 (remember to calibrate all parts;
 #X text 430 190 of the joystick first);
 #X msg 394 120 print;
-#X connect 0 0 31 0;
-#X connect 19 0 31 0;
-#X connect 28 0 31 0;
-#X connect 29 0 3 0;
-#X connect 29 1 4 0;
-#X connect 29 2 5 0;
-#X connect 29 3 6 0;
-#X connect 29 4 9 0;
-#X connect 29 5 10 0;
-#X connect 29 6 11 0;
-#X connect 29 7 12 0;
-#X connect 29 8 13 0;
-#X connect 29 9 14 0;
-#X connect 30 0 31 0;
-#X connect 31 0 2 0;
-#X connect 31 1 1 0;
-#X connect 31 2 7 0;
-#X connect 31 3 8 0;
-#X connect 31 4 26 0;
-#X connect 31 5 27 0;
-#X connect 31 6 29 0;
-#X connect 31 6 40 0;
-#X connect 33 0 32 0;
-#X connect 36 0 32 1;
-#X connect 37 0 36 0;
-#X connect 40 0 15 0;
-#X connect 40 1 16 0;
-#X connect 44 0 32 0;
+#X msg 220 112 open 2;
+#X msg 225 131 open 3;
+#X connect 0 0 29 0;
+#X connect 19 0 29 0;
+#X connect 28 0 3 0;
+#X connect 28 1 4 0;
+#X connect 28 2 5 0;
+#X connect 28 3 6 0;
+#X connect 28 4 9 0;
+#X connect 28 5 10 0;
+#X connect 28 6 11 0;
+#X connect 28 7 12 0;
+#X connect 28 8 13 0;
+#X connect 28 9 14 0;
+#X connect 29 0 2 0;
+#X connect 29 1 1 0;
+#X connect 29 2 7 0;
+#X connect 29 3 8 0;
+#X connect 29 4 26 0;
+#X connect 29 5 27 0;
+#X connect 29 6 28 0;
+#X connect 29 6 38 0;
+#X connect 31 0 30 0;
+#X connect 34 0 30 1;
+#X connect 35 0 34 0;
+#X connect 38 0 15 0;
+#X connect 38 1 16 0;
+#X connect 42 0 30 0;
+#X connect 43 0 29 0;
+#X connect 44 0 29 0;

@@ -1,9 +1,9 @@
-#N canvas 161 50 507 536 10;
+#N canvas 606 208 515 544 10;
 #X obj 20 178 inlet;
-#N canvas 0 22 462 312 graph5 0;
-#X array \$0-hid_graph_array 100 float 2;
+#N canvas 0 22 466 316 graph5 0;
+#X array \$0-hid 100 float 2;
 #X coords 0 1 100 0 100 100 1;
-#X restore 2 46 graph;
+#X restore -1 20 graph;
 #X obj 115 368 outlet;
 #X text 155 301 gives a range of 0-100;
 #X text 162 369 output range 0 to 1;

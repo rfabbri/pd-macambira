@@ -136,9 +136,15 @@ start-point and start-value.
 
 [hid_debounce]
 
+[hid_vector] - angle and distance for mouse/relative data
+
 peak finder object
 
 "kalman filters"
+
+Curves!!
+
+http://www.2dcurves.com
 
 
  /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\
