@@ -603,13 +603,6 @@ static void *ann_td_new(t_symbol *s, int argc, t_atom *argv)
 		ann_td_load_ann_from_file(x, NULL , 0, NULL);
 	}
 
-	post("");
-	post("ann_td: time delay neural nets for PD");
-	post("version: "VERSION"");
-	post("compiled: "__DATE__);
-	post("author: Davide Morelli");
-	post("contact: info@davidemorelli.it www.davidemorelli.it");
-
 	return (void *)x;
 }
 
@@ -623,6 +616,12 @@ static void ann_td_free(t_ann_td *x)
 }
 
 void ann_td_setup(void) {
+	post("");
+	post("ann_td: time delay neural nets for PD");
+	post("version: "VERSION"");
+	post("compiled: "__DATE__);
+	post("author: Davide Morelli");
+	post("contact: info@davidemorelli.it www.davidemorelli.it");
 
 	ann_td_class = class_new(gensym("ann_td"),
 		(t_newmethod)ann_td_new,

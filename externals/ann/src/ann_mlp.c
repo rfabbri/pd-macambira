@@ -508,13 +508,6 @@ static void *ann_mlp_new(t_symbol *s, int argc, t_atom *argv)
 		ann_mlp_load_ann_from_file(x, NULL , 0, NULL);
 	}
 
-	post("");
-	post("ann_mlp: neural nets for PD");
-	post("version: "VERSION"");
-	post("compiled: "__DATE__);
-	post("author: Davide Morelli");
-	post("contact: info@davidemorelli.it www.davidemorelli.it");
-
 	return (void *)x;
 }
 
@@ -527,6 +520,12 @@ static void ann_mlp_free(t_ann_mlp *x)
 }
 
 void ann_mlp_setup(void) {
+	post("");
+	post("ann_mlp: multilayer perceptron for PD");
+	post("version: "VERSION"");
+	post("compiled: "__DATE__);
+	post("author: Davide Morelli");
+	post("contact: info@davidemorelli.it www.davidemorelli.it");
 
 	ann_mlp_class = class_new(gensym("ann_mlp"),
 		(t_newmethod)ann_mlp_new,
