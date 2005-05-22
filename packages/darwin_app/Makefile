@@ -73,8 +73,7 @@ TOXY_VERSION = $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
 ZEXY_VERSION = $(shell grep VERSION ../../externals/zexy/src/zexy.h | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
-darwin_app: darwin_app_wrapper darwin_patch_pd darwin_app_core \
-	 darwin_app_docs darwin_app_externals darwin_app_abstractions
+darwin_app: darwin_app_wrapper darwin_app_core darwin_prebuilt_app
 
 # this target is for when you already have a pre-built Pd.app and you
 # just want to fill it with goodies from CVS.  To do so, place your 
@@ -157,18 +156,15 @@ darwin_app_wrapper:
 	install -m0644 -p \
 		$(WISH_SHELL_CONTENTS)/Resources/Wish\ Shell.rsrc \
 		"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
-#	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"
+	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"
 	cp -Rp $(WISH_SHELL_CONTENTS)/Frameworks "$(DESTDIR)$(PD_APP_CONTENTS)"
-	cp -Rp $(WISH_SHELL_CONTENTS)/Frameworks "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
-
-#	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Frameworks"  \
-#	"$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 # set up app wrapper
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(DESTDIR)$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(DESTDIR)$(PD_APP_CONTENTS)/Resources"
 # rename the Wish Shell executable to "Pd"
-	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
+	mv "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Wish Shell" \
+		"$(DESTDIR)$(PD_APP_CONTENTS)/MacOS/Pd"
 #	diskutil eject /Volumes/$(TCLTK)
 
 darwin_patch_pd:
@@ -192,6 +188,10 @@ darwin_app_core: darwin_app_wrapper
 # Headers
 	install -d -m0755 $(PD_FILE_ROOT)/include
 	install -m0444 ../../pd/src/*.h $(PD_FILE_ROOT)/include
+# run script to move help-*.pd files to *-help.pd according to the standard
+	cd $(PD_FILE_ROOT)/doc/5.reference && \
+		../../../../../../../../../scripts/convert-help-to-standard.sh
+
 
 darwin_app_doc_format:
 #----------------------------------------------------------------------------
@@ -205,7 +205,13 @@ darwin_app_doc_format:
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' */*.pd && \
 		rm -f */*.pd.bak	
 # run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(HELP_DIR) && ../../../../../../../../scripts/convert-help-to-standard.sh
+	cd $(HELP_DIR)/5.reference && \
+		../../../../../../../../../scripts/convert-help-to-standard.sh
+
+#----------------------------------------------------------------------------
+# remove write perms to prevent people form editing the helpfiles by mistake
+	cd $(HELP_DIR) && chmod a-wx */*.pd */*/*.pd
+	cd $(HELP_DIR)/5.reference && chmod a-w ????*/*.* *.txt
 
 darwin_app_docs:
 #----------------------------------------------------------------------------
@@ -229,6 +235,7 @@ darwin_app_docs:
 	./mkdocs $(HELP_DIR)/3.audio.examples>$(HELP_DIR)/menus/3.audio.examples.pd
 	./mkdocs $(HELP_DIR)/4.fft.examples>$(HELP_DIR)/menus/4.fft.examples.pd
 	./mkdocs $(HELP_DIR)/5.reference>$(HELP_DIR)/menus/5.reference.pd
+
 
 darwin_app_abstractions:
 #----------------------------------------------------------------------------
@@ -256,7 +263,7 @@ darwin_app_externals_flext:
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
 	install -d $(HELP_DIR)/flext
-	install -p -m0444 ../../externals/grill/flext/gpl.txt  \
+	install -p -m0644 ../../externals/grill/flext/gpl.txt  \
 		../../externals/grill/flext/readme.txt   \
 		../../externals/grill/flext/license.txt  \
 		$(HELP_DIR)/flext
@@ -265,9 +272,9 @@ darwin_app_externals_flext:
 # dyn~
 	cd ../../externals/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared
 	install -p -m0444 ../../externals/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/dynext/pd/*.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/grill/dynext/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/dynext
-	install -p -m0444 ../../externals/grill/dynext/gpl.txt  \
+	install -p -m0644 ../../externals/grill/dynext/gpl.txt  \
 		../../externals/grill/dynext/readme.txt   \
 		../../externals/grill/dynext/license.txt  \
 		$(HELP_DIR)/dynext
@@ -275,9 +282,9 @@ darwin_app_externals_flext:
 # pool
 	cd ../../externals/grill/pool && bash ../flext/build.sh pd gcc build-release-shared
 	install -p -m0444 ../../externals/grill/pool/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/pool/help-pool.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/grill/pool/help-pool.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pool
-	install -p -m0444 ../../externals/grill/pool/gpl.txt \
+	install -p -m0644 ../../externals/grill/pool/gpl.txt \
 		../../externals/grill/pool/readme.txt   \
 		../../externals/grill/pool/license.txt \
 		$(HELP_DIR)/pool
@@ -287,9 +294,9 @@ darwin_app_externals_flext:
 #	install -p -m0444 ../../externals/grill/py/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -d $(HELP_DIR)/py/examples
 	install -d $(HELP_DIR)/py/scripts
-	install -p -m0444 ../../externals/grill/py/pd/*.pd $(HELP_DIR)/py/examples
-	install -p -m0444 ../../externals/grill/py/scripts/*.py $(HELP_DIR)/py/scripts
-	install -p -m0444 ../../externals/grill/py/gpl.txt  \
+	install -p -m0644 ../../externals/grill/py/pd/*.pd $(HELP_DIR)/py/examples
+	install -p -m0644 ../../externals/grill/py/scripts/*.py $(HELP_DIR)/py/scripts
+	install -p -m0644 ../../externals/grill/py/gpl.txt  \
 		../../externals/grill/py/readme.txt ../../externals/grill/py/license.txt \
 		$(HELP_DIR)/py
 #	install -d $(INSTALL_PREFIX)/Library/Frameworks
@@ -300,9 +307,9 @@ darwin_app_externals_flext:
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
 	cd ../../externals/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared
 	install -p -m0444 ../../externals/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/vasp/pd-help/*.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/grill/vasp/pd-help/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/vasp
-	install -p -m0444 ../../externals/grill/vasp/gpl.txt  \
+	install -p -m0644 ../../externals/grill/vasp/gpl.txt  \
 		../../externals/grill/vasp/readme.txt   \
 		../../externals/grill/vasp/license.txt  \
 		../../externals/grill/vasp/changes.txt  \
@@ -313,9 +320,9 @@ darwin_app_externals_flext:
 # xsample
 	cd ../../externals/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared
 	install -p -m0444 ../../externals/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/grill/xsample/pd/*.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/grill/xsample/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/xsample
-	install -p -m0444 ../../externals/grill/xsample/gpl.txt \
+	install -p -m0644 ../../externals/grill/xsample/gpl.txt \
 		../../externals/grill/xsample/readme.txt \
 		../../externals/grill/xsample/license.txt \
 		$(HELP_DIR)/xsample
@@ -323,32 +330,34 @@ darwin_app_externals_flext:
 # syncgrain
 	cd ../../externals/footils/syncgrain/ && make -f makefile.pd-darwin
 	install -p -m0444 ../../externals/footils/syncgrain/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
 
 
 darwin_app_externals_standard:
 #----------------------------------------------------------------------------
 # PD-EXTERNALS
-	cd ../../externals/build/darwin && make
+	-cd ../../externals/build/darwin && make -k
 	install -d $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/build/darwin/*.pd_darwin $(EXTERNALS_DIR)
 #----------------------------------------------------------------------------
 # GEM
-	install -p -m0444 ../../Gem/help/*.* $(HELP_DIR)/5.reference
+	install -p -m0644 ../../Gem/help/*.* $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/Gem/doc
-	install -p -m0444 ../../Gem/doc/*.* $(HELP_DIR)/gem
+	install -p -m0644 ../../Gem/doc/*.* $(HELP_DIR)/gem
 	install -d $(HELP_DIR)/Gem/00.manual
-	install -p -m0444 ../../Gem/manual/*.* $(HELP_DIR)/gem/00.manual
+	install -p -m0644 ../../Gem/manual/*.* $(HELP_DIR)/gem/00.manual
 	cp -Rfp ../../Gem/examples/*.* ../../Gem/examples/data $(HELP_DIR)/gem
 #----------------------------------------------------------------------------
 # hcs
 	install -p -m0444 $(shell ls -1 ../../externals/hcs/*.pd | \
 			 grep -v '\-help.pd') $(EXTERNALS_DIR)
 # hid
-	cd ../../externals/hcs/hid && make
+	cd ../../externals/hcs/hid && make 
 	install -p -m0444 ../../externals/hcs/hid/hid.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0444 $(shell ls -1 ../../externals/hcs/hid/*.pd | \
 			 grep -v '\-help.pd'| grep -v '\-list.pd') $(EXTERNALS_DIR)
+# general
+	install -p -m0444 ../../externals/hcs/general/*.pd $(EXTERNALS_DIR)
 # pan
 	install -p -m0444 $(shell ls -1 ../../externals/hcs/pan/*.pd | \
 			 grep -v '\-help.pd') $(EXTERNALS_DIR)
@@ -361,37 +370,38 @@ darwin_app_externals_standard:
 # miXed
 	cd ../../externals/miXed/toxy && make
 	cd ../../externals/miXed/cyclone && make
+	cd ../../externals/miXed/pddp && make
 	install -d -m755 $(EXTERNALS_DIR)
 	install -p -m444 ../../externals/miXed/bin/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m555 ../../externals/miXed/bin/cyclist $(PD_FILE_ROOT)/bin
 	install -d -m755 $(HELP_DIR)/5.reference/cyclone
-	install -p -m0444 ../../externals/miXed/test/*/*.*    \
+	install -p -m0644 ../../externals/miXed/test/*/*.*    \
 		$(HELP_DIR)/5.reference/cyclone
-	install -p -m0444 ../../externals/miXed/doc/*/*/*.*  \
+	install -p -m0644 ../../externals/miXed/doc/*/*/*.*  \
 		$(HELP_DIR)/5.reference
 #----------------------------------------------------------------------------
 # OSC
 	cd ../../externals/OSCx && ./configure && make
-	install -p -m0444 ../../externals/OSCx/doc/*.* $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/OSCx/doc/*.* $(HELP_DIR)/5.reference
 	install -p -m0444 ../../externals/OSCx/src/*.pd_darwin $(EXTERNALS_DIR)
 #----------------------------------------------------------------------------
 # PdP
 #	cd ../../externals/pdp && ./configure && make
 #	install -p -m0444 ../../externals/pdp/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/pdp/doc/objects/*.* $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/pdp/doc/objects/*.* $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pdp/introduction
-	install -p -m0444 ../../externals/pdp/doc/introduction/*.* $(HELP_DIR)/pdp/introduction
+	install -p -m0644 ../../externals/pdp/doc/introduction/*.* $(HELP_DIR)/pdp/introduction
 	install -d $(HELP_DIR)/pdp/examples
-	install -p -m0444 ../../externals/pdp/doc/examples/*.* $(HELP_DIR)/pdp/examples
-	install -p -m0444 ../../externals/pdp/doc/reference.txt $(HELP_DIR)/pdp
+	install -p -m0644 ../../externals/pdp/doc/examples/*.* $(HELP_DIR)/pdp/examples
+	install -p -m0644 ../../externals/pdp/doc/reference.txt $(HELP_DIR)/pdp
 # libs for PdP
 #----------------------------------------------------------------------------
 # unauthorized
 	cd ../../externals/unauthorized && make 
 	install -p -m0444 ../../externals/unauthorized/*/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/unauthorized/*/*.pd $(HELP_DIR)/5.reference
-	install -p -m0444 ../../externals/unauthorized/*/*.txt $(HELP_DIR)/5.reference
-	install -p -m0444 ../../externals/unauthorized/*/*.pls $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/unauthorized/*/*.txt $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/unauthorized/*/*.pls $(HELP_DIR)/5.reference
 	cp -Rfp ../../externals/unauthorized/blinkenlights/blm  $(HELP_DIR)/5.reference
 #----------------------------------------------------------------------------
 # zexy 
@@ -403,7 +413,7 @@ darwin_app_externals_standard:
 		$(shell ls -1 ../../externals/zexy/abs/*.pd | \
 			grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
 		$(EXTERNALS_DIR)
-	install -p -m0444	../../externals/zexy/abs/*-help.pd $(HELP_DIR)/5.reference
+	install -p -m0644	../../externals/zexy/abs/*-help.pd $(HELP_DIR)/5.reference
 
 
 darwin_app_externals_c++:
@@ -415,7 +425,7 @@ darwin_app_externals_c++:
 # gem2pdp
 #	cd ../../externals/gem2pdp && make -f Makefile.darwin
 #	install -p -m0444 ../../externals/gem2pdp/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 ../../externals/gem2pdp/*.pd $(HELP_DIR)/5.reference
+	install -p -m0644 ../../externals/gem2pdp/*.pd $(HELP_DIR)/5.reference
 #----------------------------------------------------------------------------
 # GridFlow
 #	cd ../../gridflow && ./configure && make
