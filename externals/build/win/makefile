@@ -1,29 +1,40 @@
-prefix=../../..
+
+# Adapt the PDPATH if your pd is not installed in the standard place
+
+PDPATH="$(PROGRAMFILES)/pd"
+
+
+
 
 EXTERNALS = $(shell ls ../src)
 
-all: $(EXTERNALS:.c=.dll)
+all:
+	make -k externals
+
+externals: $(EXTERNALS:.c=.dll)
 
 .SUFFIXES: .dll
 
-CFLAGS = -DPD -DMSW -DNT -Wall -W -Wshadow -Wstrict-prototypes \
+DEFINES = -DPD -DNT 
+CFLAGS = -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-INCLUDE = -I. -I.. -I ../../../pd/src -I../include -I/usr/local/include
+INCLUDE = -I. -I.. -I$(PDPATH)/src
+
 
 %.dll: ../src/%.c
-	$(CC) $(CFLAGS) $(INCLUDE) -o "$*.o" -c "../src/$*.c"
-	gcc -shared -o "$*.dll" "$*.o" $(prefix)/bin/pd.dll \
-		`test -f $*.libs && cat $*.libs` -L/usr/local/lib \
-		`test -f ../src/$*.libs && cat ../src/$*.libs`
+	$(CC) -mms-bitfields $(CFLAGS) $(DEFINES) $(INCLUDE) -o "$*.o" -c "../src/$*.c"
+	gcc -shared -o "$*.dll" "$*.o" $(PDPATH)/bin/pd.dll \
+		`test -f $*.libs && cat $*.libs` `test -f ../src/$*.libs && cat ../src/$*.libs` 
+
 clean:
 	-rm *.a *.def *.dll *.o
 
 install-doc:
-	@test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
+	@test -d $(PDPATH)/doc/5.reference || mkdir -p $(PDPATH)/doc/5.reference
 	cd ../doc && make all
-	cp -r ../doc/* $(prefix)/doc/5.reference
+	cp -r ../doc/* $(PDPATH)/doc/5.reference
 
 install: install-doc
-	@test -d $(prefix)/extra || mkdir -p $(prefix)/extra
-	install *.dll $(prefix)/extra
+	@test -d $(PDPATH)/extra || mkdir -p $(PDPATH)/extra
+	install *.dll $(PDPATH)/extra
