@@ -138,6 +138,7 @@ bool flext_base::TryMethAny(Item *lst,const t_symbol *s,int argc,const t_atom *a
 bool flext_base::FindMeth(int inlet,const t_symbol *s,int argc,const t_atom *argv)
 {
     Item *lst;
+    ItemCont *clmethhead = ClMeths(thisClassId());
 
     // search for exactly matching tag
     if((lst = methhead.FindList(s,inlet)) != NULL && TryMethTag(lst,s,argc,argv)) return true;
@@ -196,7 +197,7 @@ bool flext_base::CbMethodHandler(int inlet,const t_symbol *s,int argc,const t_at
 #endif
         
         // If float or int message is not explicitly handled: try list handler instead
-        if(!trap && argc == 1 && (s == sym_float
+        if(!trap && argc == 1 && (s == sym_float || s == sym_symbol
 #if FLEXT_SYS == FLEXT_SYS_MAX
             || s == sym_int
 #endif
@@ -208,6 +209,8 @@ bool flext_base::CbMethodHandler(int inlet,const t_symbol *s,int argc,const t_at
             else if(s == sym_int)
                 SetInt(list,GetInt(argv[0]));
 #endif
+            else if(s == sym_symbol)
+                SetSymbol(list,GetSymbol(argv[0]));
 
             trap = true;
             ret = CbMethodHandler(inlet,sym_list,1,&list);
@@ -226,7 +229,7 @@ bool flext_base::CbMethodHandler(int inlet,const t_symbol *s,int argc,const t_at
         if(ret) goto end;
 
         // if distmsgs is switched on then distribute list elements over inlets (Max/MSP behavior)
-        if(distmsgs && !trap && inlet == 0 && s == sym_list && insigs <= 1) {
+        if(DoDist() && !trap && inlet == 0 && s == sym_list && insigs <= 1) {
             int i = incnt;
             if(i > argc) i = argc;
             for(--i; i >= 0; --i) { // right to left distribution
