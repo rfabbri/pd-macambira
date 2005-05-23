@@ -6,9 +6,9 @@
 
 #include "ann.h"
 
-#include "ann_som.c"
-#include "ann_mlp.c"
-#include "ann_td.c"
+//#include "ann_som.c"
+//#include "ann_mlp.c"
+//#include "ann_td.c"
 
 typedef struct ann 
 {

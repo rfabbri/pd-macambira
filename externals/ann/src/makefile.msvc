@@ -13,8 +13,8 @@ FANNLIB="C:\Documents and Settings\Davide\Documenti\personali\PD\fann-1.2.0\fann
 
 current: clean pd_nt distclean
 
-#pd_nt: ann_som.dll ann_mlp.dll ann_td.dll ann.dll
-pd_nt: ann.dll
+pd_nt: ann_som.dll ann_mlp.dll ann_td.dll ann.dll
+#pd_nt: ann.dll
 
 
 .SUFFIXES: .dll
