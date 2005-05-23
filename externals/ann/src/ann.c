@@ -6,6 +6,10 @@
 
 #include "ann.h"
 
+#include "ann_som.c"
+#include "ann_mlp.c"
+#include "ann_td.c"
+
 typedef struct ann 
 {
   t_object t_ob;
