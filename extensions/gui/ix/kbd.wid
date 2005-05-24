@@ -1,21 +1,22 @@
 namespace eval ::ix {
     proc kbd_play {t m b x y} {
 	variable _
-	foreach a {{rs {0 sunken 1 raised}} {sr {0 raised 1 sunken}} {v {0 0 1 {($y - [winfo rooty $w]) / ([winfo height $w] + 0.0)}}}} {array set [lindex $a 0] [lindex $a 1]}
-	set w [winfo containing $x $y]; set tp $t.rp
-	if {$m != 1 && $_($t:lp) != -1 && $_($t:lp) ne $w} {
-	    $_($t:lp) config -relief raised;pd "$tp _cb [winfo name $_($t:lp)] 0 \;"}
-	if {[$w cget -relief] eq $rs($b)} {
-	    eval $w config -relief $sr($b); pd "$tp _cb [winfo name $w] [eval expr $v($b)] \;"}
+	foreach a {{rs {0 sunken 1 raised}} {v {0 0 1 {($y - [winfo rooty $w]) / ([winfo height $w] + 0.0)}}}} {array set [lindex $a 0] [lindex $a 1]}
+	set w [winfo containing $x $y]
+	if {$m != 1 && $_($t:lp) != -1 && $_($t:lp) ne $w} {kbd_action $_($t:lp) $t 0}
+	if {[$w cget -relief] eq $rs($b)} {kbd_action $w $t  [eval expr $v($b)]}
 	set _($t:lp) $w}
+
+    proc kbd_action {w t v} {
+	if {$v == 0} {set relief raised} {set relief sunken}
+	$w config -relief $relief
+	pd [concat $t.rp _cb [winfo name $w] $v \;]}
 
     proc kbd_off {p t octaves} {
 	for {set o 0} {$o < $octaves} {incr o} {	
 	    for {set on 0} {$on < 12} {incr on} {
 		set no [expr $o * 12 + $on]
-	        if {[$p.f$o.$no cget -relief] eq "sunken"} {
-		    $p.f$o.$no config -relief raised
-		    pd "$t.rp _cb $no 0 \;"}}}}
+	        if {[$p.f$o.$no cget -relief] eq "sunken"} {kbd_action $p.f$o.$no $t 0}}}}
 
     proc kbd {path t octaves b f} {
 	if {![winfo exists $path.f0]} {
