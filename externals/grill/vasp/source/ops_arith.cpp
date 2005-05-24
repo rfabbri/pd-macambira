@@ -54,7 +54,7 @@ class vasp_qsum:
 	FLEXT_HEADER(vasp_qsum,vasp_unop)
 
 public:
-	vasp_qsum(): vasp_unop(true,XletCode(xlet::tp_float,0)) {}
+	vasp_qsum(): vasp_unop(true,XletCode(xlet_float,0)) {}
 
 	virtual Vasp *do_opt(OpParam &p) 
 	{ 

@@ -143,7 +143,7 @@ class vasp_peaks:
 public:			
 	
 	vasp_peaks(I argc,const t_atom *argv): 
-		vasp_anyop(argc,argv,VASP_ARG(),true,XletCode(xlet::tp_float,0)) 
+		vasp_anyop(argc,argv,VASP_ARG(),true,XletCode(xlet_float,0)) 
 	{}
 
 	virtual Vasp *do_peaks(OpParam &p) 

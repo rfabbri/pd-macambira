@@ -51,7 +51,7 @@ class vasp_copy:
 	FLEXT_HEADER(vasp_copy,vasp_anyop)
 public:			
 	
-	vasp_copy(I argc,const t_atom *argv): vasp_anyop(argc,argv,VASP_ARG(),true,XletCode(xlet::tp_any,0)) {}
+	vasp_copy(I argc,const t_atom *argv): vasp_anyop(argc,argv,VASP_ARG(),true,XletCode(xlet_any,0)) {}
 
 	virtual V m_to(I,const t_atom *) { post("s - destination vasp is ignored!",thisName()); }
 

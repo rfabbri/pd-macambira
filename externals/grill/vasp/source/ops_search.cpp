@@ -141,7 +141,7 @@ class vasp_search:
 public:			
 	
 	vasp_search(I argc,t_atom *argv): 
-		vasp_anyop(argc,argv,VASP_ARG_R(0),false,XletCode(xlet::tp_float,0)),
+		vasp_anyop(argc,argv,VASP_ARG_R(0),false,XletCode(xlet_float,0)),
 		slope(0),dir(0),incl(false)
 	{}
 
