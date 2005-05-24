@@ -1,95 +1,39 @@
 namespace eval ::ix {
-variable kbd_lastplayed
+    proc kbd_play {t m b x y} {
+	variable _
+	foreach a {{rs {0 sunken 1 raised}} {sr {0 raised 1 sunken}} {v {0 0 1 {($y - [winfo rooty $w]) / ([winfo height $w] + 0.0)}}}} {array set [lindex $a 0] [lindex $a 1]}
+	set w [winfo containing $x $y]; set tp $t.rp
+	if {$m != 1 && $_($t:lp) != -1 && $_($t:lp) ne $w} {
+	    $_($t:lp) config -relief raised;pd "$tp _cb [winfo name $_($t:lp)] 0 \;"}
+	if {[$w cget -relief] eq $rs($b)} {
+	    eval $w config -relief $sr($b); pd "$tp _cb [winfo name $w] [eval expr $v($b)] \;"}
+	set _($t:lp) $w}
 
-proc kbd_click {target w h} {
-    set height [winfo height $w]
-    set vel [expr $h.0 / $height.0]
-    variable kbd_lastplayed
-    set kbd_lastplayed $w
-    kbd_down $target $w $vel
-}
-proc kbd_down {target w vel} {
-    pd "$target.rp _cb [winfo name $w] $vel;"
-    $w conf -relief sunken
-}
-proc kbd_up {target w} {
-    pd "$target.rp _cb [winfo name $w] 0;"
-    $w conf -relief raised
-}
-proc kbd_release {target} {
-    variable kbd_lastplayed
-    if {$kbd_lastplayed != {}} {kbd_up $target $kbd_lastplayed}
-}
-proc kbd_key {path target count vel key} {
-    set w $path.f[expr $key / 12].$key
-    if {$vel > 0} {kbd_down $target $w $vel}
-    if {$vel == 0} {kbd_up $target $w}
-}
-proc kbd_fkey {path target count key} {
-    set w $path.f[expr $key / 12].$key
-    kbd_down $target $w 1
-    kbd_up $target $w
-}
+    proc kbd_off {p t octaves} {
+	for {set o 0} {$o < $octaves} {incr o} {	
+	    for {set on 0} {$on < 12} {incr on} {
+		set no [expr $o * 12 + $on]
+	        if {[$p.f$o.$no cget -relief] eq "sunken"} {
+		    $p.f$o.$no config -relief raised
+		    pd "$t.rp _cb $no 0 \;"}}}}
 
-proc kbd_drag {target x y} {
-    variable kbd_lastplayed
-    set w [winfo containing $x $y]
-    if { $w == "" } { kbd_release $target; set kbd_lastplayed {}; return }
-    if { $w == $kbd_lastplayed } return
-    if {[lsearch -exact [bindtags $w] key ] == -1 } {
-	kbd_release $target
-	set kbd_lastplayed {}; return
-    } 
-    kbd_release $target
-    set h [expr $y - [winfo rooty $w]]
-    kbd_click $target $w $h
-}
-proc kbd_white {w t p} { set t {}
-    label $w -text $t -background white -foreground black \
-				     -borderwidth 1 -relief raised 
-    place $w -relx $p -y 0 -relwidth 0.142857 -relheight 1
-    bindtags $w {key}
-    lower $w
-}
-proc kbd_black {w t p} { set t {}
-    label $w -text $t -background black -foreground white \
-			     -borderwidth 1 -relief raised 
-    place $w -relx $p -y 0 -relwidth 0.1 -relheight 0.6 -anchor n
-    bindtags $w {key}
-}
-proc kbd {path target octaves} {
-    if {[winfo exists $path.f0] != 1} {
-#    foreach oct [winfo children $path] {destroy $oct}
-	$path config -width [expr $octaves * 66]
-	for {set o 0} {$o < $octaves} {incr o} {
-	    set w $path.f$o
-	    frame $w -bd 0 -height 66 -width 66
-	    kbd_white $w.[expr $o * 12]  C  0.0
-	    kbd_black $w.[expr $o * 12 + 1]  C# 0.142857
-	    kbd_white $w.[expr $o * 12 + 2]  D  0.142857
-	    kbd_black $w.[expr $o * 12 + 3]  D# 0.285714
-	    kbd_white $w.[expr $o * 12 + 4]  E  0.285714
-	    kbd_white $w.[expr $o * 12 + 5]  F  0.428571
-	    kbd_black $w.[expr $o * 12 + 6]  F# 0.571428
-	    kbd_white $w.[expr $o * 12 + 7]  G  0.571428
-	    kbd_black $w.[expr $o * 12 + 8]  G# 0.714285
-	    kbd_white $w.[expr $o * 12 + 9]  A  0.714285
-	    kbd_black $w.[expr $o * 12 + 10] A# 0.857142
-	    kbd_white $w.[expr $o * 12 + 11] H  0.857142
-	    place $w -y 0 -relheight 1.0 -relx [expr $o / $octaves.0] -relwidth [expr 1 / $octaves.0]
-	}
-    }
-}
+    proc kbd {path t octaves b f} {
+	if {![winfo exists $path.f0]} {
+	    variable _
+	    set _($t:lp) -1
+	    $path config -width [expr $octaves * 66]
+	    set bw {0 1 0 1 0 0 1 0 1 0 1 0} ; set npl {0 1 1 2 2 3 4 4 5 5 6 6}
+	    foreach a {{bg "0 $b 1 $f"} {fg "1 $b 0 $f"} {an {0 ";lower $wk" 1 "-anchor n"}} {rw {0 {[expr 1 / 7.]} 1 {[expr 1 / 10.]}}} {rh {0 {[expr 1.]} 1 {[expr 6 / 10.]}}}} {array set [lindex $a 0] [lindex $a 1]}
+	    for {set o 0} {$o < $octaves} {incr o} {
+		set w $path.f$o ; frame $w -bd 0 -height 66 -width 66
+		for {set on 0} {$on < 12} {incr on} {
+		    set wk $w.[expr $o * 12 + $on] ; set n [lindex $bw $on]
+		    eval "label $wk -bg $bg($n) -fg $fg($n) -bd 1 -relief raised;place $wk -relx [expr [lindex $npl $on] / 7.] -y 0 -relwidth $rw($n) -relheight $rh($n) $an($n)"
+		    bind $wk <1> "::ix::kbd_play $t 0 1 %X %Y"; bind $wk <B1-Motion> [bind $wk <1>];bind $wk <ButtonRelease-1> "::ix::kbd_play $t 0 0 %X %Y"; bind $wk <Enter> "::ix::kbd_play $t 1 0 %X %Y"; bind $wk <3> "::ix::kbd_play $t 1 1 %X %Y"; bind $wk <B3-Motion> [bind $wk <3>]; bind $wk <2> "::ix::kbd_off $path $t $octaves"}
+		place $w -y 0 -relheight 1.0 -relx [expr $o / $octaves.0] -relwidth [expr 1 / $octaves.0]}}}}
 
-}
 #> kbd frame
 #. -height 100 -width 60
-#. #octaves 6
-#. @list ::ix::kbd_key .- .| .#n .#2 .#1
-#. @float ::ix::kbd_fkey .- .| .#n .#1
-puts "kbd .- .|"
-::ix::kbd .- .| .#octaves
+#. #octaves 6 #bg black #fg white
 
-bind key <1> {::ix::kbd_click .| %W %y}
-bind key <B1-Motion> {::ix::kbd_drag .| %X %Y}
-bind key <ButtonRelease-1> {::ix::kbd_release .|}
+::ix::kbd .- .| .#octaves .#bg .#fg
