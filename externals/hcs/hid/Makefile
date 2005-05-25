@@ -50,5 +50,5 @@ input_arrays:
 	./make-arrays-from-input.h.pl
 
 
-clean: ; rm -f *.pd_* *.o *~ input_arrays.? ev*-list.pd
+clean: ; rm -f *.pd_* *.o *~ input_arrays.? doc/ev*-list.pd
 

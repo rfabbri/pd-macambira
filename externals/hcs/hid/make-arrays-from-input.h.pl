@@ -72,7 +72,7 @@ sub printPdFile
 	 my $y;
 	 my $lineNum = 1;
 
-	 my $PDFILENAME = "$arrayToPrint[0]-list.pd";
+	 my $PDFILENAME = "doc/$arrayToPrint[0]-list.pd";
 	 open(PDFILE, ">$PDFILENAME");
 
 	 print(PDFILE "#N canvas 282 80 210 570 10;\n");
