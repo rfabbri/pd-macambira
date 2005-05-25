@@ -80,3 +80,9 @@
 
 # MACOS X FILES
 *.pmsp -k 'b'
+
+# prevent keyword replacement on imported sources
+# 2005-05-20 <hans@at.or.at>
+portaudio/* -k 'b'
+portaudio_osx/* -k 'b'
+portaudio_v18/* -k 'b'
