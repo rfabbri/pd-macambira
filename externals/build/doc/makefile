@@ -7,6 +7,8 @@
 DOC_DIR = .
 
 all:
+# add write perms to allow rewriting over all files
+	chmod -R u+w $(DOC_DIR)
 #----------------------------------------------------------------------------
 # all standard objs' help files
 	install -p -m0644 \
@@ -30,8 +32,6 @@ all:
 			../../hcs/*-help.pd \
 			../../hcs/*/doc/*.pd \
 			../../hcs/hid/examples/*.pd \
-			../../hcs/hid/*-help.pd \
-			../../hcs/hid/ev*-list.pd \
 			../../hcs/pan/*-help.pd \
 			../../iem/comport/*/*-help.pd \
 			../../markex/*.pd \
@@ -68,7 +68,7 @@ all:
 #----------------------------------------------------------------------------
 # zexy uses its own dir
 	install -d -m0755 $(DOC_DIR)/zexy
-	install -p -m0444 ../../zexy/zexy.pd  $(DOC_DIR)
+	install -p -m0644 ../../zexy/zexy.pd  $(DOC_DIR)
 	install -p -m0644 ../../zexy/examples/*.* $(DOC_DIR)/zexy
 
 
@@ -79,10 +79,6 @@ all:
 	rm prob-help.pd
 #  maxlib conflicts with cyclone
 	rm help-split.pd
-#----------------------------------------------------------------------------
-# no need to have pd patches executable or writable
-	chmod a-x *.pd */*.pd
-	chmod a-w ????*/*.* *.pd *.txt
 
 
 #----------------------------------------------------------------------------
