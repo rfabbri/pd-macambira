@@ -51,12 +51,8 @@ static t_namelist *sys_messagelist;
 static int sys_version;
 int sys_oldtclversion;      /* hack to warn g_rtext.c about old text sel */
 
-int sys_nmidiout = 1;
-#ifdef MSW
-int sys_nmidiin = 0;
-#else
-int sys_nmidiin = 1;
-#endif
+int sys_nmidiout = -1;
+int sys_nmidiin = -1;
 int sys_midiindevlist[MAXMIDIINDEV] = {1};
 int sys_midioutdevlist[MAXMIDIOUTDEV] = {1};
 
@@ -921,8 +917,10 @@ static void sys_afterargparse(void)
         for (i = 0; i < naudiooutdev; i++)
             audiooutdev[i] = sys_soundoutdevlist[i];
     }
+    sys_get_midi_params(&nmidiindev, midiindev, &nmidioutdev, midioutdev);
     if (sys_nmidiin >= 0)
     {
+        post("sys_nmidiin %d, nmidiindev %d", sys_nmidiin, nmidiindev);
         nmidiindev = sys_nmidiin;
         for (i = 0; i < nmidiindev; i++)
             midiindev[i] = sys_midiindevlist[i];

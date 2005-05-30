@@ -311,21 +311,25 @@ void sys_loadpreferences( void)
         naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate, advance, 0);
         
         /* load MIDI preferences */
-    for (i = 0, nmidiindev = 0; i < MAXMIDIINDEV; i++)
+    if (sys_getpreference("nomidiin", prefbuf, MAXPDSTRING))
+        nmidiindev = 0;
+    else for (i = 0, nmidiindev = 0; i < MAXMIDIINDEV; i++)
     {
         sprintf(keybuf, "midiindev%d", i+1);
         if (!sys_getpreference(keybuf, prefbuf, MAXPDSTRING))
             break;
-        if (sscanf(prefbuf, "%d %d", &midiindev[i], &chindev[i]) < 2)
+        if (sscanf(prefbuf, "%d", &midiindev[i]) < 1)
             break;
         nmidiindev++;
     }
-    for (i = 0, nmidioutdev = 0; i < MAXMIDIOUTDEV; i++)
+    if (sys_getpreference("nomidiout", prefbuf, MAXPDSTRING))
+        nmidioutdev = 0;
+    else for (i = 0, nmidioutdev = 0; i < MAXMIDIOUTDEV; i++)
     {
         sprintf(keybuf, "midioutdev%d", i+1);
         if (!sys_getpreference(keybuf, prefbuf, MAXPDSTRING))
             break;
-        if (sscanf(prefbuf, "%d %d", &midioutdev[i], &choutdev[i]) < 2)
+        if (sscanf(prefbuf, "%d", &midioutdev[i]) < 1)
             break;
         nmidioutdev++;
     }

@@ -482,6 +482,21 @@ void template_notify(t_template *template, t_symbol *s, int argc, t_atom *argv)
         outlet_anything(template->t_list->x_obj.ob_outlet, s, argc, argv);
 }
 
+#if 0
+    /* bash the first of (argv) with a pointer to a scalar, and send on
+    to template as a notification message */
+static void template_notifyforscalar(t_template *template, t_glist *owner,
+    t_scalar *sc, t_symbol *s, int argc, t_atom *argv)
+{
+    t_gpointer gp;
+    gpointer_init(&gp);
+    gpointer_setglist(&gp, owner, x);
+    SETPOINTER(argv, &gp);
+    template_notify(template, s, argc, argv);
+    gpointer_unset(&gp);
+}
+#endif
+
     /* call this when reading a patch from a file to declare what templates
     we'll need.  If there's already a template, check if it matches.
     If it doesn't it's still OK as long as there are no "struct" (gtemplate)
@@ -1899,19 +1914,22 @@ static void drawnumber_getrect(t_gobj *z, t_glist *glist,
 {
     t_drawnumber *x = (t_drawnumber *)z;
     t_atom at;
+        int xloc, yloc, font, fontwidth, fontheight;
+    char buf[DRAWNUMBER_BUFSIZE];
+
     if (!x->x_vis)
     {
         *xp1 = *yp1 = 0x7fffffff;
         *xp2 = *yp2 = -0x7fffffff;
         return;
     }
-    int xloc = glist_xtopixels(glist,
+    xloc = glist_xtopixels(glist,
         basex + fielddesc_getfloat(&x->x_xloc, template, data, 0));
-    int yloc = glist_ytopixels(glist,
+    yloc = glist_ytopixels(glist,
         basey + fielddesc_getfloat(&x->x_yloc, template, data, 0));
-    int font = glist_getfont(glist);
-    int fontwidth = sys_fontwidth(font), fontheight = sys_fontheight(font);
-    char buf[DRAWNUMBER_BUFSIZE];
+    font = glist_getfont(glist);
+    fontwidth = sys_fontwidth(font);
+        fontheight = sys_fontheight(font);
     if (x->x_flags & DRAW_SYMBOL)
         SETSYMBOL(&at, fielddesc_getsymbol(&x->x_value, template, data, 0));
     else SETFLOAT(&at, fielddesc_getfloat(&x->x_value, template, data, 0));

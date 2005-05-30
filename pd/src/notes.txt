@@ -3,6 +3,10 @@ done for 0.39:
 arrays are now first-class data
 array elements can be clicked on, etc
 fixed array onset bug
+rfft bug fix
+
+check:
+MIDI I/O for windows
 
 At the source level, "regular" arrays and arrays withing data structures
 are now the same thing.  The main user-visible effect of this is that now
@@ -23,6 +27,8 @@ block resampling arguments
 document tabwrite~_start
 
 problems:
+Macintosh .pd extension not added to filenames
+need to optimize canvas_motion (get rid of box hit test??)
 check if there's a problem loading libs on startup if superuser
 tk errors for large tables?
 wierdly small hotspot on lines

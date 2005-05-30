@@ -971,24 +971,17 @@ static void trigger_list(t_trigger *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_triggerout *u;
     int i;
-    t_atom at;
-    if (!argc)
-    {
-        argc = 1;
-        SETFLOAT(&at, 0);
-        argv = &at;
-    }
     for (i = x->x_n, u = x->x_vec + i; u--, i--;)
     {
         if (u->u_type == TR_FLOAT)
-            outlet_float(u->u_outlet, atom_getfloat(argv));
+            outlet_float(u->u_outlet, (argc ? atom_getfloat(argv) : 0));
         else if (u->u_type == TR_BANG)
             outlet_bang(u->u_outlet);
         else if (u->u_type == TR_SYMBOL)
-            outlet_symbol(u->u_outlet, atom_getsymbol(argv));
+            outlet_symbol(u->u_outlet, (argc ? atom_getsymbol(argv) : 0));
         else if (u->u_type == TR_POINTER)
         {
-            if (argv->a_type != TR_POINTER)
+            if (!argc || argv->a_type != TR_POINTER)
                 pd_error(x, "unpack: bad pointer");
             else outlet_pointer(u->u_outlet, argv->a_w.w_gpointer);
         }

@@ -30,7 +30,7 @@ objects use Posix-like threads.  */
 /***************** soundfile header structures ************************/
 
 typedef unsigned short uint16;
-typedef unsigned long uint32;
+typedef unsigned int uint32;
 
 #define FORMAT_WAVE 0
 #define FORMAT_AIFF 1

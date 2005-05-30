@@ -4,6 +4,37 @@
 
 #include "m_pd.h"
 
+/* ---------------- utility functions for DSP chains ---------------------- */
+
+    /* swap two arrays */
+static t_int *sigfft_swap(t_int *w)
+{
+    float *in1 = (t_float *)(w[1]);
+    float *in2 = (t_float *)(w[2]);
+    int n = w[3];
+    for (;n--; in1++, in2++)
+    {   
+        float f = *in1;
+        *in1 = *in2;
+        *in2 = f;
+    }
+    return (w+4);    
+}
+
+    /* take array1 (supply a pointer to beginning) and copy it,
+    into decreasing addresses, into array 2 (supply a pointer one past the
+    end), and negate the sign. */
+
+static t_int *sigrfft_flip(t_int *w)
+{
+    float *in = (t_float *)(w[1]);
+    float *out = (t_float *)(w[2]);
+    int n = w[3];
+    while (n--)
+        *(--out) = - *in++;
+    return (w+4);
+}
+
 /* ------------------------ fft~ and ifft~ -------------------------------- */
 static t_class *sigfft_class, *sigifft_class;
 
@@ -31,20 +62,6 @@ static void *sigifft_new(void)
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
     x->x_f = 0;
     return (x);
-}
-
-static t_int *sigfft_swap(t_int *w)
-{
-    float *in1 = (t_float *)(w[1]);
-    float *in2 = (t_float *)(w[2]);
-    int n = w[3];
-    for (;n--; in1++, in2++)
-    {   
-        float f = *in1;
-        *in1 = *in2;
-        *in2 = f;
-    }
-    return (w+4);    
 }
 
 static t_int *sigfft_perform(t_int *w)
@@ -130,16 +147,6 @@ static void *sigrfft_new(void)
     return (x);
 }
 
-static t_int *sigrfft_flip(t_int *w)
-{
-    float *in = (t_float *)(w[1]);
-    float *out = (t_float *)(w[2]);
-    int n = w[3];
-    while (n--) *(--out) = *in++;
-    *(--out) = 0;                   /* to hell with it */
-    return (w+4);
-}
-
 static t_int *sigrfft_perform(t_int *w)
 {
     float *in = (t_float *)(w[1]);
@@ -159,20 +166,14 @@ static void sigrfft_dsp(t_sigrfft *x, t_signal **sp)
         error("fft: minimum 4 points");
         return;
     }
-    if (in1 == out2)    /* this probably never happens */
-    {
-        dsp_add(sigrfft_perform, 2, out2, n);
-        dsp_add(copy_perform, 3, out2, out1, n2);
-        dsp_add(sigrfft_flip, 3, out2 + (n2+1), out2 + n2, n2-1);
-    }
-    else
-    {
-        if (in1 != out1) dsp_add(copy_perform, 3, in1, out1, n);
-        dsp_add(sigrfft_perform, 2, out1, n);
-        dsp_add(sigrfft_flip, 3, out1 + (n2+1), out2 + n2, n2-1);
-    }
-    dsp_add_zero(out1 + n2, n2);
+    if (in1 != out1)
+        dsp_add(copy_perform, 3, in1, out1, n);
+    dsp_add(sigrfft_perform, 2, out1, n);
+    dsp_add(sigrfft_flip, 3, out1 + (n2+1), out2 + n2, n2-1);
+    dsp_add_zero(out1 + (n2+1), ((n2-1)&(~7)));
+    dsp_add_zero(out1 + (n2+1) + ((n2-1)&(~7)), ((n2-1)&7));
     dsp_add_zero(out2 + n2, n2);
+    dsp_add_zero(out2, 1);
 }
 
 static void sigrfft_setup(void)
@@ -224,12 +225,12 @@ static void sigrifft_dsp(t_sigrifft *x, t_signal **sp)
     }
     if (in2 == out1)
     {
-        dsp_add(sigrfft_flip, 3, out1+1, out1 + n, (n2-1));
-        dsp_add(copy_perform, 3, in1, out1, n2);
+        dsp_add(sigrfft_flip, 3, out1+1, out1 + n, n2-1);
+        dsp_add(copy_perform, 3, in1, out1, n2+1);
     }
     else
     {
-        if (in1 != out1) dsp_add(copy_perform, 3, in1, out1, n2);
+        if (in1 != out1) dsp_add(copy_perform, 3, in1, out1, n2+1);
         dsp_add(sigrfft_flip, 3, in2+1, out1 + n, n2-1);
     }
     dsp_add(sigrifft_perform, 2, out1, n);

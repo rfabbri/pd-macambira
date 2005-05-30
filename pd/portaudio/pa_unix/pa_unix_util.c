@@ -1,5 +1,5 @@
 /*
- * $Id: pa_unix_util.c,v 1.1.2.4 2003/11/01 10:12:13 aknudsen Exp $
+ * $Id: pa_unix_util.c,v 1.1.2.7 2005/03/31 15:02:48 aknudsen Exp $
  * Portable Audio I/O Library
  * UNIX platform-specific support functions
  *
@@ -31,12 +31,15 @@
  */
 
  
+#include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <assert.h>
+#include <string.h> /* For memset */
 
 #include "pa_util.h"
-
+#include "pa_unix_util.h"
 
 /*
    Track memory allocations to avoid leaks.
@@ -106,5 +109,67 @@ PaTime PaUtil_GetTime( void )
 {
     struct timeval tv;
     gettimeofday( &tv, NULL );
-    return (PaTime) tv.tv_usec / 1000000 + (PaTime) tv.tv_sec;
+    return (PaTime) tv.tv_usec / 1000000. + tv.tv_sec;
 }
+
+PaError PaUtil_InitializeThreading( PaUtilThreading *threading )
+{
+    (void) paUtilErr_;
+    return paNoError;
+}
+
+void PaUtil_TerminateThreading( PaUtilThreading *threading )
+{
+}
+
+PaError PaUtil_StartThreading( PaUtilThreading *threading, void *(*threadRoutine)(void *), void *data )
+{
+    pthread_create( &threading->callbackThread, NULL, threadRoutine, data );
+    return paNoError;
+}
+
+PaError PaUtil_CancelThreading( PaUtilThreading *threading, int wait, PaError *exitResult )
+{
+    PaError result = paNoError;
+    void *pret;
+
+    if( exitResult )
+        *exitResult = paNoError;
+
+    /* Only kill the thread if it isn't in the process of stopping (flushing adaptation buffers) */
+    if( !wait )
+        pthread_cancel( threading->callbackThread );   /* XXX: Safe to call this if the thread has exited on its own? */
+    pthread_join( threading->callbackThread, &pret );
+
+#ifdef PTHREAD_CANCELED
+    if( pret && PTHREAD_CANCELED != pret )
+#else
+    /* !wait means the thread may have been canceled */
+    if( pret && wait )
+#endif
+    {
+        if( exitResult )
+            *exitResult = *(PaError *) pret;
+        free( pret );
+    }
+
+    return result;
+}
+
+/*
+static void *CanaryFunc( void *userData )
+{
+    const unsigned intervalMsec = 1000;
+    PaUtilThreading *th = (PaUtilThreading *) userData;
+
+    while( 1 )
+    {
+        th->canaryTime = PaUtil_GetTime();
+
+        pthread_testcancel();
+        Pa_Sleep( intervalMsec );
+    }
+
+    pthread_exit( NULL );
+}
+*/

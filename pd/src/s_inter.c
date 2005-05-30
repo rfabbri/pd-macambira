@@ -18,6 +18,7 @@ that didn't really belong anywhere. */
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/mman.h>
+#include <sys/resource.h>
 #endif
 #ifdef HAVE_BSTRING_H
 #include <bstring.h>
@@ -278,6 +279,12 @@ void sys_set_priority(int higher)
 #endif
 
 #ifdef _POSIX_MEMLOCK
+    /* tb: force memlock to physical memory { */
+    struct rlimit mlock_limit;
+    mlock_limit.rlim_cur=0;
+    mlock_limit.rlim_max=0;
+    setrlimit(RLIMIT_MEMLOCK,&mlock_limit);
+    /* } tb */
     if (mlockall(MCL_FUTURE) != -1) 
         fprintf(stderr, "memory locking enabled.\n");
 #endif

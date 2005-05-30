@@ -1,5 +1,5 @@
 /*
- * $Id: pa_mac_core.c,v 1.8.2.1 2004/05/27 22:39:58 gregpfeil Exp $
+ * $Id: pa_mac_core.c,v 1.8.2.2 2005/02/15 07:59:45 rossbencina Exp $
  * pa_mac_core.c
  * Implementation of PortAudio for Mac OS X CoreAudio       
  *                                                                                         
@@ -564,7 +564,9 @@ static PaError SetUpUnidirectionalStream(AudioDeviceID device, double sampleRate
 {
     PaError err = paNoError;
     err = SetSampleRate(device, sampleRate, isInput);
-    err = SetFramesPerBuffer(device, framesPerBuffer, isInput);
+    if( err == paNoError )
+        err = SetFramesPerBuffer(device, framesPerBuffer, isInput);
+    return err;
 }
 
 // =====  PortAudio functions  =====

@@ -52,7 +52,7 @@ output, in a loop.&nbsp; The complete example can be found in "pablio/test_rw.c"
 &nbsp;&nbsp;&nbsp; PABLIO_Stream&nbsp; *aStream;
 
 /* Open simplified blocking I/O layer on top of PortAudio. */
-&nbsp;&nbsp;&nbsp; err = OpenAudioStream( &amp;rwbl, SAMPLE_RATE, paFloat32,
+&nbsp;&nbsp;&nbsp; err = OpenAudioStream( &amp;aStream, SAMPLE_RATE, paFloat32,
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (PABLIO_READ_WRITE | PABLIO_STEREO) );
 &nbsp;&nbsp;&nbsp; if( err != paNoError ) goto error;
 

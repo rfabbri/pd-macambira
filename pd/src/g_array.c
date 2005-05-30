@@ -80,6 +80,7 @@ void array_resize(t_array *x, int n)
     {
         char *cp = x->a_vec + elemsize * oldn;
         int i = n - oldn;
+        post("%d->%d", oldn, i);
         for (; i--; cp += elemsize)
         {
             t_word *wp = (t_word *)cp;
@@ -468,7 +469,7 @@ void garray_arrayviewlist_new(t_garray *x)
     for (i = 0; i < ARRAYPAGESIZE && i < a->a_n; i++)
     {
         yval = *(float *)(a->a_vec +
-               elemsize * i * sizeof (t_word) + yonset);
+               elemsize * i + yonset);
         sys_vgui(".%sArrayWindow.lb insert %d {%d) %g}\n",
                  x->x_realname->s_name,
                  i,
@@ -512,7 +513,7 @@ void garray_arrayviewlist_fillpage(t_garray *x,
          i++)
     {
         yval = *(float *)(a->a_vec + \
-               elemsize * i * sizeof (t_word) + yonset);
+               elemsize * i + yonset);
         sys_vgui(".%sArrayWindow.lb insert %d {%d) %g}\n",
                  x->x_realname->s_name,
                  i % ARRAYPAGESIZE,

@@ -81,7 +81,7 @@ static void netsend_connect(t_netsend *x, t_symbol *hostname,
     {
         intarg = 1;
         if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY,
-            &intarg, sizeof(intarg)) < 0)
+            (char *)&intarg, sizeof(intarg)) < 0)
                 post("setsockopt (TCP_NODELAY) failed\n");
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -273,7 +273,7 @@ static void *netreceive_new(t_symbol *compatflag,
         /* ask OS to allow another Pd to repoen this port after we close it. */
     intarg = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
-        &intarg, sizeof(intarg)) < 0)
+        (char *)&intarg, sizeof(intarg)) < 0)
             post("setsockopt (SO_REUSEADDR) failed\n");
 #endif
 #if 0
@@ -287,7 +287,7 @@ static void *netreceive_new(t_symbol *compatflag,
     {
         intarg = 1;
         if (setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY,
-            &intarg, sizeof(intarg)) < 0)
+            (char *)&intarg, sizeof(intarg)) < 0)
                 post("setsockopt (TCP_NODELAY) failed\n");
     }
         /* assign server port number */

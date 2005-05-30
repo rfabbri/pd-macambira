@@ -1,5 +1,5 @@
 /*
- * $Id: pa_process.c,v 1.1.2.45 2004/05/11 13:40:42 rossbencina Exp $
+ * $Id: pa_process.c,v 1.1.2.48 2004/12/13 09:48:43 rossbencina Exp $
  * Portable Audio I/O Library
  * streamCallback <-> host buffer processing adapter
  *
@@ -145,9 +145,9 @@ PaError PaUtil_InitializeBufferProcessor( PaUtilBufferProcessor* bp,
 
     bp->hostBufferSizeMode = hostBufferSizeMode;
 
-    bp->hostInputChannels[0] = 0;
-    bp->hostOutputChannels[0] = 0;
-    
+    bp->hostInputChannels[0] = bp->hostInputChannels[1] = 0;
+    bp->hostOutputChannels[0] = bp->hostOutputChannels[1] = 0;
+
     if( framesPerUserBuffer == 0 ) /* streamCallback will accept any buffer size */
     {
         bp->useNonAdaptingProcess = 1;
@@ -818,48 +818,42 @@ static unsigned long NonAdaptingProcess( PaUtilBufferProcessor *bp,
                 bp->timeInfo->outputBufferDacTime += frameCount * bp->samplePeriod;
 
                 /* convert output data (user -> host) */
-                if( bp->outputChannelCount != 0 )
+                
+                if( bp->outputChannelCount != 0 && bp->hostOutputChannels[0][0].data )
                 {
-                    if( !bp->hostOutputChannels[0][0].data )
-                    {
-                        /* do nothing, this are no host output buffers */
-                    }
-                    else
-                    {
-                        /*
-                            could use more elaborate logic here and sometimes process
-                            buffers in-place.
-                        */
+                    /*
+                        could use more elaborate logic here and sometimes process
+                        buffers in-place.
+                    */
             
-                        srcBytePtr = (unsigned char *)bp->tempOutputBuffer;
+                    srcBytePtr = (unsigned char *)bp->tempOutputBuffer;
 
-                        if( bp->userOutputIsInterleaved )
-                        {
-                            srcSampleStrideSamples = bp->outputChannelCount;
-                            srcChannelStrideBytes = bp->bytesPerUserOutputSample;
-                        }
-                        else /* user output is not interleaved */
-                        {
-                            srcSampleStrideSamples = 1;
-                            srcChannelStrideBytes = frameCount * bp->bytesPerUserOutputSample;
-                        }
+                    if( bp->userOutputIsInterleaved )
+                    {
+                        srcSampleStrideSamples = bp->outputChannelCount;
+                        srcChannelStrideBytes = bp->bytesPerUserOutputSample;
+                    }
+                    else /* user output is not interleaved */
+                    {
+                        srcSampleStrideSamples = 1;
+                        srcChannelStrideBytes = frameCount * bp->bytesPerUserOutputSample;
+                    }
 
-                        for( i=0; i<bp->outputChannelCount; ++i )
-                        {
-                            bp->outputConverter(    hostOutputChannels[i].data,
-                                                    hostOutputChannels[i].stride,
-                                                    srcBytePtr, srcSampleStrideSamples,
-                                                    frameCount, &bp->ditherGenerator );
+                    for( i=0; i<bp->outputChannelCount; ++i )
+                    {
+                        bp->outputConverter(    hostOutputChannels[i].data,
+                                                hostOutputChannels[i].stride,
+                                                srcBytePtr, srcSampleStrideSamples,
+                                                frameCount, &bp->ditherGenerator );
 
-                            srcBytePtr += srcChannelStrideBytes;  /* skip to next source channel */
+                        srcBytePtr += srcChannelStrideBytes;  /* skip to next source channel */
 
-                            /* advance dest ptr for next iteration */
-                            hostOutputChannels[i].data = ((unsigned char*)hostOutputChannels[i].data) +
-                                    frameCount * hostOutputChannels[i].stride * bp->bytesPerHostOutputSample;
-                        }
+                        /* advance dest ptr for next iteration */
+                        hostOutputChannels[i].data = ((unsigned char*)hostOutputChannels[i].data) +
+                                frameCount * hostOutputChannels[i].stride * bp->bytesPerHostOutputSample;
                     }
                 }
-
+             
                 framesProcessed += frameCount;
 
                 framesToGo -= frameCount;
@@ -870,12 +864,12 @@ static unsigned long NonAdaptingProcess( PaUtilBufferProcessor *bp,
 
     if( framesToGo > 0 )
     {
-        /* zero any remaining frames. There will only be remaining frames
+        /* zero any remaining frames output. There will only be remaining frames
             if the callback has returned paComplete or paAbort */
 
         frameCount = framesToGo;
 
-        if( bp->hostOutputChannels[0][0].data )
+        if( bp->outputChannelCount != 0 && bp->hostOutputChannels[0][0].data )
         {
             for( i=0; i<bp->outputChannelCount; ++i )
             {
@@ -1133,6 +1127,79 @@ static unsigned long AdaptingOutputOnlyProcess( PaUtilBufferProcessor *bp,
     return framesProcessed;
 }
 
+/* CopyTempOutputBuffersToHostOutputBuffers is called from AdaptingProcess to copy frames from
+	tempOutputBuffer to hostOutputChannels. This includes data conversion
+	and interleaving. 
+*/
+static void CopyTempOutputBuffersToHostOutputBuffers( PaUtilBufferProcessor *bp)
+{
+    unsigned long maxFramesToCopy;
+    PaUtilChannelDescriptor *hostOutputChannels;
+    unsigned int frameCount;
+    unsigned char *srcBytePtr;
+    unsigned int srcSampleStrideSamples; /* stride from one sample to the next within a channel, in samples */
+    unsigned int srcChannelStrideBytes; /* stride from one channel to the next, in bytes */
+    unsigned int i;
+
+     /* copy frames from user to host output buffers */
+     while( bp->framesInTempOutputBuffer > 0 &&
+             ((bp->hostOutputFrameCount[0] + bp->hostOutputFrameCount[1]) > 0) )
+     {
+         maxFramesToCopy = bp->framesInTempOutputBuffer;
+
+         /* select the output buffer set (1st or 2nd) */
+         if( bp->hostOutputFrameCount[0] > 0 )
+         {
+             hostOutputChannels = bp->hostOutputChannels[0];
+             frameCount = PA_MIN_( bp->hostOutputFrameCount[0], maxFramesToCopy );
+         }
+         else
+         {
+             hostOutputChannels = bp->hostOutputChannels[1];
+             frameCount = PA_MIN_( bp->hostOutputFrameCount[1], maxFramesToCopy );
+         }
+
+         if( bp->userOutputIsInterleaved )
+         {
+             srcBytePtr = ((unsigned char*)bp->tempOutputBuffer) +
+                     bp->bytesPerUserOutputSample * bp->outputChannelCount *
+                     (bp->framesPerUserBuffer - bp->framesInTempOutputBuffer);
+                         
+             srcSampleStrideSamples = bp->outputChannelCount;
+             srcChannelStrideBytes = bp->bytesPerUserOutputSample;
+         }
+         else /* user output is not interleaved */
+         {
+             srcBytePtr = ((unsigned char*)bp->tempOutputBuffer) +
+                     bp->bytesPerUserOutputSample *
+                     (bp->framesPerUserBuffer - bp->framesInTempOutputBuffer);
+
+             srcSampleStrideSamples = 1;
+             srcChannelStrideBytes = bp->framesPerUserBuffer * bp->bytesPerUserOutputSample;
+         }
+
+         for( i=0; i<bp->outputChannelCount; ++i )
+         {
+             bp->outputConverter(    hostOutputChannels[i].data,
+                                     hostOutputChannels[i].stride,
+                                     srcBytePtr, srcSampleStrideSamples,
+                                     frameCount, &bp->ditherGenerator );
+
+             srcBytePtr += srcChannelStrideBytes;  /* skip to next source channel */
+
+             /* advance dest ptr for next iteration */
+             hostOutputChannels[i].data = ((unsigned char*)hostOutputChannels[i].data) +
+                     frameCount * hostOutputChannels[i].stride * bp->bytesPerHostOutputSample;
+         }
+
+         if( bp->hostOutputFrameCount[0] > 0 )
+             bp->hostOutputFrameCount[0] -= frameCount;
+         else
+             bp->hostOutputFrameCount[1] -= frameCount;
+
+         bp->framesInTempOutputBuffer -= frameCount;
+     }
+}
 
 /*
     AdaptingProcess is a full duplex adapting buffer processor. It converts
@@ -1154,9 +1221,7 @@ static unsigned long AdaptingProcess( PaUtilBufferProcessor *bp,
     unsigned long maxFramesToCopy;
     PaUtilChannelDescriptor *hostInputChannels, *hostOutputChannels;
     unsigned int frameCount;
-    unsigned char *srcBytePtr, *destBytePtr;
-    unsigned int srcSampleStrideSamples; /* stride from one sample to the next within a channel, in samples */
-    unsigned int srcChannelStrideBytes; /* stride from one channel to the next, in bytes */
+    unsigned char *destBytePtr;
     unsigned int destSampleStrideSamples; /* stride from one sample to the next within a channel, in samples */
     unsigned int destChannelStrideBytes; /* stride from one channel to the next, in bytes */
     unsigned int i, j;
@@ -1169,66 +1234,11 @@ static unsigned long AdaptingProcess( PaUtilBufferProcessor *bp,
     else
         endProcessingMinFrameCount = (bp->framesPerUserBuffer - 1);
 
-    while( framesAvailable > endProcessingMinFrameCount )
+    /* Fill host output with remaining frames in user output (tempOutputBuffer) */
+    CopyTempOutputBuffersToHostOutputBuffers( bp );		  	
+
+    while( framesAvailable > endProcessingMinFrameCount ) 
     {
-        /* copy frames from user to host output buffers */
-        while( bp->framesInTempOutputBuffer > 0 &&
-                ((bp->hostOutputFrameCount[0] + bp->hostOutputFrameCount[1]) > 0) )
-        {
-            maxFramesToCopy = bp->framesInTempOutputBuffer;
-
-            /* select the output buffer set (1st or 2nd) */
-            if( bp->hostOutputFrameCount[0] > 0 )
-            {
-                hostOutputChannels = bp->hostOutputChannels[0];
-                frameCount = PA_MIN_( bp->hostOutputFrameCount[0], maxFramesToCopy );
-            }
-            else
-            {
-                hostOutputChannels = bp->hostOutputChannels[1];
-                frameCount = PA_MIN_( bp->hostOutputFrameCount[1], maxFramesToCopy );
-            }
-
-            if( bp->userOutputIsInterleaved )
-            {
-                srcBytePtr = ((unsigned char*)bp->tempOutputBuffer) +
-                        bp->bytesPerUserOutputSample * bp->outputChannelCount *
-                        (bp->framesPerUserBuffer - bp->framesInTempOutputBuffer);
-                            
-                srcSampleStrideSamples = bp->outputChannelCount;
-                srcChannelStrideBytes = bp->bytesPerUserOutputSample;
-            }
-            else /* user output is not interleaved */
-            {
-                srcBytePtr = ((unsigned char*)bp->tempOutputBuffer) +
-                        bp->bytesPerUserOutputSample *
-                        (bp->framesPerUserBuffer - bp->framesInTempOutputBuffer);
-
-                srcSampleStrideSamples = 1;
-                srcChannelStrideBytes = bp->framesPerUserBuffer * bp->bytesPerUserOutputSample;
-            }
-
-            for( i=0; i<bp->outputChannelCount; ++i )
-            {
-                bp->outputConverter(    hostOutputChannels[i].data,
-                                        hostOutputChannels[i].stride,
-                                        srcBytePtr, srcSampleStrideSamples,
-                                        frameCount, &bp->ditherGenerator );
-
-                srcBytePtr += srcChannelStrideBytes;  /* skip to next source channel */
-
-                /* advance dest ptr for next iteration */
-                hostOutputChannels[i].data = ((unsigned char*)hostOutputChannels[i].data) +
-                        frameCount * hostOutputChannels[i].stride * bp->bytesPerHostOutputSample;
-            }
-
-            if( bp->hostOutputFrameCount[0] > 0 )
-                bp->hostOutputFrameCount[0] -= frameCount;
-            else
-                bp->hostOutputFrameCount[1] -= frameCount;
-
-            bp->framesInTempOutputBuffer -= frameCount;
-        }
 
         if( bp->framesInTempOutputBuffer == 0 && *streamCallbackResult != paContinue )
         {
@@ -1384,6 +1394,12 @@ static unsigned long AdaptingProcess( PaUtilBufferProcessor *bp,
                 bp->framesInTempInputBuffer = 0;
             }
         }
+
+        /* copy frames from user (tempOutputBuffer) to host output buffers (hostOutputChannels) 
+           Means to process the user output provided by the callback. Has to be called after
+            each callback. */
+        CopyTempOutputBuffersToHostOutputBuffers( bp );		  	
+
     }
     
     return framesProcessed;
@@ -1562,7 +1578,7 @@ unsigned long PaUtil_EndBufferProcessing( PaUtilBufferProcessor* bp, int *stream
 }
 
 
-int PaUtil_IsBufferProcessorOuputEmpty( PaUtilBufferProcessor* bp )
+int PaUtil_IsBufferProcessorOutputEmpty( PaUtilBufferProcessor* bp )
 {
     return (bp->framesInTempOutputBuffer) ? 0 : 1;
 } 

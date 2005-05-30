@@ -135,7 +135,6 @@ int sys_load_lib(char *dirname, char *classname)
         }
         ret = NSLinkModule( image, filename, 
                NSLINKMODULE_OPTION_BINDNOW |
-               //NSLINKMODULE_OPTION_PRIVATE |
                NSLINKMODULE_OPTION_RETURN_ON_ERROR);
                
         if (ret == NULL) {

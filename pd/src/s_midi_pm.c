@@ -60,7 +60,7 @@ void sys_do_open_midi(int nmidiin, int *midiinvec,
                 if (devno == midiinvec[i])
                 {
                     err = Pm_OpenInput(&mac_midiindevlist[mac_nmidiindev],
-                        j, NULL, 100, NULL, NULL, NULL);
+                        j, NULL, 100, NULL, NULL);
                     if (err)
                         post("could not open midi input %d (%s): %s",
                             j, info->name, Pm_GetErrorText(err));
@@ -257,21 +257,6 @@ void sys_poll_midi(void)
         }
     }
 }
-
-#if 0
-void sys_listmididevs(void)     /* lifted from pa_devs.c in portaudio */
-{
-    int i,j;
-    for (i = 0; i < Pm_CountDevices(); i++)
-    {
-        const PmDeviceInfo *info = Pm_GetDeviceInfo(i);
-        printf("%d: %s, %s", i, info->interf, info->name);
-        if (info->input) printf(" (input)");
-        if (info->output) printf(" (output)");
-        printf("\n");
-    }
-}
-#endif
 
 void midi_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int maxndev, int devdescsize)

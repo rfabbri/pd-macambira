@@ -6,8 +6,6 @@ you've got Tck/Tk installed):
 
 Change to "src" subdirectory.
 
-type "autoconf".
-
 type "./configure", possibly adding flags as follows:
 
     To enable ALSA 0.9x (the latest one), add "--enable-alsa".

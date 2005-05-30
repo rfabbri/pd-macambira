@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_hostapis.c,v 1.1.2.9 2003/09/15 18:30:26 rossbencina Exp $
+ * $Id: pa_win_hostapis.c,v 1.1.2.10 2004/09/08 17:31:37 rossbencina Exp $
  * Portable Audio I/O Library Windows initialization table
  *
  * Based on the Open Source API proposed by Ross Bencina
@@ -48,6 +48,7 @@ PaError PaSkeleton_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiI
 PaError PaWinMme_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 PaError PaWinDs_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 PaError PaAsio_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
+PaError PaWinWdm_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex index );
 
 #ifdef __cplusplus
 }
@@ -68,6 +69,12 @@ PaUtilHostApiInitializer *paHostApiInitializers[] =
 #ifndef PA_NO_ASIO
         PaAsio_Initialize,
 #endif
+
+/*
+#ifndef PA_NO_WDMKS
+        PaWinWdm_Initialize,
+#endif
+*/
 
         PaSkeleton_Initialize, /* just for testing */
 
