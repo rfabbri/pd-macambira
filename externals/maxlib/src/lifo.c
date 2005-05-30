@@ -33,7 +33,7 @@ typedef struct lifo
 {
 	t_object d_ob;
 	t_float *getal;
-	t_int count, end, size, teller;
+	t_int size, teller;
 	t_outlet *out;
 
 }t_lifo;
@@ -42,18 +42,22 @@ static t_class *lifo_class;
 
 static void lifo_int(t_lifo *x, t_floatarg n)
 {
-	x->getal[x->count] = n;
-	x->end = x->count;
-	if (x->teller < x->size) x->teller++;
-	x->count = (x->count + 1) % x->size;
+    if(x->teller < x->size )
+    {
+      	x->getal[x->teller] = n;
+        x->teller++;
+    }
+    else
+        post("no more lifo memory");
+
 }
 
 static void lifo_bang(t_lifo *x)
 {
-	if (x->teller > 0){
-		outlet_float(x->out,x->getal[x->end]);
+	if (x->teller > 0)
+	{
+		outlet_float(x->out,x->getal[x->teller-1]);
 		x->teller--;
-		x->end = (x->end + x->size - 1) % x->size;
 	}
 }
 
@@ -74,8 +78,6 @@ static void *lifo_new(t_floatarg n)
 	if (n<10) n = 10;
 	x->size = (t_int)n;
 	x->teller = 0;
-	x->end = 0;
-	x->count = 0;
 	x->getal = (t_float *)getbytes(x->size * sizeof(t_float));
 	x->out = outlet_new(&x->d_ob, gensym("float"));
 
