@@ -10,11 +10,11 @@ GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
 
 MANDIR = ${prefix}/man
 
-MORECFLAGS = -DUSEAPI_PORTAUDIO -DPA19 -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portmidi/pm_common         -I../portmidi/pm_linux 	-fno-strict-aliasing -DPA_USE_ALSA -DUSEAPI_ALSA -Wno-error
+MORECFLAGS = -DDL_OPEN -DPA_USE_OSS -DPA_LITTLE_ENDIAN -DUNIX -DUNISTD    	 -DUSEAPI_OSS         -I../portaudio/pa_common -I../portaudio/pablio         -I../portmidi/pm_common         -I../portmidi/pm_linux 	-fno-strict-aliasing -DPA_USE_ALSA -DUSEAPI_ALSA
 
 INCLUDE = -I.
 GINCLUDE = $(INCLUDE) 
-GLIB = -ltk8.4 -ltcl8.4  -lX11 -L/usr/X11R6/lib
+GLIB = -ltk8.4 -ltcl8.4 
 
 LDFLAGS = -Wl,-export-dynamic -lasound
 LIB =   -ldl -lpthread -lasound
@@ -28,7 +28,7 @@ CFLAGS = -Werror $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 
-SYSSRC += s_audio_pa.c     	s_audio_pablio.c     	s_audio_paring.c     	../portaudio/pa_common/pa_allocation.c  	../portaudio/pa_common/pa_converters.c  	../portaudio/pa_common/pa_cpuload.c     	../portaudio/pa_common/pa_dither.c      	../portaudio/pa_common/pa_front.c       	../portaudio/pa_common/pa_process.c     	../portaudio/pa_common/pa_skeleton.c    	../portaudio/pa_common/pa_stream.c      	../portaudio/pa_common/pa_trace.c       	../portaudio/pa_unix/pa_unix_hostapis.c 	../portaudio/pa_unix/pa_unix_util.c     	../portaudio/pa_unix_oss/pa_unix_oss.c s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c ../portaudio/pa_linux_alsa/pa_linux_alsa.c
+SYSSRC += s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \

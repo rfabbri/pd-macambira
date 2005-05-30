@@ -77,13 +77,6 @@ dnl Checking for `pthread_create' function in -pthread
 AC_CHECK_LIB(pthread, pthread_create,PDLIB="$PDLIB -lpthread",
          echo "pthreads required" || exit 1)
 
-
-dnl Find paths to includes and libraries for X11
-AC_PATH_X
-dnl Checking for `XCreateWindow' function in -lX11:
-AC_CHECK_LIB(X11, XCreateWindow, LIBS="$LIBS -lX11 -L$x_libraries", 
-	echo "no X11 found" || exit 1, -L$x_libraries)
-
 dnl look for tcl 8.x... do I really have to go through all this!?
 
 foundit=no
@@ -230,14 +223,22 @@ then
 	-I../portmidi/pm_common -I../portmidi/pm_mac \
 	-I../portmidi/porttime \
 	-Wno-error \
-	-DUSEAPI_PORTAUDIO -DPA_BIG_ENDIAN"
+	-DUSEAPI_PORTAUDIO -DPA_BIG_ENDIAN -DPA19"
     SYSSRC="s_midi_pm.c s_audio_pa.c \
     	s_audio_pablio.c     \
 	s_audio_paring.c     \
-	../portaudio/pa_common/pa_lib.c \
-	../portaudio/pa_common/pa_trace.c \
-	../portaudio/pa_common/pa_convert.c \
-	../portaudio/pa_mac_core/pa_mac_core.c \
+	../portaudio/pa_common/pa_allocation.c  \
+	../portaudio/pa_common/pa_converters.c  \
+	../portaudio/pa_common/pa_cpuload.c     \
+	../portaudio/pa_common/pa_dither.c      \
+	../portaudio/pa_common/pa_front.c       \
+	../portaudio/pa_common/pa_process.c     \
+	../portaudio/pa_common/pa_skeleton.c    \
+	../portaudio/pa_common/pa_stream.c      \
+	../portaudio/pa_common/pa_trace.c       \
+	../portaudio/pa_unix/pa_unix_util.c     \
+	../portaudio/pa_mac_core/pa_mac_core.c  \
+	../portaudio/pa_mac/pa_mac_hostapis.c   \
         ../portmidi/pm_mac/pmmac.c \
         ../portmidi/pm_mac/pmmacosxcm.c \
         ../portmidi/pm_common/pmutil.c \
