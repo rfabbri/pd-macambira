@@ -35,12 +35,18 @@ and set correct PATHs
 
 read ann/src/makefile.linux for more info and edit PATHs
 
-ann_mlp and ann_td have never been compiled on linux
-
 ---------- Irix users:
 
 ann_mlp and ann_td have never been compiled on irix
 
 ---------- OsX users:
 
-ann_mlp and ann_td have never been compiled on OsX and a Makefile is not provided, sorry.
+go to http://fann.sourceforge.net/ and download fann libs
+compile fann libs from source
+if you don't compile from source edit ann/src/makefile.darwin 
+and set correct PATHs
+
+read ann/src/makefile.darwin for more info and edit PATHs
+
+compile with
+make -f makefile.darwin
