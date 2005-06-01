@@ -495,6 +495,21 @@ protected:
 	inline void m_forceX(int argc,t_atom *argv) { m_force(argc,argv,0); }
 	inline void m_forceY(int argc,t_atom *argv) { m_force(argc,argv,1); }
 	inline void m_forceZ(int argc,t_atom *argv) { m_force(argc,argv,2); }
+	inline void m_forceN(int argc,t_atom *argv) {
+		t_atom arglist[2];
+
+		if(argc != 3) {
+			error("%s - %s Syntax : N Id/Nomass value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		if (IsSymbol(argv[1]))
+			SetSymbol(arglist[0],GetSymbol(argv[1]));
+		else
+			SetInt(arglist[0],GetAInt(argv[1]));
+		SetFloat(arglist[1],GetFloat(argv[2]));
+		m_force(argc-1,arglist,GetAInt(argv[0])-1);
+	 }
 
 	// displace mass(es) named Id or No to a certain position
 	void m_pos(int argc,t_atom *argv,int n) 
@@ -524,7 +539,21 @@ protected:
 	inline void m_posX(int argc,t_atom *argv) { m_pos(argc,argv,0); }
 	inline void m_posY(int argc,t_atom *argv) { m_pos(argc,argv,1); }
 	inline void m_posZ(int argc,t_atom *argv) { m_pos(argc,argv,2); }
+	inline void m_posN(int argc,t_atom *argv) {
+		t_atom arglist[2];
 
+		if(argc != 3) {
+			error("%s - %s Syntax : N Id/Nomass value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		if (IsSymbol(argv[1]))
+			SetSymbol(arglist[0],GetSymbol(argv[1]));
+		else
+			SetInt(arglist[0],GetAInt(argv[1]));
+		SetFloat(arglist[1],GetFloat(argv[2]));
+		m_pos(argc-1,arglist,GetAInt(argv[0])-1);
+	 }
 	// set mass No to mobile
 	void m_set_mobile(int argc,t_atom *argv,bool mob = true) 
 	{
@@ -590,10 +619,32 @@ protected:
 	inline void m_Xmin(int argc,t_atom *argv) { m_limit(argc,argv,0,0); }
 	inline void m_Ymin(int argc,t_atom *argv) { m_limit(argc,argv,1,0); }
 	inline void m_Zmin(int argc,t_atom *argv) { m_limit(argc,argv,2,0); }
+	inline void m_Nmin(int argc,t_atom *argv) {
+		t_atom arglist[1];
+
+		if(argc != 2) {
+			error("%s - %s Syntax : N value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		SetFloat(arglist[0],GetFloat(argv[1]));
+		m_limit(argc-1,arglist,GetAInt(argv[0])-1,0);
+	 }
 
 	inline void m_Xmax(int argc,t_atom *argv) { m_limit(argc,argv,0,1); }
 	inline void m_Ymax(int argc,t_atom *argv) { m_limit(argc,argv,1,1); }
 	inline void m_Zmax(int argc,t_atom *argv) { m_limit(argc,argv,2,1); }
+	inline void m_Nmax(int argc,t_atom *argv) {
+		t_atom arglist[1];
+
+		if(argc != 2) {
+			error("%s - %s Syntax : N value",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		SetFloat(arglist[0],GetFloat(argv[1]));
+		m_limit(argc-1,arglist,GetAInt(argv[0])-1,1);
+	 }
 
 	void m_grab_mass(int argc,t_atom *argv) 
 	{
@@ -1496,6 +1547,10 @@ private:
 		FLEXT_CADDMETHOD_(c,0,"posX",m_posX);
 		FLEXT_CADDMETHOD_(c,0,"Xmax",m_Xmax);
 		FLEXT_CADDMETHOD_(c,0,"Xmin",m_Xmin);
+		FLEXT_CADDMETHOD_(c,0,"forceN",m_forceN);
+		FLEXT_CADDMETHOD_(c,0,"posN",m_posN);
+		FLEXT_CADDMETHOD_(c,0,"Nmax",m_Nmax);
+		FLEXT_CADDMETHOD_(c,0,"Nmin",m_Nmin);
 		FLEXT_CADDMETHOD_(c,0,"massesPosL",m_mass_dumpl);
 		FLEXT_CADDMETHOD_(c,0,"massesPosXL",m_mass_dump_xl);
 		if(N >= 2) {
@@ -1560,6 +1615,10 @@ private:
 	FLEXT_CALLBACK_V(m_Zmin)
 	FLEXT_CALLBACK_V(m_forceZ)
 	FLEXT_CALLBACK_V(m_posZ)
+	FLEXT_CALLBACK_V(m_Nmax)
+	FLEXT_CALLBACK_V(m_Nmin)
+	FLEXT_CALLBACK_V(m_forceN)
+	FLEXT_CALLBACK_V(m_posN)
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
 	FLEXT_CALLBACK_V(m_setL)

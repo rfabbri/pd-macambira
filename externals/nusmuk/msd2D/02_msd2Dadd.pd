@@ -419,6 +419,8 @@
 #X restore 137 176 pd links;
 #X obj 137 62 t b b b b;
 #X text 491 431 Get a few masses speeds;
+#N canvas 0 0 450 300 record 1;
+#X restore 268 344 pd record;
 #X connect 0 0 5 0;
 #X connect 1 0 34 0;
 #X connect 2 0 0 0;
