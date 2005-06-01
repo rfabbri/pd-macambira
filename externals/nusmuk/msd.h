@@ -239,52 +239,54 @@ public:
 		t_float distance=0;
 		t_float F;
 		Mass<N> *m1 = mass1,*m2 = mass2; // cache locally
-		if (oriented == 0)	
-			distance = Mass<N>::dist(*m1,*m2); 
-		else if (oriented == 1) {
-			for(int i = 0; i < N; ++i)	
-				distance += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
-			distance = sqrt(distance);
-		}
-		else if (oriented == 2) {
-			for(int i = 0; i < N; ++i)	
-				distance += sqr((m1->pos[i]-m2->pos[i])*(tdirection1[i] +tdirection2[i]));
-			distance = sqrt(distance);
-		}
-
-		if (distance < long_min || distance > long_max || distance == 0) {
+		if (m1->invM || m2->invM) { 
+			if (oriented == 0)	
+				distance = Mass<N>::dist(*m1,*m2); 
+			else if (oriented == 1) {
+				for(int i = 0; i < N; ++i)	
+					distance += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
+				distance = sqrt(distance);
+			}
+			else if (oriented == 2) {
+				for(int i = 0; i < N; ++i)	
+					distance += sqr((m1->pos[i]-m2->pos[i])*(tdirection1[i] +tdirection2[i]));
+				distance = sqrt(distance);
+			}
+	
+			if (distance < long_min || distance > long_max || distance == 0) {
 //			for(int i = 0; i < N; ++i) {
 	//			m1->force[i] -= D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
 	//			m2->force[i] += D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
 	//		}
+			}
+			else {	// Lmin < L < Lmax
+				// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
+				if ((distance - longueur)>0)
+					F  = (K1 * pow(distance - longueur,puissance) + D1 * (distance - distance_old))/distance ;
+				else
+					F  = (-K1 * pow(longueur - distance,puissance) + D1 * (distance - distance_old))/distance ;
+				if (oriented == 0)	
+					for(int i = 0; i < N; ++i) {
+						const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
+						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+					}
+				else if (oriented == 1 || (oriented == 2 && N == 2))
+					for(int i = 0; i < N; ++i) {
+						const t_float Fn = F * (m1->pos[i] - m2->pos[i])*tdirection1[i]; // Fx = F * Lx[n]/L[n]
+						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+					}
+				else if (oriented == 2 && N == 3)
+					for(int i = 0; i < N; ++i) {
+						const t_float Fn = F * (m1->pos[i] - m2->pos[i])*(tdirection1[i] +tdirection2[i]); // Fx = F * Lx[n]/L[n]
+						m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
+						m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
+					}
+			}
+			
+			distance_old = distance;				// L[n-1] = L[n]			
 		}
-		else {	// Lmin < L < Lmax
-			// F[n] = k1 (L[n] - L[0])/L[n] + D1 (L[n] - L[n-1])/L[n]
-			if ((distance - longueur)>0)
-				F  = (K1 * pow(distance - longueur,puissance) + D1 * (distance - distance_old))/distance ;
-			else
-				F  = (-K1 * pow(longueur - distance,puissance) + D1 * (distance - distance_old))/distance ;
-			if (oriented == 0)	
-				for(int i = 0; i < N; ++i) {
-					const t_float Fn = F * (m1->pos[i] - m2->pos[i]); // Fx = F * Lx[n]/L[n]
-					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-				}
-			else if (oriented == 1 || (oriented == 2 && N == 2))
-				for(int i = 0; i < N; ++i) {
-					const t_float Fn = F * (m1->pos[i] - m2->pos[i])*tdirection1[i]; // Fx = F * Lx[n]/L[n]
-					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-				}
-			else if (oriented == 2 && N == 3)
-				for(int i = 0; i < N; ++i) {
-					const t_float Fn = F * (m1->pos[i] - m2->pos[i])*(tdirection1[i] +tdirection2[i]); // Fx = F * Lx[n]/L[n]
-					m1->force[i] -= Fn + D2 * m1->speed[i]; 	//  Fx1[n] = -Fx, Fx1[n] = Fx1[n] - D2 * vx1[n-1]
-					m2->force[i] += Fn - D2 * m2->speed[i]; 	// Fx2[n] = Fx, Fx2[n] = Fx2[n] - D2 * vx2[n-1]
-				}
-		}
-		
-		distance_old = distance;				// L[n-1] = L[n]			
 	}
 };
 
@@ -554,7 +556,7 @@ protected:
 		SetFloat(arglist[1],GetFloat(argv[2]));
 		m_pos(argc-1,arglist,GetAInt(argv[0])-1);
 	 }
-	// set mass No to mobile
+	// set mass to mobile
 	void m_set_mobile(int argc,t_atom *argv,bool mob = true) 
 	{
 		if (argc != 1) {
@@ -645,6 +647,30 @@ protected:
 		SetFloat(arglist[0],GetFloat(argv[1]));
 		m_limit(argc-1,arglist,GetAInt(argv[0])-1,1);
 	 }
+
+	// set Id of link(s) named Id or number No
+	void m_setMassId(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : OldId/NoMass NewId",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		const t_symbol *id = GetSymbol(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_mass *>::iterator it;
+			for(it = massids.find(GetSymbol(argv[0])); it; ++it)
+				it.data()->Id = id;
+		}
+		else	{
+			t_mass *m = mass.find(GetAInt(argv[0]));
+			if(m)
+				m->Id = id;
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
 
 	void m_grab_mass(int argc,t_atom *argv) 
 	{
@@ -1045,6 +1071,30 @@ protected:
 		}
 	}
 
+	// set Id of link(s) named Id or number No
+	void m_setLinkId(int argc,t_atom *argv) 
+	{
+		if (argc != 2) {
+			error("%s - %s Syntax : OldId/NoLink NewId",thisName(),GetString(thisTag()));
+			return;
+		}
+
+		const t_symbol *id = GetSymbol(argv[1]);
+
+		if(IsSymbol(argv[0])) {
+			typename IDMap<t_link *>::iterator it;
+			for(it = linkids.find(GetSymbol(argv[0])); it; ++it)
+				it.data()->Id = id;
+		}
+		else	{
+			t_link *l = link.find(GetAInt(argv[0]));
+			if(l)
+				l->Id = id;
+			else
+				error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+		}
+	}
+
 	// set rigidity of link(s) named Id or number No
 	void m_setK(int argc,t_atom *argv) 
 	{
@@ -1166,7 +1216,9 @@ protected:
 		}
 	
 		t_atom sortie[1+2*N];
+		t_float mean[N] ,std[N], nombre;
 		const t_symbol *auxtype = GetSymbol(argv[0]);
+
 
 		if (argc == 1) {
 			if (auxtype == S_massesPos)	{	// get all masses positions
@@ -1176,12 +1228,72 @@ protected:
 					ToOutAnything(0,S_massesPos,1+N,sortie);
 				}
 			}
+			else if (auxtype == S_massesPosMean)	{	// get all masses positions mean
+				for(int i = 0; i<N; ++i) 
+					mean[i] = 0;
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i)	
+						mean[i] += mit.data()->pos[i];
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],mean[i]/nombre);
+				ToOutAnything(0,S_massesPosMean,0+N,sortie);
+			}
+			else if (auxtype == S_massesPosStd)	{	// get all masses positions std
+				for(int i = 0; i<N; ++i) {
+					mean[i] = 0;
+					std[i] = 0;
+				}
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i) {	
+						mean[i] += mit.data()->pos[i];
+						std[i] += sqr(mit.data()->pos[i]) ;
+					} 
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],sqrt(std[i]/nombre-sqr(mean[i]/nombre)));
+				ToOutAnything(0,S_massesPosStd,0+N,sortie);
+			}
 			else if (auxtype == S_massesForces)	{ // get all masses forces
 				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
 					SetInt(sortie[0],mit.data()->nbr);	
 					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->out_force[i]);
 					ToOutAnything(0,S_massesForces,1+N,sortie);
 				}
+			}
+			else if (auxtype == S_massesForcesMean)	{	// get all masses forces mean
+				for(int i = 0; i<N; ++i) 
+					mean[i] = 0;
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i)	
+						mean[i] += mit.data()->out_force[i];
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],mean[i]/nombre);
+				ToOutAnything(0,S_massesForcesMean,0+N,sortie);
+			}
+			else if (auxtype == S_massesForcesStd)	{	// get all masses forces std
+				for(int i = 0; i<N; ++i) {
+					mean[i] = 0;
+					std[i] = 0;
+				}
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i) {	
+						mean[i] += mit.data()->out_force[i];
+						std[i] += sqr(mit.data()->out_force[i]) ;
+					} 
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],sqrt(std[i]/nombre-sqr(mean[i]/nombre)));
+				ToOutAnything(0,S_massesForcesStd,0+N,sortie);
 			}
 			else if (auxtype == S_linksPos) {		// get all links positions
 				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {	
@@ -1193,13 +1305,79 @@ protected:
 					ToOutAnything(0,S_linksPos,1+2*N,sortie);
 				}
 			}
-			else {					// get all masses speeds
+			else if (auxtype == S_linksLenghts) {		// get all links lenghts
+				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {	
+					SetInt(sortie[0],lit.data()->nbr);	
+					SetFloat(sortie[1],lit.data()->distance_old);
+					ToOutAnything(0,S_linksLenghts,2,sortie);
+				}
+			}
+			else if (auxtype == S_linksLenghtsMean)	{	// get all links lenghts mean
+				for(int i = 0; i<N; ++i) 
+					mean[i] = 0;
+				nombre = 0;
+				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {
+					++nombre;
+					mean[0] += lit.data()->distance_old;
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0],mean[0]/nombre);
+				ToOutAnything(0,S_linksLenghtsMean,1,sortie);
+			}
+			else if (auxtype == S_linksLenghtsStd)	{	// get all links lenghts std
+				for(int i = 0; i<N; ++i) {
+					mean[i] = 0;
+					std[i] = 0;
+				}
+				nombre = 0;
+				for(typename IndexMap<t_link *>::iterator lit(link); lit; ++lit) {
+					++nombre;
+					mean[0] += lit.data()->distance_old;
+					std[0] += sqr(lit.data()->distance_old) ;
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0],sqrt(std[0]/nombre-sqr(mean[0]/nombre)));
+				ToOutAnything(0,S_linksLenghtsStd,1,sortie);
+			}
+			else if (auxtype == S_massesSpeeds) {		// get all masses speeds
 				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {	
 					SetInt(sortie[0],mit.data()->nbr);	
 					for(int i = 0; i < N; ++i) SetFloat(sortie[1+i],mit.data()->speed[i]);
 					ToOutAnything(0,S_massesSpeeds,1+N,sortie);
 				}
 			}
+			else if (auxtype == S_massesSpeedsMean)	{	// get all masses forces mean
+				for(int i = 0; i<N; ++i) 
+					mean[i] = 0;
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i)	
+						mean[i] += mit.data()->speed[i];
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],mean[i]/nombre);
+				ToOutAnything(0,S_massesSpeedsMean,0+N,sortie);
+			}
+			else if (auxtype == S_massesSpeedsStd)	{	// get all masses forces std
+				for(int i = 0; i<N; ++i) {
+					mean[i] = 0;
+					std[i] = 0;
+				}
+				nombre = 0;
+				for(typename IndexMap<t_mass *>::iterator mit(mass); mit; ++mit) {
+					++nombre;
+					for(int i = 0; i < N; ++i) {	
+						mean[i] += mit.data()->speed[i];
+						std[i] += sqr(mit.data()->speed[i]) ;
+					} 
+				}
+				for(int i = 0; i < N; ++i)	
+					SetFloat(sortie[0+i],sqrt(std[i]/nombre-sqr(mean[i]/nombre)));
+				ToOutAnything(0,S_massesSpeedsStd,0+N,sortie);
+			}
+			else 
+				error("%s - %s : Syntax error",thisName(),GetString(thisTag()));
 			return;
 		}
 		
@@ -1273,6 +1451,29 @@ protected:
 							SetFloat(sortie[1+N+i],l->mass2->pos[i]);
 						}
 						ToOutAnything(0,S_linksPosNo,1+2*N,sortie);
+					}
+//					else
+//						error("%s - %s : Index not found",thisName(),GetString(thisTag()));
+				}
+			}
+		}
+		else if (auxtype == S_linksLenghts)		// get links lenghts
+		{
+			for(int j = 1; j<argc; j++) {
+				if(IsSymbol(argv[j])) {
+					typename IDMap<t_link *>::iterator lit;
+					for(lit = linkids.find(GetSymbol(argv[j])); lit; ++lit) {
+						SetSymbol(sortie[0],lit.data()->Id);
+						SetFloat(sortie[1],lit.data()->distance_old);
+						ToOutAnything(0,S_linksLenghtsId,2,sortie);
+					}
+				}
+				else {
+					t_link *l = link.find(GetAInt(argv[j]));
+					if(l) {
+						SetInt(sortie[0],l->nbr);
+						SetFloat(sortie[1],l->distance_old);
+						ToOutAnything(0,S_linksLenghtsNo,2,sortie);
 					}
 //					else
 //						error("%s - %s : Index not found",thisName(),GetString(thisTag()));
@@ -1488,15 +1689,26 @@ private:
 	const static t_symbol *S_Mass_deleted;
 	const static t_symbol *S_Link_deleted;
 	const static t_symbol *S_massesPos;
+	const static t_symbol *S_massesPosMean;
+	const static t_symbol *S_massesPosStd;
 	const static t_symbol *S_massesPosNo;
 	const static t_symbol *S_massesPosId;
 	const static t_symbol *S_linksPos;
 	const static t_symbol *S_linksPosNo;
 	const static t_symbol *S_linksPosId;
+	const static t_symbol *S_linksLenghts;
+	const static t_symbol *S_linksLenghtsMean;
+	const static t_symbol *S_linksLenghtsStd;
+	const static t_symbol *S_linksLenghtsNo;
+	const static t_symbol *S_linksLenghtsId;
 	const static t_symbol *S_massesForces;
+	const static t_symbol *S_massesForcesMean;
+	const static t_symbol *S_massesForcesStd;
 	const static t_symbol *S_massesForcesNo;
 	const static t_symbol *S_massesForcesId;
 	const static t_symbol *S_massesSpeeds;
+	const static t_symbol *S_massesSpeedsMean;
+	const static t_symbol *S_massesSpeedsStd;
 	const static t_symbol *S_massesSpeedsNo;
 	const static t_symbol *S_massesSpeedsId;
 	const static t_symbol *S_massesPosL;
@@ -1516,15 +1728,26 @@ private:
 		S_Mass_deleted = MakeSymbol("Mass deleted");
 		S_Link_deleted = MakeSymbol("Link deleted");
 		S_massesPos = MakeSymbol("massesPos");
+		S_massesPosMean = MakeSymbol("massesPosMean");
+		S_massesPosStd = MakeSymbol("massesPosStd");
 		S_massesPosNo = MakeSymbol("massesPosNo");
 		S_massesPosId = MakeSymbol("massesPosId");
 		S_linksPos = MakeSymbol("linksPos");
 		S_linksPosNo = MakeSymbol("linksPosNo");
 		S_linksPosId = MakeSymbol("linksPosId");
+		S_linksLenghts = MakeSymbol("linksLenghts");
+		S_linksLenghtsMean = MakeSymbol("linksLenghtsMean");
+		S_linksLenghtsStd = MakeSymbol("linksLenghtsStd");
+		S_linksLenghtsNo = MakeSymbol("linksLenghtsNo");
+		S_linksLenghtsId = MakeSymbol("linksLenghtsId");
 		S_massesForces = MakeSymbol("massesForces");
+		S_massesForcesMean = MakeSymbol("massesForcesMean");
+		S_massesForcesStd = MakeSymbol("massesForcesStd");
 		S_massesForcesNo = MakeSymbol("massesForcesNo");
 		S_massesForcesId = MakeSymbol("massesForcesId");
 		S_massesSpeeds = MakeSymbol("massesSpeeds");
+		S_massesSpeedsMean = MakeSymbol("massesSpeedsMean");
+		S_massesSpeedsStd = MakeSymbol("massesSpeedsStd");
 		S_massesSpeedsNo = MakeSymbol("massesSpeedsNo");
 		S_massesSpeedsId = MakeSymbol("massesSpeedsId");
 		S_massesPosL = MakeSymbol("massesPosL");
@@ -1571,6 +1794,8 @@ private:
 		
 		FLEXT_CADDMETHOD_(c,0,"setMobile",m_set_mobile);
 		FLEXT_CADDMETHOD_(c,0,"setFixed",m_set_fixe);
+		FLEXT_CADDMETHOD_(c,0,"setMassId",m_setMassId);
+		FLEXT_CADDMETHOD_(c,0,"setLinkId",m_setLinkId);
 		FLEXT_CADDMETHOD_(c,0,"setK",m_setK);
 		FLEXT_CADDMETHOD_(c,0,"setD",m_setD);
 		FLEXT_CADDMETHOD_(c,0,"setL",m_setL);
@@ -1619,6 +1844,8 @@ private:
 	FLEXT_CALLBACK_V(m_Nmin)
 	FLEXT_CALLBACK_V(m_forceN)
 	FLEXT_CALLBACK_V(m_posN)
+	FLEXT_CALLBACK_V(m_setMassId)
+	FLEXT_CALLBACK_V(m_setLinkId)
 	FLEXT_CALLBACK_V(m_setK)
 	FLEXT_CALLBACK_V(m_setD)
 	FLEXT_CALLBACK_V(m_setL)
@@ -1638,10 +1865,15 @@ const t_symbol \
 	*msdN<N>::S_Mass_deleted,*msdN<N>::S_Link_deleted, \
 	*msdN<N>::S_massesPos,*msdN<N>::S_massesPosNo,*msdN<N>::S_massesPosId, \
 	*msdN<N>::S_linksPos,*msdN<N>::S_linksPosNo,*msdN<N>::S_linksPosId, \
-	*msdN<N>::S_massesForces,*msdN<N>::S_massesForcesNo,*msdN<N>::S_massesForcesId, \
-	*msdN<N>::S_massesSpeeds,*msdN<N>::S_massesSpeedsNo,*msdN<N>::S_massesSpeedsId, \
+	*msdN<N>::S_linksLenghts,*msdN<N>::S_linksLenghtsMean,*msdN<N>::S_linksLenghtsStd, \
+	*msdN<N>::S_linksLenghtsNo,*msdN<N>::S_linksLenghtsId, \
+	*msdN<N>::S_massesForces,*msdN<N>::S_massesForcesMean,*msdN<N>::S_massesForcesStd, \
+	*msdN<N>::S_massesForcesNo,*msdN<N>::S_massesForcesId, \
+	*msdN<N>::S_massesSpeeds,*msdN<N>::S_massesSpeedsMean,*msdN<N>::S_massesSpeedsStd, \
+	*msdN<N>::S_massesSpeedsNo,*msdN<N>::S_massesSpeedsId, \
 	*msdN<N>::S_massesPosL,*msdN<N>::S_massesPosXL,*msdN<N>::S_massesPosYL, \
-	*msdN<N>::S_massesPosZL,*msdN<N>::S_massesForcesL; \
+	*msdN<N>::S_massesPosZL,*msdN<N>::S_massesPosStd,*msdN<N>::S_massesPosMean,\
+	*msdN<N>::S_massesForcesL; \
 \
 typedef msdN<N> CLASS; \
 FLEXT_NEW_V(NAME,CLASS)

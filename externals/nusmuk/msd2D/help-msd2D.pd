@@ -271,7 +271,7 @@ their Id.;
 #X connect 4 0 2 0;
 #X restore 17 209 pd compute;
 #X obj 17 181 tgl 20 0 empty empty ON/OFF 25 10 1 10 -262144 -1 -1
-1 1;
+0 1;
 #X obj 172 270 r \$0-out;
 #X obj 17 126 bng 20 250 50 0 empty empty Reset 25 10 1 10 -262144
 -1 -1;
@@ -449,8 +449,6 @@ internal parameters of links and masses.;
 #X msg 32 239 massesForcesL;
 #X text 170 170 Output all masses positions in a list on outlet No
 1;
-#X text 139 346 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
-/ linksPos );
 #X text 139 321 Get specific attribute on specific element;
 #X msg 19 319 get \$1 ($2);
 #X text 6 281 Specific :;
@@ -478,6 +476,8 @@ for all the elements. - Ids or/and creations No;
 #X msg 32 192 massesPosXL;
 #X text 170 202 Output all masses x or y in a list on outlet No 1;
 #X msg 32 213 massesPosYL;
+#X text 139 346 \$1 : Attribute type ( massesPos / massesSpeeds / massesForces
+/ linksPos / linksLenghts);
 #X restore 12 499 pd attributes______;
 #X text 9 761 KEYWORDS: physical model mass spring damper link;
 #X text 267 786 - Nicolas Montgermont \, May 12 \, 2005;
