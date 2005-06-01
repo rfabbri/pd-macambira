@@ -1,15 +1,14 @@
-# PSO - Particle Swarm Optimizer - Copyright Ben Bogart 2003
-# makefile adapted from pool - Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
-#
-# Makefile for gcc @ darwin (OSX)
-#
-# usage:
-# to build run "make -f makefile.pd-darwin"
-# to install (as root), do "make -f makefile.pd-darwin install"
-#
+current: pd_darwin
 
-# your c++ compiler (define only if it's different than g++)
-# CXX=g++
+clean: ; rm -f *.pd_linux *.o *.pd_darwin
+
+
+# ----------------------- Mac OSX -----------------------
+
+pd_darwin: ann_mlp.pd_darwin ann_td.pd_darwin ann_som.pd_darwin ann.pd_darwin
+
+.SUFFIXES: .pd_darwin
+
 
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
@@ -20,91 +19,28 @@ PDPATH=/Users/davidemorelli/Desktop/robaDavide/Pd-0.38-3.app/Contents/Resources/
 # where is the PD executable?
 #PD=/usr/local/bin/pd
 PD=/Users/davidemorelli/Desktop/robaDavide/Pd-0.38-3.app/Contents/Resources/bin/pd
+#PD=/Users/davidemorelli/Desktop/robaDavide/Pd-0.38-3.app/Contents/Resources/src/
 
-# where do the flext libraries reside?
-#FLEXTPATH=/usr/local/lib/pd/flext
-#FLEXTPATH=../../grill/flext
+# where do the fann libraries reside?
+#FANNLIB=/Users/davidemorelli/Desktop/robaDavide/fann-1.2.0/src/fann.o
+FANNBASE=/Users/davidemorelli/Desktop/robaDavide/fann-1.2.0
+FANNLIB=$(FANNBASE)/src/fann.o \
+		$(FANNBASE)/src/fann_train.o \
+		$(FANNBASE)/src/fann_train_data.o \
+		$(FANNBASE)/src/fann_io.o \
+		$(FANNBASE)/src/fann_error.o \
+		$(FANNBASE)/src/fann_options.o 
+#FANNLIB=/usr/local/lib/libfann.a
 
-# where is fann lib?
-FANNLIB=/usr/local/lib/libfann.a
+DARWININCLUDE =  -I../../src -I$(PDPATH)
 
-# where should flext libraries be built? 
-TARGDIR=./pd-darwin
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
 
-# where should pool be installed?
-# (leave blank to omit installation)
-#INSTPATH=/usr/local/lib/pd/extra
-INSTPATH=
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
+	cc -bundle  -bundle_loader $(PD) -flat_namespace -o $*.pd_darwin $(FANNLIB) *.o
+#	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $(FANNLIB) *.o
+#	rm -f $*.o
 
-# additional compiler flags
-# (check if they match your system!)
-UFLAGS=-malign-power -maltivec
-
-#FLEXTLIB=$(FLEXTPATH)/flext.a
-#FLEXTLIB=$(FLEXTPATH)/pd-darwin/libflext.a
-
-# compiler+linker stuff	
-INCLUDES=$(PDPATH)
-LIBPATH=$(FANNLIB)
-FLAGS=-DFLEXT_SYS=2 
-CFLAGS=-O6 ${UFLAGS} -Wno-unused -Wno-parentheses -Wno-switch -Wstrict-prototypes
-LIBS=m
-LDFLAGS=-bundle -bundle_loader $(PD)
-FRAMEWORKS=Carbon
-
-
-# ---------------------------------------------
-# the rest can stay untouched
-# ----------------------------------------------
-
-NAME=ann
-
-# all the source files from the package
-SRCS=ann.c ann_mlp.c ann_td.c ann_som.c
-HDRS=
-
-DIR=.
-
-TARGET=$(TARGDIR)/$(NAME).pd_darwin
-
-# default target
-all: $(TARGDIR) $(TARGET)
-
-$(patsubst %,$(DIR)/%,$(SRCS)): $(patsubst %,$(DIR)/%,$(HDRS)) $(CONFIG)
-	touch $@
-
-$(TARGDIR):
-	-mkdir $(TARGDIR)
-
-$(TARGDIR)/%.o : $(DIR)/%.c
-	$(CXX) -c $(CFLAGS) $(FLAGS) $(patsubst %,-I%,$(INCLUDES)) $< -o $@
-#	$(CXX) -c $(CFLAGS) $(FLAGS) $< -o $@
-
-#$(TARGET) : $(patsubst %.c,$(TARGDIR)/%.o,$(SRCS)) $(FANNLIB) 
-$(TARGET) : $(patsubst %.c,$(TARGDIR)/%.o,$(SRCS))
-	$(CXX) $(LDFLAGS) -I$(INCLUDES) $^ $(FANNLIB)  $(patsubst %,-framework %,$(FRAMEWORKS)) $(patsubst %,-L%,$(LIBPATH)) $(patsubst %,-l%,$(LIBS)) -o $@ 
-	chmod 755 $@
-
-$(INSTPATH):
-	-mkdir $(INSTPATH)
-
-install:: $(INSTPATH)
-
-install:: $(TARGET)
-	cp $^ $(INSTPATH)
-#	chown root.root  $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-#	chmod 755 $(patsubst %,$(INSTPATH)/%,$(notdir $^))
-
-.PHONY: clean
-clean:
-	rm -f $(TARGDIR)/*.o $(TARGET)
-
-
-
-
-
-
-
-
-
-
+# $(FANNLIB)
