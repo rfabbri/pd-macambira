@@ -23,21 +23,29 @@ SRC = add2_comma.c \
 	exp_inc.c \
 	float24.c \
 	iem_anything_kernel.c \
+	iem_anything.c \
 	iem_append_kernel.c \
+	iem_append.c \
 	iem_i_route.c \
 	iem_pbank_csv.c \
 	iem_prepend_kernel.c \
+	iem_prepend.c \
 	iem_receive_kernel.c \
+	iem_receive.c \
 	iem_route.c \
 	iem_sel_any.c \
 	iem_send_kernel.c \
+	iem_send.c \
 	init.c \
 	list2send.c \
 	mergefilename.c \
 	modulo_counter.c \
+	parentdollarzero.c \
 	post_netreceive.c \
 	pre_inlet.c \
 	prepend_ascii.c \
+	protect_against_open.c \
+	receive2list.c \
 	round_zero.c \
 	sigfade.c \
 	sigiem_blocksize.c \

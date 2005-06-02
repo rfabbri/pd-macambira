@@ -1,13 +1,13 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 /*
  sigmp3play.c - Mpeg Layer III Player for PD
  Version:0.1
  05-18-2000
- written by Thomas Musil (musil@iem.kug.ac.at), Norbert Math (math@iem.kug.ac.at)
+ written by Thomas Musil (musil_at_iem.kug.ac.at), Norbert Math (math_at_iem.kug.ac.at)
  IEM Graz
 
  debugged for windows 013-03-2003
@@ -157,7 +157,7 @@ struct iemmp3_III_sideinfo
     unsigned private_bits;
     struct
     {
-	struct iemmp3_gr_info_s gr[2];
+  struct iemmp3_gr_info_s gr[2];
     } ch[2];
 };
 
@@ -236,7 +236,7 @@ typedef struct _sigmp3play
     t_clock  *x_clock;
     t_outlet *x_bangout;
     t_outlet *x_floatout;
-		t_canvas	*x_canvas;
+    t_canvas  *x_canvas;
 } t_sigmp3play;
 
 
@@ -767,10 +767,10 @@ static void ExitMP3(struct iemmp3Struct *mp)
     b = mp->tail;
     while(b)
     {
-	free(b->pnt);
-	bn = b->next;
-	free(b);
-	b = bn;
+  free(b->pnt);
+  bn = b->next;
+  free(b);
+  b = bn;
     }
 }
 
@@ -782,34 +782,34 @@ static int decodeMP3(struct iemmp3Struct *mp, char *in, int isize, char *out, in
 
     if(osize < 4608)
     {
-	post("To less out space\n");
-	return MP3_ERR;
+  post("To less out space\n");
+  return MP3_ERR;
     }
 
     if(in)
     {
-	if(addbuf(mp,in,isize) == NULL)
-	{
-	    return MP3_ERR;
-	}
+  if(addbuf(mp,in,isize) == NULL)
+  {
+      return MP3_ERR;
+  }
     }
 
     /* First decode header */
     if(mp->framesize == 0)
     {
-	if(mp->bsize < 4)
-	{
-	    return MP3_NEED_MORE;
-	}
-	if(!read_head(mp))
-	    return MP3_EX;
-	if(decode_header(&mp->fr,mp->header) == MP3_EX)
-	    return MP3_EX;
-	mp->framesize = mp->fr.framesize;
+  if(mp->bsize < 4)
+  {
+      return MP3_NEED_MORE;
+  }
+  if(!read_head(mp))
+      return MP3_EX;
+  if(decode_header(&mp->fr,mp->header) == MP3_EX)
+      return MP3_EX;
+  mp->framesize = mp->fr.framesize;
     }
 
     if(mp->fr.framesize > mp->bsize)
-	return MP3_NEED_MORE;
+  return MP3_NEED_MORE;
 
     iemmp3_wordpointer = mp->bsspace[mp->bsnum] + 512;
     mp->bsnum = (mp->bsnum + 1) & 0x1;
@@ -818,32 +818,32 @@ static int decodeMP3(struct iemmp3Struct *mp, char *in, int isize, char *out, in
     len = 0;
     while(len < mp->framesize)
     {
-	int nlen;
-	int blen = mp->tail->size - mp->tail->pos;
-	if( (mp->framesize - len) <= blen)
-	{
-	    nlen = mp->framesize-len;
-	}
-	else
-	{
-	    nlen = blen;
-	}
-	memcpy(iemmp3_wordpointer+len,mp->tail->pnt+mp->tail->pos,nlen);
-	len += nlen;
-	mp->tail->pos += nlen;
-	mp->bsize -= nlen;
-	if(mp->tail->pos == mp->tail->size)
-	{
-	    remove_buf(mp);
-	}
+  int nlen;
+  int blen = mp->tail->size - mp->tail->pos;
+  if( (mp->framesize - len) <= blen)
+  {
+      nlen = mp->framesize-len;
+  }
+  else
+  {
+      nlen = blen;
+  }
+  memcpy(iemmp3_wordpointer+len,mp->tail->pnt+mp->tail->pos,nlen);
+  len += nlen;
+  mp->tail->pos += nlen;
+  mp->bsize -= nlen;
+  if(mp->tail->pos == mp->tail->size)
+  {
+      remove_buf(mp);
+  }
     }
 
     *done = 0;
     if(mp->fr.error_protection)
-	getbits(16);
+  getbits(16);
     do_layer3(&mp->fr,(unsigned char *) out,done,&error);
     if(!error)
-	return MP3_EX;
+  return MP3_EX;
 
     mp->fsizeold = mp->framesize;
     mp->framesize = 0;
@@ -858,32 +858,32 @@ static void make_decode_tables(long scaleval)
 
     for(i=0;i<5;i++)
     {
-	kr=0x10>>i; divv=0x40>>i;
-	costab = iemmp3_pnts[i];
-	for(k=0;k<kr;k++)
-	    costab[k] = 1.0 / (2.0 * cos(M_PI * ((double) k * 2.0 + 1.0) / (double) divv));
+  kr=0x10>>i; divv=0x40>>i;
+  costab = iemmp3_pnts[i];
+  for(k=0;k<kr;k++)
+      costab[k] = 1.0 / (2.0 * cos(M_PI * ((double) k * 2.0 + 1.0) / (double) divv));
     }
 
     table = iemmp3_decwin;
     scaleval = -scaleval;
     for(i=0,j=0;i<256;i++,j++,table+=32)
     {
-	if(table < iemmp3_decwin+512+16)
-	    table[16] = table[0] = (double) iemmp3_intwinbase[j] / 65536.0 * (double) scaleval;
-	if(i % 32 == 31)
-	    table -= 1023;
-	if(i % 64 == 63)
-	    scaleval = - scaleval;
+  if(table < iemmp3_decwin+512+16)
+      table[16] = table[0] = (double) iemmp3_intwinbase[j] / 65536.0 * (double) scaleval;
+  if(i % 32 == 31)
+      table -= 1023;
+  if(i % 64 == 63)
+      scaleval = - scaleval;
     }
 
     for( /* i=256 */ ;i<512;i++,j--,table+=32)
     {
-	if(table < iemmp3_decwin+512+16)
-	    table[16] = table[0] = (double) iemmp3_intwinbase[j] / 65536.0 * (double) scaleval;
-	if(i % 32 == 31)
-	    table -= 1023;
-	if(i % 64 == 63)
-	    scaleval = - scaleval;
+  if(table < iemmp3_decwin+512+16)
+      table[16] = table[0] = (double) iemmp3_intwinbase[j] / 65536.0 * (double) scaleval;
+  if(i % 32 == 31)
+      table -= 1023;
+  if(i % 64 == 63)
+      scaleval = - scaleval;
     }
 }
 
@@ -893,215 +893,215 @@ static void init_layer3(int down_sample_sblimit)
     int i,j,k,l;
 
     for(i=-256;i<118+4;i++)
-	iemmp3_gainpow2[i+256] = pow((double)2.0,-0.25 * (double) (i+210) );
+  iemmp3_gainpow2[i+256] = pow((double)2.0,-0.25 * (double) (i+210) );
 
     for(i=0;i<8207;i++)
-	iemmp3_ispow[i] = pow((double)i,(double)4.0/3.0);
+  iemmp3_ispow[i] = pow((double)i,(double)4.0/3.0);
 
     for (i=0;i<8;i++)
     {
-	static double Ci[8]={-0.6,-0.535,-0.33,-0.185,-0.095,-0.041,-0.0142,-0.0037};
-	double sq=sqrt(1.0+Ci[i]*Ci[i]);
-	iemmp3_aa_cs[i] = 1.0/sq;
-	iemmp3_aa_ca[i] = Ci[i]/sq;
+  static double Ci[8]={-0.6,-0.535,-0.33,-0.185,-0.095,-0.041,-0.0142,-0.0037};
+  double sq=sqrt(1.0+Ci[i]*Ci[i]);
+  iemmp3_aa_cs[i] = 1.0/sq;
+  iemmp3_aa_ca[i] = Ci[i]/sq;
     }
 
     for(i=0;i<18;i++)
     {
-	iemmp3_win[0][i]    = iemmp3_win[1][i]    = 0.5 * sin( M_PI / 72.0 * (double) (2*(i+0) +1) ) / cos ( M_PI * (double) (2*(i+0) +19) / 72.0 );
-	iemmp3_win[0][i+18] = iemmp3_win[3][i+18] = 0.5 * sin( M_PI / 72.0 * (double) (2*(i+18)+1) ) / cos ( M_PI * (double) (2*(i+18)+19) / 72.0 );
+  iemmp3_win[0][i]    = iemmp3_win[1][i]    = 0.5 * sin( M_PI / 72.0 * (double) (2*(i+0) +1) ) / cos ( M_PI * (double) (2*(i+0) +19) / 72.0 );
+  iemmp3_win[0][i+18] = iemmp3_win[3][i+18] = 0.5 * sin( M_PI / 72.0 * (double) (2*(i+18)+1) ) / cos ( M_PI * (double) (2*(i+18)+19) / 72.0 );
     }
     for(i=0;i<6;i++)
     {
-	iemmp3_win[1][i+18] = 0.5 / cos ( M_PI * (double) (2*(i+18)+19) / 72.0 );
-	iemmp3_win[3][i+12] = 0.5 / cos ( M_PI * (double) (2*(i+12)+19) / 72.0 );
-	iemmp3_win[1][i+24] = 0.5 * sin( M_PI / 24.0 * (double) (2*i+13) ) / cos ( M_PI * (double) (2*(i+24)+19) / 72.0 );
-	iemmp3_win[1][i+30] = iemmp3_win[3][i] = 0.0;
-	iemmp3_win[3][i+6 ] = 0.5 * sin( M_PI / 24.0 * (double) (2*i+1) )  / cos ( M_PI * (double) (2*(i+6 )+19) / 72.0 );
+  iemmp3_win[1][i+18] = 0.5 / cos ( M_PI * (double) (2*(i+18)+19) / 72.0 );
+  iemmp3_win[3][i+12] = 0.5 / cos ( M_PI * (double) (2*(i+12)+19) / 72.0 );
+  iemmp3_win[1][i+24] = 0.5 * sin( M_PI / 24.0 * (double) (2*i+13) ) / cos ( M_PI * (double) (2*(i+24)+19) / 72.0 );
+  iemmp3_win[1][i+30] = iemmp3_win[3][i] = 0.0;
+  iemmp3_win[3][i+6 ] = 0.5 * sin( M_PI / 24.0 * (double) (2*i+1) )  / cos ( M_PI * (double) (2*(i+6 )+19) / 72.0 );
     }
 
     for(i=0;i<9;i++)
-	iemmp3_COS9[i] = cos( M_PI / 18.0 * (double) i);
+  iemmp3_COS9[i] = cos( M_PI / 18.0 * (double) i);
 
     for(i=0;i<9;i++)
-	iemmp3_tfcos36[i] = 0.5 / cos ( M_PI * (double) (i*2+1) / 36.0 );
+  iemmp3_tfcos36[i] = 0.5 / cos ( M_PI * (double) (i*2+1) / 36.0 );
     for(i=0;i<3;i++)
-	iemmp3_tfcos12[i] = 0.5 / cos ( M_PI * (double) (i*2+1) / 12.0 );
+  iemmp3_tfcos12[i] = 0.5 / cos ( M_PI * (double) (i*2+1) / 12.0 );
 
     iemmp3_COS6_1 = cos( M_PI / 6.0 * (double) 1);
     iemmp3_COS6_2 = cos( M_PI / 6.0 * (double) 2);
 
     for(i=0;i<12;i++)
     {
-	iemmp3_win[2][i]  = 0.5 * sin( M_PI / 24.0 * (double) (2*i+1) ) / cos ( M_PI * (double) (2*i+7) / 24.0 );
-	for(j=0;j<6;j++)
-	    iemmp3_COS1[i][j] = cos( M_PI / 24.0 * (double) ((2*i+7)*(2*j+1)) );
+  iemmp3_win[2][i]  = 0.5 * sin( M_PI / 24.0 * (double) (2*i+1) ) / cos ( M_PI * (double) (2*i+7) / 24.0 );
+  for(j=0;j<6;j++)
+      iemmp3_COS1[i][j] = cos( M_PI / 24.0 * (double) ((2*i+7)*(2*j+1)) );
     }
 
     for(j=0;j<4;j++)
     {
-	static int len[4] = { 36,36,12,36 };
-	for(i=0;i<len[j];i+=2)
-	    iemmp3_win1[j][i] = + iemmp3_win[j][i];
-	for(i=1;i<len[j];i+=2)
-	    iemmp3_win1[j][i] = - iemmp3_win[j][i];
+  static int len[4] = { 36,36,12,36 };
+  for(i=0;i<len[j];i+=2)
+      iemmp3_win1[j][i] = + iemmp3_win[j][i];
+  for(i=1;i<len[j];i+=2)
+      iemmp3_win1[j][i] = - iemmp3_win[j][i];
     }
 
     for(i=0;i<16;i++)
     {
-	double t = tan( (double) i * M_PI / 12.0 );
-	iemmp3_tan1_1[i] = t / (1.0+t);
-	iemmp3_tan2_1[i] = 1.0 / (1.0 + t);
-	iemmp3_tan1_2[i] = M_SQRT2 * t / (1.0+t);
-	iemmp3_tan2_2[i] = M_SQRT2 / (1.0 + t);
+  double t = tan( (double) i * M_PI / 12.0 );
+  iemmp3_tan1_1[i] = t / (1.0+t);
+  iemmp3_tan2_1[i] = 1.0 / (1.0 + t);
+  iemmp3_tan1_2[i] = M_SQRT2 * t / (1.0+t);
+  iemmp3_tan2_2[i] = M_SQRT2 / (1.0 + t);
 
-	for(j=0;j<2;j++)
-	{
-	    double base = pow(2.0,-0.25*(j+1.0));
-	    double p1=1.0,p2=1.0;
-	    if(i > 0)
-	    {
-		if( i & 1 )
-		    p1 = pow(base,(i+1.0)*0.5);
-		else
-		    p2 = pow(base,i*0.5);
-	    }
-	    iemmp3_pow1_1[j][i] = p1;
-	    iemmp3_pow2_1[j][i] = p2;
-	    iemmp3_pow1_2[j][i] = M_SQRT2 * p1;
-	    iemmp3_pow2_2[j][i] = M_SQRT2 * p2;
-	}
+  for(j=0;j<2;j++)
+  {
+      double base = pow(2.0,-0.25*(j+1.0));
+      double p1=1.0,p2=1.0;
+      if(i > 0)
+      {
+    if( i & 1 )
+        p1 = pow(base,(i+1.0)*0.5);
+    else
+        p2 = pow(base,i*0.5);
+      }
+      iemmp3_pow1_1[j][i] = p1;
+      iemmp3_pow2_1[j][i] = p2;
+      iemmp3_pow1_2[j][i] = M_SQRT2 * p1;
+      iemmp3_pow2_2[j][i] = M_SQRT2 * p2;
+  }
     }
 
     for(j=0;j<9;j++)
     {
-	struct iemmp3_bandInfoStruct *bi = &bandInfo[j];
-	int *mp;
-	int cb,lwin;
-	short *bdf;
+  struct iemmp3_bandInfoStruct *bi = &bandInfo[j];
+  int *mp;
+  int cb,lwin;
+  short *bdf;
 
-	mp = iemmp3_map[j][0] = iemmp3_mapbuf0[j];
-	bdf = bi->longDiff;
-	for(i=0,cb = 0; cb < 8 ; cb++,i+=*bdf++)
-	{
-	    *mp++ = (*bdf) >> 1;
-	    *mp++ = i;
-	    *mp++ = 3;
-	    *mp++ = cb;
-	}
-	bdf = bi->shortDiff+3;
-	for(cb=3;cb<13;cb++)
-	{
-	    int l = (*bdf++) >> 1;
-	    for(lwin=0;lwin<3;lwin++)
-	    {
-		*mp++ = l;
-		*mp++ = i + lwin;
-		*mp++ = lwin;
-		*mp++ = cb;
-	    }
-	    i += 6*l;
-	}
-	iemmp3_mapend[j][0] = mp;
+  mp = iemmp3_map[j][0] = iemmp3_mapbuf0[j];
+  bdf = bi->longDiff;
+  for(i=0,cb = 0; cb < 8 ; cb++,i+=*bdf++)
+  {
+      *mp++ = (*bdf) >> 1;
+      *mp++ = i;
+      *mp++ = 3;
+      *mp++ = cb;
+  }
+  bdf = bi->shortDiff+3;
+  for(cb=3;cb<13;cb++)
+  {
+      int l = (*bdf++) >> 1;
+      for(lwin=0;lwin<3;lwin++)
+      {
+    *mp++ = l;
+    *mp++ = i + lwin;
+    *mp++ = lwin;
+    *mp++ = cb;
+      }
+      i += 6*l;
+  }
+  iemmp3_mapend[j][0] = mp;
 
-	mp = iemmp3_map[j][1] = iemmp3_mapbuf1[j];
-	bdf = bi->shortDiff+0;
-	for(i=0,cb=0;cb<13;cb++)
-	{
-	    int l = (*bdf++) >> 1;
-	    for(lwin=0;lwin<3;lwin++)
-	    {
-		*mp++ = l;
-		*mp++ = i + lwin;
-		*mp++ = lwin;
-		*mp++ = cb;
-	    }
-	    i += 6*l;
-	}
-	iemmp3_mapend[j][1] = mp;
+  mp = iemmp3_map[j][1] = iemmp3_mapbuf1[j];
+  bdf = bi->shortDiff+0;
+  for(i=0,cb=0;cb<13;cb++)
+  {
+      int l = (*bdf++) >> 1;
+      for(lwin=0;lwin<3;lwin++)
+      {
+    *mp++ = l;
+    *mp++ = i + lwin;
+    *mp++ = lwin;
+    *mp++ = cb;
+      }
+      i += 6*l;
+  }
+  iemmp3_mapend[j][1] = mp;
 
-	mp = iemmp3_map[j][2] = iemmp3_mapbuf2[j];
-	bdf = bi->longDiff;
-	for(cb = 0; cb < 22 ; cb++)
-	{
-	    *mp++ = (*bdf++) >> 1;
-	    *mp++ = cb;
-	}
-	iemmp3_mapend[j][2] = mp;
+  mp = iemmp3_map[j][2] = iemmp3_mapbuf2[j];
+  bdf = bi->longDiff;
+  for(cb = 0; cb < 22 ; cb++)
+  {
+      *mp++ = (*bdf++) >> 1;
+      *mp++ = cb;
+  }
+  iemmp3_mapend[j][2] = mp;
     }
 
     for(j=0;j<9;j++)
     {
-	for(i=0;i<23;i++)
-	{
-	    iemmp3_longLimit[j][i] = (bandInfo[j].longIdx[i] - 1 + 8) / 18 + 1;
-	    if(iemmp3_longLimit[j][i] > (down_sample_sblimit) )
-		iemmp3_longLimit[j][i] = down_sample_sblimit;
-	}
-	for(i=0;i<14;i++)
-	{
-	    iemmp3_shortLimit[j][i] = (bandInfo[j].shortIdx[i] - 1) / 18 + 1;
-	    if(iemmp3_shortLimit[j][i] > (down_sample_sblimit) )
-		iemmp3_shortLimit[j][i] = down_sample_sblimit;
-	}
+  for(i=0;i<23;i++)
+  {
+      iemmp3_longLimit[j][i] = (bandInfo[j].longIdx[i] - 1 + 8) / 18 + 1;
+      if(iemmp3_longLimit[j][i] > (down_sample_sblimit) )
+    iemmp3_longLimit[j][i] = down_sample_sblimit;
+  }
+  for(i=0;i<14;i++)
+  {
+      iemmp3_shortLimit[j][i] = (bandInfo[j].shortIdx[i] - 1) / 18 + 1;
+      if(iemmp3_shortLimit[j][i] > (down_sample_sblimit) )
+    iemmp3_shortLimit[j][i] = down_sample_sblimit;
+  }
     }
 
     for(i=0;i<5;i++)
     {
-	for(j=0;j<6;j++)
-	{
-	    for(k=0;k<6;k++)
-	    {
-		int n = k + j * 6 + i * 36;
-		iemmp3_slen2[n] = i|(j<<3)|(k<<6)|(3<<12);
-	    }
-	}
+  for(j=0;j<6;j++)
+  {
+      for(k=0;k<6;k++)
+      {
+    int n = k + j * 6 + i * 36;
+    iemmp3_slen2[n] = i|(j<<3)|(k<<6)|(3<<12);
+      }
+  }
     }
     for(i=0;i<4;i++)
     {
-	for(j=0;j<4;j++)
-	{
-	    for(k=0;k<4;k++)
-	    {
-		int n = k + j * 4 + i * 16;
-		iemmp3_slen2[n+180] = i|(j<<3)|(k<<6)|(4<<12);
-	    }
-	}
+  for(j=0;j<4;j++)
+  {
+      for(k=0;k<4;k++)
+      {
+    int n = k + j * 4 + i * 16;
+    iemmp3_slen2[n+180] = i|(j<<3)|(k<<6)|(4<<12);
+      }
+  }
     }
     for(i=0;i<4;i++)
     {
-	for(j=0;j<3;j++)
-	{
-	    int n = j + i * 3;
-	    iemmp3_slen2[n+244] = i|(j<<3) | (5<<12);
-	    iemmp3_n_slen2[n+500] = i|(j<<3) | (2<<12) | (1<<15);
-	}
+  for(j=0;j<3;j++)
+  {
+      int n = j + i * 3;
+      iemmp3_slen2[n+244] = i|(j<<3) | (5<<12);
+      iemmp3_n_slen2[n+500] = i|(j<<3) | (2<<12) | (1<<15);
+  }
     }
 
     for(i=0;i<5;i++)
     {
-	for(j=0;j<5;j++)
-	{
-	    for(k=0;k<4;k++)
-	    {
-		for(l=0;l<4;l++)
-		{
-		    int n = l + k * 4 + j * 16 + i * 80;
-		    iemmp3_n_slen2[n] = i|(j<<3)|(k<<6)|(l<<9)|(0<<12);
-		}
-	    }
-	}
+  for(j=0;j<5;j++)
+  {
+      for(k=0;k<4;k++)
+      {
+    for(l=0;l<4;l++)
+    {
+        int n = l + k * 4 + j * 16 + i * 80;
+        iemmp3_n_slen2[n] = i|(j<<3)|(k<<6)|(l<<9)|(0<<12);
+    }
+      }
+  }
     }
     for(i=0;i<5;i++)
     {
-	for(j=0;j<5;j++)
-	{
-	    for(k=0;k<4;k++)
-	    {
-		int n = k + j * 4 + i * 20;
-		iemmp3_n_slen2[n+400] = i|(j<<3)|(k<<6)|(1<<12);
-	    }
-	}
+  for(j=0;j<5;j++)
+  {
+      for(k=0;k<4;k++)
+      {
+    int n = k + j * 4 + i * 20;
+    iemmp3_n_slen2[n+400] = i|(j<<3)|(k<<6)|(1<<12);
+      }
+  }
     }
 }
 
@@ -1111,10 +1111,10 @@ static void remove_buf(struct iemmp3Struct *mp)
 
     mp->tail = buf->next;
     if(mp->tail)
-	mp->tail->prev = NULL;
+  mp->tail->prev = NULL;
     else
     {
-	mp->tail = mp->head = NULL;
+  mp->tail = mp->head = NULL;
     }
     free(buf->pnt);
     free(buf);
@@ -1127,14 +1127,14 @@ static struct iemmp3_buf *addbuf(struct iemmp3Struct *mp,char *buf,int size)
     nbuf = malloc( sizeof(struct iemmp3_buf) );
     if(!nbuf)
     {
-	post("Out of memory!\n");
-	return NULL;
+  post("Out of memory!\n");
+  return NULL;
     }
     nbuf->pnt = malloc(size);
     if(!nbuf->pnt)
     {
-	free(nbuf);
-	return NULL;
+  free(nbuf);
+  return NULL;
     }
     nbuf->size = size;
     memcpy(nbuf->pnt,buf,size);
@@ -1143,11 +1143,11 @@ static struct iemmp3_buf *addbuf(struct iemmp3Struct *mp,char *buf,int size)
     nbuf->pos = 0;
     if(!mp->tail)
     {
-	mp->tail = nbuf;
+  mp->tail = nbuf;
     }
     else
     {
-	mp->head->next = nbuf;
+  mp->head->next = nbuf;
     }
     mp->head = nbuf;
     mp->bsize += size;
@@ -1162,14 +1162,14 @@ static int read_buf_byte(struct iemmp3Struct *mp,int *err)
     pos = mp->tail->pos;
     while(pos >= mp->tail->size)
     {
-	remove_buf(mp);
-	pos = mp->tail->pos;
-	if(!mp->tail)
-	{
-	    post("Fatal error!\n");
-	    *err = 0;
-	    return(0);
-	}
+  remove_buf(mp);
+  pos = mp->tail->pos;
+  if(!mp->tail)
+  {
+      post("Fatal error!\n");
+      *err = 0;
+      return(0);
+  }
     }
     b = mp->tail->pnt[pos];
     mp->bsize--;
@@ -1197,29 +1197,29 @@ static int decode_header(struct iemmp3_frame *fr,unsigned long newhead)
 {
     if( newhead & (1<<20) )
     {
-	fr->lsf = (newhead & (1<<19)) ? 0x0 : 0x1;
-	fr->mpeg25 = 0;
+  fr->lsf = (newhead & (1<<19)) ? 0x0 : 0x1;
+  fr->mpeg25 = 0;
     }
     else
     {
-	fr->lsf = 1;
-	fr->mpeg25 = 1;
+  fr->lsf = 1;
+  fr->mpeg25 = 1;
     }
     fr->lay = 4-((newhead>>17)&3);
     if( ((newhead>>10)&0x3) == 0x3)
     {
-	post("Stream error");
-	return(MP3_EX);
+  post("Stream error");
+  return(MP3_EX);
     }
     if(fr->mpeg25)
     {
-	fr->sampling_frequency = 6 + ((newhead>>10)&0x3);
+  fr->sampling_frequency = 6 + ((newhead>>10)&0x3);
     }
     else
-	fr->sampling_frequency = ((newhead>>10)&0x3) + (fr->lsf*3);
+  fr->sampling_frequency = ((newhead>>10)&0x3) + (fr->lsf*3);
     fr->error_protection = ((newhead>>16)&0x1)^0x1;
     if(fr->mpeg25) /* allow Bitrate change for 2.5 ... */
-	fr->bitrate_index = ((newhead>>12)&0xf);
+  fr->bitrate_index = ((newhead>>12)&0xf);
     fr->bitrate_index = ((newhead>>12)&0xf);
     fr->padding   = ((newhead>>9)&0x1);
     fr->extension = ((newhead>>8)&0x1);
@@ -1231,26 +1231,26 @@ static int decode_header(struct iemmp3_frame *fr,unsigned long newhead)
     fr->stereo    = (fr->mode == MPG_MD_MONO) ? 1 : 2;
     if(!fr->bitrate_index)
     {
-	post("Free format not supported.\n");
-	return(0);
+  post("Free format not supported.\n");
+  return(0);
     }
     switch(fr->lay)
     {
     case 1:
-	post("Layer I not supported!\n");
-	break;
+  post("Layer I not supported!\n");
+  break;
     case 2:
-	post("Layer II not supported!\n");
-	break;
+  post("Layer II not supported!\n");
+  break;
     case 3:
-	fr->framesize  = (long) iemmp3_tabsel_123[fr->lsf][2][fr->bitrate_index] * 144000;
-	fr->framesize /= iemmp3_freqs[fr->sampling_frequency]<<(fr->lsf);
-	fr->framesize = fr->framesize + fr->padding - 4;
-	//post("Framesize: %d",fr->framesize);
-	break;
+  fr->framesize  = (long) iemmp3_tabsel_123[fr->lsf][2][fr->bitrate_index] * 144000;
+  fr->framesize /= iemmp3_freqs[fr->sampling_frequency]<<(fr->lsf);
+  fr->framesize = fr->framesize + fr->padding - 4;
+  //post("Framesize: %d",fr->framesize);
+  break;
     default:
-	post("Sorry, unknown layer type.\n");
-	return (0);
+  post("Sorry, unknown layer type.\n");
+  return (0);
     }
     return(1);
 }
@@ -1260,19 +1260,19 @@ static unsigned int getbits(int number_of_bits)
     unsigned long rval;
 
     if(!number_of_bits)
-	return 0;
+  return 0;
     {
-	rval = iemmp3_wordpointer[0];
-	rval <<= 8;
-	rval |= iemmp3_wordpointer[1];
-	rval <<= 8;
-	rval |= iemmp3_wordpointer[2];
-	rval <<= iemmp3_bitindex;
-	rval &= 0xffffff;
-	iemmp3_bitindex += number_of_bits;
-	rval >>= (24-number_of_bits);
-	iemmp3_wordpointer += (iemmp3_bitindex>>3);
-	iemmp3_bitindex &= 7;
+  rval = iemmp3_wordpointer[0];
+  rval <<= 8;
+  rval |= iemmp3_wordpointer[1];
+  rval <<= 8;
+  rval |= iemmp3_wordpointer[2];
+  rval <<= iemmp3_bitindex;
+  rval &= 0xffffff;
+  iemmp3_bitindex += number_of_bits;
+  rval >>= (24-number_of_bits);
+  iemmp3_wordpointer += (iemmp3_bitindex>>3);
+  iemmp3_bitindex &= 7;
     }
     return rval;
 }
@@ -1282,15 +1282,15 @@ static unsigned int getbits_fast(int number_of_bits)
     unsigned long rval;
 
     {
-	rval = iemmp3_wordpointer[0];
-	rval <<= 8;
-	rval |= iemmp3_wordpointer[1];
-	rval <<= iemmp3_bitindex;
-	rval &= 0xffff;
-	iemmp3_bitindex += number_of_bits;
-	rval >>= (16-number_of_bits);
-	iemmp3_wordpointer += (iemmp3_bitindex>>3);
-	iemmp3_bitindex &= 7;
+  rval = iemmp3_wordpointer[0];
+  rval <<= 8;
+  rval |= iemmp3_wordpointer[1];
+  rval <<= iemmp3_bitindex;
+  rval &= 0xffff;
+  iemmp3_bitindex += number_of_bits;
+  rval >>= (16-number_of_bits);
+  iemmp3_wordpointer += (iemmp3_bitindex>>3);
+  iemmp3_bitindex &= 7;
     }
     return rval;
 }
@@ -1320,229 +1320,229 @@ static int do_layer3(struct iemmp3_frame *fr,unsigned char *pcm_sample,int *pcm_
 
     if(stereo == 1)
     { /* stream is mono */
-	stereo1 = 1;
-	single = 0;
+  stereo1 = 1;
+  single = 0;
     }
     else if(single >= 0) /* stream is stereo, but force to mono */
-	stereo1 = 1;
+  stereo1 = 1;
     else
-	stereo1 = 2;
+  stereo1 = 2;
 
     if(fr->mode == MPG_MD_JOINT_STEREO)
     {
-	ms_stereo = fr->mode_ext & 0x2;
-	i_stereo  = fr->mode_ext & 0x1;
+  ms_stereo = fr->mode_ext & 0x2;
+  i_stereo  = fr->mode_ext & 0x1;
     }
     else
-	ms_stereo = i_stereo = 0;
+  ms_stereo = i_stereo = 0;
 
     if(fr->lsf)
     {
-	granules = 1;
-	if(!III_get_side_info_2(&sideinfo,stereo,ms_stereo,sfreq,single))
-	{
-	    *err = 0;
-	    return 0;
-	}
+  granules = 1;
+  if(!III_get_side_info_2(&sideinfo,stereo,ms_stereo,sfreq,single))
+  {
+      *err = 0;
+      return 0;
+  }
     }
     else
     {
-	granules = 2;
+  granules = 2;
 #ifdef IEM_MPEG1
-	if(!III_get_side_info_1(&sideinfo,stereo,ms_stereo,sfreq,single))
-	{
-	    *err = 0;
-	    return 0;
-	}
+  if(!III_get_side_info_1(&sideinfo,stereo,ms_stereo,sfreq,single))
+  {
+      *err = 0;
+      return 0;
+  }
 #else
-	post("Not supported\n");
+  post("Not supported\n");
 #endif
     }
 
     if(set_pointer(sideinfo.main_data_begin) == MP3_ERR)
-	return 0;
+  return 0;
 
     for (gr=0;gr<granules;gr++)
     {
-	static real hybridIn[2][SBLIMIT][SSLIMIT];
-	static real hybridOut[2][SSLIMIT][SBLIMIT];
+  static real hybridIn[2][SBLIMIT][SSLIMIT];
+  static real hybridOut[2][SSLIMIT][SBLIMIT];
 
-	{
-	    struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[0].gr[gr]);
-	    long part2bits;
-	    if(fr->lsf)
-		part2bits = III_get_scale_factors_2(scalefacs,gr_info,0);
-	    else
-	    {
+  {
+      struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[0].gr[gr]);
+      long part2bits;
+      if(fr->lsf)
+    part2bits = III_get_scale_factors_2(scalefacs,gr_info,0);
+      else
+      {
 #ifdef IEM_MPEG1
-		part2bits = III_get_scale_factors_1(scalefacs,gr_info);
+    part2bits = III_get_scale_factors_1(scalefacs,gr_info);
 #else
-		post("Not supported\n");
+    post("Not supported\n");
 #endif
-	    }
-	    if(III_dequantize_sample(hybridIn[0], scalefacs,gr_info,sfreq,part2bits))
-		return clip;
-	}
-	if(stereo == 2)
-	{
-	    struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[1].gr[gr]);
-	    long part2bits;
-	    if(fr->lsf)
-		part2bits = III_get_scale_factors_2(scalefacs,gr_info,i_stereo);
-	    else
-	    {
+      }
+      if(III_dequantize_sample(hybridIn[0], scalefacs,gr_info,sfreq,part2bits))
+    return clip;
+  }
+  if(stereo == 2)
+  {
+      struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[1].gr[gr]);
+      long part2bits;
+      if(fr->lsf)
+    part2bits = III_get_scale_factors_2(scalefacs,gr_info,i_stereo);
+      else
+      {
 #ifdef IEM_MPEG1
-		part2bits = III_get_scale_factors_1(scalefacs,gr_info);
+    part2bits = III_get_scale_factors_1(scalefacs,gr_info);
 #else
-		post("Not supported\n");
+    post("Not supported\n");
 #endif
-	    }
+      }
 
-	    if(III_dequantize_sample(hybridIn[1],scalefacs,gr_info,sfreq,part2bits))
-		return clip;
+      if(III_dequantize_sample(hybridIn[1],scalefacs,gr_info,sfreq,part2bits))
+    return clip;
 
-	    if(ms_stereo)
-	    {
-		int i;
-		for(i=0;i<SBLIMIT*SSLIMIT;i++)
-		{
-		    real tmp0,tmp1;
-		    tmp0 = ((real *) hybridIn[0])[i];
-		    tmp1 = ((real *) hybridIn[1])[i];
-		    ((real *) hybridIn[1])[i] = tmp0 - tmp1;
-		    ((real *) hybridIn[0])[i] = tmp0 + tmp1;
-		}
-	    }
+      if(ms_stereo)
+      {
+    int i;
+    for(i=0;i<SBLIMIT*SSLIMIT;i++)
+    {
+        real tmp0,tmp1;
+        tmp0 = ((real *) hybridIn[0])[i];
+        tmp1 = ((real *) hybridIn[1])[i];
+        ((real *) hybridIn[1])[i] = tmp0 - tmp1;
+        ((real *) hybridIn[0])[i] = tmp0 + tmp1;
+    }
+      }
 
-	    if(i_stereo)
-		III_i_stereo(hybridIn,scalefacs,gr_info,sfreq,ms_stereo,fr->lsf);
+      if(i_stereo)
+    III_i_stereo(hybridIn,scalefacs,gr_info,sfreq,ms_stereo,fr->lsf);
 
-	    if(ms_stereo || i_stereo || (single == 3) )
-	    {
-		if(gr_info->maxb > sideinfo.ch[0].gr[gr].maxb)
-		    sideinfo.ch[0].gr[gr].maxb = gr_info->maxb;
-		else
-		    gr_info->maxb = sideinfo.ch[0].gr[gr].maxb;
-	    }
+      if(ms_stereo || i_stereo || (single == 3) )
+      {
+    if(gr_info->maxb > sideinfo.ch[0].gr[gr].maxb)
+        sideinfo.ch[0].gr[gr].maxb = gr_info->maxb;
+    else
+        gr_info->maxb = sideinfo.ch[0].gr[gr].maxb;
+      }
 
-	    switch(single)
-	    {
-	    case 3:
-		{
-		    register unsigned int i;
-		    register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
-		    for(i=0;i<SSLIMIT*gr_info->maxb;i++,in0++)
-			*in0 = (*in0 + *in1++); /* *0.5 done by pow-scale */
-		}
-		break;
-	    case 1:
-		{
-		    register unsigned int i;
-		    register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
-		    for(i=0;i<SSLIMIT*gr_info->maxb;i++)
-			*in0++ = *in1++;
-		}
-		break;
-	    }
-	}
+      switch(single)
+      {
+      case 3:
+    {
+        register unsigned int i;
+        register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
+        for(i=0;i<SSLIMIT*gr_info->maxb;i++,in0++)
+      *in0 = (*in0 + *in1++); /* *0.5 done by pow-scale */
+    }
+    break;
+      case 1:
+    {
+        register unsigned int i;
+        register real *in0 = (real *) hybridIn[0],*in1 = (real *) hybridIn[1];
+        for(i=0;i<SSLIMIT*gr_info->maxb;i++)
+      *in0++ = *in1++;
+    }
+    break;
+      }
+  }
 
-	for(ch=0;ch<stereo1;ch++)
-	{
-	    struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[ch].gr[gr]);
-	    III_antialias(hybridIn[ch],gr_info);
-	    III_hybrid(hybridIn[ch], hybridOut[ch], ch,gr_info);
-	}
+  for(ch=0;ch<stereo1;ch++)
+  {
+      struct iemmp3_gr_info_s *gr_info = &(sideinfo.ch[ch].gr[gr]);
+      III_antialias(hybridIn[ch],gr_info);
+      III_hybrid(hybridIn[ch], hybridOut[ch], ch,gr_info);
+  }
 
-	for(ss=0;ss<SSLIMIT;ss++)
-	{
-	    if(single >= 0)
-	    {
-		clip += synth_1to1_mono(hybridOut[0][ss],pcm_sample,pcm_point);
-	    }
-	    else
-	    {
-		int p1 = *pcm_point;
-		clip += synth_1to1(hybridOut[0][ss],0,pcm_sample,&p1);
-		clip += synth_1to1(hybridOut[1][ss],1,pcm_sample,pcm_point);
-	    }
-	}
+  for(ss=0;ss<SSLIMIT;ss++)
+  {
+      if(single >= 0)
+      {
+    clip += synth_1to1_mono(hybridOut[0][ss],pcm_sample,pcm_point);
+      }
+      else
+      {
+    int p1 = *pcm_point;
+    clip += synth_1to1(hybridOut[0][ss],0,pcm_sample,&p1);
+    clip += synth_1to1(hybridOut[1][ss],1,pcm_sample,pcm_point);
+      }
+  }
     }
 
     return clip;
 }
 
 static int III_get_side_info_2(struct iemmp3_III_sideinfo *si,int stereo,
-			       int ms_stereo,long sfreq,int single)
+             int ms_stereo,long sfreq,int single)
 {
     int ch;
     int powdiff = (single == 3) ? 4 : 0;
 
     si->main_data_begin = getbits(8);
     if (stereo == 1)
-	si->private_bits = get1bit();
+  si->private_bits = get1bit();
     else
-	si->private_bits = getbits_fast(2);
+  si->private_bits = getbits_fast(2);
 
     for (ch=0; ch<stereo; ch++)
     {
-	register struct iemmp3_gr_info_s *gr_info = &(si->ch[ch].gr[0]);
+  register struct iemmp3_gr_info_s *gr_info = &(si->ch[ch].gr[0]);
 
-	gr_info->part2_3_length = getbits(12);
-	gr_info->big_values = getbits_fast(9);
-	if(gr_info->big_values > 288)
-	{
-	    post("big_values too large!\n");
-	    gr_info->big_values = 288;
-	}
-	gr_info->pow2gain = iemmp3_gainpow2+256 - getbits_fast(8) + powdiff;
-	if(ms_stereo)
-	    gr_info->pow2gain += 2;
-	gr_info->scalefac_compress = getbits(9);
-	/* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
-	if(get1bit())
-	{
-	    int i;
-	    gr_info->block_type = getbits_fast(2);
-	    gr_info->mixed_block_flag = get1bit();
-	    gr_info->table_select[0] = getbits_fast(5);
-	    gr_info->table_select[1] = getbits_fast(5);
-	    /*
-	     * table_select[2] not needed, because there is no region2,
-	     * but to satisfy some verifications tools we set it either.
-	     */
-	    gr_info->table_select[2] = 0;
-	    for(i=0;i<3;i++)
-		gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
-	    if(gr_info->block_type == 0)
-	    {
-		post("Blocktype == 0 and window-switching == 1 not allowed.\n");
-		return(0);
-	    }
-	    /* region_count/start parameters are implicit in this case. */
-	    /* check this again! */
-	    if(gr_info->block_type == 2)
-		gr_info->region1start = 36>>1;
-	    else if(sfreq == 8)
-		/* check this for 2.5 and sfreq=8 */
-		gr_info->region1start = 108>>1;
-	    else
-		gr_info->region1start = 54>>1;
-	    gr_info->region2start = 576>>1;
-	}
-	else
-	{
-	    int i,r0c,r1c;
-	    for (i=0; i<3; i++)
-		gr_info->table_select[i] = getbits_fast(5);
-	    r0c = getbits_fast(4);
-	    r1c = getbits_fast(3);
-	    gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
-	    gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
-	    gr_info->block_type = 0;
-	    gr_info->mixed_block_flag = 0;
-	}
-	gr_info->scalefac_scale = get1bit();
-	gr_info->count1table_select = get1bit();
+  gr_info->part2_3_length = getbits(12);
+  gr_info->big_values = getbits_fast(9);
+  if(gr_info->big_values > 288)
+  {
+      post("big_values too large!\n");
+      gr_info->big_values = 288;
+  }
+  gr_info->pow2gain = iemmp3_gainpow2+256 - getbits_fast(8) + powdiff;
+  if(ms_stereo)
+      gr_info->pow2gain += 2;
+  gr_info->scalefac_compress = getbits(9);
+  /* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
+  if(get1bit())
+  {
+      int i;
+      gr_info->block_type = getbits_fast(2);
+      gr_info->mixed_block_flag = get1bit();
+      gr_info->table_select[0] = getbits_fast(5);
+      gr_info->table_select[1] = getbits_fast(5);
+      /*
+       * table_select[2] not needed, because there is no region2,
+       * but to satisfy some verifications tools we set it either.
+       */
+      gr_info->table_select[2] = 0;
+      for(i=0;i<3;i++)
+    gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
+      if(gr_info->block_type == 0)
+      {
+    post("Blocktype == 0 and window-switching == 1 not allowed.\n");
+    return(0);
+      }
+      /* region_count/start parameters are implicit in this case. */
+      /* check this again! */
+      if(gr_info->block_type == 2)
+    gr_info->region1start = 36>>1;
+      else if(sfreq == 8)
+    /* check this for 2.5 and sfreq=8 */
+    gr_info->region1start = 108>>1;
+      else
+    gr_info->region1start = 54>>1;
+      gr_info->region2start = 576>>1;
+  }
+  else
+  {
+      int i,r0c,r1c;
+      for (i=0; i<3; i++)
+    gr_info->table_select[i] = getbits_fast(5);
+      r0c = getbits_fast(4);
+      r1c = getbits_fast(3);
+      gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
+      gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
+      gr_info->block_type = 0;
+      gr_info->mixed_block_flag = 0;
+  }
+  gr_info->scalefac_scale = get1bit();
+  gr_info->count1table_select = get1bit();
     }
     return(1);
 }
@@ -1550,82 +1550,82 @@ static int III_get_side_info_2(struct iemmp3_III_sideinfo *si,int stereo,
 
 #ifdef IEM_MPEG1
 static int III_get_side_info_1(struct iemmp3_III_sideinfo *si,int stereo,
-			       int ms_stereo,long sfreq,int single)
+             int ms_stereo,long sfreq,int single)
 {
     int ch, gr;
     int powdiff = (single == 3) ? 4 : 0;
 
     si->main_data_begin = getbits(9);
     if (stereo == 1)
-	si->private_bits = getbits_fast(5);
+  si->private_bits = getbits_fast(5);
     else
-	si->private_bits = getbits_fast(3);
+  si->private_bits = getbits_fast(3);
 
     for (ch=0; ch<stereo; ch++)
     {
-	si->ch[ch].gr[0].scfsi = -1;
-	si->ch[ch].gr[1].scfsi = getbits_fast(4);
+  si->ch[ch].gr[0].scfsi = -1;
+  si->ch[ch].gr[1].scfsi = getbits_fast(4);
     }
 
     for (gr=0; gr<2; gr++)
     {
-	for (ch=0; ch<stereo; ch++)
-	{
-	    register struct iemmp3_gr_info_s *gr_info = &(si->ch[ch].gr[gr]);
+  for (ch=0; ch<stereo; ch++)
+  {
+      register struct iemmp3_gr_info_s *gr_info = &(si->ch[ch].gr[gr]);
 
-	    gr_info->part2_3_length = getbits(12);
-	    gr_info->big_values = getbits_fast(9);
-	    if(gr_info->big_values > 288)
-	    {
-		post("big_values too large!\n");
-		gr_info->big_values = 288;
-	    }
-	    gr_info->pow2gain = iemmp3_gainpow2+256 - getbits_fast(8) + powdiff;
-	    if(ms_stereo)
-		gr_info->pow2gain += 2;
-	    gr_info->scalefac_compress = getbits_fast(4);
-	    /* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
-	    if(get1bit())
-	    {
-		int i;
+      gr_info->part2_3_length = getbits(12);
+      gr_info->big_values = getbits_fast(9);
+      if(gr_info->big_values > 288)
+      {
+    post("big_values too large!\n");
+    gr_info->big_values = 288;
+      }
+      gr_info->pow2gain = iemmp3_gainpow2+256 - getbits_fast(8) + powdiff;
+      if(ms_stereo)
+    gr_info->pow2gain += 2;
+      gr_info->scalefac_compress = getbits_fast(4);
+      /* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
+      if(get1bit())
+      {
+    int i;
 
-		gr_info->block_type = getbits_fast(2);
-		gr_info->mixed_block_flag = get1bit();
-		gr_info->table_select[0] = getbits_fast(5);
-		gr_info->table_select[1] = getbits_fast(5);
-		/*
-		 * table_select[2] not needed, because there is no region2,
-		 * but to satisfy some verifications tools we set it either.
-		 */
-		gr_info->table_select[2] = 0;
-		for(i=0;i<3;i++)
-		    gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
+    gr_info->block_type = getbits_fast(2);
+    gr_info->mixed_block_flag = get1bit();
+    gr_info->table_select[0] = getbits_fast(5);
+    gr_info->table_select[1] = getbits_fast(5);
+    /*
+     * table_select[2] not needed, because there is no region2,
+     * but to satisfy some verifications tools we set it either.
+     */
+    gr_info->table_select[2] = 0;
+    for(i=0;i<3;i++)
+        gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
 
-		if(gr_info->block_type == 0)
-		{
-		    post("Blocktype == 0 and window-switching == 1 not allowed.\n");
-		    return(0);
-		}
-		/* region_count/start parameters are implicit in this case. */
-		gr_info->region1start = 36>>1;
-		gr_info->region2start = 576>>1;
-	    }
-	    else
-	    {
-		int i,r0c,r1c;
-		for (i=0; i<3; i++)
-		    gr_info->table_select[i] = getbits_fast(5);
-		r0c = getbits_fast(4);
-		r1c = getbits_fast(3);
-		gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
-		gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
-		gr_info->block_type = 0;
-		gr_info->mixed_block_flag = 0;
-	    }
-	    gr_info->preflag = get1bit();
-	    gr_info->scalefac_scale = get1bit();
-	    gr_info->count1table_select = get1bit();
-	}
+    if(gr_info->block_type == 0)
+    {
+        post("Blocktype == 0 and window-switching == 1 not allowed.\n");
+        return(0);
+    }
+    /* region_count/start parameters are implicit in this case. */
+    gr_info->region1start = 36>>1;
+    gr_info->region2start = 576>>1;
+      }
+      else
+      {
+    int i,r0c,r1c;
+    for (i=0; i<3; i++)
+        gr_info->table_select[i] = getbits_fast(5);
+    r0c = getbits_fast(4);
+    r1c = getbits_fast(3);
+    gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
+    gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
+    gr_info->block_type = 0;
+    gr_info->mixed_block_flag = 0;
+      }
+      gr_info->preflag = get1bit();
+      gr_info->scalefac_scale = get1bit();
+      gr_info->count1table_select = get1bit();
+  }
     }
     return(1);
 }
@@ -1636,13 +1636,13 @@ static int set_pointer(long backstep)
     unsigned char *bsbufold;
     if(iemmp3_gmp->fsizeold < 0 && backstep > 0)
     {
-	post("Can't step back %ld!\n",backstep);
-	return MP3_ERR;
+  post("Can't step back %ld!\n",backstep);
+  return MP3_ERR;
     }
     bsbufold = iemmp3_gmp->bsspace[iemmp3_gmp->bsnum] + 512;
     iemmp3_wordpointer -= backstep;
     if (backstep)
-	memcpy(iemmp3_wordpointer,bsbufold+iemmp3_gmp->fsizeold-backstep,backstep);
+  memcpy(iemmp3_wordpointer,bsbufold+iemmp3_gmp->fsizeold-backstep,backstep);
     iemmp3_bitindex = 0;
     return MP3_OK;
 }
@@ -1651,8 +1651,8 @@ static int set_pointer(long backstep)
 static int III_get_scale_factors_1(int *scf,struct iemmp3_gr_info_s *gr_info)
 {
     static unsigned char slen[2][16] = {
-	{0, 0, 0, 0, 3, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4},
-	{0, 1, 2, 3, 0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 2, 3}
+  {0, 0, 0, 0, 3, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4},
+  {0, 1, 2, 3, 0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 2, 3}
     };
     int numbits;
     int num0 = slen[0][gr_info->scalefac_compress];
@@ -1660,89 +1660,89 @@ static int III_get_scale_factors_1(int *scf,struct iemmp3_gr_info_s *gr_info)
 
     if (gr_info->block_type == 2)
     {
-	int i=18;
+  int i=18;
 
-	numbits = (num0 + num1) * 18;
-	if (gr_info->mixed_block_flag)
-	{
-	    for (i=8;i;i--)
-		*scf++ = getbits_fast(num0);
-	    i = 9;
-	    numbits -= num0; /* num0 * 17 + num1 * 18 */
-	}
+  numbits = (num0 + num1) * 18;
+  if (gr_info->mixed_block_flag)
+  {
+      for (i=8;i;i--)
+    *scf++ = getbits_fast(num0);
+      i = 9;
+      numbits -= num0; /* num0 * 17 + num1 * 18 */
+  }
 
-	for (;i;i--)
-	    *scf++ = getbits_fast(num0);
-	for (i = 18; i; i--)
-	    *scf++ = getbits_fast(num1);
-	*scf++ = 0; *scf++ = 0; *scf++ = 0; /* short[13][0..2] = 0 */
+  for (;i;i--)
+      *scf++ = getbits_fast(num0);
+  for (i = 18; i; i--)
+      *scf++ = getbits_fast(num1);
+  *scf++ = 0; *scf++ = 0; *scf++ = 0; /* short[13][0..2] = 0 */
     }
     else
     {
-	int i;
-	int scfsi = gr_info->scfsi;
+  int i;
+  int scfsi = gr_info->scfsi;
 
-	if(scfsi < 0)
-	{ /* scfsi < 0 => granule == 0 */
-	    for(i=11;i;i--)
-		*scf++ = getbits_fast(num0);
-	    for(i=10;i;i--)
-		*scf++ = getbits_fast(num1);
-	    numbits = (num0 + num1) * 10 + num0;
-	}
-	else
-	{
-	    numbits = 0;
-	    if(!(scfsi & 0x8))
-	    {
-		for (i=6;i;i--)
-		    *scf++ = getbits_fast(num0);
-		numbits += num0 * 6;
-	    }
-	    else
-	    {
-		*scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
-		*scf++ = 0; *scf++ = 0; *scf++ = 0;
-	    }
+  if(scfsi < 0)
+  { /* scfsi < 0 => granule == 0 */
+      for(i=11;i;i--)
+    *scf++ = getbits_fast(num0);
+      for(i=10;i;i--)
+    *scf++ = getbits_fast(num1);
+      numbits = (num0 + num1) * 10 + num0;
+  }
+  else
+  {
+      numbits = 0;
+      if(!(scfsi & 0x8))
+      {
+    for (i=6;i;i--)
+        *scf++ = getbits_fast(num0);
+    numbits += num0 * 6;
+      }
+      else
+      {
+    *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
+    *scf++ = 0; *scf++ = 0; *scf++ = 0;
+      }
 
-	    if(!(scfsi & 0x4))
-	    {
-		for (i=5;i;i--)
-		    *scf++ = getbits_fast(num0);
-		numbits += num0 * 5;
-	    }
-	    else
-	    {
-		*scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
-		*scf++ = 0; *scf++ = 0;
-	    }
+      if(!(scfsi & 0x4))
+      {
+    for (i=5;i;i--)
+        *scf++ = getbits_fast(num0);
+    numbits += num0 * 5;
+      }
+      else
+      {
+    *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
+    *scf++ = 0; *scf++ = 0;
+      }
 
-	    if(!(scfsi & 0x2))
-	    {
-		for(i=5;i;i--)
-		    *scf++ = getbits_fast(num1);
-		numbits += num1 * 5;
-	    }
-	    else
-	    {
-		*scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
-		*scf++ = 0; *scf++ = 0;
-	    }
+      if(!(scfsi & 0x2))
+      {
+    for(i=5;i;i--)
+        *scf++ = getbits_fast(num1);
+    numbits += num1 * 5;
+      }
+      else
+      {
+    *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
+    *scf++ = 0; *scf++ = 0;
+      }
 
-	    if(!(scfsi & 0x1))
-	    {
-		for (i=5;i;i--)
-		    *scf++ = getbits_fast(num1);
-		numbits += num1 * 5;
-	    }
-	    else
-	    {
-		*scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
-		*scf++ = 0; *scf++ = 0;
-	    }
-	}
+      if(!(scfsi & 0x1))
+      {
+    for (i=5;i;i--)
+        *scf++ = getbits_fast(num1);
+    numbits += num1 * 5;
+      }
+      else
+      {
+    *scf++ = 0; *scf++ = 0; *scf++ = 0;  /* set to ZERO necessary? */
+    *scf++ = 0; *scf++ = 0;
+      }
+  }
 
-	*scf++ = 0;  /* no l[21] in original sources */
+  *scf++ = 0;  /* no l[21] in original sources */
     }
     return numbits;
 }
@@ -1757,50 +1757,50 @@ static int III_get_scale_factors_2(int *scf,struct iemmp3_gr_info_s *gr_info,int
     int numbits = 0;
 
     static unsigned char stab[3][6][4] = {
-	{ { 6, 5, 5,5 } , { 6, 5, 7,3 } , { 11,10,0,0} ,
-	{ 7, 7, 7,0 } , { 6, 6, 6,3 } , {  8, 8,5,0} } ,
-	{ { 9, 9, 9,9 } , { 9, 9,12,6 } , { 18,18,0,0} ,
-	{12,12,12,0 } , {12, 9, 9,6 } , { 15,12,9,0} } ,
-	{ { 6, 9, 9,9 } , { 6, 9,12,6 } , { 15,18,0,0} ,
-	{ 6,15,12,0 } , { 6,12, 9,6 } , {  6,18,9,0} } };
+  { { 6, 5, 5,5 } , { 6, 5, 7,3 } , { 11,10,0,0} ,
+  { 7, 7, 7,0 } , { 6, 6, 6,3 } , {  8, 8,5,0} } ,
+  { { 9, 9, 9,9 } , { 9, 9,12,6 } , { 18,18,0,0} ,
+  {12,12,12,0 } , {12, 9, 9,6 } , { 15,12,9,0} } ,
+  { { 6, 9, 9,9 } , { 6, 9,12,6 } , { 15,18,0,0} ,
+  { 6,15,12,0 } , { 6,12, 9,6 } , {  6,18,9,0} } };
 
     if(i_stereo) /* i_stereo AND second channel -> do_layer3() checks this */
-	slen = iemmp3_slen2[gr_info->scalefac_compress>>1];
+  slen = iemmp3_slen2[gr_info->scalefac_compress>>1];
     else
-	slen = iemmp3_n_slen2[gr_info->scalefac_compress];
+  slen = iemmp3_n_slen2[gr_info->scalefac_compress];
 
     gr_info->preflag = (slen>>15) & 0x1;
 
     n = 0;
     if( gr_info->block_type == 2 )
     {
-	n++;
-	if(gr_info->mixed_block_flag)
-	    n++;
+  n++;
+  if(gr_info->mixed_block_flag)
+      n++;
     }
 
     pnt = stab[n][(slen>>12)&0x7];
 
     for(i=0;i<4;i++)
     {
-	int num = slen & 0x7;
-	slen >>= 3;
-	if(num)
-	{
-	    for(j=0;j<(int)(pnt[i]);j++)
-		*scf++ = getbits_fast(num);
-	    numbits += pnt[i] * num;
-	}
-	else
-	{
-	    for(j=0;j<(int)(pnt[i]);j++)
-		*scf++ = 0;
-	}
+  int num = slen & 0x7;
+  slen >>= 3;
+  if(num)
+  {
+      for(j=0;j<(int)(pnt[i]);j++)
+    *scf++ = getbits_fast(num);
+      numbits += pnt[i] * num;
+  }
+  else
+  {
+      for(j=0;j<(int)(pnt[i]);j++)
+    *scf++ = 0;
+  }
     }
 
     n = (n << 1) + 1;
     for(i=0;i<n;i++)
-	*scf++ = 0;
+  *scf++ = 0;
 
     return numbits;
 }
@@ -1808,7 +1808,7 @@ static int III_get_scale_factors_2(int *scf,struct iemmp3_gr_info_s *gr_info,int
 
 
 static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
-				 struct iemmp3_gr_info_s *gr_info,int sfreq,int part2bits)
+         struct iemmp3_gr_info_s *gr_info,int sfreq,int part2bits)
 {
     int shift = 1 + gr_info->scalefac_scale;
     real *xrpnt = (real *) xr;
@@ -1817,406 +1817,406 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
     int *me;
 
     {
-	int bv       = gr_info->big_values;
-	int region1  = gr_info->region1start;
-	int region2  = gr_info->region2start;
+  int bv       = gr_info->big_values;
+  int region1  = gr_info->region1start;
+  int region2  = gr_info->region2start;
 
-	l3 = ((576>>1)-bv)>>1;
-	/*
-	 * we may lose the 'odd' bit here !!
-	 * check this later again
-	 */
-	if(bv <= region1)
-	{
-	    l[0] = bv; l[1] = 0; l[2] = 0;
-	}
-	else
-	{
-	    l[0] = region1;
-	    if(bv <= region2)
-	    {
-		l[1] = bv - l[0];  l[2] = 0;
-	    }
-	    else
-	    {
-		l[1] = region2 - l[0]; l[2] = bv - region2;
-	    }
-	}
+  l3 = ((576>>1)-bv)>>1;
+  /*
+   * we may lose the 'odd' bit here !!
+   * check this later again
+   */
+  if(bv <= region1)
+  {
+      l[0] = bv; l[1] = 0; l[2] = 0;
+  }
+  else
+  {
+      l[0] = region1;
+      if(bv <= region2)
+      {
+    l[1] = bv - l[0];  l[2] = 0;
+      }
+      else
+      {
+    l[1] = region2 - l[0]; l[2] = bv - region2;
+      }
+  }
     }
 
     if(gr_info->block_type == 2)
     {
-	/*
-	 * decoding with short or mixed mode BandIndex table
-	 */
-	int i,max[4];
-	int step=0,lwin=0,cb=0;
-	register real v = 0.0;
-	register int *m,mc;
+  /*
+   * decoding with short or mixed mode BandIndex table
+   */
+  int i,max[4];
+  int step=0,lwin=0,cb=0;
+  register real v = 0.0;
+  register int *m,mc;
 
-	if(gr_info->mixed_block_flag)
-	{
-	    max[3] = -1;
-	    max[0] = max[1] = max[2] = 2;
-	    m = iemmp3_map[sfreq][0];
-	    me = iemmp3_mapend[sfreq][0];
-	}
-	else
-	{
-	    max[0] = max[1] = max[2] = max[3] = -1;
-	    /* max[3] not really needed in this case */
-	    m = iemmp3_map[sfreq][1];
-	    me = iemmp3_mapend[sfreq][1];
-	}
+  if(gr_info->mixed_block_flag)
+  {
+      max[3] = -1;
+      max[0] = max[1] = max[2] = 2;
+      m = iemmp3_map[sfreq][0];
+      me = iemmp3_mapend[sfreq][0];
+  }
+  else
+  {
+      max[0] = max[1] = max[2] = max[3] = -1;
+      /* max[3] not really needed in this case */
+      m = iemmp3_map[sfreq][1];
+      me = iemmp3_mapend[sfreq][1];
+  }
 
-	mc = 0;
-	for(i=0;i<2;i++)
-	{
-	    int lp = l[i];
-	    struct iemmp3_newHuff *h = iemmp3_ht+gr_info->table_select[i];
-	    for(;lp;lp--,mc--)
-	    {
-		register int x,y;
-		if( (!mc) )
-		{
-		    mc = *m++;
-		    xrpnt = ((real *) xr) + (*m++);
-		    lwin = *m++;
-		    cb = *m++;
-		    if(lwin == 3)
-		    {
-			v = gr_info->pow2gain[(*scf++) << shift];
-			step = 1;
-		    }
-		    else
-		    {
-			v = gr_info->full_gain[lwin][(*scf++) << shift];
-			step = 3;
-		    }
-		}
-		{
-		    register short *val = h->table;
-		    while((y=*val++)<0)
-		    {
-			if (get1bit())
-			    val -= y;
-			part2remain--;
-		    }
-		    x = y >> 4;
-		    y &= 0xf;
-		}
-		if(x == 15)
-		{
-		    max[lwin] = cb;
-		    part2remain -= h->linbits+1;
-		    x += getbits(h->linbits);
-		    if(get1bit())
-			*xrpnt = -iemmp3_ispow[x] * v;
-		    else
-			*xrpnt =  iemmp3_ispow[x] * v;
-		}
-		else if(x)
-		{
-		    max[lwin] = cb;
-		    if(get1bit())
-			*xrpnt = -iemmp3_ispow[x] * v;
-		    else
-			*xrpnt =  iemmp3_ispow[x] * v;
-		    part2remain--;
-		}
-		else
-		    *xrpnt = 0.0;
-		xrpnt += step;
-		if(y == 15)
-		{
-		    max[lwin] = cb;
-		    part2remain -= h->linbits+1;
-		    y += getbits(h->linbits);
-		    if(get1bit())
-			*xrpnt = -iemmp3_ispow[y] * v;
-		    else
-			*xrpnt =  iemmp3_ispow[y] * v;
-		}
-		else if(y)
-		{
-		    max[lwin] = cb;
-		    if(get1bit())
-			*xrpnt = -iemmp3_ispow[y] * v;
-		    else
-			*xrpnt =  iemmp3_ispow[y] * v;
-		    part2remain--;
-		}
-		else
-		    *xrpnt = 0.0;
-		xrpnt += step;
-	    }
-	}
-	for(;l3 && (part2remain > 0);l3--)
-	{
-	    struct iemmp3_newHuff *h = iemmp3_htc+gr_info->count1table_select;
-	    register short *val = h->table,a;
+  mc = 0;
+  for(i=0;i<2;i++)
+  {
+      int lp = l[i];
+      struct iemmp3_newHuff *h = iemmp3_ht+gr_info->table_select[i];
+      for(;lp;lp--,mc--)
+      {
+    register int x,y;
+    if( (!mc) )
+    {
+        mc = *m++;
+        xrpnt = ((real *) xr) + (*m++);
+        lwin = *m++;
+        cb = *m++;
+        if(lwin == 3)
+        {
+      v = gr_info->pow2gain[(*scf++) << shift];
+      step = 1;
+        }
+        else
+        {
+      v = gr_info->full_gain[lwin][(*scf++) << shift];
+      step = 3;
+        }
+    }
+    {
+        register short *val = h->table;
+        while((y=*val++)<0)
+        {
+      if (get1bit())
+          val -= y;
+      part2remain--;
+        }
+        x = y >> 4;
+        y &= 0xf;
+    }
+    if(x == 15)
+    {
+        max[lwin] = cb;
+        part2remain -= h->linbits+1;
+        x += getbits(h->linbits);
+        if(get1bit())
+      *xrpnt = -iemmp3_ispow[x] * v;
+        else
+      *xrpnt =  iemmp3_ispow[x] * v;
+    }
+    else if(x)
+    {
+        max[lwin] = cb;
+        if(get1bit())
+      *xrpnt = -iemmp3_ispow[x] * v;
+        else
+      *xrpnt =  iemmp3_ispow[x] * v;
+        part2remain--;
+    }
+    else
+        *xrpnt = 0.0;
+    xrpnt += step;
+    if(y == 15)
+    {
+        max[lwin] = cb;
+        part2remain -= h->linbits+1;
+        y += getbits(h->linbits);
+        if(get1bit())
+      *xrpnt = -iemmp3_ispow[y] * v;
+        else
+      *xrpnt =  iemmp3_ispow[y] * v;
+    }
+    else if(y)
+    {
+        max[lwin] = cb;
+        if(get1bit())
+      *xrpnt = -iemmp3_ispow[y] * v;
+        else
+      *xrpnt =  iemmp3_ispow[y] * v;
+        part2remain--;
+    }
+    else
+        *xrpnt = 0.0;
+    xrpnt += step;
+      }
+  }
+  for(;l3 && (part2remain > 0);l3--)
+  {
+      struct iemmp3_newHuff *h = iemmp3_htc+gr_info->count1table_select;
+      register short *val = h->table,a;
 
-	    while((a=*val++)<0)
-	    {
-		part2remain--;
-		if(part2remain < 0)
-		{
-		    part2remain++;
-		    a = 0;
-		    break;
-		}
-		if (get1bit())
-		    val -= a;
-	    }
+      while((a=*val++)<0)
+      {
+    part2remain--;
+    if(part2remain < 0)
+    {
+        part2remain++;
+        a = 0;
+        break;
+    }
+    if (get1bit())
+        val -= a;
+      }
 
-	    for(i=0;i<4;i++)
-	    {
-		if(!(i & 1))
-		{
-		    if(!mc)
-		    {
-			mc = *m++;
-			xrpnt = ((real *) xr) + (*m++);
-			lwin = *m++;
-			cb = *m++;
-			if(lwin == 3)
-			{
-			    v = gr_info->pow2gain[(*scf++) << shift];
-			    step = 1;
-			}
-			else
-			{
-			    v = gr_info->full_gain[lwin][(*scf++) << shift];
-			    step = 3;
-			}
-		    }
-		    mc--;
-		}
-		if( (a & (0x8>>i)) )
-		{
-		    max[lwin] = cb;
-		    part2remain--;
-		    if(part2remain < 0)
-		    {
-			part2remain++;
-			break;
-		    }
-		    if(get1bit())
-			*xrpnt = -v;
-		    else
-			*xrpnt = v;
-		}
-		else
-		    *xrpnt = 0.0;
-		xrpnt += step;
-	    }
-	}
+      for(i=0;i<4;i++)
+      {
+    if(!(i & 1))
+    {
+        if(!mc)
+        {
+      mc = *m++;
+      xrpnt = ((real *) xr) + (*m++);
+      lwin = *m++;
+      cb = *m++;
+      if(lwin == 3)
+      {
+          v = gr_info->pow2gain[(*scf++) << shift];
+          step = 1;
+      }
+      else
+      {
+          v = gr_info->full_gain[lwin][(*scf++) << shift];
+          step = 3;
+      }
+        }
+        mc--;
+    }
+    if( (a & (0x8>>i)) )
+    {
+        max[lwin] = cb;
+        part2remain--;
+        if(part2remain < 0)
+        {
+      part2remain++;
+      break;
+        }
+        if(get1bit())
+      *xrpnt = -v;
+        else
+      *xrpnt = v;
+    }
+    else
+        *xrpnt = 0.0;
+    xrpnt += step;
+      }
+  }
 
-	while( m < me )
-	{
-	    if(!mc)
-	    {
-		mc = *m++;
-		xrpnt = ((real *) xr) + *m++;
-		if( (*m++) == 3)
-		    step = 1;
-		else
-		    step = 3;
-		m++; /* cb */
-	    }
-	    mc--;
-	    *xrpnt = 0.0;
-	    xrpnt += step;
-	    *xrpnt = 0.0;
-	    xrpnt += step;
-	    /* we could add a little opt. here:
-	     * if we finished a band for window 3 or a long band
-	     * further bands could copied in a simple loop without a
-	     * special 'map' decoding
-	     */
-	}
+  while( m < me )
+  {
+      if(!mc)
+      {
+    mc = *m++;
+    xrpnt = ((real *) xr) + *m++;
+    if( (*m++) == 3)
+        step = 1;
+    else
+        step = 3;
+    m++; /* cb */
+      }
+      mc--;
+      *xrpnt = 0.0;
+      xrpnt += step;
+      *xrpnt = 0.0;
+      xrpnt += step;
+      /* we could add a little opt. here:
+       * if we finished a band for window 3 or a long band
+       * further bands could copied in a simple loop without a
+       * special 'map' decoding
+       */
+  }
 
-	gr_info->maxband[0] = max[0]+1;
-	gr_info->maxband[1] = max[1]+1;
-	gr_info->maxband[2] = max[2]+1;
-	gr_info->maxbandl = max[3]+1;
+  gr_info->maxband[0] = max[0]+1;
+  gr_info->maxband[1] = max[1]+1;
+  gr_info->maxband[2] = max[2]+1;
+  gr_info->maxbandl = max[3]+1;
 
-	{
-	    int rmax = max[0] > max[1] ? max[0] : max[1];
-	    rmax = (rmax > max[2] ? rmax : max[2]) + 1;
-	    gr_info->maxb = rmax ? iemmp3_shortLimit[sfreq][rmax] : iemmp3_longLimit[sfreq][max[3]+1];
-	}
+  {
+      int rmax = max[0] > max[1] ? max[0] : max[1];
+      rmax = (rmax > max[2] ? rmax : max[2]) + 1;
+      gr_info->maxb = rmax ? iemmp3_shortLimit[sfreq][rmax] : iemmp3_longLimit[sfreq][max[3]+1];
+  }
 
     }
     else
     {
-	/*
-	 * decoding with 'long' BandIndex table (block_type != 2)
-	 */
-	int *pretab = gr_info->preflag ? iemmp3_pretab1 : iemmp3_pretab2;
-	int i,max = -1;
-	int cb = 0;
-	register int *m = iemmp3_map[sfreq][2];
-	register real v = 0.0;
-	register int mc = 0;
+  /*
+   * decoding with 'long' BandIndex table (block_type != 2)
+   */
+  int *pretab = gr_info->preflag ? iemmp3_pretab1 : iemmp3_pretab2;
+  int i,max = -1;
+  int cb = 0;
+  register int *m = iemmp3_map[sfreq][2];
+  register real v = 0.0;
+  register int mc = 0;
 
-	/*
-	 * long hash table values
-	 */
-	for(i=0;i<3;i++)
-	{
-	    int lp = l[i];
-	    struct iemmp3_newHuff *h = iemmp3_ht+gr_info->table_select[i];
+  /*
+   * long hash table values
+   */
+  for(i=0;i<3;i++)
+  {
+      int lp = l[i];
+      struct iemmp3_newHuff *h = iemmp3_ht+gr_info->table_select[i];
 
-	    for(;lp;lp--,mc--)
-	    {
-		int x,y;
+      for(;lp;lp--,mc--)
+      {
+    int x,y;
 
-		if(!mc)
-		{
-		    mc = *m++;
-		    v = gr_info->pow2gain[((*scf++) + (*pretab++)) << shift];
-		    cb = *m++;
-		}
-		{
-		    register short *val = h->table;
-		    while((y=*val++)<0)
-		    {
-			if (get1bit())
-			    val -= y;
-			part2remain--;
-		    }
-		    x = y >> 4;
-		    y &= 0xf;
-		}
-		if (x == 15)
-		{
-		    max = cb;
-		    part2remain -= h->linbits+1;
-		    x += getbits(h->linbits);
-		    if(get1bit())
-			*xrpnt++ = -iemmp3_ispow[x] * v;
-		    else
-			*xrpnt++ =  iemmp3_ispow[x] * v;
-		}
-		else if(x)
-		{
-		    max = cb;
-		    if(get1bit())
-			*xrpnt++ = -iemmp3_ispow[x] * v;
-		    else
-			*xrpnt++ =  iemmp3_ispow[x] * v;
-		    part2remain--;
-		}
-		else
-		    *xrpnt++ = 0.0;
+    if(!mc)
+    {
+        mc = *m++;
+        v = gr_info->pow2gain[((*scf++) + (*pretab++)) << shift];
+        cb = *m++;
+    }
+    {
+        register short *val = h->table;
+        while((y=*val++)<0)
+        {
+      if (get1bit())
+          val -= y;
+      part2remain--;
+        }
+        x = y >> 4;
+        y &= 0xf;
+    }
+    if (x == 15)
+    {
+        max = cb;
+        part2remain -= h->linbits+1;
+        x += getbits(h->linbits);
+        if(get1bit())
+      *xrpnt++ = -iemmp3_ispow[x] * v;
+        else
+      *xrpnt++ =  iemmp3_ispow[x] * v;
+    }
+    else if(x)
+    {
+        max = cb;
+        if(get1bit())
+      *xrpnt++ = -iemmp3_ispow[x] * v;
+        else
+      *xrpnt++ =  iemmp3_ispow[x] * v;
+        part2remain--;
+    }
+    else
+        *xrpnt++ = 0.0;
 
-		if (y == 15)
-		{
-		    max = cb;
-		    part2remain -= h->linbits+1;
-		    y += getbits(h->linbits);
-		    if(get1bit())
-			*xrpnt++ = -iemmp3_ispow[y] * v;
-		    else
-			*xrpnt++ =  iemmp3_ispow[y] * v;
-		}
-		else if(y)
-		{
-		    max = cb;
-		    if(get1bit())
-			*xrpnt++ = -iemmp3_ispow[y] * v;
-		    else
-			*xrpnt++ =  iemmp3_ispow[y] * v;
-		    part2remain--;
-		}
-		else
-		    *xrpnt++ = 0.0;
-	    }
-	}
+    if (y == 15)
+    {
+        max = cb;
+        part2remain -= h->linbits+1;
+        y += getbits(h->linbits);
+        if(get1bit())
+      *xrpnt++ = -iemmp3_ispow[y] * v;
+        else
+      *xrpnt++ =  iemmp3_ispow[y] * v;
+    }
+    else if(y)
+    {
+        max = cb;
+        if(get1bit())
+      *xrpnt++ = -iemmp3_ispow[y] * v;
+        else
+      *xrpnt++ =  iemmp3_ispow[y] * v;
+        part2remain--;
+    }
+    else
+        *xrpnt++ = 0.0;
+      }
+  }
 
-	/*
-	 * short (count1table) values
-	 */
-	for(;l3 && (part2remain > 0);l3--)
-	{
-	    struct iemmp3_newHuff *h = iemmp3_htc+gr_info->count1table_select;
-	    register short *val = h->table,a;
+  /*
+   * short (count1table) values
+   */
+  for(;l3 && (part2remain > 0);l3--)
+  {
+      struct iemmp3_newHuff *h = iemmp3_htc+gr_info->count1table_select;
+      register short *val = h->table,a;
 
-	    while((a=*val++)<0)
-	    {
-		part2remain--;
-		if(part2remain < 0)
-		{
-		    part2remain++;
-		    a = 0;
-		    break;
-		}
-		if (get1bit())
-		    val -= a;
-	    }
+      while((a=*val++)<0)
+      {
+    part2remain--;
+    if(part2remain < 0)
+    {
+        part2remain++;
+        a = 0;
+        break;
+    }
+    if (get1bit())
+        val -= a;
+      }
 
-	    for(i=0;i<4;i++)
-	    {
-		if(!(i & 1))
-		{
-		    if(!mc)
-		    {
-			mc = *m++;
-			cb = *m++;
-			v = gr_info->pow2gain[((*scf++) + (*pretab++)) << shift];
-		    }
-		    mc--;
-		}
-		if ( (a & (0x8>>i)) )
-		{
-		    max = cb;
-		    part2remain--;
-		    if(part2remain < 0)
-		    {
-			part2remain++;
-			break;
-		    }
-		    if(get1bit())
-			*xrpnt++ = -v;
-		    else
-			*xrpnt++ = v;
-		}
-		else
-		    *xrpnt++ = 0.0;
-	    }
-	}
+      for(i=0;i<4;i++)
+      {
+    if(!(i & 1))
+    {
+        if(!mc)
+        {
+      mc = *m++;
+      cb = *m++;
+      v = gr_info->pow2gain[((*scf++) + (*pretab++)) << shift];
+        }
+        mc--;
+    }
+    if ( (a & (0x8>>i)) )
+    {
+        max = cb;
+        part2remain--;
+        if(part2remain < 0)
+        {
+      part2remain++;
+      break;
+        }
+        if(get1bit())
+      *xrpnt++ = -v;
+        else
+      *xrpnt++ = v;
+    }
+    else
+        *xrpnt++ = 0.0;
+      }
+  }
 
-	/*
-	 * zero part
-	 */
-	for(i=(&xr[SBLIMIT][0]-xrpnt)>>1;i;i--)
-	{
-	    *xrpnt++ = 0.0;
-	    *xrpnt++ = 0.0;
-	}
+  /*
+   * zero part
+   */
+  for(i=(&xr[SBLIMIT][0]-xrpnt)>>1;i;i--)
+  {
+      *xrpnt++ = 0.0;
+      *xrpnt++ = 0.0;
+  }
 
-	gr_info->maxbandl = max+1;
-	gr_info->maxb = iemmp3_longLimit[sfreq][gr_info->maxbandl];
+  gr_info->maxbandl = max+1;
+  gr_info->maxb = iemmp3_longLimit[sfreq][gr_info->maxbandl];
     }
 
     while( part2remain > 16 )
     {
-	getbits(16); /* Dismiss stuffing Bits */
-	part2remain -= 16;
+  getbits(16); /* Dismiss stuffing Bits */
+  part2remain -= 16;
     }
     if(part2remain > 0)
-	getbits(part2remain);
+  getbits(part2remain);
     else if(part2remain < 0)
     {
-	post("mpg123: Can't rewind stream by %d bits!\n",-part2remain);
-	return 1; /* -> error */
+  post("mpg123: Can't rewind stream by %d bits!\n",-part2remain);
+  return 1; /* -> error */
     }
     return 0;
 }
 
 static void III_i_stereo(real xr_buf[2][SBLIMIT][SSLIMIT],int *scalefac,
-			 struct iemmp3_gr_info_s *gr_info,int sfreq,int ms_stereo,int lsf)
+       struct iemmp3_gr_info_s *gr_info,int sfreq,int ms_stereo,int lsf)
 {
     real (*xr)[SBLIMIT*SSLIMIT] = (real (*)[SBLIMIT*SSLIMIT] ) xr_buf;
     struct iemmp3_bandInfoStruct *bi = &bandInfo[sfreq];
@@ -2224,144 +2224,144 @@ static void III_i_stereo(real xr_buf[2][SBLIMIT][SSLIMIT],int *scalefac,
 
     if(lsf)
     {
-	int p = gr_info->scalefac_compress & 0x1;
-	if(ms_stereo)
-	{
-	    tab1 = iemmp3_pow1_2[p]; tab2 = iemmp3_pow2_2[p];
-	}
-	else
-	{
-	    tab1 = iemmp3_pow1_1[p]; tab2 = iemmp3_pow2_1[p];
-	}
+  int p = gr_info->scalefac_compress & 0x1;
+  if(ms_stereo)
+  {
+      tab1 = iemmp3_pow1_2[p]; tab2 = iemmp3_pow2_2[p];
+  }
+  else
+  {
+      tab1 = iemmp3_pow1_1[p]; tab2 = iemmp3_pow2_1[p];
+  }
     }
     else
     {
-	if(ms_stereo)
-	{
-	    tab1 = iemmp3_tan1_2; tab2 = iemmp3_tan2_2;
-	}
-	else
-	{
-	    tab1 = iemmp3_tan1_1; tab2 = iemmp3_tan2_1;
-	}
+  if(ms_stereo)
+  {
+      tab1 = iemmp3_tan1_2; tab2 = iemmp3_tan2_2;
+  }
+  else
+  {
+      tab1 = iemmp3_tan1_1; tab2 = iemmp3_tan2_1;
+  }
     }
 
     if (gr_info->block_type == 2)
     {
-	int lwin,do_l = 0;
-	if( gr_info->mixed_block_flag )
-	    do_l = 1;
+  int lwin,do_l = 0;
+  if( gr_info->mixed_block_flag )
+      do_l = 1;
 
-	for (lwin=0;lwin<3;lwin++) /* process each window */
-	{
-	    /* get first band with zero values */
-	    int is_p,sb,idx,sfb = gr_info->maxband[lwin];  /* sfb is minimal 3 for mixed mode */
-	    if(sfb > 3)
-		do_l = 0;
+  for (lwin=0;lwin<3;lwin++) /* process each window */
+  {
+      /* get first band with zero values */
+      int is_p,sb,idx,sfb = gr_info->maxband[lwin];  /* sfb is minimal 3 for mixed mode */
+      if(sfb > 3)
+    do_l = 0;
 
-	    for(;sfb<12;sfb++)
-	    {
-		is_p = scalefac[sfb*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
-		if(is_p != 7) {
-		    real t1,t2;
-		    sb = bi->shortDiff[sfb];
-		    idx = bi->shortIdx[sfb] + lwin;
-		    t1 = tab1[is_p]; t2 = tab2[is_p];
-		    for (; sb > 0; sb--,idx+=3)
-		    {
-			real v = xr[0][idx];
-			xr[0][idx] = v * t1;
-			xr[1][idx] = v * t2;
-		    }
-		}
-	    }
+      for(;sfb<12;sfb++)
+      {
+    is_p = scalefac[sfb*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
+    if(is_p != 7) {
+        real t1,t2;
+        sb = bi->shortDiff[sfb];
+        idx = bi->shortIdx[sfb] + lwin;
+        t1 = tab1[is_p]; t2 = tab2[is_p];
+        for (; sb > 0; sb--,idx+=3)
+        {
+      real v = xr[0][idx];
+      xr[0][idx] = v * t1;
+      xr[1][idx] = v * t2;
+        }
+    }
+      }
 
 #if 1
-	    /* in the original: copy 10 to 11 , here: copy 11 to 12
-	     maybe still wrong??? (copy 12 to 13?) */
-	    is_p = scalefac[11*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
-	    sb = bi->shortDiff[12];
-	    idx = bi->shortIdx[12] + lwin;
+      /* in the original: copy 10 to 11 , here: copy 11 to 12
+       maybe still wrong??? (copy 12 to 13?) */
+      is_p = scalefac[11*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
+      sb = bi->shortDiff[12];
+      idx = bi->shortIdx[12] + lwin;
 #else
-	    is_p = scalefac[10*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
-	    sb = bi->shortDiff[11];
-	    idx = bi->shortIdx[11] + lwin;
+      is_p = scalefac[10*3+lwin-gr_info->mixed_block_flag]; /* scale: 0-15 */
+      sb = bi->shortDiff[11];
+      idx = bi->shortIdx[11] + lwin;
 #endif
-	    if(is_p != 7)
-	    {
-		real t1,t2;
-		t1 = tab1[is_p]; t2 = tab2[is_p];
-		for ( ; sb > 0; sb--,idx+=3 )
-		{
-		    real v = xr[0][idx];
-		    xr[0][idx] = v * t1;
-		    xr[1][idx] = v * t2;
-		}
-	    }
-	} /* end for(lwin; .. ; . ) */
+      if(is_p != 7)
+      {
+    real t1,t2;
+    t1 = tab1[is_p]; t2 = tab2[is_p];
+    for ( ; sb > 0; sb--,idx+=3 )
+    {
+        real v = xr[0][idx];
+        xr[0][idx] = v * t1;
+        xr[1][idx] = v * t2;
+    }
+      }
+  } /* end for(lwin; .. ; . ) */
 
-	if (do_l)
-	{
-	    /* also check l-part, if ALL bands in the three windows are 'empty'
-	     * and mode = mixed_mode
-	     */
-	    int sfb = gr_info->maxbandl;
-	    int idx = bi->longIdx[sfb];
+  if (do_l)
+  {
+      /* also check l-part, if ALL bands in the three windows are 'empty'
+       * and mode = mixed_mode
+       */
+      int sfb = gr_info->maxbandl;
+      int idx = bi->longIdx[sfb];
 
-	    for ( ; sfb<8; sfb++ )
-	    {
-		int sb = bi->longDiff[sfb];
-		int is_p = scalefac[sfb]; /* scale: 0-15 */
-		if(is_p != 7) {
-		    real t1,t2;
-		    t1 = tab1[is_p]; t2 = tab2[is_p];
-		    for ( ; sb > 0; sb--,idx++)
-		    {
-			real v = xr[0][idx];
-			xr[0][idx] = v * t1;
-			xr[1][idx] = v * t2;
-		    }
-		}
-		else
-		    idx += sb;
-	    }
-	}
+      for ( ; sfb<8; sfb++ )
+      {
+    int sb = bi->longDiff[sfb];
+    int is_p = scalefac[sfb]; /* scale: 0-15 */
+    if(is_p != 7) {
+        real t1,t2;
+        t1 = tab1[is_p]; t2 = tab2[is_p];
+        for ( ; sb > 0; sb--,idx++)
+        {
+      real v = xr[0][idx];
+      xr[0][idx] = v * t1;
+      xr[1][idx] = v * t2;
+        }
+    }
+    else
+        idx += sb;
+      }
+  }
     }
     else /* ((gr_info->block_type != 2)) */
     {
-	int sfb = gr_info->maxbandl;
-	int is_p,idx = bi->longIdx[sfb];
-	for ( ; sfb<21; sfb++)
-	{
-	    int sb = bi->longDiff[sfb];
-	    is_p = scalefac[sfb]; /* scale: 0-15 */
-	    if(is_p != 7) {
-		real t1,t2;
-		t1 = tab1[is_p]; t2 = tab2[is_p];
-		for ( ; sb > 0; sb--,idx++)
-		{
-		    real v = xr[0][idx];
-		    xr[0][idx] = v * t1;
-		    xr[1][idx] = v * t2;
-		}
-	    }
-	    else
-		idx += sb;
-	}
+  int sfb = gr_info->maxbandl;
+  int is_p,idx = bi->longIdx[sfb];
+  for ( ; sfb<21; sfb++)
+  {
+      int sb = bi->longDiff[sfb];
+      is_p = scalefac[sfb]; /* scale: 0-15 */
+      if(is_p != 7) {
+    real t1,t2;
+    t1 = tab1[is_p]; t2 = tab2[is_p];
+    for ( ; sb > 0; sb--,idx++)
+    {
+        real v = xr[0][idx];
+        xr[0][idx] = v * t1;
+        xr[1][idx] = v * t2;
+    }
+      }
+      else
+    idx += sb;
+  }
 
-	is_p = scalefac[20]; /* copy l-band 20 to l-band 21 */
-	if(is_p != 7)
-	{
-	    int sb;
-	    real t1 = tab1[is_p],t2 = tab2[is_p];
+  is_p = scalefac[20]; /* copy l-band 20 to l-band 21 */
+  if(is_p != 7)
+  {
+      int sb;
+      real t1 = tab1[is_p],t2 = tab2[is_p];
 
-	    for ( sb = bi->longDiff[21]; sb > 0; sb--,idx++ )
-	    {
-		real v = xr[0][idx];
-		xr[0][idx] = v * t1;
-		xr[1][idx] = v * t2;
-	    }
-	}
+      for ( sb = bi->longDiff[21]; sb > 0; sb--,idx++ )
+      {
+    real v = xr[0][idx];
+    xr[0][idx] = v * t1;
+    xr[1][idx] = v * t2;
+      }
+  }
     } /* ... */
 }
 
@@ -2372,39 +2372,39 @@ static void III_antialias(real xr[SBLIMIT][SSLIMIT],struct iemmp3_gr_info_s *gr_
 
     if(gr_info->block_type == 2)
     {
-	if(!gr_info->mixed_block_flag)
-	    return;
-	sblim = 1;
+  if(!gr_info->mixed_block_flag)
+      return;
+  sblim = 1;
     }
     else {
-	sblim = gr_info->maxb-1;
+  sblim = gr_info->maxb-1;
     }
 
     /* 31 alias-reduction operations between each pair of sub-bands */
     /* with 8 butterflies between each pair                         */
 
     {
-	int sb;
-	real *xr1=(real *) xr[1];
+  int sb;
+  real *xr1=(real *) xr[1];
 
-	for(sb=sblim;sb;sb--,xr1+=10)
-	{
-	    int ss;
-	    real *cs=iemmp3_aa_cs,*ca=iemmp3_aa_ca;
-	    real *xr2 = xr1;
+  for(sb=sblim;sb;sb--,xr1+=10)
+  {
+      int ss;
+      real *cs=iemmp3_aa_cs,*ca=iemmp3_aa_ca;
+      real *xr2 = xr1;
 
-	    for(ss=7;ss>=0;ss--)
-	    {       /* upper and lower butterfly inputs */
-		register real bu = *--xr2,bd = *xr1;
-		*xr2   = (bu * (*cs)   ) - (bd * (*ca)   );
-		*xr1++ = (bd * (*cs++) ) + (bu * (*ca++) );
-	    }
-	}
+      for(ss=7;ss>=0;ss--)
+      {       /* upper and lower butterfly inputs */
+    register real bu = *--xr2,bd = *xr1;
+    *xr2   = (bu * (*cs)   ) - (bd * (*ca)   );
+    *xr1++ = (bd * (*cs++) ) + (bu * (*ca++) );
+      }
+  }
     }
 }
 
 static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
-		       int ch,struct iemmp3_gr_info_s *gr_info)
+           int ch,struct iemmp3_gr_info_s *gr_info)
 {
     real *tspnt = (real *) tsOut;
     real (*block)[2][SBLIMIT*SSLIMIT] = iemmp3_gmp->hybrid_block;
@@ -2414,41 +2414,41 @@ static void III_hybrid(real fsIn[SBLIMIT][SSLIMIT],real tsOut[SSLIMIT][SBLIMIT],
     unsigned int sb = 0;
 
     {
-	int b = blc[ch];
-	rawout1=block[b][ch];
-	b=-b+1;
-	rawout2=block[b][ch];
-	blc[ch] = b;
+  int b = blc[ch];
+  rawout1=block[b][ch];
+  b=-b+1;
+  rawout2=block[b][ch];
+  blc[ch] = b;
     }
 
 
     if(gr_info->mixed_block_flag) {
-	sb = 2;
-	dct36(fsIn[0],rawout1,rawout2,iemmp3_win[0],tspnt);
-	dct36(fsIn[1],rawout1+18,rawout2+18,iemmp3_win1[0],tspnt+1);
-	rawout1 += 36; rawout2 += 36; tspnt += 2;
+  sb = 2;
+  dct36(fsIn[0],rawout1,rawout2,iemmp3_win[0],tspnt);
+  dct36(fsIn[1],rawout1+18,rawout2+18,iemmp3_win1[0],tspnt+1);
+  rawout1 += 36; rawout2 += 36; tspnt += 2;
     }
 
     bt = gr_info->block_type;
     if(bt == 2) {
-	for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
-	    dct12(fsIn[sb],rawout1,rawout2,iemmp3_win[2],tspnt);
-	    dct12(fsIn[sb+1],rawout1+18,rawout2+18,iemmp3_win1[2],tspnt+1);
-	}
+  for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
+      dct12(fsIn[sb],rawout1,rawout2,iemmp3_win[2],tspnt);
+      dct12(fsIn[sb+1],rawout1+18,rawout2+18,iemmp3_win1[2],tspnt+1);
+  }
     }
     else {
-	for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
-	    dct36(fsIn[sb],rawout1,rawout2,iemmp3_win[bt],tspnt);
-	    dct36(fsIn[sb+1],rawout1+18,rawout2+18,iemmp3_win1[bt],tspnt+1);
-	}
+  for (; sb<gr_info->maxb; sb+=2,tspnt+=2,rawout1+=36,rawout2+=36) {
+      dct36(fsIn[sb],rawout1,rawout2,iemmp3_win[bt],tspnt);
+      dct36(fsIn[sb+1],rawout1+18,rawout2+18,iemmp3_win1[bt],tspnt+1);
+  }
     }
 
     for(;sb<SBLIMIT;sb++,tspnt++) {
-	int i;
-	for(i=0;i<SSLIMIT;i++) {
-	    tspnt[i*SBLIMIT] = *rawout1++;
-	    *rawout2++ = 0.0;
-	}
+  int i;
+  for(i=0;i<SSLIMIT;i++) {
+      tspnt[i*SBLIMIT] = *rawout1++;
+      *rawout2++ = 0.0;
+  }
     }
 }
 
@@ -2456,243 +2456,243 @@ static void dct64_1(real *out0,real *out1,real *b1,real *b2,real *samples)
 {
 
     {
-	register real *costab = iemmp3_pnts[0];
+  register real *costab = iemmp3_pnts[0];
 
-	b1[0x00] = samples[0x00] + samples[0x1F];
-	b1[0x1F] = (samples[0x00] - samples[0x1F]) * costab[0x0];
+  b1[0x00] = samples[0x00] + samples[0x1F];
+  b1[0x1F] = (samples[0x00] - samples[0x1F]) * costab[0x0];
 
-	b1[0x01] = samples[0x01] + samples[0x1E];
-	b1[0x1E] = (samples[0x01] - samples[0x1E]) * costab[0x1];
+  b1[0x01] = samples[0x01] + samples[0x1E];
+  b1[0x1E] = (samples[0x01] - samples[0x1E]) * costab[0x1];
 
-	b1[0x02] = samples[0x02] + samples[0x1D];
-	b1[0x1D] = (samples[0x02] - samples[0x1D]) * costab[0x2];
+  b1[0x02] = samples[0x02] + samples[0x1D];
+  b1[0x1D] = (samples[0x02] - samples[0x1D]) * costab[0x2];
 
-	b1[0x03] = samples[0x03] + samples[0x1C];
-	b1[0x1C] = (samples[0x03] - samples[0x1C]) * costab[0x3];
+  b1[0x03] = samples[0x03] + samples[0x1C];
+  b1[0x1C] = (samples[0x03] - samples[0x1C]) * costab[0x3];
 
-	b1[0x04] = samples[0x04] + samples[0x1B];
-	b1[0x1B] = (samples[0x04] - samples[0x1B]) * costab[0x4];
+  b1[0x04] = samples[0x04] + samples[0x1B];
+  b1[0x1B] = (samples[0x04] - samples[0x1B]) * costab[0x4];
 
-	b1[0x05] = samples[0x05] + samples[0x1A];
-	b1[0x1A] = (samples[0x05] - samples[0x1A]) * costab[0x5];
+  b1[0x05] = samples[0x05] + samples[0x1A];
+  b1[0x1A] = (samples[0x05] - samples[0x1A]) * costab[0x5];
 
-	b1[0x06] = samples[0x06] + samples[0x19];
-	b1[0x19] = (samples[0x06] - samples[0x19]) * costab[0x6];
+  b1[0x06] = samples[0x06] + samples[0x19];
+  b1[0x19] = (samples[0x06] - samples[0x19]) * costab[0x6];
 
-	b1[0x07] = samples[0x07] + samples[0x18];
-	b1[0x18] = (samples[0x07] - samples[0x18]) * costab[0x7];
+  b1[0x07] = samples[0x07] + samples[0x18];
+  b1[0x18] = (samples[0x07] - samples[0x18]) * costab[0x7];
 
-	b1[0x08] = samples[0x08] + samples[0x17];
-	b1[0x17] = (samples[0x08] - samples[0x17]) * costab[0x8];
+  b1[0x08] = samples[0x08] + samples[0x17];
+  b1[0x17] = (samples[0x08] - samples[0x17]) * costab[0x8];
 
-	b1[0x09] = samples[0x09] + samples[0x16];
-	b1[0x16] = (samples[0x09] - samples[0x16]) * costab[0x9];
+  b1[0x09] = samples[0x09] + samples[0x16];
+  b1[0x16] = (samples[0x09] - samples[0x16]) * costab[0x9];
 
-	b1[0x0A] = samples[0x0A] + samples[0x15];
-	b1[0x15] = (samples[0x0A] - samples[0x15]) * costab[0xA];
+  b1[0x0A] = samples[0x0A] + samples[0x15];
+  b1[0x15] = (samples[0x0A] - samples[0x15]) * costab[0xA];
 
-	b1[0x0B] = samples[0x0B] + samples[0x14];
-	b1[0x14] = (samples[0x0B] - samples[0x14]) * costab[0xB];
+  b1[0x0B] = samples[0x0B] + samples[0x14];
+  b1[0x14] = (samples[0x0B] - samples[0x14]) * costab[0xB];
 
-	b1[0x0C] = samples[0x0C] + samples[0x13];
-	b1[0x13] = (samples[0x0C] - samples[0x13]) * costab[0xC];
+  b1[0x0C] = samples[0x0C] + samples[0x13];
+  b1[0x13] = (samples[0x0C] - samples[0x13]) * costab[0xC];
 
-	b1[0x0D] = samples[0x0D] + samples[0x12];
-	b1[0x12] = (samples[0x0D] - samples[0x12]) * costab[0xD];
+  b1[0x0D] = samples[0x0D] + samples[0x12];
+  b1[0x12] = (samples[0x0D] - samples[0x12]) * costab[0xD];
 
-	b1[0x0E] = samples[0x0E] + samples[0x11];
-	b1[0x11] = (samples[0x0E] - samples[0x11]) * costab[0xE];
+  b1[0x0E] = samples[0x0E] + samples[0x11];
+  b1[0x11] = (samples[0x0E] - samples[0x11]) * costab[0xE];
 
-	b1[0x0F] = samples[0x0F] + samples[0x10];
-	b1[0x10] = (samples[0x0F] - samples[0x10]) * costab[0xF];
+  b1[0x0F] = samples[0x0F] + samples[0x10];
+  b1[0x10] = (samples[0x0F] - samples[0x10]) * costab[0xF];
     }
 
 
     {
-	register real *costab = iemmp3_pnts[1];
+  register real *costab = iemmp3_pnts[1];
 
-	b2[0x00] = b1[0x00] + b1[0x0F];
-	b2[0x0F] = (b1[0x00] - b1[0x0F]) * costab[0];
-	b2[0x01] = b1[0x01] + b1[0x0E];
-	b2[0x0E] = (b1[0x01] - b1[0x0E]) * costab[1];
-	b2[0x02] = b1[0x02] + b1[0x0D];
-	b2[0x0D] = (b1[0x02] - b1[0x0D]) * costab[2];
-	b2[0x03] = b1[0x03] + b1[0x0C];
-	b2[0x0C] = (b1[0x03] - b1[0x0C]) * costab[3];
-	b2[0x04] = b1[0x04] + b1[0x0B];
-	b2[0x0B] = (b1[0x04] - b1[0x0B]) * costab[4];
-	b2[0x05] = b1[0x05] + b1[0x0A];
-	b2[0x0A] = (b1[0x05] - b1[0x0A]) * costab[5];
-	b2[0x06] = b1[0x06] + b1[0x09];
-	b2[0x09] = (b1[0x06] - b1[0x09]) * costab[6];
-	b2[0x07] = b1[0x07] + b1[0x08];
-	b2[0x08] = (b1[0x07] - b1[0x08]) * costab[7];
+  b2[0x00] = b1[0x00] + b1[0x0F];
+  b2[0x0F] = (b1[0x00] - b1[0x0F]) * costab[0];
+  b2[0x01] = b1[0x01] + b1[0x0E];
+  b2[0x0E] = (b1[0x01] - b1[0x0E]) * costab[1];
+  b2[0x02] = b1[0x02] + b1[0x0D];
+  b2[0x0D] = (b1[0x02] - b1[0x0D]) * costab[2];
+  b2[0x03] = b1[0x03] + b1[0x0C];
+  b2[0x0C] = (b1[0x03] - b1[0x0C]) * costab[3];
+  b2[0x04] = b1[0x04] + b1[0x0B];
+  b2[0x0B] = (b1[0x04] - b1[0x0B]) * costab[4];
+  b2[0x05] = b1[0x05] + b1[0x0A];
+  b2[0x0A] = (b1[0x05] - b1[0x0A]) * costab[5];
+  b2[0x06] = b1[0x06] + b1[0x09];
+  b2[0x09] = (b1[0x06] - b1[0x09]) * costab[6];
+  b2[0x07] = b1[0x07] + b1[0x08];
+  b2[0x08] = (b1[0x07] - b1[0x08]) * costab[7];
 
-	b2[0x10] = b1[0x10] + b1[0x1F];
-	b2[0x1F] = (b1[0x1F] - b1[0x10]) * costab[0];
-	b2[0x11] = b1[0x11] + b1[0x1E];
-	b2[0x1E] = (b1[0x1E] - b1[0x11]) * costab[1];
-	b2[0x12] = b1[0x12] + b1[0x1D];
-	b2[0x1D] = (b1[0x1D] - b1[0x12]) * costab[2];
-	b2[0x13] = b1[0x13] + b1[0x1C];
-	b2[0x1C] = (b1[0x1C] - b1[0x13]) * costab[3];
-	b2[0x14] = b1[0x14] + b1[0x1B];
-	b2[0x1B] = (b1[0x1B] - b1[0x14]) * costab[4];
-	b2[0x15] = b1[0x15] + b1[0x1A];
-	b2[0x1A] = (b1[0x1A] - b1[0x15]) * costab[5];
-	b2[0x16] = b1[0x16] + b1[0x19];
-	b2[0x19] = (b1[0x19] - b1[0x16]) * costab[6];
-	b2[0x17] = b1[0x17] + b1[0x18];
-	b2[0x18] = (b1[0x18] - b1[0x17]) * costab[7];
+  b2[0x10] = b1[0x10] + b1[0x1F];
+  b2[0x1F] = (b1[0x1F] - b1[0x10]) * costab[0];
+  b2[0x11] = b1[0x11] + b1[0x1E];
+  b2[0x1E] = (b1[0x1E] - b1[0x11]) * costab[1];
+  b2[0x12] = b1[0x12] + b1[0x1D];
+  b2[0x1D] = (b1[0x1D] - b1[0x12]) * costab[2];
+  b2[0x13] = b1[0x13] + b1[0x1C];
+  b2[0x1C] = (b1[0x1C] - b1[0x13]) * costab[3];
+  b2[0x14] = b1[0x14] + b1[0x1B];
+  b2[0x1B] = (b1[0x1B] - b1[0x14]) * costab[4];
+  b2[0x15] = b1[0x15] + b1[0x1A];
+  b2[0x1A] = (b1[0x1A] - b1[0x15]) * costab[5];
+  b2[0x16] = b1[0x16] + b1[0x19];
+  b2[0x19] = (b1[0x19] - b1[0x16]) * costab[6];
+  b2[0x17] = b1[0x17] + b1[0x18];
+  b2[0x18] = (b1[0x18] - b1[0x17]) * costab[7];
     }
 
     {
-	register real *costab = iemmp3_pnts[2];
+  register real *costab = iemmp3_pnts[2];
 
-	b1[0x00] = b2[0x00] + b2[0x07];
-	b1[0x07] = (b2[0x00] - b2[0x07]) * costab[0];
-	b1[0x01] = b2[0x01] + b2[0x06];
-	b1[0x06] = (b2[0x01] - b2[0x06]) * costab[1];
-	b1[0x02] = b2[0x02] + b2[0x05];
-	b1[0x05] = (b2[0x02] - b2[0x05]) * costab[2];
-	b1[0x03] = b2[0x03] + b2[0x04];
-	b1[0x04] = (b2[0x03] - b2[0x04]) * costab[3];
+  b1[0x00] = b2[0x00] + b2[0x07];
+  b1[0x07] = (b2[0x00] - b2[0x07]) * costab[0];
+  b1[0x01] = b2[0x01] + b2[0x06];
+  b1[0x06] = (b2[0x01] - b2[0x06]) * costab[1];
+  b1[0x02] = b2[0x02] + b2[0x05];
+  b1[0x05] = (b2[0x02] - b2[0x05]) * costab[2];
+  b1[0x03] = b2[0x03] + b2[0x04];
+  b1[0x04] = (b2[0x03] - b2[0x04]) * costab[3];
 
-	b1[0x08] = b2[0x08] + b2[0x0F];
-	b1[0x0F] = (b2[0x0F] - b2[0x08]) * costab[0];
-	b1[0x09] = b2[0x09] + b2[0x0E];
-	b1[0x0E] = (b2[0x0E] - b2[0x09]) * costab[1];
-	b1[0x0A] = b2[0x0A] + b2[0x0D];
-	b1[0x0D] = (b2[0x0D] - b2[0x0A]) * costab[2];
-	b1[0x0B] = b2[0x0B] + b2[0x0C];
-	b1[0x0C] = (b2[0x0C] - b2[0x0B]) * costab[3];
+  b1[0x08] = b2[0x08] + b2[0x0F];
+  b1[0x0F] = (b2[0x0F] - b2[0x08]) * costab[0];
+  b1[0x09] = b2[0x09] + b2[0x0E];
+  b1[0x0E] = (b2[0x0E] - b2[0x09]) * costab[1];
+  b1[0x0A] = b2[0x0A] + b2[0x0D];
+  b1[0x0D] = (b2[0x0D] - b2[0x0A]) * costab[2];
+  b1[0x0B] = b2[0x0B] + b2[0x0C];
+  b1[0x0C] = (b2[0x0C] - b2[0x0B]) * costab[3];
 
-	b1[0x10] = b2[0x10] + b2[0x17];
-	b1[0x17] = (b2[0x10] - b2[0x17]) * costab[0];
-	b1[0x11] = b2[0x11] + b2[0x16];
-	b1[0x16] = (b2[0x11] - b2[0x16]) * costab[1];
-	b1[0x12] = b2[0x12] + b2[0x15];
-	b1[0x15] = (b2[0x12] - b2[0x15]) * costab[2];
-	b1[0x13] = b2[0x13] + b2[0x14];
-	b1[0x14] = (b2[0x13] - b2[0x14]) * costab[3];
+  b1[0x10] = b2[0x10] + b2[0x17];
+  b1[0x17] = (b2[0x10] - b2[0x17]) * costab[0];
+  b1[0x11] = b2[0x11] + b2[0x16];
+  b1[0x16] = (b2[0x11] - b2[0x16]) * costab[1];
+  b1[0x12] = b2[0x12] + b2[0x15];
+  b1[0x15] = (b2[0x12] - b2[0x15]) * costab[2];
+  b1[0x13] = b2[0x13] + b2[0x14];
+  b1[0x14] = (b2[0x13] - b2[0x14]) * costab[3];
 
-	b1[0x18] = b2[0x18] + b2[0x1F];
-	b1[0x1F] = (b2[0x1F] - b2[0x18]) * costab[0];
-	b1[0x19] = b2[0x19] + b2[0x1E];
-	b1[0x1E] = (b2[0x1E] - b2[0x19]) * costab[1];
-	b1[0x1A] = b2[0x1A] + b2[0x1D];
-	b1[0x1D] = (b2[0x1D] - b2[0x1A]) * costab[2];
-	b1[0x1B] = b2[0x1B] + b2[0x1C];
-	b1[0x1C] = (b2[0x1C] - b2[0x1B]) * costab[3];
+  b1[0x18] = b2[0x18] + b2[0x1F];
+  b1[0x1F] = (b2[0x1F] - b2[0x18]) * costab[0];
+  b1[0x19] = b2[0x19] + b2[0x1E];
+  b1[0x1E] = (b2[0x1E] - b2[0x19]) * costab[1];
+  b1[0x1A] = b2[0x1A] + b2[0x1D];
+  b1[0x1D] = (b2[0x1D] - b2[0x1A]) * costab[2];
+  b1[0x1B] = b2[0x1B] + b2[0x1C];
+  b1[0x1C] = (b2[0x1C] - b2[0x1B]) * costab[3];
     }
 
     {
-	register real const cos0 = iemmp3_pnts[3][0];
-	register real const cos1 = iemmp3_pnts[3][1];
+  register real const cos0 = iemmp3_pnts[3][0];
+  register real const cos1 = iemmp3_pnts[3][1];
 
-	b2[0x00] = b1[0x00] + b1[0x03];
-	b2[0x03] = (b1[0x00] - b1[0x03]) * cos0;
-	b2[0x01] = b1[0x01] + b1[0x02];
-	b2[0x02] = (b1[0x01] - b1[0x02]) * cos1;
+  b2[0x00] = b1[0x00] + b1[0x03];
+  b2[0x03] = (b1[0x00] - b1[0x03]) * cos0;
+  b2[0x01] = b1[0x01] + b1[0x02];
+  b2[0x02] = (b1[0x01] - b1[0x02]) * cos1;
 
-	b2[0x04] = b1[0x04] + b1[0x07];
-	b2[0x07] = (b1[0x07] - b1[0x04]) * cos0;
-	b2[0x05] = b1[0x05] + b1[0x06];
-	b2[0x06] = (b1[0x06] - b1[0x05]) * cos1;
+  b2[0x04] = b1[0x04] + b1[0x07];
+  b2[0x07] = (b1[0x07] - b1[0x04]) * cos0;
+  b2[0x05] = b1[0x05] + b1[0x06];
+  b2[0x06] = (b1[0x06] - b1[0x05]) * cos1;
 
-	b2[0x08] = b1[0x08] + b1[0x0B];
-	b2[0x0B] = (b1[0x08] - b1[0x0B]) * cos0;
-	b2[0x09] = b1[0x09] + b1[0x0A];
-	b2[0x0A] = (b1[0x09] - b1[0x0A]) * cos1;
+  b2[0x08] = b1[0x08] + b1[0x0B];
+  b2[0x0B] = (b1[0x08] - b1[0x0B]) * cos0;
+  b2[0x09] = b1[0x09] + b1[0x0A];
+  b2[0x0A] = (b1[0x09] - b1[0x0A]) * cos1;
 
-	b2[0x0C] = b1[0x0C] + b1[0x0F];
-	b2[0x0F] = (b1[0x0F] - b1[0x0C]) * cos0;
-	b2[0x0D] = b1[0x0D] + b1[0x0E];
-	b2[0x0E] = (b1[0x0E] - b1[0x0D]) * cos1;
+  b2[0x0C] = b1[0x0C] + b1[0x0F];
+  b2[0x0F] = (b1[0x0F] - b1[0x0C]) * cos0;
+  b2[0x0D] = b1[0x0D] + b1[0x0E];
+  b2[0x0E] = (b1[0x0E] - b1[0x0D]) * cos1;
 
-	b2[0x10] = b1[0x10] + b1[0x13];
-	b2[0x13] = (b1[0x10] - b1[0x13]) * cos0;
-	b2[0x11] = b1[0x11] + b1[0x12];
-	b2[0x12] = (b1[0x11] - b1[0x12]) * cos1;
+  b2[0x10] = b1[0x10] + b1[0x13];
+  b2[0x13] = (b1[0x10] - b1[0x13]) * cos0;
+  b2[0x11] = b1[0x11] + b1[0x12];
+  b2[0x12] = (b1[0x11] - b1[0x12]) * cos1;
 
-	b2[0x14] = b1[0x14] + b1[0x17];
-	b2[0x17] = (b1[0x17] - b1[0x14]) * cos0;
-	b2[0x15] = b1[0x15] + b1[0x16];
-	b2[0x16] = (b1[0x16] - b1[0x15]) * cos1;
+  b2[0x14] = b1[0x14] + b1[0x17];
+  b2[0x17] = (b1[0x17] - b1[0x14]) * cos0;
+  b2[0x15] = b1[0x15] + b1[0x16];
+  b2[0x16] = (b1[0x16] - b1[0x15]) * cos1;
 
-	b2[0x18] = b1[0x18] + b1[0x1B];
-	b2[0x1B] = (b1[0x18] - b1[0x1B]) * cos0;
-	b2[0x19] = b1[0x19] + b1[0x1A];
-	b2[0x1A] = (b1[0x19] - b1[0x1A]) * cos1;
+  b2[0x18] = b1[0x18] + b1[0x1B];
+  b2[0x1B] = (b1[0x18] - b1[0x1B]) * cos0;
+  b2[0x19] = b1[0x19] + b1[0x1A];
+  b2[0x1A] = (b1[0x19] - b1[0x1A]) * cos1;
 
-	b2[0x1C] = b1[0x1C] + b1[0x1F];
-	b2[0x1F] = (b1[0x1F] - b1[0x1C]) * cos0;
-	b2[0x1D] = b1[0x1D] + b1[0x1E];
-	b2[0x1E] = (b1[0x1E] - b1[0x1D]) * cos1;
+  b2[0x1C] = b1[0x1C] + b1[0x1F];
+  b2[0x1F] = (b1[0x1F] - b1[0x1C]) * cos0;
+  b2[0x1D] = b1[0x1D] + b1[0x1E];
+  b2[0x1E] = (b1[0x1E] - b1[0x1D]) * cos1;
     }
 
     {
-	register real const cos0 = iemmp3_pnts[4][0];
+  register real const cos0 = iemmp3_pnts[4][0];
 
-	b1[0x00] = b2[0x00] + b2[0x01];
-	b1[0x01] = (b2[0x00] - b2[0x01]) * cos0;
-	b1[0x02] = b2[0x02] + b2[0x03];
-	b1[0x03] = (b2[0x03] - b2[0x02]) * cos0;
-	b1[0x02] += b1[0x03];
+  b1[0x00] = b2[0x00] + b2[0x01];
+  b1[0x01] = (b2[0x00] - b2[0x01]) * cos0;
+  b1[0x02] = b2[0x02] + b2[0x03];
+  b1[0x03] = (b2[0x03] - b2[0x02]) * cos0;
+  b1[0x02] += b1[0x03];
 
-	b1[0x04] = b2[0x04] + b2[0x05];
-	b1[0x05] = (b2[0x04] - b2[0x05]) * cos0;
-	b1[0x06] = b2[0x06] + b2[0x07];
-	b1[0x07] = (b2[0x07] - b2[0x06]) * cos0;
-	b1[0x06] += b1[0x07];
-	b1[0x04] += b1[0x06];
-	b1[0x06] += b1[0x05];
-	b1[0x05] += b1[0x07];
+  b1[0x04] = b2[0x04] + b2[0x05];
+  b1[0x05] = (b2[0x04] - b2[0x05]) * cos0;
+  b1[0x06] = b2[0x06] + b2[0x07];
+  b1[0x07] = (b2[0x07] - b2[0x06]) * cos0;
+  b1[0x06] += b1[0x07];
+  b1[0x04] += b1[0x06];
+  b1[0x06] += b1[0x05];
+  b1[0x05] += b1[0x07];
 
-	b1[0x08] = b2[0x08] + b2[0x09];
-	b1[0x09] = (b2[0x08] - b2[0x09]) * cos0;
-	b1[0x0A] = b2[0x0A] + b2[0x0B];
-	b1[0x0B] = (b2[0x0B] - b2[0x0A]) * cos0;
-	b1[0x0A] += b1[0x0B];
+  b1[0x08] = b2[0x08] + b2[0x09];
+  b1[0x09] = (b2[0x08] - b2[0x09]) * cos0;
+  b1[0x0A] = b2[0x0A] + b2[0x0B];
+  b1[0x0B] = (b2[0x0B] - b2[0x0A]) * cos0;
+  b1[0x0A] += b1[0x0B];
 
-	b1[0x0C] = b2[0x0C] + b2[0x0D];
-	b1[0x0D] = (b2[0x0C] - b2[0x0D]) * cos0;
-	b1[0x0E] = b2[0x0E] + b2[0x0F];
-	b1[0x0F] = (b2[0x0F] - b2[0x0E]) * cos0;
-	b1[0x0E] += b1[0x0F];
-	b1[0x0C] += b1[0x0E];
-	b1[0x0E] += b1[0x0D];
-	b1[0x0D] += b1[0x0F];
+  b1[0x0C] = b2[0x0C] + b2[0x0D];
+  b1[0x0D] = (b2[0x0C] - b2[0x0D]) * cos0;
+  b1[0x0E] = b2[0x0E] + b2[0x0F];
+  b1[0x0F] = (b2[0x0F] - b2[0x0E]) * cos0;
+  b1[0x0E] += b1[0x0F];
+  b1[0x0C] += b1[0x0E];
+  b1[0x0E] += b1[0x0D];
+  b1[0x0D] += b1[0x0F];
 
-	b1[0x10] = b2[0x10] + b2[0x11];
-	b1[0x11] = (b2[0x10] - b2[0x11]) * cos0;
-	b1[0x12] = b2[0x12] + b2[0x13];
-	b1[0x13] = (b2[0x13] - b2[0x12]) * cos0;
-	b1[0x12] += b1[0x13];
+  b1[0x10] = b2[0x10] + b2[0x11];
+  b1[0x11] = (b2[0x10] - b2[0x11]) * cos0;
+  b1[0x12] = b2[0x12] + b2[0x13];
+  b1[0x13] = (b2[0x13] - b2[0x12]) * cos0;
+  b1[0x12] += b1[0x13];
 
-	b1[0x14] = b2[0x14] + b2[0x15];
-	b1[0x15] = (b2[0x14] - b2[0x15]) * cos0;
-	b1[0x16] = b2[0x16] + b2[0x17];
-	b1[0x17] = (b2[0x17] - b2[0x16]) * cos0;
-	b1[0x16] += b1[0x17];
-	b1[0x14] += b1[0x16];
-	b1[0x16] += b1[0x15];
-	b1[0x15] += b1[0x17];
+  b1[0x14] = b2[0x14] + b2[0x15];
+  b1[0x15] = (b2[0x14] - b2[0x15]) * cos0;
+  b1[0x16] = b2[0x16] + b2[0x17];
+  b1[0x17] = (b2[0x17] - b2[0x16]) * cos0;
+  b1[0x16] += b1[0x17];
+  b1[0x14] += b1[0x16];
+  b1[0x16] += b1[0x15];
+  b1[0x15] += b1[0x17];
 
-	b1[0x18] = b2[0x18] + b2[0x19];
-	b1[0x19] = (b2[0x18] - b2[0x19]) * cos0;
-	b1[0x1A] = b2[0x1A] + b2[0x1B];
-	b1[0x1B] = (b2[0x1B] - b2[0x1A]) * cos0;
-	b1[0x1A] += b1[0x1B];
+  b1[0x18] = b2[0x18] + b2[0x19];
+  b1[0x19] = (b2[0x18] - b2[0x19]) * cos0;
+  b1[0x1A] = b2[0x1A] + b2[0x1B];
+  b1[0x1B] = (b2[0x1B] - b2[0x1A]) * cos0;
+  b1[0x1A] += b1[0x1B];
 
-	b1[0x1C] = b2[0x1C] + b2[0x1D];
-	b1[0x1D] = (b2[0x1C] - b2[0x1D]) * cos0;
-	b1[0x1E] = b2[0x1E] + b2[0x1F];
-	b1[0x1F] = (b2[0x1F] - b2[0x1E]) * cos0;
-	b1[0x1E] += b1[0x1F];
-	b1[0x1C] += b1[0x1E];
-	b1[0x1E] += b1[0x1D];
-	b1[0x1D] += b1[0x1F];
+  b1[0x1C] = b2[0x1C] + b2[0x1D];
+  b1[0x1D] = (b2[0x1C] - b2[0x1D]) * cos0;
+  b1[0x1E] = b2[0x1E] + b2[0x1F];
+  b1[0x1F] = (b2[0x1F] - b2[0x1E]) * cos0;
+  b1[0x1E] += b1[0x1F];
+  b1[0x1C] += b1[0x1E];
+  b1[0x1E] += b1[0x1D];
+  b1[0x1D] += b1[0x1F];
     }
 
     out0[0x10*16] = b1[0x00];
@@ -2759,20 +2759,20 @@ void dct64(real *a,real *b,real *c)
 static void dct36(real *inbuf,real *o1,real *o2,real *wintab,real *tsbuf)
 {
     {
-	register real *in = inbuf;
+  register real *in = inbuf;
 
-	in[17]+=in[16]; in[16]+=in[15]; in[15]+=in[14];
-	in[14]+=in[13]; in[13]+=in[12]; in[12]+=in[11];
-	in[11]+=in[10]; in[10]+=in[9];  in[9] +=in[8];
-	in[8] +=in[7];  in[7] +=in[6];  in[6] +=in[5];
-	in[5] +=in[4];  in[4] +=in[3];  in[3] +=in[2];
-	in[2] +=in[1];  in[1] +=in[0];
+  in[17]+=in[16]; in[16]+=in[15]; in[15]+=in[14];
+  in[14]+=in[13]; in[13]+=in[12]; in[12]+=in[11];
+  in[11]+=in[10]; in[10]+=in[9];  in[9] +=in[8];
+  in[8] +=in[7];  in[7] +=in[6];  in[6] +=in[5];
+  in[5] +=in[4];  in[4] +=in[3];  in[3] +=in[2];
+  in[2] +=in[1];  in[1] +=in[0];
 
-	in[17]+=in[15]; in[15]+=in[13]; in[13]+=in[11]; in[11]+=in[9];
-	in[9] +=in[7];  in[7] +=in[5];  in[5] +=in[3];  in[3] +=in[1];
+  in[17]+=in[15]; in[15]+=in[13]; in[13]+=in[11]; in[11]+=in[9];
+  in[9] +=in[7];  in[7] +=in[5];  in[5] +=in[3];  in[3] +=in[1];
 
 
-	{
+  {
 
 #define MACRO0(v) { \
     real tmp; \
@@ -2792,70 +2792,70 @@ static void dct36(real *inbuf,real *o1,real *o2,real *wintab,real *tsbuf)
     sum1 = (tmp2b - tmp1b) * iemmp3_tfcos36[(v)]; \
     MACRO0(v); }
 
-	    register const real *c = iemmp3_COS9;
-	    register real *out2 = o2;
-	    register real *w = wintab;
-	    register real *out1 = o1;
-	    register real *ts = tsbuf;
+      register const real *c = iemmp3_COS9;
+      register real *out2 = o2;
+      register real *w = wintab;
+      register real *out1 = o1;
+      register real *ts = tsbuf;
 
-	    real ta33,ta66,tb33,tb66;
+      real ta33,ta66,tb33,tb66;
 
-	    ta33 = in[2*3+0] * c[3];
-	    ta66 = in[2*6+0] * c[6];
-	    tb33 = in[2*3+1] * c[3];
-	    tb66 = in[2*6+1] * c[6];
+      ta33 = in[2*3+0] * c[3];
+      ta66 = in[2*6+0] * c[6];
+      tb33 = in[2*3+1] * c[3];
+      tb66 = in[2*6+1] * c[6];
 
-	    {
-		real tmp1a,tmp2a,tmp1b,tmp2b;
-		tmp1a =             in[2*1+0] * c[1] + ta33 + in[2*5+0] * c[5] + in[2*7+0] * c[7];
-		tmp1b =             in[2*1+1] * c[1] + tb33 + in[2*5+1] * c[5] + in[2*7+1] * c[7];
-		tmp2a = in[2*0+0] + in[2*2+0] * c[2] + in[2*4+0] * c[4] + ta66 + in[2*8+0] * c[8];
-		tmp2b = in[2*0+1] + in[2*2+1] * c[2] + in[2*4+1] * c[4] + tb66 + in[2*8+1] * c[8];
+      {
+    real tmp1a,tmp2a,tmp1b,tmp2b;
+    tmp1a =             in[2*1+0] * c[1] + ta33 + in[2*5+0] * c[5] + in[2*7+0] * c[7];
+    tmp1b =             in[2*1+1] * c[1] + tb33 + in[2*5+1] * c[5] + in[2*7+1] * c[7];
+    tmp2a = in[2*0+0] + in[2*2+0] * c[2] + in[2*4+0] * c[4] + ta66 + in[2*8+0] * c[8];
+    tmp2b = in[2*0+1] + in[2*2+1] * c[2] + in[2*4+1] * c[4] + tb66 + in[2*8+1] * c[8];
 
-		MACRO1(0);
-		MACRO2(8);
-	    }
+    MACRO1(0);
+    MACRO2(8);
+      }
 
-	    {
-		real tmp1a,tmp2a,tmp1b,tmp2b;
-		tmp1a = ( in[2*1+0] - in[2*5+0] - in[2*7+0] ) * c[3];
-		tmp1b = ( in[2*1+1] - in[2*5+1] - in[2*7+1] ) * c[3];
-		tmp2a = ( in[2*2+0] - in[2*4+0] - in[2*8+0] ) * c[6] - in[2*6+0] + in[2*0+0];
-		tmp2b = ( in[2*2+1] - in[2*4+1] - in[2*8+1] ) * c[6] - in[2*6+1] + in[2*0+1];
+      {
+    real tmp1a,tmp2a,tmp1b,tmp2b;
+    tmp1a = ( in[2*1+0] - in[2*5+0] - in[2*7+0] ) * c[3];
+    tmp1b = ( in[2*1+1] - in[2*5+1] - in[2*7+1] ) * c[3];
+    tmp2a = ( in[2*2+0] - in[2*4+0] - in[2*8+0] ) * c[6] - in[2*6+0] + in[2*0+0];
+    tmp2b = ( in[2*2+1] - in[2*4+1] - in[2*8+1] ) * c[6] - in[2*6+1] + in[2*0+1];
 
-		MACRO1(1);
-		MACRO2(7);
-	    }
+    MACRO1(1);
+    MACRO2(7);
+      }
 
-	    {
-		real tmp1a,tmp2a,tmp1b,tmp2b;
-		tmp1a =             in[2*1+0] * c[5] - ta33 - in[2*5+0] * c[7] + in[2*7+0] * c[1];
-		tmp1b =             in[2*1+1] * c[5] - tb33 - in[2*5+1] * c[7] + in[2*7+1] * c[1];
-		tmp2a = in[2*0+0] - in[2*2+0] * c[8] - in[2*4+0] * c[2] + ta66 + in[2*8+0] * c[4];
-		tmp2b = in[2*0+1] - in[2*2+1] * c[8] - in[2*4+1] * c[2] + tb66 + in[2*8+1] * c[4];
+      {
+    real tmp1a,tmp2a,tmp1b,tmp2b;
+    tmp1a =             in[2*1+0] * c[5] - ta33 - in[2*5+0] * c[7] + in[2*7+0] * c[1];
+    tmp1b =             in[2*1+1] * c[5] - tb33 - in[2*5+1] * c[7] + in[2*7+1] * c[1];
+    tmp2a = in[2*0+0] - in[2*2+0] * c[8] - in[2*4+0] * c[2] + ta66 + in[2*8+0] * c[4];
+    tmp2b = in[2*0+1] - in[2*2+1] * c[8] - in[2*4+1] * c[2] + tb66 + in[2*8+1] * c[4];
 
-		MACRO1(2);
-		MACRO2(6);
-	    }
+    MACRO1(2);
+    MACRO2(6);
+      }
 
-	    {
-		real tmp1a,tmp2a,tmp1b,tmp2b;
-		tmp1a =             in[2*1+0] * c[7] - ta33 + in[2*5+0] * c[1] - in[2*7+0] * c[5];
-		tmp1b =             in[2*1+1] * c[7] - tb33 + in[2*5+1] * c[1] - in[2*7+1] * c[5];
-		tmp2a = in[2*0+0] - in[2*2+0] * c[4] + in[2*4+0] * c[8] + ta66 - in[2*8+0] * c[2];
-		tmp2b = in[2*0+1] - in[2*2+1] * c[4] + in[2*4+1] * c[8] + tb66 - in[2*8+1] * c[2];
+      {
+    real tmp1a,tmp2a,tmp1b,tmp2b;
+    tmp1a =             in[2*1+0] * c[7] - ta33 + in[2*5+0] * c[1] - in[2*7+0] * c[5];
+    tmp1b =             in[2*1+1] * c[7] - tb33 + in[2*5+1] * c[1] - in[2*7+1] * c[5];
+    tmp2a = in[2*0+0] - in[2*2+0] * c[4] + in[2*4+0] * c[8] + ta66 - in[2*8+0] * c[2];
+    tmp2b = in[2*0+1] - in[2*2+1] * c[4] + in[2*4+1] * c[8] + tb66 - in[2*8+1] * c[2];
 
-		MACRO1(3);
-		MACRO2(5);
-	    }
+    MACRO1(3);
+    MACRO2(5);
+      }
 
-	    {
-		real sum0,sum1;
-		sum0 =  in[2*0+0] - in[2*2+0] + in[2*4+0] - in[2*6+0] + in[2*8+0];
-		sum1 = (in[2*0+1] - in[2*2+1] + in[2*4+1] - in[2*6+1] + in[2*8+1] ) * iemmp3_tfcos36[4];
-		MACRO0(4);
-	    }
-	}
+      {
+    real sum0,sum1;
+    sum0 =  in[2*0+0] - in[2*2+0] + in[2*4+0] - in[2*6+0] + in[2*8+0];
+    sum1 = (in[2*0+1] - in[2*2+1] + in[2*4+1] - in[2*6+1] + in[2*8+1] ) * iemmp3_tfcos36[4];
+    MACRO0(4);
+      }
+  }
 
     }
 }
@@ -2897,106 +2897,106 @@ static void dct12(real *in,real *rawout1,real *rawout2,register real *wi,registe
 
 
     {
-	real in0,in1,in2,in3,in4,in5;
-	register real *out1 = rawout1;
-	ts[SBLIMIT*0] = out1[0]; ts[SBLIMIT*1] = out1[1]; ts[SBLIMIT*2] = out1[2];
-	ts[SBLIMIT*3] = out1[3]; ts[SBLIMIT*4] = out1[4]; ts[SBLIMIT*5] = out1[5];
+  real in0,in1,in2,in3,in4,in5;
+  register real *out1 = rawout1;
+  ts[SBLIMIT*0] = out1[0]; ts[SBLIMIT*1] = out1[1]; ts[SBLIMIT*2] = out1[2];
+  ts[SBLIMIT*3] = out1[3]; ts[SBLIMIT*4] = out1[4]; ts[SBLIMIT*5] = out1[5];
 
-	DCT12_PART1
+  DCT12_PART1
 
-	{
-	    real tmp0,tmp1 = (in0 - in4);
-	    {
-		real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
-		tmp0 = tmp1 + tmp2;
-		tmp1 -= tmp2;
-	    }
-	    ts[(17-1)*SBLIMIT] = out1[17-1] + tmp0 * wi[11-1];
-	    ts[(12+1)*SBLIMIT] = out1[12+1] + tmp0 * wi[6+1];
-	    ts[(6 +1)*SBLIMIT] = out1[6 +1] + tmp1 * wi[1];
-	    ts[(11-1)*SBLIMIT] = out1[11-1] + tmp1 * wi[5-1];
-	}
+  {
+      real tmp0,tmp1 = (in0 - in4);
+      {
+    real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
+    tmp0 = tmp1 + tmp2;
+    tmp1 -= tmp2;
+      }
+      ts[(17-1)*SBLIMIT] = out1[17-1] + tmp0 * wi[11-1];
+      ts[(12+1)*SBLIMIT] = out1[12+1] + tmp0 * wi[6+1];
+      ts[(6 +1)*SBLIMIT] = out1[6 +1] + tmp1 * wi[1];
+      ts[(11-1)*SBLIMIT] = out1[11-1] + tmp1 * wi[5-1];
+  }
 
-	DCT12_PART2
+  DCT12_PART2
 
-	    ts[(17-0)*SBLIMIT] = out1[17-0] + in2 * wi[11-0];
-	ts[(12+0)*SBLIMIT] = out1[12+0] + in2 * wi[6+0];
-	ts[(12+2)*SBLIMIT] = out1[12+2] + in3 * wi[6+2];
-	ts[(17-2)*SBLIMIT] = out1[17-2] + in3 * wi[11-2];
+      ts[(17-0)*SBLIMIT] = out1[17-0] + in2 * wi[11-0];
+  ts[(12+0)*SBLIMIT] = out1[12+0] + in2 * wi[6+0];
+  ts[(12+2)*SBLIMIT] = out1[12+2] + in3 * wi[6+2];
+  ts[(17-2)*SBLIMIT] = out1[17-2] + in3 * wi[11-2];
 
-	ts[(6+0)*SBLIMIT]  = out1[6+0] + in0 * wi[0];
-	ts[(11-0)*SBLIMIT] = out1[11-0] + in0 * wi[5-0];
-	ts[(6+2)*SBLIMIT]  = out1[6+2] + in4 * wi[2];
-	ts[(11-2)*SBLIMIT] = out1[11-2] + in4 * wi[5-2];
+  ts[(6+0)*SBLIMIT]  = out1[6+0] + in0 * wi[0];
+  ts[(11-0)*SBLIMIT] = out1[11-0] + in0 * wi[5-0];
+  ts[(6+2)*SBLIMIT]  = out1[6+2] + in4 * wi[2];
+  ts[(11-2)*SBLIMIT] = out1[11-2] + in4 * wi[5-2];
     }
 
     in++;
 
     {
-	real in0,in1,in2,in3,in4,in5;
-	register real *out2 = rawout2;
+  real in0,in1,in2,in3,in4,in5;
+  register real *out2 = rawout2;
 
-	DCT12_PART1
+  DCT12_PART1
 
-	{
-	    real tmp0,tmp1 = (in0 - in4);
-	    {
-		real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
-		tmp0 = tmp1 + tmp2;
-		tmp1 -= tmp2;
-	    }
-	    out2[5-1] = tmp0 * wi[11-1];
-	    out2[0+1] = tmp0 * wi[6+1];
-	    ts[(12+1)*SBLIMIT] += tmp1 * wi[1];
-	    ts[(17-1)*SBLIMIT] += tmp1 * wi[5-1];
-	}
+  {
+      real tmp0,tmp1 = (in0 - in4);
+      {
+    real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
+    tmp0 = tmp1 + tmp2;
+    tmp1 -= tmp2;
+      }
+      out2[5-1] = tmp0 * wi[11-1];
+      out2[0+1] = tmp0 * wi[6+1];
+      ts[(12+1)*SBLIMIT] += tmp1 * wi[1];
+      ts[(17-1)*SBLIMIT] += tmp1 * wi[5-1];
+  }
 
-	DCT12_PART2
+  DCT12_PART2
 
-	    out2[5-0] = in2 * wi[11-0];
-	out2[0+0] = in2 * wi[6+0];
-	out2[0+2] = in3 * wi[6+2];
-	out2[5-2] = in3 * wi[11-2];
+      out2[5-0] = in2 * wi[11-0];
+  out2[0+0] = in2 * wi[6+0];
+  out2[0+2] = in3 * wi[6+2];
+  out2[5-2] = in3 * wi[11-2];
 
-	ts[(12+0)*SBLIMIT] += in0 * wi[0];
-	ts[(17-0)*SBLIMIT] += in0 * wi[5-0];
-	ts[(12+2)*SBLIMIT] += in4 * wi[2];
-	ts[(17-2)*SBLIMIT] += in4 * wi[5-2];
+  ts[(12+0)*SBLIMIT] += in0 * wi[0];
+  ts[(17-0)*SBLIMIT] += in0 * wi[5-0];
+  ts[(12+2)*SBLIMIT] += in4 * wi[2];
+  ts[(17-2)*SBLIMIT] += in4 * wi[5-2];
     }
 
     in++;
 
     {
-	real in0,in1,in2,in3,in4,in5;
-	register real *out2 = rawout2;
-	out2[12]=out2[13]=out2[14]=out2[15]=out2[16]=out2[17]=0.0;
+  real in0,in1,in2,in3,in4,in5;
+  register real *out2 = rawout2;
+  out2[12]=out2[13]=out2[14]=out2[15]=out2[16]=out2[17]=0.0;
 
-	DCT12_PART1
+  DCT12_PART1
 
-	{
-	    real tmp0,tmp1 = (in0 - in4);
-	    {
-		real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
-		tmp0 = tmp1 + tmp2;
-		tmp1 -= tmp2;
-	    }
-	    out2[11-1] = tmp0 * wi[11-1];
-	    out2[6 +1] = tmp0 * wi[6+1];
-	    out2[0+1] += tmp1 * wi[1];
-	    out2[5-1] += tmp1 * wi[5-1];
-	}
+  {
+      real tmp0,tmp1 = (in0 - in4);
+      {
+    real tmp2 = (in1 - in5) * iemmp3_tfcos12[1];
+    tmp0 = tmp1 + tmp2;
+    tmp1 -= tmp2;
+      }
+      out2[11-1] = tmp0 * wi[11-1];
+      out2[6 +1] = tmp0 * wi[6+1];
+      out2[0+1] += tmp1 * wi[1];
+      out2[5-1] += tmp1 * wi[5-1];
+  }
 
-	DCT12_PART2
+  DCT12_PART2
 
-	    out2[11-0] = in2 * wi[11-0];
-	out2[6 +0] = in2 * wi[6+0];
-	out2[6 +2] = in3 * wi[6+2];
-	out2[11-2] = in3 * wi[11-2];
+      out2[11-0] = in2 * wi[11-0];
+  out2[6 +0] = in2 * wi[6+0];
+  out2[6 +2] = in3 * wi[6+2];
+  out2[11-2] = in3 * wi[11-2];
 
-	out2[0+0] += in0 * wi[0];
-	out2[5-0] += in0 * wi[5-0];
-	out2[0+2] += in4 * wi[2];
-	out2[5-2] += in4 * wi[5-2];
+  out2[0+0] += in0 * wi[0];
+  out2[5-0] += in0 * wi[5-0];
+  out2[0+2] += in4 * wi[2];
+  out2[5-2] += in4 * wi[5-2];
     }
 }
 
@@ -3012,9 +3012,9 @@ static int synth_1to1_mono(real *bandPtr,unsigned char *samples,int *pnt)
 
     for(i=0;i<32;i++)
     {
-	*( (short *) samples) = *tmp1;
-	samples += 2;
-	tmp1 += 2;
+  *( (short *) samples) = *tmp1;
+  samples += 2;
+  tmp1 += 2;
     }
     *pnt += 64;
 
@@ -3036,93 +3036,93 @@ static int synth_1to1(real *bandPtr,int channel,unsigned char *out,int *pnt)
 
     if(!channel)
     {
-	bo--;
-	bo &= 0xf;
-	buf = iemmp3_gmp->synth_buffs[0];
+  bo--;
+  bo &= 0xf;
+  buf = iemmp3_gmp->synth_buffs[0];
     }
     else
     {
-	samples++;
-	buf = iemmp3_gmp->synth_buffs[1];
+  samples++;
+  buf = iemmp3_gmp->synth_buffs[1];
     }
 
     if(bo & 0x1)
     {
-	b0 = buf[0];
-	bo1 = bo;
-	dct64(buf[1]+((bo+1)&0xf),buf[0]+bo,bandPtr);
+  b0 = buf[0];
+  bo1 = bo;
+  dct64(buf[1]+((bo+1)&0xf),buf[0]+bo,bandPtr);
     }
     else
     {
-	b0 = buf[1];
-	bo1 = bo+1;
-	dct64(buf[0]+bo,buf[1]+bo+1,bandPtr);
+  b0 = buf[1];
+  bo1 = bo+1;
+  dct64(buf[0]+bo,buf[1]+bo+1,bandPtr);
     }
 
     iemmp3_gmp->synth_bo = bo;
 
     {
-	register int j;
-	real *window = iemmp3_decwin + 16 - bo1;
+  register int j;
+  real *window = iemmp3_decwin + 16 - bo1;
 
-	for (j=16;j;j--,b0+=0x10,window+=0x20,samples+=step)
-	{
-	    real sum;
-	    sum  = window[0x0] * b0[0x0];
-	    sum -= window[0x1] * b0[0x1];
-	    sum += window[0x2] * b0[0x2];
-	    sum -= window[0x3] * b0[0x3];
-	    sum += window[0x4] * b0[0x4];
-	    sum -= window[0x5] * b0[0x5];
-	    sum += window[0x6] * b0[0x6];
-	    sum -= window[0x7] * b0[0x7];
-	    sum += window[0x8] * b0[0x8];
-	    sum -= window[0x9] * b0[0x9];
-	    sum += window[0xA] * b0[0xA];
-	    sum -= window[0xB] * b0[0xB];
-	    sum += window[0xC] * b0[0xC];
-	    sum -= window[0xD] * b0[0xD];
-	    sum += window[0xE] * b0[0xE];
-	    sum -= window[0xF] * b0[0xF];
-	    WRITE_SAMPLE(samples,sum,clip);
-	}
+  for (j=16;j;j--,b0+=0x10,window+=0x20,samples+=step)
+  {
+      real sum;
+      sum  = window[0x0] * b0[0x0];
+      sum -= window[0x1] * b0[0x1];
+      sum += window[0x2] * b0[0x2];
+      sum -= window[0x3] * b0[0x3];
+      sum += window[0x4] * b0[0x4];
+      sum -= window[0x5] * b0[0x5];
+      sum += window[0x6] * b0[0x6];
+      sum -= window[0x7] * b0[0x7];
+      sum += window[0x8] * b0[0x8];
+      sum -= window[0x9] * b0[0x9];
+      sum += window[0xA] * b0[0xA];
+      sum -= window[0xB] * b0[0xB];
+      sum += window[0xC] * b0[0xC];
+      sum -= window[0xD] * b0[0xD];
+      sum += window[0xE] * b0[0xE];
+      sum -= window[0xF] * b0[0xF];
+      WRITE_SAMPLE(samples,sum,clip);
+  }
 
-	{
-	    real sum;
-	    sum  = window[0x0] * b0[0x0];
-	    sum += window[0x2] * b0[0x2];
-	    sum += window[0x4] * b0[0x4];
-	    sum += window[0x6] * b0[0x6];
-	    sum += window[0x8] * b0[0x8];
-	    sum += window[0xA] * b0[0xA];
-	    sum += window[0xC] * b0[0xC];
-	    sum += window[0xE] * b0[0xE];
-	    WRITE_SAMPLE(samples,sum,clip);
-	    b0-=0x10,window-=0x20,samples+=step;
-	}
-	window += bo1<<1;
+  {
+      real sum;
+      sum  = window[0x0] * b0[0x0];
+      sum += window[0x2] * b0[0x2];
+      sum += window[0x4] * b0[0x4];
+      sum += window[0x6] * b0[0x6];
+      sum += window[0x8] * b0[0x8];
+      sum += window[0xA] * b0[0xA];
+      sum += window[0xC] * b0[0xC];
+      sum += window[0xE] * b0[0xE];
+      WRITE_SAMPLE(samples,sum,clip);
+      b0-=0x10,window-=0x20,samples+=step;
+  }
+  window += bo1<<1;
 
-	for (j=15;j;j--,b0-=0x10,window-=0x20,samples+=step)
-	{
-	    real sum;
-	    sum = -window[-0x1] * b0[0x0];
-	    sum -= window[-0x2] * b0[0x1];
-	    sum -= window[-0x3] * b0[0x2];
-	    sum -= window[-0x4] * b0[0x3];
-	    sum -= window[-0x5] * b0[0x4];
-	    sum -= window[-0x6] * b0[0x5];
-	    sum -= window[-0x7] * b0[0x6];
-	    sum -= window[-0x8] * b0[0x7];
-	    sum -= window[-0x9] * b0[0x8];
-	    sum -= window[-0xA] * b0[0x9];
-	    sum -= window[-0xB] * b0[0xA];
-	    sum -= window[-0xC] * b0[0xB];
-	    sum -= window[-0xD] * b0[0xC];
-	    sum -= window[-0xE] * b0[0xD];
-	    sum -= window[-0xF] * b0[0xE];
-	    sum -= window[-0x0] * b0[0xF];
-	    WRITE_SAMPLE(samples,sum,clip);
-	}
+  for (j=15;j;j--,b0-=0x10,window-=0x20,samples+=step)
+  {
+      real sum;
+      sum = -window[-0x1] * b0[0x0];
+      sum -= window[-0x2] * b0[0x1];
+      sum -= window[-0x3] * b0[0x2];
+      sum -= window[-0x4] * b0[0x3];
+      sum -= window[-0x5] * b0[0x4];
+      sum -= window[-0x6] * b0[0x5];
+      sum -= window[-0x7] * b0[0x6];
+      sum -= window[-0x8] * b0[0x7];
+      sum -= window[-0x9] * b0[0x8];
+      sum -= window[-0xA] * b0[0x9];
+      sum -= window[-0xB] * b0[0xA];
+      sum -= window[-0xC] * b0[0xB];
+      sum -= window[-0xD] * b0[0xC];
+      sum -= window[-0xE] * b0[0xD];
+      sum -= window[-0xF] * b0[0xE];
+      sum -= window[-0x0] * b0[0xF];
+      WRITE_SAMPLE(samples,sum,clip);
+  }
     }
     *pnt += 128;
 
@@ -3172,7 +3172,7 @@ static void *sigmp3play_new(void)
     x->x_floatout = outlet_new(&x->x_obj, &s_float);
     x->x_bangout = outlet_new(&x->x_obj, &s_bang);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("ft1"));
-		x->x_canvas = canvas_getcurrent();
+    x->x_canvas = canvas_getcurrent();
     return (x);
 }
 
@@ -3198,80 +3198,80 @@ static int sigmp3play_read_frame_length_first(t_sigmp3play *x, int *frsz)
     *frsz = 0;
     if((x->file_size) >= 4)
     {
-	fread(&chead, 1, sizeof(char), x->fh);
-	head = (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	syncword = (head >> 20) & 0x0fff;
-	version = ((head >> 19) & 0x01) ? 0 : 1;
-	if((syncword & 0x01) == 0)
-	    version = 2;
-	if(version == 0)
-	    x->samp_per_frame = 1152;
-	else
-	    x->samp_per_frame = 576;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head = (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  syncword = (head >> 20) & 0x0fff;
+  version = ((head >> 19) & 0x01) ? 0 : 1;
+  if((syncword & 0x01) == 0)
+      version = 2;
+  if(version == 0)
+      x->samp_per_frame = 1152;
+  else
+      x->samp_per_frame = 576;
 
-	if(head & (1<<20))
-	{
-	    lsf = (head & (1<<19)) ? 0x0 : 0x1;
-	    mpeg25 = 0;
-	}
-	else
-	{
-	    lsf = 1;
-	    mpeg25 = 1;
-	}
-	lay = 4-((head>>17)&3);
-	if(((head>>10)&0x3) == 0x3)
-	{
-	    post("Stream error");
-	    return(MP3_EX);
-	}
-	if(mpeg25)
-	    sampling_frequency = 6 + ((head>>10)&0x3);
-	else
-	    sampling_frequency = ((head>>10)&0x3) + (lsf*3);
-	x->mp3_sr = (int)iemmp3_freqs[sampling_frequency];
-	if(mpeg25)
-	    bitrate_index = ((head>>12)&0xf);
-	bitrate_index = ((head>>12)&0xf);
-	padding   = ((head>>9)&0x1);
-	if(!bitrate_index)
-	{
-	    post("Free format not supported.\n");
-	    return(MP3_EX);
-	}
-	switch(lay)
-	{
-	case 1:
-	    post("Layer I not supported!\n");
-	    break;
-	case 2:
-	    post("Layer II not supported!\n");
-	    break;
-	case 3:
-	    framesize = iemmp3_tabsel_123[lsf][2][bitrate_index]*144000;
-	    framesize /= (iemmp3_freqs[sampling_frequency] << lsf);
-	    framesize += padding;
-	    *frsz = framesize;
-	    ret = 0;
-	    break;
-	default:
-	    post("Sorry, unknown layer type.\n");
-	    break;
-	}
-	return(ret);
+  if(head & (1<<20))
+  {
+      lsf = (head & (1<<19)) ? 0x0 : 0x1;
+      mpeg25 = 0;
+  }
+  else
+  {
+      lsf = 1;
+      mpeg25 = 1;
+  }
+  lay = 4-((head>>17)&3);
+  if(((head>>10)&0x3) == 0x3)
+  {
+      post("Stream error");
+      return(MP3_EX);
+  }
+  if(mpeg25)
+      sampling_frequency = 6 + ((head>>10)&0x3);
+  else
+      sampling_frequency = ((head>>10)&0x3) + (lsf*3);
+  x->mp3_sr = (int)iemmp3_freqs[sampling_frequency];
+  if(mpeg25)
+      bitrate_index = ((head>>12)&0xf);
+  bitrate_index = ((head>>12)&0xf);
+  padding   = ((head>>9)&0x1);
+  if(!bitrate_index)
+  {
+      post("Free format not supported.\n");
+      return(MP3_EX);
+  }
+  switch(lay)
+  {
+  case 1:
+      post("Layer I not supported!\n");
+      break;
+  case 2:
+      post("Layer II not supported!\n");
+      break;
+  case 3:
+      framesize = iemmp3_tabsel_123[lsf][2][bitrate_index]*144000;
+      framesize /= (iemmp3_freqs[sampling_frequency] << lsf);
+      framesize += padding;
+      *frsz = framesize;
+      ret = 0;
+      break;
+  default:
+      post("Sorry, unknown layer type.\n");
+      break;
+  }
+  return(ret);
     }
     else
     {
-	return(1);
+  return(1);
     }
 }
 
@@ -3284,36 +3284,36 @@ static int sigmp3play_read_frame_length_next(t_sigmp3play *x, int *frsz, int fra
     *frsz = 0;
     if(begframeseek[frame_counter] < ((x->file_size) - 4))
     {
-	fread(&chead, 1, sizeof(char), x->fh);
-	head = (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	fread(&chead, 1, sizeof(char), x->fh);
-	head <<= 8;
-	head |= (unsigned int)chead;
-	if(head & (1<<20))
-	{
-	    lsf = (head & (1<<19)) ? 0x0 : 0x1;
-	    sampling_frequency = ((head>>10)&0x3) + (lsf*3);
-	}
-	else
-	{
-	    lsf = 1;
-	    sampling_frequency = 6 + ((head>>10)&0x3);
-	}
-	bitrate_index = ((head>>12)&0xf);
-	framesize = iemmp3_tabsel_123[lsf][2][bitrate_index]*144000;
-	framesize /= (iemmp3_freqs[sampling_frequency] << lsf);
-	framesize += ((head>>9)&0x1);
-	*frsz = framesize;
-	return(0);
+  fread(&chead, 1, sizeof(char), x->fh);
+  head = (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  fread(&chead, 1, sizeof(char), x->fh);
+  head <<= 8;
+  head |= (unsigned int)chead;
+  if(head & (1<<20))
+  {
+      lsf = (head & (1<<19)) ? 0x0 : 0x1;
+      sampling_frequency = ((head>>10)&0x3) + (lsf*3);
+  }
+  else
+  {
+      lsf = 1;
+      sampling_frequency = 6 + ((head>>10)&0x3);
+  }
+  bitrate_index = ((head>>12)&0xf);
+  framesize = iemmp3_tabsel_123[lsf][2][bitrate_index]*144000;
+  framesize /= (iemmp3_freqs[sampling_frequency] << lsf);
+  framesize += ((head>>9)&0x1);
+  *frsz = framesize;
+  return(0);
     }
     else
-	return(1);
+  return(1);
 }
 
 static int sigmp3play_calc_frames(t_sigmp3play *x)
@@ -3324,48 +3324,48 @@ static int sigmp3play_calc_frames(t_sigmp3play *x)
     fseek(x->fh,0,SEEK_SET);
     if(!sigmp3play_read_frame_length_first(x, &framesize))
     {
-	if(framesize <= 0)
-	{
-	    return(MP3_EX);
-	}
-	i = framesize - 6;
-	maxframeseek = (x->file_size) / i;
-	if(!begframeseek)
-	{
-	    x->begframeseek = (int *)getzbytes((maxframeseek)*sizeof(int));
-	    x->maxframeseek = maxframeseek;
-	}
-	else
-	{
-	    if(maxframeseek > (x->maxframeseek))
-	    {
-		freebytes(x->begframeseek, (x->maxframeseek)*sizeof(int));
-		x->begframeseek = (int *)getzbytes((maxframeseek)*sizeof(int));
-		x->maxframeseek = maxframeseek;
-	    }
-	}
-	begframeseek = x->begframeseek;
-	begframeseek[0] = 0;
-	begframeseek[1] = framesize;
-	frame_counter = 1;
-	/*x->curframeseek = maxframeseek;*/
-	fseek(x->fh, begframeseek[1], SEEK_SET);
-	while(!sigmp3play_read_frame_length_next(x, &framesize, frame_counter))
-	{
-	    begframeseek[frame_counter+1] = begframeseek[frame_counter] + framesize;
-	    frame_counter++;
-	    fseek(x->fh, begframeseek[frame_counter], SEEK_SET);
-	};
-	frame_counter--;
-	length = (float)(frame_counter)*(float)(x->samp_per_frame) / (float)(x->mp3_sr);
-	x->length_sec = length;
-	x->time_factor = length / (float)(frame_counter);
-	x->curframeseek = frame_counter;
-	fseek(x->fh,0,SEEK_SET);
-	return(MP3_OK);
+  if(framesize <= 0)
+  {
+      return(MP3_EX);
+  }
+  i = framesize - 6;
+  maxframeseek = (x->file_size) / i;
+  if(!begframeseek)
+  {
+      x->begframeseek = (int *)getzbytes((maxframeseek)*sizeof(int));
+      x->maxframeseek = maxframeseek;
+  }
+  else
+  {
+      if(maxframeseek > (x->maxframeseek))
+      {
+    freebytes(x->begframeseek, (x->maxframeseek)*sizeof(int));
+    x->begframeseek = (int *)getzbytes((maxframeseek)*sizeof(int));
+    x->maxframeseek = maxframeseek;
+      }
+  }
+  begframeseek = x->begframeseek;
+  begframeseek[0] = 0;
+  begframeseek[1] = framesize;
+  frame_counter = 1;
+  /*x->curframeseek = maxframeseek;*/
+  fseek(x->fh, begframeseek[1], SEEK_SET);
+  while(!sigmp3play_read_frame_length_next(x, &framesize, frame_counter))
+  {
+      begframeseek[frame_counter+1] = begframeseek[frame_counter] + framesize;
+      frame_counter++;
+      fseek(x->fh, begframeseek[frame_counter], SEEK_SET);
+  };
+  frame_counter--;
+  length = (float)(frame_counter)*(float)(x->samp_per_frame) / (float)(x->mp3_sr);
+  x->length_sec = length;
+  x->time_factor = length / (float)(frame_counter);
+  x->curframeseek = frame_counter;
+  fseek(x->fh,0,SEEK_SET);
+  return(MP3_OK);
     }
     else
-	return(MP3_EX);
+  return(MP3_EX);
 }
 
 static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
@@ -3374,162 +3374,162 @@ static void sigmp3play_do_open(t_sigmp3play *x, char *str, int calc_it)
     int file_size, size, mp3_encode_return=MP3_OK, mp3_read_length, i, j, *begframeseek;
     static char *modes[4] = { "Stereo", "Joint-Stereo", "Dual-Channel", "Single-Channel" };
     static char *layers[4] = { "Unknown" , "I", "II", "III" };
-		char completefilename[400];
+    char completefilename[400];
 
     if(x->file_is_open)
     {
-			post("mp3play-ERROR: file is already open, please stop it first!");
+      post("mp3play-ERROR: file is already open, please stop it first!");
     }
     else if(*str == 0)
     {
-			post("mp3play-ERROR: there is no filename to open");
+      post("mp3play-ERROR: there is no filename to open");
     }
     else
     {
-			if(str[0] == '/')
-			{
-				strcpy(completefilename, str);
-			}
-			else if(((str[0] >= 'A')&&(str[0] <= 'Z')||
-				(str[0] >= 'a')&&(str[0] <= 'z'))&&
-				(str[1] == ':')&&(str[2] == '/'))
-			{
-				strcpy(completefilename, str);
-			}
-			else
-			{
-				strcpy(completefilename, canvas_getdir(x->x_canvas)->s_name);
-				strcat(completefilename, "/");
-				strcat(completefilename, str);
-			}
+      if(str[0] == '/')
+      {
+        strcpy(completefilename, str);
+      }
+      else if(((str[0] >= 'A')&&(str[0] <= 'Z')||
+        (str[0] >= 'a')&&(str[0] <= 'z'))&&
+        (str[1] == ':')&&(str[2] == '/'))
+      {
+        strcpy(completefilename, str);
+      }
+      else
+      {
+        strcpy(completefilename, canvas_getdir(x->x_canvas)->s_name);
+        strcat(completefilename, "/");
+        strcat(completefilename, str);
+      }
 
-	if((x->fh = fopen(completefilename, "rb")) == NULL)
-	{
-	    post("mp3play-ERROR: cannot open %s", completefilename);
-	}
-	else
-	{
-	    strcpy(x->filename, completefilename);
-	    fseek(x->fh,0,SEEK_END);
-	    file_size = (int)ftell(x->fh);
-	    x->file_size = file_size;
-	    if(!x->mp_is_init)
-	    {
-		InitAgainMP3(&(x->mp));
-		x->mp_is_init = 1;
-	    }
-	    if(calc_it)
-		mp3_encode_return = sigmp3play_calc_frames(x);
-	    if(mp3_encode_return == MP3_EX)
-	    {
-		sigmp3play_cleanup(x);
-		return;
-	    }
-	    if(x->frame_counter)
-		x->frame_counter = (int)(x->offset_sec / x->time_factor);
-	    i = x->frame_counter;
-	    if(i > (x->curframeseek - 1))
-		i = x->curframeseek - 1;
-	    begframeseek = x->begframeseek;
-	    j = begframeseek[i];
-	    fseek(x->fh,j,SEEK_SET);
-	    x->file_block_num = (file_size-j) / MY_MP3_MALLOC_IN_SIZE;
-	    x->file_remain = (file_size-j) - (x->file_block_num)*MY_MP3_MALLOC_IN_SIZE;
-	    if(x->file_block_num)
-	    {
-		mp3_read_length = MY_MP3_MALLOC_IN_SIZE;
-		x->file_block_num--;
-	    }
-	    else
-	    {
-		mp3_read_length = x->file_remain;
-		x->file_remain = 0;
-	    }
-	    if(mp3_read_length > 0)
-	    {
-		fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
-		mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length, x->mp3outbuf,
-					      MY_MP3_MALLOC_IN_SIZE2, &size);
-		if(mp3_encode_return == MP3_EX)
-		{
-		    sigmp3play_cleanup(x);
-		    return;
-		}
-		post ("MPEG %s, Layer: %s, Freq: %ld, mode: %s, modext: %d, BPF : %d",
-		      x->mp.fr.mpeg25 ? "2.5" : (x->mp.fr.lsf ? "2.0" : "1.0"),
-		      layers[x->mp.fr.lay],iemmp3_freqs[x->mp.fr.sampling_frequency],
-		      modes[x->mp.fr.mode],x->mp.fr.mode_ext,x->mp.fr.framesize+4);
-		post ("Channels: %d, copyright: %s, original: %s, CRC: %s, emphasis: %d.",
-		      x->mp.fr.stereo,x->mp.fr.copyright?"Yes":"No",
-		      x->mp.fr.original?"Yes":"No",x->mp.fr.error_protection?"Yes":"No",
-		      x->mp.fr.emphasis);
-		post ("Bitrate: %d Kbits/s, Extension value: %d",
-		      iemmp3_tabsel_123[x->mp.fr.lsf][x->mp.fr.lay-1]
-		      [x->mp.fr.bitrate_index],x->mp.fr.extension);
-		post ("Original Soundfile-Length : %.3f sec.\n",x->length_sec);
+  if((x->fh = fopen(completefilename, "rb")) == NULL)
+  {
+      post("mp3play-ERROR: cannot open %s", completefilename);
+  }
+  else
+  {
+      strcpy(x->filename, completefilename);
+      fseek(x->fh,0,SEEK_END);
+      file_size = (int)ftell(x->fh);
+      x->file_size = file_size;
+      if(!x->mp_is_init)
+      {
+    InitAgainMP3(&(x->mp));
+    x->mp_is_init = 1;
+      }
+      if(calc_it)
+    mp3_encode_return = sigmp3play_calc_frames(x);
+      if(mp3_encode_return == MP3_EX)
+      {
+    sigmp3play_cleanup(x);
+    return;
+      }
+      if(x->frame_counter)
+    x->frame_counter = (int)(x->offset_sec / x->time_factor);
+      i = x->frame_counter;
+      if(i > (x->curframeseek - 1))
+    i = x->curframeseek - 1;
+      begframeseek = x->begframeseek;
+      j = begframeseek[i];
+      fseek(x->fh,j,SEEK_SET);
+      x->file_block_num = (file_size-j) / MY_MP3_MALLOC_IN_SIZE;
+      x->file_remain = (file_size-j) - (x->file_block_num)*MY_MP3_MALLOC_IN_SIZE;
+      if(x->file_block_num)
+      {
+    mp3_read_length = MY_MP3_MALLOC_IN_SIZE;
+    x->file_block_num--;
+      }
+      else
+      {
+    mp3_read_length = x->file_remain;
+    x->file_remain = 0;
+      }
+      if(mp3_read_length > 0)
+      {
+    fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
+    mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length, x->mp3outbuf,
+                MY_MP3_MALLOC_IN_SIZE2, &size);
+    if(mp3_encode_return == MP3_EX)
+    {
+        sigmp3play_cleanup(x);
+        return;
+    }
+    post ("MPEG %s, Layer: %s, Freq: %ld, mode: %s, modext: %d, BPF : %d",
+          x->mp.fr.mpeg25 ? "2.5" : (x->mp.fr.lsf ? "2.0" : "1.0"),
+          layers[x->mp.fr.lay],iemmp3_freqs[x->mp.fr.sampling_frequency],
+          modes[x->mp.fr.mode],x->mp.fr.mode_ext,x->mp.fr.framesize+4);
+    post ("Channels: %d, copyright: %s, original: %s, CRC: %s, emphasis: %d.",
+          x->mp.fr.stereo,x->mp.fr.copyright?"Yes":"No",
+          x->mp.fr.original?"Yes":"No",x->mp.fr.error_protection?"Yes":"No",
+          x->mp.fr.emphasis);
+    post ("Bitrate: %d Kbits/s, Extension value: %d",
+          iemmp3_tabsel_123[x->mp.fr.lsf][x->mp.fr.lay-1]
+          [x->mp.fr.bitrate_index],x->mp.fr.extension);
+    post ("Original Soundfile-Length : %.3f sec.\n",x->length_sec);
 
-		x->mp3_byterate = 128*iemmp3_tabsel_123[x->mp.fr.lsf][x->mp.fr.lay-1][x->mp.fr.bitrate_index];
-		/* 1024/8 */
+    x->mp3_byterate = 128*iemmp3_tabsel_123[x->mp.fr.lsf][x->mp.fr.lay-1][x->mp.fr.bitrate_index];
+    /* 1024/8 */
 
-		if(x->mp.fr.stereo == 2)
-		    x->mp3_ch = 2;
-		else if(x->mp.fr.stereo == 1)
-		    x->mp3_ch = 1;
-		else
-		{
-		    x->mp3_ch = 1;
-		    post("mp3_play~ WARNING: unknown number of channels : %d channels",
-			 x->mp.fr.stereo);
-		}
-		mp3_sr = (int)(iemmp3_freqs[x->mp.fr.sampling_frequency]);
-		obj_sr = x->obj_sr;
-		x->mp3_sr = mp3_sr;
-		if(mp3_sr == obj_sr)
-		{
-		    x->down = 0;
-		}
-		else if(2*mp3_sr == obj_sr)
-		{
-		    x->down = 1;
-		}
-		else if(4*mp3_sr == obj_sr)
-		{
-		    x->down = 2;
-		}
-		else if(mp3_sr == 2*obj_sr)
-		{
-		    x->down = -1;
-		}
-		else if(mp3_sr == 4*obj_sr)
-		{
-		    x->down = -2;
-		}
-		else
-		{
-		    post("mp3_play~ WARNING: playing the filesamplerate of %d Hz at %d Hz", mp3_sr,obj_sr);
-		    x->down = 0;
-		}
+    if(x->mp.fr.stereo == 2)
+        x->mp3_ch = 2;
+    else if(x->mp.fr.stereo == 1)
+        x->mp3_ch = 1;
+    else
+    {
+        x->mp3_ch = 1;
+        post("mp3_play~ WARNING: unknown number of channels : %d channels",
+       x->mp.fr.stereo);
+    }
+    mp3_sr = (int)(iemmp3_freqs[x->mp.fr.sampling_frequency]);
+    obj_sr = x->obj_sr;
+    x->mp3_sr = mp3_sr;
+    if(mp3_sr == obj_sr)
+    {
+        x->down = 0;
+    }
+    else if(2*mp3_sr == obj_sr)
+    {
+        x->down = 1;
+    }
+    else if(4*mp3_sr == obj_sr)
+    {
+        x->down = 2;
+    }
+    else if(mp3_sr == 2*obj_sr)
+    {
+        x->down = -1;
+    }
+    else if(mp3_sr == 4*obj_sr)
+    {
+        x->down = -2;
+    }
+    else
+    {
+        post("mp3_play~ WARNING: playing the filesamplerate of %d Hz at %d Hz", mp3_sr,obj_sr);
+        x->down = 0;
+    }
 
-		if(mp3_encode_return == MP3_OK)
-		{
-		    x->file_is_open = 1;
-		    x->mp3_encode_size = size * sizeof(char) / sizeof(short);
-		}
-		else
-		{
-		    x->file_is_open = 0;
-		    x->mp3_out_index = 0;
-		    fclose(x->fh);
-		}
-	    }
-	    else
-	    {
-		x->file_is_open = 0;
-		fclose(x->fh);
-	    }
-	}
-	x->play_state = 2;
-	x->mp3_out_index = 0;
+    if(mp3_encode_return == MP3_OK)
+    {
+        x->file_is_open = 1;
+        x->mp3_encode_size = size * sizeof(char) / sizeof(short);
+    }
+    else
+    {
+        x->file_is_open = 0;
+        x->mp3_out_index = 0;
+        fclose(x->fh);
+    }
+      }
+      else
+      {
+    x->file_is_open = 0;
+    fclose(x->fh);
+      }
+  }
+  x->play_state = 2;
+  x->mp3_out_index = 0;
     }
 }
 
@@ -3545,199 +3545,199 @@ static t_int *sigmp3play_perform(t_int *w)
     int mp3_out_index = x->mp3_out_index;
 
     if (!x->file_is_open)
-	goto sigmp3play_labelzero;
+  goto sigmp3play_labelzero;
     if (x->play_state != 1)
-	goto sigmp3play_labelzero;
+  goto sigmp3play_labelzero;
 
     if(mp3_out_index >= x->mp3_encode_size)
     {
-	x->frame_counter++;
-	x->time1_bang0_handle = 1;
-	clock_delay(x->x_clock, 0);
-	mp3_out_index = 0;
-	mp3_encode_return = decodeMP3(&(x->mp), NULL, 0, x->mp3outbuf,
-				      MY_MP3_MALLOC_IN_SIZE2, &size);
-	if(mp3_encode_return == MP3_OK)
-	    x->mp3_encode_size = size * sizeof(char) / sizeof(short);
-	else if(mp3_encode_return == MP3_EX)
-	{
-	    sigmp3play_cleanup(x);
-	    goto sigmp3play_labelzero;
-	}
-	else
-	{
-	    if(x->file_block_num > 0)
-	    {
-		mp3_read_length = MY_MP3_MALLOC_IN_SIZE;
-		x->file_block_num--;
-	    }
-	    else if(x->file_remain > 0)
-	    {
-		mp3_read_length = x->file_remain;
-		x->file_remain = 0;
-	    }
-	    else
-	    {
-		sigmp3play_cleanup(x);
-		goto sigmp3play_labelzero;
-	    }
+  x->frame_counter++;
+  x->time1_bang0_handle = 1;
+  clock_delay(x->x_clock, 0);
+  mp3_out_index = 0;
+  mp3_encode_return = decodeMP3(&(x->mp), NULL, 0, x->mp3outbuf,
+              MY_MP3_MALLOC_IN_SIZE2, &size);
+  if(mp3_encode_return == MP3_OK)
+      x->mp3_encode_size = size * sizeof(char) / sizeof(short);
+  else if(mp3_encode_return == MP3_EX)
+  {
+      sigmp3play_cleanup(x);
+      goto sigmp3play_labelzero;
+  }
+  else
+  {
+      if(x->file_block_num > 0)
+      {
+    mp3_read_length = MY_MP3_MALLOC_IN_SIZE;
+    x->file_block_num--;
+      }
+      else if(x->file_remain > 0)
+      {
+    mp3_read_length = x->file_remain;
+    x->file_remain = 0;
+      }
+      else
+      {
+    sigmp3play_cleanup(x);
+    goto sigmp3play_labelzero;
+      }
 
-	    fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
-	    mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length,
-					  x->mp3outbuf, MY_MP3_MALLOC_IN_SIZE2, &size);
-	    x->mp3_encode_size = size * sizeof(char) / sizeof(short);
-	    if(mp3_encode_return == MP3_EX)
-	    {
-		sigmp3play_cleanup(x);
-		goto sigmp3play_labelzero;
-	    }
-	}
+      fread(x->mp3inbuf, mp3_read_length, sizeof(char), x->fh);
+      mp3_encode_return = decodeMP3(&(x->mp), x->mp3inbuf, mp3_read_length,
+            x->mp3outbuf, MY_MP3_MALLOC_IN_SIZE2, &size);
+      x->mp3_encode_size = size * sizeof(char) / sizeof(short);
+      if(mp3_encode_return == MP3_EX)
+      {
+    sigmp3play_cleanup(x);
+    goto sigmp3play_labelzero;
+      }
+  }
     }
 
     mp3_ch = x->mp3_ch;
     down = x->down;
     if(mp3_ch == 2)
     {
-	if(down == 0)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + 2*n;
-	    while (n--)
-	    {
-		*out1++ = scale * (float)(*ivec++);
-		*out2++ = scale * (float)(*ivec++);
-	    }
-	}
-	else if(down == 1)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + n;
-	    n /= 2;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		outb = scale * (float)(*ivec++);
-		*out1++ = outa;
-		*out2++ = outb;
-		*out1++ = outa;
-		*out2++ = outb;
-	    }
-	}
-	else if(down == 2)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + n/2;
-	    n /= 4;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		outb = scale * (float)(*ivec++);
-		*out1++ = outa;
-		*out2++ = outb;
-		*out1++ = outa;
-		*out2++ = outb;
-		*out1++ = outa;
-		*out2++ = outb;
-		*out1++ = outa;
-		*out2++ = outb;
-	    }
-	}
-	else if(down == -1)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + 4*n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		outb = scale * (float)(*ivec);
-		ivec += 3;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
-	else if(down == -2)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + 8*n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		outb = scale * (float)(*ivec);
-		ivec += 7;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
+  if(down == 0)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + 2*n;
+      while (n--)
+      {
+    *out1++ = scale * (float)(*ivec++);
+    *out2++ = scale * (float)(*ivec++);
+      }
+  }
+  else if(down == 1)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + n;
+      n /= 2;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    outb = scale * (float)(*ivec++);
+    *out1++ = outa;
+    *out2++ = outb;
+    *out1++ = outa;
+    *out2++ = outb;
+      }
+  }
+  else if(down == 2)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + n/2;
+      n /= 4;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    outb = scale * (float)(*ivec++);
+    *out1++ = outa;
+    *out2++ = outb;
+    *out1++ = outa;
+    *out2++ = outb;
+    *out1++ = outa;
+    *out2++ = outb;
+    *out1++ = outa;
+    *out2++ = outb;
+      }
+  }
+  else if(down == -1)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + 4*n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    outb = scale * (float)(*ivec);
+    ivec += 3;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
+  else if(down == -2)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + 8*n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    outb = scale * (float)(*ivec);
+    ivec += 7;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
     }
     else
     {
-	if(down == 0)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
-	else if(down == 1)
-	{
-	    ivec += mp3_out_index;
-	    n /= 2;
-	    x->mp3_out_index = mp3_out_index + n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		*out1++ = outa;
-		*out2++ = outa;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
-	else if(down == 2)
-	{
-	    ivec += mp3_out_index;
-	    n /= 4;
-	    x->mp3_out_index = mp3_out_index + n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec++);
-		*out1++ = outa;
-		*out2++ = outa;
-		*out1++ = outa;
-		*out2++ = outa;
-		*out1++ = outa;
-		*out2++ = outa;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
-	else if(down == -1)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + 2*n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec);
-		ivec += 2;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
-	else if(down == -2)
-	{
-	    ivec += mp3_out_index;
-	    x->mp3_out_index = mp3_out_index + 4*n;
-	    while (n--)
-	    {
-		outa = scale * (float)(*ivec);
-		ivec += 4;
-		*out1++ = outa;
-		*out2++ = outa;
-	    }
-	}
+  if(down == 0)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
+  else if(down == 1)
+  {
+      ivec += mp3_out_index;
+      n /= 2;
+      x->mp3_out_index = mp3_out_index + n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    *out1++ = outa;
+    *out2++ = outa;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
+  else if(down == 2)
+  {
+      ivec += mp3_out_index;
+      n /= 4;
+      x->mp3_out_index = mp3_out_index + n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec++);
+    *out1++ = outa;
+    *out2++ = outa;
+    *out1++ = outa;
+    *out2++ = outa;
+    *out1++ = outa;
+    *out2++ = outa;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
+  else if(down == -1)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + 2*n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec);
+    ivec += 2;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
+  else if(down == -2)
+  {
+      ivec += mp3_out_index;
+      x->mp3_out_index = mp3_out_index + 4*n;
+      while (n--)
+      {
+    outa = scale * (float)(*ivec);
+    ivec += 4;
+    *out1++ = outa;
+    *out2++ = outa;
+      }
+  }
     }
     return (w+5);
 
@@ -3745,8 +3745,8 @@ sigmp3play_labelzero:
 
     while (n--)
     {
-	*out1++ = 0;
-	*out2++ = 0;
+  *out1++ = 0;
+  *out2++ = 0;
     }
     return (w+5);
 }
@@ -3764,8 +3764,8 @@ static void sigmp3play_stop(t_sigmp3play *x)
 {
     if(x->file_is_open)
     {
-	x->file_block_num = 0;
-	x->file_remain = 0;
+  x->file_block_num = 0;
+  x->file_remain = 0;
     }
 }
 
@@ -3773,14 +3773,14 @@ static void sigmp3play_start(t_sigmp3play *x)
 {
     if(x->file_is_open)
     {
-	x->play_state = 1;
+  x->play_state = 1;
     }
 }
 
 static void sigmp3play_ft1(t_sigmp3play *x, t_floatarg offset)
 {
     if(offset < 0.0)
-	offset = 0.0;
+  offset = 0.0;
     x->offset_sec = (float)offset;
 }
 
@@ -3788,10 +3788,10 @@ static void sigmp3play_pause(t_sigmp3play *x)
 {
     if(x->file_is_open)
     {
-	if(x->play_state == 0)
-	    x->play_state = 1;
-	else if(x->play_state == 1)
-	    x->play_state = 0;
+  if(x->play_state == 0)
+      x->play_state = 1;
+  else if(x->play_state == 1)
+      x->play_state = 0;
     }
 }
 
@@ -3824,20 +3824,20 @@ static void sigmp3play_tick(t_sigmp3play *x)
 {
     if(x->time1_bang0_handle)
     {
-	outlet_float(x->x_floatout, (float)(x->frame_counter)*(x->time_factor));
+  outlet_float(x->x_floatout, (float)(x->frame_counter)*(x->time_factor));
     }
     else
     {
-	outlet_bang(x->x_bangout);
+  outlet_bang(x->x_bangout);
     }
 }
 
 static void sigmp3play_free(t_sigmp3play *x)
 {
     if(x->mp_is_init)
-	ExitMP3(&(x->mp));
+  ExitMP3(&(x->mp));
     if(x->begframeseek)
-	freebytes(x->begframeseek, (x->maxframeseek)*sizeof(int));
+  freebytes(x->begframeseek, (x->maxframeseek)*sizeof(int));
     freebytes(x->filename, MY_MP3_MALLOC_FN);
     freebytes(x->mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     freebytes(x->mp3inbuf, MY_MP3_MALLOC_IN_SIZE);
@@ -3847,11 +3847,11 @@ static void sigmp3play_free(t_sigmp3play *x)
 void sigmp3play_setup(void)
 {
     sigmp3play_class = class_new(gensym("mp3play~"), (t_newmethod)sigmp3play_new,
-				 (t_method)sigmp3play_free, sizeof(t_sigmp3play), 0, 0);
+         (t_method)sigmp3play_free, sizeof(t_sigmp3play), 0, 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_dsp, gensym("dsp"), 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_start, gensym("start"), 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_ft1,
-		    gensym("ft1"), A_FLOAT, 0);
+        gensym("ft1"), A_FLOAT, 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_stop, gensym("stop"), 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_pause, gensym("pause"), 0);
     class_addmethod(sigmp3play_class, (t_method)sigmp3play_open_again_at, gensym("open_again_at"), 0);
@@ -3862,4 +3862,3 @@ void sigmp3play_setup(void)
     /*post("\nmp3play~ written by thomas musil & norbert math\nV 0.1 iem graz
      austria 05 2000\n");*/
 }
-

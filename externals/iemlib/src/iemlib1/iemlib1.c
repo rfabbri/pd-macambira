@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iemlib1 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -16,9 +16,9 @@ static t_class *iemlib1_class;
 
 static void *iemlib1_new(void)
 {
-	t_object *x = (t_object *)pd_new(iemlib1_class);
-
-	return (x);
+  t_object *x = (t_object *)pd_new(iemlib1_class);
+  
+  return (x);
 }
 
 void biquad_freq_resp_setup(void);
@@ -50,33 +50,34 @@ void v2db_setup(void);
 
 void iemlib1_setup(void)
 {
-	iemlib1_class = class_new(gensym("iemlib1"), iemlib1_new, 0,
-		sizeof(t_object), CLASS_NOINLET, 0);
-
-	biquad_freq_resp_setup();
-	db2v_setup();
-	f2note_setup();
-	forpp_setup();
-	gate_setup();
-	sigfilter_setup();
-	sigFIR_setup();
-	sighml_shelf_setup();
-	sigiem_cot4_setup();
-	sigiem_delay_setup();
-	sigiem_sqrt4_setup();
-	sigiem_pow4_setup();
-	siglp1_t_setup();
-	sigmov_avrg_kern_setup();
-	sigpara_bp2_setup();
-	sigpeakenv_setup();
-	sigprvu_setup();
-	sigpvu_setup();
-	sigrvu_setup();
-	sigsin_phase_setup();
-	sigvcf_filter_setup();
-	soundfile_info_setup();
-	split_setup();
-	v2db_setup();
-
-	post("iemlib1 (R-1.15) library loaded!");
+  iemlib1_class = class_new(gensym("iemlib1"), iemlib1_new, 0,
+    sizeof(t_object), CLASS_NOINLET, 0);
+  
+  biquad_freq_resp_setup();
+  db2v_setup();
+  f2note_setup();
+  forpp_setup();
+  gate_setup();
+  sigfilter_setup();
+  sigFIR_setup();
+  sighml_shelf_setup();
+  sigiem_cot4_setup();
+  sigiem_delay_setup();
+  sigiem_sqrt4_setup();
+  sigiem_pow4_setup();
+  siglp1_t_setup();
+  sigmov_avrg_kern_setup();
+  sigpara_bp2_setup();
+  sigpeakenv_setup();
+  sigprvu_setup();
+  sigpvu_setup();
+  sigrvu_setup();
+  sigsin_phase_setup();
+  sigvcf_filter_setup();
+  soundfile_info_setup();
+  split_setup();
+  v2db_setup();
+  
+	post("iemlib1 (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
