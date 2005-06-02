@@ -1,5 +1,21 @@
-iemlib Release 1.15:
+************************************************************
+iemlib Release 1.16:
+____________________________________________________________
+improvements:
 
+the linux-compile-bugs are fixed.
+
+any, iem_anything, iem_append, merge_any, 
+pp, iem_prepend, prepend, 
+iem_send, iem_s, receive2list,
+iem_receive, iem_r
+  are abstractions using kernel-externals.
+You cannot open these abstractions now.
+
+
+************************************************************
+iemlib Release 1.15:
+____________________________________________________________
 
 improvements:
 
