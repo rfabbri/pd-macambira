@@ -1,4 +1,4 @@
-#N canvas 402 159 302 241 10;
+#N canvas 402 159 306 245 10;
 #X obj 10 71 symbol;
 #X msg 10 44 blabla;
 #X obj 10 99 print a;
@@ -10,9 +10,12 @@
 #X text 72 17 to an anything selector;
 #X text 2 4 unsymbol: converts a symbol;
 #X text 225 100 no arg.;
-#X text 10 161 (c) musil@iem.kug.ac.at;
-#X text 52 174 IEM KUG;
-#X text 27 186 graz \, austria 2001;
+#X text 105 188 IEM KUG;
+#X text 89 176 musil;
+#X text 119 176 @;
+#X text 125 176 iem.at;
+#X text 40 165 (c) Thomas Musil 2000 - 2005;
+#X text 88 198 Graz \, Austria;
 #X connect 0 0 2 0;
 #X connect 1 0 0 0;
 #X connect 3 0 7 0;

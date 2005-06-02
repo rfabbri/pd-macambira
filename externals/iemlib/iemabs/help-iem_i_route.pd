@@ -1,4 +1,4 @@
-#N canvas 167 225 749 365 10;
+#N canvas 167 225 753 369 10;
 #X floatatom 25 136 4 0 0 0 - - -;
 #X obj 25 161 iem_i_route 3 7;
 #X obj 25 197 bng 15 250 50 0 empty empty empty 20 8 0 10 -262144 -1
@@ -69,14 +69,17 @@
 #X obj 718 47 - 8;
 #X text 53 39 1.arg: <int> first route-item;
 #X text 53 52 2.arg: <int> last route-item;
-#X text 60 304 IEM KUG;
-#X text 33 290 (c) musil@iem.at;
-#X text 35 316 graz \, austria 2003;
 #X text 11 8 iem_i_route;
 #X text 102 8 route only list with prepending floats (integers);
 #X text 215 76 (opt. \, default 0);
 #X text 53 64 3.arg: <int> offset \, adding to first and last;
 #X obj 562 62 - 5;
+#X text 76 305 IEM KUG;
+#X text 60 293 musil;
+#X text 90 293 @;
+#X text 96 293 iem.at;
+#X text 11 282 (c) Thomas Musil 2000 - 2005;
+#X text 59 315 Graz \, Austria;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 1 1 3 0;
@@ -102,7 +105,7 @@
 #X connect 21 0 22 0;
 #X connect 24 0 25 0;
 #X connect 24 1 26 0;
-#X connect 24 2 59 0;
+#X connect 24 2 56 0;
 #X connect 25 0 27 0;
 #X connect 26 0 25 1;
 #X connect 27 0 38 0;
@@ -129,4 +132,4 @@
 #X connect 47 0 27 0;
 #X connect 48 0 47 1;
 #X connect 49 0 47 2;
-#X connect 59 0 25 2;
+#X connect 56 0 25 2;

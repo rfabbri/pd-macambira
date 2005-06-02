@@ -1,7 +1,5 @@
-#N canvas 152 8 561 548 10;
+#N canvas 152 8 565 552 10;
 #X text 109 239 ~signal_in~;
-#X text 12 499 (c) musil@iem.kug.ac.at;
-#X text 54 512 IEM KUG;
 #X text 38 33 dsp ON/OFF;
 #X floatatom 191 175 5 0 1005 0 - - -;
 #X text 172 273 ~signal_out~;
@@ -10,9 +8,8 @@
 #X floatatom 231 225 5 2 9999 0 - - -;
 #X text 273 226 ms;
 #X obj 21 53 dsp;
-#X obj 21 33 tgl 15 0 empty empty empty 8 -8 0 10 -262144 -1 -1 1 1
+#X obj 21 33 tgl 15 0 empty empty empty 8 -8 0 10 -262144 -1 -1 0 1
 ;
-#X text 29 524 graz \, austria 2001;
 #X text 292 265 2.arg:<float> interpolation_time [ms];
 #X text 234 174 ms;
 #X obj 152 255 lp1_t~ 0.5 200;
@@ -40,17 +37,23 @@
 #X obj 13 13 cnv 8 1 1 empty empty lp1_t~ 1 2 1 18 -262144 -1109 0
 ;
 #X text 102 8 lowpass 1.order with time_constant-inlet;
-#X connect 4 0 15 1;
-#X connect 8 0 15 2;
-#X connect 10 0 6 0;
-#X connect 11 0 10 0;
-#X connect 15 0 23 0;
-#X connect 19 0 20 0;
-#X connect 19 0 21 0;
-#X connect 19 0 32 0;
-#X connect 20 0 23 0;
-#X connect 21 0 15 0;
-#X connect 24 0 4 0;
-#X connect 25 0 4 0;
-#X connect 26 0 4 0;
-#X connect 28 0 27 0;
+#X text 106 495 IEM KUG;
+#X text 90 483 musil;
+#X text 120 483 @;
+#X text 126 483 iem.at;
+#X text 41 472 (c) Thomas Musil 2000 - 2005;
+#X text 89 505 Graz \, Austria;
+#X connect 2 0 12 1;
+#X connect 6 0 12 2;
+#X connect 8 0 4 0;
+#X connect 9 0 8 0;
+#X connect 12 0 20 0;
+#X connect 16 0 17 0;
+#X connect 16 0 18 0;
+#X connect 16 0 29 0;
+#X connect 17 0 20 0;
+#X connect 18 0 12 0;
+#X connect 21 0 2 0;
+#X connect 22 0 2 0;
+#X connect 23 0 2 0;
+#X connect 25 0 24 0;

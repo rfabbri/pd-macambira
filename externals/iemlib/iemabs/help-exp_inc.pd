@@ -1,4 +1,4 @@
-#N canvas 117 75 606 470 10;
+#N canvas 117 75 610 474 10;
 #X msg 23 256 reset;
 #X obj 64 255 bng 15 250 50 0 empty empty empty 8 -8 0 10 -262144 -1
 -1;
@@ -51,6 +51,12 @@
 #X text 194 182 3.arg: <float> absolute increment;
 #X text 196 194 4.arg: <float> min-val;
 #X text 196 205 5.arg: <float> max-val;
+#X text 454 414 IEM KUG;
+#X text 438 402 musil;
+#X text 468 402 @;
+#X text 474 402 iem.at;
+#X text 389 391 (c) Thomas Musil 2000 - 2005;
+#X text 437 424 Graz \, Austria;
 #X connect 0 0 41 0;
 #X connect 1 0 41 0;
 #X connect 2 0 41 1;

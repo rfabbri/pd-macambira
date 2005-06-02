@@ -1,4 +1,4 @@
-contents of iemlib Release 1.15 from December 2003
+contents of iemlib Release 1.16 from May 2005
 
 ============================ DSP~ ===============================
 
@@ -131,11 +131,12 @@ iem_prepend	 prepend a message to any messages (abbr. pp or prepend)
 
 -------------------------- init -------------------------------
 default		 replace initial-argument, if it is zero
-dollarg		 receive parent initial-arguments (abbr. $n)
+dollarg		 output parent initial-arguments (abbr. $n)
 dsp		 control audio-engine, calculate dsp-performance (aka. dsp~)
 float24		 store a 24-bit accurate float-number
 init		 initialize a message via loadbang (abbr. ii)
 once		 any message pass through only the first time
+parentdollarzero output parent $0-unique symbol (abbr. parent$0 )
 
 ------------------------- counter -----------------------------
 exp_inc		 exponential increment counter (bang triggered)

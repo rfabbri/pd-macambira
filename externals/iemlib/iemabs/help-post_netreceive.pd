@@ -1,4 +1,4 @@
-#N canvas 153 56 742 548 10;
+#N canvas 153 56 750 556 10;
 #X msg 4 186 clear;
 #X floatatom 33 95 5 0 0 0 - - -;
 #X obj 82 124 pp 1;
@@ -14,12 +14,12 @@
 #X obj 108 344 r ccccc;
 #X obj 305 62 loadbang;
 #X text 37 39 to sended messages without this float-index;
-#X obj 135 421 nbx 5 28 -1e+037 1e+037 0 0 aaa aaa aaa -68 13 192 28
--225280 -1109 -260818 21 256;
-#X obj 135 457 nbx 5 28 -1e+037 1e+037 0 0 bbbb bbbb bbbb -88 13 192
-28 -225280 -1109 -260818 22 256;
+#X obj 135 421 nbx 5 28 -1e+037 1e+037 0 0 aaa aaa aaa -68 13 0 28
+-225280 -1109 -260818 0 256;
+#X obj 135 457 nbx 5 28 -1e+037 1e+037 0 0 bbbb bbbb bbbb -88 13 0
+28 -225280 -1109 -260818 0 256;
 #X obj 135 492 nbx 5 28 -1e+037 1e+037 0 0 ccccc ccccc ccccc -110 13
-192 28 -225280 -1109 -260818 23 256;
+0 28 -225280 -1109 -260818 0 256;
 #X msg 295 112 bbbb 1;
 #X msg 287 89 aaa 0;
 #X msg 481 186 fetch_all_parameters 3;
@@ -33,7 +33,7 @@
 #X obj 186 131 pp 3;
 #X obj 182 368 unpack;
 #X floatatom 221 394 5 0 0 0 - - -;
-#X obj 382 392 vu 15 120 vu_level empty 35 8 64 8 -66577 -1 1 0;
+#X obj 382 392 vu 15 120 vu_level empty 35 8 0 8 -66577 -1 1 0;
 #X floatatom 15 393 5 0 0 0 - - -;
 #X floatatom 61 392 5 0 0 0 - - -;
 #X floatatom 108 392 5 0 0 0 - - -;
@@ -64,6 +64,13 @@
 #X text 15 73 to the corresp. send-sym;
 #X text 361 57 set_item_name: send-symbol + para-index;
 #X msg 348 110 ccccc 2;
+#X text 546 491 IEM KUG;
+#X text 530 479 musil;
+#X text 560 479 @;
+#X text 566 479 iem.at;
+#X text 481 468 (c) Thomas Musil 2000 - 2005;
+#X text 529 501 Graz \, Austria;
+#X text 145 5 obsolete \, replaced by list2receive;
 #X connect 0 0 35 0;
 #X connect 1 0 5 0;
 #X connect 2 0 35 0;

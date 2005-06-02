@@ -1,4 +1,4 @@
-#N canvas 194 199 775 613 10;
+#N canvas 194 199 779 617 10;
 #X obj 21 148 bng 15 250 50 0 empty empty empty 20 8 0 10 -262144 -1
 -1;
 #X obj 48 148 bng 15 250 50 0 empty empty empty 20 8 0 10 -262144 -1
@@ -41,7 +41,6 @@
 #X obj 90 400 any;
 #X obj 27 342 bang;
 #X obj 27 366 del 999;
-#X text 63 532 IEM KUG;
 #X msg 620 205 88;
 #X msg 619 281 symbol www;
 #X msg 619 224 float 77;
@@ -64,10 +63,7 @@
 #X text 296 9 (like f or float for <float>-messages);
 #X text 131 9 is a latch for anything;
 #X obj 229 376 del 4999;
-#X text 32 520 (c) musil@iem.at;
-#X text 38 544 graz \, austria 2003;
 #X text 298 19 (or like symbol for <symbol>-messages);
-#X text 23 11 iem_anything;
 #X obj 104 85 iem_anything;
 #X text 195 85 arguments: any message;
 #X text 96 67 <-hot;
@@ -78,10 +74,17 @@
 #X obj 89 175 any www;
 #X obj 137 175 any symbol www;
 #X obj 292 175 any set 88;
-#X connect 0 0 66 0;
-#X connect 1 0 67 0;
-#X connect 3 0 68 0;
-#X connect 4 0 70 0;
+#X text 184 524 IEM KUG;
+#X text 168 512 musil;
+#X text 198 512 @;
+#X text 204 512 iem.at;
+#X text 119 501 (c) Thomas Musil 2000 - 2005;
+#X text 167 534 Graz \, Austria;
+#X text 23 11 iem_any;
+#X connect 0 0 62 0;
+#X connect 1 0 63 0;
+#X connect 3 0 64 0;
+#X connect 4 0 66 0;
 #X connect 7 0 8 0;
 #X connect 8 0 6 0;
 #X connect 9 0 30 0;
@@ -89,7 +92,7 @@
 #X connect 13 0 31 0;
 #X connect 14 0 31 0;
 #X connect 15 0 31 0;
-#X connect 16 0 69 0;
+#X connect 16 0 65 0;
 #X connect 17 0 31 0;
 #X connect 18 0 31 0;
 #X connect 19 0 31 0;
@@ -106,8 +109,9 @@
 #X connect 31 0 12 0;
 #X connect 32 0 27 0;
 #X connect 33 0 34 0;
-#X connect 33 0 56 0;
+#X connect 33 0 55 0;
 #X connect 34 0 32 0;
+#X connect 35 0 31 1;
 #X connect 36 0 31 1;
 #X connect 37 0 31 1;
 #X connect 38 0 31 1;
@@ -120,18 +124,17 @@
 #X connect 45 0 31 1;
 #X connect 46 0 31 1;
 #X connect 47 0 31 1;
-#X connect 48 0 31 1;
-#X connect 49 0 31 0;
+#X connect 48 0 31 0;
+#X connect 49 0 31 1;
 #X connect 50 0 31 1;
-#X connect 51 0 31 1;
-#X connect 52 0 33 0;
-#X connect 52 0 32 1;
-#X connect 52 0 53 0;
-#X connect 53 0 29 0;
-#X connect 56 0 29 0;
-#X connect 66 0 2 0;
-#X connect 67 0 2 0;
-#X connect 68 0 2 0;
-#X connect 69 0 2 0;
-#X connect 70 0 5 0;
-#X connect 70 0 6 0;
+#X connect 51 0 33 0;
+#X connect 51 0 32 1;
+#X connect 51 0 52 0;
+#X connect 52 0 29 0;
+#X connect 55 0 29 0;
+#X connect 62 0 2 0;
+#X connect 63 0 2 0;
+#X connect 64 0 2 0;
+#X connect 65 0 2 0;
+#X connect 66 0 5 0;
+#X connect 66 0 6 0;

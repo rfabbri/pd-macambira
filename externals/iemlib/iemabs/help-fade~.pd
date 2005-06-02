@@ -1,4 +1,4 @@
-#N canvas 184 90 590 534 10;
+#N canvas 184 90 594 538 10;
 #X obj 93 163 line~;
 #X obj 16 85 dsp;
 #X floatatom 16 112 5 0 0 0 - - -;
@@ -17,9 +17,6 @@
 #X obj 93 242 fade~ _lin;
 #X obj 283 14 loadbang;
 #X text 332 459 Samples;
-#X text 229 259 (c) musil@iem.kug.ac.at;
-#X text 271 272 IEM KUG;
-#X text 246 284 graz \, austria 2001;
 #X text 11 6 fade~ a special signal waveshaper;
 #X text 59 19 input-range: 0 .. 1;
 #N canvas 0 0 452 302 graph1 0;
@@ -29,6 +26,12 @@
 #X msg 282 39 \; array99 resize 442 \; array99 bounds 0 1 441 0 \;
 array99 xticks 0 100 5 \; array99 yticks 0 0.1 5 \; array99 xlabel
 -0.08 0 100 200 300 400 \; array99 ylabel -15.1 0 0.5 1;
+#X text 354 264 IEM KUG;
+#X text 338 252 musil;
+#X text 368 252 @;
+#X text 374 252 iem.at;
+#X text 289 241 (c) Thomas Musil 2000 - 2005;
+#X text 337 274 Graz \, Austria;
 #X connect 0 0 14 0;
 #X connect 1 0 2 0;
 #X connect 3 0 1 0;
@@ -44,4 +47,4 @@ array99 xticks 0 100 5 \; array99 yticks 0 0.1 5 \; array99 xlabel
 #X connect 12 0 14 0;
 #X connect 13 0 14 0;
 #X connect 14 0 4 0;
-#X connect 15 0 23 0;
+#X connect 15 0 20 0;

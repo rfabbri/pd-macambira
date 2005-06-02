@@ -1,4 +1,4 @@
-#N canvas 24 9 930 567 10;
+#N canvas 24 9 934 571 10;
 #X obj 188 46 pp 0;
 #X floatatom 188 23 5 0 0 0 - - -;
 #X floatatom 224 31 5 0 0 0 - - -;
@@ -103,6 +103,12 @@
 #X text 38 355 output input-buffer;
 #X msg 387 168 recall 3 2;
 #X obj 130 424 print zzz;
+#X text 136 525 IEM KUG;
+#X text 120 513 musil;
+#X text 150 513 @;
+#X text 156 513 iem.at;
+#X text 71 502 (c) Thomas Musil 2000 - 2005;
+#X text 119 535 Graz \, Austria;
 #X connect 0 0 73 0;
 #X connect 1 0 0 0;
 #X connect 2 0 6 0;

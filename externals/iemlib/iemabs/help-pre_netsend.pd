@@ -1,4 +1,4 @@
-#N canvas 59 233 591 312 10;
+#N canvas 59 233 595 316 10;
 #X msg 294 123 clear;
 #X obj 369 51 loadbang;
 #X obj 340 173 pre_netsend 80;
@@ -21,13 +21,21 @@
 #X text 99 2 receive messages without prepended float-index and;
 #X text 87 15 convert to message-lists with a prepended float-index
 ;
-#X obj 125 77 nbx 5 28 -1e+037 1e+037 0 0 aaa aaa aaa -68 13 192 28
--225280 -1109 -260818 0 256;
-#X obj 125 113 nbx 5 28 -1e+037 1e+037 0 0 bbbb bbbb bbbb -88 13 192
+#X obj 125 77 nbx 5 28 -1e+037 1e+037 0 0 aaa aaa aaa -68 13 0 28 -225280
+-1109 -260818 0 256;
+#X obj 125 113 nbx 5 28 -1e+037 1e+037 0 0 bbbb bbbb bbbb -88 13 0
 28 -225280 -1109 -260818 0 256;
 #X obj 125 148 nbx 5 28 -1e+037 1e+037 0 0 ccccc ccccc ccccc -110 13
-192 28 -225280 -1109 -260818 0 256;
+0 28 -225280 -1109 -260818 0 256;
 #X text 305 35 set_item_name: receive-symbol + para-index;
+#X text 115 278 IEM KUG;
+#X text 99 266 musil;
+#X text 129 266 @;
+#X text 135 266 iem.at;
+#X text 50 255 (c) Thomas Musil 2000 - 2005;
+#X text 98 288 Graz \, Austria;
+#X text 447 1 obsolete \, replaced by;
+#X text 474 13 receive2list;
 #X connect 0 0 2 0;
 #X connect 1 0 15 0;
 #X connect 1 0 16 0;

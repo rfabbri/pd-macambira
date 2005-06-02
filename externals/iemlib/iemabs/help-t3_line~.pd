@@ -1,7 +1,7 @@
-#N canvas 124 45 501 580 10;
+#N canvas 124 45 505 584 10;
 #N canvas 0 0 450 300 graph1 0;
 #X array array99 259 float 0;
-#X coords 0 1 258 0 256 140 1;
+#X coords 0 0 258 1 256 140 1;
 #X restore 97 36 graph;
 #X obj 64 239 bng 25 250 50 0 empty empty empty 8 -8 0 10 -262144 -1
 -1;
@@ -20,7 +20,7 @@
 #X obj 101 220 init 80;
 #X obj 129 332 init 30;
 #X obj 243 448 loadbang;
-#X obj 14 38 tgl 15 1 empty empty empty 20 8 0 10 -262144 -1 -1 1 1
+#X obj 14 38 tgl 15 0 empty empty empty 20 8 0 10 -262144 -1 -1 1 1
 ;
 #X floatatom 14 105 5 0 0 0 - - -;
 #X floatatom 30 83 3 0 0 0 - - -;
@@ -54,9 +54,13 @@ array99 xticks 0 64 2 \; array99 yticks 0 0.1 5 \; array99 xlabel -0.08
 0 64 128 192 256 \; array99 ylabel -9.1 0 0.5 1;
 #X obj 386 39 loadbang;
 #X text 364 178 Samples;
-#X text 325 455 (c) musil@iem.kug.ac.at;
-#X text 367 468 IEM KUG;
-#X text 342 480 graz \, austria 2001;
+#X text 375 478 IEM KUG;
+#X text 359 466 musil;
+#X text 389 466 @;
+#X text 395 466 iem.at;
+#X text 310 455 (c) Thomas Musil 2000 - 2005;
+#X text 358 488 Graz \, Austria;
+#X text 310 443 (c) Gerhard Eckel;
 #X connect 1 0 2 0;
 #X connect 1 0 4 0;
 #X connect 2 0 12 0;

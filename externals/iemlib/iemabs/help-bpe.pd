@@ -1,4 +1,4 @@
-#N canvas 112 77 526 445 10;
+#N canvas 112 77 530 449 10;
 #X obj 118 183 bng 15 250 50 0 empty empty empty 8 -8 0 10 -262144
 -1 -1;
 #X obj 365 93 bng 15 250 50 0 empty empty empty 8 -8 0 10 -262144 -1
@@ -20,9 +20,6 @@
 #X obj 365 295 timer;
 #X obj 365 317 * 0.01;
 #X obj 274 268 t f b;
-#X text 103 373 (c) musil@iem.kug.ac.at;
-#X text 145 386 IEM KUG;
-#X text 120 398 graz \, austria 2001;
 #X text 85 207 outlet 1 and 2: pair of value and time in ms;
 #X text 135 182 outlet 3: bang: end of envelope;
 #X obj 57 148 bpe _______;
@@ -30,17 +27,23 @@
 #X msg 78 113 stop;
 #X obj 57 209 pack;
 #X text 106 112 stops envelope;
+#X text 184 414 IEM KUG;
+#X text 168 402 musil;
+#X text 198 402 @;
+#X text 204 402 iem.at;
+#X text 119 391 (c) Thomas Musil 2000 - 2005;
+#X text 167 424 Graz \, Austria;
 #X connect 1 0 12 0;
-#X connect 1 0 20 0;
-#X connect 2 0 20 0;
+#X connect 1 0 17 0;
+#X connect 2 0 17 0;
 #X connect 10 0 3 0;
 #X connect 10 0 14 0;
 #X connect 12 0 13 0;
 #X connect 13 0 11 1;
 #X connect 14 0 11 0;
 #X connect 14 1 12 1;
-#X connect 20 0 23 0;
-#X connect 20 1 23 1;
-#X connect 20 2 0 0;
-#X connect 22 0 20 0;
-#X connect 23 0 10 0;
+#X connect 17 0 20 0;
+#X connect 17 1 20 1;
+#X connect 17 2 0 0;
+#X connect 19 0 17 0;
+#X connect 20 0 10 0;
