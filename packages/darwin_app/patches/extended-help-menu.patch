@@ -1,0 +1,42 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+retrieving revision 1.9
+diff -u -w -r1.9 u_main.tk
+--- u_main.tk	18 May 2005 04:28:51 -0000	1.9
++++ u_main.tk	23 May 2005 17:18:36 -0000
+@@ -531,6 +531,34 @@
+ 	 doc_submenu $mbar.$helpmenuname 4.fft.examples
+ 	 doc_submenu $mbar.$helpmenuname 5.reference
+ 	 doc_submenu $mbar.$helpmenuname 6.externs
++    $mbar.$helpmenuname add separator
++    doc_submenu $mbar.$helpmenuname 7.stuff/audio-playpen
++    doc_submenu $mbar.$helpmenuname 7.stuff/data-structures
++    doc_submenu $mbar.$helpmenuname 7.stuff/pd-msg
++    doc_submenu $mbar.$helpmenuname 7.stuff/soundfile-tools
++    doc_submenu $mbar.$helpmenuname 7.stuff/synth
++    doc_submenu $mbar.$helpmenuname 7.stuff/tools
++    $mbar.$helpmenuname add separator
++    $mbar.$helpmenuname add command -label {Gem manual...} \
++             -command {menu_doc_open doc/Gem/00.manual index.html} 
++    $mbar.$helpmenuname add separator
++    $mbar.$helpmenuname add command -label {RRADical manual...} \
++             -command {menu_doc_open doc/rradical rradicalpd.html} 
++    doc_submenu $mbar.$helpmenuname rradical
++    $mbar.$helpmenuname add separator
++    $mbar.$helpmenuname add command -label {Building Drums in Pd...} \
++             -command {menu_doc_open doc/tutorials/footils/pddrums pddrums.html} 
++    doc_submenu $mbar.$helpmenuname tutorials/footils/pddrums
++    doc_submenu $mbar.$helpmenuname abstractions/footils/angriff
++    $mbar.$helpmenuname add separator
++    $mbar.$helpmenuname add command -label {serendiPd info...} \
++             -command {menu_doc_open doc/serendipd home.html} 
++    $mbar.$helpmenuname add command -label {serendiPd client} \
++             -command {menu_doc_open doc/serendipd serendiPd-gui.pd} 
++    $mbar.$helpmenuname add command -label {serendiPd server} \
++             -command {menu_doc_open doc/serendipd serendiPd-server.pd} 
++    $mbar.$helpmenuname add separator
++    doc_submenu $mbar.$helpmenuname tutorials/playnow
+ }
+ 
+ #################### the "File" menu for the Pd window ##############

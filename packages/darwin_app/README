@@ -4,8 +4,8 @@
 
 Since currently, only Miller has commit permissions to the 'pd' section of the
 CVS, the fixes necessary for building the whole Pd.app are included in
-'packages/darwin_app/patches'.  The necessary patches are automatically applied
-by 'packages/darwin_app/Makefile' before building the sources in 'pd/src'
+'packages/darwin_app/patches'.  The patches can be applied by running "make
+darwin_patch_pd" or unpatched using "make darwin_unpatch_pd".
 
 
 ==============================================================================
@@ -20,7 +20,7 @@ Tcl/Tk Standalone .app
 
   1. download TclTkAquaStandalone-8.4.*.dmg from http://tcltkaqua.sourceforge.net/
   	  (I used 8.4.9)		  
-  2. mount the dmg manually or put TclTkAquaStandalone-8.4.*.dmg in
+  2. mount the dmg manually, or, put TclTkAquaStandalone-8.4.*.dmg in
   	  packages/darwin_app and it will be automatically mounted
   3. the Makefile will find what it needs in the mounted .dmg
 
@@ -32,6 +32,10 @@ Tcl/Tk Frameworks
 ______________________________
 JackOSX 
 ______________________________
+
+Jack is optional.  The current linking method causes the resulting binary to
+require the Jack.framework to start whether or not you are using Jack.
+Ideally with would be fixed...
 
   1. download latest JackOSX from http://www.jackosx.com/download.html 
   	  (I used version 0.6.1)
@@ -46,6 +50,13 @@ You will need all this stuff from CVS:
 	 cvs co doc
 	 cvs co externals
 	 cvs co packages
+
+either get Pd core from CVS:
+	 cvs co pd
+
+or untar a tarball:
+	 tar xzf pd-0.38-4.src.tar.gz
+	 ln -s pd-0.38-4 pd
 	 
 ______________________________
 making the Pd.app

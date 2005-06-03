@@ -27,11 +27,11 @@ PWD = $(shell pwd)
 PD_MAJOR_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 1)
 PD_MINOR_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 2)
 PD_BUGFIX_VERSION = $(shell /usr/bin/grep 'Pd version' ../../pd/src/s_main.c | /usr/bin/cut -d '\\' -f 1 | /usr/bin/cut -d ' ' -f 6 | /usr/bin/cut -d '.' -f 3)
-PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
+PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION)-$(PD_BUGFIX_VERSION)
 
 # release version for this distro
-PACKAGE_VERSION = hcs0
-PACKAGE_NAME = pd-$(PD_VERSION)-$(PACKAGE_VERSION)
+PACKAGE_VERSION = extended-RC1
+PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 DMG_NAME = $(PACKAGE_NAME)
 
 # in retrospect, I think this is a bad way to do it.
@@ -59,7 +59,7 @@ GEM_VERSION = $(shell grep "GEM_VERSION" ../../Gem/src/Base/GemVersion.h | cut -
 
 MAXLIB_VERSION = $(shell grep "define VERSION" ../../externals/maxlib/maxlib.c | cut -d '"' -f 2)
 
-OSC_VERSION = $(shell grep "define VERSION" ../../externals/OSCx/OSC.c | cut -d '"' -f 2)
+OSC_VERSION = $(shell grep "define VERSION" ../../externals/OSCx/src/OSC.c | cut -d '"' -f 2)
 
 PDP_VERSION = $(shell grep PDP_VERSION= ../../externals/pdp/configure | cut -d '=' -f 2)
 
@@ -79,7 +79,7 @@ darwin_app: darwin_app_wrapper darwin_app_core darwin_prebuilt_app
 # just want to fill it with goodies from CVS.  To do so, place your 
 # Pd.app in installroot/Applications/Pd.app
 darwin_prebuilt_app: darwin_app_externals darwin_app_docs \
-	 darwin_app_abstractions darwin_app_doc_format
+	darwin_app_abstractions darwin_app_doc_format darwin_app_noncvs 
 
 darwin_app_license:
   # generate HTML version of License
@@ -145,7 +145,7 @@ darwin_app_readme:
 # check here for a reference on how to do this:
 # http://cvs.sourceforge.net/viewcvs.py/tkcvs/tkcvs-proj/PackApp?rev=1.4
 darwin_app_wrapper:
-	-hdiutil mount $(TCLTK).dmg
+	test -d /Volumes/$(TCLTK) || hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(DESTDIR)$(PD_APP_CONTENTS)/MacOS"
@@ -172,14 +172,13 @@ darwin_patch_pd:
 #	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/socket.patch
 #	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/u_main.tk.patch
 	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/darwin_build-0.38.patch
+	cd ../../pd/src/ && patch -p0 < ../../packages/darwin_app/patches/extended-help-menu.patch
 	rm ../../pd/src/configure  ../../pd/src/makefile
 	cd  ../../pd/src/ && autoconf
 
 darwin_app_core: darwin_app_wrapper
 # pd core
-#	cd ../../pd/src/ && \
-#		./configure --enable-jack --prefix=$(INSTALL_PREFIX) && make
-	cd ../../pd/src/ && ./configure --enable-jack && make
+	cd ../../pd/src/ && ./configure && make
 	cp -Rp ../../pd/bin ../../pd/doc ../../pd/extra ../../pd/man  \
 		$(PD_FILE_ROOT)
 # AppMain.tcl
@@ -241,13 +240,50 @@ darwin_app_abstractions:
 #----------------------------------------------------------------------------
 # ABSTRACTIONS
 	install -d $(ABSTRACTIONS_DIR)
-# creb
-	install -p -m0444	../../externals/creb/abs/*.pd $(ABSTRACTIONS_DIR)
-	cd $(ABSTRACTIONS_DIR) && rm -f count.pd
-	install -d $(ABSTRACTIONS_DIR)/creb
-	install -p -m0444	../../externals/creb/doc/examples/*.* $(ABSTRACTIONS_DIR)/creb
+# audionerd
+	cp -Rp ../../abstractions/audionerd $(ABSTRACTIONS_DIR)
+# footils
+	cp -Rp ../../abstractions/footils $(ABSTRACTIONS_DIR)
+# keyboardkeys
+	cp -Rp ../../abstractions/keyboardkeys $(ABSTRACTIONS_DIR)
+#----------------------------------------------------------------------------
+# EXTERNALS written in Pd
+# RRADical
+	cp -Rp ../../abstractions/rradical $(EXTERNALS_DIR)
+	cp -Rp ../../abstractions/rradical/doc $(HELP_DIR)/rradical
+# footils
+	install -p ../../abstractions/footils/softtakeover/sto-help.pd \
+		$(HELP_DIR)/5.reference
+	install -p ../../abstractions/footils/softtakeover/sto.pd $(EXTERNALS_DIR)
+# fft_convolution
+	install -p ../../abstractions/fft_convolution/*-help.pd \
+		$(HELP_DIR)/5.reference
+	install -p -m0644 $(shell ls -1 ../../abstractions/fft_convolution/*.pd | \
+		grep -v '\-help.pd') $(EXTERNALS_DIR)
+# La-kitchen
+	install -d $(HELP_DIR)/5.reference/La-kitchen
+	install -p ../../abstractions/La-kitchen/*-help.pd \
+		$(HELP_DIR)/5.reference/La-kitchen
+	install -d $(EXTERNALS_DIR)/La-kitchen
+	install -p -m0644 $(shell ls -1 ../../abstractions/La-kitchen/*.pd | \
+		grep -v '\-help.pd') $(EXTERNALS_DIR)/La-kitchen
+# nusmuk
+	install -d $(HELP_DIR)/5.reference/nusmuk
+	install -p ../../abstractions/nusmuk/*-help.pd \
+		$(HELP_DIR)/5.reference/nusmuk
+	install -d $(EXTERNALS_DIR)/nusmuk
+	install -p -m0644 $(shell ls -1 ../../abstractions/nusmuk/*.pd | \
+		grep -v '\-help.pd') $(EXTERNALS_DIR)/nusmuk
+# timestretch~
+	install -p ../../abstractions/timestretch/*-help.pd \
+		$(HELP_DIR)/5.reference
+	install -p -m0644 $(shell ls -1 ../../abstractions/timestretch/*.pd | \
+		grep -v '\-help.pd') $(EXTERNALS_DIR)
+# vadsr~
+	install -p ../../abstractions/vadsr~/vadsr-test.pd \
+		$(HELP_DIR)/5.reference/vadsr~-help.pd
+	install -p ../../abstractions/vadsr~/vadsr~.pd $(EXTERNALS_DIR)
 
-#	cp -Rf footils timestretch vadsr~  $(ABSTRACTIONS_DIR)
 
 darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++
 #darwin_app_externals: darwin_app_externals_flext darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
@@ -339,6 +375,12 @@ darwin_app_externals_standard:
 	-cd ../../externals/build/darwin && make -k
 	install -d $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/build/darwin/*.pd_darwin $(EXTERNALS_DIR)
+# creb
+	install -d $(EXTERNALS_DIR)/creb
+	install -p -m0644	../../externals/creb/abs/*.pd $(EXTERNALS_DIR)/creb
+	install -d $(HELP_DIR)/5.reference/creb
+	install -p -m0644	../../externals/creb/doc/examples/*.* \
+		$(HELP_DIR)/5.reference/creb
 #----------------------------------------------------------------------------
 # GEM
 	install -p -m0644 ../../Gem/help/*.* $(HELP_DIR)/5.reference
@@ -349,17 +391,17 @@ darwin_app_externals_standard:
 	cp -Rfp ../../Gem/examples/*.* ../../Gem/examples/data $(HELP_DIR)/gem
 #----------------------------------------------------------------------------
 # hcs
-	install -p -m0444 $(shell ls -1 ../../externals/hcs/*.pd | \
+	install -p -m0644 $(shell ls -1 ../../externals/hcs/*.pd | \
 			 grep -v '\-help.pd') $(EXTERNALS_DIR)
 # hid
 	cd ../../externals/hcs/hid && make 
-	install -p -m0444 ../../externals/hcs/hid/hid.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0444 $(shell ls -1 ../../externals/hcs/hid/*.pd | \
+	install -p -m0644 ../../externals/hcs/hid/hid.pd_darwin $(EXTERNALS_DIR)
+	install -p -m0644 $(shell ls -1 ../../externals/hcs/hid/*.pd | \
 			 grep -v '\-help.pd'| grep -v '\-list.pd') $(EXTERNALS_DIR)
 # general
-	install -p -m0444 ../../externals/hcs/general/*.pd $(EXTERNALS_DIR)
+	install -p -m0644 ../../externals/hcs/general/*.pd $(EXTERNALS_DIR)
 # pan
-	install -p -m0444 $(shell ls -1 ../../externals/hcs/pan/*.pd | \
+	install -p -m0644 $(shell ls -1 ../../externals/hcs/pan/*.pd | \
 			 grep -v '\-help.pd') $(EXTERNALS_DIR)
 #----------------------------------------------------------------------------
 # IEMlib
@@ -476,23 +518,33 @@ darwin_app_externals_c++:
 ##	sudo chown -R root:staff $(UNIX_PACKAGE_NAME).pkg/Contents/Resources
 
 
-#darwin_unix_pkg_welcome:
-#	echo "<html><body><p><p>" > $(WELCOME_FILE)
-#	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
-#	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
-#	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
-#	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
-#	echo "<p>`grep -A9 ACKNOWLEDG ../../pd/README.txt`</p>" >> $(WELCOME_FILE)
-#	echo "</FONT>" >> $(WELCOME_FILE)
-#	echo "</body></html>" >> $(WELCOME_FILE)
+darwin_unix_pkg_welcome:
+	echo "<html><body><p><p>" > $(WELCOME_FILE)
+	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
+	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
+	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
+	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
+	echo "<p>`grep -A9 ACKNOWLEDG ../../pd/README.txt`</p>" >> $(WELCOME_FILE)
+	echo "</FONT>" >> $(WELCOME_FILE)
+	echo "</body></html>" >> $(WELCOME_FILE)
+
+darwin_app_noncvs:
+	test -d noncvs/doc/5.reference && \
+		install -p -m0644 noncvs/doc/5.reference/*.* $(HELP_DIR)/5.reference
+	test -d noncvs/extra && \
+		install -p -m0644 noncvs/extra/*.* $(EXTERNALS_DIR)
+	cp -Rp noncvs/doc/serendipd $(HELP_DIR)
 
 darwin_app_perms:
 	chmod a-x $(HELP_DIR)/*/*.pd $(HELP_DIR)/*/*/*.pd $(HELP_DIR)/*/*/*/*.pd
 	chmod -R a-w $(HELP_DIR)
+# serendiPd shared patch
+	chmod a+w $(HELP_DIR)/serendipd/*shared_patch.pd
 
-dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license
+dmg: darwin_app_readme darwin_unix_pkg_welcome darwin_app_license darwin_app_perms
 	install -d "$(DMG_NAME)"
-	cd $(DESTDIR)/Applications && mv $(PD_APP_NAME).app "../../$(DMG_NAME)"
+	cd $(DESTDIR)/Applications && mv $(PD_APP_NAME).app \
+		"../../$(DMG_NAME)/$(DMG_NAME).app"
 	install -p -m0444 ../../pd/LICENSE.txt "$(DMG_NAME)/PD LICENSE.txt"
 	install -p -m0444 $(LICENSE_FILE) $(README_FILE) \
 		$(WELCOME_FILE) $(LICENSE_FILE)   "$(DMG_NAME)"
@@ -509,6 +561,7 @@ darwin_app_clean:
 
 darwin_unpatch_pd:
 	cd ../../pd/src/ && patch -R -p0 < ../../packages/darwin_app/patches/darwin_build-0.38.patch
+	cd ../../pd/src/ && patch -R -p0 < ../../packages/darwin_app/patches/extended-help-menu.patch
 
 darwin_app_externals_standard_clean:
 	cd ../../externals/build/darwin && make clean

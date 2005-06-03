@@ -1,13 +1,12 @@
 
+- fixed Pd.app file associations
+
 - create old-style Help->Pure Documentation link on Help menu.  It should use a
   symlink to the "doc" dir internal to that particular Pd.app.  The symlink is
   named after the complete path to the "doc" dir, like:
      /tmp/.Applications_Pd-0.38-4.app_Contents_Resources_doc
 
 - make Help menu generator recursive
-
-- check up on zexy in packages/darwin_app/Makefile and
-  externals/build/doc/makefile now that its been added to the build system
 
 - follow AppMain.tcl instructions:
   http://wiki.tcl.tk/12987
@@ -39,9 +38,6 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 
 - make Cmd-H and Alt-Cmd-H work when the Alt key is spec'ed
 
-- write sed script to set help-patch font size to 10 point from 12 point on
-  all help patches.
-
 - create --enable-cpu and --enable-arch in pd/src/configure.in
 
 - create general optimization flag system
@@ -49,4 +45,4 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 - convert from -DMACOSX to -D__APPLE__ where ever possible (check out
   __gnu_linux__) while I am at it
 
-- add context to all patches
+- add context (diff -u) to all patches
