@@ -14,7 +14,7 @@ endif
 
 # ----------------------- DARWIN -----------------------
 ifeq ($(OS_NAME),Darwin)
-FRAMEWORKS = Carbon IOKit
+FRAMEWORKS = Carbon IOKit ForceFeedback
 LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) \
 	       -L/sw/lib -L./HID\ Utilities\ Source/build \
 	       -lHIDUtilities \
@@ -31,7 +31,7 @@ endif
 PDEXECUTABLE = ../../../pd/bin/pd
 
 CFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused
+    -Wall -W -Wno-shadow -Wstrict-prototypes -Wno-unused
 
 INCLUDE =  -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 

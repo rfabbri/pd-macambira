@@ -45,6 +45,7 @@
 #include "HID_Utilities_External.h"
 
 #include <IOKit/hid/IOHIDUsageTables.h>
+#include <ForceFeedback/ForceFeedback.h>
 
 #include <mach/mach.h>
 #include <mach/mach_error.h>
@@ -73,6 +74,10 @@ char *convertEventsFromDarwinToLinux(pRecElement element);
  *==============================================================================
  */
 
+/*
+ * This function is needed to translate the USB HID relative flag into the
+ * [hid]/linux style events
+ */
 void convertAxis(pRecElement element, char *linux_type, char *linux_code, char *axis) 
 {
 	if (element->relative) 
@@ -113,6 +118,15 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 				case kHIDUsage_GD_Wheel: 
 					sprintf(linux_type,"rel");sprintf(linux_code,"rel_wheel");break;
 				case kHIDUsage_GD_Slider:
+					sprintf(linux_type,"abs");sprintf(linux_code,"abs_throttle");break;
+			}
+			break;
+		case kHIDPage_Simulation:
+			switch (element->usage)
+			{
+				case kHIDUsage_Sim_Rudder: 
+					sprintf(linux_type,"abs");sprintf(linux_code,"abs_rz");break;
+				case kHIDUsage_Sim_Throttle:
 					sprintf(linux_type,"abs");sprintf(linux_code,"abs_throttle");break;
 			}
 			break;
@@ -441,6 +455,9 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	t_int result = 0;
 	pRecDevice pCurrentHIDDevice = NULL;
 
+	io_service_t hidDevice = NULL;
+	FFDeviceObjectReference *pDeviceReference = NULL;
+
 /* rebuild device list to make sure the list is current */
 	if ( ! HIDHaveDeviceList() )
 	{
@@ -467,6 +484,16 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 		  device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
 
 	hid_build_element_list(x);
+
+	if ( FFIsForceFeedback(hidDevice) == FF_OK ) 
+	{
+		post("device has Force Feedback support");
+		if ( FFCreateDevice(hidDevice,pDeviceReference) == FF_OK ) 
+		{
+			post("created FF device");
+		}
+	}
+	
 
 	HIDQueueDevice(pCurrentHIDDevice);
 // TODO: queue all elements except absolute axes, those can just be polled
