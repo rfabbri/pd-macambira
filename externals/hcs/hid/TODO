@@ -4,6 +4,7 @@
 
 - GDAM has a HID Manager implementation and probably a Linux one too
 
+
 ==============================================================================
 = profile [hid] object and usage
 
@@ -12,23 +13,19 @@
 
 
 ==============================================================================
-= define generic event timestamp struct (probably Pd-ized input_event )
-
-The question is whether the timeval is needed at all.  Linux and Darwin
-support it.  Currently, I can only think of UPS PWR events actually using
-timevals.
-
-The timestamps should be in seconds since the first [hid] object was
-instantiated since Pd limits float resolution to 6 digits.  If there were two
-floats, one for seconds, and the other for microseconds, then the [hid]
-timestamp could represent up to 11.5 days (999999 seconds).
-
-
-==============================================================================
 = device selection 
 
 by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 ("Trackpad", "Microsoft 5-button Mouse with IntelliEye(TM)", etc.)
+
+
+==============================================================================
+= make second outlet for device name
+
+just output the USB device name to the second outlet
+
+- maybe the manufacturer too?
+
 
 
 ==============================================================================
@@ -53,6 +50,7 @@ by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 - this is probably unnecessary since the t_clock seems to run well at 1ms delay
 
 - at standard block size (64 samples), one block = ~1.5ms
+
 
 ==============================================================================
 = function return values
@@ -101,13 +99,6 @@ void hid_post(const char *format, const char *);
 ==============================================================================
 = figure out whole degree issue
 
-- BUG: zexy's 3D conversion objects just pass through Z rather than converting
-  it to elevation in rad/deg.
-
-- make [hid_polar] output 0 to 1 for angle rather than -pi to pi
-
-- [hid2rad], [hid2deg], [rad2hid], [deg2hid]
-
 - should degree conversion also change rotation direction and 0 point?  The
   degrees on a compass rotate the opposite direction of radians.  The 0 point
   of a compass is due north, with radians, its right/due east.
@@ -128,15 +119,9 @@ object for Fletcher-Munson Equal-loudness contours
 
 median average object
 
-non-linear one-to-many mapping object (one curve spans the whole range of the
-movement, the other curve kicks in at a specifable point.  Arguments could be
-start-point and start-value.
-
 [infinitepot] for use with a [knob] or any single axis that could be infinite.
 
 [hid_debounce]
-
-[hid_vector] - angle and distance for mouse/relative data
 
 peak finder object
 
@@ -154,6 +139,24 @@ http://www.2dcurves.com
  \++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
 
 ______________________________________________________________________________
+- BUG: multiple instances pointing to the same device don't have seperate close/free
+
+- closing the device on one instance closing that same device on all other
+  instances of [hid]
+
+- deleting that instance also closes the device for all other instances
+  pointing to that same device
+
+
+______________________________________________________________________________
+- BUG: on MacOS X, mouse axis data is limited by the screen dimensions
+
+- the axes data stops outputting when the mouse pointer reaches the edge of
+  the screen.  Hopefully the HID Manager API will allow raw mouse data
+  access.  It must since its used with games.
+
+
+______________________________________________________________________________
 - BUG: getting events from the queue doesn't output a 0 value event when the
   motion stops, so when the mouse stops, the sound keeps playing.
 
@@ -163,6 +166,7 @@ This is probably only a problem on relative axes.
 
   - On Darwin/MacOSX, I think that the HIDGetEvent() loop will have to be
     followed by one call to HIDGetElementValue()
+
 
 ______________________________________________________________________________
 - BUG: hatswitches on MacOS X output an event without a change in value
@@ -174,13 +178,6 @@ opposed to diagonally).
 
 
 ______________________________________________________________________________
-- BUG: on MacOS X, mouse axis data is limited by the screen dimensions
-
-- the axes data stops outputting when the mouse pointer reaches the edge of
-  the screen.  Hopefully the HID Manager API will allow raw mouse data
-  access.  It must since its used with games.
-
-______________________________________________________________________________
 - BUG: on MacOS X, two keyboard key codes are reported as hatswitches
 
   abs   abs_hat0x       Button Input, Keyboard Usage 0x39
@@ -188,13 +185,4 @@ ______________________________________________________________________________
 
 I am pretty sure this is just a hid_print_element_list() display problem.
 
-
-______________________________________________________________________________
-- BUG: multiple instances pointing to the same device don't have seperate close/free
-
-- closing the device on one instance closing that same device on all other
-  instances of [hid]
-
-- deleting that instance also closes the device for all other instances
-  pointing to that same device
 
