@@ -1,0 +1,4 @@
+NAME=syncgrain~
+SRCDIR=syncgrain~
+SRCS=main.cpp BufSyncGrain.cpp buftable.cpp
+HDRS=BufSyncGrain.h buftable.h
