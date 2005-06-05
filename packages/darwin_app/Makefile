@@ -3,7 +3,7 @@ current: darwin_app
 
 PD_APP_NAME = Pd
 
-DESTDIR = installroot
+DESTDIR = installroot 
 PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
@@ -53,7 +53,7 @@ CYCLONE_RELEASE = $(shell grep CYCLONE_RELEASE ../../externals/miXed/cyclone/bui
 CYCLONE_BUILD = $(shell grep CYCLONE_BUILD ../../externals/miXed/cyclone/build_counter | cut -d ' ' -f 3 | cut -d '"' -f 2)
 CYCLONE_VERSION = $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
-FLEXT_VERSION = $(shell grep PROJECT_NUMBER ../../externals/grill/flext/flext.doxy | cut -d '"' -f2 | cut -d ' ' -f2)
+FLEXT_VERSION = $(shell grep FLEXTMAJOR ../../externals/grill/flext/buildsys/version.inc | cut -d '=' -f2).$(shell grep FLEXTMINOR ../../externals/grill/flext/buildsys/version.inc | cut -d '=' -f2).$(shell grep FLEXTMICRO ../../externals/grill/flext/buildsys/version.inc | cut -d '=' -f2)
 
 GEM_VERSION = $(shell grep "GEM_VERSION" ../../Gem/src/Base/GemVersion.h | cut -d '"' -f 2)
 
@@ -294,8 +294,23 @@ darwin_app_externals_gem:
 darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
-	cd ../../externals/grill/flext && bash build.sh pd gcc build-release-shared
-	install -p -m0444 ../../externals/grill/flext/pd-darwin/release-shared/libflext-pd.dylib $(EXTERNALS_DIR)
+	cd ../../externals/grill/flext && \
+		( \
+			( \
+				cat buildsys/config-mac-pd-gcc.txt | \
+					sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/"  > ____c && \
+				cp ____c buildsys/config-mac-pd-gcc.txt && rm -f ____c \
+			) || \
+			( \
+				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" buildsys/mac/pd/config-gcc.def > buildsys/config-mac-pd-gcc.txt \
+			) \
+		) && \
+		( \
+			cp -f build/config-mac.def config.txt \
+		) && \
+		bash build.sh pd gcc build-release-shared
+	install -p -m0444 ../../externals/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(EXTERNALS_DIR)
+	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(EXTERNALS_DIR)/libflext-pd.dylib
 	install -d $(HELP_DIR)/tutorials
 	cp -rp ../../externals/grill/flext/tutorial $(HELP_DIR)/tutorials/flext
 	install -d $(HELP_DIR)/flext
@@ -306,7 +321,7 @@ darwin_app_externals_flext:
 # FLEXTERNALS
 #########
 # dyn~
-	cd ../../externals/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared
+	cd ../../externals/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(EXTERNALS_DIR) FLEXTINC=../flext/source
 	install -p -m0444 ../../externals/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/grill/dynext/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/dynext
@@ -316,7 +331,7 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/dynext
 #########
 # pool
-	cd ../../externals/grill/pool && bash ../flext/build.sh pd gcc build-release-shared
+	cd ../../externals/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(EXTERNALS_DIR) FLEXTINC=../flext/source
 	install -p -m0444 ../../externals/grill/pool/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/grill/pool/help-pool.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/pool
@@ -326,8 +341,12 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/pool
 #########
 # py/pyext
-#	cd ../../externals/grill/py && bash ../flext/build.sh pd gcc build-release-shared
-#	install -p -m0444 ../../externals/grill/py/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
+	cd ../../externals/grill/py && \
+		( \
+			cp -f build/config-mac.def config.txt \
+		) && \
+		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(EXTERNALS_DIR) FLEXTINC=../flext/source
+	install -p -m0444 ../../externals/grill/py/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -d $(HELP_DIR)/py/examples
 	install -d $(HELP_DIR)/py/scripts
 	install -p -m0644 ../../externals/grill/py/pd/*.pd $(HELP_DIR)/py/examples
@@ -341,7 +360,7 @@ darwin_app_externals_flext:
 # vasp
 #  fails without the dir
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-	cd ../../externals/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared
+	cd ../../externals/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(EXTERNALS_DIR) FLEXTINC=../flext/source
 	install -p -m0444 ../../externals/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/grill/vasp/pd-help/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/vasp
@@ -354,7 +373,7 @@ darwin_app_externals_flext:
 	cp -rp ../../externals/grill/vasp/pd-ex $(HELP_DIR)/vasp
 #########
 # xsample
-	cd ../../externals/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared
+	cd ../../externals/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(EXTERNALS_DIR) FLEXTINC=../flext/source
 	install -p -m0444 ../../externals/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(EXTERNALS_DIR)
 	install -p -m0644 ../../externals/grill/xsample/pd/*.pd $(HELP_DIR)/5.reference
 	install -d $(HELP_DIR)/xsample
