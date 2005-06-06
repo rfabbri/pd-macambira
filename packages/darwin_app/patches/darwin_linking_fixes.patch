@@ -1,99 +1,150 @@
 Index: configure.in
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/configure.in,v
-retrieving revision 1.8
-diff -r1.8 configure.in
-14a15
-> AC_SUBST(TCLTK_FRAMEWORKS_PATH)
-175a177,178
-> 
-> 
-212a216,233
-> 
->     if test x$jack == "xyes";
->     then
->         LDFLAGS=$LDFLAGS" -lrt -ljack"
->     fi
->     if test x$jack == "xrun";
->     then
->         LDFLAGS=$LDFLAGS" -lrt -ljack"
->     fi
->     fi
-> 
->     if test x$jack == "xyes";
->     then
->         LDFLAGS=$LDFLAGS" -lrt -ljack"
->     fi
->     if test x$jack == "xrun";
->     then
->         LDFLAGS=$LDFLAGS" -lrt -ljack"
-242,246c263,281
-<     GUINAME="pdtcl"
-<     GUIFLAGS="-F../../Frameworks -framework Tcl -framework Tk \
-<         -I../../Frameworks/Tk.framework/Versions/Current/Headers \
-<         -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
-<         -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
----
->     GUINAME="libPdTcl.dylib"
-> 
-> # find the Tcl/Tk Frameworks
->  	 if test -d "../../Frameworks";
->     then
->         # Miller's location
->         TCLTK_FRAMEWORKS_PATH="../../Frameworks"
->  	 elif test -d "/Library/Frameworks";
-> 	 then
->         # get it from the default install location
->         TCLTK_FRAMEWORKS_PATH="/Library/Frameworks"
->     else
->         # Panther has Tcl here; Tiger has Tcl and Tk here
->         TCLTK_FRAMEWORKS_PATH="/System/Library/Frameworks"
->     fi		 
->     GUIFLAGS="-F$TCLTK_FRAMEWORKS_PATH -framework Tcl -framework Tk \
->         -I$TCLTK_FRAMEWORKS_PATH/Tk.framework/Versions/Current/Headers \
->         -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/Current/Headers \
->         -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/8.4/PrivateHeaders"
-258,259c294,297
-< 	MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
-< 	SYSSRC=$SYSSRC" s_audio_jack.c"
----
->     fi
->     if test x$jack == "xrun";
->     then
->         LDFLAGS=$LDFLAGS" -framework Jack"
-269d306
-<     LDFLAGS=$LDFLAGS" -lrt -ljack"
-275d311
-<     LDFLAGS=$LDFLAGS" -lrt -ljack"
+retrieving revision 1.10
+diff -u -w -r1.10 configure.in
+--- configure.in	30 May 2005 04:37:25 -0000	1.10
++++ configure.in	6 Jun 2005 23:45:51 -0000
+@@ -13,6 +13,7 @@
+ AC_SUBST(USE_DEBUG_CFLAGS, no)
+ AC_SUBST(SYSSRC)
+ AC_SUBST(STRIPFLAG)
++AC_SUBST(TCLTK_FRAMEWORKS_PATH)
+ AC_SUBST(GUINAME)
+ AC_SUBST(GUIFLAGS)
+ AC_SUBST(OSNUMBER)
+@@ -207,6 +210,24 @@
+ 	OPT_CFLAGS="-g"
+     else
+ 	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
++
++    if test x$jack == "xyes";
++    then
++        LDFLAGS=$LDFLAGS" -lrt -ljack"
++    fi
++    if test x$jack == "xrun";
++    then
++        LDFLAGS=$LDFLAGS" -lrt -ljack"
++    fi
++    fi
++
++    if test x$jack == "xyes";
++    then
++        LDFLAGS=$LDFLAGS" -lrt -ljack"
++    fi
++    if test x$jack == "xrun";
++    then
++        LDFLAGS=$LDFLAGS" -lrt -ljack"
+     fi
+     echo OPT_CFLAGS --------------- $OPT_CFLAGS
+     OSNUMBER=0
+@@ -245,24 +266,41 @@
+         ../portmidi/pm_common/portmidi.c \
+         ../portmidi/porttime/ptmacosx_cf.c "
+     STRIPFLAG=""
+-    GUINAME="pdtcl"
+-    GUIFLAGS="-F../../Frameworks -framework Tcl -framework Tk \
+-        -I../../Frameworks/Tk.framework/Versions/Current/Headers \
+-        -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
+-        -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
++    GUINAME="libPdTcl.dylib"
++
++# find the Tcl/Tk Frameworks
++ 	 if test -d "../../Frameworks";
++    then
++        # Miller's location
++        TCLTK_FRAMEWORKS_PATH="../../Frameworks"
++ 	 elif test -d "/Library/Frameworks";
++	 then
++        # get it from the default install location
++        TCLTK_FRAMEWORKS_PATH="/Library/Frameworks"
++    else
++        # Panther has Tcl here; Tiger has Tcl and Tk here
++        TCLTK_FRAMEWORKS_PATH="/System/Library/Frameworks"
++    fi		 
++    GUIFLAGS="-F$TCLTK_FRAMEWORKS_PATH -framework Tcl -framework Tk \
++        -I$TCLTK_FRAMEWORKS_PATH/Tk.framework/Versions/Current/Headers \
++        -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/Current/Headers \
++        -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/8.4/PrivateHeaders"
+     if test x$USE_DEBUG_CFLAGS == "xyes";
+     then
+ 	OPT_CFLAGS="-g"
+     else
+-	OPT_CFLAGS="-O2"
++        OPT_CFLAGS="-O2 -fast -fPIC -mcpu=7450 -faltivec"
+     fi
+     OSNUMBER=2
+     EXTERNTARGET=pd_darwin
++
+     if test x$jack == "xyes";
+     then
+     	LDFLAGS=$LDFLAGS" -framework Jack"
+-	MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
+-	SYSSRC=$SYSSRC" s_audio_jack.c"
++    fi
++    if test x$jack == "xrun";
++    then
++        LDFLAGS=$LDFLAGS" -framework Jack"
+     fi
+ fi
+ 
+@@ -272,13 +310,11 @@
+ then
+     MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
+     SYSSRC=$SYSSRC" s_audio_jack.c"
+-    LDFLAGS=$LDFLAGS" -lrt -ljack"
+ fi
+ if test x$jack == "xrun";
+ then
+     MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK -DJACK_XRUN"
+     SYSSRC=$SYSSRC" s_audio_jack.c"
+-    LDFLAGS=$LDFLAGS" -lrt -ljack"
+ fi
+ 
+ # extra flags for alpha machines
 Index: makefile.in
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.6
-diff -r1.6 makefile.in
-100,104c100,110
-< $(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)
-< 	cd ../obj; libtool -dynamic -o $(BIN_DIR)/pdtcl $(GOBJ) \
-< 	../../Frameworks/Tk.framework/Versions/Current/Tk \
-< 	../../Frameworks/Tcl.framework/Versions/Current/Tcl \
-< 	/usr/lib/libSystem.B.dylib
----
-> $(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)
-> 	cd ../obj && $(CC) -dynamiclib -read_only_relocs warning  \
-> 		-o $(BIN_DIR)/libPdTcl.dylib $(GOBJ)  \
-> 		-F@TCLTK_FRAMEWORKS_PATH@ \
-> 		-framework Tcl  -framework Tk  -framework System  \
-> 		-Wl,-install_name,@executable_path/../Resources/bin/libPdTcl.dylib
-> 	install_name_tool -change @TCLTK_FRAMEWORKS_PATH@/Tcl.framework/Versions/8.4/Tcl\
-> 		 @executable_path/../Frameworks/Tcl.framework/Versions/8.4/Tcl \
-> 		 -change @TCLTK_FRAMEWORKS_PATH@/Tk.framework/Versions/8.4/Tk \
-> 		 @executable_path/../Frameworks/Tk.framework/Versions/8.4/Tk \
-> 		../bin/libPdTcl.dylib
+diff -u -w -r1.6 makefile.in
+--- makefile.in	18 May 2005 04:28:51 -0000	1.6
++++ makefile.in	6 Jun 2005 23:45:51 -0000
+@@ -97,11 +97,17 @@
+ 	cp u_main.tk $(BIN_DIR)/pd.tk
+ 
+ #this is for Max OSX only...
+-$(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)
+-	cd ../obj; libtool -dynamic -o $(BIN_DIR)/pdtcl $(GOBJ) \
+-	../../Frameworks/Tk.framework/Versions/Current/Tk \
+-	../../Frameworks/Tcl.framework/Versions/Current/Tcl \
+-	/usr/lib/libSystem.B.dylib
++$(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)
++	cd ../obj && $(CC) -dynamiclib -read_only_relocs warning  \
++		-o $(BIN_DIR)/libPdTcl.dylib $(GOBJ)  \
++		-F@TCLTK_FRAMEWORKS_PATH@ \
++		-framework Tcl  -framework Tk  -framework System  \
++		-Wl,-install_name,@executable_path/../Resources/bin/libPdTcl.dylib
++	install_name_tool -change @TCLTK_FRAMEWORKS_PATH@/Tcl.framework/Versions/8.4/Tcl\
++		 @executable_path/../Frameworks/Tcl.framework/Versions/8.4/Tcl \
++		 -change @TCLTK_FRAMEWORKS_PATH@/Tk.framework/Versions/8.4/Tk \
++		 @executable_path/../Frameworks/Tk.framework/Versions/8.4/Tk \
++		../bin/libPdTcl.dylib
+ 
+ externs: 
+ 	cd ../extra/bonk~;make @EXTERNTARGET@
 Index: u_main.tk
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 retrieving revision 1.9
-diff -r1.9 u_main.tk
-51c51
-<     load $pd_guidir/bin/pdtcl
----
->     load $pd_guidir/bin/libPdTcl.dylib
+diff -u -w -r1.9 u_main.tk
+--- u_main.tk	18 May 2005 04:28:51 -0000	1.9
++++ u_main.tk	6 Jun 2005 23:45:52 -0000
+@@ -48,7 +48,7 @@
+     global pd_tearoff
+     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
+     set pd_guidir $pd_gui2/..
+-    load $pd_guidir/bin/pdtcl
++    load $pd_guidir/bin/libPdTcl.dylib
+     set pd_tearoff 0
+ 
+ 	 # tk::mac::OpenDocument is called with the filenames put into the 

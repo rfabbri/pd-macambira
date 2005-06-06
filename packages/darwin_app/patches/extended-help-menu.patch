@@ -4,7 +4,7 @@ RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 retrieving revision 1.9
 diff -u -w -r1.9 u_main.tk
 --- u_main.tk	18 May 2005 04:28:51 -0000	1.9
-+++ u_main.tk	23 May 2005 17:18:36 -0000
++++ u_main.tk	6 Jun 2005 23:43:45 -0000
 @@ -531,6 +531,34 @@
  	 doc_submenu $mbar.$helpmenuname 4.fft.examples
  	 doc_submenu $mbar.$helpmenuname 5.reference
