@@ -30,8 +30,8 @@ OBJ = $(SRC:.c=.o)
 #
 
 clean:
-	rm ../../lib/$(TARGET)
-	rm *.o
+	-rm ../../lib/$(TARGET) $(TARGET)
+	-rm *.o
 
 all: $(OBJ)
 
@@ -39,8 +39,7 @@ all: $(OBJ)
 
 	ld $(LDFLAGS) -o $(TARGET) *.o $(LIB)
 	strip --strip-unneeded $(TARGET)
-	mv $(TARGET) ../../lib
-	rm *.o
+	cp $(TARGET) ../../lib
 
 $(OBJ) : %.o : %.c
 	touch $*.c
