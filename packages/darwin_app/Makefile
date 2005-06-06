@@ -3,7 +3,7 @@ current: darwin_app
 
 PD_APP_NAME = Pd
 
-DESTDIR = installroot 
+DESTDIR = installroot
 PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
@@ -297,11 +297,11 @@ darwin_app_externals_flext:
 	cd ../../externals/grill/flext && \
 		( \
 			( \
-				cat buildsys/config-mac-pd-gcc.txt | \
-					sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/"  > ____c && \
-				cp ____c buildsys/config-mac-pd-gcc.txt && rm -f ____c \
-			) || \
-			( \
+            cat buildsys/config-mac-pd-gcc.txt | \
+              sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/"  > ____c && \
+              cp ____c buildsys/config-mac-pd-gcc.txt && rm -f ____c \
+         ) || \
+         ( \
 				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" buildsys/mac/pd/config-gcc.def > buildsys/config-mac-pd-gcc.txt \
 			) \
 		) && \
@@ -590,14 +590,17 @@ darwin_app_externals_gem_clean:
 	cd ../../Gem && pbxbuild clean
 
 darwin_app_externals_flext_clean:
-	-rm ../../externals/grill/flext/source/libflext.a
-	cd ../../externals/grill/flext && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/dyn && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/fftease && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/pool && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/py && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/vasp && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/vst && make -f makefile.pd-darwin clean
-	cd ../../externals/grill/xsample && make -f makefile.pd-darwin clean
+	cd ../../externals/grill && ( \
+		rm flext/buildsys/config-mac-pd-gcc.txt config.txt; \
+		rm flext/source/libflext.a; \
+		cd flext && make -f makefile.pd-darwin clean; \
+		cd dyn && make -f makefile.pd-darwin clean; \
+		cd fftease && make -f makefile.pd-darwin clean; \
+		cd pool && make -f makefile.pd-darwin clean; \
+		cd py && make -f makefile.pd-darwin clean; \
+		cd vasp && make -f makefile.pd-darwin clean; \
+		cd vst && make -f makefile.pd-darwin clean; \
+		cd xsample && make -f makefile.pd-darwin clean; \
+	)			
 	cd ../../externals/footils/syncgrain && make -f makefile.pd-darwin clean
 
