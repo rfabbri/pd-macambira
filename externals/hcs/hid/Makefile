@@ -30,8 +30,12 @@ endif
 
 PDEXECUTABLE = ../../../pd/bin/pd
 
-CFLAGS = -DUNIX -DPD -O2 -funroll-loops -fomit-frame-pointer \
-    -Wall -W -Wno-shadow -Wstrict-prototypes -Wno-unused
+# generic optimization
+OPT_FLAGS = -O3
+# G4 7450 optimization  (gives errors)
+#OPT_FLAGS = -fast -mcpu=7450 -maltivec
+
+CFLAGS = $(OPT_FLAGS) -Wall -W -Wno-shadow -Wstrict-prototypes -Wno-unused
 
 INCLUDE =  -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 

@@ -14,7 +14,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 5
 
-static char *version = "$Revision: 1.14 $";
+static char *version = "$Revision: 1.15 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -30,6 +30,8 @@ typedef struct _hid
 		t_int               x_delay;
 		t_int               x_started;
 		t_int               x_device_open;
+		t_outlet            *x_data_outlet;
+		t_outlet            *x_device_name_outlet;
 } t_hid;
 
 

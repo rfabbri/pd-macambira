@@ -1,3 +1,10 @@
+==============================================================================
+= make fake names in input_arrays.c
+
+Instead of having "NULL" names, make up names using the event type, and the
+code number, i.e. abs_41, rel_15
+
+
 
 ==============================================================================
 = check out GDAM HID implementation 

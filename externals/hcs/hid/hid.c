@@ -50,13 +50,13 @@ static void hid_float(t_hid* x, t_floatarg f);
 
 void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 {
-	t_atom event_data[4];
+	t_atom event_data[3];
 	
 	SETSYMBOL(event_data, gensym(type));	   /* type */
 	SETSYMBOL(event_data + 1, gensym(code));	/* code */
 	SETFLOAT(event_data + 2, value);	         /* value */
 
-	outlet_anything(x->x_obj.te_outlet,atom_gensym(event_data),2,event_data+1);
+	outlet_anything(x->x_data_outlet,atom_gensym(event_data),2,event_data+1);
 }
 
 void hid_set_from_float(t_hid *x, t_floatarg f)
@@ -115,10 +115,14 @@ t_int hid_close(t_hid *x)
 }
 
 
-/* closed / same device          open */
-/* open / same device            no action */
-/* closed / different device     open */
-/* open / different device       close open */
+/* hid_open behavoir
+ * current state                 action
+ * ---------------------------------------
+ * closed / same device          open 
+ * open / same device            no action 
+ * closed / different device     open 
+ * open / different device       close open 
+ */
 
 t_int hid_open(t_hid *x, t_float f) 
 {
@@ -241,8 +245,9 @@ static void *hid_new(t_float f)
   x->x_clock = clock_new(x, (t_method)hid_read);
 
   /* create anything outlet used for HID data */ 
-  outlet_new(&x->x_obj, 0);
-
+  x->x_data_outlet = outlet_new(&x->x_obj, 0);
+  x->x_device_name_outlet = outlet_new(&x->x_obj, 0);
+  
   /* find and report the list of devices */
   hid_build_device_list(x);
   

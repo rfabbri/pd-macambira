@@ -52,8 +52,8 @@
 
 #include "hid.h"
 
-#define DEBUG(x)
-//#define DEBUG(x) x 
+//#define DEBUG(x)
+#define DEBUG(x) x 
 
 /*==============================================================================
  *  GLOBAL VARS
@@ -293,6 +293,21 @@ void hid_print_device_list(t_hid *x)
 	}
 }
 
+void hid_output_device_name(t_hid *x, char *manufacturer, char *product) 
+{
+	char      *device_name;
+	t_symbol  *device_name_symbol;
+
+	device_name = malloc( strlen(manufacturer) + 1 + strlen(product) + 1 );
+//	device_name = malloc( 7 + strlen(manufacturer) + 1 + strlen(product) + 1 );
+//	strcpy( device_name, "append " );
+	strcat( device_name, manufacturer );
+	strcat ( device_name, " ");
+	strcat( device_name, product );
+//	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
+	outlet_symbol( x->x_device_name_outlet, gensym( device_name ) );
+}
+
 /* ============================================================================== */
 /* Pd [hid] FUNCTIONS */
 /* ============================================================================== */
@@ -477,8 +492,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 		return(1);
 	}
 
-// this doesn't seem to be needed at all
-//   result = HIDCreateOpenDeviceInterface(pCurrentHIDDevice);
+	hid_output_device_name( x, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product );
 
 	post("[hid] opened device %d: %s %s",
 		  device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
@@ -521,9 +535,22 @@ t_int hid_build_device_list(t_hid *x)
 {
 	DEBUG(post("hid_build_device_list"););
 
-	// returns false if no device found
+	pRecDevice    pCurrentHIDDevice;
+	t_atom        device_name_atoms[2];
+	
+// returns false if no device found
 	if(HIDBuildDeviceList (NULL, NULL)) 
 		error("[hid]: no HID devices found\n");
+
+	/* send the [menu( msg to set the [hid_menu] to blank */
+	outlet_anything( x->x_device_name_outlet, gensym( "menu" ),0,NULL );
+
+	pCurrentHIDDevice = HIDGetFirstDevice();
+	while ( pCurrentHIDDevice != NULL )
+	{
+		hid_output_device_name( x, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product );
+		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
+	} 
 	
 	return (0);
 }
