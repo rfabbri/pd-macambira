@@ -58,12 +58,14 @@ typedef struct _popup
 	
      t_symbol** x_options;
      int        x_maxoptions;
+
+  int initialized; /* 1 when we are allowed to draw, 0 otherwise */
 } t_popup;
 
 /* widget helper functions */
 
 /* Append " x " to the following line to show debugging messages */
-#define DEBUG(x) 
+#define DEBUG(x)
 
 
 static void draw_inlets(t_popup *x, t_glist *glist, int firsttime, int nin, int nout)
@@ -154,14 +156,14 @@ static void create_widget(t_popup *x, t_glist *glist)
   }
 
   /* Seems we have to delete the widget in case it already exists (Provided by Guenter)*/
-  sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+  if(x->initialized)sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
 
-  sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
+  if(x->initialized)sys_vgui("set %xw .x%x.c.s%x ; menubutton $%xw -relief raised -background \"%s\" -text \"%s\" -direction flush -menu $%xw.menu ; menu $%xw.menu -tearoff 0\n",
 		x,canvas,x,x,x->x_colour->s_name,temp_name->s_name,x,x);
 
   for(i=0 ; i<x->x_num_options ; i++)
   {
-	sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
+	if(x->initialized)sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
 		canvas, x, x->x_options[i]->s_name, canvas, x, x->x_options[i]->s_name, x, i);
   }
 
@@ -173,6 +175,13 @@ static void popup_drawme(t_popup *x, t_glist *glist, int firsttime)
 {
   t_canvas *canvas=glist_getcanvas(glist);
   DEBUG(post("drawme start");)
+
+    /* by drawing, we "initialize" the popup */
+    if(!x->initialized){
+      x->initialized=1;
+    }
+
+
   DEBUG(post("drawme %d",firsttime);)
      if (firsttime) {
        DEBUG(post("glist %x canvas %x",x->x_glist,canvas);)
@@ -203,15 +212,15 @@ static void popup_erase(t_popup* x,t_glist* glist)
      int n;
 
      DEBUG(post("erase start");)
-     sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
+     if(x->initialized)sys_vgui("destroy .x%x.c.s%x\n",glist_getcanvas(glist),x);
 
-     sys_vgui(".x%x.c delete %xS\n",glist_getcanvas(glist), x);
+     if(x->initialized)sys_vgui(".x%x.c delete %xS\n",glist_getcanvas(glist), x);
 
      /* inlets and outlets */
      
-     sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
-     sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
-     sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
+     if(x->initialized)sys_vgui(".x%x.c delete %xi\n",glist_getcanvas(glist),x); /* Added tag for all inlets of one instance */
+     if(x->initialized)sys_vgui(".x%x.c delete %xo\n",glist_getcanvas(glist),x); /* Added tag for all outlets of one instance */
+     if(x->initialized)sys_vgui(".x%x.c delete  %xhandle\n",glist_getcanvas(glist),x,0);
 
     DEBUG(post("erase end");)
 }
@@ -224,7 +233,7 @@ static void popup_erase(t_popup* x,t_glist* glist)
 static void popup_getrect(t_gobj *z, t_glist *owner,
     int *xp1, int *yp1, int *xp2, int *yp2)
 {
-    DEBUG(post("getrect start");)
+  DEBUG(post("getrect start");)
 
     int width, height;
     t_popup* s = (t_popup*)z;
@@ -248,7 +257,7 @@ static void popup_displace(t_gobj *z, t_glist *glist,
     x->x_obj.te_ypix += dy;
     if (glist_isvisible(glist))
     {
-      sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
+      if(x->initialized)sys_vgui(".x%x.c coords %xSEL %d %d %d %d\n",
 	       glist_getcanvas(glist), x,
 	       text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
 	       text_xpix(&x->x_obj, glist) + x->x_rect_width, text_ypix(&x->x_obj, glist) + x->x_rect_height-2);
@@ -265,7 +274,7 @@ static void popup_select(t_gobj *z, t_glist *glist, int state)
 
      t_popup *x = (t_popup *)z;
      if (state) {
-	  sys_vgui(".x%x.c create rectangle \
+	  if(x->initialized)sys_vgui(".x%x.c create rectangle \
 %d %d %d %d -tags %xSEL -outline blue\n",
 		   glist_getcanvas(glist),
 		   text_xpix(&x->x_obj, glist), text_ypix(&x->x_obj, glist)-1,
@@ -273,7 +282,7 @@ static void popup_select(t_gobj *z, t_glist *glist, int state)
 		   x);
      }
      else {
-	  sys_vgui(".x%x.c delete %xSEL\n",
+	  if(x->initialized)sys_vgui(".x%x.c delete %xSEL\n",
 		   glist_getcanvas(glist), x);
      }
 
@@ -383,7 +392,7 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 	x->x_num_options = argc;
 	
 	/* delete old menu items */
-	sys_vgui(".x%x.c.s%x.menu delete 0 end \n", x->x_glist, x);
+	if(x->initialized)sys_vgui(".x%x.c.s%x.menu delete 0 end \n", x->x_glist, x);
 
         if(argc>x->x_maxoptions){
           /* resize the options-array */
@@ -395,7 +404,7 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 	for(i=0 ; i<argc ; i++)
 	{
 		x->x_options[i] = atom_getsymbol(argv+i);
-		sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
+		if(x->initialized)sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n", 
 			x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
 	}
 
@@ -408,7 +417,7 @@ static void popup_bgcolour(t_popup* x, t_symbol* col)
 	DEBUG(post("bgcolour start");)
 
 	x->x_colour = col;
-	sys_vgui(".x%x.c.s%x configure -background \"%s\"\n", x->x_glist, x, col->s_name);
+	if(x->initialized)sys_vgui(".x%x.c.s%x configure -background \"%s\"\n", x->x_glist, x, col->s_name);
 }
 
 /* Function to change name of popup */
@@ -417,7 +426,7 @@ static void popup_name(t_popup* x, t_symbol *name)
 	DEBUG(post("name start");)
 
 	x->x_name = name;
-	sys_vgui(".x%x.c.s%x configure -text \"%s\"\n", x->x_glist, x, name->s_name);
+	if(x->initialized)sys_vgui(".x%x.c.s%x configure -text \"%s\"\n", x->x_glist, x, name->s_name);
 }
 
 /* Function to select a menu option by inlet */
@@ -428,11 +437,12 @@ static void popup_iselect(t_popup* x, t_floatarg item)
 	int i=(int)item;
 	if( i<x->x_num_options && i>=0)
 	{
-		sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
+		if(x->initialized)sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
 			glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
+                else popup_output(x, i);
 
 	} else {
-		post("popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options, i);
+          pd_error(x, "popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options, i);
 	}
 
 	DEBUG(post("iselect end");)
@@ -448,8 +458,9 @@ static void popup_symselect(t_popup* x, t_symbol *s)
 	{
 	  if(x->x_options[i]->s_name == s->s_name)
 	  {
-	    sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
+	    if(x->initialized)sys_vgui(".x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\" \n",
                         glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name,x, i);
+            else popup_output(x, i);
 	    match = 1;
 	    break;
           }
@@ -488,7 +499,7 @@ void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
         for(i=x->x_num_options ; i<new_limit ; i++)
         {
                 x->x_options[i] = atom_getsymbol(argv+i-x->x_num_options);
-                sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
+                if(x->initialized)sys_vgui(".x%x.c.s%x.menu add command -label \"%s\" -command {.x%x.c.s%x configure -text \"%s\" ; popup_sel%x \"%d\"} \n",
                         x->x_glist, x, x->x_options[i]->s_name, x->x_glist, x, x->x_options[i]->s_name, x, i);
         }
 
@@ -531,6 +542,8 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
     x->x_name = gensym("popup");
     
     x->x_options[0] = gensym("option");
+
+    x->initialized=0;
 
     switch(argc){
     case 0: break; /* just use default values */
@@ -619,7 +632,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.12 $ $Date: 2005-06-06 15:13:43 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.13 $ $Date: 2005-06-06 16:05:31 $");
 }
 
 
