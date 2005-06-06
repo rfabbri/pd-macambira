@@ -44,7 +44,6 @@ typedef struct _popup
 
      t_glist * x_glist;
      t_outlet* out2;
-     t_inlet* in2;
      int x_rect_width;
      int x_rect_height;
      t_symbol*  x_sym;
@@ -57,8 +56,8 @@ typedef struct _popup
      t_symbol* x_colour;
      t_symbol* x_name;
 	
-     t_symbol* x_options[MAX_OPTIONS];
-
+     t_symbol** x_options;
+     int        x_maxoptions;
 } t_popup;
 
 /* widget helper functions */
@@ -386,6 +385,13 @@ void popup_options(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 	/* delete old menu items */
 	sys_vgui(".x%x.c.s%x.menu delete 0 end \n", x->x_glist, x);
 
+        if(argc>x->x_maxoptions){
+          /* resize the options-array */
+          if(x->x_options)freebytes(x->x_options, sizeof(t_symbol*)*x->x_maxoptions);
+          x->x_maxoptions=argc;
+          x->x_options=(t_symbol**)getbytes(sizeof(t_symbol*)*x->x_maxoptions);
+        }
+
 	for(i=0 ; i<argc ; i++)
 	{
 		x->x_options[i] = atom_getsymbol(argv+i);
@@ -462,6 +468,22 @@ void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
         int i, new_limit;
 
         new_limit = x->x_num_options + argc;
+        if(new_limit>x->x_maxoptions){
+          t_symbol**dummy;
+          int new_size=new_limit*2;
+          DEBUG(post("resizing options");)
+          dummy=(t_symbol**)getbytes(sizeof(t_symbol*)*new_size);
+          if(dummy)
+            {
+              memcpy(dummy, x->x_options, sizeof(t_symbol*)*x->x_maxoptions);
+              freebytes(x->x_options, sizeof(t_symbol*)*x->x_maxoptions);
+              x->x_maxoptions=new_size;
+              x->x_options=dummy;
+            } else {
+            error("popup: no memory for options");
+            return;
+          }
+        }
 
         for(i=x->x_num_options ; i<new_limit ; i++)
         {
@@ -479,6 +501,11 @@ void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 
 static t_class *popup_class;
 
+static void popup_free(t_popup*x)
+{
+  if(x->x_options)freebytes(x->x_options, sizeof(t_symbol*)*x->x_maxoptions);
+}
+
 
 static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 {
@@ -492,39 +519,48 @@ static void *popup_new(t_symbol *s, int argc, t_atom *argv)
 
     x->x_height = 25;
     x->current_selection = -1;
-	
-	if (argc < 5)
-	{
-		post("popup: You must enter at least 5 arguments. Default values used.\n\nArguments:\npopup [width] [height] [colour] [name] [option-1] [option-2] ...");
-		x->x_width = 124;
-		x->x_height = 25;
-		x->x_num_options = 1; 
-		x->x_colour = gensym("#ffffff");
-		x->x_name = gensym("popup");
-		
-		x->x_options[0] = gensym("option");
-		
-	} else {
-		/* Copy args into structure */
-		x->x_width = atom_getint(argv);
-		x->x_height = atom_getint(argv+1);
-		x->x_colour = atom_getsymbol(argv+2);
-		x->x_name = atom_getsymbol(argv+3);
-		
-		x->x_num_options = argc-4;
-		
-		for(i=0 ; i<x->x_num_options ; i++)
-		{
-			x->x_options[i] = atom_getsymbol( argv+(i+4) );
-		}
-	}	
 
-	/* Bind the recieve "popup%p" to the widget outlet*/
-    sprintf(buf,"popup%p",x);
-    x->x_sym = gensym(buf);
-    pd_bind(&x->x_obj.ob_pd, x->x_sym);
+    x->x_maxoptions=MAX_OPTIONS;
+    x->x_options=(t_symbol**)getbytes(sizeof(t_symbol*)*x->x_maxoptions);
 
-	/* define proc in tcl/tk where "popup%p" is the receive, "output" is the method, and "$index" is an argument. */
+
+    x->x_width = 124;
+    x->x_height = 25;
+    x->x_num_options = 1; 
+    x->x_colour = gensym("#ffffff");
+    x->x_name = gensym("popup");
+    
+    x->x_options[0] = gensym("option");
+
+    switch(argc){
+    case 0: break; /* just use default values */
+    case 1:
+      post("popup: You must enter at least 5 arguments. Default values used.\n\nArguments:\npopup [width] [height] [colour] [name] [option-1] [option-2] ...");		
+      break;
+    default:
+      /* Copy args into structure */		
+      x->x_num_options = argc-4;
+		
+      for(i=0 ; i<x->x_num_options ; i++)
+        {
+          x->x_options[i] = atom_getsymbol( argv+(i+4) );
+        }
+    case 4:
+      x->x_name = atom_getsymbol(argv+3);
+    case 3:
+      x->x_colour = atom_getsymbol(argv+2);
+    case 2:
+      x->x_width =atom_getint(argv+0);
+      x->x_height=atom_getint(argv+1);
+      break;
+    }
+
+      /* Bind the recieve "popup%p" to the widget outlet*/
+      sprintf(buf,"popup%p",x);
+      x->x_sym = gensym(buf);
+      pd_bind(&x->x_obj.ob_pd, x->x_sym);
+
+      /* define proc in tcl/tk where "popup%p" is the receive, "output" is the method, and "$index" is an argument. */
     sys_vgui("proc popup_sel%x {index} {\n pd [concat popup%p output $index \\;]\n }\n",x,x); 
 
     /* Add symbol inlet (hard to say how this actually works?? */
@@ -541,7 +577,7 @@ void popup_setup(void) {
 
     DEBUG(post("setup start");)
 
-    popup_class = class_new(gensym("popup"), (t_newmethod)popup_new, 0,
+      popup_class = class_new(gensym("popup"), (t_newmethod)popup_new, (t_method)popup_free,
 				sizeof(t_popup),0,A_GIMME,0);
 				
 	class_addmethod(popup_class, (t_method)popup_output,
@@ -576,14 +612,14 @@ void popup_setup(void) {
 
 	class_doaddfloat(popup_class, (t_method)popup_iselect);
 
-//	class_addsymbol(popup_class, (t_method)popup_symselect);
+	//class_addsymbol(popup_class, (t_method)popup_symselect);
 
     class_setwidget(popup_class,&popup_widgetbehavior);
 #if PD_MINOR_VERSION >= 37
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.11 $ $Date: 2005-01-17 21:06:59 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.12 $ $Date: 2005-06-06 15:13:43 $");
 }
 
 
