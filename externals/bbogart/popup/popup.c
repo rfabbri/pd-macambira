@@ -311,7 +311,7 @@ static void popup_delete(t_gobj *z, t_glist *glist)
     DEBUG(post("delete start");)
 
     t_text *x = (t_text *)z;
-    canvas_deletelinesfor(glist_getcanvas(glist), x);
+    canvas_deletelinesfor(glist, x);
 
     DEBUG(post("delete end");)
 }
@@ -705,7 +705,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.16 $ $Date: 2005-06-07 15:07:53 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.17 $ $Date: 2005-06-07 18:09:55 $");
 }
 
 
