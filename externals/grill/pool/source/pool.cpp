@@ -78,7 +78,7 @@ poolval &poolval::Set(AtomList *d)
 
 poolval *poolval::Dup() const
 {
-	return new poolval(key,data?new AtomList(*data):NULL); 
+	return new poolval(key,data?new Atoms(*data):NULL); 
 }
 
 
@@ -314,7 +314,7 @@ flext::AtomList *pooldir::GetVal(const A &key,BL cut)
 			delete ix;
 		}
 		else
-			ret = new AtomList(*ix->data);
+			ret = new Atoms(*ix->data);
 		return ret;
 	}
 }
@@ -361,11 +361,11 @@ I pooldir::GetKeys(AtomList &keys)
 	return cnt;
 }
 
-I pooldir::GetAll(A *&keys,AtomList *&lst,BL cut)
+I pooldir::GetAll(A *&keys,Atoms *&lst,BL cut)
 {
 	I cnt = CntAll();
 	keys = new A[cnt];
-	lst = new AtomList[cnt];
+	lst = new Atoms[cnt];
 
 	for(I i = 0,vix = 0; vix < vsize; ++vix) {
 		poolval *ix = vals[vix].v;
@@ -413,7 +413,7 @@ BL pooldir::Paste(const pooldir *p,I depth,BL repl,BL mkdir)
 
 	for(I vi = 0; vi < p->vsize; ++vi) {
 		for(poolval *ix = p->vals[vi].v; ix; ix = ix->nxt) {
-			SetVal(ix->key,new AtomList(*ix->data),repl);
+			SetVal(ix->key,new Atoms(*ix->data),repl);
 		}
 	}
 
@@ -446,7 +446,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 	else {
 		for(I vi = 0; vi < vsize; ++vi) {
 			for(poolval *ix = vals[vi].v; ix; ix = ix->nxt) {
-				p->SetVal(ix->key,new AtomList(*ix->data));
+				p->SetVal(ix->key,new Atoms(*ix->data));
 			}
 		}
 	}
@@ -602,7 +602,7 @@ static V WriteAtoms(ostream &os,const flext::AtomList &l)
 BL pooldir::LdDir(istream &is,I depth,BL mkdir)
 {
 	for(I i = 1; !is.eof(); ++i) {
-		AtomList d,k,*v = new AtomList;
+		Atoms d,k,*v = new Atoms;
 		BL r = 
             ReadAtoms(is,d,',') && 
             ReadAtoms(is,k,',') &&
@@ -656,7 +656,7 @@ BL pooldir::SvDir(ostream &os,I depth,const AtomList &dir)
 		I nd = depth > 0?depth-1:-1;
 		for(I di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
-				ix->SvDir(os,nd,AtomList(dir).Append(ix->dir));
+				ix->SvDir(os,nd,Atoms(dir).Append(ix->dir));
 			}
 		}
 	}
@@ -783,7 +783,7 @@ static void getvalue(istream &is,string &s)
 
 BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
 {
-    AtomList k,v;
+    Atoms k,v;
     bool inval = false,inkey = false,indata = false;
     int cntval = 0;
 
@@ -836,7 +836,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                 if(d.Count() && GetSymbol(d[d.Count()-1]) == sym__)
                     post("pool - XML load: dir key must be given prior to subdirs, ignoring items");
 
-                AtomList dnext(d.Count()+1);
+                Atoms dnext(d.Count()+1);
                 // copy existing dir
                 dnext.Set(d.Count(),d.Atoms(),0,false);
                 // initialize current dir key as empty
@@ -880,7 +880,7 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                         if(k.Count() == 1) {
 		        		    pooldir *nd = mkdir?AddDir(d):GetDir(d);
         				    if(nd) 
-                                nd->SetVal(k[0],new AtomList(v));
+                                nd->SetVal(k[0],new Atoms(v));
                             else
                                 post("pool - XML load: value key must be exactly one word, value not stored");
 				        }
@@ -929,7 +929,7 @@ BL pooldir::LdDirXML(istream &is,I depth,BL mkdir)
 
         if(tag == "pool") {
             if(tag.type == xmltag::t_start) {
-                AtomList empty; // must be a separate definition for gcc
+                Atoms empty; // must be a separate definition for gcc
                 LdDirXMLRec(is,depth,mkdir,empty);
             }
             else
@@ -980,7 +980,7 @@ BL pooldir::SvDirXML(ostream &os,I depth,const AtomList &dir,I ind)
 		I nd = depth > 0?depth-1:-1;
 		for(I di = 0; di < dsize; ++di) {
 			for(pooldir *ix = dirs[di].d; ix; ix = ix->nxt) {
-				ix->SvDirXML(os,nd,AtomList(dir).Append(ix->dir),ind+lvls);
+				ix->SvDirXML(os,nd,Atoms(dir).Append(ix->dir),ind+lvls);
 			}
 		}
 	}

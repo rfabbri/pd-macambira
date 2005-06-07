@@ -15,8 +15,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 406)
-#error You need at least flext version 0.4.6
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
+#error You need at least flext version 0.5.0
 #endif
 
 #include <iostream>
@@ -31,6 +31,8 @@ typedef char C;
 typedef bool BL;
 typedef t_atom A;
 typedef t_symbol S;
+
+typedef flext::AtomListStatic<8> Atoms;
 
 class poolval:
 	public flext
@@ -75,7 +77,7 @@ public:
 	AtomList *PeekVal(const A &key);
 	AtomList *GetVal(const A &key,BL cut = false);
 	I CntAll() const;
-	I GetAll(A *&keys,AtomList *&lst,BL cut = false);
+	I GetAll(A *&keys,Atoms *&lst,BL cut = false);
 	I PrintAll(char *buf,int len) const;
 	I GetKeys(AtomList &keys);
 	I CntSub() const;
@@ -218,7 +220,7 @@ public:
     }
 
 	I PrintAll(const AtomList &d);
-	I GetAll(const AtomList &d,A *&keys,AtomList *&lst);
+	I GetAll(const AtomList &d,A *&keys,Atoms *&lst);
 
     I CntSub(const AtomList &d)
     {

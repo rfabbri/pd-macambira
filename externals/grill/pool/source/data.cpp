@@ -32,7 +32,7 @@ pooldata::~pooldata()
 
 const A pooldata::nullatom = { A_NULL };
 
-I pooldata::GetAll(const AtomList &d,A *&keys,AtomList *&lst)
+I pooldata::GetAll(const AtomList &d,A *&keys,Atoms *&lst)
 {
 	pooldir *pd = root.GetDir(d);
 	if(pd)
@@ -143,7 +143,7 @@ BL pooldata::SvDir(const AtomList &d,const C *flnm,I depth,BL absdir)
 		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ofstream file(t);
-			AtomList tmp;
+			Atoms tmp;
 			if(absdir) tmp = d;
 			return file.good() && pd->SvDir(file,depth,tmp);
 		}
@@ -190,7 +190,7 @@ BL pooldata::SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir)
 		const C *t = CnvFlnm(tmp,flnm,sizeof tmp);
 		if(t) {
 			ofstream file(t);
-			AtomList tmp;
+			Atoms tmp;
 			if(absdir) tmp = d;
             if(file.good()) {
                 file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" << endl;

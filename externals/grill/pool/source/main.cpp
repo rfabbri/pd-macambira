@@ -141,7 +141,7 @@ private:
 	BL priv,absdir,echo;
 	I vcnt,dcnt;
 	pooldata *pl;
-	AtomList curdir;
+	Atoms curdir;
 	pooldir *clip;
 	const S *holdname;
 
@@ -390,6 +390,7 @@ V pool::mg_pool(AtomList &l)
 
 V pool::m_reset() 
 {
+    curdir();
 	pl->Reset();
 }
 
@@ -408,7 +409,7 @@ V pool::m_mkdir(I argc,const A *argv,BL abs,BL chg)
 	if(!ValChk(argc,argv))
 		post("%s - %s: invalid directory name",thisName(),GetString(thisTag()));
 	else {
-		AtomList ndir;
+		Atoms ndir;
 		if(abs) ndir(argc,argv);
 		else (ndir = curdir).Append(argc,argv);
 		if(!pl->MkDir(ndir,vcnt,dcnt)) {
@@ -427,7 +428,7 @@ V pool::m_chdir(I argc,const A *argv,BL abs)
 	if(!ValChk(argc,argv)) 
 		post("%s - %s: invalid directory name",thisName(),GetString(thisTag()));
 	else {
-		AtomList prv(curdir);
+		Atoms prv(curdir);
 		if(abs) curdir(argc,argv);
 		else curdir.Append(argc,argv);
 		if(!pl->ChkDir(curdir)) {
@@ -454,7 +455,7 @@ V pool::m_updir(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to 1",thisName(),GetString(thisTag()));
 	}
 
-	AtomList prv(curdir);
+	Atoms prv(curdir);
 
 	if(lvls > curdir.Count()) {
 		post("%s - %s: level exceeds directory depth - corrected",thisName(),GetString(thisTag()));
@@ -505,7 +506,7 @@ V pool::m_seti(I argc,const A *argv)
 		post("%s - %s: invalid data values",thisName(),GetString(thisTag()));
 	}
 	else 
-		if(!pl->Seti(curdir,GetAInt(argv[0]),new AtomList(argc-1,argv+1)))
+		if(!pl->Seti(curdir,GetAInt(argv[0]),new Atoms(argc-1,argv+1)))
 			post("%s - %s: value couldn't be set",thisName(),GetString(thisTag()));
 
 	echodir();
@@ -617,7 +618,7 @@ V pool::m_geti(I ix)
 
 I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rdir)
 {
-	AtomList gldir(curdir);
+	Atoms gldir(curdir);
 	gldir.Append(rdir);
 
 	I ret = 0;
@@ -631,7 +632,7 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
             break;
         case get_norm: {
 		    A *k;
-		    AtomList *r;
+		    Atoms *r;
 		    I cnt = pl->GetAll(gldir,k,r);
 		    if(!k) 
 			    post("%s - %s: error retrieving values",thisName(),GetString(tag));
@@ -657,7 +658,7 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
 		else {
 			I lv = level > 0?level-1:-1;
 			for(I i = 0; i < cnt; ++i) {
-				ret += getrec(tag,lv,order,how,AtomList(rdir).Append(*r[i]));
+				ret += getrec(tag,lv,order,how,Atoms(rdir).Append(*r[i]));
 			}
 			delete[] r;
 		}
@@ -722,7 +723,7 @@ V pool::m_ogetrec(I argc,const A *argv)
 
 I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 {
-	AtomList gldir(curdir);
+	Atoms gldir(curdir);
 	gldir.Append(rdir);
 	
 	I ret = 0;
@@ -735,7 +736,7 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 	else {
 		I lv = level > 0?level-1:-1;
 		for(I i = 0; i < cnt; ++i) {
-			AtomList ndir(absdir?gldir:rdir);
+			Atoms ndir(absdir?gldir:rdir);
 			ndir.Append(*r[i]);
             ++ret;
 
@@ -747,7 +748,7 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 			}
 
 			if(level != 0)
-				ret += getsub(tag,lv,order,how,AtomList(rdir).Append(*r[i]));
+				ret += getsub(tag,lv,order,how,Atoms(rdir).Append(*r[i]));
 		}
 		delete[] r;
 	}
@@ -872,7 +873,7 @@ V pool::m_printrec(I argc,const A *argv,BL fromroot)
 			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(tag));
 	}
 
-	AtomList svdir(curdir);
+	Atoms svdir(curdir);
     if(fromroot) curdir.Clear();
 
 	I cnt = getrec(tag,lvls,false,get_print);

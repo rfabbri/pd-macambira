@@ -86,6 +86,8 @@ Version history:
 - escaped symbols (with \) for whitespace support on store and load
 - escape symbols also with "" to help the load routine
 - improved reading of legacy data by Frank Barknecht
+- use statically allocated lists where feasible
+- bug fix: [reset( didn't reset the current dir
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
