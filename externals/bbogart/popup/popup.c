@@ -483,6 +483,46 @@ static void popup_symselect(t_popup* x, t_symbol *s)
 	
 }
 
+/* Function to choose value via name/index but without outputting it*/
+static void popup_set(t_popup* x, t_symbol *S, int argc, t_atom*argv)
+{
+  if(!argc)return;
+  int visible=(x->x_glist)?glist_isvisible(x->x_glist):0;
+
+  if(argv->a_type==A_FLOAT)
+    {
+      int i=atom_getint(argv);
+      if( i<x->x_num_options && i>=0)
+	{
+          x->current_selection = i;
+          if(visible)
+            sys_vgui(".x%x.c.s%x configure -text \"%s\"\n",
+                     glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name);
+	} else {
+          error("popup: Valid menu selections are from %d to %d\npopup: You entered %d.", 0, x->x_num_options-1, i);
+	}
+    } else if(argv->a_type==A_SYMBOL)
+    {
+      int i;
+      t_symbol*s=atom_getsymbol(argv);
+      /* Compare inlet symbol to each option */
+      for(i=0; i<x->x_num_options; i++)
+	{
+	  if(x->x_options[i]->s_name == s->s_name)
+            {
+              x->current_selection = i;
+              if(visible)sys_vgui(".x%x.c.s%x configure -text \"%s\"\n",
+                                  glist_getcanvas(x->x_glist), x, x->x_options[i]->s_name);
+              return;
+          }
+	}
+      error("popup: '%s' is not an available option.", s->s_name);
+    } else 
+    {
+      pd_error(x, "popup: can only 'set' symbols or floats");
+    }
+}
+
 /* Function to append symbols to popup list */
 static void popup_append(t_popup* x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -641,6 +681,11 @@ void popup_setup(void) {
                                                                   A_GIMME,
                                                                   0);
 
+        class_addmethod(popup_class, (t_method)popup_set,
+                                                                  gensym("set"),
+                                                                  A_GIMME,
+                                                                  0);
+
 	class_addmethod(popup_class, (t_method)popup_symselect,
                                                                   gensym(""),
                                                                   A_DEFSYMBOL,
@@ -660,7 +705,7 @@ void popup_setup(void) {
     class_setsavefn(popup_class,&popup_save);
 #endif
 
-	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.15 $ $Date: 2005-06-07 08:49:23 $");
+	post("Popup v0.1 Ben Bogart.\nCVS: $Revision: 1.16 $ $Date: 2005-06-07 15:07:53 $");
 }
 
 
