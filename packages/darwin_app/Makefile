@@ -3,7 +3,10 @@ current: darwin_app
 
 PD_APP_NAME = Pd
 
+ifndef DESTDIR
 DESTDIR = installroot
+endif
+
 PD_APP_CONTENTS = /Applications/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
@@ -297,16 +300,22 @@ darwin_app_externals_flext:
 	cd ../../externals/grill/flext && \
 		( \
 			( \
-            cat buildsys/config-mac-pd-gcc.txt | \
-              sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/"  > ____c && \
-              cp ____c buildsys/config-mac-pd-gcc.txt && rm -f ____c \
-         ) || \
-         ( \
-				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" buildsys/mac/pd/config-gcc.def > buildsys/config-mac-pd-gcc.txt \
-			) \
+				test -f buildsys/config-mac-pd-gcc.txt || \
+				( \
+					cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
+					echo Copied template sys config file \
+				) \
+			) && \
+			cat buildsys/config-mac-pd-gcc.txt | \
+				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" | \
+				sed "s/^FLEXTPREFIX=.*/FLEXTPREFIX=@executable_path\/..\/extra/" > buildsys/config-mac-pd-gcc.txt \
 		) && \
 		( \
-			cp -f build/config-mac.def config.txt \
+			test -f config.txt || \
+			( \
+				cp -f build/config-mac.def config.txt && \
+				echo Copied template flext config file \
+			) \
 		) && \
 		bash build.sh pd gcc build-release-shared
 	install -p -m0444 ../../externals/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(EXTERNALS_DIR)
@@ -383,9 +392,9 @@ darwin_app_externals_flext:
 		$(HELP_DIR)/xsample
 ########## FOOTILS #########
 # syncgrain
-	cd ../../externals/footils/syncgrain/ && make -f makefile.pd-darwin
-	install -p -m0444 ../../externals/footils/syncgrain/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
-	install -p -m0644 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
+#	cd ../../externals/footils/syncgrain/ && make -f makefile.pd-darwin
+#	install -p -m0444 ../../externals/footils/syncgrain/pd-darwin/*.pd_darwin $(EXTERNALS_DIR)
+#	install -p -m0644 ../../externals/footils/syncgrain/pd/*.* $(HELP_DIR)/5.reference
 
 
 darwin_app_externals_standard:
