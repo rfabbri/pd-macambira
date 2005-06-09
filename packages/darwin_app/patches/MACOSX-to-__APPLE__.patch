@@ -1,0 +1,357 @@
+Index: configure.in
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/configure.in,v
+retrieving revision 1.10
+diff -u -w -r1.10 configure.in
+--- configure.in	30 May 2005 04:37:25 -0000	1.10
++++ configure.in	9 Jun 2005 06:01:51 -0000
+@@ -218,7 +218,7 @@
+         -framework AudioUnit -framework AudioToolbox \
+         -framework Carbon -framework CoreMIDI"
+     EXT=pd_darwin
+-    MORECFLAGS="-DMACOSX -DUNISTD -I/usr/X11R6/include \
++    MORECFLAGS="-DUNISTD -I/usr/X11R6/include \
+ 	 -I../portaudio/pa_common -I../portaudio/pablio \
+ 	-I../portmidi/pm_common -I../portmidi/pm_mac \
+ 	-I../portmidi/porttime \
+Index: d_array.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/d_array.c,v
+retrieving revision 1.5
+diff -u -w -r1.5 d_array.c
+--- d_array.c	11 Nov 2004 04:58:21 -0000	1.5
++++ d_array.c	9 Jun 2005 06:01:51 -0000
+@@ -540,12 +540,12 @@
+ #define int32 int32_t
+ 
+ #else
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define HIOFFSET 0    /* word offset to find MSB */
+ #define LOWOFFSET 1    /* word offset to find LSB */
+ #define int32 int  /* a data type that has 32 bits */
+ 
+-#endif /* MACOSX */
++#endif /* __APPLE__ */
+ #endif /* __linux__ */
+ #endif /* MSW */
+ #endif /* SGI */
+Index: d_osc.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/d_osc.c,v
+retrieving revision 1.2
+diff -u -w -r1.2 d_osc.c
+--- d_osc.c	6 Sep 2004 20:20:33 -0000	1.2
++++ d_osc.c	9 Jun 2005 06:01:51 -0000
+@@ -56,12 +56,12 @@
+ #define int32 int32_t
+ 
+ #else
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define HIOFFSET 0    /* word offset to find MSB */
+ #define LOWOFFSET 1    /* word offset to find LSB */
+ #define int32 int  /* a data type that has 32 bits */
+ 
+-#endif /* MACOSX */
++#endif /* __APPLE__ */
+ #endif /* __linux__ */
+ #endif /* MSW */
+ #endif /* SGI */
+Index: g_canvas.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/g_canvas.c,v
+retrieving revision 1.7
+diff -u -w -r1.7 g_canvas.c
+--- g_canvas.c	18 May 2005 04:28:50 -0000	1.7
++++ g_canvas.c	9 Jun 2005 06:01:51 -0000
+@@ -25,7 +25,7 @@
+ #define GLIST_DEFCANVASWIDTH 450
+ #define GLIST_DEFCANVASHEIGHT 300
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define GLIST_DEFCANVASYLOC 22
+ #else
+ #define GLIST_DEFCANVASYLOC 0
+Index: g_editor.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/g_editor.c,v
+retrieving revision 1.7
+diff -u -w -r1.7 g_editor.c
+--- g_editor.c	18 May 2005 04:28:50 -0000	1.7
++++ g_editor.c	9 Jun 2005 06:01:52 -0000
+@@ -949,7 +949,7 @@
+ 
+ /* on one-button-mouse machines, you can use double click to
+     mean right click (which gets the popup menu.)  Do this for Mac. */
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define SIMULATERIGHTCLICK
+ #endif
+ 
+@@ -1412,7 +1412,7 @@
+         keyupsym = gensym("#keyup");
+         keynamesym = gensym("#keyname");
+     }
+-#ifdef MACOSX
++#ifdef __APPLE__
+         if (keynum == 30)
+             keynum = 0, gotkeysym = gensym("Up");
+         else if (keynum == 31)
+Index: g_text.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/g_text.c,v
+retrieving revision 1.7
+diff -u -w -r1.7 g_text.c
+--- g_text.c	18 May 2005 04:28:51 -0000	1.7
++++ g_text.c	9 Jun 2005 06:01:52 -0000
+@@ -1100,7 +1100,7 @@
+ 
+ /* -------------------- the "text" class  ------------ */
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define EXTRAPIX 2
+ #else
+ #define EXTRAPIX 1
+Index: s_file.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_file.c,v
+retrieving revision 1.5
+diff -u -w -r1.5 s_file.c
+--- s_file.c	30 May 2005 03:04:18 -0000	1.5
++++ s_file.c	9 Jun 2005 06:01:52 -0000
+@@ -205,7 +205,7 @@
+ 
+ #endif /* MSW */
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+ 
+ static void sys_initloadpreferences( void)
+ {
+@@ -255,7 +255,7 @@
+ {
+ }
+ 
+-#endif /* MACOSX */
++#endif /* __APPLE__ */
+ 
+ void sys_loadpreferences( void)
+ {
+Index: s_inter.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_inter.c,v
+retrieving revision 1.9
+diff -u -w -r1.9 s_inter.c
+--- s_inter.c	30 May 2005 03:04:18 -0000	1.9
++++ s_inter.c	9 Jun 2005 06:01:53 -0000
+@@ -40,7 +40,7 @@
+ #include <string.h>
+ #include <stdio.h>
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <pthread.h>
+@@ -1007,7 +1007,7 @@
+         else if (!childpid)                     /* we're the child */
+         {
+             seteuid(getuid());          /* lose setuid priveliges */
+-#ifndef MACOSX
++#ifndef __APPLE__
+                 /* the wish process in Unix will make a wish shell and
+                     read/write standard in and out unless we close the
+                     file descriptors.  Somehow this doesn't make the MAC OSX
+@@ -1026,7 +1026,7 @@
+ #endif
+             if (!sys_guicmd)
+             {
+-#ifdef MACOSX
++#ifdef __APPLE__
+                 char *homedir = getenv("HOME"), filename[250];
+                 struct stat statbuf;
+                 if (!homedir || strlen(homedir) > 150)
+@@ -1165,7 +1165,7 @@
+     if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
+         fprintf(stderr, "pd: couldn't set high priority class\n");
+ #endif
+-#ifdef MACOSX
++#ifdef __APPLE__
+     if (sys_hipriority)
+     {
+         struct sched_param param;
+@@ -1177,7 +1177,7 @@
+         if (err)
+             post("warning: high priority scheduling failed\n");
+     }
+-#endif /* MACOSX */
++#endif /* __APPLE__ */
+ 
+     if (!sys_nogui && !sys_guisetportnumber)
+     {
+Index: s_loader.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
+retrieving revision 1.6
+diff -u -w -r1.6 s_loader.c
+--- s_loader.c	30 May 2005 03:04:19 -0000	1.6
++++ s_loader.c	9 Jun 2005 06:01:53 -0000
+@@ -13,7 +13,7 @@
+ #include <io.h>
+ #include <windows.h>
+ #endif
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #include <mach-o/dyld.h> 
+ #endif
+ #include <string.h>
+@@ -37,7 +37,7 @@
+ #ifdef __linux__
+     ".pd_linux";
+ #endif
+-#ifdef MACOSX
++#ifdef __APPLE__
+     ".pd_darwin";
+ #endif
+ #ifdef MSW
+@@ -90,7 +90,7 @@
+     if (lastdot = strrchr(nameptr, '.'))
+         *lastdot = 0;
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+     strcpy(symname, "_");
+     strcat(symname, nameptr);
+ #else
+@@ -122,7 +122,7 @@
+     }
+     makeout = (t_xxx)GetProcAddress(ntdll, symname);  
+ #endif
+-#ifdef MACOSX
++#ifdef __APPLE__
+     {
+         NSObjectFileImage image; 
+         void *ret;
+Index: s_path.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_path.c,v
+retrieving revision 1.6
+diff -u -w -r1.6 s_path.c
+--- s_path.c	18 May 2005 04:28:51 -0000	1.6
++++ s_path.c	9 Jun 2005 06:01:53 -0000
+@@ -356,7 +356,7 @@
+ }
+ 
+ 
+-/* Startup file reading for linux and MACOSX.  As of 0.38 this will be
++/* Startup file reading for linux and __APPLE__.  As of 0.38 this will be
+ deprecated in favor of the "settings" mechanism */
+ 
+ int sys_argparse(int argc, char **argv);
+Index: s_stuff.h
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_stuff.h,v
+retrieving revision 1.6
+diff -u -w -r1.6 s_stuff.h
+--- s_stuff.h	28 Nov 2004 21:20:43 -0000	1.6
++++ s_stuff.h	9 Jun 2005 06:01:53 -0000
+@@ -160,7 +160,7 @@
+ #define API_DEFAULT API_MMIO
+ #define API_DEFSTRING "MMIO"
+ #endif
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define API_DEFAULT API_PORTAUDIO
+ #define API_DEFSTRING "portaudio"
+ #endif
+Index: t_main.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/t_main.c,v
+retrieving revision 1.2
+diff -u -w -r1.2 t_main.c
+--- t_main.c	6 Sep 2004 20:20:36 -0000	1.2
++++ t_main.c	9 Jun 2005 06:01:53 -0000
+@@ -14,7 +14,7 @@
+  */
+ 
+ 
+-#ifndef MACOSX     /* linux and IRIX only; in MACOSX we don't link this in */
++#ifndef __APPLE__     /* linux and IRIX only; in __APPLE__ we don't link this in */
+ #include "tk.h"
+ #include <stdlib.h>
+ 
+@@ -112,4 +112,4 @@
+     return TCL_OK;
+ }
+ 
+-#endif  /* MACOSX */
++#endif  /* __APPLE__ */
+Index: t_tkcmd.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/t_tkcmd.c,v
+retrieving revision 1.3
+diff -u -w -r1.3 t_tkcmd.c
+--- t_tkcmd.c	6 Nov 2004 16:07:34 -0000	1.3
++++ t_tkcmd.c	9 Jun 2005 06:01:53 -0000
+@@ -40,7 +40,7 @@
+ #include "tk.h"
+ #endif
+ 
+-#ifdef MACOSX
++#ifdef __APPLE__
+ #define STARTGUI
+ #endif
+ 
+@@ -528,7 +528,7 @@
+     /* in linux, we load the tk code from here (in MSW and MACOS, this
+     is done by passing the name of the file as a startup argument to
+     the wish shell.) */
+-#if !defined(MSW) && !defined(MACOSX)
++#if !defined(MSW) && !defined(__APPLE__)
+ void pdgui_doevalfile(Tcl_Interp *interp, char *s)
+ {
+     char buf[GUISTRING];
+@@ -566,7 +566,7 @@
+ #endif
+     pdgui_setupsocket();
+         /* read in the startup file */
+-#if !defined(MSW) && !defined(MACOSX)
++#if !defined(MSW) && !defined(__APPLE__)
+     pdgui_evalfile("pd.tk");
+ #endif
+ }
+Index: x_arithmetic.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/x_arithmetic.c,v
+retrieving revision 1.2
+diff -u -w -r1.2 x_arithmetic.c
+--- x_arithmetic.c	6 Sep 2004 20:20:36 -0000	1.2
++++ x_arithmetic.c	9 Jun 2005 06:01:53 -0000
+@@ -11,7 +11,7 @@
+ 
+ 
+ /* MSW and OSX don't appear to have single-precision ANSI math */
+-#if defined(MSW) || defined(MACOSX)
++#if defined(MSW) || defined(__APPLE__)
+ #define sinf sin
+ #define cosf cos
+ #define atanf atan
+Index: x_misc.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/x_misc.c,v
+retrieving revision 1.2
+diff -u -w -r1.2 x_misc.c
+--- x_misc.c	6 Sep 2004 20:20:36 -0000	1.2
++++ x_misc.c	9 Jun 2005 06:01:53 -0000
+@@ -21,7 +21,7 @@
+ #include <time.h>
+ #endif
+ 
+-#if defined (MACOSX) || defined (__FreeBSD__)
++#if defined (__APPLE__) || defined (__FreeBSD__)
+ #define HZ CLK_TCK
+ #endif
+ 

@@ -1,5 +1,8 @@
 
-- fixed Pd.app file associations
+- convert the wget sf dev listing line in darwin_app_readme from wget to curl
+  so it works out-of-box on macosx
+
+- fix Pd.app file associations
 
 - create old-style Help->Pure Documentation link on Help menu.  It should use a
   symlink to the "doc" dir internal to that particular Pd.app.  The symlink is
@@ -21,9 +24,6 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 
 - include auto-.pdrc script in package somewhere...
 
-- make a web page that has stuff that can't be included due to license issues:
-  (percolate)
-
 - create Tcl script called from Prefs that creates links for the standard unix
 - locations for files that are in bin, include, man inside $(PD_FILE_ROOT)
 
@@ -36,13 +36,15 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 - make Cmd-Delete also delete, as well as just Delete, so that my Finder key
   command habits work in Pd as well
 
-- make Cmd-H and Alt-Cmd-H work when the Alt key is spec'ed
-
-- create --enable-cpu and --enable-arch in pd/src/configure.in
-
 - create general optimization flag system
 
 - convert from -DMACOSX to -D__APPLE__ where ever possible (check out
   __gnu_linux__) while I am at it
 
-- add context (diff -u) to all patches
+
+
+------------------------------------------------------------------------------
+semi-abandoned TODOs
+
+- make a web page that has stuff that can't be included due to license issues:
+  (percolate)

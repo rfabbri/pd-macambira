@@ -66,3 +66,4 @@ making the Pd.app
     you compiling from MSP source or CVS.
 
 
+	 The final build product will be put into build/Pd.app.
