@@ -18,17 +18,10 @@ Installation/Compilation instructions for "iemmatrix"
 
 CrossCompilation for w32 with MinGW (http://www.mingw.org) on linux-systems
 	you need a cross-compilation tool-chain for windows (there is a debian-package mingw32)
-	set the CC-environment-variable to the cross-compiler and export it
-	set the STRIP-environment-variable to the strip-version that comes with the toolchain and export it
-	set the CFLAGS-environment-variable to "-mms-bitfields" and export it (this is highly necessary to
-	run the external if pd was compiled with M$-vc)
 	run "./configure" and specify the path to your "m_pd.h" (with --includedir) and to your "pd.lib" (with --libdir)
 	don't forget to override the default extension ("pd_linux" on linux-systems) with the more appropriate "dll".
 	on bash this looks like:
-	 % export CC=i586-mingw32msvc-cc
-	 % export STRIP=i586-mingw32msvc-strip	
-	 % export CFLAGS=-mms-bitfields
-	 % ./configure --includedir=/path/to/w32-pd/src/ -libdir=/path/to/w32-pd/bin/ -with-extension=dll
+	 % ./configure  --with-extension=dll --host=i586-mingw32msvc --includedir=/path/to/w32-pd/src/ -libdir=/path/to/w32-pd/bin/
 	now run "make" and enjoy.
 	
 	

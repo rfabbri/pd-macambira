@@ -64,9 +64,62 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 AC_CHECK_FUNCS(select socket strerror)
 
+dnl check for "-mms-bitfields" cflag
+dnl why is there no generic compiler-check for a given flag ?
+dnl it would make things so easy: AC_CHECK_FLAG([-mms-bitfields],,)
+AC_MSG_CHECKING("ms-bitfields")
+cat > conftest.c << EOF
+int main(){
+  return 0;
+}
+EOF
+if ${CC} ${INCLUDES} ${DFLAGS} -o conftest.o conftest.c ${CFLAGS} -mms-bitfields > /dev/null 2>&1
+then
+  echo "yes"
+  CFLAGS="${CFLAGS} -mms-bitfields"
+else
+  echo "no"
+fi
 
+
+
+
+dnl isn't there a better way to check for good linker/stripper ?
+
+dnl if we don't have $LD set, we set it to $(CC)
+dnl LD=${LD:=$CC}
+if test "x$LD" = "x"
+then
+ if test "x$host" != "x"
+ then
+  LD=${host}-ld
+  if $(which ${LD} > /dev/null)
+  then
+    :
+  else
+    LD=""
+  fi
+ fi
+fi
 LD=${LD:=$CC}
-STRIP=${STRIP:=strip}
+
+dnl if we don't have $STRIP set, we set it to ${host}-strip or strip
+if test "x$STRIP" = "x"
+then
+ if test "x$host" != "x"
+ then
+  STRIP=${host}-strip
+  if $(which ${host}-strip > /dev/null)
+  then
+    :
+  else
+    STRIP="echo fake strip"
+  fi
+ else
+  STRIP=strip
+ fi
+fi
+dnl STRIP=${STRIP:=strip}
 
 DFLAGS=""
 
