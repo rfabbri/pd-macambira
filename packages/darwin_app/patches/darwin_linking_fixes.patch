@@ -4,7 +4,7 @@ RCS file: /cvsroot/pure-data/pd/src/configure.in,v
 retrieving revision 1.10
 diff -u -w -r1.10 configure.in
 --- configure.in	30 May 2005 04:37:25 -0000	1.10
-+++ configure.in	6 Jun 2005 23:45:51 -0000
++++ configure.in	7 Jun 2005 00:14:52 -0000
 @@ -13,6 +13,7 @@
  AC_SUBST(USE_DEBUG_CFLAGS, no)
  AC_SUBST(SYSSRC)
@@ -13,7 +13,7 @@ diff -u -w -r1.10 configure.in
  AC_SUBST(GUINAME)
  AC_SUBST(GUIFLAGS)
  AC_SUBST(OSNUMBER)
-@@ -207,6 +210,24 @@
+@@ -207,6 +208,24 @@
  	OPT_CFLAGS="-g"
      else
  	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
@@ -38,7 +38,7 @@ diff -u -w -r1.10 configure.in
      fi
      echo OPT_CFLAGS --------------- $OPT_CFLAGS
      OSNUMBER=0
-@@ -245,24 +266,41 @@
+@@ -245,11 +264,25 @@
          ../portmidi/pm_common/portmidi.c \
          ../portmidi/porttime/ptmacosx_cf.c "
      STRIPFLAG=""
@@ -69,26 +69,25 @@ diff -u -w -r1.10 configure.in
      if test x$USE_DEBUG_CFLAGS == "xyes";
      then
  	OPT_CFLAGS="-g"
-     else
--	OPT_CFLAGS="-O2"
-+        OPT_CFLAGS="-O2 -fast -fPIC -mcpu=7450 -faltivec"
+@@ -258,11 +291,14 @@
      fi
      OSNUMBER=2
      EXTERNTARGET=pd_darwin
 +
      if test x$jack == "xyes";
      then
-     	LDFLAGS=$LDFLAGS" -framework Jack"
+-    	LDFLAGS=$LDFLAGS" -framework Jack"
 -	MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
 -	SYSSRC=$SYSSRC" s_audio_jack.c"
++    	LDFLAGS=$LDFLAGS" -weak_framework Jack"
 +    fi
 +    if test x$jack == "xrun";
 +    then
-+        LDFLAGS=$LDFLAGS" -framework Jack"
++        LDFLAGS=$LDFLAGS" -weak_framework Jack"
      fi
  fi
  
-@@ -272,13 +310,11 @@
+@@ -272,13 +308,11 @@
  then
      MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
      SYSSRC=$SYSSRC" s_audio_jack.c"
@@ -108,7 +107,7 @@ RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.6
 diff -u -w -r1.6 makefile.in
 --- makefile.in	18 May 2005 04:28:51 -0000	1.6
-+++ makefile.in	6 Jun 2005 23:45:51 -0000
++++ makefile.in	7 Jun 2005 00:14:52 -0000
 @@ -97,11 +97,17 @@
  	cp u_main.tk $(BIN_DIR)/pd.tk
  
@@ -138,7 +137,7 @@ RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 retrieving revision 1.9
 diff -u -w -r1.9 u_main.tk
 --- u_main.tk	18 May 2005 04:28:51 -0000	1.9
-+++ u_main.tk	6 Jun 2005 23:45:52 -0000
++++ u_main.tk	7 Jun 2005 00:14:52 -0000
 @@ -48,7 +48,7 @@
      global pd_tearoff
      set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
