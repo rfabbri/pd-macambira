@@ -236,12 +236,12 @@ public:
 
 	BL LdDir(const AtomList &d,const C *flnm,I depth,BL mkdir = true);
 	BL SvDir(const AtomList &d,const C *flnm,I depth,BL absdir);
-	BL Load(const C *flnm) { return LdDir(AtomList(),flnm,-1); }
-	BL Save(const C *flnm) { return SvDir(AtomList(),flnm,-1,true); }
+	BL Load(const C *flnm) { AtomList l; return LdDir(l,flnm,-1); }
+	BL Save(const C *flnm) { AtomList l; return SvDir(l,flnm,-1,true); }
 	BL LdDirXML(const AtomList &d,const C *flnm,I depth,BL mkdir = true);
 	BL SvDirXML(const AtomList &d,const C *flnm,I depth,BL absdir);
-	BL LoadXML(const C *flnm) { return LdDirXML(AtomList(),flnm,-1); }
-	BL SaveXML(const C *flnm) { return SvDirXML(AtomList(),flnm,-1,true); }
+	BL LoadXML(const C *flnm) { AtomList l; return LdDirXML(l,flnm,-1); }
+	BL SaveXML(const C *flnm) { AtomList l; return SvDirXML(l,flnm,-1,true); }
 
 	I refs;
 	const S *sym;
