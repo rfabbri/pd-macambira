@@ -23,7 +23,7 @@
 
 void chaos_library_setup()
 {
-	post("chaos~ version "PACKAGE_VERSION", compiled on "__DATE__" \n");
+	post("chaos~ version 0.01, compiled on "__DATE__" \n");
 
 
 	CHAOS_ADD(bernoulli);

@@ -34,22 +34,22 @@ class driven_anharmonic
 public:
 	driven_anharmonic()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(method,0);
-		CHAOS_SYS_INIT(dt,0.01);
+		CHAOS_PAR_INIT(method,0);
+		CHAOS_PAR_INIT(dt,0.01);
 
-		CHAOS_SYS_INIT(u1,0);
-		CHAOS_SYS_INIT(u2,1);
+		CHAOS_SYS_INIT(u1,0,0);
+		CHAOS_SYS_INIT(u2,1,1);
 
-		CHAOS_SYS_INIT(a,1);
-		CHAOS_SYS_INIT(b,-10);
-		CHAOS_SYS_INIT(c,100);
-		CHAOS_SYS_INIT(Omega,3.5);
-		CHAOS_SYS_INIT(k1,0.01);
-		CHAOS_SYS_INIT(k2,1);
+		CHAOS_PAR_INIT(a,1);
+		CHAOS_PAR_INIT(b,-10);
+		CHAOS_PAR_INIT(c,100);
+		CHAOS_PAR_INIT(Omega,3.5);
+		CHAOS_PAR_INIT(k1,0.01);
+		CHAOS_PAR_INIT(k2,1);
 
+		CHAOS_POSTCONSTRUCTOR;
 		ode_base_alloc();
 		m_t = 0;
 	}
@@ -57,7 +57,7 @@ public:
 	~driven_anharmonic()
 	{
 		ode_base_free();
-		delete m_data;
+		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

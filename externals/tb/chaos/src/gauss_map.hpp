@@ -33,14 +33,16 @@ class gauss_map:
 public:
 	gauss_map()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x,0.5);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_SYS_INIT(x,0.5, 0);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~gauss_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

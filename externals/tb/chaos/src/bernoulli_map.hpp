@@ -28,16 +28,19 @@ class bernoulli:
 	public map_base
 {
 public:
+
 	bernoulli()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x,0.5);
+ 		CHAOS_PRECONSTRUCTOR;
+		
+		CHAOS_SYS_INIT(x,0.5,0);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~bernoulli()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

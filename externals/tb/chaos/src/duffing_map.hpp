@@ -31,17 +31,19 @@ class duffing_map:
 public:
 	duffing_map()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x1, 0.5);
-		CHAOS_SYS_INIT(x2, 0.5);
-		CHAOS_SYS_INIT(a, 0.5);
-		CHAOS_SYS_INIT(b, 0.5);
+		CHAOS_PRECONSTRUCTOR;
+		
+		CHAOS_SYS_INIT(x1, 0.5, 0);
+		CHAOS_SYS_INIT(x2, 0.5, 1);
+		CHAOS_PAR_INIT(a, 0.5);
+		CHAOS_PAR_INIT(b, 0.5);
+		
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~duffing_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

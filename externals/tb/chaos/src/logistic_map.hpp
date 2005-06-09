@@ -30,10 +30,12 @@ class logistic:
 public:
 	logistic()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(alpha, 3.8);
-		CHAOS_SYS_INIT(x, 0.5);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_PAR_INIT(alpha, 3.8);
+		CHAOS_SYS_INIT(x, 0.5,0);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~logistic()

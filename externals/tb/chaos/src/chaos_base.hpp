@@ -21,6 +21,9 @@
 #ifndef __chaos_base_hpp
 
 #include "chaos.hpp"
+#include <map>
+
+#define MAXDIMENSION 5 // this should be enough for the first 
 
 class chaos_base
 {
@@ -42,6 +45,9 @@ public:
 		m_verify();
 	}
 
+	std::map<const t_symbol*,int> attr_ind;
+	
+	// check the integrity of the system
 	virtual void m_verify() 
 	{
 		for (int i = 0; i != get_num_eq(); ++i)
@@ -52,13 +58,24 @@ public:
 #endif
 		}
 	};
-	
-	data_t * m_data;       // state of the system
+
+	data_t m_data[MAXDIMENSION];  // state of the system
 
 protected:
-	virtual void m_step() = 0;
-	int m_num_eq;  // number of equations of the system
+	virtual void m_step() = 0;    // iteration
+	int m_num_eq;                 // number of equations of the system
+ 	flext::AtomList Parameter;    // parameter
+ 	flext::AtomList System;       // system
 };
+
+#define CHAOS_PRECONSTRUCTOR					\
+    /* dummy */	
+
+#define CHAOS_POSTCONSTRUCTOR					\
+m_num_eq = System.Count();
+
+#define CHAOS_DESTRUCTOR						\
+    
 
 
 #define CHAOS_CALLBACKS							\
@@ -68,6 +85,7 @@ void get_dimension(int &i)						\
 	i = m_system->get_num_eq();					\
 }												\
 FLEXT_CALLGET_I(get_dimension);
+
 
 #define CHAOS_ATTRIBUTES						\
 FLEXT_ADDATTR_GET("dimension",get_dimension);

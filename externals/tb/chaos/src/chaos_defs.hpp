@@ -124,8 +124,23 @@ FLEXT_CALLVAR_I(get_##NAME, set_##NAME);
 #define CHAOS_SYS_ATTRIBUTE(NAME)					\
 FLEXT_ADDATTR_VAR(#NAME,get_##NAME, set_##NAME);
 
-#define CHAOS_SYS_INIT(NAME, VALUE)				\
+
+#define CHAOS_INIT(NAME, VALUE)					\
 set_##NAME(VALUE);
+
+#define CHAOS_SYS_INIT(NAME, VALUE, INDEX)					\
+set_##NAME(VALUE);											\
+t_atom atom_##NAME;											\
+flext::SetSymbol(atom_##NAME, flext::MakeSymbol(#NAME));	\
+System.Append(atom_##NAME);									\
+attr_ind[flext::MakeSymbol(#NAME)] = INDEX;
+
+#define CHAOS_PAR_INIT(NAME, VALUE)							\
+set_##NAME(VALUE);											\
+t_atom atom_##NAME;											\
+flext::SetSymbol(atom_##NAME, flext::MakeSymbol(#NAME));	\
+Parameter.Append(atom_##NAME);
+
 
 #define CHAOS_PARAMETER(NAME) m_##NAME
 
@@ -141,6 +156,7 @@ class CLASSNAME##_dsp:										\
 	CLASSNAME_UC##_CALLBACKS;								\
 };															\
 FLEXT_LIB_DSP_V(#CLASSNAME"~", CLASSNAME##_dsp);
+
 
 #define CHAOS_DSP_CLASS_NAME(CLASSNAME,CLASSNAME_UC, NAME)	\
 class CLASSNAME##_dsp:										\
@@ -161,6 +177,7 @@ class CLASSNAME##_msg:										\
 };															\
 FLEXT_LIB_V(#CLASSNAME, CLASSNAME##_msg);
 
+
 #define CHAOS_MSG_CLASS_NAME(CLASSNAME,CLASSNAME_UC, NAME)	\
 class CLASSNAME##_msg:										\
 	public chaos_msg<CLASSNAME>								\
@@ -170,9 +187,31 @@ class CLASSNAME##_msg:										\
 };															\
 FLEXT_LIB_V(#NAME, CLASSNAME##_msg);
 
+#define CHAOS_SEARCH_CLASS(CLASSNAME,CLASSNAME_UC)				\
+class CLASSNAME##_search:										\
+	public chaos_search<CLASSNAME>								\
+{																\
+	CHAOS_SEARCH_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;									\
+};																\
+FLEXT_LIB_V(#CLASSNAME"_search", CLASSNAME##_search);
+
+
+#define CHAOS_SEARCH_CLASS_NAME(CLASSNAME,CLASSNAME_UC, NAME)	\
+class CLASSNAME##_msg:											\
+	public chaos_search<CLASSNAME>								\
+{																\
+	CHAOS_SEARCH_INIT(CLASSNAME, CLASSNAME_UC##_ATTRIBUTES);	\
+	CLASSNAME_UC##_CALLBACKS;									\
+};																\
+FLEXT_LIB_V(#NAME, CLASSNAME##_msg);
+
+
+
 #define CHAOS_ADD(NAME)							\
 FLEXT_DSP_SETUP(NAME##_dsp);					\
-FLEXT_SETUP(NAME##_msg);
+FLEXT_SETUP(NAME##_msg);						\
+FLEXT_SETUP(NAME##_search);
 
 #define __chaos_defs_hpp
 #endif /* __chaos_defs_hpp */

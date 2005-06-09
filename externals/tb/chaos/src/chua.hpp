@@ -36,15 +36,18 @@ class chua:
 public:
 	chua()
 	{
-		m_num_eq = 3;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x1,1);
-		CHAOS_SYS_INIT(x2,1);
-		CHAOS_SYS_INIT(x3,1);
-		CHAOS_SYS_INIT(a,1.4);
-		CHAOS_SYS_INIT(b,0.3);
-		CHAOS_SYS_INIT(alpha,0.3);
-		CHAOS_SYS_INIT(beta,0.3);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_SYS_INIT(x1,1,0);
+		CHAOS_SYS_INIT(x2,1,1);
+		CHAOS_SYS_INIT(x3,1,2);
+
+		CHAOS_PAR_INIT(a,1.4);
+		CHAOS_PAR_INIT(b,0.3);
+		CHAOS_PAR_INIT(alpha,0.3);
+		CHAOS_PAR_INIT(beta,0.3);
+		
+		CHAOS_POSTCONSTRUCTOR;
 		
 		ode_base_alloc();
 	}
@@ -52,7 +55,6 @@ public:
 	~chua()
 	{
 		ode_base_free();
-		delete m_data;
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

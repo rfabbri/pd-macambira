@@ -31,18 +31,20 @@ class henon:
 public:
 	henon()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(x,0);
-		CHAOS_SYS_INIT(y,0);
-		CHAOS_SYS_INIT(a,1.4);
-		CHAOS_SYS_INIT(b,0.3);
+		CHAOS_SYS_INIT(x,0,0);
+		CHAOS_SYS_INIT(y,0,1);
+
+		CHAOS_PAR_INIT(a,1.4);
+		CHAOS_PAR_INIT(b,0.3);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~henon()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

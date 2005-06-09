@@ -33,20 +33,22 @@ class latoocarfian
 public:
 	latoocarfian()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR
 
-		CHAOS_SYS_INIT(x1,0.5);
-		CHAOS_SYS_INIT(x2,0);
-		CHAOS_SYS_INIT(a,-0.966918);
-		CHAOS_SYS_INIT(b,2.879879);
-		CHAOS_SYS_INIT(c,0.765145);
-		CHAOS_SYS_INIT(d,0.744728);
+		CHAOS_SYS_INIT(x1,0.5,0);
+		CHAOS_SYS_INIT(x2,0,1);
+
+		CHAOS_PAR_INIT(a,-0.966918);
+		CHAOS_PAR_INIT(b,2.879879);
+		CHAOS_PAR_INIT(c,0.765145);
+		CHAOS_PAR_INIT(d,0.744728);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 	
 	~latoocarfian()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

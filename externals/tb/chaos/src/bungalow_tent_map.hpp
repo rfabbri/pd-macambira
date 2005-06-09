@@ -38,15 +38,17 @@ class bungalow_tent:
 public:
 	bungalow_tent()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x, 0.6);
-		CHAOS_SYS_INIT(r, 0.5);
+ 		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_SYS_INIT(x, 0.6,0);
+		CHAOS_PAR_INIT(r, 0.5);
+
+ 		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~bungalow_tent()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

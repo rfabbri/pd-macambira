@@ -31,17 +31,20 @@ class lozi_map:
 public:
 	lozi_map()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x,0);
-		CHAOS_SYS_INIT(y,0);
-		CHAOS_SYS_INIT(a,1.4);
-		CHAOS_SYS_INIT(b,0.3);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_SYS_INIT(x,0,0);
+		CHAOS_SYS_INIT(y,0,1);
+
+		CHAOS_PAR_INIT(a,1.4);
+		CHAOS_PAR_INIT(b,0.3);
+		
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~lozi_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()
@@ -57,7 +60,12 @@ public:
 		m_data[1] = CHAOS_PARAMETER(b) * x;
 		
 	}
-
+	virtual void m_verify() 
+	{
+		if (PD_BIGORSMALL(m_data[0]))
+			m_data[0] = 1;
+	}
+							
 	CHAOS_SYSVAR_FUNCS(x, 0);
 	CHAOS_SYSVAR_FUNCS(y, 1);
 

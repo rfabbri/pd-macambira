@@ -31,25 +31,28 @@ class lorenz
 public:
 	lorenz()
 	{
-		m_num_eq = 3;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(method,0);
-		CHAOS_SYS_INIT(dt,0.01);
-		CHAOS_SYS_INIT(x1,0.8);
-		CHAOS_SYS_INIT(x2,0.7);
-		CHAOS_SYS_INIT(x3,0.6);
-		CHAOS_SYS_INIT(sigma,16);
-		CHAOS_SYS_INIT(b,4);
-		CHAOS_SYS_INIT(r,40);
+		CHAOS_PAR_INIT(method,0);
+		CHAOS_PAR_INIT(dt,0.01);
 
+		CHAOS_SYS_INIT(x1,0.8,0);
+		CHAOS_SYS_INIT(x2,0.7,1);
+		CHAOS_SYS_INIT(x3,0.6,2);
+
+		CHAOS_PAR_INIT(sigma,16);
+		CHAOS_PAR_INIT(b,4);
+		CHAOS_PAR_INIT(r,40);
+
+		CHAOS_POSTCONSTRUCTOR;
+		
 		ode_base_alloc();
 	}
 	
 	~lorenz()
 	{
 		ode_base_free();
-		delete m_data;
+		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

@@ -32,14 +32,16 @@ class sine_map:
 public:
 	sine_map()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(x,0);
+		CHAOS_PRECONSTRUCTOR;
+		
+		CHAOS_SYS_INIT(x,0,0);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~sine_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

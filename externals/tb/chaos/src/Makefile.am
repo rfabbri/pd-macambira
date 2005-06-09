@@ -16,13 +16,13 @@ BUILT_SOURCES = main.cpp ode_base.cpp chaos_dsp.cpp \
 	latoomutalpha_dsp.cpp latoomutalpha_msg.cpp \
 	latoomutbeta_dsp.cpp latoomutbeta_msg.cpp \
 	latoomutgamma_dsp.cpp latoomutgamma_msg.cpp \
-	logistic_dsp.cpp logistic_msg.cpp \
+	logistic_dsp.cpp logistic_msg.cpp logistic_search.cpp\
 	lorenz_dsp.cpp lorenz_msg.cpp \
 	lozi_map_dsp.cpp lozi_map_msg.cpp \
 	roessler_dsp.cpp roessler_msg.cpp \
 	sine_map_dsp.cpp sine_map_msg.cpp \
 	standard_map_dsp.cpp standard_map_msg.cpp \
-	tent_map_dsp.cpp tent_map_msg.cpp
+	tent_map_dsp.cpp tent_map_msg.cpp 
 
 CXXFLAGS  = @CXXFLAGS@ \
 	@OPT_FLAGS@ \

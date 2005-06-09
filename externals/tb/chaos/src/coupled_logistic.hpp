@@ -21,7 +21,7 @@
 #include "map_base.hpp"
 
 //  coupled_logistic map: x[n+1] = r * x[n] * (1 - x[n]) + e * (y[n] - x[n])
-//                        y[n+1] = r * y[n] * (1 - y[n]) + e * (x[t] - y[t])
+//                        y[n+1] = r * y[n] * (1 - y[n]) + e * (x[n] - y[n])
 //                        1 <= r <= 4
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
@@ -31,17 +31,19 @@ class coupled_logistic:
 public:
 	coupled_logistic()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(e, 0.06);
-		CHAOS_SYS_INIT(r, 3.7);
-		CHAOS_SYS_INIT(x, 0.1);
-		CHAOS_SYS_INIT(x, 0.2);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_PAR_INIT(e, 0.06);
+		CHAOS_PAR_INIT(r, 3.7);
+
+		CHAOS_SYS_INIT(x, 0.1,0);
+		CHAOS_SYS_INIT(y, 0.2,1);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~coupled_logistic()
 	{
-		delete m_data;
 	}
 
 	virtual void m_step()
@@ -61,8 +63,24 @@ public:
 		return (f > 0) && (f < 4);
 	}
 
-	CHAOS_SYSVAR_FUNCS(x, 0);
-	CHAOS_SYSVAR_FUNCS(y, 0);
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_xy);
+	CHAOS_SYSVAR_FUNCS_PRED(y, 0, m_pred_xy);
+	
+	bool m_pred_xy(t_float f)
+	{
+		return (f > 0) && (f < 1);
+	}
+
+	virtual void m_verify()
+	{
+		data_t x = m_data[0];
+		data_t y = m_data[1];
+		if (!m_pred_xy(x))
+			m_data[0] = 0.5;
+		if (!m_pred_xy(y))
+			m_data[1] = 0.5;
+	}
+
 	
 };
 

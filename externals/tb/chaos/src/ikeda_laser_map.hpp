@@ -37,19 +37,22 @@ class ikeda_laser_map:
 public:
 	ikeda_laser_map()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(c1,0.4);
-		CHAOS_SYS_INIT(c2,0.9);
-		CHAOS_SYS_INIT(c3,9);
-		CHAOS_SYS_INIT(roh,0.85);
-		CHAOS_SYS_INIT(x,0.5);
-		CHAOS_SYS_INIT(y,0.5);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_PAR_INIT(c1,0.4);
+		CHAOS_PAR_INIT(c2,0.9);
+		CHAOS_PAR_INIT(c3,9);
+		CHAOS_PAR_INIT(roh,0.85);
+
+		CHAOS_SYS_INIT(x,0.5,0);
+		CHAOS_SYS_INIT(y,0.5,1);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~ikeda_laser_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

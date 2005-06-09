@@ -35,27 +35,27 @@ class driven_van_der_pol
 public:
 	driven_van_der_pol()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(method,0);
-		CHAOS_SYS_INIT(dt,0.01);
+		CHAOS_PAR_INIT(method,0);
+		CHAOS_PAR_INIT(dt,0.01);
 
-		CHAOS_SYS_INIT(u1,0.8);
-		CHAOS_SYS_INIT(u2,0.6);
-		CHAOS_SYS_INIT(u3,0.4);
+		CHAOS_SYS_INIT(u1,0.8, 0);
+		CHAOS_SYS_INIT(u2,0.6, 1);
+		CHAOS_SYS_INIT(u3,0.4, 2);
 
-		CHAOS_SYS_INIT(a,5);
-		CHAOS_SYS_INIT(Omega,2.466);
-		CHAOS_SYS_INIT(k,5);
+		CHAOS_PAR_INIT(a,5);
+		CHAOS_PAR_INIT(Omega,2.466);
+		CHAOS_PAR_INIT(k,5);
 
+		CHAOS_POSTCONSTRUCTOR;
 		ode_base_alloc();
 	}
 	
 	~driven_van_der_pol()
 	{
 		ode_base_free();
-		delete m_data;
+		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

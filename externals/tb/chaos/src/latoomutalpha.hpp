@@ -32,19 +32,21 @@ class latoomutalpha
 public:
 	latoomutalpha()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(x1,0.5);
-		CHAOS_SYS_INIT(x2,0.2);
-		CHAOS_SYS_INIT(a,-0.966918);
-		CHAOS_SYS_INIT(b,2.879879);
-		CHAOS_SYS_INIT(c,0.765145);
+		CHAOS_SYS_INIT(x1,0.5,0);
+		CHAOS_SYS_INIT(x2,0.2,1);
+
+		CHAOS_PAR_INIT(a,-0.966918);
+		CHAOS_PAR_INIT(b,2.879879);
+		CHAOS_PAR_INIT(c,0.765145);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 	
 	~latoomutalpha()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()
@@ -68,7 +70,7 @@ public:
 		{
 #ifndef DOUBLE_PRECISION
 			if (PD_BIGORSMALL(m_data[i]))
-				m_data[i] = 0.01;
+				m_data[i] = 0.5;
 #endif
 		}
 	};

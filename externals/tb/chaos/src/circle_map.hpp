@@ -32,16 +32,19 @@ class circle_map:
 public:
 	circle_map()
 	{
-		m_num_eq = 1;
-		m_data = new data_t[m_num_eq];
-		CHAOS_SYS_INIT(omega, 0.1);
-		CHAOS_SYS_INIT(r, 3);
-		CHAOS_SYS_INIT(x, 0.4);
+		CHAOS_PRECONSTRUCTOR;
+
+		CHAOS_SYS_INIT(x, 0.4,0);
+
+		CHAOS_PAR_INIT(omega, 0.1);
+		CHAOS_PAR_INIT(r, 3);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~circle_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()

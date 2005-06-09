@@ -32,17 +32,19 @@ class standard_map:
 public:
 	standard_map()
 	{
-		m_num_eq = 2;
-		m_data = new data_t[m_num_eq];
+		CHAOS_PRECONSTRUCTOR;
+		
+		CHAOS_SYS_INIT(I,0.1,0);
+		CHAOS_SYS_INIT(theta,0.2,1);
 
-		CHAOS_SYS_INIT(I,0.1);
-		CHAOS_SYS_INIT(theta,0.2);
-		CHAOS_SYS_INIT(k, 0.8);
+		CHAOS_PAR_INIT(k, 0.8);
+
+		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~standard_map()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()
