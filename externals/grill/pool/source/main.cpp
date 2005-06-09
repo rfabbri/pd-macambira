@@ -121,8 +121,8 @@ private:
 
 	V set(I argc,const A *argv,BL over);
 	V getdir(const S *tag);
-	I getrec(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
-	I getsub(const S *tag,I level,BL order,get_t how = get_norm,const AtomList &rdir = AtomList());
+	I getrec(const S *tag,I level,BL order,get_t how /*= get_norm*/,const AtomList &rdir);
+	I getsub(const S *tag,I level,BL order,get_t how /*= get_norm*/,const AtomList &rdir);
 
 	V paste(const S *tag,I argc,const A *argv,BL repl);
 	V copy(const S *tag,I argc,const A *argv,BL cut);
@@ -658,7 +658,8 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
 		else {
 			I lv = level > 0?level-1:-1;
 			for(I i = 0; i < cnt; ++i) {
-				ret += getrec(tag,lv,order,how,Atoms(rdir).Append(*r[i]));
+				Atoms l(rdir); l.Append(*r[i]);
+				ret += getrec(tag,lv,order,how,l);
 			}
 			delete[] r;
 		}
@@ -669,7 +670,8 @@ I pool::getrec(const t_symbol *tag,I level,BL order,get_t how,const AtomList &rd
 
 V pool::m_getall()
 {
-	getrec(thisTag(),0,false);
+	AtomList l;
+	getrec(thisTag(),0,false,get_norm,l);
 	ToOutBang(3);
 
 	echodir();
@@ -677,7 +679,8 @@ V pool::m_getall()
 
 V pool::m_ogetall()
 {
-	getrec(thisTag(),0,true);
+	AtomList l;
+	getrec(thisTag(),0,true,get_norm,l);
 	ToOutBang(3);
 
 	echodir();
@@ -695,7 +698,9 @@ V pool::m_getrec(I argc,const A *argv)
 		else 
 			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
-	getrec(thisTag(),lvls,false);
+
+	AtomList l;
+	getrec(thisTag(),lvls,false,get_norm,l);
 	ToOutBang(3);
 
 	echodir();
@@ -714,7 +719,9 @@ V pool::m_ogetrec(I argc,const A *argv)
 		else 
 			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
-	getrec(thisTag(),lvls,true);
+
+	AtomList l;
+	getrec(thisTag(),lvls,true,get_norm,l);
 	ToOutBang(3);
 
 	echodir();
@@ -747,8 +754,10 @@ I pool::getsub(const S *tag,I level,BL order,get_t how,const AtomList &rdir)
 				ToOutBang(0);
 			}
 
-			if(level != 0)
-				ret += getsub(tag,lv,order,how,Atoms(rdir).Append(*r[i]));
+			if(level != 0) {
+				AtomList l(rdir); l.Append(*r[i]);
+				ret += getsub(tag,lv,order,how,l);
+			}
 		}
 		delete[] r;
 	}
@@ -768,8 +777,9 @@ V pool::m_getsub(I argc,const A *argv)
 		else 
 			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
-
-	getsub(thisTag(),lvls,false);
+	
+	AtomList l;
+	getsub(thisTag(),lvls,false,get_norm,l);
 	ToOutBang(3);
 
 	echodir();
@@ -789,7 +799,8 @@ V pool::m_ogetsub(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
 
-	getsub(thisTag(),lvls,true); 
+	AtomList l;
+	getsub(thisTag(),lvls,true,get_norm,l); 
 	ToOutBang(3);
 
 	echodir();
@@ -798,7 +809,8 @@ V pool::m_ogetsub(I argc,const A *argv)
 
 V pool::m_cntall()
 {
-	I cnt = getrec(thisTag(),0,false,get_cnt);
+	AtomList l;
+	I cnt = getrec(thisTag(),0,false,get_cnt,l);
 	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
@@ -820,7 +832,8 @@ V pool::m_cntrec(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to infinite",thisName(),GetString(thisTag()));
 	}
 	
-	I cnt = getrec(thisTag(),lvls,false,get_cnt);
+	AtomList l;
+	I cnt = getrec(thisTag(),lvls,false,get_cnt,l);
 	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
@@ -843,7 +856,8 @@ V pool::m_cntsub(I argc,const A *argv)
 			post("%s - %s: invalid level specification - set to 0",thisName(),GetString(thisTag()));
 	}
 
-	I cnt = getsub(thisTag(),lvls,false,get_cnt);
+	AtomList l;
+	I cnt = getsub(thisTag(),lvls,false,get_cnt,l);
 	ToOutSymbol(3,thisTag());
 	ToOutBang(2);
 	ToOutBang(1);
@@ -854,7 +868,8 @@ V pool::m_cntsub(I argc,const A *argv)
 
 V pool::m_printall()
 {
-	I cnt = getrec(thisTag(),0,false,get_print);
+	AtomList l;
+	I cnt = getrec(thisTag(),0,false,get_print,l);
     post("");
 }
 
@@ -876,7 +891,8 @@ V pool::m_printrec(I argc,const A *argv,BL fromroot)
 	Atoms svdir(curdir);
     if(fromroot) curdir.Clear();
 
-	I cnt = getrec(tag,lvls,false,get_print);
+	AtomList l;
+	I cnt = getrec(tag,lvls,false,get_print,l);
     post("");
 
     curdir = svdir;
