@@ -12,6 +12,7 @@
 			};
 		};
 		113C0C5F036745F00CCB177F = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Transaction_Utilities.c;
 			refType = 4;
@@ -55,6 +56,7 @@
 //F93
 //F94
 		F94467BD024699CF0ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Name_Lookup.c;
 			refType = 4;
@@ -66,6 +68,7 @@
 			};
 		};
 		F94467C302469A860ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Name_Lookup.h;
 			refType = 4;
@@ -81,6 +84,7 @@
 				F94745CB01B2DAC40ACA2316,
 				F94745CC01B2DAC40ACA2316,
 			);
+			hasScannedForEncodings = 1;
 			isa = PBXProject;
 			mainGroup = F94745CA01B2DAC40ACA2316;
 			productRefGroup = F94745CF01B2DB060ACA2316;
@@ -163,11 +167,13 @@
 				F94745D501B2DB060ACA2316,
 			);
 			buildSettings = {
+				DEBUGGING_SYMBOLS = NO;
 				LIBRARY_STYLE = STATIC;
-				OTHER_CFLAGS = "";
+				OPTIMIZATION_CFLAGS = "-O3";
 				OTHER_LDFLAGS = "";
 				OTHER_LIBTOOL_FLAGS = "";
 				OTHER_REZFLAGS = "";
+				PRECOMPILE_PREFIX_HEADER = YES;
 				PREFIX_HEADER = HIDLib.h;
 				PRODUCT_NAME = libHIDUtilities.a;
 				REZ_EXECUTABLE = YES;
@@ -180,7 +186,6 @@
 			name = libHIDUtilities.a;
 			productName = libHIDUtilities.a;
 			productReference = F94745D001B2DB060ACA2316;
-			shouldUseHeadermap = 0;
 		};
 		F94745D201B2DB060ACA2316 = {
 			buildActionMask = 2147483647;
@@ -221,11 +226,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F94745D601B2DB130ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Config_Utilities.c;
 			refType = 4;
 		};
 		F94745DA01B2DB130ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Queue_Utilities.c;
 			refType = 4;
@@ -253,16 +260,19 @@
 			refType = 4;
 		};
 		F94745E301B2DB720ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = IOHIDPowerUsage.h;
 			refType = 4;
 		};
 		F94745E401B2DB720ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = PID.h;
 			refType = 4;
 		};
 		F94745E601B2DB720ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Utilities.c;
 			refType = 4;
@@ -274,6 +284,7 @@
 			};
 		};
 		F94745EB01B2E50A0ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HIDLib.h;
 			refType = 4;
@@ -285,11 +296,13 @@
 			};
 		};
 		F94745EF01B301760ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Utilities_External.h;
 			refType = 4;
 		};
 		F94745F001B301760ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Utilities_Internal.h;
 			refType = 4;
@@ -301,6 +314,7 @@
 			};
 		};
 		F94745F301B3062C0ACA2316 = {
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			path = HID_Error_Handler.c;
 			refType = 4;
