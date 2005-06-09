@@ -45,6 +45,7 @@ typedef struct _detach
 
 typedef struct _detach_content
 {
+	struct _detach_content_t * next;
 	enum { BANG, 
 		   POINTER,
 		   FLOAT,
@@ -54,6 +55,7 @@ typedef struct _detach_content
 		   CANCEL} type;
 	int argc;
 	t_atom * argv;
+	t_symbol * symbol;
 } detach_content_t;
 
 
@@ -85,7 +87,7 @@ static void detach_thread(detach_t* x)
 				freebytes(me->argv, me->argc * sizeof(t_atom));
 				break;
 			case ANYTHING:
-				outlet_anything(x->x_outlet, 0, me->argc, me->argv);
+				outlet_anything(x->x_outlet, me->symbol, me->argc, me->argv);
 				freebytes(me->argv, me->argc * sizeof(t_atom));
 				break;
 			case CANCEL:
@@ -232,6 +234,7 @@ static void detach_anything(detach_t * x, t_symbol * s,
 	me->type = ANYTHING;
 	me->argc = argc;
 	me->argv = copybytes(argv, argc * sizeof(t_atom));
+	me->symbol = s;
 	fifo_put(x->x_fifo, me);
 	
 	pthread_cond_broadcast(&x->x_cond);
