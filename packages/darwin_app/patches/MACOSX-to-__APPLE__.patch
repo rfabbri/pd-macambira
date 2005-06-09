@@ -247,7 +247,7 @@ diff -u -w -r1.6 s_path.c
  
  
 -/* Startup file reading for linux and MACOSX.  As of 0.38 this will be
-+/* Startup file reading for linux and __APPLE__.  As of 0.38 this will be
++/* Startup file reading for linux and Mac OS X.  As of 0.38 this will be
  deprecated in favor of the "settings" mechanism */
  
  int sys_argparse(int argc, char **argv);
@@ -279,7 +279,7 @@ diff -u -w -r1.2 t_main.c
  
  
 -#ifndef MACOSX     /* linux and IRIX only; in MACOSX we don't link this in */
-+#ifndef __APPLE__     /* linux and IRIX only; in __APPLE__ we don't link this in */
++#ifndef __APPLE__     /* linux and IRIX only; in Mac OS X we don't link this in */
  #include "tk.h"
  #include <stdlib.h>
  
