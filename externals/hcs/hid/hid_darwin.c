@@ -542,8 +542,8 @@ t_int hid_build_device_list(t_hid *x)
 	if(HIDBuildDeviceList (NULL, NULL)) 
 		error("[hid]: no HID devices found\n");
 
-	/* send the [menu( msg to set the [hid_menu] to blank */
-	outlet_anything( x->x_device_name_outlet, gensym( "menu" ),0,NULL );
+	/* send the [options( msg to set the [hid_menu] to blank */
+	outlet_anything( x->x_device_name_outlet, gensym( "options" ),0,NULL );
 
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while ( pCurrentHIDDevice != NULL )

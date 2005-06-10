@@ -1,11 +1,11 @@
-#N canvas 469 172 252 29 10;
+#N canvas 469 172 202 29 10;
 #X obj 131 138 inlet;
 #X obj 15 350 outlet;
-#X obj 1 2 popup 250 25 grey90 HID_device none;
+#X obj 1 2 popup 200 25 grey90 HID_device none;
 #X msg 15 318 open \$1;
 #X obj 251 141 prepend append;
 #X msg 131 203 options;
-#X obj 131 176 route menu;
+#X obj 131 176 route options;
 #X connect 0 0 6 0;
 #X connect 2 0 3 0;
 #X connect 3 0 1 0;
@@ -13,4 +13,4 @@
 #X connect 5 0 2 0;
 #X connect 6 0 5 0;
 #X connect 6 1 4 0;
-#X coords 0 0 1 1 252 29 1;
+#X coords 0 0 1 1 202 29 1;
