@@ -7,5 +7,7 @@
  *
  */
 
-extern io_object_t AllocateHIDObjectFromRecDevice( pRecDevice pDevice );
-extern Boolean FreeHIDObject( io_object_t hidDevice );
+//extern io_object_t AllocateHIDObjectFromRecDevice( pRecDevice pDevice );
+//extern Boolean FreeHIDObject( io_object_t hidDevice );
+io_service_t AllocateHIDObjectFromRecDevice( pRecDevice pDevice );
+bool FreeHIDObject( io_service_t hidDevice );

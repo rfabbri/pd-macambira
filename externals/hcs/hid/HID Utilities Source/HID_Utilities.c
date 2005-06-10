@@ -99,7 +99,7 @@ static void hid_GetElementInfo (CFTypeRef refElement, pRecElement pElement)
 	else
 		pElement->min = 0;
 
-	pElement->calMax = pElement->min;
+//	pElement->calMax = pElement->min;
 	pElement->userMin = kDefaultUserMin;
 
 	refType = CFDictionaryGetValue (refElement, CFSTR(kIOHIDElementMaxKey));
@@ -108,7 +108,7 @@ static void hid_GetElementInfo (CFTypeRef refElement, pRecElement pElement)
 	else
 		pElement->max = 0;
 
-	pElement->calMin = pElement->max;
+//	pElement->calMin = pElement->max;
 	pElement->userMax = kDefaultUserMax;
 
 	refType = CFDictionaryGetValue (refElement, CFSTR(kIOHIDElementScaledMinKey));
@@ -1853,7 +1853,7 @@ void HIDGetUsageName (const long valueUsagePage, const long valueUsage, char * c
 // ---------------------------------
 // returns calibrated value given raw value passed in
 // calibrated value is equal to min and max values returned by HIDGetElementValue since device list built scaled to element reported min and max values
-
+/*
 SInt32 HIDCalibrateValue (SInt32 value, pRecElement pElement)
 {
 	if (NULL != pElement)
@@ -1868,7 +1868,7 @@ SInt32 HIDCalibrateValue (SInt32 value, pRecElement pElement)
 	else
 		return 0; // bad element passed in
 }
-
+*/
 // ---------------------------------
 // returns scaled value given raw value passed in
 // scaled value is equal to current value assumed to be in the range of element reported min and max values scaled to user min and max scaled values

@@ -33,6 +33,52 @@
 //112
 //113
 //114
+//3A0
+//3A1
+//3A2
+//3A3
+//3A4
+		3A1E2F8308593DC100E32947 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = HID_APIs.h;
+			refType = 4;
+		};
+		3A1E2F8408593DC100E32947 = {
+			fileRef = 3A1E2F8308593DC100E32947;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3A1E2F8508593DD700E32947 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = ImmrHIDUtilAddOn.h;
+			refType = 4;
+		};
+		3A1E2F8608593DD700E32947 = {
+			fileRef = 3A1E2F8508593DD700E32947;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		3A1E2F8708593DE400E32947 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			path = ImmrHIDUtilAddOn.c;
+			refType = 4;
+		};
+		3A1E2F8808593DE400E32947 = {
+			fileRef = 3A1E2F8708593DE400E32947;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//3A0
+//3A1
+//3A2
+//3A3
+//3A4
 //F60
 //F61
 //F62
@@ -141,6 +187,7 @@
 				F94745DA01B2DB130ACA2316,
 				113C0C5F036745F00CCB177F,
 				F94745E601B2DB720ACA2316,
+				3A1E2F8708593DE400E32947,
 			);
 			isa = PBXGroup;
 			name = Source;
@@ -194,6 +241,8 @@
 				F94745F201B301760ACA2316,
 				F94467C402469A860ACA2316,
 				11019ECA0367675E0CCB177F,
+				3A1E2F8408593DC100E32947,
+				3A1E2F8608593DD700E32947,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -207,6 +256,7 @@
 				F94745F401B3062C0ACA2316,
 				F94467BF024699CF0ACA2316,
 				113C0C60036745F00CCB177F,
+				3A1E2F8808593DE400E32947,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,6 +304,8 @@
 				F94745E301B2DB720ACA2316,
 				F94745E401B2DB720ACA2316,
 				F94745EF01B301760ACA2316,
+				3A1E2F8308593DC100E32947,
+				3A1E2F8508593DD700E32947,
 			);
 			isa = PBXGroup;
 			name = "External Headers";

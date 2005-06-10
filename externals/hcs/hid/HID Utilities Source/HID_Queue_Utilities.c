@@ -509,11 +509,13 @@ try_getElementValue:
 		HIDREPORTERROR ("HIDGetElementValue - invalid device and/or element.");
 
     // record min and max for auto scale and auto ...
+/*
     if (hidEvent.value < pElement->calMin)
         pElement->calMin = hidEvent.value; 
     if (hidEvent.value > pElement->calMax)
         pElement->calMax = hidEvent.value; 
-
+*/
+ 
     // auto user scale
     return hidEvent.value;
 }
@@ -547,6 +549,7 @@ long HIDSetElementValue (pRecDevice pDevice, pRecElement pElement,void* pIOHIDEv
 
 // ---------------------------------
 // Set a callback to be called when a queue goes from empty to non-empty
+/*
 long HIDSetQueueCallback (pRecDevice pDevice, IOHIDCallbackFunction callback)
 {
     IOReturn result = kIOReturnError;	// assume failure (pessimist!)
@@ -582,7 +585,7 @@ long HIDSetQueueCallback (pRecDevice pDevice, IOHIDCallbackFunction callback)
 		HIDREPORTERROR ("HIDSetQueueCallback - invalid device and/or element.");
     return result;
 }
-
+*/
 #if 1
 // ---------------------------------
 // Get a report from a device
