@@ -238,6 +238,7 @@ static void *hid_new(t_float f)
 #endif
 
   /* init vars */
+  x->x_has_ff = 0;
   x->x_device_open = 0;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
@@ -285,5 +286,17 @@ void hid_setup(void)
 	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_stop,gensym("stop"),0);
 	class_addmethod(hid_class,(t_method) hid_stop,gensym("nopoll"),0);
+   /* force feedback messages */
+	class_addmethod(hid_class,(t_method) hid_ff_autocenter,
+						 gensym("ff_autocenter"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_ff_gain,gensym("ff_gain"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_ff_motors,gensym("ff_motors"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_ff_continue,gensym("ff_continue"),0);
+	class_addmethod(hid_class,(t_method) hid_ff_pause,gensym("ff_pause"),0);
+	class_addmethod(hid_class,(t_method) hid_ff_reset,gensym("ff_reset"),0);
+	class_addmethod(hid_class,(t_method) hid_ff_stopall,gensym("ff_stopall"),0);
+	/* ff tests */
+	class_addmethod(hid_class,(t_method) hid_ff_fftest,gensym("fftest"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_ff_print,gensym("ff_print"),0);
 }
 

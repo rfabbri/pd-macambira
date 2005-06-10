@@ -43,6 +43,7 @@
 #include <Carbon/Carbon.h>
 
 #include "HID_Utilities_External.h"
+#include "ImmrHIDUtilAddOn.h"
 
 #include <IOKit/hid/IOHIDUsageTables.h>
 #include <ForceFeedback/ForceFeedback.h>
@@ -207,10 +208,9 @@ void hid_build_element_list(t_hid *x)
 	
 }
 
-
 t_int hid_print_element_list(t_hid *x)
 {
-	DEBUG(post("hid_build_element_list"););
+	DEBUG(post("hid_print_element_list"););
 
 	UInt32 i;
 	pRecElement	pCurrentHIDElement;
@@ -262,12 +262,37 @@ t_int hid_print_element_list(t_hid *x)
 }
 
 
+void hid_ff_print( t_hid *x )
+{
+	DEBUG(post("hid_ff_print"););
+	HRESULT result;
+	UInt32 value;
+
+	if ( x->x_has_ff ) 
+	{
+		result = FFDeviceGetForceFeedbackProperty( (FFDeviceObjectReference) x->x_ff_device, 
+																 FFPROP_AUTOCENTER, 
+																 &value, 
+																 (IOByteCount) sizeof( value ) );
+		if ( result == FF_OK ) post( "autocenter: %d",value );
+
+		result = FFDeviceGetForceFeedbackProperty( (FFDeviceObjectReference) x->x_ff_device, 
+																 FFPROP_FFGAIN, 
+																 &value, 
+																 (IOByteCount) sizeof( value ) );
+		if ( result == FF_OK ) post( "gain: %d", value );
+	}
+
+//	FFEffectGetParameters(  ); 
+}
+
+
 void hid_print_device_list(t_hid *x) 
 {
 	char cstrDeviceName [256];
 	t_int i,numdevs;
 	UInt32 usagePage, usage;
-	pRecDevice pCurrentHIDDevice;
+	pRecDevice pCurrentHIDDevice = NULL;
 
 	if( HIDHaveDeviceList() )
 	{
@@ -306,6 +331,139 @@ void hid_output_device_name(t_hid *x, char *manufacturer, char *product)
 	strcat( device_name, product );
 //	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
 	outlet_symbol( x->x_device_name_outlet, gensym( device_name ) );
+}
+
+/* ============================================================================== 
+ * FORCE FEEDBACK
+ * ============================================================================== */
+
+/* --------------------------------------------------------------------------
+ * FF "Properties"
+ * autocenter ( 0/1 ), ffgain (overall feedback gain 0-10000)
+ */
+
+t_int hid_ff_autocenter(t_hid *x, t_float value)
+{
+	DEBUG(post("hid_ff_autocenter"););
+	HRESULT result;
+	UInt32 autocenter_value;
+
+	if( x->x_has_ff ) 
+	{
+		if ( value > 0 ) autocenter_value = 1;
+		else if ( value <= 0 ) autocenter_value = 0;
+		/* FFPROP_AUTOCENTER is either 0 or 1 */
+		result = FFDeviceSetForceFeedbackProperty( 
+			(FFDeviceObjectReference) x->x_ff_device, 
+			FFPROP_AUTOCENTER, 
+			&autocenter_value );
+		if ( result != FF_OK )
+		{
+			post("[hid]: ff_autocenter failed!");
+		}
+	}
+	
+	return(0);
+}
+
+t_int hid_ff_gain(t_hid *x, t_float value)
+{
+	DEBUG(post("hid_ff_gain"););
+	HRESULT result;
+	UInt32 ffgain_value;
+	
+	if( x->x_has_ff ) 
+	{
+		if ( value > 1 ) value = 1;
+		else if ( value < 0 ) value = 0;
+		ffgain_value = value * 10000;
+		/* FFPROP_FFGAIN has a integer range of 0-10000 */
+		result = FFDeviceSetForceFeedbackProperty( 
+			(FFDeviceObjectReference)x->x_ff_device, FFPROP_FFGAIN, &ffgain_value );
+		if ( result != FF_OK )
+		{
+			post("[hid]: ff_gain failed!");
+		}
+	}
+	
+	return(0);
+}
+
+/* --------------------------------------------------------------------------
+ * FF "Commands"
+ * continue, pause, reset, setactuatorsoff, setactuatorson, stopall
+ */
+
+t_int hid_ff_send_ff_command (t_hid *x, UInt32 ff_command)
+{
+	HRESULT result = 0;
+
+	if( x->x_has_ff ) 
+	{
+		result = FFDeviceSendForceFeedbackCommand( x->x_ff_device, ff_command );
+	}
+
+	return ( (t_int) result );
+}
+
+t_int hid_ff_continue( t_hid *x )
+{
+	DEBUG(post("hid_ff_continue"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_CONTINUE ) );
+}
+
+t_int hid_ff_pause( t_hid *x )
+{
+	DEBUG(post("hid_ff_pause"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_PAUSE ) );
+}
+
+t_int hid_ff_reset( t_hid *x )
+{
+	DEBUG(post("hid_ff_reset"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_RESET ) );
+}
+
+t_int hid_ff_setactuatorsoff( t_hid *x )
+{
+	DEBUG(post("hid_ff_setactuatorsoff"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_SETACTUATORSOFF ) );
+}
+
+t_int hid_ff_setactuatorson( t_hid *x )
+{
+	DEBUG(post("hid_ff_setactuatorson"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_SETACTUATORSON ) );
+}
+
+t_int hid_ff_stopall( t_hid *x )
+{
+	DEBUG(post("hid_ff_stopall"););
+	return(  hid_ff_send_ff_command( x, FFSFFC_STOPALL ) );
+}
+
+t_int hid_ff_motors( t_hid *x, t_float value )
+{
+	if ( value > 0 ) 
+	{
+		return ( hid_ff_setactuatorson( x )  );
+	}
+	else
+	{
+		return ( hid_ff_setactuatorsoff( x )  );
+	}
+}
+
+
+/* --------------------------------------------------------------------------
+ * FF test functions
+ */
+
+t_int hid_ff_fftest ( t_hid *x, t_float value)
+{
+	DEBUG(post("hid_get_events"););
+	
+	return( 0 );
 }
 
 /* ============================================================================== */
@@ -471,7 +629,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	pRecDevice pCurrentHIDDevice = NULL;
 
 	io_service_t hidDevice = NULL;
-	FFDeviceObjectReference *pDeviceReference = NULL;
+	FFDeviceObjectReference ffDeviceReference = NULL;
 
 /* rebuild device list to make sure the list is current */
 	if ( ! HIDHaveDeviceList() )
@@ -499,12 +657,20 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 
 	hid_build_element_list(x);
 
+	hidDevice = AllocateHIDObjectFromRecDevice( pCurrentHIDDevice );
 	if ( FFIsForceFeedback(hidDevice) == FF_OK ) 
 	{
-		post("device has Force Feedback support");
-		if ( FFCreateDevice(hidDevice,pDeviceReference) == FF_OK ) 
+		post("\tdevice has Force Feedback support");
+		if ( FFCreateDevice(hidDevice,&ffDeviceReference) == FF_OK ) 
 		{
-			post("created FF device");
+			x->x_has_ff = 1;
+			x->x_ff_device = ffDeviceReference;
+		}
+		else
+		{
+			x->x_has_ff = 0;
+			post("[hid]: FF device creation failed!");
+			return( -1 );
 		}
 	}
 	
@@ -548,7 +714,8 @@ t_int hid_build_device_list(t_hid *x)
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while ( pCurrentHIDDevice != NULL )
 	{
-		hid_output_device_name( x, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product );
+		hid_output_device_name( x, pCurrentHIDDevice->manufacturer, 
+										pCurrentHIDDevice->product );
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	} 
 	
@@ -560,8 +727,11 @@ void hid_print(t_hid *x)
 {
 	hid_print_device_list(x);
 	
-	if(x->x_device_open)
+	if(x->x_device_open) 
+	{
 		hid_print_element_list(x);
+		hid_ff_print( x );
+	}
 }
 
 

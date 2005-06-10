@@ -27,11 +27,9 @@ by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 
 
 ==============================================================================
-= make second outlet for device name
+= Report available FF effects
 
-just output the USB device name to the second outlet
-
-- maybe the manufacturer too?
+- check against HID Utilities Source/PID.h
 
 
 
