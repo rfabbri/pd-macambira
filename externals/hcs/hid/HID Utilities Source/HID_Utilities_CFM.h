@@ -41,6 +41,7 @@
 				OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT, TORT
 				(INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN
 				ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
 */
 
 #ifndef _HID_Utilities_CFM_h_
@@ -57,22 +58,6 @@ extern "C" {
 //includes
 
 #include "HID_Utilities_External.h"
-
-// from IOHIDKeys.h (IOKit)
-// this can't be included since the roginal file has framework includes
-// developers may need to add definitions here
-
-enum IOHIDElementType
-{
-	kIOHIDElementTypeInput_Misc        = 1,
-	kIOHIDElementTypeInput_Button      = 2,
-	kIOHIDElementTypeInput_Axis        = 3,
-	kIOHIDElementTypeInput_ScanCodes   = 4,
-	kIOHIDElementTypeOutput            = 129,
-	kIOHIDElementTypeFeature           = 257,
-	kIOHIDElementTypeCollection        = 513
-};
-typedef enum IOHIDElementType IOHIDElementType;
 
 // ==================================
 

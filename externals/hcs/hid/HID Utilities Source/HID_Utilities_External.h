@@ -2,8 +2,10 @@
 	File:		HID_Utilities_External.h
 
 	Contains:   Definition of the HID Utilities exported functions
-    
-	DRI: George Warner
+				External interface for HID Utilities, can be used with either library or source
+				Check notes below for usage.  Some type casting is required so library is framework and carbon free
+
+	DRI: 		George Warner
 
 	Copyright:	Copyright © 2002 Apple Computer, Inc., All Rights Reserved
 
@@ -41,34 +43,66 @@
 				OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT, TORT
 				(INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN
 				ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
 */
 
 #ifndef _HID_Utilities_External_h_
 #define _HID_Utilities_External_h_
-
 // ==================================
-//includes
-
-#if TARGET_RT_MAC_CFM
-	typedef void (*IOHIDCallbackFunction)(void * target, unsigned long result, void* refcon, void * sender);
-#else
-	#include <IOKit/hid/IOHIDLib.h>
-#endif TARGET_RT_MAC_CFM
-
-#include <stdio.h>
-
-#if 0
-#include <IOKit/hid/IOHIDUsageTables.h>
-
-#include "PID.h"				// NOTE: These are now in <IOHIDUsageTables.h>
-#include "IOHIDPowerUsage.h"	// NOTE: These are now in <IOHIDUsageTables.h>
+#if PRAGMA_ONCE
+#pragma once
 #endif
-
-// ==================================
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if PRAGMA_IMPORT
+#pragma import on
+#endif
+
+#pragma options align=mac68k
+// ==================================
+//includes
+
+#if TARGET_RT_MAC_CFM
+// from IOHIDKeys.h (IOKit)
+// this can't be included since the orginal file has framework includes
+// developers may need to add definitions here
+enum IOHIDElementType
+{
+	kIOHIDElementTypeInput_Misc        = 1,
+	kIOHIDElementTypeInput_Button      = 2,
+	kIOHIDElementTypeInput_Axis        = 3,
+	kIOHIDElementTypeInput_ScanCodes   = 4,
+	kIOHIDElementTypeOutput            = 129,
+	kIOHIDElementTypeFeature           = 257,
+	kIOHIDElementTypeCollection        = 513
+};
+typedef enum IOHIDElementType IOHIDElementType;
+
+enum IOHIDReportType
+{
+    kIOHIDReportTypeInput = 0,
+    kIOHIDReportTypeOutput,
+    kIOHIDReportTypeFeature,
+    kIOHIDReportTypeCount
+};
+typedef enum IOHIDReportType IOHIDReportType;
+typedef void (*IOHIDCallbackFunction)(void * target, unsigned long result, void* refcon, void * sender);
+typedef void* IOHIDEventStruct;
+#else
+	#include <IOKit/hid/IOHIDLib.h>
+#endif TARGET_RT_MAC_CFM
+
+#if 0
+#include <IOKit/hid/IOHIDUsageTables.h>
+
+#include "PID.h"				// NOTE: These are now in <IOKit/hid/IOHIDUsageTables.h>
+#include "IOHIDPowerUsage.h"	// NOTE: These are now in <IOKit/hid/IOHIDUsageTables.h>
+#endif
+
+#include <stdio.h>
 
 // ==================================
 // Device and Element Interfaces
@@ -104,8 +138,10 @@ struct recElement
     char name[256];							// name of element (c string)
 
 // runtime variables
-    long calMin; 							// min returned value
-    long calMax; 							// max returned value (calibrate call)
+    long initialCenter; 					// center value at start up
+    unsigned char  hasCenter; 				// whether or not to use center for calibration
+    long minReport; 						// min returned value
+    long maxReport; 						// max returned value (calibrate call)
     long userMin; 							// user set value to scale to (scale call)
     long userMax;							
     
@@ -163,7 +199,21 @@ extern unsigned long HIDCreateOpenDeviceInterface (UInt32 hidDevice, pRecDevice 
 // list is allcoated internally within HID Utilites and can be accessed via accessor functions
 // structures within list are considered flat and user accessable, butnot user modifiable
 // can be called again to rebuild list to account for new devices (will do the right thing in case of disposing existing list)
+// usagePage, usage are each a numDeviceTypes sized array of matching usage and usage pages
+// returns true if succesful
+
+extern Boolean HIDBuildMultiDeviceList (UInt32 *pUsagePage, UInt32 *pUsage, UInt32 numDeviceTypes);
+
+// same as above but this uses a single usagePage and usage
+
 extern Boolean HIDBuildDeviceList (UInt32 usagePage, UInt32 usage);
+
+// updates the current device list for any new/removed devices
+// if this is called before HIDBuildDeviceList the it functions like HIDBuildMultiDeviceList
+// usagePage, usage are each a numDeviceTypes sized array of matching usage and usage pages
+// returns true if successful which means if any device were added or removed (the device config changed)
+
+extern Boolean HIDUpdateDeviceList (UInt32 *pUsagePage, UInt32 *pUsage, UInt32 numDeviceTypes);
 
 // release list built by above function
 // MUST be called prior to application exit to properly release devices
@@ -205,11 +255,14 @@ extern pRecElement HIDGetFirstDeviceElement (pRecDevice pDevice, HIDElementTypeM
 extern pRecElement HIDGetNextDeviceElement (pRecElement pElement, HIDElementTypeMask typeMask);
 
 // get previous element of given device in list given current element as parameter
-// this wlaks directly up the tree to the top element and does not search at each level
+// this walks directly up the tree to the top element and does not search at each level
 // returns NULL if beginning of list
 // uses mask of HIDElementTypeMask to restrict element found
 // use kHIDElementTypeIO to get non-collection elements
 extern pRecElement HIDGetPreviousDeviceElement (pRecElement pElement, HIDElementTypeMask typeMask);
+
+// ==================================
+// Name Lookup Interfaces
 
 // returns C string type name given a type enumeration passed in as parameter (see IOHIDKeys.h)
 // returns empty string for invlid types
@@ -224,14 +277,6 @@ extern Boolean HIDGetElementNameFromVendorProductUsage (const long vendorID, con
 // returns C string usage given usage page and usage passed in as parameters (see IOUSBHIDParser.h)
 // returns usage page and usage values in string form for unknown values
 extern void HIDGetUsageName (long valueUsagePage, long valueUsage, char * cstrName);
-
-// returns calibrated value given raw value passed in
-// calibrated value is equal to min and max values returned by HIDGetElementValue since device list built scaled to element reported min and max values
-extern SInt32 HIDCalibrateValue (SInt32 value, pRecElement pElement);
-
-// returns scaled value given raw value passed in
-// scaled value is equal to current value assumed to be in the range of element reported min and max values scaled to user min and max scaled values
-extern SInt32 HIDScaleValue (SInt32 value, pRecElement pElement);
 
 // ---------------------------------
 // convert an element type to a mask
@@ -311,61 +356,26 @@ extern long HIDGetElementValue (pRecDevice pDevice, pRecElement pElement);
 extern long HIDSetElementValue (pRecDevice pDevice, pRecElement pElement,void* pIOHIDEvent);
 
 // Set a callback to be called when a queue goes from empty to non-empty
-extern long HIDSetQueueCallback (pRecDevice pDevice, IOHIDCallbackFunction callback);
+extern long HIDSetQueueCallback (pRecDevice pDevice, IOHIDCallbackFunction callback,void* callbackTarget, void* callbackRefcon);
 
-#if 0
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
 // Get a report from a device
 extern long HIDGetReport (pRecDevice pDevice,const IOHIDReportType reportType, const unsigned long reportID, void* reportBuffer, unsigned long* reportBufferSize);
 
 // Send a report to a device
 extern long HIDSetReport (pRecDevice pDevice,const IOHIDReportType reportType, const unsigned long reportID, void* reportBuffer, const unsigned long reportBufferSize);
-#endif
+#endif MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_2
 
 // ==================================
 // HUD utilities interfaces
 
 // returns calibrated value given raw value passed in
 // calibrated value is equal to min and max values returned by HIDGetElementValue since device list built scaled to element reported min and max values
-extern long HIDCalibrateValue (long value, pRecElement pElement);
+extern SInt32 HIDCalibrateValue (SInt32 value, pRecElement pElement);
 
 // returns scaled value given raw value passed in
 // scaled value is equal to current value assumed to be in the range of element reported min and max values scaled to user min and max scaled values
-extern long HIDScaleValue (long value, pRecElement pElement);
-
-// convert an element type to a mask
-extern HIDElementTypeMask HIDConvertElementTypeToMask (const long type);
-
-// find this device
-extern Boolean HIDFindDevice(const pRecDevice pSearchDevice, pRecDevice *ppFoundDevice);
-
-// find the device and element for this action
-// Device: serial, vendorID, productID, location, usagePage, usage
-// Element: cookie, usagePage, usage, 
-extern Boolean HIDFindActionDeviceAndElement(const pRecDevice pSearchDevice, const pRecElement pSearchElement,
-										  pRecDevice *ppFoundDevice, pRecElement *ppFoundElement);
-// find the device and element for this action
-// Device: serial, vendorID, productID, location, usagePage, usage
-// Element: cookie, usagePage, usage, 
-
-extern Boolean HIDFindSubElement(const pRecElement pStartElement, const pRecElement pSearchElement, pRecElement *ppFoundElement);
-
-// print out all of an elements information
-extern int HIDPrintElement(const pRecElement pElement);
-
-// return true if this is a valid device pointer
-extern Boolean HIDIsValidDevice(const pRecDevice pSearchDevice);
-
-// return true if this is a valid element pointer for this device
-extern Boolean HIDIsValidElement(const pRecDevice pSearchDevice, const pRecElement pSearchElement);
-
-// ==================================
-// Name Lookup Interfaces
-
-// set name from vendor id/product id look up (using cookies)
-extern Boolean HIDGetElementNameFromVendorProductCookie (const long vendorID, const long productID, const long cookie, char * pName);
-
-// set name from vendor id/product id look up (using usage page & usage)
-extern Boolean HIDGetElementNameFromVendorProductUsage (const long vendorID, const long productID, const long pUsagePage, const long pUsage, char * pName);
+extern SInt32 HIDScaleValue (SInt32 value, pRecElement pElement);
 
 // ==================================
 // Conguration and Save Interfaces
@@ -396,14 +406,19 @@ typedef struct recSaveHID
 // returns false and NULL for both parameters if not found
 extern unsigned char HIDConfigureAction (pRecDevice * ppDevice, pRecElement * ppElement, float timeout);
 
+// -- These are routines to use if the applcation wants HID Utilities to do the file handling --
+// Note: the FILE* is a MachO posix FILE and will not work with the MW MSL FILE* type.
+
 // take input records, save required info
 // assume file is open and at correct position.
-extern void HIDSaveElementConfig (FILE * fileRef, pRecDevice pDevice, pRecElement pElement, long actionCookie);
+extern void HIDSaveElementConfig (FILE* fileRef, pRecDevice pDevice, pRecElement pElement, long actionCookie);
 
 // take file, read one record (assume file position is correct and file is open)
 // search for matching device
 // return pDevice, pElement and cookie for action
-extern long HIDRestoreElementConfig (FILE * fileRef, pRecDevice * ppDevice, pRecElement * ppElement);
+extern long HIDRestoreElementConfig (FILE* fileRef, pRecDevice * ppDevice, pRecElement * ppElement);
+
+// -- These routines use the CFPreferences API's.
 
 // Save the device & element values into the specified key in the specified applications preferences
 extern Boolean HIDSaveElementPref (CFStringRef keyCFStringRef, CFStringRef appCFStringRef, pRecDevice pDevice, pRecElement pElement);
@@ -413,6 +428,19 @@ extern Boolean HIDSaveElementPref (CFStringRef keyCFStringRef, CFStringRef appCF
 // return pDevice, pElement that matches
 
 extern Boolean HIDRestoreElementPref (CFStringRef keyCFStringRef, CFStringRef appCFStringRef, pRecDevice * ppDevice, pRecElement * ppElement);
+
+// -- These are routines to use if the client wants to use their own file handling -- 
+
+// Set up a config record for saving
+// takes an input records, returns record user can save as they want 
+// Note: the save rec must be pre-allocated by the calling app and will be filled out
+extern void HIDSetElementConfig (pRecSaveHID pConfigRec, pRecDevice pDevice, pRecElement pElement, long actionCookie);
+
+// Get matching element from config record
+// takes a pre-allocated and filled out config record
+// search for matching device
+// return pDevice, pElement and cookie for action
+extern long HIDGetElementConfig (pRecSaveHID pConfigRec, pRecDevice * ppDevice, pRecElement * ppElement);
 
 // ==================================
 // Output Transaction interface
@@ -465,9 +493,17 @@ extern unsigned long HIDTransactionCommit(pRecDevice pDevice);
 extern unsigned long HIDTransactionClear(pRecDevice pDevice);
 
 // ==================================
+#pragma options align=reset
+
+#ifdef PRAGMA_IMPORT_OFF
+#pragma import off
+#elif PRAGMA_IMPORT
+#pragma import reset
+#endif
 
 #ifdef __cplusplus
 }
 #endif
+// ==================================
 
 #endif // _HID_Utilities_External_h_

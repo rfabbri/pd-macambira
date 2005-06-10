@@ -41,72 +41,78 @@
 				OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT, TORT
 				(INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN
 				ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
-//includes
-
+// Note: All the HID API's are defined externally in the file "HID_APIs.h".
+// How they are used in this file is defined via one or two macros:
+//
+// The DO_API micro takes four parameters:
+//    #define DO_API(r,n,p,a)
+//        r - what the API Returns
+//        n - the Name of the API
+//        p - the Parameters to the API
+//        a - the Arguments passed by the API
+//
+//    DO_APIr is used when an API returns a value.
+//    DO_API is used when an API doesn't return a value.
+//
+//  For example:
+//
+//  if you have a routine that doesn't return a value:
+//
+//  void MyFunction(const UInt32 pSelector, void* pPtr);
+//
+//  It's macro would look like this:
+//
+//  DO_API(
+//      void,									// this is what the function returns
+//      MyFunction,								// this is its Name
+//      (const UInt32 pSelector, void* pPtr),	// these are its parameters
+//      (pSelector, pPtr)) 						// and these are just the arguments (no type info)
+//
+//  If it returns a value like this
+//
+//  OSStatus MyFunction2(const UInt32 pSelector, void* pPtr);
+//
+//  It's macro would look like this:
+//
+//  DO_APIr(
+//      OSStatus,								// this is what the function returns
+//      MyFunction2,							// this is its Name
+//      (const UInt32 pSelector, void* pPtr), 	// these are its parameters
+//      (pSelector, pPtr))                    	// and these are just the arguments (no type info)
+//
+// ==================================
+// includes
+// ==================================
 #include "HID_Utilities_CFM.h"
 
+typedef OSStatus 		HRESULT;
+typedef UInt32 			IOByteCount;
+typedef unsigned int	io_service_t;
+typedef unsigned int	io_object_t;
+#define S_OK		    ((HRESULT)0x00000000L)
+
 // ==================================
+// define a ProcPtr type for each API
+#define DO_API(r,n,p,a)	typedef r (*fp##n##Type)##p;
+#include "HID_APIs.h"
 
-// types
+// ==================================
+// declare storage for each API's function pointers
+#define DO_API(r,n,p,a)	static fp##n##Type fp##n = NULL;
+#include "HID_APIs.h"
 
-typedef unsigned char (*fpHIDBuildDeviceListtype) (unsigned long usagePage, unsigned long usage);
-typedef void (*fpHIDReleaseDeviceListtype) (void);
-typedef unsigned char (*fpHIDHaveDeviceListtype) (void);
-typedef unsigned long (*fpHIDCountDevicestype) (void);
-typedef unsigned long (*fpHIDCountDeviceElementstype) (pRecDevice pDevice, HIDElementTypeMask typeMask);
-typedef pRecDevice (*fpHIDGetFirstDevicetype) (void);
-typedef pRecDevice (*fpHIDGetNextDevicetype) (pRecDevice pDevice);
-typedef pRecElement (*fpHIDGetFirstDeviceElementtype) (pRecDevice pDevice, HIDElementTypeMask typeMask);
-typedef pRecElement (*fpHIDGetNextDeviceElementtype) (pRecElement pElement, HIDElementTypeMask typeMask);
-typedef pRecElement (*fpHIDGetPreviousDeviceElementtype) (pRecElement pElement, HIDElementTypeMask typeMask);
-typedef void (*fpHIDGetTypeNametype) (unsigned long type, char * cstrName);
-typedef void (*fpHIDGetUsageNametype) (long valueUsagePage, long valueUsage, char * cstrName);
-typedef unsigned long  (*fpHIDQueueElementtype) (pRecDevice pDevice, pRecElement pElement);
-typedef unsigned long  (*fpHIDQueueDevicetype) (pRecDevice pDevice);
-typedef unsigned long  (*fpHIDDequeueElementtype) (pRecDevice pDevice, pRecElement pElement);
-typedef unsigned long  (*fpHIDDequeueDevicetype) (pRecDevice pDevice);
-typedef unsigned char (*fpHIDGetEventtype) (pRecDevice pDevice, void * pHIDEvent);
-typedef long (*fpHIDGetElementValuetype) (pRecDevice pDevice, pRecElement pElement);
-typedef long (*fpHIDCalibrateValuetype) (long value, pRecElement pElement);
-typedef long (*fpHIDScaleValuetype) (long value, pRecElement pElement);
-typedef unsigned char (*fpHIDConfigureActiontype) (pRecDevice * ppDevice, pRecElement * ppElement, float timeout);
-typedef void (*fpHIDSaveElementConfigtype) (FILE * fileRef, pRecDevice pDevice, pRecElement pElement, long actionCookie);
-typedef long (*fpHIDRestoreElementConfigtype) (FILE * fileRef, pRecDevice * ppDevice, pRecElement * ppElement);
-
-// function pointers
-fpHIDBuildDeviceListtype fpHIDBuildDeviceList = NULL;
-fpHIDReleaseDeviceListtype fpHIDReleaseDeviceList = NULL;
-fpHIDHaveDeviceListtype fpHIDHaveDeviceList = NULL;
-fpHIDCountDevicestype fpHIDCountDevices = NULL;
-fpHIDCountDeviceElementstype fpHIDCountDeviceElements = NULL;
-fpHIDGetFirstDevicetype fpHIDGetFirstDevice = NULL;
-fpHIDGetNextDevicetype fpHIDGetNextDevice = NULL;
-fpHIDGetFirstDeviceElementtype fpHIDGetFirstDeviceElement = NULL;
-fpHIDGetNextDeviceElementtype fpHIDGetNextDeviceElement = NULL;
-fpHIDGetPreviousDeviceElementtype fpHIDGetPreviousDeviceElement = NULL;
-fpHIDGetTypeNametype fpHIDGetTypeName = NULL;
-fpHIDGetUsageNametype fpHIDGetUsageName = NULL;
-fpHIDQueueElementtype fpHIDQueueElement = NULL;
-fpHIDQueueDevicetype fpHIDQueueDevice = NULL;
-fpHIDDequeueElementtype fpHIDDequeueElement = NULL;
-fpHIDDequeueDevicetype fpHIDDequeueDevice = NULL;
-fpHIDGetEventtype fpHIDGetEvent = NULL;
-fpHIDGetElementValuetype fpHIDGetElementValue = NULL;
-fpHIDCalibrateValuetype fpHIDCalibrateValue = NULL;
-fpHIDScaleValuetype fpHIDScaleValue = NULL;
-fpHIDConfigureActiontype fpHIDConfigureAction = NULL;
-fpHIDSaveElementConfigtype fpHIDSaveElementConfig = NULL;
-fpHIDRestoreElementConfigtype fpHIDRestoreElementConfig = NULL;
-
-//globals
-
+// ==================================
+// globals
+// ==================================
 CFURLRef gBundleURL = NULL;
 CFBundleRef gBundle = NULL;
 
 // ==================================
-
+// setup the CFM to MachO (HID) connection
+// ==================================
 OSStatus SetupHIDCFM (void)
 {
 	Boolean didLoad = false; //	Flag that indicates the status returned when attempting to load a bundle's executable code.
@@ -121,6 +127,7 @@ OSStatus SetupHIDCFM (void)
         DebugStr ("\pCould open main bundle");
 		return paramErr;
 	}
+
 	// create a URL to the app bundle
 	refMainBundleURL = CFBundleCopyBundleURL (refMainBundle); 
 	if (!refMainBundleURL)
@@ -128,8 +135,9 @@ OSStatus SetupHIDCFM (void)
         DebugStr ("\pCould not copy main bundle URL");
 		return paramErr;
 	}
+#if 0	// This should only be true if the app is bundled
 	// create a URL that points to the app's directory
-	refPathBundleURL = CFURLCreateCopyDeletingLastPathComponent (NULL, refMainBundleURL); 
+	refPathBundleURL = CFURLCreateCopyDeletingLastPathComponent (kCFAllocatorDefault, refMainBundleURL); 
 	if (!refPathBundleURL)
 	{
         DebugStr ("\pCould not create new parent URL deleting last path component");
@@ -137,8 +145,13 @@ OSStatus SetupHIDCFM (void)
 			CFRelease (refMainBundleURL);
 		return paramErr;
 	}
+#else
+	refPathBundleURL = refMainBundleURL;
+	refMainBundleURL = NULL;
+#endif
+
 	// create a URL to the HID library bundle
-	gBundleURL = CFURLCreateCopyAppendingPathComponent (NULL, refPathBundleURL, CFSTR("HID.bundle"), true); 
+	gBundleURL = CFURLCreateCopyAppendingPathComponent (kCFAllocatorDefault, refPathBundleURL, CFSTR("HID.bundle"), true); 
 	// release created URLs
 	if (refMainBundleURL != NULL) 
 		CFRelease (refMainBundleURL);
@@ -147,74 +160,41 @@ OSStatus SetupHIDCFM (void)
 	// did we actaully get a bundle URL
 	if (!gBundleURL)
 	{
-        DebugStr ("\pCould create HID bundle URL");
+        DebugStr ("\pCould not create HID bundle URL");
 		return paramErr;
     }
 	// get the actual bundle for the HID library
-	gBundle = CFBundleCreate (NULL, gBundleURL);
+	gBundle = CFBundleCreate (kCFAllocatorDefault, gBundleURL);
 	if (!gBundle)
 	{
         DebugStr ("\pCould not create HID MachO library bundle");
+		CFShow(gBundleURL);
 		return paramErr;
 	}
+
     if (!CFBundleLoadExecutable (gBundle)) // If the code was successfully loaded, look for our function.
 	{
     	DebugStr ("\pCould not load MachO executable");
     	return paramErr;
 	}
-	// Now that the code is loaded, search for the function we want by name.
-	fpHIDBuildDeviceList = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDBuildDeviceList"));
-	fpHIDReleaseDeviceList = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDReleaseDeviceList"));
-	fpHIDHaveDeviceList = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDHaveDeviceList"));
-	fpHIDCountDevices = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDCountDevices"));
-	fpHIDCountDeviceElements = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDCountDeviceElements"));
-	fpHIDGetFirstDevice = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetFirstDevice"));
-	fpHIDGetNextDevice = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetNextDevice"));
-	fpHIDGetFirstDeviceElement = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetFirstDeviceElement"));
-	fpHIDGetNextDeviceElement = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetNextDeviceElement"));
-	fpHIDGetPreviousDeviceElement = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetPreviousDeviceElement"));
-	fpHIDGetTypeName = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetTypeName"));
-	fpHIDGetUsageName = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetUsageName"));
-	fpHIDQueueElement = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDQueueElement"));
-	fpHIDQueueDevice = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDQueueDevice"));
-	fpHIDDequeueElement = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDDequeueElement"));
-	fpHIDDequeueDevice = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDDequeueDevice"));
-	fpHIDGetEvent = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetEvent"));
-	fpHIDGetElementValue = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDGetElementValue"));
-	fpHIDCalibrateValue = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDCalibrateValue"));
-	fpHIDScaleValue = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDScaleValue"));
-	fpHIDConfigureAction = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDConfigureAction"));
-	fpHIDSaveElementConfig = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDSaveElementConfig"));
-	fpHIDRestoreElementConfig = (void *) CFBundleGetFunctionPointerForName (gBundle, CFSTR("HIDRestoreElementConfig"));
+
+	// Now that the code is loaded, search for the functions we want by name.
+	// for each API, look up it's function pointer and store it the local ProcPtr.
+
+#define DO_API(r,n,p,a)	fp##n = (fp##n##Type) CFBundleGetFunctionPointerForName (gBundle, CFSTR(#n));;
+#include "HID_APIs.h"
+
 	return noErr;
 }
-
+// ==================================
+// tear down the CFM to MachO (HID) connection
+// ==================================
 void TearDownHIDCFM (void)
 {
-	// disassociate function pointers
-	fpHIDBuildDeviceList = NULL;
-	fpHIDReleaseDeviceList = NULL;
-	fpHIDHaveDeviceList = NULL;
-	fpHIDCountDevices = NULL;
-	fpHIDCountDeviceElements = NULL;
-	fpHIDGetFirstDevice = NULL;
-	fpHIDGetNextDevice = NULL;
-	fpHIDGetFirstDeviceElement = NULL;
-	fpHIDGetNextDeviceElement = NULL;
-	fpHIDGetPreviousDeviceElement = NULL;
-	fpHIDGetTypeName = NULL;
-	fpHIDGetUsageName = NULL;
-	fpHIDQueueElement = NULL;
-	fpHIDQueueDevice = NULL;
-	fpHIDDequeueElement = NULL;
-	fpHIDDequeueDevice = NULL;
-	fpHIDGetEvent = NULL;
-	fpHIDGetElementValue = NULL;
-	fpHIDCalibrateValue = NULL;
-	fpHIDScaleValue = NULL;
-	fpHIDConfigureAction = NULL;
-	fpHIDSaveElementConfig = NULL;
-	fpHIDRestoreElementConfig = NULL;
+	// disassociate function pointers (assign null to each one)
+#define DO_API(r,n,p,a)	fp##n = NULL;
+#include "HID_APIs.h"
+
 	if (gBundle != NULL)
 	{
         CFBundleUnloadExecutable (gBundle);			//	Unload the bundle's executable code. 
@@ -224,125 +204,10 @@ void TearDownHIDCFM (void)
 	}
 }
 
-unsigned char HIDBuildDeviceList (unsigned long usagePage, unsigned long usage)
-{
-	return (*fpHIDBuildDeviceList) (usagePage, usage);
-}
+// Now for each API declare a (CFM) routine that calls thru the local ProcPtr to the MachO glue.
+// Note: we use two different macros here: with & without a return value.
 
-void HIDReleaseDeviceList (void)
-{
-	(*fpHIDReleaseDeviceList) ();
-}
-
-unsigned char HIDHaveDeviceList (void)
-{
-	return (*fpHIDHaveDeviceList) ();
-}
-
-unsigned long HIDCountDevices (void)
-{
-	return (*fpHIDCountDevices) ();
-}
-
-unsigned long HIDCountDeviceElements (pRecDevice pDevice, HIDElementTypeMask typeMask)
-{
-	return (*fpHIDCountDeviceElements) (pDevice, typeMask);
-}
-
-pRecDevice HIDGetFirstDevice (void)
-{
-	return (*fpHIDGetFirstDevice) ();
-}
-
-pRecDevice HIDGetNextDevice (pRecDevice pDevice)
-{
-	return (*fpHIDGetNextDevice) (pDevice);
-}
-
-pRecElement HIDGetFirstDeviceElement (pRecDevice pDevice, HIDElementTypeMask typeMask)
-{
-	return (*fpHIDGetFirstDeviceElement) (pDevice, typeMask);
-}
-
-pRecElement HIDGetNextDeviceElement (pRecElement pElement, HIDElementTypeMask typeMask)
-{
-	return (*fpHIDGetNextDeviceElement) (pElement, typeMask);
-}
-
-pRecElement HIDGetPreviousDeviceElement (pRecElement pElement, HIDElementTypeMask typeMask)
-{
-	return (*fpHIDGetPreviousDeviceElement) (pElement, typeMask);
-}
-
-void HIDGetTypeName (unsigned long type, char * cstrName)
-{
-	(*fpHIDGetTypeName) (type, cstrName);
-}
-
-void HIDGetUsageName (long valueUsagePage, long valueUsage, char * cstrName)
-{
-	(*fpHIDGetUsageName) (valueUsagePage, valueUsage, cstrName);
-}
-
+#define DO_API(r,n,p,a)		void n##p { (*fp##n)##a;}
+#define DO_APIr(r,n,p,a)	r n##p { return (r) (*fp##n)##a;}
+#include "HID_APIs.h"
 // ==================================
-
-// Element Event Queue and Value Interfaces
-
-unsigned long  HIDQueueElement (pRecDevice pDevice, pRecElement pElement)
-{
-	return (*fpHIDQueueElement) (pDevice, pElement);
-}
-
-unsigned long  HIDQueueDevice (pRecDevice pDevice)
-{
-	return (*fpHIDQueueDevice) (pDevice);
-}
-
-unsigned long  HIDDequeueElement (pRecDevice pDevice, pRecElement pElement)
-{
-	return (*fpHIDDequeueElement) (pDevice, pElement);
-}
-
-unsigned long  HIDDequeueDevice (pRecDevice pDevice)
-{
-	return (*fpHIDDequeueDevice) (pDevice);
-}
-
-unsigned char HIDGetEvent (pRecDevice pDevice, void * pHIDEvent)
-{
-	return (*fpHIDGetEvent) (pDevice, pHIDEvent);
-}
-
-long HIDGetElementValue (pRecDevice pDevice, pRecElement pElement)
-{
-	return (*fpHIDGetElementValue) (pDevice, pElement);
-}
-
-long HIDCalibrateValue (long value, pRecElement pElement)
-{
-	return (*fpHIDCalibrateValue) (value, pElement);
-}
-
-long HIDScaleValue (long value, pRecElement pElement)
-{
-	return (*fpHIDScaleValue) (value, pElement);
-}
-
-// ==================================
-
-// Conguration and Save Interfaces
-
-unsigned char HIDConfigureAction (pRecDevice * ppDevice, pRecElement * ppElement, float timeout)
-{
-	return (*fpHIDConfigureAction) (ppDevice, ppElement, timeout);
-}
-
-void HIDSaveElementConfig (FILE * fileRef, pRecDevice pDevice, pRecElement pElement, long actionCookie)
-{
-	(*fpHIDSaveElementConfig) (fileRef, pDevice, pElement, actionCookie);
-}
-
-long HIDRestoreElementConfig (FILE * fileRef, pRecDevice * ppDevice, pRecElement * ppElement)
-{
-	return (*fpHIDRestoreElementConfig) (fileRef, ppDevice, ppElement);
-}
