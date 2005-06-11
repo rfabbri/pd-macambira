@@ -31,10 +31,14 @@ endif
 PDEXECUTABLE = ../../../pd/bin/pd
 
 # generic optimization
-#OPT_FLAGS = -O3 -ffast-math
-# G4 optimization
-OPT_FLAGS = -O3 -mcpu=7400 -faltivec -ffast-math -fPIC
-# faster G4 7450 optimization  (gives errors)
+OPT_FLAGS = -O3 -ffast-math
+# G4 optimization on Mac OS X
+#OPT_FLAGS = -O3 -mcpu=7400 -maltivec -ffast-math -fPIC
+# faster G4 7450 optimization  (gives errors) on GNU/Linux
+#OPT_FLAGS = -O3 -mcpu=7450 -maltivec -ffast-math -fPIC
+# G4 optimization on Mac OS X
+#OPT_FLAGS = -O3 -mcpu=7400 -faltivec -ffast-math -fPIC
+# faster G4 7450 optimization  (gives errors) on Mac OS X
 #OPT_FLAGS = -ffast -mcpu=7450 -faltivec -ffast-math -fPIC
 
 CFLAGS = $(OPT_FLAGS) -Wall -W -Wno-shadow -Wstrict-prototypes -Wno-unused

@@ -258,6 +258,67 @@ void hid_print_device_list(void)
 }
 
 /* ------------------------------------------------------------------------------ */
+/*  FORCE FEEDBACK FUNCTIONS */
+/* ------------------------------------------------------------------------------ */
+
+/* cross-platform force feedback functions */
+t_int hid_ff_autocenter( t_hid *x, t_float value )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_gain( t_hid *x, t_float value )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_motors( t_hid *x, t_float value )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_continue( t_hid *x )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_pause( t_hid *x )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_reset( t_hid *x )
+{
+	return ( 0 );
+}
+
+
+t_int hid_ff_stopall( t_hid *x )
+{
+	return ( 0 );
+}
+
+
+
+// these are just for testing...
+t_int hid_ff_fftest ( t_hid *x, t_float value)
+{
+	return ( 0 );
+}
+
+
+void hid_ff_print( t_hid *x )
+{
+}
+
+
+
+/* ------------------------------------------------------------------------------ */
 /* Pd [hid] FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
 
@@ -287,9 +348,13 @@ t_int hid_get_events(t_hid *x)
 			hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
 			hid_convert_linux_keys(hid_input_event.code,hid_code);
 		}
-		else
+		else if (event_names[hid_input_event.type][hid_input_event.code] != NULL) 
 		{
 			strcpy(hid_code, event_names[hid_input_event.type][hid_input_event.code]);
+		}
+		else 
+		{
+			strcpy(hid_code, "unknown");
 		}
 		
 		hid_output_event(x, ev[hid_input_event.type], hid_code, 
