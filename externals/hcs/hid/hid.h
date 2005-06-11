@@ -14,7 +14,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 5
 
-static char *version = "$Revision: 1.16 $";
+static char *version = "$Revision: 1.17 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -80,10 +80,9 @@ t_int hid_ff_continue( t_hid *x );
 t_int hid_ff_pause( t_hid *x );
 t_int hid_ff_reset( t_hid *x );
 t_int hid_ff_stopall( t_hid *x );
+
 // these are just for testing...
 t_int hid_ff_fftest ( t_hid *x, t_float value);
-
-#include "HID_Utilities_External.h"
 void hid_ff_print( t_hid *x );
 
 

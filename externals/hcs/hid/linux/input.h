@@ -189,18 +189,18 @@ struct input_absinfo {
 #define KEY_KP3			81
 #define KEY_KP0			82
 #define KEY_KPDOT		83
-#define KEY_103RD		84
-#define KEY_F13			85
+
+#define KEY_ZENKAKUHANKAKU	85
 #define KEY_102ND		86
 #define KEY_F11			87
 #define KEY_F12			88
-#define KEY_F14			89
-#define KEY_F15			90
-#define KEY_F16			91
-#define KEY_F17			92
-#define KEY_F18			93
-#define KEY_F19			94
-#define KEY_F20			95
+#define KEY_RO			89
+#define KEY_KATAKANA		90
+#define KEY_HIRAGANA		91
+#define KEY_HENKAN		92
+#define KEY_KATAKANAHIRAGANA	93
+#define KEY_MUHENKAN		94
+#define KEY_KPJPCOMMA		95
 #define KEY_KPENTER		96
 #define KEY_RIGHTCTRL		97
 #define KEY_KPSLASH		98
@@ -225,11 +225,11 @@ struct input_absinfo {
 #define KEY_KPEQUAL		117
 #define KEY_KPPLUSMINUS		118
 #define KEY_PAUSE		119
-#define KEY_F21			120
-#define KEY_F22			121
-#define KEY_F23			122
-#define KEY_F24			123
-#define KEY_KPCOMMA		124
+
+#define KEY_KPCOMMA		121
+#define KEY_HANGUEL		122
+#define KEY_HANJA		123
+#define KEY_YEN			124
 #define KEY_LEFTMETA		125
 #define KEY_RIGHTMETA		126
 #define KEY_COMPOSE		127
@@ -288,24 +288,18 @@ struct input_absinfo {
 #define KEY_KPLEFTPAREN		179
 #define KEY_KPRIGHTPAREN	180
 
-#define KEY_INTL1		181
-#define KEY_INTL2		182
-#define KEY_INTL3		183
-#define KEY_INTL4		184
-#define KEY_INTL5		185
-#define KEY_INTL6		186
-#define KEY_INTL7		187
-#define KEY_INTL8		188
-#define KEY_INTL9		189
-#define KEY_LANG1		190
-#define KEY_LANG2		191
-#define KEY_LANG3		192
-#define KEY_LANG4		193
-#define KEY_LANG5		194
-#define KEY_LANG6		195
-#define KEY_LANG7		196
-#define KEY_LANG8		197
-#define KEY_LANG9		198
+#define KEY_F13			183
+#define KEY_F14			184
+#define KEY_F15			185
+#define KEY_F16			186
+#define KEY_F17			187
+#define KEY_F18			188
+#define KEY_F19			189
+#define KEY_F20			190
+#define KEY_F21			191
+#define KEY_F22			192
+#define KEY_F23			193
+#define KEY_F24			194
 
 #define KEY_PLAYCD		200
 #define KEY_PAUSECD		201
@@ -479,6 +473,28 @@ struct input_absinfo {
 #define KEY_INS_LINE		0x1c2
 #define KEY_DEL_LINE		0x1c3
 
+#define KEY_FN			0x1d0
+#define KEY_FN_ESC		0x1d1
+#define KEY_FN_F1		0x1d2
+#define KEY_FN_F2		0x1d3
+#define KEY_FN_F3		0x1d4
+#define KEY_FN_F4		0x1d5
+#define KEY_FN_F5		0x1d6
+#define KEY_FN_F6		0x1d7
+#define KEY_FN_F7		0x1d8
+#define KEY_FN_F8		0x1d9
+#define KEY_FN_F9		0x1da
+#define KEY_FN_F10		0x1db
+#define KEY_FN_F11		0x1dc
+#define KEY_FN_F12		0x1dd
+#define KEY_FN_1		0x1de
+#define KEY_FN_2		0x1df
+#define KEY_FN_D		0x1e0
+#define KEY_FN_E		0x1e1
+#define KEY_FN_F		0x1e2
+#define KEY_FN_S		0x1e3
+#define KEY_FN_B		0x1e4
+
 #define KEY_MAX			0x1ff
 
 /*
@@ -488,6 +504,9 @@ struct input_absinfo {
 #define REL_X			0x00
 #define REL_Y			0x01
 #define REL_Z			0x02
+#define REL_RX			0x03
+#define REL_RY			0x04
+#define REL_RZ			0x05
 #define REL_HWHEEL		0x06
 #define REL_DIAL		0x07
 #define REL_WHEEL		0x08
@@ -533,6 +552,8 @@ struct input_absinfo {
 #define MSC_SERIAL		0x00
 #define MSC_PULSELED		0x01
 #define MSC_GESTURE		0x02
+#define MSC_RAW			0x03
+#define MSC_SCAN		0x04
 #define MSC_MAX			0x07
 
 /*
@@ -548,6 +569,8 @@ struct input_absinfo {
 #define LED_SUSPEND		0x06
 #define LED_MUTE		0x07
 #define LED_MISC		0x08
+#define LED_MAIL		0x09
+#define LED_CHARGING		0x0a
 #define LED_MAX			0x0f
 
 /*
@@ -580,6 +603,7 @@ struct input_absinfo {
 #define BUS_ISAPNP		0x02
 #define BUS_USB			0x03
 #define BUS_HIL			0x04
+#define BUS_BLUETOOTH		0x05
 
 #define BUS_ISA			0x10
 #define BUS_I8042		0x11
@@ -660,7 +684,7 @@ struct ff_periodic_effect {
 	struct ff_envelope envelope;
 
 /* Only used if waveform == FF_CUSTOM */
-	__u32 custom_len;	/* Number of samples  */	
+	__u32 custom_len;	/* Number of samples */
 	__s16 *custom_data;	/* Buffer of samples */
 /* Note: the data pointed by custom_data is copied by the driver. You can
  * therefore dispose of the memory after the upload/update */
@@ -754,7 +778,29 @@ struct ff_effect {
 #define INPUT_KEYCODE(dev, scancode) ((dev->keycodesize == 1) ? ((u8*)dev->keycode)[scancode] : \
 	((dev->keycodesize == 2) ? ((u16*)dev->keycode)[scancode] : (((u32*)dev->keycode)[scancode])))
 
-#define init_input_dev(dev)	do { INIT_LIST_HEAD(&((dev)->h_list)); INIT_LIST_HEAD(&((dev)->node)); } while (0)
+#define SET_INPUT_KEYCODE(dev, scancode, val)			\
+		({	unsigned __old;				\
+		switch (dev->keycodesize) {			\
+			case 1: {				\
+				u8 *k = (u8 *)dev->keycode;	\
+				__old = k[scancode];		\
+				k[scancode] = val;		\
+				break;				\
+			}					\
+			case 2: {				\
+				u16 *k = (u16 *)dev->keycode;	\
+				__old = k[scancode];		\
+				k[scancode] = val;		\
+				break;				\
+			}					\
+			default: {				\
+				u32 *k = (u32 *)dev->keycode;	\
+				__old = k[scancode];		\
+				k[scancode] = val;		\
+				break;				\
+			}					\
+		}						\
+		__old; })
 
 struct input_dev {
 
@@ -782,7 +828,6 @@ struct input_dev {
 	unsigned int repeat_key;
 	struct timer_list timer;
 
-	struct pm_dev *pm_dev;
 	struct pt_regs *regs;
 	int state;
 
@@ -809,6 +854,7 @@ struct input_dev {
 	int (*erase_effect)(struct input_dev *dev, int effect_id);
 
 	struct input_handle *grab;
+	struct device *dev;
 
 	struct list_head	h_list;
 	struct list_head	node;
@@ -870,6 +916,7 @@ struct input_handler {
 	char *name;
 
 	struct input_device_id *id_table;
+	struct input_device_id *blacklist;
 
 	struct list_head	h_list;
 	struct list_head	node;
@@ -894,6 +941,12 @@ struct input_handle {
 #define to_handle(n) container_of(n,struct input_handle,d_node)
 #define to_handle_h(n) container_of(n,struct input_handle,h_node)
 
+static inline void init_input_dev(struct input_dev *dev)
+{
+	INIT_LIST_HEAD(&dev->h_list);
+	INIT_LIST_HEAD(&dev->node);
+}
+
 void input_register_device(struct input_dev *);
 void input_unregister_device(struct input_dev *);
 
@@ -911,16 +964,53 @@ int input_flush_device(struct input_handle* handle, struct file* file);
 
 void input_event(struct input_dev *dev, unsigned int type, unsigned int code, int value);
 
-#define input_report_key(a,b,c) input_event(a, EV_KEY, b, !!(c))
-#define input_report_rel(a,b,c) input_event(a, EV_REL, b, c)
-#define input_report_abs(a,b,c) input_event(a, EV_ABS, b, c)
-#define input_report_ff(a,b,c)	input_event(a, EV_FF, b, c)
-#define input_report_ff_status(a,b,c)	input_event(a, EV_FF_STATUS, b, c)
+static inline void input_report_key(struct input_dev *dev, unsigned int code, int value)
+{
+	input_event(dev, EV_KEY, code, !!value);
+}
 
-#define input_regs(a,b)		do { (a)->regs = (b); } while (0)
-#define input_sync(a)		do { input_event(a, EV_SYN, SYN_REPORT, 0); (a)->regs = NULL; } while (0)
+static inline void input_report_rel(struct input_dev *dev, unsigned int code, int value)
+{
+	input_event(dev, EV_REL, code, value);
+}
 
-extern struct class input_class;
+static inline void input_report_abs(struct input_dev *dev, unsigned int code, int value)
+{
+	input_event(dev, EV_ABS, code, value);
+}
+
+static inline void input_report_ff(struct input_dev *dev, unsigned int code, int value)
+{
+	input_event(dev, EV_FF, code, value);
+}
+
+static inline void input_report_ff_status(struct input_dev *dev, unsigned int code, int value)
+{
+	input_event(dev, EV_FF_STATUS, code, value);
+}
+
+static inline void input_regs(struct input_dev *dev, struct pt_regs *regs)
+{
+	dev->regs = regs;
+}
+
+static inline void input_sync(struct input_dev *dev)
+{
+	input_event(dev, EV_SYN, SYN_REPORT, 0);
+	dev->regs = NULL;
+}
+
+static inline void input_set_abs_params(struct input_dev *dev, int axis, int min, int max, int fuzz, int flat)
+{
+	dev->absmin[axis] = min;
+	dev->absmax[axis] = max;
+	dev->absfuzz[axis] = fuzz;
+	dev->absflat[axis] = flat;
+
+	dev->absbit[LONG(axis)] |= BIT(axis);
+}
+
+extern struct class_simple *input_class;
 
 #endif
 #endif

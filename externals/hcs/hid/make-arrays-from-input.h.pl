@@ -8,6 +8,25 @@ use Switch;
 
 #------------------------------------------------------------------------
 # parse out the types and codes from a line from the header 
+# usage:  @dataArray initArrayWithGenericNames( $arrayName, $arrayMax );
+sub initArrayWithGenericNames
+{
+	 my $arrayName = shift;
+	 my $arrayMax = shift;
+	 my @returnArray;
+	 
+	 my $displayName = lc( $arrayName );
+#	 print "$displayName $arrayMax   ";
+	 for( $i=0; $i<$arrayMax; ++$i ) 		  
+	 {
+		  $returnArray[$i] = "${displayName}_$i";
+	 }
+	 
+	 return @returnArray;
+}
+
+#------------------------------------------------------------------------
+# parse out the types and codes from a line from the header 
 # usage:  @dataArray getDataFromHeaderLine($lineFromHeader);
 sub getDataFromHeaderLine 
 {
@@ -35,6 +54,7 @@ sub getDataFromHeaderLine
 sub printCArrayDeclarations
 {
 	 my @arrayToPrint = @_;
+
 	 print(HEADER "char *${arrayToPrint[0]}[$#arrayToPrint];\n");
 }
 
@@ -50,13 +70,13 @@ sub printCArray
 	 print(ARRAYS "int ${arrayToPrint[0]}_total = $#arrayToPrint;  /* # of elements in array */\n");
 	 print(ARRAYS "char *${arrayToPrint[0]}[$#arrayToPrint] = {");
 
-	 for($i = 1; $i < $#arrayToPrint; $i++)
+	 for(my $i = 1; $i < $#arrayToPrint; $i++)
 	 {
 		  # format nicely in sets of 6
 		  if ( ($i+4)%6 == 5 ) { print(ARRAYS "\n       "); }
-		  # if the array element's data is null, print NULL
+		  # only print if there is data
 		  if ($arrayToPrint[$i]) { print(ARRAYS "\"$arrayToPrint[$i]\","); }
-		  else { print(ARRAYS "NULL,"); }
+#		  else { print(ARRAYS "${arrayType}_$i,"); }
 	 }
 
 	 print(ARRAYS "\"$arrayToPrint[$#arrayToPrint]\"\n };\n\n\n");
@@ -122,8 +142,50 @@ open(ARRAYS, ">$ARRAYSFILENAME");
 
 #----------------------------------------
 # create the arrays from INPUT_H
+# find array MAX for each one
 while (<INPUT_H>)
 {
+	 if (m/\#define (FF_STATUS|[A-Z_]+?)_MAX/)
+	 {
+		  switch( $1 ) {
+				# types
+				case "EV"        { ($index, $value) = getDataFromHeaderLine($_);
+										 @EV = initArrayWithGenericNames( "EV", $index + 1 ); }
+            # codes
+				case "SYN"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @SYN = initArrayWithGenericNames( "SYN", $index + 1 ); }
+				case "KEY"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @KEY = initArrayWithGenericNames( "KEY", $index + 1 ); }
+            # BTN codes are actually part of the KEY type
+				case "BTN"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @BTN = initArrayWithGenericNames( "KEY", $index + 1 ); }
+				case "REL"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @REL = initArrayWithGenericNames( "REL", $index + 1 ); }
+				case "ABS"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @ABS = initArrayWithGenericNames( "ABS", $index + 1 ); }
+				case "MSC"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @MSC = initArrayWithGenericNames( "MSC", $index + 1 ); }
+				case "LED"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @LED = initArrayWithGenericNames( "LED", $index + 1 ); }
+				case "SND"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @SND = initArrayWithGenericNames( "SND", $index + 1 ); }
+				case "REP"       { ($index, $value) = getDataFromHeaderLine($_);
+										 @REP = initArrayWithGenericNames( "REP", $index + 1 ); }
+				case "FF"        { ($index, $value) = getDataFromHeaderLine($_);
+										 @FF = initArrayWithGenericNames( "FF", $index + 1 ); }
+            # there doesn't seem to be any PWR events yet...
+#				case "PWR"       { ($index, $value) = getDataFromHeaderLine($_);
+#				                   @PWR = initArrayWithGenericNames( "PWR", $index + 1 ); }
+				case "FF_STATUS" { ($index, $value) = getDataFromHeaderLine($_);
+										 @FF_STATUS = initArrayWithGenericNames( "FF_STATUS", $index + 1 ); }
+		  }
+	 }
+}
+
+seek( INPUT_H, 0, 0 );
+while (<INPUT_H>)
+{
+# get data from input.h
 	 if (m/\#define (FF_STATUS|[A-Z_]*?)_/)
 	 {
 # filter EV_VERSION and *_MAX
@@ -165,7 +227,7 @@ print(HEADER "\#define _INPUT_ARRAYS_H\n\n\n");
 # strip the ev_ from the type names
 for ($i=0; $i <= $#EV; ++$i) {
 	 $_ = $EV[$i];
-	 s/ev_//;
+	 s/ev_([a-z_])/\1/;
 	 $EVtemp[$i] = $_;	 
 }
 
@@ -187,25 +249,41 @@ print(HEADER "char *ev_pwr[1];\n");
 #
 printArray("ev_ff_status",@FF_STATUS);
 
-# print array of arrays
-print(HEADER "char **event_names[",$#EV+1,"];\n\n");
-print(ARRAYS "char **event_names[",$#EV+1,"] = {");
-for($i = 0; $i < $#EV; $i++)
+#------------------------------------------------------------------------------#
+# print fake event type arrays
+for( my $i = 0; $i <= $#EV; $i++ )
 {
 	 # format nicely in sets of 6
 	 if ( ($i+4)%6 == 5 ) { print(ARRAYS "\n       "); }
 
-	 # if the array element's data is null, print NULL
-	 if ($EV[$i]) 
-	 { 
-		  $_ = $EV[$i];
-		  m/(ev_[a-z_]+)/;
-		  print(ARRAYS "$1,");  
+	 $_ = $EV[$i];
+	 if ( m/(ev_[0-9]+)/ ) 
+	 {
+		  $temp[0] = $1;
+		  for( $j=1; $j<=16; ++$j )
+		  {
+				$temp[$j] = "ev_${i}_${j}";
+		  }
+		  printCArray(@temp);
+		  printCArrayDeclarations(@temp);
 	 }
-	 else { print(ARRAYS "NULL,"); }
+}
+
+#------------------------------------------------------------------------------#
+# print array of arrays
+print(HEADER "char **event_names[",$#EV+1,"];\n\n");
+print(ARRAYS "char **event_names[",$#EV+1,"] = {");
+for( $i = 0; $i < $#EV; $i++ )
+{
+	 # format nicely in sets of 6
+	 if ( ($i+4)%6 == 5 ) { print(ARRAYS "\n       "); }
+
+	 $_ = $EV[$i];
+	 m/(ev_[0-9a-z_]+)/;
+	 print(ARRAYS "$1,");  
 }
 $_ = $EV[$#EV];
-m/(ev_[a-z_]+)/;
+m/(ev_[0-9a-z_]+)/;
 print(ARRAYS "$1\n };\n");
 
 # print file footers
@@ -214,4 +292,6 @@ print(HEADER "\n\n\#endif  /* #ifndef _INPUT_ARRAYS_H */\n");
 close(ARRAYS);
 close(HEADER);
 close(INPUT_H);
+
+
 
