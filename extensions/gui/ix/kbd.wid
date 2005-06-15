@@ -4,8 +4,7 @@ namespace eval ::ix {
 	set w $p.f[expr [lindex $args 0] / 12].[lindex $args 0]
 	if {[llength $args] == 1} {set v 1;if {$_($t:lp) != -1 && $_($t:lp) ne $w} {kbd_action $_($t:lp) $t 0}} {set v [lindex $args 1]}	
 	kbd_action $w $t $v
-	set _($t:lp) $w
-    }
+	set _($t:lp) $w}
 
     proc kbd_play {t m b x y} {
 	variable _
@@ -27,10 +26,10 @@ namespace eval ::ix {
 	        if {[$w cget -relief] eq "sunken"} {kbd_action $w $t 0}}}}
 
     proc kbd {path t octaves b f} {
+	$path config -width [expr $octaves * 66]
 	if {![winfo exists $path.f0]} {
 	    variable _
 	    set _($t:lp) -1
-	    $path config -width [expr $octaves * 66]
 	    set bw {0 1 0 1 0 0 1 0 1 0 1 0} ; set npl {0 1 1 2 2 3 4 4 5 5 6 6}
 	    foreach a {{bg "0 $b 1 $f"} {fg "1 $b 0 $f"} {an {0 ";lower $wk" 1 "-anchor n"}} {rw {0 {[expr 1 / 7.]} 1 {[expr 1 / 10.]}}} {rh {0 {[expr 1.]} 1 {[expr 6 / 10.]}}}} {array set [lindex $a 0] [lindex $a 1]}
 	    for {set o 0} {$o < $octaves} {incr o} {

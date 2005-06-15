@@ -1,14 +1,12 @@
 package require tkpath
 namespace eval ::ix {
-    proc random_int {} {return [expr "int(floor(rand()*16))"]}
-    proc random_clr {} {return [format "\#%1X%1X%1X%1X%1X%1X" [random_int] [random_int] [random_int] [random_int] [random_int] [random_int]]}
-
+    proc rc {} {return [format "\#%06x" [expr "int(floor(rand() * 16))"]]}
     proc mat_note {p t item} {
 	variable _
 	set id [lindex [$p.m itemcget $item -tags] 1]
-	set len [expr [lindex $_($t:items:$id) 2] - [lindex $_($t:items:$id) 0]]
+	set len [expr [dict get $_($t) $id xx] - [dict get $_($t) $id x]]
 	set vel [$p.m itemcget $item -fillopacity]
-	pd [concat $t.rp _cb note [lindex $_($t:items:$id) 1] $vel $len \;]}
+	pd [concat $t.rp _cb note [dict get $_($t) $id y] $vel $len \;]}
 
     proc mat_click {m button action p t x y} {
 	variable _
@@ -64,10 +62,9 @@ namespace eval ::ix {
 			    2 {
 				foreach item [$p.m find withtag item] {
 				    set id [lindex [$p.m itemcget $item -tags] 1]
-				    set px [mat_tr $p $t x t [lindex $_($t:items:$id) 0]]
-				    set py [mat_tr $p $t y t [lindex $_($t:items:$id) 1]]
-				    set sx [mat_tr $p $t x id [expr [lindex $_($t:items:$id) 2] - [lindex $_($t:items:$id) 0]]]
-				    #			    set sy [mat_tr $p $t y id [expr [lindex $_($t:items:$id) 3] - [lindex $_($t:items:$id) 1]]]
+				    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
+				    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
+				    set sx [mat_tr $p $t x id [expr [dict get $_($t) $id xx] - [dict get $_($t) $id x]]]
 				    set sy [mat_tr $p $t y id 1]
 				    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
 				}
@@ -97,7 +94,10 @@ namespace eval ::ix {
 		if {$x >= $_($t:cx)} {set xa $_($t:cx);set xb $x} else {set xa $x;set xb $_($t:cx)}
 		$p.m coords drawing [::tkpath::coords rect $xa $y [expr $xb - $xa] [mat_tr $p $t y id 1] -rx 3 -ry 3]
 		set yi [mat_tr $p $t y i $y]
-		set _($t:items:$_($t:i)) [list [mat_tr $p $t x i $xa] $yi [mat_tr $p $t x i $xb] $yi]
+		dict set _($t) $_($t:i) x [mat_tr $p $t x i $xa]
+		dict set _($t) $_($t:i) y $yi
+		dict set _($t) $_($t:i) xx [mat_tr $p $t x i $xb]
+		dict set _($t) $_($t:i) yy $yi
 		pd [concat $t.rp _cb note $yi 0.8 \;]}
 	    first {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
