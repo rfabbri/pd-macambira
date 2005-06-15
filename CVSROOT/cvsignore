@@ -1,0 +1,30 @@
+# Pd binaries
+*.pd_linux
+*.pd_darwin
+*.pd_darwin_o
+pd-watchdog
+libPdTcl.dylib
+pd.tk
+pdreceive
+pdsend
+
+# archive formats
+*.zip
+*.sit
+*.gz
+*.bz2
+*.tar
+*.dmg
+
+# Mac OS X directory wrappers
+*.app
+*.bundle
+*.framework
+
+# Mac OS X directory info
+.DS_Store
+
+# autotools build files
+autom4te.cache
+config.log
+config.status
