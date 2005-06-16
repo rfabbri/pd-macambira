@@ -1,0 +1,43 @@
+systems = Split("""bernoulli
+                   bungalow_tent
+				   circle_map
+				   coupled_logistic
+                   chua
+				   delayed_logistic
+				   driven_anharmonic
+				   driven_van_der_pol
+				   duffing_map
+				   gauss_map
+				   gaussian_map
+				   henon_map
+				   hydrogen
+				   ikeda_laser_map
+				   latoocarfian
+				   latoomutalpha
+				   latoomutbeta
+				   latoomutgamma
+				   logistic
+				   lorenz
+				   lozi_map
+				   roessler
+				   sine_map
+				   standard_map
+				   tent_map""")
+
+sources = []
+
+env = Environment(CCFLAGS = '-O3 -g -mtune=pentium-m -march=pentium-m -mmmx -msse -msse2 -mfpmath=sse -I~/pd/devel/pd/src/ -I/usr/local/include/flext -DFLEXT_SYS_PD -DFLEXT_THREADS -DFLEXT_SHARED')
+
+for system in systems:
+	sources.append(system+"_dsp.cpp")
+	sources.append(system+"_msg.cpp")
+	sources.append(system+"_search.cpp")
+sources += Split("main.cpp ode_base.cpp")
+
+sources = map(lambda x: "./src/"+x, sources)
+
+chaos = env.SharedLibrary('chaos', sources, LIBS = 'flext-pd_d',
+						  SHLIBPREFIX='', SHLIBSUFFIX='.pd_linux')
+
+env.Install('/usr/local/lib/pd/extra',chaos)
+env.Alias('install', '/usr/local/lib/pd/extra')
