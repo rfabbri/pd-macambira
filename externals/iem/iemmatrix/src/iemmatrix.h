@@ -62,6 +62,8 @@
 #ifdef __WIN32__
 # define fabsf fabs
 # define sqrtf sqrt
+# define powf pow
+
 #endif
 
 typedef double t_matrixfloat;

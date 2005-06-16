@@ -42,6 +42,7 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   int row=atom_getfloat(argv);
   int col=atom_getfloat(argv+1);
   int i, j, k, row2=row*row;
+  const t_matrixfloat singrange = 1.0e-10;
 
   t_matrixfloat *original, *gaussed;
   t_matrixfloat *a1, *a2, *b1, *b2;  // dummy pointers
@@ -62,7 +63,6 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   adjustsize(x, row, row);
   original=matrix2float(argv);
 
-  const t_matrixfloat singrange = 1.0e-10;
   // Gauss elimination
   for(i=0; i<row; i++) {
     int nz = 0;

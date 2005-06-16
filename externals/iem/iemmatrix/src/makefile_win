@@ -1,0 +1,67 @@
+
+all: ..\iemmatrix.dll
+
+VIS_CPP_PATH = "C:\Programme\Microsoft Visual Studio\Vc98"
+
+PD_INST_PATH = "C:\Programme\pd-0.37-1"
+
+PD_WIN_INCLUDE_PATH = /I. /I$(PD_INST_PATH)\src /I$(VIS_CPP_PATH)\include
+
+PD_WIN_C_FLAGS = /nologo /W3 /WX /DPD /D__WIN32__ /Ox -DPA_LITTLE_ENDIAN
+
+PD_WIN_L_FLAGS = /nologo
+
+PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NODEFAULTLIB:uuid \
+	$(VIS_CPP_PATH)\lib\libc.lib \
+	$(PD_INST_PATH)\bin\pd.lib
+
+
+SRC =	mtx_add.c \
+	mtx_binops.c \
+	mtx_check.c \
+	mtx_cholesky.c \
+	mtx_col.c \
+	mtx_diag.c \
+	mtx_diegg.c \
+	mtx_distance2.c \
+	mtx_egg.c \
+	mtx_element.c \
+	mtx_exp.c \
+	mtx_eye.c \
+	mtx_gauss.c \
+	mtx_inverse.c \
+	mtx_log.c \
+	mtx_matrix.c \
+	mtx_mean.c \
+	mtx_mul.c \
+	mtx_mul~.c \
+	mtx_ones.c \
+	mtx_pivot.c \
+	mtx_pow.c \
+	mtx_print.c \
+	mtx_prod.c \
+	mtx_rand.c \
+	mtx_resize.c \
+	mtx_roll.c \
+	mtx_row.c \
+	mtx_scroll.c \
+	mtx_size.c \
+	mtx_sub.c \
+	mtx_sum.c \
+	mtx_trace.c \
+	mtx_transpose.c \
+	mtx_zeros.c \
+	iemmatrix.c
+
+
+OBJ = $(SRC:.c=.obj)
+
+.c.obj:
+	cl $(PD_WIN_C_FLAGS) $(PD_WIN_INCLUDE_PATH) /c $*.c
+
+..\iemmatrix.dll: $(OBJ)
+	link $(PD_WIN_L_FLAGS) /dll /export:iemmatrix_setup \
+	/out:..\iemmatrix.dll $(OBJ) $(PD_WIN_LIB)
+
+clean:
+	del *.obj

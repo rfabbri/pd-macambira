@@ -25,9 +25,11 @@
 
 t_matrixfloat*mtx_doMultiply(int rowA, t_matrixfloat*A, int colArowB, t_matrixfloat*B, int colB){
   t_matrixfloat*result=0;
+  int r, c, n;
+
   if(!A || !B || !rowA || !colArowB || !colB)return 0;
   result=(t_matrixfloat*)getbytes(sizeof(t_matrixfloat)*rowA*colB);
-  int r, c, n;
+
   for(r=0; r<rowA; r++){
     for(c=0; c<colB; c++){
       t_matrixfloat sum=0.f;
