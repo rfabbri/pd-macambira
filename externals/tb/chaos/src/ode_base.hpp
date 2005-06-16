@@ -68,7 +68,7 @@ public:
 	void ode_base_alloc()
 	{
 		int dimension = get_num_eq();
-
+		
 		for (int i = 0; i != 3; ++i)
 		{
 			m_k[i] = new data_t[dimension];
@@ -87,15 +87,14 @@ public:
 	}
 
 protected:
-	void (ode_base::*m_routine)();
+ 	void (ode_base::*m_routine)(void);
+
 	unsigned char m_method; /* 0: rk1, 1: rk2, 3: rk4 */
 
 	data_t* m_k[3];         /* temporary arrays for runge kutta */
 	data_t* m_tmp;   
 
-	virtual void m_system (data_t* deriv, data_t* data)
-	{
-	}
+	virtual void m_system (data_t* deriv, data_t* data) = 0;
 
 	void rk1 ();
 	void rk2 ();

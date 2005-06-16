@@ -37,7 +37,7 @@ public:
 	{
 		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_PAR_INIT(method,0);
+		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.01);
 
 		CHAOS_SYS_INIT(u1,0.8, 0);
@@ -68,9 +68,16 @@ public:
 		deriv[2] = CHAOS_PARAMETER(Omega);
 	}
 	
+	virtual void m_verify()
+	{
+		/* make sure to stay in the range of 2 pi */
+		if (m_data[2] > 2*M_PI)
+			m_data[2] = chaos_mod(m_data[2], 2*M_PI);
+	}
+
 	CHAOS_SYSVAR_FUNCS(u1, 0);
 	CHAOS_SYSVAR_FUNCS(u2, 1);
-	CHAOS_SYSVAR_FUNCS(u3, 2);
+ 	CHAOS_SYSVAR_FUNCS(u3, 2);
 
 	CHAOS_SYSPAR_FUNCS(a);
 	CHAOS_SYSPAR_FUNCS(k);
@@ -82,6 +89,7 @@ public:
 ODE_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(u1);						\
 CHAOS_SYS_CALLBACKS(u2);						\
+CHAOS_SYS_CALLBACKS(u3);						\
 CHAOS_SYS_CALLBACKS(a);							\
 CHAOS_SYS_CALLBACKS(k);							\
 CHAOS_SYS_CALLBACKS(Omega);
@@ -90,6 +98,7 @@ CHAOS_SYS_CALLBACKS(Omega);
 ODE_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(u1);						\
 CHAOS_SYS_ATTRIBUTE(u2);						\
+CHAOS_SYS_ATTRIBUTE(u3);						\
 CHAOS_SYS_ATTRIBUTE(a);							\
 CHAOS_SYS_ATTRIBUTE(k);							\
 CHAOS_SYS_ATTRIBUTE(Omega);

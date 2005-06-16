@@ -82,14 +82,10 @@ public:
 	/* function has a fix point for x1 == x2 == 0 */
 	virtual void m_verify() 
 	{
-		for (int i = 0; i != get_num_eq(); ++i)
-		{
-#ifndef DOUBLE_PRECISION
-			if (PD_BIGORSMALL(m_data[i]))
-				m_data[i] = 0.01;
-#endif
-		}
-	};
+		if (m_data[0] == 0 && m_data[1] == 0)
+			for (int i = 0; i != 2; ++i)
+				m_data[i] = rand_range(0,0.1);
+	}
 };
 
 

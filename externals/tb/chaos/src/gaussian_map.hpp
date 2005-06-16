@@ -20,70 +20,65 @@
 
 #include "map_base.hpp"
 
-//  lozi map: x[n+1] = y[n] + 1 - a * abs(x[n])
-//            y[n+1] = b * x[n]
-//            b != 0
-//  taken from Willi-Hans Steeb: Chaos and Fractals
 
-class lozi_map:
+//  gaussian map: x[n+1] = exp(-b * x[n] * x[n]) + c
+//
+//  taken from Robert C. Hilborn: Chaos and Nonlinear Dynamics 
+
+class gaussian_map:
 	public map_base
 {
 public:
-	lozi_map()
+	gaussian_map()
 	{
 		CHAOS_PRECONSTRUCTOR;
-
-		CHAOS_SYS_INIT(x,0,0);
-		CHAOS_SYS_INIT(y,0,1);
-
-		CHAOS_PAR_INIT(a,1.4);
-		CHAOS_PAR_INIT(b,0.3);
 		
+		CHAOS_SYS_INIT(x, 0.5, 0);
+
+		CHAOS_PAR_INIT(b,7);
+		CHAOS_PAR_INIT(c,0.5);
+
 		CHAOS_POSTCONSTRUCTOR;
 	}
 
-	~lozi_map()
+	~gaussian_map()
 	{
 		
 	}
 
 	virtual void m_step()
 	{
-		data_t x = m_data[0];
-		data_t y = m_data[1];
-		
-		if (x > 0)
-			m_data[0] = 1 + y - CHAOS_PARAMETER(a) * x;
+		data_t data = m_data[0];
+
+		if (data == 0)
+			m_data[0] = 0.001;
 		else
-			m_data[0] = 1 + y + CHAOS_PARAMETER(a) * x;
-			
-		m_data[1] = CHAOS_PARAMETER(b) * x;
-		
+			m_data[0] = exp(-CHAOS_PARAMETER(b) * data * data)
+				+ CHAOS_PARAMETER(c);
 	}
-							
-	CHAOS_SYSVAR_FUNCS(x, 0);
-	CHAOS_SYSVAR_FUNCS(y, 1);
 
-	CHAOS_SYSPAR_FUNCS(a);
-
-	CHAOS_SYSPAR_FUNCS_PRED(b, m_pred_b);
-	bool m_pred_b(t_float f)
+	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
+	bool m_pred_x(t_float f)
 	{
-		return (f != 0);
+		return (f >= 0) && (f < 1);
 	}
+
+	CHAOS_SYSPAR_FUNCS(b);
+	CHAOS_SYSPAR_FUNCS(c);
+
 };
 
-
-#define LOZI_MAP_CALLBACKS						\
+#define GAUSSIAN_MAP_CALLBACKS					\
 MAP_CALLBACKS;									\
-CHAOS_SYS_CALLBACKS(a);							\
-CHAOS_SYS_CALLBACKS(b);							\
 CHAOS_SYS_CALLBACKS(x);							\
-CHAOS_SYS_CALLBACKS(y);
+CHAOS_SYS_CALLBACKS(b);							\
+CHAOS_SYS_CALLBACKS(c);
 
-#define LOZI_MAP_ATTRIBUTES						\
+#define GAUSSIAN_MAP_ATTRIBUTES					\
 MAP_ATTRIBUTES;									\
-CHAOS_SYS_ATTRIBUTE(a);							\
-CHAOS_SYS_ATTRIBUTE(b);							\
 CHAOS_SYS_ATTRIBUTE(x);							\
-CHAOS_SYS_ATTRIBUTE(y);
+CHAOS_SYS_ATTRIBUTE(b);							\
+CHAOS_SYS_ATTRIBUTE(c);
+
+
+

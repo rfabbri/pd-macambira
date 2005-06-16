@@ -34,11 +34,11 @@ public:
 		CHAOS_PRECONSTRUCTOR;
 
 		CHAOS_PAR_INIT(method,0);
-		CHAOS_PAR_INIT(dt,0.01);
+		CHAOS_PAR_INIT(dt,0.001);
 
-		CHAOS_SYS_INIT(x1,0,0);
-		CHAOS_SYS_INIT(x2,0,1);
-		CHAOS_SYS_INIT(x3,0,2);
+		CHAOS_SYS_INIT(x1,0.2,0);
+		CHAOS_SYS_INIT(x2,0.1,1);
+		CHAOS_SYS_INIT(x3,0.3,2);
 
 		CHAOS_PAR_INIT(a,4);
 		CHAOS_PAR_INIT(b,4);
@@ -58,7 +58,7 @@ public:
 	{
 		data_t x1 = data[0], x2 = data[1], x3 = data[2];
 		
-		deriv[0] = - (x2 - x1);
+		deriv[0] = - (x2 + x3);
 		deriv[1] = x1 + CHAOS_PARAMETER(a) * x2;
 		deriv[2] = CHAOS_PARAMETER(b) + (x1 - CHAOS_PARAMETER(c)) * x3;
 	}

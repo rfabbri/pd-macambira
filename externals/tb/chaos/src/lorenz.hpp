@@ -63,6 +63,16 @@ public:
 		deriv[1] = - x1 * x3 + CHAOS_PARAMETER(r) * x1 - x2;
 		deriv[2] = x1 * x2 - CHAOS_PARAMETER(b) * x3;
 	}
+	
+
+	/* function has a fix point for x1 == x2 == x3 == 0 */
+	virtual void m_verify() 
+	{
+		if (m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0)
+			for (int i = 0; i != 3; ++i)
+				m_data[i] = rand_range(0,3);
+	}
+
 
 	CHAOS_SYSVAR_FUNCS(x1, 0);
 	CHAOS_SYSVAR_FUNCS(x2, 1);

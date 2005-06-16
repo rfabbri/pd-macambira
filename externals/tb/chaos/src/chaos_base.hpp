@@ -29,26 +29,32 @@ class chaos_base
 {
 
 public:
-	t_sample get_data(unsigned int i)
+	inline t_sample get_data(unsigned int i)
 	{
 		return (t_sample)m_data[i]; /* this is not save, but fast */
 	}
 
-	int get_num_eq()
+	inline int get_num_eq()
 	{
 		return m_num_eq;
 	}
 
-	void m_perform()
+	inline void m_perform()
 	{
 		m_step();
+		m_bash_denormals();
 		m_verify();
 	}
 
-	std::map<const t_symbol*,int> attr_ind;
+ 	std::map<const t_symbol*,int> attr_ind;
+	//	TableAnyMap attr_ind; /* thomas fragen :-) */
 	
 	// check the integrity of the system
 	virtual void m_verify() 
+	{
+	}
+	
+	inline void m_bash_denormals()
 	{
 		for (int i = 0; i != get_num_eq(); ++i)
 		{
@@ -58,7 +64,7 @@ public:
 #endif
 		}
 	};
-
+	
 	data_t m_data[MAXDIMENSION];  // state of the system
 
 protected:

@@ -27,6 +27,8 @@
 #include "chaos_defs.hpp"
 #include <cmath>
 
+#include <cstdlib>
+
 /* internal we can work with a higher precision than pd */
 #ifdef DOUBLE_PRECISION
 typedef double data_t;
@@ -35,6 +37,21 @@ typedef double data_t;
 typedef float data_t;
 #define CHAOS_ABS(x) fabsf(x)
 #endif
+
+inline data_t chaos_mod(data_t x, data_t y)
+{
+#ifdef DOUBLE_PRECISION
+	return fmod(x,y);
+#else
+	return fmodf(x,y);
+#endif
+}
+
+inline data_t rand_range(data_t low, data_t high)
+{
+	return low + ( (rand() * (high - low)) / RAND_MAX);
+}
+
 
 
 #define __chaos_hpp

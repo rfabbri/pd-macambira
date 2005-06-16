@@ -18,7 +18,7 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "coupled_logistic.hpp"
-#include "chaos_msg.hpp"
+#include "driven_anharmonic.hpp"
+#include "chaos_search.hpp"
 
-CHAOS_MSG_CLASS(coupled_logistic,COUPLED_LOGISTIC)
+CHAOS_SEARCH_CLASS(driven_anharmonic, DRIVEN_ANHARMONIC);

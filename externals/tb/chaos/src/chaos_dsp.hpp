@@ -28,13 +28,15 @@ template <class system> class chaos_dsp
 public:
 
 	/* signal functions: */
-	/* for frequency = sr/2 */
+	/* for frequency = sr */
 	void m_signal_(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	/* sample & hold */
 	void m_signal_n(int n, t_sample *const *insigs,t_sample *const *outsigs);
+	/* sample & hold for high frequencies */
+	void m_signal_n_hf(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	/* linear interpolation */
 	void m_signal_l(int n, t_sample *const *insigs,t_sample *const *outsigs);
-	/* cubic interpolatio */
+	/* cubic interpolation */
 	void m_signal_c(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	
 	virtual void m_signal(int n, t_sample *const *insigs,t_sample *const *outsigs)
@@ -45,8 +47,9 @@ public:
 	virtual void m_dsp(int n, t_sample *const *insigs,t_sample *const *outsigs)
 	{
 		m_sr = Samplerate();
+		set_freq(m_freq); /* maybe we have to change the interpolation mode */
 	}
-
+	
 	void (thisType::*m_routine)(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	
 	/* local data for system, output and interpolation */
@@ -63,6 +66,7 @@ public:
 	float m_freq;        /* frequency of oscillations */
 	float m_invfreq;     /* inverse frequency */
 	int m_phase;         /* phase counter */
+	float m_fphase;      /* phase for high frequency linear interpolation */
 	float m_sr;          /* sample rate */
 	
 	int m_imethod;       /* interpolation method */
@@ -123,18 +127,22 @@ public:
 
 	void set_freq(float f)
 	{
-		if( (f >= 0) && (f <= m_sr*0.5) )
+		if (f < 0) /* we can't go back in time :-) */
+			f = -f;
+
+		if( f <= m_sr * 0.5 ) 
 		{
-			if (m_freq == -1)
+			if (m_freq >= m_sr * 0.5)
 				set_imethod(m_imethod);
 			m_freq = f;
 			m_invfreq = 1.f / f;
 		}
-		else if (f == -1)
+		else if (f > m_sr * 0.5)
 		{
-			m_freq = -1;
+			m_freq = f;
+			m_invfreq = 1.f / f;
 
-			m_routine = &thisType::m_signal_;
+			m_routine = &thisType::m_signal_n_hf;
 		}
 		else
 			post("frequency out of range");
@@ -143,6 +151,7 @@ public:
 	FLEXT_CALLVAR_F(get_freq, set_freq);
 	FLEXT_CALLVAR_I(get_imethod, set_imethod);
 };
+
 
 
 /* create constructor / destructor */
@@ -228,8 +237,38 @@ void chaos_dsp<system>::m_signal_(int n, t_sample *const *insigs,
 			outsigs[j][i] = m_system->get_data(j);
 		}
 	}
-	
 }
+
+
+template <class system> 
+void chaos_dsp<system>::m_signal_n_hf(int n, t_sample *const *insigs,
+	t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	float phase = m_fphase;
+	
+	int offset = 0;
+	while (n)
+	{
+		while (phase <= 0)
+		{
+ 			m_system->m_perform();
+			phase += m_sr * m_invfreq;
+		}
+		int next = (phase < n) ? int(ceilf (phase)) : n;
+		n -= next;
+		phase -=next;
+		
+		for (int i = 0; i != outlets; ++i)
+		{
+			SetSamples(outsigs[i]+offset, next, m_system->get_data(i));
+		}
+		offset += next;
+	}
+	m_fphase = phase;
+}
+
 
 template <class system> 
 void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,

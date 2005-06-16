@@ -19,6 +19,6 @@
 //  Boston, MA 02111-1307, USA.
 
 #include "coupled_logistic.hpp"
-#include "chaos_msg.hpp"
+#include "chaos_search.hpp"
 
-CHAOS_MSG_CLASS(coupled_logistic,COUPLED_LOGISTIC)
+CHAOS_SEARCH_CLASS(coupled_logistic, COUPLED_LOGISTIC);

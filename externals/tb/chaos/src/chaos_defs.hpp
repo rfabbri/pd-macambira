@@ -97,7 +97,8 @@ data_t m_##NAME;
 
 
 #define CHAOS_SYS_CALLBACKS(NAME)				\
-public:void get_##NAME(t_float &f)				\
+public:											\
+void get_##NAME(t_float &f)						\
 {												\
 	f = m_system->get_##NAME();					\
 }												\
@@ -134,6 +135,9 @@ t_atom atom_##NAME;											\
 flext::SetSymbol(atom_##NAME, flext::MakeSymbol(#NAME));	\
 System.Append(atom_##NAME);									\
 attr_ind[flext::MakeSymbol(#NAME)] = INDEX;
+
+#define CHAOS_SYS_INIT_HIDDEN(NAME, VALUE, INDEX)	\
+set_##NAME(VALUE);
 
 #define CHAOS_PAR_INIT(NAME, VALUE)							\
 set_##NAME(VALUE);											\

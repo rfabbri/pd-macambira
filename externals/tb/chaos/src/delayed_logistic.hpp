@@ -20,45 +20,53 @@
 
 #include "map_base.hpp"
 
-//  logistic map: x[n+1] = alpha * x[n] * (1 - x[n])
-//                0 < x[n] <  1
-//                0 <= alpha <= 4
+// delayed logistic map: x[n+1] = alpha * x[n] * (1 - x[n-1])
+//                       0 < x[n] <  1
+//                       0 <= alpha <= 4
+// taken from E. Atlee Jackson: Perspective of nonlinear dynamics (Vol. 2)
 
-class logistic:
+class delayed_logistic:
 	public map_base
 {
 public:
-	logistic()
+	delayed_logistic()
 	{
 		CHAOS_PRECONSTRUCTOR;
 
+		CHAOS_SYS_INIT(x, 0.5, 0);
+
 		CHAOS_PAR_INIT(alpha, 3.8);
-		CHAOS_SYS_INIT(x, 0.5,0);
 
 		CHAOS_POSTCONSTRUCTOR;
+
+		m_delayed = get_x(); /* the initial state of the delay */
 	}
 
-	~logistic()
+	~delayed_logistic()
 	{
-		delete m_data;
+		
 	}
 
 	virtual void m_step()
 	{
 		data_t x = m_data[0];
 		data_t alpha = CHAOS_PARAMETER(alpha);
-		m_data[0] = alpha * x * (1.f - x);
+		data_t delayed = m_delayed;
+
+		m_delayed = x;
+		m_data[0] = alpha * x * (1.f - delayed);
+		
 	}
+	data_t m_delayed;
 
 	CHAOS_SYSPAR_FUNCS_PRED(alpha, m_pred_alpha);
-	bool m_pred_alpha(data_t f)
+	bool m_pred_alpha(t_float f)
 	{
 		return (f > 0) && (f < 4);
 	}
 
 	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
-	
-	bool m_pred_x(data_t f)
+	bool m_pred_x(t_float f)
 	{
 		return (f > 0) && (f < 1);
 	}
@@ -72,12 +80,12 @@ public:
 	}
 };
 
-#define LOGISTIC_CALLBACKS						\
+#define DELAYED_LOGISTIC_CALLBACKS				\
 MAP_CALLBACKS;									\
 CHAOS_SYS_CALLBACKS(alpha);						\
 CHAOS_SYS_CALLBACKS(x);
 
-#define LOGISTIC_ATTRIBUTES						\
+#define DELAYED_LOGISTIC_ATTRIBUTES				\
 MAP_ATTRIBUTES;									\
 CHAOS_SYS_ATTRIBUTE(alpha);						\
 CHAOS_SYS_ATTRIBUTE(x);

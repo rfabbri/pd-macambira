@@ -28,7 +28,7 @@
 //                      a*x            (for -1 <= x <= 1
 //                      b*x - a + b    (for x < -1)
 //            
-//  taken from Viktor Avrutin: lecture note
+//  taken from Viktor Avrutin: lecture notes
 
 class chua:
 	public ode_base
@@ -38,14 +38,17 @@ public:
 	{
 		CHAOS_PRECONSTRUCTOR;
 
-		CHAOS_SYS_INIT(x1,1,0);
-		CHAOS_SYS_INIT(x2,1,1);
-		CHAOS_SYS_INIT(x3,1,2);
+		CHAOS_PAR_INIT(method,2);
+		CHAOS_PAR_INIT(dt,0.05);
 
-		CHAOS_PAR_INIT(a,1.4);
-		CHAOS_PAR_INIT(b,0.3);
-		CHAOS_PAR_INIT(alpha,0.3);
-		CHAOS_PAR_INIT(beta,0.3);
+		CHAOS_SYS_INIT(x1,1,1);
+		CHAOS_SYS_INIT(x2,1,1);
+		CHAOS_SYS_INIT(x3,1,1);
+
+		CHAOS_PAR_INIT(a,140);
+		CHAOS_PAR_INIT(b,30);
+		CHAOS_PAR_INIT(alpha,30);
+		CHAOS_PAR_INIT(beta,30);
 		
 		CHAOS_POSTCONSTRUCTOR;
 		
@@ -79,12 +82,74 @@ public:
 		deriv[2] = - CHAOS_PARAMETER(beta) * x2;
 	}
 
+	virtual void m_verify()
+	{
+		data_t x1 = m_data[0];
+		data_t x2 = m_data[1];
+		data_t x3 = m_data[2];
+		
+		if ( CHAOS_ABS(x3) < 1e-10)
+			x3 = 0;
+		
+		if (x1 == 0 && x2 == 0 && x3 == 0) /* fixpoint at (0,0,0) */
+		{
+			reset();
+			return;
+		}
+		else
+		{
+			data_t c = m_c;
+			if (m_c)
+			{
+				data_t mc = - c;
+				if (x1 == c && x3 == mc) /* fixpoint at (c,0,-c) */
+				{
+					reset();
+					return;
+				}
+				if (x1 == mc && x3 == c) /* fixpoint at (-c,0,c) */
+				{
+					reset();
+					return;
+				}
+			}
+		}
+	}
+	
+	inline void reset()
+	{
+		m_data[0] = rand_range(-1,1);
+		m_data[1] = rand_range(-1,1);
+		m_data[2] = rand_range(-1,1);
+	}			
+
 	CHAOS_SYSVAR_FUNCS(x1, 0);
 	CHAOS_SYSVAR_FUNCS(x2, 1);
 	CHAOS_SYSVAR_FUNCS(x3, 2);
 
-	CHAOS_SYSPAR_FUNCS(a);
-	CHAOS_SYSPAR_FUNCS(b);
+	/* due to stability issues, we hook into the predicates */
+	data_t m_c;
+	bool m_pred_a(data_t a)
+	{
+		data_t b = CHAOS_PARAMETER(b);
+		m_c = (b - a) / (b + 1);
+		return true;
+	}
+
+	bool m_pred_b(data_t b)
+	{
+		if (b == -1)
+			m_c = 0;
+		else
+		{
+			data_t a = CHAOS_PARAMETER(a);
+			m_c = (b - a) / (b + 1);
+		}
+		return true;
+	}
+
+	CHAOS_SYSPAR_FUNCS_PRED(a, m_pred_a);
+	CHAOS_SYSPAR_FUNCS_PRED(b, m_pred_b);
 	CHAOS_SYSPAR_FUNCS(alpha);
 	CHAOS_SYSPAR_FUNCS(beta);
 };

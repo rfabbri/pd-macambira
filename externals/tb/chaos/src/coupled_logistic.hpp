@@ -22,7 +22,7 @@
 
 //  coupled_logistic map: x[n+1] = r * x[n] * (1 - x[n]) + e * (y[n] - x[n])
 //                        y[n+1] = r * y[n] * (1 - y[n]) + e * (x[n] - y[n])
-//                        1 <= r <= 4
+//                        0 <= r <= 4
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class coupled_logistic:
@@ -54,6 +54,7 @@ public:
 		data_t r = CHAOS_PARAMETER(r);
 		m_data[0] = r * x * (1.f - x) + e * (y - x);
 		m_data[1] = r * y * (1.f - y) + e * (x - y);
+		m_verify();
 	}
 
 	CHAOS_SYSPAR_FUNCS(e);
@@ -76,9 +77,14 @@ public:
 		data_t x = m_data[0];
 		data_t y = m_data[1];
 		if (!m_pred_xy(x))
-			m_data[0] = 0.5;
+			m_data[0] = rand_range(0,0.08);
 		if (!m_pred_xy(y))
-			m_data[1] = 0.5;
+			m_data[1] = rand_range(0,0.08);
+		if (x == y)
+		{
+			m_data[0] += rand_range(0,0.2);
+			m_data[1] += -rand_range(0,0.2);
+		}
 	}
 
 	

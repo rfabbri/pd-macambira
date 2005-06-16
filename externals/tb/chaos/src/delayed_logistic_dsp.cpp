@@ -1,4 +1,4 @@
-// 
+//
 //  
 //  chaos~
 //  Copyright (C) 2005  Tim Blechmann
@@ -18,7 +18,6 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-#include "coupled_logistic.hpp"
-#include "chaos_msg.hpp"
-
-CHAOS_MSG_CLASS(coupled_logistic,COUPLED_LOGISTIC)
+#include "delayed_logistic.hpp"
+#include "chaos_dsp.hpp"
+CHAOS_DSP_CLASS(delayed_logistic,DELAYED_LOGISTIC);
