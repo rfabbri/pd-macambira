@@ -1,0 +1,76 @@
+#N canvas 140 53 889 703 10;
+#X obj 92 298 gemwin;
+#X obj 338 264 gemhead;
+#X obj 151 557 pix_texture;
+#X obj 151 589 rectangle 4 4;
+#X obj 501 531 pdp_xv;
+#X msg 546 478 create;
+#X msg 546 502 destroy;
+#X obj 338 398 pix_2pdp;
+#X obj 338 341 t a b;
+#X obj 338 307 pix_film;
+#X floatatom 405 293 5 0 1000 0 - - -;
+#X msg 405 237 set open \$1;
+#X text 446 293 <- frame;
+#X obj 405 214 openpanel;
+#X obj 405 194 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 405 262 open /home/Georg/pd-cvs/gem/Gem/examples/data/homer.avi
+;
+#X msg 92 251 create \, 1;
+#X msg 104 273 0 \, destroy;
+#X text 90 229 Gem Control:;
+#X text 313 223 Gem input:;
+#X text 385 341 <- so you can trigger pdp automatically each frame
+;
+#X text 401 403 pdp outlet;
+#X text 261 403 Gem outlet;
+#X obj 151 528 spigot;
+#X obj 188 508 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 210 514 chain to save CPU;
+#X obj 368 369 spigot;
+#X obj 419 370 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 441 370 <- turn on/off pdp processing;
+#X text 210 499 cut Gem render-;
+#X obj 500 578 pdp_rec~;
+#X text 498 598 (record a gem-pix !!!);
+#X text 45 321 (Gem rendering must be on \,;
+#X text 47 335 but you can cut the Gem;
+#X text 48 348 render-chain after pix_2pdp;
+#X text 46 362 and hide the Gem-window;
+#X text 46 376 to save CPU !);
+#X text 264 667 =%)!(%= (c) Georg Holzmann <grh@mur.at> \, 2005 =%)!(%=
+;
+#X text 27 79 pix_2pdp captures the contents of a Gem pix and transforms
+it to a PDP packet with almost no cpu power. So it's possible to convert
+from Gem to PDP to Gem to PDP to ... if you use the Gem pix objects!
+;
+#X text 490 77 So what can you do with it?;
+#X text 503 96 - use pix_video/pix_2pdp for firewire input in PDP;
+#X text 503 111 - use pix_2pdp/pdp_rec~ to record Gem pixes;
+#X text 503 126 - maybe switch between Gem and PDP all the time;
+#X text 503 141 - ...;
+#X text 395 25 pix_2pdp;
+#X connect 1 0 9 0;
+#X connect 2 0 3 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 0;
+#X connect 7 0 23 0;
+#X connect 7 1 4 0;
+#X connect 7 1 30 0;
+#X connect 8 0 7 0;
+#X connect 8 1 26 0;
+#X connect 9 0 8 0;
+#X connect 10 0 9 1;
+#X connect 11 0 15 0;
+#X connect 13 0 11 0;
+#X connect 14 0 13 0;
+#X connect 15 0 9 0;
+#X connect 16 0 0 0;
+#X connect 17 0 0 0;
+#X connect 23 0 2 0;
+#X connect 24 0 23 1;
+#X connect 26 0 7 0;
+#X connect 27 0 26 1;
