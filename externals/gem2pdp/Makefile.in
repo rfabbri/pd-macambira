@@ -15,7 +15,7 @@ GEM2PDP_CPPFLAGS  = -DPD -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
     -DGEM2PDP_VERSION=\"$(GEM2PDP_VERSION)\" -g
 PDP_PIDIP_CPPFLAGS  = -O
 
-all: gem2pdp.pd_linux pdp2gem.pd_linux
+all: gem2pdp.pd_linux pdp2gem.pd_linux pix_2pdp.pd_linux
 
 pdp2gem.pd_linux: pdp2gem.o yuv.o
 	rm -f pdp2gem.pd_linux
@@ -25,10 +25,15 @@ gem2pdp.pd_linux: gem2pdp.o yuv.o
 	rm -f gem2pdp.pd_linux
 	gcc -export_dynamic -shared -o gem2pdp.pd_linux gem2pdp.o yuv.o $(LIBS)
 
+pix_2pdp.pd_linux: pix_2pdp.o yuv.o
+	rm -f pix_2pdp.pd_linux
+	gcc -export_dynamic -shared -o pix_2pdp.pd_linux pix_2pdp.o yuv.o $(LIBS)
+
 clean:
 	rm -f *.o
 	rm -f gem2pdp.pd_linux
 	rm -f pdp2gem.pd_linux
+	rm -f pix_2pdp.pd_linux
 
 distro: clean all
 	rm *.o

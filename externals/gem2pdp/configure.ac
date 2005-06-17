@@ -23,15 +23,15 @@ else
    echo "PdP sources not found"
 fi
 
-if test -d /usr/local/pd/gem; 
+if test -d /win/Georg/pd-cvs/gem/Gem; 
 then
-   GEM_DIR=/usr/local/pd/gem
-elif test -d ../../Gem; 
+   GEM_DIR=/win/Georg/pd-cvs/gem/Gem
+elif test -d ../../gem/Gem; 
 then
-	GEM_DIR=../../Gem
-elif  test -d ../gem/Gem; 
+	GEM_DIR=../../gem/Gem
+elif  test -d ../../gem/Gem; 
 then
-	GEM_DIR=../gem/Gem
+	GEM_DIR=../../gem/Gem
 else
    echo "Gem sources not found"
 fi
@@ -48,6 +48,25 @@ AM_MAINTAINER_MODE
 AM_WITH_DMALLOC
 
 AC_SUBST(GEM2PDP_VERSION)
+
+AC_ARG_WITH(pddir,       [  --with-pddir=<dir>      specify an alternate pd source tree])
+AC_ARG_WITH(gemdir,      [  --with-gemdir=<dir>     specify an alternate gem source tree])
+AC_ARG_WITH(pdpdir,      [  --with-pdpdir=<dir>     specify an alternate pdp source tree])
+
+if test "$with_gemdir" != ""
+then
+ GEM_DIR=$with_gemdir
+fi
+
+if test "$with_pdpdir" != ""
+then
+ PDP_DIR=$with_pdpdir
+fi
+
+if test "$with_pddir" != ""
+then
+ PD_DIR=$with_pddir
+fi
 
 echo -n "looking for gem sources (required) ... "
 if test -f $GEM_DIR/src/Base/GemMan.h

@@ -32,7 +32,7 @@ class GEM_EXTERN gem2pdp : public GemBase
    virtual void bangMess(void);
    virtual void render(GemState *state);
    void         cleanImage();
-   t_int        m_packet0;
+   int        m_packet0;
    t_pdp        *m_header;
    short int    *m_data;
     	
