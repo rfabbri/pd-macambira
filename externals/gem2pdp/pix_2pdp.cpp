@@ -44,51 +44,95 @@ void pix_2pdp::bangMess()
 {
   t_int psize, px, py;
   short int *pY, *pU, *pV;
-  unsigned char r,g,b;
+  unsigned char g1,g2,g3,g4;
   t_int helper;
 
   if(gem_image)
   {
-    if(gem_format == GL_RGBA)
-    {
-      // make pdp packet
-      psize = gem_xsize * gem_ysize;
-      m_packet0 = pdp_packet_new_image_YCrCb( gem_xsize, gem_ysize);
-      m_header = pdp_packet_header(m_packet0);
-      m_data = (short int *)pdp_packet_data(m_packet0);
+    // make pdp packet
+    psize = gem_xsize * gem_ysize;
+    m_packet0 = pdp_packet_new_image_YCrCb( gem_xsize, gem_ysize);
+    m_header = pdp_packet_header(m_packet0);
+    m_data = (short int *)pdp_packet_data(m_packet0);
 
-      pY = m_data;
-      pV = m_data+psize;
-      pU = m_data+psize+(psize>>2);
-  
-      for ( py=0; py<gem_ysize; py++)
-      {
-        for ( px=0; px<gem_xsize; px++)
+    pY = m_data;
+    pV = m_data+psize;
+    pU = m_data+psize+(psize>>2);
+    
+    switch(gem_format)
+    {
+      // RGB
+      case GL_RGB:
+      case GL_RGBA:
+        for ( py=0; py<gem_ysize; py++)
         {
-          // the way to access the pixels: (C=chRed, chBlue, ...)
-          // image[Y * xsize * csize + X * csize + C]
-          helper = py*gem_xsize*gem_csize + px*gem_csize;
-          r=gem_image[helper+chRed];
-          g=gem_image[helper+chGreen];
-          b=gem_image[helper+chBlue];
-          
-          *(pY) = yuv_RGBtoY( (r<<16) +  (g<<8) +  b ) << 7;
-          *(pV) = ( yuv_RGBtoV( (r<<16) +  (g<<8) +  b ) - 128 ) << 8;
-          *(pU) = ( yuv_RGBtoU( (r<<16) +  (g<<8) +  b ) - 128 ) << 8;
-          pY++;
-          if ( (px%2==0) && (py%2==0) )
+          for ( px=0; px<gem_xsize; px++)
           {
-            pV++; pU++;
+            // the way to access the pixels: (C=chRed, chBlue, ...)
+            // image[Y * xsize * csize + X * csize + C]
+            helper = py*gem_xsize*gem_csize + px*gem_csize;
+            g1=gem_image[helper+chRed];   // R
+            g2=gem_image[helper+chGreen]; // G
+            g3=gem_image[helper+chBlue];  // B
+            
+            *(pY) = yuv_RGBtoY( (g1<<16) +  (g2<<8) +  g3 ) << 7;
+            *(pV) = ( yuv_RGBtoV( (g1<<16) +  (g2<<8) +  g3 ) - 128 ) << 8;
+            *(pU) = ( yuv_RGBtoU( (g1<<16) +  (g2<<8) +  g3 ) - 128 ) << 8;
+            pY++;
+            if ( (px%2==0) && (py%2==0) )
+              pV++; pU++;
           }
         }
-      }
-
-      pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
-
-    }
-    else
-    {
-      post( "pix_2pdp: Sorry, Gem-input RGB only for now!" );
+        pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
+        break;
+        
+      // YUV
+      case GL_YUV422_GEM:
+        for ( py=0; py<gem_ysize; py++)
+        {
+          for ( px=0; px<gem_xsize; px++)
+          {
+            helper = py*gem_xsize*gem_csize + px*gem_csize;
+            g1=gem_image[helper+chU];  // U
+            g2=gem_image[helper+chY0]; // Y0
+            g3=gem_image[helper+chV];  // V
+            g4=gem_image[helper+chY1]; // Y1
+            
+            if(px%2==0)
+              *pY = g2 << 7;
+            else
+              *pY = g4 << 7;
+            pY++;
+            
+            *pU = (g1-128) << 8;
+            *pV = (g3-128) << 8;
+            if ( (px%2==0) && (py%2==0) )
+              pV++; pU++;
+          }
+        }
+        pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
+        break;
+      
+      // grey
+      case GL_LUMINANCE:
+        for ( py=0; py<gem_ysize; py++)
+        {
+          for ( px=0; px<gem_xsize; px++)
+          {
+            *pY = gem_image[py*gem_xsize*gem_csize + px*gem_csize] << 7;
+            pY++;
+            if ( (px%2==0) && (py%2==0) )
+            {
+              *pV++=128;
+              *pU++=128;
+            }
+          }
+        }
+        pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
+        break;
+        
+      default:
+        post( "pix_2pdp: Sorry, wrong input type!" );
     }
   }
 }
