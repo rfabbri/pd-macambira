@@ -7,9 +7,19 @@ namespace eval ::ix {
 	set len [expr [dict get $_($t) $id xx] - [dict get $_($t) $id x]]
 	set vel [$p.m itemcget $item -fillopacity]
 	pd [concat $t.rp _cb note [dict get $_($t) $id y] $vel $len \;]}
-
+    namespace eval actions {
+	proc action {p t o} {puts gah}
+	proc draw {p t o} {puts draw}
+	proc resize_canvas {p t o} {}
+	proc move_canvas {p t o} {puts cvda}
+	proc move_object {p t o} {
+	    puts hiihect
+	}
+    }
     proc mat_click {m button action p t x y} {
 	variable _
+	set a [$p.m itemcget mode -text]
+	eval actions::$a $p $t o
 	switch $m {
 	    control {mat_draw $action $p $t $x $y}	    
 	    "" {
@@ -21,12 +31,19 @@ namespace eval ::ix {
 				mat_note $p $t $item
 			    }
 			}
+			if {$clicked ne "" && [lindex [$p.m itemcget $item -tags] 0] eq "item"} {
+			    mat_mode $p $t {move_object}
+			} {mat_mode $p $t {move_canvas}}
+			    set junk ""
+			    foreach cfg [$p.m itemconfigure $clicked] {set junk "$junk\n$cfg"}
+			    mat_info $p $t $junk
 		    }
 		    first {
 			#		if {$clicked ne ""} {
 			set _($t:cl) $clicked
 			#		}
 			foreach xy {x y}  {set _($t:f$xy) [set $xy]}
+			switch $button {2 {mat_mode $p $t resize_canvas}}
 		    }
 		    motion {
 			set mx [expr $x - $_($t:cx)]
@@ -81,6 +98,11 @@ namespace eval ::ix {
 			    }
 			}			
 		    }
+		    release {
+			switch $button {
+			    2 {mat_mode $p $t move_canvas}
+			}
+		    }
 		}
 		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
 	    }
@@ -121,6 +143,28 @@ namespace eval ::ix {
 	set _($t:ya) $_($t:yao);set _($t:yb) $_($t:ybo);set _($t:xa) $_($t:xao);set _($t:xb) $_($t:xbo)
 	mat_gridlines $p $t}
 
+    proc mat_key {p t k b} {
+	puts $k
+	switch $b {
+	    1 {
+		switch $k {
+		    37 {mat_mode  $p $t draw}
+		}
+	    }
+	    0 {
+		switch $k {
+		    37 {mat_mode  $p $t {move_canvas}}
+		}
+	    }
+	}
+    }
+    proc mat_mode {p t m} {
+	$p.m itemconfigure mode -text $m
+    }
+    proc mat_info {p t m} {
+	$p.m itemconfigure info -text $m
+    }
+
     proc mat_new {path target w h bg ln xa xb ya yb qx qy} {
 	variable _
 	set i 0
@@ -129,6 +173,8 @@ namespace eval ::ix {
 	if {[winfo exists $path.m] != 1} {
 	    canvas $path.m -bg $bg -width $w -height $h
 	    pack $path.m -side left
+	    bind $path.m <Key> "::ix::mat_key $path $target %k 1"
+	    bind $path.m <KeyRelease> "::ix::mat_key $path $target %k 0"
 	    bind $path.m <Motion> "::ix::mat_click {} 0 hover $path $target %x %y"
 	    foreach m {"Control-" "" "Shift-"} {
 		foreach bn {1 2 3} {
@@ -137,6 +183,8 @@ namespace eval ::ix {
 			bind $path.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $path $target %x %y"}}}
 	    set bd [expr {[$path cget -bd] * 2}]
             $path configure -bg gray -width [expr [winfo width $path.m] + $bd] -height [expr [winfo height $path.m] + $bd]
+	    $path.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text action
+	    $path.m create text {20 32} -fill gray49 -justify left -anchor nw -font {{bitstream vera sans} 12} -tags info
 	    mat_gridlines $path $target}}
     
     proc mat_gridlines {path target} {
