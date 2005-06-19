@@ -1,4 +1,4 @@
-#N canvas 69 230 1009 667 10;
+#N canvas 44 74 1007 677 10;
 #X floatatom 19 530 0 0 0 0 - - -;
 #X msg 83 488 1;
 #X msg 49 488 54;
@@ -35,62 +35,62 @@ to the rightmost outlet.;
 you can use [select] to test the input for many different values. You
 will see an outlet for each test value and finally an outlet for values
 which match none of them (the rightmost outlet).;
-#X obj 635 303 print NO_match;
-#X obj 508 302 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 601 303 print NO_match;
+#X obj 474 302 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 539 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 505 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 571 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 537 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 603 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 569 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 511 92 symbol dog;
-#X msg 516 111 symbol cat;
-#X msg 524 129 symbol foo;
-#X msg 531 149 symbol earth;
-#X msg 540 168 symbol 400;
-#X obj 508 282 select dog cat foo 400;
-#X msg 536 218 400;
-#X obj 639 580 print NO_match;
-#X obj 512 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X msg 477 92 symbol dog;
+#X msg 482 111 symbol cat;
+#X msg 490 129 symbol foo;
+#X msg 497 149 symbol earth;
+#X msg 506 168 symbol 400;
+#X obj 474 282 select dog cat foo 400;
+#X msg 502 218 400;
+#X obj 605 580 print NO_match;
+#X obj 478 579 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 543 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 509 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 575 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 541 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 607 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 573 580 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 508 377 symbol dog;
-#X msg 520 404 symbol cat;
-#X msg 528 423 symbol foo;
-#X msg 535 442 symbol earth;
-#X msg 543 463 symbol 400;
-#X msg 564 496 400;
-#X obj 512 560 select 400 dog cat foo;
-#X text 612 160 Notice that "400" here is defined as a symbol data
+#X msg 474 377 symbol dog;
+#X msg 486 404 symbol cat;
+#X msg 494 423 symbol foo;
+#X msg 501 442 symbol earth;
+#X msg 509 463 symbol 400;
+#X msg 530 496 400;
+#X obj 478 560 select 400 dog cat foo;
+#X text 578 160 Notice that "400" here is defined as a symbol data
 type and the [select] object can successfully match it to the creation
 argment.;
-#X text 563 206 Notice that "400" here is a number and the [select]
+#X text 529 206 Notice that "400" here is a number and the [select]
 object cannot successfully match it to the creation argument. That
 is because this [select] expects symbols - not numbers.;
-#X obj 486 631 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 460 631 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 486 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 460 14 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 508 320 However \, in this case below \, you'll notice that
+#X text 474 320 However \, in this case below \, you'll notice that
 the FIRST creation argument is a number. Therefore \, this [select]
 object expects numbers and will ignore the "symbol" data type.;
-#X text 547 264 FIRST CREATION ARGUMENT IS A SYMBOL;
-#X text 555 543 FIRST CREATION ARGUMENT IS A NUMBER;
-#X text 511 9 [select] can also be used to match symbols like the example
+#X text 513 264 FIRST CREATION ARGUMENT IS A SYMBOL;
+#X text 521 543 FIRST CREATION ARGUMENT IS A NUMBER;
+#X text 477 9 [select] can also be used to match symbols like the example
 in the upper-right of this patch. It important to note that the FIRST
 creation argument indicates to the [select] object which data type
 to expect. If your first creation argument is a symbol \, like "dog"
 \, then the object will test only symbols and numbers will be ignored!
 ;
-#X text 592 490 Notice that "400" here is a number and the [select]
+#X text 558 490 Notice that "400" here is a number and the [select]
 object can successfully match it to the creation argument.;
-#X text 612 457 Notice that "400" here is a symbol and the [select]
+#X text 578 457 Notice that "400" here is a symbol and the [select]
 object cannot successfully match it to the creation argument.;
 #X obj 23 373 sel 42;
 #X msg 23 330 42;
@@ -102,8 +102,8 @@ object cannot successfully match it to the creation argument.;
 #X text 325 686 This document was updated for Pd version 0.35 test
 24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
 Czaja to build comprehensive documentation for Pd.;
-#X obj 514 639 route;
-#X text 513 618 RELATED OBJECTS;
+#X obj 480 639 route;
+#X text 479 618 RELATED OBJECTS;
 #X text 22 614 A WORD ABOUT CONDITIONAL OBJECTS;
 #N canvas 245 41 580 582 more 0;
 #X text 22 16 Using the [select] object \, and others listed below
@@ -163,7 +163,7 @@ is:;
 ;
 #X text 16 140 or;
 #X text 17 154 iem.kug.ac.at/pdb/;
-#X restore 555 639 pd related_objects_from_other_libraries;
+#X restore 521 639 pd related_objects_from_other_libraries;
 #X obj 233 397 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 196 332 symbol word;
@@ -173,7 +173,6 @@ is:;
 #X obj 305 397 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 305 332 symbol word;
-#X obj -316 311;
 #X text 21 260 Also note that in the example above \, there is a second
 inlet. This is used to reset the argument's value like below. This
 feature is available only on [select] objects with only ONE creation

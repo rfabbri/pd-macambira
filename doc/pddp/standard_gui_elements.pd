@@ -1,14 +1,14 @@
-#N canvas 218 38 464 552 10;
+#N canvas 218 38 476 564 10;
 #X msg 22 148 \; pd dsp \$1;
 #X obj 2 2 cnv 15 450 20 empty empty [object_name] 2 11 1 18 -233017
 -66577 0;
-#X obj 21 93 tgl 30 0 empty empty start 2 15 1 12 -24198 -1 -1 0 1
+#X obj 21 93 tgl 30 0 empty empty start 1 15 1 12 -90049 -1 -1 0 1
 ;
-#X obj 369 103 vsl 20 128 0 127 0 0 empty empty amp -1 -8 1 12 -225271
+#X obj 369 103 vsl 20 128 0 1 0 0 empty empty amp -1 -8 1 12 -225271
 -1 -1 0 1;
 #X obj 194 466 grouping patch;
 #X obj 113 228 nbx 5 20 -1e+37 1e+37 0 0 empty empty display_number_box
-0 -6 1 16 -199729 -1 -1 34 256;
+0 -6 1 16 -199729 -1 -1 0 256;
 #X text 17 261 The idea behind these objects is to have a color scheme
 which consistently represents various ideas. Also \, having GUI objects
 highlighted by color signals the user that they should play with that
@@ -21,13 +21,15 @@ object \, while plain white objects are part of the implementation.
 #X restore 317 466 pd related_objects;
 #X text 14 37 [object_name] is an example patch for the PDDP style
 guide.;
-#X obj 223 92 bng 30 250 50 0 empty empty open 1 15 1 12 -44926 -1
--1;
-#X obj 129 93 bng 30 250 50 0 empty empty stop 2 15 1 12 -258699 -1
+#X obj 223 92 bng 30 250 50 0 empty empty open 1 15 1 12 -4080 -1 -1
+;
+#X obj 129 93 bng 30 250 50 0 empty empty stop 2 15 1 12 -258579 -1
 -1;
 #X obj 271 156 hsl 60 18 0 1 0 1 empty empty pan 2 9 1 12 -257472 -1
 -1 2950 0;
-#X obj 55 93 bng 30 250 50 0 empty empty start 1 15 1 12 -24198 -1
+#X obj 55 93 bng 30 250 50 0 empty empty start 1 15 1 12 -90049 -1
 -1;
 #X obj 28 349 comment 400 12 Times ? 0 0 0 0 This is Times 12pt;
 #X obj 33 378 comment 400 14 Times ? 0 0 0 0 comment;
+#X obj 255 92 bng 30 250 50 0 empty empty save 1 15 1 12 -4015 -1 -1
+;

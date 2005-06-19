@@ -1,7 +1,7 @@
-#N canvas 255 95 864 631 10;
+#N canvas 255 95 868 635 10;
 #X text 460 79 looping objects:;
 #X obj 462 101 until;
-#X obj 572 102 loop;
+#X obj 520 101 loop;
 #X obj 437 504 susloop~;
 #X obj 506 504 loop~;
 #X text 434 483 for looping samples:;
@@ -89,6 +89,10 @@ this. Instead of setting up a C-like [counter] or [for++] \, set up
 a condition to continue the loop \, and a condition that stops the
 loop.;
 #X text 429 395 other examples:;
+#X obj 705 504 count~;
+#X obj 557 101 modulo_counter;
+#X obj 665 101 count;
+#X obj 709 101 countund;
 #X connect 16 0 17 0;
 #X connect 16 0 27 0;
 #X connect 17 0 16 1;
