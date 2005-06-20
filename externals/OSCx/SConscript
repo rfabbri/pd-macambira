@@ -14,4 +14,4 @@ for OSCexternal in Split('dumpOSC sendOSC OSC OSCroute'):
     env.Alias('install', env.Install(os.path.join(prefix, 'extra'), OSCx))
     Default(OSCx)
 
-env.Alias('install', env.Install(os.path.join(prefix, 'doc/5.reference'), glob.glob('doc/*.pd')))
+env.Alias('install', env.Install(os.path.join(prefix, 'doc/OSCx'), glob.glob('doc/*.pd')))

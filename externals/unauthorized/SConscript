@@ -2,7 +2,6 @@ import glob
 import os
 import re
 Import('env prefix')
-#env.Append(CPPPATH = '/usr/include/speex')
 
 for tk in glob.glob('*/*.tk'):
     (dir, file) = os.path.split(tk)
@@ -15,6 +14,4 @@ for extra in glob.glob('*/*.c'):
     env.Alias('install', env.Install(os.path.join(prefix, 'extra'), unauthorized))
     Default(unauthorized)
 
-env.Alias('install', env.Install(os.path.join(prefix, 'doc/5.reference'), glob.glob('*/*.pd')))
-
-
+env.Alias('install', env.Install(os.path.join(prefix, 'doc/unauthorized'), glob.glob('*/*.pd')))
