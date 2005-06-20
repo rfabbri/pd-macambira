@@ -1,4 +1,4 @@
-#N canvas 225 469 135 205 10;
+#N canvas 225 469 146 202 10;
 #N canvas 375 417 614 523 left-right-links 0;
 #X obj 192 225 pointer mass;
 #X obj 184 423 pack p p;
@@ -43,10 +43,10 @@ to right and create links between two neighbor masses like:;
 #X connect 16 0 15 1;
 #X connect 18 0 20 1;
 #X connect 19 0 0 0;
-#X restore 141 68 pd left-right-links;
-#X obj 2 19 cnv 15 130 80 empty empty empty 20 12 0 14 -233017 -66577
+#X restore 141 67 pd left-right-links;
+#X obj 2 18 cnv 15 140 80 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 10 53 bng 15 250 50 0 empty empty left-to-right 20 8 0 8 -241291
+#X obj 10 52 bng 15 250 50 0 empty empty left-to-right 20 8 0 8 -241291
 -1 -1;
 #N canvas 487 247 771 749 one-to-many 0;
 #X obj 203 173 pointer mass;
@@ -85,22 +85,22 @@ to right and create links between two neighbor masses like:;
 #X connect 12 1 2 0;
 #X connect 13 0 15 1;
 #X connect 14 0 5 0;
-#X restore 143 95 pd one-to-many;
-#X obj 10 76 tgl 15 0 empty empty one2many-Start 20 8 0 8 -262131 -1
+#X restore 143 94 pd one-to-many;
+#X obj 10 75 tgl 15 0 empty empty one2many-Start 20 8 0 8 -262131 -1
 -1 0 1;
-#X obj 10 31 bng 15 250 50 0 empty empty all_selected 20 8 0 8 -241291
+#X obj 10 30 bng 15 250 50 0 empty empty all_selected 20 8 0 8 -241291
 -1 -1;
-#X obj 109 30 tgl 15 0 empty empty Keys -3 -6 0 8 -24198 -1 -1 0 1
+#X obj 115 31 tgl 15 0 empty empty Keys -3 -6 0 8 -24198 -1 -1 0 1
 ;
-#X obj 211 6 keyup;
-#X obj 211 27 spigot;
-#X obj 2 101 cnv 15 130 100 empty empty Link_Params 10 10 0 10 -195568
+#X obj 211 5 keyup;
+#X obj 211 26 spigot;
+#X obj 2 100 cnv 15 140 100 empty empty Link_Params 10 10 0 10 -195568
 -1 0;
-#X obj 20 121 nbx 4 14 -1e+37 1e+37 0 0 \$0-K \$0-K K -12 8 0 10 -225271
+#X obj 20 120 nbx 4 14 -1e+37 1e+37 0 0 \$0-K \$0-K K -12 8 0 10 -225271
 -1 -1 10 256;
-#X obj 46 182 nbx 5 14 -1e+37 1e+37 0 0 \$0-lsid \$0-lsid SID -30 8
+#X obj 46 181 nbx 5 14 -1e+37 1e+37 0 0 \$0-lsid \$0-lsid SID -30 8
 0 10 -261681 -1 -1 0 256;
-#X obj 20 138 nbx 4 14 -1e+37 1e+37 0 0 \$0-D \$0-D D -12 8 0 10 -225271
+#X obj 20 142 nbx 4 14 -1e+37 1e+37 0 0 \$0-D \$0-D D -12 8 0 10 -225271
 -1 -1 2.5 256;
 #N canvas 374 319 746 411 linkparam 0;
 #X obj 34 229 s \$0-link-param;
@@ -138,6 +138,8 @@ to right and create links between two neighbor masses like:;
 #X obj 235 106 t b f;
 #X obj 195 53 r \$0-Lmin;
 #X obj 235 78 r \$0-Lmax;
+#X obj 49 315 outlet;
+#X obj 49 287 r \$0-link-param;
 #X connect 1 0 30 0;
 #X connect 1 1 30 1;
 #X connect 2 0 30 0;
@@ -178,7 +180,8 @@ to right and create links between two neighbor masses like:;
 #X connect 32 1 30 5;
 #X connect 33 0 31 0;
 #X connect 34 0 32 0;
-#X restore 145 127 pd linkparam;
+#X connect 36 0 35 0;
+#X restore 145 126 pd linkparam;
 #N canvas 0 0 483 507 ilinker 0;
 #X obj 195 306 pointer mass;
 #X obj 197 167 pointer mass;
@@ -209,14 +212,15 @@ masses like iLink.;
 #X connect 8 0 11 1;
 #X connect 9 0 1 0;
 #X connect 10 0 0 0;
-#X restore 137 46 pd ilinker;
-#X obj 210 47 select 108 114;
-#X obj 68 132 nbx 3 14 0 1e+37 0 0 \$0-Lmin \$0-Lmin Lmin 0 -8 0 10
+#X restore 137 45 pd ilinker;
+#X obj 210 46 select 108 114;
+#X obj 77 132 nbx 3 14 0 1e+37 0 0 \$0-Lmin \$0-Lmin Lmin 0 -8 0 10
 -225271 -1 -1 0 256;
-#X obj 20 155 nbx 3 14 -1e+37 1e+37 0 0 \$0-P \$0-P P -12 8 0 10 -225271
+#X obj 20 161 nbx 3 14 -1e+37 1e+37 0 0 \$0-P \$0-P P -12 8 0 10 -225271
 -1 -1 1 256;
-#X obj 67 162 nbx 6 14 0 1e+37 0 0 \$0-Lmax \$0-Lmax Lmax 0 -8 0 10
--225271 -1 -1 0 256;
+#X obj 76 162 nbx 6 14 0 1e+37 0 0 \$0-Lmax \$0-Lmax Lmax 0 -8 0 10
+-225271 -1 -1 1e+10 256;
+#X obj 145 156 outlet;
 #X connect 2 0 0 0;
 #X connect 3 0 4 0;
 #X connect 4 0 3 0;
@@ -224,6 +228,7 @@ masses like iLink.;
 #X connect 6 0 8 1;
 #X connect 7 0 8 0;
 #X connect 8 0 15 0;
+#X connect 13 0 19 0;
 #X connect 15 0 14 0;
 #X connect 15 1 0 0;
-#X coords 0 0 1 1 132 200 1;
+#X coords 0 0 1 1 142 200 1;
