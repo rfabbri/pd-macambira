@@ -14,11 +14,9 @@ namespace eval ::ix {
 
     proc mat_scroll {p t d axis} {
 	variable _
-	puts "Scroll0: $_($t:xa) $_($t:xb)  $_($t:ya) $_($t:yb)"
 	foreach xy $axis {
 	    set mv [expr ($_($t:${xy}b) - $_($t:${xy}a)) / 4.0]
 	    foreach ab {a b} {set _($t:${xy}$ab) [expr $_($t:${xy}$ab) $d $mv]}}
-	puts "Scroll1: $_($t:xa) $_($t:xb)  $_($t:ya) $_($t:yb)"
 	mat_redraw $p $t all
 	mat_gridlines $p $t
     }
@@ -28,7 +26,6 @@ namespace eval ::ix {
 	switch $a {
 	    start {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy];set _($t:f$xy) [set $xy]}
-#		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] -tags sel -fill cyan -stroke white -fillopacity 0.2
 		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] -tags sel -stroke [rc] -strokewidth 12 -strokeopacity 0.3
 
 	    }
@@ -136,7 +133,6 @@ namespace eval ::ix {
 	variable _
 	if {[$p.m find withtag sel] ne ""} {
 	    set clicked [$p.m find overlapping $x $y $_($t:fx) $_($t:fy)] 
-	    puts sel
 	    mat_sel motion $p $t $x $y
 	} else {
 	    set clicked [$p.m find overlapping $x $y $x $y]
@@ -151,14 +147,11 @@ namespace eval ::ix {
 		incr n
 	    }
 	}
-#	set junk $clicked
-#	foreach cfg [$p.m itemconfigure $clicked] {set junk "$junk\n$cfg"}
-#	mat_info $p $t $junk
+	mat_loc $p $t $x $y
     }
 
-    proc mat_click {m button action p t x y} {
+    proc mat_click {m button action p t x y X Y} {
 	variable _
-#	puts "$m $button $action"
 	set clicked [$p.m find overlapping $x $y $x $y]
 	set a [$p.m itemcget mode -text]
 	switch $action {
@@ -180,7 +173,13 @@ namespace eval ::ix {
 			}
 		    }
 		    2 {mat_mode $p $t resize_canvas}
-		    3 {mat_mode $p $t object_trans}
+		    3 {
+			if {$clicked ne "" && [lindex [$p.m itemcget [lindex $clicked 0] -tags] 0] eq "item"} {
+			    mat_mode $p $t object_trans
+			} else {
+			    mat_rmenu $p $t $X $Y
+			}
+		    }
 		}
 	    }
 	    motion {eval mat_$a $p $t $action $x $y}
@@ -197,23 +196,76 @@ namespace eval ::ix {
 	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
     }
 
+    proc mat_rmenu {p t x y} {
+	if {[winfo exists $p.rmenu] != 1} {
+	    set m [menu $p.rmenu -tearoff no]
+	    $m add command -label "zoom to fit" -command "::ix::mat_zoom $p $t fit"
+	    $m add command -label "reset zoom" -command "::ix::mat_zoom $p $t reset"
+	    $m add command -label "jupas" -command {}  -state disabled
+	    $m add command -label "frukas" -command {}  -state disabled
+	} else {
+#	    $p.rmenu entryconfigure 0 -label $x
+	}
+	tk_popup $p.rmenu $x $y
+    }
+
     proc mat_tr {p t d inv v} {
 	variable _
 	array set dm {x width y height}
 	switch $inv {
+	    #value->pixels
 	    t {return [expr ($v - $_($t:${d}a)) / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
+
+	    #pixels->value
 	    i {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0) + $_($t:${d}a)]}
+
+	    #pixels->value (distance)
 	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
-	    #	    id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
+
+	    #values->pixel (distance)
+	    #	   id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
 	    id {return [expr abs($v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m])]}}}
 
-    proc mat_zoomReset {p t} {
+    proc mat_zoom {p t a} {
 	variable _
-	set _($t:ya) $_($t:yao);set _($t:yb) $_($t:ybo);set _($t:xa) $_($t:xao);set _($t:xb) $_($t:xbo)
-	mat_gridlines $p $t}
+	switch $a {
+	    fit {
+		set i 0
+		dict for {s xy} $_($t) {
+		    dict with xy {
+		        if {$i == 0} {
+			    set xa $x
+			    set xb $x
+			    set ya $y
+			    set yb $y
+			}
+			if {$x > $xb} {set xb $x}
+			if {$x < $xa} {set xa $x}
+			if {$y > $yb} {set yb $y}
+			if {$y < $ya} {set ya $y}
+			if {$xx > $xb} {set xb $xx}
+			if {$xx < $xa} {set xa $xx}
+			if {$yy > $yb} {set yb $yy}
+			if {$yy < $ya} {set ya $yy}
+			incr i
+		    }
+		}
+		set _($t:xa) $xa
+		set _($t:xb) $xb
+		set _($t:ya) $ya
+		set _($t:yb) $yb
+		puts "new: $_($t:xa) $_($t:xb) $_($t:ya) $_($t:yb)"
+	    }
+	    reset {
+		set _($t:ya) $_($t:yao);set _($t:yb) $_($t:ybo);set _($t:xa) $_($t:xao);set _($t:xb) $_($t:xbo)
+	    }
+	}
+	mat_redraw $p $t all
+	mat_gridlines $p $t
+    }
 
     proc mat_key {p t k b} {
-	puts $k
+#	puts $k
 	switch $b {
 	    1 {
 		switch $k {
@@ -230,13 +282,14 @@ namespace eval ::ix {
     proc mat_mode {p t m} {
 	$p.m itemconfigure mode -text $m
     }
-    proc mat_info {p t m} {
-	$p.m itemconfigure info -text $m
+    proc mat_loc {p t x y} {
+	$p.m itemconfigure loc -text [list [mat_tr $p $t x i $x] [mat_tr $p $t y i $y]]
     }
 
     proc mat_new {p t w h bg ln xa xb ya yb qx qy} {
 	variable _
 	set i 0
+	set _($t) {}
 	foreach xy {x y} {foreach ab {a b} {set ${xy}${ab}o [set ${xy}${ab}]}}
 	foreach a {i ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
 	if {[winfo exists $p.m] != 1} {
@@ -253,17 +306,15 @@ namespace eval ::ix {
 		foreach bn {1 2 3} {
 		    set b [list [concat $bn first] [concat B${bn}-Motion motion] [concat ButtonRelease-$bn release]]
 		    foreach ba {0 1 2} {
-			bind $p.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $p $t %x %y"}}}
+			bind $p.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $p $t %x %y %X %Y"}}}
 	    set bd [expr {[$p cget -bd] * 2}]
             $p configure -bg gray -width [expr [winfo width $p.m] + $bd] -height [expr [winfo height $p.m] + $bd]
 	    $p.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text action
-	    $p.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill red -tags snap -text "snap (off)"
-	    $p.m create text {20 32} -fill gray49 -justify left -anchor nw -font {{bitstream vera sans} 12} -tags info
+	    $p.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill purple -tags loc -text ""
 	    mat_gridlines $p $t}}
     
     proc mat_gridlines {p t} {
 	variable _
-#	puts gridlines
 	set w $p.m
 	$w delete gridlines
 	set gh [winfo height $w]
