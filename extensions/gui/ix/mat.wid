@@ -1,6 +1,6 @@
 package require tkpath
 namespace eval ::ix {
-    proc rc {} {return [format "\#%06x" [expr "int(floor(rand() * 16))"]]}
+    proc rc {} {return [format "\#%06x" [expr "int(floor(rand() * 16777216))"]]}
 
     proc mat_note {p t item} {
 	variable _
@@ -12,7 +12,15 @@ namespace eval ::ix {
     proc mat_action {p t a x y} {
     }
 
-    proc mat_scroll {p t a x y} {
+    proc mat_scroll {p t d axis} {
+	variable _
+	puts "Scroll0: $_($t:xa) $_($t:xb)  $_($t:ya) $_($t:yb)"
+	foreach xy $axis {
+	    set mv [expr ($_($t:${xy}b) - $_($t:${xy}a)) / 4.0]
+	    foreach ab {a b} {set _($t:${xy}$ab) [expr $_($t:${xy}$ab) $d $mv]}}
+	puts "Scroll1: $_($t:xa) $_($t:xb)  $_($t:ya) $_($t:yb)"
+	mat_redraw $p $t all
+	mat_gridlines $p $t
     }
 
     proc mat_sel {a p t x y} {
@@ -20,14 +28,19 @@ namespace eval ::ix {
 	switch $a {
 	    start {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy];set _($t:f$xy) [set $xy]}
-		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 16 -ry 16] -tags sel -fill cyan -fillopacity 0.2
+#		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] -tags sel -fill cyan -stroke white -fillopacity 0.2
+		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] -tags sel -stroke [rc] -strokewidth 12 -strokeopacity 0.3
+
+	    }
+	    close {
+		$p.m delete sel
 	    }
 	    motion {
 		if {$x >= $_($t:cx)} {set xa $_($t:fx);set xb $x} else {set xa $x;set xb $_($t:fx)}
 		if {$y >= $_($t:cy)} {set ya $_($t:fy);set yb $y} else {set ya $y;set yb $_($t:fy)}
 		set w [expr abs($xb - $xa)]
 		set h [expr abs($yb - $ya)]
-		$p.m coords sel [::tkpath::coords rect $xa $ya $w $h -rx 16 -ry 16]
+		$p.m coords sel [::tkpath::coords rect $xa $ya $w $h -rx 12 -ry 12]
 	    }
 	}
    }
@@ -62,7 +75,17 @@ namespace eval ::ix {
 	    set _($t:${xy}a) [expr $_($t:${xy}a) - $mvt]
 	    set _($t:${xy}b) [expr $_($t:${xy}b) + $mvt]
 	}
-	foreach item [$p.m find withtag item] {
+	mat_redraw $p $t all
+	mat_gridlines $p $t
+    }
+
+    proc mat_redraw {p t items} {
+	variable _
+	switch $items {
+	    all {set items [$p.m find withtag item]}
+	    default {}
+	}
+	foreach item $items {
 	    set id [lindex [$p.m itemcget $item -tags] 1]
 	    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
 	    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
@@ -70,7 +93,6 @@ namespace eval ::ix {
 	    set sy [mat_tr $p $t y id 1]
 	    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
 	}
-	mat_gridlines $p $t
     }
 
     proc mat_object_trans {p t a x y} {
@@ -124,8 +146,8 @@ namespace eval ::ix {
 	foreach item $clicked {
 	    if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} {
 		set id [lindex [$p.m itemcget $item -tags] 1]
-		mat_note $p $t $item
-		$p.m create text "[expr [winfo width $p.m] - 8.0 ] [expr [winfo height $p.m] - 8.0 - 16 * $n.0]" -fill "#ff0022" -justify right -anchor se -font {{bitstream vera sans} 12} -tags hover -text [dict get $_($t) $id] 
+#		mat_note $p $t $item
+		$p.m create text "[expr [winfo width $p.m] - 8.0 ] [expr [winfo height $p.m] - 8.0 - 11 * $n.0]" -fill "#ff0022" -justify right -anchor se -font {{bitstream vera sans} 10} -tags hover -text [dict get $_($t) $id] 
 		incr n
 	    }
 	}
@@ -147,7 +169,9 @@ namespace eval ::ix {
 		    1 {
 			if {$a eq "draw"} {mat_draw $p $t $action $x $y} elseif {$m eq "double"} {
 			    mat_sel start $p $t $x $y
-									     } else {
+			} elseif {[$p.m find withtag sel] ne ""} {
+			    mat_sel close $p $t $x $y
+			} else {
 			    if {$clicked ne "" && [lindex [$p.m itemcget [lindex $clicked 0] -tags] 0] eq "item"} {
 				mat_mode $p $t move_object
 			    } else {
@@ -157,8 +181,6 @@ namespace eval ::ix {
 		    }
 		    2 {mat_mode $p $t resize_canvas}
 		    3 {mat_mode $p $t object_trans}
-		    4 {mat_mode $p $t scroll}
-		    5 {mat_mode $p $t scroll}
 		}
 	    }
 	    motion {eval mat_$a $p $t $action $x $y}
@@ -212,33 +234,37 @@ namespace eval ::ix {
 	$p.m itemconfigure info -text $m
     }
 
-    proc mat_new {path target w h bg ln xa xb ya yb qx qy} {
+    proc mat_new {p t w h bg ln xa xb ya yb qx qy} {
 	variable _
 	set i 0
 	foreach xy {x y} {foreach ab {a b} {set ${xy}${ab}o [set ${xy}${ab}]}}
-	foreach a {i ln xa xb ya yb xao xbo yao ybo qx qy} {set _($target:$a) [set $a]}
-	if {[winfo exists $path.m] != 1} {
-	    canvas $path.m -bg $bg -width $w -height $h
-	    pack $path.m -side left
-	    bind $path.m <Key> "::ix::mat_key $path $target %k 1"
-	    bind $path.m <KeyRelease> "::ix::mat_key $path $target %k 0"
-	    bind $path.m <Motion> "::ix::mat_hover $path $target %x %y"
+	foreach a {i ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
+	if {[winfo exists $p.m] != 1} {
+	    canvas $p.m -bg $bg -width $w -height $h
+	    pack $p.m -side left
+	    bind $p.m <Key> "::ix::mat_key $p $t %k 1"
+	    bind $p.m <KeyRelease> "::ix::mat_key $p $t %k 0"
+	    bind $p.m <Motion> "::ix::mat_hover $p $t %x %y"
+	    bind $p.m <4> "::ix::mat_scroll $p $t - x"
+	    bind $p.m <5> "::ix::mat_scroll $p $t + x"
+	    bind $p.m <Shift-4> "::ix::mat_scroll $p $t - y"
+	    bind $p.m <Shift-5> "::ix::mat_scroll $p $t + y"
 	    foreach m {"Control-" "" "Shift-" "Double-"} {
-		foreach bn {1 2 3 4 5} {
+		foreach bn {1 2 3} {
 		    set b [list [concat $bn first] [concat B${bn}-Motion motion] [concat ButtonRelease-$bn release]]
 		    foreach ba {0 1 2} {
-			bind $path.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $path $target %x %y"}}}
-	    set bd [expr {[$path cget -bd] * 2}]
-            $path configure -bg gray -width [expr [winfo width $path.m] + $bd] -height [expr [winfo height $path.m] + $bd]
-	    $path.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text action
-	    $path.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill red -tags snap -text "snap (off)"
-	    $path.m create text {20 32} -fill gray49 -justify left -anchor nw -font {{bitstream vera sans} 12} -tags info
-	    mat_gridlines $path $target}}
+			bind $p.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $p $t %x %y"}}}
+	    set bd [expr {[$p cget -bd] * 2}]
+            $p configure -bg gray -width [expr [winfo width $p.m] + $bd] -height [expr [winfo height $p.m] + $bd]
+	    $p.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text action
+	    $p.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill red -tags snap -text "snap (off)"
+	    $p.m create text {20 32} -fill gray49 -justify left -anchor nw -font {{bitstream vera sans} 12} -tags info
+	    mat_gridlines $p $t}}
     
-    proc mat_gridlines {path target} {
+    proc mat_gridlines {p t} {
 	variable _
 #	puts gridlines
-	set w $path.m
+	set w $p.m
 	$w delete gridlines
 	set gh [winfo height $w]
 	set gw [winfo width $w]
@@ -247,13 +273,13 @@ namespace eval ::ix {
 	    array set ta {x n y w}
 	    array set tj {x center y left}
 	    array set igx {y width x height}
-	    if {$_($target:${xy}a) > $_($target:${xy}b)} {set oa ">=";set ob "-"} {set oa "<=";set ob "+"}
-	    for {set x [expr int($_($target:${xy}a) / ($_($target:q${xy}) + 0.0) + 1)*($_($target:q${xy}) + 0.0)]} {[expr $x $oa $_($target:${xy}b)]} {set x [expr $x $ob $_($target:q${xy})]} {
-		set og [mat_tr $path $target $xy t $x]
+	    if {$_($t:${xy}a) > $_($t:${xy}b)} {set oa ">=";set ob "-"} {set oa "<=";set ob "+"}
+	    for {set x [expr int($_($t:${xy}a) / ($_($t:q${xy}) + 0.0) + 1)*($_($t:q${xy}) + 0.0)]} {[expr $x $oa $_($t:${xy}b)]} {set x [expr $x $ob $_($t:q${xy})]} {
+		set og [mat_tr $p $t $xy t $x]
 		set invgeo [winfo $igx($xy) $w]
 		switch $xy {y {set coords [concat M 0 $og L $invgeo $og]}
 		    x {set coords [concat M $og 0 L $og $invgeo]}}
-		$w lower [$w create path $coords -stroke $_($target:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
+		$w lower [$w create path $coords -stroke $_($t:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
 		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
 			      -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline]}}}}
 
