@@ -4,7 +4,10 @@ prefix=$(DESTDIR)/usr
 EXTERNALS = $(shell ls ../src)
 STRIP = strip --strip-unneeded -R .note -R .comment
 
-all: $(EXTERNALS:.c=.pd_linux)
+all: 
+	make -k externals
+	
+externals: $(EXTERNALS:.c=.pd_linux)
 
 # this might be a better way to do this:
 # EXTERNALS    := ${patsubst %.c, %.o, ${wildcard *.c}} 
