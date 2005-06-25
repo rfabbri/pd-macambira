@@ -48,7 +48,7 @@ if {$pd_nt == 2} {
     global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
     set pd_guidir $pd_gui2/..
-    load $pd_guidir/bin/pdtcl
+    load $pd_guidir/bin/libPdTcl.dylib
     set pd_tearoff 0
 
 	 # tk::mac::OpenDocument is called with the filenames put into the 

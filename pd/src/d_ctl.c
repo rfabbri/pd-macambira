@@ -552,8 +552,8 @@ static void vsnapshot_tilde_setup(void)
 
 /* ---------------- env~ - simple envelope follower. ----------------- */
 
-#define MAXOVERLAP 10
-#define MAXVSTAKEN 64
+#define MAXOVERLAP 32
+#define INITVSTAKEN 64
 
 typedef struct sigenv
 {
@@ -568,6 +568,7 @@ typedef struct sigenv
     float x_result;                 /* result to output */
     float x_sumbuf[MAXOVERLAP];     /* summing buffer */
     float x_f;
+    int x_allocforvs;               /* extra buffer for DSP vector size */
 } t_sigenv;
 
 t_class *env_tilde_class;
@@ -585,7 +586,7 @@ static void *env_tilde_new(t_floatarg fnpoints, t_floatarg fperiod)
     if (period < 1) period = npoints/2;
     if (period < npoints / MAXOVERLAP + 1)
         period = npoints / MAXOVERLAP + 1;
-    if (!(buf = getbytes(sizeof(float) * (npoints + MAXVSTAKEN))))
+    if (!(buf = getbytes(sizeof(float) * (npoints + INITVSTAKEN))))
     {
         error("env: couldn't allocate buffer");
         return (0);
@@ -598,10 +599,11 @@ static void *env_tilde_new(t_floatarg fnpoints, t_floatarg fperiod)
     for (i = 0; i < MAXOVERLAP; i++) x->x_sumbuf[i] = 0;
     for (i = 0; i < npoints; i++)
         buf[i] = (1. - cos((2 * 3.14159 * i) / npoints))/npoints;
-    for (; i < npoints+MAXVSTAKEN; i++) buf[i] = 0;
+    for (; i < npoints+INITVSTAKEN; i++) buf[i] = 0;
     x->x_clock = clock_new(x, (t_method)env_tilde_tick);
     x->x_outlet = outlet_new(&x->x_obj, gensym("float"));
     x->x_f = 0;
+    x->x_allocforvs = INITVSTAKEN;
     return (x);
 }
 
@@ -648,8 +650,20 @@ static void env_tilde_dsp(t_sigenv *x, t_signal **sp)
     if (x->x_period % sp[0]->s_n) x->x_realperiod =
         x->x_period + sp[0]->s_n - (x->x_period % sp[0]->s_n);
     else x->x_realperiod = x->x_period;
+    if (sp[0]->s_n > x->x_allocforvs)
+    {
+        void *xx = resizebytes(x->x_buf,
+            (x->x_npoints + x->x_allocforvs) * sizeof(float),
+            (x->x_npoints + sp[0]->s_n) * sizeof(float));
+        if (!xx)
+        {
+            post("env~: out of memory");
+            return;
+        }
+        x->x_buf = (t_float *)xx;
+        x->x_allocforvs = sp[0]->s_n;
+    }
     dsp_add(env_tilde_perform, 3, x, sp[0]->s_vec, sp[0]->s_n);
-    if (sp[0]->s_n > MAXVSTAKEN) bug("env_tilde_dsp");
 }
 
 static void env_tilde_tick(t_sigenv *x) /* callback function for the clock */
@@ -660,7 +674,7 @@ static void env_tilde_tick(t_sigenv *x) /* callback function for the clock */
 static void env_tilde_ff(t_sigenv *x)           /* cleanup on free */
 {
     clock_free(x->x_clock);
-    freebytes(x->x_buf, (x->x_npoints + MAXVSTAKEN) * sizeof(float));
+    freebytes(x->x_buf, (x->x_npoints + x->x_allocforvs) * sizeof(float));
 }
 
 

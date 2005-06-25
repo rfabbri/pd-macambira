@@ -36,10 +36,9 @@ static t_class *my_numbox_class;
 
 static void my_numbox_tick_reset(t_my_numbox *x)
 {
-    if(x->x_gui.x_fsf.x_change)
+  if(x->x_gui.x_fsf.x_change && x->x_gui.x_glist)
     {
         x->x_gui.x_fsf.x_change = 0;
-        glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
         (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
     }
 }
@@ -383,9 +382,7 @@ static void my_numbox_save(t_gobj *z, t_binbuf *b)
     {
         x->x_gui.x_fsf.x_change = 0;
         clock_unset(x->x_clock_reset);
-        glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
         (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
-
     }
     binbuf_addv(b, "ssiisiiffiisssiiiiiiifi", gensym("#X"),gensym("obj"),
                 (int)x->x_gui.x_obj.te_xpix, (int)x->x_gui.x_obj.te_ypix,
@@ -449,7 +446,6 @@ static void my_numbox_properties(t_gobj *z, t_glist *owner)
     {
         x->x_gui.x_fsf.x_change = 0;
         clock_unset(x->x_clock_reset);
-        glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
         (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
 
     }
@@ -556,8 +552,6 @@ static int my_numbox_newclick(t_gobj *z, struct _glist *glist,
             clock_delay(x->x_clock_wait, 50);
             x->x_gui.x_fsf.x_change = 1;
             clock_delay(x->x_clock_reset, 3000);
-            /* glist_grab(x->x_gui.x_glist, &x->x_gui.x_obj.ob_g,
-                0, my_numbox_key, 0, 0); */
 
             x->x_buf[0] = 0;
         }
@@ -565,7 +559,6 @@ static int my_numbox_newclick(t_gobj *z, struct _glist *glist,
         {
             x->x_gui.x_fsf.x_change = 0;
             clock_unset(x->x_clock_reset);
-            glist_grab(x->x_gui.x_glist, 0, 0, 0, 0, 0);
             x->x_buf[0] = 0;
             (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);
         }

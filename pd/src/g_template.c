@@ -1239,7 +1239,6 @@ t_class *plot_class;
 typedef struct _plot
 {
     t_object x_obj;
-    int x_vis;
     t_canvas *x_canvas;
     t_fielddesc x_outlinecolor;
     t_fielddesc x_width;
@@ -1251,13 +1250,14 @@ typedef struct _plot
     t_fielddesc x_xpoints;
     t_fielddesc x_ypoints;
     t_fielddesc x_wpoints;
+    t_fielddesc x_vis;          /* visible */
+    t_fielddesc x_scalarvis;    /* true if drawing the scalar at each point */
 } t_plot;
 
 static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
 {
     t_plot *x = (t_plot *)pd_new(plot_class);
-    int defstyle = PLOTSTYLE_POLY;
-    x->x_vis = 1;
+    int defstyle = PLOTSTYLE_POLY, vis = 1, scalarvis = 1;
     x->x_canvas = canvas_getcurrent();
 
     fielddesc_setfloat_var(&x->x_xpoints, gensym("x"));
@@ -1275,7 +1275,12 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
         }
         else if (!strcmp(firstarg->s_name, "-n"))
         {
-            x->x_vis = 0;
+            vis = 0;
+            argc--; argv++;
+        }
+        else if (!strcmp(firstarg->s_name, "-noscalar"))
+        {
+            scalarvis = 0;
             argc--; argv++;
         }
         else if (!strcmp(firstarg->s_name, "-x") && argc > 1)
@@ -1309,15 +1314,26 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
     else fielddesc_setfloat_const(&x->x_xinc, 1);
     if (argc) fielddesc_setfloatarg(&x->x_style, argc--, argv++);
     else fielddesc_setfloat_const(&x->x_style, defstyle);
+    if (argc) fielddesc_setfloatarg(&x->x_vis, argc--, argv++);
+    else fielddesc_setfloat_const(&x->x_vis, vis);
+    if (argc) fielddesc_setfloatarg(&x->x_scalarvis, argc--, argv++);
+    else fielddesc_setfloat_const(&x->x_scalarvis, 1);
     return (x);
 }
 
 void plot_float(t_plot *x, t_floatarg f)
 {
-    if ((f != 0 && x->x_vis) || (f == 0 && !x->x_vis))
+    if (x->x_vis.fd_type != A_FLOAT || x->x_vis.fd_var)
+    {
+        pd_error(x, "global vis/invis for a template with variable visibility");
+        return;
+    }
+    int viswas = (x->x_vis.fd_un.fd_float != 0);
+    
+    if ((f != 0 && viswas) || (f == 0 && !viswas))
         return;
     canvas_redrawallfortemplatecanvas(x->x_canvas, 2);
-    x->x_vis = (f!= 0);
+    fielddesc_setfloat_const(&x->x_vis, (f != 0));
     canvas_redrawallfortemplatecanvas(x->x_canvas, 1);
 }
 
@@ -1330,6 +1346,7 @@ static int plot_readownertemplate(t_plot *x,
     t_word *data, t_template *ownertemplate, 
     t_symbol **elemtemplatesymp, t_array **arrayp,
     float *linewidthp, float *xlocp, float *xincp, float *ylocp, float *stylep,
+    float *visp, float *scalarvisp,
     t_fielddesc **xfield, t_fielddesc **yfield, t_fielddesc **wfield)
 {
     int arrayonset, type;
@@ -1359,6 +1376,8 @@ static int plot_readownertemplate(t_plot *x,
     *xincp = fielddesc_getfloat(&x->x_xinc, ownertemplate, data, 1);
     *ylocp = fielddesc_getfloat(&x->x_yloc, ownertemplate, data, 1);
     *stylep = fielddesc_getfloat(&x->x_style, ownertemplate, data, 1);
+    *visp = fielddesc_getfloat(&x->x_vis, ownertemplate, data, 1);
+    *scalarvisp = fielddesc_getfloat(&x->x_scalarvis, ownertemplate, data, 1);
     *elemtemplatesymp = elemtemplatesym;
     *arrayp = array;
     *xfield = &x->x_xpoints;
@@ -1434,15 +1453,16 @@ static void plot_getrect(t_gobj *z, t_glist *glist,
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     t_symbol *elemtemplatesym;
-    float linewidth, xloc, xinc, yloc, style, xsum, yval;
+    float linewidth, xloc, xinc, yloc, style, xsum, yval, vis, scalarvis;
     t_array *array;
     int x1 = 0x7fffffff, y1 = 0x7fffffff, x2 = -0x7fffffff, y2 = -0x7fffffff;
     int i;
     float xpix, ypix, wpix;
     t_fielddesc *xfielddesc, *yfielddesc, *wfielddesc;
-    if (x->x_vis && !plot_readownertemplate(x, data, template, 
+    if (!plot_readownertemplate(x, data, template, 
         &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style,
-                &xfielddesc, &yfielddesc, &wfielddesc) &&
+            &vis, &scalarvis, &xfielddesc, &yfielddesc, &wfielddesc) &&
+                (vis != 0) &&
             !array_getfields(elemtemplatesym, &elemtemplatecanvas,
                 &elemtemplate, &elemsize, 
                 xfielddesc, yfielddesc, wfielddesc,
@@ -1465,34 +1485,37 @@ static void plot_getrect(t_gobj *z, t_glist *glist,
             if (ypix + wpix > y2)
                 y2 = ypix + wpix;
             
-                /* check also the drawing instructions for the scalar */ 
-            if (xonset >= 0)
-                usexloc = basex + xloc + fielddesc_cvttocoord(xfielddesc, 
-                    *(float *)(((char *)(array->a_vec) + elemsize * i)
-                        + xonset));
-            else usexloc = basex + xsum, xsum += xinc;
-            if (yonset >= 0)
-                yval = *(float *)(((char *)(array->a_vec) + elemsize * i)
-                    + yonset);
-            else yval = 0;
-            useyloc = basey + yloc + fielddesc_cvttocoord(yfielddesc, yval);
-            for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+            if (scalarvis != 0)
             {
-                int xx1, xx2, yy1, yy2;
-                t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-                if (!wb) continue;
-                (*wb->w_parentgetrectfn)(y, glist,
-                    (t_word *)((char *)(array->a_vec) + elemsize * i),
-                        elemtemplate, usexloc, useyloc, 
-                            &xx1, &yy1, &xx2, &yy2);
-                if (xx1 < x1)
-                    x1 = xx1;
-                if (yy1 < y1)
-                    y1 = yy1;
-                 if (xx2 > x2)
-                    x2 = xx2;
-                if (yy2 > y2)
-                    y2 = yy2;   
+                    /* check also the drawing instructions for the scalar */ 
+                if (xonset >= 0)
+                    usexloc = basex + xloc + fielddesc_cvttocoord(xfielddesc, 
+                        *(float *)(((char *)(array->a_vec) + elemsize * i)
+                            + xonset));
+                else usexloc = basex + xsum, xsum += xinc;
+                if (yonset >= 0)
+                    yval = *(float *)(((char *)(array->a_vec) + elemsize * i)
+                        + yonset);
+                else yval = 0;
+                useyloc = basey + yloc + fielddesc_cvttocoord(yfielddesc, yval);
+                for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+                {
+                    int xx1, xx2, yy1, yy2;
+                    t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+                    if (!wb) continue;
+                    (*wb->w_parentgetrectfn)(y, glist,
+                        (t_word *)((char *)(array->a_vec) + elemsize * i),
+                            elemtemplate, usexloc, useyloc, 
+                                &xx1, &yy1, &xx2, &yy2);
+                    if (xx1 < x1)
+                        x1 = xx1;
+                    if (yy1 < y1)
+                        y1 = yy1;
+                     if (xx2 > x2)
+                        x2 = xx2;
+                    if (yy2 > y2)
+                        y2 = yy2;   
+                }
             }
         }
     }
@@ -1526,24 +1549,24 @@ static void plot_activate(t_gobj *z, t_glist *glist,
 
 static void plot_vis(t_gobj *z, t_glist *glist, 
     t_word *data, t_template *template, float basex, float basey,
-    int vis)
+    int tovis)
 {
     t_plot *x = (t_plot *)z;
     int elemsize, yonset, wonset, xonset, i;
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     t_symbol *elemtemplatesym;
-    float linewidth, xloc, xinc, yloc, style, usexloc, xsum, yval;
+    float linewidth, xloc, xinc, yloc, style, usexloc, xsum, yval, vis,
+        scalarvis;
     t_array *array;
     int nelem;
     char *elem;
     t_fielddesc *xfielddesc, *yfielddesc, *wfielddesc;
     
-    if (!x->x_vis)
-        return;
     if (plot_readownertemplate(x, data, template, 
         &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style,
-        &xfielddesc, &yfielddesc, &wfielddesc) ||
+        &vis, &scalarvis, &xfielddesc, &yfielddesc, &wfielddesc) ||
+            (vis == 0) || 
             array_getfields(elemtemplatesym, &elemtemplatecanvas,
                 &elemtemplate, &elemsize, xfielddesc, yfielddesc, wfielddesc,
                 &xonset, &yonset, &wonset))
@@ -1551,7 +1574,7 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     nelem = array->a_n;
     elem = (char *)array->a_vec;
 
-    if (vis)
+    if (tovis)
     {
         if (style == PLOTSTYLE_POINTS)
         {
@@ -1738,43 +1761,48 @@ static void plot_vis(t_gobj *z, t_glist *glist,
             /* We're done with the outline; now draw all the points.
             This code is inefficient since the template has to be
             searched for drawing instructions for every last point. */
-        
-        for (xsum = xloc, i = 0; i < nelem; i++)
+        if (scalarvis != 0)
         {
-            float usexloc, useyloc;
-            t_gobj *y;
-            if (xonset >= 0)
-                usexloc = basex + xloc +
-                    *(float *)((elem + elemsize * i) + xonset);
-            else usexloc = basex + xsum, xsum += xinc;
-            if (yonset >= 0)
-                yval = *(float *)((elem + elemsize * i) + yonset);
-            else yval = 0;
-            useyloc = basey + fielddesc_cvttocoord(yfielddesc, yloc + yval);
-            for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+            for (xsum = xloc, i = 0; i < nelem; i++)
             {
-                t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-                if (!wb) continue;
-                (*wb->w_parentvisfn)(y, glist,
-                    (t_word *)(elem + elemsize * i),
-                        elemtemplate, usexloc, useyloc, vis);
+                float usexloc, useyloc;
+                t_gobj *y;
+                if (xonset >= 0)
+                    usexloc = basex + xloc +
+                        *(float *)((elem + elemsize * i) + xonset);
+                else usexloc = basex + xsum, xsum += xinc;
+                if (yonset >= 0)
+                    yval = *(float *)((elem + elemsize * i) + yonset);
+                else yval = 0;
+                useyloc = basey + fielddesc_cvttocoord(yfielddesc, yloc+yval);
+                for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+                {
+                    t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+                    if (!wb) continue;
+                    (*wb->w_parentvisfn)(y, glist,
+                        (t_word *)(elem + elemsize * i),
+                            elemtemplate, usexloc, useyloc, tovis);
+                }
             }
         }
     }
     else
     {
             /* un-draw the individual points */
-        int i;
-        for (i = 0; i < nelem; i++)
+        if (scalarvis != 0)
         {
-            t_gobj *y;
-            for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+            int i;
+            for (i = 0; i < nelem; i++)
             {
-                t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
-                if (!wb) continue;
-                (*wb->w_parentvisfn)(y, glist,
-                    (t_word *)(elem + elemsize * i), elemtemplate,
-                        0, 0, 0);
+                t_gobj *y;
+                for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
+                {
+                    t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
+                    if (!wb) continue;
+                    (*wb->w_parentvisfn)(y, glist,
+                        (t_word *)(elem + elemsize * i), elemtemplate,
+                            0, 0, 0);
+                }
             }
         }
             /* and then the trace */
@@ -1790,17 +1818,18 @@ static int plot_click(t_gobj *z, t_glist *glist,
 {
     t_plot *x = (t_plot *)z;
     t_symbol *elemtemplatesym;
-    float linewidth, xloc, xinc, yloc, style;
+    float linewidth, xloc, xinc, yloc, style, vis, scalarvis;
     t_array *array;
     t_fielddesc *xfielddesc, *yfielddesc, *wfielddesc;
 
     if (!plot_readownertemplate(x, data, template, 
         &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style,
-        &xfielddesc, &yfielddesc, &wfielddesc))
+        &vis, &scalarvis,
+        &xfielddesc, &yfielddesc, &wfielddesc) && (vis != 0))
     {
         return (array_doclick(array, glist, sc, ap,
             elemtemplatesym,
-            linewidth, basex + xloc, xinc, basey + yloc,
+            linewidth, basex + xloc, xinc, basey + yloc, scalarvis,
             xfielddesc, yfielddesc, wfielddesc,
             xpix, ypix, shift, alt, dbl, doit));
     }
@@ -2031,7 +2060,7 @@ static int drawnumber_click(t_gobj *z, t_glist *glist,
         data, template, basex, basey,
         &x1, &y1, &x2, &y2);
     if (xpix >= x1 && xpix <= x2 && ypix >= y1 && ypix <= y2
-        && x->x_value.fd_var)
+        && x->x_value.fd_var && x->x_vis)
     {
         if (doit)
         {

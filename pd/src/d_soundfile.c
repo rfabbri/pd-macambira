@@ -1710,6 +1710,12 @@ static t_int *readsf_perform(t_int *w)
 #endif
             sfread_cond_signal(&x->x_requestcondition);
             sfread_cond_wait(&x->x_answercondition, &x->x_mutex);
+                /* resync local cariables -- bug fix thanks to Shahrokh */
+            vecsize = x->x_vecsize;
+            bytespersample = x->x_bytespersample;
+            sfchannels = x->x_sfchannels;
+            wantbytes = sfchannels * vecsize * bytespersample;
+            bigendian = x->x_bigendian;
 #ifdef DEBUG_SOUNDFILE
             pute("done\n");
 #endif

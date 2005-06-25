@@ -80,7 +80,6 @@ void array_resize(t_array *x, int n)
     {
         char *cp = x->a_vec + elemsize * oldn;
         int i = n - oldn;
-        post("%d->%d", oldn, i);
         for (; i--; cp += elemsize)
         {
             t_word *wp = (t_word *)cp;
@@ -730,7 +729,7 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     they can be static (look in g_canvas.h for candidates). */
 int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
-    float linewidth, float xloc, float xinc, float yloc,
+    float linewidth, float xloc, float xinc, float yloc, float scalarvis,
     t_fielddesc *xfield, t_fielddesc *yfield, t_fielddesc *wfield,
     int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
@@ -777,10 +776,14 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
             }
         }
         if (best > 8)
-            return (array_doclick_element(array, glist, sc, ap,
-                elemtemplatesym, linewidth, xloc, xinc, yloc,
-                    xfield, yfield, wfield,
-                    xpix, ypix, shift, alt, dbl, doit));
+        {
+            if (scalarvis != 0)
+                return (array_doclick_element(array, glist, sc, ap,
+                    elemtemplatesym, linewidth, xloc, xinc, yloc,
+                        xfield, yfield, wfield,
+                        xpix, ypix, shift, alt, dbl, doit));
+            else return (0);
+        }
         best += 0.001;  /* add truncation error margin */
         for (i = 0; i < array->a_n; i += incr)
         {

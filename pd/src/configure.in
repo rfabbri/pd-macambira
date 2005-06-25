@@ -12,6 +12,7 @@ AC_SUBST(EXT)
 AC_SUBST(OPT_CFLAGS)
 AC_SUBST(USE_DEBUG_CFLAGS, no)
 AC_SUBST(SYSSRC)
+AC_SUBST(TCLTK_FRAMEWORKS_PATH)
 AC_SUBST(STRIPFLAG)
 AC_SUBST(GUINAME)
 AC_SUBST(GUIFLAGS)
@@ -173,6 +174,8 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
 	LDFLAGS=$LDFLAGS" -lasound"
     fi
     if test x$portaudio == "xyes";
+
+
     then
     	MORECFLAGS="-DUSEAPI_PORTAUDIO -DPA19 "$MORECFLAGS
 	SYSSRC="s_audio_pa.c \
@@ -210,6 +213,24 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
     fi
     echo OPT_CFLAGS --------------- $OPT_CFLAGS
     OSNUMBER=0
+
+    if test x$jack == "xyes";
+    then
+        LDFLAGS=$LDFLAGS" -lrt -ljack"
+    fi
+    if test x$jack == "xrun";
+    then
+        LDFLAGS=$LDFLAGS" -lrt -ljack"
+    fi
+    fi
+
+    if test x$jack == "xyes";
+    then
+        LDFLAGS=$LDFLAGS" -lrt -ljack"
+    fi
+    if test x$jack == "xrun";
+    then
+        LDFLAGS=$LDFLAGS" -lrt -ljack"
 fi
 
 if test `uname -s` = Darwin;
@@ -245,11 +266,25 @@ then
         ../portmidi/pm_common/portmidi.c \
         ../portmidi/porttime/ptmacosx_cf.c "
     STRIPFLAG=""
-    GUINAME="pdtcl"
-    GUIFLAGS="-F../../Frameworks -framework Tcl -framework Tk \
-        -I../../Frameworks/Tk.framework/Versions/Current/Headers \
-        -I../../Frameworks/Tcl.framework/Versions/Current/Headers \
-        -I../../Frameworks/Tcl.framework/Versions/8.4/PrivateHeaders"
+    GUINAME="libPdTcl.dylib"
+
+# find the Tcl/Tk Frameworks
+ 	 if test -d "../../Frameworks";
+    then
+        # Miller's location
+        TCLTK_FRAMEWORKS_PATH="../../Frameworks"
+ 	 elif test -d "/Library/Frameworks";
+	 then
+        # get it from the default install location
+        TCLTK_FRAMEWORKS_PATH="/Library/Frameworks"
+    else
+        # Panther has Tcl here; Tiger has Tcl and Tk here
+        TCLTK_FRAMEWORKS_PATH="/System/Library/Frameworks"
+    fi		 
+    GUIFLAGS="-F$TCLTK_FRAMEWORKS_PATH -framework Tcl -framework Tk \
+        -I$TCLTK_FRAMEWORKS_PATH/Tk.framework/Versions/Current/Headers \
+        -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/Current/Headers \
+        -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/8.4/PrivateHeaders"
     if test x$USE_DEBUG_CFLAGS == "xyes";
     then
 	OPT_CFLAGS="-g"
@@ -261,8 +296,10 @@ then
     if test x$jack == "xyes";
     then
     	LDFLAGS=$LDFLAGS" -framework Jack"
-	MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
-	SYSSRC=$SYSSRC" s_audio_jack.c"
+    fi
+    if test x$jack == "xrun";
+    then
+        LDFLAGS=$LDFLAGS" -framework Jack"
     fi
 fi
 
@@ -272,13 +309,11 @@ if test x$jack == "xyes";
 then
     MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK"
     SYSSRC=$SYSSRC" s_audio_jack.c"
-    LDFLAGS=$LDFLAGS" -lrt -ljack"
 fi
 if test x$jack == "xrun";
 then
     MORECFLAGS=$MORECFLAGS" -DUSEAPI_JACK -DJACK_XRUN"
     SYSSRC=$SYSSRC" s_audio_jack.c"
-    LDFLAGS=$LDFLAGS" -lrt -ljack"
 fi
 
 # extra flags for alpha machines

@@ -556,7 +556,7 @@ EXTERN void scalar_getbasexy(t_scalar *x, float *basex, float *basey);
 /* ------helper routines for "garrays" and "plots" -------------- */
 EXTERN int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
     t_symbol *elemtemplatesym,
-    float linewidth, float xloc, float xinc, float yloc,
+    float linewidth, float xloc, float xinc, float yloc, float scalarvis,
     t_fielddesc *xfield, t_fielddesc *yfield, t_fielddesc *wfield,
     int xpix, int ypix, int shift, int alt, int dbl, int doit);
 
