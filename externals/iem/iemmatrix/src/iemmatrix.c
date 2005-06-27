@@ -20,6 +20,8 @@ void mtx_sub_setup();
 void mtx_pow_setup();
 void mtx_col_setup();
 void mtx_cholesky_setup();
+void mtx_dbtorms_setup();
+void mtx_rmstodb_setup();
 void mtx_diag_setup();
 void mtx_diegg_setup();
 void mtx_distance2_setup();
@@ -67,6 +69,8 @@ void iemtx_setup(){
   mtx_gauss_setup();
   mtx_inverse_setup();
   mtx_log_setup();
+  mtx_dbtorms_setup();
+  mtx_rmstodb_setup();  
   mtx_matrix_setup();
   mtx_mean_setup();
   mtx_check_setup();
