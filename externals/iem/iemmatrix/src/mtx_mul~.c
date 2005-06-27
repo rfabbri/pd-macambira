@@ -73,7 +73,7 @@ static void matrix_multilde_matrix_set(t_matrix_multilde *x, int argc, t_atom *a
 
   if(argc<2)
     {
-      post("mtx_*~ : bad matrix: <int> out_rows <int> in_cols !");
+      pd_error(x, "mtx_*~ : bad matrix: <int> out_rows <int> in_cols !");
       return;
     }
 
@@ -91,12 +91,12 @@ static void matrix_multilde_matrix_set(t_matrix_multilde *x, int argc, t_atom *a
 
   if((col!=x->x_n_in)||(row!=x->x_n_out))
     {
-      post("mtx_*~ : matrix dimensions do not match (%dx%d != %dx%d)!!", col, row, x->x_n_in, x->x_n_out);
+      pd_error(x,"mtx_*~ : matrix dimensions do not match (%dx%d != %dx%d)!!", col, row, x->x_n_in, x->x_n_out);
       return;
     }
   if(argc<row*col)
     {
-      post("mtx_*~ : reduced matrices not yet supported");
+      pd_error(x,"mtx_*~ : reduced matrices not yet supported");
       return;
     }
   
@@ -137,7 +137,7 @@ static void matrix_multilde_element(t_matrix_multilde *x, t_symbol *s, int argc,
 
   if(argc != 3)
     {
-      post("mtx_*~ : bad element: 3 floats: <int> out_row <int> in_col <float> element !");
+      pd_error(x,"mtx_*~ : bad element: 3 floats: <int> out_row <int> in_col <float> element !");
       return;
     }
 
@@ -147,12 +147,12 @@ static void matrix_multilde_element(t_matrix_multilde *x, t_symbol *s, int argc,
 
   if((row >= x->x_n_out) || (row < 0))
     {
-      post("mtx_*~ : row dimensions do not match !!");
+      pd_error(x,"mtx_*~ : row dimensions do not match !!");
       return;
     }
   if((col >= n_in_cols) || (col < 0))
     {
-      post("mtx_*~ : col dimensions do not match !!");
+      pd_error(x,"mtx_*~ : col dimensions do not match !!");
       return;
     }
 
@@ -179,7 +179,7 @@ static void matrix_multilde_row(t_matrix_multilde *x, t_symbol *s, int argc, t_a
 
   if(argc<1)
     {
-      post("mtx_*~ : bad row: <int> in_row !");
+      pd_error(x,"mtx_*~ : bad row: <int> in_row !");
       return;
     }
 
@@ -189,13 +189,13 @@ static void matrix_multilde_row(t_matrix_multilde *x, t_symbol *s, int argc, t_a
 
   if((nth_row >= x->x_n_out) || (nth_row < 0))
     {
-      post("mtx_*~ : row dimensions do not match !!");
+      pd_error(x,"mtx_*~ : row dimensions do not match !!");
       return;
     }
   col = x->x_n_in;
   if(argc < col)
     {
-      post("mtx_*~ : col dimensions do not match !!");
+      pd_error(x,"mtx_*~ : col dimensions do not match !!");
       return;
     }
 
@@ -229,7 +229,7 @@ static void matrix_multilde_col(t_matrix_multilde *x, t_symbol *s, int argc, t_a
 
   if(argc<1)
     {
-      post("mtx_*~ : bad col: <int> in_cols !");
+      pd_error(x,"mtx_*~ : bad col: <int> in_cols !");
       return;
     }
 
@@ -240,13 +240,13 @@ static void matrix_multilde_col(t_matrix_multilde *x, t_symbol *s, int argc, t_a
   col = x->x_n_in;
   if((nth_col < 0)||(nth_col >= col))
     {
-      post("mtx_*~ : col dimensions do not match !!");
+      pd_error(x,"mtx_*~ : col dimensions do not match !!");
       return;
     }
   row = x->x_n_out;
   if(argc < row)
     {
-      post("mtx_*~ : row dimensions do not match !!");
+      pd_error(x,"mtx_*~ : row dimensions do not match !!");
       return;
     }
 
@@ -777,11 +777,9 @@ static void matrix_multilde_dsp(t_matrix_multilde *x, t_signal **sp)
 
   if(n&7)
     {
-      post("adding perform");
       dsp_add(matrix_multilde_perform, 2, x, n);
     }
   else {
-    post("adding perf8");
     dsp_add(matrix_multilde_perf8, 2, x, n);
   }
 }
