@@ -12,9 +12,9 @@
 #include "input_arrays.h"
 
 #define HID_MAJOR_VERSION 0
-#define HID_MINOR_VERSION 5
+#define HID_MINOR_VERSION 6
 
-static char *version = "$Revision: 1.17 $";
+static char *version = "$Revision: 1.18 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

@@ -1,4 +1,28 @@
 ==============================================================================
+= test verbose names
+
+- matju says symbols are compared by pointer, so they are fast
+
+- try verbose names like:
+  		syn = sync
+		snd = sound
+		msc = misc
+		rep = repeat
+		pwr = power
+
+- maybe these too
+		abs = absolute
+		rel = relative
+		btn = button
+
+- maybe make the type the full name, with the code using the abbreviation
+
+- change generic ev_9 to type_9
+
+- change word "code" to "element"
+
+
+==============================================================================
 = make fake names in input_arrays.c
 
 Instead of having "NULL" names, make up names using the event type, and the
