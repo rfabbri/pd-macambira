@@ -47,7 +47,7 @@
 #X msg 421 523 get massesPos \$1;
 #X obj 602 334 rotateXYZ;
 #X obj 56 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
--1 -1 500 1;
+-1 -1 0 1;
 #X obj 75 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131
 -1 -1 0 1;
 #X obj 94 547 vsl 15 128 0 4 0 0 empty empty empty 0 -8 0 8 -262131

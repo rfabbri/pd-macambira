@@ -87,7 +87,7 @@
 #X obj 405 213 random 50;
 #X msg 213 130 mass fix 0 100 50 50 50;
 #X obj 34 141 vradio 20 1 0 3 \$0-choix empty empty 0 -6 0 8 -262144
--1 -1 2;
+-1 -1 1;
 #N canvas 82 198 791 599 cylindertype 0;
 #X obj 49 14 inlet;
 #X obj 248 503 outlet;
@@ -138,7 +138,8 @@
 #X text 63 164 Rings;
 #X text 63 184 Obstacle;
 #X obj 434 22 nbx 5 14 200 20000 1 0 empty empty empty 0 -6 0 10 -262144
--1 -1 1473.05 256;
+-1 -1 874.289 256;
+#X text 132 758 NOT UPDATED;
 #X connect 0 0 17 0;
 #X connect 1 0 5 0;
 #X connect 2 0 0 0;
