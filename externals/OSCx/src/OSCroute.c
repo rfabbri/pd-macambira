@@ -30,6 +30,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
   To-do:
 
   	Match a pattern against a pattern?
+      [Done: Only Slash-Star is allowed, see MyPatternMatch.]
   	Declare outlet types / distinguish leaf nodes from other children
   	More sophisticated (2-pass?) allmessages scheme
   	set message?
@@ -69,6 +70,20 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 /* Version 1.04: Allows #1 thru #9 as typed-in arguments
    Version 1.05: Allows "list" messages as well as "message" messages.
 */
+
+static Boolean MyPatternMatch (const char *pattern, const char *test)
+{
+    // This allows the special case of "OSCroute /* " to be an outlet that
+    // matches anything; i.e., it always outputs the input with the first level
+    // of the address stripped off. 
+    
+    if (test[0] == '*' && test[1] == '\0') {
+        return 1;
+    } else {
+        return PatternMatch(pattern, test);
+    }
+}
+
 
 static t_class *OSCroute_class;
 
@@ -310,7 +325,7 @@ void OSCroute_doanything(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
 #endif
     
     for (i = 0; i < x->x_num; ++i) {
-      if (PatternMatch(pattern+1, x->x_prefixes[i]+1)) {
+      if (MyPatternMatch(pattern+1, x->x_prefixes[i]+1)) {
 	++matchedAnything;
 	
 	// I hate stupid Max lists with a special first element
@@ -351,7 +366,7 @@ void OSCroute_doanything(t_OSCroute *x, t_symbol *s, int argc, t_atom *argv) {
     StrCopyUntilSlash(patternBegin, pattern+1);
     
     for (i = 0; i < x->x_num; ++i) {
-      if (PatternMatch(patternBegin, x->x_prefixes[i]+1)) {
+      if (MyPatternMatch(patternBegin, x->x_prefixes[i]+1)) {
 	++matchedAnything;
 	if (restOfPattern == 0) {
 	  restOfPattern = gensym(nextSlash);
