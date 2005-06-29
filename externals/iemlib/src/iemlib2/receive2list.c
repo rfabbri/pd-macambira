@@ -206,7 +206,6 @@ void receive2list_setup(void)
 {
   receive2list_class = class_new(gensym("receive2list"), (t_newmethod)receive2list_new, 
     (t_method)receive2list_free, sizeof(t_receive2list), 0, A_DEFFLOAT, 0);
-	class_addcreator((t_newmethod)receive2list_new, gensym("iem_r"), A_DEFFLOAT, 0);
 	class_addmethod(receive2list_class, (t_method)receive2list_clear, gensym("clear"), A_GIMME, 0);
   class_addmethod(receive2list_class, (t_method)receive2list_add, gensym("add"), A_GIMME, 0);
   class_sethelpsymbol(receive2list_class, gensym("iemhelp/help-receive2list"));
