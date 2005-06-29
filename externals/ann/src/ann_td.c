@@ -21,7 +21,7 @@
 #define TRAIN 0
 #define RUN  1
 
-#define MAXINPUT 256
+#define MAXINPUT 1024
 #define MAXOUTPUT 256
 
 static t_class *ann_td_class;
