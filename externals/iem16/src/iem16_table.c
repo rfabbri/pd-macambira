@@ -7,6 +7,17 @@
 /* sampling */
 
 #include "iem16_table.h"
+
+#include <stdio.h>      /* for read/write to files */
+
+static int am_bigendian(void){
+    /* actually this should be in m_pd.h */
+    unsigned short s = 1;
+    unsigned char c = *(char *)(&s);
+    return (c==0);
+}
+
+
 static void table16_const(t_table16*x, t_float f);
 
 static void *table16_new(t_symbol *s, t_float f){
@@ -18,6 +29,7 @@ static void *table16_new(t_symbol *s, t_float f){
   x->x_table=getbytes(x->x_size*sizeof(t_iem16_16bit));
   x->x_usedindsp=0;
   pd_bind(&x->x_obj.ob_pd, x->x_tablename);
+  x->x_canvas = canvas_getcurrent();
 
   table16_const(x, 0);
   return(x);
@@ -63,7 +75,7 @@ static void table16_from(t_table16*x, t_symbol*s, int argc, t_atom*argv){
   int startfrom=0, startto=0, endfrom=0, endto=x->x_size;
   t_garray *a=0;
   int npoints;
-  t_float *vec, *src;
+  t_float *vec=(0), *src=(0);
   t_iem16_16bit   *dest;
 
   int i,length=0;
@@ -120,7 +132,71 @@ static void table16_from(t_table16*x, t_symbol*s, int argc, t_atom*argv){
   src =vec+startfrom;
   i=length;
   while(i--)*dest++=(*src++)*scale;
-  post("from %s (%d, %d) --> (%d, %d)\tresize=%s", s->s_name, startfrom, endfrom, startto, endto, (resize)?"yes":"no");
+  //post("from %s (%d, %d) --> (%d, %d)\tresize=%s", s->s_name, startfrom, endfrom, startto, endto, (resize)?"yes":"no");
+}
+
+#define BINREADMODE "rb"
+#define BINWRITEMODE "wb"
+static void table16_read16(t_table16 *x, t_symbol *filename,  t_symbol *endian, t_floatarg fskip)
+{
+    int skip = fskip, filedesc;
+    int i, nelem;
+    t_iem16_16bit *vec;
+    FILE *fd;
+    char buf[MAXPDSTRING], *bufptr;
+    short s;
+    int cpubig = am_bigendian(), swap = 0;
+    char c = endian->s_name[0];
+    if (c == 'b')
+    {
+        if (!cpubig) swap = 1;
+    }
+    else if (c == 'l')
+    {
+        if (cpubig) swap = 1;
+    }
+    else if (c)
+    {
+        error("array_read16: endianness is 'l' (low byte first ala INTEL)");
+        post("... or 'b' (high byte first ala MIPS,DEC,PPC)");
+    }
+    if (!table16_getarray16(x, &nelem, &vec))
+    {
+        error("%s: not a 16bit array", x->x_tablename->s_name);
+        return;
+    }
+    if ((filedesc = open_via_path(
+        canvas_getdir(x->x_canvas)->s_name,
+            filename->s_name, "", buf, &bufptr, MAXPDSTRING, 1)) < 0 
+                || !(fd = fdopen(filedesc, BINREADMODE)))
+    {
+        error("%s: can't open", filename->s_name);
+        return;
+    }
+    if (skip)
+    {
+        long pos = fseek(fd, (long)skip, SEEK_SET);
+        if (pos < 0)
+        {
+            error("%s: can't seek to byte %d", buf, skip);
+            fclose(fd);
+            return;
+        }
+    }
+
+    for (i = 0; i < nelem; i++)
+    {
+        if (fread(&s, sizeof(s), 1, fd) < 1)
+        {
+            post("%s: read %d elements into table of size %d",
+                filename->s_name, i, nelem);
+            break;
+        }
+        if (swap) s = ((s & 0xff) << 8) | ((s & 0xff00) >> 8);
+        vec[i] = s;
+    }
+    while (i < nelem) vec[i++] = 0;
+    fclose(fd);
 }
 
  
@@ -131,6 +207,8 @@ static void table16_setup(void){
   class_addmethod(table16_class, (t_method)table16_resize, gensym("resize"), A_DEFFLOAT);
   class_addmethod(table16_class, (t_method)table16_const, gensym("const"), A_DEFFLOAT);
   class_addmethod(table16_class, (t_method)table16_from, gensym("from"), A_GIMME);
+  class_addmethod(table16_class, (t_method)table16_read16, gensym("read16"),  A_SYMBOL, 
+                  A_DEFFLOAT, A_DEFSYM, A_NULL);
 }
 
 
