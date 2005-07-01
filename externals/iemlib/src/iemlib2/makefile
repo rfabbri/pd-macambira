@@ -2,7 +2,7 @@ current: all
 
 .SUFFIXES: .pd_linux
 
-INCLUDE = -I. -I/usr/local/src/pd-0.37-4/src
+INCLUDE = -I. -I/usr/local/src/pd-0.38-4/src
 
 LDFLAGS = -export-dynamic -shared
 LIB = -ldl -lm -lpthread
@@ -81,7 +81,6 @@ all: $(OBJ)
 	cp $(TARGET) ../../lib
 
 $(OBJ) : %.o : %.c
-	touch $*.c
 	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
 
