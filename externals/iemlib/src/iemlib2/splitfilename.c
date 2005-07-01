@@ -89,23 +89,35 @@ static void splitfilename_symbol(t_splitfilename *x, t_symbol *s)
 			strcpy(str_file, s->s_name);
 			cpp = strrchr(str_path, x->x_sep[0]);
 			cpf = strrchr(str_file, x->x_sep[0]);
-			if(((int)cpp - (int)str_path) < 0)
+			if(!cpp) /* JMZ: 20050701 */
 			{
+			  post("1");
 				outlet_symbol(x->x_outfile, gensym(str_file));
-				outlet_symbol(x->x_outpath, &s_);
-			}
-			else if(((int)cpp - (int)str_path) >= len)
+				outlet_symbol(x->x_outpath, &s_);			  
+			} 
+			else if (!cpf) /* JMZ: 20050701 */
 			{
+			  post("2");
 				outlet_symbol(x->x_outfile, &s_);
 				outlet_symbol(x->x_outpath, gensym(str_path));
 			}
-			else
-			{
+			else if((cpp - str_path) < 0) /* JMZ:removed typecast (char*) to (int); this is not portable */
+			  {
+				outlet_symbol(x->x_outfile, gensym(str_file));
+				outlet_symbol(x->x_outpath, &s_);
+			  }
+			else if((cpp - str_path) >= len) /* JMZ: removed typecast (char*) to (int) */
+			    {
+				outlet_symbol(x->x_outfile, &s_);
+				outlet_symbol(x->x_outpath, gensym(str_path));
+			  }
+			  else
+			  {
 				*cpp = 0;
 				cpf++;
 				outlet_symbol(x->x_outfile, gensym(cpf));
 				outlet_symbol(x->x_outpath, gensym(str_path));
-			}
+			  }
 			freebytes(str_file, len*sizeof(char));
 			freebytes(str_path, len*sizeof(char));
 		}
