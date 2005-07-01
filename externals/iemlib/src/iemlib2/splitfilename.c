@@ -91,13 +91,11 @@ static void splitfilename_symbol(t_splitfilename *x, t_symbol *s)
 			cpf = strrchr(str_file, x->x_sep[0]);
 			if(!cpp) /* JMZ: 20050701 */
 			{
-			  post("1");
 				outlet_symbol(x->x_outfile, gensym(str_file));
 				outlet_symbol(x->x_outpath, &s_);			  
 			} 
 			else if (!cpf) /* JMZ: 20050701 */
 			{
-			  post("2");
 				outlet_symbol(x->x_outfile, &s_);
 				outlet_symbol(x->x_outpath, gensym(str_path));
 			}
