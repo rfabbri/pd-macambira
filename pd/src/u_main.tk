@@ -1746,7 +1746,14 @@ proc pdtk_canvas_dofont {name initsize} {
 
 ############ pdtk_gatom_dialog -- run a gatom dialog #########
 
-# see graph_apply, etc., for comments about handling variable names here...
+# dialogs like this one can come up in many copies; but in TK the easiest
+# way to get data from an "entry", etc., is to set an associated variable
+# name.  This is especially true for grouped "radio buttons".  So we have
+# to synthesize variable names for each instance of the dialog.  The dialog
+# gets a TK pathname $id, from which it strips the leading "." to make a
+# variable suffix $vid.  Then you can get the actual value out by asking for
+# [eval concat $$variablename].  There should be an easier way but I don't see
+# it yet.
 
 proc gatom_escape {sym} {
     if {[string length $sym] == 0} {
@@ -1970,141 +1977,6 @@ proc pdtk_canvas_popup {name xpix ypix canprop canopen} {
     	 [expr $ypix + [winfo rooty $name.c]] 0
 }
 
-############ pdtk_graph_dialog -- dialog window for graphs #########
-
-# the graph and array dialogs can come up in many copies; but in TK the easiest
-# way to get data from an "entry", etc., is to set an associated variable
-# name.  This is especially true for grouped "radio buttons".  So we have
-# to synthesize variable names for each instance of the dialog.  The dialog
-# gets a TK pathname $id, from which it strips the leading "." to make a
-# variable suffix $vid.  Then you can get the actual value out by asking for
-# [eval concat $$variablename].  There should be an easier way but I don't see
-# it yet.
-
-proc graph_apply {id} {
-# strip "." from the TK id to make a variable name suffix 
-    set vid [string trimleft $id .]
-# for each variable, make a local variable to hold its name...
-    set var_graph_x1 [concat graph_x1_$vid]
-    global $var_graph_x1
-    set var_graph_x2 [concat graph_x2_$vid]
-    global $var_graph_x2
-    set var_graph_xpix [concat graph_xpix_$vid]
-    global $var_graph_xpix
-    set var_graph_y1 [concat graph_y1_$vid]
-    global $var_graph_y1
-    set var_graph_y2 [concat graph_y2_$vid]
-    global $var_graph_y2
-    set var_graph_ypix [concat graph_ypix_$vid]
-    global $var_graph_ypix
-
-    pd [concat $id dialog \
-    	[eval concat $$var_graph_x1] \
-    	[eval concat $$var_graph_y1] \
-    	[eval concat $$var_graph_x2] \
-    	[eval concat $$var_graph_y2] \
-    	[eval concat $$var_graph_xpix] \
-    	[eval concat $$var_graph_ypix] \
-	\;]
-}
-
-proc graph_cancel {id} {
-    set cmd [concat $id cancel \;]
-#    puts stderr $cmd
-    pd $cmd
-}
-
-proc graph_ok {id} {
-    graph_apply $id
-    graph_cancel $id
-}
-
-proc pdtk_graph_dialog {id x1 y1 x2 y2 xpix ypix} {
-    set vid [string trimleft $id .]
-    set var_graph_x1 [concat graph_x1_$vid]
-    global $var_graph_x1
-    set var_graph_x2 [concat graph_x2_$vid]
-    global $var_graph_x2
-    set var_graph_xpix [concat graph_xpix_$vid]
-    global $var_graph_xpix
-    set var_graph_y1 [concat graph_y1_$vid]
-    global $var_graph_y1
-    set var_graph_y2 [concat graph_y2_$vid]
-    global $var_graph_y2
-    set var_graph_ypix [concat graph_ypix_$vid]
-    global $var_graph_ypix
-
-    set $var_graph_x1 $x1
-    set $var_graph_x2 $x2
-    set $var_graph_xpix $xpix
-    set $var_graph_y1 $y1
-    set $var_graph_y2 $y2
-    set $var_graph_ypix $ypix
-
-    toplevel $id
-    wm title $id {graph}
-    wm protocol $id WM_DELETE_WINDOW [concat graph_cancel $id]
-
-    label $id.label -text {GRAPH BOUNDS}
-    pack $id.label -side top
-
-    frame $id.buttonframe
-    pack $id.buttonframe -side bottom -fill x -pady 2m
-    button $id.buttonframe.cancel -text {Cancel}\
-    	-command "graph_cancel $id"
-    button $id.buttonframe.apply -text {Apply}\
-    	-command "graph_apply $id"
-    button $id.buttonframe.ok -text {OK}\
-    	-command "graph_ok $id"
-    pack $id.buttonframe.cancel -side left -expand 1
-    pack $id.buttonframe.apply -side left -expand 1
-    pack $id.buttonframe.ok -side left -expand 1
-    
-    frame $id.xrangef
-    pack $id.xrangef -side top
-    
-    label $id.xrangef.l1 -text "X from:"
-    entry $id.xrangef.x1 -textvariable $var_graph_x1 -width 7
-    label $id.xrangef.l2 -text "to:"
-    entry $id.xrangef.x2 -textvariable $var_graph_x2 -width 7
-    label $id.xrangef.l3 -text "screen width:"
-    entry $id.xrangef.xpix -textvariable $var_graph_xpix -width 7
-    pack $id.xrangef.l1 $id.xrangef.x1 \
-    	 $id.xrangef.l2 $id.xrangef.x2 \
-	 $id.xrangef.l3 $id.xrangef.xpix -side left
-    
-    frame $id.yrangef
-    pack $id.yrangef -side top
-
-# dig in the following that the upper bound is labeled y1 but the variable is
-# y2, etc. This is to deal with the inconsistent use of "upper and lower"
-# graph bounds... in the dialog the upper Y bound is the lower valued Y pixel.
-    label $id.yrangef.l1 -text "Y from:"
-    entry $id.yrangef.y1 -textvariable $var_graph_y2 -width 7
-    label $id.yrangef.l2 -text "to:"
-    entry $id.yrangef.y2 -textvariable $var_graph_y1 -width 7
-    label $id.yrangef.l3 -text "screen height:"
-    entry $id.yrangef.ypix -textvariable $var_graph_ypix -width 7
-    pack $id.yrangef.l1 $id.yrangef.y1 \
-    	 $id.yrangef.l2 $id.yrangef.y2 \
-	 $id.yrangef.l3 $id.yrangef.ypix -side left
-
-    bind $id.xrangef.x1 <KeyPress-Return> [concat graph_ok $id]
-    bind $id.xrangef.x2 <KeyPress-Return> [concat graph_ok $id]
-    bind $id.xrangef.xpix <KeyPress-Return> [concat graph_ok $id]
-    bind $id.yrangef.y1 <KeyPress-Return> [concat graph_ok $id]
-    bind $id.yrangef.y2 <KeyPress-Return> [concat graph_ok $id]
-    bind $id.yrangef.ypix <KeyPress-Return> [concat graph_ok $id]
-    pdtk_standardkeybindings $id.xrangef.x1
-    pdtk_standardkeybindings $id.xrangef.x2
-    pdtk_standardkeybindings $id.xrangef.xpix
-    pdtk_standardkeybindings $id.yrangef.y1
-    pdtk_standardkeybindings $id.yrangef.y2
-    pdtk_standardkeybindings $id.yrangef.ypix
-    $id.xrangef.x2 select from 0
-    $id.xrangef.x2 select adjust end
-    focus $id.xrangef.x2
-}
 
 # begin of change "iemlib"
 ############ pdtk_iemgui_dialog -- dialog window for iem guis #########
@@ -2835,6 +2707,8 @@ proc pdtk_iemgui_dialog {id mainheader \
 # end of change "iemlib"
 
 ############ pdtk_array_dialog -- dialog window for arrays #########
+# see comments above (pdtk_gatom_dialog) about variable name handling 
+
 proc array_apply {id} {
 # strip "." from the TK id to make a variable name suffix 
     set vid [string trimleft $id .]
@@ -2979,22 +2853,48 @@ proc pdtk_array_dialog {id name n flags newone} {
 }
 
 ############ pdtk_canvas_dialog -- dialog window for canvass #########
+# see comments above (pdtk_gatom_dialog) about variable name handling 
+
 proc canvas_apply {id} {
 # strip "." from the TK id to make a variable name suffix 
     set vid [string trimleft $id .]
 # for each variable, make a local variable to hold its name...
+
     set var_canvas_xscale [concat canvas_xscale_$vid]
     global $var_canvas_xscale
     set var_canvas_yscale [concat canvas_yscale_$vid]
     global $var_canvas_yscale
     set var_canvas_graphme [concat canvas_graphme_$vid]
     global $var_canvas_graphme
-#    set var_canvas_stretch [concat canvas_stretch_$vid]
-#    global $var_canvas_stretch
+    set var_canvas_x1 [concat canvas_x1_$vid]
+    global $var_canvas_x1
+    set var_canvas_x2 [concat canvas_x2_$vid]
+    global $var_canvas_x2
+    set var_canvas_xpix [concat canvas_xpix_$vid]
+    global $var_canvas_xpix
+    set var_canvas_xmargin [concat canvas_xmargin_$vid]
+    global $var_canvas_xmargin
+    set var_canvas_y1 [concat canvas_y1_$vid]
+    global $var_canvas_y1
+    set var_canvas_y2 [concat canvas_y2_$vid]
+    global $var_canvas_y2
+    set var_canvas_ypix [concat canvas_ypix_$vid]
+    global $var_canvas_ypix
+    set var_canvas_ymargin [concat canvas_ymargin_$vid]
+    global $var_canvas_ymargin
+
     pd [concat $id donecanvasdialog \
     	[eval concat $$var_canvas_xscale] \
 	[eval concat $$var_canvas_yscale] \
     	[eval concat $$var_canvas_graphme] \
+    	[eval concat $$var_canvas_x1] \
+    	[eval concat $$var_canvas_y1] \
+    	[eval concat $$var_canvas_x2] \
+    	[eval concat $$var_canvas_y2] \
+    	[eval concat $$var_canvas_xpix] \
+    	[eval concat $$var_canvas_ypix] \
+    	[eval concat $$var_canvas_xmargin] \
+    	[eval concat $$var_canvas_ymargin] \
 	\;]
 }
 
@@ -3008,7 +2908,85 @@ proc canvas_ok {id} {
     canvas_cancel $id
 }
 
-proc pdtk_canvas_dialog {id xscale yscale graphme stretch} {
+proc canvas_checkcommand {id} {
+    set vid [string trimleft $id .]
+#    puts stderr [concat canvas_checkcommand $id $vid]
+
+    set var_canvas_xscale [concat canvas_xscale_$vid]
+    global $var_canvas_xscale
+    set var_canvas_yscale [concat canvas_yscale_$vid]
+    global $var_canvas_yscale
+    set var_canvas_graphme [concat canvas_graphme_$vid]
+    global $var_canvas_graphme
+    set var_canvas_x1 [concat canvas_x1_$vid]
+    global $var_canvas_x1
+    set var_canvas_x2 [concat canvas_x2_$vid]
+    global $var_canvas_x2
+    set var_canvas_xpix [concat canvas_xpix_$vid]
+    global $var_canvas_xpix
+    set var_canvas_xmargin [concat canvas_xmargin_$vid]
+    global $var_canvas_xmargin
+    set var_canvas_y1 [concat canvas_y1_$vid]
+    global $var_canvas_y1
+    set var_canvas_y2 [concat canvas_y2_$vid]
+    global $var_canvas_y2
+    set var_canvas_ypix [concat canvas_ypix_$vid]
+    global $var_canvas_ypix
+    set var_canvas_ymargin [concat canvas_ymargin_$vid]
+    global $var_canvas_ymargin
+
+    if { [eval concat $$var_canvas_graphme] != 0 } {
+        $id.xrange.entry1 configure -state normal
+        $id.xrange.entry2 configure -state normal
+        $id.xrange.entry3 configure -state normal
+        $id.xrange.entry4 configure -state normal
+        $id.yrange.entry1 configure -state normal
+        $id.yrange.entry2 configure -state normal
+        $id.yrange.entry3 configure -state normal
+        $id.yrange.entry4 configure -state normal
+        $id.xscale.entry configure -state disabled
+        $id.yscale.entry configure -state disabled
+        set x1 [eval concat $$var_canvas_x1]
+        set y1 [eval concat $$var_canvas_y1]
+        set x2 [eval concat $$var_canvas_x2]
+        set y2 [eval concat $$var_canvas_y2]
+        if { [eval concat $$var_canvas_x1] == 0 && \
+             [eval concat $$var_canvas_y1] == 0 && \
+             [eval concat $$var_canvas_x2] == 0 && \
+             [eval concat $$var_canvas_y2] == 0 } {
+                set $var_canvas_x2 1
+                set $var_canvas_y2 1
+        }
+        if { [eval concat $$var_canvas_xpix] == 0 } {
+            set $var_canvas_xpix 85
+            set $var_canvas_xmargin 100
+        }
+        if { [eval concat $$var_canvas_ypix] == 0 } {
+            set $var_canvas_ypix 60
+            set $var_canvas_ymargin 100
+        }
+    } else {
+        $id.xrange.entry1 configure -state disabled
+        $id.xrange.entry2 configure -state disabled
+        $id.xrange.entry3 configure -state disabled
+        $id.xrange.entry4 configure -state disabled
+        $id.yrange.entry1 configure -state disabled
+        $id.yrange.entry2 configure -state disabled
+        $id.yrange.entry3 configure -state disabled
+        $id.yrange.entry4 configure -state disabled
+        $id.xscale.entry configure -state normal
+        $id.yscale.entry configure -state normal
+        if { [eval concat $$var_canvas_xscale] == 0 } {
+            set $var_canvas_xscale 1
+        }
+        if { [eval concat $$var_canvas_yscale] == 0 } {
+            set $var_canvas_yscale -1
+        }
+    }
+}
+
+proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
+    xpix ypix xmargin ymargin} {
     set vid [string trimleft $id .]
 
     set var_canvas_xscale [concat canvas_xscale_$vid]
@@ -3017,18 +2995,43 @@ proc pdtk_canvas_dialog {id xscale yscale graphme stretch} {
     global $var_canvas_yscale
     set var_canvas_graphme [concat canvas_graphme_$vid]
     global $var_canvas_graphme
-#    set var_canvas_stretch [concat canvas_stretch_$vid]
-#    global $var_canvas_stretch
+    set var_canvas_x1 [concat canvas_x1_$vid]
+    global $var_canvas_x1
+    set var_canvas_x2 [concat canvas_x2_$vid]
+    global $var_canvas_x2
+    set var_canvas_xpix [concat canvas_xpix_$vid]
+    global $var_canvas_xpix
+    set var_canvas_xmargin [concat canvas_xmargin_$vid]
+    global $var_canvas_xmargin
+    set var_canvas_y1 [concat canvas_y1_$vid]
+    global $var_canvas_y1
+    set var_canvas_y2 [concat canvas_y2_$vid]
+    global $var_canvas_y2
+    set var_canvas_ypix [concat canvas_ypix_$vid]
+    global $var_canvas_ypix
+    set var_canvas_ymargin [concat canvas_ymargin_$vid]
+    global $var_canvas_ymargin
+
 
     set $var_canvas_xscale $xscale
     set $var_canvas_yscale $yscale
     set $var_canvas_graphme $graphme
-#    set $var_canvas_stretch $stretch
+    set $var_canvas_x1 $x1
+    set $var_canvas_y1 $y1
+    set $var_canvas_x2 $x2
+    set $var_canvas_y2 $y2
+    set $var_canvas_xpix $xpix
+    set $var_canvas_ypix $ypix
+    set $var_canvas_xmargin $xmargin
+    set $var_canvas_ymargin $ymargin
 
     toplevel $id
     wm title $id {canvas}
     wm protocol $id WM_DELETE_WINDOW [concat canvas_cancel $id]
 
+    label $id.toplabel -text "Canvas Properties"
+    pack $id.toplabel -side top
+    
     frame $id.xscale
     pack $id.xscale -side top
     label $id.xscale.label -text "X units per pixel"
@@ -3042,13 +3045,41 @@ proc pdtk_canvas_dialog {id xscale yscale graphme stretch} {
     pack $id.yscale.label $id.yscale.entry -side left
 
     checkbutton $id.graphme -text {graph on parent} \
-    	-variable $var_canvas_graphme -anchor w
+    	-variable $var_canvas_graphme -anchor w \
+        -command [concat canvas_checkcommand $id]
     pack $id.graphme -side top
 
-#    checkbutton $id.stretch -text {stretch on resize} \
-#    	-variable $var_canvas_stretch -anchor w
-#    pack $id.stretch -side top
+    frame $id.xrange
+    pack $id.xrange -side top
+    label $id.xrange.label1 -text "X range: from"
+    entry $id.xrange.entry1 -textvariable $var_canvas_x1 -width 6
+    label $id.xrange.label2 -text "to"
+    entry $id.xrange.entry2 -textvariable $var_canvas_x2 -width 6
+    label $id.xrange.label3 -text "size"
+    entry $id.xrange.entry3 -textvariable $var_canvas_xpix -width 4
+    label $id.xrange.label4 -text "margin"
+    entry $id.xrange.entry4 -textvariable $var_canvas_xmargin -width 4
+    pack $id.xrange.label1 $id.xrange.entry1 \
+        $id.xrange.label2 $id.xrange.entry2 \
+        $id.xrange.label3 $id.xrange.entry3 \
+        $id.xrange.label4 $id.xrange.entry4 \
+        -side left
 
+    frame $id.yrange
+    pack $id.yrange -side top
+    label $id.yrange.label1 -text "Y range: from"
+    entry $id.yrange.entry1 -textvariable $var_canvas_y1 -width 6
+    label $id.yrange.label2 -text "to"
+    entry $id.yrange.entry2 -textvariable $var_canvas_y2 -width 6
+    label $id.yrange.label3 -text "size"
+    entry $id.yrange.entry3 -textvariable $var_canvas_ypix -width 4
+    label $id.yrange.label4 -text "margin"
+    entry $id.yrange.entry4 -textvariable $var_canvas_ymargin -width 4
+    pack $id.yrange.label1 $id.yrange.entry1 \
+        $id.yrange.label2 $id.yrange.entry2 \
+        $id.yrange.label3 $id.yrange.entry3 \
+        $id.yrange.label4 $id.yrange.entry4 \
+        -side left
 
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
@@ -3069,6 +3100,7 @@ proc pdtk_canvas_dialog {id xscale yscale graphme stretch} {
     $id.xscale.entry select from 0
     $id.xscale.entry select adjust end
     focus $id.xscale.entry
+    canvas_checkcommand $id
 }
 
 ############ pdtk_data_dialog -- run a data dialog #########

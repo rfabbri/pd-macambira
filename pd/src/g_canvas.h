@@ -158,6 +158,8 @@ struct _glist
     int gl_screeny1;
     int gl_screenx2;
     int gl_screeny2;
+    int gl_xmargin;                /* origin for GOP rectangle */
+    int gl_ymargin;
     t_tick gl_xtick;            /* ticks marking X values */    
     int gl_nxlabels;            /* number of X coordinate labels */
     t_symbol **gl_xlabel;           /* ... an array to hold them */
@@ -178,7 +180,7 @@ struct _glist
     unsigned int gl_willvis:1;      /* make me visible after loading */ 
     unsigned int gl_edit:1;         /* edit mode */
     unsigned int gl_isdeleting:1;   /* we're inside glist_delete -- hack! */
-    unsigned int gl_stretch:1;      /* stretch contents on resize */
+    unsigned int gl_goprect:1;      /* draw rectangle for graph-on-parent */
     unsigned int gl_isgraph:1;      /* show as graph on parent */
 };
 

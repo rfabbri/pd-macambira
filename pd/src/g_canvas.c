@@ -14,6 +14,7 @@ to be different but are now unified except for some fossilized names.) */
 #include <string.h>
 #include "g_all_guis.h"
 
+    /* LATER consider adding font size to this struct (see glist_getfont()) */
 struct _canvasenvironment
 {
     t_symbol *ce_dir;   /* directory patch lives in */
@@ -401,6 +402,7 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
     if (strcmp(x->gl_name->s_name, "Pd"))
         pd_bind(&x->gl_pd, canvas_makebindsym(x->gl_name));
     x->gl_loading = 1;
+    x->gl_goprect = 0;      /* no GOP rectangle unless it's turned on later */
     x->gl_willvis = vis;
     x->gl_edit = !strncmp(x->gl_name->s_name, "Untitled", 8);
     x->gl_font = sys_nearestfontsize(font);
@@ -408,7 +410,7 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
     return(x);
 }
 
-void canvas_setgraph(t_glist *x, int flag);
+void canvas_setgraph(t_glist *x, int flag, int nogoprect);
 
 static void canvas_coords(t_glist *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -418,7 +420,14 @@ static void canvas_coords(t_glist *x, t_symbol *s, int argc, t_atom *argv)
     x->gl_y2 = atom_getfloatarg(3, argc, argv);
     x->gl_pixwidth = atom_getintarg(4, argc, argv);
     x->gl_pixheight = atom_getintarg(5, argc, argv);
-    canvas_setgraph(x, atom_getintarg(6, argc, argv));
+    if (argc <= 7)
+        canvas_setgraph(x, atom_getintarg(6, argc, argv), 1);
+    else
+    {
+        x->gl_xmargin = atom_getintarg(7, argc, argv);
+        x->gl_ymargin = atom_getintarg(8, argc, argv);
+        canvas_setgraph(x, atom_getintarg(6, argc, argv), 0);
+    }
 }
 
     /* make a new glist and add it to this glist.  It will appear as
@@ -480,8 +489,8 @@ t_glist *glist_addglist(t_glist *g, t_symbol *sym,
     if (strcmp(x->gl_name->s_name, "Pd"))
         pd_bind(&x->gl_pd, canvas_makebindsym(x->gl_name));
     x->gl_owner = g;
-    x->gl_stretch = 1;
     x->gl_isgraph = 1;
+    x->gl_goprect = 0;
     x->gl_obj.te_binbuf = binbuf_new();
     binbuf_addv(x->gl_obj.te_binbuf, "s", gensym("graph"));
     if (!menu)
@@ -589,6 +598,20 @@ void canvas_dirty(t_canvas *x, t_int n)
     }
 }
 
+void canvas_drawredrect(t_canvas *x, int doit)
+{
+    if (doit)
+        sys_vgui(".x%lx.c create line\
+            %d %d %d %d %d %d %d %d %d %d -fill #ff8080 -tags GOP\n",
+            glist_getcanvas(x),
+            x->gl_xmargin, x->gl_ymargin,
+            x->gl_xmargin + x->gl_pixwidth, x->gl_ymargin,
+            x->gl_xmargin + x->gl_pixwidth, x->gl_ymargin + x->gl_pixheight,
+            x->gl_xmargin, x->gl_ymargin + x->gl_pixheight,
+            x->gl_xmargin, x->gl_ymargin);
+    else sys_vgui(".x%lx.c delete GOP\n",  glist_getcanvas(x));
+}
+
     /* the window becomes "mapped" (visible and not miniaturized) or
     "unmapped" (either miniaturized or just plain gone.)  This should be
     called from the GUI after the fact to "notify" us that we're mapped. */
@@ -612,6 +635,8 @@ void canvas_map(t_canvas *x, t_floatarg f)
                 gobj_select(sel->sel_what, x, 1);
             x->gl_mapped = 1;
             canvas_drawlines(x);
+            if (x->gl_isgraph && x->gl_goprect)
+                canvas_drawredrect(x, 1);
             sys_vgui("pdtk_canvas_getscroll .x%lx.c\n", x);
         }
     }
@@ -621,11 +646,13 @@ void canvas_map(t_canvas *x, t_floatarg f)
         {
                 /* just clear out the whole canvas... */
             sys_vgui(".x%lx.c delete all\n", x);
+#if 0
                 /* alternatively, we could have erased them one by one...
             for (y = x->gl_list; y; y = y->g_next)
                 gobj_vis(y, x, 0);
                     ... but we should go through and erase the lines as well
                     if we do it that way. */
+#endif
             x->gl_mapped = 0;
         }
     }
@@ -816,7 +843,10 @@ int glist_istoplevel(t_glist *x)
 
 int glist_getfont(t_glist *x)
 {
-    return (glist_getcanvas(x)->gl_font);
+    while (!x->gl_env)
+        if (!(x = x->gl_owner))
+            bug("t_canvasenvironment");
+    return (x->gl_font);
 }
 
 void canvas_free(t_canvas *x)
@@ -1413,7 +1443,7 @@ extern void glist_scalar(t_glist *canvas, t_symbol *s, int argc, t_atom *argv);
 void g_graph_setup(void);
 void g_editor_setup(void);
 void g_readwrite_setup(void);
-extern void graph_properties(t_gobj *z, t_glist *owner);
+extern void canvas_properties(t_gobj *z);
 
 void g_canvas_setup(void)
 {
@@ -1484,7 +1514,7 @@ void g_canvas_setup(void)
         gensym("menu-open"), A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_map,
         gensym("map"), A_FLOAT, A_NULL);
-    class_setpropertiesfn(canvas_class, graph_properties);
+    class_setpropertiesfn(canvas_class, (t_propertiesfn)canvas_properties);
 
 /* ---------------------- list handling ------------------------ */
     class_addmethod(canvas_class, (t_method)glist_clear, gensym("clear"),

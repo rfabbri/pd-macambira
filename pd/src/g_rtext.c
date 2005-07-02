@@ -153,17 +153,24 @@ static void rtext_senditup(t_rtext *x, int action, int *widthp, int *heightp,
     float dispx, dispy;
     char smallbuf[200], *tempbuf;
     int outchars = 0, nlines = 0, ncolumns = 0,
-        pixwide, pixhigh;
-    int font = glist_getfont(x->x_glist);
-    int fontwidth = sys_fontwidth(font), fontheight = sys_fontheight(font);
-    int findx = (*widthp + (fontwidth/2)) / fontwidth,
-        findy = *heightp / fontheight;
+        pixwide, pixhigh, font, fontwidth, fontheight, findx, findy;
     int reportedindex = 0;
     t_canvas *canvas = glist_getcanvas(x->x_glist);
     int widthspec = x->x_text->te_width;
     int widthlimit = (widthspec ? widthspec : BOXWIDTH);
     int inindex = 0;
     int selstart = 0, selend = 0;
+        /* if we're a GOP (the new, "goprect" style) borrow the font size
+        from the inside to preserve the spacing */
+    if (pd_class(&x->x_text->te_pd) == canvas_class &&
+        ((t_glist *)(x->x_text))->gl_isgraph &&
+        ((t_glist *)(x->x_text))->gl_goprect)
+            font =  glist_getfont((t_glist *)(x->x_text));
+    else font = glist_getfont(x->x_glist);
+    fontwidth = sys_fontwidth(font);
+    fontheight = sys_fontheight(font);
+    findx = (*widthp + (fontwidth/2)) / fontwidth;
+    findy = *heightp / fontheight;
     if (x->x_bufsize >= 100)
          tempbuf = (char *)t_getbytes(2 * x->x_bufsize + 1);
     else tempbuf = smallbuf;

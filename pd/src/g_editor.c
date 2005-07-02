@@ -64,7 +64,25 @@ void gobj_delete(t_gobj *x, t_glist *glist)
 void gobj_vis(t_gobj *x, struct _glist *glist, int flag)
 {
     if (x->g_pd->c_wb && x->g_pd->c_wb->w_visfn)
+    {
+        if (!glist->gl_havewindow && glist->gl_isgraph && glist->gl_goprect &&
+            glist->gl_owner && (pd_class(&glist->gl_pd) != garray_class))
+        {
+            /* if we're graphing-on-parent and the object falls outside the
+            graph rectangle, don't draw it. */
+            int x1, y1, x2, y2, gx1, gy1, gx2, gy2, m;
+            gobj_getrect(&glist->gl_gobj, glist->gl_owner, &x1, &y1, &x2, &y2);
+            if (x1 > x2)
+                m = x1, x1 = x2, x2 = m;
+            if (y1 > y2)
+                m = y1, y1 = y2, x2 = m;
+            gobj_getrect(x, glist, &gx1, &gy1, &gx2, &gy2);
+            if (gx1 < x1 || gx1 > x2 || gx2 < x1 || gx2 > x2 ||
+                gy1 < y1 || gy1 > y2 || gy2 < y1 || gy2 > y2)
+                    return;
+        }
         (*x->g_pd->c_wb->w_visfn)(x, glist, flag);
+    }
 }
 
 int gobj_click(t_gobj *x, struct _glist *glist,
@@ -787,20 +805,9 @@ static void canvas_rightclick(t_canvas *x, int xpos, int ypos, t_gobj *y)
         x, xpos, ypos, canprop, canopen);
 }
 
-    /* tell GUI to create a properties dialog on the canvas.  We tell
-    the user the negative of the "pixel" y scale to make it appear to grow
-    naturally upward, whereas pixels grow downward. */
-static void canvas_properties(t_glist *x)
-{
-    char graphbuf[200];
-    sprintf(graphbuf, "pdtk_canvas_dialog %%s %g %g %g %g \n",
-        glist_dpixtodx(x, 1), -glist_dpixtody(x, 1),
-        (float)glist_isgraph(x), (float)x->gl_stretch);
-    gfxstub_new(&x->gl_pd, x, graphbuf);
-}
-
-
-void canvas_setgraph(t_glist *x, int flag)
+    /* set a canvas up as a graph-on-parent.  Set reasonable defaults for
+    any missing paramters and redraw things if necessary. */
+void canvas_setgraph(t_glist *x, int flag, int nogoprect)
 {
     if (!flag && glist_isgraph(x))
     {
@@ -824,8 +831,18 @@ void canvas_setgraph(t_glist *x, int flag)
         if (x->gl_owner && !x->gl_loading && glist_isvisible(x->gl_owner))
             gobj_vis(&x->gl_gobj, x->gl_owner, 0);
         x->gl_isgraph = 1;
-        /* if (x->gl_owner && glist_isvisible(x->gl_owner))
-            canvas_vis(x, 1); */
+        if (!nogoprect && !x->gl_goprect)
+        {
+            t_gobj *g;
+            for (g = x->gl_list; g; g = g->g_next)
+                if (pd_checkobject(&g->g_pd))
+            {
+                x->gl_goprect = 1;
+                break;
+            }
+        }
+        if (glist_isvisible(x) && x->gl_goprect)
+            glist_redraw(x);
         if (x->gl_loading && x->gl_owner && glist_isvisible(x->gl_owner))
             canvas_create_editor(x, 1);
         if (x->gl_owner && !x->gl_loading && glist_isvisible(x->gl_owner))
@@ -836,20 +853,76 @@ void canvas_setgraph(t_glist *x, int flag)
     }
 }
 
+    /* tell GUI to create a properties dialog on the canvas.  We tell
+    the user the negative of the "pixel" y scale to make it appear to grow
+    naturally upward, whereas pixels grow downward. */
+void canvas_properties(t_glist *x)
+{
+    char graphbuf[200];
+    if (glist_isgraph(x) != 0)
+        sprintf(graphbuf,
+            "pdtk_canvas_dialog %%s %g %g %d %g %g %g %g %d %d %d %d\n",
+                0., 0.,
+                1,
+                x->gl_x1, x->gl_y1, x->gl_x2, x->gl_y2, 
+                (int)x->gl_pixwidth, (int)x->gl_pixheight,
+                (int)x->gl_xmargin, (int)x->gl_ymargin);
+    else sprintf(graphbuf,
+            "pdtk_canvas_dialog %%s %g %g %d %g %g %g %g %d %d %d %d\n",
+                glist_dpixtodx(x, 1), -glist_dpixtody(x, 1),
+                0,
+                0., -1., 1., 1., 
+                (int)x->gl_pixwidth, (int)x->gl_pixheight,
+                (int)x->gl_xmargin, (int)x->gl_ymargin);
+    gfxstub_new(&x->gl_pd, x, graphbuf);
+}
+
     /* called from the gui when "OK" is selected on the canvas properties
         dialog.  Again we negate "y" scale. */
-static void canvas_donecanvasdialog(t_glist *x,  t_floatarg xperpix,
-    t_floatarg yperpix, t_floatarg fgraphme)
+static void canvas_donecanvasdialog(t_glist *x,
+    t_symbol *s, int argc, t_atom *argv)
 {
-    int graphme = (fgraphme != 0), redraw = 0;
+
+
+    float xperpix, yperpix, x1, y1, x2, y2, xpix, ypix, xmargin, ymargin; 
+    int graphme, redraw = 0;
+
+    xperpix = atom_getfloatarg(0, argc, argv);
+    yperpix = atom_getfloatarg(1, argc, argv);
+    graphme = (atom_getfloatarg(2, argc, argv) != 0);
+    x1 = atom_getfloatarg(3, argc, argv);
+    y1 = atom_getfloatarg(4, argc, argv);
+    x2 = atom_getfloatarg(5, argc, argv);
+    y2 = atom_getfloatarg(6, argc, argv);
+    xpix = atom_getfloatarg(7, argc, argv);
+    ypix = atom_getfloatarg(8, argc, argv);
+    xmargin = atom_getfloatarg(9, argc, argv);
+    ymargin = atom_getfloatarg(10, argc, argv);
+    
+    x->gl_pixwidth = xpix;
+    x->gl_pixheight = ypix;
+    x->gl_xmargin = xmargin;
+    x->gl_ymargin = ymargin;
+
     yperpix = -yperpix;
     if (xperpix == 0)
         xperpix = 1;
     if (yperpix == 0)
         yperpix = 1;
-    canvas_setgraph(x, graphme);
-    if (!x->gl_isgraph && (xperpix != glist_dpixtodx(x, 1)))
+
+    if (graphme)
     {
+        if (x1 != x2)
+            x->gl_x1 = x1, x->gl_x2 = x2;
+        else x->gl_x1 = 0, x->gl_x2 = 1;
+        if (y1 != y2)
+            x->gl_y1 = y1, x->gl_y2 = y2;
+        else x->gl_y1 = 0, x->gl_y2 = 1;
+    }
+    else
+    {
+        if (xperpix != glist_dpixtodx(x, 1) || yperpix != glist_dpixtody(x, 1))
+            redraw = 1;
         if (xperpix > 0)
         {
             x->gl_x1 = 0;
@@ -860,10 +933,6 @@ static void canvas_donecanvasdialog(t_glist *x,  t_floatarg xperpix,
             x->gl_x1 = -xperpix * (x->gl_screenx2 - x->gl_screenx1);
             x->gl_x2 = x->gl_x1 + xperpix;
         }
-        redraw = 1;
-    }   
-    if (!x->gl_isgraph && (yperpix != glist_dpixtody(x, 1)))
-    {
         if (yperpix > 0)
         {
             x->gl_y1 = 0;
@@ -874,10 +943,10 @@ static void canvas_donecanvasdialog(t_glist *x,  t_floatarg xperpix,
             x->gl_y1 = -yperpix * (x->gl_screeny2 - x->gl_screeny1);
             x->gl_y2 = x->gl_y1 + yperpix;
         }
-        redraw = 1;
     }
-    if (redraw)
-        canvas_redraw(x);
+        /* LATER avoid doing 2 redraws here (possibly one inside setgraph) */
+    canvas_setgraph(x, graphme, 0);
+    canvas_redraw(x);
 }
 
     /* called from the gui when a popup menu comes back with "properties,"
@@ -2316,7 +2385,7 @@ void g_editor_setup(void)
     class_addmethod(canvas_class, (t_method)canvas_done_popup,
         gensym("done-popup"), A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_donecanvasdialog,
-        gensym("donecanvasdialog"), A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
+        gensym("donecanvasdialog"), A_GIMME, A_NULL);
     class_addmethod(canvas_class, (t_method)glist_arraydialog,
         gensym("arraydialog"), A_SYMBOL, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
 

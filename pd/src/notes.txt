@@ -1,22 +1,24 @@
 ---------------- dolist --------------------
 done for 0.39:
-arrays are now first-class data
+At the source level, "regular" arrays and arrays withing data structures
+are now the same thing.  The main user-visible effect of this is that now
+"arrays" may be graphed as "bezier curves".
 array elements can be clicked on, etc
 fixed array onset bug
 rfft bug fix
 bug fix in d_soundfile.c
 bugfix in number2
 plot drawing instructions turn on and off
+ranges in drawing instructions
+unify graph properties dialogs
+GOP font depends on abstraction, not parent
+
+
+------------ 0.39 ---------
 
 check:
 MIDI I/O for windows
 blechman patch for s_inter.c
-
-At the source level, "regular" arrays and arrays withing data structures
-are now the same thing.  The main user-visible effect of this is that now
-"arrays" may be graphed as "bezier curves".
-
------------- 0.39 ---------
 
 garray change:
 make a gobj_redraw that schedules the redraw
@@ -31,6 +33,7 @@ block resampling arguments
 document tabwrite~_start
 
 problems:
+modal dialogs confuse watchdog
 patcher inlets don't deal with scalars (zbug.pd)
 Macintosh .pd extension not added to filenames
 need to optimize canvas_motion (get rid of box hit test??)
@@ -52,7 +55,6 @@ check what happens when going back and forth between graph-on-parent
 get rid of messages causing renaming; try to prevent patches closing themselves.
 dac~/ adc~/ block~ incompatibility
 scofo reports error on reading score1.txt
-rfft~ loses nyquist bin -- see "to hell with it" comment in d_fft.c
 loading e-mailed patches without removing headers crashes pd
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')
 check if _vsnprintf with zero argument in windows works any better...
@@ -93,7 +95,6 @@ data:
 data copy/paste doesn't check templates aren't changed
 figure out why Pd sometimes crashes when you close example after adding fields
 arrays of non-existent templates crash
-allow field(1,5,0,100) etc. in drawing commands
 vget, vset traversal objects
 cursor to show (x, y) location
 better hit detection (getrect is too greedy; try tk's "current" tag for canvas)

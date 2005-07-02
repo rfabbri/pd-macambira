@@ -1323,12 +1323,13 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
 
 void plot_float(t_plot *x, t_floatarg f)
 {
+    int viswas;
     if (x->x_vis.fd_type != A_FLOAT || x->x_vis.fd_var)
     {
         pd_error(x, "global vis/invis for a template with variable visibility");
         return;
     }
-    int viswas = (x->x_vis.fd_un.fd_float != 0);
+    viswas = (x->x_vis.fd_un.fd_float != 0);
     
     if ((f != 0 && viswas) || (f == 0 && !viswas))
         return;

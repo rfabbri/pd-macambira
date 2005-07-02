@@ -24,6 +24,8 @@ static void graph_getrect(t_gobj *z, t_glist *glist,
 
 /* -------------------- maintaining the list -------------------- */
 
+void canvas_drawredrect(t_canvas *x, int doit);
+
 void glist_add(t_glist *x, t_gobj *y)
 {
     t_object *ob;
@@ -37,6 +39,11 @@ void glist_add(t_glist *x, t_gobj *y)
     }
     if (x->gl_editor && (ob = pd_checkobject(&y->g_pd)))
         rtext_new(x, ob);
+    if (x->gl_editor && x->gl_isgraph && !x->gl_goprect)
+    {
+        x->gl_goprect = 1;
+        canvas_drawredrect(x, 1);
+    }
     if (glist_isvisible(x))
         gobj_vis(y, x, 1);
     if (class_isdrawcommand(y->g_pd)) 
@@ -593,12 +600,16 @@ float glist_dpixtody(t_glist *x, float dypix)
 
     /* get the window location in pixels of a "text" object.  The
     object's x and y positions are in pixels when the glist they're
-    in is toplevel.  If it's not, we convert to pixels on the parent
-    window. */
+    in is toplevel.  Otherwise, if it's a new-style graph-on-parent
+    (so gl_goprect is set) we use the offset into the framing subrectangle
+    as an offset into the parent rectangle.  Finally, it might be an old,
+    proportional-style GOP.  In this case we do a coordinate transformation. */
 int text_xpix(t_text *x, t_glist *glist)
 {
     if (glist->gl_havewindow || !glist->gl_isgraph)
         return (x->te_xpix);
+    else if (glist->gl_goprect)
+         return (glist->gl_obj.te_xpix + x->te_xpix - glist->gl_xmargin);
     else return (glist_xtopixels(glist, 
             glist->gl_x1 + (glist->gl_x2 - glist->gl_x1) * 
                 x->te_xpix / (glist->gl_screenx2 - glist->gl_screenx1)));
@@ -608,6 +619,8 @@ int text_ypix(t_text *x, t_glist *glist)
 {
     if (glist->gl_havewindow || !glist->gl_isgraph)
         return (x->te_ypix);
+    else if (glist->gl_goprect)
+         return (glist->gl_obj.te_ypix + x->te_ypix - glist->gl_ymargin);
     else return (glist_ytopixels(glist, 
             glist->gl_y1 + (glist->gl_y2 - glist->gl_y1) * 
                 x->te_ypix / (glist->gl_screeny2 - glist->gl_screeny1)));
@@ -638,6 +651,12 @@ void glist_redraw(t_glist *x)
                 sys_vgui(".x%lx.c coords l%lx %d %d %d %d\n",
                     glist_getcanvas(x), oc,
                         t.tr_lx1, t.tr_ly1, t.tr_lx2, t.tr_ly2);
+            canvas_drawredrect(x, 0);
+            if (x->gl_goprect)
+            {
+                post("draw it");
+                canvas_drawredrect(x, 1);
+            }
         }
         if (x->gl_owner && glist_isvisible(x->gl_owner))
         {
@@ -838,26 +857,6 @@ static void graph_graphrect(t_gobj *z, t_glist *glist,
     int x1 = text_xpix(&x->gl_obj, glist);
     int y1 = text_ypix(&x->gl_obj, glist);
     int x2, y2;
-#if 0   /* this used to adjust graph size when it was in another graph;
-            now we just preserve the size. */
-        /* same logic here as in text_xpix(): */
-    if (glist->gl_havewindow)
-    {
-        x2 = x1 + x->gl_pixwidth;
-        y2 = y1 + x->gl_pixheight;
-    }
-    else
-    {
-        x2 = glist_xtopixels(glist, 
-            glist->gl_x1 + (glist->gl_x2 - glist->gl_x1) * 
-                (x->gl_obj.te_xpix + x->gl_pixwidth) /
-                    (glist->gl_screenx2 - glist->gl_screenx1));
-        y2 = glist_ytopixels(glist, 
-            glist->gl_y1 + (glist->gl_y2 - glist->gl_y1) * 
-                (x->gl_obj.te_ypix + x->gl_pixheight) /
-                    (glist->gl_screeny2 - glist->gl_screeny1));
-    }
-#endif
     x2 = x1 + x->gl_pixwidth;
     y2 = y1 + x->gl_pixheight;
 
@@ -890,24 +889,29 @@ static void graph_getrect(t_gobj *z, t_glist *glist,
             if (y22 > y2) 
                 y2 = y22;
         }
-            /* lie about whether we have our own window to affect gobj_getrect
-            calls below.  (LATER add argument to gobj_getrect()?) */
-        hadwindow = x->gl_havewindow;
-        x->gl_havewindow = 0;
-        for (g = x->gl_list; g; g = g->g_next)
-            if ((!(ob = pd_checkobject(&g->g_pd))) || text_shouldvis(ob, x))
+        if (!x->gl_goprect)
         {
-                /* don't do this for arrays, just let them hang outsize the
-                box. */
-            if (pd_class(&g->g_pd) == garray_class)
-                continue;
-            gobj_getrect(g, x, &x21, &y21, &x22, &y22);
-            if (x22 > x2) 
-                x2 = x22;
-            if (y22 > y2) 
-                y2 = y22;
+            /* expand the rectangle to fit in text objects; this applies only
+            to the old (0.37) graph-on-parent behavior. */
+            /* lie about whether we have our own window to affect gobj_getrect
+            calls below.  */
+            hadwindow = x->gl_havewindow;
+            x->gl_havewindow = 0;
+            for (g = x->gl_list; g; g = g->g_next)
+                if ((!(ob = pd_checkobject(&g->g_pd))) || text_shouldvis(ob, x))
+            {
+                    /* don't do this for arrays, just let them hang outside the
+                    box. */
+                if (pd_class(&g->g_pd) == garray_class)
+                    continue;
+                gobj_getrect(g, x, &x21, &y21, &x22, &y22);
+                if (x22 > x2) 
+                    x2 = x22;
+                if (y22 > y2) 
+                    y2 = y22;
+            }
+            x->gl_havewindow = hadwindow;
         }
-        x->gl_havewindow = hadwindow;
     }
     else text_widgetbehavior.w_getrectfn(z, glist, &x1, &y1, &x2, &y2);
     *xp1 = x1;
@@ -1068,23 +1072,6 @@ t_widgetbehavior graph_widgetbehavior =
     graph_click,
 };
 
-void graph_properties(t_gobj *z, t_glist *owner)
-{
-    t_glist *x = (t_glist *)z;
-    {
-        t_gobj *y;
-        char graphbuf[200];
-        sprintf(graphbuf, "pdtk_graph_dialog %%s %g %g %g %g %d %d\n",
-            x->gl_x1, x->gl_y1, x->gl_x2, x->gl_y2,
-                x->gl_pixwidth, x->gl_pixheight);
-        gfxstub_new(&x->gl_pd, x, graphbuf);
-
-        for (y = x->gl_list; y; y = y->g_next)
-            if (pd_class(&y->g_pd) == garray_class) 
-                garray_properties((t_garray *)y);
-    }
-}
-
     /* find the graph most recently added to this glist;
         if none exists, return 0. */
 
@@ -1095,29 +1082,6 @@ t_glist *glist_findgraph(t_glist *x)
         if (pd_class(&z->g_pd) == canvas_class && ((t_glist *)z)->gl_isgraph)
             y = z;
     return ((t_glist *)y);
-}
-
-    /* message back from dialog GUI to set parameters.  Args are:
-        1-4: bounds in our coordinates; 5-6: size in parent */
-static void graph_dialog(t_glist *x, t_symbol *s, int argc, t_atom *argv)
-{
-    t_float x1 = atom_getfloatarg(0, argc, argv);
-    t_float y1 = atom_getfloatarg(1, argc, argv);
-    t_float x2 = atom_getfloatarg(2, argc, argv);
-    t_float y2 = atom_getfloatarg(3, argc, argv);
-    t_float xpix = atom_getfloatarg(4, argc, argv);
-    t_float ypix = atom_getfloatarg(5, argc, argv);
-    if (x1 != x->gl_x1 || x2 != x->gl_x2 ||
-        y1 != x->gl_y1 || y2 != x->gl_y2)
-            graph_bounds(x, x1, y1, x2, y2);
-    if (xpix != x->gl_pixwidth || ypix != x->gl_pixheight)
-    {
-        x->gl_pixwidth = xpix;
-        x->gl_pixheight = ypix;
-        glist_redraw(x);
-        if (x->gl_owner)
-            canvas_fixlinesfor(x->gl_owner, &x->gl_obj);
-    }
 }
 
 extern void canvas_menuarray(t_glist *canvas);
@@ -1139,8 +1103,6 @@ void g_graph_setup(void)
         A_SYMBOL, A_FLOAT, A_SYMBOL, A_DEFFLOAT, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_menuarray,
         gensym("menuarray"), A_NULL);
-    class_addmethod(canvas_class, (t_method)graph_dialog, gensym("dialog"),
-        A_GIMME, 0);
     class_addmethod(canvas_class, (t_method)glist_arraydialog,
         gensym("arraydialog"), A_SYMBOL, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
     class_addmethod(canvas_class, (t_method)glist_sort,

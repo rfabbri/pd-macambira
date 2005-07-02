@@ -47,9 +47,10 @@ SRCPA = $(PADIR)/pa_common/pa_stream.c \
         $(PADIR)/pa_common/pa_dither.c \
         $(PADIR)/pa_common/pa_cpuload.c \
         $(PADIR)/pa_common/pa_converters.c \
+        $(PADIR)/pa_common/pa_allocation.c \
         $(PADIR)/pa_win/pa_win_util.c \
         $(PADIR)/pa_win/pa_win_hostapis.c \
-        $(PADIR)/pa_common/pa_allocation.c
+        $(PADIR)/pa_win_wmme/pa_win_wmme.c
 
 SRCASIO = $(PADIR)/pa_asio/pa_asio.cpp 
 
@@ -60,7 +61,8 @@ $(LDIR)\odbc32.lib $(LDIR)\odbccp32.lib ..\lib\asio\asiolib.lib
 
 PAOBJ = pa_stream.obj pa_trace.obj pa_skeleton.obj pa_process.obj \
 	pa_front.obj pa_dither.obj pa_cpuload.obj pa_converters.obj \
-	pa_allocation.obj pa_win_util.obj pa_win_hostapis.obj pa_asio.obj
+	pa_allocation.obj pa_win_util.obj pa_win_hostapis.obj pa_asio.obj \
+	pa_win_wmme.obj
 
 
 OBJC = $(SRC:.c=.obj) $(PAOBJ)
@@ -125,6 +127,8 @@ pa_win_util.obj: $(PADIR)\pa_win\pa_win_util.c
 	cl /c $(ALLCF) $(PADIR)\pa_win\pa_win_util.c
 pa_win_hostapis.obj: $(PADIR)\pa_win\pa_win_hostapis.c
 	cl /c $(ALLCF) $(PADIR)\pa_win\pa_win_hostapis.c
+pa_win_wmme.obj: $(PADIR)\pa_win_wmme\pa_win_wmme.c
+	cl /c $(ALLCF) $(PADIR)\pa_win_wmme\pa_win_wmme.c
 pa_asio.obj: $(PADIR)\pa_asio\pa_asio.cpp
 	cl /c $(ALLCF) $(PADIR)\pa_asio\pa_asio.cpp
 

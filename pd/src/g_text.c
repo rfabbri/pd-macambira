@@ -950,13 +950,14 @@ static void text_delete(t_gobj *z, t_glist *glist)
     canvas_deletelinesfor(glist, x);
 }
 
-    /* return true if the text box should be drawn.
-    We don't show object boxes inside graphs. */
+    /* return true if the text box should be drawn.  We don't show text boxes
+    inside graphs---except comments, if we're doing the new (goprect) style. */
 int text_shouldvis(t_text *x, t_glist *glist)
 {
     return (glist->gl_havewindow ||
         (x->te_pd != canvas_class && x->te_pd->c_wb != &text_widgetbehavior) ||
-        (x->te_pd == canvas_class && (((t_glist *)x)->gl_isgraph)));
+        (x->te_pd == canvas_class && (((t_glist *)x)->gl_isgraph)) ||
+        (glist->gl_goprect && (x->te_type == T_TEXT)));
 }
 
 static void text_vis(t_gobj *z, t_glist *glist, int vis)

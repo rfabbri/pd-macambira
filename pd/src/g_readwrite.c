@@ -597,11 +597,23 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
         print out a "coords" message to set up the coordinate systems */
     if (x->gl_isgraph || x->gl_x1 || x->gl_y1 ||
         x->gl_x2 != 1 ||  x->gl_y2 != 1 || x->gl_pixwidth || x->gl_pixheight)
-            binbuf_addv(b, "ssfffffff;", gensym("#X"), gensym("coords"),
+    {
+        if (x->gl_isgraph && x->gl_goprect)
+                /* if we have a graph-on-parent rectangle, we're new style.
+                The format is arranged so
+                that old versions of Pd can at least do something with it. */
+            binbuf_addv(b, "ssfffffffff;", gensym("#X"), gensym("coords"),
+                x->gl_x1, x->gl_y1,
+                x->gl_x2, x->gl_y2,
+                (float)x->gl_pixwidth, (float)x->gl_pixheight,
+                1., (float)x->gl_xmargin, (float)x->gl_ymargin); 
+                    /* otherwise write in 0.38-compatible form */
+        else binbuf_addv(b, "ssfffffff;", gensym("#X"), gensym("coords"),
                 x->gl_x1, x->gl_y1,
                 x->gl_x2, x->gl_y2,
                 (float)x->gl_pixwidth, (float)x->gl_pixheight,
                 (float)x->gl_isgraph);
+    }
 }
 
     /* call this recursively to collect all the template names for
