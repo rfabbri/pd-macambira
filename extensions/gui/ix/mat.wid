@@ -9,59 +9,52 @@ namespace eval ::ix {
 	set vel [$p.m itemcget $item -fillopacity]
 	pd [concat $t.rp _cb note [dict get $_($t) $id y] $vel $len \;]}
 
-    proc mat_action {p t a x y} {
-    }
-
     proc mat_scroll {p t d axis} {
 	variable _
 	foreach xy $axis {
 	    set mv [expr ($_($t:${xy}b) - $_($t:${xy}a)) / 4.0]
 	    foreach ab {a b} {set _($t:${xy}$ab) [expr $_($t:${xy}$ab) $d $mv]}}
 	mat_redraw $p $t all
-	mat_gridlines $p $t
-    }
+	mat_gridlines $p $t} 
 
     proc mat_sel {a p t x y} {
 	variable _
+	set _($t:sc) [rc]
 	switch $a {
 	    start {
 		foreach xy {x y}  {set _($t:c$xy) [set $xy];set _($t:f$xy) [set $xy]}
-		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] -tags sel -stroke [rc] -strokewidth 12 -strokeopacity 0.3
-
-	    }
-	    close {
-		$p.m delete sel
-	    }
+		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 12 -ry 12] \
+		    -tags sel -stroke $_($t:sc) -strokewidth 12 -strokeopacity 0.3}
+	    close {$p.m delete sel}
 	    motion {
 		if {$x >= $_($t:cx)} {set xa $_($t:fx);set xb $x} else {set xa $x;set xb $_($t:fx)}
 		if {$y >= $_($t:cy)} {set ya $_($t:fy);set yb $y} else {set ya $y;set yb $_($t:fy)}
 		set w [expr abs($xb - $xa)]
 		set h [expr abs($yb - $ya)]
 		$p.m coords sel [::tkpath::coords rect $xa $ya $w $h -rx 12 -ry 12]
-	    }
-	}
-   }
+		$p.m itemconfigure sel -stroke $_($t:sc)}}}
+
+    proc mat_item_new {p t} {
+	variable _
+	incr _($t:i)
+	mat_item_update $p $t $_($t:i) [$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [list item $_($t:i)] -fill green -fillopacity 0.8] abs 0 0 0 0}
+    
+    proc mat_item_update {p t item ci r x y xx yy} {
+	variable _
+	foreach v {ci x xx y yy} {
+	    if {[set $v] ne "-"} {
+		switch $r {
+		    abs {dict set _($t) $item $v [set $v]}
+		    rel {dict set _($t) $item $v [expr [dict get $_($t) $item $v] + [set $v]]}}}}
+	mat_redraw $p $t [dict get $_($t) $item ci]}
 
     proc mat_draw {p t a x y} {
 	variable _
 	switch $a {
 	    motion {
 		if {$x >= $_($t:cx)} {set xa $_($t:fx);set xb $x} else {set xa $x;set xb $_($t:fx)}
-		set w [expr abs($xb - $xa)]
-		set h [mat_tr $p $t y id 1]
-		$p.m coords drawing [::tkpath::coords rect $xa $y $w $h -rx 3 -ry 3]
-		set yi [mat_tr $p $t y i $y]
-		dict set _($t) $_($t:i) x [mat_tr $p $t x i $xa]
-		dict set _($t) $_($t:i) y $yi
-		dict set _($t) $_($t:i) xx [mat_tr $p $t x i $xb]
-		dict set _($t) $_($t:i) yy $yi
-		pd [concat $t.rp _cb note $yi 0.8 \;]}
-	    first {
-		foreach xy {x y}  {set _($t:c$xy) [set $xy]}
-		$p.m create path [::tkpath::coords rect $_($t:cx) $_($t:cy) 0 0 -rx 3 -ry 3] -tags drawing -fill green -fillopacity 0.8}
-	    release {
-		$p.m itemconfigure drawing -tags [list item $_($t:i)] -matrix {{1.0 0.0} {0.0 1.0} {0.0 0.0}}
-		incr _($t:i)}}}
+		mat_item_update $p $t $_($t:i) - abs [mat_tr $p $t x i $xa] [mat_tr $p $t y i $y] [mat_tr $p $t x i $xb] [mat_tr $p $t y i $y]}
+	    first {mat_item_new $p $t}}}
 
     proc mat_resize_canvas {p t a x y} {
 	variable _
@@ -70,32 +63,28 @@ namespace eval ::ix {
 	foreach xy {x y} {
 	    set mvt [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
 	    set _($t:${xy}a) [expr $_($t:${xy}a) - $mvt]
-	    set _($t:${xy}b) [expr $_($t:${xy}b) + $mvt]
-	}
+	    set _($t:${xy}b) [expr $_($t:${xy}b) + $mvt]}
 	mat_redraw $p $t all
-	mat_gridlines $p $t
-    }
+	mat_gridlines $p $t}
 
     proc mat_redraw {p t items} {
 	variable _
 	switch $items {
 	    all {set items [$p.m find withtag item]}
-	    default {}
-	}
+	    default {}}
 	foreach item $items {
 	    set id [lindex [$p.m itemcget $item -tags] 1]
 	    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
 	    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
-	    set sx [mat_tr $p $t x id [expr [dict get $_($t) $id xx] - [dict get $_($t) $id x]]]
-	    set sy [mat_tr $p $t y id 1]
-	    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
-	}
-    }
+	    set sx [expr abs([mat_tr $p $t x id [expr [dict get $_($t) $id xx] - [dict get $_($t) $id x]]])]
+	    set sy [expr abs([mat_tr $p $t y id 1])]
+#	    puts "$px $py $sx $sy"
+	    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]}}
 
     proc mat_object_trans {p t a x y} {
 	variable _
 	set velo [expr ($x - $_($t:cx)) / 100.0]
-	foreach item $_($t:cl) {
+	foreach item $_($t:sel) {
 	    set vel [expr $velo + [$p.m itemcget $item -fillopacity]]
 	    if {$vel > 1} {set vel 1}
 	    if {$vel < 0} {set vel 0}
@@ -110,42 +99,47 @@ namespace eval ::ix {
 	foreach xy {x y} {
 	    set mvt [mat_tr $p $t $xy d [expr $$xy - $_($t:c$xy)]]
 	    foreach ab {a b} {set _($t:${xy}$ab) [expr $_($t:${xy}$ab) - $mvt]}}	
-	foreach item [$p.m find withtag item] {
-	    set m [$p.m itemcget $item -matrix]
-	    set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mx] [expr [lindex [lindex $m 2] 1] + $my]]]
-	    $p.m itemconfigure $item -matrix $m
-	}
-	mat_gridlines $p $t
-    }
+	mat_redraw $p $t all
+	mat_gridlines $p $t}
 
     proc mat_move_object {p t a x y} {
 	variable _
-	set mx [expr $x - $_($t:cx)]
-	set my [expr $y - $_($t:cy)]
-	foreach item $_($t:cl) {
-	    set m [$p.m itemcget $item -matrix]
-	    set m [list [lindex $m 0] [lindex $m 1] [list [expr [lindex [lindex $m 2] 0] + $mx] [expr [lindex [lindex $m 2] 1] + $my]]]
-	    $p.m itemconfigure $item -matrix $m
-	}
-    }
+	set mx [mat_tr $p $t x d [expr $x - $_($t:cx)]]
+	set my [mat_tr $p $t y d [expr $y - $_($t:cy)]]
+	foreach item $_($t:sel) {mat_item_update $p $t [lindex [$p.m itemcget $item -tags] 1] - rel $mx $my $mx $my}}
+
+    proc mat_cleansel {p t sel} {
+	set clean {}
+	foreach item $sel {if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} { lappend clean $item}}
+	return $clean}
 
     proc mat_hover {p t x y} {
 	variable _
 	if {[$p.m find withtag sel] ne ""} {
-	    set clicked [$p.m find overlapping $x $y $_($t:fx) $_($t:fy)] 
+	    set clicked [$p.m find overlapping $_($t:fx) $_($t:fy) $x $y] 
 	    mat_sel motion $p $t $x $y
 	} else {
+#	    if {[llength $_($t:sel)] > 1} {return}
 	    set clicked [$p.m find overlapping $x $y $x $y]
 	}
 	set n 0
 	$p.m delete hover
-	foreach item $clicked {
-	    if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} {
+	set clicked [mat_cleansel $p $t $clicked]
+	if {$clicked ne ""} {
+	    mat_mode $p $t move_object
+	    foreach item $_($t:sel) {
+		if {[lsearch -integer $clicked $item] < 0} {
+		    $p.m itemconfigure $item -fill blue}}
+	    foreach item $clicked {
 		set id [lindex [$p.m itemcget $item -tags] 1]
-#		mat_note $p $t $item
+		$p.m itemconfigure $item -fill $_($t:sc)
+		#		mat_note $p $t $item
 		$p.m create text "[expr [winfo width $p.m] - 8.0 ] [expr [winfo height $p.m] - 8.0 - 11 * $n.0]" -fill "#ff0022" -justify right -anchor se -font {{bitstream vera sans} 10} -tags hover -text [dict get $_($t) $id] 
-		incr n
+		incr n		
 	    }
+	    set _($t:sel) $clicked
+	} else {
+	    mat_mode $p $t move_canvas
 	}
 	mat_loc $p $t $x $y
     }
@@ -156,32 +150,17 @@ namespace eval ::ix {
 	set a [$p.m itemcget mode -text]
 	switch $action {
 	    first {
-		set _($t:cl) $clicked
 		foreach xy {x y}  {set _($t:f$xy) [set $xy]}
 		switch $button {
-		    1 {
-			if {$a eq "draw"} {mat_draw $p $t $action $x $y} elseif {$m eq "double"} {
-			    mat_sel start $p $t $x $y
-			} elseif {[$p.m find withtag sel] ne ""} {
-			    mat_sel close $p $t $x $y
-			} else {
-			    if {$clicked ne "" && [lindex [$p.m itemcget [lindex $clicked 0] -tags] 0] eq "item"} {
-				mat_mode $p $t move_object
-			    } else {
-				mat_mode $p $t move_canvas
-			    }
-			}
-		    }
+		    1 {if {$m eq "control"} {
+			mat_mode $p $t draw; mat_draw $p $t $action $x $y
+		    } elseif {$m eq "double"} {
+			mat_sel start $p $t $x $y
+		    } elseif {[$p.m find withtag sel] ne ""} {
+			mat_sel close $p $t $x $y}}
 		    2 {mat_mode $p $t resize_canvas}
-		    3 {
-			if {$clicked ne "" && [lindex [$p.m itemcget [lindex $clicked 0] -tags] 0] eq "item"} {
-			    mat_mode $p $t object_trans
-			} else {
-			    mat_rmenu $p $t $X $Y
-			}
-		    }
-		}
-	    }
+		    3 {if {$clicked ne "" && [lindex [$p.m itemcget [lindex $clicked 0] -tags] 0] eq "item"} {
+			mat_mode $p $t object_trans } else {mat_rmenu $p $t $X $Y}}}}
 	    motion {eval mat_$a $p $t $action $x $y}
 	    release {
 		switch $button {
@@ -195,7 +174,7 @@ namespace eval ::ix {
 	}
 	foreach xy {x y}  {set _($t:c$xy) [set $xy]}
     }
-
+    
     proc mat_rmenu {p t x y} {
 	if {[winfo exists $p.rmenu] != 1} {
 	    set m [menu $p.rmenu -tearoff no]
@@ -213,18 +192,10 @@ namespace eval ::ix {
 	variable _
 	array set dm {x width y height}
 	switch $inv {
-	    #value->pixels
 	    t {return [expr ($v - $_($t:${d}a)) / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
-
-	    #pixels->value
 	    i {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0) + $_($t:${d}a)]}
-
-	    #pixels->value (distance)
 	    d {return [expr ($_($t:${d}b) - $_($t:${d}a)) * $v /([winfo $dm($d) $p.m] + 0.0)]}
-
-	    #values->pixel (distance)
-	    #	   id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}
-	    id {return [expr abs($v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m])]}}}
+	    id {return [expr $v / ($_($t:${d}b) - $_($t:${d}a) + 0.0) * [winfo $dm($d) $p.m]]}}}
 
     proc mat_zoom {p t a} {
 	variable _
@@ -254,7 +225,6 @@ namespace eval ::ix {
 		set _($t:xb) $xb
 		set _($t:ya) $ya
 		set _($t:yb) $yb
-		puts "new: $_($t:xa) $_($t:xb) $_($t:ya) $_($t:yb)"
 	    }
 	    reset {
 		set _($t:ya) $_($t:yao);set _($t:yb) $_($t:ybo);set _($t:xa) $_($t:xao);set _($t:xb) $_($t:xbo)
@@ -264,42 +234,29 @@ namespace eval ::ix {
 	mat_gridlines $p $t
     }
 
-    proc mat_key {p t k b} {
-#	puts $k
-	switch $b {
-	    1 {
-		switch $k {
-		    37 {mat_mode  $p $t draw}
-		}
-	    }
-	    0 {
-		switch $k {
-		    37 {mat_mode  $p $t {move_canvas}}
-		}
-	    }
-	}
-    }
     proc mat_mode {p t m} {
+	array set cursor {draw pencil move_canvas fleur move_object dotbox object_trans box_spiral resize_canvas bogosity}
 	$p.m itemconfigure mode -text $m
-    }
+	$p.m configure -cursor $cursor($m)
+     }
     proc mat_loc {p t x y} {
 	$p.m itemconfigure loc -text [list [mat_tr $p $t x i $x] [mat_tr $p $t y i $y]]
     }
 
     proc mat_new {p t w h bg ln xa xb ya yb qx qy} {
 	variable _
-	set i 0
+	set i -1
 	set _($t) {}
+	set _($t:sel) -1
+	set _($t:sc) white
 	foreach xy {x y} {foreach ab {a b} {set ${xy}${ab}o [set ${xy}${ab}]}}
 	foreach a {i ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
 	if {[winfo exists $p.m] != 1} {
 	    canvas $p.m -bg $bg -width $w -height $h
 	    pack $p.m -side left
-	    bind $p.m <Key> "::ix::mat_key $p $t %k 1"
-	    bind $p.m <KeyRelease> "::ix::mat_key $p $t %k 0"
 	    bind $p.m <Motion> "::ix::mat_hover $p $t %x %y"
-	    bind $p.m <4> "::ix::mat_scroll $p $t - x"
-	    bind $p.m <5> "::ix::mat_scroll $p $t + x"
+	    bind $p.m <4> "::ix::mat_scroll $p $t + x"
+	    bind $p.m <5> "::ix::mat_scroll $p $t - x"
 	    bind $p.m <Shift-4> "::ix::mat_scroll $p $t - y"
 	    bind $p.m <Shift-5> "::ix::mat_scroll $p $t + y"
 	    foreach m {"Control-" "" "Shift-" "Double-"} {
@@ -309,7 +266,7 @@ namespace eval ::ix {
 			bind $p.m <$m[lindex [lindex $b $ba] 0]> "::ix::mat_click [list [string tolower [string trimright $m -1]]] $bn [lindex [lindex $b $ba] 1] $p $t %x %y %X %Y"}}}
 	    set bd [expr {[$p cget -bd] * 2}]
             $p configure -bg gray -width [expr [winfo width $p.m] + $bd] -height [expr [winfo height $p.m] + $bd]
-	    $p.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text action
+	    $p.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text move_canvas
 	    $p.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill purple -tags loc -text ""
 	    mat_gridlines $p $t}}
     
@@ -328,10 +285,15 @@ namespace eval ::ix {
 	    for {set x [expr int($_($t:${xy}a) / ($_($t:q${xy}) + 0.0) + 1)*($_($t:q${xy}) + 0.0)]} {[expr $x $oa $_($t:${xy}b)]} {set x [expr $x $ob $_($t:q${xy})]} {
 		set og [mat_tr $p $t $xy t $x]
 		set invgeo [winfo $igx($xy) $w]
-		switch $xy {y {set coords [concat M 0 $og L $invgeo $og]}
-		    x {set coords [concat M $og 0 L $og $invgeo]}}
-		$w lower [$w create path $coords -stroke $_($t:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
-		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
+		switch $xy {
+#		    y {set coords [concat M 0 $og L $invgeo $og]}
+#		    x {set coords [concat M $og 0 L $og $invgeo]}}
+		    y {set coords [concat 0 $og $invgeo $og]}
+		    x {set coords [concat $og 0 $og $invgeo]}}
+#		$w lower [$w create path $coords -stroke $_($t:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
+		$w lower [$w create line $coords -fill $_($t:ln) -tags gridline -width 1]
+#		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
+		$w lower [$w create text [lrange $coords 0 1] -font {{Bitstream Vera Sans} 8} \
 			      -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline]}}}}
 
 #> mat frame
@@ -341,3 +303,5 @@ namespace eval ::ix {
 #. @add  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
 puts "mat .- .|"
 ::ix::mat_new .- .| .#w .#h .#bg .#ln .#Xa .#Xb .#Ya .#Yb .#qx .#qy
+#bind .- <Enter> {focus .-}
+#bind .- <Leave> {focus .^.c}
