@@ -25,7 +25,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error PD version >= 0.37 required, please upgrade! 
 #endif
 
-#define PY__VERSION "0.2.0pre"
+#define PY__VERSION "0.2.0"
 
 
 #define PYEXT_MODULE "pyext" // name for module
@@ -200,19 +200,19 @@ public:
     // (recursive calls can only happen in the system thread)
     static int lockcount;
 
-	inline PyThreadState *PyLock(PyThreadState *st = FindThreadState()) 
+	static PyThreadState *PyLock(PyThreadState *st = FindThreadState()) 
     { 
         if(!IsSystemThread() || !lockcount++) PyEval_AcquireLock();
 	    return PyThreadState_Swap(st);
     }
 
-	inline PyThreadState *PyLockSys() 
+	static PyThreadState *PyLockSys() 
     { 
         if(!lockcount++) PyEval_AcquireLock();
 	    return PyThreadState_Swap(pythrsys);
     }
 
-	inline void PyUnlock(PyThreadState *st) 
+	static void PyUnlock(PyThreadState *st) 
     {
         PyThreadState *old = PyThreadState_Swap(st);
         if(old != pythrsys || !--lockcount) PyEval_ReleaseLock();
@@ -222,9 +222,9 @@ public:
 	inline void Lock() {}
 	inline void Unlock() {}
 
-	inline PyThreadState *PyLock(PyThreadState * = NULL) { return NULL; }
-	inline PyThreadState *PyLockSys() { return NULL; }
-	inline void PyUnlock(PyThreadState *st) {}
+	static PyThreadState *PyLock(PyThreadState * = NULL) { return NULL; }
+	static PyThreadState *PyLockSys() { return NULL; }
+	static void PyUnlock(PyThreadState *st) {}
 #endif
 
 	static PyObject* StdOut_Write(PyObject* Self, PyObject* Args);
