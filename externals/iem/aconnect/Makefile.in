@@ -20,6 +20,7 @@ WFLAGS =
 MAKEDEP_FLAGS = @MAKEDEP_FLAGS@
 
 TARNAME =  $(LIBNAME).tgz
+BINTARNAME =  $(LIBNAME)-bin.tgz
 
 .SUFFIXES: .$(EXT)
 
@@ -32,13 +33,15 @@ TARGETS = $(SOURCES:.c=.o)
 
 
 all: $(LIBNAME)
-	cp $(LIBNAME).$(EXT) ..
 
 clean:
-	-rm -f *.$(EXT) *.o 
+	-rm -f *.o *.d
 
-distclean: clean
-	-rm -f *~ _* config.* *.d
+binclean:
+	-rm -f *.$(EXT)
+
+distclean: clean binclean
+	-rm -f *~ _* config.*
 	-rm -rf autom4te.cache
 
 install: install-bin install-doc
@@ -51,8 +54,11 @@ install-doc:
 	-install -d $(INSTALL_DOC)
 	-install -m 644 ../doc/*.pd $(INSTALL_DOC)
 
-dist: all distclean
+dist: distclean
 	(cd ..;tar czvf $(TARNAME) $(LIBNAME))
+
+distbin: distclean all clean
+	(cd ..; tar cvzf $(BINTARNAME) $(LIBNAME))
 
 everything: clean all install distclean
 
