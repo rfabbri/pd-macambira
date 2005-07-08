@@ -15,6 +15,14 @@ GOP font depends on abstraction, not parent
 
 
 ------------ 0.39 ---------
+problems:
+array dimension change gives TK erro (doesn't update)
+throwing new array on canvas makes red rectangle?
+dialog doesn't start array dialog, just canvas one
+arrays that don't fit in bounds don't update (same as red rectangle problem?)
+
+
+flag for array to suppress printing name
 
 check:
 MIDI I/O for windows

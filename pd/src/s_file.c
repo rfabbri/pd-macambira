@@ -270,8 +270,9 @@ void sys_loadpreferences( void)
     if (sys_getpreference("audioapi", prefbuf, MAXPDSTRING)
         && sscanf(prefbuf, "%d", &api) > 0)
             sys_set_audio_api(api);
-    if (sys_getpreference("noaudioin", prefbuf, MAXPDSTRING))
-        naudioindev = 0;
+    if (sys_getpreference("noaudioin", prefbuf, MAXPDSTRING) &&
+        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+            naudioindev = 0;
     else
     {
         for (i = 0, naudioindev = 0; i < MAXAUDIOINDEV; i++)
@@ -287,8 +288,9 @@ void sys_loadpreferences( void)
         if (naudioindev == 0)
             naudioindev = -1;
     }
-    if (sys_getpreference("noaudioout", prefbuf, MAXPDSTRING))
-        naudiooutdev = 0;
+    if (sys_getpreference("noaudioout", prefbuf, MAXPDSTRING) &&
+        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+            naudiooutdev = 0;
     else
     {
         for (i = 0, naudiooutdev = 0; i < MAXAUDIOOUTDEV; i++)
@@ -311,8 +313,9 @@ void sys_loadpreferences( void)
         naudiooutdev, audiooutdev, naudiooutdev, choutdev, rate, advance, 0);
         
         /* load MIDI preferences */
-    if (sys_getpreference("nomidiin", prefbuf, MAXPDSTRING))
-        nmidiindev = 0;
+    if (sys_getpreference("nomidiin", prefbuf, MAXPDSTRING) &&
+        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+            nmidiindev = 0;
     else for (i = 0, nmidiindev = 0; i < MAXMIDIINDEV; i++)
     {
         sprintf(keybuf, "midiindev%d", i+1);
@@ -322,8 +325,9 @@ void sys_loadpreferences( void)
             break;
         nmidiindev++;
     }
-    if (sys_getpreference("nomidiout", prefbuf, MAXPDSTRING))
-        nmidioutdev = 0;
+    if (sys_getpreference("nomidiout", prefbuf, MAXPDSTRING) &&
+        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+            nmidioutdev = 0;
     else for (i = 0, nmidioutdev = 0; i < MAXMIDIOUTDEV; i++)
     {
         sprintf(keybuf, "midioutdev%d", i+1);
@@ -397,16 +401,14 @@ void glob_savepreferences(t_pd *dummy)
     sys_get_audio_params(&naudioindev, audioindev, chindev,
         &naudiooutdev, audiooutdev, choutdev, &rate, &advance);
 
-    if (naudioindev <= 0)
-        sys_putpreference("noaudioin", ".");
+    sys_putpreference("noaudioin", (naudioindev <= 0 ? "True" : "False"));
     for (i = 0; i < naudioindev; i++)
     {
         sprintf(buf1, "audioindev%d", i+1);
         sprintf(buf2, "%d %d", audioindev[i], chindev[i]);
         sys_putpreference(buf1, buf2);
     }
-    if (naudiooutdev <= 0)
-        sys_putpreference("noaudioout", ".");
+    sys_putpreference("noaudioout", (naudiooutdev <= 0 ? "True" : "False"));
     for (i = 0; i < naudiooutdev; i++)
     {
         sprintf(buf1, "audiooutdev%d", i+1);
@@ -422,16 +424,14 @@ void glob_savepreferences(t_pd *dummy)
 
         /* MIDI settings */
     sys_get_midi_params(&nmidiindev, midiindev, &nmidioutdev, midioutdev);
-    if (nmidiindev <= 0)
-        sys_putpreference("nomidiin", ".");
+    sys_putpreference("nomidiin", (nmidiindev <= 0 ? "True" : "False"));
     for (i = 0; i < nmidiindev; i++)
     {
         sprintf(buf1, "midiindev%d", i+1);
         sprintf(buf2, "%d", midiindev[i]);
         sys_putpreference(buf1, buf2);
     }
-    if (nmidioutdev <= 0)
-        sys_putpreference("nomidiout", ".");
+    sys_putpreference("nomidiout", (nmidioutdev <= 0 ? "True" : "False"));
     for (i = 0; i < nmidioutdev; i++)
     {
         sprintf(buf1, "midioutdev%d", i+1);

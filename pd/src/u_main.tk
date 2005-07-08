@@ -102,24 +102,16 @@ menu .mbar.audio -tearoff $pd_tearoff
 if {$pd_nt != 2} {
     .mbar add cascade -label "Windows" -menu .mbar.windows
     .mbar add cascade -label "Media" -menu .mbar.audio
-# a menu on the main menubar named $whatever.help while be treated
-# as a special menu with specific behaviors on different platforms.
-# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-	 menu .mbar.help -tearoff $pd_tearoff
-	 .mbar add cascade -label "Help" -menu .mbar.help
+    menu .mbar.help -tearoff $pd_tearoff
+    .mbar add cascade -label "Help" -menu .mbar.help
 } else {
-	 menu .mbar.apple -tearoff 0
-	 .mbar add cascade -label "Apple" -menu .mbar.apple 
+    menu .mbar.apple -tearoff 0
+    .mbar add cascade -label "Apple" -menu .mbar.apple 
 # arrange menus according to Apple HIG
     .mbar add cascade -label "Media" -menu .mbar.audio
     .mbar add cascade -label "Window" -menu .mbar.windows
-# a menu on the main menubar named "$whatever.help" while be treated
-# as a special menu with specific behaviors on different platforms.
-# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-# Apple doesn't allow cascading menus in their Help so I had to call this 
-# one $mbar.docs # <hans@at.or.at>
-	 menu .mbar.docs -tearoff $pd_tearoff
-	 .mbar add cascade -label "Help" -menu .mbar.docs
+    menu .mbar.help -tearoff $pd_tearoff
+    .mbar add cascade -label "Help" -menu .mbar.help
 }
 
 set ctrls_audio_on 0
@@ -506,31 +498,15 @@ proc menu_addstd {mbar} {
 	 }
 
 
-#          the "Help" menu
-	 if {$pd_nt != 2} {
-# a menu on the main menubar named "$whatever.help" while be treated
-# as a special menu with specific behaviors on different platforms.
-# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-    $mbar.help add command -label {About Pd} \
-	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
-    $mbar.help add command -label {Pure Documentation...} \
-	-command {menu_documentation} 
-		  # add menu items for each section instead of using Pd patches
-		  $mbar.help add separator
-		  set helpmenuname help
-	 } else {
-# Apple doesn't allow cascading menus in their Help so I had to call this 
-# one "docs"  <hans@at.or.at>
-		  set helpmenuname docs
-	 }
-
-	 $mbar.$helpmenuname add command -label {1 manual...} \
-		  -command {menu_doc_open doc/1.manual index.htm} 
-	 doc_submenu $mbar.$helpmenuname 2.control.examples
-	 doc_submenu $mbar.$helpmenuname 3.audio.examples
-	 doc_submenu $mbar.$helpmenuname 4.fft.examples
-	 doc_submenu $mbar.$helpmenuname 5.reference
-	 doc_submenu $mbar.$helpmenuname 6.externs
+    	# the "Help" menu
+    if {$pd_nt != 2} {
+    	$mbar.help add command -label {About Pd} \
+	    -command {menu_doc_open doc/1.manual 1.introduction.txt} 
+    }
+    $mbar.help add command -label {Html ...} \
+    	-command {menu_doc_open doc/1.manual index.htm} 
+    $mbar.help add command -label {Browser ...} \
+    	-command {menu_documentation} 
 }
 
 #################### the "File" menu for the Pd window ##############
@@ -1104,18 +1080,8 @@ proc pdtk_canvas_new {name width height geometry editable} {
 
 # the help menu
 
-# a menu on the main menubar named "$whatever.help" while be treated
-# as a special menu with specific behaviors on different platforms.
-# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-	 if {$pd_nt != 2} {
     menu $name.m.help -tearoff $pd_tearoff
     $name.m add cascade -label Help -menu $name.m.help
-	 } else {
-		  # Apple doesn't allow cascading menus in their Help
-		  # so I had to call this one "docs". <hans@at.or.at>
-		  menu $name.m.docs -tearoff $pd_tearoff
-		  $name.m add cascade -label Help -menu  $name.m.docs
-	 }
 
     menu_addstd $name.m
 

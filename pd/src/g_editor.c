@@ -853,11 +853,14 @@ void canvas_setgraph(t_glist *x, int flag, int nogoprect)
     }
 }
 
+void garray_properties(t_garray *x);
+
     /* tell GUI to create a properties dialog on the canvas.  We tell
     the user the negative of the "pixel" y scale to make it appear to grow
     naturally upward, whereas pixels grow downward. */
 void canvas_properties(t_glist *x)
 {
+    t_gobj *y;
     char graphbuf[200];
     if (glist_isgraph(x) != 0)
         sprintf(graphbuf,
@@ -875,6 +878,10 @@ void canvas_properties(t_glist *x)
                 (int)x->gl_pixwidth, (int)x->gl_pixheight,
                 (int)x->gl_xmargin, (int)x->gl_ymargin);
     gfxstub_new(&x->gl_pd, x, graphbuf);
+        /* if any arrays are in the graph, put out their dialogs too */
+    for (y = x->gl_list; y; y = y->g_next)
+        if (pd_class(&y->g_pd) == garray_class) 
+            garray_properties((t_garray *)y);
 }
 
     /* called from the gui when "OK" is selected on the canvas properties
@@ -946,7 +953,9 @@ static void canvas_donecanvasdialog(t_glist *x,
     }
         /* LATER avoid doing 2 redraws here (possibly one inside setgraph) */
     canvas_setgraph(x, graphme, 0);
-    canvas_redraw(x);
+    if (x->gl_havewindow)
+        canvas_redraw(x);
+    else gobj_redraw(&x->gl_gobj, x->gl_owner);
 }
 
     /* called from the gui when a popup menu comes back with "properties,"

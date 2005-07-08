@@ -39,7 +39,8 @@ void glist_add(t_glist *x, t_gobj *y)
     }
     if (x->gl_editor && (ob = pd_checkobject(&y->g_pd)))
         rtext_new(x, ob);
-    if (x->gl_editor && x->gl_isgraph && !x->gl_goprect)
+    if (x->gl_editor && x->gl_isgraph && !x->gl_goprect
+        && pd_checkobject(&y->g_pd))
     {
         x->gl_goprect = 1;
         canvas_drawredrect(x, 1);
@@ -1058,8 +1059,6 @@ static int graph_click(t_gobj *z, struct _glist *glist,
         return (clickreturned); 
     }
 }
-
-void garray_properties(t_garray *x);
 
 t_widgetbehavior graph_widgetbehavior =
 {

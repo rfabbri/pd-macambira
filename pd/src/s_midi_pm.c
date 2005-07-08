@@ -37,18 +37,6 @@ void sys_do_open_midi(int nmidiin, int *midiinvec,
     
     Pt_Start(1, 0, 0); /* start a timer with millisecond accuracy */
 
-        /* protect the unwary from having MIDI inputs open; they're
-        bad news if you close Pd's terminal window.  see sys_nmidiin
-        in s_main.c too. */
-#ifdef MSW
-    if (nmidiin)
-    {
-        post(
-         "midi input enabled; warning, don't close the DOS window directly!");
-    }
-    else post("not using MIDI input (use 'pd -midiindev 1' to override)");
-#endif
-
     mac_nmidiindev = 0;
     for (i = 0; i < nmidiin; i++)
     {

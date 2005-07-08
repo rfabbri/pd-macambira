@@ -20,7 +20,7 @@ CFLAGS = /nologo /W3 /DMSW /DNT /DPD /DPD_INTERNAL /DWIN32 /DWINDOWS /Ox \
 LFLAGS = /nologo
 
 SYSSRC = s_audio_pa.c s_audio_pablio.c s_audio_paring.c \
-    s_audio_mmio.c s_midi_mmio.c
+    s_audio_mmio.c s_midi_pm.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -54,8 +54,9 @@ SRCPA = $(PADIR)/pa_common/pa_stream.c \
 
 SRCASIO = $(PADIR)/pa_asio/pa_asio.cpp 
 
-ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib $(LDIR)\comdlg32.lib \
-$(LDIR)\advapi32.lib $(LDIR)\shell32.lib $(LDIR)\ole32.lib $(LDIR)\oleaut32.lib $(LDIR)\uuid.lib \
+ASIOLIB = $(LDIR)\user32.lib $(LDIR)\gdi32.lib $(LDIR)\winspool.lib \
+$(LDIR)\comdlg32.lib $(LDIR)\advapi32.lib $(LDIR)\shell32.lib \
+$(LDIR)\ole32.lib $(LDIR)\oleaut32.lib $(LDIR)\uuid.lib \
 $(LDIR)\odbc32.lib $(LDIR)\odbccp32.lib ..\lib\asio\asiolib.lib
 
 
@@ -64,15 +65,26 @@ PAOBJ = pa_stream.obj pa_trace.obj pa_skeleton.obj pa_process.obj \
 	pa_allocation.obj pa_win_util.obj pa_win_hostapis.obj pa_asio.obj \
 	pa_win_wmme.obj
 
+PMDIR = ..\portmidi
+INCPM = -I$(PMDIR)\pm_common -I$(PMDIR)\pm_win -I$(PMDIR)\porttime
+SRCPM = $(PADIR)/pm_common/portmidi.c \
+        $(PMDIR)/pm_common/pmutil.c \
+        $(PMDIR)/porttime/porttime.c \
+        $(PMDIR)/porttime/ptwinmm.c \
+        $(PMDIR)/pm_win/pmwin.c \
+        $(PMDIR)/pm_win/pmwinmm.c
 
-OBJC = $(SRC:.c=.obj) $(PAOBJ)
+PMOBJ = portmidi.obj pmutil.obj porttime.obj ptwinmm.obj pmwin.obj pmwinmm.obj
+
+OBJC = $(SRC:.c=.obj) $(PAOBJ) $(PMOBJ)
 
 GSRC =  t_main.c t_tkcmd.c
 
 GOBJ = $(GSRC:.c=.obj)
 .PHONY: pd gui
 
-ALLCF = $(CFLAGS)  $(INCLUDE) $(INCASIO) $(INCPA) $(INCPM) /D_WINDOWS /DPA_NO_DS
+ALLCF = $(CFLAGS)  $(INCLUDE) $(INCASIO) $(INCPA) $(INCPM) /D_WINDOWS \
+    /DPA_NO_DS
 
 .c.obj:
 	cl /c $(ALLCF) /Tc$*.c
@@ -100,8 +112,8 @@ gui: ..\bin\pdtcl.dll
 	    $(LIB)
 
 ..\bin\pdreceive.exe: u_pdreceive.obj
-	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO u_pdreceive.obj \
-	    $(LIB)
+	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO \
+	    u_pdreceive.obj $(LIB)
 
 # explicit rules to compile portaudio sources:
 pa_stream.obj: $(PADIR)\pa_common\pa_stream.c
@@ -131,6 +143,19 @@ pa_win_wmme.obj: $(PADIR)\pa_win_wmme\pa_win_wmme.c
 	cl /c $(ALLCF) $(PADIR)\pa_win_wmme\pa_win_wmme.c
 pa_asio.obj: $(PADIR)\pa_asio\pa_asio.cpp
 	cl /c $(ALLCF) $(PADIR)\pa_asio\pa_asio.cpp
+
+portmidi.obj: $(PMDIR)\pm_common\portmidi.c
+	cl /c $(ALLCF) $(PMDIR)\pm_common\portmidi.c
+pmutil.obj: $(PMDIR)\pm_common\pmutil.c
+	cl /c $(ALLCF) $(PMDIR)\pm_common\pmutil.c
+pmwin.obj: $(PMDIR)\pm_win\pmwin.c
+	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwin.c
+pmwinmm.obj: $(PMDIR)\pm_win\pmwinmm.c
+	cl /c $(ALLCF) $(PMDIR)\pm_win\pmwinmm.c
+porttime.obj: $(PMDIR)\porttime\porttime.c
+	cl /c $(ALLCF) $(PMDIR)\porttime\porttime.c
+ptwinmm.obj: $(PMDIR)\porttime\ptwinmm.c
+	cl /c $(ALLCF) $(PMDIR)\porttime\ptwinmm.c
 
 # the following should also clean up "bin" but it doesn't because "bin" holds
 # precious stuff from elsewhere.

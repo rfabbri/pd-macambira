@@ -507,11 +507,7 @@ void sys_reopen_midi( void)
 #define MAXNDEV 20
 #define DEVDESCSIZE 80
 
-#ifdef MSW
-#define DEVONSET 0  /* microsoft device list starts at 0 (the "mapper"). */
-#else               /* (see also MSW ifdef in sys_parsedevlist(), s_main.c)  */
 #define DEVONSET 1  /* To agree with command line flags, normally start at 1 */
-#endif
 
 void sys_listmididevs(void )
 {
