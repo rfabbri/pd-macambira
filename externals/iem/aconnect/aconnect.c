@@ -18,6 +18,7 @@
  * license: GNU General Public License v.2
  *
  ******************************************************/
+#define ACONNECT_VERSION "0.2"
 
 #include "m_pd.h"
 
@@ -393,6 +394,7 @@ void aconnect_setup(void)
   post("          ported to pure-data by IOhannes m zmölnig 2005");
   post("          institute of electronic music and acoustics (iem)");
   post("          published under the GNU General Public License version 2");
+  post("          version:"ACONNECT_VERSION"\tcompiled: "__DATE__"");
 
   aconnect_class = class_new(gensym("aconnect"), (t_newmethod)aconnect_new, 0,
 			     sizeof(t_aconnect), 0, 0);
