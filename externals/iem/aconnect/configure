@@ -1291,6 +1291,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+VERSION=0.2
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -2530,6 +2532,8 @@ fi
 if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
   DFLAGS="-DHAVE_ALSA ${DFLAGS}"
 fi
+
+DFLAGS="-DACONNECT_VERSION=\\\"${VERSION}\\\" ${DFLAGS}"
 
 if test "x$includedir" != "x"; then
  for id in $includedir

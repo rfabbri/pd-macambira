@@ -6,7 +6,7 @@ INSTALL_BIN=$(PREFIX)/extra
 INSTALL_DOC=$(PREFIX)/extra/help-$(LIBNAME)
 
 EXT = pd_linux 
-DEFS = -DHAVE_ALSA 
+DEFS = -DACONNECT_VERSION=\"0.2\" -DHAVE_ALSA 
 IFLAGS = -I.  $(INCLUDES)
 
 CC = gcc

@@ -1,6 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(aconnect.c)
 
+VERSION=0.2
+
 dnl Checks for programs.
 AC_PROG_CC
 
@@ -38,6 +40,8 @@ AC_CHECK_LIB(asound, snd_seq_close)
 if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
   DFLAGS="-DHAVE_ALSA ${DFLAGS}"
 fi
+
+DFLAGS="-DACONNECT_VERSION=\\\"${VERSION}\\\" ${DFLAGS}"
 
 if test "x$includedir" != "x"; then
  for id in $includedir
