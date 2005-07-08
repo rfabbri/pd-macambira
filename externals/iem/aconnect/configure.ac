@@ -16,7 +16,7 @@ AC_SUBST(STRIPFLAGS)
 AC_SUBST(REFERENCEPATH)
 AC_SUBST(PDLIBDIR)
 AC_SUBST(INCLUDES)
-AC_SUBST(SOURCES)
+AC_SUBST(VERSION)
 
 
 AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (e.g. 0.37)])
@@ -40,8 +40,6 @@ AC_CHECK_LIB(asound, snd_seq_close)
 if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
   DFLAGS="-DHAVE_ALSA ${DFLAGS}"
 fi
-
-DFLAGS="-DACONNECT_VERSION=\\\"${VERSION}\\\" ${DFLAGS}"
 
 if test "x$includedir" != "x"; then
  for id in $includedir

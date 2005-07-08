@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT STK DFLAGS LFLAGS EXT LD STRIP STRIPFLAGS REFERENCEPATH PDLIBDIR INCLUDES SOURCES CPP EGREP MAKEDEP_FLAGS ac_ct_LD ac_ct_STRIP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT STK DFLAGS LFLAGS EXT LD STRIP STRIPFLAGS REFERENCEPATH PDLIBDIR INCLUDES VERSION CPP EGREP MAKEDEP_FLAGS ac_ct_LD ac_ct_STRIP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2532,8 +2532,6 @@ fi
 if test "x$ac_cv_lib_asound_snd_seq_close" = "xyes"; then
   DFLAGS="-DHAVE_ALSA ${DFLAGS}"
 fi
-
-DFLAGS="-DACONNECT_VERSION=\\\"${VERSION}\\\" ${DFLAGS}"
 
 if test "x$includedir" != "x"; then
  for id in $includedir
@@ -4810,7 +4808,7 @@ s,@STRIPFLAGS@,$STRIPFLAGS,;t t
 s,@REFERENCEPATH@,$REFERENCEPATH,;t t
 s,@PDLIBDIR@,$PDLIBDIR,;t t
 s,@INCLUDES@,$INCLUDES,;t t
-s,@SOURCES@,$SOURCES,;t t
+s,@VERSION@,$VERSION,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@MAKEDEP_FLAGS@,$MAKEDEP_FLAGS,;t t
