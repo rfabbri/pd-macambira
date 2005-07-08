@@ -63,7 +63,6 @@ SRC =	add2_comma.c \
 OBJ = $(SRC:.c=.obj)
 
 .c.obj:
-
 	cl $(PD_WIN_C_FLAGS) $(PD_WIN_INCLUDE_PATH) /c $*.c
 
 ..\..\lib\iemlib2.dll: $(OBJ)
