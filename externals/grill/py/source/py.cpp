@@ -8,8 +8,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 */
 
-#include "main.h"
-
+#include "pybase.h"
 
 class pyobj
     : public pybase
@@ -35,15 +34,6 @@ protected:
     void m_dir_() { m__dir(function); }
     void m_doc_() { m__doc(function); }
 
-	// methods for python arguments
-	void callwork(const t_symbol *s,int argc,const t_atom *argv);
-	
-	inline void m_bang() { callwork(NULL,0,NULL); }
-	inline void m_py_list(int argc,const t_atom *argv) { callwork(sym_list,argc,argv); }
-	inline void m_py_float(int argc,const t_atom *argv) { callwork(sym_float,argc,argv); }
-	inline void m_py_int(int argc,const t_atom *argv) { callwork(sym_int,argc,argv); }
-	inline void m_py_any(const t_symbol *s,int argc,const t_atom *argv) { callwork(s,argc,argv); }
-
 	const t_symbol *funname;
 	PyObject *function;
     bool withfunction;
@@ -60,6 +50,8 @@ protected:
     virtual bool thrcall(void *data);
     virtual void DumpOut(const t_symbol *sym,int argc,const t_atom *argv);
 
+    PyObject **objects;
+
 private:
 
     virtual bool callpy(PyObject *fun,PyObject *args);
@@ -67,21 +59,17 @@ private:
 	static void Setup(t_classid c);
 
 	FLEXT_CALLBACK(m_help)
-	FLEXT_CALLBACK(m_bang)
 	FLEXT_CALLBACK(m_reload)
 	FLEXT_CALLBACK_V(m_reload_)
 	FLEXT_CALLBACK_V(m_set)
 	FLEXT_CALLBACK(m_dir_)
 	FLEXT_CALLBACK(m_doc_)
 
-	FLEXT_CALLBACK_V(m_py_float)
-	FLEXT_CALLBACK_V(m_py_list)
-	FLEXT_CALLBACK_V(m_py_int)
-	FLEXT_CALLBACK_A(m_py_any)
-
 	// callbacks
 	FLEXT_ATTRVAR_I(detach)
+	FLEXT_ATTRVAR_B(xlate)
 	FLEXT_ATTRVAR_B(respond)
+
 	FLEXT_CALLBACK_V(m_stop)
 	FLEXT_CALLBACK(m_dir)
 	FLEXT_CALLGET_V(mg_dir)
@@ -114,56 +102,64 @@ void pyobj::Setup(t_classid c)
 	FLEXT_CADDMETHOD_(c,0,"doc+",m_doc_);
 	FLEXT_CADDMETHOD_(c,0,"dir+",m_dir_);
 
-	FLEXT_CADDBANG(c,0,m_bang);
 	FLEXT_CADDMETHOD_(c,0,"set",m_set);
 
-	FLEXT_CADDMETHOD_(c,1,"float",m_py_float);
-	FLEXT_CADDMETHOD_(c,1,"int",m_py_int);
-	FLEXT_CADDMETHOD(c,1,m_py_list);
-	FLEXT_CADDMETHOD(c,1,m_py_any);
-
+  	FLEXT_CADDATTR_VAR1(c,"xlate",xlate);
   	FLEXT_CADDATTR_VAR1(c,"respond",respond);
 }
 
-pyobj::pyobj(int argc,const t_atom *argv):
-	funname(NULL),function(NULL),withfunction(false)
+pyobj::pyobj(int argc,const t_atom *argv)
+    : funname(NULL)
+    , function(NULL)
+    , withfunction(false)
+    , objects(NULL)
 { 
-	AddInAnything(2);  
-	AddOutAnything();  
-
 #ifdef FLEXT_THREADS
     FLEXT_ADDTIMER(stoptmr,tick);
     // launch thread worker
     FLEXT_CALLMETHOD(threadworker);
 #endif
 
-	if(argc > 2) args(argc-2,argv+2);
-
 	PyThreadState *state = PyLockSys();
 
+    int inlets = -1; // -1 signals non-explicit definition
+    if(argc && CanbeInt(*argv)) {
+        inlets = GetAInt(*argv);
+        argv++,argc--;
+    }
+
+    if(inlets >= 1) {
+        objects = new PyObject *[inlets];
+        for(int i = 0; i < inlets; ++i) { objects[i] = Py_None; Py_INCREF(Py_None); }
+    }
+
+    AddInAnything(1+(inlets < 0?1:inlets));
+	AddOutAnything();  
+
+    const char *funnm = NULL;
+
 	// init script module
-	if(argc >= 1) {
-	    const char *sn = GetAString(argv[0]);
+	if(argc) {
+        AddCurrentPath(thisCanvas());
+
+	    const char *sn = GetAString(*argv);
+        argv++,argc--;
+
         if(sn) {
-		    char dir[1024];
-		    GetModulePath(sn,dir,sizeof(dir));
-		    // set script path
+            char modnm[64];
+            strcpy(modnm,sn);
+
+            char *pt = strrchr(modnm,'.'); // search for last dot
+            if(pt && *pt) {
+                funnm = pt+1;
+                *pt = 0;
+            }
+
+    		char dir[1024];
+		    GetModulePath(modnm,dir,sizeof(dir));
 		    AddToPath(dir);
 
-#if FLEXT_SYS == FLEXT_SYS_PD
-			// add dir of current patch to path
-			AddToPath(GetString(canvas_getdir(thisCanvas())));
-			// add current dir to path
-			AddToPath(GetString(canvas_getcurrentdir()));
-#elif FLEXT_SYS == FLEXT_SYS_MAX 
-			short path = patcher_myvol(thisCanvas());
-			path_topathname(path,NULL,dir); 
-			AddToPath(dir);       
-#else 
-	        #pragma message("Adding current dir to path is not implemented")
-#endif
-
-			ImportModule(sn);
+			ImportModule(modnm);
         }
         else
             PyErr_SetString(PyExc_ValueError,"Invalid module name");
@@ -171,13 +167,19 @@ pyobj::pyobj(int argc,const t_atom *argv):
 
 	Register(GetRegistry(REGNAME));
 
-    if(argc >= 2) {
-	    const char *fn = GetAString(argv[1]);
-        if(fn)
-	        SetFunction(fn);
+    if(funnm || argc) {
+        if(!funnm) {
+	        funnm = GetAString(*argv);
+            argv++,argc--;
+        }
+
+        if(funnm)
+	        SetFunction(funnm);
         else
             PyErr_SetString(PyExc_ValueError,"Invalid function name");
     }
+
+	if(argc) args(argc,argv);
 
     Report();
 
@@ -186,7 +188,12 @@ pyobj::pyobj(int argc,const t_atom *argv):
 
 pyobj::~pyobj() 
 {
-	PyThreadState *state = PyLockSys();
+    if(objects) {
+        for(int i = 0; i < CntIn()-1; ++i) Py_DECREF(objects[i]);
+        delete[] objects;
+    }
+    
+    PyThreadState *state = PyLockSys();
 	Unregister(GetRegistry(REGNAME));
     Report();
 	PyUnlock(state);
@@ -196,13 +203,6 @@ void pyobj::Exit()
 { 
     pybase::Exit(); 
     flext_base::Exit(); 
-}
-
-bool pyobj::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
-{
-	if(n == 1)
-		post("%s - no method for type %s",thisName(),GetString(s));
-	return false;
 }
 
 void pyobj::m_set(int argc,const t_atom *argv)
@@ -333,31 +333,52 @@ bool pyobj::callpy(PyObject *fun,PyObject *args)
         return false;
     }
     else {
-        flext::AtomListStatic<16> rargs;
-        if(GetPyArgs(rargs,ret)) {
-            // call to outlet _outside_ the Mutex lock!
-            // otherwise (if not detached) deadlock will occur
-            if(rargs.Count()) ToOutList(0,rargs);
-        }
-        else if(PyErr_Occurred())
+        if(ret != Py_None && !OutObject(this,0,ret) && PyErr_Occurred())
             PyErr_Print();
-
         Py_DECREF(ret);
         return true;
     }
 } 
 
-void pyobj::callwork(const t_symbol *s,int argc,const t_atom *argv)
+bool pyobj::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
 {
     bool ret = false;
  
+    if(n == 0 && s != sym_bang) goto end;
+
+    if(objects && n >= 1) {
+        // store args
+        PyObject *&obj = objects[n-1];
+        Py_DECREF(obj);
+        obj = MakePyArg(s,argc,argv); // steal reference
+
+        if(n > 1) {
+            ret = true; // just store, don't trigger
+            goto end;
+        }
+    }
+
     PyThreadState *state = PyLock();
 
     if(withfunction) {
         if(function) {
-		    PyObject *pargs = MakePyArgs(s,argc,argv);
             Py_INCREF(function);
-            ret = gencall(function,pargs);
+
+		    PyObject *pargs;
+        
+            if(objects) {
+                int inlets = CntIn()-1;
+            	pargs = PyTuple_New(inlets);
+                for(int i = 0; i < inlets; ++i) {
+                    Py_INCREF(objects[i]);
+    		        PyTuple_SET_ITEM(pargs,i,objects[i]);
+                }
+            }
+            else
+                // construct tuple from args
+                pargs = MakePyArgs(s,argc,argv);
+
+            ret = gencall(function,pargs); // references are stolen
         }
 	    else
 		    PyErr_SetString(PyExc_RuntimeError,"No function set");
@@ -380,6 +401,9 @@ void pyobj::callwork(const t_symbol *s,int argc,const t_atom *argv)
     PyUnlock(state);
 
     Respond(ret);
+
+end:
+    return ret || flext_base::CbMethodResort(n,s,argc,argv);
 }
 
 void pyobj::CbClick() { pybase::OpenEditor(); }
