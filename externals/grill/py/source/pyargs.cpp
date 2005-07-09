@@ -17,19 +17,19 @@ static PyObject *MakePyAtom(const t_atom &at)
 {
 	if(flext::IsSymbol(at)) 
         return pySymbol_FromSymbol(flext::GetSymbol(at));
-/*
+#if 1
     else if(flext::CanbeInt(at) || flext::CanbeFloat(at)) {
         // if a number can be an integer... let it be an integer!
         int ival = flext::GetAInt(at);
         double fval = flext::GetAFloat(at);
         return (double)ival == fval?PyInt_FromLong(ival):PyFloat_FromDouble(fval);
     }
-*/
+#else
     else if(flext::IsFloat(at))
         return PyFloat_FromDouble(flext::GetFloat(at));
     else if(flext::IsInt(at))
         return PyInt_FromLong(flext::GetInt(at));
-
+#endif
     return NULL;
 }
 
@@ -99,7 +99,8 @@ PyObject *pybase::MakePyArg(const t_symbol *s,int argc,const t_atom *argv)
     if(s == symatom && (ret = MakePyAtom(argc,argv)) != NULL) {
         // ok!
     }
-    else if(argc == 1 && IsAtom(s))
+    else if(argc == 1 && !IsAnything(s))
+        // convert atoms and one-element lists
 		ret = MakePyAtom(*argv);       
     else {
 	    bool any = s != sym_list;
@@ -125,14 +126,13 @@ PyObject *pybase::MakePyArg(const t_symbol *s,int argc,const t_atom *argv)
 	return ret;
 }
 
-bool pybase::GetPyArgs(AtomList &lst,PyObject *pValue,int offs)
+const t_symbol *pybase::GetPyArgs(AtomList &lst,PyObject *pValue,int offs)
 {
 	if(pValue == NULL) return false; 
 
 	// analyze return value or tuple
 
 	int rargc = 0;
-	bool ok = true;
 	retval tp = nothing;
 
 	if(PyString_Check(pValue)) {
@@ -152,6 +152,8 @@ bool pybase::GetPyArgs(AtomList &lst,PyObject *pValue,int offs)
 
 	lst(offs+rargc);
 
+    const t_symbol *sym = NULL;
+
 	for(int ix = 0; ix < rargc; ++ix) {
 		PyObject *arg;
 		if(tp == sequ)
@@ -160,11 +162,11 @@ bool pybase::GetPyArgs(AtomList &lst,PyObject *pValue,int offs)
             arg = pValue;
 
         t_atom &at = lst[offs+ix];
-		if(PyInt_Check(arg)) SetInt(at,PyInt_AsLong(arg));
-		else if(PyLong_Check(arg)) SetInt(at,PyLong_AsLong(arg));
-		else if(PyFloat_Check(arg)) SetFloat(at,(float)PyFloat_AsDouble(arg));
-		else if(pySymbol_Check(arg)) SetSymbol(at,pySymbol_AS_SYMBOL(arg));
-		else if(PyString_Check(arg)) SetString(at,PyString_AS_STRING(arg));
+        if(PyInt_Check(arg)) { SetInt(at,PyInt_AsLong(arg)); sym = sym_fint; }
+        else if(PyLong_Check(arg)) { SetInt(at,PyLong_AsLong(arg)); sym = sym_fint; }
+        else if(PyFloat_Check(arg)) { SetFloat(at,(float)PyFloat_AsDouble(arg)); sym = sym_float; }
+        else if(pySymbol_Check(arg)) { SetSymbol(at,pySymbol_AS_SYMBOL(arg)); sym = sym_symbol; }
+        else if(PyString_Check(arg)) { SetString(at,PyString_AS_STRING(arg)); sym = sym_symbol; }
 /*
         else if(ix == 0 && self && PyInstance_Check(arg)) {
 			// assumed to be self ... that should be checked _somehow_ !!!
@@ -180,25 +182,27 @@ bool pybase::GetPyArgs(AtomList &lst,PyObject *pValue,int offs)
 			post("py/pyext: Could not convert argument %s",tmp);
 			Py_XDECREF(stp);
 			Py_XDECREF(tp);
-			ok = false;
+
+            SetSymbol(at,sym__); sym = sym_symbol;
 		}
 
 		if(tp == sequ) 
             Py_DECREF(arg);
 	}
 
-    return ok;
+    if(sym && tp == sequ) sym = sym_list;
+
+    return sym;
 }
 
 
-bool pybase::GetPyAtom(AtomList &lst,PyObject *obj)
+const t_symbol *pybase::GetPyAtom(AtomList &lst,PyObject *obj)
 {
     size_t atom = PyAtom::Register(obj);
     size_t szat = sizeof(atom)/2;
 
-    lst(1+szat);
-    SetSymbol(lst[0],symatom);
+    lst(szat);
     for(size_t i = 0; i < szat; ++i,atom >>= 16)
-        flext::SetInt(lst[i+1],(int)(atom&((1<<16)-1)));
-    return true;
+        flext::SetInt(lst[i],(int)(atom&((1<<16)-1)));
+    return symatom;
 }

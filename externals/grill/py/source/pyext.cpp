@@ -420,7 +420,9 @@ void pyext::m_get(const t_symbol *s)
 	PyObject *pvar  = PyObject_GetAttrString(pyobj,const_cast<char *>(GetString(s))); /* fetch bound method */
 	if(pvar) {
         flext::AtomListStatic<16> lst;
-        if(GetPyArgs(lst,pvar,1)) {
+        const t_symbol *sym = GetPyArgs(lst,pvar,1);
+        if(sym) {
+            FLEXT_ASSERT(!IsAnything(sym));
             // dump value to attribute outlet
             SetSymbol(lst[0],s);
             ToOutAnything(GetOutAttr(),sym_get,lst.Count(),lst.Atoms());
@@ -469,7 +471,10 @@ void pyext::m_set(int argc,const t_atom *argv)
 
 bool pyext::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
 {
-	return (pyobj && n >= 1 && work(n,s,argc,argv)) || flext_dsp::CbMethodResort(n,s,argc,argv);
+    if(!n) 
+        return flext_dsp::CbMethodResort(n,s,argc,argv);
+
+	return pyobj && work(n,s,argc,argv);
 }
 
 
