@@ -77,6 +77,8 @@ extern "C"
     void pdp_mapper_setup(void);
     void pdp_theonice_tilde_setup(void);
     void pdp_icedthe_tilde_setup(void);
+    void pdp_fdiff_setup(void);
+    void pdp_hue_setup(void);
 
 #ifdef HAVE_PIDIP_FFMPEG
     void pdp_ffmpeg_tilde_setup(void);
@@ -161,6 +163,8 @@ void pidip_setup(void){
     pdp_mapper_setup();
     pdp_theonice_tilde_setup();
     pdp_icedthe_tilde_setup();
+    pdp_fdiff_setup();
+    pdp_hue_setup();
 
 #ifdef HAVE_PIDIP_FFMPEG
     pdp_ffmpeg_tilde_setup();

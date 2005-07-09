@@ -1,3 +1,10 @@
+0.12.19 ( codename GISS action force )
+  addapted to newer Image Magick ( > 6.1.9 ) 
+  modified pdp_icedthe~ : added a framerate control
+  modified pdp_shape : added isolate option
+  added pdp_hue : a frame hue estimator
+  added pdp_fdiff : a frame difference estimator
+
 0.12.18 ( codename Benisensi )
   added pdp_icedthe~  : a threaded theora stream reader ( from flumotion or icecast )
   added pdp_theonice~ : a theora a/v streamer ( to flumotion or icecast )

@@ -1267,7 +1267,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
           ac_config_headers="$ac_config_headers include/pidip_config.h"
 
 
-PDP_PIDIP_VERSION="0.12.18"
+PDP_PIDIP_VERSION="0.12.19"
 PD_DIR=/usr/local/pd
 PDP_DIR=/usr/local/pd/pdp
 FFMPEG_SOURCE_DIR=/SOURCES/ffmpeg

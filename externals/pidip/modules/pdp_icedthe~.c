@@ -112,6 +112,7 @@ typedef struct pdp_icedthe_struct
     t_int x_endofstream;    // end of the stream reached
     t_int x_nbframes;       // number of frames emitted
     t_float x_framerate;    // framerate
+    t_int x_forcedframerate;// the framerate we want to receive
     t_int x_samplerate;     // audio sample rate
     t_int x_audiochannels;  // audio channels
     t_int x_blocksize;      // audio block size
@@ -152,9 +153,17 @@ typedef struct pdp_icedthe_struct
 
 static void pdp_icedthe_priority(t_pdp_icedthe *x, t_floatarg fpriority )
 {
-   if ( ( x->x_priority >= MIN_PRIORITY ) && ( x->x_priority <= MAX_PRIORITY ) )
+   if ( ( (t_int)fpriority >= MIN_PRIORITY ) && ( (t_int)fpriority <= MAX_PRIORITY ) )
    {
      x->x_priority = (int)fpriority;
+   }
+}
+
+static void pdp_icedthe_framerate(t_pdp_icedthe *x, t_floatarg fframerate )
+{
+   if ( fframerate > 0. )
+   {
+     x->x_forcedframerate = (int)fframerate;
    }
 }
 
@@ -392,43 +401,47 @@ static t_int pdp_icedthe_decode_stream(t_pdp_icedthe *x)
        }
        theora_decode_YUVout(&x->x_theora_state, &x->x_yuvbuffer); 
 
-       // create a new pdp packet from PIX_FMT_YUV420P image format
-       x->x_vwidth = x->x_yuvbuffer.y_width;
-       x->x_vheight = x->x_yuvbuffer.y_height;
-       x->x_vsize = x->x_vwidth*x->x_vheight;
-       x->x_packet0 = pdp_packet_new_bitmap_yv12( x->x_vwidth, x->x_vheight );
-       // post( "pdp_icedthe~ : allocated packet %d", x->x_packet0 );
-       x->x_header = pdp_packet_header(x->x_packet0);
-       x->x_data = (unsigned char*) pdp_packet_data(x->x_packet0);
+       if ( x->x_secondcount < x->x_forcedframerate )
+       { 
+         // create a new pdp packet from PIX_FMT_YUV420P image format
+         x->x_vwidth = x->x_yuvbuffer.y_width;
+         x->x_vheight = x->x_yuvbuffer.y_height;
+         x->x_vsize = x->x_vwidth*x->x_vheight;
+         x->x_packet0 = pdp_packet_new_bitmap_yv12( x->x_vwidth, x->x_vheight );
+         // post( "pdp_icedthe~ : allocated packet %d", x->x_packet0 );
+         x->x_header = pdp_packet_header(x->x_packet0);
+         x->x_data = (unsigned char*) pdp_packet_data(x->x_packet0);
 
-       x->x_header->info.image.encoding = PDP_BITMAP_YV12;
-       x->x_header->info.image.width = x->x_vwidth;
-       x->x_header->info.image.height = x->x_vheight;
+         x->x_header->info.image.encoding = PDP_BITMAP_YV12;
+         x->x_header->info.image.width = x->x_vwidth;
+         x->x_header->info.image.height = x->x_vheight;
 
-       pY = x->x_data;
-       pV = x->x_data+x->x_vsize;
-       pU = x->x_data+x->x_vsize+(x->x_vsize>>2);
+         pY = x->x_data;
+         pV = x->x_data+x->x_vsize;
+         pU = x->x_data+x->x_vsize+(x->x_vsize>>2);
 
-       psY = x->x_yuvbuffer.y;
-       psU = x->x_yuvbuffer.u;
-       psV = x->x_yuvbuffer.v;
+         psY = x->x_yuvbuffer.y;
+         psU = x->x_yuvbuffer.u;
+         psV = x->x_yuvbuffer.v;
 
-       for ( py=0; py<x->x_vheight; py++)
-       {
-          memcpy( (void*)pY, (void*)psY, x->x_vwidth );
-          pY += x->x_vwidth;
-          psY += x->x_yuvbuffer.y_stride;
-          if ( py%2==0 )
-          {
-            memcpy( (void*)pU, (void*)psU, (x->x_vwidth>>1) );
-            memcpy( (void*)pV, (void*)psV, (x->x_vwidth>>1) );
-            pU += (x->x_vwidth>>1);
-            pV += (x->x_vwidth>>1);
-            psU += x->x_yuvbuffer.uv_stride;
-            psV += x->x_yuvbuffer.uv_stride;
-          }
+         for ( py=0; py<x->x_vheight; py++)
+         {
+            memcpy( (void*)pY, (void*)psY, x->x_vwidth );
+            pY += x->x_vwidth;
+            psY += x->x_yuvbuffer.y_stride;
+            if ( py%2==0 )
+            {
+              memcpy( (void*)pU, (void*)psU, (x->x_vwidth>>1) );
+              memcpy( (void*)pV, (void*)psV, (x->x_vwidth>>1) );
+              pU += (x->x_vwidth>>1);
+              pV += (x->x_vwidth>>1);
+              psU += x->x_yuvbuffer.uv_stride;
+              psV += x->x_yuvbuffer.uv_stride;
+            }
+         }
+         x->x_newpicture = 1;
        }
-       x->x_newpicture = 1;
+ 
        // post( "pdp_icedthe~ : new picture decoded" );
        if ( pthread_mutex_unlock( &x->x_videolock ) < 0 )
        {
@@ -505,6 +518,58 @@ static void *pdp_icedthe_decode(void *tdata)
     return NULL;
 }
 
+static void pdp_icedthe_split_url(t_pdp_icedthe *x)
+{
+  char *hostptr = NULL, *p, *endhost = NULL, *pathptr = NULL;
+  t_int length;
+
+     /* strip http:// or ftp:// */
+   p = x->x_url;
+   if (strncmp(p, "http://", 7) == 0) p+=7;
+
+   hostptr = p;
+   while (*p && *p != '/' && *p != ':')  /* look for end of hostname: */ p++;
+
+   endhost = p;
+   switch ( *p )
+   {
+      case ':' :
+         x->x_portnum = atoi( p+1 );
+         while (*p && *p != '/') p++;
+         pathptr = p+1;
+         break;
+      case '/' :
+         x->x_portnum = 8000;
+         pathptr = p+1;
+         break;
+      default :
+         if ( ( p - x->x_url ) != (int)strlen( x->x_url ) )
+         {
+            post( "pdp_icedthe~ : wrong url : %s", hostptr );
+            return;
+         }
+         pathptr = "";
+         break;
+   }
+
+   length = (t_int)(endhost - hostptr);
+   if ( x->x_hostname ) 
+   {
+     post ("pdp_icedthe~ : freeing hostname" );
+     free( x->x_hostname );
+   }
+   x->x_hostname=(char*)malloc( length + 1);
+   strncpy( x->x_hostname, hostptr, length );
+   x->x_hostname[ length ] = '\0';
+
+   if ( x->x_mountpoint ) free( x->x_mountpoint );
+   x->x_mountpoint=(char*)malloc( strlen( pathptr ) + 1);
+   strncpy( x->x_mountpoint, pathptr, strlen( pathptr ) );
+   x->x_mountpoint[ strlen( pathptr ) ] = '\0';
+
+   post ("pdp_icedthe~ : connecting to host=>%s< port=>%d< mountpoint=>%s<", x->x_hostname, x->x_portnum, x->x_mountpoint );
+}
+
 static void pdp_icedthe_connect(t_pdp_icedthe *x, t_symbol *s);
 
 static void *pdp_icedthe_do_connect(void *tdata)
@@ -522,7 +587,6 @@ static void *pdp_icedthe_do_connect(void *tdata)
   char          *cpoint = NULL;
   t_int         offset = 0, endofheaders = 0, wpackets = 0;
   char          *sptr = NULL;
-  char          *url;                     /* used for relocation */
    
    if ( x->x_insock != -1 )
    {
@@ -530,7 +594,6 @@ static void *pdp_icedthe_do_connect(void *tdata)
      pdp_icedthe_disconnect(x);
    }
 
-   sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
    if ( ( sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) ) <= 0 )
    {
       error("pdp_icedthe~: couldn't obtain a socket");
@@ -624,7 +687,7 @@ static void *pdp_icedthe_do_connect(void *tdata)
      } 
    }
 
-   // post( "pdp_icedthe~ : read HTTP headers : %s", x->x_request );
+   post( "pdp_icedthe~ : read HTTP headers : %s", x->x_request );
    post( "pdp_icedthe~ : got HTTP answer" );
 
    strip_ice_header(x->x_request, STRBUF_SIZE);
@@ -639,11 +702,12 @@ static void *pdp_icedthe_do_connect(void *tdata)
           x->x_connectchild = 0;
           return NULL;
        }
-       url = strdup(cpoint + 10);
-       post("pdp_icedthe~: relocating to %s", url);
-       if ( close(sockfd) < 0 ) post("pdp_icedthe~: could not close socket" );
-       x->x_connectchild = 0;
-       pdp_icedthe_connect(x, gensym(url));
+       if ( x->x_url ) free( x->x_url );
+       x->x_url = strdup(cpoint + 10);
+       post("pdp_icedthe~: relocating to %s", x->x_url);
+       pdp_icedthe_split_url(x);
+       x->x_connected = 0;
+       pdp_icedthe_do_connect(x);
        return NULL;
    }
    if ( !(sptr = strstr(x->x_request, "200")) )
@@ -1049,9 +1113,8 @@ static void *pdp_icedthe_do_connect(void *tdata)
 
 static void pdp_icedthe_connect(t_pdp_icedthe *x, t_symbol *s)
 {
-  t_int ret, i, length;
+  t_int ret, i;
   pthread_attr_t connect_child_attr;
-  char *hostptr = NULL, *p, *endhost = NULL, *pathptr = NULL;
 
    if ( x->x_connectchild != 0 )
    {
@@ -1071,51 +1134,7 @@ static void pdp_icedthe_connect(t_pdp_icedthe *x, t_symbol *s)
 
    post ("pdp_icedthe~ : connecting to url=%s", x->x_url );
 
-     /* strip http:// or ftp:// */
-   p = x->x_url;
-   if (strncmp(p, "http://", 7) == 0) p+=7;
-
-   hostptr = p;
-   while (*p && *p != '/' && *p != ':')  /* look for end of hostname: */ p++;
-
-   endhost = p;
-   switch ( *p )
-   {
-      case ':' :
-         x->x_portnum = atoi( p+1 );
-         while (*p && *p != '/') p++;
-         pathptr = p+1;
-         break;
-      case '/' :
-         x->x_portnum = 8000;
-         pathptr = p+1;
-         break;
-      default :
-         if ( ( p - x->x_url ) != (int)strlen( x->x_url ) )
-         {
-            post( "pdp_icedthe~ : wrong url : %s", hostptr );
-            return;
-         }
-         pathptr = "";
-         break;
-   }
-
-   length = (t_int)(endhost - hostptr);
-   if ( x->x_hostname ) 
-   {
-     post ("pdp_icedthe~ : freeing hostname" );
-     free( x->x_hostname );
-   }
-   x->x_hostname=(char*)malloc( length + 1);
-   strncpy( x->x_hostname, hostptr, length );
-   x->x_hostname[ length ] = '\0';
-
-   if ( x->x_mountpoint ) free( x->x_mountpoint );
-   x->x_mountpoint=(char*)malloc( strlen( pathptr ) + 1);
-   strncpy( x->x_mountpoint, pathptr, strlen( pathptr ) );
-   x->x_mountpoint[ strlen( pathptr ) ] = '\0';
-
-   post ("pdp_icedthe~ : connecting to host=%s port=%d mountpoint=%s", x->x_hostname, x->x_portnum, x->x_mountpoint );
+   pdp_icedthe_split_url(x);
 
    // launch connection thread
    if ( pthread_attr_init( &connect_child_attr ) < 0 ) {
@@ -1313,6 +1332,7 @@ void *pdp_icedthe_new(void)
     x->x_theorainit = 0;
     x->x_priority = DEFAULT_PRIORITY;
     x->x_framerate = DEFAULT_FRAME_RATE;
+    x->x_forcedframerate = 1024; // think it will not occur or maybe in 2156
     x->x_nbframes = 0;
     x->x_samplerate = 0;
     x->x_audio = 1;
@@ -1359,6 +1379,7 @@ void pdp_icedthe_tilde_setup(void)
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_connect, gensym("connect"), A_SYMBOL, A_NULL);
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_disconnect, gensym("disconnect"), A_NULL);
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_priority, gensym("priority"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_framerate, gensym("framerate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_icedthe_class, (t_method)pdp_icedthe_audio, gensym("audio"), A_FLOAT, A_NULL);
     class_sethelpsymbol( pdp_icedthe_class, gensym("pdp_icedthe~.pd") );
 

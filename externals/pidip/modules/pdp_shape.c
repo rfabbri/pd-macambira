@@ -54,9 +54,10 @@ typedef struct pdp_shape_struct
     t_int x_colorU;
     t_int x_colorV;
 
-    t_int x_tolerance; // tolerance
-    t_int x_paint;     // paint option
-    t_int x_shape;     // drawing shape option
+    t_int x_tolerance;  // tolerance
+    t_int x_paint;      // paint option
+    t_int x_isolate;    // isolate option
+    t_int x_shape;      // drawing shape option
     t_int x_luminosity; // use luminosity or not
 
     short int *x_bdata;
@@ -103,6 +104,14 @@ static void pdp_shape_luminosity(t_pdp_shape *x, t_floatarg fluminosity )
    if ( ( fluminosity == 0 ) || ( fluminosity == 1 ) )
    {
       x->x_luminosity = (int)fluminosity;
+   }
+}
+
+static void pdp_shape_isolate(t_pdp_shape *x, t_floatarg fisolate )
+{
+   if ( ( fisolate == 0 ) || ( fisolate == 1 ) )
+   {
+      x->x_isolate = (int)fisolate;
    }
 }
 
@@ -300,6 +309,12 @@ static void pdp_shape_do_detect(t_pdp_shape *x, t_floatarg X, t_floatarg Y)
   }
   else
   {
+     if ( x->x_isolate )
+     {
+       *(pbbY+nY*x->x_vwidth+nX) = *(pbY+nY*x->x_vwidth+nX);
+       *(pbbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) = *(pbU+(nY>>1)*(x->x_vwidth>>1)+(nX>>1));
+       *(pbbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1)) = *(pbV+(nY>>1)*(x->x_vwidth>>1)+(nX>>1));
+     }
      if ( x->x_paint )
      {
        *(pbbY+nY*x->x_vwidth+nX) =
@@ -446,12 +461,19 @@ static void pdp_shape_process_yv12(t_pdp_shape *x)
     newheader->info.image.height = x->x_vheight;
 
     memcpy( x->x_bdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
-    memcpy( x->x_bbdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
+    if ( !x->x_isolate )
+    {
+      memcpy( x->x_bbdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
+    }
+    else
+    {
+      memset( x->x_bbdata, 0x0, (x->x_vsize+(x->x_vsize>>1))<<1 );
+    }
 
     if ( x->x_cursX != -1 ) pdp_shape_frame_detect( x, x->x_cursX, x->x_cursY );
   
     // paint cursor in red for debug purpose
-    if ( x->x_cursX != -1 )
+    if ( ( x->x_cursX != -1 ) && ( x->x_shape ) )
     {
       pbbY = x->x_bbdata;
       pbbU = (x->x_bbdata+x->x_vsize);
@@ -557,6 +579,7 @@ void *pdp_shape_new(void)
 
     x->x_tolerance = 20;
     x->x_paint = 0;
+    x->x_isolate = 0;
     x->x_shape = 1;
     x->x_luminosity = 1;
 
@@ -589,6 +612,7 @@ void pdp_shape_setup(void)
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_detect, gensym("detect"), A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_rgb, gensym("rgb"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_tolerance, gensym("tolerance"), A_FLOAT, A_NULL);
+    class_addmethod(pdp_shape_class, (t_method)pdp_shape_isolate, gensym("isolate"), A_FLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_paint, gensym("paint"), A_FLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_shape, gensym("shape"), A_FLOAT, A_NULL);
     class_addmethod(pdp_shape_class, (t_method)pdp_shape_luminosity, gensym("luminosity"), A_FLOAT, A_NULL);

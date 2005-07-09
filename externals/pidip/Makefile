@@ -1,15 +1,15 @@
 PD_DIR = /usr/local/pd
 PDP_DIR = /usr/local/pd/pdp
-FFMPEG_SOURCE_DIR = /SOURCES/ffmpeg-cvs-2003-03-04
+FFMPEG_SOURCE_DIR = /SOURCES/ffmpeg
 
-PDP_PIDIP_LIBS =  -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc /SOURCES/ffmpeg-cvs-2003-03-04/libavformat/libavformat.a /SOURCES/ffmpeg-cvs-2003-03-04/libavcodec/libavcodec.a
+PDP_PIDIP_LIBS =  -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc
 IMLIB_CFLAGS = -I/usr/local/include -I/usr/X11R6/include
 IMLIB_LIBS = -L/usr/local/lib -lImlib2 -lfreetype -lz -lm -ldl -lXext -lXext -lX11 -L/usr/X11R6/lib
 MAGICK_CFLAGS = -I/usr/X11R6/include -O2 -g -pipe -m32 -march=i386 -mtune=pentium4 -Wall -pthread 
 MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljpeg -lpng -ldpstk -ldps -lXext -lXt -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -lpthread -L/usr/lib -L/usr/X11R6/lib -lfreetype -lz -L/usr/lib
 THEORA_LIBS =  /usr/lib/libtheora.a /usr/local/lib/libtheora.a /usr/lib/libogg.a /usr/local/lib/libvorbis.a /usr/local/lib/libvorbisenc.a
-PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps  -I/SOURCES/ffmpeg-cvs-2003-03-04/libavcodec -I/SOURCES/ffmpeg-cvs-2003-03-04/libavformat
-PDP_PIDIP_VERSION = 0.12.18
+PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps
+PDP_PIDIP_VERSION = 0.12.19
 MPEG4IP_CFLAGS = 
 
 PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)

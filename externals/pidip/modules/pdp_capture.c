@@ -29,11 +29,17 @@
 #include <assert.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <magick/methods.h>
 #include <magick/api.h>
 #include <magick/magick.h>
 #include <magick/xwindow.h>
 
 #define PDP_DISPLAY_LENGTH 1024
+
+// trick to handle Image Magick compatibility
+#if MagickLibVersion >= 0x619
+#include "../include/xwindow-private.h"
+#endif
 
 static char   *pdp_capture_version = "pdp_capture: version 0.1, capture of screen written by Yves Degoyon (ydegoyon@free.fr)";
 
