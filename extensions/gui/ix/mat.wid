@@ -54,7 +54,13 @@ namespace eval ::ix {
     proc mat_item_new {p t} {
 	variable _
 	incr _($t:i)
-	mat_item_update $p $t $_($t:i) [$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [list item $_($t:i)] -fill [color [dict get $_($t:g) 0 color]] -stroke [color [darken [dict get $_($t:g) 0 color] 0.5]] -fillopacity 0.8] abs 0 0 0 0}
+	$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [list item i$_($t:i) $_($t:i)] -fill [color [dict get $_($t:g) 0 color]] -stroke [color [darken [dict get $_($t:g) 0 color] 0.5]] -fillopacity 0.8
+	mat_item_update $p $t $_($t:i) abs 0 0 0 0 0}
+
+    proc mat_item_delete {p t} {
+	variable _
+	foreach item $_($t:sel) {$p.m delete $item}
+    }
 
     proc mat_quant {p t y v} {
 	variable _
@@ -65,29 +71,30 @@ namespace eval ::ix {
 	return $v
     }
     
-    proc mat_item_update {p t item ci r x y xx yy} {
+    proc mat_item_update {p t item r x y xx yy g} {
 	variable _
-	foreach v {ci x xx y yy} {
+	foreach v {x xx y yy g} {
 	    if {[set $v] ne "-"} {
 		switch $r {
 		    abs {dict set _($t) $item $v [set $v]}
 		    rel {dict set _($t) $item $v [expr {[dict get $_($t) $item $v] + [set $v]}]}}}}
-	mat_redraw $p $t [dict get $_($t) $item ci]}
+	mat_redraw $p $t $item}
 
    proc mat_item_ua {p t item r u} {
        variable _
        foreach a [dict keys $u] {
 	   switch $r {
-	       abs {dict set _($t) $item $a [dict get $u $a]}
+	       abs {dict set _($t) $item $a [dict get $u $a]
+	       }
 	       rel {dict set _($t) $item $a [expr {[dict get $_($t) $item $a] + [dict get $u $a]}]}}}
-    mat_redraw $p $t [dict get $_($t) $item ci]}
+    mat_redraw $p $t $item}
 
     proc mat_draw {p t a x y} {
 	variable _
 	switch $a {
 	    motion {
 		if {$x >= $_($t:cx)} {set xa $_($t:fx);set xb $x} else {set xa $x;set xb $_($t:fx)}
-		mat_item_update $p $t $_($t:i) - abs [mat_tr $p $t x i $xa] [mat_tr $p $t y i $y] [mat_tr $p $t x i $xb] [mat_tr $p $t y i $y]}
+		mat_item_update $p $t $_($t:i) abs [mat_tr $p $t x i $xa] [mat_tr $p $t y i $y] [mat_tr $p $t x i $xb] [mat_tr $p $t y i $y] 0}
 	    first {mat_item_new $p $t}}}
 
     proc mat_resize_canvas {p t a x y} {
@@ -105,10 +112,11 @@ namespace eval ::ix {
     proc mat_redraw {p t items} {
 	variable _
 	switch $items {
-	    all {set items [$p.m find withtag item]}
+	    all {set items [dict keys $_($t)]}
 	    default {}}
-	foreach item $items {
-	    set id [lindex [$p.m itemcget $item -tags] 1]
+	foreach id $items {
+	    set item [$p.m find withtag i$id]
+	    puts "redrawing $item"
 	    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
 	    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
 	    set w [expr {[dict get $_($t) $id xx] - [dict get $_($t) $id x]}]
@@ -116,17 +124,18 @@ namespace eval ::ix {
 	    if {$h < 0.01} {set h 1}
 	    set sx [expr {abs([mat_tr $p $t x id $w])}]
 	    set sy [expr {abs([mat_tr $p $t y id $h])}]
-#	    puts "$px $py $sx $sy"
+	    $p.m itemconfigure $item -fill [color [dict get $_($t:g) [dict get $_($t) $id g] color]]
 	    $p.m coords $item [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]}}
 
     proc mat_object_trans {p t a x y} {
 	variable _
 	set velo [expr {($x - $_($t:cx)) / 100.0}]
 	foreach item $_($t:sel) {
-	    set vel [expr {$velo + [$p.m itemcget $item -fillopacity]}]
+	    set id [$p.m find withtag i$item]
+	    set vel [expr {$velo + [$p.m itemcget $id -fillopacity]}]
 	    if {$vel > 1} {set vel 1}
 	    if {$vel < 0} {set vel 0}
-	    $p.m itemconfigure $item -fillopacity $vel
+	    $p.m itemconfigure $id -fillopacity $vel
 	}
     }
 
@@ -145,7 +154,7 @@ namespace eval ::ix {
 	variable _
 	set mx [mat_tr $p $t x d [expr {$x - $_($t:cx)}]]
 	set my [mat_tr $p $t y d [expr {$y - $_($t:cy)}]]
-	foreach item $_($t:sel) {mat_item_update $p $t [lindex [$p.m itemcget $item -tags] 1] - rel $mx $my $mx $my}
+	foreach item $_($t:sel) {mat_item_update $p $t $item rel $mx $my $mx $my 0}
 	mat_item_info $p $t $_($t:sel)
     }
 
@@ -158,37 +167,38 @@ namespace eval ::ix {
 	variable _
 	array set ax {x x xx x y y yy y}
 	set m [mat_tr $p $t $ax($e) d [expr $$ax($e) - $_($t:c$ax($e))]]
-	foreach item $_($t:sel) {mat_item_ua $p $t [lindex [$p.m itemcget $item -tags] 1] rel [dict create $e $m]}
+	foreach item $_($t:sel) {mat_item_ua $p $t $item rel [dict create $e $m]}
 	mat_item_info $p $t $_($t:sel)
     }
 
     proc mat_cleansel {p t sel} {
 	set clean {}
-	foreach item $sel {if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} { lappend clean $item}}
-	return $clean}
+	foreach item $sel {if {[lindex [$p.m itemcget $item -tags] 0] eq "item"} {lappend clean [lindex [$p.m itemcget $item -tags] 2]}}
+	set clean [lsort -integer -unique $clean]
+	return $clean
+}
 
     proc mat_hover {p t x y} {
 	variable _
 	mat_loc $p $t $x $y
 	if {[$p.m find withtag sel] ne ""} {
 	    set _($t:hover) 1
-	    set clicked [$p.m find overlapping $_($t:fx) $_($t:fy) $x $y] 
+	    set clicked [mat_cleansel $p $t [$p.m find overlapping $_($t:fx) $_($t:fy) $x $y]]
 	    mat_sel $p $t motion $x $y
 	} else {
-	    set clicked [$p.m find overlapping $x $y $x $y]
+	    set clicked [mat_cleansel $p $t [$p.m find overlapping $x $y $x $y]]
 	}
-	set clicked [mat_cleansel $p $t $clicked]
 	if {$clicked ne ""} {
 	    mat_mode $p $t move_object
-	    set id [lindex [$p.m itemcget [lindex $clicked 0] -tags] 1]
+	    set id [lindex $clicked 0]
 	    set eX [mat_tr $p $t x t [dict get $_($t) $id x]]
 	    set eXX [mat_tr $p $t x t [dict get $_($t) $id xx]]
 	    set eY [mat_tr $p $t y t [dict get $_($t) $id y]]
 	    set eYY [mat_tr $p $t y t [dict get $_($t) $id yy]]
 	    if {[expr {abs($eX - $x)}] < 5} {mat_mode $p $t resize_left}
 	    if {[expr {abs($eXX - $x)}] < 5} {mat_mode $p $t resize_right} 
-#	    if {[expr {abs($eY - $y)}] < 1} {mat_mode $p $t resize_top}
-#	    if {[expr {abs($eYY - $y)}] < 1} {mat_mode $p $t resize_bottom} 
+	    if {[expr {abs($eY - $y)}] < 1} {mat_mode $p $t resize_top}
+	    if {[expr {abs($eYY - $y)}] < 1} {mat_mode $p $t resize_bottom} 
 	    if {[$p.m find withtag sel] eq "" && [llength $_($t:sel)] > 1} {return}
 	    mat_updatesel $p $t $clicked
 	} else {
@@ -201,7 +211,7 @@ namespace eval ::ix {
 	set n 0;$p.m delete hover
 	foreach item $clicked {
 	    set info ""
-	    set data  [dict get $_($t) [lindex [$p.m itemcget $item -tags] 1]] 
+	    set data  [dict get $_($t) $item] 
 	    foreach d $data {lappend info [string range $d 0 7]}
 	    $p.m create text [list [expr [winfo width $p.m] - 8.0] [expr [winfo height $p.m] - 8.0 - 11 * $n.0]] -fill $_($t:sc) -justify right -anchor se -font {{bitstream vera sans mono} 10} -tags hover -text $info
 	    incr n		
@@ -210,14 +220,13 @@ namespace eval ::ix {
     proc mat_updatesel {p t clicked} {
 	variable _
 	foreach item $_($t:sel) {
-	    if {[lsearch -integer $clicked $item] < 0} {
-		$p.m itemconfigure $item -fill [color [dict get $_($t:g) 0 color]]}}
+	    if {[lsearch -integer $clicked $item] < 0 && $item >= 0} {
+		$p.m itemconfigure [$p.m find withtag i$item] -fill [color [dict get $_($t:g) [dict get $_($t) $item g] color]]}}
 	foreach item $clicked {
-	    $p.m itemconfigure $item -fill $_($t:sc)
+	    $p.m itemconfigure [$p.m find withtag i$item] -fill $_($t:sc)
 	}
 	mat_item_info $p $t $clicked
 	set _($t:sel) $clicked
-
     }
 
     proc mat_click {m button action p t x y X Y} {
@@ -253,15 +262,23 @@ namespace eval ::ix {
     }
     
     proc mat_rmenu {p t x y} {
+	variable _
 	if {[winfo exists $p.rmenu] != 1} {
 	    set m [menu $p.rmenu -tearoff no]
 	    $m add command -label "zoom to fit" -command "::ix::mat_zoom $p $t fit"
 	    $m add command -label "reset zoom" -command "::ix::mat_zoom $p $t reset"
 	    $m add command -label "add group" -command "::ix::mat_group_new $p $t -"
-	    $m add command -label "frukas" -command {}  -state disabled
+	    $m add cascade -label "sel to group" -menu [menu $p.rmenu.seltogroup -tearoff no]
 	} else {
-#	    $p.rmenu entryconfigure 0 -label $x
+	    #	    $p.rmenu entryconfigure 0 -label $x
 	}
+	$p.rmenu.seltogroup delete 0 end
+	foreach group [dict keys $_($t:g)] {
+	    $p.rmenu.seltogroup add command -label [dict get $_($t:g) $group name] -command "::ix::mat_group_assign $p $t $group"
+	}
+
+
+
 	tk_popup $p.rmenu $x $y
     }
 
@@ -320,6 +337,13 @@ namespace eval ::ix {
 	$p.m itemconfigure loc -text [list [mat_tr $p $t x i $x] [mat_tr $p $t y i $y]]
     }
 
+    proc mat_group_assign {p t group} {
+	variable _
+	foreach item $_($t:sel) {
+	    mat_item_ua $p $t $item abs [dict create g $group]
+	}	
+    }
+
     proc mat_group_new {p t grp} {
 	variable _
 	set color [rgb]
@@ -336,6 +360,8 @@ namespace eval ::ix {
 	    1 {
 		switch $k {
 		    37 {mat_mode  $p $t draw}
+		    22 {mat_item_delete $p $t}
+		    107 {mat_item_delete $p $t}
 		}
 	    }
 	    0 {
@@ -350,10 +376,12 @@ namespace eval ::ix {
 	variable _
 	set _($t) {}
 	set _($t:g) {}
-	set i -1;set sel -1;set gi 0;set hover 0
+	set i -1;
+	set sel -1;
+	set gi 0;set hover 0
 	set sc white
 	foreach xy {x y} {foreach ab {a b} {set ${xy}${ab}o [set ${xy}${ab}]}}
-	foreach a {i sc gi hover sel ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
+	foreach a {i sel sc gi hover ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
 
 	if {[winfo exists $p.m] != 1} {
 	    canvas $p.m -bg $bg -width $w -height $h
