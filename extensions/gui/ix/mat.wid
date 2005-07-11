@@ -51,7 +51,8 @@ namespace eval ::ix {
 	set tags [list item i$_($t:i) $_($t:i)]
 	switch [dict get $d type] {
 	    note {
-		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags $tags -fill [color [dict get $_($t:g) 0 color]] -stroke [color [darken [dict get $_($t:g) 0 color] 0.5]] -fillopacity 0.8
+		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags r] -stroke [color [darken [dict get $_($t:g) $_($t:cg) color] 0.2]]
+		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags q] -fill [color [dict get $_($t:g) $_($t:cg) color]] -strokewidth 0 -fillopacity 0.8
 	    }
 	    sound {
 		snack:::sound s$_($t:i)
@@ -101,7 +102,7 @@ namespace eval ::ix {
 	    motion {
 		if {$x >= $_($t:cx)} {set xa $_($t:fx);set xb $x} else {set xa $x;set xb $_($t:fx)}
 		mat_item_pos $p $t $_($t:i) abs [mat_tr $p $t x i $xa] [mat_tr $p $t y i $y] [mat_tr $p $t x i $xb] [mat_tr $p $t y i $y]}
-	    first {mat_item_new $p $t [dict create type note g 0 x 0 y 0 xx 0 yy 0 v 1]}}}
+	    first {mat_item_new $p $t [dict create type note g $_($t:cg) x 0 y 0 xx 0 yy 0 v 1]}}}
 
     proc mat_resize_canvas {p t a x y} {
 	variable _
@@ -121,7 +122,6 @@ namespace eval ::ix {
 	    all {set items [dict keys $_($t)]}
 	    default {}}
 	foreach id $items {
-	    set cid [$p.m find withtag i$id]
 	    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
 	    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
 	    set w [expr {[dict get $_($t) $id xx] - [dict get $_($t) $id x]}]
@@ -131,11 +131,14 @@ namespace eval ::ix {
 		    if {$h < 0.01} {set h 1}
 		    set sx [expr {abs([mat_tr $p $t x id $w])}]
 		    set sy [expr {abs([mat_tr $p $t y id $h])}]
-		    $p.m coords $cid [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
-		    $p.m itemconfigure $cid -fillopacity [dict get $_($t) $id v]
+		    set r [$p.m find withtag "i$id && r"]
+		    set q [$p.m find withtag "i$id && q"]
+		    $p.m coords $r [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
+		    $p.m coords $q [::tkpath::coords rect [mat_quant $p $t x $px] [mat_quant $p $t y $py] $sx $sy -rx 3 -ry 3]
+		    $p.m itemconfigure $q -fillopacity [dict get $_($t) $id v]
 		}
 		sound {
-		    $p.m coords $cid $px $py
+		    $p.m coords [$p.m find withtag i$id] $px $py
 		}
 	    }    
 	}
@@ -146,6 +149,7 @@ namespace eval ::ix {
 	foreach item $_($t:sel) {
 	    mat_item_ua $p $t $item rel [dict create v [expr {($x - $_($t:cx)) / 100.0}]] 1
 	}
+	mat_item_info $p $t $_($t:sel)
     }
 
     proc mat_move_canvas {p t a x y} {
@@ -355,12 +359,42 @@ namespace eval ::ix {
 
     proc mat_group_new {p t grp} {
 	variable _
-	set color [rgb]
-	if {$grp eq "-"} {set grp [random_txt [expr "int(floor(rand() * 10 + 2))"]]}
-	dict set _($t:g) $_($t:gi) name $grp
-	dict set _($t:g) $_($t:gi) color $color
-	$p.m create text [list 8.0 [expr 38.0 + 11 * $_($t:gi).0]] -fill [color $color]  -justify left -anchor w -font {{bitstream vera sans mono} 10} -tags group -text $grp
-	incr _($t:gi)
+	set exists 0
+	dict for {key val} $_($t:g) {if {[dict get $val name] eq $grp} {set exists 1}}
+	if {$exists == 0} {
+	    if {$grp eq "-"} {set grp [random_txt [expr "int(floor(rand() * 10 + 2))"]]}
+	    set n -1
+	    while true { if {[lsearch -integer [dict keys $_($t:g)] [incr n]] == -1} {break}}
+	    dict set _($t:g) $n name $grp
+	    dict set _($t:g) $n color [rgb]
+	    set _($t:cg) $n
+	    mat_groups_view $p $t
+	}
+    }
+
+    proc mat_groups_view {p t} {
+	variable _
+	$p.m delete [$p.m find withtag group]
+	foreach i [dict keys $_($t:g)] {
+	    set id [$p.m create text [concat 68.0 [expr {38.0 + 11 * $i}]] -fill [color [dict get $_($t:g) $i color]] -justify right -anchor e -font {{bitstream vera sans mono} 10} -tags [concat group $i lb] -text [dict get $_($t:g) $i name]]
+	    $p.m bind $id <Enter> "::ix::mat_group_active $p $t $i"
+	    set bx [$p.m bbox $id]
+	    $p.m lower [$p.m create path [::tkpath::coords rect [lindex $bx 0] [lindex $bx 1] [expr [lindex $bx 2] - [lindex $bx 0]] [expr [lindex $bx 3] - [lindex $bx 1]] -rx 6 -ry 6] -tags [concat group $i bg] -strokewidth 1 -stroke white -fill white -fillopacity 0.5]
+	}
+	mat_group_active $p $t $_($t:cg)
+    }
+
+    proc mat_group_active {p t g} {
+	variable _
+	set _($t:cg) $g
+	foreach n [dict keys $_($t:g)] {
+	    if {$g == $n} {set cb black; set cl white; set tl 1} {set cb white; set cl [color [dict get $_($t:g) $n color]]; set tl 0.5}
+	    set idb [$p.m find withtag "group && $n  && bg"]
+	    $p.m itemconfigure $idb -fill $cb -fillopacity $tl -stroke $cl
+	    set idl [$p.m find withtag "group && $n  && lb"]
+	    $p.m itemconfigure $idl -fill $cl; 
+	    if {$g == $n} {$p.m raise $idb;$p.m raise $idl;}
+	}
     }
 
     proc mat_key {p t k b} {
@@ -390,17 +424,11 @@ namespace eval ::ix {
 	}
     }
 
-    proc mat_new {p t w h bg ln xa xb ya yb qx qy} {
+    proc mat_new {p t w h bg ln xa xb ya yb qx qy mx my} {
 	variable _
-	set _($t) {}
-	set _($t:g) {}
-	set i -1;
-	set sel -1;
-	set gi 0;set hover 0
 	set sc white
 	foreach xy {x y} {foreach ab {a b} {set ${xy}${ab}o [set ${xy}${ab}]}}
-	foreach a {i sel sc gi hover ln xa xb ya yb xao xbo yao ybo qx qy} {set _($t:$a) [set $a]}
-
+	foreach a {sc ln xa xb ya yb xao xbo yao ybo qx qy mx my} {set _($t:$a) [set $a]}
 	if {[winfo exists $p.m] != 1} {
 	    canvas $p.m -bg $bg -width $w -height $h
 	    pack $p.m -side left
@@ -423,9 +451,18 @@ namespace eval ::ix {
 	    $p.m create text {20 20} -fill blue -justify left -anchor w -font {{bitstream vera sans} 18} -tags mode -text move_canvas
 	    $p.m create text [list [expr {$w / 2.}] 5] -fill red -justify center -anchor n -font {{bitstream vera sans} 14} -tags q -text q
 	    $p.m create text "10 $h" -fill red -justify left -anchor sw -font {{bitstream vera sans} 12 bold} -fill purple -tags loc -text ""
-	    mat_gridlines $p $t}
-	mat_group_new $p $t default
-	mat_group_new $p $t wavs
+	    if {[info exists _($t)] != 1} {
+	    set _($t) {}
+	    set _($t:g) {}
+	    set sel -1; set i -1; set hover 0;
+	    foreach a {i sel hover} {set _($t:$a) [set $a]}
+	    mat_group_new $p $t default
+	    mat_group_new $p $t wavs
+	    } 
+	}
+	mat_gridlines $p $t
+	mat_redraw $p $t all
+	mat_groups_view $p $t
     }
     
     proc mat_gridlines {p t} {
@@ -439,26 +476,28 @@ namespace eval ::ix {
 	    array set ta {x n y w}
 	    array set tj {x center y left}
 	    array set igx {y width x height}
-	    for {set x [expr {int($_($t:${xy}a) / ($_($t:q${xy}) + 0.0) + 1)*($_($t:q${xy}) + 0.0)}]} {[expr {$_($t:${xy}a) > $_($t:${xy}b) ? $x >=  $_($t:${xy}b) : $x <=  $_($t:${xy}b)}]} {set x [expr {$_($t:${xy}a) > $_($t:${xy}b) ? $x - $_($t:q${xy}) : $x + $_($t:q${xy})}]} {
+	    set range [expr {abs($_($t:${xy}b) - $_($t:${xy}a))}]
+	    set numshits [expr {$range / $_($t:q$xy)}]
+	    if {$numshits > $_($t:m${xy})} {set factor [expr {int($numshits / ($_($t:m${xy}) + 0.0) + 1)}]} else {
+		set factor [expr {1. / (int(1./($numshits / ($_($t:m${xy}) + 0.0) + 0.0)) + 0.0)}]
+	    }
+	    set increment [expr {$_($t:q${xy}) * $factor}]
+	    for {set x [expr {int($_($t:${xy}a) / ($increment + 0.0) + 1)*($increment + 0.0)}]} {[expr {$_($t:${xy}a) > $_($t:${xy}b) ? $x >=  $_($t:${xy}b) : $x <=  $_($t:${xy}b)}]} {set x [expr {$_($t:${xy}a) > $_($t:${xy}b) ? $x - $increment : $x + $increment}]} {
 		set og [mat_tr $p $t $xy t $x]
 		set invgeo [winfo $igx($xy) $w]
 		switch $xy {
-#		    y {set coords [concat M 0 $og L $invgeo $og]}
-#		    x {set coords [concat M $og 0 L $og $invgeo]}}
-		    y {set coords [concat 0 $og $invgeo $og]}
-		    x {set coords [concat $og 0 $og $invgeo]}}
-#		$w lower [$w create path $coords -stroke $_($t:ln) -strokedasharray 2 -tags gridline -strokewidth 1]
-		$w lower [$w create line $coords -fill $_($t:ln) -tags gridline -width 1]
-#		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} \
-		$w lower [$w create text [lrange $coords 0 1] -font {{Bitstream Vera Sans} 8} \
-			      -fill green -anchor $ta($xy) -text $x -justify $tj($xy) -tags gridline]}}}}
+		    y {set coords [concat M [expr {int(rand()*32)}] $og L $invgeo $og]}
+		    x {set coords [concat M $og  [expr {int(rand()*16)}] L $og $invgeo]}}
+		$w lower [$w create text [lrange $coords 1 2] -font {{Bitstream Vera Sans} 8} -fill [rc] -anchor $ta($xy) -text [string range $x 0 7] -justify $tj($xy) -tags gridline]
+		$w lower [$w create path $coords -stroke $_($t:ln) -strokedasharray [expr {int(rand()*42 + 1)}] -tags gridline -strokewidth 1]
+	    }}}}
 
 #> mat frame
-#. -bd 3 #w 384 #h 144 #bg white #ln purple
-#. #Xa 123 #Xb 2000 #Ya 0 #Yb 127 #qx 125 #qy 1
+#. -bd 3 #w 384 #h 144 #bg gray86 #ln white
+#. #Xa 123 #Xb 2000 #Ya 0 #Yb 127 #qx 125 #qy 1 #mx 12 #my 64
 #. @list  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
 #. @add  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
 puts "mat .- .|"
-::ix::mat_new .- .| .#w .#h .#bg .#ln .#Xa .#Xb .#Ya .#Yb .#qx .#qy
+::ix::mat_new .- .| .#w .#h .#bg .#ln .#Xa .#Xb .#Ya .#Yb .#qx .#qy .#mx .#my
 #bind .- <Enter> {focus .-}
 #bind .- <Leave> {focus .^.c}
