@@ -10,8 +10,10 @@
 # renamed by their respective maintainers.
 
 for helpfile in help-*.pd ; do
-   mv "$helpfile" "`echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
-#	echo "SWAP $helpfile `echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
+	 if [ -e $helpfile ]; then
+		  mv "$helpfile" "`echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
+		  echo "SWAP $helpfile FOR `echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
+	 fi
 done
 
 # this isn't used yet
