@@ -592,7 +592,7 @@ EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
 EXTERN t_template *gtemplate_get(t_gtemplate *x);
 EXTERN t_template *template_findbyname(t_symbol *s);
 EXTERN t_canvas *template_findcanvas(t_template *tmpl);
-EXTERN void template_notify(t_template *template,
+EXTERN void template_notify(t_template *,
     t_symbol *s, int argc, t_atom *argv);
 
 EXTERN t_float template_getfloat(t_template *x, t_symbol *fieldname,
@@ -603,9 +603,9 @@ EXTERN t_symbol *template_getsymbol(t_template *x, t_symbol *fieldname,
     t_word *wp, int loud);
 EXTERN void template_setsymbol(t_template *x, t_symbol *fieldname,
     t_word *wp, t_symbol *s, int loud);
-EXTERN t_float fielddesc_getcoord(t_fielddesc *f, t_template *template,
+EXTERN t_float fielddesc_getcoord(t_fielddesc *f, t_template *,
     t_word *wp, int loud);
-EXTERN void fielddesc_setcoord(t_fielddesc *f, t_template *template,
+EXTERN void fielddesc_setcoord(t_fielddesc *f, t_template *,
     t_word *wp, float pix, int loud);
 EXTERN t_float fielddesc_cvttocoord(t_fielddesc *f, float val);
 EXTERN float fielddesc_cvtfromcoord(t_fielddesc *f, float coord);
