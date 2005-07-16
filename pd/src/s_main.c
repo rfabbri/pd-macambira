@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-char pd_version[] = "Pd version 0.39 TEST 3\n";
+char pd_version[] = "Pd version 0.39 TEST 4\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 
@@ -346,6 +346,10 @@ static char *(usagemessage[]) = {
 "-nomidiin        -- suppress MIDI input\n",
 "-nomidiout       -- suppress MIDI output\n",
 "-nomidi          -- suppress MIDI input and output\n",
+#ifdef USEAPI_ALSA
+"-alsamidi        -- use ALSA midi API\n",
+#endif
+
 
 "\nother flags:\n",
 "-path <path>     -- add to file search path\n",
@@ -603,6 +607,11 @@ int sys_argparse(int argc, char **argv)
                 alsa_adddev(argv[1]);
             else goto usage;
             argc -= 2; argv +=2;
+        }
+        else if (!strcmp(*argv, "-alsamidi"))
+        {
+          sys_set_midi_api(API_ALSA);
+            argc--; argv++;
         }
 #endif
 #ifdef USEAPI_JACK

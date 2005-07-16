@@ -36,7 +36,7 @@ static t_class *my_numbox_class;
 
 static void my_numbox_tick_reset(t_my_numbox *x)
 {
-  if(x->x_gui.x_fsf.x_change && x->x_gui.x_glist)
+    if(x->x_gui.x_fsf.x_change && x->x_gui.x_glist)
     {
         x->x_gui.x_fsf.x_change = 0;
         (*x->x_gui.x_draw)(x, x->x_gui.x_glist, IEM_GUI_DRAW_MODE_UPDATE);

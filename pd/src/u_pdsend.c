@@ -105,7 +105,8 @@ connected: ;
         /* now loop reading stdin and sending  it to socket */
     while (1)
     {
-        char buf[BUFSIZE], *bp, nsent, nsend;
+        char buf[BUFSIZE], *bp;
+        int nsent, nsend;
         if (!fgets(buf, BUFSIZE, stdin))
             break;
         nsend = strlen(buf);

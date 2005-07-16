@@ -42,6 +42,8 @@ t_midiqelem midi_inqueue[MIDIQSIZE];
 int midi_inhead, midi_intail;
 static double sys_midiinittime;
 
+int sys_midiapi = API_DEFAULT;
+
     /* this is our current estimate for at what "system" real time the
     current logical time's output should occur. */
 static double sys_dactimeminusrealtime;
@@ -99,11 +101,24 @@ static double sys_getmidiinrealtime( void)
 static void sys_putnext( void)
 {
     int portno = midi_outqueue[midi_outtail].q_portno;
-    if (midi_outqueue[midi_outtail].q_onebyte)
-        sys_putmidibyte(portno, midi_outqueue[midi_outtail].q_byte1);
-    else sys_putmidimess(portno, midi_outqueue[midi_outtail].q_byte1,
-            midi_outqueue[midi_outtail].q_byte2,
-                midi_outqueue[midi_outtail].q_byte3);
+#ifdef USEAPI_ALSA
+    if (sys_midiapi == API_ALSA)
+      {
+        if (midi_outqueue[midi_outtail].q_onebyte)
+          sys_alsa_putmidibyte(portno, midi_outqueue[midi_outtail].q_byte1);
+        else sys_alsa_putmidimess(portno, midi_outqueue[midi_outtail].q_byte1,
+                             midi_outqueue[midi_outtail].q_byte2,
+                             midi_outqueue[midi_outtail].q_byte3);
+      }
+    else
+#endif /* ALSA */
+      {
+        if (midi_outqueue[midi_outtail].q_onebyte)
+          sys_putmidibyte(portno, midi_outqueue[midi_outtail].q_byte1);
+        else sys_putmidimess(portno, midi_outqueue[midi_outtail].q_byte1,
+                             midi_outqueue[midi_outtail].q_byte2,
+                             midi_outqueue[midi_outtail].q_byte3);
+      }
     midi_outtail  = (midi_outtail + 1 == MIDIQSIZE ? 0 : midi_outtail + 1);
 }
 
@@ -441,6 +456,11 @@ void sys_pollmidiqueue( void)
         post("delay %d", (int)(1000 * (newtime - lasttime)));
     lasttime = newtime;
 #endif
+#ifdef USEAPI_ALSA
+      if (sys_midiapi == API_ALSA)
+        sys_alsa_poll_midi();
+      else
+#endif /* ALSA */
     sys_poll_midi();    /* OS dependent poll for MIDI input */
     sys_pollmidioutqueue();
     sys_pollmidiinqueue();
@@ -448,6 +468,9 @@ void sys_pollmidiqueue( void)
 
 /******************** dialog window and device listing ********************/
 
+#ifdef USEAPI_ALSA
+void midi_alsa_init( void);
+#endif
 #ifdef USEAPI_OSS
 void midi_oss_init( void);
 #endif
@@ -458,6 +481,21 @@ static int midi_midiindev[MAXMIDIINDEV];
 static int midi_nmidioutdev;
 static int midi_midioutdev[MAXMIDIOUTDEV];
 
+
+void sys_get_midi_apis(char *buf)
+{
+    int n = 0;
+    strcpy(buf, "{ ");
+    sprintf(buf + strlen(buf), "{default-MIDI %d} ", API_DEFAULT); n++;
+#ifdef USEAPI_ALSA
+    sprintf(buf + strlen(buf), "{ALSA-MIDI %d} ", API_ALSA); n++;
+#endif
+    strcat(buf, "}");
+        /* then again, if only one API (or none) we don't offer any choice. */
+    if (n < 2)
+        strcpy(buf, "{}");
+    
+}
 void sys_get_midi_params(int *pnmidiindev, int *pmidiindev,
     int *pnmidioutdev, int *pmidioutdev)
 {
@@ -486,13 +524,24 @@ static void sys_save_midi_params(
 void sys_open_midi(int nmidiindev, int *midiindev,
     int nmidioutdev, int *midioutdev, int enable)
 {
+#ifdef USEAPI_ALSA
+  midi_alsa_init();
+#endif
 #ifdef USEAPI_OSS
     midi_oss_init();
 #endif
     if (enable)
+#ifdef USEAPI_ALSA
+      if (sys_midiapi == API_ALSA)
+        sys_alsa_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
+      else
+#endif /* ALSA */
         sys_do_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev);
     sys_save_midi_params(nmidiindev, midiindev,
         nmidioutdev, midioutdev);
+
+    sys_vgui("set pd_whichmidiapi %d\n", sys_midiapi);
+
 }
 
     /* open midi using whatever parameters were last used */
@@ -514,6 +563,12 @@ void sys_listmididevs(void )
     char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
     int nindevs = 0, noutdevs = 0, i;
 
+#ifdef USEAPI_ALSA
+    if (sys_midiapi == API_ALSA)
+      midi_alsa_getdevs(indevlist, &nindevs, outdevlist, &noutdevs,
+        MAXNDEV, DEVDESCSIZE);
+    else
+#endif /* ALSA */
     midi_getdevs(indevlist, &nindevs, outdevlist, &noutdevs,
         MAXNDEV, DEVDESCSIZE);
 
@@ -532,6 +587,50 @@ void sys_listmididevs(void )
         post("output devices:");
         for (i = 0; i < noutdevs; i++)
             post("%d. %s", i+DEVONSET, outdevlist + i * DEVDESCSIZE);
+    }
+}
+
+void sys_set_midi_api(int which)
+{
+     sys_midiapi = which;
+     if (sys_verbose)
+        post("sys_midiapi %d", sys_midiapi);
+}
+
+void glob_midi_properties(t_pd *dummy, t_floatarg flongform);
+
+void glob_midi_setapi(void *dummy, t_floatarg f)
+{
+    int newapi = f;
+    if (newapi)
+    {
+        if (newapi == sys_midiapi)
+        {
+          //if (!midi_isopen())
+          //  s_reopen_midi();
+        }
+        else
+        {
+#ifdef USEAPI_ALSA
+          if (sys_midiapi == API_ALSA)
+              sys_alsa_close_midi();
+          else
+#endif
+            sys_close_midi();
+          sys_midiapi = newapi;
+          /* bash device params back to default */
+          midi_nmidiindev = midi_nmidioutdev = 1;
+          //midi_midiindev[0] = midi_midioutdev[0] = DEFAULTMIDIDEV;
+          //midi_midichindev[0] = midi_midichoutdev[0] = SYS_DEFAULTCH;
+          sys_reopen_midi();
+        }
+
+        glob_midi_properties(0, 0);
+    }
+    else //if (midi_isopen())
+    {
+        sys_close_midi();
+        //midi_state = 0;
     }
 }
 
@@ -589,6 +688,19 @@ void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
     midioutdev3 = (noutdev > 2 && midioutdev[2]>=0 ? midioutdev[2]+1 : 0);  
     midioutdev4 = (noutdev > 3 && midioutdev[3]>=0 ? midioutdev[3]+1 : 0);  
 
+#ifdef USEAPI_ALSA
+      if (sys_midiapi == API_ALSA)
+    sprintf(buf,
+"pdtk_alsa_midi_dialog %%s \
+%s %d %d %d %d %s %d %d %d %d \
+%d 1\n",
+        indevliststring,
+        midiindev1, midiindev2, midiindev3, midiindev4, 
+        outdevliststring,
+        midioutdev1, midioutdev2, midioutdev3, midioutdev4,
+        (flongform != 0));
+      else
+#endif
     sprintf(buf,
 "pdtk_midi_dialog %%s \
 %s %d %d %d %d %s %d %d %d %d \
@@ -598,6 +710,7 @@ void glob_midi_properties(t_pd *dummy, t_floatarg flongform)
         outdevliststring,
         midioutdev1, midioutdev2, midioutdev3, midioutdev4,
         (flongform != 0));
+
     gfxstub_deleteforkey(0);
     gfxstub_new(&glob_pdobject, (void *)glob_midi_properties, buf);
 }
@@ -609,6 +722,7 @@ void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
     int i, nindev, noutdev;
     int newmidiindev[4], newmidioutdev[4];
+    int alsadevin, alsadevout;
 
     for (i = 0; i < 4; i++)
     {
@@ -632,7 +746,20 @@ void glob_midi_dialog(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
             noutdev++;
         }
     }
+    alsadevin = atom_getintarg(8, argc, argv);
+    alsadevout = atom_getintarg(9, argc, argv);
+        
+#ifdef USEAPI_ALSA
+    if (sys_midiapi == API_ALSA)
+      {
+        sys_alsa_close_midi();
+        sys_open_midi(alsadevin, newmidiindev, alsadevout, newmidioutdev, 1);
+      }
+    else
+#endif
+      {
+        sys_close_midi();
+        sys_open_midi(nindev, newmidiindev, noutdev, newmidioutdev, 1);
+      }
 
-    sys_close_midi();
-    sys_open_midi(nindev, newmidiindev, noutdev, newmidioutdev, 1);
 }

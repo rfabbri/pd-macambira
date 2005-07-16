@@ -28,7 +28,7 @@ CFLAGS = -Werror $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 
-SYSSRC += s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c
+SYSSRC += s_midi_oss.c s_audio_oss.c s_audio_alsa.c s_audio_alsamm.c s_midi_alsa.c
 
 SRC = g_canvas.c g_graph.c g_text.c g_rtext.c g_array.c g_template.c g_io.c \
     g_scalar.c g_traversal.c g_guiconnect.c g_readwrite.c g_editor.c \
@@ -97,11 +97,17 @@ $(BIN_DIR)/pd.tk: u_main.tk
 	cp u_main.tk $(BIN_DIR)/pd.tk
 
 #this is for Max OSX only...
-$(BIN_DIR)/pdtcl: $(GOBJ) $(GSRC)
-	cd ../obj; libtool -dynamic -o $(BIN_DIR)/pdtcl $(GOBJ) \
-	../../Frameworks/Tk.framework/Versions/Current/Tk \
-	../../Frameworks/Tcl.framework/Versions/Current/Tcl \
-	/usr/lib/libSystem.B.dylib
+$(BIN_DIR)/libPdTcl.dylib: $(GOBJ) $(GSRC)
+	cd ../obj && $(CC) -dynamiclib -read_only_relocs warning  \
+		-o $(BIN_DIR)/libPdTcl.dylib $(GOBJ)  \
+		-F \
+		-framework Tcl  -framework Tk  -framework System  \
+		-Wl,-install_name,@executable_path/../Resources/bin/libPdTcl.dylib
+	install_name_tool -change /Tcl.framework/Versions/8.4/Tcl\
+		 @executable_path/../Frameworks/Tcl.framework/Versions/8.4/Tcl \
+		 -change /Tk.framework/Versions/8.4/Tk \
+		 @executable_path/../Frameworks/Tk.framework/Versions/8.4/Tk \
+		../bin/libPdTcl.dylib
 
 externs: 
 	cd ../extra/bonk~;make 

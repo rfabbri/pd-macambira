@@ -505,7 +505,11 @@ static void route_list(t_route *x, t_symbol *sel, int argc, t_atom *argv)
     if (x->x_type == A_FLOAT)
     {
         float f;
-        if (!argc) return;
+        if (!argc)  /* empty lists go out reject outlet */
+        {
+            outlet_bang(x->x_rejectout);
+            return;
+        }
         f = atom_getfloat(argv);
         for (nelement = x->x_nelement, e = x->x_vec; nelement--; e++)
             if (e->e_w.w_float == f)
@@ -580,7 +584,8 @@ static void *route_new(t_symbol *s, int argc, t_atom *argv)
 {
     int n;
     t_routeelement *e;
-    t_route *x = (t_route *)pd_new(route_class);
+    t_route *x;
+    
     t_atom a;
     if (argc == 0)
     {
@@ -588,6 +593,13 @@ static void *route_new(t_symbol *s, int argc, t_atom *argv)
         SETFLOAT(&a, 0);
         argv = &a;
     }
+    for (n = 1; n < argc; n++)
+        if (argv[n].a_type != argv[0].a_type)
+    {
+        error("route: creation with mixed argument types failed");
+        return (0);
+    }
+    x = (t_route *)pd_new(route_class);
     x->x_type = argv[0].a_type;
     x->x_nelement = argc;
     x->x_vec = (t_routeelement *)getbytes(argc * sizeof(*x->x_vec));

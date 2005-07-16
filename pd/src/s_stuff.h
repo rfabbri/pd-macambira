@@ -95,6 +95,8 @@ void sys_open_midi(int nmidiin, int *midiinvec,
 void sys_get_midi_params(int *pnmidiindev, int *pmidiindev,
     int *pnmidioutdev, int *pmidioutdev);
 
+void sys_get_midi_apis(char *buf);
+
 void sys_reopen_midi( void);
 void sys_close_midi( void);
 EXTERN void sys_putmidimess(int portno, int a, int b, int c);
@@ -108,6 +110,22 @@ void midi_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int maxndev, int devdescsize);
 void sys_do_open_midi(int nmidiindev, int *midiindev,
     int nmidioutdev, int *midioutdev);
+
+#ifdef USEAPI_ALSA
+EXTERN void sys_alsa_putmidimess(int portno, int a, int b, int c);
+EXTERN void sys_alsa_putmidibyte(int portno, int a);
+EXTERN void sys_alsa_poll_midi(void);
+EXTERN void sys_alsa_setmiditimediff(double inbuftime, double outbuftime);
+EXTERN void sys_alsa_midibytein(int portno, int byte);
+EXTERN void sys_alsa_close_midi( void);
+
+
+    /* implemented in the system dependent MIDI code (s_midi_pm.c, etc. ) */
+void midi_alsa_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int maxndev, int devdescsize);
+void sys_alsa_do_open_midi(int nmidiindev, int *midiindev,
+    int nmidioutdev, int *midioutdev);
+#endif
 
 /* m_sched.c */
 EXTERN void sys_log_error(int type);
@@ -233,6 +251,7 @@ void mmio_getdevs(char *indevlist, int *nindevs,
         int maxndev, int devdescsize);
 
 void sys_listmididevs(void);
+void sys_set_midi_api(int whichapi);
 void sys_set_audio_api(int whichapi);
 void sys_get_audio_apis(char *buf);
 extern int sys_audioapi;

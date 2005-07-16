@@ -353,9 +353,6 @@ void iemgui_send(void *x, t_iemgui *iemgui, t_symbol *s)
     snd = iemgui_raute2dollar(s);
     iemgui->x_snd_unexpanded = snd;
     iemgui->x_snd = snd = canvas_realizedollar(iemgui->x_glist, snd);
-        post("send: before %s, after %s", iemgui->x_snd_unexpanded->s_name,
-            iemgui->x_snd->s_name);
-
     iemgui->x_fsf.x_snd_able = sndable;
     iemgui_verify_snd_ne_rcv(iemgui);
     (*iemgui->x_draw)(x, iemgui->x_glist, IEM_GUI_DRAW_MODE_IO + oldsndrcvable);

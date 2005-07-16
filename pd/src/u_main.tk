@@ -44,6 +44,12 @@ if {$pd_nt == 1} {
 if {$pd_nt == 2} {
 # turn on James Tittle II's fast drawing (wait until I can test this...):
 #   set tk::mac::useCGDrawing 1
+    # set minimum line size for anti-aliasing.  If set to 1 or 0, then every
+    # line will be anti-aliased.  While this makes connections and circles in
+    # [bng] and such look really good, it makes boxes and messages look out of
+    # focus.  Setting this to 2 makes it so the thick audio rate connections
+    # are anti-aliased.  <hans@at.or.at> 2005-06-09
+    set tk::mac::CGAntialiasLimit 2
     global pd_guidir
     global pd_tearoff
     set pd_gui2 [string range $argv0 0 [expr [string last / $argv0 ] - 1]]
@@ -338,10 +344,10 @@ proc menu_opentext {filename} {
     global doc_number
     global pd_guidir
     global pd_myversion
-	global pd_font3
+#    global pd_font3
     set name [format ".help%d" $doc_number]
     toplevel $name
-    text $name.text -relief raised -bd 2 -font $pd_font3 \
+    text $name.text -relief raised -bd 2 -font -*-times-regular--normal--14-* \
     	-yscrollcommand "$name.scroll set" -background white
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
@@ -451,7 +457,7 @@ proc doc_submenu {helpmenu subdir} {
 ############# routine to add media, help, and apple menu items ###############
 
 proc menu_addstd {mbar} {
-    global pd_apilist pd_nt pd_tearoff
+    global pd_apilist pd_midiapilist pd_nt pd_tearoff
 #          the "Audio" menu
     $mbar.audio add command -label {audio ON} -accelerator [accel_munge "Ctrl+/"] \
 	-command {menu_audio 1} 
@@ -462,6 +468,12 @@ proc menu_addstd {mbar} {
 	    -command {menu_audio 0} -variable pd_whichapi \
 	    	-value [lindex [lindex $pd_apilist $x] 1]\
 		-command {pd [concat pd audio-setapi $pd_whichapi \;]}
+    }
+    for {set x 0} {$x<[llength $pd_midiapilist]} {incr x} {
+    	$mbar.audio add radiobutton -label [lindex [lindex $pd_midiapilist $x] 0] \
+	    -command {menu_midi 0} -variable pd_whichmidiapi \
+	    	-value [lindex [lindex $pd_midiapilist $x] 1]\
+		-command {pd [concat pd midi-setapi $pd_whichmidiapi \;]}
     }
 	 if {$pd_nt != 2} {
     $mbar.audio add command -label {Audio settings...} \
@@ -3112,7 +3124,7 @@ proc pdtk_data_dialog {name stuff} {
     pack $name.buttonframe.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 40 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font pd_font3
+    	-yscrollcommand "$name.scroll set" -font $pd_font3
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -3182,20 +3194,21 @@ proc pdtk_pd_ctrlkey {name key shift} {
 # font sizes 8, 10, 12, 14, 16, and 24.
 
 # tb: user defined typefaces
-proc pdtk_pd_startup {version apilist fontname} {
+proc pdtk_pd_startup {version apilist midiapilist fontname} {
 #    puts stderr [concat $version $apilist $fontname]
-    global pd_myversion pd_apilist
+    global pd_myversion pd_apilist pd_midiapilist
     set pd_myversion $version
     set pd_apilist $apilist
-	global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7
+    set pd_midiapilist $midiapilist
+    global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7
 
-	set pd_font1 [format -*-%s-bold--normal--8-* $fontname]
-	set pd_font2 [format -*-%s-bold--normal--10-* $fontname]
- 	set pd_font3 [format -*-%s-bold--normal--12-* $fontname]
- 	set pd_font4 [format -*-%s-bold--normal--14-* $fontname]
-	set pd_font5 [format -*-%s-bold--normal--16-* $fontname]
-	set pd_font6 [format -*-%s-bold--normal--24-* $fontname]
-	set pd_font7 [format -*-%s-bold--normal--36-* $fontname]
+    set pd_font1 [format -*-%s-bold--normal--8-* $fontname]
+    set pd_font2 [format -*-%s-bold--normal--10-* $fontname]
+    set pd_font3 [format -*-%s-bold--normal--12-* $fontname]
+    set pd_font4 [format -*-%s-bold--normal--14-* $fontname]
+    set pd_font5 [format -*-%s-bold--normal--16-* $fontname]
+    set pd_font6 [format -*-%s-bold--normal--24-* $fontname]
+    set pd_font7 [format -*-%s-bold--normal--36-* $fontname]
 
     set width1 [font measure  $pd_font1 x]
     set height1 [lindex [font metrics $pd_font1] 5]
@@ -3676,11 +3689,11 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     pdtk_standardkeybindings $id.out1f.x2
 }
 
-####################### midi dialog ##################3
+####################### midi dialog ##################
 
 proc midi_apply {id} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
-    global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4 
+    global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4 midi_alsain midi_alsaout
 
     pd [concat pd midi-dialog \
     	$midi_indev1 \
@@ -3691,6 +3704,8 @@ proc midi_apply {id} {
     	$midi_outdev2 \
     	$midi_outdev3 \
     	$midi_outdev4 \
+    	$midi_alsain \
+    	$midi_alsaout \
 	\;]
 }
 
@@ -3727,12 +3742,12 @@ proc midi_popup {name buttonname varname devlist} {
 # start a dialog window to select midi devices.  "longform" asks us to make
 # controls for opening several devices; if not, we get an extra button to
 # turn longform on and restart the dialog.
-
 proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     	outdevlist outdev1 outdev2 outdev3 outdev4 longform} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
     global midi_indevlist midi_outdevlist
+    global midi_alsain midi_alsaout
 
     set midi_indev1 $indev1
     set midi_indev2 $indev2
@@ -3744,6 +3759,8 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     set midi_outdev4 $outdev4
     set midi_indevlist $indevlist
     set midi_outdevlist $outdevlist
+    set midi_alsain [llength $indevlist]
+    set midi_alsaout [llength $outdevlist]
 
     toplevel $id
     wm title $id {midi}
@@ -3854,6 +3871,148 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     	button $id.longbutton.b -text {use multiple devices} \
     	    -command  {pd pd midi-properties 1 \;}
     	pack $id.longbutton.b
+    }
+}
+
+proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
+    	outdevlist outdev1 outdev2 outdev3 outdev4 longform alsa} {
+    global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
+    global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
+    global midi_indevlist midi_outdevlist
+    global midi_alsain midi_alsaout
+
+    set midi_indev1 $indev1
+    set midi_indev2 $indev2
+    set midi_indev3 $indev3
+    set midi_indev4 $indev4
+    set midi_outdev1 $outdev1
+    set midi_outdev2 $outdev2
+    set midi_outdev3 $outdev3
+    set midi_outdev4 $outdev4
+    set midi_indevlist $indevlist
+    set midi_outdevlist $outdevlist
+    set midi_alsain [llength $indevlist]
+    set midi_alsaout [llength $outdevlist]
+    
+    toplevel $id
+    wm title $id {midi}
+    wm protocol $id WM_DELETE_WINDOW [concat midi_cancel $id]
+
+    frame $id.buttonframe
+    pack $id.buttonframe -side bottom -fill x -pady 2m
+    button $id.buttonframe.cancel -text {Cancel}\
+    	-command "midi_cancel $id"
+    button $id.buttonframe.apply -text {Apply}\
+    	-command "midi_apply $id"
+    button $id.buttonframe.ok -text {OK}\
+    	-command "midi_ok $id"
+    pack $id.buttonframe.cancel -side left -expand 1
+    pack $id.buttonframe.apply -side left -expand 1
+    pack $id.buttonframe.ok -side left -expand 1
+
+    frame $id.in1f
+    pack $id.in1f -side top
+
+  if {$alsa == 0} {
+    	# input device 1
+    label $id.in1f.l1 -text "input device 1:"
+    button $id.in1f.x1 -text [lindex $indevlist $midi_indev1] \
+    	-command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
+    pack $id.in1f.l1 $id.in1f.x1 -side left
+
+    	# input device 2
+    if {$longform && [llength $indevlist] > 2} {
+	frame $id.in2f
+	pack $id.in2f -side top
+
+	label $id.in2f.l1 -text "input device 2:"
+	button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
+    	    -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
+	pack $id.in2f.l1 $id.in2f.x1 -side left
+    }
+
+    	# input device 3
+    if {$longform && [llength $indevlist] > 3} {
+	frame $id.in3f
+	pack $id.in3f -side top
+
+	label $id.in3f.l1 -text "input device 3:"
+	button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
+    	    -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
+	pack $id.in3f.l1 $id.in3f.x1 -side left
+    }
+
+    	# input device 4
+    if {$longform && [llength $indevlist] > 4} {
+	frame $id.in4f
+	pack $id.in4f -side top
+
+	label $id.in4f.l1 -text "input device 4:"
+	button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
+    	    -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
+	pack $id.in4f.l1 $id.in4f.x1 -side left
+    }
+
+    	# output device 1
+
+    frame $id.out1f
+    pack $id.out1f -side top
+    label $id.out1f.l1 -text "output device 1:"
+    button $id.out1f.x1 -text [lindex $outdevlist $midi_outdev1] \
+    	-command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
+    pack $id.out1f.l1 $id.out1f.x1 -side left
+
+    	# output device 2
+    if {$longform && [llength $indevlist] > 2} {
+	frame $id.out2f
+	pack $id.out2f -side top
+    	label $id.out2f.l1 -text "output device 2:"
+    	button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
+    	    -command \
+	    [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
+    	pack $id.out2f.l1 $id.out2f.x1 -side left
+    }
+
+    	# output device 3
+    if {$longform && [llength $indevlist] > 3} {
+	frame $id.out3f
+	pack $id.out3f -side top
+    	label $id.out3f.l1 -text "output device 3:"
+    	button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
+    	    -command \
+	    [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
+    	pack $id.out3f.l1 $id.out3f.x1 -side left
+    }
+
+    	# output device 4
+    if {$longform && [llength $indevlist] > 4} {
+	frame $id.out4f
+	pack $id.out4f -side top
+    	label $id.out4f.l1 -text "output device 4:"
+    	button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
+    	    -command \
+	    [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
+    	pack $id.out4f.l1 $id.out4f.x1 -side left
+    }
+
+    	# if not the "long form" make a button to
+	# restart with longform set. 
+    
+    if {$longform == 0} {
+	frame $id.longbutton
+	pack $id.longbutton -side top
+    	button $id.longbutton.b -text {use multiple alsa devices} \
+    	    -command  {pd pd midi-properties 1 \;}
+    	pack $id.longbutton.b
+    }
+    }
+    if {$alsa} {
+    	label $id.in1f.l1 -text "In Channels:"
+    	entry $id.in1f.x1 -textvariable midi_alsain -width 4
+        pack $id.in1f.l1 $id.in1f.x1 -side left
+	label $id.in1f.l2 -text "Out Channels:"
+    	entry $id.in1f.x2 -textvariable midi_alsaout -width 4
+        pack $id.in1f.l2 $id.in1f.x2 -side left
     }
 }
 

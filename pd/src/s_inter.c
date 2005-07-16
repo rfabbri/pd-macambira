@@ -851,7 +851,7 @@ int sys_startgui(const char *guidir)
 #ifdef UNISTD
     int stdinpipe[2];
 #endif
-
+    fprintf(stderr, "gui; %s\n", guidir);
     /* create an empty FD poll list */
     sys_fdpoll = (t_fdpoll *)t_getbytes(0);
     sys_nfdpoll = 0;
@@ -1029,6 +1029,9 @@ int sys_startgui(const char *guidir)
 #ifdef MACOSX
                 char *homedir = getenv("HOME"), filename[250];
                 struct stat statbuf;
+                sprintf(filename, "%s/../../MacOS/Pd", guidir);
+                if (stat(filename, &statbuf) >= 0)
+                    goto foundit;
                 if (!homedir || strlen(homedir) > 150)
                     goto nohomedir;
                 sprintf(filename,
@@ -1196,7 +1199,7 @@ int sys_startgui(const char *guidir)
     }
     if (!sys_nogui)
     {
-         char buf[256];
+      char buf[256], buf2[256];
          sys_socketreceiver = socketreceiver_new(0, 0, 0, 0);
          sys_addpollfn(sys_guisock, (t_fdpollfn)socketreceiver_read,
              sys_socketreceiver);
@@ -1207,7 +1210,8 @@ int sys_startgui(const char *guidir)
              sys_gui("pdtk_watchdog\n");
 #endif
          sys_get_audio_apis(buf);
-         sys_vgui("pdtk_pd_startup {%s} %s {%s}\n", pd_version, buf, 
+         sys_get_midi_apis(buf2);
+         sys_vgui("pdtk_pd_startup {%s} %s %s {%s}\n", pd_version, buf, buf2,
                                   sys_font); 
     }
     return (0);
