@@ -51,8 +51,9 @@ namespace eval ::ix {
 	set tags [list item i$_($t:i) $_($t:i)]
 	switch [dict get $d type] {
 	    note {
-		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags r] -stroke [color [darken [dict get $_($t:g) $_($t:cg) color] 0.2]]
-		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags q] -fill [color [dict get $_($t:g) $_($t:cg) color]] -strokewidth 0 -fillopacity 0.8
+		set color [dict get $_($t:g) $_($t:cg) color]
+		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags r] -stroke [color [lighten $color 0.4]] -strokeopacity 1.0 -fill [color $color] -fillopacity 0.08
+		$p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags q] -fill [color $color] -strokewidth 0 -fillopacity 0.8
 	    }
 	    sound {
 		snack:::sound s$_($t:i)
@@ -122,23 +123,24 @@ namespace eval ::ix {
 	    all {set items [dict keys $_($t)]}
 	    default {}}
 	foreach id $items {
-	    set px [mat_tr $p $t x t [dict get $_($t) $id x]]
-	    set py [mat_tr $p $t y t [dict get $_($t) $id y]]
-	    set w [expr {[dict get $_($t) $id xx] - [dict get $_($t) $id x]}]
-	    set h [expr {[dict get $_($t) $id yy] - [dict get $_($t) $id y]}]
+	    set x [mat_tr $p $t x t [dict get $_($t) $id x]]
+	    set y [mat_tr $p $t y t [dict get $_($t) $id y]]
+	    set qx [mat_tr $p $t x t [mat_quant $p $t x [dict get $_($t) $id x]]]
+	    set qy [mat_tr $p $t y t [mat_quant $p $t y [dict get $_($t) $id y]]]
 	    switch [dict get $_($t) $id type] {
 		note {
-		    if {$h < 0.01} {set h 1}
-		    set sx [expr {abs([mat_tr $p $t x id $w])}]
-		    set sy [expr {abs([mat_tr $p $t y id $h])}]
+		    set sx [expr abs([mat_tr $p $t x id [expr {[dict get $_($t) $id xx] - [dict get $_($t) $id x]}]])]
+		    set qsx [expr abs([mat_tr $p $t x id [expr {[mat_quant $p $t x [dict get $_($t) $id xx]] - [mat_quant $p $t x [dict get $_($t) $id x]]}]])]
+		    set sy [expr abs([mat_tr $p $t y id 1])]
+		    		    set ro [expr {int( $sy / 2.0 )}]
 		    set r [$p.m find withtag "i$id && r"]
 		    set q [$p.m find withtag "i$id && q"]
-		    $p.m coords $r [::tkpath::coords rect $px $py $sx $sy -rx 3 -ry 3]
-		    $p.m coords $q [::tkpath::coords rect [mat_quant $p $t x $px] [mat_quant $p $t y $py] $sx $sy -rx 3 -ry 3]
+		    $p.m coords $r [::tkpath::coords rect $x $y $sx $sy -rx $ro -ry $ro]
+		    $p.m coords $q [::tkpath::coords rect $qx $qy $qsx $sy  -rx $ro -ry $ro]
 		    $p.m itemconfigure $q -fillopacity [dict get $_($t) $id v]
 		}
 		sound {
-		    $p.m coords [$p.m find withtag i$id] $px $py
+		    $p.m coords [$p.m find withtag i$id] $x $y
 		}
 	    }    
 	}
@@ -175,6 +177,10 @@ namespace eval ::ix {
     proc mat_resize_right {p t a x y} {mat_resize_object $p $t xx $x $y}    
     proc mat_resize_top {p t a x y} {mat_resize_object $p $t y $x $y}
     proc mat_resize_bottom {p t a x y} {mat_resize_object $p $t yy $x $y}  
+    proc mat_resize_tl {p t a x y} {mat_resize_object $p $t x $x $y; mat_resize_object $p $t y $x $y}
+    proc mat_resize_tr {p t a x y} {mat_resize_object $p $t x $x $y; mat_resize_object $p $t yy $x $y}
+    proc mat_resize_bl {p t a x y} {mat_resize_object $p $t xx $x $y; mat_resize_object $p $t y $x $y}
+    proc mat_resize_br {p t a x y} {mat_resize_object $p $t xx $x $y; mat_resize_object $p $t yy $x $y}
 
     proc mat_resize_object {p t e x y} {
 	variable _
@@ -204,21 +210,36 @@ namespace eval ::ix {
 	if {$clicked ne ""} {
 	    mat_mode $p $t move_object
 	    set id [lindex $clicked 0]
-	    set eX [mat_tr $p $t x t [dict get $_($t) $id x]]
-	    set eXX [mat_tr $p $t x t [dict get $_($t) $id xx]]
-	    set eY [mat_tr $p $t y t [dict get $_($t) $id y]]
-	    set eYY [mat_tr $p $t y t [dict get $_($t) $id yy]]
-	    if {[expr {abs($eX - $x)}] < 5} {mat_mode $p $t resize_left}
-	    if {[expr {abs($eXX - $x)}] < 5} {mat_mode $p $t resize_right} 
-	    if {[expr {abs($eY - $y)}] < 1} {mat_mode $p $t resize_top}
-	    if {[expr {abs($eYY - $y)}] < 1} {mat_mode $p $t resize_bottom} 
+	    set d 3
+	    set dx [expr {abs([mat_tr $p $t x t [dict get $_($t) $id x]] - $x)}]
+	    set dxx [expr {abs([mat_tr $p $t x t [dict get $_($t) $id xx]] - $x)}]
+	    set dy [expr {abs([mat_tr $p $t y t [dict get $_($t) $id y]] - $y)}]
+	    set dyy [expr {abs([mat_tr $p $t y t [dict get $_($t) $id yy]] - $y)}]
+	    puts "d: x $dx y $dy xx $dxx yy $dyy"
+	    if {$dx < $d && $dy < $d} {
+		mat_mode $p $t resize_tl
+	    } elseif {$dxx < $d && $dy < $d} {
+		mat_mode $p $t resize_tr
+	    } elseif {$dx < $d && $dyy < $d} {
+		mat_mode $p $t resize_bl
+	    } elseif {$dxx < $d && $dyy < $d} {
+		mat_mode $p $t resize_br
+	    } elseif {$dx < $d} {
+		mat_mode $p $t resize_left
+	    } elseif {$dxx < $d} {
+		mat_mode $p $t resize_right
+	    } elseif {$dy < $d} {
+		mat_mode $p $t resize_top
+	    } elseif {$dyy < $d} {
+		mat_mode $p $t resize_bottom
+	    }
 	    if {[$p.m find withtag sel] eq "" && [llength $_($t:sel)] > 1} {return}
 	    mat_updatesel $p $t $clicked
 	} else {
 	    mat_mode $p $t move_canvas
 	}
     }
-
+    
     proc mat_item_info {p t clicked} {
 	variable _
 	set n 0;$p.m delete hover
@@ -342,7 +363,7 @@ namespace eval ::ix {
     }
 
     proc mat_mode {p t m} {
-	array set cursor {draw pencil move_canvas fleur move_object dotbox item_v box_spiral resize_canvas bogosity sel cross_reverse resize_left left_side resize_right right_side resize_top top_side resize_bottom bottom_side}
+	array set cursor {draw pencil move_canvas fleur move_object dotbox item_v box_spiral resize_canvas bogosity sel cross_reverse resize_left left_side resize_right right_side resize_top top_side resize_bottom bottom_side resize_tl top_left_corner resize_tr top_right_corner resize_bl bottom_left_corner resize_br bottom_right_corner}
 	$p.m itemconfigure mode -text $m
 	$p.m configure -cursor $cursor($m)
      }
@@ -494,7 +515,7 @@ namespace eval ::ix {
 
 #> mat frame
 #. -bd 3 #w 384 #h 144 #bg gray86 #ln white
-#. #Xa 123 #Xb 2000 #Ya 0 #Yb 127 #qx 125 #qy 1 #mx 12 #my 64
+#. #Xa 123 #Xb 2000 #Ya 127 #Yb 0 #qx 50 #qy 1 #mx 12 #my 64
 #. @list  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
 #. @add  ::ix::mat_add .- .| {.#1} .#2 .#3 .#4
 puts "mat .- .|"
