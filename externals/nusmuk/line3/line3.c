@@ -68,13 +68,12 @@ void line3_tick(t_line3 *x)
     }
     else
     {
-	t = (timenow - x->x_prevtime);
+	   t = (timenow - x->x_prevtime);
 
-	tmp = x->a * t * t * t + x->b * t * t + x->setderiv * t + x->x_setval;
+	   tmp = x->a * t * t * t + x->b * t * t + x->setderiv * t + x->x_setval;
 
-        outlet_float(x->x_obj.ob_outlet, tmp);
-        clock_delay(x->x_clock,
-            (x->x_grain > msectogo ? msectogo : x->x_grain));
+       outlet_float(x->x_obj.ob_outlet, tmp);
+       clock_delay(x->x_clock, (x->x_grain > msectogo ? msectogo : x->x_grain));
     }
 }
 
@@ -83,10 +82,10 @@ void line3_float(t_line3 *x, t_float f)
     double timenow = clock_getsystime();
     if (x->x_gotinlet && x->x_in1val > 0)
     {
-        if (timenow > x->x_targettime) 
+        if (timenow >= x->x_targettime) 
 	{
 		x->x_setval = x->x_targetval;
-		x->setderiv = 0;
+		x->setderiv = 0;	
 	}
         else 
 	{
@@ -94,8 +93,7 @@ void line3_float(t_line3 *x, t_float f)
 
 		x->setderiv = 3 * x->a * (timenow - x->x_prevtime) * (timenow - x->x_prevtime) + 2 * x->b * (timenow - x->x_prevtime) + x->setderiv;
 
-	}
-	
+	}	
         x->x_prevtime = timenow;
         x->x_targettime = clock_getsystimeafter(x->x_in1val);
         x->x_targetval = f;
@@ -119,6 +117,7 @@ void line3_float(t_line3 *x, t_float f)
     {
         clock_unset(x->x_clock);
         x->x_targetval = x->x_setval = f;
+        x->x_targettime = timenow;
         outlet_float(x->x_obj.ob_outlet, f);
     }
     x->x_gotinlet = 0;
