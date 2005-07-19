@@ -24,7 +24,7 @@ $(TARGETPATH)/%.o : $(SRCDIR)/%.c
 $(TARGET) :: $(TARGETPATH) 
 
 $(TARGET) :: $(COBJS) $(CPPOBJS)
-	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ $(COBJS) $(CPPOBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) $(LIBPATH) -o $@ $(COBJS) $(CPPOBJS) $(LIBS) $(SYSLIBS)
 	strip --strip-unneeded $@
 	chmod 755 $@
 
@@ -36,7 +36,7 @@ _clean_:
 ##############################################
 
 $(INSTPATH):
-	-mkdir -p $@
+	-mkdir -p $(INSTPATH)
 
 _install_: $(INSTPATH)
 	install $(TARGET) $(INSTPATH)
