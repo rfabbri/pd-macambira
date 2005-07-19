@@ -80,8 +80,16 @@ typedef struct pdp_rec_struct
 
 static void pdp_rec_free_ressources(t_pdp_rec *x)
 {
-    if ( x->x_yuvpointers ) freebytes ( x->x_yuvpointers, 3*sizeof( unsigned char** ) );
-    if ( x->x_yuvbuffer ) freebytes ( x->x_yuvbuffer, x->x_vsize + (x->x_vsize>>1) );
+    if ( x->x_yuvpointers ) 
+    {
+       post( "pdp_rec~ : freeing pointers..." );
+       freebytes ( x->x_yuvpointers, 3*sizeof(unsigned char**) );
+    }
+    if ( x->x_yuvbuffer )
+    {
+       post( "pdp_rec~ : freeing buffers..." );
+       freebytes ( x->x_yuvbuffer, x->x_vsize + (x->x_vsize>>1) );
+    }
 
 }
 
