@@ -13,6 +13,22 @@ see http://www.parasitaere-kapazitaeten.net/ext
 
 ----------------------------------------------------------------------------
 
+HOW TO COMPILE:
+
+
+1) New flext build system:
+
+windows:
+pathtoflext/build.bat
+ 
+linux/OSX:
+sh patchtoflext/build.sh
+
+
+2) old build system:
+
 To compile the external edit the config-pd-*.txt file of your platform and the run build-pd-*.
+
+----------------------------------------------------------------------------
 
 For suggestions, bugs, ... mail me: grh@mur.at
