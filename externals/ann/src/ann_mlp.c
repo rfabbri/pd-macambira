@@ -514,6 +514,15 @@ static void ann_mlp_set_activation_function_output(t_ann_mlp *x, t_symbol *sl, i
 			funzione = FANN_SIGMOID_SYMMETRIC;
 		if (strcmp(parametro->s_name, "FANN_SIGMOID_SYMMETRIC_STEPWISE")==0)
 			funzione = FANN_SIGMOID_SYMMETRIC_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_GAUSSIAN")==0)
+      funzione = FANN_GAUSSIAN;
+    if (strcmp(parametro->s_name, "FANN_GAUSSIAN_STEPWISE")==0)
+      funzione = FANN_GAUSSIAN_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_ELLIOT")==0)
+      funzione = FANN_ELLIOT;
+    if (strcmp(parametro->s_name, "FANN_ELLIOT_SYMMETRIC")==0)
+      funzione = FANN_ELLIOT_SYMMETRIC;
+    
 		fann_set_activation_function_output(x->ann, funzione);
 	} else
 	{
@@ -536,20 +545,29 @@ static void ann_mlp_set_activation_function_hidden(t_ann_mlp *x, t_symbol *sl, i
 
 	if (argc>0) {
 		parametro = atom_gensym(argv);
-		if (strcmp(parametro->s_name, "FANN_THRESHOLD")==0)
-			funzione = FANN_THRESHOLD;
-		if (strcmp(parametro->s_name, "FANN_THRESHOLD_SYMMETRIC")==0)
-			funzione = FANN_THRESHOLD_SYMMETRIC;
-		if (strcmp(parametro->s_name, "FANN_LINEAR")==0)
-			funzione = FANN_LINEAR;
-		if (strcmp(parametro->s_name, "FANN_SIGMOID")==0)
-			funzione = FANN_SIGMOID;
-		if (strcmp(parametro->s_name, "FANN_SIGMOID_STEPWISE")==0)
-			funzione = FANN_SIGMOID_STEPWISE;
-		if (strcmp(parametro->s_name, "FANN_SIGMOID_SYMMETRIC")==0)
-			funzione = FANN_SIGMOID_SYMMETRIC;
-		if (strcmp(parametro->s_name, "FANN_SIGMOID_SYMMETRIC_STEPWISE")==0)
-			funzione = FANN_SIGMOID_SYMMETRIC_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_THRESHOLD")==0)
+      funzione = FANN_THRESHOLD;
+    if (strcmp(parametro->s_name, "FANN_THRESHOLD_SYMMETRIC")==0)
+      funzione = FANN_THRESHOLD_SYMMETRIC;
+    if (strcmp(parametro->s_name, "FANN_LINEAR")==0)
+      funzione = FANN_LINEAR;
+    if (strcmp(parametro->s_name, "FANN_SIGMOID")==0)
+      funzione = FANN_SIGMOID;
+    if (strcmp(parametro->s_name, "FANN_SIGMOID_STEPWISE")==0)
+      funzione = FANN_SIGMOID_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_SIGMOID_SYMMETRIC")==0)
+      funzione = FANN_SIGMOID_SYMMETRIC;
+    if (strcmp(parametro->s_name, "FANN_SIGMOID_SYMMETRIC_STEPWISE")==0)
+      funzione = FANN_SIGMOID_SYMMETRIC_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_GAUSSIAN")==0)
+      funzione = FANN_GAUSSIAN;
+    if (strcmp(parametro->s_name, "FANN_GAUSSIAN_STEPWISE")==0)
+      funzione = FANN_GAUSSIAN_STEPWISE;
+    if (strcmp(parametro->s_name, "FANN_ELLIOT")==0)
+      funzione = FANN_ELLIOT;
+    if (strcmp(parametro->s_name, "FANN_ELLIOT_SYMMETRIC")==0)
+      funzione = FANN_ELLIOT_SYMMETRIC;
+    
 		fann_set_activation_function_hidden(x->ann, funzione);
 	} else
 	{
