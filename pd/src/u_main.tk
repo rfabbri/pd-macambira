@@ -4007,10 +4007,10 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     }
     }
     if {$alsa} {
-    	label $id.in1f.l1 -text "In Channels:"
+    	label $id.in1f.l1 -text "In Ports:"
     	entry $id.in1f.x1 -textvariable midi_alsain -width 4
         pack $id.in1f.l1 $id.in1f.x1 -side left
-	label $id.in1f.l2 -text "Out Channels:"
+	label $id.in1f.l2 -text "Out Ports:"
     	entry $id.in1f.x2 -textvariable midi_alsaout -width 4
         pack $id.in1f.l2 $id.in1f.x2 -side left
     }

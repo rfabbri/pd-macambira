@@ -60,7 +60,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday select socket strerror)
-
+AC_FUNC_ALLOCA
 
 dnl Checks for libraries.
 dnl Checking for `dlopen' function in -ldl:
@@ -349,5 +349,5 @@ then
     MORECFLAGS=$MORECFLAGS"  -g3 -D__COMPAQC__ -arch host"
 fi
 
-AC_OUTPUT(makefile)
+AC_OUTPUT(makefile config.h)
 

@@ -90,18 +90,6 @@ int gpointer_check(const t_gpointer *gp, int headok)
     else return (0);
 }
 
-/* call this if you know the pointer is fresh but don't know if we're pointing
-to the head of a list or to real data.   Any pointer is known to be fresh
-when it appears as the argument of a message, but if your "pointer" method 
-or inlet stores it and you use it later, call gpointer_check above. */
-
-/* LATER reconsider the above... I no longer think it's true! */
-
-static int gpointer_ishead(const t_gpointer *gp)
-{
-    return ((gp->gp_stub->gs_which == GP_GLIST) && !gp->gp_un.gp_scalar);
-}
-
 /* get the template for the object pointer to.  Assumes we've already checked
 freshness.  Returns 0 if head of list. */
 
@@ -122,8 +110,9 @@ static t_symbol *gpointer_gettemplatesym(const t_gpointer *gp)
     }
 }
 
-    /* copy a pointer to another, assuming the first one is fresh and
-    the second one hasn't yet been initialized. */
+    /* copy a pointer to another, assuming the second one hasn't yet been
+    initialized.  New gpointers should be initialized either by this
+    routine or by gpointer_init below. */
 void gpointer_copy(const t_gpointer *gpfrom, t_gpointer *gpto)
 {
     *gpto = *gpfrom;
@@ -132,6 +121,8 @@ void gpointer_copy(const t_gpointer *gpfrom, t_gpointer *gpto)
     else bug("gpointer_copy");
 }
 
+    /* clear a gpointer that was previously set, releasing the associted
+    gstub if this was the last reference to it. */
 void gpointer_unset(t_gpointer *gp)
 {
     t_gstub *gs;
@@ -416,9 +407,9 @@ static void get_pointer(t_get *x, t_gpointer *gp)
         pd_error(x, "get: couldn't find template %s", templatesym->s_name);
         return;
     }
-    if (gpointer_ishead(gp))
+    if (!gpointer_check(gp, 0))
     {
-        pd_error(x, "get: empty pointer");
+        pd_error(x, "get: stale or empty pointer");
         return;
     }
     if (gs->gs_which == GP_ARRAY) vec = gp->gp_un.gp_w;
@@ -691,9 +682,9 @@ static void getsize_pointer(t_getsize *x, t_gpointer *gp)
         pd_error(x, "getsize: field %s not of type array", fieldsym->s_name);
         return;
     }
-    if (gpointer_ishead(gp))
+    if (!gpointer_check(gp, 0))
     {
-        pd_error(x, "getsize: empty pointer");
+        pd_error(x, "get: stale or empty pointer");
         return;
     }
     if (gpointer_gettemplatesym(gp) != x->x_templatesym)
@@ -1033,9 +1024,9 @@ static void sublist_pointer(t_sublist *x, t_gpointer *gp)
         pd_error(x, "sublist: couldn't find template %s", templatesym->s_name);
         return;
     }
-    if (gpointer_ishead(gp))
+    if (!gpointer_check(gp, 0))
     {
-        pd_error(x, "sublist: empty pointer");
+        pd_error(x, "get: stale or empty pointer");
         return;
     }
     if (!template_find_field(template, x->x_fieldsym,

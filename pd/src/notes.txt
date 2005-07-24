@@ -16,10 +16,15 @@ GOP font depends on abstraction, not parent
 
 ------------ 0.39 ---------
 problems:
+windows:
+  modal dialogs confuse watchdog
+mac:
+  .pd extension not added when saving?
 TK commands to nonexistent windows? (maybe fixed)
 array name changes don't show up on parent
 arrays that don't fit in bounds don't update (same as red rectangle problem?)
 what about upsampling inlet~s?  ask Pd list...
+
 
 flag for array to suppress printing name
 
@@ -40,7 +45,6 @@ block resampling arguments
 document tabwrite~_start
 
 problems:
-modal dialogs confuse watchdog
 patcher inlets don't deal with scalars (zbug.pd)
 Macintosh .pd extension not added to filenames
 need to optimize canvas_motion (get rid of box hit test??)
@@ -70,7 +74,6 @@ features:
 flag to suppress printing array name above graph
 rename windowname-pd instead of pd-windowname
 fix copyright notices
-update portmusic to latest
 IEM guis to use queued updates
 pixel font sizes
 pd to find running ones (pd -new to defeat)
@@ -85,7 +88,6 @@ tables:
 queued graphics updates for IEMGUIs and scalars
 think of a way to embed abstractions in a patch
 make watchdog work for MACOSX
-GOP bounding box object
 IEMGUIs better default font size
 search path to include both calling patch and abstraction, if different
 abstraction reload shouldn't have to vis everyone
@@ -96,7 +98,7 @@ put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
 open/save panel to take messages to init directory, and to set extent list
 flags to defeat pre-loading specified classes
 expr to parse exponential notation
-
+pipe to handle symbols&pointers (just takes floats now???)
 
 data:
 data copy/paste doesn't check templates aren't changed

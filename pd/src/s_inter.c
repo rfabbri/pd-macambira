@@ -851,7 +851,6 @@ int sys_startgui(const char *guidir)
 #ifdef UNISTD
     int stdinpipe[2];
 #endif
-    fprintf(stderr, "gui; %s\n", guidir);
     /* create an empty FD poll list */
     sys_fdpoll = (t_fdpoll *)t_getbytes(0);
     sys_nfdpoll = 0;

@@ -890,6 +890,14 @@ x_gui.o: x_gui.c m_pd.h \
   /usr/include/endian.h /usr/include/bits/endian.h /usr/include/stdlib.h \
   /usr/include/unistd.h /usr/include/bits/posix_opt.h \
   /usr/include/bits/confname.h /usr/include/getopt.h
+x_list.o: x_list.c m_pd.h \
+  /usr/lib/gcc-lib/i386-redhat-linux/3.3.3/include/stddef.h \
+  /usr/include/string.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/gnu/stubs.h /usr/include/bits/string.h \
+  /usr/include/bits/string2.h /usr/include/endian.h \
+  /usr/include/bits/endian.h /usr/include/bits/types.h \
+  /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h \
+  /usr/include/stdlib.h
 d_soundfile.o: d_soundfile.c /usr/include/unistd.h \
   /usr/include/features.h /usr/include/sys/cdefs.h \
   /usr/include/gnu/stubs.h /usr/include/bits/posix_opt.h \

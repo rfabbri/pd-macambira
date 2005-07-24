@@ -48,6 +48,16 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
     int i;
     alsa_nmidiin = 0;
     alsa_nmidiout = 0;
+    if(nmidiin>MAXMIDIINDEV )
+      {
+        post("midi input ports reduced to maximum %d", MAXMIDIINDEV);
+        nmidiin=MAXMIDIINDEV;
+      }
+    if(nmidiout>MAXMIDIOUTDEV)
+      {
+        post("midi output ports reduced to maximum %d", MAXMIDIOUTDEV);
+        nmidiout=MAXMIDIOUTDEV;
+      }
 
     if (nmidiin>0 && nmidiout>0)
         err = snd_seq_open(&midi_handle,"default",SND_SEQ_OPEN_DUPLEX,0);
@@ -200,8 +210,14 @@ void sys_alsa_poll_midi(void)
 void sys_alsa_close_midi()
 {
     alsa_nmidiin = alsa_nmidiout = 0;
-    snd_seq_close(midi_handle);
-    snd_midi_event_free(midiev);
+    if(midi_handle)
+      {
+        snd_seq_close(midi_handle);
+        if(midiev)
+          {
+            snd_midi_event_free(midiev);
+          }
+      }
 }
 
 #define NSEARCH 10

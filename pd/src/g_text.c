@@ -332,6 +332,38 @@ static void message_add(t_message *x, t_symbol *s, int argc, t_atom *argv)
     glist_retext(x->m_glist, &x->m_text);
 }
 
+static void message_addcomma(t_message *x)
+{
+    t_atom a;
+    SETCOMMA(&a);
+    binbuf_add(x->m_text.te_binbuf, 1, &a);
+    glist_retext(x->m_glist, &x->m_text);
+}
+
+static void message_addsemi(t_message *x)
+{
+    message_add(x, 0, 0, 0);
+}
+
+static void message_adddollar(t_message *x, t_floatarg f)
+{
+    int n = f;
+    if (n < 0)
+        n = 0;
+    t_atom a;
+    SETDOLLAR(&a, n);
+    binbuf_add(x->m_text.te_binbuf, 1, &a);
+    glist_retext(x->m_glist, &x->m_text);
+}
+
+static void message_adddollsym(t_message *x, t_symbol *s)
+{
+    t_atom a;
+    SETDOLLSYM(&a, s);
+    binbuf_add(x->m_text.te_binbuf, 1, &a);
+    glist_retext(x->m_glist, &x->m_text);
+}
+
 static void message_click(t_message *x,
     t_floatarg xpos, t_floatarg ypos, t_floatarg shift,
         t_floatarg ctrl, t_floatarg alt)
@@ -1295,6 +1327,14 @@ void g_text_setup(void)
         A_GIMME, 0);
     class_addmethod(message_class, (t_method)message_add2, gensym("add2"),
         A_GIMME, 0);
+    class_addmethod(message_class, (t_method)message_addcomma,
+        gensym("addcomma"), 0);
+    class_addmethod(message_class, (t_method)message_addsemi,
+        gensym("addsemi"), 0);
+    class_addmethod(message_class, (t_method)message_adddollar,
+        gensym("adddollar"), A_FLOAT, 0);
+    class_addmethod(message_class, (t_method)message_adddollsym,
+        gensym("adddollsym"), A_SYMBOL, 0);
 
     messresponder_class = class_new(gensym("messresponder"), 0, 0,
         sizeof(t_text), CLASS_PD, 0);
