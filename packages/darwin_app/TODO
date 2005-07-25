@@ -1,19 +1,23 @@
 
-- convert the wget sf dev listing line in darwin_app_readme from wget to curl
-  so it works out-of-box on macosx
+- review permissions so that you can build on top on existing builds
 
-- fix Pd.app file associations
+- import nqpoly4 and write helpfiles based on website: 
+  			http://pix.test.at/pd/nqpoly/nqpoly4.html
+
+- add standard paths to included org.puredata.pd.plist following these
+  guidelines:
+http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles/WhereToPutFiles.html
+
+- explore Pd.app/Contents/Plugins with "Get Info" installation for externals
+
+- include org.puredata.pd.plist file in the DMG
+
+- add "extended" version to pd/src/s_main.c:char pd_version[] = "Pd version 0.38.4\n";
 
 - create old-style Help->Pure Documentation link on Help menu.  It should use a
   symlink to the "doc" dir internal to that particular Pd.app.  The symlink is
   named after the complete path to the "doc" dir, like:
      /tmp/.Applications_Pd-0.38-4.app_Contents_Resources_doc
-
-- make Help menu generator recursive
-
-- follow AppMain.tcl instructions:
-  http://wiki.tcl.tk/12987
-http://www.wordtech-software.com/tcl-bundle-tutorial.html
 
 - try this for the Pref Pane:
  kAEShowPreferences ::tk::mac::ShowPreferences
@@ -21,8 +25,6 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 - research Tcl "auto_path"
 
 - research Tk + "Custom MDEF" for menus
-
-- include auto-.pdrc script in package somewhere...
 
 - create Tcl script called from Prefs that creates links for the standard unix
 - locations for files that are in bin, include, man inside $(PD_FILE_ROOT)
@@ -45,6 +47,9 @@ http://www.wordtech-software.com/tcl-bundle-tutorial.html
 
 ------------------------------------------------------------------------------
 semi-abandoned TODOs
+
+
+- make Help menu generator recursive
 
 - make a web page that has stuff that can't be included due to license issues:
   (percolate)

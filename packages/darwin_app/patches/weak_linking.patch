@@ -1,0 +1,22 @@
+Index: makefile.in
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
+retrieving revision 1.8
+diff -u -w -r1.8 makefile.in
+--- makefile.in	24 Jul 2005 19:41:14 -0000	1.8
++++ makefile.in	25 Jul 2005 01:59:05 -0000
+@@ -85,9 +85,12 @@
+ $(BIN_DIR)/pdreceive: u_pdreceive.c
+ 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
+ 
++# MACOSX_DEPLOYMENT_TARGET=10.2 is necessary on Mac OS X to support weak
++# linking of frameworks.  Since its just a environment variable, it should be
++# safely ignored on other platforms.  <hans@eds.org>
+ $(PDEXEC): $(OBJ) 
+-	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
+-	$(LIB)
++	cd ../obj; MACOSX_DEPLOYMENT_TARGET=10.2 $(CC) $(LDFLAGS) $(DBG_CFLAGS) \
++		-o $(PDEXEC) $(OBJ) $(LIB)
+ 
+ $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
+ 	cd ../obj; $(CC) $(INCLUDE) -o $(BIN_DIR)/$(GUINAME) $(GOBJ) \

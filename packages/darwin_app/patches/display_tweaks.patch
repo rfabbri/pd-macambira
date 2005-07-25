@@ -18,7 +18,7 @@
  
  frame .printout
 -text .printout.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
-+text .printout.text -relief raised -bd 2 -font -*-courier-regular--normal--12-* \
++text .printout.text -relief raised -bd 2 -font { courier 12 } \
      -yscrollcommand ".printout.scroll set" -width 80
  # .printout.text insert end "\n\n\n\n\n\n\n\n\n\n"
  scrollbar .printout.scroll -command ".printout.text yview"
@@ -27,7 +27,7 @@
      set name [format ".help%d" $doc_number]
      toplevel $name
 -    text $name.text -relief raised -bd 2 -font -*-courier-bold--normal--12-* \
-+    text $name.text -relief raised -bd 2 -font -*-times-regular--normal--14-* \
++    text $name.text -relief raised -bd 2 -font { helvetica 14 } \
      	-yscrollcommand "$name.scroll set" -background white
      scrollbar $name.scroll -command "$name.text yview"
      pack $name.scroll -side right -fill y

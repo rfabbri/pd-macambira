@@ -3,9 +3,10 @@
 ==============================================================================
 
 Since currently, only Miller has commit permissions to the 'pd' section of the
-CVS, the fixes necessary for building the whole Pd.app are included in
-'packages/darwin_app/patches'.  The patches can be applied by running "make
-darwin_patch_pd" or unpatched using "make darwin_unpatch_pd".
+CVS, optional fixes and fixes necessary for building the whole Pd.app are
+included in 'packages/darwin_app/patches'.  The currently used patches can be
+applied by running "make darwin_patch_pd" or unpatched using "make
+darwin_unpatch_pd".
 
 
 ==============================================================================
@@ -33,9 +34,8 @@ ______________________________
 JackOSX 
 ______________________________
 
-Jack is optional.  The current linking method causes the resulting binary to
-require the Jack.framework to start whether or not you are using Jack.
-Ideally with would be fixed...
+Jack is optional.  The current linking allows Jack to be "weakly" linked,
+meaning that its an optional dependency.
 
   1. download latest JackOSX from http://www.jackosx.com/download.html 
   	  (I used version 0.6.1)
