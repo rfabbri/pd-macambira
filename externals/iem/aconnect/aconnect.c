@@ -37,11 +37,12 @@ typedef struct _aconnect
 
 #define LIST_INPUT	1
 #define LIST_OUTPUT	2
+#define ACONNECT_SEQ_NAME "default"
+
 #define perm_ok(pinfo,bits) ((snd_seq_port_info_get_capability(pinfo) & (bits)) == (bits))
 
-static snd_seq_t* ac_seq;
-
-
+static int ac_count=0;
+static snd_seq_t* ac_seq=0;
 
 static int check_permission(snd_seq_port_info_t *pinfo, int perm)
 {
@@ -73,19 +74,21 @@ static void do_search_port(t_aconnect *x, snd_seq_t *seq, int perm, action_func_
   snd_seq_client_info_t *cinfo;
   snd_seq_port_info_t *pinfo;
   int count;
-
   snd_seq_client_info_alloca(&cinfo);
   snd_seq_port_info_alloca(&pinfo);
   snd_seq_client_info_set_client(cinfo, -1);
   while (snd_seq_query_next_client(seq, cinfo) >= 0) {
     /* reset query info */
-    snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
-    snd_seq_port_info_set_port(pinfo, -1);
-    count = 0;
-    while (snd_seq_query_next_port(seq, pinfo) >= 0) {
-      if (check_permission(pinfo, perm)) {
-	do_action(x, seq, cinfo, pinfo);
-	count++;
+    int senderport=snd_seq_client_info_get_client(cinfo);
+    if(SND_SEQ_CLIENT_SYSTEM != senderport){ /* skipping port 0 */
+      snd_seq_port_info_set_client(pinfo, senderport);
+      snd_seq_port_info_set_port(pinfo, -1);
+      count = 0;
+      while (snd_seq_query_next_port(seq, pinfo) >= 0) {
+        if (check_permission(pinfo, perm)) {
+          do_action(x, seq, cinfo, pinfo);
+          count++;
+        }
       }
     }
   }
@@ -127,13 +130,13 @@ static void print_connections(t_aconnect *x, snd_seq_t *seq, snd_seq_client_info
   int sender_port   =snd_seq_port_info_get_port(pinfo);
   int receiver_id   =-1;
   int receiver_port =-1;
+  snd_seq_query_subscribe_t *subs;
 
   t_atom ap[4];
 
   SETFLOAT (ap+0, sender_id);
   SETFLOAT (ap+1, sender_port);
 
-  snd_seq_query_subscribe_t *subs;
   snd_seq_query_subscribe_alloca(&subs);
   snd_seq_query_subscribe_set_root(subs, snd_seq_port_info_get_addr(pinfo));
 
@@ -224,19 +227,18 @@ static void remove_all_connections(t_aconnect *x, snd_seq_t *seq)
 static void aconnect_listdevices(t_aconnect *x, t_symbol *s)
 {
   snd_seq_t *seq;
-  if (snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0) {
+  if (((seq=ac_seq)==0) && snd_seq_open(&seq, ACONNECT_SEQ_NAME, SND_SEQ_OPEN_DUPLEX, 0) < 0) {
     error("aconnect: can't open sequencer");
     outlet_float(x->x_error, (float)(-2));
     return;
   }
-
   if(&s_==s || gensym("input")==s)
     do_search_port(x, seq, LIST_INPUT, print_input);
 
   if(&s_==s || gensym("output")==s)
     do_search_port(x, seq, LIST_OUTPUT, print_output);
 
-  snd_seq_close(seq);
+  if(!ac_seq)snd_seq_close(seq);
   outlet_float(x->x_error, 0.);
 }
 
@@ -248,15 +250,15 @@ static void aconnect_listdevices(t_aconnect *x, t_symbol *s)
 static void aconnect_bang(t_aconnect *x)
 {
   snd_seq_t *seq;
-  if (snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0) {
+  if (((seq=ac_seq)==0) && snd_seq_open(&seq, ACONNECT_SEQ_NAME, SND_SEQ_OPEN_DUPLEX, 0) < 0) {
     error("aconnect: can't open sequencer");
     outlet_float(x->x_error, (float)(-2));
     return;
   }
 
-  do_search_port(x, seq, LIST_OUTPUT, print_connections);
+  do_search_port(x, seq, LIST_INPUT, print_connections);
 
-  snd_seq_close(seq);
+  if(!ac_seq)snd_seq_close(seq);
   outlet_float(x->x_error, 0.);
 }
 
@@ -320,7 +322,7 @@ static void aconnect_connect(t_aconnect *x, t_symbol *s, int argc, t_atom *argv)
     return;
   }
 
-  if (snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0) {
+  if (((seq=ac_seq)==0) && snd_seq_open(&seq, ACONNECT_SEQ_NAME, SND_SEQ_OPEN_DUPLEX, 0) < 0) {
     error("aconnect: can't open sequencer");
     outlet_float(x->x_error, (float)(-2));
     return;
@@ -334,7 +336,7 @@ static void aconnect_connect(t_aconnect *x, t_symbol *s, int argc, t_atom *argv)
 
   err=aconnect_subscribe(seq, 1, sender_id, sender_port, dest_id, dest_port);
   
-  snd_seq_close(seq);
+  if(!ac_seq)snd_seq_close(seq);
   outlet_float(x->x_error, (float)err);
 }
 /* a list like "disconnect <sender_client> <sender_port> <receiver_client> <receiver_port>"
@@ -351,7 +353,7 @@ static void aconnect_disconnect(t_aconnect *x, t_symbol *s, int argc, t_atom *ar
     return;
   }
 
-  if (snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0) < 0) {
+  if (((seq=ac_seq)==0) && snd_seq_open(&seq, ACONNECT_SEQ_NAME, SND_SEQ_OPEN_DUPLEX, 0) < 0) {
     error("aconnect: can't open sequencer");
     outlet_float(x->x_error, (float)(-2));
     return;
@@ -366,9 +368,20 @@ static void aconnect_disconnect(t_aconnect *x, t_symbol *s, int argc, t_atom *ar
   err=aconnect_subscribe(seq, 0, sender_id, sender_port, dest_id, dest_port);
   outlet_float(x->x_error, (float)err);
 
-  snd_seq_close(seq);
+  if(!ac_seq)snd_seq_close(seq);
 }
 #endif /* ALSA */
+
+static void aconnect_free(t_aconnect *x){
+#ifdef HAVE_ALSA
+  ac_count--;
+  if(ac_count<=0){
+    if(ac_seq)snd_seq_close(ac_seq);
+    ac_seq=0;
+  }
+#endif /* ALSA */
+}
+
 
 static void *aconnect_new(void)
 {
@@ -379,6 +392,16 @@ static void *aconnect_new(void)
 #ifndef HAVE_ALSA
   error("aconnect: compiled without ALSA-suppor !!");
   error("aconnect: no functionality enabled!");
+#else
+  if(ac_count<=0){
+    ac_count=0;
+    if (snd_seq_open(&ac_seq, ACONNECT_SEQ_NAME, SND_SEQ_OPEN_DUPLEX, 0) < 0){
+      error("aconnect: can't open sequencer");
+      ac_seq=0;
+    }
+  }
+  ac_count++;
+
 #endif /* !ALSA */
 
   return (x);
@@ -397,7 +420,7 @@ void aconnect_setup(void)
 #endif
   post("\tcompiled: "__DATE__"");
 
-  aconnect_class = class_new(gensym("aconnect"), (t_newmethod)aconnect_new, 0,
+  aconnect_class = class_new(gensym("aconnect"), (t_newmethod)aconnect_new, (t_method)aconnect_free,
 			     sizeof(t_aconnect), 0, 0);
 #ifdef HAVE_ALSA
   class_addmethod(aconnect_class, (t_method)aconnect_connect,gensym("connect"), A_GIMME, 0);
