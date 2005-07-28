@@ -1,4 +1,4 @@
-#N canvas 11 11 777 611 10;
+#N canvas 190 76 886 627 10;
 #X msg 93 173 walk the dog;
 #X msg 19 173 bang;
 #X msg 60 173 234;
@@ -26,16 +26,42 @@ the entire list as a single message. Like below:;
 #X text 66 201 A print object without a name. Be sure you can see the
 terminal window as you click on these messages.;
 #X text 74 9 -- print messages to the terminal window;
-#X obj 411 43 print~;
-#X text 410 22 RELATED OBJECTS;
+#X obj 153 588 print~;
+#X text 40 588 RELATED OBJECTS;
 #X text 17 408 To output the list as separate elements \, the list
 needs to be unpacked first. Note that [unpack]'s outlets are triggered
 from right to left. Like below:;
 #X text 28 481 The arguments here are used to tell Pd what type of
 atom to expect: (f = float \, s = symbol).;
-#X text 402 524 This document was updated for Pd version 0.35 test
-24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
-Czaja to build comprehensive documentation for Pd.;
+#X obj 477 252 print;
+#X msg 497 87 1;
+#X msg 506 108 float 1;
+#X text 464 52 "floats" are interpreted (i.e. it doesn't show the word
+"float" before the number):;
+#X obj 531 210 symbol test;
+#X msg 526 169 symbol this;
+#X obj 531 191 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 568 383 one 2 three;
+#X obj 500 467 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 568 468 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 586 443 print STRAIGHT;
+#X msg 552 363 list 1 two 3;
+#X msg 535 343 1 two 3;
+#X msg 577 404 list one 2 three;
+#X obj 503 444 route list;
+#X text 467 295 [print] only interprets the "list" selector when the
+following body of the message is an implied list \, i.e. a set of atoms
+that starts with a float.;
+#X text 452 551 This document was updated for Pd version 0.38.4 by
+Dave Sabine and Hans-Christoph Steiner as part of a project called
+pddp proposed by Krzysztof Czaja to build comprehensive documentation
+for Pd.;
+#X text 454 28 [print]'S ODDITIES;
+#X text 509 139 "symbols" are not interpreted (i.e. "symbol" is also
+printed:;
 #X connect 0 0 4 0;
 #X connect 1 0 4 0;
 #X connect 2 0 4 0;
@@ -48,3 +74,18 @@ Czaja to build comprehensive documentation for Pd.;
 #X connect 15 1 16 0;
 #X connect 15 2 16 0;
 #X connect 15 3 16 0;
+#X connect 24 0 23 0;
+#X connect 25 0 23 0;
+#X connect 27 0 23 0;
+#X connect 28 0 23 0;
+#X connect 29 0 27 0;
+#X connect 30 0 33 0;
+#X connect 30 0 37 0;
+#X connect 34 0 33 0;
+#X connect 34 0 37 0;
+#X connect 35 0 33 0;
+#X connect 35 0 37 0;
+#X connect 36 0 33 0;
+#X connect 36 0 37 0;
+#X connect 37 0 31 0;
+#X connect 37 1 32 0;
