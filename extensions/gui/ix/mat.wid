@@ -54,9 +54,9 @@ namespace eval ::ix {
 	if {$is eq "all"} {set is [dict keys $_($t)]}
 	foreach id $is {
 	    set tags [list item i$id $id]
+	    set color [dict get $_($t:g) $_($t:cg) color]
 	    switch [dict get $_($t) $id type] {
 		note {
-		    set color [dict get $_($t:g) $_($t:cg) color]
 		    $p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags r] -stroke [color [lighten $color 0.4]] -strokeopacity 1.0 -fill [color $color] -fillopacity 0.08
 		    $p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags q] -fill [color $color] -strokewidth 0 -fillopacity 0.8
 		}
@@ -64,7 +64,8 @@ namespace eval ::ix {
 		    snack:::sound s$id
 		    set filename [dict get $_($t) $id filename]
 		    s$id read $filename
-		    $p.m create waveform 0 0 -tags [concat $tags w] -sound s$id
+		    $p.m create path [::tkpath::coords rect 0 0 0 0 -rx 3 -ry 3] -tags [concat $tags r] -strokewidth 0 -fill [color $color] -fillopacity 0.08
+		    $p.m create waveform 0 0 -tags [concat $tags w] -sound s$id -fill white
 		    set length [expr [s$id length] / ($_($t:samplerate) + 0.0) * 1000]
 		    mat_item_ua $p $t $id abs [dict create xx [expr [dict get $_($t) $id x] + $length]] 0
 		    $p.m create text 0 0 -tags [concat $tags tl] -font {{bitstream vera sans} 8} -fill HotPink -anchor nw -justify left -text "[string range $length 0 10] s"
@@ -167,9 +168,14 @@ namespace eval ::ix {
 		}
 		sound {
 		    set waveform [$p.m find withtag "i$id && w"]
+		    set r [$p.m find withtag "i$id && r"]
+#		    set ro [expr int($ro / 2.)]
+		    set ro 6
+		    $p.m coords $r [::tkpath::coords rect $x $y $sx $sy -rx $ro -ry $ro]
+		    $p.m itemconfigure $r -fillopacity [dict get $_($t) $id v] -fill $color
 		    $p.m coords $waveform $x $y
-#		    $p.m itemconfigure $waveform -width $sx -height $sy
-		    $p.m itemconfigure $waveform -width $sx
+		    $p.m itemconfigure $waveform -width $sx -height [expr int($sy)]
+#		    $p.m itemconfigure $waveform -width $sx
 		    $p.m coords [$p.m find withtag "i$id && tl"] [expr $x + 4] [expr $y + 4]
 		    $p.m coords [$p.m find withtag "i$id && tlr"] [$p.m bbox [$p.m find withtag "i$id && tl"] ]
 		    $p.m coords [$p.m find withtag "i$id && tf"] [expr $x + $sx] [expr $y + 4]
@@ -253,8 +259,8 @@ namespace eval ::ix {
 	} else {
 	    set clicked [mat_cleansel $p $t [$p.m find overlapping [expr $x - 2]  [expr $y - 2] [expr $x + 2] [expr $y + 2]]]
 	    if {$clicked ne ""} {
-		mat_resize_modes $p $t $x $y [lindex $clicked 0]
-		if {[llength $_($t:sel)] <= 1} {mat_updatesel $p $t [lindex $clicked 0]}
+		mat_resize_modes $p $t $x $y [lindex $clicked end]
+		if {[llength $_($t:sel)] <= 1} {mat_updatesel $p $t [lindex $clicked end]}
 	    } else {
 		mat_mode $p $t move_canvas
 	    }
