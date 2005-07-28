@@ -1,4 +1,4 @@
-#N canvas 266 99 873 619 10;
+#N canvas 268 58 885 631 10;
 #X msg 95 298 1 2 3;
 #X obj 125 329 route list;
 #X msg 62 278 list 1 2 3;
@@ -49,7 +49,7 @@ NOT a "list":;
 #X text 22 575 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 239 589 released under the GNU GPL;
-#X text 445 576 $Revision: 1.5 $$Date: 2005-07-25 21:33:45 $;
+#X text 445 576 $Revision: 1.6 $$Date: 2005-07-28 01:02:56 $;
 #X text 446 589 $Author: eighthave $;
 #X text 673 551 updated for Pd 0.38-2;
 #X obj 487 117 route bang float list pointer symbol;
@@ -87,57 +87,86 @@ starting with a "symbol" is not \, unless that "symbol" is the selector
 -1 -1;
 #X obj 257 169 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
 -1 -1;
-#X text 450 389 When working with sets that might be either "lists"
-or undefined \, use [prepend]. Many of the "list" handling objects
-in Pd are not general enough to handle this situation.;
-#N canvas 0 22 848 498 some 0;
-#X obj 176 169 print;
-#X msg 137 100 list one two three;
-#X msg 122 61 1 2 3;
-#X msg 131 80 one 2 three;
-#X obj 97 169 route list;
-#X obj 97 198 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 183 32 857 475 has 0;
+#X obj 96 162 print;
+#X msg 57 93 list one two three;
+#X msg 42 54 1 2 3;
+#X msg 51 73 one 2 three;
+#X obj 17 162 route list;
+#X obj 17 181 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 165 199 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 85 182 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 124 139 prepend test;
-#X text 19 23 [prepend] accepts lists and undefined sets and outputs
-undefined sets.;
+#X obj 44 132 prepend test;
 #X text 12 229 [print] only interprets the "list" selector when the
 following body of the message is an implied list \, i.e. a set of atoms
 that starts with a float.;
-#X msg 86 307 list one two three;
-#X msg 67 269 1 2 3;
-#X msg 77 287 one 2 three;
-#X obj 37 401 route list;
-#X obj 37 430 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 105 431 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 64 371 prepend list;
-#X obj 116 401 print PREPEND;
-#X obj 92 351 print STRAIGHT;
-#X msg 100 326 list 1 two 3;
-#X msg 490 222 list one two three;
-#X msg 475 183 1 2 3;
-#X msg 484 202 one 2 three;
-#X obj 450 291 route list;
-#X obj 450 320 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 518 321 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 616 294 route list;
-#X obj 616 323 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 684 324 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X text 221 141 (I used cyclone's);
-#X obj 477 261 route one;
-#X text 415 127 [route] accepts lists and undefined sets and outputs
+#X msg 443 68 one 2 three;
+#X text 141 134 (I used cyclone's);
+#X obj 442 127 route one;
+#X text 426 17 [route] accepts lists and undefined sets and outputs
 lists \, and like [print] only interprets the 'list' selector for implied
 lists:;
-#X obj 529 291 print ONE;
-#X obj 692 294 print NOT_ONE;
+#X obj 460 159 print ONE;
+#X obj 441 159 bng 16 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 604 159 bng 16 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 668 160 print ONE;
+#X obj 650 160 bng 16 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 813 160 bng 16 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 651 129 route 1;
+#X msg 658 90 list 1 two 3;
+#X msg 652 70 1 two 3;
+#X msg 449 88 list one 2 three;
+#X msg 281 68 one 2 three;
+#X obj 280 133 prepend list;
+#X obj 280 177 print PREPEND_LIST;
+#X msg 290 89 list one 2 three;
+#X text 12 19 [prepend] interprets lists and outputs undefined sets.
+;
+#X obj 746 160 print NOT;
+#X obj 536 159 print NOT;
+#X msg 679 305 symbol test;
+#X obj 685 359 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 762 360 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 677 398 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 755 398 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 685 341 route symbol;
+#X obj 677 379 route symbol;
+#X msg 770 305 test;
+#X obj 470 359 route list;
+#X obj 470 378 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 538 379 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 457 397 route list;
+#X obj 457 416 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 525 417 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 473 310 list 1 two 3;
+#X msg 456 290 1 two 3;
+#X msg 489 330 list one 2 three;
+#X msg 133 330 one 2 three;
+#X obj 65 414 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 133 415 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 151 390 print STRAIGHT;
+#X msg 117 310 list 1 two 3;
+#X msg 100 290 1 two 3;
+#X msg 142 351 list one 2 three;
+#X obj 68 391 route list;
+#X text 429 231 [route list] interprets all lists \, but outputs non-lists
+on its left outlet for lists whose first element is a symbol. [route
+symbol] outputs a symbol from its left outlet.;
 #X connect 1 0 7 0;
 #X connect 2 0 7 0;
 #X connect 3 0 7 0;
@@ -145,30 +174,50 @@ lists:;
 #X connect 4 1 6 0;
 #X connect 7 0 0 0;
 #X connect 7 0 4 0;
-#X connect 10 0 16 0;
-#X connect 10 0 18 0;
-#X connect 11 0 16 0;
-#X connect 11 0 18 0;
-#X connect 12 0 16 0;
-#X connect 12 0 18 0;
-#X connect 13 0 14 0;
-#X connect 13 1 15 0;
-#X connect 16 0 13 0;
-#X connect 16 0 17 0;
-#X connect 19 0 18 0;
+#X connect 9 0 11 0;
+#X connect 11 0 13 0;
+#X connect 11 0 14 0;
+#X connect 11 1 15 0;
+#X connect 11 1 29 0;
 #X connect 19 0 16 0;
-#X connect 20 0 30 0;
-#X connect 21 0 30 0;
-#X connect 22 0 30 0;
+#X connect 19 0 17 0;
+#X connect 19 1 18 0;
+#X connect 19 1 28 0;
+#X connect 20 0 19 0;
+#X connect 21 0 19 0;
+#X connect 22 0 11 0;
 #X connect 23 0 24 0;
-#X connect 23 1 25 0;
-#X connect 26 0 27 0;
-#X connect 26 1 28 0;
-#X connect 30 0 23 0;
-#X connect 30 0 32 0;
-#X connect 30 1 26 0;
-#X connect 30 1 33 0;
-#X restore 463 466 pd some odd cases of list handling;
+#X connect 24 0 25 0;
+#X connect 26 0 24 0;
+#X connect 30 0 35 0;
+#X connect 35 0 31 0;
+#X connect 35 0 36 0;
+#X connect 35 1 32 0;
+#X connect 36 0 33 0;
+#X connect 36 1 34 0;
+#X connect 37 0 35 0;
+#X connect 38 0 39 0;
+#X connect 38 0 41 0;
+#X connect 38 1 40 0;
+#X connect 41 0 42 0;
+#X connect 41 1 43 0;
+#X connect 44 0 38 0;
+#X connect 45 0 38 0;
+#X connect 46 0 38 0;
+#X connect 47 0 50 0;
+#X connect 47 0 54 0;
+#X connect 51 0 50 0;
+#X connect 51 0 54 0;
+#X connect 52 0 50 0;
+#X connect 52 0 54 0;
+#X connect 53 0 50 0;
+#X connect 53 0 54 0;
+#X connect 54 0 48 0;
+#X connect 54 1 49 0;
+#X restore 486 453 pd has some odd cases of list handling;
+#X text 450 389 When working with sets that might be either "lists"
+or undefined \, use [prepend]. Many of the "list" handling objects
+in Pd have odd quirks which can make things difficult.;
 #X connect 0 0 1 0;
 #X connect 1 0 7 0;
 #X connect 1 1 8 0;
