@@ -416,9 +416,21 @@ static void get_pointer(t_get *x, t_gpointer *gp)
     else vec = gp->gp_un.gp_scalar->sc_vec;
     for (i = nitems - 1, vp = x->x_variables + i; i >= 0; i--, vp--)
     {
-        float f = template_getfloat(template, vp->gv_sym, vec, 1);
-        outlet_float(vp->gv_outlet, f);
-            /* LATER deal with other types. */
+        int onset, type;
+        t_symbol *arraytype;
+        if (template_find_field(template, vp->gv_sym, &onset, &type, &arraytype))
+        {
+            if (type == DT_FLOAT)
+                outlet_float(vp->gv_outlet,
+                    *(t_float *)(((char *)vec) + onset));
+            else if (type == DT_SYMBOL)
+                outlet_symbol(vp->gv_outlet,
+                    *(t_symbol **)(((char *)vec) + onset));
+            else pd_error(x, "get: %s.%s is not a number or symbol",
+                    template->t_sym->s_name, vp->gv_sym->s_name);
+        }
+        else pd_error(x, "get: %s.%s: no such field",
+            template->t_sym->s_name, vp->gv_sym->s_name);
     }
 }
 
@@ -441,7 +453,7 @@ static t_class *set_class;
 typedef struct _setvariable
 {
     t_symbol *gv_sym;
-    t_float gv_f;       /* LATER take other types */
+    union word gv_w;
 } t_setvariable;
 
 typedef struct _set
@@ -450,6 +462,7 @@ typedef struct _set
     t_gpointer x_gp;
     t_symbol *x_templatesym;
     int x_nin;
+    int x_issymbol;
     t_setvariable *x_variables;
 } t_set;
 
@@ -458,6 +471,14 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv)
     t_set *x = (t_set *)pd_new(set_class);
     int i;
     t_setvariable *sp;
+    if (argc && (argv[0].a_type == A_SYMBOL) &&
+        !strcmp(argv[0].a_w.w_symbol->s_name, "-symbol"))
+    {
+        x->x_issymbol = 1;
+        argc--;
+        argv++;
+    }
+    else x->x_issymbol = 0;
     x->x_templatesym = canvas_makebindsym(atom_getsymbolarg(0, argc, argv));
     if (argc) argc--, argv++;
     x->x_variables
@@ -468,9 +489,15 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv)
         for (i = 0, sp = x->x_variables; i < argc; i++, sp++)
         {
             sp->gv_sym = atom_getsymbolarg(i, argc, argv);
-            sp->gv_f = 0;
-            if (i) floatinlet_new(&x->x_obj, &sp->gv_f);
-                /* LATER figure out type as in "get" object. */
+            if (x->x_issymbol)
+                sp->gv_w.w_symbol = &s_;
+            else sp->gv_w.w_float = 0;
+            if (i)
+            {
+                if (x->x_issymbol)
+                    symbolinlet_new(&x->x_obj, &sp->gv_w.w_symbol);
+                else floatinlet_new(&x->x_obj, &sp->gv_w.w_float);
+            }
         }
     }
     pointerinlet_new(&x->x_obj, &x->x_gp);
@@ -478,7 +505,7 @@ static void *set_new(t_symbol *why, int argc, t_atom *argv)
     return (x);
 }
 
-static void set_float(t_set *x, t_float f)
+static void set_bang(t_set *x)
 {
     int nitems = x->x_nin, i;
     t_symbol *templatesym = x->x_templatesym;
@@ -503,15 +530,16 @@ static void set_float(t_set *x, t_float f)
             x->x_templatesym->s_name, gpointer_gettemplatesym(gp)->s_name);
         return;
     }
-    if (!nitems) return;
-    x->x_variables[0].gv_f = f;
-    if (gs->gs_which == GP_ARRAY) vec = gp->gp_un.gp_w;
+    if (!nitems)
+        return;
+    if (gs->gs_which == GP_ARRAY)
+        vec = gp->gp_un.gp_w;
     else vec = gp->gp_un.gp_scalar->sc_vec;
-    for (i = 0, vp = x->x_variables; i < nitems; i++, vp++)
-    {
-        template_setfloat(template, vp->gv_sym, vec, vp->gv_f, 1);
-            /* LATER deal with other types ala get_pointer. */
-    }
+    if (x->x_issymbol)
+        for (i = 0, vp = x->x_variables; i < nitems; i++, vp++)
+            template_setsymbol(template, vp->gv_sym, vec, vp->gv_w.w_symbol, 1);
+    else for (i = 0, vp = x->x_variables; i < nitems; i++, vp++)
+        template_setfloat(template, vp->gv_sym, vec, vp->gv_w.w_float, 1);
     if (gs->gs_which == GP_GLIST)
         glist_redrawitem(gs->gs_un.gs_glist, (t_gobj *)(gp->gp_un.gp_scalar));  
     else
@@ -522,6 +550,26 @@ static void set_float(t_set *x, t_float f)
         glist_redrawitem(owner_array->a_gp.gp_stub->gs_un.gs_glist,
             (t_gobj *)(owner_array->a_gp.gp_un.gp_scalar));  
     }
+}
+
+static void set_float(t_set *x, t_float f)
+{
+    if (x->x_nin && !x->x_issymbol)
+    {
+        x->x_variables[0].gv_w.w_float = f;
+        set_bang(x);
+    }
+    else pd_error(x, "type mismatch or no field specified");
+}
+
+static void set_symbol(t_set *x, t_symbol *s)
+{
+    if (x->x_nin && x->x_issymbol)
+    {
+        x->x_variables[0].gv_w.w_symbol = s;
+        set_bang(x);
+    }
+    else pd_error(x, "type mismatch or no field specified");
 }
 
 static void set_free(t_set *x)
@@ -535,6 +583,8 @@ static void set_setup(void)
     set_class = class_new(gensym("set"), (t_newmethod)set_new,
         (t_method)set_free, sizeof(t_set), 0, A_GIMME, 0);
     class_addfloat(set_class, set_float); 
+    class_addsymbol(set_class, set_symbol); 
+    class_addbang(set_class, set_bang); 
 }
 
 /* ---------------------- elem ----------------------------- */

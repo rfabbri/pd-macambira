@@ -33,7 +33,7 @@ AC_ARG_ENABLE(portaudio,[  --enable-portaudio      portaudio],
 AC_ARG_ENABLE(portmidi, [  --enable-portmidi       portmidi],
     portmidi=$enableval)
 AC_ARG_ENABLE(debug,    [  --enable-debug          debugging support],
-    USE_DEBUG_CFLAGS="no")
+    USE_DEBUG_CFLAGS=$enableval)
 AC_ARG_ENABLE(static,   [  --enable-static         link statically],
     static=$enableval)
 AC_ARG_ENABLE(setuid,   [  --enable-setuid         install as setuid (linux)],

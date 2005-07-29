@@ -15,7 +15,7 @@ extern t_pd *newest;
     list append - append a list to another
     list prepend - prepend a list to another
     list split - first n elements to first outlet, rest to second outlet 
-    list strip - send message with leading symbol as selector
+    list trim - trim off "list" selector
     list length - output number of items in list
     list nth - nth item in list, counting from zero
 

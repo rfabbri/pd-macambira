@@ -801,6 +801,20 @@ static void fielddesc_setfloatarg(t_fielddesc *fd, int argc, t_atom *argv)
         else fielddesc_setfloat_const(fd, argv->a_w.w_float);
 }
 
+static void fielddesc_setsymbolarg(t_fielddesc *fd, int argc, t_atom *argv)
+{
+        if (argc <= 0) fielddesc_setsymbol_const(fd, &s_);
+        else if (argv->a_type == A_SYMBOL)
+        {
+            fd->fd_type = A_SYMBOL;
+            fd->fd_var = 1;
+            fd->fd_un.fd_varsym = argv->a_w.w_symbol;
+            fd->fd_v1 = fd->fd_v2 = fd->fd_screen1 = fd->fd_screen2 =
+                fd->fd_quantum = 0;
+        }
+        else fielddesc_setsymbol_const(fd, &s_);
+}
+
 static void fielddesc_setarrayarg(t_fielddesc *fd, int argc, t_atom *argv)
 {
         if (argc <= 0) fielddesc_setfloat_const(fd, 0);
@@ -1902,8 +1916,17 @@ static void *drawnumber_new(t_symbol *classsym, t_int argc, t_atom *argv)
         }
         else break;
     }
-    if (argc) fielddesc_setfloatarg(&x->x_value, argc--, argv++);
-    else fielddesc_setfloat_const(&x->x_value, 0);
+    if (flags & DRAW_SYMBOL)
+    {
+        if (argc) fielddesc_setsymbolarg(&x->x_value, argc--, argv++);
+        else fielddesc_setsymbol_const(&x->x_value, &s_);
+    
+    }
+    else
+    {
+        if (argc) fielddesc_setfloatarg(&x->x_value, argc--, argv++);
+        else fielddesc_setfloat_const(&x->x_value, 0);
+    }
     if (argc) fielddesc_setfloatarg(&x->x_xloc, argc--, argv++);
     else fielddesc_setfloat_const(&x->x_xloc, 0);
     if (argc) fielddesc_setfloatarg(&x->x_yloc, argc--, argv++);

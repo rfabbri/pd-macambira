@@ -104,6 +104,8 @@ typedef struct _datachunk
 {
     char  dc_id[4];                 /* data chunk id 'SSND'       */
     uint32 dc_size;                 /* length of data chunk       */
+    uint32 dc_offset;               /* additional offset in bytes */
+    uint32 dc_block;                /* block size                 */
 } t_datachunk;
 
 typedef struct _comm
@@ -133,7 +135,7 @@ typedef struct _aiff
 #define AIFFHDRSIZE 38      /* probably not what sizeof() gives */
 
 
-#define AIFFPLUS (AIFFHDRSIZE + 8)  /* header size including first chunk hdr */
+#define AIFFPLUS (AIFFHDRSIZE + 16)  /* header size including SSND chunk hdr */
 
 #define WHDR1 sizeof(t_nextstep)
 #define WHDR2 (sizeof(t_wave) > WHDR1 ? sizeof (t_wave) : WHDR1)
@@ -678,6 +680,7 @@ static int create_soundfile(t_canvas *canvas, const char *filename,
         memcpy(aiffhdr->a_samprate, dogdoo, sizeof(dogdoo));
         longtmp = swap4(datasize, swap);
         memcpy(aiffhdr->a_samprate + sizeof(dogdoo), &longtmp, 4);
+        memset(aiffhdr->a_samprate + sizeof(dogdoo) + 4, 0, 8);
         headersize = AIFFPLUS;
     }
     else    /* WAVE format */
@@ -751,7 +754,19 @@ static void soundfile_finishwrite(void *obj, char *filename, int fd,
                 ((char *)(&((t_aiff *)0)->a_nframeshi)) - (char *)0,
                     SEEK_SET) == 0)
                         goto baddonewrite;
-            mofo = swap4(nframes, swap);
+            mofo = swap4(itemswritten, swap);
+            if (write(fd, (char *)(&mofo), 4) < 4)
+                goto baddonewrite;
+            if (lseek(fd,
+                ((char *)(&((t_aiff *)0)->a_chunksize)) - (char *)0,
+                    SEEK_SET) == 0)
+                        goto baddonewrite;
+            mofo = swap4(itemswritten*bytesperframe+AIFFHDRSIZE, swap);
+            if (write(fd, (char *)(&mofo), 4) < 4)
+                goto baddonewrite;
+            if (lseek(fd, (AIFFHDRSIZE+4), SEEK_SET) == 0)
+                goto baddonewrite;
+            mofo = swap4(itemswritten*bytesperframe, swap);
             if (write(fd, (char *)(&mofo), 4) < 4)
                 goto baddonewrite;
         }

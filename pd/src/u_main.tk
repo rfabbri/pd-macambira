@@ -1426,7 +1426,8 @@ proc pdtk_canvas_checkgeometry {topname} {
 }
 
 proc pdtk_canvas_click {name x y b f} {
-#    puts stderr [concat got $f]
+    global pd_nt
+    if {$pd_nt == 0} {focus $name}
     pd [canvastosym $name] mouse [$name canvasx $x] [$name canvasy $y] $b $f \;
 }
 
@@ -1621,11 +1622,28 @@ set saveas_dir nowhere
 ############ pdtk_canvas_saveas -- run a saveas dialog ##############
 
 proc pdtk_canvas_saveas {name initfile initdir} {
+    global pd_nt
     set filename [tk_getSaveFile -initialfile $initfile \
        -initialdir $initdir  -defaultextension .pd \
         -filetypes { {{pd files} {.pd}} {{max files} {.pat}} }]
 
     if {$filename != ""} {
+# yes, we need the extent even if we're on a mac.
+	if {$pd_nt == 2} {
+	  if {[string last .pd $filename] < 0 && \
+            [string last .PD $filename] < 0 && \
+            [string last .pat $filename] < 0 && \
+	    [string last .PAT $filename] < 0} {
+		set filename $filename.pd
+		if {[file exists $filename]} {
+    			set answer [tk_messageBox \
+			\-message [concat overwrite $filename "?"] \
+			 \-type yesno \-icon question]
+    			if {$answer == no} {return}
+		}
+	  }
+	}
+
     	set directory [string range $filename 0 \
     	    [expr [string last / $filename ] - 1]]
     	set basename [string range $filename \

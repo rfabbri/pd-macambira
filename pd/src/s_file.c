@@ -263,7 +263,7 @@ void sys_loadpreferences( void)
     int naudiooutdev, audiooutdev[MAXAUDIOOUTDEV], choutdev[MAXAUDIOOUTDEV];
     int nmidiindev, midiindev[MAXMIDIINDEV];
     int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
-    int i, rate = 0, advance = 0, api, nolib;
+    int i, rate = 0, advance = 0, api, nolib, maxi;
     char prefbuf[MAXPDSTRING], keybuf[80];
     sys_initloadpreferences();
         /* load audio preferences */
@@ -338,8 +338,12 @@ void sys_loadpreferences( void)
         nmidioutdev++;
     }
     sys_open_midi(nmidiindev, midiindev, nmidioutdev, midioutdev, 0);
+
         /* search path */
-    for (i = 0; 1; i++)
+    if (sys_getpreference("npath", prefbuf, MAXPDSTRING))
+        sscanf(prefbuf, "%d", &maxi);
+    else maxi = 0x7fffffff;
+    for (i = 0; i<maxi; i++)
     {
         sprintf(keybuf, "path%d", i+1);
         if (!sys_getpreference(keybuf, prefbuf, MAXPDSTRING))
@@ -352,7 +356,10 @@ void sys_loadpreferences( void)
         sscanf(prefbuf, "%d", &sys_verbose);
 
         /* startup settings */
-    for (i = 0; 1; i++)
+    if (sys_getpreference("nloadlib", prefbuf, MAXPDSTRING))
+        sscanf(prefbuf, "%d", &maxi);
+    else maxi = 0x7fffffff;
+    for (i = 0; i<maxi; i++)
     {
         sprintf(keybuf, "loadlib%d", i+1);
         if (!sys_getpreference(keybuf, prefbuf, MAXPDSTRING))
@@ -448,6 +455,8 @@ void glob_savepreferences(t_pd *dummy)
         sprintf(buf1, "path%d", i+1);
         sys_putpreference(buf1, pathelem);
     }
+    sprintf(buf1, "%d", i);
+    sys_putpreference("npath", buf1);
     sprintf(buf1, "%d", sys_usestdpath);
     sys_putpreference("standardpath", buf1);
     sprintf(buf1, "%d", sys_verbose);
@@ -462,6 +471,8 @@ void glob_savepreferences(t_pd *dummy)
         sprintf(buf1, "loadlib%d", i+1);
         sys_putpreference(buf1, pathelem);
     }
+    sprintf(buf1, "%d", i);
+    sys_putpreference("nloadlib", buf1);
     sprintf(buf1, "%d", sys_defeatrt);
     sys_putpreference("defeatrt", buf1);
     sys_putpreference("flags", 

@@ -512,9 +512,11 @@ static void sigsamphold_dsp(t_sigsamphold *x, t_signal **sp)
             x, sp[0]->s_n);
 }
 
-static void sigsamphold_reset(t_sigsamphold *x)
+static void sigsamphold_reset(t_sigsamphold *x, t_symbol *s, int argc,
+    t_atom *argv)
 {
-    x->x_lastin = 1e20;
+    x->x_lastin = ((argc > 0 && (argv[0].a_type == A_FLOAT)) ?
+        argv[0].a_w.w_float : 1e20);
 }
 
 static void sigsamphold_set(t_sigsamphold *x, t_float f)
@@ -530,7 +532,7 @@ void sigsamphold_setup(void)
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_set,
         gensym("set"), A_DEFFLOAT, 0);
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_reset,
-        gensym("reset"), 0);
+        gensym("reset"), A_GIMME, 0);
     class_addmethod(sigsamphold_class, (t_method)sigsamphold_dsp,
         gensym("dsp"), 0);
 }

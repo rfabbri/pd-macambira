@@ -12,29 +12,28 @@ plot drawing instructions turn on and off
 ranges in drawing instructions
 unify graph properties dialogs
 GOP font depends on abstraction, not parent
-
+bug fixes, stale pointers
+message "addcomma" etc
+"list" object
+Mac to tcl/tk 8.4.5; pd extension added automatically
+bug fix writing aiff gfiles
+bug fix (tcl error messages when starting open dialogs)
 
 ------------ 0.39 ---------
 problems:
 windows:
   modal dialogs confuse watchdog
+  check the right-click-on-empty-canvas
 mac:
-  .pd extension not added when saving?
-TK commands to nonexistent windows? (maybe fixed)
-array name changes don't show up on parent
-arrays that don't fit in bounds don't update (same as red rectangle problem?)
-what about upsampling inlet~s?  ask Pd list...
-
-
-flag for array to suppress printing name
+  load libraries first before opening patches on drag-and-drop
 
 check:
 MIDI I/O for windows
 blechman patch for s_inter.c
+check what happens when going back and forth between graph-on-parent
 
 garray change:
 make a gobj_redraw that schedules the redraw
-put two radio button banks side by side
 array_resize etc., should redraw the array directly?  Or should "setsize"
     and "garray_resize" do it instead?  check it's queued correctly.
 
@@ -45,8 +44,13 @@ block resampling arguments
 document tabwrite~_start
 
 problems:
+TK commands to nonexistent windows? (occasionally still happens)
+array name changes don't show up on parent
+arrays that don't fit in bounds don't update (same as red rectangle problem?)
+look in d_resample.pd to inderstand inlet~ upsampling...
+flag for array to suppress printing name
+fix samplerate~ to figure out blocking
 patcher inlets don't deal with scalars (zbug.pd)
-Macintosh .pd extension not added to filenames
 need to optimize canvas_motion (get rid of box hit test??)
 check if there's a problem loading libs on startup if superuser
 tk errors for large tables?
@@ -60,9 +64,7 @@ qlist - 'next 1' seems not to work
 Krzysztof's qlist_next reentrancy bug
 don't draw in/outlets on gui objects in graph-on-parent
 reasonable font size default for GUIs
-font size should depend on subpatch/abstraction
 moving a bang toward top of window creates problem (invisible label)
-check what happens when going back and forth between graph-on-parent
 get rid of messages causing renaming; try to prevent patches closing themselves.
 dac~/ adc~/ block~ incompatibility
 scofo reports error on reading score1.txt
@@ -72,11 +74,11 @@ check if _vsnprintf with zero argument in windows works any better...
 
 features:
 flag to suppress printing array name above graph
-rename windowname-pd instead of pd-windowname
 fix copyright notices
 IEM guis to use queued updates
 pixel font sizes
 pd to find running ones (pd -new to defeat)
+rename windowname-pd instead of pd-windowname
 "enter" into object box to create new one (also, changing borders? forking?)
 tab to jump to a connected object (first one?) (shift-tab to back up?)
 tables:
@@ -88,10 +90,8 @@ tables:
 queued graphics updates for IEMGUIs and scalars
 think of a way to embed abstractions in a patch
 make watchdog work for MACOSX
-IEMGUIs better default font size
 search path to include both calling patch and abstraction, if different
 abstraction reload shouldn't have to vis everyone
-addcomma message to message
 pasting should look at current mouse location
 delete-in-rectangle message to Pds
 put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)

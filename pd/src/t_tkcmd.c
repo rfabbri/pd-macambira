@@ -99,18 +99,19 @@ static void pdgui_sockerror(char *s)
 
 static int sockfd;
 
-/* The "pd_suck" command, which polls the socket. */
+/* The "pd_readsocket" command, which polls the socket. */
 
 #define CHUNKSIZE 20000 /* chunks to allocate memory for reading socket */
 #define READSIZE 10000  /* size of read to issue */
 
 static char *pd_tkbuf = 0;      /* buffer for reading */
 static int pd_tkbufsize = 0;    /* current buffer size */
-static int pd_tkgotbytes = 0;   /* number of bytes already in buffer */
+static int pd_buftail = 0;      /* number of bytes already in buffer */
+static int pd_bufhead = 0;    /* index of first byte to read */
 
+    /* mask argument unused but is here to follow tcl's prototype. */
 static void pd_readsocket(ClientData cd, int mask)
 {
-    int ngot;
     fd_set readset, writeset, exceptset;
     struct timeval timout;
 
@@ -130,7 +131,7 @@ static void pd_readsocket(ClientData cd, int mask)
         }
         pd_tkbufsize = CHUNKSIZE;
     }
-    if (pd_tkgotbytes + READSIZE + 1 > pd_tkbufsize)
+    if (pd_buftail + READSIZE + 1 > pd_tkbufsize)
     {   
         int newsize = pd_tkbufsize + CHUNKSIZE;
         char *newbuf = realloc(pd_tkbuf, newsize);
@@ -147,56 +148,80 @@ static void pd_readsocket(ClientData cd, int mask)
     if (FD_ISSET(sockfd, &exceptset) || FD_ISSET(sockfd, &readset))
     {
         int ret;
-        ret = recv(sockfd, pd_tkbuf + pd_tkgotbytes, READSIZE, 0);
+        ret = recv(sockfd, pd_tkbuf + pd_buftail, READSIZE, 0);
         if (ret < 0)
             pdgui_sockerror("socket receive error");
         else if (ret == 0)
         {
-            /* fprintf(stderr, "read %d\n", SOCKSIZE - pd_tkgotbytes); */
+            /* fprintf(stderr, "read %d\n", SOCKSIZE - pd_buftail); */
             fprintf(stderr, "pd_gui: pd process exited\n");
             tcl_mess("exit\n");
         }
         else
         {
-            char *lastcr = 0, *bp = pd_tkbuf, *ep = bp + (pd_tkgotbytes + ret);
-            int brace = 0;
-            char lastc = 0;
-                /* search for locations that terminate a complete TK
-                command.  These are carriage returns which are not inside
-                any braces.  Braces can be escaped with backslashes (but
-                backslashes themselves can't.) */
-            while (bp < ep)
+            pd_buftail += ret;
+            while (1)
             {
-                char c = *bp;
-                if (c == '}' && brace)
-                    brace--;
-                else if (c == '{')
-                    brace++;
-                else if (!brace && c == '\n' && lastc != '\\')
-                    lastcr = bp;
-                lastc = c;
-                bp++;
-            }
-                /* if lastcr is set there is at least one complete TK
-                command in the buffer.  Execute it or them, and slide any
-                extra bytes to beginning of the buffer. */
-            if (lastcr)
-            {
-                int xtra = pd_tkbuf + pd_tkgotbytes + ret - (lastcr+1);
-                char bashwas = lastcr[1];
-                lastcr[1] = 0;
-                tcl_mess(pd_tkbuf);
-                lastcr[1] = bashwas;
-                if (xtra)
+                char lastc = 0, *gotcr = 0, *bp = pd_tkbuf + pd_bufhead,
+                    *ep = pd_tkbuf + pd_buftail;
+                int brace = 0;
+                    /* search for locations that terminate a complete TK
+                    command.  These are carriage returns which are not inside
+                    any braces.  Braces can be escaped with backslashes (but
+                    backslashes themselves can't.) */
+                while (bp < ep)
                 {
-                    /* fprintf(stderr, "x %d\n", xtra); */
-                    memmove(pd_tkbuf, lastcr+1, xtra);
+                    char c = *bp;
+                    if (c == '}' && brace)
+                        brace--;
+                    else if (c == '{')
+                        brace++;
+                    else if (!brace && c == '\n' && lastc != '\\')
+                    {
+                        gotcr = bp;
+                        break;
+                    }
+                    lastc = c;
+                    bp++;
                 }
-                pd_tkgotbytes = xtra;
+                    /* if gotcr is set there is at least one complete TK
+                    command in the buffer, and gotcr terminates the first one.
+                    Because sending the command to tcl may cause this code to
+                    be reentered, we first copy the command and take it out of
+                    the buffer, then execute the command.
+                    Execute it and slide any
+                    extra bytes to beginning of the buffer. */
+                if (gotcr)
+                {
+                    int bytesincmd = (gotcr - (pd_tkbuf+pd_bufhead)) + 1;
+                    char smallcmdbuf[1000], *realcmdbuf;
+                    if (gotcr - (pd_tkbuf+pd_bufhead) < 998)
+                        realcmdbuf = smallcmdbuf;
+                    else realcmdbuf = malloc(bytesincmd+1);
+                    if (realcmdbuf)
+                    {
+                        strncpy(realcmdbuf, pd_tkbuf+pd_bufhead, bytesincmd);
+                        realcmdbuf[bytesincmd] = 0;
+                    }
+                    pd_bufhead += bytesincmd;
+                    if (realcmdbuf)
+                    {
+                        tcl_mess(realcmdbuf);
+                        if (realcmdbuf != smallcmdbuf)
+                            free(realcmdbuf);
+                    }
+                    if (pd_buftail < pd_bufhead)
+                        fprintf(stderr, "tkcmd bug\n");
+                }
+                else break;
             }
-            else
+            if (pd_bufhead)
             {
-                pd_tkgotbytes += ret;
+                if (pd_buftail > pd_bufhead)
+                    memmove(pd_tkbuf, pd_tkbuf + pd_bufhead,
+                        pd_buftail-pd_bufhead);
+                pd_buftail  -= pd_bufhead;
+                pd_bufhead = 0;
             }
         }
     }
