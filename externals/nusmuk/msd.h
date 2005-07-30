@@ -1858,22 +1858,43 @@ private:
 // -------------------------------------------------------------- STATIC VARIABLES
 // -------------------------------------------------------------------------------
 
+template<int N> const t_symbol *msdN<N>::S_Reset;
+template<int N> const t_symbol *msdN<N>::S_Mass;
+template<int N> const t_symbol *msdN<N>::S_Link;
+template<int N> const t_symbol *msdN<N>::S_iLink;
+template<int N> const t_symbol *msdN<N>::S_tLink;
+template<int N> const t_symbol *msdN<N>::S_nLink;
+template<int N> const t_symbol *msdN<N>::S_Mass_deleted;
+template<int N> const t_symbol *msdN<N>::S_Link_deleted;
+template<int N> const t_symbol *msdN<N>::S_massesPos;
+template<int N> const t_symbol *msdN<N>::S_massesPosNo;
+template<int N> const t_symbol *msdN<N>::S_massesPosId;
+template<int N> const t_symbol *msdN<N>::S_linksPos;
+template<int N> const t_symbol *msdN<N>::S_linksPosNo;
+template<int N> const t_symbol *msdN<N>::S_linksPosId;
+template<int N> const t_symbol *msdN<N>::S_linksLenghts;
+template<int N> const t_symbol *msdN<N>::S_linksLenghtsMean;
+template<int N> const t_symbol *msdN<N>::S_linksLenghtsStd;
+template<int N> const t_symbol *msdN<N>::S_linksLenghtsNo;
+template<int N> const t_symbol *msdN<N>::S_linksLenghtsId;
+template<int N> const t_symbol *msdN<N>::S_massesForces;
+template<int N> const t_symbol *msdN<N>::S_massesForcesMean;
+template<int N> const t_symbol *msdN<N>::S_massesForcesStd;
+template<int N> const t_symbol *msdN<N>::S_massesForcesNo;
+template<int N> const t_symbol *msdN<N>::S_massesForcesId;
+template<int N> const t_symbol *msdN<N>::S_massesSpeeds;
+template<int N> const t_symbol *msdN<N>::S_massesSpeedsMean;
+template<int N> const t_symbol *msdN<N>::S_massesSpeedsStd;
+template<int N> const t_symbol *msdN<N>::S_massesSpeedsNo;
+template<int N> const t_symbol *msdN<N>::S_massesSpeedsId;
+template<int N> const t_symbol *msdN<N>::S_massesPosL;
+template<int N> const t_symbol *msdN<N>::S_massesPosXL;
+template<int N> const t_symbol *msdN<N>::S_massesPosYL;
+template<int N> const t_symbol *msdN<N>::S_massesPosZL;
+template<int N> const t_symbol *msdN<N>::S_massesPosStd;
+template<int N> const t_symbol *msdN<N>::S_massesPosMean;
+template<int N> const t_symbol *msdN<N>::S_massesForcesL;
+
 #define MSD(NAME,CLASS,N) \
-const t_symbol \
-	*msdN<N>::S_Reset,*msdN<N>::S_Mass, \
-	*msdN<N>::S_Link,*msdN<N>::S_iLink,*msdN<N>::S_tLink,*msdN<N>::S_nLink, \
-	*msdN<N>::S_Mass_deleted,*msdN<N>::S_Link_deleted, \
-	*msdN<N>::S_massesPos,*msdN<N>::S_massesPosNo,*msdN<N>::S_massesPosId, \
-	*msdN<N>::S_linksPos,*msdN<N>::S_linksPosNo,*msdN<N>::S_linksPosId, \
-	*msdN<N>::S_linksLenghts,*msdN<N>::S_linksLenghtsMean,*msdN<N>::S_linksLenghtsStd, \
-	*msdN<N>::S_linksLenghtsNo,*msdN<N>::S_linksLenghtsId, \
-	*msdN<N>::S_massesForces,*msdN<N>::S_massesForcesMean,*msdN<N>::S_massesForcesStd, \
-	*msdN<N>::S_massesForcesNo,*msdN<N>::S_massesForcesId, \
-	*msdN<N>::S_massesSpeeds,*msdN<N>::S_massesSpeedsMean,*msdN<N>::S_massesSpeedsStd, \
-	*msdN<N>::S_massesSpeedsNo,*msdN<N>::S_massesSpeedsId, \
-	*msdN<N>::S_massesPosL,*msdN<N>::S_massesPosXL,*msdN<N>::S_massesPosYL, \
-	*msdN<N>::S_massesPosZL,*msdN<N>::S_massesPosStd,*msdN<N>::S_massesPosMean,\
-	*msdN<N>::S_massesForcesL; \
-\
 typedef msdN<N> CLASS; \
 FLEXT_NEW_V(NAME,CLASS)
