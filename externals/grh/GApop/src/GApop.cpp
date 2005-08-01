@@ -4,7 +4,7 @@
 // This is a genetic algorithm, see the PD help-file
 // how to use it
 // 
-// Copyright (c) 2004 Georg Holzmann <grh@gmx.at>
+// Copyright (c) 2004 Georg Holzmann <grh@mur.at>
 // For information on usage and redistribution, and for a DISCLAIMER OF ALL
 // WARRANTIES, see the file, "license.txt," in this distribution.  
 // 
@@ -40,6 +40,9 @@ class GApop:
 public:
 	// constructor with a variable argument list
 	GApop(int argc,const t_atom *argv);
+  
+  //destructor
+  ~GApop();
 
 protected:
 	
@@ -52,6 +55,7 @@ protected:
 	int buffsize;
 	// the fitness order
 	int *tempfit;
+  float *tempfit1;
 
 	// the other parameters:
 	// pairs = number of pairs at crossover
@@ -177,7 +181,7 @@ void GApop::m_help()
 	post("compiled with flext on %s",__DATE__);
 	post("1 - set all parameters:");
 	post("popbuf    contains the population (array with numbers");
-	post("          between 0 and 1, max size is 200)");
+	post("          between 0 and 1)");
 	post("fitbuf    contains the fitness function (numbers between");
 	post("          0 and 1, size should be 101: 0 = fitness(0),");
 	post("          1 = fitness(0.01), ..., 100 = fitness(1) )");
@@ -186,9 +190,9 @@ void GApop::m_help()
 	post("mutrange  mutation range in percent (between 0 and 1)");
 	post("2 - get the data:");
 	post("cross     makes fitscaling, crossover and mutation");
-	post("numbers in inlet 0    get the values: 0 means the value");
+	post("numbers in inlet 0 get the values: 0 means the value");
 	post("          of the fittest, 1 the value of the next...");
-	post("have fun - Georg Holzmann <grh@gmx.at>\n");
+	post("have fun - Georg Holzmann <grh@mur.at>\n");
 }
 
 
@@ -202,6 +206,7 @@ GApop::GApop(int argc,const t_atom *argv)
 	fitbuf=NULL; fitname=NULL;
 	popbuf=NULL; popname=NULL;
   tempfit=NULL;
+  tempfit1=NULL;
 	buffsize=0;
 	pairs = 0;
 	mutprop = 0; mutrange = 0;
@@ -216,8 +221,17 @@ GApop::GApop(int argc,const t_atom *argv)
 	
 	// set buffer according to creation arguments
 	if(argc == 1 && IsSymbol(argv[0]))
-	{ m_set(argc,argv); }
-}	
+	 m_set(argc,argv);
+}
+
+GApop::~GApop()
+{
+  if(popbuf) delete popbuf;
+  if(fitbuf) delete fitbuf;
+  if(tempfit) delete[] tempfit;
+  if(tempfit1) delete[] tempfit1;
+  
+}
 
 
 // gives out a random float in the given boundaries
@@ -316,7 +330,8 @@ void GApop::m_set(int argc,const t_atom *argv)
 		
 		// clear existing buffer
       if(popbuf) delete popbuf;
-      if(tempfit) delete tempfit;
+      if(tempfit) delete[] tempfit;
+      if(tempfit1) delete[] tempfit1;
     
 		// save buffer name
 		popname = GetSymbol(argv[0]);
@@ -324,8 +339,9 @@ void GApop::m_set(int argc,const t_atom *argv)
 		popbuf = new buffer(popname);
 		buffsize = popbuf->Frames();
     
-    // make new tempfit buffer
+    // make new tempfit buffers
     tempfit = new int[buffsize];
+    tempfit1 = new float[buffsize];
 
 		if(!popbuf->Ok()) {
 			post("%s (%s) - warning: population buffer is currently not valid!",thisName(),GetString(thisTag()));
@@ -390,23 +406,25 @@ void GApop::ms_fit(const AtomList &lst)
 // make the fitscaling, crossover and mutation
 void GApop::m_cross()
 {
-	if(Checkpopbuf() && Checkfitbuf() && pairs<(buffsize/2-1))
-	{
+  if(!Checkpopbuf() || !Checkfitbuf())
+    return;
+  
+  if(pairs>=(buffsize/2))
+  {
+    post("GApop - pairs must be smaller then (buffsize/2)-1!");
+    post("  currently %d pairs with a buffsize of %d!", pairs, buffsize);
+    return; 
+  }
 	
 
-	// 1. step:
+  // 1. step:
 	// every parameter get's a fitness from the
 	// given fitness function
 	// this fitness is saved into the temporary array tempfit1[]
 
-	// make temporary array
-	float *tempfit1 = new float[200];
-
 	// write the fitness
 	for(int i=0; i < buffsize; i++)
-	{
 		tempfit1[i] = cutse(fitbuf->Data()[int(popbuf->Data()[i]*100+0.5)]);
-	}
 
 
 	// 2. step:
@@ -463,23 +481,12 @@ void GApop::m_cross()
 			popbuf->Data()[jj] = cutse(popbuf->Data()[jj] + (ZZ(0,2*mutrange)-mutrange));
 		}
 	}
-
-	// delete the temporary array
-	delete []tempfit1;	
-	}
-
-
-	else 
-	{
-		// invalid buffers
-		post("GApop - entered buffers are invalid!");
-	}
 }
 
 
 // takes the incomig ints and gives out the specific individuum:
 // 0 ... fittest individuum
-// 1 ... next individuum
+// 1 ... next fit individuum
 // ...
 void GApop::m_trigger(int i)
 {
@@ -487,8 +494,8 @@ void GApop::m_trigger(int i)
 	if(!Checkpopbuf()) return;
 	
 	// make the boundaries for i:
-	if(i<0) {i=0;}
-	if(i>200) {i=200;}
+	if(i<0) i=0;
+	if(i>buffsize) i=buffsize;
 	
 	// correct syntax, output value
 	ToOutFloat(0,popbuf->Data()[tempfit[i]]);
