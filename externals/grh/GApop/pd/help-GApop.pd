@@ -39,18 +39,17 @@
 #X msg 90 646 pairs 5;
 #X msg 89 671 getpairs;
 #X obj 883 727 GApop pop1;
-#X msg 598 631 cross;
+#X msg 598 647 cross;
 #X floatatom 883 769 5 0 0 0 - - -;
 #X floatatom 883 665 5 0 0 0 - - -;
 #X msg 680 285 getfitbuf;
 #X msg 61 380 getpopbuf;
 #X msg 600 746 help;
-#X msg 658 632 update;
+#X msg 658 648 update;
 #X obj 898 699 r GAmessages;
 #X obj 679 311 s GAmessages;
 #X obj 18 13 cnv 15 130 30 empty empty GApop: 7 15 0 16 -217163 -262144
 0;
-#X text 152 15 Georg Holzmann <grh@gmx.at>;
 #X obj 61 405 s GAmessages;
 #X obj 22 103 cnv 15 30 30 empty empty 1 10 14 0 14 -233017 -1 0;
 #X text 60 105 you have to give in a population:;
@@ -92,8 +91,8 @@ and mutation;
 #X text 595 527 - number in inlet0: gives out the parameters: for example
 if you give in 0 \, GApop puts out the value of the fittest parameters
 \, if you give in 1 \, the value of the next fit parameter \, ...;
-#X obj 598 664 s GAmessages;
-#X text 746 662 give in numbers:;
+#X obj 598 680 s GAmessages;
+#X text 758 665 give in numbers:;
 #X obj 600 799 s GAmessages;
 #X text 619 719 Help:;
 #X text 755 768 get parameters:;
@@ -149,25 +148,26 @@ if you give in 0 \, GApop puts out the value of the fittest parameters
 in this range (+/- mutrange) if it mutates;
 #X obj 526 450 cnv 15 30 30 empty empty 4 10 14 0 14 -233017 -1 0;
 #X text 566 457 get the data:;
-#X text 595 591 - update: updates the pop1 array (only to see the changes)
-;
-#X connect 2 0 49 0;
-#X connect 4 0 42 0;
-#X connect 5 0 42 0;
-#X connect 6 0 42 0;
-#X connect 7 0 42 0;
-#X connect 8 0 42 0;
+#X text 152 15 Georg Holzmann <grh@mur.at>;
+#X text 595 591 - update: updates the graphic of the pop1 array (only
+to see the changes);
+#X connect 2 0 48 0;
+#X connect 4 0 41 0;
+#X connect 5 0 41 0;
+#X connect 6 0 41 0;
+#X connect 7 0 41 0;
+#X connect 8 0 41 0;
 #X connect 9 0 11 0;
 #X connect 9 1 3 0;
-#X connect 10 0 47 0;
+#X connect 10 0 46 0;
 #X connect 12 0 9 0;
 #X connect 13 0 18 0;
-#X connect 14 0 21 0;
-#X connect 15 0 49 0;
-#X connect 16 0 47 0;
+#X connect 14 0 20 0;
+#X connect 15 0 48 0;
+#X connect 16 0 46 0;
 #X connect 17 0 9 0;
-#X connect 26 0 21 0;
-#X connect 27 0 21 0;
-#X connect 36 0 18 0;
-#X connect 43 0 42 0;
-#X connect 53 0 52 0;
+#X connect 25 0 20 0;
+#X connect 26 0 20 0;
+#X connect 35 0 18 0;
+#X connect 42 0 41 0;
+#X connect 52 0 51 0;
