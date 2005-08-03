@@ -22,3 +22,4 @@ tk is ugly without Cairo graphics (linux only), apply the patch, then
 ./configure --enable-xft --enable-cairo
 
 tkdnd is broken on linux with tk 8.5, unless you patch tkEvent.c
+http://whats-your.name/pd/gui
