@@ -12,8 +12,8 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include <flext.h>
 
-#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 500)
-#error You need at least flext version 0.5.0
+#if !defined(FLEXT_VERSION) || (FLEXT_VERSION < 501)
+#error You need at least flext version 0.5.1
 #endif
 
 #include <map>

@@ -9,6 +9,10 @@ Visit https://www.paypal.com/xclick/business=gr%40grrrr.org&item_name=pyext&no_n
 
 ----------------------------------------------------------------------------
 
+Driven by vibrez.net
+
+----------------------------------------------------------------------------
+
 BUILDING from source
 --------------------
 
