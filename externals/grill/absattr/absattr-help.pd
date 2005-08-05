@@ -1,0 +1,13 @@
+#N canvas 858 421 470 238 12;
+#X obj 32 186 print EXT;
+#X msg 33 20 getattributes;
+#X text 228 102 delete attribute;
+#X msg 148 72 set attr1 huhu haha;
+#X msg 149 99 set attr1;
+#X msg 63 72 get attr1;
+#X obj 32 143 absattr-sub 1 2 3 @attr1 hey ho;
+#X connect 1 0 6 0;
+#X connect 3 0 6 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 0 0;
