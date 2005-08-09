@@ -106,13 +106,15 @@ protected:
 
     void SetAttr(const t_symbol *attr,int argc,const t_atom *argv)
     {
-        if(argc) 
-            attrs[attr].Set(argc,argv,0,true);
+        if(argc) {
+            AtomList &lst = attrs[attr]; 
+            lst.Set(argc,argv,0,true);
+        }
         else
             attrs.erase(attr);
     }
 
-    static IsAttr(const t_atom &at) { return IsSymbol(at) && *GetString(at) == '@'; }
+    static bool IsAttr(const t_atom &at) { return IsSymbol(at) && *GetString(at) == '@'; }
 
     void Process(int argc,const t_atom *argv)
     {
