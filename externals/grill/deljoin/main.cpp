@@ -130,11 +130,13 @@ void deljoin::m_list(const t_symbol *s,int argc,const t_atom *argv)
 		const t_atom &a = argv[i];
 		if(IsSymbol(a))
 			strcpy(t,GetString(a));
-		else if(IsInt(a)) {
-			STD::sprintf(t,"%i",GetInt(a),10);
-		}
-		else if(IsFloat(a)) {
-			STD::sprintf(t,"%f",GetFloat(a),10);
+        else if(CanbeFloat(a)) {
+            const float f = GetAFloat(a);
+            const int fi = (int)f;
+            if(f == fi)
+			    STD::sprintf(t,"%i",fi,10);
+            else
+    			STD::sprintf(t,"%f",f,10);
 		}
 //		else do nothing
 			
