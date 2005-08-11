@@ -154,12 +154,6 @@ pyobj::pyobj(int argc,const t_atom *argv)
             if(pt && *pt) {
                 funnm = MakeSymbol(pt+1);
                 *pt = 0;
-
-#if 0
-                if(!*modnm) 
-                    // if module name is empty set it to __builtin__
-                    strcpy(modnm,"__builtin__");
-#endif
             }
 
             if(*modnm) {
@@ -337,7 +331,8 @@ void pyobj::Load()
 
 void pyobj::Unload()
 {
-    SetFunction(NULL);
+//    SetFunction(NULL);
+    function = NULL; // just clear the PyObject, not the function name
 }
 
 void pyobj::callpy(PyObject *fun,PyObject *args)
@@ -354,7 +349,7 @@ bool pyobj::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
     if(n == 0 && s != sym_bang) 
         return flext_base::CbMethodResort(n,s,argc,argv);
 
-    PyThreadState *state = PyLock();
+    PyThreadState *state = PyLockSys();
 
     bool ret = false;
  
