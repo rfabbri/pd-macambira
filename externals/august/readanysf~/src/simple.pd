@@ -1,0 +1,107 @@
+#N canvas 119 113 595 349 10;
+#X obj 150 223 dac~;
+#X msg 149 123 play;
+#X msg 232 123 stop;
+#X msg 187 123 pause;
+#X obj 29 25 hsl 100 15 0 15 0 0 empty empty empty -2 -6 0 8 -44926
+-1 -1 661 1;
+#X floatatom 95 40 5 0 0 0 - - -;
+#X msg 26 45 speed \$1;
+#X msg 170 41 loop \$1;
+#X obj 170 25 tgl 15 0 empty empty empty 0 -6 0 8 -44926 -1 -1 0 1
+;
+#X obj 214 282 nbx 4 10 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-241291 -1 -1 172.072 256;
+#X obj 260 271 nbx 6 10 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-260818 -1 -1 0 256;
+#X obj 307 255 nbx 5 10 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-260241 -1 -1 44100 256;
+#X obj 353 242 nbx 7 12 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-259729 -1 -1 34273 256;
+#X msg 21 269 \; pd dsp 1;
+#X obj 21 244 loadbang;
+#X obj 149 180 readanysf~;
+#X obj 53 163 r rany;
+#X obj 26 72 s rany;
+#X obj 170 67 s rany;
+#X msg 253 50 recover 1;
+#N canvas 381 279 570 425 testfiles 0;
+#X msg 308 151 open Schnucki.wav;
+#X msg 42 111 open http://fro.at:8008/24k;
+#X msg 308 132 open Schnucki.ogg;
+#X msg 308 112 open Schnucki.mp3;
+#X obj 43 372 s rany;
+#X msg 42 131 open http://66.28.68.70:8000/;
+#X msg 43 151 open http://212.23.57.33:8010;
+#X msg 308 172 open Schnucki.fla;
+#X msg 309 191 open Schnucki.aif;
+#X text 301 85 some test files;
+#X text 42 87 open some test streams;
+#X connect 0 0 4 0;
+#X connect 1 0 4 0;
+#X connect 2 0 4 0;
+#X connect 3 0 4 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 0;
+#X connect 7 0 4 0;
+#X connect 8 0 4 0;
+#X restore 389 31 pd testfiles;
+#N canvas 0 22 450 300 testseek 0;
+#X msg 145 167 pcm_seek \$1;
+#X floatatom 145 147 5 0 0 0 - - -;
+#X obj 145 192 s rany;
+#X floatatom 149 60 5 0 0 0 - - -;
+#X obj 149 99 s rany;
+#X msg 149 77 time_seek \$1;
+#X obj 184 147 * 44100;
+#X msg 145 126 13;
+#X msg 149 41 13;
+#X obj 204 124 f;
+#X obj 208 102 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 240 100 5 0 0 0 - - -;
+#X msg 268 130 81;
+#X msg 268 155 19;
+#X connect 0 0 2 0;
+#X connect 1 0 6 0;
+#X connect 3 0 5 0;
+#X connect 5 0 4 0;
+#X connect 6 0 0 0;
+#X connect 7 0 1 0;
+#X connect 8 0 3 0;
+#X connect 9 0 6 0;
+#X connect 10 0 9 0;
+#X connect 11 0 9 1;
+#X connect 12 0 1 0;
+#X connect 13 0 1 0;
+#X restore 390 61 pd testseek;
+#X obj 400 264 bng 15 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X obj 214 223 route float length rate cache bang;
+#X msg 413 163 open \$1;
+#X obj 413 142 openpanel;
+#X obj 413 123 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 409 103 Open a File on disk;
+#X connect 1 0 15 0;
+#X connect 2 0 15 0;
+#X connect 3 0 15 0;
+#X connect 4 0 5 0;
+#X connect 4 0 6 0;
+#X connect 6 0 17 0;
+#X connect 7 0 18 0;
+#X connect 8 0 7 0;
+#X connect 14 0 13 0;
+#X connect 15 0 0 0;
+#X connect 15 1 0 1;
+#X connect 15 2 23 0;
+#X connect 16 0 15 0;
+#X connect 19 0 18 0;
+#X connect 23 0 9 0;
+#X connect 23 1 10 0;
+#X connect 23 2 11 0;
+#X connect 23 3 12 0;
+#X connect 23 4 22 0;
+#X connect 24 0 15 0;
+#X connect 25 0 24 0;
+#X connect 26 0 25 0;
