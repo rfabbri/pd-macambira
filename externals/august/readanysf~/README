@@ -1,0 +1,77 @@
+readanysf~, a puredata external for reading multiple file formats.
+
+© august black 2003 (and others)
+licensed under the GNU GPL v2
+
+
+
+
+
+INSTALL
+
+do './configure --help'   to see options
+
+
+  --disable-flext-shared   build with flext compiled in statically, not the best idea
+  --with-pd-dir=path       pd header path (default=/usr/local/include)
+  --with-flext-dir=path    flext headers path (default=/usr/local/lib/pd/flext)
+  --with-flext-sys=<N>     1 for Max/Msp, 2 for PD (default=2)
+
+
+
+then do something like './confugure --bindir=/usr/local/lib/pd/extra'
+and then 'make'
+and then 'make install'
+
+
+
+if you assign a --bindir, it will install the readansf~.pd_*   external there.
+
+
+afterwards, a 'make uninstall' will also properly remove the readanysf~.pd_* external
+
+
+
+
+FEATURES
+
+    * pcm and time seeking
+    * looping (internally and should be sample accurate)
+    * varispeed play (resampling)
+    * plays these file formats:
+          o aiff
+          o wav
+          o nextstep
+          o ogg vorbis plust ogg streaming NEW
+          o mp3 (using madlib) plus http streaming
+          o flac
+    * plays both kinds of music, ... country AND western.
+
+DEPENDANCIES
+
+    * NEEDED
+
+          o Flext : by Thomas Grill
+            unified C++ programming interface for MAX, puredata, and jmax 
+	    http://www.parasitaere-kapazitaeten.net/Pd/ext/flext/
+
+          o libsamplerate : Erik de Castro Lopo
+            Secret Rabbit Code for high quality resampling of audio.
+            http://www.mega-nerd.com/SRC/
+
+    * OPTIONAL
+
+          o Madlib: by Robert Leslie
+            MAD is a high-quality and fast MPEG audio decoder library.
+            its apt-getable as libmad0 under the current debian distro
+            you will need this for reading mp3 audio.
+            http://www.underbit.com/products/mad/
+
+          o Ogg Vorbis: by Monty and Xiph.org
+            a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
+            http://vorbis.com
+
+          o Flac : by Josh Coalson
+            Free Lossless Audio Codec. Compresses audio data almost in half without loosing any quality.
+            http://flac.sourceforge.net/
+

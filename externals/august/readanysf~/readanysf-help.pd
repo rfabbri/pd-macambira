@@ -1,0 +1,120 @@
+#N canvas 105 11 865 702 10;
+#X obj 219 386 readanysf~;
+#X msg 33 337 stop;
+#X msg 33 241 open \$1;
+#X obj 33 220 symbol;
+#X obj 32 201 openpanel;
+#X obj 32 146 bng 45 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X msg 33 308 pause;
+#X msg 33 369 play;
+#X text 649 359 TIME seeking.;
+#X text 649 376 seeks to seconds of time;
+#X text 615 479 bang at end of file;
+#X text 614 492 it won't bang in loop mode;
+#X obj 549 103 hsl 100 15 0 15 0 0 empty empty empty -2 -6 0 8 -44926
+-1 -1 0 1;
+#X floatatom 615 118 5 0 0 0 - - -;
+#X msg 546 123 speed \$1;
+#X msg 34 529 \; pd dsp 1;
+#X obj 34 507 loadbang;
+#X msg 546 77 1;
+#X msg 577 77 2;
+#X msg 609 77 3;
+#X obj 546 301 * 44100;
+#X msg 546 320 pcm_seek \$1;
+#X obj 546 285 nbx 3 14 0 1e+37 0 0 empty empty empty 0 -6 0 10 -241291
+-1 -1 0 256;
+#X msg 643 77 1.378;
+#X obj 586 487 bng 15 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X text 519 567 length of file in seconds;
+#X text 545 155 how often to send seconds played;
+#X text 544 170 to 3rd outlet (relative to blocksize);
+#X msg 546 370 time_seek \$1;
+#X obj 546 354 nbx 3 14 0 1e+37 0 0 empty empty empty 0 -6 0 10 -241291
+-1 -1 0 256;
+#X text 641 316 seeks to this frame number.;
+#X text 642 299 PCM seeking.;
+#X obj 200 498 catch~ L;
+#X obj 222 517 catch~ R;
+#X obj 220 466 throw~ L;
+#X obj 251 446 throw~ R;
+#X obj 312 514 env~;
+#X floatatom 312 532 5 0 0 0 - - -;
+#X obj 276 534 env~;
+#X floatatom 276 552 5 0 0 0 - - -;
+#X obj 200 547 dac~;
+#X text 550 21 speed adjustment;
+#X text 550 35 is automatically set;
+#X text 549 51 to (pd_samplerate/file_samplerate);
+#X text 613 233 turn looping on/off;
+#X text 466 593 secs played (+/- .5);
+#X obj 400 594 nbx 5 20 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-241291 -1 -1 29.9888 256;
+#X text 613 671 http://aug.ment.org/readanysf;
+#X obj 446 566 nbx 5 16 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-260818 -1 -1 293 256;
+#X obj 546 227 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
+1;
+#X msg 546 243 loop \$1;
+#X obj 493 542 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-260241 -1 -1 44100 256;
+#X obj 539 519 nbx 7 12 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-259729 -1 -1 0 256;
+#X text 559 542 samperate;
+#X msg 546 188 set_tick 100;
+#X text 32 104 !!!!!!!!!!;
+#X text 32 120 START HERE;
+#X text 625 521 amount of cache used;
+#X text 654 532 for http streams;
+#X msg 130 79 open http://radiostudio.org:8000/streaps_broadband.ogg
+;
+#X msg 207 103 open http://bonjour.mp3.at:8000/;
+#X msg 240 127 open http://fro.at:8008/24k;
+#X msg 95 55 open http://radiostudio.org:8000/free_radio_linux.ogg
+;
+#X obj 400 428 route float length rate cache bang;
+#X text 612 653 readanysf~ (C) august black 2003-5;
+#X text 107 33 some URLs to test out;
+#X connect 0 0 34 0;
+#X connect 0 1 35 0;
+#X connect 0 2 63 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 12 0 13 0;
+#X connect 12 0 14 0;
+#X connect 14 0 0 0;
+#X connect 16 0 15 0;
+#X connect 17 0 12 0;
+#X connect 18 0 12 0;
+#X connect 19 0 12 0;
+#X connect 20 0 21 0;
+#X connect 21 0 0 0;
+#X connect 22 0 20 0;
+#X connect 23 0 12 0;
+#X connect 28 0 0 0;
+#X connect 29 0 28 0;
+#X connect 32 0 40 0;
+#X connect 32 0 36 0;
+#X connect 33 0 40 1;
+#X connect 33 0 38 0;
+#X connect 36 0 37 0;
+#X connect 38 0 39 0;
+#X connect 49 0 50 0;
+#X connect 50 0 0 0;
+#X connect 54 0 0 0;
+#X connect 59 0 0 0;
+#X connect 60 0 0 0;
+#X connect 61 0 0 0;
+#X connect 62 0 0 0;
+#X connect 63 0 46 0;
+#X connect 63 1 48 0;
+#X connect 63 2 51 0;
+#X connect 63 3 52 0;
+#X connect 63 4 24 0;
