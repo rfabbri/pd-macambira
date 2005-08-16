@@ -31,18 +31,20 @@ static t_class *hradio_class, *hradio_old_class;
 
 /* widget helper functions */
 
-void hradio_draw_update(t_hradio *x, t_glist *glist)
+void hradio_draw_update(t_gobj *client, t_glist *glist)
 {
+    t_hradio *x = (t_hradio *)client;
     if(glist_isvisible(glist))
     {
         t_canvas *canvas=glist_getcanvas(glist);
 
         sys_vgui(".x%lx.c itemconfigure %lxBUT%d -fill #%6.6x -outline #%6.6x\n",
-                 canvas, x, x->x_on_old,
+                 canvas, x, x->x_drawn,
                  x->x_gui.x_bcol, x->x_gui.x_bcol);
         sys_vgui(".x%lx.c itemconfigure %lxBUT%d -fill #%6.6x -outline #%6.6x\n",
                  canvas, x, x->x_on,
                  x->x_gui.x_fcol, x->x_gui.x_fcol);
+        x->x_drawn = x->x_on;
     }
 }
 
@@ -68,6 +70,7 @@ void hradio_draw_new(t_hradio *x, t_glist *glist)
         xx11 += dx;
         xx21 += dx;
         xx22 += dx;
+        x->x_drawn = x->x_on;
     }
     sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor w \
              -font {%s %d bold} -fill #%6.6x -tags %lxLABEL\n",
@@ -204,7 +207,7 @@ void hradio_draw_select(t_hradio* x, t_glist* glist)
 void hradio_draw(t_hradio *x, t_glist *glist, int mode)
 {
     if(mode == IEM_GUI_DRAW_MODE_UPDATE)
-        hradio_draw_update(x, glist);
+        sys_queuegui(x, glist, hradio_draw_update);
     else if(mode == IEM_GUI_DRAW_MODE_MOVE)
         hradio_draw_move(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_NEW)

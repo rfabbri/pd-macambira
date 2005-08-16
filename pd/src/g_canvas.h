@@ -352,7 +352,6 @@ EXTERN int gobj_click(t_gobj *x, struct _glist *glist,
 EXTERN void gobj_save(t_gobj *x, t_binbuf *b);
 EXTERN void gobj_properties(t_gobj *x, struct _glist *glist);
 EXTERN void gobj_save(t_gobj *x, t_binbuf *b);
-EXTERN void gobj_redraw(t_gobj *gobj, t_glist *glist);
 
 /* -------------------- functions on glists --------------------- */
 EXTERN t_glist *glist_new( void);
@@ -387,7 +386,6 @@ EXTERN float glist_ytopixels(t_glist *x, float yval);
 EXTERN float glist_dpixtodx(t_glist *x, float dxpix);
 EXTERN float glist_dpixtody(t_glist *x, float dypix);
 
-EXTERN void glist_redrawitem(t_glist *owner, t_gobj *gobj);
 EXTERN void glist_getnextxy(t_glist *gl, int *xval, int *yval);
 EXTERN void glist_glist(t_glist *g, t_symbol *s, int argc, t_atom *argv);
 EXTERN t_glist *glist_addglist(t_glist *g, t_symbol *sym,
@@ -522,14 +520,6 @@ EXTERN void linetraverser_start(t_linetraverser *t, t_canvas *x);
 EXTERN t_outconnect *linetraverser_next(t_linetraverser *t);
 EXTERN void linetraverser_skipobject(t_linetraverser *t);
 
-/* --------------------- functions on tscalars --------------------- */
-
-EXTERN void tscalar_getrect(t_tscalar *x, t_glist *owner,
-    int *xp1, int *yp1, int *xp2, int *yp2);
-EXTERN void tscalar_vis(t_tscalar *x, t_glist *owner, int flag);
-EXTERN int tscalar_click(t_tscalar *x, int xpix, int ypix, int shift,
-    int alt, int dbl, int doit);
-
 /* --------- functions on garrays (graphical arrays) -------------------- */
 
 EXTERN t_template *garray_template(t_garray *x);
@@ -554,6 +544,7 @@ EXTERN t_scalar *scalar_new(t_glist *owner,
     t_symbol *templatesym);
 EXTERN void word_free(t_word *wp, t_template *tmpl);
 EXTERN void scalar_getbasexy(t_scalar *x, float *basex, float *basey);
+EXTERN void scalar_redraw(t_scalar *x, t_glist *glist);
 
 /* ------helper routines for "garrays" and "plots" -------------- */
 EXTERN int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,

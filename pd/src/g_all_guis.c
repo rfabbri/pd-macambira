@@ -521,7 +521,10 @@ void iemgui_vis(t_gobj *z, t_glist *glist, int vis)
     if (vis)
         (*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_NEW);
     else
+    {
         (*x->x_gui.x_draw)((void *)z, glist, IEM_GUI_DRAW_MODE_ERASE);
+        sys_unqueuegui(z);
+    }
 }
 
 void iemgui_save(t_iemgui *iemgui, t_symbol **srl, int *bflcol)

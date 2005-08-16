@@ -403,6 +403,18 @@ t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
         pd_bind(&x->gl_pd, canvas_makebindsym(x->gl_name));
     x->gl_loading = 1;
     x->gl_goprect = 0;      /* no GOP rectangle unless it's turned on later */
+        /* cancel "vis" flag if we're a subpatch of an
+         abstraction inside another patch.  A separate mechanism prevents
+         the toplevel abstraction from showing up. */
+    if (vis && gensym("#X")->s_thing && 
+        ((*gensym("#X")->s_thing) == canvas_class))
+    {
+        t_canvas *zzz = (t_canvas *)(gensym("#X")->s_thing);
+        while (zzz && !zzz->gl_env)
+            zzz = zzz->gl_owner;
+        if (zzz && canvas_isabstraction(zzz) && zzz->gl_owner)
+            vis = 0;
+    }
     x->gl_willvis = vis;
     x->gl_edit = !strncmp(x->gl_name->s_name, "Untitled", 8);
     x->gl_font = sys_nearestfontsize(font);
@@ -1344,15 +1356,6 @@ void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv)
     else post("dsp state %d", canvas_dspstate);
 }
 
-    /* LATER replace this with a queueing scheme */
-void glist_redrawitem(t_glist *owner, t_gobj *gobj)
-{
-    if (glist_isvisible(owner))
-    {
-        gobj_vis(gobj, owner, 0);
-        gobj_vis(gobj, owner, 1);
-    }
-}
 
     /* redraw all "scalars" (do this if a drawing command is changed.) 
     LATER we'll use the "template" information to select which ones we
@@ -1376,7 +1379,7 @@ static void glist_redrawall(t_glist *gl, int action)
                 if (glist_isvisible(gl))
                     gobj_vis(g, gl, 0);
             }
-            else glist_redrawitem(gl, g);
+            else scalar_redraw((t_scalar *)g, gl);
         }
         else if (g->g_pd == canvas_class)
             glist_redrawall((t_glist *)g, action);

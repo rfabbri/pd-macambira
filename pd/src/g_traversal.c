@@ -273,7 +273,6 @@ static void ptrobj_next(t_ptrobj *x)
 {
     ptrobj_vnext(x, 0);
 }
-
 static void ptrobj_sendwindow(t_ptrobj *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_scalar *sc;
@@ -334,6 +333,32 @@ static void ptrobj_pointer(t_ptrobj *x, t_gpointer *gp)
     ptrobj_bang(x);
 }
 
+
+static void ptrobj_rewind(t_ptrobj *x)
+{
+    t_scalar *sc;
+    t_symbol *templatesym;
+    int n;
+    t_typedout *to;
+    t_glist *glist;
+    t_pd *canvas;
+    t_gstub *gs;
+    if (!gpointer_check(&x->x_gp, 1))
+    {
+        pd_error(x, "pointer_rewind: empty pointer");
+        return;
+    }
+    gs = x->x_gp.gp_stub;
+    if (gs->gs_which != GP_GLIST)
+    {
+        pd_error(x, "pointer_rewind: sorry, unavailable for arrays");
+        return;
+    }
+    glist = gs->gs_un.gs_glist;  
+    gpointer_setglist(&x->x_gp, glist, 0);
+    ptrobj_bang(x);
+}
+
 static void ptrobj_free(t_ptrobj *x)
 {
     freebytes(x->x_typedout, x->x_ntypedout * sizeof (*x->x_typedout));
@@ -351,6 +376,8 @@ static void ptrobj_setup(void)
         A_DEFFLOAT, 0); 
     class_addmethod(ptrobj_class, (t_method)ptrobj_sendwindow,
         gensym("send-window"), A_GIMME, 0); 
+    class_addmethod(ptrobj_class, (t_method)ptrobj_rewind,
+        gensym("rewind"), 0); 
     class_addpointer(ptrobj_class, ptrobj_pointer); 
     class_addbang(ptrobj_class, ptrobj_bang); 
 }
@@ -541,14 +568,14 @@ static void set_bang(t_set *x)
     else for (i = 0, vp = x->x_variables; i < nitems; i++, vp++)
         template_setfloat(template, vp->gv_sym, vec, vp->gv_w.w_float, 1);
     if (gs->gs_which == GP_GLIST)
-        glist_redrawitem(gs->gs_un.gs_glist, (t_gobj *)(gp->gp_un.gp_scalar));  
+        scalar_redraw(gp->gp_un.gp_scalar, gs->gs_un.gs_glist);  
     else
     {
         t_array *owner_array = gs->gs_un.gs_array;
         while (owner_array->a_gp.gp_stub->gs_which == GP_ARRAY)
             owner_array = owner_array->a_gp.gp_stub->gs_un.gs_array;
-        glist_redrawitem(owner_array->a_gp.gp_stub->gs_un.gs_glist,
-            (t_gobj *)(owner_array->a_gp.gp_un.gp_scalar));  
+        scalar_redraw(owner_array->a_gp.gp_un.gp_scalar,
+            owner_array->a_gp.gp_stub->gs_un.gs_glist);  
     }
 }
 
@@ -1019,7 +1046,7 @@ static void append_float(t_append *x, t_float f)
         template_setfloat(template, vp->gv_sym, vec, vp->gv_f, 1);
     }
  
-    glist_redrawitem(glist, (t_gobj *)sc);  
+    scalar_redraw(sc, glist);  
 
     outlet_pointer(x->x_obj.ob_outlet, gp);
 }

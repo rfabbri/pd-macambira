@@ -434,7 +434,7 @@ void template_conform(t_template *tfrom, t_template *tto)
         t_dataslot *dataslot = &tto->t_vec[i];
         for (j = 0; j < nfrom; j++)
             if (!conformedfrom[j] &&
-                dataslot_matches(dataslot, &tfrom->t_vec[j], 1))
+                dataslot_matches(dataslot, &tfrom->t_vec[j], 0))
         {
             conformaction[i] = j;
             conformedfrom[j] = 1;
@@ -960,8 +960,10 @@ typedef struct _curve
     t_fielddesc x_fillcolor;
     t_fielddesc x_outlinecolor;
     t_fielddesc x_width;
+    t_fielddesc x_vis;
     int x_npoints;
     t_fielddesc *x_vec;
+    t_canvas *x_canvas;
 } t_curve;
 
 static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
@@ -971,16 +973,29 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
     int flags = 0;
     int nxy, i;
     t_fielddesc *fd;
+    x->x_canvas = canvas_getcurrent();
     if (classname[0] == 'f')
     {
         classname += 6;
         flags |= CLOSED;
-        if (argc) fielddesc_setfloatarg(&x->x_fillcolor, argc--, argv++);
-        else fielddesc_setfloat_const(&x->x_outlinecolor, 0); 
     }
     else classname += 4;
     if (classname[0] == 'c') flags |= BEZ;
     x->x_flags = flags;
+    fielddesc_setfloat_const(&x->x_vis, 1);
+    while (1)
+    {
+        t_symbol *firstarg = atom_getsymbolarg(0, argc, argv);
+        if (!strcmp(firstarg->s_name, "-v") && argc > 1)
+        {
+            fielddesc_setfloatarg(&x->x_vis, 1, argv+1);
+            argc -= 2; argv += 2;
+        }
+        else break;
+    }
+    if ((flags & CLOSED) && argc)
+        fielddesc_setfloatarg(&x->x_fillcolor, argc--, argv++);
+    else fielddesc_setfloat_const(&x->x_fillcolor, 0); 
     if (argc) fielddesc_setfloatarg(&x->x_outlinecolor, argc--, argv++);
     else fielddesc_setfloat_const(&x->x_outlinecolor, 0);
     if (argc) fielddesc_setfloatarg(&x->x_width, argc--, argv++);
@@ -996,6 +1011,23 @@ static void *curve_new(t_symbol *classsym, t_int argc, t_atom *argv)
     return (x);
 }
 
+void curve_float(t_curve *x, t_floatarg f)
+{
+    int viswas;
+    if (x->x_vis.fd_type != A_FLOAT || x->x_vis.fd_var)
+    {
+        pd_error(x, "global vis/invis for a template with variable visibility");
+        return;
+    }
+    viswas = (x->x_vis.fd_un.fd_float != 0);
+    
+    if ((f != 0 && viswas) || (f == 0 && !viswas))
+        return;
+    canvas_redrawallfortemplatecanvas(x->x_canvas, 2);
+    fielddesc_setfloat_const(&x->x_vis, (f != 0));
+    canvas_redrawallfortemplatecanvas(x->x_canvas, 1);
+}
+
 /* -------------------- widget behavior for curve ------------ */
 
 static void curve_getrect(t_gobj *z, t_glist *glist,
@@ -1006,6 +1038,12 @@ static void curve_getrect(t_gobj *z, t_glist *glist,
     int i, n = x->x_npoints;
     t_fielddesc *f = x->x_vec;
     int x1 = 0x7fffffff, x2 = -0x7fffffff, y1 = 0x7fffffff, y2 = -0x7fffffff;
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+    {
+        *xp1 = *yp1 = 0x7fffffff;
+        *xp2 = *yp2 = -0x7fffffff;
+        return;
+    }
     for (i = 0, f = x->x_vec; i < n; i++, f += 2)
     {
         int xloc = glist_xtopixels(glist,
@@ -1071,6 +1109,8 @@ static void curve_vis(t_gobj *z, t_glist *glist,
     int i, n = x->x_npoints;
     t_fielddesc *f = x->x_vec;
     
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+        return;
     if (vis)
     {
         if (n > 1)
@@ -1158,7 +1198,7 @@ static void curve_motion(void *z, t_floatarg dx, t_floatarg dy)
                 1); 
     }
     if (curve_motion_scalar)
-        glist_redrawitem(curve_motion_glist, &curve_motion_scalar->sc_gobj);
+        scalar_redraw(curve_motion_scalar, curve_motion_glist);
     if (curve_motion_array)
         array_redraw(curve_motion_array, curve_motion_glist);
 }
@@ -1173,6 +1213,8 @@ static int curve_click(t_gobj *z, t_glist *glist,
     int bestn = -1;
     int besterror = 0x7fffffff;
     t_fielddesc *f;
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
+        return (0);
     for (i = 0, f = x->x_vec; i < n; i++, f += 2)
     {
         int xval = fielddesc_getcoord(f, template, data, 0),
@@ -1235,7 +1277,7 @@ static void curve_free(t_curve *x)
 static void curve_setup(void)
 {
     curve_class = class_new(gensym("drawpolygon"), (t_newmethod)curve_new,
-        (t_method)curve_free, sizeof(t_curve), CLASS_NOINLET, A_GIMME, 0);
+        (t_method)curve_free, sizeof(t_curve), 0, A_GIMME, 0);
     class_setdrawcommand(curve_class);
     class_addcreator((t_newmethod)curve_new, gensym("drawcurve"),
         A_GIMME, 0);
@@ -1244,6 +1286,7 @@ static void curve_setup(void)
     class_addcreator((t_newmethod)curve_new, gensym("filledcurve"),
         A_GIMME, 0);
     class_setparentwidget(curve_class, &curve_widgetbehavior);
+    class_addfloat(curve_class, curve_float);
 }
 
 /* --------- plots for showing arrays --------------- */
@@ -1271,13 +1314,15 @@ typedef struct _plot
 static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
 {
     t_plot *x = (t_plot *)pd_new(plot_class);
-    int defstyle = PLOTSTYLE_POLY, vis = 1, scalarvis = 1;
+    int defstyle = PLOTSTYLE_POLY;
     x->x_canvas = canvas_getcurrent();
 
     fielddesc_setfloat_var(&x->x_xpoints, gensym("x"));
     fielddesc_setfloat_var(&x->x_ypoints, gensym("y"));
     fielddesc_setfloat_var(&x->x_wpoints, gensym("w"));
     
+    fielddesc_setfloat_const(&x->x_vis, 1);
+    fielddesc_setfloat_const(&x->x_scalarvis, 1);
     while (1)
     {
         t_symbol *firstarg = atom_getsymbolarg(0, argc, argv);
@@ -1287,15 +1332,15 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
             defstyle = PLOTSTYLE_BEZ;
             argc--, argv++;
         }
-        else if (!strcmp(firstarg->s_name, "-n"))
+        else if (!strcmp(firstarg->s_name, "-v") && argc > 1)
         {
-            vis = 0;
-            argc--; argv++;
+            fielddesc_setfloatarg(&x->x_vis, 1, argv+1);
+            argc -= 2; argv += 2;
         }
-        else if (!strcmp(firstarg->s_name, "-noscalar"))
+        else if (!strcmp(firstarg->s_name, "-vs") && argc > 1)
         {
-            scalarvis = 0;
-            argc--; argv++;
+            fielddesc_setfloatarg(&x->x_scalarvis, 1, argv+1);
+            argc -= 2; argv += 2;
         }
         else if (!strcmp(firstarg->s_name, "-x") && argc > 1)
         {
@@ -1328,10 +1373,6 @@ static void *plot_new(t_symbol *classsym, t_int argc, t_atom *argv)
     else fielddesc_setfloat_const(&x->x_xinc, 1);
     if (argc) fielddesc_setfloatarg(&x->x_style, argc--, argv++);
     else fielddesc_setfloat_const(&x->x_style, defstyle);
-    if (argc) fielddesc_setfloatarg(&x->x_vis, argc--, argv++);
-    else fielddesc_setfloat_const(&x->x_vis, vis);
-    if (argc) fielddesc_setfloatarg(&x->x_scalarvis, argc--, argv++);
-    else fielddesc_setfloat_const(&x->x_scalarvis, 1);
     return (x);
 }
 
@@ -1701,8 +1742,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     if (xonset >= 0 || ixpix != lastpixel)
                     {
                         sys_vgui("%d %f \\\n", ixpix, glist_ytopixels(glist,
-                            basey + fielddesc_cvttocoord(yfielddesc,
-                                yloc + yval) +
+                            basey + yloc + fielddesc_cvttocoord(yfielddesc,
+                                yval) +
                                     fielddesc_cvttocoord(wfielddesc, wval)));
                         ndrawn++;
                     }
@@ -1714,12 +1755,12 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                 if (ndrawn < 4)
                 {
                     sys_vgui("%d %f \\\n", ixpix + 10, glist_ytopixels(glist,
-                        basey + fielddesc_cvttocoord(yfielddesc,
-                            yloc + yval) +
+                        basey + yloc + fielddesc_cvttocoord(yfielddesc,
+                            yval) +
                                 fielddesc_cvttocoord(wfielddesc, wval)));
                     sys_vgui("%d %f \\\n", ixpix + 10, glist_ytopixels(glist,
-                        basey + fielddesc_cvttocoord(yfielddesc,
-                            yloc + yval) -
+                        basey + yloc + fielddesc_cvttocoord(yfielddesc,
+                            yval) -
                                 fielddesc_cvttocoord(wfielddesc, wval)));
                 }
             ouch:
@@ -1753,8 +1794,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     {
                         sys_vgui("%d %f \\\n", ixpix,
                             glist_ytopixels(glist,
-                                basey + fielddesc_cvttocoord(yfielddesc,
-                                    yloc + yval)));
+                                basey + yloc + fielddesc_cvttocoord(yfielddesc,
+                                    yval)));
                         ndrawn++;
                     }
                     lastpixel = ixpix;
@@ -1763,8 +1804,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                     /* TK will complain if there aren't at least 2 points... */
                 if (ndrawn == 0) sys_vgui("0 0 0 0 \\\n");
                 else if (ndrawn == 1) sys_vgui("%d %f \\\n", ixpix + 10,
-                    glist_ytopixels(glist, basey +
-                        fielddesc_cvttocoord(yfielddesc, yloc + yval)));
+                    glist_ytopixels(glist, basey + yloc + 
+                        fielddesc_cvttocoord(yfielddesc, yval)));
 
                 sys_vgui("-width %f\\\n", linewidth);
                 sys_vgui("-fill %s\\\n", outline);
@@ -1789,7 +1830,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
                 if (yonset >= 0)
                     yval = *(float *)((elem + elemsize * i) + yonset);
                 else yval = 0;
-                useyloc = basey + fielddesc_cvttocoord(yfielddesc, yloc+yval);
+                useyloc = basey + yloc +
+                    fielddesc_cvttocoord(yfielddesc, yval);
                 for (y = elemtemplatecanvas->gl_list; y; y = y->g_next)
                 {
                     t_parentwidgetbehavior *wb = pd_getparentwidget(&y->g_pd);
@@ -1870,12 +1912,12 @@ static void plot_setup(void)
     class_setparentwidget(plot_class, &plot_widgetbehavior);
 }
 
-/* ---------------- drawnumber: draw a number ---------------- */
+/* ---------------- drawnumber: draw a number (or symbol) ---------------- */
 
 /*
     drawnumbers draw numeric fields at controllable locations, with
-    controllable color and label  .
-        invocation: (drawnumber|drawsymbol) variable x y color label
+    controllable color and label.  invocation:
+    (drawnumber|drawsymbol) [-v <visible>] variable x y color label
 */
 
 t_class *drawnumber_class;
@@ -1885,11 +1927,11 @@ t_class *drawnumber_class;
 typedef struct _drawnumber
 {
     t_object x_obj;
-    int x_vis;              /* LATER incorporate into flags field below? */
     t_fielddesc x_value;
     t_fielddesc x_xloc;
     t_fielddesc x_yloc;
     t_fielddesc x_color;
+    t_fielddesc x_vis;
     t_symbol *x_label;
     int x_flags;
     t_canvas *x_canvas;
@@ -1904,15 +1946,15 @@ static void *drawnumber_new(t_symbol *classsym, t_int argc, t_atom *argv)
     if (classname[4] == 's')
         flags |= DRAW_SYMBOL;
     x->x_flags = flags;
-    x->x_vis = 1;
+    fielddesc_setfloat_const(&x->x_vis, 1);
     x->x_canvas = canvas_getcurrent();
     while (1)
     {
         t_symbol *firstarg = atom_getsymbolarg(0, argc, argv);
-        if (!strcmp(firstarg->s_name, "-n"))
+        if (!strcmp(firstarg->s_name, "-v") && argc > 1)
         {
-            x->x_vis = 0;
-            argc--; argv++;
+            fielddesc_setfloatarg(&x->x_vis, 1, argv+1);
+            argc -= 2; argv += 2;
         }
         else break;
     }
@@ -1920,7 +1962,6 @@ static void *drawnumber_new(t_symbol *classsym, t_int argc, t_atom *argv)
     {
         if (argc) fielddesc_setsymbolarg(&x->x_value, argc--, argv++);
         else fielddesc_setsymbol_const(&x->x_value, &s_);
-    
     }
     else
     {
@@ -1942,10 +1983,18 @@ static void *drawnumber_new(t_symbol *classsym, t_int argc, t_atom *argv)
 
 void drawnumber_float(t_drawnumber *x, t_floatarg f)
 {
-    if ((f != 0 && x->x_vis) || (f == 0 && !x->x_vis))
+    int viswas;
+    if (x->x_vis.fd_type != A_FLOAT || x->x_vis.fd_var)
+    {
+        pd_error(x, "global vis/invis for a template with variable visibility");
+        return;
+    }
+    viswas = (x->x_vis.fd_un.fd_float != 0);
+    
+    if ((f != 0 && viswas) || (f == 0 && !viswas))
         return;
     canvas_redrawallfortemplatecanvas(x->x_canvas, 2);
-    x->x_vis = (f!= 0);
+    fielddesc_setfloat_const(&x->x_vis, (f != 0));
     canvas_redrawallfortemplatecanvas(x->x_canvas, 1);
 }
 
@@ -1970,7 +2019,7 @@ static void drawnumber_getrect(t_gobj *z, t_glist *glist,
         int xloc, yloc, font, fontwidth, fontheight;
     char buf[DRAWNUMBER_BUFSIZE];
 
-    if (!x->x_vis)
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
     {
         *xp1 = *yp1 = 0x7fffffff;
         *xp2 = *yp2 = -0x7fffffff;
@@ -2021,7 +2070,7 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
 {
     t_drawnumber *x = (t_drawnumber *)z;
     
-    if (!x->x_vis)
+    if (!fielddesc_getfloat(&x->x_vis, template, data, 0))
         return;
     if (vis)
     {
@@ -2067,8 +2116,7 @@ static void drawnumber_motion(void *z, t_floatarg dx, t_floatarg dy)
             drawnumber_motion_ycumulative,
                 1);
     if (drawnumber_motion_scalar)
-        glist_redrawitem(drawnumber_motion_glist,
-            &drawnumber_motion_scalar->sc_gobj);
+        scalar_redraw(drawnumber_motion_scalar, drawnumber_motion_glist);
     if (drawnumber_motion_array)
         array_redraw(drawnumber_motion_array, drawnumber_motion_glist);
 }
@@ -2084,7 +2132,8 @@ static int drawnumber_click(t_gobj *z, t_glist *glist,
         data, template, basex, basey,
         &x1, &y1, &x2, &y2);
     if (xpix >= x1 && xpix <= x2 && ypix >= y1 && ypix <= y2
-        && x->x_value.fd_var && x->x_vis)
+        && x->x_value.fd_var &&
+            fielddesc_getfloat(&x->x_vis, template, data, 0))
     {
         if (doit)
         {

@@ -349,5 +349,5 @@ then
     MORECFLAGS=$MORECFLAGS"  -g3 -D__COMPAQC__ -arch host"
 fi
 
-AC_OUTPUT(makefile config.h)
+AC_OUTPUT(makefile)
 

@@ -61,9 +61,9 @@ started" in the Help menu.;
 but is free for you to use for any reasonable purpose. See the file
 \, LICENSE.txt in the distribution.;
 #X obj 135 117 tgl 20 0 tone-ch1 tone-ch1 1 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 160 117 tgl 20 0 tone-ch2 tone-ch2 2 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 236 282 tgl 20 0 empty empty empty 20 8 0 8 -262144 -1 -1 0
 1;
 #X obj 394 110 tgl 20 0 tone-monitor set-tone-monitor monitor 25 10
@@ -93,13 +93,13 @@ but is free for you to use for any reasonable purpose. See the file
 #X obj 393 148 tgl 20 0 tone-hipass set-tone-hipass input-hipass 25
 10 0 12 -262144 -1 -1 0 1;
 #X obj 185 117 tgl 20 0 tone-ch3 tone-ch3 3 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 210 117 tgl 20 0 tone-ch4 tone-ch4 4 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 235 117 tgl 20 0 tone-ch5 tone-ch5 5 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 260 117 tgl 20 0 tone-ch6 tone-ch6 6 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 331 108 bng 15 250 50 0 tone-all empty ALL 20 8 0 12 -262144
 -1 -1;
 #X obj 331 129 bng 15 250 50 0 tone-none empty NONE 20 8 0 12 -262144
@@ -447,9 +447,9 @@ but is free for you to use for any reasonable purpose. See the file
 #X floatatom 335 186 3 0 0 0 - - -;
 #X floatatom 368 186 3 0 0 0 - - -;
 #X obj 283 117 tgl 20 0 tone-ch7 tone-ch7 7 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X obj 308 117 tgl 20 0 tone-ch8 tone-ch8 8 5 -8 0 12 -262144 -1 -1
-0 1;
+1 1;
 #X connect 1 0 2 0;
 #X connect 1 1 2 1;
 #X connect 2 0 3 0;

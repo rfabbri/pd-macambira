@@ -30,8 +30,9 @@ static t_class *hslider_class;
 
 /* widget helper functions */
 
-static void hslider_draw_update(t_hslider *x, t_glist *glist)
+static void hslider_draw_update(t_gobj *client, t_glist *glist)
 {
+    t_hslider *x = (t_hslider *)client;
     t_canvas *canvas=glist_getcanvas(glist);
     int ypos=text_ypix(&x->x_gui.x_obj, glist);
 
@@ -182,7 +183,7 @@ static void hslider_draw_select(t_hslider* x,t_glist* glist)
 void hslider_draw(t_hslider *x, t_glist *glist, int mode)
 {
     if(mode == IEM_GUI_DRAW_MODE_UPDATE)
-        hslider_draw_update(x, glist);
+        sys_queuegui(x, glist, hslider_draw_update);
     else if(mode == IEM_GUI_DRAW_MODE_MOVE)
         hslider_draw_move(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_NEW)

@@ -30,8 +30,9 @@ static t_class *vslider_class;
 
 /* widget helper functions */
 
-static void vslider_draw_update(t_vslider *x, t_glist *glist)
+static void vslider_draw_update(t_gobj *client, t_glist *glist)
 {
+    t_vslider *x = (t_vslider *)client;
     if (glist_isvisible(glist))
     {
         int r = text_ypix(&x->x_gui.x_obj, glist) + x->x_gui.x_h - (x->x_val + 50)/100;
@@ -174,7 +175,7 @@ static void vslider_draw_select(t_vslider *x, t_glist *glist)
 void vslider_draw(t_vslider *x, t_glist *glist, int mode)
 {
     if(mode == IEM_GUI_DRAW_MODE_UPDATE)
-        vslider_draw_update(x, glist);
+        sys_queuegui(x, glist, vslider_draw_update);
     else if(mode == IEM_GUI_DRAW_MODE_MOVE)
         vslider_draw_move(x, glist);
     else if(mode == IEM_GUI_DRAW_MODE_NEW)

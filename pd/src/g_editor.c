@@ -94,11 +94,6 @@ int gobj_click(t_gobj *x, struct _glist *glist,
     else return (0);
 }
 
-void gobj_redraw(t_gobj *gobj, t_glist *glist)
-{
-    glist_redrawitem(glist, gobj);
-}
-
 /* ------------------------ managing the selection ----------------- */
 
 void glist_selectline(t_glist *x, t_outconnect *oc, int index1,
@@ -696,10 +691,11 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
         {
                 /* we're going to remake the object, so "g" will go stale.
                 Get its index here, and afterward restore g.  Also, the
-                replacement will be at teh end of the list, so we don't
+                replacement will be at the end of the list, so we don't
                 do g = g->g_next in this case. */
             int j = glist_getindex(gl, g);
-            if (!gl->gl_havewindow)
+            int hadwindow = gl->gl_havewindow;
+            if (!hadwindow)
                 canvas_vis(glist_getcanvas(gl), 1);
             glist_noselect(gl);
             glist_select(gl, g);
@@ -709,6 +705,8 @@ static void glist_doreload(t_glist *gl, t_symbol *name, t_symbol *dir,
             canvas_undo(gl);
             glist_noselect(gl);
             g = glist_nth(gl, j);
+            if (!hadwindow)
+                canvas_vis(glist_getcanvas(gl), 0);
         }
         else
         {
@@ -955,7 +953,11 @@ static void canvas_donecanvasdialog(t_glist *x,
     canvas_setgraph(x, graphme, 0);
     if (x->gl_havewindow)
         canvas_redraw(x);
-    else gobj_redraw(&x->gl_gobj, x->gl_owner);
+    else if (glist_isvisible(x->gl_owner))
+    {
+        gobj_vis(&x->gl_gobj, x->gl_owner, 0);
+        gobj_vis(&x->gl_gobj, x->gl_owner, 1);
+    }
 }
 
     /* called from the gui when a popup menu comes back with "properties,"

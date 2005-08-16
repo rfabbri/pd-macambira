@@ -198,9 +198,10 @@ typedef struct _hdial
 {
     t_iemgui x_gui;
     int      x_on;
-    int      x_on_old;
+    int      x_on_old;  /* LATER delete this; it's used for old version */
     int      x_change;
     int      x_number;
+    int      x_drawn;
     t_atom   x_at[2];
 } t_hdial;
 
@@ -242,6 +243,8 @@ typedef struct _vu
     int      x_scale;
     void     *x_out_rms;
     void     *x_out_peak;
+    unsigned int x_updaterms:1;
+    unsigned int x_updatepeak:1;
 } t_vu;
 
 typedef struct _my_numbox
@@ -266,6 +269,7 @@ typedef struct _vdial
     int      x_on_old;
     int      x_change;
     int      x_number;
+    int      x_drawn;
     t_atom   x_at[2];
 } t_vdial;
 

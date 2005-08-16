@@ -198,18 +198,16 @@ static void scalar_getrect(t_gobj *z, t_glist *owner,
 static void scalar_select(t_gobj *z, t_glist *owner, int state)
 {
     t_scalar *x = (t_scalar *)z;
-    /* post("scalar_select %d", state); */
-    /* later */
+    t_symbol *templatesym = x->sc_template;
+    t_template *tmpl;
+    t_atom at;
+    t_gpointer gp;
+    gpointer_init(&gp);
+    gpointer_setglist(&gp, owner, x);
+    SETPOINTER(&at, &gp);
     if (state)
     {
         int x1, y1, x2, y2;
-        t_symbol *templatesym = x->sc_template;
-        t_template *tmpl;
-        t_atom at;
-        t_gpointer gp;
-        gpointer_init(&gp);
-        gpointer_setglist(&gp, owner, x);
-        SETPOINTER(&at, &gp);
         if (tmpl = template_findbyname(templatesym))
             template_notify(tmpl, gensym("select"), 1, &at);
         gpointer_unset(&gp);
@@ -221,7 +219,13 @@ static void scalar_select(t_gobj *z, t_glist *owner, int state)
                 glist_getcanvas(owner), x1, y1, x1, y2, x2, y2, x2, y1, x1, y1,
                 x);
     }
-    else sys_vgui(".x%lx.c delete select%lx\n", glist_getcanvas(owner), x);
+    else
+    {
+        sys_vgui(".x%lx.c delete select%lx\n", glist_getcanvas(owner), x);
+        if (tmpl = template_findbyname(templatesym))
+            template_notify(tmpl, gensym("deselect"), 1, &at);
+        
+    }
 }
 
 static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
@@ -248,7 +252,7 @@ static void scalar_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     if (goty)
         *(t_float *)(((char *)(x->sc_vec)) + yonset) +=
             dy * (glist_pixelstoy(glist, 1) - glist_pixelstoy(glist, 0));
-    glist_redrawitem(glist, z);
+    scalar_redraw(x, glist);
     if (glist_isselected(glist, z))
     {
         scalar_select(z, glist, 0);
@@ -295,8 +299,18 @@ static void scalar_vis(t_gobj *z, t_glist *owner, int vis)
         if (!wb) continue;
         (*wb->w_parentvisfn)(y, owner, x->sc_vec, template, basex, basey, vis);
     }
-    if (!vis)
-        sys_unqueuegui(x);
+    sys_unqueuegui(x);
+}
+
+static void scalar_doredraw(t_gobj *client, t_glist *glist)
+{
+    scalar_vis(client, glist, 0);
+    scalar_vis(client, glist, 1);
+}
+
+void scalar_redraw(t_scalar *x, t_glist *glist)
+{
+    sys_queuegui(x, glist, scalar_doredraw);
 }
 
 int scalar_doclick(t_word *data, t_template *template, t_scalar *sc,

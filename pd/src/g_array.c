@@ -552,7 +552,7 @@ void array_redraw(t_array *a, t_glist *glist)
 {
     while (a->a_gp.gp_stub->gs_which == GP_ARRAY)
         a = a->a_gp.gp_stub->gs_un.gs_array;
-    gobj_redraw(&a->a_gp.gp_un.gp_scalar->sc_gobj, glist);
+    scalar_redraw(a->a_gp.gp_un.gp_scalar, glist);
 }
 
     /* routine to get screen coordinates of a point in an array */
@@ -615,7 +615,7 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
     array_motion_ycumulative += dy * array_motion_yperpix;
     if (array_motion_xfield)
     {
-            /* it's an x, y plot; can drag many points at once */
+            /* it's an x, y plot */
         int i;
         for (i = 0; i < array_motion_npoints; i++)
         {
@@ -653,7 +653,7 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
     else if (array_motion_yfield)
     {
             /* a y-only plot. */
-        int thisx = array_motion_initx + array_motion_xcumulative, x2;
+        int thisx = array_motion_initx + array_motion_xcumulative + 0.5, x2;
         int increment, i, nchange;
         float newy = array_motion_ycumulative,
             oldy = fielddesc_getcoord(array_motion_yfield,
@@ -680,8 +680,7 @@ static void array_motion(void *z, t_floatarg dx, t_floatarg dy)
          array_motion_lastx = thisx;
     }
     if (array_motion_scalar)
-        sys_queuegui(&array_motion_scalar->sc_gobj,
-            array_motion_glist, gobj_redraw);
+        scalar_redraw(array_motion_scalar, array_motion_glist);
     if (array_motion_array)
         array_redraw(array_motion_array, array_motion_glist);
 }
@@ -703,6 +702,7 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     t_canvas *elemtemplatecanvas;
     t_template *elemtemplate;
     int elemsize, yonset, wonset, xonset, i, incr, hit;
+    float xsum;
 
     if (elemtemplatesym == &s_float)
         return (0);
@@ -714,12 +714,21 @@ static int array_doclick_element(t_array *array, t_glist *glist,
     if (array->a_n < 2000)
         incr = 1;
     else incr = array->a_n / 300;
-    for (i = 0; i < array->a_n; i += incr)
+    for (i = 0, xsum = 0; i < array->a_n; i += incr)
     {
+        float usexloc, useyloc;
+        if (xonset >= 0)
+            usexloc = xloc + fielddesc_cvttocoord(xfield, 
+                *(float *)(((char *)(array->a_vec) + elemsize * i) + xonset));
+        else usexloc = xloc + xsum, xsum += xinc;
+        useyloc = yloc + (yonset >= 0 ? fielddesc_cvttocoord(yfield,
+            *(float *)(((char *)(array->a_vec) + elemsize * i) + yonset)) : 0);
+        
         if (hit = scalar_doclick(
             (t_word *)((char *)(array->a_vec) + i * elemsize),
             elemtemplate, 0, array,
-            glist, xloc, yloc, xpix, ypix, shift, alt, dbl, doit))
+            glist, usexloc, useyloc,
+            xpix, ypix, shift, alt, dbl, doit))
                 return (hit);
     }
     return (0);
@@ -850,8 +859,10 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
                         array_motion_xcumulative = 
                             fielddesc_getcoord(xfield, array_motion_template,
                                 (t_word *)(elem + i * elemsize), 1);
-                        array_motion_wp = (t_word *)(elem + i * elemsize);
-                        array_motion_npoints = array->a_n - i;
+                            array_motion_wp = (t_word *)(elem + i * elemsize);
+                        if (shift)
+                            array_motion_npoints = array->a_n - i;
+                        else array_motion_npoints = 1;
                     }
                     else
                     {

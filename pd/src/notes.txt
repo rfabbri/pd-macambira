@@ -10,6 +10,7 @@ bug fix in d_soundfile.c
 bugfix in number2
 plot drawing instructions turn on and off
 ranges in drawing instructions
+select/deselect hook
 unify graph properties dialogs
 GOP font depends on abstraction, not parent
 bug fixes, stale pointers
@@ -18,22 +19,32 @@ message "addcomma" etc
 Mac to tcl/tk 8.4.5; pd extension added automatically
 bug fix writing aiff gfiles
 bug fix (tcl error messages when starting open dialogs)
+pointer rewind (also check if send-window documented?)
+
 
 ------------ 0.39 ---------
 problems:
+"list" to signal inlet (e.g., "*~") complains
+"find" doesn't open GOPs correctly
+save dirty abstractions on close
+close dirty patches on quit
+stop vis-ing subpatches of abstractions
+when retyping abstractions, offer to save dirty one
+don't filter locked click() through getrect
+better hit detection (getrect is too greedy; try just sending it through)
+thread-unsafe callbacks from sys_microsleep()
+
 windows:
   modal dialogs confuse watchdog
   check the right-click-on-empty-canvas
 mac:
   load libraries first before opening patches on drag-and-drop
+  writing 3-byte soundfiles distorts???
 
 check:
 MIDI I/O for windows
 blechman patch for s_inter.c
 check what happens when going back and forth between graph-on-parent
-
-garray change:
-make a gobj_redraw that schedules the redraw
 array_resize etc., should redraw the array directly?  Or should "setsize"
     and "garray_resize" do it instead?  check it's queued correctly.
 
@@ -47,11 +58,10 @@ problems:
 TK commands to nonexistent windows? (occasionally still happens)
 array name changes don't show up on parent
 arrays that don't fit in bounds don't update (same as red rectangle problem?)
-look in d_resample.pd to inderstand inlet~ upsampling...
+look in d_resample.pd to understand inlet~ upsampling...
 flag for array to suppress printing name
 fix samplerate~ to figure out blocking
 patcher inlets don't deal with scalars (zbug.pd)
-need to optimize canvas_motion (get rid of box hit test??)
 check if there's a problem loading libs on startup if superuser
 tk errors for large tables?
 wierdly small hotspot on lines
@@ -106,7 +116,6 @@ figure out why Pd sometimes crashes when you close example after adding fields
 arrays of non-existent templates crash
 vget, vset traversal objects
 cursor to show (x, y) location
-better hit detection (getrect is too greedy; try tk's "current" tag for canvas)
 typing at drawnumbers
 test and debug list elements of templates
 sublists should display on parent if desired? (new drawing instruction)

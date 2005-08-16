@@ -76,6 +76,21 @@ static void vu_update_peak(t_vu *x, t_glist *glist)
     }
 }
 
+static void vu_draw_update(t_gobj *client, t_glist *glist)
+{
+    t_vu *x = (t_vu *)client;
+    if (x->x_updaterms)
+    {
+        vu_update_rms(x, glist);
+        x->x_updaterms = 0;
+    }
+    if (x->x_updatepeak)
+    {
+        vu_update_peak(x, glist);
+        x->x_updatepeak = 0;
+    }
+}
+    
 static void vu_draw_new(t_vu *x, t_glist *glist)
 {
     t_canvas *canvas=glist_getcanvas(glist);
@@ -151,6 +166,8 @@ static void vu_draw_new(t_vu *x, t_glist *glist)
              xpos+x->x_gui.x_w+1, ypos-1,
              x, 1);
     }
+    x->x_updaterms = x->x_updatepeak = 1;
+    sys_queuegui(x, x->x_gui.x_glist, vu_draw_update);
 }
 
 
@@ -185,8 +202,8 @@ static void vu_draw_move(t_vu *x, t_glist *glist)
         sys_vgui(".x%lx.c coords %lxSCALE%d %d %d\n",
                  canvas, x, i, end, yyy+k3);
     }
-    vu_update_peak(x, glist);
-    vu_update_rms(x, glist);
+    x->x_updaterms = x->x_updatepeak = 1;
+    sys_queuegui(x, glist, vu_draw_update);
     sys_vgui(".x%lx.c coords %lxLABEL %d %d\n",
              canvas, x, xpos+x->x_gui.x_ldx,
              ypos+x->x_gui.x_ldy);
@@ -572,7 +589,8 @@ static void vu_float(t_vu *x, t_floatarg rms)
     rms = 0.01*(float)(i - 10000);
     x->x_fr = rms;
     outlet_float(x->x_out_rms, rms);
-    vu_update_rms(x, x->x_gui.x_glist);
+    x->x_updaterms = 1;
+    sys_queuegui(x, x->x_gui.x_glist, vu_draw_update);
 }
 
 static void vu_ft1(t_vu *x, t_floatarg peak)
@@ -591,16 +609,17 @@ static void vu_ft1(t_vu *x, t_floatarg peak)
     i = (int)(100.0*peak + 10000.5);
     peak = 0.01*(float)(i - 10000);
     x->x_fp = peak;
+    x->x_updatepeak = 1;
+    sys_queuegui(x, x->x_gui.x_glist, vu_draw_update);
     outlet_float(x->x_out_peak, peak);
-    vu_update_peak(x, x->x_gui.x_glist);
 }
 
 static void vu_bang(t_vu *x)
 {
     outlet_float(x->x_out_peak, x->x_fp);
     outlet_float(x->x_out_rms, x->x_fr);
-    vu_update_rms(x, x->x_gui.x_glist);
-    vu_update_peak(x, x->x_gui.x_glist);
+    x->x_updaterms = x->x_updatepeak = 1;
+    sys_queuegui(x, x->x_gui.x_glist, vu_draw_update);
 }
 
 static void *vu_new(t_symbol *s, int argc, t_atom *argv)
