@@ -46,6 +46,7 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
     int err = 0;
     int client;
     int i;
+    snd_seq_client_info_t *alsainfo;
     alsa_nmidiin = 0;
     alsa_nmidiout = 0;
     if(nmidiin>MAXMIDIINDEV )
@@ -91,7 +92,6 @@ void sys_alsa_do_open_midi(int nmidiin, int *midiinvec,
     }
    
     if (nmidiout == 0 && nmidiin == 0) return;
-    snd_seq_client_info_t *alsainfo;
     snd_seq_client_info_malloc(&alsainfo);
     snd_seq_get_client_info(midi_handle,alsainfo);
     snd_seq_client_info_set_name(alsainfo,"Pure Data");
@@ -184,7 +184,7 @@ void sys_alsa_putmidibyte(int portno, int byte)
     /* this version uses the asynchronous "read()" ... */
 void sys_alsa_poll_midi(void)
 {
-   char buf[20];
+   unsigned char buf[20];
    int count, alsa_source;
    int i;
    snd_seq_event_t *midievent = NULL;

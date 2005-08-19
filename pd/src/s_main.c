@@ -2,7 +2,7 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-char pd_version[] = "Pd version 0.39 TEST 4c\n";
+char pd_version[] = "Pd version 0.39 TEST 5\n";
 char pd_compiletime[] = __TIME__;
 char pd_compiledate[] = __DATE__;
 

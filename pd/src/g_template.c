@@ -1524,7 +1524,9 @@ static void plot_getrect(t_gobj *z, t_glist *glist,
                 xfielddesc, yfielddesc, wfielddesc,
                 &xonset, &yonset, &wonset))
     {
-        for (i = 0, xsum = 0; i < array->a_n; i++)
+            /* if it has more than 2000 points, just check 1000 of them. */
+        int incr = (array->a_n <= 2000 ? 1 : array->a_n / 1000);
+        for (i = 0, xsum = 0; i < array->a_n; i += incr)
         {
             float usexloc, useyloc;
             t_gobj *y;

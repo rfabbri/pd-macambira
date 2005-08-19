@@ -174,7 +174,13 @@ static int sys_domicrosleep(int microsec, int pollem)
         for (i = 0; i < sys_nfdpoll; i++)
             if (FD_ISSET(sys_fdpoll[i].fdp_fd, &readset))
         {
+#ifdef THREAD_LOCKING
+            sys_lock();
+#endif
             (*sys_fdpoll[i].fdp_fn)(sys_fdpoll[i].fdp_ptr, sys_fdpoll[i].fdp_fd);
+#ifdef THREAD_LOCKING
+            sys_unlock();
+#endif
             didsomething = 1;
         }
         return (didsomething);
@@ -280,10 +286,12 @@ void sys_set_priority(int higher)
 
 #ifdef _POSIX_MEMLOCK
     /* tb: force memlock to physical memory { */
-    struct rlimit mlock_limit;
-    mlock_limit.rlim_cur=0;
-    mlock_limit.rlim_max=0;
-    setrlimit(RLIMIT_MEMLOCK,&mlock_limit);
+    {
+        struct rlimit mlock_limit;
+        mlock_limit.rlim_cur=0;
+        mlock_limit.rlim_max=0;
+        setrlimit(RLIMIT_MEMLOCK,&mlock_limit);
+    }
     /* } tb */
     if (mlockall(MCL_FUTURE) != -1) 
         fprintf(stderr, "memory locking enabled.\n");
@@ -1087,7 +1095,7 @@ int sys_startgui(const char *guidir)
                 sys_guicmd = cmdbuf;
             }
             if (sys_verbose) fprintf(stderr, "%s", sys_guicmd);
-            execl("/bin/sh", "sh", "-c", sys_guicmd, 0);
+            execl("/bin/sh", "sh", "-c", sys_guicmd, (char*)0);
             perror("pd: exec");
             _exit(1);
         }
@@ -1171,7 +1179,7 @@ int sys_startgui(const char *guidir)
 
             sprintf(cmdbuf, "%s/pd-watchdog\n", guidir);
             if (sys_verbose) fprintf(stderr, "%s", cmdbuf);
-            execl("/bin/sh", "sh", "-c", cmdbuf, 0);
+            execl("/bin/sh", "sh", "-c", cmdbuf, (char*)0);
             perror("pd: exec");
             _exit(1);
         }

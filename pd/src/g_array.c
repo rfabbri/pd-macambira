@@ -429,6 +429,14 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
             pd_unbind(&x->x_gobj.g_pd, x->x_realname);
             x->x_realname = canvas_realizedollar(x->x_glist, argname);
             pd_bind(&x->x_gobj.g_pd, x->x_realname);
+                /* redraw the whole glist, just so the name change shows up */
+            if (x->x_glist->gl_havewindow)
+                canvas_redraw(x->x_glist);
+            else if (glist_isvisible(x->x_glist->gl_owner))
+            {
+                gobj_vis(&x->x_glist->gl_gobj, x->x_glist->gl_owner, 0);
+                gobj_vis(&x->x_glist->gl_gobj, x->x_glist->gl_owner, 1);
+            }
         }
         size = fsize;
         if (size < 1)
@@ -448,7 +456,7 @@ void garray_arraydialog(t_garray *x, t_symbol *name, t_floatarg fsize,
 /* jsarlo { */
 void garray_arrayviewlist_new(t_garray *x)
 {
-    int i, xonset, yonset, type, elemsize;
+    int i, xonset=0, yonset=0, type=0, elemsize=0;
     float yval;
     char cmdbuf[200];
     t_symbol *arraytype;
@@ -480,7 +488,7 @@ void garray_arrayviewlist_new(t_garray *x)
 void garray_arrayviewlist_fillpage(t_garray *x,
                                    t_float page)
 {
-    int i, xonset, yonset, type, elemsize;
+    int i, xonset=0, yonset=0, type=0, elemsize=0;
     float yval;
     char cmdbuf[200];
     t_symbol *arraytype;
@@ -751,11 +759,8 @@ int array_doclick(t_array *array, t_glist *glist, t_scalar *sc, t_array *ap,
         &xonset, &yonset, &wonset))
     {
         float best = 100;
-        int incr;
-            /* if it has more than 2000 points, just check 300 of them. */
-        if (array->a_n < 2000)
-            incr = 1;
-        else incr = array->a_n / 300;
+            /* if it has more than 2000 points, just check 1000 of them. */
+        int incr = (array->a_n <= 2000 ? 1 : array->a_n / 1000);
         for (i = 0; i < array->a_n; i += incr)
         {
             float pxpix, pypix, pwpix, dx, dy;

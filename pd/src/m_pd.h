@@ -515,6 +515,7 @@ EXTERN float *cos_table;
 EXTERN int canvas_suspend_dsp(void);
 EXTERN void canvas_resume_dsp(int oldstate);
 EXTERN void canvas_update_dsp(void);
+EXTERN int canvas_dspstate;
 
 /*   up/downsampling */
 typedef struct _resample

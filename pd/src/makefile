@@ -24,7 +24,7 @@ WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 ARCH_CFLAGS = -DPD 
 
-CFLAGS = -Werror $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
+CFLAGS = -Werror -Wdeclaration-after-statement $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
 
 # the sources
 

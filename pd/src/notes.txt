@@ -20,88 +20,77 @@ Mac to tcl/tk 8.4.5; pd extension added automatically
 bug fix writing aiff gfiles
 bug fix (tcl error messages when starting open dialogs)
 pointer rewind (also check if send-window documented?)
-
-
------------- 0.39 ---------
-problems:
-"list" to signal inlet (e.g., "*~") complains
-"find" doesn't open GOPs correctly
+stop vis-ing subpatches of abstractions
 save dirty abstractions on close
 close dirty patches on quit
-stop vis-ing subpatches of abstractions
-when retyping abstractions, offer to save dirty one
-don't filter locked click() through getrect
-better hit detection (getrect is too greedy; try just sending it through)
+"find" fixed to open GOPs correctly
+cheat to speed up mouse motion over arrays
+fix samplerate~ to figure out blocking
 thread-unsafe callbacks from sys_microsleep()
+writesf -- "open" without "0" misses closing the previous file.
+
+------------ 0.39 ---------
 
 windows:
   modal dialogs confuse watchdog
   check the right-click-on-empty-canvas
 mac:
   load libraries first before opening patches on drag-and-drop
-  writing 3-byte soundfiles distorts???
 
 check:
 MIDI I/O for windows
 blechman patch for s_inter.c
 check what happens when going back and forth between graph-on-parent
-array_resize etc., should redraw the array directly?  Or should "setsize"
-    and "garray_resize" do it instead?  check it's queued correctly.
 
 doc:
+object list
 document env~ second argument (and why is it no less than 1/10 of first???)
 vibrato example
 block resampling arguments
 document tabwrite~_start
+"list" to signal inlet (e.g., "*~") or float inlet (f) complains.
 
 problems:
+don't filter locked click() through getrect
+better scalar hit detection (getrect is too greedy)
+when retyping abstractions, offer to save dirty one
+should linux stop grabbing focus on vis?  Is there a way to detect whether
+    the mouse is in a window when it opens?
 TK commands to nonexistent windows? (occasionally still happens)
-array name changes don't show up on parent
 arrays that don't fit in bounds don't update (same as red rectangle problem?)
 look in d_resample.pd to understand inlet~ upsampling...
-flag for array to suppress printing name
-fix samplerate~ to figure out blocking
 patcher inlets don't deal with scalars (zbug.pd)
 check if there's a problem loading libs on startup if superuser
-tk errors for large tables?
-wierdly small hotspot on lines
 '[' in numbox label breaks it (Yury Sept. 3)
-soundfiles with 3-byte samples buzz for the first readsf buffer (bug/x.pd)
 read xx.txt in "bad" gives warnings
-writesf -- "open" without "0" misses closing the previous file.
-Also writesf~ acts differently if DSP is off when "open" is sent?
 qlist - 'next 1' seems not to work
 Krzysztof's qlist_next reentrancy bug
 don't draw in/outlets on gui objects in graph-on-parent
 reasonable font size default for GUIs
 moving a bang toward top of window creates problem (invisible label)
 get rid of messages causing renaming; try to prevent patches closing themselves.
-dac~/ adc~/ block~ incompatibility
 scofo reports error on reading score1.txt
 loading e-mailed patches without removing headers crashes pd
 pd $1 bug ($1 is saved as it was evaluated, not as '$1')
 check if _vsnprintf with zero argument in windows works any better...
+detect adc~ and dac~ reblocking
 
 features:
 flag to suppress printing array name above graph
+flag to suppress scrollbars in canvases
 fix copyright notices
-IEM guis to use queued updates
 pixel font sizes
 pd to find running ones (pd -new to defeat)
 rename windowname-pd instead of pd-windowname
-"enter" into object box to create new one (also, changing borders? forking?)
-tab to jump to a connected object (first one?) (shift-tab to back up?)
 tables:
     if there's just one array, don't do stringent hit check.
     array click protection (Krzysztof's suggestion)
     make graph labels persistent and add to dialog
     object to get/set table size; random; quantile
     flag to hide array names 
-queued graphics updates for IEMGUIs and scalars
 think of a way to embed abstractions in a patch
 make watchdog work for MACOSX
 search path to include both calling patch and abstraction, if different
-abstraction reload shouldn't have to vis everyone
 pasting should look at current mouse location
 delete-in-rectangle message to Pds
 put serial object in main dist (see rat@telecoma, Apr. 25; winfried May 22)
@@ -109,6 +98,14 @@ open/save panel to take messages to init directory, and to set extent list
 flags to defeat pre-loading specified classes
 expr to parse exponential notation
 pipe to handle symbols&pointers (just takes floats now???)
+editing:
+    "enter" into object box to create new one (also, change border? forking?)
+    tab to jump to a connected object (first one?) (shift-tab to back up?)
+    arrow keys to shift connections left and right
+    menu item to connect selected objects
+    highlight connections (and I/Os) on mouse motion
+    select line and hit "insert" to interpolate an object
+    option-drag an outlet to make a new, connected object
 
 data:
 data copy/paste doesn't check templates aren't changed
@@ -146,31 +143,20 @@ look at prctl(2) for FP exception handling
 ??? have a way to disambiguate externs from different libs???
 netsend separate thread
 netreceive (and netsend?) message to set port number
-think about x and y scale preservation when changing between graph and object
-show outlines of objects even when graph is "open"
 graph_vis() to decorate graphs when they're toplevel (parent_glist == 0)
-get graphs to expand to hold their contents
 suita.chopin.edu.pl/~czaja/miXed/externs/xeq.html -- MIDI file reader
 in glist_delete, consider why this can't be just "vis 0" -- why do we need it?
 closebang
 check that -blocksize really reflects in audiobuf calc for Hammerfall
 makefile to have make install depend on make local.
 Float method for random
-figure out list, message objects
 put in something for tilde order forcing
 extensible "toolbar" so people can add external GUI objects
-allow spaces in paths
 variable send and receive -- check how max/MSP does it?
 number boxes to darken for typing and/or received messages
-dialog to change lib flag and path
 pique~ and fiddle~ unification (notice pique filtering is different!)
 new message box look
 figure out what to do when "pd sym" conflicts with window title as in Pluton?
-
-MAX compatibilty:
-trigger 1 (on Pd, outputs 0; on Max?)
-
-LATER
 bonk~ file path handling
 unify arrays and garrays
 dialog to give values of $1, ... for the canvas

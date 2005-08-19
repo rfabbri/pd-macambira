@@ -4,7 +4,12 @@
 
 #include "m_pd.h"
 /* #include <string.h> */
+#ifdef MSW
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
+
 extern t_pd *newest;
 
 #define HAVE_ALLOCA 1   /* LATER this should be set by configure script! */

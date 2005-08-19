@@ -1976,13 +1976,34 @@ static void *writesf_child_main(void *zz)
             x->x_requestcode = REQUEST_BUSY;
             x->x_fileerror = 0;
 
-                /* if there's already a file open, close it */
+                /* if there's already a file open, close it.  This
+                should never happen since writesf_open() calls stop if
+                needed and then waits until we're idle. */
             if (x->x_fd >= 0)
             {
+                int bytesperframe = x->x_bytespersample * x->x_sfchannels;
+                int bigendian = x->x_bigendian;
+                char *filename = x->x_filename;
+                int fd = x->x_fd;
+                int filetype = x->x_filetype;
+                int itemswritten = x->x_itemswritten;
+                int swap = x->x_swap;
                 pthread_mutex_unlock(&x->x_mutex);
-                close (x->x_fd);
+                
+                soundfile_finishwrite(x, filename, fd,
+                    filetype, 0x7fffffff, itemswritten,
+                    bytesperframe, swap);
+                close (fd);
+
                 pthread_mutex_lock(&x->x_mutex);
                 x->x_fd = -1;
+#ifdef DEBUG_SOUNDFILE
+                {
+                    char s[1000];
+                    sprintf(s, "bug??? ditched %d\n", itemswritten);
+                    pute(s);
+                }
+#endif  
                 if (x->x_requestcode != REQUEST_BUSY)
                     continue;
             }
@@ -2087,9 +2108,9 @@ static void *writesf_child_main(void *zz)
                 }
                 x->x_itemswritten +=
                     sysrtn / (x->x_bytespersample * x->x_sfchannels);
-                sprintf(boo, "after: head %d, tail %d\n", 
-                    x->x_fifohead, x->x_fifotail);
 #ifdef DEBUG_SOUNDFILE
+                sprintf(boo, "after: head %d, tail %d written %d\n", 
+                    x->x_fifohead, x->x_fifotail, x->x_itemswritten);
                 pute(boo);
 #endif
                     /* signal parent in case it's waiting for data */
@@ -2263,6 +2284,10 @@ static void writesf_open(t_writesf *x, t_symbol *s, int argc, t_atom *argv)
     int filetype, bytespersamp, swap, bigendian, normalize;
     long onset, nframes;
     float samplerate;
+    if (x->x_state != STATE_IDLE)
+    {
+        writesf_stop(x);
+    }
     if (soundfiler_writeargparse(x, &argc,
         &argv, &filesym, &filetype, &bytespersamp, &swap, &bigendian,
         &normalize, &onset, &nframes, &samplerate))
@@ -2276,6 +2301,11 @@ static void writesf_open(t_writesf *x, t_symbol *s, int argc, t_atom *argv)
     if (argc)
         pd_error(x, "extra argument(s) to writesf~: ignored");
     pthread_mutex_lock(&x->x_mutex);
+    while (x->x_requestcode != REQUEST_NOTHING)
+    {
+        sfread_cond_signal(&x->x_requestcondition);
+        sfread_cond_wait(&x->x_answercondition, &x->x_mutex);
+    }
     x->x_bytespersample = bytespersamp;
     x->x_swap = swap;
     x->x_bigendian = bigendian;

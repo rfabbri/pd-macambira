@@ -660,7 +660,7 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
     t_siginlet *uin;
     t_sigoutconnect *oc, *oc2;
     t_class *class = pd_class(&u->u_obj->ob_pd);
-    int i, n;
+    int i, n, totnsig;
         /* suppress creating new signals for the outputs of signal
         inlets and subpatchs; except in the case we're an inlet and "blocking"
         is set.  We don't yet know if a subcanvas will be "blocking" so there
@@ -695,7 +695,8 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
             s3->s_refcount = 1;
         }
     }
-    insig = (t_signal **)getbytes((u->u_nin + u->u_nout) * sizeof(t_signal *));
+    totnsig = u->u_nin + u->u_nout;
+    insig = (t_signal **)getbytes((totnsig ? totnsig : 1) * sizeof(t_signal *));
     outsig = insig + u->u_nin;
     for (sig = insig, uin = u->u_in, i = u->u_nin; i--; sig++, uin++)
     {
@@ -730,6 +731,11 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
             *sig = uout->o_signal = signal_new(dc->dc_vecsize, dc->dc_srate);
         (*sig)->s_refcount = uout->o_nconnect;
     }
+        /* if thre are no input or output signals, supply one fake signal so
+        the object can learn the sample rate and block size.  Used by the
+        samplerate~ object. */
+    if (!totnsig)
+        insig[0] = signal_new(dc->dc_vecsize, dc->dc_srate);
         /* now call the DSP scheduling routine for the ugen.  This
         routine must fill in "borrowed" signal outputs in case it's either
         a subcanvas or a signal inlet. */
@@ -744,6 +750,9 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
         if (!(*sig)->s_refcount)
             signal_makereusable(*sig);
     }
+        /* special case: no inputs or outputs: free the fake signal we made */
+    if (!totnsig)
+        signal_makereusable(insig[0]);
     if (ugen_loud)
     {
         if (u->u_nin + u->u_nout == 0) post("put %s %d", 

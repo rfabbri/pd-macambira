@@ -347,10 +347,10 @@ static void message_addsemi(t_message *x)
 
 static void message_adddollar(t_message *x, t_floatarg f)
 {
+    t_atom a;
     int n = f;
     if (n < 0)
         n = 0;
-    t_atom a;
     SETDOLLAR(&a, n);
     binbuf_add(x->m_text.te_binbuf, 1, &a);
     glist_retext(x->m_glist, &x->m_text);

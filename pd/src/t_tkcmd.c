@@ -432,7 +432,7 @@ static void pd_startfromgui( void)
         fprintf(debugfd, "%s", cmdbuf);
         fflush(debugfd);
 #endif
-        execl("/bin/sh", "sh", "-c", cmdbuf, 0);
+        execl("/bin/sh", "sh", "-c", cmdbuf, (char*)0);
         perror("pd: exec");
         _exit(1);
     }

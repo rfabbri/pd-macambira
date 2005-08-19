@@ -42,8 +42,8 @@ if {$pd_nt == 1} {
 }
 
 if {$pd_nt == 2} {
-# turn on James Tittle II's fast drawing (wait until I can test this...):
-#   set tk::mac::useCGDrawing 1
+# turn on James Tittle II's fast drawing
+    set tk::mac::useCGDrawing 1
     # set minimum line size for anti-aliasing.  If set to 1 or 0, then every
     # line will be anti-aliased.  While this makes connections and circles in
     # [bng] and such look really good, it makes boxes and messages look out of
@@ -56,18 +56,26 @@ if {$pd_nt == 2} {
     set pd_guidir $pd_gui2/..
     load $pd_guidir/bin/libPdTcl.dylib
     set pd_tearoff 0
-
-	 # tk::mac::OpenDocument is called with the filenames put into the 
-	 # var args whenever docs are either dropped on the Pd.app icon or 
-	 # opened from the Finder.
-	 # It uses menu_doc_open so it can handles numerous file types.
-	 proc tk::mac::OpenDocument {args} {
-		  foreach file $args {
-				pd [concat pd open [pdtk_enquote [file tail $file]] \
-						  [pdtk_enquote  [file dirname $file]] \;]
-				menu_doc_open [file dirname $file] [file tail $file]
-		  }
-	 }
+    global pd_macready
+    set pd_macready 0
+    global pd_macdropped
+    set pd_macdropped ""
+    # tk::mac::OpenDocument is called with the filenames put into the 
+    # var args whenever docs are either dropped on the Pd.app icon or 
+    # opened from the Finder.
+    # It uses menu_doc_open so it can handles numerous file types.
+    proc tk::mac::OpenDocument {args} {
+        global pd_macready pd_macdropped
+        foreach file $args {
+            if {$pd_macready != 0} {
+                pd [concat pd open [pdtk_enquote [file tail $file]] \
+		    [pdtk_enquote  [file dirname $file]] \;]
+		    menu_doc_open [file dirname $file] [file tail $file]
+            } else {
+                set pd_macdropped $args
+            }
+        }
+    }
 }
 
 # hack so you can easily test-run this script in linux... define pd_guidir
@@ -233,11 +241,11 @@ proc pdtk_ping {} {
     pd [concat pd ping \;]
 }
 
-proc pdtk_check {x message} {
-    set answer [tk_messageBox \-message $x \-type yesno \-icon question]
-    switch $answer {
-    	yes {pd $message} }
-#    	no {tk_messageBox \-message "cancelled" \-type ok}
+##### routine to ask user if OK and, if so, send a message on to Pd ######
+proc pdtk_check {x message default} {
+    set answer [tk_messageBox \-message $x \-type yesno -default $default \
+        \-icon question]
+    if {$answer == yes}  {pd $message}
 }
 
 set menu_windowlist {} 
@@ -327,7 +335,7 @@ proc menu_send {} {
 ################## the "Quit" menu command #########################
 proc menu_really_quit {} {pd {pd quit;}}
 
-proc menu_quit {} {pdtk_check {Really quit?} {pd quit;}}
+proc menu_quit {} {pd {pd verifyquit;}}
 
 ######### the "Pd" menu command, which puts the Pd window on top ########
 proc menu_pop_pd {} {raise .}
@@ -569,7 +577,12 @@ proc menu_print {name} {
 
 proc menu_close {name} {
     pdtk_canvas_checkgeometry $name
-    pd [concat $name menuclose \;]
+    pd [concat $name menuclose 0 \;]
+}
+
+proc menu_really_close {name} {
+    pdtk_canvas_checkgeometry $name
+    pd [concat $name menuclose 1 \;]
 }
 
 proc menu_undo {name} {
@@ -1553,6 +1566,7 @@ proc pdtk_canvas_ctrlkey {name key shift} {
     if {$key == "period"} {menu_audio 0}
     if {$shift == 1} {
         if {$key == "q" || $key == "Q"} {menu_really_quit}
+        if {$key == "w" || $key == "W"} {menu_really_close $topname}
         if {$key == "s" || $key == "S"} {menu_saveas $topname}
         if {$key == "z" || $key == "Z"} {menu_redo $topname}
         if {$key == "b" || $key == "B"} {menu_bng $topname 1}
@@ -3266,6 +3280,16 @@ proc pdtk_pd_startup {version apilist midiapilist fontname} {
     # so that we'd know the value of "apilist".
     menu_addstd .mbar 
 
+    global pd_nt
+    if {$pd_nt == 2} {
+        global pd_macdropped pd_macready
+        set pd_macready 1
+        foreach file $pd_macdropped {
+            pd [concat pd open [pdtk_enquote [file tail $file]] \
+                [pdtk_enquote  [file dirname $file]] \;]
+		menu_doc_open [file dirname $file] [file tail $file]
+        }
+    }
 }
 
 ##################### DSP ON/OFF, METERS, DIO ERROR ###################
@@ -4186,3 +4210,4 @@ proc pdtk_startup_dialog {id nort flags} {
 
     focus $id.f0
 }
+

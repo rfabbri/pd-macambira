@@ -134,11 +134,24 @@ static t_class *samplerate_tilde_class;
 typedef struct _samplerate
 {
     t_object x_obj;
+    float x_sr;
 } t_samplerate;
 
 static void samplerate_tilde_bang(t_samplerate *x)
 {
-    outlet_float(x->x_obj.ob_outlet, sys_getsr());
+    if (!canvas_dspstate)
+    {
+        post(
+          "NB: samplerate~ momentarily started DSP to learn sample rate");
+        canvas_resume_dsp(1);
+        canvas_suspend_dsp();
+    }
+    outlet_float(x->x_obj.ob_outlet, x->x_sr);
+}
+
+static void samplerate_tilde_dsp(t_samplerate *x, t_signal **sp)
+{
+    x->x_sr = sp[0]->s_sr;
 }
 
 static void *samplerate_tilde_new(t_symbol *s)
@@ -153,6 +166,8 @@ static void samplerate_tilde_setup(void)
     samplerate_tilde_class = class_new(gensym("samplerate~"),
         (t_newmethod)samplerate_tilde_new, 0, sizeof(t_samplerate), 0, 0);
     class_addbang(samplerate_tilde_class, samplerate_tilde_bang);
+    class_addmethod(samplerate_tilde_class, (t_method)samplerate_tilde_dsp,
+        gensym("dsp"), A_CANT, 0);
 }
 
 /* ------------------------ global setup routine ------------------------- */

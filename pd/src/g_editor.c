@@ -1043,7 +1043,7 @@ void canvas_doclick(t_canvas *x, int xpos, int ypos, int which,
 {
     t_gobj *y;
     int shiftmod, runmode, altmod, doublemod = 0, rightclick;
-    int x1, y1, x2, y2, clickreturned = 0;
+    int x1=0, y1=0, x2=0, y2=0, clickreturned = 0;
     
     if (!x->gl_editor)
     {
@@ -1267,9 +1267,9 @@ int canvas_isconnected (t_canvas *x, t_text *ob1, int n1,
 
 void canvas_doconnect(t_canvas *x, int xpos, int ypos, int which, int doit)
 {
-    int x11, y11, x12, y12;
+    int x11=0, y11=0, x12=0, y12=0;
     t_gobj *y1;
-    int x21, y21, x22, y22;
+    int x21=0, y21=0, x22=0, y22=0;
     t_gobj *y2;
     int xwas = x->gl_editor->e_xwas,
         ywas = x->gl_editor->e_ywas;
@@ -1628,14 +1628,80 @@ void canvas_print(t_canvas *x, t_symbol *s)
     else sys_vgui(".x%lx.c postscript -file x.ps\n", x);
 }
 
-void canvas_menuclose(t_canvas *x, t_floatarg force)
+    /* find a dirty sub-glist, if any, of this one (including itself) */
+static t_glist *glist_finddirty(t_glist *x)
 {
-    if (x->gl_owner)
-        canvas_vis(x, 0);
-    else if ((force != 0) || (!x->gl_dirty))
+    t_gobj *g;
+    t_glist *g2;
+    if (x->gl_env && x->gl_dirty)
+        return (x);
+    for (g = x->gl_list; g; g = g->g_next)
+        if (pd_class(&g->g_pd) == canvas_class &&
+            (g2 = glist_finddirty((t_glist *)g)))
+                return (g2);
+    return (0);
+}
+
+    /* quit, after calling glist_finddirty() on all toplevels and verifying
+    the user really wants to discard changes  */
+void glob_verifyquit(void *dummy, t_floatarg f)
+{
+    t_glist *g, *g2;
+        /* find all root canvases */
+    for (g = canvas_list; g; g = g->gl_next)
+        if (g2 = glist_finddirty(g))
+    {
+        canvas_vis(g2, 1);
+        sys_vgui(
+"pdtk_check {Discard changes to this window??} {.x%lx menuclose 3;\n} no\n",
+                g2);
+        return;
+    }
+    if (f == 0)
+        sys_vgui("pdtk_check {really quit?} {pd quit;\n} yes\n");
+    else glob_quit(0);
+}
+
+    /* close a window (or possibly quit Pd), checking for dirty flags.
+    The "force" parameter is interpreted as follows:
+        0 - request from GUI to close, verifying whether clean or dirty
+        1 - request from GUI to close, no verification
+        2 - verified - mark this one clean, then continue as in 1
+        3 - verified - mark this one clean, then verify-and-quit
+    */
+void canvas_menuclose(t_canvas *x, t_floatarg fforce)
+{
+    int force = fforce;
+    t_glist *g;
+    if (x->gl_owner && (force == 0 || force == 1))
+        canvas_vis(x, 0);   /* if subpatch, just invis it */
+    else if (force == 0)    
+    {
+        g = glist_finddirty(x);
+        if (g)
+        {
+            canvas_vis(g, 1);
+            sys_vgui(
+"pdtk_check {Discard changes to this window??} {.x%lx menuclose 2;\n} no\n",
+                g);
+            return;
+        }
+        else pd_free(&x->gl_pd);
+    }
+    else if (force == 1)
         pd_free(&x->gl_pd);
-    else sys_vgui("pdtk_check {This window has been modified.  Close anyway?}\
-     {.x%lx menuclose 1;\n}\n", x);
+    else if (force == 2)
+    {
+        canvas_dirty(x, 0);
+        while (x->gl_owner)
+            x = x->gl_owner;
+        canvas_menuclose(x, 0);
+    }
+    else if (force == 3)
+    {
+        canvas_dirty(x, 0);
+        glob_verifyquit(0, 1);
+    }
 }
 
     /* put up a dialog which may call canvas_font back to do the work */
@@ -1674,7 +1740,7 @@ static int canvas_dofind(t_canvas *x, int *myindex1p)
                         canvas_find_index1 = myindex1;
                         canvas_find_index2 = myindex2;
                         glist_noselect(x);
-                        canvas_vis(x, 1);
+                        vmess(&x->gl_pd, gensym("menu-open"), "");
                         canvas_editmode(x, 1.);
                         glist_select(x, y);
                         return (1);
