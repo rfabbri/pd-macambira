@@ -66,7 +66,7 @@ public:
 	{
 		if (m_data[0] == 0 && m_data[1] == 0)
 			for (int i = 0; i != 2; ++i)
-				m_data[i] = rand_range(0,0.1);
+				m_data[i] = rand_range(-1,1);
 	}
 	
 	CHAOS_SYSVAR_FUNCS(x1, 0);
