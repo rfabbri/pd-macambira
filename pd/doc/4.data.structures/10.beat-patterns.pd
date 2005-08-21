@@ -1,5 +1,5 @@
 #N struct rect float x float y float w float h;
-#N canvas 637 175 299 256 10;
+#N canvas 193 140 549 265 10;
 #N canvas 457 224 643 316 rect 0;
 #X obj 134 219 pointer;
 #X msg 134 188 traverse pd-test \, bang;
@@ -17,7 +17,7 @@
 #X connect 6 0 9 4;
 #X connect 8 0 9 0;
 #X connect 9 0 7 0;
-#X restore 26 67 pd rect;
+#X restore 27 186 pd rect;
 #N canvas 34 58 616 659 output 1;
 #X scalar rect 57 179 2 10 \;;
 #X scalar rect 82 179 1 10 \;;
@@ -353,7 +353,7 @@
 #X text 305 53 the beats and the lighter ones help;
 #X text 304 73 show the proportions.;
 #X coords 0 659 1 658 0 0 0;
-#X restore 24 98 pd output;
+#X restore 26 208 pd output;
 #N canvas 386 64 781 519 generator 0;
 #X obj 646 4 r start;
 #X obj 645 71 pointer;
@@ -449,4 +449,7 @@
 #X connect 27 0 26 0;
 #X connect 27 0 28 0;
 #X connect 28 0 39 0;
-#X restore 26 38 pd generator;
+#X restore 27 166 pd generator;
+#X text 27 21 Example: computing and graphing beat patterns. I made
+this to make it easier to practice performing a-in-the-time-of-b time
+divisions.;

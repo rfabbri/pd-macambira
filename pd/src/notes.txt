@@ -75,6 +75,7 @@ editing:
     option-drag an outlet to make a new, connected object
 
 data:
+fix blue selection rectangle to update if selected datum is redrawn
 data copy/paste doesn't check templates aren't changed
 arrays of non-existent templates crash
 vget, vset traversal objects
@@ -85,6 +86,7 @@ sublists should display on parent if desired? (new drawing instruction)
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
+append doesn't do symbols yet.
 
 more features:
 

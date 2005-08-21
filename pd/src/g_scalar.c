@@ -310,7 +310,8 @@ static void scalar_doredraw(t_gobj *client, t_glist *glist)
 
 void scalar_redraw(t_scalar *x, t_glist *glist)
 {
-    sys_queuegui(x, glist, scalar_doredraw);
+    if (glist_isvisible(glist))
+        sys_queuegui(x, glist, scalar_doredraw);
 }
 
 int scalar_doclick(t_word *data, t_template *template, t_scalar *sc,

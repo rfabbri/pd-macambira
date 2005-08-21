@@ -2028,9 +2028,9 @@ static void drawnumber_getrect(t_gobj *z, t_glist *glist,
         return;
     }
     xloc = glist_xtopixels(glist,
-        basex + fielddesc_getfloat(&x->x_xloc, template, data, 0));
+        basex + fielddesc_getcoord(&x->x_xloc, template, data, 0));
     yloc = glist_ytopixels(glist,
-        basey + fielddesc_getfloat(&x->x_yloc, template, data, 0));
+        basey + fielddesc_getcoord(&x->x_yloc, template, data, 0));
     font = glist_getfont(glist);
     fontwidth = sys_fontwidth(font);
         fontheight = sys_fontheight(font);
@@ -2078,9 +2078,9 @@ static void drawnumber_vis(t_gobj *z, t_glist *glist,
     {
         t_atom at;
         int xloc = glist_xtopixels(glist,
-            basex + fielddesc_getfloat(&x->x_xloc, template, data, 0));
+            basex + fielddesc_getcoord(&x->x_xloc, template, data, 0));
         int yloc = glist_ytopixels(glist,
-            basey + fielddesc_getfloat(&x->x_yloc, template, data, 0));
+            basey + fielddesc_getcoord(&x->x_yloc, template, data, 0));
         char colorstring[20], buf[DRAWNUMBER_BUFSIZE];
         numbertocolor(fielddesc_getfloat(&x->x_color, template, data, 1),
             colorstring);

@@ -1,6 +1,6 @@
 #N struct peak-template float x float y float amp float ampreal float
 ampimag;
-#N canvas 82 391 858 492 12;
+#N canvas 303 216 854 536 12;
 #X msg 501 258 bang;
 #X obj 30 360 pack 0 100;
 #X obj 30 384 line~;
@@ -27,11 +27,10 @@ ampimag;
 #X connect 2 0 1 0;
 #X connect 3 0 6 0;
 #X connect 3 1 7 0;
-#X restore 134 409 pd fft;
+#X restore 135 412 pd fft;
 #X obj 30 408 *~;
-#X obj 29 435 dac~;
 #X obj 476 231 adc~;
-#N canvas 204 36 521 368 analysis 1;
+#N canvas 204 36 521 368 analysis 0;
 #X obj 206 37 inlet;
 #X msg 207 68 bang;
 #X obj 275 52 r snapshot;
@@ -118,94 +117,47 @@ ampimag;
 float ampimag;
 #X restore 339 402 pd peak-template;
 #N canvas 0 0 600 382 peak-list 1;
-#X scalar peak-template 58.2195 330 -122.487 0.000825282 -0.000727483
-\;;
-#X scalar peak-template 113.041 330 -92.8753 -0.000338659 0.00010002
-\;;
-#X scalar peak-template 118.46 330 -94.8943 0.00031586 -0.000214072
-\;;
-#X scalar peak-template 138.93 330 -0 3.25541e-06 -5.9315e-06 \;;
-#X scalar peak-template 142.074 330 -0 7.21258e-06 6.84986e-07 \;;
-#X scalar peak-template 146.444 330 -0 -7.88035e-06 8.62137e-07 \;
+#X scalar peak-template 6.52298 330 -195.561 0.0125191 -0.0131689 \;
 ;
-#X scalar peak-template 172.29 330 -79.5955 0.000108583 0.000182228
-\;;
-#X scalar peak-template 177.651 330 -85.3731 -0.000234655 0.00012266
-\;;
-#X scalar peak-template 195.809 330 -0 2.79175e-06 -8.34867e-06 \;
+#X scalar peak-template 13.0656 330 -262.841 0.222392 0.0909196 \;
 ;
-#X scalar peak-template 203.103 330 -0 5.14234e-06 -6.78858e-06 \;
+#X scalar peak-template 26.2816 330 -188.229 0.0133818 0.00299871 \;
 ;
-#X scalar peak-template 211.356 330 -0 -5.54349e-06 -6.98329e-06 \;
+#X scalar peak-template 34.1579 330 -182.784 -0.0111106 0.000616574
+\;;
+#X scalar peak-template 39.2398 330 -192.587 0.00649353 -0.0148522
+\;;
+#X scalar peak-template 54.2567 330 -169.462 -0.00637704 0.00196744
+\;;
+#X scalar peak-template 64.6374 330 -153.343 -0.00231745 -0.00274854
+\;;
+#X scalar peak-template 70.731 330 -228.984 -0.0391646 -0.0525299 \;
 ;
-#X scalar peak-template 221.688 330 -42.6342 -5.09215e-05 6.6466e-06
+#X scalar peak-template 83.4018 330 -157.354 0.00213705 0.00360794
 \;;
-#X scalar peak-template 226.081 330 -43.02 5.18789e-05 5.00157e-06
+#X scalar peak-template 89.0428 330 -164.547 0.00509053 0.00215158
 \;;
-#X scalar peak-template 229.339 330 -43.3736 -1.05481e-05 -5.17679e-05
+#X scalar peak-template 96.8527 330 -127.029 0.00018868 -0.00129597
 \;;
-#X scalar peak-template 274.262 330 -12.1351 -2.70512e-06 1.57e-05
-\;;
-#X scalar peak-template 277.663 330 -12.8808 -1.61933e-05 2.5564e-06
-\;;
-#X scalar peak-template 290.641 330 -0 2.56841e-06 6.25735e-06 \;;
-#X scalar peak-template 303.545 330 -0 -5.80611e-06 4.01017e-06 \;
+#X scalar peak-template 108.145 330 -206.524 -0.0244265 0.0130057 \;
 ;
-#X scalar peak-template 306.665 330 -0 6.64873e-06 2.12955e-06 \;;
-#X scalar peak-template 332.606 330 -31.28 -2.93873e-05 1.54798e-05
+#X scalar peak-template 119.672 330 -139.871 0.000310867 0.00212115
 \;;
-#X scalar peak-template 342.348 330 -39.2289 4.48755e-05 4.09977e-06
+#X scalar peak-template 129.195 330 -154.988 0.00101519 -0.00369247
 \;;
-#X scalar peak-template 349.861 330 -42.7285 -4.16831e-05 -3.03127e-05
+#X scalar peak-template 148.144 330 -131.59 -0.000488336 0.00148172
 \;;
-#X scalar peak-template 358.384 330 -16.8763 8.55105e-06 -1.70906e-05
+#X scalar peak-template 156.394 330 -157.846 0.00107442 -0.00413614
 \;;
-#X scalar peak-template 364.267 330 -0 -8.11825e-06 3.74108e-06 \;
-;
-#X scalar peak-template 381.317 330 -0 1.65706e-07 -7.33649e-06 \;
-;
-#X scalar peak-template 390.885 330 -0.231076 9.93783e-06 1.7404e-06
+#X scalar peak-template 168.637 330 -126.924 0.0001938 -0.00128991
 \;;
-#X scalar peak-template 401.603 330 -2.38845 -3.17752e-06 -1.04892e-05
+#X scalar peak-template 189.884 330 -119.499 0.000252664 -0.000947853
 \;;
-#X scalar peak-template 408.086 330 -0.241569 2.517e-06 -9.77426e-06
+#X scalar peak-template 211.047 330 -130.949 0.000525129 0.0014288
 \;;
 #X restore 339 426 pd peak-list;
 #X msg 38 192 \; pd dsp 1;
 #X obj 720 296 s loud;
-#X floatatom 557 77 0 0 0 0 - - -;
-#N canvas 194 37 730 728 output 0;
-#X obj 77 218 t b;
-#X obj 77 154 f;
-#X obj 66 71 inlet;
-#X text 73 46 mute;
-#X obj 77 244 f;
-#X msg 156 235 0;
-#X msg 69 102 bang;
-#X obj 77 189 moses 1;
-#X obj 169 33 r loop-amp;
-#X obj 78 286 s loop-amp;
-#X obj 156 179 t b f;
-#X obj 93 462 outlet;
-#X msg 92 428 set \$1;
-#X obj 93 400 r loop-amp;
-#X connect 0 0 4 0;
-#X connect 1 0 7 0;
-#X connect 2 0 6 0;
-#X connect 4 0 9 0;
-#X connect 5 0 9 0;
-#X connect 6 0 1 0;
-#X connect 7 0 0 0;
-#X connect 7 1 10 0;
-#X connect 8 0 1 1;
-#X connect 10 0 5 0;
-#X connect 10 1 4 1;
-#X connect 12 0 11 0;
-#X connect 13 0 12 0;
-#X restore 557 53 pd output;
-#X obj 557 104 s loop-amp;
-#X msg 557 30 mute;
-#X text 593 80 AMPLITUDE;
 #X text 539 189 live sample;
 #X text 719 234 print out;
 #X text 720 249 peak list;
@@ -216,8 +168,8 @@ sinusoidal peaks that were found at that instant in the sound. You
 can also ask for the peak lists to be printed out.;
 #N canvas 132 255 634 331 insample 0;
 #N canvas 0 0 450 300 graph1 0;
-#X array sample 39075 float 0;
-#X coords 0 1 39074 -1 400 150 1;
+#X array sample 155948 float 0;
+#X coords 0 1 155947 -1 400 150 1;
 #X restore 199 18 graph;
 #X obj 19 70 r read-sample;
 #X obj 19 95 unpack s f;
@@ -232,15 +184,11 @@ can also ask for the peak lists to be printed out.;
 #X connect 4 0 6 0;
 #X connect 5 0 4 0;
 #X restore 336 350 pd insample;
-#X floatatom 134 363 0 0 0 0 - - -;
-#N canvas 190 43 405 461 test-signal 0;
+#N canvas 186 103 405 461 test-signal 0;
 #X obj 135 296 tabread4~ sample;
 #X obj 135 271 line~;
 #X obj 95 146 f;
 #X obj 254 46 r insamprate;
-#X obj 136 350 *~;
-#X obj 171 350 dbtorms;
-#X obj 171 327 inlet;
 #X obj 135 415 outlet~;
 #X obj 146 33 r insamplength;
 #X msg 134 247 0 \, \$1 \$2;
@@ -255,54 +203,48 @@ can also ask for the peak lists to be printed out.;
 #X floatatom 33 48 0 0 0 0 - - -;
 #X obj 255 75 t b b f;
 #X obj 161 84 t b f;
-#X connect 0 0 4 0;
+#X connect 0 0 10 0;
 #X connect 1 0 0 0;
-#X connect 2 0 10 0;
-#X connect 3 0 19 0;
-#X connect 4 0 13 0;
-#X connect 5 0 4 1;
-#X connect 6 0 5 0;
-#X connect 8 0 20 0;
-#X connect 9 0 1 0;
-#X connect 10 0 9 0;
-#X connect 11 0 10 1;
-#X connect 11 0 17 1;
-#X connect 12 0 11 1;
-#X connect 13 0 7 0;
-#X connect 14 0 16 0;
-#X connect 16 0 18 0;
-#X connect 17 0 2 0;
-#X connect 18 0 17 0;
-#X connect 19 0 16 0;
-#X connect 19 1 11 0;
-#X connect 19 2 12 0;
-#X connect 20 0 16 0;
-#X connect 20 1 11 0;
-#X connect 20 1 2 1;
-#X restore 134 386 pd test-signal;
-#X text 135 341 amplitude;
+#X connect 2 0 7 0;
+#X connect 3 0 16 0;
+#X connect 5 0 17 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 0;
+#X connect 8 0 7 1;
+#X connect 8 0 14 1;
+#X connect 9 0 8 1;
+#X connect 10 0 4 0;
+#X connect 11 0 13 0;
+#X connect 13 0 15 0;
+#X connect 14 0 2 0;
+#X connect 15 0 14 0;
+#X connect 16 0 13 0;
+#X connect 16 1 8 0;
+#X connect 16 2 9 0;
+#X connect 17 0 13 0;
+#X connect 17 1 8 0;
+#X connect 17 1 2 1;
+#X restore 135 389 pd test-signal;
+#X text 136 317 amplitude;
 #X text 212 174 read a sample;
 #X msg 136 193 \; read-sample ../sound/bell.aiff 44100;
 #X text 12 97 The active ingredient is "pique" in the "analysis" subwindow
 \, which is in the "extras" directory in the Pd release.;
 #X msg 136 230 \; read-sample ../sound/voice.wav 32000;
 #X obj 458 295 tabwrite~ sample;
-#X obj 720 274 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+#X obj 720 274 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
 #X msg 136 268 \; read-sample ../sound/voice2.wav;
-#X connect 0 0 36 0;
+#X obj 29 435 output~;
+#X connect 0 0 29 0;
 #X connect 1 0 2 0;
 #X connect 2 0 5 0;
 #X connect 3 0 1 0;
-#X connect 5 0 6 0;
-#X connect 5 0 6 1;
-#X connect 7 0 36 0;
-#X connect 9 0 3 0;
-#X connect 10 0 8 0;
-#X connect 18 0 20 0;
-#X connect 19 0 18 0;
-#X connect 21 0 19 0;
-#X connect 29 0 30 0;
-#X connect 30 0 4 0;
-#X connect 30 0 5 1;
-#X connect 37 0 17 0;
+#X connect 5 0 32 0;
+#X connect 5 0 32 1;
+#X connect 6 0 29 0;
+#X connect 8 0 3 0;
+#X connect 9 0 7 0;
+#X connect 23 0 4 0;
+#X connect 23 0 5 1;
+#X connect 30 0 16 0;
