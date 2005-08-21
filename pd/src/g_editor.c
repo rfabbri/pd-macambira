@@ -1686,7 +1686,12 @@ void canvas_menuclose(t_canvas *x, t_floatarg fforce)
                 g);
             return;
         }
-        else pd_free(&x->gl_pd);
+        else
+        {
+            sys_vgui(
+"pdtk_check {Close this window??} {.x%lx menuclose 1;\n} yes\n",
+                x);
+        }
     }
     else if (force == 1)
         pd_free(&x->gl_pd);
@@ -1695,7 +1700,16 @@ void canvas_menuclose(t_canvas *x, t_floatarg fforce)
         canvas_dirty(x, 0);
         while (x->gl_owner)
             x = x->gl_owner;
-        canvas_menuclose(x, 0);
+        g = glist_finddirty(x);
+        if (g)
+        {
+            canvas_vis(g, 1);
+            sys_vgui(
+"pdtk_check {Discard changes to this window??} {.x%lx menuclose 2;\n} no\n",
+                g);
+            return;
+        }
+        else pd_free(&x->gl_pd);
     }
     else if (force == 3)
     {

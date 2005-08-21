@@ -247,6 +247,18 @@ static void block_dsp(t_block *x, t_signal **sp)
     /* do nothing here */
 }
 
+void block_tilde_setup(void)
+{
+    block_class = class_new(gensym("block~"), (t_newmethod)block_new, 0,
+            sizeof(t_block), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addcreator((t_newmethod)switch_new, gensym("switch~"),
+        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(block_class, (t_method)block_set, gensym("set"), 
+        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod(block_class, (t_method)block_dsp, gensym("dsp"), 0);
+    class_addfloat(block_class, block_float);
+}
+
 /* ------------------ DSP call list ----------------------- */
 
 static t_int *dsp_chain;
@@ -660,7 +672,7 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
     t_siginlet *uin;
     t_sigoutconnect *oc, *oc2;
     t_class *class = pd_class(&u->u_obj->ob_pd);
-    int i, n, totnsig;
+    int i, n;
         /* suppress creating new signals for the outputs of signal
         inlets and subpatchs; except in the case we're an inlet and "blocking"
         is set.  We don't yet know if a subcanvas will be "blocking" so there
@@ -695,8 +707,7 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
             s3->s_refcount = 1;
         }
     }
-    totnsig = u->u_nin + u->u_nout;
-    insig = (t_signal **)getbytes((totnsig ? totnsig : 1) * sizeof(t_signal *));
+    insig = (t_signal **)getbytes((u->u_nin + u->u_nout) * sizeof(t_signal *));
     outsig = insig + u->u_nin;
     for (sig = insig, uin = u->u_in, i = u->u_nin; i--; sig++, uin++)
     {
@@ -731,11 +742,6 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
             *sig = uout->o_signal = signal_new(dc->dc_vecsize, dc->dc_srate);
         (*sig)->s_refcount = uout->o_nconnect;
     }
-        /* if thre are no input or output signals, supply one fake signal so
-        the object can learn the sample rate and block size.  Used by the
-        samplerate~ object. */
-    if (!totnsig)
-        insig[0] = signal_new(dc->dc_vecsize, dc->dc_srate);
         /* now call the DSP scheduling routine for the ugen.  This
         routine must fill in "borrowed" signal outputs in case it's either
         a subcanvas or a signal inlet. */
@@ -750,9 +756,6 @@ static void ugen_doit(t_dspcontext *dc, t_ugenbox *u)
         if (!(*sig)->s_refcount)
             signal_makereusable(*sig);
     }
-        /* special case: no inputs or outputs: free the fake signal we made */
-    if (!totnsig)
-        signal_makereusable(insig[0]);
     if (ugen_loud)
     {
         if (u->u_nin + u->u_nout == 0) post("put %s %d", 
@@ -1099,18 +1102,52 @@ t_signal *ugen_getiosig(int index, int inout)
     return (ugen_currentcontext->dc_iosigs[index]);
 }
 
+/* ------------------------ samplerate~~ -------------------------- */
+
+static t_class *samplerate_tilde_class;
+
+typedef struct _samplerate
+{
+    t_object x_obj;
+    float x_sr;
+    t_canvas *x_canvas;
+} t_samplerate;
+
+void *canvas_getblock(t_class *blockclass, t_canvas **canvasp);
+
+static void samplerate_tilde_bang(t_samplerate *x)
+{
+    float srate = sys_getsr();
+    t_canvas *canvas = x->x_canvas;
+    while (canvas)
+    {
+        t_block *b = (t_block *)canvas_getblock(block_class, &canvas);
+        if (b) 
+            srate *= (float)(b->x_upsample) / (float)(b->x_downsample); 
+    }
+    outlet_float(x->x_obj.ob_outlet, srate);
+}
+
+static void *samplerate_tilde_new(t_symbol *s)
+{
+    t_samplerate *x = (t_samplerate *)pd_new(samplerate_tilde_class);
+    outlet_new(&x->x_obj, &s_float);
+    x->x_canvas = canvas_getcurrent();
+    return (x);
+}
+
+static void samplerate_tilde_setup(void)
+{
+    samplerate_tilde_class = class_new(gensym("samplerate~"),
+        (t_newmethod)samplerate_tilde_new, 0, sizeof(t_samplerate), 0, 0);
+    class_addbang(samplerate_tilde_class, samplerate_tilde_bang);
+}
 
 /* -------------------- setup routine -------------------------- */
 
-void d_ugen_setup(void)  /* really just block_setup */
+void d_ugen_setup(void) 
 {
-    block_class = class_new(gensym("block~"), (t_newmethod)block_new, 0,
-            sizeof(t_block), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addcreator((t_newmethod)switch_new, gensym("switch~"),
-        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addmethod(block_class, (t_method)block_set, gensym("set"), 
-        A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addmethod(block_class, (t_method)block_dsp, gensym("dsp"), 0);
-    class_addfloat(block_class, block_float);
+    block_tilde_setup();
+    samplerate_tilde_setup();
 }
 

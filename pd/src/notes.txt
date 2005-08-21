@@ -1,46 +1,12 @@
 ---------------- dolist --------------------
-done for 0.39:
-At the source level, "regular" arrays and arrays withing data structures
-are now the same thing.  The main user-visible effect of this is that now
-"arrays" may be graphed as "bezier curves".
-array elements can be clicked on, etc
-fixed array onset bug
-rfft bug fix
-bug fix in d_soundfile.c
-bugfix in number2
-plot drawing instructions turn on and off
-ranges in drawing instructions
-select/deselect hook
-unify graph properties dialogs
-GOP font depends on abstraction, not parent
-bug fixes, stale pointers
-message "addcomma" etc
-"list" object
-Mac to tcl/tk 8.4.5; pd extension added automatically
-bug fix writing aiff gfiles
-bug fix (tcl error messages when starting open dialogs)
-pointer rewind (also check if send-window documented?)
-stop vis-ing subpatches of abstractions
-save dirty abstractions on close
-close dirty patches on quit
-"find" fixed to open GOPs correctly
-cheat to speed up mouse motion over arrays
-fix samplerate~ to figure out blocking
-thread-unsafe callbacks from sys_microsleep()
-writesf -- "open" without "0" misses closing the previous file.
 
------------- 0.39 ---------
-
+test:
+compile on various versions of linux
 windows:
   modal dialogs confuse watchdog
   check the right-click-on-empty-canvas
-mac:
-  load libraries first before opening patches on drag-and-drop
+  MIDI I/O (inc. sysex)
 
-check:
-MIDI I/O for windows
-blechman patch for s_inter.c
-check what happens when going back and forth between graph-on-parent
 
 doc:
 object list
@@ -76,6 +42,7 @@ check if _vsnprintf with zero argument in windows works any better...
 detect adc~ and dac~ reblocking
 
 features:
+integrate video into tilde objects
 flag to suppress printing array name above graph
 flag to suppress scrollbars in canvases
 fix copyright notices
@@ -109,7 +76,6 @@ editing:
 
 data:
 data copy/paste doesn't check templates aren't changed
-figure out why Pd sometimes crashes when you close example after adding fields
 arrays of non-existent templates crash
 vget, vset traversal objects
 cursor to show (x, y) location
@@ -119,8 +85,6 @@ sublists should display on parent if desired? (new drawing instruction)
 sublists seem not to handle canvas allocation right (get.pd->pointer.pd bug)
 scalar hook to catch the mouse
 protect against "plots" going away while you drag on them
-when last drawing instruction leaves, glist_redrawitem() fails to erase it;
-    perhaps scalar_vis(...0) should just delete for the tag, itself?
 
 more features:
 

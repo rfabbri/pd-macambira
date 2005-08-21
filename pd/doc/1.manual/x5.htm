@@ -20,6 +20,91 @@
 
 <H3> <A name="s2"> 5.1. release notes </A> </H3>
 
+<P> ------------------ 0.39.0 --------------------------
+
+<P> At the source level, "regular" arrays and arrays within data structures are
+now the same thing.  This will mean that, in the future, features introduced to
+one array type will become available on the other one too.  Array elements are
+"scalars" (i.e., data structures) and if they have drawing instructions, each
+point of the array is drawn according to them; they can be clicked on, etc.,
+just like any other scalars. "Regular" arrays have points which are of a
+special, built-in template, "float".
+
+<P> Drawing instructions now can use variable ranges for screen coordinates;
+for instance, specifying an offset of "a(0:10)(100:200)(0.2)" specifies that
+the member "a", which shoudl range from 0 to 10, should be graphed at locations
+ranging from 100 to 200 (relative to the scalar's base location) and should
+have a "grain" of 0.2, i.e., steps of 2 pixels each.
+
+<P> Drawing instructions can be turned on and off, either globally
+(for all data of the given structure) or by a data field.
+
+<P> The "struct" object has an outlet to notify you when a datum is selected or
+deselected.
+
+<P> Graph-on-parent subpatches and abstractions no longer scale the GUI objects
+to fit the parent rectangle; instead you get a sub-rectangle in the subpatch,
+of the same size as the parent object, to place GUI objects in.  GUI objects
+that don't fit inside aren't shown on the parent, and the parent objects no
+longer stretches itself to show things that wouldn't otherwise fit.  Older
+patches work as before until you try to edit them - at which point you have
+no choice but to use the new functionality.
+
+<P> The font size of a Graph-on-parent abstraction is that of the abstraction
+itself, not the calling patch.
+
+<P> Message boxes now take "addcomma" and similar messages.
+
+<P> A "list" object is provided for joining and splitting lists, and converting
+between lists and non-list messages.
+
+<P> Pd extension is now added automatically to files on Macintish when you
+do a "save as".  The tcl/tk version is updated to 8.4.5.  This should run on
+OSX version 10.2 and later.  Also on Mac, drag-and-drop startups read
+"libraries" (specified in "startup" dialog) before opening the file.
+
+<P> The "pointer" object has a method to rewind to the beginning of a list.
+A "sendwindow" message forwards any message to the window contining the
+scalar currently pointed to.
+
+<P> Abstractions don't produce visible windows, even if subwindows of the
+abstraction were visible when the abstraction was saved.
+
+<P> MIDI sysex messages should now work on all platforms.
+
+<P> Bug fixes:
+
+<P> sending lists to arrays now correctly interprets the first number of the
+list as the starting index (following values are then stored seuentially in the
+array.)
+
+<P> The rfft~ object's imaginary part had the wrong sign.  Also, the Nyquist
+bin is now supplied correctly.
+
+<P> Fixed problems writing aiff files using the writesf~ and soundfiler objects.
+Writesf, if sent an "open" while a file was previously being written, closes the
+previous file first.
+
+<P> Bug fix in number2 which sometimes crashed Pd.
+
+<P> Stale-pointer protection made more robust.
+
+<P> Some of Pd's tcl/tk error messages have been tracked down, but probably
+not all of them yet.
+
+<P> "Find" crashed Pd when the found object was in a GOP.
+
+<P> Mouse motion over arrays no longer is quite so CPU-consuming (but is
+still somewhat so.)
+
+<P> samplerate~ now reflects up/downsampling.
+
+<P> Tilde objects in blocked, overlapped subpatches no longer adjust their
+internal sample rate to reflect the overlap.
+
+<P> Fixed a thread-safety problem in sys_microsleep().
+
+
 <P> ------------------ 0.38.1 --------------------------
 
 Fixed two bugs that crashed Pd when deleting number boxes in certain

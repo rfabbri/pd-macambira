@@ -1224,12 +1224,6 @@ int canvas_showtext(t_canvas *x)
     return (!isarray);
 }
 
-static void canvas_dodsp(t_canvas *x, int toplevel, t_signal **sp);
-static void canvas_dsp(t_canvas *x, t_signal **sp)
-{
-    canvas_dodsp(x, 0, sp);
-}
-
     /* get the document containing this canvas */
 t_canvas *canvas_getrootfor(t_canvas *x)
 {
@@ -1287,6 +1281,11 @@ static void canvas_dodsp(t_canvas *x, int toplevel, t_signal **sp)
 
         /* finally, sort them and add them to the DSP chain */
     ugen_done_graph(dc);
+}
+
+static void canvas_dsp(t_canvas *x, t_signal **sp)
+{
+    canvas_dodsp(x, 0, sp);
 }
 
     /* this routine starts DSP for all root canvases. */
@@ -1356,6 +1355,21 @@ void glob_dsp(void *dummy, t_symbol *s, int argc, t_atom *argv)
     else post("dsp state %d", canvas_dspstate);
 }
 
+void *canvas_getblock(t_class *blockclass, t_canvas **canvasp)
+{
+    t_canvas *canvas = *canvasp;
+    t_gobj *g;
+    void *ret = 0;
+    for (g = canvas->gl_list; g; g = g->g_next)
+    {
+        if (g->g_pd == blockclass)
+            ret = g;
+    }
+    *canvasp = canvas->gl_owner;
+    return(ret);
+}
+    
+/******************* redrawing  data *********************/
 
     /* redraw all "scalars" (do this if a drawing command is changed.) 
     LATER we'll use the "template" information to select which ones we
