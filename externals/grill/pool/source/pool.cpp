@@ -467,7 +467,7 @@ BL pooldir::Copy(pooldir *p,I depth,BL cut)
 }
 
 
-static char *ReadAtom(char *c,A *a)
+static const char *ReadAtom(const char *c,A &a)
 {
 	// skip leading whitespace
 	while(*c && isspace(*c)) ++c;
@@ -522,18 +522,15 @@ static char *ReadAtom(char *c,A *a)
     fres = (float)strtod(tmp,&endp);   
     if(!issymbol && !*endp && endp != tmp) { 
 #endif
-        if(a) {
-            int ires = (int)fres; // try a cast
-            if(fres == ires)
-                flext::SetInt(*a,ires);
-            else
-                flext::SetFloat(*a,fres);
-        }
+        int ires = (int)fres; // try a cast
+        if(fres == ires)
+            flext::SetInt(a,ires);
+        else
+            flext::SetFloat(a,fres);
     }
     // no, it's a symbol
-    else {
-        if(a) flext::SetString(*a,tmp);
-    }
+    else
+        flext::SetString(a,tmp);
 
 	return c;
 }
@@ -543,8 +540,8 @@ static BL ParseAtoms(C *tmp,flext::AtomList &l)
     const int MAXATOMS = 1024;
     int cnt = 0;
     t_atom atoms[MAXATOMS];
-    for(char *t = tmp; *t && cnt < MAXATOMS; ++cnt) {
-		t = ReadAtom(t,&atoms[cnt]);
+    for(const char *t = tmp; *t && cnt < MAXATOMS; ++cnt) {
+		t = ReadAtom(t,atoms[cnt]);
         if(!t) break;
     }
     l(cnt,atoms);
@@ -817,12 +814,14 @@ BL pooldir::LdDirXMLRec(istream &is,I depth,BL mkdir,AtomList &d)
                     }
                     else {
                         t_atom &dkey = d[d.Count()-1];
+                        FLEXT_ASSERT(IsSymbol(dkey));
                         const char *ds = GetString(dkey);
                         FLEXT_ASSERT(ds);
                         if(*ds) 
                             post("pool - XML load: dir key already given, ignoring new key");
                         else
-                            SetString(dkey,s.c_str());
+                            ReadAtom(s.c_str(),dkey);
+
                         ret = true;
                     }
                 if(!ret) post("pool - error interpreting XML value (%s)",s.c_str());

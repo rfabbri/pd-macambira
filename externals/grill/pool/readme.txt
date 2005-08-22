@@ -88,6 +88,7 @@ Version history:
 - improved reading of legacy data by Frank Barknecht
 - use statically allocated lists where feasible
 - bug fix: [reset( didn't reset the current dir
+- file loading: fixed recognition of stringified directory names
 
 0.2.0:
 - attributes (pool,private,echodir,absdir)
