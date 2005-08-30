@@ -56,6 +56,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #ifdef WIN32
 	#include <stdlib.h>
 	#include <string.h>
+  #include <stdio.h>
 #endif
 #ifdef __APPLE__
   #include <stdio.h>
@@ -65,7 +66,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 #endif
 
 /* structure definition of your object */
-#define MAX_NUM 20
+#define MAX_NUM 128
 #define OSC_ROUTE_VERSION "1.05"
 /* Version 1.04: Allows #1 thru #9 as typed-in arguments
    Version 1.05: Allows "list" messages as well as "message" messages.
@@ -125,7 +126,7 @@ static void OSCroute_free(t_OSCroute *x)
 
 // setup
 #ifdef WIN32
- OSC_API void OSCroute_setup(void) { 
+  OSC_API void OSCroute_setup(void) { 
 #else
 void OSCroute_setup(void) {
 #endif
@@ -149,7 +150,7 @@ void OSCroute_setup(void) {
   ps_emptySymbol = gensym("");
   
   post("OSCroute object version " OSC_ROUTE_VERSION " by Matt Wright. pd: jdl Win32 raf.");
-  post("OSCroute Copyright © 1999 Regents of the University of California. All Rights Reserved.");
+  post("OSCroute Copyright © 1999 Regents of the Univ. of California. All Rights Reserved.");
 }
 
 

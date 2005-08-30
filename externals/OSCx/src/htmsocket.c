@@ -54,6 +54,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 	#include <sys/types.h>
 	#include <stdlib.h>
 	#include "OSC-common.h"
+	#include <stdio.h>
 #else
 	#include <stdio.h>
 	#include <unistd.h>
@@ -113,11 +114,12 @@ void *OpenHTMSocket(char *host, int portnumber)
 		unsigned int sockfd;
 	#endif
 
+	char oval = 1;
+
 	desc *o;
 	o = malloc(sizeof(*o));
 	if(!o)
 		return 0;
-	int oval = 1;
 
   #ifndef WIN32
 

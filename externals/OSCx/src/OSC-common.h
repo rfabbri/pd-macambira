@@ -43,6 +43,20 @@ typedef int Boolean;
 #endif
 
 
+#ifdef WIN32
+	#include <stdio.h>
+	#ifdef OSC_EXPORTS
+		#define OSC_API __declspec(dllexport)
+	#else
+		#define OSC_API __declspec(dllimport)
+	#endif
+	#ifdef _DEBUG
+		#define DEBUG
+	#endif
+#endif
+
+//#define int32_t t_int
+
 /* Fixed byte width types */
 typedef int int4;   /* 4 byte int */
 
@@ -56,5 +70,4 @@ void OSCProblem(char *s, ...);
 
 /* Warning for user */
 void OSCWarning(char *s, ...);
-
 

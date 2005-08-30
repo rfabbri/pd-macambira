@@ -49,7 +49,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LIB32=link.exe -lib
 # ADD BASE LIB32 /nologo
-# ADD LIB32 /nologo /out:"..\..\..\pd\lib\LIBOSC.lib"
+# ADD LIB32 /nologo
 
 !ELSEIF  "$(CFG)" == "LIBOSC - Win32 Debug"
 

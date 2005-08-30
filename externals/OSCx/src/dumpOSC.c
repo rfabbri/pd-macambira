@@ -77,7 +77,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 /* declarations */
 
 // typedef void (*t_fdpollfn)(void *ptr, int fd);
-void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
+//void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 
 
 #if defined(__sgi) || defined(__linux) || defined(WIN32) || defined(__APPLE__)
@@ -92,6 +92,7 @@ void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 	#include <sys/stat.h>
 	#include <ctype.h>
 	#include <signal.h>
+	#include <stdio.h>
 #else
 	#include <stdio.h>
 	#include <string.h>
@@ -134,7 +135,7 @@ typedef struct ClientAddressStruct {
         int sockfd;
 } *ClientAddr;
 
-typedef unsigned long long osc_time_t;
+
 
 Boolean ShowBytes = FALSE;
 Boolean Silent = FALSE;
@@ -143,6 +144,14 @@ Boolean Silent = FALSE;
 #ifndef WIN32
 static int unixinitudp(int chan);
 #endif
+
+#ifdef WIN32
+  typedef unsigned __int64 osc_time_t;
+#else
+  typedef unsigned long long osc_time_t;
+#endif
+
+
 
 static int initudp(int chan);
 static void closeudp(int sockfd);
@@ -156,6 +165,7 @@ static int Synthmessage(char *m, int n, void *clientdesc, int clientdesclength, 
 char *DataAfterAlignedString(char *string, char *boundary) ;
 Boolean IsNiceString(char *string, char *boundary) ;
 void complain(char *s, ...);
+osc_time_t ReadTime(const char* src);
 
 #define MAXMESG 32768
 static char mbuf[MAXMESG];
@@ -225,7 +235,7 @@ static void dumpOSC_read(t_dumpOSC *x, int sockfd) {
 		printf("dumpOSC_read: received UDP packet of length %d\n",  n);
 		#endif
 		
-		if(!dumpOSC_SendReply(mbuf, n, &x->x_server, clilen, sockfd))
+		//if(!dumpOSC_SendReply(mbuf, n, &x->x_server, clilen, sockfd))
 		{
 			dumpOSC_ParsePacket(x, mbuf, n, ra);
 		}
@@ -506,7 +516,7 @@ void PrintClientAddr(ClientAddr CA) {
 
 //*******************
 
-void WriteTime(char* dst, osc_time_t osctime)
+/*void WriteTime(char* dst, osc_time_t osctime)
 {
 	*(int32_t*)dst = htonl((int32_t)(osctime >> 32));
 	*(int32_t*)(dst+4) = htonl((int32_t)osctime);
@@ -525,13 +535,15 @@ osc_time_t ReadTime(const char* src)
 
 double TimeToSeconds(osc_time_t osctime)
 {
-  return (double)osctime * 2.3283064365386962890625e-10 /* 1/2^32 */;
+  return (double)osctime * 2.3283064365386962890625e-10 // 1/2^32 ;
+//       ^^^^^^^^^^^^^^^ isn't working on WIN32 (and on other machines: doesn't make sense!)
 }
 
 int timeRound(double x)
 {	
 	return x >= 0.0 ? x+0.5 : x-0.5;
 }
+*/
 /*
 void WriteLogicalTime(char* dst)
 {
@@ -551,10 +563,10 @@ void WriteLogicalTime(char* dst)
 }
 */
 
-void WriteLogicalTime(char* dst)
+/*void WriteLogicalTime(char* dst)
 {
 	double sTime = clock_gettimesince(19230720) / 1000.0;
-	double tau = sTime - timeRound(sTime);
+	double tau = sTime - (double)timeRound(sTime);
 	
 	//fprintf(stderr, "sSec = %f tau = %f\n", sTime, tau);
 	
@@ -562,7 +574,7 @@ void WriteLogicalTime(char* dst)
 	*(int32_t*)(dst+4) = htonl((int32_t)(4294967296 * tau));
 }
 
-Boolean dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLenght, int fd)
+int dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLenght, int fd)
 {
 	if((n == 24) && (strcmp(buf, "#time") == 0))
 	{		
@@ -587,7 +599,7 @@ Boolean dumpOSC_SendReply(char *buf, int n, void *clientDesc, int clientDescLeng
 	{
 		return FALSE;
 	}
-}
+}*/
 
 //**********************
 

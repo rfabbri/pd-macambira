@@ -5,6 +5,7 @@
 		-- tweaks for Win32    www.zeggz.com/raf	13-April-2002
 		-- smoothed out build, clean up for Darwin  <hans@at.or.at> 2004.04.04
 		-- shoutz: miller and the others
+		-- Windows-ification by Piotr Majdak <piotr@majdak.com> 30.08.2005
 */
 
 #if HAVE_CONFIG_H 
@@ -14,7 +15,7 @@
 #include <m_pd.h>
 #include "OSC-common.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 #ifndef OSC_API 
 #define OSC_API
@@ -28,11 +29,11 @@ typedef struct _OSC
 
 OSC_API void OSC_setup(void);
 OSC_API void OSC_version(t_OSC*);
-/*
+
 OSC_API void sendOSC_setup(void);
 OSC_API void dumpOSC_setup(void);
 OSC_API void OSCroute_setup(void);
-*/
+
 
 static t_class* OSC_class;
 
@@ -45,12 +46,11 @@ static void* OSC_new(t_symbol* s) {
 
 OSC_API void OSC_version (t_OSC *x) { 
 
-  // EnterCallback();
-  post("OSC4PD Version " VERSION
-       "\n ¯\\    original code by matt wright. pd-fication jdl@xdv.org\n"
-       "   ·   Win32-port raf@interaccess.com   unified versions hans@at.or.at\n"
-		 "      \\_ Compiled " __TIME__ " " __DATE__);
-  // ExitCallback();
+  post("OSC4PD Version " VERSION "\n"
+       "  Original code by matt wright. pd-fication jdl@xdv.org\n"
+       "  Win32-port raf@interaccess.com   unified versions hans@at.or.at\n"
+	   "  Adaptations for Windows: piotr@majdak.com\n"
+	   "  Compiled: "__DATE__);
 }
 
 OSC_API void OSC_setup(void) { 
@@ -64,5 +64,5 @@ OSC_API void OSC_setup(void) {
   
   post("O  : Open Sound Control 4 PD, http://www.cnmat.berkeley.edu/OSC");
   post(" S : original code by matt wright, pd hakcs cxc, Win32-port raf@interaccess.com");
-  post("  C: ver: "VERSION ", compiled: "__DATE__);
+  post("  C: ver: "VERSION ", compiled: "__DATE__ " -- adapted by piotr@majdak.com");
 }

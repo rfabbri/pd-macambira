@@ -218,7 +218,7 @@ void sendOSC_disconnect(t_sendOSC *x)
   }
 }
 
-void sendOSC_senduntyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
+/*void sendOSC_senduntyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
 {
   char* targv[MAXPDARG];
   char tmparg[MAXPDSTRING];
@@ -247,7 +247,7 @@ void sendOSC_senduntyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
     post("sendOSC: not connected");
     //    exit(3);
   }
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////
 // this is the real and only sending routine now, for both typed and
@@ -267,24 +267,22 @@ static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
   int numArgs = 0;
 
   messageName = "";
-#ifdef DEBUG
-  post ("sendOSC: messageName: %s", messageName);
-#endif
 
-
+  if(argc>MAX_ARGS) 
+  {  post ("sendOSC: too many arguments! (max: %d)", MAX_ARGS); return; }
   
   for (c=0;c<argc;c++) {
-    atom_string(argv+c,tmp, 80);
+    atom_string(argv+c,tmp, MAXPDSTRING);
 
 #ifdef DEBUG
-    // post ("sendOSC: %d, %s",c, tmp);
+    post ("sendOSC: %d, %s",c, tmp);
 #endif
 
     targv[c] = tmp;
     tmp += strlen(tmp)+1;
 
 #ifdef DEBUG
-    // post ("sendOSC: %d, %s",c, targv[c]);
+    post ("sendOSC: %d, %s",c, targv[c]);
 #endif
   }
 
@@ -298,35 +296,29 @@ static void sendOSC_sendtyped(t_sendOSC *x, t_symbol *s, int argc, t_atom *argv)
       messageName = strtok(targv[0], ",");
       j = 1;
       for (i = j; i < argc; i++) {
-	token = strtok(targv[i],",");
-	args[i-j] = ParseToken(token);
+		token = strtok(targv[i],",");
+		args[i-j] = ParseToken(token);
 #ifdef DEBUG
-	printf("cell-cont: %s\n", targv[i]);
-	printf("  type-id: %d\n", args[i-j]);
+		printf("cell-cont: %s\n", targv[i]);
+		printf("  type-id: %d\n", args[i-j]);
 #endif
-	numArgs = i;
+		numArgs = i;
       }
       
 
       if(WriteMessage(x->x_oscbuf, messageName, numArgs, args)) {
-	post("sendOSC: usage error, write-msg failed: %s", OSC_errorMessage);
-	return;
+		post("sendOSC: usage error, write-msg failed: %s", OSC_errorMessage);
+		return;
       }
       
       if(!x->x_bundle) {
-/* 	// post("sendOSC: accumulating bundle, not sending things ...");	 */
-/*       } else { */
-	// post("sendOSC: yeah and OUT!");
-	SendBuffer(x->x_htmsocket, x->x_oscbuf);
-	OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
+		SendBuffer(x->x_htmsocket, x->x_oscbuf);
+		OSC_initBuffer(x->x_oscbuf, SC_BUFFER_SIZE, bufferForOSCbuf);
       }
       
-      //CommandLineMode(argc, targv, x->x_htmsocket);
-      //useTypeTags = 0;
     }
   else {
     post("sendOSC: not connected");
-    //    exit(3);
   }
 }
 
@@ -351,7 +343,7 @@ static void sendOSC_free(t_sendOSC *x)
 }
 
 #ifdef WIN32
-	OSC_API void sendOSC_setup(void) { 
+	void sendOSC_setup(void) { 
 #else
 	void sendOSC_setup(void) {
 #endif

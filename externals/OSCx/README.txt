@@ -17,8 +17,8 @@ which installs the files in /usr/lib/pd/extra and /usr/lib/pd/doc
 
 windows:
 use extra/OSC.dll
-.dsw and .dsp files are also included.
-i m not sure how compilation would work on windows. if you manage to build the current stuff on win let me know then i can include these instead of the outdated OSC.dll
+.dsw and .dsp files are also included. You'll want to adapt include and link paths for pd and LIBOSC.
+
 
 files:
 
@@ -32,6 +32,13 @@ send+dump/	CNMAT's OSC commandline utils (with some changes)
 
 
 log:
+
+	20050830: v0.3: (piotr@majdak.com)
+						adapted to compile on Windows2000
+						dumpOSC routes up to 128 branches (tested with 24)
+						sendOSC doesn't crash on longer messages (tested with one argument of 120 characters)
+						sendOSC # of arguments limited by the length of the message (tested with 110 messages)
+	          tested on Windows 2000 ONLY!
 
   20040409: changed build setup to suit externals build system
             single object objects, no lib

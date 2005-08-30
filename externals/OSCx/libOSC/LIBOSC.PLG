@@ -6,18 +6,8 @@
 --------------------Configuration: LIBOSC - Win32 Release--------------------
 </h3>
 <h3>Command Lines</h3>
-Creating temporary file "C:\DOCUME~1\gustav\LOCALS~1\Temp\RSPB.tmp" with contents
-[
-/nologo /ML /W3 /GX /O2 /I "../../pd/src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/LIBOSC.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
-"D:\pd\OSC\LIBOSC\OSC-client.c"
-"D:\pd\OSC\LIBOSC\OSC-timetag.c"
-]
-Creating command line "cl.exe @C:\DOCUME~1\gustav\LOCALS~1\Temp\RSPB.tmp" 
-Creating command line "link.exe -lib /nologo /out:"..\..\..\pd\lib\LIBOSC.lib"  ".\Release\OSC-client.obj" ".\Release\OSC-timetag.obj" "
+Creating command line "link.exe -lib /nologo /out:"Release\LIBOSC.lib"  ".\Release\OSC-client.obj" ".\Release\OSC-timetag.obj" "
 <h3>Output Window</h3>
-Compiling...
-OSC-client.c
-OSC-timetag.c
 Creating library...
 
 
