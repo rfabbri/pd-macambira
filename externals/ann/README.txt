@@ -3,6 +3,7 @@ ann: Artificial Neural Networks
 Authors: 
  IOhannes m zmölnig - forum::für::umläute
  Davide Morelli - www.davidemorelli.it
+ 2005, Georg Holzmann - http://grh.mur.at
 
 this software is under the GnuGPL that is provided with these files
 
