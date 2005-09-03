@@ -40,7 +40,7 @@ static void *parentdollarzero_new(void)
   t_glist *glist = (t_glist *)canvas_getcurrent();
   t_canvas *this_canvas = glist_getcanvas(glist);
 
-  x->x_is_there_a_parent = (unsigned int)this_canvas->gl_owner;
+  x->x_is_there_a_parent = (unsigned int)(0!=this_canvas->gl_owner);
 
   if(x->x_is_there_a_parent)
     x->s_parent_unique = canvas_realizedollar((t_canvas *)this_canvas->gl_owner, gensym("$0"));
