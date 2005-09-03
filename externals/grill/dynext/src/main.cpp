@@ -829,7 +829,15 @@ void dyn::m_send(int argc,const t_atom *argv)
 			post("%s - send: object \"%s\" not found",thisName(),GetString(argv[0]));
 		else if(!canvasmsg && o->AsGlist())
 			post("%s - send: object \"%s\" is an abstraction, please create proxy",thisName(),GetString(argv[0]));
+        else if(IsSymbol(argv[1])) {
+            const t_symbol *s = GetSymbol(argv[1]);
+            if(s == sym_list)
+    			pd_forwardmess((t_pd *)o->object,argc-2,(t_atom *)argv+2);
+            else
+                pd_typedmess((t_pd *)o->object,(t_symbol *)s,argc-2,(t_atom *)argv+2);
+        }
         else
+            // assume it's a list
 			pd_forwardmess((t_pd *)o->object,argc-1,(t_atom *)argv+1);
 	}
 }

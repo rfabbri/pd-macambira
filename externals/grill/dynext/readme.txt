@@ -35,6 +35,7 @@ CHANGES:
 - guard against messages to canvases ("canvasmsg" attribute)
 - more stable
 - make connections visible
+- fixed send method: any messages do work now not only lists...
 
 0.1.0:
 - first release: PD 0.37 supports all necessary functionality

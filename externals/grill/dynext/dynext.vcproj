@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\data\pd\pd-cvs\src;..\flext\source"
+				AdditionalIncludeDirectories="c:\programme\audio\pd-0.39-0\src;..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PD"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"

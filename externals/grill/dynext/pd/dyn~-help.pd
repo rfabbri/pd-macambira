@@ -1,5 +1,5 @@
-#N canvas 131 104 817 536 12;
-#N canvas 71 10 554 561 examples 0;
+#N canvas 36 61 829 548 12;
+#N canvas 71 10 558 565 examples 0;
 #X floatatom 148 239 5 0 0 0 - - -;
 #X floatatom 105 304 5 0 0 0 - - -;
 #X floatatom 113 501 5 0 0 0 - - -;
@@ -59,8 +59,7 @@ conn a 0 0;
 #X text 181 358 delete object "a";
 #X obj 11 10 cnv 15 700 40 empty empty dyn~ 10 22 0 24 -260818 -1 0
 ;
-#X msg 128 387 send a message 1;
-#X text 270 387 send "message 1" to a-inlet 0;
+#X text 282 387 send "message 1" to a-inlet 0;
 #X obj 54 468 dyn~ 0 1 0 2;
 #X text 156 467 dyn sig/msg inlets sig/msg outlets;
 #X msg 165 421 vis \$1;
@@ -72,7 +71,7 @@ conn a 0 0;
 #X text 187 98 reload all objects (keep connections);
 #X msg 127 98 reload;
 #X text 218 432 (connections are not drawn at the moment!);
-#N canvas 178 192 578 434 dsp-ex 0;
+#N canvas 178 192 582 438 dsp-ex 0;
 #X obj 73 380 dac~;
 #X obj 183 257 hsl 128 15 0 1000 0 0 empty empty empty -2 -6 0 8 -261681
 -1 -1 0 1;
@@ -122,17 +121,51 @@ patcher;
 #X text 133 12 dynamic object management \, (C)2003-2005 Thomas Grill
 ;
 #X text 133 30 http://grrrr.org/ext;
-#X connect 1 0 14 0;
-#X connect 3 0 14 0;
-#X connect 5 0 14 0;
-#X connect 7 0 14 0;
-#X connect 9 0 14 0;
-#X connect 12 0 14 0;
-#X connect 16 0 14 0;
-#X connect 17 0 16 0;
-#X connect 19 0 14 0;
-#X connect 22 0 14 0;
-#X connect 25 0 14 0;
-#X connect 26 0 14 0;
-#X connect 29 0 14 0;
-#X connect 31 0 14 0;
+#N canvas 132 483 562 540 proxies 0;
+#X text 25 78 Instead you have to create a "real" object that;
+#X text 24 94 gets the message and passes it along to the abstraction.
+;
+#X text 25 123 If you wanted to send float for example you could use
+;
+#X text 24 141 [float] objects as "proxies".;
+#X text 25 29 You can't use send to send directly to an inlet of an
+;
+#X text 24 45 abstraction or subpatcher object you placed inside dyn~.
+;
+#X obj 13 470 dyn~ 0 0 0 0;
+#X text 31 190 create a subpatcher with an inlet and a print object
+in it;
+#X text 35 270 try to send a message to it;
+#X msg 35 290 send mysub 0 Hello!;
+#X msg 30 212 reset \, newobj . mysub pd sub \, newobj mysub in inlet
+\, newobj mysub p print SUB \, conn in 0 p 0;
+#X text 209 289 doesn't work! (watch PD console);
+#X msg 34 360 newobj . proxy symbol \, conn proxy 0 mysub 0;
+#X text 36 388 send to that instead;
+#X msg 33 407 send proxy Hello!;
+#X obj 128 453 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 127 470 vis \$1;
+#X text 37 338 create a proxy ([symbol] object in this case);
+#X connect 9 0 6 0;
+#X connect 10 0 6 0;
+#X connect 12 0 6 0;
+#X connect 14 0 6 0;
+#X connect 15 0 16 0;
+#X connect 16 0 6 0;
+#X restore 626 469 pd proxies;
+#X msg 128 387 send a message 1;
+#X connect 1 0 13 0;
+#X connect 3 0 13 0;
+#X connect 5 0 13 0;
+#X connect 7 0 13 0;
+#X connect 9 0 13 0;
+#X connect 15 0 13 0;
+#X connect 16 0 15 0;
+#X connect 18 0 13 0;
+#X connect 21 0 13 0;
+#X connect 24 0 13 0;
+#X connect 25 0 13 0;
+#X connect 28 0 13 0;
+#X connect 30 0 13 0;
+#X connect 35 0 13 0;
