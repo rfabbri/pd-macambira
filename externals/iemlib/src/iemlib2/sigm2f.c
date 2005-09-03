@@ -13,6 +13,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 /* ----------- m2f~ ----------- */
 /* --------- obsolete --------- */
