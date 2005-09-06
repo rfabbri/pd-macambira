@@ -11,7 +11,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "pool.h"
 #include <string>
 
-#define POOL_VERSION "0.2.1pre"
+#define POOL_VERSION "0.2.1"
 
 #define VCNT 64
 #define DCNT 16
