@@ -7,6 +7,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 ----------------------------------------------------------------------------
 
+Attention: dyn~ is bound to the PD version it is compiled for.
+This means that you cannot use a version compiled for PD 0.38 with PD 0.39.
+
+----------------------------------------------------------------------------
+
 You will need the flext C++ layer for PD and Max/MSP externals to compile this.
 see http://grrrr.org/ext
 
@@ -17,7 +22,7 @@ Please see build.txt in the flext package on how to compile dyn~.
 BUGS:
 -----
 
-- deletion of subcanvases and objects therein is crashy
+- deletion of subcanvases and objects therein may be crashy
 
 
 CHANGES:
@@ -60,5 +65,4 @@ CHANGES:
 
 TODO:
 --------
-- Hash table for object tags
 - add mute attribute

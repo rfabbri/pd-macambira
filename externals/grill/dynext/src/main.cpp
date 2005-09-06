@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.5.0
 #endif
 
-#define DYN_VERSION "0.1.1pre"
+#define DYN_VERSION "0.1.1"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
@@ -212,7 +212,6 @@ private:
 	FLEXT_CALLBACK_V(m_disconnect)
 	FLEXT_CALLBACK_V(m_send)
 	FLEXT_CALLVAR_B(mg_vis,ms_vis)
-//	FLEXT_CALLBACK(m_refresh)
 
 	FLEXT_ATTRVAR_B(stripext)
 	FLEXT_ATTRVAR_B(symreuse)
@@ -829,13 +828,9 @@ void dyn::m_send(int argc,const t_atom *argv)
 			post("%s - send: object \"%s\" not found",thisName(),GetString(argv[0]));
 		else if(!canvasmsg && o->AsGlist())
 			post("%s - send: object \"%s\" is an abstraction, please create proxy",thisName(),GetString(argv[0]));
-        else if(IsSymbol(argv[1])) {
-            const t_symbol *s = GetSymbol(argv[1]);
-            if(s == sym_list)
-    			pd_forwardmess((t_pd *)o->object,argc-2,(t_atom *)argv+2);
-            else
-                pd_typedmess((t_pd *)o->object,(t_symbol *)s,argc-2,(t_atom *)argv+2);
-        }
+        else if(IsSymbol(argv[1]))
+            // has a tag symbol
+            pd_typedmess((t_pd *)o->object,(t_symbol *)GetSymbol(argv[1]),argc-2,(t_atom *)argv+2);
         else
             // assume it's a list
 			pd_forwardmess((t_pd *)o->object,argc-1,(t_atom *)argv+1);
