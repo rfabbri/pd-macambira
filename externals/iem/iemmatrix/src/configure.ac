@@ -64,6 +64,14 @@ dnl Checks for library functions.
 AC_FUNC_MMAP
 AC_CHECK_FUNCS(select socket strerror)
 
+
+### make-depend flags
+if test "x$ac_cv_c_compiler_gnu" = "xyes"; then
+ AC_SUBST(MAKEDEP_FLAGS, "-MM")
+else
+ AC_SUBST(MAKEDEP_FLAGS, "-M")
+fi
+
 dnl check for "-mms-bitfields" cflag
 dnl why is there no generic compiler-check for a given flag ?
 dnl it would make things so easy: AC_CHECK_FLAG([-mms-bitfields],,)

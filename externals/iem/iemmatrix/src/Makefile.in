@@ -8,6 +8,7 @@ INSTALL_DOC=$(PREFIX)/@REFERENCEPATH@$(LIBNAME)
 EXT = @EXT@ 
 DEFS = @DFLAGS@
 IFLAGS = -I. @INCLUDES@ $(INCLUDES)
+MAKEDEP_FLAGS = @MAKEDEP_FLAGS@
 
 CC = @CC@
 LD = @LD@
@@ -24,27 +25,37 @@ TARNAME =  $(LIBNAME)-@IEMMATRIX_VERSION@.tgz
 CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@ 
 
 LIBS = @LIBS@
-include Make.source
-TARGETS = $(SOURCES:.c=.o)
 
+SOURCES=$(sort $(filter %.c, $(wildcard mtx_*.c))) iemmatrix.c
+TARGETS = $(SOURCES:.c=.o) 
 
 all: $(LIBNAME)
+	echo targets $(TARGETS)
 	cp $(LIBNAME).$(EXT) ..
 
 $(LIBNAME): $(TARGETS)
 	$(LD) $(LFLAGS) -o $(LIBNAME).$(EXT) *.o $(LIBS)
 	$(STRIP) @STRIPFLAGS@ $(LIBNAME).$(EXT)
 
+## dependencies: as proposed by the GNU-make documentation
+## see http://www.gnu.org/software/make/manual/html_node/make_47.html#SEC51
+-include $(SOURCES:.c=.d)
+%.d: %.c
+	@set -e; rm -f $@; \
+	$(CXX) $(MAKEDEP_FLAGS) $(CFLAGS) $< > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
 clean:
 	-rm -f *.$(EXT) *.o 
 
 cleaner: clean
-	-rm -f *~ _* config.*
+	-rm -f *~ _* config.* *.d *.d.*
 
 cleanest: cleaner
-	-rm -f Makefile ../*.$(EXT) Make.source
+	-rm -f Makefile ../*.$(EXT) 
 
-distclean: cleanest newmakefile
+distclean: cleanest
 
 install: install-bin install-doc
 
@@ -65,7 +76,8 @@ newmakefile:
 	echo "current:">Makefile
 	echo "	./configure && make">>Makefile
 
-source:
-	echo "SOURCES = \\"> Make.source
-	echo `ls mtx_*.c $(LIBNAME).c` >> Make.source
-	echo >> Make.source
+Makefile: Makefile.in configure
+	./configure
+
+configure: configure.ac
+	autoconf
