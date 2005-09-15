@@ -610,7 +610,8 @@ int text_xpix(t_text *x, t_glist *glist)
     if (glist->gl_havewindow || !glist->gl_isgraph)
         return (x->te_xpix);
     else if (glist->gl_goprect)
-         return (glist->gl_obj.te_xpix + x->te_xpix - glist->gl_xmargin);
+        return (glist_xtopixels(glist, glist->gl_x1) +
+            x->te_xpix - glist->gl_xmargin);
     else return (glist_xtopixels(glist, 
             glist->gl_x1 + (glist->gl_x2 - glist->gl_x1) * 
                 x->te_xpix / (glist->gl_screenx2 - glist->gl_screenx1)));
@@ -621,7 +622,8 @@ int text_ypix(t_text *x, t_glist *glist)
     if (glist->gl_havewindow || !glist->gl_isgraph)
         return (x->te_ypix);
     else if (glist->gl_goprect)
-         return (glist->gl_obj.te_ypix + x->te_ypix - glist->gl_ymargin);
+        return (glist_ytopixels(glist, glist->gl_y1) +
+            x->te_ypix - glist->gl_ymargin);
     else return (glist_ytopixels(glist, 
             glist->gl_y1 + (glist->gl_y2 - glist->gl_y1) * 
                 x->te_ypix / (glist->gl_screeny2 - glist->gl_screeny1)));

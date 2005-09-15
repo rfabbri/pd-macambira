@@ -89,7 +89,7 @@ ALLCF = $(CFLAGS)  $(INCLUDE) $(INCASIO) $(INCPA) $(INCPM) /D_WINDOWS \
 .c.obj:
 	cl /c $(ALLCF) /Tc$*.c
 
-pd: ..\bin\pd.exe
+pd: ..\bin\pd.exe ..\bin\pd.com
 
 gui: ..\bin\pdtcl.dll
 
@@ -114,6 +114,15 @@ gui: ..\bin\pdtcl.dll
 ..\bin\pdreceive.exe: u_pdreceive.obj
 	link $(LFLAGS) /out:..\bin\pdreceive.exe /INCREMENTAL:NO \
 	    u_pdreceive.obj $(LIB)
+
+s_entry_com.obj: s_entry.c
+	copy s_entry.c s_entry_com.c
+	cl /c s_entry_com.c 
+	del s_entry_com.c
+
+..\bin\pd.com: s_entry_com.obj ..\bin\pd.lib
+	link $(LFLAGS) /out:..\bin\pd.com /INCREMENTAL:NO s_entry_com.obj \
+	    ..\bin\pd.lib $(LIB) $(ASIOLIB)
 
 # explicit rules to compile portaudio sources:
 pa_stream.obj: $(PADIR)\pa_common\pa_stream.c

@@ -2295,6 +2295,7 @@ static void writesf_open(t_writesf *x, t_symbol *s, int argc, t_atom *argv)
         pd_error(x,
             "writesf~: usage: open [-bytes [234]] [-wave,-nextstep,-aiff] ...");
         post("... [-big,-little] [-rate ####] filename");
+        return;
     }
     if (normalize || onset || (nframes != 0x7fffffff))
         pd_error(x, "normalize/onset/nframes argument to writesf~: ignored");

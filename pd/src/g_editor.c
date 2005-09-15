@@ -75,7 +75,7 @@ void gobj_vis(t_gobj *x, struct _glist *glist, int flag)
             if (x1 > x2)
                 m = x1, x1 = x2, x2 = m;
             if (y1 > y2)
-                m = y1, y1 = y2, x2 = m;
+                m = y1, y1 = y2, y2 = m;
             gobj_getrect(x, glist, &gx1, &gy1, &gx2, &gy2);
             if (gx1 < x1 || gx1 > x2 || gx2 < x1 || gx2 > x2 ||
                 gy1 < y1 || gy1 > y2 || gy2 < y1 || gy2 > y2)

@@ -61,8 +61,8 @@ void glist_text(t_glist *gl, t_symbol *s, int argc, t_atom *argv)
         SETSYMBOL(&at, gensym("comment"));
         glist_noselect(gl);
         glist_getnextxy(gl, &xpix, &ypix);
-        x->te_xpix = glist_pixelstox(gl, xpix-3);
-        x->te_ypix = glist_pixelstoy(gl, ypix-3);
+        x->te_xpix = xpix-1;
+        x->te_ypix = ypix-1;
         binbuf_restore(x->te_binbuf, 1, &at);
         glist_add(gl, &x->te_g);
         glist_noselect(gl);
@@ -1030,7 +1030,7 @@ static int text_click(t_gobj *z, struct _glist *glist,
             if (doit)
                 pd_vmess(&x->te_pd, clicksym, "fffff",
                     (double)xpix, (double)ypix,
-                        (double)shift, 0, (double)alt);
+                        (double)shift, (double)0, (double)alt);
             return (1);
         }
         else return (0);
@@ -1039,14 +1039,14 @@ static int text_click(t_gobj *z, struct _glist *glist,
     {
         if (doit)
             gatom_click((t_gatom *)x, (t_floatarg)xpix, (t_floatarg)ypix,
-                (t_floatarg)shift, 0, (t_floatarg)alt);
+                (t_floatarg)shift, (t_floatarg)0, (t_floatarg)alt);
         return (1);
     }
     else if (x->te_type == T_MESSAGE)
     {
         if (doit)
             message_click((t_message *)x, (t_floatarg)xpix, (t_floatarg)ypix,
-                (t_floatarg)shift, 0, (t_floatarg)alt);
+                (t_floatarg)shift, (t_floatarg)0, (t_floatarg)alt);
         return (1);
     }
     else return (0);
