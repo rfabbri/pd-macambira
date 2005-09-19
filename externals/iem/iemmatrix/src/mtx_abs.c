@@ -51,7 +51,7 @@ static void mtx_abs_list(t_mtx_binscalar *x, t_symbol *s, int argc, t_atom *argv
 
   while(n--){
     m->a_type = A_FLOAT;
-    (m++)->a_w.w_float = (t_float)abs(atom_getfloat(argv++));
+    (m++)->a_w.w_float = (t_float)fabs(atom_getfloat(argv++));
   }
 
   outlet_list(x->x_obj.ob_outlet, gensym("list"), argc, x->m.atombuffer);
