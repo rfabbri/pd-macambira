@@ -55,7 +55,7 @@ cleaner: clean
 cleanest: cleaner
 	-rm -f Makefile ../*.$(EXT) 
 
-distclean: cleanest
+distclean: cleanest newmakefile
 
 install: install-bin install-doc
 
