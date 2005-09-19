@@ -30,7 +30,6 @@ SOURCES=$(sort $(filter %.c, $(wildcard mtx_*.c))) iemmatrix.c
 TARGETS = $(SOURCES:.c=.o) 
 
 all: $(LIBNAME)
-	echo targets $(TARGETS)
 	cp $(LIBNAME).$(EXT) ..
 
 $(LIBNAME): $(TARGETS)
