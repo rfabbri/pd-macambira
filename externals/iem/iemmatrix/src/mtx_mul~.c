@@ -942,3 +942,8 @@ void mtx_mul_tilde_setup(void)
 
   class_sethelpsymbol(matrix_multilde_class, gensym("iemmatrix/matrix_mul~"));
 }
+
+void iemtx_mul__setup(void)
+{
+  mtx_mul_tilde_setup();
+}

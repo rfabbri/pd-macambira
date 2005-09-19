@@ -53,3 +53,8 @@ void mtx_binscalar_free(t_mtx_binscalar *x)
 {
   matrix_free(&x->m);
 }
+
+
+void iemtx_binops_setup(void)
+{
+}
