@@ -32,8 +32,8 @@ static void mtx_abs_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
   m =  x->m.atombuffer+2;
 
   while(n--){
-    t_float f = (t_float)abs(atom_getfloat(argv++));
-    SETFLOAT(m, f);
+    t_float f = atom_getfloat(argv++);
+    SETFLOAT(m, (t_float)fabs(f));
     m++;
   }
 
