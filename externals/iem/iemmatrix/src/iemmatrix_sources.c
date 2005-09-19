@@ -18,19 +18,26 @@ void iemmatrix_sources_setup(void)
 	iemtx_check_setup(); /* mtx_check.c */
 	iemtx_cholesky_setup(); /* mtx_cholesky.c */
 	iemtx_col_setup(); /* mtx_col.c */
+	iemtx_colon_setup(); /* mtx_colon.c */
+	iemtx_conv_setup(); /* mtx_conv.c */
 	iemtx_cos_setup(); /* mtx_cos.c */
+	iemtx_cumsum_setup(); /* mtx_cumsum.c */
 	iemtx_dbtorms_setup(); /* mtx_dbtorms.c */
 	iemtx_diag_setup(); /* mtx_diag.c */
 	iemtx_diegg_setup(); /* mtx_diegg.c */
+	iemtx_diff_setup(); /* mtx_diff.c */
 	iemtx_distance2_setup(); /* mtx_distance2.c */
 	iemtx_egg_setup(); /* mtx_egg.c */
 	iemtx_element_setup(); /* mtx_element.c */
 	iemtx_eq_setup(); /* mtx_eq.c */
 	iemtx_exp_setup(); /* mtx_exp.c */
 	iemtx_eye_setup(); /* mtx_eye.c */
+	iemtx_fill_setup(); /* mtx_fill.c */
+	iemtx_find_setup(); /* mtx_find.c */
 	iemtx_gauss_setup(); /* mtx_gauss.c */
 	iemtx_ge_setup(); /* mtx_ge.c */
 	iemtx_gt_setup(); /* mtx_gt.c */
+	iemtx_index_setup(); /* mtx_index.c */
 	iemtx_int_setup(); /* mtx_int.c */
 	iemtx_inverse_setup(); /* mtx_inverse.c */
 	iemtx_le_setup(); /* mtx_le.c */
@@ -40,9 +47,11 @@ void iemmatrix_sources_setup(void)
 	iemtx_max2_setup(); /* mtx_max2.c */
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
+	iemtx_minmax_setup(); /* mtx_minmax.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
+	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
 	iemtx_or_setup(); /* mtx_or.c */
 	iemtx_pivot_setup(); /* mtx_pivot.c */
@@ -50,13 +59,16 @@ void iemmatrix_sources_setup(void)
 	iemtx_print_setup(); /* mtx_print.c */
 	iemtx_prod_setup(); /* mtx_prod.c */
 	iemtx_rand_setup(); /* mtx_rand.c */
+	iemtx_repmat_setup(); /* mtx_repmat.c */
 	iemtx_resize_setup(); /* mtx_resize.c */
+	iemtx_reverse_setup(); /* mtx_reverse.c */
 	iemtx_rmstodb_setup(); /* mtx_rmstodb.c */
 	iemtx_roll_setup(); /* mtx_roll.c */
 	iemtx_row_setup(); /* mtx_row.c */
 	iemtx_scroll_setup(); /* mtx_scroll.c */
 	iemtx_sin_setup(); /* mtx_sin.c */
 	iemtx_size_setup(); /* mtx_size.c */
+	iemtx_sort_setup(); /* mtx_sort.c */
 	iemtx_sub_setup(); /* mtx_sub.c */
 	iemtx_sum_setup(); /* mtx_sum.c */
 	iemtx_trace_setup(); /* mtx_trace.c */
