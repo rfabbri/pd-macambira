@@ -37,7 +37,9 @@ void iemmatrix_sources_setup(void)
 	iemtx_log_setup(); /* mtx_log.c */
 	iemtx_lt_setup(); /* mtx_lt.c */
 	iemtx_matrix_setup(); /* mtx_matrix.c */
+	iemtx_max2_setup(); /* mtx_max2.c */
 	iemtx_mean_setup(); /* mtx_mean.c */
+	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */

@@ -35,7 +35,9 @@ void iemtx_le_setup(void); /* mtx_le.c */
 void iemtx_log_setup(void); /* mtx_log.c */
 void iemtx_lt_setup(void); /* mtx_lt.c */
 void iemtx_matrix_setup(void); /* mtx_matrix.c */
+void iemtx_max2_setup(void); /* mtx_max2.c */
 void iemtx_mean_setup(void); /* mtx_mean.c */
+void iemtx_min2_setup(void); /* mtx_min2.c */
 void iemtx_mul_setup(void); /* mtx_mul.c */
 void iemtx_mul__setup(void); /* mtx_mul~.c */
 void iemtx_neq_setup(void); /* mtx_neq.c */
