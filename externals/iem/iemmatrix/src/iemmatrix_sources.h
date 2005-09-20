@@ -21,6 +21,7 @@ void iemtx_conv_setup(void); /* mtx_conv.c */
 void iemtx_cos_setup(void); /* mtx_cos.c */
 void iemtx_cumsum_setup(void); /* mtx_cumsum.c */
 void iemtx_dbtorms_setup(void); /* mtx_dbtorms.c */
+void iemtx_decay_setup(void); /* mtx_decay.c */
 void iemtx_diag_setup(void); /* mtx_diag.c */
 void iemtx_diegg_setup(void); /* mtx_diegg.c */
 void iemtx_diff_setup(void); /* mtx_diff.c */
@@ -63,9 +64,13 @@ void iemtx_reverse_setup(void); /* mtx_reverse.c */
 void iemtx_rmstodb_setup(void); /* mtx_rmstodb.c */
 void iemtx_roll_setup(void); /* mtx_roll.c */
 void iemtx_row_setup(void); /* mtx_row.c */
+void iemtx_rowrfft_setup(void); /* mtx_rowrfft.c */
+void iemtx_rowrifft_setup(void); /* mtx_rowrifft.c */
 void iemtx_scroll_setup(void); /* mtx_scroll.c */
+void iemtx_semipivot_setup(void); /* mtx_semipivot.c */
 void iemtx_sin_setup(void); /* mtx_sin.c */
 void iemtx_size_setup(void); /* mtx_size.c */
+void iemtx_slice_setup(void); /* mtx_slice.c */
 void iemtx_sort_setup(void); /* mtx_sort.c */
 void iemtx_sub_setup(void); /* mtx_sub.c */
 void iemtx_sum_setup(void); /* mtx_sum.c */
