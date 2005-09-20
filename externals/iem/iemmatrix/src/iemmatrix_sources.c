@@ -69,7 +69,6 @@ void iemmatrix_sources_setup(void)
 	iemtx_rowrfft_setup(); /* mtx_rowrfft.c */
 	iemtx_rowrifft_setup(); /* mtx_rowrifft.c */
 	iemtx_scroll_setup(); /* mtx_scroll.c */
-	iemtx_semipivot_setup(); /* mtx_semipivot.c */
 	iemtx_sin_setup(); /* mtx_sin.c */
 	iemtx_size_setup(); /* mtx_size.c */
 	iemtx_slice_setup(); /* mtx_slice.c */

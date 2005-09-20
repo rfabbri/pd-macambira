@@ -67,7 +67,6 @@ void iemtx_row_setup(void); /* mtx_row.c */
 void iemtx_rowrfft_setup(void); /* mtx_rowrfft.c */
 void iemtx_rowrifft_setup(void); /* mtx_rowrifft.c */
 void iemtx_scroll_setup(void); /* mtx_scroll.c */
-void iemtx_semipivot_setup(void); /* mtx_semipivot.c */
 void iemtx_sin_setup(void); /* mtx_sin.c */
 void iemtx_size_setup(void); /* mtx_size.c */
 void iemtx_slice_setup(void); /* mtx_slice.c */
