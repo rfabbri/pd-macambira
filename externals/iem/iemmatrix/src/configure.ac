@@ -117,17 +117,17 @@ then
  if test "x$host" != "x"
  then
   STRIP=${host}-strip
-  if $(which ${host}-strip > /dev/null)
-  then
-    :
-  else
-    STRIP="echo fake strip"
-  fi
  else
-  STRIP=strip
+# we need a method to check arguments for arbitrary commands like strip
+  STRIP="strip"
  fi
 fi
-dnl STRIP=${STRIP:=strip}
+if $(which ${STRIP} > /dev/null)
+then
+  STRIPFLAGS="--strip-uneeded"
+else
+  STRIP="echo fake strip"
+fi
 
 DFLAGS=""
 
