@@ -16,6 +16,9 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_minmax_class;
+static t_symbol *row_sym;
+static t_symbol *col_sym;
+static t_symbol *col_sym2;
 
 typedef struct _MTXminmax_ MTXminmax;
 struct _MTXminmax_
@@ -23,9 +26,8 @@ struct _MTXminmax_
    t_object x_obj;
    int size;
    int outsize;
-   int minmax_dimension;
-   int minmax_direction;
-  int operator_minimum; // 1 if we are [mtx_min], 0 if we are [mtx_max]
+   t_symbol *minmax_mode;
+   int operator_minimum; // 1 if we are [mtx_min], 0 if we are [mtx_max]
 
    t_outlet *list_outlet;
 
@@ -39,37 +41,22 @@ static void deleteMTXMinMax (MTXminmax *mtx_minmax_obj)
       freebytes (mtx_minmax_obj->list_out, sizeof(t_atom)*(mtx_minmax_obj->size+2));
 }
 
-static void mTXSetMinMaxDirection (MTXminmax *mtx_minmax_obj, t_float c_dir)
+static void mTXSetMinMaxMode (MTXminmax *mtx_minmax_obj, t_symbol *m_sym)
 {
-   int direction = (int) c_dir;
-   if ((direction != -1) && (direction != 1))
-      direction = 1;
-   mtx_minmax_obj->minmax_direction = direction;
-}
-
-static void mTXSetMinMaxDimension (MTXminmax *mtx_minmax_obj, t_float c_dim)
-{
-   int dimension = (int) c_dim;
-   dimension = (dimension > 0)?dimension:0;
-   dimension = (dimension < 3)?dimension:3;
-   mtx_minmax_obj->minmax_dimension = dimension;
+   mtx_minmax_obj->minmax_mode = m_sym;
 }
 
 static void *newMTXMin (t_symbol *s, int argc, t_atom *argv)
 {
    MTXminmax *mtx_minmax_obj = (MTXminmax *) pd_new (mtx_minmax_class);
-   int c_dim = 1;
-   int c_dir = 1;
+   t_symbol *c_mode = 0;
 
-   switch ((argc>2)?2:argc) {
-      case 2:
-	 c_dir = atom_getint(argv+1);
+   switch ((argc>1)?1:argc) {
       case 1:
-	 c_dim = atom_getint(argv);
+	 c_mode = atom_getsymbol (argv);
    }
    mtx_minmax_obj->operator_minimum = 1;
-   mTXSetMinMaxDimension (mtx_minmax_obj, (t_float) c_dim);
-   mTXSetMinMaxDirection (mtx_minmax_obj, (t_float) c_dir);
+   mTXSetMinMaxMode (mtx_minmax_obj, c_mode);
 
    mtx_minmax_obj->list_outlet = outlet_new (&mtx_minmax_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_minmax_obj);
@@ -77,18 +64,14 @@ static void *newMTXMin (t_symbol *s, int argc, t_atom *argv)
 static void *newMTXMax (t_symbol *s, int argc, t_atom *argv)
 {
    MTXminmax *mtx_minmax_obj = (MTXminmax *) pd_new (mtx_minmax_class);
-   int c_dim = 1;
-   int c_dir = 1;
+   t_symbol *c_mode = 0;
 
-   switch ((argc>2)?2:argc) {
-      case 2:
-	 c_dir = atom_getint(argv+1);
+   switch ((argc>1)?1:argc) {
       case 1:
-	 c_dim = atom_getint(argv);
+	 c_mode = atom_getsymbol (argv);
    }
    mtx_minmax_obj->operator_minimum = 0;
-   mTXSetMinMaxDimension (mtx_minmax_obj, (t_float) c_dim);
-   mTXSetMinMaxDirection (mtx_minmax_obj, (t_float) c_dir);
+   mTXSetMinMaxMode (mtx_minmax_obj, c_mode);
 
    mtx_minmax_obj->list_outlet = outlet_new (&mtx_minmax_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_minmax_obj);
@@ -227,31 +210,30 @@ static void mTXMinMaxMatrix (MTXminmax *mtx_minmax_obj, t_symbol *s,
    // main part
    list_out += 2;
    //copyList (size, argv, list_out);
-   switch (mtx_minmax_obj->minmax_dimension) {
-      case 0:
-	 columns_out = 1;
-	 rows_out = 1;
-	 if (mtx_minmax_obj->operator_minimum)
-	    minListRows (1, size, list_in, list_out); 
-	 else
-	    maxListRows (1, size, list_in, list_out);
-	 break;
-      case 1:
+   if (mtx_minmax_obj->minmax_mode == row_sym) {
 	 rows_out = rows;
 	 columns_out = 1;
 	 if (mtx_minmax_obj->operator_minimum)
 	    minListRows (rows, columns, list_in, list_out); 
 	 else
 	    maxListRows (rows, columns, list_in, list_out);
-	 break;
-      case 2:
+   }
+   else if ((mtx_minmax_obj->minmax_mode == col_sym) ||
+	 (mtx_minmax_obj->minmax_mode == col_sym2)) {
 	 rows_out = 1;
 	 columns_out = columns;
 	 if (mtx_minmax_obj->operator_minimum)
 	    minListColumns (rows, columns, list_in, list_out); 
 	 else
 	    maxListColumns (rows, columns, list_in, list_out);
-	 break;
+   }
+   else {
+	 columns_out = 1;
+	 rows_out = 1;
+	 if (mtx_minmax_obj->operator_minimum)
+	    minListRows (1, size, list_in, list_out); 
+	 else
+	    maxListRows (1, size, list_in, list_out);
    }
    mtx_minmax_obj->outsize = columns_out * rows_out;
    list_out = mtx_minmax_obj->list_out;
@@ -273,10 +255,13 @@ void mtx_minmax_setup (void)
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_minmax_class, (t_method) mTXMinMaxBang);
    class_addmethod (mtx_minmax_class, (t_method) mTXMinMaxMatrix, gensym("matrix"), A_GIMME,0);
-   class_addmethod (mtx_minmax_class, (t_method) mTXSetMinMaxDimension, gensym("dimension"), A_DEFFLOAT,0);
-   class_addmethod (mtx_minmax_class, (t_method) mTXSetMinMaxDirection, gensym("direction"), A_DEFFLOAT,0);
+//   class_addmethod (mtx_minmax_class, (t_method) mTXSetMinMaxDimension, gensym("dimension"), A_DEFFLOAT,0);
+   class_addmethod (mtx_minmax_class, (t_method) mTXSetMinMaxMode, gensym("mode"), A_DEFSYMBOL ,0);
    class_addcreator ((t_newmethod) newMTXMax, gensym("mtx_max"), A_GIMME,0);
    class_sethelpsymbol (mtx_minmax_class, gensym("iemmatrix/mtx_minmax"));
+   row_sym = gensym("row");
+   col_sym = gensym("col");
+   col_sym2 = gensym("column");
 }
 
 void iemtx_minmax_setup(void){
