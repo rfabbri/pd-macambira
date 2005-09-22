@@ -68,5 +68,5 @@ void mtx_sum_setup(void)
   class_sethelpsymbol(mtx_sum_class, gensym("iemmatrix/mtx_sum"));
 }
 void iemtx_sum_setup(void){
-  void mtx_sum_setup(void);
+  mtx_sum_setup();
 }
