@@ -16,6 +16,9 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_cumsum_class;
+static t_symbol *row_sym;
+static t_symbol *col_sym;
+static t_symbol *col_sym2;
 
 typedef struct _MTXCumsum_ MTXCumsum;
 struct _MTXCumsum_
@@ -24,8 +27,8 @@ struct _MTXCumsum_
    int rows;
    int columns;
    int size;
-   int cumsum_dimension;
    int cumsum_direction;
+   t_symbol *cumsum_mode;
 
    t_outlet *list_outlet;
 
@@ -50,27 +53,36 @@ static void mTXSetCumsumDirection (MTXCumsum *mtx_cumsum_obj, t_float c_dir)
    int direction = (int) c_dir;
    mtx_cumsum_obj->cumsum_direction = (direction==-1)?direction:1;
 }
-static void mTXSetCumsumDimension (MTXCumsum *mtx_cumsum_obj, t_float c_dim)
+
+static void mTXSetCumsumMode (MTXCumsum *mtx_cumsum_obj, t_symbol *m_sym)
 {
-   int dimension = (int) c_dim;
-   mtx_cumsum_obj->cumsum_dimension = (dimension==2)?dimension:1;
+   mtx_cumsum_obj->cumsum_mode = m_sym;
 }
 
 static void *newMTXCumsum (t_symbol *s, int argc, t_atom *argv)
 {
    MTXCumsum *mtx_cumsum_obj = (MTXCumsum *) pd_new (mtx_cumsum_class);
-   int c_dir = 1;
-   int c_dim = 1;
-
-   mtx_cumsum_obj->cumsum_dimension = c_dim;
-   switch ((argc>2)?2:argc) {
-      case 2:
-	 c_dir = atom_getint(argv+1);
-      case 1:
-	 c_dim = atom_getint(argv);
+   mTXSetCumsumMode (mtx_cumsum_obj, gensym(":"));
+   mTXSetCumsumDirection (mtx_cumsum_obj, 1.0f);
+   if (argc>=1) {
+      if (argv[0].a_type == A_SYMBOL) {
+	 mTXSetCumsumMode (mtx_cumsum_obj, atom_getsymbol (argv));
+	 if (argc>=2) 
+	    if (argv[1].a_type != A_SYMBOL)
+	       mTXSetCumsumDirection (mtx_cumsum_obj, atom_getfloat (argv+1));
+	    else
+	       post("mtx_cumsum: 2nd arg ignored. supposed to be float");
+      }
+      else {
+	 mTXSetCumsumDirection (mtx_cumsum_obj, atom_getfloat (argv));
+	 if (argc>=2) {
+	    if (argv[1].a_type == A_SYMBOL)
+	       mTXSetCumsumMode (mtx_cumsum_obj, atom_getsymbol (argv+1));
+	    else
+	       post("mtx_cumsum: 2nd arg ignored. supposed to be symbolic, e.g. \"row\", \"col\", \":\"");
+	 }
+      }
    }
-   mTXSetCumsumDirection (mtx_cumsum_obj, (t_float) c_dir);
-   mTXSetCumsumDimension (mtx_cumsum_obj, (t_float) c_dim);
 
    mtx_cumsum_obj->list_outlet = outlet_new (&mtx_cumsum_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_cumsum_obj);
@@ -181,7 +193,8 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
 
    // main part
    // reading matrix from inlet
-   if (mtx_cumsum_obj->cumsum_dimension == 2) {
+   if ((mtx_cumsum_obj->cumsum_mode == col_sym) ||
+	(mtx_cumsum_obj->cumsum_mode == col_sym2)) {
       readFloatFromListModulo (size, columns, list_ptr, x);
       columns = mtx_cumsum_obj->rows;
       rows = mtx_cumsum_obj->columns;
@@ -191,19 +204,35 @@ static void mTXCumsumMatrix (MTXCumsum *mtx_cumsum_obj, t_symbol *s,
    
    // calculating cumsum
    if (mtx_cumsum_obj->cumsum_direction == -1) {
-      x += columns-1;
-      y += columns-1;
-      for (count = rows; count--; x += columns, y += columns)
-	 cumSumReverse (columns,x,y);
+      if ((mtx_cumsum_obj->cumsum_mode == row_sym) ||
+	    (mtx_cumsum_obj->cumsum_mode == col_sym) ||
+	    (mtx_cumsum_obj->cumsum_mode == col_sym2)) {
+	 x += columns-1;
+	 y += columns-1;
+
+	 for (count = rows; count--; x += columns, y += columns)
+	    cumSumReverse (columns,x,y);
+      }
+      else {
+	 x += size-1;
+	 y += size-1;
+	 cumSumReverse (size, x, y);
+      }
    }
-   else
+   else if ((mtx_cumsum_obj->cumsum_mode == row_sym) ||
+	 (mtx_cumsum_obj->cumsum_mode == col_sym) ||
+	 (mtx_cumsum_obj->cumsum_mode == col_sym2))
       for (count = rows; count--; x += columns, y += columns)
 	 cumSum (columns,x,y);
+   else
+      cumSum (size, x, y);
+
    x = mtx_cumsum_obj->x;
    y = mtx_cumsum_obj->y;
 
    // writing matrix to outlet
-   if (mtx_cumsum_obj->cumsum_dimension == 2) {
+   if ((mtx_cumsum_obj->cumsum_mode == col_sym) ||
+	(mtx_cumsum_obj->cumsum_mode == col_sym2)) {
       columns = mtx_cumsum_obj->columns;
       rows = mtx_cumsum_obj->rows;
       writeFloatIntoListModulo (size, columns, list_out+2, y);
@@ -228,9 +257,12 @@ void mtx_cumsum_setup (void)
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_cumsum_class, (t_method) mTXCumsumBang);
    class_addmethod (mtx_cumsum_class, (t_method) mTXCumsumMatrix, gensym("matrix"), A_GIMME,0);
-   class_addmethod (mtx_cumsum_class, (t_method) mTXSetCumsumDimension, gensym("dimension"), A_DEFFLOAT,0);
+   class_addmethod (mtx_cumsum_class, (t_method) mTXSetCumsumMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_cumsum_class, (t_method) mTXSetCumsumDirection, gensym("direction"), A_DEFFLOAT,0);
    class_sethelpsymbol (mtx_cumsum_class, gensym("iemmatrix/mtx_cumsum"));
+   row_sym = gensym("row");
+   col_sym = gensym("col");
+   col_sym2 = gensym("column");
 }
 
 void iemtx_cumsum_setup(void){
