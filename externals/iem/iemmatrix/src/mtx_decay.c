@@ -79,7 +79,6 @@ static void *newMTXDecay (t_symbol *s, int argc, t_atom *argv)
    argc = ((argc<3)?argc:3);
    while (n < argc) {
      if (argv[n].a_type == A_SYMBOL) {
-	post("postition %d",n);
 	sym_count++;
 	first_sym = (first_sym<n)?first_sym:n;
      }
