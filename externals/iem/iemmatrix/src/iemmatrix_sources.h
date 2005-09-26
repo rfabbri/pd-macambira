@@ -17,6 +17,7 @@ void iemtx_check_setup(void); /* mtx_check.c */
 void iemtx_cholesky_setup(void); /* mtx_cholesky.c */
 void iemtx_col_setup(void); /* mtx_col.c */
 void iemtx_colon_setup(void); /* mtx_colon.c */
+void iemtx_concat_setup(void); /* mtx_concat.c */
 void iemtx_conv_setup(void); /* mtx_conv.c */
 void iemtx_cos_setup(void); /* mtx_cos.c */
 void iemtx_cumsum_setup(void); /* mtx_cumsum.c */
@@ -47,8 +48,8 @@ void iemtx_max2_setup(void); /* mtx_max2.c */
 void iemtx_mean_setup(void); /* mtx_mean.c */
 void iemtx_min2_setup(void); /* mtx_min2.c */
 void iemtx_minmax_setup(void); /* mtx_minmax.c */
-void iemtx_mul_setup(void); /* mtx_mul.c */
 void iemtx_mul__setup(void); /* mtx_mul~.c */
+void iemtx_mul_setup(void); /* mtx_mul.c */
 void iemtx_neq_setup(void); /* mtx_neq.c */
 void iemtx_not_setup(void); /* mtx_not.c */
 void iemtx_ones_setup(void); /* mtx_ones.c */

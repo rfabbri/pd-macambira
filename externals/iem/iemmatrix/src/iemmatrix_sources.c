@@ -19,6 +19,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_cholesky_setup(); /* mtx_cholesky.c */
 	iemtx_col_setup(); /* mtx_col.c */
 	iemtx_colon_setup(); /* mtx_colon.c */
+	iemtx_concat_setup(); /* mtx_concat.c */
 	iemtx_conv_setup(); /* mtx_conv.c */
 	iemtx_cos_setup(); /* mtx_cos.c */
 	iemtx_cumsum_setup(); /* mtx_cumsum.c */
@@ -49,8 +50,8 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_mul__setup(); /* mtx_mul~.c */
+	iemtx_mul_setup(); /* mtx_mul.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
