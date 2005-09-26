@@ -49,14 +49,13 @@ static void mTXSetMinMaxMode (MTXminmax *mtx_minmax_obj, t_symbol *m_sym)
 static void *newMTXMin (t_symbol *s, int argc, t_atom *argv)
 {
    MTXminmax *mtx_minmax_obj = (MTXminmax *) pd_new (mtx_minmax_class);
-   t_symbol *c_mode = 0;
+   mTXSetMinMaxMode (mtx_minmax_obj, gensym(":"));
 
    switch ((argc>1)?1:argc) {
       case 1:
-	 c_mode = atom_getsymbol (argv);
+	 mTXSetMinMaxMode (mtx_minmax_obj, atom_getsymbol (argv));
    }
    mtx_minmax_obj->operator_minimum = 1;
-   mTXSetMinMaxMode (mtx_minmax_obj, c_mode);
 
    mtx_minmax_obj->list_outlet = outlet_new (&mtx_minmax_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_minmax_obj);
@@ -64,14 +63,13 @@ static void *newMTXMin (t_symbol *s, int argc, t_atom *argv)
 static void *newMTXMax (t_symbol *s, int argc, t_atom *argv)
 {
    MTXminmax *mtx_minmax_obj = (MTXminmax *) pd_new (mtx_minmax_class);
-   t_symbol *c_mode = 0;
+   mTXSetMinMaxMode (mtx_minmax_obj, gensym(":"));
 
    switch ((argc>1)?1:argc) {
       case 1:
-	 c_mode = atom_getsymbol (argv);
+	 mTXSetMinMaxMode (mtx_minmax_obj, atom_getsymbol (argv));
    }
    mtx_minmax_obj->operator_minimum = 0;
-   mTXSetMinMaxMode (mtx_minmax_obj, c_mode);
 
    mtx_minmax_obj->list_outlet = outlet_new (&mtx_minmax_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_minmax_obj);

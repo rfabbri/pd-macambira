@@ -16,6 +16,11 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_find_class;
+static t_symbol *row_sym;
+static t_symbol *col_sym;
+static t_symbol *col_sym2;
+static t_symbol *mtx_sym;
+static t_symbol *mtx_sym2;
 
 typedef struct _MTXfind_ MTXfind;
 struct _MTXfind_
@@ -23,7 +28,8 @@ struct _MTXfind_
    t_object x_obj;
    int size;
    int outsize;
-   int find_dimension;
+   //int find_dimension;
+   t_symbol *find_mode;
    int find_direction;
 
    t_outlet *list_outlet;
@@ -45,7 +51,7 @@ static void mTXSetFindDirection (MTXfind *mtx_find_obj, t_float c_dir)
       direction = 1;
    mtx_find_obj->find_direction = direction;
 }
-
+/*
 static void mTXSetFindDimension (MTXfind *mtx_find_obj, t_float c_dim)
 {
    int dimension = (int) c_dim;
@@ -53,13 +59,40 @@ static void mTXSetFindDimension (MTXfind *mtx_find_obj, t_float c_dim)
    dimension = (dimension < 3)?dimension:3;
    mtx_find_obj->find_dimension = dimension;
 }
+*/
+static void mTXSetFindMode (MTXfind *mtx_find_obj, t_symbol *c_dim)
+{
+   mtx_find_obj->find_mode = c_dim;
+}
 
 static void *newMTXFind (t_symbol *s, int argc, t_atom *argv)
 {
    MTXfind *mtx_find_obj = (MTXfind *) pd_new (mtx_find_class);
-   int c_dim = 0;
-   int c_dir = 1;
+//   int c_dim = 0;
+//   int c_dir = 1;
 
+   mTXSetFindMode (mtx_find_obj, gensym(":"));
+   mTXSetFindDirection (mtx_find_obj, 1);
+   if (argc>=1) {
+      if (argv[0].a_type == A_SYMBOL) {
+	 mTXSetFindMode (mtx_find_obj, atom_getsymbol (argv));
+	 if (argc>=2) 
+	    if (argv[1].a_type != A_SYMBOL)
+	       mTXSetFindDirection (mtx_find_obj, atom_getfloat (argv+1));
+	    else
+	       post("mtx_find: 2nd arg ignored. supposed to be float");
+      }
+      else {
+	 mTXSetFindDirection (mtx_find_obj, atom_getfloat (argv));
+	 if (argc>=2) {
+	    if (argv[1].a_type == A_SYMBOL)
+	       mTXSetFindMode (mtx_find_obj, atom_getsymbol (argv+1));
+	    else
+	       post("mtx_find: 2nd arg ignored. supposed to be symbolic, e.g. \"row\", \"col\", \":\", \"mtx\"");
+	 }
+      }
+   }
+/*
    switch ((argc>2)?2:argc) {
       case 2:
 	 c_dir = atom_getint(argv+1);
@@ -68,6 +101,7 @@ static void *newMTXFind (t_symbol *s, int argc, t_atom *argv)
    }
    mTXSetFindDimension (mtx_find_obj, (t_float) c_dim);
    mTXSetFindDirection (mtx_find_obj, (t_float) c_dir);
+   */
 
    mtx_find_obj->list_outlet = outlet_new (&mtx_find_obj->x_obj, gensym("matrix"));
 
@@ -229,6 +263,34 @@ static void mTXFindMatrix (MTXfind *mtx_find_obj, t_symbol *s,
    list_out += 2;
    //copyList (size, argv, list_out);
    rows_out = 1;
+   if (mtx_find_obj->find_mode == row_sym) {
+      if (mtx_find_obj->find_direction == -1)
+	 findLastNonZeroRow (rows, columns, list_in, list_out);
+      else
+	 findFirstNonZeroRow (rows, columns, list_in, list_out);
+      rows_out = rows;
+      columns_out = 1;
+   }
+   else if ((mtx_find_obj->find_mode == col_sym)||
+	 (mtx_find_obj->find_mode == col_sym2)) {
+      if (mtx_find_obj->find_direction == -1)
+	 findLastNonZeroColumn (rows, columns, list_in, list_out);
+      else
+	 findFirstNonZeroColumn (rows, columns, list_in, list_out);
+      columns_out = columns;
+      rows_out = 1;
+   }
+   else if ((mtx_find_obj->find_mode == mtx_sym)||
+	 (mtx_find_obj->find_mode == mtx_sym2)) {
+      findReplaceNonZerosWithIndex (size, list_in, list_out);
+      rows_out = rows;
+      columns_out = columns;
+   }
+   else {
+      columns_out = findAllNonZeros (size, list_in, list_out); 
+      rows_out = 1;
+   }
+   /*
    switch (mtx_find_obj->find_dimension) {
       case 0:
 	 columns_out = findAllNonZeros (size, list_in, list_out); 
@@ -256,6 +318,7 @@ static void mTXFindMatrix (MTXfind *mtx_find_obj, t_symbol *s,
 	 columns_out = 1;
 	 break;
    }
+   */
    mtx_find_obj->outsize = columns_out * rows_out;
    list_out = mtx_find_obj->list_out;
 
@@ -276,9 +339,15 @@ void mtx_find_setup (void)
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_find_class, (t_method) mTXFindBang);
    class_addmethod (mtx_find_class, (t_method) mTXFindMatrix, gensym("matrix"), A_GIMME,0);
-   class_addmethod (mtx_find_class, (t_method) mTXSetFindDimension, gensym("dimension"), A_DEFFLOAT,0);
+//   class_addmethod (mtx_find_class, (t_method) mTXSetFindDimension, gensym("dimension"), A_DEFFLOAT,0);
+   class_addmethod (mtx_find_class, (t_method) mTXSetFindMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_find_class, (t_method) mTXSetFindDirection, gensym("direction"), A_DEFFLOAT,0);
    class_sethelpsymbol (mtx_find_class, gensym("iemmatrix/mtx_find"));
+   row_sym = gensym("row");
+   col_sym = gensym("col");
+   col_sym2 = gensym("columns");
+   mtx_sym = gensym("mtx");
+   mtx_sym2 = gensym ("matrix");
 }
 
 void iemtx_find_setup(void){

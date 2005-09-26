@@ -16,12 +16,15 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_colon_class;
+static t_symbol *col_sym;
+static t_symbol *col_sym2;
 
 typedef struct _MTXColon_ MTXColon;
 struct _MTXColon_
 {
    t_object x_obj;
    int size;
+   t_symbol *colon_mode;
 
    t_atom *list_out;
    t_outlet *list_outlet;
@@ -31,6 +34,11 @@ static void deleteMTXColon (MTXColon *mtx_colon_obj)
 {
    if (mtx_colon_obj->list_out)
       freebytes (mtx_colon_obj->list_out, sizeof(t_atom)*(mtx_colon_obj->size+2));
+}
+
+static void mTXSetColonMode (MTXColon *mtx_colon_obj, t_symbol *c_mode) 
+{
+   mtx_colon_obj->colon_mode = c_mode;
 }
 
 static void *newMTXColon (t_symbol *s, int argc, t_atom *argv)
@@ -85,8 +93,15 @@ static void mTXColonList (MTXColon *mtx_colon_obj, t_symbol *s,
       }
       mtx_colon_obj->list_out = list_out;
 
-      SETFLOAT (&list_out[0],1.0f);
-      SETFLOAT (&list_out[1],(t_float)size);
+      if ((mtx_colon_obj->colon_mode == col_sym)||
+	    (mtx_colon_obj->colon_mode == col_sym2)) {
+	 SETFLOAT (&list_out[1],1.0f);
+	 SETFLOAT (&list_out[0],(t_float)size);
+      }
+      else {
+	 SETFLOAT (&list_out[0],1.0f);
+	 SETFLOAT (&list_out[1],(t_float)size);
+      }
       list_out += 2;
       for (;size--;list_out++,startval+=step)
 	 SETFLOAT(list_out,startval);
@@ -104,9 +119,12 @@ void mtx_colon_setup (void)
        sizeof (MTXColon),
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_colon_class, (t_method) mTXColonBang);
+   class_addmethod (mtx_colon_class, (t_method) mTXSetColonMode, gensym("mode"), A_DEFSYMBOL, 0);
    class_addlist (mtx_colon_class, (t_method) mTXColonList);
    class_addcreator ((t_newmethod) newMTXColon, gensym("mtx_:"), A_GIMME, 0);
    class_sethelpsymbol (mtx_colon_class, gensym("iemmatrix/mtx_colon"));
+   col_sym = gensym("col");
+   col_sym2 = gensym("column");
 }
 
 void iemtx_colon_setup(void){
