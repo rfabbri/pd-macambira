@@ -1,0 +1,82 @@
+# From: Tanaka Akira <akr@m17n.org>
+#  matz@ruby-lang.org (Yukihiro Matsumoto) writes:
+#
+#> Some reports from valgrind is due to Ruby's conservative GC, which
+#> touch all C stack region.
+#
+#I use following suppression file to suppress such reports.
+
+{
+  memcpy/rb_thread_save_context(Value1)
+  Addr1
+  fun:memcpy
+  fun:rb_thread_save_context
+}
+
+{
+  memcpy/rb_thread_restore_context(Value1)
+  Addr1
+  fun:memcpy
+  fun:rb_thread_restore_context
+}
+
+{
+  strchr/_dl_catch_error(Cond)
+  Cond
+  fun:strchr
+  obj:/lib/libc-2.2.5.so
+  fun:_dl_catch_error
+}
+
+{
+  mark_locations_array(Cond)
+  Cond
+  fun:mark_locations_array
+}
+
+{
+  mark_locations_array(Value4)
+  Value4
+  fun:mark_locations_array
+}
+
+{
+  mark_locations_array(Value4)
+  Addr4
+  fun:mark_locations_array
+}
+
+{
+  rb_gc_mark(Cond)
+  Cond
+  fun:rb_gc_mark
+}
+
+{
+  rb_gc_mark(Value4)
+  Value4
+  fun:rb_gc_mark
+}
+
+{
+  rb_gc_mark_children(Value4)
+  Value4
+  fun:rb_gc_mark_children
+}
+
+{
+  rb_gc_mark_children(Cond)
+  Cond
+  fun:rb_gc_mark_children
+}
+
+#-- 
+#Tanaka Akira
+
+
+# additional attempt by matju:
+{
+  libc
+  Cond
+  obj:/lib/libc-2.2.5.so
+}

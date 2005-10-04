@@ -1,0 +1,46 @@
+#N canvas 599 113 566 552 10;
+#X text 428 11 GridFlow 0.8.0;
+#X obj 258 207 #color;
+#X obj 288 391 #color;
+#X obj 259 476 display;
+#X text 15 27 [#reverse];
+#X obj 258 359 t a a;
+#X text 15 57 Swaps the values of incoming grids while preserving the
+number of Dimensions between incoming and outgoing grids.;
+#X obj 22 287 #in;
+#X obj 22 206 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 52 256 open b001.jpg;
+#X obj 22 401 #out window;
+#X obj 87 289 hradio 15 1 0 6 empty empty empty 0 -6 0 8 -260818 -1
+-1 5;
+#X obj 87 307 - 3;
+#X floatatom 87 327 5 0 0 0 - - -;
+#X text 16 107 0 vertical;
+#X text 16 122 1 horizontal;
+#X text 16 135 2 rgb <-> bgr;
+#X text 16 150 -1 \, -2 \, -3 \, swaps the specicied dimensions;
+#X text 16 92 An int argument changes the behavior in this way :;
+#X obj 22 228 t b b;
+#X obj 22 344 #reverse 0;
+#X obj 258 330 #reverse 0;
+#X obj 323 275 hradio 15 1 0 6 empty empty empty 0 -6 0 8 -260818 -1
+-1 0;
+#X obj 323 293 - 3;
+#X floatatom 323 313 5 0 0 0 - - -;
+#X connect 1 0 21 0;
+#X connect 5 0 3 0;
+#X connect 5 1 2 0;
+#X connect 7 0 20 0;
+#X connect 8 0 19 0;
+#X connect 9 0 7 0;
+#X connect 11 0 12 0;
+#X connect 12 0 13 0;
+#X connect 13 0 20 1;
+#X connect 19 0 7 0;
+#X connect 19 1 9 0;
+#X connect 20 0 10 0;
+#X connect 21 0 5 0;
+#X connect 22 0 23 0;
+#X connect 23 0 24 0;
+#X connect 24 0 21 1;

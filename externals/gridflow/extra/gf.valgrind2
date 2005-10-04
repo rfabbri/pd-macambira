@@ -1,0 +1,42 @@
+{
+   hello1
+   Memcheck:Cond
+   fun:mark_locations_array
+}
+{
+   hello2
+   Memcheck:Cond
+   fun:gc_mark
+}
+{
+   hello3
+   Memcheck:Value4
+   fun:gc_mark
+}
+{
+   hello4
+   Memcheck:Cond
+   fun:gc_mark_children
+}
+{
+   hello5
+   Memcheck:Value4
+   fun:gc_mark_children
+}
+{
+   hello6
+   Memcheck:Cond
+   fun:_dl_relocate_object_internal
+}
+{
+   hello7
+   Memcheck:Value4
+   fun:st_lookup
+   fun:rb_mark_generic_ivar
+}
+{
+   hello8
+   Memcheck:Cond
+   fun:st_lookup
+   fun:rb_mark_generic_ivar
+}

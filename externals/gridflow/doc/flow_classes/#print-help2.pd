@@ -1,0 +1,113 @@
+#N canvas 186 33 771 654 10;
+#X obj 268 45 cnv 15 460 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X obj 278 65 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 483 cnv 15 720 30 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X obj 8 513 cnv 15 720 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 5 cnv 15 720 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 525 KEYWORDS: control number float store;
+#X text 12 515 CATAGORY: control;
+#X text 281 65 Left:;
+#X obj 268 305 cnv 15 460 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X text 271 305 Arguments:;
+#X text 283 325 One - [float] accepts a single float as a creation
+argument which initializes the first value to be sent out the left
+outlet.;
+#X obj 268 375 cnv 15 460 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X text 271 375 Outlets:;
+#X text 283 395 One - outputs the stored floating point value of the
+object.;
+#X obj 8 45 cnv 15 250 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X text 11 45 Usage:;
+#X obj 8 65 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 103 cnv 15 250 350 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 150 73 f;
+#X text 126 73 OR;
+#X obj 452 489 pddp;
+#N canvas 58 22 261 146 Related_Objects 0;
+#X obj 3 87 cnv 15 250 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X obj 5 6 cnv 15 250 15 empty empty empty 20 12 0 14 -158509 -66577
+0;
+#X obj 3 107 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 69 113 randomF;
+#X obj 138 113 lister;
+#X text 7 6 Native PD Objects (internals);
+#X text 5 87 Externals and libraries;
+#X obj 4 27 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 70 34 int;
+#X obj 137 34 symbol;
+#X restore 15 490 pd Related_Objects;
+#N canvas 57 22 517 577 More_Info 0;
+#X text 43 24 All numbers in PD are kept in 32-bit floating point and
+can represent real numbers between -8 \, 388608 and 8.388.608.00;
+#X text 11 78 WHAT IS A FLOATING POINT NUMBER?;
+#X text 41 267 The following are examples of floating point numbers:
+;
+#X text 61 293 3;
+#X text 62 334 -111.5;
+#X text 61 313 0.5;
+#X text 40 387 3e-05 : This example is a computer shorthand for scientific
+notation. It means 3*10-5 (or 10 to the negative 5th power multiplied
+by 3).;
+#X text 41 108 According to Webopedia.com \, "computers are integer
+machines and are capable of representing real numbers only by using
+complex codes." Hence \, real numbers must be 'approximated' by computers
+using the "floating point standard". In such a number \, the decimal
+point can "float" meaning that there is no fixed number of digits preceding
+or following the decimal. A floating point number is therefore a computer's
+approximation of a real number.;
+#X text 43 453 Interesting side-note: In the early 1990's \, the Intel
+80486 was shipped with a math coprocessor to help accelerate the process
+of computing floating point numbers (which previously required a considerable
+amount of CPU power.) Math coprocessors have since found there way
+into nearly every graphics card and CPU available today.;
+#X text 62 358 10000 to 1e-16;
+#X restore 154 490 pd More_Info;
+#X text 496 490 - Dave Sabine \, November 18 \, 2002;
+#X text 10 459 doc/2.control.examples/sendnumber.pd - should be a bang/link
+;
+#X text 12 7 HELP: #print;
+#X text 12 17 DESCRIPTION: Displays values in the console.;
+#X obj 80 73 #print;
+#X text 271 45 Inlet:;
+#X text 301 111 Grid - receives a grid;
+#X floatatom 71 221 5 0 0 0 - - -;
+#X floatatom 93 242 5 0 0 0 - - -;
+#X floatatom 115 262 5 0 0 0 - - -;
+#X obj 133 349 until;
+#X msg 133 323 27;
+#X obj 133 373 random 27;
+#X obj 71 281 #pack 3;
+#X obj 133 398 #import ( 3 3 3 );
+#X obj 14 421 #print;
+#X msg 39 139 open r001.jpg;
+#X obj 39 167 #in;
+#X obj 16 139 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 65 420 <-- view result in console;
+#X text 12 106 view grid dimensions;
+#X text 71 190 view grid info;
+#X text 297 141 Integer - jhu;
+#X connect 30 0 36 0;
+#X connect 31 0 36 1;
+#X connect 32 0 36 2;
+#X connect 33 0 35 0;
+#X connect 34 0 33 0;
+#X connect 35 0 37 0;
+#X connect 36 0 38 0;
+#X connect 37 0 38 0;
+#X connect 39 0 40 0;
+#X connect 40 0 38 0;
+#X connect 41 0 40 0;

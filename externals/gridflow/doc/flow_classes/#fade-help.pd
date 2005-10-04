@@ -1,0 +1,80 @@
+#N canvas 48 74 732 441 10;
+#X obj 268 95 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 278 115 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 406 cnv 15 720 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 3 cnv 15 720 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 278 174 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 25 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 25 Arguments:;
+#X obj 268 281 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 281 Outlets:;
+#X obj 8 25 cnv 15 250 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 11 25 Usage:;
+#X obj 8 45 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 81 cnv 15 250 320 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 343 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 343 More Info:;
+#X text 271 95 Inlets: (Read left to right \, inlet "0" being the leftmost)
+;
+#X text 281 115 0: (Leftmost);
+#X text 281 174 1: (Rightmost);
+#X obj 104 53 #fade;
+#X obj 91 324 #fade;
+#X obj 91 350 #out window;
+#X msg 31 224 open b001.jpg;
+#X obj 22 166 bng 15 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
+-1;
+#X obj 22 252 #in;
+#X obj 22 199 t b b;
+#X obj 50 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X floatatom 134 305 5 0 0 0 - - -;
+#X obj 22 139 metro 500;
+#X obj 22 113 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 144 165 bng 15 250 50 0 empty empty empty 0 -6 0 8 -225271 -1
+-1;
+#X obj 144 251 #in;
+#X obj 144 198 t b b;
+#X msg 153 223 open r001.jpg;
+#X obj 144 136 metro 500;
+#X obj 144 111 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X text 16 413 GridFlow 0.8.0;
+#X text 71 3 Fades a grids according to the argument you provide.;
+#X text 10 4 SUMMARY:;
+#X text 284 45 One - See inlet 0: (rightmost);
+#X text 292 135 Grid - Accepts s grid and multiplies it with a fraction
+of the previously outputted grid.;
+#X text 292 195 Integer - accepts an integer that determines the amount
+one grid is blended with another. For example: integer 5 takes 20%
+of the first image and blends it with 80% of the following image.;
+#X text 283 301 One - Outputs the fading images.;
+#X connect 19 0 20 0;
+#X connect 21 0 23 0;
+#X connect 22 0 24 0;
+#X connect 23 0 19 0;
+#X connect 24 0 23 0;
+#X connect 24 1 21 0;
+#X connect 25 0 19 0;
+#X connect 26 0 19 1;
+#X connect 27 0 22 0;
+#X connect 28 0 27 0;
+#X connect 29 0 31 0;
+#X connect 30 0 19 0;
+#X connect 31 0 30 0;
+#X connect 31 1 32 0;
+#X connect 32 0 30 0;
+#X connect 33 0 29 0;
+#X connect 34 0 33 0;

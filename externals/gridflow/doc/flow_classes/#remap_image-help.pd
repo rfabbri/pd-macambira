@@ -1,0 +1,73 @@
+#N canvas 95 151 750 524 10;
+#X obj 268 25 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 278 68 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 442 cnv 15 720 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 5 cnv 15 720 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 278 140 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 259 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 259 Outlets:;
+#X obj 8 25 cnv 15 250 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 11 25 Usage:;
+#X obj 8 45 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 81 cnv 15 250 355 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 271 25 Inlets: (Read left to right \, inlet "0" being the leftmost)
+;
+#X text 281 68 0: (Leftmost);
+#X text 281 140 1: (Rightmost);
+#X text 12 5 SUMMARY: Transforms a grid by displacing pixels.;
+#X obj 84 51 #remap_image;
+#X text 292 88 Grid - Receives a grid that is to be transformed by
+the object connected to the rightmost inlet.;
+#X text 291 159 Numop - Receives a numereic operator \, pixel positions
+are displaced according to the mathematic operation. Click here for
+more transformation options.;
+#X msg 48 143 open b001.jpg;
+#X obj 18 86 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 18 174 #in;
+#X obj 18 112 t b b;
+#X obj 18 411 #out window;
+#X obj 97 383 #print;
+#X obj 57 213 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 101 285 5 0 0 0 - - -;
+#X obj 68 244 #for (0 0) (240 320) (1 1);
+#X obj 82 212 metro 100;
+#X obj 82 187 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 97 317 # /;
+#X obj 18 352 #remap_image;
+#X text 16 449 GridFlow 0.8.0;
+#X text 281 295 comment;
+#X text 285 294 comment;
+#X obj 282 299 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 281 355 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 285 299 0: (Leftmost);
+#X text 284 355 1: (Rightmost);
+#X text 296 323 Grid - Outputs the transformend image.;
+#X text 288 375 Numop - Displays the displaced values.;
+#X text 145 284 <-- Modify the value to see transformations.;
+#X connect 18 0 20 0;
+#X connect 19 0 21 0;
+#X connect 20 0 30 0;
+#X connect 21 0 20 0;
+#X connect 21 1 18 0;
+#X connect 24 0 26 0;
+#X connect 25 0 29 1;
+#X connect 26 0 29 0;
+#X connect 27 0 26 0;
+#X connect 28 0 27 0;
+#X connect 29 0 30 1;
+#X connect 30 0 22 0;
+#X connect 30 1 23 0;

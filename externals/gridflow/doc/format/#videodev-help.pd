@@ -1,0 +1,15 @@
+#N canvas 442 389 450 300 10;
+#X msg 114 236 open videodev \$1 \, get;
+#X msg 106 12 brightness 1000;
+#X msg 106 35 hue 1000;
+#X msg 107 64 color 1000;
+#X msg 107 87 contrast 1000;
+#X msg 107 120 whiteness 1000;
+#X msg 288 59 channel 2;
+#X msg 287 84 tuner 2;
+#X msg 287 107 norm 2;
+#X msg 291 138 frequency 2;
+#X msg 108 156 transfer mmap 4;
+#X msg 103 184 transfer read;
+#X msg 283 210 colorspace RGB24;
+#X msg 288 167 size 400 600;

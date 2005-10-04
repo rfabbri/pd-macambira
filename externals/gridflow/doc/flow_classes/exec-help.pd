@@ -1,0 +1,13 @@
+#N canvas 0 0 450 267 10;
+#X text 259 22 GridFlow 0.8.0;
+#X text 50 221 see also:;
+#X obj 126 221 renamefile;
+#X obj 241 221 unix_time;
+#X obj 61 130 exec;
+#X msg 35 78 shell xlogo &;
+#X msg 144 78 shell ftp ac@artengine.ca &;
+#X obj 209 221 ls;
+#X text 141 121 Executes a program or script. It is not return a result
+\, see the PureData shell after using the ftp command.;
+#X connect 5 0 4 0;
+#X connect 6 0 4 0;

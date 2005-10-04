@@ -1,0 +1,68 @@
+#N canvas 38 0 738 404 10;
+#X obj 269 196 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 279 217 cnv 15 450 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 7 369 cnv 15 720 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 720 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 268 53 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 271 53 Arguments:;
+#X obj 8 53 cnv 15 250 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 11 53 Usage:;
+#X obj 8 73 cnv 15 250 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 271 305 cnv 15 460 15 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 272 196 Inlets: (Read left to right \, inlet "0" being the
+leftmost);
+#X text 282 217 0: (Leftmost);
+#X obj 8 110 cnv 15 250 250 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 105 79 #print;
+#X text 12 6 SUMMARY:;
+#X floatatom 167 212 5 0 0 0 - - -;
+#X floatatom 189 233 5 0 0 0 - - -;
+#X floatatom 211 253 5 0 0 0 - - -;
+#X obj 34 202 until;
+#X msg 34 176 27;
+#X obj 34 226 random 27;
+#X obj 167 272 #pack 3;
+#X obj 34 251 #import ( 3 3 3 );
+#X msg 35 118 open r001.jpg;
+#X obj 15 150 #in;
+#X obj 12 118 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 155 189 view grid info;
+#X text 101 344 view result in console;
+#X text 274 305 Related objects:;
+#X obj 460 336 rubyprint;
+#X obj 530 329 printargs;
+#X obj 279 336 #dim;
+#X obj 314 336 #export;
+#X obj 369 336 #export_list;
+#X obj 600 329 print;
+#X text 15 376 GridFLow 0.8.0;
+#X text 73 6 Displays the dimensions of a grid in the console. If the
+grid has less than two dimensions it will display all grid data.;
+#X text 284 123 Symbol - Adds a symbol (text) as a prefix before the
+printed element in the console.;
+#X text 283 87 Integer - Adds a number as a prefix before the element
+printed in the console. See here;
+#X text 282 246 Grid - Receives and outputs the dimensions of a grid.
+;
+#X obj 15 319 #print paprika;
+#X connect 15 0 21 0;
+#X connect 16 0 21 1;
+#X connect 17 0 21 2;
+#X connect 18 0 20 0;
+#X connect 19 0 18 0;
+#X connect 20 0 22 0;
+#X connect 21 0 40 0;
+#X connect 22 0 40 0;
+#X connect 23 0 24 0;
+#X connect 24 0 40 0;
+#X connect 25 0 24 0;

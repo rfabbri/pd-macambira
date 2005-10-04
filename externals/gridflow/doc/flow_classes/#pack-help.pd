@@ -1,0 +1,75 @@
+#N canvas 29 63 693 623 10;
+#X obj 8 3 cnv 15 90 578 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 45 273 INLETS:;
+#X text 42 304 - LEFT:;
+#X text 33 410 OUTLETS:;
+#X text 28 53 EXAMPLES:;
+#X text 24 506 SEE ALSO:;
+#N canvas 247 137 487 505 More_Info 0;
+#X text 485 23 GridFlow 0.8.0;
+#X obj 523 257 #unpack 3;
+#X floatatom 513 305 5 0 0 0 - - -;
+#X obj 416 190 t a a;
+#X obj 333 301 display;
+#X floatatom 552 305 5 0 0 0 - - -;
+#X floatatom 591 305 5 0 0 0 - - -;
+#X text -48 51 [#unpack];
+#X obj 530 352 #pack 3;
+#X text -49 122 It takes an integer as an argument to specify the number
+of Dimensions the incoming grid has.;
+#X obj 416 76 #color;
+#X obj 516 411 #color;
+#X text -48 84 Accepts grids in its inlet and produces integers via
+its outlet.;
+#X text -39 349 [#pack];
+#X text -39 382 Accepts integers in its inlets and produces a corresponding
+grid via its outlet.;
+#X text -40 421 It takes an integer as an argument to specify the number
+of incoming integers and the corresponding number of Dimensions the
+outgoing grid will have.;
+#X obj 483 332 - 127;
+#X obj -31 190 trigger bang bang;
+#X obj 166 178 metro 100;
+#X obj 89 345 display;
+#X obj 174 272 print blah;
+#X obj 145 316 print blah2;
+#X obj 122 155 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X connect 1 0 2 0;
+#X connect 1 1 5 0;
+#X connect 1 2 6 0;
+#X connect 2 0 16 0;
+#X connect 3 0 4 0;
+#X connect 3 1 1 0;
+#X connect 5 0 8 1;
+#X connect 6 0 8 2;
+#X connect 8 0 11 0;
+#X connect 10 0 3 0;
+#X connect 16 0 8 0;
+#X connect 18 0 19 0;
+#X connect 18 0 20 0;
+#X connect 18 0 21 0;
+#X connect 22 0 18 0;
+#X restore 119 550 pd More_Info;
+#X text 36 435 - LEFT:;
+#X text 412 575 updated for GridFlow version 0.8.0;
+#X obj 47 13 #pack;
+#X text 183 183 comment;
+#X obj 120 173 #color;
+#X floatatom 120 65 5 0 0 0 - - -;
+#X floatatom 142 93 5 0 0 0 - - -;
+#X floatatom 164 121 5 0 0 0 - - -;
+#X obj 120 147 #pack 3;
+#X text 25 346 ARGUMENT:;
+#X text 120 304 Grid - combination of inputs.;
+#X text 104 436 Grid - combination of inputs given by inlets.;
+#X text 114 344 Interger - defines the number of inlets and the amount
+of outcoming grid dimensions.;
+#X obj 121 511 #unpack 3;
+#X text 114 13 Creates a vector (a list of numbers) from individual
+integers.;
+#X connect 12 0 15 0;
+#X connect 13 0 15 1;
+#X connect 14 0 15 2;
+#X connect 15 0 11 0;

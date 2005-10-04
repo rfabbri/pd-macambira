@@ -1,0 +1,10 @@
+#N canvas 328 114 500 300 10;
+#X msg 93 60 codec jpg;
+#X msg 94 92 parameter jpeg_quality 75;
+#X msg 309 255 framerate 33;
+#X msg 182 229 colorspace rgb;
+#X msg 285 165 size 400 600;
+#X msg 294 92 force_size 400 600;
+#X obj 117 261 #in;
+#X msg 107 194 open quicktime.mov;
+#X connect 7 0 6 0;

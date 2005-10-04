@@ -1,0 +1,135 @@
+#N canvas 373 24 613 584 10;
+#X obj 123 779 #out window;
+#X obj 123 711 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 5 -9 cnv 15 90 1100 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 57 -1 #in;
+#X text 35 37 INLETS:;
+#X text 42 68 -LEFT:;
+#X text 102 -1 -IMPORTS GRIDS (IMAGES OR MOVIES);
+#X text 110 268 Message "close" closes the video input device. Only
+necessary if you are using a live capture device.;
+#X text 109 68 Bang sends a grid (static image or one frame of video)
+to [#out]. Successive bangs advance through the grid (frames of video).
+;
+#X text 110 119 Message "open" follwed by the filename \, ex: "open
+someimage.jpg" gives a grid (most often an image) to an [#out].;
+#X text 108 226 Interger will display the frame number of the frame
+just sent. Applies to formats that have frame numbers.;
+#X text 109 173 Message "set" \, followed by a number \, will select
+the video frame corresponding to the number. A bang must be sent in
+order to display the frame.;
+#X text 8 444 ARGUMENTS:;
+#X text 107 444 filename \, [#in someimage.jpg] eliminates the need
+for message "open someimage.jpg" but limits that image.;
+#X text 23 500 OUTLETS:;
+#X text 37 531 -LEFT:;
+#X text 110 530 Displays the resulting grid when connected to [#out]
+;
+#X text 29 574 -RIGHT:;
+#X text 109 574 Integer \, a numbner box will identify the frame number
+corresponding to the frame currently displayed.Applies only to formats
+that have frame numbers.;
+#X text 16 676 EXAMPLES:;
+#X text 112 313 Message "rewind" will rewind a video file to its beginning.
+;
+#X text 111 341 Message "loop 1" restarts a video each time it reaches
+the end. The loop option is on by default.;
+#X text 110 381 Message "loop 0" turns off the loop option. The video
+stops once it reaches the end.;
+#X text 110 624 Bang signals when a frame could not be read and signals
+the end of a file.;
+#X obj 123 755 #in;
+#X floatatom 402 752 5 0 0 0 - - -;
+#X msg 343 752 set 2;
+#X msg 131 733 open b001.jpg;
+#X text 137 685 for images:;
+#X obj 320 880 #out window;
+#X obj 320 711 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 320 833 #in;
+#X msg 326 730 open movie.mpeg;
+#X msg 404 802 loop 0;
+#X msg 466 804 loop 1;
+#X floatatom 336 859 5 0 0 0 - - -;
+#X msg 404 777 rewind;
+#X text 323 686 for video files:;
+#X obj 382 850 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 16 949 SEE ALSO:;
+#X text 367 1067 updated for GridFlow version 0.8.0;
+#N canvas 135 17 680 586 More_Info 0;
+#X msg 52 283 option timelog \$1;
+#X obj 52 263 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0 1
+;
+#X text 274 307 upload a grid;
+#X text 261 80 upload a grid;
+#X text 194 108 open default display for screenshot;
+#X msg 73 134 open videodev /dev/video0;
+#X text 260 136 open a video device;
+#X msg 75 332 open x11 here;
+#X msg 87 356 open x11 local 10;
+#X text 182 285 show/hide timing statistics;
+#X text 178 334 connect to default display;
+#X text 218 358 connect to display #10 on this machine;
+#X msg 100 380 open x11 remote.host.bla.net 0;
+#X text 324 382 connect to remote machine on display #0;
+#X text 290 161 open mpeg video stream;
+#X text 272 155 *;
+#X text 36 558 * path is where you started pd from. usually $home.
+;
+#X text 308 188 open an image file;
+#X msg 114 450 close;
+#X msg 90 161 open lsd.mpeg;
+#X msg 55 107 open x11 here;
+#X msg 35 80 open host.bla.net 7777;
+#X msg 113 404 open img/bla.jpg;
+#X text 300 405 open single file in jpg format;
+#X msg 108 186 open ./img/bla.jpg;
+#X text 35 481 incoming file is sent through the opened device/socket/file.
+in single file formats subsequent pictures overwrite the preceeding
+one. there are many more options. for more information see the reference
+manual in the "formats" and "objects for input/output" sections.;
+#X msg 65 307 open x.test.at 7777;
+#X msg 125 426 open window;
+#X text 228 426 opens a window x11 \, quartz or sdl;
+#X text 577 15 comment;
+#X obj 35 213 #in;
+#X obj 35 441 #out;
+#X text 14 15 #in \, #out communicating grids (pictures) to/from devices
+\, sockets \, files;
+#X connect 0 0 31 0;
+#X connect 1 0 0 0;
+#X connect 5 0 30 0;
+#X connect 7 0 31 0;
+#X connect 8 0 31 0;
+#X connect 12 0 31 0;
+#X connect 18 0 31 0;
+#X connect 19 0 30 0;
+#X connect 20 0 30 0;
+#X connect 21 0 30 0;
+#X connect 22 0 31 0;
+#X connect 24 0 30 0;
+#X connect 26 0 31 0;
+#X connect 27 0 31 0;
+#X connect 30 0 31 0;
+#X restore 105 951 pd More_Info;
+#X obj 105 990 #import ( 1 );
+#X obj 202 990 #export;
+#X obj 257 990 #export_list;
+#X obj 347 990 #export_symbol;
+#X obj 453 989 #pack;
+#X connect 1 0 24 0;
+#X connect 24 0 0 0;
+#X connect 25 0 31 0;
+#X connect 26 0 31 0;
+#X connect 27 0 24 0;
+#X connect 30 0 31 0;
+#X connect 31 0 29 0;
+#X connect 31 1 35 0;
+#X connect 31 1 38 0;
+#X connect 32 0 31 0;
+#X connect 33 0 31 0;
+#X connect 34 0 31 0;
+#X connect 36 0 31 0;
