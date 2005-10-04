@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# NOTE: this works with diff -u only!!!
+
+puts "-"*64
+
+$plustot=0
+$minustot=0
+
+def show
+  printf "%20s %+5d %+5d (net %+5d)\n", $file, $plus, -$minus, $plus-$minus
+end
+
+loop{
+  line = gets
+  break if not line
+  if /^diff/.match line then
+    x = line.split(/\s+/)
+    $plustot+=$plus if $plus
+    $minustot+=$minus if $minus
+    show if $file
+    $file = x[-1]
+    $on=false
+    $plus=0
+    $minus=0
+  elsif /^\@\@/ =~ line then $on=true
+  elsif $on and /^\+/ =~ line then $plus+=1
+  elsif $on and /^\-/ =~ line then $minus+=1
+  end
+}
+
+$plustot+=$plus if $plus
+$minustot+=$minus if $minus
+show if $file
+
+$file="total"
+$plus=$plustot
+$minus=$minustot
+puts "-"*64
+show

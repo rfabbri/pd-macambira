@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require "gridflow"
+require "gridflow/extra/jmax_format.rb"
+require "gridflow/extra/puredata_format.rb"
+include GridFlow
+#GridFlow.verbose = true
+
+iname,oname = ARGV
+if not iname
+  raise "usage: jmax2pd <input.jmax> [<output.pd>]"
+end
+if not oname
+  oname = iname.sub(/\.jmax$/,".pd")
+end
+keep=["broken","jpatcher","button","slider","messbox"]
+GridFlow.instance_eval{@fclasses_set.delete_if {|k,v|
+  not keep.include? k
+}}
+#p GridFlow.instance_eval{@fclasses_set.keys.sort}
+	
+jfr = JMaxFileReader.new(File.open(iname),FObject)
+FObject.broken_ok = true
+FObject.do_loadbangs = false
+my_patcher = jfr.parse
+pfw = PureDataFileWriter.new(oname)
+pfw.write_patcher my_patcher
+pfw.close
+

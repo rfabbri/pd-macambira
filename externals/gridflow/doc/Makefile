@@ -1,0 +1,2 @@
+all::
+	ruby moulinette.rb
