@@ -1,0 +1,122 @@
+<html><head>
+<!-- $Id: install.html,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<title>GridFlow 0.8.0 - Installation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - Installation</h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="1"><h4><a href="#Hardware_and_Software_you_Probably_Need">Hardware and Software you Probably Need</a></h4><ul>
+</ul>
+<h4><a href="#Downloading_from_CVS">Downloading from CVS</a></h4><ul>
+</ul>
+<h4><a href="#Installation_instructions_(incl._compilation)">Installation instructions (incl. compilation)</a></h4><ul>
+</ul>
+<h4><a href="#Other_Tips">Other Tips</a></h4><ul>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Hardware_and_Software_you_Probably_Need"></a><h4>Hardware and Software you Probably Need</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Required Computer/Processor (one of...):<ul> <li><b>1</b> : PC : AMD K6/K7/K8 or Intel P2/P3/P4 (absolute minimum is 386)</li> <li><b>2</b> : Macintosh : G3/G4/G5</li> <li><b>3</b> : Corel NetWinder : StrongARM V4L</li> <li><b>4</b> : HP iPaq : some processor that works like the NetWinder</li> <li><b>5</b> : could work on SiliconGraphics and SPARCstation with a little nurture.</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Required OS (one of...):<ul> <li><b>1</b> : Linux (most any variant) (recommended)</li> <li><b>2</b> : MacOS 10.2 or later (experimental)</li> <li><b>3</b> : Windows with MinGW (very experimental)</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Required Software:<ul> <li><b>1</b> : Ruby 1.6.6 or more recent (1.8.0 recommended) (make sure you have the *.so and *.h files) 
+	(on MacOS you may have to remove or hide the existing one and install a more complete package)</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Dataflow Software :<ul> <li><b>1</b> : PureData 0.36 or later (recommended)</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Multimedia Components (optional):<ul> <li><b>1</b> : libSDL (Simple Directmedia Layer)</li> <li><b>2</b> : libjpeg</li> <li><b>3</b> : libpng</li> <li><b>4</b> : libmpeg3 (.mpg reader, HeroineWarrior's)</li> <li><b>5</b> : libquicktime (.mov reader/writer, Burkhard Plaum's or HeroineWarrior's) </li> <li><b>6</b> : libmpeg (.mpg reader, Greg Ward's, old)</li> <li><b>7</b> : Apple QuickTime (.mov reader/writer)</li> <li><b>8</b> : Ascii Art Library (aalib)</li> <li><b>9</b> : PCI video digitizer card  (and Video4linux 1 driver)</li> <li><b>10</b> : USB camera (and Video4linux 1 driver)</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Developer Tools (roll-your-own):<ul> <li><b>1</b> : GNU C++ Compiler (gcc/g++) version 3.x or maybe 2.95</li> <li><b>2</b> : GNU Make (gmake)</li> <li><b>3</b> : CVS (for upgrading/collaboration)</li> <li><b>4</b> : Ruby library "xmlparser" (optional, for editing documentation)</li> <li><b>5</b> : Developer Tools CD dec 2002 (if MacOS 10.2)</li> <li><b>6</b> : XCODE (if MacOS 10.3)</li> <li><b>7</b> : FINK (if MacOS 10)</li> </ul></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>NOTE: Apparently GCC 2.x has problems dealing with *.a components; if that 
+affects you, use *.so files instead.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Downloading_from_CVS"></a><h4>Downloading from CVS</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>The CVS has the absolute latest version of GridFlow, but it's not guaranteed to be working, whereas 
+the actual releases are more tested.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>However you may have various reasons to use the CVS edition, so here's how:</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Make sure you have the <kbd><font color="#007777">cvs</font></kbd> program installed.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">mkdir -p ~/src/gridflow</font></kbd> (make a directory; it could be called otherwise if you like)</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">cd ~/src/gridflow</font></kbd> (go in that directory)</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow login</font></kbd> (the password is blank)</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow checkout .</font></kbd> (download the first time)</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>And the subsequent times, you only do this:</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">cd ~/src/gridflow</font></kbd></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><kbd><font color="#007777">cvs update -dP</font></kbd></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Installation_instructions_(incl._compilation)"></a><h4>Installation instructions (incl. compilation)</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><ul> <li><b>1</b> : Install Ruby. Make sure it contains <kbd><font color="#007777">ruby.h</font></kbd> and <kbd><font color="#007777">intern.h</font></kbd> and related files. It's also 
+recommended to have <kbd><font color="#007777">libruby.so</font></kbd>. Those extra files may be in a package called <kbd><font color="#007777">ruby-dev</font></kbd> 
+if you are using RPM or DEB/FINK. If you are building Ruby yourself, it's better to configure ruby with <kbd><font color="#007777">--enable-shared</font></kbd>. If you install into a system directory, you may have to run <kbd><font color="#007777">ldconfig</font></kbd> 
+after installing Ruby.</li> <li><b>2</b> : Download GridFlow from the website and uncompress it, or get it from the CVS server.</li> <li><b>3</b> : Run <kbd><font color="#007777">./configure</font></kbd> from the <kbd><font color="#007777">gridflow</font></kbd> directory. Make sure it detects all the components 
+you want to use with GridFlow. In MacOS you would normally use FINK to install: <kbd><font color="#007777">libjpeg libjpeg-shlibs libpng-shlibs libpng3 libpng3-shlibs libmpeg libmpeg-shlibs</font></kbd> </li> <li><b>4</b> : Note: you may have to set <kbd><font color="#007777">CPLUS_INCLUDE_PATH</font></kbd> to indicate where to find *.h files, and you 
+may have to set both <kbd><font color="#007777">LIBRARY_PATH</font></kbd> and <kbd><font color="#007777">LD_LIBRARY_PATH</font></kbd> to indicate where to find 
+*.so  or *.aor *.dylib or *.bundle or *.dll or *.lib files.</li> <li><b>5</b> : Note: you can do <kbd><font color="#007777">./configure --help</font></kbd> to get a list of supported 
+options. You can use them to ignore the presence of troublesome libraries 
+and select debugging level. With <kbd><font color="#007777">--use-compiler</font></kbd> you should use a version of <kbd><font color="#007777">g++</font></kbd>, not 
+directly a version of <kbd><font color="#007777">gcc</font></kbd>, else you get <kbd><font color="#007777">undefined symbol</font></kbd> problems. Some versions of gcc/g++ 
+are troublesome.</li> <li><b>6</b> : Run <kbd><font color="#007777">make</font></kbd> to produce the executables <kbd><font color="#007777">gridflow.so</font></kbd> and <kbd><font color="#007777">gridflow.pd_linux</font></kbd> or similar</li> <li><b>7</b> : Run <kbd><font color="#007777">make install</font></kbd> to copy those executables and related files to their final locations.</li> <li><b>8</b> : Run <kbd><font color="#007777">make test</font></kbd> just to verify that GridFlow isn't working too bad.</li> <li><b>9</b> : With a text editor, create <kbd><font color="#007777">~/.gridflow_startup</font></kbd> and write something like <kbd><font color="#007777">GridFlow.data_path &lt;&lt; "/home/myself/gridflow/images"</font></kbd> to tell GridFlow where to find the 
+images used in the examples. You may add more lines like that one if you have folders containing images 
+or movies you want to use with GridFlow.</li> <li><b>10</b> : Loading GridFlow:<ul> <li><b>1</b> : PureData : With a text editor, modify or create <kbd><font color="#007777">~/.pdrc</font></kbd> and write <kbd><font color="#007777">-lib gridflow</font></kbd>. </li> <li><b>2</b> : ImpureData : In the ".pdrc editor", add <kbd><font color="#007777">gridflow</font></kbd> to the list of libraries.</li> <li><b>3</b> : plain Ruby : the command <kbd><font color="#007777">require "gridflow"</font></kbd> will load gridflow.so.</li> </ul> 
+Note that on MacOS the dot-files are invisible in the Finder but you do <kbd><font color="#007777">cd ~/Desktop; ln -s ../.pdrc "PureData Configuration"</font></kbd> to make an alias on the Desktop. 
+Note also that on Windows the dot-files are even more trouble.</li> </ul></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Other_Tips"></a><h4>Other Tips</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><ul> <li><b>1</b> : you just did a CVS update and now the program does not compile, or 
+crashes, or changes didn't go through. <ul> <li><b>1</b> : Did you forget the "make install" step?</li> <li><b>2</b> : If a new directory is created, you need to do <kbd><font color="#007777">cvs update -d</font></kbd>. 
+	  Many people just add that option to their configuration of the CVS software.</li> <li><b>3</b> : When some kinds of changes have happened, you may have to rerun the <kbd><font color="#007777">configure</font></kbd> 
+	program before redoing <kbd><font color="#007777">make</font></kbd>. If you had previously reconfigured with specific options, 
+	don't forget to use them again in this case.</li> <li><b>4</b> : Maybe matju forgot to upload part of an important change. Tell him.</li> </ul></li> <li><b>2</b> : PureData Crashing: <ul> <li><b>1</b> : you can start the debugger like <kbd><font color="#007777">gdb `which pd` core.24255</font></kbd> where the latter part 
+	is the name of a RAM dump file. You can enable those dumps using the shell command <kbd><font color="#007777">ulimit -c unlimited</font></kbd>. To avoid dumping, you can also start Pd from within the debugger 
+	using <kbd><font color="#007777">gdb `which pd`</font></kbd> then <kbd><font color="#007777">run</font></kbd> then cause the crash.</li> <li><b>2</b> : In GDB, after a crash, you can use the <kbd><font color="#007777">where</font></kbd> to find out what Pd was doing at the moment 
+	of the crash. If instead Pd is frozen, you can force it to crash using Ctrl+C in the terminal. </li> <li><b>3</b> : To quit GDB use the <kbd><font color="#007777">quit</font></kbd> command. (really.)</li> </ul></li> </ul></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

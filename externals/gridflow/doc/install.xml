@@ -1,0 +1,140 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE documentation SYSTEM 'jmax.dtd'>
+<documentation title="Installation">
+<!-- $Id: install.xml,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<!--
+        GridFlow Installation
+        Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
+-->
+<section name="Hardware and Software you Probably Need">
+<p>Required Computer/Processor (one of...):<list>
+	<li>PC : AMD K6/K7/K8 or Intel P2/P3/P4 (absolute minimum is 386)</li>
+	<li>Macintosh : G3/G4/G5</li>
+	<li>Corel NetWinder : StrongARM V4L</li>
+	<li>HP iPaq : some processor that works like the NetWinder</li>
+	<li>could work on SiliconGraphics and SPARCstation with a little nurture.</li>
+</list></p>
+<p>Required OS (one of...):<list>
+	<li>Linux (most any variant) (recommended)</li>
+	<li>MacOS 10.2 or later (experimental)</li>
+	<li>Windows with MinGW (very experimental)</li>
+</list></p>
+<p>Required Software:<list>
+	<li>Ruby 1.6.6 or more recent (1.8.0 recommended) (make sure you have the *.so and *.h files)
+	(on MacOS you may have to remove or hide the existing one and install a more complete package)</li>
+</list></p>
+<p>Dataflow Software :<list>
+	<li>PureData 0.36 or later (recommended)</li>
+</list></p>
+<p>Multimedia Components (optional):<list>
+	<li>libSDL (Simple Directmedia Layer)</li>
+	<li>libjpeg</li>
+	<li>libpng</li>
+	<li>libmpeg3 (.mpg reader, HeroineWarrior's)</li>
+	<li>libquicktime (.mov reader/writer, Burkhard Plaum's or HeroineWarrior's) </li>
+	<li>libmpeg (.mpg reader, Greg Ward's, old)</li>
+	<li>Apple QuickTime (.mov reader/writer)</li>
+	<li>Ascii Art Library (aalib)</li>
+	<li>PCI video digitizer card  (and Video4linux 1 driver)</li>
+	<li>USB camera (and Video4linux 1 driver)</li>
+</list></p>
+<p>Developer Tools (roll-your-own):<list>
+	<li>GNU C++ Compiler (gcc/g++) version 3.x or maybe 2.95</li>
+	<li>GNU Make (gmake)</li>
+	<li>CVS (for upgrading/collaboration)</li>
+	<li>Ruby library "xmlparser" (optional, for editing documentation)</li>
+	<li>Developer Tools CD dec 2002 (if MacOS 10.2)</li>
+	<li>XCODE (if MacOS 10.3)</li>
+	<li>FINK (if MacOS 10)</li>
+</list></p>
+<p>NOTE: Apparently GCC 2.x has problems dealing with *.a components; if that
+affects you, use *.so files instead.</p>
+</section>
+
+<section name="Downloading from CVS">
+<p>The CVS has the absolute latest version of GridFlow, but it's not guaranteed to be working, whereas
+the actual releases are more tested.</p>
+<p>However you may have various reasons to use the CVS edition, so here's how:</p>
+<p>Make sure you have the <k>cvs</k> program installed.</p>
+<p><k>mkdir -p ~/src/gridflow</k> (make a directory; it could be called otherwise if you like)</p>
+<p><k>cd ~/src/gridflow</k> (go in that directory)</p>
+<p><k>cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow login</k> (the password is blank)</p>
+<p><k>cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow checkout .</k> (download the first time)</p>
+<p>And the subsequent times, you only do this:</p>
+<p><k>cd ~/src/gridflow</k></p>
+<p><k>cvs update -dP</k></p>
+</section>
+
+<section name="Installation instructions (incl. compilation)">
+<list>
+<li>Install Ruby. Make sure it contains <k>ruby.h</k> and <k>intern.h</k> and related files. It's also
+recommended to have <k>libruby.so</k>. Those extra files may be in a package called <k>ruby-dev</k>
+if you are using RPM or DEB/FINK. If you are building Ruby yourself, it's better to configure ruby with
+<k>--enable-shared</k>. If you install into a system directory, you may have to run <k>ldconfig</k>
+after installing Ruby.</li>
+
+<li>Download GridFlow from the website and uncompress it, or get it from the CVS server.</li>
+
+<li>Run <k>./configure</k> from the <k>gridflow</k> directory. Make sure it detects all the components
+you want to use with GridFlow. In MacOS you would normally use FINK to install:
+	<k>libjpeg libjpeg-shlibs libpng-shlibs libpng3 libpng3-shlibs libmpeg libmpeg-shlibs</k>
+</li>
+
+<li>Note: you may have to set <k>CPLUS_INCLUDE_PATH</k> to indicate where to find *.h files, and you
+may have to set both <k>LIBRARY_PATH</k> and <k>LD_LIBRARY_PATH</k> to indicate where to find
+*.so  or *.aor *.dylib or *.bundle or *.dll or *.lib files.</li>
+
+<li>Note: you can do <k>./configure --help</k> to get a list of supported
+options. You can use them to ignore the presence of troublesome libraries
+and select debugging level. With <k>--use-compiler</k> you should use a version of <k>g++</k>, not
+directly a version of <k>gcc</k>, else you get <k>undefined symbol</k> problems. Some versions of gcc/g++
+are troublesome.</li>
+
+<li>Run <k>make</k> to produce the executables <k>gridflow.so</k> and <k>gridflow.pd_linux</k> or similar</li>
+<li>Run <k>make install</k> to copy those executables and related files to their final locations.</li>
+<li>Run <k>make test</k> just to verify that GridFlow isn't working too bad.</li>
+<li>With a text editor, create <k>~/.gridflow_startup</k> and write something like
+<k>GridFlow.data_path &lt;&lt; "/home/myself/gridflow/images"</k> to tell GridFlow where to find the
+images used in the examples. You may add more lines like that one if you have folders containing images
+or movies you want to use with GridFlow.</li>
+<li>Loading GridFlow:<list>
+	<li>PureData : With a text editor, modify or create <k>~/.pdrc</k> and write <k>-lib gridflow</k>. </li>
+	<li>ImpureData : In the ".pdrc editor", add <k>gridflow</k> to the list of libraries.</li>
+	<li>plain Ruby : the command <k>require "gridflow"</k> will load gridflow.so.</li>
+</list>
+Note that on MacOS the dot-files are invisible in the Finder but you do
+<k>cd ~/Desktop; ln -s ../.pdrc "PureData Configuration"</k> to make an alias on the Desktop.
+Note also that on Windows the dot-files are even more trouble.</li>
+</list>
+</section>
+
+<section name="Other Tips">
+<list>
+
+<li>you just did a CVS update and now the program does not compile, or
+crashes, or changes didn't go through. 
+	<list>
+	<li>Did you forget the "make install" step?</li>
+	<li>If a new directory is created, you need to do <k>cvs update -d</k>.
+	  Many people just add that option to their configuration of the CVS software.</li>
+	<li>When some kinds of changes have happened, you may have to rerun the <k>configure</k>
+	program before redoing <k>make</k>. If you had previously reconfigured with specific options,
+	don't forget to use them again in this case.</li>
+	<li>Maybe matju forgot to upload part of an important change. Tell him.</li>
+	</list></li>
+
+
+<li>PureData Crashing:
+	<list>
+	<li>you can start the debugger like <k>gdb `which pd` core.24255</k> where the latter part
+	is the name of a RAM dump file. You can enable those dumps using the shell command
+	<k>ulimit -c unlimited</k>. To avoid dumping, you can also start Pd from within the debugger
+	using <k>gdb `which pd`</k> then <k>run</k> then cause the crash.</li>
+	<li>In GDB, after a crash, you can use the <k>where</k> to find out what Pd was doing at the moment
+	of the crash. If instead Pd is frozen, you can force it to crash using Ctrl+C in the terminal.
+	</li>
+	<li>To quit GDB use the <k>quit</k> command. (really.)</li>
+</list></li>
+</list>
+</section>
+</documentation>

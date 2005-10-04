@@ -1,0 +1,1070 @@
+<html><head>
+<!-- $Id: reference.html,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<title>GridFlow 0.8.0 - Reference Manual: Flow Classes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - Reference Manual: Flow Classes</h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="3"><h4><a href="#Objects_for_making_grids_and_breaking_them_down">Objects for making grids and breaking them down</a></h4><ul>
+<li><a href="##import"><img src="flow_classes/%23import-icon.png" alt="[#import]" border="0"></a></li>
+<li><a href="##export"><img src="flow_classes/%23export-icon.png" alt="[#export]" border="0"></a></li>
+<li><a href="##export_list"><img src="flow_classes/%23export_list-icon.png" alt="[#export_list]" border="0"></a></li>
+<li><a href="##export_symbol"><img src="flow_classes/%23export_symbol-icon.png" alt="[#export_symbol]" border="0"></a></li>
+<li><a href="##pack"><img src="flow_classes/%23pack-icon.png" alt="[#pack]" border="0"></a></li>
+<li><a href="##color"><img src="flow_classes/%23color-icon.png" alt="[#color]" border="0"></a></li>
+<li><a href="##unpack"><img src="flow_classes/%23unpack-icon.png" alt="[#unpack]" border="0"></a></li>
+<li><a href="##centroid"><img src="flow_classes/%23centroid-icon.png" alt="[#centroid]" border="0"></a></li>
+<li><a href="##centroid2"><img src="flow_classes/%23centroid2-icon.png" alt="[#centroid2]" border="0"></a></li>
+<li><a href="##for"><img src="flow_classes/%23for-icon.png" alt="[#for]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Computing">Objects for Computing</a></h4><ul>
+<li><a href="##"><img src="flow_classes/%23-icon.png" alt="[#]" border="0"></a></li>
+<li><a href="#@complex_sq"><img src="flow_classes/@complex_sq-icon.png" alt="[@complex_sq]" border="0"></a></li>
+<li><a href="##fold"><img src="flow_classes/%23fold-icon.png" alt="[#fold]" border="0"></a></li>
+<li><a href="##scan"><img src="flow_classes/%23scan-icon.png" alt="[#scan]" border="0"></a></li>
+<li><a href="##outer"><img src="flow_classes/%23outer-icon.png" alt="[#outer]" border="0"></a></li>
+<li><a href="##inner"><img src="flow_classes/%23inner-icon.png" alt="[#inner]" border="0"></a></li>
+<li><a href="#@join"><img src="flow_classes/@join-icon.png" alt="[@join]" border="0"></a></li>
+<li><a href="##finished"><img src="flow_classes/%23finished-icon.png" alt="[#finished]" border="0"></a></li>
+<li><a href="##cast"><img src="flow_classes/%23cast-icon.png" alt="[#cast]" border="0"></a></li>
+<li><a href="##ravel"><img src="flow_classes/%23ravel-icon.png" alt="[#ravel]" border="0"></a></li>
+<li><a href="##grade"><img src="flow_classes/%23grade-icon.png" alt="[#grade]" border="0"></a></li>
+<li><a href="##perspective"><img src="flow_classes/%23perspective-icon.png" alt="[#perspective]" border="0"></a></li>
+<li><a href="##transpose"><img src="flow_classes/%23transpose-icon.png" alt="[#transpose]" border="0"></a></li>
+<li><a href="##fade"><img src="flow_classes/%23fade-icon.png" alt="[#fade]" border="0"></a></li>
+<li><a href="##fade_lin"><img src="flow_classes/%23fade_lin-icon.png" alt="[#fade_lin]" border="0"></a></li>
+<li><a href="##reverse"><img src="flow_classes/%23reverse-icon.png" alt="[#reverse]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Coordinate_Transforms">Objects for Coordinate Transforms</a></h4><ul>
+<li><a href="##redim"><img src="flow_classes/%23redim-icon.png" alt="[#redim]" border="0"></a></li>
+<li><a href="##store"><img src="flow_classes/%23store-icon.png" alt="[#store]" border="0"></a></li>
+<li><a href="##scale_to"><img src="flow_classes/%23scale_to-icon.png" alt="[#scale_to]" border="0"></a></li>
+<li><a href="##scale_by"><img src="flow_classes/%23scale_by-icon.png" alt="[#scale_by]" border="0"></a></li>
+<li><a href="##downscale_by"><img src="flow_classes/%23downscale_by-icon.png" alt="[#downscale_by]" border="0"></a></li>
+<li><a href="##spread"><img src="flow_classes/%23spread-icon.png" alt="[#spread]" border="0"></a></li>
+<li><a href="##rotate"><img src="flow_classes/%23rotate-icon.png" alt="[#rotate]" border="0"></a></li>
+<li><a href="##remap_image"><img src="flow_classes/%23remap_image-icon.png" alt="[#remap_image]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Reporting">Objects for Reporting</a></h4><ul>
+<li><a href="##dim"><img src="flow_classes/%23dim-icon.png" alt="[#dim]" border="0"></a></li>
+<li><a href="##type"><img src="flow_classes/%23type-icon.png" alt="[#type]" border="0"></a></li>
+<li><a href="##print"><img src="flow_classes/%23print-icon.png" alt="[#print]" border="0"></a></li>
+<li><a href="#rubyprint"><img src="flow_classes/rubyprint-icon.png" alt="[rubyprint]" border="0"></a></li>
+<li><a href="#printargs"><img src="flow_classes/printargs-icon.png" alt="[printargs]" border="0"></a></li>
+<li><a href="#display"><img src="flow_classes/display-icon.png" alt="[display]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Color_Conversion">Objects for Color Conversion</a></h4><ul>
+<li><a href="##apply_colormap_channelwise"><img src="flow_classes/%23apply_colormap_channelwise-icon.png" alt="[#apply_colormap_channelwise]" border="0"></a></li>
+<li><a href="##rgb_to_greyscale"><img src="flow_classes/%23rgb_to_greyscale-icon.png" alt="[#rgb_to_greyscale]" border="0"></a></li>
+<li><a href="##greyscale_to_rgb"><img src="flow_classes/%23greyscale_to_rgb-icon.png" alt="[#greyscale_to_rgb]" border="0"></a></li>
+<li><a href="##yuv_to_rgb"><img src="flow_classes/%23yuv_to_rgb-icon.png" alt="[#yuv_to_rgb]" border="0"></a></li>
+<li><a href="##rgb_to_yuv"><img src="flow_classes/%23rgb_to_yuv-icon.png" alt="[#rgb_to_yuv]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Miscellaneous_Picture_Processing">Objects for Miscellaneous Picture Processing</a></h4><ul>
+<li><a href="##convolve"><img src="flow_classes/%23convolve-icon.png" alt="[#convolve]" border="0"></a></li>
+<li><a href="##contrast"><img src="flow_classes/%23contrast-icon.png" alt="[#contrast]" border="0"></a></li>
+<li><a href="##posterize"><img src="flow_classes/%23posterize-icon.png" alt="[#posterize]" border="0"></a></li>
+<li><a href="##solarize"><img src="flow_classes/%23solarize-icon.png" alt="[#solarize]" border="0"></a></li>
+<li><a href="##checkers"><img src="flow_classes/%23checkers-icon.png" alt="[#checkers]" border="0"></a></li>
+<li><a href="##layer"><img src="flow_classes/%23layer-icon.png" alt="[#layer]" border="0"></a></li>
+<li><a href="##draw_image"><img src="flow_classes/%23draw_image-icon.png" alt="[#draw_image]" border="0"></a></li>
+<li><a href="##draw_polygon"><img src="flow_classes/%23draw_polygon-icon.png" alt="[#draw_polygon]" border="0"></a></li>
+<li><a href="##text_to_image"><img src="flow_classes/%23text_to_image-icon.png" alt="[#text_to_image]" border="0"></a></li>
+<li><a href="##hueshift"><img src="flow_classes/%23hueshift-icon.png" alt="[#hueshift]" border="0"></a></li>
+</ul>
+<h4><a href="#Other_Objects">Other Objects</a></h4><ul>
+<li><a href="#rtmetro"><img src="flow_classes/rtmetro-icon.png" alt="[rtmetro]" border="0"></a></li>
+<li><a href="#bindpatcher"><img src="flow_classes/bindpatcher-icon.png" alt="[bindpatcher]" border="0"></a></li>
+<li><a href="#pingpong"><img src="flow_classes/pingpong-icon.png" alt="[pingpong]" border="0"></a></li>
+<li><a href="##global"><img src="flow_classes/%23global-icon.png" alt="[#global]" border="0"></a></li>
+<li><a href="#fps"><img src="flow_classes/fps-icon.png" alt="[fps]" border="0"></a></li>
+<li><a href="#unix_time"><img src="flow_classes/unix_time-icon.png" alt="[unix_time]" border="0"></a></li>
+<li><a href="#ls"><img src="flow_classes/ls-icon.png" alt="[ls]" border="0"></a></li>
+<li><a href="#exec"><img src="flow_classes/exec-icon.png" alt="[exec]" border="0"></a></li>
+<li><a href="#renamefile"><img src="flow_classes/renamefile-icon.png" alt="[renamefile]" border="0"></a></li>
+<li><a href="#plotter_control"><img src="flow_classes/plotter_control-icon.png" alt="[plotter_control]" border="0"></a></li>
+<li><a href="#rubyarray"><img src="flow_classes/rubyarray-icon.png" alt="[rubyarray]" border="0"></a></li>
+</ul>
+<h4><a href="#jMax_emulation">jMax emulation</a></h4><ul>
+<li><a href="#fork"><img src="flow_classes/fork-icon.png" alt="[fork]" border="0"></a></li>
+<li><a href="#jmax_udpsend"><img src="flow_classes/jmax_udpsend-icon.png" alt="[jmax_udpsend]" border="0"></a></li>
+<li><a href="#jmax_udpreceive"><img src="flow_classes/jmax_udpreceive-icon.png" alt="[jmax_udpreceive]" border="0"></a></li>
+<li><a href="#foreach"><img src="flow_classes/foreach-icon.png" alt="[foreach]" border="0"></a></li>
+<li><a href="#rubysprintf"><img src="flow_classes/rubysprintf-icon.png" alt="[rubysprintf]" border="0"></a></li>
+<li><a href="#listflatten"><img src="flow_classes/listflatten-icon.png" alt="[listflatten]" border="0"></a></li>
+<li><a href="#listmake"><img src="flow_classes/listmake-icon.png" alt="[listmake]" border="0"></a></li>
+<li><a href="#listlength"><img src="flow_classes/listlength-icon.png" alt="[listlength]" border="0"></a></li>
+<li><a href="#listelement"><img src="flow_classes/listelement-icon.png" alt="[listelement]" border="0"></a></li>
+<li><a href="#listsublist"><img src="flow_classes/listsublist-icon.png" alt="[listsublist]" border="0"></a></li>
+<li><a href="#listprepend"><img src="flow_classes/listprepend-icon.png" alt="[listprepend]" border="0"></a></li>
+<li><a href="#listappend"><img src="flow_classes/listappend-icon.png" alt="[listappend]" border="0"></a></li>
+<li><a href="#listreverse"><img src="flow_classes/listreverse-icon.png" alt="[listreverse]" border="0"></a></li>
+<li><a href="#oneshot"><img src="flow_classes/oneshot-icon.png" alt="[oneshot]" border="0"></a></li>
+<li><a href="#inv+"><img src="flow_classes/inv+-icon.png" alt="[inv+]" border="0"></a></li>
+<li><a href="#inv*"><img src="flow_classes/inv*-icon.png" alt="[inv*]" border="0"></a></li>
+<li><a href="#messageprepend"><img src="flow_classes/messageprepend-icon.png" alt="[messageprepend]" border="0"></a></li>
+<li><a href="#messageappend"><img src="flow_classes/messageappend-icon.png" alt="[messageappend]" border="0"></a></li>
+<li><a href="#shunt"><img src="flow_classes/shunt-icon.png" alt="[shunt]" border="0"></a></li>
+<li><a href="#demux"><img src="flow_classes/demux-icon.png" alt="[demux]" border="0"></a></li>
+<li><a href="#range"><img src="flow_classes/range-icon.png" alt="[range]" border="0"></a></li>
+</ul>
+<h4><a href="#PureData_emulation">PureData emulation</a></h4><ul>
+<li><a href="#pd_netsend"><img src="flow_classes/pd_netsend-icon.png" alt="[pd_netsend]" border="0"></a></li>
+<li><a href="#pd_netreceive"><img src="flow_classes/pd_netreceive-icon.png" alt="[pd_netreceive]" border="0"></a></li>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_making_grids_and_breaking_them_down"></a><h4>Objects for making grids and breaking them down</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#import">#import</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23import-icon.png" alt="[#import]" border="0"><br clear="left"><br><br><a href="#importexport"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <p>This object allows you to produce grids from non-grid data, such as 
+		integers and lists of integers. This object also reframes/resyncs 
+		grids so that multiple grids may be joined together, or 
+		single grids may be split. That kind of operation is already done implicitly in many 
+		cases (e.g. sending an integer or list to a grid-receiving inlet), 
+		but using this object you have greater flexibility on the conversion.</p> <br><b>attr</b>&nbsp;shape <b>(</b><b><i>GridShape|symbol(per_message)</i> shape</b><b>)</b>  <br><b>attr</b>&nbsp;cast <b>(</b><b><i>NumberType</i> cast</b><b>)</b>  <br><b>method</b>&nbsp;init <b>(</b>shape<b>, </b>cast<b>)</b>    <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				begins a new grid if there is no current grid. 
+				puts that integer in the current grid. 
+				ends the grid if it is full. 
+				the constructed grid is not stored: it is streamed. 
+				the stream is buffered, so the output is in packets 
+				of about a thousand numbers. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+				just like a sequence of ints sent one after another, 
+				except in a single message. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b>  
+				considered as a list of ascii characters. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;reset <b>(</b><b>)</b>  
+				aborts the current grid if there is one. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>   
+				this is the equivalent of filtering this grid through 
+				an <kbd><font color="#007777">[#export]</font></kbd> object and sending the resulting integers 
+				to this <kbd><font color="#007777">[#import]</font></kbd> object, except that it's over 
+				10 times faster. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;per_message <b>(</b><b>)</b>  
+				old synonym for "shape per_message" <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+				the grid produced from incoming integers and/or grids. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#export">#export</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23export-icon.png" alt="[#export]" border="0"><br clear="left"><br><br><a href="#importexport"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>this object is the opposite of #import.</p> <br><b>method</b>&nbsp;init <b>(</b><b>)</b>  
+			this object is not configurable because there isn't 
+			anything that could possibly be configured here. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				transforms this grid into a sequence of integer messages. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				elements of the incoming grid. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#export_list">#export_list</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23export_list-icon.png" alt="[#export_list]" border="0"><br clear="left"><br><br><a href="#importexport"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>this object is another opposite of <kbd><font color="#007777">[#import]</font></kbd>, which puts 
+		all of its values in a list.</p> <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				transforms this grid into a single message containing 
+				a list of integers. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+				elements of the incoming grid. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#export_symbol">#export_symbol</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23export_symbol-icon.png" alt="[#export_symbol]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>this object is another opposite of #import, which constructs a symbol 
+		from its input. The values are expected to be valid ASCII codes, but no check 
+		will be performed for that, and additionally, no check will be made that the generated 
+		symbol only contains characters that can be put in a symbol.</p> <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				transforms this grid into a single message containing 
+				a list of integers. <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> generated symbol<br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#pack">#pack</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23pack-icon.png" alt="[#pack]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Similar to <kbd><font color="#007777">[#join]</font></kbd>, but takes individual integers, and builds a Dim(N) vector out of it. </p> <br><b>attr</b>&nbsp;trigger_by <b>(</b><b><i>TriggerBy</i> trigger_by</b><b>)</b>  <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> inputs<b>)</b>   <br>
+ <br><b>inlet&nbsp;* </b><b>method</b>&nbsp;int <b>(</b><b>)</b> <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><b>)</b>  
+			combination of inputs given in all inlets. 
+			this is produced according to the value of the trigger attribute. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#color">#color</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23color-icon.png" alt="[#color]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Triple slider for the selection of RGB values.</p> <br><b>method</b>&nbsp;init <b>(</b><i>float</i> min<b>, </b><i>float</i> max<b>, </b><i>0,1</i> hidepreview<b>)</b>     <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><b>)</b>  
+			Produces a Dim(3) grid of RGB values. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#unpack">#unpack</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23unpack-icon.png" alt="[#unpack]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> outputs<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid(N) <b>(</b><b>)</b>  
+			the input vector is split in N parts containing one number each. 
+			numbers are sent left-to-right, that is, outlet 0 is triggered first, then outlet 1, etc. <br>
+ <br><b>outlet&nbsp;* </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#centroid">#centroid</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23centroid-icon.png" alt="[#centroid]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid(rows,columns,1) <b>(</b><b>)</b>  
+			will compute the centroid of the given grid, which 
+			is a weighted average, namely, the average position weighted 
+			by the pixel values. <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid(2) <b>(</b><b>)</b>  
+			result <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#centroid2">#centroid2</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23centroid2-icon.png" alt="[#centroid2]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		a new experimental and faster version of #centroid. <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid(rows,columns,1) <b>(</b><b>)</b>  
+			will compute the centroid of the given grid, which 
+			is a weighted average, namely, the average position weighted 
+			by the pixel values. <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid(2) <b>(</b><b>)</b>  
+			result <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#for">#for</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23for-icon.png" alt="[#for]" border="0"><br clear="left"><br><br><a href="#for"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <p>when given scalar bounds, works like a regular <kbd><font color="#007777">[for]</font></kbd> object plugged 
+		to a <kbd><font color="#007777">[#import]</font></kbd> tuned for a Dim(size) where size is the number of values 
+		produced by a bang to that <kbd><font color="#007777">[for]</font></kbd>.</p> <p>when given vector bounds, will work like any number of [for] objects 
+		producing all possible combinations of their values in the proper order. 
+		This replaces the old <kbd><font color="#007777">[#identity_transform]</font></kbd> object.</p> <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> from<b>, </b><i>integer</i> to<b>, </b><i>integer</i> step<b>)</b>     <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(index)</i> grid<b>)</b>  
+			replaces the "from" value and produces output. <br>
+ <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(index)</i> grid<b>)</b>  
+			replaces the "to" value. <br>
+ <br><b>inlet&nbsp;2 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(index_steps)</i> grid<b>)</b>  
+			replaces the "step" value. <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(size)</i> grid<b>)</b>  
+				where size is floor((to-from+1)/step) 
+				[for scalar bounds] <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(*size,dimension)</i> grid<b>)</b>  
+				where *size is floor((to-from+1)/step) 
+				[for vector bounds] <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Computing"></a><h4>Objects for Computing</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#">#</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23-icon.png" alt="[#]" border="0"><br clear="left"><br><br><a href="#"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <br><b>attr</b>&nbsp;op <b>(</b><b><i>grid</i> op</b><b>)</b>  <br><b>attr</b>&nbsp;right_hand <b>(</b><b><i>grid</i> right_hand</b><b>)</b>  <p>This object outputs a grid by computing "in parallel" a same 
+		operation on each left-hand element with its corresponding right-hand 
+		element. </p> <br><b>method</b>&nbsp;init <b>(</b>op<b>, </b>right_hand<b>)</b>    <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				on each element of this grid, perform the operation 
+				together with the corresponding element of inlet 1. 
+				in the table of operators (at the top of this document) 
+				elements of inlet 0 are called "A" and elements of inlet 1 
+				are called "B". the resulting grid is the same size as the 
+				one in inlet 0. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				any grid, preferably shaped like the one that will be put 
+				in the left inlet, or like a subpart of it (anyway the contents 
+				will be redim'ed on-the-fly to fit the grid of inlet-0, 
+				but the stored grid will not be modified itself) <br>
+ <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				stores a single int in the right inlet; the same int will 
+				be applied in all computations; this is like sending a 
+				Dim(1) or Dim() grid with that number in it. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="@complex_sq">@complex_sq</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/@complex_sq-icon.png" alt="[@complex_sq]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>this object computes the square of complex numbers. 
+		If seeing imaginary as Y and real as X, then this operation squares 
+		the distance of a point from origin and doubles the angle between it 
+		and the +X half-axis clockwise. (fun, eh?) </p> <p>used on an indexmap, this makes each thing appear twice, 
+		each apparition spanning half of the original angle.</p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims... {imaginary real})</i> grid<b>)</b>   <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims... {imaginary real})</i> grid<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#fold">#fold</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23fold-icon.png" alt="[#fold]" border="0"><br clear="left"><br><br><a href="#foldinnerouter"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <p><ul> <li><b>1</b> : <kbd><font color="#007777">[#fold +]</font></kbd> computes totals</li> <li><b>2</b> : <kbd><font color="#007777">[#fold inv+]</font></kbd> is an alternated sum (+/-)</li> <li><b>3</b> : <kbd><font color="#007777">[#fold * 1]</font></kbd> can compute the size of a grid using its dimension list</li> <li><b>4</b> : <kbd><font color="#007777">[#fold &amp; 1]</font></kbd> can mean "for all"</li> <li><b>5</b> : <kbd><font color="#007777">[#fold | 0]</font></kbd> can mean "there exists (at least one)"</li> <li><b>6</b> : <kbd><font color="#007777">[#fold ^ 0]</font></kbd> can mean "there exists an odd number of..."</li> <li><b>7</b> : <kbd><font color="#007777">[#fold ^ 1]</font></kbd> can mean "there exists an even number of...".</li> </ul></p> <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> operator<b>, </b><i>grid</i> seed<b>, </b><i>grid</i> right_hand<b>)</b>     <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims..., last)</i> grid<b>)</b>  
+				replaces every Dim(last) subgrid by the result of a cascade on that subgrid. 
+				Doing that 
+				with seed value 0 and operation + on grid "2 3 5 7" will compute 
+				((((0+2)+3)+5)+7) find the total "17". 
+				produces a Dim(dims) grid. <br>
+    <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#scan">#scan</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23scan-icon.png" alt="[#scan]" border="0"><br clear="left"><br><br><a href="#scan"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <p><kbd><font color="#007777">[#scan +]</font></kbd> computes subtotals; this can be used, for example, 
+		to convert a regular probability distribution into a cumulative one. 
+		(or in general, discrete integration) </p> <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> operator<b>, </b><i>grid</i> seed<b>)</b>    <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims..., last)</i> grid<b>)</b>  
+				replaces every Dim(last) subgrid by all the results of 
+				cascading the operator on that subgrid, 
+				producing a Dim(dims,last) grid. 
+				For example, with base value 0 and operation + on grid "2 3 5 
+				7" will compute 0+2=2, 2+3=5, 5+5=10, 10+7=17, and give the 
+				subtotals "2 5 10 17". <br>
+     <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#outer">#outer</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23outer-icon.png" alt="[#outer]" border="0"><br clear="left"><br><br><a href="#foldinnerouter"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> operator<b>, </b><i>grid</i> value<b>)</b>    
+			the operator must be picked from the table of two-input operators. 
+			the grid is optional and corresponds to inlet 1. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyA...)</i> grid<b>)</b> <br>
+ 
+			produces a grid of size Dim(anyA..., anyB...), where numbers 
+			are the results of the operation on every element of A and 
+			every element of B. the resulting array can be very big. Don't 
+			try this on two pictures (the result will have 6 dimensions)   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyB...)</i> grid<b>)</b> <br>
+ 
+			stores the specified grid, to be used when inlet 0 is activated.    <p>When given a grid of Dim(3) and a grid of Dim(5) <kbd><font color="#007777">[#outer]</font></kbd> will 
+		produce  a grid of Dim(3,5) with the selected two-input operation 
+		applied on each  of the possible pairs combinations between numbers 
+		from the left grid  and the ones from the right. for example : 
+		(10,20,30) [#outer +] (1,2,3)  will give : 
+		((11,12,13),(21,22,23),(31,32,33)) </p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#inner">#inner</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23inner-icon.png" alt="[#inner]" border="0"><br clear="left"><br><br><a href="#inner"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>think of this one as a special combination of <kbd><font color="#007777">[#outer]</font></kbd>, <kbd><font color="#007777">[#]</font></kbd> and <kbd><font color="#007777">[#fold]</font></kbd>. this is one of the most complex operations. It is very useful 
+		for performing linear transforms like rotations, scalings, shearings, 
+		and some kinds of color remappings. A linear transform is done by 
+		something called matrix multiplication, which happens to be <kbd><font color="#007777">[#inner * + 
+		0]</font></kbd>. <kbd><font color="#007777">[#inner]</font></kbd> also does dot product and other funny operations.</p> <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> op_para<b>, </b><i>numop2</i> op_fold<b>, </b><i>integer</i> base<b>, </b><i>grid</i> right_hand<b>)</b>      
+			op_para and op_fold are two operators picked from the table 
+			of two-input operators. 
+			the base value has to be specified (has no default value yet). <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyA..., lastA)</i> grid<b>)</b>  
+				Splits the Dim(anyA...,lastA) left-hand grid into Dim(anyA...) 
+				pieces of Dim(lastA) size. 
+				Splits the Dim(firstB,anyB...) right-hand grid into 
+				Dim(anyB...) pieces of Dim(firstB) size. 
+				On every piece pair, does <kbd><font color="#007777">[#]</font></kbd> using the specified 
+				op_para operation, followed by a <kbd><font color="#007777">[#fold]</font></kbd> using 
+				the specified op_fold operator and base value. 
+				creates a Dim(anyA...,anyB...) grid by assembling all 
+				the results together. 
+				(note: lastA must be equal to firstB.) <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				changes the base value to that. <br>
+   <br><b>inlet&nbsp;2 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyB..., lastB)</i> grid<b>)</b>  
+				changes the right-hand side grid to that. <br>
+    <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="@join">@join</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/@join-icon.png" alt="[@join]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b>which_dim<b>)</b>   
+			Which_dim is the number of the dimension by which the join will 
+			occur. For N-dimensional grids, the dimensions are numbered from 0 
+			to N-1. In addition, negative numbers from -N to -1 may be used, to 
+			which N will be added. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+				The left grid and right grid must have the same number 
+				of elements in all dimensions except the one specified. 
+				The result will have the same number of elements in all 
+				dimensions except the one specified, which will be the 
+				sum of the two corresponding one. <p>For example, joining a RGB picture Dim[y,x,3] and a 
+				greyscale picture Dim[y,x,1] on dimension 2 (or -1) could 
+				make a RGBA picture Dim[y,x,4] in which the greyscale image 
+				becomes the opacity channel. </p> <br>
+  <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> <br>
+   <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#finished">#finished</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23finished-icon.png" alt="[#finished]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> any grid<br>
+   
+			a bang is emitted every time a grid transmission ends.  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#cast">#cast</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23cast-icon.png" alt="[#cast]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>numbertype</i> numbertype<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> any grid<br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> a grid of the same shape containing all the same 
+			values after type conversion. note that while casting to 
+			a smaller type, values that are overflowing will be truncated. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#ravel">#ravel</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23ravel-icon.png" alt="[#ravel]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> any grid<br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+			like <kbd><font color="#007777">[#redim]</font></kbd> but always produce a 1-D grid 
+			with the same total number of elements. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#grade">#grade</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23grade-icon.png" alt="[#grade]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> any grid<br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  <p>splits a Dim[A...,B] grid into Dim[B] vectors, 
+			producing new Dim[B] vectors that each contain numbers from 
+			0 to B-1 indicating the ordering of the values. The result is 
+			a Dim[A...,B] grid.</p> <p>for example, connecting a [#grade] to a <kbd><font color="#007777">[#outer ignore {0}]</font></kbd> 
+			to a <kbd><font color="#007777">[#store]</font></kbd> object, storing a single vector into <kbd><font color="#007777">[#store]</font></kbd>, and 
+			sending the same vector to <kbd><font color="#007777">[#grade]</font></kbd>, will sort the values of the 
+			vector. however for higher-dimensional grids, what should go 
+			between <kbd><font color="#007777">[#store]</font></kbd> and <kbd><font color="#007777">[#grade]</font></kbd> to achieve the same result would 
+			be more complex.</p> <p>you may achieve different kinds of sorting by applying various 
+			filters before <kbd><font color="#007777">[#grade]</font></kbd>. the possibilities are unlimited.</p> <p>if you plug <kbd><font color="#007777">[#grade]</font></kbd> directly into another <kbd><font color="#007777">[#grade]</font></kbd>, you will 
+			get the inverse arrangement, which allows to take the sorted values 
+			and make them unsorted in the original way. note that this is really 
+			not the same as just listing the values backwards.</p> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#perspective">#perspective</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23perspective-icon.png" alt="[#perspective]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> depth<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> any grid<br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  <p>transforms a Dim[A...,B] grid into a Dim[A...,B-1] grid. 
+			There is a projection plane perpendicular to the last axis and 
+			whose position is given by the "depth" parameter. Each vector's 
+			length is adjusted so that it lies onto that plane. Then the 
+			last dimension of each vector is dropped.</p> <p>useful for converting from 3-D geometry to 2-D geometry. Also 
+			useful for converting homogeneous 3-D into regular 3-D, as 
+			homogeneous 3-D is really just regular 4-D...(!)</p> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#transpose">#transpose</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23transpose-icon.png" alt="[#transpose]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> dim1<b>, </b><i>integer</i> dim2<b>)</b>    <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+			swaps the two specified dimensions; dimension numbers are as in <kbd><font color="#007777">[#join]</font></kbd>. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#fade">#fade</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23fade-icon.png" alt="[#fade]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> rate<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+			produces on outlet 0 a linear recurrent fading according to the flow of 
+			incoming messages. For example, if rate=5, then 20% (one fifth) 
+			of each new message will be blended with 80% of the previous output. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#fade_lin">#fade_lin</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23fade_lin-icon.png" alt="[#fade_lin]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> maxraise<b>, </b><i>integer</i> maxdrop<b>)</b>    <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+			produces on outlet 0 a piecewise-linear nonrecurrent fading according to the flow of 
+			incoming messages. For example, if maxraise=2 and maxdrop=4, then with each 
+			new message an output is produced that is at most 2 more or 4 less than the 
+			previous output. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#reverse">#reverse</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23reverse-icon.png" alt="[#reverse]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b>whichdim<b>)</b>   
+			Whichdim is the number of the dimension by which the reverse will 
+			occur. For N-dimensional grids, the dimensions are numbered from 0 
+			to N-1. In addition, negative numbers from -N to -1 may be used, to 
+			which N will be added. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Coordinate_Transforms"></a><h4>Objects for Coordinate Transforms</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#redim">#redim</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23redim-icon.png" alt="[#redim]" border="0"><br clear="left"><br><br><a href="#redim"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <br><b>method</b>&nbsp;init <b>(</b><i>dim_list</i> dims<b>)</b>   
+			a list specifying a grid shape that the numbers 
+			will fit into. 
+			(same as with <kbd><font color="#007777">[#import]</font></kbd>) <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+			the elements of this grid are serialized. if the resulting grid 
+			must be larger, the sequence is repeated as much as necessary. 
+			if the resulting grid must be smaller, the sequence is truncated. 
+			then the elements are deserialized to form the resulting grid. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rank)</i> grid<b>)</b>  
+				this grid is a dimension list that replaces the one 
+				specified in the constructor. 
+				(same as with <kbd><font color="#007777">[#import]</font></kbd>) <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+				redimensioned grid potentially containing repeating data. <br>
+  <p>example: with a 240 320 RGB image, <kbd><font color="#007777">[#redim 120 640 3]</font></kbd> will visually 
+		separate the even lines (left) from the odd lines (right). contrary 
+		to this, <kbd><font color="#007777">[#redim 640 120 3]</font></kbd> will split every line and put its left half 
+		on a even line and the right half on the following odd line. <kbd><font color="#007777">[#redim]</font></kbd> 
+		480 320 3 will repeat the input image twice in the output image. <kbd><font color="#007777">[#redim]</font></kbd> 240 50 3 will only keep the 50 top lines.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#store">#store</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23store-icon.png" alt="[#store]" border="0"><br clear="left"><br><br><a href="#store"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>A <kbd><font color="#007777">[#store]</font></kbd> object can store exactly one grid, using the right 
+		inlet. You fetch it back, or selected subparts thereof, using the left 
+		inlet.</p> <br><b>method</b>&nbsp;init <b>(</b><i>grid</i> contents<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b>  
+				the stored grid is fully sent to the outlet. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims..., indices)</i> grid<b>)</b>  
+				in this grid, the last dimension refers to subparts of 
+				the stored grid. sending a Dim(200,200,2) on a <kbd><font color="#007777">[#store]</font></kbd> 
+				that holds a Dim(240,320,3) will cause the <kbd><font color="#007777">[#store]</font></kbd> to handle 
+				the incoming grid as a Dim(200,200) of Dim(2)'s, where each 
+				Dim(2) represents a position in a Dim(240,320) of Dim(3)'s. 
+				therefore the resulting grid will be a Dim(200,200) of 
+				Dim(3) which is a Dim(200,200,3). in practice this example 
+				would be used for generating a 200*200 RGB picture from a 
+				200*200 XY map and a 240*320 RGB picture. this object can 
+				be logically used in the same way for many purposes 
+				including color palettes, tables of probabilities, tables 
+				of statistics, whole animations, etc. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+			replace the whole grid, or a subpart of it (see other options on inlet 1) <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;reassign <b>(</b><b>)</b> (Future Use): 
+				makes it so that sending a grid to inlet 1 detaches the old buffer from [#store] 
+				and attaches a new one instead.  This is the default. <br>
+ <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;put_at <b>(</b>indices...<b>)</b> (Future Use): 
+				makes it so that sending a grid to inlet 1 writes into the existing buffer of [#store]. <p> 
+				example: suppose you have <kbd><font color="#007777">[#store {10 240 320 3}]</font></kbd>. then "put_at 3" 
+				will allow to write a Dim[240,320,3] grid in indices (3,y,x,c) where y,x,c are indices of the incoming grid; 
+				in other words, if that's a buffer of 10 RGB frames, you'd be replacing frame #3. Furthermore, 
+				it also allows you to write a Dim[n,240,320,3] grid at (3+f,y,x,c) where f,y,x,c are indices of the incoming grid, 
+				replacing frame #3, #4, ... up to #3+n-1. Here n is at most 7 because the last frame in the buffer is #9. </p> <p>that way of working extends to other kinds of data you'd put in Grids, in any numbers of dimensions; 
+				because, as usual, [#store] wouldn't know the difference. </p> <br>
+   
+			grids as stored, as indexed, or as assembled from multiple 
+			indexings.  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#scale_to">#scale_to</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23scale_to-icon.png" alt="[#scale_to]" border="0"><br clear="left"><br><br><a href="#scale_to"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <br><b>method</b>&nbsp;init <b>(</b>size<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> a 3-channel picture to be scaled.<br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b> a {height width} pair.<br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> a scaled 3-channel picture.<br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#scale_by">#scale_by</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23scale_by-icon.png" alt="[#scale_by]" border="0"><br clear="left"><br><br><a href="#scale_by"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <br><b>method</b>&nbsp;init <b>(</b><i>grid dim() or dim(2)</i> factor<b>)</b>   
+			factor is optional (default is 2). 
+			if it's a single value, then that factor is to be used 
+			for both rows and columns. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+			duplicates each pixel several times in width and several times in height, 
+			where the number of times is determined by the factor described above. 
+			twice those of the incoming grid. It is several times faster. <br>
+  <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(1 or 2)</i> grid<b>)</b> sets factor<br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid((factor*y) (factor*x) channels)</i> grid<b>)</b>   <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#downscale_by">#downscale_by</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23downscale_by-icon.png" alt="[#downscale_by]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>+integer</i> factor<b>, </b><i>optional symbol(smoothly)</i> how<b>)</b>    
+			factor is optional (default is 2). 
+			if it's a single value, then that factor is to be used 
+			for both rows and columns. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+			Scales down picture by specified amount. (See scale factor above) <br>
+  <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(1 or 2)</i> grid<b>)</b>  sets scale factor<br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid((factor/y) (factor/x) channels)</i> grid<b>)</b>   <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#spread">#spread</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23spread-icon.png" alt="[#spread]" border="0"><br clear="left"><br><br><a href="#spread"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>typically you plug a <kbd><font color="#007777">[#for]</font></kbd> into this object, 
+		and you plug this object into the left side of a <kbd><font color="#007777">[#store]</font></kbd>. it will 
+		scatter pixels around, giving an "unpolished glass" effect.</p> <p>if you put a picture in it, however, it will add noise. The 
+		resulting values may be out of range, so you may need to clip them 
+		using min/max.</p> <br><b>method</b>&nbsp;init <b>(</b>factor<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> a coordinate map.<br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b> a spread factor.<br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b> a coordinate map.<br>
+  <p><kbd><font color="#007777">[#spread]</font></kbd> scatters the pixels in an image. Not all original pixels 
+		will  appear, and some may get duplicated (triplicated, etc) 
+		randomly. Some  wrap-around effect will occur close to the edges. </p> <p> Sending an integer to inlet 1 sets the amount of spreading in 
+		maximum  number of pixels + 1. even values translate the whole image 
+		by half  a pixel due to rounding.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#rotate">#rotate</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23rotate-icon.png" alt="[#rotate]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>performs rotations on indexmaps and polygons and such.</p> <br><b>method</b>&nbsp;init <b>(</b><i>0...35999</i> angle<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyA 2)</i> grid<b>)</b>  <br>
+ <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b> rotation angle; 0...36000<br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(anyA 2)</i> grid<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#remap_image">#remap_image</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23remap_image-icon.png" alt="[#remap_image]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>if you chain indexmap (coordinate) transformations from outlet 1 
+		to inlet 1, then sending an image in inlet 0 will emit its 
+		deformation out of outlet 0.</p>     <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Reporting"></a><h4>Objects for Reporting</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#dim">#dim</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23dim-icon.png" alt="[#dim]" border="0"><br clear="left"><br><br><a href="#dim"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>Returns list of dimensions as a grid. Given a grid sized like Dim(240,320,4), <kbd><font color="#007777">[#dim]</font></kbd> will return a grid like Dim(3), whose values are 240, 320, 4. </p> <br><b>method</b>&nbsp;init <b>(</b><b>)</b>  
+			no arguments. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+				ignores any data contained within. 
+				sends a grid dim(length of dims) containing dims. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rank)</i> grid<b>)</b>  
+				the list of dimensions of the incoming grid. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#type">#type</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23type-icon.png" alt="[#type]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>gives a symbol representing the numeric type of the grid received. </p> <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;&lt;numeric type symbol&gt; <b>(</b><b>)</b> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#print">#print</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23print-icon.png" alt="[#print]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(dims...)</i> grid<b>)</b>  
+			prints the dimensions of the grid. 
+			prints all the grid data if there are 2 dimensions or less. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="rubyprint">rubyprint</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/rubyprint-icon.png" alt="[rubyprint]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This is only for testing the translation from PD to Ruby. <br><b>method</b>&nbsp;init <b>(</b><b>)</b> <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;(any) <b>(</b><b>)</b>  
+			prints the message to the console. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="printargs">printargs</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/printargs-icon.png" alt="[printargs]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This is only for testing the translation from PD to Ruby. <br><b>method</b>&nbsp;init <b>(</b>any...<b>)</b>   
+			prints everything. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="display">display</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/display-icon.png" alt="[display]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		GUI object equivalent to [print] and [#print]. <br><b>method</b>&nbsp;(any) <b>(</b><b>)</b>  
+		Displays the received message in the box, resizing the box so that the message fits exactly. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Color_Conversion"></a><h4>Objects for Color Conversion</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#apply_colormap_channelwise">#apply_colormap_channelwise</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23apply_colormap_channelwise-icon.png" alt="[#apply_colormap_channelwise]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>This object is useful for color correction. For each pixel 
+		it takes it apart, looks up each part separately in the colormap, 
+		and constructs a new pixel from that. You may also color-correct 
+		colormaps themselves.</p> <p>Only works for things that have 3 channels.</p> <p>Note: if you just need to apply a palette on an indexed-color 
+		picture, you don't need this. Just use #store instead.</p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>   
+			picture <br>
+  <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(intensities channels)</i> grid<b>)</b>   
+			colormap ("palette") <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>   
+			picture <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#rgb_to_greyscale">#rgb_to_greyscale</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23rgb_to_greyscale-icon.png" alt="[#rgb_to_greyscale]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {white})</i> grid<b>)</b>  <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#greyscale_to_rgb">#greyscale_to_rgb</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23greyscale_to_rgb-icon.png" alt="[#greyscale_to_rgb]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {white})</i> grid<b>)</b>  <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#yuv_to_rgb">#yuv_to_rgb</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23yuv_to_rgb-icon.png" alt="[#yuv_to_rgb]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>note: may change slightly to adapt to actual video standards.</p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {y u v})</i> grid<b>)</b>  <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#rgb_to_yuv">#rgb_to_yuv</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23rgb_to_yuv-icon.png" alt="[#rgb_to_yuv]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>note: may change slightly to adapt to actual video standards.</p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>  <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {y u v})</i> grid<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Miscellaneous_Picture_Processing"></a><h4>Objects for Miscellaneous Picture Processing</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#convolve">#convolve</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23convolve-icon.png" alt="[#convolve]" border="0"><br clear="left"><br><br><a href="#convolve"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p>this is the object for blurring, sharpening, finding edges, 
+		embossing, cellular automata, and many other uses.</p> <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> op_para<b>, </b><i>numop2</i> op_fold<b>, </b><i>grid</i> seed<b>, </b><i>grid</i> right_hand<b>)</b>      <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns rest...)</i> grid<b>)</b>   
+				splits the incoming grid into dim(rest...) parts. 
+				for each of those parts at (y,x), a rectangle of such 
+				parts, centered around (y,x), is combined with the 
+				convolution grid like a <kbd><font color="#007777">[#]</font></kbd> of operation op_para. Then 
+				each such result is folded like <kbd><font color="#007777">[#fold]</font></kbd> of operation 
+				op_fold and specified base. the results are assembled 
+				into a grid that is sent to the outlet. near the borders of 
+				the grid, coordinates wrap around. this means the whole grid 
+				has to be received before production of the next grid 
+				starts. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows2 columns2)</i> grid<b>)</b>   
+				this is the convolution grid and it gets stored in 
+				the object. if rows2 and/or columns2 are odd numbers, 
+				then the centre of convolution is the middle of the convolution 
+				grid. if they are even numbers, then the chosen centre will 
+				be slightly more to the left and/or to the top, because the 
+				actual middle is between cells of the grid. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns rest...)</i> grid<b>)</b>   <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#contrast">#contrast</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23contrast-icon.png" alt="[#contrast]" border="0"><br clear="left"><br><br><a href="#contrast"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <br><b>method</b>&nbsp;init <b>(</b>iwhiteness<b>, </b>contrast<b>)</b>    <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>   
+			produces a grid like the incoming grid but with 
+			different constrast. <br>
+ <p><kbd><font color="#007777">[#contrast]</font></kbd> adjusts the intensity in an image. 
+			resulting values outside 0-255 are automatically clipped.</p>   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+			this is the secondary contrast (inverse whiteness). 
+			it makes the incoming black 
+			correspond to a certain fraction between output black and the 
+			master contrast value. no effect is 256. default value is 256. <br>
+   <br><b>inlet&nbsp;2 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+			this is the master contrast. it makes the incoming white 
+			correspond to a certain fraction between output black and output 
+			white. no effect is 256. default value is 256. <br>
+   <br><b>outlet&nbsp; </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>   <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#posterize">#posterize</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23posterize-icon.png" alt="[#posterize]" border="0"><br clear="left"><br><br><a href="#posterize"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p><kbd><font color="#007777">[#posterize]</font></kbd> reduces the number of possible intensities in an image; 
+		it rounds the color values.The effect is mostly apparent with a low 
+		number of levels.</p> <br><b>method</b>&nbsp;init <b>(</b>levels<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>   
+				produces a posterized picture from the input picture. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				this is the number of possible levels per channel. the 
+				levels are equally spaced, with the lowest at 0 and the 
+				highest at 255. the minimum number of levels is 2, and the 
+				default value is 2. <br>
+    <p>example: simulate the 216-color "web" palette using 6 levels. 
+		simulate a 15-bit display using 32 levels.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#solarize">#solarize</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23solarize-icon.png" alt="[#solarize]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>makes medium intensities brightest; formerly brightest colours 
+		become darkest; formerly darkest stays darkest. This filter is linear: 
+		it's like a 200% contrast except that overflows are <i>mirrored</i> 
+		instead of clipped or wrapped.</p>  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>  <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns channels)</i> grid<b>)</b>  <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#checkers">#checkers</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23checkers-icon.png" alt="[#checkers]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x {y x})</i> grid<b>)</b>   
+				result from a <kbd><font color="#007777">[#for {0 0} {height width} {1 1}]</font></kbd> <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x {r g b})</i> grid<b>)</b>   
+				checkered pattern of 50%/75% greys 
+				in 8x8 squares <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#layer">#layer</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23layer-icon.png" alt="[#layer]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x {r g b a})</i> grid<b>)</b>   
+				a picture that has an opacity channel. 
+				will be used as foreground. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x {r g b})</i> grid<b>)</b>   
+				a picture that has NO opacity channel. 
+				will be used as background. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x {r g b})</i> grid<b>)</b>   
+				a picture that has NO opacity channel. 
+				the opacity channel of the foreground is used as 
+				a weighting of how much of either picture is seen 
+				in the result. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#draw_image">#draw_image</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23draw_image-icon.png" alt="[#draw_image]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> operator<b>, </b><i>grid(y,x,channels)</i> picture<b>, </b><i>grid({y x})</i> position<b>)</b>     <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+				picture onto which another picture will be superimposed. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;tile <b>(</b><i>0 or 1</i> flag<b>)</b>  
+				if enabled, inlet 1 picture will be repeated to cover the inlet 0 picture. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;alpha <b>(</b><i>0 or 1</i> flag<b>)</b>  
+				if enabled, inlet 1 picture will be combined with inlet 0 picture using 
+				the selected operator, 
+				and then blended with inlet 0 picture according to transparency of 
+				the inlet 1 picture, and then inserted in the result. 
+				if disabled, the blending doesn't occur, as the transparency level 
+				is considered to be "opaque". note that with alpha enabled, 
+				the last channel of inlet 1 picture is considered to represent transparency. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+				picture that will be superimposed onto another picture. <br>
+   <br><b>inlet&nbsp;2 </b><b>method</b>&nbsp;grid <b>(</b><i>grid({y x})</i> grid<b>)</b>  
+				position of the inlet 0 picture corresponding to top-left corner 
+				of inlet 1 picture. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+				resulting picture. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#draw_polygon">#draw_polygon</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23draw_polygon-icon.png" alt="[#draw_polygon]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>numop2</i> operator<b>, </b><i>grid(channels)</i> color<b>, </b><i>grid(vertices,{y x})</i> vertices<b>)</b>     <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>  
+				picture on which the polygon will be superimposed. <br>
+   <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(channels)</i> grid<b>)</b>  
+				color of each pixel <br>
+   <br><b>inlet&nbsp;2 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(vertices {y x})</i> grid<b>)</b>  
+				vertices of the polygon. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid(y x channels)</i> grid<b>)</b>   
+				modified picture. 
+				note: starting with 0.7.2, drawing a 1-by-1 
+				square really generates a 1-by-1 square, and 
+				so on. This is because the right-hand border of a 
+				polygon is excluded, whereas it was included 
+				before, leading to slightly-wider-than-expected polygons. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#text_to_image">#text_to_image</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23text_to_image-icon.png" alt="[#text_to_image]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>inlet 2 receives a font grid, for example, [#in grid file lucida-typewriter-12.grid.gz]</p> <p>inlet 1 receives a 2 by 3 matrix representing the colours to use (e.g. (2 3 # 0 170 0 255 255 0) means yellow on green)</p> <p>inlet 0 receives a bang, transforming the data into an image suitable for #draw_image.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#hueshift">#hueshift</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23hueshift-icon.png" alt="[#hueshift]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>inlet 1 receives an angle (0..36000)</p> <p>inlet 0 receives a RGB picture that gets hueshifted by a rotation in the colorwheel by the specified angle; it gets sent to outlet 0.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Other_Objects"></a><h4>Other Objects</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="rtmetro">rtmetro</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/rtmetro-icon.png" alt="[rtmetro]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+This class has been removed (0.7.7).<br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="bindpatcher">bindpatcher</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/bindpatcher-icon.png" alt="[bindpatcher]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>sets the receive-symbol for the Pd patcher it is in.</p> <p>has no inlets, no outlets.</p> <p>EXPERIMENTAL.</p> <br><b>method</b>&nbsp;init <b>(</b><i>symbol</i> symbol<b>)</b>   <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="pingpong">pingpong</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/pingpong-icon.png" alt="[pingpong]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Transforms linear counting (0, 1, 2, 3, 4, ...)  into a back-and-forth counting (0, 1, 2, 1, 0, ...) 
+		from 0 to a specified upper bound. <br><b>method</b>&nbsp;init <b>(</b><i>int</i> top<b>)</b>   <br>
+  <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;float <b>(</b><i>float</i> top<b>)</b> <br>
+   <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;float <b>(</b><b>)</b>  
+				a value to be transformed. 
+				If, for example, top=10, then values 0 thru 10 are left unchanged, 
+				values 11 thru 19 are mapped to 9 thru 1 respectively, and 20 thru 30 
+				are mapped to 0 thru 10, and so on. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#global">#global</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23global-icon.png" alt="[#global]" border="0"><br clear="left"><br><br><a href="#global"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+  <p> 
+		objects of this class do nothing by themselves and are just 
+		an access point to features that don't belong to any object in 
+		particular. </p> <br><b>method</b>&nbsp;profiler_reset <b>(</b><b>)</b>  
+			resets all the time counters. <br>
+ <br><b>method</b>&nbsp;profiler_dump <b>(</b><b>)</b>  
+			displays the time counters in decreasing order, with 
+			the names of the classes those objects are in. this is 
+			an experimental feature. like most statistics, 
+			it could be vaguely relied upon if 
+			only you knew to which extent it is unreliable. more on this 
+			in a future section called "profiling". <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="fps">fps</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/fps-icon.png" alt="[fps]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>symbol(real|user|system|cpu)</i> clocktype<b>, </b><i>symbol(detailed)</i> detailed<b>)</b>    <br>
+ <br><b>method</b>&nbsp;init detailed <b>(</b><b>)</b>  <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b>  
+			Times at which bangs are received are stored until a large 
+			enough sample of those is accumulated. Large enough is defined 
+			to be whenever the timespan exceeds one second. Then a report 
+			is made through the outlet. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;(else) <b>(</b><b>)</b>  
+				messages other than bangs are ignored. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;float <b>(</b><b>)</b>  
+			non-detailed mode only. 
+			this is the messages-per-second rating. <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;list(float,6) <b>(</b><b>)</b>  
+			detailed mode only. 
+			this is: messages-per-second, followed by five values of 
+			milliseconds-per-message: minimum, median, maximum, average, 
+			standard deviation. 
+			(the average happens to be simply 1000 divided by the 
+			messages-per-second, but it is convenient to have it anyway) <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="unix_time">unix_time</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/unix_time-icon.png" alt="[unix_time]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object returns the Unix timestamp. The first 
+		outlet does so with ASCII, the second in seconds and the third outlet 
+		outputs the fractions of seconds up to 1/100 000 th of a second which is useful for creating 
+		filenames. </p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b> <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> <br>
+Outputs the time and date in ASCII format <br><b>outlet&nbsp;1 </b><b>method</b>&nbsp;float <b>(</b><b>)</b> <br>
+Outputs the Unix timestamp in seconds <br><b>outlet&nbsp;2 </b><b>method</b>&nbsp;float <b>(</b><b>)</b> <br>
+Outputs the fractions of a second up to 10 microseconds (?) (actual precision is platform-dependent afaik) <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ls">ls</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/ls-icon.png" alt="[ls]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object is similar to the Unix list command 
+		'ls'. It returns the names of files in a given 
+		directory.  May be used with [listlength] to retrieve the number of files. 
+		Hidden files are displayed. </p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="exec">exec</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/exec-icon.png" alt="[exec]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object launches a Unix shell program or script. </p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="renamefile">renamefile</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/renamefile-icon.png" alt="[renamefile]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object accepts a list of two elements as arguments. 
+		The current file name being the first and the second is the desired change 
+		in name. </p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="plotter_control">plotter_control</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/plotter_control-icon.png" alt="[plotter_control]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object produces HPGL instructions in ASCII form 
+		that can be sent to the comport object in order to control an HPGL 
+		compatible plotter. </p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;symbol <b>(</b><b>)</b> <br>
+Outputs the HPGL commands in ASCII format <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="rubyarray">rubyarray</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/rubyarray-icon.png" alt="[rubyarray]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>inlet 0 float : sends the specified array entry to outlet 0</p> <p>inlet 1 list: writes that list as an array entry in position last specified by inlet 0.</p> <p>inlet 0 save(symbol filename): writes the array contents to a file of the given filename as a CSV</p> <p>inlet 0 save(symbol filename, symbol format): same thing but using a sprintf string such as %x,%f or whatever</p> <p>inlet 0 load(symbol filename): replace all array contents by the contents of a CSV file</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="jMax_emulation"></a><h4>jMax emulation</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>those classes emulate jMax functionality, 
+	for use within PureData and Ruby.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="fork">fork</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/fork-icon.png" alt="[fork]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Every incoming message is sent to inlet 1 and then sent to 
+		inlet 0 as well. Messages remain completely unaltered. Contrast 
+		with PureData's "t a a" objects, which have the same purpose but 
+		transform bangs into zeros and such.</p> <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;(any) <b>(</b><b>)</b> <br>
+   <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="jmax_udpsend">jmax_udpsend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/jmax_udpsend-icon.png" alt="[jmax_udpsend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Sends messages (but not grids nor dspsignals) via UDP (which 
+		does not involve a connection, and may lose packets in case of 
+		network overload or noise or etc). <p>This works with jMax 2.5 and 4.1 but not 4.0.</p> <br><b>method</b>&nbsp;init <b>(</b><i>host</i> host<b>, </b><i>integer</i> port<b>)</b>    <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;&lt;any&gt; <b>(</b><b>)</b> <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="jmax_udpreceive">jmax_udpreceive</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/jmax_udpreceive-icon.png" alt="[jmax_udpreceive]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Counterpart of jmax_udpsend</p> <p>This works with jMax 2.5 and 4.1 but not 4.0.</p> <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> port<b>)</b>   <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;&lt;any&gt; <b>(</b><b>)</b> <br>
+ <br><b>outlet&nbsp;1 </b><b>method</b>&nbsp;list <b>(</b>protocol_name<b>, </b>sender_port<b>, </b>sender_host<b>, </b>sender_ip_address<b>)</b>      <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="foreach">foreach</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/foreach-icon.png" alt="[foreach]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs N messages, one per list element, in order. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="rubysprintf">rubysprintf</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/rubysprintf-icon.png" alt="[rubysprintf]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>symbol</i> format<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			Outputs the format string with %-codes replaced 
+			by elements of the list formatted as the %-codes say. 
+			To get a list of those codes, consult a Ruby manual 
+			(Equivalently, Perl, Python, Tcl and C all have equivalents of this, 
+			and it's almost always called sprintf, or the % operator, or both) <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listflatten">listflatten</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listflatten-icon.png" alt="[listflatten]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listmake">listmake</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listmake-icon.png" alt="[listmake]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Emulation of jMax's [list] (but there cannot be a class named [list] in Pd) <br><b>method</b>&nbsp;init <b>(</b>list...<b>)</b>   <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b> send "list" to outlet 0<br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b> as sending to inlet 1 and then banging; that is, passes thru and remembers.<br>
+   <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listlength">listlength</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listlength-icon.png" alt="[listlength]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			outputs the number of elements in the incoming list. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listelement">listelement</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listelement-icon.png" alt="[listelement]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>int</i> index<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs one element of the list, as selected by "index". 
+			Also accepts negative indices (e.g.: -1 means "last"), like Ruby, but unlike jMax. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listsublist">listsublist</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listsublist-icon.png" alt="[listsublist]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>int</i> index<b>, </b><i>int</i> length<b>)</b>    <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs consecutive elements of the list, as selected by "index" and "length". 
+			Also accepts negative indices (e.g.: -1 means "last"), like Ruby, but unlike jMax. <br>
+   <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listprepend">listprepend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listprepend-icon.png" alt="[listprepend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b>list...<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs the stored list followed by the incoming list, all in one message. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listappend">listappend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listappend-icon.png" alt="[listappend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b>list...<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs the incoming list followed by the stored list, all in one message. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="listreverse">listreverse</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/listreverse-icon.png" alt="[listreverse]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b>...<b>)</b>  
+			Outputs the incoming list, from last element to first element. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="oneshot">oneshot</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/oneshot-icon.png" alt="[oneshot]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Like [spigot], but turns itself off after each message, so you have to turn it on 
+		again to making it pass another message. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="inv+">inv+</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/inv+-icon.png" alt="[inv+]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>float</i> b<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;float <b>(</b><i>float</i> a<b>)</b>  
+			outputs b-a <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="inv*">inv*</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/inv*-icon.png" alt="[inv*]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>float</i> b<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;float <b>(</b><i>float</i> a<b>)</b>  
+			outputs b/a <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="messageprepend">messageprepend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/messageprepend-icon.png" alt="[messageprepend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		(This is not in jMax, but is there to help port $* messageboxes) <br><b>method</b>&nbsp;init <b>(</b>list...<b>)</b> <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;&lt;any&gt; <b>(</b>...<b>)</b>  
+			Like [listprepend], but operates on whole messages, that is, including the selector. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="messageappend">messageappend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/messageappend-icon.png" alt="[messageappend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		(This is not in jMax, but is there to help port $* messageboxes) <br><b>method</b>&nbsp;init <b>(</b>list...<b>)</b> <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;&lt;any&gt; <b>(</b>...<b>)</b>  
+			Like [listappend], but operates on whole messages, that is, including the selector. <br>
+   <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="shunt">shunt</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/shunt-icon.png" alt="[shunt]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Compatible with jMax's [demux]. <br><b>method</b>&nbsp;init <b>(</b>n<b>, </b>i<b>)</b>    <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;&lt;any&gt; <b>(</b>...<b>)</b>  
+			Routes a message to the active outlet. <br>
+ <br><b>inlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><i>int</i> i<b>)</b>  
+			Selects which outlet is active. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="demux">demux</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/demux-icon.png" alt="[demux]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		please use shunt instead (name conflict with another Pd external) <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="range">range</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/range-icon.png" alt="[range]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;init <b>(</b>separators...<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;float <b>(</b><b>)</b>  
+			a value to be sent to one of the outlets. The first outlet is for values 
+			smaller than the first argument; else the second outlet is for values smaller 
+			than the second argument; and so on; and the last outlet is for values greater 
+			or equal to the last argument. <br>
+ <br><b>inlet&nbsp;1..n </b><b>method</b>&nbsp;float <b>(</b><b>)</b>  
+			sets the corresponding separator in the separator list. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="PureData_emulation"></a><h4>PureData emulation</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="pd_netsend">pd_netsend</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/pd_netsend-icon.png" alt="[pd_netsend]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		same as jmax_udpsend but for PureData UDP connections. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="pd_netreceive">pd_netreceive</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/pd_netreceive-icon.png" alt="[pd_netreceive]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		same as jmax_udpreceive but for PureData UDP connections. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

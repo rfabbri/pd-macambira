@@ -1,0 +1,206 @@
+<html><head>
+<!-- $Id: internals.html,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<title>GridFlow 0.8.0 - C++/Ruby Internals</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - C++/Ruby Internals</h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="1"><h4><a href="#notes">notes</a></h4><ul>
+</ul>
+<h4><a href="#Objects_for_Scripting">Objects for Scripting</a></h4><ul>
+<li><a href="#ruby class FObject extending Data"><img src="flow_classes/ruby class FObject extending Data-icon.png" alt="[ruby class FObject extending Data]" border="0"></a></li>
+<li><a href="#ruby class GridObject extending FObject"><img src="flow_classes/ruby class GridObject extending FObject-icon.png" alt="[ruby class GridObject extending FObject]" border="0"></a></li>
+<li><a href="#ruby class BitPacking"><img src="flow_classes/ruby class BitPacking-icon.png" alt="[ruby class BitPacking]" border="0"></a></li>
+<li><a href="#ruby FPatcher extending FObject"><img src="flow_classes/ruby FPatcher extending FObject-icon.png" alt="[ruby FPatcher extending FObject]" border="0"></a></li>
+<li><a href="#ruby GridFlow::USB"><img src="flow_classes/ruby GridFlow::USB-icon.png" alt="[ruby GridFlow::USB]" border="0"></a></li>
+<li><a href="#ruby GridFlow::USB::Device"><img src="flow_classes/ruby GridFlow::USB::Device-icon.png" alt="[ruby GridFlow::USB::Device]" border="0"></a></li>
+<li><a href="#ruby GridFlow::USB::Config"><img src="flow_classes/ruby GridFlow::USB::Config-icon.png" alt="[ruby GridFlow::USB::Config]" border="0"></a></li>
+<li><a href="#ruby GridFlow::USB::Interface"><img src="flow_classes/ruby GridFlow::USB::Interface-icon.png" alt="[ruby GridFlow::USB::Interface]" border="0"></a></li>
+<li><a href="#ruby GridFlow::USB::Endpoint"><img src="flow_classes/ruby GridFlow::USB::Endpoint-icon.png" alt="[ruby GridFlow::USB::Endpoint]" border="0"></a></li>
+</ul>
+<h4><a href="#Objects_for_Internals">Objects for Internals</a></h4><ul>
+<li><a href="#C++ class GridInlet"><img src="flow_classes/C++ class GridInlet-icon.png" alt="[C++ class GridInlet]" border="0"></a></li>
+<li><a href="#C++ class GridOutlet"><img src="flow_classes/C++ class GridOutlet-icon.png" alt="[C++ class GridOutlet]" border="0"></a></li>
+<li><a href="#C++ class Dim"><img src="flow_classes/C++ class Dim-icon.png" alt="[C++ class Dim]" border="0"></a></li>
+<li><a href="#C++ class Grid"><img src="flow_classes/C++ class Grid-icon.png" alt="[C++ class Grid]" border="0"></a></li>
+<li><a href="#C++ class Numop1"><img src="flow_classes/C++ class Numop1-icon.png" alt="[C++ class Numop1]" border="0"></a></li>
+<li><a href="#C++ class Numop2"><img src="flow_classes/C++ class Numop2-icon.png" alt="[C++ class Numop2]" border="0"></a></li>
+<li><a href="#C++ class GridClass"><img src="flow_classes/C++ class GridClass-icon.png" alt="[C++ class GridClass]" border="0"></a></li>
+<li><a href="#C++ class GFBridge"><img src="flow_classes/C++ class GFBridge-icon.png" alt="[C++ class GFBridge]" border="0"></a></li>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="notes"></a><h4>notes</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In Ruby, GridFlow defines a namespace (module) called GridFlow. Most  of the 
+constants it defines are part of that namespace.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Ruby does not have the same concept of object as PD. In GridFlow, object classes may 
+inherit features from other object classes, and also there is no concept of inlet nor outlet, which are instead 
+provided by <kbd><font color="#007777">GridFlow::FObject</font></kbd>, which also has the purpose of exporting functionality to 
+PD.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In this document (and in many others) the phrase "a Potato" will be a shorthand for "an object of the class 
+called Potato", which is often used in modern software design and is a nice convention borrowed from 
+biology.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+A FObject is normally in two or three parts: a (Ruby) GridFlow::FObject 
+that is the central part; a (C++) FObject; a (C++) BFObject. 
+The GridFlow::FObject is created as a RData kind of box (T_DATA) 
+using Ruby-C's Data_Make_Struct on a GridObject. This is 
+how most Ruby-C programs inherit from Ruby classes. Note that 
+Ruby's boxed objects have a maximum of five fields, and they're usually 
+taken, so additional fields have to be outside of it. This is why RData exists. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+So basically you have a C++ FObject that is "part of" a GridFlow::FObject 
+and they point to each other using "peer pointers". 
+ The BFObject links back to the RData box through a pointer called peer. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Scripting"></a><h4>Objects for Scripting</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby class FObject extending Data">ruby class FObject extending Data</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Provides inlets and outlets to Ruby Objects. <br><b>method</b>&nbsp;init <b>(</b><b>)</b>  <br>
+ <br><b>method</b>&nbsp;send_in <b>(</b><i>int</i> inlet<b>, </b>message...<b>)</b>    <br>
+ <br><b>method</b>&nbsp;send_out <b>(</b><i>int</i> outlet<b>, </b>message...<b>)</b>    <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby class GridObject extending FObject">ruby class GridObject extending FObject</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Provides grid support to FObjects. <br><b>method</b>&nbsp;inlet_dim <b>(</b><i>Integer</i> inlet<b>)</b>   
+			gives an array of Integers (dimension list) <br>
+ <br><b>method</b>&nbsp;inlet_nt <b>(</b><i>Integer</i> inlet<b>)</b>   
+			gives a Symbol (number type) <br>
+ <br><b>method</b>&nbsp;inlet_set_factor <b>(</b><i>Integer</i> inlet<b>, </b><i>Integer</i> factor<b>)</b>    
+			ensures received packets have a size that is 
+			a whole multiple of this size. 
+			must be called from rgrid_begin. <br>
+ <br><b>method</b>&nbsp;send_out_grid_begin <b>(</b><i>Integer</i> outlet<b>, </b><i>Array of Integer</i> dimensions<b>, </b><i>number type</i> nt<b>)</b>     
+			establishes grid streams between an outlet and all inlets 
+			connected to it. <br>
+ <br><b>method</b>&nbsp;send_out_grid_flow <b>(</b><i>Integer</i> outlet<b>, </b><i>String</i> data<b>)</b>    
+			for sending a grid data packet through that outlet. <br>
+ <br><b>method</b>&nbsp;send_out_grid_end <b>(</b><i>Integer</i> outlet<b>)</b>   
+			(isn't this one obsolete?) <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;rgrid_begin <b>(</b><b>)</b> <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;rgrid_flow <b>(</b><i>String</i> data<b>)</b>   <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;rgrid_end <b>(</b><b>)</b> <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby class BitPacking">ruby class BitPacking</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		A BitPacking is a simple two-way converter between different 
+		numeric layouts. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby FPatcher extending FObject">ruby FPatcher extending FObject</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>This class is much like PureData's abstractions.</p> <p>This is a container for objects. Its proper objects are numbered 
+		starting with zero. The wire list is given in terms of those numbers: 
+		(sourceobject,sourceinlet,destobject,destinlet). There is a 
+		pseudo-object numbered #-1 which map to the container's own inlets 
+		and outlets.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby GridFlow::USB">ruby GridFlow::USB</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+<p>wrapper for struct usb_dev_handle</p> <br><b>attr</b>&nbsp;.busses <b>(</b><b>.busses</b><b>)</b>  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby GridFlow::USB::Device">ruby GridFlow::USB::Device</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>wrapper for struct usb_device and struct usb_device_descriptor</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby GridFlow::USB::Config">ruby GridFlow::USB::Config</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>wrapper for struct usb_config_descriptor, struct usb_interface</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby GridFlow::USB::Interface">ruby GridFlow::USB::Interface</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>wrapper for struct usb_interface_descriptor</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="ruby GridFlow::USB::Endpoint">ruby GridFlow::USB::Endpoint</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>wrapper for struct usb_endpoint_descriptor</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Internals"></a><h4>Objects for Internals</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class GridInlet">C++ class GridInlet</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		GridInlets represent inlets that accept grids. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class GridOutlet">C++ class GridOutlet</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		GridOutlets represent outlets that send grids. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class Dim">C++ class Dim</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Dim represents a list of dimensions. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class Grid">C++ class Grid</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Grid represents a grid that is fully stored in memory. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class Numop1">C++ class Numop1</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This represents a one-input operator. 
+		Such an object contains a map() function that applies the operator 
+		over a memory segment. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class Numop2">C++ class Numop2</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This represents a two-input operator. 
+		Such an object contains four functions for each T, where 
+		T is one of the types uint8, int16, int32, float32. <br><b>method</b>&nbsp;map <b>(</b><i>integer</i> n<b>, </b><i>Pt<T></i> as<b>, </b><i>T</i> b<b>)</b>     
+			for i in 0...n, 
+			as[i] := f(as[i],b); 
+			This is like <kbd><font color="#007777">[#]</font></kbd> with a scalar righthand <br>
+ <br><b>method</b>&nbsp;zip <b>(</b><i>integer</i> n<b>, </b><i>Pt<T></i> as<b>, </b><i>Pt<T></i> bs<b>)</b>     
+			for i in 0...n, 
+			as[i] := f(as[i],bs[i]); 
+			bs is not modified. 
+			(This is like <kbd><font color="#007777">[#]</font></kbd> with a nonscalar righthand) <br>
+ <br><b>method</b>&nbsp;fold <b>(</b><i>integer</i> an<b>, </b><i>integer</i> n<b>, </b><i>Pt<T></i> as<b>, </b><i>Pt<T></i> bs<b>)</b>      <p> 
+			for i in 0...n, 
+			for j in 0...an, 
+			as[j] := f(as[j],bs[i*an+j]); </p> 
+			(this is like <kbd><font color="#007777">[#fold]</font></kbd>) <br>
+ <br><b>method</b>&nbsp;scan <b>(</b><i>integer</i> an<b>, </b><i>integer</i> n<b>, </b><i>Pt<T></i> as<b>, </b><i>Pt<T></i> bs<b>)</b>      <p> for j in 0...an: bs[j] := f(as[j],bs[j]); </p> <p> for i in 1...n: for j in 0...an: 
+				bs[j] := f(bs[(i-1)*an+j],bs[i*an+j]); </p> 
+			(this is like <kbd><font color="#007777">[#scan]</font></kbd>) <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class GridClass">C++ class GridClass</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This represents a class of GridObjects. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="C++ class GFBridge">C++ class GFBridge</a></td></tr><tr><td></td><td valign="top"><br>
+<br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This holds linkage information about PureData. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

@@ -1,0 +1,98 @@
+<html><head>
+<!-- $Id: project_policy.html,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<title>GridFlow 0.8.0 - </title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - </h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="1"><h4><a href="#Note">Note</a></h4><ul>
+</ul>
+<h4><a href="#Release">Release</a></h4><ul>
+</ul>
+<h4><a href="#Documentation">Documentation</a></h4><ul>
+</ul>
+<h4><a href="#CVS">CVS</a></h4><ul>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Note"></a><h4>Note</h4></td></tr><tr><td></td><td></td><td> 
+	first consult the file ../README for a vague idea on the meaning of 
+	subdirectories. </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Release"></a><h4>Release</h4></td></tr><tr><td></td><td></td><td> 
+Compatibility: </td></tr>
+<tr><td></td><td></td><td><ul><li><b>1</b> :  
+	Should work with Ruby 1.6.6 and PureData 0.36, 0.37, 0.38 </li></ul></td></tr>
+<tr><td></td><td></td><td> 
+Release steps (</td></tr>
+<tr><td></td><td></td><td><b>OPERATE WITH CAUTION</b></td></tr>
+<tr><td></td><td></td><td>): </td></tr>
+<tr><td></td><td></td><td><ul> <li><b>1</b> : make vvtest # leak detection </li><li><b>2</b> : ruby base/test.rb formats </li><li><b>3</b> : cvs tag gridflow_0_7_7 . </li><li><b>4</b> : mkdir gridflow </li><li><b>5</b> : cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow 
+			export -r gridflow_0_7_7 -d gridflow . </li><li><b>6</b> : cd gridflow </li><li><b>7</b> : rm -rf CVS CVSROOT </li><li><b>8</b> : chmod -R go=u-w . </li><li><b>9</b> : cd .. </li><li><b>10</b> : tar cfzvv gridflow-0.7.7.tar.gz gridflow </li><li><b>11</b> : rm -rf gridflow # caution!!! </li><li><b>12</b> : scp gridflow*gz gridflow@artengine.ca:download </li><li><b>13</b> : mv gridflow*gz /home/matju/net/GridFlow </li><li><b>14</b> : ssh gridflow@artengine.ca  : expand tarball into public_html/latest </li><li><b>15</b> : download somewhere else and try to compile </li><li><b>16</b> : update main page </li><li><b>17</b> : jmax/pd/ruby-talk mlists : post release (note: prefix subject with [ANN] !!!!) </li><li><b>18</b> : freshmeat.net : post release </li><li><b>19</b> : RAA : post release </li> </ul></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Documentation"></a><h4>Documentation</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><ul> <li><b>1</b> :  
+	Pictures identified as "&lt;help&gt;" should be screenshots of the 
+	help files. They shouldn't be screenshots of the template. </li> <li><b>2</b> :  
+	A Help file is a visual summary of what an object does. It should be 
+	interactive and allow the user to understand what the object does. 
+	Sample inputs are provided and sample results can be seen. </li> <li><b>3</b> :  
+	All modifications to the documentation must be done in the XML. The 
+	HTML must be kept up-to-date by rerunning "make" in the "doc/" directory. </li> <li><b>4</b> :  
+	Help-wise, Formats are considered objects. 
+	Operators are to be documented as part of [@] and [@!]. </li> <li><b>5</b> :  
+	Images grabbed directly from a jMax window should be encoded in PNG. 
+	This includes "icons" (object boxes, message boxes, etc). If they are 
+	in JPEG, only change to PNG when the image has to change anyway. 
+	Distinguish "icons" from "thumbnails", the latter of which are <b>scaled-down</b> grabs, which should be encoded in JPEG. </li> <li><b>6</b> :  
+	There are not help-thumbnails anymore in the reference manual 
+	because they were not helpful. </li> <li><b>7</b> :  
+	Large images should be kept out of the release. The release itself must 
+	be small enough not to discourage us from doing releases and keeping 
+	them all. It also should be downloadable on a bad modem. =) 
+	Let's keep it under 500k please. </li> </ul></td></tr>
+<tr><td></td><td></td><td> 
+in doc do: 
+for z in images/*.* images/*/*.*; do fgrep -q $z *.html || echo "$z"; done </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="CVS"></a><h4>CVS</h4></td></tr><tr><td></td><td></td><td> 
+	environment variables 
+		CVSEDITOR=pico 
+		CVS_RSH=ssh2 </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

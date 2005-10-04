@@ -1,0 +1,1591 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE documentation SYSTEM 'gridflow.dtd'>
+<documentation title="Reference Manual: Flow Classes" indexcols="3">
+<!-- $Id: reference.xml,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<!--
+	GridFlow Reference Manual: Class Reference
+	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard and Alexandre Castonguay
+-->
+
+<section name="Objects for making grids and breaking them down">
+	<class name="#import">
+		<icon text="[#import {240 320 3}]"/>
+		<help text="[#import {240 320 3}]" image="#importexport" />
+		<p>This object allows you to produce grids from non-grid data, such as
+		integers and lists of integers. This object also reframes/resyncs
+		grids so that multiple grids may be joined together, or
+		single grids may be split. That kind of operation is already done implicitly in many
+		cases (e.g. sending an integer or list to a grid-receiving inlet),
+		but using this object you have greater flexibility on the conversion.</p>
+		<attr name="shape" type="GridShape|symbol(per_message)" default="per_message">
+			a list specifying a grid shape that the numbers
+			will fit into; or "per_message" indicating each incoming message
+			will be turned into a vector.
+		</attr>
+		<attr name="cast" type="NumberType" default="int32"/>
+		<method name="init">
+			<arg name="shape" isattr="yes"/>
+			<arg name="cast" isattr="yes"/>
+		</method>
+		<inlet id="0">
+			<method name="int">
+				begins a new grid if there is no current grid.
+				puts that integer in the current grid.
+				ends the grid if it is full.
+				the constructed grid is not stored: it is streamed.
+				the stream is buffered, so the output is in packets
+				of about a thousand numbers.
+			</method>
+			<method name="list">
+				just like a sequence of ints sent one after another,
+				except in a single message.
+			</method>
+			<method name="symbol">
+				considered as a list of ascii characters.
+			</method>
+			<method name="reset">
+				aborts the current grid if there is one.
+			</method>
+			<method name="grid">
+				<arg name="grid" type="grid(dims...)"/>
+				this is the equivalent of filtering this grid through
+				an <k>[#export]</k> object and sending the resulting integers
+				to this <k>[#import]</k> object, except that it's over
+				10 times faster.
+			</method>
+		</inlet>
+		<inlet id="1" attr="shape">
+			<method name="per_message">
+				old synonym for "shape per_message"
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>
+				the grid produced from incoming integers and/or grids.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#export">
+		<help text="[#export]" image="#importexport" />
+
+		<p>this object is the opposite of #import.</p>
+		<method name="init">
+			this object is not configurable because there isn't
+			anything that could possibly be configured here.
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				transforms this grid into a sequence of integer messages.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="int">
+				elements of the incoming grid.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#export_list">
+		<help text="[#export_list]" image="#importexport" />
+
+		<p>this object is another opposite of <k>[#import]</k>, which puts
+		all of its values in a list.</p>
+		<method name="init" />
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				transforms this grid into a single message containing
+				a list of integers.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="list">
+				elements of the incoming grid.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#export_symbol">
+		<p>this object is another opposite of #import, which constructs a symbol
+		from its input. The values are expected to be valid ASCII codes, but no check
+		will be performed for that, and additionally, no check will be made that the generated
+		symbol only contains characters that can be put in a symbol.</p>
+		<method name="init" />
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				transforms this grid into a single message containing
+				a list of integers.
+			</method>
+		</inlet>
+		<outlet id="0"><method name="symbol">generated symbol</method></outlet>
+	</class>
+
+	<class name="#pack">
+		<p>Similar to <k>[#join]</k>, but takes individual integers, and builds a Dim(N) vector out of it.
+		</p>
+
+		<attr name="trigger_by" type="TriggerBy" default="any">
+			The value "any" (and the only available value for now) causes an output
+			to produced when an integer is received thru any inlet, contrary to most
+			other object classes, that only act upon reception of a value thru inlet 0.
+		</attr>
+
+		<method name="init">
+			<arg name="inputs" type="integer">how many inlets the object should have.</arg>
+		</method>
+		<inlet id="*"><method name="int"/></inlet>
+		<outlet id="0"><method name="grid">
+			combination of inputs given in all inlets.
+			this is produced according to the value of the trigger attribute.
+		</method></outlet>
+	</class>
+	
+	<class name="#color">
+		<p>Triple slider for the selection of RGB values.</p>
+		<method name="init">
+			<arg name="min" type="float"></arg>
+			<arg name="max" type="float"></arg>
+			<arg name="hidepreview" type="0,1"></arg>
+		</method>
+		<inlet id="0"><method name="grid">
+			Produces a Dim(3) grid of RGB values.
+		</method></inlet>
+	</class>
+
+	<class name="#unpack">
+		<method name="init">
+			<arg name="outputs" type="integer">
+				how many outlets the object should have.
+				(depending on the version of the software, the number of visible outlets
+				may have been frozen to 4. If it is so, then the value of this argument
+				must not exceed 4; and if it is below 4, then don't use the extraneous outlets.)
+			</arg>
+		</method>
+		<inlet id="0"><method name="grid(N)">
+			the input vector is split in N parts containing one number each.
+			numbers are sent left-to-right, that is, outlet 0 is triggered first, then outlet 1, etc.
+		</method></inlet>
+		<outlet id="*"><method name="int">
+		</method></outlet>
+	</class>
+
+	<class name="#centroid">
+		<method name="init"/>
+		<inlet id="0"><method name="grid(rows,columns,1)">
+			will compute the centroid of the given grid, which
+			is a weighted average, namely, the average position weighted
+			by the pixel values.
+		</method></inlet>
+		<outlet id="0">
+			<method name="grid(2)">
+			result
+			</method>
+		</outlet>
+	</class>
+	<class name="#centroid2">
+		a new experimental and faster version of #centroid.
+		<method name="init"/>
+		<inlet id="0"><method name="grid(rows,columns,1)">
+			will compute the centroid of the given grid, which
+			is a weighted average, namely, the average position weighted
+			by the pixel values.
+		</method></inlet>
+		<outlet id="0">
+			<method name="grid(2)">
+			result
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#for">
+		<icon text="[#for 0 320 1]"/>
+		<help text="[#for 0 320 1]"/>
+
+		<p>when given scalar bounds, works like a regular <k>[for]</k> object plugged
+		to a <k>[#import]</k> tuned for a Dim(size) where size is the number of values
+		produced by a bang to that <k>[for]</k>.</p>
+
+		<p>when given vector bounds, will work like any number of [for] objects
+		producing all possible combinations of their values in the proper order.
+		This replaces the old <k>[#identity_transform]</k> object.</p>
+
+		<method name="init">
+			<arg name="from" type="integer"/>
+			<arg name="to" type="integer"/>
+			<arg name="step" type="integer"/>
+		</method>
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid(index)"/>
+			replaces the "from" value and produces output.
+		</method></inlet>
+		<inlet id="1"><method name="grid"><arg name="grid" type="grid(index)"/>
+			replaces the "to" value.
+		</method></inlet>
+		<inlet id="2"><method name="grid"><arg name="grid" type="grid(index_steps)"/>
+			replaces the "step" value.
+		</method></inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid(size)"/>
+				where size is floor((to-from+1)/step)
+				[for scalar bounds]
+			</method>
+			<method name="grid"><arg name="grid" type="grid(*size,dimension)"/>
+				where *size is floor((to-from+1)/step)
+				[for vector bounds]
+			</method>
+		</outlet>
+	</class>
+</section>
+
+<section name="Objects for Computing">
+	<class name="#">
+		<icon text="[# +]" image="images/op/add.png" />
+		<help text="two-input operators"/>
+
+		<attr name="op" type="grid"/>
+		<attr name="right_hand" type="grid" default="0">
+		
+		</attr>
+
+		<p>This object outputs a grid by computing "in parallel" a same
+		operation on each left-hand element with its corresponding right-hand
+		element. 
+		</p>
+
+		<method name="init">
+			<arg name="op" isattr="yes"/>
+			<arg name="right_hand" isattr="yes"/>
+		</method>
+
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				on each element of this grid, perform the operation
+				together with the corresponding element of inlet 1.
+				in the table of operators (at the top of this document)
+				elements of inlet 0 are called "A" and elements of inlet 1
+				are called "B". the resulting grid is the same size as the
+				one in inlet 0.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				any grid, preferably shaped like the one that will be put
+				in the left inlet, or like a subpart of it (anyway the contents
+				will be redim'ed on-the-fly to fit the grid of inlet-0,
+				but the stored grid will not be modified itself)
+			</method>
+			<method name="int">
+				stores a single int in the right inlet; the same int will
+				be applied in all computations; this is like sending a
+				Dim(1) or Dim() grid with that number in it.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>
+			</method>
+		</outlet>
+	
+	</class>
+
+	<class name="@complex_sq">
+		<p>this object computes the square of complex numbers.
+		If seeing imaginary as Y and real as X, then this operation squares
+		the distance of a point from origin and doubles the angle between it
+		and the +X half-axis clockwise. (fun, eh?)
+		</p>
+		<p>used on an indexmap, this makes each thing appear twice,
+		each apparition spanning half of the original angle.</p>
+		<inlet id="0"><method name="grid">
+			<arg name="grid" type="grid(dims... {imaginary real})"/>
+		</method></inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(dims... {imaginary real})"/>
+		</method></outlet>
+	</class>
+
+	<class name="#fold">
+		<icon text="[#fold +]"/>
+		<help text="[#fold +]" image="#foldinnerouter"/>
+
+		<p><list>
+		<li><k>[#fold +]</k> computes totals</li>
+		<li><k>[#fold inv+]</k> is an alternated sum (+/-)</li>
+		<li><k>[#fold * 1]</k> can compute the size of a grid using its dimension list</li>
+		<li><k>[#fold &amp; 1]</k> can mean "for all"</li>
+		<li><k>[#fold | 0]</k> can mean "there exists (at least one)"</li>
+		<li><k>[#fold ^ 0]</k> can mean "there exists an odd number of..."</li>
+		<li><k>[#fold ^ 1]</k> can mean "there exists an even number of...".</li>
+		</list></p>
+
+		<method name="init">
+			<arg name="operator" type="numop2"/>
+			<arg name="seed" type="grid" default="0"/>
+			<arg name="right_hand" type="grid"/>
+		</method>
+		
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims..., last)"/>
+				replaces every Dim(last) subgrid by the result of a cascade on that subgrid.
+				Doing that
+				with seed value 0 and operation + on grid "2 3 5 7" will compute
+				((((0+2)+3)+5)+7) find the total "17".
+				produces a Dim(dims) grid.
+			</method>
+		</inlet>
+		<inlet id="1" attr="seed"/>
+		<outlet id="0"></outlet>
+	</class>
+
+	<class name="#scan">
+		<icon text="[#scan +]"/>
+		<help text="[#scan +]"/>
+
+		<p><k>[#scan +]</k> computes subtotals; this can be used, for example,
+		to convert a regular probability distribution into a cumulative one.
+		(or in general, discrete integration)
+		</p>
+
+		<method name="init">
+			<arg name="operator" type="numop2"/>
+			<arg name="seed" type="grid" default="0"/>
+		</method>
+
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims..., last)"/>
+
+				replaces every Dim(last) subgrid by all the results of
+				cascading the operator on that subgrid,
+				producing a Dim(dims,last) grid.
+
+				For example, with base value 0 and operation + on grid "2 3 5
+				7" will compute 0+2=2, 2+3=5, 5+5=10, 10+7=17, and give the
+				subtotals "2 5 10 17".
+
+			</method>
+		</inlet>
+		<inlet id="1" attr="seed"/>
+		<outlet id="0">
+		</outlet>
+
+	</class>
+
+	<class name="#outer">
+		<icon text="[#outer +]"/>
+		<help text="[#outer +]" image="#foldinnerouter"/>
+
+		<method name="init">
+			<arg name="operator" type="numop2"/>
+			<arg name="value" type="grid"/>
+			the operator must be picked from the table of two-input operators.
+			the grid is optional and corresponds to inlet 1.
+		</method>
+
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(anyA...)"/></method>
+			produces a grid of size Dim(anyA..., anyB...), where numbers
+			are the results of the operation on every element of A and
+			every element of B. the resulting array can be very big. Don't
+			try this on two pictures (the result will have 6 dimensions)
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(anyB...)"/></method>
+			stores the specified grid, to be used when inlet 0 is activated.
+		</inlet>
+		<outlet id="0">
+		</outlet>
+
+		<p>When given a grid of Dim(3) and a grid of Dim(5) <k>[#outer]</k> will
+		produce  a grid of Dim(3,5) with the selected two-input operation
+		applied on each  of the possible pairs combinations between numbers
+		from the left grid  and the ones from the right. for example :
+		(10,20,30) [#outer +] (1,2,3)  will give :
+		((11,12,13),(21,22,23),(31,32,33)) </p>
+
+	</class>
+
+	<class name="#inner">
+		<help text="[#inner]"/>
+
+		<p>think of this one as a special combination of <k>[#outer]</k>, <k>[#]</k> and
+		<k>[#fold]</k>. this is one of the most complex operations. It is very useful
+		for performing linear transforms like rotations, scalings, shearings,
+		and some kinds of color remappings. A linear transform is done by
+		something called matrix multiplication, which happens to be <k>[#inner * +
+		0]</k>. <k>[#inner]</k> also does dot product and other funny operations.</p>
+
+		<method name="init">
+			<arg name="op_para" type="numop2"/>
+			<arg name="op_fold" type="numop2"/>
+			<arg name="base"    type="integer"/>
+			<arg name="right_hand" type="grid"/>
+			op_para and op_fold are two operators picked from the table
+			of two-input operators.
+			the base value has to be specified (has no default value yet).
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(anyA..., lastA)"/>
+
+				Splits the Dim(anyA...,lastA) left-hand grid into Dim(anyA...)
+				pieces of Dim(lastA) size.
+
+				Splits the Dim(firstB,anyB...) right-hand grid into
+				Dim(anyB...) pieces of Dim(firstB) size.
+
+				On every piece pair, does <k>[#]</k> using the specified
+				op_para operation, followed by a <k>[#fold]</k> using
+				the specified op_fold operator and base value.
+			
+				creates a Dim(anyA...,anyB...) grid by assembling all
+				the results together.
+
+				(note: lastA must be equal to firstB.)
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="int">
+				changes the base value to that.
+			</method>
+		</inlet>
+		<inlet id="2">
+			<method name="grid"><arg name="grid" type="grid(anyB..., lastB)"/>
+				changes the right-hand side grid to that.
+			</method>
+		</inlet>
+		<outlet id="0">
+		</outlet>
+	</class>
+
+	<class name="@join">
+		<method name="init">
+			<arg name="which_dim"/>
+			Which_dim is the number of the dimension by which the join will
+			occur. For N-dimensional grids, the dimensions are numbered from 0
+			to N-1. In addition, negative numbers from -N to -1 may be used, to
+			which N will be added.
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>
+				The left grid and right grid must have the same number
+				of elements in all dimensions except the one specified.
+				The result will have the same number of elements in all
+				dimensions except the one specified, which will be the
+				sum of the two corresponding one.
+				
+				<p>For example, joining a RGB picture Dim[y,x,3] and a
+				greyscale picture Dim[y,x,1] on dimension 2 (or -1) could
+				make a RGBA picture Dim[y,x,4] in which the greyscale image
+				becomes the opacity channel.
+				</p>
+			</method>
+		</inlet>
+		<inlet id="1"><method name="grid"><arg name="grid" type="grid"/></method></inlet>
+		<outlet id="0">
+		</outlet>
+	</class>
+
+	<class name="#finished">
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>any grid</method>
+		</inlet>
+		<outlet id="0">
+			a bang is emitted every time a grid transmission ends.
+		</outlet>
+	</class>
+
+	<class name="#cast">
+		<method name="init">
+			<arg name="numbertype" type="numbertype"/>
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>any grid</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>a grid of the same shape containing all the same
+			values after type conversion. note that while casting to
+			a smaller type, values that are overflowing will be truncated.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#ravel">
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>any grid</method></inlet>
+		<outlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			like <k>[#redim]</k> but always produce a 1-D grid
+			with the same total number of elements.
+		</method></outlet>
+	</class>
+
+	<class name="#grade">
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>any grid</method></inlet>
+		<outlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			<p>splits a Dim[A...,B] grid into Dim[B] vectors,
+			producing new Dim[B] vectors that each contain numbers from
+			0 to B-1 indicating the ordering of the values. The result is
+			a Dim[A...,B] grid.</p>
+			<p>for example, connecting a [#grade] to a <k>[#outer ignore {0}]</k>
+			to a <k>[#store]</k> object, storing a single vector into <k>[#store]</k>, and
+			sending the same vector to <k>[#grade]</k>, will sort the values of the
+			vector. however for higher-dimensional grids, what should go
+			between <k>[#store]</k> and <k>[#grade]</k> to achieve the same result would
+			be more complex.</p>
+			<p>you may achieve different kinds of sorting by applying various
+			filters before <k>[#grade]</k>. the possibilities are unlimited.</p>
+			<p>if you plug <k>[#grade]</k> directly into another <k>[#grade]</k>, you will
+			get the inverse arrangement, which allows to take the sorted values
+			and make them unsorted in the original way. note that this is really
+			not the same as just listing the values backwards.</p>
+		</method></outlet>
+	</class>
+
+	<class name="#perspective">
+		<method name="init">
+			<arg name="depth" type="integer"/>
+		</method>
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>any grid</method></inlet>
+		<outlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			<p>transforms a Dim[A...,B] grid into a Dim[A...,B-1] grid.
+			There is a projection plane perpendicular to the last axis and
+			whose position is given by the "depth" parameter. Each vector's
+			length is adjusted so that it lies onto that plane. Then the
+			last dimension of each vector is dropped.</p>
+			
+			<p>useful for converting from 3-D geometry to 2-D geometry. Also
+			useful for converting homogeneous 3-D into regular 3-D, as
+			homogeneous 3-D is really just regular 4-D...(!)</p>
+		</method></outlet>
+	</class>			
+
+	<class name="#transpose">
+		<method name="init">
+			<arg name="dim1" type="integer"/>
+			<arg name="dim2" type="integer"/>
+		</method>
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			swaps the two specified dimensions; dimension numbers are as in <k>[#join]</k>.
+		</method></inlet>
+	</class>
+	
+	<class name="#fade">
+		<method name="init">
+			<arg name="rate" type="integer"/>
+		</method>
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			produces on outlet 0 a linear recurrent fading according to the flow of
+			incoming messages. For example, if rate=5, then 20% (one fifth)
+			of each new message will be blended with 80% of the previous output.
+		</method></inlet>
+	</class>
+
+	<class name="#fade_lin">
+		<method name="init">
+			<arg name="maxraise" type="integer"/>
+			<arg name="maxdrop"  type="integer"/>
+		</method>
+		<inlet id="0"><method name="grid"><arg name="grid" type="grid"/>
+			produces on outlet 0 a piecewise-linear nonrecurrent fading according to the flow of
+			incoming messages. For example, if maxraise=2 and maxdrop=4, then with each
+			new message an output is produced that is at most 2 more or 4 less than the
+			previous output.
+		</method></inlet>
+	</class>
+
+	<class name="#reverse">
+		<method name="init">
+			<arg name="whichdim"/>
+			Whichdim is the number of the dimension by which the reverse will
+			occur. For N-dimensional grids, the dimensions are numbered from 0
+			to N-1. In addition, negative numbers from -N to -1 may be used, to
+			which N will be added.
+		</method>
+	</class>
+</section>
+
+<section name="Objects for Coordinate Transforms">
+	<class name="#redim">
+		<icon text="[#redim {2}]"/>
+		<help text="[#redim 2]"/>
+
+		<method name="init">
+			<arg name="dims" type="dim_list"/>
+			a list specifying a grid shape that the numbers
+			will fit into.
+			(same as with <k>[#import]</k>)
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+			the elements of this grid are serialized. if the resulting grid
+			must be larger, the sequence is repeated as much as necessary.
+			if the resulting grid must be smaller, the sequence is truncated.
+			then the elements are deserialized to form the resulting grid.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(rank)"/>
+				this grid is a dimension list that replaces the one
+				specified in the constructor.
+				(same as with <k>[#import]</k>)
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>
+				redimensioned grid potentially containing repeating data.
+			</method>
+		</outlet>
+
+		<p>example: with a 240 320 RGB image, <k>[#redim 120 640 3]</k> will visually
+		separate the even lines (left) from the odd lines (right). contrary
+		to this, <k>[#redim 640 120 3]</k> will split every line and put its left half
+		on a even line and the right half on the following odd line. <k>[#redim]</k>
+		480 320 3 will repeat the input image twice in the output image.
+		<k>[#redim]</k> 240 50 3 will only keep the 50 top lines.</p>
+
+	</class>
+	<class name="#store">
+		<help text="[#store]"/>
+
+		<p>A <k>[#store]</k> object can store exactly one grid, using the right
+		inlet. You fetch it back, or selected subparts thereof, using the left
+		inlet.</p>
+
+		<method name="init">
+			<arg name="contents" type="grid"/>
+		</method>
+
+		<inlet id="0">
+			<method name="bang">
+				the stored grid is fully sent to the outlet.
+			</method>
+			<method name="grid"><arg name="grid" type="grid(dims..., indices)"/>
+				in this grid, the last dimension refers to subparts of
+				the stored grid. sending a Dim(200,200,2) on a <k>[#store]</k>
+				that holds a Dim(240,320,3) will cause the <k>[#store]</k> to handle
+				the incoming grid as a Dim(200,200) of Dim(2)'s, where each
+				Dim(2) represents a position in a Dim(240,320) of Dim(3)'s.
+				therefore the resulting grid will be a Dim(200,200) of
+				Dim(3) which is a Dim(200,200,3). in practice this example
+				would be used for generating a 200*200 RGB picture from a
+				200*200 XY map and a 240*320 RGB picture. this object can
+				be logically used in the same way for many purposes
+				including color palettes, tables of probabilities, tables
+				of statistics, whole animations, etc.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+			replace the whole grid, or a subpart of it (see other options on inlet 1)
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="reassign">(Future Use): 
+				makes it so that sending a grid to inlet 1 detaches the old buffer from [#store]
+				and attaches a new one instead.  This is the default.
+			</method>
+			<method name="put_at"><rest name="indices"/>(Future Use): 
+				makes it so that sending a grid to inlet 1 writes into the existing buffer of [#store].
+				<p>
+				example: suppose you have <k>[#store {10 240 320 3}]</k>. then "put_at 3"
+				will allow to write a Dim[240,320,3] grid in indices (3,y,x,c) where y,x,c are indices of the incoming grid;
+				in other words, if that's a buffer of 10 RGB frames, you'd be replacing frame #3. Furthermore,
+				it also allows you to write a Dim[n,240,320,3] grid at (3+f,y,x,c) where f,y,x,c are indices of the incoming grid,
+				replacing frame #3, #4, ... up to #3+n-1. Here n is at most 7 because the last frame in the buffer is #9.
+				</p>
+				<p>that way of working extends to other kinds of data you'd put in Grids, in any numbers of dimensions;
+				because, as usual, [#store] wouldn't know the difference.
+				</p>
+			</method>
+		</inlet>
+		<outlet id="0">
+			grids as stored, as indexed, or as assembled from multiple
+			indexings.
+		</outlet>
+	</class>
+
+	<class name="#scale_to">
+		<help text="[#scale_to]"/>
+
+		<method name="init">
+			<arg name="size">{height width} pair.</arg>
+		</method>
+
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>a 3-channel picture to be scaled.</method>
+		</inlet>
+		<inlet id="1">
+			<method name="int">a {height width} pair.</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>a scaled 3-channel picture.</method>
+		</outlet>
+	</class>
+
+	<class name="#scale_by">
+		<help text="[#scale_by]"/>
+
+		<method name="init">
+			<arg name="factor" type="grid dim() or dim(2)"/>
+			factor is optional (default is 2).
+			if it's a single value, then that factor is to be used
+			for both rows and columns.
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+			duplicates each pixel several times in width and several times in height,
+			where the number of times is determined by the factor described above.
+			twice those of the incoming grid. It is several times faster.
+			</method>
+		</inlet>
+		<inlet id="1"><method name="grid"><arg name="grid" type="grid(1 or 2)"/>sets factor</method></inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid((factor*y) (factor*x) channels)"/>
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#downscale_by">
+		<method name="init">
+			<arg name="factor" type="+integer"/>
+			<arg name="how" type="optional symbol(smoothly)"/>
+			factor is optional (default is 2).
+			if it's a single value, then that factor is to be used
+			for both rows and columns.
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+			Scales down picture by specified amount. (See scale factor above)
+			</method>
+		</inlet>
+		<inlet id="1"><method name="grid">
+			<arg name="grid" type="grid(1 or 2)"/>sets scale factor</method></inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid((factor/y) (factor/x) channels)"/>
+		</method>
+		</outlet>
+	</class>
+
+	<class name="#spread">
+		<help text="[#spread]"/>
+
+		<p>typically you plug a <k>[#for]</k> into this object,
+		and you plug this object into the left side of a <k>[#store]</k>. it will
+		scatter pixels around, giving an "unpolished glass" effect.</p>
+		
+		<p>if you put a picture in it, however, it will add noise. The
+		resulting values may be out of range, so you may need to clip them
+		using min/max.</p>
+
+		<method name="init">
+			<arg name="factor">same as inlet 1</arg>
+		</method>
+
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>a coordinate map.</method>
+		</inlet>
+		<inlet id="1">
+			<method name="int">a spread factor.</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid"/>a coordinate map.</method>
+		</outlet>
+
+
+		<p><k>[#spread]</k> scatters the pixels in an image. Not all original pixels
+		will  appear, and some may get duplicated (triplicated, etc)
+		randomly. Some  wrap-around effect will occur close to the edges.
+		</p>
+
+		<p> Sending an integer to inlet 1 sets the amount of spreading in
+		maximum  number of pixels + 1. even values translate the whole image
+		by half  a pixel due to rounding.</p>
+
+	</class>
+
+	<class name="#rotate">
+		<p>performs rotations on indexmaps and polygons and such.</p>
+		
+		<method name="init">
+			<arg name="angle" type="0...35999"/>
+		</method>
+		<inlet id="0"><method name="grid">
+			<arg name="grid" type="grid(anyA 2)"/></method></inlet>
+		<inlet id="1"><method name="int">rotation angle; 0...36000</method>
+		</inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(anyA 2)"/>
+		</method></outlet>
+	</class>
+
+	<class name="#remap_image">
+		<p>if you chain indexmap (coordinate) transformations from outlet 1
+		to inlet 1, then sending an image in inlet 0 will emit its
+		deformation out of outlet 0.</p>
+
+		<inlet id="0"/>
+		<inlet id="1"/>
+		<outlet id="0"/>
+		<outlet id="1"/>
+	</class>
+</section>
+
+<section name="Objects for Reporting">
+	<class name="#dim">
+		<help text="[#dim]"/>
+
+		<p>Returns list of dimensions as a grid. Given a grid sized like Dim(240,320,4), 
+		<k>[#dim]</k> will return a grid like Dim(3), whose values are 240, 320, 4. </p>
+
+		<method name="init">
+			no arguments.
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+				ignores any data contained within.
+				sends a grid dim(length of dims) containing dims.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid(rank)"/>
+				the list of dimensions of the incoming grid.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#type">
+		<p>gives a symbol representing the numeric type of the grid received.
+		</p>
+		<outlet id="0"><method name="&lt;numeric type symbol&gt;"/></outlet>
+	</class>
+
+	<class name="#print">
+		<method name="init"/>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(dims...)"/>
+			prints the dimensions of the grid.
+			prints all the grid data if there are 2 dimensions or less.
+			</method>
+		</inlet>
+	</class>
+
+	<class name="rubyprint">
+		This is only for testing the translation from PD to Ruby.
+		<method name="init"/>
+		<inlet id="0">
+			<method name="(any)">
+			prints the message to the console.
+			</method>
+		</inlet>
+	</class>
+
+	<class name="printargs">
+		This is only for testing the translation from PD to Ruby.
+		<method name="init">
+			<rest name="any"/>
+			prints everything.
+		</method>
+	</class>
+	
+	<class name="display">
+		GUI object equivalent to [print] and [#print].
+		<method name="(any)">
+		Displays the received message in the box, resizing the box so that the message fits exactly.
+		</method>
+	</class>
+</section>
+
+<section name="Objects for Color Conversion">
+	<class name="#apply_colormap_channelwise">
+		<p>This object is useful for color correction. For each pixel
+		it takes it apart, looks up each part separately in the colormap,
+		and constructs a new pixel from that. You may also color-correct
+		colormaps themselves.</p>
+
+		<p>Only works for things that have 3 channels.</p>
+
+		<p>Note: if you just need to apply a palette on an indexed-color
+		picture, you don't need this. Just use #store instead.</p>
+		
+		<inlet id="0"><method name="grid">
+			<arg name="grid" type="grid(rows columns channels)"/>
+			picture
+		</method></inlet>
+		<inlet id="1">
+			<method name="grid">
+			<arg name="grid" type="grid(intensities channels)"/>
+			colormap ("palette")
+		</method></inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(rows columns channels)"/>
+			picture
+		</method></outlet>
+	</class>
+
+	<class name="#rgb_to_greyscale">
+		<inlet id="0"><method name="grid">
+		<arg name="grid" type="grid(rows columns {red green blue})"/>
+		</method></inlet>
+		<outlet id="0"><method name="grid">
+		<arg name="grid" type="grid(rows columns {white})"/></method>
+		</outlet>
+	</class>
+
+	<class name="#greyscale_to_rgb">
+		<inlet id="0"><method name="grid">
+		<arg name="grid" type="grid(rows columns {white})"/></method>
+		</inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(rows columns {red green blue})"/>
+		</method></outlet>
+	</class>
+
+	<class name="#yuv_to_rgb">
+		<p>note: may change slightly to adapt to actual video standards.</p>
+		<inlet id="0"><method name="grid">
+		<arg name="grid" type="grid(rows columns {y u v})"/></method>
+		</inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(rows columns {red green blue})"/>
+		</method></outlet>
+	</class>
+
+	<class name="#rgb_to_yuv">
+		<p>note: may change slightly to adapt to actual video standards.</p>
+		<inlet id="0"><method name="grid">
+		<arg name="grid" type="grid(rows columns {red green blue})"/></method>
+		</inlet>
+		<outlet id="0"><method name="grid">
+			<arg name="grid" type="grid(rows columns {y u v})"/>
+		</method></outlet>
+	</class>
+</section>
+
+<section name="Objects for Miscellaneous Picture Processing">
+	<class name="#convolve">
+		<help text="[#convolve]"/>
+
+		<p>this is the object for blurring, sharpening, finding edges,
+		embossing, cellular automata, and many other uses.</p>
+<!--NYI
+		<attr name="seed">
+		
+		</attr>
+-->
+		<method name="init">
+			<arg name="op_para" type="numop2"/>
+			<arg name="op_fold" type="numop2"/>
+			<arg name="seed"   type="grid"/>
+			<arg name="right_hand" type="grid" default="none"/>
+		</method>
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns rest...)"/>
+				splits the incoming grid into dim(rest...) parts.
+				for each of those parts at (y,x), a rectangle of such
+				parts, centered around (y,x), is combined with the
+				convolution grid like a <k>[#]</k> of operation op_para. Then
+				each such result is folded like <k>[#fold]</k> of operation
+				op_fold and specified base. the results are assembled
+				into a grid that is sent to the outlet. near the borders of
+				the grid, coordinates wrap around. this means the whole grid
+				has to be received before production of the next grid
+				starts.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid">
+				<arg name="grid" type="grid(rows2 columns2)"/>
+				this is the convolution grid and it gets stored in
+				the object. if rows2 and/or columns2 are odd numbers,
+				then the centre of convolution is the middle of the convolution
+				grid. if they are even numbers, then the chosen centre will
+				be slightly more to the left and/or to the top, because the
+				actual middle is between cells of the grid.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns rest...)"/>
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#contrast">
+		<help text="[#contrast]"/> 
+
+		<method name="init">
+			<arg name="iwhiteness" default="256">same as inlet 1.</arg>
+			<arg name="contrast" default="256">same as inlet 2.</arg>
+		</method>
+
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns channels)"/>
+			produces a grid like the incoming grid but with
+			different constrast.
+			</method>
+			<p><k>[#contrast]</k> adjusts the intensity in an image.
+			resulting values outside 0-255 are automatically clipped.</p>
+		</inlet>
+		<inlet id="1">
+			<method name="int">
+			this is the secondary contrast (inverse whiteness).
+			it makes the incoming black
+			correspond to a certain fraction between output black and the
+			master contrast value. no effect is 256. default value is 256.
+			</method>	
+		</inlet>
+		<inlet id="2">
+			<method name="int">
+			this is the master contrast. it makes the incoming white
+			correspond to a certain fraction between output black and output
+			white. no effect is 256. default value is 256.
+			</method>	
+		</inlet>
+		<outlet>
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns channels)"/>
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#posterize">
+		<help text="[#posterize]"/>
+
+		<p><k>[#posterize]</k> reduces the number of possible intensities in an image;
+		it rounds the color values.The effect is mostly apparent with a low
+		number of levels.</p>
+
+		<method name="init">
+			<arg name="levels">same as inlet 1</arg>
+		</method>
+
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns channels)"/>
+				produces a posterized picture from the input picture.
+			</method>
+		</inlet>
+
+		<inlet id="1">
+			<method name="int">
+				this is the number of possible levels per channel. the
+				levels are equally spaced, with the lowest at 0 and the
+				highest at 255. the minimum number of levels is 2, and the
+				default value is 2.
+			</method>
+		</inlet>
+		
+		<outlet id="0">
+		</outlet>
+
+		<p>example: simulate the 216-color "web" palette using 6 levels.
+		simulate a 15-bit display using 32 levels.</p>
+	</class>
+
+	<class name="#solarize">
+		<p>makes medium intensities brightest; formerly brightest colours
+		become darkest; formerly darkest stays darkest. This filter is linear:
+		it's like a 200% contrast except that overflows are <i>mirrored</i>
+		instead of clipped or wrapped.</p>
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns channels)"/></method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(rows columns channels)"/></method>
+		</outlet>
+	</class>
+
+	<class name="#checkers">
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(y x {y x})"/>
+				result from a <k>[#for {0 0} {height width} {1 1}]</k>
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(y x {r g b})"/>
+				checkered pattern of 50%/75% greys
+				in 8x8 squares
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#layer">
+		<inlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(y x {r g b a})"/>
+				a picture that has an opacity channel.
+				will be used as foreground.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid">
+				<arg name="grid" type="grid(y x {r g b})"/>
+				a picture that has NO opacity channel.
+				will be used as background.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(y x {r g b})"/>
+				a picture that has NO opacity channel.
+				the opacity channel of the foreground is used as
+				a weighting of how much of either picture is seen
+				in the result.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#draw_image">
+		<method name="init">
+			<arg name="operator" type="numop2">
+				Normally you would use the "put" operator here;
+				but abnormally I recommend + and ^ for psychedelic effects.
+			</arg>
+			<arg name="picture" type="grid(y,x,channels)"/>
+			<arg name="position" type="grid({y x})"/>
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+				picture onto which another picture will be superimposed.
+			</method>
+			<method name="tile"><arg name="flag" type="0 or 1"/>
+				if enabled, inlet 1 picture will be repeated to cover the inlet 0 picture.
+			</method>
+			<method name="alpha"><arg name="flag" type="0 or 1"/>
+				if enabled, inlet 1 picture will be combined with inlet 0 picture using
+				the selected operator,
+				and then blended with inlet 0 picture according to transparency of
+				the inlet 1 picture, and then inserted in the result.
+				if disabled, the blending doesn't occur, as the transparency level
+				is considered to be "opaque". note that with alpha enabled,
+				the last channel of inlet 1 picture is considered to represent transparency.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+				picture that will be superimposed onto another picture.
+			</method>
+		</inlet>
+		<inlet id="2">
+			<method name="grid"><arg name="grid" type="grid({y x})"/>
+				position of the inlet 0 picture corresponding to top-left corner
+				of inlet 1 picture.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+				resulting picture.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#draw_polygon">
+		<method name="init">
+			<arg name="operator" type="numop2">
+				Normally you would use the "put" operator here;
+				but abnormally I recommend + and ^ for psychedelic effects.
+			</arg>
+			<arg name="color" type="grid(channels)"/>
+			<arg name="vertices" type="grid(vertices,{y x})"/>
+		</method>
+		<inlet id="0">
+			<method name="grid"><arg name="grid" type="grid(y x channels)"/>
+				picture on which the polygon will be superimposed.
+			</method>
+		</inlet>
+		<inlet id="1">
+			<method name="grid"><arg name="grid" type="grid(channels)"/>
+				color of each pixel
+			</method>
+		</inlet>
+		<inlet id="2">
+			<method name="grid"><arg name="grid" type="grid(vertices {y x})"/>
+				vertices of the polygon.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="grid">
+				<arg name="grid" type="grid(y x channels)"/>
+				modified picture.
+				note: starting with 0.7.2, drawing a 1-by-1
+				square really generates a 1-by-1 square, and
+				so on. This is because the right-hand border of a
+				polygon is excluded, whereas it was included
+				before, leading to slightly-wider-than-expected polygons.
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#text_to_image">
+		<p>inlet 2 receives a font grid, for example, [#in grid file lucida-typewriter-12.grid.gz]</p>
+		<p>inlet 1 receives a 2 by 3 matrix representing the colours to use (e.g. (2 3 # 0 170 0 255 255 0) means yellow on green)</p>
+		<p>inlet 0 receives a bang, transforming the data into an image suitable for #draw_image.</p>
+	</class>
+	<class name="#hueshift">
+		<p>inlet 1 receives an angle (0..36000)</p>
+		<p>inlet 0 receives a RGB picture that gets hueshifted by a rotation in the colorwheel by the specified angle; it gets sent to outlet 0.</p>
+	</class>
+</section>
+
+<section name="Other Objects">
+	<class name="rtmetro">This class has been removed (0.7.7).</class>
+
+	<class name="bindpatcher">
+		<p>sets the receive-symbol for the Pd patcher it is in.</p>
+		<p>has no inlets, no outlets.</p>
+		<p>EXPERIMENTAL.</p>
+		<method name="init">
+			<arg name="symbol" type="symbol"/>
+		</method>
+	</class>
+
+	<class name="pingpong">
+		Transforms linear counting (0, 1, 2, 3, 4, ...)  into a back-and-forth counting (0, 1, 2, 1, 0, ...)
+		from 0 to a specified upper bound.
+		<method name="init">
+			<arg name="top" type="int"/>
+		</method>
+		<inlet id="1">
+			<method name="float"><arg name="top" type="float"/></method>
+		</inlet>
+		<inlet id="0">
+			<method name="float">
+				a value to be transformed.
+				If, for example, top=10, then values 0 thru 10 are left unchanged,
+				values 11 thru 19 are mapped to 9 thru 1 respectively, and 20 thru 30
+				are mapped to 0 thru 10, and so on.
+			</method>
+		</inlet>
+	</class>
+
+	<class name="#global">
+		<help text="[#global]" />
+
+		<p>
+		objects of this class do nothing by themselves and are just
+		an access point to features that don't belong to any object in
+		particular.
+		</p>
+		<method name="profiler_reset">
+			resets all the time counters.
+		</method>
+		<method name="profiler_dump">
+			displays the time counters in decreasing order, with
+			the names of the classes those objects are in. this is
+			an experimental feature. like most statistics,
+			it could be vaguely relied upon if
+			only you knew to which extent it is unreliable. more on this
+			in a future section called "profiling".
+		</method>
+	</class>
+
+	<class name="fps">
+		<method name="init">
+			<arg name="clocktype" type="symbol(real|user|system|cpu)">
+				which clock to use. "real" uses wallclock time. "user" uses
+				the amount of time spent in the process. "system" uses the
+				amount of time spent in the kernel on behalf of the process.
+				"cpu" uses the Pentium clock, which is like a more precise
+				version of "real" if you have a Pentium.
+			</arg>
+			<arg name="detailed" type="symbol(detailed)">optional</arg>
+		</method>
+		<method name="init detailed">
+		</method>
+		<inlet id="0">
+			<method name="bang">
+			Times at which bangs are received are stored until a large
+			enough sample of those is accumulated. Large enough is defined
+			to be whenever the timespan exceeds one second. Then a report
+			is made through the outlet.
+			</method>
+			<method name="(else)">
+				messages other than bangs are ignored.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="float">
+			non-detailed mode only.
+			this is the messages-per-second rating.
+			</method>
+			<method name="list(float,6)">
+			detailed mode only.
+			this is: messages-per-second, followed by five values of
+			milliseconds-per-message: minimum, median, maximum, average,
+			standard deviation.
+			(the average happens to be simply 1000 divided by the
+			messages-per-second, but it is convenient to have it anyway)
+			</method>
+		</outlet>
+	</class>
+
+	<class name="unix_time">
+		<p>
+		This object returns the Unix timestamp. The first 
+		outlet does so with ASCII, the second in seconds and the third outlet 
+		outputs the fractions of seconds up to 1/100 000 th of a second which is useful for creating 
+		filenames.
+		</p>
+		<inlet id="0"><method name="bang"/></inlet>
+		<outlet id="0"><method name="symbol"/>Outputs the time and date in ASCII format</outlet>
+		<outlet id="1"><method name="float"/>Outputs the Unix timestamp in seconds</outlet>
+		<outlet id="2"><method name="float"/>Outputs the fractions of a second up to 10 microseconds (?) (actual precision is platform-dependent afaik)</outlet>
+	</class>
+
+	<class name="ls">
+		<p>
+		This object is similar to the Unix list command 
+		'ls'. It returns the names of files in a given 
+		directory.  May be used with [listlength] to retrieve the number of files. 
+		Hidden files are displayed.
+		</p>
+		<inlet id="0"><method name="symbol"/></inlet>
+	</class>
+
+	<class name="exec">
+		<p>
+		This object launches a Unix shell program or script.
+		</p>
+		<inlet id="0"><method name="symbol"/></inlet>
+	</class>
+
+	<class name="renamefile">
+		<p>
+		This object accepts a list of two elements as arguments.  
+		The current file name being the first and the second is the desired change 
+		in name.
+		</p>
+		<inlet id="0"><method name="list"/></inlet>
+	</class>
+
+	<class name="plotter_control">
+		<p>
+		This object produces HPGL instructions in ASCII form 
+		that can be sent to the comport object in order to control an HPGL 
+		compatible plotter.
+		</p>
+		<inlet id="0"><method name="symbol"/></inlet>
+		<outlet id="0"><method name="symbol"/>Outputs the HPGL commands in ASCII format</outlet>
+	</class>
+	
+	<class name="rubyarray">
+		<p>inlet 0 float : sends the specified array entry to outlet 0</p>
+		<p>inlet 1 list: writes that list as an array entry in position last specified by inlet 0.</p>
+		<p>inlet 0 save(symbol filename): writes the array contents to a file of the given filename as a CSV</p>
+		<p>inlet 0 save(symbol filename, symbol format): same thing but using a sprintf string such as %x,%f or whatever</p>
+		<p>inlet 0 load(symbol filename): replace all array contents by the contents of a CSV file</p>
+	</class>
+</section>
+
+<section name="jMax emulation">
+	<p>those classes emulate jMax functionality,
+	for use within PureData and Ruby.</p>
+	
+	<class name="fork">
+		<p>Every incoming message is sent to inlet 1 and then sent to
+		inlet 0 as well. Messages remain completely unaltered. Contrast
+		with PureData's "t a a" objects, which have the same purpose but
+		transform bangs into zeros and such.</p>
+
+		<inlet id="0"><method name="(any)"/></inlet>
+		<outlet id="0"/>
+		<outlet id="1"/>
+	</class>
+	<class name="jmax_udpsend">
+		Sends messages (but not grids nor dspsignals) via UDP (which
+		does not involve a connection, and may lose packets in case of
+		network overload or noise or etc).
+
+		<p>This works with jMax 2.5 and 4.1 but not 4.0.</p>
+
+		<method name="init">
+			<arg name="host" type="host"/>
+			<arg name="port" type="integer"/>
+		</method>
+
+		<inlet id="0"><method name="&lt;any&gt;"/></inlet>
+	</class>
+	<class name="jmax_udpreceive">
+		<p>Counterpart of jmax_udpsend</p>
+
+		<p>This works with jMax 2.5 and 4.1 but not 4.0.</p>
+
+		<method name="init">
+			<arg name="port" type="integer"/>
+		</method>
+		<outlet id="0"><method name="&lt;any&gt;"/></outlet>
+		<outlet id="1"><method name="list">
+			<arg name="protocol_name"/>
+			<arg name="sender_port"/>
+			<arg name="sender_host"/>
+			<arg name="sender_ip_address"/>
+		</method>
+		</outlet>
+	</class>
+	<class name="foreach">
+		<inlet id="0"><method name="list"><rest/>
+			Outputs N messages, one per list element, in order.
+		</method></inlet>
+	</class>
+	<class name="rubysprintf">
+		<method name="init">
+			<arg name="format" type="symbol"/>
+		</method>
+		<inlet id="0"><method name="list">
+			Outputs the format string with %-codes replaced
+			by elements of the list formatted as the %-codes say.
+			To get a list of those codes, consult a Ruby manual
+			(Equivalently, Perl, Python, Tcl and C all have equivalents of this,
+			and it's almost always called sprintf, or the % operator, or both)
+		</method></inlet>
+		<inlet id="1" attr="format" type="symbol"/>
+	</class>
+	<class name="listflatten">
+		<inlet id="0"><method name="list"><rest/>
+		</method></inlet>
+	</class>
+	<class name="listmake">
+		Emulation of jMax's [list] (but there cannot be a class named [list] in Pd)
+		<method name="init">
+			<rest name="list" isattr="yes"/>
+		</method>
+		<inlet id="0">
+			<method name="bang">send "list" to outlet 0</method>
+			<method name="list">as sending to inlet 1 and then banging; that is, passes thru and remembers.</method>
+		</inlet>
+		<inlet id="1" attr="list"/>
+	</class>
+	<class name="listlength">
+		<inlet id="0"><method name="list">
+			outputs the number of elements in the incoming list.
+		</method></inlet>
+	</class>
+	<class name="listelement">
+		<method name="init">
+			<arg name="index" type="int" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="list"><rest/>
+			Outputs one element of the list, as selected by "index".
+			Also accepts negative indices (e.g.: -1 means "last"), like Ruby, but unlike jMax.
+		</method></inlet>
+		<inlet id="1" attr="index"/>
+	</class>
+	<class name="listsublist">
+		<method name="init">
+			<arg name="index" type="int" isattr="yes"/>
+			<arg name="length" type="int" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="list"><rest/>
+			Outputs consecutive elements of the list, as selected by "index" and "length".
+			Also accepts negative indices (e.g.: -1 means "last"), like Ruby, but unlike jMax.
+		</method></inlet>
+		<inlet id="1" attr="index"/>
+		<inlet id="2" attr="length"/>
+	</class>
+	<class name="listprepend">
+		<method name="init">
+			<rest name="list" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="list"><rest/>
+			Outputs the stored list followed by the incoming list, all in one message.
+		</method></inlet>
+		<inlet id="1" attr="list"/>
+	</class>
+	<class name="listappend">
+		<method name="init">
+			<rest name="list" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="list"><rest/>
+			Outputs the incoming list followed by the stored list, all in one message.
+		</method></inlet>
+		<inlet id="1" attr="list"/>
+	</class>
+	<class name="listreverse">
+		<inlet id="0"><method name="list"><rest/>
+			Outputs the incoming list, from last element to first element.
+		</method></inlet>
+	</class>
+	<class name="oneshot">
+		Like [spigot], but turns itself off after each message, so you have to turn it on
+		again to making it pass another message.
+	</class>
+	<class name="inv+">
+		<method name="init">
+			<arg name="b" type="float" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="float"><arg name="a" type="float"/>
+			outputs b-a
+		</method></inlet>
+		<inlet id="1" attr="b"/>
+	</class>
+	<class name="inv*">
+		<method name="init">
+			<arg name="b" type="float" isattr="yes"/>
+		</method>
+		<inlet id="0"><method name="float"><arg name="a" type="float"/>
+			outputs b/a
+		</method></inlet>
+		<inlet id="1" attr="b"/>
+	</class>
+	<class name="messageprepend">
+		(This is not in jMax, but is there to help port $* messageboxes)
+		<method name="init"><rest name="list" isattr="yes"/></method>
+		<inlet id="0"><method name="&lt;any&gt;"><rest/>
+			Like [listprepend], but operates on whole messages, that is, including the selector.
+		</method></inlet>
+		<inlet id="1" attr="list"/>
+	</class>
+	<class name="messageappend">
+		(This is not in jMax, but is there to help port $* messageboxes)
+		<method name="init"><rest name="list" isattr="yes"/></method>
+		<inlet id="0"><method name="&lt;any&gt;"><rest/>
+			Like [listappend], but operates on whole messages, that is, including the selector.
+		</method>
+		</inlet>
+		<inlet id="1" attr="list"/>
+	</class>
+	<class name="shunt">
+		Compatible with jMax's [demux].
+		<method name="init">
+			<arg name="n">number of outlets</arg>
+			<arg name="i" default="0">initial selected outlet</arg>
+		</method>
+		<inlet id="0"><method name="&lt;any&gt;"><rest/>
+			Routes a message to the active outlet.
+		</method></inlet>
+		<inlet id="1"><method name="int"><arg name="i" type="int"/>
+			Selects which outlet is active.
+		</method></inlet>
+	</class>
+	<class name="demux">
+		please use shunt instead (name conflict with another Pd external)
+	</class>
+	<class name="range">
+		<method name="init">
+			<rest name="separators" type="float"></rest>
+		</method>
+		<inlet id="0"><method name="float">
+			a value to be sent to one of the outlets. The first outlet is for values
+			smaller than the first argument; else the second outlet is for values smaller
+			than the second argument; and so on; and the last outlet is for values greater
+			or equal to the last argument.
+		</method></inlet>
+		<inlet id="1..n"><method name="float">
+			sets the corresponding separator in the separator list.
+		</method></inlet>
+	</class>
+</section>
+
+<section name="PureData emulation">
+	<class name="pd_netsend">
+		same as jmax_udpsend but for PureData UDP connections.
+	</class>
+	<class name="pd_netreceive">
+		same as jmax_udpreceive but for PureData UDP connections.
+	</class>
+</section>
+
+</documentation>

@@ -1,0 +1,780 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE documentation SYSTEM 'jmax.dtd'>
+<documentation title="Reference Manual: Format Classes">
+<!-- $Id: format.xml,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<!--
+	GridFlow Reference Manual: Format Handler Reference
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
+-->
+
+<section name="Objects for Input/Output">
+
+	<class name="#in">
+		<icon text="[#in]"/>
+		<help text="[#in]" image="#inout"/>
+
+		<method name="init" min="0">
+				<arg name="format"/>
+				<rest name="format_specific_part"/>
+
+			If no arguments given, creates an input object for an unspecified
+			format. You then need to use the <k>"open"</k> command to link
+			a format handler to it.
+
+			If arguments given, the <k>"open"</k> command is immediately called
+			with those arguments.
+
+			Remember that most formats produce Dim[rows,columns,3] grids with
+			0-255 values. (Most.)
+		</method>
+
+		<inlet id="0">
+			<method name="open" min="1">
+				<arg name="format"/>
+				<rest name="format_specific_part"/>
+				This is the command that gives a particular resource
+				to a <k>[#out]</k> object. This is done through a "format"
+				(there is a list of formats in this manual). The other
+				arguments depend on the chosen format. The format may
+				be a file format or a protocol or a hardware device, etc.
+				
+				The format called "file" is a special shortcut that autodetects the
+				type of file (by name suffix) and picks up the appropriate handler.
+			</method>
+			<method name="open">
+				<arg name="filename"/>
+				This is a shortcut for <k>"open file"</k> followed by a filename.
+				The filename must contain a dot, else it will be seen as a handler name.
+			</method>
+			<method name="close">
+				close may be necessary if you operate on <k>"/dev/video"</k>,
+				which can only be read by one at a time. otherwise it's
+				usually not necessary.
+			</method>
+			<method name="int">
+				<arg name="frame_number"/>
+				selects one picture from a multi-picture format
+				and then does the same as a bang.
+			</method>
+			<method name="set">
+				<arg name="frame_number"/>
+				selects one picture from a multi-picture format,
+				to be displayed by the next bang.
+			</method>
+			<method name="bang">
+				sends a grid through the outlet. the grid may be the
+				result of reading from a file, acquiring from a device,
+				capturing from the screen etc.
+
+				this is format-specific. most formats
+				produce grid(rows columns {red green blue}).
+
+				In formats that read from a file, reading another picture
+				will continue if there are several pictures in the
+				same file, but if the end of file is reached instead,
+				it will rewind and send the first picture again.
+
+				see section "External Picture Formats".
+
+			</method>
+			<method name="option">
+				<arg name="selector" type="symbol"/>
+				<rest name="stuff"/>
+				Obsolete. the word "option" is optional now.
+			</method>
+			<method name="rewind">
+				rewinds to beginning of file if applicable.
+			</method>
+			<method name="loop">
+				<arg name="flag" type="bool"/>
+				controls the automatic looping of movies.
+			</method>
+		</inlet>
+
+		<outlet id="1">
+			<method name="int">
+				frame number of frame just sent,
+				for formats that have frame numbers.
+			</method>
+			
+			<method name="bang">
+				tried to read a frame that does not exist
+				(signals end of file)
+			</method>
+		</outlet>
+	</class>
+
+	<class name="#out">
+		<icon text="[#out]"/>
+		<help text="[#out]" image="#inout"/>
+
+		<method name="init" min="0">
+				<arg name="format"/>
+				<rest name="format_specific_part"/>
+
+			If no arguments given, creates an output object for an unspecified
+			format. You then need to use the <k>"open"</k> command to link
+			a format handler to it.
+
+			If arguments given, the <k>"open"</k> command is immediately called
+			with those arguments.
+
+			Remember that most formats expect dim(rows,columns,3) grids with
+			0-255 values. (Most.)
+		</method>
+		<method name="init">
+			<arg name="rows" type="integer"/>
+			<arg name="columns" type="integer"/>
+
+			This alternate way to create an <k>[#out]</k> automatically calls
+			<k>"open window"</k> and <k>"out_size <i>rows columns</i>"</k>.
+		</method>
+		<inlet id="0">
+			<method name="open" min="1">
+				<arg name="format"/>
+				<rest name="format_specific_part"/>
+				This is the command that gives a particular resource
+				to a <k>[#out]</k> object. This is done through a "format"
+				(there is a list of formats in this manual). The other
+				arguments depend on the chosen format. The format may
+				be a file format or a protocol or a hardware device, etc.
+			</method>
+			<method name="open file">
+				The format called "file" is a special shortcut that autodetects the
+				type of file (by name suffix) and picks up the appropriate handler.
+			</method>
+			<method name="open">
+				<arg name="filename"/>
+				This is a shortcut for "open file" followed by a filename.
+				The filename must contain a dot, else it will be seen as a handler name.
+			</method>
+			<method name="grid"><arg name="grid" type="grid"/>
+				this is format-specific. most formats
+				expect grid(rows columns {red green blue}).
+
+				In formats that write to a file, sending a 2nd picture
+				overwrites the first.
+
+				see section "External Picture Formats".
+			</method>
+			<method name="close">
+				closes the file. usually not necessary.
+			</method>
+			<method name="option">
+				<arg name="selector" type="symbol"/>
+				<rest name="stuff"/>
+				Obsolete. Omit the word "option" now.
+			</method>
+			<method name="timelog">
+				<arg name="status" type="0,1"/>
+				when status=1, current time (unix clock) and time since last
+				frame-end are printed in the console. when status=0, it is off.
+				default is 0.
+			</method>
+			<method name="rewind">
+				rewinds to beginning of file if applicable.
+				will overwrite the previous data.
+			</method>
+		</inlet>
+		<outlet id="0">
+			<method name="bang">
+				sent when a complete grid has been received.
+			</method>
+		</outlet>
+	</class>
+	
+	<class name="#peephole">
+		<p>
+		This object class only works with a X11-based version of Pd.
+		(e.g. on Linux, BSD, but not MacOS X).
+		</p>
+		<p>Similar to <k>[#out window]</k>, except it creates an inset in the patch you put it
+		in, and a scaled version of the picture appears in the inset. It also emits the same messages
+		as <k>[#out window]</k> and automatically scales cursor position according to the current scale factor.
+		The scale factor is decided automatically.
+		</p>
+		<method name="init">
+			<arg name="height" type="int"/>
+			<arg name="width" type="int"/>
+		</method>
+		<p>All other methods are as in <k>[#out window]</k>.</p>
+	</class>
+	<class name="#mouse">
+		This will process the "position" messages emitted by <k>[#out]</k> or <k>[#peephole]</k> in
+		useful ways.
+		<outlet id="0"><method name="list">
+			y,x coords of a click
+		</method></outlet>
+		<outlet id="1"><method name="list">
+			y,x coords of a drag (any button is kept pressed)
+		</method></outlet>
+		<outlet id="2"><method name="list">
+			y,x coords of an unclick
+		</method></outlet>
+		<outlet id="3"><method name="list">
+			y,x coords of a move (no button is pressed)
+		</method></outlet>
+		<outlet id="4"><method name="float" type="0,1">button 1 status</method></outlet>
+		<outlet id="5"><method name="float" type="0,1">button 2 status</method></outlet>
+		<outlet id="6"><method name="float" type="0,1">button 3 status</method></outlet>
+		<outlet id="7"><method name="float" type="-1,1">
+			wheel difference: -1 = roll up; 1 = roll down.
+		</method></outlet>
+	</class>
+	<class name="#camera">
+		Works about like <k>[#in videodev]</k> except you can right-click-open it to access all of the
+		camera settings visually.
+	</class>
+</section>
+
+<section name="Picture/Movie Formats">
+
+	<class name="format ppm #in/#out">
+		<icon image="format_ppm" text="[open filename.ppm]"/>
+
+		<p>Subformat P6 only.
+		Max-number can only be 255 (24-bit RGB).
+		</p>
+
+		<method name="open ppm file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+
+		<method name="open ppm gzfile">
+			<arg name="filename" type="symbol"/>
+			same but for .ppm.gz files
+		</method>
+
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {r g b})"/>
+			values 0-255
+		</method>
+	</class>
+
+	<class name="format targa #in/#out">
+		<icon image="format_targa" text="[open filename.tga]"/>
+		<p>Support for RGB-24 (3 channels) and RGBA-32 (4 channels)</p>
+
+		<method name="open targa file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+
+		<method name="open targa gzfile">
+			<arg name="filename" type="symbol"/>
+			same but for .tga.gz files
+		</method>
+
+		<method name="grid"><arg name="grid" type="grid(rows columns 3)"/>RGB-24</method>
+		<method name="grid"><arg name="grid" type="grid(rows columns 4)"/>RGBA-32</method>
+	</class>
+
+	<class name="format jpeg #in/#out">
+		<!--<icon image="format_jpeg" text="[open foo.jpg]"/>-->
+		<p>Support for RGB non-progressive</p>
+		
+		<method name="open jpeg file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns 3)"/>RGB-24
+		</method>
+	</class>
+
+	<class name="format png #in">
+		<!--<icon image="format_jpeg" text="[open foo.jpg]"/>-->
+		<p>Support for RGB non-progressive</p>
+		
+		<method name="open png file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+
+		<method name="grid"><arg name="grid" type="grid(rows columns 1)"/>Y-8 (greyscale)</method>
+		<method name="grid"><arg name="grid" type="grid(rows columns 2)"/>YA-16 (greyscale and transparency)</method>
+		<method name="grid"><arg name="grid" type="grid(rows columns 3)"/>RGB-24 (colour)</method>
+		<method name="grid"><arg name="grid" type="grid(rows columns 4)"/>RGBA-32 (colour and transparency)</method>
+	</class>
+
+	<class name="format quicktime #in/#out">
+		<p>Support for .mov files.</p>
+		<p>This format supports frame-seek and frame-tell.</p>
+		<p>Uses the HW-QuickTime library aka QuickTime4Linux
+		(libquicktime.so). There is also a variant on the same library and that project
+		is just called LibQuickTime.</p>
+		<p>Some versions of those libraries may include support for different codecs,
+		and some also may support entirely different wrapper formats such as AVI.</p>
+		<p>On Macintosh, Apple QuickTime is used instead, but several of the following
+		messages may not be available.</p>
+
+		<method name="open quicktime file">
+			<arg name="filename" type="symbol" />
+		</method>
+		<method name="codec">
+			<arg name="codec" type="symbol"/>
+			Allowed values are at least: raw, jpeg, png, mjpa, yuv2, yuv4.
+			Some other values may allowed, depending on the version of the library
+			and which codec plugins are installed.
+			Must be set before the first frame is written.
+			only applies to <k>[#out]</k>. Choosing a codec is important
+			because codecs influence greatly the speed of
+			encoding, the speed of decoding,
+			the size of the written file, and its fidelity to the
+			original content. Note that there exist other Apple-QuickTime
+			codecs that are not supported by HW-QuickTime.
+		</method>
+		<method name="parameter">
+			<arg name="key" type="symbol"/>
+			<arg name="value" type="int"/>
+			Sets special codec-specific settings.
+			For example: <k>"parameter jpeg_quality 75"</k>
+		</method>
+		<method name="framerate">
+			<arg name="fps" type="int"/>
+			Sets the framerate of the file.
+			This is not used by GridFlow when reading a file, but other
+			programs usually care.
+		</method>
+
+		<method name="colorspace">
+			<arg name="colorspace" type="symbol"/>
+			Allowed values are rgb, rgba, bgr, bgra, yuv, yuva.
+			Normally you don't need this.
+		</method>
+		<method name="size">
+			<arg name="height" type="int"/>
+			<arg name="width"  type="int"/>
+			Forces a window size when writing. Usually this has to be used <u>after</u>
+			setting the framerate and codec and <u>before</u> setting the codec-parameters.
+			(Strange. Sorry.)
+		</method>
+		<method name="force_size">
+			<arg name="height" type="int"/>
+			<arg name="width"  type="int"/>
+			forces a window size when reading.
+			this is a workaround for a problem in HW-QuickTime.
+		</method>
+	</class>
+
+	<class name="format mpeg #in">
+		<icon image="format_mpeg" text="[open mpeg file filename.mpeg]"/>
+		<p>support for .mpeg files</p>
+		<p>this format supports frame-seek and frame-tell.</p>
+		<p>Two different libraries are available for dealing with
+		MPEG files. Those have different details, capabilities and quirks.</p>
+		<p>In any case, GridFlow does not support importing audio from
+		those files.</p>
+		<p>If you use the HeroineWarrior library, you may open several
+		mpeg files at once, but not with the GregWard library.</p>
+		<p>Libraries may scream error messages in a rude way.</p>
+		<p>By opposition to PPM and TARGA, this format driver only
+		allows a single MPEG stream per file (you cannot "cat"
+		several MPEG files together).
+		</p>
+		<p>Supports Rewind and Frame Select.</p>
+		<method name="open mpeg file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+	</class>
+
+	<class name="format grid #in/#out">
+		<icon image="format_grid" text="[open grid file filename.grid]"/>
+		<icon image="format_grid_tcp" text="[open grid tcp artengine.ca 4242]"/>
+		<icon image="format_grid_tcpserver" text="[open grid tcpserver 4242]"/>
+
+		<p>
+		This is GridFlow's special file format. This is the only I/O
+		format that can hold anything that the <k>[#store]</k> object can.
+		</p>
+		<p>
+		This is the picture format that would support TCP connections
+		if that feature actually worked. More on this later.
+		</p>
+
+		<method name="open grid file">
+			<arg name="filename" type="symbol"/>
+			opens the specified file, taken from the current
+			directory.
+		</method>
+		<method name="open grid gzfile">
+			<arg name="filename" type="symbol"/>
+			same but for .grid.gz files
+		</method>
+		<method name="open grid tcp">
+			<arg name="hostname" type="symbol"/>
+			<arg name="port" type="integer"/>
+			dials an specified hostname/port on the InterNet or
+			compatible network. the TCP protocol is used.
+		</method>
+		<method name="open grid tcpserver">
+			<arg name="port" type="integer"/>
+			waits for a call (and answers) for this port on the
+			local machine via InterNet or compatible network.
+			Answers the call.
+		</method>
+		<method name="type int32">
+			output will be as 32 bit signed integers.
+		</method>
+		<method name="type uint8">
+			output will be as 8 bit unsigned integers.
+		</method>
+		<method name="headerful">
+			cancels "headerless" (and back to reading .grid)
+		</method>
+		<method name="headerless">
+			<rest name="dimensions" type="integer"/>
+			instead of reading .grid files with header, will read raw data,
+			faking a .grid header to itself. It will use the hereby specified
+			dimension list, as well as two other settings:
+			<k>type</k> and <k>endian</k>.
+		</method>
+
+		<p>When writing "raw" data, a file may be considered a long string of
+		base 256 digits (called bytes), but different computers have different
+		conventions for dealing with them:
+
+		<method name="endian" type="symbol(big|endian|same)">
+			<list><li>big:
+			A number will be written starting with the biggest digit.
+			This is the natural way on the Macintosh, Sun, Amiga, and so on.
+			</li>
+			<li>little:
+			A number will be written starting with the smallest digit.
+			This is the natural way on the Intel 386/Pentium.
+			</li>
+			<li>same:
+			A number will be written in whichever way is more natural
+			on this computer. The natural way is slightly faster to handle.
+			This is the default setting.
+			</li>
+			</list>
+		</method>
+		</p>
+	</class>
+</section>
+
+<section name="Acquisition Devices">
+
+	<class name="format videodev #in">
+		<icon image="format_videodev" text="[open /dev/video0]"/>
+
+		<method name="open">
+			<arg name="device"/>
+		</method>
+
+		<p>Video4Linux-1 devices, RGB-24 only. Variable picture size.</p>
+		
+		<p>We have been testing it using cards of the BT-848 family,
+		such as Miro DC10plus and Hauppauge WinTV, using the <k>bttv.o</k> linux driver.
+		Also we have been testing using Logitech QuickCam (and similar Labtec hardware),
+		but don't use the <k>qce-ga</k> driver, which is buggy and obsolete: the <k>qc-usb</k>
+		works better.</p>
+
+		<p>Some hardware doesn't support RGB, so you may have to select a YUV colorspace
+		(see below) and then use <k>[#yuv_to_rgb]</k>. Don't forget to also do
+		<k>[# min 255]</k> and <k>[# max 0]</k>.
+		</p>
+
+		<p>If for some reason there's a bug that causes a driver to produce BGR instead of RGB,
+		so that red and blue are swapped, you can swap them back by filtering through a RGB-BGR
+		converter, such as <k>[#inner * + 0 {3 3 # 0 0 1 0 1 0 1 0 0}]</k>.</p>
+
+		<p>color adjustments:
+		<method name="brightness"><arg name="level" type="0-65535"/></method>
+		<method name="hue"       ><arg name="level" type="0-65535"/></method>
+		<method name="colour"    ><arg name="level" type="0-65535"/></method>
+		<method name="contrast"  ><arg name="level" type="0-65535"/></method>
+		<method name="whiteness" ><arg name="level" type="0-65535"/></method>
+		</p>
+		<method name="get">
+			<arg name="attr" type="symbol"/>
+			gets a specific attribute. a message is sent through right outlet.
+			valid attributes are: brightness, hue, colour, contrast, whiteness.
+		</method>
+		<method name="get">
+			gets all attributes.
+		</method>
+		
+		<p>other options:
+		<method name="channel"   ><arg type="integer"/></method>
+		<method name="tuner"     ><arg type="integer"/></method>
+		<method name="norm"      ><arg type="integer"/></method>
+		<method name="frequency" ><arg type="integer"/></method>
+		<method name="transfer"  >
+			<arg type="symbol(read|mmap)"/>
+			<arg type="integer" default="2"/>
+			<list>
+			<li>mmap:
+			This is the normal (and fast) way of transferring pictures
+			from the camera.
+			</li>
+			<li>read:
+			Some cameras/drivers only support this instead of mmap.
+			</li></list>
+			In case of mmap, the extra numeric argument sets the
+			queue length in number of frames, so you can select an
+			appropriate tradeoff between efficiency and latency.
+		</method>
+
+		<method name="colorspace">
+			<arg name="colorspace" type="symbol"/>
+			Allowed values are: RGB24, YUV420P.
+			Use this if your driver doesn't support RGB24.
+		</method>
+
+		<method name="size">
+			<arg name="height"/>
+			<arg name="width"/>
+			sets the input size, especially when using a video digitalizer
+			device.
+		</method>
+		</p>
+	</class>
+</section>
+
+<section name="Window Output">
+
+	<class name="format x11 #in/#out">
+		<icon image="format_x11" text="[open window]"/>
+		<icon image="format_x11_remote" text="[open x11 remote artengine.ca 10]"/>
+
+		<p>supports 15,16,24,32-bit truecolor displays</p>
+
+		<p>now also support 8-bit indexed displays, using a private colormap
+		configured as 3:3:2 RGB. When using 8-bit you can specify the
+		"use_stripes" option to use a completely different color scheme
+		involving R,G,B diagonal stripes, a kind of 6:6:6 RGB spread over three
+		pixels.</p>
+
+		<p>If you are using Windows or MacOS 10: you will have to install
+		a X11 server. This will emulate Unix display on your OS. (note:
+		Unix systems also need a X11 server, but it's built-in and handles
+		the video driver directly). In the case of MacOS 10 and QNX that both
+		use non-X11 display technology on top of a basically Unix OS, the
+		OS comes with a X11 server, but it may be on a "bundled software"
+		CD.</p>
+	
+		<method name="open x11">
+			synonym of "open x11 here".
+		</method>
+
+		<method name="open x11 here">
+			connects to the default X11 server,
+			according to your environment variable "DISPLAY".
+		</method>
+
+		<method name="open x11 local">
+			<arg name="display_number" type="integer"/>
+			connects to a display server on this machine.
+		</method>
+		
+		<method name="open x11 remote">
+			<arg name="host_name" type="symbol"/>
+			<arg name="display_number" type="integer"/>
+			connects to a remote X11 display server using TCP.
+			Sorry, IP addresses are not supported.
+			Port number will be 6000 plus the display number, because
+			of the X11 standard.
+		</method>
+		
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {red green blue})"/>
+			resizes the window to the size of the grid;
+			encodes that grid in the display's pixel format;
+			also displays it if autodraw &gt; 0
+			the values must be in range 0-255,
+			or else they will be "wrapped".
+		</method>
+
+		<p>
+		Destroying the object (or sending "close") should close the window.
+		</p>
+
+		<p>because of the design of Xlib, or if any of the connections
+		involved crashes, then the whole program has to be terminated.
+		(don't you love xlib). Something similar happens if you close any
+		of the windows yourself, but IIRC this could be fixed.</p>
+
+		<p>only one window may be used per connection (to simplify matters;
+		this doesn't reduce flexibility).</p>
+
+		<p>there is an additional argument that may be added to every
+		<k>"open"</k> message; if you don't put it, a new toplevel window is created.
+		if you put "root" then the screen's wallpaper will be used instead
+		(it may fail to work with some popular window managers). You can also
+		put a window number, e.g. <k>0x28003ff</k>, you may connect to
+		an existing window; you can find out the number of a window by using
+		a tool like <k>xwininfo</k>, part of X11 standard tools.</p>
+
+		<method name="out_size">
+			<arg name="height" type="integer"/>
+			<arg name="width"  type="integer"/>
+			changes the window's size, just like sending a grid
+			dim(height,width,3) would.
+
+			this affects the size of screen captures too.
+		</method>
+		
+		<method name="draw">
+			forces a redraw of the window's contents.
+		</method>
+
+		<method name="autodraw">
+			<arg name="level" type="0,1,2"/>
+			<list start="0">
+			<li>draw() is never automatically invoked</li>
+			<li>draw() is invoked after each grid is finished</li>
+			<li>draw() is invoked incrementally after each row is
+			received. (but buffering may cause lines to come in groups
+			anyway)</li>
+			</list>
+		</method>
+
+		<method name="setcursor">
+			<arg name="cursor" type="0..63"/>
+			Selects one of the 64 predefined cursors of X11. (Note that if
+			your cursor table has them numbered from 0 to 126 using only even
+			numbers, then those cursor numbers are all doubled compared to
+			the ones GridFlow uses.)
+		</method>
+		
+		<method name="hidecursor">
+			This makes the cursor invisible.
+		</method>
+
+		<outlet id="0">
+			<method name="position">
+				<arg name="y" type="integer"/>
+				<arg name="x" type="integer"/>
+				<arg name="buttons" type="integer"/>
+				
+				<p>This is emitted every time the cursor moves inside
+				the window connected to this format handler. This is also
+				emitted when the cursor is dragging from inside to outside
+				the window. This is also emitted when a mouse button is pressed.</p>
+
+				<p>The y and x coordinates are relative to the upper
+				right corner of the window. Specific button states may be
+				extracted from the button value by applying [&gt;&gt;
+				buttonnumber] and then checking whether the result is odd.
+				Button numbers normally are:
+				<list start="0">
+				<li>Shift</li>
+				<li>CapsLock</li>
+				<li>Control</li>
+				<li>Alternate</li>
+				<li>NumLock</li>
+				<li>???</li>
+				<li>Meta</li>
+				<li>ScrollLock</li>
+				<li>Left Button</li>
+				<li>Middle Button</li>
+				<li>Right Button</li>
+				<li>Wheel Up</li>
+				<li>Wheel Down</li>
+				</list></p>
+				<p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p>
+			</method>
+			<method name="keypress">
+				<arg name="y" type="integer"/>
+				<arg name="x" type="integer"/>
+				<arg name="buttons" type="integer"/>
+				<arg name="keyname" type="symbol"/>
+				<p>Similar to <k>position</k> above, but this is emitted when a
+				keyboard key is pressed while this format handler's window
+				is active. Keynames follow the X11 standard, similarly to PureData's [keyname] object.
+				The only exception is that keynames that are digits get prefixed by a capital D so that
+				they don't get mistaken for actual numbers.</p>
+				<p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p>
+			</method>
+			<method name="keyrelease">
+				<arg name="y" type="integer"/>
+				<arg name="x" type="integer"/>
+				<arg name="buttons" type="integer"/>
+				<arg name="keyname" type="symbol"/>
+				Same as keypress but when a key gets released instead.
+				<p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p>
+			</method>
+		</outlet>
+	</class>
+
+	<class name="format quartz #out">
+		The equivalent of format x11 on MacOS 10.x, but with less features (sorry).
+		<method name="open">
+			opens a dim(240,320,3) rgb window (default).
+		</method>
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {red green blue})"/>
+			Sends image to screen. Window will be resized to fit the image exactly.
+		</method>
+	</class>
+
+	<class name="format sdl #out">
+		<method name="open">
+			Opens a dim(240,320,3) rgb window (default).
+		</method>
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {red green blue})"/>
+			Sends image to screen. Window will be resized to fit the image exactly.
+		</method>
+	</class>
+
+	<class name="format aalib #out">
+		<method name="open aalib">
+			<arg name="driver">
+				Normally "X11" with uppercase X; else consult
+				the AALib manual.
+			</arg>
+			<rest name="args">
+				You can pass "commandline options" of AALib here.
+			</rest>
+		</method>
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {white})"/>
+			converts a greyscale image to an ascii image and possibly
+			displays it. note that the image is typically downscaled by
+			a factor of 2 by aalib itself.
+		</method>
+		<method name="grid">
+			<arg name="grid" type="grid(rows columns {ascii attr})"/>
+			the inverse of "dump". Both together in a loop allow to
+			post-process aalib's buffer before displaying. Goes well
+			with "draw", "autodraw".
+		</method>
+		<method name="print">
+			<arg name="y" type="int"/>
+			<arg name="x" type="int"/>
+			<arg name="attr" type="int"/>
+			<arg name="text" type="symbol"/>
+		</method>
+		<method name="autodraw">
+			like X11's autodraw.
+		</method>
+		<method name="draw">
+			like X11's draw.
+		</method>
+		<method name="dump">
+			produces a Dim[y,x,2] grid whose two channels are
+			ascii character codes and character attributes.
+		</method>
+	</class>
+
+	<class name="format window #out">
+		<method name="open window">
+			Equivalent to "open x11", but this can be set by putting a line like
+			this in the config file: <k>GridFlow.formats[:window] = GridFlow.formats[:x11]</k>
+			(and similarly other aliases can be created too)
+		</method>
+	</class>
+</section>
+
+</documentation>

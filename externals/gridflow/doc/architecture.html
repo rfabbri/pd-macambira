@@ -1,0 +1,217 @@
+<html><head>
+<!-- $Id: architecture.html,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<title>GridFlow 0.8.0 - Reference Manual: Architecture</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - Reference Manual: Architecture</h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="1"><h4><a href="#Numbers">Numbers</a></h4><ul>
+</ul>
+<h4><a href="#Grid_Literals">Grid Literals</a></h4><ul>
+</ul>
+<h4><a href="#Grid_Protocol">Grid Protocol</a></h4><ul>
+</ul>
+<h4><a href="#Picture_Protocol">Picture Protocol</a></h4><ul>
+</ul>
+<h4><a href="#Numeric_Operators">Numeric Operators</a></h4><ul>
+</ul>
+<h4><a href="#Synchronisation">Synchronisation</a></h4><ul>
+</ul>
+<h4><a href="#Bridges">Bridges</a></h4><ul>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Numbers"></a><h4>Numbers</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>High-performance computation requires precise and quite peculiar 
+	definitions of numbers and their representation.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Inside most programs, numbers are written down as strings of 
+	bits. A bit is either zero or one. Just like the decimal system 
+	uses units, tens, hundreds, the binary system uses units, twos, 
+	fours, eights, sixteens, and so on, doubling every time.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>One notation, called integer allows for only integer values to be 
+	written (no fractions). when it is unsigned, no negative values may 
+	be written. when it is signed, one bit indicates whether the number 
+	is positive or negative. Integer storage is usually fixed-size, so you have 
+	bounds on the size of numbers, and if a result is too big it "wraps around", truncating the biggest 
+	bits.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Another notation, called floating point (or float) stores numbers using 
+	a fixed number of significant digits, and a scale factor that allows for huge numbers 
+	and tiny fractions at once. Note that 1/3 has periodic digits, but even 0.1 has periodic digits, 
+	in binary coding; so expect some slight roundings; the precision offered should be 
+	sufficient for most purposes. Make sure the errors of rounding don't accumulate, though.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>This little program of mine prints 1/3 in base 2 (only digits after the period): <kbd><font color="#007777">ruby -e 'x=1/3.0;for i in 0..52 do x*=2;y=x.floor;print y;x-=y end;puts'</font></kbd></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In GridFlow, there are six kinds of numbers:</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><tr><td></td><td></td><td><table border="0" bgcolor="black" cellspacing="1"><tr><td valign="top" align="left"><table bgcolor="white" border="0" cellpadding="4" cellspacing="1"><tr><td bgcolor="#808080"><font color="#ffffff"><b>name</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>aliases</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>range</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>size (bytes)</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>precision</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>description</b></font></td></tr>       <tr><td bgcolor="#ffffff">uint8</td><td bgcolor="#ffffff">u8 b</td><td bgcolor="#ffffff">0..255</td><td bgcolor="#ffffff">1</td><td bgcolor="#ffffff">1</td><td bgcolor="#ffffff"> 
+			unsigned 8-bit integer. 
+			this is the usual size of numbers taken from files and cameras, and 
+			written to files and to windows. (however this gets converted to <kbd><font color="#007777">int32</font></kbd> 
+			unless otherwise specified.) </td></tr> <tr><td bgcolor="#f0f8ff">int16</td><td bgcolor="#f0f8ff">i16 s</td><td bgcolor="#f0f8ff">±2<sup>15</sup> = -32768..32767</td><td bgcolor="#f0f8ff">2</td><td bgcolor="#f0f8ff">1</td><td bgcolor="#f0f8ff">...</td></tr> <tr><td bgcolor="#ffffff">int32</td><td bgcolor="#ffffff">i32 i</td><td bgcolor="#ffffff">±2<sup>31</sup> = -2147483648..2147483647</td><td bgcolor="#ffffff">4</td><td bgcolor="#ffffff">1</td><td bgcolor="#ffffff"> 
+			signed 32-bit integer. 
+			this is used for most computations. </td></tr> <tr><td bgcolor="#f0f8ff">int64</td><td bgcolor="#f0f8ff">i64 l</td><td bgcolor="#f0f8ff">±2<sup>63</sup></td><td bgcolor="#f0f8ff">8</td><td bgcolor="#f0f8ff">1</td><td bgcolor="#f0f8ff">...</td></tr> <tr><td bgcolor="#ffffff">float32</td><td bgcolor="#ffffff">f32 f</td><td bgcolor="#ffffff">±10<sup>±38</sup></td><td bgcolor="#ffffff">4</td><td bgcolor="#ffffff">23 bits = 0.000012% (about 7 digits)</td><td bgcolor="#ffffff">...</td></tr> <tr><td bgcolor="#f0f8ff">float64</td><td bgcolor="#f0f8ff">f64 d</td><td bgcolor="#f0f8ff">±10<sup>±308</sup></td><td bgcolor="#f0f8ff">8</td><td bgcolor="#f0f8ff">52 bits (about 15 digits)</td><td bgcolor="#f0f8ff">...</td></tr> </table></td></tr></table></td></tr></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Grid_Literals"></a><h4>Grid Literals</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	In every grid-accepting inlet, a list may be sent instead; if 
+	it consists only of integers, it will be converted to a 
+	one-dimensional grid. Else it may contain a single "#" sign and 
+	integers on both sides of it, where the ones to the left of it are 
+	fed as arguments to an imaginary <kbd><font color="#007777">[#redim]</font></kbd> object and the one to the 
+	right of it are fed through that <kbd><font color="#007777">[#redim]</font></kbd>. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	In every grid-accepting inlet, an integer or float may also be sent; 
+	it will be converted to a zero-dimensional grid (a <b>scalar</b>). </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Grid_Protocol"></a><h4>Grid Protocol</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	a grid has an associated number type that defines what are the possible values for its elements 
+	(and how much space it takes). the default is <b>int32</b>. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	a single-dimensional grid of 3 elements (a triplet) is called dim(3). a 
+	three-dimensional grid of 240 rows of 320 columns of triplets is called 
+	dim(240,320,3). </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	There is a sequence in which elements of a Grid are stored and 
+	transmitted.  Dimension 0 is called "first" and dimension N-1 is 
+	called "last". They are called so because if you select a 
+	position in the first dimension of a grid, the selected part is of the same 
+	shape minus the first dimension; so in dim(240,320,3) if you select 
+	row 51 (or whichever valid row number), you get a dim(320,3). if you select 
+	a subpart two more times you get to a single number. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	At each such level, elements are sent/stored in their numeric order, 
+	and are numbered using natural numbers starting at 0. This ordering usually 
+	does not matter, but sometimes it does. Most notably, <kbd><font color="#007777">[#import]</font></kbd>, <kbd><font color="#007777">[#export]</font></kbd> and <kbd><font color="#007777">[#redim]</font></kbd> care about it. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	On the other hand, order of dimensions usually does matter; this is 
+	what distinguishes rows from columns and channels, for example. 
+	Most objects care about the distinction. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	A grid with only 1 element in a given dimension is different from one 
+	lacking that dimension; it won't have the same meaning. You can use this 
+	property to your advantage sometimes. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	Zero-dimensional grids exist. They are called dim(). They can only contain 
+	a single number. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Picture_Protocol"></a><h4>Picture Protocol</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p><i>This section is useful if you want to know what a picture is 
+	in terms of a grid. </i></p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>A picture is a three-dimensional Grid: <ul> <li><b>0</b> : rows</li> <li><b>1</b> : columns</li> <li><b>2</b> : channels</li> </ul> </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Channels for the RGB color model are: <ul> <li><b>0</b> : red</li> <li><b>1</b> : green</li> <li><b>2</b> : blue</li> </ul> </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	Because Grids are made of 32-bit integers, a three-channel picture uses 
+	96 bpp (bits per pixel), and have to be downscaled to 24 bpp (or 16 bpp) 
+	for display. That huge amount of slack is there because when you create 
+	your own effects you often have intermediate results that need to be of 
+	higher precision than a normal picture. Especially, results of multiplications 
+	are big and should not overflow before you divide them back to normal; 
+	and similarly, you can have negative values all over, as long as you take 
+	care of them before they get to the display. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p> 
+	In the final conversion, high bits are just ignored. This means: black is 
+	0, maximum is 255, and values wrap like with <kbd><font color="#007777">% 256</font></kbd>. If you want to 
+	clip them, you may use <kbd><font color="#007777">[# max 0]</font></kbd> and <kbd><font color="#007777">[# min 255]</font></kbd> objects. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Numeric_Operators"></a><h4>Numeric Operators</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In the following table, A is the value entered to the 
+		left, and B is the value entered to the right.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Angles are in hundredths of degrees. This means a full circle 
+		(two pi radians) is 36000. You convert from degrees to our angles 
+		by multiplying by 100. You convert from radians to our angles by 
+		multiplying by 18000/pi.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Hyperbolic functions (tanh) work with our angles too, so the 
+		same conversions apply.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><tr><td></td><td></td><td><table border="0" bgcolor="black" cellspacing="1"><tr><td valign="top" align="left"><table bgcolor="white" border="0" cellpadding="4" cellspacing="1"><tr><td bgcolor="#808080"><font color="#ffffff"><b>name</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>description</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>meaning in pixel context (pictures, palettes)</b></font></td><td bgcolor="#808080"><font color="#ffffff"><b>meaning in spatial context (indexmaps, polygons)</b></font></td></tr>     <tr><td bgcolor="#ffffff"><img src="op/ignore-icon.png" border="0" alt="ignore"></td><td bgcolor="#ffffff"> A </td><td bgcolor="#ffffff">no effect</td><td bgcolor="#ffffff">no effect</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/put-icon.png" border="0" alt="put"></td><td bgcolor="#f0f8ff"> B </td><td bgcolor="#f0f8ff">replace by</td><td bgcolor="#f0f8ff">replace by</td></tr> <tr><td bgcolor="#ffffff"><img src="op/add-icon.png" border="0" alt="+"></td><td bgcolor="#ffffff"> A + B </td><td bgcolor="#ffffff">brightness, crossfade</td><td bgcolor="#ffffff">move, morph</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/sub-icon.png" border="0" alt="-"></td><td bgcolor="#f0f8ff"> A - B </td><td bgcolor="#f0f8ff">brightness, motion detection</td><td bgcolor="#f0f8ff">move, motion detection</td></tr> <tr><td bgcolor="#ffffff"><img src="op/bus-icon.png" border="0" alt="inv+"></td><td bgcolor="#ffffff"> B - A </td><td bgcolor="#ffffff">negate then contrast</td><td bgcolor="#ffffff">180 degree rotate then move</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/mul-icon.png" border="0" alt="*"></td><td bgcolor="#f0f8ff"> A * B </td><td bgcolor="#f0f8ff">contrast</td><td bgcolor="#f0f8ff">zoom out</td></tr> <tr><td bgcolor="#ffffff"><img src="op/div-icon.png" border="0" alt="/"></td><td bgcolor="#ffffff"> A / B, rounded towards zero </td><td bgcolor="#ffffff">contrast</td><td bgcolor="#ffffff">zoom in</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/div2-icon.png" border="0" alt="div"></td><td bgcolor="#f0f8ff"> A / B, rounded downwards </td><td bgcolor="#f0f8ff">contrast</td><td bgcolor="#f0f8ff">zoom in</td></tr> <tr><td bgcolor="#ffffff"><img src="op/vid-icon.png" border="0" alt="inv*"></td><td bgcolor="#ffffff"> B / A, rounded towards zero </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/vid2-icon.png" border="0" alt="swapdiv"></td><td bgcolor="#f0f8ff"> B / A, rounded downwards </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/mod-icon.png" border="0" alt="%"></td><td bgcolor="#ffffff"> A % B, modulo (goes with div) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">tile</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/dom-icon.png" border="0" alt="swap%"></td><td bgcolor="#f0f8ff"> B % A, modulo (goes with div) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/rem-icon.png" border="0" alt="rem"></td><td bgcolor="#ffffff"> A % B, remainder (goes with /) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/mer-icon.png" border="0" alt="swaprem"></td><td bgcolor="#f0f8ff"> B % A, remainder (goes with /) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/gcd-icon.png" border="0" alt="gcd"></td><td bgcolor="#ffffff"> 
+	greatest common divisor</td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/lcm-icon.png" border="0" alt="lcm"></td><td bgcolor="#f0f8ff"> 
+	least common multiple</td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/or-icon.png" border="0" alt="|"></td><td bgcolor="#ffffff"> A or B, bitwise </td><td bgcolor="#ffffff">bright munchies</td><td bgcolor="#ffffff">bottomright munchies</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/xor-icon.png" border="0" alt="^"></td><td bgcolor="#f0f8ff"> A xor B, bitwise </td><td bgcolor="#f0f8ff">symmetric munchies (fractal checkers)</td><td bgcolor="#f0f8ff">symmetric munchies (fractal checkers)</td></tr> <tr><td bgcolor="#ffffff"><img src="op/and-icon.png" border="0" alt="&"></td><td bgcolor="#ffffff"> A and B, bitwise </td><td bgcolor="#ffffff">dark munchies</td><td bgcolor="#ffffff">topleft munchies</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/shl-icon.png" border="0" alt="<<"></td><td bgcolor="#f0f8ff"> A * (2**(B % 32)), which is left-shifting </td><td bgcolor="#f0f8ff">like *</td><td bgcolor="#f0f8ff">like *</td></tr> <tr><td bgcolor="#ffffff"><img src="op/shr-icon.png" border="0" alt=">>"></td><td bgcolor="#ffffff"> A / (2**(B % 32)), which is right-shifting </td><td bgcolor="#ffffff">like /,div</td><td bgcolor="#ffffff">like /,div</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/sc_or-icon.png" border="0" alt="||"></td><td bgcolor="#f0f8ff"> if A is zero then B else A </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/sc_and-icon.png" border="0" alt="&&"></td><td bgcolor="#ffffff"> if A is zero then zero else B</td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/min-icon.png" border="0" alt="min"></td><td bgcolor="#f0f8ff"> the lowest value in A,B </td><td bgcolor="#f0f8ff">clipping</td><td bgcolor="#f0f8ff">clipping (of individual points)</td></tr> <tr><td bgcolor="#ffffff"><img src="op/max-icon.png" border="0" alt="max"></td><td bgcolor="#ffffff"> the highest value in A,B </td><td bgcolor="#ffffff">clipping</td><td bgcolor="#ffffff">clipping (of individual points)</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/cmp-icon.png" border="0" alt="cmp"></td><td bgcolor="#f0f8ff"> -1 when A&lt;B; 0 when A=B; 1 when A&gt;B. </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/eq-icon.png" border="0" alt="=="></td><td bgcolor="#ffffff"> is A equal to B ? 1=true, 0=false </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/ne-icon.png" border="0" alt="!="></td><td bgcolor="#f0f8ff"> is A not equal to B ? </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/gt-icon.png" border="0" alt=">"></td><td bgcolor="#ffffff"> is A greater than B ? </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/le-icon.png" border="0" alt="<="></td><td bgcolor="#f0f8ff"> is A not greater than B ? </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/lt-icon.png" border="0" alt="<"></td><td bgcolor="#ffffff"> is A less than B ? </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/ge-icon.png" border="0" alt=">="></td><td bgcolor="#f0f8ff">is A not less than B ? </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/sin-icon.png" border="0" alt="sin*"></td><td bgcolor="#ffffff"> B * sin(A) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">waves, rotations</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/cos-icon.png" border="0" alt="cos*"></td><td bgcolor="#f0f8ff"> B * cos(A) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">waves, rotations</td></tr> <tr><td bgcolor="#ffffff"><img src="op/atan-icon.png" border="0" alt="atan"></td><td bgcolor="#ffffff"> arctan(A/B) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">find angle to origin (part of polar transform)</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/tanh-icon.png" border="0" alt="tanh*"></td><td bgcolor="#f0f8ff"> B * tanh(A) </td><td bgcolor="#f0f8ff">smooth clipping</td><td bgcolor="#f0f8ff">smooth clipping (of individual points), neural sigmoid, fuzzy logic</td></tr> <tr><td bgcolor="#ffffff"><img src="op/log-icon.png" border="0" alt="log*"></td><td bgcolor="#ffffff"> B * log(A) (in base e) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/gamma-icon.png" border="0" alt="gamma"></td><td bgcolor="#f0f8ff"> floor(pow(a/256.0,256.0/b)*256.0) </td><td bgcolor="#f0f8ff">gamma correction</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/pow-icon.png" border="0" alt="**"></td><td bgcolor="#ffffff"> A**B, that is, A raised to power B </td><td bgcolor="#ffffff">gamma correction</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/abs-icon.png" border="0" alt="abs-"></td><td bgcolor="#f0f8ff"> absolute value of (A-B) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/rand-icon.png" border="0" alt="rand"></td><td bgcolor="#ffffff"> randomly produces a non-negative number below A </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/sqrt-icon.png" border="0" alt="sqrt"></td><td bgcolor="#f0f8ff"> square root of A, rounded downwards </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/sq-icon.png" border="0" alt="sq-"></td><td bgcolor="#ffffff"> (A-B) times (A-B) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/clip+-icon.png" border="0" alt="clip+"></td><td bgcolor="#f0f8ff"> like A+B but overflow causes clipping instead of wrapping around (coming soon) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/clip--icon.png" border="0" alt="clip-"></td><td bgcolor="#ffffff"> like A-B but overflow causes clipping instead of wrapping around (coming soon) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/avg-icon.png" border="0" alt="avg"></td><td bgcolor="#f0f8ff"> (A+B)/2 </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> <tr><td bgcolor="#ffffff"><img src="op/hypot-icon.png" border="0" alt="hypot"></td><td bgcolor="#ffffff"> square root of (A*A+B*B) </td><td bgcolor="#ffffff">--</td><td bgcolor="#ffffff">--</td></tr> <tr><td bgcolor="#f0f8ff"><img src="op/erf-icon.png" border="0" alt="erf*"></td><td bgcolor="#f0f8ff"> integral of e^(-x*x) dx ... (coming soon; what ought to be the scaling factor?) </td><td bgcolor="#f0f8ff">--</td><td bgcolor="#f0f8ff">--</td></tr> </table></td></tr></table></td></tr></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Synchronisation"></a><h4>Synchronisation</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In GridFlow you cannot send two grids in different inlets at the 
+same time. You have to use <kbd><font color="#007777">[#finished]</font></kbd> together with (possibly) <kbd><font color="#007777">[fork]</font></kbd> and <kbd><font color="#007777">[#store]</font></kbd>, 
+which can be cumbersome. If you don't do this, the result is undefined 
+behaviour (or crash!).</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>In GridFlow 0.7.1 this is beginning to change. <kbd><font color="#007777">[#store]</font></kbd> and # now allow 
+right-inlet grids to be buffered if an operation is occuring on left inlet. This 
+should make many circuits simpler. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>(more to come)</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Bridges"></a><h4>Bridges</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Starting with version 0.6, GridFlow is Ruby-centric instead of jMax-centric. 
+jMax support has been added back as a <b>Bridge</b>.</p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td></td><td></td><td><p>Bridges, for the most part, plug into the FObject class, which is the common 
+root of most of GridFlow's classes. Under the current design, the bridge is 
+compiled separately, and is directly loaded by the host software; then the 
+bridge starts Ruby and makes it load the main GridFlow; then the bridge hooks 
+with the main part. </p></td></tr>
+<tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

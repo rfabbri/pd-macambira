@@ -1,0 +1,228 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE documentation SYSTEM 'jmax.dtd'>
+<documentation title="C++/Ruby Internals">
+<!-- $Id: internals.xml,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<!--
+	GridFlow Reference Manual: Internals
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
+-->
+<section name="notes">
+
+<p>In Ruby, GridFlow defines a namespace (module) called GridFlow. Most  of the
+constants it defines are part of that namespace.</p>
+<p>Ruby does not have the same concept of object as PD. In GridFlow, object classes may
+inherit features from other object classes, and also there is no concept of inlet nor outlet, which are instead
+provided by <k>GridFlow::FObject</k>, which also has the purpose of exporting functionality to
+PD.</p>
+<p>In this document (and in many others) the phrase "a Potato" will be a shorthand for "an object of the class
+called Potato", which is often used in modern software design and is a nice convention borrowed from
+biology.</p>
+
+<p>
+A FObject is normally in two or three parts: a (Ruby) GridFlow::FObject
+that is the central part; a (C++) FObject; a (C++) BFObject. 
+The GridFlow::FObject is created as a RData kind of box (T_DATA) 
+using Ruby-C's Data_Make_Struct on a GridObject. This is 
+how most Ruby-C programs inherit from Ruby classes. Note that 
+Ruby's boxed objects have a maximum of five fields, and they're usually 
+taken, so additional fields have to be outside of it. This is why RData exists.
+</p>		
+		
+<p>
+So basically you have a C++ FObject that is "part of" a GridFlow::FObject 
+and they point to each other using "peer pointers".
+ The BFObject links back to the RData box through a pointer called peer.
+</p>
+
+</section>
+
+<section name="Objects for Scripting">
+	<class name="ruby class FObject extending Data">
+		Provides inlets and outlets to Ruby Objects.
+
+		<method name="init">
+		</method>
+
+		<method name="send_in">
+			<arg name="inlet" type="int"/>
+			<rest name="message"/>
+		</method>
+
+		<method name="send_out">
+			<arg name="outlet" type="int"/>
+			<rest name="message"/>
+		</method>
+
+	</class>
+
+	<class name="ruby class GridObject extending FObject">
+		Provides grid support to FObjects.
+
+		<method name="inlet_dim">
+			<arg name="inlet" type="Integer"/>
+			gives an array of Integers (dimension list)
+		</method>
+		
+		<method name="inlet_nt">
+			<arg name="inlet" type="Integer"/>
+			gives a Symbol (number type)
+		</method>
+
+		<method name="inlet_set_factor">
+			<arg name="inlet" type="Integer"/>
+			<arg name="factor" type="Integer"/>
+			ensures received packets have a size that is
+			a whole multiple of this size.
+			must be called from rgrid_begin.
+		</method>
+
+		<method name="send_out_grid_begin">
+			<arg name="outlet" type="Integer"/>
+			<arg name="dimensions" type="Array of Integer"/>
+			<arg name="nt" type="number type" default="int32"/>
+			establishes grid streams between an outlet and all inlets
+			connected to it.
+		</method>
+
+		<method name="send_out_grid_flow">
+			<arg name="outlet" type="Integer"/>
+			<arg name="data" type="String"/>
+			for sending a grid data packet through that outlet.
+		</method>
+		
+		<method name="send_out_grid_end">
+			<arg name="outlet" type="Integer"/>
+			(isn't this one obsolete?)
+		</method>
+
+		<inlet id="0">
+			<method name="rgrid_begin"/>
+			<method name="rgrid_flow">
+				<arg name="data" type="String"/>
+			</method>
+			<method name="rgrid_end"/>
+		</inlet>
+	</class>
+
+	<class name="ruby class BitPacking">
+		A BitPacking is a simple two-way converter between different
+		numeric layouts.
+	</class>
+
+	<class name="ruby FPatcher extending FObject">
+		<p>This class is much like PureData's abstractions.</p>
+		<p>This is a container for objects. Its proper objects are numbered
+		starting with zero. The wire list is given in terms of those numbers:
+		(sourceobject,sourceinlet,destobject,destinlet). There is a
+		pseudo-object numbered #-1 which map to the container's own inlets
+		and outlets.</p>
+	</class>
+
+	<class name="ruby GridFlow::USB"><p>wrapper for struct usb_dev_handle</p>
+		<attr name=".busses">wrapper for struct usb_bus and usb_get_busses()</attr>
+	</class>
+	
+	<class name="ruby GridFlow::USB::Device">
+		<p>wrapper for struct usb_device and struct usb_device_descriptor</p>
+	</class>
+	
+	<class name="ruby GridFlow::USB::Config">
+		<p>wrapper for struct usb_config_descriptor, struct usb_interface</p>
+	</class>
+	
+	<class name="ruby GridFlow::USB::Interface">
+		<p>wrapper for struct usb_interface_descriptor</p>
+	</class>
+
+	<class name="ruby GridFlow::USB::Endpoint">
+		<p>wrapper for struct usb_endpoint_descriptor</p>
+	</class>
+</section>
+
+<section name="Objects for Internals">
+	<class name="C++ class GridInlet">
+		GridInlets represent inlets that accept grids.
+	</class>
+
+	<class name="C++ class GridOutlet">
+		GridOutlets represent outlets that send grids.
+	</class>
+
+	<class name="C++ class Dim">
+		Dim represents a list of dimensions.
+	</class>
+
+	<class name="C++ class Grid">
+		Grid represents a grid that is fully stored in memory.
+	</class>
+
+	<class name="C++ class Numop1">
+		This represents a one-input operator.
+		Such an object contains a map() function that applies the operator
+		over a memory segment.
+	</class>
+
+	<class name="C++ class Numop2">
+		This represents a two-input operator.
+		Such an object contains four functions for each T, where
+		T is one of the types uint8, int16, int32, float32.
+
+		<method name="map">
+			<arg name="n" type="integer"/>
+			<arg name="as" type="Pt&lt;T&gt;"/>
+			<arg name="b" type="T"/>
+			for i in 0...n,
+			as[i] := f(as[i],b);
+			This is like <k>[#]</k> with a scalar righthand
+		</method>
+
+		<method name="zip">
+			<arg name="n" type="integer"/>
+			<arg name="as" type="Pt&lt;T&gt;"/>
+			<arg name="bs" type="Pt&lt;T&gt;"/>
+			for i in 0...n,
+			as[i] := f(as[i],bs[i]);
+			bs is not modified.
+			(This is like <k>[#]</k> with a nonscalar righthand)
+		</method>
+
+		<method name="fold">
+			<arg name="an" type="integer"/>
+			<arg name="n" type="integer"/>
+			<arg name="as" type="Pt&lt;T&gt;"/>
+			<arg name="bs" type="Pt&lt;T&gt;"/>
+
+			<p>
+			for i in 0...n,
+			for j in 0...an,
+			as[j] := f(as[j],bs[i*an+j]);
+			</p>
+
+			(this is like <k>[#fold]</k>)
+		</method>
+
+		<method name="scan">
+			<arg name="an" type="integer"/>
+			<arg name="n" type="integer"/>
+			<arg name="as" type="Pt&lt;T&gt;"/>
+			<arg name="bs" type="Pt&lt;T&gt;"/>
+
+			<p> for j in 0...an: bs[j] := f(as[j],bs[j]); </p>
+			<p> for i in 1...n: for j in 0...an:
+				bs[j] := f(bs[(i-1)*an+j],bs[i*an+j]); </p>
+
+			(this is like <k>[#scan]</k>)
+		</method>
+	</class>
+
+	<class name="C++ class GridClass">
+		This represents a class of GridObjects.
+	</class>
+
+	<class name="C++ class GFBridge">
+		This holds linkage information about PureData.
+	</class>
+
+</section>
+
+</documentation>

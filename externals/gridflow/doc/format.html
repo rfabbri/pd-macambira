@@ -1,0 +1,485 @@
+<html><head>
+<!-- $Id: format.html,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<title>GridFlow 0.8.0 - Reference Manual: Format Classes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF"
+  leftmargin="0" topmargin="0"
+  marginwidth="0" marginheight="0">
+<table width="100%" bgcolor="white" border="0" cellspacing="2">
+<tr><td colspan="4" bgcolor="#082069">
+<img src="images/titre_gridflow.png" width="253" height="23">
+</td></tr><tr><td>&nbsp;</td></tr>
+<tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4" height="16"> 
+    <h4>GridFlow 0.8.0 - Reference Manual: Format Classes</h4>
+</td></tr>
+<tr> 
+  <td width="5%"  rowspan="2">&nbsp;</td>
+  <td width="15%" height="23">&nbsp;</td>
+  <td width="80%" height="23">&nbsp;</td>
+  <td width="5%"  height="23">&nbsp;</td>
+</tr>
+<tr><td colspan="2"><div cols="1"><h4><a href="#Objects_for_Input/Output">Objects for Input/Output</a></h4><ul>
+<li><a href="##in"><img src="flow_classes/%23in-icon.png" alt="[#in]" border="0"></a></li>
+<li><a href="##out"><img src="flow_classes/%23out-icon.png" alt="[#out]" border="0"></a></li>
+<li><a href="##peephole"><img src="flow_classes/%23peephole-icon.png" alt="[#peephole]" border="0"></a></li>
+<li><a href="##mouse"><img src="flow_classes/%23mouse-icon.png" alt="[#mouse]" border="0"></a></li>
+<li><a href="##camera"><img src="flow_classes/%23camera-icon.png" alt="[#camera]" border="0"></a></li>
+</ul>
+<h4><a href="#Picture/Movie_Formats">Picture/Movie Formats</a></h4><ul>
+<li><a href="#format ppm #in/#out"><img src="flow_classes/format ppm %23in/%23out-icon.png" alt="[format ppm #in/#out]" border="0"></a></li>
+<li><a href="#format targa #in/#out"><img src="flow_classes/format targa %23in/%23out-icon.png" alt="[format targa #in/#out]" border="0"></a></li>
+<li><a href="#format jpeg #in/#out"><img src="flow_classes/format jpeg %23in/%23out-icon.png" alt="[format jpeg #in/#out]" border="0"></a></li>
+<li><a href="#format png #in"><img src="flow_classes/format png %23in-icon.png" alt="[format png #in]" border="0"></a></li>
+<li><a href="#format quicktime #in/#out"><img src="flow_classes/format quicktime %23in/%23out-icon.png" alt="[format quicktime #in/#out]" border="0"></a></li>
+<li><a href="#format mpeg #in"><img src="flow_classes/format mpeg %23in-icon.png" alt="[format mpeg #in]" border="0"></a></li>
+<li><a href="#format grid #in/#out"><img src="flow_classes/format grid %23in/%23out-icon.png" alt="[format grid #in/#out]" border="0"></a></li>
+</ul>
+<h4><a href="#Acquisition_Devices">Acquisition Devices</a></h4><ul>
+<li><a href="#format videodev #in"><img src="flow_classes/format videodev %23in-icon.png" alt="[format videodev #in]" border="0"></a></li>
+</ul>
+<h4><a href="#Window_Output">Window Output</a></h4><ul>
+<li><a href="#format x11 #in/#out"><img src="flow_classes/format x11 %23in/%23out-icon.png" alt="[format x11 #in/#out]" border="0"></a></li>
+<li><a href="#format quartz #out"><img src="flow_classes/format quartz %23out-icon.png" alt="[format quartz #out]" border="0"></a></li>
+<li><a href="#format sdl #out"><img src="flow_classes/format sdl %23out-icon.png" alt="[format sdl #out]" border="0"></a></li>
+<li><a href="#format aalib #out"><img src="flow_classes/format aalib %23out-icon.png" alt="[format aalib #out]" border="0"></a></li>
+<li><a href="#format window #out"><img src="flow_classes/format window %23out-icon.png" alt="[format window #out]" border="0"></a></li>
+</ul>
+<br><br>
+</div></td></tr> <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Objects_for_Input/Output"></a><h4>Objects for Input/Output</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#in">#in</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23in-icon.png" alt="[#in]" border="0"><br clear="left"><br><br><a href="#inout"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <br><b>method</b>&nbsp;init <b>(</b>format<b>, </b>format_specific_part...<b>)</b>    
+			If no arguments given, creates an input object for an unspecified 
+			format. You then need to use the <kbd><font color="#007777">"open"</font></kbd> command to link 
+			a format handler to it. 
+			If arguments given, the <kbd><font color="#007777">"open"</font></kbd> command is immediately called 
+			with those arguments. 
+			Remember that most formats produce Dim[rows,columns,3] grids with 
+			0-255 values. (Most.) <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;open <b>(</b>format<b>, </b>format_specific_part...<b>)</b>    
+				This is the command that gives a particular resource 
+				to a <kbd><font color="#007777">[#out]</font></kbd> object. This is done through a "format" 
+				(there is a list of formats in this manual). The other 
+				arguments depend on the chosen format. The format may 
+				be a file format or a protocol or a hardware device, etc. 
+				The format called "file" is a special shortcut that autodetects the 
+				type of file (by name suffix) and picks up the appropriate handler. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;open <b>(</b>filename<b>)</b>   
+				This is a shortcut for <kbd><font color="#007777">"open file"</font></kbd> followed by a filename. 
+				The filename must contain a dot, else it will be seen as a handler name. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;close <b>(</b><b>)</b>  
+				close may be necessary if you operate on <kbd><font color="#007777">"/dev/video"</font></kbd>, 
+				which can only be read by one at a time. otherwise it's 
+				usually not necessary. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;int <b>(</b>frame_number<b>)</b>   
+				selects one picture from a multi-picture format 
+				and then does the same as a bang. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;set <b>(</b>frame_number<b>)</b>   
+				selects one picture from a multi-picture format, 
+				to be displayed by the next bang. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b>  
+				sends a grid through the outlet. the grid may be the 
+				result of reading from a file, acquiring from a device, 
+				capturing from the screen etc. 
+				this is format-specific. most formats 
+				produce grid(rows columns {red green blue}). 
+				In formats that read from a file, reading another picture 
+				will continue if there are several pictures in the 
+				same file, but if the end of file is reached instead, 
+				it will rewind and send the first picture again. 
+				see section "External Picture Formats". <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;option <b>(</b><i>symbol</i> selector<b>, </b>stuff...<b>)</b>    
+				Obsolete. the word "option" is optional now. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;rewind <b>(</b><b>)</b>  
+				rewinds to beginning of file if applicable. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;loop <b>(</b><i>bool</i> flag<b>)</b>   
+				controls the automatic looping of movies. <br>
+   <br><b>outlet&nbsp;1 </b><b>method</b>&nbsp;int <b>(</b><b>)</b>  
+				frame number of frame just sent, 
+				for formats that have frame numbers. <br>
+ <br><b>outlet&nbsp;1 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b>  
+				tried to read a frame that does not exist 
+				(signals end of file) <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#out">#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23out-icon.png" alt="[#out]" border="0"><br clear="left"><br><br><a href="#inout"><img src="images/see_screenshot.png" border="0"></a><br clear="left"><br></td><td><br>
+   <br><b>method</b>&nbsp;init <b>(</b>format<b>, </b>format_specific_part...<b>)</b>    
+			If no arguments given, creates an output object for an unspecified 
+			format. You then need to use the <kbd><font color="#007777">"open"</font></kbd> command to link 
+			a format handler to it. 
+			If arguments given, the <kbd><font color="#007777">"open"</font></kbd> command is immediately called 
+			with those arguments. 
+			Remember that most formats expect dim(rows,columns,3) grids with 
+			0-255 values. (Most.) <br>
+ <br><b>method</b>&nbsp;init <b>(</b><i>integer</i> rows<b>, </b><i>integer</i> columns<b>)</b>    
+			This alternate way to create an <kbd><font color="#007777">[#out]</font></kbd> automatically calls <kbd><font color="#007777">"open window"</font></kbd> and <kbd><font color="#007777">"out_size <i>rows columns</i>"</font></kbd>. <br>
+  <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;open <b>(</b>format<b>, </b>format_specific_part...<b>)</b>    
+				This is the command that gives a particular resource 
+				to a <kbd><font color="#007777">[#out]</font></kbd> object. This is done through a "format" 
+				(there is a list of formats in this manual). The other 
+				arguments depend on the chosen format. The format may 
+				be a file format or a protocol or a hardware device, etc. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;open file <b>(</b><b>)</b>  
+				The format called "file" is a special shortcut that autodetects the 
+				type of file (by name suffix) and picks up the appropriate handler. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;open <b>(</b>filename<b>)</b>   
+				This is a shortcut for "open file" followed by a filename. 
+				The filename must contain a dot, else it will be seen as a handler name. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;grid <b>(</b><i>grid</i> grid<b>)</b>  
+				this is format-specific. most formats 
+				expect grid(rows columns {red green blue}). 
+				In formats that write to a file, sending a 2nd picture 
+				overwrites the first. 
+				see section "External Picture Formats". <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;close <b>(</b><b>)</b>  
+				closes the file. usually not necessary. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;option <b>(</b><i>symbol</i> selector<b>, </b>stuff...<b>)</b>    
+				Obsolete. Omit the word "option" now. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;timelog <b>(</b><i>0,1</i> status<b>)</b>   
+				when status=1, current time (unix clock) and time since last 
+				frame-end are printed in the console. when status=0, it is off. 
+				default is 0. <br>
+ <br><b>inlet&nbsp;0 </b><b>method</b>&nbsp;rewind <b>(</b><b>)</b>  
+				rewinds to beginning of file if applicable. 
+				will overwrite the previous data. <br>
+   <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;bang <b>(</b><b>)</b>  
+				sent when a complete grid has been received. <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#peephole">#peephole</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23peephole-icon.png" alt="[#peephole]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p> 
+		This object class only works with a X11-based version of Pd. 
+		(e.g. on Linux, BSD, but not MacOS X). </p> <p>Similar to <kbd><font color="#007777">[#out window]</font></kbd>, except it creates an inset in the patch you put it 
+		in, and a scaled version of the picture appears in the inset. It also emits the same messages 
+		as <kbd><font color="#007777">[#out window]</font></kbd> and automatically scales cursor position according to the current scale factor. 
+		The scale factor is decided automatically. </p> <br><b>method</b>&nbsp;init <b>(</b><i>int</i> height<b>, </b><i>int</i> width<b>)</b>    <br>
+ <p>All other methods are as in <kbd><font color="#007777">[#out window]</font></kbd>.</p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#mouse">#mouse</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23mouse-icon.png" alt="[#mouse]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		This will process the "position" messages emitted by <kbd><font color="#007777">[#out]</font></kbd> or <kbd><font color="#007777">[#peephole]</font></kbd> in 
+		useful ways. <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			y,x coords of a click <br>
+ <br><b>outlet&nbsp;1 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			y,x coords of a drag (any button is kept pressed) <br>
+ <br><b>outlet&nbsp;2 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			y,x coords of an unclick <br>
+ <br><b>outlet&nbsp;3 </b><b>method</b>&nbsp;list <b>(</b><b>)</b>  
+			y,x coords of a move (no button is pressed) <br>
+ <br><b>outlet&nbsp;4 </b><b>method</b>&nbsp;float <b>(</b><b>)</b> button 1 status<br>
+ <br><b>outlet&nbsp;5 </b><b>method</b>&nbsp;float <b>(</b><b>)</b> button 2 status<br>
+ <br><b>outlet&nbsp;6 </b><b>method</b>&nbsp;float <b>(</b><b>)</b> button 3 status<br>
+ <br><b>outlet&nbsp;7 </b><b>method</b>&nbsp;float <b>(</b><b>)</b>  
+			wheel difference: -1 = roll up; 1 = roll down. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="#camera">#camera</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/%23camera-icon.png" alt="[#camera]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		Works about like <kbd><font color="#007777">[#in videodev]</font></kbd> except you can right-click-open it to access all of the 
+		camera settings visually. <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Picture/Movie_Formats"></a><h4>Picture/Movie Formats</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format ppm #in/#out">format ppm #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format ppm %23in/%23out-icon.png" alt="[format ppm #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <p>Subformat P6 only. 
+		Max-number can only be 255 (24-bit RGB). </p> <br><b>method</b>&nbsp;open ppm file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br><b>method</b>&nbsp;open ppm gzfile <b>(</b><i>symbol</i> filename<b>)</b>   
+			same but for .ppm.gz files <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {r g b})</i> grid<b>)</b>   
+			values 0-255 <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format targa #in/#out">format targa #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format targa %23in/%23out-icon.png" alt="[format targa #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <p>Support for RGB-24 (3 channels) and RGBA-32 (4 channels)</p> <br><b>method</b>&nbsp;open targa file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br><b>method</b>&nbsp;open targa gzfile <b>(</b><i>symbol</i> filename<b>)</b>   
+			same but for .tga.gz files <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 3)</i> grid<b>)</b> RGB-24<br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 4)</i> grid<b>)</b> RGBA-32<br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format jpeg #in/#out">format jpeg #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format jpeg %23in/%23out-icon.png" alt="[format jpeg #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Support for RGB non-progressive</p> <br><b>method</b>&nbsp;open jpeg file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 3)</i> grid<b>)</b>  RGB-24 <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format png #in">format png #in</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format png %23in-icon.png" alt="[format png #in]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Support for RGB non-progressive</p> <br><b>method</b>&nbsp;open png file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 1)</i> grid<b>)</b> Y-8 (greyscale)<br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 2)</i> grid<b>)</b> YA-16 (greyscale and transparency)<br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 3)</i> grid<b>)</b> RGB-24 (colour)<br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns 4)</i> grid<b>)</b> RGBA-32 (colour and transparency)<br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format quicktime #in/#out">format quicktime #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format quicktime %23in/%23out-icon.png" alt="[format quicktime #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <p>Support for .mov files.</p> <p>This format supports frame-seek and frame-tell.</p> <p>Uses the HW-QuickTime library aka QuickTime4Linux 
+		(libquicktime.so). There is also a variant on the same library and that project 
+		is just called LibQuickTime.</p> <p>Some versions of those libraries may include support for different codecs, 
+		and some also may support entirely different wrapper formats such as AVI.</p> <p>On Macintosh, Apple QuickTime is used instead, but several of the following 
+		messages may not be available.</p> <br><b>method</b>&nbsp;open quicktime file <b>(</b><i>symbol</i> filename<b>)</b>   <br>
+ <br><b>method</b>&nbsp;codec <b>(</b><i>symbol</i> codec<b>)</b>   
+			Allowed values are at least: raw, jpeg, png, mjpa, yuv2, yuv4. 
+			Some other values may allowed, depending on the version of the library 
+			and which codec plugins are installed. 
+			Must be set before the first frame is written. 
+			only applies to <kbd><font color="#007777">[#out]</font></kbd>. Choosing a codec is important 
+			because codecs influence greatly the speed of 
+			encoding, the speed of decoding, 
+			the size of the written file, and its fidelity to the 
+			original content. Note that there exist other Apple-QuickTime 
+			codecs that are not supported by HW-QuickTime. <br>
+ <br><b>method</b>&nbsp;parameter <b>(</b><i>symbol</i> key<b>, </b><i>int</i> value<b>)</b>    
+			Sets special codec-specific settings. 
+			For example: <kbd><font color="#007777">"parameter jpeg_quality 75"</font></kbd> <br>
+ <br><b>method</b>&nbsp;framerate <b>(</b><i>int</i> fps<b>)</b>   
+			Sets the framerate of the file. 
+			This is not used by GridFlow when reading a file, but other 
+			programs usually care. <br>
+ <br><b>method</b>&nbsp;colorspace <b>(</b><i>symbol</i> colorspace<b>)</b>   
+			Allowed values are rgb, rgba, bgr, bgra, yuv, yuva. 
+			Normally you don't need this. <br>
+ <br><b>method</b>&nbsp;size <b>(</b><i>int</i> height<b>, </b><i>int</i> width<b>)</b>    
+			Forces a window size when writing. Usually this has to be used <u>after</u> 
+			setting the framerate and codec and <u>before</u> setting the codec-parameters. 
+			(Strange. Sorry.) <br>
+ <br><b>method</b>&nbsp;force_size <b>(</b><i>int</i> height<b>, </b><i>int</i> width<b>)</b>    
+			forces a window size when reading. 
+			this is a workaround for a problem in HW-QuickTime. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format mpeg #in">format mpeg #in</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format mpeg %23in-icon.png" alt="[format mpeg #in]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <p>support for .mpeg files</p> <p>this format supports frame-seek and frame-tell.</p> <p>Two different libraries are available for dealing with 
+		MPEG files. Those have different details, capabilities and quirks.</p> <p>In any case, GridFlow does not support importing audio from 
+		those files.</p> <p>If you use the HeroineWarrior library, you may open several 
+		mpeg files at once, but not with the GregWard library.</p> <p>Libraries may scream error messages in a rude way.</p> <p>By opposition to PPM and TARGA, this format driver only 
+		allows a single MPEG stream per file (you cannot "cat" 
+		several MPEG files together). </p> <p>Supports Rewind and Frame Select.</p> <br><b>method</b>&nbsp;open mpeg file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format grid #in/#out">format grid #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format grid %23in/%23out-icon.png" alt="[format grid #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+    <p> 
+		This is GridFlow's special file format. This is the only I/O 
+		format that can hold anything that the <kbd><font color="#007777">[#store]</font></kbd> object can. </p> <p> 
+		This is the picture format that would support TCP connections 
+		if that feature actually worked. More on this later. </p> <br><b>method</b>&nbsp;open grid file <b>(</b><i>symbol</i> filename<b>)</b>   
+			opens the specified file, taken from the current 
+			directory. <br>
+ <br><b>method</b>&nbsp;open grid gzfile <b>(</b><i>symbol</i> filename<b>)</b>   
+			same but for .grid.gz files <br>
+ <br><b>method</b>&nbsp;open grid tcp <b>(</b><i>symbol</i> hostname<b>, </b><i>integer</i> port<b>)</b>    
+			dials an specified hostname/port on the InterNet or 
+			compatible network. the TCP protocol is used. <br>
+ <br><b>method</b>&nbsp;open grid tcpserver <b>(</b><i>integer</i> port<b>)</b>   
+			waits for a call (and answers) for this port on the 
+			local machine via InterNet or compatible network. 
+			Answers the call. <br>
+ <br><b>method</b>&nbsp;type int32 <b>(</b><b>)</b>  
+			output will be as 32 bit signed integers. <br>
+ <br><b>method</b>&nbsp;type uint8 <b>(</b><b>)</b>  
+			output will be as 8 bit unsigned integers. <br>
+ <br><b>method</b>&nbsp;headerful <b>(</b><b>)</b>  
+			cancels "headerless" (and back to reading .grid) <br>
+ <br><b>method</b>&nbsp;headerless <b>(</b>dimensions...<b>)</b>   
+			instead of reading .grid files with header, will read raw data, 
+			faking a .grid header to itself. It will use the hereby specified 
+			dimension list, as well as two other settings: <kbd><font color="#007777">type</font></kbd> and <kbd><font color="#007777">endian</font></kbd>. <br>
+ <p>When writing "raw" data, a file may be considered a long string of 
+		base 256 digits (called bytes), but different computers have different 
+		conventions for dealing with them: <br><b>method</b>&nbsp;endian <b>(</b><b>)</b>  <ul><li><b>1</b> : big: 
+			A number will be written starting with the biggest digit. 
+			This is the natural way on the Macintosh, Sun, Amiga, and so on. </li> <li><b>2</b> : little: 
+			A number will be written starting with the smallest digit. 
+			This is the natural way on the Intel 386/Pentium. </li> <li><b>3</b> : same: 
+			A number will be written in whichever way is more natural 
+			on this computer. The natural way is slightly faster to handle. 
+			This is the default setting. </li> </ul> <br>
+ </p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Acquisition_Devices"></a><h4>Acquisition Devices</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format videodev #in">format videodev #in</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format videodev %23in-icon.png" alt="[format videodev #in]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+  <br><b>method</b>&nbsp;open <b>(</b>device<b>)</b>   <br>
+ <p>Video4Linux-1 devices, RGB-24 only. Variable picture size.</p> <p>We have been testing it using cards of the BT-848 family, 
+		such as Miro DC10plus and Hauppauge WinTV, using the <kbd><font color="#007777">bttv.o</font></kbd> linux driver. 
+		Also we have been testing using Logitech QuickCam (and similar Labtec hardware), 
+		but don't use the <kbd><font color="#007777">qce-ga</font></kbd> driver, which is buggy and obsolete: the <kbd><font color="#007777">qc-usb</font></kbd> 
+		works better.</p> <p>Some hardware doesn't support RGB, so you may have to select a YUV colorspace 
+		(see below) and then use <kbd><font color="#007777">[#yuv_to_rgb]</font></kbd>. Don't forget to also do <kbd><font color="#007777">[# min 255]</font></kbd> and <kbd><font color="#007777">[# max 0]</font></kbd>. </p> <p>If for some reason there's a bug that causes a driver to produce BGR instead of RGB, 
+		so that red and blue are swapped, you can swap them back by filtering through a RGB-BGR 
+		converter, such as <kbd><font color="#007777">[#inner * + 0 {3 3 # 0 0 1 0 1 0 1 0 0}]</font></kbd>.</p> <p>color adjustments: <br><b>method</b>&nbsp;brightness <b>(</b><i>0-65535</i> level<b>)</b> <br>
+ <br><b>method</b>&nbsp;hue <b>(</b><i>0-65535</i> level<b>)</b> <br>
+ <br><b>method</b>&nbsp;colour <b>(</b><i>0-65535</i> level<b>)</b> <br>
+ <br><b>method</b>&nbsp;contrast <b>(</b><i>0-65535</i> level<b>)</b> <br>
+ <br><b>method</b>&nbsp;whiteness <b>(</b><i>0-65535</i> level<b>)</b> <br>
+ </p> <br><b>method</b>&nbsp;get <b>(</b><i>symbol</i> attr<b>)</b>   
+			gets a specific attribute. a message is sent through right outlet. 
+			valid attributes are: brightness, hue, colour, contrast, whiteness. <br>
+ <br><b>method</b>&nbsp;get <b>(</b><b>)</b>  
+			gets all attributes. <br>
+ <p>other options: <br><b>method</b>&nbsp;channel <b>(</b><i>integer</i> <b>)</b> <br>
+ <br><b>method</b>&nbsp;tuner <b>(</b><i>integer</i> <b>)</b> <br>
+ <br><b>method</b>&nbsp;norm <b>(</b><i>integer</i> <b>)</b> <br>
+ <br><b>method</b>&nbsp;frequency <b>(</b><i>integer</i> <b>)</b> <br>
+ <br><b>method</b>&nbsp;transfer <b>(</b><i>symbol(read|mmap)</i> <b>, </b><i>integer</i> <b>)</b>    <ul> <li><b>1</b> : mmap: 
+			This is the normal (and fast) way of transferring pictures 
+			from the camera. </li> <li><b>2</b> : read: 
+			Some cameras/drivers only support this instead of mmap. </li></ul> 
+			In case of mmap, the extra numeric argument sets the 
+			queue length in number of frames, so you can select an 
+			appropriate tradeoff between efficiency and latency. <br>
+ <br><b>method</b>&nbsp;colorspace <b>(</b><i>symbol</i> colorspace<b>)</b>   
+			Allowed values are: RGB24, YUV420P. 
+			Use this if your driver doesn't support RGB24. <br>
+ <br><b>method</b>&nbsp;size <b>(</b>height<b>, </b>width<b>)</b>    
+			sets the input size, especially when using a video digitalizer 
+			device. <br>
+ </p> <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <tr><td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"><a name="Window_Output"></a><h4>Window Output</h4></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format x11 #in/#out">format x11 #in/#out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format x11 %23in/%23out-icon.png" alt="[format x11 #in/#out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+   <p>supports 15,16,24,32-bit truecolor displays</p> <p>now also support 8-bit indexed displays, using a private colormap 
+		configured as 3:3:2 RGB. When using 8-bit you can specify the 
+		"use_stripes" option to use a completely different color scheme 
+		involving R,G,B diagonal stripes, a kind of 6:6:6 RGB spread over three 
+		pixels.</p> <p>If you are using Windows or MacOS 10: you will have to install 
+		a X11 server. This will emulate Unix display on your OS. (note: 
+		Unix systems also need a X11 server, but it's built-in and handles 
+		the video driver directly). In the case of MacOS 10 and QNX that both 
+		use non-X11 display technology on top of a basically Unix OS, the 
+		OS comes with a X11 server, but it may be on a "bundled software" 
+		CD.</p> <br><b>method</b>&nbsp;open x11 <b>(</b><b>)</b>  
+			synonym of "open x11 here". <br>
+ <br><b>method</b>&nbsp;open x11 here <b>(</b><b>)</b>  
+			connects to the default X11 server, 
+			according to your environment variable "DISPLAY". <br>
+ <br><b>method</b>&nbsp;open x11 local <b>(</b><i>integer</i> display_number<b>)</b>   
+			connects to a display server on this machine. <br>
+ <br><b>method</b>&nbsp;open x11 remote <b>(</b><i>symbol</i> host_name<b>, </b><i>integer</i> display_number<b>)</b>    
+			connects to a remote X11 display server using TCP. 
+			Sorry, IP addresses are not supported. 
+			Port number will be 6000 plus the display number, because 
+			of the X11 standard. <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   
+			resizes the window to the size of the grid; 
+			encodes that grid in the display's pixel format; 
+			also displays it if autodraw &gt; 0 
+			the values must be in range 0-255, 
+			or else they will be "wrapped". <br>
+ <p> 
+		Destroying the object (or sending "close") should close the window. </p> <p>because of the design of Xlib, or if any of the connections 
+		involved crashes, then the whole program has to be terminated. 
+		(don't you love xlib). Something similar happens if you close any 
+		of the windows yourself, but IIRC this could be fixed.</p> <p>only one window may be used per connection (to simplify matters; 
+		this doesn't reduce flexibility).</p> <p>there is an additional argument that may be added to every <kbd><font color="#007777">"open"</font></kbd> message; if you don't put it, a new toplevel window is created. 
+		if you put "root" then the screen's wallpaper will be used instead 
+		(it may fail to work with some popular window managers). You can also 
+		put a window number, e.g. <kbd><font color="#007777">0x28003ff</font></kbd>, you may connect to 
+		an existing window; you can find out the number of a window by using 
+		a tool like <kbd><font color="#007777">xwininfo</font></kbd>, part of X11 standard tools.</p> <br><b>method</b>&nbsp;out_size <b>(</b><i>integer</i> height<b>, </b><i>integer</i> width<b>)</b>    
+			changes the window's size, just like sending a grid 
+			dim(height,width,3) would. 
+			this affects the size of screen captures too. <br>
+ <br><b>method</b>&nbsp;draw <b>(</b><b>)</b>  
+			forces a redraw of the window's contents. <br>
+ <br><b>method</b>&nbsp;autodraw <b>(</b><i>0,1,2</i> level<b>)</b>   <ul> <li><b>0</b> : draw() is never automatically invoked</li> <li><b>1</b> : draw() is invoked after each grid is finished</li> <li><b>2</b> : draw() is invoked incrementally after each row is 
+			received. (but buffering may cause lines to come in groups 
+			anyway)</li> </ul> <br>
+ <br><b>method</b>&nbsp;setcursor <b>(</b><i>0..63</i> cursor<b>)</b>   
+			Selects one of the 64 predefined cursors of X11. (Note that if 
+			your cursor table has them numbered from 0 to 126 using only even 
+			numbers, then those cursor numbers are all doubled compared to 
+			the ones GridFlow uses.) <br>
+ <br><b>method</b>&nbsp;hidecursor <b>(</b><b>)</b>  
+			This makes the cursor invisible. <br>
+  <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;position <b>(</b><i>integer</i> y<b>, </b><i>integer</i> x<b>, </b><i>integer</i> buttons<b>)</b>     <p>This is emitted every time the cursor moves inside 
+				the window connected to this format handler. This is also 
+				emitted when the cursor is dragging from inside to outside 
+				the window. This is also emitted when a mouse button is pressed.</p> <p>The y and x coordinates are relative to the upper 
+				right corner of the window. Specific button states may be 
+				extracted from the button value by applying [&gt;&gt; 
+				buttonnumber] and then checking whether the result is odd. 
+				Button numbers normally are: <ul> <li><b>0</b> : Shift</li> <li><b>1</b> : CapsLock</li> <li><b>2</b> : Control</li> <li><b>3</b> : Alternate</li> <li><b>4</b> : NumLock</li> <li><b>5</b> : ???</li> <li><b>6</b> : Meta</li> <li><b>7</b> : ScrollLock</li> <li><b>8</b> : Left Button</li> <li><b>9</b> : Middle Button</li> <li><b>10</b> : Right Button</li> <li><b>11</b> : Wheel Up</li> <li><b>12</b> : Wheel Down</li> </ul></p> <p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p> <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;keypress <b>(</b><i>integer</i> y<b>, </b><i>integer</i> x<b>, </b><i>integer</i> buttons<b>, </b><i>symbol</i> keyname<b>)</b>      <p>Similar to <kbd><font color="#007777">position</font></kbd> above, but this is emitted when a 
+				keyboard key is pressed while this format handler's window 
+				is active. Keynames follow the X11 standard, similarly to PureData's [keyname] object. 
+				The only exception is that keynames that are digits get prefixed by a capital D so that 
+				they don't get mistaken for actual numbers.</p> <p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p> <br>
+ <br><b>outlet&nbsp;0 </b><b>method</b>&nbsp;keyrelease <b>(</b><i>integer</i> y<b>, </b><i>integer</i> x<b>, </b><i>integer</i> buttons<b>, </b><i>symbol</i> keyname<b>)</b>      
+				Same as keypress but when a key gets released instead. <p>NOTE: This message form may become longer in the future, but the already defined parts will stay the same.</p> <br>
+  <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format quartz #out">format quartz #out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format quartz %23out-icon.png" alt="[format quartz #out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ 
+		The equivalent of format x11 on MacOS 10.x, but with less features (sorry). <br><b>method</b>&nbsp;open <b>(</b><b>)</b>  
+			opens a dim(240,320,3) rgb window (default). <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   
+			Sends image to screen. Window will be resized to fit the image exactly. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format sdl #out">format sdl #out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format sdl %23out-icon.png" alt="[format sdl #out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;open <b>(</b><b>)</b>  
+			Opens a dim(240,320,3) rgb window (default). <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {red green blue})</i> grid<b>)</b>   
+			Sends image to screen. Window will be resized to fit the image exactly. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format aalib #out">format aalib #out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format aalib %23out-icon.png" alt="[format aalib #out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;open aalib <b>(</b>driver<b>, </b>args...<b>)</b>    <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {white})</i> grid<b>)</b>   
+			converts a greyscale image to an ascii image and possibly 
+			displays it. note that the image is typically downscaled by 
+			a factor of 2 by aalib itself. <br>
+ <br><b>method</b>&nbsp;grid <b>(</b><i>grid(rows columns {ascii attr})</i> grid<b>)</b>   
+			the inverse of "dump". Both together in a loop allow to 
+			post-process aalib's buffer before displaying. Goes well 
+			with "draw", "autodraw". <br>
+ <br><b>method</b>&nbsp;print <b>(</b><i>int</i> y<b>, </b><i>int</i> x<b>, </b><i>int</i> attr<b>, </b><i>symbol</i> text<b>)</b>      <br>
+ <br><b>method</b>&nbsp;autodraw <b>(</b><b>)</b>  
+			like X11's autodraw. <br>
+ <br><b>method</b>&nbsp;draw <b>(</b><b>)</b>  
+			like X11's draw. <br>
+ <br><b>method</b>&nbsp;dump <b>(</b><b>)</b>  
+			produces a Dim[y,x,2] grid whose two channels are 
+			ascii character codes and character attributes. <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td colspan="4" bgcolor="#ffb080"><b>&nbsp;&nbsp;class </b><a name="format window #out">format window #out</a></td></tr><tr><td></td><td valign="top"><br>
+<img src="flow_classes/format window %23out-icon.png" alt="[format window #out]" border="0"><br clear="left"><br><br><br clear="left"><br></td><td><br>
+ <br><b>method</b>&nbsp;open window <b>(</b><b>)</b>  
+			Equivalent to "open x11", but this can be set by putting a line like 
+			this in the config file: <kbd><font color="#007777">GridFlow.formats[:window] = GridFlow.formats[:x11]</font></kbd> 
+			(and similarly other aliases can be created too) <br>
+ <br></td></tr><tr><td></td><td></td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+ <td colspan="4" bgcolor="black">
+<img src="images/black.png" width="1" height="2"></td></tr>
+<tr><td colspan="4"> 
+<p><font size="-1">
+GridFlow 0.8.0 Documentation<br>
+Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
+<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+</font></p>
+</td></tr></table></body></html>
+
+

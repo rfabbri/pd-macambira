@@ -1,0 +1,151 @@
+<html>
+<head>
+<!-- $Id: profiling.html,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<!--
+	GridFlow Reference Manual: Architecture
+	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
+-->
+<title>GridFlow 0.7.7 - Profiling Execution Speed</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="gridflow.css" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<br>
+<table width="100%" border="0" cellspacing="5">
+  <tr><td colspan="4" bgcolor="#082069">
+	<img src="images/titre_gridflow.png" width="253" height="23"></td></tr>
+
+  <tr><td>&nbsp;</td></tr>
+  <tr><td colspan="4" bgcolor="black"><img src="images/black.png" width="1" height="2"></td></tr>
+
+  <tr><td colspan="3" height="16">
+      <h4>GridFlow 0.7.7 - Profiling Execution Speed</h4>
+  </td></tr>
+
+  <tr> 
+    <td width="12%" height="4">&nbsp;</td>
+    <td width="80%" height="4">&nbsp;</td>
+    <td width="12%" height="4">&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td width="13%">&nbsp;</td>
+    <td width="82%">
+
+	<h4>What is profiling?</h4>
+	<p>
+	It is about getting empiric metrics about the execution of a program.
+	For example, find out which parts of a program consume the most time
+	and/or memory. Usually it's about the time, and this is what GridFlow
+	allows you to measure.
+	</p>
+
+	<h4>How to get those stats from GridFlow ?</h4>
+	<ul>
+	<li>create a "@global" object and connect two
+	messageboxes to it, "profiler_reset" and "profiler_dump". The first
+	one resets all counters to zero. The second one gives a top of
+	the busiest objects, with percentages.</li>
+	<li>note that those results are global to a process. That is, if you load
+	several patches in the same process (program instance), then all those patches
+	will be monitored at once. But if you open jMax (or PD) several times at once, then
+	the profiler will not see everything happening on that machine.
+	</li>
+	<h4>How do i interpret those stats?</h4>
+	<li>Note that some operations may not be monitored, and some of the
+	monitoring may be buggy. I think it's not buggy as it is now, but I may be wrong.
+	</li>
+	<li>
+	The current profiler uses a thing called RDTSC (Pentium only). This is a very high
+	precision clock that is very fast to use. However, *major* imprecisions
+	may come from the fact that an ordinary multitasking OS will run other
+	tasks without stopping/resuming the clock. This may happen randomly;
+	however, it has a much bigger chance of happening in [@in] or [@out], because that's
+	where all the communication with other stuff is (files, sockets, windows, etc).
+	</li>
+	<li>
+	If you make sure that only the bare minimum is actively running on your
+	computer, then [@out] (using x11) would still include the time spent in the x11
+	server, except in some conditions. This applies to every kind of window output too,
+	because however the data trickles through libraries (sdl, aalib), it has to reach the x11 server
+	and the display driver.
+	</li>
+	<li>
+	The profiler has an impact on the results of the profiler. The profiler
+	includes half of its own influence in its own results, and disregards the
+	other half (or so). Profiling shouldn't add more than 100-300 ticks per
+	message (of which half is counted).
+	</li>
+	<li>
+	Message-passing time is not counted at all. Only time actually spent
+	inside GridFlow objects is counted. This may skew results.
+	Transmission of a grid requires one message, thus we may speak of "grid messages".
+	However, when the message is received, one or several packets may get transmitted, which
+	is done outside of the message system. Each packet contains at most 2048 numbers
+	(adjustable limit), and normally a packet should be at least one quarter of that size unless it is the last one.
+	On RGB grids of widths 640,320,160, the packet size will usually be 1920.
+	</li>
+	</ul>
+	</p>
+
+	<h4>Getting a frames-per-second measure</h4>
+	<p>This section formerly was describing what can now be obtained using the [fps] object class.</p>
+
+	<h4>acceleration tricks</h4>
+	<ul>
+	<li>try the profiler and see what it says.</li>
+	<li>i mean really.</li>
+	<li>you can lose a lot of your time accelerating something
+	that isn't really taking execution time.</li>
+	<li>it's faster to work on big grids than on small grids,
+	for the amount of number-crunching you can do.
+	</li>
+	<li>about numbertypes: uint8 is the fastest, followed by int16, int32, float32.
+	(and the first two are faster when MMX is enabled). However it
+	may be difficult to make some effects use int16
+	or smaller without overflow happening.</li>
+	<li>[@ &lt;&lt;] is a very fast multiplication by powers of two (1, 2, 4, 8, 16, ...).
+	[@ &gt;&gt;] is a very fast division by powers of two.
+	<p>
+	from my little experience, normal integer multiplication and division are
+	rather slow, especially on Intel brand. The gap between *,/ and
+	&lt;&lt;,&gt;&gt; is smaller on Cyrix/AMD brand CPUs, but still, try it
+	yourself. (my experience has been on specific models and may not reflect currently common models)
+	</p>
+	</li>
+	<li>[@ &amp; 255] is a very fast [@ % 256], and likewise for other
+	powers of two.</li>
+	<li>for do-nothing operations, "ignore" and "put" are faster than
+	"+ 0" and such...</li>
+	<li>remember that an image twice smaller in height <u>and</u> twice
+	smaller in height will be processed <u>four</u> times as fast (for
+	most effects) so you can get four times more frames per second.
+	It's the "rows*columns*channels" value that makes the biggest
+	difference (usually).</li>
+
+	<li>If all fails you may recode a jMax/PD/Ruby abstraction into
+	plain Ruby code or C++ code. If your new class is of generic
+	usefulness then maybe it should be added to the releases of
+	GridFlow. Contact me if you need help extending GridFlow.</li>
+
+	<li>Put often-used files on fast drives. This means don't use NFS
+	(networked file system) for that. The file-to-ram cache can compensate for
+	that up to a certain amount, but the larger the file is, and the most used
+	the file is, the more important it is to put it on a local drive. </li>
+	</ul>
+</td>
+
+  <tr><td>&nbsp;</td></tr>
+  <tr><td colspan="4" bgcolor="black"><img src="images/black.png" width="1" height="2"></td></tr>
+
+  <tr><td colspan="4">
+	<p><font size="-1">GridFlow 0.7.7 Documentation<br>
+	by Mathieu Bouchard <a href="mailto:matju@sympatico.ca">matju@sympatico.ca</a> 
+	</font></p>
+    </td>
+  </tr>
+
+</table>
+</body>
+</html>

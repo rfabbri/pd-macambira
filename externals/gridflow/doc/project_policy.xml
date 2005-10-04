@@ -1,0 +1,99 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE documentation SYSTEM 'jmax.dtd'>
+<documentation>
+<!-- $Id: project_policy.xml,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<!--
+	GridFlow Reference Manual: Project Policy
+	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard and Alexandre Castonguay
+-->
+
+<section name="Note">
+	first consult the file ../README for a vague idea on the meaning of
+	subdirectories.
+</section>
+
+<section name="Release">
+
+Compatibility:
+
+<list><li>
+	Should work with Ruby 1.6.6 and PureData 0.36, 0.37, 0.38
+</li></list>
+
+Release steps (<b>OPERATE WITH CAUTION</b>):
+
+<list>
+	<li>make vvtest # leak detection
+	</li><li>ruby base/test.rb formats
+	</li><li>cvs tag gridflow_0_7_7 .
+	</li><li>mkdir gridflow
+	</li><li>cvs -d :pserver:anonymous@cvs.gridflow.ca:/home/cvs/gridflow
+			export -r gridflow_0_7_7 -d gridflow .
+	</li><li>cd gridflow
+	</li><li>rm -rf CVS CVSROOT
+	</li><li>chmod -R go=u-w .
+	</li><li>cd ..
+	</li><li>tar cfzvv gridflow-0.7.7.tar.gz gridflow
+	</li><li>rm -rf gridflow # caution!!!
+	</li><li>scp gridflow*gz gridflow@artengine.ca:download
+	</li><li>mv gridflow*gz /home/matju/net/GridFlow
+	</li><li>ssh gridflow@artengine.ca  : expand tarball into public_html/latest
+	</li><li>download somewhere else and try to compile
+	</li><li>update main page
+	</li><li>jmax/pd/ruby-talk mlists : post release (note: prefix subject with [ANN] !!!!)
+	</li><li>freshmeat.net : post release
+	</li><li>RAA : post release
+	</li>
+</list>
+</section>
+
+<section name="Documentation">
+<list>
+<li>
+	Pictures identified as "&lt;help&gt;" should be screenshots of the
+	help files. They shouldn't be screenshots of the template.
+</li>
+<li>
+	A Help file is a visual summary of what an object does. It should be
+	interactive and allow the user to understand what the object does.
+	Sample inputs are provided and sample results can be seen.
+</li>
+<li>
+	All modifications to the documentation must be done in the XML. The
+	HTML must be kept up-to-date by rerunning "make" in the "doc/" directory.
+</li>
+<li>
+	Help-wise, Formats are considered objects.
+	Operators are to be documented as part of [@] and [@!].
+</li>
+<li>
+	Images grabbed directly from a jMax window should be encoded in PNG.
+	This includes "icons" (object boxes, message boxes, etc). If they are
+	in JPEG, only change to PNG when the image has to change anyway.
+	Distinguish "icons" from "thumbnails", the latter of which are
+	<b>scaled-down</b> grabs, which should be encoded in JPEG.
+</li>
+<li>
+	There are not help-thumbnails anymore in the reference manual
+	because they were not helpful.
+</li>
+<li>
+	Large images should be kept out of the release. The release itself must
+	be small enough not to discourage us from doing releases and keeping
+	them all. It also should be downloadable on a bad modem. =)
+	Let's keep it under 500k please.
+</li>
+</list>
+
+in doc do:
+for z in images/*.* images/*/*.*; do fgrep -q $z *.html || echo "$z"; done
+
+</section>
+
+<section name="CVS">
+	environment variables
+		CVSEDITOR=pico
+		CVS_RSH=ssh2
+</section>
+
+</documentation>
