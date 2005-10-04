@@ -21,6 +21,6 @@ OBJECTS = pdp_intrusion.o  pdp_yqt.o  pdp_simura.o  pdp_underwatch.o  \
           pdp_theorout~.o pdp_cropper.o pdp_background.o \
           pdp_mapper.o pdp_theonice~.o pdp_icedthe~.o\
           pdp_fdiff.o pdp_hue.o \
-           # pdp_xcanvas.o pdp_aa.o
+          pdp_live~.o pdp_ffmpeg~.o # pdp_xcanvas.o pdp_aa.o
 
 all_modules: $(OBJECTS) 

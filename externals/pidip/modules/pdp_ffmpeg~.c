@@ -112,6 +112,28 @@ static int pdp_ffmpeg_read_ffserver_streams(t_pdp_ffmpeg *x)
         memcpy(st, ic->streams[i], sizeof(AVStream));
         x->x_avcontext->streams[i] = st;
  
+#if FFMPEG_VERSION_INT >= 0x000409
+        if ( ic->streams[i]->codec->codec_type == CODEC_TYPE_UNKNOWN )
+        {
+           post( "pdp_ffmpeg~ : stream #%d # type : unknown", i ); 
+        }
+        if ( ic->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO )
+        {
+           post( "pdp_ffmpeg~ : stream #%d # type : audio # id : %d # bitrate : %d", 
+                 i, ic->streams[i]->codec->codec_id, ic->streams[i]->codec->bit_rate ); 
+           post( "pdp_ffmpeg~ : sample rate : %d # channels : %d", 
+                 ic->streams[i]->codec->sample_rate, ic->streams[i]->codec->channels ); 
+           x->x_nbaudiostreams++;
+        }
+        if ( ic->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO )
+        {
+           post( "pdp_ffmpeg~ : stream #%d # type : video # id : %d # bitrate : %d", 
+                 i, ic->streams[i]->codec->codec_id, ic->streams[i]->codec->bit_rate ); 
+           post( "pdp_ffmpeg~ : framerate : %d # width : %d # height : %d", 
+                 av_q2d( ic->streams[i]->r_frame_rate ), ic->streams[i]->codec->width, ic->streams[i]->codec->height ); 
+           x->x_nbvideostreams++;
+        }
+#else
         if ( ic->streams[i]->codec.codec_type == CODEC_TYPE_UNKNOWN )
         {
            post( "pdp_ffmpeg~ : stream #%d # type : unknown", i ); 
@@ -132,6 +154,7 @@ static int pdp_ffmpeg_read_ffserver_streams(t_pdp_ffmpeg *x)
                  ic->streams[i]->codec.frame_rate/10000, ic->streams[i]->codec.width, ic->streams[i]->codec.height ); 
            x->x_nbvideostreams++;
         }
+#endif
     }
 
     if ( x->x_secondcount ) free( x->x_secondcount );
@@ -188,7 +211,11 @@ static void pdp_ffmpeg_starve(t_pdp_ffmpeg *x)
    
    for(i=0;i<x->x_avcontext->nb_streams;i++)
    {
+#if FFMPEG_VERSION_INT >= 0x000409
+     avcodec_close( x->x_avcontext->streams[i]->codec );
+#else
      avcodec_close( &x->x_avcontext->streams[i]->codec );
+#endif
      av_free( x->x_avcontext->streams[i] );
    }
 
@@ -247,7 +274,11 @@ static void pdp_ffmpeg_feed(t_pdp_ffmpeg *x, t_symbol *s)
    for(i=0;i<x->x_avcontext->nb_streams;i++) 
    {
       AVCodec *codec;
+#if FFMPEG_VERSION_INT >= 0x000409
+      codec = avcodec_find_encoder(x->x_avcontext->streams[i]->codec->codec_id);
+#else
       codec = avcodec_find_encoder(x->x_avcontext->streams[i]->codec.codec_id);
+#endif
       if (!codec) 
       {
           post("pdp_ffmpeg~ : unsupported codec for output stream #%d\n", i );
@@ -255,7 +286,11 @@ static void pdp_ffmpeg_feed(t_pdp_ffmpeg *x, t_symbol *s)
           outlet_float( x->x_outlet_streaming, x->x_streaming );
           return;
       }
+#if FFMPEG_VERSION_INT >= 0x000409
+      if (avcodec_open(x->x_avcontext->streams[i]->codec, codec) < 0) 
+#else
       if (avcodec_open(&x->x_avcontext->streams[i]->codec, codec) < 0) 
+#endif
       {
           post("pdp_ffmpeg~ : error while opening codec for stream #%d - maybe incorrect parameters such as bit_rate, rate, width or height\n", i);
           x->x_streaming = 0;
@@ -371,8 +406,240 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
          // output all video streams
          svideoindex=0;
          saudioindex=0;
-         for (i=0; i<x->x_avcontext->nb_streams; i++)
-         {
+#if FFMPEG_VERSION_INT >= 0x000409
+        for (i=0; i<x->x_avcontext->nb_streams; i++)
+        {
+             /* convert pixel format and size if needed */
+           if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO )
+           {
+             t_int size;
+
+             // check if the framerate has been exceeded
+             if ( gettimeofday(&etime, NULL) == -1)
+             {
+                post("pdp_ffmpeg~ : could not read time" );
+             }
+             if ( etime.tv_sec != x->x_cursec )
+             {
+                x->x_cursec = etime.tv_sec;
+                outlet_float( x->x_outlet_framerate, x->x_secondcount[ svideoindex ] );
+                for (j=0; j<x->x_nbvideostreams; j++)
+                {
+                   x->x_secondcount[ j ] = 0;
+                }
+             }
+             framerate = av_q2d( x->x_avcontext->streams[i]->r_frame_rate );
+             ttime = ( ( x->x_nbframes + 1 ) % framerate ) * ( 1000 / framerate );
+             atime = ( etime.tv_usec / 1000 );
+             // post("pdp_theonice~ : actual : %d, theoretical : %d", atime, ttime );
+             if ( atime < ttime )
+             {
+                x->x_nbframes_dropped++;
+                continue;
+             }
+
+             if ( x->x_avcontext->streams[i]->codec->pix_fmt != PIX_FMT_YUV420P )
+             {
+               /* create temporary picture */
+               size = avpicture_get_size(x->x_avcontext->streams[i]->codec->pix_fmt, 
+                                         x->x_vwidth, x->x_vheight );  
+               if (!x->x_buf1) x->x_buf1 = (uint8_t*) malloc(size);
+               if (!x->x_buf1)
+               {
+                 post ("pdp_ffmpeg~ : severe error : could not allocate image buffer" );
+                 return;
+               }
+               x->x_formatted_picture = &x->x_picture_format;
+               avpicture_fill(x->x_formatted_picture, x->x_buf1, 
+                              x->x_avcontext->streams[i]->codec->pix_fmt, 
+                              x->x_vwidth, x->x_vheight );  
+  
+               if (img_convert(x->x_formatted_picture, 
+                          x->x_avcontext->streams[i]->codec->pix_fmt,
+                          &pdppict, PIX_FMT_YUV420P,
+                          x->x_vwidth, x->x_vheight ) < 0) 
+               {
+                 post ("pdp_ffmpeg~ : error : image conversion failed" );
+               }
+             }
+             else
+             {
+                 x->x_formatted_picture = &pdppict;
+             }
+
+             // post ( "pdp_ffmpeg~ : resampling [%d,%d] -> [%d,%d]",
+             //        x->x_vwidth, x->x_vheight,
+             //        x->x_avcontext->streams[i]->codec->width,
+             //        x->x_avcontext->streams[i]->codec->height );
+             if ( ( x->x_avcontext->streams[i]->codec->width < x->x_vwidth ) &&
+                  ( x->x_avcontext->streams[i]->codec->height < x->x_vheight ) )
+             {
+               owidth = x->x_avcontext->streams[i]->codec->width;
+               oheight = x->x_avcontext->streams[i]->codec->height;
+
+               if (x->x_img_resample_ctx) img_resample_close(x->x_img_resample_ctx);
+		
+#if LIBAVCODEC_BUILD > 4715	
+               x->x_img_resample_ctx = img_resample_full_init(
+                              owidth, oheight, 
+                              x->x_vwidth, x->x_vheight, 
+                              0, 0, 0, 0,
+                              0, 0, 0, 0);
+#else
+               x->x_img_resample_ctx = img_resample_full_init(
+                              owidth, oheight, 
+                              x->x_vwidth, x->x_vheight, 0, 0, 0, 0);
+#endif
+                 
+               size = avpicture_get_size(x->x_avcontext->streams[i]->codec->pix_fmt, 
+                                         owidth, oheight );
+               if ( !x->x_buf2 ) 
+               {
+                  x->x_buf2 = (uint8_t*) malloc(size);
+               }
+               if (!x->x_buf2)
+               {
+                 post ("pdp_ffmpeg~ : severe error : could not allocate image buffer" );
+                 return;
+               }
+               x->x_final_picture = &x->x_picture_final;
+               avpicture_fill(x->x_final_picture, x->x_buf2, 
+                              x->x_avcontext->streams[i]->codec->pix_fmt, 
+                              owidth, oheight );
+  
+               img_resample(x->x_img_resample_ctx, x->x_final_picture, x->x_formatted_picture);
+    
+             }
+             else
+             {
+               x->x_final_picture = x->x_formatted_picture;
+             }
+
+             // encode and send the picture
+             {
+               AVFrame aframe;
+#if LIBAVCODEC_BUILD > 4715	
+               AVPacket vpkt;
+#endif
+               t_int fsize, ret;
+                
+                 memset(&aframe, 0, sizeof(AVFrame));
+                 *(AVPicture*)&aframe= *x->x_final_picture;
+                 aframe.pts = etime.tv_sec*1000000 + etime.tv_usec;
+                 aframe.quality = x->x_avcontext->streams[i]->quality;
+  
+                 fsize = avcodec_encode_video(x->x_avcontext->streams[i]->codec,
+                             x->x_video_buffer, VIDEO_BUFFER_SIZE,
+                             &aframe);
+
+#if LIBAVCODEC_BUILD > 4715	
+                 av_init_packet(&vpkt);
+
+                 vpkt.pts = aframe.pts;
+                 if(x->x_avcontext->streams[i]->codec->coded_frame->key_frame) 
+                        vpkt.flags |= PKT_FLAG_KEY;
+                 vpkt.stream_index= i;
+                 vpkt.data= (uint8_t *)x->x_video_buffer;
+                 vpkt.size= fsize;
+
+                 if ( ( ret = av_write_frame( x->x_avcontext, &vpkt) ) < 0 )
+#else
+                 if ( ( ret = av_write_frame( x->x_avcontext, i, x->x_video_buffer, fsize) ) < 0 )
+#endif
+                 {
+                    post ("pdp_ffmpeg~ : error : could not send frame : (ret=%d)", ret );
+                    return;
+                 }
+                 else
+                 {
+                    x->x_nbframes++;
+                    x->x_secondcount[ svideoindex ]++;
+                    // post ("pdp_ffmpeg~ : index=%d count=%d", svideoindex, x->x_secondcount[ svideoindex ] );
+                    svideoindex++;
+                 }
+             }
+           } 
+
+              /* convert and stream audio data */
+           if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO )
+           {
+                    // we assume audio is synchronized on next video stream 
+                 if ( ( (i+1) < x->x_avcontext->nb_streams ) &&
+                      ( x->x_avcontext->streams[i+1]->codec->codec_type == CODEC_TYPE_VIDEO ) )
+                 {
+                     x->x_audio_per_frame = 
+                        // 2*( (int) sys_getsr() ) / av_q2d( x->x_avcontext->streams[i+1]->r_frame_rate ) ;
+                        AUDIO_PACKET_SIZE;
+                     // post ("pdp_ffmpeg~ : transmit %d samples", x->x_audio_per_frame );
+                 }
+                 else
+                 {
+                     post ("pdp_ffmpeg~ : can't stream audio : video stream is not found" );
+                     continue;
+                 }
+       
+                 if ( x->x_audioin_position > x->x_audio_per_frame )
+                 {
+                    size = x->x_audioin_position;
+                    if ( ( x->x_avcontext->streams[i]->codec->sample_rate != (int)sys_getsr() ) ||
+                         ( x->x_avcontext->streams[i]->codec->channels != 2 ) )
+                    {
+                      if (x->x_audio_resample_ctx) audio_resample_close(x->x_audio_resample_ctx);
+                      x->x_audio_resample_ctx = 
+                       audio_resample_init(x->x_avcontext->streams[i]->codec->channels, 2,
+                                         x->x_avcontext->streams[i]->codec->sample_rate,
+                                         (int)sys_getsr());
+                      sizeout = audio_resample(x->x_audio_resample_ctx,
+                                    x->x_audio_enc_buf, 
+                                    x->x_audio_buf,
+                                    size / (x->x_avcontext->streams[i]->codec->channels * 2));
+                      pencbuf = (short*) &x->x_audio_enc_buf;
+                      sizeout = sizeout * x->x_avcontext->streams[i]->codec->channels * 2;
+                    }
+                    else
+                    {
+                      pencbuf = (short*) &x->x_audio_buf;
+                      sizeout = size;
+                    }
+
+                      /* output resampled raw samples */
+                    fifo_write(&x->x_audio_fifo[saudioindex], (uint8_t*)pencbuf, sizeout,
+                               &x->x_audio_fifo[saudioindex].wptr);
+
+                    framebytes = x->x_avcontext->streams[i]->codec->frame_size * 2 * 
+                                 x->x_avcontext->streams[i]->codec->channels;
+ 
+                    while (fifo_read(&x->x_audio_fifo[saudioindex], (uint8_t*)pencbuf, framebytes,
+                                     &x->x_audio_fifo[saudioindex].rptr) == 0) 
+                    {
+#if LIBAVCODEC_BUILD > 4715	
+                      AVPacket apkt;
+#endif
+                         encsize = avcodec_encode_audio(x->x_avcontext->streams[i]->codec, 
+                                       (uint8_t*)&x->x_audio_out, sizeof(x->x_audio_out),
+                                       (short *)pencbuf);
+#if LIBAVCODEC_BUILD > 4715	
+                         av_init_packet(&apkt);
+
+                         apkt.pts = etime.tv_sec*1000000 + etime.tv_usec;
+                         if(x->x_avcontext->streams[i]->codec->coded_frame->key_frame) 
+                                  apkt.flags |= PKT_FLAG_KEY;
+                         apkt.stream_index= i;
+                         apkt.data= (uint8_t *)x->x_audio_out;
+                         apkt.size= encsize;
+                         
+                         av_write_frame(x->x_avcontext, &apkt);
+#else
+                         av_write_frame(x->x_avcontext, i, x->x_audio_out, encsize);
+#endif
+                    }
+                    saudioindex++;
+                 }
+           }
+        }
+#else
+        for (i=0; i<x->x_avcontext->nb_streams; i++)
+        {
              /* convert pixel format and size if needed */
            if ( x->x_avcontext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO )
            {
@@ -601,6 +868,7 @@ static void pdp_ffmpeg_process_yv12(t_pdp_ffmpeg *x)
                  }
            }
         }
+#endif
         x->x_audioin_position=0;
     }
     return;

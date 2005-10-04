@@ -276,7 +276,11 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
    while (length > 0) 
    {
          if ( !x->x_streaming ) break;
+#if FFMPEG_VERSION_INT >= 0x000409
+         switch(x->x_avcontext->streams[x->x_pkt.stream_index]->codec->codec_type) 
+#else
          switch(x->x_avcontext->streams[x->x_pkt.stream_index]->codec.codec_type) 
+#endif
          {
              case CODEC_TYPE_AUDIO:
                     if ( !x->x_audio )
@@ -284,7 +288,11 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                       av_free_packet(&x->x_pkt);
                       return 0;
                     }
+#if FFMPEG_VERSION_INT >= 0x000409
+                    chunksize = avcodec_decode_audio(x->x_avcontext->streams[x->x_pkt.stream_index]->codec, 
+#else
                     chunksize = avcodec_decode_audio(&x->x_avcontext->streams[x->x_pkt.stream_index]->codec, 
+#endif
                                                &x->x_audio_buf[0], &audiosize,
                                                pcktptr, length);
                     if (chunksize < 0)
@@ -316,6 +324,21 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                     //                x->x_avcontext->streams[x->x_pkt.stream_index]->codec.channels,
                     //                (int)sys_getsr(), 2, x->x_audioin_position );
 
+#if FFMPEG_VERSION_INT >= 0x000409
+                    x->x_audiochannels = x->x_avcontext->streams[x->x_pkt.stream_index]->codec->channels;
+                    x->x_samplerate = x->x_avcontext->streams[x->x_pkt.stream_index]->codec->sample_rate;
+                    if (x->x_audio_resample_ctx) audio_resample_close(x->x_audio_resample_ctx);
+                    x->x_audio_resample_ctx =
+                          audio_resample_init(DEFAULT_CHANNELS, 
+                                         x->x_avcontext->streams[x->x_pkt.stream_index]->codec->channels,
+                                         (int)sys_getsr(),
+                                         x->x_avcontext->streams[x->x_pkt.stream_index]->codec->sample_rate);
+
+                    sizeout = audio_resample(x->x_audio_resample_ctx,
+                                    &x->x_audio_in[x->x_audioin_position],
+                                    &x->x_audio_buf[0],
+                                    audiosize/(x->x_avcontext->streams[x->x_pkt.stream_index]->codec->channels * sizeof(short)));
+#else
                     x->x_audiochannels = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.channels;
                     x->x_samplerate = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.sample_rate;
                     if (x->x_audio_resample_ctx) audio_resample_close(x->x_audio_resample_ctx);
@@ -329,6 +352,7 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                                     &x->x_audio_in[x->x_audioin_position],
                                     &x->x_audio_buf[0],
                                     audiosize/(x->x_avcontext->streams[x->x_pkt.stream_index]->codec.channels * sizeof(short)));
+#endif
                     sizeout = sizeout * DEFAULT_CHANNELS;
 
                     if ( ( x->x_audioin_position + sizeout ) < 3*MAX_AUDIO_PACKET_SIZE )
@@ -354,6 +378,25 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
 
              case CODEC_TYPE_VIDEO:
 
+#if FFMPEG_VERSION_INT >= 0x000409
+                    imagesize = (x->x_avcontext->streams[x->x_pkt.stream_index]->codec->width * 
+                                 x->x_avcontext->streams[x->x_pkt.stream_index]->codec->height * 3) / 2; // yuv planar
+
+                    x->x_framerate = ( t_int ) av_q2d( x->x_avcontext->streams[x->x_pkt.stream_index]->r_frame_rate );
+                    if ( x->x_framerate == 0 ) x->x_framerate = DEFAULT_FRAME_RATE;
+                    x->x_videoindex = x->x_pkt.stream_index; 
+
+                    chunksize = avcodec_decode_video(
+                                   x->x_avcontext->streams[x->x_pkt.stream_index]->codec,
+                                   &frame, &pictureok, 
+                                   pcktptr, length);
+                    if ( x->x_avcontext->streams[x->x_pkt.stream_index]->codec->pix_fmt != PIX_FMT_YUV420P )
+                    {
+                       post( "pdp_live~ : unsupported image format : %d", 
+                              x->x_avcontext->streams[x->x_pkt.stream_index]->codec->pix_fmt ); 
+                       pictureok = 0;
+                    }
+#else
                     imagesize = (x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width * 
                                  x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height * 3) / 2; // yuv planar
 
@@ -371,15 +414,7 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                               x->x_avcontext->streams[x->x_pkt.stream_index]->codec.pix_fmt ); 
                        pictureok = 0;
                     }
-                    // post( "pdp_live~ : decoded new frame : type=%d format=%d (w=%d) (h=%d) (linesizes=%d,%d,%d,%d)", 
-                    //           frame.pict_type,
-                    //           x->x_avcontext->streams[x->x_pkt.stream_index]->codec.pix_fmt, 
-                    //           x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width, 
-                    //           x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height, 
-                    //           frame.linesize[0],
-                    //           frame.linesize[1],
-                    //           frame.linesize[2],
-                    //           frame.linesize[3] );
+#endif
                     x->x_picture_decoded = *(AVPicture*)&frame;
                     x->x_avcontext->streams[x->x_pkt.stream_index]->quality= frame.quality;
                     if (chunksize < 0) 
@@ -403,8 +438,13 @@ static t_int pdp_live_decode_packet(t_pdp_live *x)
                           perror( "pthread_mutex_lock" );
                         }
                         x->x_newpicture=1;
+#if FFMPEG_VERSION_INT >= 0x000409
+                        x->x_vwidth = x->x_avcontext->streams[x->x_pkt.stream_index]->codec->width;
+                        x->x_vheight = x->x_avcontext->streams[x->x_pkt.stream_index]->codec->height;
+#else
                         x->x_vwidth = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.width;
                         x->x_vheight = x->x_avcontext->streams[x->x_pkt.stream_index]->codec.height;
+#endif
                         x->x_vsize = x->x_vwidth*x->x_vheight;
 
                         // create a new pdp packet from BITMAP YV12 image format
@@ -543,7 +583,6 @@ static void *pdp_live_connect_to_url(void *tdata)
     memset(&x->x_avparameters, 0, sizeof(AVFormatParameters));
     x->x_avparameters.sample_rate = sys_getsr();
     x->x_avparameters.channels = DEFAULT_CHANNELS;
-    x->x_avparameters.frame_rate = DEFAULT_FRAME_RATE;
     x->x_avparameters.width = DEFAULT_WIDTH;
     if ( x->x_framerate = 0 ) x->x_framerate = DEFAULT_FRAME_RATE;
     x->x_avparameters.height = DEFAULT_HEIGHT;
@@ -584,6 +623,31 @@ static void *pdp_live_connect_to_url(void *tdata)
     {
       AVStream *st;
 
+#if FFMPEG_VERSION_INT >= 0x000409
+        if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_UNKNOWN )
+        {
+           post( "pdp_live~ : stream #%d # type : unknown", i ); 
+        }
+        if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO )
+        {
+           post( "pdp_live~ : stream #%d # type : audio # id : %d # bitrate : %d", 
+                 i, x->x_avcontext->streams[i]->codec->codec_id, x->x_avcontext->streams[i]->codec->bit_rate ); 
+           post( "pdp_live~ : sample rate : %d # channels : %d", 
+                 x->x_avcontext->streams[i]->codec->sample_rate, x->x_avcontext->streams[i]->codec->channels ); 
+           x->x_nbaudiostreams++;
+        }
+        if ( x->x_avcontext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO )
+        {
+           post( "pdp_live~ : stream #%d # type : video # id : %d # bitrate : %d", 
+                 i, x->x_avcontext->streams[i]->codec->codec_id, 
+                 x->x_avcontext->streams[i]->codec->bit_rate ); 
+           post( "pdp_live~ : framerate : %d # width : %d # height : %d", 
+                 av_q2d( x->x_avcontext->streams[i]->r_frame_rate )/10000, 
+                 x->x_avcontext->streams[i]->codec->width, 
+                 x->x_avcontext->streams[i]->codec->height ); 
+           x->x_nbvideostreams++;
+        }
+#else
         if ( x->x_avcontext->streams[i]->codec.codec_type == CODEC_TYPE_UNKNOWN )
         {
            post( "pdp_live~ : stream #%d # type : unknown", i ); 
@@ -607,6 +671,7 @@ static void *pdp_live_connect_to_url(void *tdata)
                  x->x_avcontext->streams[i]->codec.height ); 
            x->x_nbvideostreams++;
         }
+#endif
     }
 
      /* open each decoder */
@@ -614,7 +679,11 @@ static void *pdp_live_connect_to_url(void *tdata)
     {
       AVCodec *codec;
       post("pdp_live~ : opening decoder for stream #%d", i);
+#if FFMPEG_VERSION_INT >= 0x000409
+      codec = avcodec_find_decoder(x->x_avcontext->streams[i]->codec->codec_id);
+#else
       codec = avcodec_find_decoder(x->x_avcontext->streams[i]->codec.codec_id);
+#endif
       if (!codec) 
       {
           post("pdp_live~ : unsupported codec for output stream #%d\n", i );
@@ -624,7 +693,11 @@ static void *pdp_live_connect_to_url(void *tdata)
           x->x_avcontext = av_mallocz(sizeof(AVFormatContext));
           pthread_exit(NULL);
       }
+#if FFMPEG_VERSION_INT >= 0x000409
+      if (avcodec_open(x->x_avcontext->streams[i]->codec, codec) < 0) 
+#else
       if (avcodec_open(&x->x_avcontext->streams[i]->codec, codec) < 0) 
+#endif
       {
           post("pdp_live~ : error while opening codec for stream #%d - maybe incorrect parameters such as bit_rate, rate, width or height\n", i);
           x->x_streaming = 0;
@@ -703,7 +776,11 @@ static void pdp_live_disconnect(t_pdp_live *x)
      /* close each decoder */
      for(i=0;i<x->x_avcontext->nb_streams;i++) 
      {
+#if FFMPEG_VERSION_INT >= 0x000409
+       if (avcodec_close(x->x_avcontext->streams[i]->codec) < 0) 
+#else
        if (avcodec_close(&x->x_avcontext->streams[i]->codec) < 0) 
+#endif
        {
            post("pdp_live~ : error while closing codec for stream #%d", i);
        }
