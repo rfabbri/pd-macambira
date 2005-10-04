@@ -1,0 +1,27 @@
+#N canvas 301 131 637 303 10;
+#X text 14 14 @comlex_sq;
+#X obj 21 159 @complex_sq;
+#X text 96 15 this object computes the square of complex numbers. if
+seeing imaginary as Y and real as X \, then this operation squares
+the distance of a point from origin and doubles the angle between it
+and the +X half-axis clockwise. :);
+#X floatatom 21 108 5 0 0 0 - - -;
+#X obj 21 188 @export_list;
+#X floatatom 21 238 5 0 0 0 - - -;
+#X obj 21 128 @two;
+#X floatatom 64 108 5 0 0 0 - - -;
+#X obj 114 235 @print;
+#X obj 21 209 unpack;
+#X floatatom 58 238 5 0 0 0 - - -;
+#X text 572 13 gridflow;
+#X text 21 275 see also:;
+#X obj 94 279 @ +;
+#X obj 127 279 @! abs;
+#X connect 1 0 4 0;
+#X connect 1 0 8 0;
+#X connect 3 0 6 0;
+#X connect 4 0 9 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 1;
+#X connect 9 0 5 0;
+#X connect 9 1 10 0;

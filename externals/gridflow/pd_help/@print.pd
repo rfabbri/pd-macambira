@@ -1,0 +1,28 @@
+#N canvas 435 101 688 277 10;
+#X text 191 203 see also:;
+#X obj 297 208 @export;
+#X obj 352 208 @export_list;
+#X obj 442 208 rubyprint;
+#X obj 19 123 @three;
+#X floatatom 19 73 5 0 0 0 - - -;
+#X floatatom 37 52 5 0 0 0 - - -;
+#X floatatom 56 73 5 0 0 0 - - -;
+#X obj 19 197 @print;
+#X text 14 15 @print;
+#X text 143 15 prints grids dimensions or all the grid data if there
+are 2 dimensions or less.;
+#X obj 112 123 @import ( 3 3 3 );
+#X obj 113 73 until;
+#X msg 113 53 27;
+#X obj 112 93 random 27;
+#X text 619 13 gridflow;
+#X obj 262 208 @dim;
+#X obj 512 208 printargs;
+#X connect 4 0 8 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 1;
+#X connect 7 0 4 2;
+#X connect 11 0 8 0;
+#X connect 12 0 14 0;
+#X connect 13 0 12 0;
+#X connect 14 0 11 0;

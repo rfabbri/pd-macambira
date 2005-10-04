@@ -1,0 +1,34 @@
+#N canvas 497 180 649 321 10;
+#X obj 113 26 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 113 101 @in;
+#X text 14 15 @scale_to;
+#X obj 20 49 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+;
+#X obj 269 157 @two;
+#X obj 310 43 vsl 15 128 0 640 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 3300 1;
+#X obj 333 43 vsl 15 128 0 480 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 6300 1;
+#X obj 352 285 @scale_by;
+#X text 281 281 see also:;
+#X text 190 182 though not pointed out in the manual \, the initial
+arguments seem to be mandatory.;
+#X text 578 11 gridflow;
+#X obj 423 285 @downscale_by;
+#X obj 20 72 metro 100;
+#X obj 113 262 @out window;
+#X msg 135 74 open b001.jpg;
+#X obj 113 51 fork;
+#X obj 113 157 @scale_to ( 133 133 );
+#X connect 0 0 15 0;
+#X connect 1 0 16 0;
+#X connect 3 0 12 0;
+#X connect 4 0 16 1;
+#X connect 5 0 4 0;
+#X connect 6 0 4 1;
+#X connect 12 0 1 0;
+#X connect 14 0 1 0;
+#X connect 15 0 1 0;
+#X connect 15 1 14 0;
+#X connect 16 0 13 0;

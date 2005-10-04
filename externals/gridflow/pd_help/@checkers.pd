@@ -1,0 +1,13 @@
+#N canvas 431 74 440 355 10;
+#X obj 20 47 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 20 164 @checkers;
+#X obj 20 81 @for ( 0 0 ) ( 128 128 ) ( 1 1 );
+#X text 16 7 @checkers;
+#X text 216 297 see also;
+#X obj 283 301 @draw_polygon;
+#X text 354 7 gridflow;
+#X obj 20 309 @out window;
+#X connect 0 0 2 0;
+#X connect 1 0 7 0;
+#X connect 2 0 1 0;

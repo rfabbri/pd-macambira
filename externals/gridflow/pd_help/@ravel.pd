@@ -1,0 +1,31 @@
+#N canvas 435 101 660 279 10;
+#X text 14 15 @ravel;
+#X text 143 15 like @redim but always produces a 1-D grid with the
+same total number of elements.;
+#X obj 20 102 @in;
+#X obj 20 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 20 168 @dim;
+#X obj 20 190 @export_list;
+#X obj 20 211 print before;
+#X obj 140 129 @ravel;
+#X obj 259 170 @dim;
+#X obj 259 192 @export_list;
+#X obj 259 213 print after;
+#X text 403 215 see also:;
+#X obj 567 214 @perspective;
+#X text 575 14 gridflow;
+#X obj 477 214 @redim ( 1 );
+#X msg 43 81 open bluemarble.jpg;
+#X obj 20 60 fork;
+#X connect 2 0 4 0;
+#X connect 2 0 7 0;
+#X connect 3 0 16 0;
+#X connect 4 0 5 0;
+#X connect 5 0 6 0;
+#X connect 7 0 8 0;
+#X connect 8 0 9 0;
+#X connect 9 0 10 0;
+#X connect 15 0 2 0;
+#X connect 16 0 2 0;
+#X connect 16 1 15 0;

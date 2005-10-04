@@ -1,0 +1,36 @@
+#N canvas 432 100 640 338 10;
+#X obj 20 32 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 20 100 @in;
+#X obj 19 174 @posterize;
+#X text 16 7 @posterize;
+#X floatatom 84 131 5 2 255 0 - - -;
+#X obj 84 147 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 19 127 @store;
+#X text 132 131 2 - 255;
+#X text 157 157 number of possible levels per channel. the levels are
+equally spaced \, with the lowest at 0 and the highest at 255 the minimum
+number of levels is 2 and the default value is also 2;
+#X text 572 6 gridflow;
+#X text 210 300 see also:;
+#X obj 281 304 @convolve;
+#X obj 419 304 @solarize;
+#X obj 488 304 @layer;
+#X obj 350 304 @contrast;
+#X obj 20 59 fork;
+#X msg 43 79 open bluemarble.jpg;
+#X obj 19 303 @out window;
+#X text 98 7 reduces the number of possible intensities in an image:
+it rounds the color values. the effect is mostly apparent with a low
+number of levels;
+#X connect 0 0 15 0;
+#X connect 1 0 6 1;
+#X connect 2 0 17 0;
+#X connect 4 0 2 1;
+#X connect 4 0 5 0;
+#X connect 5 0 6 0;
+#X connect 6 0 2 0;
+#X connect 15 0 1 0;
+#X connect 15 1 16 0;
+#X connect 16 0 1 0;

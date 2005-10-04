@@ -1,0 +1,64 @@
+#N canvas 265 540 787 472 10;
+#X text 14 15 @spread;
+#X text 129 15 makes noise;
+#X obj 232 159 @in;
+#X obj 232 58 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 232 207 spigot;
+#X obj 278 207 == 0;
+#X obj 275 140 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0
+1;
+#X obj 310 207 spigot;
+#X obj 310 291 @ min 255;
+#X obj 310 270 @spread 1;
+#X obj 310 312 @ min 0;
+#X floatatom 368 241 5 0 0 0 - - -;
+#X obj 195 269 @store;
+#X obj 20 197 @spread 1;
+#X floatatom 78 163 5 0 0 0 - - -;
+#X obj 20 88 until;
+#X obj 20 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X msg 20 69 65536;
+#X obj 61 88 float;
+#X obj 101 88 + 1;
+#X obj 20 129 @import ( 256 256 2 );
+#X text 368 314 we limit here \, because the values might go out of
+range;
+#X text 702 13 gridflow;
+#X obj 195 393 @out window;
+#X obj 310 395 @out window;
+#X msg 255 112 open r001.jpg;
+#X obj 232 87 fork;
+#X obj 149 73 metro 50;
+#X obj 149 51 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X text 300 141 switch displays \, use this to get an image into the
+@store;
+#X connect 2 0 4 0;
+#X connect 2 0 7 0;
+#X connect 3 0 26 0;
+#X connect 4 0 12 1;
+#X connect 5 0 7 1;
+#X connect 6 0 4 1;
+#X connect 6 0 5 0;
+#X connect 7 0 9 0;
+#X connect 8 0 10 0;
+#X connect 9 0 8 0;
+#X connect 10 0 24 0;
+#X connect 11 0 9 1;
+#X connect 12 0 23 0;
+#X connect 13 0 12 0;
+#X connect 14 0 13 1;
+#X connect 15 0 18 0;
+#X connect 16 0 17 0;
+#X connect 17 0 15 0;
+#X connect 18 0 19 0;
+#X connect 18 0 20 0;
+#X connect 19 0 18 1;
+#X connect 20 0 13 0;
+#X connect 25 0 2 0;
+#X connect 26 0 2 0;
+#X connect 26 1 25 0;
+#X connect 27 0 2 0;
+#X connect 28 0 27 0;

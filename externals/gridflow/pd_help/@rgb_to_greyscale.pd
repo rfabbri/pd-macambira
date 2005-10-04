@@ -1,0 +1,19 @@
+#N canvas 119 122 514 375 10;
+#X obj 19 47 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 19 100 @in;
+#X obj 19 132 @rgb_to_greyscale;
+#X text 14 15 @rgb_to_greyscale;
+#X obj 19 152 s xx;
+#X obj 18 215 r xx;
+#X obj 18 235 @greyscale_to_rgb;
+#X text 444 11 gridflow;
+#X obj 18 329 @out window;
+#X msg 44 72 open r001.jpg;
+#X connect 0 0 9 0;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 5 0 6 0;
+#X connect 6 0 8 0;
+#X connect 9 0 1 0;

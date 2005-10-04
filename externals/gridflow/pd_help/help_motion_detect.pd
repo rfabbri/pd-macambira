@@ -1,0 +1,76 @@
+#N canvas 126 0 350 447 10;
+#X obj 37 24 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 71 539 fps detailed;
+#X obj 71 559 print;
+#X obj 82 254 @motion_detection;
+#X floatatom 261 298 5 0 0 0 - displaced_numb -;
+#X obj 112 79 @camera_control;
+#X obj 71 116 @in;
+#X obj 261 272 tgl 15 0 displaced empty empty 0 0 128 4 -233017 -62784
+-233017 0 1;
+#X text 283 271 <-- toggle displaced pixels on/off;
+#X text 229 78 <-- select and initialise the type of camera first;
+#X obj 264 246 hsl 128 15 0 30 0 0 noise empty noise_reduction 10 6
+128 12 -233017 -1 -62784 0 0;
+#X text 312 299 <-- total number of displaced pixels (divided by 100000)
+;
+#X obj 261 220 tgl 15 0 snapshot empty empty 0 0 128 4 -233017 -258699
+-260818 0 1;
+#X text 284 219 <-- compare incoming images/ take a snapshot;
+#X obj 82 358 @centroid;
+#X obj 37 45 metro 50;
+#X obj 71 143 fork;
+#X obj 71 231 demux 2;
+#X obj 71 333 demux 2;
+#X obj 71 441 demux 2;
+#X obj 115 210 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
+1;
+#X obj 115 313 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
+1;
+#X obj 115 421 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
+1;
+#X obj 71 518 @out window;
+#N canvas 0 0 450 300 pixelate 0;
+#X obj 55 92 @downscale_by ( 15 20 ) smoothly;
+#X obj 55 118 @scale_by ( 32 32 );
+#X obj 42 40 inlet;
+#X obj 39 168 outlet;
+#X connect 0 0 1 0;
+#X connect 1 0 3 0;
+#X connect 2 0 0 0;
+#X restore 82 464 pd pixelate;
+#N canvas 0 0 450 300 get_image_size 0;
+#X obj 39 70 @dim;
+#X obj 39 116 @export_list;
+#X obj 39 139 s size;
+#X obj 39 92 @inner * + 0 ( 3 2 # 1 0 0 1 0 0 );
+#X obj 30 28 inlet;
+#X connect 0 0 3 0;
+#X connect 1 0 2 0;
+#X connect 3 0 1 0;
+#X connect 4 0 0 0;
+#X restore 94 169 pd get_image_size;
+#X text 226 169 <-- necessary for centroid;
+#X text 208 357 <-- finds the centre of the displaced pixels;
+#X text 169 463 <-- make the image into 15 x 20 squares;
+#X connect 0 0 15 0;
+#X connect 1 0 2 0;
+#X connect 3 0 18 0;
+#X connect 5 0 6 0;
+#X connect 6 0 16 0;
+#X connect 14 0 19 0;
+#X connect 15 0 6 0;
+#X connect 16 0 17 0;
+#X connect 16 1 25 0;
+#X connect 17 0 18 0;
+#X connect 17 1 3 0;
+#X connect 18 0 19 0;
+#X connect 18 1 14 0;
+#X connect 19 0 23 0;
+#X connect 19 1 24 0;
+#X connect 20 0 17 1;
+#X connect 21 0 18 1;
+#X connect 22 0 19 1;
+#X connect 23 0 1 0;
+#X connect 24 0 23 0;

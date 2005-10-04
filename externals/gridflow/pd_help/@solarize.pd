@@ -1,0 +1,25 @@
+#N canvas 432 100 613 339 10;
+#X obj 20 59 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 20 138 @in;
+#X text 16 7 @solarize;
+#X obj 20 174 @solarize;
+#X text 98 7 makes medium intensities brightest. formerly brightest
+colors become darkest \, formerly darkest stays darkest. this filter
+is linear. it's like a 200% contrast \, except that overflows are mirrored
+instead of clipped or wrapped.;
+#X text 545 5 gridflow;
+#X text 202 305 see also:;
+#X obj 273 309 @convolve;
+#X obj 487 309 @layer;
+#X obj 342 309 @contrast;
+#X obj 411 309 @posterize;
+#X obj 20 222 @out window;
+#X msg 43 112 open bluemarble.jpg;
+#X obj 20 83 fork;
+#X connect 0 0 13 0;
+#X connect 1 0 3 0;
+#X connect 3 0 11 0;
+#X connect 12 0 1 0;
+#X connect 13 0 1 0;
+#X connect 13 1 12 0;

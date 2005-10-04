@@ -1,0 +1,39 @@
+#N canvas 306 222 526 344 10;
+#X obj 18 103 @in;
+#X obj 18 280 print value;
+#X obj 18 137 @fold + 0;
+#X obj 18 160 @fold + 0;
+#X obj 18 184 @fold + 0;
+#X text 114 133 treats the grid as a grid of one- dimensional grids
+such that the same operation (here addition) will be performed on all
+its elements together with the base value. the results are combined
+back. each @fold operation removes a dimension. syntax: @fold <two-input
+operation> <starting value>;
+#X text 19 8 @fold;
+#X text 451 11 gridflow;
+#X obj 85 313 @inner2;
+#X text 14 309 see also:;
+#X obj 141 313 @join;
+#X obj 183 313 @perspective;
+#X msg 41 70 open bluemarble.jpg;
+#X obj 18 246 @export_list;
+#X msg 237 66 open b001.jpg;
+#X obj 18 49 fork;
+#X obj 9 29 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1 -1
+;
+#X obj 214 41 fork;
+#X obj 199 21 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 13 0;
+#X connect 12 0 0 0;
+#X connect 13 0 1 0;
+#X connect 14 0 0 0;
+#X connect 15 0 0 0;
+#X connect 15 1 12 0;
+#X connect 16 0 15 0;
+#X connect 17 0 0 0;
+#X connect 17 1 14 0;
+#X connect 18 0 17 0;

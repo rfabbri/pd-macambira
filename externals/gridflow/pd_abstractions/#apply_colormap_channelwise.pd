@@ -1,0 +1,12 @@
+#N canvas 0 0 450 300 10;
+#X obj 17 17 inlet;
+#X obj 17 37 #outer & ( -1 0 );
+#X obj 17 57 # + ( 3 2 # 0 0 0 1 0 2 );
+#X obj 17 77 #store;
+#X obj 17 97 outlet;
+#X obj 67 17 inlet;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 5 0 3 1;

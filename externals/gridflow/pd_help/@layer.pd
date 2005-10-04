@@ -1,0 +1,46 @@
+#N canvas 297 501 656 323 10;
+#X obj 18 29 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 18 96 @in;
+#X obj 211 28 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 211 96 @in;
+#X obj 237 96 @rgb_to_greyscale;
+#X text 14 5 @layer;
+#X obj 18 208 @layer;
+#X obj 18 161 @join -1;
+#X obj 406 29 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 406 96 @in;
+#X text 208 121 opacity channel file;
+#X text 51 95 foreground file;
+#X text 438 96 background file;
+#X text 579 14 gridflow;
+#X obj 18 269 @out window;
+#X text 206 209 a picture that has an opacity level will be used as
+foreground vs a picture that has no opacity channel. the output is
+a picture that has no opacity channel;
+#X msg 41 72 open r001.jpg;
+#X msg 234 69 open b001.jpg;
+#X msg 429 71 open g001.jpg;
+#X obj 18 50 fork;
+#X obj 211 47 fork;
+#X obj 406 50 fork;
+#X connect 0 0 19 0;
+#X connect 1 0 7 0;
+#X connect 2 0 20 0;
+#X connect 3 0 4 0;
+#X connect 4 0 7 1;
+#X connect 6 0 14 0;
+#X connect 7 0 6 0;
+#X connect 8 0 21 0;
+#X connect 9 0 6 1;
+#X connect 16 0 1 0;
+#X connect 17 0 3 0;
+#X connect 18 0 9 0;
+#X connect 19 0 1 0;
+#X connect 19 1 16 0;
+#X connect 20 0 3 0;
+#X connect 20 1 17 0;
+#X connect 21 0 9 0;
+#X connect 21 1 18 0;

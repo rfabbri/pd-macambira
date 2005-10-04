@@ -1,0 +1,73 @@
+#N canvas 211 415 621 272 10;
+#N canvas 803 450 420 235 plot-a-function 0;
+#X obj 8 61 # inv+ 640;
+#X obj 8 40 #for 0 640 1;
+#X obj 105 59 outlet;
+#X obj 33 175 #outer <;
+#X obj 105 80 inlet;
+#X text 209 199 to rgb;
+#X text 97 176 make graph \, twotone channelless;
+#X obj 35 232 outlet;
+#X obj 105 34 #for 0 640 1;
+#X obj 105 10 inlet;
+#X obj 92 132 #finished;
+#X obj 105 103 t a a;
+#X obj 33 200 #outer * (255 255 255);
+#X connect 0 0 3 0;
+#X connect 1 0 0 0;
+#X connect 3 0 12 0;
+#X connect 4 0 11 0;
+#X connect 8 0 2 0;
+#X connect 9 0 8 0;
+#X connect 10 0 1 0;
+#X connect 11 0 10 0;
+#X connect 11 1 3 1;
+#X connect 12 0 7 0;
+#X restore 57 47 pd plot-a-function ( tm );
+#X obj 257 81 # + 320;
+#X obj 57 72 #out window;
+#X obj 256 -3 # - 320;
+#X obj 256 53 # tanh* 343;
+#X obj 256 25 # * 30;
+#X obj 33 15 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj -16 -85 cnv 15 620 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -15 152 cnv 15 620 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text -7 159 GridFlow 0.8.0;
+#X text -7 159 GridFlow 0.8.0;
+#X text -3 -86 plot.pd;
+#X obj 57 -10 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+;
+#X obj 57 14 metro 100;
+#X obj 360 -3 hsl 128 15 0 500 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 3600 1;
+#X floatatom 314 -2 5 0 0 0 - - -;
+#X obj 358 25 hsl 128 15 0 500 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 1300 1;
+#X floatatom 311 26 5 0 0 0 - - -;
+#X obj 390 54 hsl 128 15 0 500 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 6700 1;
+#X floatatom 343 54 5 0 0 0 - - -;
+#X obj 361 82 hsl 128 15 0 500 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 5600 1;
+#X floatatom 314 82 5 0 0 0 - - -;
+#X text -3 -72 Copyright 2003 Mathieu Bouchard;
+#X connect 0 0 2 0;
+#X connect 0 1 3 0;
+#X connect 1 0 0 1;
+#X connect 3 0 5 0;
+#X connect 4 0 1 0;
+#X connect 5 0 4 0;
+#X connect 6 0 0 0;
+#X connect 12 0 13 0;
+#X connect 13 0 0 0;
+#X connect 14 0 15 0;
+#X connect 15 0 3 1;
+#X connect 16 0 17 0;
+#X connect 17 0 5 1;
+#X connect 18 0 19 0;
+#X connect 19 0 4 1;
+#X connect 20 0 21 0;
+#X connect 21 0 1 1;

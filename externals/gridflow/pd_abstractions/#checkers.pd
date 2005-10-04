@@ -1,0 +1,18 @@
+#N canvas 0 0 450 300 10;
+#X obj 18 14 inlet;
+#X obj 18 34 # >> 3;
+#X obj 18 54 # & 1;
+#X obj 18 74 #fold ^;
+#X obj 18 94 # inv+;
+#X obj 18 114 # & 63;
+#X obj 18 134 # + 128;
+#X obj 18 154 #outer ignore ( 0 0 0 );
+#X obj 18 174 outlet;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 5 0;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 8 0;

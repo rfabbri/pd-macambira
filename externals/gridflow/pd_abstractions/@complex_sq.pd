@@ -1,0 +1,8 @@
+#N canvas 0 0 303 155 10;
+#X obj 17 15 inlet;
+#X obj 17 75 outlet;
+#X obj 17 35 #inner ( 2 2 2 # 0 2 1 -1 1 0 1 1 );
+#X obj 17 55 #fold * \, seed 1;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;

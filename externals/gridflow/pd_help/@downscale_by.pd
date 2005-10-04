@@ -1,0 +1,26 @@
+#N canvas 614 643 463 368 10;
+#X obj 144 82 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 113 101 @in;
+#X obj 20 72 metro 10;
+#X obj 20 49 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+;
+#X text 301 313 see also:;
+#X obj 377 312 @scale_to;
+#X obj 200 133 @import ( 1 );
+#X floatatom 200 113 5 0 0 0 - - -;
+#X obj 377 333 @scale_by;
+#X text 14 15 @downscale_by;
+#X text 384 17 gridflow;
+#X obj 113 157 @downscale_by;
+#X obj 113 310 @out window;
+#X msg 114 56 open bluemarble.jpg;
+#X connect 0 0 1 0;
+#X connect 1 0 11 0;
+#X connect 2 0 1 0;
+#X connect 3 0 2 0;
+#X connect 6 0 11 1;
+#X connect 7 0 6 0;
+#X connect 11 0 12 0;
+#X connect 13 0 1 0;
+#X connect 13 0 0 0;

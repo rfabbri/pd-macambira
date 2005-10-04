@@ -1,0 +1,10 @@
+#N canvas 435 101 688 277 10;
+#X text 191 203 see also:;
+#X obj 297 208 @export;
+#X text 619 13 gridflow;
+#X obj 262 208 @dim;
+#X obj 352 208 @print;
+#X text 14 15 printargs;
+#X text 144 14 prints everything;
+#X obj 401 208 rubyprint;
+#X obj 17 101 printargs lallala;

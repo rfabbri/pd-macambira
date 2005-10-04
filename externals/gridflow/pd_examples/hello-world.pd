@@ -1,0 +1,38 @@
+#N canvas 604 118 501 445 10;
+#X obj 46 67 # / 320;
+#X obj 46 187 # * 255;
+#X obj 46 153 # != 0;
+#X obj 46 -12 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 46 280 #out window;
+#X obj 46 99 # inv+ 7;
+#X obj 46 15 #for 0 320 1;
+#X obj 46 48 # * 7;
+#X obj 46 -34 loadbang;
+#X text 66 -12 make one line:;
+#X text 54 31 numbers 0 to 319;
+#X text 55 84 numbers 0 to 6 repeated 45 or 46 times;
+#X text 56 116 numbers 7 down to 1 ...;
+#X text 53 172 3*1-bit rgb image line;
+#X text 83 206 3*8-bit rgb image line;
+#X text 53 234 repeat line 240 times;
+#X obj -13 -85 cnv 15 500 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 0 -86 hello-world.pd;
+#X obj 46 134 #outer & (2 4 1);
+#X obj 46 252 #redim (240 320 3);
+#X obj -14 319 cnv 15 500 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text -7 325 GridFlow 0.8.0;
+#X text -7 325 GridFlow 0.8.0;
+#X text 0 -72 Copyright 2001 Mathieu Bouchard;
+#X connect 0 0 5 0;
+#X connect 1 0 19 0;
+#X connect 2 0 1 0;
+#X connect 3 0 6 0;
+#X connect 5 0 18 0;
+#X connect 6 0 7 0;
+#X connect 7 0 0 0;
+#X connect 8 0 3 0;
+#X connect 18 0 2 0;
+#X connect 19 0 4 0;

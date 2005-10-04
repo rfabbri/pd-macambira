@@ -1,0 +1,21 @@
+#N canvas 119 122 433 374 10;
+#X obj 15 33 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 19 105 @in;
+#X obj 19 141 @rgb_to_greyscale;
+#X obj 19 161 s xx;
+#X obj 19 185 r xx;
+#X obj 19 205 @greyscale_to_rgb;
+#X text 24 5 @greyscale_to_rgb;
+#X text 353 13 gridflow;
+#X msg 42 78 open bluemarble.jpg;
+#X obj 19 55 fork;
+#X obj 19 263 @out window;
+#X connect 0 0 9 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 4 0 5 0;
+#X connect 5 0 10 0;
+#X connect 8 0 1 0;
+#X connect 9 0 1 0;
+#X connect 9 1 8 0;

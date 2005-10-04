@@ -1,0 +1,94 @@
+#N canvas 63 0 747 645 10;
+#X obj 18 34 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 18 233 @export;
+#X obj 18 96 @in;
+#X text 18 10 @fold \, @inner \, @outer;
+#X obj 18 264 print value;
+#X obj 18 137 @fold + 0;
+#X obj 18 160 @fold + 0;
+#X obj 18 184 @fold + 0;
+#X text 114 133 treats the grid as a grid of one- dimensional grids
+such that the same operation (here addition) will be performed on all
+its elements together with the base value. the results are combined
+back. each @fold operation removes a dimension. syntax: @fold <two-input
+operation> <starting value>;
+#X obj 19 309 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 171 402 @ * 128;
+#X obj 19 400 spigot;
+#X obj 100 400 spigot;
+#X obj 67 400 == 0;
+#X obj 67 309 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+;
+#X obj 19 432 @outer +;
+#X obj 100 431 @outer ^;
+#X obj 100 451 @ * 2;
+#X text 171 448 @outer does the same two-input operation between every
+possible pair of the left-side grid and the right side grid. @inner
+treats both input grids like @fold does \, then does a @outer on the
+other dimensions \, such that every two-input operation is like a @fold.
+this is a very powerful operation that can be used to do rotations
+\, rgb->yuv \, color conversions \, etc.;
+#X text 88 310 select pattern;
+#X text 17 566 combine channelless picture with gamma factors (r \,
+g \, b);
+#X obj 19 379 @import ( 128 );
+#X obj 19 359 until;
+#X msg 19 338 128;
+#X obj 60 359 float 1;
+#X obj 115 359 + 1;
+#X obj 19 525 @outer gamma;
+#X obj 171 360 until;
+#X obj 212 360 float 1;
+#X obj 267 360 + 1;
+#X msg 171 339 4;
+#X obj 171 381 @import ( 3 );
+#X text 665 16 gridflow;
+#X text 19 598 see also:;
+#X obj 87 603 @scan;
+#X obj 129 603 @join;
+#X obj 171 603 @finished;
+#X obj 241 603 @cast;
+#X obj 283 603 @ravel;
+#X obj 331 603 @grade;
+#X obj 380 603 @perspective;
+#X msg 41 76 open bluemarble.jpg;
+#X obj 18 55 fork;
+#X obj 19 547 @out window;
+#X connect 0 0 42 0;
+#X connect 1 0 4 0;
+#X connect 2 0 5 0;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 1 0;
+#X connect 9 0 23 0;
+#X connect 9 0 30 0;
+#X connect 10 0 26 1;
+#X connect 11 0 15 0;
+#X connect 11 0 15 1;
+#X connect 12 0 16 0;
+#X connect 12 0 16 1;
+#X connect 13 0 12 1;
+#X connect 14 0 11 1;
+#X connect 14 0 13 0;
+#X connect 15 0 26 0;
+#X connect 16 0 17 0;
+#X connect 17 0 26 0;
+#X connect 21 0 11 0;
+#X connect 21 0 12 0;
+#X connect 22 0 24 0;
+#X connect 23 0 22 0;
+#X connect 24 0 25 0;
+#X connect 24 0 21 0;
+#X connect 25 0 24 1;
+#X connect 26 0 43 0;
+#X connect 27 0 28 0;
+#X connect 28 0 29 0;
+#X connect 28 0 31 0;
+#X connect 29 0 28 1;
+#X connect 30 0 27 0;
+#X connect 31 0 10 0;
+#X connect 41 0 2 0;
+#X connect 42 0 2 0;
+#X connect 42 1 41 0;

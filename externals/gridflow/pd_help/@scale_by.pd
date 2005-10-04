@@ -1,0 +1,30 @@
+#N canvas 614 643 589 398 10;
+#X obj 113 29 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 113 101 @in;
+#X obj 20 72 metro 10;
+#X obj 20 49 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+;
+#X text 26 359 see also:;
+#X text 14 15 @scale_by;
+#X obj 102 358 @scale_to;
+#X obj 113 157 @scale_by;
+#X floatatom 172 116 5 0 0 0 - - -;
+#X text 518 16 gridflow;
+#X obj 172 358 @downscale_by;
+#X obj 172 136 @import ( 1 );
+#X text 157 198 identical to scale_to with arguments that are exactly
+twice that of the incoming grid. it's several times faster.;
+#X obj 113 275 @out window;
+#X msg 136 71 open bluemarble.jpg;
+#X obj 113 50 fork;
+#X connect 0 0 15 0;
+#X connect 1 0 7 0;
+#X connect 2 0 1 0;
+#X connect 3 0 2 0;
+#X connect 7 0 13 0;
+#X connect 8 0 11 0;
+#X connect 11 0 7 1;
+#X connect 14 0 1 0;
+#X connect 15 0 1 0;
+#X connect 15 1 14 0;

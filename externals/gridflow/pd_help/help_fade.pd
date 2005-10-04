@@ -1,0 +1,19 @@
+#N canvas 68 40 747 435 10;
+#X obj 197 148 @in;
+#X obj 215 114 @camera_control;
+#X obj 95 87 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 197 190 @fade 10;
+#X text 268 184 the creation argument is the number of frames the fade
+occurs over;
+#X obj 251 161 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 122 86 metro 50;
+#X obj 197 240 @out window;
+#X text 514 13 gridflow;
+#X connect 0 0 3 0;
+#X connect 1 0 0 0;
+#X connect 2 0 6 0;
+#X connect 3 0 7 0;
+#X connect 5 0 3 1;
+#X connect 6 0 0 0;

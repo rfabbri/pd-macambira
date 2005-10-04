@@ -1,0 +1,40 @@
+#N canvas 923 183 662 404 10;
+#X obj 19 37 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X text 14 15 @convolve blurs \, sharpens \, finds edges \, emboss
+& more ...;
+#X obj 19 108 @in;
+#X obj 19 133 @convolve ^ + 0;
+#X msg 212 76 1 1 1 1 1 1 1 1 1;
+#X obj 212 96 @redim ( 3 3 );
+#X text 569 17 gridflow;
+#X text 18 363 see also:;
+#X obj 234 367 @solarize;
+#X obj 303 367 @layer;
+#X obj 158 367 @posterize;
+#X obj 89 367 @contrast;
+#X obj 212 57 loadbang;
+#X msg 42 85 open bluemarble.jpg;
+#X text 216 187 splits the incoming grid into dim(rest...) parts \,
+for each of those parts at (xy \, x). a rectangle of such parts \,
+centered around (y \, x) is combined with the convolution grid like
+a [@] of operation op_para. then each such result is folded like [@
+fold] of operation op_fold and specified base. the results are assembled
+into a grid that is sent to the outlet. near the borders of the grid
+\, coordinates wrap around. this means the whole grid has to be received
+before production of the next grid starts. this is the convolution
+grid and it gets stored in the object. rows2 and columns2 must be odd
+numbers.;
+#X text 145 130 here ^ is the parallel operator \, fold is indicated
+by + and 0 is its base.;
+#X obj 19 62 fork;
+#X obj 19 309 @out window;
+#X connect 0 0 16 0;
+#X connect 2 0 3 0;
+#X connect 3 0 17 0;
+#X connect 4 0 5 0;
+#X connect 5 0 3 1;
+#X connect 12 0 4 0;
+#X connect 13 0 2 0;
+#X connect 16 0 2 0;
+#X connect 16 1 13 0;

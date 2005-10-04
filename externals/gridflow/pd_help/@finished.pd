@@ -1,0 +1,15 @@
+#N canvas 551 311 442 238 10;
+#X text 21 22 @finished;
+#X text 22 53 a bang is emitted every time a grid transmission ends
+;
+#X obj 24 146 @finished;
+#X obj 24 175 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 24 118 @two;
+#X floatatom 24 80 5 0 0 0 - - -;
+#X floatatom 47 98 5 0 0 0 - - -;
+#X text 371 15 gridflow;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 1;

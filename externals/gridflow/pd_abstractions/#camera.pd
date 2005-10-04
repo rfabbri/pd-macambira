@@ -1,0 +1,149 @@
+#N canvas 192 66 485 362 10;
+#X obj 132 83 hradio 18 1 0 4 \$0-channel \$0-channel _0__1__2__3_
+0 14 0 8 -241291 -258699 -1 1;
+#X obj 299 31 hsl 128 15 0 65535 0 0 \$0-brightness \$0-brightness
+brightness 8 8 0 8 -260818 -1 -1 10250 1;
+#X obj 299 71 hsl 128 15 0 65535 0 0 \$0-hue \$0-hue hue 8 8 0 8 -260818
+-1 -1 6600 1;
+#X obj 299 11 hsl 128 15 0 65535 0 0 \$0-contrast \$0-contrast contrast
+8 8 0 8 -260818 -1 -1 8800 1;
+#X obj 299 91 hsl 128 15 0 65635 0 0 \$0-whiteness \$0-whiteness whiteness
+8 8 0 8 -260818 -1 -1 0 1;
+#N canvas 256 168 546 412 camera 0;
+#X obj 20 387 outlet;
+#X obj 11 9 inlet;
+#X msg 160 126 contrast \$1;
+#X msg 160 186 whiteness \$1;
+#X msg 160 106 brightness \$1;
+#X msg 160 227 channel \$1;
+#X obj 270 106 r \$0-brightness;
+#X obj 270 126 r \$0-contrast;
+#X obj 270 186 r \$0-whiteness;
+#X obj 153 276 r \$0-size;
+#X obj 270 226 r \$0-channel;
+#X obj 270 166 r \$0-hue;
+#X msg 160 166 hue \$1;
+#X msg 160 146 colour \$1;
+#X obj 270 146 r \$0-colour;
+#X obj 23 198 t a;
+#X msg 319 382 open videodev \$1 \, get;
+#X obj 318 363 rubysprintf /dev/video%d;
+#X msg 160 206 frequency \$1;
+#X obj 270 206 r \$0-frequency;
+#X obj 318 344 r \$0-device;
+#X obj 153 346 #export_list;
+#X msg 153 295 list \$1;
+#X msg 154 365 size \$1 \$2;
+#X obj 153 314 #store ( 4 2 # 120 160 240 320 480 640 120 180 240 360
+480 720 );
+#X obj 12 98 rubysprintf %d-%s;
+#X obj 11 117 pack s f;
+#X obj 12 77 t a a;
+#X msg 68 77 \$3;
+#X msg 11 136 \; \$1 \$2;
+#X obj 11 56 messageprepend \$0;
+#X msg 160 247 tuner \$1;
+#X obj 270 246 r \$0-tuner;
+#X connect 1 0 30 0;
+#X connect 2 0 15 0;
+#X connect 3 0 15 0;
+#X connect 4 0 15 0;
+#X connect 5 0 15 0;
+#X connect 6 0 4 0;
+#X connect 7 0 2 0;
+#X connect 8 0 3 0;
+#X connect 9 0 22 0;
+#X connect 10 0 5 0;
+#X connect 11 0 12 0;
+#X connect 12 0 15 0;
+#X connect 13 0 15 0;
+#X connect 14 0 13 0;
+#X connect 15 0 0 0;
+#X connect 16 0 0 0;
+#X connect 17 0 16 0;
+#X connect 18 0 15 0;
+#X connect 19 0 18 0;
+#X connect 20 0 17 0;
+#X connect 21 0 23 0;
+#X connect 22 0 24 0;
+#X connect 23 0 0 0;
+#X connect 24 0 21 0;
+#X connect 25 0 26 0;
+#X connect 26 0 29 0;
+#X connect 27 0 25 0;
+#X connect 27 1 28 0;
+#X connect 28 0 26 1;
+#X connect 30 0 27 0;
+#X connect 31 0 15 0;
+#X connect 32 0 31 0;
+#X restore 49 115 pd camera;
+#X msg 317 236 colorspace YUV420P;
+#X obj 66 177 #yuv_to_rgb;
+#X obj 299 51 hsl 128 15 0 65535 0 0 \$0-colour \$0-colour colour 8
+8 0 8 -260818 -1 -1 12700 1;
+#X obj 133 21 vradio 15 1 0 3 \$0-size \$0-size empty 0 -6 0 8 -241291
+-258699 -1 1;
+#X text 151 21 120 \, 160;
+#X text 151 37 240 \, 320;
+#X text 151 52 480 \, 640;
+#X text 131 6 select size;
+#X text 132 68 select channel;
+#X obj 240 12 nbx 5 14 0 65535 0 0 \$0-contrast \$0-contrast empty
+0 -6 0 10 -260818 -1 -1 45410 256;
+#X obj 240 32 nbx 5 14 0 65535 0 0 \$0-brightness \$0-brightness empty
+0 -6 0 10 -260818 -1 -1 52892 256;
+#X obj 240 52 nbx 5 14 0 65535 0 0 \$0-colour \$0-colour empty 0 -6
+0 10 -260818 -1 -1 65535 256;
+#X obj 240 72 nbx 5 14 0 65535 0 0 \$0-hue \$0-hue empty 0 -6 0 10
+-260818 -1 -1 34058 256;
+#X obj 240 92 nbx 5 14 0 65535 0 0 \$0-whiteness \$0-whiteness empty
+0 -6 0 10 -260818 -1 -1 0 256;
+#X text 17 6 Select a camera;
+#X msg 317 156 transfer mmap;
+#X msg 317 196 transfer read;
+#X msg 317 216 colorspace RGB24;
+#X text 316 140 Special options:;
+#X obj 22 115 #in;
+#X obj 22 245 outlet image;
+#X obj 21 33 hradio 18 1 0 4 \$0-device \$0-device _0__1__2__3_ 0 -4
+0 8 -241291 -258699 -1 0;
+#X obj 22 148 shunt 2;
+#X obj 141 206 vradio 15 1 0 2 empty empty empty 0 -6 0 8 -241291 -258699
+-1 0;
+#X text 161 221 YUV->RGB;
+#X text 161 205 no conversion;
+#X obj 23 96 inlet;
+#X obj 66 198 # min 255;
+#X obj 66 217 # max 0;
+#X msg 317 176 transfer mmap 4;
+#X obj 132 117 hradio 18 1 0 4 \$0-tuner \$0-tuner _0__1__2__3_ 0 14
+0 8 -241291 -258699 -1 0;
+#X text 132 102 select tuner;
+#X obj 299 121 hsl 128 15 0 65635 0 0 \$0-frequency \$0-frequency frequency
+8 8 0 8 -62784 -44926 -44926 0 1;
+#X obj 240 122 nbx 5 14 0 65535 0 0 \$0-frequency \$0-frequency empty
+0 -6 0 10 -62784 -44926 -44926 0 256;
+#X obj 21 271 \$0;
+#X obj 47 272 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 305 257 s \$0-o;
+#X msg 21 290 \; \$1-device 0 \; \$1-size 1 \; \$1-channel 1;
+#X obj 62 95 r \$0-o;
+#X connect 5 0 25 0;
+#X connect 6 0 42 0;
+#X connect 7 0 33 0;
+#X connect 21 0 42 0;
+#X connect 22 0 42 0;
+#X connect 23 0 42 0;
+#X connect 25 0 28 0;
+#X connect 25 1 5 0;
+#X connect 28 0 26 0;
+#X connect 28 1 7 0;
+#X connect 29 0 28 1;
+#X connect 32 0 25 0;
+#X connect 33 0 34 0;
+#X connect 34 0 26 0;
+#X connect 35 0 42 0;
+#X connect 40 0 43 0;
+#X connect 41 0 40 0;
+#X connect 44 0 25 0;

@@ -1,0 +1,63 @@
+#N canvas 281 197 649 652 10;
+#X obj 35 213 @in;
+#X msg 52 283 option timelog \$1;
+#X obj 52 263 tgl 15 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0 1
+;
+#X text 274 307 upload a grid;
+#X text 261 80 upload a grid;
+#X text 194 108 open default display for screenshot;
+#X msg 73 134 open videodev /dev/video0;
+#X text 260 136 open a video device;
+#X msg 75 332 open x11 here;
+#X msg 87 356 open x11 local 10;
+#X text 182 285 show/hide timing statistics;
+#X text 178 334 connect to default display;
+#X text 218 358 connect to display #10 on this machine;
+#X msg 100 380 open x11 remote.host.bla.net 0;
+#X text 324 382 connect to remote machine on display #0;
+#X text 290 161 open mpeg video stream;
+#X obj 35 441 @out;
+#X text 14 15 @in \, @out communicating grids (pictures) to/from devices
+\, sockets \, files;
+#X text 272 155 *;
+#X text 36 558 * path is where you started pd from. usually $home.
+;
+#X text 308 188 open an image file;
+#X msg 114 450 close;
+#X text 577 15 gridflow;
+#X text 37 590 see also:;
+#X obj 108 595 @import ( 1 );
+#X obj 205 595 @export;
+#X obj 260 595 @export_list;
+#X obj 350 595 @export_symbol;
+#X obj 454 595 @two;
+#X obj 488 595 @three;
+#X obj 536 595 @four;
+#X msg 90 161 open lsd.mpeg;
+#X msg 55 107 open x11 here;
+#X msg 35 80 open host.bla.net 7777;
+#X msg 113 404 open img/bla.jpg;
+#X text 300 405 open single file in jpg format;
+#X msg 108 186 open ./img/bla.jpg;
+#X text 35 481 incoming file is sent through the opened device/socket/file.
+in single file formats subsequent pictures overwrite the preceeding
+one. there are many more options. for more information see the reference
+manual in the "formats" and "objects for input/output" sections.;
+#X msg 65 307 open x.test.at 7777;
+#X msg 125 426 open window;
+#X text 228 426 opens a window x11 \, quartz or sdl;
+#X connect 0 0 16 0;
+#X connect 1 0 16 0;
+#X connect 2 0 1 0;
+#X connect 6 0 0 0;
+#X connect 8 0 16 0;
+#X connect 9 0 16 0;
+#X connect 13 0 16 0;
+#X connect 21 0 16 0;
+#X connect 31 0 0 0;
+#X connect 32 0 0 0;
+#X connect 33 0 0 0;
+#X connect 34 0 16 0;
+#X connect 36 0 0 0;
+#X connect 38 0 16 0;
+#X connect 39 0 16 0;

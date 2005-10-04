@@ -1,0 +1,29 @@
+#N canvas 280 56 664 282 10;
+#X text 403 215 see also:;
+#X obj 477 214 @redim;
+#X obj 259 173 @perspective;
+#X obj 20 147 @three;
+#X obj 530 214 @ravel;
+#X obj 20 125 random 10;
+#X obj 87 125 random 10;
+#X obj 155 125 random 10;
+#X obj 20 86 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 587 12 gridflow;
+#X text 14 15 @perspective;
+#X obj 20 210 @print;
+#X obj 259 210 @print;
+#X text 143 15 transforms a dim[a... \, b] grid into a dim[a... \,
+b-1] grid. there is a projection plane perpendicular to the last axis
+and whose position is given by the creation argument. each vector's
+length is adjusted so that it lies onto that plane. then the last dimension
+of each vector is dropped;
+#X connect 2 0 12 0;
+#X connect 3 0 2 0;
+#X connect 3 0 11 0;
+#X connect 5 0 3 0;
+#X connect 6 0 3 1;
+#X connect 7 0 3 2;
+#X connect 8 0 5 0;
+#X connect 8 0 6 0;
+#X connect 8 0 7 0;

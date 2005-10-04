@@ -1,0 +1,21 @@
+#N canvas 435 101 633 282 10;
+#X text 15 8 @redim;
+#X text 114 14 rearrange a grid's values according to new dimensions
+;
+#X obj 25 99 @in;
+#X obj 25 32 bng 15 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 25 132 @redim ( 120 120 3 );
+#X text 287 192 see also:;
+#X obj 367 195 @ravel;
+#X obj 418 195 @perspective;
+#X text 551 13 gridflow;
+#X msg 48 77 open bluemarble.jpg;
+#X obj 25 55 fork;
+#X obj 25 187 @out window;
+#X connect 2 0 4 0;
+#X connect 3 0 10 0;
+#X connect 4 0 11 0;
+#X connect 9 0 2 0;
+#X connect 10 0 2 0;
+#X connect 10 1 9 0;
