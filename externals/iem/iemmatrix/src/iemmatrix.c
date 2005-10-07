@@ -13,7 +13,7 @@
  */
 #include "iemmatrix.h"
 
-#include "iemmatrix_sources.c"
+void iemmatrix_sources_setup(void);
 
 void iemmatrix_setup(){
   post("");

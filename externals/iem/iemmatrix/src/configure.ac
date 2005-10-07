@@ -15,7 +15,6 @@ AC_SUBST(IEMMATRIX_VERSION)
 AC_SUBST(REFERENCEPATH)
 AC_SUBST(PDLIBDIR)
 AC_SUBST(INCLUDES)
-AC_SUBST(SOURCES)
 
 
 AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (e.g. 0.37)])
@@ -271,13 +270,6 @@ else
   echo "(X)"
 fi
 fi
-
-echo "SOURCES = \\"> Make.source
-for i in `ls mtx_*.c iemmatrix.c`
-do
-  echo "	$i\\">> Make.source
-done
-echo >> Make.source
 
 AC_OUTPUT(Makefile)
 

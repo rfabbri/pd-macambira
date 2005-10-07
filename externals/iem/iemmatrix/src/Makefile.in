@@ -26,7 +26,7 @@ CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@
 
 LIBS = @LIBS@
 
-SOURCES=$(sort $(filter %.c, $(wildcard mtx_*.c))) iemmatrix.c
+SOURCES=$(sort $(filter %.c, $(wildcard *.c)))
 TARGETS = $(SOURCES:.c=.o) 
 
 all: $(LIBNAME)
