@@ -39,15 +39,16 @@ public:
 	/* cubic interpolation */
 	void m_signal_c(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	
-	virtual void m_signal(int n, t_sample *const *insigs,t_sample *const *outsigs)
+	virtual void CbSignal()
 	{
- 		(this->*m_routine)(n,insigs,outsigs);
+ 		(this->*m_routine)(Blocksize(),InSig(),OutSig());
 	}
 
-	virtual void m_dsp(int n, t_sample *const *insigs,t_sample *const *outsigs)
+	virtual bool CbDsp()
 	{
 		m_sr = Samplerate();
 		set_freq(m_freq); /* maybe we have to change the interpolation mode */
+		return true;
 	}
 	
 	void (thisType::*m_routine)(int n, t_sample *const *insigs,t_sample *const *outsigs);
@@ -130,14 +131,14 @@ public:
 		if (f < 0) /* we can't go back in time :-) */
 			f = -f;
 
-		if( f <= m_sr * 0.5 ) 
+		if( f <= m_sr * 0.1 ) 
 		{
 			if (m_freq >= m_sr * 0.5)
 				set_imethod(m_imethod);
 			m_freq = f;
 			m_invfreq = 1.f / f;
 		}
-		else if (f > m_sr * 0.5)
+		else if (f > m_sr * 0.1)
 		{
 			m_freq = f;
 			m_invfreq = 1.f / f;
