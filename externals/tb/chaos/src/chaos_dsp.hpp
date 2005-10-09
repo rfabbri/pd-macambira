@@ -134,7 +134,7 @@ public:
 		if (f < 0) /* we can't go back in time :-) */
 			f = -f;
 
-		if( f <= m_sr * 0.1 ) 
+		if( f <= m_sr * 0.01 ) 
 		{
 			switch(m_imethod)
 			{
