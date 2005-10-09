@@ -36,8 +36,12 @@ public:
 	void m_signal_n_hf(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	/* linear interpolation */
 	void m_signal_l(int n, t_sample *const *insigs,t_sample *const *outsigs);
+	/* linear interpolation for high frequencies */
+	void m_signal_l_hf(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	/* cubic interpolation */
 	void m_signal_c(int n, t_sample *const *insigs,t_sample *const *outsigs);
+	/* cubic interpolation for high frequencies */
+	void m_signal_c_hf(int n, t_sample *const *insigs,t_sample *const *outsigs);
 	
 	virtual void CbSignal()
 	{
@@ -66,8 +70,7 @@ public:
 	/* local data for signal functions */
 	float m_freq;        /* frequency of oscillations */
 	float m_invfreq;     /* inverse frequency */
-	int m_phase;         /* phase counter */
-	float m_fphase;      /* phase for high frequency linear interpolation */
+	float m_phase;       /* phase */
 	float m_sr;          /* sample rate */
 	
 	int m_imethod;       /* interpolation method */
@@ -118,7 +121,7 @@ public:
 				m_nextmidpts[j] = m_values[j];
 			}
 		}
-
+		set_freq(m_freq);
 	}
 
 	void get_freq(float &f)
@@ -133,20 +136,41 @@ public:
 
 		if( f <= m_sr * 0.1 ) 
 		{
-			if (m_freq >= m_sr * 0.5)
-				set_imethod(m_imethod);
-			m_freq = f;
-			m_invfreq = 1.f / f;
-		}
-		else if (f > m_sr * 0.1)
-		{
-			m_freq = f;
-			m_invfreq = 1.f / f;
-
-			m_routine = &thisType::m_signal_n_hf;
+			switch(m_imethod)
+			{
+			case 0:
+				m_routine = &thisType::m_signal_n;
+				break;
+			case 1:
+				m_routine = &thisType::m_signal_l;
+				break;
+			case 2:
+				m_routine = &thisType::m_signal_c;
+				break;
+			default:
+				assert(false);
+			}
 		}
 		else
-			post("frequency out of range");
+		{
+			switch(m_imethod)
+			{
+			case 0:
+				m_routine = &thisType::m_signal_n_hf;
+				break;
+			case 1:
+				m_routine = &thisType::m_signal_l_hf;
+				break;
+			case 2:
+				m_routine = &thisType::m_signal_c_hf;
+				break;
+			default:
+				assert(false);
+			}
+		}
+		
+		m_freq = f;
+		m_invfreq = 1.f / f;
 	}
 	
 	FLEXT_CALLVAR_F(get_freq, set_freq);
@@ -226,7 +250,7 @@ FLEXT_ATTRVAR_I(m_imethod);
 
 template <class system> 
 void chaos_dsp<system>::m_signal_(int n, t_sample *const *insigs,
-								 t_sample *const *outsigs)
+	t_sample *const *outsigs)
 {
 	int outlets = m_system->get_num_eq();
 
@@ -247,7 +271,7 @@ void chaos_dsp<system>::m_signal_n_hf(int n, t_sample *const *insigs,
 {
 	int outlets = m_system->get_num_eq();
 	
-	float phase = m_fphase;
+	float phase = m_phase;
 	
 	int offset = 0;
 	while (n)
@@ -267,17 +291,17 @@ void chaos_dsp<system>::m_signal_n_hf(int n, t_sample *const *insigs,
 		}
 		offset += next;
 	}
-	m_fphase = phase;
+	m_phase = phase;
 }
 
 
 template <class system> 
 void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
-								   t_sample *const *outsigs)
+	t_sample *const *outsigs)
 {
 	int outlets = m_system->get_num_eq();
 	
-	int phase = m_phase;
+	int phase = int(m_phase);
 	
 	int offset = 0;
 	while (n)
@@ -304,11 +328,11 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 /* linear and cubic interpolation adapted from supercollider by James McCartney */
 template <class system> 
 void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
-								   t_sample *const *outsigs)
+	t_sample *const *outsigs)
 {
 	int outlets = m_system->get_num_eq();
 	
-	int phase = m_phase;
+	int phase = int(m_phase);
 
 	int i = 0;
 
@@ -341,13 +365,53 @@ void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 }
 
 
+
 template <class system> 
-void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
-								   t_sample *const *outsigs)
+void chaos_dsp<system>::m_signal_l_hf(int n, t_sample *const *insigs,
+	t_sample *const *outsigs)
 {
 	int outlets = m_system->get_num_eq();
 	
-	int phase = m_phase;
+	float phase = int(m_phase);
+
+	int i = 0;
+
+	while (n)
+	{
+		if (phase == 0)
+		{
+			m_system->m_perform();
+			phase = int (m_sr * m_invfreq);
+
+			for (int j = 0; j != outlets; ++j)
+				m_slopes[j] = (m_system->get_data(j) - m_values[j]) / phase;
+		}
+		
+		int next = (phase < n) ? int(ceilf (phase)) : n;
+		n -= next;
+		phase -=next;
+		
+		while (next--)
+		{
+			for (int j = 0; j != outlets; ++j)
+			{
+				outsigs[j][i] = m_values[j];
+				m_values[j]+=m_slopes[j];
+			}
+			++i;
+		}
+	}
+	m_phase = phase;
+}
+
+
+template <class system> 
+void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
+	t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	int phase = int(m_phase);
 
 	int i = 0;
 
@@ -369,12 +433,64 @@ void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 				
 				float fseglen = (float)phase;
 				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - 
-									 fseglen * m_slopes[j]) 
+					fseglen * m_slopes[j]) 
 					/ (fseglen * fseglen + fseglen);
 			}
 		}
 		
 		int next = (phase < n) ? phase : n;
+		n -= next;
+		phase -=next;
+		
+		while (next--)
+		{
+			for (int j = 0; j != outlets; ++j)
+			{
+				outsigs[j][i] = m_values[j];
+				m_slopes[j]+=m_curves[j];
+				m_values[j]+=m_slopes[j];
+			}
+			++i;
+		}
+	}
+	m_phase = phase;
+}
+
+
+template <class system> 
+void chaos_dsp<system>::m_signal_c_hf(int n, t_sample *const *insigs,
+	t_sample *const *outsigs)
+{
+	int outlets = m_system->get_num_eq();
+	
+	float phase = m_phase;
+
+	int i = 0;
+
+	while (n)
+	{
+		if (phase == 0)
+		{
+			m_system->m_perform();
+			phase = int (m_sr * m_invfreq);
+			phase = (phase > 2) ? phase : 2;
+			
+			for (int j = 0; j != outlets; ++j)
+			{
+				t_sample value = m_nextvalues[j];
+				m_nextvalues[j]= m_system->get_data(j);
+				
+				m_values[j] =  m_nextmidpts[j];
+				m_nextmidpts[j] = (m_nextvalues[j] + value) * 0.5f;
+				
+				float fseglen = (float)phase;
+				m_curves[j] = 2.f * (m_nextmidpts[j] - m_values[j] - 
+					fseglen * m_slopes[j]) 
+					/ (fseglen * fseglen + fseglen);
+			}
+		}
+		
+		int next = (phase < n) ? int(ceilf (phase)) : n;
 		n -= next;
 		phase -=next;
 		
