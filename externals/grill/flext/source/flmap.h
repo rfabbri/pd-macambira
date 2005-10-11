@@ -144,7 +144,7 @@ public:
     void _check(int tsize);
 #endif
 
-    Data *const data;
+    Data *data;
     TableAnyMap *parent,*left,*right;
     int n;
 
