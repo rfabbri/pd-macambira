@@ -42,7 +42,8 @@ class GEM_EXTERN pix_2pdp : public GemPixObj
     int gem_ysize;
     int gem_csize;
     int gem_format;
-    
+    int gem_upsidedown;
+
     // pdp data
     t_outlet *m_pdpoutlet;
     int m_packet0;

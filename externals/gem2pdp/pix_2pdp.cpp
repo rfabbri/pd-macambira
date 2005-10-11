@@ -28,6 +28,7 @@ pix_2pdp::~pix_2pdp()
   gem_xsize = 0;
   gem_ysize = 0;
   gem_csize = 0;
+  gem_upsidedown = 0;
 }
 
 // Image processing
@@ -38,6 +39,7 @@ void pix_2pdp::processImage(imageStruct &image)
   gem_ysize = image.ysize;
   gem_csize = image.csize;
   gem_format = image.format;
+  gem_upsidedown = image.upsidedown;
 }
 
 // pdp processing
@@ -57,7 +59,7 @@ void pix_2pdp::bangMess()
     m_data = (short int *)pdp_packet_data(m_packet0);
 
     pY = m_data;
-	pY2 = m_data + gem_xsize;
+    pY2 = m_data + gem_xsize;
     pV = m_data+psize;
     pU = m_data+psize+(psize>>2);
     
@@ -68,13 +70,14 @@ void pix_2pdp::bangMess()
       case GL_RGBA:
 	  case GL_BGR:
 	  case GL_BGRA:
-        for ( py=0; py<gem_ysize; py++)
+       for ( py=0; py<gem_ysize; py++)
         {
+          const t_int py2=(gem_upsidedown)?py:(gem_ysize-py);
           for ( px=0; px<gem_xsize; px++)
           {
             // the way to access the pixels: (C=chRed, chBlue, ...)
             // image[Y * xsize * csize + X * csize + C]
-            helper = py*gem_xsize*gem_csize + px*gem_csize;
+            helper = py2*gem_xsize*gem_csize + px*gem_csize;
             g1=gem_image[helper+chRed];   // R
             g2=gem_image[helper+chGreen]; // G
             g3=gem_image[helper+chBlue];  // B
@@ -97,6 +100,11 @@ void pix_2pdp::bangMess()
 		short u,v;
 		unsigned char *pixel = gem_image;
 		unsigned char *pixel2 = gem_image + gem_xsize * gem_csize;
+                const int row_length = gem_xsize* gem_csize;
+                if(0==gem_upsidedown){
+                  pixel=gem_image+row_length * (gem_ysize-1);
+                  pixel2=gem_image+row_length * (gem_ysize-2);
+                }
 		while (row--){
 		  int col=cols;
 		  while(col--){
@@ -113,9 +121,14 @@ void pix_2pdp::bangMess()
 				pixel2+=4;
 				pU++; pV++;
 		  }
-			pixel += gem_xsize * gem_csize;
-			pixel2 += gem_xsize * gem_csize;
-			pY += gem_xsize; pY2 += gem_xsize;
+                  if(gem_upsidedown){
+                    pixel += row_length;
+                    pixel2 += row_length;
+                  } else {
+                    pixel -= 3*row_length;
+                    pixel2 -= 3*row_length;
+                  }
+                  pY += gem_xsize; pY2 += gem_xsize;
 		}
         pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
         break;
@@ -124,9 +137,10 @@ void pix_2pdp::bangMess()
       case GL_LUMINANCE:
         for ( py=0; py<gem_ysize; py++)
         {
+          const t_int py2=(gem_upsidedown)?py:(gem_ysize-py);
           for ( px=0; px<gem_xsize; px++)
           {
-            *pY = gem_image[py*gem_xsize*gem_csize + px*gem_csize] << 7;
+            *pY = gem_image[py2*gem_xsize*gem_csize + px*gem_csize] << 7;
             pY++;
             if ( (px%2==0) && (py%2==0) )
             {
