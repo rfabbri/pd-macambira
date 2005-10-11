@@ -112,6 +112,7 @@ void pdp2gem :: createBuffer()
   m_pixBlock.image.ysize = neededYSize;
   m_pixBlock.image.csize = m_csize;
   m_pixBlock.image.format= m_format;
+  m_pixBlock.image.upsidedown=1;
 
   // +4 from MPEG 
   dataSize = (m_pixBlock.image.xsize * m_pixBlock.image.ysize * m_pixBlock.image.csize)+4; 
