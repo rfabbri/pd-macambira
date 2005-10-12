@@ -474,13 +474,13 @@ void flext_base::SetGfx(t_classid c)
     ori_vis = widgetbehavior.w_visfn; 
     ori_select = widgetbehavior.w_selectfn; 
 #endif
-    widgetbehavior.w_visfn =        cb_GfxVis;
-    widgetbehavior.w_selectfn =     cb_GfxSelect; 
+    widgetbehavior.w_visfn =        (t_visfn)cb_GfxVis;
+    widgetbehavior.w_selectfn =     (t_selectfn)cb_GfxSelect; 
 
 #if PD_MINOR_VERSION >= 37
     class_setsavefn(cl,(t_savefn)cb_GfxSave);
 #else
-    widgetbehavior.w_savefn =       cb_GfxSave;
+    widgetbehavior.w_savefn =       (t_savefn)cb_GfxSave;
 #endif
 
 #endif // FLEXT_ATTRHIDE
@@ -491,7 +491,7 @@ void flext_base::SetGfx(t_classid c)
 #if PD_MINOR_VERSION >= 37
     class_setpropertiesfn(cl,(t_propertiesfn)cb_GfxProperties);
 #else
-    widgetbehavior.w_propertiesfn = cb_GfxProperties;
+    widgetbehavior.w_propertiesfn = (t_propertiesfn)cb_GfxProperties;
 #endif
 
     tclscript();
@@ -806,9 +806,9 @@ void flext_base::cb_GfxVis(flext_hdr *c, t_glist *gl, int vis)
 
         // now display the changed text with the normal drawing function
     #ifdef __FLEXT_CLONEWIDGET
-        text_widgetbehavior.w_visfn(c,gl,vis);
+        text_widgetbehavior.w_visfn((t_gobj *)c,gl,vis);
     #else
-        ori_vis(c,gl,vis);
+        ori_vis((t_gobj *)c,gl,vis);
     #endif
     }
     // else don't show
@@ -846,9 +846,9 @@ void flext_base::cb_GfxSelect(flext_hdr *c,t_glist *gl,int state)
 
         // call original function
         #ifdef __FLEXT_CLONEWIDGET
-            text_widgetbehavior.w_selectfn(c,gl,state);
+            text_widgetbehavior.w_selectfn((t_gobj *)c,gl,state);
         #else
-            ori_select(c,gl,state);
+            ori_select((t_gobj *)c,gl,state);
         #endif
     }
 }
