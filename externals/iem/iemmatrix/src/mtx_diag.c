@@ -55,5 +55,5 @@ void mtx_diag_setup(void)
   class_sethelpsymbol(mtx_diag_class, gensym("iemmatrix/mtx_trace"));
 }
 void iemtx_diag_setup(void){
-  void mtx_diag_setup(void);
+  mtx_diag_setup();
 }
