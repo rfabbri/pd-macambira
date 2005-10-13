@@ -1,0 +1,15 @@
+#N canvas 367 200 321 256 10;
+#X obj 86 199 testunit;
+#X obj 86 130 textfile;
+#X obj 86 56 t b b;
+#X msg 116 84 read runtests.txt \, rewind;
+#X obj 86 34 loadbang;
+#X msg 137 156 \; pd quit;
+#X obj 86 110 until;
+#X connect 1 0 0 0;
+#X connect 1 1 5 0;
+#X connect 2 0 6 0;
+#X connect 2 1 3 0;
+#X connect 3 0 1 0;
+#X connect 4 0 2 0;
+#X connect 6 0 1 0;
