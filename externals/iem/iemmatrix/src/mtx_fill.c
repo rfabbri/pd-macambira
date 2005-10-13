@@ -157,6 +157,7 @@ static void *newMTXFill (t_symbol *s, int argc, t_atom *argv)
    mtx_fill_obj->fill_startrow = 1;
    mtx_fill_obj->fill_startcol = 1;
    mtx_fill_obj->fill_type = FILL_SUBMATRIX;
+   error("[mtx_fill]: this object _might_ change in the future!");
    if (argc) {
       if (atom_getsymbol(argv)==gensym("matrix")) 
 	 mTXFillIndexMatrix (mtx_fill_obj, s, argc-1, argv+1);
