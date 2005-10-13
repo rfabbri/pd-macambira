@@ -1,25 +1,13 @@
-ix::gui		http://whats-your.name/pd/gui/
-                http://suita.chopin.edu.pl/~czaja/miXed/externs/toxy.html
+pd_base.tk:    a pure TCL/Tk PD gui
+pd_objects.tk: objects for above GUI
 
-hi, these objects were created in hopes of making the pd gui 'suck less'
-
-you need ToXY to use them: 
-cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/pure-data co externals/miXed
-cd externals/miXed && make && mv bin/* /usr/lib/pd/extra
-
-and loads of tk libraries, most are in portage, or try this:
-cvs -d :pserver:anonymous@cvs.sf.net:/cvsroot/blt
-cd blt && ./configure && make && make install
+*.wid: original widget prototypes, considered 'stable', all are working on:
+    - linux
+     \- pd 0.0.39
+      \- toxy 0.1.19
+       \- tk 8.5
+        \- handful of tk extensions: grep require *.wid
 
 
-to use a file called 'crack.wid' youd make an object [widget crack rock1] where 
-you pick an id..
-
-.,,
-
-misc notes (april 2005):
-tk is ugly without Cairo graphics (linux only), apply the patch, then 
-./configure --enable-xft --enable-cairo
-
-tkdnd is broken on linux with tk 8.5, unless you patch tkEvent.c
-http://whats-your.name/pd/gui
+screenshots:
+http://whats-your.name/pd/gui/
