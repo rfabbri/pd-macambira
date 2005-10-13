@@ -68,5 +68,5 @@ void mtx_prod_setup(void)
   class_sethelpsymbol(mtx_prod_class, gensym("iemmatrix/mtx_prod"));
 }
 void iemtx_prod_setup(void){
-  void mtx_prod_setup(void);
+  mtx_prod_setup();
 }
