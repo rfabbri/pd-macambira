@@ -111,21 +111,15 @@ fi
 LD=${LD:=$CC}
 
 dnl if we don't have $STRIP set, we set it to ${host}-strip or strip
-if test "x$STRIP" = "x"
+AC_CHECK_TOOL([STRIP], [strip], [true])
+AC_MSG_CHECKING([if strip is GNU strip])
+if $STRIP -V 2>&1 | grep GNU > /dev/null
 then
- if test "x$host" != "x"
- then
-  STRIP=${host}-strip
- else
-# we need a method to check arguments for arbitrary commands like strip
-  STRIP="strip"
- fi
-fi
-if $(which ${STRIP} > /dev/null)
-then
-  STRIPFLAGS="--strip-uneeded"
+    AC_SUBST(STRIPFLAGS, "--strip-unneeded")
+    AC_MSG_RESULT([yes])
 else
-  STRIP="echo fake strip"
+    AC_SUBST(STRIPFLAGS,"-x")
+    AC_MSG_RESULT([no])
 fi
 
 DFLAGS=""
@@ -138,7 +132,6 @@ then
   LFLAGS="-export_dynamic  -shared"
   CFLAGS="-fPIC $CFLAGS"
   EXT=pd_linux	
-  STRIPFLAGS="--strip-unneeded"
 fi
 
 dnl This should use '-bundle_loader /path/to/pd/bin/pd' instead of'-undefined suppress'
@@ -148,7 +141,6 @@ then
   LD=cc
   LFLAGS="-bundle -undefined suppress -flat_namespace"
   EXT=pd_darwin
-  STRIPFLAGS=
 fi
 
 if test `uname | sed -e 's/^MINGW.*/NT/'` = NT; 
@@ -169,7 +161,6 @@ then
         -shared -rdata_shared"
   EXT=pd_irix6
   dnl DFLAGS="-DUNIX -DIRIX6"
-  STRIPFLAGS="--strip-unneeded"
 fi
 
 if test `uname -s` = IRIX32; 
@@ -178,7 +169,6 @@ then
          -shared -rdata_shared"
   EXT=pd_irix5
   dnl DFLAGS="-DUNIX -DIRIX5"
-  STRIPFLAGS="--strip-unneeded"
 fi
 
 
