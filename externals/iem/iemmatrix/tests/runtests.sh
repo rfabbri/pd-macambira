@@ -1,14 +1,22 @@
 #!/bin/sh
 
-ls -1 */*.pd | sed 's/\.pd/;/' > runtests.txt
+RUNTESTS_TXT=runtests.txt
+RUNTESTS_LOG=runtests.log
+
+ls -1 */*.pd | sed 's/\.pd/;/' > $RUNTESTS_TXT
+
+IEMMATRIX="-lib ../iemmatrix -path ../abs/"
 
 function run_nogui() {
- pd -lib ../iemmatrix -nogui runtests_nogui.pd > runtests.log.$$ 2>&1 
-cat runtests.log.$$ | egrep "^regression-test: " | sed -e 's/^regression-test: //'
+ pd $IEMMATRIX -nogui runtests_nogui.pd > ${RUNTESTS_LOG}.$$ 2>&1 
+ NUMTESTS=`grep -c . $RUNTESTS_TXT`
+ echo "regression-test: ${NUMTESTS} tests total" >>  ${RUNTESTS_LOG}.$$
+ 
+ cat ${RUNTESTS_LOG}.$$ | egrep "^regression-test: " | sed -e 's/^regression-test: //'
 }
 
 function run_withgui() {
- pd -lib ../iemmatrix runtests.pd > runtests.log 2>&1
+ pd $IEMMATRIX -stderr runtests.pd > ${RUNTESTS_LOG} 2>&1
 }
 
 if test "x$1" = "x-gui"; then
