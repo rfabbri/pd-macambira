@@ -52,7 +52,7 @@ static void deleteMTXFill (MTXfill *mtx_fill_obj)
    if (mtx_fill_obj->list_out)
       freebytes (mtx_fill_obj->list_out, sizeof(t_atom)*(mtx_fill_obj->size+2));
    if (mtx_fill_obj->index)
-      freebytes (mtx_fill_obj->list_out, sizeof(int)*(mtx_fill_obj->index_size));
+      freebytes (mtx_fill_obj->index, sizeof(int)*(mtx_fill_obj->index_size));
 }
 
 static void setListConstFloat (int size, t_float f, t_atom *y)
