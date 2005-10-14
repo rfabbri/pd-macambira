@@ -268,7 +268,7 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
       return;
    }
 
-   post("1");
+   //   post("1");
 
    if ((mtx_conv_obj->rows != rows)||(mtx_conv_obj->columns != columns)) { 
      if (x)
@@ -281,7 +281,7 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      mtx_conv_obj->rows = rows;
      mtx_conv_obj->columns = columns;
    }
-   post("2");
+   //post("2");
    rows_y = rows+rows_k-1;
    columns_y = columns+columns_k-1;
    if ((mtx_conv_obj->rows_y != rows_y)||(mtx_conv_obj->columns_y != columns_y)) { 
@@ -302,20 +302,20 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
      mtx_conv_obj->y = y;
      mtx_conv_obj->list = list_ptr;
    }
-   post("3");
+   //post("3");
    // main part
    readMatrixFromList (rows, columns, argv, x); 
-   post("4");
+   //post("4");
    convolveMtx (rows, columns, rows_k, columns_k, x, k, y);
-   post("5");
+   //post("5");
    writeMatrixIntoList (rows_y, columns_y, list_ptr+2, y);
-   post("6");
+   //post("6");
    SETSYMBOL(list_ptr, gensym("matrix"));
    SETFLOAT(list_ptr, rows_y);
    SETFLOAT(&list_ptr[1], columns_y);
    outlet_anything(mtx_conv_obj->list_outlet, gensym("matrix"), 
                    size_y+2, list_ptr);
-   post("7");
+   //post("7");
 }
 
 void mtx_conv_setup (void)
