@@ -375,6 +375,12 @@ int sys_rcfile(void)
     char* rcargv[NUMARGS];
     char* buffer;
     char  fname[MAXPDSTRING], buf[1000], *home = getenv("HOME");
+    int retval = 1; /* that's what we will return at the end; for now, let's think it'll be an error */
+ 
+    /* initialize rc-arg-array so we can safely clean up at the end */
+    for (i = 1; i < NUMARGS-1; i++)
+      rcargv[i]=0;
+
 
     /* parse a startup file */
     
@@ -398,7 +404,7 @@ int sys_rcfile(void)
             break;
         buf[1000] = 0;
         if (!(rcargv[i] = malloc(strlen(buf) + 1)))
-            return (1);
+            goto cleanup;
         strcpy(rcargv[i], buf);
     }
     if (i >= NUMARGS-1)
@@ -423,9 +429,17 @@ int sys_rcfile(void)
     if (sys_argparse(rcargc-1, rcargv+1))
     {
         post("error parsing RC arguments");
-        return (1);
+        goto cleanup;
     }
-    return (0);
+
+    retval=0; /* we made it without an error */
+
+
+ cleanup: /* prevent memleak */
+    for (i = 1; i < NUMARGS-1; i++)
+      if(rcargv[i])free(rcargv[i]);
+    
+    return(retval);
 }
 #endif /* MSW */
 

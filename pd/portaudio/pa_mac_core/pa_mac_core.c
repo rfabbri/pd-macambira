@@ -1,5 +1,5 @@
 /*
- * $Id: pa_mac_core.c,v 1.8.2.2 2005/02/15 07:59:45 rossbencina Exp $
+ * $Id: pa_mac_core.c,v 1.8.2.3 2005/06/19 22:12:38 tgrill Exp $
  * pa_mac_core.c
  * Implementation of PortAudio for Mac OS X CoreAudio       
  *                                                                                         
@@ -249,18 +249,22 @@ static PaError GetChannelInfo(PaDeviceInfo *deviceInfo, AudioDeviceID macCoreDev
         for (i = 0; i < buflist->mNumberBuffers; ++i) {
             numChannels += buflist->mBuffers[i].mNumberChannels;
         }
+		
+		if (isInput)
+			deviceInfo->maxInputChannels = numChannels;
+		else
+			deviceInfo->maxOutputChannels = numChannels;
+		
         int frameLatency;
         propSize = sizeof(UInt32);
         err = conv_err(AudioDeviceGetProperty(macCoreDeviceId, 0, isInput, kAudioDevicePropertyLatency, &propSize, &frameLatency));
         if (!err) {
             double secondLatency = frameLatency / deviceInfo->defaultSampleRate;
             if (isInput) {
-                deviceInfo->maxInputChannels = numChannels;
                 deviceInfo->defaultLowInputLatency = secondLatency;
                 deviceInfo->defaultHighInputLatency = secondLatency;
             }
             else {
-                deviceInfo->maxOutputChannels = numChannels;
                 deviceInfo->defaultLowOutputLatency = secondLatency;
                 deviceInfo->defaultHighOutputLatency = secondLatency;
             }
@@ -661,8 +665,8 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         clientData->inputChannelCount = inputParameters->channelCount;
         clientData->inputSampleFormat = inputParameters->sampleFormat;
         err = SetUpUnidirectionalStream(stream->inputDevice, sampleRate, framesPerBuffer, 1);
+        fprintf(stderr, "error %d (%d)\n", err, paNoError);
     }
-    
     if (err == paNoError && outputParameters != NULL) {
         stream->outputDevice = macCoreHostApi->macCoreDeviceIds[outputParameters->device];
         clientData->outputConverter = PaUtil_SelectConverter(outputParameters->sampleFormat, paFloat32, streamFlags);
@@ -675,7 +679,9 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
     if (inputParameters == NULL || outputParameters == NULL || stream->inputDevice == stream->outputDevice) {
         AudioDeviceID device = (inputParameters == NULL) ? stream->outputDevice : stream->inputDevice;
 
-        AudioDeviceAddIOProc(device, AudioIOProc, clientData);
+        int e2 = AudioDeviceAddIOProc(device, AudioIOProc, clientData);
+        fprintf(stderr, "AudioDeviceAddIOProc %d\n", e2);
+
     }
     else {
         // using different devices for input and output

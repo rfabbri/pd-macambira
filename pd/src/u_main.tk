@@ -69,8 +69,8 @@ if {$pd_nt == 2} {
         foreach file $args {
             if {$pd_macready != 0} {
                 pd [concat pd open [pdtk_enquote [file tail $file]] \
-		    [pdtk_enquote  [file dirname $file]] \;]
-		    menu_doc_open [file dirname $file] [file tail $file]
+                    [pdtk_enquote  [file dirname $file]] \;]
+                    menu_doc_open [file dirname $file] [file tail $file]
             } else {
                 set pd_macdropped $args
             }
@@ -83,9 +83,9 @@ if {$pd_nt == 2} {
 
 if {$pd_nt == 0} {
     if {! [info exists pd_guidir]} {
-    	global pd_guidir
-    	puts stderr {setting pd_guidir to '.'}
-	set pd_guidir .
+        global pd_guidir
+        puts stderr {setting pd_guidir to '.'}
+        set pd_guidir .
     }
 }
 
@@ -189,8 +189,8 @@ proc pdtk_standardkeybindings {id} {
     bind $id <Control-Key> {pdtk_pd_ctrlkey %W %K 0}
     bind $id <Control-Shift-Key> {pdtk_pd_ctrlkey %W %K 1}
     if {$pd_nt == 2} {
-	bind $id <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
-	bind $id <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+        bind $id <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+        bind $id <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
     }
 }
 
@@ -244,8 +244,8 @@ proc pdtk_ping {} {
 ##### routine to ask user if OK and, if so, send a message on to Pd ######
 proc pdtk_check {x message default} {
     set answer [tk_messageBox \-message $x \-type yesno -default $default \
-        \-icon question]
-    if {$answer == yes}  {pd $message}
+        -icon question]
+    if {! [string compare $answer yes]}  {pd $message}
 }
 
 set menu_windowlist {} 
@@ -254,8 +254,8 @@ proc pdtk_fixwindowmenu {} {
     global menu_windowlist
     .mbar.windows delete 0 end
     foreach i $menu_windowlist {
-	.mbar.windows add command -label [lindex $i 0] \
-	    -command [concat menu_domenuwindow [lindex $i 1]]
+        .mbar.windows add command -label [lindex $i 0] \
+            -command [concat menu_domenuwindow [lindex $i 1]]
         menu_fixwindowmenu [lindex $i 1]
     }
 }
@@ -266,14 +266,14 @@ proc accel_munge {acc} {
     global pd_nt
 
     if {$pd_nt == 2} {
-	if [string is upper [string index $acc end]] {
-	    return [format "%s%s" "Shift+" \
-			[string toupper [string map {Ctrl Meta} $acc] end]]
-	} else {
-	    return [string toupper [string map {Ctrl Meta} $acc] end]
-	}
+        if [string is upper [string index $acc end]] {
+            return [format "%s%s" "Shift+" \
+                        [string toupper [string map {Ctrl Meta} $acc] end]]
+        } else {
+            return [string toupper [string map {Ctrl Meta} $acc] end]
+        }
     } else {
-	return $acc
+        return $acc
     }
 }
 
@@ -285,8 +285,8 @@ proc menu_new {} {
     global untitled_directory
     pd [concat pd filename Untitled-$untitled_number $untitled_directory \;]
     pd {
-    	#N canvas;
-    	#X pop 1;
+        #N canvas;
+        #X pop 1;
     }
     set untitled_number [expr $untitled_number + 1]
 }
@@ -296,7 +296,7 @@ proc menu_new {} {
 proc menu_open {} {
     global pd_opendir
     set filename [tk_getOpenFile -defaultextension .pd \
-    	-filetypes { {{pd files} {.pd}} {{max files} {.pat}}} \
+        -filetypes { {{pd files} {.pd}} {{max files} {.pat}}} \
         -initialdir $pd_opendir]
     if {$filename != ""} {open_file $filename}
 }
@@ -314,7 +314,7 @@ proc open_file {filename} {
 catch {
     package require tkdnd
     dnd bindtarget . text/uri-list <Drop> {
-	foreach file %D {open_file $file}
+        foreach file %D {open_file $file}
     }
 }
 
@@ -326,7 +326,7 @@ proc menu_send {} {
     .sendpanel.entry select from 0
     .sendpanel.entry select adjust end
     bind .sendpanel.entry <KeyPress-Return> {
-    	pd [concat $send_textvariable \;]
+        pd [concat $send_textvariable \;]
     }
     pdtk_standardkeybindings .sendpanel.entry
     focus .sendpanel.entry
@@ -356,17 +356,17 @@ proc menu_opentext {filename} {
     set name [format ".help%d" $doc_number]
     toplevel $name
     text $name.text -relief raised -bd 2 -font -*-times-regular--normal--14-* \
-    	-yscrollcommand "$name.scroll set" -background white
+        -yscrollcommand "$name.scroll set" -background white
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
     
     set f [open $filename]
     while {![eof $f]} {
-    	set bigstring [read $f 1000]
-	regsub -all PD_BASEDIR $bigstring $pd_guidir bigstring2
-    	regsub -all PD_VERSION $bigstring2 $pd_myversion bigstring3
-    	$name.text insert end $bigstring3
+        set bigstring [read $f 1000]
+        regsub -all PD_BASEDIR $bigstring $pd_guidir bigstring2
+        regsub -all PD_VERSION $bigstring2 $pd_myversion bigstring3
+        $name.text insert end $bigstring3
     }
     close $f
     set doc_number [expr $doc_number + 1] 
@@ -374,7 +374,7 @@ proc menu_opentext {filename} {
 
 # open HTML docs from the menu using the OS-default HTML viewer
 proc menu_openhtml {filename} {
-    global pd_nt	 
+    global pd_nt         
 
     if {$pd_nt == 0} {
         exec sh -c \
@@ -398,29 +398,29 @@ proc menu_documentation {} {
     global pd_guidir
 
     if {$pd_nt == 2} {
-    	exec rm -rf /tmp/pd-documentation
-    	exec cp -pr $pd_guidir/doc /tmp/pd-documentation
-	set filename [tk_getOpenFile -defaultextension .pd \
-	-filetypes { {{documentation} {.pd .txt .htm}} } \
-	-initialdir /tmp/pd-documentation]
+        exec rm -rf /tmp/pd-documentation
+        exec cp -pr $pd_guidir/doc /tmp/pd-documentation
+        set filename [tk_getOpenFile -defaultextension .pd \
+        -filetypes { {{documentation} {.pd .txt .htm}} } \
+        -initialdir /tmp/pd-documentation]
     } else {
-	set filename [tk_getOpenFile -defaultextension .pd \
-	-filetypes { {{documentation} {.pd .txt .htm}} } \
-	-initialdir $help_directory]
+        set filename [tk_getOpenFile -defaultextension .pd \
+        -filetypes { {{documentation} {.pd .txt .htm}} } \
+        -initialdir $help_directory]
     }    
     if {$filename != ""} {
-    	if {[string first .txt $filename] >= 0} {
-    	    menu_opentext $filename
-    	} elseif {[string first .htm $filename] >= 0} {
-				menu_openhtml $filename
-	} else {
-	    set help_directory [string range $filename 0 \
-    		[expr [string last / $filename ] - 1]]
-    	    set basename [string range $filename \
-    		[expr [string last / $filename ] + 1] end]
-    	    pd [concat pd open [pdtk_enquote $basename] \
-		 [pdtk_enquote $help_directory] \;]
-    	}
+        if {[string first .txt $filename] >= 0} {
+            menu_opentext $filename
+        } elseif {[string first .htm $filename] >= 0} {
+                                menu_openhtml $filename
+        } else {
+            set help_directory [string range $filename 0 \
+                [expr [string last / $filename ] - 1]]
+            set basename [string range $filename \
+                [expr [string last / $filename ] + 1] end]
+            pd [concat pd open [pdtk_enquote $basename] \
+                 [pdtk_enquote $help_directory] \;]
+        }
     }
 }
 
@@ -430,35 +430,35 @@ proc menu_doc_open {subdir basename} {
     set dirname $pd_guidir/$subdir
 
     if {[regexp ".*\.(txt|c)$" $basename]} {
-    	menu_opentext $dirname/$basename
+        menu_opentext $dirname/$basename
     } elseif {[regexp ".*\.html?$" $basename]} {
-		  menu_openhtml $dirname/$basename
+                  menu_openhtml $dirname/$basename
     } else {
-    	pd [concat pd open [pdtk_enquote $basename] \
-		[pdtk_enquote $dirname] \;]
+        pd [concat pd open [pdtk_enquote $basename] \
+                [pdtk_enquote $dirname] \;]
     }
 }
 
 proc doc_submenu {helpmenu subdir} {
-	 global help_top_directory pd_tearoff
+         global help_top_directory pd_tearoff
 
-	 set menudir $help_top_directory/$subdir
+         set menudir $help_top_directory/$subdir
 
     regsub -all "\\\." $subdir "" submenu
 
-	 menu $helpmenu.$submenu -tearoff $pd_tearoff
+         menu $helpmenu.$submenu -tearoff $pd_tearoff
     regsub -all "\\\." $subdir " " submenuname
-	 $helpmenu add cascade -label $submenuname \
-		  -menu $helpmenu.$submenu
+         $helpmenu add cascade -label $submenuname \
+                  -menu $helpmenu.$submenu
     catch {
 # use this glob pattern to exclude the supporting files
-#	 foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
-	 foreach file [ lsort [ glob -dir $menudir * ] ] {
-		  set filename ""
-		  regsub {.*/(.*\..+$)} $file {\1} filename
-		  $helpmenu.$submenu add command -label $filename \
-				-command "menu_doc_open doc/$subdir $filename"
-	 }
+#        foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
+         foreach file [ lsort [ glob -dir $menudir * ] ] {
+                  set filename ""
+                  regsub {.*/(.*\..+$)} $file {\1} filename
+                  $helpmenu.$submenu add command -label $filename \
+                                -command "menu_doc_open doc/$subdir $filename"
+         }
     }
 }
 
@@ -468,32 +468,32 @@ proc menu_addstd {mbar} {
     global pd_apilist pd_midiapilist pd_nt pd_tearoff
 #          the "Audio" menu
     $mbar.audio add command -label {audio ON} -accelerator [accel_munge "Ctrl+/"] \
-	-command {menu_audio 1} 
+        -command {menu_audio 1} 
     $mbar.audio add command -label {audio OFF} -accelerator [accel_munge "Ctrl+."] \
-	-command {menu_audio 0} 
+        -command {menu_audio 0} 
     for {set x 0} {$x<[llength $pd_apilist]} {incr x} {
-    	$mbar.audio add radiobutton -label [lindex [lindex $pd_apilist $x] 0] \
-	    -command {menu_audio 0} -variable pd_whichapi \
-	    	-value [lindex [lindex $pd_apilist $x] 1]\
-		-command {pd [concat pd audio-setapi $pd_whichapi \;]}
+        $mbar.audio add radiobutton -label [lindex [lindex $pd_apilist $x] 0] \
+            -command {menu_audio 0} -variable pd_whichapi \
+                -value [lindex [lindex $pd_apilist $x] 1]\
+                -command {pd [concat pd audio-setapi $pd_whichapi \;]}
     }
     for {set x 0} {$x<[llength $pd_midiapilist]} {incr x} {
-    	$mbar.audio add radiobutton -label [lindex [lindex $pd_midiapilist $x] 0] \
-	    -command {menu_midi 0} -variable pd_whichmidiapi \
-	    	-value [lindex [lindex $pd_midiapilist $x] 1]\
-		-command {pd [concat pd midi-setapi $pd_whichmidiapi \;]}
+        $mbar.audio add radiobutton -label [lindex [lindex $pd_midiapilist $x] 0] \
+            -command {menu_midi 0} -variable pd_whichmidiapi \
+                -value [lindex [lindex $pd_midiapilist $x] 1]\
+                -command {pd [concat pd midi-setapi $pd_whichmidiapi \;]}
     }
-	 if {$pd_nt != 2} {
+         if {$pd_nt != 2} {
     $mbar.audio add command -label {Audio settings...} \
-	-command {pd pd audio-properties \;}
+        -command {pd pd audio-properties \;}
     $mbar.audio add command -label {MIDI settings...} \
-	-command {pd pd midi-properties \;}
-	 }
-	 
+        -command {pd pd midi-properties \;}
+         }
+         
     $mbar.audio add command -label {Test Audio and MIDI} \
-	-command {menu_doc_open doc/7.stuff/tools testtone.pd} 
+        -command {menu_doc_open doc/7.stuff/tools testtone.pd} 
     $mbar.audio add command -label {Load Meter} \
-	-command {menu_doc_open doc/7.stuff/tools load-meter.pd} 
+        -command {menu_doc_open doc/7.stuff/tools load-meter.pd} 
 
 #       the MacOS X app menu
 
@@ -502,31 +502,31 @@ proc menu_addstd {mbar} {
 # to the app-specific menu in MacOS X that is named after the app,
 # so in our case, the Pd menu.  <hans@at.or.at>
 # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-	 if {$pd_nt == 2} {
-		  $mbar.apple add command -label "About Pd..." -command \
-				{menu_doc_open doc/1.manual 1.introduction.txt} 
-		  menu $mbar.apple.preferences -tearoff 0
-		  $mbar.apple add cascade -label "Preferences" -menu $mbar.apple.preferences
-		  $mbar.apple.preferences add command -label "Path..." \
-				-command {pd pd start-path-dialog \;}
-		  $mbar.apple.preferences add command -label "Startup..." \
-				-command {pd pd start-startup-dialog \;}
-		  $mbar.apple.preferences add command -label "Audio Settings..." \
-				-command {pd pd audio-properties \;}
-		  $mbar.apple.preferences add command -label "MIDI settings..." \
-				-command {pd pd midi-properties \;}
-	 }
+         if {$pd_nt == 2} {
+                  $mbar.apple add command -label "About Pd..." -command \
+                                {menu_doc_open doc/1.manual 1.introduction.txt} 
+                  menu $mbar.apple.preferences -tearoff 0
+                  $mbar.apple add cascade -label "Preferences" -menu $mbar.apple.preferences
+                  $mbar.apple.preferences add command -label "Path..." \
+                                -command {pd pd start-path-dialog \;}
+                  $mbar.apple.preferences add command -label "Startup..." \
+                                -command {pd pd start-startup-dialog \;}
+                  $mbar.apple.preferences add command -label "Audio Settings..." \
+                                -command {pd pd audio-properties \;}
+                  $mbar.apple.preferences add command -label "MIDI settings..." \
+                                -command {pd pd midi-properties \;}
+         }
 
 
-    	# the "Help" menu
+        # the "Help" menu
     if {$pd_nt != 2} {
-    	$mbar.help add command -label {About Pd} \
-	    -command {menu_doc_open doc/1.manual 1.introduction.txt} 
+        $mbar.help add command -label {About Pd} \
+            -command {menu_doc_open doc/1.manual 1.introduction.txt} 
     }
     $mbar.help add command -label {Html ...} \
-    	-command {menu_doc_open doc/1.manual index.htm} 
+        -command {menu_doc_open doc/1.manual index.htm} 
     $mbar.help add command -label {Browser ...} \
-    	-command {menu_documentation} 
+        -command {menu_documentation} 
 }
 
 #################### the "File" menu for the Pd window ##############
@@ -571,7 +571,7 @@ proc menu_print {name} {
        -filetypes { {{postscript} {.ps}} }]
 
     if {$filename != ""} {
-    	$name.c postscript -file $filename
+        $name.c postscript -file $filename
     }
 }
 
@@ -590,7 +590,7 @@ proc menu_undo {name} {
     global pd_redoaction
     global pd_undocanvas
     if {$name == $pd_undocanvas && $pd_undoaction != "no"} {
-    	pd [concat $name undo \;]
+        pd [concat $name undo \;]
     }
 }
 
@@ -599,7 +599,7 @@ proc menu_redo {name} {
     global pd_redoaction
     global pd_undocanvas
     if {$name == $pd_undocanvas && $pd_redoaction != "no"} {
-    	pd [concat $name redo \;]
+        pd [concat $name redo \;]
     }
 }
 
@@ -714,16 +714,16 @@ proc menu_fixeditmenu {name} {
     global pd_undocanvas
 #    puts stderr [concat menu_fixeditmenu $name $pd_undocanvas $pd_undoaction]
     if {$name == $pd_undocanvas && $pd_undoaction != "no"} {
-	$name.m.edit entryconfigure "Undo*" -state normal \
-	    -label [concat "Undo " $pd_undoaction]
+        $name.m.edit entryconfigure "Undo*" -state normal \
+            -label [concat "Undo " $pd_undoaction]
     } else {
-	$name.m.edit entryconfigure "Undo*" -state disabled -label "Undo"
+        $name.m.edit entryconfigure "Undo*" -state disabled -label "Undo"
     }
     if {$name == $pd_undocanvas && $pd_redoaction != "no"} {
-	$name.m.edit entryconfigure "Redo*" -state normal\
+        $name.m.edit entryconfigure "Redo*" -state normal\
             -label [concat "Redo " $pd_redoaction]
     } else {
-	$name.m.edit entryconfigure "Redo*" -state disabled
+        $name.m.edit entryconfigure "Redo*" -state disabled
     }
 }
 
@@ -763,13 +763,13 @@ proc menu_fixwindowmenu {name} {
     global pd_tearoff
     $name.m.windows add command
     if $pd_tearoff {
-	$name.m.windows delete 4 end
+        $name.m.windows delete 4 end
     } else {
-	$name.m.windows delete 3 end
+        $name.m.windows delete 3 end
     }
     foreach i $menu_windowlist {
-	$name.m.windows add command -label [lindex $i 0] \
-	    -command [concat menu_domenuwindow [lindex $i 1]]
+        $name.m.windows add command -label [lindex $i 0] \
+            -command [concat menu_domenuwindow [lindex $i 1]]
     }
 }
 
@@ -785,9 +785,9 @@ proc find_apply {name} {
     regsub -all \; $find_string " _semi_ " find_string2
     regsub -all \, $find_string2 " _comma_ " find_string3
 #    puts stderr [concat $find_canvas find $find_string3 \
-#	\;]
+#       \;]
     pd [concat $find_canvas find $find_string3 \
-	\;]
+        \;]
     after 50 destroy $name
 }
 
@@ -816,9 +816,9 @@ proc menu_findobject {canvas} {
     frame $name.buttonframe
     pack $name.buttonframe -side bottom -fill x -pady 2m
     button $name.buttonframe.cancel -text {Cancel}\
-    	-command "find_cancel $name"
+        -command "find_cancel $name"
     button $name.buttonframe.ok -text {OK}\
-    	-command "find_apply $name"
+        -command "find_apply $name"
     pack $name.buttonframe.cancel -side left -expand 1
     pack $name.buttonframe.ok -side left -expand 1
     
@@ -835,32 +835,33 @@ proc pdtk_canvas_new {name width height geometry editable} {
     global pd_opendir
     global pd_tearoff
     global pd_nt
+    global tcl_version
 
     toplevel $name -menu $name.m
-
 # slide offscreen windows into view
-    set geometry [split $geometry +]
-    set i 1
-    foreach geo {width height} {
-	set screen($geo) [winfo screen$geo .]
-	if {[expr [lindex $geometry $i] + [set $geo]] > $screen($geo)} {
-	    set pos($geo) [expr $screen($geo) - [set $geo]]
-	    if {$pos($geo) < 0} {set pos($geo) 0}
-	    lset geometry $i $pos($geo)
-	}
-	incr i
-    }
-    set geometry [join $geometry +] 
-
+    if {$tcl_version >= 8.4} {
+        set geometry [split $geometry +]
+        set i 1
+        foreach geo {width height} {
+            set screen($geo) [winfo screen$geo .]
+            if {[expr [lindex $geometry $i] + [set $geo]] > $screen($geo)} {
+                set pos($geo) [expr $screen($geo) - [set $geo]]
+                if {$pos($geo) < 0} {set pos($geo) 0}
+                lset geometry $i $pos($geo)
+            }
+            incr i
+        }
+        set geometry [join $geometry +] 
+   }
    wm geometry $name $geometry
     canvas $name.c -width $width -height $height -background white \
-    	-yscrollcommand "$name.scrollvert set" \
-    	-xscrollcommand "$name.scrollhort set" \
-	-scrollregion [concat 0 0 $width $height] 
+        -yscrollcommand "$name.scrollvert set" \
+        -xscrollcommand "$name.scrollhort set" \
+        -scrollregion [concat 0 0 $width $height] 
 
     scrollbar $name.scrollvert -command "$name.c yview"
     scrollbar $name.scrollhort -command "$name.c xview" \
-    	-orient horizontal
+        -orient horizontal
 
     pack $name.scrollhort -side bottom -fill x
     pack $name.scrollvert -side right -fill y
@@ -877,98 +878,98 @@ proc pdtk_canvas_new {name width height geometry editable} {
     $name.m add cascade -label File -menu $name.m.file
 
     $name.m.file add command -label New -command {menu_new} \
-	-accelerator [accel_munge "Ctrl+n"]
+        -accelerator [accel_munge "Ctrl+n"]
 
     $name.m.file add command -label Open -command {menu_open} \
-	-accelerator [accel_munge "Ctrl+o"]
+        -accelerator [accel_munge "Ctrl+o"]
 
     $name.m.file add  separator
     $name.m.file add command -label Message -command {menu_send} \
-	-accelerator [accel_munge "Ctrl+m"]
+        -accelerator [accel_munge "Ctrl+m"]
 
-	 # arrange menus according to Apple HIG
-	 # these are now part of Preferences...
-	 if {$pd_nt != 2 } {
+         # arrange menus according to Apple HIG
+         # these are now part of Preferences...
+         if {$pd_nt != 2 } {
     $name.m.file add command -label Path... \
-    	-command {pd pd start-path-dialog \;} 
+        -command {pd pd start-path-dialog \;} 
 
     $name.m.file add command -label Startup... \
-    	-command {pd pd start-startup-dialog \;} 
-	 }
+        -command {pd pd start-startup-dialog \;} 
+         }
 
     $name.m.file add  separator
     $name.m.file add command -label Close \
-    	-command [concat menu_close $name] \
-	-accelerator [accel_munge "Ctrl+w"]
+        -command [concat menu_close $name] \
+        -accelerator [accel_munge "Ctrl+w"]
 
     $name.m.file add command -label Save -command [concat menu_save $name] \
-	-accelerator [accel_munge "Ctrl+s"]
+        -accelerator [accel_munge "Ctrl+s"]
 
     $name.m.file add command -label "Save as..." \
-    	-command [concat menu_saveas $name] \
-	-accelerator [accel_munge "Ctrl+S"]
+        -command [concat menu_saveas $name] \
+        -accelerator [accel_munge "Ctrl+S"]
 
     $name.m.file add command -label Print -command [concat menu_print $name] \
-	-accelerator [accel_munge "Ctrl+p"]
+        -accelerator [accel_munge "Ctrl+p"]
 
     $name.m.file add separator
 
     $name.m.file add command -label Quit -command {menu_quit} \
-	-accelerator [accel_munge "Ctrl+q"]
+        -accelerator [accel_munge "Ctrl+q"]
 
 # the edit menu
     menu $name.m.edit -postcommand [concat menu_fixeditmenu $name] -tearoff $pd_tearoff
     $name.m add cascade -label Edit -menu $name.m.edit
     
     $name.m.edit add command -label Undo -command [concat menu_undo $name] \
-	-accelerator [accel_munge "Ctrl+z"]
+        -accelerator [accel_munge "Ctrl+z"]
 
     $name.m.edit add command -label Redo -command [concat menu_redo $name] \
-	-accelerator [accel_munge "Ctrl+Z"]
+        -accelerator [accel_munge "Ctrl+Z"]
 
     $name.m.edit add separator
 
     $name.m.edit add command -label Cut -command [concat menu_cut $name] \
-	-accelerator [accel_munge "Ctrl+x"]
+        -accelerator [accel_munge "Ctrl+x"]
 
     $name.m.edit add command -label Copy -command [concat menu_copy $name] \
-	-accelerator [accel_munge "Ctrl+c"]
+        -accelerator [accel_munge "Ctrl+c"]
 
     $name.m.edit add command -label Paste \
-    	-command [concat menu_paste $name] \
-	-accelerator [accel_munge "Ctrl+v"]
+        -command [concat menu_paste $name] \
+        -accelerator [accel_munge "Ctrl+v"]
 
     $name.m.edit add command -label Duplicate \
-    	-command [concat menu_duplicate $name] \
-	-accelerator [accel_munge "Ctrl+d"]
+        -command [concat menu_duplicate $name] \
+        -accelerator [accel_munge "Ctrl+d"]
 
     $name.m.edit add command -label {Select all} \
-    	-command [concat menu_selectall $name] \
-	-accelerator [accel_munge "Ctrl+a"]
+        -command [concat menu_selectall $name] \
+        -accelerator [accel_munge "Ctrl+a"]
 
     $name.m.edit add separator
 
     $name.m.edit add command -label {Text Editor} \
-    	-command [concat menu_texteditor $name] \
-	-accelerator [accel_munge "Ctrl+t"]
+        -command [concat menu_texteditor $name] \
+        -accelerator [accel_munge "Ctrl+t"]
 
     $name.m.edit add command -label Font \
-    	-command [concat menu_font $name] 
+        -command [concat menu_font $name] 
 
     $name.m.edit add command -label {Tidy Up} \
-    	-command [concat menu_tidyup $name]
+        -command [concat menu_tidyup $name]
 
     $name.m.edit add separator
     
 # Apple, Microsoft, and others put find functions in the Edit menu.
     $name.m.edit add command -label {Find...} \
-		  -accelerator [accel_munge "Ctrl+f"] \
-		  -command [concat menu_findobject $name] 
+                  -accelerator [accel_munge "Ctrl+f"] \
+                  -command [concat menu_findobject $name] 
     $name.m.edit add command -label {Find Again} \
-		  -accelerator [accel_munge "Ctrl+g"] \
-		  -command [concat menu_findagain $name] 
+                  -accelerator [accel_munge "Ctrl+g"] \
+                  -command [concat menu_findagain $name] 
     $name.m.edit add command -label {Find last error} \
-		  -command [concat menu_finderror] 
+                  -command [concat menu_finderror] 
 
     $name.m.edit add separator
 
@@ -977,14 +978,14 @@ proc pdtk_canvas_new {name width height geometry editable} {
 # if widget is selected or not.
 
     $name.m.edit add checkbutton -label "Edit mode" \
-    	-indicatoron true -selectcolor grey85 \
-    	-command [concat menu_editmode $name] \
-	-accelerator [accel_munge "Ctrl+e"]	
+        -indicatoron true -selectcolor grey85 \
+        -command [concat menu_editmode $name] \
+        -accelerator [accel_munge "Ctrl+e"]     
 
     if { $editable == 0 } {
             $name.m.edit entryconfigure "Edit mode" -indicatoron false }
 
-	
+        
 ############iemlib##################
 
 
@@ -993,74 +994,74 @@ proc pdtk_canvas_new {name width height geometry editable} {
     $name.m add cascade -label Put -menu $name.m.put
 
     $name.m.put add command -label Object \
-    	-command [concat menu_object $name 0] \
-	-accelerator [accel_munge "Ctrl+1"]
+        -command [concat menu_object $name 0] \
+        -accelerator [accel_munge "Ctrl+1"]
 
     $name.m.put add command -label Message \
-    	-command [concat menu_message $name 0] \
-	-accelerator [accel_munge "Ctrl+2"]
+        -command [concat menu_message $name 0] \
+        -accelerator [accel_munge "Ctrl+2"]
 
     $name.m.put add command -label Number \
-    	-command [concat menu_floatatom $name 0] \
-	-accelerator [accel_munge "Ctrl+3"]
+        -command [concat menu_floatatom $name 0] \
+        -accelerator [accel_munge "Ctrl+3"]
 
     $name.m.put add command -label Symbol \
-    	-command [concat menu_symbolatom $name 0] \
-	-accelerator [accel_munge "Ctrl+4"]
+        -command [concat menu_symbolatom $name 0] \
+        -accelerator [accel_munge "Ctrl+4"]
 
     $name.m.put add command -label Comment \
-    	-command [concat menu_comment $name 0] \
-	-accelerator [accel_munge "Ctrl+5"]
+        -command [concat menu_comment $name 0] \
+        -accelerator [accel_munge "Ctrl+5"]
 
     $name.m.put add separator
-	
+        
 ############iemlib##################
 
     $name.m.put add command -label Bang \
-    	-command [concat menu_bng $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+b"]
+        -command [concat menu_bng $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+b"]
     
     $name.m.put add command -label Toggle \
-    	-command [concat menu_toggle $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+t"]
+        -command [concat menu_toggle $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+t"]
     
     $name.m.put add command -label Number2 \
-    	-command [concat menu_numbox $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+n"]
+        -command [concat menu_numbox $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+n"]
     
     $name.m.put add command -label Vslider \
-    	-command [concat menu_vslider $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+v"]
+        -command [concat menu_vslider $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+v"]
     
     $name.m.put add command -label Hslider \
-    	-command [concat menu_hslider $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+h"]
+        -command [concat menu_hslider $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+h"]
     
     $name.m.put add command -label Vradio \
-    	-command [concat menu_vradio $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+d"]
+        -command [concat menu_vradio $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+d"]
     
     $name.m.put add command -label Hradio \
-    	-command [concat menu_hradio $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+i"]
+        -command [concat menu_hradio $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+i"]
     
     $name.m.put add command -label VU \
-    	-command [concat menu_vumeter $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+u"]
+        -command [concat menu_vumeter $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+u"]
     
     $name.m.put add command -label Canvas \
-    	-command [concat menu_mycnv $name 0] \
-	-accelerator [accel_munge "Shift+Ctrl+c"]
+        -command [concat menu_mycnv $name 0] \
+        -accelerator [accel_munge "Shift+Ctrl+c"]
 
 ############iemlib##################
     
     $name.m.put add separator
-	
+        
     $name.m.put add command -label Graph \
-    	-command [concat menu_graph $name] 
+        -command [concat menu_graph $name] 
 
     $name.m.put add command -label Array \
-    	-command [concat menu_array $name] 
+        -command [concat menu_array $name] 
 
 # the find menu
 # Apple, Microsoft, and others put find functions in the Edit menu.
@@ -1072,20 +1073,20 @@ proc pdtk_canvas_new {name width height geometry editable} {
     $name.m add cascade -label Find -menu $name.m.find
 
     $name.m.find add command -label {Find...} \
-	-accelerator [accel_munge "Ctrl+f"] \
-    	-command [concat menu_findobject $name] 
+        -accelerator [accel_munge "Ctrl+f"] \
+        -command [concat menu_findobject $name] 
     $name.m.find add command -label {Find Again} \
-	-accelerator [accel_munge "Ctrl+g"] \
-    	-command [concat menu_findagain $name] 
+        -accelerator [accel_munge "Ctrl+g"] \
+        -command [concat menu_findagain $name] 
     $name.m.find add command -label {Find last error} \
-    	-command [concat menu_finderror] 
+        -command [concat menu_finderror] 
     
 # the window menu
     menu $name.m.windows -postcommand [concat menu_fixwindowmenu $name] \
-	-tearoff $pd_tearoff
+        -tearoff $pd_tearoff
 
     $name.m.windows add command -label {parent window}\
-    	-command [concat menu_windowparent $name] 
+        -command [concat menu_windowparent $name] 
     $name.m.windows add command -label {Pd window} -command menu_pop_pd
     $name.m.windows add separator
 
@@ -1099,8 +1100,8 @@ proc pdtk_canvas_new {name width height geometry editable} {
         $name.m add cascade -label Media -menu $name.m.audio
         $name.m add cascade -label Window -menu $name.m.windows
 # the MacOS X app menu
-		  menu $name.m.apple -tearoff $pd_tearoff
-		  $name.m add cascade -label "Apple" -menu $name.m.apple 
+                  menu $name.m.apple -tearoff $pd_tearoff
+                  $name.m add cascade -label "Apple" -menu $name.m.apple 
     }
 
 # the help menu
@@ -1113,11 +1114,11 @@ proc pdtk_canvas_new {name width height geometry editable} {
 # the popup menu
     menu $name.popup -tearoff false
     $name.popup add command -label {Properties} \
-	-command [concat popup_action $name 0] 
+        -command [concat popup_action $name 0] 
     $name.popup add command -label {Open} \
-	-command [concat popup_action $name 1] 
+        -command [concat popup_action $name 1] 
     $name.popup add command -label {Help} \
-	-command [concat popup_action $name 2] 
+        -command [concat popup_action $name 2] 
 
 # WM protocol
     wm protocol $name WM_DELETE_WINDOW [concat menu_close $name]
@@ -1135,17 +1136,17 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Control-Shift-Button> {pdtk_canvas_click %W %x %y %b 3}
     # Alt key is called Option on the Mac
     if {$pd_nt == 2} {
-    	bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
-    	bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
-    	bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
-    	bind $name.c <Option-Control-Shift-Button> \
-	    {pdtk_canvas_click %W %x %y %b 7}
+        bind $name.c <Option-Button> {pdtk_canvas_click %W %x %y %b 4}
+        bind $name.c <Option-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+        bind $name.c <Option-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+        bind $name.c <Option-Control-Shift-Button> \
+            {pdtk_canvas_click %W %x %y %b 7}
     } else {
-    	bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
-    	bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
-    	bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
-    	bind $name.c <Alt-Control-Shift-Button> \
-	    {pdtk_canvas_click %W %x %y %b 7}
+        bind $name.c <Alt-Button> {pdtk_canvas_click %W %x %y %b 4}
+        bind $name.c <Alt-Shift-Button> {pdtk_canvas_click %W %x %y %b 5}
+        bind $name.c <Alt-Control-Button> {pdtk_canvas_click %W %x %y %b 6}
+        bind $name.c <Alt-Control-Shift-Button> \
+            {pdtk_canvas_click %W %x %y %b 7}
     }
     global pd_nt
 # button 2 is the right button on Mac; on other platforms it's button 3.
@@ -1158,10 +1159,10 @@ proc pdtk_canvas_new {name width height geometry editable} {
     }
 #on linux, button 2 "pastes" from the X windows clipboard
     if {$pd_nt == 0} {
-    	bind $name.c <Button-2> {\
-	    pdtk_canvas_click %W %x %y %b 0;\
-	     pdtk_canvas_mouseup %W %x %y %b;\
-	     pdtk_pastetext}
+        bind $name.c <Button-2> {\
+            pdtk_canvas_click %W %x %y %b 0;\
+             pdtk_canvas_mouseup %W %x %y %b;\
+             pdtk_pastetext}
     }
 
     bind $name.c <ButtonRelease> {pdtk_canvas_mouseup %W %x %y %b}
@@ -1169,8 +1170,8 @@ proc pdtk_canvas_new {name width height geometry editable} {
     bind $name.c <Control-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
 #    bind $name.c <Mod1-Key> {puts stderr [concat mod1 %W %K %A]}
     if {$pd_nt == 2} {
-	bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
-	bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
+        bind $name.c <Mod1-Key> {pdtk_canvas_ctrlkey %W %K 0}
+        bind $name.c <Mod1-Shift-Key> {pdtk_canvas_ctrlkey %W %K 1}
     }
     bind $name.c <Key> {pdtk_canvas_key %W %K %A 0}
     bind $name.c <Shift-Key> {pdtk_canvas_key %W %K %A 1}
@@ -1187,20 +1188,20 @@ proc pdtk_canvas_new {name width height geometry editable} {
     focus $name.c
 
     switch $pd_nt { 0 {
-	bind $name.c <Button-4>  "pdtk_canvas_scroll $name.c y -1"
-    	bind $name.c <Button-5>  "pdtk_canvas_scroll $name.c y +1"
-	bind $name.c <Shift-Button-4>  "pdtk_canvas_scroll $name.c x -1"
-    	bind $name.c <Shift-Button-5>  "pdtk_canvas_scroll $name.c x +1"
+        bind $name.c <Button-4>  "pdtk_canvas_scroll $name.c y -1"
+        bind $name.c <Button-5>  "pdtk_canvas_scroll $name.c y +1"
+        bind $name.c <Shift-Button-4>  "pdtk_canvas_scroll $name.c x -1"
+        bind $name.c <Shift-Button-5>  "pdtk_canvas_scroll $name.c x +1"
     } default {
-	bind $name.c  <MouseWheel> \
-	    "pdtk_canvas_scroll $name.c y \[expr -abs(%D)/%D\]"
-	bind $name.c  <Shift-MouseWheel> \
-	    "pdtk_canvas_scroll $name.c x \[expr -abs(%D)/%D\]"
+        bind $name.c  <MouseWheel> \
+            "pdtk_canvas_scroll $name.c y \[expr -abs(%D)/%D\]"
+        bind $name.c  <Shift-MouseWheel> \
+            "pdtk_canvas_scroll $name.c x \[expr -abs(%D)/%D\]"
     }}
 
     catch {
-	dnd bindtarget $name.c text/uri-list <Drop> \
-	    "pdtk_canvas_makeobjs $name %D %x %y"
+        dnd bindtarget $name.c text/uri-list <Drop> \
+            "pdtk_canvas_makeobjs $name %D %x %y"
     }
 
 #    puts stderr "all done"
@@ -1431,10 +1432,10 @@ proc pdtk_canvas_checkgeometry {topname} {
     global pdtk_lastcanvasconfigured
     global pdtk_lastcanvasconfiguration
     if {$topname != $pdtk_lastcanvasconfigured || \
-    	$boo != $pdtk_lastcanvasconfiguration} {
-    	    set pdtk_lastcanvasconfigured $topname
-    	    set pdtk_lastcanvasconfiguration $boo
-    	    pd $topname relocate $boo $boo2 \;
+        $boo != $pdtk_lastcanvasconfiguration} {
+            set pdtk_lastcanvasconfigured $topname
+            set pdtk_lastcanvasconfiguration $boo
+            pd $topname relocate $boo $boo2 \;
     }
 }
 
@@ -1468,7 +1469,7 @@ set pdtk_canvas_mouseup_ymaxval 0
 
 proc pdtk_canvas_mouseup {name x y b} {
     pd [concat [canvastosym $name] mouseup [$name canvasx $x] \
-    	[$name canvasy $y] $b \;]
+        [$name canvasy $y] $b \;]
 }
 
 proc pdtk_canvas_getscroll {name} {
@@ -1480,35 +1481,35 @@ proc pdtk_canvas_getscroll {name} {
 
     set size [$name bbox all]
     if {$size != ""} {
-    	set xminval 0
-    	set yminval 0
-    	set xmaxval 100
-    	set ymaxval 100
-    	set x1 [lindex $size 0]
-    	set x2 [lindex $size 2]
-    	set y1 [lindex $size 1]
-    	set y2 [lindex $size 3]
-    	
-    	if {$x1 < 0} {set xminval $x1}
-    	if {$y1 < 0} {set yminval $y1}
+        set xminval 0
+        set yminval 0
+        set xmaxval 100
+        set ymaxval 100
+        set x1 [lindex $size 0]
+        set x2 [lindex $size 2]
+        set y1 [lindex $size 1]
+        set y2 [lindex $size 3]
+        
+        if {$x1 < 0} {set xminval $x1}
+        if {$y1 < 0} {set yminval $y1}
 
-    	if {$x2 > 100} {set xmaxval $x2}
-    	if {$y2 > 100} {set ymaxval $y2}
-    	
-    	if {$pdtk_canvas_mouseup_name != $name || \
-    	    $pdtk_canvas_mouseup_xminval != $xminval || \
-    	    $pdtk_canvas_mouseup_xmaxval != $xmaxval || \
-    	    $pdtk_canvas_mouseup_yminval != $yminval || \
-    	    $pdtk_canvas_mouseup_ymaxval != $ymaxval } {
-    	    
-	    	set newsize "$xminval $yminval $xmaxval $ymaxval"
-	    	$name configure -scrollregion $newsize
-	    	set pdtk_canvas_mouseup_name $name
-	    	set pdtk_canvas_mouseup_xminval $xminval
-	    	set pdtk_canvas_mouseup_xmaxval $xmaxval
-	    	set pdtk_canvas_mouseup_yminval $yminval
-	    	set pdtk_canvas_mouseup_ymaxval $ymaxval
-    	}
+        if {$x2 > 100} {set xmaxval $x2}
+        if {$y2 > 100} {set ymaxval $y2}
+        
+        if {$pdtk_canvas_mouseup_name != $name || \
+            $pdtk_canvas_mouseup_xminval != $xminval || \
+            $pdtk_canvas_mouseup_xmaxval != $xmaxval || \
+            $pdtk_canvas_mouseup_yminval != $yminval || \
+            $pdtk_canvas_mouseup_ymaxval != $ymaxval } {
+            
+                set newsize "$xminval $yminval $xmaxval $ymaxval"
+                $name configure -scrollregion $newsize
+                set pdtk_canvas_mouseup_name $name
+                set pdtk_canvas_mouseup_xminval $xminval
+                set pdtk_canvas_mouseup_xmaxval $xmaxval
+                set pdtk_canvas_mouseup_yminval $yminval
+                set pdtk_canvas_mouseup_ymaxval $ymaxval
+        }
 
     }
     pdtk_canvas_checkgeometry [canvastosym $name]
@@ -1521,34 +1522,34 @@ proc pdtk_canvas_key {name key iso shift} {
 #  invesigate this LATER...
     global pd_nt
     if {$pd_nt == 2} {
-	if {$key == "BackSpace"} {
-	    set key 8
-	    set keynum 8
-	}
-	if {$key == "Delete"} {
-	    set key 8
-	    set keynum 8
-	}
+        if {$key == "BackSpace"} {
+            set key 8
+            set keynum 8
+        }
+        if {$key == "Delete"} {
+            set key 8
+            set keynum 8
+        }
     }
     if {$key == "KP_Delete"} {
-	set key 127
-	set keynum 127
+        set key 127
+        set keynum 127
     }
     if {$iso != ""} {
-    	scan $iso %c keynum 
-    	pd [canvastosym $name] key 1 $keynum $shift\;
+        scan $iso %c keynum 
+        pd [canvastosym $name] key 1 $keynum $shift\;
     } else {
-    	pd [canvastosym $name] key 1 $key $shift\;
+        pd [canvastosym $name] key 1 $key $shift\;
     }
 }
 
 proc pdtk_canvas_keyup {name key iso} {
 #    puts stderr [concat up key= $key iso= $iso]
     if {$iso != ""} {
-    	scan $iso %c keynum 
-    	pd [canvastosym $name] key 0 $keynum 0 \;
+        scan $iso %c keynum 
+        pd [canvastosym $name] key 0 $keynum 0 \;
     } else {
-    	pd [canvastosym $name] key 0 $key 0 \;
+        pd [canvastosym $name] key 0 $key 0 \;
     }
 }
 
@@ -1624,10 +1625,10 @@ proc pdtk_canvas_unmap {name} {
 proc pdtk_canvas_makeobjs {name files x y} {
     set c 0
     for {set n 0} {$n < [llength $files]} {incr n} {
-	if {[regexp {.*/(.+).pd$} [lindex $files $n] file obj] == 1} {
-	    pd $name obj $x [expr $y + ($c * 30)] [pdtk_enquote $obj] \;
-	    incr c
-	}
+        if {[regexp {.*/(.+).pd$} [lindex $files $n] file obj] == 1} {
+            pd $name obj $x [expr $y + ($c * 30)] [pdtk_enquote $obj] \;
+            incr c
+        }
     } 
 }
 
@@ -1643,28 +1644,28 @@ proc pdtk_canvas_saveas {name initfile initdir} {
 
     if {$filename != ""} {
 # yes, we need the extent even if we're on a mac.
-	if {$pd_nt == 2} {
-	  if {[string last .pd $filename] < 0 && \
+        if {$pd_nt == 2} {
+          if {[string last .pd $filename] < 0 && \
             [string last .PD $filename] < 0 && \
             [string last .pat $filename] < 0 && \
-	    [string last .PAT $filename] < 0} {
-		set filename $filename.pd
-		if {[file exists $filename]} {
-    			set answer [tk_messageBox \
-			\-message [concat overwrite $filename "?"] \
-			 \-type yesno \-icon question]
-    			if {$answer == no} {return}
-		}
-	  }
-	}
+            [string last .PAT $filename] < 0} {
+                set filename $filename.pd
+                if {[file exists $filename]} {
+                        set answer [tk_messageBox \
+                        \-message [concat overwrite $filename "?"] \
+                         \-type yesno \-icon question]
+                        if {! [string compare $answer no]} {return}
+                }
+          }
+        }
 
-    	set directory [string range $filename 0 \
-    	    [expr [string last / $filename ] - 1]]
-    	set basename [string range $filename \
-    	    [expr [string last / $filename ] + 1] end]
-    	pd [concat $name savetofile [pdtk_enquote $basename] \
-	     [pdtk_enquote $directory] \;]
-#    	pd [concat $name savetofile $basename $directory \;]
+        set directory [string range $filename 0 \
+            [expr [string last / $filename ] - 1]]
+        set basename [string range $filename \
+            [expr [string last / $filename ] + 1] end]
+        pd [concat $name savetofile [pdtk_enquote $basename] \
+             [pdtk_enquote $directory] \;]
+#       pd [concat $name savetofile $basename $directory \;]
     }
 }
 
@@ -1707,9 +1708,9 @@ proc pdtk_canvas_dofont {name initsize} {
     frame $name.buttonframe
     pack $name.buttonframe -side bottom -fill x -pady 2m
     button $name.buttonframe.cancel -text {Cancel}\
-    	-command "dofont_cancel $name"
+        -command "dofont_cancel $name"
     button $name.buttonframe.ok -text {Do it}\
-    	-command "dofont_apply $name"
+        -command "dofont_apply $name"
     pack $name.buttonframe.cancel -side left -expand 1
     pack $name.buttonframe.ok -side left -expand 1
     
@@ -1742,11 +1743,11 @@ proc pdtk_canvas_dofont {name initsize} {
     pack $name.stretchf.entry -side left
 
     radiobutton $name.stretchf.radio1 \
-    	-value 1 -variable whichstretch -text "X and Y"
+        -value 1 -variable whichstretch -text "X and Y"
     radiobutton $name.stretchf.radio2 \
-    	-value 2 -variable whichstretch -text "X only"
+        -value 2 -variable whichstretch -text "X only"
     radiobutton $name.stretchf.radio3 \
-    	-value 3 -variable whichstretch -text "Y only"
+        -value 3 -variable whichstretch -text "Y only"
 
     pack $name.stretchf.radio1 -side top -anchor w
     pack $name.stretchf.radio2 -side top -anchor w
@@ -1767,41 +1768,41 @@ proc pdtk_canvas_dofont {name initsize} {
 
 proc gatom_escape {sym} {
     if {[string length $sym] == 0} {
-    	set ret "-"
-#	puts stderr [concat escape1 $sym $ret]
+        set ret "-"
+#       puts stderr [concat escape1 $sym $ret]
     } else {
-    	if {[string equal -length 1 $sym "-"]} {
-    	set ret [string replace $sym 0 0 "--"]
-#	puts stderr [concat escape $sym $ret]
-	} else {
-    	    if {[string equal -length 1 $sym "$"]} {
-    		set ret [string replace $sym 0 0 "#"]
-#	    	puts stderr [concat unescape $sym $ret]
-    	    } else {
-    		set ret $sym
-#	    	puts stderr [concat escape $sym "no change"]
-    	    }
-	}
+        if {[string equal -length 1 $sym "-"]} {
+        set ret [string replace $sym 0 0 "--"]
+#       puts stderr [concat escape $sym $ret]
+        } else {
+            if {[string equal -length 1 $sym "$"]} {
+                set ret [string replace $sym 0 0 "#"]
+#               puts stderr [concat unescape $sym $ret]
+            } else {
+                set ret $sym
+#               puts stderr [concat escape $sym "no change"]
+            }
+        }
     }
     pdtk_unspace $ret
 }
 
 proc gatom_unescape {sym} {
     if {[string equal -length 1 $sym "-"]} {
-    	set ret [string replace $sym 0 0 ""]
-#	puts stderr [concat unescape $sym $ret]
+        set ret [string replace $sym 0 0 ""]
+#       puts stderr [concat unescape $sym $ret]
     } else {
-    	if {[string equal -length 1 $sym "#"]} {
-    	    set ret [string replace $sym 0 0 "$"]
-#	    puts stderr [concat unescape $sym $ret]
-    	} else {
-    	    set ret $sym
-#	    puts stderr [concat unescape $sym "no change"]
-    	}
+        if {[string equal -length 1 $sym "#"]} {
+            set ret [string replace $sym 0 0 "$"]
+#           puts stderr [concat unescape $sym $ret]
+        } else {
+            set ret $sym
+#           puts stderr [concat unescape $sym "no change"]
+        }
     }
     concat $ret
 }
-    	
+        
 proc dogatom_apply {id} {
     set vid [string trimleft $id .]
 
@@ -1823,14 +1824,14 @@ proc dogatom_apply {id} {
 #    set cmd [concat $id param $gatomwidth $gatomlo $gatomhi \;]
     
     set cmd [concat $id param \
-    	[eval concat $$var_gatomwidth] \
-    	[eval concat $$var_gatomlo] \
-    	[eval concat $$var_gatomhi] \
-    	[eval gatom_escape $$var_gatomlabel] \
-    	[eval concat $$var_gatomwherelabel] \
-    	[eval gatom_escape $$var_gatomsymfrom] \
-    	[eval gatom_escape $$var_gatomsymto] \
-	\;]
+        [eval concat $$var_gatomwidth] \
+        [eval concat $$var_gatomlo] \
+        [eval concat $$var_gatomhi] \
+        [eval gatom_escape $$var_gatomlabel] \
+        [eval concat $$var_gatomwherelabel] \
+        [eval gatom_escape $$var_gatomsymfrom] \
+        [eval gatom_escape $$var_gatomsymto] \
+        \;]
 
 #    puts stderr $cmd
     pd $cmd
@@ -1882,11 +1883,11 @@ proc pdtk_gatom_dialog {id initwidth initlo inithi \
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "dogatom_cancel $id"
+        -command "dogatom_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "dogatom_apply $id"
+        -command "dogatom_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "dogatom_ok $id"
+        -command "dogatom_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
@@ -1911,20 +1912,20 @@ proc pdtk_gatom_dialog {id initwidth initlo inithi \
     pack $id.radio.label -side top
     pack $id.radio.l $id.radio.r -side left
     radiobutton $id.radio.l.radio0 -value 0 \
-	-variable $var_gatomwherelabel \
-	-text "left"
+        -variable $var_gatomwherelabel \
+        -text "left"
     radiobutton $id.radio.l.radio1 -value 1 \
-	-variable $var_gatomwherelabel \
-	-text "right"
+        -variable $var_gatomwherelabel \
+        -text "right"
     radiobutton $id.radio.r.radio2 -value 2 \
-	-variable $var_gatomwherelabel \
-	-text "top"
+        -variable $var_gatomwherelabel \
+        -text "top"
     radiobutton $id.radio.r.radio3 -value 3 \
-	-variable $var_gatomwherelabel \
-	-text "bottom"
+        -variable $var_gatomwherelabel \
+        -text "bottom"
     pack $id.radio.l.radio0 $id.radio.l.radio1 -side top -anchor w
     pack $id.radio.r.radio2 $id.radio.r.radio3 -side top -anchor w
-    	
+        
 
     frame $id.paramlabel
     pack $id.paramlabel -side bottom
@@ -1984,7 +1985,7 @@ proc pdtk_canvas_popup {name xpix ypix canprop canopen} {
     if {$canopen == 0} {$name.popup entryconfigure 1 -state disabled}
     if {$canopen == 1} {$name.popup entryconfigure 1 -state active}
     tk_popup $name.popup [expr $xpix + [winfo rootx $name.c]] \
-    	 [expr $ypix + [winfo rooty $name.c]] 0
+         [expr $ypix + [winfo rooty $name.c]] 0
 }
 
 
@@ -2025,7 +2026,7 @@ proc iemgui_clip_num {id} {
     
     if {[eval concat $$var_iemgui_num] > 2000} {
         set $var_iemgui_num 2000
-	$id.para.num_ent configure -textvariable $var_iemgui_num
+        $id.para.num_ent configure -textvariable $var_iemgui_num
     }
     if {[eval concat $$var_iemgui_num] < 1} {
         set $var_iemgui_num 1
@@ -2049,23 +2050,23 @@ proc iemgui_sched_rng {id} {
     if {[eval concat $$var_iemgui_rng_sch] == 2} {
         if {[eval concat $$var_iemgui_max_rng] < [eval concat $$var_iemgui_min_rng]} {
             set hhh [eval concat $$var_iemgui_min_rng]
-	    set $var_iemgui_min_rng [eval concat $$var_iemgui_max_rng]
-	    set $var_iemgui_max_rng $hhh
+            set $var_iemgui_min_rng [eval concat $$var_iemgui_max_rng]
+            set $var_iemgui_max_rng $hhh
             $id.rng.max_ent configure -textvariable $var_iemgui_max_rng
-	    $id.rng.min_ent configure -textvariable $var_iemgui_min_rng }
+            $id.rng.min_ent configure -textvariable $var_iemgui_min_rng }
         if {[eval concat $$var_iemgui_max_rng] < $iemgui_define_min_flashhold} {
-	    set $var_iemgui_max_rng $iemgui_define_min_flashhold
+            set $var_iemgui_max_rng $iemgui_define_min_flashhold
             $id.rng.max_ent configure -textvariable $var_iemgui_max_rng
         }
-	if {[eval concat $$var_iemgui_min_rng] < $iemgui_define_min_flashbreak} {
-	    set $var_iemgui_min_rng $iemgui_define_min_flashbreak
-	    $id.rng.min_ent configure -textvariable $var_iemgui_min_rng
+        if {[eval concat $$var_iemgui_min_rng] < $iemgui_define_min_flashbreak} {
+            set $var_iemgui_min_rng $iemgui_define_min_flashbreak
+            $id.rng.min_ent configure -textvariable $var_iemgui_min_rng
         }
     }
     if {[eval concat $$var_iemgui_rng_sch] == 1} {
-	if {[eval concat $$var_iemgui_min_rng] == 0.0} {
-	    set $var_iemgui_min_rng 1.0
-	    $id.rng.min_ent configure -textvariable $var_iemgui_min_rng
+        if {[eval concat $$var_iemgui_min_rng] == 0.0} {
+            set $var_iemgui_min_rng 1.0
+            $id.rng.min_ent configure -textvariable $var_iemgui_min_rng
         }
     }
 }
@@ -2082,20 +2083,20 @@ proc iemgui_verify_rng {id} {
     
     if {[eval concat $$var_iemgui_lin0_log1] == 1} {
         if {[eval concat $$var_iemgui_max_rng] == 0.0 && [eval concat $$var_iemgui_min_rng] == 0.0} {
-	    set $var_iemgui_max_rng 1.0
-	    $id.rng.max_ent configure -textvariable $var_iemgui_max_rng
-	    }
+            set $var_iemgui_max_rng 1.0
+            $id.rng.max_ent configure -textvariable $var_iemgui_max_rng
+            }
         if {[eval concat $$var_iemgui_max_rng] > 0} {
             if {[eval concat $$var_iemgui_min_rng] <= 0} {
-	        set $var_iemgui_min_rng [expr [eval concat $$var_iemgui_max_rng] * 0.01]
-		$id.rng.min_ent configure -textvariable $var_iemgui_min_rng
-	    }
+                set $var_iemgui_min_rng [expr [eval concat $$var_iemgui_max_rng] * 0.01]
+                $id.rng.min_ent configure -textvariable $var_iemgui_min_rng
+            }
         } else {
             if {[eval concat $$var_iemgui_min_rng] > 0} {
-	        set $var_iemgui_max_rng [expr [eval concat $$var_iemgui_min_rng] * 0.01]
-		$id.rng.max_ent configure -textvariable $var_iemgui_max_rng
-	    }
-	}
+                set $var_iemgui_max_rng [expr [eval concat $$var_iemgui_min_rng] * 0.01]
+                $id.rng.max_ent configure -textvariable $var_iemgui_max_rng
+            }
+        }
     }
 }
 
@@ -2188,7 +2189,7 @@ proc iemgui_choose_col_bkfrlb {id} {
               set $var_iemgui_fcol [expr [eval concat $$var_iemgui_fcol] & 0xFCFCFC] }
     }
     if {[eval concat $$var_iemgui_l2_f1_b0] == 2} {
-	set $var_iemgui_lcol [expr [eval concat $$var_iemgui_lcol] & 0xFCFCFC]
+        set $var_iemgui_lcol [expr [eval concat $$var_iemgui_lcol] & 0xFCFCFC]
         set helpstring [tk_chooseColor -title "Label-Color" -initialcolor [format "#%6.6x" [eval concat $$var_iemgui_lcol]]]
         if { $helpstring != "" } {
               set $var_iemgui_lcol [string replace $helpstring 0 0 "0x"]
@@ -2212,8 +2213,8 @@ proc iemgui_lilo {id} {
     if {[eval concat $$var_iemgui_lin0_log1] == 0} {
         set $var_iemgui_lin0_log1 1
         $id.para.lilo configure -text [eval concat $$var_iemgui_lilo1]
-	iemgui_verify_rng $id
-	iemgui_sched_rng $id
+        iemgui_verify_rng $id
+        iemgui_sched_rng $id
     } else {
         set $var_iemgui_lin0_log1 0
         $id.para.lilo configure -text [eval concat $$var_iemgui_lilo0]
@@ -2340,21 +2341,21 @@ proc iemgui_apply {id} {
         [eval concat $$var_iemgui_hgt] \
         [eval concat $$var_iemgui_min_rng] \
         [eval concat $$var_iemgui_max_rng] \
-	[eval concat $$var_iemgui_lin0_log1] \
+        [eval concat $$var_iemgui_lin0_log1] \
         [eval concat $$var_iemgui_loadbang] \
         [eval concat $$var_iemgui_num] \
-	$hhhsnd \
+        $hhhsnd \
         $hhhrcv \
-	$hhhgui_nam \
+        $hhhgui_nam \
         [eval concat $$var_iemgui_gn_dx] \
         [eval concat $$var_iemgui_gn_dy] \
-	[eval concat $$var_iemgui_gn_f] \
+        [eval concat $$var_iemgui_gn_f] \
         [eval concat $$var_iemgui_gn_fs] \
-	[eval concat $$var_iemgui_bcol] \
+        [eval concat $$var_iemgui_bcol] \
         [eval concat $$var_iemgui_fcol] \
         [eval concat $$var_iemgui_lcol] \
         [eval concat $$var_iemgui_steady] \
-	\;]
+        \;]
 }
 
 proc iemgui_cancel {id} {pd [concat $id cancel \;]}
@@ -2366,13 +2367,13 @@ proc iemgui_ok {id} {
 
 proc pdtk_iemgui_dialog {id mainheader \
         dim_header wdt min_wdt wdt_label hgt min_hgt hgt_label \
-	rng_header min_rng min_rng_label max_rng max_rng_label rng_sched \
-	lin0_log1 lilo0_label lilo1_label loadbang steady num_label num \
-	snd rcv \
+        rng_header min_rng min_rng_label max_rng max_rng_label rng_sched \
+        lin0_log1 lilo0_label lilo1_label loadbang steady num_label num \
+        snd rcv \
         gui_name \
-	gn_dx gn_dy \
-	gn_f gn_fs \
-	bcol fcol lcol} {
+        gn_dx gn_dy \
+        gn_f gn_fs \
+        bcol fcol lcol} {
 
     set vid [string trimleft $id .]
 
@@ -2489,10 +2490,10 @@ proc pdtk_iemgui_dialog {id mainheader \
     entry $id.rng.max_ent -textvariable $var_iemgui_max_rng -width 9
     if { $rng_header != "empty" } {
         pack $id.rng.head -side top
-	if { $min_rng_label != "empty" } {
+        if { $min_rng_label != "empty" } {
             pack $id.rng.min_lab $id.rng.min_ent -side left}
-	if { $max_rng_label != "empty" } {
-	    pack $id.rng.dummy1 \
+        if { $max_rng_label != "empty" } {
+            pack $id.rng.dummy1 \
             $id.rng.max_lab $id.rng.max_ent -side left} }
     
     if { [eval concat $$var_iemgui_lin0_log1] >= 0 || [eval concat $$var_iemgui_loadbang] >= 0 || [eval concat $$var_iemgui_num] > 0 || [eval concat $$var_iemgui_steady] >= 0 } {
@@ -2562,7 +2563,7 @@ proc pdtk_iemgui_dialog {id mainheader \
     label $id.gnxy.y_lab -text "y_off:" -width 6
     entry $id.gnxy.y_ent -textvariable $var_iemgui_gn_dy -width 5
     pack $id.gnxy.x_lab $id.gnxy.x_ent $id.gnxy.dummy1 \
-    	 $id.gnxy.y_lab $id.gnxy.y_ent -side left
+         $id.gnxy.y_lab $id.gnxy.y_ent -side left
     
     frame $id.gnfs
     pack $id.gnfs -side top
@@ -2577,7 +2578,7 @@ proc pdtk_iemgui_dialog {id mainheader \
     label $id.gnfs.fs_lab -text "fontsize:" -width 8
     entry $id.gnfs.fs_ent -textvariable $var_iemgui_gn_fs -width 5
     pack $id.gnfs.f_lab $id.gnfs.fb $id.gnfs.dummy1 \
-    	 $id.gnfs.fs_lab $id.gnfs.fs_ent -side left
+         $id.gnfs.fs_lab $id.gnfs.fs_ent -side left
     
     label $id.col_head -text "--------------colors:--------------"
     pack $id.col_head -side top
@@ -2628,7 +2629,7 @@ proc pdtk_iemgui_dialog {id mainheader \
     foreach i { 0 1 2 3 4 5 6 7 8 9 } hexcol { 16579836 14737632 12369084 \
       16572640 16572608 16579784 14220504 14220540 14476540 16308476 } {
         button $id.bcol.c$i -background [format "#%6.6x" $hexcol] \
-	    -activebackground [format "#%6.6x" $hexcol] \
+            -activebackground [format "#%6.6x" $hexcol] \
             -font {courier 2 normal} -padx 7 -pady 6 \
             -command [format "iemgui_preset_col %s %d" $id $hexcol] }
     pack $id.bcol.c0 $id.bcol.c1 $id.bcol.c2 $id.bcol.c3 $id.bcol.c4 \
@@ -2638,8 +2639,8 @@ proc pdtk_iemgui_dialog {id mainheader \
     pack $id.fcol -side top
     foreach i { 0 1 2 3 4 5 6 7 8 9 } hexcol { 10526880 8158332 6316128 \
       16525352 16559172 15263784 1370132 2684148 3952892 16003312 } {
-	button $id.fcol.c$i -background [format "#%6.6x" $hexcol] \
-	    -activebackground [format "#%6.6x" $hexcol] \
+        button $id.fcol.c$i -background [format "#%6.6x" $hexcol] \
+            -activebackground [format "#%6.6x" $hexcol] \
             -font {courier 2 normal} -padx 7 -pady 6 \
             -command [format "iemgui_preset_col %s %d" $id $hexcol] }
     pack $id.fcol.c0 $id.fcol.c1 $id.fcol.c2 $id.fcol.c3 $id.fcol.c4 \
@@ -2650,7 +2651,7 @@ proc pdtk_iemgui_dialog {id mainheader \
     foreach i { 0 1 2 3 4 5 6 7 8 9 } hexcol { 4210752 2105376 0 \
       9177096 5779456 7874580 2641940 17488 5256 5767248 } {
         button $id.lcol.c$i -background [format "#%6.6x" $hexcol] \
-	    -activebackground [format "#%6.6x" $hexcol] \
+            -activebackground [format "#%6.6x" $hexcol] \
             -font {courier 2 normal} -padx 7 -pady 6 \
             -command [format "iemgui_preset_col %s %d" $id $hexcol] }
     pack $id.lcol.c0 $id.lcol.c1 $id.lcol.c2 $id.lcol.c3 $id.lcol.c4 \
@@ -2663,26 +2664,26 @@ proc pdtk_iemgui_dialog {id mainheader \
     frame $id.cao
     pack $id.cao -side top
     button $id.cao.cancel -text {Cancel} -width 6 \
-    	-command "iemgui_cancel $id"
+        -command "iemgui_cancel $id"
     label $id.cao.dummy1 -text "" -width 3
     button $id.cao.apply -text {Apply} -width 6 \
-    	-command "iemgui_apply $id"
+        -command "iemgui_apply $id"
     label $id.cao.dummy2 -text "" -width 3
     button $id.cao.ok -text {OK} -width 6 \
-    	-command "iemgui_ok $id"
+        -command "iemgui_ok $id"
     pack $id.cao.cancel $id.cao.dummy1 \
         $id.cao.apply $id.cao.dummy2 \
-	$id.cao.ok -side left
+        $id.cao.ok -side left
     
     label $id.space5 -text ""
     pack $id.space5 -side top
 
     if {[info tclversion] < 8.4} {
-    	bind $id <Key-Tab> {tkTabToWindow [tk_focusNext %W]}
-    	bind $id <<PrevWindow>> {tkTabToWindow [tk_focusPrev %W]}
+        bind $id <Key-Tab> {tkTabToWindow [tk_focusNext %W]}
+        bind $id <<PrevWindow>> {tkTabToWindow [tk_focusPrev %W]}
     } else {
-    	bind $id <Key-Tab> {tk::TabToWindow [tk_focusNext %W]}
-    	bind $id <<PrevWindow>> {tk::TabToWindow [tk_focusPrev %W]}
+        bind $id <Key-Tab> {tk::TabToWindow [tk_focusNext %W]}
+        bind $id <<PrevWindow>> {tk::TabToWindow [tk_focusPrev %W]}
     }
     
     bind $id.dim.w_ent <KeyPress-Return> [concat iemgui_ok $id]
@@ -2741,10 +2742,10 @@ proc array_apply {id} {
     set drawasrects [eval concat $$var_array_drawasrects]
 
     pd [concat $id arraydialog $mofo \
-	[eval concat $$var_array_n] \
-    	[expr $saveit + 2 * $drawasrects] \
-	[eval concat $$var_array_otherflag] \
-	\;]
+        [eval concat $$var_array_n] \
+        [expr $saveit + 2 * $drawasrects] \
+        [eval concat $$var_array_otherflag] \
+        \;]
 }
 
 # jsarlo
@@ -2800,39 +2801,39 @@ proc pdtk_array_dialog {id name n flags newone} {
     pack $id.n.label $id.n.entry -side left
 
     checkbutton $id.saveme -text {save contents} -variable $var_array_saveit \
-    	-anchor w
+        -anchor w
     pack $id.saveme -side top
 
     frame $id.drawasrects
     pack $id.drawasrects -side top
     radiobutton $id.drawasrects.drawasrects0 -value 0 \
-	-variable $var_array_drawasrects \
-	-text "draw as points"
+        -variable $var_array_drawasrects \
+        -text "draw as points"
     radiobutton $id.drawasrects.drawasrects1 -value 1 \
-	-variable $var_array_drawasrects \
-	-text "polygon"
+        -variable $var_array_drawasrects \
+        -text "polygon"
     radiobutton $id.drawasrects.drawasrects2 -value 2 \
-	-variable $var_array_drawasrects \
-	-text "bezier curve"
+        -variable $var_array_drawasrects \
+        -text "bezier curve"
     pack $id.drawasrects.drawasrects0 -side top -anchor w
     pack $id.drawasrects.drawasrects1 -side top -anchor w
     pack $id.drawasrects.drawasrects2 -side top -anchor w
 
     if {$newone != 0} {
-	frame $id.radio
-    	pack $id.radio -side top
-    	radiobutton $id.radio.radio0 -value 0 \
-	    -variable $var_array_otherflag \
-	    -text "in new graph"
-    	radiobutton $id.radio.radio1 -value 1 \
-	    -variable $var_array_otherflag \
-	    -text "in last graph"
-    	pack $id.radio.radio0 -side top -anchor w
-    	pack $id.radio.radio1 -side top -anchor w
-    } else {	
-    	checkbutton $id.deleteme -text {delete me} \
-	    -variable $var_array_otherflag -anchor w
-	pack $id.deleteme -side top
+        frame $id.radio
+        pack $id.radio -side top
+        radiobutton $id.radio.radio0 -value 0 \
+            -variable $var_array_otherflag \
+            -text "in new graph"
+        radiobutton $id.radio.radio1 -value 1 \
+            -variable $var_array_otherflag \
+            -text "in last graph"
+        pack $id.radio.radio0 -side top -anchor w
+        pack $id.radio.radio1 -side top -anchor w
+    } else {    
+        checkbutton $id.deleteme -text {delete me} \
+            -variable $var_array_otherflag -anchor w
+        pack $id.deleteme -side top
     }
     # jsarlo
     if {$newone == 0} {
@@ -2844,11 +2845,11 @@ proc pdtk_array_dialog {id name n flags newone} {
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "array_cancel $id"
+        -command "array_cancel $id"
     if {$newone == 0} {button $id.buttonframe.apply -text {Apply}\
-    	-command "array_apply $id"}
+        -command "array_apply $id"}
     button $id.buttonframe.ok -text {OK}\
-    	-command "array_ok $id"
+        -command "array_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     if {$newone == 0} {pack $id.buttonframe.apply -side left -expand 1}
     pack $id.buttonframe.ok -side left -expand 1
@@ -2894,18 +2895,18 @@ proc canvas_apply {id} {
     global $var_canvas_ymargin
 
     pd [concat $id donecanvasdialog \
-    	[eval concat $$var_canvas_xscale] \
-	[eval concat $$var_canvas_yscale] \
-    	[eval concat $$var_canvas_graphme] \
-    	[eval concat $$var_canvas_x1] \
-    	[eval concat $$var_canvas_y1] \
-    	[eval concat $$var_canvas_x2] \
-    	[eval concat $$var_canvas_y2] \
-    	[eval concat $$var_canvas_xpix] \
-    	[eval concat $$var_canvas_ypix] \
-    	[eval concat $$var_canvas_xmargin] \
-    	[eval concat $$var_canvas_ymargin] \
-	\;]
+        [eval concat $$var_canvas_xscale] \
+        [eval concat $$var_canvas_yscale] \
+        [eval concat $$var_canvas_graphme] \
+        [eval concat $$var_canvas_x1] \
+        [eval concat $$var_canvas_y1] \
+        [eval concat $$var_canvas_x2] \
+        [eval concat $$var_canvas_y2] \
+        [eval concat $$var_canvas_xpix] \
+        [eval concat $$var_canvas_ypix] \
+        [eval concat $$var_canvas_xmargin] \
+        [eval concat $$var_canvas_ymargin] \
+        \;]
 }
 
 proc canvas_cancel {id} {
@@ -3055,7 +3056,7 @@ proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
     pack $id.yscale.label $id.yscale.entry -side left
 
     checkbutton $id.graphme -text {graph on parent} \
-    	-variable $var_canvas_graphme -anchor w \
+        -variable $var_canvas_graphme -anchor w \
         -command [concat canvas_checkcommand $id]
     pack $id.graphme -side top
 
@@ -3094,11 +3095,11 @@ proc pdtk_canvas_dialog {id xscale yscale graphme x1 y1 x2 y2 \
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "canvas_cancel $id"
+        -command "canvas_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "canvas_apply $id"
+        -command "canvas_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "canvas_ok $id"
+        -command "canvas_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
@@ -3118,11 +3119,11 @@ proc dodata_send {name} {
 #    puts stderr [$name.text get 0.0 end]
 
     for {set i 1} {[$name.text compare [concat $i.0 + 3 chars] < end]} \
-    	    {incr i 1} {
-#    	puts stderr [concat it's [$name.text get $i.0 [expr $i + 1].0]]
-    	set cmd [concat $name data [$name.text get $i.0 [expr $i + 1].0] \;]
-#	puts stderr $cmd
-    	pd $cmd
+            {incr i 1} {
+#       puts stderr [concat it's [$name.text get $i.0 [expr $i + 1].0]]
+        set cmd [concat $name data [$name.text get $i.0 [expr $i + 1].0] \;]
+#       puts stderr $cmd
+        pd $cmd
     }
     set cmd [concat $name end \;]
 #    puts stderr $cmd
@@ -3149,14 +3150,14 @@ proc pdtk_data_dialog {name stuff} {
     frame $name.buttonframe
     pack $name.buttonframe -side bottom -fill x -pady 2m
     button $name.buttonframe.send -text {Send (Ctrl s)}\
-    	-command [concat dodata_send $name]
+        -command [concat dodata_send $name]
     button $name.buttonframe.ok -text {OK (Ctrl t)}\
-    	-command [concat dodata_ok $name]
+        -command [concat dodata_ok $name]
     pack $name.buttonframe.send -side left -expand 1
     pack $name.buttonframe.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 40 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font $pd_font3
+        -yscrollcommand "$name.scroll set" -font $pd_font3
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -3170,7 +3171,7 @@ proc pdtk_data_dialog {name stuff} {
 #####################iemlib#######################
 proc pdtk_canvas_editval {name value} {
     if { $value } {
-	$name.m.edit entryconfigure "Edit mode" -indicatoron true
+        $name.m.edit entryconfigure "Edit mode" -indicatoron true
     } else {                          
         $name.m.edit entryconfigure "Edit mode" -indicatoron false
     }                                                 
@@ -3182,20 +3183,20 @@ proc pdtk_text_new {canvasname myname x y text font color} {
 #    if {$font < 13} {set fontname [format -*-courier-bold----%d-* $font]}
 #    if {$font >= 13} {set fontname [format -*-courier-----%d-* $font]}
 
-	global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7 
-	switch -- $font {
-		8  { set typeface $pd_font1 }
-		10 { set typeface $pd_font2 }
-		12 { set typeface $pd_font3 }
-		14 { set typeface $pd_font4 }
-		16 { set typeface $pd_font5 }
-		24 { set typeface $pd_font6 }
-		36 { set typeface $pd_font7 }
-	}
+        global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7 
+        switch -- $font {
+                8  { set typeface $pd_font1 }
+                10 { set typeface $pd_font2 }
+                12 { set typeface $pd_font3 }
+                14 { set typeface $pd_font4 }
+                16 { set typeface $pd_font5 }
+                24 { set typeface $pd_font6 }
+                36 { set typeface $pd_font7 }
+        }
 
     $canvasname create text $x $y \
-    	-font $typeface \
-    	-tags $myname -text $text -fill $color  -anchor nw 
+        -font $typeface \
+        -tags $myname -text $text -fill $color  -anchor nw 
 #    pd [concat $myname size [$canvasname bbox $myname] \;]
 }
 
@@ -3214,7 +3215,7 @@ proc pdtk_pd_ctrlkey {name key shift} {
     if {$key == "o" || $key == "O"} {menu_open}
     if {$key == "m" || $key == "M"} {menu_send}
     if {$key == "q" || $key == "Q"} {
-    	if {$shift == 1} {menu_really_quit} else    {menu_quit}
+        if {$shift == 1} {menu_really_quit} else    {menu_quit}
     }
     if {$key == "slash"} {menu_audio 1}
     if {$key == "period"} {menu_audio 0}
@@ -3259,22 +3260,22 @@ proc pdtk_pd_startup {version apilist midiapilist fontname} {
 
     set tclpatch [info patchlevel]
     if {$tclpatch == "8.3.0" || \
-    	$tclpatch == "8.3.1" || \
-	$tclpatch == "8.3.2" || \
-	$tclpatch == "8.3.3" } {
-    	set oldtclversion 1
+        $tclpatch == "8.3.1" || \
+        $tclpatch == "8.3.2" || \
+        $tclpatch == "8.3.3" } {
+        set oldtclversion 1
     } else {
-    	set oldtclversion 0
+        set oldtclversion 0
     }
     pd [concat pd init [pdtk_enquote [pwd]] \
-    	8 $width1 $height1 \
-    	10 $width2 $height2 \
-    	12 $width3 $height3 \
-    	14 $width4 $height4 \
-    	16 $width5 $height5 \
-    	24 $width6 $height6 \
-    	36 $width7 $height7 \
-    	$oldtclversion \;];
+        8 $width1 $height1 \
+        10 $width2 $height2 \
+        12 $width3 $height3 \
+        14 $width4 $height4 \
+        16 $width5 $height5 \
+        24 $width6 $height6 \
+        36 $width7 $height7 \
+        $oldtclversion \;];
 
     # add the audio and help menus to the Pd window.  We delayed this
     # so that we'd know the value of "apilist".
@@ -3287,7 +3288,7 @@ proc pdtk_pd_startup {version apilist midiapilist fontname} {
         foreach file $pd_macdropped {
             pd [concat pd open [pdtk_enquote [file tail $file]] \
                 [pdtk_enquote  [file dirname $file]] \;]
-		menu_doc_open [file dirname $file] [file tail $file]
+                menu_doc_open [file dirname $file] [file tail $file]
         }
     }
 }
@@ -3304,15 +3305,15 @@ proc pdtk_pd_meters {indb outdb inclip outclip} {
     global ctrls_inlevel ctrls_outlevel
     set ctrls_inlevel $indb
     if {$inclip == 1} {
-	.controls.inout.in.clip configure -background red
+        .controls.inout.in.clip configure -background red
     } else {
-	.controls.inout.in.clip configure -background grey
+        .controls.inout.in.clip configure -background grey
     }
     set ctrls_outlevel $outdb
     if {$outclip == 1} {
-	.controls.inout.out.clip configure -background red
+        .controls.inout.out.clip configure -background red
     } else {
-	.controls.inout.out.clip configure -background grey
+        .controls.inout.out.clip configure -background grey
     }
     
 }
@@ -3320,11 +3321,11 @@ proc pdtk_pd_meters {indb outdb inclip outclip} {
 proc pdtk_pd_dio {red} {
 #    puts stderr [concat dio $red]
     if {$red == 1} {
-    	.controls.dio configure -background red -activebackground red
+        .controls.dio configure -background red -activebackground red
     } else {
-    	.controls.dio configure -background grey -activebackground lightgrey
+        .controls.dio configure -background grey -activebackground lightgrey
     }
-    	
+        
 }
 
 ############# text editing from the "edit" menu ###################
@@ -3333,11 +3334,11 @@ set edit_number 1
 proc texteditor_send {name} {
     set topname [string trimright $name .text]
     for {set i 0} \
-    	{[$name compare [concat 0.0 + [expr $i + 1] chars] < end]} \
-    	    {incr i 1} {
-    	set cha [$name get [concat 0.0 + $i chars]]
-    	scan $cha %c keynum
-    	pd [concat pd key 1 $keynum 0 \;]
+        {[$name compare [concat 0.0 + [expr $i + 1] chars] < end]} \
+            {incr i 1} {
+        set cha [$name get [concat 0.0 + $i chars]]
+        scan $cha %c keynum
+        pd [concat pd key 1 $keynum 0 \;]
     }
 }
 
@@ -3359,14 +3360,14 @@ proc pdtk_pd_texteditor {stuff} {
     frame $name.buttons
     pack $name.buttons -side bottom -fill x -pady 2m
     button $name.buttons.send -text {Send (Ctrl s)}\
-    	-command "texteditor_send $name.text"
+        -command "texteditor_send $name.text"
     button $name.buttons.ok -text {OK (Ctrl t)}\
-    	-command "texteditor_ok $name.text"
+        -command "texteditor_ok $name.text"
     pack $name.buttons.send -side left -expand 1
     pack $name.buttons.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 12 -width 60 \
-    	-yscrollcommand "$name.scroll set" -font $pd_font3
+        -yscrollcommand "$name.scroll set" -font $pd_font3
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -3383,9 +3384,9 @@ proc pdtk_pastetext {} {
     catch {global pdtk_pastebuffer; set pdtk_pastebuffer [selection get]}
 #    puts stderr [concat paste $pdtk_pastebuffer]
     for {set i 0} {$i < [string length $pdtk_pastebuffer]} {incr i 1} {
-    	set cha [string index $pdtk_pastebuffer $i]
-    	scan $cha %c keynum
-    	pd [concat pd key 1 $keynum 0 \;]
+        set cha [string index $pdtk_pastebuffer $i]
+        scan $cha %c keynum
+        pd [concat pd key 1 $keynum 0 \;]
     }
 }
 
@@ -3394,20 +3395,20 @@ proc pdtk_pastetext {} {
 proc pdtk_openpanel {target} {
     global pd_opendir
     set filename [tk_getOpenFile \
-    	-initialdir $pd_opendir]
+        -initialdir $pd_opendir]
     if {$filename != ""} {
-    	set directory [string range $filename 0 \
-    	    [expr [string last / $filename ] - 1]]
-    	set pd_opendir $directory
+        set directory [string range $filename 0 \
+            [expr [string last / $filename ] - 1]]
+        set pd_opendir $directory
 
-    	pd [concat $target symbol [pdtk_enquote $filename] \;]
+        pd [concat $target symbol [pdtk_enquote $filename] \;]
     }
 }
 
 proc pdtk_savepanel {target} {
     set filename [tk_getSaveFile]
     if {$filename != ""} {
-    	pd [concat $target symbol [pdtk_enquote $filename] \;]
+        pd [concat $target symbol [pdtk_enquote $filename] \;]
     }
 }
 
@@ -3438,8 +3439,8 @@ proc com1_send {str} {
 
 if {$pd_nt == 1} {
     proc polleofloop {} {
-    	pd_pollsocket
-    	after 20 polleofloop
+        pd_pollsocket
+        after 20 polleofloop
     }
 
     polleofloop
@@ -3457,25 +3458,25 @@ proc audio_apply {id} {
     global audio_sr audio_advance
 
     pd [concat pd audio-dialog \
-    	$audio_indev1 \
-    	$audio_indev2 \
-    	$audio_indev3 \
-    	$audio_indev4 \
-    	[expr $audio_inchan1 * ( $audio_inenable1 ? 1 : -1 ) ]\
-    	[expr $audio_inchan2 * ( $audio_inenable2 ? 1 : -1 ) ]\
-    	[expr $audio_inchan3 * ( $audio_inenable3 ? 1 : -1 ) ]\
-    	[expr $audio_inchan4 * ( $audio_inenable4 ? 1 : -1 ) ]\
-    	$audio_outdev1 \
-    	$audio_outdev2 \
-    	$audio_outdev3 \
-    	$audio_outdev4 \
-    	[expr $audio_outchan1 * ( $audio_outenable1 ? 1 : -1 ) ]\
-    	[expr $audio_outchan2 * ( $audio_outenable2 ? 1 : -1 ) ]\
-    	[expr $audio_outchan3 * ( $audio_outenable3 ? 1 : -1 ) ]\
-    	[expr $audio_outchan4 * ( $audio_outenable4 ? 1 : -1 ) ]\
-	$audio_sr \
-	$audio_advance \
-	\;]
+        $audio_indev1 \
+        $audio_indev2 \
+        $audio_indev3 \
+        $audio_indev4 \
+        [expr $audio_inchan1 * ( $audio_inenable1 ? 1 : -1 ) ]\
+        [expr $audio_inchan2 * ( $audio_inenable2 ? 1 : -1 ) ]\
+        [expr $audio_inchan3 * ( $audio_inenable3 ? 1 : -1 ) ]\
+        [expr $audio_inchan4 * ( $audio_inenable4 ? 1 : -1 ) ]\
+        $audio_outdev1 \
+        $audio_outdev2 \
+        $audio_outdev3 \
+        $audio_outdev4 \
+        [expr $audio_outchan1 * ( $audio_outenable1 ? 1 : -1 ) ]\
+        [expr $audio_outchan2 * ( $audio_outenable2 ? 1 : -1 ) ]\
+        [expr $audio_outchan3 * ( $audio_outenable3 ? 1 : -1 ) ]\
+        [expr $audio_outchan4 * ( $audio_outenable4 ? 1 : -1 ) ]\
+        $audio_sr \
+        $audio_advance \
+        \;]
 }
 
 proc audio_cancel {id} {
@@ -3501,9 +3502,9 @@ proc audio_popup {name buttonname varname devlist} {
     menu $name.popup -tearoff false
 #    puts stderr [concat $devlist ]
     for {set x 0} {$x<[llength $devlist]} {incr x} {
-	$name.popup add command -label [lindex $devlist $x] \
-	    -command [list audio_popup_action \
-	    	$buttonname $varname $devlist $x] 
+        $name.popup add command -label [lindex $devlist $x] \
+            -command [list audio_popup_action \
+                $buttonname $varname $devlist $x] 
     }
     tk_popup $name.popup [winfo pointerx $name] [winfo pointery $name] 0
 }
@@ -3516,9 +3517,9 @@ proc audio_popup {name buttonname varname devlist} {
 # on and restart the dialog.
 
 proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
-    	inchan1 inchan2 inchan3 inchan4 \
-    	outdevlist outdev1 outdev2 outdev3 outdev4 \
-	outchan1 outchan2 outchan3 outchan4 sr advance multi longform} {
+        inchan1 inchan2 inchan3 inchan4 \
+        outdevlist outdev1 outdev2 outdev3 outdev4 \
+        outchan1 outchan2 outchan3 outchan4 sr advance multi longform} {
     global audio_indev1 audio_indev2 audio_indev3 audio_indev4 
     global audio_inchan1 audio_inchan2 audio_inchan3 audio_inchan4
     global audio_inenable1 audio_inenable2 audio_inenable3 audio_inenable4
@@ -3568,16 +3569,16 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "audio_cancel $id"
+        -command "audio_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "audio_apply $id"
+        -command "audio_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "audio_ok $id"
+        -command "audio_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
     
-    	# sample rate and advance
+        # sample rate and advance
     frame $id.srf
     pack $id.srf -side top
     
@@ -3587,136 +3588,136 @@ proc pdtk_audio_dialog {id indevlist indev1 indev2 indev3 indev4 \
     entry $id.srf.x2 -textvariable audio_advance -width 4
     pack $id.srf.l1 $id.srf.x1 $id.srf.l2 $id.srf.x2 -side left
     
-    	# input device 1
+        # input device 1
     frame $id.in1f
     pack $id.in1f -side top
 
     checkbutton $id.in1f.x0 -variable audio_inenable1 \
-    	-text {input device 1} -anchor e
+        -text {input device 1} -anchor e
     button $id.in1f.x1 -text [lindex $indevlist $audio_indev1] \
-    	-command [list audio_popup $id $id.in1f.x1 audio_indev1 $indevlist]
+        -command [list audio_popup $id $id.in1f.x1 audio_indev1 $indevlist]
     label $id.in1f.l2 -text "channels:"
     entry $id.in1f.x2 -textvariable audio_inchan1 -width 3
     pack $id.in1f.x0 $id.in1f.x1 $id.in1f.l2 $id.in1f.x2 -side left
 
-    	# input device 2
+        # input device 2
     if {$longform && $multi > 1 && [llength $indevlist] > 1} {
-	frame $id.in2f
-	pack $id.in2f -side top
+        frame $id.in2f
+        pack $id.in2f -side top
 
-    	checkbutton $id.in2f.x0 -variable audio_inenable2 \
-    	    -text {input device 2} -anchor e
-	button $id.in2f.x1 -text [lindex $indevlist $audio_indev2] \
-    	    -command [list audio_popup $id $id.in2f.x1 audio_indev2 $indevlist]
-	label $id.in2f.l2 -text "channels:"
-	entry $id.in2f.x2 -textvariable audio_inchan2 -width 3
-	pack $id.in2f.x0 $id.in2f.x1 $id.in2f.l2 $id.in2f.x2 -side left
+        checkbutton $id.in2f.x0 -variable audio_inenable2 \
+            -text {input device 2} -anchor e
+        button $id.in2f.x1 -text [lindex $indevlist $audio_indev2] \
+            -command [list audio_popup $id $id.in2f.x1 audio_indev2 $indevlist]
+        label $id.in2f.l2 -text "channels:"
+        entry $id.in2f.x2 -textvariable audio_inchan2 -width 3
+        pack $id.in2f.x0 $id.in2f.x1 $id.in2f.l2 $id.in2f.x2 -side left
     }
 
-    	# input device 3
+        # input device 3
     if {$longform && $multi > 1 && [llength $indevlist] > 2} {
-	frame $id.in3f
-	pack $id.in3f -side top
+        frame $id.in3f
+        pack $id.in3f -side top
 
-    	checkbutton $id.in3f.x0 -variable audio_inenable3 \
-    	    -text {input device 3} -anchor e
-	button $id.in3f.x1 -text [lindex $indevlist $audio_indev3] \
-    	    -command [list audio_popup $id $id.in3f.x1 audio_indev3 $indevlist]
-	label $id.in3f.l2 -text "channels:"
-	entry $id.in3f.x2 -textvariable audio_inchan3 -width 3
-	pack $id.in3f.x0 $id.in3f.x1 $id.in3f.l2 $id.in3f.x2 -side left
+        checkbutton $id.in3f.x0 -variable audio_inenable3 \
+            -text {input device 3} -anchor e
+        button $id.in3f.x1 -text [lindex $indevlist $audio_indev3] \
+            -command [list audio_popup $id $id.in3f.x1 audio_indev3 $indevlist]
+        label $id.in3f.l2 -text "channels:"
+        entry $id.in3f.x2 -textvariable audio_inchan3 -width 3
+        pack $id.in3f.x0 $id.in3f.x1 $id.in3f.l2 $id.in3f.x2 -side left
     }
 
-    	# input device 4
+        # input device 4
     if {$longform && $multi > 1 && [llength $indevlist] > 3} {
-	frame $id.in4f
-	pack $id.in4f -side top
+        frame $id.in4f
+        pack $id.in4f -side top
 
-    	checkbutton $id.in4f.x0 -variable audio_inenable4 \
-    	    -text {input device 4} -anchor e
-	button $id.in4f.x1 -text [lindex $indevlist $audio_indev4] \
-    	    -command [list audio_popup $id $id.in4f.x1 audio_indev4 $indevlist]
-	label $id.in4f.l2 -text "channels:"
-	entry $id.in4f.x2 -textvariable audio_inchan4 -width 3
-	pack $id.in4f.x0 $id.in4f.x1 $id.in4f.l2 $id.in4f.x2 -side left
+        checkbutton $id.in4f.x0 -variable audio_inenable4 \
+            -text {input device 4} -anchor e
+        button $id.in4f.x1 -text [lindex $indevlist $audio_indev4] \
+            -command [list audio_popup $id $id.in4f.x1 audio_indev4 $indevlist]
+        label $id.in4f.l2 -text "channels:"
+        entry $id.in4f.x2 -textvariable audio_inchan4 -width 3
+        pack $id.in4f.x0 $id.in4f.x1 $id.in4f.l2 $id.in4f.x2 -side left
     }
 
-    	# output device 1
+        # output device 1
     frame $id.out1f
     pack $id.out1f -side top
 
     checkbutton $id.out1f.x0 -variable audio_outenable1 -text {output device 1} \
-    	-anchor e
+        -anchor e
     if {$multi == 0} {
-    	label $id.out1f.l1 \
-	    -text "(same as input device) ..............      "
+        label $id.out1f.l1 \
+            -text "(same as input device) ..............      "
     } else {
-    	button $id.out1f.x1 -text [lindex $outdevlist $audio_outdev1] \
-    	    -command \
-	    [list audio_popup $id $id.out1f.x1 audio_outdev1 $outdevlist]
+        button $id.out1f.x1 -text [lindex $outdevlist $audio_outdev1] \
+            -command \
+            [list audio_popup $id $id.out1f.x1 audio_outdev1 $outdevlist]
     }
     label $id.out1f.l2 -text "channels:"
     entry $id.out1f.x2 -textvariable audio_outchan1 -width 3
     if {$multi == 0} {
-    	pack $id.out1f.x0 $id.out1f.l1 $id.out1f.x2 -side left
+        pack $id.out1f.x0 $id.out1f.l1 $id.out1f.x2 -side left
     } else {
-    	pack $id.out1f.x0 $id.out1f.x1 $id.out1f.l2 $id.out1f.x2 -side left
+        pack $id.out1f.x0 $id.out1f.x1 $id.out1f.l2 $id.out1f.x2 -side left
     }
 
-    	# output device 2
+        # output device 2
     if {$longform && $multi > 1 && [llength $indevlist] > 1} {
-	frame $id.out2f
-	pack $id.out2f -side top
+        frame $id.out2f
+        pack $id.out2f -side top
 
-    	checkbutton $id.out2f.x0 -variable audio_outenable2 \
-    	    -text {output device 2} -anchor e
-    	button $id.out2f.x1 -text [lindex $outdevlist $audio_outdev2] \
-    	    -command \
-	    [list audio_popup $id $id.out2f.x1 audio_outdev2 $outdevlist]
-	label $id.out2f.l2 -text "channels:"
-	entry $id.out2f.x2 -textvariable audio_outchan2 -width 3
-    	pack $id.out2f.x0 $id.out2f.x1 $id.out2f.l2 $id.out2f.x2 -side left
+        checkbutton $id.out2f.x0 -variable audio_outenable2 \
+            -text {output device 2} -anchor e
+        button $id.out2f.x1 -text [lindex $outdevlist $audio_outdev2] \
+            -command \
+            [list audio_popup $id $id.out2f.x1 audio_outdev2 $outdevlist]
+        label $id.out2f.l2 -text "channels:"
+        entry $id.out2f.x2 -textvariable audio_outchan2 -width 3
+        pack $id.out2f.x0 $id.out2f.x1 $id.out2f.l2 $id.out2f.x2 -side left
     }
 
-    	# output device 3
+        # output device 3
     if {$longform && $multi > 1 && [llength $indevlist] > 2} {
-	frame $id.out3f
-	pack $id.out3f -side top
+        frame $id.out3f
+        pack $id.out3f -side top
 
-    	checkbutton $id.out3f.x0 -variable audio_outenable3 \
-    	    -text {output device 3} -anchor e
-    	button $id.out3f.x1 -text [lindex $outdevlist $audio_outdev3] \
-    	    -command \
-	    [list audio_popup $id $id.out3f.x1 audio_outdev3 $outdevlist]
-	label $id.out3f.l2 -text "channels:"
-	entry $id.out3f.x2 -textvariable audio_outchan3 -width 3
-    	pack $id.out3f.x0 $id.out3f.x1 $id.out3f.l2 $id.out3f.x2 -side left
+        checkbutton $id.out3f.x0 -variable audio_outenable3 \
+            -text {output device 3} -anchor e
+        button $id.out3f.x1 -text [lindex $outdevlist $audio_outdev3] \
+            -command \
+            [list audio_popup $id $id.out3f.x1 audio_outdev3 $outdevlist]
+        label $id.out3f.l2 -text "channels:"
+        entry $id.out3f.x2 -textvariable audio_outchan3 -width 3
+        pack $id.out3f.x0 $id.out3f.x1 $id.out3f.l2 $id.out3f.x2 -side left
     }
 
-    	# output device 4
+        # output device 4
     if {$longform && $multi > 1 && [llength $indevlist] > 3} {
-	frame $id.out4f
-	pack $id.out4f -side top
+        frame $id.out4f
+        pack $id.out4f -side top
 
-    	checkbutton $id.out4f.x0 -variable audio_outenable4 \
-    	    -text {output device 4} -anchor e
-    	button $id.out4f.x1 -text [lindex $outdevlist $audio_outdev4] \
-    	    -command \
-	    [list audio_popup $id $id.out4f.x1 audio_outdev4 $outdevlist]
-	label $id.out4f.l2 -text "channels:"
-	entry $id.out4f.x2 -textvariable audio_outchan4 -width 3
-    	pack $id.out4f.x0 $id.out4f.x1 $id.out4f.l2 $id.out4f.x2 -side left
+        checkbutton $id.out4f.x0 -variable audio_outenable4 \
+            -text {output device 4} -anchor e
+        button $id.out4f.x1 -text [lindex $outdevlist $audio_outdev4] \
+            -command \
+            [list audio_popup $id $id.out4f.x1 audio_outdev4 $outdevlist]
+        label $id.out4f.l2 -text "channels:"
+        entry $id.out4f.x2 -textvariable audio_outchan4 -width 3
+        pack $id.out4f.x0 $id.out4f.x1 $id.out4f.l2 $id.out4f.x2 -side left
     }
 
-    	# if not the "long form" but if "multi" is 2, make a button to
-	# restart with longform set. 
+        # if not the "long form" but if "multi" is 2, make a button to
+        # restart with longform set. 
     
     if {$longform == 0 && $multi > 1} {
-	frame $id.longbutton
-	pack $id.longbutton -side top
-    	button $id.longbutton.b -text {use multiple devices} \
-    	    -command  {pd pd audio-properties 1 \;}
-    	pack $id.longbutton.b
+        frame $id.longbutton
+        pack $id.longbutton -side top
+        button $id.longbutton.b -text {use multiple devices} \
+            -command  {pd pd audio-properties 1 \;}
+        pack $id.longbutton.b
     }
     bind $id.srf.x1 <KeyPress-Return> [concat audio_ok $id]
     bind $id.srf.x2 <KeyPress-Return> [concat audio_ok $id]
@@ -3738,17 +3739,17 @@ proc midi_apply {id} {
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4 midi_alsain midi_alsaout
 
     pd [concat pd midi-dialog \
-    	$midi_indev1 \
-    	$midi_indev2 \
-    	$midi_indev3 \
-    	$midi_indev4 \
-    	$midi_outdev1 \
-    	$midi_outdev2 \
-    	$midi_outdev3 \
-    	$midi_outdev4 \
-    	$midi_alsain \
-    	$midi_alsaout \
-	\;]
+        $midi_indev1 \
+        $midi_indev2 \
+        $midi_indev3 \
+        $midi_indev4 \
+        $midi_outdev1 \
+        $midi_outdev2 \
+        $midi_outdev3 \
+        $midi_outdev4 \
+        $midi_alsain \
+        $midi_alsaout \
+        \;]
 }
 
 proc midi_cancel {id} {
@@ -3774,9 +3775,9 @@ proc midi_popup {name buttonname varname devlist} {
     menu $name.popup -tearoff false
 #    puts stderr [concat $devlist ]
     for {set x 0} {$x<[llength $devlist]} {incr x} {
-	$name.popup add command -label [lindex $devlist $x] \
-	    -command [list midi_popup_action \
-	    	$buttonname $varname $devlist $x] 
+        $name.popup add command -label [lindex $devlist $x] \
+            -command [list midi_popup_action \
+                $buttonname $varname $devlist $x] 
     }
     tk_popup $name.popup [winfo pointerx $name] [winfo pointery $name] 0
 }
@@ -3785,7 +3786,7 @@ proc midi_popup {name buttonname varname devlist} {
 # controls for opening several devices; if not, we get an extra button to
 # turn longform on and restart the dialog.
 proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
-    	outdevlist outdev1 outdev2 outdev3 outdev4 longform} {
+        outdevlist outdev1 outdev2 outdev3 outdev4 longform} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
     global midi_indevlist midi_outdevlist
@@ -3811,113 +3812,113 @@ proc pdtk_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "midi_cancel $id"
+        -command "midi_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "midi_apply $id"
+        -command "midi_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "midi_ok $id"
+        -command "midi_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
     
-    	# input device 1
+        # input device 1
     frame $id.in1f
     pack $id.in1f -side top
 
     label $id.in1f.l1 -text "input device 1:"
     button $id.in1f.x1 -text [lindex $indevlist $midi_indev1] \
-    	-command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
+        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
     pack $id.in1f.l1 $id.in1f.x1 -side left
 
-    	# input device 2
+        # input device 2
     if {$longform && [llength $indevlist] > 2} {
-	frame $id.in2f
-	pack $id.in2f -side top
+        frame $id.in2f
+        pack $id.in2f -side top
 
-	label $id.in2f.l1 -text "input device 2:"
-	button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
-    	    -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
-	pack $id.in2f.l1 $id.in2f.x1 -side left
+        label $id.in2f.l1 -text "input device 2:"
+        button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
+            -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
+        pack $id.in2f.l1 $id.in2f.x1 -side left
     }
 
-    	# input device 3
+        # input device 3
     if {$longform && [llength $indevlist] > 3} {
-	frame $id.in3f
-	pack $id.in3f -side top
+        frame $id.in3f
+        pack $id.in3f -side top
 
-	label $id.in3f.l1 -text "input device 3:"
-	button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
-    	    -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
-	pack $id.in3f.l1 $id.in3f.x1 -side left
+        label $id.in3f.l1 -text "input device 3:"
+        button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
+            -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
+        pack $id.in3f.l1 $id.in3f.x1 -side left
     }
 
-    	# input device 4
+        # input device 4
     if {$longform && [llength $indevlist] > 4} {
-	frame $id.in4f
-	pack $id.in4f -side top
+        frame $id.in4f
+        pack $id.in4f -side top
 
-	label $id.in4f.l1 -text "input device 4:"
-	button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
-    	    -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
-	pack $id.in4f.l1 $id.in4f.x1 -side left
+        label $id.in4f.l1 -text "input device 4:"
+        button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
+            -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
+        pack $id.in4f.l1 $id.in4f.x1 -side left
     }
 
-    	# output device 1
+        # output device 1
 
     frame $id.out1f
     pack $id.out1f -side top
     label $id.out1f.l1 -text "output device 1:"
     button $id.out1f.x1 -text [lindex $outdevlist $midi_outdev1] \
-    	-command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
+        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
     pack $id.out1f.l1 $id.out1f.x1 -side left
 
-    	# output device 2
+        # output device 2
     if {$longform && [llength $indevlist] > 2} {
-	frame $id.out2f
-	pack $id.out2f -side top
-    	label $id.out2f.l1 -text "output device 2:"
-    	button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
-    	    -command \
-	    [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
-    	pack $id.out2f.l1 $id.out2f.x1 -side left
+        frame $id.out2f
+        pack $id.out2f -side top
+        label $id.out2f.l1 -text "output device 2:"
+        button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
+            -command \
+            [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
+        pack $id.out2f.l1 $id.out2f.x1 -side left
     }
 
-    	# output device 3
+        # output device 3
     if {$longform && [llength $indevlist] > 3} {
-	frame $id.out3f
-	pack $id.out3f -side top
-    	label $id.out3f.l1 -text "output device 3:"
-    	button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
-    	    -command \
-	    [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
-    	pack $id.out3f.l1 $id.out3f.x1 -side left
+        frame $id.out3f
+        pack $id.out3f -side top
+        label $id.out3f.l1 -text "output device 3:"
+        button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
+            -command \
+            [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
+        pack $id.out3f.l1 $id.out3f.x1 -side left
     }
 
-    	# output device 4
+        # output device 4
     if {$longform && [llength $indevlist] > 4} {
-	frame $id.out4f
-	pack $id.out4f -side top
-    	label $id.out4f.l1 -text "output device 4:"
-    	button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
-    	    -command \
-	    [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
-    	pack $id.out4f.l1 $id.out4f.x1 -side left
+        frame $id.out4f
+        pack $id.out4f -side top
+        label $id.out4f.l1 -text "output device 4:"
+        button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
+            -command \
+            [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
+        pack $id.out4f.l1 $id.out4f.x1 -side left
     }
 
-    	# if not the "long form" make a button to
-	# restart with longform set. 
+        # if not the "long form" make a button to
+        # restart with longform set. 
     
     if {$longform == 0} {
-	frame $id.longbutton
-	pack $id.longbutton -side top
-    	button $id.longbutton.b -text {use multiple devices} \
-    	    -command  {pd pd midi-properties 1 \;}
-    	pack $id.longbutton.b
+        frame $id.longbutton
+        pack $id.longbutton -side top
+        button $id.longbutton.b -text {use multiple devices} \
+            -command  {pd pd midi-properties 1 \;}
+        pack $id.longbutton.b
     }
 }
 
 proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
-    	outdevlist outdev1 outdev2 outdev3 outdev4 longform alsa} {
+        outdevlist outdev1 outdev2 outdev3 outdev4 longform alsa} {
     global midi_indev1 midi_indev2 midi_indev3 midi_indev4 
     global midi_outdev1 midi_outdev2 midi_outdev3 midi_outdev4
     global midi_indevlist midi_outdevlist
@@ -3943,11 +3944,11 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "midi_cancel $id"
+        -command "midi_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "midi_apply $id"
+        -command "midi_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "midi_ok $id"
+        -command "midi_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
@@ -3956,104 +3957,104 @@ proc pdtk_alsa_midi_dialog {id indevlist indev1 indev2 indev3 indev4 \
     pack $id.in1f -side top
 
   if {$alsa == 0} {
-    	# input device 1
+        # input device 1
     label $id.in1f.l1 -text "input device 1:"
     button $id.in1f.x1 -text [lindex $indevlist $midi_indev1] \
-    	-command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
+        -command [list midi_popup $id $id.in1f.x1 midi_indev1 $indevlist]
     pack $id.in1f.l1 $id.in1f.x1 -side left
 
-    	# input device 2
+        # input device 2
     if {$longform && [llength $indevlist] > 2} {
-	frame $id.in2f
-	pack $id.in2f -side top
+        frame $id.in2f
+        pack $id.in2f -side top
 
-	label $id.in2f.l1 -text "input device 2:"
-	button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
-    	    -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
-	pack $id.in2f.l1 $id.in2f.x1 -side left
+        label $id.in2f.l1 -text "input device 2:"
+        button $id.in2f.x1 -text [lindex $indevlist $midi_indev2] \
+            -command [list midi_popup $id $id.in2f.x1 midi_indev2 $indevlist]
+        pack $id.in2f.l1 $id.in2f.x1 -side left
     }
 
-    	# input device 3
+        # input device 3
     if {$longform && [llength $indevlist] > 3} {
-	frame $id.in3f
-	pack $id.in3f -side top
+        frame $id.in3f
+        pack $id.in3f -side top
 
-	label $id.in3f.l1 -text "input device 3:"
-	button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
-    	    -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
-	pack $id.in3f.l1 $id.in3f.x1 -side left
+        label $id.in3f.l1 -text "input device 3:"
+        button $id.in3f.x1 -text [lindex $indevlist $midi_indev3] \
+            -command [list midi_popup $id $id.in3f.x1 midi_indev3 $indevlist]
+        pack $id.in3f.l1 $id.in3f.x1 -side left
     }
 
-    	# input device 4
+        # input device 4
     if {$longform && [llength $indevlist] > 4} {
-	frame $id.in4f
-	pack $id.in4f -side top
+        frame $id.in4f
+        pack $id.in4f -side top
 
-	label $id.in4f.l1 -text "input device 4:"
-	button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
-    	    -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
-	pack $id.in4f.l1 $id.in4f.x1 -side left
+        label $id.in4f.l1 -text "input device 4:"
+        button $id.in4f.x1 -text [lindex $indevlist $midi_indev4] \
+            -command [list midi_popup $id $id.in4f.x1 midi_indev4 $indevlist]
+        pack $id.in4f.l1 $id.in4f.x1 -side left
     }
 
-    	# output device 1
+        # output device 1
 
     frame $id.out1f
     pack $id.out1f -side top
     label $id.out1f.l1 -text "output device 1:"
     button $id.out1f.x1 -text [lindex $outdevlist $midi_outdev1] \
-    	-command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
+        -command [list midi_popup $id $id.out1f.x1 midi_outdev1 $outdevlist]
     pack $id.out1f.l1 $id.out1f.x1 -side left
 
-    	# output device 2
+        # output device 2
     if {$longform && [llength $indevlist] > 2} {
-	frame $id.out2f
-	pack $id.out2f -side top
-    	label $id.out2f.l1 -text "output device 2:"
-    	button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
-    	    -command \
-	    [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
-    	pack $id.out2f.l1 $id.out2f.x1 -side left
+        frame $id.out2f
+        pack $id.out2f -side top
+        label $id.out2f.l1 -text "output device 2:"
+        button $id.out2f.x1 -text [lindex $outdevlist $midi_outdev2] \
+            -command \
+            [list midi_popup $id $id.out2f.x1 midi_outdev2 $outdevlist]
+        pack $id.out2f.l1 $id.out2f.x1 -side left
     }
 
-    	# output device 3
+        # output device 3
     if {$longform && [llength $indevlist] > 3} {
-	frame $id.out3f
-	pack $id.out3f -side top
-    	label $id.out3f.l1 -text "output device 3:"
-    	button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
-    	    -command \
-	    [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
-    	pack $id.out3f.l1 $id.out3f.x1 -side left
+        frame $id.out3f
+        pack $id.out3f -side top
+        label $id.out3f.l1 -text "output device 3:"
+        button $id.out3f.x1 -text [lindex $outdevlist $midi_outdev3] \
+            -command \
+            [list midi_popup $id $id.out3f.x1 midi_outdev3 $outdevlist]
+        pack $id.out3f.l1 $id.out3f.x1 -side left
     }
 
-    	# output device 4
+        # output device 4
     if {$longform && [llength $indevlist] > 4} {
-	frame $id.out4f
-	pack $id.out4f -side top
-    	label $id.out4f.l1 -text "output device 4:"
-    	button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
-    	    -command \
-	    [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
-    	pack $id.out4f.l1 $id.out4f.x1 -side left
+        frame $id.out4f
+        pack $id.out4f -side top
+        label $id.out4f.l1 -text "output device 4:"
+        button $id.out4f.x1 -text [lindex $outdevlist $midi_outdev4] \
+            -command \
+            [list midi_popup $id $id.out4f.x1 midi_outdev4 $outdevlist]
+        pack $id.out4f.l1 $id.out4f.x1 -side left
     }
 
-    	# if not the "long form" make a button to
-	# restart with longform set. 
+        # if not the "long form" make a button to
+        # restart with longform set. 
     
     if {$longform == 0} {
-	frame $id.longbutton
-	pack $id.longbutton -side top
-    	button $id.longbutton.b -text {use multiple alsa devices} \
-    	    -command  {pd pd midi-properties 1 \;}
-    	pack $id.longbutton.b
+        frame $id.longbutton
+        pack $id.longbutton -side top
+        button $id.longbutton.b -text {use multiple alsa devices} \
+            -command  {pd pd midi-properties 1 \;}
+        pack $id.longbutton.b
     }
     }
     if {$alsa} {
-    	label $id.in1f.l1 -text "In Ports:"
-    	entry $id.in1f.x1 -textvariable midi_alsain -width 4
+        label $id.in1f.l1 -text "In Ports:"
+        entry $id.in1f.x1 -textvariable midi_alsain -width 4
         pack $id.in1f.l1 $id.in1f.x1 -side left
-	label $id.in1f.l2 -text "Out Ports:"
-    	entry $id.in1f.x2 -textvariable midi_alsaout -width 4
+        label $id.in1f.l2 -text "Out Ports:"
+        entry $id.in1f.x2 -textvariable midi_alsaout -width 4
         pack $id.in1f.l2 $id.in1f.x2 -side left
     }
 }
@@ -4096,11 +4097,11 @@ proc pdtk_path_dialog {id extrapath verbose} {
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "path_cancel $id"
+        -command "path_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "path_apply $id"
+        -command "path_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "path_ok $id"
+        -command "path_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
@@ -4108,27 +4109,27 @@ proc pdtk_path_dialog {id extrapath verbose} {
     frame $id.extraframe
     pack $id.extraframe -side bottom -fill x -pady 2m
     checkbutton $id.extraframe.extra -text {use standard extensions} \
-	-variable pd_extrapath -anchor w 
+        -variable pd_extrapath -anchor w 
     checkbutton $id.extraframe.verbose -text {verbose} \
-	-variable pd_verbose -anchor w 
+        -variable pd_verbose -anchor w 
     button $id.extraframe.save -text {Save all settings}\
-    	-command "path_apply $id \; pd pd save-preferences \\;"
+        -command "path_apply $id \; pd pd save-preferences \\;"
     pack $id.extraframe.extra $id.extraframe.verbose $id.extraframe.save \
-    	-side left -expand 1
+        -side left -expand 1
     
     for {set x 0} {$x < 10} {incr x} {
-	entry $id.f$x -textvariable pd_path$x -width 80
-    	bind $id.f$x <KeyPress-Return> [concat path_ok $id]
-    	pdtk_standardkeybindings $id.f$x
-	pack $id.f$x -side top
+        entry $id.f$x -textvariable pd_path$x -width 80
+        bind $id.f$x <KeyPress-Return> [concat path_ok $id]
+        pdtk_standardkeybindings $id.f$x
+        pack $id.f$x -side top
     }
 
     focus $id.f0
 }
 
 proc pd_set {var value} {
-	global $var
-	set $var $value
+        global $var
+        set $var $value
 }
 
 ########## pdtk_startup_dialog -- dialog window for startup options #########
@@ -4170,11 +4171,11 @@ proc pdtk_startup_dialog {id nort flags} {
     frame $id.buttonframe
     pack $id.buttonframe -side bottom -fill x -pady 2m
     button $id.buttonframe.cancel -text {Cancel}\
-    	-command "startup_cancel $id"
+        -command "startup_cancel $id"
     button $id.buttonframe.apply -text {Apply}\
-    	-command "startup_apply $id"
+        -command "startup_apply $id"
     button $id.buttonframe.ok -text {OK}\
-    	-command "startup_ok $id"
+        -command "startup_ok $id"
     pack $id.buttonframe.cancel -side left -expand 1
     pack $id.buttonframe.apply -side left -expand 1
     pack $id.buttonframe.ok -side left -expand 1
@@ -4190,22 +4191,22 @@ proc pdtk_startup_dialog {id nort flags} {
     frame $id.nortframe
     pack $id.nortframe -side bottom -fill x -pady 2m
     if {$pd_nt != 1} {
-    	checkbutton $id.nortframe.nort -text {defeat real-time scheduling} \
-	    -variable pd_nort -anchor w
+        checkbutton $id.nortframe.nort -text {defeat real-time scheduling} \
+            -variable pd_nort -anchor w
     }
     button $id.nortframe.save -text {Save all settings}\
-    	-command "startup_apply $id \; pd pd save-preferences \\;"
+        -command "startup_apply $id \; pd pd save-preferences \\;"
     if {$pd_nt != 1} {
-    	pack $id.nortframe.nort $id.nortframe.save -side left -expand 1
+        pack $id.nortframe.nort $id.nortframe.save -side left -expand 1
     } else {
-    	pack $id.nortframe.save -side left -expand 1
+        pack $id.nortframe.save -side left -expand 1
     }
 
     for {set x 0} {$x < 10} {incr x} {
-	entry $id.f$x -textvariable pd_startup$x -width 80
-    	bind $id.f$x <KeyPress-Return> [concat startup_ok $id]
-    	pdtk_standardkeybindings $id.f$x
-	pack $id.f$x -side top
+        entry $id.f$x -textvariable pd_startup$x -width 80
+        bind $id.f$x <KeyPress-Return> [concat startup_ok $id]
+        pdtk_standardkeybindings $id.f$x
+        pack $id.f$x -side top
     }
 
     focus $id.f0

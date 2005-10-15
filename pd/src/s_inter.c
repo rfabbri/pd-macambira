@@ -284,6 +284,7 @@ void sys_set_priority(int higher)
        fprintf(stderr, "priority %d scheduling enabled.\n", p3);
 #endif
 
+#ifdef REALLY_POSIX_MEMLOCK /* this doesn't work on Fedora 4, for example. */
 #ifdef _POSIX_MEMLOCK
     /* tb: force memlock to physical memory { */
     {
@@ -296,7 +297,7 @@ void sys_set_priority(int higher)
     if (mlockall(MCL_FUTURE) != -1) 
         fprintf(stderr, "memory locking enabled.\n");
 #endif
-
+#endif
 }
 
 #endif /* __linux__ */

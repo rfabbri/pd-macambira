@@ -25,6 +25,12 @@ typedef long t_pa_sample;
 #define SYS_BYTESPERCHAN (DEFDACBLKSIZE * SYS_SAMPLEWIDTH) 
 #define SYS_XFERSAMPS (SYS_DEFAULTCH*DEFDACBLKSIZE)
 #define SYS_XFERSIZE (SYS_SAMPLEWIDTH * SYS_XFERSAMPS)
+#define MAXNDEV 20
+#define DEVDESCSIZE 80
+
+static void audio_getdevs(char *indevlist, int *nindevs,
+    char *outdevlist, int *noutdevs, int *canmulti, 
+        int maxndev, int devdescsize);
 
     /* these are set in this file when opening audio, but then may be reduced,
     even to zero, in the system dependent open_audio routines. */
@@ -167,6 +173,11 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     int inchans, outchans;
     int realinchans[MAXAUDIOINDEV], realoutchans[MAXAUDIOOUTDEV];
 
+    char indevlist[MAXNDEV*DEVDESCSIZE], outdevlist[MAXNDEV*DEVDESCSIZE];
+    int indevs = 0, outdevs = 0, canmulti = 0;
+    audio_getdevs(indevlist, &indevs, outdevlist, &outdevs, &canmulti,
+        MAXNDEV, DEVDESCSIZE);
+
     if (sys_externalschedlib)
     {
         return;
@@ -188,10 +199,14 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     {           /* no input audio devices specified */
         if (nchindev == -1)
         {
-            nchindev=1;
-            chindev[0] = defaultchannels;
-            naudioindev = 1;
-            audioindev[0] = DEFAULTAUDIODEV;
+            if (indevs >= 1)
+            {
+                nchindev=1;
+                chindev[0] = defaultchannels;
+                naudioindev = 1;
+                audioindev[0] = DEFAULTAUDIODEV;
+            }
+            else naudioindev = nchindev = 0;
         }
         else
         {
@@ -234,10 +249,14 @@ void sys_open_audio(int naudioindev, int *audioindev, int nchindev,
     {           /* not set */
         if (nchoutdev == -1)
         {
-            nchoutdev=1;
-            choutdev[0]=defaultchannels;
-            naudiooutdev=1;
-            audiooutdev[0] = DEFAULTAUDIODEV;
+            if (outdevs >= 1)
+            {
+                nchoutdev=1;
+                choutdev[0]=defaultchannels;
+                naudiooutdev=1;
+                audiooutdev[0] = DEFAULTAUDIODEV;
+            }
+            else nchoutdev = naudiooutdev = 0;
         }
         else
         {
@@ -500,9 +519,6 @@ void sys_reportidle(void)
 {
 }
 
-#define MAXNDEV 20
-#define DEVDESCSIZE 80
-
 static void audio_getdevs(char *indevlist, int *nindevs,
     char *outdevlist, int *noutdevs, int *canmulti, 
         int maxndev, int devdescsize)
@@ -604,6 +620,7 @@ static void sys_listaudiodevs(void )
     }
     post("API number %d\n", sys_audioapi);
 }
+
 
     /* start an audio settings dialog window */
 void glob_audio_properties(t_pd *dummy, t_floatarg flongform)

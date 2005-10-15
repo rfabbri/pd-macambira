@@ -257,6 +257,7 @@ static void sys_donesavepreferences( void)
 
 #endif /* MACOSX */
 
+
 void sys_loadpreferences( void)
 {
     int naudioindev, audioindev[MAXAUDIOINDEV], chindev[MAXAUDIOINDEV];
@@ -265,13 +266,14 @@ void sys_loadpreferences( void)
     int nmidioutdev, midioutdev[MAXMIDIOUTDEV];
     int i, rate = 0, advance = 0, api, nolib, maxi;
     char prefbuf[MAXPDSTRING], keybuf[80];
+
     sys_initloadpreferences();
         /* load audio preferences */
     if (sys_getpreference("audioapi", prefbuf, MAXPDSTRING)
         && sscanf(prefbuf, "%d", &api) > 0)
             sys_set_audio_api(api);
     if (sys_getpreference("noaudioin", prefbuf, MAXPDSTRING) &&
-        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
             naudioindev = 0;
     else
     {
@@ -289,7 +291,7 @@ void sys_loadpreferences( void)
             naudioindev = -1;
     }
     if (sys_getpreference("noaudioout", prefbuf, MAXPDSTRING) &&
-        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
             naudiooutdev = 0;
     else
     {
@@ -314,7 +316,7 @@ void sys_loadpreferences( void)
         
         /* load MIDI preferences */
     if (sys_getpreference("nomidiin", prefbuf, MAXPDSTRING) &&
-        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
             nmidiindev = 0;
     else for (i = 0, nmidiindev = 0; i < MAXMIDIINDEV; i++)
     {
@@ -326,7 +328,7 @@ void sys_loadpreferences( void)
         nmidiindev++;
     }
     if (sys_getpreference("nomidiout", prefbuf, MAXPDSTRING) &&
-        !strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))
+        (!strcmp(prefbuf, ".") || !strcmp(prefbuf, "True"))) /* JMZ/MB: brackets for initializing */
             nmidioutdev = 0;
     else for (i = 0, nmidioutdev = 0; i < MAXMIDIOUTDEV; i++)
     {

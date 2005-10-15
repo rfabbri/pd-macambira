@@ -65,6 +65,7 @@ open/save panel to take messages to init directory, and to set extent list
 flags to defeat pre-loading specified classes
 expr to parse exponential notation
 pipe to handle symbols&pointers (just takes floats now???)
+use snd_pcm_poll_descriptors_count, etc., to set alsa FDs CLOEXEC?
 editing:
     "enter" into object box to create new one (also, change border? forking?)
     tab to jump to a connected object (first one?) (shift-tab to back up?)
