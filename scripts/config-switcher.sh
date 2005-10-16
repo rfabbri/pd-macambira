@@ -6,43 +6,69 @@
 
 print_usage() {
 	 echo "Usage: "
-	 echo "To select a config file:"
-	 echo "   $0 select CONFIG_NAME"
+	 echo "To load a config file:"
+	 echo "   $0 load CONFIG_NAME"
+	 echo " "
 	 echo "To save the current config to file:"
 	 echo "   $0 save CONFIG_NAME"
+	 echo " "
 	 echo "To delete the current config:"
 	 echo "   $0 delete CONFIG_NAME"
+	 echo " "
 	 echo "To list existing configs:"
 	 echo "   $0 list"
+	 echo " "
+	 echo "To use the .pdrc instead, add '--pdrc':"
+	 echo "   $0 --pdrc load CONFIG_NAME"
+	 echo "   $0 --pdrc save CONFIG_NAME"
+	 echo "   $0 --pdrc delete CONFIG_NAME"
+	 echo "   $0 --pdrc list"
 	 exit
 }
 
 #==============================================================================#
 # THE PROGRAM
 
-# location of pref file that Pd reads
-case `uname` in
-	 Darwin)
-		  CONFIG_DIR=~/Library/Preferences
-		  CONFIG_FILE=org.puredata.pd.plist
-		  ;;
-	 *)
+if [ $# -eq 0 ]; then
+	 print_usage
+else
+	 # get the command line arguments
+	 if [ $1 == "--pdrc" ]; then
 		  CONFIG_DIR=~
 		  CONFIG_FILE=.pdrc
-		  ;;
-esac
-
-# everything happens in this dir
-cd $CONFIG_DIR
-
-if [ $# -gt 1 ]; then
-	 save_file="$CONFIG_FILE-$2"
-	 case $1 in
-		  select)
+		  COMMAND=$2
+		  CONFIG_NAME=$3
+	 else
+		  COMMAND=$1
+		  CONFIG_NAME=$2
+    # location of pref file that Pd reads
+		  case `uname` in
+				Darwin)
+					 CONFIG_DIR=~/Library/Preferences
+					 CONFIG_FILE=org.puredata.pd.plist
+					 ;;
+				Linux)
+					 CONFIG_DIR=~
+					 CONFIG_FILE=.pdsettings
+					 ;;
+				*)
+					 echo "Not supported on this platform."
+					 exit
+					 ;;
+		  esac
+	 fi
+	 
+    # everything happens in this dir
+	 cd $CONFIG_DIR
+	 
+	 save_file="$CONFIG_DIR/$CONFIG_FILE-$CONFIG_NAME"
+	 case $COMMAND in
+		  load)
 				if [ -e "$save_file" ]; then
 					 test -e "$CONFIG_FILE" && mv "$CONFIG_FILE" /tmp
-					 ln -s "$save_file" "$CONFIG_FILE" && \
-						  echo "Pd config \"$save_file\" selected." 
+					 rm "$CONFIG_FILE"
+					 cp "$save_file" "$CONFIG_FILE" && \
+						  echo "Pd config \"$save_file\" loaded." 
 				else
 					 echo "\"$save_file\" doesn't exist.  No action taken."
 				fi
@@ -50,7 +76,7 @@ if [ $# -gt 1 ]; then
 		  save)
 				if [ -e "$CONFIG_DIR/$CONFIG_FILE" ]; then
 					 cp "$CONFIG_FILE" "$save_file" && \
-						  echo "Pd config \"$2\" saved." 
+						  echo "Pd config \"$CONFIG_NAME\" saved." 
 				else
 					 echo "\"$CONFIG_FILE\" doesn't exist.  No action taken."
 				fi
@@ -60,19 +86,13 @@ if [ $# -gt 1 ]; then
 					 rm "$save_file" && \
 						  echo "Pd config \"$save_file\" deleted." 
 				else
-					 echo "\"$CONFIG_FILE\" doesn't exist.  No action taken."
+					 echo "\"$save_file\" doesn't exist.  No action taken."
 				fi
 				;;
-		  *) print_usage ;;
-	 esac
-else
-	 case $1 in
  		  list)
 				echo "Available configs:"
 				\ls -1 ${CONFIG_FILE}*
 				;;
-		  *)
-				print_usage
-				;; 
+		  *) print_usage ;;
 	 esac
 fi
