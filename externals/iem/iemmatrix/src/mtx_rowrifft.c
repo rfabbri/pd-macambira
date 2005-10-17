@@ -79,65 +79,54 @@ static void ifftPrepareReal (int n, t_float *re, t_float *im)
 
 static void *newMTXRowrifft (t_symbol *s, int argc, t_atom *argv)
 {
-  MTXRowrifft *mtx_rowrifft_obj = (MTXRowrifft *) pd_new (mtx_rowrifft_class);
-  inlet_new(&mtx_rowrifft_obj->x_obj, &mtx_rowrifft_obj->x_obj.ob_pd, gensym("matrix"),gensym(""));
-  mtx_rowrifft_obj->list_re_out = outlet_new (&mtx_rowrifft_obj->x_obj, gensym("matrix"));
-  return ((void *) mtx_rowrifft_obj);
+  MTXRowrifft *x = (MTXRowrifft *) pd_new (mtx_rowrifft_class);
+  inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("matrix"),gensym(""));
+  x->list_re_out = outlet_new (&x->x_obj, gensym("matrix"));
+  return ((void *) x);
 } 
 
 
-static void mTXrowrifftMatrixCold (MTXRowrifft *mtx_rowrifft_obj, t_symbol *s, 
+static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s, 
 				   int argc, t_atom *argv)
 {
-  //mTXrowrifftList (mtx_rowrifft_obj, s, argc-2, argv+2);
+  //mTXrowrifftList (x, s, argc-2, argv+2);
   int rows = atom_getint (argv++);
   int columns_re = atom_getint (argv++);
   int in_size = argc-2;
-  int columns = (columns_re-1)<<1;
+  int columns = columns_re<<1;
   int size2 = columns_re * rows;
   int size = rows * columns;
   int ifft_count;
-  t_atom *ptr_re = mtx_rowrifft_obj->list_re;
-  t_float *f_re = mtx_rowrifft_obj->f_re;
-  t_float *f_im = mtx_rowrifft_obj->f_im;
+  t_atom *list_re = x->list_re;
+  t_float *f_re = x->f_re;
+  t_float *f_im = x->f_im;
 
   // ifftsize check
   if (!size)
     post("mtx_rowrifft: invalid dimensions");
   else if (in_size < size2)
     post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
+  else if (columns<4)
+    post("mtx_rowrifft: too small matrices");
   else if (columns == (1 << ilog2(columns))) {
+
     // memory things
-    if (f_re) {
-      if (size != mtx_rowrifft_obj->size) {
-	f_re = (t_float *) resizebytes (f_re, 
-					sizeof (t_float) * mtx_rowrifft_obj->size,
-					sizeof (t_float) * size);
-	f_im = (t_float *) resizebytes (f_im, 
-					sizeof (t_float) * mtx_rowrifft_obj->size,
-					sizeof (t_float) * size);
-	ptr_re = (t_atom *) resizebytes (ptr_re,
-					 sizeof (t_atom) * (mtx_rowrifft_obj->size + 2),
-					 sizeof (t_atom) * (size + 2));
-      }
-    }
-    else {
-      f_re = (t_float *) getbytes (sizeof (t_float) * size);
-      f_im = (t_float *) getbytes (sizeof (t_float) * size);
-      ptr_re = (t_atom *) getbytes (sizeof (t_atom) * (size + 2));
-    }
-    mtx_rowrifft_obj->size = size;
-    mtx_rowrifft_obj->size2 = size2;
-    mtx_rowrifft_obj->rows = rows;
-    mtx_rowrifft_obj->columns = columns;
-    mtx_rowrifft_obj->columns_re = columns_re;
-    mtx_rowrifft_obj->list_re = ptr_re;
-    mtx_rowrifft_obj->f_re = f_re;
-    mtx_rowrifft_obj->f_im = f_im;
+    f_re=(t_float*)realloc(f_re, sizeof(t_float)*size);
+    f_im=(t_float*)realloc(f_im, sizeof(t_float)*size);
+    list_re=(t_atom*)realloc(list_re, sizeof(t_atom)*(size+2));
+
+    x->size = size;
+    x->size2 = size2;
+    x->rows = rows;
+    x->columns = columns;
+    x->columns_re = columns_re;
+    x->list_re = list_re;
+    x->f_re = f_re;
+    x->f_im = f_im;
       
     // main part: reading imaginary part
     ifft_count = rows;
-    mtx_rowrifft_obj->renorm_fac = 1.0f / columns;
+    x->renorm_fac = 1.0f / columns;
     while (ifft_count--) {
       readFloatFromList (columns_re, argv, f_im);
       argv += columns_re;
@@ -149,34 +138,33 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *mtx_rowrifft_obj, t_symbol *s,
     post("mtx_rowrifft: rowvector size no power of 2!");
 }
 
-static void mTXrowrifftMatrixHot (MTXRowrifft *mtx_rowrifft_obj, t_symbol *s, 
+static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s, 
 				  int argc, t_atom *argv)
 {
-  //mTXrowrifftList (mtx_rowrifft_obj, s, argc-2, argv+2);
+  //mTXrowrifftList (x, s, argc-2, argv+2);
   int rows = atom_getint (argv++);
   int columns_re = atom_getint (argv++);
-  int columns = mtx_rowrifft_obj->columns;
-  int size = mtx_rowrifft_obj->size;
+  int columns = x->columns;
+  int size = x->size;
   int in_size = argc-2;
-  int size2 = mtx_rowrifft_obj->size2;
+  int size2 = x->size2;
   int ifft_count;
-  t_atom *ptr_re = mtx_rowrifft_obj->list_re;
-  t_float *f_re = mtx_rowrifft_obj->f_re;
-  t_float *f_im = mtx_rowrifft_obj->f_im;
-  t_float renorm_fac;
+  t_atom *ptr_re = x->list_re;
+  t_float *f_re = x->f_re;
+  t_float *f_im = x->f_im;
+  t_float renorm_fac = x->renorm_fac;
 
   // ifftsize check
-  if ((rows != mtx_rowrifft_obj->rows) || 
-      (columns_re != mtx_rowrifft_obj->columns_re))
+  if ((rows != x->rows) || 
+      (columns_re != x->columns_re))
     post("mtx_rowrifft: matrix dimensions do not match");
   else if (in_size<size2)
     post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
-  else if (!mtx_rowrifft_obj->size2)
+  else if (!x->size2)
     post("mtx_rowrifft: invalid right side matrix");
   else { // main part
     ifft_count = rows;
     ptr_re += 2;
-    renorm_fac = mtx_rowrifft_obj->renorm_fac;
     while (ifft_count--){ 
       readFloatFromList (columns_re, argv, f_re);
       ifftPrepareReal (columns, f_re, f_im);
@@ -187,36 +175,32 @@ static void mTXrowrifftMatrixHot (MTXRowrifft *mtx_rowrifft_obj, t_symbol *s,
       ptr_re += columns;
       argv += columns_re;
     }
-    ptr_re = mtx_rowrifft_obj->list_re;
-    f_re = mtx_rowrifft_obj->f_re;
-    size2 = mtx_rowrifft_obj->size2;
+    ptr_re = x->list_re;
+    f_re = x->f_re;
+    size2 = x->size2;
 
     SETSYMBOL(ptr_re, gensym("matrix"));
     SETFLOAT(ptr_re, rows);
-    SETFLOAT(&ptr_re[1], mtx_rowrifft_obj->columns);
+    SETFLOAT(&ptr_re[1], x->columns);
     writeFloatIntoList (size, ptr_re+2, f_re);
-    outlet_anything(mtx_rowrifft_obj->list_re_out, gensym("matrix"), size+2, ptr_re);
+    outlet_anything(x->list_re_out, gensym("matrix"), size+2, ptr_re);
   }
 }
 
-static void mTXrowrifftBang (MTXRowrifft *mtx_rowrifft_obj)
+static void mTXrowrifftBang (MTXRowrifft *x)
 {
-  if (mtx_rowrifft_obj->list_re)
-    outlet_anything(mtx_rowrifft_obj->list_re_out, gensym("matrix"), 
-		    mtx_rowrifft_obj->size+2, mtx_rowrifft_obj->list_re);
+  if (x->list_re)
+    outlet_anything(x->list_re_out, gensym("matrix"), 
+		    x->size+2, x->list_re);
 }
 
 
-static void deleteMTXRowrifft (MTXRowrifft *mtx_rowrfft_obj) 
+static void deleteMTXRowrifft (MTXRowrifft *x) 
 {
-  if (mtx_rowrfft_obj->f_re)
-    freebytes (mtx_rowrfft_obj->f_re, sizeof(t_float)*mtx_rowrfft_obj->size);
-  if (mtx_rowrfft_obj->f_im)
-    freebytes (mtx_rowrfft_obj->f_im, sizeof(t_float)*mtx_rowrfft_obj->size);
-  if (mtx_rowrfft_obj->list_re)
-    freebytes (mtx_rowrfft_obj->list_re, sizeof(t_atom)*(mtx_rowrfft_obj->size2+2));
-  if (mtx_rowrfft_obj->list_im)
-    freebytes (mtx_rowrfft_obj->list_im, sizeof(t_atom)*(mtx_rowrfft_obj->size2+2));
+  free(x->f_re);
+  free(x->f_im);
+  free(x->list_re);
+  free(x->list_im);
 }
 
 static void mtx_rowrifft_setup (void)
