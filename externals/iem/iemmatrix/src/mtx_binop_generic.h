@@ -26,6 +26,12 @@
 #define MTXBIN_SHORTNAME2(s1) MTXBIN_STRINGNAME ("mtx_",s1)
 #define MTXBIN_SHORTNAME MTXBIN_SHORTNAME2 (MTXBIN_GENERIC__OPERATOR)
 
+#define MTXBIN_HELPNAME2(s1) MTXBIN_STRINGNAME("iemmatrix/",s1)
+#ifdef MTXBIN_HELPNAME
+# define MTXBIN_REALHELPNAME MTXBIN_HELPNAME2(MTXBIN_HELPNAME)
+#else
+# define MTXBIN_REALHELPNAME MTXBIN_HELPNAME2(MTXBIN_GENERIC__NAME)
+#endif
 
 #define MTXBIN_IEMSETUP_EXPAND(s1) ie ## s1 ## _setup
 #define MTXBIN_IEMSETUP(s1)  MTXBIN_IEMSETUP_EXPAND (s1)
@@ -196,8 +202,8 @@ void MTXBIN_APPEND(_setup) (void)
   class_addlist  (MTXBIN_APPEND(_scalarclass), mtxbin_scalar_list);
   class_addbang  (MTXBIN_APPEND(_scalarclass), mtx_binscalar_bang);
 
-  class_sethelpsymbol(MTXBIN_APPEND(_class), gensym("iemmatrix/mtx_logical"));
-  class_sethelpsymbol(MTXBIN_APPEND(_scalarclass), gensym("iemmatrix/mtx_logical"));
+  class_sethelpsymbol(MTXBIN_APPEND(_class), gensym(MTXBIN_REALHELPNAME));
+  class_sethelpsymbol(MTXBIN_APPEND(_scalarclass), gensym(MTXBIN_REALHELPNAME));
 }
 
 void MTXBIN_IEMSETUP(MTXBIN_GENERIC__NAME)  (void)
