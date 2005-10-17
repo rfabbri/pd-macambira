@@ -38,25 +38,25 @@ static void mtxbin_scalar_matrix (t_mtx_binscalar *x, t_symbol *s, int argc, t_a
   int n=argc-2;
   int row=atom_getint(argv), col=atom_getint(argv+1);
 #ifdef MTXBIN_GENERIC__INTEGEROP
-  t_int offset=x->f;
+  t_int offset=(t_int)x->f;
 #else
   t_float offset=x->f;
 #endif
   t_atom *buf;
   t_atom *ap=argv+2;
 
-  if(argc<2){post("mtx_&&: crippled matrix");return; }
+  if(argc<2){post( MTXBIN_SHORTNAME ": crippled matrix");return; }
   adjustsize(&x->m, row, col);
 
   buf=x->m.atombuffer+2;
-
   while(n--){
-    buf->a_type = A_FLOAT;
 #ifdef MTXBIN_GENERIC__INTEGEROP
-    buf++->a_w.w_float = atom_getint(ap++) MTXBIN_GENERIC__OPERATOR offset;
+    buf->a_w.w_float = atom_getint(ap) MTXBIN_GENERIC__OPERATOR offset;
 #else
-    buf++->a_w.w_float = atom_getfloat(ap++) MTXBIN_GENERIC__OPERATOR offset;
+    buf->a_w.w_float = atom_getfloat(ap) MTXBIN_GENERIC__OPERATOR offset;
 #endif
+    buf->a_type = A_FLOAT;
+    buf++; ap++;
   }
   outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
 }
@@ -92,9 +92,9 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
   t_atom *m2 = x->m2.atombuffer+2;
   int n = argc-2;
 
-  if (argc<2){    post("mtx_&&: crippled matrix");    return;  }
-  if ((col<1)||(row<1)) {    post("mtx_&&: invalid dimensions");    return;  }
-  if (col*row>argc-2){    post("sparse matrix not yet suppandted : use \"mtx_check\"");    return;  }
+  if (argc<2){    post( MTXBIN_SHORTNAME ": crippled matrix");    return;  }
+  if ((col<1)||(row<1)) {    post( MTXBIN_SHORTNAME ": invalid dimensions");    return;  }
+  if (col*row>argc-2){    post( MTXBIN_SHORTNAME ":sparse matrix not yet suppandted : use \"mtx_check\"");    return;  }
 
   if (!(x->m2.col*x->m2.row)) {
     outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, argv);
@@ -102,7 +102,7 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
   }
 
   if ((col!=x->m2.col)||(row!=x->m2.row)){ 
-    post("mtx_&&: matrix dimensions do not match");
+    post( MTXBIN_SHORTNAME ": matrix dimensions do not match");
     /* LATER SOLVE THIS */    
     return;
   }
@@ -111,10 +111,11 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
 
   while(n--){
 #ifdef MTXBIN_GENERIC__INTEGEROP
-    t_float f = (t_float)(atom_getint(m1++) MTXBIN_GENERIC__OPERATOR atom_getint(m2++));
+    t_float f = (t_float)(atom_getint(m1) MTXBIN_GENERIC__OPERATOR atom_getint(m2));
 #else
-    t_float f = atom_getfloat(m1++) MTXBIN_GENERIC__OPERATOR atom_getfloat(m2++);
+    t_float f = atom_getfloat(m1) MTXBIN_GENERIC__OPERATOR atom_getfloat(m2);
 #endif
+    m1++; m2++;
     SETFLOAT(m, f);
     m++;
   }
@@ -126,9 +127,15 @@ static void mtxbin_float(t_mtx_binmtx *x, t_float f)
   t_matrix *m=&x->m, *m2=&x->m2;
   t_atom *ap, *ap2=m2->atombuffer+2;
   int row2, col2, n;
-  t_int i=(t_int)f;
 
-  if (!m2->atombuffer){ post("AND with what ?");            return; }
+#ifdef MTXBIN_GENERIC__INTEGEROP
+  t_int offset=(t_int)f;
+#else
+  t_float offset=f;
+#endif
+
+
+  if (!m2->atombuffer){ post( MTXBIN_SHORTNAME ": operate on what ?");            return; }
 
   row2=atom_getint(m2->atombuffer);
   col2=atom_getint(m2->atombuffer+1);
@@ -139,11 +146,11 @@ static void mtxbin_float(t_mtx_binmtx *x, t_float f)
 
   while(n--){
 #ifdef MTXBIN_GENERIC__INTEGEROP
-    SETFLOAT(ap, i MTXBIN_GENERIC__OPERATOR atom_getint(ap2++));
+    ap->a_w.w_float = offset MTXBIN_GENERIC__OPERATOR atom_getint(ap2);
 #else
-    SETFLOAT(ap, i MTXBIN_GENERIC__OPERATOR atom_getfloat(ap2++));
+    ap->a_w.w_float = offset MTXBIN_GENERIC__OPERATOR atom_getfloat(ap2);
 #endif
-    ap++;
+    ap++; ap2++;
   }
   
   outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), m->row*m->col+2, m->atombuffer);
