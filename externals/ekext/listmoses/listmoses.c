@@ -36,6 +36,13 @@ typedef struct _listmoses
 
 void listmoses_list(t_listmoses *x, t_symbol *s, int argc, t_atom *argv)
 {
+  float temp;
+  if (x->highsplit < x->lowsplit)
+    {
+	temp = x->highsplit;
+	x->highsplit = x->lowsplit;
+	x->lowsplit = temp;
+	}
   float current, curamps;
   int i;
   x->low_argc = 0;
@@ -96,21 +103,21 @@ void listmoses_bang(t_listmoses *x)
 void *listmoses_new(t_symbol *s, int argc, t_atom *argv)
 {
   t_listmoses *x = (t_listmoses *)pd_new(listmoses_class);
-  switch(argc)
+  x->highsplit = 96;
+  x->lowsplit = 36;
+/*  switch(argc)
     {
-    default:
-    case 2:
+      default:
+      case 2:
       x->highsplit = atom_getfloat(argv+1);
+      //x->lowsplit = atom_getfloat(argv);
+      case 1:
+      //x->highsplit = atom_getfloat(argv);
       x->lowsplit = atom_getfloat(argv);
-    case 1:
-      x->highsplit = atom_getfloat(argv);
-      x->lowsplit = 0;
       break;
-    case 0:
-      x->highsplit = 96;
-      x->lowsplit = 36;
-    }
-
+      case 0:
+    } */ // I don't know why it doesn't work with args! 
+	
   x->low_argc = 0;
   x->mid_argc = 0;
   x->high_argc = 0;
