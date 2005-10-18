@@ -107,6 +107,79 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
     return;
   }
 
+  if(x->m2.col==1&&x->m2.row==1)
+    {
+      adjustsize(&x->m, row, col);
+      m = x->m.atombuffer+2;
+
+#ifdef MTXBIN_GENERIC__INTEGEROP
+      t_int offset=atom_getint(m2);
+#else
+      t_float offset=atom_getfloat(m2);
+#endif
+      while(n--){
+#ifdef MTXBIN_GENERIC__INTEGEROP
+        t_float f = (t_float)(atom_getint(m1) MTXBIN_GENERIC__OPERATOR offset);
+#else
+        t_float f = atom_getfloat(m1) MTXBIN_GENERIC__OPERATOR offset;
+#endif
+        SETFLOAT(m, f);
+        m++; m1++;
+      }
+      outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
+      return;
+    }
+  if(x->m2.row==1)
+    {
+      int c, r;
+      adjustsize(&x->m, row, col);
+      m = x->m.atombuffer+2; 
+      for(r=0; r<row; r++){
+        m2 = x->m2.atombuffer+2;
+        for(c=0; c<col; c++){
+#ifdef MTXBIN_GENERIC__INTEGEROP
+          t_float f = (t_float)(atom_getint(m1) MTXBIN_GENERIC__OPERATOR atom_getint(m2));
+#else
+          t_float f = atom_getfloat(m1) MTXBIN_GENERIC__OPERATOR atom_getfloat(m2);
+#endif
+          m1++; m2++;
+          SETFLOAT(m, f);
+          m++;
+        }
+      }
+      outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
+      return;
+    }
+  if(x->m2.col==1)
+    {
+      int c, r;
+      adjustsize(&x->m, row, col);
+      m = x->m.atombuffer+2;
+
+      for(r=0; r<row; r++){
+#ifdef MTXBIN_GENERIC__INTEGEROP
+        t_int offset = atom_getint(m2);
+#else
+        t_float offset = atom_getfloat(m2);
+#endif
+
+        for(c=0; c<col; c++){
+#ifdef MTXBIN_GENERIC__INTEGEROP
+          t_float f = (t_float)(atom_getint(m1) MTXBIN_GENERIC__OPERATOR offset);
+#else
+          t_float f = atom_getfloat(m1) MTXBIN_GENERIC__OPERATOR offset;
+#endif
+          SETFLOAT(m, f);
+          m++; m1++;
+        }
+        m2++;
+      }
+
+      outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), argc, x->m.atombuffer);
+      return;
+    }
+
+
   if ((col!=x->m2.col)||(row!=x->m2.row)){ 
     post( MTXBIN_SHORTNAME ": matrix dimensions do not match");
     /* LATER SOLVE THIS */    
