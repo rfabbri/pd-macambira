@@ -149,16 +149,16 @@ static void mtxbin_float(t_mtx_binmtx *x, t_float f)
   ap=m->atombuffer+2;
 
   n=row2*col2;
-
   while(n--){
+    t_float f = 
 #ifdef MTXBIN_GENERIC__INTEGEROP
-    ap->a_w.w_float = offset MTXBIN_GENERIC__OPERATOR atom_getint(ap2);
+                offset MTXBIN_GENERIC__OPERATOR atom_getint(ap2);
 #else
-    ap->a_w.w_float = offset MTXBIN_GENERIC__OPERATOR atom_getfloat(ap2);
+                offset MTXBIN_GENERIC__OPERATOR atom_getfloat(ap2);
 #endif
+    SETFLOAT(ap, f);
     ap++; ap2++;
   }
-  
   outlet_anything(x->x_obj.ob_outlet, gensym("matrix"), m->row*m->col+2, m->atombuffer);
 }
 static void *mtxbin_new(t_symbol *s, int argc, t_atom *argv)
