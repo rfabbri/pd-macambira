@@ -1,12 +1,12 @@
 #N canvas 385 142 508 466 10;
 #X obj 122 68 inlet bang;
 #X obj 122 385 outlet 1==OK;
-#X obj 122 211 mtx_abs;
+#X obj 122 211 mtx_int;
 #X msg 122 233 \$3;
 #X obj 122 101 t b;
 #X obj 122 151 t f f;
 #X msg 122 190 matrix 1 1 \$1;
-#X obj 165 232 abs;
+#X obj 165 232 int;
 #X obj 122 265 ==;
 #X msg 122 127 -2;
 #X connect 0 0 4 0;
