@@ -48,7 +48,7 @@ typedef struct _ann_mlp {
 // allocation
 static void ann_mlp_allocate_storage(t_ann_mlp *x)
 {
-  int i;
+  unsigned int i;
 
   if(!x->ann)
     return;
@@ -299,9 +299,9 @@ static void ann_mlp_set_iterations_between_reports(t_ann_mlp *x, t_symbol *sl, i
 
 // run the ann using floats in list passed to the inlet as input values
 // and send result to outlet as list of float
-static void ann_mlp_run_the_net(t_ann_mlp *x, t_symbol *sl, int argc, t_atom *argv)
+static void ann_mlp_run_the_net(t_ann_mlp *x, t_symbol *sl, unsigned int argc, t_atom *argv)
 {
-	int i=0;	
+	unsigned int i=0;	
 	fann_type *calc_out;
 
 	if (x->ann == 0)

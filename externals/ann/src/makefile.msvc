@@ -6,9 +6,9 @@
 
 # customize here !
 VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7" 
-PDPATH="C:\Documents and Settings\Davide\Documenti\personali\pd-0.38-3.msw\pd"
-FANNSRC="C:\Documents and Settings\Davide\Documenti\personali\PD\fann-1.2.0\fann-1.2.0\src\include"
-FANNLIB="C:\Documents and Settings\Davide\Documenti\personali\PD\fann-1.2.0\fann-1.2.0\MSVC++\Release"
+PDPATH="H:\PureData\pd-0.38-3.msw\pd"
+FANNSRC="H:\PureData\FANN\fann-1.2.0\fann-1.2.0\src\include"
+FANNLIB="H:\PureData\FANN\fann-1.2.0\fann-1.2.0\MSVC++\Release"
 
 
 current: clean pd_nt distclean
