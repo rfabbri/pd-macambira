@@ -29,10 +29,9 @@ class lorenz
 	: public ode_base
 {
 public:
-	lorenz()
+	lorenz():
+		ode_base(3)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.01);
 
@@ -43,16 +42,10 @@ public:
 		CHAOS_PAR_INIT(sigma,16);
 		CHAOS_PAR_INIT(b,4);
 		CHAOS_PAR_INIT(r,40);
-
-		CHAOS_POSTCONSTRUCTOR;
-		
-		ode_base_alloc();
 	}
 	
 	~lorenz()
 	{
-		ode_base_free();
-		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

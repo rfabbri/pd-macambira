@@ -32,10 +32,9 @@ class driven_anharmonic
 	: public ode_base
 {
 public:
-	driven_anharmonic()
+	driven_anharmonic():
+		ode_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.01);
 
@@ -49,15 +48,11 @@ public:
 		CHAOS_PAR_INIT(k1,0.01);
 		CHAOS_PAR_INIT(k2,1);
 
-		CHAOS_POSTCONSTRUCTOR;
-		ode_base_alloc();
 		m_t = 0;
 	}
 	
 	~driven_anharmonic()
 	{
-		ode_base_free();
-		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

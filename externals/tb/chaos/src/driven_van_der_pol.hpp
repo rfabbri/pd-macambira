@@ -33,10 +33,9 @@ class driven_van_der_pol
 	: public ode_base
 {
 public:
-	driven_van_der_pol()
+	driven_van_der_pol():
+		ode_base(3)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.01);
 
@@ -47,15 +46,10 @@ public:
 		CHAOS_PAR_INIT(a,5);
 		CHAOS_PAR_INIT(Omega,2.466);
 		CHAOS_PAR_INIT(k,5);
-
-		CHAOS_POSTCONSTRUCTOR;
-		ode_base_alloc();
 	}
 	
 	~driven_van_der_pol()
 	{
-		ode_base_free();
-		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

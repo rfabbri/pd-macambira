@@ -36,14 +36,11 @@ class bungalow_tent:
 	public map_base
 {
 public:
-	bungalow_tent()
+	bungalow_tent():
+		map_base(1)
 	{
- 		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x, 0.6,0);
 		CHAOS_PAR_INIT(r, 0.5);
-
- 		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~bungalow_tent()

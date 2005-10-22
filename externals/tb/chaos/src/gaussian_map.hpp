@@ -29,16 +29,13 @@ class gaussian_map:
 	public map_base
 {
 public:
-	gaussian_map()
+	gaussian_map():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-		
 		CHAOS_SYS_INIT(x, 0.5, 0);
 
 		CHAOS_PAR_INIT(b,7);
 		CHAOS_PAR_INIT(c,0.5);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~gaussian_map()

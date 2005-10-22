@@ -236,11 +236,11 @@ SYSTEM##_dsp(int argc, t_atom* argv )									\
 ~SYSTEM##_dsp()															\
 {																		\
 	delete m_system;													\
-	delete m_values;													\
-	delete m_slopes;													\
-	delete m_nextvalues;												\
-	delete m_nextmidpts;												\
-	delete m_curves;													\
+	delete[] m_values;													\
+	delete[] m_slopes;													\
+	delete[] m_nextvalues;												\
+	delete[] m_nextmidpts;												\
+	delete[] m_curves;													\
 }																		\
 																		\
 FLEXT_ATTRVAR_F(m_freq);												\

@@ -29,13 +29,10 @@ class bernoulli:
 {
 public:
 
-	bernoulli()
+	bernoulli():
+		map_base(1)
 	{
- 		CHAOS_PRECONSTRUCTOR;
-		
 		CHAOS_SYS_INIT(x,0.5,0);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~bernoulli()

@@ -29,10 +29,9 @@ class roessler
 	: public ode_base
 {
 public:
-	roessler()
+	roessler():
+		ode_base(3)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.001);
 
@@ -43,15 +42,10 @@ public:
 		CHAOS_PAR_INIT(a,4);
 		CHAOS_PAR_INIT(b,4);
 		CHAOS_PAR_INIT(c,4);
-
-		CHAOS_POSTCONSTRUCTOR;
-		ode_base_alloc();
 	}
 	
 	~roessler()
 	{
-		ode_base_free();
-		
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

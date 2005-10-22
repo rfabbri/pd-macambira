@@ -29,15 +29,11 @@ class delayed_logistic:
 	public map_base
 {
 public:
-	delayed_logistic()
+	delayed_logistic():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x, 0.5, 0);
-
 		CHAOS_PAR_INIT(alpha, 3.8);
-
-		CHAOS_POSTCONSTRUCTOR;
 
 		m_delayed = get_x(); /* the initial state of the delay */
 	}

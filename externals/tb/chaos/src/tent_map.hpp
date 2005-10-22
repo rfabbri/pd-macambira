@@ -29,15 +29,12 @@ class tent_map:
 	public map_base
 {
 public:
-	tent_map()
+	tent_map():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x, 0.6,0);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
-
+	
 	~tent_map()
 	{
 		
@@ -49,7 +46,7 @@ public:
 		
 		m_data[0] = 1 - 2*CHAOS_ABS(data);
 	}
-
+	
 	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_x);
 	bool m_pred_x(t_float f)
 	{

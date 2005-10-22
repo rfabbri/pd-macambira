@@ -27,14 +27,20 @@
 
 class chaos_base
 {
-
 public:
+	chaos_base(int n):
+		m_num_eq(n)
+	{
+		m_data = new data_t[n];
+	}
+
+		
 	inline t_sample get_data(unsigned int i)
 	{
 		return (t_sample)m_data[i]; /* this is not save, but fast */
 	}
 
-	inline int get_num_eq()
+	inline int get_num_eq() const
 	{
 		return m_num_eq;
 	}
@@ -65,24 +71,14 @@ public:
 		}
 	};
 	
-	data_t m_data[MAXDIMENSION];  // state of the system
+	data_t * m_data;  // state of the system
 
 protected:
 	virtual void m_step() = 0;    // iteration
-	int m_num_eq;                 // number of equations of the system
+	const int m_num_eq;                 // number of equations of the system
  	flext::AtomList Parameter;    // parameter
  	flext::AtomList System;       // system
 };
-
-#define CHAOS_PRECONSTRUCTOR					\
-    /* dummy */	
-
-#define CHAOS_POSTCONSTRUCTOR					\
-m_num_eq = System.Count();
-
-#define CHAOS_DESTRUCTOR						\
-    
-
 
 #define CHAOS_CALLBACKS							\
 public:											\

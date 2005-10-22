@@ -20,54 +20,49 @@
 
 #include "map_base.hpp"
 
-#include <cmath>
+//  tent map: x[n+1] = A*x[n] + B mod C
+//
+//  taken from Julien C. Sprott, Chaos and Time-Series Analysis
 
-//  circle_map map: x[n+1] = x[n] + omega - r / (2*pi) * sin (2 * pi * x [n])
-// 
-//  taken from Willi-Hans Steeb: Chaos and Fractals
-
-class circle_map:
+class linear_congruental:
 	public map_base
 {
 public:
-	circle_map()
-		: map_base(1)
+	linear_congruental():
+		map_base(1)
 	{
-		CHAOS_SYS_INIT(x, 0.4,0);
-
-		CHAOS_PAR_INIT(omega, 0.1);
-		CHAOS_PAR_INIT(r, 3);
-	}
-
-	~circle_map()
-	{
+		CHAOS_SYS_INIT(x, 0, 0);
 		
+		CHAOS_PAR_INIT(A, 1741);
+		CHAOS_PAR_INIT(B, 54773);
+		CHAOS_PAR_INIT(C, 259200);
 	}
 
 	virtual void m_step()
 	{
 		data_t x = m_data[0];
-		data_t omega = CHAOS_PARAMETER(omega);
-		data_t r = CHAOS_PARAMETER(r);
-		
-		m_data[0] = x + omega - r / (2.f * M_PI) * sin (2.f * M_PI * x);
+
+		m_data[0] = chaos_mod( CHAOS_PARAMETER(A) * x + CHAOS_PARAMETER(B), CHAOS_PARAMETER(C));
 	}
 
 	CHAOS_SYSVAR_FUNCS(x,0);
-	CHAOS_SYSPAR_FUNCS(r);
-	CHAOS_SYSPAR_FUNCS(omega);
+
+	CHAOS_SYSPAR_FUNCS(A);
+	CHAOS_SYSPAR_FUNCS(B);
+	CHAOS_SYSPAR_FUNCS(C);
 };
 
-#define CIRCLE_MAP_CALLBACKS					\
+#define LINEAR_CONGRUENTAL_CALLBACKS			\
 MAP_CALLBACKS;									\
-CHAOS_SYS_CALLBACKS(omega);						\
-CHAOS_SYS_CALLBACKS(r);							\
+CHAOS_SYS_CALLBACKS(A);							\
+CHAOS_SYS_CALLBACKS(B);							\
+CHAOS_SYS_CALLBACKS(C);							\
 CHAOS_SYS_CALLBACKS(x);
 
-
-#define CIRCLE_MAP_ATTRIBUTES					\
+#define LINEAR_CONGRUENTAL_ATTRIBUTES			\
 MAP_ATTRIBUTES;									\
-CHAOS_SYS_ATTRIBUTE(omega);						\
-CHAOS_SYS_ATTRIBUTE(r);							\
+CHAOS_SYS_ATTRIBUTE(A);							\
+CHAOS_SYS_ATTRIBUTE(B);							\
+CHAOS_SYS_ATTRIBUTE(C);							\
 CHAOS_SYS_ATTRIBUTE(x);
 

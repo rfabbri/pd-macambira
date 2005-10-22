@@ -28,19 +28,15 @@ class logistic:
 	public map_base
 {
 public:
-	logistic()
+	logistic():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(alpha, 3.8);
 		CHAOS_SYS_INIT(x, 0.5,0);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~logistic()
 	{
-		delete m_data;
 	}
 
 	virtual void m_step()

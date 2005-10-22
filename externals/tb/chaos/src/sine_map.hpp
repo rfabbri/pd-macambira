@@ -30,13 +30,10 @@ class sine_map:
 {
 	
 public:
-	sine_map()
+	sine_map():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-		
 		CHAOS_SYS_INIT(x,0,0);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~sine_map()

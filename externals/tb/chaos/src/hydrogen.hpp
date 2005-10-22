@@ -29,10 +29,9 @@ class hydrogen
 
 
 public:
-	hydrogen()
+	hydrogen():
+		ode_base(4)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.01);
 
@@ -43,14 +42,11 @@ public:
 		
 		CHAOS_PAR_INIT(etilde,-0.3);
 
-		CHAOS_POSTCONSTRUCTOR;
-		ode_base_alloc();
 		reset = 0;
 	}
 	
 	~hydrogen()
 	{
-		ode_base_free();
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

@@ -31,10 +31,9 @@ class latoocarfian
 	: public map_base
 {
 public:
-	latoocarfian()
+	latoocarfian():
+		map_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR
-
 		CHAOS_SYS_INIT(x1,0.5,0);
 		CHAOS_SYS_INIT(x2,0,1);
 
@@ -42,13 +41,10 @@ public:
 		CHAOS_PAR_INIT(b,2.879879);
 		CHAOS_PAR_INIT(c,0.765145);
 		CHAOS_PAR_INIT(d,0.744728);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 	
 	~latoocarfian()
 	{
-		
 	}
 
 	virtual void m_step()

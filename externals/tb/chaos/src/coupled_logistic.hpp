@@ -29,17 +29,14 @@ class coupled_logistic:
 	public map_base
 {
 public:
-	coupled_logistic()
+	coupled_logistic():
+		map_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(e, 0.06);
 		CHAOS_PAR_INIT(r, 3.7);
 
 		CHAOS_SYS_INIT(x, 0.1,0);
 		CHAOS_SYS_INIT(y, 0.2,1);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~coupled_logistic()

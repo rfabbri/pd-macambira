@@ -29,17 +29,14 @@ class henon:
 	public map_base
 {
 public:
-	henon()
+	henon():
+		map_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x,0,0);
 		CHAOS_SYS_INIT(y,0,1);
 
 		CHAOS_PAR_INIT(a,1.4);
 		CHAOS_PAR_INIT(b,0.3);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~henon()

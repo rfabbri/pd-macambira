@@ -35,10 +35,9 @@ class ikeda_laser_map:
 	public map_base
 {
 public:
-	ikeda_laser_map()
+	ikeda_laser_map():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(c1,0.4);
 		CHAOS_PAR_INIT(c2,0.9);
 		CHAOS_PAR_INIT(c3,9);
@@ -46,13 +45,10 @@ public:
 
 		CHAOS_SYS_INIT(x,0.5,0);
 		CHAOS_SYS_INIT(y,0.5,1);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~ikeda_laser_map()
 	{
-		
 	}
 
 	virtual void m_step()

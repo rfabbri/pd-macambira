@@ -29,16 +29,13 @@ class duffing_map:
 	public map_base
 {
 public:
-	duffing_map()
+	duffing_map():
+		map_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR;
-		
 		CHAOS_SYS_INIT(x1, 0.5, 0);
 		CHAOS_SYS_INIT(x2, 0.5, 1);
 		CHAOS_PAR_INIT(a, 0.5);
 		CHAOS_PAR_INIT(b, 0.5);
-		
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~duffing_map()

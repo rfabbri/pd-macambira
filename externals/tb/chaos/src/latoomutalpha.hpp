@@ -30,18 +30,15 @@ class latoomutalpha
 	: public map_base
 {
 public:
-	latoomutalpha()
+	latoomutalpha():
+		map_base(2)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x1,0.5,0);
 		CHAOS_SYS_INIT(x2,0.2,1);
 
 		CHAOS_PAR_INIT(a,-0.966918);
 		CHAOS_PAR_INIT(b,2.879879);
 		CHAOS_PAR_INIT(c,0.765145);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 	
 	~latoomutalpha()

@@ -31,13 +31,10 @@ class gauss_map:
 	public map_base
 {
 public:
-	gauss_map()
+	gauss_map():
+		map_base(1)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_SYS_INIT(x,0.5, 0);
-
-		CHAOS_POSTCONSTRUCTOR;
 	}
 
 	~gauss_map()

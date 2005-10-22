@@ -27,6 +27,26 @@ class ode_base
 	: public chaos_base
 {
 public:
+	ode_base(int n):
+		chaos_base (n)
+	{
+		for (int i = 0; i != 3; ++i)
+		{
+			m_k[i] = new data_t[n];
+		}
+		m_tmp = new data_t[n];
+
+	}
+
+	~ode_base()
+	{
+		for (int i = 0; i != 3; ++i)
+		{
+			delete[] m_k[i];
+		}
+		delete[] m_tmp;
+	}
+	
 	void set_method(int i)
 	{
 		if (i >=0 && i <4)
@@ -65,27 +85,6 @@ public:
 		(this->*m_routine)();
 	}
 	
-	void ode_base_alloc()
-	{
-		int dimension = get_num_eq();
-		
-		for (int i = 0; i != 3; ++i)
-		{
-			m_k[i] = new data_t[dimension];
-		}
-
-		m_tmp = new data_t[dimension];
-	}
-	
-	void ode_base_free()
-	{
-		for (int i = 0; i != 3; ++i)
-		{
-			delete m_k[i];
-		}
-		delete m_tmp;
-	}
-
 protected:
  	void (ode_base::*m_routine)(void);
 

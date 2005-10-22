@@ -34,10 +34,9 @@ class chua:
 	public ode_base
 {
 public:
-	chua()
+	chua():
+		ode_base(3)
 	{
-		CHAOS_PRECONSTRUCTOR;
-
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.05);
 
@@ -49,15 +48,10 @@ public:
 		CHAOS_PAR_INIT(b,30);
 		CHAOS_PAR_INIT(alpha,30);
 		CHAOS_PAR_INIT(beta,30);
-		
-		CHAOS_POSTCONSTRUCTOR;
-		
-		ode_base_alloc();
 	}
 
 	~chua()
 	{
-		ode_base_free();
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

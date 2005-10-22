@@ -1,7 +1,7 @@
-// 
+//
 //  
 //  chaos~
-//  Copyright (C) 2004  Tim Blechmann
+//  Copyright (C) 2005  Tim Blechmann
 //  
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,31 +18,6 @@
 //  the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 //  Boston, MA 02111-1307, USA.
 
-
-#ifndef __map_base_hpp
-
-#include "chaos_base.hpp"
-
-class map_base
-	: public chaos_base
-{
-protected:
-	map_base(int n):
-		chaos_base(n)
-	{
-	}
-		
-	virtual void m_step()
-	{
-	}
-};
-
-#define MAP_CALLBACKS							\
-CHAOS_CALLBACKS
-
-
-#define MAP_ATTRIBUTES 							\
-CHAOS_ATTRIBUTES;
-
-#define __map_base_hpp
-#endif /* __map_base_hpp */
+#include "linear_congruental.hpp"
+#include "chaos_dsp.hpp"
+CHAOS_DSP_CLASS(linear_congruental,LINEAR_CONGRUENTAL);

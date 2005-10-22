@@ -23,7 +23,8 @@
 
 void chaos_library_setup()
 {
-	post("chaos~ version 0.01, compiled on "__DATE__" \n");
+	post("chaos~ version 0.01, compiled on "__DATE__);
+	post("(C)2005 Tim Blechmann, www.mokabar.tk\n\n");
 
 
 	CHAOS_ADD(bernoulli);
@@ -34,6 +35,7 @@ void chaos_library_setup()
 	CHAOS_ADD(delayed_logistic);
 	CHAOS_ADD(driven_anharmonic);
 	CHAOS_ADD(driven_van_der_pol);
+	CHAOS_ADD(duffing);
 	CHAOS_ADD(duffing_map);
 	CHAOS_ADD(gauss_map);
 	CHAOS_ADD(gaussian_map);
@@ -44,6 +46,7 @@ void chaos_library_setup()
 	CHAOS_ADD(latoomutalpha);
 	CHAOS_ADD(latoomutbeta);
 	CHAOS_ADD(latoomutgamma);
+	CHAOS_ADD(linear_congruental);
 	CHAOS_ADD(logistic);
 	CHAOS_ADD(lorenz);
 	CHAOS_ADD(lozi_map);
