@@ -17,8 +17,6 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 using namespace std;
 
-#define VBITS 6
-#define DBITS 5
 
 inline I compare(I a,I b) { return a == b?0:(a < b?-1:1); }
 inline I compare(F a,F b) { return a == b?0:(a < b?-1:1); }
@@ -84,7 +82,7 @@ poolval *poolval::Dup() const
 
 pooldir::pooldir(const A &d,pooldir *p,I vcnt,I dcnt):
 	parent(p),nxt(NULL),vals(NULL),dirs(NULL),
-	vbits(vcnt?Int2Bits(vcnt):VBITS),dbits(dcnt?Int2Bits(dcnt):DBITS),
+	vbits(Int2Bits(vcnt)),dbits(Int2Bits(dcnt)),
 	vsize(1<<vbits),dsize(1<<dbits)
 {
 	Reset();
@@ -101,11 +99,31 @@ pooldir::~pooldir()
 V pooldir::Clear(BL rec,BL dironly)
 {
 	if(rec && dirs) { 
-		for(I i = 0; i < dsize; ++i) if(dirs[i].d) { delete dirs[i].d; dirs[i].d = NULL; }
+        for(I i = 0; i < dsize; ++i) {
+            pooldir *d = dirs[i].d,*d1; 
+            if(d) {
+                do {
+                    d1 = d->nxt;
+                    delete d;
+                } while((d = d1) != NULL);
+                dirs[i].d = NULL; 
+                dirs[i].cnt = 0;
+            }
+        }
 	}
 	if(!dironly && vals) { 
-		for(I i = 0; i < vsize; ++i) if(vals[i].v) { delete vals[i].v; vals[i].v = NULL; }
-	}
+        for(I i = 0; i < vsize; ++i) {
+            poolval *v = vals[i].v,*v1;
+            if(v) {
+                do {
+                    v1 = v->nxt;
+                    delete v;
+                } while((v = v1) != NULL);
+                vals[i].v = NULL; 
+                vals[i].cnt = 0;
+            }
+        }
+    }
 }
 
 V pooldir::Reset(BL realloc)

@@ -75,6 +75,9 @@ bash ../flext/build.sh
 
 Version history:
 
+0.2.2:
+- fixed serious bug with clearing values and dirs. e.g. "clrall" and "clrrec" messages.
+
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten
 - store/create also empty dirs with file I/O

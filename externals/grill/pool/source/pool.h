@@ -53,7 +53,7 @@ class pooldir:
 	public flext
 {
 public:
-	pooldir(const A &dir,pooldir *parent,I vcnt = 0,I dcnt = 0);
+	pooldir(const A &dir,pooldir *parent,I vcnt,I dcnt);
 	~pooldir();
 
 	V Clear(BL rec,BL dironly = false);

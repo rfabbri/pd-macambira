@@ -11,12 +11,11 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include "pool.h"
 #include <string>
 
-#define POOL_VERSION "0.2.1"
+#define POOL_VERSION "0.2.2pre"
 
-#define VCNT 64
-#define DCNT 16
+#define VCNT 32
+#define DCNT 8
 
-const t_symbol *sym_echo = flext::MakeSymbol("echo");
 
 class pool:
 	public flext_base
@@ -116,6 +115,8 @@ private:
 	static BL ValChk(I argc,const A *argv);
 	static BL ValChk(const AtomList &l) { return ValChk(l.Count(),l.Atoms()); }
 	V ToOutAtom(I ix,const A &a);
+
+    static const t_symbol *sym_echo;
 
     enum get_t { get_norm,get_cnt,get_print };
 
@@ -227,6 +228,7 @@ FLEXT_NEW_V("pool",pool);
 
 
 pooldata *pool::head,*pool::tail;	
+const t_symbol *pool::sym_echo;
 
 
 V pool::setup(t_classid c)
@@ -236,6 +238,7 @@ V pool::setup(t_classid c)
 	post("");
 
 	head = tail = NULL;
+    sym_echo = MakeSymbol("echo");
 
 	FLEXT_CADDATTR_VAR(c,"pool",mg_pool,ms_pool);
 	FLEXT_CADDATTR_VAR1(c,"absdir",absdir);
