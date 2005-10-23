@@ -109,14 +109,14 @@ static void mtxbin_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
 
   if(x->m2.col==1&&x->m2.row==1)
     {
-      adjustsize(&x->m, row, col);
-      m = x->m.atombuffer+2;
-
 #ifdef MTXBIN_GENERIC__INTEGEROP
       t_int offset=atom_getint(m2);
 #else
       t_float offset=atom_getfloat(m2);
 #endif
+      adjustsize(&x->m, row, col);
+      m = x->m.atombuffer+2;
+
       while(n--){
 #ifdef MTXBIN_GENERIC__INTEGEROP
         t_float f = (t_float)(atom_getint(m1) MTXBIN_GENERIC__OPERATOR offset);
