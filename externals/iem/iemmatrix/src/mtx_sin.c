@@ -44,7 +44,6 @@ static void mtx_sin_list(t_mtx_binscalar *x, t_symbol *s, int argc, t_atom *argv
 {
   int n=argc;
   t_atom *m;
-  t_float factor = x->f;
 
   adjustsize(&x->m, 1, argc);
   m = x->m.atombuffer;

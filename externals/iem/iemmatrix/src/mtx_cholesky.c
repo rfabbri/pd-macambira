@@ -30,9 +30,6 @@ static void mtx_cholesky_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv
   int i, j, k, row2=row*row;
 
   t_matrixfloat *original, *cholesky;
-  t_matrixfloat *a1, *b1;  // dummy pointers
-
-  int ok = 0;
 
   if(row*col+2>argc){
     post("mtx_print : sparse matrices not yet supported : use \"mtx_check\"");

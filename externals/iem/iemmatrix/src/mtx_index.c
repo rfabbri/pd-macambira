@@ -53,7 +53,11 @@ static void *newMTXIndex (t_symbol *s, int argc, t_atom *argv)
 	 fill_atom = *argv;
    }
    if (atom_getsymbol(&fill_atom) == gensym("nan"))
+#ifdef __WIN32__
+      mtx_index_obj->fill_value = 0.0f;
+#else
       mtx_index_obj->fill_value = 0.0f/0.0f;
+#endif
    else 
       mtx_index_obj->fill_value = atom_getfloat(&fill_atom);
    
@@ -159,7 +163,6 @@ static void mTXIndexMatrix (MTXindex *mtx_index_obj, t_symbol *s,
    int list_size = argc - 2;
    t_atom *list_in = argv;
    t_atom *list_out = mtx_index_obj->list_out;
-   int count;
    int index_rows = mtx_index_obj->index_rows;
    int index_columns = mtx_index_obj->index_columns;
    int *index = mtx_index_obj->index_in;

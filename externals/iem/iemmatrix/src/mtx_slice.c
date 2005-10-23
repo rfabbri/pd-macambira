@@ -45,7 +45,6 @@ static void mTXSliceIndexList (MTXslice *mtx_slice_obj, t_symbol *s,
   int stopcol;
   int stoprow;
   t_symbol *endsym = gensym("end");
-  t_atom *list_out = mtx_slice_obj->list_out;
 
   if (argc<4) {
     post("mtx_slice: invalid index vector: <startrow><startcol><stoprow><stopcol>");

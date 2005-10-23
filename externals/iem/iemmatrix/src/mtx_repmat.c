@@ -77,7 +77,6 @@ static void writeRepeatIntoMatrix (int repeat_rows, int repeat_cols, int rows, i
 {
    int row_cnt;
    int col_cnt;
-   int idx = 0;
    int new_col = columns * repeat_cols;
    t_atom *ptr = y;
 

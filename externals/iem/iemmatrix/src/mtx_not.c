@@ -46,14 +46,13 @@ static void mtx_not_list(t_mtx_binscalar *x, t_symbol *s, int argc, t_atom *argv
 {
   int n=argc;
   t_atom *m;
-  t_float factor = x->f;
 
   adjustsize(&x->m, 1, argc);
   m = x->m.atombuffer;
 
   while(n--){
-    m->a_type = A_FLOAT;
     t_float f = atom_getfloat(argv++);
+    m->a_type = A_FLOAT;
     (m++)->a_w.w_float = (t_float)(f<MTX_ALMOSTZERO&&f>-MTX_ALMOSTZERO);
   }
 

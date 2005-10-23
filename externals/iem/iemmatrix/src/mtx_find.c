@@ -76,11 +76,12 @@ static void *newMTXFind (t_symbol *s, int argc, t_atom *argv)
    if (argc>=1) {
       if (argv[0].a_type == A_SYMBOL) {
 	 mTXSetFindMode (mtx_find_obj, atom_getsymbol (argv));
-	 if (argc>=2) 
+	 if (argc>=2) {
 	    if (argv[1].a_type != A_SYMBOL)
 	       mTXSetFindDirection (mtx_find_obj, atom_getfloat (argv+1));
 	    else
 	       post("mtx_find: 2nd arg ignored. supposed to be float");
+	 }
       }
       else {
 	 mTXSetFindDirection (mtx_find_obj, atom_getfloat (argv));
@@ -233,7 +234,6 @@ static void mTXFindMatrix (MTXfind *mtx_find_obj, t_symbol *s,
    int list_size = argc - 2;
    t_atom *list_in = argv;
    t_atom *list_out = mtx_find_obj->list_out;
-   int count;
    int rows_out;
    int columns_out;
 

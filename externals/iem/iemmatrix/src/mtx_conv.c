@@ -70,13 +70,13 @@ static t_float **resizeTFloatMatrix (t_float **old, int rows_old, int columns_ol
       int rows_new, int columns_new)
 {
    t_float **mtx = old;
-   int count1, count2;
+   int count1;
    post("resizing from %dx%d to %dx%d", rows_old, columns_old, rows_new, columns_new);
    
    if ((rows_new == 0)||(columns_new == 0)) {
       deleteTFloatMatrix (old, rows_old, columns_old);
       old = 0;
-      return;
+      return old;
    }
    // 1. if rows_old>rows_new: old row disposal
    if (rows_old>rows_new)
@@ -98,13 +98,12 @@ static t_float **resizeTFloatMatrix (t_float **old, int rows_old, int columns_ol
       for (count1 = (rows_new - rows_old); count1--; mtx++)
 	 *mtx = (t_float *) getbytes (sizeof(t_float) * columns_new);
    }
-   post("return resize");
+   /* post("return resize"); */
    return old;
 }
 
 static void deleteMTXConv (MTXConv *mtx_conv_obj) 
 {
-   int count = mtx_conv_obj->rows;
    deleteTFloatMatrix (mtx_conv_obj->k, mtx_conv_obj->rows_k, mtx_conv_obj->columns_k);
    deleteTFloatMatrix (mtx_conv_obj->x, mtx_conv_obj->rows, mtx_conv_obj->columns);
    deleteTFloatMatrix (mtx_conv_obj->y, mtx_conv_obj->rows_y, mtx_conv_obj->columns_y);
@@ -160,16 +159,6 @@ static void readFloatFromList (int n, t_atom *l, t_float *f)
 {
    while (n--) 
       *f++ = atom_getfloat (l++);
-}
-static void scaleVector (int n, t_float *x, t_float *y, t_float k)
-{
-   while (n--)
-      *y++ = k * *x++;
-}
-static void addWeightedVector (int n, t_float *x, t_float *y, t_float k)
-{
-   while (n--)
-      *y++ += k * *y++;
 }
 static void readMatrixFromList (int rows, int columns, t_atom *l, t_float **mtx) 
 {
@@ -249,12 +238,6 @@ static void mTXConvMatrix (MTXConv *mtx_conv_obj, t_symbol *s,
    t_float **x = mtx_conv_obj->x;
    t_float **y = mtx_conv_obj->y;
    t_float **k = mtx_conv_obj->k;
-   t_float *ptr1;
-   t_float *ptr2;
-   int row_count;
-   int offset1;
-   int offset2;
-   int count;
 
    // fftsize check
    if (!size){

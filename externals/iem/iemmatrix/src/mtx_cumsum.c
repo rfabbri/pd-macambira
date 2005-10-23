@@ -67,11 +67,12 @@ static void *newMTXCumsum (t_symbol *s, int argc, t_atom *argv)
    if (argc>=1) {
       if (argv[0].a_type == A_SYMBOL) {
 	 mTXSetCumsumMode (mtx_cumsum_obj, atom_getsymbol (argv));
-	 if (argc>=2) 
+	 if (argc>=2) {
 	    if (argv[1].a_type != A_SYMBOL)
 	       mTXSetCumsumDirection (mtx_cumsum_obj, atom_getfloat (argv+1));
 	    else
 	       post("mtx_cumsum: 2nd arg ignored. supposed to be float");
+	 }
       }
       else {
 	 mTXSetCumsumDirection (mtx_cumsum_obj, atom_getfloat (argv));

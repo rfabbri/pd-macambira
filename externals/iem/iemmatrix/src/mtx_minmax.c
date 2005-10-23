@@ -179,7 +179,6 @@ static void mTXMinMaxMatrix (MTXminmax *mtx_minmax_obj, t_symbol *s,
    int list_size = argc - 2;
    t_atom *list_in = argv;
    t_atom *list_out = mtx_minmax_obj->list_out;
-   int count;
    int rows_out;
    int columns_out;
 

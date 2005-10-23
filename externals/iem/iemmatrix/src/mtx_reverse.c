@@ -120,7 +120,6 @@ static void mTXreverseMatrix (MTXreverse *mtx_reverse_obj, t_symbol *s,
    int columns = atom_getint (argv++);
    int size = rows * columns;
    int list_size = argc - 2;
-   t_atom *list_in = argv;
    t_atom *list_out = mtx_reverse_obj->list_out;
    int count;
 

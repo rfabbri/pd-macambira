@@ -41,14 +41,12 @@ static void mtx_gauss_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   /* maybe we should do this in double or long double ? */
   int row=atom_getfloat(argv);
   int col=atom_getfloat(argv+1);
-  int i, j, k, row2=row*row;
+  int i, j;
   const t_matrixfloat singrange = 1.0e-10;
 
-  t_matrixfloat *original, *gaussed;
-  t_matrixfloat *a1, *a2, *b1, *b2;  // dummy pointers
+  t_matrixfloat *original;
+  t_matrixfloat *a1, *a2;  // dummy pointers
 
-  int ok = 0;
-  int I;
 
   if(row*col+2>argc){
     post("mtx_print : sparse matrices not yet supported : use \"mtx_check\"");

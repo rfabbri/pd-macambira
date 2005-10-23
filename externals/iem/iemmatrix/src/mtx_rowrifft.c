@@ -13,6 +13,7 @@
  */
 
 #include "iemmatrix.h"
+#include <stdlib.h>
 
 static t_class *mtx_rowrifft_class;
 
