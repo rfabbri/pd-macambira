@@ -221,6 +221,7 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
 
 		t_float * item = alloca(maxchannels * sizeof(t_float));
 
+		
 		t_int ** syncdata = getbytes(sizeof(t_int*) * 5);
 		
 #if (_POSIX_MEMLOCK - 0) >=  200112L
@@ -235,14 +236,14 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
 
 		for (i = 0; i != info.frames; ++i)
 		{
-			sf_read_float(sndfile, item, 1);
+			sf_read_float(sndfile, item, info.channels);
 
-			for (j = 0; j != channel_count; ++j)
+			for (j = 0; j != info.channels; ++j)
 			{
-				if (j < minchannels)
+				if (j < channel_count)
+				{
 					helper_arrays[j][i] = item[j];
-				else
-					helper_arrays[j][i] = 0;
+				}
 			}
 		}
 #if (_POSIX_MEMLOCK - 0) >=  200112L
