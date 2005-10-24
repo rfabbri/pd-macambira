@@ -162,7 +162,7 @@ static void *newMTXFill (t_symbol *s, int argc, t_atom *argv)
       if (atom_getsymbol(argv)==gensym("matrix")) 
 	 mTXFillIndexMatrix (mtx_fill_obj, s, argc-1, argv+1);
       else
-	 post("mtx_fill: creation argument must be 'matrix <startrow> <startcol>' for submatrix filling or 'matrix rows columns [...]' for indexed filling with scalar/matrices"); 
+	 pd_error(mtx_fill_obj, "mtx_fill: creation argument must be 'matrix <startrow> <startcol>' for submatrix filling or 'matrix rows columns [...]' for indexed filling with scalar/matrices"); 
    }
 
    mtx_fill_obj->list_outlet = outlet_new (&mtx_fill_obj->x_obj, gensym("matrix"));

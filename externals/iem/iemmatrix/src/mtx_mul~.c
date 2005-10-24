@@ -826,11 +826,11 @@ static void *matrix_multilde_new(t_symbol *s, int argc, t_atom *argv)
   x->x_compat=0;
   
   if(s==gensym("matrix~")){
-    error("[matrix~] is deprecated! use [mtx_*~] instead!!");
+    pd_error(x,"[matrix~] is deprecated! use [mtx_*~] instead!!");
     x->x_compat=2;
   }
   else if (s==gensym("matrix_mul_line~")){
-    error("[matrix_mul_line~] is deprecated! use [mtx_*~] instead!!");
+    pd_error(x,"[matrix_mul_line~] is deprecated! use [mtx_*~] instead!!");
     x->x_compat=1;
   }
 

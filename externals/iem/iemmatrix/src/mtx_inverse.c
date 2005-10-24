@@ -77,7 +77,6 @@ t_matrixfloat* mtx_doInvert(t_matrixfloat*input, int rowcol, int*error){
         }
       }
   }
-  if (ok)post("mtx_inverse: couldn't really invert the matrix !!! %d error%c", ok, (ok-1)?'s':0);
   if(error!=0)*error=ok;
 
   return inverted;
@@ -134,7 +133,10 @@ static void mtx_inverse_matrix(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
   /* 3b destroy the buffers */
   freebytes(original, sizeof(t_matrixfloat)*row*col);
 
-  if(error)outlet_bang(x->x_outlet);
+  if(error){
+    outlet_bang(x->x_outlet);
+    pd_error(x, "mtx_inverse: couldn't really invert the matrix !!! %d error%c", error, (error-1)?'s':0);
+  }
 
   /* 3c output the atombuf; */
   matrix_bang(x);

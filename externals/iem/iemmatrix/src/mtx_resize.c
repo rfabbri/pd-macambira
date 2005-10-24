@@ -20,7 +20,7 @@ static void mtx_resize_list2(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
 {
   int r, c;
   if (argc<1)return;
-  if (argc>2)error("mtx_resize : only rows & cols are needed, skipping the rest");
+  if (argc>2)pd_error(x, "mtx_resize : only rows & cols are needed, skipping the rest");
   if (argc==1)r=c=atom_getfloat(argv++);
   else{
     r=atom_getfloat(argv++);
