@@ -22,7 +22,7 @@
 #X obj 185 156 t f f;
 #X obj 122 221 mtx_bitright 0;
 #X msg 122 132 4 3 7 6;
-#X msg 185 133 123;
+#X msg 185 133 3.6;
 #X connect 0 0 13 0;
 #X connect 2 0 3 0;
 #X connect 3 0 8 0;
