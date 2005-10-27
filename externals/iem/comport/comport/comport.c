@@ -325,7 +325,11 @@ static HANDLE open_serial(int com_nr, t_comport *x)
 		   0, 
 		   0, 
 		   OPEN_EXISTING,
+#ifdef WIN2000
+		   0,
+#elif
 		   FILE_FLAG_OVERLAPPED,
+#endif
 		   0);
 
   if(fd == INVALID_HANDLE_VALUE)
@@ -682,11 +686,13 @@ static void comport_tick(t_comport *x)
 
     err = 0;
 
-//    if (!SetCommMask(x->comhandle, EV_RXCHAR))
-//      post(" Error setting communications event mask for serial device");
+/*
+    if (!SetCommMask(x->comhandle, EV_RXCHAR))
+      post(" Error setting communications event mask for serial device");
 
-//    for ( ; ; ) {
-//      if (WaitCommEvent(x->comhandle, &dwCommEvent,NULL)) {
+    for ( ; ; ) {
+      if (WaitCommEvent(x->comhandle, &dwCommEvent,NULL)) {
+*/
 		do {
 
 		  if(ReadFile(x->comhandle, &chr, 1, &dwRead, NULL))
@@ -697,13 +703,15 @@ static void comport_tick(t_comport *x)
 	         break;
 		  }
 		} while (dwRead);
-//      }
-//      else{
-//	     post("serial dev: Error in WaitCommEvent");
-	  //   break;
-//      }
-    //}
+/*
+      }
+      else{
+	     post("serial dev: Error in WaitCommEvent");
+	     break;
+      }
+    }
   }
+*/
 #else
   {
     fd_set com_rfds;  	 
@@ -787,7 +795,7 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
   x->x_clock = clock_new(x, (t_method)comport_tick);
 
   clock_delay(x->x_clock, x->x_deltime);
-  
+
   return x;
 }
 
