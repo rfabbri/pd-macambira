@@ -200,11 +200,11 @@ static Image *XMyGetWindowImage(t_pdp_capture *o, Display *display,const Window 
       max_windows+=1024;
       if (window_info == (WindowInfo *) NULL)
       {
-        window_info=(WindowInfo *) AcquireMemory(max_windows*sizeof(WindowInfo));
+        window_info=(WindowInfo *) AcquireMemory(max_windows*sizeof(*window_info));
       }
       else
       {
-        ReacquireMemory((void **) &window_info,max_windows*sizeof(WindowInfo));
+        window_info=(WindowInfo *) ResizeMagickMemory(window_info,max_windows*sizeof(*window_info));
       }
   }
   if (window_info == (WindowInfo *) NULL)
@@ -335,8 +335,13 @@ static Image *XMyGetWindowImage(t_pdp_capture *o, Display *display,const Window 
                     XDestroyImage(ximage);
                     return((Image *) NULL);
                 }
+#if MagickLibVersion >= 0x608
+                if ((window_info[id].visual->klass != DirectColor) &&
+                    (window_info[id].visual->klass != TrueColor))
+#else
                 if ((window_info[id].visual->storage_class != DirectColor) &&
                     (window_info[id].visual->storage_class != TrueColor))
+#endif
                 {
                   for (i=0; i < (int) number_colors; i++)
                   {
@@ -389,8 +394,13 @@ static Image *XMyGetWindowImage(t_pdp_capture *o, Display *display,const Window 
             XDestroyImage(ximage);
             return((Image *) NULL);
         }
-        if ((window_info[id].visual->storage_class != TrueColor) &&
-            (window_info[id].visual->storage_class != DirectColor))
+#if MagickLibVersion >= 0x608
+        if ((window_info[id].visual->klass != DirectColor) &&
+            (window_info[id].visual->klass != TrueColor))
+#else
+        if ((window_info[id].visual->storage_class != DirectColor) &&
+            (window_info[id].visual->storage_class != TrueColor))
+#endif
         {
           composite_image->storage_class=PseudoClass;
         }
@@ -426,7 +436,11 @@ static Image *XMyGetWindowImage(t_pdp_capture *o, Display *display,const Window 
               blue_shift++;
             }
             if ((number_colors != 0) &&
+#if MagickLibVersion >= 0x608
+                (window_info[id].visual->klass == DirectColor))
+#else
                 (window_info[id].visual->storage_class == DirectColor))
+#endif
             {
               for (y=0; y < (long) composite_image->rows; y++)
               {
@@ -535,14 +549,23 @@ static Image *XMyGetWindowImage(t_pdp_capture *o, Display *display,const Window 
       while (colormap_info != (ColormapInfo *) NULL)
       {
         next=colormap_info->next;
+#if MagickLibVersion >= 0x608
+        colormap_info->colors=(XColor *) RelinquishMagickMemory(colormap_info->colors);
+        colormap_info=(ColormapInfo *) RelinquishMagickMemory(colormap_info);
+#else
         LiberateMemory((void **) &colormap_info->colors);
         LiberateMemory((void **) &colormap_info);
+#endif
         colormap_info=next;
       }
       /*
         Free resources and restore initial state.
       */
+#if MagickLibVersion >= 0x608
+      window_info=(WindowInfo *) RelinquishMagickMemory(window_info);
+#else
       LiberateMemory((void **) &window_info);
+#endif
       window_info=(WindowInfo *) NULL;
       max_windows=0;
       number_windows=0;

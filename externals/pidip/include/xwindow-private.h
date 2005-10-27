@@ -33,6 +33,12 @@ extern "C" {
 #include <X11/Xutil.h>
 #include "magick/quantize.h"
 
+#if defined(__cplusplus) || defined(c_plusplus)
+# define klass  c_class
+#else
+# define klass  class
+#endif
+
 /*
   Invoke pre-X11R6 ICCCM routines if XlibSpecificationRelease is not 6.
 */
