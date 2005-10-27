@@ -26,6 +26,13 @@
 /* Culturcide : Bruce                                                           */
 /* ---------------------------------------------------------------------------- */
 
+//added functions:
+//"static void blinkenlights_findframes(t_blinkenlights *x)"
+//this is to remember the frame positions in the .blm file
+
+//"static void blinkenlights_goto(t_blinkenlights* x, t_float frame)"
+//with a "goto $1" message, you can stratch the blm film. note that the 
+//range of $1 is 0 to 1
 
 
 #include <sys/types.h>
@@ -35,7 +42,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef __APPLE__
+#ifndef MACOSX
 #include <malloc.h>
 #endif
 #include <ctype.h>
@@ -46,7 +53,7 @@
 #include "m_pd.h"            /* standard pd stuff */
 #include "g_canvas.h"        /* some pd's graphical functions */
 
-static char   *blinkenlights_version = "blinkenlights: a blinkenlights movies player version 0.1 ( bugs @ ydegoyon@free.fr )";
+static char   *blinkenlights_version = "blinkenlights: a blinkenlights movies player version 0.2 ( bugs @ ydegoyon@free.fr and chun@goto10.org )";
 
 static int guidebug=0;
 
@@ -107,6 +114,13 @@ typedef struct _blinkenlights
     t_int x_timer;       /* timer read from bl movie */
     t_int *x_frame;      /* frame contents */
     t_clock *x_clock;    /* clock used for reading frames */
+    t_outlet *outlet_bang;
+    t_int frame_no; 
+    t_int frame_pos[BL_MAX_LENGTH];
+    t_clock *x_clock2;
+    t_int x_timer2;
+    t_float frame_inc;
+    
 } t_blinkenlights;
 
 static void blinkenlights_close(t_blinkenlights *x);
@@ -124,6 +138,11 @@ static void blinkenlights_free(t_blinkenlights *x)
   {
      clock_unset( x->x_clock );
      clock_free( x->x_clock );
+  }
+  if ( x->x_clock2 != NULL ) 
+  {
+     clock_unset( x->x_clock2 );
+     clock_free( x->x_clock2 );
   }
   post( "blinkenlights : done" );
 }
@@ -162,6 +181,10 @@ static void *blinkenlights_new(t_float fwidth, t_float fheight, t_float fxpixsiz
   x->x_foreground = (char*) getbytes( 8 );
   strncpy( x->x_foreground, BL_FOREGROUND_COLOR, 7 );
   x->x_foreground[7] = '\0';
+  x->x_timer2 = 40; 
+  x->frame_inc = 0; 
+  
+  x->outlet_bang = outlet_new(&x->x_obj, &s_bang);
 
   return(x);
 }
@@ -447,6 +470,8 @@ static void blinkenlights_readframe(t_blinkenlights *x)
   char *lineread = (char*) getbytes( BL_MAX_LENGTH );
   t_int flineno = 0;
   t_int width, height, nwidth;
+  
+  //post( "blinkenlights: being readframe:>%s<", lineread );
 
     if ( !x->x_ecanvas )
     {
@@ -463,12 +488,14 @@ static void blinkenlights_readframe(t_blinkenlights *x)
 
     // skip header and empty lines
     while ( lineread[0] == '#' || lineread[0] == '\n' || lineread[0] == '\0' ) 
-    {
-       // post( "blinkenlights : skipped line : >%s<", lineread );
+    {     
+    
+       //post( "blinkenlights : skipped line : >%s<", lineread );
        if ( fgets( lineread, BL_MAX_LENGTH, x->x_filed ) == 0 )
        {
           post( "blinkenlights : end of file detected : looping..." );
           fseek( x->x_filed, 0L, SEEK_SET ); 
+          outlet_bang(x->outlet_bang);
        }
     }
 
@@ -561,6 +588,132 @@ static void blinkenlights_readframe(t_blinkenlights *x)
 
     if ( lineread ) freebytes( lineread, BL_MAX_LENGTH );
 }
+//-------------------------------------------------------------------------
+//--chun's functions begin here...
+//-------------------------------------------------------------------------
+/* remember all the frame positions */
+static void blinkenlights_findframes(t_blinkenlights *x)
+{
+ int i =0;
+ 
+ x->frame_no = 0; 
+ 
+ for(i=0;;i++)
+ {
+ char *lineread = (char*) getbytes( BL_MAX_LENGTH );
+ 
+ fgets( lineread, BL_MAX_LENGTH, x->x_filed );
+ if(strlen(lineread) == 0) break;
+ 
+ if(lineread[0] == '@')
+ { 
+  x->frame_pos[x->frame_no] = ftell(x->x_filed);
+  x->frame_no++;
+ }
+ if (lineread) freebytes( lineread, BL_MAX_LENGTH );
+ }
+ fseek( x->x_filed, 0L, SEEK_SET );
+ post("the end:: %d frames!", x->frame_no);
+}
+
+//-------------------------------------------------------------------------
+static void blinkenlights_goto(t_blinkenlights* x)
+{
+ //char *lineread = (char*) getbytes( BL_MAX_LENGTH );
+ char lineread[BL_MAX_LENGTH];
+ int current_frame = x->frame_pos[(int)(x->frame_inc * (x->frame_no-1))];
+ int i, n, width, newvalue, height, nwidth; 
+ 
+  t_int flineno = 0;
+
+ fseek(x->x_filed, current_frame, SEEK_SET);
+ 
+ height = 0;
+    width = 0;
+    while ( 1 )
+    {
+
+        if ( fgets( lineread, BL_MAX_LENGTH, x->x_filed ) == NULL ) 
+        {
+           post( "blinkenlights : EOF not expected here !!! ");
+           blinkenlights_close(x);
+           return;
+        }
+        else
+        {
+           if ( (lineread[0] == '\0') || (lineread[0] == '#') || (lineread[0] == '\n') ) break;
+           // post( "blinkenlights : lineread : %s", lineread );
+
+           nwidth = strlen( lineread )-1; // because of the carriage return
+           flineno++;
+           height = flineno;
+           if ( ( nwidth != width ) && ( width != 0 ) ) 
+           {
+              post( "blinkenlights : weird file : width has changed (nwidth=%d) (width=%d)", nwidth, width );
+              blinkenlights_close( x );
+              return;
+           }
+           width = nwidth;
+           if ( x->x_frame != NULL )
+           {
+              t_int pint = 0;
+              t_int newvalue;   
+              
+              while ( pint < width )
+              {
+                 newvalue = (int) *(lineread+pint) - 48 /* ascii value for '0' */;
+                 if ( newvalue != *(x->x_frame+(flineno-1)*x->x_width+pint ) )
+                 {
+                    *(x->x_frame+(flineno-1)*x->x_width+pint ) = newvalue;
+                    switch ( newvalue ) 
+                    {
+                       case 0:
+                          // post( "pixoff %d %d", pint+1, flineno );
+                          blinkenlights_pixoff( x, pint+1, flineno );
+                          break;
+                       case 1:
+                          // post( "pixon %d %d", pint+1, flineno );
+                          blinkenlights_pixon( x, pint+1, flineno );
+                          break;
+                       default:
+                          // post("blinkenlights : wrong value found for pixel : %d (c=%c)", newvalue, *(lineread+pint) );
+                          break;
+                    }
+                 }
+                 pint++;  
+              }
+           }
+           if ( x->x_frame == NULL ) x->x_height++;
+        }
+    }
+    if ( x->x_frame == NULL )
+    {
+       if ( x->x_filed != NULL ) if ( fseek(x->x_filed, 0L, SEEK_SET) < 0 ) 
+       {
+          post( "blinkenlights : could not rewind file" );
+          blinkenlights_close( x );
+          return;
+       }
+       blinkenlights_width(x, width);
+       blinkenlights_height(x, height);
+       x->x_frame = ( t_int* ) getbytes( x->x_width*x->x_height*sizeof(t_int) );
+       blinkenlights_readframe(x);
+    }
+ 
+}
+
+static void blinkenlights_frame_pos(t_blinkenlights* x, t_float pos)
+{
+ if(pos > 1 | pos < 0) post ("dude, don't be crazy!");
+  else x->frame_inc = pos;;
+ //post("frame %d", x->frame_inc);
+}
+
+static void blinkenlights_timer2(t_blinkenlights* x, t_float timer)
+{
+ x->x_timer2 = timer;
+ //post("frame %d", x->frame_inc);
+}
 
     /* open movie */
 static void blinkenlights_open(t_blinkenlights *x, t_symbol *sfile)
@@ -571,7 +724,21 @@ static void blinkenlights_open(t_blinkenlights *x, t_symbol *sfile)
      return;
   }
 
-  blinkenlights_close(x);
+  //----------------------------------
+  /* closing previous file descriptor */
+  if ( x->x_filed != NULL ) {
+     if(fclose(x->x_filed) < 0)
+     {
+        perror( "blinkenlights : closing file" );
+     }
+     x->x_filed = NULL; 
+  }
+  if ( x->x_frame )
+  {
+    blinkenlights_clear(x);
+  }
+    
+  //-------------------------------- 
  
   if ( ( x->x_filed = fopen( sfile->s_name, "r" ) ) == NULL )
   {
@@ -579,8 +746,9 @@ static void blinkenlights_open(t_blinkenlights *x, t_symbol *sfile)
        return;
   }
   post( "blinkenlights : opened >%s<", sfile->s_name);
- 
-  blinkenlights_readframe(x);
+  // don't read the first frame when open..
+  //blinkenlights_readframe(x);
+  blinkenlights_findframes(x);
 }
 
     /* play frames */
@@ -588,6 +756,13 @@ static void blinkenlights_playframes(t_blinkenlights *x)
 {
    blinkenlights_readframe( x );
    clock_delay( x->x_clock, (double)x->x_timer );
+}
+
+/* play frames2 */
+static void blinkenlights_playframes2(t_blinkenlights *x)
+{
+   blinkenlights_goto(x);
+   clock_delay( x->x_clock2, (double)x->x_timer2 );
 }
 
     /* play movie */
@@ -608,6 +783,33 @@ static void blinkenlights_play(t_blinkenlights *x)
   
   if ( x->x_clock == NULL ) x->x_clock = clock_new( x, (t_method)blinkenlights_playframes);
   clock_delay( x->x_clock, (double)x->x_timer );
+}
+
+   /* vj movie */
+static void blinkenlights_vj(t_blinkenlights *x, t_float start_vj)
+{
+  if ( !x->x_ecanvas )
+  {
+     post("blinkenlights : play : canvas does not exist" );
+     return;
+  }
+
+  if ( x->x_filed == NULL )
+  {
+     post( "blinkenlights : no file is opened for playing" );
+     blinkenlights_close(x);
+     return;
+  }
+  
+  if(start_vj)
+  {
+  if ( x->x_clock2 == NULL ) x->x_clock2 = clock_new( x, (t_method)blinkenlights_playframes2);
+  clock_delay( x->x_clock2, (double)x->x_timer2 );
+  }
+  else
+  {
+  clock_unset( x->x_clock2 );
+  }
 }
 
     /* stop movie */
@@ -632,8 +834,6 @@ static void blinkenlights_stop(t_blinkenlights *x)
   }
 }
 
-
-
     /* jump to next frame */
 static void blinkenlights_next(t_blinkenlights *x)
 {
@@ -656,6 +856,9 @@ void blinkenlights_setup(void)
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_next, gensym("next"), 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_play, gensym("play"), 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_stop, gensym("stop"), 0);
+  class_addmethod( blinkenlights_class, (t_method)blinkenlights_frame_pos, gensym("goto"), A_FLOAT, 0);
+  class_addmethod( blinkenlights_class, (t_method)blinkenlights_vj, gensym("vj"), A_FLOAT, 0);
+  class_addmethod( blinkenlights_class, (t_method)blinkenlights_timer2, gensym("timer2"), A_FLOAT, 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_background, gensym("background"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_foreground, gensym("foreground"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
   class_addmethod( blinkenlights_class, (t_method)blinkenlights_destroy, gensym("destroy"), 0);
