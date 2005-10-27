@@ -113,13 +113,13 @@ static void print_port(t_aconnect *x, t_symbol*s, snd_seq_t *seq, snd_seq_client
 static void print_output(t_aconnect *x, snd_seq_t *seq, snd_seq_client_info_t *cinfo,
 		       snd_seq_port_info_t *pinfo)
 {
-  print_port(x, gensym("output"), seq, cinfo, pinfo);
+  print_port(x, gensym("dst"), seq, cinfo, pinfo);
 }
 
 static void print_input(t_aconnect *x, snd_seq_t *seq, snd_seq_client_info_t *cinfo,
 		       snd_seq_port_info_t *pinfo)
 {
-  print_port(x, gensym("input"), seq, cinfo, pinfo);
+  print_port(x, gensym("src"), seq, cinfo, pinfo);
 }
 
 static void print_connections(t_aconnect *x, snd_seq_t *seq, snd_seq_client_info_t *cinfo,
@@ -232,10 +232,10 @@ static void aconnect_listdevices(t_aconnect *x, t_symbol *s)
     outlet_float(x->x_error, (float)(-2));
     return;
   }
-  if(&s_==s || gensym("input")==s)
+  if(&s_==s || gensym("src")==s)
     do_search_port(x, seq, LIST_INPUT, print_input);
 
-  if(&s_==s || gensym("output")==s)
+  if(&s_==s || gensym("dst")==s)
     do_search_port(x, seq, LIST_OUTPUT, print_output);
 
   if(!ac_seq)snd_seq_close(seq);
