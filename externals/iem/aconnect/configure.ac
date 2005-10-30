@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(aconnect.c)
 
-VERSION=0.3
+VERSION=0.4
 
 dnl Checks for programs.
 AC_PROG_CC
