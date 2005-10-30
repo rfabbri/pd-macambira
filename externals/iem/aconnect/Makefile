@@ -6,7 +6,7 @@ INSTALL_BIN=$(PREFIX)/extra
 INSTALL_DOC=$(PREFIX)/extra/help-$(LIBNAME)
 
 EXT = pd_linux 
-DEFS = -DHAVE_ALSA  -DACONNECT_VERSION=\"0.3\"
+DEFS = -DHAVE_ALSA  -DACONNECT_VERSION=\"0.4\"
 IFLAGS = -I.  $(INCLUDES)
 
 CC = gcc
@@ -19,12 +19,12 @@ WFLAGS =
 
 MAKEDEP_FLAGS = -MM
 
-TARNAME =  $(LIBNAME)-0.3.tgz
-BINTARNAME =  $(LIBNAME)-0.3-bin.tgz
+TARNAME =  $(LIBNAME)-0.4.tgz
+BINTARNAME =  $(LIBNAME)-0.4-bin.tgz
 
 .SUFFIXES: .$(EXT)
 
-CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) -fPIC -g -O2 
+CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) -fPIC -g -O2 -mms-bitfields 
 
 LIBS = -lasound -lm -lc 
 
