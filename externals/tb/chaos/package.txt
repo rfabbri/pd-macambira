@@ -32,6 +32,9 @@ driven_anharmonic_search.cpp \
 driven_van_der_pol_dsp.cpp \
 driven_van_der_pol_msg.cpp \
 driven_van_der_pol_search.cpp \
+duffing_dsp.cpp \
+duffing_msg.cpp \
+duffing_search.cpp \
 duffing_map_dsp.cpp \
 duffing_map_msg.cpp \
 duffing_map_search.cpp \
@@ -62,6 +65,9 @@ latoomutbeta_search.cpp \
 latoomutgamma_dsp.cpp \
 latoomutgamma_msg.cpp \
 latoomutgamma_search.cpp \
+linear_congruental_dsp.cpp \
+linear_congruental_msg.cpp \
+linear_congruental_search.cpp \
 logistic_dsp.cpp \
 logistic_msg.cpp \
 logistic_search.cpp \
