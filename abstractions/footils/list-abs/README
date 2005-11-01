@@ -8,6 +8,10 @@ last-x.pd
 
   get a list containing the last x atoms received.
 
+list-abs.pd
+
+  change floats in a lists to their absolute values.
+
 list-accum.pd
 
   sum all floats in a list.
@@ -28,6 +32,10 @@ list-drip2.pd
 list-dripslow.pd
 
   serialize a list on demand: each bang will output the next element.
+
+list-equalize.pd
+
+  scale a list so that all float elements sum up to 1
 
 list-inter.pd
 
@@ -50,6 +58,10 @@ list-math.pd
 list-minmax.pd
 
   find minimum and maximum float in a list.
+
+list-normalize.pd
+
+  normalize a list to (-1,1) like you can normalize a Pd array.
 
 list-rev.pd
 
