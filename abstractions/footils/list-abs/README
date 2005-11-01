@@ -71,6 +71,10 @@ list-rot.pd
 
   rotate a list (move X elements from front to back)
 
+list-sieve.pd
+
+  let only those incoming floats pass, that have been found in a test list.
+
 sroute.pd
 
   a settable [route] object for a single selector.
