@@ -23,7 +23,7 @@
 
 void chaos_library_setup()
 {
-	post("chaos~ version 0.01, compiled on "__DATE__);
+	post("\nchaos~ version 0.01, compiled on "__DATE__);
 	post("(C)2005 Tim Blechmann, www.mokabar.tk\n\n");
 
 

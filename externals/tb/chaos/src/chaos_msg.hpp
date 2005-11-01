@@ -25,6 +25,11 @@ template <class system> class chaos_msg
 {
 	FLEXT_HEADER(chaos_msg, flext_base);
 
+	~chaos_msg()
+	{
+		delete m_system;
+	}
+
 public:
 
 	/* local data for system, output and interpolation */
@@ -59,10 +64,5 @@ SYSTEM##_msg(int argc, t_atom* argv )			\
         AddOutFloat();							\
 												\
     ATTRIBUTES;									\
-    FLEXT_ADDBANG(0, m_bang);              	\
-}												\
-												\
-~SYSTEM##_msg()									\
-{												\
-	delete m_system;							\
+    FLEXT_ADDBANG(0, m_bang);					\
 }
