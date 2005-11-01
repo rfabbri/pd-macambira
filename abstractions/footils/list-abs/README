@@ -1,0 +1,73 @@
+list-abs
+--------
+
+These are abstractions implementing common list operations. Included are in
+alphabetical order:
+
+last-x.pd
+
+  get a list containing the last x atoms received.
+
+list-accum.pd
+
+  sum all floats in a list.
+
+list-demux.pd
+
+  route lists to different outlets (like demux in zexy). Not an abstraction,
+  just a patch illustrating the idiom.
+
+list-drip.pd
+
+  serialize a list automatically (like drip in zexy).
+
+list-drip2.pd
+
+  serialize two lists in sync as long as first list lasts.
+
+list-dripslow.pd
+
+  serialize a list on demand: each bang will output the next element.
+
+list-inter.pd
+
+  element-wise linear interpolation between two (float) lists.
+  list-inter-example-gem.pd shows a more complicated usage example, but
+  requires gem for visualisation.
+
+list-len.pd
+
+  calculate length of a list.
+
+list-makefilename.pd
+
+  apply [makefilename] on list elements, if they are symbols.
+
+list-math.pd
+
+  apply [expr OP] with OP in (+,-,*,/) on list elements, if they are floats.
+
+list-minmax.pd
+
+  find minimum and maximum float in a list.
+
+list-rev.pd
+
+  reverse a list.
+
+list-rot.pd
+
+  rotate a list (move X elements from front to back)
+
+sroute.pd
+
+  a settable [route] object for a single selector.
+
+take-two.pd
+
+  take a list as input and print all combinations of length two without repetition.
+
+triple-scale.pd
+
+  this actually is not using [list]: Interpolate between two (x,y,z)-points.
+  Also see [list-inter], which is more powerful.
