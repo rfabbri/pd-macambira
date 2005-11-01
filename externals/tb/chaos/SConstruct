@@ -64,14 +64,14 @@ else:
 if env.Dictionary().has_key('pd_path'):
 	env.Append(CPPPATH=[env['pd_path']])
 
+if env.Dictionary().has_key('simd') and env['simd']:
+	env.Append(CCFLAGS=' -mfpmath=sse -msse -mmmx -msse2')
+
 if env.Dictionary().has_key('optimize'):
 	if env['optimize']:
 		env.Append(CCFLAGS=' -O3 '+env['optimize'])
 		env.Append(LINKFLAGS=' -O3 '+env['optimize'])
 
-if env.Dictionary().has_key('simd') and env['simd']:
-	env.Append(CCFLAGS=' -mfpmath=sse -msse -mmmx -msse2')
-			   
 if env.Dictionary().has_key('debug') and env['debug']:
 	env.Append(CCFLAGS=' -g ')
 	env.Append(CPPDEFINES=['_DEBUG'])
