@@ -69,11 +69,17 @@ list-rev.pd
 
 list-rot.pd
 
-  rotate a list (move X elements from front to back)
+  rotate a list (move X elements from front to back). 
 
 list-sieve.pd
 
   let only those incoming floats pass, that have been found in a test list.
+
+list-splat.pd
+
+  an advanced [list split] which also accepts negative indices to split off
+  elements from the back of a list. Otherwise compatible to [list split] so it
+  can be used as a drop-in replacement.
 
 sroute.pd
 
