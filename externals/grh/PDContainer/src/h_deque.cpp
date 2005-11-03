@@ -343,6 +343,30 @@ static void h_deque_get_namespace(t_h_deque *x)
   post("h_deque current namespace: %s",x->hdeque->getNamespace().c_str());
 }
 
+static void h_deque_getall(t_h_deque *x)
+{
+  deque<Element>::iterator iter  = x->hdeque->getAll().begin();
+  
+  while(iter != x->hdeque->getAll().end())
+  {
+    Element output = *iter;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_deque_print(t_h_deque *x)
 {
   x->hdeque->printAllIndex();
@@ -554,6 +578,8 @@ void h_deque_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_deque_class, (t_method)h_deque_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
+  class_addmethod(h_deque_class, (t_method)h_deque_getall,
+		  gensym("getall"), A_DEFFLOAT, 0);
   class_addmethod(h_deque_class, (t_method)h_deque_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_deque_class, (t_method)h_deque_clear,  

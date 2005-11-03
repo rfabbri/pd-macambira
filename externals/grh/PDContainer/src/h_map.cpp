@@ -182,6 +182,54 @@ static void h_map_get_namespace(t_h_map *x)
   post("h_map current namespace: %s",x->hmap->getNamespace().c_str());
 }
 
+static void h_map_keys(t_h_map *x)
+{
+  map<Element,Element>::iterator iter = x->hmap->getAll().begin();
+  
+  while(iter != x->hmap->getAll().end())
+  {
+    Element output = (*iter).first;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
+static void h_map_values(t_h_map *x)
+{
+  map<Element,Element>::iterator iter  = x->hmap->getAll().begin();
+  
+  while(iter != x->hmap->getAll().end())
+  {
+    Element output = (*iter).second;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_map_print(t_h_map *x)
 {
   x->hmap->printAll();
@@ -314,6 +362,10 @@ void h_map_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_map_class, (t_method)h_map_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
+  class_addmethod(h_map_class, (t_method)h_map_keys,
+		  gensym("keys"), A_DEFFLOAT, 0);
+  class_addmethod(h_map_class, (t_method)h_map_values,
+		  gensym("values"), A_DEFFLOAT, 0);
   class_addmethod(h_map_class, (t_method)h_map_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_map_class, (t_method)h_map_clear,  

@@ -279,6 +279,30 @@ static void h_list_clear_all(t_h_list *x)
   x->hlist->clearAll();
 }
 
+static void h_list_getall(t_h_list *x)
+{
+  list<Element>::iterator iter  = x->hlist->getAll().begin();
+  
+  while(iter != x->hlist->getAll().end())
+  {
+    Element output = *iter;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_list_print(t_h_list *x)
 {
   x->hlist->printAllIndex();
@@ -426,6 +450,8 @@ void h_list_setup(void)
 		  gensym("clear"), A_DEFFLOAT, 0);
   class_addmethod(h_list_class, (t_method)h_list_clear_all,  
 		  gensym("clearall"), A_DEFFLOAT, 0);
+  class_addmethod(h_list_class, (t_method)h_list_getall,
+		  gensym("getall"), A_DEFFLOAT, 0);
   class_addmethod(h_list_class, (t_method)h_list_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_list_class, (t_method)h_list_save, 

@@ -1,4 +1,4 @@
-#N canvas 535 40 834 864 10;
+#N canvas 535 40 834 856 10;
 #X obj 36 29 cnv 15 404 54 empty empty empty 22 25 0 18 -1 -66577 0
 ;
 #X obj 38 31 cnv 15 400 50 empty empty PDContainer 22 25 0 18 -228992
@@ -6,33 +6,33 @@
 #X text 298 41 help file of;
 #X text 39 103 init arg: namespace;
 #X msg 483 298 print;
-#X msg 483 342 clear;
-#X msg 483 653 help;
-#X obj 604 712 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X msg 483 372 clear;
+#X msg 483 643 help;
+#X obj 604 702 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 483 239 getnamespace;
-#X msg 483 380 clearall;
-#X obj 483 769 print BBB;
+#X msg 483 410 clearall;
+#X obj 483 759 print BBB;
 #X text 594 264 <- change namespace;
 #X msg 483 263 namespace grix;
 #X text 530 299 <- print all the data of the;
 #X text 549 314 current namespace;
-#X text 531 342 <- clear all the data of the;
-#X text 552 357 current namespace;
-#X text 551 382 <- clear all the data in all;
-#X text 572 397 same containers (maybe;
-#X text 574 412 you shouldn't use this);
+#X text 531 372 <- clear all the data of the;
+#X text 552 387 current namespace;
+#X text 551 412 <- clear all the data in all;
+#X text 572 427 same containers (maybe;
+#X text 574 442 you shouldn't use this);
 #X text 583 241 <- get current namespace;
 #X text 514 198 general operations:;
-#X msg 483 561 getsize;
-#X floatatom 523 749 5 0 0 0 - - -;
-#X text 570 574 outlet);
+#X msg 483 568 getsize;
+#X floatatom 523 739 5 0 0 0 - - -;
+#X text 570 581 outlet);
 #X text 290 58 ::: h_list :::;
 #X text 40 133 Fast insertion and removal anywhere \, all the other
 elements move up. But a list provides only sequential access (not via
 index !). A list is a doubly linked list.;
-#X obj 483 691 h_list simonatbase;
-#X text 604 730 <- size of the list;
+#X obj 483 681 h_list simonatbase;
+#X text 604 720 <- size of the list;
 #X obj 192 721 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 71 700 h_list simonatbase;
@@ -176,14 +176,14 @@ removed is unchanged.;
 #X connect 8 0 3 0;
 #X restore 134 578 pd special_operations;
 #X text 217 720 <- bang if not found;
-#X floatatom 563 730 5 0 0 0 - - -;
-#X text 565 750 <- current iterator position;
+#X floatatom 563 720 5 0 0 0 - - -;
+#X text 565 740 <- current iterator position;
 #X floatatom 151 721 5 0 0 0 - - -;
 #X floatatom 111 721 5 0 0 0 - - -;
-#X msg 483 604 getiter;
-#X text 548 560 <- get the size (at 3nd;
-#X text 574 620 (2nd outlet);
-#X text 553 605 <- get current iterator pos;
+#X msg 483 600 getiter;
+#X text 548 567 <- get the size (at 3nd;
+#X text 574 616 (2nd outlet);
+#X text 553 601 <- get current iterator pos;
 #X obj 500 28 cnv 15 204 120 empty empty empty 20 12 0 14 -66577 -66577
 0;
 #X obj 502 30 cnv 15 200 116 empty empty ReadMe: 65 15 0 14 -262131
@@ -495,13 +495,16 @@ it at the back (so the size will increase);
 #X connect 2 0 0 0;
 #X connect 7 0 0 0;
 #X connect 8 0 0 0;
-#X restore 483 459 pd read_save_possibilities;
-#X text 523 483 different possiblities to read;
-#X text 523 497 and write from and to files;
-#X text 522 512 (XML and textfiles);
-#X text 234 821 htttp://grh.mur.at/software/pdcontainer.html;
-#X text 194 805 =%)!(%= PDContainer \, by Georg Holzmann <grh@mur.at>
+#X restore 483 477 pd read_save_possibilities;
+#X text 523 501 different possiblities to read;
+#X text 523 515 and write from and to files;
+#X text 522 530 (XML and textfiles);
+#X text 229 822 htttp://grh.mur.at/software/pdcontainer.html;
+#X text 189 806 =%)!(%= PDContainer \, by Georg Holzmann <grh@mur.at>
 \, 2004;
+#X msg 483 335 getall;
+#X text 535 335 <- dumps out all data sequentially;
+#X text 556 349 at the first outlet;
 #X connect 4 0 27 0;
 #X connect 5 0 27 0;
 #X connect 6 0 27 0;
@@ -520,3 +523,4 @@ it at the back (so the size will increase);
 #X connect 31 0 30 0;
 #X connect 49 0 27 0;
 #X connect 58 0 27 0;
+#X connect 64 0 27 0;

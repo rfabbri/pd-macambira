@@ -94,6 +94,12 @@ class ContainerBase
   virtual void clearNamespace()
     { data_.erase(h_namespace_); }
 
+  /* returns a reference to the whole Container
+  * of the current namespace
+   */
+  virtual ContainerType &getAll()
+  { return data_[h_namespace_]; }
+  
   /* clears all the data of the current container
    * ( in all namespaces !!!!! )
    * so be carefull !!!

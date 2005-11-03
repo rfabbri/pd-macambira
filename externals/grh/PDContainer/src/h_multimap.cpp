@@ -179,6 +179,54 @@ static void h_multimap_get_namespace(t_h_multimap *x)
   post("h_multimap current namespace: %s",x->hmultimap->getNamespace().c_str());
 }
 
+static void h_multimap_keys(t_h_multimap *x)
+{
+  multimap<Element,Element>::iterator iter = x->hmultimap->getAll().begin();
+  
+  while(iter != x->hmultimap->getAll().end())
+  {
+    Element output = (*iter).first;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
+static void h_multimap_values(t_h_multimap *x)
+{
+  multimap<Element,Element>::iterator iter  = x->hmultimap->getAll().begin();
+  
+  while(iter != x->hmultimap->getAll().end())
+  {
+    Element output = (*iter).second;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_multimap_print(t_h_multimap *x)
 {
   x->hmultimap->printAll();
@@ -310,6 +358,10 @@ void h_multimap_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_multimap_class, (t_method)h_multimap_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
+  class_addmethod(h_multimap_class, (t_method)h_multimap_keys,
+		  gensym("keys"), A_DEFFLOAT, 0);
+  class_addmethod(h_multimap_class, (t_method)h_multimap_values,
+		  gensym("values"), A_DEFFLOAT, 0);
   class_addmethod(h_multimap_class, (t_method)h_multimap_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_multimap_class, (t_method)h_multimap_clear,  

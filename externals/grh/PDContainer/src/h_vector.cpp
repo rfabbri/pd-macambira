@@ -261,6 +261,30 @@ static void h_vector_get_namespace(t_h_vector *x)
   post("h_vector current namespace: %s",x->hvector->getNamespace().c_str());
 }
 
+static void h_vector_getall(t_h_vector *x)
+{
+  vector<Element>::iterator iter  = x->hvector->getAll().begin();
+  
+  while(iter != x->hvector->getAll().end())
+  {
+    Element output = *iter;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_vector_print(t_h_vector *x)
 {
   x->hvector->printAllIndex();
@@ -464,6 +488,8 @@ void h_vector_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_vector_class, (t_method)h_vector_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
+  class_addmethod(h_vector_class, (t_method)h_vector_print,
+		  gensym("getall"), A_DEFFLOAT, 0);
   class_addmethod(h_vector_class, (t_method)h_vector_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_vector_class, (t_method)h_vector_clear,  

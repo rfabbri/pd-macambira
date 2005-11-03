@@ -1,6 +1,6 @@
-#N canvas 0 0 818 882 10;
-#X msg 82 407 add ge;
-#X obj 175 494 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 551 0 818 885 10;
+#X msg 82 392 add ge;
+#X obj 175 479 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 33 24 cnv 15 404 54 empty empty empty 22 25 0 18 -1 -66577 0
 ;
@@ -9,69 +9,69 @@
 #X text 295 36 help file of;
 #X text 292 53 ::: h_map :::;
 #X text 40 98 init arg: namespace;
-#X msg 474 379 print;
-#X msg 474 423 clear;
-#X msg 474 643 help;
-#X obj 567 704 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X msg 474 364 print;
+#X msg 474 478 clear;
+#X msg 474 698 help;
+#X obj 567 750 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 474 320 getnamespace;
-#X msg 474 461 clearall;
-#X obj 474 681 h_map druschka;
-#X obj 474 757 print BBB;
-#X obj 82 495 print AAA;
-#X text 585 345 <- change namespace;
-#X msg 474 344 namespace grix;
-#X text 521 380 <- print all the data of the;
-#X text 540 395 current namespace;
-#X text 522 423 <- clear all the data of the;
-#X text 543 438 current namespace;
-#X text 542 463 <- clear all the data in all;
-#X text 563 478 same containers (maybe;
-#X text 565 493 you shouldn't use this);
-#X text 574 322 <- get current namespace;
-#X text 473 268 general operations:;
-#X msg 82 381 add bla bal tuff;
-#X msg 82 431 add 4 f 3;
-#X msg 82 356 add \$1;
-#X floatatom 82 318 5 0 0 0 - - -;
-#X symbolatom 129 320 10 0 0 0 - - -;
-#X obj 82 472 h_map druschka;
-#X msg 244 433 list damm 4345 it;
-#X floatatom 244 339 5 0 0 0 - - -;
-#X symbolatom 244 357 10 0 0 0 - - -;
-#X msg 244 409 hacka 45;
-#X msg 244 386 3 4 krschi;
+#X msg 474 305 getnamespace;
+#X msg 474 516 clearall;
+#X obj 474 727 h_map druschka;
+#X obj 474 803 print BBB;
+#X obj 82 480 print AAA;
+#X text 585 330 <- change namespace;
+#X msg 474 329 namespace grix;
+#X text 521 365 <- print all the data of the;
+#X text 540 380 current namespace;
+#X text 522 478 <- clear all the data of the;
+#X text 543 493 current namespace;
+#X text 542 518 <- clear all the data in all;
+#X text 563 533 same containers (maybe;
+#X text 565 548 you shouldn't use this);
+#X text 574 307 <- get current namespace;
+#X text 473 253 general operations:;
+#X msg 82 366 add bla bal tuff;
+#X msg 82 416 add 4 f 3;
+#X msg 82 341 add \$1;
+#X floatatom 82 303 5 0 0 0 - - -;
+#X symbolatom 129 305 10 0 0 0 - - -;
+#X obj 82 457 h_map druschka;
+#X msg 244 418 list damm 4345 it;
+#X floatatom 244 324 5 0 0 0 - - -;
+#X symbolatom 244 342 10 0 0 0 - - -;
+#X msg 244 394 hacka 45;
+#X msg 244 371 3 4 krschi;
 #X text 37 130 Maps represent a mapping from one type (the key type)
 to another type (the value type). You can associate a value with a
 key \, or find the value associated with a key \, very efficiently.
 Map is a Sorted Associative Container and it is also a Unique Associative
 Container \, meaning that no two elements have the same key. (see Multimap
 for more elements with the same key);
-#X text 110 293 key:;
-#X text 254 308 value:;
-#X text 127 269 add data to the map:;
-#X obj 172 748 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X text 110 278 key:;
+#X text 254 293 value:;
+#X text 127 254 add data to the map:;
+#X obj 172 733 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 79 749 print AAA;
-#X floatatom 79 572 5 0 0 0 - - -;
-#X symbolatom 126 574 10 0 0 0 - - -;
-#X obj 79 726 h_map druschka;
-#X text 136 541 get \, remove data:;
-#X msg 79 610 get \$1;
-#X msg 79 635 get bla bal tuff;
-#X msg 79 661 get ge;
-#X msg 79 685 get 4 f 3;
-#X floatatom 222 576 5 0 0 0 - - -;
-#X symbolatom 269 578 10 0 0 0 - - -;
-#X msg 222 614 remove \$1;
-#X msg 222 639 remove bla bal tuff;
-#X msg 222 665 remove ge;
-#X msg 222 689 remove 4 f 3;
-#X text 195 748 <- bang if the key isn't found;
-#X msg 474 609 getsize;
-#X text 539 608 <- get the size (at 2nd;
-#X text 561 622 outlet);
-#X obj 520 730 print size;
+#X obj 79 734 print AAA;
+#X floatatom 79 557 5 0 0 0 - - -;
+#X symbolatom 126 559 10 0 0 0 - - -;
+#X obj 79 711 h_map druschka;
+#X text 136 526 get \, remove data:;
+#X msg 79 595 get \$1;
+#X msg 79 620 get bla bal tuff;
+#X msg 79 646 get ge;
+#X msg 79 670 get 4 f 3;
+#X floatatom 222 561 5 0 0 0 - - -;
+#X symbolatom 269 563 10 0 0 0 - - -;
+#X msg 222 599 remove \$1;
+#X msg 222 624 remove bla bal tuff;
+#X msg 222 650 remove ge;
+#X msg 222 674 remove 4 f 3;
+#X text 195 733 <- bang if the key isn't found;
+#X msg 474 664 getsize;
+#X text 539 663 <- get the size (at 2nd;
+#X text 561 677 outlet);
+#X obj 520 776 print size;
 #X obj 504 26 cnv 15 204 120 empty empty empty 20 12 0 14 -66577 -66577
 0;
 #X obj 506 28 cnv 15 200 116 empty empty ReadMe: 65 15 0 14 -262131
@@ -383,13 +383,19 @@ it at the back (so the size will increase);
 #X connect 2 0 0 0;
 #X connect 7 0 0 0;
 #X connect 8 0 0 0;
-#X restore 474 522 pd read_save_possibilities;
-#X text 512 543 different possiblities to read;
-#X text 512 557 and write from and to files;
-#X text 511 571 (XML and textfiles);
-#X text 248 827 htttp://grh.mur.at/software/pdcontainer.html;
-#X text 208 811 =%)!(%= PDContainer \, by Georg Holzmann <grh@mur.at>
+#X restore 474 577 pd read_save_possibilities;
+#X text 512 598 different possiblities to read;
+#X text 512 612 and write from and to files;
+#X text 511 626 (XML and textfiles);
+#X text 242 857 htttp://grh.mur.at/software/pdcontainer.html;
+#X text 202 841 =%)!(%= PDContainer \, by Georg Holzmann <grh@mur.at>
 \, 2004;
+#X text 535 415 at the first outlet;
+#X msg 474 401 keys;
+#X text 514 401 <- dumps out all keys sequentially;
+#X text 549 451 at the first outlet;
+#X msg 474 437 values;
+#X text 528 437 <- dumps out all values sequentially;
 #X connect 0 0 32 0;
 #X connect 7 0 13 0;
 #X connect 8 0 13 0;
@@ -428,3 +434,5 @@ it at the back (so the size will increase);
 #X connect 57 0 46 0;
 #X connect 59 0 13 0;
 #X connect 68 0 13 0;
+#X connect 75 0 13 0;
+#X connect 78 0 13 0;

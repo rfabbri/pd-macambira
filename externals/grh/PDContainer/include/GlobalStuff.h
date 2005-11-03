@@ -32,7 +32,7 @@ using std::endl;
 
 
 // current version
-#define PDC_VERSION   "0.2"
+#define PDC_VERSION   "0.2.1"
 
 
 // TinyXML
@@ -78,19 +78,6 @@ class Element
     if(atom_ && size_)
     {
       length = size_;
-      
-      // !!!! FIXME !!!!
-      // hack to avoid lockating too much memory
-      // (somewhere I read an uninitialized value ...
-      //  ... but where !?)
-      if(length>999)
-      {
-	post("Element, constr1: invalid construction !!! should be fixed !!!");
-	length=0;
-	atom=NULL;
-	return;
-      }
-
       atom = (t_atom*)copybytes(atom_, length*sizeof(t_atom));
     }
   }
@@ -101,19 +88,6 @@ class Element
     if(src.atom)
     {
       length = src.length;
-      
-      // !!!! FIXME !!!!
-      // hack to avoid lockating too much memory
-      // (somewhere I read an uninitialized value ...
-      //  ... but where !?)
-      if(length>999)
-      {
-	post("Element, constr2: invalid construction !!! should be fixed !!!");
-        length=0;
-        atom=NULL;
-	return;
-      }
-
       atom = (t_atom*)copybytes(src.atom, length*sizeof(t_atom));
     }
   }
@@ -138,19 +112,6 @@ class Element
     if(atom_)
     {
       length = size_;
-      
-      // !!!! FIXME !!!!
-      // hack to avoid lockating too much memory
-      // (somewhere I read an uninitialized value ...
-      //  ... but where !?)
-      if(length>999)
-      {
-	post("Element, setAtoms: invalid construction !!! should be fixed !!!");
-	length=0;
-	atom=NULL;
-	return;
-      }
-      
       atom = (t_atom*)copybytes(atom_, length*sizeof(t_atom));
     }
   }
@@ -175,19 +136,6 @@ class Element
     if(src.atom)
     {
       length = src.length;
-      
-      // !!!! FIXME !!!!
-      // hack to avoid lockating too much memory
-      // (somewhere I read an uninitialized value ...
-      //  ... but where !?)
-      if(length>999)
-      {
-	post("Element, assignment: invalid construction !!! should be fixed !!!");
-	length=0;
-	atom=NULL;
-	return (*this);
-      }
-      
       atom = (t_atom*)copybytes(src.atom, length*sizeof(t_atom));
     }
 

@@ -82,6 +82,30 @@ static void h_multiset_get_namespace(t_h_multiset *x)
   post("h_multiset current namespace: %s",x->hmultiset->getNamespace().c_str());
 }
 
+static void h_multiset_getall(t_h_multiset *x)
+{
+  multiset<Element>::iterator iter  = x->hmultiset->getAll().begin();
+  
+  while(iter != x->hmultiset->getAll().end())
+  {
+    Element output = *iter;
+ 
+    if(output.getLength() == 1) // symbol or float
+    {
+      if (output.getAtom()[0].a_type == A_FLOAT)
+	outlet_float(x->out0, output.getAtom()[0].a_w.w_float);
+      if (output.getAtom()[0].a_type == A_SYMBOL)
+	outlet_symbol(x->out0, output.getAtom()[0].a_w.w_symbol);
+      if (output.getAtom()[0].a_type == A_POINTER)
+	outlet_pointer(x->out0, output.getAtom()[0].a_w.w_gpointer);
+    }
+    if(output.getLength() > 1) // list
+      outlet_list(x->out0,&s_list,output.getLength(),output.getAtom());
+
+    iter++;
+  }
+}
+
 static void h_multiset_print(t_h_multiset *x)
 {
   x->hmultiset->printAll();
@@ -200,6 +224,8 @@ void h_multiset_setup(void)
 		  gensym("namespace"), A_DEFSYMBOL , 0);
   class_addmethod(h_multiset_class, (t_method)h_multiset_get_namespace, 
 		  gensym("getnamespace"), A_DEFFLOAT, 0);
+  class_addmethod(h_multiset_class, (t_method)h_multiset_getall,
+		  gensym("getall"), A_DEFFLOAT, 0);
   class_addmethod(h_multiset_class, (t_method)h_multiset_print,
 		  gensym("print"), A_DEFFLOAT, 0);
   class_addmethod(h_multiset_class, (t_method)h_multiset_clear,  

@@ -7,19 +7,19 @@
 #X text 295 36 help file of;
 #X text 37 100 init arg: namespace;
 #X msg 477 380 print;
-#X msg 477 424 clear;
-#X msg 477 644 help;
+#X msg 477 454 clear;
+#X msg 477 674 help;
 #X msg 477 321 getnamespace;
-#X msg 477 462 clearall;
+#X msg 477 492 clearall;
 #X text 588 346 <- change namespace;
 #X msg 477 345 namespace grix;
 #X text 524 381 <- print all the data of the;
 #X text 543 396 current namespace;
-#X text 525 424 <- clear all the data of the;
-#X text 546 439 current namespace;
-#X text 545 464 <- clear all the data in all;
-#X text 566 479 same containers (maybe;
-#X text 568 494 you shouldn't use this);
+#X text 525 454 <- clear all the data of the;
+#X text 546 469 current namespace;
+#X text 545 494 <- clear all the data in all;
+#X text 566 509 same containers (maybe;
+#X text 568 524 you shouldn't use this);
 #X text 577 323 <- get current namespace;
 #X text 476 269 general operations:;
 #X msg 154 362 add bla bal tuff;
@@ -41,7 +41,7 @@
 #X msg 227 671 remove ge;
 #X msg 227 695 remove 4 f 3;
 #X floatatom 84 757 5 0 0 0 - - -;
-#X floatatom 477 698 5 0 0 0 - - -;
+#X floatatom 477 728 5 0 0 0 - - -;
 #X text 291 51 ::: h_set :::;
 #X text 37 129 Sets allow you to add and delete elements. Afterwards
 you can look if an element is set. Set is a Sorted Associative Container
@@ -53,11 +53,11 @@ are the same. (see Multiset to have several copies of the same element)
 #X floatatom 154 477 5 0 0 0 - - -;
 #X obj 84 732 h_set krx;
 #X text 131 757 <- 1 if the data is set (otherwise 0);
-#X obj 477 675 h_set krx;
-#X obj 535 698 print size;
-#X msg 477 609 getsize;
-#X text 542 608 <- get the size (at 2nd;
-#X text 564 622 outlet);
+#X obj 477 705 h_set krx;
+#X obj 535 728 print size;
+#X msg 477 639 getsize;
+#X text 542 638 <- get the size (at 2nd;
+#X text 564 652 outlet);
 #X obj 500 24 cnv 15 204 120 empty empty empty 20 12 0 14 -66577 -66577
 0;
 #X obj 502 26 cnv 15 200 116 empty empty ReadMe: 65 15 0 14 -262131
@@ -369,13 +369,16 @@ it at the back (so the size will increase);
 #X connect 2 0 0 0;
 #X connect 7 0 0 0;
 #X connect 8 0 0 0;
-#X restore 477 525 pd read_save_possibilities;
-#X text 515 546 different possiblities to read;
-#X text 515 560 and write from and to files;
-#X text 514 574 (XML and textfiles);
+#X restore 477 555 pd read_save_possibilities;
+#X text 515 576 different possiblities to read;
+#X text 515 590 and write from and to files;
+#X text 514 604 (XML and textfiles);
 #X text 283 824 htttp://grh.mur.at/software/pdcontainer.html;
 #X text 243 808 =%)!(%= PDContainer \, by Georg Holzmann <grh@mur.at>
 \, 2004;
+#X msg 477 418 getall;
+#X text 529 418 <- dumps out all data sequentially;
+#X text 550 432 at the first outlet;
 #X connect 0 0 44 0;
 #X connect 5 0 48 0;
 #X connect 6 0 48 0;
@@ -406,3 +409,4 @@ it at the back (so the size will increase);
 #X connect 48 1 49 0;
 #X connect 50 0 7 0;
 #X connect 58 0 48 0;
+#X connect 64 0 48 0;
