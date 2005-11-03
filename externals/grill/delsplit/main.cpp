@@ -22,7 +22,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #include <ctype.h>
 
 
-#define VERSION "0.1.4"
+#define VERSION "0.1.5"
 
 #ifdef __MWERKS__
 #define STD std
@@ -40,7 +40,7 @@ public:
 	delsplit(int argc,const t_atom *argv);
 
 protected:
-	void m_list(const t_symbol *s);
+	void m_any(const t_symbol *s,int argc,const t_atom *argv);
     void m_del(const t_symbol *s,int argc,const t_atom *argv);	
 	
 	const t_symbol *delim;
@@ -51,7 +51,7 @@ private:
 
 	static const t_symbol *sym__space;
 	
-	FLEXT_CALLBACK_S(m_list)
+	FLEXT_CALLBACK_A(m_any)
 	FLEXT_CALLBACK_A(m_del)
     FLEXT_ATTRVAR_S(delim)
 };
@@ -65,7 +65,7 @@ void delsplit::Setup(t_classid c)
 {
     sym__space = MakeSymbol(" ");
 
-	FLEXT_CADDMETHOD(c,0,m_list);
+	FLEXT_CADDMETHOD(c,0,m_any);
 	FLEXT_CADDMETHOD(c,1,m_del);
 	FLEXT_CADDATTR_VAR1(c,"del",delim);
 }
@@ -127,7 +127,7 @@ void delsplit::SetAtom(t_atom &l,const char *s)
 		SetFloat(l,(float)atof(s));
 }
 
-void delsplit::m_list(const t_symbol *sym)
+void delsplit::m_any(const t_symbol *sym,int argc,const t_atom *argv)
 {
     FLEXT_ASSERT(delim);
     
@@ -135,21 +135,40 @@ void delsplit::m_list(const t_symbol *sym)
 	int cnt = 0;
 	const char *sdel = GetString(delim);
 	int ldel = strlen(sdel);
-	char str[1024];
-	strcpy(str,GetString(sym));
-	
-	for(const char *s = str; *s; ) {
-		char *e = strstr(s,sdel);
-		if(!e) {
-			SetAtom(lst[cnt++],s);
-			break;
+
+    for(int i = -1; i < argc; ++i) {
+        char str[1024];
+        if(i < 0) {
+			if(
+				sym != sym_list && sym != sym_float && sym != sym_symbol && sym != sym_bang
+#if FLEXT_SYS == FLEXT_SYS_MAX
+				&& sym != sym_int
+#endif
+			)
+	        	strcpy(str,GetString(sym));
+			else
+				str[0] = 0;
 		}
-		else {
-			*e = 0;
-			SetAtom(lst[cnt++],s);
-			s = e+ldel;
-		}
-	}
+        else if(IsString(argv[i]))
+	        strcpy(str,GetString(argv[i]));
+        else if(CanbeFloat(argv[i]))
+            sprintf(str,"%e",GetAFloat(argv[i]));
+        else
+            str[0] = 0;
+    	
+	    for(const char *s = str; *s; ) {
+		    char *e = strstr(s,sdel);
+		    if(!e) {
+			    SetAtom(lst[cnt++],s);
+			    break;
+		    }
+		    else {
+			    *e = 0;
+			    SetAtom(lst[cnt++],s);
+			    s = e+ldel;
+		    }
+	    }
+    }
 	
 	ToOutList(0,cnt,lst);
 }
