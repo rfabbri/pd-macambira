@@ -32,7 +32,7 @@ CHANGES:
 - using aligned memory
 - cached several symbols
 - strip .pd extension from abstraction filenames (if stripext attribute is set)
-- debug patcher opens on alt-click
+- debug patcher opens on shift-click
 - made vis an attribute (visibility can now be queried)
 - fixed connecting objects in subpatchers
 - use TablePtrMap type to store named objects
