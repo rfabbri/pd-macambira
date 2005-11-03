@@ -662,12 +662,6 @@ static void amixer_cset(t_amixer *x, t_symbol *s, int argc, t_atom *argv)
   amixer_control(x, argc, argv, 0);
 }
 
-static void amixer_sget(t_amixer *x, t_symbol *s, int argc, t_atom *argv)
-{
-}
-static void amixer_sset(t_amixer *x, t_symbol *s, int argc, t_atom *argv)
-{
-}
 static void amixer_card(t_amixer *x, t_symbol *s, int argc, t_atom *argv)
 {
   if(1==argc){
@@ -733,8 +727,6 @@ void amixer_setup(void)
   class_addmethod(amixer_class, (t_method)amixer_cset,gensym("set"), A_GIMME, 0);
   class_addmethod(amixer_class, (t_method)amixer_cget,gensym("cget"), A_GIMME, 0);
   class_addmethod(amixer_class, (t_method)amixer_cset,gensym("cset"), A_GIMME, 0);
-  class_addmethod(amixer_class, (t_method)amixer_sget,gensym("sget"), A_GIMME, 0);
-  class_addmethod(amixer_class, (t_method)amixer_sset,gensym("sset"), A_GIMME, 0);
 
   //  class_addmethod(amixer_class, (t_method)amixer_listdevices,gensym(""), A_DEFSYM, 0);
   class_addbang(amixer_class, (t_method)amixer_bang);

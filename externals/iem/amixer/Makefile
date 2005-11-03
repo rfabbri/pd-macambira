@@ -1,32 +1,13 @@
-LIBNAME    =@LIBNAME@
+default: all
 
-PREFIX     =@prefix@@PDLIBDIR@
+include Make.version
 
-INSTALL_BIN=$(PREFIX)/extra
-INSTALL_DOC=$(PREFIX)/@REFERENCEPATH@$(LIBNAME)
+Make.config: Make.config.in configure
+	./configure
 
-EXT = @EXT@ 
-DEFS = @DFLAGS@ -DACONNECT_VERSION=\"@VERSION@\"
-IFLAGS = -I. @INCLUDES@ $(INCLUDES)
-
-CC = @CC@
-LD = @LD@
-STRIP = @STRIP@ @STRIPFLAGS@
-
-AFLAGS = 
-LFLAGS = @LFLAGS@
-WFLAGS =
-
-MAKEDEP_FLAGS = @MAKEDEP_FLAGS@
-
-TARNAME =  $(LIBNAME)-@VERSION@.tgz
-BINTARNAME =  $(LIBNAME)-@VERSION@-bin.tgz
+include Make.config
 
 .SUFFIXES: .$(EXT)
-
-CFLAGS = $(DEFS) $(IFLAGS) $(WFLAGS) @CFLAGS@ 
-
-LIBS = @LIBS@
 
 SOURCES=$(sort $(filter %.c, $(wildcard *.c)))
 TARGETS = $(SOURCES:.c=.o)
@@ -79,6 +60,3 @@ $(LIBNAME): $(TARGETS)
 
 configure: configure.ac
 	autoconf
-
-Makefile: Makefile.in configure
-	./configure

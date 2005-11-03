@@ -1,7 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(amixer.c)
 
-VERSION=0.0.1
 LIBNAME=amixer
 
 dnl Checks for programs.
@@ -17,7 +16,6 @@ AC_SUBST(STRIPFLAGS)
 AC_SUBST(REFERENCEPATH)
 AC_SUBST(PDLIBDIR)
 AC_SUBST(INCLUDES)
-AC_SUBST(VERSION)
 AC_SUBST(LIBNAME)
 
 
@@ -219,6 +217,6 @@ else
   echo " no"
 fi
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Make.config)
 
 rm -f conftest.*
