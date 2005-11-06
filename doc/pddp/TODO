@@ -1,2 +1,5 @@
 
-- change [pwd] to whatever the object is finally called.
+- update route-help.pd to discuss the three modes of [route]: float mode,
+  symbol mode, and data type mode.
+
+- change [pwd] to [getdir]
