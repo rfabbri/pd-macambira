@@ -465,6 +465,7 @@ static OSStatus AudioIOProc( AudioDeviceID inDevice,
         CopyOutputData(outOutputData, clientData, frameCount);
     }
 
+    PaUtil_FreeMemory(timeInfo);
     PaUtil_EndCpuLoadMeasurement( &clientData->stream->cpuLoadMeasurer, frameCount );
     
     if (result == paComplete || result == paAbort) {
@@ -493,6 +494,7 @@ static OSStatus AudioInputProc( AudioDeviceID inDevice,
     CopyInputData(clientData, inInputData, frameCount);
     clientData->callback(clientData->inputBuffer, NULL, frameCount, timeInfo, paNoFlag, clientData->userData);
     
+    PaUtil_FreeMemory(timeInfo);
     PaUtil_EndCpuLoadMeasurement( &clientData->stream->cpuLoadMeasurer, frameCount );
 }
 
@@ -516,7 +518,7 @@ static OSStatus AudioOutputProc( AudioDeviceID inDevice,
     clientData->callback(NULL, clientData->outputBuffer, frameCount, timeInfo, paNoFlag, clientData->userData);
 
     CopyOutputData(outOutputData, clientData, frameCount);
-
+    PaUtil_FreeMemory(timeInfo);
     PaUtil_EndCpuLoadMeasurement( &clientData->stream->cpuLoadMeasurer, frameCount );
 }
 
@@ -665,8 +667,8 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         clientData->inputChannelCount = inputParameters->channelCount;
         clientData->inputSampleFormat = inputParameters->sampleFormat;
         err = SetUpUnidirectionalStream(stream->inputDevice, sampleRate, framesPerBuffer, 1);
-        fprintf(stderr, "error %d (%d)\n", err, paNoError);
     }
+    
     if (err == paNoError && outputParameters != NULL) {
         stream->outputDevice = macCoreHostApi->macCoreDeviceIds[outputParameters->device];
         clientData->outputConverter = PaUtil_SelectConverter(outputParameters->sampleFormat, paFloat32, streamFlags);
@@ -679,9 +681,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
     if (inputParameters == NULL || outputParameters == NULL || stream->inputDevice == stream->outputDevice) {
         AudioDeviceID device = (inputParameters == NULL) ? stream->outputDevice : stream->inputDevice;
 
-        int e2 = AudioDeviceAddIOProc(device, AudioIOProc, clientData);
-        fprintf(stderr, "AudioDeviceAddIOProc %d\n", e2);
-
+        AudioDeviceAddIOProc(device, AudioIOProc, clientData);
     }
     else {
         // using different devices for input and output

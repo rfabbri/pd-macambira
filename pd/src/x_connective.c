@@ -978,7 +978,8 @@ static void trigger_list(t_trigger *x, t_symbol *s, int argc, t_atom *argv)
         else if (u->u_type == TR_BANG)
             outlet_bang(u->u_outlet);
         else if (u->u_type == TR_SYMBOL)
-            outlet_symbol(u->u_outlet, (argc ? atom_getsymbol(argv) : 0));
+            outlet_symbol(u->u_outlet,
+                (argc ? atom_getsymbol(argv) : &s_symbol));
         else if (u->u_type == TR_POINTER)
         {
             if (!argc || argv->a_type != TR_POINTER)
