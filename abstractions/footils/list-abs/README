@@ -16,6 +16,10 @@ list-accum.pd
 
   sum all floats in a list.
 
+list-delete.pd
+
+  delete element at position POS from list.
+
 list-demux.pd
 
   route lists to different outlets (like demux in zexy). Not an abstraction,
@@ -36,6 +40,10 @@ list-dripslow.pd
 list-equalize.pd
 
   scale a list so that all float elements sum up to 1
+
+list-insert.pd
+
+  insert LIST before element at position POS
 
 list-inter.pd
 
