@@ -1,0 +1,16 @@
+#N canvas 0 0 450 300 10;
+#X obj 151 149 list-splat \$1;
+#X obj 237 52 inlet;
+#X text 235 32 pos;
+#X obj 151 53 inlet;
+#X text 135 31 orig. list;
+#X obj 194 177 list split 1;
+#X obj 151 216 list;
+#X obj 151 245 outlet;
+#X connect 0 0 6 0;
+#X connect 0 1 5 0;
+#X connect 0 2 7 0;
+#X connect 1 0 0 1;
+#X connect 3 0 0 0;
+#X connect 5 1 6 1;
+#X connect 6 0 7 0;
