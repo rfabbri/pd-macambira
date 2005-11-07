@@ -949,6 +949,8 @@ void comport_setup(void)
 					 (t_method)comport_free, sizeof(t_comport), 
 					 0, A_DEFFLOAT, A_DEFFLOAT, 0);
 
+
+  
   class_addfloat(comport_class, (t_method)comport_float);
   
   /*
@@ -981,6 +983,7 @@ void comport_setup(void)
   null_tv.tv_sec = 0; /* no wait */
   null_tv.tv_usec = 0;
 #endif
+  post("comport - PD external for unix/windows\n"
+       "GPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
+       "Institute for Electronic Music - Graz");
 }
-
-   
