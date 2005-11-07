@@ -57,6 +57,18 @@ dejong.c:#include "../../bbogart/chaos/lyapunov.c"
 dejong.c:#include "../../bbogart/chaos/dejong.c"
 
 
+How To Add Aliases
+==================
+
+In the "externals/build/src/OBJECT.c" file, add a function with the alias name
+with "_setup" appended to it.  Then make a symlink to original external binary
+file that is named using the alias.
+
+(Currently, this probably won't work with Windows because it uses symlinks,
+which Windows doesn't have.  It should be possible to make it work using
+Cygwin or MinGW).
+
+
 Help Files
 ==========
 

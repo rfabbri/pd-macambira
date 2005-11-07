@@ -33,7 +33,7 @@ all:
 			../../hcs/*/doc/*.pd \
 			../../hcs/hid/examples/*.pd \
 			../../hcs/pan/*-help.pd \
-			../../iem/comport/*/*-help.pd \
+			../../iem/*/*/*-help.pd \
 			../../markex/*.pd \
 			../../maxlib/help/*.* \
 			../../mjlib/doc/*.pd \
@@ -70,6 +70,10 @@ all:
 	install -d -m0755 $(DOC_DIR)/zexy
 	install -p -m0644 ../../zexy/zexy.pd  $(DOC_DIR)
 	install -p -m0644 ../../zexy/examples/*.* $(DOC_DIR)/zexy
+#----------------------------------------------------------------------------
+# iemmatrix uses its own dir
+	install -d -m0755 $(DOC_DIR)/iemmatrix
+	install -p -m0644 ../../iem/iemmatrix/doc/*.pd  $(DOC_DIR)/iemmatrix
 
 
 #----------------------------------------------------------------------------
@@ -84,6 +88,6 @@ all:
 #----------------------------------------------------------------------------
 # this is mildly dangerous, since it just deletes everything
 clean:
-	rm -f *.pd *.ps *.txt test.som *~
-	rm -Rf iemhelp zexy pmpd
+	rm -f -- *.pd *.ps *.txt test.som *~
+	rm -Rf -- iemhelp zexy pmpd iemmatrix
 

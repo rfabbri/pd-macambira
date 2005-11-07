@@ -12,13 +12,13 @@ PDEXECUTABLE = ../../../pd/bin/pd
 
 ## These generally need gcc-3.3
 # Generic PowerPC
-OPTIM_FLAGS = -mpowerpc-gpopt
+#OPTIM_FLAGS = -mpowerpc-gpopt
 # PowerPC 750 (G3)
-#OPTIM_FLAGS = -mpowerpc-gpopt -mcpu=750
+OPTIM_FLAGS = -mpowerpc-gpopt -mcpu=750
 # PowerPC 7400 (G4 <= 700Mhz)
 #OPTIM_FLAGS = -fast -fPIC -mcpu=7400 -faltivec
 # PowerPC 7450 (G4 >= 533MHz)
-#OPTIM_FLAGS = -fast -fPIC -mcpu=7450 -faltivec
+#OPTIM_FLAGS = -fast -fPIC -mcpu=7450 -faltivec -ffast-math
 # PowerPC G5 (gcc-3.3)
 #OPTIM_FLAGS = -fast -fPIC -faltivec
 
