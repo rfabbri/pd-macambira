@@ -4,10 +4,6 @@ list-abs
 These are abstractions implementing common list operations. Included are in
 alphabetical order:
 
-last-x.pd
-
-  get a list containing the last x atoms received.
-
 list-abs.pd
 
   change floats in a lists to their absolute values.
@@ -50,6 +46,11 @@ list-inter.pd
   element-wise linear interpolation between two (float) lists.
   list-inter-example-gem.pd shows a more complicated usage example, but
   requires gem for visualisation.
+
+list-lastx.pd
+
+  get a list containing the last x atoms received. (Previously known as
+  "last-x.pd")
 
 list-len.pd
 

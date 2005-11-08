@@ -1,23 +1,10 @@
-#N canvas 417 318 723 395 10;
-#X obj 153 175 cnv 15 150 80 empty empty empty 20 12 0 14 -233017 -66577
-0;
-#X floatatom 356 89 5 0 0 2 change-size - -;
-#X obj 326 112 t f b;
-#X text 378 110 first reset (b) \, then set new length (f).;
-#X text 311 195 Right outlet is responsible to first fill the list
-;
-#X text 312 211 Left outlet then only lets the smaller list pass.;
-#X obj 180 183 list;
-#X obj 326 54 inlet;
-#X obj 180 149 inlet;
-#X obj 180 302 outlet;
-#X obj 180 228 list split \$1;
-#X connect 1 0 2 0;
-#X connect 2 0 10 1;
-#X connect 2 1 6 1;
-#X connect 6 0 10 0;
-#X connect 7 0 2 0;
-#X connect 8 0 6 0;
-#X connect 10 0 6 1;
-#X connect 10 0 9 0;
-#X connect 10 2 6 1;
+#N canvas 417 318 464 379 10;
+#X obj 244 149 inlet;
+#X obj 179 149 inlet;
+#X obj 179 253 outlet;
+#X obj 179 206 list-lastx;
+#X text 54 77 This is just a backwards compatibility wrapper around
+list-lastx;
+#X connect 0 0 3 1;
+#X connect 1 0 3 0;
+#X connect 3 0 2 0;
