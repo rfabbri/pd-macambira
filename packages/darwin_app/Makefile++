@@ -178,13 +178,13 @@ darwin_app_wrapper:
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 # rename the Wish Shell executable to "Pd"
 	mv "$(PD_APP_CONTENTS)/MacOS/Wish" \
-		"$(PD_APP_CONTENTS)/MacOS/pd"
+		"$(PD_APP_CONTENTS)/MacOS/Pd"
 #	diskutil eject /Volumes/$(TCLTK)
 
 darwin_patch_pd:
 	sed -i.bak 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  \
 		$(PD_SRC)/src/s_main.c
-	cd $(PD_SRC)/src/ && patch -p0 < \
+	cd $(PD_SRC)/src && patch -p0 < \
 		../../packages/darwin_app/patches/darwin_linking_fixes.patch
 	cd $(PD_SRC)/src/ && patch -p0 < \
 		../../packages/darwin_app/patches/extended-help-menu.patch
@@ -196,7 +196,11 @@ darwin_app_core: darwin_app_wrapper
 # pd core
 #	cd $(PD_SRC)/src/ && $(PD_AUTOCONF) && ./configure && $(MAKE)
 # or pd core with jack
-	cd $(PD_SRC)/src/ && $(PD_AUTOCONF) && ./configure && $(MAKE)
+#	cd $(PD_SRC)/src/ && patch -p0 < \
+#		../../../packages/darwin_app/patches/extended-help-menu.patch
+#	cd $(PD_SRC)/src/ && patch -p0 < \
+#		../../../packages/darwin_app/patches/darwin_linking_fixes.patch
+	cd $(PD_SRC)/src/ && $(PD_AUTOCONF) && ./configure --enable-jack && $(MAKE)
 	/Developer/tools/Rez -t APPL mac.r -o $(PD_SRC)/bin/pd
 	cp -Rp -- $(PD_SRC)/bin $(PD_SRC)/doc $(PD_SRC)/extra $(PD_SRC)/man  \
 		$(INSTALL_PREFIX)
@@ -223,7 +227,7 @@ darwin_app_doc_format:
 	cd $(DOC_DST) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
 			*/*.pd */*/*.pd && \
-		rm -f -- */*.pd.bak	
+		rm -Rf -- */*.pd.bak	
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(DOC_DST)/5.reference && \
 		$(SCRIPTS_SRC)/convert-help-to-standard.sh
@@ -495,7 +499,7 @@ darwin_app_externals_standard:
 #----------------------------------------------------------------------------
 # PdP
 #	cd $(EXTERNALS_SRC)/pdp && ./configure && $(MAKE)
-#	install -p -m0444 $(EXTERNALS_SRC)/pdp/*.pd_darwin $(EXTERNALS_DST)
+	install -p -m0444 $(EXTERNALS_SRC)/../pdp-0.12.4/*.pd_darwin $(EXTERNALS_DST)
 	install -p -m0644 $(EXTERNALS_SRC)/pdp/doc/objects/*.* $(DOC_DST)/5.reference
 	install -d $(DOC_DST)/pdp/introduction
 	install -p -m0644 $(EXTERNALS_SRC)/pdp/doc/introduction/*.* $(DOC_DST)/pdp/introduction
@@ -503,9 +507,11 @@ darwin_app_externals_standard:
 	install -p -m0644 $(EXTERNALS_SRC)/pdp/doc/examples/*.* $(DOC_DST)/pdp/examples
 	install -p -m0644 $(EXTERNALS_SRC)/pdp/doc/reference.txt $(DOC_DST)/pdp
 # libs for PdP
+	install -p -m0444 $(EXTERNALS_SRC)/pidip/*.pd_darwin $(EXTERNALS_DST)
+	install -p -m0444 $(EXTERNALS_SRC)/gem2pdp/*.pd_darwin $(EXTERNALS_DST)
 #----------------------------------------------------------------------------
 # unauthorized
-	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE) 
+	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE)
 	install -p -m0444 $(EXTERNALS_SRC)/unauthorized/*/*.pd_darwin $(EXTERNALS_DST)
 	install -p -m0644 $(EXTERNALS_SRC)/unauthorized/*/*.pd $(DOC_DST)/5.reference
 	install -p -m0644 $(EXTERNALS_SRC)/unauthorized/*/*.txt $(DOC_DST)/5.reference
@@ -515,13 +521,14 @@ darwin_app_externals_standard:
 # zexy 
 # new build system doesn't work with CVS layout, and most of zexy is
 # included in the extrnals build system now anyway
-#	cd $(EXTERNALS_SRC)/zexy/src && autoconf && ./configure && $(MAKE)
-	-install -p -m0444 $(EXTERNALS_SRC)/zexy/src/*.pd_darwin $(EXTERNALS_DST)
-	install -p -m0444 \
-		$(shell ls -1 $(EXTERNALS_SRC)/zexy/abs/*.pd | \
-			grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
-		$(EXTERNALS_DST)
-	install -p -m0644	$(EXTERNALS_SRC)/zexy/abs/*-help.pd $(DOC_DST)/5.reference
+#	cd $(EXTERNALS_SRC)/zexy/src && autoconf && \
+#	  ./configure --includedir=$(PD_SRC)/src --prefix=$(PD_SRC) && $(MAKE)
+#	-install -p -m0444 $(EXTERNALS_SRC)/zexy/src/*.pd_darwin $(EXTERNALS_DST)
+#	install -p -m0444 \
+#		$(shell ls -1 $(EXTERNALS_SRC)/zexy/abs/*.pd | \
+#			grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
+#		$(EXTERNALS_DST)
+#	install -p -m0644	$(EXTERNALS_SRC)/zexy/abs/*-help.pd $(DOC_DST)/5.reference
 
 
 darwin_app_externals_c++:
