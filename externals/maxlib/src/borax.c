@@ -228,11 +228,11 @@ void maxlib_borax_setup(void)
     class_addmethod(borax_class, (t_method)borax_reset, gensym("ft2"), A_GIMME, 0);
     class_addfloat(borax_class, borax_float);
 #ifndef MAXLIB
-    class_sethelpsymbol(borax_class, gensym("help-borax.pd"));
+    
     post(version);
 #else
 	class_addcreator((t_newmethod)borax_new, gensym("borax"), 0);
-    class_sethelpsymbol(borax_class, gensym("maxlib/help-borax.pd"));
+    class_sethelpsymbol(borax_class, gensym("maxlib/borax-help.pd"));
 #endif
 }
 

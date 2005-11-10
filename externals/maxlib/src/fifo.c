@@ -80,7 +80,7 @@ void fifo_setup(void)
     	(t_method)fifo_free, sizeof(t_fifo), 0, A_DEFFLOAT, 0);
     class_addfloat(fifo_class, fifo_int);
 	class_addbang(fifo_class, fifo_bang);
-    class_sethelpsymbol(fifo_class, gensym("help-fifo.pd"));
+    
     post(version);
 }
 #else
@@ -91,6 +91,6 @@ void maxlib_fifo_setup(void)
 	class_addcreator((t_newmethod)fifo_new, gensym("fifo"), A_DEFFLOAT, 0);
     class_addfloat(fifo_class, fifo_int);
 	class_addbang(fifo_class, fifo_bang);
-    class_sethelpsymbol(fifo_class, gensym("maxlib/help-fifo.pd"));
+    class_sethelpsymbol(fifo_class, gensym("maxlib/fifo-help.pd"));
 }
 #endif

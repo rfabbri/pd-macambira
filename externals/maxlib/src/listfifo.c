@@ -93,7 +93,7 @@ void listfifo_setup(void)
     	(t_method)listfifo_free, sizeof(t_listfifo), 0, A_DEFFLOAT, 0);
 	class_addbang(listfifo_class, listfifo_bang);
     class_addlist(listfifo_class, listfifo_list);
-    class_sethelpsymbol(listfifo_class, gensym("help-listfifo.pd"));
+    
     post(version);
 }
 #else
@@ -104,6 +104,6 @@ void maxlib_listfifo_setup(void)
 	class_addcreator((t_newmethod)listfifo_new, gensym("listfifo"), A_DEFFLOAT, 0);
 	class_addbang(listfifo_class, listfifo_bang);
     class_addlist(listfifo_class, listfifo_list);
-    class_sethelpsymbol(listfifo_class, gensym("maxlib/help-listfifo.pd"));
+    class_sethelpsymbol(listfifo_class, gensym("maxlib/listfifo-help.pd"));
 }
 #endif

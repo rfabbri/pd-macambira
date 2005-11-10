@@ -432,7 +432,7 @@ void netrec_setup(void)
     netrec_class = class_new(gensym("netrec"),(t_newmethod)netrec_new, (t_method)netrec_free,
     	sizeof(t_netrec), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
 	class_addmethod(netrec_class, (t_method)netrec_print, gensym("print"), 0);
-	class_sethelpsymbol(netrec_class, gensym("help-netrec.pd"));
+	
     post(version);
 }
 #else
@@ -442,6 +442,6 @@ void maxlib_netrec_setup(void)
     	sizeof(t_netrec), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
 	class_addcreator((t_newmethod)netrec_new, gensym("netrec"), A_DEFFLOAT, A_DEFFLOAT, A_DEFSYM, 0);
 	class_addmethod(netrec_class, (t_method)netrec_print, gensym("print"), 0);
-	class_sethelpsymbol(netrec_class, gensym("maxlib/help-netrec.pd"));
+	class_sethelpsymbol(netrec_class, gensym("maxlib/netrec-help.pd"));
 }
 #endif

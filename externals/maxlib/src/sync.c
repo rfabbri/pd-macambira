@@ -284,11 +284,11 @@ void maxlib_sync_setup(void)
 	class_addmethod(sync_class, (t_method)sync_set_require, gensym("require"), A_GIMME, 0);
 	class_addmethod(sync_class, (t_method)sync_set_mode, gensym("mode"), A_SYMBOL, 0);
 #ifndef MAXLIB
-    class_sethelpsymbol(sync_class, gensym("help-sync.pd"));
+    
     post(version);
 #else
 	class_addcreator((t_newmethod)sync_new, gensym("sync"), A_GIMME, 0);
-    class_sethelpsymbol(sync_class, gensym("maxlib/help-sync.pd"));
+    class_sethelpsymbol(sync_class, gensym("maxlib/sync-help.pd"));
 #endif
 }
 

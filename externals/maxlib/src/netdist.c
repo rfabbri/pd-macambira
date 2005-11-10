@@ -296,7 +296,7 @@ void netdist_setup(void)
     class_addmethod(netdist_class, (t_method)netdist_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netdist_class, (t_method)netdist_clear, gensym("clear"), 0);
 	class_addmethod(netdist_class, (t_method)netdist_print, gensym("print"), 0);
-	class_sethelpsymbol(netdist_class, gensym("help-netdist.pd"));
+	
     post(version);
 }
 #else
@@ -310,6 +310,6 @@ void maxlib_netdist_setup(void)
     class_addmethod(netdist_class, (t_method)netdist_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netdist_class, (t_method)netdist_clear, gensym("clear"), 0);
 	class_addmethod(netdist_class, (t_method)netdist_print, gensym("print"), 0);
-	class_sethelpsymbol(netdist_class, gensym("maxlib/help-netdist.pd"));
+	class_sethelpsymbol(netdist_class, gensym("maxlib/netdist-help.pd"));
 }
 #endif

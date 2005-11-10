@@ -270,10 +270,10 @@ void maxlib_dist_setup(void)
 	class_addmethod(dist_class, (t_method)dist_send, gensym("send"), A_GIMME, 0);
     class_addanything(dist_class, dist_anything);
 #ifndef MAXLIB
-	class_sethelpsymbol(dist_class, gensym("help-dist.pd"));
+	
     post(version);
 #else
 	class_addcreator((t_newmethod)dist_new, gensym("dist"), A_GIMME, 0);
-	class_sethelpsymbol(dist_class, gensym("maxlib/help-dist.pd"));
+	class_sethelpsymbol(dist_class, gensym("maxlib/dist-help.pd"));
 #endif
 }

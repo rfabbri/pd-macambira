@@ -90,11 +90,11 @@ void maxlib_divmod_setup(void)
     class_addmethod(divmod_class, (t_method)divmod_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(divmod_class, (t_method)divmod_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(divmod_class, gensym("help-divmod.pd"));
+    
     post(version);
 #else
 	class_addcreator((t_newmethod)divmod_new, gensym("divmod"), A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_sethelpsymbol(divmod_class, gensym("maxlib/help-divmod.pd"));
+    class_sethelpsymbol(divmod_class, gensym("maxlib/divmod-help.pd"));
 #endif
 }
 

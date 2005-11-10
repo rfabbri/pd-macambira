@@ -116,10 +116,10 @@ void maxlib_limit_setup(void)
     class_addfloat(limit_class, limit_float);
     class_addbang(limit_class, limit_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(limit_class, gensym("help-limit.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(limit_class, gensym("maxlib/help-limit.pd"));
+    class_sethelpsymbol(limit_class, gensym("maxlib/limit-help.pd"));
 #endif
 }
 

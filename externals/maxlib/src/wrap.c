@@ -133,10 +133,10 @@ void maxlib_wrap_setup(void)
 	class_addmethod(wrap_class, (t_method)wrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(wrap_class, (t_method)wrap_b, gensym("b"), A_FLOAT, 0);
 #ifndef MAXLIB
-    class_sethelpsymbol(wrap_class, gensym("help-wrap.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(wrap_class, gensym("maxlib/help-wrap.pd"));
+    class_sethelpsymbol(wrap_class, gensym("maxlib/wrap-help.pd"));
 #endif
 }
 

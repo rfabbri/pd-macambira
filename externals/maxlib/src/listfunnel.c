@@ -75,7 +75,7 @@ void listfunnel_setup(void)
     	0, sizeof(t_listfunnel), 0, 0, 0);
     class_addfloat(listfunnel_class, listfunnel_float);
     class_addlist(listfunnel_class, listfunnel_list);
-    class_sethelpsymbol(listfunnel_class, gensym("help-listfunnel.pd"));
+    
     post(version);
 }
 #else
@@ -86,7 +86,7 @@ void maxlib_listfunnel_setup(void)
 	class_addcreator((t_newmethod)listfunnel_new, gensym("listfunnel"), 0);
     class_addfloat(listfunnel_class, listfunnel_float);
     class_addlist(listfunnel_class, listfunnel_list);
-    class_sethelpsymbol(listfunnel_class, gensym("maxlib/help-listfunnel.pd"));
+    class_sethelpsymbol(listfunnel_class, gensym("maxlib/listfunnel-help.pd"));
 }
 #endif
 

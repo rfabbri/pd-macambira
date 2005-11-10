@@ -93,7 +93,7 @@ void remote_setup(void)
     remote_class = class_new(gensym("remote"), (t_newmethod)remote_new, 0,
     	sizeof(t_remote), 0, A_DEFSYM, 0);
     class_addanything(remote_class, remote_anything);
-	class_sethelpsymbol(remote_class, gensym("help-remote.pd"));
+	
     post(version);
 }
 #else
@@ -103,6 +103,6 @@ void maxlib_remote_setup(void)
     	sizeof(t_remote), 0, A_DEFSYM, 0);
 	class_addcreator((t_newmethod)remote_new, gensym("remote"), A_DEFSYM, 0);
     class_addanything(remote_class, remote_anything);
-	class_sethelpsymbol(remote_class, gensym("maxlib/help-remote.pd"));
+	class_sethelpsymbol(remote_class, gensym("maxlib/remote-help.pd"));
 }
 #endif

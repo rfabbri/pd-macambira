@@ -194,7 +194,7 @@ void iso_setup(void) {
     class_addmethod(iso_class, (t_method)iso_hook, gensym("hook"), A_FLOAT, 0);
     class_addbang(iso_class, iso_bang);
 	class_addlist(iso_class, iso_pitch);
-    class_sethelpsymbol(iso_class, gensym("help-iso.pd"));
+    
 	post(version);
 }
 #else
@@ -214,6 +214,6 @@ void maxlib_iso_setup(void) {
     class_addmethod(iso_class, (t_method)iso_hook, gensym("hook"), A_FLOAT, 0);
     class_addbang(iso_class, iso_bang);
 	class_addlist(iso_class, iso_pitch);
-    class_sethelpsymbol(iso_class, gensym("maxlib/help-iso.pd"));
+    class_sethelpsymbol(iso_class, gensym("maxlib/iso-help.pd"));
 }
 #endif

@@ -652,7 +652,7 @@ void netserver_setup(void)
    class_addmethod(netserver_class, (t_method)netserver_info, gensym("verbose"), 0);
    class_addmethod(netserver_class, (t_method)netserver_debug, gensym("debug"), 0);
    
-   class_sethelpsymbol(netserver_class, gensym("help-netserver.pd"));
+   
    post(version);
 }
 #else
@@ -665,6 +665,6 @@ void maxlib_netserver_setup(void)
    class_addmethod(netserver_class, (t_method)netserver_send, gensym("send"), A_GIMME, 0);
    class_addmethod(netserver_class, (t_method)netserver_client_send, gensym("client"), A_GIMME, 0);
    class_addmethod(netserver_class, (t_method)netserver_broadcast, gensym("broadcast"), A_GIMME, 0);
-   class_sethelpsymbol(netserver_class, gensym("maxlib/help-netserver.pd"));
+   class_sethelpsymbol(netserver_class, gensym("maxlib/netserver-help.pd"));
 }
 #endif

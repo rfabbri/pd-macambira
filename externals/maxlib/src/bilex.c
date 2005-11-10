@@ -76,7 +76,7 @@ void bilex_setup(void)
     rand_bilex_class = class_new(gensym("bilex"), (t_newmethod)rand_bilex_new, 0,
     	sizeof(t_rand_bilex), 0, A_DEFFLOAT, 0);
     class_addbang(rand_bilex_class, rand_bilex_bang);
-	class_sethelpsymbol(rand_bilex_class, gensym("help-bilex.pd"));
+	class_sethelpsymbol(rand_bilex_class, gensym("bilex-help.pd"));
     post(version);
 }
 #else
@@ -86,6 +86,6 @@ void maxlib_bilex_setup(void)
     	sizeof(t_rand_bilex), 0, A_DEFFLOAT, 0);
     class_addbang(rand_bilex_class, rand_bilex_bang);
 	class_addcreator((t_newmethod)rand_bilex_new, gensym("bilex"), A_DEFFLOAT, 0);
-	class_sethelpsymbol(rand_bilex_class, gensym("maxlib/help-bilex.pd"));
+	class_sethelpsymbol(rand_bilex_class, gensym("maxlib/bilex-help.pd"));
 }
 #endif

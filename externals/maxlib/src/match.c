@@ -267,8 +267,8 @@ void maxlib_match_setup(void)
     class_addmethod(match_class, (t_method)match_set, gensym("set"), A_GIMME, 0);
     class_addmethod(match_class, (t_method)match_clear, gensym("clear"), 0);
 #ifndef MAXLIB
-    class_sethelpsymbol(match_class, gensym("help-match.pd"));
+    
 #else
-    class_sethelpsymbol(match_class, gensym("maxlib/help-match.pd"));
+    class_sethelpsymbol(match_class, gensym("maxlib/match-help.pd"));
 #endif
 }

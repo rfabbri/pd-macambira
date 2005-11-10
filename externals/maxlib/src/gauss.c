@@ -72,7 +72,7 @@ void gauss_setup(void)
     rand_gauss_class = class_new(gensym("gauss"), (t_newmethod)rand_gauss_new, 0,
     	sizeof(t_rand_gauss), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addbang(rand_gauss_class, rand_gauss_bang);
-	class_sethelpsymbol(rand_gauss_class, gensym("help-gauss.pd"));
+	class_sethelpsymbol(rand_gauss_class, gensym("gauss-help.pd"));
     post(version);
 }
 #else
@@ -82,7 +82,7 @@ void maxlib_gauss_setup(void)
     	sizeof(t_rand_gauss), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
 	class_addcreator((t_newmethod)rand_gauss_new, gensym("gauss"), A_DEFFLOAT, 0);
     class_addbang(rand_gauss_class, rand_gauss_bang);
-	class_sethelpsymbol(rand_gauss_class, gensym("maxlib/help-gauss.pd"));
+	class_sethelpsymbol(rand_gauss_class, gensym("maxlib/gauss-help.pd"));
 }
 #endif
 

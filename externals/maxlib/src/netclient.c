@@ -369,7 +369,7 @@ void netclient_setup(void)
     class_addmethod(netclient_class, (t_method)netclient_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("receive"), 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("rcv"), 0);
-    class_sethelpsymbol(netclient_class, gensym("help-netclient.pd"));
+    
 	post(version);
 }
 #else
@@ -384,6 +384,6 @@ void maxlib_netclient_setup(void)
     class_addmethod(netclient_class, (t_method)netclient_send, gensym("send"), A_GIMME, 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("receive"), 0);
 	class_addmethod(netclient_class, (t_method)netclient_rcv, gensym("rcv"), 0);
-    class_sethelpsymbol(netclient_class, gensym("maxlib/help-netclient.pd"));
+    class_sethelpsymbol(netclient_class, gensym("maxlib/netclient-help.pd"));
 }
 #endif

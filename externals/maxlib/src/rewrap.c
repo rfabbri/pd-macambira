@@ -138,7 +138,7 @@ void rewrap_setup(void)
     class_addfloat(rewrap_class, rewrap_float);
 	class_addmethod(rewrap_class, (t_method)rewrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(rewrap_class, (t_method)rewrap_b, gensym("b"), A_FLOAT, 0);
-    class_sethelpsymbol(rewrap_class, gensym("help-rewrap.pd"));
+    
     post(version);
 }
 #else
@@ -150,6 +150,6 @@ void maxlib_rewrap_setup(void)
     class_addfloat(rewrap_class, rewrap_float);
 	class_addmethod(rewrap_class, (t_method)rewrap_a, gensym("a"), A_FLOAT, 0);
 	class_addmethod(rewrap_class, (t_method)rewrap_b, gensym("b"), A_FLOAT, 0);
-    class_sethelpsymbol(rewrap_class, gensym("maxlib/help-rewrap.pd"));
+    class_sethelpsymbol(rewrap_class, gensym("maxlib/rewrap-help.pd"));
 }
 #endif

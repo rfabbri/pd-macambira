@@ -122,7 +122,7 @@ void scale_setup(void)
     	0, sizeof(t_scale), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(scale_class, scale_float);
     class_addbang(scale_class, scale_bang);
-    class_sethelpsymbol(scale_class, gensym("help-scale.pd"));
+    
     post(version);
 #else
 void maxlib_scale_setup(void)
@@ -132,7 +132,7 @@ void maxlib_scale_setup(void)
 	class_addcreator((t_newmethod)scale_new, gensym("scale"), A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(scale_class, scale_float);
     class_addbang(scale_class, scale_bang);
-    class_sethelpsymbol(scale_class, gensym("maxlib/help-scale.pd"));
+    class_sethelpsymbol(scale_class, gensym("maxlib/scale-help.pd"));
 #endif
 }
 

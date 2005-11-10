@@ -66,7 +66,7 @@ void edge_setup(void)
     edge_class = class_new(gensym("edge"), (t_newmethod)edge_new,
     	0, sizeof(t_edge), 0, A_DEFFLOAT, 0);
     class_addfloat(edge_class, edge_float);
-    class_sethelpsymbol(edge_class, gensym("help-edge.pd"));
+    
     post(version);
 }
 #else
@@ -76,7 +76,7 @@ void maxlib_edge_setup(void)
     	0, sizeof(t_edge), 0, A_DEFFLOAT, 0);
     class_addfloat(edge_class, edge_float);
 	class_addcreator((t_newmethod)edge_new, gensym("edge"), A_DEFFLOAT, 0);
-    class_sethelpsymbol(edge_class, gensym("maxlib/help-edge.pd"));
+    class_sethelpsymbol(edge_class, gensym("maxlib/edge-help.pd"));
 }
 #endif
 

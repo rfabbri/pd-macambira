@@ -193,10 +193,10 @@ void maxlib_average_setup(void)
 	class_addmethod(average_class, (t_method)average_index, gensym("index"), A_FLOAT, 0);
 #ifndef MAXLIB
     post(version);
-    class_sethelpsymbol(average_class, gensym("help-average.pd"));
+    
 #else
 	class_addcreator((t_newmethod)average_new, gensym("average"), A_DEFFLOAT, 0);
-    class_sethelpsymbol(average_class, gensym("maxlib/help-average.pd"));
+    class_sethelpsymbol(average_class, gensym("maxlib/average-help.pd"));
 #endif
 }
 

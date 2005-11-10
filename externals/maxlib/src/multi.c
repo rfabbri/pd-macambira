@@ -93,7 +93,7 @@ void multi_setup(void)
     class_addfloat(multi_class, multi_float);
     class_addmethod(multi_class, (t_method)multi_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(multi_class, (t_method)multi_bang);
-    class_sethelpsymbol(multi_class, gensym("help-multi.pd"));
+    
     post(version);
 }
 #else
@@ -105,6 +105,6 @@ void maxlib_multi_setup(void)
     class_addfloat(multi_class, multi_float);
     class_addmethod(multi_class, (t_method)multi_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(multi_class, (t_method)multi_bang);
-    class_sethelpsymbol(multi_class, gensym("maxlib/help-multi.pd"));
+    class_sethelpsymbol(multi_class, gensym("maxlib/multi-help.pd"));
 }
 #endif

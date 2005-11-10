@@ -93,7 +93,7 @@ void plus_setup(void)
     class_addfloat(plus_class, plus_float);
     class_addmethod(plus_class, (t_method)plus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(plus_class, (t_method)plus_bang);
-    class_sethelpsymbol(plus_class, gensym("help-plus.pd"));
+    
     post(version);
 }
 #else
@@ -105,6 +105,6 @@ void maxlib_plus_setup(void)
     class_addfloat(plus_class, plus_float);
     class_addmethod(plus_class, (t_method)plus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(plus_class, (t_method)plus_bang);
-    class_sethelpsymbol(plus_class, gensym("maxlib/help-plus.pd"));
+    class_sethelpsymbol(plus_class, gensym("maxlib/plus-help.pd"));
 }
 #endif

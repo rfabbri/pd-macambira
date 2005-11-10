@@ -101,7 +101,7 @@ void ignore_setup(void)
     class_addmethod(ignore_class, (t_method)ignore_reset, gensym("reset"), 0);
     class_addmethod(ignore_class, (t_method)ignore_time, gensym("time"), A_FLOAT, 0);
     class_addfloat(ignore_class, ignore_float);
-    class_sethelpsymbol(ignore_class, gensym("help-ignore.pd"));
+    
     post(version);
 }
 #else
@@ -113,7 +113,7 @@ void maxlib_ignore_setup(void)
     class_addmethod(ignore_class, (t_method)ignore_reset, gensym("reset"), 0);
     class_addmethod(ignore_class, (t_method)ignore_time, gensym("time"), A_FLOAT, 0);
     class_addfloat(ignore_class, ignore_float);
-    class_sethelpsymbol(ignore_class, gensym("maxlib/help-ignore.pd"));
+    class_sethelpsymbol(ignore_class, gensym("maxlib/ignore-help.pd"));
 }
 #endif
 

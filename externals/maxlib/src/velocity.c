@@ -103,10 +103,10 @@ void maxlib_velocity_setup(void)
     class_addfloat(velocity_class, velocity_float);
 	class_addbang(velocity_class, velocity_bang);
 #ifndef MAXLIB
-    class_sethelpsymbol(velocity_class, gensym("help-velocity.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(velocity_class, gensym("maxlib/help-velocity.pd"));
+    class_sethelpsymbol(velocity_class, gensym("maxlib/velocity-help.pd"));
 #endif
 }
 

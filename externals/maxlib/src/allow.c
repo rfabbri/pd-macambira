@@ -104,9 +104,9 @@ void maxlib_allow_setup(void)
     class_addsymbol(allow_class, allow_symbol);
     class_addfloat(allow_class, allow_float);
 #ifndef MAXLIB
-    class_sethelpsymbol(allow_class, gensym("help-allow.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(allow_class, gensym("maxlib/help-allow.pd"));
+    class_sethelpsymbol(allow_class, gensym("maxlib/allow-help.pd"));
 #endif
 }

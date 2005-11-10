@@ -66,7 +66,7 @@ void linear_setup(void)
     rand_linear_class = class_new(gensym("linear"), (t_newmethod)rand_linear_new, 0,
     	sizeof(t_rand_linear), 0, A_DEFFLOAT, 0);
     class_addbang(rand_linear_class, rand_linear_bang);
-	class_sethelpsymbol(rand_linear_class, gensym("help-linear.pd"));
+	class_sethelpsymbol(rand_linear_class, gensym("linear-help.pd"));
     post(version);
 }		
 #else
@@ -76,6 +76,6 @@ void maxlib_linear_setup(void)
     	sizeof(t_rand_linear), 0, A_DEFFLOAT, 0);
 	class_addcreator((t_newmethod)rand_linear_new, gensym("linear"), A_DEFFLOAT, 0);
     class_addbang(rand_linear_class, rand_linear_bang);
-	class_sethelpsymbol(rand_linear_class, gensym("maxlib/help-linear.pd"));
+	class_sethelpsymbol(rand_linear_class, gensym("maxlib/linear-help.pd"));
 }		
 #endif

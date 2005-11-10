@@ -185,7 +185,7 @@ void nchange_setup(void)
     class_addlist(nchange_class, nchange_list);
     class_addanything(nchange_class, nchange_list);
     class_addmethod(nchange_class, (t_method)nchange_set, gensym("set"), A_GIMME, 0);
-    class_sethelpsymbol(nchange_class, gensym("help-nchange.pd"));
+    
     post(version);
 }
 #else
@@ -200,6 +200,6 @@ void maxlib_nchange_setup(void)
     class_addlist(nchange_class, nchange_list);
     class_addanything(nchange_class, nchange_list);
     class_addmethod(nchange_class, (t_method)nchange_set, gensym("set"), A_GIMME, 0);
-    class_sethelpsymbol(nchange_class, gensym("maxlib/help-nchange.pd"));
+    class_sethelpsymbol(nchange_class, gensym("maxlib/nchange-help.pd"));
 }
 #endif

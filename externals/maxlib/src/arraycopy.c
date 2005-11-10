@@ -275,9 +275,9 @@ void maxlib_arraycopy_setup(void)
 	class_addbang(arraycopy_class, arraycopy_docopy);
 	// class_addlist(arraycopy_class, arraycopy_list);
 #ifndef MAXLIB
-    class_sethelpsymbol(arraycopy_class, gensym("help-arraycopy.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(arraycopy_class, gensym("maxlib/help-arraycopy.pd"));
+    class_sethelpsymbol(arraycopy_class, gensym("maxlib/arraycopy-help.pd"));
 #endif
 }

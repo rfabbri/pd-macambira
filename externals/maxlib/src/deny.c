@@ -106,9 +106,9 @@ void maxlib_deny_setup(void)
     class_addsymbol(deny_class, deny_symbol);
     class_addfloat(deny_class, deny_float);
 #ifndef MAXLIB
-    class_sethelpsymbol(deny_class, gensym("help-deny.pd"));
+    
     post(version);
 #else
-    class_sethelpsymbol(deny_class, gensym("maxlib/help-deny.pd"));
+    class_sethelpsymbol(deny_class, gensym("maxlib/deny-help.pd"));
 #endif
 }

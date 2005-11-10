@@ -94,7 +94,7 @@ void minus_setup(void)
     class_addfloat(minus_class, minus_float);
     class_addmethod(minus_class, (t_method)minus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(minus_class, (t_method)minus_bang);
-    class_sethelpsymbol(minus_class, gensym("help-minus.pd"));
+    
     post(version);
 }
 #else
@@ -106,6 +106,6 @@ void maxlib_minus_setup(void)
     class_addfloat(minus_class, minus_float);
     class_addmethod(minus_class, (t_method)minus_ft1, gensym("ft1"), A_FLOAT, 0);
 	class_addbang(minus_class, (t_method)minus_bang);
-    class_sethelpsymbol(minus_class, gensym("maxlib/help-minus.pd"));
+    class_sethelpsymbol(minus_class, gensym("maxlib/minus-help.pd"));
 }
 #endif

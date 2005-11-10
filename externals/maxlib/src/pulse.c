@@ -281,7 +281,7 @@ void pulse_setup(void)
     class_addmethod(pulse_class, (t_method)pulse_tempo, gensym("tempo"), A_FLOAT, 0);
     class_addfloat(pulse_class, pulse_onoff);
     class_addbang(pulse_class, pulse_bang);
-    class_sethelpsymbol(pulse_class, gensym("help-pulse.pd"));
+    
     post(version);
 }
 #else
@@ -296,6 +296,6 @@ void maxlib_pulse_setup(void)
     class_addmethod(pulse_class, (t_method)pulse_tempo, gensym("tempo"), A_FLOAT, 0);
     class_addfloat(pulse_class, pulse_onoff);
     class_addbang(pulse_class, pulse_bang);
-    class_sethelpsymbol(pulse_class, gensym("maxlib/help-pulse.pd"));
+    class_sethelpsymbol(pulse_class, gensym("maxlib/pulse-help.pd"));
 }
 #endif

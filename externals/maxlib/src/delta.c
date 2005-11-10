@@ -127,13 +127,13 @@ void maxlib_delta_setup(void)
     class_addfloat(delta_class, delta_float);
 	class_addbang(delta_class, (t_method)delta_bang);
 	class_addmethod(delta_class, (t_method)delta_clear, gensym("clear"), 0);
-    class_sethelpsymbol(delta_class, gensym("maxlib/help-delta.pd"));
+    class_sethelpsymbol(delta_class, gensym("maxlib/delta-help.pd"));
 #ifndef MAXLIB
-    class_sethelpsymbol(delta_class, gensym("help-delta.pd"));
+    
     post(version);
 #else
 	class_addcreator((t_newmethod)delta_new, gensym("delta"), A_DEFFLOAT, 0);
-    class_sethelpsymbol(delta_class, gensym("maxlib/help-delta.pd"));
+    class_sethelpsymbol(delta_class, gensym("maxlib/delta-help.pd"));
 #endif
 }
 
