@@ -1,8 +1,8 @@
 #N canvas 358 124 60 18 10;
 #X obj 19 1 cnv 16 40 16 empty pddp_dsp_canvas dsp 7 8 0 14 -233017
 -33289 0;
-#X obj 0 0 tgl 18 0 empty pddp_dsp empty 1 8 1 9 -233017 -33289 -33289
-0 1;
+#X obj 0 0 tgl 18 0 THIS_IS_HERE_TO_GET_RID_OF_THE_OUTLET pddp_dsp
+empty 1 8 1 9 -233017 -33289 -33289 0 1;
 #X obj 82 146 select 0 1;
 #X msg 127 179 76;
 #X msg 92 180 10;
