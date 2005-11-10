@@ -1,56 +1,59 @@
-#N canvas 9 19 907 630 10;
-#X msg 33 230 bang;
-#X floatatom 23 313 0 0 0;
-#X floatatom 23 208 0 0 0;
-#X floatatom 47 255 0 0 0;
-#X text 71 230 You can force the object to output the stored number.
+#N canvas 9 22 906 517 10;
+#X msg 23 230 bang;
+#X floatatom 13 313 0 0 0 0 - - -;
+#X floatatom 13 208 0 0 0 0 - - -;
+#X floatatom 56 264 0 0 0 0 - - -;
+#X text 61 230 You can force the object to output the stored number.
 ;
-#X text 68 208 You can set and output the value simoultaneously.;
-#X text 105 255 You can store the number \, without outputting it.
-;
-#X text 488 142 NOTE;
-#X obj 450 8 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 450 547 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X text 284 568 This document was updated for Pd version 0.35 test
-24 by Dave Sabine as part of a project called pddp proposed by Krzysztof
+#X text 58 208 You can set and output the value simoultaneously.;
+#X text 71 288 You can store the number \, without outputting it.;
+#X text 458 142 NOTE;
+#X text 10 452 This document was updated for Pd version 0.35 test 24
+by Dave Sabine as part of a project called pddp proposed by Krzysztof
 Czaja to build comprehensive documentation for Pd.;
-#X text 482 480 RELATED OBJECTS;
-#X obj 529 507 symbol;
-#X text 97 11 - STORE AN INTEGER;
-#X obj 55 12 int;
-#X text 19 41 The int object stores an integer (which is set either
+#X text 456 415 RELATED OBJECTS;
+#X obj 546 442 symbol;
+#X obj 45 12 int;
+#X text 9 41 The int object stores an integer (which is set either
 by its creation argument or by the right inlet) and then outputs that
 number when it receives a "bang" message or a new number in its left
 inlet.;
-#X text 18 98 This object acts exactly as its nearest cousin:;
-#X obj 307 97 float;
-#X text 495 159 All numbers in Pd are kept in 32-bit floating point
+#X text 8 98 This object acts exactly as its nearest cousin:;
+#X obj 297 97 float;
+#X text 465 159 All numbers in Pd are kept in 32-bit floating point
 and can represent real numbers between -8 \, 388 \, 608 and 8 \, 388
 \, 608 Hence \, the [int] object takes about as much CPU as the [float]
 object \; but is useful when numbers need to be truncated and/or when
 patches are being designed to be compatible with Pd and MAX/MSP.;
-#X text 18 160 Tip: Press and hold SHIFT while click-n-dragging these
+#X text 8 160 Tip: Press and hold SHIFT while click-n-dragging these
 number boxes to see how the [int] object truncates the number - drops
 decimal places.;
-#X obj 23 287 int 6.5;
-#X text 17 114 with only one exception: All decimal places are dropped!
+#X obj 13 287 int 6.5;
+#X text 7 114 with only one exception: All decimal places are dropped!
 All fractions will be truncated \; they will not be 'rounded off'.
 ;
-#X obj 491 507 float;
-#X obj 573 506 random;
-#X text 487 10 WHAT IS AN INTEGER?;
-#X text 493 29 Integers are "whole" numbers - numbers which do not
+#X obj 465 442 float;
+#X obj 603 442 random;
+#X text 457 10 WHAT IS AN INTEGER?;
+#X text 463 29 Integers are "whole" numbers - numbers which do not
 contain fractions. The following are examples of whole numbers:;
-#X text 494 59 1;
-#X text 494 74 -544;
-#X text 494 103 10024;
-#X text 493 88 420;
-#N canvas 0 0 414 279 related_objects_from_other_libraries 0;
+#X text 464 59 1;
+#X text 464 74 -544;
+#X text 464 103 10024;
+#X text 463 88 420;
+#N canvas 0 22 414 279 related_objects_from_other_libraries 0;
 #X obj 22 19 list2int;
 #X obj 77 19 i2l;
-#X obj 104 19 probalizer;
+#X obj 104 19 probalizer 200 200 100 100 1 0 10 1 10 2 10 3 10 4 10
+5 10 6 10 7 10 8 10 9 10 10 10 11 10 12 10 13 10 14 10 15 10 16 10
+17 10 18 10 19 10 20 10 21 10 22 10 23 10 24 10 25 10 26 10 27 10 28
+10 29 10 30 10 31 10 32 10 33 10 34 10 35 10 36 10 37 10 38 10 39 10
+40 10 41 10 42 10 43 10 44 10 45 10 46 10 47 10 48 10 49 10 50 10 51
+10 52 10 53 10 54 10 55 10 56 10 57 10 58 10 59 10 60 10 61 10 62 10
+63 10 64 10 65 10 66 10 67 10 68 10 69 10 70 10 71 10 72 10 73 10 74
+10 75 10 76 10 77 10 78 10 79 10 80 10 81 10 82 10 83 10 84 10 85 10
+86 10 87 10 88 10 89 10 90 10 91 10 92 10 93 10 94 10 95 10 96 10 97
+10 98 10 99 10;
 #X text 20 56 These objects are offered in Pd only if you have downloaded
 and properly installed the appropriate library. These objects may or
 may not exist in a single library.;
@@ -59,25 +62,29 @@ is:;
 #X text 16 127 www.puredata.org and click on "Downloads" then "Software"
 ;
 #X text 18 157 iem.kug.ac.at/pdb/;
-#X restore 490 529 pd related_objects_from_other_libraries;
-#X text 496 283 The [int] object can be used as a basis for building
+#X restore 464 464 pd related_objects_from_other_libraries;
+#X text 466 283 The [int] object can be used as a basis for building
 simple counter mechanisms in Pd. In the example below \, the [int]
 object's stored value is incremented by 1 with each "bang".;
-#X text 87 281 The creation argument initializes the object and stores
+#X text 11 334 The creation argument initializes the object and stores
 the number until the value is reset. The creation argument is optional.
 If no creation argument is provided \, the object defaults to zero.
 ;
-#X msg 511 340 bang;
-#X obj 511 369 int;
-#X obj 539 369 + 1;
-#X floatatom 511 395 5 0 0;
-#X text 486 263 EXAMPLE: BUILDING A COUNTER;
-#X connect 0 0 20 0;
-#X connect 2 0 20 0;
-#X connect 3 0 20 1;
-#X connect 8 0 9 0;
-#X connect 20 0 1 0;
-#X connect 33 0 34 0;
-#X connect 34 0 35 0;
-#X connect 34 0 36 0;
-#X connect 35 0 34 1;
+#X msg 481 340 bang;
+#X obj 481 369 int;
+#X obj 509 369 + 1;
+#X floatatom 481 395 5 0 0 0 - - -;
+#X text 456 263 EXAMPLE: BUILDING A COUNTER;
+#X obj 244 12 i;
+#X obj 436 3 cnv 10 2 500 empty empty empty 20 12 0 14 -166441 -262144
+0;
+#X obj 506 442 f;
+#X text 87 11 - STORE AN INTEGER -;
+#X connect 0 0 17 0;
+#X connect 2 0 17 0;
+#X connect 3 0 17 1;
+#X connect 17 0 1 0;
+#X connect 30 0 31 0;
+#X connect 31 0 32 0;
+#X connect 31 0 33 0;
+#X connect 32 0 31 1;
