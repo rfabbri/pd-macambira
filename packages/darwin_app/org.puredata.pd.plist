@@ -5,6 +5,12 @@
 	<key>loadlib1</key>
 	<string>Gem</string>
 	<key>loadlib2</key>
+	<string>xsample</string>
+	<key>loadlib3</key>
+	<string>vasp</string>
+	<key>loadlib4</key>
+	<string>dyn~</string>
+	<key>loadlib5</key>
 	<string>pmpd</string>
 	<key>standardpath</key>
 	<string>1</string>
