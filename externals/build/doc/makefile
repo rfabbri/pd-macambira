@@ -29,6 +29,7 @@ all:
 			../../ggee/*/*.pd \
 			../../gem2pdp/*.pd \
 			../../ff/*.pd \
+			../../freeverb~/*.pd \
 			../../hcs/*-help.pd \
 			../../hcs/*/doc/*.pd \
 			../../hcs/hid/examples/*.pd \

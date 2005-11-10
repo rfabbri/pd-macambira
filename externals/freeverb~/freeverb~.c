@@ -767,7 +767,7 @@ void *freeverb_new(t_floatarg f)
 }
 
 #ifdef PD
-extern "C" void freeverb_tilde_setup(void)
+void freeverb_tilde_setup(void)
 {
     freeverb_class = class_new(gensym("freeverb~"), (t_newmethod)freeverb_new, (t_method)freeverb_free,
     	sizeof(t_freeverb), 0, A_DEFFLOAT, 0);
