@@ -1,0 +1,6 @@
+
+This is the pd.spec file that Fernando Lopez-Lezcano aka nando uses to build
+his Pd RPMS for PlanetCCRMA.  I just stuck it here in the hopes that someone
+will maintain the RedHat packages.  I personally never use RedHat.
+
+-Hans
