@@ -1,42 +1,157 @@
 Index: u_main.tk
 ===================================================================
-RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
-retrieving revision 1.9
-diff -u -w -r1.9 u_main.tk
---- u_main.tk	18 May 2005 04:28:51 -0000	1.9
-+++ u_main.tk	6 Jun 2005 23:43:45 -0000
-@@ -531,6 +531,34 @@
- 	 doc_submenu $mbar.$helpmenuname 4.fft.examples
- 	 doc_submenu $mbar.$helpmenuname 5.reference
- 	 doc_submenu $mbar.$helpmenuname 6.externs
-+    $mbar.$helpmenuname add separator
-+    doc_submenu $mbar.$helpmenuname 7.stuff/audio-playpen
-+    doc_submenu $mbar.$helpmenuname 7.stuff/data-structures
-+    doc_submenu $mbar.$helpmenuname 7.stuff/pd-msg
-+    doc_submenu $mbar.$helpmenuname 7.stuff/soundfile-tools
-+    doc_submenu $mbar.$helpmenuname 7.stuff/synth
-+    doc_submenu $mbar.$helpmenuname 7.stuff/tools
-+    $mbar.$helpmenuname add separator
-+    $mbar.$helpmenuname add command -label {Gem manual...} \
-+             -command {menu_doc_open doc/Gem/00.manual index.html} 
-+    $mbar.$helpmenuname add separator
-+    $mbar.$helpmenuname add command -label {RRADical manual...} \
-+             -command {menu_doc_open doc/rradical rradicalpd.html} 
-+    doc_submenu $mbar.$helpmenuname rradical
-+    $mbar.$helpmenuname add separator
-+    $mbar.$helpmenuname add command -label {Building Drums in Pd...} \
-+             -command {menu_doc_open doc/tutorials/footils/pddrums pddrums.html} 
-+    doc_submenu $mbar.$helpmenuname tutorials/footils/pddrums
-+    doc_submenu $mbar.$helpmenuname abstractions/footils/angriff
-+    $mbar.$helpmenuname add separator
-+    $mbar.$helpmenuname add command -label {serendiPd info...} \
-+             -command {menu_doc_open doc/serendipd home.html} 
-+    $mbar.$helpmenuname add command -label {serendiPd client} \
-+             -command {menu_doc_open doc/serendipd serendiPd-gui.pd} 
-+    $mbar.$helpmenuname add command -label {serendiPd server} \
-+             -command {menu_doc_open doc/serendipd serendiPd-server.pd} 
-+    $mbar.$helpmenuname add separator
-+    doc_submenu $mbar.$helpmenuname tutorials/playnow
+--- u_main.tk	Sun Feb 20 20:03:36 2005
++++ u_main.tk	Fri Nov 11 19:40:51 2005
+@@ -374,22 +374,40 @@
+ set help_directory $pd_guidir/doc
+ set help_top_directory $pd_guidir/doc
+ 
++################## generate_menu_doc_link #########################
++# This procedure generates a temporary mirror of the documentation directory
++# in /tmp so that it can be opened from the Help->Pure Documentation... menu
++# under Mac OS X.  It is meant to be run at startup.
++# Damn you Apple and your "we know best" "features".  <hans@at.or.at.>
++proc generate_menu_doc_link {} {
++    global help_directory
++	 
++	 regsub -all "/" $help_directory "_" help_directory_alias
++	 set help_directory_alias /tmp/$help_directory_alias
++	 set help_directory_tmpdir $help_directory_alias/doc
++	 # if something other than a directory exists, delete it
++	 if [file exists $help_directory_alias] {
++		  file delete -force -- $help_directory_alias
++	 }
++	 if { ! [ file isdirectory $help_directory_tmpdir ] } {
++		  file mkdir -p $help_directory_tmpdir
++	 }
++	 foreach file [ lsort [ glob -dir $help_directory * ] ] {
++		  regsub -all ".*/" $file "" link_file_name
++		  file link -symbolic [file join $help_directory_tmpdir $link_file_name ] $file 
++	 }
++	 set help_directory $help_directory_tmpdir
++}
++
++################## menu_documentation #########################
+ proc menu_documentation {} {
+     global help_directory
+     global pd_nt
+     global pd_guidir
+ 
+-    if {$pd_nt == 2} {
+-    	exec rm -rf /tmp/pd-documentation
+-    	exec cp -pr $pd_guidir/doc /tmp/pd-documentation
+-	set filename [tk_getOpenFile -defaultextension .pd \
+-	-filetypes { {{documentation} {.pd .txt .htm}} } \
+-	-initialdir /tmp/pd-documentation]
+-    } else {
+ 	set filename [tk_getOpenFile -defaultextension .pd \
+ 	-filetypes { {{documentation} {.pd .txt .htm}} } \
+ 	-initialdir $help_directory]
+-    }    
+     if {$filename != ""} {
+     	if {[string first .txt $filename] >= 0} {
+     	    menu_opentext $filename
+@@ -421,25 +439,41 @@
+     }
+ }
+ 
+-proc doc_submenu {helpmenu subdir} {
+-	 global help_top_directory pd_tearoff
+ 
+-	 set menudir $help_top_directory/$subdir
++################## menu_doc_submenu #########################
++
++# this is a recursive function to generation a nested menu in the help menu
++# which shows the complete contents of the doc directory <hans@at.or.at>
++proc menu_doc_submenu {helpmenu base_dir sub_dir} {
++	 global pd_tearoff
++	 global help_top_directory
++
++	 set menu_dir $help_top_directory/$base_dir/$sub_dir
+ 
+-    regsub -all "\\\." $subdir "" submenu
++    regsub -all "\\\." $sub_dir "" submenu
+ 
+ 	 menu $helpmenu.$submenu -tearoff $pd_tearoff
+-    regsub -all "\\\." $subdir " " submenuname
++    regsub -all "\\\." $sub_dir " " submenuname
+ 	 $helpmenu add cascade -label $submenuname \
+ 		  -menu $helpmenu.$submenu
+ 
+-# use this glob pattern to exclude the supporting files
+-#	 foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
+-	 foreach file [ lsort [ glob -dir $menudir * ] ] {
+-		  set filename ""
+-		  regsub {.*/(.*\..+$)} $file {\1} filename
+-		  $helpmenu.$submenu add command -label $filename \
+-				-command "menu_doc_open doc/$subdir $filename"
++	 foreach file [ lsort [ glob -dir $menu_dir * ] ] {
++		  set file_type [file type $file]
++# If links are going to be used then there needs to be a check to see if each
++# link might cause this function to recurse forever  <hans@at.or.at>
++#		  if { $file_type == "link"} {
++#				puts stderr "LINK: $file"
++#		  }
++		  if { $file_type == "file" } {
++				set file_name ""
++				regsub {.*/.*\.(.+$)} $file {\1} file_extension
++				regsub {.*/(.*\..+$)} $file {\1} file_name
++				# test by file_extension so that only .htm .html .c .pd and .txt get put on the menu
++				$helpmenu.$submenu add command -label $file_name \
++					 -command "menu_doc_open doc/$base_dir/$sub_dir $file_name"
++		  } elseif { $file_type == "directory" } {
++				menu_doc_submenu $helpmenu.$submenu $base_dir/$sub_dir [file tail $file]
++		  }
+ 	 }
+ }
+ 
+@@ -494,7 +528,23 @@
+ 
+ 
+ #          the "Help" menu
+-	 if {$pd_nt != 2} {
++	 if {$pd_nt == 2} {
++# Apple doesn't allow cascading menus in their Help so I had to call this 
++# one "docs"  <hans@at.or.at>
++		  generate_menu_doc_link
++		  $mbar.docs add command -label {Browse Documentation...} \
++				-command {menu_documentation} 
++	 # the help menu only really works well on Mac OS X <hans@at.or.at>
++		  $mbar.docs add separator
++		  $mbar.docs add command -label {1 manual...} \
++				-command {menu_doc_open doc/1.manual index.htm} 
++		  menu_doc_submenu $mbar.docs "." 2.control.examples
++		  menu_doc_submenu $mbar.docs "." 3.audio.examples
++		  menu_doc_submenu $mbar.docs "." 4.fft.examples
++		  menu_doc_submenu $mbar.docs "." 5.reference
++		  menu_doc_submenu $mbar.docs "." 6.externs
++		  menu_doc_submenu $mbar.docs "." 7.stuff
++	 } else {
+ # a menu on the main menubar named "$whatever.help" while be treated
+ # as a special menu with specific behaviors on different platforms.
+ # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
+@@ -502,22 +552,9 @@
+ 	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
+     $mbar.help add command -label {Pure Documentation...} \
+ 	-command {menu_documentation} 
+-		  # add menu items for each section instead of using Pd patches
+-		  $mbar.help add separator
+-		  set helpmenuname help
+-	 } else {
+-# Apple doesn't allow cascading menus in their Help so I had to call this 
+-# one "docs"  <hans@at.or.at>
+-		  set helpmenuname docs
+-	 }
+-
+-	 $mbar.$helpmenuname add command -label {1 manual...} \
++		  $mbar.help add command -label {1 manual...} \
+ 		  -command {menu_doc_open doc/1.manual index.htm} 
+-	 doc_submenu $mbar.$helpmenuname 2.control.examples
+-	 doc_submenu $mbar.$helpmenuname 3.audio.examples
+-	 doc_submenu $mbar.$helpmenuname 4.fft.examples
+-	 doc_submenu $mbar.$helpmenuname 5.reference
+-	 doc_submenu $mbar.$helpmenuname 6.externs
++	 }
  }
  
  #################### the "File" menu for the Pd window ##############
