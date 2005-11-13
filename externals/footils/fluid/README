@@ -38,6 +38,17 @@ $ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data login
 
 $ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data co externals/footils/fluid
 
+_ ___building it __
+
+fluid~ should be compiled using the flext-build system. See the flext
+documentation for details. Basically you need to run the flext build script
+with your architecture as arguments. So if for example you built flext for Pd
+on Linux using the gcc compile, you need to call: 
+
+$ sh FLEXTPATH/build.sh pd gcc
+
+from inside the fluid-directors (this one here).
+
 _ __troubleshooting __
 
 If you encounter Pd crashes when using fluid~ then the reason might be a bug in
