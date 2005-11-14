@@ -102,7 +102,7 @@ static void mTXrowrfftMatrix (MTXRowrfft *x, t_symbol *s,
   //mTXrowrfftList (x, s, argc-2, argv+2);
   int rows = atom_getint (argv++);
   int columns = atom_getint (argv++);
-  int columns_re = (columns>>1);
+  int columns_re = (columns>>1)+1; /* N/2+1 samples needed for real part of realfft */
   int size = rows * columns;
   int in_size = argc-2;
   int size2 = columns_re * rows + 2; /* +2 since the list also contains matrix row+col */

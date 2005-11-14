@@ -94,7 +94,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
   int rows = atom_getint (argv++);
   int columns_re = atom_getint (argv++);
   int in_size = argc-2;
-  int columns = columns_re<<1;
+  int columns = (columns_re-1)<<1;
   int size2 = columns_re * rows;
   int size = rows * columns;
   int ifft_count;
@@ -103,7 +103,9 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
   t_float *f_im = x->f_im;
 
   // ifftsize check
-  if (!size)
+  if (columns_re < 3)
+    post("mtx_rowrifft: matrix must have at least 3 columns");
+  else if (!size) 
     post("mtx_rowrifft: invalid dimensions");
   else if (in_size < size2)
     post("mtx_rowrifft: sparse matrix not yet supported: use \"mtx_check\"");
@@ -136,7 +138,7 @@ static void mTXrowrifftMatrixCold (MTXRowrifft *x, t_symbol *s,
     // do nothing else!
   }
   else
-    post("mtx_rowrifft: rowvector size no power of 2!");
+    post("mtx_rowrifft: rowvector 2*(size+1) no power of 2!");
 }
 
 static void mTXrowrifftMatrixHot (MTXRowrifft *x, t_symbol *s, 
