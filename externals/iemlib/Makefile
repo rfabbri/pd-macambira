@@ -33,3 +33,7 @@ install-abs:
 	-install -d ${INSTALL_BIN}
 	-install -m 644 iemabs/*.pd $(INSTALL_BIN)
 
+clean:
+	for d in ${IEMLIBS}; do \
+	  ${MAKE} -C src/$$d clean; \
+	done
