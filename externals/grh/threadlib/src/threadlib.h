@@ -30,7 +30,7 @@
 
 
 // threadlib version string
-#define VERSION "0.1pre"
+#define VERSION "0.1"
 
 // define it to use the lockfree fifo
 #define THREADLIB_LOCKFREE
