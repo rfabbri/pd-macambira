@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#ifdef NT
+#ifdef _MSC_VER
 // #pragma warning( disable : 4091 ) 
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
