@@ -1,8 +1,9 @@
 current: all
 
 .SUFFIXES: .pd_linux
+include ../../Make.include
 
-INCLUDE = -I. -I/usr/local/src/pd-0.38-4/src
+INCLUDE = -I. -I$(PDSOURCE)
 
 LDFLAGS = -export-dynamic -shared
 LIB = -ldl -lm -lpthread
