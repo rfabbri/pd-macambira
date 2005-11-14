@@ -24,10 +24,12 @@ typedef struct _prepend_kernel
   t_object    x_obj;
   int         x_inlet_select;
   int         x_size12;
+  int         x_size1;
   int         x_size2;
   int         x_ac1;
   int         x_ac2;
   t_atom      *x_at12;
+  t_atom      *x_at1;
   t_atom      *x_at2;
   t_symbol    *x_sym1;
   t_symbol    *x_sym2;
@@ -256,7 +258,7 @@ static void *prepend_kernel_new(void)
 {
   t_prepend_kernel *x = (t_prepend_kernel *)pd_new(prepend_kernel_class);
   t_glist *glist = (t_glist *)canvas_getcurrent();
-  t_canvas *canvas=glist_getcanvas(glist);
+  t_canvas *canvas=(t_canvas*)glist_getcanvas(glist);
   int ac=0;
   t_atom *av;
   
