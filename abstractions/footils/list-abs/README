@@ -8,9 +8,18 @@ list-abs.pd
 
   change floats in a lists to their absolute values.
 
+list-add.pd
+
+  Add the floats in two lists element by element.
+
 list-accum.pd
 
   sum all floats in a list.
+
+list-clip.pd
+
+  restrict the floats in a list between two borders. Applies [clip] on list
+  floats.
 
 list-delete.pd
 
@@ -32,6 +41,12 @@ list-drip2.pd
 list-dripslow.pd
 
   serialize a list on demand: each bang will output the next element.
+
+list-emath.pd
+
+  do elementwise math operations on list. Like list-math, but for two lists
+  instead of list and scalar. Also see list-mult, list-sub and list-add, which
+  are wrappers around list-emath.
 
 list-equalize.pd
 
@@ -68,6 +83,10 @@ list-minmax.pd
 
   find minimum and maximum float in a list.
 
+list-mult.pd
+
+  multiply the floats in two lists element by element.
+
 list-normalize.pd
 
   normalize a list to (-1,1) like you can normalize a Pd array.
@@ -89,6 +108,10 @@ list-splat.pd
   an advanced [list split] which also accepts negative indices to split off
   elements from the back of a list. Otherwise compatible to [list split] so it
   can be used as a drop-in replacement.
+
+list-sub.pd
+
+  substract the floats in two lists element by element.
 
 sroute.pd
 

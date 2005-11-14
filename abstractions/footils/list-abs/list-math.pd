@@ -44,6 +44,8 @@ to its right inlet.;
 #X obj 77 530 outlet;
 #X text 182 32 Use as "list-math operator" where operator is some binary
 operator \, expr can understand.;
+#X obj 290 266 loadbang;
+#X obj 290 287 f \$2;
 #X connect 0 0 8 0;
 #X connect 2 0 5 1;
 #X connect 3 0 19 0;
@@ -60,3 +62,5 @@ operator \, expr can understand.;
 #X connect 16 0 8 0;
 #X connect 17 0 5 0;
 #X connect 18 0 17 1;
+#X connect 21 0 22 0;
+#X connect 22 0 17 1;
