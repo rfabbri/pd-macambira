@@ -1,1 +1,1 @@
-#include "../ext13/strippath.c"
+#include "../../ext13/strippath.c"

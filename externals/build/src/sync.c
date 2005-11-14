@@ -1,1 +1,1 @@
-#include "../maxlib/src/sync.c"
+#include "../../maxlib/src/sync.c"

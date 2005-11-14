@@ -1,1 +1,1 @@
-#include "../zexy/src/makesymbol.c"
+#include "../../zexy/src/makesymbol.c"

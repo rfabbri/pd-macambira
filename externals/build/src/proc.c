@@ -1,1 +1,1 @@
-#include "../cxc/proc.c"
+#include "../../cxc/proc.c"

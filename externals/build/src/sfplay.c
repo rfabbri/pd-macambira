@@ -1,1 +1,1 @@
-#include "../zexy/src/sfplay.c"
+#include "../../zexy/src/sfplay.c"

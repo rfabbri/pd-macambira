@@ -1,1 +1,1 @@
-#include "../ggee/gui/ticker.c"
+#include "../../ggee/gui/ticker.c"

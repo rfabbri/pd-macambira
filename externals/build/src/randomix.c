@@ -1,1 +1,1 @@
-#include "../cxc/randomix.c"
+#include "../../cxc/randomix.c"

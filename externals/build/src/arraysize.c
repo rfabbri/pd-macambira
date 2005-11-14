@@ -1,1 +1,1 @@
-#include "../arraysize/arraysize.c"
+#include "../../arraysize/arraysize.c"

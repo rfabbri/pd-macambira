@@ -1,1 +1,1 @@
-#include "../ggee/control/stripdir.c"
+#include "../../ggee/control/stripdir.c"

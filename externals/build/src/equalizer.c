@@ -1,1 +1,1 @@
-#include "../ggee/filters/equalizer.c"
+#include "../../ggee/filters/equalizer.c"

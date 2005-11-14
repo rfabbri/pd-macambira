@@ -1,1 +1,1 @@
-#include "../zexy/src/strcmp.c"
+#include "../../zexy/src/strcmp.c"

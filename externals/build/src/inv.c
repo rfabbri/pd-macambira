@@ -1,1 +1,1 @@
-#include "../ggee/control/inv.c"
+#include "../../ggee/control/inv.c"

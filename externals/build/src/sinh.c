@@ -1,1 +1,1 @@
-#include "../ggee/control/sinh.c"
+#include "../../ggee/control/sinh.c"

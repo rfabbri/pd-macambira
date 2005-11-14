@@ -1,1 +1,1 @@
-#include "../zexy/src/prime.c"
+#include "../../zexy/src/prime.c"

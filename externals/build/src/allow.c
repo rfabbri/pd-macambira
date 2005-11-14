@@ -1,1 +1,1 @@
-#include "../maxlib/src/allow.c"
+#include "../../maxlib/src/allow.c"

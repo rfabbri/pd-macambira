@@ -1,1 +1,1 @@
-#include "../zexy/src/symbol2list.c"
+#include "../../zexy/src/symbol2list.c"

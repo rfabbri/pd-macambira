@@ -1,1 +1,1 @@
-#include "../ggee/gui/envgen.c"
+#include "../../ggee/gui/envgen.c"

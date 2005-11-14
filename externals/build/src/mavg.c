@@ -1,1 +1,1 @@
-#include "../zexy/src/mavg.c"
+#include "../../zexy/src/mavg.c"

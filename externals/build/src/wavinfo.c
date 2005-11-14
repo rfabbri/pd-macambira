@@ -1,1 +1,1 @@
-#include "../ext13/wavinfo.c"
+#include "../../ext13/wavinfo.c"
