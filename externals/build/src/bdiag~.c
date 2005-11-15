@@ -1,7 +1,7 @@
 #ifndef __i386__
 #define IS_DENORMAL(f) f
+#else
+#include "../../creb/include/extlib_util.h"
 #endif
-/* this doesn't work on Mac OS X now <hans@eds.org> */
-#ifndef __APPLE__
+#include "../../../pd/src/d_mayer_fft.c"
 #include "../../creb/modules/bdiag.c"
-#endif
