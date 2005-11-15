@@ -1,9 +1,9 @@
 prefix=/tmp
 #prefix=$(DESTDIR)/usr/local/lib/pd
 
-EXTERNALS = $(shell ls )
+EXTERNALS = $(shell ls -1 ../src | grep -e '.*\.c$$')
 
-all: link.stamp $(EXTERNALS:.c=.pd_darwin)
+all: $(EXTERNALS:.c=.pd_darwin)
 
 .SUFFIXES: .pd_darwin
 
@@ -36,9 +36,8 @@ LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) -L/sw/lib
 	rm -f "$*.o" 
 
 clean:
-	-rm *.pd_darwin *~ *.c *.o
-	-rm -rf root *.pkg
-	-rm link.stamp
+	-rm *.pd_darwin *~
+	-rm -rf root *.pkg 
 
 install-doc:	
 	test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
@@ -55,19 +54,8 @@ install: install-doc
 	test -d $(prefix)/extra || mkdir -p $(prefix)/extra
 	install -m644 *.pd_darwin $(prefix)/extra
 
-link: link.stamp
 
-link.stamp:
-	cp ../src/*.c .
-# MacOSX exceptions that don't work just yet (if ever)
-	-rm ossmixer.c plugin~.c cdplayer.c promiscous~.c serialctl.c \
-		serial_bird.c serial_ms.c proc.c streamin~.c streamout~.c rhythm_* \
-		piperead~.c pipewrite~.c
-	touch link.stamp
-	make
-
-
-EXTERNALS_VERSION = $(shell date +20%y.%m.%d)
+EXTERNALS_VERSION := $(shell date +20%y.%m.%d)
 PACKAGE_PREFIX = pd-externals
 PACKAGE_NAME = $(PACKAGE_PREFIX)-$(EXTERNALS_VERSION)
 
