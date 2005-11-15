@@ -169,7 +169,7 @@ standard functionality.;
 #X obj 278 252 outlet~;
 #X obj 336 253 outlet~;
 #X obj 165 177 r \$0-fade;
-#X obj 63 209 mtx_*~ 6 1 100;
+#X obj 63 209 matrix_mul~ 6 1 100;
 #X obj 63 133 mtx 6 1;
 #X connect 2 0 11 1;
 #X connect 3 0 12 0;
