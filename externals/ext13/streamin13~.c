@@ -17,8 +17,7 @@
 #include <winsock2.h>
 #endif
 
-
-
+/* these pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
