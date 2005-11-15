@@ -10,7 +10,7 @@
 #X floatatom 274 299 5 0 0 0 - - -;
 #X obj 160 226 list-math *;
 #X msg 159 167 1 2 3 4 a b c \, 10 20 30 x y z;
-#X text 144 93 Use as "list-math operator" where operator is some binary
+#X text 132 87 Use as "list-math operator" where operator is some binary
 operator \, that expr can understand \, like + \, - \, * or /;
 #X obj 406 373 print L;
 #X msg 406 308 1 2 3 4 a b c;
@@ -21,6 +21,13 @@ operator \, that expr can understand \, like + \, - \, * or /;
 #X obj 404 230 list-math +;
 #X obj 164 332 list-math /;
 #X obj 406 340 list-math -;
+#X msg 406 416 1 2 3 4 a b c;
+#X floatatom 516 415 5 0 0 0 - - -;
+#X obj 406 448 list-math - 2;
+#X obj 406 481 print L-with-arg;
+#X text 249 448 Using a default arg:;
+#X text 131 125 A second argument is accepted to set a default scalar
+to use.;
 #X connect 1 0 9 0;
 #X connect 2 0 9 1;
 #X connect 4 0 17 0;
@@ -34,3 +41,6 @@ operator \, that expr can understand \, like + \, - \, * or /;
 #X connect 17 0 3 0;
 #X connect 18 0 6 0;
 #X connect 19 0 12 0;
+#X connect 20 0 22 0;
+#X connect 21 0 22 1;
+#X connect 22 0 23 0;

@@ -83,6 +83,13 @@ list-minmax.pd
 
   find minimum and maximum float in a list.
 
+list-moses.pd
+
+  A [moses] for lists: Route incoming list according to how an element compares
+  against a test float. It's possible to set the position of the element to
+  compare using a zero-based index. (Not to be confused with the [listmoses]
+  external which does something completely different!)
+
 list-mult.pd
 
   multiply the floats in two lists element by element.
