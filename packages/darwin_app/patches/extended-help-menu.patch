@@ -1,7 +1,5 @@
-Index: u_main.tk
-===================================================================
---- u_main.tk	Sun Feb 20 20:03:36 2005
-+++ u_main.tk	Fri Nov 11 19:40:51 2005
+--- pd-0.38-3/src/u_main.tk	Sun Feb 20 20:03:36 2005
++++ u_main.tk	Tue Nov 15 02:22:59 2005
 @@ -374,22 +374,40 @@
  set help_directory $pd_guidir/doc
  set help_top_directory $pd_guidir/doc
@@ -51,33 +49,61 @@ Index: u_main.tk
      if {$filename != ""} {
      	if {[string first .txt $filename] >= 0} {
      	    menu_opentext $filename
-@@ -421,25 +439,41 @@
+@@ -411,38 +429,56 @@
+  
+     set dirname $pd_guidir/$subdir
+ 
+-    if {[regexp ".*\.(txt|c)$" $basename]} {
++    if {[regexp ".*\.(txt|c|css)$" $basename]} {
+     	menu_opentext $dirname/$basename
+     } elseif {[regexp ".*\.html?$" $basename]} {
+ 		  menu_openhtml $dirname/$basename
++    } elseif {[regexp ".*\.(wav|aif|aiff|jpg|jpeg|gif|png|mov|avi)$" $basename]} {
++		  menu_openhtml $dirname/$basename
+     } else {
+     	pd [concat pd open [pdtk_enquote $basename] \
+ 		[pdtk_enquote $dirname] \;]
      }
  }
  
 -proc doc_submenu {helpmenu subdir} {
 -	 global help_top_directory pd_tearoff
- 
+-
 -	 set menudir $help_top_directory/$subdir
+ 
+-    regsub -all "\\\." $subdir "" submenu
 +################## menu_doc_submenu #########################
-+
+ 
 +# this is a recursive function to generation a nested menu in the help menu
 +# which shows the complete contents of the doc directory <hans@at.or.at>
 +proc menu_doc_submenu {helpmenu base_dir sub_dir} {
 +	 global pd_tearoff
 +	 global help_top_directory
++	 
++	 set menu_dir [file join $help_top_directory $base_dir $sub_dir]
 +
-+	 set menu_dir $help_top_directory/$base_dir/$sub_dir
- 
--    regsub -all "\\\." $subdir "" submenu
-+    regsub -all "\\\." $sub_dir "" submenu
- 
++	 foreach file [ lsort [ glob -dir $menu_dir * ] ] {
++		  set file_type [file type $file]
++		  regsub {.*/(.*$)} $file {\1} file_name
++# If links are going to be used then there needs to be a check to see if each
++# link might cause this function to recurse forever  <hans@at.or.at>
++#		  if { $file_type == "link"} {
++#				puts stderr "LINK: $file"
++#		  }
++		  if { $file_type == "file" } {
++				# only put certain file types on the menu
++				if {[regexp ".*\.(htm|html|c|pd|txt|wav|aif|aiff)$" $file]} {
++					 $helpmenu add command -label $file_name \
++						  -command "menu_doc_open doc/$base_dir/$sub_dir $file_name"
++				}
++		  } elseif { $file_type == "directory" } {
++				regsub -all "\\\." $file_name "" submenu
  	 menu $helpmenu.$submenu -tearoff $pd_tearoff
 -    regsub -all "\\\." $subdir " " submenuname
-+    regsub -all "\\\." $sub_dir " " submenuname
++				regsub -all "\\\." $file_name " " submenuname
  	 $helpmenu add cascade -label $submenuname \
  		  -menu $helpmenu.$submenu
- 
+-
 -# use this glob pattern to exclude the supporting files
 -#	 foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
 -	 foreach file [ lsort [ glob -dir $menudir * ] ] {
@@ -85,27 +111,17 @@ Index: u_main.tk
 -		  regsub {.*/(.*\..+$)} $file {\1} filename
 -		  $helpmenu.$submenu add command -label $filename \
 -				-command "menu_doc_open doc/$subdir $filename"
-+	 foreach file [ lsort [ glob -dir $menu_dir * ] ] {
-+		  set file_type [file type $file]
-+# If links are going to be used then there needs to be a check to see if each
-+# link might cause this function to recurse forever  <hans@at.or.at>
-+#		  if { $file_type == "link"} {
-+#				puts stderr "LINK: $file"
-+#		  }
-+		  if { $file_type == "file" } {
-+				set file_name ""
-+				regsub {.*/.*\.(.+$)} $file {\1} file_extension
-+				regsub {.*/(.*\..+$)} $file {\1} file_name
-+				# test by file_extension so that only .htm .html .c .pd and .txt get put on the menu
-+				$helpmenu.$submenu add command -label $file_name \
-+					 -command "menu_doc_open doc/$base_dir/$sub_dir $file_name"
-+		  } elseif { $file_type == "directory" } {
 +				menu_doc_submenu $helpmenu.$submenu $base_dir/$sub_dir [file tail $file]
-+		  }
  	 }
  }
  
-@@ -494,7 +528,23 @@
++
++}
++
+ ############# routine to add media, help, and apple menu items ###############
+ 
+ proc menu_addstd {mbar} {
+@@ -494,7 +530,18 @@
  
  
  #          the "Help" menu
@@ -117,20 +133,15 @@ Index: u_main.tk
 +		  $mbar.docs add command -label {Browse Documentation...} \
 +				-command {menu_documentation} 
 +	 # the help menu only really works well on Mac OS X <hans@at.or.at>
-+		  $mbar.docs add separator
-+		  $mbar.docs add command -label {1 manual...} \
++		  $mbar.docs add command -label {Pd HTML Manual...} \
 +				-command {menu_doc_open doc/1.manual index.htm} 
-+		  menu_doc_submenu $mbar.docs "." 2.control.examples
-+		  menu_doc_submenu $mbar.docs "." 3.audio.examples
-+		  menu_doc_submenu $mbar.docs "." 4.fft.examples
-+		  menu_doc_submenu $mbar.docs "." 5.reference
-+		  menu_doc_submenu $mbar.docs "." 6.externs
-+		  menu_doc_submenu $mbar.docs "." 7.stuff
++		  $mbar.docs add separator
++		  menu_doc_submenu $mbar.docs "." "."
 +	 } else {
  # a menu on the main menubar named "$whatever.help" while be treated
  # as a special menu with specific behaviors on different platforms.
  # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-@@ -502,22 +552,9 @@
+@@ -502,22 +549,9 @@
  	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
      $mbar.help add command -label {Pure Documentation...} \
  	-command {menu_documentation} 
