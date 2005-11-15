@@ -32,8 +32,8 @@ install-bin:
 	-install -m 644 $(LIBNAME).$(EXT) $(INSTALL_BIN)
 
 install-doc:
-	-install -d $(INSTALL_DOC)
-	-install -m 644 ../doc/*.pd $(INSTALL_DOC)
+	-install -d $(INSTALL_BIN)
+	-install -m 644 *.pd $(INSTALL_BIN)
 
 dist: distclean
 	(cd ..;tar czvf $(TARNAME) $(LIBNAME))
