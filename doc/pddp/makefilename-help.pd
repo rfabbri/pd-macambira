@@ -1,27 +1,23 @@
-#N canvas 22 93 613 608 12;
+#N canvas 320 94 583 575 10;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 463 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 523 37 597 612 More_Info 0;
-#X text 17 24 COMMON USES;
-#X text 15 417 INNOVATIVE USES;
-#X text 47 47 I believe that this object was developed first to allow
+#N canvas 282 108 621 636 More_Info 0;
+#X text 17 4 COMMON USES;
+#X text 15 557 INNOVATIVE USES;
+#X text 47 19 I believe that this object was developed first to allow
 PD to generate sequential file names - perhaps to be used in conjunction
 with [soundfiler] or [openpanel]. For example \, an audio loop recorder
 might generate a continuous series of sound files to be saved on a
 hard drive...like below:;
-#X obj 54 136 bng 15 250 50 0 empty empty Bang_me 18 7 0 8 -262144
--1 -1;
-#X obj 54 160 f;
-#X symbolatom 54 215 0 0 0 0 - - -;
-#X text 53 238 This file name could be used when saving the audio data
-to disk.;
-#X obj 87 161 + 1;
-#X obj 54 187 makefilename file-%d.aif;
-#X text 20 280 LIMITATIONS;
-#N canvas 175 22 583 599 spaces_and_multiple_variables 0;
+#X obj 53 125 f;
+#X symbolatom 53 166 0 0 0 0 - - -;
+#X obj 82 125 + 1;
+#X obj 53 145 makefilename file-%d.aif;
+#X text 20 410 LIMITATIONS;
+#N canvas 175 22 595 611 spaces_and_multiple_variables 0;
 #X text 25 19 Instead of using spaces \, an underscore will often produce
 a tolerable compromise.;
 #X obj 210 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -105,8 +101,10 @@ which operates 24 hours per day \, every day.;
 #X connect 29 0 22 0;
 #X connect 35 0 17 0;
 #X connect 36 0 25 0;
-#X restore 47 445 pd spaces_and_multiple_variables;
-#N canvas 175 22 507 609 help_with_interfaces 0;
+#X restore 47 585 pd spaces_and_multiple_variables;
+#X obj 53 90 bng 30 250 50 0 empty empty start 1 15 1 12 -90049 -1
+-1;
+#N canvas 475 61 515 617 help_with_interfaces 0;
 #X text 17 16 Building user interfaces in Pd is a difficult balance
 between usability and performance. Pd is not winning any awards for
 usability - let's face it: it's powerful \, it's cool \, and that's
@@ -121,12 +119,12 @@ affords.;
 -1 -1 0 1;
 #X obj 45 401 bng 15 250 50 0 b_panel empty Open_File 18 7 0 8 -262144
 -1 -1;
-#X obj 40 280 cnv 15 400 20 empty d_canvas DSP 20 12 0 8 -233017 -66577
-0;
-#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN 20 12 0 8 -233017
+#X obj 40 280 cnv 15 400 20 empty d_canvas DSP:OFF 20 12 0 8 -233017
 -66577 0;
-#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME 20 12 0 8 -233017
--66577 0;
+#X obj 40 302 cnv 15 400 20 empty f_canvas FILE_OPEN:/Users/hans/cvs/pure-data/doc/pddp/all_about_lists_vs_anythings.pd
+20 12 0 8 -233017 -66577 0;
+#X obj 40 324 cnv 15 400 20 empty v_canvas VOLUME:99/100 20 12 0 8
+-233017 -66577 0;
 #X text 187 361 The grey canvases above could;
 #X text 189 383 be used like "status bars" to;
 #X text 189 404 write relevant information to;
@@ -134,7 +132,7 @@ affords.;
 #X text 188 484 the information in a meaningful;
 #X text 189 505 way.;
 #X text 187 426 the screen.;
-#N canvas 217 22 470 320 look_inside 0;
+#N canvas 217 22 478 328 look_inside 0;
 #X obj 199 14 r b_panel;
 #X obj 235 166 r v_slider;
 #X obj 36 236 s d_canvas;
@@ -177,17 +175,41 @@ in the area of performance to provide users with on-screen reporting
 \, record keeping \, and sometimes even a few 'pleasantries'. Consider
 the following examples - but always weight the pros and cons when incorporating
 these types of interfaces. Performance vs. Usability.;
-#X restore 47 477 pd help_with_interfaces;
-#X text 45 304 This object does not provide advanced formatting and
+#X restore 298 585 pd help_with_interfaces;
+#X text 22 215 CONVERT ASCII;
+#X symbolatom 206 350 0 0 0 0 - - -;
+#X obj 138 268 hsl 150 18 0 127 0 1 empty empty ASCII_range 2 9 1 12
+-262131 -1 -1 14900 0;
+#X floatatom 175 352 3 0 0 0 - - -;
+#X obj 200 309 int;
+#X text 45 487 - only one printf pattern can be used at once;
+#X text 45 510 - currently \, floats are not supported via the printf
+%f pattern. You can only display the integer part of the float using
+%d.;
+#X text 45 444 - This object does not provide advanced formatting and
 parsing abilities. For example \, you cannot use spaces or odd characters
-in the argument - also the argument can only include ONE variable.
-Although \, these limitations can be easily overcome with a little
-ingenuity and compromise -- see below.;
-#X connect 3 0 4 0;
-#X connect 4 0 7 0;
-#X connect 4 0 8 0;
-#X connect 7 0 4 1;
-#X connect 8 0 5 0;
+in the argument.;
+#X obj 206 330 makefilename %c;
+#X text 47 187 This file name could be used when saving the audio data
+to disk.;
+#X obj 135 290 select 123;
+#X text 40 232 The %c pattern allows you to convert ASCII numbers to
+the respective character.;
+#X text 45 425 - non-printable ASCII characters show up as a little
+box.;
+#X text 44 366 Watch out! ASCII character 123 locks up Pd (the open
+curly brace). Also \, reserved characters that Pd uses show up with
+a backslash in front of them ( \, \; and backslash).;
+#X connect 3 0 5 0;
+#X connect 3 0 6 0;
+#X connect 5 0 3 1;
+#X connect 6 0 4 0;
+#X connect 9 0 3 0;
+#X connect 13 0 21 0;
+#X connect 15 0 14 0;
+#X connect 15 0 19 0;
+#X connect 19 0 12 0;
+#X connect 21 1 15 0;
 #X restore 104 513 pd More_Info;
 #N canvas 85 22 397 246 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
@@ -203,16 +225,12 @@ ingenuity and compromise -- see below.;
 #X text 29 316 OUTLETS:;
 #X text 22 342 EXAMPLES:;
 #X text 21 462 SEE ALSO:;
-#X obj 5 18 makefilename;
+#X obj 10 18 makefilename;
 #X text 115 18 - FORMAT A STRING WITH A VARIABLE FIELD.;
 #X text 104 316 Symbol - The output is formatted like "symbol YOURSTRING".
 ;
 #X floatatom 114 346 0 0 0 0 - - -;
-#X obj 114 400 print;
-#X obj 114 373 makefilename soundfile%d.aif;
-#X text 170 400 numbered filenames;
-#X obj 353 431 print;
-#X text 406 433 text examples;
+#X text 146 425 numbered filenames;
 #X obj 353 380 symbol;
 #X msg 353 343 dave;
 #X msg 412 341 drums;
@@ -225,19 +243,24 @@ names \, or whatnot. You can plug in a variable number or symbol by
 putting "%d" or "%s" in the string. If you put "%s" in the string \,
 be sure to send it a symbol and vice versa... there' no checking. Each
 [makefilename] object can have only one variable.;
-#X text 152 540 - Dave Sabine \, April 25 \, 2003;
 #X text 108 53 Integer - If a number is sent to the inlet \, the argument
 should be written with a "%d" which represents the location of the
 incoming variable number in the outgoing symbol. Floats will be converted
 to integers.;
-#X text 107 126 Symbol - If a symbol is sent to the inlet \, the argument
+#X text 107 106 Symbol - If a symbol is sent to the inlet \, the argument
 should be written with a "%s" which represent the location of the incoming
 variable symbol in the outgoing symbol. Lists will be truncated.;
-#X connect 13 0 15 0;
-#X connect 15 0 14 0;
-#X connect 19 0 24 0;
-#X connect 20 0 19 0;
-#X connect 21 0 19 0;
-#X connect 22 0 19 0;
-#X connect 23 0 19 0;
-#X connect 24 0 17 0;
+#X symbolatom 353 428 0 0 0 0 - - -;
+#X symbolatom 114 404 0 0 0 0 - - -;
+#X text 115 159 comment;
+#X obj 115 373 makefilename soundfile%d.aif;
+#X text 392 551 updated for Pd 0.38-4;
+#X text 140 538 - Dave Sabine \, Hans-Christoph Steiner;
+#X connect 13 0 27 0;
+#X connect 15 0 20 0;
+#X connect 16 0 15 0;
+#X connect 17 0 15 0;
+#X connect 18 0 15 0;
+#X connect 19 0 15 0;
+#X connect 20 0 24 0;
+#X connect 27 0 25 0;
