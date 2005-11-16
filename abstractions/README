@@ -1,28 +1,87 @@
 Collection of abstractions for Pd
 =================================
 
-This is a collection of abstractions for Pd. Pd is a 
-language that is very low-level. There are several 
-concepts that need a certain amount of work in order
-to be implemented. Instead of reimplementing these higher
-level concepts again and again, this collection of abstractions
-try to establish a layer of Pd abstractions that should grow
-into a reusable library that can be shared by Pd users. 
+This is a collection of abstractions for Pd. Pd is a language that is very
+low-level. There are several concepts that need a certain amount of work in
+order to be implemented. Instead of reimplementing these higher level concepts
+again and again, this collection of abstractions try to establish a layer of
+Pd abstractions that should grow into a reusable library that can be shared by
+Pd users.
+
+What kind of abstractions?
+==========================
+
+ One of the problems with organizing all this is the vague definition of
+ "abstraction" and "external".  "application" and "object" are much more
+ useful distinctions.  Therefore, there are two sections to the build system,
+ one for Pd patches which are objects, and another for Pd patches that are
+ "applications" (also examples, demos, etc.).
 
 How to add your abstractions ?
 ==============================
 
-First rule for adding an abstraction is that it is written
-in Pd (without using externals). 
+First rule for adding an abstraction is that it is written in Pd, without
+using externals whenever possible.  Otherwise, it should work with the
+Pd-extended builds.
 
-You can either send your abstarction with the request for
-adding it to the pd-dev list, or if you are a Pd developer
-already, you can add them by yourself. 
+You can either send your abstraction with the request for adding it to the
+pd-dev list, or if you are a Pd developer already, you can add them by
+yourself.
 
 If you have questions about how, feel free to ask.
 
-I hope that we can come up with a style guide for abstractions
-at some point, but we need to gather experience how this should
-look like before.
+I hope that we can come up with a style guide for abstractions at some point,
+but we need to gather experience how this should look like before.
 
-Guenter
+Explanations of Terms
+=====================
+
+$(APPLICATIONS_DST): 
+	 If your project is an application or patch that is meant to be run
+	 directly, then it should go into this directory in its own subdirectory.
+	 This directory is a browsable collection of applications.  If your
+	 application has a lot of files associated with it, put a main patch and
+	 have the extra files in a subdirectory.  rradical/usecases/showcase is a
+	 good example of this.  This is the only place were mixed or upper case is
+	 appropriate in directory names.
+
+$(OBJECTS_DST):
+    If your project consists of objects that are meant to be reused in other
+    patches rather than used as a application, then they should go into this
+    directory.  
+
+	 They should be in a directory with a distinct name.  This will be the name
+    of your library of objects, which can be added to the path, or called
+    directly (e.g. [mylibrary/myobject]).
+
+	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
+
+$(DOCS_DST):
+    All help patches should go into this directory in a subdirectory with the
+    same nameas the subdirectory for your objects.  For example, for
+    [mylibrary/myobject] above, the helpfile would be "mylibrary/myobject-help.pd".
+
+	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
+
+$(MANUALS_DST): 
+    If you have any other kinds of documentation, like a text or HTML manual,
+	 or a Pd-based tutorial, then it should go into this directory, again in a
+	 subdirectory with the same name as the library or application.  Using the
+	 previous example again, the "mylibrary" manual would be
+	 "mylibrary/mylibrary.html".
+
+	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
+
+"objects" target:
+    To add your objects to this build system, first make your own target and
+    add it to the "objects" target.  For example: for the RRADical objects,
+    there is a target called "objects_rradical:" which does everything needed
+    to install the RRADical objects.  This includes installing help patches
+    and any other documentation. 
+
+"applications" target:
+   This target is meant for any patch that is intended to be opened up and
+   used, played, ran, etc.  The RRADical showcase is a good example
+
+
+
