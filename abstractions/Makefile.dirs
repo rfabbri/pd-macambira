@@ -1,0 +1,35 @@
+#
+# $(INSTALL_PREFIX) and $(SRC_ROOT_DIR) are set in Makefile
+
+# base
+DOCS_BASE = $(INSTALL_PREFIX)/doc
+
+# sources
+ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
+DOCS_SRC = $(SRC_ROOT_DIR)/doc
+EXTERNALS_SRC = $(SRC_ROOT_DIR)/externals
+
+# destinations
+APPLICATIONS_DST = $(DOCS_BASE)/examples
+OBJECTS_DST = $(INSTALL_PREFIX)/extra
+DOCS_DST = $(DOCS_BASE)/5.reference
+MANUALS_DST = $(DOCS_BASE)/manuals
+
+#------------------------------------------------------------------------------#
+# DIRECTORY STRUCTURE TARGETS
+#------------------------------------------------------------------------------#
+# first make sure that the directory structure is setup
+$(INSTALL_PREFIX):
+	install -d $(INSTALL_PREFIX)
+
+$(APPLICATIONS_DST):  $(INSTALL_PREFIX)
+	install -d $(APPLICATIONS_DST)
+
+$(OBJECTS_DST): $(INSTALL_PREFIX)
+	install -d $(OBJECTS_DST)
+
+$(DOCS_DST): $(INSTALL_PREFIX)
+	install -d $(DOCS_DST)
+
+$(MANUALS_DST): $(INSTALL_PREFIX)
+	install -d $(MANUALS_DST)

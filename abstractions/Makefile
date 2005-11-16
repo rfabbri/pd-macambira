@@ -9,71 +9,81 @@ SRC_ROOT_DIR := $(shell pwd)/..
 INSTALL_PREFIX = build
 DOCS_BASE = $(INSTALL_PREFIX)/doc
 
-# sources
-ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
+# default target
+all: objects applications
 
-# destinations
-APPLICATIONS_DST = $(DOCS_BASE)/examples
-OBJECTS_DST = $(INSTALL_PREFIX)/extra
-DOCS_DST = $(DOCS_BASE)/5.reference
-MANUALS_DST = $(DOCS_BASE)/manuals
-
-#------------------------------------------------------------------------------#
-# DIRECTORY STRUCTURE TARGETS
-#------------------------------------------------------------------------------#
-# first make sure that the directory structure is setup
-$(INSTALL_PREFIX):
-	install -d $(INSTALL_PREFIX)
-
-$(APPLICATIONS_DST):  $(INSTALL_PREFIX)
-	install -d $(APPLICATIONS_DST)
-
-$(OBJECTS_DST): $(INSTALL_PREFIX)
-	install -d $(OBJECTS_DST)
-
-$(DOCS_DST): $(INSTALL_PREFIX)
-	install -d $(DOCS_DST)
-
-$(MANUALS_DST): $(INSTALL_PREFIX)
-	install -d $(MANUALS_DST)
-
+include Makefile.dirs
 
 #------------------------------------------------------------------------------#
 # OVERARCHING BUILD TARGETS
 #------------------------------------------------------------------------------#
 
-all: objects applications
-
 final_setup:
 	chmod -R ugo-w $(INSTALL_PREFIX)
 
 objects: $(OBJECTS_DST) $(DOCS_DST) $(MANUALS_DST)
-objects: objects_rradical objects_memento
+objects: objects_memento objects_nusmuk objects_rradical objects_keyboardkeys
+objects: objects_gyre objects_la-kitchen
 
 applications: $(APPLICATIONS_DST) $(MANUALS_DST)
-applications: applications_rradical
+applications: applications_rradical applications_keyboardkeys applications_gyre
 
 
 #------------------------------------------------------------------------------#
 # PROJECT TARGETS
 #------------------------------------------------------------------------------#
+#------------------------------
+# GYRE
+objects_gyre:
+	install -d $(OBJECTS_DST)/gyre
+	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.*.pd \
+		 $(OBJECTS_DST)/gyre
+	install -d $(MANUALS_DST)/gyre
+	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.html \
+		 $(MANUALS_DST)/gyre
+
+applications_gyre:
+	install -d $(APPLICATIONS_DST)/gyre
+	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.pd \
+		 $(APPLICATIONS_DST)/GYRE
+
 
 #------------------------------
-# RRADICAL
-objects_rradical:
-	install -d $(OBJECTS_DST)/memento
+# keyboardkeys
+objects_keyboardkeys:
+	install -d $(OBJECTS_DST)/keyboardkeys
+	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/keyboardkeys/*.pd \
+		 $(OBJECTS_DST)/keyboardkeys
+	install -d $(DOCS_DST)/keyboardkeys
+	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/doc/*-help.pd \
+		 $(DOCS_DST)/keyboardkeys
 
-applications_rradical:
-	install -d $(APPLICATIONS_DST)/RRADical
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* $(APPLICATIONS_DST)/RRADical
-	cp -rp $(ABSTRACTIONS_SRC)/rradical/usecases/showcase $(APPLICATIONS_DST)/RRADical/
+applications_keyboardkeys:
+	install -d $(APPLICATIONS_DST)/keyboardkeys
+	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/keyboard_main.pd \
+		 $(APPLICATIONS_DST)/keyboardkeys
+
 
 #------------------------------
-# MEMENTO
+# la-kitchen
+objects_la-kitchen:
+	install -d $(OBJECTS_DST)/la-kitchen
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
+		grep -v '\-help.pd')    $(OBJECTS_DST)/la-kitchen
+	install -d $(DOCS_DST)/la-kitchen
+	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
+		 $(DOCS_DST)/la-kitchen
+	install -d $(MANUALS_DST)/la-kitchen
+	install -p $(ABSTRACTIONS_SRC)/La-kitchen/readme.txt \
+		 $(MANUALS_DST)/la-kitchen
+
+
+#------------------------------
+# memento
 objects_memento:
 	install -d $(OBJECTS_DST)/memento
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/memento/*.pd | \
-		grep -v -e '-help.pd$$')  $(OBJECTS_DST)/memento
+		grep -v '\-help.pd')  $(OBJECTS_DST)/memento
 	install -d $(DOCS_DST)/memento
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd $(DOCS_DST)/memento
 	install -d $(MANUALS_DST)/memento
@@ -82,6 +92,40 @@ objects_memento:
 	install -d $(APPLICATIONS_DST)/memento_tutorial
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/examples/*.* \
 		$(APPLICATIONS_DST)/memento_tutorial
+
+#------------------------------
+# nusmuk
+objects_nusmuk:
+	install -d $(OBJECTS_DST)/nusmuk
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DST)/nusmuk
+	install -d $(DOCS_DST)/nusmuk
+	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd $(DOCS_DST)/nusmuk
+
+
+#------------------------------
+# RRADical
+objects_rradical:
+	install -d $(OBJECTS_DST)/rradical
+
+applications_rradical:
+	install -d $(APPLICATIONS_DST)/RRADical
+	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* $(APPLICATIONS_DST)/RRADical
+	cp -rp $(ABSTRACTIONS_SRC)/rradical/usecases/showcase $(APPLICATIONS_DST)/RRADical/
+
+#------------------------------------------------------------------------------#
+# DEVELOPER'S TARGETS
+#------------------------------------------------------------------------------#
+
+# make the symlinks necessary to simulate the installed environment
+devsymlinks: devsymlinks_keyboardkeys
+
+
+devsymlinks_keyboardkeys:
+	ln -s abs \
+		$(ABSTRACTIONS_SRC)/keyboardkeys/keyboardkeys
+	ln -s ../keyboardkeys \
+		$(ABSTRACTIONS_SRC)/keyboardkeys/doc/keyboardkeys
 
 #------------------------------------------------------------------------------#
 # CLEAN TARGETS
