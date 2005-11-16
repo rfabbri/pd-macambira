@@ -4,18 +4,24 @@
 # inclusion into the externals packages
 #
 
-SRC_ROOT_DIR := $(shell pwd)/../../..
+CWD := $(shell pwd)
+
+# these are setup to be overridden by the packages/Makefile
+SRC_ROOT_DIR := $(CWD)/../../..
 INSTALL_PREFIX = .
+BUILDLAYOUT_DIR = $(CWD)/..
 
 all: install
+	echo "Completed externals/doc build!"
 
-include ../Makefile.buildlayout
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+
 
 # this is here to retain compatibility to the way that this makefile copied
 # files before it was added to the unified build system
 HELP_DEST = .
 
-install:
+install: $(HELP_DEST)
 #----------------------------------------------------------------------------
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
