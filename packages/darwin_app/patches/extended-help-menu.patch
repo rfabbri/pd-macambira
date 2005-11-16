@@ -1,6 +1,9 @@
---- pd-0.38-3/src/u_main.tk	Sun Feb 20 20:03:36 2005
-+++ u_main.tk	Tue Nov 15 02:22:59 2005
-@@ -374,22 +374,40 @@
+Index: u_main.tk
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
+--- pd-0.38-4/src/u_main.tk	Sun Feb 20 20:03:36 2005
++++ u_main.tk	Wed Nov 16 00:33:02 2005
+@@ -374,22 +374,41 @@
  set help_directory $pd_guidir/doc
  set help_top_directory $pd_guidir/doc
  
@@ -8,11 +11,12 @@
 +# This procedure generates a temporary mirror of the documentation directory
 +# in /tmp so that it can be opened from the Help->Pure Documentation... menu
 +# under Mac OS X.  It is meant to be run at startup.
-+# Damn you Apple and your "we know best" "features".  <hans@at.or.at.>
++# Damn you Apple and your "hide stuff from the user" "features".  
++# <hans@at.or.at.>
 +proc generate_menu_doc_link {} {
 +    global help_directory
 +	 
-+	 regsub -all "/" $help_directory "_" help_directory_alias
++	 regsub -all "/" $help_directory "." help_directory_alias
 +	 set help_directory_alias /tmp/$help_directory_alias
 +	 set help_directory_tmpdir $help_directory_alias/doc
 +	 # if something other than a directory exists, delete it
@@ -20,7 +24,7 @@
 +		  file delete -force -- $help_directory_alias
 +	 }
 +	 if { ! [ file isdirectory $help_directory_tmpdir ] } {
-+		  file mkdir -p $help_directory_tmpdir
++		  file mkdir $help_directory_tmpdir
 +	 }
 +	 foreach file [ lsort [ glob -dir $help_directory * ] ] {
 +		  regsub -all ".*/" $file "" link_file_name
@@ -49,20 +53,27 @@
      if {$filename != ""} {
      	if {[string first .txt $filename] >= 0} {
      	    menu_opentext $filename
-@@ -411,38 +429,56 @@
+@@ -411,35 +430,57 @@
   
      set dirname $pd_guidir/$subdir
  
--    if {[regexp ".*\.(txt|c)$" $basename]} {
-+    if {[regexp ".*\.(txt|c|css)$" $basename]} {
++	 set file_type [file type $dirname/$basename]
++	 if { $file_type == "directory" } {
++		  pd [concat pd open [pdtk_enquote $basename] \
++					 [pdtk_enquote $dirname] \;]
++	 } else {
+     if {[regexp ".*\.(txt|c)$" $basename]} {
      	menu_opentext $dirname/$basename
++		  } elseif {[regexp ".*\.(pd|max)$" $basename]} {
++				pd [concat pd open [pdtk_enquote $basename] \
++						  [pdtk_enquote $dirname] \;]
      } elseif {[regexp ".*\.html?$" $basename]} {
  		  menu_openhtml $dirname/$basename
-+    } elseif {[regexp ".*\.(wav|aif|aiff|jpg|jpeg|gif|png|mov|avi)$" $basename]} {
-+		  menu_openhtml $dirname/$basename
      } else {
-     	pd [concat pd open [pdtk_enquote $basename] \
- 		[pdtk_enquote $dirname] \;]
+-    	pd [concat pd open [pdtk_enquote $basename] \
+-		[pdtk_enquote $dirname] \;]
++				menu_openhtml $dirname/$basename
++		  }
      }
  }
  
@@ -80,24 +91,24 @@
 +	 global pd_tearoff
 +	 global help_top_directory
 +	 
-+	 set menu_dir [file join $help_top_directory $base_dir $sub_dir]
-+
-+	 foreach file [ lsort [ glob -dir $menu_dir * ] ] {
++	 set menu_dir $help_top_directory/$base_dir/$sub_dir
++	 
++	 foreach file [ lsort [ glob -nocomplain -dir $menu_dir * ] ] {
 +		  set file_type [file type $file]
 +		  regsub {.*/(.*$)} $file {\1} file_name
-+# If links are going to be used then there needs to be a check to see if each
-+# link might cause this function to recurse forever  <hans@at.or.at>
-+#		  if { $file_type == "link"} {
-+#				puts stderr "LINK: $file"
-+#		  }
++		  # If links are going to be used then there needs to be a check to see if each
++		  # link might cause this function to recurse forever  <hans@at.or.at>
++		  #		  if { $file_type == "link"} {
++		  #				puts stderr "LINK: $file"
++		  #		  }
 +		  if { $file_type == "file" } {
 +				# only put certain file types on the menu
-+				if {[regexp ".*\.(htm|html|c|pd|txt|wav|aif|aiff)$" $file]} {
++				if {[regexp ".*\.(htm|html|c|pd|txt|pdf|wav|aif|aiff)$" $file]} {
 +					 $helpmenu add command -label $file_name \
 +						  -command "menu_doc_open doc/$base_dir/$sub_dir $file_name"
 +				}
 +		  } elseif { $file_type == "directory" } {
-+				regsub -all "\\\." $file_name "" submenu
++				regsub -all "\\\." [string tolower $file_name] "" submenu
  	 menu $helpmenu.$submenu -tearoff $pd_tearoff
 -    regsub -all "\\\." $subdir " " submenuname
 +				regsub -all "\\\." $file_name " " submenuname
@@ -112,16 +123,11 @@
 -		  $helpmenu.$submenu add command -label $filename \
 -				-command "menu_doc_open doc/$subdir $filename"
 +				menu_doc_submenu $helpmenu.$submenu $base_dir/$sub_dir [file tail $file]
++		  }
  	 }
  }
  
-+
-+}
-+
- ############# routine to add media, help, and apple menu items ###############
- 
- proc menu_addstd {mbar} {
-@@ -494,7 +530,18 @@
+@@ -494,7 +535,18 @@
  
  
  #          the "Help" menu
@@ -141,7 +147,7 @@
  # a menu on the main menubar named "$whatever.help" while be treated
  # as a special menu with specific behaviors on different platforms.
  # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-@@ -502,22 +549,9 @@
+@@ -502,22 +554,9 @@
  	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
      $mbar.help add command -label {Pure Documentation...} \
  	-command {menu_documentation} 
