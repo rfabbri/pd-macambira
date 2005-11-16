@@ -1,0 +1,58 @@
+Index: s_loader.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
+retrieving revision 1.6
+diff -u -w -r1.6 s_loader.c
+--- s_loader.c	30 May 2005 03:04:19 -0000	1.6
++++ s_loader.c	15 Nov 2005 22:28:41 -0000
+@@ -49,7 +49,7 @@
+ int sys_load_lib(char *dirname, char *classname)
+ {
+     char symname[MAXPDSTRING], filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
+-        classname2[MAXPDSTRING], *nameptr, *lastdot;
++		 classname2[MAXPDSTRING], *nameptr, *lastdot, tmptildestr[MAXPDSTRING];
+     void *dlobj;
+     t_xxx makeout = NULL;
+     int fd;
+@@ -96,9 +96,40 @@
+ #else
+     strcpy(symname, nameptr);
+ #endif
++	 /*
++	  * this is a quick hack to get the matrix externals working as single
++	  * files.  This should be done with hex translation of special characters
++	  * <hans@at.or.at> 
++	  */
+         /* if the last character is a tilde, replace with "_tilde" */
+     if (symname[strlen(symname) - 1] == '~')
+-        strcpy(symname + (strlen(symname) - 1), "_tilde");
++	 {
++		 strcpy(symname + (strlen(symname) - 1), "");
++		 strcpy(tmptildestr, "_tilde");
++	 }
++	 else 
++	 {
++		 strcpy(tmptildestr, "");
++	 }
++    switch (symname[strlen(symname) - 1]) 
++	 {
++		 case '.':
++			 strcpy(symname + (strlen(symname) - 1), "_dot");
++			 break;
++		 case '+':
++			 strcpy(symname + (strlen(symname) - 1), "_plus");
++			 break;
++		 case '-':
++			 strcpy(symname + (strlen(symname) - 1), "_hyphen");
++			 break;
++		 case '*':
++			 strcpy(symname + (strlen(symname) - 1), "_asterisk");
++			 break;
++		 case '^':
++			 strcpy(symname + (strlen(symname) - 1), "_caret");
++			 break;
++	 }
++	 strcat(symname, tmptildestr);
+         /* and append _setup to form the C setup function name */
+     strcat(symname, "_setup");
+ #ifdef DL_OPEN
