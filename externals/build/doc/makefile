@@ -26,7 +26,7 @@ all:
 			../../cxc/reference/*.pd \
 			../../dfx/*/*.pd \
 			../../ext13/doc/*.pd \
-			../../ggee/*/*.pd \
+			../../ggee/*/*-help.pd \
 			../../gem2pdp/*.pd \
 			../../ff/*.pd \
 			../../freeverb~/*.pd \
