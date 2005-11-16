@@ -10,7 +10,7 @@
 #X obj 248 37 r ldbng;
 #X obj 250 103 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 248 79 ../abs/keybang;
+#X obj 248 79 keybang;
 #X msg 248 58 e;
 #X obj 466 36 r ldbng;
 #X obj 355 37 r ldbng;
@@ -40,15 +40,15 @@
 #X msg 785 55 i;
 #X msg 896 54 o;
 #X msg 1003 53 p;
-#X obj 30 78 ../abs/keybang;
-#X obj 141 79 ../abs/keybang;
-#X obj 355 79 ../abs/keybang;
-#X obj 466 78 ../abs/keybang;
-#X obj 573 77 ../abs/keybang;
-#X obj 678 76 ../abs/keybang;
-#X obj 785 76 ../abs/keybang;
-#X obj 896 75 ../abs/keybang;
-#X obj 1003 74 ../abs/keybang;
+#X obj 30 78 keybang;
+#X obj 141 79 keybang;
+#X obj 355 79 keybang;
+#X obj 466 78 keybang;
+#X obj 573 77 keybang;
+#X obj 678 76 keybang;
+#X obj 785 76 keybang;
+#X obj 896 75 keybang;
+#X obj 1003 74 keybang;
 #X obj 139 138 r ldbng;
 #X obj 28 137 r ldbng;
 #X obj 141 204 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -58,7 +58,7 @@
 #X obj 246 138 r ldbng;
 #X obj 248 204 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 246 180 ../abs/keybang;
+#X obj 246 180 keybang;
 #X obj 464 137 r ldbng;
 #X obj 353 138 r ldbng;
 #X obj 466 203 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -77,14 +77,14 @@
 -1;
 #X obj 784 202 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 28 179 ../abs/keybang;
-#X obj 139 180 ../abs/keybang;
-#X obj 353 180 ../abs/keybang;
-#X obj 464 179 ../abs/keybang;
-#X obj 571 178 ../abs/keybang;
-#X obj 676 177 ../abs/keybang;
-#X obj 783 177 ../abs/keybang;
-#X obj 894 176 ../abs/keybang;
+#X obj 28 179 keybang;
+#X obj 139 180 keybang;
+#X obj 353 180 keybang;
+#X obj 464 179 keybang;
+#X obj 571 178 keybang;
+#X obj 676 177 keybang;
+#X obj 783 177 keybang;
+#X obj 894 176 keybang;
 #X msg 28 158 a;
 #X msg 139 159 s;
 #X msg 246 159 d;
@@ -103,7 +103,7 @@
 #X obj 247 238 r ldbng;
 #X obj 249 304 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 247 280 ../abs/keybang;
+#X obj 247 280 keybang;
 #X obj 465 237 r ldbng;
 #X obj 354 238 r ldbng;
 #X obj 467 303 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -116,12 +116,12 @@
 #X obj 677 235 r ldbng;
 #X obj 679 301 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 29 279 ../abs/keybang;
-#X obj 140 280 ../abs/keybang;
-#X obj 354 280 ../abs/keybang;
-#X obj 465 279 ../abs/keybang;
-#X obj 572 278 ../abs/keybang;
-#X obj 677 277 ../abs/keybang;
+#X obj 29 279 keybang;
+#X obj 140 280 keybang;
+#X obj 354 280 keybang;
+#X obj 465 279 keybang;
+#X obj 572 278 keybang;
+#X obj 677 277 keybang;
 #X msg 29 258 z;
 #X msg 140 259 x;
 #X msg 247 259 c;
