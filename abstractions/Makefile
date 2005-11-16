@@ -20,7 +20,7 @@ include Makefile.dirs
 final_setup:
 	chmod -R ugo-w $(INSTALL_PREFIX)
 
-objects: $(OBJECTS_DEST) $(DOCS_DEST) $(MANUALS_DEST)
+objects: $(OBJECTS_DEST) $(HELP_DEST) $(MANUALS_DEST)
 objects: objects_memento objects_nusmuk objects_rradical objects_keyboardkeys
 objects: objects_gyre objects_la-kitchen objects_nqpoly
 
@@ -53,9 +53,9 @@ objects_keyboardkeys:
 	install -d $(OBJECTS_DEST)/keyboardkeys
 	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/keyboardkeys/*.pd \
 		 $(OBJECTS_DEST)/keyboardkeys
-	install -d $(DOCS_DEST)/keyboardkeys
+	install -d $(HELP_DEST)/keyboardkeys
 	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/doc/*-help.pd \
-		 $(DOCS_DEST)/keyboardkeys
+		 $(HELP_DEST)/keyboardkeys
 
 applications_keyboardkeys:
 	install -d $(APPLICATIONS_DEST)/keyboardkeys
@@ -69,9 +69,9 @@ objects_la-kitchen:
 	install -d $(OBJECTS_DEST)/la-kitchen
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
 		grep -v '\-help.pd')    $(OBJECTS_DEST)/la-kitchen
-	install -d $(DOCS_DEST)/la-kitchen
+	install -d $(HELP_DEST)/la-kitchen
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
-		 $(DOCS_DEST)/la-kitchen
+		 $(HELP_DEST)/la-kitchen
 	install -d $(MANUALS_DEST)/la-kitchen
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/readme.txt \
 		 $(MANUALS_DEST)/la-kitchen
@@ -83,8 +83,8 @@ objects_memento:
 	install -d $(OBJECTS_DEST)/memento
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/memento/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/memento
-	install -d $(DOCS_DEST)/memento
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd $(DOCS_DEST)/memento
+	install -d $(HELP_DEST)/memento
+	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd $(HELP_DEST)/memento
 	install -d $(MANUALS_DEST)/memento
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/tutorial/*.* \
 		$(MANUALS_DEST)/memento
@@ -102,10 +102,10 @@ objects_nqpoly:
 	install -d $(OBJECTS_DEST)/nqpoly4
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/nqpoly4
-	install -d $(DOCS_DEST)/nqpoly~
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd $(DOCS_DEST)/nqpoly~
-	install -d $(DOCS_DEST)/nqpoly4
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(DOCS_DEST)/nqpoly4
+	install -d $(HELP_DEST)/nqpoly~
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd $(HELP_DEST)/nqpoly~
+	install -d $(HELP_DEST)/nqpoly4
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(HELP_DEST)/nqpoly4
 	install -d $(MANUALS_DEST)/nqpoly
 	install -p $(ABSTRACTIONS_SRC)/nqpoly/*.html	$(MANUALS_DEST)/nqpoly
 	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/readme.txt	\
@@ -124,8 +124,8 @@ objects_nusmuk:
 	install -d $(OBJECTS_DEST)/nusmuk
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.* | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/nusmuk
-	install -d $(DOCS_DEST)/nusmuk
-	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd $(DOCS_DEST)/nusmuk
+	install -d $(HELP_DEST)/nusmuk
+	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd $(HELP_DEST)/nusmuk
 
 
 #------------------------------
@@ -162,7 +162,7 @@ devsymlinks_keyboardkeys:
 # CLEAN TARGETS
 #------------------------------------------------------------------------------#
 objects_clean:
-	-rm -rf $(OBJECTS_DEST) $(DOCS_DEST)
+	-rm -rf $(OBJECTS_DEST) $(HELP_DEST)
 
 applications_clean:
 	-rm -rf $(APPLICATIONS_DEST)
@@ -171,7 +171,7 @@ applications_clean:
 clean: applications_clean objects_clean
 	-rm -f *~
 	rm -rf $(MANUALS_DEST)
-	rmdir $(DOCS_BASE) $(INSTALL_PREFIX)
+	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
 
 
 #------------------------------------------------------------------------------#

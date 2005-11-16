@@ -5,19 +5,23 @@
 
 # $(INSTALL_PREFIX) and $(SRC_ROOT_DIR) are set in Makefile
 
-# base
-DOCS_BASE = $(INSTALL_PREFIX)/doc
-
 # sources
 ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
-DOCS_SRC = $(SRC_ROOT_DIR)/doc
+DOC_SRC = $(SRC_ROOT_DIR)/doc
 EXTERNALS_SRC = $(SRC_ROOT_DIR)/externals
+FLEXT_SRC = $(SRC_ROOT_DIR)/externals/grill/flext
+GEM_SRC = $(SRC_ROOT_DIR)/Gem
+GEMLIBS_SRC = $(SRC_ROOT_DIR)/GemLibs
+PD_SRC = $(SRC_ROOT_DIR)/pd
+SCRIPTS_SRC = $(SRC_ROOT_DIR)/scripts
+
 
 # destinations
-APPLICATIONS_DEST = $(DOCS_BASE)/examples
+APPLICATIONS_DEST = $(DOCS_DEST)/examples
+DOCS_DEST = $(INSTALL_PREFIX)/doc
 OBJECTS_DEST = $(INSTALL_PREFIX)/extra
-DOCS_DEST = $(DOCS_BASE)/5.reference
-MANUALS_DEST = $(DOCS_BASE)/manuals
+HELP_DEST = $(DOCS_DEST)/5.reference
+MANUALS_DEST = $(DOCS_DEST)/manuals
 
 #------------------------------------------------------------------------------#
 # DIRECTORY STRUCTURE TARGETS
@@ -29,11 +33,15 @@ $(INSTALL_PREFIX):
 $(APPLICATIONS_DEST):  $(INSTALL_PREFIX)
 	install -d $(APPLICATIONS_DEST)
 
-$(OBJECTS_DEST): $(INSTALL_PREFIX)
-	install -d $(OBJECTS_DEST)
-
 $(DOCS_DEST): $(INSTALL_PREFIX)
 	install -d $(DOCS_DEST)
 
+$(HELP_DEST): $(INSTALL_PREFIX)
+	install -d $(HELP_DEST)
+
 $(MANUALS_DEST): $(INSTALL_PREFIX)
 	install -d $(MANUALS_DEST)
+
+$(OBJECTS_DEST): $(INSTALL_PREFIX)
+	install -d $(OBJECTS_DEST)
+

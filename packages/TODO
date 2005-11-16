@@ -1,4 +1,19 @@
 
+- hex convertor for setup function names, and object file names
+
+- merge in tigital's Makefile++
+
+- move purepd to abstractions 
+
+- add GRIPD for Anders
+
+- add reg keys for Martin Dupras
+
+- mDNS objects!
+
+- import nqpoly4 and write helpfiles based on website: 
+  			http://pix.test.at/pd/nqpoly/nqpoly4.html
+
 - global versioning system
   		the package releases should have versions of there own which apply to
   		all packages, regardless of format or OS.  This will make for easy and

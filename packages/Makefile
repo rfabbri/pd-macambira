@@ -12,9 +12,10 @@ all: abstractions
 include Makefile.dirs
 
 DST_PATHS = APPLICATIONS_DEST=$(APPLICATIONS_DEST) \
-			   OBJECTS_DEST=$(OBJECTS_DEST) \
 				DOCS_DEST=$(DOCS_DEST) \
-				MANUALS_DEST=$(MANUALS_DEST)
+				HELP_DEST=$(HELP_DEST) \
+				MANUALS_DEST=$(MANUALS_DEST) \
+			   OBJECTS_DEST=$(OBJECTS_DEST) 
 
 #------------------------------------------------------------------------------#
 # BUILD TARGETS
@@ -30,5 +31,5 @@ abstractions_clean:
 
 clean: abstractions_clean
 	-rm -f *~
-	rm -rf $(MANUALS_DEST)
-	rmdir $(DOCS_BASE) $(INSTALL_PREFIX)
+	rm -rf $(MANUALS_DEST) $(HELP_DEST)
+	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
