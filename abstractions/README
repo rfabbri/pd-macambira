@@ -36,7 +36,7 @@ but we need to gather experience how this should look like before.
 Explanations of Terms
 =====================
 
-$(APPLICATIONS_DST): 
+$(APPLICATIONS_DEST): 
 	 If your project is an application or patch that is meant to be run
 	 directly, then it should go into this directory in its own subdirectory.
 	 This directory is a browsable collection of applications.  If your
@@ -45,7 +45,7 @@ $(APPLICATIONS_DST):
 	 good example of this.  This is the only place were mixed or upper case is
 	 appropriate in directory names.
 
-$(OBJECTS_DST):
+$(OBJECTS_DEST):
     If your project consists of objects that are meant to be reused in other
     patches rather than used as a application, then they should go into this
     directory.  
@@ -56,14 +56,14 @@ $(OBJECTS_DST):
 
 	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
 
-$(DOCS_DST):
+$(DOCS_DEST):
     All help patches should go into this directory in a subdirectory with the
     same nameas the subdirectory for your objects.  For example, for
     [mylibrary/myobject] above, the helpfile would be "mylibrary/myobject-help.pd".
 
 	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
 
-$(MANUALS_DST): 
+$(MANUALS_DEST): 
     If you have any other kinds of documentation, like a text or HTML manual,
 	 or a Pd-based tutorial, then it should go into this directory, again in a
 	 subdirectory with the same name as the library or application.  Using the
