@@ -1,0 +1,4 @@
+#N canvas 350 285 450 300 10;
+#X msg 34 38 foo bar;
+#X obj 49 78 nqpoly4 5 minimal param_1 param_2;
+#X connect 0 0 1 0;
