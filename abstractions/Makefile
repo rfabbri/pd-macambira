@@ -7,7 +7,6 @@
 # these are setup to be overridden by the packages/*/Makefiles
 SRC_ROOT_DIR := $(shell pwd)/..
 INSTALL_PREFIX = build
-DOCS_BASE = $(INSTALL_PREFIX)/doc
 
 # default target
 all: objects applications
@@ -23,7 +22,7 @@ final_setup:
 
 objects: $(OBJECTS_DST) $(DOCS_DST) $(MANUALS_DST)
 objects: objects_memento objects_nusmuk objects_rradical objects_keyboardkeys
-objects: objects_gyre objects_la-kitchen
+objects: objects_gyre objects_la-kitchen objects_nqpoly
 
 applications: $(APPLICATIONS_DST) $(MANUALS_DST)
 applications: applications_rradical applications_keyboardkeys applications_gyre
@@ -93,6 +92,32 @@ objects_memento:
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/examples/*.* \
 		$(APPLICATIONS_DST)/memento_tutorial
 
+
+#------------------------------
+# nqpoly
+objects_nqpoly:
+	install -d $(OBJECTS_DST)/nqpoly~
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
+		grep -v '\-help.pd')  $(OBJECTS_DST)/nqpoly~
+	install -d $(OBJECTS_DST)/nqpoly4
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
+		grep -v '\-help.pd')  $(OBJECTS_DST)/nqpoly4
+	install -d $(DOCS_DST)/nqpoly~
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd $(DOCS_DST)/nqpoly~
+	install -d $(DOCS_DST)/nqpoly4
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(DOCS_DST)/nqpoly4
+	install -d $(MANUALS_DST)/nqpoly
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/*.html	$(MANUALS_DST)/nqpoly
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/readme.txt	\
+		$(MANUALS_DST)/nqpoly/nqpoly~.txt
+	install -d $(APPLICATIONS_DST)/nqpoly~
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
+		grep -v '\-help.pd')  $(APPLICATIONS_DST)/nqpoly~
+	install -d $(APPLICATIONS_DST)/nqpoly4
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
+		grep -v '\-help.pd')  $(APPLICATIONS_DST)/nqpoly4
+
+
 #------------------------------
 # nusmuk
 objects_nusmuk:
@@ -101,6 +126,12 @@ objects_nusmuk:
 		grep -v '\-help.pd')  $(OBJECTS_DST)/nusmuk
 	install -d $(DOCS_DST)/nusmuk
 	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd $(DOCS_DST)/nusmuk
+
+
+#------------------------------
+# parazit
+	install -d $(OBJECTS_DST)
+	install -p $(ABSTRACTIONS_SRC)/parazit/parazit.pd $(OBJECTS_DST)
 
 
 #------------------------------
