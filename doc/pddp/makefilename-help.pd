@@ -1,12 +1,12 @@
-#N canvas 320 94 583 575 10;
+#N canvas 320 94 583 580 10;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 463 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 282 108 621 636 More_Info 0;
+#N canvas 282 108 629 644 More_Info 0;
 #X text 17 4 COMMON USES;
-#X text 15 557 INNOVATIVE USES;
+#X text 15 577 INNOVATIVE USES;
 #X text 47 19 I believe that this object was developed first to allow
 PD to generate sequential file names - perhaps to be used in conjunction
 with [soundfiler] or [openpanel]. For example \, an audio loop recorder
@@ -16,7 +16,7 @@ hard drive...like below:;
 #X symbolatom 53 166 0 0 0 0 - - -;
 #X obj 82 125 + 1;
 #X obj 53 145 makefilename file-%d.aif;
-#X text 20 410 LIMITATIONS;
+#X text 20 430 LIMITATIONS;
 #N canvas 175 22 595 611 spaces_and_multiple_variables 0;
 #X text 25 19 Instead of using spaces \, an underscore will often produce
 a tolerable compromise.;
@@ -101,7 +101,7 @@ which operates 24 hours per day \, every day.;
 #X connect 29 0 22 0;
 #X connect 35 0 17 0;
 #X connect 36 0 25 0;
-#X restore 47 585 pd spaces_and_multiple_variables;
+#X restore 47 605 pd spaces_and_multiple_variables;
 #X obj 53 90 bng 30 250 50 0 empty empty start 1 15 1 12 -90049 -1
 -1;
 #N canvas 475 61 515 617 help_with_interfaces 0;
@@ -175,41 +175,52 @@ in the area of performance to provide users with on-screen reporting
 \, record keeping \, and sometimes even a few 'pleasantries'. Consider
 the following examples - but always weight the pros and cons when incorporating
 these types of interfaces. Performance vs. Usability.;
-#X restore 298 585 pd help_with_interfaces;
-#X text 22 215 CONVERT ASCII;
-#X symbolatom 206 350 0 0 0 0 - - -;
-#X obj 138 268 hsl 150 18 0 127 0 1 empty empty ASCII_range 2 9 1 12
--262131 -1 -1 14900 0;
-#X floatatom 175 352 3 0 0 0 - - -;
-#X obj 200 309 int;
-#X text 45 487 - only one printf pattern can be used at once;
-#X text 45 510 - currently \, floats are not supported via the printf
-%f pattern. You can only display the integer part of the float using
-%d.;
-#X text 45 444 - This object does not provide advanced formatting and
+#X restore 298 605 pd help_with_interfaces;
+#X symbolatom 126 355 0 0 0 0 - - -;
+#X obj 53 273 hsl 150 18 0 127 0 1 empty empty ASCII_range 2 9 1 12
+-262131 -1 -1 12700 0;
+#X floatatom 95 357 3 0 0 0 - - -;
+#X obj 120 316 int;
+#X text 45 488 - only one printf pattern can be used at once;
+#X text 45 445 - This object does not provide advanced formatting and
 parsing abilities. For example \, you cannot use spaces or odd characters
 in the argument.;
-#X obj 206 330 makefilename %c;
-#X text 47 187 This file name could be used when saving the audio data
-to disk.;
-#X obj 135 290 select 123;
-#X text 40 232 The %c pattern allows you to convert ASCII numbers to
-the respective character.;
-#X text 45 425 - non-printable ASCII characters show up as a little
+#X text 45 550 - non-printable ASCII characters show up as a little
 box.;
-#X text 44 366 Watch out! ASCII character 123 locks up Pd (the open
-curly brace). Also \, reserved characters that Pd uses show up with
-a backslash in front of them ( \, \; and backslash).;
+#X text 22 209 CONVERSIONS;
+#X text 40 225 The %c pattern allows you to convert ASCII numbers to
+the respective character. The %X converts the decimal number to hexadecimal.
+;
+#X symbolatom 329 352 10 0 0 0 - - -;
+#X obj 332 270 hsl 150 18 0 255 0 1 empty empty 0_to_FF 2 9 1 12 -262131
+-1 -1 11700 0;
+#X obj 329 330 makefilename hex=%X;
+#X floatatom 294 352 3 0 0 0 - - -;
+#X obj 328 302 int;
+#X obj 126 335 makefilename ASCII=%c;
+#X obj 50 295 sel 123 125;
+#X text 44 378 Watch out! ASCII characters 123 and 125 (curly braces)
+lock up Pd. Also \, reserved characters that Pd uses show up with a
+backslash in front of them ( \, \; and backslash).;
+#X text 45 507 - currently \, floats are not supported via the printf
+%f pattern. You can only display the integer part of the float using
+%d or %X.;
+#X text 47 187 This file name could be used when saving the audio to
+disk.;
 #X connect 3 0 5 0;
 #X connect 3 0 6 0;
 #X connect 5 0 3 1;
 #X connect 6 0 4 0;
 #X connect 9 0 3 0;
-#X connect 13 0 21 0;
-#X connect 15 0 14 0;
-#X connect 15 0 19 0;
-#X connect 19 0 12 0;
-#X connect 21 1 15 0;
+#X connect 12 0 26 0;
+#X connect 14 0 13 0;
+#X connect 14 0 25 0;
+#X connect 21 0 24 0;
+#X connect 22 0 20 0;
+#X connect 24 0 22 0;
+#X connect 24 0 23 0;
+#X connect 25 0 11 0;
+#X connect 26 2 14 0;
 #X restore 104 513 pd More_Info;
 #N canvas 85 22 397 246 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
@@ -237,30 +248,29 @@ a backslash in front of them ( \, \; and backslash).;
 #X msg 479 344 Pd;
 #X msg 526 355 cool;
 #X obj 353 404 makefilename %s_PD.aif;
-#X text 107 198 This object generates symbols according to a format
-string (the argument) \, for use as a series of filenames \, table
-names \, or whatnot. You can plug in a variable number or symbol by
-putting "%d" or "%s" in the string. If you put "%s" in the string \,
-be sure to send it a symbol and vice versa... there' no checking. Each
-[makefilename] object can have only one variable.;
-#X text 108 53 Integer - If a number is sent to the inlet \, the argument
-should be written with a "%d" which represents the location of the
-incoming variable number in the outgoing symbol. Floats will be converted
-to integers.;
-#X text 107 106 Symbol - If a symbol is sent to the inlet \, the argument
+#X text 109 115 Symbol - If a symbol is sent to the inlet \, the argument
 should be written with a "%s" which represent the location of the incoming
 variable symbol in the outgoing symbol. Lists will be truncated.;
 #X symbolatom 353 428 0 0 0 0 - - -;
 #X symbolatom 114 404 0 0 0 0 - - -;
-#X text 115 159 comment;
 #X obj 115 373 makefilename soundfile%d.aif;
 #X text 392 551 updated for Pd 0.38-4;
 #X text 140 538 - Dave Sabine \, Hans-Christoph Steiner;
-#X connect 13 0 27 0;
+#X text 107 198 This object generates symbols according to a format
+string (the argument) \, for use as a series of filenames \, table
+names \, or whatnot. You can plug in a variable number or symbol by
+putting "%s" \, "%c" \, "%d" \, or "%X" in the string. If you use"%s"
+\, be sure to send it a symbol \, the rest take numbers. there' no
+checking. Each [makefilename] object can have only one variable.;
+#X text 108 53 Integer - If a number is sent to the inlet \, the argument
+should be written with a "%c" \, "%d" \, or "%X" which represents the
+location of the incoming variable number in the outgoing symbol. Floats
+will be converted to integers.;
+#X connect 13 0 24 0;
 #X connect 15 0 20 0;
 #X connect 16 0 15 0;
 #X connect 17 0 15 0;
 #X connect 18 0 15 0;
 #X connect 19 0 15 0;
-#X connect 20 0 24 0;
-#X connect 27 0 25 0;
+#X connect 20 0 22 0;
+#X connect 24 0 23 0;
