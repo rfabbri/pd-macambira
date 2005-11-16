@@ -1,8 +1,10 @@
+#==============================================================================#
 #
 # Centralized build system for "abstractions".  
 #
 # see README for instructions  <hans@at.or.at>
 #
+#==============================================================================#
 
 # these are setup to be overridden by the packages/*/Makefiles
 SRC_ROOT_DIR := $(shell pwd)/..
@@ -13,9 +15,11 @@ all: objects applications
 
 include Makefile.dirs
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # OVERARCHING BUILD TARGETS
-#------------------------------------------------------------------------------#
+#
+#==============================================================================#
 
 final_setup:
 	chmod -R ugo-w $(INSTALL_PREFIX)
@@ -28,125 +32,152 @@ applications: $(APPLICATIONS_DEST) $(MANUALS_DEST)
 applications: applications_rradical applications_keyboardkeys applications_gyre
 
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # PROJECT TARGETS
-#------------------------------------------------------------------------------#
-#------------------------------
+#
+#==============================================================================#
+
+#-------------------------------------------------------------------------------
 # GYRE
+GYRE_NAME = gyre
 objects_gyre:
-	install -d $(OBJECTS_DEST)/gyre
+	install -d $(OBJECTS_DEST)/$(GYRE_NAME)
 	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.*.pd \
-		 $(OBJECTS_DEST)/gyre
-	install -d $(MANUALS_DEST)/gyre
+		 $(OBJECTS_DEST)/$(GYRE_NAME)
+	install -d $(MANUALS_DEST)/$(GYRE_NAME)
 	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.html \
-		 $(MANUALS_DEST)/gyre
+		 $(MANUALS_DEST)/$(GYRE_NAME)
 
 applications_gyre:
-	install -d $(APPLICATIONS_DEST)/gyre
+	install -d $(APPLICATIONS_DEST)/$(GYRE_NAME)
 	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.pd \
-		 $(APPLICATIONS_DEST)/GYRE
+		 $(APPLICATIONS_DEST)/$(GYRE_NAME)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # keyboardkeys
+KEYBOARDKEYS_NAME = keyboardkeys
 objects_keyboardkeys:
-	install -d $(OBJECTS_DEST)/keyboardkeys
-	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/keyboardkeys/*.pd \
-		 $(OBJECTS_DEST)/keyboardkeys
-	install -d $(HELP_DEST)/keyboardkeys
-	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/doc/*-help.pd \
-		 $(HELP_DEST)/keyboardkeys
+	install -d $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
+	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
+		 $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
+	install -d $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
+	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
+		 $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
 
 applications_keyboardkeys:
-	install -d $(APPLICATIONS_DEST)/keyboardkeys
-	install -p $(ABSTRACTIONS_SRC)/keyboardkeys/keyboard_main.pd \
-		 $(APPLICATIONS_DEST)/keyboardkeys
+	install -d $(APPLICATIONS_DEST)/$(KEYBOARDKEYS_NAME)
+	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
+		 $(APPLICATIONS_DEST)/$(KEYBOARDKEYS_NAME)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # la-kitchen
+LA-KITCHEN_NAME = la-kitchen
 objects_la-kitchen:
-	install -d $(OBJECTS_DEST)/la-kitchen
+	install -d $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
-		grep -v '\-help.pd')    $(OBJECTS_DEST)/la-kitchen
-	install -d $(HELP_DEST)/la-kitchen
+		grep -v '\-help.pd')    $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
+	install -d $(HELP_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
-		 $(HELP_DEST)/la-kitchen
-	install -d $(MANUALS_DEST)/la-kitchen
+		 $(HELP_DEST)/$(LA-KITCHEN_NAME)
+	install -d $(MANUALS_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/readme.txt \
-		 $(MANUALS_DEST)/la-kitchen
+		 $(MANUALS_DEST)/$(LA-KITCHEN_NAME)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # memento
+MEMENTO_NAME = memento
 objects_memento:
-	install -d $(OBJECTS_DEST)/memento
+	install -d $(OBJECTS_DEST)/$(MEMENTO_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/memento/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/memento
-	install -d $(HELP_DEST)/memento
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd $(HELP_DEST)/memento
-	install -d $(MANUALS_DEST)/memento
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(MEMENTO_NAME)
+	install -d $(HELP_DEST)/$(MEMENTO_NAME)
+	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd \
+		$(HELP_DEST)/$(MEMENTO_NAME)
+	install -d $(MANUALS_DEST)/$(MEMENTO_NAME)
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/tutorial/*.* \
-		$(MANUALS_DEST)/memento
-	install -d $(APPLICATIONS_DEST)/memento_tutorial
+		$(MANUALS_DEST)/$(MEMENTO_NAME)
+	install -d $(APPLICATIONS_DEST)/$(MEMENTO_NAME)
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/examples/*.* \
-		$(APPLICATIONS_DEST)/memento_tutorial
+		$(APPLICATIONS_DEST)/$(MEMENTO_NAME)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # nqpoly
-objects_nqpoly:
-	install -d $(OBJECTS_DEST)/nqpoly~
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/nqpoly~
-	install -d $(OBJECTS_DEST)/nqpoly4
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/nqpoly4
-	install -d $(HELP_DEST)/nqpoly~
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd $(HELP_DEST)/nqpoly~
-	install -d $(HELP_DEST)/nqpoly4
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(HELP_DEST)/nqpoly4
+objects_nqpoly: objects_nqpoly~ objects_nqpoly4
+# make a common target for the manuals so they are in one place
 	install -d $(MANUALS_DEST)/nqpoly
 	install -p $(ABSTRACTIONS_SRC)/nqpoly/*.html	$(MANUALS_DEST)/nqpoly
 	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/readme.txt	\
 		$(MANUALS_DEST)/nqpoly/nqpoly~.txt
-	install -d $(APPLICATIONS_DEST)/nqpoly~
+
+NQPOLY_NAME = nqpoly~
+objects_nqpoly~:
+	install -d $(OBJECTS_DEST)/$(NQPOLY_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/nqpoly~
-	install -d $(APPLICATIONS_DEST)/nqpoly4
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NQPOLY_NAME)
+	install -d $(HELP_DEST)/$(NQPOLY_NAME) 
+# all of the patches should be installed into help since [nqpoly~] needs to be
+# in the same directory as the patches its manipulating
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd \
+		$(HELP_DEST)/$(NQPOLY_NAME)
+	install -d $(APPLICATIONS_DEST)/$(NQPOLY_NAME)
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
+		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/$(NQPOLY_NAME)
+
+
+NQPOLY4_NAME = nqpoly4
+objects_nqpoly4:
+	install -d $(OBJECTS_DEST)/$(NQPOLY4_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/nqpoly4
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NQPOLY4_NAME)
+	install -d $(HELP_DEST)/$(NQPOLY4_NAME)
+# all of the patches should be installed into help since [nqpoly4] needs to be
+# in the same directory as the patches its manipulating
+	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(HELP_DEST)/$(NQPOLY4_NAME)
+	install -d $(APPLICATIONS_DEST)/$(NQPOLY4_NAME)
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
+		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/$(NQPOLY4_NAME)
 
-
-#------------------------------
+#-------------------------------------------------------------------------------
 # nusmuk
+NUSMUK_NAME = nusmuk
 objects_nusmuk:
-	install -d $(OBJECTS_DEST)/nusmuk
+	install -d $(OBJECTS_DEST)/$(NUSMUK_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/nusmuk
-	install -d $(HELP_DEST)/nusmuk
-	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd $(HELP_DEST)/nusmuk
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NUSMUK_NAME)
+	install -d $(HELP_DEST)/$(NUSMUK_NAME)
+	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd \
+		$(HELP_DEST)/$(NUSMUK_NAME)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # parazit
 	install -d $(OBJECTS_DEST)
 	install -p $(ABSTRACTIONS_SRC)/parazit/parazit.pd $(OBJECTS_DEST)
 
 
-#------------------------------
+#-------------------------------------------------------------------------------
 # RRADical
+RRADICAL_NAME = rradical
 objects_rradical:
-	install -d $(OBJECTS_DEST)/rradical
+	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)
 
 applications_rradical:
-	install -d $(APPLICATIONS_DEST)/RRADical
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* $(APPLICATIONS_DEST)/RRADical
-	cp -rp $(ABSTRACTIONS_SRC)/rradical/usecases/showcase $(APPLICATIONS_DEST)/RRADical/
+	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)
+	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* \
+		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)
+	cp -rp $(ABSTRACTIONS_SRC)/rradical/usecases/showcase \
+		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # DEVELOPER'S TARGETS
-#------------------------------------------------------------------------------#
+#
+#==============================================================================#
 
 # make the symlinks necessary to simulate the installed environment
 devsymlinks: devsymlinks_keyboardkeys
@@ -158,9 +189,12 @@ devsymlinks_keyboardkeys:
 	ln -s ../keyboardkeys \
 		$(ABSTRACTIONS_SRC)/keyboardkeys/doc/keyboardkeys
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # CLEAN TARGETS
-#------------------------------------------------------------------------------#
+#
+#==============================================================================#
+
 objects_clean:
 	-rm -rf $(OBJECTS_DEST) $(HELP_DEST)
 
@@ -174,9 +208,11 @@ clean: applications_clean objects_clean
 	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
 
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # LEGACY TARGETS
-#------------------------------------------------------------------------------#
+#
+#==============================================================================#
 # this is a legacy clean target to get rid of cruft
 darwin_pkg_clean:
 	-sudo rm -Rf installroot/ $(PKG_PREFIX)*.pkg/
