@@ -9,7 +9,7 @@ INSTALL_PREFIX = $(SRC_ROOT_DIR)/packages/build
 # default target
 all: abstractions
 
-include Makefile.dirs
+include Makefile.buildlayout
 
 DST_PATHS = APPLICATIONS_DEST=$(APPLICATIONS_DEST) \
 				DOCS_DEST=$(DOCS_DEST) \
@@ -17,15 +17,42 @@ DST_PATHS = APPLICATIONS_DEST=$(APPLICATIONS_DEST) \
 				MANUALS_DEST=$(MANUALS_DEST) \
 			   OBJECTS_DEST=$(OBJECTS_DEST) 
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
+#
 # BUILD TARGETS
-#------------------------------------------------------------------------------#
-abstractions:
-	make -f $(ABSTRACTIONS_SRC)/Makefile $(DST_PATHS)
+#
+#==============================================================================#
 
-#------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------
+# abstractions
+abstractions:
+	make -f $(ABSTRACTIONS_SRC)/Makefile $(DST_PATHS) install
+
+#------------------------------------------------------------------------------
+# doc
+doc:
+
+
+#------------------------------------------------------------------------------
+# externals
+externals:
+# doc
+	make -f $(EXTERNALS_SRC)/build/doc/makefile $(DST_PATHS) install
+
+
+#------------------------------------------------------------------------------
+# Gem
+gem:
+
+
+#------------------------------------------------------------------------------
+# pd
+pd:
+
+
+#==============================================================================#
 # CLEAN TARGETS
-#------------------------------------------------------------------------------#
+#==============================================================================#
 abstractions_clean:
 	make -f $(ABSTRACTIONS_SRC)/Makefile $(DST_PATHS) clean
 
