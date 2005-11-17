@@ -6,14 +6,17 @@
 #
 #==============================================================================#
 
-# these are setup to be overridden by the packages/*/Makefiles
-SRC_ROOT_DIR := $(shell pwd)/..
+CWD := $(shell pwd)
+
+# these are setup to be overridden by the packages/Makefile
+SRC_ROOT_DIR = $(CWD)/..
 INSTALL_PREFIX = build
+BUILDLAYOUT_DIR = $(CWD)
 
 # default target
-all: objects applications
+install: objects applications
 
-include Makefile.dirs
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 #==============================================================================#
 #
