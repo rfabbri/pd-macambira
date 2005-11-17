@@ -245,7 +245,7 @@ static void playlist_update_dir(t_playlist *x, t_glist *glist)
     }
 }
 
-void playlist_output_current(t_playlist* x)
+static void playlist_output_current(t_playlist* x)
 {
     // output the selected dir+file
     // check that it's not a directory 
@@ -266,11 +266,11 @@ void playlist_output_current(t_playlist* x)
     }
 }             
 
-void playlist_sort(t_playlist* x, t_floatarg fsort)
+static void playlist_sort(t_playlist* x, t_floatarg fsort)
 {
     if ( ( (t_int)fsort != 0 ) && ( (t_int)fsort != 1 ) )
     {
-       post( "plyalist : wrong argument to playlist message : %d", (t_int)fsort );
+       post( "playlist : wrong argument to playlist message : %d", (t_int)fsort );
        return;
     }
 
@@ -278,7 +278,7 @@ void playlist_sort(t_playlist* x, t_floatarg fsort)
     playlist_update_dir( x, x->x_glist );
 }
 
-void playlist_font(t_playlist* x, t_symbol *fname, t_symbol *fcase, t_floatarg fsize)
+static void playlist_font(t_playlist* x, t_symbol *fname, t_symbol *fcase, t_floatarg fsize)
 {
     if ( (t_int)fsize <= 4 )
     {
@@ -292,7 +292,7 @@ void playlist_font(t_playlist* x, t_symbol *fname, t_symbol *fcase, t_floatarg f
     playlist_update_dir( x, x->x_glist );
 }
 
-void playlist_draw_new(t_playlist *x, t_glist *glist)
+static void playlist_draw_new(t_playlist *x, t_glist *glist)
 {   
   t_canvas *canvas=glist_getcanvas(glist);    
 
@@ -312,7 +312,7 @@ void playlist_draw_new(t_playlist *x, t_glist *glist)
 
 }
 
-void playlist_draw_move(t_playlist *x, t_glist *glist)
+static void playlist_draw_move(t_playlist *x, t_glist *glist)
 {  
   t_canvas *canvas=glist_getcanvas(glist);
   t_int i;
@@ -349,7 +349,7 @@ void playlist_draw_move(t_playlist *x, t_glist *glist)
     canvas_fixlinesfor( canvas, (t_text*)x );
 }
 
-void playlist_draw_erase(t_playlist* x, t_glist* glist)
+static void playlist_draw_erase(t_playlist* x, t_glist* glist)
 {
  t_canvas *canvas=glist_getcanvas(glist);
  t_int i;
@@ -366,7 +366,7 @@ void playlist_draw_erase(t_playlist* x, t_glist* glist)
     }
 } 
 
-void playlist_draw_select(t_playlist* x, t_glist* glist)
+static void playlist_draw_select(t_playlist* x, t_glist* glist)
 {
   t_canvas *canvas=glist_getcanvas(glist);
  
@@ -385,7 +385,7 @@ void playlist_draw_select(t_playlist* x, t_glist* glist)
 /* ------------------------ playlist widgetbehaviour----------------------------- */
 
 
-void playlist_getrect(t_gobj *z, t_glist *owner,
+static void playlist_getrect(t_gobj *z, t_glist *owner,
 			    int *xp1, int *yp1, int *xp2, int *yp2)
 {
  t_playlist* x = (t_playlist*)z;
@@ -396,7 +396,7 @@ void playlist_getrect(t_gobj *z, t_glist *owner,
    *yp2 = text_ypix(&x->x_obj, owner)+x->x_height;
 }
 
-void playlist_save(t_gobj *z, t_binbuf *b)
+static void playlist_save(t_gobj *z, t_binbuf *b)
 {
  t_playlist *x = (t_playlist *)z;
 
@@ -409,7 +409,7 @@ void playlist_save(t_gobj *z, t_binbuf *b)
    binbuf_addv(b, ";");
 }
 
-void playlist_select(t_gobj *z, t_glist *glist, int selected)
+static void playlist_select(t_gobj *z, t_glist *glist, int selected)
 {
  t_playlist *x = (t_playlist *)z;
 
@@ -418,7 +418,7 @@ void playlist_select(t_gobj *z, t_glist *glist, int selected)
    playlist_draw_select( x, glist );
 }
 
-void playlist_vis(t_gobj *z, t_glist *glist, int vis)
+static void playlist_vis(t_gobj *z, t_glist *glist, int vis)
 {
  t_playlist *x = (t_playlist *)z;
  t_rtext *y;
@@ -434,14 +434,14 @@ void playlist_vis(t_gobj *z, t_glist *glist, int vis)
    }
 }
 
-void playlist_delete(t_gobj *z, t_glist *glist)
+static void playlist_delete(t_gobj *z, t_glist *glist)
 {
   t_playlist *x = (t_playlist *)z;
 
     canvas_deletelinesfor( glist_getcanvas(glist), (t_text *)z);
 }
 
-void playlist_displace(t_gobj *z, t_glist *glist, int dx, int dy)
+static void playlist_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
   t_playlist *x = (t_playlist *)z;
   t_int xold = text_xpix(&x->x_obj, glist);
@@ -457,7 +457,7 @@ void playlist_displace(t_gobj *z, t_glist *glist, int dx, int dy)
     }
 }
 
-void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
+static void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
 {
  t_int i;
  t_canvas *canvas=glist_getcanvas(x->x_glist);
@@ -553,7 +553,7 @@ void playlist_motion(t_playlist *x, t_floatarg dx, t_floatarg dy)
   } // scroll test
 } 
   
-void playlist_scroll(t_playlist *x, t_floatarg fdy)
+static void playlist_scroll(t_playlist *x, t_floatarg fdy)
 {
   t_int nbsteps, si;
 
@@ -566,7 +566,7 @@ void playlist_scroll(t_playlist *x, t_floatarg fdy)
     }
 }
 
-void playlist_graphics(t_playlist *x, t_floatarg fgraphics)
+static void playlist_graphics(t_playlist *x, t_floatarg fgraphics)
 {
    if ( ( (t_int)fgraphics == 0 ) || ( (t_int)fgraphics == 1 ) ) 
    {
@@ -576,7 +576,7 @@ void playlist_graphics(t_playlist *x, t_floatarg fgraphics)
    }
 }
 
-int playlist_click(t_gobj *z, struct _glist *glist,
+static int playlist_click(t_gobj *z, struct _glist *glist,
 		   int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
  t_playlist* x = (t_playlist *)z;
@@ -697,7 +697,7 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
 }
 
 
-t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
+static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
 {
  t_int i, argoffset=0;
  t_playlist *x;
@@ -865,7 +865,7 @@ t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
    return (x);
 }
 
-void playlist_free(t_playlist *x)
+static void playlist_free(t_playlist *x)
 {
     // post( "playlist : playlist_free" );
     if ( x->x_extension )
@@ -898,7 +898,7 @@ void playlist_free(t_playlist *x)
     }
 }
 
-void playlist_seek(t_playlist *x, t_floatarg fseeked)
+static void playlist_seek(t_playlist *x, t_floatarg fseeked)
 {
  t_int iout=0;
  t_canvas *canvas=glist_getcanvas(x->x_glist);
@@ -924,7 +924,7 @@ void playlist_seek(t_playlist *x, t_floatarg fseeked)
    playlist_output_current(x);
 }
 
-void playlist_location(t_playlist *x, t_symbol *flocation)
+static void playlist_location(t_playlist *x, t_symbol *flocation)
 {
    int iout=0;
    char olddir[ MAX_DIR_LENGTH ];           /* remember old location  */
