@@ -1,5 +1,5 @@
 #include "mtx_mul~.c"
-void matrix_mul_tilde_setup(void)
+void mtx_0x2a0x7e_setup(void)
 {
 	mtx_mul_tilde_setup();
 }
