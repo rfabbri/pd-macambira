@@ -1,34 +1,35 @@
 
-# Adapt the PDPATH if your pd is not installed in the standard place
+# Adapt the PD_PATH if your pd is not installed in the standard place
 
 # path for compiling against an installed version of Pd
-#PDPATH="$(PROGRAMFILES)/pd"
+#PD_PATH="$(PROGRAMFILES)/pd"
 # path for compiling from CVS with the standard developer layout
-PDPATH=../../../pd
+PD_PATH=../../../pd
 
-EXTERNALS = $(shell ls ../src)
+STRIP = strip --strip-unneeded -R .note -R .comment
 
-all: externals
+# only try to compile C files
+EXTERNALS = $(shell ls ../src | grep -e '.*\.c$$')
 
-externals: $(EXTERNALS:.c=.dll)
-
-.SUFFIXES: .dll
-
-# these are little macros for remapping things on Windows
+# these are little macros for remapping things on Windows which are
+# defined on other platforms
 WINDOWS_COMPAT_DEFINES = \
 	-D'drand48()=((double)rand()/RAND_MAX)' \
 	-D'srand48(n)=srand((n))' \
+	-D'O_NONBLOCK=1' \
+# These don't seem to be needed:
 #	-D'bzero(p,n)=memset(p,0,n)' \
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
-#	-D'O_NONBLOCK=1' \
 #	-D'O_NDELAY=O_NONBLOCK'
 
 DEFINES = -DPD -DNT $(WINDOWS_COMPAT_DEFINES)
 
 
-# Generic x86 (tune for 686, since that's most common these days)
-OPTIM_FLAGS = -O2 -march=i686 -mfpmath=sse -msse
+# Generic x86 (compile for 686, since that's most common these days)
+OPTIM_FLAGS = -O3 -march=i686 -mfpmath=sse -msse
+# Pentium
+#OPTIM_FLAGS = -O3 -march=pentium
 # Pentium MMX
 #OPTIM_FLAGS = -O3 -march=pentium-mmx -mmmx
 # Pentium Pro
@@ -43,28 +44,39 @@ OPTIM_FLAGS = -O2 -march=i686 -mfpmath=sse -msse
 # AMD Athlon XP K7
 #OPTIM_FLAGS = -O3 -march=athlon-xp -m3dnow -msse -mfpmath=sse
 
+
 CFLAGS = -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused -Wno-parentheses \
 	 -Wno-switch $(OPTIM_FLAGS)
 
-INCLUDE = -I. -I.. -I$(PDPATH)/src
+INCLUDE = -I. -I.. -I$(PD_PATH)/src -I/usr/local/include
+LDFLAGS = -shared -L/usr/local/lib -L$(PD_PATH)/bin -lpd
 
-DLLWRAP_FLAGS = --as=$(AS) --export-all --driver-name $(CC) -s 
+all: externals
+
+
+.SUFFIXES: .dll
+
+externals: $(EXTERNALS:.c=.dll)
 
 %.dll: ../src/%.c
 	$(CC) -mms-bitfields $(CFLAGS) $(DEFINES) $(INCLUDE) \
 		 -o "$*.o" -c "../src/$*.c"
-	gcc -shared -o "$*.dll" "$*.o" $(PDPATH)/bin/pd.dll \
+	gcc $(LDFLAGS) -o "$*.dll" "$*.o" \
 		`test -f $*.libs && cat $*.libs` \
 		`test -f ../src/$*.libs && cat ../src/$*.libs` 
+	$(STRIP) "$*.dll"
+#	strip --strip-all "$*.dll"
+	rm "$*.o"
 
 clean:
-	-rm *.a *.def *.dll *.o *.obj
+	-rm *.a *.def *.c *.o *.obj
+	rm *.dll
 
 install-doc:
-	@test -d $(PDPATH)/doc/5.reference || mkdir -p $(PDPATH)/doc/5.reference
+	@test -d $(PD_PATH)/doc/5.reference || mkdir -p $(PD_PATH)/doc/5.reference
 	cd ../doc && make all
-	cp -r ../doc/* $(PDPATH)/doc/5.reference
+	cp -r ../doc/* $(PD_PATH)/doc/5.reference
 
 install: install-doc
-	@test -d $(PDPATH)/extra || mkdir -p $(PDPATH)/extra
-	install *.dll $(PDPATH)/extra
+	@test -d $(PD_PATH)/extra || mkdir -p $(PD_PATH)/extra
+	install *.dll $(PD_PATH)/extra
