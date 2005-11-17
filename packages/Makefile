@@ -12,12 +12,10 @@ SRC_ROOT_DIR = $(CWD)/..
 INSTALL_PREFIX = $(SRC_ROOT_DIR)/packages/build
 BUILDLAYOUT_DIR = $(CWD)
 
-# get the platform
-UNAME := $(shell uname)
 
 # default target
 all: abstractions doc externals gem pd
-	echo "Complete build succeeded!"
+	@echo "Complete build succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -31,6 +29,24 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #				HELP_DEST=$(HELP_DEST) \
 #				MANUALS_DEST=$(MANUALS_DEST) \
 #			   OBJECTS_DEST=$(OBJECTS_DEST) 
+
+#------------------------------------------------------------------------------
+# which OS to compile for
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+  OS_NAME = linux
+else 
+  ifeq ($(UNAME),Darwin)
+    OS_NAME = darwin
+  else
+    ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+      OS_NAME = win
+    else
+      OS_NAME = unknown
+      $(warning WARNING: unknown environment "$(UNAME)".)
+    endif
+  endif
+endif
 
 #==============================================================================#
 #
@@ -50,10 +66,21 @@ doc:
 
 #------------------------------------------------------------------------------
 # externals
-externals:
+externals: externals_$(OS_NAME)
 # doc
 	make -f $(EXTERNALS_SRC)/build/doc/makefile $(DEST_PATHS) install
+	@echo "Making externals for $(OS_NAME) aka $(UNAME)"
+	make -f $(EXTERNALS_SRC)/build/$(OS_NAME)/makefile $(DEST_PATHS) install
 
+# these targets are for platform-specific needs
+externals_darwin:
+
+externals_linux:
+
+externals_win:
+
+externals_unknown:
+# this target is for "everything else"
 
 #------------------------------------------------------------------------------
 # Gem
@@ -71,7 +98,13 @@ pd:
 abstractions_clean:
 	make -f $(ABSTRACTIONS_SRC)/Makefile $(DEST_PATHS) clean
 
-clean: abstractions_clean
+
+externals_clean:
+	make -f $(EXTERNALS_SRC)/build/$(OS_NAME)/makefile $(DEST_PATHS) clean
+
+
+
+clean: abstractions_clean 
 	-rm -f *~
 	rm -rf $(MANUALS_DEST) $(HELP_DEST)
 	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
