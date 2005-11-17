@@ -17,10 +17,6 @@ all: install
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 
-# this is here to retain compatibility to the way that this makefile copied
-# files before it was added to the unified build system
-HELP_DEST = .
-
 install: $(HELP_DEST)
 #----------------------------------------------------------------------------
 # all standard objs' help files
