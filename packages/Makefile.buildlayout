@@ -1,9 +1,29 @@
 
-# this file should be exactly the same in each section of the CVS.  A copy is
-# kept in each section of the CVS so that each section will be
-# self-contained.  <hans@at.or.at>
+## Makefile.buildlayout
 
-# $(INSTALL_PREFIX) and $(SRC_ROOT_DIR) are set in Makefile
+# This file should be exactly the same in each section of the CVS.  A copy is
+# kept in each section of the CVS so that each section will be self-contained.
+# To use it, you need to include it in your Makefile (i.e. "include
+# Makefile.buildlayout") and then define $(INSTALL_PREFIX) and $(SRC_ROOT_DIR).
+#
+# $(SRC_ROOT_DIR) is the base directory of src tree, equivalent to the root
+# level of the pure-data CVS.
+#
+# $(INSTALL_PREFIX) is the base directory to where all of the resulting files
+# will be copied.
+#
+# This file is currently located in these places: 
+#	  abstractions
+#	  externals/build
+# 	  packages
+#
+# it will be going here too:
+#    doc
+#    extensions
+#    gem
+#    pd
+#
+# <hans@at.or.at>
 
 # sources
 ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
