@@ -1,2 +1,2 @@
 
-#include <../../ggee/control/sl.c>
+#include "../../ggee/control/sl.c"
