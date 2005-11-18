@@ -1,4 +1,19 @@
 
+- make abstraction -lib loader.  when a -lib mylibrary name is tried and fails
+  in the path, then fails with IO's altname, then try to load as a path on top
+  of extra: i.e. extra/mylibrary.  If found, add to path, and add
+  doc/5.reference/mylibrary to helppath.  
+
+    - call it sys_load_lib_folder();, 
+
+	 - insert it after  if (!sys_load_lib()) in s_main.c
+
+- make pd section since I can't easily modify the pd tree
+
+- add notes.txt to manuals
+
+- create patch system and incorporate IO's hex patch
+
 - hex convertor for setup function names, and object file names
 
 - merge in tigital's Makefile++

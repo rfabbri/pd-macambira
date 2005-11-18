@@ -14,7 +14,7 @@ BUILDLAYOUT_DIR = $(CWD)
 
 
 # default target
-all: abstractions doc externals gem pd
+all: abstractions doc externals flext gem pd
 	@echo "Complete build succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -23,30 +23,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				SRC_ROOT_DIR=$(SRC_ROOT_DIR) \
-				INSTALL_PREFIX=$(INSTALL_PREFIX)
-#				APPLICATIONS_DEST=$(APPLICATIONS_DEST) \
-#				DOCS_DEST=$(DOCS_DEST) \
-#				HELP_DEST=$(HELP_DEST) \
-#				MANUALS_DEST=$(MANUALS_DEST) \
-#			   OBJECTS_DEST=$(OBJECTS_DEST) 
-
-#------------------------------------------------------------------------------
-# which OS to compile for
-UNAME := $(shell uname -s)
-ifeq ($(UNAME),Linux)
-  OS_NAME = linux
-else 
-  ifeq ($(UNAME),Darwin)
-    OS_NAME = darwin
-  else
-    ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-      OS_NAME = win
-    else
-      OS_NAME = unknown
-      $(warning WARNING: unknown environment "$(UNAME)".)
-    endif
-  endif
-endif
+				INSTALL_PREFIX=$(INSTALL_PREFIX) \
+				UNAME=$(UNAME)
 
 #==============================================================================#
 #
@@ -57,7 +35,7 @@ endif
 #------------------------------------------------------------------------------
 # abstractions
 abstractions:
-	make -f $(ABSTRACTIONS_SRC)/Makefile $(DEST_PATHS) install
+
 
 #------------------------------------------------------------------------------
 # doc
@@ -66,21 +44,14 @@ doc:
 
 #------------------------------------------------------------------------------
 # externals
-externals: externals_$(OS_NAME)
-# doc
-	make -f $(EXTERNALS_SRC)/build/doc/makefile $(DEST_PATHS) install
-	@echo "Making externals for $(OS_NAME) aka $(UNAME)"
-	make -f $(EXTERNALS_SRC)/build/$(OS_NAME)/makefile $(DEST_PATHS) install
+externals: 
+	cd $(EXTERNALS_SRC) && make $(DEST_PATHS)
 
-# these targets are for platform-specific needs
-externals_darwin:
 
-externals_linux:
+#------------------------------------------------------------------------------
+# flext
+flext:
 
-externals_win:
-
-externals_unknown:
-# this target is for "everything else"
 
 #------------------------------------------------------------------------------
 # Gem
@@ -91,20 +62,73 @@ gem:
 # pd
 pd:
 
+#==============================================================================#
+#
+# INSTALL TARGETS
+#
+#==============================================================================#
+
+#------------------------------------------------------------------------------
+# abstractions
+abstractions_install:
+	cd $(ABSTRACTIONS_SRC) && make $(DEST_PATHS) install
+
+#------------------------------------------------------------------------------
+# doc
+doc_install:
+
+
+#------------------------------------------------------------------------------
+# externals
+externals_install: 
+	cd $(EXTERNALS_SRC) && make $(DEST_PATHS) install
+
+
+#------------------------------------------------------------------------------
+# flext_install
+flext_install:
+
+
+#------------------------------------------------------------------------------
+# Gem
+gem_install:
+
+
+#------------------------------------------------------------------------------
+# pd
+pd_install:
+
+
+#------------------------------------------------------------------------------
+# install
+install: abstractions_install doc_install externals_install flext_install 
+install: gem_install pd_install
+	@echo "Complete install succeeded!"
 
 #==============================================================================#
 # CLEAN TARGETS
 #==============================================================================#
 abstractions_clean:
-	make -f $(ABSTRACTIONS_SRC)/Makefile $(DEST_PATHS) clean
+	-cd $(ABSTRACTIONS_SRC) && make $(DEST_PATHS) clean
+
+
+doc_clean:
 
 
 externals_clean:
-	make -f $(EXTERNALS_SRC)/build/$(OS_NAME)/makefile $(DEST_PATHS) clean
+	-cd $(EXTERNALS_SRC) && make $(DEST_PATHS) clean
 
 
+flext_clean:
 
-clean: abstractions_clean 
-	-rm -f *~
-	rm -rf $(MANUALS_DEST) $(HELP_DEST)
-	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
+
+gem_clean:
+
+
+pd_clean:
+
+# these targets are all from Makefile.buildlayout:
+#   install_clean cruft_clean
+clean: abstractions_clean doc_clean externals_clean flext_clean 
+clean: gem_clean pd_clean 
+	echo "Complete clean finished."

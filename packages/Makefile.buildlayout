@@ -1,6 +1,11 @@
-
-## Makefile.buildlayout
-
+#==============================================================================#
+#
+# Centralized cross-platform build system Makefile.buildsystem
+#
+# this file contains all the common locations and targets
+#  <hans@at.or.at>
+#
+#==============================================================================#
 # This file should be exactly the same in each section of the CVS.  A copy is
 # kept in each section of the CVS so that each section will be self-contained.
 # To use it, you need to include it in your Makefile (i.e. "include
@@ -25,6 +30,39 @@
 #
 # <hans@at.or.at>
 
+#==============================================================================#
+#
+## PLATFORM-SPECIFIC SETTINGS
+#
+#==============================================================================#
+# which OS to compile for
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+  OS_NAME = linux
+  EXTENSION = pd_linux
+else 
+  ifeq ($(UNAME),Darwin)
+    OS_NAME = darwin
+    EXTENSION = pd_darwin
+  else
+    ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+      OS_NAME = win
+      EXTENSION = dll
+    else
+      OS_NAME = unknown
+      EXTENSION = so
+      $(warning WARNING: unknown environment "$(UNAME)".)
+    endif
+  endif
+endif
+
+
+#==============================================================================#
+#
+# DIRECTORY STRUCTURE
+#
+#==============================================================================#
+
 # sources
 ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
 DOC_SRC = $(SRC_ROOT_DIR)/doc
@@ -43,9 +81,13 @@ OBJECTS_DEST = $(INSTALL_PREFIX)/extra
 HELP_DEST = $(DOCS_DEST)/5.reference
 MANUALS_DEST = $(DOCS_DEST)/manuals
 
-#------------------------------------------------------------------------------#
+
+#==============================================================================#
+#
 # DIRECTORY STRUCTURE TARGETS
-#------------------------------------------------------------------------------#
+#
+#==============================================================================#
+
 # first make sure that the directory structure is setup
 $(INSTALL_PREFIX):
 	install -d $(INSTALL_PREFIX)
@@ -64,4 +106,80 @@ $(MANUALS_DEST): $(INSTALL_PREFIX)
 
 $(OBJECTS_DEST): $(INSTALL_PREFIX)
 	install -d $(OBJECTS_DEST)
+
+
+#==============================================================================#
+#
+# CLEAN TARGETS
+#
+#==============================================================================#
+
+applications_clean:
+	-rm -f -- $(APPLICATIONS_DEST)/*/*/*/*/*.*
+	-rm -f -- $(APPLICATIONS_DEST)/*/*/*/*.*
+	-rm -f -- $(APPLICATIONS_DEST)/*/*/*.*
+	-rm -f -- $(APPLICATIONS_DEST)/*/*.*
+	-rmdir $(APPLICATIONS_DEST)/*/*/*/*
+	-rmdir $(APPLICATIONS_DEST)/*/*/*
+	-rmdir $(APPLICATIONS_DEST)/*/*
+	-rmdir $(APPLICATIONS_DEST)/*
+	-rmdir $(APPLICATIONS_DEST)
+
+
+help_clean:
+	-rm -f -- $(HELP_DEST)/*/*/*.*
+	-rm -f -- $(HELP_DEST)/*/*.*
+	-rm -f -- $(HELP_DEST)/*.*
+	-rmdir $(HELP_DEST)/*/*
+	-rmdir $(HELP_DEST)/*
+	-rmdir $(HELP_DEST)
+
+
+manuals_clean:
+	-rm -f -- $(MANUALS_DEST)/*/*/*.*
+	-rm -f -- $(MANUALS_DEST)/*/*.*
+	-rmdir $(MANUALS_DEST)/*/*
+	-rmdir $(MANUALS_DEST)/*
+	-rmdir $(MANUALS_DEST)
+
+
+objects_clean:
+	-rm $(OBJECTS_DEST)/*/*/*.pd
+	-rm $(OBJECTS_DEST)/*/*.pd
+	-rm $(OBJECTS_DEST)/*.pd 
+	-rm $(OBJECTS_DEST)/*/*/*.$(EXTENSION)
+	-rm $(OBJECTS_DEST)/*/*.$(EXTENSION)
+	-rm $(OBJECTS_DEST)/*.$(EXTENSION)
+	-rmdir $(OBJECTS_DEST)/*/*
+	-rmdir $(OBJECTS_DEST)/*
+	-rmdir $(OBJECTS_DEST)
+
+
+install_clean: applications_clean help_clean manuals_clean objects_clean
+	-rmdir $(DOCS_DEST)
+	-rmdir $(INSTALL_PREFIX)
+	@echo " "
+	@echo "Build destination cleaned: $(INSTALL_PREFIX)"
+
+
+cruft_clean:
+# emacs litter
+	-rm -f -- */*/*/*/*.*~
+	-rm -f -- */*/*/*.*~
+	-rm -f -- */*/*.*~
+	-rm -f -- */*.*~
+	-rm -f -- *.*~
+# sed replace litter
+	-rm -f -- */*/*/*/*.*.bak
+	-rm -f -- */*/*/*.*.bak
+	-rm -f -- */*/*.*.bak
+	-rm -f -- */*.*.bak
+	-rm -f -- *.*.bak
+# autoconf cache
+	-rm -rf -- */*/*/*/autom4te.cache
+	-rm -rf -- */*/*/autom4te.cache
+	-rm -rf -- */*/autom4te.cache
+	-rm -rf -- */autom4te.cache
+	-rm -rf -- autom4te.cache
+
 
