@@ -169,6 +169,7 @@ cruft_clean:
 	-rm -f -- */*/*.*~
 	-rm -f -- */*.*~
 	-rm -f -- *.*~
+	-rm -f -- Makefile~ Makefile.buildlayout~
 # sed replace litter
 	-rm -f -- */*/*/*/*.*.bak
 	-rm -f -- */*/*/*.*.bak
