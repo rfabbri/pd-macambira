@@ -62,6 +62,11 @@ list-inter.pd
   list-inter-example-gem.pd shows a more complicated usage example, but
   requires gem for visualisation.
 
+list-l2s.pd
+
+  Concatenate a list into a single symbol using ARG1 as delimiter. Delimiter
+  can be set through second inlet.
+
 list-lastx.pd
 
   get a list containing the last x atoms received. (Previously known as
