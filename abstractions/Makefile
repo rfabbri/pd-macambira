@@ -15,6 +15,7 @@ BUILDLAYOUT_DIR = $(CWD)
 
 # default target
 install: objects applications
+	echo "abstractions install succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -24,6 +25,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
+# clean up after everything is installed
 final_setup:
 	chmod -R ugo-w $(INSTALL_PREFIX)
 
@@ -150,10 +152,12 @@ objects_nqpoly4:
 NUSMUK_NAME = nusmuk
 objects_nusmuk:
 	install -d $(OBJECTS_DEST)/$(NUSMUK_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.* | \
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NUSMUK_NAME)
 	install -d $(HELP_DEST)/$(NUSMUK_NAME)
 	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd \
+		$(HELP_DEST)/$(NUSMUK_NAME)
+	install -p $(ABSTRACTIONS_SRC)/nusmuk/*.wav \
 		$(HELP_DEST)/$(NUSMUK_NAME)
 
 
@@ -173,8 +177,15 @@ applications_rradical:
 	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)
 	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* \
 		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)
-	cp -rp $(ABSTRACTIONS_SRC)/rradical/usecases/showcase \
-		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/
+	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase
+	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/*.* \
+		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase
+	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/impl
+	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/impl/*.* \
+		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/impl
+	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/songs
+	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/songs/*.* \
+		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/songs
 
 #==============================================================================#
 #
@@ -198,18 +209,8 @@ devsymlinks_keyboardkeys:
 #
 #==============================================================================#
 
-objects_clean:
-	-rm -rf $(OBJECTS_DEST) $(HELP_DEST)
-
-applications_clean:
-	-rm -rf $(APPLICATIONS_DEST)
-
-
-clean: applications_clean objects_clean
-	-rm -f *~
-	rm -rf $(MANUALS_DEST)
-	rmdir $(DOCS_DEST) $(INSTALL_PREFIX)
-
+# the destination-specific clean targets are in Makefile.buildlayout
+clean: install_clean cruft_clean
 
 #==============================================================================#
 #

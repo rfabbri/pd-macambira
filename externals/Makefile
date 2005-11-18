@@ -39,7 +39,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 objects: objects_$(OS_NAME)
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
-	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make -k
+	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make -k 
 
 # these targets are for platform-specific needs
 objects_darwin:
@@ -67,10 +67,11 @@ applications_install: $(APPLICATIONS_DEST)
 		$(APPLICATIONS_DEST)/$(IEMLIB_NAME)
 # PMDP examples
 	install -d $(APPLICATIONS_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd $(APPLICATIONS_DEST)/$(PMPD_NAME)
+	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd \
+		$(APPLICATIONS_DEST)/$(PMPD_NAME)
 
 
-docs_install: $(HELP_DEST)
+help_install: $(HELP_DEST)
 #------------------------------------------------------------------------------#
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
@@ -173,8 +174,9 @@ objects_install: objects
 
 
 
-install: $(OBJECTS_DEST) docs_install applications_install objects_install
+install: $(OBJECTS_DEST) help_install applications_install objects_install
 install: manuals_install
+	@echo "externals install succeeded!"
 
 #==============================================================================#
 #
@@ -186,34 +188,5 @@ install: manuals_install
 devsymlinks: 
 
 
-#==============================================================================#
-#
-# CLEAN TARGETS
-#
-#==============================================================================#
-
-applications_clean:
-	rm $(APPLICATIONS_DEST)/*/*.*
-	rmdir $(APPLICATIONS_DEST)/*
-	rmdir $(APPLICATIONS_DEST)
-
-docs_clean:
-	-rm $(HELP_DEST)/*.* $(HELP_DEST)/*/*.*
-	rmdir $(HELP_DEST)/*
-
-manuals_clean:
-	rm $(MANUALS_DEST)/*/*.*
-	rmdir $(MANUALS_DEST)/*
-	rmdir $(MANUALS_DEST)
-
-objects_clean:
-	rm $(OBJECTS_DEST)/*.pd 
-	rm $(OBJECTS_DEST)/*/*.pd
-	rm $(OBJECTS_DEST)/*.$(EXTENSION)
-# for upcoming lib directory structure
-	-rm $(OBJECTS_DEST)/*/*.$(EXTENSION)
-	rmdir $(OBJECTS_DEST)/*
-
-clean: applications_clean docs_clean manuals_clean objects_clean
-	rmdir $(DOCS_DEST)/*	
-	rmdir $(DOCS_DEST)
+# FYI: clean targets are in Makefile.buildlayout
+clean: install_clean cruft_clean

@@ -149,7 +149,7 @@ $(OBJECTS_DEST):
 
 "applications" targets:
    This target is meant for any patch that is intended to be opened up and
-   used, played, ran, etc.  The RRADical showcase is a good example
+   used, played, ran, etc.  The RRADical the-showcase.pd is a good example
 
 
 
