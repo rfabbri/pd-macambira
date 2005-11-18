@@ -1,4 +1,14 @@
 
+- fold externals/build/doc/makefile into externals/build/Makefile
+
+- get externals/build/src/prepend.c to compile in Pd mode, which means it will
+  have a right inlet when created without an argument
+
+- add in mtx_ objects with special characters using setup functions and
+  filenames with 0x escapes (mtx_/ and mtx_./ for example).  Make sure to have
+  the objects call the correct setup function since it can change the
+  functionality
+
 - fix compilation of netclient, netrec, netserver, piperead~, pipewrite~
 
 - include mp3 externals from iem_mp3 and unauthorized and make mp3*.libs files
@@ -17,9 +27,7 @@
   externals/build/PLATFORM directory.  The makefiles will use both:
   `test -f $*.libs && cat $*.libs` `test -f ../src/$*.libs && cat ../src/$*.libs`
 
-- make MinGW makefile for "win" so that the GNU Makefile method will be
-  standard on all platforms.
-
-- do symlink aliases in externals/build/src/makefile.common
-
-- write externals/build/doc/standardize-help.sh
+- add these to the build system:
+      PDContainer
+      ann
+		grh

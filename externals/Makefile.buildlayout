@@ -25,6 +25,30 @@
 #
 # <hans@at.or.at>
 
+#------------------------------------------------------------------------------#
+# PLATFORM-SPECIFIC SETTINGS
+#------------------------------------------------------------------------------#
+# which OS to compile for
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+  OS_NAME = linux
+  EXTENSION = pd_linux
+else 
+  ifeq ($(UNAME),Darwin)
+    OS_NAME = darwin
+    EXTENSION = pd_darwin
+  else
+    ifeq (MINGW,$(findstring MINGW,$(UNAME)))
+      OS_NAME = win
+      EXTENSION = dll
+    else
+      OS_NAME = unknown
+      EXTENSION = so
+      $(warning WARNING: unknown environment "$(UNAME)".)
+    endif
+  endif
+endif
+
 # sources
 ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
 DOC_SRC = $(SRC_ROOT_DIR)/doc
@@ -64,4 +88,3 @@ $(MANUALS_DEST): $(INSTALL_PREFIX)
 
 $(OBJECTS_DEST): $(INSTALL_PREFIX)
 	install -d $(OBJECTS_DEST)
-
