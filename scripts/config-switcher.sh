@@ -18,18 +18,26 @@ print_usage() {
 	 echo "To list existing configs:"
 	 echo "   $0 list"
 	 echo " "
+	 echo "To print the contents of a config:"
+	 echo "   $0 print CONFIG_NAME"
+	 echo " "
+	 echo "To see the difference between the current config and another:"
+	 echo "   $0 diff CONFIG_NAME"
+	 echo " "
 	 echo "To use the .pdrc instead, add '--pdrc':"
 	 echo "   $0 --pdrc load CONFIG_NAME"
 	 echo "   $0 --pdrc save CONFIG_NAME"
 	 echo "   $0 --pdrc delete CONFIG_NAME"
 	 echo "   $0 --pdrc list"
+	 echo "   $0 --pdrc print CONFIG_NAME"
+	 echo "   $0 --pdrc diff CONFIG_NAME"
 	 exit
 }
 
 #==============================================================================#
 # THE PROGRAM
 
-if [ $# -eq 0 ]; then
+if [ $# -lt 1 ]; then
 	 print_usage
 else
 	 # get the command line arguments
@@ -61,37 +69,48 @@ else
     # everything happens in this dir
 	 cd $CONFIG_DIR
 	 
-	 save_file="$CONFIG_DIR/$CONFIG_FILE-$CONFIG_NAME"
+	 selected_file="$CONFIG_DIR/$CONFIG_FILE-$CONFIG_NAME"
 	 case $COMMAND in
 		  load)
-				if [ -e "$save_file" ]; then
-					 test -e "$CONFIG_FILE" && mv "$CONFIG_FILE" /tmp
-					 rm "$CONFIG_FILE"
-					 cp "$save_file" "$CONFIG_FILE" && \
-						  echo "Pd config \"$save_file\" loaded." 
+				if [ -e "$selected_file" ]; then
+					 test -e "$CONFIG_FILE" && mv -f "$CONFIG_FILE" /tmp
+					 cp "$selected_file" "$CONFIG_FILE" && \
+						  echo "Pd config \"$selected_file\" loaded." 
 				else
-					 echo "\"$save_file\" doesn't exist.  No action taken."
+					 echo "\"$selected_file\" doesn't exist.  No action taken."
 				fi
 				;;
 		  save)
-				if [ -e "$CONFIG_DIR/$CONFIG_FILE" ]; then
-					 cp "$CONFIG_FILE" "$save_file" && \
+				if [ -e "$CONFIG_FILE" ]; then
+					 cp -f "$CONFIG_FILE" "$selected_file" && \
 						  echo "Pd config \"$CONFIG_NAME\" saved." 
 				else
 					 echo "\"$CONFIG_FILE\" doesn't exist.  No action taken."
 				fi
 				;;
 		  delete)
-				if [ -e "$save_file" ]; then
-					 rm "$save_file" && \
-						  echo "Pd config \"$save_file\" deleted." 
+				if [ -e "$selected_file" ]; then
+					 rm -f "$selected_file" && \
+						  echo "Pd config \"$selected_file\" deleted." 
 				else
-					 echo "\"$save_file\" doesn't exist.  No action taken."
+					 echo "\"$selected_file\" doesn't exist.  No action taken."
 				fi
 				;;
  		  list)
 				echo "Available configs:"
-				\ls -1 ${CONFIG_FILE}*
+				pwd
+				ls -1 "${CONFIG_FILE}"*
+pwd
+				;;
+		  print)
+				if [ "${CONFIG_NAME}" == "" ]; then
+					 cat "${CONFIG_FILE}"
+				else
+					 cat "$selected_file"
+				fi
+				;;
+		  diff)
+				diff -uw "${CONFIG_FILE}" "$selected_file"
 				;;
 		  *) print_usage ;;
 	 esac
