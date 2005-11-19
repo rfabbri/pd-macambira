@@ -62,11 +62,16 @@
    (list
     (list (concat                                       ; object types
            "^#X \\("
-           (regexp-opt '("canvas" "connect" "floatatom" "msg" 
-								 "obj" "restore" "scalar" "struct" 
+           (regexp-opt '("connect" "floatatom" "msg" "obj" "scalar" "struct" 
 								 "symbolatom" "text"))
            "\\) ")
       1 'font-lock-type-face)
+
+    (list (concat                                       ; object types
+           "\\(^#[NX] "
+           (regexp-opt '("canvas" "restore"))
+           "\\) ")
+      1 'font-lock-warning-face)
 
 	 ; connect numbers
     (list "^#X connect \\([0-9]+\\) [0-9]+ [0-9]+ [0-9]+"
@@ -87,29 +92,19 @@
 
     (list "\\(^#X\\)" 0 'font-lock-builtin-face t)
 
-    (list "\\(^#N\\)" 0 'font-lock-constant-face t)
+;    (list "\\(^#N\\)" 0 'font-lock-constant-face t)
 
 ;    (list "^#N.*$" 0 'font-lock-comment-face t)
 
-    (list (concat                                       ; object names
-       "\\Wobj\\W[0-9]+\\W[0-9]+\\W\\("
-           (regexp-opt '("+" "+~" "-" "-~"
-								 "a2l" "adc~" "any2list" "bang" "bng" "cnv"
-								 "dac~" "del" "delay"
-								 "expr"
-								 "f" "float"
-								 "hsl" 
-								 "i" "int" "loadbang"
-								 "makefilename" "metro" "mod" 
-								 "openpanel"
-								 "pack" "pddp" "pddplink"
-                         "print"
-								 "r" "route" 
-								 "s" "savepanel" "sel" "select" "symbol"
-								 "t" "tgl" "trigger"
-								 "unpack" "vsl"))
-           "\\)\\W")
-      1 'font-lock-constant-face)))
+    (list "^#X obj [0-9]+ [0-9]+ \\([a-zA-Z0-9+*._-]+\\)[ ;]" 
+			 1 'font-lock-constant-face t)
+
+    (list "^#X msg [0-9]+ [0-9]+ \\([a-zA-Z0-9+*._-]+\\);" 
+			 1 'font-lock-variable-name-face)
+
+;    (list "^#X text [0-9]+ [0-9]+ \\(.*\\);" 
+;			 1 'font-lock-comment-face)
+	 ))
   "Expressions to highlight in Pd config buffers.")
 
 (put 'pd-mode 'font-lock-defaults '(pd-font-lock-keywords nil t
