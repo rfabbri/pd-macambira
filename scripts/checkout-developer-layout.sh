@@ -20,8 +20,10 @@ function print_usage ()
 }
 
 if [ $# -eq 0 ]; then
-	 echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
 	 CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data"
+	 echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
+	 echo "The anonymous password is: anoncvs"
+	 cvs login
 elif [ "$1" == "--help" ]; then
 	 print_usage
 elif [ "$1" == "-h" ]; then
@@ -37,3 +39,5 @@ for section in abstractions doc extensions externals pd scripts; do
 	 cvs checkout $section
 done
 
+# make the symlinks which simulate the files being installed into the packages
+cd packages && make devsymlinks
