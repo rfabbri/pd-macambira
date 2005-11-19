@@ -1,0 +1,6 @@
+
+PurePd is a library of objects are written purely in Pd.  The idea is to
+replace standard externals with Pd objects so that Pd its more and more a
+language written in Pd.
+
+<hans@at.or.at>

@@ -1,0 +1,4 @@
+#N canvas 0 22 454 304 10;
+#X obj 168 52 inlet;
+#X obj 167 186 print \$1_ERROR:;
+#X connect 0 0 1 0;
