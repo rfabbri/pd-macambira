@@ -435,7 +435,7 @@ static void scrolllist_properties(t_gobj *z, t_glist *owner)
  t_scrolllist *x=(t_scrolllist *)z;
 
    sprintf(buf, "pdtk_scrolllist_dialog %%s %d %d %d %s %s %s %s\n",
-            x->x_capacity, x->x_width, x->x_height, 
+            (int)x->x_capacity, (int)x->x_width, (int)x->x_height, 
             x->x_font, x->x_bgcolor,
             x->x_fgcolor, x->x_secolor );
    // post("scrolllist_properties : %s", buf );
@@ -502,7 +502,7 @@ static void scrolllist_dialog(t_scrolllist *x, t_symbol *s, int argc, t_atom *ar
    x->x_width = (int)argv[1].a_w.w_float;
    x->x_height = (int)argv[2].a_w.w_float;
    sprintf( x->x_font, "{%s %d %s}", argv[3].a_w.w_symbol->s_name, 
-                       (t_int)argv[4].a_w.w_float, argv[5].a_w.w_symbol->s_name );
+                       (int)argv[4].a_w.w_float, argv[5].a_w.w_symbol->s_name );
    x->x_charheight = (t_int)argv[4].a_w.w_float;
    strcpy( x->x_bgcolor, argv[6].a_w.w_symbol->s_name );
    strcpy( x->x_fgcolor, argv[7].a_w.w_symbol->s_name );
@@ -597,7 +597,7 @@ static void scrolllist_font(t_scrolllist* x, t_symbol *fname, t_symbol *fcase, t
        post( "scrolllist : wrong font size in font message : %d", (t_int)fsize );
        return;
     }
-    sprintf( x->x_font, "{%s %d %s}", fname->s_name, (t_int)fsize, fcase->s_name );
+    sprintf( x->x_font, "{%s %d %s}", fname->s_name, (int)fsize, fcase->s_name );
     x->x_charheight = (t_int)fsize;
     x->x_charwidth = (2*x->x_charheight)/3;
     // post( "scrolllist : setting font to : %s", x->x_font );
@@ -867,7 +867,7 @@ static t_scrolllist *scrolllist_new(t_symbol *s, int argc, t_atom *argv )
       {
         x->x_charheight = (t_int)argv[4].a_w.w_float;
         sprintf( x->x_font, "%s %d %s", argv[3].a_w.w_symbol->s_name, 
-                           x->x_charheight, argv[5].a_w.w_symbol->s_name );
+                           (int)x->x_charheight, argv[5].a_w.w_symbol->s_name );
         argoffset=0;
       }
       post( "scrolllist : font : %s, size : %d", x->x_font, x->x_charheight );
