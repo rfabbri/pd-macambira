@@ -1,0 +1,120 @@
+Index: s_loader.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
+retrieving revision 1.4
+diff -u -w -r1.4 s_loader.c
+--- s_loader.c	6 Sep 2004 20:20:35 -0000	1.4
++++ s_loader.c	20 Nov 2005 01:52:20 -0000
+@@ -163,3 +163,82 @@
+ 
+ 
+ 
++/* <hans@at.or.at> { */
++
++/*
++ * This function opens a directory as a library.  In the long run, the idea is
++ * that one folder will have all of objects files, all of the related
++ * *-help.pd files, a file with meta data for the help system, etc.  Then to
++ * install the lib, it would just be dropped into extra, or the path anywhere.
++ * <hans@at.or.at>
++ */
++
++int sys_load_lib_dir(char *dirname, char *classname)
++{
++    int fd = -1;
++    char searchpathname[MAXPDSTRING], helppathname[MAXPDSTRING], 
++        classname2[MAXPDSTRING], dirbuf[MAXPDSTRING], *nameptr;
++    
++#if 0
++    fprintf(stderr, "sys_load_lib_directory %s %s\n", dirname, classname);
++#endif
++
++        /* look for meta file (classname)/(classname).pd <hans@at.or.at> */
++    strncpy(classname2, classname, MAXPDSTRING);
++    strcat(classname2, "/");
++    strncat(classname2, classname, MAXPDSTRING-strlen(classname2));
++    if ((fd = open_via_path(dirname, classname2, ".pd",
++                            dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
++    {
++        return (0);
++    }
++    close(fd);
++    
++    /* Ultimately, the meta file will be read for meta data, specifically for
++     * the auto-generated Help system, but for other things too.  Right now,
++     * its just used as a marker that a directory is meant to be a library.
++     * Plus its much easier to implement it this way, I can use
++     * open_via_path() instead of writing a new function.  The grand plan is
++     * to have one directory hold the objects, help files, manuals,
++     * etc. making it a self-contained library. <hans@at.or.at>
++     */
++
++#if 0
++    fprintf(stderr, "sys_load_lib_directory %s %s\n", dirname, classname);
++#endif
++        /* create full path to libdir for adding to the paths */
++    strcpy(searchpathname,dirbuf);
++//    strcat(searchpathname,"/");
++//    strncat(searchpathname,classname, MAXPDSTRING-strlen(searchpathname));
++
++    strncpy(helppathname, sys_libdir->s_name, MAXPDSTRING-30);
++    helppathname[MAXPDSTRING-30] = 0;
++    strcat(helppathname, "/doc/5.reference/");
++    strcat(helppathname, classname);
++
++    sys_searchpath = namelist_append_files(sys_searchpath, searchpathname);
++    /* this help path supports having the help files in a complete library
++     * directory format, where everything is in one folder.  The help meta
++     * system needs to be implemented for this to work with the new Help
++     * menu/browser system. Ultimately, /path/to/extra will have to be added
++     * to sys_helppath in order for this to work properly.<hans@at.or.at> */
++    sys_helppath = namelist_append_files(sys_helppath, searchpathname);
++    /* this supports having the help files in a distinct dir
++     * (i.e. doc/5.reference), but having the help files in subdirs named with
++     * the same name as the library directory.  <hans@at.or.at>*/
++    sys_helppath = namelist_append_files(sys_helppath, helppathname);
++    
++        /* this should be changed to use sys_debuglevel */
++    if (sys_verbose) 
++    {
++        post("Added to search path: %s", searchpathname);
++        post("Added to help path: %s", searchpathname);
++        post("Added to help path: %s", helppathname);
++    }
++    if (sys_verbose) 
++        post("Loaded libdir %s from %s", classname, dirbuf);
++
++    return (1);
++}
++
++/* }  <hans@at.or.at> */
+Index: s_main.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_main.c,v
+retrieving revision 1.9.2.5
+diff -u -w -r1.9.2.5 s_main.c
+--- s_main.c	24 Feb 2005 01:37:20 -0000	1.9.2.5
++++ s_main.c	20 Nov 2005 01:52:20 -0000
+@@ -233,6 +233,7 @@
+         /* load dynamic libraries specified with "-lib" args */
+     for  (nl = sys_externlist; nl; nl = nl->nl_next)
+         if (!sys_load_lib(cwd, nl->nl_string))
++            if (!sys_load_lib_dir(cwd, nl->nl_string))
+             post("%s: can't load library", nl->nl_string);
+         /* open patches specifies with "-open" args */
+     for  (nl = sys_openlist; nl; nl = nl->nl_next)
+Index: s_stuff.h
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/s_stuff.h,v
+retrieving revision 1.5
+diff -u -w -r1.5 s_stuff.h
+--- s_stuff.h	6 Sep 2004 20:20:36 -0000	1.5
++++ s_stuff.h	20 Nov 2005 01:52:20 -0000
+@@ -47,6 +47,7 @@
+ 
+ /* s_loader.c */
+ int sys_load_lib(char *dirname, char *filename);
++int sys_load_lib_dir(char *dirname, char *filename);
+ 
+ /* s_audio.c */
+ 
