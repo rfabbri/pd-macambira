@@ -1,0 +1,48 @@
+#N canvas 225 0 465 689 10;
+#X obj 29 23 cnv 15 404 54 empty empty empty 22 25 0 18 -1 -66577 0
+;
+#X obj 31 25 cnv 15 400 50 empty empty sndfiler 22 25 0 18 -228992
+-66577 0;
+#X obj 72 637 print THREADED_SF;
+#X obj 72 592 r \$0-tsf;
+#X obj 68 394 openpanel;
+#X obj 68 438 s \$0-tsf;
+#X obj 68 374 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 258 615 table array1;
+#X text 89 373 <- read;
+#X obj 256 536 s \$0-tsf;
+#X msg 256 510 resize array1 4410;
+#X text 39 276 read a file: read filename array1 array2 ...;
+#X text 40 292 NOTE: this will also resize the array to the filesize
+!;
+#X text 66 340 for mono files:;
+#X msg 68 416 read \$1 array1;
+#X obj 239 396 openpanel;
+#X obj 239 440 s \$0-tsf;
+#X obj 239 376 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 260 375 <- read;
+#X text 235 340 for multichannel specify;
+#X text 237 353 more arrays:;
+#X msg 239 418 read \$1 array1 array2;
+#X obj 258 637 table array2;
+#X obj 72 615 sndfiler;
+#X text 288 34 threaded soundfiler;
+#X text 308 51 using libsndfile;
+#X text 161 113 ::: SNDFILER :::;
+#X text 65 152 A threaded soundfiler for PD using libsndfile.;
+#X text 65 182 REQUIREMENTS:;
+#X text 118 199 - pd >= 0.39;
+#X text 118 215 - libsndfile;
+#X text 118 231 - threadlib (for main pd);
+#X text 65 509 threaded resize of arrays:;
+#X connect 3 0 23 0;
+#X connect 4 0 14 0;
+#X connect 6 0 4 0;
+#X connect 10 0 9 0;
+#X connect 14 0 5 0;
+#X connect 15 0 21 0;
+#X connect 17 0 15 0;
+#X connect 21 0 16 0;
+#X connect 23 0 2 0;
