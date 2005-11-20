@@ -33,7 +33,7 @@ t_class *threadlib_class;
 
 static void threadlib_help(void)
 {
-  post("\nthreadlib vers."VERSION", library for threaded patching\n"
+  post("\nthreadlib vers."VERSION", library for threaded patching and externals\n"
        "2005, by Georg Holzmann <grh@mur.at>\n"
        "heavily based on pd_devel code by Tim Blechmann\n"
 
@@ -41,7 +41,6 @@ static void threadlib_help(void)
         "\tdetach       run part of the patch in a helper thread\n"
         "\tjoin         synchronize messages to pd's main thread\n"
         "\tsleep        block system for specific time\n"
-        "\tthreadedsf   threaded soundfiler from pd_devel_0.38\n"
        
         "WARNING: this is very experimental and can crash your patches !\n");
 }
@@ -55,24 +54,18 @@ void *threadlib_new(void)
 void sleep_setup();
 void detach_setup();
 void join_setup();
-void threadedsf_setup();
-void sys_start_sfthread();
 
-void threadlib_setup(void) 
+void threadlib_setup(void)
 {
   // call all the setup functions:
   sleep_setup();
   detach_setup();
   join_setup();
-  threadedsf_setup();
   
   // init callback system
   h_init_callbacks();
-  
-  // start global soundfiler helper thread
-  sys_start_sfthread();
 
-  post("\nthreadlib vers."VERSION", library for threaded patching\n"
+  post("\nthreadlib vers."VERSION", library for threaded patching and externals\n"
        "2005, by Georg Holzmann <grh@mur.at>\n"
        "heavily based on pd_devel code by Tim Blechmann\n"
        "WARNING: this is very experimental and may crash your patches !\n");
@@ -80,4 +73,6 @@ void threadlib_setup(void)
   threadlib_class = class_new(gensym("threadlib"), threadlib_new, 0, 
 			      sizeof(t_threadlib), 0, 0);
   class_addmethod(threadlib_class, (t_method)threadlib_help, gensym("help"), 0);
+  
+  return 0;
 }

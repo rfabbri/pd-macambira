@@ -28,6 +28,12 @@
 #include "m_pd.h"
 #include "pthread.h"
 
+#ifdef MSW
+#define THREADLIB_EXTERN __declspec(dllexport) extern
+#else
+#define THREADLIB_EXTERN extern
+#endif /* MSW */
+
 
 // threadlib version string
 #define VERSION "0.1"
@@ -38,6 +44,8 @@
 // for debuging
 //#define DEBUG
 
+// setup function
+THREADLIB_EXTERN void threadlib_setup(void);
 
 /* --------- lockfree FIFO of pd devel ----------- */
 // (implemted in fifo.c)
@@ -47,12 +55,12 @@ EXTERN_STRUCT _fifo;
 #define t_fifo struct _fifo
 
 /* function prototypes */
-t_fifo * fifo_init(void);
-void fifo_destroy(t_fifo*);
+THREADLIB_EXTERN t_fifo * fifo_init(void);
+THREADLIB_EXTERN void fifo_destroy(t_fifo*);
 
 /* fifo_put() and fifo_get are the only threadsafe functions!!! */
-void fifo_put(t_fifo*, void*);
-void* fifo_get(t_fifo*);
+THREADLIB_EXTERN void fifo_put(t_fifo*, void*);
+THREADLIB_EXTERN void* fifo_get(t_fifo*);
 
 
 /* --------- callback FIFO of pd devel ----------- */
@@ -65,17 +73,19 @@ void* fifo_get(t_fifo*);
  * clock callbacks
  */
 
+/* register a new callback in FIFO */
+/* tb: to be called at idle time */
+/* Holzmann: idle callbacks of current PD are not reliable, so
+             it will be called by the clock-callbacks for now */
+THREADLIB_EXTERN void sys_callback(t_int (*callback) (t_int* argv),
+				   t_int* argv, t_int argc);
+
+/* private: */
+
 /* set up callback fifo and start clock callback */
 void h_init_callbacks();
 
 /* free fifo and clock callback */
 void h_free_callbacks();
-
-/* tb: to be called at idle time */
-/* Holzmann: idle callbacks of current PD are not reliable, so
-             it will be called by the clock-callbacks for now */
-/* register a new callback in FIFO */
-void h_set_callback(t_int (*callback) (t_int* argv), t_int* argv, t_int argc);
-
 
 #endif // __PD_THREADLIB_H_

@@ -1,23 +1,32 @@
 threadlib
-PD library for threaded patching
+C and PD library for threaded patching and threaded PD externals
 heavily based on pd_devel code by Tim Blechmann
 (c) 2005, Georg Holzmann, <grh@mur.at>
 http://grh.mur.at/software/threadlib.html
 
 ------------------------------------------------------------------------
 
-contents of threadlib:
-  detach		run part of the patch in a helper thread
-  join		synchronize messages to pd's main thread
-  sleep		blocks the system for a specific time
-  threadedsf	modified threaded soundfiler from pd_devel_0.38
+PD objects for threaded patching:
+- detach	run part of the patch in a helper thread
+- join		synchronize messages to pd's main thread
+- sleep		blocks the system for a specific time
+- threadedsf	modified threaded soundfiler from pd_devel_0.38
 
 WARNING:
 these objects (especially detach/join) are very experimental and may
 crash your patches if you use them in the wrong way, because some 
 externals/internals are not threadsafe!
 
-REQUIREMENT: pd >= 0.39
+Features for PD external programmers:
+- lockfree FIFO from pd_devel
+- callback system like in pd_devel:
+    Instead of the idle callbacks, which are not really useable 
+    in current main pd, it uses clock callbacks
+- USAGE: you have to link your externals against threadlib
+         (see sndfiler as an example)
+- ADVANTAGES: so it's possible to write threaded externals
+         for main and devel pd with the same source code
+         (using the lockfree FIFO and sys_callback)
 
 Many thanks to Tim Blechmann for his code and help!
 
@@ -42,12 +51,6 @@ Join can be used everywhere, where a message has to be rescheduled, this
 is also useful to place behind any threaded external calling the outlet
 functions from the helper thread, to make sure the following messages
 are being run in the main pd thread.
-
-threadedsf:
-This is the threaded soundfiler from pd devel 0.38 by Tim Blechmann,
-adapted to work with main pd >= 0.39.
-Instead of the idle callbacks, which are not really useable in current
-main pd, it uses clock-callbacks (and also the lockfree FIFO of pd devel).
 
 !!! WARNING: !!!
 detach/join provide the possibility of threaded patching.

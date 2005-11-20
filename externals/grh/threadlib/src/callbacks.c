@@ -41,7 +41,7 @@ void h_free_callbacks()
   fifo_destroy(h_callback_fifo);
 }
 
-void h_set_callback(t_int (*callback) (t_int* argv), t_int* argv, t_int argc)
+void sys_callback(t_int (*callback) (t_int* argv), t_int* argv, t_int argc)
 {
   t_sched_callback* new = (t_sched_callback*) getbytes
       (sizeof(t_sched_callback));

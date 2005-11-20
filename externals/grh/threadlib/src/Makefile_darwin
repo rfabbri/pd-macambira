@@ -11,10 +11,10 @@ PDPATH=/usr/lib/pd
 
 # --------------------------------------------------
 
-TARGET=threadlib.pd_linux
+TARGET=threadlib.pd_darwin
 
-OBJ=fifo.o callbacks.o threadlib.o sleep.o detach.o \
-    join.o threadedsf.o
+OBJ=fifo.o callbacks.o threadlib.o \
+    sleep.o detach.o join.o
 
 CC = gcc
 LD = gcc
@@ -28,9 +28,9 @@ LD_FLAGS = -bundle -bundle_loader $(PDPATH)/bin/pd \
 
 # --------------------------------------------------
 
-all: pd_linux
+all: pd_darwin
 
-pd_linux: $(TARGET)
+pd_darwin: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(LD) $(LD_FLAGS) $(TARGET) $(OBJ) $(LIB)
@@ -54,9 +54,6 @@ detach.o: threadlib.o fifo.o detach.c
 
 join.o: threadlib.o callbacks.o join.c
 	$(CC) $(CC_FLAGS) $(INCLUDE) join.c
-
-threadedsf.o: threadlib.o callbacks.o threadedsf.c
-	$(CC) $(CC_FLAGS) $(INCLUDE) threadedsf.c
 
 # --------------------------------------------------
 

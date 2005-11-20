@@ -11,25 +11,26 @@ PDPATH=c:/pd
 
 # --------------------------------------------------
 
-TARGET=threadlib.pd_linux
+TARGET=threadlib.dll
 
-OBJ=fifo.o callbacks.o threadlib.o sleep.o detach.o \
-    join.o threadedsf.o
+OBJ=fifo.o callbacks.o threadlib.o \
+    sleep.o detach.o join.o
 
 CC = gcc
 LD = gcc
-INCLUDE=-I$(PDSCR) -I.
-LIB=$(PD-PATH)/bin/pd.dll
-CC_FLAGS = -DPD -DWINDOWS -c -mms-bitfields \
+INCLUDE = -I$(PDSCR) -I.
+LIB = $(PDPATH)/bin/pd.dll \
+      c:/windows/system/pthreadGC.dll
+CC_FLAGS = -DPD -DMSW -c -mms-bitfields \
            -Wall -Wno-parentheses -Wno-switch -O3 \
-           -funroll-loops -fomit-frame-pointer -pthread
+           -funroll-loops -fomit-frame-pointer
 LD_FLAGS = --export-dynamic -shared -o
 
 # --------------------------------------------------
 
-all: pd_linux
+all: dll
 
-pd_linux: $(TARGET)
+dll: $(TARGET)
 
 $(TARGET): $(OBJ)
 	$(LD) $(LD_FLAGS) $(TARGET) $(OBJ) $(LIB)
@@ -53,9 +54,6 @@ detach.o: threadlib.o fifo.o detach.c
 
 join.o: threadlib.o callbacks.o join.c
 	$(CC) $(CC_FLAGS) $(INCLUDE) join.c
-
-threadedsf.o: threadlib.o callbacks.o threadedsf.c
-	$(CC) $(CC_FLAGS) $(INCLUDE) threadedsf.c
 
 # --------------------------------------------------
 

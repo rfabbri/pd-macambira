@@ -49,7 +49,7 @@ static void join_bang(join_t * x)
   t_int* argv = getbytes(sizeof(t_int*));
   argv[0] = (t_int)x->x_outlet;
   
-  h_set_callback(join_bang_callback, argv, 1);
+  sys_callback(join_bang_callback, argv, 1);
 }
 
 static t_int join_pointer_callback(t_int * argv)
@@ -64,7 +64,7 @@ static void join_pointer(join_t * x, t_gpointer * gp)
   argv[0] = (t_int)x->x_outlet;
   argv[1] = (t_int)gp;
 
-  h_set_callback(join_pointer_callback, argv, 2);
+  sys_callback(join_pointer_callback, argv, 2);
 }
 
 static t_int join_float_callback(t_int * argv)
@@ -79,7 +79,7 @@ static void join_float(join_t * x, t_float f)
   argv[0] = (t_int)x->x_outlet;
   argv[1] = (t_int)f;
 
-  h_set_callback(join_float_callback, argv, 2);
+  sys_callback(join_float_callback, argv, 2);
 }
 
 static t_int join_symbol_callback(t_int * argv)
@@ -94,7 +94,7 @@ static void join_symbol(join_t * x, t_symbol * s)
   argv[0] = (t_int)x->x_outlet;
   argv[1] = (t_int)s;
 
-  h_set_callback(join_symbol_callback, argv, 2);
+  sys_callback(join_symbol_callback, argv, 2);
 }
 
 static t_int join_list_callback(t_int * argv)
@@ -113,7 +113,7 @@ static void join_list(join_t * x, t_symbol * s, int argc, t_atom* largv)
   argv[1] = (t_int)argc;
   argv[2] = (t_int)copied_argv;
 
-  h_set_callback(join_list_callback, argv, 3);
+  sys_callback(join_list_callback, argv, 3);
 }
 
 static t_int join_anything_callback(t_int * argv)
@@ -144,7 +144,7 @@ static void join_anything(join_t * x, t_symbol * s, int argc, t_atom* largv)
   argv[1] = (t_int)copied_argc;
   argv[2] = (t_int)copied_argv;
 
-  h_set_callback(join_anything_callback, argv, 3);
+  sys_callback(join_anything_callback, argv, 3);
 }
 
 void join_setup(void)

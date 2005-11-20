@@ -21,7 +21,14 @@
 */
 
 #include "threadlib.h"
+
+// include for sleep
+#ifdef MSW
+#include <windows.h>
+#define sleep(t) Sleep(1000*(t))
+#else
 #include <unistd.h>
+#endif
 
 static t_class *sleep_class;
 
@@ -41,9 +48,7 @@ static void sleep_float(t_sleep * x, t_float f)
 static void *sleep_new(void)
 {
   t_sleep *x = (t_sleep *)pd_new(sleep_class);
-
   x->x_outlet = outlet_new(&x->x_obj,&s_float);
-
   return (void *)x;
 }
 

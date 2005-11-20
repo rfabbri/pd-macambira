@@ -1,4 +1,9 @@
-threadlib installation
+threadlib binary:
+  get them on http://grh.mur.at/software/threadlib.html
+  and follow the instructions there
+
+
+threadlib compilation:
 
 1) open the right makefile for your platform/compiler
 

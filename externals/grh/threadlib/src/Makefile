@@ -3,7 +3,7 @@
 
 # this should point to the directory which contains
 # m_pd.h and g_canvas.h
-PDSCR=/home/holzi/pd-0.39-1test1/src
+PDSCR=/home/holzi/pd-0.39-1/src
 
 # this is the pd directory, here the files will be
 # installed
@@ -13,8 +13,8 @@ PDPATH=/usr/lib/pd
 
 TARGET=threadlib.pd_linux
 
-OBJ=fifo.o callbacks.o threadlib.o sleep.o detach.o \
-    join.o threadedsf.o
+OBJ=fifo.o callbacks.o threadlib.o \
+    sleep.o detach.o join.o
 
 CC = gcc
 LD = gcc
@@ -53,9 +53,6 @@ detach.o: threadlib.o fifo.o detach.c
 
 join.o: threadlib.o callbacks.o join.c
 	$(CC) $(CC_FLAGS) $(INCLUDE) join.c
-
-threadedsf.o: threadlib.o callbacks.o threadedsf.c
-	$(CC) $(CC_FLAGS) $(INCLUDE) threadedsf.c
 
 # --------------------------------------------------
 
