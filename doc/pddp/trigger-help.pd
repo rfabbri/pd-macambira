@@ -1,4 +1,4 @@
-#N canvas 145 60 985 628 10;
+#N canvas 145 60 989 632 10;
 #X obj 26 16 trigger;
 #X text 24 230 As I see it \, the [trigger] object serves two great
 purposes which aren't really related - but they might be on some level
@@ -214,6 +214,105 @@ time" between "bangs" from the [trigger] object.;
 #X text 86 15 - sequence messages in right-to-left order and convert
 data;
 #X text 503 15 types;
+#N canvas 127 144 682 490 trigger 0;
+#X obj 14 298 trigger anything bang float list pointer symbol;
+#X obj 19 318 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 83 318 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 147 317 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 213 318 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 278 317 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 343 318 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 200 386 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 278 386 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 103 365 route float;
+#X obj 103 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 167 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 312 388 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 376 388 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 17 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 81 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 17 365 route bang;
+#X obj 312 367 route symbol;
+#X obj 200 366 route list;
+#X msg 43 174 1 2 3;
+#X msg 15 77 1;
+#X msg 21 102 float 2;
+#X msg 28 126 test;
+#X msg 35 151 symbol this;
+#X msg 57 220 list 1 two 3;
+#X msg 66 267 list one 2 three;
+#X obj 165 443 print LIST;
+#X obj 81 443 print FLOAT;
+#X msg 48 199 1 two 3;
+#X msg 61 244 one 2 three;
+#X obj 397 152 trigger anything;
+#X obj 437 186 print;
+#X obj 396 207 prepend set;
+#X msg 397 231 0;
+#X msg 511 94 bang;
+#X obj 610 187 print;
+#X obj 569 208 prepend set;
+#X msg 570 232 0;
+#X obj 570 153 trigger list;
+#X msg 552 96 list;
+#X text 405 56 These two triggers convert bangs to 0;
+#X text 18 16 "float" is interpreted;
+#X text 19 36 "symbol" is not interpreted;
+#X text 20 55 "list" is interpreted \, and outputted;
+#X connect 0 0 1 0;
+#X connect 0 1 2 0;
+#X connect 0 1 16 0;
+#X connect 0 2 3 0;
+#X connect 0 2 9 0;
+#X connect 0 2 27 0;
+#X connect 0 3 4 0;
+#X connect 0 3 18 0;
+#X connect 0 3 26 0;
+#X connect 0 4 5 0;
+#X connect 0 5 6 0;
+#X connect 0 5 17 0;
+#X connect 9 0 10 0;
+#X connect 9 1 11 0;
+#X connect 16 0 14 0;
+#X connect 16 1 15 0;
+#X connect 17 0 12 0;
+#X connect 17 1 13 0;
+#X connect 18 0 7 0;
+#X connect 18 1 8 0;
+#X connect 19 0 0 0;
+#X connect 20 0 0 0;
+#X connect 21 0 0 0;
+#X connect 22 0 0 0;
+#X connect 23 0 0 0;
+#X connect 24 0 0 0;
+#X connect 25 0 0 0;
+#X connect 28 0 0 0;
+#X connect 29 0 0 0;
+#X connect 30 0 31 0;
+#X connect 30 0 32 0;
+#X connect 32 0 33 0;
+#X connect 34 0 30 0;
+#X connect 34 0 38 0;
+#X connect 36 0 37 0;
+#X connect 38 0 35 0;
+#X connect 38 0 36 0;
+#X connect 39 0 30 0;
+#X connect 39 0 38 0;
+#X restore 475 350 pd trigger has a few odd conditions;
 #X connect 3 0 5 0;
 #X connect 4 0 3 1;
 #X connect 6 0 11 0;
