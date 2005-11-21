@@ -72,7 +72,8 @@ tutorials_install: $(MANUALS_DEST)
 # playnow
 	install -d $(MANUALS_DEST)/PlayNow
 	install -p $(DOC_SRC)/tutorials/playnow/*.pd $(MANUALS_DEST)/PlayNow
-	install -p $(DOC_SRC)/tutorials/playnow/*.mid $(MANUALS_DEST)/PlayNow
+# these aren't needed yet <hans@at.or.at>
+#	install -p $(DOC_SRC)/tutorials/playnow/*.mid $(MANUALS_DEST)/PlayNow
 
 
 #==============================================================================#
@@ -91,6 +92,8 @@ devsymlinks:
 	ln -s $(PD_SRC)/doc/4.data.structures $(DOC_SRC)/4.data.structures
 	ln -s $(PD_SRC)/doc/7.stuff $(DOC_SRC)/7.stuff
 	ln -s $(PD_SRC)/doc/sound $(DOC_SRC)/sound
+# put the pddp support objects in the path
+	ln -s $(ABSTRACTIONS_SRC)/pddp $(DOC_SRC)/pddp/pddp
 
 #==============================================================================#
 #
