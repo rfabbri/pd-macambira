@@ -38,8 +38,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 #------------------------------------------------------------------------------#
 # BUILD
-all: pre_all_$(OS_NAME) 
-all: creb iemabs iemlib iemmatrix pdp pmpd vbap zexy
+all: pre_all_$(OS_NAME) creb cyclone iemabs iemlib iemmatrix pddp pdp pmpd \
+		toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
 	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make -k 
@@ -57,9 +57,9 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: $(OBJECTS_DEST) help_install objects_install unfiltered_install
-install: creb_install iemabs_install iemabs_install iemmatrix_install
-install: pdp_install pmpd_install vbap_install zexy_install
+install: $(OBJECTS_DEST) help_install objects_install unfiltered_install \
+ creb_install cyclone_install iemabs_install iemabs_install iemmatrix_install \
+ pddp_install pdp_install pmpd_install toxy_install vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -168,6 +168,41 @@ creb_install: creb
 
 
 #------------------------------------------------------------------------------#
+# CYCLONE
+CYCLONE_NAME=cyclone
+# cyclone is compiled straight into $(OUT_DIR)
+CYCLONE_OUT_DIR=$(OBJECTS_DEST)/$(CYCLONE_NAME)
+cyclone:
+
+
+cyclone_install: cyclone
+	install -d $(OBJECTS_DEST)/$(CYCLONE_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(CYCLONE_NAME) \
+		--author "Kzrysztof Czaja" \
+		--license "BSD" \
+		--description "a library for porting and running Max/MSP patches in Pd"
+	cd $(EXTERNALS_SRC)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
+# install "cyclist" command line app with pd
+	install -d $(BIN_DEST)
+# this doesn't build in the right place yet
+#	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(BIN_DEST) && \
+#		rm $(CYCLONE_OUT_DIR)/cyclist
+# rename cyclone lib since it will pre-empt libdir functionality
+	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
+		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
+	install -d $(HELP_DEST)/$(CYCLONE_NAME)
+	install -p $(EXTERNALS_SRC)/miXed/doc/help/cyclone/*.*  \
+		$(HELP_DEST)/$(CYCLONE_NAME)
+#	install -d $(MANUALS_DEST)/$(CYCLONE_NAME)
+	install -d $(APPLICATIONS_DEST)/$(CYCLONE_NAME)
+	install -p $(EXTERNALS_SRC)/miXed/test/cyclone/*.*  \
+		$(APPLICATIONS_DEST)/$(CYCLONE_NAME)
+
+
+
+
+
+#------------------------------------------------------------------------------#
 # IEMABS
 IEMABS_NAME=iemabs
 iemabs:
@@ -224,6 +259,29 @@ iemmatrix_install: iemmatrix
 
 
 #------------------------------------------------------------------------------#
+# PDDP
+PDDP_NAME=pddp
+# pddp is compiled straight into $(OUT_DIR)
+PDDP_OUT_DIR=$(OBJECTS_DEST)/$(PDDP_NAME)
+pddp:
+
+
+pddp_install: pddp
+	install -d $(OBJECTS_DEST)/$(PDDP_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(PDDP_NAME) \
+		--author "PDDP" \
+		--license "BSD" \
+		--description "objects for working with Tcl and Pd's Tk GUI"
+	cd $(EXTERNALS_SRC)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
+#	install -d $(HELP_DEST)/$(PDDP_NAME)
+#	install -d $(MANUALS_DEST)/$(PDDP_NAME)
+	install -d $(APPLICATIONS_DEST)/$(PDDP_NAME)
+	install -p $(EXTERNALS_SRC)/miXed/test/pddp/*.*  \
+		$(APPLICATIONS_DEST)/$(PDDP_NAME)
+
+
+
+#------------------------------------------------------------------------------#
 # PDP
 PDP_NAME=pdp
 pdp:
@@ -233,9 +291,9 @@ pdp:
 
 pdp_install: pdp
 #	install -d $(OBJECTS_DEST)/$(PDP_NAME)
-#	install -p $(EXTERNALS_SRC)/pdp/*.pd_darwin $(OBJECTS_DEST)
-#	install -p $(EXTERNALS_SRC)/pidip/*.pd_darwin $(OBJECTS_DEST)
-#	install -p $(EXTERNALS_SRC)/gem2pdp/*.pd_darwin $(OBJECTS_DEST)
+#	install -p $(EXTERNALS_SRC)/pdp/*.$(EXTENSION) $(OBJECTS_DEST)
+#	install -p $(EXTERNALS_SRC)/pidip/*.$(EXTENSION) $(OBJECTS_DEST)
+#	install -p $(EXTERNALS_SRC)/gem2pdp/*.$(EXTENSION) $(OBJECTS_DEST)
 	install -p $(EXTERNALS_SRC)/pdp/abstractions/*.pd $(OBJECTS_DEST)
 #	install -d $(HELP_DEST)/$(PDP_NAME)
 	install -p $(EXTERNALS_SRC)/pdp/doc/objects/*.* $(HELP_DEST)
@@ -246,6 +304,7 @@ pdp_install: pdp
 	install -d $(APPLICATIONS_DEST)/$(PDP_NAME)
 	install -p $(EXTERNALS_SRC)/pdp/doc/examples/*.* \
 		$(APPLICATIONS_DEST)/$(PDP_NAME)
+
 
 
 #------------------------------------------------------------------------------#
@@ -266,6 +325,32 @@ pmpd_install: pmpd
 	install -d $(APPLICATIONS_DEST)/$(PMPD_NAME)
 	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd \
 		$(APPLICATIONS_DEST)/$(PMPD_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# TOXY
+TOXY_NAME=toxy
+# toxy is compiled straight into $(OUT_DIR)
+TOXY_OUT_DIR=$(OBJECTS_DEST)/$(TOXY_NAME)
+toxy:
+
+
+toxy_install: toxy
+	install -d $(OBJECTS_DEST)/$(TOXY_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(TOXY_NAME) \
+		--author "Kzrysztof Czaja" \
+		--license "BSD" \
+		--description "objects for working with Tcl and Pd's Tk GUI"
+	cd $(EXTERNALS_SRC)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
+	install -d $(HELP_DEST)/$(TOXY_NAME)
+	install -p $(EXTERNALS_SRC)/miXed/doc/help/toxy/*.*  \
+		$(HELP_DEST)/$(TOXY_NAME)
+#	install -d $(MANUALS_DEST)/$(TOXY_NAME)
+	install -d $(APPLICATIONS_DEST)/$(TOXY_NAME)
+	install -p $(EXTERNALS_SRC)/miXed/test/toxy/*.*  \
+		$(APPLICATIONS_DEST)/$(TOXY_NAME)
+
 
 
 #------------------------------------------------------------------------------#
@@ -296,7 +381,7 @@ zexy:
 
 zexy_install: zexy
 	install -d $(OBJECTS_DEST)/$(ZEXY_NAME)
-#	install -p $(EXTERNALS_SRC)/zexy/src/*.pd_darwin $(OBJECTS_DEST)/$(ZEXY_NAME)
+#	install -p $(EXTERNALS_SRC)/zexy/src/*.$(EXTENSION) $(OBJECTS_DEST)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
 		$(OBJECTS_DEST)/$(ZEXY_NAME)
@@ -321,7 +406,7 @@ unfiltered_install:
 			 grep -v '\-help.pd') $(OBJECTS_DEST)
 # hid
 	cd $(EXTERNALS_SRC)/hcs/hid && $(MAKE) 
-	install -p $(EXTERNALS_SRC)/hcs/hid/hid.pd_darwin $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/hcs/hid/hid.$(EXTENSION) $(OBJECTS_DEST)
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/hid/*.pd | \
 			 grep -v '\-help.pd'| grep -v '\-list.pd') $(OBJECTS_DEST)
 # general
@@ -330,29 +415,14 @@ unfiltered_install:
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/pan/*.pd | \
 			 grep -v '\-help.pd') $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
-# miXed
-	cd $(EXTERNALS_SRC)/miXed/toxy && $(MAKE)
-	cd $(EXTERNALS_SRC)/miXed/cyclone && $(MAKE)
-	cd $(EXTERNALS_SRC)/miXed/pddp && $(MAKE)
-	install -d $(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/miXed/bin/*.pd_darwin $(OBJECTS_DEST)
-	install -d $(HELP_DEST)/cyclone
-	install -p $(EXTERNALS_SRC)/miXed/test/*/*.*    \
-		$(HELP_DEST)/cyclone
-	install -p $(EXTERNALS_SRC)/miXed/doc/*/*/*.*  \
-		$(HELP_DEST)
-# install cyclist with pd
-	install -d $(INSTALL_PREFIX)/bin
-	install -p $(EXTERNALS_SRC)/miXed/bin/cyclist $(INSTALL_PREFIX)/bin
-#----------------------------------------------------------------------------
 # OSC
 	cd $(EXTERNALS_SRC)/OSCx && ./configure && $(MAKE)
 	install -p $(EXTERNALS_SRC)/OSCx/doc/*.* $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/OSCx/src/*.pd_darwin $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/OSCx/src/*.$(EXTENSION) $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
 # unauthorized
 	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE) 
-	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd_darwin $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/unauthorized/*/*.$(EXTENSION) $(OBJECTS_DEST)
 	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd $(HELP_DEST)
 	install -p $(EXTERNALS_SRC)/unauthorized/*/*.txt $(HELP_DEST)
 	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pls $(HELP_DEST)
