@@ -102,7 +102,7 @@ LD_DARWIN = -bundle -undefined suppress -flat_namespace \
 
 .c.pd_darwin:
 	$(CC) $(CC_FLAGS) $(CC_DARWIN) $(INCLUDE) -o $*.o -c $*.c
-	$(LD) $(LD_DARWIN) -o $*.pd_linux $*.o $(LIB)
+	$(LD) $(LD_DARWIN) -o $*.pd_darwin $*.o $(LIB)
 	chmod 755 $*.pd_darwin
 	@test -d ../bin || mkdir -p ../bin
 	cp $*.pd_darwin ../bin
