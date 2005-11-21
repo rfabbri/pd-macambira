@@ -56,7 +56,6 @@ else
   endif
 endif
 
-
 #==============================================================================#
 #
 # DIRECTORY STRUCTURE
@@ -111,6 +110,31 @@ $(MANUALS_DEST): $(INSTALL_PREFIX)
 
 $(OBJECTS_DEST): $(INSTALL_PREFIX)
 	install -d $(OBJECTS_DEST)
+
+
+#==============================================================================#
+#
+# PD VERSION AND PACKAGE NAMING
+#
+#==============================================================================#
+
+
+PD_MAJOR_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*\\n";/\1/')
+PD_MINOR_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
+PD_BUGFIX_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
+# the separators [.-] need to be the same as in s_main.c or the regexps break
+PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
+
+
+# release version for this distro
+PACKAGE_VERSION = extended-RC3
+PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
+DMG_NAME = $(PACKAGE_NAME)
+
+
 
 
 #==============================================================================#

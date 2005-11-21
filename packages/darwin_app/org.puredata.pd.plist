@@ -12,6 +12,14 @@
 	<string>dyn~</string>
 	<key>loadlib5</key>
 	<string>pmpd</string>
+	<key>loadlib6</key>
+	<string>cyclone</string>
+	<key>loadlib7</key>
+	<string>memento</string>
+	<key>loadlib8</key>
+	<string>toxy</string>
+	<key>loadlib9</key>
+	<string></string>
 	<key>standardpath</key>
 	<string>1</string>
 </dict>

@@ -28,21 +28,6 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #==============================================================================#
 
 
-PD_MAJOR_VERSION := $(shell /usr/bin/grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES]*[0-9]*[0-9extndRC.-]*\\n";/\1/')
-PD_MINOR_VERSION := $(shell /usr/bin/grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
-PD_BUGFIX_VERSION := $(shell /usr/bin/grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
-PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION)-$(PD_BUGFIX_VERSION)
-
-
-# release version for this distro
-PACKAGE_VERSION = extended-RC3
-PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
-DMG_NAME = $(PACKAGE_NAME)
-
-
 CYCLONE_MAJOR_VERSION := $(shell grep CYCLONE_VERSION \
 	$(EXTERNALS_SRC)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
@@ -231,9 +216,12 @@ gem_install:
 
 #------------------------------------------------------------------------------
 # pd
+PD_NAME=Pd
 pd_install: pd
 	cd $(PD_SRC)/src && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS) install
+	install -d $(MANUALS_DEST)/$(PD_NAME)
+	install -p $(PD_SRC)/src/notes.txt $(MANUALS_DEST)/$(PD_DEST)
 
 
 #------------------------------------------------------------------------------
@@ -251,20 +239,22 @@ install: pd_install abstractions_install doc_install externals_install
 #
 #==============================================================================#
 
-LICENSE_FILE = $(INSTALL_PREFIX)/License.html
+LICENSE_FILE = $(MANUALS_DEST)/$(PD_NAME)/License.html
 license_install:
   # generate HTML version of License
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
-	echo "<h3>(Parts of this package can be used under the Pd/BSD license)</h3>" >> "$(LICENSE_FILE)"
+	echo "<h3>(Parts of this package can be used under " >> "$(LICENSE_FILE)"
+	echo "<a href="PD%20LICENSE.txt">Pd&quot;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
 	echo "<font size=\"-1\">" >> "$(LICENSE_FILE)"
 	cat "$(EXTERNALS_SRC)/creb/COPYING" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
 	echo "</font></body></html>" >> $(LICENSE_FILE)
-	install -p "$(PD_SRC)/LICENSE.txt" "$(INSTALL_PREFIX)/PD LICENSE.txt"
+# Pd's license file
+	install -p "$(PD_SRC)/LICENSE.txt" "$(MANUALS_DEST)/$(PD_NAME)/PD LICENSE.txt"
 
 
 
-WELCOME_FILE = $(INSTALL_PREFIX)/Welcome.html
+WELCOME_FILE = $(MANUALS_DEST)/$(PD_NAME)/Welcome.html
 welcome_install:
 	touch $(WELCOME_FILE)
 	echo "<html><body><p><p>" >> $(WELCOME_FILE)
@@ -278,7 +268,7 @@ welcome_install:
 
 
 
-README_FILE = $(INSTALL_PREFIX)/ReadMe.html
+README_FILE = $(MANUALS_DEST)/$(PD_NAME)/ReadMe.html
 readme_install: 
 	echo $(CYCLONE_RELEASE)
 	-rm $(README_FILE)
@@ -368,6 +358,7 @@ devsymlinks:
 
 
 patch_pd:
+	@echo PD_SRC $(PD_SRC)
 # change Pd's version number to reflect the extended build
 	sed -i.bak 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  $(PD_SRC)/src/s_main.c
 # apply all platform-neutral patches
@@ -384,11 +375,12 @@ patch_pd:
 	@echo " "
 	@echo "patching succeeded!"
 
+
 unpatch_pd:
-# this sed pattern won't work with TEST versions
-	cd $(PD_SRC)/src && \
-		sed -i.bak 's/\(pd_version\[\] = "Pd version [0-9.]*\)[0-9extndRC.-]*/\1/' \
-			s_main.c
+# this sed pattern won't work with TEST versions.  
+	sed -i.bak \
+		's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
+		$(PD_SRC)/src/s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \

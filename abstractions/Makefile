@@ -190,7 +190,6 @@ objects_pddp:
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/pddp/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(PDDP_NAME)
 	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(PDDP_NAME) \
-		--author "Hans-Christoph Steiner" \
 		--license "GNU GPL" \
 		--description "support objects for the Pure Data Documentation Project"
 	install -d $(HELP_DEST)/$(PDDP_NAME)
@@ -198,6 +197,7 @@ objects_pddp:
 		$(HELP_DEST)/$(PDDP_NAME)
 #	install -d $(MANUALS_DEST)/$(PDDP_NAME)
 #	install -d $(APPLICATIONS_DEST)/$(PDDP_NAME)
+
 
 #-------------------------------------------------------------------------------
 # RRADical

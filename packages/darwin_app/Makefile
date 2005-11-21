@@ -38,7 +38,9 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_app_install
+darwin_app: darwin_app_core extended_app_install rez
+	@echo " "
+	@echo "Pd.app build succeeded!"
 
 #------------------------------------------------------------------------------#
 # this target is for when you already have a pre-built Pd.app and you
@@ -68,32 +70,34 @@ darwin_app_wrapper:
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
-# rename the Wish Shell executable to "pd", the all lowercase is important
-# since it needs to match the pd executable in order for the Gem windows to
-# get focus properly
 	mv "$(PD_APP_CONTENTS)/MacOS/Wish Shell" \
-		"$(PD_APP_CONTENTS)/MacOS/pd"
+		"$(PD_APP_CONTENTS)/MacOS/$(PD_APP_NAME)"
 #	diskutil eject /Volumes/$(TCLTK)
 
+
+#------------------------------------------------------------------------------#
+# generate Info.plist using PD_APP_NAME and PD_VERSION
+Info.plist: Info.plist.in 
+
+
+# tigital's Gem window focus black magic
+rez:
+	install -p $(CWD)/mac.r $(BIN_DEST)
+	cd $(BIN_DEST) && /Developer/tools/Rez -t APPL mac.r -o pd
 
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
 	cd $(PACKAGES_SRC) && \
 		make $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
-# tigital's Gem window focus black magic:
-	install -p $(CWD)/mac.r $(BIN_DEST)
-	cd $(BIN_DEST) && /Developer/tools/Rez -t APPL mac.r -o pd
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
-# Headers
-	install -d $(INSTALL_PREFIX)/include
-	install $(PD_SRC)/src/*.h $(INSTALL_PREFIX)/include
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(DOCS_DEST) && \
 		$(SCRIPTS_SRC)/convert-help-to-standard.sh
+
 
 
 darwin_app_doc_format:
@@ -288,8 +292,9 @@ darwin_app_perms:
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/$(DMG_NAME).app"
-	install -p -m0444 $(INSTALL_PREFIX)/*.txt $(INSTALL_PREFIX)/*.html  \
-		"$(CWD)/$(DMG_NAME)"
+#	install -p -m0444 $(MANUALS_DEST)/$(PD_NAME)/PD\ LICENSE.txt \
+#		$(MANUALS_DEST)/*.html "$(CWD)/$(DMG_NAME)"
+	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 

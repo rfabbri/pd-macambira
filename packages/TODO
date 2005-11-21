@@ -1,4 +1,12 @@
 
+- rename "applications" to "examples"
+
+- downcase *_DEST and *_SRC to be more readable
+
+- On GNU/Linux, figure out how to deal with build/extra vs. build/lib/pd/extra
+
+- fix unpatch_pd bug that doesn't fix the version name in s_main.c
+
 - global versioning system
   		the package releases should have versions of there own which apply to
   		all packages, regardless of format or OS.  This will make for easy and
@@ -10,27 +18,7 @@
   		developed so that you can specific the target CPU in one place and have
   		everything compile for that CPU.
 
-- libdir
-
-	 - document libdir format
-
-	 - write .sh script that generates the mylibrary/mylibrary.pd file with the
-  	 	meta data.  It should take command line arguments, and put them into the
-  	 	meta file.
-
-- rename "applications" to "examples"
-
-- downcase *_DEST and *_SRC to be more readable
-
-- make pd section since I can't easily modify the pd tree
-
-- add notes.txt to manuals
-
-- create patch system and incorporate IO's hex patch
-
-- hex convertor for setup function names, and object file names
-
-- merge in tigital's Makefile++
+- document libdir format
 
 - add GRIPD for Anders
 

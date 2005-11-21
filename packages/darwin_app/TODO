@@ -1,4 +1,6 @@
 
+- make Info.plist.in template and have the Makefile create Info.plist
+
 - check to make sure that Rez mac.r is working in Makefile
 
 - make Pd open a new window when its launched to workaround the bug where the
