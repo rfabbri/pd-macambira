@@ -1,10 +1,10 @@
-#N canvas 320 94 591 588 10;
+#N canvas 183 30 603 600 10;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X text 104 463 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
+#X text 104 483 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 135 30 504 632 More_Info 0;
+#N canvas 135 30 508 636 More_Info 0;
 #X text 17 4 COMMON USES;
 #X text 15 577 INNOVATIVE USES;
 #X text 47 19 I believe that this object was developed first to allow
@@ -216,7 +216,7 @@ of the decimal is discarded.;
 #X connect 19 0 21 0;
 #X connect 20 0 18 0;
 #X connect 22 0 11 0;
-#X restore 104 513 pd More_Info;
+#X restore 106 507 pd More_Info;
 #N canvas 85 22 397 246 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
 #X text 25 92 Externals and other object libraries;
@@ -225,12 +225,12 @@ of the decimal is discarded.;
 #X obj 156 46 openpanel;
 #X obj 31 126 strcat;
 #X obj 32 155 makesymbol;
-#X restore 104 487 pd Related_Objects;
+#X restore 379 507 pd Related_Objects;
 #X text 38 53 INLETS:;
 #X text 15 197 ARGUMENTS:;
 #X text 29 316 OUTLETS:;
 #X text 22 342 EXAMPLES:;
-#X text 21 462 SEE ALSO:;
+#X text 21 482 SEE ALSO:;
 #X obj 10 18 makefilename;
 #X text 115 18 - FORMAT A STRING WITH A VARIABLE FIELD.;
 #X text 104 316 Symbol - The output is formatted like "symbol YOURSTRING".
@@ -261,6 +261,33 @@ checking. Each [makefilename] object can have only one variable.;
 should be written with a "%c" \, "%d" \, or "%X" which represents the
 location of the incoming variable number in the outgoing symbol. Floats
 will be converted to integers.;
+#N canvas 325 212 524 316 all 0;
+#X text 37 59 %c;
+#X text 114 59 character;
+#X text 37 79 %d or %i;
+#X text 114 79 signed decimal integer;
+#X text 37 99 %e;
+#X text 114 99 scientific notation using "e" character;
+#X text 37 119 %E;
+#X text 114 119 scientific notation using "e" character;
+#X text 37 139 %f;
+#X text 37 159 %o;
+#X text 114 159 signed octal;
+#X text 37 179 %s;
+#X text 114 179 symbol;
+#X text 37 199 %u;
+#X text 114 199 unsigned integer;
+#X text 37 219 %x;
+#X text 114 219 unsigned hexadecimal in lowercase;
+#X text 37 239 %X;
+#X text 114 239 unsigned hexadecimal in CAPS;
+#X text 37 259 %p;
+#X text 114 259 unsigned hexadecimal in lowercase preceeded by "0x"
+;
+#X text 24 10 This is a listing of all possible printf patterns used
+in Pd's [makefilename]:;
+#X text 114 139 decimal floating point (currently broken);
+#X restore 201 507 pd all possible patterns;
 #X connect 13 0 24 0;
 #X connect 15 0 20 0;
 #X connect 16 0 15 0;
