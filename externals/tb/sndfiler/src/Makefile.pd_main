@@ -96,11 +96,13 @@ pd_darwin: $(NAME).pd_darwin
 
 CC_DARWIN = -pthread
 LD_DARWIN = -bundle -undefined suppress -flat_namespace \
-            -bundle_loader $(PD_PATH)/bin/pd --export-dynamic
+            -bundle_loader $(PD_PATH)/bin/pd --export-dynamic \
+            -L/sw/lib -L/opt/local/lib -lsndfile \
+            $(THREADLIB_PATH)/threadlib.pd_darwin
 
 .c.pd_darwin:
 	$(CC) $(CC_FLAGS) $(CC_DARWIN) $(INCLUDE) -o $*.o -c $*.c
-	$(LD) $(LD_DARWIN) $*.pd_linux $*.o $(LIB)
+	$(LD) $(LD_DARWIN) -o $*.pd_linux $*.o $(LIB)
 	chmod 755 $*.pd_darwin
 	@test -d ../bin || mkdir -p ../bin
 	cp $*.pd_darwin ../bin
