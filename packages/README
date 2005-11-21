@@ -1,4 +1,19 @@
 
+Pd-extended build system
+========================
+
+Check out this webpage for full documentation:
+
+	http://puredata.org/docs/developer/build
+
+While you are there, check out the rest of them:
+
+	http://puredata.org/docs/developer/
+
+
+Adding specific package types
+=============================
+
 This directory is for package builders for various platforms.  The
 directories here should be named using the following format:
 

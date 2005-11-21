@@ -1,0 +1,59 @@
+? configure
+Index: d_mayer_fft.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/d_mayer_fft.c,v
+retrieving revision 1.3
+diff -u -w -r1.3 d_mayer_fft.c
+--- d_mayer_fft.c	18 May 2005 04:28:50 -0000	1.3
++++ d_mayer_fft.c	17 Nov 2005 23:29:25 -0000
+@@ -48,7 +48,8 @@
+ * of work.  -msp
+ */
+ 
+-#ifdef MSW
++/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
++#ifdef _MSC_VER
+ #pragma warning( disable : 4305 )  /* uncast const double to float */
+ #pragma warning( disable : 4244 )  /* uncast double to float */
+ #pragma warning( disable : 4101 )  /* unused local variables */
+Index: m_pd.h
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/m_pd.h,v
+retrieving revision 1.8
+diff -u -w -r1.8 m_pd.h
+--- m_pd.h	19 Aug 2005 23:28:03 -0000	1.8
++++ m_pd.h	17 Nov 2005 23:29:25 -0000
+@@ -17,12 +17,13 @@
+ #define MSW
+ #endif
+ 
+-#ifdef MSW
++/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
++#ifdef _MSC_VER
+ /* #pragma warning( disable : 4091 ) */
+ #pragma warning( disable : 4305 )  /* uncast const double to float */
+ #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
+ #pragma warning( disable : 4101 )  /* unused automatic variables */
+-#endif /* MSW */
++#endif /* _MSC_VER */
+ 
+     /* the external storage class is "extern" in UNIX; in MSW it's ugly. */
+ #ifdef MSW
+Index: t_tkcmd.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/t_tkcmd.c,v
+retrieving revision 1.6
+diff -u -w -r1.6 t_tkcmd.c
+--- t_tkcmd.c	15 Oct 2005 23:14:28 -0000	1.6
++++ t_tkcmd.c	17 Nov 2005 23:29:25 -0000
+@@ -30,7 +30,9 @@
+ #include <winsock.h>
+ #include <io.h>
+ #endif
+-#ifdef MSW
++
++/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
++#ifdef _MSC_VER
+ #pragma warning( disable : 4305 )  /* uncast const double to float */
+ #pragma warning( disable : 4244 )  /* uncast double to float */
+ #pragma warning( disable : 4101 )  /* unused local variables */

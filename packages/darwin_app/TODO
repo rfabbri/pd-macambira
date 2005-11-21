@@ -1,23 +1,35 @@
 
-- review permissions so that you can build on top on existing builds
+- make Pd open a new window when its launched to workaround the bug where the
+  menus don't work until a window is opened.
 
-- import nqpoly4 and write helpfiles based on website: 
-  			http://pix.test.at/pd/nqpoly/nqpoly4.html
+- otool dylib help: http://qin.laya.com/tech_coding_help/dylib_linking.html
+
+- add symbolic link for flext 
+  (cd Pd.app/Contents/Resources/extra && ln -s . lib)
+
+- explore Pd.app/Contents/Plugins with "Get Info" installation for externals
+  (just make it a symlink to Resources/extra)
+
+- from Carmen Rocco about [fiddle~] crash: "is fiddle~: * compiled with the same header * linked with the same binary of (lib)pd * compiled with the same compiler? i had very similar issues with bonk on windows (Virtually same stacktrace but s/fiddle/bonk) until fixing the above 3 things..."
+
+- test for noncvs locations before copying to prevent show-stopping errors
+
+- investigate moving pd binary to Contents/MacOS to solve GEM window not
+  getting focus, i.e. no symlink, make it the real binary location
+
+- review permissions so that you can build on top on existing builds
 
 - add standard paths to included org.puredata.pd.plist following these
   guidelines:
 http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles/WhereToPutFiles.html
 
-- explore Pd.app/Contents/Plugins with "Get Info" installation for externals
+- help menu
 
-- include org.puredata.pd.plist file in the DMG
-
-- add "extended" version to pd/src/s_main.c:char pd_version[] = "Pd version 0.38.4\n";
-
-- create old-style Help->Pure Documentation link on Help menu.  It should use a
-  symlink to the "doc" dir internal to that particular Pd.app.  The symlink is
-  named after the complete path to the "doc" dir, like:
-     /tmp/.Applications_Pd-0.38-4.app_Contents_Resources_doc
+  	 - check up on this bug: Opening Help patches from "Pure Documentation"
+   
+    - make help menu function check if item exists before trying to make a
+      menu item so that it doesn't break pd.tk<->pd interaction (i.e. windows
+      titled x50bf90).  (the recursive function might have fixed this)
 
 - try this for the Pref Pane:
  kAEShowPreferences ::tk::mac::ShowPreferences
@@ -34,22 +46,24 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 		 - instead of hiding menus, grey-out/disable menu items on Pd window
 		 - one method for creating all menus
 		 - Pd window has method which disables menus
+		 - flash menu when accelerator hits
+		 - fix edit mode menu item (make it a checkbox or change to "play mode"
 
-- make Cmd-Delete also delete, as well as just Delete, so that my Finder key
-  command habits work in Pd as well
-
-- create general optimization flag system
+- redo key mapping system
+		 - make Cmd-Delete also delete, as well as just Delete, so that my
+		   Finder key command habits work in Pd as well
+		 - make Cmd-click work like Ctrl-click
 
 - convert from -DMACOSX to -D__APPLE__ where ever possible (check out
   __gnu_linux__) while I am at it
 
-
+- instead of shipping Pd.app with a org.puredata.pd.plist, make a script that
+  uses the "defaults" command to add the desired prefs to any existing
+  file. (its a good idea, but unforunately, the key names prevent that from
+  working, i.e. loadlib1, loadlib2, etc)
 
 ------------------------------------------------------------------------------
 semi-abandoned TODOs
-
-
-- make Help menu generator recursive
 
 - make a web page that has stuff that can't be included due to license issues:
   (percolate)

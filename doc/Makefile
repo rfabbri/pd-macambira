@@ -1,42 +1,104 @@
-# Created by Hans-Christoph Steiner <hans@eds.org> to generate MacOS X packages
-# This Makefile does not generate a PDDP pkg, PDDP has its own Makefile
+#==============================================================================#
+#
+# Centralized build system for "doc".  
+#
+# see for instructions: http://puredata.org/docs/developer/build
+#  <hans@at.or.at>
+#
+#==============================================================================#
 
-current: darwin_pkg
+CWD := $(shell pwd)
 
-PACKAGE_VERSION = $(shell date +20%y.%m.%d)
-PACKAGE_PREFIX = pd-doc
-PACKAGE_NAME = $(PACKAGE_PREFIX)-$(PACKAGE_VERSION)
+# these are designed to be overridden by the packages/Makefile
+SRC_ROOT_DIR = $(CWD)/..
+INSTALL_PREFIX = build
+BUILDLAYOUT_DIR = $(CWD)
 
-darwin_pkg_license:
-  # generate HTML version of License
-# 	echo "<HTML><BODY><FONT SIZE="-1">" > License.html
-# 	cat ../../creb/COPYING | sed -e 's/^$$/\<P\>/g' >> License.html	
-# 	echo "</FONT></BODY></HTML>" >> License.html
+# default target
+all:
+	@echo "this currently does nothing"
 
-darwin_pkg_welcome:
-# generate Welcome.html from ../README.txt
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-darwin_pkg_clean:
-	-sudo rm -Rf installroot/ $(PACKAGE_PREFIX)*.pkg/
-	-rm -f $(PACKAGE_PREFIX)-*.info 1 License.html Welcome.???*
+#==============================================================================#
+#
+# OVERARCHING BUILD TARGETS
+#
+#==============================================================================#
 
-# install into MSP's default: /usr/local/lib
+# clean up after everything is installed
+final_setup:
+	chmod -R ugo-w $(DOCS_DEST)
 
-darwin_pkg: darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
-# set up installroot dir
-	-chmod a-x */*/*.pd */*/*/*.pd */*/*/*/*.pd
-	test -d installroot/pd/doc/7.stuff || mkdir -p installroot/pd/doc/7.stuff
-	cp -R tutorials installroot/pd/doc/
-	cp -R additional/pd-msg installroot/pd/doc/7.stuff/
-	cp -f pd-doc.info $(PACKAGE_NAME).info
-# delete cruft
-	-find installroot -name .DS_Store -delete
-	-sudo rm -Rf installroot/*/*/*/CVS installroot/*/*/*/*/CVS  installroot/*/*/*/*/*/CVS
-	-rm -f 1
-# set proper permissions
-	sudo chown -R root:staff installroot
-	package installroot $(PACKAGE_NAME).info -d . -ignoreDSStore
-# install pkg docs
-#	install -m 644 License.html $(PACKAGE_NAME).pkg/Contents/Resources
-	sudo chown -R root:staff $(PACKAGE_NAME).pkg/Contents/Resources
+install: pd-msg_install pddp_install tutorials_install
+	@echo " "
+	@echo "doc install succeeded!"
 
+#==============================================================================#
+#
+# PROJECT-SPECIFIC TARGETS
+#
+#==============================================================================#
+
+#------------------------------------------------------------------------------#
+# PD-MSG
+PD-MSG_NAME = pd-msg
+pd-msg_install: $(MANUALS_DEST)
+	install -d $(MANUALS_DEST)/$(PD-MSG_NAME)
+	install -p $(DOC_SRC)/additional/pd-msg/*.txt \
+		$(MANUALS_DEST)/$(PD-MSG_NAME) 
+	for dir in $(shell cd  $(DOC_SRC)/additional/pd-msg && ls -d [1-5].*); do \
+		echo "Including $$dir in $(PD-MSG_NAME)"; \
+		install -d $(MANUALS_DEST)/$(PD-MSG_NAME)/$$dir; \
+		install -p $(DOC_SRC)/additional/pd-msg/$$dir/*.* \
+			$(MANUALS_DEST)/$(PD-MSG_NAME)/$$dir; \
+	done
+
+
+#------------------------------------------------------------------------------#
+# PDDP
+pddp_install: $(HELP_DEST)
+	install -p $(DOC_SRC)/pddp/*.pd $(HELP_DEST)
+# this file is used in key-help.pd
+	install -p $(DOC_SRC)/pddp/keyboard_fun.txt $(HELP_DEST)
+
+
+#------------------------------------------------------------------------------#
+# TUTORIALS
+tutorials_install: $(MANUALS_DEST)
+# pddrums
+	install -d $(MANUALS_DEST)/PdDrums
+	install -p $(DOC_SRC)/tutorials/footils/pddrums/*.* $(MANUALS_DEST)/PdDrums
+# playnow
+	install -d $(MANUALS_DEST)/PlayNow
+	install -p $(DOC_SRC)/tutorials/playnow/*.pd $(MANUALS_DEST)/PlayNow
+	install -p $(DOC_SRC)/tutorials/playnow/*.mid $(MANUALS_DEST)/PlayNow
+
+
+#==============================================================================#
+#
+# DEVELOPER'S TARGETS
+#
+#==============================================================================#
+
+# make the symlinks necessary to simulate the installed environment
+devsymlinks:
+	ln -s $(PD_SRC)/doc/2.control.examples $(DOC_SRC)/2.control.examples
+	ln -s $(PD_SRC)/doc/3.audio.examples $(DOC_SRC)/3.audio.examples
+# pd <= 0.38-4 has 4.fft.examples
+	ln -s $(PD_SRC)/doc/4.fft.examples $(DOC_SRC)/4.fft.examples
+# pd > 0.38-4 has 4.data.structures
+	ln -s $(PD_SRC)/doc/4.data.structures $(DOC_SRC)/4.data.structures
+	ln -s $(PD_SRC)/doc/7.stuff $(DOC_SRC)/7.stuff
+	ln -s $(PD_SRC)/doc/sound $(DOC_SRC)/sound
+
+#==============================================================================#
+#
+# CLEAN TARGETS
+#
+#==============================================================================#
+
+# the destination-specific clean targets are in Makefile.buildlayout
+clean: install_clean
+
+distclean: clean cruft_clean

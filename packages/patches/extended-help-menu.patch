@@ -103,7 +103,7 @@ RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 +		  #		  }
 +		  if { $file_type == "file" } {
 +				# only put certain file types on the menu
-+				if {[regexp ".*\.(htm|html|c|pd|txt|pdf|wav|aif|aiff)$" $file]} {
++				if {[regexp ".*\.(htm|html|c|pd|txt|tk|pdf|wav|aif|aiff)$" $file]} {
 +					 $helpmenu add command -label $file_name \
 +						  -command "menu_doc_open doc/$base_dir/$sub_dir $file_name"
 +				}

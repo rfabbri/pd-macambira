@@ -1,10 +1,11 @@
+? configure
 Index: s_loader.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
 retrieving revision 1.4
 diff -u -w -r1.4 s_loader.c
 --- s_loader.c	6 Sep 2004 20:20:35 -0000	1.4
-+++ s_loader.c	20 Nov 2005 01:52:20 -0000
++++ s_loader.c	20 Nov 2005 03:47:04 -0000
 @@ -163,3 +163,82 @@
  
  
@@ -94,7 +95,7 @@ RCS file: /cvsroot/pure-data/pd/src/s_main.c,v
 retrieving revision 1.9.2.5
 diff -u -w -r1.9.2.5 s_main.c
 --- s_main.c	24 Feb 2005 01:37:20 -0000	1.9.2.5
-+++ s_main.c	20 Nov 2005 01:52:20 -0000
++++ s_main.c	20 Nov 2005 03:47:04 -0000
 @@ -233,6 +233,7 @@
          /* load dynamic libraries specified with "-lib" args */
      for  (nl = sys_externlist; nl; nl = nl->nl_next)
@@ -109,12 +110,13 @@ RCS file: /cvsroot/pure-data/pd/src/s_stuff.h,v
 retrieving revision 1.5
 diff -u -w -r1.5 s_stuff.h
 --- s_stuff.h	6 Sep 2004 20:20:36 -0000	1.5
-+++ s_stuff.h	20 Nov 2005 01:52:20 -0000
-@@ -47,6 +47,7 @@
- 
++++ s_stuff.h	20 Nov 2005 03:47:04 -0000
+@@ -48,6 +48,8 @@
  /* s_loader.c */
  int sys_load_lib(char *dirname, char *filename);
-+int sys_load_lib_dir(char *dirname, char *filename);
  
++int sys_load_lib_dir(char *dirname, char *filename);
++
  /* s_audio.c */
  
+ #define SENDDACS_NO 0           /* return values for sys_send_dacs() */
