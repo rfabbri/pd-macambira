@@ -773,6 +773,7 @@ static void scrolllist_seek(t_scrolllist *x, t_floatarg fseeked)
       post( "scrolllist : wrong searched file : %f", fseeked );
       return;
    }
+   if ( x->x_nitems == 0 ) return;
 
    iout = (t_int)fseeked % (x->x_nitems);
    SYS_VGUI5(".x%x.c itemconfigure %xITEM%d -fill %s\n", canvas, x, x->x_itemselected, x->x_fgcolor); 
