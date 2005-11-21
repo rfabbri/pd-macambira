@@ -1,0 +1,11 @@
+#N canvas 273 236 140 203 10;
+#X obj 0 0 cnv 15 100 20 empty \$0-pddp_print empty 5 11 1 16 -233017
+-33289 0;
+#X obj 10 156 s \$0-pddp_print;
+#X obj 10 130 prepend label;
+#X obj 9 48 inlet;
+#X obj 9 78 list2symbol;
+#X connect 2 0 1 0;
+#X connect 3 0 4 0;
+#X connect 4 0 2 0;
+#X coords 0 0 1 1 100 20 1;
