@@ -229,7 +229,7 @@ static float set_bits(t_comport *x, int nr)
   if(nr < 4 && nr > 8)
     nr = 8;
   
- // number of bits/byte, 4-8 
+ /*  number of bits/byte, 4-8  */
   return x->dcb.ByteSize = nr;
 }
 
@@ -239,18 +239,18 @@ static float set_parity(t_comport *x,int n)
 {
   switch(n){
   case 1:
-    x->dcb.fParity = TRUE; // enable parity checking
-    x->dcb.Parity = 2;     // 0-4=no,odd,even,mark,space 
+    x->dcb.fParity = TRUE; /*  enable parity checking */
+    x->dcb.Parity = 2;     /*  0-4=no,odd,even,mark,space  */
     return 1;
 
   case -1:
-    x->dcb.fParity = TRUE; // enable parity checking
-    x->dcb.Parity = 1;     // 0-4=no,odd,even,mark,space 
+    x->dcb.fParity = TRUE; /*  enable parity checking */
+    x->dcb.Parity = 1;     /*  0-4=no,odd,even,mark,space  */
     return -1;
 
   default:
-    x->dcb.fParity = FALSE; // enable parity checking
-    x->dcb.Parity = 0;     // 0-4=no,odd,even,mark,space 
+    x->dcb.fParity = FALSE; /*  enable parity checking */
+    x->dcb.Parity = 0;     /*  0-4=no,odd,even,mark,space  */
   }
   return 0;
 }
@@ -260,11 +260,11 @@ static float set_parity(t_comport *x,int n)
 static float set_stopflag(t_comport *x, int nr)
 {
   if(nr == 1){
-    x->dcb.StopBits = 1;             // 0,1,2 = 1, 1.5, 2 
+    x->dcb.StopBits = 1;             /*  0,1,2 = 1, 1.5, 2  */
     return 1;
   }
   else
-    x->dcb.StopBits = 0;             // 0,1,2 = 1, 1.5, 2 
+    x->dcb.StopBits = 0;             /*  0,1,2 = 1, 1.5, 2  */
 
   return 0;
 }
@@ -273,27 +273,27 @@ static float set_stopflag(t_comport *x, int nr)
 static int set_ctsrts(t_comport *x, int nr)
 {
   if(nr == 1){
-  x->dcb.fOutxCtsFlow = TRUE;      // CTS output flow control 
-  x->dcb.fRtsControl = RTS_CONTROL_ENABLE;       // RTS flow control 
+  x->dcb.fOutxCtsFlow = TRUE;      /*  CTS output flow control  */
+  x->dcb.fRtsControl = RTS_CONTROL_ENABLE;       /*  RTS flow control  */
   return 1;
   }
-  x->dcb.fOutxCtsFlow = FALSE;      // CTS output flow control 
-  x->dcb.fRtsControl = RTS_CONTROL_DISABLE;       // RTS flow control 
+  x->dcb.fOutxCtsFlow = FALSE;      /*  CTS output flow control  */
+  x->dcb.fRtsControl = RTS_CONTROL_DISABLE;       /*  RTS flow control  */
   return 0;
 }
 
 static int set_xonxoff(t_comport *x, int nr)
 {
-  //  x->dcb.fTXContinueOnXoff = FALSE; // XOFF continues Tx 
+  /*   x->dcb.fTXContinueOnXoff = FALSE;  XOFF continues Tx  */
 
   if(nr == 1){ 
-    x->dcb.fOutX  = TRUE;           // XON/XOFF out flow control 
-    x->dcb.fInX  = TRUE;             // XON/XOFF in flow control
+    x->dcb.fOutX  = TRUE;           /*  XON/XOFF out flow control  */
+    x->dcb.fInX  = TRUE;             /*  XON/XOFF in flow control */
     return 1;
   }
 
-  x->dcb.fOutX  = FALSE;           // XON/XOFF out flow control 
-  x->dcb.fInX  = FALSE;             // XON/XOFF in flow control
+  x->dcb.fOutX  = FALSE;           /*  XON/XOFF out flow control  */
+  x->dcb.fInX  = FALSE;             /*  XON/XOFF in flow control */
   return 0;
 }
 
@@ -360,23 +360,23 @@ static HANDLE open_serial(int com_nr, t_comport *x)
   }
 
   
-  x->dcb.fBinary = TRUE;          // binary mode, no EOF check 
+  x->dcb.fBinary = TRUE;          /*  binary mode, no EOF check  */
 
-  //  x->dcb.fOutxDsrFlow = FALSE;      // DSR output flow control 
-  //  x->dcb.fDtrControl = DTR_CONTROL_DISABLE;       // DTR flow control type 
+  /*   x->dcb.fOutxDsrFlow = FALSE;       DSR output flow control  */
+  /*   x->dcb.fDtrControl = DTR_CONTROL_DISABLE;        DTR flow control type  */
 
-  //  x->dcb.fDsrSensitivity = FALSE;   // DSR sensitivity 
+  /*   x->dcb.fDsrSensitivity = FALSE;    DSR sensitivity  */
   
-  x->dcb.fErrorChar = FALSE;       // enable error replacement 
-  //   x->dcb.fNull = FALSE;            // enable null stripping 
+  x->dcb.fErrorChar = FALSE;       /*  enable error replacement  */
+  /*    x->dcb.fNull = FALSE;             enable null stripping  */
 
-  //    DWORD x->dcb.fAbortOnError:1;     // abort reads/writes on error 
+  /*     DWORD x->dcb.fAbortOnError:1;      abort reads/writes on error  */
 
-  //   char x->dcb.XonChar;              // Tx and Rx XON character 
-  //   char x->dcb.XoffChar;             // Tx and Rx XOFF character 
-  //   char x->dcb.ErrorChar;            // error replacement character 
-  //   char x->dcb.EofChar;              // end of input character 
-  //   char x->dcb.EvtChar;              // received event character 
+  /*    char x->dcb.XonChar;               Tx and Rx XON character  */
+  /*    char x->dcb.XoffChar;              Tx and Rx XOFF character  */
+  /*    char x->dcb.ErrorChar;             error replacement character  */
+  /*    char x->dcb.EofChar;               end of input character  */
+  /*    char x->dcb.EvtChar;               received event character  */
   
 
   set_bits(x,8);      /* CS8 */
@@ -405,7 +405,7 @@ static HANDLE open_serial(int com_nr, t_comport *x)
 	  post("Couldnt get old timeouts for serial device");
   };
 
-  //setting new timeouts for read to immidiatly return
+  /* setting new timeouts for read to immidiatly return */
   timeouts.ReadIntervalTimeout = MAXDWORD; 
   timeouts.ReadTotalTimeoutMultiplier = 0;
   timeouts.ReadTotalTimeoutConstant = 0;
@@ -777,8 +777,8 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
     x->comhandle = fd;           /* holds the comport handle */
 
 #ifdef NT
-  memcpy(&(test.dcb_old),&(x->dcb_old),sizeof(DCB));    // save the old com config 
-  memcpy(&(test.dcb),&(x->dcb),sizeof(DCB));       // for the new com config 
+  memcpy(&(test.dcb_old),&(x->dcb_old),sizeof(DCB));    /*  save the old com config  */
+  memcpy(&(test.dcb),&(x->dcb),sizeof(DCB));       /*  for the new com config  */
 #else  
   /* save the old com and new com config */
   bcopy(&(test.oldcom_termio),&(x->oldcom_termio),sizeof(struct termios));    
