@@ -1,5 +1,6 @@
 
-- fold externals/build/doc/makefile into externals/build/Makefile
+- simplify Makefile, making just "all" and "install" with subsections for each
+  subdir.
 
 - get externals/build/src/prepend.c to compile in Pd mode, which means it will
   have a right inlet when created without an argument

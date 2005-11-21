@@ -1,3 +1,16 @@
+
+
+There are lots of docs here: http://puredata.org/docs/developer  
+
+
+Pd-extended build system
+========================
+
+This stuff as all be incorporated into the unified, cross-platform Pd-extended 
+build system.  These makefiles will probably stay around for a while since they 
+are widely used.
+
+
 PD externals build system
 =========================
 
@@ -15,10 +28,11 @@ To build with SCons:
     scons
     scons install
 
+
 Build System Internals
 ======================
 
-The build system is actually on top of the  different externals packages
+The build system is actually on top of the different externals packages
 that are in the CVS.
 
 Every external (the source code) is linked into the "src" directory.

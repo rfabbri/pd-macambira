@@ -70,13 +70,18 @@ EXTERNALS_SRC = $(SRC_ROOT_DIR)/externals
 FLEXT_SRC = $(SRC_ROOT_DIR)/externals/grill/flext
 GEM_SRC = $(SRC_ROOT_DIR)/Gem
 GEMLIBS_SRC = $(SRC_ROOT_DIR)/GemLibs
+PACKAGES_SRC = $(SRC_ROOT_DIR)/packages
 PD_SRC = $(SRC_ROOT_DIR)/pd
 SCRIPTS_SRC = $(SRC_ROOT_DIR)/scripts
 
 
 # destinations
 APPLICATIONS_DEST = $(DOCS_DEST)/examples
+BIN_DEST = $(INSTALL_PREFIX)/bin
 DOCS_DEST = $(INSTALL_PREFIX)/doc
+INCLUDE_DEST = $(INSTALL_PREFIX)/include
+LIB_DEST = $(INSTALL_PREFIX)/lib
+MAN_DEST = $(INSTALL_PREFIX)/man
 OBJECTS_DEST = $(INSTALL_PREFIX)/extra
 HELP_DEST = $(DOCS_DEST)/5.reference
 MANUALS_DEST = $(DOCS_DEST)/manuals
@@ -146,7 +151,7 @@ manuals_clean:
 objects_clean:
 	-rm $(OBJECTS_DEST)/*/*/*.pd
 	-rm $(OBJECTS_DEST)/*/*.pd
-	-rm $(OBJECTS_DEST)/*.pd 
+	-rm $(OBJECTS_DEST)/*.pd
 	-rm $(OBJECTS_DEST)/*/*/*.$(EXTENSION)
 	-rm $(OBJECTS_DEST)/*/*.$(EXTENSION)
 	-rm $(OBJECTS_DEST)/*.$(EXTENSION)

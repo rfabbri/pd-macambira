@@ -1,14 +1,23 @@
-prefix=/tmp
-#prefix=$(DESTDIR)/usr/local/lib/pd
 
-EXTERNALS = $(shell ls -1 ../src | grep -e '.*\.c$$')
+CWD := $(shell pwd)
 
-all: $(EXTERNALS:.c=.pd_darwin)
+# these are setup to be overridden by the packages/Makefile
+SRC_ROOT_DIR = $(CWD)/../../..
+INSTALL_PREFIX = build
+BUILDLAYOUT_DIR = $(CWD)/../..
+
+all: externals
 
 .SUFFIXES: .pd_darwin
 
-#PDEXECUTABLE = /usr/local/bin/pd
-PDEXECUTABLE = ../../../pd/bin/pd
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+
+BUILD_SRC = $(EXTERNALS_SRC)/build/src
+BUILD_DARWIN_SRC = $(EXTERNALS_SRC)/build/darwin
+
+EXTERNALS = $(shell ls -1 $(BUILD_SRC) | grep -e '.*\.c$$')
+
+PDEXECUTABLE = $(PD_SRC)/bin/pd
 
 ## These generally need gcc-3.3
 # Generic PowerPC
@@ -24,93 +33,28 @@ OPTIM_FLAGS = -mpowerpc-gpopt -mcpu=750
 
 CFLAGS = -DPD -DUNIX -DMACOSX -Dunix $(OPTIM_FLAGS) \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
-INCLUDES = -I. -I.. -I../../../pd/src -I../include -I/sw/include
+INCLUDES = -I$(PD_SRC)/src -I/sw/include
 LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) -L/sw/lib
 
-%.pd_darwin: ../src/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
-	$(CC) $(LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm \
-		`test -f $*.libs && cat $*.libs`	\
-		`test -f ../src/$*.libs && cat ../src/$*.libs`
-	chmod a-x "$*.pd_darwin"
-	rm -f "$*.o" 
+externals: $(EXTERNALS:.c=.pd_darwin)
+
+%.pd_darwin: $(BUILD_SRC)/%.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o "$(BUILD_DARWIN_SRC)/$*.o" \
+		-c "$(BUILD_SRC)/$*.c"
+	$(CC) $(LDFLAGS) -o "$(BUILD_DARWIN_SRC)/$*.pd_darwin" \
+		"$(BUILD_DARWIN_SRC)/$*.o" -lc -lm \
+		`test -f $(BUILD_DARWIN_SRC)/$*.libs && \
+			cat $(BUILD_DARWIN_SRC)/$*.libs`	\
+		`test -f $(BUILD_SRC)/$*.libs && \
+			cat $(BUILD_SRC)/$*.libs`
+	chmod a-x "$(BUILD_DARWIN_SRC)/$*.pd_darwin"
+	rm -f "$(BUILD_DARWIN_SRC)/$*.o" 
+
+#------------------------------------------------------------------------------
+# CLEAN TARGETS
+#------------------------------------------------------------------------------
 
 clean:
-	-rm *.pd_darwin *~
 	-rm -rf root *.pkg 
-
-install-doc:	
-	test -d $(prefix)/doc/5.reference || mkdir -p $(prefix)/doc/5.reference
-	cd ../doc && make all
-	install -m444 ../doc/*.* $(prefix)/doc/5.reference
-
-install-abstractions:
-	test -d $(prefix)/extra || mkdir -p $(prefix)/extra
-	install -m444 \
-			../../vbap/graph-to-aziele.pd \
-			$(prefix)/extra
-
-install: install-doc
-	test -d $(prefix)/extra || mkdir -p $(prefix)/extra
-	install -m644 *.pd_darwin $(prefix)/extra
-
-
-EXTERNALS_VERSION := $(shell date +20%y.%m.%d)
-PACKAGE_PREFIX = pd-externals
-PACKAGE_NAME = $(PACKAGE_PREFIX)-$(EXTERNALS_VERSION)
-
-darwin_pkg_license:
-  # generate HTML version of License
-	echo "<HTML><BODY><FONT SIZE=\"-1\">" > License.html
-	cat ../../creb/COPYING | sed -e 's/^$$/\<P\>/g' >> License.html	
-	echo "</FONT></BODY></HTML>" >> License.html
-
-darwin_pkg_welcome:
-# generate Welcome.html from ../README.txt
-
-darwin_pkg_clean:
-	-sudo rm -Rf installroot/ $(PACKAGE_PREFIX)*.pkg/
-	-rm -f $(PACKAGE_PREFIX)-*.info 1 License.html Welcome.???*
-
-# install into MSP's default: /usr/local/lib
-
-darwin_pkg: DESTDIR = installroot
-darwin_pkg: prefix = $(DESTDIR)/pd
-darwin_pkg: all install darwin_pkg_license darwin_pkg_welcome
-# set up installroot dir
-#  test -d installroot/pd/doc/5.reference/ || mkdir -p installroot/pd/doc/5.reference/
-#	test -d installroot/pd/extra || mkdir -p installroot/pd/extra
-#	install -m644 --group=staff *.pd_darwin installroot/pd/extra
-	cp -f pd-externals.info $(PACKAGE_NAME).info
-# delete cruft
-	-find installroot -name .DS_Store -delete
-	-sudo rm -Rf installroot/*/*/CVS installroot/*/*/*/CVS installroot/*/*/*/*/CVS 
-	-rm -f 1
-# set proper permissions
-	sudo chown -R root:staff installroot
-	package installroot $(PACKAGE_NAME).info -d . -ignoreDSStore
-# install pkg docs
-	install -m 644 License.html $(PACKAGE_NAME).pkg/Contents/Resources
-	sudo chown -R root:staff $(PACKAGE_NAME).pkg/Contents/Resources
-
-
-# install into MacOS X style path: /Library/Pd
-
-darwin_altpkg: all darwin_pkg_clean darwin_pkg_license darwin_pkg_welcome
-	test -d installroot/Help || mkdir -p installroot/Help
-	cp -r ../doc/* installroot/Help
-	test -d installroot/Externals || mkdir -p installroot/Externals
-	install -m644 --group=staff *.pd_darwin installroot/Externals
-	sed -e 's/\/usr\/local\/lib/\/Library\/Pd/' pd-externals.info \
-		 | sed -e 's/MSP standard paths/MacOS X-style Paths/' \
-		 > $(PACKAGE_NAME)-alt.info
- # delete cruft
-	-sudo find installroot -name .DS_Store -delete
-	-sudo rm -Rf installroot/*/*/CVS installroot/*/*/*/CVS installroot/*/*/*/*/CVS 
-	-rm -f 1
- # set proper permissions
-	sudo chown -R root:staff installroot
-	package installroot $(PACKAGE_NAME)-alt.info -d . -ignoreDSStore
- # install pkg docs
-	install -m 644 License.html $(PACKAGE_NAME)-alt.pkg/Contents/Resources
-	sudo chown -R root:staff $(PACKAGE_NAME)-alt.pkg/Contents/Resources
+	-rm $(BUILD_DARWIN_SRC)/*~
+	rm $(BUILD_DARWIN_SRC)/*.pd_darwin

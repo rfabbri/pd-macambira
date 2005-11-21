@@ -2,20 +2,22 @@
 #
 # Centralized build system for "abstractions".  
 #
-# see README for instructions  <hans@at.or.at>
+# see for instructions: http://puredata.org/docs/developer/build
+#  <hans@at.or.at>
 #
 #==============================================================================#
 
 CWD := $(shell pwd)
 
-# these are setup to be overridden by the packages/Makefile
+# these are designed to be overridden by the packages/Makefile
 SRC_ROOT_DIR = $(CWD)/..
 INSTALL_PREFIX = build
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
 install: objects applications
-	echo "abstractions install succeeded!"
+	@echo " "
+	@echo "abstractions install succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
@@ -67,6 +69,9 @@ objects_keyboardkeys:
 	install -d $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
 	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
 		 $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(MEMENTO_NAME) \
+		--author "Andrey Savitsky" \
+		--description "objects for using keyboard keys for scrolling and selecting"
 	install -d $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
 	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
 		 $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
@@ -84,6 +89,8 @@ objects_la-kitchen:
 	install -d $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
 		grep -v '\-help.pd')    $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(LA-KITCHEN_NAME) \
+		--description "a collection of objects working with sensors"
 	install -d $(HELP_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
 		 $(HELP_DEST)/$(LA-KITCHEN_NAME)
@@ -99,6 +106,10 @@ objects_memento:
 	install -d $(OBJECTS_DEST)/$(MEMENTO_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/memento/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(MEMENTO_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(MEMENTO_NAME) \
+		--author "Frank Barknecht" \
+		--license "GNU GPL" \
+		--description "a collection of objects for managing state saving"
 	install -d $(HELP_DEST)/$(MEMENTO_NAME)
 	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd \
 		$(HELP_DEST)/$(MEMENTO_NAME)
@@ -154,6 +165,9 @@ objects_nusmuk:
 	install -d $(OBJECTS_DEST)/$(NUSMUK_NAME)
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.pd | \
 		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NUSMUK_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(NUSMUK_NAME) \
+		--author "Cyrille Henry" \
+		--description "a collection of objects for physical modelling"
 	install -d $(HELP_DEST)/$(NUSMUK_NAME)
 	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd \
 		$(HELP_DEST)/$(NUSMUK_NAME)
@@ -210,14 +224,6 @@ devsymlinks_keyboardkeys:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: install_clean cruft_clean
+clean: install_clean
 
-#==============================================================================#
-#
-# LEGACY TARGETS
-#
-#==============================================================================#
-# this is a legacy clean target to get rid of cruft
-darwin_pkg_clean:
-	-sudo rm -Rf installroot/ $(PKG_PREFIX)*.pkg/
-	-rm -f $(PKG_NAME).info 1 
+distclean: clean cruft_clean

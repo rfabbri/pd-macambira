@@ -16,7 +16,7 @@ INSTALL_PREFIX = $(CWD)/build
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
-all: objects
+default: all
 
 .SUFFIXES: .$(EXTENSION)
 
@@ -36,39 +36,41 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-objects: objects_$(OS_NAME)
+#------------------------------------------------------------------------------#
+# BUILD
+all: pre_all_$(OS_NAME) 
+all: creb iemabs iemlib iemmatrix pdp pmpd vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
 	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make -k 
 
-# these targets are for platform-specific needs
-objects_darwin:
+# these targets are for platform-specific needs that run before objects:
+pre_all_darwin:
 
-objects_linux:
+pre_all_linux:
 
-objects_win:
+pre_all_win:
 
-objects_unknown:
+pre_all_unknown:
 # this target is for "everything else"
+
+
+#------------------------------------------------------------------------------#
+# INSTALL
+install: $(OBJECTS_DEST) help_install objects_install unfiltered_install
+install: creb_install iemabs_install iemabs_install iemmatrix_install
+install: pdp_install pmpd_install vbap_install zexy_install
+	@echo " "
+	@echo "externals install succeeded!"
+
+objects_install: 
+	install -p $(EXTERNALS_SRC)/build/$(OS_NAME)/*.$(EXTENSION) $(OBJECTS_DEST)
 
 #==============================================================================#
 #
 # INSTALL TARGETS
 #
 #==============================================================================#
-
-IEMABS_NAME = iemabs
-IEMLIB_NAME = iemlib
-PMPD_NAME = pmpd
-applications_install: $(APPLICATIONS_DEST)
-# iemlib
-	install -d $(APPLICATIONS_DEST)/$(IEMLIB_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/examples/*.* \
-		$(APPLICATIONS_DEST)/$(IEMLIB_NAME)
-# PMDP examples
-	install -d $(APPLICATIONS_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd \
-		$(APPLICATIONS_DEST)/$(PMPD_NAME)
 
 
 help_install: $(HELP_DEST)
@@ -108,7 +110,6 @@ help_install: $(HELP_DEST)
 	install -p \
 			$(EXTERNALS_SRC)/pdogg/*/*.pd \
 			$(EXTERNALS_SRC)/plugin~/*.pd \
-			$(EXTERNALS_SRC)/pmpd/help/*.pd\
 			$(EXTERNALS_SRC)/rhythm_estimator/*.p? \
 			$(EXTERNALS_SRC)/signal/*/*.pd \
 			$(EXTERNALS_SRC)/sprinkler/sprinkler-help.pd \
@@ -119,20 +120,6 @@ help_install: $(HELP_DEST)
 			$(EXTERNALS_SRC)/zhzxh~/*.pd \
 				$(HELP_DEST)
 #------------------------------------------------------------------------------#
-# IEMlib uses its own dir and since its not maintained in CVS
-# its best not to change the objects
-	install -d $(HELP_DEST)/iemhelp
-	install -p $(EXTERNALS_SRC)/iemlib/iemhelp/*.* $(HELP_DEST)/iemhelp
-#------------------------------------------------------------------------------#
-# zexy uses its own dir
-	install -d $(HELP_DEST)/zexy
-	install -p $(EXTERNALS_SRC)/zexy/zexy.pd  $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/zexy/examples/*.* $(HELP_DEST)/zexy
-#------------------------------------------------------------------------------#
-# iemmatrix uses its own dir
-	install -d $(HELP_DEST)/iemmatrix
-	install -p $(EXTERNALS_SRC)/iem/iemmatrix/doc/*.pd  $(HELP_DEST)/iemmatrix
-#------------------------------------------------------------------------------#
 #  mjlib [prob] conflicts with cyclone's [prob] so filter it
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/mjlib/doc/*.* | \
 		grep -v 'prob') $(HELP_DEST)
@@ -142,21 +129,51 @@ help_install: $(HELP_DEST)
 		grep -v 'split') $(HELP_DEST)
 
 
-manuals_install: $(MANUALS_DEST)
-# pmpd
-	install -d $(MANUALS_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/doc/pmpd.pdf/pmpd.pdf \
-		$(MANUALS_DEST)/$(PMPD_NAME)
+
+#==============================================================================#
+#
+# PROJECT TARGETS
+#
+#==============================================================================#
 
 
-objects_install: objects
-	install -p $(EXTERNALS_SRC)/build/$(OS_NAME)/*.$(EXTENSION) $(OBJECTS_DEST)
 #------------------------------------------------------------------------------#
-# abstractions (i.e. objects written in Pd)
-# iemmatrix
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/iem/iemmatrix/abs/*.* | \
-		grep -v '\-help.pd') $(OBJECTS_DEST)
-# IEMlib
+# TEMPLATE
+TEMPLATE_NAME=template
+template:
+
+
+template_install: template
+	install -d $(OBJECTS_DEST)/$(TEMPLATE_NAME)
+	install -d $(HELP_DEST)/$(TEMPLATE_NAME)
+	install -d $(MANUALS_DEST)/$(TEMPLATE_NAME)
+	install -d $(APPLICATIONS_DEST)/$(TEMPLATE_NAME)
+
+
+#------------------------------------------------------------------------------#
+# CREB
+CREB_NAME=creb
+creb:
+
+
+creb_install: creb
+	install -d $(OBJECTS_DEST)/$(CREB_NAME)
+	install -p $(EXTERNALS_SRC)/creb/abs/*.pd $(OBJECTS_DEST)/$(CREB_NAME)
+	install -d $(HELP_DEST)/$(CREB_NAME)
+	install -p -m0644	$(EXTERNALS_SRC)/creb/doc/examples/*.* \
+		$(HELP_DEST)/$(CREB_NAME)
+#	install -d $(MANUALS_DEST)/$(CREB_NAME)
+#	install -d $(APPLICATIONS_DEST)/$(CREB_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# IEMABS
+IEMABS_NAME=iemabs
+iemabs:
+
+
+iemabs_install: iemabs
 #  iemabs still has the help patches in the old help-*.pd style
 	install -d $(OBJECTS_DEST)/$(IEMABS_NAME)
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/iemlib/iemabs/*.pd | \
@@ -169,14 +186,178 @@ objects_install: objects
 	install -d $(MANUALS_DEST)/$(IEMABS_NAME)
 	install -p $(EXTERNALS_SRC)/iemlib/iemabs/*.txt \
 		$(MANUALS_DEST)/$(IEMABS_NAME)
-# vbap
-	install -p $(EXTERNALS_SRC)/vbap/graph-to-aziele.pd $(OBJECTS_DEST)
 
 
 
-install: $(OBJECTS_DEST) help_install applications_install objects_install
-install: manuals_install
-	@echo "externals install succeeded!"
+#------------------------------------------------------------------------------#
+# IEMLIB
+IEMLIB_NAME=iemlib
+iemlib:
+
+
+iemlib_install: iemlib
+#	install -d $(OBJECTS_DEST)/$(IEMLIB_NAME)
+#	install -d $(HELP_DEST)/$(IEMLIB_NAME)
+	install -d $(HELP_DEST)/iemhelp
+	install -p $(EXTERNALS_SRC)/iemlib/iemhelp/*.* $(HELP_DEST)/iemhelp
+#	install -d $(MANUALS_DEST)/$(IEMLIB_NAME)
+	install -d $(APPLICATIONS_DEST)/$(IEMLIB_NAME)
+	install -p $(EXTERNALS_SRC)/iemlib/examples/*.* \
+		$(APPLICATIONS_DEST)/$(IEMLIB_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# IEMMATRIX
+IEMMATRIX_NAME=iemmatrix
+iemmatrix:
+
+
+iemmatrix_install: iemmatrix
+	install -d $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
+	install -p $(shell ls -1 $(EXTERNALS_SRC)/iem/iemmatrix/abs/*.* | \
+		grep -v '\-help.pd') $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
+	install -d $(HELP_DEST)/$(IEMMATRIX_NAME)
+	install -p $(EXTERNALS_SRC)/iem/iemmatrix/doc/*.pd \
+		$(HELP_DEST)/$(IEMMATRIX_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# PDP
+PDP_NAME=pdp
+pdp:
+#	cd $(EXTERNALS_SRC)/pdp && ./configure && $(MAKE)
+#TODO: compile pidip here
+#TODO: compile gem2pdp here
+
+pdp_install: pdp
+#	install -d $(OBJECTS_DEST)/$(PDP_NAME)
+#	install -p $(EXTERNALS_SRC)/pdp/*.pd_darwin $(OBJECTS_DEST)
+#	install -p $(EXTERNALS_SRC)/pidip/*.pd_darwin $(OBJECTS_DEST)
+#	install -p $(EXTERNALS_SRC)/gem2pdp/*.pd_darwin $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/pdp/abstractions/*.pd $(OBJECTS_DEST)
+#	install -d $(HELP_DEST)/$(PDP_NAME)
+	install -p $(EXTERNALS_SRC)/pdp/doc/objects/*.* $(HELP_DEST)
+	install -d $(MANUALS_DEST)/$(PDP_NAME)
+	install -p $(EXTERNALS_SRC)/pdp/doc/reference.txt $(MANUALS_DEST)/$(PDP_NAME)
+	install -p $(EXTERNALS_SRC)/pdp/doc/introduction/*.* \
+		$(MANUALS_DEST)/$(PDP_NAME)
+	install -d $(APPLICATIONS_DEST)/$(PDP_NAME)
+	install -p $(EXTERNALS_SRC)/pdp/doc/examples/*.* \
+		$(APPLICATIONS_DEST)/$(PDP_NAME)
+
+
+#------------------------------------------------------------------------------#
+# PMPD
+PMPD_NAME=pmpd
+pmpd:
+
+
+pmpd_install: pmpd
+	install -d $(OBJECTS_DEST)/$(PMPD_NAME)
+	install -d $(HELP_DEST)/$(PMPD_NAME)
+	install -p $(EXTERNALS_SRC)/pmpd/help/*.pd \
+		 $(HELP_DEST)/$(PMPD_NAME)
+	install -d $(MANUALS_DEST)/$(PMPD_NAME)
+	install -d $(MANUALS_DEST)/$(PMPD_NAME)
+	install -p $(EXTERNALS_SRC)/pmpd/doc/pmpd.pdf/pmpd.pdf \
+		$(MANUALS_DEST)/$(PMPD_NAME)
+	install -d $(APPLICATIONS_DEST)/$(PMPD_NAME)
+	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd \
+		$(APPLICATIONS_DEST)/$(PMPD_NAME)
+
+
+#------------------------------------------------------------------------------#
+# VBAP
+VBAP_NAME=vbap
+vbap:
+
+
+vbap_install: vbap
+	install -d $(OBJECTS_DEST)/$(VBAP_NAME)
+#	install -d $(HELP_DEST)/$(VBAP_NAME)
+#	install -d $(MANUALS_DEST)/$(VBAP_NAME)
+#	install -d $(APPLICATIONS_DEST)/$(VBAP_NAME)
+	install -p $(EXTERNALS_SRC)/vbap/graph-to-aziele.pd \
+		$(OBJECTS_DEST)/$(VBAP_NAME)
+
+
+
+#------------------------------------------------------------------------------#
+# Zexy
+ZEXY_NAME = zexy
+zexy:
+#  zexy's new build system doesn't work with CVS layout, and most of zexy is
+#  included in the extrnals build system now anyway.  But the abstractions
+#  should still be included
+#	cd $(EXTERNALS_SRC)/zexy/src && autoconf && ./configure && $(MAKE)
+
+
+zexy_install: zexy
+	install -d $(OBJECTS_DEST)/$(ZEXY_NAME)
+#	install -p $(EXTERNALS_SRC)/zexy/src/*.pd_darwin $(OBJECTS_DEST)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(EXTERNALS_SRC)/zexy/abs/*.pd | \
+		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
+		$(OBJECTS_DEST)/$(ZEXY_NAME)
+	install -d $(HELP_DEST)/$(ZEXY_NAME)
+	install -p $(EXTERNALS_SRC)/zexy/abs/*-help.pd $(HELP_DEST)/$(ZEXY_NAME)
+	install -p $(EXTERNALS_SRC)/zexy/zexy.pd  $(HELP_DEST)
+	install -p $(EXTERNALS_SRC)/zexy/examples/*.* $(HELP_DEST)/$(ZEXY_NAME)
+
+
+
+#==============================================================================#
+#
+# UNFILTERED PROJECT TARGETS
+#
+#==============================================================================#
+# this is not yet organized into libdirs, but just leftover <hans@at.or.at>
+
+unfiltered_install:
+#----------------------------------------------------------------------------
+# hcs
+	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/*.pd | \
+			 grep -v '\-help.pd') $(OBJECTS_DEST)
+# hid
+	cd $(EXTERNALS_SRC)/hcs/hid && $(MAKE) 
+	install -p $(EXTERNALS_SRC)/hcs/hid/hid.pd_darwin $(OBJECTS_DEST)
+	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/hid/*.pd | \
+			 grep -v '\-help.pd'| grep -v '\-list.pd') $(OBJECTS_DEST)
+# general
+	install -p $(EXTERNALS_SRC)/hcs/general/*.pd $(OBJECTS_DEST)
+# pan
+	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/pan/*.pd | \
+			 grep -v '\-help.pd') $(OBJECTS_DEST)
+#----------------------------------------------------------------------------
+# miXed
+	cd $(EXTERNALS_SRC)/miXed/toxy && $(MAKE)
+	cd $(EXTERNALS_SRC)/miXed/cyclone && $(MAKE)
+	cd $(EXTERNALS_SRC)/miXed/pddp && $(MAKE)
+	install -d $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/miXed/bin/*.pd_darwin $(OBJECTS_DEST)
+	install -d $(HELP_DEST)/cyclone
+	install -p $(EXTERNALS_SRC)/miXed/test/*/*.*    \
+		$(HELP_DEST)/cyclone
+	install -p $(EXTERNALS_SRC)/miXed/doc/*/*/*.*  \
+		$(HELP_DEST)
+# install cyclist with pd
+	install -d $(INSTALL_PREFIX)/bin
+	install -p $(EXTERNALS_SRC)/miXed/bin/cyclist $(INSTALL_PREFIX)/bin
+#----------------------------------------------------------------------------
+# OSC
+	cd $(EXTERNALS_SRC)/OSCx && ./configure && $(MAKE)
+	install -p $(EXTERNALS_SRC)/OSCx/doc/*.* $(HELP_DEST)
+	install -p $(EXTERNALS_SRC)/OSCx/src/*.pd_darwin $(OBJECTS_DEST)
+#----------------------------------------------------------------------------
+# unauthorized
+	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE) 
+	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd_darwin $(OBJECTS_DEST)
+	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd $(HELP_DEST)
+	install -p $(EXTERNALS_SRC)/unauthorized/*/*.txt $(HELP_DEST)
+	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pls $(HELP_DEST)
+	cp -Rfp $(EXTERNALS_SRC)/unauthorized/blinkenlights/blm  $(HELP_DEST)
+
 
 #==============================================================================#
 #
@@ -188,5 +369,13 @@ install: manuals_install
 devsymlinks: 
 
 
-# FYI: clean targets are in Makefile.buildlayout
-clean: install_clean cruft_clean
+#==============================================================================#
+#
+# CLEAN TARGETS
+#
+#==============================================================================#
+
+# the destination-specific clean targets are in Makefile.buildlayout
+clean: install_clean
+
+distclean: clean cruft_clean
