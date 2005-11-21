@@ -3,6 +3,8 @@
  (c) 1998-2005  Winfried Ritsch (see LICENCE.txt)
  Institute for Electronic Music - Graz
 
+ V 1.0 RC2
+
 */
 
 #include "m_pd.h"
@@ -228,7 +230,7 @@ static float set_bits(t_comport *x, int nr)
 
   if(nr < 4 && nr > 8)
     nr = 8;
-  
+
  /*  number of bits/byte, 4-8  */
   return x->dcb.ByteSize = nr;
 }
@@ -300,7 +302,7 @@ static int set_xonxoff(t_comport *x, int nr)
 
 static int set_serial(t_comport *x)
 {
- 
+
  if (SetCommState(x->comhandle, &(x->dcb)))
    return 1;
 
@@ -359,14 +361,14 @@ static HANDLE open_serial(int com_nr, t_comport *x)
     return INVALID_HANDLE_VALUE;
   }
 
-  
+
   x->dcb.fBinary = TRUE;          /*  binary mode, no EOF check  */
 
   /*   x->dcb.fOutxDsrFlow = FALSE;       DSR output flow control  */
   /*   x->dcb.fDtrControl = DTR_CONTROL_DISABLE;        DTR flow control type  */
 
   /*   x->dcb.fDsrSensitivity = FALSE;    DSR sensitivity  */
-  
+
   x->dcb.fErrorChar = FALSE;       /*  enable error replacement  */
   /*    x->dcb.fNull = FALSE;             enable null stripping  */
 
@@ -377,7 +379,6 @@ static HANDLE open_serial(int com_nr, t_comport *x)
   /*    char x->dcb.ErrorChar;             error replacement character  */
   /*    char x->dcb.EofChar;               end of input character  */
   /*    char x->dcb.EvtChar;               received event character  */
-  
 
   set_bits(x,8);      /* CS8 */
   set_stopflag(x,0);  /* ~CSTOPB */
@@ -434,10 +435,9 @@ static HANDLE close_serial(t_comport *x)
     if (!SetCommTimeouts(x->comhandle, &(x->old_timeouts))){
       post("Couldnt reset old_timeouts for serial device");
     };
-   
     CloseHandle(x->comhandle); 
   }
-  
+
   return INVALID_HANDLE_VALUE;
 }
 
@@ -447,7 +447,7 @@ static int write_serial(t_comport *x, unsigned char  chr)
   OVERLAPPED osWrite = {0};
   DWORD dwWritten;
   DWORD dwRes;
-   
+
   /*  post("open send %d",chr); */
 
   if (!WriteFile(x->comhandle, &chr, 1, &dwWritten, &osWrite)) {
@@ -719,9 +719,9 @@ static void comport_tick(t_comport *x)
     FD_SET(fd,&com_rfds);
 
     while((err=select(fd+1,&com_rfds,NULL,NULL,&null_tv)) > 0) {
-      
+
       err = read(fd,(char *) &chr,1); 
-    
+
       /*  while(    (err = read(fd,(char *) &chr,1)) > 0){ */
       outlet_float(x->x_obj.ob_outlet, (t_float) chr);
 
@@ -749,12 +749,11 @@ static void comport_float(t_comport *x, t_float f)
 }
 
 static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
-  
+
   t_comport test;
   t_comport *x;
   int com_nr = comnr;
   HANDLE fd;
-  
 
 /*	 Open the Comport for RD and WR and get a handle */
   test.baud = fbaud;
@@ -950,10 +949,8 @@ void comport_setup(void)
 					 (t_method)comport_free, sizeof(t_comport), 
 					 0, A_DEFFLOAT, A_DEFFLOAT, 0);
 
-
-  
   class_addfloat(comport_class, (t_method)comport_float);
-  
+
   /*
     class_addbang(comport_class, comport_bang
   */  
@@ -985,6 +982,6 @@ void comport_setup(void)
   null_tv.tv_usec = 0;
 #endif
   post("comport - PD external for unix/windows\n"
-       "GPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
+       "LGPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
        "Institute for Electronic Music - Graz");
 }

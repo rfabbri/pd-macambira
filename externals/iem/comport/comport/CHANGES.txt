@@ -1,3 +1,8 @@
+1.0RC2 - 18.11.2005
+
+ made more C-compatible and LGPL
+ added some code for NT and a Test SWITCH for W2000
+
 1.0RC1 - (12.4.2005)
 
  first check in pure-data.sourceforge.net 
