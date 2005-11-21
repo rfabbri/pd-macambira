@@ -710,8 +710,8 @@ static void comport_tick(t_comport *x)
 	     break;
       }
     }
-  }
 */
+  }
 #else
   {
     fd_set com_rfds;  	 
@@ -738,7 +738,7 @@ static void comport_tick(t_comport *x)
   if (!x->x_hit) clock_delay(x->x_clock, 1);
 }
 
-static void comport_float(t_comport *x,t_float f)
+static void comport_float(t_comport *x, t_float f)
 {
   unsigned char chr = ((int) f) & 0xFF; /* brutal conv */
 
@@ -929,9 +929,10 @@ static void comport_devicename(t_comport *x, t_symbol *s)
 static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
 {
   static char buf[256];
+  char *pch = buf;
+
   while(argc--) {
     atom_string(argv++, buf, 255);
-    char *pch = buf;
     while(*pch != 0) {
       write_serial(x, *pch++);
     }
