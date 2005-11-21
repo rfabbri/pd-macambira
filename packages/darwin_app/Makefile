@@ -82,7 +82,8 @@ darwin_app_core: darwin_app_wrapper
 	cd $(PACKAGES_SRC) && \
 		make $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
 # tigital's Gem window focus black magic:
-	/Developer/tools/Rez -t APPL mac.r -o $(BIN_DEST)/pd
+	install -p $(CWD)/mac.r $(BIN_DEST)
+	cd $(BIN_DEST) && /Developer/tools/Rez -t APPL mac.r -o pd
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
@@ -274,21 +275,21 @@ darwin_app_noncvs:
 	test -d noncvs/doc/5.reference && \
 		install -p noncvs/doc/5.reference/*.* $(HELP_DEST)
 	test -d noncvs/extra && install -p noncvs/extra/*.* $(OBJECTS_DEST)
-	test -d noncvs/doc/serendipd && cp -Rp noncvs/doc/serendipd $(DOCS_DEST)
+	test -d noncvs/doc/serendipd && cp -Rp noncvs/doc/serendipd \
+		$(APPLICATIONS_DEST)
 
 darwin_app_perms:
 	chmod a-x $(DOCS_DEST)/*/*.pd $(DOCS_DEST)/*/*/*.pd $(DOCS_DEST)/*/*/*/*.pd
 	chmod -R a-w $(DOCS_DEST)
 # serendiPd shared patch
-	test -d $(DOCS_DEST)/serendipd && \
-		chmod a+w $(DOCS_DEST)/serendipd/*shared_patch.pd
+	test -d $(APPLICATIONS_DEST)/serendipd && \
+		chmod a+w $(APPLICATIONS_DEST)/serendipd/*shared_patch.pd
 
-dmg: darwin_app_readme darwin_app_welcome darwin_app_license darwin_app_perms
+dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/$(DMG_NAME).app"
-	install -p -m0444 $(PD_SRC)/LICENSE.txt "$(CWD)/$(DMG_NAME)/PD LICENSE.txt"
-	install -p -m0444 $(LICENSE_FILE) $(README_FILE) \
-		$(WELCOME_FILE) $(LICENSE_FILE)   "$(CWD)/$(DMG_NAME)"
+	install -p -m0444 $(INSTALL_PREFIX)/*.txt $(INSTALL_PREFIX)/*.html  \
+		"$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 

@@ -238,6 +238,7 @@ pd_install: pd
 
 #------------------------------------------------------------------------------
 # install
+install: license_install readme_install welcome_install
 install: pd_install abstractions_install doc_install externals_install
 #install: flext_install gem_install
 	@echo "Complete install succeeded!"
@@ -251,7 +252,7 @@ install: pd_install abstractions_install doc_install externals_install
 #==============================================================================#
 
 LICENSE_FILE = $(INSTALL_PREFIX)/License.html
-license:
+license_install:
   # generate HTML version of License
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
@@ -264,7 +265,7 @@ license:
 
 
 WELCOME_FILE = $(INSTALL_PREFIX)/Welcome.html
-welcome:
+welcome_install:
 	touch $(WELCOME_FILE)
 	echo "<html><body><p><p>" >> $(WELCOME_FILE)
 	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
@@ -278,7 +279,7 @@ welcome:
 
 
 README_FILE = $(INSTALL_PREFIX)/ReadMe.html
-readme: 
+readme_install: 
 	echo $(CYCLONE_RELEASE)
 	-rm $(README_FILE)
 	touch $(README_FILE)
