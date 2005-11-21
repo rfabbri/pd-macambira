@@ -32,8 +32,8 @@ final_setup:
 	chmod -R ugo-w $(INSTALL_PREFIX)
 
 objects: $(OBJECTS_DEST) $(HELP_DEST) $(MANUALS_DEST)
-objects: objects_memento objects_nusmuk objects_rradical objects_keyboardkeys
-objects: objects_gyre objects_la-kitchen objects_nqpoly
+objects: objects_gyre objects_keyboardkeys objects_la-kitchen objects_memento
+objects: objects_pddp objects_nusmuk objects_nqpoly objects_rradical
 
 applications: $(APPLICATIONS_DEST) $(MANUALS_DEST)
 applications: applications_rradical applications_keyboardkeys applications_gyre
@@ -69,7 +69,7 @@ objects_keyboardkeys:
 	install -d $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
 	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
 		 $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(MEMENTO_NAME) \
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(KEYBOARDKEYS_NAME) \
 		--author "Andrey Savitsky" \
 		--description "objects for using keyboard keys for scrolling and selecting"
 	install -d $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
@@ -180,6 +180,24 @@ objects_nusmuk:
 	install -d $(OBJECTS_DEST)
 	install -p $(ABSTRACTIONS_SRC)/parazit/parazit.pd $(OBJECTS_DEST)
 
+
+
+#-------------------------------------------------------------------------------
+# PDDP support lib
+PDDP_NAME = pddp
+objects_pddp:
+	install -d $(OBJECTS_DEST)/$(PDDP_NAME)
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/pddp/*.pd | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(PDDP_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(PDDP_NAME) \
+		--author "Hans-Christoph Steiner" \
+		--license "GNU GPL" \
+		--description "support objects for the Pure Data Documentation Project"
+	install -d $(HELP_DEST)/$(PDDP_NAME)
+	install -p $(ABSTRACTIONS_SRC)/pddp/*-help.pd \
+		$(HELP_DEST)/$(PDDP_NAME)
+#	install -d $(MANUALS_DEST)/$(PDDP_NAME)
+#	install -d $(APPLICATIONS_DEST)/$(PDDP_NAME)
 
 #-------------------------------------------------------------------------------
 # RRADical
