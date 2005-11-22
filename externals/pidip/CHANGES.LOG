@@ -1,3 +1,8 @@
+0.12.20 ( codename Lavapies )
+  added contributions from Pablo Martin Caedes ( caedes@sindominio.net ) :
+  pdp_qtext : a layered texts object, based on pdp_text and using imlib2
+  pdp_imgloader : improved version from PMC, different ways of blending images ( in quality mode ) 
+
 0.12.19 ( codename GISS action force )
   addapted to newer Image Magick ( > 6.1.9 ) 
   modified pdp_icedthe~ : added a framerate control

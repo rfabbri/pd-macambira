@@ -42,6 +42,7 @@ extern "C"
     void pdp_dice_setup(void);
     void pdp_puzzle_setup(void);
     void pdp_text_setup(void);
+    void pdp_qtext_setup(void);
     void pdp_form_setup(void);
     void pdp_compose_setup(void);
     void pdp_cmap_setup(void);
@@ -128,6 +129,7 @@ void pidip_setup(void){
     pdp_dice_setup();
     pdp_puzzle_setup();
     pdp_text_setup();
+    pdp_qtext_setup();
     pdp_form_setup();
     pdp_compose_setup();
     pdp_cmap_setup();

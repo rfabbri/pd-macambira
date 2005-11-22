@@ -1,6 +1,6 @@
 /*
  *   PiDiP module
- *   Copyright (c) by Yves Degoyon (ydegoyon@free.fr)
+ *   Copyright (c) by Yves Degoyon (ydegoyon@free.fr) and Pablo Martin Caedes ( caedes@sindominio.net )
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #define MAX_ZONES 20
 
-static char   *pdp_imgloader_version = "pdp_imgloader: version 0.1 : image loading object written by ydegoyon@free.fr ";
+static char   *pdp_imgloader_version = "pdp_imgloader: version 0.2 : image loading object written by ydegoyon@free.fr, improved by caedes@sindominio.net";
 
 typedef struct _triangle
 {
@@ -66,14 +66,18 @@ typedef struct pdp_imgloader_struct
     DATA32     *x_imdata;
     t_int       x_iwidth;
     t_int       x_iheight;
+    t_int       x_operation;
+    t_int       b_fit;
 
     t_float     x_blend;
+    t_int       x_quality;   // quality forces an additional yuv->rgb conversion in yuv mode
 
     t_triangle  x_hiddenzones[ MAX_ZONES ]; // hide these parts of the image
     unsigned char *x_mask;
 
 } t_pdp_imgloader;
 
+static void draw_rgb_image(t_pdp_imgloader *x);
         /* load an image */
 static void pdp_imgloader_load(t_pdp_imgloader *x, t_symbol *filename, t_floatarg fx, t_floatarg fy)
 {
@@ -98,8 +102,16 @@ static void pdp_imgloader_load(t_pdp_imgloader *x, t_symbol *filename, t_floatar
    x->x_iwidth = imlib_image_get_width();
    x->x_iheight = imlib_image_get_height();
    post( "pdp_imgloader : loaded : %s (%dx%d)", filename->s_name, x->x_iwidth, x->x_iheight );
-   if ( fx!= 0.) x->x_xoffset = (int) fx;
-   if ( fy!= 0.) x->x_yoffset = (int) fy;
+   x->x_xoffset = (int) fx;
+   x->x_yoffset = (int) fy;
+
+   //if ( fx!= 0.) x->x_xoffset = (int) fx;
+   //if ( fy!= 0.) x->x_yoffset = (int) fy;
+   DATA8 tablas[768];
+   DATA8 *redt,*greent,*bluet;
+   redt = &tablas[0];
+   greent = &tablas[256];
+   bluet = &tablas[512];
 }
 
 static void pdp_imgloader_xoffset(t_pdp_imgloader *x, t_floatarg fx )
@@ -112,14 +124,32 @@ static void pdp_imgloader_yoffset(t_pdp_imgloader *x, t_floatarg fy )
    x->x_yoffset = (int) fy;
 }
 
+static void pdp_imgloader_quality(t_pdp_imgloader *x, t_floatarg fqual )
+{
+   x->x_quality = (int) fqual;
+}
+
 static void pdp_imgloader_blend(t_pdp_imgloader *x, t_floatarg fblend )
 {
-   if ( ( fblend > 0.0 ) && ( fblend < 1.0 ) )
+   if ( ( fblend >= 0.0 ) && ( fblend <= 1.0 ) )
    {
      x->x_blend = fblend;
    }
 }
-
+static void pdp_imgloader_fit(t_pdp_imgloader *x, t_floatarg ffit )
+{
+   if ( ( ffit >= 0.0 ) )
+   {
+     x->b_fit = (int)ffit;
+   }
+}
+static void pdp_imgloader_operation(t_pdp_imgloader *x, t_symbol *s)
+{
+	if      (s == gensym("copy")) x->x_operation = IMLIB_OP_COPY;
+	else if      (s == gensym("add")) x->x_operation = IMLIB_OP_ADD;
+	else if      (s == gensym("substract")) x->x_operation = IMLIB_OP_SUBTRACT;
+	else if      (s == gensym("reshade")) x->x_operation = IMLIB_OP_RESHADE;
+}
 static t_int pdp_imgloader_isinzone(t_pdp_imgloader *x, t_int px, t_int py, t_int index)
 {
   t_int c1=0, c2=0, c3=0;
@@ -472,10 +502,12 @@ static void pdp_imgloader_unhide(t_pdp_imgloader *x, t_floatarg findex )
 
 static void pdp_imgloader_clear(t_pdp_imgloader *x )
 {
-   //if ( x->x_image != NULL ) 
-   //{
-   //   imlib_free_image();
-   //}
+   if ( x->x_image != NULL ) 
+   {
+      imlib_context_set_image(x->x_image);
+      imlib_image_put_back_data(x->x_imdata);
+      imlib_free_image();
+   }
    x->x_image = NULL;
 }
 
@@ -490,6 +522,46 @@ static void pdp_imgloader_free_ressources(t_pdp_imgloader *x )
 static void pdp_imgloader_allocate(t_pdp_imgloader *x )
 {
     x->x_mask = (unsigned char*)getbytes( x->x_vsize );
+}
+
+static void draw_rgb_image(t_pdp_imgloader *x)
+{
+   Imlib_Image im_target = imlib_context_get_image();
+   imlib_context_set_operation(x->x_operation);
+   
+   int i;
+   DATA8 redt[256], greent[256], bluet[256], alphat[256];
+   Imlib_Color_Modifier colormod = imlib_create_color_modifier();
+   imlib_context_set_color_modifier(colormod);
+   imlib_context_set_image(x->x_image);
+   Imlib_Image image_buf= imlib_clone_image();   //clones for color mod
+   imlib_context_set_image(image_buf);
+   if ( x->x_blend < 1.0 ) 
+   {
+     imlib_get_color_modifier_tables( redt, greent, bluet, alphat );
+     for ( i=0; i<=255; i++ )
+     {
+        alphat[i]=alphat[i]*x->x_blend;
+     } 
+     imlib_set_color_modifier_tables( redt, greent, bluet, alphat );
+     imlib_apply_color_modifier();
+   }
+   imlib_context_set_image(im_target);
+   if (x->b_fit)
+   {
+       imlib_blend_image_onto_image(image_buf,0,0,0,x->x_iwidth,x->x_iheight,x->x_xoffset,x->x_yoffset,
+                                    x->x_xoffset+x->x_vwidth,x->x_yoffset+x->x_vheight);
+   }
+   else
+   {
+       imlib_blend_image_onto_image(image_buf,0,0,0,x->x_iwidth,x->x_iheight,x->x_xoffset,x->x_yoffset,x->x_iwidth,x->x_iheight);
+   }
+   imlib_context_set_operation(IMLIB_OP_COPY);
+   
+   imlib_context_set_image(image_buf);
+   imlib_free_image();
+   imlib_free_color_modifier();
+   imlib_context_set_image(im_target);
 }
 
 static void pdp_imgloader_process_yv12(t_pdp_imgloader *x)
@@ -516,62 +588,65 @@ static void pdp_imgloader_process_yv12(t_pdp_imgloader *x)
     newheader->info.image.encoding = header->info.image.encoding;
     newheader->info.image.width = x->x_vwidth;
     newheader->info.image.height = x->x_vheight;
-
-    memcpy( newdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
-
-    if ( x->x_image != NULL ) imlib_context_set_image(x->x_image);
-    pY = newdata;
-    pV = newdata+x->x_vsize;
-    pU = newdata+x->x_vsize+(x->x_vsize>>2);
-    for ( py=0; py<x->x_vheight; py++ )
+    if (x->x_quality && x->x_image != NULL)
     {
-      for ( px=0; px<x->x_vwidth; px++ )
-      {
-        if ( ( x->x_image != NULL ) 
-             && (px >= x->x_xoffset) && ( px < x->x_xoffset + x->x_iwidth )
-	     && (py >= x->x_yoffset) && ( py < x->x_yoffset + x->x_iheight ) 
-	     && ( !(*(x->x_mask+py*x->x_vwidth+px)) )
-           )
+        Imlib_Image newframe;	//only for quality mode
+	newframe = imlib_create_image(x->x_vwidth, x->x_vheight);
+	imlib_context_set_image(newframe);
+	DATA32 *imdata = imlib_image_get_data();
+        yuv_Y122RGB( data, imdata, x->x_vwidth, x->x_vheight );
+	draw_rgb_image(x);
+        yuv_RGB2Y12( imdata, newdata, x->x_vwidth, x->x_vheight );
+	imlib_image_put_back_data(imdata);
+	imlib_free_image();
+    }
+    else
+    {
+        if ( x->x_image != NULL ) imlib_context_set_image(x->x_image);
+        memcpy( newdata, data, (x->x_vsize+(x->x_vsize>>1))<<1 );
+
+        pY = newdata;
+        pV = newdata+x->x_vsize;
+        pU = newdata+x->x_vsize+(x->x_vsize>>2);
+        for ( py=0; py<x->x_vheight; py++ )
         {
-            y = yuv_RGBtoY(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
-            u = yuv_RGBtoU(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
-            v = yuv_RGBtoV(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
-
-
-	    if ( imlib_image_has_alpha() )
-	    {
-	      alpha = (x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)] >> 24)/255; 
-	    }
-	    else
-	    {
-              alpha = 1.0;
-	    }
-            factor = x->x_blend*alpha;
-          
-            *(pY) = (int)((1-factor)*(*(pY)) + factor*(y<<7));
+          for ( px=0; px<x->x_vwidth; px++ )
+          {
+            if ( ( x->x_image != NULL ) 
+                 && (px >= x->x_xoffset) && ( px < x->x_xoffset + x->x_iwidth )
+    	     && (py >= x->x_yoffset) && ( py < x->x_yoffset + x->x_iheight ) 
+    	     && ( !(*(x->x_mask+py*x->x_vwidth+px)) )
+               )
+            {
+                y = yuv_RGBtoY(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
+                u = yuv_RGBtoU(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
+                v = yuv_RGBtoV(x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)]);
+    
+    
+    	        if ( imlib_image_has_alpha() )
+    	        {
+    	          alpha = (x->x_imdata[(py-x->x_yoffset)*x->x_iwidth+(px-x->x_xoffset)] >> 24)/255; 
+    	        }
+    	        else
+    	        {
+                  alpha = 1.0;
+    	        }
+                factor = x->x_blend*alpha;
+              
+                *(pY) = (int)((1-factor)*(*(pY)) + factor*(y<<7));
+                if ( (px%2==0) && (py%2==0) )
+                {
+                  *(pV) = (int)((1-factor)*(*(pV)) + factor*((v-128)<<8));
+                  *(pU) = (int)((1-factor)*(*(pU)) + factor*((u-128)<<8));
+                }
+            }
+            pY++;
             if ( (px%2==0) && (py%2==0) )
             {
-              *(pV) = (int)((1-factor)*(*(pV)) + factor*((v-128)<<8));
-              *(pU) = (int)((1-factor)*(*(pU)) + factor*((u-128)<<8));
+              pV++;pU++;
             }
+          }
         }
-	// paint it white ( for debugging )
-        /*
-	if ( ( abs( py - x->x_hiddenzones[0].a1*px - x->x_hiddenzones[0].b1 ) < 0.1 ) ||
-             ( abs( py - x->x_hiddenzones[0].a2*px - x->x_hiddenzones[0].b2 ) < 0.1 ) ||
-             ( abs( py - x->x_hiddenzones[0].a3*px - x->x_hiddenzones[0].b3 ) < 0.1 ) )
-        {
-            *(pY) = (0xff<<7);
-            *(pU) = (0xff<<8);
-            *(pV) = (0xff<<8);
-        }
-        */
-        pY++;
-        if ( (px%2==0) && (py%2==0) )
-        {
-          pV++;pU++;
-        }
-      }
     }
 
     return;
@@ -609,7 +684,6 @@ static void pdp_imgloader_process(t_pdp_imgloader *x)
             // should write something to handle these one day
             // but i don't use this mode                      
 	    break;
-
 	  default:
 	    /* don't know the type, so dont pdp_imgloader_process */
 	    break;
@@ -625,8 +699,12 @@ static void pdp_imgloader_input_0(t_pdp_imgloader *x, t_symbol *s, t_floatarg f)
     /* if this is a register_ro message or register_rw message, register with packet factory */
 
     if (s== gensym("register_rw")) 
-       x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("image/YCrCb/*") );
-
+	switch(pdp_packet_header((int)f)->info.image.encoding)
+        {
+	  case PDP_IMAGE_YV12:
+          x->x_dropped = pdp_packet_convert_ro_or_drop(&x->x_packet0, (int)f, pdp_gensym("image/YCrCb/*") );
+	  break;
+	}
     if ((s == gensym("process")) && (-1 != x->x_packet0) && (!x->x_dropped)){
 
         /* add the process method and callback to the process queue */
@@ -662,8 +740,10 @@ void *pdp_imgloader_new(void)
     x->x_queue_id = -1;
     x->x_image = NULL;
 
-    x->x_blend = 1;
+    x->x_blend = 1.0;
     x->x_mask = NULL;
+    x->x_quality = 0;
+    x->b_fit = 0;
 
     for ( ti=0; ti<MAX_ZONES; ti++ )
     {
@@ -694,9 +774,12 @@ void pdp_imgloader_setup(void)
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_xoffset, gensym("xoffset"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_yoffset, gensym("yoffset"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_blend, gensym("blend"),  A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_quality, gensym("quality"),  A_DEFFLOAT, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_hide, gensym("hide"),  A_GIMME, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_rawhide, gensym("rawhide"),  A_GIMME, A_NULL);
     class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_unhide, gensym("unhide"),  A_DEFFLOAT, A_NULL);
+    class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_operation, gensym("operation"),  A_SYMBOL, A_NULL);
+    class_addmethod(pdp_imgloader_class, (t_method)pdp_imgloader_fit, gensym("fit"),  A_DEFFLOAT, A_NULL);
     class_sethelpsymbol( pdp_imgloader_class, gensym("pdp_imgloader.pd") );
 
 }
