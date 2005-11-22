@@ -64,7 +64,9 @@ install: $(OBJECTS_DEST) help_install objects_install unfiltered_install \
 	@echo "externals install succeeded!"
 
 objects_install: 
-	install -p $(EXTERNALS_SRC)/build/$(OS_NAME)/*.$(EXTENSION) $(OBJECTS_DEST)
+	cd $(EXTERNALS_SRC)/build/$(OS_NAME)/ && \
+		install -p *.$(EXTENSION) $(OBJECTS_DEST)
+
 
 #==============================================================================#
 #
@@ -404,7 +406,8 @@ unfiltered_install:
 # hcs
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/*.pd | \
 			 grep -v '\-help.pd') $(OBJECTS_DEST)
-# hid
+# hid 
+# these don't work on Windows yet
 	cd $(EXTERNALS_SRC)/hcs/hid && $(MAKE) 
 	install -p $(EXTERNALS_SRC)/hcs/hid/hid.$(EXTENSION) $(OBJECTS_DEST)
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/hid/*.pd | \
@@ -416,11 +419,13 @@ unfiltered_install:
 			 grep -v '\-help.pd') $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
 # OSC
-	cd $(EXTERNALS_SRC)/OSCx && ./configure && $(MAKE)
+# these don't work on Windows yet
+	cd $(EXTERNALS_SRC)/OSCx && ./configure && $(MAKE) CC=gcc
 	install -p $(EXTERNALS_SRC)/OSCx/doc/*.* $(HELP_DEST)
 	install -p $(EXTERNALS_SRC)/OSCx/src/*.$(EXTENSION) $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
 # unauthorized
+# these don't work on Windows yet
 	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE) 
 	install -p $(EXTERNALS_SRC)/unauthorized/*/*.$(EXTENSION) $(OBJECTS_DEST)
 	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd $(HELP_DEST)
