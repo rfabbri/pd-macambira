@@ -360,7 +360,9 @@ devsymlinks:
 patch_pd:
 	@echo PD_SRC $(PD_SRC)
 # change Pd's version number to reflect the extended build
-	sed -i.bak 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  $(PD_SRC)/src/s_main.c
+	cd $(PD_SRC)/src/ && \
+		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
+		mv s_main.c.tmp s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
@@ -377,10 +379,11 @@ patch_pd:
 
 
 unpatch_pd:
-# this sed pattern won't work with TEST versions.  
-	sed -i.bak \
-		's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
-		$(PD_SRC)/src/s_main.c
+# this sed pattern won't work with TEST versions
+	cd $(PD_SRC)/src && \
+		sed 's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
+			s_main.c > s_main.c.tmp && \
+		mv s_main.c.tmp s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
