@@ -1,31 +1,55 @@
 
+
+Check this webpage for more build instructions:
+http://puredata.org/docs/developer/mingw
+
 ------------------------------------------------------------------------------
 Software Requirements
 ------------------------------------------------------------------------------
 
+MinGW
+	 MinGW provides a free, complete build environment for Pd.
+
 Inno Setup - http://www.jrsoftware.org/isinfo.php
-	  This package is assembled using Inno Setup, check pd.iss for details.
+	 This package is assembled using Inno Setup, check pd.iss for details.
 
 ogg vorbis win32k SDK - 
 	 Install into C:\ to make it work with the current Makefile
+
+Tcl/Tk
+	 Compile for MinGW.
 
 pthreads - ftp://sources.redhat.com/pub/pthreads-win32/
 	 pthreads is a standard, cross-platform threading library used in the pd 
 	 core and externals.  You can use the version included with Pd.
 
+MinGW/gcc
+	 Pd is free software, and can be compiled using free tools.  MinGW is the
+	 preferred way of compiling Pd on Windows.
+
 Microsoft Visual Studio - 
-    Sad but true, Pd is free software, but you need some very unfree software
-	 to compile it on Windows.  You need MS Visual Studio 6.0 or better.
+	 You can use MS Visual Studio 6.0 or better to compile Pd and some
 
 ------------------------------------------------------------------------------
-Makefile
+MinGW Makefile
 ------------------------------------------------------------------------------
+
+Since MinGW is the default build system, the file called "Makefile" is the
+MinGW Makefile.  TO compile:
+
+cd packages/win32_inno && make
+
+------------------------------------------------------------------------------
+Microsoft Visual Studio Makefile
+------------------------------------------------------------------------------
+
+You will need to do this to compile:
+
+nmake /f Makefile.nmake
 
 Currently, the Makefile.nmake only compiles the 'externals' collection.  It
 can also compile flext if you manually check the flext config and uncomment
-things from the Makefile.nmake.  Ideally, everything would be compiled and
-built from a Makefile using MinGW, so that only free software would be
-needed.
+things from the Makefile.nmake.
 
 ------------------------------------------------------------------------------
 Directory Layout
@@ -74,6 +98,10 @@ The recommended way to do this is (these are probably somewhat wrong):
          cvs checkout externals
          cd packages/win32_inno
 		 make clean && make
+
+------------------------------------------------------------------------------
+non-CVS binaries
+------------------------------------------------------------------------------
 
 Binary Sources I Used (I haven't tested them all, I just downloaded them):
 

@@ -1,4 +1,10 @@
 
+- in generate-pd.inno.sh, don't add dirs with no files in them (doc, 7.stuff, etc).
+
+- fix PD_VERSION, the sed patterns aren't working
+
+- make Pd.exe using MinGW's "start.exe" like MacOSX's "open"
+
 - figure out why MinGW-compiled "unauthorized" externals don't work
 
 - get Windows Makefiles for cyclone, toxy, zexy, Gem, unauthorized

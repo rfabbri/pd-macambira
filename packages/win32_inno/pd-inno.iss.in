@@ -1,0 +1,122 @@
+;
+;
+; This file is a template with packages/win32_inno/Makefile turns
+; into a proper .iss ISTool/Inno Setup file.  <hans@at.or.at>
+;
+;
+
+[Setup]
+AppName=pd
+AppVerName=PACKAGE_NAME
+AppPublisher=pure-data.org
+AppPublisherURL=http://puredata.org
+AppSupportURL=http://puredata.org/community/lists/
+AppUpdatesURL=http://puredata.org/downloads/
+DefaultDirName={pf}\pd
+DefaultGroupName=Pure Data
+LicenseFile=..\..\externals\maxlib\LICENSE
+
+Compression=zip/9
+ChangesAssociations=true
+OutputBaseFilename=PACKAGE_NAME
+[Tasks]
+; NOTE: The following entry contains English phrases ("Create a desktop icon" and "Additional icons"). You are free to translate them into another language if required.
+Name: desktopicon; Description: Create a &desktop icon; GroupDescription: Additional icons:
+; NOTE: The following entry contains English phrases ("Create a Quick Launch icon" and "Additional icons"). You are free to translate them into another language if required.
+Name: quicklaunchicon; Description: Create a &Quick Launch icon; GroupDescription: Additional icons:; Flags: unchecked
+
+[INI]
+Filename: {app}\pd.url; Section: InternetShortcut; Key: URL; String: http://puredata.org
+
+[Icons]
+Name: {group}\Pure Data; Filename: {app}\bin\pd.exe; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
+Name: {group}\puredata.org; Filename: {app}\pd.url
+Name: {group}\Uninstall Pure Data; Filename: {uninstallexe}
+Name: {userdesktop}\Pure Data; Filename: {app}\pd.exe; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
+
+;Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon; WorkingDir: {app}
+Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
+Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
+Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
+Name: {group}\Documentation\Gem Primer; Filename: {app}\doc\gem\GemPrimer.pdf
+
+
+[Run]
+; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
+Filename: {app}\pd.bat; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
+
+[UninstallDelete]
+Type: files; Name: {app}\pd.url
+
+[Registry]
+Root: HKCR; SubKey: Pure.Data; ValueType: dword; ValueName: EditFlags; ValueData: $00000000; Flags: noerror uninsdeletekey
+Root: HKCR; SubKey: Pure.Data; ValueType: dword; ValueName: BrowserFlags; ValueData: $00000008; Flags: uninsdeletekey noerror
+Root: HKCR; SubKey: Pure.Data; ValueType: string; ValueData: Pure Data; Flags: uninsdeletekey noerror
+Root: HKCR; SubKey: Pure.Data\DefaultIcon; ValueType: string; ValueData: {app}\lib\pdpatch.ico,0; Flags: createvalueifdoesntexist noerror
+Root: HKCR; SubKey: Pure.Data\shell; ValueType: string; ValueData: open; Flags: noerror uninsdeletekey
+Root: HKCR; SubKey: Pure.Data\shell\open\command; ValueType: string; ValueData: """{app}\bin\pd.exe"" -listdev ""%1"""; Flags: uninsdeletekey noerror
+Root: HKCR; SubKey: .pd; ValueType: string; ValueData: Pure.Data; Flags: noerror uninsdeletekey
+Root: HKCR; SubKey: .pd; ValueType: string; ValueName: Content Type; ValueData: text/plain; Flags: noerror uninsdeletekey
+
+[_ISTool]
+Use7zip=false
+OutputExeFilename=Output\PACKAGE_NAME.exe
+
+[Files]
+; commented out lines have no files, so they give an error
+; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+;
+;
+;-----------------------------------------------------------------------------
+; packages\win32_inno
+Source: pdpatch.ico; DestDir: {app}\lib
+Source: pd.ico; DestDir: {app}\lib
+#ifexist "pd-nolibs.bat"
+  Source: pd-nolibs.bat; DestDir: {app}
+#endif
+#ifexist "pd.bat"
+  Source: pd.bat; DestDir: {app}
+#endif
+#ifexist "pd-novideo.bat"
+  Source: pd-novideo.bat; DestDir: {app}
+#endif
+;
+;
+;-----------------------------------------------------------------------------
+; put pdsend and pdreceive in the System dir so that they are in the path
+;
+Source: build\bin\pdsend.exe; DestDir: {sys}; Flags: confirmoverwrite
+Source: build\bin\pdreceive.exe; DestDir: {sys}; Flags: confirmoverwrite
+; add Cyclone's cyclist.exe if it is present
+#ifexist "build\bin\cyclist.exe"
+  Source: build\bin\cyclist.exe; DestDir: {sys}; Flags: confirmoverwrite
+#endif
+;
+;
+;-----------------------------------------------------------------------------
+; MinGW Files
+; these are some helpful utilities from MinGW
+;
+; start.exe - like Mac OS X's 'open' command, allows you to open files and
+; URLs from the command line
+;Source: C:\msys\1.0\bin\start.exe; DestDir: {sys}; Flags: confirmoverwrite
+;
+;
+;-----------------------------------------------------------------------------
+; non CVS files
+;
+#ifexist "noncvs\extra"
+Source: noncvs\extra\*.dll; DestDir: {app}\extra
+#endif
+#ifexist "noncvs\doc\5.reference"
+Source: noncvs\doc\5.reference\*.*; DestDir: {app}\doc\5.reference; Flags:
+ignoreversion
+#endif
+;
+;
+;-----------------------------------------------------------------------------
+; AUTO-GENERATED
+; below this line should be blank since the rest of this file is generated
+; by the packages/win32_inno/Makefile.  <hans@at.or.at>
+;

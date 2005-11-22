@@ -11,7 +11,7 @@ PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
 SRC_ROOT_DIR = $(CWD)/../..
-BUILDLAYOUT_DIR = $(PACKAGES_SRC)
+BUILDLAYOUT_DIR = $(CWD)/..
 
 # source for the Wish Shell.app used to build Pd
 # download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
@@ -23,10 +23,7 @@ WISH = /Volumes/$(TCLTK)/$(WISH_NAME).app
 WISH_CONTENTS = $(WISH)/Contents
 
 
-# locations of the various directories from CVS
-SRC_ROOT_DIR = $(CWD)/../..
-
-include ../Makefile.buildlayout
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
@@ -38,7 +35,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_app_install rez
+darwin_app: darwin_app_core extended_app_install rez_install
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -81,7 +78,7 @@ Info.plist: Info.plist.in
 
 
 # tigital's Gem window focus black magic
-rez:
+rez_install:
 	install -p $(CWD)/mac.r $(BIN_DEST)
 	cd $(BIN_DEST) && /Developer/tools/Rez -t APPL mac.r -o pd
 
