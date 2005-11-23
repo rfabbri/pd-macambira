@@ -1,10 +1,10 @@
 Index: m_class.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/m_class.c,v
-retrieving revision 1.4
-diff -u -w -r1.4 m_class.c
---- m_class.c	28 Nov 2004 21:20:42 -0000	1.4
-+++ m_class.c	17 Nov 2005 23:33:06 -0000
+retrieving revision 1.3
+diff -u -w -r1.3 m_class.c
+--- m_class.c	6 Sep 2004 20:20:35 -0000	1.3
++++ m_class.c	22 Nov 2005 16:48:21 -0000
 @@ -16,6 +16,7 @@
  
  #include <stdarg.h>
@@ -81,10 +81,10 @@ diff -u -w -r1.4 m_class.c
 Index: s_loader.c
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/s_loader.c,v
-retrieving revision 1.6
-diff -u -w -r1.6 s_loader.c
---- s_loader.c	30 May 2005 03:04:19 -0000	1.6
-+++ s_loader.c	17 Nov 2005 23:33:07 -0000
+retrieving revision 1.4
+diff -u -w -r1.4 s_loader.c
+--- s_loader.c	6 Sep 2004 20:20:35 -0000	1.4
++++ s_loader.c	22 Nov 2005 16:48:22 -0000
 @@ -46,10 +46,11 @@
  
  void class_set_extern_dir(t_symbol *s);
@@ -125,28 +125,30 @@ diff -u -w -r1.6 s_loader.c
              return (0);
          }
      }
-@@ -93,9 +113,20 @@
+@@ -93,9 +113,22 @@
  #ifdef MACOSX
      strcpy(symname, "_");
      strcat(symname, nameptr);
 +    if(altname)
 +      {
-+        strcpy(altsymname, "_setup_");
-+        strcat(symname, altname);
++        strcpy(altsymname, "_alt_");
++        strcat(altsymname, altname);
++        strcat(altsymname, "_setup");
 +      }
  #else
      strcpy(symname, nameptr);
 +    if(altname)
 +      {
-+        strcpy(altsymname, "setup_");
++        strcpy(altsymname, "alt_");
 +        strcat(altsymname, altname);
++        strcat(altsymname, "_setup");
 +      }
  #endif
 +
          /* if the last character is a tilde, replace with "_tilde" */
      if (symname[strlen(symname) - 1] == '~')
          strcpy(symname + (strlen(symname) - 1), "_tilde");
-@@ -110,6 +141,7 @@
+@@ -110,6 +143,7 @@
          return (0);
      }
      makeout = (t_xxx)dlsym(dlobj,  symname);
@@ -154,7 +156,7 @@ diff -u -w -r1.6 s_loader.c
  #endif
  #ifdef MSW
      sys_bashfilename(filename, filename);
-@@ -121,6 +153,7 @@
+@@ -121,6 +155,7 @@
          return (0);
      }
      makeout = (t_xxx)GetProcAddress(ntdll, symname);  
@@ -162,8 +164,8 @@ diff -u -w -r1.6 s_loader.c
  #endif
  #ifdef MACOSX
      {
-@@ -147,6 +180,8 @@
-         }
+@@ -138,6 +173,8 @@
+ 
          s = NSLookupSymbolInModule(ret, symname); 
  
 +        if(!s)s=NSLookupSymbolInModule(ret, altsymname); 
@@ -171,7 +173,7 @@ diff -u -w -r1.6 s_loader.c
          if (s)
              makeout = (t_xxx)NSAddressOfSymbol( s);
          else makeout = 0;
-@@ -156,6 +191,8 @@
+@@ -147,6 +184,8 @@
      if (!makeout)
      {
          post("load_object: Symbol \"%s\" not found", symname);
@@ -180,7 +182,7 @@ diff -u -w -r1.6 s_loader.c
          class_set_extern_dir(&s_);
          return 0;
      }
-@@ -164,6 +201,10 @@
+@@ -155,6 +194,10 @@
      return (1);
  }
  
@@ -194,10 +196,10 @@ diff -u -w -r1.6 s_loader.c
 Index: s_stuff.h
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/s_stuff.h,v
-retrieving revision 1.7
-diff -u -w -r1.7 s_stuff.h
---- s_stuff.h	16 Jul 2005 01:43:18 -0000	1.7
-+++ s_stuff.h	17 Nov 2005 23:33:07 -0000
+retrieving revision 1.5
+diff -u -w -r1.5 s_stuff.h
+--- s_stuff.h	6 Sep 2004 20:20:36 -0000	1.5
++++ s_stuff.h	22 Nov 2005 16:48:22 -0000
 @@ -47,6 +47,7 @@
  
  /* s_loader.c */

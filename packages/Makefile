@@ -221,7 +221,7 @@ pd_install: pd
 	cd $(PD_SRC)/src && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS) install
 	install -d $(MANUALS_DEST)/$(PD_NAME)
-	install -p $(PD_SRC)/src/notes.txt $(MANUALS_DEST)/$(PD_DEST)
+	install -p $(PD_SRC)/src/notes.txt $(MANUALS_DEST)/$(PD_NAME)
 
 
 #------------------------------------------------------------------------------

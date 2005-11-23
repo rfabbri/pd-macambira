@@ -21,9 +21,9 @@
 #	  abstractions
 #	  externals/build
 # 	  packages
+#    doc
 #
 # it will be going here too:
-#    doc
 #    extensions
 #    gem
 #    pd
@@ -130,10 +130,8 @@ PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 
 # release version for this distro
-PACKAGE_VERSION = extended-RC3
+PACKAGE_VERSION = extended-RC4
 PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
-DMG_NAME = $(PACKAGE_NAME)
-
 
 
 

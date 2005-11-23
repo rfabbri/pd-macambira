@@ -11,12 +11,8 @@
 
 - On GNU/Linux, figure out how to deal with build/extra vs. build/lib/pd/extra
 
-- fix unpatch_pd bug that doesn't fix the version name in s_main.c
-
-- global versioning system
-  		the package releases should have versions of there own which apply to
-  		all packages, regardless of format or OS.  This will make for easy and
-  		seemless cross-platform work.
+- make loaderHEX functions follow Pd standart of object_setup() rather than
+  setup_object()
 
 - global optimization flags
   		ideally, you would use a version of Pd that is fully optimized for your
