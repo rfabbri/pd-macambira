@@ -1,4 +1,8 @@
 
+- somehow 3.audio.examples and fiddle~, bonk~, etc. didn't get installed
+
+- in post-clean, rm *.bak
+
 - make Info.plist.in template and have the Makefile create Info.plist
 
 - check to make sure that Rez mac.r is working in Makefile

@@ -9,7 +9,7 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>pd</string>
+				<string>PD_APP_NAME</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>pd-file.icns</string>
@@ -22,7 +22,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Pd</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.puredata</string>
+	<string>org.puredata.pd</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -32,6 +32,6 @@
 	<key>CFBundleIconFile</key>
 	<string>pd.icns</string>
 	<key>CFBundleVersion</key>
-	<string>0.37-CVS</string>
+	<string>PD_VERSION</string>
 </dict>
 </plist>

@@ -6,7 +6,7 @@ MAKE=MACOSX_DEPLOYMENT_TARGET=10.3 make
 
 CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
-PD_APP_NAME = Pd
+PD_APP_NAME = $(PACKAGE_NAME)
 PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
 INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
 
@@ -49,7 +49,7 @@ extended_app_install:  extended_install darwin_app_noncvs darwin_app_doc_format
 #------------------------------------------------------------------------------#
 # check here for a reference on how to do this:
 # http://cvs.sourceforge.net/viewcvs.py/tkcvs/tkcvs-proj/PackApp?rev=1.4
-darwin_app_wrapper:
+darwin_app_wrapper: Info.plist
 	test -d /Volumes/$(TCLTK) || hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
@@ -75,7 +75,10 @@ darwin_app_wrapper:
 #------------------------------------------------------------------------------#
 # generate Info.plist using PD_APP_NAME and PD_VERSION
 Info.plist: Info.plist.in 
-
+	cat Info.plist.in | \
+		sed 's/PD_APP_NAME/$(PD_APP_NAME)/' | \
+		sed 's/PD_VERSION/$(PD_VERSION)-$(PACKAGE_VERSION)/' > \
+		Info.plist
 
 # tigital's Gem window focus black magic
 rez_install:
@@ -286,29 +289,28 @@ darwin_app_perms:
 	test -d $(APPLICATIONS_DEST)/serendipd && \
 		chmod a+w $(APPLICATIONS_DEST)/serendipd/*shared_patch.pd
 
+DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
-	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/$(DMG_NAME).app"
+	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 #	install -p -m0444 $(MANUALS_DEST)/$(PD_NAME)/PD\ LICENSE.txt \
 #		$(MANUALS_DEST)/*.html "$(CWD)/$(DMG_NAME)"
 	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 
-clean: darwin_app_clean darwin_app_externals_standard_clean darwin_pd_clean
-clean: darwin_app_externals_gem_clean darwin_app_externals_flext_clean
+clean: darwin_app_clean darwin_app_externals_standard_clean \
+	darwin_app_externals_gem_clean darwin_app_externals_flext_clean \
+	cd $(PACKAGES_SRC) && make clean
+	-rm Info.plist
 
-darwin_pd_clean:
-	cd $(PD_SRC)/src/ && make clean
 
 darwin_app_clean:
 	-sudo rm -Rf -- $(BUILD_BASE) "$(DMG_NAME)" 
 	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
 
-darwin_app_externals_standard_clean:
-	cd $(EXTERNALS_SRC)/build/darwin && make clean
-	cd $(EXTERNALS_SRC)/hcs/hid && make clean
+
 
 darwin_app_externals_gem_clean:
 	cd $(GEM_SRC)/Gem && xcodebuild clean
@@ -328,6 +330,16 @@ darwin_app_externals_flext_clean:
 ## DEPRECATED TARGETS
 #
 #==============================================================================#
+
+darwin_app_externals_standard_clean:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(PACKAGES_SRC) && make externals_clean"
+
+darwin_pd_clean:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(PACKAGES_SRC) && make pd_clean"
 
 darwin_app_externals:
 	@echo " "
