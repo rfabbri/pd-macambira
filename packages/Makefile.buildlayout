@@ -19,12 +19,12 @@
 #
 # This file is currently located in these places: 
 #	  abstractions
-#	  externals/build
+#    extensions
+#	  externals
 # 	  packages
 #    doc
 #
 # it will be going here too:
-#    extensions
 #    gem
 #    pd
 #
