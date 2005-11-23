@@ -1,4 +1,10 @@
 
+- fix scripts/checkout...sh.  It doesn't cvs co into the newly created pure-data folder
+
+- add packages/win32_inno/Makefile to cvs on winky
+
+- menu_openhtml on Win32 with rundll should be able to open other filetypes like open on MACOSX.
+
 - rename "applications" to "examples"
 
 - downcase *_DEST and *_SRC to be more readable
