@@ -1,12 +1,20 @@
 
-- in generate-pd.inno.sh, don't add dirs with no files in them (doc, 7.stuff, etc).
+- add Gem to noncvs
 
-- fix PD_VERSION, the sed patterns aren't working
+- get Pd compiling on MinGW:.  From Carmen: 
+  
+  - "theres a SConscript in devel_0_39 and theres also a makefile.mingw maybe
+  	 in devel_0_38. just ./configure && make && make install the deps like tk
+  	 and such first, although you can use a static path to MSVC-generated .libs
+  	 if you dont feel like doing that.."
+
 
 - make Pd.exe using MinGW's "start.exe" like MacOSX's "open"
 
+- menu_openhtml on Win32 with rundll should be able to open other filetypes like open on MACOSX.
+
+- fix PD_VERSION, the sed patterns aren't working
+
 - figure out why MinGW-compiled "unauthorized" externals don't work
 
-- get Windows Makefiles for cyclone, toxy, zexy, Gem, unauthorized
-
-- change license file to GPL
+- get Windows Makefiles for Gem, unauthorized
