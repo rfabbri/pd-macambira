@@ -30,7 +30,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 final_setup:
 	chmod -R ugo-w $(DOCS_DEST)
 
-install: pd-msg_install pddp_install tutorials_install
+install: pd_fileformat_install pd-msg_install pddp_install tutorials_install
 	@echo " "
 	@echo "doc install succeeded!"
 
@@ -55,12 +55,24 @@ pd-msg_install: $(MANUALS_DEST)
 	done
 
 
+
+#------------------------------------------------------------------------------#
+# PD_FILEFORMAT
+PD_FILEFORMAT_NAME = Pd
+pd_fileformat_install: $(MANUALS_DEST)
+	install -d $(MANUALS_DEST)/$(PD_FILEFORMAT_NAME)
+	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
+		$(MANUALS_DEST)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
+
+
+
 #------------------------------------------------------------------------------#
 # PDDP
 pddp_install: $(HELP_DEST)
 	install -p $(DOC_SRC)/pddp/*.pd $(HELP_DEST)
 # this file is used in key-help.pd
 	install -p $(DOC_SRC)/pddp/keyboard_fun.txt $(HELP_DEST)
+
 
 
 #------------------------------------------------------------------------------#
@@ -84,16 +96,23 @@ tutorials_install: $(MANUALS_DEST)
 
 # make the symlinks necessary to simulate the installed environment
 devsymlinks:
-	ln -s $(PD_SRC)/doc/2.control.examples $(DOC_SRC)/2.control.examples
-	ln -s $(PD_SRC)/doc/3.audio.examples $(DOC_SRC)/3.audio.examples
+	test -e $(DOC_SRC)/2.control.examples || \
+		ln -s $(PD_SRC)/doc/2.control.examples $(DOC_SRC)/2.control.examples
+	test -e $(DOC_SRC)/3.audio.examples || \
+		ln -s $(PD_SRC)/doc/3.audio.examples $(DOC_SRC)/3.audio.examples
 # pd <= 0.38-4 has 4.fft.examples
-	ln -s $(PD_SRC)/doc/4.fft.examples $(DOC_SRC)/4.fft.examples
+	test -e $(DOC_SRC)/4.fft.examples || \
+		ln -s $(PD_SRC)/doc/4.fft.examples $(DOC_SRC)/4.fft.examples
 # pd > 0.38-4 has 4.data.structures
-	ln -s $(PD_SRC)/doc/4.data.structures $(DOC_SRC)/4.data.structures
-	ln -s $(PD_SRC)/doc/7.stuff $(DOC_SRC)/7.stuff
-	ln -s $(PD_SRC)/doc/sound $(DOC_SRC)/sound
+	test -e $(DOC_SRC)/4.data.structures || \
+		ln -s $(PD_SRC)/doc/4.data.structures $(DOC_SRC)/4.data.structures
+	test -e $(DOC_SRC)/7.stuff || \
+		ln -s $(PD_SRC)/doc/7.stuff $(DOC_SRC)/7.stuff
+	test -e $(DOC_SRC)/sound || \
+		ln -s $(PD_SRC)/doc/sound $(DOC_SRC)/sound
 # put the pddp support objects in the path
-	ln -s $(ABSTRACTIONS_SRC)/pddp $(DOC_SRC)/pddp/pddp
+	test -e $(DOC_SRC)/pddp/pddp || \
+		ln -s $(ABSTRACTIONS_SRC)/pddp $(DOC_SRC)/pddp/pddp
 
 #==============================================================================#
 #
