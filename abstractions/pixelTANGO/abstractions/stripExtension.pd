@@ -1,0 +1,8 @@
+#N canvas 599 457 398 185 10;
+#X obj 17 51 inlet;
+#X obj 17 141 outlet;
+#X obj 17 104 py pt stripExtension;
+#X text 4 5 Uses py to remove the extension from a symbol using os.path.splitext()
+;
+#X connect 0 0 2 1;
+#X connect 2 0 1 0;
