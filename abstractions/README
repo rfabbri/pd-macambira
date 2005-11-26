@@ -64,23 +64,23 @@ edit the paths of the files that you want to include.  The paths will be the
 only text written out.  All of the installation paths will be Makefile
 variables.  Check the below example:
 
-	install -d $(HELP_DEST)/$(MEMENTO_NAME)
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd \
-		$(HELP_DEST)/$(MEMENTO_NAME)
+	install -d $(helpdir)/$(MEMENTO_NAME)
+	install -p $(abstractions_src)/rradical/memento/*-help.pd \
+		$(helpdir)/$(MEMENTO_NAME)
 
 becomes:
 
-	install -d $(HELP_DEST)/$(MYLIBRARY_NAME)
-	install -p $(ABSTRACTIONS_SRC)/mylibrary/*-help.pd \
-		$(HELP_DEST)/$(MYLIBRARY_NAME)
+	install -d $(helpdir)/$(MYLIBRARY_NAME)
+	install -p $(abstractions_src)/mylibrary/*-help.pd \
+		$(helpdir)/$(MYLIBRARY_NAME)
 
 
 Also, since it is common to store the help patches in the same directory as
 the object patchs, you can use this pattern to exclude the help patches from
-being copied to $(OBJECTS_DEST):
+being copied to $(objectsdir):
 
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/mylibrary/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(MYLIBRARY_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/mylibrary/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(MYLIBRARY_NAME)
 
 
 
@@ -96,7 +96,7 @@ MYLIBRARY_NAME = mylibrary
 	 of objects within Pd (e.g. [mylibrary/myobject]).
 
 
-$(APPLICATIONS_DEST): 
+$(examplesdir): 
 
 	 If your project is an application or patch that is meant to be run
 	 directly, then it should go into this directory in its own subdirectory.
@@ -107,7 +107,7 @@ $(APPLICATIONS_DEST):
 	 appropriate in directory names.
 
 
-$(DOCS_DEST):
+$(pddocdir):
     All help patches should go into this directory in a subdirectory with the
     same nameas the subdirectory for your objects.  For example, for
     [mylibrary/myobject] above, the helpfile would be "mylibrary/myobject-help.pd".
@@ -115,7 +115,7 @@ $(DOCS_DEST):
 	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
 
 
-$(MANUALS_DEST): 
+$(manualsdir): 
 
     If you have any other kinds of documentation, like a text or HTML manual,
 	 or a Pd-based tutorial, then it should go into this directory, again in a
@@ -126,7 +126,7 @@ $(MANUALS_DEST):
 	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
 
 
-$(OBJECTS_DEST):
+$(objectsdir):
 
     If your project consists of objects that are meant to be reused in other
     patches rather than used as a application, then they should go into this

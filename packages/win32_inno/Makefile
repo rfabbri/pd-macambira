@@ -5,8 +5,8 @@ all: install
 
 CWD := $(shell pwd)
 
-INSTALL_PREFIX = $(CWD)/build
-SRC_ROOT_DIR = $(CWD)/../..
+prefix = $(CWD)/build
+cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
 
 
@@ -16,8 +16,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
-				SRC_ROOT_DIR=$(SRC_ROOT_DIR) \
-				INSTALL_PREFIX=$(INSTALL_PREFIX) \
+				cvs_root_dir=$(cvs_root_dir) \
+				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
 
@@ -47,5 +47,5 @@ $(PD_ISS_NAME): $(PD_ISS_NAME).in
 #==============================================================================#
 
 extended_install:
-	cd $(PACKAGES_SRC) && make $(DEST_PATHS) install
+	cd $(packages_src) && make $(DEST_PATHS) install
 

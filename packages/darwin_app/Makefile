@@ -8,9 +8,9 @@ CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
 PD_APP_NAME = $(PACKAGE_NAME)
 PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
-INSTALL_PREFIX = $(PD_APP_CONTENTS)/Resources
+prefix = $(PD_APP_CONTENTS)/Resources
 
-SRC_ROOT_DIR = $(CWD)/../..
+cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
 
 # source for the Wish Shell.app used to build Pd
@@ -28,8 +28,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
-				SRC_ROOT_DIR=$(SRC_ROOT_DIR) \
-				INSTALL_PREFIX=$(INSTALL_PREFIX) \
+				cvs_root_dir=$(cvs_root_dir) \
+				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
 install: darwin_app
@@ -82,21 +82,21 @@ Info.plist: Info.plist.in
 
 # tigital's Gem window focus black magic
 rez_install:
-	install -p $(CWD)/mac.r $(BIN_DEST)
-	cd $(BIN_DEST) && /Developer/tools/Rez -t APPL mac.r -o pd
+	install -p $(CWD)/mac.r $(bindir)
+	cd $(bindir) && /Developer/tools/Rez -t APPL mac.r -o pd
 
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
-	cd $(PACKAGES_SRC) && \
+	cd $(packages_src) && \
 		make $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
 	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
 # run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(DOCS_DEST) && \
-		$(SCRIPTS_SRC)/convert-help-to-standard.sh
+	cd $(pddocdir) && \
+		$(scripts_src)/convert-help-to-standard.sh
 
 
 
@@ -104,10 +104,10 @@ darwin_app_doc_format:
 # set the font to 10pt on all help patches
 # the BSD/Darwin version of sed must create a backup file when doing 
 # in-place replacement, so delete the unneeded backup files
-	cd $(DOCS_DEST) && \
+	cd $(pddocdir) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
 			*/*.pd */*/*.pd */*/*/*.pd
-	find $(INSTALL_PREFIX) -name '*.pd.bak' -delete
+	find $(prefix) -name '*.pd.bak' -delete
 
 #==============================================================================#
 #
@@ -116,7 +116,7 @@ darwin_app_doc_format:
 #==============================================================================#
 
 extended_install:
-	cd $(PACKAGES_SRC) && make $(DEST_PATHS) install
+	cd $(packages_src) && make $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------#
@@ -129,12 +129,12 @@ darwin_app_externals_flext:
 #----------------------------------------------------------------------------
 # FLEXT
 # temp hack -HCS
-	test -f $(EXTERNALS_SRC)/grill/flext/buildsys/mac/pd/config-gcc.def || \
-		cp $(EXTERNALS_SRC)/grill/flext/buildsys/mac/pd/config-gcc.def \
-			$(EXTERNALS_SRC)/grill/flext/buildsys/config-mac-pd-gcc.txt
+	test -f $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def || \
+		cp $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def \
+			$(externals_src)/grill/flext/buildsys/config-mac-pd-gcc.txt
 # end temp hack
 # tigital 8/30/2005 added
-	cd $(EXTERNALS_SRC)/grill/flext && \
+	cd $(externals_src)/grill/flext && \
 		( \
         test -f buildsys/config-mac-pd-gcc.txt || \
           ( \
@@ -164,88 +164,88 @@ darwin_app_externals_flext:
 				echo Copied template flext config file \
 			) \
 		) && \
-		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(OBJECTS_DEST)
-	ln -sf $(EXTERNALS_SRC)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(EXTERNALS_SRC)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
-	install -p -m0444 $(EXTERNALS_SRC)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(OBJECTS_DEST)
-	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(OBJECTS_DEST)/libflext-pd.dylib
-	install -d $(DOCS_DEST)/tutorials
-	cp -rp $(EXTERNALS_SRC)/grill/flext/tutorial $(DOCS_DEST)/tutorials/flext
-	install -d $(DOCS_DEST)/flext
-	install -p -m0644 $(EXTERNALS_SRC)/grill/flext/gpl.txt  \
-		$(EXTERNALS_SRC)/grill/flext/readme.txt   \
-		$(EXTERNALS_SRC)/grill/flext/license.txt  \
-		$(DOCS_DEST)/flext
+		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
+	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
+	install -p -m0444 $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
+	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
+	install -d $(pddocdir)/tutorials
+	cp -rp $(externals_src)/grill/flext/tutorial $(pddocdir)/tutorials/flext
+	install -d $(pddocdir)/flext
+	install -p -m0644 $(externals_src)/grill/flext/gpl.txt  \
+		$(externals_src)/grill/flext/readme.txt   \
+		$(externals_src)/grill/flext/license.txt  \
+		$(pddocdir)/flext
 # FLEXTERNALS
 #########
 # dyn~
-	cd $(EXTERNALS_SRC)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/grill/dynext/pd/*.pd $(DOCS_DEST)
-	install -d $(DOCS_DEST)/dynext
-	install -p $(EXTERNALS_SRC)/grill/dynext/gpl.txt  \
-		$(EXTERNALS_SRC)/grill/dynext/readme.txt   \
-		$(EXTERNALS_SRC)/grill/dynext/license.txt  \
-		$(DOCS_DEST)/dynext
+	cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
+	install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p $(externals_src)/grill/dynext/pd/*.pd $(pddocdir)
+	install -d $(pddocdir)/dynext
+	install -p $(externals_src)/grill/dynext/gpl.txt  \
+		$(externals_src)/grill/dynext/readme.txt   \
+		$(externals_src)/grill/dynext/license.txt  \
+		$(pddocdir)/dynext
 #########
 # pool
-	cd $(EXTERNALS_SRC)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(OBJECTS_DEST) FLEXTINC=../flext/source
-	install -p $(EXTERNALS_SRC)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/grill/pool/help-pool.pd $(DOCS_DEST)
-	install -d $(DOCS_DEST)/pool
-	install -p $(EXTERNALS_SRC)/grill/pool/gpl.txt \
-		$(EXTERNALS_SRC)/grill/pool/readme.txt   \
-		$(EXTERNALS_SRC)/grill/pool/license.txt \
-		$(DOCS_DEST)/pool
+	cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+	install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p $(externals_src)/grill/pool/help-pool.pd $(pddocdir)
+	install -d $(pddocdir)/pool
+	install -p $(externals_src)/grill/pool/gpl.txt \
+		$(externals_src)/grill/pool/readme.txt   \
+		$(externals_src)/grill/pool/license.txt \
+		$(pddocdir)/pool
 #########
 # py/pyext
-#	cd $(EXTERNALS_SRC)/grill/py && \
+#	cd $(externals_src)/grill/py && \
 #		( \
 #			cp -f build/config-mac.def config.txt \
 #		) && \
-#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(OBJECTS_DEST) FLEXTINC=../flext/source
-#	install -p -m0444 $(EXTERNALS_SRC)/grill/py/pd-darwin/release-shared/*.pd_darwin $(OBJECTS_DEST)
+#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	install -p -m0444 $(externals_src)/grill/py/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
 # this wasn't building for me -HCS 2005-06-09
-	install -d $(DOCS_DEST)/py/examples
-	install -d $(DOCS_DEST)/py/scripts
-	install -p $(EXTERNALS_SRC)/grill/py/pd/*.pd $(DOCS_DEST)/py/examples
-	install -p $(EXTERNALS_SRC)/grill/py/scripts/*.py $(DOCS_DEST)/py/scripts
-	install -p $(EXTERNALS_SRC)/grill/py/gpl.txt  \
-		$(EXTERNALS_SRC)/grill/py/readme.txt $(EXTERNALS_SRC)/grill/py/license.txt \
-		$(DOCS_DEST)/py
-#	install -d $(INSTALL_PREFIX)/Library/Frameworks
-#	cp -R /Library/Frameworks/Python.framework $(INSTALL_PREFIX)/Library/Frameworks
+	install -d $(pddocdir)/py/examples
+	install -d $(pddocdir)/py/scripts
+	install -p $(externals_src)/grill/py/pd/*.pd $(pddocdir)/py/examples
+	install -p $(externals_src)/grill/py/scripts/*.py $(pddocdir)/py/scripts
+	install -p $(externals_src)/grill/py/gpl.txt  \
+		$(externals_src)/grill/py/readme.txt $(externals_src)/grill/py/license.txt \
+		$(pddocdir)/py
+#	install -d $(prefix)/Library/Frameworks
+#	cp -R /Library/Frameworks/Python.framework $(prefix)/Library/Frameworks
 #########
 # vasp
 #  fails without the dir
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-#	cd $(EXTERNALS_SRC)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(OBJECTS_DEST) FLEXTINC=../flext/source
-#	install -p -m0444 $(EXTERNALS_SRC)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(OBJECTS_DEST)
+#	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	install -p -m0444 $(externals_src)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
 # this wasn't building for me -HCS 2005-06-09
-	install -p -m0644 $(EXTERNALS_SRC)/grill/vasp/pd-help/*.pd $(DOCS_DEST)
-	install -d $(DOCS_DEST)/vasp
-	install -p -m0644 $(EXTERNALS_SRC)/grill/vasp/gpl.txt  \
-		$(EXTERNALS_SRC)/grill/vasp/readme.txt   \
-		$(EXTERNALS_SRC)/grill/vasp/license.txt  \
-		$(EXTERNALS_SRC)/grill/vasp/changes.txt  \
-		$(EXTERNALS_SRC)/grill/vasp/todo.txt     \
-		$(DOCS_DEST)/vasp
-	cp -rp $(EXTERNALS_SRC)/grill/vasp/pd-ex $(DOCS_DEST)/vasp
+	install -p -m0644 $(externals_src)/grill/vasp/pd-help/*.pd $(pddocdir)
+	install -d $(pddocdir)/vasp
+	install -p -m0644 $(externals_src)/grill/vasp/gpl.txt  \
+		$(externals_src)/grill/vasp/readme.txt   \
+		$(externals_src)/grill/vasp/license.txt  \
+		$(externals_src)/grill/vasp/changes.txt  \
+		$(externals_src)/grill/vasp/todo.txt     \
+		$(pddocdir)/vasp
+	cp -rp $(externals_src)/grill/vasp/pd-ex $(pddocdir)/vasp
 #########
 # xsample
-	cd $(EXTERNALS_SRC)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(OBJECTS_DEST) FLEXTINC=../flext/source
-	install -p -m0444 $(EXTERNALS_SRC)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(OBJECTS_DEST)
-	install -p -m0644 $(EXTERNALS_SRC)/grill/xsample/pd/*.pd $(DOCS_DEST)
-	install -d $(DOCS_DEST)/xsample
-	install -p -m0644 $(EXTERNALS_SRC)/grill/xsample/gpl.txt \
-		$(EXTERNALS_SRC)/grill/xsample/readme.txt \
-		$(EXTERNALS_SRC)/grill/xsample/license.txt \
-		$(DOCS_DEST)/xsample
+	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+	install -p -m0444 $(externals_src)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p -m0644 $(externals_src)/grill/xsample/pd/*.pd $(pddocdir)
+	install -d $(pddocdir)/xsample
+	install -p -m0644 $(externals_src)/grill/xsample/gpl.txt \
+		$(externals_src)/grill/xsample/readme.txt \
+		$(externals_src)/grill/xsample/license.txt \
+		$(pddocdir)/xsample
 ########## FOOTILS #########
 # syncgrain
-#	cd $(EXTERNALS_SRC)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
-#	install -p -m0444 $(EXTERNALS_SRC)/footils/syncgrain/pd-darwin/*.pd_darwin \
-#		$(OBJECTS_DEST)
-	install -p -m0644 $(EXTERNALS_SRC)/footils/syncgrain/pd/*.* $(DOCS_DEST)
+#	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
+#	install -p -m0444 $(externals_src)/footils/syncgrain/pd-darwin/*.pd_darwin \
+#		$(objectsdir)
+	install -p -m0644 $(externals_src)/footils/syncgrain/pd/*.* $(pddocdir)
 
 
 
@@ -253,29 +253,29 @@ darwin_app_externals_flext:
 darwin_app_externals_c++:
 #----------------------------------------------------------------------------
 # CREB
-#	cd $(EXTERNALS_SRC)/creb && autoconf && ./configure && cd modules++ && $(MAKE)
-#	install -p -m0644 $(EXTERNALS_SRC)/creb/modules++/*.pd_darwin $(OBJECTS_DEST)
+#	cd $(externals_src)/creb && autoconf && ./configure && cd modules++ && $(MAKE)
+#	install -p -m0644 $(externals_src)/creb/modules++/*.pd_darwin $(objectsdir)
 #----------------------------------------------------------------------------
 # gem2pdp
-#	cd $(EXTERNALS_SRC)/gem2pdp && $(MAKE) -f Makefile.darwin
-#	install -p -m0444 $(EXTERNALS_SRC)/gem2pdp/*.pd_darwin $(OBJECTS_DEST)
+#	cd $(externals_src)/gem2pdp && $(MAKE) -f Makefile.darwin
+#	install -p -m0444 $(externals_src)/gem2pdp/*.pd_darwin $(objectsdir)
 
 
 darwin_app_perms:
-	chmod -R a-w $(DOCS_DEST)
+	chmod -R a-w $(pddocdir)
 
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
-#	install -p -m0444 $(MANUALS_DEST)/$(PD_NAME)/PD\ LICENSE.txt \
-#		$(MANUALS_DEST)/*.html "$(CWD)/$(DMG_NAME)"
+#	install -p -m0444 $(manualsdir)/$(PD_NAME)/PD\ LICENSE.txt \
+#		$(manualsdir)/*.html "$(CWD)/$(DMG_NAME)"
 	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 
 clean: darwin_app_clean	darwin_app_externals_flext_clean \
-	cd $(PACKAGES_SRC) && make clean
+	cd $(packages_src) && make clean
 	-rm Info.plist
 
 
@@ -287,11 +287,11 @@ darwin_app_clean:
 
 
 
-	cd $(GEM_SRC)/Gem && xcodebuild clean
+	cd $(gem_src)/Gem && xcodebuild clean
 
 darwin_app_externals_flext_clean:
-	cd $(EXTERNALS_SRC)/footils/syncgrain && make -f makefile.pd-darwin clean
-	-cd $(EXTERNALS_SRC)/grill && \
+	cd $(externals_src)/footils/syncgrain && make -f makefile.pd-darwin clean
+	-cd $(externals_src)/grill && \
 		rm -- flext/buildsys/config-mac-pd-gcc.txt config.txt flext/config.txt \
 			flext/source/libflext.a */pd-darwin/*.o */pd-darwin/*/*.o \
 		 	*/pd-darwin/*/*.pd_darwin */pd-darwin/*.pd_darwin \
@@ -308,38 +308,38 @@ darwin_app_externals_flext_clean:
 darwin_app_noncvs:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(PACKAGES_SRC) && make noncvs_install"
-	cd $(PACKAGES_SRC) && make $(DEST_PATHS) noncvs_install
+	@echo "cd $(packages_src) && make noncvs_install"
+	cd $(packages_src) && make $(DEST_PATHS) noncvs_install
 
 darwin_app_externals_gem_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(PACKAGES_SRC) && make gem_clean"
+	@echo "cd $(packages_src) && make gem_clean"
 
 darwin_app_externals_gem:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(PACKAGES_SRC) && make gem_install"
+	@echo "cd $(packages_src) && make gem_install"
 
 darwin_app_externals_standard_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(PACKAGES_SRC) && make externals_clean"
+	@echo "cd $(packages_src) && make externals_clean"
 
 darwin_pd_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(PACKAGES_SRC) && make pd_clean"
+	@echo "cd $(packages_src) && make pd_clean"
 
 darwin_app_externals:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(EXTERNALS_SRC) && make install"
+	@echo "cd $(externals_src) && make install"
 
 darwin_app_externals_standard:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(EXTERNALS_SRC) && make install"
+	@echo "cd $(externals_src) && make install"
 
 darwin_patch_pd:
 	@echo " "
@@ -354,7 +354,7 @@ darwin_unpatch_pd:
 darwin_app_docs:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(DOC_SRC) && make install"
+	@echo "cd $(doc_src) && make install"
 
 darwin_app_license:
 	@echo " "

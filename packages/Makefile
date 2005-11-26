@@ -9,8 +9,8 @@
 
 CWD := $(shell pwd)
 
-SRC_ROOT_DIR = $(CWD)/..
-INSTALL_PREFIX = $(SRC_ROOT_DIR)/packages/build
+cvs_root_dir = $(CWD)/..
+prefix = $(cvs_root_dir)/packages/build
 BUILDLAYOUT_DIR = $(CWD)
 
 
@@ -29,59 +29,59 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 
 CYCLONE_MAJOR_VERSION := $(shell grep CYCLONE_VERSION \
-	$(EXTERNALS_SRC)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 CYCLONE_RELEASE := $(shell grep CYCLONE_RELEASE \
-	$(EXTERNALS_SRC)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 CYCLONE_BUILD := $(shell grep CYCLONE_BUILD \
-	$(EXTERNALS_SRC)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/cyclone/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 CYCLONE_VERSION := $(CYCLONE_MAJOR_VERSION) $(CYCLONE_RELEASE) $(CYCLONE_BUILD)
 
 
 FLEXT_MAJOR_VERSION := $(shell grep FLEXTMAJOR \
-	$(EXTERNALS_SRC)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
+	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
 FLEXT_MINOR_VERSION := $(shell grep FLEXTMINOR \
-	$(EXTERNALS_SRC)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
+	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
 FLEXT_MICRO_VERSION := $(shell grep FLEXTMICRO \
-	$(EXTERNALS_SRC)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
+	$(externals_src)/grill/flext/buildsys/version.inc | cut -d '=' -f2)
 FLEXT_VERSION := $(FLEXT_MAJOR_VERSION).$(FLEXT_MINOR_VERSION).$(FLEXT_MICRO_VERSION)
 
 
-GEM_VERSION := $(shell grep "GEM_VERSION" $(GEM_SRC)/src/Base/GemVersion.h | \
+GEM_VERSION := $(shell grep "GEM_VERSION" $(gem_src)/src/Base/GemVersion.h | \
 	cut -d '"' -f 2)
 
 
 MAXLIB_VERSION := $(shell grep "define VERSION" \
-	$(EXTERNALS_SRC)/maxlib/maxlib.c | cut -d '"' -f 2)
+	$(externals_src)/maxlib/maxlib.c | cut -d '"' -f 2)
 
 
-OSC_VERSION := $(shell grep "define VERSION" $(EXTERNALS_SRC)/OSCx/src/OSC.c | \
+OSC_VERSION := $(shell grep "define VERSION" $(externals_src)/OSCx/src/OSC.c | \
 	cut -d '"' -f 2)
 
 
-PDP_VERSION := $(shell grep PDP_VERSION= $(EXTERNALS_SRC)/pdp/configure | \
+PDP_VERSION := $(shell grep PDP_VERSION= $(externals_src)/pdp/configure | \
 	cut -d '=' -f 2)
 
 
 PMPD_VERSION := $(shell grep "define VERSION" \
-	$(EXTERNALS_SRC)/pmpd/src/pmpd.c | cut -d '"' -f 2)
+	$(externals_src)/pmpd/src/pmpd.c | cut -d '"' -f 2)
 
 
 TOXY_MAJOR_VERSION := $(shell grep TOXY_VERSION \
-	$(EXTERNALS_SRC)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 TOXY_RELEASE := $(shell grep TOXY_RELEASE \
-	$(EXTERNALS_SRC)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 TOXY_BUILD := $(shell grep TOXY_BUILD \
-	$(EXTERNALS_SRC)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
+	$(externals_src)/miXed/toxy/build_counter | cut -d ' ' -f 3 | \
 	cut -d '"' -f 2)
 TOXY_VERSION := $(TOXY_MAJOR_VERSION) $(TOXY_RELEASE) $(TOXY_BUILD)
 
 
-ZEXY_VERSION := $(shell grep VERSION $(EXTERNALS_SRC)/zexy/src/zexy.h | \
+ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
@@ -89,8 +89,8 @@ ZEXY_VERSION := $(shell grep VERSION $(EXTERNALS_SRC)/zexy/src/zexy.h | \
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
-				SRC_ROOT_DIR=$(SRC_ROOT_DIR) \
-				INSTALL_PREFIX=$(INSTALL_PREFIX) \
+				cvs_root_dir=$(cvs_root_dir) \
+				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
 
@@ -113,24 +113,24 @@ doc:
 #------------------------------------------------------------------------------
 # externals
 externals: 
-	cd $(EXTERNALS_SRC) && make $(DEST_PATHS)
+	cd $(externals_src) && make $(DEST_PATHS)
 
 
 #------------------------------------------------------------------------------
 # flext
 flext:
 # nusmuk
-	cd $(EXTERNALS_SRC)/nusmuk/msd && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
 		pd gcc
-	cd $(EXTERNALS_SRC)/nusmuk/msd2D && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
 		pd gcc
-	cd $(EXTERNALS_SRC)/nusmuk/msd3D && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
 		pd gcc
 
 #------------------------------------------------------------------------------
 # Gem
 gem:
-#	cd $(GEM_SRC)/Gem && xcodebuild
+#	cd $(gem_src)/Gem && xcodebuild
 
 
 #------------------------------------------------------------------------------
@@ -139,21 +139,21 @@ gem:
 # this relies on patches/build_vars_4_makefile.in.patch  <hans@at.or.at>
 DESTDIR = ""
 ifeq ($(OS_NAME),darwin)
-  LIBPD_DEST = $(INSTALL_PREFIX)
-  LIBBIN_DEST = $(BIN_DEST)
+  libpddir = $(prefix)
+  libpdbindir = $(bindir)
 else
   ifeq ($(OS_NAME),win)
-    LIBPD_DEST = $(INSTALL_PREFIX)
-    LIBBIN_DEST = $(BIN_DEST)
+    libpddir = $(prefix)
+    libpdbindir = $(bindir)
   else
-    LIBPD_DEST = $(INSTDIR)/lib/pd
-    LIBBIN_DEST = $(LIB_DEST)/pd/bin
+    libpddir = $(INSTDIR)/lib/pd
+    libpdbindir = $(libpddir)/bin
   endif
 endif
 
 PD_DEST_PATHS = $(DEST_PATHS) DESTDIR=$(DESTDIR) \
-	 LIBPD_DEST=$(LIBPD_DEST) \
-	 LIBBIN_DEST=$(LIBBIN_DEST) 
+	 libpddir=$(libpddir) \
+	 libpdbindir=$(libpdbindir) 
 
 PD_CONFIGURE_FLAGS = 
 PD_EXTRA_FLAGS = 
@@ -165,12 +165,12 @@ PD_AUTOCONF = autoconf
 
 
 pd:
-	echo "DESTDIR $(DESTDIR)  LIBBIN_DEST $(LIBBIN_DEST)"
+	echo "DESTDIR $(DESTDIR)  libpdbindir $(libpdbindir)"
 	echo "DEST_PATHS $(DEST_PATHS)"
 	echo "PD_DEST_PATHS $(PD_DEST_PATHS)"
 	echo "PD_EXTRA_FLAGS $(PD_EXTRA_FLAGS)"
-	cd $(PD_SRC)/src/ && $(PD_AUTOCONF)
-	cd $(PD_SRC)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
+	cd $(pd_src)/src/ && $(PD_AUTOCONF)
+	cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS)
 
 
@@ -190,29 +190,29 @@ install: noncvs_install
 #------------------------------------------------------------------------------
 # abstractions_install
 abstractions_install:
-	cd $(ABSTRACTIONS_SRC) && make $(DEST_PATHS) install
+	cd $(abstractions_src) && make $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------
 # doc_install
 doc_install: 
-	cd $(DOC_SRC) && make $(DEST_PATHS) install
+	cd $(doc_src) && make $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # externals_install
 externals_install: 
-	cd $(EXTERNALS_SRC) && make $(DEST_PATHS) install
+	cd $(externals_src) && make $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # flext_install
 flext_install:
 # nusmuk
-	cd $(EXTERNALS_SRC)/nusmuk/msd && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
 		pd gcc install
-	cd $(EXTERNALS_SRC)/nusmuk/msd2D && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
 		pd gcc install
-	cd $(EXTERNALS_SRC)/nusmuk/msd3D && $(EXTERNALS_SRC)/grill/flext/build.sh \
+	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
 		pd gcc install
 #TODO: need to add nusmuk/editor
 
@@ -220,20 +220,20 @@ flext_install:
 #------------------------------------------------------------------------------
 # gem_install
 GEM_NAME = gem
-gem_install: gem $(HELP_DEST)
-	install -p $(GEM_SRC)/help/*.* $(HELP_DEST)
-	install -p $(GEM_SRC)/abstractions/*-help.pd $(HELP_DEST)
-	install -d $(OBJECTS_DEST)/$(GEM_NAME)
-	install -p $(shell ls -1 $(GEM_SRC)/abstractions/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)
-	install -d $(MANUALS_DEST)/$(GEM_NAME)
-	install -p $(GEM_SRC)/doc/*.* $(MANUALS_DEST)/$(GEM_NAME)
-	install -d $(MANUALS_DEST)/$(GEM_NAME)/manual
-	install -p $(GEM_SRC)/manual/*.* $(MANUALS_DEST)/$(GEM_NAME)/manual
-	for dir in $(shell ls -1 $(GEM_SRC)/examples | grep -v CVS); do \
+gem_install: gem $(helpdir)
+	install -p $(gem_src)/help/*.* $(helpdir)
+	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)
+	install -d $(objectsdir)/$(GEM_NAME)
+	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
+		grep -v '\-help.pd')  $(objectsdir)
+	install -d $(manualsdir)/$(GEM_NAME)
+	install -p $(gem_src)/doc/*.* $(manualsdir)/$(GEM_NAME)
+	install -d $(manualsdir)/$(GEM_NAME)/manual
+	install -p $(gem_src)/manual/*.* $(manualsdir)/$(GEM_NAME)/manual
+	for dir in $(shell ls -1 $(gem_src)/examples | grep -v CVS); do \
 		echo "installing $$dir"; \
-		install -d $(APPLICATIONS_DEST)/$(GEM_NAME)/$$dir ; \
-		install -p $(GEM_SRC)/examples/$$dir/*.* $(APPLICATIONS_DEST)/$(GEM_NAME)/$$dir ; \
+		install -d $(examplesdir)/$(GEM_NAME)/$$dir ; \
+		install -p $(gem_src)/examples/$$dir/*.* $(examplesdir)/$(GEM_NAME)/$$dir ; \
 	done
 
 
@@ -241,10 +241,10 @@ gem_install: gem $(HELP_DEST)
 # noncvs_install
 # this is for including pre-compiled binaries in a build
 noncvs_install:
-		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/bin/*.* $(BIN_DEST)
-		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/doc/5.reference/*.* \
-			$(HELP_DEST)
-		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/extra/*.* $(OBJECTS_DEST)
+		-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(bindir)
+		-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* \
+			$(helpdir)
+		-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
 
 
 
@@ -252,10 +252,10 @@ noncvs_install:
 # pd_install
 PD_NAME=Pd
 pd_install: pd
-	cd $(PD_SRC)/src && \
+	cd $(pd_src)/src && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS) install
-	install -d $(MANUALS_DEST)/$(PD_NAME)
-	install -p $(PD_SRC)/src/notes.txt $(MANUALS_DEST)/$(PD_NAME)
+	install -d $(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
 
 
@@ -265,37 +265,40 @@ pd_install: pd
 #
 #==============================================================================#
 
-LICENSE_FILE = $(MANUALS_DEST)/$(PD_NAME)/License.html
+LICENSE_FILE = $(manualsdir)/$(PD_NAME)/License.html
 license_install:
   # generate HTML version of License
+	install -d $(manualsdir)/$(PD_NAME)
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
 	echo "<h3>(Parts of this package can be used under " >> "$(LICENSE_FILE)"
 	echo "<a href="PD%20LICENSE.txt">Pd&quot;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
 	echo "<font size=\"-1\">" >> "$(LICENSE_FILE)"
-	cat "$(EXTERNALS_SRC)/creb/COPYING" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
+	cat "$(externals_src)/creb/COPYING" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
 	echo "</font></body></html>" >> $(LICENSE_FILE)
 # Pd's license file
-	install -p "$(PD_SRC)/LICENSE.txt" "$(MANUALS_DEST)/$(PD_NAME)/PD LICENSE.txt"
+	install -p "$(pd_src)/LICENSE.txt" "$(manualsdir)/$(PD_NAME)/PD LICENSE.txt"
 
 
 
-WELCOME_FILE = $(MANUALS_DEST)/$(PD_NAME)/Welcome.html
+WELCOME_FILE = $(manualsdir)/$(PD_NAME)/Welcome.html
 welcome_install:
+	install -d $(manualsdir)/$(PD_NAME)
 	touch $(WELCOME_FILE)
 	echo "<html><body><p><p>" >> $(WELCOME_FILE)
 	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
 	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
 	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
 	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
-	echo "<p>`grep -A9 ACKNOWLEDG $(PD_SRC)/README.txt`</p>" >> $(WELCOME_FILE)
+	echo "<p>`grep -A9 ACKNOWLEDG $(pd_src)/README.txt`</p>" >> $(WELCOME_FILE)
 	echo "</FONT>" >> $(WELCOME_FILE)
 	echo "</body></html>" >> $(WELCOME_FILE)
 
 
 
-README_FILE = $(MANUALS_DEST)/$(PD_NAME)/ReadMe.html
+README_FILE = $(manualsdir)/$(PD_NAME)/ReadMe.html
 readme_install: 
+	install -d $(manualsdir)/$(PD_NAME)
 	echo $(CYCLONE_RELEASE)
 	-rm $(README_FILE)
 	touch $(README_FILE)
@@ -361,15 +364,15 @@ readme_install:
 # DOC_FORMAT
 doc_format:
 # clean out cruft files
-	-find $(INSTALL_PREFIX) -name .DS_Store -delete
-	-find $(INSTALL_PREFIX) -name '*.*.bak' -delete
+	-find $(prefix) -name .DS_Store -delete
+	-find $(prefix) -name '*.*.bak' -delete
 # run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(DOCS_DEST) && \
-		$(SCRIPTS_SRC)/convert-help-to-standard.sh
+	cd $(pddocdir) && \
+		$(scripts_src)/convert-help-to-standard.sh
 # remove write perms to prevent people form editing the helpfiles by mistake
-	cd $(DOCS_DEST) && chmod a-wx */*.pd */*/*.pd
-	find $(DOCS_DEST) -name '*.pd' -print0 | xargs -0 chmod a-wx
-	find $(DOCS_DEST) -name '*.txt' -print0 | xargs -0 chmod a-wx
+	cd $(pddocdir) && chmod a-wx */*.pd */*/*.pd
+	find $(pddocdir) -name '*.pd' -print0 | xargs -0 chmod a-wx
+	find $(pddocdir) -name '*.txt' -print0 | xargs -0 chmod a-wx
 
 
 
@@ -384,43 +387,43 @@ devsymlinks:
 
 
 patch_pd:
-	@echo PD_SRC $(PD_SRC)
+	@echo pd_src $(pd_src)
 # change Pd's version number to reflect the extended build
-	cd $(PD_SRC)/src/ && \
+	cd $(pd_src)/src/ && \
 		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
 		mv s_main.c.tmp s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
-		cd $(PD_SRC)/src/ && patch -p0 < $$patch; \
+		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
 # apply all platform-specific patches
 	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
-		cd $(PD_SRC)/src/ && patch -p0 < $$patch; \
+		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
-	-rm -f -- $(PD_SRC)/src/configure  $(PD_SRC)/src/makefile
+	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
 	@echo " "
 	@echo "patching succeeded!"
 
 
 unpatch_pd:
 # this sed pattern won't work with TEST versions
-	cd $(PD_SRC)/src && \
+	cd $(pd_src)/src && \
 		sed 's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
 			s_main.c > s_main.c.tmp && \
 		mv s_main.c.tmp s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
-		cd $(PD_SRC)/src/ && patch -p0 -R < $$patch; \
+		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
 # apply all platform-specific patches
 	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
-		cd $(PD_SRC)/src/ && patch -p0 -R < $$patch; \
+		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
-	-rm -f -- $(PD_SRC)/src/configure  $(PD_SRC)/src/makefile
+	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
 	@echo " "
 	@echo "unpatching succeeded!"
 
@@ -431,14 +434,14 @@ unpatch_pd:
 #
 #==============================================================================#
 abstractions_clean:
-	-cd $(ABSTRACTIONS_SRC) && make $(DEST_PATHS) clean
+	-cd $(abstractions_src) && make $(DEST_PATHS) clean
 
 
 doc_clean:
 
 
 externals_clean:
-	-cd $(EXTERNALS_SRC) && make $(DEST_PATHS) clean
+	-cd $(externals_src) && make $(DEST_PATHS) clean
 
 
 flext_clean:
@@ -448,7 +451,7 @@ gem_clean:
 
 
 pd_clean:
-	-cd $(PD_SRC) && make $(PD_DEST_PATHS) clean
+	-cd $(pd_src) && make $(PD_DEST_PATHS) clean
 
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean

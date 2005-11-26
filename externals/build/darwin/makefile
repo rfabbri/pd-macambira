@@ -2,8 +2,8 @@
 CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
-SRC_ROOT_DIR = $(CWD)/../../..
-INSTALL_PREFIX = build
+cvs_root_dir = $(CWD)/../../..
+prefix = build
 BUILDLAYOUT_DIR = $(CWD)/../..
 
 all: externals
@@ -12,12 +12,12 @@ all: externals
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-BUILD_SRC = $(EXTERNALS_SRC)/build/src
-BUILD_DARWIN_SRC = $(EXTERNALS_SRC)/build/darwin
+BUILD_SRC = $(externals_src)/build/src
+BUILD_DARWIN_SRC = $(externals_src)/build/darwin
 
 EXTERNALS = $(shell ls -1 $(BUILD_SRC) | grep -e '.*\.c$$')
 
-PDEXECUTABLE = $(PD_SRC)/bin/pd
+PDEXECUTABLE = $(pd_src)/bin/pd
 
 ## These generally need gcc-3.3
 # Generic PowerPC
@@ -33,7 +33,7 @@ OPTIM_FLAGS = -mpowerpc-gpopt -mcpu=750
 
 CFLAGS = -DPD -DUNIX -DMACOSX -Dunix $(OPTIM_FLAGS) \
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
-INCLUDES = -I$(PD_SRC)/src -I/sw/include
+INCLUDES = -I$(pd_src)/src -I/sw/include
 LDFLAGS = -bundle  -bundle_loader $(PDEXECUTABLE) -L/sw/lib
 
 externals: $(EXTERNALS:.c=.pd_darwin)

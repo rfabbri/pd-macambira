@@ -11,8 +11,8 @@
 CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
-SRC_ROOT_DIR = $(CWD)/..
-INSTALL_PREFIX = $(CWD)/build
+cvs_root_dir = $(CWD)/..
+prefix = $(CWD)/build
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
@@ -27,8 +27,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
-				SRC_ROOT_DIR=$(SRC_ROOT_DIR) \
-				INSTALL_PREFIX=$(INSTALL_PREFIX)
+				cvs_root_dir=$(cvs_root_dir) \
+				prefix=$(prefix)
 
 #==============================================================================#
 #
@@ -42,7 +42,7 @@ all: pre_all_$(OS_NAME) creb cyclone iemabs iemlib iemmatrix pddp pdp pmpd \
 		toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
-	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make -k 
+	cd $(externals_src)/build/$(OS_NAME) && make -k 
 
 # these targets are for platform-specific needs that run before objects:
 pre_all_darwin:
@@ -57,15 +57,15 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: all $(OBJECTS_DEST) help_install objects_install unfiltered_install \
+install: all $(objectsdir) help_install objects_install unfiltered_install \
  creb_install cyclone_install iemabs_install iemabs_install iemmatrix_install \
  pddp_install pdp_install pmpd_install toxy_install vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
 objects_install: 
-	cd $(EXTERNALS_SRC)/build/$(OS_NAME)/ && \
-		install -p *.$(EXTENSION) $(OBJECTS_DEST)
+	cd $(externals_src)/build/$(OS_NAME)/ && \
+		install -p *.$(EXTENSION) $(objectsdir)
 
 
 #==============================================================================#
@@ -75,60 +75,60 @@ objects_install:
 #==============================================================================#
 
 
-help_install: $(HELP_DEST)
+help_install: $(helpdir)
 #------------------------------------------------------------------------------#
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
 	install -p \
-			$(EXTERNALS_SRC)/OSCx/doc/*.pd \
-			$(EXTERNALS_SRC)/aenv~/*.pd \
-			$(EXTERNALS_SRC)/arraysize/*.pd \
-			$(EXTERNALS_SRC)/beatpipe/*.pd \
-			$(EXTERNALS_SRC)/control/*/*.pd \
-			$(EXTERNALS_SRC)/bbogart/chaos/tools/*.pd \
-			$(EXTERNALS_SRC)/bbogart/*/*.pd \
-			$(EXTERNALS_SRC)/creb/doc/*.pd \
-				$(HELP_DEST)
+			$(externals_src)/OSCx/doc/*.pd \
+			$(externals_src)/aenv~/*.pd \
+			$(externals_src)/arraysize/*.pd \
+			$(externals_src)/beatpipe/*.pd \
+			$(externals_src)/control/*/*.pd \
+			$(externals_src)/bbogart/chaos/tools/*.pd \
+			$(externals_src)/bbogart/*/*.pd \
+			$(externals_src)/creb/doc/*.pd \
+				$(helpdir)
 	install -p \
-			$(EXTERNALS_SRC)/creb/doc/examples/*.pd \
-			$(EXTERNALS_SRC)/cxc/reference/*.pd \
-			$(EXTERNALS_SRC)/dfx/*/*.pd \
-			$(EXTERNALS_SRC)/ext13/doc/*.pd \
-			$(EXTERNALS_SRC)/ggee/*/*-help.pd \
-			$(EXTERNALS_SRC)/gem2pdp/*.pd \
-			$(EXTERNALS_SRC)/ff/*.pd \
-			$(EXTERNALS_SRC)/freeverb~/*.pd \
-			$(EXTERNALS_SRC)/hcs/*-help.pd \
-				$(HELP_DEST)
+			$(externals_src)/creb/doc/examples/*.pd \
+			$(externals_src)/cxc/reference/*.pd \
+			$(externals_src)/dfx/*/*.pd \
+			$(externals_src)/ext13/doc/*.pd \
+			$(externals_src)/ggee/*/*-help.pd \
+			$(externals_src)/gem2pdp/*.pd \
+			$(externals_src)/ff/*.pd \
+			$(externals_src)/freeverb~/*.pd \
+			$(externals_src)/hcs/*-help.pd \
+				$(helpdir)
 	install -p \
-			$(EXTERNALS_SRC)/hcs/*/doc/*.pd \
-			$(EXTERNALS_SRC)/hcs/hid/examples/*.pd \
-			$(EXTERNALS_SRC)/hcs/pan/*-help.pd \
-			$(EXTERNALS_SRC)/iem/comport/*/*-help.pd \
-			$(EXTERNALS_SRC)/markex/*.pd \
-			$(EXTERNALS_SRC)/motex/*.pd \
-			$(EXTERNALS_SRC)/nusmuk/line3/*.pd\
-				$(HELP_DEST)
+			$(externals_src)/hcs/*/doc/*.pd \
+			$(externals_src)/hcs/hid/examples/*.pd \
+			$(externals_src)/hcs/pan/*-help.pd \
+			$(externals_src)/iem/comport/*/*-help.pd \
+			$(externals_src)/markex/*.pd \
+			$(externals_src)/motex/*.pd \
+			$(externals_src)/nusmuk/line3/*.pd\
+				$(helpdir)
 	install -p \
-			$(EXTERNALS_SRC)/pdogg/*/*.pd \
-			$(EXTERNALS_SRC)/plugin~/*.pd \
-			$(EXTERNALS_SRC)/rhythm_estimator/*.p? \
-			$(EXTERNALS_SRC)/signal/*/*.pd \
-			$(EXTERNALS_SRC)/sprinkler/sprinkler-help.pd \
-			$(EXTERNALS_SRC)/susloop~/*.pd \
-			$(EXTERNALS_SRC)/svf~/*.pd \
-			$(EXTERNALS_SRC)/vbap/*.pd \
-			$(EXTERNALS_SRC)/vst/*.pd \
-			$(EXTERNALS_SRC)/zhzxh~/*.pd \
-				$(HELP_DEST)
+			$(externals_src)/pdogg/*/*.pd \
+			$(externals_src)/plugin~/*.pd \
+			$(externals_src)/rhythm_estimator/*.p? \
+			$(externals_src)/signal/*/*.pd \
+			$(externals_src)/sprinkler/sprinkler-help.pd \
+			$(externals_src)/susloop~/*.pd \
+			$(externals_src)/svf~/*.pd \
+			$(externals_src)/vbap/*.pd \
+			$(externals_src)/vst/*.pd \
+			$(externals_src)/zhzxh~/*.pd \
+				$(helpdir)
 #------------------------------------------------------------------------------#
 #  mjlib [prob] conflicts with cyclone's [prob] so filter it
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/mjlib/doc/*.* | \
-		grep -v 'prob') $(HELP_DEST)
+	install -p $(shell ls -1 $(externals_src)/mjlib/doc/*.* | \
+		grep -v 'prob') $(helpdir)
 #------------------------------------------------------------------------------#
 #  maxlib [split] conflicts with cyclone so filter it
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/maxlib/help/*.* | \
-		grep -v 'split') $(HELP_DEST)
+	install -p $(shell ls -1 $(externals_src)/maxlib/help/*.* | \
+		grep -v 'split') $(helpdir)
 
 
 
@@ -146,10 +146,10 @@ template:
 
 
 template_install: template
-	install -d $(OBJECTS_DEST)/$(TEMPLATE_NAME)
-	install -d $(HELP_DEST)/$(TEMPLATE_NAME)
-	install -d $(MANUALS_DEST)/$(TEMPLATE_NAME)
-	install -d $(APPLICATIONS_DEST)/$(TEMPLATE_NAME)
+	install -d $(objectsdir)/$(TEMPLATE_NAME)
+	install -d $(helpdir)/$(TEMPLATE_NAME)
+	install -d $(manualsdir)/$(TEMPLATE_NAME)
+	install -d $(examplesdir)/$(TEMPLATE_NAME)
 
 
 #------------------------------------------------------------------------------#
@@ -159,13 +159,13 @@ creb:
 
 
 creb_install: creb
-	install -d $(OBJECTS_DEST)/$(CREB_NAME)
-	install -p $(EXTERNALS_SRC)/creb/abs/*.pd $(OBJECTS_DEST)/$(CREB_NAME)
-	install -d $(HELP_DEST)/$(CREB_NAME)
-	install -p -m0644	$(EXTERNALS_SRC)/creb/doc/examples/*.* \
-		$(HELP_DEST)/$(CREB_NAME)
-#	install -d $(MANUALS_DEST)/$(CREB_NAME)
-#	install -d $(APPLICATIONS_DEST)/$(CREB_NAME)
+	install -d $(objectsdir)/$(CREB_NAME)
+	install -p $(externals_src)/creb/abs/*.pd $(objectsdir)/$(CREB_NAME)
+	install -d $(helpdir)/$(CREB_NAME)
+	install -p -m0644	$(externals_src)/creb/doc/examples/*.* \
+		$(helpdir)/$(CREB_NAME)
+#	install -d $(manualsdir)/$(CREB_NAME)
+#	install -d $(examplesdir)/$(CREB_NAME)
 
 
 
@@ -173,32 +173,32 @@ creb_install: creb
 # CYCLONE
 CYCLONE_NAME=cyclone
 # cyclone is compiled straight into $(OUT_DIR)
-CYCLONE_OUT_DIR=$(OBJECTS_DEST)/$(CYCLONE_NAME)
+CYCLONE_OUT_DIR=$(objectsdir)/$(CYCLONE_NAME)
 cyclone:
 
 
 cyclone_install: cyclone
-	install -d $(OBJECTS_DEST)/$(CYCLONE_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(CYCLONE_NAME) \
+	install -d $(objectsdir)/$(CYCLONE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CYCLONE_NAME) \
 		--author "Kzrysztof Czaja" \
 		--license "BSD" \
 		--description "a library for porting and running Max/MSP patches in Pd"
-	cd $(EXTERNALS_SRC)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
+	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
 # install "cyclist" command line app with pd
-	install -d $(BIN_DEST)
+	install -d $(bindir)
 # this doesn't build in the right place yet
-#	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(BIN_DEST) && \
+#	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(bindir) && \
 #		rm $(CYCLONE_OUT_DIR)/cyclist
 # rename cyclone lib since it will pre-empt libdir functionality
-	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
-		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
-	install -d $(HELP_DEST)/$(CYCLONE_NAME)
-	install -p $(EXTERNALS_SRC)/miXed/doc/help/cyclone/*.*  \
-		$(HELP_DEST)/$(CYCLONE_NAME)
-#	install -d $(MANUALS_DEST)/$(CYCLONE_NAME)
-	install -d $(APPLICATIONS_DEST)/$(CYCLONE_NAME)
-	install -p $(EXTERNALS_SRC)/miXed/test/cyclone/*.*  \
-		$(APPLICATIONS_DEST)/$(CYCLONE_NAME)
+#	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
+#		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
+	install -d $(helpdir)/$(CYCLONE_NAME)
+	install -p $(externals_src)/miXed/doc/help/cyclone/*.*  \
+		$(helpdir)/$(CYCLONE_NAME)
+#	install -d $(manualsdir)/$(CYCLONE_NAME)
+	install -d $(examplesdir)/$(CYCLONE_NAME)
+	install -p $(externals_src)/miXed/test/cyclone/*.*  \
+		$(examplesdir)/$(CYCLONE_NAME)
 
 
 
@@ -212,19 +212,19 @@ iemabs:
 
 iemabs_install: iemabs
 #  iemabs still has the help patches in the old help-*.pd style
-	install -d $(OBJECTS_DEST)/$(IEMABS_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(IEMABS_NAME) \
+	install -d $(objectsdir)/$(IEMABS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMABS_NAME) \
 		--description "a collection of objects written at IEM/KUG"
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/iemlib/iemabs/*.pd | \
-		grep -v 'help') $(OBJECTS_DEST)/$(IEMABS_NAME)
-	install -d $(HELP_DEST)/$(IEMABS_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/iemabs/*help*.pd \
-		$(HELP_DEST)/$(IEMABS_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/iemabs/*.mp3 $(HELP_DEST)/$(IEMABS_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/iemabs/*.wav $(HELP_DEST)/$(IEMABS_NAME)
-	install -d $(MANUALS_DEST)/$(IEMABS_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/iemabs/*.txt \
-		$(MANUALS_DEST)/$(IEMABS_NAME)
+	install -p $(shell ls -1 $(externals_src)/iemlib/iemabs/*.pd | \
+		grep -v 'help') $(objectsdir)/$(IEMABS_NAME)
+	install -d $(helpdir)/$(IEMABS_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*help*.pd \
+		$(helpdir)/$(IEMABS_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMABS_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMABS_NAME)
+	install -d $(manualsdir)/$(IEMABS_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.txt \
+		$(manualsdir)/$(IEMABS_NAME)
 
 
 
@@ -235,14 +235,14 @@ iemlib:
 
 
 iemlib_install: iemlib
-#	install -d $(OBJECTS_DEST)/$(IEMLIB_NAME)
-#	install -d $(HELP_DEST)/$(IEMLIB_NAME)
-	install -d $(HELP_DEST)/iemhelp
-	install -p $(EXTERNALS_SRC)/iemlib/iemhelp/*.* $(HELP_DEST)/iemhelp
-#	install -d $(MANUALS_DEST)/$(IEMLIB_NAME)
-	install -d $(APPLICATIONS_DEST)/$(IEMLIB_NAME)
-	install -p $(EXTERNALS_SRC)/iemlib/examples/*.* \
-		$(APPLICATIONS_DEST)/$(IEMLIB_NAME)
+#	install -d $(objectsdir)/$(IEMLIB_NAME)
+#	install -d $(helpdir)/$(IEMLIB_NAME)
+	install -d $(helpdir)/iemhelp
+	install -p $(externals_src)/iemlib/iemhelp/*.* $(helpdir)/iemhelp
+#	install -d $(manualsdir)/$(IEMLIB_NAME)
+	install -d $(examplesdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/examples/*.* \
+		$(examplesdir)/$(IEMLIB_NAME)
 
 
 
@@ -253,15 +253,15 @@ iemmatrix:
 
 
 iemmatrix_install: iemmatrix
-	install -d $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(IEMMATRIX_NAME) \
+	install -d $(objectsdir)/$(IEMMATRIX_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMMATRIX_NAME) \
 		--description "objects for matrix operations and math"
-	mv $(OBJECTS_DEST)/mtx*.$(EXTENSION) $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/iem/iemmatrix/abs/*.* | \
-		grep -v '\-help.pd') $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
-	install -d $(HELP_DEST)/$(IEMMATRIX_NAME)
-	install -p $(EXTERNALS_SRC)/iem/iemmatrix/doc/*.pd \
-		$(HELP_DEST)/$(IEMMATRIX_NAME)
+	mv $(objectsdir)/mtx*.$(EXTENSION) $(objectsdir)/$(IEMMATRIX_NAME)
+	install -p $(shell ls -1 $(externals_src)/iem/iemmatrix/abs/*.* | \
+		grep -v '\-help.pd') $(objectsdir)/$(IEMMATRIX_NAME)
+	install -d $(helpdir)/$(IEMMATRIX_NAME)
+	install -p $(externals_src)/iem/iemmatrix/doc/*.pd \
+		$(helpdir)/$(IEMMATRIX_NAME)
 
 
 
@@ -269,22 +269,22 @@ iemmatrix_install: iemmatrix
 # PDDP
 PDDP_NAME=pddp
 # pddp is compiled straight into $(OUT_DIR)
-PDDP_OUT_DIR=$(OBJECTS_DEST)/$(PDDP_NAME)
+PDDP_OUT_DIR=$(objectsdir)/$(PDDP_NAME)
 pddp:
 
 
 pddp_install: pddp
-	install -d $(OBJECTS_DEST)/$(PDDP_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(PDDP_NAME) \
+	install -d $(objectsdir)/$(PDDP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDDP_NAME) \
 		--author "PDDP" \
 		--license "BSD" \
 		--description "objects for working with Tcl and Pd's Tk GUI"
-	cd $(EXTERNALS_SRC)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
-#	install -d $(HELP_DEST)/$(PDDP_NAME)
-#	install -d $(MANUALS_DEST)/$(PDDP_NAME)
-	install -d $(APPLICATIONS_DEST)/$(PDDP_NAME)
-	install -p $(EXTERNALS_SRC)/miXed/test/pddp/*.*  \
-		$(APPLICATIONS_DEST)/$(PDDP_NAME)
+	cd $(externals_src)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
+#	install -d $(helpdir)/$(PDDP_NAME)
+#	install -d $(manualsdir)/$(PDDP_NAME)
+	install -d $(examplesdir)/$(PDDP_NAME)
+	install -p $(externals_src)/miXed/test/pddp/*.*  \
+		$(examplesdir)/$(PDDP_NAME)
 
 
 
@@ -292,25 +292,25 @@ pddp_install: pddp
 # PDP
 PDP_NAME=pdp
 pdp:
-#	cd $(EXTERNALS_SRC)/pdp && ./configure && $(MAKE)
+#	cd $(externals_src)/pdp && ./configure && $(MAKE)
 #TODO: compile pidip here
 #TODO: compile gem2pdp here
 
 pdp_install: pdp
-#	install -d $(OBJECTS_DEST)/$(PDP_NAME)
-#	install -p $(EXTERNALS_SRC)/pdp/*.$(EXTENSION) $(OBJECTS_DEST)
-#	install -p $(EXTERNALS_SRC)/pidip/*.$(EXTENSION) $(OBJECTS_DEST)
-#	install -p $(EXTERNALS_SRC)/gem2pdp/*.$(EXTENSION) $(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/pdp/abstractions/*.pd $(OBJECTS_DEST)
-#	install -d $(HELP_DEST)/$(PDP_NAME)
-	install -p $(EXTERNALS_SRC)/pdp/doc/objects/*.* $(HELP_DEST)
-	install -d $(MANUALS_DEST)/$(PDP_NAME)
-	install -p $(EXTERNALS_SRC)/pdp/doc/reference.txt $(MANUALS_DEST)/$(PDP_NAME)
-	install -p $(EXTERNALS_SRC)/pdp/doc/introduction/*.* \
-		$(MANUALS_DEST)/$(PDP_NAME)
-	install -d $(APPLICATIONS_DEST)/$(PDP_NAME)
-	install -p $(EXTERNALS_SRC)/pdp/doc/examples/*.* \
-		$(APPLICATIONS_DEST)/$(PDP_NAME)
+#	install -d $(objectsdir)/$(PDP_NAME)
+#	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
+#	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
+#	install -p $(externals_src)/gem2pdp/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
+#	install -d $(helpdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
+	install -d $(manualsdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/introduction/*.* \
+		$(manualsdir)/$(PDP_NAME)
+	install -d $(examplesdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/examples/*.* \
+		$(examplesdir)/$(PDP_NAME)
 
 
 
@@ -321,17 +321,17 @@ pmpd:
 
 
 pmpd_install: pmpd
-#	install -d $(OBJECTS_DEST)/$(PMPD_NAME)
-	install -d $(HELP_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/help/*.pd \
-		 $(HELP_DEST)/$(PMPD_NAME)
-	install -d $(MANUALS_DEST)/$(PMPD_NAME)
-	install -d $(MANUALS_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/doc/pmpd.pdf/pmpd.pdf \
-		$(MANUALS_DEST)/$(PMPD_NAME)
-	install -d $(APPLICATIONS_DEST)/$(PMPD_NAME)
-	install -p $(EXTERNALS_SRC)/pmpd/exemples/*.pd \
-		$(APPLICATIONS_DEST)/$(PMPD_NAME)
+#	install -d $(objectsdir)/$(PMPD_NAME)
+	install -d $(helpdir)/$(PMPD_NAME)
+	install -p $(externals_src)/pmpd/help/*.pd \
+		 $(helpdir)/$(PMPD_NAME)
+	install -d $(manualsdir)/$(PMPD_NAME)
+	install -d $(manualsdir)/$(PMPD_NAME)
+	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
+		$(manualsdir)/$(PMPD_NAME)
+	install -d $(examplesdir)/$(PMPD_NAME)
+	install -p $(externals_src)/pmpd/exemples/*.pd \
+		$(examplesdir)/$(PMPD_NAME)
 
 
 
@@ -339,24 +339,25 @@ pmpd_install: pmpd
 # TOXY
 TOXY_NAME=toxy
 # toxy is compiled straight into $(OUT_DIR)
-TOXY_OUT_DIR=$(OBJECTS_DEST)/$(TOXY_NAME)
+TOXY_OUT_DIR=$(objectsdir)/$(TOXY_NAME)
 toxy:
 
 
 toxy_install: toxy
-	install -d $(OBJECTS_DEST)/$(TOXY_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(TOXY_NAME) \
+	install -d $(objectsdir)/$(TOXY_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TOXY_NAME) \
 		--author "Kzrysztof Czaja" \
 		--license "BSD" \
 		--description "objects for working with Tcl and Pd's Tk GUI"
-	cd $(EXTERNALS_SRC)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
-	install -d $(HELP_DEST)/$(TOXY_NAME)
-	install -p $(EXTERNALS_SRC)/miXed/doc/help/toxy/*.*  \
-		$(HELP_DEST)/$(TOXY_NAME)
-#	install -d $(MANUALS_DEST)/$(TOXY_NAME)
-	install -d $(APPLICATIONS_DEST)/$(TOXY_NAME)
-	install -p $(EXTERNALS_SRC)/miXed/test/toxy/*.*  \
-		$(APPLICATIONS_DEST)/$(TOXY_NAME)
+# [tow] is currently broken, it doesn't compile
+	-cd $(externals_src)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
+	install -d $(helpdir)/$(TOXY_NAME)
+	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
+		$(helpdir)/$(TOXY_NAME)
+#	install -d $(manualsdir)/$(TOXY_NAME)
+	install -d $(examplesdir)/$(TOXY_NAME)
+	install -p $(externals_src)/miXed/test/toxy/*.*  \
+		$(examplesdir)/$(TOXY_NAME)
 
 
 
@@ -367,12 +368,12 @@ vbap:
 
 
 vbap_install: vbap
-	install -d $(OBJECTS_DEST)/$(VBAP_NAME)
-#	install -d $(HELP_DEST)/$(VBAP_NAME)
-#	install -d $(MANUALS_DEST)/$(VBAP_NAME)
-#	install -d $(APPLICATIONS_DEST)/$(VBAP_NAME)
-	install -p $(EXTERNALS_SRC)/vbap/graph-to-aziele.pd \
-		$(OBJECTS_DEST)/$(VBAP_NAME)
+	install -d $(objectsdir)/$(VBAP_NAME)
+#	install -d $(helpdir)/$(VBAP_NAME)
+#	install -d $(manualsdir)/$(VBAP_NAME)
+#	install -d $(examplesdir)/$(VBAP_NAME)
+	install -p $(externals_src)/vbap/graph-to-aziele.pd \
+		$(objectsdir)/$(VBAP_NAME)
 
 
 
@@ -383,19 +384,19 @@ zexy:
 #  zexy's new build system doesn't work with CVS layout, and most of zexy is
 #  included in the extrnals build system now anyway.  But the abstractions
 #  should still be included
-#	cd $(EXTERNALS_SRC)/zexy/src && autoconf && ./configure && $(MAKE)
+#	cd $(externals_src)/zexy/src && autoconf && ./configure && $(MAKE)
 
 
 zexy_install: zexy
-	install -d $(OBJECTS_DEST)/$(ZEXY_NAME)
-#	install -p $(EXTERNALS_SRC)/zexy/src/*.$(EXTENSION) $(OBJECTS_DEST)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/zexy/abs/*.pd | \
+	install -d $(objectsdir)/$(ZEXY_NAME)
+#	install -p $(externals_src)/zexy/src/*.$(EXTENSION) $(objectsdir)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
-		$(OBJECTS_DEST)/$(ZEXY_NAME)
-	install -d $(HELP_DEST)/$(ZEXY_NAME)
-	install -p $(EXTERNALS_SRC)/zexy/abs/*-help.pd $(HELP_DEST)/$(ZEXY_NAME)
-	install -p $(EXTERNALS_SRC)/zexy/zexy.pd  $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/zexy/examples/*.* $(HELP_DEST)/$(ZEXY_NAME)
+		$(objectsdir)/$(ZEXY_NAME)
+	install -d $(helpdir)/$(ZEXY_NAME)
+	install -p $(externals_src)/zexy/abs/*-help.pd $(helpdir)/$(ZEXY_NAME)
+	install -p $(externals_src)/zexy/zexy.pd  $(helpdir)
+	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
 
 
@@ -409,36 +410,36 @@ zexy_install: zexy
 unfiltered_install:
 #----------------------------------------------------------------------------
 # hcs
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/*.pd | \
-			 grep -v '\-help.pd') $(OBJECTS_DEST)
+	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
+			 grep -v '\-help.pd') $(objectsdir)
 # hid 
 # these don't work on Windows yet
-	cd $(EXTERNALS_SRC)/hcs/hid && $(MAKE) 
-	install -p $(EXTERNALS_SRC)/hcs/hid/hid.$(EXTENSION) $(OBJECTS_DEST)
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/hid/*.pd | \
-			 grep -v '\-help.pd'| grep -v '\-list.pd') $(OBJECTS_DEST)
+	cd $(externals_src)/hcs/hid && $(MAKE) 
+	install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(objectsdir)
+	install -p $(shell ls -1 $(externals_src)/hcs/hid/*.pd | \
+			 grep -v '\-help.pd'| grep -v '\-list.pd') $(objectsdir)
 # general
-	install -p $(EXTERNALS_SRC)/hcs/general/*.pd $(OBJECTS_DEST)
+	install -p $(externals_src)/hcs/general/*.pd $(objectsdir)
 # pan
-	install -p $(shell ls -1 $(EXTERNALS_SRC)/hcs/pan/*.pd | \
-			 grep -v '\-help.pd') $(OBJECTS_DEST)
+	install -p $(shell ls -1 $(externals_src)/hcs/pan/*.pd | \
+			 grep -v '\-help.pd') $(objectsdir)
 #----------------------------------------------------------------------------
 # OSC
-	test -e cd $(EXTERNALS_SRC)/OSCx/Makefile || \
-		(cd $(EXTERNALS_SRC)/OSCx && ./configure)
+	test -e $(externals_src)/OSCx/Makefile || \
+		(cd $(externals_src)/OSCx && ./configure)
 # these don't work on Windows yet
-	cd $(EXTERNALS_SRC)/OSCx && $(MAKE) CC=gcc
-	install -p $(EXTERNALS_SRC)/OSCx/doc/*.* $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/OSCx/src/*.$(EXTENSION) $(OBJECTS_DEST)
+	cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
+	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 #----------------------------------------------------------------------------
 # unauthorized
 # these don't work on Windows yet
-	cd $(EXTERNALS_SRC)/unauthorized && $(MAKE) 
-	install -p $(EXTERNALS_SRC)/unauthorized/*/*.$(EXTENSION) $(OBJECTS_DEST)
-	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pd $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/unauthorized/*/*.txt $(HELP_DEST)
-	install -p $(EXTERNALS_SRC)/unauthorized/*/*.pls $(HELP_DEST)
-	cp -Rfp $(EXTERNALS_SRC)/unauthorized/blinkenlights/blm  $(HELP_DEST)
+	cd $(externals_src)/unauthorized && $(MAKE) 
+	install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/unauthorized/*/*.pd $(helpdir)
+	install -p $(externals_src)/unauthorized/*/*.txt $(helpdir)
+	install -p $(externals_src)/unauthorized/*/*.pls $(helpdir)
+	cp -Rfp $(externals_src)/unauthorized/blinkenlights/blm  $(helpdir)
 
 
 #==============================================================================#
@@ -459,13 +460,13 @@ devsymlinks:
 
 # the destination-specific clean targets are in Makefile.buildlayout
 clean: install_clean
-	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/hcs/hid && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/OSCx && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/mixed/cyclone && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/mixed/pddp && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/mixed/toxy && make $(DEST_PATHS) clean
-	cd $(EXTERNALS_SRC)/unauthorized && make $(DEST_PATHS) clean
+	cd $(externals_src)/build/$(OS_NAME) && make $(DEST_PATHS) clean
+	cd $(externals_src)/hcs/hid && make $(DEST_PATHS) clean
+	cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
+	cd $(externals_src)/mixed/cyclone && make $(DEST_PATHS) clean
+	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
+	cd $(externals_src)/mixed/toxy && make $(DEST_PATHS) clean
+	cd $(externals_src)/unauthorized && make $(DEST_PATHS) clean
 
 distclean: clean cruft_clean
-	rm $(EXTERNALS_SRC)/OSCx Makefile
+	rm $(externals_src)/OSCx Makefile

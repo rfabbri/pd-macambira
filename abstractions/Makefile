@@ -10,8 +10,8 @@
 CWD := $(shell pwd)
 
 # these are designed to be overridden by the packages/Makefile
-SRC_ROOT_DIR = $(CWD)/..
-INSTALL_PREFIX = build
+cvs_root_dir = $(CWD)/..
+prefix = build
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
@@ -29,13 +29,13 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 # clean up after everything is installed
 final_setup:
-	chmod -R ugo-w $(INSTALL_PREFIX)
+	chmod -R ugo-w $(prefix)
 
-objects: $(OBJECTS_DEST) $(HELP_DEST) $(MANUALS_DEST)
+objects: $(objectsdir) $(helpdir) $(manualsdir)
 objects: objects_gyre objects_keyboardkeys objects_la-kitchen objects_memento
 objects: objects_pddp objects_nusmuk objects_nqpoly objects_rradical
 
-applications: $(APPLICATIONS_DEST) $(MANUALS_DEST)
+applications: $(examplesdir) $(manualsdir)
 applications: applications_rradical applications_keyboardkeys applications_gyre
 
 
@@ -49,137 +49,137 @@ applications: applications_rradical applications_keyboardkeys applications_gyre
 # GYRE
 GYRE_NAME = gyre
 objects_gyre:
-	install -d $(OBJECTS_DEST)/$(GYRE_NAME)
-	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.*.pd \
-		 $(OBJECTS_DEST)/$(GYRE_NAME)
-	install -d $(MANUALS_DEST)/$(GYRE_NAME)
-	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.html \
-		 $(MANUALS_DEST)/$(GYRE_NAME)
+	install -d $(objectsdir)/$(GYRE_NAME)
+	install -p $(abstractions_src)/audionerd/GYRE/gyre.*.pd \
+		 $(objectsdir)/$(GYRE_NAME)
+	install -d $(manualsdir)/$(GYRE_NAME)
+	install -p $(abstractions_src)/audionerd/GYRE/gyre.html \
+		 $(manualsdir)/$(GYRE_NAME)
 
 applications_gyre:
-	install -d $(APPLICATIONS_DEST)/$(GYRE_NAME)
-	install -p $(ABSTRACTIONS_SRC)/audionerd/GYRE/gyre.pd \
-		 $(APPLICATIONS_DEST)/$(GYRE_NAME)
+	install -d $(examplesdir)/$(GYRE_NAME)
+	install -p $(abstractions_src)/audionerd/GYRE/gyre.pd \
+		 $(examplesdir)/$(GYRE_NAME)
 
 
 #-------------------------------------------------------------------------------
 # keyboardkeys
 KEYBOARDKEYS_NAME = keyboardkeys
 objects_keyboardkeys:
-	install -d $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
-	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
-		 $(OBJECTS_DEST)/$(KEYBOARDKEYS_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(KEYBOARDKEYS_NAME) \
+	install -d $(objectsdir)/$(KEYBOARDKEYS_NAME)
+	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
+		 $(objectsdir)/$(KEYBOARDKEYS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(KEYBOARDKEYS_NAME) \
 		--author "Andrey Savitsky" \
 		--description "objects for using keyboard keys for scrolling and selecting"
-	install -d $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
-	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
-		 $(HELP_DEST)/$(KEYBOARDKEYS_NAME)
+	install -d $(helpdir)/$(KEYBOARDKEYS_NAME)
+	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
+		 $(helpdir)/$(KEYBOARDKEYS_NAME)
 
 applications_keyboardkeys:
-	install -d $(APPLICATIONS_DEST)/$(KEYBOARDKEYS_NAME)
-	install -p $(ABSTRACTIONS_SRC)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
-		 $(APPLICATIONS_DEST)/$(KEYBOARDKEYS_NAME)
+	install -d $(examplesdir)/$(KEYBOARDKEYS_NAME)
+	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
+		 $(examplesdir)/$(KEYBOARDKEYS_NAME)
 
 
 #-------------------------------------------------------------------------------
 # la-kitchen
 LA-KITCHEN_NAME = la-kitchen
 objects_la-kitchen:
-	install -d $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
-		grep -v '\-help.pd')    $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(LA-KITCHEN_NAME) \
+	install -d $(objectsdir)/$(LA-KITCHEN_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/La-kitchen/*.pd | \
+		grep -v '\-help.pd')    $(objectsdir)/$(LA-KITCHEN_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(LA-KITCHEN_NAME) \
 		--author "Charles Verron" \
 		--description "a collection of objects working with sensors"
-	install -d $(HELP_DEST)/$(LA-KITCHEN_NAME)
-	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
-		 $(HELP_DEST)/$(LA-KITCHEN_NAME)
-	install -d $(MANUALS_DEST)/$(LA-KITCHEN_NAME)
-	install -p $(ABSTRACTIONS_SRC)/La-kitchen/readme.txt \
-		 $(MANUALS_DEST)/$(LA-KITCHEN_NAME)
+	install -d $(helpdir)/$(LA-KITCHEN_NAME)
+	install -p $(abstractions_src)/La-kitchen/*-help.pd \
+		 $(helpdir)/$(LA-KITCHEN_NAME)
+	install -d $(manualsdir)/$(LA-KITCHEN_NAME)
+	install -p $(abstractions_src)/La-kitchen/readme.txt \
+		 $(manualsdir)/$(LA-KITCHEN_NAME)
 
 
 #-------------------------------------------------------------------------------
 # memento
 MEMENTO_NAME = memento
 objects_memento:
-	install -d $(OBJECTS_DEST)/$(MEMENTO_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/memento/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(MEMENTO_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(MEMENTO_NAME) \
+	install -d $(objectsdir)/$(MEMENTO_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/rradical/memento/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(MEMENTO_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MEMENTO_NAME) \
 		--author "Frank Barknecht" \
 		--license "GNU GPL" \
 		--description "a collection of objects for managing state saving"
-	install -d $(HELP_DEST)/$(MEMENTO_NAME)
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/*-help.pd \
-		$(HELP_DEST)/$(MEMENTO_NAME)
-	install -d $(MANUALS_DEST)/$(MEMENTO_NAME)
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/tutorial/*.* \
-		$(MANUALS_DEST)/$(MEMENTO_NAME)
-	install -d $(APPLICATIONS_DEST)/$(MEMENTO_NAME)
-	install -p $(ABSTRACTIONS_SRC)/rradical/memento/examples/*.* \
-		$(APPLICATIONS_DEST)/$(MEMENTO_NAME)
+	install -d $(helpdir)/$(MEMENTO_NAME)
+	install -p $(abstractions_src)/rradical/memento/*-help.pd \
+		$(helpdir)/$(MEMENTO_NAME)
+	install -d $(manualsdir)/$(MEMENTO_NAME)
+	install -p $(abstractions_src)/rradical/memento/tutorial/*.* \
+		$(manualsdir)/$(MEMENTO_NAME)
+	install -d $(examplesdir)/$(MEMENTO_NAME)
+	install -p $(abstractions_src)/rradical/memento/examples/*.* \
+		$(examplesdir)/$(MEMENTO_NAME)
 
 
 #-------------------------------------------------------------------------------
 # nqpoly
 objects_nqpoly: objects_nqpoly~ objects_nqpoly4
 # make a common target for the manuals so they are in one place
-	install -d $(MANUALS_DEST)/nqpoly
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/*.html	$(MANUALS_DEST)/nqpoly
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/readme.txt	\
-		$(MANUALS_DEST)/nqpoly/nqpoly~.txt
+	install -d $(manualsdir)/nqpoly
+	install -p $(abstractions_src)/nqpoly/*.html	$(manualsdir)/nqpoly
+	install -p $(abstractions_src)/nqpoly/nqpoly~/readme.txt	\
+		$(manualsdir)/nqpoly/nqpoly~.txt
 
 NQPOLY_NAME = nqpoly~
 objects_nqpoly~:
-	install -d $(OBJECTS_DEST)/$(NQPOLY_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NQPOLY_NAME)
-	install -d $(HELP_DEST)/$(NQPOLY_NAME) 
+	install -d $(objectsdir)/$(NQPOLY_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly~/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(NQPOLY_NAME)
+	install -d $(helpdir)/$(NQPOLY_NAME) 
 # all of the patches should be installed into help since [nqpoly~] needs to be
 # in the same directory as the patches its manipulating
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd \
-		$(HELP_DEST)/$(NQPOLY_NAME)
-	install -d $(APPLICATIONS_DEST)/$(NQPOLY_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly~/*.pd | \
-		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/$(NQPOLY_NAME)
+	install -p $(abstractions_src)/nqpoly/nqpoly~/*.pd \
+		$(helpdir)/$(NQPOLY_NAME)
+	install -d $(examplesdir)/$(NQPOLY_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly~/*.pd | \
+		grep -v '\-help.pd')  $(examplesdir)/$(NQPOLY_NAME)
 
 
 NQPOLY4_NAME = nqpoly4
 objects_nqpoly4:
-	install -d $(OBJECTS_DEST)/$(NQPOLY4_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NQPOLY4_NAME)
-	install -d $(HELP_DEST)/$(NQPOLY4_NAME)
+	install -d $(objectsdir)/$(NQPOLY4_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(NQPOLY4_NAME)
+	install -d $(helpdir)/$(NQPOLY4_NAME)
 # all of the patches should be installed into help since [nqpoly4] needs to be
 # in the same directory as the patches its manipulating
-	install -p $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd $(HELP_DEST)/$(NQPOLY4_NAME)
-	install -d $(APPLICATIONS_DEST)/$(NQPOLY4_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nqpoly/nqpoly4/*.pd | \
-		grep -v '\-help.pd')  $(APPLICATIONS_DEST)/$(NQPOLY4_NAME)
+	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd $(helpdir)/$(NQPOLY4_NAME)
+	install -d $(examplesdir)/$(NQPOLY4_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
+		grep -v '\-help.pd')  $(examplesdir)/$(NQPOLY4_NAME)
 
 #-------------------------------------------------------------------------------
 # nusmuk
 NUSMUK_NAME = nusmuk
 objects_nusmuk:
-	install -d $(OBJECTS_DEST)/$(NUSMUK_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/nusmuk/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(NUSMUK_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(NUSMUK_NAME) \
+	install -d $(objectsdir)/$(NUSMUK_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/nusmuk/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(NUSMUK_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(NUSMUK_NAME) \
 		--author "Cyrille Henry" \
 		--description "a collection of objects for physical modelling"
-	install -d $(HELP_DEST)/$(NUSMUK_NAME)
-	install -p $(ABSTRACTIONS_SRC)/nusmuk/*-help.pd \
-		$(HELP_DEST)/$(NUSMUK_NAME)
-	install -p $(ABSTRACTIONS_SRC)/nusmuk/*.wav \
-		$(HELP_DEST)/$(NUSMUK_NAME)
+	install -d $(helpdir)/$(NUSMUK_NAME)
+	install -p $(abstractions_src)/nusmuk/*-help.pd \
+		$(helpdir)/$(NUSMUK_NAME)
+	install -p $(abstractions_src)/nusmuk/*.wav \
+		$(helpdir)/$(NUSMUK_NAME)
 
 
 #-------------------------------------------------------------------------------
 # parazit
-	install -d $(OBJECTS_DEST)
-	install -p $(ABSTRACTIONS_SRC)/parazit/parazit.pd $(OBJECTS_DEST)
+	install -d $(objectsdir)
+	install -p $(abstractions_src)/parazit/parazit.pd $(objectsdir)
 
 
 
@@ -187,54 +187,54 @@ objects_nusmuk:
 # PDDP support lib
 PDDP_NAME = pddp
 objects_pddp:
-	install -d $(OBJECTS_DEST)/$(PDDP_NAME)
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/pddp/*.pd | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(PDDP_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(PDDP_NAME) \
+	install -d $(objectsdir)/$(PDDP_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/pddp/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(PDDP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDDP_NAME) \
 		--license "GNU GPL" \
 		--description "support objects for the Pure Data Documentation Project"
-	install -d $(HELP_DEST)/$(PDDP_NAME)
-	install -p $(ABSTRACTIONS_SRC)/pddp/*-help.pd \
-		$(HELP_DEST)/$(PDDP_NAME)
-#	install -d $(MANUALS_DEST)/$(PDDP_NAME)
-#	install -d $(APPLICATIONS_DEST)/$(PDDP_NAME)
+	install -d $(helpdir)/$(PDDP_NAME)
+	install -p $(abstractions_src)/pddp/*-help.pd \
+		$(helpdir)/$(PDDP_NAME)
+#	install -d $(manualsdir)/$(PDDP_NAME)
+#	install -d $(examplesdir)/$(PDDP_NAME)
 
 
 #-------------------------------------------------------------------------------
 # RRADical
 RRADICAL_NAME = rradical
 objects_rradical:
-	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)
-	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(RRADICAL_NAME) \
+	install -d $(objectsdir)/$(RRADICAL_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(RRADICAL_NAME) \
 		--author "Frank Barknecht" \
 		--license "GNU GPL"
-	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/control
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/control/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/control
-	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/effects
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/effects/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/effects
-	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/instruments
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/instruments/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/instruments
-	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/stuff
-	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/stuff/*.* | \
-		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/stuff
+	install -d $(objectsdir)/$(RRADICAL_NAME)/control
+	install -p $(shell ls -1 $(abstractions_src)/rradical/control/*.* | \
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/control
+	install -d $(objectsdir)/$(RRADICAL_NAME)/effects
+	install -p $(shell ls -1 $(abstractions_src)/rradical/effects/*.* | \
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/effects
+	install -d $(objectsdir)/$(RRADICAL_NAME)/instruments
+	install -p $(shell ls -1 $(abstractions_src)/rradical/instruments/*.* | \
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/instruments
+	install -d $(objectsdir)/$(RRADICAL_NAME)/stuff
+	install -p $(shell ls -1 $(abstractions_src)/rradical/stuff/*.* | \
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/stuff
 
 
 applications_rradical:
-	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/*.* \
-		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)
-	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/*.* \
-		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase
-	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/impl
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/impl/*.* \
-		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/impl
-	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/songs
-	install -p $(ABSTRACTIONS_SRC)/rradical/usecases/showcase/songs/*.* \
-		$(APPLICATIONS_DEST)/$(RRADICAL_NAME)/showcase/songs
+	install -d $(examplesdir)/$(RRADICAL_NAME)
+	install -p $(abstractions_src)/rradical/usecases/*.* \
+		$(examplesdir)/$(RRADICAL_NAME)
+	install -d $(examplesdir)/$(RRADICAL_NAME)/showcase
+	install -p $(abstractions_src)/rradical/usecases/showcase/*.* \
+		$(examplesdir)/$(RRADICAL_NAME)/showcase
+	install -d $(examplesdir)/$(RRADICAL_NAME)/showcase/impl
+	install -p $(abstractions_src)/rradical/usecases/showcase/impl/*.* \
+		$(examplesdir)/$(RRADICAL_NAME)/showcase/impl
+	install -d $(examplesdir)/$(RRADICAL_NAME)/showcase/songs
+	install -p $(abstractions_src)/rradical/usecases/showcase/songs/*.* \
+		$(examplesdir)/$(RRADICAL_NAME)/showcase/songs
 
 #==============================================================================#
 #
@@ -248,9 +248,9 @@ devsymlinks: devsymlinks_keyboardkeys
 
 devsymlinks_keyboardkeys:
 	ln -s abs \
-		$(ABSTRACTIONS_SRC)/keyboardkeys/keyboardkeys
+		$(abstractions_src)/keyboardkeys/keyboardkeys
 	ln -s ../keyboardkeys \
-		$(ABSTRACTIONS_SRC)/keyboardkeys/doc/keyboardkeys
+		$(abstractions_src)/keyboardkeys/doc/keyboardkeys
 
 #==============================================================================#
 #

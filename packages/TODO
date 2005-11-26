@@ -8,6 +8,14 @@
 
 - downcase *_DEST and *_SRC to be more readable
 
+- change CWD to packages_src where appropriate
+
+- add DESTDIR to the top of each Makefile
+
+- test for configure before running autoconf/clean configure on distclean
+
+- try including packages/Makefile in darwin_app/Makefile to see if I can run pacakges/makefile targets tehn
+
 - On GNU/Linux, figure out how to deal with build/extra vs. build/lib/pd/extra
 
 - global optimization flags

@@ -10,8 +10,8 @@
 CWD := $(shell pwd)
 
 # these are designed to be overridden by the packages/Makefile
-SRC_ROOT_DIR = $(CWD)/..
-INSTALL_PREFIX = build
+cvs_root_dir = $(CWD)/..
+prefix = build
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
@@ -28,7 +28,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 # clean up after everything is installed
 final_setup:
-	chmod -R ugo-w $(DOCS_DEST)
+	chmod -R ugo-w $(pddocdir)
 
 install: pd_fileformat_install pd-msg_install pddp_install tutorials_install
 	@echo " "
@@ -43,15 +43,15 @@ install: pd_fileformat_install pd-msg_install pddp_install tutorials_install
 #------------------------------------------------------------------------------#
 # PD-MSG
 PD-MSG_NAME = pd-msg
-pd-msg_install: $(MANUALS_DEST)
-	install -d $(MANUALS_DEST)/$(PD-MSG_NAME)
-	install -p $(DOC_SRC)/additional/pd-msg/*.txt \
-		$(MANUALS_DEST)/$(PD-MSG_NAME) 
-	for dir in $(shell cd  $(DOC_SRC)/additional/pd-msg && ls -d [1-5].*); do \
+pd-msg_install: $(manualsdir)
+	install -d $(manualsdir)/$(PD-MSG_NAME)
+	install -p $(doc_src)/additional/pd-msg/*.txt \
+		$(manualsdir)/$(PD-MSG_NAME) 
+	for dir in $(shell cd  $(doc_src)/additional/pd-msg && ls -d [1-5].*); do \
 		echo "Including $$dir in $(PD-MSG_NAME)"; \
-		install -d $(MANUALS_DEST)/$(PD-MSG_NAME)/$$dir; \
-		install -p $(DOC_SRC)/additional/pd-msg/$$dir/*.* \
-			$(MANUALS_DEST)/$(PD-MSG_NAME)/$$dir; \
+		install -d $(manualsdir)/$(PD-MSG_NAME)/$$dir; \
+		install -p $(doc_src)/additional/pd-msg/$$dir/*.* \
+			$(manualsdir)/$(PD-MSG_NAME)/$$dir; \
 	done
 
 
@@ -59,60 +59,60 @@ pd-msg_install: $(MANUALS_DEST)
 #------------------------------------------------------------------------------#
 # PD_FILEFORMAT
 PD_FILEFORMAT_NAME = Pd
-pd_fileformat_install: $(MANUALS_DEST)
-	install -d $(MANUALS_DEST)/$(PD_FILEFORMAT_NAME)
+pd_fileformat_install: $(manualsdir)
+	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
 	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
-		$(MANUALS_DEST)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
+		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 #------------------------------------------------------------------------------#
 # EXTERNALS-HOWTO
 EXTERNALS-HOWTO_NAME = Externals-HOWTO
-externals-howto_install: $(MANUALS_DEST)
-	install -d $(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)
+externals-howto_install: $(manualsdir)
+	install -d $(manualsdir)/$(EXTERNALS-HOWTO_NAME)
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node1.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node1.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node2.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node2.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node3.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node3.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node5.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node5.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node6.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node6.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node7.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node7.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node8.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node8.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node9.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node9.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
-		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node10.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node10.html
 
 
 #------------------------------------------------------------------------------#
 # PDDP
-pddp_install: $(HELP_DEST)
-	install -p $(DOC_SRC)/pddp/*.pd $(HELP_DEST)
+pddp_install: $(helpdir)
+	install -p $(doc_src)/pddp/*.pd $(helpdir)
 # this file is used in key-help.pd
-	install -p $(DOC_SRC)/pddp/keyboard_fun.txt $(HELP_DEST)
+	install -p $(doc_src)/pddp/keyboard_fun.txt $(helpdir)
 
 
 
 #------------------------------------------------------------------------------#
 # TUTORIALS
-tutorials_install: $(MANUALS_DEST)
+tutorials_install: $(manualsdir)
 # pddrums
-	install -d $(MANUALS_DEST)/PdDrums
-	install -p $(DOC_SRC)/tutorials/footils/pddrums/*.* $(MANUALS_DEST)/PdDrums
+	install -d $(manualsdir)/PdDrums
+	install -p $(doc_src)/tutorials/footils/pddrums/*.* $(manualsdir)/PdDrums
 # playnow
-	install -d $(MANUALS_DEST)/PlayNow
-	install -p $(DOC_SRC)/tutorials/playnow/*.pd $(MANUALS_DEST)/PlayNow
+	install -d $(manualsdir)/PlayNow
+	install -p $(doc_src)/tutorials/playnow/*.pd $(manualsdir)/PlayNow
 # these aren't needed yet <hans@at.or.at>
-#	install -p $(DOC_SRC)/tutorials/playnow/*.mid $(MANUALS_DEST)/PlayNow
+#	install -p $(doc_src)/tutorials/playnow/*.mid $(manualsdir)/PlayNow
 
 
 #==============================================================================#
@@ -123,23 +123,23 @@ tutorials_install: $(MANUALS_DEST)
 
 # make the symlinks necessary to simulate the installed environment
 devsymlinks:
-	test -e $(DOC_SRC)/2.control.examples || \
-		ln -s $(PD_SRC)/doc/2.control.examples $(DOC_SRC)/2.control.examples
-	test -e $(DOC_SRC)/3.audio.examples || \
-		ln -s $(PD_SRC)/doc/3.audio.examples $(DOC_SRC)/3.audio.examples
+	test -e $(doc_src)/2.control.examples || \
+		ln -s $(pd_src)/doc/2.control.examples $(doc_src)/2.control.examples
+	test -e $(doc_src)/3.audio.examples || \
+		ln -s $(pd_src)/doc/3.audio.examples $(doc_src)/3.audio.examples
 # pd <= 0.38-4 has 4.fft.examples
-	test -e $(DOC_SRC)/4.fft.examples || \
-		ln -s $(PD_SRC)/doc/4.fft.examples $(DOC_SRC)/4.fft.examples
+	test -e $(doc_src)/4.fft.examples || \
+		ln -s $(pd_src)/doc/4.fft.examples $(doc_src)/4.fft.examples
 # pd > 0.38-4 has 4.data.structures
-	test -e $(DOC_SRC)/4.data.structures || \
-		ln -s $(PD_SRC)/doc/4.data.structures $(DOC_SRC)/4.data.structures
-	test -e $(DOC_SRC)/7.stuff || \
-		ln -s $(PD_SRC)/doc/7.stuff $(DOC_SRC)/7.stuff
-	test -e $(DOC_SRC)/sound || \
-		ln -s $(PD_SRC)/doc/sound $(DOC_SRC)/sound
+	test -e $(doc_src)/4.data.structures || \
+		ln -s $(pd_src)/doc/4.data.structures $(doc_src)/4.data.structures
+	test -e $(doc_src)/7.stuff || \
+		ln -s $(pd_src)/doc/7.stuff $(doc_src)/7.stuff
+	test -e $(doc_src)/sound || \
+		ln -s $(pd_src)/doc/sound $(doc_src)/sound
 # put the pddp support objects in the path
-	test -e $(DOC_SRC)/pddp/pddp || \
-		ln -s $(ABSTRACTIONS_SRC)/pddp $(DOC_SRC)/pddp/pddp
+	test -e $(doc_src)/pddp/pddp || \
+		ln -s $(abstractions_src)/pddp $(doc_src)/pddp/pddp
 
 #==============================================================================#
 #

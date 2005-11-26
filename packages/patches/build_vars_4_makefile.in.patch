@@ -4,22 +4,35 @@ RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.5
 diff -u -w -r1.5 makefile.in
 --- makefile.in	6 Nov 2004 16:07:33 -0000	1.5
-+++ makefile.in	21 Nov 2005 04:32:51 -0000
-@@ -113,29 +113,48 @@
++++ makefile.in	26 Nov 2005 04:06:12 -0000
+@@ -5,8 +5,8 @@
+ EXT= @EXT@
+ GUINAME= @GUINAME@
+ 
+-INSTALL_PREFIX = @prefix@
+-GFLAGS = -DINSTALL_PREFIX=\"$(INSTALL_PREFIX)\"
++prefix = @prefix@
++GFLAGS = -DINSTALL_PREFIX=\"$(prefix)\"
+ 
+ MANDIR = @mandir@
+ 
+@@ -112,30 +112,49 @@
+ 	cd ../extra/lrshift~;make @EXTERNTARGET@
  	cd ../extra/pique;make @EXTERNTARGET@
  
- INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
+-INSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)
 -MANINSTDIR = $(DESTDIR)/$(INSTALL_PREFIX)/$(MANDIR)
++INSTDIR = $(DESTDIR)$(prefix)
  BINARYMODE=@binarymode@
  
 +# varibles to match packages/Makefile.buildlayout so that they can be easily
 +# overridden when building extended builds. <hans@at.or.at>
-+BIN_DEST = $(INSTDIR)/bin
-+DOCS_DEST = $(INSTDIR)/doc
-+INCLUDE_DEST = $(INSTDIR)/include
-+LIBPD_DEST = $(INSTDIR)/lib/pd
-+LIBBIN_DEST = $(LIBPD_DEST)/bin
-+MAN_DEST = $(INSTDIR)/$(MANDIR)
++bindir = $(INSTDIR)/bin
++pddocdir = $(INSTDIR)/doc
++includedir = $(INSTDIR)/include
++libpddir = $(INSTDIR)/lib/pd
++libpdbindir = $(libpddir)/bin
++mandir = $(DESTDIR)$(MANDIR)
 +
  install:  all
 -	install -d $(INSTDIR)/lib/pd/bin
@@ -31,25 +44,25 @@ diff -u -w -r1.5 makefile.in
 -	install -m755 $(BIN_DIR)/pdsend $(INSTDIR)/bin/pdsend
 -	install -m755 $(BIN_DIR)/pdreceive $(INSTDIR)/bin/pdreceive 
 -	cp -pr ../doc ../extra $(INSTDIR)/lib/pd/
-+	install -d $(LIBBIN_DEST)
-+	install $(BIN_DIR)/$(GUINAME) $(LIBBIN_DEST)/$(GUINAME)
-+	install $(BIN_DIR)/pd-watchdog $(LIBBIN_DEST)/pd-watchdog
-+	install -m644 $(BIN_DIR)/pd.tk $(LIBBIN_DEST)/pd.tk
-+	install -d $(BIN_DEST)
-+	install $(BINARYMODE) $(PDEXEC) $(BIN_DEST)/pd
-+	install -m755 $(BIN_DIR)/pdsend $(BIN_DEST)/pdsend
-+	install -m755 $(BIN_DIR)/pdreceive $(BIN_DEST)/pdreceive 
++	install -d $(libpdbindir)
++	install $(BIN_DIR)/$(GUINAME) $(libpdbindir)/$(GUINAME)
++	install $(BIN_DIR)/pd-watchdog $(libpdbindir)/pd-watchdog
++	install -m644 $(BIN_DIR)/pd.tk $(libpdbindir)/pd.tk
++	install -d $(bindir)
++	install $(BINARYMODE) $(PDEXEC) $(bindir)/pd
++	install -m755 $(BIN_DIR)/pdsend $(bindir)/pdsend
++	install -m755 $(BIN_DIR)/pdreceive $(bindir)/pdreceive 
 +	for dir in $(shell ls -1 ../doc | grep -v CVS); do \
 +		echo "installing $$dir"; \
-+		install -d $(DOCS_DEST)/$$dir ; \
-+		install -p ../doc/$$dir/*.* $(DOCS_DEST)/$$dir ; \
++		install -d $(pddocdir)/$$dir ; \
++		install -p ../doc/$$dir/*.* $(pddocdir)/$$dir ; \
 +	done
 +	for dir in $(shell ls -1 ../doc/7.stuff | grep -v CVS); do \
 +		echo "installing 7.stuff/$$dir"; \
-+		install -d $(DOCS_DEST)/7.stuff/$$dir ; \
-+		install -p ../doc/7.stuff/$$dir/*.* $(DOCS_DEST)/7.stuff/$$dir ; \
++		install -d $(pddocdir)/7.stuff/$$dir ; \
++		install -p ../doc/7.stuff/$$dir/*.* $(pddocdir)/7.stuff/$$dir ; \
 +	done
-+	cp -pr ../extra $(LIBPD_DEST)/
++	cp -pr ../extra $(libpddir)/
  	rm -f $(INSTDIR)/extra/*/*.o
 -	install -d $(INSTDIR)/include
 -	install -m644 m_pd.h $(INSTDIR)/include/m_pd.h
@@ -60,15 +73,15 @@ diff -u -w -r1.5 makefile.in
 -	chmod 644 $(MANINSTDIR)/man1/pdsend.1.gz
 -	gzip < ../man/pdreceive.1 >  $(MANINSTDIR)/man1/pdreceive.1.gz
 -	chmod 644 $(MANINSTDIR)/man1/pdreceive.1.gz
-+	install -d $(INCLUDE_DEST)
-+	install -m644 m_pd.h $(INCLUDE_DEST)/m_pd.h
-+	install -d $(MAN_DEST)/man1
-+	gzip < ../man/pd.1 >  $(MAN_DEST)/man1/pd.1.gz
-+	chmod 644 $(MAN_DEST)/man1/pd.1.gz
-+	gzip < ../man/pdsend.1 >  $(MAN_DEST)/man1/pdsend.1.gz
-+	chmod 644 $(MAN_DEST)/man1/pdsend.1.gz
-+	gzip < ../man/pdreceive.1 >  $(MAN_DEST)/man1/pdreceive.1.gz
-+	chmod 644 $(MAN_DEST)/man1/pdreceive.1.gz
++	install -d $(includedir)
++	install -m644 m_pd.h $(includedir)/m_pd.h
++	install -d $(mandir)/man1
++	gzip < ../man/pd.1 >  $(mandir)/man1/pd.1.gz
++	chmod 644 $(mandir)/man1/pd.1.gz
++	gzip < ../man/pdsend.1 >  $(mandir)/man1/pdsend.1.gz
++	chmod 644 $(mandir)/man1/pdsend.1.gz
++	gzip < ../man/pdreceive.1 >  $(mandir)/man1/pdreceive.1.gz
++	chmod 644 $(mandir)/man1/pdreceive.1.gz
 +	@echo "Pd install succeeded."
  
  local-clean:
@@ -85,14 +98,14 @@ diff -u -w -r1.5 makefile.in
 -	rm -f $(MANINSTDIR)/man1/pd.1.gz
 -	rm -f $(MANINSTDIR)/man1/pdsend.1.gz
 -	rm -f $(MANINSTDIR)/man1/pdreceive.1.gz
-+	rm -f -r $(LIBPD_DEST)
-+	rm -f $(BIN_DEST)/pd
-+	rm -f $(BIN_DEST)/pdsend
-+	rm -f $(BIN_DEST)/pdreceive
-+	rm -f $(INCLUDE_DEST)/m_pd.h
-+	rm -f $(MAN_DEST)/man1/pd.1.gz
-+	rm -f $(MAN_DEST)/man1/pdsend.1.gz
-+	rm -f $(MAN_DEST)/man1/pdreceive.1.gz
++	rm -f -r $(libpddir)
++	rm -f $(bindir)/pd
++	rm -f $(bindir)/pdsend
++	rm -f $(bindir)/pdreceive
++	rm -f $(includedir)/m_pd.h
++	rm -f $(mandir)/man1/pd.1.gz
++	rm -f $(mandir)/man1/pdsend.1.gz
++	rm -f $(mandir)/man1/pdreceive.1.gz
  
  include makefile.dependencies
  
