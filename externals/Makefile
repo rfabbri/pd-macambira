@@ -42,7 +42,7 @@ all: pre_all_$(OS_NAME) creb cyclone iemabs iemlib iemmatrix pddp pdp pmpd \
 		toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
-	cd $(externals_src)/build/$(OS_NAME) && make -k 
+	-cd $(externals_src)/build/$(OS_NAME) && make -k 
 
 # these targets are for platform-specific needs that run before objects:
 pre_all_darwin:
@@ -193,8 +193,8 @@ cyclone_install: cyclone
 #	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
 #		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
 	install -d $(helpdir)/$(CYCLONE_NAME)
-	install -p $(externals_src)/miXed/doc/help/cyclone/*.*  \
-		$(helpdir)/$(CYCLONE_NAME)
+	cd $(externals_src)/miXed/doc/help/cyclone && \
+		install -p *.* $(helpdir)/$(CYCLONE_NAME)
 #	install -d $(manualsdir)/$(CYCLONE_NAME)
 	install -d $(examplesdir)/$(CYCLONE_NAME)
 	install -p $(externals_src)/miXed/test/cyclone/*.*  \
@@ -215,8 +215,8 @@ iemabs_install: iemabs
 	install -d $(objectsdir)/$(IEMABS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMABS_NAME) \
 		--description "a collection of objects written at IEM/KUG"
-	install -p $(shell ls -1 $(externals_src)/iemlib/iemabs/*.pd | \
-		grep -v 'help') $(objectsdir)/$(IEMABS_NAME)
+	install -p $(shell ls -1 $(externals_src)/iemlib/iemabs/*.pd | grep -v 'help') \
+		$(objectsdir)/$(IEMABS_NAME)
 	install -d $(helpdir)/$(IEMABS_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*help*.pd \
 		$(helpdir)/$(IEMABS_NAME)
@@ -414,8 +414,8 @@ unfiltered_install:
 			 grep -v '\-help.pd') $(objectsdir)
 # hid 
 # these don't work on Windows yet
-	cd $(externals_src)/hcs/hid && $(MAKE) 
-	install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(objectsdir)
+	-cd $(externals_src)/hcs/hid && $(MAKE) 
+	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(objectsdir)
 	install -p $(shell ls -1 $(externals_src)/hcs/hid/*.pd | \
 			 grep -v '\-help.pd'| grep -v '\-list.pd') $(objectsdir)
 # general
@@ -428,14 +428,14 @@ unfiltered_install:
 	test -e $(externals_src)/OSCx/Makefile || \
 		(cd $(externals_src)/OSCx && ./configure)
 # these don't work on Windows yet
-	cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+	-install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
-	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 #----------------------------------------------------------------------------
 # unauthorized
 # these don't work on Windows yet
-	cd $(externals_src)/unauthorized && $(MAKE) 
-	install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) $(objectsdir)
+	-cd $(externals_src)/unauthorized && $(MAKE) 
+	-install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/unauthorized/*/*.pd $(helpdir)
 	install -p $(externals_src)/unauthorized/*/*.txt $(helpdir)
 	install -p $(externals_src)/unauthorized/*/*.pls $(helpdir)

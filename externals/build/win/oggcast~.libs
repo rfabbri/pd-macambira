@@ -1,1 +1,1 @@
--logg -lvorbis -lvorbisenc -lvorbisfile
+-logg -lvorbis -lvorbisenc -lvorbisfile -lwsock32 -lpthreadGC2
