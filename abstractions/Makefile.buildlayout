@@ -19,12 +19,12 @@
 #
 # This file is currently located in these places: 
 #	  abstractions
-#	  externals/build
+#    extensions
+#	  externals
 # 	  packages
 #    doc
 #
 # it will be going here too:
-#    extensions
 #    gem
 #    pd
 #
@@ -65,10 +65,10 @@ endif
 # sources
 ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
 DOC_SRC = $(SRC_ROOT_DIR)/doc
+EXTENSIONS_SRC = $(SRC_ROOT_DIR)/extensions
 EXTERNALS_SRC = $(SRC_ROOT_DIR)/externals
 FLEXT_SRC = $(SRC_ROOT_DIR)/externals/grill/flext
 GEM_SRC = $(SRC_ROOT_DIR)/Gem
-GEMLIBS_SRC = $(SRC_ROOT_DIR)/GemLibs
 PACKAGES_SRC = $(SRC_ROOT_DIR)/packages
 PD_SRC = $(SRC_ROOT_DIR)/pd
 SCRIPTS_SRC = $(SRC_ROOT_DIR)/scripts
@@ -130,7 +130,7 @@ PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 
 # release version for this distro
-PACKAGE_VERSION = extended-RC4
+PACKAGE_VERSION = extended-RC5
 PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 
 

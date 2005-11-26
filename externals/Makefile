@@ -57,7 +57,7 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: $(OBJECTS_DEST) help_install objects_install unfiltered_install \
+install: all $(OBJECTS_DEST) help_install objects_install unfiltered_install \
  creb_install cyclone_install iemabs_install iemabs_install iemmatrix_install \
  pddp_install pdp_install pmpd_install toxy_install vbap_install zexy_install
 	@echo " "
@@ -104,7 +104,7 @@ help_install: $(HELP_DEST)
 			$(EXTERNALS_SRC)/hcs/*/doc/*.pd \
 			$(EXTERNALS_SRC)/hcs/hid/examples/*.pd \
 			$(EXTERNALS_SRC)/hcs/pan/*-help.pd \
-			$(EXTERNALS_SRC)/iem/*/*/*-help.pd \
+			$(EXTERNALS_SRC)/iem/comport/*/*-help.pd \
 			$(EXTERNALS_SRC)/markex/*.pd \
 			$(EXTERNALS_SRC)/motex/*.pd \
 			$(EXTERNALS_SRC)/nusmuk/line3/*.pd\
@@ -213,6 +213,8 @@ iemabs:
 iemabs_install: iemabs
 #  iemabs still has the help patches in the old help-*.pd style
 	install -d $(OBJECTS_DEST)/$(IEMABS_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(IEMABS_NAME) \
+		--description "a collection of objects written at IEM/KUG"
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/iemlib/iemabs/*.pd | \
 		grep -v 'help') $(OBJECTS_DEST)/$(IEMABS_NAME)
 	install -d $(HELP_DEST)/$(IEMABS_NAME)
@@ -252,6 +254,9 @@ iemmatrix:
 
 iemmatrix_install: iemmatrix
 	install -d $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(IEMMATRIX_NAME) \
+		--description "objects for matrix operations and math"
+	mv $(OBJECTS_DEST)/mtx*.$(EXTENSION) $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
 	install -p $(shell ls -1 $(EXTERNALS_SRC)/iem/iemmatrix/abs/*.* | \
 		grep -v '\-help.pd') $(OBJECTS_DEST)/$(IEMMATRIX_NAME)
 	install -d $(HELP_DEST)/$(IEMMATRIX_NAME)
@@ -316,7 +321,7 @@ pmpd:
 
 
 pmpd_install: pmpd
-	install -d $(OBJECTS_DEST)/$(PMPD_NAME)
+#	install -d $(OBJECTS_DEST)/$(PMPD_NAME)
 	install -d $(HELP_DEST)/$(PMPD_NAME)
 	install -p $(EXTERNALS_SRC)/pmpd/help/*.pd \
 		 $(HELP_DEST)/$(PMPD_NAME)
@@ -419,8 +424,10 @@ unfiltered_install:
 			 grep -v '\-help.pd') $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
 # OSC
+	test -e cd $(EXTERNALS_SRC)/OSCx/Makefile || \
+		(cd $(EXTERNALS_SRC)/OSCx && ./configure)
 # these don't work on Windows yet
-	cd $(EXTERNALS_SRC)/OSCx && ./configure && $(MAKE) CC=gcc
+	cd $(EXTERNALS_SRC)/OSCx && $(MAKE) CC=gcc
 	install -p $(EXTERNALS_SRC)/OSCx/doc/*.* $(HELP_DEST)
 	install -p $(EXTERNALS_SRC)/OSCx/src/*.$(EXTENSION) $(OBJECTS_DEST)
 #----------------------------------------------------------------------------
@@ -452,5 +459,13 @@ devsymlinks:
 
 # the destination-specific clean targets are in Makefile.buildlayout
 clean: install_clean
+	cd $(EXTERNALS_SRC)/build/$(OS_NAME) && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/hcs/hid && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/OSCx && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/mixed/cyclone && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/mixed/pddp && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/mixed/toxy && make $(DEST_PATHS) clean
+	cd $(EXTERNALS_SRC)/unauthorized && make $(DEST_PATHS) clean
 
 distclean: clean cruft_clean
+	rm $(EXTERNALS_SRC)/OSCx Makefile

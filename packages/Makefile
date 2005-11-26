@@ -130,6 +130,7 @@ flext:
 #------------------------------------------------------------------------------
 # Gem
 gem:
+#	cd $(GEM_SRC)/Gem && xcodebuild
 
 
 #------------------------------------------------------------------------------
@@ -180,18 +181,25 @@ pd:
 #==============================================================================#
 
 #------------------------------------------------------------------------------
-# abstractions
+# install
+install: license_install readme_install welcome_install gem_install
+install: pd_install abstractions_install doc_install externals_install
+install: noncvs_install
+	@echo "Complete install succeeded!"
+
+#------------------------------------------------------------------------------
+# abstractions_install
 abstractions_install:
 	cd $(ABSTRACTIONS_SRC) && make $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------
-# doc
+# doc_install
 doc_install: 
 	cd $(DOC_SRC) && make $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
-# externals
+# externals_install
 externals_install: 
 	cd $(EXTERNALS_SRC) && make $(DEST_PATHS) install
 
@@ -210,26 +218,44 @@ flext_install:
 
 
 #------------------------------------------------------------------------------
-# Gem
-gem_install:
+# gem_install
+GEM_NAME = gem
+gem_install: gem $(HELP_DEST)
+	install -p $(GEM_SRC)/help/*.* $(HELP_DEST)
+	install -p $(GEM_SRC)/abstractions/*-help.pd $(HELP_DEST)
+	install -d $(OBJECTS_DEST)/$(GEM_NAME)
+	install -p $(shell ls -1 $(GEM_SRC)/abstractions/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)
+	install -d $(MANUALS_DEST)/$(GEM_NAME)
+	install -p $(GEM_SRC)/doc/*.* $(MANUALS_DEST)/$(GEM_NAME)
+	install -d $(MANUALS_DEST)/$(GEM_NAME)/manual
+	install -p $(GEM_SRC)/manual/*.* $(MANUALS_DEST)/$(GEM_NAME)/manual
+	for dir in $(shell ls -1 $(GEM_SRC)/examples | grep -v CVS); do \
+		echo "installing $$dir"; \
+		install -d $(APPLICATIONS_DEST)/$(GEM_NAME)/$$dir ; \
+		install -p $(GEM_SRC)/examples/$$dir/*.* $(APPLICATIONS_DEST)/$(GEM_NAME)/$$dir ; \
+	done
 
 
 #------------------------------------------------------------------------------
-# pd
+# noncvs_install
+# this is for including pre-compiled binaries in a build
+noncvs_install:
+		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/bin/*.* $(BIN_DEST)
+		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/doc/5.reference/*.* \
+			$(HELP_DEST)
+		-install -p $(PACKAGES_SRC)/noncvs/$(OS_NAME)/extra/*.* $(OBJECTS_DEST)
+
+
+
+#------------------------------------------------------------------------------
+# pd_install
 PD_NAME=Pd
 pd_install: pd
 	cd $(PD_SRC)/src && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS) install
 	install -d $(MANUALS_DEST)/$(PD_NAME)
 	install -p $(PD_SRC)/src/notes.txt $(MANUALS_DEST)/$(PD_NAME)
-
-
-#------------------------------------------------------------------------------
-# install
-install: license_install readme_install welcome_install
-install: pd_install abstractions_install doc_install externals_install
-#install: flext_install gem_install
-	@echo "Complete install succeeded!"
 
 
 
@@ -340,10 +366,10 @@ doc_format:
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(DOCS_DEST) && \
 		$(SCRIPTS_SRC)/convert-help-to-standard.sh
-#----------------------------------------------------------------------------
 # remove write perms to prevent people form editing the helpfiles by mistake
 	cd $(DOCS_DEST) && chmod a-wx */*.pd */*/*.pd
-	cd $(DOCS_DEST) && chmod a-w ????*/*.* *.txt
+	find $(DOCS_DEST) -name '*.pd' -print0 | xargs -0 chmod a-wx
+	find $(DOCS_DEST) -name '*.txt' -print0 | xargs -0 chmod a-wx
 
 
 

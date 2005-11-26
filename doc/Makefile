@@ -64,6 +64,33 @@ pd_fileformat_install: $(MANUALS_DEST)
 	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
 		$(MANUALS_DEST)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
+#------------------------------------------------------------------------------#
+# EXTERNALS-HOWTO
+EXTERNALS-HOWTO_NAME = Externals-HOWTO
+externals-howto_install: $(MANUALS_DEST)
+	install -d $(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node1.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node2.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node3.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node5.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node6.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node7.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node8.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node9.html
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
+		$(MANUALS_DEST)/$(EXTERNALS-HOWTO_NAME)/node10.html
 
 
 #------------------------------------------------------------------------------#

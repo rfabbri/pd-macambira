@@ -1,4 +1,7 @@
 
+- incorporate %.c building into cross-platform Makefile, and have it work with
+  subdirectories so that libdirs can be compiled here.
+
 - simplify Makefile, making just "all" and "install" with subsections for each
   subdir.
 
@@ -32,3 +35,5 @@
       PDContainer
       ann
 		grh
+		iemstream
+		iemxmlrpc

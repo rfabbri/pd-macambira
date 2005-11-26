@@ -3,17 +3,10 @@
 
 - in post-clean, rm *.bak
 
-- make Info.plist.in template and have the Makefile create Info.plist
-
-- check to make sure that Rez mac.r is working in Makefile
-
 - make Pd open a new window when its launched to workaround the bug where the
   menus don't work until a window is opened.
 
 - otool dylib help: http://qin.laya.com/tech_coding_help/dylib_linking.html
-
-- add symbolic link for flext 
-  (cd Pd.app/Contents/Resources/extra && ln -s . lib)
 
 - from Carmen Rocco about [fiddle~] crash: "is fiddle~: * compiled with the same header * linked with the same binary of (lib)pd * compiled with the same compiler? i had very similar issues with bonk on windows (Virtually same stacktrace but s/fiddle/bonk) until fixing the above 3 things..."
 
@@ -55,7 +48,7 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 		 - make Cmd-click work like Ctrl-click
 
 - write script to convert from -DMACOSX to -D__APPLE__ where ever possible (check out
-  __gnu_linux__ while I am at it) and submit to miller
+  __gnu_linux__ and WIN32 while I am at it) and submit to miller
 
 - instead of shipping Pd.app with a org.puredata.pd.plist, make a script that
   uses the "defaults" command to add the desired prefs to any existing

@@ -90,6 +90,7 @@ objects_la-kitchen:
 	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/La-kitchen/*.pd | \
 		grep -v '\-help.pd')    $(OBJECTS_DEST)/$(LA-KITCHEN_NAME)
 	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(LA-KITCHEN_NAME) \
+		--author "Charles Verron" \
 		--description "a collection of objects working with sensors"
 	install -d $(HELP_DEST)/$(LA-KITCHEN_NAME)
 	install -p $(ABSTRACTIONS_SRC)/La-kitchen/*-help.pd \
@@ -204,6 +205,22 @@ objects_pddp:
 RRADICAL_NAME = rradical
 objects_rradical:
 	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)
+	$(SCRIPTS_SRC)/generate-libdir-metafile.sh $(OBJECTS_DEST) $(RRADICAL_NAME) \
+		--author "Frank Barknecht" \
+		--license "GNU GPL"
+	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/control
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/control/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/control
+	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/effects
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/effects/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/effects
+	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/instruments
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/instruments/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/instruments
+	install -d $(OBJECTS_DEST)/$(RRADICAL_NAME)/stuff
+	install -p $(shell ls -1 $(ABSTRACTIONS_SRC)/rradical/stuff/*.* | \
+		grep -v '\-help.pd')  $(OBJECTS_DEST)/$(RRADICAL_NAME)/stuff
+
 
 applications_rradical:
 	install -d $(APPLICATIONS_DEST)/$(RRADICAL_NAME)

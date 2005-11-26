@@ -35,7 +35,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_app_install rez_install
+darwin_app: darwin_app_core extended_app_install darwin_app_doc_format rez_install
 	@echo " "
 	@echo "Pd.app build succeeded!"
 
@@ -43,7 +43,7 @@ darwin_app: darwin_app_core extended_app_install rez_install
 # this target is for when you already have a pre-built Pd.app and you
 # just want to fill it with goodies from CVS.  To do so, place your 
 # Pd.app in $(BUILD_BASE)/Pd.app
-extended_app_install:  extended_install darwin_app_noncvs darwin_app_doc_format
+extended_app_install:  extended_install
 
 
 #------------------------------------------------------------------------------#
@@ -68,7 +68,7 @@ darwin_app_wrapper: Info.plist
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/Wish Shell" \
-		"$(PD_APP_CONTENTS)/MacOS/$(PD_APP_NAME)"
+		"$(PD_APP_CONTENTS)/MacOS/Pd"
 #	diskutil eject /Volumes/$(TCLTK)
 
 
@@ -107,6 +107,7 @@ darwin_app_doc_format:
 	cd $(DOCS_DEST) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
 			*/*.pd */*/*.pd */*/*/*.pd
+	find $(INSTALL_PREFIX) -name '*.pd.bak' -delete
 
 #==============================================================================#
 #
@@ -120,19 +121,7 @@ extended_install:
 
 #------------------------------------------------------------------------------#
 darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_flext
-#darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ darwin_app_externals_gem
-
-
-#------------------------------------------------------------------------------#
-# GEM
-darwin_app_externals_gem:
-	cd $(GEM_SRC)/Gem && xcodebuild
-	install -p -m0644 $(GEM_SRC)/Gem/help/*.* $(HELP_DEST)
-	install -d $(DOCS_DEST)/Gem/doc
-	install -p -m0644 $(GEM_SRC)/Gem/doc/*.* $(DOCS_DEST)/gem
-	install -d $(DOCS_DEST)/Gem/00.manual
-	install -p -m0644 $(GEM_SRC)/Gem/manual/*.* $(DOCS_DEST)/gem/00.manual
-	cp -Rfp $(GEM_SRC)/Gem/examples/*.* $(GEM_SRC)/Gem/examples/data $(DOCS_DEST)/gem
+#darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++
 
 
 #------------------------------------------------------------------------------#
@@ -270,24 +259,10 @@ darwin_app_externals_c++:
 # gem2pdp
 #	cd $(EXTERNALS_SRC)/gem2pdp && $(MAKE) -f Makefile.darwin
 #	install -p -m0444 $(EXTERNALS_SRC)/gem2pdp/*.pd_darwin $(OBJECTS_DEST)
-#----------------------------------------------------------------------------
-# GridFlow
-#	cd ../../gridflow && ./configure && $(MAKE)
 
-
-darwin_app_noncvs:
-	test -d noncvs/doc/5.reference && \
-		install -p noncvs/doc/5.reference/*.* $(HELP_DEST)
-	test -d noncvs/extra && install -p noncvs/extra/*.* $(OBJECTS_DEST)
-	test -d noncvs/doc/serendipd && cp -Rp noncvs/doc/serendipd \
-		$(APPLICATIONS_DEST)
 
 darwin_app_perms:
-	chmod a-x $(DOCS_DEST)/*/*.pd $(DOCS_DEST)/*/*/*.pd $(DOCS_DEST)/*/*/*/*.pd
 	chmod -R a-w $(DOCS_DEST)
-# serendiPd shared patch
-	test -d $(APPLICATIONS_DEST)/serendipd && \
-		chmod a+w $(APPLICATIONS_DEST)/serendipd/*shared_patch.pd
 
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
@@ -299,8 +274,7 @@ dmg: darwin_app_perms
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 
-clean: darwin_app_clean darwin_app_externals_standard_clean \
-	darwin_app_externals_gem_clean darwin_app_externals_flext_clean \
+clean: darwin_app_clean	darwin_app_externals_flext_clean \
 	cd $(PACKAGES_SRC) && make clean
 	-rm Info.plist
 
@@ -312,7 +286,7 @@ darwin_app_clean:
 
 
 
-darwin_app_externals_gem_clean:
+
 	cd $(GEM_SRC)/Gem && xcodebuild clean
 
 darwin_app_externals_flext_clean:
@@ -330,6 +304,22 @@ darwin_app_externals_flext_clean:
 ## DEPRECATED TARGETS
 #
 #==============================================================================#
+
+darwin_app_noncvs:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(PACKAGES_SRC) && make noncvs_install"
+	cd $(PACKAGES_SRC) && make $(DEST_PATHS) noncvs_install
+
+darwin_app_externals_gem_clean:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(PACKAGES_SRC) && make gem_clean"
+
+darwin_app_externals_gem:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(PACKAGES_SRC) && make gem_install"
 
 darwin_app_externals_standard_clean:
 	@echo " "

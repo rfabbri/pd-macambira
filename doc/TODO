@@ -1,4 +1,6 @@
 
+- add externals HOWTO to manuals/Pd
+
 - create Makefile for Pd-extended build system
 
 - add pd-fileformat doc: http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html
