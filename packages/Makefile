@@ -146,7 +146,7 @@ else
     libpddir = $(prefix)
     libpdbindir = $(bindir)
   else
-    libpddir = $(INSTDIR)/lib/pd
+    libpddir = $(prefix)/lib/pd
     libpdbindir = $(libpddir)/bin
   endif
 endif
@@ -165,6 +165,7 @@ PD_AUTOCONF = autoconf
 
 
 pd:
+	echo "OS_NAME $(OS_NAME)"
 	echo "DESTDIR $(DESTDIR)  libpdbindir $(libpdbindir)"
 	echo "DEST_PATHS $(DEST_PATHS)"
 	echo "PD_DEST_PATHS $(PD_DEST_PATHS)"
