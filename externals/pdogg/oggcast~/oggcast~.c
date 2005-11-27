@@ -1463,5 +1463,4 @@ void oggcast_tilde_setup(void)
     class_addmethod(oggcast_class, (t_method)oggcast_vbr, gensym("vbr"), A_FLOAT, A_FLOAT, A_FLOAT, 0);
     class_addmethod(oggcast_class, (t_method)oggcast_server, gensym("server"), A_FLOAT, 0);
     class_addanything(oggcast_class, oggcast_comment);
-    class_sethelpsymbol(oggcast_class, gensym("help-oggcast~.pd"));
 }

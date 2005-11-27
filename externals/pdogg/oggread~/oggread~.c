@@ -410,5 +410,4 @@ void oggread_tilde_setup(void)
     class_addmethod(oggread_class, (t_method)oggread_resume, gensym("resume"), 0);
     class_addmethod(oggread_class, (t_method)oggread_seek, gensym("seek"), A_DEFFLOAT, 0);
     class_addmethod(oggread_class, (t_method)oggread_stop, gensym("stop"), 0);
-    class_sethelpsymbol(oggread_class, gensym("help-oggread~.pd"));
 }

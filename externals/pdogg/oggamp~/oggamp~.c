@@ -1424,5 +1424,4 @@ void oggamp_tilde_setup(void)
     class_addmethod(oggamp_class, (t_method)oggamp_connect_url, gensym("connecturl"), A_SYMBOL, 0);
     class_addmethod(oggamp_class, (t_method)oggamp_recover, gensym("recover"), A_FLOAT, 0);
     class_addmethod(oggamp_class, (t_method)oggamp_print, gensym("print"), 0);
-    class_sethelpsymbol(oggamp_class, gensym("help-oggamp~.pd"));
 }
