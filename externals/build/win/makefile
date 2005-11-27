@@ -48,8 +48,8 @@ OPTIM_FLAGS = -O3 -march=i686 -mfpmath=sse -msse
 CFLAGS = -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused -Wno-parentheses \
 	 -Wno-switch $(OPTIM_FLAGS)
 
-INCLUDE = -I. -I.. -I$(PD_PATH)/src -IC:/msys/1.0/local/include
-LDFLAGS = -shared -LC:/msys/1.0/local/lib -L$(PD_PATH)/bin -lpd
+INCLUDE = -I. -I.. -I$(PD_PATH)/src -IC:/msys/1.0/include
+LDFLAGS = -shared -LC:/msys/1.0/lib -L$(PD_PATH)/bin -lpd
 
 all: externals
 
@@ -65,7 +65,6 @@ externals: $(EXTERNALS:.c=.dll)
 		`test -f $*.libs && cat $*.libs` \
 		`test -f ../src/$*.libs && cat ../src/$*.libs` 
 	$(STRIP) "$*.dll"
-#	strip --strip-all "$*.dll"
 	rm "$*.o"
 
 clean:

@@ -6,7 +6,9 @@
   subdir.
 
 - get externals/build/src/prepend.c to compile in Pd mode, which means it will
-  have a right inlet when created without an argument
+  have a right inlet when created without an argument (because of cyclone's
+  buld system, its quite difficult to do.  I think it should just be removed
+  from default)
 
 - add in mtx_ objects with special characters using setup functions and
   filenames with 0x escapes (mtx_/ and mtx_./ for example).  Make sure to have
@@ -24,12 +26,6 @@
 		iem/prepend
 		cxc/prepend
 		flext/prepend
-
-- move .libs files to externals/build/src from externals/build/PLATFORM.  The
-  platform-specific makefiles copy them before compiling.  If a
-  platform-specific .libs file is needed, create it in the
-  externals/build/PLATFORM directory.  The makefiles will use both:
-  `test -f $*.libs && cat $*.libs` `test -f ../src/$*.libs && cat ../src/$*.libs`
 
 - add these to the build system:
       PDContainer

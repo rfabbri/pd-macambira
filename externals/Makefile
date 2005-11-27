@@ -59,7 +59,8 @@ pre_all_unknown:
 # INSTALL
 install: all $(objectsdir) help_install objects_install unfiltered_install \
  creb_install cyclone_install iemabs_install iemabs_install iemmatrix_install \
- pddp_install pdp_install pmpd_install toxy_install vbap_install zexy_install
+ pddp_install pdp_install pmpd_install toxy_install unauthorized_install \
+	vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -197,8 +198,8 @@ cyclone_install: cyclone
 		install -p *.* $(helpdir)/$(CYCLONE_NAME)
 #	install -d $(manualsdir)/$(CYCLONE_NAME)
 	install -d $(examplesdir)/$(CYCLONE_NAME)
-	install -p $(externals_src)/miXed/test/cyclone/*.*  \
-		$(examplesdir)/$(CYCLONE_NAME)
+	cd $(externals_src)/miXed/test/cyclone && \
+		install -p *.* $(examplesdir)/$(CYCLONE_NAME)
 
 
 
@@ -215,11 +216,12 @@ iemabs_install: iemabs
 	install -d $(objectsdir)/$(IEMABS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMABS_NAME) \
 		--description "a collection of objects written at IEM/KUG"
-	install -p $(shell ls -1 $(externals_src)/iemlib/iemabs/*.pd | grep -v 'help') \
-		$(objectsdir)/$(IEMABS_NAME)
+	cd $(externals_src)/iemlib/iemabs/ && \
+		install -p $(shell cd $(externals_src)/iemlib/iemabs/ && ls -1 *.pd | \
+			grep -v 'help') $(objectsdir)/$(IEMABS_NAME)
 	install -d $(helpdir)/$(IEMABS_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*help*.pd \
-		$(helpdir)/$(IEMABS_NAME)
+	cd $(externals_src)/iemlib/iemabs/ && \
+		install -p *help*.pd $(helpdir)/$(IEMABS_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMABS_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMABS_NAME)
 	install -d $(manualsdir)/$(IEMABS_NAME)
@@ -297,13 +299,16 @@ pdp:
 #TODO: compile gem2pdp here
 
 pdp_install: pdp
-#	install -d $(objectsdir)/$(PDP_NAME)
-#	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
-#	install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)
-#	install -p $(externals_src)/gem2pdp/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
-#	install -d $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
+	install -d $(objectsdir)/$(PDP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDP_NAME) \
+		--author "Tom Schouten" \
+		--description "Pure Data Packet" \
+		--license "GNU GPL"
+	-install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
+	-install -p $(externals_src)/gem2pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
+	install -d $(helpdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -312,6 +317,29 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/doc/examples/*.* \
 		$(examplesdir)/$(PDP_NAME)
 
+
+#------------------------------------------------------------------------------#
+# PIDIP
+PIDIP_NAME=pidip
+pidip:
+#	cd $(externals_src)/pidip && ./configure && $(MAKE)
+
+pidip_install: pidip
+	install -d $(objectsdir)/$(PIDIP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
+		--author "Yves Degoyon" \
+		--description "PiDiP is Definitely in Pieces"
+	-install -p $(externals_src)/pidip/*.$(EXTENSION) $(objectsdir)/$(PIDIP_NAME)
+	install -d $(helpdir)/$(PIDIP_NAME)
+	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
+	install -d $(examplesdir)/$(PIDIP_NAME)
+	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
+	install -d $(examplesdir)/$(PIDIP_NAME)/images
+	install -p $(externals_src)/pidip/patches/images/*.* \
+		$(examplesdir)/$(PIDIP_NAME)/images
+	install -d $(examplesdir)/$(PIDIP_NAME)/morphology
+	install -p $(externals_src)/pidip/patches/morphology/*.* \
+		$(examplesdir)/$(PIDIP_NAME)/morphology
 
 
 #------------------------------------------------------------------------------#
@@ -323,8 +351,7 @@ pmpd:
 pmpd_install: pmpd
 #	install -d $(objectsdir)/$(PMPD_NAME)
 	install -d $(helpdir)/$(PMPD_NAME)
-	install -p $(externals_src)/pmpd/help/*.pd \
-		 $(helpdir)/$(PMPD_NAME)
+	install -p $(externals_src)/pmpd/help/*.pd $(helpdir)
 	install -d $(manualsdir)/$(PMPD_NAME)
 	install -d $(manualsdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
@@ -360,6 +387,31 @@ toxy_install: toxy
 		$(examplesdir)/$(TOXY_NAME)
 
 
+#------------------------------------------------------------------------------#
+# UNAUTHORIZED
+UNAUTHORIZED_NAME=unauthorized
+# unauthorized is compiled straight into $(OUT_DIR)
+UNAUTHORIZED_OUT_DIR=$(objectsdir)/$(UNAUTHORIZED_NAME)
+unauthorized:
+
+
+unauthorized_install: unauthorized
+# this needs to go here since it produces errors
+	-cd $(externals_src)/unauthorized && $(MAKE) -k
+	install -d $(objectsdir)/$(UNAUTHORIZED_NAME)
+	install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) \
+		$(objectsdir)/$(UNAUTHORIZED_NAME)
+	install -d $(helpdir)/$(UNAUTHORIZED_NAME)
+	install -p $(externals_src)/unauthorized/*/*.pd \
+		$(helpdir)/$(UNAUTHORIZED_NAME)
+	install -p $(externals_src)/unauthorized/*/*.txt \
+		$(helpdir)/$(UNAUTHORIZED_NAM)
+	install -p $(externals_src)/unauthorized/*/*.pls \
+		$(helpdir)/$(UNAUTHORIZED_NAME)
+	install -d $(helpdir)/$(UNAUTHORIZED_NAME)/blm
+	install -p $(externals_src)/unauthorized/blinkenlights/blm/*.* \
+		$(helpdir)/$(UNAUTHORIZED_NAME)/blm
+
 
 #------------------------------------------------------------------------------#
 # VBAP
@@ -390,11 +442,13 @@ zexy:
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
 #	install -p $(externals_src)/zexy/src/*.$(EXTENSION) $(objectsdir)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
-		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
+	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(ZEXY_NAME)
+#		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
+
 	install -d $(helpdir)/$(ZEXY_NAME)
-	install -p $(externals_src)/zexy/abs/*-help.pd $(helpdir)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(externals_src)/zexy/abs/*-help.pd | sed 's|\(.*\)|"\1"|g') \
+		$(helpdir)/$(ZEXY_NAME)
 	install -p $(externals_src)/zexy/zexy.pd  $(helpdir)
 	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
@@ -431,15 +485,6 @@ unfiltered_install:
 	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc
 	-install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
-#----------------------------------------------------------------------------
-# unauthorized
-# these don't work on Windows yet
-	-cd $(externals_src)/unauthorized && $(MAKE) 
-	-install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/unauthorized/*/*.pd $(helpdir)
-	install -p $(externals_src)/unauthorized/*/*.txt $(helpdir)
-	install -p $(externals_src)/unauthorized/*/*.pls $(helpdir)
-	cp -Rfp $(externals_src)/unauthorized/blinkenlights/blm  $(helpdir)
 
 
 #==============================================================================#
@@ -466,7 +511,7 @@ clean: install_clean
 	cd $(externals_src)/mixed/cyclone && make $(DEST_PATHS) clean
 	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
 	cd $(externals_src)/mixed/toxy && make $(DEST_PATHS) clean
-	cd $(externals_src)/unauthorized && make $(DEST_PATHS) clean
+	cd $(externals_src)/unauthorized && make clean
 
 distclean: clean cruft_clean
 	rm $(externals_src)/OSCx Makefile

@@ -170,8 +170,8 @@ pd:
 	echo "DEST_PATHS $(DEST_PATHS)"
 	echo "PD_DEST_PATHS $(PD_DEST_PATHS)"
 	echo "PD_EXTRA_FLAGS $(PD_EXTRA_FLAGS)"
-	cd $(pd_src)/src/ && $(PD_AUTOCONF)
-	cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
+	-cd $(pd_src)/src/ && $(PD_AUTOCONF)
+	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS)
 
 
@@ -181,11 +181,15 @@ pd:
 #
 #==============================================================================#
 
+# this is used for installing into a pre-build Pd binary
+extended_install: abstractions_install doc_install externals_install \
+flext_install gem_install readme_install welcome_install license_install \
+noncvs_install
+
+
 #------------------------------------------------------------------------------
 # install
-install: license_install readme_install welcome_install gem_install
-install: pd_install abstractions_install doc_install externals_install
-install: noncvs_install
+install: pd_install extended_install
 	@echo "Complete install succeeded!"
 
 #------------------------------------------------------------------------------
@@ -208,21 +212,144 @@ externals_install:
 #------------------------------------------------------------------------------
 # flext_install
 flext_install:
+# FLEXT
+# temp hack -HCS
+#	test -f $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def || \
+#		cp $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def \
+#			$(externals_src)/grill/flext/buildsys/config-mac-pd-gcc.txt
+# end temp hack
+# tigital 8/30/2005 added
+#	cd $(externals_src)/grill/flext && \
+#		( \
+#        test -f buildsys/config-mac-pd-gcc.txt || \
+#          ( \
+#            cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
+#            echo Copied template sys config file \
+          ) \
+      ) && \
+		( \
+			cat buildsys/config-mac-pd-gcc.txt | \
+				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" > buildsys/config-mac-pd-gcc.txt \
+		) && \
+		( \
+			cat package.txt | sed "s/^PRECOMPILE=.*/PRECOMPILE=/" > package.txt \
+		) && \
+		( \
+			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
+				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -bundle -bundle_loader ..\/..\/..\/pd\/bin\/pd/" > buildsys/mac/pd/gnumake-gcc-ext.inc \
+		) && \
+			( \
+			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
+				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -dynamiclib -undefined dynamic_lookup /" > buildsys/mac/pd/gnumake-gcc-flext.inc \
+		) && \
+		( \
+			test -f config.txt || \
+			( \
+				cp -f build/config-mac.def config.txt && \
+				echo Copied template flext config file \
+			) \
+		) && \
+#		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
+#	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
+#	install -p $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
+#	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
+	install -d $(manualsdir)/flext
+	cp -rp $(externals_src)/grill/flext/tutorial $(manualsdir)/flext
+	install -p $(externals_src)/grill/flext/gpl.txt  \
+		$(externals_src)/grill/flext/readme.txt   \
+		$(externals_src)/grill/flext/license.txt  \
+		$(manualsdir)/flext
+# FLEXTERNALS
+#########
+# dyn~
+	-cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
+	-install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
+	install -d $(manualsdir)/dynext
+	install -p $(externals_src)/grill/dynext/gpl.txt  \
+		$(externals_src)/grill/dynext/readme.txt   \
+		$(externals_src)/grill/dynext/license.txt  \
+		$(manualsdir)/dynext
+#########
+# pool
+	-cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+	-install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/grill/pool/pool-help.pd $(helpdir)
+	install -d $(manualsdir)/pool
+	install -p $(externals_src)/grill/pool/gpl.txt \
+		$(externals_src)/grill/pool/readme.txt   \
+		$(externals_src)/grill/pool/license.txt \
+		$(manualsdir)/pool
+#########
+# py/pyext
+#	cd $(externals_src)/grill/py && \
+#		( \
+#			cp -f build/config-mac.def config.txt \
+#		) && \
+#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	install -p $(externals_src)/grill/py/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
+# this wasn't building for me -HCS 2005-06-09
+	install -d $(examplesdir)/py/examples
+	install -d $(examplesdir)/py/scripts
+	install -p $(externals_src)/grill/py/pd/*.pd $(examplesdir)/py/examples
+	install -p $(externals_src)/grill/py/scripts/*.py $(examplesdir)/py/scripts
+	install -d $(manualsdir)/py/scripts
+	install -p $(externals_src)/grill/py/gpl.txt  \
+		$(externals_src)/grill/py/readme.txt $(externals_src)/grill/py/license.txt \
+		$(manualsdir)/py
+#	install -d $(prefix)/Library/Frameworks
+#	cp -R /Library/Frameworks/Python.framework $(prefix)/Library/Frameworks
+#########
+# vasp
+#  fails without the dir
+#	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
+#	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	install -p $(externals_src)/grill/vasp/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
+# this wasn't building for me -HCS 2005-06-09
+	install -d $(helpdir)/vasp
+	install -p $(externals_src)/grill/vasp/pd-help/*.pd $(helpdir)/vasp
+	install -d $(manualsdir)/vasp
+	install -p $(externals_src)/grill/vasp/gpl.txt  \
+		$(externals_src)/grill/vasp/readme.txt   \
+		$(externals_src)/grill/vasp/license.txt  \
+		$(externals_src)/grill/vasp/changes.txt  \
+		$(externals_src)/grill/vasp/todo.txt     \
+		$(manualsdir)/vasp
+	install -d $(examplesdir)/vasp
+	cp -rp $(externals_src)/grill/vasp/pd-ex $(examplesdir)/vasp
+#########
+# xsample
+#	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	install -p $(externals_src)/grill/xsample/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/grill/xsample/pd/*.pd $(helpdir)
+	install -d $(manualsdir)/xsample
+	install -p $(externals_src)/grill/xsample/gpl.txt \
+		$(externals_src)/grill/xsample/readme.txt \
+		$(externals_src)/grill/xsample/license.txt \
+		$(manualsdir)/xsample
+########## FOOTILS #########
+# syncgrain
+#	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
+#	install -p $(externals_src)/footils/syncgrain/pd-darwin/*.$(EXTENSION) \
+#		$(objectsdir)
+	install -p $(externals_src)/footils/syncgrain/pd/*.* $(helpdir)
+########## NUSMUK ##########
 # nusmuk
-	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
-		pd gcc install
-	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
-		pd gcc install
-	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
-		pd gcc install
+#	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
+#		pd gcc install
+#	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
+#		pd gcc install
+#	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
+#		pd gcc install
 #TODO: need to add nusmuk/editor
 
 
 #------------------------------------------------------------------------------
 # gem_install
-GEM_NAME = gem
+GEM_NAME = Gem
 gem_install: gem $(helpdir)
-	install -p $(gem_src)/help/*.* $(helpdir)
+	install -d $(helpdir)/$(GEM_NAME)
+	install -p $(gem_src)/help/*.* $(helpdir)/$(GEM_NAME)
 	install -p $(gem_src)/abstractions/*-help.pd $(helpdir)
 	install -d $(objectsdir)/$(GEM_NAME)
 	install -p $(shell ls -1 $(gem_src)/abstractions/*.* | \
@@ -368,10 +495,11 @@ doc_format:
 	-find $(prefix) -name .DS_Store -delete
 	-find $(prefix) -name '*.*.bak' -delete
 # run script to move help-*.pd files to *-help.pd according to the standard
-	cd $(pddocdir) && \
+	cd $(helpdir) && \
+		$(scripts_src)/convert-help-to-standard.sh
+	cd $(helpdir)/iemabs && \
 		$(scripts_src)/convert-help-to-standard.sh
 # remove write perms to prevent people form editing the helpfiles by mistake
-	cd $(pddocdir) && chmod a-wx */*.pd */*/*.pd
 	find $(pddocdir) -name '*.pd' -print0 | xargs -0 chmod a-wx
 	find $(pddocdir) -name '*.txt' -print0 | xargs -0 chmod a-wx
 

@@ -8,30 +8,80 @@ INSTALL_PREFIX=/usr/local/lib/pd
 # find all files to compile
 TARGETS=$(subst .tk,.tk2c,$(wildcard */*.tk)) $(subst .c,.$(EXT),$(wildcard */*.c))
 
-current: $(EXT)
+current: $(TARGETS)
+	@echo "Making $(TARGETS)"
 
 .SUFFIXES: .pd_linux .pd_darwin .pd_irix5 .pd_irix6 .dll .tk .tk2c
 
 # ----------------------- Common ------------------------
 
 .tk.tk2c:
-	./tk2c.bash < $*.tk > $*.tk2c
+	bash ./tk2c.bash < $*.tk > $*.tk2c
+
+
+# ----------------------- MinGW -----------------------
+
+pd_nt: $(TARGETS)
+
+MINGW_CFLAGS = -DPD -DUNIX -DICECAST -DWANT_WINSOCK2_H \
+		-O2 -funroll-loops -fomit-frame-pointer \
+		-Wall -W -Wno-shadow -Wstrict-prototypes -g \
+		-Wno-unused -Wno-parentheses -Wno-switch \
+		-mno-cygwin -c -DBUILD_DLL
+MINGW_CFLAGS = -DPD -DNT -DICECAST -funroll-loops \
+    -Wall -W -Wno-shadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+MINGW_INCLUDE =  -I../../src -I../../pd/src -IC:/msys/1.0/include
+
+
+MINGW_LDFLAGS = -shared -L../../pd/bin -LC:/msys/1.0/lib \
+		 -lpd -logg -lvorbis -lpthreadGC2
+
+
+.c.dll:
+	$(CC) -mms-bitfields $(MINGW_CFLAGS) $(DEFINES) $(MINGW_INCLUDE) \
+		 -o "$*.o" -c "$*.c"
+	gcc $(MINGW_LDFLAGS) -o "$*.dll" "$*.o"
+	strip --strip-unneeded "$*.dll"
+	rm "$*.o"
+
+
+#.c.dll: CURRENT_DIR = `echo $* | cut -d '/' -f 1`
+#	$(CC) $(MINGW_CFLAGS) $(MINGW_INCLUDE) -o $*.o -c $*.c
+#	ld -export_dynamic  -shared -o $*.dll $*.o -lc -lm $(MINGW_LFLAGS)
+#	strip --strip-unneeded $*.dll
+#	dllwrap --target=i386-mingw32 -mno-cygwin --output-lib=lib$*.a \
+#				--dllname=$*.dll --driver-name=gcc $*.o $(MINGW_LFLAGS)
+#	-rm $*.o
 
 
 # ----------------------- Windows -----------------------
 
-dll: $(TARGETS)
+# PDNTCFLAGS = /W3 /WX /DNT /DPD /nologo
+# VC="C:\Program Files\Microsoft Visual Studio\Vc98"
 
-WINCFLAGS = -DPD -DNT -DICECAST -funroll-loops \
-    -Wall -W -Wno-shadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+# PDNTINCLUDE = /I. /I\tcl\include /I\ftp\pd\src /I$(VC)\include
 
-WININCLUDE =  -I../../src -I../../pd/src
+# PDNTLDIR = $(VC)\lib
+# PDNTLIB = $(PDNTLDIR)\libc.lib \
+# 	$(PDNTLDIR)\oldnames.lib \
+# 	$(PDNTLDIR)\kernel32.lib \
+# 	\ftp\pd\bin\pd.lib 
 
-.c.dll:
-	$(CC) $(WINCFLAGS) $(WININCLUDE) -o $*.o -c $*.c
-	gcc -shared -o $*.dll $*.o ../../bin/pd.dll -lwsock32 -lmp3lame -lpthread
-	-rm $*.o
+# .c.ont:
+# 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
+
+# .c.dll:
+# 	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
+# need to find a way to replace $(CSYM)
+#	link /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+#=======
+#	$(CC) $(WINCFLAGS) $(WININCLUDE) -o $*.o -c $*.c
+#	gcc -shared -o $*.dll $*.o ../../bin/pd.dll -lwsock32 -lmp3lame -lpthread
+#	-rm $*.o
+#>>>>>>> 1.10
+
 
 # ----------------------- IRIX 5.x -----------------------
 

@@ -11,8 +11,13 @@
 
 for helpfile in help-*.pd ; do
 	 if [ -e $helpfile ]; then
-		  mv "$helpfile" "`echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
-		  echo "SWAP $helpfile FOR `echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`"
+		  newhelpfile=`echo $helpfile | sed 's/^help\-\(.*\)\.pd$/\1-help.pd/'`
+		  if [ "$helpfile" != "$newhelpfile" ]; then
+				echo "  swap $helpfile" "$newhelpfile"
+				mv "$helpfile" "$newhelpfile"
+		  else
+				echo "SAMEFILE $helpfile"
+		  fi
 	 fi
 done
 

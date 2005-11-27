@@ -7,7 +7,7 @@
 
 [Setup]
 AppName=pd
-AppVerName=PACKAGE_NAME
+AppVerName=Pd-PD_VERSION-PACKAGE_VERSION
 AppPublisher=pure-data.org
 AppPublisherURL=http://puredata.org
 AppSupportURL=http://puredata.org/community/lists/
@@ -34,12 +34,15 @@ Name: {group}\puredata.org; Filename: {app}\pd.url
 Name: {group}\Uninstall Pure Data; Filename: {uninstallexe}
 Name: {userdesktop}\Pure Data; Filename: {app}\bin\pd.exe; Tasks: desktopicon; IconFilename: {app}\lib\pd.ico; IconIndex: 0; WorkingDir: {app}
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\Pure Data; Filename: {app}\bin\pd.exe; Tasks: quicklaunchicon; WorkingDir: {app}; IconFilename: {app}\lib\pd.ico; IconIndex: 0
-
-;Name: {group}\Pure Data (no video); Filename: {app}\pd-novideo.bat; IconFilename: {app}\lib\pd.ico; IconIndex: 0; Tasks: quicklaunchicon desktopicon; WorkingDir: {app}
 Name: {group}\Documentation\Pd Manual; Filename: {app}\doc\1.manual\index.htm
 Name: {group}\Documentation\Pd Drums Tutorial; Filename: {app}\doc\tutorials\footils\pddrums\pddrums.html
 Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.html
 Name: {group}\Documentation\Gem Primer; Filename: {app}\doc\gem\GemPrimer.pdf
+;-----------------------------------------------------------------------------
+; GRIPD
+#ifexist "build\bin\gripd.exe"
+Name: {group}\GrIPD; Filename: {app}\bin\gripd.exe
+#endif
 
 
 [Run]
@@ -72,25 +75,16 @@ OutputExeFilename=Output\PACKAGE_NAME.exe
 ; packages\win32_inno
 Source: pdpatch.ico; DestDir: {app}\lib
 Source: pd.ico; DestDir: {app}\lib
-#ifexist "pd-nolibs.bat"
-  Source: pd-nolibs.bat; DestDir: {app}
-#endif
-#ifexist "pd.bat"
-  Source: pd.bat; DestDir: {app}
-#endif
-#ifexist "pd-novideo.bat"
-  Source: pd-novideo.bat; DestDir: {app}
-#endif
 ;
 ;
 ;-----------------------------------------------------------------------------
 ; put pdsend and pdreceive in the System dir so that they are in the path
 ;
-Source: build\bin\pdsend.exe; DestDir: {sys}; Flags: confirmoverwrite
-Source: build\bin\pdreceive.exe; DestDir: {sys}; Flags: confirmoverwrite
+Source: build\bin\pdsend.exe; DestDir: {sys}; Flags: confirmoverwrite promptifolder
+Source: build\bin\pdreceive.exe; DestDir: {sys}; Flags: confirmoverwrite promptifolder
 ; add Cyclone's cyclist.exe if it is present
 #ifexist "build\bin\cyclist.exe"
-  Source: build\bin\cyclist.exe; DestDir: {sys}; Flags: confirmoverwrite
+Source: build\bin\cyclist.exe; DestDir: {sys}; Flags: confirmoverwrite promptifolder
 #endif
 ;
 ;
@@ -104,19 +98,17 @@ Source: build\bin\pdreceive.exe; DestDir: {sys}; Flags: confirmoverwrite
 ;
 ;
 ;-----------------------------------------------------------------------------
-; non CVS files
+; build system files
 ;
-#ifexist "noncvs\extra"
-Source: noncvs\extra\*.dll; DestDir: {app}\extra
-#endif
-#ifexist "noncvs\doc\5.reference"
-Source: noncvs\doc\5.reference\*.*; DestDir: {app}\doc\5.reference; Flags:
-ignoreversion
-#endif
-;
-;
-;-----------------------------------------------------------------------------
-; AUTO-GENERATED
-; below this line should be blank since the rest of this file is generated
-; by the packages/win32_inno/Makefile.  <hans@at.or.at>
-;
+Source: build\doc\manuals\Pd\Welcome.html; DestDir: {app}; Flags: isreadme; Tasks: 
+Source: build\doc\manuals\Pd\ReadMe.html; DestDir: {app}; Flags: isreadme
+Source: build\doc\manuals\Pd\License.html; DestDir: {app}; Flags: isreadme
+Source: build\doc\manuals\Pd\PD LICENSE.txt; DestDir: {app}; Flags: isreadme
+Source: build\pd-settings.reg; DestDir: {app}; Flags: ignoreversion
+Source: build\bin\*.*; DestDir: {app}\bin; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly
+Source: build\doc\*.*; DestDir: {app}\doc; Flags: ignoreversion confirmoverwrite recursesubdirs uninsremovereadonly; Attribs: readonly
+Source: build\extra\*.*; DestDir: {app}\extra; Flags: ignoreversion recursesubdirs uninsremovereadonly promptifolder; Attribs: readonly
+Source: build\lib\*.*; DestDir: {app}\lib; Flags: ignoreversion recursesubdirs
+Source: build\portaudio\*.*; DestDir: {app}\portaudio; Flags: ignoreversion recursesubdirs
+Source: build\src\*.*; DestDir: {app}\src; Flags: ignoreversion recursesubdirs
+Source: build\tcl\*.*; DestDir: {app}\tcl; Flags: ignoreversion recursesubdirs

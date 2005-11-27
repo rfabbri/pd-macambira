@@ -20,9 +20,15 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
+PD_INNO_SETUP = pd-inno.iss
 
-install: extended_install
 
+install: $(PD_INNO_SETUP)
+	cd $(packages_src) && make $(DEST_PATHS) extended_install
+	cd .. && make $(DEST_PATHS) doc_format
+	install -p pd-settings.reg $(prefix)
+	@echo " "
+	@echo "win32_inno install succeeded!"
 
 #==============================================================================#
 #
@@ -30,15 +36,19 @@ install: extended_install
 #
 #==============================================================================#
 
-PD_ISS_NAME = pd-inno.iss
-$(PD_ISS_NAME): $(PD_ISS_NAME).in
-	@echo "Making Inno Setup file: $(PD_ISS_NAME)"
-	cat "$(PD_ISS_NAME).in" | \
+# since I can't get Pd to compile, here are some hacks to assemble a package
+# from binaries
+no_compile_hacks:
+	cp -a /c/Program\ Files/pd-0.38-4 $(prefix)/
+
+$(PD_INNO_SETUP): $(PD_INNO_SETUP).in
+	@echo "Making Inno Setup file: $(PD_INNO_SETUP)"
+	cat "$(PD_INNO_SETUP).in" | \
 		sed 's/PACKAGE_NAME/$(PACKAGE_NAME)/g' | \
-		sed 's/PD_VERSION/$(PD_VERSION)-$(PACKAGE_VERSION)/g' > \
-		$(PD_ISS_NAME)
-	-./generate_inno_files.sh >> $(PD_ISS_NAME)
-#	start $(PD_ISS_NAME)
+		sed 's/PD_VERSION/$(PD_VERSION)/g' | \
+		sed 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/g' > \
+		$(PD_INNO_SETUP)
+#	start $(PD_INNO_SETUP)
 
 #==============================================================================#
 #
@@ -46,6 +56,8 @@ $(PD_ISS_NAME): $(PD_ISS_NAME).in
 #
 #==============================================================================#
 
-extended_install:
-	cd $(packages_src) && make $(DEST_PATHS) install
+clean: 	
+	rm $(PD_INNO_SETUP)
+	cd $(packages_src) && make $(DEST_PATHS) clean
+
 

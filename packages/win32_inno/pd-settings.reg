@@ -1,0 +1,11 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
+"path1"="c:/progra~1/pd/extra/cyclone"
+"path2"="c:/progra~1/pd/extra/iemabs"
+"path2"="c:/progra~1/pd/extra/unauthorized"
+"loadlib1"="gem"
+"loadlib2"="pmpd"
+"loadlib3"="vasp"
+"loadlib4"="xsample"
+

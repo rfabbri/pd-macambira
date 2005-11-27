@@ -124,130 +124,6 @@ darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++ dar
 #darwin_app_externals: darwin_app_externals_standard darwin_app_externals_c++
 
 
-#------------------------------------------------------------------------------#
-darwin_app_externals_flext:
-#----------------------------------------------------------------------------
-# FLEXT
-# temp hack -HCS
-	test -f $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def || \
-		cp $(externals_src)/grill/flext/buildsys/mac/pd/config-gcc.def \
-			$(externals_src)/grill/flext/buildsys/config-mac-pd-gcc.txt
-# end temp hack
-# tigital 8/30/2005 added
-	cd $(externals_src)/grill/flext && \
-		( \
-        test -f buildsys/config-mac-pd-gcc.txt || \
-          ( \
-            cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
-            echo Copied template sys config file \
-          ) \
-      ) && \
-		( \
-			cat buildsys/config-mac-pd-gcc.txt | \
-				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" > buildsys/config-mac-pd-gcc.txt \
-		) && \
-		( \
-			cat package.txt | sed "s/^PRECOMPILE=.*/PRECOMPILE=/" > package.txt \
-		) && \
-		( \
-			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
-				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -bundle -bundle_loader ..\/..\/..\/pd\/bin\/pd/" > buildsys/mac/pd/gnumake-gcc-ext.inc \
-		) && \
-			( \
-			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
-				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -dynamiclib -undefined dynamic_lookup /" > buildsys/mac/pd/gnumake-gcc-flext.inc \
-		) && \
-		( \
-			test -f config.txt || \
-			( \
-				cp -f build/config-mac.def config.txt && \
-				echo Copied template flext config file \
-			) \
-		) && \
-		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
-	install -p -m0444 $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
-	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
-	install -d $(pddocdir)/tutorials
-	cp -rp $(externals_src)/grill/flext/tutorial $(pddocdir)/tutorials/flext
-	install -d $(pddocdir)/flext
-	install -p -m0644 $(externals_src)/grill/flext/gpl.txt  \
-		$(externals_src)/grill/flext/readme.txt   \
-		$(externals_src)/grill/flext/license.txt  \
-		$(pddocdir)/flext
-# FLEXTERNALS
-#########
-# dyn~
-	cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p $(externals_src)/grill/dynext/pd/*.pd $(pddocdir)
-	install -d $(pddocdir)/dynext
-	install -p $(externals_src)/grill/dynext/gpl.txt  \
-		$(externals_src)/grill/dynext/readme.txt   \
-		$(externals_src)/grill/dynext/license.txt  \
-		$(pddocdir)/dynext
-#########
-# pool
-	cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-	install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p $(externals_src)/grill/pool/help-pool.pd $(pddocdir)
-	install -d $(pddocdir)/pool
-	install -p $(externals_src)/grill/pool/gpl.txt \
-		$(externals_src)/grill/pool/readme.txt   \
-		$(externals_src)/grill/pool/license.txt \
-		$(pddocdir)/pool
-#########
-# py/pyext
-#	cd $(externals_src)/grill/py && \
-#		( \
-#			cp -f build/config-mac.def config.txt \
-#		) && \
-#		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p -m0444 $(externals_src)/grill/py/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -d $(pddocdir)/py/examples
-	install -d $(pddocdir)/py/scripts
-	install -p $(externals_src)/grill/py/pd/*.pd $(pddocdir)/py/examples
-	install -p $(externals_src)/grill/py/scripts/*.py $(pddocdir)/py/scripts
-	install -p $(externals_src)/grill/py/gpl.txt  \
-		$(externals_src)/grill/py/readme.txt $(externals_src)/grill/py/license.txt \
-		$(pddocdir)/py
-#	install -d $(prefix)/Library/Frameworks
-#	cp -R /Library/Frameworks/Python.framework $(prefix)/Library/Frameworks
-#########
-# vasp
-#  fails without the dir
-#	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
-#	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p -m0444 $(externals_src)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-# this wasn't building for me -HCS 2005-06-09
-	install -p -m0644 $(externals_src)/grill/vasp/pd-help/*.pd $(pddocdir)
-	install -d $(pddocdir)/vasp
-	install -p -m0644 $(externals_src)/grill/vasp/gpl.txt  \
-		$(externals_src)/grill/vasp/readme.txt   \
-		$(externals_src)/grill/vasp/license.txt  \
-		$(externals_src)/grill/vasp/changes.txt  \
-		$(externals_src)/grill/vasp/todo.txt     \
-		$(pddocdir)/vasp
-	cp -rp $(externals_src)/grill/vasp/pd-ex $(pddocdir)/vasp
-#########
-# xsample
-	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-	install -p -m0444 $(externals_src)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p -m0644 $(externals_src)/grill/xsample/pd/*.pd $(pddocdir)
-	install -d $(pddocdir)/xsample
-	install -p -m0644 $(externals_src)/grill/xsample/gpl.txt \
-		$(externals_src)/grill/xsample/readme.txt \
-		$(externals_src)/grill/xsample/license.txt \
-		$(pddocdir)/xsample
-########## FOOTILS #########
-# syncgrain
-#	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
-#	install -p -m0444 $(externals_src)/footils/syncgrain/pd-darwin/*.pd_darwin \
-#		$(objectsdir)
-	install -p -m0644 $(externals_src)/footils/syncgrain/pd/*.* $(pddocdir)
-
-
 
 
 darwin_app_externals_c++:
@@ -304,6 +180,14 @@ darwin_app_externals_flext_clean:
 ## DEPRECATED TARGETS
 #
 #==============================================================================#
+
+
+darwin_app_externals_flext:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(packages_src) && make flext_install"
+	cd $(packages_src) && make $(DEST_PATHS) flext_install
+
 
 darwin_app_noncvs:
 	@echo " "
