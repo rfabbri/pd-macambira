@@ -30,7 +30,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 final_setup:
 	chmod -R ugo-w $(pddocdir)
 
-install: pd_fileformat_install pd-msg_install pddp_install tutorials_install
+install: externals-howto_install pd_fileformat_install pd-msg_install 
+install: pddp_install tutorials_install
 	@echo " "
 	@echo "doc install succeeded!"
 
@@ -39,30 +40,6 @@ install: pd_fileformat_install pd-msg_install pddp_install tutorials_install
 # PROJECT-SPECIFIC TARGETS
 #
 #==============================================================================#
-
-#------------------------------------------------------------------------------#
-# PD-MSG
-PD-MSG_NAME = pd-msg
-pd-msg_install: $(manualsdir)
-	install -d $(manualsdir)/$(PD-MSG_NAME)
-	install -p $(doc_src)/additional/pd-msg/*.txt \
-		$(manualsdir)/$(PD-MSG_NAME) 
-	for dir in $(shell cd  $(doc_src)/additional/pd-msg && ls -d [1-5].*); do \
-		echo "Including $$dir in $(PD-MSG_NAME)"; \
-		install -d $(manualsdir)/$(PD-MSG_NAME)/$$dir; \
-		install -p $(doc_src)/additional/pd-msg/$$dir/*.* \
-			$(manualsdir)/$(PD-MSG_NAME)/$$dir; \
-	done
-
-
-
-#------------------------------------------------------------------------------#
-# PD_FILEFORMAT
-PD_FILEFORMAT_NAME = Pd
-pd_fileformat_install: $(manualsdir)
-	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
-	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
-		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 #------------------------------------------------------------------------------#
 # EXTERNALS-HOWTO
@@ -91,6 +68,31 @@ externals-howto_install: $(manualsdir)
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node9.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node10.html
+
+
+#------------------------------------------------------------------------------#
+# PD-MSG
+PD-MSG_NAME = pd-msg
+pd-msg_install: $(manualsdir)
+	install -d $(manualsdir)/$(PD-MSG_NAME)
+	install -p $(doc_src)/additional/pd-msg/*.txt \
+		$(manualsdir)/$(PD-MSG_NAME) 
+	for dir in $(shell cd  $(doc_src)/additional/pd-msg && ls -d [1-5].*); do \
+		echo "Including $$dir in $(PD-MSG_NAME)"; \
+		install -d $(manualsdir)/$(PD-MSG_NAME)/$$dir; \
+		install -p $(doc_src)/additional/pd-msg/$$dir/*.* \
+			$(manualsdir)/$(PD-MSG_NAME)/$$dir; \
+	done
+
+
+
+#------------------------------------------------------------------------------#
+# PD_FILEFORMAT
+PD_FILEFORMAT_NAME = Pd
+pd_fileformat_install: $(manualsdir)
+	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
+	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
+		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 
 #------------------------------------------------------------------------------#

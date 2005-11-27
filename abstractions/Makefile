@@ -14,11 +14,6 @@ cvs_root_dir = $(CWD)/..
 prefix = build
 BUILDLAYOUT_DIR = $(CWD)
 
-# default target
-install: objects applications
-	@echo " "
-	@echo "abstractions install succeeded!"
-
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 #==============================================================================#
@@ -27,17 +22,19 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
+# in case anything needs to be compiled or processed somehow before installing
+all:
+
 # clean up after everything is installed
 final_setup:
 	chmod -R ugo-w $(prefix)
 
-objects: $(objectsdir) $(helpdir) $(manualsdir)
-objects: objects_gyre objects_keyboardkeys objects_la-kitchen objects_memento
-objects: objects_pddp objects_nusmuk objects_nqpoly objects_rradical
-
-applications: $(examplesdir) $(manualsdir)
-applications: applications_rradical applications_keyboardkeys applications_gyre
-
+install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
+gyre_install keyboardkeys_install la_install-kitchen memento_install \
+nusmuk_install nqpoly_install parazit_install pddp_install pixeltango_install \
+rradical_install
+	@echo " "
+	@echo "abstractions install succeeded!"
 
 #==============================================================================#
 #
@@ -48,15 +45,13 @@ applications: applications_rradical applications_keyboardkeys applications_gyre
 #-------------------------------------------------------------------------------
 # GYRE
 GYRE_NAME = gyre
-objects_gyre:
+gyre_install:
 	install -d $(objectsdir)/$(GYRE_NAME)
 	install -p $(abstractions_src)/audionerd/GYRE/gyre.*.pd \
 		 $(objectsdir)/$(GYRE_NAME)
 	install -d $(manualsdir)/$(GYRE_NAME)
 	install -p $(abstractions_src)/audionerd/GYRE/gyre.html \
 		 $(manualsdir)/$(GYRE_NAME)
-
-applications_gyre:
 	install -d $(examplesdir)/$(GYRE_NAME)
 	install -p $(abstractions_src)/audionerd/GYRE/gyre.pd \
 		 $(examplesdir)/$(GYRE_NAME)
@@ -65,7 +60,7 @@ applications_gyre:
 #-------------------------------------------------------------------------------
 # keyboardkeys
 KEYBOARDKEYS_NAME = keyboardkeys
-objects_keyboardkeys:
+keyboardkeys_install:
 	install -d $(objectsdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/abs/*.pd \
 		 $(objectsdir)/$(KEYBOARDKEYS_NAME)
@@ -75,8 +70,6 @@ objects_keyboardkeys:
 	install -d $(helpdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/doc/*-help.pd \
 		 $(helpdir)/$(KEYBOARDKEYS_NAME)
-
-applications_keyboardkeys:
 	install -d $(examplesdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
 		 $(examplesdir)/$(KEYBOARDKEYS_NAME)
@@ -85,7 +78,7 @@ applications_keyboardkeys:
 #-------------------------------------------------------------------------------
 # la-kitchen
 LA-KITCHEN_NAME = la-kitchen
-objects_la-kitchen:
+la_install-kitchen:
 	install -d $(objectsdir)/$(LA-KITCHEN_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/La-kitchen/*.pd | \
 		grep -v '\-help.pd')    $(objectsdir)/$(LA-KITCHEN_NAME)
@@ -103,7 +96,7 @@ objects_la-kitchen:
 #-------------------------------------------------------------------------------
 # memento
 MEMENTO_NAME = memento
-objects_memento:
+memento_install:
 	install -d $(objectsdir)/$(MEMENTO_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/memento/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(MEMENTO_NAME)
@@ -124,7 +117,7 @@ objects_memento:
 
 #-------------------------------------------------------------------------------
 # nqpoly
-objects_nqpoly: objects_nqpoly~ objects_nqpoly4
+nqpoly_install: nqpoly_install~ nqpoly_install4
 # make a common target for the manuals so they are in one place
 	install -d $(manualsdir)/nqpoly
 	install -p $(abstractions_src)/nqpoly/*.html	$(manualsdir)/nqpoly
@@ -132,7 +125,7 @@ objects_nqpoly: objects_nqpoly~ objects_nqpoly4
 		$(manualsdir)/nqpoly/nqpoly~.txt
 
 NQPOLY_NAME = nqpoly~
-objects_nqpoly~:
+nqpoly_install~:
 	install -d $(objectsdir)/$(NQPOLY_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly~/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(NQPOLY_NAME)
@@ -147,7 +140,7 @@ objects_nqpoly~:
 
 
 NQPOLY4_NAME = nqpoly4
-objects_nqpoly4:
+nqpoly_install4:
 	install -d $(objectsdir)/$(NQPOLY4_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(NQPOLY4_NAME)
@@ -162,7 +155,7 @@ objects_nqpoly4:
 #-------------------------------------------------------------------------------
 # nusmuk
 NUSMUK_NAME = nusmuk
-objects_nusmuk:
+nusmuk_install:
 	install -d $(objectsdir)/$(NUSMUK_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/nusmuk/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(NUSMUK_NAME)
@@ -178,6 +171,7 @@ objects_nusmuk:
 
 #-------------------------------------------------------------------------------
 # parazit
+parazit_install:
 	install -d $(objectsdir)
 	install -p $(abstractions_src)/parazit/parazit.pd $(objectsdir)
 
@@ -186,7 +180,7 @@ objects_nusmuk:
 #-------------------------------------------------------------------------------
 # PDDP support lib
 PDDP_NAME = pddp
-objects_pddp:
+pddp_install:
 	install -d $(objectsdir)/$(PDDP_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/pddp/*.pd | \
 		grep -v '\-help.pd')  $(objectsdir)/$(PDDP_NAME)
@@ -201,9 +195,37 @@ objects_pddp:
 
 
 #-------------------------------------------------------------------------------
+# pixeltango
+PIXELTANGO_NAME = pixeltango
+pixeltango_install:
+	install -d $(objectsdir)/$(PIXELTANGO_NAME)
+	install -p $(abstractions_src)/pixelTANGO/abstractions/*.pd \
+		$(objectsdir)/$(PIXELTANGO_NAME)
+	install -d $(objectsdir)/$(PIXELTANGO_NAME)/fx
+	install -p $(abstractions_src)/pixelTANGO/abstractions/fx/*.pd \
+		$(objectsdir)/$(PIXELTANGO_NAME)/fx
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIXELTANGO_NAME) \
+		--author "Ben Bogart" \
+		--license "GNU GPL" \
+		--description "objects for creating visuals in a live performance setting"
+	install -d $(helpdir)/$(PIXELTANGO_NAME)
+	install -p $(abstractions_src)/pixeltango/help/*.* \
+		$(helpdir)/$(PIXELTANGO_NAME)
+	install -d $(examplesdir)/$(PIXELTANGO_NAME)
+	install -p $(abstractions_src)/pixeltango/Example-Patches/*.* \
+		$(examplesdir)/$(PIXELTANGO_NAME)
+	install -d $(manualsdir)/$(PIXELTANGO_NAME)
+	install -p $(abstractions_src)/pixelTANGO/*.txt \
+		$(manualsdir)/$(PIXELTANGO_NAME)
+	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
+		$(manualsdir)/$(PIXELTANGO_NAME)
+
+
+
+#-------------------------------------------------------------------------------
 # RRADical
 RRADICAL_NAME = rradical
-objects_rradical:
+rradical_install:
 	install -d $(objectsdir)/$(RRADICAL_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(RRADICAL_NAME) \
 		--author "Frank Barknecht" \
@@ -220,9 +242,6 @@ objects_rradical:
 	install -d $(objectsdir)/$(RRADICAL_NAME)/stuff
 	install -p $(shell ls -1 $(abstractions_src)/rradical/stuff/*.* | \
 		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/stuff
-
-
-applications_rradical:
 	install -d $(examplesdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/usecases/*.* \
 		$(examplesdir)/$(RRADICAL_NAME)
