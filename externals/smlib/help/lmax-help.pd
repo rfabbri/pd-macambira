@@ -1,0 +1,22 @@
+#N canvas 553 310 441 199 12;
+#X text 353 169 j#|@2002;
+#X obj 375 147 SMLib;
+#X floatatom 55 73 5 0 0;
+#X obj 11 56 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 55 53 x(i);
+#X floatatom 11 169 5 0 0;
+#X obj 11 99 float;
+#X text 7 22 argument: half-decay time (in number of activations);
+#X msg 119 95 clear;
+#X text 118 77 clear accumulator;
+#X text 8 5 lmax: leaky maximum;
+#X obj 11 139 lmax 10;
+#X msg 244 106 decay 5;
+#X text 243 90 set half-decay time;
+#X connect 2 0 6 1;
+#X connect 3 0 6 0;
+#X connect 6 0 11 0;
+#X connect 8 0 11 0;
+#X connect 11 0 5 0;
+#X connect 12 0 11 0;

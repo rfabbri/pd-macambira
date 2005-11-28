@@ -1,0 +1,21 @@
+#N canvas 480 472 473 127 12;
+#X floatatom 35 104 5 0 0;
+#X text 387 99 j#|@2002;
+#X obj 409 77 SMLib;
+#X msg 133 47 0;
+#X msg 168 47 0 1 0 1;
+#X msg 243 48 0 0 1 1;
+#X text 14 3 vcog computes maximum of a list of floats;
+#X obj 49 76 vmax;
+#X floatatom 86 104 5 0 0;
+#X msg 15 47 1 2 3 1;
+#X msg 81 47 3 4 1;
+#X text 13 21 and the location of the first occurance of the maximum
+;
+#X connect 3 0 7 0;
+#X connect 4 0 7 0;
+#X connect 5 0 7 0;
+#X connect 7 0 0 0;
+#X connect 7 1 8 0;
+#X connect 9 0 7 0;
+#X connect 10 0 7 0;

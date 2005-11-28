@@ -1,0 +1,15 @@
+#N canvas 381 509 392 123 12;
+#X msg 17 39 1 2 3 4;
+#X floatatom 50 96 5 0 0;
+#X msg 84 40 3 4 5;
+#X text 315 100 j#|@2002;
+#X obj 337 78 SMLib;
+#X obj 52 69 vrms;
+#X text 16 14 vrms computes the root-mean-square of a vector;
+#X msg 134 40 1 1 1 1;
+#X msg 200 40 1 -1 1 -1;
+#X connect 0 0 5 0;
+#X connect 2 0 5 0;
+#X connect 5 0 1 0;
+#X connect 7 0 5 0;
+#X connect 8 0 5 0;

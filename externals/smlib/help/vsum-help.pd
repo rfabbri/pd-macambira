@@ -1,0 +1,13 @@
+#N canvas 468 275 355 125 12;
+#X text 16 14 vsum computes the sum of a list of floats;
+#X msg 17 39 1 2 3 4;
+#X obj 52 69 vsum;
+#X floatatom 50 96 5 0 0;
+#X msg 84 40 3 4 5;
+#X text 275 102 j#|@2002;
+#X obj 297 80 SMLib;
+#X msg 136 40 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 4 0 2 0;
+#X connect 7 0 2 0;

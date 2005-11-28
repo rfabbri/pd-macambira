@@ -1,0 +1,15 @@
+#N canvas 381 509 394 125 12;
+#X msg 17 39 1 2 3 4;
+#X floatatom 51 95 5 0 0;
+#X msg 84 40 3 4 5;
+#X text 315 100 j#|@2002;
+#X obj 337 78 SMLib;
+#X msg 134 40 1 1 1 1;
+#X obj 51 70 vstd;
+#X msg 200 40 1 -1 1 -1 1;
+#X text 16 14 vstd computes the standard deviation of a vector;
+#X connect 0 0 6 0;
+#X connect 2 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 0;

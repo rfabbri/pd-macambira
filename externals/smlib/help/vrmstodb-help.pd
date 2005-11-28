@@ -1,0 +1,9 @@
+#N canvas 606 355 283 118 12;
+#X text 194 88 j#|@2002;
+#X obj 216 68 SMLib;
+#X text 10 6 frequency to midi on a vector;
+#X obj 15 56 vrmstodb;
+#X msg 15 33 100 97 94;
+#X obj 15 80 print vrmstodb;
+#X connect 3 0 5 0;
+#X connect 4 0 3 0;
