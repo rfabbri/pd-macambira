@@ -40,6 +40,7 @@ UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
   OS_NAME = linux
   EXTENSION = pd_linux
+  prefix = /usr/local
 else 
   ifeq ($(UNAME),Darwin)
     OS_NAME = darwin
@@ -75,13 +76,25 @@ scripts_src = $(cvs_root_dir)/scripts
 
 
 # destinations
+bindir = $(DESTDIR)$(prefix)/bin
+includedir = $(DESTDIR)$(prefix)/include
+libdir = $(DESTDIR)$(prefix)/lib
+mandir = $(DESTDIR)$(prefix)/man
+
+ifeq ($(OS_NAME),darwin)
+  objectsdir = $(DESTDIR)$(prefix)/extra
+  pddocdir = $(DESTDIR)$(prefix)/doc
+  else
+    ifeq ($(OS_NAME),win)
+      objectsdir = $(DESTDIR)$(prefix)/extra
+      pddocdir = $(DESTDIR)$(prefix)/doc
+    else
+      objectsdir = $(libdir)/pd/extra
+      pddocdir = $(libdir)/pd/doc
+    endif
+endif
+
 examplesdir = $(pddocdir)/examples
-bindir = $(prefix)/bin
-pddocdir = $(prefix)/doc
-includedir = $(prefix)/include
-libdir = $(prefix)/lib
-mandir = $(prefix)/man
-objectsdir = $(prefix)/extra
 helpdir = $(pddocdir)/5.reference
 manualsdir = $(pddocdir)/manuals
 
@@ -93,24 +106,31 @@ manualsdir = $(pddocdir)/manuals
 #==============================================================================#
 
 # first make sure that the directory structure is setup
-$(prefix):
-	install -d $(prefix)
+$(DESTDIR):
+	install -d $(DESTDIR)
 
-$(examplesdir):  $(prefix)
+$(bindir): $(DESTDIR)
+	install -d $(bindir)
+
+$(examplesdir): $(DESTDIR)
 	install -d $(examplesdir)
 
-$(pddocdir): $(prefix)
+$(includedir): $(DESTDIR)
+	install -d $(includedir)
+
+$(pddocdir): $(DESTDIR)
 	install -d $(pddocdir)
 
-$(helpdir): $(prefix)
+$(helpdir): $(DESTDIR)
 	install -d $(helpdir)
 
-$(manualsdir): $(prefix)
+$(manualsdir): $(DESTDIR)
 	install -d $(manualsdir)
 
-$(objectsdir): $(prefix)
+$(objectsdir): $(DESTDIR)
 	install -d $(objectsdir)
 
+installdirs: $(DESTDIR) $(bindir) $(examplesdir) $(pddocdir) $(includedir) $(helpdir) $(manualsdir) $(objectsdir)
 
 #==============================================================================#
 #
@@ -120,11 +140,11 @@ $(objectsdir): $(prefix)
 
 
 PD_MAJOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*\\n";/\1/')
+	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*.n";/\1/')
 PD_MINOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
 PD_BUGFIX_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
 # the separators [.-] need to be the same as in s_main.c or the regexps break
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
@@ -184,9 +204,10 @@ objects_clean:
 
 install_clean: applications_clean help_clean manuals_clean objects_clean
 	-rmdir $(pddocdir)
-	-rmdir $(prefix)
+	-rmdir $(DESTDIR)$(prefix)
+	-rmdir $(DESTDIR)
 	@echo " "
-	@echo "Build destination cleaned: $(prefix)"
+	@echo "Build destination cleaned: $(DESTDIR)"
 
 
 cruft_clean:

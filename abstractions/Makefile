@@ -11,7 +11,7 @@ CWD := $(shell pwd)
 
 # these are designed to be overridden by the packages/Makefile
 cvs_root_dir = $(CWD)/..
-prefix = build
+DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(CWD)
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -27,7 +27,7 @@ all:
 
 # clean up after everything is installed
 final_setup:
-	chmod -R ugo-w $(prefix)
+	chmod -R ugo-w $(pddocdir)
 
 install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
 gyre_install keyboardkeys_install la_install-kitchen memento_install \
@@ -209,10 +209,10 @@ pixeltango_install:
 		--license "GNU GPL" \
 		--description "objects for creating visuals in a live performance setting"
 	install -d $(helpdir)/$(PIXELTANGO_NAME)
-	install -p $(abstractions_src)/pixeltango/help/*.* \
+	install -p $(abstractions_src)/pixelTANGO/help/*.* \
 		$(helpdir)/$(PIXELTANGO_NAME)
 	install -d $(examplesdir)/$(PIXELTANGO_NAME)
-	install -p $(abstractions_src)/pixeltango/Example-Patches/*.* \
+	install -p $(abstractions_src)/pixelTANGO/Example-Patches/*.* \
 		$(examplesdir)/$(PIXELTANGO_NAME)
 	install -d $(manualsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/*.txt \
