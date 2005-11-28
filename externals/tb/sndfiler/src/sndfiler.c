@@ -236,18 +236,37 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
     int i, j;
     int channel_count;
     t_float** helper_arrays;
+    int resize = 0;
+    int seek = 0, arraysize = 0, writesize;
 
     t_symbol* file;
     t_garray ** arrays;
 
     SNDFILE* sndfile;
     SF_INFO info;
-  
-    if (argc < 2)
+    
+    // parse flags
+    while (argc > 0 && argv->a_type == A_SYMBOL &&
+	   *argv->a_w.w_symbol->s_name == '-')
     {
-        pd_error(x, "usage: read soundfile array1 array2 ...");
-        return;
+        char *flag = argv->a_w.w_symbol->s_name + 1;
+	if (!strcmp(flag, "resize"))
+	{
+	    resize = 1;
+	    argc -= 1; argv += 1;
+	}
+	else if (!strcmp(flag, "skip"))
+	{
+	  if (argc < 2 || argv[1].a_type != A_FLOAT ||
+		     ((seek = argv[1].a_w.w_float) == 0))
+	    goto usage;
+	  argc -= 2; argv += 2;
+	}
+	else goto usage;
     }
+    
+    if (argc < 2)
+        goto usage;
 
     file = atom_getsymbolarg(0, argc, argv);
 
@@ -257,41 +276,83 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
     arrays = getbytes(channel_count * sizeof(t_garray*));
     for (i = 0; i != channel_count; ++i)
     {
-        t_garray * array = (t_garray *)pd_findbyclass(atom_getsymbolarg(i+1, 
-                                       argc, argv), garray_class);
-
-        if (array)
-            arrays[i] = array;
-        else
-        {
-            pd_error(x, "%s: no such array", atom_getsymbolarg(i+1, argc, argv)->s_name);
-            return;
-        }
+        t_float *dummy;
+	int size;
+        t_garray *array;
+         
+        if(!(array = (t_garray *)pd_findbyclass(
+           atom_getsymbolarg(i+1, argc, argv), garray_class)))
+	{
+	    pd_error(x, "%s: no such array", atom_getsymbolarg(i+1, 
+		   argc, argv)->s_name);
+	    return;
+	}
+	
+	if(garray_getfloatarray(array, &size, &dummy))
+	    arrays[i] = array;
+	else
+	{
+	    pd_error(x, "%s: bad template for sndfiler", atom_getsymbolarg(i+1, 
+		   argc, argv)->s_name);
+	    return;
+	}
+	
+	// in multichannel mode: check if arrays have different length
+	if (arraysize && arraysize != size && !resize)
+	{
+	  post("sndfiler: arrays have different lengths, resizing to last one ...");
+	}
+	arraysize = size;
     }
   
-    post("sndfiler: loading file ...");
-
     sndfile = sf_open(file->s_name, SFM_READ, &info);
 
     if (sndfile)
     {
+        int pos = 0;
         int maxchannels = (channel_count < info.channels) ?
                            channel_count : info.channels;
 
         t_float * item = alloca(maxchannels * sizeof(t_float));
     
         t_int ** syncdata = getbytes(sizeof(t_int*) * 5);
+	
+	// negative seek: offset from the end of the file
+	if(seek<0)
+	{
+	    pos = sf_seek(sndfile, seek, SEEK_END);
+	}
+	if(seek>0)
+	{
+	    pos = sf_seek(sndfile, seek, SEEK_SET);
+	}
+	if(pos == -1)
+	{
+	    pd_error(x, "invalid seek in soundfile");
+	    return;
+	}
+	
+	if(resize)
+	{
+	    writesize = (info.frames-pos);
+	    arraysize = writesize;
+	}
+	else
+	    writesize = (arraysize>(info.frames-pos)) ? 
+	      info.frames-pos : arraysize;
 
+	post("sndfiler: loading file ...");
+	
 #if (_POSIX_MEMLOCK - 0) >=  200112L
         munlockall();
 #endif
 
         for (i = 0; i != channel_count; ++i)
         {
-            helper_arrays[i] = getalignedbytes(info.frames * sizeof(t_float));
+            helper_arrays[i] = getalignedbytes(arraysize * sizeof(t_float));
         }
 
-        for (i = 0; i != info.frames; ++i)
+        for (i = 0; i != writesize; ++i)
         {
             sf_read_float(sndfile, item, info.channels);
 
@@ -303,6 +364,21 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
                 }
             }
         }
+	
+	// fill remaining elements with zero
+	if(!resize && (arraysize>(info.frames-pos)))
+	{
+	    for (i = writesize; i != arraysize; ++i)
+	    {
+	        for (j = 0; j != info.channels; ++j)
+	        {
+	            if (j < channel_count)
+	            {
+		        helper_arrays[j][i] = 0;
+	            }
+	        }
+	    }
+	}
 
 #if (_POSIX_MEMLOCK - 0) >=  200112L
         mlockall(MCL_FUTURE);
@@ -313,13 +389,21 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
         syncdata[0] = (t_int*)arrays;
         syncdata[1] = (t_int*)helper_arrays;
         syncdata[2] = (t_int*)channel_count;
-        syncdata[3] = (t_int*)(long)info.frames;
+        syncdata[3] = (t_int*)arraysize;
         syncdata[4] = (t_int*)x;
 
         sys_callback(sndfiler_synchonize, (t_int*)syncdata, 5);
+	return;
     }
     else
+    {
         pd_error(x, "Error opening file");
+	return;
+    }
+    
+    usage:
+	pd_error(x, "usage: read [flags] filename array1 array2 ...");
+        post("flags: -skip <n> -resize ");
 }
 
 static t_int sndfiler_synchonize(t_int * w)
