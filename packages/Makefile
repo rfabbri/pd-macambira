@@ -10,7 +10,7 @@
 CWD := $(shell pwd)
 
 cvs_root_dir = $(CWD)/..
-prefix = $(cvs_root_dir)/packages/build
+DESTDIR = $(CWD)/build
 BUILDLAYOUT_DIR = $(CWD)
 
 
@@ -90,6 +90,7 @@ ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
+				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
@@ -120,11 +121,11 @@ externals:
 # flext
 flext:
 # nusmuk
-	cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
+	-cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
 		pd gcc
-	cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
+	-cd $(externals_src)/nusmuk/msd2D && $(externals_src)/grill/flext/build.sh \
 		pd gcc
-	cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
+	-cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
 		pd gcc
 
 #------------------------------------------------------------------------------
@@ -135,44 +136,31 @@ gem:
 
 #------------------------------------------------------------------------------
 # pd
-# pd's makefile has some of its own variables that need to be remapped
-# this relies on patches/build_vars_4_makefile.in.patch  <hans@at.or.at>
-DESTDIR = ""
-ifeq ($(OS_NAME),darwin)
-  libpddir = $(prefix)
-  libpdbindir = $(bindir)
-else
-  ifeq ($(OS_NAME),win)
-    libpddir = $(prefix)
-    libpdbindir = $(bindir)
-  else
-    libpddir = $(prefix)/lib/pd
-    libpdbindir = $(libpddir)/bin
-  endif
-endif
-
-PD_DEST_PATHS = $(DEST_PATHS) DESTDIR=$(DESTDIR) \
-	 libpddir=$(libpddir) \
-	 libpdbindir=$(libpdbindir) 
+# pd's makefile has some of its own variables that need to be remapped,
+# this relies on patches/build_vars_4_makefile.in.patch.
 
 PD_CONFIGURE_FLAGS = 
-PD_EXTRA_FLAGS = 
+PD_BUILD_FLAGS = 
 
 # Pd sometimes needs a specific autoconf, which is labeled differently on different
 # machines
 #PD_AUTOCONF := ${shell ( test -x "`which autoconf-2.59`" && echo autoconf-2.59 ) || echo autoconf }
 PD_AUTOCONF = autoconf
 
-
 pd:
-	echo "OS_NAME $(OS_NAME)"
-	echo "DESTDIR $(DESTDIR)  libpdbindir $(libpdbindir)"
-	echo "DEST_PATHS $(DEST_PATHS)"
-	echo "PD_DEST_PATHS $(PD_DEST_PATHS)"
-	echo "PD_EXTRA_FLAGS $(PD_EXTRA_FLAGS)"
+	@echo "OS_NAME $(OS_NAME)"
+	@echo "==================================================================="
+	@echo "DESTDIR $(DESTDIR)  libpdbindir $(libpdbindir)"
+	@echo "==================================================================="
+	@echo "DEST_PATHS $(DEST_PATHS)"
+	@echo "==================================================================="
+	@echo "DEST_PATHS $(DEST_PATHS)"
+	@echo "==================================================================="
+	@echo "PD_BUILD_FLAGS $(PD_BUILD_FLAGS)"
+	@echo "==================================================================="
 	-cd $(pd_src)/src/ && $(PD_AUTOCONF)
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
-		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS)
+		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
 
 #==============================================================================#
@@ -182,9 +170,9 @@ pd:
 #==============================================================================#
 
 # this is used for installing into a pre-build Pd binary
-extended_install: abstractions_install doc_install externals_install \
-flext_install gem_install readme_install welcome_install license_install \
-noncvs_install
+extended_install: abstractions_install doc_install extensions_install \
+externals_install flext_install gem_install readme_install welcome_install \
+license_install noncvs_install
 
 
 #------------------------------------------------------------------------------
@@ -204,9 +192,16 @@ doc_install:
 
 
 #------------------------------------------------------------------------------
+# extensions_install
+extensions_install: 
+	cd $(extensions_src) && make $(DEST_PATHS) install
+
+
+#------------------------------------------------------------------------------
 # externals_install
 externals_install: 
 	cd $(externals_src) && make $(DEST_PATHS) install
+
 
 
 #------------------------------------------------------------------------------
@@ -225,30 +220,30 @@ flext_install:
 #          ( \
 #            cp buildsys/mac/pd/config-gcc.def buildsys/config-mac-pd-gcc.txt && \
 #            echo Copied template sys config file \
-          ) \
-      ) && \
-		( \
-			cat buildsys/config-mac-pd-gcc.txt | \
-				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" > buildsys/config-mac-pd-gcc.txt \
-		) && \
-		( \
-			cat package.txt | sed "s/^PRECOMPILE=.*/PRECOMPILE=/" > package.txt \
-		) && \
-		( \
-			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
-				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -bundle -bundle_loader ..\/..\/..\/pd\/bin\/pd/" > buildsys/mac/pd/gnumake-gcc-ext.inc \
-		) && \
-			( \
-			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
-				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -dynamiclib -undefined dynamic_lookup /" > buildsys/mac/pd/gnumake-gcc-flext.inc \
-		) && \
-		( \
-			test -f config.txt || \
-			( \
-				cp -f build/config-mac.def config.txt && \
-				echo Copied template flext config file \
-			) \
-		) && \
+#          ) \
+#      ) && \
+#		( \
+#			cat buildsys/config-mac-pd-gcc.txt | \
+#				sed "s/^PDPATH=.*/PDPATH=..\/..\/..\/pd/" > buildsys/config-mac-pd-gcc.txt \
+#		) && \
+#		( \
+#			cat package.txt | sed "s/^PRECOMPILE=.*/PRECOMPILE=/" > package.txt \
+#		) && \
+#		( \
+#			cat buildsys/mac/pd/gnumake-gcc-ext.inc | \
+#				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -bundle -bundle_loader ..\/..\/..\/pd\/bin\/pd/" > buildsys/mac/pd/gnumake-gcc-ext.inc \
+#		) && \
+#			( \
+#			cat buildsys/mac/pd/gnumake-gcc-flext.inc | \
+#				sed "s/^LDFLAG\S +=.*/LDFLAG\S += -dynamiclib -undefined dynamic_lookup /" > buildsys/mac/pd/gnumake-gcc-flext.inc \
+#		) && \
+#		( \
+#			test -f config.txt || \
+#			( \
+#				cp -f build/config-mac.def config.txt && \
+#				echo Copied template flext config file \
+#			) \
+#		) && \
 #		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
 #	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
 #	install -p $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
@@ -260,9 +255,12 @@ flext_install:
 		$(externals_src)/grill/flext/license.txt  \
 		$(manualsdir)/flext
 # FLEXTERNALS
-#########
+#------------------------------------------------------------------------------#
 # dyn~
-	-cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
+#	-cd $(externals_src)/grill/dynext && \
+#		bash ../flext/build.sh pd gcc build-release-shared \
+#			FLEXTLIB=../flext/pd-darwin/release-shared \
+#			FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
 	-install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
 	install -d $(manualsdir)/dynext
@@ -272,7 +270,7 @@ flext_install:
 		$(manualsdir)/dynext
 #########
 # pool
-	-cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
+#	-cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
 	-install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/grill/pool/pool-help.pd $(helpdir)
 	install -d $(manualsdir)/pool
@@ -381,7 +379,7 @@ noncvs_install:
 PD_NAME=Pd
 pd_install: pd
 	cd $(pd_src)/src && \
-		make $(PD_DEST_PATHS) $(PD_EXTRA_FLAGS) install
+		make $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
@@ -492,8 +490,8 @@ readme_install:
 # DOC_FORMAT
 doc_format:
 # clean out cruft files
-	-find $(prefix) -name .DS_Store -delete
-	-find $(prefix) -name '*.*.bak' -delete
+	-find $(DESTDIR) -name .DS_Store -delete
+	-find $(DESTDIR) -name '*.*.bak' -delete
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(helpdir) && \
 		$(scripts_src)/convert-help-to-standard.sh
@@ -580,7 +578,7 @@ gem_clean:
 
 
 pd_clean:
-	-cd $(pd_src) && make $(PD_DEST_PATHS) clean
+	-cd $(pd_src) && make $(DEST_PATHS) clean
 
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean
@@ -590,3 +588,17 @@ clean: gem_clean pd_clean
 
 
 distclean: clean cruft_clean
+
+test:
+	@echo "PD_VERSION: $(PD_VERSION)"
+	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "CWD $(CWD)"
+	@echo "DESTDIR $(DESTDIR)"
+	@echo "PREFIX $(prefix)"
+	@echo "BINDIR  $(bindir)"
+	@echo "LIBDIR  $(libdir)"
+	@echo "OBJECTSDIR  $(objectsdir)"
+	@echo "PDDOCDIR  $(pddocdir)"
+	@echo "HELPDIR  $(helpdir)"
+	@echo "MANUALSDIR  $(manualsdir)"
+	@echo "EXAMPLESDIR  $(examplesdir)"

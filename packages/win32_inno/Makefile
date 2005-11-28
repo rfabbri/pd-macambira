@@ -5,7 +5,7 @@ all: install
 
 CWD := $(shell pwd)
 
-prefix = $(CWD)/build
+DESTDIR = $(CWD)/build
 cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
 
@@ -17,6 +17,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
+				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				UNAME=$(UNAME)
 
@@ -26,7 +27,7 @@ PD_INNO_SETUP = pd-inno.iss
 install: $(PD_INNO_SETUP)
 	cd $(packages_src) && make $(DEST_PATHS) extended_install
 	cd .. && make $(DEST_PATHS) doc_format
-	install -p pd-settings.reg $(prefix)
+	install -p pd-settings.reg $(DESTDIR)$(prefix)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
@@ -39,7 +40,7 @@ install: $(PD_INNO_SETUP)
 # since I can't get Pd to compile, here are some hacks to assemble a package
 # from binaries
 no_compile_hacks:
-	cp -a /c/Program\ Files/pd-0.38-4 $(prefix)/
+	cp -a /c/Program\ Files/pd-0.38-4 $(DESTDIR)$(prefix)/
 
 $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 	@echo "Making Inno Setup file: $(PD_INNO_SETUP)"

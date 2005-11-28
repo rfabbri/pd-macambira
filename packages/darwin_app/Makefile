@@ -8,7 +8,7 @@ CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
 PD_APP_NAME = $(PACKAGE_NAME)
 PD_APP_CONTENTS = $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
-prefix = $(PD_APP_CONTENTS)/Resources
+DESTDIR = $(PD_APP_CONTENTS)/Resources
 
 cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
@@ -30,6 +30,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
 				prefix=$(prefix) \
+				DESTDIR=$(DESTDIR) \
 				UNAME=$(UNAME)
 
 install: darwin_app
@@ -107,7 +108,7 @@ darwin_app_doc_format:
 	cd $(pddocdir) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
 			*/*.pd */*/*.pd */*/*/*.pd
-	find $(prefix) -name '*.pd.bak' -delete
+	find $(DESTDIR) -name '*.pd.bak' -delete
 
 #==============================================================================#
 #

@@ -4,19 +4,7 @@
 
 - fix scripts/checkout...sh.  It doesn't cvs co into the newly created pure-data folder
 
-- rename "applications" to "examples"
-
-- downcase *_DEST and *_SRC to be more readable
-
-- change CWD to packages_src where appropriate
-
-- add DESTDIR to the top of each Makefile
-
 - test for configure before running autoconf/clean configure on distclean
-
-- try including packages/Makefile in darwin_app/Makefile to see if I can run pacakges/makefile targets tehn
-
-- On GNU/Linux, figure out how to deal with build/extra vs. build/lib/pd/extra
 
 - global optimization flags
   		ideally, you would use a version of Pd that is fully optimized for your
@@ -30,18 +18,11 @@
 
 - mDNS objects!
 
-- make standard targets: distclean (*~, etc.), installdirs (make just the
-  dirs), uninstall instead of install_clean
+- make standard targets: distclean (*~, etc.), uninstall instead of install_clean
 
 - help menu
 
   	 - check up on this bug: Opening Help patches from "Pure Documentation"
-   
-    - make help menu function check if item exists before trying to make a
-      menu item so that it doesn't break pd.tk<->pd interaction (i.e. windows
-      titled x50bf90).  (the recursive function might have fixed this)
-
-	 - port to Linux/Windows
 
 - Preferences
 
