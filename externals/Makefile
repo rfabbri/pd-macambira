@@ -12,7 +12,7 @@ CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
 cvs_root_dir = $(CWD)/..
-prefix = $(CWD)/build
+DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
@@ -28,6 +28,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
+				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix)
 
 #==============================================================================#

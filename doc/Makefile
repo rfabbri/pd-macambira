@@ -11,7 +11,7 @@ CWD := $(shell pwd)
 
 # these are designed to be overridden by the packages/Makefile
 cvs_root_dir = $(CWD)/..
-prefix = build
+DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(CWD)
 
 # default target
