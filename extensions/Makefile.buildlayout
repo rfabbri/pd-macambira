@@ -9,22 +9,22 @@
 # This file should be exactly the same in each section of the CVS.  A copy is
 # kept in each section of the CVS so that each section will be self-contained.
 # To use it, you need to include it in your Makefile (i.e. "include
-# Makefile.buildlayout") and then define $(INSTALL_PREFIX) and $(SRC_ROOT_DIR).
+# Makefile.buildlayout") and then define $(prefix) and $(cvs_root_dir).
 #
-# $(SRC_ROOT_DIR) is the base directory of src tree, equivalent to the root
+# $(cvs_root_dir) is the base directory of src tree, equivalent to the root
 # level of the pure-data CVS.
 #
-# $(INSTALL_PREFIX) is the base directory to where all of the resulting files
+# $(prefix) is the base directory to where all of the resulting files
 # will be copied.
 #
 # This file is currently located in these places: 
 #	  abstractions
-#	  externals/build
+#    extensions
+#	  externals
 # 	  packages
 #    doc
 #
 # it will be going here too:
-#    extensions
 #    gem
 #    pd
 #
@@ -63,27 +63,27 @@ endif
 #==============================================================================#
 
 # sources
-ABSTRACTIONS_SRC = $(SRC_ROOT_DIR)/abstractions
-DOC_SRC = $(SRC_ROOT_DIR)/doc
-EXTERNALS_SRC = $(SRC_ROOT_DIR)/externals
-FLEXT_SRC = $(SRC_ROOT_DIR)/externals/grill/flext
-GEM_SRC = $(SRC_ROOT_DIR)/Gem
-GEMLIBS_SRC = $(SRC_ROOT_DIR)/GemLibs
-PACKAGES_SRC = $(SRC_ROOT_DIR)/packages
-PD_SRC = $(SRC_ROOT_DIR)/pd
-SCRIPTS_SRC = $(SRC_ROOT_DIR)/scripts
+abstractions_src = $(cvs_root_dir)/abstractions
+doc_src = $(cvs_root_dir)/doc
+extensions_src = $(cvs_root_dir)/extensions
+externals_src = $(cvs_root_dir)/externals
+flext_src = $(cvs_root_dir)/externals/grill/flext
+gem_src = $(cvs_root_dir)/Gem
+packages_src = $(cvs_root_dir)/packages
+pd_src = $(cvs_root_dir)/pd
+scripts_src = $(cvs_root_dir)/scripts
 
 
 # destinations
-APPLICATIONS_DEST = $(DOCS_DEST)/examples
-BIN_DEST = $(INSTALL_PREFIX)/bin
-DOCS_DEST = $(INSTALL_PREFIX)/doc
-INCLUDE_DEST = $(INSTALL_PREFIX)/include
-LIB_DEST = $(INSTALL_PREFIX)/lib
-MAN_DEST = $(INSTALL_PREFIX)/man
-OBJECTS_DEST = $(INSTALL_PREFIX)/extra
-HELP_DEST = $(DOCS_DEST)/5.reference
-MANUALS_DEST = $(DOCS_DEST)/manuals
+examplesdir = $(pddocdir)/examples
+bindir = $(prefix)/bin
+pddocdir = $(prefix)/doc
+includedir = $(prefix)/include
+libdir = $(prefix)/lib
+mandir = $(prefix)/man
+objectsdir = $(prefix)/extra
+helpdir = $(pddocdir)/5.reference
+manualsdir = $(pddocdir)/manuals
 
 
 #==============================================================================#
@@ -93,23 +93,23 @@ MANUALS_DEST = $(DOCS_DEST)/manuals
 #==============================================================================#
 
 # first make sure that the directory structure is setup
-$(INSTALL_PREFIX):
-	install -d $(INSTALL_PREFIX)
+$(prefix):
+	install -d $(prefix)
 
-$(APPLICATIONS_DEST):  $(INSTALL_PREFIX)
-	install -d $(APPLICATIONS_DEST)
+$(examplesdir):  $(prefix)
+	install -d $(examplesdir)
 
-$(DOCS_DEST): $(INSTALL_PREFIX)
-	install -d $(DOCS_DEST)
+$(pddocdir): $(prefix)
+	install -d $(pddocdir)
 
-$(HELP_DEST): $(INSTALL_PREFIX)
-	install -d $(HELP_DEST)
+$(helpdir): $(prefix)
+	install -d $(helpdir)
 
-$(MANUALS_DEST): $(INSTALL_PREFIX)
-	install -d $(MANUALS_DEST)
+$(manualsdir): $(prefix)
+	install -d $(manualsdir)
 
-$(OBJECTS_DEST): $(INSTALL_PREFIX)
-	install -d $(OBJECTS_DEST)
+$(objectsdir): $(prefix)
+	install -d $(objectsdir)
 
 
 #==============================================================================#
@@ -119,18 +119,18 @@ $(OBJECTS_DEST): $(INSTALL_PREFIX)
 #==============================================================================#
 
 
-PD_MAJOR_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*\\n";/\1/')
-PD_MINOR_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
-PD_BUGFIX_VERSION := $(shell grep 'Pd version' $(PD_SRC)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*\\n";/\1/')
+PD_MAJOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*.n";/\1/')
+PD_MINOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
+PD_BUGFIX_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
+	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
 # the separators [.-] need to be the same as in s_main.c or the regexps break
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 
 # release version for this distro
-PACKAGE_VERSION = extended-RC4
+PACKAGE_VERSION = extended-RC6
 PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 
 
@@ -142,51 +142,51 @@ PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
 #==============================================================================#
 
 applications_clean:
-	-rm -f -- $(APPLICATIONS_DEST)/*/*/*/*/*.*
-	-rm -f -- $(APPLICATIONS_DEST)/*/*/*/*.*
-	-rm -f -- $(APPLICATIONS_DEST)/*/*/*.*
-	-rm -f -- $(APPLICATIONS_DEST)/*/*.*
-	-rmdir $(APPLICATIONS_DEST)/*/*/*/*
-	-rmdir $(APPLICATIONS_DEST)/*/*/*
-	-rmdir $(APPLICATIONS_DEST)/*/*
-	-rmdir $(APPLICATIONS_DEST)/*
-	-rmdir $(APPLICATIONS_DEST)
+	-rm -f -- $(examplesdir)/*/*/*/*/*.*
+	-rm -f -- $(examplesdir)/*/*/*/*.*
+	-rm -f -- $(examplesdir)/*/*/*.*
+	-rm -f -- $(examplesdir)/*/*.*
+	-rmdir $(examplesdir)/*/*/*/*
+	-rmdir $(examplesdir)/*/*/*
+	-rmdir $(examplesdir)/*/*
+	-rmdir $(examplesdir)/*
+	-rmdir $(examplesdir)
 
 
 help_clean:
-	-rm -f -- $(HELP_DEST)/*/*/*.*
-	-rm -f -- $(HELP_DEST)/*/*.*
-	-rm -f -- $(HELP_DEST)/*.*
-	-rmdir $(HELP_DEST)/*/*
-	-rmdir $(HELP_DEST)/*
-	-rmdir $(HELP_DEST)
+	-rm -f -- $(helpdir)/*/*/*.*
+	-rm -f -- $(helpdir)/*/*.*
+	-rm -f -- $(helpdir)/*.*
+	-rmdir $(helpdir)/*/*
+	-rmdir $(helpdir)/*
+	-rmdir $(helpdir)
 
 
 manuals_clean:
-	-rm -f -- $(MANUALS_DEST)/*/*/*.*
-	-rm -f -- $(MANUALS_DEST)/*/*.*
-	-rmdir $(MANUALS_DEST)/*/*
-	-rmdir $(MANUALS_DEST)/*
-	-rmdir $(MANUALS_DEST)
+	-rm -f -- $(manualsdir)/*/*/*.*
+	-rm -f -- $(manualsdir)/*/*.*
+	-rmdir $(manualsdir)/*/*
+	-rmdir $(manualsdir)/*
+	-rmdir $(manualsdir)
 
 
 objects_clean:
-	-rm $(OBJECTS_DEST)/*/*/*.pd
-	-rm $(OBJECTS_DEST)/*/*.pd
-	-rm $(OBJECTS_DEST)/*.pd
-	-rm $(OBJECTS_DEST)/*/*/*.$(EXTENSION)
-	-rm $(OBJECTS_DEST)/*/*.$(EXTENSION)
-	-rm $(OBJECTS_DEST)/*.$(EXTENSION)
-	-rmdir $(OBJECTS_DEST)/*/*
-	-rmdir $(OBJECTS_DEST)/*
-	-rmdir $(OBJECTS_DEST)
+	-rm $(objectsdir)/*/*/*.pd
+	-rm $(objectsdir)/*/*.pd
+	-rm $(objectsdir)/*.pd
+	-rm $(objectsdir)/*/*/*.$(EXTENSION)
+	-rm $(objectsdir)/*/*.$(EXTENSION)
+	-rm $(objectsdir)/*.$(EXTENSION)
+	-rmdir $(objectsdir)/*/*
+	-rmdir $(objectsdir)/*
+	-rmdir $(objectsdir)
 
 
 install_clean: applications_clean help_clean manuals_clean objects_clean
-	-rmdir $(DOCS_DEST)
-	-rmdir $(INSTALL_PREFIX)
+	-rmdir $(pddocdir)
+	-rmdir $(prefix)
 	@echo " "
-	@echo "Build destination cleaned: $(INSTALL_PREFIX)"
+	@echo "Build destination cleaned: $(prefix)"
 
 
 cruft_clean:
