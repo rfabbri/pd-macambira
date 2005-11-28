@@ -4,7 +4,7 @@ RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 retrieving revision 1.7.2.4
 diff -u -w -r1.7.2.4 u_main.tk
 --- u_main.tk	21 Feb 2005 04:20:20 -0000	1.7.2.4
-+++ u_main.tk	25 Nov 2005 22:47:06 -0000
++++ u_main.tk	28 Nov 2005 15:27:03 -0000
 @@ -24,6 +24,14 @@
  # Tearoff is set to true by default:
  set pd_tearoff 1
@@ -69,7 +69,7 @@ diff -u -w -r1.7.2.4 u_main.tk
 +    # Apple doesn't allow cascading menus in their Help so I had to call this 
 +    # one "docs" <hans@at.or.at>
 +    set help_menu_name "docs"
-+
++    
  
  	 # tk::mac::OpenDocument is called with the filenames put into the 
  	 # var args whenever docs are either dropped on the Pd.app icon or 
@@ -83,10 +83,10 @@ diff -u -w -r1.7.2.4 u_main.tk
      	global pd_guidir
      	puts stderr {setting pd_guidir to '.'}
  	set pd_guidir .
-+	set help_top_directory $pd_guidir/doc
-+	# init last help directory browsed
-+	set help_directory $help_top_directory
      }
++    set help_top_directory $pd_guidir/doc
++    # init last help directory browsed
++    set help_directory $help_top_directory
  }
  
 +#################### init for all platforms ####################
@@ -140,11 +140,11 @@ diff -u -w -r1.7.2.4 u_main.tk
 -    if {$pd_nt == 2} {
 -    	exec rm -rf /tmp/pd-documentation
 -    	exec cp -pr $pd_guidir/doc /tmp/pd-documentation
--	set filename [tk_getOpenFile -defaultextension .pd \
+ 	set filename [tk_getOpenFile -defaultextension .pd \
 -	-filetypes { {{documentation} {.pd .txt .htm}} } \
 -	-initialdir /tmp/pd-documentation]
 -    } else {
- 	set filename [tk_getOpenFile -defaultextension .pd \
+-	set filename [tk_getOpenFile -defaultextension .pd \
 -	-filetypes { {{documentation} {.pd .txt .htm}} } \
 +		      -filetypes { {{documentation} {.pd .txt .htm .html}} } \
  	-initialdir $help_directory]
@@ -180,14 +180,14 @@ diff -u -w -r1.7.2.4 u_main.tk
 -proc doc_submenu {helpmenu subdir} {
 -	 global help_top_directory pd_tearoff
 +################## menu_doc_submenu #########################
-+
+ 
+-	 set menudir $help_top_directory/$subdir
 +# this is a recursive function to generation a nested menu in the help menu
 +# which shows the complete contents of the doc directory <hans@at.or.at>
 +proc menu_doc_submenu {helpmenu base_dir sub_dir} {
 +    global pd_tearoff
 +    global help_top_directory
- 
--	 set menudir $help_top_directory/$subdir
++
 +    set menu_dir $help_top_directory/$base_dir/$sub_dir
  
 -    regsub -all "\\\." $subdir "" submenu
@@ -238,10 +238,14 @@ diff -u -w -r1.7.2.4 u_main.tk
  #          the "Audio" menu
      $mbar.audio add command -label {audio ON} -accelerator [accel_munge "Ctrl+/"] \
  	-command {menu_audio 1} 
-@@ -494,30 +554,15 @@
- 
- 
- #          the "Help" menu
+@@ -490,34 +550,17 @@
+ 				-command {pd pd audio-properties \;}
+ 		  $mbar.apple.preferences add command -label "MIDI settings..." \
+ 				-command {pd pd midi-properties \;}
+-	 }
+-
+-
+-#          the "Help" menu
 -	 if {$pd_nt != 2} {
 -# a menu on the main menubar named "$whatever.help" while be treated
 -# as a special menu with specific behaviors on different platforms.
@@ -249,20 +253,21 @@ diff -u -w -r1.7.2.4 u_main.tk
 -    $mbar.help add command -label {About Pd} \
 -	-command {menu_doc_open doc/1.manual 1.introduction.txt} 
 -    $mbar.help add command -label {Pure Documentation...} \
-+    puts stderr "Starting Menu crap"
-+    $mbar.$help_menu_name add command -label {Browse Documentation...} \
- 	-command {menu_documentation} 
+-	-command {menu_documentation} 
 -		  # add menu items for each section instead of using Pd patches
 -		  $mbar.help add separator
 -		  set helpmenuname help
--	 } else {
+ 	 } else {
 -# Apple doesn't allow cascading menus in their Help so I had to call this 
 -# one "docs"  <hans@at.or.at>
 -		  set helpmenuname docs
--	 }
--
++	$mbar.$help_menu_name add command -label "About Pd..." -command \
++	    {menu_doc_open doc/1.manual 1.introduction.txt} 
+ 	 }
+ 
 -	 $mbar.$helpmenuname add command -label {1 manual...} \
-+    # the help menu only really works well on Mac OS X <hans@at.or.at>
++    $mbar.$help_menu_name add command -label {Browse Documentation...} \
++	-command {menu_documentation} 
 +    $mbar.$help_menu_name add command -label {Pd HTML Manual...} \
  		  -command {menu_doc_open doc/1.manual index.htm} 
 -	 doc_submenu $mbar.$helpmenuname 2.control.examples
@@ -272,11 +277,10 @@ diff -u -w -r1.7.2.4 u_main.tk
 -	 doc_submenu $mbar.$helpmenuname 6.externs
 +    $mbar.$help_menu_name add separator
 +    menu_doc_submenu $mbar.$help_menu_name "." "."
-+    puts stderr "Finishing Menu crap"
  }
  
  #################### the "File" menu for the Pd window ##############
-@@ -820,6 +865,7 @@
+@@ -820,6 +863,7 @@
      global pd_opendir
      global pd_tearoff
      global pd_nt
@@ -284,7 +288,7 @@ diff -u -w -r1.7.2.4 u_main.tk
  
      toplevel $name -menu $name.m
  #    puts stderr [concat geometry: $geometry]
-@@ -1078,13 +1124,11 @@
+@@ -1078,13 +1122,11 @@
  # as a special menu with specific behaviors on different platforms.
  # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
  	 if {$pd_nt != 2} {
