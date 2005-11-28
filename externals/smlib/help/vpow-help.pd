@@ -1,6 +1,6 @@
-#N canvas 163 334 444 177 12;
+#N canvas 163 334 444 177 10;
 #X text 364 147 j#|@2002;
-#X obj 386 127 SMLib;
+#X obj 386 127 SMLib-help;
 #X obj 15 127 print;
 #X floatatom 66 81 5 0 0 0 - - -;
 #X text 78 134 default argument is 1;

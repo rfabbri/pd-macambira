@@ -1,4 +1,4 @@
-#N canvas 35 57 1126 761 12;
+#N canvas 35 57 1126 761 10;
 #X floatatom 35 282 5 0 0;
 #X obj 35 259 float;
 #X obj 35 195 loadbang;

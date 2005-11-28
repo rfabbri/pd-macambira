@@ -1,6 +1,6 @@
-#N canvas 553 310 489 262 12;
+#N canvas 553 310 489 262 10;
 #X text 390 239 j#|@2002;
-#X obj 412 217 SMLib;
+#X obj 412 217 SMLib-help;
 #X floatatom 14 74 5 0 0;
 #X obj 12 165 print deltas;
 #X floatatom 68 108 5 0 0;

@@ -1,6 +1,6 @@
-#N canvas 436 204 416 478 12;
+#N canvas 436 204 416 478 10;
 #X text 327 442 j#|@2002;
-#X text 347 423 SMLib;
+#X text 347 423 SMLib-help;
 #X msg 275 239 clear;
 #X text 277 219 reinit;
 #X text 11 81 - value of first class;

@@ -1,6 +1,6 @@
-#N canvas 606 355 283 118 12;
+#N canvas 606 355 283 118 10;
 #X text 194 88 j#|@2002;
-#X obj 216 68 SMLib;
+#X obj 216 68 SMLib-help;
 #X msg 15 33 100 97 94;
 #X text 10 6 db to rms on a vector;
 #X obj 15 56 vdbtorms;

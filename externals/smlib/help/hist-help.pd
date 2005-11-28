@@ -1,6 +1,6 @@
-#N canvas 678 207 414 422 12;
+#N canvas 678 207 414 422 10;
 #X text 331 381 j#|@2002;
-#X text 351 362 SMLib;
+#X text 351 362 SMLib-help;
 #X text 14 7 hist: histograms;
 #X obj 2 354 print;
 #X obj 11 181 random 10;

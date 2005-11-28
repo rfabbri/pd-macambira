@@ -1,6 +1,6 @@
-#N canvas 133 245 443 412 12;
+#N canvas 133 245 443 412 10;
 #X text 360 376 j#|@2002;
-#X text 380 357 SMLib;
+#X text 380 357 SMLib-help;
 #X obj 51 362 print;
 #X obj 11 193 random 10;
 #X obj 11 174 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1

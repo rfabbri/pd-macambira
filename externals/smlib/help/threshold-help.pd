@@ -1,4 +1,4 @@
-#N canvas 114 43 708 422 12;
+#N canvas 114 43 708 422 10;
 #X text 221 309 Arguments:;
 #X text 310 310 1 trigger threshold;
 #X floatatom 20 235 5 0 0;
@@ -35,7 +35,7 @@ after the two event types before triggering again.;
 -1;
 #X obj 20 332 threshold 70 10 30 10;
 #X text 620 398 j#|@2002;
-#X obj 638 376 SMLib;
+#X obj 638 376 SMLib-help;
 #X connect 2 0 25 0;
 #X connect 15 0 2 0;
 #X connect 16 0 15 0;

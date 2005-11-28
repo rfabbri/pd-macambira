@@ -1,4 +1,4 @@
-#N canvas 588 327 324 246 12;
+#N canvas 588 327 324 246 10;
 #X obj 11 141 vclip -1 1;
 #X obj 11 196 print;
 #X msg 11 30 -4 -3 -2 -1 0 1 2 3 4;
@@ -10,7 +10,7 @@
 #X text 79 81 lower bound;
 #X text 121 120 upper bound;
 #X text 252 220 j#|@2002;
-#X obj 274 200 SMLib;
+#X obj 274 200 SMLib-help;
 #X connect 0 0 1 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 1;

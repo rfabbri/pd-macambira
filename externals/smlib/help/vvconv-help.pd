@@ -1,4 +1,4 @@
-#N canvas 482 447 441 276 12;
+#N canvas 482 447 441 276 10;
 #X msg 132 78 1 2 1;
 #X msg 132 53 1 0 1;
 #X text 26 18 vvconv: convolution of 2 vectors;
@@ -13,7 +13,7 @@
 #X msg 230 92 1 0 1 0 0 1;
 #X msg 31 90 1 0 1 0 0 1;
 #X text 177 178 arguments: convolution kernel;
-#X obj 377 225 SMLib;
+#X obj 377 225 SMLib-help;
 #X obj 48 154 print vvconv;
 #X obj 247 156 print vvconv;
 #X text 2 202 length of output is the sum of input lengths minus one

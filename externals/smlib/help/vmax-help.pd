@@ -1,7 +1,7 @@
-#N canvas 480 472 473 127 12;
+#N canvas 480 472 473 127 10;
 #X floatatom 35 104 5 0 0;
 #X text 387 99 j#|@2002;
-#X obj 409 77 SMLib;
+#X obj 409 77 SMLib-help;
 #X msg 133 47 0;
 #X msg 168 47 0 1 0 1;
 #X msg 243 48 0 0 1 1;

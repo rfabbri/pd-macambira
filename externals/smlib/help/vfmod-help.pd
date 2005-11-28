@@ -1,6 +1,6 @@
-#N canvas 163 334 442 175 12;
+#N canvas 163 334 442 175 10;
 #X text 364 147 j#|@2002;
-#X obj 386 127 SMLib;
+#X obj 386 127 SMLib-help;
 #X text 10 6 vfmod computes the modulo of each element in a vector
 ;
 #X obj 15 127 print;

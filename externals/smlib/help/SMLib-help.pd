@@ -1,4 +1,4 @@
-#N canvas 97 25 525 422 12;
+#N canvas 97 25 525 422 10;
 #X obj 31 188 lmax;
 #X obj 31 211 lmin;
 #X obj 31 234 lrange;
@@ -90,7 +90,7 @@ to the zexy and gem/markex library \, so have a look at those too.
 #X obj 26 466 lhisti;
 #X text 88 467 leaky histogram without clipping input;
 #X text 88 546 difference between current input and past inputs;
-#X obj 455 1243 SMLib;
+#X obj 455 1243 SMLib-help;
 #X obj 472 1224 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144
 -1 -1;
 #X obj 26 520 prevl;

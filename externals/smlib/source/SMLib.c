@@ -167,7 +167,11 @@ static void *SMLib_new()
 	return (void *)x;
 }
 
+#ifdef WIN32
 __declspec(dllexport) void __cdecl SMLib_setup( void)
+#else
+void SMLib_setup( void)
+#endif
 {
 	// dummy object for help-system
     SMLib_class = class_new(gensym("SMLib"),

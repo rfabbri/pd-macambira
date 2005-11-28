@@ -1,4 +1,4 @@
-#N canvas 114 43 428 284 12;
+#N canvas 114 43 428 284 10;
 #X floatatom 12 141 5 0 0;
 #X obj 12 118 float;
 #X obj 12 95 metro 100;
@@ -8,7 +8,7 @@
 #X obj 124 77 hsl 128 15 -127 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 12700 1;
 #X text 349 255 j#|@2002;
-#X obj 367 233 SMLib;
+#X obj 367 233 SMLib-help;
 #X text 13 7 bp: bandpass filter on float stream;
 #X floatatom 138 133 0 0 0;
 #X msg 106 110 clear;

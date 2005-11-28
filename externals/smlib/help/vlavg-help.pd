@@ -1,4 +1,4 @@
-#N canvas 448 299 464 314 12;
+#N canvas 448 299 464 314 10;
 #X obj 8 249 prepend 0;
 #N canvas 0 0 450 300 graph1 0;
 #X array array_vlavg 10 float 0;
@@ -16,7 +16,7 @@
 #X text 8 22 the argument is the half-decay expressed in number of
 activations;
 #X obj 8 275 s array_vlavg;
-#X obj 397 264 SMLib;
+#X obj 397 264 SMLib-help;
 #X msg 27 201 decay 20;
 #X connect 0 0 12 0;
 #X connect 2 0 6 0;

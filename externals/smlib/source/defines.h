@@ -1,11 +1,11 @@
-//#include <m_pd.h>
+#include <m_pd.h>
 #include "m_imp.h"
 #include <math.h>
 #define MAXFLOAT  1e18f;
 #define LOGTEN 2.302585092994
 
 /* NT and OSX don't appear to have single-precision ANSI math */
-#if defined(WIN32) || defined(MACOSX)
+#if defined(WIN32) || defined(__APPLE__)
 #define sinf sin
 #define cosf cos
 #define atanf atan

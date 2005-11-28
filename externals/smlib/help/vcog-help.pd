@@ -1,9 +1,9 @@
-#N canvas 480 472 471 125 12;
+#N canvas 480 472 471 125 10;
 #X msg 18 40 1 2 3 4;
 #X floatatom 50 96 5 0 0;
 #X msg 84 40 3 4 5;
 #X text 387 99 j#|@2002;
-#X obj 409 77 SMLib;
+#X obj 409 77 SMLib-help;
 #X obj 52 69 vcog;
 #X text 16 14 vcog computes the center of gravity of a list of floats
 ;

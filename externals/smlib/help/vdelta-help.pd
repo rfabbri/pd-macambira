@@ -1,4 +1,4 @@
-#N canvas 619 449 433 228 12;
+#N canvas 619 449 433 228 10;
 #X msg 5 30 1 1 1 1 1 1 1 1 1 1;
 #X msg 5 52 1 0 1 0 1 0 1 0 1 0;
 #X msg 5 74 0 1 0 1 0 1 0 1 0 1;
@@ -6,7 +6,7 @@
 #X msg 5 118 -1 -1 0 0 -1 -1 0 0 -1 -1;
 #X msg 5 140 0 0 0 0 0 1 1 1 1 1;
 #X text 352 205 j#|@2002;
-#X obj 373 184 SMLib;
+#X obj 373 184 SMLib-help;
 #X text 7 3 vdelta: difference between consecutive vectors;
 #X obj 5 193 print vdelta;
 #X msg 221 31 0;

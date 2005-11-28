@@ -1,6 +1,6 @@
-#N canvas 606 355 281 116 12;
+#N canvas 606 355 281 116 10;
 #X text 194 88 j#|@2002;
-#X obj 216 68 SMLib;
+#X obj 216 68 SMLib-help;
 #X text 10 6 frequency to midi on a vector;
 #X msg 15 33 440 446.164 880;
 #X obj 15 56 vftom;
