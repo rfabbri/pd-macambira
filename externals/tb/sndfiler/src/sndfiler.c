@@ -341,8 +341,6 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
 	    writesize = (arraysize>(info.frames-pos)) ? 
 	      info.frames-pos : arraysize;
 
-	post("sndfiler: loading file ...");
-	
 #if (_POSIX_MEMLOCK - 0) >=  200112L
         munlockall();
 #endif
