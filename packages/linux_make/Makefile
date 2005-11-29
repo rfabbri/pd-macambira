@@ -10,6 +10,11 @@ cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
 
 
+# for command-line UNIX versions, you need to install Pd into the same
+# directory as $(prefix) otherwise Pd won't be able to find extra, doc, etc.
+prefix = /usr/local
+
+
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 
@@ -30,20 +35,47 @@ install:
 
 #==============================================================================#
 #
-## 
+## installer package
 #
 #==============================================================================#
 
-PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)-$(OS_NAME)-$(shell uname -m)
-tarbz2:
-# it is very hard to escape the $ in shell scripts so delete files
-	-rm -f -- $(helpdir)/iemabs/*\$$*.pd $(objectsdir)/iemabs/*\$$*.pd
-	-./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
-	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
+PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)-$(OS_NAME)-$(shell uname -p)
+tarbz2: installer_makefile installer_readme
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
 		tar cjf $(PACKAGE_NAME).tar.bz2  $(PACKAGE_NAME)
 	mv $(DESTDIR)$(PACKAGE_NAME) $(DESTDIR)$(prefix)
+
+
+INSTALLER_README_FILE = $(DESTDIR)$(prefix)/README.txt
+installer_readme:
+	install -d $(DESTDIR)$(prefix)
+	-rm $(INSTALLER_README_FILE)
+	touch $(INSTALLER_README_FILE)
+	echo -e "$(PACKAGE_NAME)" >> $(INSTALLER_README_FILE)
+	echo -e "\n\n" >> $(INSTALLER_README_FILE)
+	echo -e "To install:\n" >> $(INSTALLER_README_FILE)
+	echo -e "\tmake install\n" >> $(INSTALLER_README_FILE)
+	echo -e "To uninstall:\n" >> $(INSTALLER_README_FILE)
+	echo -e "\tmake uninstall\n" >> $(INSTALLER_README_FILE)
+	echo -e "\n\n" >> $(INSTALLER_README_FILE)
+	echo -e "You can install this package elsewhere, but its been compiled to run in $(prefix).  If you install it somewhere other than $(prefix), you will only be able to run Pd like this:\n" >> $(INSTALLER_README_FILE)
+	echo -e "\tcd /path/to/bin/pd && ./pd\n" >> $(INSTALLER_README_FILE)
+	echo -e "Here's how to install it elsewhere:" >> $(INSTALLER_README_FILE)
+	echo -e "To install:\n" >> $(INSTALLER_README_FILE)
+	echo -e "\tmake install prefix=/path/to\n" >> $(INSTALLER_README_FILE)
+	echo -e "To uninstall:\n" >> $(INSTALLER_README_FILE)
+	echo -e "\tmake uninstall prefix=/path/to\n" >> $(INSTALLER_README_FILE)
+
+
+installer_makefile:
+# it is very hard to escape the $ in shell scripts so delete files
+	-rm -f -- $(helpdir)/iemabs/*\$$*.pd $(objectsdir)/iemabs/*\$$*.pd
+# don't put the Makefile into the package yet, otherwise it'll get installed
+	-./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
+	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
+
+
 
 #==============================================================================#
 #

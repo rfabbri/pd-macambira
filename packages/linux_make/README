@@ -1,0 +1,30 @@
+
+To build everything and create an generic installer for linux, do this:
+
+
+Download and run the script from CVS which will download all the sources from
+anonymous CVS:
+
+    scripts/checkout-developer-layout.sh
+
+Now you will have all of the sources in a directory called "pure-data".  Next,
+run these commands to build in the package:
+
+    cd packages/linux_make
+    make install
+
+It will then compile and install everything into packages/linux_make/build.
+The default installation prefix is "/usr/local".  Pd will need to be installed
+into that directory in order for it to find all its externals and docs.  You
+can compile everything to use a different prefix like this:
+
+    make install prefix=/usr
+
+After you have everything built, you can make a tarball with a generated
+Makefile which will install and uninstall everything:
+
+    make tarbz2
+
+You can generate just the Makefile used for installation using:
+
+    make installer_makefile
