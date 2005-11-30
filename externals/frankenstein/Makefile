@@ -1,13 +1,13 @@
 # customize here !
 #VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7"
 VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7"
-PDPATH="H:\PureData\pd-0.38-3.msw\pd"
-#PDPATH="C:\Documents and Settings\Davide\Documenti\personali\pd-0.38-3.msw\pd"
+#PDPATH="H:\PureData\pd-0.38-3.msw\pd"
+PDPATH="C:\Documents and Settings\Davide\Documenti\personali\pd-0.38-3.msw\pd"
 
 
 current: pd_nt distclean
 
-pd_nt: chord_melo.dll chords_memory.dll harmonizer.dll GArhythm.dll ritmo1.dll
+pd_nt: chord_melo.dll chords_memory.dll harmonizer.dll GArhythm.dll ritmo1.dll test.dll
 
 .SUFFIXES: .dll
 
@@ -22,8 +22,8 @@ PDNTLIB = $(PDNTLDIR)\libc.lib \
 	$(PDPATH)\bin\pd.lib 
 
 .c.dll:
-	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
-	link /dll /export:$*_setup $*.obj $(PDNTLIB) 
+	cl $(PDNTCFLAGS) $(PDNTINCLUDE) /c common.c $*.c
+	link /dll /export:$*_setup $*.obj common.obj $(PDNTLIB) 
 
 
 

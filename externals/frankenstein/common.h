@@ -37,13 +37,14 @@ typedef struct _note_event
 
 // data structures
 
-typedef struct _rhythm_event
+typedef struct t_rhythm_event t_rhythm_event;
+struct t_rhythm_event
 {
 	unsigned short int voice;
 	t_duration duration;
-	struct t_rhythm_event *previous; // this is a list, link to the previous element
-	struct t_rhythm_event *next;  // this is a list, link to the next element
-} t_rhythm_event;
+	t_rhythm_event *previous; // this is a list, link to the previous element
+	t_rhythm_event *next;  // this is a list, link to the next element
+};
 
 // rhythms memory graph
 
@@ -67,10 +68,17 @@ typedef struct _rhythm_memory_node
 // with a table
 // simpler and most of all non recursive when searching nodes!
 #define num_possible_denominators 11
-unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
+static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
+
 // functions needed to fill and use the memory table
+
+// converts from integer to duration: used to know this table index
+// what corresponds in terms of duration
 t_duration int2duration(int n);
+// converts from duration to integer: used to know this duration
+// what corresponds in terms table index
 unsigned short int duration2int(t_duration dur);
+// tells you how many durations there are
 int possible_durations();
 
 // manipolation functions
@@ -79,3 +87,17 @@ int possible_durations();
 // - from data structures to lists of numbers and vice versa
 // - from a (voice, duration) representation to (voice, start, duration) and viceversa
 
+// converts from float (0-1) to duration. it performs quantization
+t_duration float2duration(float fduration);
+
+// converts from numerator/denominator to a float (0-1)
+float duration2float(t_duration duration);
+
+// set the first beat of a sequence
+void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float fduration);
+
+//adds a beat at the end of this list
+void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, float fduration);
+
+// used to free the memory allocated by this list
+void freeBeats(t_rhythm_event *currentEvent);
