@@ -23,7 +23,7 @@ if [ $# -eq 0 ]; then
     CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data"
     echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
     echo "The anonymous password is: anoncvs"
-    cvs login
+#    cvs login
 elif [ "$1" == "--help" ]; then
     print_usage
 elif [ "$1" == "-h" ]; then
@@ -42,8 +42,8 @@ for section in abstractions doc extensions externals pd packages scripts; do
 done
 
 # Gem is still separate
-CVSROOT := :pserver:anonymous@cvs.gem.iem.at:/cvsroot/pd-gem
-cvs login
+CVSROOT=:pserver:anonymous@cvs.gem.iem.at:/cvsroot/pd-gem
+#cvs login
 cvs checkout Gem GemLibs
 
 
