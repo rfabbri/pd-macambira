@@ -41,6 +41,11 @@ doc/pddp/pddp_style_guide.pd
 How to add your library of patches
 ==================================
 
+
+For the most up-to-date version of these instructions, see:
+
+   http://puredata.org/docs/developer/build
+
 The best way to start is to copy the complete section of an existing library,
 like memento.  Then do a case-preserving search-and-replace, replacing
 "memento" with the name of your library.  Editors such as emacs will make the
@@ -138,18 +143,6 @@ $(objectsdir):
 
 	 The subdirectory name (e.g. mylibrary) should always be all lowercase.
 
-
-"objects" targets
-    To add your objects to this build system, first make your own target and
-    add it to the "objects" target.  For example: for the RRADical objects,
-    there is a target called "objects_rradical:" which does everything needed
-    to install the RRADical objects.  This includes installing help patches
-    and any other documentation. 
-
-
-"applications" targets:
-   This target is meant for any patch that is intended to be opened up and
-   used, played, ran, etc.  The RRADical the-showcase.pd is a good example
 
 
 

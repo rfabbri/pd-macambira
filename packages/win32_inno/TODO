@@ -1,7 +1,7 @@
 
-- add SMlib from email from Anders
+- Another detail is that the menu item "help/1 manual" results in no action - possibly some link pointing to the wrong place?
 
-- add Gem to noncvs
+- add SMlib from email from Anders
 
 - get Pd compiling on MinGW:.  From Carmen: 
   
@@ -15,8 +15,4 @@
 
 - menu_openhtml on Win32 with rundll should be able to open other filetypes like open on MACOSX.
 
-- fix PD_VERSION, the sed patterns aren't working
-
-- figure out why MinGW-compiled "unauthorized" externals don't work
-
-- get Windows Makefiles for Gem, unauthorized
+- get Windows Makefiles for Gem

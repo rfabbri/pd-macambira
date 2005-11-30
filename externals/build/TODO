@@ -1,6 +1,7 @@
 
-- incorporate %.c building into cross-platform Makefile, and have it work with
-  subdirectories so that libdirs can be compiled here.
+- document smlib building 
+
+- add "test lib" functionality to binary building in externals/Makefile
 
 - simplify Makefile, making just "all" and "install" with subsections for each
   subdir.

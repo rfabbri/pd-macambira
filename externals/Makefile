@@ -37,10 +37,67 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
+CFLAGS = -DPD -DUNIX -Dunix $(OPTIM_FLAGS) \
+    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
+INCLUDES = -I$(pd_src)/src
+LDFLAGS =  
+STRIP = strip --strip-unneeded -R .note -R .comment
+
 #------------------------------------------------------------------------------#
-# BUILD
+# DARWIN
+DARWIN_CFLAGS = $(CFLAGS)
+DARWIN_INCLUDES = $(INCLUDES) -I/sw/include
+DARWIN_LDFLAGS = $(LDFLAGS) -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
+%.pd_darwin: %.c
+	$(CC) $(DARWIN_CFLAGS) $(DARWIN_INCLUDES) -o "$*.o" -c "$*.c"
+	$(CC) $(DARWIN_LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm
+	chmod a-x "$*.pd_darwin"
+	rm -f "$*.o" 
+
+
+#------------------------------------------------------------------------------#
+# LINUX
+LINUX_CFLAGS = $(CFLAGS) -fPIC
+LINUX_INCLUDES = $(INCLUDES)
+LINUX_LDFLAGS = $(LDFLAGS) -Wl,-export_dynamic  -shared
+%.pd_linux: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
+	gcc  $(LINUX_LDFLAGS) -o "$*.pd_linux" "$*.o" -lc -lm 
+	chmod a-x "$*.pd_linux"
+	$(STRIP) $*.pd_linux
+	rm -f "$*.o" 
+
+
+#------------------------------------------------------------------------------#
+# WIN (MinGW)
+WIN_CFLAGS = -mms-bitfields $(CFLAGS)
+WIN_INCLUDES = $-I. -I.. -I$(PD_PATH)/src -IC:/msys/1.0/include
+WIN_LDFLAGS = $(LDFLAGS) -shared -LC:/msys/1.0/lib -L$(PD_PATH)/bin -lpd
+# these are for compatibility
+WIN_DEFINES = \
+	-D'drand48()=((double)rand()/RAND_MAX)' \
+	-D'srand48(n)=srand((n))' \
+	-D'O_NONBLOCK=1' \
+# These don't seem to be needed:
+#	-D'bzero(p,n)=memset(p,0,n)' \
+#	-D'PROT_READ=1' \
+#	-D'MAP_PRIVATE=2' \
+#	-D'O_NDELAY=O_NONBLOCK'
+%.dll: %.c
+	$(CC) $(WIN_CFLAGS) $(WIN_DEFINES) $(WIN_INCLUDES) \
+		 -o "$*.o" -c "../src/$*.c"
+	gcc $(LDFLAGS) -o "$*.dll" "$*.o" 
+	chmod a-x "$*.pd_linux"
+	$(STRIP) "$*.dll"
+	rm "$*.o"
+
+
+
+
+#------------------------------------------------------------------------------#
+# ALL
 all: pre_all_$(OS_NAME) creb cyclone iemabs iemlib iemmatrix pddp pdp pmpd \
-		toxy vbap zexy
+		smlib toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
 	-cd $(externals_src)/build/$(OS_NAME) && make -k 
@@ -97,6 +154,7 @@ help_install: $(helpdir)
 			$(externals_src)/dfx/*/*.pd \
 			$(externals_src)/ext13/doc/*.pd \
 			$(externals_src)/ggee/*/*-help.pd \
+			$(externals_src)/ggee/*/*.gif \
 			$(externals_src)/gem2pdp/*.pd \
 			$(externals_src)/ff/*.pd \
 			$(externals_src)/freeverb~/*.pd \
@@ -362,6 +420,32 @@ pmpd_install: pmpd
 		$(examplesdir)/$(PMPD_NAME)
 
 
+#------------------------------------------------------------------------------#
+# SMLIB
+SMLIB_NAME=smlib
+# exclude SMlib.c since its just for the compiled library
+SMLIB_OBJECTS = $(wildcard $(externals_src)/smlib/source/[a-z]*.c)
+smlib: $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+
+smlib_install: smlib
+	install -d $(objectsdir)/$(SMLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SMLIB_NAME) \
+		--author "Johannes Taelman <johannes.taelman@rug.ac.be>" \
+		--license "GNU GPL" \
+		--description "vector processing, vector analysis, vector synthesis, number stream analysis, number stream filters"
+	install -p $(SMLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(SMLIB_NAME)
+	install -d $(helpdir)/$(SMLIB_NAME)
+	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
+		$(helpdir)/$(SMLIB_NAME)
+	install -d $(manualsdir)/$(SMLIB_NAME)
+	install -p $(externals_src)/smlib/readme.txt $(manualsdir)/$(SMLIB_NAME)
+	install -d $(examplesdir)/$(SMLIB_NAME)
+	install -p $(wildcard $(externals_src)/smlib/examples/*.pd) \
+		$(examplesdir)/$(SMLIB_NAME)
+
+smlib_clean:
+	rm $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+
 
 #------------------------------------------------------------------------------#
 # TOXY
@@ -377,8 +461,7 @@ toxy_install: toxy
 		--author "Kzrysztof Czaja" \
 		--license "BSD" \
 		--description "objects for working with Tcl and Pd's Tk GUI"
-# [tow] is currently broken, it doesn't compile
-	-cd $(externals_src)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
+	cd $(externals_src)/miXed/toxy && $(MAKE) OUT_DIR=$(TOXY_OUT_DIR)
 	install -d $(helpdir)/$(TOXY_NAME)
 	install -p $(externals_src)/miXed/doc/help/toxy/*.*  \
 		$(helpdir)/$(TOXY_NAME)
@@ -400,6 +483,10 @@ unauthorized_install: unauthorized
 # this needs to go here since it produces errors
 	-cd $(externals_src)/unauthorized && $(MAKE) -k
 	install -d $(objectsdir)/$(UNAUTHORIZED_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(UNAUTHORIZED_NAME) \
+		--author "Yves Degoyon" \
+		--license "GNU GPL" \
+		--description "GUI and streaming objects"
 	install -p $(externals_src)/unauthorized/*/*.$(EXTENSION) \
 		$(objectsdir)/$(UNAUTHORIZED_NAME)
 	install -d $(helpdir)/$(UNAUTHORIZED_NAME)
@@ -505,7 +592,7 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: install_clean
+clean: smlib_clean install_clean
 	cd $(externals_src)/build/$(OS_NAME) && make $(DEST_PATHS) clean
 	cd $(externals_src)/hcs/hid && make $(DEST_PATHS) clean
 	cd $(externals_src)/OSCx && make $(DEST_PATHS) clean

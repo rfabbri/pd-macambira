@@ -1,4 +1,6 @@
 
+- document generate-libdir-metafile.sh
+
 - move darwin_app_perms to here and make generic prerelease_clean target which
   is called separately
 

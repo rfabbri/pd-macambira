@@ -2,25 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>standardpath</key>
+	<string>1</string>
 	<key>loadlib1</key>
 	<string>Gem</string>
 	<key>loadlib2</key>
-	<string>xsample</string>
-	<key>loadlib3</key>
-	<string>vasp</string>
-	<key>loadlib4</key>
-	<string>dyn~</string>
-	<key>loadlib5</key>
-	<string>pmpd</string>
-	<key>loadlib6</key>
 	<string>cyclone</string>
-	<key>loadlib7</key>
+	<key>loadlib3</key>
+	<string>iemabs</string>
+	<key>loadlib4</key>
+	<string>iemmatrix</string>
+	<key>loadlib5</key>
 	<string>memento</string>
+	<key>loadlib6</key>
+	<string>pixeltango</string>
+	<key>loadlib7</key>
+	<string>pmpd</string>
 	<key>loadlib8</key>
-	<string>toxy</string>
+	<string>rradical</string>
 	<key>loadlib9</key>
-	<string></string>
-	<key>standardpath</key>
-	<string>1</string>
+	<string>toxy</string>
+	<key>loadlib10</key>
+	<string>unauthorized</string>
+	<key>loadlib11</key>
+	<string>vasp</string>
+	<key>loadlib12</key>
+	<string>xsample</string>
+	<key>loadlib13</key>
+	<string>zexy</string>
 </dict>
 </plist>

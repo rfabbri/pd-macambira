@@ -395,29 +395,34 @@ LICENSE_FILE = $(manualsdir)/$(PD_NAME)/License.html
 license_install:
   # generate HTML version of License
 	install -d $(manualsdir)/$(PD_NAME)
+	-rm $(LICENSE_FILE)
 	touch $(LICENSE_FILE)
 	echo "<html><body>" >> "$(LICENSE_FILE)"
 	echo "<h3>(Parts of this package can be used under " >> "$(LICENSE_FILE)"
-	echo "<a href="PD%20LICENSE.txt">Pd&quot;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
+	echo "<a href="Pd-LICENSE.txt">Pd&quot;s BSD license</a>)</h3>" >> "$(LICENSE_FILE)"
 	echo "<font size=\"-1\">" >> "$(LICENSE_FILE)"
 	cat "$(externals_src)/creb/COPYING" | sed -e 's/^$$/\<P\>/g' >> "$(LICENSE_FILE)"
 	echo "</font></body></html>" >> $(LICENSE_FILE)
 # Pd's license file
-	install -p "$(pd_src)/LICENSE.txt" "$(manualsdir)/$(PD_NAME)/PD LICENSE.txt"
+	install -p "$(pd_src)/LICENSE.txt" "$(manualsdir)/$(PD_NAME)/Pd-LICENSE.txt"
 
 
 
 WELCOME_FILE = $(manualsdir)/$(PD_NAME)/Welcome.html
 welcome_install:
 	install -d $(manualsdir)/$(PD_NAME)
+	-rm $(WELCOME_FILE)
 	touch $(WELCOME_FILE)
-	echo "<html><body><p><p>" >> $(WELCOME_FILE)
-	echo "<CENTER><IMG SRC=\"logo.jpg\">" >> $(WELCOME_FILE)
+	echo "<html><head>" >> $(WELCOME_FILE)
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://puredata.org/ploneCustom.css\" />" >> $(README_FILE)
+	echo "</head>" >> $(README_FILE)
+	echo "<body><p><p>" >> $(WELCOME_FILE)
+	echo "<center><img src=\"\">" >> $(WELCOME_FILE)
 	echo "<h2>Version $(PD_VERSION)</h2>" >> $(WELCOME_FILE)
-	echo "<p>written by Miller S. Puckette</p></CENTER>" >> $(WELCOME_FILE)
-	echo "<FONT SIZE=\"-1\">" >> $(WELCOME_FILE)
+	echo "<p>written by Miller S. Puckette</p></center>" >> $(WELCOME_FILE)
+	echo "<font size=\"-1\">" >> $(WELCOME_FILE)
 	echo "<p>`grep -A9 ACKNOWLEDG $(pd_src)/README.txt`</p>" >> $(WELCOME_FILE)
-	echo "</FONT>" >> $(WELCOME_FILE)
+	echo "</font>" >> $(WELCOME_FILE)
 	echo "</body></html>" >> $(WELCOME_FILE)
 
 
@@ -431,14 +436,26 @@ readme_install:
 	echo "<html>" >> $(README_FILE)
 	echo "<head>" >> $(README_FILE)
 	echo "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />" >> $(README_FILE)
+	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://puredata.org/plone.css\" />" >> $(README_FILE)
 	echo "</head>" >> $(README_FILE)
 	echo "<body>" >> $(README_FILE)
 	echo "<h2>Pure Data $(PD_VERSION)-$(PACKAGE_VERSION)</h2>" 	>> $(README_FILE)
 	echo "<p>Pd is a free real-time computer music software package resembling Max.  It provides a patchable environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</p>" >> $(README_FILE)
 	echo "<p>For more information, go to: <a href=\"http://puredata.org\" target=\"pd\">http://puredata.org</a></p>" >> $(README_FILE)
 	echo "<h3>Installation</h3>" >> $(README_FILE)	
+	echo "<dl><dt>GNU/Linux</dt><dd>" >> $(README_FILE)
+	echo "<p></p>" >> $(README_FILE)
+	echo "<p></p>" >> $(README_FILE)
+	echo "</dd><dt>Mac OS X</dt>" >> $(README_FILE)
+	echo "<dd>" >> $(README_FILE)
 	echo "<p>To install Pd, drag the Pd.app to anywhere in your hard disk.</p>" >> $(README_FILE)	
 	echo "<p>To install Gem, pmpd, xsample, dyn~, and vasp support, copy <code>org.puredata.pd.plist</code> to <code>~/Library/Preferences</code> (<code>~</code> means your home folder).  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)	
+	echo "</dd>" >> $(README_FILE)
+	echo "<dt>Windows</dt><dd>" >> $(README_FILE)
+	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
+	echo "<p>To make sure that all of the libraries are loaded when Pd runs, " >> $(README_FILE)
+	echo "double-click <code>C:\Program Files\pd\pd-settings.reg</code> to import the settings to the registry.</p>" >> $(README_FILE)
+	echo "</dd></dl>" >> $(README_FILE)
 	echo "<h3>Pure Data CVS Developers</h3>" >> $(README_FILE)	
 # this may seem whack, but it generates the list of developers from the SourceForge site:
 	curl 'http://sourceforge.net/project/memberlist.php?group_id=55736' | grep -A2 -e '<td>' | sed 's|\(href="\)|target="w" \1http://sourceforge.net|' >> $(README_FILE)
@@ -448,7 +465,7 @@ readme_install:
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>License</h3>" >> $(README_FILE)	
 	echo "<p>" >> $(README_FILE)
-	echo "The Pd core is licensed under a <a href="PD%20LICENSE.txt">BSD license</a>, almost every other part of this package is available under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  A couple packages have BSD-style licenses too." >> $(README_FILE)
+	echo "The Pd core is licensed under a <a href="Pd-LICENSE.txt">BSD license</a>, almost every other part of this package is available under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  A couple packages have BSD-style licenses too." >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>Included Versions</h3>" >> $(README_FILE)	
 	echo "<p>These externals are all included from the Pd CVS repository:</p>" >> $(README_FILE)

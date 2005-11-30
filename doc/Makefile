@@ -48,6 +48,8 @@ externals-howto_install: $(manualsdir)
 	install -d $(manualsdir)/$(EXTERNALS-HOWTO_NAME)
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
+	curl http://iem.kug.ac.at/pd/externals-HOWTO/HOWTO-externals-en.html > \
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/HOWTO-externals-en.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node1.html
 	curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \

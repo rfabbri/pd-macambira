@@ -145,8 +145,11 @@ DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
-#	install -p -m0444 $(manualsdir)/$(PD_NAME)/PD\ LICENSE.txt \
-#		$(manualsdir)/*.html "$(CWD)/$(DMG_NAME)"
+	install -p -m0444 $(manualsdir)/Pd/Pd-LICENSE.txt \
+		$(manualsdir)/Pd/License.html \
+		$(manualsdir)/Pd/Welcome.html \
+		$(manualsdir)/Pd/ReadMe.html \
+		"$(CWD)/$(DMG_NAME)"
 	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 

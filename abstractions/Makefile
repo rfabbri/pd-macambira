@@ -201,12 +201,12 @@ pixeltango_install:
 	install -d $(objectsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/abstractions/*.pd \
 		$(objectsdir)/$(PIXELTANGO_NAME)
-	install -d $(objectsdir)/$(PIXELTANGO_NAME)/fx
 	install -p $(abstractions_src)/pixelTANGO/abstractions/fx/*.pd \
-		$(objectsdir)/$(PIXELTANGO_NAME)/fx
+		$(objectsdir)/$(PIXELTANGO_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIXELTANGO_NAME) \
 		--author "Ben Bogart" \
 		--license "GNU GPL" \
+		--version "0.3.4" \
 		--description "objects for creating visuals in a live performance setting"
 	install -d $(helpdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/help/*.* \
@@ -230,18 +230,15 @@ rradical_install:
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(RRADICAL_NAME) \
 		--author "Frank Barknecht" \
 		--license "GNU GPL"
-	install -d $(objectsdir)/$(RRADICAL_NAME)/control
+	install -d $(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/control/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/control
-	install -d $(objectsdir)/$(RRADICAL_NAME)/effects
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/effects/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/effects
-	install -d $(objectsdir)/$(RRADICAL_NAME)/instruments
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/instruments/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/instruments
-	install -d $(objectsdir)/$(RRADICAL_NAME)/stuff
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/stuff/*.* | \
-		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)/stuff
+		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
 	install -d $(examplesdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/usecases/*.* \
 		$(examplesdir)/$(RRADICAL_NAME)
