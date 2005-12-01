@@ -107,7 +107,7 @@ there are plenty of such algos, we must just copy them down.
 static t_class *chords_memory_class;
 
 // how can a chord be?
-#define TYPES_NUM 10 // keep me updated
+#define TYPES_NUM 11 // keep me updated
 typedef enum {
 			kMaj=0, 
 			kMin=1, 
@@ -118,12 +118,15 @@ typedef enum {
 			kMin7=6,
 			kMinMaj7=7,
 			kDim7=8,
-			kHalfDim7=9
+			kHalfDim7=9,
+			//pland adding 9ths 30.11.12
+			kDomb9=10
 			} chord_type_t;
 
 // how many tones do we have in our octave?
 #define TONES_NUM 12 // keep me updated
-typedef enum {I=0,
+typedef enum {
+			I=0,
 			Id=1,
 			II=2,
 			IId=3,
@@ -152,7 +155,8 @@ typedef struct _chord
 
 // enumeration of absolute notes 
 // i'll need this when parsing strings like "C major"
-typedef enum {C=0,
+typedef enum {
+			C=0,
 			Db=1,
 			D=2,
 			Eb=3,
@@ -318,6 +322,9 @@ chord_type_t from_string_to_type(const char *substr)
 		return kAug;
 	if (strstr(substr, "dominant 7th"))
 		return kDom7;
+	// pland adding chords 30.11.05
+	if (strstr(substr, "dominant b9"))
+		return kDomb9;
 	// TODO: other chords
 	// beware when adding new chords
 	// put shorter names at end of this function!
@@ -371,6 +378,7 @@ void chords_memory_chord2string(t_chords_memory *x, char *string, chord_t chord)
 		case kHalfDim7:	strcat(string, "half diminished 7th"); break;
 		case kDim7:		strcat(string, "diminished 7th");	  break;
 		case kMinMaj7:	strcat(string, "minor/major 7th");	  break;
+		case kDomb9:	strcat(string, "dominant b9");		  break;
 
 	}
 }
