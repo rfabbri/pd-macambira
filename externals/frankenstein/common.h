@@ -27,11 +27,6 @@ typedef struct _note_event
 	struct t_note_event *next;  // this is a list, link to the next element
 } t_note_event;
 
-// manipolation functions
-
-// TODO: 
-// - from data structures to lists of numbers and vice versa
-// - from a (voice, rest, duration) representation to (voice, start, duration) and viceversa
 
 // --------- rhythm notation
 
@@ -81,7 +76,7 @@ unsigned short int duration2int(t_duration dur);
 // tells you how many durations there are
 int possible_durations();
 
-// manipolation functions
+// ----------- rhythm manipolation functions
 
 // TODO: 
 // - from data structures to lists of numbers and vice versa
@@ -101,3 +96,15 @@ void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, flo
 
 // used to free the memory allocated by this list
 void freeBeats(t_rhythm_event *currentEvent);
+
+// -------- notes manipulation functions
+
+// set the first beat of a sequence
+void setFirstNote(t_note_event **firstEvent, unsigned short int voice, float fduration, t_note note);
+
+//adds a beat at the end of this list
+void concatenateNote(t_note_event *currentEvent, unsigned short int voice, float fduration, t_note note);
+
+// used to free the memory allocated by this list
+void freeNotes(t_note_event *currentEvent);
+

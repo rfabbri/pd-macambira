@@ -157,3 +157,73 @@ void freeBeats(t_rhythm_event *currentEvent)
 	} while(next);
 
 }
+
+
+// set the first note of a sequence
+void setFirstNote(t_note_event **firstEvent, unsigned short int voice, float fduration, t_note note)
+{
+	t_duration res;
+	t_note_event *newElement;
+	// convert from float to duration
+	res = float2duration(fduration);
+	// allocate a new element of the list
+	newElement = malloc(sizeof(t_note_event));
+	// set the pointers
+	newElement->previous = 0;
+	newElement->next = 0;
+	newElement->voice=voice;
+	newElement->note.played = note.played;
+	newElement->note.chord = note.chord;
+	newElement->note.diatonic = note.diatonic;
+	newElement->note.interval = note.interval;
+	newElement->duration.numerator = res.numerator;
+	newElement->duration.denominator = res.denominator;
+	*firstEvent = newElement;
+}
+
+//adds a note at the end of this list
+void concatenateNote(t_note_event *currentEvent, unsigned short int voice, float fduration, t_note note)
+{
+	t_duration res;
+	t_note_event *newElement, *lastElement;
+	lastElement = currentEvent;
+	while(lastElement->next)
+		lastElement = lastElement->next;
+	// convert from float to duration
+	res = float2duration(fduration);
+	// allocate a new element of the list
+	newElement = (t_rhythm_event *) malloc(sizeof(t_note_event));
+	// set the pointers
+	newElement->previous = lastElement;
+	newElement->next = 0;
+	lastElement->next = newElement;
+	newElement->voice=voice;
+	newElement->note.played = note.played;
+	newElement->note.chord = note.chord;
+	newElement->note.diatonic = note.diatonic;
+	newElement->note.interval = note.interval;
+	newElement->duration.numerator = res.numerator;
+	newElement->duration.denominator = res.denominator;
+
+}
+
+// used to free the memory allocated by this list
+void freeNotes(t_note_event *currentEvent)
+{
+	t_note_event *prev;
+	t_note_event *next;
+
+	// go to the first element of the list
+	while(currentEvent->previous)
+		currentEvent = currentEvent->previous;
+
+	// now free each element
+	next=currentEvent->next;
+	do
+	{
+		prev = currentEvent;
+		next = currentEvent->next;
+		free(currentEvent);
+	} while(next);
+
+}
