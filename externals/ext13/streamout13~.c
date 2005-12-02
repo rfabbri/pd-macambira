@@ -379,7 +379,7 @@ void streamout13_setup(void)
 {
     streamout13_class = class_new(gensym("streamout13~"), (t_newmethod) streamout13_new, 0,
     	sizeof(t_streamout13), 0, A_DEFSYM, A_DEFFLOAT,A_DEFFLOAT, 0);
-    class_sethelpsymbol(streamout13_class, gensym("streamio13~"));
+    
     class_addmethod(streamout13_class, (t_method) streamout13_connect,gensym("connect"), A_SYMBOL, A_DEFFLOAT, 0);
     class_addmethod(streamout13_class, (t_method) streamout13_disconnect, gensym("disconnect"), 0);
     class_addfloat(streamout13_class,streamout13_float);

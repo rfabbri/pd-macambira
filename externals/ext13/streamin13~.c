@@ -305,7 +305,7 @@ void streamin13_setup(void)
     streamin13_class = class_new(gensym("streamin13~"), 
     	(t_newmethod) streamin13_new, (t_method) streamin13_free,
     	sizeof(t_streamin13), A_DEFSYM, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_sethelpsymbol(streamin13_class, gensym("streamio13~"));
+    
     class_addmethod(streamin13_class, nullfn, gensym("signal"), 0);
     class_addmethod(streamin13_class, (t_method) streamin13_dsp, gensym("dsp"), 0);
     class_addmethod(streamin13_class, (t_method)streamin13_port,gensym("port"),A_DEFFLOAT,0);

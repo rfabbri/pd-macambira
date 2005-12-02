@@ -112,7 +112,7 @@ void sigreceive13_setup(void)
     	(t_newmethod)sigreceive13_new, 0,
     	sizeof(t_sigreceive13),0, A_DEFSYM, 0);
     class_addcreator((t_newmethod)sigreceive13_new, gensym("r13~"), A_DEFSYM, 0);
-    class_sethelpsymbol(sigreceive13_class, gensym("ext13"));
+    
     class_addmethod(sigreceive13_class, (t_method)sigreceive13_set, gensym("set"),
     	A_SYMBOL, 0);
     class_addmethod(sigreceive13_class, (t_method)sigreceive13_dsp, gensym("dsp"),

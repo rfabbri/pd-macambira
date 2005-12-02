@@ -73,7 +73,7 @@ void receive13_setup(void)
     receive13_class = class_new(gensym("receive13"), (t_newmethod)receive13_new, 
         (t_method)receive13_free, sizeof(t_receive13), 0, A_DEFSYM, 0);
     class_addcreator((t_newmethod)receive13_new, gensym("r13"), A_DEFSYM, 0);
-    class_sethelpsymbol(receive13_class, gensym("ext13"));
+    
     class_addbang(receive13_class, receive13_bang);
     class_addfloat(receive13_class, (t_method)receive13_float);
     class_addsymbol(receive13_class, receive13_symbol);

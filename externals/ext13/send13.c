@@ -65,7 +65,7 @@ void send13_setup(void)
     send13_class = class_new(gensym("send13"), (t_newmethod)send13_new, 0,
     	sizeof(t_send13), 0, A_DEFSYM, 0);
     class_addcreator((t_newmethod)send13_new, gensym("s13"), A_DEFSYM, 0);
-    class_sethelpsymbol(send13_class, gensym("ext13"));
+    
     class_addbang(send13_class, send13_bang);
     class_addfloat(send13_class, send13_float);
     class_addsymbol(send13_class, send13_symbol);
