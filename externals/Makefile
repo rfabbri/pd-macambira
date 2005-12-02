@@ -96,8 +96,8 @@ WIN_DEFINES = \
 
 #------------------------------------------------------------------------------#
 # ALL
-all: pre_all_$(OS_NAME) creb cyclone iemabs iemlib iemmatrix pddp pdp pmpd \
-		smlib toxy vbap zexy
+all: pre_all_$(OS_NAME) creb cxc cyclone ext13 iemabs iemlib iemmatrix pddp \
+pdp pmpd smlib toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
 	-cd $(externals_src)/build/$(OS_NAME) && make -k 
@@ -116,9 +116,9 @@ pre_all_unknown:
 #------------------------------------------------------------------------------#
 # INSTALL
 install: all $(objectsdir) help_install objects_install unfiltered_install \
- creb_install cyclone_install iemabs_install iemabs_install iemmatrix_install \
- pddp_install pdp_install pmpd_install toxy_install unauthorized_install \
-	vbap_install zexy_install
+creb_install cxc_install cyclone_install ext13_install iemabs_install \
+iemabs_install iemmatrix_install pddp_install pdp_install pmpd_install \
+toxy_install unauthorized_install vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -150,9 +150,7 @@ help_install: $(helpdir)
 				$(helpdir)
 	install -p \
 			$(externals_src)/creb/doc/examples/*.pd \
-			$(externals_src)/cxc/reference/*.pd \
 			$(externals_src)/dfx/*/*.pd \
-			$(externals_src)/ext13/doc/*.pd \
 			$(externals_src)/ggee/*/*-help.pd \
 			$(externals_src)/ggee/*/*.gif \
 			$(externals_src)/gem2pdp/*.pd \
@@ -202,14 +200,29 @@ help_install: $(helpdir)
 #------------------------------------------------------------------------------#
 # TEMPLATE
 TEMPLATE_NAME=template
-template:
-
+TEMPLATE_OBJECTS = $(wildcard $(externals_src)/template/*.c)
+template: $(TEMPLATE_OBJECTS:.c=.$(EXTENSION))
 
 template_install: template
 	install -d $(objectsdir)/$(TEMPLATE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TEMPLATE_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(TEMPLATE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(TEMPLATE_NAME)
 	install -d $(helpdir)/$(TEMPLATE_NAME)
+	install -p $(wildcard $(externals_src)/template/help/*.pd) \
+		$(examplesdir)/$(TEMPLATE_NAME)
 	install -d $(manualsdir)/$(TEMPLATE_NAME)
+	install -p $(externals_src)/template/README.txt $(manualsdir)/$(TEMPLATE_NAME)
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
+	install -p $(wildcard $(externals_src)/template/examples/*.pd) \
+		$(examplesdir)/$(TEMPLATE_NAME)
+
+template_clean:
+	-rm -f -- $(externals_src)/template/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/template/*.bak
 
 
 #------------------------------------------------------------------------------#
@@ -227,7 +240,36 @@ creb_install: creb
 #	install -d $(manualsdir)/$(CREB_NAME)
 #	install -d $(examplesdir)/$(CREB_NAME)
 
+creb_clean:
+	-rm -f -- $(externals_src)/creb/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/creb/*.bak
 
+
+#------------------------------------------------------------------------------#
+# CXC
+CXC_NAME=cxc
+CXC_OBJECTS = $(wildcard $(externals_src)/cxc/???*.c)
+cxc: $(CXC_OBJECTS:.c=.$(EXTENSION))
+
+cxc_install: cxc
+	install -d $(objectsdir)/$(CXC_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CXC_NAME) \
+		--author "jdl@xdv.org" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(CXC_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(CXC_NAME)
+	install -d $(helpdir)/$(CXC_NAME)
+	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
+		$(helpdir)/$(CXC_NAME)
+	install -d $(manualsdir)/$(CXC_NAME)
+	install -p $(externals_src)/cxc/README \
+		 $(manualsdir)/$(CXC_NAME)/README.txt
+
+cxc_clean:
+	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/cxc/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/cxc/*.bak
 
 #------------------------------------------------------------------------------#
 # CYCLONE
@@ -261,6 +303,36 @@ cyclone_install: cyclone
 		install -p *.* $(examplesdir)/$(CYCLONE_NAME)
 
 
+
+#------------------------------------------------------------------------------#
+# EXT13
+EXT13_NAME=ext13
+# sfread.c doesn't compile, so exclude it
+EXT13_OBJECTS = $(wildcard $(externals_src)/ext13/???????*.c) \
+	$(externals_src)/ext13/ftos.c $(externals_src)/ext13/send13.c 
+ext13: $(EXT13_OBJECTS:.c=.$(EXTENSION))
+
+ext13_test:
+	@echo "objects: $(EXT13_OBJECTS)"
+
+
+ext13_install: ext13
+	install -d $(objectsdir)/$(EXT13_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(EXT13_NAME) \
+		--author "d13@klingt.org" \
+		--version "0.17"
+	install -p $(EXT13_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EXT13_NAME)
+	install -d $(helpdir)/$(EXT13_NAME)
+	install -p $(wildcard $(externals_src)/ext13/doc/*.pd) \
+		$(helpdir)/$(EXT13_NAME)
+	install -d $(manualsdir)/$(EXT13_NAME)
+	install -p $(externals_src)/ext13/README \
+		$(manualsdir)/$(EXT13_NAME)/README.txt
+
+ext13_clean:
+	-rm -f -- $(externals_src)/ext13/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/ext13/*.bak
+	-rm -f -- $(externals_src)/ext13/*~
 
 
 
@@ -444,7 +516,9 @@ smlib_install: smlib
 		$(examplesdir)/$(SMLIB_NAME)
 
 smlib_clean:
-	rm $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/smlib/*.bak
+	-rm -f -- $(externals_src)/smlib/*~
 
 
 #------------------------------------------------------------------------------#
@@ -592,7 +666,7 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: smlib_clean install_clean
+clean: creb_clean cxc_clean ext13_clean smlib_clean install_clean
 	cd $(externals_src)/build/$(OS_NAME) && make $(DEST_PATHS) clean
 	cd $(externals_src)/hcs/hid && make $(DEST_PATHS) clean
 	cd $(externals_src)/OSCx && make $(DEST_PATHS) clean

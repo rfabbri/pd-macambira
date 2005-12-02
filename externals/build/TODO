@@ -1,5 +1,5 @@
 
-- document smlib building 
+- document externals building following the smlib example
 
 - add "test lib" functionality to binary building in externals/Makefile
 
@@ -25,7 +25,6 @@
   		maxlib/scale
 		Gem/scale
 		iem/prepend
-		cxc/prepend
 		flext/prepend
 
 - add these to the build system:
