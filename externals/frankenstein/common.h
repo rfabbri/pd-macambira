@@ -43,25 +43,31 @@ struct t_rhythm_event
 
 // rhythms memory graph
 
-/*
+
 // list implementation
 // this implements a graph that stores the memory of the current rhythm sub-elements
 // list of links
-typedef struct _rhythm_memory_arc
-{
-	float weight;
-	struct t_rhythm_memory_node *to_node; // the target of this link (arc)
-	struct t_rhythm_memory_arc *next_arc; // next link in the list
-} t_rhythm_memory_arc;
+// the actual implementation will be an array of nodes, each node 
+typedef struct t_rhythm_memory_arc t_rhythm_memory_arc;
+typedef struct t_rhythm_memory_node t_rhythm_memory_node;
 // graph node
-typedef struct _rhythm_memory_node
+typedef struct t_rhythm_memory_node
 {
 	t_duration duration;
-	struct t_rhythm_memory_arc *arcs; // the list of arcs to other nodes
-} t_rhythm_memory_node;
-*/
-// with a table
-// simpler and most of all non recursive when searching nodes!
+	t_rhythm_memory_arc *arcs; // the list of arcs to other nodes
+} ;
+// graph arc
+struct t_rhythm_memory_arc
+{
+	unsigned short int weight;
+	t_rhythm_memory_node *to_node; // the target of this link (arc)
+	t_rhythm_memory_arc *next_arc; // next link in the list
+} ;
+// it will be arranged in a heap list?
+
+// add an arc to this node
+void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, t_rhythm_memory_node *dstNode);
+
 #define num_possible_denominators 11
 static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
 

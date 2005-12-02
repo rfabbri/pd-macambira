@@ -158,6 +158,32 @@ void freeBeats(t_rhythm_event *currentEvent)
 
 }
 
+void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, t_rhythm_memory_node *dstNode)
+{
+	t_rhythm_memory_arc *newArc;
+	t_rhythm_memory_arc *lastArc;
+
+	// create a new arc
+	newArc = (t_rhythm_memory_arc *) malloc(sizeof(t_rhythm_memory_arc));
+	newArc->to_note = dstNode;
+	newArc->weight = 1;
+	// go to the last arc in the list
+	// and add this arc as the last
+	lastArc = srcNode->arcs;
+	if (lastArc)
+	{
+		// this is not the first arc
+		while(lastArc->next_arc)
+			lastArc = lastArc->next_arc;
+		lastArc->next_arc = newArc;
+	} else
+	{
+		// this is the first arc
+		srcNode->arcs = newArc;
+	}
+}
+
+// ------------------- themes manipulation functions
 
 // set the first note of a sequence
 void setFirstNote(t_note_event **firstEvent, unsigned short int voice, float fduration, t_note note)
