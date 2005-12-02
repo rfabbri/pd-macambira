@@ -13,7 +13,7 @@ CWD := $(shell pwd)
 # these are setup to be overridden by the packages/Makefile
 cvs_root_dir = $(CWD)/..
 DESTDIR = $(CWD)/build/
-BUILDLAYOUT_DIR = $(CWD)
+BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
 # default target
 default: all
