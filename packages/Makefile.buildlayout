@@ -81,18 +81,20 @@ libdir = $(DESTDIR)$(prefix)/lib
 mandir = $(DESTDIR)$(prefix)/man
 
 ifeq ($(OS_NAME),darwin)
-  objectsdir = $(DESTDIR)$(prefix)/extra
-  pddocdir = $(DESTDIR)$(prefix)/doc
+  libpddir = $(DESTDIR)$(prefix)
+  libpdbindir = $(bindir)
   else
     ifeq ($(OS_NAME),win)
-      objectsdir = $(DESTDIR)$(prefix)/extra
-      pddocdir = $(DESTDIR)$(prefix)/doc
+      libpddir = $(DESTDIR)$(prefix)
+      libpdbindir = $(bindir)
     else
-      objectsdir = $(libdir)/pd/extra
-      pddocdir = $(libdir)/pd/doc
+      libpddir = $(libdir)/pd
+      libpdbindir = $(libpdbindir)/bin
     endif
 endif
 
+objectsdir = $(libpddir)/extra
+pddocdir = $(libpddir)/doc
 examplesdir = $(pddocdir)/examples
 helpdir = $(pddocdir)/5.reference
 manualsdir = $(pddocdir)/manuals
@@ -218,11 +220,17 @@ cruft_clean:
 	-rm -f -- *.*~
 	-rm -f -- Makefile~ Makefile.buildlayout~
 # sed replace litter
-	-rm -f -- */*/*/*/*.*.bak
-	-rm -f -- */*/*/*.*.bak
-	-rm -f -- */*/*.*.bak
-	-rm -f -- */*.*.bak
-	-rm -f -- *.*.bak
+	-rm -f -- */*/*/*/*.bak
+	-rm -f -- */*/*/*.bak
+	-rm -f -- */*/*.bak
+	-rm -f -- */*.bak
+	-rm -f -- *.bak
+# patching replace litter
+	-rm -f -- */*/*/*/*.rej
+	-rm -f -- */*/*/*.rej
+	-rm -f -- */*/*.rej
+	-rm -f -- */*.rej
+	-rm -f -- *.rej
 # autoconf cache
 	-rm -rf -- */*/*/*/autom4te.cache
 	-rm -rf -- */*/*/autom4te.cache

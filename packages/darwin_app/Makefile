@@ -89,6 +89,7 @@ rez_install:
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
+	export MACOSX_DEPLOYMENT_TARGET=10.3
 	cd $(packages_src) && \
 		make $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
@@ -160,14 +161,16 @@ clean: darwin_app_clean	darwin_app_externals_flext_clean \
 
 
 darwin_app_clean:
-	-sudo rm -Rf -- $(BUILD_BASE) "$(DMG_NAME)" 
+	-sudo rm -Rf -- $(PD_APP_CONTENTS)/Frameworks
+	-rm -f -- $(PD_APP_CONTENTS)/Plugins $(PD_APP_CONTENTS)/Info.plist
+	-rm -f -- $(PD_APP_CONTENTS)/MacOS/Pd
+	-rmdir  $(PD_APP_CONTENTS)/MacOS
+	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
+	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
+	-rm -f -- $(DESTDIR)
 	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
 
-
-
-
-	cd $(gem_src)/Gem && xcodebuild clean
 
 darwin_app_externals_flext_clean:
 	cd $(externals_src)/footils/syncgrain && make -f makefile.pd-darwin clean

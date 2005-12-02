@@ -9,13 +9,13 @@ diff -u -w -r1.8 makefile.in
  $(BIN_DIR)/pdreceive: u_pdreceive.c
  	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
  
-+# MACOSX_DEPLOYMENT_TARGET=10.2 is necessary on Mac OS X to support weak
++# MACOSX_DEPLOYMENT_TARGET=10.3 is necessary on Mac OS X to support weak
 +# linking of frameworks.  Since its just a environment variable, it should be
-+# safely ignored on other platforms.  <hans@eds.org>
++# safely ignored on other platforms.  <hans@at.or.at>
  $(PDEXEC): $(OBJ) 
 -	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
 -	$(LIB)
-+	cd ../obj; MACOSX_DEPLOYMENT_TARGET=10.2 $(CC) $(LDFLAGS) $(DBG_CFLAGS) \
++	cd ../obj; MACOSX_DEPLOYMENT_TARGET=10.3 $(CC) $(LDFLAGS) $(DBG_CFLAGS) \
 +		-o $(PDEXEC) $(OBJ) $(LIB)
  
  $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)

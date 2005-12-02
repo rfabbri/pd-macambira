@@ -1,4 +1,6 @@
 
+- try out FFTW patch from patch tracker
+
 - document generate-libdir-metafile.sh
 
 - move darwin_app_perms to here and make generic prerelease_clean target which

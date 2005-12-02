@@ -92,6 +92,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
 				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
+				libpddir=$(libpddir) \
 				UNAME=$(UNAME)
 
 
@@ -136,10 +137,13 @@ gem:
 
 #------------------------------------------------------------------------------
 # pd
-# pd's makefile has some of its own variables that need to be remapped,
-# this relies on patches/build_vars_4_makefile.in.patch.
 
-PD_CONFIGURE_FLAGS = 
+ifeq ($(OS_NAME),win)
+  PD_CONFIGURE_FLAGS = 
+else
+  PD_CONFIGURE_FLAGS = --enable-jack
+endif
+
 PD_BUILD_FLAGS = 
 
 # Pd sometimes needs a specific autoconf, which is labeled differently on different
@@ -148,16 +152,6 @@ PD_BUILD_FLAGS =
 PD_AUTOCONF = autoconf
 
 pd:
-	@echo "OS_NAME $(OS_NAME)"
-	@echo "==================================================================="
-	@echo "DESTDIR $(DESTDIR)  libpdbindir $(libpdbindir)"
-	@echo "==================================================================="
-	@echo "DEST_PATHS $(DEST_PATHS)"
-	@echo "==================================================================="
-	@echo "DEST_PATHS $(DEST_PATHS)"
-	@echo "==================================================================="
-	@echo "PD_BUILD_FLAGS $(PD_BUILD_FLAGS)"
-	@echo "==================================================================="
 	-cd $(pd_src)/src/ && $(PD_AUTOCONF)
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
@@ -532,10 +526,6 @@ devsymlinks:
 
 patch_pd:
 	@echo pd_src $(pd_src)
-# change Pd's version number to reflect the extended build
-	cd $(pd_src)/src/ && \
-		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
-		mv s_main.c.tmp s_main.c
 # apply all platform-neutral patches
 	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
@@ -547,23 +537,35 @@ patch_pd:
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
 	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
+# change Pd's version number to reflect the extended build
+	cd $(pd_src)/src/ && \
+		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
+		mv s_main.c.tmp s_main.c
+	for file in $(wildcard *.[ch]); do \
+		sed 's/MACOSX/__APPLE__/g' $${file} > $${file}.tmp && \
+			mv -f $${file}.tmp $$file;\
+	done
 	@echo " "
 	@echo "patching succeeded!"
 
 
 unpatch_pd:
+	for file in $(wildcard *.[ch]); do \
+		sed 's/__APPLE__/MACOSX/g' $${file} > $${file}.tmp && \
+			mv -f $${file}.tmp $$file;\
+	done
 # this sed pattern won't work with TEST versions
 	cd $(pd_src)/src && \
 		sed 's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
 			s_main.c > s_main.c.tmp && \
 		mv s_main.c.tmp s_main.c
-# apply all platform-neutral patches
-	for patch in $(wildcard $(CWD)/patches/*.patch); do \
+# apply all platform-specific patches
+	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
-# apply all platform-specific patches
-	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
+# apply all platform-neutral patches
+	for patch in $(wildcard $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
@@ -605,6 +607,11 @@ clean: gem_clean pd_clean
 
 
 distclean: clean cruft_clean
+	cd $(abstractions_src) && make distclean
+	cd $(doc_src) && make distclean
+	cd $(extensions_src) && make distclean
+	cd $(externals_src) && make distclean
+	cd $(pd_src) && make distclean
 
 test:
 	@echo "PD_VERSION: $(PD_VERSION)"
@@ -616,6 +623,8 @@ test:
 	@echo "LIBDIR  $(libdir)"
 	@echo "OBJECTSDIR  $(objectsdir)"
 	@echo "PDDOCDIR  $(pddocdir)"
+	@echo "LIBPDDIR  $(libpddir)"
+	@echo "LIBPDBINDIR  $(libpdbindir)"
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"

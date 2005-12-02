@@ -1,7 +1,15 @@
 
-- Another detail is that the menu item "help/1 manual" results in no action - possibly some link pointing to the wrong place?
+- check out using env vars in Path settings in registry, or make relative paths
 
-- add SMlib from email from Anders
+- move gripd files to pd\gripd
+
+- Another detail is that the menu item "help/1 manual" results in no action -
+  possibly some link pointing to the wrong place?  It turns out that the
+  rundll "open" thingy isn't working...
+      - make Pd.exe using MinGW's "start.exe" like MacOSX's "open"
+      - menu_openhtml on Win32 with rundll should be able to open other
+        filetypes like open on MACOSX.
+
 
 - get Pd compiling on MinGW:.  From Carmen: 
   
@@ -10,9 +18,5 @@
   	 and such first, although you can use a static path to MSVC-generated .libs
   	 if you dont feel like doing that.."
 
-
-- make Pd.exe using MinGW's "start.exe" like MacOSX's "open"
-
-- menu_openhtml on Win32 with rundll should be able to open other filetypes like open on MACOSX.
 
 - get Windows Makefiles for Gem

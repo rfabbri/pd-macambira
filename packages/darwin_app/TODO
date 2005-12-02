@@ -16,6 +16,12 @@
   guidelines:
 http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles/WhereToPutFiles.html
 
+- Pd should then test to see if Jack is available before switching to it,
+  otherwise it'll just crash.  Here's apple's method of testing:
+
+  http://developer.apple.com/documentation/mac/runtimehtml/RTArch-43.html
+
+
 - help menu
 
   	 - check up on this bug: Opening Help patches from "Pure Documentation"
