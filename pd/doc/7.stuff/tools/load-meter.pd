@@ -1,10 +1,10 @@
 #N canvas 161 261 299 317 12;
-#X floatatom 118 256;
+#X floatatom 118 256 0 0 0 0 - - -;
 #X obj 118 168 cputime;
 #X obj 118 28 loadbang;
 #X obj 118 112 metro 1000;
 #X msg 118 56 1;
-#X floatatom 118 84;
+#X floatatom 118 84 0 0 0 0 - - -;
 #X obj 118 140 t b b;
 #X obj 118 228 * 0.1;
 #X obj 118 197 int;
