@@ -1,7 +1,7 @@
 #include <m_pd.h>
 #include "g_canvas.h"
 
-#ifndef NT
+#ifdef __gnu_linux__
 #include <sys/mman.h>
 #endif
 #include <stdio.h>

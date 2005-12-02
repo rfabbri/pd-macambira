@@ -1,6 +1,6 @@
 #include "m_pd.h"
 
-#ifndef NT
+#ifdef __gnu_linux__
 #include <sys/mman.h>
 #endif
 #include <sys/types.h>
