@@ -100,7 +100,7 @@ float duration2float(t_duration duration)
 	return (float) (((float)duration.numerator) / ((float)duration.denominator));
 }
 
-void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float fduration)
+void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float fduration, unsigned short int played)
 {
 	t_duration res;
 	t_rhythm_event *newElement;
@@ -112,12 +112,13 @@ void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float f
 	newElement->previous = 0;
 	newElement->next = 0;
 	newElement->voice=voice;
+	newElement->played=played;
 	newElement->duration.numerator = res.numerator;
 	newElement->duration.denominator = res.denominator;
 	*firstEvent = newElement;
 }
 
-void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, float fduration)
+void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, float fduration, unsigned short int played)
 {
 	t_duration res;
 	t_rhythm_event *newElement, *lastElement;
@@ -133,6 +134,7 @@ void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, flo
 	newElement->next = 0;
 	lastElement->next = newElement;
 	newElement->voice=voice;
+	newElement->played=played;
 	newElement->duration.numerator = res.numerator;
 	newElement->duration.denominator = res.denominator;
 
@@ -165,7 +167,7 @@ void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, t_rhythm_memory_node
 
 	// create a new arc
 	newArc = (t_rhythm_memory_arc *) malloc(sizeof(t_rhythm_memory_arc));
-	newArc->to_note = dstNode;
+	newArc->to_node = dstNode;
 	newArc->weight = 1;
 	// go to the last arc in the list
 	// and add this arc as the last
@@ -182,6 +184,108 @@ void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, t_rhythm_memory_node
 		srcNode->arcs = newArc;
 	}
 }
+
+// initialize this representation, allocates memory for the pointers
+void init_rhythm_memory_representation(t_rhythm_memory_representation *this_rep)
+{
+	this_rep->transitions = (t_rhythm_memory_node *) malloc(sizeof(t_rhythm_memory_node) * possible_durations());
+	this_rep->main_rhythm = 0;
+	this_rep->similar_rhythms = 0;
+}
+
+// add a new rhythm in the list of similar thythms related to one main rhythm
+void add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm)
+{
+	t_rhythm_memory_element *curr;
+	t_rhythm_memory_element *newElement;
+	// creates a new element of the list of similar rhythms
+	newElement = (t_rhythm_memory_element *) malloc(sizeof(t_rhythm_memory_element));
+	newElement->rhythm = new_rhythm;
+	newElement->next = 0;
+	// finds the last element and adds itself
+	curr = this_rep->similar_rhythms;
+	if (curr)
+	{
+		while (curr->next)
+			curr=curr->next;
+		curr->next = newElement;
+
+	} else
+	{
+		this_rep->similar_rhythms = newElement;
+	}
+
+
+}
+
+// from (duration) to (start) style
+void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
+{
+	t_rhythm_event *oldCurr, *newElement, *oldPrev;
+	float diff, currMoment;
+	t_duration dur_tmp;
+
+	// allocate the first event
+	oldCurr = oldStyle;
+	oldPrev = 0;
+	currMoment = 0;
+	
+	// look for the first beat played in old rhythm
+	while (oldCurr && (! (oldCurr->played)))
+	{
+		// prepare for the next event
+		dur_tmp.numerator = oldCurr->duration.numerator;
+		dur_tmp.denominator = oldCurr->duration.denominator;
+		currMoment = duration2float(dur_tmp);
+		oldPrev = oldCurr;
+		oldCurr = oldCurr->next;
+	}
+
+	if (currMoment == 0)
+		return; // empty rhythm?!?
+
+	// now in currMoment there is the moment of the first played beat
+	// i can set the first one and initialize the new style
+	newElement = (t_rhythm_event *) malloc(sizeof(t_rhythm_event));
+	*newStyle = newElement;
+	dur_tmp = float2duration(currMoment);
+	newElement->duration.numerator = dur_tmp.numerator;
+	newElement->duration.denominator = dur_tmp.denominator;
+	newElement->previous = oldPrev;
+	if (oldPrev)
+		oldPrev->next = newElement;
+
+	while (oldCurr)
+	{
+		if (oldCurr->played)
+		{
+			// allocate a new element
+			newElement = (t_rhythm_event *) malloc(sizeof(t_rhythm_event));
+			// set its value
+			dur_tmp = float2duration(currMoment);
+			newElement->duration.numerator = dur_tmp.numerator;
+			newElement->duration.denominator = dur_tmp.denominator;
+			newElement->previous = oldPrev;
+			if (oldPrev)
+				oldPrev->next = newElement;
+		}
+		// prepare for the next event
+		dur_tmp.numerator = oldCurr->duration.numerator;
+		dur_tmp.denominator = oldCurr->duration.denominator;
+		currMoment = duration2float(dur_tmp);
+		oldPrev = oldCurr;
+		oldCurr = oldCurr->next;
+	}
+
+
+}
+
+// from (start) to (duration) style
+void swap_rhythm_to_duration(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
+{
+
+}
+
 
 // ------------------- themes manipulation functions
 
@@ -218,7 +322,7 @@ void concatenateNote(t_note_event *currentEvent, unsigned short int voice, float
 	// convert from float to duration
 	res = float2duration(fduration);
 	// allocate a new element of the list
-	newElement = (t_rhythm_event *) malloc(sizeof(t_note_event));
+	newElement = (t_note_event *) malloc(sizeof(t_note_event));
 	// set the pointers
 	newElement->previous = lastElement;
 	newElement->next = 0;

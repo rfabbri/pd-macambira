@@ -42,10 +42,10 @@ static void test_bang(t_test *x) {
 
 	if (x->seq_initialized)
 	{
-		concatenateBeat(x->seq, 0, rnd);
+		concatenateBeat(x->seq, 0, rnd, 1);
 	} else
 	{
-		setFirstBeat(&(x->seq), 0, rnd);
+		setFirstBeat(&(x->seq), 0, rnd, 1);
 		x->seq_initialized = 1;
 	}
 
