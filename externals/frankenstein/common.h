@@ -150,6 +150,9 @@ void init_rhythm_memory_representation(t_rhythm_memory_representation *this_rep)
 // add a new rhythm in the list of similar rhythms related to one main rhythm
 void add_similar_rhythm(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm);
 
+// free the array with pointers and lists
+void free_memory_representation(t_rhythm_memory_representation *this_rep);
+
 // functions needed to fill and use the memory table
 
 

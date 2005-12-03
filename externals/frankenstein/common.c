@@ -214,14 +214,13 @@ void add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhy
 	{
 		this_rep->similar_rhythms = newElement;
 	}
-
-
+	// now update the transition table..
 }
 
 // from (duration) to (start) style
 void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
 {
-	t_rhythm_event *oldCurr, *newElement, *oldPrev;
+	t_rhythm_event *oldCurr, *newElement, *oldPrev, *newPrev;
 	float diff, currMoment;
 	t_duration dur_tmp;
 
@@ -229,6 +228,7 @@ void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
 	oldCurr = oldStyle;
 	oldPrev = 0;
 	currMoment = 0;
+	newPrev = 0;
 	
 	// look for the first beat played in old rhythm
 	while (oldCurr && (! (oldCurr->played)))
@@ -251,9 +251,8 @@ void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
 	dur_tmp = float2duration(currMoment);
 	newElement->duration.numerator = dur_tmp.numerator;
 	newElement->duration.denominator = dur_tmp.denominator;
-	newElement->previous = oldPrev;
-	if (oldPrev)
-		oldPrev->next = newElement;
+	newElement->previous = newPrev;
+	newPrev = newElement;
 
 	while (oldCurr)
 	{
@@ -265,9 +264,10 @@ void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
 			dur_tmp = float2duration(currMoment);
 			newElement->duration.numerator = dur_tmp.numerator;
 			newElement->duration.denominator = dur_tmp.denominator;
-			newElement->previous = oldPrev;
-			if (oldPrev)
-				oldPrev->next = newElement;
+			newElement->previous = newPrev;
+			if (newPrev)
+				newPrev->next = newElement;
+			newPrev = newElement;
 		}
 		// prepare for the next event
 		dur_tmp.numerator = oldCurr->duration.numerator;
@@ -276,8 +276,6 @@ void swap_rhythm_to_start(t_rhythm_event *oldStyle, t_rhythm_event **newStyle)
 		oldPrev = oldCurr;
 		oldCurr = oldCurr->next;
 	}
-
-
 }
 
 // from (start) to (duration) style
@@ -286,6 +284,44 @@ void swap_rhythm_to_duration(t_rhythm_event *oldStyle, t_rhythm_event **newStyle
 
 }
 
+void free_memory_representation(t_rhythm_memory_representation *this_rep)
+{
+	int i, maxi;
+	t_rhythm_memory_element *currElement, *tmpElement;
+	t_rhythm_memory_arc *currArc, *tmpArc;
+	// free the main rhythm
+	if (this_rep->main_rhythm)
+	{
+		freeBeats(this_rep->main_rhythm->rhythm);
+		free(this_rep->main_rhythm);
+	}
+
+	// free the table
+	maxi = possible_durations();
+	for (i=0; i<maxi; i++)
+	{
+		currArc = this_rep->transitions[i].arcs;
+		while (currArc)
+		{
+			tmpArc = currArc;
+			currArc = currArc->next_arc;
+			free(tmpArc);
+		}
+	}
+	free(this_rep->transitions);
+
+	// free the list of similar rhythms
+	currElement = this_rep->similar_rhythms;
+	while (currElement)
+	{
+		freeBeats(currElement->rhythm);
+		tmpElement = currElement;
+		currElement = currElement->next;
+		free(tmpElement);
+	}
+
+
+}
 
 // ------------------- themes manipulation functions
 
