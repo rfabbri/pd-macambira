@@ -4,7 +4,7 @@ RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.5
 diff -u -w -r1.5 makefile.in
 --- makefile.in	6 Nov 2004 16:07:33 -0000	1.5
-+++ makefile.in	2 Dec 2005 15:46:04 -0000
++++ makefile.in	4 Dec 2005 19:45:18 -0000
 @@ -5,10 +5,20 @@
  EXT= @EXT@
  GUINAME= @GUINAME@
@@ -91,7 +91,23 @@ diff -u -w -r1.5 makefile.in
  
  local-clean:
  	-rm -f ../obj/* $(BIN_DIR)/pd $(BIN_DIR)/$(GUINAME) $(BIN_DIR)/pdsend \
-@@ -166,14 +185,14 @@
+@@ -154,11 +173,10 @@
+ clean: extra-clean local-clean
+ 
+ distclean: clean
+-	rm -rf config.cache config.log config.status makefile tags \
+-	     autom4te-*.cache
+-	echo all: > makefile
+-	echo -e  "\t./configure" >> makefile
+-	echo -e "\tmake" >> makefile
++	-rm -f config.cache config.log config.status makefile configure tags \
++		autom4te.cache/output.* autom4te.cache/traces.* autom4te.cache/requests
++	-rmdir autom4te.cache
++	-rm -rf autom4te-*.cache
+ 
+ tags: $(SRC) $(GSRC); ctags *.[ch]
+ 
+@@ -166,14 +184,14 @@
  	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
  
  uninstall:

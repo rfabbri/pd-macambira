@@ -146,8 +146,7 @@ endif
 
 PD_BUILD_FLAGS = 
 
-# Pd sometimes needs a specific autoconf, which is labeled differently on different
-# machines
+# Pd needs autoconf 2.5x, which is labeled differently on different machines
 #PD_AUTOCONF := ${shell ( test -x "`which autoconf-2.59`" && echo autoconf-2.59 ) || echo autoconf }
 PD_AUTOCONF = autoconf
 
@@ -520,7 +519,68 @@ doc_format:
 #
 #==============================================================================#
 
-devsymlinks:
+devsymlinks: devsymlinks_$(OS_NAME)
+
+
+
+devsymlinks_win:
+
+
+devsymlinks_linux:
+
+
+TCLTK_VERSION=8.4
+devsymlinks_darwin:
+# this makes /usr/local symlinks to the Tcl/Tk frameworks so that ./configure
+# can find them.
+# headers
+	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tcl.h && \
+		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tcl.h \
+			/usr/local/lib/tcl.h
+	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclDecls.h && \
+		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclDecls.h \
+			/usr/local/lib/tclDecls.h
+	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclPlatDecls.h && \
+		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclPlatDecls.h \
+			/usr/local/lib/tclPlatDecls.h
+# libs
+	test -e  /Library/Frameworks/Tcl.framework/tclConfig.sh && \
+		ln -s /Library/Frameworks/Tcl.framework/tclConfig.sh /usr/local/lib
+	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Tcl && \
+		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Tcl \
+			/usr/local/lib/libtcl$(TCLTK_VERSION).dylib
+	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/libtclstub$(TCLTK_VERSION).a && \
+		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/libtclstub$(TCLTK_VERSION).a \
+			/usr/local/lib/libtclstub$(TCLTK_VERSION).a
+	test -e  /usr/local/lib/libtcl$(TCLTK_VERSION).dylib && \
+		ln -s /usr/local/lib/libtcl$(TCLTK_VERSION).dylib /usr/local/lib/libtcl.dylib
+# headers
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tk.h && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tk.h \
+			/usr/local/lib/tk.h
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkDecls.h && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkDecls.h \
+			/usr/local/lib/tkDecls.h
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkIntXlibDecls.h && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkIntXlibDecls.h \
+			/usr/local/lib/tkIntXlibDecls.h
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkMacOSX.h && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkMacOSX.h \
+			/usr/local/lib/tkMacOSX.h
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkPlatDecls.h && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkPlatDecls.h \
+			/usr/local/lib/tkPlatDecls.h
+# libs
+	test -e  /Library/Frameworks/Tk.framework/tkConfig.sh && \
+		ln -s /Library/Frameworks/Tk.framework/tkConfig.sh /usr/local/lib
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Tk && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Tk \
+			/usr/local/lib/libtk$(TCLTK_VERSION).dylib
+	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a && \
+		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a \
+			/usr/local/lib/libtkstub$(TCLTK_VERSION).a
+	test -e  /usr/local/lib/libtk$(TCLTK_VERSION).dylib && \
+		ln -s /usr/local/lib/libtk$(TCLTK_VERSION).dylib /usr/local/lib/libtk.dylib
 
 
 
@@ -628,3 +688,4 @@ test:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+
