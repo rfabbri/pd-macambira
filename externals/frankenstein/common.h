@@ -1,3 +1,4 @@
+
 // here i put common data structures and functions
 
 // ------------------------------------------------ data structures
@@ -88,17 +89,21 @@ struct t_rhythm_memory_element
 {
 	t_rhythm_event *rhythm; // this rhythm
 	t_rhythm_memory_element *next; // next element of the list
+	unsigned short int id; // its sub id
 } ;
 // a rhythm in memory, each rhythm is :
-// - a main rhythm
 // - its probability transition table
 // - similar rhythms played
+// - each one has its main id and each different played rhythm its sub-id
 struct t_rhythm_memory_representation
 {
-	t_rhythm_memory_element *main_rhythm;
 	t_rhythm_memory_node *transitions;
 	unsigned short int max_weight;
-	t_rhythm_memory_element *similar_rhythms;
+	t_rhythm_memory_element *rhythms;
+	unsigned short int id; // its main id
+	unsigned short int last_sub_id; // last sub assigned
+	// I can express a list of representations with this data structure
+	t_rhythm_memory_representation *next;
 } ;
 
 // ------------------------------------------------ functions
@@ -139,18 +144,38 @@ void freeBeats(t_rhythm_event *currentEvent);
 void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, unsigned short int dstNode);
 
 // create and initialize this representation, allocate memory for the pointers
-void create_rhythm_memory_representation(t_rhythm_memory_representation **this_rep);
+// I must pass its id also
+void create_rhythm_memory_representation(t_rhythm_memory_representation **this_rep, unsigned short int id);
+
+// define a return value to express "rhythm not found in this representation"
+#define INVALID_RHYTHM 65535
 
 // add a new rhythm in the list of similar rhythms related to one main rhythm
-void add_similar_rhythm(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm);
+// the sub id is auto-generated and returned
+unsigned short int add_similar_rhythm(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm);
 
-// free the array with pointers and lists
-void free_memory_representation(t_rhythm_memory_representation *this_rep);
+// free the list of representations
+void free_memory_representations(t_rhythm_memory_representation *this_rep);
 
 // compares this rhythm to this representation
 // and tells you how close it is to it
-// TODO !!!!!!!!!!!!!!!!!!
+// I return values using pointers
+// the unsigned short and the 2 floats should be already allocated
+void find_similar_rhythm_in_memory(t_rhythm_memory_representation *this_rep, 
+						 t_rhythm_event *src_rhythm, // the src rhythm 
+						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
+						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
+						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+						 );
 
+// same as before but search all available representations
+void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list, 
+						 t_rhythm_event *src_rhythm, // the src rhythm 
+						 unsigned short int *id, // the id of the closest rhythm
+						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
+						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
+						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+						 );
 
 // -------- notes manipulation functions
 

@@ -188,7 +188,7 @@ void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, unsigned short int d
 }
 
 // initialize this representation, allocates memory for the pointers
-void create_rhythm_memory_representation(t_rhythm_memory_representation **this_rep)
+void create_rhythm_memory_representation(t_rhythm_memory_representation **this_rep, unsigned short int id)
 {
 	int i;
 	// allocate space for the data structure
@@ -202,25 +202,30 @@ void create_rhythm_memory_representation(t_rhythm_memory_representation **this_r
 		(*this_rep)->transitions[i].weight=0;
 		(*this_rep)->transitions[i].arcs=0;
 	}
-	(*this_rep)->main_rhythm = 0;
-	(*this_rep)->similar_rhythms = 0;
+	(*this_rep)->rhythms = 0;
+	// the naming variables
+	(*this_rep)->id = id; // the main id
+	(*this_rep)->last_sub_id = 0; // the sub id
 }
 
 // add a new rhythm in the list of similar thythms related to one main rhythm
-void add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm)
+unsigned short int add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm)
 {
 	t_rhythm_memory_element *curr;
 	t_rhythm_memory_element *newElement;
 	t_rhythm_event *currEvent;
 	t_rhythm_memory_arc *currArc, *newArc, *prevArc;
-	unsigned short int last;
+	unsigned short int last, sub_id;
 	int i, arcFound;
 	// creates a new element of the list of similar rhythms
 	newElement = (t_rhythm_memory_element *) malloc(sizeof(t_rhythm_memory_element));
 	newElement->rhythm = new_rhythm;
 	newElement->next = 0;
+	sub_id = this_rep->last_sub_id;
+	newElement->id = sub_id;
+	this_rep->last_sub_id++;
 	// finds the last element and adds itself
-	curr = this_rep->similar_rhythms;
+	curr = this_rep->rhythms;
 	if (curr)
 	{
 		while (curr->next)
@@ -229,7 +234,7 @@ void add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhy
 
 	} else
 	{
-		this_rep->similar_rhythms = newElement;
+		this_rep->rhythms = newElement;
 	}
 	// now update the transition table..
 	currEvent = new_rhythm;
@@ -287,46 +292,103 @@ void add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhy
 		last = i;
 		currEvent = currEvent->next;
 	}
+	return sub_id;
 }
 
-void free_memory_representation(t_rhythm_memory_representation *this_rep)
+// free the list of representations
+void free_memory_representations(t_rhythm_memory_representation *this_rep)
 {
 	int i, maxi;
+	t_rhythm_memory_representation *currRep, *oldRep;
 	t_rhythm_memory_element *currElement, *tmpElement;
 	t_rhythm_memory_arc *currArc, *tmpArc;
-	// free the main rhythm
-	if (this_rep->main_rhythm)
+	currRep = this_rep;
+	while(currRep)
 	{
-		freeBeats(this_rep->main_rhythm->rhythm);
-		free(this_rep->main_rhythm);
-	}
-
-	// free the table
-	maxi = possible_durations();
-	for (i=0; i<maxi; i++)
-	{
-		currArc = this_rep->transitions[i].arcs;
-		while (currArc)
+		// free the table
+		maxi = possible_durations();
+		for (i=0; i<maxi; i++)
 		{
-			tmpArc = currArc;
-			currArc = currArc->next_arc;
-			free(tmpArc);
+			currArc = currRep->transitions[i].arcs;
+			while (currArc)
+			{
+				tmpArc = currArc;
+				currArc = currArc->next_arc;
+				free(tmpArc);
+			}
 		}
-	}
-	free(this_rep->transitions);
+		free(currRep->transitions);
 
-	// free the list of similar rhythms
-	currElement = this_rep->similar_rhythms;
-	while (currElement)
-	{
-		freeBeats(currElement->rhythm);
-		tmpElement = currElement;
-		currElement = currElement->next;
-		free(tmpElement);
+		// free the list of similar rhythms
+		currElement = currRep->rhythms;
+		while (currElement)
+		{
+			freeBeats(currElement->rhythm);
+			tmpElement = currElement;
+			currElement = currElement->next;
+			free(tmpElement);
+		}
+		oldRep = currRep;
+		currRep = currRep->next;
+		free(oldRep);
 	}
-
 
 }
+
+// compares this rhythm to this representation
+// and tells you how close it is to it
+void find_similar_rhythm_in_memory(t_rhythm_memory_representation *this_rep, 
+						 t_rhythm_event *src_rhythm, // the src rhythm 
+						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
+						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
+						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+						 )
+{
+	// check that the return values have been allocated
+	if ((sub_id==0)||(root_closeness==0)||(sub_closeness==0))
+	{
+		post("error in find_similar_rhythm(): return values not allocated");
+		return;
+	}
+
+	// look the main table for closeness to the main rhythm
+
+	// TODO
+
+	// for each rhythm in the list
+	// count the number of identical nodes
+	// cound thenumber of different nodes
+
+	// TODO
+
+	// return the better matching rhythm id
+	// and the closeness floats
+
+	// TODO
+}
+
+void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list, 
+						 t_rhythm_event *src_rhythm, // the src rhythm 
+						 unsigned short int *id, // the id of the closest rhythm
+						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
+						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
+						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+						 )
+{
+	// for each element of the rep_list
+
+	// TODO
+
+	// invoke find_similar_rhythm_in_memory
+
+	// TODO
+
+	// return the cosest representation with its subrhythm and closeness values
+	
+	// TODO
+
+}
+
 
 // ------------------- themes manipulation functions
 
