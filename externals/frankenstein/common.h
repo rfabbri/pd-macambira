@@ -161,7 +161,7 @@ void free_memory_representations(t_rhythm_memory_representation *this_rep);
 // and tells you how close it is to it
 // I return values using pointers
 // the unsigned short and the 2 floats should be already allocated
-void find_similar_rhythm_in_memory(t_rhythm_memory_representation *this_rep, 
+void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep, 
 						 t_rhythm_event *src_rhythm, // the src rhythm 
 						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
 						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)

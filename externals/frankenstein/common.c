@@ -337,13 +337,18 @@ void free_memory_representations(t_rhythm_memory_representation *this_rep)
 
 // compares this rhythm to this representation
 // and tells you how close it is to it
-void find_similar_rhythm_in_memory(t_rhythm_memory_representation *this_rep, 
+void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep, 
 						 t_rhythm_event *src_rhythm, // the src rhythm 
 						 unsigned short int *sub_id, // the sub-id of the closest sub-rhythm 
 						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
 						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
 						 )
 {
+	t_duration tmp_dur, this_dur;
+	t_rhythm_event *curr_event;
+	float this_weight_float;
+	int i, max_i, int_from_dur, this_weight_int;
+
 	// check that the return values have been allocated
 	if ((sub_id==0)||(root_closeness==0)||(sub_closeness==0))
 	{
@@ -352,8 +357,18 @@ void find_similar_rhythm_in_memory(t_rhythm_memory_representation *this_rep,
 	}
 
 	// look the main table for closeness to the main rhythm
+	curr_event = src_rhythm;
+	while(curr_event)
+	{
+		int_from_dur = duration2int(curr_event->start);
+		// get the weight of this beat
+		this_weight_int = this_rep->transitions[int_from_dur].weight;
+		this_weight_float = (float) (((float) this_weight_int)/((float) this_rep->max_weight);
+		// TODO
 
-	// TODO
+		curr_event = curr_event->next;
+	}
+	
 
 	// for each rhythm in the list
 	// count the number of identical nodes
