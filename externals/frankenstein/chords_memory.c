@@ -112,7 +112,7 @@ there are plenty of such algos, we must just copy them down.
 static t_class *chords_memory_class;
 
 // how can a chord be?
-#define TYPES_NUM 13 // keep me updated
+#define TYPES_NUM 17 // keep me updated
 typedef enum {
 			kMaj=0, 
 			kMin=1, 
@@ -127,7 +127,11 @@ typedef enum {
 			//pland adding 9ths 30.11.05 and beyond
 			kDomb9=10
 			kMaj9=11
-			kDom9=12		
+			kDom9=12
+			kMin9=13
+			kHalfDim9=14
+			kMinMaj9=15
+			kDimMaj9=16	
 			} chord_type_t;
 
 // how many tones do we have in our octave?
@@ -336,6 +340,14 @@ chord_type_t from_string_to_type(const char *substr)
 		return kMaj9;
 	if (strstr(substr, "dominant 9th"))
 		return kDom9;
+	if (strstr(substr, "minor 9th"))
+		return kMin9;
+	if (strstr(substr, "half diminished 9th"))
+		return kHalfDim9;
+	if (strstr(substr, "minor major 9th"))
+		return kMinMaj9;
+	if (strstr(substr, "diminished major 9th"))
+		return kDimMaj9;
 	// TODO: other chords
 	// beware when adding new chords
 	// put shorter names at end of this function!
