@@ -28,6 +28,11 @@ dim7maj
 aug7min
 aug7maj
 (tot 13 forms)
+
+pland adding more chord types here:
+
+
+
 we have 12 grades:
 I
 I# 
@@ -107,7 +112,7 @@ there are plenty of such algos, we must just copy them down.
 static t_class *chords_memory_class;
 
 // how can a chord be?
-#define TYPES_NUM 11 // keep me updated
+#define TYPES_NUM 13 // keep me updated
 typedef enum {
 			kMaj=0, 
 			kMin=1, 
@@ -119,8 +124,10 @@ typedef enum {
 			kMinMaj7=7,
 			kDim7=8,
 			kHalfDim7=9,
-			//pland adding 9ths 30.11.12
+			//pland adding 9ths 30.11.05 and beyond
 			kDomb9=10
+			kMaj9=11
+			kDom9=12		
 			} chord_type_t;
 
 // how many tones do we have in our octave?
@@ -325,6 +332,10 @@ chord_type_t from_string_to_type(const char *substr)
 	// pland adding chords 30.11.05
 	if (strstr(substr, "dominant b9"))
 		return kDomb9;
+	if (strstr(substr, "major 9th"))
+		return kMaj9;
+	if (strstr(substr, "dominant 9th"))
+		return kDom9;
 	// TODO: other chords
 	// beware when adding new chords
 	// put shorter names at end of this function!
