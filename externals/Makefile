@@ -677,3 +677,24 @@ clean: creb_clean cxc_clean ext13_clean smlib_clean install_clean
 
 distclean: clean cruft_clean
 	rm $(externals_src)/OSCx Makefile
+
+
+
+
+
+
+test_locations:
+	@echo "PD_VERSION: $(PD_VERSION)"
+	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "CWD $(CWD)"
+	@echo "DESTDIR $(DESTDIR)"
+	@echo "PREFIX $(prefix)"
+	@echo "BINDIR  $(bindir)"
+	@echo "LIBDIR  $(libdir)"
+	@echo "OBJECTSDIR  $(objectsdir)"
+	@echo "PDDOCDIR  $(pddocdir)"
+	@echo "LIBPDDIR  $(libpddir)"
+	@echo "LIBPDBINDIR  $(libpdbindir)"
+	@echo "HELPDIR  $(helpdir)"
+	@echo "MANUALSDIR  $(manualsdir)"
+	@echo "EXAMPLESDIR  $(examplesdir)"
