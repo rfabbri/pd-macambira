@@ -30,7 +30,7 @@ final_setup:
 	chmod -R ugo-w $(pddocdir)
 
 install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
-gyre_install keyboardkeys_install la_install-kitchen memento_install \
+gyre_install keyboardkeys_install la_install-kitchen list-abs_install memento_install \
 nusmuk_install nqpoly_install parazit_install pddp_install pixeltango_install \
 rradical_install
 	@echo " "
@@ -73,6 +73,22 @@ keyboardkeys_install:
 	install -d $(examplesdir)/$(KEYBOARDKEYS_NAME)
 	install -p $(abstractions_src)/$(KEYBOARDKEYS_NAME)/keyboard_main.pd \
 		 $(examplesdir)/$(KEYBOARDKEYS_NAME)
+
+#-------------------------------------------------------------------------------
+# list-abs
+LIST-ABS_NAME = list-abs
+list-abs_install:
+	install -d $(objectsdir)/$(LIST-ABS_NAME)
+	install -p $(shell ls -1 $(abstractions_src)/footils/list-abs/*.pd | \
+		grep -v '\-help.pd')  $(objectsdir)/$(LIST-ABS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(LIST-ABS_NAME) \
+		--author "Frank Barknecht" \
+		--license "GNU GPL" \
+		--description "a collection of objects for manipulating lists. Requires pd>=0.39"
+	install -d $(helpdir)/$(LIST-ABS_NAME)
+	install -p $(abstractions_src)/footils//list-abs/*-help.pd \
+		$(helpdir)/$(LIST-ABS_NAME)
+
 
 
 #-------------------------------------------------------------------------------
