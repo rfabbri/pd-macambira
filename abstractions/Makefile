@@ -86,7 +86,7 @@ list-abs_install:
 		--license "GNU GPL" \
 		--description "a collection of objects for manipulating lists. Requires pd>=0.39"
 	install -d $(helpdir)/$(LIST-ABS_NAME)
-	install -p $(abstractions_src)/footils//list-abs/*-help.pd \
+	install -p $(abstractions_src)/footils/list-abs/*-help.pd \
 		$(helpdir)/$(LIST-ABS_NAME)
 
 
