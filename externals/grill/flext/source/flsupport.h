@@ -17,6 +17,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 
 #include "flstdc.h"
 #include <new>
+#include <string.h>
 
 /*!	\defgroup FLEXT_SUPPORT Flext support classes
 	@{
@@ -828,11 +829,13 @@ protected:
 
 	static thrid_t thrhelpid;
 	static thrid_t thrmsgid;
-	static bool StartHelper();
 	static void ThrHelper(void *);
 
 	//! the system's thread id
 	static thrid_t thrid;  // the system thread
+
+private:
+    static bool StartHelper(); // used in flext::Setup()
 
 public:
 
