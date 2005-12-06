@@ -82,6 +82,10 @@ static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32}
 
 // the minimum percentage for a beat to be considered part of the main rhythm
 #define min_to_be_main_rhythm_beat 0.7
+// minimum value to be considered a subrhythm of this rhythm
+#define min_to_be_same_rhythm 0.7
+// minimum percentage to be considered this exact rhythm
+#define min_to_be_same_subrhythm 0.9
 
 // this defines a space for rhythms, variations, transitions and representations
 typedef struct t_rhythm_memory_representation t_rhythm_memory_representation;
@@ -158,7 +162,7 @@ void create_rhythm_memory_representation(t_rhythm_memory_representation **this_r
 
 // add a new rhythm in the list of similar rhythms related to one main rhythm
 // the sub id is auto-generated and returned
-unsigned short int add_similar_rhythm(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm);
+unsigned short int add_t_rhythm_memory_element(t_rhythm_memory_representation *this_rep, t_rhythm_event *new_rhythm);
 
 // free the list of representations
 void free_memory_representations(t_rhythm_memory_representation *this_rep);
@@ -182,6 +186,80 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 						 float *root_closeness, // how much this rhythm is close to the root (1=identical, 0=nothing common)
 						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
 						 );
+
+// the following are the functions that externals should use
+/* usage:
+
+	// first of all declare a pointer for the memory
+	t_rhythm_memory_representation *rhythms_memory;
+	// then each time you get a rhythm let the memory evaluate it and
+	// tell you if is a new rhythm or a old one
+	float root_closeness, sub_closeness;
+	unsigned short int id, subid, is_it_a_new_rhythm;
+	rhythm_memory_evaluate(rhythms_memory, rhythm, &is_it_a_new_rhythm,
+							&id, &subid, &root_closeness, &sub_closeness);
+	if (is_it_a_new_rhythm==1)
+	{
+		// it was a completely new rhythm
+		// id tells us new id assigned
+		// and subid tells us the new sub id assigned
+	}
+	if (is_it_a_new_rhythm==2)
+	{
+		// it was a new sub-rhythm of a known rhythm
+		// id tells us rht root rhythm id
+		// and subid tells us the new sub id assigned
+	}
+	if (is_it_a_new_rhythm==0)
+	{
+		// it was a known rhythm and subrhythm
+		// id and subid tell us the identificator
+	}
+	// i can also use root_closeness and sub_closeness and is_it_a_new_rhythm
+	// to know how much novelty there was in this rhythm
+
+	// i can ask the memory to give me back a specific rhythm
+	t_rhythm_event *wanted_rhythm
+	int rhythm_found = rhythm_memory_get_rhythm(rhythms_memory,
+							  wanted_rhythm,
+							  id, // the id of the main rhythm wanted
+							  sub_id // the sub-id of the sub-rhythm wanted
+							  );
+	if (rhythm_found == 0)
+	{
+		// that rhythm was not present!
+	}
+
+	// when i am ready I should free the memory
+	rhythm_memory_free(rhythms_memory);
+*/
+
+
+// create a new memory for rhythms
+void rhythm_memory_create(t_rhythm_memory_representation **this_rep);
+// free the space 
+void rhythm_memory_free(t_rhythm_memory_representation *rep_list);
+// evaluate this rhythm and add it to the memory if is new
+void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the memory
+							t_rhythm_event *src_rhythm, // the rhythm to evaluate
+							// is it a new rhythm? (0 if no, 1 if new main rhythm, 2 if new subrhythm)
+							unsigned short int *new_rhythm,
+							// the id of the closest rhythm or the new id assigned
+							unsigned short int *id, 
+							// the sub-id of the closest sub-rhythm or the new sub-id assigned
+							unsigned short int *sub_id,
+							// how much this rhythm is close to the root (1=identical, 0=nothing common)
+							float *root_closeness,
+							// how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+							float *sub_closeness 
+							);
+// return 0 if failed finding the rhythm, 1 if the rhythm was found
+int rhythm_memory_get_rhythm(t_rhythm_memory_representation *rep_list, // the memory
+							  t_rhythm_event *out_rhythm, // a pointer to the returned rhythm
+							  // the id of the main rhythm wanted
+							  unsigned short int id, 
+							  // the sub-id of the sub-rhythm wanted
+							  unsigned short int sub_id);
 
 // -------- notes manipulation functions
 

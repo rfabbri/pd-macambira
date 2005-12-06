@@ -125,12 +125,12 @@ typedef enum {
 			kDim7=8,
 			kHalfDim7=9,
 			//pland adding 9ths 30.11.05 and beyond
-			kDomb9=10
-			kMaj9=11
-			kDom9=12
-			kMin9=13
-			kHalfDim9=14
-			kMinMaj9=15
+			kDomb9=10,
+			kMaj9=11,
+			kDom9=12,
+			kMin9=13,
+			kHalfDim9=14,
+			kMinMaj9=15,
 			kDimMaj9=16	
 			} chord_type_t;
 

@@ -538,6 +538,157 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 }
 
 
+// create a new memory for rhythms
+void rhythm_memory_create(t_rhythm_memory_representation **this_rep)
+{
+	create_rhythm_memory_representation(this_rep, 0);
+}
+
+// free the space 
+void rhythm_memory_free(t_rhythm_memory_representation *rep_list)
+{
+	t_rhythm_memory_representation *curr, *next;
+	next = rep_list;
+	while (next)
+	{
+		curr = next;
+		next = curr->next;
+		free_memory_representations(curr);
+	}
+}
+// evaluate this rhythm and add it to the memory if is new
+void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the memory
+							t_rhythm_event *src_rhythm, // the rhythm to evaluate
+							// is it a new rhythm? (0 if no, 1 if new main rhythm, 2 if new subrhythm)
+							unsigned short int *new_rhythm,
+							// the id of the closest rhythm or the new id assigned
+							unsigned short int *id, 
+							// the sub-id of the closest sub-rhythm or the new sub-id assigned
+							unsigned short int *sub_id,
+							// how much this rhythm is close to the root (1=identical, 0=nothing common)
+							float *root_closeness,
+							// how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+							float *sub_closeness 
+							)
+{
+	float root_closeness_found, sub_closeness_found;
+	unsigned short int id_found, sub_id_found, new_id;
+	t_rhythm_memory_representation *curr, *newRep, *lastRep;
+	int found;
+
+	// look for the closest main rhythm and subrhythm
+	find_rhythm_in_memory(rep_list, 
+						 src_rhythm, // the src rhythm 
+						 &id_found, // the id of the closest rhythm
+						 &sub_id_found, // the sub-id of the closest sub-rhythm 
+						 &root_closeness_found, // how much this rhythm is close to the root (1=identical, 0=nothing common)
+						 &sub_closeness_found // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
+						 );
+
+	// decide if add to the memory or if return the closest
+
+	if (root_closeness_found>=min_to_be_same_rhythm)
+	{
+		// is close enough to be considered a subrhythm
+		*new_rhythm = 0;
+		*id = id_found;
+		*root_closeness = root_closeness_found;
+		if (sub_closeness_found>=min_to_be_same_subrhythm)
+		{
+			// this is a known subrhythm
+			*sub_id = sub_id_found;
+			*sub_closeness = sub_closeness_found;
+		} else
+		{
+			// add this rhythm as a new subrhythm
+			curr = rep_list;
+			found = 0;
+			while (curr && !found)
+			{
+				if (curr->id == id_found)
+				{
+					// i've found the rhythm
+					found = 1;
+				} else
+				{
+					curr = curr->next;
+				}
+			}
+
+			sub_id_found = add_t_rhythm_memory_element(curr, src_rhythm);
+			sub_closeness_found = 1;
+			*sub_id = sub_id_found;
+			*sub_closeness = sub_closeness_found;
+			*new_rhythm = 2;
+		}
+	} else
+	{
+		// this is a completely new rhythm!
+		// find the last id and representation
+		curr = rep_list;
+		new_id = 0;
+		lastRep = 0;
+		while (curr)
+		{
+			new_id = curr->id;
+			lastRep = curr;
+			curr = curr->next;
+		}	
+		// create a new representation with a new id
+		new_id++;
+		create_rhythm_memory_representation(&newRep, new_id);
+		// link the representations
+		lastRep->next = newRep;
+		// add the rhythm as subrhythm
+		sub_id_found = add_t_rhythm_memory_element(newRep, src_rhythm);
+		sub_closeness_found = 1;
+		*sub_id = sub_id_found;
+		*sub_closeness = sub_closeness_found;
+		*id = new_id;
+		*root_closeness = 1;
+		*new_rhythm = 1;
+	}
+
+}
+// return 0 if failed finding the rhythm, 1 if the rhythm was found
+int rhythm_memory_get_rhythm(t_rhythm_memory_representation *rep_list, // the memory
+							  t_rhythm_event *out_rhythm, // a pointer to the returned rhythm
+							  // the id of the main rhythm wanted
+							  unsigned short int id, 
+							  // the sub-id of the sub-rhythm wanted
+							  unsigned short int sub_id)
+{
+	// look for this id and subid in memory and return that subrhythm
+	t_rhythm_memory_representation *curr;
+	t_rhythm_memory_element *curr2;
+	curr = rep_list;
+	while (curr)
+	{
+		if (curr->id == id)
+		{
+			// this is the right main rhythm
+			// now look for the correct subid
+			curr2 = curr->rhythms;
+			while (curr2)
+			{
+				if (curr2->id == sub_id)
+				{
+					// i've found the rhythm!
+					out_rhythm=curr2->rhythm;
+					return 1;
+				}
+				curr2 = curr2->next;
+			}
+
+		}
+
+		curr = curr->next;
+	}
+	// if i am here then i didn't find the rhythm
+	return 0;
+}
+
+
 // ------------------- themes manipulation functions
 
 // set the first note of a sequence
