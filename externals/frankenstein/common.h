@@ -192,6 +192,8 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 
 	// first of all declare a pointer for the memory
 	t_rhythm_memory_representation *rhythms_memory;
+	// initialize it
+	rhythm_memory_create(&this_rep);
 	// then each time you get a rhythm let the memory evaluate it and
 	// tell you if is a new rhythm or a old one
 	float root_closeness, sub_closeness;

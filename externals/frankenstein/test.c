@@ -18,14 +18,15 @@ typedef struct _test
 {
     t_object x_obj; // myself
 	t_outlet *l_out;
-	t_rhythm_event *seq;
+	t_rhythm_event *curr_seq;
 	int seq_initialized;
+	t_rhythm_memory_representation *rhythms_memory;
 	
 } t_test;
 
 void test_free(t_test *x)
 {
-	freeBeats(x->seq);
+	freeBeats(x->curr_seq);
 }
 
 static void test_bang(t_test *x) {
@@ -42,15 +43,15 @@ static void test_bang(t_test *x) {
 
 	if (x->seq_initialized)
 	{
-		concatenateBeat(x->seq, 0, rnd, 1);
+		concatenateBeat(x->curr_seq, 0, rnd, 1);
 	} else
 	{
-		setFirstBeat(&(x->seq), 0, rnd, 1);
+		setFirstBeat(&(x->curr_seq), 0, rnd, 1);
 		x->seq_initialized = 1;
 	}
 
 	// print the sequence
-	events = x->seq;
+	events = x->curr_seq;
 	while(events)
 	{
 		post("event: numerator=%i, denominator=%i", events->duration.numerator, events->duration.denominator);
@@ -67,6 +68,8 @@ void *test_new(t_symbol *s, int argc, t_atom *argv)
 	x->l_out = outlet_new(&x->x_obj, &s_list);
 	
 	x->seq_initialized = 0;
+
+	rhythm_memory_create(&(x->rhythms_memory));
 
     return (x);
 }
