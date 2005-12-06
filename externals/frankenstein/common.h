@@ -80,6 +80,9 @@ struct t_rhythm_memory_arc
 #define num_possible_denominators 11
 static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
 
+// the minimum percentage for a beat to be considered part of the main rhythm
+#define min_to_be_main_rhythm_beat 0.7
+
 // this defines a space for rhythms, variations, transitions and representations
 typedef struct t_rhythm_memory_representation t_rhythm_memory_representation;
 typedef struct t_rhythm_memory_element t_rhythm_memory_element;
@@ -105,6 +108,9 @@ struct t_rhythm_memory_representation
 	// I can express a list of representations with this data structure
 	t_rhythm_memory_representation *next;
 } ;
+
+// define a return value to express "rhythm not found in this representation"
+#define INVALID_RHYTHM 65535
 
 // ------------------------------------------------ functions
 
@@ -140,15 +146,15 @@ void freeBeats(t_rhythm_event *currentEvent);
 
 // --- memory representation of rhythms
 
+// create an array of nodes (without arcs?) to express the beats in this rhythm (the noteon moments)
+void create_array_beats(unsigned short int **this_array, t_rhythm_event *currentEvent);
+
 // add an arc to this node
 void add_t_rhythm_memory_arc(t_rhythm_memory_node *srcNode, unsigned short int dstNode);
 
 // create and initialize this representation, allocate memory for the pointers
 // I must pass its id also
 void create_rhythm_memory_representation(t_rhythm_memory_representation **this_rep, unsigned short int id);
-
-// define a return value to express "rhythm not found in this representation"
-#define INVALID_RHYTHM 65535
 
 // add a new rhythm in the list of similar rhythms related to one main rhythm
 // the sub id is auto-generated and returned

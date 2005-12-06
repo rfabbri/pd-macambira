@@ -335,6 +335,31 @@ void free_memory_representations(t_rhythm_memory_representation *this_rep)
 
 }
 
+void create_array_beats(unsigned short int **this_array, t_rhythm_event *currentEvent)
+{
+	unsigned short int *new_array;
+	t_rhythm_event *curr_event;
+	int i, maxi, startint;
+	maxi = possible_durations();
+	// allocate space for the nodes
+	new_array = (unsigned short int *) malloc(sizeof(unsigned short int) * maxi);
+	// set default values
+	for (i=0; i<maxi; i++)
+	{
+			new_array[i] = 0;
+	}
+	// set the actual data
+	curr_event = currentEvent;
+	while(curr_event)
+	{
+		startint = duration2int(curr_event->start);
+		new_array[startint]=1;
+		curr_event = curr_event->next;
+	}
+	*this_array = new_array;
+
+}
+
 // compares this rhythm to this representation
 // and tells you how close it is to it
 void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep, 
@@ -346,8 +371,13 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 {
 	t_duration tmp_dur, this_dur;
 	t_rhythm_event *curr_event;
-	float this_weight_float;
-	int i, max_i, int_from_dur, this_weight_int;
+	float this_weight_float, average_weight, strong_ratio;
+	int i, max_i, int_from_dur, this_weight_int, beats, strong_ok, strong_no;
+	unsigned short int *src_rhythm_array, *tmp_rhythm_array;
+	unsigned short int best_subid, curr_subid;
+	float best_closeness, curr_closeness;
+	int sub_ok, sub_no;
+	t_rhythm_memory_element *possible_rhythms;
 
 	// check that the return values have been allocated
 	if ((sub_id==0)||(root_closeness==0)||(sub_closeness==0))
@@ -356,30 +386,116 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 		return;
 	}
 
+	max_i = possible_durations();
+	// create an array of bools
+	create_array_beats(&src_rhythm_array, src_rhythm);
+
 	// look the main table for closeness to the main rhythm
 	curr_event = src_rhythm;
+	beats=0;
+	strong_ok=0;
+	strong_no=0;
+	strong_ratio=0;
+	average_weight = 0;
 	while(curr_event)
 	{
 		int_from_dur = duration2int(curr_event->start);
 		// get the weight of this beat
 		this_weight_int = this_rep->transitions[int_from_dur].weight;
-		this_weight_float = (float) (((float) this_weight_int)/((float) this_rep->max_weight);
-		// TODO
-
+		this_weight_float = (float) ( ((float) this_weight_int) / ((float) this_rep->max_weight));
+		average_weight += this_weight_float;
+		beats++;
 		curr_event = curr_event->next;
 	}
-	
 
+	// look all the representation's rhythm 
+	// looking for strong beats corrispondance
+	for (i=0; i<max_i; i++)
+	{
+		if (this_weight_float > min_to_be_main_rhythm_beat)
+		{
+			this_weight_int = this_rep->transitions[i].weight;
+			this_weight_float = (float) (((float) this_weight_int) / ((float) this_rep->max_weight));
+			// this is a main rhythm beat
+			if (src_rhythm_array[i]>0)
+			{
+				// both playing
+				strong_ok++;
+			} else
+			{
+				// strong beat miss
+				strong_no++;
+			}
+		}
+	}
+
+	// this is the average weight of this rhythm in this representation
+	if (beats==0)
+	{
+		average_weight = 0;
+	} else
+	{
+		average_weight = (float) (average_weight / ((float) beats));
+	}
+	// ratio of corresponding strong beats.. 
+	// close to 0 = no corrispondance
+	// close to 1 = corrispondance
+	if (strong_no==0)
+	{
+		strong_ratio = 1;
+	} else
+	{
+		strong_ratio = (float) ( ((float) strong_ok) / ((float)strong_no) );
+	}
 	// for each rhythm in the list
 	// count the number of identical nodes
 	// cound thenumber of different nodes
-
-	// TODO
+	best_subid = curr_subid = INVALID_RHYTHM;
+	best_closeness = curr_closeness = 0;
+	possible_rhythms = this_rep->rhythms;
+	while(possible_rhythms)
+	{
+		// create the table of this rhythm
+		create_array_beats(&tmp_rhythm_array, possible_rhythms->rhythm);
+		sub_ok = sub_no = 0;
+		for (i=0; i<max_i; i++)
+		{
+			if (tmp_rhythm_array[i]>0  && src_rhythm_array[i]>0)
+			{
+				sub_ok++;
+			} else if (tmp_rhythm_array[i]==0  && src_rhythm_array[i]==0)
+			{
+				// nothing important
+			} else
+			{
+				sub_no++;
+			}
+		}
+		if (sub_no == 0)
+		{
+			curr_closeness = 1;
+		} else
+		{
+			curr_closeness = (float) ( ((float) sub_ok) / ((float) sub_no) );
+		}
+		if (curr_closeness > best_closeness)
+		{
+			best_closeness = curr_closeness;
+			best_subid = possible_rhythms->id;
+		}
+		possible_rhythms = possible_rhythms->next;
+		free(tmp_rhythm_array);
+	}
 
 	// return the better matching rhythm id
 	// and the closeness floats
 
-	// TODO
+	*sub_id = best_subid;
+	*sub_closeness = best_closeness;
+	*root_closeness = strong_ratio;
+
+	// free allocated memory
+	free(src_rhythm_array);
 }
 
 void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list, 
@@ -390,17 +506,34 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 						 float *sub_closeness // how much this rhythm is close to the closest sub-rhythm (1=identical, 0=nothing common)
 						 )
 {
+	unsigned short int best_id, curr_id, best_subid, curr_subid;
+	float best_closeness, curr_closeness, best_sub_closeness, curr_sub_closeness;
+	t_rhythm_memory_representation *this_rep;
+	best_closeness = curr_closeness = best_sub_closeness = curr_sub_closeness = 0;
+	best_id = curr_id = best_subid = curr_subid = INVALID_RHYTHM;
 	// for each element of the rep_list
+	this_rep = rep_list;
+	while(this_rep)
+	{
+		compare_rhythm_vs_representation(this_rep, 
+			src_rhythm, 
+			&curr_subid, 
+			&curr_closeness, 
+			&curr_sub_closeness);
+		if (curr_closeness > best_closeness)
+		{
+			best_closeness = curr_closeness;
+			best_id = this_rep->id;
+			best_sub_closeness = curr_sub_closeness;
+			best_subid = curr_subid;
+		}
+	}
 
-	// TODO
-
-	// invoke find_similar_rhythm_in_memory
-
-	// TODO
-
-	// return the cosest representation with its subrhythm and closeness values
+	*id = best_id;
+	*sub_id = best_subid;
+	*root_closeness = best_closeness;
+	*sub_closeness = best_sub_closeness;
 	
-	// TODO
 
 }
 
