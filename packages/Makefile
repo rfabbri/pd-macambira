@@ -530,57 +530,76 @@ devsymlinks_linux:
 
 
 TCLTK_VERSION=8.4
-devsymlinks_darwin:
+devsymlinks_darwin: devsymlinks_clean
 # this makes /usr/local symlinks to the Tcl/Tk frameworks so that ./configure
 # can find them.
 # headers
 	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tcl.h && \
-		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tcl.h \
-			/usr/local/lib/tcl.h
+		sudo ln -s \
+			/Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tcl.h \
+			/usr/local/include/tcl.h
 	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclDecls.h && \
-		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclDecls.h \
-			/usr/local/lib/tclDecls.h
+		sudo ln -s \
+			/Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclDecls.h \
+			/usr/local/include/tclDecls.h
 	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclPlatDecls.h && \
-		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclPlatDecls.h \
-			/usr/local/lib/tclPlatDecls.h
+		sudo ln -s \
+			/Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Headers/tclPlatDecls.h \
+			/usr/local/include/tclPlatDecls.h
 # libs
 	test -e  /Library/Frameworks/Tcl.framework/tclConfig.sh && \
-		ln -s /Library/Frameworks/Tcl.framework/tclConfig.sh /usr/local/lib
+		sudo ln -s /Library/Frameworks/Tcl.framework/tclConfig.sh /usr/local/lib
 	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Tcl && \
-		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Tcl \
+		sudo ln -s \
+			/Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/Tcl \
 			/usr/local/lib/libtcl$(TCLTK_VERSION).dylib
 	test -e  /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/libtclstub$(TCLTK_VERSION).a && \
-		ln -s /Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/libtclstub$(TCLTK_VERSION).a \
+		sudo ln -s \
+			/Library/Frameworks/Tcl.framework/Versions/$(TCLTK_VERSION)/libtclstub$(TCLTK_VERSION).a \
 			/usr/local/lib/libtclstub$(TCLTK_VERSION).a
 	test -e  /usr/local/lib/libtcl$(TCLTK_VERSION).dylib && \
-		ln -s /usr/local/lib/libtcl$(TCLTK_VERSION).dylib /usr/local/lib/libtcl.dylib
+		sudo ln -s /usr/local/lib/libtcl$(TCLTK_VERSION).dylib /usr/local/lib/libtcl.dylib
 # headers
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tk.h && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tk.h \
-			/usr/local/lib/tk.h
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tk.h \
+			/usr/local/include/tk.h
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkDecls.h && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkDecls.h \
-			/usr/local/lib/tkDecls.h
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkDecls.h \
+			/usr/local/include/tkDecls.h
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkIntXlibDecls.h && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkIntXlibDecls.h \
-			/usr/local/lib/tkIntXlibDecls.h
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkIntXlibDecls.h \
+			/usr/local/include/tkIntXlibDecls.h
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkMacOSX.h && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkMacOSX.h \
-			/usr/local/lib/tkMacOSX.h
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkMacOSX.h \
+			/usr/local/include/tkMacOSX.h
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkPlatDecls.h && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkPlatDecls.h \
-			/usr/local/lib/tkPlatDecls.h
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Headers/tkPlatDecls.h \
+			/usr/local/include/tkPlatDecls.h
 # libs
 	test -e  /Library/Frameworks/Tk.framework/tkConfig.sh && \
-		ln -s /Library/Frameworks/Tk.framework/tkConfig.sh /usr/local/lib
+		sudo ln -s /Library/Frameworks/Tk.framework/tkConfig.sh /usr/local/lib
 	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Tk && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Tk \
+		sudo ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/Tk \
 			/usr/local/lib/libtk$(TCLTK_VERSION).dylib
-	test -e  /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a && \
-		ln -s /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a \
+	test -e /Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a && \
+		sudo ln -s \
+			/Library/Frameworks/Tk.framework/Versions/$(TCLTK_VERSION)/libtkstub$(TCLTK_VERSION).a \
 			/usr/local/lib/libtkstub$(TCLTK_VERSION).a
 	test -e  /usr/local/lib/libtk$(TCLTK_VERSION).dylib && \
-		ln -s /usr/local/lib/libtk$(TCLTK_VERSION).dylib /usr/local/lib/libtk.dylib
+		sudo ln -s /usr/local/lib/libtk$(TCLTK_VERSION).dylib /usr/local/lib/libtk.dylib
+
+
+
+devsymlinks_clean:
+	-sudo rm -f /usr/local/include/tcl*.h /usr/local/include/tk*.h
+	-sudo rm -f /usr/local/lib/tclConfig.sh /usr/local/lib/tkConfig.sh
+	-sudo rm -f /usr/local/lib/libtcl*.dylib /usr/local/lib/libtk*.dylib
+	-sudo rm -f /usr/local/lib/libtclstub*.a /usr/local/lib/libtkstub*.a
 
 
 
@@ -673,7 +692,7 @@ distclean: clean cruft_clean
 	cd $(externals_src) && make distclean
 	cd $(pd_src) && make distclean
 
-test:
+test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
 	@echo "CWD $(CWD)"

@@ -61,7 +61,7 @@ LINUX_CFLAGS = $(CFLAGS) -fPIC
 LINUX_INCLUDES = $(INCLUDES)
 LINUX_LDFLAGS = $(LDFLAGS) -Wl,-export_dynamic  -shared
 %.pd_linux: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "../src/$*.c"
+	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "$*.c"
 	gcc  $(LINUX_LDFLAGS) -o "$*.pd_linux" "$*.o" -lc -lm 
 	chmod a-x "$*.pd_linux"
 	$(STRIP) $*.pd_linux
@@ -117,8 +117,8 @@ pre_all_unknown:
 # INSTALL
 install: all $(objectsdir) help_install objects_install unfiltered_install \
 creb_install cxc_install cyclone_install ext13_install iemabs_install \
-iemabs_install iemmatrix_install pddp_install pdp_install pmpd_install \
-toxy_install unauthorized_install vbap_install zexy_install
+iemabs_install iemlib_install iemmatrix_install pddp_install pdp_install \
+pmpd_install toxy_install unauthorized_install vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
