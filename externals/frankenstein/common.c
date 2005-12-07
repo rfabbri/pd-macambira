@@ -53,7 +53,7 @@ unsigned short int duration2int(t_duration dur)
 				curr++;
 		}
 	}
-	return curr+1;	
+	return curr;	
 }
 
 int possible_durations()
@@ -148,18 +148,21 @@ void freeBeats(t_rhythm_event *currentEvent)
 	t_rhythm_event *prev;
 	t_rhythm_event *next;
 
+	if (currentEvent==0)
+		return;
+
 	// go to the first element of the list
 	while(currentEvent->previous)
 		currentEvent = currentEvent->previous;
 
 	// now free each element
 	next=currentEvent->next;
-	do
+	while(currentEvent)
 	{
 		prev = currentEvent;
-		next = currentEvent->next;
-		free(currentEvent);
-	} while(next);
+		currentEvent = currentEvent->next;
+		free(prev);
+	} 
 
 }
 
@@ -219,6 +222,8 @@ unsigned short int add_t_rhythm_memory_element(t_rhythm_memory_representation *t
 	t_rhythm_memory_arc *currArc, *newArc, *prevArc;
 	unsigned short int last, sub_id;
 	int i, arcFound;
+	if (new_rhythm==0)
+		return INVALID_RHYTHM;
 	// creates a new element of the list of similar rhythms
 	newElement = (t_rhythm_memory_element *) malloc(sizeof(t_rhythm_memory_element));
 	newElement->rhythm = new_rhythm;
@@ -341,7 +346,7 @@ void free_memory_representations(t_rhythm_memory_representation *this_rep)
 void create_array_beats(unsigned short int **this_array, t_rhythm_event *currentEvent)
 {
 	unsigned short int *new_array;
-	t_rhythm_event *curr_event;
+	//t_rhythm_event *curr_event;
 	int i, maxi, startint;
 	maxi = possible_durations();
 	// allocate space for the nodes
@@ -352,12 +357,12 @@ void create_array_beats(unsigned short int **this_array, t_rhythm_event *current
 			new_array[i] = 0;
 	}
 	// set the actual data
-	curr_event = currentEvent;
-	while(curr_event)
+	//curr_event = currentEvent;
+	while(currentEvent)
 	{
-		startint = duration2int(curr_event->start);
+		startint = duration2int(currentEvent->start);
 		new_array[startint]=1;
-		curr_event = curr_event->next;
+		currentEvent = currentEvent->next;
 	}
 	*this_array = new_array;
 
@@ -635,6 +640,7 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 			*sub_id = sub_id_found;
 			*sub_closeness = sub_closeness_found;
 			*new_rhythm = 2;
+			post("DEBUG: new subrhythm");
 		}
 	} else
 	{
@@ -662,6 +668,7 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 		*id = new_id;
 		*root_closeness = 1;
 		*new_rhythm = 1;
+		post("DEBUG: new rhythm");
 	}
 
 }

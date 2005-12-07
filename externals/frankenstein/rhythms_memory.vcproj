@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;H:\PureData\pd-0.38-3.msw\pd\src&quot;"
+				AdditionalIncludeDirectories="../"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -36,7 +36,7 @@
 				AdditionalDependencies="pd.lib"
 				OutputFile="$(OutDir)/rhythms_memory.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;H:\PureData\pd-0.38-3.msw\pd\bin&quot;"
+				AdditionalLibraryDirectories="../"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/frankenstein.pdb"
 				SubSystem="0"

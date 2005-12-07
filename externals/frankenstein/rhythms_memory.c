@@ -119,7 +119,6 @@ void end_measure(t_rhythms_memory *x)
 		free(lastEvent);
 	}
 	x->events = 0;
-	x->seq_initialized = 0;
 
 	// now I evaluate this rhythm with the memory
 	rhythm_memory_evaluate(x->rhythms_memory, x->curr_seq, &is_it_a_new_rhythm,
