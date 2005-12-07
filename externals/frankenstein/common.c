@@ -206,6 +206,8 @@ void create_rhythm_memory_representation(t_rhythm_memory_representation **this_r
 	// the naming variables
 	(*this_rep)->id = id; // the main id
 	(*this_rep)->last_sub_id = 0; // the sub id
+	(*this_rep)->next = 0;
+	(*this_rep)->max_weight = 0;
 }
 
 // add a new rhythm in the list of similar thythms related to one main rhythm
@@ -288,6 +290,7 @@ unsigned short int add_t_rhythm_memory_element(t_rhythm_memory_representation *t
 		{
 			// a new champion!
 			this_rep->max_weight = this_rep->transitions[i].weight;
+			post("DEBUG: max_weight=%i", this_rep->max_weight);
 		}
 		last = i;
 		currEvent = currEvent->next;
@@ -377,6 +380,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	unsigned short int best_subid, curr_subid;
 	float best_closeness, curr_closeness;
 	int sub_ok, sub_no;
+	int count_strong;
 	t_rhythm_memory_element *possible_rhythms;
 
 	// check that the return values have been allocated
@@ -410,23 +414,28 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 
 	// look all the representation's rhythm 
 	// looking for strong beats corrispondance
+	count_strong = 0;
 	for (i=0; i<max_i; i++)
 	{
-		if (this_weight_float > min_to_be_main_rhythm_beat)
-		{
 			this_weight_int = this_rep->transitions[i].weight;
 			this_weight_float = (float) (((float) this_weight_int) / ((float) this_rep->max_weight));
-			// this is a main rhythm beat
-			if (src_rhythm_array[i]>0)
+			post("DEBUG: transition %i this_weight_float=%f", i, this_weight_float);
+			if (this_weight_float > min_to_be_main_rhythm_beat)
 			{
-				// both playing
-				strong_ok++;
-			} else
-			{
-				// strong beat miss
-				strong_no++;
-			}
-		}
+				// this is a main rhythm beat
+				if (src_rhythm_array[i]>0)
+				{
+					// both playing
+					strong_ok++;
+					post("DEBUG: beat %i, both playing", i);
+				} else
+				{
+					// strong beat miss
+					strong_no++;
+					post("DEBUG: beat %i, src not playing", i);
+				}
+				count_strong++;
+			}	
 	}
 
 	// this is the average weight of this rhythm in this representation
@@ -440,12 +449,14 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	// ratio of corresponding strong beats.. 
 	// close to 0 = no corrispondance
 	// close to 1 = corrispondance
-	if (strong_no==0)
+	if (count_strong==0)
 	{
-		strong_ratio = 1;
+		strong_ratio = 0;
 	} else
 	{
-		strong_ratio = (float) ( ((float) strong_ok) / ((float)strong_no) );
+		strong_ratio = (float) ( ( ((float) strong_ok) / ((float)count_strong) ) -
+			( ((float) strong_no) / ((float)count_strong) )) ;
+		post("DEBUG: strong_ratio=%f", strong_ratio);
 	}
 	// for each rhythm in the list
 	// count the number of identical nodes
@@ -527,6 +538,7 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 			best_sub_closeness = curr_sub_closeness;
 			best_subid = curr_subid;
 		}
+		this_rep = this_rep->next;
 	}
 
 	*id = best_id;
@@ -547,14 +559,15 @@ void rhythm_memory_create(t_rhythm_memory_representation **this_rep)
 // free the space 
 void rhythm_memory_free(t_rhythm_memory_representation *rep_list)
 {
-	t_rhythm_memory_representation *curr, *next;
-	next = rep_list;
-	while (next)
+	t_rhythm_memory_representation *curr, *nextRep;
+	nextRep = rep_list;
+	while (nextRep)
 	{
-		curr = next;
-		next = curr->next;
+		curr = nextRep;
+		nextRep = curr->next;
 		free_memory_representations(curr);
 	}
+
 }
 // evaluate this rhythm and add it to the memory if is new
 void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the memory
@@ -589,13 +602,15 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 
 	if (root_closeness_found>=min_to_be_same_rhythm)
 	{
-		// is close enough to be considered a subrhythm
+		// is close enough to be considered a rhythm
+		post("DEBUG: rhythm found");
 		*new_rhythm = 0;
 		*id = id_found;
 		*root_closeness = root_closeness_found;
 		if (sub_closeness_found>=min_to_be_same_subrhythm)
 		{
 			// this is a known subrhythm
+			post("DEBUG: sub-rhythm found");
 			*sub_id = sub_id_found;
 			*sub_closeness = sub_closeness_found;
 		} else

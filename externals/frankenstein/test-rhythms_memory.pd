@@ -1,0 +1,42 @@
+#N canvas 0 0 641 458 12;
+#X obj 134 262 rhythms_memory;
+#X msg 126 212 measure;
+#X msg 317 224 0;
+#X obj 168 69 metro 500;
+#X obj 130 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 168 46 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X obj 169 92 int 0;
+#X obj 220 93 + 1;
+#X obj 169 115 % 4;
+#X floatatom 196 152 5 0 0 0 - - -;
+#X obj 127 155 sel 0;
+#X obj 125 185 bang;
+#X obj 317 189 bng 30 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X obj 133 285 unpack f f f f f;
+#X floatatom 131 312 5 0 0 1 is_this_a_new_rhythm - -;
+#X floatatom 160 330 5 0 0 1 id - -;
+#X floatatom 193 348 5 0 0 1 subid - -;
+#X floatatom 225 368 5 0 0 1 root_closeness - -;
+#X floatatom 257 391 5 0 0 1 sub_closeness - -;
+#X connect 0 0 13 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 4 0;
+#X connect 3 0 6 0;
+#X connect 5 0 3 0;
+#X connect 6 0 7 0;
+#X connect 6 0 8 0;
+#X connect 7 0 6 1;
+#X connect 8 0 9 0;
+#X connect 8 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X connect 12 0 2 0;
+#X connect 13 0 14 0;
+#X connect 13 1 15 0;
+#X connect 13 2 16 0;
+#X connect 13 3 17 0;
+#X connect 13 4 18 0;
