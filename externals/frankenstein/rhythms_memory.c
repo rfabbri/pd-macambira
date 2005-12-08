@@ -182,7 +182,7 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
 	int i;
 	time_t a;
     t_rhythms_memory *x = (t_rhythms_memory *)pd_new(rhythms_memory_class);
-	x->l_out = outlet_new(&x->x_obj, "list");
+	x->l_out = outlet_new(&x->x_obj, &s_list);
 	
 	x->seq_initialized = 0;
 

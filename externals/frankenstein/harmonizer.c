@@ -263,7 +263,7 @@ void harmonizer_init_pop(t_harmonizer *x)
 				{
 					// i go up
 					rnd = rand()/((double)RAND_MAX + 1);
-					steps = rnd * 5; // how many step (good notes) will I ignore?
+					steps = rnd * 5; // how many steps (good notes) will I ignore?
 					note = insertpoint + steps;
 					if (note >= POSSIBLE_NOTES)
 						note = POSSIBLE_NOTES-1;
@@ -272,7 +272,7 @@ void harmonizer_init_pop(t_harmonizer *x)
 				{
 					// i go down
 					rnd = rand()/((double)RAND_MAX + 1);
-					steps = rnd * 5; // how many step (good notes) will I ignore?
+					steps = rnd * 5; // how many steps (good notes) will I ignore?
 					note = insertpoint - steps;
 					if (note < 0)
 						note = 0;
@@ -295,6 +295,8 @@ void harmonizer_free(t_harmonizer *x)
 int fitness(t_harmonizer *x, int *candidate)
 {
 	int i, j, tmp, res, last, avgHI, avgLOW;
+	short int chord_notes[4];
+	short int chord_notes_ok[4];
 	short int transitions[VOICES];
 	short int directions[VOICES];
 	// intervals between voices
@@ -434,6 +436,41 @@ int fitness(t_harmonizer *x, int *candidate)
 	// TODO: too many near limits?
 	
 	// TODO: is a complete chord?
+	// does this voicing have all 5 notes?
+	// first build a table for comparision
+	for (i=0; i<4; i++)
+	{
+		chord_notes[i] = (x->target_notes[i]) % 12;
+		chord_notes_ok[i] = 0;
+	}
+	for (i=0; i<VOICES; i++)
+	{
+		tmp = notes[i] % 12;
+		for (j=0; j<4; j++)
+		{
+			if (chord_notes[j] == tmp)
+				chord_notes_ok[j]++;
+		}
+	}
+	// now in chord_notes_ok i have the number of times each note is present
+	if (chord_notes_ok[0] == 0)
+	{
+		// no fundamental! this is bad!!
+		res -= 5;
+	}
+	if ((chord_notes_ok[0] != 0) &&
+		(chord_notes_ok[2] != 0) &&
+		(chord_notes_ok[3] != 0) && 
+		(chord_notes_ok[4] != 0))
+	{
+		// complete chord! this is good
+		res += 5;
+	}
+	for (j=0; j<4; j++)
+	{
+		res -= 2^chord_notes_ok[j];
+	}
+	res += 2*VOICES;
 
 	// penalize too many basses
 	tmp = 0;
@@ -450,6 +487,7 @@ int fitness(t_harmonizer *x, int *candidate)
 	case 3: res -= 20; break;
 	case 4: res -= 30; break;
 	}
+
 
 	if (DEBUG_VERBOSE)
 		post("fitness is %i", res);

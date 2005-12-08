@@ -99,7 +99,7 @@ there are plenty of such algos, we must just copy them down.
 #include "m_pd.h"
 
 
-#define DEBUG 1 // messaggi di debug
+#define DEBUG 0 // messaggi di debug
 #define DEBUG_VERBOSE 0 // messaggi di debug
 
 // is this system Little Endian? (thanks to Mathieu Bouchard)

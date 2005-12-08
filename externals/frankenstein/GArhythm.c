@@ -41,7 +41,8 @@ typedef struct _GArhythm
 	float prob_crossover;
 	float prob_mutation;
 	char last[BUFFER_LENGHT];
-
+	int reinsert_src;
+	int reinsert_last;
 } t_GArhythm;
 
 void GArhythm_init_pop(t_GArhythm *x)
@@ -72,6 +73,73 @@ void GArhythm_init_pop(t_GArhythm *x)
 				x->population[i][3]
 				); 
 	}
+	
+}
+
+void GArhythm_reinit_pop(t_GArhythm *x)
+{
+	int i, j, vecsize, ntot, tmp, me;
+	float prob, variatore;
+	t_garray *arysrc_strum1;
+	t_garray *arysrc_strum2;
+	t_garray *arysrc_strum3;
+	t_garray *arysrc_strum4;
+	t_float *vecsrc_strum1;
+	t_float *vecsrc_strum2;
+	t_float *vecsrc_strum3;
+	t_float *vecsrc_strum4;
+
+	// load tables
+
+	if (!(arysrc_strum1 = (t_garray *)pd_findbyclass(x->x_arrayname_src_strum1, garray_class)))
+	{
+        pd_error(x, "%s: no such array", x->x_arrayname_src_strum1->s_name);
+	}
+    else if (!garray_getfloatarray(arysrc_strum1, &vecsize, &vecsrc_strum1))
+	{
+		pd_error(x, "%s: bad template for tabwrite", x->x_arrayname_src_strum1->s_name);
+	} 
+	else if (!(arysrc_strum2 = (t_garray *)pd_findbyclass(x->x_arrayname_src_strum2, garray_class)))
+	{
+        pd_error(x, "%s: no such array", x->x_arrayname_src_strum2->s_name);
+	}
+    else if (!garray_getfloatarray(arysrc_strum2, &vecsize, &vecsrc_strum2))
+	{
+		pd_error(x, "%s: bad template for tabwrite", x->x_arrayname_src_strum2->s_name);
+	}
+	else if (!(arysrc_strum3 = (t_garray *)pd_findbyclass(x->x_arrayname_src_strum3, garray_class)))
+	{
+        pd_error(x, "%s: no such array", x->x_arrayname_src_strum3->s_name);
+	}
+    else if (!garray_getfloatarray(arysrc_strum3, &vecsize, &vecsrc_strum3))
+	{
+		pd_error(x, "%s: bad template for tabwrite", x->x_arrayname_src_strum3->s_name);
+	}
+	else if (!(arysrc_strum4 = (t_garray *)pd_findbyclass(x->x_arrayname_src_strum4, garray_class)))
+	{
+        pd_error(x, "%s: no such array", x->x_arrayname_src_strum4->s_name);
+	}
+    else if (!garray_getfloatarray(arysrc_strum4, &vecsize, &vecsrc_strum4))
+	{
+		pd_error(x, "%s: bad template for tabwrite", x->x_arrayname_src_strum4->s_name);
+	}
+	
+	for (i=0; i<MAX_POPULATION; i++)
+		{
+			for (j=0; j<BUFFER_LENGHT; j++)
+			{
+				char c = 0x00;
+				if (vecsrc_strum1[j])
+					c = c | 0x01;
+				if (vecsrc_strum2[j])
+					c = c | (0x01 << 1);
+				if (vecsrc_strum3[j])
+					c = c | (0x01 << 2);
+				if (vecsrc_strum4[j])
+					c = c | (0x01 << 3);
+				x->population[i][j]=c;
+			}
+		}
 }
 
 void GArhythm_init_buf(t_float *buf)
@@ -316,7 +384,7 @@ static void GArhythm_bang(t_GArhythm *x) {
 			post("--------- starting process");
 	
 		// uccido a caso REINSERT_SRC elementi e inserisco il ritmo src al loro posto
-		for (i=0; i<REINSERT_SRC; i++)
+		for (i=0; i<x->reinsert_src; i++)
 		{
 			rnd = rand()/((double)RAND_MAX + 1);
 			me = (int) (rnd * MAX_POPULATION);
@@ -335,7 +403,7 @@ static void GArhythm_bang(t_GArhythm *x) {
 			}
 		}
 		// uccido a caso REINSERT_LAST elementi e inserisco il last al loro posto
-		for (i=0; i<REINSERT_LAST; i++)
+		for (i=0; i<x->reinsert_last; i++)
 		{
 			rnd = rand()/((double)RAND_MAX + 1);
 			me = (int) (rnd * MAX_POPULATION);
@@ -478,6 +546,57 @@ static void GArhythm_mutation_set(t_GArhythm *x, t_floatarg f)
   x->prob_mutation = f;
 }
 
+static void GArhythm_reinsert_src_set(t_GArhythm *x, t_floatarg f)
+{
+	if (f>=0)
+		x->reinsert_src = (int) f;
+}
+
+static void GArhythm_reinsert_last_set(t_GArhythm *x, t_floatarg f)
+{
+	if (f>=0)
+		x->reinsert_last = (int) f;
+}
+
+static void GArhythm_prob_crossover_set(t_GArhythm *x, t_floatarg f)
+{
+	if (f<=1 && f>=0)
+		x->prob_crossover = f;
+}
+
+static void GArhythm_prob_mutation_set(t_GArhythm *x, t_floatarg f)
+{
+	if (f<=1 && f>=0) 
+		x->prob_mutation = f;
+}
+
+static void GArhythm_help(t_GArhythm *x)
+{
+	post("");
+	post("");
+	post("GArhythm");
+	post("");
+	post("a rhythm generator/variatior that uses co-evolving Genetic Algorithms");
+	post("at the moment it only works with 16 step measure, 1 measure rhythms, it needs 4 arrays as input rhythms and outputs its rhythms on 4 arrays");
+	post("");
+
+	post("global usage hints");
+	post("you must provide 8 arguments: the first 4 are the names of arrays with src rhythms, the second 4 are names of arrays where GArhythm will put its output");
+	post("send a bang each time you want a new population (and a new rhythm) to be evaluated");
+	post("");
+	post("available commands");
+	post("reinit: initialize the population with the content of the src arrays");
+	post("variazione float: sets the index of wanted variation between the last proposed rhythm and the next one (from 0 to 1)");
+	post("aderenza float: sets the index of wanted closeness between the current src rhythm and proposed one (from 0 to 1)");
+	post("riempimento float: set 0 if you want sparse rhythms, 1 if you want a rhythm full of events");
+	post("reinsert_src int: how many times the src rhythms will be randomly copied in the population before breeding");
+	post("reinsert_last int: how many times the last rhythms will be randomly copied in the population before breeding");
+	post("prob_crossover float: sets the crossover probability. default is %f", DEF_PROB_CROSSOVER);
+	post("prob_mutation float: sets the mutation probability, default is %f", DEF_PROB_MUTATION);
+
+}
+
+
 static void *GArhythm_new(t_symbol *s, int argc, t_atom *argv)
 {
     t_GArhythm *x = (t_GArhythm *)pd_new(GArhythm_class);
@@ -489,6 +608,8 @@ static void *GArhythm_new(t_symbol *s, int argc, t_atom *argv)
 	x->indice_aderenza=0;
 	x->prob_crossover = DEF_PROB_CROSSOVER;
 	x->prob_mutation = DEF_PROB_MUTATION;
+	x->reinsert_src=REINSERT_SRC;
+	x->reinsert_last=REINSERT_LAST;
 
 
 	if (argc>0) 
@@ -536,4 +657,10 @@ void GArhythm_setup(void)
 	class_addmethod(GArhythm_class, (t_method)GArhythm_variazione_set, gensym("variazione"), A_DEFFLOAT, 0);
 	class_addmethod(GArhythm_class, (t_method)GArhythm_riempimento_set, gensym("riempimento"), A_DEFFLOAT, 0);
 	class_addmethod(GArhythm_class, (t_method)GArhythm_aderenza_set, gensym("aderenza"), A_DEFFLOAT, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_reinit_pop, gensym("reinit"), 0, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_reinsert_src_set, gensym("reinsert_src"), A_DEFFLOAT, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_reinsert_last_set, gensym("reinsert_last"), A_DEFFLOAT, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_prob_crossover_set, gensym("prob_crossover"), A_DEFFLOAT, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_prob_mutation_set, gensym("prob_mutation"), A_DEFFLOAT, 0);
+	class_addmethod(GArhythm_class, (t_method)GArhythm_help, gensym("help"), 0, 0);
 }
