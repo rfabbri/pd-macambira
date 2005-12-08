@@ -96,7 +96,7 @@ void end_measure(t_rhythms_memory *x)
 	counter = 0;
 	while(currEvent)
 	{
-		fduration = currEvent->when / x->measure_length;
+		fduration = (float) (((float) currEvent->when) / ((float) x->measure_length));
 		if (x->seq_initialized)
 		{
 			concatenateBeat(x->curr_seq, currEvent->voice, fduration, 1);

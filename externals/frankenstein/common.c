@@ -118,6 +118,7 @@ void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float f
 	newElement->start.numerator = res.numerator;
 	newElement->start.denominator = res.denominator;
 	*firstEvent = newElement;
+	post("DEBUG setFirstBeat: %i %i", res.numerator, res.denominator);
 }
 
 void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, float fstart, float fduration)
@@ -141,6 +142,7 @@ void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, flo
 	res = float2duration(fstart);
 	newElement->start.numerator = res.numerator;
 	newElement->start.denominator = res.denominator;
+	post("DEBUG concatenateBeat: %i %i", res.numerator, res.denominator);
 }
 
 void freeBeats(t_rhythm_event *currentEvent)
@@ -424,7 +426,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	{
 			this_weight_int = this_rep->transitions[i].weight;
 			this_weight_float = (float) (((float) this_weight_int) / ((float) this_rep->max_weight));
-			post("DEBUG: transition %i this_weight_float=%f", i, this_weight_float);
+			post("DEBUG: transition %i this_weight_int=%i max_weight=%i this_weight_float=%f", i, this_weight_int, this_rep->max_weight, this_weight_float);
 			if (this_weight_float > min_to_be_main_rhythm_beat)
 			{
 				// this is a main rhythm beat
@@ -531,17 +533,21 @@ void find_rhythm_in_memory(t_rhythm_memory_representation *rep_list,
 	this_rep = rep_list;
 	while(this_rep)
 	{
-		compare_rhythm_vs_representation(this_rep, 
-			src_rhythm, 
-			&curr_subid, 
-			&curr_closeness, 
-			&curr_sub_closeness);
-		if (curr_closeness > best_closeness)
+		// if max_weight maxweight == 0 then there are no rhythms and no table
+		if (this_rep->max_weight)
 		{
-			best_closeness = curr_closeness;
-			best_id = this_rep->id;
-			best_sub_closeness = curr_sub_closeness;
-			best_subid = curr_subid;
+			compare_rhythm_vs_representation(this_rep, 
+				src_rhythm, 
+				&curr_subid, 
+				&curr_closeness, 
+				&curr_sub_closeness);
+			if (curr_closeness > best_closeness)
+			{
+				best_closeness = curr_closeness;
+				best_id = this_rep->id;
+				best_sub_closeness = curr_sub_closeness;
+				best_subid = curr_subid;
+			}
 		}
 		this_rep = this_rep->next;
 	}
