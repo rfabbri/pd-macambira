@@ -1,0 +1,12 @@
+#N canvas 476 83 465 356 10;
+#X msg 112 134 bang;
+#X text 33 42 [import] loads libraries from the patch. Currently \,
+it loads the libraries into the global namespace \, but the grand plan
+is for it only load the libraries into the patch's namespace.;
+#X obj 112 159 import ext13 memento rradical;
+#X text 37 204 Sending a bang to [import] makes it output information
+about the libraries it loaded to the Console.;
+#X text 27 300 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 244 314 released under the GNU GPL;
+#X connect 0 0 2 0;

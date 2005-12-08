@@ -96,8 +96,8 @@ WIN_DEFINES = \
 
 #------------------------------------------------------------------------------#
 # ALL
-all: pre_all_$(OS_NAME) creb cxc cyclone ext13 iemabs iemlib iemmatrix pddp \
-pdp pmpd smlib toxy vbap zexy
+all: pre_all_$(OS_NAME) creb cxc cyclone ext13 freeverb iemabs iemlib \
+iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy vbap zexy
 	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
 # try it this way so that it'll recognize files that have already been built
 	-cd $(externals_src)/build/$(OS_NAME) && make -k 
@@ -116,9 +116,11 @@ pre_all_unknown:
 #------------------------------------------------------------------------------#
 # INSTALL
 install: all $(objectsdir) help_install objects_install unfiltered_install \
-creb_install cxc_install cyclone_install ext13_install iemabs_install \
-iemabs_install iemlib_install iemmatrix_install pddp_install pdp_install \
-pmpd_install toxy_install unauthorized_install vbap_install zexy_install
+creb_install cxc_install cyclone_install ext13_install freeverb_install\
+iemabs_install iemabs_install iemlib_install iemmatrix_install loaders_install \
+markex_install maxlib_install mjlib_install motex_install pddp_install \
+pdp_install pmpd_install toxy_install unauthorized_install vbap_install \
+zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -155,7 +157,6 @@ help_install: $(helpdir)
 			$(externals_src)/ggee/*/*.gif \
 			$(externals_src)/gem2pdp/*.pd \
 			$(externals_src)/ff/*.pd \
-			$(externals_src)/freeverb~/*.pd \
 			$(externals_src)/hcs/*-help.pd \
 				$(helpdir)
 	install -p \
@@ -163,8 +164,6 @@ help_install: $(helpdir)
 			$(externals_src)/hcs/hid/examples/*.pd \
 			$(externals_src)/hcs/pan/*-help.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
-			$(externals_src)/markex/*.pd \
-			$(externals_src)/motex/*.pd \
 			$(externals_src)/nusmuk/line3/*.pd\
 				$(helpdir)
 	install -p \
@@ -179,14 +178,6 @@ help_install: $(helpdir)
 			$(externals_src)/vst/*.pd \
 			$(externals_src)/zhzxh~/*.pd \
 				$(helpdir)
-#------------------------------------------------------------------------------#
-#  mjlib [prob] conflicts with cyclone's [prob] so filter it
-	install -p $(shell ls -1 $(externals_src)/mjlib/doc/*.* | \
-		grep -v 'prob') $(helpdir)
-#------------------------------------------------------------------------------#
-#  maxlib [split] conflicts with cyclone so filter it
-	install -p $(shell ls -1 $(externals_src)/maxlib/help/*.* | \
-		grep -v 'split') $(helpdir)
 
 
 
@@ -196,6 +187,7 @@ help_install: $(helpdir)
 #
 #==============================================================================#
 
+# this is the template for creating new entries:
 
 #------------------------------------------------------------------------------#
 # TEMPLATE
@@ -213,16 +205,17 @@ template_install: template
 	install -p $(TEMPLATE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(TEMPLATE_NAME)
 	install -d $(helpdir)/$(TEMPLATE_NAME)
 	install -p $(wildcard $(externals_src)/template/help/*.pd) \
-		$(examplesdir)/$(TEMPLATE_NAME)
+		$(helpdir)/$(TEMPLATE_NAME)
 	install -d $(manualsdir)/$(TEMPLATE_NAME)
-	install -p $(externals_src)/template/README.txt $(manualsdir)/$(TEMPLATE_NAME)
+	install -p $(externals_src)/template/README \
+		$(manualsdir)/$(TEMPLATE_NAME)/README.txt
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
 	install -p $(wildcard $(externals_src)/template/examples/*.pd) \
 		$(examplesdir)/$(TEMPLATE_NAME)
 
 template_clean:
 	-rm -f -- $(externals_src)/template/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/template/*.bak
+	-rm -f -- $(externals_src)/template/*.bak *.*~
 
 
 #------------------------------------------------------------------------------#
@@ -235,14 +228,14 @@ creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
 	install -p $(externals_src)/creb/abs/*.pd $(objectsdir)/$(CREB_NAME)
 	install -d $(helpdir)/$(CREB_NAME)
-	install -p -m0644	$(externals_src)/creb/doc/examples/*.* \
+	install -p $(externals_src)/creb/doc/examples/*.* \
 		$(helpdir)/$(CREB_NAME)
 #	install -d $(manualsdir)/$(CREB_NAME)
 #	install -d $(examplesdir)/$(CREB_NAME)
 
 creb_clean:
 	-rm -f -- $(externals_src)/creb/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/creb/*.bak
+	-rm -f -- $(externals_src)/creb/*.bak *.*~
 
 
 #------------------------------------------------------------------------------#
@@ -267,16 +260,16 @@ cxc_install: cxc
 		 $(manualsdir)/$(CXC_NAME)/README.txt
 
 cxc_clean:
-	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/cxc/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/cxc/*.bak
+	-rm -f -- $(CXC_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/cxc/*.bak *.*~
+
 
 #------------------------------------------------------------------------------#
 # CYCLONE
 CYCLONE_NAME=cyclone
 # cyclone is compiled straight into $(OUT_DIR)
 CYCLONE_OUT_DIR=$(objectsdir)/$(CYCLONE_NAME)
-cyclone:
+cyclone: $(bindir)
 
 
 cyclone_install: cyclone
@@ -287,7 +280,6 @@ cyclone_install: cyclone
 		--description "a library for porting and running Max/MSP patches in Pd"
 	cd $(externals_src)/miXed/cyclone && $(MAKE) OUT_DIR=$(CYCLONE_OUT_DIR)
 # install "cyclist" command line app with pd
-	install -d $(bindir)
 # this doesn't build in the right place yet
 #	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(bindir) && \
 #		rm $(CYCLONE_OUT_DIR)/cyclist
@@ -301,6 +293,10 @@ cyclone_install: cyclone
 	install -d $(examplesdir)/$(CYCLONE_NAME)
 	cd $(externals_src)/miXed/test/cyclone && \
 		install -p *.* $(examplesdir)/$(CYCLONE_NAME)
+
+
+cyclone_clean:
+	cd $(externals_src)/mixed/cyclone && make $(DEST_PATHS) clean
 
 
 
@@ -331,9 +327,34 @@ ext13_install: ext13
 
 ext13_clean:
 	-rm -f -- $(externals_src)/ext13/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/ext13/*.bak
-	-rm -f -- $(externals_src)/ext13/*~
+	-rm -f -- $(externals_src)/ext13/*.bak *.*~
 
+
+#------------------------------------------------------------------------------#
+# FREEVERB
+FREEVERB_NAME=freeverb
+FREEVERB_OBJECTS = $(wildcard $(externals_src)/freeverb~/*.c)
+freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
+
+freeverb_install: freeverb
+	install -d $(objectsdir)/$(FREEVERB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FREEVERB_NAME) \
+		--author "Olaf Matthes and Jezar Wakefield" \
+		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
+		--license "GNU GPL" \
+		--version "1.2"
+	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FREEVERB_NAME)
+	install -d $(helpdir)/$(FREEVERB_NAME)
+	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
+		$(helpdir)/$(FREEVERB_NAME)
+	install -d $(manualsdir)/$(FREEVERB_NAME)
+	install -p $(externals_src)/freeverb/README \
+		$(manualsdir)/$(FREEVERB_NAME)/README.txt
+
+
+freeverb_clean:
+	-rm -f -- $(externals_src)/freeverb/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/freeverb/*.bak *.*~
 
 
 #------------------------------------------------------------------------------#
@@ -399,6 +420,134 @@ iemmatrix_install: iemmatrix
 
 
 #------------------------------------------------------------------------------#
+# LOADERS
+LOADERS_NAME=
+LOADERS_OBJECTS = $(wildcard $(externals_src)/loaders/*.c)
+loaders: $(LOADERS_OBJECTS:.c=.$(EXTENSION))
+
+loaders_install: loaders
+	install -d $(objectsdir)/$(LOADERS_NAME)
+	install -p $(LOADERS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(LOADERS_NAME)
+	install -d $(helpdir)/$(LOADERS_NAME)
+	install -p $(wildcard $(externals_src)/loaders/help/*.pd) \
+		$(helpdir)/$(LOADERS_NAME)
+	install -d $(manualsdir)/$(LOADERS_NAME)
+	install -p $(externals_src)/loaders/README \
+		$(manualsdir)/$(LOADERS_NAME)/README.txt
+	install -d $(examplesdir)/$(LOADERS_NAME)
+	install -p $(wildcard $(externals_src)/loaders/examples/*.pd) \
+		$(examplesdir)/$(LOADERS_NAME)
+
+loaders_clean:
+	-rm -f -- $(externals_src)/loaders/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/loaders/*.bak *.*~
+
+
+#------------------------------------------------------------------------------#
+# MARKEX
+MARKEX_NAME=markex
+MARKEX_OBJECTS = $(wildcard $(externals_src)/markex/*.c)
+markex: $(MARKEX_OBJECTS:.c=.$(EXTENSION))
+
+markex_install: markex
+	install -d $(objectsdir)/$(MARKEX_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MARKEX_NAME) \
+		--author "Mark Danks" \
+		--license "GNU GPL"
+	install -p $(MARKEX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MARKEX_NAME)
+	install -d $(helpdir)/$(MARKEX_NAME)
+	install -p $(wildcard $(externals_src)/markex/*.pd) \
+		$(helpdir)/$(MARKEX_NAME)
+	install -d $(manualsdir)/$(MARKEX_NAME)
+	install -p $(externals_src)/markex/README \
+		$(manualsdir)/$(MARKEX_NAME)/README.txt
+	install -d $(examplesdir)/$(MARKEX_NAME)
+	install -p $(wildcard $(externals_src)/markex/examples/*.pd) \
+		$(examplesdir)/$(MARKEX_NAME)
+
+markex_clean:
+	-rm -f -- $(externals_src)/markex/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/markex/*.bak *.*~
+
+
+#------------------------------------------------------------------------------#
+# MAXLIB
+MAXLIB_NAME=maxlib
+MAXLIB_OBJECTS = $(wildcard $(externals_src)/maxlib/src/*.c)
+maxlib: $(MAXLIB_OBJECTS:.c=.$(EXTENSION))
+
+maxlib_install: maxlib
+	install -d $(objectsdir)/$(MAXLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MAXLIB_NAME) \
+		--author "Olaf Matthes <olaf.matthes@gmx.de>" \
+		--license "GNU GPL" \
+		--version "1.5.2-cvs"
+	install -p $(MAXLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAXLIB_NAME)
+	install -d $(helpdir)/$(MAXLIB_NAME)
+	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
+		$(helpdir)/$(MAXLIB_NAME)
+	install -d $(manualsdir)/$(MAXLIB_NAME)
+	install -p $(externals_src)/maxlib/README \
+		$(manualsdir)/$(MAXLIB_NAME)/README.txt
+
+maxlib_clean:
+	-rm -f -- $(externals_src)/maxlib/src/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/maxlib/*/*.bak *.*~ */*.*~
+
+
+#------------------------------------------------------------------------------#
+# MJLIB
+MJLIB_NAME=mjlib
+# exclude the library file mjLib.c
+MJLIB_OBJECTS = $(wildcard $(externals_src)/mjlib/[a-z]?[a-z]*.c)
+mjlib: $(MJLIB_OBJECTS:.c=.$(EXTENSION))
+
+mjlib_install: mjlib
+	install -d $(objectsdir)/$(MJLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MJLIB_NAME) \
+		--author "mark williamson <mark@junklight.com>" \
+		--license "GNU GPL" \
+		--version "0.1"
+	install -p $(MJLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MJLIB_NAME)
+	install -d $(helpdir)/$(MJLIB_NAME)
+	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
+		$(helpdir)/$(MJLIB_NAME)
+	install -d $(manualsdir)/$(MJLIB_NAME)
+	install -p $(externals_src)/mjlib/readme.txt \
+		$(manualsdir)/$(MJLIB_NAME)
+
+mjlib_clean:
+	-rm -f -- $(externals_src)/mjlib/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/mjlib/*.bak *.*~
+
+
+#------------------------------------------------------------------------------#
+# MOTEX
+MOTEX_NAME=motex
+MOTEX_OBJECTS = $(wildcard $(externals_src)/motex/*.c)
+motex: $(MOTEX_OBJECTS:.c=.$(EXTENSION))
+
+motex_install: motex
+	install -d $(objectsdir)/$(MOTEX_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MOTEX_NAME) \
+		--author "Iain Mott <iain.mott@bigpond.com>" \
+		--license "GNU GPL" \
+		--version "1.1.3-cvs"
+	install -p $(MOTEX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MOTEX_NAME)
+	install -p $(externals_src)/motex/noisegate~.pd $(objectsdir)/$(MOTEX_NAME)
+	install -d $(helpdir)/$(MOTEX_NAME)
+	install -p $(wildcard $(externals_src)/motex/*-help.pd) \
+		$(helpdir)/$(MOTEX_NAME)
+	install -d $(manualsdir)/$(MOTEX_NAME)
+	install -p $(externals_src)/motex/README \
+		$(manualsdir)/$(MOTEX_NAME)/README.txt
+
+motex_clean:
+	-rm -f -- $(externals_src)/motex/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/motex/*.bak *.*~
+
+
+#------------------------------------------------------------------------------#
 # PDDP
 PDDP_NAME=pddp
 # pddp is compiled straight into $(OUT_DIR)
@@ -419,6 +568,9 @@ pddp_install: pddp
 	install -p $(externals_src)/miXed/test/pddp/*.*  \
 		$(examplesdir)/$(PDDP_NAME)
 
+
+pddp_clean:
+	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
 
 
 #------------------------------------------------------------------------------#
@@ -517,8 +669,7 @@ smlib_install: smlib
 
 smlib_clean:
 	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/smlib/*.bak
-	-rm -f -- $(externals_src)/smlib/*~
+	-rm -f -- $(externals_src)/smlib/*.bak *.*~
 
 
 #------------------------------------------------------------------------------#
@@ -545,11 +696,13 @@ toxy_install: toxy
 		$(examplesdir)/$(TOXY_NAME)
 
 
+toxy_clean:
+	cd $(externals_src)/mixed/toxy && make $(DEST_PATHS) clean
+
+
 #------------------------------------------------------------------------------#
 # UNAUTHORIZED
 UNAUTHORIZED_NAME=unauthorized
-# unauthorized is compiled straight into $(OUT_DIR)
-UNAUTHORIZED_OUT_DIR=$(objectsdir)/$(UNAUTHORIZED_NAME)
 unauthorized:
 
 
@@ -574,6 +727,9 @@ unauthorized_install: unauthorized
 	install -p $(externals_src)/unauthorized/blinkenlights/blm/*.* \
 		$(helpdir)/$(UNAUTHORIZED_NAME)/blm
 
+unauthorized_clean:
+	cd $(externals_src)/unauthorized && make clean
+
 
 #------------------------------------------------------------------------------#
 # VBAP
@@ -594,23 +750,20 @@ vbap_install: vbap
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-zexy:
-#  zexy's new build system doesn't work with CVS layout, and most of zexy is
-#  included in the extrnals build system now anyway.  But the abstractions
-#  should still be included
-#	cd $(externals_src)/zexy/src && autoconf && ./configure && $(MAKE)
-
+ZEXY_OBJECTS = $(wildcard $(externals_src)/zexy/src/[a-y]*.c)
+zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
-#	install -p $(externals_src)/zexy/src/*.$(EXTENSION) $(objectsdir)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
+	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
+		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
 		$(objectsdir)/$(ZEXY_NAME)
-#		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') \
-
+# an escape pattern for the abstractions with special characters
+#		grep -v '-help.pd' | sed 's/\([&<>|~]\)/\\\1/g') 
 	install -d $(helpdir)/$(ZEXY_NAME)
-	install -p $(shell ls -1 $(externals_src)/zexy/abs/*-help.pd | sed 's|\(.*\)|"\1"|g') \
-		$(helpdir)/$(ZEXY_NAME)
+	install -p $(shell ls -1 $(externals_src)/zexy/abs/*-help.pd | \
+		sed 's|\(.*\)|"\1"|g') $(helpdir)/$(ZEXY_NAME)
 	install -p $(externals_src)/zexy/zexy.pd  $(helpdir)
 	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
@@ -666,14 +819,10 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean ext13_clean smlib_clean install_clean
+clean: creb_clean cxc_clean cyclone_clean ext13_clean freeverb_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
 	cd $(externals_src)/build/$(OS_NAME) && make $(DEST_PATHS) clean
 	cd $(externals_src)/hcs/hid && make $(DEST_PATHS) clean
 	cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
-	cd $(externals_src)/mixed/cyclone && make $(DEST_PATHS) clean
-	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
-	cd $(externals_src)/mixed/toxy && make $(DEST_PATHS) clean
-	cd $(externals_src)/unauthorized && make clean
 
 distclean: clean cruft_clean
 	rm $(externals_src)/OSCx Makefile
