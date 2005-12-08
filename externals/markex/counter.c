@@ -6,24 +6,24 @@
 
 #include "m_pd.h"
 
-/* -------------------------- gem_counter ------------------------------ */
+/* -------------------------- counter ------------------------------ */
 
 /* instance structure */
-static t_class *gem_counter_class;
+static t_class *counter_class;
 
-typedef struct _gem_counter
+typedef struct _counter
 {
 	t_object    x_obj;	    /* obligatory object header */
 	int	        c_current;	/* current number */
 	int	        c_high;	    /* highest number */
 	int	        c_low;	    /* lowest number */
 	int	        c_updown;	/* 0 = going up, 1 = going down */
-	int	        c_dir;	    /* gem_counter dir. 1=up, 2=down, 3=up/down */
+	int	        c_dir;	    /* counter dir. 1=up, 2=down, 3=up/down */
 	t_outlet    *t_out1;	/* the outlet */
 	t_outlet    *t_out2;	/* the outlet */
-} t_gem_counter;
+} t_counter;
 
-void gem_counter_bang(t_gem_counter *x)
+void counter_bang(t_counter *x)
 {
 	int sendBang = 0;
     switch(x->c_dir)
@@ -93,23 +93,23 @@ void gem_counter_bang(t_gem_counter *x)
 		outlet_bang(x->t_out2);
 }
 
-void gem_counter_dir(t_gem_counter *x, t_floatarg n)
+void counter_dir(t_counter *x, t_floatarg n)
 {
     if (n == 1 || n == 2 || n == 3) x->c_dir = (int)n;
     else error("bad dir");
 }
 
-void gem_counter_high(t_gem_counter *x, t_floatarg n)
+void counter_high(t_counter *x, t_floatarg n)
 {
     x->c_high = (int)n;
 }
 
-void gem_counter_low(t_gem_counter *x, t_floatarg n)
+void counter_low(t_counter *x, t_floatarg n)
 {
     x->c_low = (int)n;
 }
 
-void gem_counter_reset(t_gem_counter *x, t_symbol *s, int argc, t_atom *argv)
+void counter_reset(t_counter *x, t_symbol *s, int argc, t_atom *argv)
 {
     if (!argc)
     {
@@ -137,14 +137,14 @@ void gem_counter_reset(t_gem_counter *x, t_symbol *s, int argc, t_atom *argv)
 		        x->c_current = (int)argv[0].a_w.w_float;
 		        break;
 	        default :
-		        error ("gem_counter: reset not float");
+		        error ("counter: reset not float");
 		        break;
 	    }
     }
     outlet_float(x->t_out1, (float)x->c_current);
 }
 
-void gem_counter_clear(t_gem_counter *x, t_symbol *s, int argc, t_atom *argv)
+void counter_clear(t_counter *x, t_symbol *s, int argc, t_atom *argv)
 {
     if (!argc)
     {
@@ -172,15 +172,15 @@ void gem_counter_clear(t_gem_counter *x, t_symbol *s, int argc, t_atom *argv)
 		        x->c_current = (int)argv[0].a_w.w_float - 1;
 		        break;
 	        default :
-		        error ("gem_counter: reset not float");
+		        error ("counter: reset not float");
 		        break;
 	    }
     }
 }
 
-void *gem_counter_new(t_floatarg f, t_floatarg g, t_floatarg h) /* init vals in struc */
+void *counter_new(t_floatarg f, t_floatarg g, t_floatarg h) /* init vals in struc */
 {
-    t_gem_counter *x = (t_gem_counter *)pd_new(gem_counter_class);
+    t_counter *x = (t_counter *)pd_new(counter_class);
     x->t_out1 = outlet_new(&x->x_obj, 0);
     x->t_out2 = outlet_new(&x->x_obj, 0);
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_float, gensym("fl1"));
@@ -190,20 +190,20 @@ void *gem_counter_new(t_floatarg f, t_floatarg g, t_floatarg h) /* init vals in 
     x->c_updown = 0;
     if (h)
     {
-	    gem_counter_low(x, f);
-	    gem_counter_high(x, g);
-	    gem_counter_dir(x, h);
+	    counter_low(x, f);
+	    counter_high(x, g);
+	    counter_dir(x, h);
     }
     else if (g)
     {
 	    x->c_dir = 1;
-	    gem_counter_low(x, f);
-	    gem_counter_high(x, g);
+	    counter_low(x, f);
+	    counter_high(x, g);
     }
     else if (f)
     {
 	    x->c_dir = x->c_low = 1;
-	    gem_counter_high(x, f);
+	    counter_high(x, f);
     }
     else
     {
@@ -213,18 +213,18 @@ void *gem_counter_new(t_floatarg f, t_floatarg g, t_floatarg h) /* init vals in 
     return (x);
 }
 
-void gem_counter_setup(void)
+void counter_setup(void)
 {
-    gem_counter_class = class_new(gensym("gem_counter"), (t_newmethod)gem_counter_new, 0,
-    	    sizeof(t_gem_counter), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
-    class_addbang(gem_counter_class, (t_method)gem_counter_bang);
-    class_addmethod(gem_counter_class, (t_method)gem_counter_dir, gensym("fl1"), A_FLOAT, 0);
-    class_addmethod(gem_counter_class, (t_method)gem_counter_low, gensym("fl2"), A_FLOAT, 0);
-    class_addmethod(gem_counter_class, (t_method)gem_counter_high, gensym("fl3"), A_FLOAT, 0);
-    class_addmethod(gem_counter_class, (t_method)gem_counter_reset, gensym("reset"), A_GIMME, 0);
-    class_addmethod(gem_counter_class, (t_method)gem_counter_clear, gensym("clear"), A_GIMME, 0);
+    counter_class = class_new(gensym("counter"), (t_newmethod)counter_new, 0,
+    	    sizeof(t_counter), 0, A_DEFFLOAT, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addbang(counter_class, (t_method)counter_bang);
+    class_addmethod(counter_class, (t_method)counter_dir, gensym("fl1"), A_FLOAT, 0);
+    class_addmethod(counter_class, (t_method)counter_low, gensym("fl2"), A_FLOAT, 0);
+    class_addmethod(counter_class, (t_method)counter_high, gensym("fl3"), A_FLOAT, 0);
+    class_addmethod(counter_class, (t_method)counter_reset, gensym("reset"), A_GIMME, 0);
+    class_addmethod(counter_class, (t_method)counter_clear, gensym("clear"), A_GIMME, 0);
 
 #if PD_MINOR_VERSION < 37 
-	class_sethelpsymbol(gem_counter_class, gensym("gem_counter-help.pd"));
+
 #endif
 }
