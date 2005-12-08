@@ -348,7 +348,7 @@ freeverb_install: freeverb
 	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
 		$(helpdir)/$(FREEVERB_NAME)
 	install -d $(manualsdir)/$(FREEVERB_NAME)
-	install -p $(externals_src)/freeverb/README \
+	install -p $(externals_src)/freeverb~/README \
 		$(manualsdir)/$(FREEVERB_NAME)/README.txt
 
 
@@ -431,12 +431,8 @@ loaders_install: loaders
 	install -d $(helpdir)/$(LOADERS_NAME)
 	install -p $(wildcard $(externals_src)/loaders/help/*.pd) \
 		$(helpdir)/$(LOADERS_NAME)
-	install -d $(manualsdir)/$(LOADERS_NAME)
-	install -p $(externals_src)/loaders/README \
-		$(manualsdir)/$(LOADERS_NAME)/README.txt
-	install -d $(examplesdir)/$(LOADERS_NAME)
-	install -p $(wildcard $(externals_src)/loaders/examples/*.pd) \
-		$(examplesdir)/$(LOADERS_NAME)
+#	install -d $(manualsdir)/$(LOADERS_NAME)
+#	install -p $(externals_src)/loaders/README.txt $(manualsdir)/$(LOADERS_NAME)
 
 loaders_clean:
 	-rm -f -- $(externals_src)/loaders/*.$(EXTENSION)
@@ -461,9 +457,6 @@ markex_install: markex
 	install -d $(manualsdir)/$(MARKEX_NAME)
 	install -p $(externals_src)/markex/README \
 		$(manualsdir)/$(MARKEX_NAME)/README.txt
-	install -d $(examplesdir)/$(MARKEX_NAME)
-	install -p $(wildcard $(externals_src)/markex/examples/*.pd) \
-		$(examplesdir)/$(MARKEX_NAME)
 
 markex_clean:
 	-rm -f -- $(externals_src)/markex/*.$(EXTENSION)
