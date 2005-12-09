@@ -35,7 +35,7 @@
 ;; configuration file:
 ;;
 ;;   (autoload 'pd-mode "pd-mode" "autoloaded" t)
-;;   (add-to-list 'auto-mode-alist '("\\.max$" . pd-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.pat$" . pd-mode))
 ;;   (add-to-list 'auto-mode-alist '("\\.pd$"  . pd-mode))
 ;;
  
