@@ -37,70 +37,63 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-CFLAGS = -DPD -DUNIX -Dunix $(OPTIM_FLAGS) \
-    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow 
-INCLUDES = -I$(pd_src)/src
+
+CFLAGS = -DPD -DUNIX -Dunix $(OPTIM_FLAGS) -I$(pd_src)/src\
+    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow \
+	-I$(pd_src)/src
 LDFLAGS =  
-STRIP = strip --strip-unneeded -R .note -R .comment
+LIBS = 
 
-#------------------------------------------------------------------------------#
-# DARWIN
-DARWIN_CFLAGS = $(CFLAGS)
-DARWIN_INCLUDES = $(INCLUDES) -I/sw/include
-DARWIN_LDFLAGS = $(LDFLAGS) -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
-%.pd_darwin: %.c
-	$(CC) $(DARWIN_CFLAGS) $(DARWIN_INCLUDES) -o "$*.o" -c "$*.c"
-	$(CC) $(DARWIN_LDFLAGS) -o "$*.pd_darwin" "$*.o" -lc -lm
-	chmod a-x "$*.pd_darwin"
-	rm -f "$*.o" 
-
-
-#------------------------------------------------------------------------------#
-# LINUX
-LINUX_CFLAGS = $(CFLAGS) -fPIC
-LINUX_INCLUDES = $(INCLUDES)
-LINUX_LDFLAGS = $(LDFLAGS) -Wl,-export_dynamic  -shared
-%.pd_linux: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o "$*.o" -c "$*.c"
-	gcc  $(LINUX_LDFLAGS) -o "$*.pd_linux" "$*.o" -lc -lm 
-	chmod a-x "$*.pd_linux"
-	$(STRIP) $*.pd_linux
-	rm -f "$*.o" 
-
-
-#------------------------------------------------------------------------------#
-# WIN (MinGW)
-WIN_CFLAGS = -mms-bitfields $(CFLAGS)
-WIN_INCLUDES = $-I. -I.. -I$(PD_PATH)/src -IC:/msys/1.0/include
-WIN_LDFLAGS = $(LDFLAGS) -shared -LC:/msys/1.0/lib -L$(PD_PATH)/bin -lpd
-# these are for compatibility
-WIN_DEFINES = \
-	-D'drand48()=((double)rand()/RAND_MAX)' \
-	-D'srand48(n)=srand((n))' \
-	-D'O_NONBLOCK=1' \
+ifeq ($(OS_NAME),darwin)
+  CFLAGS += -I/sw/include
+  LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
+  STRIP = strip -u -r
+else
+  ifeq ($(OS_NAME),win)
+    CFLAGS += -mms-bitfields -D'O_NONBLOCK=1' \
+      -D'drand48()=((double)rand()/RAND_MAX)' -D'srand48(n)=srand((n))'
+    LDFLAGS += -shared
+    LIBS += -L$(PD_PATH)/bin -lpd
 # These don't seem to be needed:
 #	-D'bzero(p,n)=memset(p,0,n)' \
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
-%.dll: %.c
-	$(CC) $(WIN_CFLAGS) $(WIN_DEFINES) $(WIN_INCLUDES) \
-		 -o "$*.o" -c "../src/$*.c"
-	gcc $(LDFLAGS) -o "$*.dll" "$*.o" 
-	chmod a-x "$*.pd_linux"
-	$(STRIP) "$*.dll"
-	rm "$*.o"
+    STRIP = strip --strip-unneeded -R .note -R .comment
+  else
+    CFLAGS += -fPIC
+    LDFLAGS += -Wl,-export_dynamic  -shared
+    STRIP = strip --strip-unneeded -R .note -R .comment
+  endif
+endif
 
+%.o: %.c
+	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
+%.$(EXTENSION): %.o
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o" -lc -lm  $(LIBS) \
+		`test -f $*.libs && cat $*.libs`	\
+		`test -f $(dir $*)../$(OS_NAME)/$(notdir $*).libs && \
+			cat $(dir $*)../$(OS_NAME)/$(notdir $*).libs`
+	chmod a-x "$*.$(EXTENSION)"
+	$(STRIP) $*.$(EXTENSION)
+	rm -f -- $*.o
 
 
 #------------------------------------------------------------------------------#
 # ALL
-all: pre_all_$(OS_NAME) creb cxc cyclone ext13 freeverb iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy vbap zexy
-	@echo "Compiling objects for $(OS_NAME) aka $(UNAME)"
-# try it this way so that it'll recognize files that have already been built
-	-cd $(externals_src)/build/$(OS_NAME) && make -k 
+
+#TARGETS = creb cxc cyclone ext13 freeverb hid iemabs iemlib \
+#iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy vbap zexy
+#$(patsubst %, %_install,$(TARGETS))
+
+BUILDSRC_OBJECTS = $(wildcard $(externals_src)/build/src/*.c)
+all: pre_all_$(OS_NAME) $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) \
+creb cxc cyclone ext13 freeverb \
+hid iemabs iemlib iemmatrix loaders markex maxlib mjlib motex pddp pdp \
+pmpd smlib toxy vbap zexy
+	@echo " "
+	@echo "Compiled objects for $(OS_NAME) aka $(UNAME)"
 
 # these targets are for platform-specific needs that run before objects:
 pre_all_darwin:
@@ -115,7 +108,7 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: all $(objectsdir) help_install objects_install unfiltered_install \
+install: $(objectsdir) all help_install objects_install unfiltered_install \
 creb_install cxc_install cyclone_install ext13_install freeverb_install\
 iemabs_install iemabs_install iemlib_install iemmatrix_install loaders_install \
 markex_install maxlib_install mjlib_install motex_install pddp_install \
@@ -125,8 +118,7 @@ zexy_install
 	@echo "externals install succeeded!"
 
 objects_install: 
-	cd $(externals_src)/build/$(OS_NAME)/ && \
-		install -p *.$(EXTENSION) $(objectsdir)
+	install -p $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
 
 
 #==============================================================================#
@@ -161,7 +153,6 @@ help_install: $(helpdir)
 				$(helpdir)
 	install -p \
 			$(externals_src)/hcs/*/doc/*.pd \
-			$(externals_src)/hcs/hid/examples/*.pd \
 			$(externals_src)/hcs/pan/*-help.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
 			$(externals_src)/nusmuk/line3/*.pd\
@@ -204,18 +195,20 @@ template_install: template
 		--version ""
 	install -p $(TEMPLATE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(TEMPLATE_NAME)
 	install -d $(helpdir)/$(TEMPLATE_NAME)
-	install -p $(wildcard $(externals_src)/template/help/*.pd) \
+	install -p $(externals_src)/template/help/*.pd \
 		$(helpdir)/$(TEMPLATE_NAME)
 	install -d $(manualsdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/README \
 		$(manualsdir)/$(TEMPLATE_NAME)/README.txt
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
-	install -p $(wildcard $(externals_src)/template/examples/*.pd) \
+	install -p $(externals_src)/template/examples/*.pd \
 		$(examplesdir)/$(TEMPLATE_NAME)
 
 template_clean:
 	-rm -f -- $(externals_src)/template/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/template/*.bak *.*~
+	-rm -f -- $(externals_src)/template/*.o
+	-rm -f -- $(externals_src)/template/*.bak
+	-rm -f -- $(externals_src)/template/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -235,7 +228,9 @@ creb_install: creb
 
 creb_clean:
 	-rm -f -- $(externals_src)/creb/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/creb/*.bak *.*~
+	-rm -f -- $(externals_src)/creb/*.o
+	-rm -f -- $(externals_src)/creb/*.bak
+	-rm -f -- $(externals_src)/creb/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -261,7 +256,9 @@ cxc_install: cxc
 
 cxc_clean:
 	-rm -f -- $(CXC_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/cxc/*.bak *.*~
+	-rm -f -- $(externals_src)/cxc/*.o
+	-rm -f -- $(externals_src)/cxc/*.bak
+	-rm -f -- $(externals_src)/cxc/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -327,7 +324,9 @@ ext13_install: ext13
 
 ext13_clean:
 	-rm -f -- $(externals_src)/ext13/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/ext13/*.bak *.*~
+	-rm -f -- $(externals_src)/ext13/*.o
+	-rm -f -- $(externals_src)/ext13/*.bak
+	-rm -f -- $(externals_src)/ext13/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -354,7 +353,48 @@ freeverb_install: freeverb
 
 freeverb_clean:
 	-rm -f -- $(externals_src)/freeverb/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/freeverb/*.bak *.*~
+	-rm -f -- $(externals_src)/freeverb/*.o
+	-rm -f -- $(externals_src)/freeverb/*.bak
+	-rm -f -- $(externals_src)/freeverb/*.*~
+
+
+
+
+#------------------------------------------------------------------------------#
+# HID
+HID_NAME = hid
+HID_INCLUDES = -I./ -I../../../pd/src -I./HID\ Utilities\ Source
+HID_CFLAGS = 
+
+# this build method doesn't work yet <hans@at.or.at>
+HID_OBJECTS = $(wildcard $(externals_src)/hcs/hid/*.c)
+hid: 
+#	$(CC) $(CFLAGS) -c $(HID_OBJECTS:.c=.$(EXTENSION))
+#	$(CC) $(LDFLAGS) -o hid.$(EXTENSION) $(externals_src)/hcs/hid/*.o
+	-cd $(externals_src)/hcs/hid && make
+
+hid_install: hid
+	install -d $(objectsdir)/$(HID_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HID_NAME) \
+		--author "Hans-Christoph Steiner" \
+		--description "" \
+		--license "GNU GPL" \
+		--version ""
+	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) \
+		$(objectsdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/*.pd $(objectsdir)/$(HID_NAME)
+	install -d $(helpdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/doc/*.pd       $(helpdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/examples/*.pd) $(helpdir)/$(HID_NAME)
+	install -d $(examplesdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/examples/*.pd  $(examplesdir)/$(HID_NAME)
+
+hid_clean:
+	-rm -f -- $(externals_src)/hcs/hid/*.o
+	-rm -f -- $(externals_src)/hcs/hid/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/hcs/hid/*.bak
+	-rm -f -- $(externals_src)/hcs/hid/*.*~
+
 
 
 #------------------------------------------------------------------------------#
@@ -436,7 +476,9 @@ loaders_install: loaders
 
 loaders_clean:
 	-rm -f -- $(externals_src)/loaders/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/loaders/*.bak *.*~
+	-rm -f -- $(externals_src)/loaders/*.o
+	-rm -f -- $(externals_src)/loaders/*.bak
+	-rm -f -- $(externals_src)/loaders/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -460,7 +502,9 @@ markex_install: markex
 
 markex_clean:
 	-rm -f -- $(externals_src)/markex/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/markex/*.bak *.*~
+	-rm -f -- $(externals_src)/markex/*.o
+	-rm -f -- $(externals_src)/markex/*.bak
+	-rm -f -- $(externals_src)/markex/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -485,7 +529,10 @@ maxlib_install: maxlib
 
 maxlib_clean:
 	-rm -f -- $(externals_src)/maxlib/src/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/maxlib/*/*.bak *.*~ */*.*~
+	-rm -f -- $(externals_src)/maxlib/src/*.o
+	-rm -f -- $(externals_src)/maxlib/*/*.bak
+	-rm -f -- $(externals_src)/maxlib/*/*.*~
+	-rm -f -- $(externals_src)/maxlib/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -511,7 +558,9 @@ mjlib_install: mjlib
 
 mjlib_clean:
 	-rm -f -- $(externals_src)/mjlib/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/mjlib/*.bak *.*~
+	-rm -f -- $(externals_src)/mjlib/*.o
+	-rm -f -- $(externals_src)/mjlib/*.bak
+	-rm -f -- $(externals_src)/mjlib/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -537,7 +586,30 @@ motex_install: motex
 
 motex_clean:
 	-rm -f -- $(externals_src)/motex/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/motex/*.bak *.*~
+	-rm -f -- $(externals_src)/motex/*.o
+	-rm -f -- $(externals_src)/motex/*.bak
+	-rm -f -- $(externals_src)/motex/*.*~
+
+
+
+#----------------------------------------------------------------------------
+# OSCx
+oscx:
+	test -e $(externals_src)/OSCx/Makefile || \
+		(cd $(externals_src)/OSCx && ./configure)
+# these don't work on Windows yet
+	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+
+oscx_install:
+	install -d $(objectsdir)
+	-install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
+	install -d $(helpdir)
+	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
+
+
+oscx_clean:
+	-cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
+	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc clean
 
 
 #------------------------------------------------------------------------------#
@@ -662,7 +734,9 @@ smlib_install: smlib
 
 smlib_clean:
 	-rm -f -- $(SMLIB_OBJECTS:.c=.$(EXTENSION))
-	-rm -f -- $(externals_src)/smlib/*.bak *.*~
+	-rm -f -- $(externals_src)/smlib/*.o
+	-rm -f -- $(externals_src)/smlib/*.bak
+	-rm -f -- $(externals_src)/smlib/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -696,12 +770,20 @@ toxy_clean:
 #------------------------------------------------------------------------------#
 # UNAUTHORIZED
 UNAUTHORIZED_NAME=unauthorized
-unauthorized:
+# these need to be created before compiling the C
+UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
+%.tk2c: %.tk
+	bash $(externals_src)/unauthorized/tk2c.bash < $*.tk > $*.tk2c
 
+UNAUTHORIZED_OBJECTS = $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
+# [vocoder~] to be built separately
+UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
+unauthorized:  $(UNAUTHORIZED_VOCODER:.c=.o) \
+$(UNAUTHORIZED_TKFILES:.tk=.tk2c) $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
+	$(CC) $(LDFLAGS) -o $(externals_src)/unauthorized/vocoder~/vocoder~.$(EXTENSION) \
+		$(UNAUTHORIZED_VOCODER:.c=.o)
 
 unauthorized_install: unauthorized
-# this needs to go here since it produces errors
-	-cd $(externals_src)/unauthorized && $(MAKE) -k
 	install -d $(objectsdir)/$(UNAUTHORIZED_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(UNAUTHORIZED_NAME) \
 		--author "Yves Degoyon" \
@@ -712,16 +794,23 @@ unauthorized_install: unauthorized
 	install -d $(helpdir)/$(UNAUTHORIZED_NAME)
 	install -p $(externals_src)/unauthorized/*/*.pd \
 		$(helpdir)/$(UNAUTHORIZED_NAME)
-	install -p $(externals_src)/unauthorized/*/*.txt \
-		$(helpdir)/$(UNAUTHORIZED_NAM)
 	install -p $(externals_src)/unauthorized/*/*.pls \
 		$(helpdir)/$(UNAUTHORIZED_NAME)
 	install -d $(helpdir)/$(UNAUTHORIZED_NAME)/blm
 	install -p $(externals_src)/unauthorized/blinkenlights/blm/*.* \
 		$(helpdir)/$(UNAUTHORIZED_NAME)/blm
+	install -d $(manualsdir)/$(UNAUTHORIZED_NAME)
+	install -p $(externals_src)/unauthorized/*/*.txt \
+		$(manualsdir)/$(UNAUTHORIZED_NAME)
 
 unauthorized_clean:
-	cd $(externals_src)/unauthorized && make clean
+	-rm -f -- $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(UNAUTHORIZED_OBJECTS:.c=.o)
+	-rm -f -- $(UNAUTHORIZED_VOCODER:.c=.$(EXTENSION))
+	-rm -f -- $(UNAUTHORIZED_VOCODER:.c=.o)
+	-rm -f -- $(externals_src)/unauthorized/*/*.bak
+	-rm -f -- $(externals_src)/*/*.*~
+	-rm -f -- $(externals_src)/*.*~
 
 
 #------------------------------------------------------------------------------#
@@ -744,10 +833,17 @@ vbap_install: vbap
 # Zexy
 ZEXY_NAME = zexy
 ZEXY_OBJECTS = $(wildcard $(externals_src)/zexy/src/[a-y]*.c)
+ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
+	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(UNAUTHORIZED_NAME) \
+		--author "iohannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
+		--license "GNU GPL" \
+		--description "GUI and streaming objects" \
+		--version "$(ZEXY_VERSION)"
 	install -p $(ZEXY_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(ZEXY_NAME)
 	install -p $(shell ls -1 $(externals_src)/zexy/abs/*.pd | \
 		grep -v '-help.pd' | sed 's|\(.*\)|"\1"|g') \
@@ -760,6 +856,12 @@ zexy_install: zexy
 	install -p $(externals_src)/zexy/zexy.pd  $(helpdir)
 	install -p $(externals_src)/zexy/examples/*.* $(helpdir)/$(ZEXY_NAME)
 
+zexy_clean:
+	-rm -f -- $(ZEXY_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/zexy/src/*.o
+	-rm -f -- $(externals_src)/zexy/src/*.bak
+	-rm -f -- $(externals_src)/*/*.*~
+	-rm -f -- $(externals_src)/*.*~
 
 
 #==============================================================================#
@@ -774,25 +876,11 @@ unfiltered_install:
 # hcs
 	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
 			 grep -v '\-help.pd') $(objectsdir)
-# hid 
-# these don't work on Windows yet
-	-cd $(externals_src)/hcs/hid && $(MAKE) 
-	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(objectsdir)
-	install -p $(shell ls -1 $(externals_src)/hcs/hid/*.pd | \
-			 grep -v '\-help.pd'| grep -v '\-list.pd') $(objectsdir)
 # general
 	install -p $(externals_src)/hcs/general/*.pd $(objectsdir)
 # pan
 	install -p $(shell ls -1 $(externals_src)/hcs/pan/*.pd | \
 			 grep -v '\-help.pd') $(objectsdir)
-#----------------------------------------------------------------------------
-# OSC
-	test -e $(externals_src)/OSCx/Makefile || \
-		(cd $(externals_src)/OSCx && ./configure)
-# these don't work on Windows yet
-	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc
-	-install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
-	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
 
 
 #==============================================================================#
@@ -812,15 +900,12 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean cyclone_clean ext13_clean freeverb_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
-	cd $(externals_src)/build/$(OS_NAME) && make $(DEST_PATHS) clean
-	cd $(externals_src)/hcs/hid && make $(DEST_PATHS) clean
-	cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
+clean: creb_clean cxc_clean cyclone_clean ext13_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
+	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
+	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 
 distclean: clean cruft_clean
 	rm $(externals_src)/OSCx Makefile
-
-
 
 
 

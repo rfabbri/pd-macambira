@@ -1,15 +1,12 @@
 
+- add version number getters from packages/Makefile
+
 - document externals building following the smlib example
 
 - add "test lib" functionality to binary building in externals/Makefile
 
 - simplify Makefile, making just "all" and "install" with subsections for each
   subdir.
-
-- get externals/build/src/prepend.c to compile in Pd mode, which means it will
-  have a right inlet when created without an argument (because of cyclone's
-  buld system, its quite difficult to do.  I think it should just be removed
-  from default)
 
 - add in mtx_ objects with special characters using setup functions and
   filenames with 0x escapes (mtx_/ and mtx_./ for example).  Make sure to have
