@@ -91,9 +91,9 @@ BUILDSRC_OBJECTS = $(wildcard $(externals_src)/build/src/*.c)
 all: pre_all_$(OS_NAME) $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) \
 creb cxc cyclone ext13 freeverb \
 hid iemabs iemlib iemmatrix loaders markex maxlib mjlib motex pddp pdp \
-pmpd smlib toxy vbap zexy
+pmpd smlib toxy unauthorized vbap zexy
 	@echo " "
-	@echo "Compiled objects for $(OS_NAME) aka $(UNAME)"
+	@echo "Compiled external for $(OS_NAME) aka $(UNAME)"
 
 # these targets are for platform-specific needs that run before objects:
 pre_all_darwin:
@@ -293,7 +293,7 @@ cyclone_install: cyclone
 
 
 cyclone_clean:
-	cd $(externals_src)/mixed/cyclone && make $(DEST_PATHS) clean
+	cd $(externals_src)/miXed/cyclone && make $(DEST_PATHS) clean
 
 
 
