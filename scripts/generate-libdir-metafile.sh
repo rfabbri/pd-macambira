@@ -19,11 +19,15 @@ function print_pd_text ()
 
 if [ $# -lt 2 ]; then
 	 echo "Usage: $0 BASE_DIR LIBNAME [ meta types ] "
+	 echo " "
+	 echo "  meta types: "
 	 echo "     --author"
 	 echo "     --copyright"
 	 echo "     --description"
 	 echo "     --keywords"
 	 echo "     --license"
+	 echo "     --version"
+	 echo " "
 else
 
 BASE_DIR="$1"; shift
@@ -59,6 +63,9 @@ while [ $# -ge 1 ]; do
 				;;
 		  --license)
 				print_pd_text "${libdir_file_name}" LICENSE "$2"
+				;;
+		  --version)
+				print_pd_text "${libdir_file_name}" VERSION "$2"
 				;;
 		  *)
 				echo "ERROR: unknown flag: $1 with data: $2"
