@@ -53,8 +53,12 @@
 #include <windows.h>
 #include <winsock.h>
 #include <windef.h>
+#endif
+
+#if defined(__APPLE__) || defined(WIN32)
 #define MSG_NOSIGNAL 0
 #endif
+
 #include <lame/lame.h>        /* lame encoder stuff */
 
 #include "m_pd.h"            /* standard pd stuff */

@@ -52,8 +52,13 @@
 #include <winsock.h>
 #include <io.h>
 #include <fcntl.h>
-#define  MSG_NOSIGNAL 0
 #endif
+
+#if defined(__APPLE__) || defined(WIN32)
+#define MSG_NOSIGNAL 0
+#endif
+
+
 #include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
 #include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
 #include "interface.h"   /* mpglib decoding library from lame 3.92 */

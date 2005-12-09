@@ -33,7 +33,9 @@
 #include <sys/types.h>
 #include <string.h>
 #include <stdlib.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <winsock.h>
+#else
 #include <sys/socket.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -45,14 +47,17 @@
 #include <fcntl.h>
 #include <stdio.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
+#endif
+
+#if defined(__APPLE__) || defined(WIN32)
+#define MSG_NOSIGNAL 0
+#define SOL_TCP IPPROTO_TCP
 #endif
 
 #include <speex/speex.h>        /* speex decoder stuff */
 #include <speex/speex_bits.h>   /* speex decoder stuff */
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif

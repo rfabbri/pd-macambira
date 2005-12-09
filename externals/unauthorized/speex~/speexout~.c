@@ -47,7 +47,12 @@
 #include <malloc.h>
 #endif
 #include <ctype.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <io.h>
+#include <windows.h>
+#include <winsock.h>
+#include <windef.h>
+#else
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -55,11 +60,10 @@
 #include <time.h>
 #include <sys/time.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <windows.h>
-#include <winsock.h>
-#include <windef.h>
+#endif
+
+#if defined(__APPLE__) || defined(WIN32)
+#define MSG_NOSIGNAL 0
 #endif
 
 #include <speex/speex.h>        /* speex codec stuff */ 

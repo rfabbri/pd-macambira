@@ -40,7 +40,7 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifdef UNIX
+#ifndef WIN32
 #include <sys/socket.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -54,9 +54,13 @@
 #define SOCKET_ERROR -1
 #else
 #include <winsock.h>
+#endif
+
+#if defined(__APPLE__) || defined(WIN32)
 #define MSG_NOSIGNAL 0
 #define SOL_TCP IPPROTO_TCP
 #endif
+
 #include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
 #include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
 #include "interface.h"   /* mpglib decoding library from lame 3.92 */

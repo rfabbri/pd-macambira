@@ -57,17 +57,19 @@
 #include <io.h>
 #endif
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
 
+#if defined(__APPLE__) || defined(WIN32)
+#define MSG_NOSIGNAL 0
+#endif
 #ifdef UNIX
 #define STRDUP strdup
 #endif
-#ifdef NT
+#ifdef WIN32
 #define STRDUP _strdup
-#define MSG_NOSIGNAL 0
 #define sys_closesocket closesocket
 #endif
 

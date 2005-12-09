@@ -36,7 +36,7 @@ MINGW_INCLUDE =  -I../../src -I../../pd/src -IC:/msys/1.0/include
 
 
 MINGW_LDFLAGS = -shared -L../../pd/bin -LC:/msys/1.0/lib \
-		 -lpd -logg -lvorbis -lpthreadGC2
+		 -lpd -logg -lvorbis -lspeex -lpthreadGC2
 
 
 .c.dll:
@@ -140,22 +140,24 @@ pd_darwin: $(TARGETS)
 #     -DMSG_NOSIGNAL=0 -DSOL_TCP=0
 # I got this from here: http://www.holwegner.com/forum/viewtopic.php?t=4
 # <hans@eds.org>
-DARWINCFLAGS = -DPD -DUNIX -DICECAST -DMSG_NOSIGNAL=0  -DSOL_TCP=0 \
+DARWINCFLAGS = -DPD -DUNIX \
 	-O2 -Wall -W -Wshadow -Wstrict-prototypes -Wno-unused -Wno-parentheses \
 	-Wno-switch
 
 ##  if you point the linker to the pd binary, then it can check the symbols,
 ## and therefore allow for a two-level namespace, and that makes Darwin happy
 ## but this doesn't work for some of the files yet.
-#DARWINLINKFLAGS = -bundle -bundle_loader ../../pd/bin/pd
-DARWINLINKFLAGS = -bundle -undefined suppress -flat_namespace
+DARWINLINKFLAGS = -bundle -bundle_loader ../../pd/bin/pd
+DARWINLIBS = -L/sw/lib -logg -lvorbis -lmp3lame -lspeex
+#DARWINLINKFLAGS = -bundle -undefined suppress -flat_namespace
 
 DARWININCLUDE =  -I../../src -I../../pd/src -I/sw/include
 
 .c.pd_darwin:
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
-	$(CC) $(DARWINLINKFLAGS) -o $*.pd_darwin $*.o
+	$(CC) $(DARWINLINKFLAGS) -o $*.pd_darwin $*.o $(DARWINLIBS)
 	chmod a-x "$*.pd_darwin"
+	strip -u -r $*.pd_darwin
 	-rm $*.o
 
 # added by Hans-Christoph Steiner <hans@eds.org>
