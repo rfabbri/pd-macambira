@@ -20,16 +20,16 @@ function print_usage ()
 }
 
 if [ $# -eq 0 ]; then
-    CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data"
+    export CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data"
     echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
     echo "The anonymous password is: anoncvs"
-#    cvs login
+    cvs login
 elif [ "$1" == "--help" ]; then
     print_usage
 elif [ "$1" == "-h" ]; then
     print_usage
 elif [ $# -eq 1 ]; then
-    CVSROOT=":ext:${1}@cvs.sourceforge.net:/cvsroot/pure-data"
+    export CVSROOT=":ext:${1}@cvs.sourceforge.net:/cvsroot/pure-data"
 else
     print_usage
 fi
@@ -42,8 +42,8 @@ for section in abstractions doc extensions externals pd packages scripts; do
 done
 
 # Gem is still separate
-CVSROOT=:pserver:anonymous@cvs.gem.iem.at:/cvsroot/pd-gem
-#cvs login
+export CVSROOT=:pserver:anonymous@cvs.gem.iem.at:/cvsroot/pd-gem
+cvs login
 cvs checkout Gem GemLibs
 
 
