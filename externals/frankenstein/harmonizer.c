@@ -66,7 +66,7 @@ typedef enum {
 			kMinMaj7=7,
 			kDim7=8,
 			kHalfDim7=9
-			} mode_t;
+			} chordmode_t;
 
 typedef enum {C=0,
 			Db=1,
@@ -87,7 +87,7 @@ typedef enum {C=0,
 // this defines a chord in a tonality
 typedef struct _chord
 {
-	mode_t mode;
+	chordmode_t mode;
 	note_t note;
 } chord_t;
 
@@ -198,7 +198,7 @@ note_t string2note(const char *substr)
 	return C;
 }
 
-mode_t string2mode(const char *substr)
+chordmode_t string2mode(const char *substr)
 {
 	if (strstr(substr, "minor/major 7th"))
 		return kMinMaj7;
