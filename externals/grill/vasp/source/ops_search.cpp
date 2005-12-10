@@ -188,6 +188,8 @@ public:
 		CVasp cdst(dst),cref(ref);
 		return VaspOp::m_soffset(p,cref,arg,&cdst); 
 	}
+
+	virtual V m_help() { post("%s - Define starting point by searching for given value",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.offset= vasp.o=",vasp_soffset)
 
@@ -203,6 +205,8 @@ public:
 		CVasp cdst(dst),cref(ref);
 		return VaspOp::m_sframes(p,cref,arg,&cdst); 
 	}
+
+	virtual V m_help() { post("%s - Define vasp frame length by searching for given value",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.frames= vasp.f=",vasp_sframes)
 

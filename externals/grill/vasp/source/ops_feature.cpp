@@ -168,6 +168,8 @@ public:
 		ToOutFloat(1,p.peaks.density);
 		return ret;
 	}
+
+	virtual V m_help() { post("%s - Get non-zero values only for peaks",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.peaks",vasp_peaks)
 
@@ -183,6 +185,8 @@ public:
 		CVasp cdst(dst),cref(ref);
 		return VaspOp::m_valleys(p,cref,&cdst); 
 	}
+
+	virtual V m_help() { post("%s - Get non-zero values only for values",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.valleys",vasp_valleys)
 
@@ -198,6 +202,8 @@ public:
 		CVasp cdst(dst),cref(ref);
 		return VaspOp::m_rpeaks(p,cref,&cdst); 
 	}
+
+	virtual V m_help() { post("%s - Get non-zero values only for peaks of the complex radius",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.rpeaks",vasp_rpeaks)
 
@@ -213,6 +219,8 @@ public:
 		CVasp cdst(dst),cref(ref);
 		return VaspOp::m_rvalleys(p,cref,&cdst); 
 	}
+
+	virtual V m_help() { post("%s - Get non-zero values only for valleys of the complex radius",thisName()); }
 };																				
 FLEXT_LIB_V("vasp, vasp.rvalleys",vasp_rvalleys)
 

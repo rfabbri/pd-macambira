@@ -1,5 +1,8 @@
 Version history:
 
+0.1.4:
+- FIX: resurrect help message-functionality and add some missing help texts
+
 0.1.3:
 - CHANGE: exchanged #defines for templates in vector calculation loops
 - FIX: bug for binary operations of complex vasps

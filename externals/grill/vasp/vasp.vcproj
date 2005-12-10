@@ -83,7 +83,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="c:\programme\audio\pd\src,f:\prog\max\flext\source"
+				AdditionalIncludeDirectories="C:\data\prog\packs\pthreads\include;c:\programme\audio\pd\src;..\flext\source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FLEXT_SYS=2;FLEXT_THREADS;VASP_COMPACT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"

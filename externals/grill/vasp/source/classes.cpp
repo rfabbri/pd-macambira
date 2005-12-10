@@ -34,6 +34,7 @@ V vasp_base::Setup(t_classid c)
 	sym_vector = MakeSymbol("vector");
 
 	FLEXT_CADDMETHOD_(c,0,"radio",m_radio);
+	FLEXT_CADDMETHOD_(c,0,"help",m_help);
 
 	FLEXT_CADDATTR_VAR1(c,"defer",deferred);
 

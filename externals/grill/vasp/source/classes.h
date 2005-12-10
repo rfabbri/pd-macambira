@@ -39,6 +39,8 @@ protected:
 
 	virtual V m_radio(I argc,const t_atom *argv);  // commands for all
 
+    virtual V m_help() = 0;
+
 /*
 	V m_argchk(BL chk);  // precheck argument on arrival
 	V m_loglvl(I lvl);  // noise level of log messages
@@ -58,6 +60,7 @@ private:
 	static V Setup(t_classid);
 
 	FLEXT_CALLBACK_V(m_radio)
+	FLEXT_CALLBACK(m_help)
 
 	FLEXT_ATTRVAR_B(argchk)
 	FLEXT_ATTRVAR_B(deferred)
