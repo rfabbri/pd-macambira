@@ -1,9 +1,9 @@
 #N canvas 569 176 587 435 10;
 #X obj 19 292 volctl~ 0 0;
 #X obj 177 15 inlet control;
-#X obj 413 339 switch~;
+#X obj 413 369 switch~;
 #X obj 177 40 t a b;
-#X obj 455 268 1;
+#X obj 455 258 1;
 #X obj 413 226 delay;
 #X obj 413 247 0;
 #X obj 177 120 *;
@@ -21,10 +21,13 @@
 #X obj 413 204 + 10;
 #X obj 455 138 t b b;
 #X obj 485 159 zl reg stop;
-#X obj 413 290 pre_switch 10;
+#X obj 413 280 pre_switch 10;
 #X obj 19 11 inlet~;
 #X obj 19 313 outlet~;
-#X text 23 391 $Id: triangle.pd 195 2005-11-20 01:25:43Z tim $;
+#X text 23 391 $Id: triangle.pd 211 2005-12-10 21:10:37Z tim $;
+#X obj 413 304 t f f;
+#X obj 443 325 sel 0;
+#X obj 443 346 s \$1-done;
 #X connect 0 0 24 0;
 #X connect 1 0 3 0;
 #X connect 3 0 17 0;
@@ -55,5 +58,8 @@
 #X connect 20 0 4 0;
 #X connect 20 1 21 0;
 #X connect 21 0 5 0;
-#X connect 22 0 2 0;
+#X connect 22 0 26 0;
 #X connect 23 0 0 0;
+#X connect 26 0 2 0;
+#X connect 26 1 27 0;
+#X connect 27 0 28 0;

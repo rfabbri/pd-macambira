@@ -116,7 +116,7 @@ btn_8 btn_9 btn_10 btn_11;
 #X obj 38 106 route -1;
 #X obj 38 126 0;
 #X obj 8 148 spigot 1;
-#X text 12 294 $Id: le3dp.pd 194 2005-11-20 01:17:05Z tim $;
+#X text 12 294 $Id: le3dp.pd 211 2005-12-10 21:10:37Z tim $;
 #X text 116 220 abstraction to use a Logitech Extreme 3D Joystick with
 hid under linux;
 #X msg 38 60 find "product=Logitech Extreme 3D";

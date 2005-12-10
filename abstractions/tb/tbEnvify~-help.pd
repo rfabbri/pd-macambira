@@ -12,9 +12,12 @@
 #X msg 214 133 1000 bpe-slide 0 0 1 1 0.2 1 0 1 4000 8000;
 #X text 344 36 $Id$;
 #X text 344 17 a simple envelope generator;
+#X obj 99 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
 #X connect 0 0 1 0;
 #X connect 0 0 2 0;
 #X connect 0 0 2 1;
+#X connect 0 1 12 0;
 #X connect 3 0 0 1;
 #X connect 4 0 0 1;
 #X connect 5 0 0 1;
