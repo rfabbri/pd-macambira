@@ -142,6 +142,8 @@ darwin_app_externals_c++:
 darwin_app_perms:
 	chmod -R a-w $(pddocdir)
 
+package: dmg
+
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"

@@ -23,8 +23,12 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 PD_INNO_SETUP = pd-inno.iss
 
+package:  $(PD_INNO_SETUP)
+	start $(PD_INNO_SETUP)
+	@echo " "
+	@echo "win32_inno install succeeded!"
 
-install: $(PD_INNO_SETUP)
+install:
 	cd $(packages_src) && make $(DEST_PATHS) extended_install
 	cd .. && make $(DEST_PATHS) doc_format
 	install -p pd-settings.reg $(DESTDIR)$(prefix)
