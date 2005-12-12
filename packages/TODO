@@ -1,12 +1,15 @@
 
-- try out FFTW patch from patch tracker
+- allow DESTDIR to be a relative path
+
+- fiddle~, bonk~, etc. didn't get installed
+
+- try out FFTW patch from patch tracker (it applies fine, but the build system
+  needs to set the define to enable it).
 
 - document generate-libdir-metafile.sh
 
 - move darwin_app_perms to here and make generic prerelease_clean target which
   is called separately
-
-- fix scripts/checkout...sh.  It doesn't cvs co into the newly created pure-data folder
 
 - test for configure before running autoconf/clean configure on distclean
 
@@ -18,15 +21,14 @@
 
 - add GRIPD for Anders
 
-- add reg keys for Martin Dupras
-
 - mDNS objects!
 
 - make standard targets: distclean (*~, etc.), uninstall instead of install_clean
 
-- help menu
-
-  	 - check up on this bug: Opening Help patches from "Pure Documentation"
+- adding flext (from tgrill) "you could take the templates, *.def in the
+  buildsys hierarchy from which the original config*.txt files are
+  generated. These don't make assumptions about CPU etc. and should therefore
+  be portable"
 
 - Preferences
 

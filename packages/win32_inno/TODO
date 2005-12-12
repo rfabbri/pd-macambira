@@ -1,4 +1,6 @@
 
+- update pd-settings.reg with libs from org.puredata.pd.plist
+
 - check out using env vars in Path settings in registry, or make relative paths
 
 - move gripd files to pd\gripd

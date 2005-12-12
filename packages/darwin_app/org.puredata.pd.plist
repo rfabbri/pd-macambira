@@ -30,5 +30,17 @@
 	<string>xsample</string>
 	<key>loadlib13</key>
 	<string>zexy</string>
+	<key>loadlib14</key>
+	<string>maxlib</string>
+	<key>loadlib15</key>
+	<string>mjlib</string>
+	<key>loadlib16</key>
+	<string>motex</string>
+	<key>loadlib17</key>
+	<string>loaders</string>
+	<key>loadlib18</key>
+	<string>zexy</string>
+	<key>loadlib19</key>
+	<string>markex</string>
 </dict>
 </plist>

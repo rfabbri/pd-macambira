@@ -182,6 +182,26 @@ darwin_app_externals_flext_clean:
 
 
 
+
+
+test_locations:
+	@echo "PD_VERSION: $(PD_VERSION)"
+	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "CWD $(CWD)"
+	@echo "DESTDIR $(DESTDIR)"
+	@echo "PREFIX $(prefix)"
+	@echo "BINDIR  $(bindir)"
+	@echo "LIBDIR  $(libdir)"
+	@echo "OBJECTSDIR  $(objectsdir)"
+	@echo "PDDOCDIR  $(pddocdir)"
+	@echo "LIBPDDIR  $(libpddir)"
+	@echo "LIBPDBINDIR  $(libpdbindir)"
+	@echo "HELPDIR  $(helpdir)"
+	@echo "MANUALSDIR  $(manualsdir)"
+	@echo "EXAMPLESDIR  $(examplesdir)"
+
+
+
 #==============================================================================#
 #
 ## DEPRECATED TARGETS

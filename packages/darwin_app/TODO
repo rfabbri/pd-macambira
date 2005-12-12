@@ -1,7 +1,8 @@
 
-- somehow 3.audio.examples and fiddle~, bonk~, etc. didn't get installed
+- check out using TclTkBI package for all of the tcl deps.  It should have all
+  of the binaries necessary for extensions/gui/ix
 
-- in post-clean, rm *.bak
+     - research Tcl "auto_path"
 
 - make Pd open a new window when its launched to workaround the bug where the
   menus don't work until a window is opened.
@@ -10,7 +11,7 @@
 
 - from Carmen Rocco about [fiddle~] crash: "is fiddle~: * compiled with the same header * linked with the same binary of (lib)pd * compiled with the same compiler? i had very similar issues with bonk on windows (Virtually same stacktrace but s/fiddle/bonk) until fixing the above 3 things..."
 
-- review permissions so that you can build on top on existing builds
+- review permissions so that you can build on top on existing builds (its the Frameworks)
 
 - add standard paths to included org.puredata.pd.plist following these
   guidelines:
@@ -21,24 +22,12 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 
   http://developer.apple.com/documentation/mac/runtimehtml/RTArch-43.html
 
-
-- help menu
-
-  	 - check up on this bug: Opening Help patches from "Pure Documentation"
-   
-    - make help menu function check if item exists before trying to make a
-      menu item so that it doesn't break pd.tk<->pd interaction (i.e. windows
-      titled x50bf90).  (the recursive function might have fixed this)
-
 - try this for the Pref Pane:
  kAEShowPreferences ::tk::mac::ShowPreferences
-
-- research Tcl "auto_path"
 
 - research Tk + "Custom MDEF" for menus
 
 - create Tcl script called from Prefs that creates links for the standard unix
-- locations for files that are in bin, include, man inside $(PD_FILE_ROOT)
 
 - redo menu system
   		 - the menus are the same for all windows
