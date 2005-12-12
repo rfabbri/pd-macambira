@@ -320,10 +320,11 @@ static void entry_output(t_entry* x, t_symbol *s, int argc, t_atom *argv)
 /* Pass the contents of the text widget onto the entry_output fuction above */
 static void entry_bang_output(t_entry* x)
 {
-/* This code is not functional, all OS's return "unmatches quote in string" removed until someone has time to look more closely.
-  sys_vgui("pd [concat entry%p output [string map {\",\" \"\\\\,\" \";\" \"\\\\;} [.x%x.c.s%x get 0.0 end]]\" \\;]\n", x, x->x_glist, x); */
+  /* With "," and ";" escaping thanks to JMZ */
+  sys_vgui("pd [concat entry%p output [string map {\",\" \"\\\\,\" \";\" \"\\\\;\"} [.x%x.c.s%x get 0.0 end]] \\;]\n", x, x->x_glist, x);
 
-  sys_vgui("pd [concat entry%p output [.x%x.c.s%x get 0.0 end] \\;]\n", x, x->x_glist, x);
+  /* Without "," and ";" escaping, left here but commented out in case we want to add a kind of "pd terminal" mode in the future.
+  sys_vgui("pd [concat entry%p output [.x%x.c.s%x get 0.0 end] \\;]\n", x, x->x_glist, x); */
 
   sys_vgui("bind .x%x.c.s%x <Leave> {focus [winfo parent .x%x.c.s%x]} \n", x->x_glist, x, x->x_glist, x);
 }
@@ -435,7 +436,7 @@ void entry_setup(void) {
     class_setsavefn(entry_class,&entry_save);
 #endif
 
-	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.5 $ $Date: 2005-12-11 17:06:58 $");
+	post("Text v0.1 Ben Bogart.\nCVS: $Revision: 1.6 $ $Date: 2005-12-12 18:32:40 $");
 }
 
 
