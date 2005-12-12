@@ -143,6 +143,8 @@ kctrl =	ampdb(kctrl)
   zawm asig1, 1
   zawm asig2, 2
 endin
+
+
 instr 4	;String pad
 ; String-pad borrwoed from the piece "Dorian Gray",
 ; http://akozar.spymac.net/music/ Modified to fit my needs
@@ -181,8 +183,51 @@ kctrl =	ampdb(kctrl)
   zawm asig2, 2
 endin
 
+instr 5	;String pad
+; String-pad borrwoed from the piece "Dorian Gray",
+; http://akozar.spymac.net/music/ Modified to fit my needs
 
+;  ihz  = p4
+;  idb  = p5/127 * 70    ; rescale MIDI velocity to 70db
+;  ipos = p6
+;  iamp = ampdb(idb)
 
+; modified by dmorelli
+khz	invalue	"hz5"
+kpos invalue "pos5"
+kamp  invalue "amp5"
+kctrl = kamp*70
+kctrl =	ampdb(kctrl)
+  ; Slow attack and release
+;  kctrl   linseg  0, p3/4, iamp, p3/2, 0  
+  ; Slight chorus effect
+  afund   oscil   kctrl, khz, 1            ; audio oscillator
+  acel1   oscil   kctrl, khz - .1, 1       ; audio oscillator - flat
+  acel2   oscil   kctrl, khz + .1, 1       ; audio oscillator - sharp
+  asig    =   afund + acel1 + acel2
+
+  ; Cut-off high frequencies depending on midi-velocity
+  ; (larger velocity implies more brighter sound)
+  asig butterlp asig, (p5-60)*40+900
+ 
+  ; Panning
+  kppan =       kpos*1.570796325  ; half of PI (radians of 90o angle)
+  kpleft        =       cos(kppan)        ; half sign "down"
+  kpright       =       sin(kppan)        ; half sign "up"
+  asig1 = asig*kpleft;
+  asig2 = asig*kpright;
+  ; To the chorus effect, through zak channels 1 and 2
+  zawm asig1, 1
+  zawm asig2, 2
+endin
+
+; live input per reverbero
+
+instr 8	;live input
+  asig1,asig2	ins
+  zawm asig1, 1
+  zawm asig2, 2
+endin
 
 
 ; strumento senza invalue
