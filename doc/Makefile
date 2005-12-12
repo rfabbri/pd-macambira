@@ -46,29 +46,29 @@ install: pddp_install tutorials_install
 EXTERNALS-HOWTO_NAME = Externals-HOWTO
 externals-howto_install: $(manualsdir)
 	install -d $(manualsdir)/$(EXTERNALS-HOWTO_NAME)
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/pd-externals-HOWTO.pdf > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/pd-externals-HOWTO.pdf
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/HOWTO-externals-en.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/HOWTO-externals-en.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/HOWTO-externals-en.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node1.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node1.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node2.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node2.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node3.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node5.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node6.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node7.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node7.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node8.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node8.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node9.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node9.html
-	curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
+	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node10.html
 
 
@@ -93,7 +93,7 @@ pd-msg_install: $(manualsdir)
 PD_FILEFORMAT_NAME = Pd
 pd_fileformat_install: $(manualsdir)
 	install -d $(manualsdir)/$(PD_FILEFORMAT_NAME)
-	curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
+	-curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
 		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
 
