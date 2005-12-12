@@ -33,7 +33,11 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <io.h>
+#include <fcntl.h>
+#include <winsock.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -43,10 +47,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <fcntl.h>
-#include <winsock.h>
 #endif
 
 #define MAX_CONNECT  32		/* maximum number of connections */

@@ -32,7 +32,9 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <winsock.h>
+#else
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/errno.h>
@@ -41,8 +43,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
 #endif
 
 #define INBUFSIZE 4096	/* maximum numbers of characters to read */

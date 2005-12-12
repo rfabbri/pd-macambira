@@ -42,7 +42,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <io.h>	/* for 'write' in pute-function only */
+#include <winsock.h>
+#include <winbase.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -51,22 +55,17 @@
 #include <sys/time.h>
 #include <unistd.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>	/* for 'write' in pute-function only */
-#include <winsock.h>
-#include <winbase.h>
 #endif
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
 
-#ifdef UNIX
-#define     sys_closesocket close
-#endif
-#ifdef NT
+#ifdef WIN32
 #define     sys_closesocket closesocket
+#else
+#define     sys_closesocket close
 #endif
 
 

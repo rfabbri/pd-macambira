@@ -35,7 +35,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <io.h>
+#include <stdlib.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -44,12 +47,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <stdlib.h>
 #endif
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -290,10 +290,10 @@ static void oggread_open(t_oggread *x, t_symbol *filename)
 		post("oggread~: previous file closed");
 	}
 		/* open file for reading */
-#ifdef UNIX
-    if((x->x_file = fopen(filename->s_name, "r")) < 0)
-#else
+#ifdef WIN32
 	if((x->x_file = fopen(filename->s_name, "rb")) < 0)
+#else
+   if((x->x_file = fopen(filename->s_name, "r")) < 0)
 #endif
     {
 		post("oggread~: could not open file \"%s\"", filename->s_name);

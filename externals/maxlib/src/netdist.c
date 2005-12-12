@@ -29,7 +29,9 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef WIN32
+#include <winsock.h>
+#else
 #include <sys/socket.h>
 #include <sys/errno.h>
 #include <netinet/in.h>
@@ -37,8 +39,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
 #endif
 
 #define MAX_REC 32
@@ -63,11 +63,10 @@ typedef struct _netdist
 
 static void sys_sockerror(char *s)
 {
-#ifdef NT
+#ifdef WIN32
     int err = WSAGetLastError();
     if (err == 10054) return;
-#endif
-#ifdef UNIX
+#else
     int err = errno;
 #endif
     post("%s: %s (%d)\n", s, strerror(err), err);
@@ -75,11 +74,10 @@ static void sys_sockerror(char *s)
 
 static void sys_closesocket(int fd) {
 
-#ifdef UNIX
-    close(fd);
-#endif
-#ifdef NT
+#ifdef WIN32
     closesocket(fd);
+#else
+    close(fd);
 #endif
 }
 
