@@ -29,7 +29,8 @@ void ritmo1_free(t_ritmo1 *x)
 {
 	freebytes(x->buf1, sizeof(x->buf1));
 //	freebytes(x->buf2, sizeof(x->buf2));	
-//	freebytes(x->buf3, sizeof(x->buf3));}
+//	freebytes(x->buf3, sizeof(x->buf3));
+}
 
 static void ritmo1_bang(t_ritmo1 *x) {
 
@@ -62,7 +63,7 @@ static void ritmo1_bang(t_ritmo1 *x) {
 		for (i=0; i<16; i++)
 		{
 	//		vecdest[i] = (x->buf1[i] + x->buf2[i] + x->buf3[i] + vecsrc[i])/4;
-			vecdest[i] = (x->buf1[i] vecsrc[i])/2;
+			vecdest[i] = (x->buf1[i] + vecsrc[i])/2;
 		}
 		// redraw the arrays
 		garray_redraw(arysrc);
