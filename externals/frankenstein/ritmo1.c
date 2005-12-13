@@ -14,22 +14,22 @@ typedef struct _ritmo1
     t_symbol *x_arrayname_src; // where i read the current pattern
     t_symbol *x_arrayname_dest; // where i put the computed pattern
 	t_float *buf1;
-	t_float *buf2;
-	t_float *buf3;
+//	t_float *buf2;
+//	t_float *buf3;
 } t_ritmo1;
 
 void ritmo1_allocate_buffers(t_ritmo1 *x)
 {
 	x->buf1 = (t_float *)getbytes(BUFFER_LENGHT * sizeof(t_float));
-	x->buf2 = (t_float *)getbytes(BUFFER_LENGHT * sizeof(t_float));
-	x->buf3 =  (t_float *)getbytes(BUFFER_LENGHT * sizeof(t_float));
+//	x->buf2 = (t_float *)getbytes(BUFFER_LENGHT * sizeof(t_float));
+//	x->buf3 =  (t_float *)getbytes(BUFFER_LENGHT * sizeof(t_float));
 }
 
 void ritmo1_free(t_ritmo1 *x)
 {
 	freebytes(x->buf1, sizeof(x->buf1));
-	freebytes(x->buf2, sizeof(x->buf2));	
-	freebytes(x->buf3, sizeof(x->buf3));}
+//	freebytes(x->buf2, sizeof(x->buf2));	
+//	freebytes(x->buf3, sizeof(x->buf3));}
 
 static void ritmo1_bang(t_ritmo1 *x) {
 
@@ -61,16 +61,17 @@ static void ritmo1_bang(t_ritmo1 *x) {
 		// and write it in vecdest
 		for (i=0; i<16; i++)
 		{
-			vecdest[i] = (x->buf1[i] + x->buf2[i] + x->buf3[i] + vecsrc[i])/4;
+	//		vecdest[i] = (x->buf1[i] + x->buf2[i] + x->buf3[i] + vecsrc[i])/4;
+			vecdest[i] = (x->buf1[i] vecsrc[i])/2;
 		}
 		// redraw the arrays
 		garray_redraw(arysrc);
 		garray_redraw(arydest);
 
 		// step 2: cycle buffers
-		x->buf3 = x->buf2;
-		x->buf2 = x->buf1;
-		x->buf1 = x->buf3;
+	//	x->buf3 = x->buf2;
+	//	x->buf2 = x->buf1;
+	//	x->buf1 = x->buf3;
 		// fill the first buffer with src data
 		for (i=0; i<16; i++)
 		{
