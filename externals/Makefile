@@ -37,8 +37,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-
-CFLAGS = -DPD -DUNIX -Dunix $(OPTIM_FLAGS) -I$(pd_src)/src\
+OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
+CFLAGS = -DPD -DUNIX -Dunix $(OPT_CFLAGS) -I$(pd_src)/src\
     -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow \
 	-I$(pd_src)/src
 LDFLAGS =  
@@ -47,7 +47,7 @@ LIBS =
 ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
-  STRIP = strip -u -r
+  STRIP = echo
 else
   ifeq ($(OS_NAME),win)
     CFLAGS += -mms-bitfields -D'O_NONBLOCK=1' \
@@ -329,6 +329,40 @@ ext13_clean:
 	-rm -f -- $(externals_src)/ext13/*.*~
 
 
+
+#------------------------------------------------------------------------------#
+# FRANKENSTEIN
+FRANKENSTEIN_NAME=frankenstein
+# exclude test.c since it is not used
+FRANKENSTEIN_OBJECTS = $(wildcard $(externals_src)/frankenstein/*.c)
+frankenstein: $(FRANKENSTEIN_OBJECTS:.c=.$(EXTENSION))
+
+frankenstein_install: frankenstein
+	install -d $(objectsdir)/$(FRANKENSTEIN_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FRANKENSTEIN_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(FRANKENSTEIN_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FRANKENSTEIN_NAME)
+#	install -d $(helpdir)/$(FRANKENSTEIN_NAME)
+#	install -p $(externals_src)/frankenstein/help/*.pd \
+#		$(helpdir)/$(FRANKENSTEIN_NAME)
+	install -d $(manualsdir)/$(FRANKENSTEIN_NAME)
+	install -p $(externals_src)/frankenstein/doc/*.* \
+		$(manualsdir)/$(FRANKENSTEIN_NAME)
+	install -d $(examplesdir)/$(FRANKENSTEIN_NAME)
+	install -p $(externals_src)/frankenstein/patches/*.* \
+		$(examplesdir)/$(FRANKENSTEIN_NAME)
+
+frankenstein_clean:
+	-rm -f -- $(externals_src)/frankenstein/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/frankenstein/*.o
+	-rm -f -- $(externals_src)/frankenstein/*.bak
+	-rm -f -- $(externals_src)/frankenstein/*.*~
+
+
+
 #------------------------------------------------------------------------------#
 # FREEVERB
 FREEVERB_NAME=freeverb
@@ -598,11 +632,11 @@ oscx:
 	test -e $(externals_src)/OSCx/Makefile || \
 		(cd $(externals_src)/OSCx && ./configure)
 # these don't work on Windows yet
-	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+	cd $(externals_src)/OSCx && $(MAKE) CC=gcc
 
-oscx_install:
+oscx_install: oscx
 	install -d $(objectsdir)
-	-install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 	install -d $(helpdir)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
 
@@ -610,6 +644,7 @@ oscx_install:
 oscx_clean:
 	-cd $(externals_src)/OSCx && make $(DEST_PATHS) clean
 	-cd $(externals_src)/OSCx && $(MAKE) CC=gcc clean
+	-rm $(externals_src)/OSCx/Makefile
 
 
 #------------------------------------------------------------------------------#
@@ -900,14 +935,12 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean cyclone_clean ext13_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
+clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 
+
 distclean: clean cruft_clean
-	rm $(externals_src)/OSCx Makefile
-
-
 
 
 test_locations:
