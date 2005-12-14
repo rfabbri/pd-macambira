@@ -184,7 +184,7 @@ static double GArhythm_evaluate_fitness1(char *woman, char *man)
 		if ((woman[i]== 0) && (man[i] == 0))
 			res++;
 	}
-	return res/max;
+	return (float) ((float) res) / ((float) max);
 }
 
 // riempimento
@@ -201,7 +201,7 @@ static double GArhythm_evaluate_fitness2(char *woman, char *man)
 				ris++;
 		}
 	}
-	return ris/max;
+	return (float) ((float) ris) / ((float) max);
 
 }
 
@@ -227,6 +227,37 @@ static double GArhythm_evaluate_fitness3(char *woman, char *man)
 	return 0;
 }
 
+// svaforisce troppi colpi consecutivi
+static double GArhythm_evaluate_fitness4(char *woman, char *man)
+{
+	int i, j, max, curr_consecutivi, max_consecutivi, tot_consecutivi;
+	double ris=0;
+	curr_consecutivi = max_consecutivi = tot_consecutivi = 0;
+	max = (BUFFER_LENGHT-1) * NUM_STRUM;
+	for (j=0; j<NUM_STRUM; j++)
+	{
+		i=1; 
+		curr_consecutivi = 0;
+		while(i<BUFFER_LENGHT)
+		{
+			if (man[i] & (0x01<<j))
+			{
+				// here is an event
+				//is it the first?
+				curr_consecutivi++;
+				if (curr_consecutivi>max_consecutivi)
+					max_consecutivi = curr_consecutivi;
+			} else
+			{
+				tot_consecutivi += curr_consecutivi;
+				curr_consecutivi = 0;
+			}
+		}
+	}
+	ris = (float) (((float) ris) / ((float) max));
+	return 1 - ris;
+
+}
 
 static void GArhythm_create_child(t_GArhythm *x, char *woman, char *man, char *child)
 {
@@ -443,7 +474,8 @@ static void GArhythm_bang(t_GArhythm *x) {
 				fitnessTOT[j]=fitness1[j] * (x->indice_aderenza) 
 					+ fitness2[j] * (x->indice_riempimento) 
 					+ (1 - fitness2[j]) * (1-(x->indice_riempimento)) 
-					+ fitness3[j] * (x->indice_variazione);
+					+ fitness3[j] * (x->indice_variazione)
+					+ GArhythm_evaluate_fitness4(x->population[me], x->population[tmp]);
 				if (winner_value <= fitnessTOT[j])
 				{
 					winner = tmp;
@@ -486,7 +518,8 @@ static void GArhythm_bang(t_GArhythm *x) {
 			tmpTOT = tmp1 * (x->indice_aderenza) 
 					+ tmp2 * (x->indice_riempimento) 
 					+ (1-tmp2) * (1-(x->indice_riempimento)) 
-					+ tmp3 * (x->indice_variazione);
+					+ tmp3 * (x->indice_variazione)
+					+ GArhythm_evaluate_fitness4(x->last, x->population[i]);
 			if (tmpTOT >= winner_fitness)
 			{
 				winner_fitness = tmpTOT;
