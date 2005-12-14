@@ -46,7 +46,7 @@ static void *rec2pol_new(t_symbol *s, int argc, t_atom *argv)
   return (x);
 }
 
-t_int *sigsqrt_perform(t_int *w);
+/* t_int *sigsqrt_perform(t_int *w); */
 
 
 static t_int *rec2pol_perform8(t_int *w)
@@ -113,7 +113,7 @@ static void rec2pol_dsp(t_rec2pol *x, t_signal **sp)
     dsp_add(rec2pol_perform, 5, in1, in2, out1, out2, n);
   else 
     dsp_add(rec2pol_perform8, 5, in1, in2, out1, out2, n);
-  dsp_add(sigsqrt_perform, 3, out2, out2, n);
+/*   dsp_add(sigsqrt_perform, 3, out2, out2, n); */
 }
 
 

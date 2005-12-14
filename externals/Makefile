@@ -37,32 +37,35 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-OPT_CFLAGS = -O6 -funroll-loops -fomit-frame-pointer
-CFLAGS = -DPD -DUNIX -Dunix $(OPT_CFLAGS) -I$(pd_src)/src\
-    -Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow \
-	-I$(pd_src)/src
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -fstrict-aliasing
+
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src \
+	-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow
 LDFLAGS =  
-LIBS = 
+LIBS = -lm
 
 ifeq ($(OS_NAME),darwin)
-  CFLAGS += -I/sw/include
+  CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
+  LIBS += -lc
   STRIP = echo
 else
   ifeq ($(OS_NAME),win)
-    CFLAGS += -mms-bitfields -D'O_NONBLOCK=1' \
-      -D'drand48()=((double)rand()/RAND_MAX)' -D'srand48(n)=srand((n))'
-    LDFLAGS += -shared
-    LIBS += -L$(PD_PATH)/bin -lpd
+	 WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
+		-D'setenv(a,b,c)=_putenv(a)' \
+      -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
 # These don't seem to be needed:
-#	-D'bzero(p,n)=memset(p,0,n)' \
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
+    CFLAGS += -mms-bitfields -DMSW -DNT -DWIN32 $(WINDOWS_HACKS)
+    LDFLAGS += -shared
+    LIBS += -L$(pd_src)/bin -lpd -lwsock32 -lpthreadGC2
     STRIP = strip --strip-unneeded -R .note -R .comment
   else
-    CFLAGS += -fPIC
+    CFLAGS +=  -DUNIX -Dunix -fPIC
     LDFLAGS += -Wl,-export_dynamic  -shared
+    LIBS += -lc
     STRIP = strip --strip-unneeded -R .note -R .comment
   endif
 endif
@@ -71,7 +74,7 @@ endif
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
 
 %.$(EXTENSION): %.o
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o" -lc -lm  $(LIBS) \
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
 		`test -f $*.libs && cat $*.libs`	\
 		`test -f $(dir $*)../$(OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(OS_NAME)/$(notdir $*).libs`
