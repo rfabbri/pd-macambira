@@ -1,4 +1,4 @@
-#N canvas 4 3 943 713 12;
+#N canvas 4 3 947 717 12;
 #X msg 296 105 set 1 2 3;
 #X obj 238 631 print K;
 #X msg 607 211 getall;
@@ -225,8 +225,6 @@ the folder containing the current patcher will be used.;
 #X connect 2 0 0 0;
 #X connect 8 0 0 0;
 #X restore 717 659 pd print;
-#X text 272 13 a hierarchical storage object \, (C)2002-2004 Thomas
-Grill;
 #X text 272 33 http://grrrr.org;
 #X msg 428 225 geti \$1;
 #X text 426 185 get indexed element;
@@ -237,6 +235,8 @@ Grill;
 #X msg 295 276 seti 3 Uhu;
 #X text 424 343 clear value at index;
 #X msg 425 363 clri 2;
+#X text 272 13 a hierarchical storage object \, (C)2002-2005 Thomas
+Grill;
 #X connect 0 0 69 0;
 #X connect 2 0 69 0;
 #X connect 3 0 69 0;
@@ -272,7 +272,7 @@ Grill;
 #X connect 72 0 69 0;
 #X connect 73 0 69 0;
 #X connect 74 0 69 0;
-#X connect 80 0 69 0;
-#X connect 82 0 80 0;
-#X connect 85 0 69 0;
-#X connect 87 0 69 0;
+#X connect 79 0 69 0;
+#X connect 81 0 79 0;
+#X connect 84 0 69 0;
+#X connect 86 0 69 0;

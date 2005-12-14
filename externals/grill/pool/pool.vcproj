@@ -107,12 +107,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="pd.lib"
-				OutputFile=".\pd-msvc/d/pool.dll"
+				OutputFile="$(outdir)/pool.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="c:\data\pd\pd-cvs\bin"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\pd-msvc/d/pool.pdb"
+				ProgramDatabaseFile="$(outdir)/pool.pdb"
 				ImportLibrary=".\pd-msvc/d/pool.lib"
 				TargetMachine="1"/>
 			<Tool

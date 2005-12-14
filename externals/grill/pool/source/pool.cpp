@@ -64,7 +64,9 @@ poolval::poolval(const A &k,AtomList *d):
 poolval::~poolval()
 {
 	if(data) delete data;
-	if(nxt) delete nxt;
+
+//    if(nxt) delete nxt;
+    FLEXT_ASSERT(nxt == NULL);
 }
 
 poolval &poolval::Set(AtomList *d)
@@ -93,7 +95,8 @@ pooldir::~pooldir()
 {
 	Reset(false);
 		
-	if(nxt) delete nxt;
+//	if(nxt) delete nxt;
+    FLEXT_ASSERT(nxt == NULL);
 }
 
 V pooldir::Clear(BL rec,BL dironly)
@@ -104,6 +107,7 @@ V pooldir::Clear(BL rec,BL dironly)
             if(d) {
                 do {
                     d1 = d->nxt;
+                    d->nxt = NULL;
                     delete d;
                 } while((d = d1) != NULL);
                 dirs[i].d = NULL; 
@@ -117,6 +121,7 @@ V pooldir::Clear(BL rec,BL dironly)
             if(v) {
                 do {
                     v1 = v->nxt;
+                    v->nxt = NULL;
                     delete v;
                 } while((v = v1) != NULL);
                 vals[i].v = NULL; 

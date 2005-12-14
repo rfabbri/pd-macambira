@@ -38,6 +38,9 @@ protected:
 	V ms_pool(const AtomList &l);
 	V mg_pool(AtomList &l);
 
+    // print some help message
+    static V m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2005 Thomas Grill"); }
+
 	// clear all data in pool
 	V m_reset();
 
@@ -164,6 +167,8 @@ private:
 	FLEXT_ATTRVAR_I(vcnt)
 	FLEXT_ATTRVAR_I(dcnt)
 
+	FLEXT_CALLBACK(m_help)
+
 	FLEXT_CALLBACK(m_reset)
 
 	FLEXT_CALLBACK(m_getdir)
@@ -234,7 +239,7 @@ const t_symbol *pool::sym_echo;
 V pool::setup(t_classid c)
 {
 	post("");
-	post("pool %s - hierarchical storage object, (C)2002-2005 Thomas Grill",POOL_VERSION);
+    pool::m_help();
 	post("");
 
 	head = tail = NULL;
@@ -247,6 +252,7 @@ V pool::setup(t_classid c)
 	FLEXT_CADDATTR_VAR1(c,"valcnt",vcnt);
 	FLEXT_CADDATTR_VAR1(c,"dircnt",dcnt);
 
+	FLEXT_CADDMETHOD_(c,0,"help",m_help);
 	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
 	FLEXT_CADDMETHOD_(c,0,"getdir",m_getdir);
 	FLEXT_CADDMETHOD_(c,0,"mkdir",m_mkdir);
