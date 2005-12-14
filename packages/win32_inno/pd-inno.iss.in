@@ -40,14 +40,14 @@ Name: {group}\Documentation\Gem Manual; Filename: {app}\doc\gem\00.manual\index.
 Name: {group}\Documentation\Gem Primer; Filename: {app}\doc\gem\GemPrimer.pdf
 ;-----------------------------------------------------------------------------
 ; GRIPD
-#ifexist "build\bin\gripd.exe"
-Name: {group}\GrIPD; Filename: {app}\bin\gripd.exe
+#ifexist "build\gripd\gripd.exe"
+Name: {group}\GrIPD; Filename: {app}\gripd\gripd.exe
 #endif
 
 
 [Run]
 ; NOTE: The following entry contains an English phrase ("Launch"). You are free to translate it into another language if required.
-Filename: {app}\pd.bat; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
+Filename: {app}\bin\pd.exe; Description: Launch Pure Data; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 Type: files; Name: {app}\pd.url

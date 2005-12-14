@@ -39,8 +39,6 @@
 	<key>loadlib17</key>
 	<string>loaders</string>
 	<key>loadlib18</key>
-	<string>zexy</string>
-	<key>loadlib19</key>
 	<string>markex</string>
 </dict>
 </plist>

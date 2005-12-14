@@ -1,9 +1,5 @@
 
-- update pd-settings.reg with libs from org.puredata.pd.plist
-
 - check out using env vars in Path settings in registry, or make relative paths
-
-- move gripd files to pd\gripd
 
 - Another detail is that the menu item "help/1 manual" results in no action -
   possibly some link pointing to the wrong place?  It turns out that the
