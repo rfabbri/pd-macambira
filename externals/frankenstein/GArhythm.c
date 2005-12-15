@@ -172,11 +172,14 @@ static double GArhythm_evaluate_fitness1(char *woman, char *man)
 	int res=0;
 	int max = BUFFER_LENGHT*2;
 	int i;
+	/*
+	// commenting here I allow beat swapped rhythms to be considered as identical
 	for (i=0; i<BUFFER_LENGHT; i++)
 	{
 		if (woman[i] == man[i])
 			res++;
 	}
+	*/
 	for (i=0; i<BUFFER_LENGHT; i++)
 	{
 		if ((woman[i]!= 0) && (man[i] != 0))
@@ -208,6 +211,7 @@ static double GArhythm_evaluate_fitness2(char *woman, char *man)
 // similarities TODO
 static double GArhythm_evaluate_fitness3(char *woman, char *man)
 {
+	// TODO: DUMMY, not working!
 	int i;
 	short int global1[BUFFER_LENGHT];
 	short int global2[BUFFER_LENGHT];
@@ -227,7 +231,7 @@ static double GArhythm_evaluate_fitness3(char *woman, char *man)
 	return 0;
 }
 
-// svaforisce troppi colpi consecutivi
+// penalyze too many consecutive beats
 static double GArhythm_evaluate_fitness4(char *woman, char *man)
 {
 	int i, j, max, curr_consecutivi, max_consecutivi, tot_consecutivi;
@@ -240,7 +244,7 @@ static double GArhythm_evaluate_fitness4(char *woman, char *man)
 		curr_consecutivi = 0;
 		while(i<BUFFER_LENGHT)
 		{
-			if (man[i] & (0x01<<j))
+			if ((man[i] & (0x01<<j)) && (man[i-1] & (0x01<<j)))
 			{
 				// here is an event
 				//is it the first?
@@ -252,6 +256,7 @@ static double GArhythm_evaluate_fitness4(char *woman, char *man)
 				tot_consecutivi += curr_consecutivi;
 				curr_consecutivi = 0;
 			}
+			i++;
 		}
 	}
 	ris = (float) (((float) ris) / ((float) max));
