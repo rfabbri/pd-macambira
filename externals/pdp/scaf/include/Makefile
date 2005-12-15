@@ -1,6 +1,0 @@
-current:
-
-
-clean:
-	rm -f *~
-

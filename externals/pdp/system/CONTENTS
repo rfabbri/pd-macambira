@@ -1,7 +1,0 @@
-X11		x window specific code
-image		image processing code
-kernel		the core pdp system (pool, queue, type, ...)
-mmx		mmx assembly code
-pdbase		base classes for pd objects
-type		different packet type implementations
-
