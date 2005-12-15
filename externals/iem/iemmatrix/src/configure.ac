@@ -20,7 +20,8 @@ AC_SUBST(INCLUDES)
 AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (e.g. 0.37)])
 AC_ARG_WITH(version,   [  --with-version=<ver>    enforce a certain iemmatrix-version (e.g. 0.1)])
 AC_ARG_WITH(extension, [  --with-extension=<ext>  enforce a certain extension for the dynamic library (e.g. dll)])
-
+AC_ARG_WITH(pdpath,    [  --with-pd=</path/to/pd> where to look for pd-headers and and -libs])
+AC_ARG_ENABLE(PIC,     [  --disable-PIC           disable compilation with PIC-flag])
 
 dnl Checks for libraries.
 dnl Replace `main' with a function in -lc:
@@ -35,15 +36,22 @@ dnl Replace `main' with a function in -lstk:
 dnl AC_CHECK_LIB(stk, main, STK=yes)
 
 
-if test $includedir
-then
+if test "x$with_pd" != "x"; then
+ if test -d "${with_pd}/src"; then
+  INCLUDES="-I${with_pd}/src ${INCLUDES}"
+ fi
+ if test -d "${with_pd}/bin"; then
+  LIBS="-L${with_pd}/bin ${LIBS}"
+ fi
+fi
+
+if test "x$includedir" != "x"; then
  for id in $includedir
  do
    if test -d $id; then INCLUDES="-I$id $INCLUDES"; fi
  done
 fi
-if test $libdir
-then
+if test "x$libdir" != "x"; then
  for id in $libdir
  do
    if test -d $id; then LIBS="-L$id $LIBS"; fi
@@ -124,13 +132,31 @@ fi
 
 DFLAGS=""
 
+
+if test "x$enable_PIC" != "xno"; then
+AC_MSG_CHECKING("PIC")
+cat > conftest.c << EOF
+int main(){
+  return 0;
+}
+EOF
+if ${CC} ${INCLUDES} ${DFLAGS} -o conftest.o conftest.c ${CFLAGS} -fPIC > /dev/null 2>&1
+then
+  echo "yes"
+  CFLAGS="${CFLAGS} -fPIC"
+else
+  echo "no"
+fi
+fi
+
+
 dnl
 dnl  OK, checks for machines are here now
 dnl
 if test `uname -s` = Linux; 
 then
   LFLAGS="-export_dynamic  -shared"
-  CFLAGS="-fPIC $CFLAGS"
+  CFLAGS="$CFLAGS"
   EXT=pd_linux	
 fi
 
