@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>PDP Forth Scripting</title>
+  </head>
+
+  <body>
+    <h1>PDP Forth Scripting</h1>
+    <h2>Introduction</h2>
+
+    <p> This document describes the rationale behind the pdp forth scripting
+      language, aka "pdp's rpn calculator".
+
+   
+   <p>The point is to be able to decouple the packet processors from the pd
+   object model, in order to be able to port the functional part of pdp to other 
+   systems. Therefore pdp needs its own processor model.
+
+   <p>A requirement for this is that it is both flexible and simple. pd's object
+   model is very flexible, but it is hard to port to other architextures, because
+   of the tight bindings to the pd kernel. What is needed is a way to abstract the
+   functionality of a packet processor in such a way that a pd class can be
+   generated from the pdp processor model.
+
+   <p>There are a lot of ways to solve this problem. One is to extend a packet
+   class to support methods. This seems like a very clean solution, however
+   when a processor has more than one packet as internal state, this poses
+   a problem. It would require to define an operation like biquad (which has 1 input
+   packet and 2 extra state packets) as a method of a packet collection. To
+   do this properly requires a much more advanced object model, or a separate
+      object model for processors.
+   
+
+   <p>In short: it is not always clear if a packet processor can be seen as a metod
+   'of' or an operation 'on' a single packet, so extending a packet with methods 
+   would require a separate packet processor class anyway. Therefore we do not
+   define packet operations as methods of packets. (no object oriented solution)
+
+   <p>Another approach is to write operators in a pure functional way: a processor
+   accepts a list of arguments and returns a new list of arguments. To do this
+   cleanly it would require the calling style to be pass by value: i.e. the arguments
+   passed will not be modified themselves. Since most of the image processors in
+   pdp all use in place processing for performance reasons, this would require
+   a lot of workarounds or a big kludge mixing const and non const references 
+      (like it would be done in C++). 
+
+    <p>Since one of the goals is to automate
+   the generation of wrappers of pdp processors (i.e. pd classes, python classes,
+   scheme functions, ...) the interface can best be kept as simple as possible.
+   (no pure functional solution)
+
+   <p>The most natural solution, given the underlying code base, seems to be to embrace 
+   an in place processing approach. What comes to mind is to use a data stack to solve 
+   the communication problem. I.e. the forth language model. A packet operation is then
+   a forth word that manipulates a data stack. A data stack is nothing more than a list 
+   of atoms containing the basic data building blocks: floats, ints, symbols and packets.
+
+    <p>An additional advantage is that dataflow and forth mix very well. This would enable
+   the possibility to create new words by chaining old ones, without the disadvantage
+   that pd abstractions using pdp objects have: passive packets are contained in internal processor
+   registers longer than necessary, leading to inefficient memory usage. 
+
+   <p>Several practical problems need to be solved to implement this. The first being
+   description of the stack effect. Each primitive word has a mandatory description of
+      the number of stack elements it consumes and produces.
+
+    <P>The forth words will support
+      polymorphy: each word has a type template to describe the type of atoms it can operate
+      on. The type is determined by some word on the stack, or a symbol indicating the type for
+      generators. 
+
+   <p>To solve the additional problem of mapping forth words to processors, the concept
+      of a forth process is introduced. A forth process has a stack (representing it's
+      state), an init method that constructs a stack, a process method that operates
+      on the stack and some description of how to map inputs to stack and stack to output.
+
+   <p>There is one last class of objects that don't fit the forth description
+      very well: it is the input/output classes. These will probably stay as special
+      cases, since they really need an internal state represented as an object,
+      incorporating them into the system would require them to be defined as an
+      object (quicktime packet, v4l packet, xv packet, ...). More later.
+
+    <h2>Implementation</h2>
+    Have a look at <code>pdp_forth.h</code>
+
+
+    <hr>
+    <address><a href="mailto:no@spam">Tom Schouten</a></address>
+<!-- Created: Sun Jun  8 17:42:50 CEST 2003 -->
+<!-- hhmts start -->
+Last modified: Mon Jun  9 13:41:09 CEST 2003
+<!-- hhmts end -->
+  </body>
+</html>

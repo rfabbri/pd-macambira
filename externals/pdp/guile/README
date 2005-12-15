@@ -1,0 +1,73 @@
+PDP_GUILE - a scheme interpreter for pd/pdp
+
+Copyright (c) by Tom Schouten <pdp@zzz.kotnet.org>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+The GNU Public Licence can be found in the file COPYING
+
+---
+
+pdp_guile starts a scheme interpreter is started on pd's standard io. 
+there is a simple send/receive interface in pd to communicate with the 
+running scheme interpreter trough an input and output queue. pd can 
+send messages, including pdp packets, to guile with the [ss tag] object.
+
+guile can read using the (in) fuction, which returs a two element list:
+the tag and the object (a float, a symbol, a list or a packet) i.e. if 
+you connect a [pdp_v4l] object to a [ss some-tag-symbol] object and bang 
+the v4l object, you can retreive the packet in guile using something 
+like this:
+
+(in)
+=> (some-tag-symbol #<pdp 0 image/YCrCb/320x240>)
+
+(in) retreives the oldest message from the input queue. if there are no 
+more messages, (in) returns #f
+
+guile can write using the (out tag object) function, which will send the
+object to a [r tag] pd reciever. i.e. if you connect a 
+[r some-tag-symbol] object to a [pdp_xv] object, you can display a 
+packet (here contained in variable p) by doing:
+
+(out 'some-tag-symbol p)
+
+
+guile is connected to pdp's forth scripting language (pdp's "rpn 
+calculator") using the (forth stack wordlist) statement. it returns the 
+processed stack. i.e.:
+
+(define p0 (make-pdp 'image/grey/320x240))
+(define p1 (make-pdp 'image/grey/320x240))
+(forth `(,p0 ,p1) '(add))
+=> (#<pdp 2 image/grey/320x240>)
+
+
+see pdp_guile.scm and pdp_guile.pd for an example of how pdp_guile 
+could be used.
+
+this is mainly for experimental interactive work and testing pdp's forth 
+scripting. there's no documentation, apart from this file, the example 
+and the source code. if you like to have more info, just drop me a 
+line.
+
+if you want to write externals in scheme, this is probably not for you.
+
+requirements: libguile 1.6.x
+
+
+enjoy,
+
+tom

@@ -1,0 +1,36 @@
+#N canvas 135 3 467 427 10;
+#X obj 90 309 pdp_xv;
+#X obj 90 170 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 90 202 pdp_v4l;
+#X obj 169 128 metro 10;
+#X obj 90 285 r out-vid;
+#X obj 90 237 ss in-vid;
+#X obj 250 206 ss control;
+#X msg 248 177 stop;
+#X msg 292 177 gc;
+#X obj 293 142 metro 1000;
+#X msg 304 48 stop;
+#X msg 162 80 1;
+#X msg 193 80 0;
+#X obj 101 48 r start;
+#X text 283 29 pd controls stop;
+#X text 233 229 scheme control port;
+#X text 29 28 scheme interpreter controls start;
+#X text 20 372 load "example.scm" in the guile dir to use this patch
+;
+#X text 82 262 scheme code;
+#X connect 1 0 2 0;
+#X connect 2 0 5 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 7 0 6 0;
+#X connect 8 0 6 0;
+#X connect 9 0 8 0;
+#X connect 10 0 7 0;
+#X connect 10 0 12 0;
+#X connect 11 0 3 0;
+#X connect 11 0 9 0;
+#X connect 12 0 3 0;
+#X connect 12 0 9 0;
+#X connect 13 0 11 0;
