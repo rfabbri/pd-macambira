@@ -704,15 +704,17 @@ pdp: $(externals_src)/pdp/configure $(externals_src)/pdp/Makefile.config
 	-make -C $(externals_src)/pdp
 
 pdp_install: pdp
-	install -d $(objectsdir)/$(PDP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDP_NAME) \
-		--author "Tom Schouten" \
-		--description "Pure Data Packet" \
-		--license "GNU GPL"
-	-install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
+#	install -d $(objectsdir)/$(PDP_NAME)
+#	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDP_NAME) \
+#		--author "Tom Schouten" \
+#		--description "Pure Data Packet" \
+#		--license "GNU GPL"
+	-install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
+#	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
 	install -d $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
+#	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -724,7 +726,7 @@ pdp_install: pdp
 pdp_clean:
 	-rm -f -- $(externals_src)/pdp/*.$(EXTENSION)
 	-find $(externals_src)/pdp -name '*.o' -delete
-	-rm -f -- $(externals_src)/pdp/*.bak
+	-find $(externals_src)/pdp -name '*.bak' -delete
 	-rm -f -- $(externals_src)/pdp/Makefile.config
 	-rm -f -- $(externals_src)/pdp/configure
 
@@ -954,6 +956,7 @@ zexy_clean:
 	-rm -f -- $(externals_src)/*.*~
 
 
+
 #==============================================================================#
 #
 # UNFILTERED PROJECT TARGETS
@@ -990,7 +993,10 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean pdp_clean pidip_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
+clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean \
+freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean \
+oscx_clean pddp_clean pdp_clean pidip_clean smlib_clean toxy_clean \
+unauthorized_clean zexy_clean install_clean
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 
