@@ -48,7 +48,7 @@ ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
   LIBS += -lc
-  STRIP = echo
+  STRIP = strip -x
 else
   ifeq ($(OS_NAME),win)
 	 WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
@@ -70,8 +70,16 @@ else
   endif
 endif
 
+CXXFLAGS = $(CFLAGS)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -o "$*.o" -c "$*.c"
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$*.cpp"
+
+%.o: %.cc
+	$(CXX) $(CXXFLAGS) -o "$*.o" -c "$*.cc"
 
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
@@ -90,7 +98,7 @@ endif
 #iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy vbap zexy
 #$(patsubst %, %_install,$(TARGETS))
 
-BUILDSRC_OBJECTS = $(wildcard $(externals_src)/build/src/*.c)
+BUILDSRC_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
 all: pre_all_$(OS_NAME) $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) \
 creb cxc cyclone ext13 freeverb \
 hid iemabs iemlib iemmatrix loaders markex maxlib mjlib motex pddp pdp \
@@ -115,8 +123,8 @@ install: $(objectsdir) all help_install objects_install unfiltered_install \
 creb_install cxc_install cyclone_install ext13_install freeverb_install\
 iemabs_install iemabs_install iemlib_install iemmatrix_install loaders_install \
 markex_install maxlib_install mjlib_install motex_install pddp_install \
-pdp_install pmpd_install toxy_install unauthorized_install vbap_install \
-zexy_install
+pdp_install pidip_install pmpd_install toxy_install unauthorized_install \
+vbap_install zexy_install
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -186,7 +194,7 @@ help_install: $(helpdir)
 #------------------------------------------------------------------------------#
 # TEMPLATE
 TEMPLATE_NAME=template
-TEMPLATE_OBJECTS = $(wildcard $(externals_src)/template/*.c)
+TEMPLATE_OBJECTS := $(wildcard $(externals_src)/template/*.c)
 template: $(TEMPLATE_OBJECTS:.c=.$(EXTENSION))
 
 template_install: template
@@ -217,6 +225,9 @@ template_clean:
 #------------------------------------------------------------------------------#
 # CREB
 CREB_NAME=creb
+#CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
+#CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
+#creb: $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) $(CREB_OBJECTS:.c=.$(EXTENSION))
 creb:
 
 
@@ -239,7 +250,7 @@ creb_clean:
 #------------------------------------------------------------------------------#
 # CXC
 CXC_NAME=cxc
-CXC_OBJECTS = $(wildcard $(externals_src)/cxc/???*.c)
+CXC_OBJECTS := $(wildcard $(externals_src)/cxc/???*.c)
 cxc: $(CXC_OBJECTS:.c=.$(EXTENSION))
 
 cxc_install: cxc
@@ -303,9 +314,12 @@ cyclone_clean:
 #------------------------------------------------------------------------------#
 # EXT13
 EXT13_NAME=ext13
-# sfread.c doesn't compile, so exclude it
-EXT13_OBJECTS = $(wildcard $(externals_src)/ext13/???????*.c) \
-	$(externals_src)/ext13/ftos.c $(externals_src)/ext13/send13.c 
+# openpatch and sfread.c doesn't compile, so exclude them
+EXT13_FILES = catch13~.c kalashnikov.c ossmixer.c receive13~.c sfwrite13~.c \
+wavinfo.c cdplayer.c mandelbrot.c piperead~.c scramble~.c streamin13~.c \
+mandelbrot~.c pipewrite~.c send13.c streamout13~.c filesize.c messages.c \
+promiscous~.c send13~.c strippath.c ftos.c receive13.c throw13~.c
+EXT13_OBJECTS = $(patsubst %,$(externals_src)/ext13/%,$(EXT13_FILES))
 ext13: $(EXT13_OBJECTS:.c=.$(EXTENSION))
 
 ext13_test:
@@ -337,7 +351,7 @@ ext13_clean:
 # FRANKENSTEIN
 FRANKENSTEIN_NAME=frankenstein
 # exclude test.c since it is not used
-FRANKENSTEIN_OBJECTS = $(wildcard $(externals_src)/frankenstein/*.c)
+FRANKENSTEIN_OBJECTS := $(wildcard $(externals_src)/frankenstein/*.c)
 frankenstein: $(FRANKENSTEIN_OBJECTS:.c=.$(EXTENSION))
 
 frankenstein_install: frankenstein
@@ -369,7 +383,7 @@ frankenstein_clean:
 #------------------------------------------------------------------------------#
 # FREEVERB
 FREEVERB_NAME=freeverb
-FREEVERB_OBJECTS = $(wildcard $(externals_src)/freeverb~/*.c)
+FREEVERB_OBJECTS := $(wildcard $(externals_src)/freeverb~/*.c)
 freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
 
 freeverb_install: freeverb
@@ -404,7 +418,7 @@ HID_INCLUDES = -I./ -I../../../pd/src -I./HID\ Utilities\ Source
 HID_CFLAGS = 
 
 # this build method doesn't work yet <hans@at.or.at>
-HID_OBJECTS = $(wildcard $(externals_src)/hcs/hid/*.c)
+HID_OBJECTS := $(wildcard $(externals_src)/hcs/hid/*.c)
 hid: 
 #	$(CC) $(CFLAGS) -c $(HID_OBJECTS:.c=.$(EXTENSION))
 #	$(CC) $(LDFLAGS) -o hid.$(EXTENSION) $(externals_src)/hcs/hid/*.o
@@ -499,7 +513,7 @@ iemmatrix_install: iemmatrix
 #------------------------------------------------------------------------------#
 # LOADERS
 LOADERS_NAME=
-LOADERS_OBJECTS = $(wildcard $(externals_src)/loaders/*.c)
+LOADERS_OBJECTS := $(wildcard $(externals_src)/loaders/*.c)
 loaders: $(LOADERS_OBJECTS:.c=.$(EXTENSION))
 
 loaders_install: loaders
@@ -521,7 +535,7 @@ loaders_clean:
 #------------------------------------------------------------------------------#
 # MARKEX
 MARKEX_NAME=markex
-MARKEX_OBJECTS = $(wildcard $(externals_src)/markex/*.c)
+MARKEX_OBJECTS := $(wildcard $(externals_src)/markex/*.c)
 markex: $(MARKEX_OBJECTS:.c=.$(EXTENSION))
 
 markex_install: markex
@@ -547,7 +561,7 @@ markex_clean:
 #------------------------------------------------------------------------------#
 # MAXLIB
 MAXLIB_NAME=maxlib
-MAXLIB_OBJECTS = $(wildcard $(externals_src)/maxlib/src/*.c)
+MAXLIB_OBJECTS := $(wildcard $(externals_src)/maxlib/src/*.c)
 maxlib: $(MAXLIB_OBJECTS:.c=.$(EXTENSION))
 
 maxlib_install: maxlib
@@ -576,7 +590,7 @@ maxlib_clean:
 # MJLIB
 MJLIB_NAME=mjlib
 # exclude the library file mjLib.c
-MJLIB_OBJECTS = $(wildcard $(externals_src)/mjlib/[a-z]?[a-z]*.c)
+MJLIB_OBJECTS := $(wildcard $(externals_src)/mjlib/[a-z]?[a-z]*.c)
 mjlib: $(MJLIB_OBJECTS:.c=.$(EXTENSION))
 
 mjlib_install: mjlib
@@ -603,7 +617,7 @@ mjlib_clean:
 #------------------------------------------------------------------------------#
 # MOTEX
 MOTEX_NAME=motex
-MOTEX_OBJECTS = $(wildcard $(externals_src)/motex/*.c)
+MOTEX_OBJECTS := $(wildcard $(externals_src)/motex/*.c)
 motex: $(MOTEX_OBJECTS:.c=.$(EXTENSION))
 
 motex_install: motex
@@ -676,13 +690,18 @@ pddp_clean:
 	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
 
 
+
 #------------------------------------------------------------------------------#
 # PDP
 PDP_NAME=pdp
-pdp:
-#	cd $(externals_src)/pdp && ./configure && $(MAKE)
-#TODO: compile pidip here
-#TODO: compile gem2pdp here
+$(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
+	cd $(externals_src)/pdp && autoconf
+
+$(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
+	cd $(externals_src)/pdp && ./configure
+
+pdp: $(externals_src)/pdp/configure $(externals_src)/pdp/Makefile.config
+	-make -C $(externals_src)/pdp
 
 pdp_install: pdp
 	install -d $(objectsdir)/$(PDP_NAME)
@@ -691,7 +710,6 @@ pdp_install: pdp
 		--description "Pure Data Packet" \
 		--license "GNU GPL"
 	-install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
-	-install -p $(externals_src)/gem2pdp/*.$(EXTENSION) $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -d $(helpdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
@@ -703,14 +721,27 @@ pdp_install: pdp
 	install -p $(externals_src)/pdp/doc/examples/*.* \
 		$(examplesdir)/$(PDP_NAME)
 
+pdp_clean:
+	-rm -f -- $(externals_src)/pdp/*.$(EXTENSION)
+	-find $(externals_src)/pdp -name '*.o' -delete
+	-rm -f -- $(externals_src)/pdp/*.bak
+	-rm -f -- $(externals_src)/pdp/Makefile.config
+	-rm -f -- $(externals_src)/pdp/configure
+
 
 #------------------------------------------------------------------------------#
 # PIDIP
 PIDIP_NAME=pidip
-pidip:
-#	cd $(externals_src)/pidip && ./configure && $(MAKE)
+$(externals_src)/pidip/configure: $(externals_src)/pidip/configure.ac
+	cd $(externals_src)/pidip && autoconf
 
-pidip_install: pidip
+$(externals_src)/pidip/Makefile: $(externals_src)/pidip/Makefile.in
+	cd $(externals_src)/pidip && ./configure --with-pd=../../pd --with-pdp=../pdp
+
+pidip: $(externals_src)/pidip/configure $(externals_src)/pidip/Makefile
+	make -C $(externals_src)/pidip
+
+pidip_install:
 	install -d $(objectsdir)/$(PIDIP_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIDIP_NAME) \
 		--author "Yves Degoyon" \
@@ -720,6 +751,9 @@ pidip_install: pidip
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
+	install -d $(manualsdir)/$(PIDIP_NAME)
+	install -p $(externals_src)/pidip/README \
+		$(manualsdir)/$(PIDIP_NAME)/README.txt
 	install -d $(examplesdir)/$(PIDIP_NAME)/images
 	install -p $(externals_src)/pidip/patches/images/*.* \
 		$(examplesdir)/$(PIDIP_NAME)/images
@@ -727,17 +761,29 @@ pidip_install: pidip
 	install -p $(externals_src)/pidip/patches/morphology/*.* \
 		$(examplesdir)/$(PIDIP_NAME)/morphology
 
+pidip_clean:
+	-rm -f -- $(externals_src)/pidip/*.$(EXTENSION)
+	-find $(externals_src)/pidip -name '*.o' -delete
+	-rm -f -- $(externals_src)/pidip/*.bak
+	-rm -f -- $(externals_src)/pidip/Makefile
+	-rm -f -- $(externals_src)/pidip/configure
+
 
 #------------------------------------------------------------------------------#
 # PMPD
 PMPD_NAME=pmpd
-pmpd:
-
+PMPD_OBJECTS := $(wildcard $(externals_src)/pmpd/src/[a-lq-z]*.c)
+pmpd: $(PMPD_OBJECTS:.c=.$(EXTENSION))
 
 pmpd_install: pmpd
-#	install -d $(objectsdir)/$(PMPD_NAME)
+	install -d $(objectsdir)/$(PMPD_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PMPD_NAME) \
+		--author "Cyrille Henry" \
+		--description "Physical Modelling for Pd"
+	-install -p $(externals_src)/pmpd/*.$(EXTENSION) $(objectsdir)/$(PMPD_NAME)
 	install -d $(helpdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/help/*.pd $(helpdir)
+	install -p $(externals_src)/pmpd/help/*.pd $(helpdir)/$(PMPD_NAME)
 	install -d $(manualsdir)/$(PMPD_NAME)
 	install -d $(manualsdir)/$(PMPD_NAME)
 	install -p $(externals_src)/pmpd/doc/pmpd.pdf/pmpd.pdf \
@@ -746,12 +792,18 @@ pmpd_install: pmpd
 	install -p $(externals_src)/pmpd/exemples/*.pd \
 		$(examplesdir)/$(PMPD_NAME)
 
+pmpd_clean:
+	-rm -f -- $(PMPD_OBJECTS:.c=.$(EXTENSION))
+	-find $(externals_src)/pmpd -name '*.o' -delete
+	-find $(externals_src)/pmpd -name '*.bak' -delete
+	-find $(externals_src)/pmpd -name '*~' -delete
+
 
 #------------------------------------------------------------------------------#
 # SMLIB
 SMLIB_NAME=smlib
 # exclude SMlib.c since its just for the compiled library
-SMLIB_OBJECTS = $(wildcard $(externals_src)/smlib/source/[a-z]*.c)
+SMLIB_OBJECTS := $(wildcard $(externals_src)/smlib/source/[a-z]*.c)
 smlib: $(SMLIB_OBJECTS:.c=.$(EXTENSION))
 
 smlib_install: smlib
@@ -813,8 +865,8 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 %.tk2c: %.tk
 	bash $(externals_src)/unauthorized/tk2c.bash < $*.tk > $*.tk2c
 
-UNAUTHORIZED_OBJECTS = $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
-# [vocoder~] to be built separately
+UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
+# [vocoder~] is built separately since its made from a number of files
 UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
 unauthorized:  $(UNAUTHORIZED_VOCODER:.c=.o) \
 $(UNAUTHORIZED_TKFILES:.tk=.tk2c) $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
@@ -870,14 +922,14 @@ vbap_install: vbap
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-ZEXY_OBJECTS = $(wildcard $(externals_src)/zexy/src/[a-y]*.c)
+ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y]*.c)
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(UNAUTHORIZED_NAME) \
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(ZEXY_NAME) \
 		--author "iohannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
 		--license "GNU GPL" \
 		--description "GUI and streaming objects" \
@@ -938,7 +990,7 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
+clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean oscx_clean pddp_clean pdp_clean pidip_clean smlib_clean toxy_clean unauthorized_clean zexy_clean install_clean
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 
