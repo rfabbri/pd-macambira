@@ -170,6 +170,8 @@ help_install: $(helpdir)
 				$(helpdir)
 	install -p \
 			$(externals_src)/pdogg/*/*.pd \
+			$(externals_src)/pdp/doc/objects/*.* \
+			$(externals_src)/pidip/doc/*.pd \
 			$(externals_src)/plugin~/*.pd \
 			$(externals_src)/rhythm_estimator/*.p? \
 			$(externals_src)/signal/*/*.pd \
@@ -307,7 +309,7 @@ cyclone_install: cyclone
 
 
 cyclone_clean:
-	cd $(externals_src)/miXed/cyclone && make $(DEST_PATHS) clean
+	-make -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
 
 
 
@@ -645,17 +647,25 @@ motex_clean:
 
 #----------------------------------------------------------------------------
 # OSCx
-oscx:
-	test -e $(externals_src)/OSCx/Makefile || \
-		(cd $(externals_src)/OSCx && ./configure)
-# these don't work on Windows yet
-	cd $(externals_src)/OSCx && $(MAKE) CC=gcc
+OSCX_NAME=oscx
+$(externals_src)/OSCx/configure: $(externals_src)/OSCx/configure.ac
+	cd $(externals_src)/OSCx && autoconf
+
+$(externals_src)/OSCx/Makefile: $(externals_src)/OSCx/Makefile.in
+	cd $(externals_src)/OSCx && ./configure
+
+$(externals_src)/OSCx/src/OSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
+$(externals_src)/OSCx/Makefile
+	-make -C $(externals_src)/OSCx CC=gcc
+
+oscx: $(externals_src)/OSCx/src/OSC.$(EXTENSION)
+
 
 oscx_install: oscx
 	install -d $(objectsdir)
 	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
 	install -d $(helpdir)
-	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)
+	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)/$(OSCX_NAME)
 
 
 oscx_clean:
@@ -687,7 +697,7 @@ pddp_install: pddp
 
 
 pddp_clean:
-	cd $(externals_src)/mixed/pddp && make $(DEST_PATHS) clean
+	-make -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
 
 
 
@@ -700,8 +710,11 @@ $(externals_src)/pdp/configure: $(externals_src)/pdp/configure.ac
 $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
 	cd $(externals_src)/pdp && ./configure
 
-pdp: $(externals_src)/pdp/configure $(externals_src)/pdp/Makefile.config
+$(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
+$(externals_src)/pdp/Makefile.config 
 	-make -C $(externals_src)/pdp
+
+pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
 pdp_install: pdp
 #	install -d $(objectsdir)/$(PDP_NAME)
@@ -713,8 +726,7 @@ pdp_install: pdp
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
 	install -d $(helpdir)/$(PDP_NAME)
-#	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
-	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)
+	install -p $(externals_src)/pdp/doc/objects/*.* $(helpdir)/$(PDP_NAME)
 	install -d $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/reference.txt $(manualsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/doc/introduction/*.* \
@@ -725,8 +737,8 @@ pdp_install: pdp
 
 pdp_clean:
 	-rm -f -- $(externals_src)/pdp/*.$(EXTENSION)
-	-find $(externals_src)/pdp -name '*.o' -delete
-	-find $(externals_src)/pdp -name '*.bak' -delete
+	-find $(externals_src)/pdp -name '*.o' | xargs rm -f --
+	-find $(externals_src)/pdp -name '*.bak' | xargs rm -f --
 	-rm -f -- $(externals_src)/pdp/Makefile.config
 	-rm -f -- $(externals_src)/pdp/configure
 
@@ -740,8 +752,11 @@ $(externals_src)/pidip/configure: $(externals_src)/pidip/configure.ac
 $(externals_src)/pidip/Makefile: $(externals_src)/pidip/Makefile.in
 	cd $(externals_src)/pidip && ./configure --with-pd=../../pd --with-pdp=../pdp
 
-pidip: $(externals_src)/pidip/configure $(externals_src)/pidip/Makefile
-	make -C $(externals_src)/pidip
+$(externals_src)/pidip/pidip.$(EXTENSION):  $(externals_src)/pidip/configure \
+$(externals_src)/pidip/Makefile
+	-make -C $(externals_src)/pidip
+
+pidip: $(externals_src)/pidip/pidip.$(EXTENSION)
 
 pidip_install:
 	install -d $(objectsdir)/$(PIDIP_NAME)
@@ -765,7 +780,7 @@ pidip_install:
 
 pidip_clean:
 	-rm -f -- $(externals_src)/pidip/*.$(EXTENSION)
-	-find $(externals_src)/pidip -name '*.o' -delete
+	-find $(externals_src)/pidip -name '*.o' | xargs rm -f --
 	-rm -f -- $(externals_src)/pidip/*.bak
 	-rm -f -- $(externals_src)/pidip/Makefile
 	-rm -f -- $(externals_src)/pidip/configure
@@ -796,9 +811,9 @@ pmpd_install: pmpd
 
 pmpd_clean:
 	-rm -f -- $(PMPD_OBJECTS:.c=.$(EXTENSION))
-	-find $(externals_src)/pmpd -name '*.o' -delete
-	-find $(externals_src)/pmpd -name '*.bak' -delete
-	-find $(externals_src)/pmpd -name '*~' -delete
+	-find $(externals_src)/pmpd -name '*.o' | xargs rm -f --
+	-find $(externals_src)/pmpd -name '*.bak' | xargs rm -f --
+	-find $(externals_src)/pmpd -name '*~' | xargs rm -f --
 
 
 #------------------------------------------------------------------------------#
@@ -856,7 +871,7 @@ toxy_install: toxy
 
 
 toxy_clean:
-	cd $(externals_src)/mixed/toxy && make $(DEST_PATHS) clean
+	-make -C $(externals_src)/mixed/toxy $(DEST_PATHS) clean
 
 
 #------------------------------------------------------------------------------#
