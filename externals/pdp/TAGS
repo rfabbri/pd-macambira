@@ -1,0 +1,2617 @@
+
+include/pdp.h,21
+#define PDP_H24,840
+
+include/pdp_ascii.h,140
+#define PDP_H23,858
+} t_ascii;t_ascii31,1093
+#define PDP_ASCII_BW 35,1128
+#define PDP_ASCII_IBM 36,1198
+#define PDP_ASCII_RGB 37,1324
+
+include/pdp_base.h,221
+#define MAX_NB_PDP_BASE_INLETS 30,1059
+#define MAX_NB_PDP_BASE_OUTLETS 31,1092
+typedef void (*t_pdp_method)t_pdp_method41,1288
+typedef void* (*t_pdp_newmethod)t_pdp_newmethod42,1326
+} t_pdp_base;t_pdp_base78,2653
+
+include/pdp_bitmap.h,327
+#define PDP_BITMAP_H32,1089
+typedef struct _bitmap_bitmap37,1142
+} t_bitmap;t_bitmap45,1450
+#define PDP_BITMAP_RGB 52,1515
+#define PDP_BITMAP_RGBA 53,1550
+#define PDP_BITMAP_GREY 54,1585
+#define PDP_BITMAP_YUY2 57,1638
+#define PDP_BITMAP_UYVY 58,1673
+#define PDP_BITMAP_I420 61,1726
+#define PDP_BITMAP_YV12 62,1761
+
+include/pdp_comm.h,246
+#define PDP_COMM_H24,906
+#define S_PDP 52,1420
+#define S_REGISTER_RO 53,1449
+#define S_REGISTER_RW 54,1486
+#define S_PROCESS 55,1523
+#define S_DPD 56,1556
+#define S_INSPECT 57,1585
+#define S_ACCUMULATE 58,1618
+#define S_CHANMASK 59,1654
+
+include/pdp_compat.h,26
+#define PDP_COMPAT_H8,97
+
+include/pdp_config.h,790
+#define HAVE_INTTYPES_H 5,191
+#define HAVE_LIBGSLCBLAS 8,285
+#define HAVE_LIBM 11,366
+#define HAVE_MEMORY_H 14,445
+#define HAVE_PDP_GLX 17,490
+#define HAVE_PDP_GSL 20,532
+#define HAVE_PDP_PNG 23,580
+#define HAVE_PDP_QT 26,623
+#define HAVE_PDP_SDL 32,740
+#define HAVE_PDP_V4L 35,784
+#define HAVE_PDP_X 41,899
+#define HAVE_PDP_XV 44,940
+#define HAVE_STDINT_H 50,1083
+#define HAVE_STDLIB_H 53,1166
+#define HAVE_STRINGS_H 56,1250
+#define HAVE_STRING_H 59,1334
+#define HAVE_SYS_STAT_H 62,1419
+#define HAVE_SYS_TYPES_H 65,1507
+#define HAVE_UNISTD_H 68,1593
+#define PACKAGE_BUGREPORT 71,1697
+#define PACKAGE_NAME 74,1774
+#define PACKAGE_STRING 77,1858
+#define PACKAGE_TARNAME 80,1944
+#define PACKAGE_VERSION 83,2017
+#define PDP_DEBUG 86,2079
+#define STDC_HEADERS 89,2155
+
+include/pdp_control.h,107
+#define __PDP_CONTROL_H__2,26
+typedef void (t_pdp_control_method_notify)t_pdp_control_method_notify7,95
+
+include/pdp_debug.h,104
+#define __PDP_DEBUG_H_2,23
+#define PDP_ASSERT(PDP_ASSERT11,182
+#define PDP_ASSERT(PDP_ASSERT13,263
+
+include/pdp_dpd_base.h,273
+#define PDP_DPD_MAX_CONTEXT_OUTLETS 48,2164
+typedef struct pdp_dpd_base_structpdp_dpd_base_struct50,2203
+} t_pdp_dpd_base;t_pdp_dpd_base78,3443
+#define pdp_dpd_base_set_queue 133,5290
+#define pdp_dpd_base_get_queue 134,5342
+#define pdp_dpd_base_queue_wait 135,5394
+
+include/pdp_dpd_command.h,268
+#define PDP_DPD_COMMAND46,1777
+typedef struct _pdp_dpd_command_pdp_dpd_command52,1852
+} t_pdp_dpd_command;t_pdp_dpd_command57,1936
+typedef struct _pdp_dpd_commandfactory_pdp_dpd_commandfactory61,2002
+} t_pdp_dpd_commandfactory;t_pdp_dpd_commandfactory66,2118
+
+include/pdp_image.h,347
+#define PDP_IMAGE_H32,1082
+typedef struct _image_image38,1176
+} t_image;t_image47,1585
+#define PDP_IMAGE_YV12 51,1620
+#define PDP_IMAGE_GREY 52,1725
+#define PDP_IMAGE_MCHP 53,1781
+#define PDP_IMAGE_SLICE_FIRST 56,1902
+#define PDP_IMAGE_SLICE_LAST 57,1939
+#define PDP_IMAGE_SLICE_BODY 58,1976
+#define pdp_packet_new_image_multi 81,2503
+
+include/pdp_imagebase.h,43
+} t_pdp_imagebase;t_pdp_imagebase38,1183
+
+include/pdp_imageproc.h,477
+#define PDP_IMAGEPROC_H27,985
+typedef long long t_pdp_imageproc_stackword;t_pdp_imageproc_stackword36,1104
+#define PDP_IMAGEPROC_NB_STACKWORDS(PDP_IMAGEPROC_NB_STACKWORDS39,1195
+#define PDP_IMAGEPROC_CONV_HORIZONTAL 123,4492
+#define PDP_IMAGEPROC_CONV_VERTICAL 124,4532
+#define PDP_IMAGEPROC_BIQUAD_TOP2BOTTOM 155,5707
+#define PDP_IMAGEPROC_BIQUAD_BOTTOM2TOP 156,5754
+#define PDP_IMAGEPROC_BIQUAD_LEFT2RIGHT 157,5801
+#define PDP_IMAGEPROC_BIQUAD_RIGHT2LEFT 158,5848
+
+include/pdp_internals.h,32
+#define PDP_INTERNALS_H31,1013
+
+include/pdp_list.h,2132
+#define PDP_LIST_H38,1305
+    a_undef 47,1424
+    a_pointer,48,1441
+    a_float,49,1456
+    a_int,50,1469
+    a_symbol,51,1480
+    a_packet,52,1494
+    a_list,53,1508
+    a_atom_pointer,54,1520
+    a_forthword,57,1563
+    a_vmword,58,1626
+    a_vmmacro 59,1699
+} t_pdp_word_type;t_pdp_word_type60,1783
+typedef union _pdp_word_pdp_word62,1803
+} t_pdp_word;t_pdp_word72,2097
+typedef struct _pdp_atom_pdp_atom75,2133
+} t_pdp_atom;t_pdp_atom80,2229
+typedef struct _pdp_list_pdp_list83,2267
+} t_pdp_list;t_pdp_list89,2362
+typedef void (*t_pdp_atom_method)t_pdp_atom_method107,3006
+typedef void (*t_pdp_word_method)t_pdp_word_method108,3055
+typedef void (*t_pdp_pword_method)t_pdp_pword_method109,3102
+typedef void (*t_pdp_free_method)t_pdp_free_method110,3152
+#define pdp_list_add_front 186,6642
+#define pdp_list_push 187,6682
+#define pdp_list_queue 188,6722
+#define pdp_list_unqueue 189,6766
+#define PDP_ATOM_IN(PDP_ATOM_IN195,6885
+#define PDP_WORD_IN(PDP_WORD_IN200,7030
+#define PDP_POINTER_IN(PDP_POINTER_IN203,7177
+#define PDP_INT_IN(PDP_INT_IN204,7253
+#define PDP_FLOAT_IN(PDP_FLOAT_IN205,7325
+#define PDP_SYMBOL_IN(PDP_SYMBOL_IN206,7399
+#define PDP_PACKET_IN(PDP_PACKET_IN207,7474
+#define PDP_LIST_IN(PDP_LIST_IN208,7549
+#define pdp_list_add_pointer(pdp_list_add_pointer213,7664
+#define pdp_list_add_back_pointer(pdp_list_add_back_pointer214,7763
+#define pdp_list_add_pointer_to_set(pdp_list_add_pointer_to_set215,7867
+#define pdp_list_remove_pointer(pdp_list_remove_pointer216,7973
+#define pdp_list_contains_pointer(pdp_list_contains_pointer217,8075
+#define PDP_LIST_ATOM_0(PDP_LIST_ATOM_0220,8198
+#define PDP_LIST_ATOM_1(PDP_LIST_ATOM_1221,8238
+#define PDP_LIST_ATOM_2(PDP_LIST_ATOM_2222,8284
+#define PDP_LIST_ATOM_3(PDP_LIST_ATOM_3223,8336
+#define PDP_LIST_ATOM_4(PDP_LIST_ATOM_4224,8394
+static inline void pdp_atom_set(227,8484
+static inline void pdp_list_set_0(228,8586
+static inline void pdp_list_set_1(229,8700
+static inline void pdp_list_set_2(230,8820
+typedef t_pdp_list* (*t_pdp_list_evaluator_function)t_pdp_list_evaluator_function237,8981
+
+include/pdp_list_macros.h,355
+#define __PDP_LIST_MACROS__2,28
+#define FIRST(FIRST8,201
+#define SIZE(SIZE9,232
+#define NEXT(NEXT11,267
+#define N(N12,297
+#define FLOAT(FLOAT14,330
+#define PACKET(PACKET15,392
+#define INT(INT16,454
+#define LIST(LIST20,576
+#define LFREE(LFREE21,614
+#define QFLOAT(QFLOAT22,653
+#define QINT(QINT23,731
+#define QPACKET(QPACKET24,807
+
+include/pdp_llconv.h,399
+#define PDP_LLCONV_H30,1177
+enum RIF RIF51,1669
+	RIF_YVU__P411_U8,52,1680
+	RIF_YUV__P411_U8,53,1699
+	RIF_YVU__P411_S16,54,1718
+	RIF_YVU__P444_S16,55,1738
+	RIF_YUYV_P____U8,56,1758
+        RIF_RGB__P____U8,57,1777
+	RIF_RGBA_P____U8,58,1803
+	RIF_RGB__P444_S16,59,1822
+	RIF_GREY______S16,60,1842
+	RIF_GREY______U8,61,1862
+        RIF_BGR__P____U8,62,1881
+        RIF_BGRA_P____U863,1907
+
+include/pdp_matrix.h,341
+#define PDP_MATRIX_H22,879
+#define gsl_rows 33,1083
+#define gsl_columns 34,1106
+typedef struct _matrix_matrix36,1133
+} t_matrix;t_matrix51,1644
+#define PDP_MATRIX 53,1657
+#define PDP_MATRIX_TYPE_RFLOAT 55,1679
+#define PDP_MATRIX_TYPE_CFLOAT 56,1712
+#define PDP_MATRIX_TYPE_RDOUBLE 57,1745
+#define PDP_MATRIX_TYPE_CDOUBLE 58,1779
+
+include/pdp_mem.h,169
+#define _PDP_MEM_H_22,862
+#define PDP_FASTALLOC_BLOCK_ELEMENTS 32,1090
+typedef struct _pdp_fastalloc_pdp_fastalloc33,1132
+} t_pdp_fastalloc;t_pdp_fastalloc40,1278
+
+include/pdp_mmx.h,25
+#define PDP_MMX_H24,862
+
+include/pdp_net.h,693
+#define __PDP_UDP_H_2,21
+#define MAX_UDP_PACKET 53,1542
+#define RESEND_MAX_CHUNKS 54,1570
+#define PDP_UDP_VERSION 56,1664
+typedef struct _pdp_udp_header_pdp_udp_header60,1745
+} t_pdp_udp_header;t_pdp_udp_header67,2083
+#define PDP_UDP_NEW 71,2146
+typedef struct _pdp_udp_new_pdp_udp_new72,2200
+} t_pdp_udp_newpacket;t_pdp_udp_newpacket80,2587
+#define PDP_UDP_DONE 82,2611
+#define PDP_UDP_RESEND 84,2665
+#define PDP_UDP_ACKNEW 85,2762
+#define PDP_UDP_BUFSIZE 90,2892
+typedef struct _pdp_udp_receiver_pdp_udp_receiver93,2939
+} t_pdp_udp_receiver;t_pdp_udp_receiver123,3973
+typedef struct _pdp_udp_sender_pdp_udp_sender143,4553
+} t_pdp_udp_sender;t_pdp_udp_sender177,5625
+
+include/pdp_packet.h,466
+#define PDP_PACKET_H69,3247
+#define PDP_HEADER_SIZE 79,3414
+typedef int (*t_pdp_factory_method)t_pdp_factory_method91,3517
+typedef struct _pdp_class_pdp_class94,3620
+}t_pdp_class;t_pdp_class103,4278
+#define PDP_GC_COLOUR_GREY 111,4427
+#define PDP_GC_COLOUR_WHITE 112,4502
+#define PDP_GC_COLOUR_BLACK 113,4532
+struct _pdp_pdp117,4591
+#define PDP_IMAGE 146,5771
+#define PDP_BITMAP 151,6152
+#define PDP_FOB 153,6327
+#define PDP_FLAG_DONOTCOPY 156,6420
+
+include/pdp_pd.h,22
+#define _M_PD_H_4,41
+
+include/pdp_png.h,29
+#define __PDP_PNG_H__22,861
+
+include/pdp_post.h,28
+#define _PDP_POST_H_23,859
+
+include/pdp_queue.h,279
+#define PDP_QUEUE_H23,860
+typedef void (*t_pdpmethod)t_pdpmethod30,1009
+typedef struct process_queue_structprocess_queue_struct33,1089
+} t_process_queue_item;t_process_queue_item39,1394
+typedef struct _pd_queue_pd_queue43,1452
+} t_pdp_procqueue;t_pdp_procqueue69,2108
+
+include/pdp_resample.h,30
+#define PDP_RESAMPLE_H22,877
+
+include/pdp_symbol.h,970
+#define _PDP_SYMBOL_22,884
+typedef struct _pdp_symbol_pdp_symbol41,1173
+} t_pdp_symbol;t_pdp_symbol57,1560
+typedef void (*t_pdp_symbol_iterator)t_pdp_symbol_iterator67,1769
+#define PDP_SYM_WILDCARD 99,2878
+#define PDP_SYM_FLOAT 100,2928
+#define PDP_SYM_INT 101,2975
+#define PDP_SYM_SYMBOL 102,3020
+#define PDP_SYM_PACKET 103,3068
+#define PDP_SYM_POINTER 104,3116
+#define PDP_SYM_LIST 105,3165
+#define PDP_SYM_INVALID 106,3211
+#define PDP_SYM_QUESTION_MARK 107,3260
+#define PDP_SYM_ATOM 108,3315
+#define PDP_SYM_NULL 109,3361
+#define PDP_SYM_QUOTE_START 110,3407
+#define PDP_SYM_QUOTE_END 111,3460
+#define PDP_SYM_RETURN 112,3511
+#define PDP_SYM_NRETURN 113,3559
+#define PDP_SYM_DEF_START 114,3608
+#define PDP_SYM_DEF_END 115,3658
+#define PDP_SYM_IF 116,3706
+#define PDP_SYM_THEN 117,3750
+#define PDP_SYM_LOCAL 118,3796
+#define PDP_SYM_FORTH 119,3843
+#define PDP_SYM_CALL 120,3890
+#define PDP_SYM_PUSH 121,3936
+#define PDP_SYM_POP 122,3982
+
+include/pdp_type.h,281
+#define PDP_TYPE_H126,4477
+typedef int (*t_pdp_conversion_method)t_pdp_conversion_method133,4711
+typedef t_pdp_list t_pdp_conversion_program;t_pdp_conversion_program136,4831
+typedef struct _pdp_conversion_pdp_conversion139,4952
+} t_pdp_conversion;t_pdp_conversion144,5226
+
+include/pdp_types.h,663
+#define PDP_TYPES_H25,911
+typedef signed char        s8;s827,932
+typedef signed short       s16;s1628,963
+typedef signed long        s32;s3229,995
+typedef signed long long   s64;s6430,1027
+typedef unsigned char      u8;u832,1060
+typedef unsigned short     u16;u1633,1091
+typedef unsigned long      u32;u3234,1123
+typedef unsigned long long u64;u6435,1155
+typedef int bool;bool39,1209
+#define true 40,1227
+#define false 41,1243
+typedef struct _pdp t_pdp;t_pdp45,1269
+typedef void (*t_pdp_packet_method1)t_pdp_packet_method146,1296
+typedef void (*t_pdp_packet_method2)t_pdp_packet_method247,1366
+typedef unsigned int t_raw;t_raw54,1527
+
+include/pdp_xvideo.h,171
+#define FOURCC_YV12 30,1019
+#define FOURCC_YUV2 31,1072
+#define FOURCC_I420 32,1124
+typedef struct _pdp_xvideo_pdp_xvideo37,1205
+} t_pdp_xvideo;t_pdp_xvideo59,1526
+
+include/pdp_xwindow.h,179
+typedef struct _pdp_xdisplay_pdp_xdisplay30,966
+} t_pdp_xdisplay;t_pdp_xdisplay39,1260
+typedef struct _pdp_xwindow_pdp_xwindow54,1600
+} t_pdp_xwindow;t_pdp_xwindow78,2102
+
+include/pwc-ioctl.h,1259
+#define PWC_IOCTL_H2,20
+#define PWC_FPS_SHIFT	51,1771
+#define PWC_FPS_MASK	52,1797
+#define PWC_FPS_FRMASK	53,1830
+#define PWC_FPS_SNAPSHOT	54,1865
+struct pwc_probepwc_probe58,1904
+#define PWC_WB_INDOOR	66,1990
+#define PWC_WB_OUTDOOR	67,2015
+#define PWC_WB_FL	68,2041
+#define PWC_WB_MANUAL	69,2062
+#define PWC_WB_AUTO	70,2087
+struct pwc_whitebalancepwc_whitebalance81,2482
+struct pwc_wb_speedpwc_wb_speed93,2814
+struct pwc_ledspwc_leds101,2914
+#define VIDIOCPWCRUSER	110,3072
+#define VIDIOCPWCSUSER	112,3136
+#define VIDIOCPWCFACTORY	114,3206
+#define VIDIOCPWCSCQUAL	124,3756
+#define VIDIOCPWCGCQUAL	126,3842
+#define VIDIOCPWCPROBE	139,4444
+#define VIDIOCPWCSAGC	142,4576
+#define VIDIOCPWCGAGC	144,4680
+#define VIDIOCPWCSSHUTTER	146,4794
+#define VIDIOCPWCSAWB 149,4888
+#define VIDIOCPWCGAWB 150,4960
+#define VIDIOCPWCSAWBSPEED	153,5054
+#define VIDIOCPWCGAWBSPEED	154,5117
+#define VIDIOCPWCSLED 157,5226
+#define VIDIOCPWCGLED 158,5290
+#define VIDIOCPWCSCONTOUR	161,5417
+#define VIDIOCPWCGCONTOUR	162,5463
+#define VIDIOCPWCSBACKLIGHT	165,5564
+#define VIDIOCPWCGBACKLIGHT	166,5612
+#define VIDIOCPWCSFLICKER	169,5709
+#define VIDIOCPWCGFLICKER	170,5755
+#define VIDIOCPWCSDYNNOISE	173,5869
+#define VIDIOCPWCGDYNNOISE	174,5916
+
+system/pdp.c,25
+void pdp_setup(106,2812
+
+system/mmx/pixel_add_s16.s,78
+.globl .globl18,815
+.type .type19,836
+pixel_add_s16:pixel_add_s1624,949
+
+system/mmx/pixel_biquad_dirI_s16.s,204
+.globl .globl255,6234
+.type .type256,6264
+pixel_biquad_vertb_s16:pixel_biquad_vertb_s16262,6422
+.globl .globl307,7190
+.type .type308,7220
+pixel_biquad_horlr_s16:pixel_biquad_horlr_s16314,7375
+
+system/mmx/pixel_biquad_s16.s,508
+.globl .globl189,5038
+.type .type190,5068
+pixel_biquad_vertb_s16:pixel_biquad_vertb_s16196,5226
+.globl .globl240,5987
+.type .type241,6017
+pixel_biquad_verbt_s16:pixel_biquad_verbt_s16247,6175
+.globl .globl300,7090
+.type .type301,7120
+pixel_biquad_horlr_s16:pixel_biquad_horlr_s16304,7271
+.globl .globl351,8046
+.type .type352,8076
+pixel_biquad_horrl_s16:pixel_biquad_horrl_s16355,8229
+.globl .globl408,9104
+.type .type409,9133
+pixel_biquad_time_s16:pixel_biquad_time_s16412,9291
+
+system/mmx/pixel_ca_s1.s,0
+
+system/mmx/pixel_cascade_s16.s,208
+.globl .globl168,4556
+.type .type169,4587
+pixel_cascade_vertb_s16:pixel_cascade_vertb_s16175,4747
+.globl .globl237,5692
+.type .type238,5723
+pixel_cascade_horlr_s16:pixel_cascade_horlr_s16244,5880
+
+system/mmx/pixel_cheby_s16.s,114
+.globl .globl18,815
+.type .type19,844
+pixel_cheby_s16_3plus:pixel_cheby_s16_3plus25,1011
+skip:skip82,2374
+
+system/mmx/pixel_conv_hor_s16.s,91
+.globl .globl66,1684
+.type .type67,1710
+pixel_conv_hor_s16:pixel_conv_hor_s1675,1932
+
+system/mmx/pixel_conv_ver_s16.s,91
+.globl .globl58,1462
+.type .type59,1488
+pixel_conv_ver_s16:pixel_conv_ver_s1667,1709
+
+system/mmx/pixel_crot_s16.s,173
+.globl .globl18,815
+.type .type19,839
+pixel_crot3d_s16:pixel_crot3d_s1627,1084
+.globl .globl97,2377
+.type .type98,2401
+pixel_crot2d_s16:pixel_crot2d_s16105,2646
+
+system/mmx/pixel_gain.s,72
+.globl .globl18,815
+.type .type19,833
+pixel_gain:pixel_gain25,987
+
+system/mmx/pixel_gain_s16.s,81
+.globl .globl18,815
+.type .type19,837
+pixel_gain_s16:pixel_gain_s1624,1012
+
+system/mmx/pixel_mix_s16.s,79
+.globl .globl18,815
+.type .type19,836
+pixel_mix_s16:pixel_mix_s1625,1010
+
+system/mmx/pixel_mul_s16.s,78
+.globl .globl18,815
+.type .type19,836
+pixel_mul_s16:pixel_mul_s1624,949
+
+system/mmx/pixel_pack_s16u8.s,181
+.globl .globl18,815
+.type .type19,841
+pixel_pack_s16u8_y:pixel_pack_s16u8_y24,975
+.globl .globl78,2094
+.type .type79,2121
+pixel_pack_s16u8_uv:pixel_pack_s16u8_uv81,2159
+
+system/mmx/pixel_rand_s16.s,80
+.globl .globl18,815
+.type .type19,837
+pixel_rand_s16:pixel_rand_s1624,970
+
+system/mmx/pixel_randmix_s16.s,87
+.globl .globl18,815
+.type .type19,840
+pixel_randmix_s16:pixel_randmix_s1624,1020
+
+system/mmx/pixel_resample_s16.s,257
+getpixelsbilin:getpixelsbilin90,2042
+skipfetch:skipfetch198,4771
+.globl .globl237,5405
+.type .type238,5438
+pixel_resample_linmap_s16:pixel_resample_linmap_s16244,5600
+linmap_looprow:linmap_looprow259,5953
+linmap_loopcol:linmap_loopcol263,6076
+
+system/mmx/pixel_s1.s,84
+.globl .globl162,3387
+.type .type163,3408
+pixel_test_s1:pixel_test_s1173,3538
+
+system/mmx/pixel_unpack_u8s16.s,189
+.globl .globl18,815
+.type .type19,843
+pixel_unpack_u8s16_y:pixel_unpack_u8s16_y24,982
+.globl .globl67,1901
+.type .type68,1930
+pixel_unpack_u8s16_uv:pixel_unpack_u8s16_uv69,1969
+
+system/X11/pdp_xvideo.c,362
+#define D 32,1123
+static void pdp_xvideo_create_xvimage(39,1232
+static void pdp_xvideo_destroy_xvimage(59,1992
+void pdp_xvideo_display_packet(67,2176
+void pdp_xvideo_close(109,3427
+void pdp_xvideo_cleanup(121,3710
+void pdp_xvideo_free(130,3871
+void pdp_xvideo_init(135,3969
+t_pdp_xvideo *pdp_xvideo_new(153,4246
+int pdp_xvideo_open_on_display(160,4381
+
+system/X11/pdp_xwindow.c,1152
+#define D 33,1144
+t_pdp_xdisplay *pdp_xdisplay_new(51,1649
+void pdp_xdisplay_free(67,2019
+static int _windowset_contains(76,2271
+static void _windowset_add(85,2484
+static t_pdp_list *_windowset_get_info_for_Window(96,2874
+static t_pdp_list *_windowset_get_info(105,3136
+static void _windowset_remove(114,3367
+void pdp_xdisplay_register_window(123,3579
+void pdp_xdisplay_unregister_window(128,3717
+void pdp_xdisplay_get_events(136,3969
+t_pdp_list *pdp_xdisplay_get_events_for_window(299,8517
+void pdp_xwindow_warppointer(319,9070
+static void pdp_xwindow_overrideredirect(329,9247
+void pdp_xwindow_moveresize(339,9536
+void pdp_xwindow_fullscreen(357,9991
+void pdp_xwindow_tile(384,10726
+void pdp_xwindow_resize(412,11714
+void pdp_xwindow_move(427,12158
+t_pdp_list *pdp_xwindow_get_eventlist(434,12426
+void pdp_xwindow_cursor_image(448,12690
+void pdp_xwindow_cursor(468,13280
+void pdp_xwindow_title(481,13558
+int pdp_xwindow_create_on_display(489,13721
+void pdp_xwindow_init(570,15858
+t_pdp_xwindow *pdp_xwindow_new(585,16129
+void pdp_xwindow_close(593,16273
+void pdp_xwindow_cleanup(609,16642
+void pdp_xwindow_free(617,16770
+
+system/image/pdp_imageproc_common.c,1470
+#define CLAMP16(CLAMP1640,1270
+u32 pdp_imageproc_legalwidth(42,1352
+u32 pdp_imageproc_legalheight(50,1483
+u32 pdp_imageproc_legalwidth_round_down(56,1609
+u32 pdp_imageproc_legalheight_round_down(64,1743
+bool pdp_packet_compat(73,1936
+void pdp_imageproc_xor_process(88,2259
+void pdp_imageproc_and_process(100,2526
+void pdp_imageproc_or_process(112,2793
+void pdp_imageproc_not_process(124,3059
+void pdp_imageproc_mask_process(135,3281
+} t_plasma;t_plasma157,3766
+static inline s16 _rand_s16(159,3779
+static inline s16 _new_color(164,3847
+void *pdp_imageproc_plasma_new(170,4021
+void pdp_imageproc_plasma_delete(171,4095
+void pdp_imageproc_plasma_setseed(172,4154
+void pdp_imageproc_plasma_setturbulence(176,4239
+static void _plasma_subdiv(181,4361
+void pdp_imageproc_plasma_process(251,6656
+void pdp_imageproc_zero_process(271,7163
+void pdp_imageproc_constant_process(277,7318
+static inline u32 _sign(296,7792
+static inline void _decouple(312,8337
+void pdp_imageproc_abs_process(317,8409
+void pdp_imageproc_zthresh_process(332,8789
+void pdp_imageproc_hardthresh_process(344,9136
+void pdp_imageproc_softthresh_process(368,9803
+void pdp_imageproc_ispositive_process(395,10422
+void pdp_imageproc_sign_process(407,10674
+void pdp_imageproc_flip_lr_process(419,10943
+void pdp_imageproc_flip_tb_process(440,11319
+void pdp_imageproc_dispatch_1buf(451,11704
+void pdp_imageproc_dispatch_2buf(502,12961
+void pdp_imageproc_dispatch_3buf(554,14415
+
+system/image/pdp_imageproc_mmx.c,3195
+inline static s16 float2fixed(33,1119
+inline static void setvec(41,1245
+void pdp_imageproc_add_process(53,1397
+void pdp_imageproc_mul_process(60,1609
+#define MIX_SIZE 68,1820
+void *pdp_imageproc_mix_new(69,1851
+int pdp_imageproc_mix_nb_stackwords(70,1914
+void pdp_imageproc_mix_delete(71,2003
+void pdp_imageproc_mix_setleftgain(72,2061
+void pdp_imageproc_mix_setrightgain(73,2142
+void pdp_imageproc_mix_process(74,2228
+#define RANDMIX_SIZE 83,2477
+void *pdp_imageproc_randmix_new(84,2512
+int  pdp_imageproc_randmix_nb_stackwords(85,2583
+void pdp_imageproc_randmix_delete(86,2683
+void pdp_imageproc_randmix_setthreshold(87,2745
+void pdp_imageproc_randmix_setseed(88,2845
+void pdp_imageproc_randmix_process(98,3061
+} t_conv;t_conv116,3472
+void *pdp_imageproc_conv_new(117,3482
+void pdp_imageproc_conv_delete(118,3553
+void pdp_imageproc_conv_setmin1(119,3610
+void pdp_imageproc_conv_setzero(120,3697
+void pdp_imageproc_conv_setplus1(121,3784
+void pdp_imageproc_conv_setbordercolor(122,3873
+void pdp_imageproc_conv_setorientation(123,3969
+void pdp_imageproc_conv_setnbpasses(124,4061
+void pdp_imageproc_conv_process(125,4147
+void *pdp_imageproc_gain_new(152,4705
+void pdp_imageproc_gain_delete(153,4775
+void pdp_imageproc_gain_setgain(154,4832
+void pdp_imageproc_gain_process(190,5370
+void *pdp_imageproc_crot2d_new(197,5576
+void pdp_imageproc_crot2d_delete(198,5648
+void pdp_imageproc_crot2d_setmatrix(199,5707
+void pdp_imageproc_crot2d_process(207,5905
+} t_bq;t_bq227,6289
+void *pdp_imageproc_bq_new(229,6298
+void pdp_imageproc_bq_delete(230,6364
+void pdp_imageproc_bq_setcoef(231,6419
+void pdp_imageproc_bq_setnbpasses(254,7010
+void pdp_imageproc_bq_setdirection(255,7102
+void pdp_imageproc_bqt_process(259,7275
+void pdp_imageproc_bq_process(265,7476
+void *pdp_imageproc_random_new(339,9357
+void pdp_imageproc_random_delete(340,9428
+void pdp_imageproc_random_setseed(341,9487
+void pdp_imageproc_random_process(351,9702
+} t_resample_id;t_resample_id378,10474
+static void pdp_imageproc_resample_init_id(381,10563
+} t_resample_cid;t_resample_cid399,11169
+static void pdp_imageproc_resample_init_cid(402,11290
+} t_resample_clmd;t_resample_clmd433,12366
+static void pdp_imageproc_resample_cookedlinmap_init(436,12493
+} t_resample_cbrd;t_resample_cbrd461,13347
+} t_resample_zrd;t_resample_zrd473,13588
+static void pdp_imageproc_resample_clmd_init_from_id_zrd(477,13698
+} t_resample_zoom_rotate;t_resample_zoom_rotate513,15164
+void *pdp_imageproc_resample_affinemap_new(516,15208
+void pdp_imageproc_resample_affinemap_delete(526,15509
+void pdp_imageproc_resample_affinemap_setcenterx(527,15580
+void pdp_imageproc_resample_affinemap_setcentery(528,15696
+void pdp_imageproc_resample_affinemap_setzoomx(529,15812
+void pdp_imageproc_resample_affinemap_setzoomy(530,15924
+void pdp_imageproc_resample_affinemap_setangle(531,16036
+void pdp_imageproc_resample_affinemap_process(532,16148
+} t_cheby;t_cheby559,16908
+void *pdp_imageproc_cheby_new(561,16920
+void pdp_imageproc_cheby_delete(574,17259
+void pdp_imageproc_cheby_setcoef(575,17317
+void pdp_imageproc_cheby_setnbpasses(582,17504
+void pdp_imageproc_cheby_process(584,17589
+
+system/image/pdp_imageproc_portable.c,2909
+inline static s32 float2fixed(34,1048
+#define CLAMP16(CLAMP1644,1176
+void pdp_imageproc_add_process(47,1276
+void pdp_imageproc_mul_process(60,1542
+void *pdp_imageproc_mix_new(73,1803
+int  pdp_imageproc_mix_nb_stackwords(74,1871
+void pdp_imageproc_mix_delete(75,1967
+void pdp_imageproc_mix_setleftgain(76,2025
+void pdp_imageproc_mix_setrightgain(81,2138
+void pdp_imageproc_mix_process(86,2252
+void *pdp_imageproc_randmix_new(103,2560
+int  pdp_imageproc_randmix_nb_stackwords(104,2633
+void pdp_imageproc_randmix_delete(105,2733
+void pdp_imageproc_randmix_setthreshold(106,2794
+void pdp_imageproc_randmix_setseed(113,3010
+void pdp_imageproc_randmix_process(118,3123
+void *pdp_imageproc_conv_new(136,3493
+void pdp_imageproc_conv_delete(137,3563
+void pdp_imageproc_conv_setmin1(138,3620
+void pdp_imageproc_conv_setzero(143,3728
+void pdp_imageproc_conv_setplus1(148,3836
+void pdp_imageproc_conv_setbordercolor(153,3945
+void pdp_imageproc_conv_setorientation(158,4060
+void pdp_imageproc_conv_setnbpasses(159,4139
+static inline void pdp_imageproc_conv_scanline(161,4216
+void pdp_imageproc_conv_process(189,4807
+void *pdp_imageproc_gain_new(215,5352
+void pdp_imageproc_gain_delete(216,5422
+void pdp_imageproc_gain_setgain(217,5479
+void pdp_imageproc_gain_process(247,5940
+void *pdp_imageproc_crot2d_new(259,6215
+void pdp_imageproc_crot2d_delete(260,6286
+void pdp_imageproc_crot2d_setmatrix(261,6345
+void pdp_imageproc_crot2d_process(270,6573
+} t_bq;t_bq310,7177
+void *pdp_imageproc_bq_new(311,7185
+void pdp_imageproc_bq_delete(312,7251
+void pdp_imageproc_bq_setnbpasses(313,7306
+void pdp_imageproc_bq_setdirection(314,7384
+void pdp_imageproc_bq_setcoef(315,7464
+#define A1 340,8110
+#define A2 341,8126
+#define B0 342,8142
+#define B1 343,8158
+#define B2 344,8174
+static inline void pdp_imageproc_bq_scanline(356,8418
+void pdp_imageproc_bqt_process(386,8863
+void pdp_imageproc_bq_process(410,9354
+void *pdp_imageproc_random_new(485,11216
+void pdp_imageproc_random_delete(486,11285
+void pdp_imageproc_random_setseed(487,11344
+void pdp_imageproc_random_process(495,11490
+static inline s32 pdp_resample_bilin(515,11889
+} t_affine_map;t_affine_map553,12666
+void *pdp_imageproc_resample_affinemap_new(556,12684
+void pdp_imageproc_resample_affinemap_delete(568,12938
+void pdp_imageproc_resample_affinemap_setcenterx(569,13009
+void pdp_imageproc_resample_affinemap_setcentery(570,13111
+void pdp_imageproc_resample_affinemap_setzoomx(571,13213
+void pdp_imageproc_resample_affinemap_setzoomy(572,13311
+void pdp_imageproc_resample_affinemap_setangle(573,13409
+void pdp_imageproc_resample_affinemap_process(574,13507
+} t_cheby;t_cheby632,15153
+void *pdp_imageproc_cheby_new(634,15165
+void pdp_imageproc_cheby_delete(646,15471
+void pdp_imageproc_cheby_setnbpasses(647,15529
+void pdp_imageproc_cheby_setcoef(648,15613
+void pdp_imageproc_cheby_process(657,15804
+
+system/image/pdp_llconv.c,877
+#define CLAMP8(CLAMP842,1351
+#define CLAMP16(CLAMP1643,1406
+#define FP(FP44,1481
+#define CLAMP 46,1527
+static inline int rgb2y(55,1945
+static inline int rgb2v(59,2067
+static inline int rgb2u(63,2190
+static inline void _exchange_row(70,2341
+void pdp_llconv_flip_top_bottom(96,2810
+static void llconv_rgb2yvu(114,3225
+static void llconv_yvu16planar2rgbpacked(135,3562
+inline static void llconv_rgb2yvu_planar16sub_indexed(244,5946
+static void llconv_rgb2yvu_planar16sub(313,7871
+static void llconv_rgba2yvu_planar16sub(319,8075
+static void llconv_bgr2yvu_planar16sub(325,8279
+static void llconv_bgra2yvu_planar16sub(331,8483
+static void llconv_rgb2yvu_planar8sub(338,8687
+static void llconv_yvu2rgb(409,10482
+static void llconv_yvu2yuyv(434,10992
+static void llconv_yuyv_packed_u8s16(459,11404
+#define CONVERT(CONVERT512,12779
+void pdp_llconv(514,12819
+
+system/image/pdp_llconv_mmx.c,145
+void llconv_grey_s16u8(28,966
+void llconv_yvu_planar_s16u8(34,1161
+void llconv_yvu_planar_u8s16(42,1444
+void llconv_yuv_planar_u8s16(49,1733
+
+system/image/pdp_llconv_portable.c,369
+#define CLAMP(CLAMP22,879
+#define FP(FP23,933
+void pixel_unpack_portable_u8s16_y(25,979
+void pixel_unpack_portable_u8s16_uv(31,1166
+void pixel_pack_portable_s16u8_y(38,1366
+void pixel_pack_portable_s16u8_uv(44,1558
+void llconv_grey_s16u8(53,1845
+void llconv_yvu_planar_s16u8(59,2046
+void llconv_yvu_planar_u8s16(68,2345
+void llconv_yuv_planar_u8s16(75,2649
+
+system/image/pdp_resample.c,219
+static s32 pdp_resample_bilin(38,1168
+void pdp_resample_scale_bilin(70,1829
+void pdp_resample_scale_nn(89,2313
+void pdp_resample_halve(142,3622
+void pdp_resample_double(174,4371
+void pdp_resample_padcrop(198,4895
+
+system/kernel/pdp_debug.c,95
+int pdp_debug_sigtrap_on_assert;6,86
+void pdp_assert_hook 9,121
+void pdp_debug_setup(18,423
+
+system/kernel/pdp_dpd_command.c,231
+void pdp_dpd_commandfactory_init(27,963
+void _pdp_dpd_commandfactory_free(34,1112
+void pdp_dpd_commandfactory_free(40,1243
+t_pdp_dpd_command *pdp_dpd_commandfactory_get_new_command(49,1422
+void pdp_dpd_command_suicide(78,2107
+
+system/kernel/pdp_list.c,2559
+#define D 42,1303
+t_pdp_fastalloc *_fast_atom_allocator;45,1322
+t_pdp_fastalloc *_fast_list_allocator;46,1361
+static void _pdp_list_dealloc(51,1404
+#define PDP_ATOM_ALLOC(PDP_ATOM_ALLOC57,1526
+#define PDP_ATOM_DEALLOC(PDP_ATOM_DEALLOC58,1596
+#define PDP_LIST_ALLOC(PDP_LIST_ALLOC59,1673
+#define PDP_LIST_DEALLOC(PDP_LIST_DEALLOC60,1743
+void pdp_list_setup(69,1932
+t_pdp_list* pdp_list_new(98,2421
+void pdp_list_clear(129,2883
+void pdp_list_free(147,3132
+void pdp_tree_free(157,3258
+void pdp_tree_clear(166,3379
+static inline int _is_whitespace(190,3745
+static inline void _skip_real_whitespace(191,3832
+static inline int _is_left_comment(194,3944
+static inline int _is_right_comment(195,4008
+static inline void _skip_comment(196,4074
+static inline void _skip_whitespace(208,4319
+static inline int _is_left_separator(220,4562
+static inline int _is_right_separator(221,4628
+static inline int _is_terminator(222,4695
+static inline int _is_separator(225,4806
+static inline void _parse_pure_atom(235,5098
+t_pdp_atom *pdp_atom_new(274,5967
+void pdp_atom_free(275,6056
+t_pdp_atom *pdp_atom_from_cstring(282,6309
+t_pdp_list *pdp_tree_from_cstring(338,7458
+int pdp_tree_check_syntax(376,8466
+void pdp_list_apply(510,11529
+void pdp_tree_apply(517,11664
+void pdp_list_apply_word_method(527,11870
+void pdp_list_apply_pword_method(536,12075
+void pdp_tree_apply_word_method(546,12286
+void pdp_tree_apply_pword_method(556,12572
+static void _atom_packet_mark_unused(567,12866
+static void _atom_packet_copy_ro(575,13019
+void pdp_tree_strip_packets 583,13168
+static void _pdp_tree_copy_ro_packets 588,13266
+t_pdp_list *pdp_tree_copy_ro(593,13370
+static void _pdp_atom_fprint(602,13567
+static void _pdp_atomlist_fprint(635,14645
+void _pdp_list_fprint(646,14840
+void pdp_list_print(652,14952
+void pdp_atom_print(657,15025
+void pdp_list_add_atom(668,15178
+void pdp_list_add(676,15328
+void pdp_list_add_back_atom(686,15535
+void pdp_list_add_back(700,15731
+int pdp_list_size(709,15927
+t_pdp_atom  *pdp_list_pop_atom(718,16032
+t_pdp_word pdp_list_pop(732,16293
+void pdp_list_pop_push(744,16486
+t_pdp_word pdp_list_index(763,16843
+void pdp_list_remove(775,17022
+t_pdp_list* pdp_tree_copy_reverse(804,17639
+t_pdp_list* pdp_list_copy_reverse(818,17981
+t_pdp_list* pdp_tree_copy(827,18203
+t_pdp_list* pdp_list_copy(847,18656
+void pdp_list_join 862,18971
+void pdp_list_cat 878,19291
+void pdp_list_reverse(887,19521
+void pdp_list_reverse_old(902,19813
+int pdp_list_contains(913,20080
+void pdp_list_add_to_set(923,20360
+
+system/kernel/pdp_mem.c,388
+void *pdp_alloc(27,958
+void pdp_dealloc(42,1223
+typedef struct _fastalloc_fastalloc55,1476
+} t_fastalloc;t_fastalloc58,1532
+static void _pdp_fastalloc_lock(63,1551
+static void _pdp_fastalloc_unlock(64,1633
+static void _pdp_fastalloc_refill_freelist(66,1720
+void *pdp_fastalloc_new_atom(90,2341
+void pdp_fastalloc_save_atom(111,2744
+t_pdp_fastalloc *pdp_fastalloc_new(119,2946
+
+system/kernel/pdp_packet.c,1097
+#define PDP_INITIAL_POOL_SIZE 82,2453
+static int pdp_pool_size;83,2486
+static t_pdp** pdp_pool;84,2512
+static pthread_mutex_t pdp_pool_mutex;87,2605
+#define LOCK 88,2644
+#define UNLOCK 89,2698
+static t_pdp_list *class_list;92,2779
+pdp_packet_print_debug(96,2828
+pdp_packet_setup(118,3302
+t_pdp_class *pdp_class_new(129,3606
+int pdp_factory_newpacket(139,3954
+_pdp_pool_expand_nolock(166,4668
+_pdp_packet_dealloc_nolock(188,5242
+_pdp_packet_alloc_nolock(195,5341
+_pdp_packet_create_nolock(211,5734
+pdp_packet_destroy(231,6169
+pdp_packet_create(254,6694
+pdp_packet_new(291,7827
+_pdp_packet_save_nolock(328,8742
+pdp_packet_reuse(343,9186
+pdp_packet_copy_ro(395,10542
+pdp_packet_clone_rw(413,10902
+pdp_packet_copy_rw(447,11837
+void pdp_packet_mark_unused(480,12627
+void pdp_packet_delete(516,13455
+pdp_packet_header(551,14062
+pdp_packet_subheader(558,14198
+pdp_packet_data(566,14356
+pdp_packet_data_size(579,14577
+int pdp_packet_writable(594,14802
+void pdp_packet_replace_with_writable(601,14976
+pdp_pool_collect_garbage(615,15252
+pdp_pool_set_max_mem_usage(622,15365
+
+system/kernel/pdp_packet2.c,1097
+#define PDP_INITIAL_POOL_SIZE 82,2453
+static int pdp_pool_size;83,2486
+static t_pdp** pdp_pool;84,2512
+static pthread_mutex_t pdp_pool_mutex;87,2605
+#define LOCK 88,2644
+#define UNLOCK 89,2698
+static t_pdp_list *class_list;92,2779
+pdp_packet_print_debug(96,2828
+pdp_packet_setup(118,3302
+t_pdp_class *pdp_class_new(129,3606
+int pdp_factory_newpacket(139,3954
+_pdp_pool_expand_nolock(166,4668
+_pdp_packet_dealloc_nolock(188,5242
+_pdp_packet_alloc_nolock(195,5341
+_pdp_packet_create_nolock(211,5734
+pdp_packet_destroy(231,6169
+pdp_packet_create(254,6694
+pdp_packet_new(291,7827
+_pdp_packet_save_nolock(328,8665
+pdp_packet_reuse(343,9109
+pdp_packet_copy_ro(395,10465
+pdp_packet_clone_rw(413,10825
+pdp_packet_copy_rw(436,11358
+void pdp_packet_mark_unused(469,12148
+void pdp_packet_delete(505,12976
+pdp_packet_header(540,13583
+pdp_packet_subheader(547,13719
+pdp_packet_data(555,13877
+pdp_packet_data_size(568,14098
+int pdp_packet_writable(583,14323
+void pdp_packet_replace_with_writable(590,14497
+pdp_pool_collect_garbage(604,14773
+pdp_pool_set_max_mem_usage(611,14886
+
+system/kernel/pdp_post.c,48
+void pdp_post_n(32,1044
+void pdp_post(39,1166
+
+system/kernel/pdp_symbol.c,1336
+static pthread_mutex_t pdp_hash_mutex;32,1099
+#define HASHSIZE 34,1139
+static t_pdp_symbol *pdp_symhash[35,1161
+#define LOCK 38,1207
+#define UNLOCK 39,1256
+static void _pdp_symbol_init(42,1311
+t_pdp_symbol *_pdp_dogensym(50,1479
+t_pdp_symbol *pdp_gensym(93,2283
+int pdp_symbol_set_typelist(101,2462
+void pdp_symbol_apply_all(114,2659
+t_pdp_symbol _pdp_sym_wildcard;126,2843
+t_pdp_symbol _pdp_sym_float;127,2875
+t_pdp_symbol _pdp_sym_int;128,2904
+t_pdp_symbol _pdp_sym_symbol;129,2931
+t_pdp_symbol _pdp_sym_packet;130,2961
+t_pdp_symbol _pdp_sym_pointer;131,2991
+t_pdp_symbol _pdp_sym_invalid;132,3022
+t_pdp_symbol _pdp_sym_list;133,3053
+t_pdp_symbol _pdp_sym_question_mark;134,3081
+t_pdp_symbol _pdp_sym_atom;135,3118
+t_pdp_symbol _pdp_sym_null;136,3146
+t_pdp_symbol _pdp_sym_quote_start;137,3174
+t_pdp_symbol _pdp_sym_quote_end;138,3209
+t_pdp_symbol _pdp_sym_return;139,3242
+t_pdp_symbol _pdp_sym_nreturn;140,3272
+t_pdp_symbol _pdp_sym_defstart;141,3303
+t_pdp_symbol _pdp_sym_defend;142,3335
+t_pdp_symbol _pdp_sym_if;143,3365
+t_pdp_symbol _pdp_sym_then;144,3391
+t_pdp_symbol _pdp_sym_local;145,3419
+t_pdp_symbol _pdp_sym_forth;146,3448
+t_pdp_symbol _pdp_sym_call;147,3477
+t_pdp_symbol _pdp_sym_push;148,3505
+t_pdp_symbol _pdp_sym_pop;149,3533
+static void _sym(151,3561
+void pdp_symbol_setup(160,3804
+
+system/kernel/pdp_type.c,1116
+#define D 37,1157
+static t_pdp_list *conversion_list;40,1176
+#define INIT_MAX_CACHE_SIZE 42,1213
+static t_pdp_list *cached_conversion_list;44,1245
+static int max_cache_size;45,1288
+static pthread_mutex_t pdp_conversion_mutex;48,1328
+static pthread_mutex_t pdp_cache_mutex;49,1373
+t_pdp_list *pdp_type_to_list(54,1447
+#define TMPSIZE 56,1498
+t_pdp_symbol *pdp_packet_get_description(86,2043
+int _pdp_type_run_conversion_program(104,2529
+_pdp_type_find_conversion_program(139,3643
+_pdp_type_find_cached_conversion_program(173,4647
+void pdp_conversion_program_free(215,5699
+void _pdp_conversion_program_print(221,5818
+t_pdp_conversion_program *pdp_conversion_program_new(227,5983
+t_pdp_conversion_program *pdp_conversion_program_copy(245,6484
+void pdp_conversion_program_add(251,6645
+void pdp_type_register_conversion 258,6825
+void pdp_type_register_cached_conversion 277,7379
+int _pdp_packet_convert(304,8333
+int pdp_packet_convert_ro(365,10567
+int pdp_packet_convert_rw(377,10967
+static void _setup_type_cache(395,11597
+int pdp_type_description_match(405,11879
+void pdp_type_setup(457,13340
+
+system/mmx/pdp_mmx_test.c,397
+#define FP(FP3,22
+#define nbp 5,78
+    short int a1[7,95
+    short int a2[8,148
+    short int b0[9,201
+    short int b1[10,254
+    short int b2[11,307
+    short int u1[13,361
+    short int u2[14,414
+    short int x0[16,468
+    short int x1[17,521
+    short int x2[18,574
+    short int x3[19,627
+void print_pixel(21,681
+void print_line(27,767
+void print_square(32,812
+main(43,970
+
+system/net/pdp_net.c,1209
+#define D 7,89
+#define DD 8,121
+static int _is_udp_header(12,183
+static void _make_udp_header(20,430
+static void _send_packet(34,611
+static void _send_ack_new(46,1035
+static int _handle_PDP_UDP_NEW(58,1327
+static void _handle_PDP_UDP_DONE(111,2944
+static int _handle_UDP_DATA(160,4400
+t_pdp_udp_receiver *pdp_udp_receiver_new(192,5332
+void pdp_udp_receiver_free(222,6123
+void pdp_udp_receiver_reset(231,6398
+int pdp_udp_receiver_receive(238,6551
+char *pdp_udp_receiver_type(309,8235
+unsigned int pdp_udp_receiver_size(310,8310
+void *pdp_udp_receiver_data(311,8392
+static void _sleep(318,8500
+static void _send(328,8711
+static void _prepare_for_new_transmission(345,9120
+static void _send_header_packet(367,9854
+static void _send_chunks(386,10475
+static void _send_done(424,11536
+static int _receive_packet(429,11668
+static int _need_resend(497,13203
+void pdp_udp_sender_timeout_us(547,14213
+void pdp_udp_sender_sleepgrain_us(553,14330
+void pdp_udp_sender_sleepperiod(558,14458
+void pdp_udp_sender_udp_packet_size(564,14580
+void pdp_udp_sender_connect(572,14842
+t_pdp_udp_sender *pdp_udp_sender_new(601,15613
+void pdp_udp_sender_free(623,16096
+int pdp_udp_sender_send(632,16317
+
+system/png/pdp_png.c,885
+#define READING 36,1037
+#define WRITING 37,1055
+#define SIG_BYTES 38,1073
+#define D 40,1094
+} t_png_image;t_png_image62,1474
+static t_png_image *_init(64,1490
+static int _cleanup(74,1650
+#define INTERNAL_ERROR 76,1688
+static int _open_read(89,2065
+static int _open_write(107,2461
+static void _row_callback(123,2719
+static int _initio_read(128,2818
+static int _initio_write(137,3013
+static int _checkimagetype(146,3167
+#define user_error_ptr 212,4888
+#define user_error_fn 213,4916
+#define user_warning_fn 214,4943
+static int _buildstruct_read(216,4973
+static int _buildstruct_write(230,5347
+static int _getimagedata(243,5652
+static int _saveimagedata(274,6392
+int pdp_packet_bitmap_from_png_file(321,7766
+int pdp_packet_bitmap_save_png_file(346,8250
+int pdp_packet_bitmap_save_png_file(369,8665
+int pdp_packet_bitmap_from_png_file(375,8823
+int main(397,9012
+
+system/type/pdp_bitmap.c,1251
+static t_pdp_class* bitmap_class;32,1054
+t_bitmap *pdp_packet_bitmap_info(35,1090
+int pdp_packet_bitmap_isvalid(41,1239
+t_pdp_symbol *pdp_packet_bitmap_get_description(55,1504
+int pdp_packet_new_bitmap_yv12(88,2521
+int pdp_packet_new_bitmap_grey(113,3097
+int pdp_packet_new_bitmap_rgb(137,3667
+int pdp_packet_new_bitmap_rgba(162,4240
+int pdp_packet_new_bitmap(187,4815
+void pdp_packet_bitmap_flip_top_bottom(203,5317
+static int _pdp_packet_bitmap_convert_grey_to_grey8(226,5925
+static int _pdp_packet_bitmap_convert_YCrCb_to_rgb8(252,6676
+static int _pdp_packet_bitmap_convert_image_to_yv12(277,7386
+static int _pdp_packet_bitmap_convert_rgb8_to_YCrCb(315,8380
+static int _pdp_packet_bitmap_convert_rgb8_to_bitmap_YCrCb(336,8982
+static int _pdp_packet_bitmap_convert_grey8_to_grey(357,9588
+static int _pdp_packet_bitmap_convert_rgb8_to_rgba8(377,10188
+static int _pdp_packet_bitmap_convert_rgba8_to_rgb8(400,10832
+static int _pdp_packet_bitmap_convert_rgb8_to_mchp(422,11450
+static int _pdp_packet_bitmap_convert_yv12_to_image(447,12147
+static int _pdp_packet_bitmap_convert_mchp_to_rgb8(466,12711
+static int _pdp_packet_bitmap_convert_fallback(517,14087
+static int pdp_bitmap_factory(525,14316
+void pdp_bitmap_setup(569,15329
+
+system/type/pdp_image.c,1057
+static t_pdp_class* image_class;41,1280
+static void _checkdim(46,1339
+int pdp_packet_new_image_YCrCb(55,1638
+int pdp_packet_new_image_grey(82,2238
+int pdp_packet_new_image_mchp(109,2823
+int pdp_packet_new_image(139,3441
+int pdp_packet_image_compat(157,3834
+int pdp_packet_image_isvalid(186,4684
+void pdp_packet_image_set_chanmask(201,5093
+t_image *pdp_packet_image_info(208,5268
+t_pdp_symbol *pdp_packet_image_get_description(214,5369
+static int _pdp_packet_image_convert_YCrCb_to_grey(266,6789
+static int _pdp_packet_image_convert_grey_to_YCrCb(279,7220
+static int _pdp_packet_image_convert_grey_to_multi(296,7755
+static int _pdp_packet_image_convert_multi_to_YCrCb(312,8274
+static int _pdp_packet_image_convert_YCrCb_to_multi(352,9331
+static void _pdp_description_get_dims(389,10227
+static int _pdp_packet_image_convert_resample_YCrCb(403,10531
+static int _pdp_packet_image_convert_resample_multi(440,12204
+static int _pdp_packet_image_convert_fallback(482,13381
+static int pdp_image_factory(493,13646
+void pdp_image_setup(548,14861
+
+system/type/pdp_matrix.c,1605
+static t_pdp_class *matrix_class;11,245
+#define VALID_MATRIX_HEADER(VALID_MATRIX_HEADER16,359
+int pdp_packet_matrix_isvalid(24,707
+void *pdp_packet_matrix_get_gsl_matrix(31,804
+void *pdp_packet_matrix_get_gsl_vector(37,931
+int pdp_packet_matrix_get_type(43,1058
+int pdp_packet_matrix_isvector(49,1161
+int pdp_packet_matrix_ismatrix(55,1294
+int pdp_packet_matrix_LU_to_inverse(113,2216
+int pdp_packet_matrix_LU(141,3154
+int pdp_packet_matrix_LU_solve(172,4204
+int pdp_packet_matrix_blas_mm202,5260
+int pdp_packet_matrix_blas_mv247,6763
+t_pdp_symbol *_pdp_matrix_get_description(292,8155
+static size_t _pdp_matrix_mdata_byte_size(332,9346
+static size_t _pdp_matrix_pdata_vector_size(346,9805
+static void _pdp_matrix_init(352,9922
+static void _pdp_matrix_clone(396,11177
+static void _pdp_matrix_copy(402,11341
+static void _pdp_matrix_reinit(408,11556
+static void _pdp_matrix_cleanup(412,11653
+int pdp_packet_new_matrix(417,11736
+int pdp_packet_new_matrix_product_result(436,12286
+void pdp_packet_matrix_setzero(479,13268
+static int _pdp_packet_convert_matrix_to_greyimage(490,13499
+static int _pdp_packet_convert_image_to_matrix(525,14731
+static int _pdp_packet_convert_image_to_floatmatrix(583,16332
+static int _pdp_packet_convert_image_to_doublematrix(585,16522
+static int _pdp_packet_convert_image_to_complexfloatmatrix(587,16714
+static int _pdp_packet_convert_image_to_complexdoublematrix(589,16911
+static int _pdp_packet_matrix_convert_fallback(593,17112
+static void _gsl_error_handler 603,17412
+static int pdp_matrix_factory(611,17660
+void pdp_matrix_setup(615,17729
+
+puredata/pdp_base.c,1054
+static void pdp_base_debug(35,1143
+static void pdp_base_thread(46,1436
+static void pdp_base_process(52,1573
+static void pdp_base_postprocess(60,1749
+void pdp_base_movepassive(73,2122
+void pdp_base_bang(88,2448
+void pdp_base_input_hot(119,3220
+void pdp_base_input_cold(164,4411
+void pdp_base_set_process_method(207,5211
+void pdp_base_set_preproc_method(213,5340
+void pdp_base_set_postproc_method(220,5470
+void pdp_base_queue_wait(227,5602
+void pdp_base_set_queue(233,5710
+t_pdp_procqueue *pdp_base_get_queue(240,5849
+void pdp_base_setup(246,5955
+void pdp_base_init(261,6446
+void pdp_base_free(290,7039
+void pdp_base_readonly_active_inlet(305,7397
+void pdp_base_disable_active_inlet(311,7520
+void pdp_base_add_pdp_inlet(319,7661
+t_outlet *pdp_base_add_pdp_outlet(336,8076
+void pdp_base_set_packet(351,8358
+int pdp_base_get_packet(363,8634
+int pdp_base_move_packet(375,8867
+t_object *pdp_base_get_object(391,9085
+void pdp_base_add_gen_inlet(396,9155
+void pdp_base_disable_thread(402,9299
+void pdp_base_set_type_template(409,9413
+
+puredata/pdp_comm.c,734
+void outlet_pdp_register(56,1743
+void outlet_pdp_process(77,2357
+void outlet_pdp(93,2780
+void outlet_dpd(100,2946
+pdp_packet_pass_if_valid(117,3271
+pdp_packet_replace_if_valid(136,3620
+pdp_packet_copy_ro_or_drop(148,3795
+pdp_packet_copy_rw_or_drop(162,4074
+pdp_packet_convert_ro_or_drop(175,4352
+pdp_packet_convert_rw_or_drop(192,4745
+void outlet_pdp_atom(209,5207
+void outlet_pdp_list(234,5693
+void pd_atom_to_pdp_atom(303,6919
+t_symbol s_pdp 323,7311
+t_symbol s_register_ro 324,7351
+t_symbol s_register_rw 325,7399
+t_symbol s_process 326,7447
+t_symbol s_dpd 327,7491
+t_symbol s_inspect 328,7531
+t_symbol s_accumulate 329,7575
+t_symbol s_chanmask 330,7622
+static void _addsym(334,7737
+pdp_pdsym_setup(349,8163
+
+puredata/pdp_compat.c,57
+pdp_pass_if_valid(38,1078
+pdp_replace_if_valid(44,1183
+
+puredata/pdp_control.c,671
+static long dropped_packets;38,1109
+static t_class* pdp_control_class;40,1139
+typedef struct _pdp_control_pdp_control46,1230
+} t_pdp_control;t_pdp_control52,1339
+static t_pdp_control *pdp_control_list;56,1359
+static void pdp_control_info(58,1400
+static void pdp_control_collectgarbage(62,1452
+static void pdp_control_set_mem_limit(69,1636
+static void pdp_control_thread(79,1935
+static void pdp_control_send_drop_message(94,2237
+static void pdp_control_free(104,2455
+static void *pdp_control_new(122,2787
+void pdp_control_addmethod(136,3130
+void pdp_control_setup(141,3250
+void pdp_control_notify_broadcast(160,3967
+void pdp_control_notify_drop(173,4230
+
+puredata/pdp_dpd_base.c,766
+#define THIS(THIS26,906
+static void _pdp_dpd_base_context_input(42,1071
+void *_pdp_dpd_base_get_command_object(79,1900
+void pdp_dpd_base_queue_command(84,1983
+void pdp_dpd_base_bang(94,2315
+int pdp_dpd_base_get_context_packet(134,3410
+int pdp_dpd_base_move_context_packet(138,3503
+void pdp_dpd_base_set_context_packet(145,3644
+void pdp_dpd_base_add_cleanup(152,3882
+void pdp_dpd_base_add_inspector(161,4152
+t_outlet *pdp_dpd_base_add_outlet(169,4351
+void pdp_dpd_base_free(191,4926
+void pdp_dpd_base_disable_active_inlet(200,5020
+void pdp_dpd_base_enable_outlet(208,5128
+void pdp_dpd_base_register_complete_notify(218,5319
+void pdp_dpd_base_register_command_factory_method(224,5445
+void pdp_dpd_base_init(232,5639
+void pdp_dpd_base_setup(260,6243
+
+puredata/pdp_imagebase.c,183
+static void pdp_imagebase_chanmask(31,966
+void pdp_imagebase_setup(38,1105
+void pdp_imagebase_init(49,1370
+void pdp_imagebase_free(66,1729
+u32 pdp_imagebase_get_chanmask(74,1833
+
+puredata/pdp_queue.c,815
+#define D 43,1343
+#define PDP_QUEUE_LOGSIZE 50,1401
+#define PDP_QUEUE_DELTIME 51,1430
+void pdp_procqueue_wait(70,1946
+void pdp_procqueue_finish(82,2354
+void pdp_procqueue_flush(100,2746
+static void pdp_procqueue_signal_processor(119,3133
+static void pdp_procqueue_wait_for_feeder(133,3566
+int pdp_procqueue_full(157,4173
+void pdp_procqueue_add(163,4273
+static void *pdp_procqueue_thread(210,5661
+static void pdp_procqueue_callback 244,6285
+static void pdp_procqueue_tick 262,6766
+void pdp_procqueue_use_thread(281,7094
+void pdp_procqueue_init(299,7482
+static t_pdp_procqueue pdp_queue;357,9087
+t_pdp_procqueue *pdp_queue_get_queue(361,9151
+void pdp_queue_wait(366,9263
+void pdp_queue_finish(367,9319
+void pdp_queue_add(368,9396
+void pdp_queue_use_thread(371,9549
+void pdp_queue_setup(372,9625
+
+puredata/pdp_ut.c,1459
+t_class *pdp_ut_addscaleclip_class;32,1107
+typedef struct pdp_ut_addscaleclip_structpdp_ut_addscaleclip_struct34,1144
+} t_pdp_ut_addscaleclip;t_pdp_ut_addscaleclip42,1314
+static void pdp_ut_addscaleclip_float(45,1341
+static void pdp_ut_addscaleclip_free(54,1580
+void *pdp_ut_addscaleclip_new(56,1646
+void pdp_ut_addscaleclip_setup(67,2006
+t_class *pdp_ut_linmap_class;80,2589
+t_class *pdp_ut_logmap_class;81,2619
+t_class *pdp_ut_logmap_comp_class;82,2649
+typedef struct pdp_ut_map_structpdp_ut_map_struct84,2685
+} t_pdp_ut_map;t_pdp_ut_map90,2803
+static void pdp_ut_logmap_float(93,2821
+static void pdp_ut_linmap_float(103,3038
+static void pdp_ut_logmap_comp_float(113,3253
+static void pdp_ut_map_free(123,3484
+void pdp_ut_map_init(126,3533
+void *pdp_ut_logmap_new(133,3701
+void *pdp_ut_linmap_new(140,3885
+void *pdp_ut_logmap_comp_new(147,4069
+void pdp_ut_logmap_setup(154,4263
+void pdp_ut_logmap_comp_setup(162,4550
+void pdp_ut_linmap_setup(170,4867
+t_class *pdp_ut_rgb2ycrcb_class;180,5156
+typedef struct pdp_ut_rgb2ycrcbpdp_ut_rgb2ycrcb182,5190
+} t_pdp_ut_rgb2ycrcb;t_pdp_ut_rgb2ycrcb191,5382
+static void pdp_ut_rgb2ycrcb_bang 194,5406
+static void pdp_ut_rgb2ycrcb_red 208,5810
+static void pdp_ut_rgb2ycrcb_green 209,5929
+static void pdp_ut_rgb2ycrcb_blue 210,6048
+static void pdp_ut_rgb2ycrcb_free 214,6170
+static void* pdp_ut_rgb2ycrcb_new(215,6233
+void pdp_ut_rgb2ycrcb_setup(235,6799
+void pdp_ut_setup(250,7356
+
+modules/generic/pdp_convert.c,311
+typedef struct pdp_convert_structpdp_convert_struct26,840
+} t_pdp_convert;t_pdp_convert33,968
+static void pdp_convert_type_mask(37,988
+static void pdp_convert_input_0(42,1082
+t_class *pdp_convert_class;62,1572
+void pdp_convert_free(66,1603
+void *pdp_convert_new(71,1690
+void pdp_convert_setup(89,1966
+
+modules/generic/pdp_del.c,353
+typedef struct pdp_del_structpdp_del_struct26,840
+} t_pdp_del;t_pdp_del39,1033
+static void pdp_del_input_0(45,1051
+static void pdp_del_delay(100,2306
+static void pdp_del_reset(110,2484
+static void pdp_del_debug(121,2666
+static void pdp_del_free(132,2889
+t_class *pdp_del_class;138,2982
+void *pdp_del_new(142,3009
+void pdp_del_setup(176,3641
+
+modules/generic/pdp_description.c,367
+typedef struct pdp_description_structpdp_description_struct27,841
+} t_pdp_description;t_pdp_description32,926
+static void pdp_description_input_pdp(37,951
+static void pdp_description_input_dpd(47,1200
+static void pdp_description_free(58,1446
+t_class *pdp_description_class;63,1507
+static void *pdp_description_new(67,1542
+void pdp_description_setup(83,1814
+
+modules/generic/pdp_inspect.c,463
+#define TR_BANG 27,881
+#define TR_FLOAT 28,899
+#define TR_SYMBOL 29,918
+#define TR_POINTER 30,938
+#define TR_LIST 31,959
+#define TR_ANYTHING 32,977
+#define TR_PDP 33,999
+typedef struct pdp_inspect_structpdp_inspect_struct47,1294
+} t_pdp_inspect;t_pdp_inspect54,1393
+static void pdp_inspect_input_0(59,1414
+static void pdp_inspect_free(82,1897
+t_class *pdp_inspect_class;87,1950
+static void *pdp_inspect_new(91,1981
+void pdp_inspect_setup(108,2213
+
+modules/generic/pdp_loop.c,627
+typedef struct pdp_loop_structpdp_loop_struct40,1146
+} t_pdp_loop;t_pdp_loop56,1596
+static void pdp_loop_input_0(62,1615
+static void pdp_loop_bang(91,2326
+static void pdp_loop_reset(118,2873
+static void pdp_loop_record(130,3086
+static void pdp_loop_store(142,3404
+static void pdp_loop_seek(152,3593
+static void pdp_loop_seek_hot(161,3748
+static void pdp_loop_stop(168,3860
+static void pdp_loop_loop(173,3937
+static void pdp_loop_free(179,4065
+static int pdp_loop_realsize(185,4161
+static void pdp_loop_resize(193,4278
+t_class *pdp_loop_class;240,5287
+void *pdp_loop_new(244,5315
+void pdp_loop_setup(274,5948
+
+modules/generic/pdp_rawin.c,520
+#define PERIOD 39,1160
+#define D 40,1180
+typedef struct rawin_structrawin_struct47,1235
+} t_rawin;t_rawin72,1762
+static inline void lock(75,1775
+static inline void unlock(76,1843
+static void tick(79,1953
+static void move_current_to_queue(95,2309
+static void *rawin_thread(102,2465
+static void rawin_type(192,4202
+static void rawin_open(197,4300
+static void rawin_close(213,4653
+static void rawin_free(233,4972
+t_class *rawin_class;241,5131
+static void *rawin_new(244,5155
+void pdp_rawin_setup(281,5981
+
+modules/generic/pdp_rawout.c,530
+#define D 41,1199
+#define MAX_QUEUESIZE 42,1216
+#define PIPE_BLOCKSIZE 43,1240
+typedef struct rawout_structrawout_struct50,1306
+} t_rawout;t_rawout74,1814
+static inline void lock(77,1828
+static inline void unlock(78,1897
+static void pdp_in(81,2010
+static void *rawout_thread(107,2548
+static void rawout_type(213,4587
+static void rawout_open(218,4687
+static void rawout_close(234,5043
+static void rawout_free(254,5364
+t_class *rawout_class;261,5498
+static void *rawout_new(264,5523
+void pdp_rawout_setup(299,6272
+
+modules/generic/pdp_reg.c,393
+typedef struct pdp_reg_structpdp_reg_struct28,888
+} t_pdp_reg;t_pdp_reg37,1004
+static void pdp_reg_load_png(40,1019
+static void pdp_reg_save_png(55,1352
+static void pdp_reg_bang(73,1751
+static void pdp_reg_input_0(82,1867
+static void pdp_reg_input_1(103,2384
+static void pdp_reg_free(120,2838
+t_class *pdp_reg_class;126,2925
+void *pdp_reg_new(130,2952
+void pdp_reg_setup(150,3257
+
+modules/generic/pdp_route.c,381
+#define PDP_ROUTE_MAX_NB_OUTLETS 27,882
+typedef struct pdp_route_structpdp_route_struct29,920
+} t_pdp_route;t_pdp_route41,1106
+static void pdp_route_input_0(44,1123
+static void pdp_route_input_0_dpd(62,1514
+static void pdp_route_route(77,1791
+static void pdp_route_free(90,2009
+t_class *pdp_route_class;95,2062
+void *pdp_route_new(99,2091
+void pdp_route_setup(130,2671
+
+modules/generic/pdp_snap.c,321
+typedef struct pdp_snap_structpdp_snap_struct26,866
+} t_pdp_snap;t_pdp_snap36,1004
+static void pdp_snap_bang(39,1020
+static void pdp_snap_input_1(50,1141
+static void pdp_snap_snap(67,1591
+static void pdp_snap_free(72,1661
+t_class *pdp_snap_class;78,1750
+void *pdp_snap_new(82,1778
+void pdp_snap_setup(103,2114
+
+modules/generic/pdp_trigger.c,595
+#define TR_BANG 28,908
+#define TR_FLOAT 29,926
+#define TR_SYMBOL 30,945
+#define TR_POINTER 31,965
+#define TR_LIST 32,986
+#define TR_ANYTHING 33,1004
+#define TR_PDP 34,1026
+typedef struct triggerouttriggerout48,1321
+} t_triggerout;t_triggerout52,1426
+typedef struct pdp_trigger_structpdp_trigger_struct55,1444
+} t_pdp_trigger;t_pdp_trigger63,1557
+static void pdp_trigger_input_pdp(68,1578
+static void pdp_trigger_input_dpd(93,2237
+static void pdp_trigger_free(119,2816
+t_class *pdp_trigger_class;124,2895
+static void *pdp_trigger_new(128,2926
+void pdp_trigger_setup(175,4067
+
+modules/generic/pdp_udp_receive.c,359
+#define D 28,967
+typedef struct pdp_udp_receive_structpdp_udp_receive_struct30,984
+} t_pdp_udp_receive;t_pdp_udp_receive54,1379
+static void clock_tick(57,1402
+static void *receive_thread(68,1587
+static void pdp_udp_receive_free(133,3183
+t_class *pdp_udp_receive_class;147,3504
+void *pdp_udp_receive_new(151,3539
+void pdp_udp_receive_setup(191,4405
+
+modules/generic/pdp_udp_send.c,768
+#define DD 36,1085
+#define D 37,1128
+#define V 38,1182
+typedef struct pdp_udp_send_structpdp_udp_send_struct40,1243
+} t_pdp_udp_send;t_pdp_udp_send68,1732
+static int _wait_for_feeder(76,1780
+static void _signal_sender(100,2364
+static void _wait_until_done(108,2536
+static void _remove_packet_from_queue(118,2772
+static void *send_thread(127,2839
+static void pdp_udp_send_input_0(166,3849
+static void pdp_udp_send_timeout(211,4891
+static void pdp_udp_send_sleepgrain(218,5043
+static void pdp_udp_send_sleepperiod(224,5200
+static void pdp_udp_send_udpsize(231,5347
+static void pdp_udp_send_connect(237,5493
+static void pdp_udp_send_free(255,5920
+t_class *pdp_udp_send_class;272,6338
+void *pdp_udp_send_new(276,6370
+void pdp_udp_send_setup(318,7309
+
+modules/image_basic/pdp_add.c,241
+typedef struct pdp_add_structpdp_add_struct26,866
+} t_pdp_add;t_pdp_add32,1088
+static void pdp_add_process(36,1128
+static void pdp_add_free(56,1645
+t_class *pdp_add_class;66,1937
+void *pdp_add_new(69,1963
+void pdp_add_setup(97,2491
+
+modules/image_basic/pdp_bq.c,1231
+typedef struct pdp_bq_structpdp_bq_struct36,1043
+} t_pdp_bq;t_pdp_bq61,1517
+static void pdp_bq_a0(66,1609
+static void pdp_bq_a1(67,1680
+static void pdp_bq_a2(68,1752
+static void pdp_bq_b0(70,1825
+static void pdp_bq_b1(71,1896
+static void pdp_bq_b2(72,1967
+static void pdp_bq_u0(74,2039
+static void pdp_bq_u1(75,2115
+static void pdp_bq_setcoefs(78,2193
+static void pdp_bq_setstate(91,2497
+static void pdp_bq_lpf(101,2683
+static void pdp_bq_hpf(121,3109
+static void pdp_bq_apf(143,3536
+static void pdp_bq_bsf(163,3970
+static void pdp_bq_onep(183,4356
+static void pdp_bq_twop(199,4637
+static void pdp_bqt_process(225,5026
+static void pdp_bq_process(237,5338
+static void pdp_bqt_reset(250,5738
+static void pdp_bqt_preproc(258,5950
+static void pdp_bq_passes(283,6643
+static void pdp_bq_lr(291,6793
+static void pdp_bq_rl(297,6988
+static void pdp_bq_tb(302,7182
+static void pdp_bq_bt(308,7377
+static void pdp_bq_hor(315,7573
+static void pdp_bq_ver(320,7669
+static void pdp_bq_free(329,7842
+void pdp_bq_init(339,8039
+t_class *pdp_bq_class;358,8314
+t_class *pdp_bqt_class;359,8371
+void *pdp_bq_new(361,8426
+void *pdp_bqt_new(375,8742
+void pdp_bq_coefmethods_setup(403,9186
+void pdp_bq_setup(426,10412
+
+modules/image_basic/pdp_cheby.c,467
+typedef struct pdp_cheby_structpdp_cheby_struct29,942
+} t_pdp_cheby;t_pdp_cheby40,1150
+static double pdp_cheby_mappingfunction(44,1168
+static void pdp_cheby_coef(58,1508
+static void pdp_cheby_approx(63,1640
+static void pdp_cheby_process(96,2280
+static void pdp_cheby_reset(106,2570
+static void pdp_cheby_iterations(114,2717
+static void pdp_cheby_free(121,2844
+t_class *pdp_cheby_class;129,2993
+void *pdp_cheby_new(133,3022
+void pdp_cheby_setup(171,3802
+
+modules/image_basic/pdp_constant.c,474
+typedef struct pdp_constant_structpdp_constant_struct27,867
+} t_pdp_constant;t_pdp_constant42,1080
+void pdp_constant_type(46,1101
+void pdp_constant_value(52,1181
+static void pdp_constant_process(62,1349
+static void pdp_constant_postproc(79,2011
+static void pdp_constant_bang(84,2128
+static void pdp_constant_dim(89,2204
+static void pdp_constant_free(97,2443
+t_class *pdp_constant_class;104,2567
+void *pdp_constant_new(108,2599
+void pdp_constant_setup(144,3324
+
+modules/image_basic/pdp_conv.c,693
+typedef struct pdp_conv_structpdp_conv_struct27,867
+} t_pdp_conv;t_pdp_conv39,1059
+static void pdp_conv_process(43,1076
+static void pdp_conv_passes(62,1589
+static void pdp_conv_hor(69,1742
+static void pdp_conv_ver(75,1857
+static void pdp_conv_free(80,1969
+static void pdp_conv_hleft(89,2163
+static void pdp_conv_hmiddle(94,2279
+static void pdp_conv_hright(98,2396
+static void pdp_conv_hmask(103,2514
+static void pdp_conv_vtop(110,2678
+static void pdp_conv_vmiddle(114,2792
+static void pdp_conv_vbottom(119,2910
+static void pdp_conv_vmask(124,3029
+static void pdp_conv_mask(132,3194
+t_class *pdp_conv_class;138,3342
+void *pdp_conv_new(142,3370
+void pdp_conv_setup(181,4307
+
+modules/image_basic/pdp_gain.c,276
+typedef struct pdp_gain_structpdp_gain_struct27,867
+} t_pdp_gain;t_pdp_gain32,947
+static void pdp_gain_process(37,965
+static void pdp_gain_gain(48,1229
+t_class *pdp_gain_class;55,1337
+void pdp_gain_free(59,1365
+void *pdp_gain_new(65,1473
+void pdp_gain_setup(96,2017
+
+modules/image_basic/pdp_logic.c,952
+typedef struct pdp_logic_structpdp_logic_struct26,866
+} t_pdp_logic;t_pdp_logic32,951
+static void pdp_logic_process_and(35,968
+static void pdp_logic_process_or(43,1227
+static void pdp_logic_process_xor(51,1484
+static void pdp_logic_process_not(59,1743
+static void pdp_logic_process_mask(66,1958
+static void pdp_logic_process_softthresh(73,2183
+static void pdp_logic_process_hardthresh(81,2421
+static void pdp_logic_set_mask(89,2659
+static void pdp_logic_set_threshold(96,2837
+static void pdp_logic_set_depth(104,3059
+static void pdp_logic_free(116,3307
+t_class *pdp_logic_class;122,3446
+void *pdp_logic_new(126,3498
+void *pdp_logic_new_and(140,3732
+void *pdp_logic_new_or(150,3960
+void *pdp_logic_new_xor(159,4185
+void *pdp_logic_new_not(168,4412
+void *pdp_logic_new_mask(176,4606
+void *pdp_logic_new_depth(187,4901
+void *pdp_logic_new_softthresh(198,5198
+void *pdp_logic_new_hardthresh(210,5521
+void pdp_logic_setup(228,5885
+
+modules/image_basic/pdp_mix.c,482
+typedef struct pdp_mix_structpdp_mix_struct26,866
+} t_pdp_mix;t_pdp_mix37,1027
+static void pdp_mix_process(40,1042
+static void pdp_mix_mix(49,1303
+static void pdp_mix_mix1(63,1583
+static void pdp_mix_mix2(68,1691
+static void pdp_mix_extrapolate(73,1802
+static void pdp_mix_free(80,1950
+t_class *pdp_mix_class;86,2063
+t_class *pdp_mix2_class;87,2087
+void *pdp_mix_common_init(90,2114
+void *pdp_mix_new(107,2447
+void *pdp_mix2_new(118,2713
+void pdp_mix_setup(139,3165
+
+modules/image_basic/pdp_mul.c,239
+typedef struct pdp_mul_structpdp_mul_struct26,866
+} t_pdp_mul;t_pdp_mul30,927
+static void pdp_mul_process(34,943
+static void pdp_mul_free(44,1196
+t_class *pdp_mul_class;49,1267
+void *pdp_mul_new(53,1294
+void pdp_mul_setup(73,1627
+
+modules/image_basic/pdp_noise.c,433
+typedef struct pdp_noise_structpdp_noise_struct27,867
+} t_pdp_noise;t_pdp_noise40,1079
+void pdp_noise_type(44,1097
+void pdp_noise_random(50,1171
+static void pdp_noise_process(58,1364
+static void pdp_noise_postproc(78,1986
+static void pdp_noise_bang(83,2097
+static void pdp_noise_dim(88,2167
+static void pdp_noise_free(96,2400
+t_class *pdp_noise_class;105,2584
+void *pdp_noise_new(108,2612
+void pdp_noise_setup(142,3226
+
+modules/image_basic/pdp_plasma.c,483
+typedef struct pdp_plasma_structpdp_plasma_struct27,867
+} t_pdp_plasma;t_pdp_plasma40,1081
+void pdp_plasma_type(44,1100
+void pdp_plasma_random(50,1176
+void pdp_plasma_turbulence(57,1341
+static void pdp_plasma_process(64,1495
+static void pdp_plasma_postproc(80,2107
+static void pdp_plasma_bang(85,2220
+static void pdp_plasma_dim(90,2292
+static void pdp_plasma_free(98,2527
+t_class *pdp_plasma_class;107,2714
+void *pdp_plasma_new(110,2743
+void pdp_plasma_setup(147,3476
+
+modules/image_basic/pdp_randmix.c,351
+typedef struct pdp_randmix_structpdp_randmix_struct26,866
+} t_pdp_randmix;t_pdp_randmix31,955
+void pdp_randmix_random(34,974
+static void pdp_randmix_process(40,1096
+static void pdp_randmix_threshold(50,1374
+static void pdp_randmix_free(58,1507
+t_class *pdp_randmix_class;64,1636
+void *pdp_randmix_new(67,1666
+void pdp_randmix_setup(97,2203
+
+modules/image_basic/pdp_stateless.c,851
+typedef struct pdp_stateless_structpdp_stateless_struct26,899
+} t_pdp_stateless;t_pdp_stateless30,966
+static void pdp_stateless_process_abs(34,988
+static void pdp_stateless_process_hardthresh(41,1211
+static void pdp_stateless_process_zthresh(48,1448
+static void pdp_stateless_process_positive(55,1679
+static void pdp_stateless_process_sign(62,1914
+static void pdp_stateless_process_flip_tb(69,2139
+static void pdp_stateless_process_flip_lr(76,2370
+static void pdp_stateless_free(83,2601
+t_class *pdp_stateless_class;89,2748
+void *pdp_stateless_new(93,2804
+void *pdp_stateless_new_abs(106,3035
+void *pdp_stateless_new_zthresh(114,3245
+void *pdp_stateless_new_positive(122,3463
+void *pdp_stateless_new_sign(130,3683
+void *pdp_stateless_new_flip_tb(138,3895
+void *pdp_stateless_new_flip_lr(147,4114
+void pdp_stateless_setup(162,4374
+
+modules/image_basic/pdp_zoom.c,720
+typedef struct pdp_zoom_structpdp_zoom_struct28,868
+} t_pdp_zoom;t_pdp_zoom39,1029
+static void pdp_zoom_process(42,1045
+static void pdp_zoom_postproc(49,1291
+static void pdp_zoom_preproc(58,1544
+static void pdp_zoom_zoom_x(70,1776
+static void pdp_zoom_angle(75,1899
+static void pdp_zoom_zoom_y(80,2021
+static void pdp_zoom_zoom(85,2144
+static void pdp_zoom_center_x(91,2258
+static void pdp_zoom_center_y(96,2385
+static void pdp_zoom_center(100,2511
+static void pdp_zoom_quality(107,2661
+t_class *pdp_zoom_class;114,2789
+void pdp_zoom_free(118,2817
+void pdp_zoom_init_common(126,2982
+void *pdp_zoom_new(145,3556
+void *pdp_zrot_new(159,3865
+void *pdp_rotate_new(175,4259
+void pdp_zoom_setup(196,4581
+
+modules/image_io/pdp_glx.c,1138
+#define PDP_OGL_W 41,1133
+#define PDP_OGL_H 42,1155
+#define PDP_OGL_AUTOCREATE_RETRY 44,1178
+typedef struct pdp_glx_structpdp_glx_struct47,1216
+} t_pdp_glx;t_pdp_glx76,1696
+static void pdp_glx_cursor(80,1712
+static void pdp_glx_destroy(86,1833
+static void pdp_glx_fullscreen(105,2214
+static void pdp_glx_resize(111,2326
+static void pdp_glx_move(117,2482
+static void pdp_glx_moveresize(123,2634
+static void pdp_glx_tile(129,2844
+void pdp_glx_generate_texture(138,3035
+void pdp_glx_regenerate_texture(169,3877
+static void pdp_glx_create(176,4033
+static int pdp_glx_try_autocreate(242,5654
+static void pdp_glx_fill_texture(264,6116
+static void pdp_glx_process(314,7555
+static void pdp_glx_display_texture(354,8405
+static void pdp_glx_bang_thread(403,9882
+static void pdp_glx_bang_callback(412,9996
+static void pdp_glx_bang(431,10466
+static void pdp_glx_input_0(456,10944
+static void pdp_glx_vga(465,11160
+static void pdp_glx_autocreate(470,11236
+static void pdp_glx_display(476,11389
+static void pdp_glx_free(490,11663
+t_class *pdp_glx_class;499,11909
+void *pdp_glx_new(503,11936
+void pdp_glx_setup(543,12535
+
+modules/image_io/pdp_qt.c,1241
+#define min(min29,926
+#define FREE(FREE33,962
+#define DEBUG_MSG(DEBUG_MSG41,1117
+#define DEBUG_MSG(DEBUG_MSG47,1292
+typedef struct pdp_qt_structpdp_qt_struct50,1328
+} t_pdp_qt;t_pdp_qt122,2847
+static void pdp_qt_close(127,2900
+void  pdp_qt_create_pdp_packet(171,3754
+static void pdp_qt_open(207,4629
+static void pdp_qt_bangaudio(408,10700
+static void pdp_qt_bangvideo(492,13003
+static void pdp_qt_sendpacket(552,14436
+static void pdp_qt_thread_bang(565,14691
+static void pdp_qt_bang(582,15094
+static void pdp_qt_loop(651,16779
+static void pdp_qt_autoplay(657,16896
+static void pdp_qt_frame_cold(671,17118
+static void pdp_qt_frame(689,17486
+static void pdp_qt_stop(695,17610
+static void pdp_qt_continue(700,17679
+static void pdp_qt_play(707,17773
+static void pdp_qt_importaudio(715,17870
+static t_int *pdp_qt_perform(773,19408
+static void pdp_qt_dsp(832,20981
+static void pdp_qt_process_in_thread(838,21113
+static void pdp_qt_tick(849,21309
+static void pdp_qt_free(856,21396
+t_class *pdp_qt_class;867,21549
+t_class *pdp_qt_tilde_class;868,21572
+void pdp_qt_init_common(871,21603
+void *pdp_qt_new(904,22353
+void *pdp_qt_tilde_new(913,22538
+void pdp_qt_setup_common(936,22979
+void pdp_qt_setup(953,24135
+
+modules/image_io/pdp_sdl.c,1202
+#define PDP_SDL_W 43,1155
+#define PDP_SDL_H 44,1177
+typedef struct pdp_sdl_struct pdp_sdl_struct47,1201
+} t_pdp_sdl;t_pdp_sdl75,1656
+static SDL_Surface *pdp_sdl_getSurface(77,1670
+static SDL_Surface *pdp_sdl_recreateSurface(127,3100
+static inline void pdp_sdl_getOverlay(133,3421
+static inline void pdp_sdl_freeOverlay(137,3583
+static int pdp_sdl_drawImage(141,3683
+static inline void pdp_sdl_recreate(175,4770
+static int pdp_sdl_create(179,4975
+static void pdp_sdl_checkEvents(205,5681
+static void pdp_sdl_process(237,6278
+static void pdp_sdl_destroy(274,7142
+static void pdp_sdl_random(283,7319
+static void pdp_sdl_bang_thread(292,7619
+static void pdp_sdl_bang_callback(297,7785
+static void pdp_sdl_bang(305,7977
+static void pdp_sdl_input_0(315,8248
+static void pdp_sdl_resize(322,8463
+static void pdp_sdl_fullscreen(333,8760
+static void pdp_sdl_cursor(342,8947
+static void pdp_sdl_win(352,9141
+static void pdp_sdl_renderer(362,9433
+static void pdp_sdl_free(376,9741
+static void pdp_sdl_listmodes(384,9907
+static void pdp_sdl_modes(408,10483
+static void pdp_sdl_info(416,11123
+t_class *pdp_sdl_class;433,12178
+void *pdp_sdl_new(435,12203
+void pdp_sdl_setup(474,12776
+
+modules/image_io/pdp_v4l.c,1063
+#define PDP_XV_RETRIES 47,1400
+#define DEVICENO 55,1502
+#define NBUF 56,1521
+#define COMPOSITEIN 57,1536
+typedef struct pdp_v4l_structpdp_v4l_struct62,1562
+} t_pdp_v4l;t_pdp_v4l118,2658
+static void pdp_v4l_audio(124,2676
+static void pdp_v4l_close(148,3424
+static void pdp_v4l_close_manual(174,3873
+static void pdp_v4l_close_error(181,3986
+static void pdp_v4l_pwc_init(188,4103
+static void pdp_v4l_sync_frame(249,5459
+static void pdp_v4l_capture_frame(258,5670
+static void *pdp_v4l_thread(277,6275
+static void pdp_v4l_open(306,6837
+#define TRYPALETTE(TRYPALETTE448,10778
+static void pdp_v4l_open_manual(505,12283
+static void pdp_v4l_channel(512,12416
+static void pdp_v4l_norm(525,12652
+static void pdp_v4l_freq(545,13079
+static void pdp_v4l_freqMHz(558,13368
+static void pdp_v4l_bang(564,13457
+static void pdp_v4l_setlegaldim(690,16501
+static void pdp_v4l_dim(708,16929
+static void pdp_v4l_format(721,17196
+static void pdp_v4l_free(740,17711
+t_class *pdp_v4l_class;745,17777
+void *pdp_v4l_new(749,17804
+void pdp_v4l_setup(810,18951
+
+modules/image_io/pdp_xv.c,993
+#define PDP_XV_AUTOCREATE_RETRY 30,977
+typedef struct pdp_xv_structpdp_xv_struct33,1014
+} t_pdp_xv;t_pdp_xv53,1310
+static void pdp_xv_cursor(56,1324
+static void _pdp_xv_cleanup(62,1463
+static void _pdp_xv_waitforthread(74,1768
+static void pdp_xv_destroy(82,2021
+static void pdp_xv_create(98,2388
+static int pdp_xv_try_autocreate(126,3053
+static void pdp_xv_bang_thread(148,3506
+static void pdp_xv_bang_callback(154,3623
+static void pdp_xv_poll(175,4123
+static void pdp_xv_bang(181,4217
+static void pdp_xv_input_0(202,4751
+static void pdp_xv_autocreate(212,4994
+static void pdp_xv_display(218,5144
+static void pdp_xv_movecursor(230,5367
+static void pdp_xv_fullscreen(239,5570
+static void pdp_xv_resize(245,5680
+static void pdp_xv_move(251,5834
+static void pdp_xv_moveresize(257,5984
+static void pdp_xv_tile(263,6192
+static void pdp_xv_vga(269,6378
+static void pdp_xv_free(274,6451
+t_class *pdp_xv_class;279,6516
+void *pdp_xv_new(283,6542
+void pdp_xv_setup(309,6928
+
+modules/image_special/pdp_array.c,410
+typedef struct _pdp_array_pdp_array28,912
+} t_pdp_array;t_pdp_array38,1099
+static void pdp_array_bang(41,1119
+static void pdp_array_input_0(47,1203
+static void pdp_array_array(107,2736
+static void pdp_array_free(115,2890
+t_class *pdp_array2grey_class;121,2987
+t_class *pdp_grey2array_class;122,3019
+void *pdp_array2grey_new(126,3057
+void *pdp_grey2array_new(133,3235
+void pdp_array_setup(155,3638
+
+modules/image_special/pdp_chrot.c,393
+typedef struct pdp_chrot_structpdp_chrot_struct28,880
+} t_pdp_chrot;t_pdp_chrot35,982
+static void pdp_chrot_process(39,1000
+static void pdp_chrot_setelement(73,1733
+static void pdp_chrot_angle_radians(79,1841
+static void pdp_chrot_angle_degrees(92,2173
+static void pdp_chrot_free(98,2307
+t_class *pdp_chrot_class;104,2423
+void *pdp_chrot_new(108,2452
+void pdp_chrot_setup(130,2891
+
+modules/image_special/pdp_cog.c,401
+typedef struct pdp_cog_structpdp_cog_struct28,977
+} t_pdp_cog;t_pdp_cog42,1257
+static void _pdp_cog_perform(45,1275
+static void pdp_cog_perform(140,3185
+static void pdp_cog_input_0(154,3496
+static void pdp_cog_threshold(173,3914
+static void pdp_cog_free(180,4035
+t_class *pdp_cog_class;186,4128
+void *pdp_cog_new(190,4159
+void *pdp_cog_abs_thresh_new(208,4609
+void pdp_cog_setup(225,4925
+
+modules/image_special/pdp_grey2mask.c,487
+typedef struct pdp_grey2mask_structpdp_grey2mask_struct28,1011
+} t_pdp_grey2mask;t_pdp_grey2mask40,1173
+static void pdp_grey2mask_process_grey(44,1195
+static void pdp_grey2mask_process_yv12(81,2342
+static void pdp_grey2mask_process(89,2488
+static void pdp_grey2mask_sendpacket(117,3098
+static void pdp_grey2mask_input_0(123,3270
+static void pdp_grey2mask_free(147,3879
+t_class *pdp_grey2mask_class;155,4070
+void *pdp_grey2mask_new(159,4103
+void pdp_grey2mask_setup(180,4393
+
+modules/image_special/pdp_histo.c,796
+typedef void (*t_histo_proc)t_histo_proc28,930
+typedef struct _pdp_histo_pdp_histo31,986
+} t_pdp_histo;t_pdp_histo55,1553
+static int round_up_2log(58,1573
+static void dump_to_array(73,1777
+static void get_sampleset(106,2622
+static void get_brightest(193,5011
+static void _pdp_histo_perform(229,5871
+static void pdp_histo_perform(268,6655
+static void pdp_histo_input_0(284,7052
+static void pdp_histo_samplesize(304,7481
+static void pdp_histo_scale(311,7614
+static void pdp_histo_size(315,7696
+static void pdp_histo_array(323,7844
+static void pdp_histo_free(330,7974
+t_class *pdp_histo_class;336,8071
+void *pdp_histo_new(340,8104
+void *pdp_histo_array_new(353,8364
+void *pdp_histo_sample_new(363,8648
+void *pdp_histo_sample_matrix_new(379,9181
+void pdp_histo_setup(393,9436
+
+modules/image_special/pdp_scale.c,581
+typedef struct pdp_scale_structpdp_scale_struct28,867
+} t_pdp_scale;t_pdp_scale46,1122
+static void pdp_scale_process_yv12(49,1139
+static void pdp_scale_process_grey(87,2654
+static void pdp_scale_sendpacket(112,3443
+static void pdp_scale_process(122,3709
+static void pdp_scale_input_0(173,4923
+static void pdp_scale_width(194,5318
+static void pdp_scale_height(201,5445
+static void pdp_scale_dim(209,5575
+static void pdp_scale_quality(215,5705
+t_class *pdp_scale_class;222,5835
+void pdp_scale_free(226,5864
+void *pdp_scale_new(234,6081
+void pdp_scale_setup(259,6522
+
+modules/image_special/pdp_scan.c,406
+#define PDP_SCAN_COSTABLE_SIZE 27,878
+static float pdp_cos[28,914
+typedef struct pdp_scan_structpdp_scan_struct30,961
+} t_pdp_scan;t_pdp_scan49,1228
+static t_int *pdp_scan_perform(52,1244
+static void pdp_scan_input_0(122,3354
+static void pdp_scan_interpolate(164,4413
+static void pdp_scan_free(173,4607
+t_class *pdp_scan_class;179,4696
+void *pdp_scan_new(183,4724
+void pdp_scan_setup(210,5164
+
+modules/image_special/pdp_scanxy.c,360
+typedef struct pdp_scanxy_structpdp_scanxy_struct26,857
+} t_pdp_scanxy;t_pdp_scanxy40,1045
+static t_int *pdp_scanxy_perform(43,1063
+static void pdp_scanxy_input_0(107,2727
+static void pdp_scanxy_interpolate(149,3810
+static void pdp_scanxy_free(158,4008
+t_class *pdp_scanxy_class;164,4101
+void *pdp_scanxy_new(168,4131
+void pdp_scanxy_setup(190,4508
+
+modules/image_special/pdp_scope.c,756
+#define BUFSIZE 26,859
+typedef struct pdp_scope_datapdp_scope_data28,881
+}t_pdp_scope_data;t_pdp_scope_data32,944
+typedef struct pdp_scope_structpdp_scope_struct34,964
+} t_pdp_scope;t_pdp_scope54,1259
+void pdp_scope_type(58,1277
+static void pdp_scope_createpacket_yv12(71,1525
+static void pdp_scope_generate_yv12(92,2053
+static void pdp_scope_createpacket_grey(120,2635
+static void pdp_scope_generate_grey(147,3255
+static void pdp_scope_sendpacket(172,3816
+static void pdp_scope_bang(179,3959
+static void pdp_scope_dim(214,4701
+static void pdp_scope_free(224,4903
+static t_int *pdp_scope_perform(237,5179
+static void pdp_scope_dsp(256,5516
+t_class *pdp_scope_class;262,5645
+void *pdp_scope_new(267,5675
+void pdp_scope_setup(300,6213
+
+modules/matrix_basic/clusterstuff.c,1094
+typedef void (*t_histo_proc)t_histo_proc28,930
+typedef struct _cluster_cluster32,1012
+} t_cluster;t_cluster37,1084
+typedef struct _pdp_histo_pdp_histo41,1104
+} t_pdp_histo;t_pdp_histo68,1826
+static void cluster_join(72,1888
+static void cluster_copy(82,2151
+static void cluster_clear(89,2279
+static void cluster_new(94,2346
+static float cluster_dsquared(101,2461
+static int round_up_2log(109,2625
+static void compute_clusters(124,2829
+static void dump_to_array(217,5168
+static void get_sampleset(250,6013
+static void get_brightest(314,7840
+static void _pdp_histo_perform(350,8700
+static void pdp_histo_perform(389,9484
+static void pdp_histo_input_0(405,9881
+static void pdp_histo_samplesize(425,10310
+static void pdp_histo_clusters(431,10458
+static void pdp_histo_scale(440,10685
+static void pdp_histo_size(444,10767
+static void pdp_histo_array(452,10915
+static void pdp_histo_free(459,11045
+t_class *pdp_histo_class;466,11192
+void *pdp_histo_new(470,11225
+void *pdp_histo_array_new(485,11535
+void *pdp_histo_sample_new(495,11819
+void pdp_histo_setup(518,12437
+
+modules/matrix_basic/pdp_mat_lu.c,492
+typedef struct pdp_mat_LU_structpdp_mat_LU_struct29,1002
+} t_pdp_mat_LU;t_pdp_mat_LU33,1061
+static void pdp_mat_LU_process_LU_inverse(37,1080
+static void pdp_mat_LU_process_LU(44,1289
+static void pdp_mat_LU_process_LU_solve(51,1479
+static void pdp_mat_LU_free(74,1992
+t_class *pdp_mat_LU_class;80,2128
+t_pdp_mat_LU *pdp_mat_LU_base_new(84,2182
+void *pdp_mat_LU_inverse_new(92,2359
+void *pdp_mat_LU_new(101,2586
+void *pdp_mat_LU_solve_new(109,2796
+void pdp_mat_lu_setup(124,3090
+
+modules/matrix_basic/pdp_mat_mul.c,778
+typedef struct pdp_mat_mm_structpdp_mat_mm_struct29,1006
+} t_pdp_mat_mm;t_pdp_mat_mm40,1192
+static void pdp_mat_mm_rscale(43,1210
+static void pdp_mat_mm_cscale(49,1323
+static void pdp_mat_mv_process_mul(57,1470
+static void pdp_mat_mm_process_mul(93,2263
+static void pdp_mat_mm_process_mac(121,2960
+static void pdp_mat_mm_free(139,3411
+t_class *pdp_mat_mm_class;145,3547
+void *pdp_mat_mm_new(149,3600
+static int pdp_mat_mm_setup_routing_M0(165,3827
+static int pdp_mat_mm_setup_routing_M1(177,4298
+static int pdp_mat_mm_setup_scaling(192,4822
+void *pdp_mat_mm_new_mul_common(208,5304
+void *pdp_mat_mv_new_mul_common(229,5856
+void *pdp_mat_mm_new_mul(249,6336
+void *pdp_mat_mv_new_mul(259,6616
+void *pdp_mat_mm_new_mac(269,6878
+void pdp_mat_mul_setup(285,7165
+
+modules/matrix_basic/pdp_mat_vec.c,491
+typedef struct pdp_mat_vec_structpdp_mat_vec_struct29,993
+} t_pdp_mat_vec;t_pdp_mat_vec38,1154
+#define GETFLOAT(GETFLOAT41,1173
+#define GETDOUBLE(GETDOUBLE42,1244
+static void pdp_mat_vec_list_in(45,1287
+static void pdp_mat_vec_list_out(87,2364
+static void pdp_mat_vec_free(136,3679
+t_class *pdp_mat_vec_class;145,3884
+t_pdp_mat_vec *pdp_mat_vec_base_new(149,3939
+void *pdp_mat_vec_list2vec_new(160,4198
+void *pdp_mat_vec_vec2list_new(178,4814
+void pdp_mat_vec_setup(194,5143
+
+modules/test/pdp_dpd_test.c,473
+typedef struct pdp_dpd_test_structpdp_dpd_test_struct26,865
+} t_pdp_dpd_test;t_pdp_dpd_test30,930
+static void pdp_dpd_test_1(35,972
+static void pdp_dpd_test_2(36,1039
+static void pdp_dpd_test_3(37,1106
+static void pdp_dpd_test_cleanup(38,1175
+static void pdp_dpd_test_inspect(39,1252
+static void pdp_dpd_test_bang(43,1332
+static void pdp_dpd_test_free(53,1538
+t_class *pdp_dpd_test_class;59,1619
+void *pdp_dpd_test_new(62,1650
+void pdp_dpd_test_setup(89,2285
+
+scaf/pdp/pdp_ca.c,1904
+t_class *pdp_ca_class;28,928
+t_class *pdp_ca2image_class;30,1116
+t_class *pdp_image2ca_class;31,1181
+#define PDP_CA_STACKSIZE 40,1400
+#define PDP_CA_MODE_1D 41,1429
+#define PDP_CA_MODE_2D 42,1454
+typedef struct pdp_ca_data_structpdp_ca_data_struct44,1480
+} t_pdp_ca_data;t_pdp_ca_data50,1644
+typedef struct pdp_ca_structpdp_ca_struct52,1662
+} t_pdp_ca;t_pdp_ca89,2361
+static void pdp_ca_process_ca_1D(93,2417
+static void pdp_ca_process_ca_2D(180,4994
+static void pdp_ca_swappackets(301,8735
+static void pdp_ca_bang_thread(314,8933
+static void pdp_ca_sendpacket(353,9963
+static void pdp_ca_bang(387,10851
+static void pdp_ca_copy_rw_if_valid(412,11452
+static void pdp_ca_input_0(453,12584
+static void pdp_ca_input_1(467,12824
+static void pdp_ca_rule_string(478,12984
+static void pdp_ca_rule(498,13410
+static void pdp_ca_rule_index(507,13605
+static void pdp_ca_close(524,13914
+static void pdp_ca_printrules(540,14157
+static void pdp_ca_openlib(552,14414
+static void pdp_ca_opensrc(605,15632
+    #define TMPSIZE 607,15687
+static void pdp_ca_open(631,16222
+static void pdp_ca_rand(652,16672
+static void pdp_ca_newca(666,17005
+static void pdp_ca_iterations(680,17340
+static void pdp_ca_horshift16(689,17468
+static void pdp_ca_vershift(694,17560
+static void pdp_ca_set1d(699,17645
+static void pdp_ca_set2d(704,17720
+static void pdp_ca_fullscreen1d(709,17795
+static void pdp_ca_free(715,17943
+void *pdp_ca_new(725,18113
+#define PDP_CA2IMAGE 762,19108
+#define PDP_IMAGE2CA 763,19131
+typedef struct pdp_ca_conv_structpdp_ca_conv_struct765,19155
+} t_pdp_ca_conv;t_pdp_ca_conv784,19440
+static void pdp_ca_conv_input_0(787,19481
+void pdp_ca_conv_free(824,20297
+void pdp_image2ca_threshold(830,20385
+void *pdp_ca2image_new(840,20567
+void *pdp_image2ca_new(850,20840
+void pdp_ca2image_setup(872,21338
+void pdp_image2ca_setup(879,21644
+void pdp_ca_setup(887,22064
+
+scaf/pdp/pdp_ca_system.c,505
+int pdp_packet_ca_isvalid(32,1018
+static t_pdp_symbol *pdp_packet_ca_get_description(43,1266
+int pdp_packet_new_ca(69,1950
+inline void _pdp_type_ca2grey_convert_word(113,2977
+int pdp_type_ca2grey(123,3209
+#define check_srcindex 156,4199
+#define check_dstindex 159,4301
+inline unsigned short int _pdp_type_grey2ca_convert_word(220,5826
+int pdp_type_grey2ca(236,6082
+t_ca *pdp_type_ca_info(274,7102
+static int _ca_to_image(282,7258
+static int _image_to_ca(287,7360
+void pdp_scaf_setup(293,7513
+
+scaf/compiler/scafmacro.s,0
+
+scaf/pdp/scaf_feeder.s,103
+.include .include20,837
+.globl .globl26,1049
+.type .type27,1068
+scaf_feeder:scaf_feeder28,1097
+
+opengl/modules/pdp_3d_color.c,630
+typedef struct _color_command_color_command27,891
+} t_color_command;t_color_command33,1022
+typedef struct _pdp_3d_color_pdp_3d_color35,1042
+} t_pdp_3d_color;t_pdp_3d_color45,1213
+static void pdp_3d_color_process_right(50,1256
+static void pdp_3d_color_process_left(65,1562
+static void *pdp_3d_color_get_new_command(81,1901
+static void pdp_3d_color_set_r(93,2279
+static void pdp_3d_color_set_g(94,2359
+static void pdp_3d_color_set_b(95,2441
+static void pdp_3d_color_set_a(96,2522
+t_class *pdp_3d_color_class;99,2606
+void pdp_3d_color_free(102,2637
+void *pdp_3d_color_new(107,2710
+void pdp_3d_color_setup(146,3726
+
+opengl/modules/pdp_3d_context.c,478
+typedef struct pdp_3d_context_structpdp_3d_context_struct28,886
+} t_pdp_3d_context;t_pdp_3d_context43,1096
+static void pdp_3d_context_preproc(49,1121
+static void pdp_3d_context_process(79,1790
+static void pdp_3d_context_postproc(83,1851
+static void pdp_3d_context_bang(88,1965
+static void pdp_3d_context_dim(93,2045
+static void pdp_3d_context_free(101,2288
+t_class *pdp_3d_context_class;108,2411
+void *pdp_3d_context_new(112,2445
+void pdp_3d_context_setup(146,3113
+
+opengl/modules/pdp_3d_dlist.c,431
+typedef struct pdp_3d_dlist_structpdp_3d_dlist_struct29,938
+} t_pdp_3d_dlist;t_pdp_3d_dlist36,1043
+static void pdp_3d_dlist_complete_notify(40,1064
+static void pdp_3d_dlist_compile(46,1206
+static void pdp_3d_dlist_process_start(53,1363
+static void pdp_3d_dlist_process_cleanup(82,2019
+t_class *pdp_3d_dlist_class;120,2576
+void pdp_3d_dlist_free(124,2608
+void *pdp_3d_dlist_new(130,2731
+void pdp_3d_dlist_setup(164,3439
+
+opengl/modules/pdp_3d_draw.c,1391
+typedef struct _drawcommand_drawcommand29,932
+} t_drawcommand;t_drawcommand42,1225
+typedef struct _pdp_3d_draw_pdp_3d_draw45,1244
+} t_pdp_3d_draw;t_pdp_3d_draw60,1538
+void pdp_3d_draw_delete_texture(63,1557
+void *pdp_3d_draw_get_command_object(69,1678
+static void draw_clear(88,2305
+static void draw_square(94,2408
+static void draw_wsquare(112,2801
+static void draw_triangle(125,3056
+static void draw_wtriangle(146,3561
+static void draw_wcube(163,3927
+static void draw_cube(168,4001
+static void draw_wtorus(194,4475
+static void draw_torus(208,4703
+static void draw_cone(222,4931
+static void draw_wcone(236,5169
+static void draw_wteapot(250,5407
+static void draw_teapot(257,5502
+static void draw_wsphere(264,5597
+static void draw_sphere(277,5797
+static void draw_dodeca(292,6038
+static void draw_octa(293,6106
+static void draw_tetra(294,6172
+static void draw_icosa(295,6239
+static void draw_wdodeca(297,6307
+static void draw_wocta(298,6375
+static void draw_wtetra(299,6441
+static void draw_wicosa(300,6508
+static void draw_process(310,6698
+static void pdp_3d_draw_p0(369,8362
+static void pdp_3d_draw_p1(370,8435
+static void pdp_3d_draw_p2(371,8508
+static void pdp_3d_draw_p3(372,8581
+t_class *pdp_3d_draw_class;375,8656
+void pdp_3d_draw_free(379,8687
+void pdp_3d_draw_object(386,8840
+void *pdp_3d_draw_new(427,11462
+void pdp_3d_draw_setup(480,12582
+
+opengl/modules/pdp_3d_drawmesh.c,1326
+typedef struct _pdp_3d_drawmesh_pdp_3d_drawmesh38,1107
+} t_pdp_3d_drawmesh;t_pdp_3d_drawmesh47,1273
+typedef struct _meshcommand_meshcommand52,1322
+} t_meshcommand;t_meshcommand67,1617
+static void meshcommand_draw(73,1683
+static void meshcommand_relax(106,2302
+static void meshcommand_execute(113,2459
+static void meshcommand_split_all_four(133,2896
+static void meshcommand_split_all_three(137,3003
+static void meshcommand_split_random_three(140,3111
+static void meshcommand_reset(145,3227
+static void meshcommand_debug(151,3360
+static void meshcommand_calculate_normals(156,3450
+void *pdp_3d_drawmesh_get_command_object(169,3684
+static void pdp_3d_drawmesh_queue_command(182,4122
+static void pdp_3d_drawmesh_queue_simple_command(187,4288
+static void pdp_3d_drawmesh_debug(198,4709
+static void pdp_3d_drawmesh_relax(203,4848
+void pdp_3d_drawmesh_normal(215,5193
+void pdp_3d_drawmesh_wireframe(228,5833
+void pdp_3d_drawmesh_flatshading(233,5936
+static void pdp_3d_drawmesh_split_all_four(239,6044
+static void pdp_3d_drawmesh_split_all_three(244,6201
+static void pdp_3d_drawmesh_split_random_three(249,6360
+static void pdp_3d_drawmesh_reset(255,6526
+t_class *pdp_3d_drawmesh_class;270,6675
+void pdp_3d_drawmesh_free(273,6709
+void *pdp_3d_drawmesh_new(283,6948
+void pdp_3d_drawmesh_setup(316,7754
+
+opengl/modules/pdp_3d_for.c,306
+typedef struct pdp_3d_for_structpdp_3d_for_struct28,966
+} t_pdp_3d_for;t_pdp_3d_for37,1101
+static void pdp_3d_for_input_0(41,1120
+static void pdp_3d_for_count(55,1413
+static void pdp_3d_for_free(62,1543
+t_class *pdp_3d_for_class;66,1593
+void *pdp_3d_for_new(70,1623
+void pdp_3d_for_setup(92,2055
+
+opengl/modules/pdp_3d_light.c,282
+typedef struct pdp_3d_light_structpdp_3d_light_struct26,890
+} t_pdp_3d_light;t_pdp_3d_light35,1042
+static void pdp_3d_light_process(39,1063
+t_class *pdp_3d_light_class;96,2717
+void pdp_3d_light_free(100,2749
+void *pdp_3d_light_new(105,2822
+void pdp_3d_light_setup(137,3539
+
+opengl/modules/pdp_3d_push.c,530
+typedef struct pdp_3d_push_structpdp_3d_push_struct27,891
+} t_pdp_3d_push;t_pdp_3d_push33,999
+static void pdp_3d_push_process_right(37,1019
+static void pdp_3d_push_process_left(51,1322
+static void pdp_3d_mode_process_right(68,1608
+static void pdp_3d_mode_process_left(79,1797
+static void pdp_3d_push_setmatrix(91,2004
+t_class *pdp_3d_push_class;108,2424
+void pdp_3d_push_free(112,2455
+void *pdp_3d_push_mode_new(117,2526
+void *pdp_3d_push_new(132,2820
+void *pdp_3d_mode_new(146,3185
+void pdp_3d_push_setup(166,3538
+
+opengl/modules/pdp_3d_snap.c,524
+typedef struct _pdp_3d_snap_pdp_3d_snap27,907
+} t_pdp_3d_snap;t_pdp_3d_snap39,1171
+typedef struct _snap_command_snap_command42,1190
+} t_snap_command;t_snap_command49,1349
+static void snap_texture_process(56,1393
+static void snap_callback(103,2691
+static void pdp_3d_snap_snap(114,2913
+static void pdp_3d_snap_autosnap(119,2992
+static void *pdp_3d_snap_get_new_command(131,3186
+t_class *pdp_3d_snap_class;143,3565
+void pdp_3d_snap_free(147,3596
+void *pdp_3d_snap_new(153,3701
+void pdp_3d_snap_setup(200,5030
+
+opengl/modules/pdp_3d_state.c,463
+typedef struct pdp_3d_state_structpdp_3d_state_struct35,1195
+} t_pdp_3d_state;t_pdp_3d_state43,1356
+static void _setflag(46,1376
+static void pdp_3d_state_process_right(52,1490
+static void pdp_3d_state_process_left(64,1812
+static void pdp_3d_state_flag(74,2077
+static void _blend(79,2195
+static void _blend_add(80,2277
+t_class *pdp_3d_state_class;82,2344
+void pdp_3d_state_free(83,2373
+void *pdp_3d_state_new(84,2438
+void pdp_3d_state_setup(121,3399
+
+opengl/modules/pdp_3d_subcontext.c,382
+typedef struct pdp_3d_subcontext_structpdp_3d_subcontext_struct27,891
+} t_pdp_3d_subcontext;t_pdp_3d_subcontext33,996
+static void pdp_3d_subcontext_process_right(37,1022
+static void pdp_3d_subcontext_process_left(52,1408
+t_class *pdp_3d_subcontext_class;69,1844
+void pdp_3d_subcontext_free(73,1881
+void *pdp_3d_subcontext_new(78,1964
+void pdp_3d_subcontext_setup(103,2489
+
+opengl/modules/pdp_3d_view.c,1033
+typedef struct _pdp_3d_view_pdp_3d_view30,909
+} t_pdp_3d_view;t_pdp_3d_view43,1116
+typedef struct _viewcommand_viewcommand47,1156
+} t_viewcommand;t_viewcommand57,1378
+static void view_rot2d(65,1468
+static void view_rotx(68,1585
+static void view_roty(69,1656
+static void view_rotz(70,1727
+static void view_rota(71,1798
+static void view_transx(74,1918
+static void view_transy(75,1991
+static void view_transz(76,2064
+static void view_transxyz(77,2137
+static void view_scalex(80,2268
+static void view_scaley(81,2337
+static void view_scalez(82,2406
+static void view_scale(83,2475
+static void view_reset_3d(86,2571
+static void view_scale_aspect(87,2677
+static void view_process(91,2818
+void *pdp_3d_view_get_command_object(112,3263
+static void pdp_3d_view_p0(129,3628
+static void pdp_3d_view_p1(130,3701
+static void pdp_3d_view_p2(131,3774
+static void pdp_3d_view_p3(132,3847
+t_class *pdp_3d_view_class;135,3922
+void pdp_3d_view_free(139,3953
+void *pdp_3d_view_new(145,4070
+void pdp_3d_view_setup(212,6603
+
+opengl/modules/pdp_3d_windowcontext.c,687
+typedef struct pdp_3d_windowcontext_structpdp_3d_windowcontext_struct26,890
+} t_pdp_3d_windowcontext;t_pdp_3d_windowcontext35,1089
+static void pdp_3d_windowcontext_sendfinish(38,1117
+static void pdp_3d_windowcontext_clearbuffer(48,1361
+static void pdp_3d_windowcontext_swapbuffer(71,1996
+void pdp_3d_windowcontext_resize(80,2313
+void pdp_3d_windowcontext_open(92,2621
+void pdp_3d_windowcontext_close(102,2896
+void pdp_3d_windowcontext_cursor(117,3276
+static void pdp_3d_windowcontext_bang(126,3484
+static void pdp_3d_windowcontext_free(164,4504
+t_class *pdp_3d_windowcontext_class;171,4636
+void *pdp_3d_windowcontext_new(174,4675
+void pdp_3d_windowcontext_setup(208,5511
+
+opengl/system/pdp_3Dcontext_common.c,620
+#define D 35,1229
+u32 pdp_packet_3Dcontext_width(41,1288
+u32 pdp_packet_3Dcontext_height(48,1439
+u32 pdp_packet_3Dcontext_subwidth(55,1592
+u32 pdp_packet_3Dcontext_subheight(63,1751
+void  pdp_packet_3Dcontext_set_subwidth(71,1912
+void pdp_packet_3Dcontext_set_subheight(78,2062
+float pdp_packet_3Dcontext_subaspect(85,2214
+int pdp_packet_3Dcontext_isvalid(92,2396
+t_3Dcontext *pdp_packet_3Dcontext_info(103,2662
+int pdp_packet_3Dcontext_snap_to_bitmap(115,2972
+void pdp_packet_3Dcontext_setup_2d_context(178,4585
+void pdp_packet_3Dcontext_setup_3d_context(207,5300
+void pdp_3Dcontext_common_setup(265,6810
+
+opengl/system/pdp_3Dcontext_glx.c,991
+#define PRIVATE_CONTEXT 40,1222
+typedef struct _gl_env_gl_env44,1320
+} t_gl_env;t_gl_env57,1903
+static t_gl_env pdp_glx_env;59,1916
+static t_pdp_class *context_class;60,1945
+void pdp_packet_3Dcontext_set_rendering_context(65,2063
+void pdp_packet_3Dcontext_unset_rendering_context(99,3031
+static void _3Dcontext_clone(121,3561
+static void _3Dcontext_copy(126,3681
+static void _3Dcontext_reinit(131,3799
+static void _3Dcontext_cleanup(135,3878
+static void _3Dcontext_init_methods(162,4519
+void _pdp_3Dcontext_set_window_size(173,4687
+void pdp_packet_3Dcontext_win_resize(182,4931
+t_pdp_list *pdp_packet_3Dcontext_win_get_eventlist(194,5294
+void pdp_packet_3Dcontext_win_cursor(207,5704
+void pdp_packet_3Dcontext_win_swapbuffers(218,6005
+int pdp_packet_new_3Dcontext_win(234,6393
+int pdp_packet_new_3Dcontext_pbuf(279,7581
+void pdp_3Dcontext_prepare_for_thread_switch(289,7908
+static void pdp_3Dcontext_glx_setup_inthread(299,8071
+void pdp_3Dcontext_glx_setup(384,10779
+
+opengl/system/pdp_3dp_base.c,117
+#define THIS(THIS4,51
+void pdp_3dp_base_free(7,125
+void pdp_3dp_base_init(14,224
+void pdp_3dp_base_setup(25,442
+
+opengl/system/pdp_mesh.c,1293
+void vertex_add_triangle(34,1056
+void vertex_remove_triangle(38,1154
+void vertex_add_neighbour(42,1258
+void _vertex_free(51,1539
+t_vertex *_vertex_new(66,1864
+void vertex_compute_normal_random(78,2119
+void vertex_compute_normal_sphere(79,2199
+void vertex_compute_normal_prism(80,2279
+void vertex_compute_normal_average(99,2780
+float vertex_normalize(117,3128
+t_triangle *_triangle_new(129,3406
+void _triangle_free(160,4152
+t_triangle *triangle_neighbour(177,4506
+void triangle_add_median(189,4878
+void triangle_compute_normal(202,5191
+void triangle_compute_unit_normal(212,5415
+t_vertex *mesh_vertex_add(221,5607
+void mesh_vertex_remove(228,5762
+t_triangle *mesh_triangle_add(234,5881
+void mesh_triangle_remove(241,6071
+void mesh_calculate_normals(248,6221
+void mesh_split_four(270,7071
+#define GET_MEDIAN(GET_MEDIAN287,7435
+void mesh_split_three(315,8177
+void mesh_split_all_four(344,8822
+void mesh_split_all_three(360,9150
+void mesh_split_random_three(375,9480
+void mesh_free(385,9709
+t_mesh *_mesh_new(414,10263
+t_mesh *mesh_new_tetra(429,10564
+void _mesh_relax_compute_resultant_spring(459,11192
+void _mesh_relax_apply_force(487,11981
+void mesh_compute_center(500,12200
+void mesh_translate(516,12490
+void mesh_relax(528,12706
+void mesh_debug(544,13171
+
+opengl/system/pdp_opengl.c,244
+#define PDP_3DP_QUEUE_LOGSIZE 25,892
+#define PDP_3DP_QUEUE_DELTIME 26,925
+static t_pdp_procqueue _3dp_queue;31,1017
+static void pdp_control_thread(34,1054
+void pdp_opengl_system_setup(60,1796
+t_pdp_procqueue* pdp_opengl_get_queue(73,2229
+
+opengl/system/pdp_texture.c,1580
+static t_pdp_class *texture_class;33,1096
+static t_pdp_dpd_commandfactory _tex_cf;35,1132
+typedef struct _texture_command_texture_command37,1174
+} t_texture_command;t_texture_command42,1266
+static t_texture *_pdp_tex_info(54,1430
+static int _round_to_pow_2(61,1571
+t_pdp_symbol *_pdp_get_tex_description_from_params(67,1665
+t_pdp_symbol *_pdp_tex_get_description(86,2200
+static void texture_command_convert_bitmap_to_texture(106,2804
+int _pdp_packet_texture_convert_image_to_texture(131,3606
+int _pdp_packet_texture_convert_bitmap_to_texture(148,4057
+int _pdp_packet_texture_convert_texture_to_bitmap(204,5646
+t_texture *pdp_packet_texture_info(211,5836
+int pdp_packet_texture_isvalid(219,6106
+static void _tex_init_obj(229,6335
+static void _pdp_tex_init_methods(252,7024
+static void _pdp_tex_reinit(257,7106
+static void _pdp_tex_clone(261,7221
+static void _pdp_tex_copy(298,8259
+static void _pdp_tex_cleanup(313,8820
+static int _pdp_packet_texture_old_or_dummy(324,9147
+static void _pdp_packet_gentexture(381,10597
+int pdp_packet_new_texture(398,10960
+void pdp_packet_texture_make_current(414,11386
+void pdp_packet_texture_make_current_enable(421,11573
+float pdp_packet_texture_fracx(432,12041
+float pdp_packet_texture_fracy(439,12206
+u32 pdp_packet_texture_total_width(446,12373
+u32 pdp_packet_texture_total_height(453,12524
+u32 pdp_packet_texture_sub_width(461,12678
+u32 pdp_packet_texture_sub_height(468,12831
+float pdp_packet_texture_sub_aspect(475,12983
+void pdp_packet_texture_setup_2d_context(483,13209
+void pdp_texture_setup(508,13868
+
+opengl/system/setup.c,52
+#define D(D47,1258
+void pdp_opengl_setup(49,1274
