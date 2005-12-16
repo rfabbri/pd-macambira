@@ -45,6 +45,7 @@ struct _garray
 #include "m_pd.h"
 #include "m_fifo.h"
 #include "pthread.h"
+#include "semaphore.h"
 
 #endif /* USE_PD_MAIN */
 
@@ -89,7 +90,7 @@ t_array *h_garray_getarray(t_garray *x)
         return (0);
     }
     if (!template_find_field(_template, gensym("z"), 
-        &zonset, &ztype, &zarraytype))
+            &zonset, &ztype, &zarraytype))
     {
         error("array: template %s has no 'z' field", templatesym->s_name);
         return (0);
@@ -97,7 +98,7 @@ t_array *h_garray_getarray(t_garray *x)
     if (ztype != DT_ARRAY)
     {
         error("array: template %s, 'z' field is not an array",
-               templatesym->s_name);
+            templatesym->s_name);
         return (0);
     }
     return (sc->sc_vec[zonset].w_array);
@@ -128,9 +129,7 @@ typedef struct _sfprocess
 typedef struct _sfqueue
 {
     t_fifo* x_jobs;
-
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
+    sem_t sem;
 } t_sfqueue;
 
 typedef struct _syncdata
@@ -158,8 +157,8 @@ static void sndfiler_thread(void)
     while (1)
     {
         t_sfprocess * me;
-        pthread_cond_wait(&sndfiler_queue.cond, &sndfiler_queue.mutex);
-
+        sem_wait(&sndfiler_queue.sem);
+        
         while (me = (t_sfprocess *)fifo_get(sndfiler_queue.x_jobs))
         {
             (me->process)(me->x, me->argc, me->argv);
@@ -179,9 +178,8 @@ static void sndfiler_start_thread(void)
 
     //initialize queue
     sndfiler_queue.x_jobs = fifo_init();
-    pthread_mutex_init (&sndfiler_queue.mutex,NULL);
-    pthread_cond_init (&sndfiler_queue.cond,NULL);
-
+    sem_init (&sndfiler_queue.sem,0,0);
+    
     // initialize thread
     pthread_attr_init(&sf_attr);
     
@@ -198,13 +196,13 @@ static void sndfiler_start_thread(void)
 
     //start thread
     status = pthread_create(&sf_thread_id, &sf_attr, 
-	(void *) sndfiler_thread,NULL);
+        (void *) sndfiler_thread,NULL);
   
     if (status != 0)
         error("Couldn't create sndfiler thread: %d",status);
     else
         post("Global sndfiler thread launched, priority: %d", 
-	      sf_param.sched_priority);
+            sf_param.sched_priority);
 }
 
 static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv);
@@ -226,7 +224,7 @@ static void sndfiler_read(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    pthread_cond_signal(&sndfiler_queue.cond);
+    sem_post(&sndfiler_queue.sem);
 }
 
 static t_int sndfiler_synchonize(t_int * w);
@@ -247,22 +245,22 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
     
     // parse flags
     while (argc > 0 && argv->a_type == A_SYMBOL &&
-	   *argv->a_w.w_symbol->s_name == '-')
+        *argv->a_w.w_symbol->s_name == '-')
     {
         char *flag = argv->a_w.w_symbol->s_name + 1;
-	if (!strcmp(flag, "resize"))
-	{
-	    resize = 1;
-	    argc -= 1; argv += 1;
-	}
-	else if (!strcmp(flag, "skip"))
-	{
-	  if (argc < 2 || argv[1].a_type != A_FLOAT ||
-		     ((seek = argv[1].a_w.w_float) == 0))
-	    goto usage;
-	  argc -= 2; argv += 2;
-	}
-	else goto usage;
+        if (!strcmp(flag, "resize"))
+        {
+            resize = 1;
+            argc -= 1; argv += 1;
+        }
+        else if (!strcmp(flag, "skip"))
+        {
+            if (argc < 2 || argv[1].a_type != A_FLOAT ||
+                ((seek = argv[1].a_w.w_float) == 0))
+                goto usage;
+            argc -= 2; argv += 2;
+        }
+        else goto usage;
     }
     
     if (argc < 2)
@@ -277,32 +275,32 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
     for (i = 0; i != channel_count; ++i)
     {
         t_float *dummy;
-	int size;
+        int size;
         t_garray *array;
          
         if(!(array = (t_garray *)pd_findbyclass(
-           atom_getsymbolarg(i+1, argc, argv), garray_class)))
-	{
-	    pd_error(x, "%s: no such array", atom_getsymbolarg(i+1, 
-		   argc, argv)->s_name);
-	    return;
-	}
+                                                atom_getsymbolarg(i+1, argc, argv), garray_class)))
+        {
+            pd_error(x, "%s: no such array", atom_getsymbolarg(i+1, 
+                         argc, argv)->s_name);
+            return;
+        }
 	
-	if(garray_getfloatarray(array, &size, &dummy))
-	    arrays[i] = array;
-	else
-	{
-	    pd_error(x, "%s: bad template for sndfiler", atom_getsymbolarg(i+1, 
-		   argc, argv)->s_name);
-	    return;
-	}
+        if(garray_getfloatarray(array, &size, &dummy))
+            arrays[i] = array;
+        else
+        {
+            pd_error(x, "%s: bad template for sndfiler", atom_getsymbolarg(i+1, 
+                         argc, argv)->s_name);
+            return;
+        }
 	
-	// in multichannel mode: check if arrays have different length
-	if (arraysize && arraysize != size && !resize)
-	{
-	  post("sndfiler: arrays have different lengths, resizing to last one ...");
-	}
-	arraysize = size;
+        // in multichannel mode: check if arrays have different length
+        if (arraysize && arraysize != size && !resize)
+        {
+            post("sndfiler: arrays have different lengths, resizing to last one ...");
+        }
+        arraysize = size;
     }
   
     sndfile = sf_open(file->s_name, SFM_READ, &info);
@@ -311,35 +309,35 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
     {
         int pos = 0;
         int maxchannels = (channel_count < info.channels) ?
-                           channel_count : info.channels;
+            channel_count : info.channels;
 
         t_float * item = alloca(maxchannels * sizeof(t_float));
     
         t_int ** syncdata = getbytes(sizeof(t_int*) * 5);
 	
-	// negative seek: offset from the end of the file
-	if(seek<0)
-	{
-	    pos = sf_seek(sndfile, seek, SEEK_END);
-	}
-	if(seek>0)
-	{
-	    pos = sf_seek(sndfile, seek, SEEK_SET);
-	}
-	if(pos == -1)
-	{
-	    pd_error(x, "invalid seek in soundfile");
-	    return;
-	}
+        // negative seek: offset from the end of the file
+        if(seek<0)
+        {
+            pos = sf_seek(sndfile, seek, SEEK_END);
+        }
+        if(seek>0)
+        {
+            pos = sf_seek(sndfile, seek, SEEK_SET);
+        }
+        if(pos == -1)
+        {
+            pd_error(x, "invalid seek in soundfile");
+            return;
+        }
 	
-	if(resize)
-	{
-	    writesize = (info.frames-pos);
-	    arraysize = writesize;
-	}
-	else
-	    writesize = (arraysize>(info.frames-pos)) ? 
-	      info.frames-pos : arraysize;
+        if(resize)
+        {
+            writesize = (info.frames-pos);
+            arraysize = writesize;
+        }
+        else
+            writesize = (arraysize>(info.frames-pos)) ? 
+                info.frames-pos : arraysize;
 
 #if (_POSIX_MEMLOCK - 0) >=  200112L
         munlockall();
@@ -363,20 +361,20 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
             }
         }
 	
-	// fill remaining elements with zero
-	if(!resize && (arraysize>(info.frames-pos)))
-	{
-	    for (i = writesize; i != arraysize; ++i)
-	    {
-	        for (j = 0; j != info.channels; ++j)
-	        {
-	            if (j < channel_count)
-	            {
-		        helper_arrays[j][i] = 0;
-	            }
-	        }
-	    }
-	}
+        // fill remaining elements with zero
+        if(!resize && (arraysize>(info.frames-pos)))
+        {
+            for (i = writesize; i != arraysize; ++i)
+            {
+                for (j = 0; j != info.channels; ++j)
+                {
+                    if (j < channel_count)
+                    {
+                        helper_arrays[j][i] = 0;
+                    }
+                }
+            }
+        }
 
 #if (_POSIX_MEMLOCK - 0) >=  200112L
         mlockall(MCL_FUTURE);
@@ -391,17 +389,17 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
         syncdata[4] = (t_int*)x;
 
         sys_callback(sndfiler_synchonize, (t_int*)syncdata, 5);
-	return;
+        return;
     }
     else
     {
         pd_error(x, "Error opening file");
-	return;
+        return;
     }
     
-    usage:
+ usage:
 	pd_error(x, "usage: read [flags] filename array1 array2 ...");
-        post("flags: -skip <n> -resize ");
+    post("flags: -skip <n> -resize ");
 }
 
 static t_int sndfiler_synchonize(t_int * w)
@@ -426,7 +424,7 @@ static t_int sndfiler_synchonize(t_int * w)
         if (gl->gl_list == &garray->x_gobj && !garray->x_gobj.g_next)
         {
             vmess(&gl->gl_pd, gensym("bounds"), "ffff", 0., gl->gl_y1,
-                  (double)(frames > 1 ? frames-1 : 1), gl->gl_y2);
+                (double)(frames > 1 ? frames-1 : 1), gl->gl_y2);
 
             /* close any dialogs that might have the wrong info now... */
             gfxstub_deleteforkey(gl);
@@ -461,7 +459,7 @@ static void sndfiler_resize(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    pthread_cond_signal(&sndfiler_queue.cond);
+    sem_post(&sndfiler_queue.sem);
 }
 
 static void sndfiler_t_resize(t_sndfiler *y, int argc, t_atom *argv)
@@ -561,20 +559,20 @@ static void sndfiler_t_resize(t_sndfiler *y, int argc, t_atom *argv)
   
     return;
   
-    usage:
-        pd_error(x, "usage: resize tablename size");
+ usage:
+    pd_error(x, "usage: resize tablename size");
 }
 
 void sndfiler_setup(void)
 {
     sndfiler_class = class_new(gensym("sndfiler"), 
-                        (t_newmethod)sndfiler_new, 0,
-                        sizeof(t_sndfiler), 0, 0);
+        (t_newmethod)sndfiler_new, 0,
+        sizeof(t_sndfiler), 0, 0);
 
     class_addmethod(sndfiler_class, (t_method)sndfiler_read,
-                    gensym("read"), A_GIMME, 0);
+        gensym("read"), A_GIMME, 0);
     class_addmethod(sndfiler_class, (t_method)sndfiler_resize,
-                    gensym("resize"), A_GIMME, 0);
+        gensym("resize"), A_GIMME, 0);
 
 #ifdef USE_PD_MAIN
     // needed to start thread callback system
