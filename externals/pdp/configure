@@ -2641,8 +2641,8 @@ else
 fi;
 
 
-
-PDP_CFLAGS="-DPD -Wall -W -Wstrict-prototypes -Wno-unused -Wno-parentheses -Wno-switch"
+PWD=`pwd`
+PDP_CFLAGS="-DPD -Wall -W -Wstrict-prototypes -Wno-unused -Wno-parentheses -Wno-switch -I$(PWD)/../../pd/src"
 
 
 
@@ -2680,7 +2680,6 @@ _ACEOF
 fi
 
 
-PWD=`pwd`
 if test -f $prefix/pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$prefix/pd/src"
@@ -2688,6 +2687,9 @@ then
 elif test -f $prefix/src/pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$prefix/src/pd/src"
+elif test -f $PWD/../../pd/src/m_pd.h;
+then
+	PD_CPPFLAGS="-I$PWD/../../pd/src"
 elif test -f $PWD/../pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$PWD/../pd/src"
@@ -2988,7 +2990,7 @@ fi
 
 if test $ARCH == Darwin
 then
-	PD_EXECUTABLE=$prefix/bin/pd
+	PD_EXECUTABLE=$PWD/../../pd/bin/pd
 	LIBS="$LIBS -L/sw/lib"
 	CPPFLAGS="$CPPFLAGS -I/sw/include"
 	PDP_EXTRA_CPPFLAGS="-I/sw/include"
@@ -3627,9 +3629,9 @@ fi
 
 if test $enable_sdl == yes
 then
-	echo "$as_me:$LINENO: checking for SDL_Init in -lSDL" >&5
-echo $ECHO_N "checking for SDL_Init in -lSDL... $ECHO_C" >&6
-if test "${ac_cv_lib_SDL_SDL_Init+set}" = set; then
+	echo "$as_me:$LINENO: checking for SDL_GL_GetAttribute in -lSDL" >&5
+echo $ECHO_N "checking for SDL_GL_GetAttribute in -lSDL... $ECHO_C" >&6
+if test "${ac_cv_lib_SDL_SDL_GL_GetAttribute+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -3648,11 +3650,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char SDL_Init ();
+char SDL_GL_GetAttribute ();
 int
 main ()
 {
-SDL_Init ();
+SDL_GL_GetAttribute ();
   ;
   return 0;
 }
@@ -3669,19 +3671,19 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_SDL_SDL_Init=yes
+  ac_cv_lib_SDL_SDL_GL_GetAttribute=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_SDL_SDL_Init=no
+ac_cv_lib_SDL_SDL_GL_GetAttribute=no
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_SDL_SDL_Init" >&5
-echo "${ECHO_T}$ac_cv_lib_SDL_SDL_Init" >&6
-if test $ac_cv_lib_SDL_SDL_Init = yes; then
+echo "$as_me:$LINENO: result: $ac_cv_lib_SDL_SDL_GL_GetAttribute" >&5
+echo "${ECHO_T}$ac_cv_lib_SDL_SDL_GL_GetAttribute" >&6
+if test $ac_cv_lib_SDL_SDL_GL_GetAttribute = yes; then
   PDP_OPTMOD="$PDP_OPTMOD pdp_sdl.o"
 		LIBS="$LIBS -lSDL"
 

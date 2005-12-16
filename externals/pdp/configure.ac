@@ -42,8 +42,8 @@ AC_ARG_ENABLE(debug,
 	[  --enable-debug          enable debugging support (no)], , enable_debug=no)
 
 
-
-PDP_CFLAGS="-DPD -Wall -W -Wstrict-prototypes -Wno-unused -Wno-parentheses -Wno-switch"
+PWD=`pwd`
+PDP_CFLAGS="-DPD -Wall -W -Wstrict-prototypes -Wno-unused -Wno-parentheses -Wno-switch -I$(PWD)/../../pd/src"
 dnl -Werror -Wshadow
 
 
@@ -75,7 +75,6 @@ fi
 dnl try to locate the pd header in case the setup is nonstandard
 dnl check in  $prefix/pd/src then ../pd/src 
 dnl if this fails we trust it is in the standard include path
-PWD=`pwd`
 if test -f $prefix/pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$prefix/pd/src"
@@ -83,6 +82,9 @@ then
 elif test -f $prefix/src/pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$prefix/src/pd/src"
+elif test -f $PWD/../../pd/src/m_pd.h;
+then
+	PD_CPPFLAGS="-I$PWD/../../pd/src"
 elif test -f $PWD/../pd/src/m_pd.h;
 then
 	PD_CPPFLAGS="-I$PWD/../pd/src"
@@ -125,7 +127,7 @@ dnl Darwin specific stuff: this is still pretty experimental
 dnl How to test if frameworks are present ????
 if test $ARCH == Darwin
 then
-	PD_EXECUTABLE=$prefix/bin/pd
+	PD_EXECUTABLE=$PWD/../../pd/bin/pd
 	LIBS="$LIBS -L/sw/lib"
 	CPPFLAGS="$CPPFLAGS -I/sw/include"
 	PDP_EXTRA_CPPFLAGS="-I/sw/include"
