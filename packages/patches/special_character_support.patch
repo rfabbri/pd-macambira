@@ -1,0 +1,18 @@
+Index: g_rtext.c
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/g_rtext.c,v
+retrieving revision 1.4
+diff -u -w -r1.4 g_rtext.c
+--- g_rtext.c	6 Sep 2004 20:20:34 -0000	1.4
++++ g_rtext.c	14 Dec 2005 03:59:31 -0000
+@@ -432,7 +432,9 @@
+         x->x_buf = resizebytes(x->x_buf, x->x_bufsize, newsize);
+         x->x_bufsize = newsize;
+ 
+-        if (n == '\n' || isprint(n))
++/* at guenter's suggestion, this gets european characters working */
++/*         if (n == '\n' || isprint(n)) */
++        if (n == '\n' || n > 31)
+         {
+             newsize = x->x_bufsize+1;
+             x->x_buf = resizebytes(x->x_buf, x->x_bufsize, newsize);

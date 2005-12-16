@@ -86,6 +86,8 @@ ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 
 
 
+OPT_FLAGS = -O6 -funroll-loops -fomit-frame-pointer
+
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
@@ -93,6 +95,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				DESTDIR=$(DESTDIR) \
 				prefix=$(prefix) \
 				libpddir=$(libpddir) \
+				OPT_CFLAGS="$(OPT_CFLAGS)" \
 				UNAME=$(UNAME)
 
 
@@ -150,8 +153,15 @@ PD_BUILD_FLAGS =
 #PD_AUTOCONF := ${shell ( test -x "`which autoconf-2.59`" && echo autoconf-2.59 ) || echo autoconf }
 PD_AUTOCONF = autoconf
 
-pd:
-	-cd $(pd_src)/src/ && $(PD_AUTOCONF)
+$(pd_src)/src/configure: $(pd_src)/src/configure.in
+	cd $(pd_src)/src/ && $(PD_AUTOCONF)
+
+# this is not used yet because MinGW doesn't use ./configure && make yet
+#$(pd_src)/src/makefile: $(pd_src)/src/makefile.in
+#	cd $(pd_src)/src/ && ./configure $(PD_CONFIGURE_FLAGS)
+
+pd: $(pd_src)/src/configure
+	echo $$MACOSX_DEPLOYMENT_TARGET
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
@@ -670,18 +680,24 @@ externals_clean:
 
 
 flext_clean:
+	-cd $(externals_src)/footils/syncgrain && make -f makefile.pd-darwin clean
+	-cd $(externals_src)/grill && \
+		rm -- flext/buildsys/config-mac-pd-gcc.txt config.txt flext/config.txt \
+			flext/source/libflext.a */pd-darwin/*.o */pd-darwin/*/*.o \
+		 	*/pd-darwin/*/*.pd_darwin */pd-darwin/*.pd_darwin \
+			*/pd-darwin/release-shared/*.dylib */pd-darwin/release-shared/*.opp
 
 
 gem_clean:
 
 
 pd_clean:
-	-cd $(pd_src) && make $(DEST_PATHS) clean
+	-cd $(pd_src)/src && make $(DEST_PATHS) clean
 
 
 # these targets are all from Makefile.buildlayout: install_clean cruft_clean
-clean: abstractions_clean doc_clean externals_clean flext_clean 
-clean: gem_clean pd_clean 
+clean: abstractions_clean doc_clean externals_clean flext_clean gem_clean \
+pd_clean 
 	echo "Complete clean finished."
 
 
@@ -690,7 +706,7 @@ distclean: clean cruft_clean
 	cd $(doc_src) && make distclean
 	cd $(extensions_src) && make distclean
 	cd $(externals_src) && make distclean
-	cd $(pd_src) && make distclean
+	-cd $(pd_src) && make distclean
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"

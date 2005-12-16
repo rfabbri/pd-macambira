@@ -2,7 +2,7 @@
 current: darwin_app
 
 # needed to support weak linking of frameworks
-MAKE=MACOSX_DEPLOYMENT_TARGET=10.3 make
+MAKE = MACOSX_DEPLOYMENT_TARGET=10.3 make
 
 CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
@@ -25,26 +25,58 @@ WISH_CONTENTS = $(WISH)/Contents
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
+# base level optimizations
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
+
+# CPU-specific gleaned from http://developer.apple.com/releasenotes/DeveloperTools/GCC3.html
+# check this too: http://hpc.sourceforge.net/
+# Generic PowerPC
+#OPT_CFLAGS += -mcpu=powerpc -mpowerpc
+# PowerPC 750 (G3)
+#OPT_CFLAGS += -mcpu=750 -mpowerpc-gfxopt
+# PowerPC 7400 (G4 <= 700Mhz) 
+#OPT_CFLAGS += -mcpu=7400 -faltivec -mpowerpc-gfxopt
+# PowerPC 7450 (G4 >= 533MHz) 
+#OPT_CFLAGS += -fast -fPIC -mcpu=7450 -mtune=7450 -faltivec -ffast-math -mpowerpc-gfxopt
+# PowerPC G5 (gcc-3.3)
+#OPT_CFLAGS += -fast -fPIC -faltivec -mpowerpc-gpopt -mpowerpc-gfxopt
+
+# Package default, support older PowerPCs, but G4 (7450) is the most common
+OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
+
+
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				cvs_root_dir=$(cvs_root_dir) \
 				prefix=$(prefix) \
 				DESTDIR=$(DESTDIR) \
+				OPT_CFLAGS="$(OPT_CFLAGS)" \
 				UNAME=$(UNAME)
+
+all:
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS)
 
 install: darwin_app
 
 #------------------------------------------------------------------------------#
-darwin_app: darwin_app_core extended_app_install darwin_app_doc_format rez_install
+darwin_app: darwin_app_core extended_install darwin_app_doc_format rez_install \
+darwin_app_embed_libs
 	@echo " "
 	@echo "Pd.app build succeeded!"
+
+extended_install:
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------#
 # this target is for when you already have a pre-built Pd.app and you
 # just want to fill it with goodies from CVS.  To do so, place your 
 # Pd.app in $(BUILD_BASE)/Pd.app
-extended_app_install:  extended_install
+extended_app_install:
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) abstractions_install
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) doc_install
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) extensions_install
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) externals_install
 
 
 #------------------------------------------------------------------------------#
@@ -60,7 +92,7 @@ darwin_app_wrapper: Info.plist
 		"$(PD_APP_CONTENTS)/MacOS"
 	install -d "$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p \
-		$(WISH_CONTENTS)/Resources/Wish\ Shell.rsrc \
+		$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc \
 		"$(PD_APP_CONTENTS)/Resources"
 	install -d "$(PD_APP_CONTENTS)/Frameworks"
 	cp -Rp $(WISH_CONTENTS)/Frameworks "$(PD_APP_CONTENTS)"
@@ -87,11 +119,14 @@ rez_install:
 	cd $(bindir) && /Developer/tools/Rez -t APPL mac.r -o pd
 
 
+darwin_app_embed_libs:
+	./embed-MacOSX-dependencies.sh $(PD_APP_CONTENTS)
+
+
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
-	export MACOSX_DEPLOYMENT_TARGET=10.3
 	cd $(packages_src) && \
-		make $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
+		$(MAKE) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
@@ -116,9 +151,6 @@ darwin_app_doc_format:
 ## CVS SOURCES
 #
 #==============================================================================#
-
-extended_install:
-	cd $(packages_src) && make $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------#
@@ -147,40 +179,43 @@ package: dmg
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
-	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 	install -p -m0444 $(manualsdir)/Pd/Pd-LICENSE.txt \
 		$(manualsdir)/Pd/License.html \
 		$(manualsdir)/Pd/Welcome.html \
 		$(manualsdir)/Pd/ReadMe.html \
 		"$(CWD)/$(DMG_NAME)"
+	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 
-clean: darwin_app_clean	darwin_app_externals_flext_clean \
-	cd $(packages_src) && make clean
+
+distclean: clean
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) distclean
+
+
+clean: darwin_app_clean
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
 	-rm Info.plist
 
 
 darwin_app_clean:
-	-sudo rm -Rf -- $(PD_APP_CONTENTS)/Frameworks
+	-chmod -R u+w $(PD_APP_CONTENTS)/Frameworks
+	-rm -rf -- $(PD_APP_CONTENTS)/Frameworks
 	-rm -f -- $(PD_APP_CONTENTS)/Plugins $(PD_APP_CONTENTS)/Info.plist
 	-rm -f -- $(PD_APP_CONTENTS)/MacOS/Pd
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
 	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
 	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
+	-rm -f -- $(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc \
+		$(WISH_CONTENTS)/Resources/pd*.icns
+	-rmdir $(PD_APP_CONTENTS)/Resources
 	-rm -f -- $(DESTDIR)
 	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
 
 
-darwin_app_externals_flext_clean:
-	cd $(externals_src)/footils/syncgrain && make -f makefile.pd-darwin clean
-	-cd $(externals_src)/grill && \
-		rm -- flext/buildsys/config-mac-pd-gcc.txt config.txt flext/config.txt \
-			flext/source/libflext.a */pd-darwin/*.o */pd-darwin/*/*.o \
-		 	*/pd-darwin/*/*.pd_darwin */pd-darwin/*.pd_darwin \
-			*/pd-darwin/release-shared/*.dylib */pd-darwin/release-shared/*.opp
+
 
 
 
@@ -210,79 +245,84 @@ test_locations:
 #
 #==============================================================================#
 
+darwin_app_externals_flext_clean:
+	@echo " "
+	@echo "Deprecated!!" 
+	@echo "cd $(packages_src) && $(MAKE) flext_clean"
+
 
 darwin_app_externals_flext:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make flext_install"
-	cd $(packages_src) && make $(DEST_PATHS) flext_install
+	@echo "cd $(packages_src) && $(MAKE) flext_install"
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) flext_install
 
 
 darwin_app_noncvs:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make noncvs_install"
-	cd $(packages_src) && make $(DEST_PATHS) noncvs_install
+	@echo "cd $(packages_src) && $(MAKE) noncvs_install"
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) noncvs_install
 
 darwin_app_externals_gem_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make gem_clean"
+	@echo "cd $(packages_src) && $(MAKE) gem_clean"
 
 darwin_app_externals_gem:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make gem_install"
+	@echo "cd $(packages_src) && $(MAKE) gem_install"
 
 darwin_app_externals_standard_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make externals_clean"
+	@echo "cd $(packages_src) && $(MAKE) externals_clean"
 
 darwin_pd_clean:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && make pd_clean"
+	@echo "cd $(packages_src) && $(MAKE) pd_clean"
 
 darwin_app_externals:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(externals_src) && make install"
+	@echo "cd $(externals_src) && $(MAKE) install"
 
 darwin_app_externals_standard:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(externals_src) && make install"
+	@echo "cd $(externals_src) && $(MAKE) install"
 
 darwin_patch_pd:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd .. && make patch_pd"
+	@echo "cd .. && $(MAKE) patch_pd"
 
 darwin_unpatch_pd:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd .. && make unpatch_pd"
+	@echo "cd .. && $(MAKE) unpatch_pd"
 
 darwin_app_docs:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd $(doc_src) && make install"
+	@echo "cd $(doc_src) && $(MAKE) install"
 
 darwin_app_license:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd .. && make license"
+	@echo "cd .. && $(MAKE) license"
 
 darwin_app_welcome:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd .. && make welcome"
+	@echo "cd .. && $(MAKE) welcome"
 
 darwin_app_readme:
 	@echo " "
 	@echo "Deprecated!!" 
-	@echo "cd .. && make readme"
+	@echo "cd .. && $(MAKE) readme"
 
 darwin_prebuilt_app:
 	@echo " "

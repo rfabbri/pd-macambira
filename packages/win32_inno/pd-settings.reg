@@ -1,8 +1,8 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
-"path1"="c:/progra~1/pd/extra/creb"
-"path2"="c:/progra~1/pd/extra/cyclone"
+"path1"="c:/progra~1/pd/extra/cyclone"
+"path2"="c:/progra~1/pd/extra/zexy"
 "path3"="c:/progra~1/pd/extra/iemabs"
 "path4"="c:/progra~1/pd/extra/iemmatrix"
 "path5"="c:/progra~1/pd/extra/ix"
@@ -15,7 +15,8 @@ Windows Registry Editor Version 5.00
 "path12"="c:/progra~1/pd/extra/smlib"
 "path13"="c:/progra~1/pd/extra/toxy"
 "path14"="c:/progra~1/pd/extra/unauthorized"
-"path15"="c:/progra~1/pd/extra/zexy"
+"path15"="c:/progra~1/pd/extra/creb"
+"path16"="c:/progra~1/pd/extra/maxlib"
 "loadlib1"="dyn~"
 "loadlib2"="gem"
 "loadlib3"="gripd"
