@@ -5,7 +5,7 @@
 #X obj 146 113 volctl~ 0 100;
 #X obj 35 132 outlet~;
 #X obj 146 132 outlet~;
-#X text 40 182 $Id: pan~.pd 196 2005-11-20 01:40:43Z tim $;
+#X text 40 182 (c) Tim Blechmann 2005 \, $Id: pan~.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 315 33 init \$2;
 #X obj 315 55 moses 0;
 #X text 311 126 \$1: pan;

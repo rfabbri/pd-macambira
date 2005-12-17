@@ -40,7 +40,7 @@
 #X obj 35 342 volctl~ 1 \$2;
 #X text 521 102 \$2: interpolation time;
 #X obj 586 273 + 10;
-#X text 36 426 $Id$;
+#X text 36 426 (c) Tim Blechmann 2005 \, $Id: xfade.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 500 347 pre_switch 20;
 #X connect 0 0 21 0;
 #X connect 1 0 20 0;

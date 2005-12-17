@@ -16,7 +16,7 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 #
-# $Id: find_hid.py,v 1.2 2005-12-09 12:50:06 timblech Exp $
+# $Id: find_hid.py,v 1.3 2005-12-17 17:52:01 timblech Exp $
 #
 
 from os import popen, listdir

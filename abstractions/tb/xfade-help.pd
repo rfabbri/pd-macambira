@@ -22,7 +22,7 @@
 #X restore 98 48 pd sig2;
 #X obj 62 144 dacer~;
 #X floatatom 150 76 5 0 0 0 - - -;
-#X text 69 212 $Id: xfade-help.pd 189 2005-11-20 00:27:13Z tim $;
+#X text 69 212 (c) Tim Blechmann 2005 \, $Id: xfade-help.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 348 118 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
 #X obj 375 118 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0

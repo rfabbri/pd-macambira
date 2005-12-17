@@ -14,7 +14,7 @@
 #X obj 227 214 prepend rampdown;
 #X obj 72 262 edge~;
 #X obj 102 282 0;
-#X text 21 407 $Id: bpe_rampsmooth.pd 195 2005-11-20 01:25:43Z tim
+#X text 21 407 (c) Tim Blechmann 2005 \, $Id: bpe_rampsmooth.pd 195 2005-11-20 01:25:43Z tim
 $;
 #X obj 269 243 sel 1;
 #X obj 269 264 1;

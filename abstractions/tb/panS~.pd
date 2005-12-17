@@ -8,7 +8,7 @@
 #X obj 132 150 outlet~;
 #X text 365 190 \$1: pan;
 #X text 365 210 \$2: ramp;
-#X text 33 249 $Id: panS~.pd 196 2005-11-20 01:40:43Z tim $;
+#X text 33 249 (c) Tim Blechmann 2005 \, $Id: panS~.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 391 43 init \$2;
 #X obj 391 65 moses 0;
 #X obj 196 64 _pan~math \$1;

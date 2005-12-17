@@ -12,7 +12,7 @@
 #X obj 197 38 inlet delay;
 #X obj 197 59 moses 0;
 #X obj 197 79 assert;
-#X text 35 265 $Id: pre_switch.pd 188 2005-11-20 00:26:53Z tim $;
+#X text 35 265 (c) Tim Blechmann 2005 \, $Id: pre_switch.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 3 0;
 #X connect 0 1 2 0;
 #X connect 1 0 7 0;

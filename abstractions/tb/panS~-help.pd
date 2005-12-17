@@ -8,7 +8,7 @@
 #X obj 179 177 dacer~;
 #X floatatom 83 63 5 0 0 0 - - -;
 #X floatatom 222 57 5 0 0 0 - - -;
-#X text 36 233 $Id: panS~-help.pd 188 2005-11-20 00:26:53Z tim $;
+#X text 36 233 (c) Tim Blechmann 2005 \, $Id: panS~-help.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 1 0 3 0;
 #X connect 2 0 3 1;
 #X connect 3 0 0 0;

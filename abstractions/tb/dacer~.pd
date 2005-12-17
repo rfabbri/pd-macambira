@@ -8,7 +8,7 @@
 #X obj 4 110 hip~ 5;
 #X obj 109 110 hip~ 5;
 #X obj 47 67 dbtorms;
-#X text 11 217 $Id: dacer~.pd 194 2005-11-20 01:17:05Z tim $;
+#X text 11 217 (c) Tim Blechmann 2005 \, $Id: dacer~.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 6 0;
 #X connect 1 0 7 0;
 #X connect 2 0 4 0;

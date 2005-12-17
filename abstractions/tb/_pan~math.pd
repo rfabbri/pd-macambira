@@ -24,7 +24,7 @@
 #X obj 96 253 v \$0-sin;
 #X obj 77 380 v \$0-sin;
 #X obj 47 397 -;
-#X text 43 503 $Id: _pan~math.pd 196 2005-11-20 01:40:43Z tim $;
+#X text 43 503 (c) Tim Blechmann 2005 \, $Id: _pan~math.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 271 55 \$1;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;

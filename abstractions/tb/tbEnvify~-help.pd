@@ -10,7 +10,7 @@
 #X obj 20 272 osc~ 440;
 #X msg 204 109 1000 bpe-smooth 0 0 1 1 0.2 1 0 1 2000 8000;
 #X msg 214 133 1000 bpe-slide 0 0 1 1 0.2 1 0 1 4000 8000;
-#X text 344 36 $Id$;
+#X text 344 36 (c) Tim Blechmann 2005 \, $Id: tbEnvify~-help.pd 221 2005-12-17 18:31:17Z tim $;
 #X text 344 17 a simple envelope generator;
 #X obj 99 351 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;

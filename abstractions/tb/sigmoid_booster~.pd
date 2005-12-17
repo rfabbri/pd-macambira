@@ -17,7 +17,7 @@
 except that it's using pd's db scaling instead of tap's;
 #X obj 26 181 sig~ 2;
 #X obj 26 203 /~;
-#X text 28 287 $Id: sigmoid_booster~.pd 194 2005-11-20 01:17:05Z tim $;
+#X text 28 287 (c) Tim Blechmann 2005 \, $Id: sigmoid_booster~.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 10 1;
 #X connect 1 0 0 0;
 #X connect 2 0 10 0;

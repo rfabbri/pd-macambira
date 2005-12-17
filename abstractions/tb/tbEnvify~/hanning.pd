@@ -20,7 +20,7 @@
 #X obj 19 11 inlet~;
 #X obj 19 399 outlet~;
 #X obj 55 268 _env_lookup~ 0.5;
-#X text 21 433 $Id: hanning.pd 211 2005-12-10 21:10:37Z tim $;
+#X text 21 433 (c) Tim Blechmann 2005 \, $Id: hanning.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 323 379 switch~;
 #X obj 323 314 t f f;
 #X obj 353 335 sel 0;

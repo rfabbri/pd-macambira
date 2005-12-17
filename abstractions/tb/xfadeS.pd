@@ -48,7 +48,7 @@
 #X obj 237 342 volctl~ 0 \$2;
 #X text 238 6 100;
 #X obj 756 283 + 10;
-#X text 45 447 $Id$;
+#X text 45 447 (c) Tim Blechmann 2005 \, $Id: xfadeS.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 22 0;
 #X connect 1 0 21 0;
 #X connect 6 0 10 0;

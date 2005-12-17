@@ -13,7 +13,7 @@
 #X obj 45 246 pack \$1 f;
 #X obj 45 299 outlet~;
 #X text 101 300 outlet function;
-#X text 47 329 $Id: _env_lookup~.pd 195 2005-11-20 01:25:43Z tim $;
+#X text 47 329 (c) Tim Blechmann 2005 \, $Id: _env_lookup~.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 3 0;
 #X connect 1 0 2 1;
 #X connect 2 0 6 0;

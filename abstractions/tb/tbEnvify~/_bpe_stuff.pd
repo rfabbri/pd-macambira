@@ -14,7 +14,7 @@
 #X obj 55 286 outlet factor;
 #X obj 77 309 outlet time;
 #X obj 55 80 py bpe parse_arguments @detach 0;
-#X text 47 460 $Id: _bpe_stuff.pd 195 2005-11-20 01:25:43Z tim $;
+#X text 47 460 (c) Tim Blechmann 2005 \, $Id: _bpe_stuff.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 0 0 10 0;
 #X connect 1 0 6 0;
 #X connect 2 0 3 0;

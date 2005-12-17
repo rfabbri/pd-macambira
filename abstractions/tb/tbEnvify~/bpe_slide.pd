@@ -16,7 +16,7 @@
 #X obj 121 261 edge~;
 #X obj 37 231 slide~;
 #X obj 151 281 0;
-#X text 21 417 $Id: bpe_slide.pd 211 2005-12-10 21:10:37Z tim $;
+#X text 21 417 (c) Tim Blechmann 2005 \, $Id: bpe_slide.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 269 298 pre_switch 10;
 #X obj 269 383 switch~;
 #X obj 269 318 t f f;

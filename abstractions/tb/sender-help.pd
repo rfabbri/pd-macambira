@@ -4,7 +4,7 @@
 #X floatatom 154 39 5 0 0 0 - - -;
 #X msg 29 15 sendname 1;
 #X msg 29 41 sendname 2;
-#X text 23 92 $Id: sender-help.pd 212 2005-12-10 21:49:22Z tim $;
+#X text 23 92 (c) Tim Blechmann 2005 \, $Id: sender-help.pd 221 2005-12-17 18:31:17Z tim $;
 #X connect 1 0 2 0;
 #X connect 3 0 0 0;
 #X connect 4 0 0 0;

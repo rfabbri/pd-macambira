@@ -1,4 +1,4 @@
-# $Id: bpe.py,v 1.1 2005-11-20 00:31:44 timblech Exp $
+# $Id: bpe.py,v 1.2 2005-12-17 17:52:01 timblech Exp $
 #
 # Copyright (C) 2005  Tim Blechmann
 # 

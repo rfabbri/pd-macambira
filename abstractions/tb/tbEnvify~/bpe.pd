@@ -5,7 +5,7 @@
 #X obj 13 26 outlet~;
 #X text 298 -40 duration [bp time] * n;
 #X obj 198 -12 _bpe_stuff;
-#X text 17 99 $Id: bpe.pd 211 2005-12-10 21:10:37Z tim $;
+#X text 17 99 (c) Tim Blechmann 2005 \, $Id: bpe.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 263 75 switch~;
 #X obj 263 10 t f f;
 #X obj 293 31 sel 0;

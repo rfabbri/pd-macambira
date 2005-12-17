@@ -76,7 +76,7 @@
 #X connect 14 0 6 0;
 #X restore 28 45 pd envelopes;
 #X obj 142 17 inlet duration_type_volume_(arguments);
-#X text 31 105 $Id$;
+#X text 31 105 (c) Tim Blechmann 2005 \, $Id: tbEnvify~.pd 221 2005-12-17 18:31:17Z tim $;
 #X obj 252 84 outlet done;
 #X obj 252 62 r \$0-done;
 #X connect 0 0 3 0;
