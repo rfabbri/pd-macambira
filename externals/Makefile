@@ -57,7 +57,6 @@ else
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
-#	-D'setenv(a,b,c)=_putenv(a)' 
     CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
     LDFLAGS += -shared
 # all of these included libs are part of libc in UNIX platforms.  All except
@@ -443,7 +442,7 @@ hid_install: hid
 	install -p $(externals_src)/hcs/hid/*.pd $(objectsdir)/$(HID_NAME)
 	install -d $(helpdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/doc/*.pd       $(helpdir)/$(HID_NAME)
-	install -p $(externals_src)/hcs/hid/examples/*.pd) $(helpdir)/$(HID_NAME)
+	install -p $(externals_src)/hcs/hid/examples/*.pd $(helpdir)/$(HID_NAME)
 	install -d $(examplesdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/examples/*.pd  $(examplesdir)/$(HID_NAME)
 
