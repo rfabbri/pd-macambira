@@ -36,7 +36,11 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <winsock.h>
+#include <io.h>
+#include <fcntl.h>
+#else
 #include <sys/socket.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -48,13 +52,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
-#include <io.h>
-#include <fcntl.h>
-#endif
+#endif /* _WIN32 */
 
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
 #define MSG_NOSIGNAL 0
 #endif
 

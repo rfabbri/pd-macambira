@@ -39,21 +39,21 @@
 #include <malloc.h>
 #endif
 #include <ctype.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#include <winsock.h>
+#include <windef.h>
+#else
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <time.h>
-#include <sys/time.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <windows.h>
-#include <winsock.h>
-#include <windef.h>
-#endif
+#endif /* _WIN32 */
+#include <sys/time.h>
 #include <lame/lame.h>        /* lame encoder stuff */
 #include "m_pd.h"            /* standard pd stuff */
 

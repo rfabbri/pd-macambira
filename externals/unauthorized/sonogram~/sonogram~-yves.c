@@ -42,16 +42,13 @@
 #endif
 #include <ctype.h>
 #include <pthread.h>
-#ifdef UNIX
-#include <unistd.h>
-#endif
-#ifdef NT
+#ifdef WIN32
 #define random rand
+#define usleep(a) _sleep(a/1000)
+#include <io.h>
 #include <windows.h>
-static int usleep (unsigned int us) {
-  Sleep((long)(us/1000.));
-  return 0;
-}
+#else
+#include <unistd.h>
 #endif
 #include <math.h>
 

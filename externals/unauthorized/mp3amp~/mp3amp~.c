@@ -39,7 +39,11 @@
 #include "mpg123.h"      /* mpg123 decoding library from lame 3.92 */
 #include "mpglib.h"      /* mpglib decoding library from lame 3.92 */
 #include "interface.h"   /* mpglib decoding library from lame 3.92 */ 
-#ifdef UNIX
+#ifdef _WIN32
+#include <winsock.h>
+#include <winbase.h>
+#include <io.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -51,11 +55,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
-#include <winbase.h>
-#include <io.h>
-#endif
+#endif /* _WIN32 */
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4244 )

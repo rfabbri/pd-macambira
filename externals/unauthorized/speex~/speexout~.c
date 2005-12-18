@@ -31,7 +31,7 @@
 
 
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -47,7 +47,7 @@
 #include <malloc.h>
 #endif
 #include <ctype.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #include <windows.h>
 #include <winsock.h>
@@ -62,7 +62,7 @@
 #define SOCKET_ERROR -1
 #endif
 
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
 #define MSG_NOSIGNAL 0
 #endif
 

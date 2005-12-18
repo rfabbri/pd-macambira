@@ -46,13 +46,18 @@
 
 #include <ctype.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <io.h>
+#define random rand
+#define usleep(a) _sleep(a/1000)
+#else
 #include <unistd.h>
 #endif
-#ifdef NT
+#include <math.h>
+
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-#include <math.h>
 
 #include "m_pd.h"
 #include "m_imp.h"
@@ -326,7 +331,7 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
     }
     for ( i=0; i<x->x_zoom; i++ )
     {
-        sprintf( x->x_guicommand, "SONIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
+		 sprintf( x->x_guicommand, "SONIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (int) ((bnumber*x->x_zoom)+i) );
         sys_gui( x->x_guicommand );
     }
 
@@ -346,7 +351,7 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
       }
       for ( i=0; i<x->x_zoom; i++ )
       {
-        sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
+			sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (int) ((bnumber*x->x_zoom)+i) );
         sys_gui( x->x_guicommand );
       }
     }
@@ -377,15 +382,15 @@ static void sonogram_erase_block(t_sonogram *x, t_glist *glist, t_int bnumber )
 
 static void *sonogram_do_update_part(void *tdata)
 {
- t_sonogram *x = (t_sonogram*) tdata;
- t_int si;
- t_int nbpoints = 0;
- t_float percentage = 0, opercentage = 0;
- t_canvas *canvas=glist_getcanvas(x->x_glist);
- 
-
+	t_sonogram *x = (t_sonogram*) tdata;
+	t_int si;
+	t_int nbpoints = 0;
+	t_float percentage = 0, opercentage = 0;
+	t_canvas *canvas=glist_getcanvas(x->x_glist);
+	
+	
    // loose synchro
-   usleep( THREAD_SLEEP_TIME );
+	usleep( THREAD_SLEEP_TIME );
 
    // check boundaries
    if ( x->x_updateend > x->x_size-1 ) x->x_updateend = x->x_size-1;

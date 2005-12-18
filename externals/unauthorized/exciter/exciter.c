@@ -44,8 +44,9 @@
 #include "t_tk.h"
 #include "exciter.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
+#include "timeval.h"
 #else
 #include <unistd.h>
 #endif
@@ -349,7 +350,8 @@ static void exciter_properties(t_gobj *z, t_glist *owner)
    t_exciter *x=(t_exciter *)z;
 
    sprintf(buf, "pdtk_exciter_dialog %%s %d %d %d %.2f %d %d\n",
-            x->x_width, x->x_height, x->x_nbevents, x->x_timegrain, x->x_loop, x->x_save );
+			  (int)x->x_width, (int)x->x_height, (int)x->x_nbevents, 
+			  x->x_timegrain, x->x_loop, x->x_save );
    // post("exciter_properties : %s", buf );
    gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }

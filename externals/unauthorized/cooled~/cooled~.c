@@ -45,13 +45,17 @@
 
 #include <ctype.h>
 #include <pthread.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <io.h>
+#define usleep(a) _sleep(a/1000)
+#else
 #include <unistd.h>
 #endif
-#ifdef NT
+
+#include <math.h>
+#ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-#include <math.h>
 
 #include "m_pd.h"
 #include "m_imp.h"

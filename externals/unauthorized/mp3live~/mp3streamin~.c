@@ -40,7 +40,10 @@
 
 #include <sys/types.h>
 #include <string.h>
-#ifndef WIN32
+#ifdef _WIN32
+#include <io.h>
+#include <winsock.h>
+#else
 #include <sys/socket.h>
 #include <errno.h>
 #include <netinet/in.h>
@@ -52,11 +55,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #define SOCKET_ERROR -1
-#else
-#include <winsock.h>
-#endif
+#endif /* _WIN32 */
 
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
 #define MSG_NOSIGNAL 0
 #define SOL_TCP IPPROTO_TCP
 #endif

@@ -5,6 +5,10 @@
 #include "m_pd.h"
 #include <stdlib.h>
 
+#ifdef _WIN32
+#define setenv(a,b,c) _putenv(a)
+#endif /* _WIN32 */
+
 #ifndef RAND_MAX
 #define RAND_MAX 2147483647
 #endif

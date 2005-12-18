@@ -42,11 +42,12 @@
 #include "t_tk.h"
 #include "probalizer.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
+#define random rand
 #else
 #include <unistd.h>
-#endif
+#endif /* _WIN32 */
 
 #define DEFAULT_PROBALIZER_WIDTH 200
 #define DEFAULT_PROBALIZER_HEIGHT 200

@@ -29,6 +29,8 @@
 /* Gang Of Four -- Guns Before Butter                                           */
 /* ---------------------------------------------------------------------------- */  
 
+#ifndef _WIN32 /* this object doesn't compile on Windows because of alphasort() */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -42,11 +44,15 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
+#include <pthread.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
+#endif
+
+#ifndef _MSC_VER
 #include <dirent.h>
 #endif
 
@@ -1017,3 +1023,5 @@ void playlist_setup(void)
     class_setwidget(playlist_class, &playlist_widgetbehavior);
     class_sethelpsymbol(playlist_class, gensym("playlist.pd"));
 }
+
+#endif /* not _WIN32 */

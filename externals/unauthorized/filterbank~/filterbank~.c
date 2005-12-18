@@ -33,11 +33,12 @@
 
 #include "filterbank~.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
+#define random rand
 #else
 #include <unistd.h>
-#endif
+#endif /* _WIN32 */
 
 #define DEFAULT_FILTERBANK_LOWFREQ 0
 #define DEFAULT_FILTERBANK_HIGHFREQ 1600

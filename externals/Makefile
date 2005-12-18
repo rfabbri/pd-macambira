@@ -37,7 +37,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -fstrict-aliasing
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
 CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src \
 	-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow
@@ -52,15 +52,18 @@ ifeq ($(OS_NAME),darwin)
 else
   ifeq ($(OS_NAME),win)
 	 WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
-		-D'setenv(a,b,c)=_putenv(a)' \
       -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
 # These don't seem to be needed:
 #	-D'PROT_READ=1' \
 #	-D'MAP_PRIVATE=2' \
 #	-D'O_NDELAY=O_NONBLOCK'
-    CFLAGS += -mms-bitfields -DMSW -DNT -DWIN32 $(WINDOWS_HACKS)
+#	-D'setenv(a,b,c)=_putenv(a)' 
+    CFLAGS += -mms-bitfields -DMSW -DNT $(WINDOWS_HACKS)
     LDFLAGS += -shared
-    LIBS += -L$(pd_src)/bin -lpd -lwsock32 -lpthreadGC2
+# all of these included libs are part of libc in UNIX platforms.  All except
+# libregex are in DLLs, so they get stripped from the external's .dll binary
+    LIBS += -L$(pd_src)/bin -lpd \
+      -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
     STRIP = strip --strip-unneeded -R .note -R .comment
   else
     CFLAGS +=  -DUNIX -Dunix -fPIC
@@ -94,15 +97,12 @@ CXXFLAGS = $(CFLAGS)
 #------------------------------------------------------------------------------#
 # ALL
 
-#TARGETS = creb cxc cyclone ext13 freeverb hid iemabs iemlib \
-#iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy vbap zexy
-#$(patsubst %, %_install,$(TARGETS))
+LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
+iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy \
+unauthorized vbap zexy
 
-BUILDSRC_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
-all: pre_all_$(OS_NAME) $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) \
-creb cxc cyclone ext13 freeverb \
-hid iemabs iemlib iemmatrix loaders markex maxlib mjlib motex pddp pdp \
-pmpd smlib toxy unauthorized vbap zexy
+
+all: pre_all_$(OS_NAME) buildsrc $(LIB_TARGETS)
 	@echo " "
 	@echo "Compiled external for $(OS_NAME) aka $(UNAME)"
 
@@ -119,28 +119,28 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: $(objectsdir) all help_install objects_install unfiltered_install \
-creb_install cxc_install cyclone_install ext13_install freeverb_install\
-iemabs_install iemabs_install iemlib_install iemmatrix_install loaders_install \
-markex_install maxlib_install mjlib_install motex_install pddp_install \
-pdp_install pidip_install pmpd_install toxy_install unauthorized_install \
-vbap_install zexy_install
+install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) \
+all unfiltered_install $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "externals install succeeded!"
 
-objects_install: 
+
+#==============================================================================#
+#
+# OLD EXTERNALS BUILD SYSTEM TARGETS
+#
+# this is all stuff related to the externals/build/src/*.c links
+#
+#==============================================================================#
+
+
+BUILDSRC_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
+
+buildsrc: $(BUILDSRC_OBJECTS:.c=.$(EXTENSION))
+
+
+buildsrc_install: $(helpdir) $(objectsdir)
 	install -p $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
-
-
-#==============================================================================#
-#
-# INSTALL TARGETS
-#
-#==============================================================================#
-
-
-help_install: $(helpdir)
-#------------------------------------------------------------------------------#
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
 	install -p \
@@ -183,6 +183,11 @@ help_install: $(helpdir)
 			$(externals_src)/zhzxh~/*.pd \
 				$(helpdir)
 
+
+buildsrc_clean:
+	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(externals_src)/build/src/*.*~
+	-rm -f -- $(externals_src)/build/src/*.c.bak
 
 
 #==============================================================================#
@@ -882,13 +887,14 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 %.tk2c: %.tk
 	bash $(externals_src)/unauthorized/tk2c.bash < $*.tk > $*.tk2c
 
+# [cooled~] doesn't compile under MinGW (yet)
 UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
 # [vocoder~] is built separately since its made from a number of files
 UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
 unauthorized:  $(UNAUTHORIZED_VOCODER:.c=.o) \
 $(UNAUTHORIZED_TKFILES:.tk=.tk2c) $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
 	$(CC) $(LDFLAGS) -o $(externals_src)/unauthorized/vocoder~/vocoder~.$(EXTENSION) \
-		$(UNAUTHORIZED_VOCODER:.c=.o)
+		$(UNAUTHORIZED_VOCODER:.c=.o) $(LIBS)
 
 unauthorized_install: unauthorized
 	install -d $(objectsdir)/$(UNAUTHORIZED_NAME)

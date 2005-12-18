@@ -48,13 +48,17 @@
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <io.h>
+#include "timeval.h"
+#else
 #include <unistd.h>
-#endif
-#ifdef NT
-#define M_PI 3.14159265358979323846
-#endif
+#endif /* _WIN32 */
 #include <math.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif /* not M_PI */
 
 #include "m_pd.h"
 #include "m_imp.h"

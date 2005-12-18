@@ -40,7 +40,12 @@
 #include <malloc.h>
 #endif
 #include <ctype.h>
-#ifdef UNIX
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#include <winsock.h>
+#include <windef.h>
+#else
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -48,14 +53,9 @@
 #include <time.h>
 #include <sys/time.h>
 #define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <windows.h>
-#include <winsock.h>
-#include <windef.h>
 #endif
 
-#if defined(__APPLE__) || defined(WIN32)
+#if defined(__APPLE__) || defined(_WIN32)
 #define MSG_NOSIGNAL 0
 #endif
 

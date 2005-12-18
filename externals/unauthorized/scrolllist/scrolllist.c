@@ -41,8 +41,9 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
+#include <pthread.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
