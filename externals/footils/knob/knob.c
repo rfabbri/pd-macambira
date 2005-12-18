@@ -29,11 +29,14 @@
 #include "g_all_guis.h"
 #include <math.h>
 
-#ifdef NT
+#ifdef WIN32
 #include <io.h>
-#define M_PI 3.141592654
 #else
 #include <unistd.h>
+#endif
+
+#ifndef M_PI
+#define M_PI 3.141592654
 #endif
 
 #define IEM_KNOB_DEFAULTSIZE 32
