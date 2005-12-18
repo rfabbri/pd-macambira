@@ -89,7 +89,7 @@ ifeq ($(OS_NAME),darwin)
       libpdbindir = $(bindir)
     else
       libpddir = $(libdir)/pd
-      libpdbindir = $(libpdbindir)/bin
+      libpdbindir = $(libpddir)/bin
     endif
 endif
 

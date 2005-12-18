@@ -13,7 +13,7 @@ BUILDLAYOUT_DIR = $(CWD)/..
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
 # base level optimizations
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer -fstrict-aliasing
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
 # Generic x86 (tune for Pentium III, since that's most common these days)
 OPT_CFLAGS += -march=pentium-mmx -mtune=pentium3 -mmmx
