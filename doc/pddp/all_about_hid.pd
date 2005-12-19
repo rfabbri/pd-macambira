@@ -1,4 +1,4 @@
-#N canvas 22 63 872 602 10;
+#N canvas 22 63 884 614 10;
 #X obj 5 2 cnv 15 850 20 empty empty all_about_hid 20 10 1 18 -233017
 -66577 0;
 #X obj 821 3 pddp;
@@ -12,35 +12,36 @@ the low end \, or the SensAble PHANTOM 6DOF on the high end.;
 #X obj 11 233 key;
 #X obj 43 233 keyup;
 #X obj 431 437 gemkeyboard;
-#X obj 659 437 gemtablet;
-#X obj 730 437 gemorb;
 #X obj 517 437 gemkeyname;
 #X obj 88 233 keyname;
 #X text 16 557 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 233 571 released under the GNU GPL;
-#X text 429 558 $Revision: 1.5 $$Date: 2005-04-26 05:34:40 $;
+#X text 429 558 $Revision: 1.6 $$Date: 2005-12-19 21:00:31 $;
 #X text 430 571 $Author: eighthave $;
-#N canvas 0 22 663 467 deprecated 0;
+#N canvas 0 22 671 475 deprecated 0;
 #X text 35 38 The use of these objects is deprecated since the functionality
 that they provide is available in the [hid] object \, which is a unified
 \, cross-platform approach.;
 #X text 23 14 DEPRECATED HID OBJECTS;
 #X text 22 148 CYCLONE;
-#X obj 27 181 MouseState;
-#X obj 108 181 mousefilter;
-#X obj 24 311 linuxjoystick;
 #X text 22 346 J. SARLO'S [joystick];
 #X text 31 374 only works with Windows and GNU/Linux;
 #X text 26 163 meant for porting Max/MSP patches to Pd.;
 #X text 21 218 RAWHID;
 #X text 28 230 incomplete \, first stab at creating [hid];
-#X obj 30 248 rawmouse;
-#X obj 94 248 rawjoystick;
-#X obj 125 311 linuxevent;
 #X text 26 293 These have been replaced by [linuxhid] and [joystick]
 ;
 #X text 22 278 LINUXEVENT;
+#X text 108 181 [mousefilter];
+#X text 27 181 [MouseState];
+#X text 26 250 [rawmouse];
+#X text 103 250 [rawjoystick];
+#X text 158 312 [linuxevent];
+#X text 32 312 [linuxjoystick];
+#X text 26 97 GEM;
+#X obj 33 117 gemtablet;
+#X obj 104 117 gemorb;
 #X restore 438 533 pd deprecated HID objects;
 #X text 425 415 USING HIDs WITH GEM;
 #X text 435 478 There are quite a few objects that support HIDs from
@@ -76,17 +77,17 @@ X-axis and Y-axis \, though a wheel could be considered another DOF.
 The PHANTOM 6DOF device has six degrees of freedom: X \, Y \, Z movement
 \; X \, Y \, Z rotation.;
 #X text 0 325 GENERAL HIDs;
-#X obj 76 424 mouse;
-#X obj 119 424 joystick;
-#X obj 183 424 tablet;
-#X obj 233 424 gamepad;
+#X text 96 424 [mouse];
+#X text 159 424 [joystick];
+#X text 243 424 [tablet];
+#X text 313 424 [gamepad];
 #X text 435 201 ADB (Apple Desktop Bus) devices;
 #X text 435 303 P5 Glove;
 #X text 685 303 22;
 #X text 765 303 45;
 #X text 765 289 40;
 #X text 685 289 25;
-#X obj 12 424 keyboard;
+#X text 12 424 [keyboard];
 #X text 685 275 5-25;
 #X text 765 275 40-200;
 #X text 435 261 Generic USB Devices;
@@ -96,7 +97,6 @@ The PHANTOM 6DOF device has six degrees of freedom: X \, Y \, Z movement
 #X text 435 289 Serial mice;
 #X text 425 23 LATENCY AND POLLING;
 #X text 425 156 REFRESH RATES OF VARIOUS DEVICES;
-#X obj 11 347 hid;
 #X text 11 369 Basically any device that is supported by the various
 HID layers on each OS is supported by the [hid] object. So any of those
 devices can be used as controllers with Pd. There already exists a
@@ -112,7 +112,6 @@ sound.;
 #X text 435 314 --------------------------------------------------------
 ;
 #X text 3 453 PLATFORM-SPECIFIC HID OBJECTS;
-#X obj 254 527 linuxmouse;
 #X text 15 470 To get full access to some devices \, you need to use
 the platform-specific objects. The objects have dummy versions on the
 other platforms so that you open the patches on other platforms and
@@ -122,8 +121,9 @@ They only receive key events when Pd has focus \; they output alternating
 1s and 0s to represent auto-repeat \; [key] and [heyup] are limited
 to the 'printing' characters. [keyname] reports Shift \, Ctrl \, Alt
 \, Meta \, etc.;
-#X obj 12 527 linuxhid;
 #X text 435 216 USB mice on Windows or MacOS X;
-#X obj 85 527 darwinhid;
-#X obj 166 527 windowshid;
+#X text 85 527 [darwinhid];
+#X text 166 527 [windowshid];
 #X text 742 160 refresh rate;
+#X text 12 527 [linuxhid];
+#X obj 11 347 hid;
