@@ -96,8 +96,9 @@ CXXFLAGS = $(CFLAGS)
 #------------------------------------------------------------------------------#
 # ALL
 
+# if your library isn't included here, it won't be built with Pd-extended
 LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex pddp pdp pmpd smlib toxy \
+iemmatrix loaders markex maxlib mjlib motex oscx pddp pdp pidip pmpd smlib toxy\
 unauthorized vbap zexy
 
 
@@ -660,15 +661,16 @@ $(externals_src)/OSCx/Makefile: $(externals_src)/OSCx/Makefile.in
 
 $(externals_src)/OSCx/src/OSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	-make -C $(externals_src)/OSCx CC=gcc
+	make -C $(externals_src)/OSCx
 
 oscx: $(externals_src)/OSCx/src/OSC.$(EXTENSION)
 
 
 oscx_install: oscx
-	install -d $(objectsdir)
-	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)
-	install -d $(helpdir)
+	install -d $(objectsdir)/$(OSCX_NAME)
+	install -p $(externals_src)/OSCx/src/OSC.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)/$(OSCX_NAME)
+	install -d $(helpdir)/$(OSCX_NAME)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)/$(OSCX_NAME)
 
 
@@ -754,7 +756,7 @@ $(externals_src)/pidip/configure: $(externals_src)/pidip/configure.ac
 	cd $(externals_src)/pidip && autoconf
 
 $(externals_src)/pidip/Makefile: $(externals_src)/pidip/Makefile.in
-	cd $(externals_src)/pidip && ./configure --with-pd=../../pd --with-pdp=../pdp
+	-cd $(externals_src)/pidip && ./configure --with-pd=../../pd --with-pdp=../pdp
 
 $(externals_src)/pidip/pidip.$(EXTENSION):  $(externals_src)/pidip/configure \
 $(externals_src)/pidip/Makefile
@@ -1039,3 +1041,7 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+
+
+.PHONY: all install clean distclean test_locations $(LIB_TARGETS) \
+$(patsubst %, %_install,$(LIB_TARGETS)) $(patsubst %, %_clean,$(LIB_TARGETS))
