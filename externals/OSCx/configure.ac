@@ -82,39 +82,50 @@ else
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 dnl we could test for bad glibc here, but don't
 					 pd_suffix=pd_linux
+					 LIBS="-lc -lm"
 					 ;;
         powerpc-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 pd_suffix=pd_linux
+					 LIBS="-lc -lm"
 					 ;;
         *-*-linux*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 INCLUDES="$INCLUDES"
 					 pd_suffix=pd_linux
+					 LIBS="-L../../../pd/bin -lpd -lc -lm"
 					 ;;
         sparc-sun-*)
 		          echo "YOU HAVE A SPARC STATION,	not setting any flags, not supported yet"
 			       ;;
         *-*-cygwin*)
-                CFLAGS="$CPFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
+                CFLAGS="$CFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 INCLUDES="$INCLUDES -I../../../pd/bin"
-					 LIBOSC=libOSC.lib
 					 pd_suffix=dll
+					 LIBS="-lc -lm"
+					 ;;
+        *-*-mingw*)
+                CFLAGS="$CFLAGS -mms-bitfields -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
+					 LDFLAGS="-shared"
+					 INCLUDES="$INCLUDES -I../../../pd/bin"
+					 pd_suffix=dll
+					 LIBS="-L../../../pd/bin -lpd -lm -lwsock32"
 					 ;;
         *-*-darwin*)
-                CFLAGS="$CPFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
-					 # LDFLAGS=" -bundle -bundle_loader ../../../pd/bin/pd -undefined suppress -flat_namespace"
+                CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
 					 LDFLAGS=" -bundle -bundle_loader ../../../pd/bin/pd -flat_namespace "
 					 pd_suffix=pd_darwin
+					 LIBS="-lc -lm"
 					 ;;
         *)
 					 dnl assume unix
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
 					 LDFLAGS="-Wl,-export_dynamic -shared"
 					 pd_suffix=pd_linux
+					 LIBS="-lc -lm"
 					 ;;
         esac
 fi

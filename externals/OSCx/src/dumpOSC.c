@@ -80,10 +80,12 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 //void sys_addpollfn(int fd, t_fdpollfn fn, void *ptr);
 
 
-#if defined(__sgi) || defined(__linux) || defined(WIN32) || defined(__APPLE__)
+#if defined(__sgi) || defined(__linux) || defined(_WIN32) || defined(__APPLE__)
 
-#ifdef WIN32
+#ifdef _WIN32
+   #ifdef _MSC_VER
 	#include "OSC-common.h"
+   #endif /* _MSC_VER */
 	#include <winsock2.h>	
 	#include <string.h>
 	#include <stdlib.h>
@@ -122,7 +124,7 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
 	#include <sys/schedctl.h>
 	#include <sys/lock.h>
 	#endif
-#endif
+#endif /* _WIN32 */
 
 
 char *htm_error_string;
@@ -329,7 +331,7 @@ static void dumpOSC_free(t_dumpOSC *x)
     }
 }
 
-#ifdef WIN32
+#ifdef _MSC_VER
 OSC_API void dumpOSC_setup(void)
 #else
 void dumpOSC_setup(void)

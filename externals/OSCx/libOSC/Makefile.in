@@ -17,10 +17,10 @@ all:	${LIBOBJS}
 	rm -f $*.o
 
 test_OSC: test_OSC.o ${LIB}
-	cc -o test_OSC test_OSC.o ${LIB}
+	$(CC) -o test_OSC test_OSC.o ${LIB}
 
 test_OSC_timeTag: test_OSC_timeTag.o OSC-timetag.o
-	cc -o test_OSC_timeTag test_OSC_timeTag.o  OSC-timetag.o
+	$(CC) -o test_OSC_timeTag test_OSC_timeTag.o  OSC-timetag.o
 
 
 clean:

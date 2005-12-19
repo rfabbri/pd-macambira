@@ -17,7 +17,7 @@
 
 
 EXT=o
-LIBS = -lm -lc
+LIBS = @LIBS@
 LIBOSC = ../libOSC/@LIBOSC@
 
 CFLAGS = @CFLAGS@
@@ -35,19 +35,19 @@ EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@ OSC.@pd_suffix
 all: $(EXTS)
 
 dumpOSC.@pd_suffix@: dumpOSC.o
-	cc $(LDFLAGS) -o dumpOSC.@pd_suffix@ $? -lc -lm
+	$(CC) $(LDFLAGS) -o dumpOSC.@pd_suffix@ $? $(LIBS)
 
 sendOSC.@pd_suffix@: sendOSC.o htmsocket.o OSC-system-dependent.o
-	cc $(LDFLAGS) -o sendOSC.@pd_suffix@ $? -lc -lm $(LIBOSC)
+	$(CC) $(LDFLAGS) -o sendOSC.@pd_suffix@ $? $(LIBS) $(LIBOSC)
 
 OSCroute.@pd_suffix@: OSCroute.o OSC-pattern-match.o OSC-system-dependent.o
-	cc $(LDFLAGS) -o OSCroute.@pd_suffix@ $? -lc -lm
+	$(CC) $(LDFLAGS) -o OSCroute.@pd_suffix@ $? $(LIBS)
 
 OSC.@pd_suffix@: OSC.o sendOSC.o dumpOSC.o OSCroute.o htmsocket.o OSC-pattern-match.o OSC-system-dependent.o
-	cc $(LDFLAGS) -o OSC.@pd_suffix@ $? -lc -lm $(LIBOSC)
+	$(CC) $(LDFLAGS) -o OSC.@pd_suffix@ $? $(LIBS) $(LIBOSC)
 
 $(TARGETS): %.o : %.c
-	cc $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o $*.o $*.c
 
 # ----------------------------------------------------------
 

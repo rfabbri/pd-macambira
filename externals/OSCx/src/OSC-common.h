@@ -34,6 +34,9 @@ The OpenSound Control WWW page is
    by Matt Wright, 3/13/98
 */
 
+#ifndef _OSC_COMMON_H
+#define _OSC_COMMON_H
+
 /* Boolean type */
 
 #ifndef TRUE
@@ -43,7 +46,7 @@ typedef int Boolean;
 #endif
 
 
-#ifdef WIN32
+#ifdef _WIN32
 	#include <stdio.h>
 	#ifdef OSC_EXPORTS
 		#define OSC_API __declspec(dllexport)
@@ -70,4 +73,8 @@ void OSCProblem(char *s, ...);
 
 /* Warning for user */
 void OSCWarning(char *s, ...);
+
+
+
+#endif /* _OSC_COMMON_H */
 
