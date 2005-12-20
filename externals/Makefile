@@ -39,6 +39,9 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
+# this variable is to support old "win" directories, rather than "windows"
+BUILDSRC_OS_NAME = $(OS_NAME)
+
 CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src \
 	-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow
 LDFLAGS =  
@@ -50,7 +53,8 @@ ifeq ($(OS_NAME),darwin)
   LIBS += -lc
   STRIP = strip -x
 else
-  ifeq ($(OS_NAME),win)
+  ifeq ($(OS_NAME),windows)
+    BUILDSRC_OS_NAME = win
 	 WINDOWS_HACKS = -D'O_NONBLOCK=1' -D'srand48(n)=srand((n))' \
       -D'drand48()=((double)rand()/RAND_MAX)' -D'bzero(p,n)=memset(p,0,n)'
 # These don't seem to be needed:
@@ -86,8 +90,8 @@ CXXFLAGS = $(CFLAGS)
 %.$(EXTENSION): %.o
 	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)" "$*.o"  $(LIBS) \
 		`test -f $*.libs && cat $*.libs`	\
-		`test -f $(dir $*)../$(OS_NAME)/$(notdir $*).libs && \
-			cat $(dir $*)../$(OS_NAME)/$(notdir $*).libs`
+		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
+			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"
 	$(STRIP) $*.$(EXTENSION)
 	rm -f -- $*.o
@@ -111,7 +115,7 @@ pre_all_darwin:
 
 pre_all_linux:
 
-pre_all_win:
+pre_all_windows:
 
 pre_all_unknown:
 # this target is for "everything else"
@@ -421,15 +425,32 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # HID
 HID_NAME = hid
-HID_INCLUDES = -I./ -I../../../pd/src -I./HID\ Utilities\ Source
-HID_CFLAGS = 
+HID_INCLUDES = -I$(externals_src)/hcs/hid -I$(pd_src)/src \
+	-I$(externals_src)/hcs/hid/HID\ Utilities\ Source
+HID_CFLAGS = $(CFLAGS)
+ifeq ($(OS_NAME),windows)
+  HID_LIBS = $(LIBS) -lhid -lsetupapi
+else
+  ifeq ($(OS_NAME),darwin)
+    FRAMEWORKS = Carbon IOKit ForceFeedback
+    HID_LIBS = $(LIBS) -L./HID\ Utilities\ Source/build \
+       -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
+  else
+    HID_LIBS = $(LIBS)
+  endif
+endif
 
-# this build method doesn't work yet <hans@at.or.at>
-HID_OBJECTS := $(wildcard $(externals_src)/hcs/hid/*.c)
-hid: 
-#	$(CC) $(CFLAGS) -c $(HID_OBJECTS:.c=.$(EXTENSION))
-#	$(CC) $(LDFLAGS) -o hid.$(EXTENSION) $(externals_src)/hcs/hid/*.o
-	-cd $(externals_src)/hcs/hid && make
+HID_SRC = input_arrays.c hid_$(OS_NAME).c hid.c
+HID_OBJECTS := $(patsubst %.c, $(externals_src)/hcs/hid/%.o, $(HID_SRC))
+%.$(EXTENSION): %.o
+	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)"  $(HID_OBJECTS) $(HID_LIBS)
+	chmod a-x "$*.$(EXTENSION)"
+#	$(STRIP) $*.$(EXTENSION)
+
+$(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS)
+
+hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
+
 
 hid_install: hid
 	install -d $(objectsdir)/$(HID_NAME)
@@ -658,17 +679,24 @@ $(externals_src)/OSCx/configure: $(externals_src)/OSCx/configure.ac
 
 $(externals_src)/OSCx/Makefile: $(externals_src)/OSCx/Makefile.in
 	cd $(externals_src)/OSCx && ./configure
+$(externals_src)/OSCx/libOSC/Makefile: $(externals_src)/OSCx/libOSC/Makefile.in
+	cd $(externals_src)/OSCx && ./configure
+$(externals_src)/OSCx/src/Makefile: $(externals_src)/OSCx/src/Makefile.in
+	cd $(externals_src)/OSCx && ./configure
 
 $(externals_src)/OSCx/src/OSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	make -C $(externals_src)/OSCx
+	-make -C $(externals_src)/OSCx
 
 oscx: $(externals_src)/OSCx/src/OSC.$(EXTENSION)
 
 
 oscx_install: oscx
+	-install -p $(externals_src)/OSCx/src/OSC.$(EXTENSION) $(objectsdir)
 	install -d $(objectsdir)/$(OSCX_NAME)
-	install -p $(externals_src)/OSCx/src/OSC.$(EXTENSION) $(objectsdir)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(OSCX_NAME) \
+		--author "jdl at xdv.org" \
+		--license "BSD"
 	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)/$(OSCX_NAME)
 	install -d $(helpdir)/$(OSCX_NAME)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)/$(OSCX_NAME)
