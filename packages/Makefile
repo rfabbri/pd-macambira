@@ -141,7 +141,7 @@ gem:
 #------------------------------------------------------------------------------
 # pd
 
-ifeq ($(OS_NAME),win)
+ifeq ($(OS_NAME),windows)
   PD_CONFIGURE_FLAGS = 
 else
   PD_CONFIGURE_FLAGS = --enable-jack
@@ -374,7 +374,9 @@ noncvs_install:
 		-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* \
 			$(helpdir)
 		-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
-
+		-install -d $(DESTDIR)$(prefix)/gripd
+		-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
+			 $(DESTDIR)$(prefix)/gripd
 
 
 #------------------------------------------------------------------------------
@@ -533,7 +535,7 @@ devsymlinks: devsymlinks_$(OS_NAME)
 
 
 
-devsymlinks_win:
+devsymlinks_windows:
 
 
 devsymlinks_linux:
@@ -630,7 +632,7 @@ patch_pd:
 	cd $(pd_src)/src/ && \
 		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
 		mv s_main.c.tmp s_main.c
-	for file in $(wildcard *.[ch]); do \
+	for file in $(wildcard $(pd_src)/src/*.[ch]); do \
 		sed 's/MACOSX/__APPLE__/g' $${file} > $${file}.tmp && \
 			mv -f $${file}.tmp $$file;\
 	done
@@ -639,7 +641,7 @@ patch_pd:
 
 
 unpatch_pd:
-	for file in $(wildcard *.[ch]); do \
+	for file in $(wildcard $(pd_src)/src/*.[ch]); do \
 		sed 's/__APPLE__/MACOSX/g' $${file} > $${file}.tmp && \
 			mv -f $${file}.tmp $$file;\
 	done

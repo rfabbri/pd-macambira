@@ -16,7 +16,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
 # Generic x86 (tune for Pentium III, since that's most common these days)
-OPT_CFLAGS += -march=pentium-mmx -mtune=pentium3 -mmmx
+OPT_CFLAGS += -mcpu=i586 -mtune=pentium3
 
 # INTEL
 #
@@ -53,21 +53,65 @@ package:  $(PD_INNO_SETUP)
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
-install:
-	cd $(packages_src) && make $(DEST_PATHS) extended_install
-	cd .. && make $(DEST_PATHS) doc_format
-	install -p pd-settings.reg $(DESTDIR)$(prefix)
+# makefile.mingw is available from here:
+# http://sourceforge.net/tracker/index.php?func=detail&aid=1374659&group_id=55736&atid=478072
+build_pd:
+	make -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS)
+
+pd_install: build_pd
+# the autoconf/MinGW setup doesn't compile the extras yet
+#	make -C $(pd_src)/src $(DEST_PATHS) bin
+#	-make -C $(pd_src)/src $(DEST_PATHS) install
+	make -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS) install
+
+install: pd_install prebuilt_install lib_install exe_install
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
+
+prebuilt_install:
+	make -C $(packages_src) $(DEST_PATHS) extended_install
+	make -C $(packages_src) $(DEST_PATHS) doc_format
+	install -p pd-settings.reg $(DESTDIR)$(prefix)
+
 #==============================================================================#
 #
-## CVS SOURCES
+## setup Pd binaries
 #
 #==============================================================================#
 
-# since I can't get Pd to compile, here are some hacks to assemble a package
-# from binaries
+bin_src = /usr/local/bin
+# ultimately, the DLLs should be installed in %SystemRoot%\system32 by InnoSetup
+#dlldir =  $(DESTDIR)$(prefix)/
+dlldir = $(bindir)
+lib_install:
+# these get installed into %SystemRoot%\system32 by the installer
+	install -d $(dlldir)
+	install -p $(bin_src)/libogg-0.dll  $(dlldir)/libogg-0.dll
+	install -p $(bin_src)/libsndfile-1.dll  $(dlldir)/libsndfile-1.dll
+	install -p $(bin_src)/libvorbis-0.dll  $(dlldir)/libvorbis-0.dll
+	install -p $(bin_src)/libvorbisenc-2.dll  $(dlldir)/libvorbisenc-2.dll
+	install -p $(bin_src)/libvorbisfile-3.dll  $(dlldir)/libvorbisfile-3.dll
+	install -p $(bin_src)/pthreadGC2.dll  $(dlldir)/pthreadGC2.dll
+	install -p $(bin_src)/tcl84.dll  $(dlldir)/tcl84.dll
+	install -p $(bin_src)/tclpip84.dll  $(dlldir)/tclpip84.dll
+	install -p $(bin_src)/tk84.dll  $(dlldir)/tk84.dll
+# this is a quick hack, since the gripd.dll still looks for pthreadVC.dll
+	install -p $(DESTDIR)$(prefix)/gripd/pthreadVC.dll $(dlldir)/pthreadVC.dll
+# these go into the Pd package's lib dir
+	install -d $(libdir)/tcl8.4
+	cp -r /usr/local/lib/tcl8.4/* $(libdir)/tcl8.4
+	install -d $(libdir)/tk8.4
+	cp -r /usr/local/lib/tk8.4/* $(libdir)/tk8.4
+
+
+exe_install:
+	install -d $(bindir)
+	install -p $(bin_src)/wish84.exe  $(bindir)
+	install -p $(bin_src)/tclsh84.exe  $(bindir)
+
+
+# here are some hacks to assemble a package from binaries
 no_compile_hacks:
 	cp -a /c/Program\ Files/pd-0.38-4 $(DESTDIR)$(prefix)/
 
@@ -79,6 +123,7 @@ $(PD_INNO_SETUP): $(PD_INNO_SETUP).in
 		sed 's/PACKAGE_VERSION/$(PACKAGE_VERSION)/g' > \
 		$(PD_INNO_SETUP)
 #	start $(PD_INNO_SETUP)
+
 
 #==============================================================================#
 #
@@ -113,3 +158,6 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+
+
+.PHONY: all install package clean distclean test_locations dll_install exe_install

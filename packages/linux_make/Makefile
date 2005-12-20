@@ -54,8 +54,8 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 
 install: 
-	cd $(packages_src) && make $(DEST_PATHS) install
-	cd $(packages_src) && make $(DEST_PATHS) doc_format
+	make -C $(packages_src) $(DEST_PATHS) install
+	make -C $(packages_src) $(DEST_PATHS) doc_format
 	@echo " "
 	@echo "linux_make install succeeded!"
 

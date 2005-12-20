@@ -46,7 +46,7 @@ else
     EXTENSION = pd_darwin
   else
     ifeq (MINGW,$(findstring MINGW,$(UNAME)))
-      OS_NAME = win
+      OS_NAME = windows
       EXTENSION = dll
     else
       OS_NAME = unknown
@@ -84,7 +84,7 @@ ifeq ($(OS_NAME),darwin)
   libpddir = $(DESTDIR)$(prefix)
   libpdbindir = $(bindir)
   else
-    ifeq ($(OS_NAME),win)
+    ifeq ($(OS_NAME),windows)
       libpddir = $(DESTDIR)$(prefix)
       libpdbindir = $(bindir)
     else

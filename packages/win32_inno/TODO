@@ -6,17 +6,9 @@
 - Another detail is that the menu item "help/1 manual" results in no action -
   possibly some link pointing to the wrong place?  It turns out that the
   rundll "open" thingy isn't working...
-      - make Pd.exe using MinGW's "start.exe" like MacOSX's "open"
+      - make Pd.exe using MSYS's "start.exe" like MacOSX's "open"
       - menu_openhtml on Win32 with rundll should be able to open other
         filetypes like open on MACOSX.
-
-
-- get Pd compiling on MinGW:.  From Carmen: 
-  
-  - "theres a SConscript in devel_0_39 and theres also a makefile.mingw maybe
-  	 in devel_0_38. just ./configure && make && make install the deps like tk
-  	 and such first, although you can use a static path to MSVC-generated .libs
-  	 if you dont feel like doing that.."
 
 
 - get Windows Makefiles for Gem
