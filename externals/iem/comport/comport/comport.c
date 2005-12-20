@@ -329,7 +329,7 @@ static HANDLE open_serial(int com_nr, t_comport *x)
 		   OPEN_EXISTING,
 #ifdef WIN2000
 		   0,
-#elif
+#else
 		   FILE_FLAG_OVERLAPPED,
 #endif
 		   0);
