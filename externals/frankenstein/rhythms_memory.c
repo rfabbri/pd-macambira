@@ -120,26 +120,28 @@ void end_measure(t_rhythms_memory *x)
 	}
 	x->events = 0;
 
-	// now I evaluate this rhythm with the memory
-	rhythm_memory_evaluate(x->rhythms_memory, x->curr_seq, &is_it_a_new_rhythm,
-							&id, &subid, &root_closeness, &sub_closeness);
-	// tell out the answer
-	// allocate space for the list
-	lista = (t_atom *) malloc(sizeof(t_atom) * 5);
-	SETFLOAT(lista, (float) is_it_a_new_rhythm);
-	SETFLOAT(lista+1, (float) id);
-	SETFLOAT(lista+2, (float) subid);
-	SETFLOAT(lista+3, (float) root_closeness);
-	SETFLOAT(lista+4, (float) sub_closeness);
-	outlet_anything(x->l_out,
-                     gensym("list") ,
-					 5, 
-					 lista);
-	free(lista);
-	freeBeats(x->curr_seq);
-	x->seq_initialized = 0;
-	x->curr_seq = 0;
-
+	if (x->curr_seq)
+	{
+		// now I evaluate this rhythm with the memory
+		rhythm_memory_evaluate(x->rhythms_memory, x->curr_seq, &is_it_a_new_rhythm,
+								&id, &subid, &root_closeness, &sub_closeness);
+		// tell out the answer
+		// allocate space for the list
+		lista = (t_atom *) malloc(sizeof(t_atom) * 5);
+		SETFLOAT(lista, (float) is_it_a_new_rhythm);
+		SETFLOAT(lista+1, (float) id);
+		SETFLOAT(lista+2, (float) subid);
+		SETFLOAT(lista+3, (float) root_closeness);
+		SETFLOAT(lista+4, (float) sub_closeness);
+		outlet_anything(x->l_out,
+						gensym("list") ,
+						5, 
+						lista);
+		free(lista);
+		// rhythm_memory_evaluate freed the memory for the rhythm if needed
+		x->seq_initialized = 0;
+		x->curr_seq = 0;
+	}
 	// also start the new measure!
 	start_measure(x);
 
@@ -182,7 +184,8 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
 	int i;
 	time_t a;
     t_rhythms_memory *x = (t_rhythms_memory *)pd_new(rhythms_memory_class);
-	x->l_out = outlet_new(&x->x_obj, &s_list);
+	//x->l_out = outlet_new(&x->x_obj, &s_list);
+	x->l_out = outlet_new(&x->x_obj, "symbol");
 	
 	x->seq_initialized = 0;
 

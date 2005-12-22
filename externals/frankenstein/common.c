@@ -118,7 +118,7 @@ void setFirstBeat(t_rhythm_event **firstEvent, unsigned short int voice, float f
 	newElement->start.numerator = res.numerator;
 	newElement->start.denominator = res.denominator;
 	*firstEvent = newElement;
-	post("DEBUG setFirstBeat: %i %i", res.numerator, res.denominator);
+	//post("DEBUG setFirstBeat: %i %i", res.numerator, res.denominator);
 }
 
 void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, float fstart, float fduration)
@@ -142,7 +142,7 @@ void concatenateBeat(t_rhythm_event *currentEvent, unsigned short int voice, flo
 	res = float2duration(fstart);
 	newElement->start.numerator = res.numerator;
 	newElement->start.denominator = res.denominator;
-	post("DEBUG concatenateBeat: %i %i", res.numerator, res.denominator);
+	//post("DEBUG concatenateBeat: %i %i", res.numerator, res.denominator);
 }
 
 void freeBeats(t_rhythm_event *currentEvent)
@@ -165,6 +165,7 @@ void freeBeats(t_rhythm_event *currentEvent)
 		currentEvent = currentEvent->next;
 		free(prev);
 	} 
+	currentEvent = 0;
 
 }
 
@@ -297,7 +298,7 @@ unsigned short int add_t_rhythm_memory_element(t_rhythm_memory_representation *t
 		{
 			// a new champion!
 			this_rep->max_weight = this_rep->transitions[i].weight;
-			post("DEBUG: max_weight=%i", this_rep->max_weight);
+			//post("DEBUG: max_weight=%i", this_rep->max_weight);
 		}
 		last = i;
 		currEvent = currEvent->next;
@@ -426,7 +427,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	{
 			this_weight_int = this_rep->transitions[i].weight;
 			this_weight_float = (float) (((float) this_weight_int) / ((float) this_rep->max_weight));
-			post("DEBUG: transition %i this_weight_int=%i max_weight=%i this_weight_float=%f", i, this_weight_int, this_rep->max_weight, this_weight_float);
+			//post("DEBUG: transition %i this_weight_int=%i max_weight=%i this_weight_float=%f", i, this_weight_int, this_rep->max_weight, this_weight_float);
 			if (this_weight_float > min_to_be_main_rhythm_beat)
 			{
 				// this is a main rhythm beat
@@ -434,12 +435,12 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 				{
 					// both playing
 					strong_ok++;
-					post("DEBUG: beat %i, both playing", i);
+					//post("DEBUG: beat %i, both playing", i);
 				} else
 				{
 					// strong beat miss
 					strong_no++;
-					post("DEBUG: beat %i, src not playing", i);
+					//post("DEBUG: beat %i, src not playing", i);
 				}
 				count_strong++;
 			}	
@@ -463,7 +464,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	{
 		strong_ratio = (float) ( ( ((float) strong_ok) / ((float)count_strong) ) -
 			( ((float) strong_no) / ((float)count_strong) )) ;
-		post("DEBUG: strong_ratio=%f", strong_ratio);
+		//post("DEBUG: strong_ratio=%f", strong_ratio);
 	}
 	// for each rhythm in the list
 	// count the number of identical nodes
@@ -624,6 +625,8 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 			post("DEBUG: sub-rhythm found");
 			*sub_id = sub_id_found;
 			*sub_closeness = sub_closeness_found;
+			//only in this case free the memory allocated for the rhythm
+			freeBeats(src_rhythm);
 		} else
 		{
 			// add this rhythm as a new subrhythm
@@ -646,7 +649,7 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 			*sub_id = sub_id_found;
 			*sub_closeness = sub_closeness_found;
 			*new_rhythm = 2;
-			post("DEBUG: new subrhythm");
+			//post("DEBUG: new subrhythm");
 		}
 	} else
 	{
@@ -674,7 +677,7 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 		*id = new_id;
 		*root_closeness = 1;
 		*new_rhythm = 1;
-		post("DEBUG: new rhythm");
+		//post("DEBUG: new rhythm");
 	}
 
 }

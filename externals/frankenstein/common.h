@@ -19,8 +19,8 @@ typedef struct t_note
 };
 typedef struct t_duration
 {
-	int numerator; // like in music notation: in a 1/4 note the numerator is 1
-	int denominator; // like in music notation: in a 1/4 note the denominator is 4
+	unsigned short int numerator; // like in music notation: in a 1/4 note the numerator is 1
+	unsigned short int denominator; // like in music notation: in a 1/4 note the denominator is 4
 };
 struct t_note_event
 {

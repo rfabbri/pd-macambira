@@ -1,4 +1,4 @@
-#N canvas 14 34 943 709 12;
+#N canvas 14 34 955 709 12;
 #X symbolatom 731 341 18 0 0 2 next_chord - -;
 #N canvas 39 349 531 328 readme 0;
 #X text 59 31 howto populate the graph: play the chord \, when the
@@ -71,7 +71,7 @@ max novelty \, 1= min novelty;
 #X obj 63 111 f 1;
 #X msg 59 135 next \$1;
 #X obj 48 70 vsl 15 30 0 1 0 0 empty empty empty 0 -8 0 8 -262144 -1
--1 2755 1;
+-1 507 1;
 #X floatatom 13 112 5 0 0 0 - - -;
 #X obj 178 571 csoundapi~ bay.orc;
 #X msg 463 545 event i 10 0 17000 10 30;
@@ -225,10 +225,8 @@ max novelty \, 1= min novelty;
 #X obj 27 585 *~ 0.9;
 #X obj 105 587 *~ 0.9;
 #X msg 461 421 -2;
-#X obj 780 488 adc~ 8;
-#X obj 780 513 *~ 0.5;
-#X obj 835 407 vsl 15 128 0 1 0 0 empty sax-vol-in empty 0 -8 0 8 -262144
--1 -1 0 1;
+#X obj 714 438 catch~ sax;
+#X obj 784 137 inlet~;
 #X connect 2 0 15 0;
 #X connect 3 0 2 0;
 #X connect 4 0 2 0;
@@ -326,6 +324,5 @@ max novelty \, 1= min novelty;
 #X connect 73 0 46 0;
 #X connect 74 0 47 0;
 #X connect 75 0 50 5;
-#X connect 76 0 77 0;
+#X connect 76 0 28 0;
 #X connect 77 0 28 0;
-#X connect 78 0 77 1;
