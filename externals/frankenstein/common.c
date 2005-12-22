@@ -46,7 +46,7 @@ unsigned short int duration2int(t_duration dur)
 	{
 		for (j=0; j<i; j++)
 		{
-			if ((dur.numerator==j) && (dur.denominator==i))
+			if ((dur.numerator==j) && (dur.denominator==possible_denominators[i]))
 			{
 				return curr;
 			} else
@@ -612,14 +612,14 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 
 	// decide if add to the memory or if return the closest
 
-	if (root_closeness_found>=min_to_be_same_rhythm)
+	if (root_closeness_found >= (float)min_to_be_same_rhythm)
 	{
 		// is close enough to be considered a rhythm
 		post("DEBUG: rhythm found");
 		*new_rhythm = 0;
 		*id = id_found;
 		*root_closeness = root_closeness_found;
-		if (sub_closeness_found>=min_to_be_same_subrhythm)
+		if (sub_closeness_found >= (float)min_to_be_same_subrhythm)
 		{
 			// this is a known subrhythm
 			post("DEBUG: sub-rhythm found");

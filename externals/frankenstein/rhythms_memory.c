@@ -195,6 +195,14 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 }
 
+// debugging function
+void crash(t_rhythms_memory *x)
+{
+	int *a;
+	a = malloc(sizeof(int));
+	a[9999999999999999999] = 1;
+}
+
 void rhythms_memory_setup(void)
 {
     rhythms_memory_class = class_new(gensym("rhythms_memory"), (t_newmethod)rhythms_memory_new,
@@ -203,4 +211,8 @@ void rhythms_memory_setup(void)
 	class_addmethod(rhythms_memory_class, (t_method)end_measure, gensym("measure"), 0);
 	class_doaddfloat(rhythms_memory_class, (t_method)add_event);
 
+	class_addmethod(rhythms_memory_class, (t_method)crash, gensym("crash"), 0);
+
 }
+
+
