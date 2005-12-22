@@ -563,6 +563,9 @@ static void sndfiler_t_resize(t_sndfiler *y, int argc, t_atom *argv)
     pd_error(x, "usage: resize tablename size");
 }
 
+#ifdef _MSC_VER
+__declspec(dllexport)
+#endif
 void sndfiler_setup(void)
 {
     sndfiler_class = class_new(gensym("sndfiler"), 
