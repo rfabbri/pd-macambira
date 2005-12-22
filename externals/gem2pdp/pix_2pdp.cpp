@@ -94,7 +94,7 @@ void pix_2pdp::bangMess()
         break;
         
       // YUV
-      case GL_YUV422_GEM:
+      case GL_YUV422_GEM: {
 	    int row=gem_ysize>>1;
 		int cols=gem_xsize>>1;
 		short u,v;
@@ -131,7 +131,7 @@ void pix_2pdp::bangMess()
                   pY += gem_xsize; pY2 += gem_xsize;
 		}
         pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
-        break;
+        } break;
       
       // grey
       case GL_LUMINANCE:
