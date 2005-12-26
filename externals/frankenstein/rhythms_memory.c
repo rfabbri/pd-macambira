@@ -1,5 +1,17 @@
 /* 
-just a dummy rhythms_memory patch
+rhythms_memory
+by Davide Morelli www.davidemorelli.it 2005
+
+a working version of rhythms_memory
+
+uses graphs to store rhythms
+
+TODO:
+  * test and debug core functionalities
+  * memory save/load to file
+  * output rhythms in realtime (BANGs)
+  * output rhythms in the form of list of floats
+  * add velo
 
 */
 
@@ -26,10 +38,19 @@ typedef struct _rhythms_memory
 	t_outlet *l_out;
 	t_rhythm_event *curr_seq;
 	int seq_initialized;
+	// the memory
 	t_rhythm_memory_representation *rhythms_memory;
+	// measure length
 	double measure_start_time;
 	double measure_length;
+	// input rhythm's events
 	event *events;
+	// output rhythm's events
+	unsigned short int next_main_rhythm_out;
+	unsigned short int next_sub_rhythm_out;
+	event *events_out;
+	t_clock *x_clock;
+    double x_deltime;
 	
 } t_rhythms_memory;
 
@@ -39,6 +60,8 @@ void rhythms_memory_free(t_rhythms_memory *x)
 		freeBeats(x->curr_seq);	
 	if (x->rhythms_memory)
 		rhythm_memory_free(x->rhythms_memory);
+
+	clock_free(x->x_clock);
 }
 
 void start_measure(t_rhythms_memory *x)
@@ -84,6 +107,10 @@ void end_measure(t_rhythms_memory *x)
 	float root_closeness, sub_closeness;
 	int counter;
 	t_atom *lista;
+	// these 2 are for output rhythm
+	int rhythm_found;
+	t_rhythm_event *wanted_rhythm;
+
 	// I call the pd functions to get a representation
 	// of this very moment
 	x->measure_length = clock_gettimesince(x->measure_start_time);
@@ -142,10 +169,88 @@ void end_measure(t_rhythms_memory *x)
 		x->seq_initialized = 0;
 		x->curr_seq = 0;
 	}
+
+	// I free the list of events_out (if present)
+	currEvent = x->events_out;
+	// this is not the first event
+	while(currEvent)
+	{
+		lastEvent = currEvent;
+		currEvent = currEvent->next;
+		free(lastEvent);
+	}
+	x->events_out = 0;
+	// i set up the list of events_out
+	// for the wanted rhythm
+	if (x->next_main_rhythm_out)
+	{
+		// ask the memory for the wanted rhythm
+		rhythm_found = rhythm_memory_get_rhythm(x->rhythms_memory, // the memory
+								wanted_rhythm, // a pointer to the returned rhythm
+								// the id of the main rhythm wanted
+								x->next_main_rhythm_out, 
+								// the sub-id of the sub-rhythm wanted
+								x->next_sub_rhythm_out);
+		if (rhythm_found==0)
+		{
+			post("rhythms_memory: rhythm %i %i was not found ", x->next_main_rhythm_out, x->next_sub_rhythm_out);
+			return 0;
+		}
+
+		// now I setup the events_out list
+		// for each event in wanted_rhythm
+		// allocate and link an element of elements_out
+
+		//--> TODO <--
+		
+		// also setup the timer for the first event
+
+		//--> TODO <--
+
+	}
+
 	// also start the new measure!
 	start_measure(x);
 
 	
+}
+
+// this function is called  by pd
+// when the timer bangs
+static void delay_tick(t_rhythms_memory *x)
+{
+    // here i must:
+	// take the next element in x->events_out
+	// and compute when I'll need to schedule next event
+	// (next_event - curr_event)
+	
+	// TODO
+
+	// set the next element as the current one
+	// and free the memory allocated for the old curr event
+	
+	// TODO
+
+	// set up the timer
+
+	// TODO
+}
+
+// the user wants me to play a rhythm in the next measure
+// the user MUST pass 2 args: main_rhythm and sub_rhythm wanted
+static void ask_rhythm(t_rhythms_memory *x, t_symbol *s, int argc, t_atom *argv)
+{
+	if (argc<3)
+	{
+		error("this method needs at least 2 floats: main_rhythm and sub_rhythm wanted");
+		return;
+	}
+	argv++;
+	x->next_main_rhythm_out = atom_getfloat(argv++);
+	x->next_sub_rhythm_out = atom_getfloat(argv);
+	// i have nothing left to do:
+	// when this measure will end a list of events_out will be set
+	// from the current values of x->next_main_rhythm_out and x->next_sub_rhythm_out
 }
 
 static void rhythms_memory_bang(t_rhythms_memory *x) {
@@ -210,9 +315,10 @@ void rhythms_memory_setup(void)
     class_addbang(rhythms_memory_class, (t_method)rhythms_memory_bang);
 	class_addmethod(rhythms_memory_class, (t_method)end_measure, gensym("measure"), 0);
 	class_doaddfloat(rhythms_memory_class, (t_method)add_event);
-
 	class_addmethod(rhythms_memory_class, (t_method)crash, gensym("crash"), 0);
-
+	// the user asks for a rhythm
+	class_addmethod(rhythms_memory_class, (t_method)ask_rhythm, gensym("rhythm"),
+        A_GIMME, 0);
 }
 
 
