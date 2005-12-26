@@ -22,7 +22,8 @@ _pd()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     #prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-r \
+    opts="-help \
+    -r \
     -audioindev \
     -audiooutdev \
     -audiodev \
