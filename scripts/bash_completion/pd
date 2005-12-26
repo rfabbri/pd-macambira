@@ -1,19 +1,17 @@
 # 
 # bash_completion file for Pd. 
 # 
-# Save as: /etc/bash_completion.d/pd or ~/.bash_completion and enjoy
-# never having to type any full command line option anymore. Instead you
-# can press <TAB>.
+# Save as: /etc/bash_completion.d/pd or ~/.bash_completion and enjoy never
+# having to type any full command line option anymore. Instead you can press
+# <TAB>.
 #
-# Later add some more fine grained settings, like having "-path"
-# only complete on directory names etc. If you want to help, these are
-# fine introductions to bash's completion feature:
+# If you want to help, these are fine introductions to bash's completion
+# feature:
 # 
 # http://www.debian-administration.org/articles/316
 # http://www.debian-administration.org/articles/317
 #
-# First version written by Frank Barknecht <fbar AT footils.org>
-# Dec 26 2005
+# First version written by Frank Barknecht <fbar AT footils.org> Dec 26 2005
 
 have pd && 
 _pd() 
@@ -21,7 +19,9 @@ _pd()
     local cur prev opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    #prev="${COMP_WORDS[COMP_CWORD-1]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    
+    # Pd's options:
     opts="-help \
     -r \
     -audioindev \
@@ -69,6 +69,28 @@ _pd()
     -rt \
     -realtime \
     -nrt"
+
+
+    # options that require an argument:
+    case "${prev}" in
+        # directory argument:
+        # TODO: colon-separated paths as in "/usr/lib/pd/extra:/home/user/pd"
+        -path)
+            COMPREPLY=( $(compgen -d ${cur}) )
+            return 0
+            ;;
+        -helppath)
+            COMPREPLY=( $(compgen -d ${cur}) )
+            return 0
+            ;;
+        # patch file argument:
+        -open)
+            _filedir '@(pd|pat)'
+            return 0
+            ;;
+        *)
+            ;;
+    esac
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
