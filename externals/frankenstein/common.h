@@ -257,7 +257,7 @@ void rhythm_memory_evaluate(t_rhythm_memory_representation *rep_list, // the mem
 							);
 // return 0 if failed finding the rhythm, 1 if the rhythm was found
 int rhythm_memory_get_rhythm(t_rhythm_memory_representation *rep_list, // the memory
-							  t_rhythm_event *out_rhythm, // a pointer to the returned rhythm
+							  t_rhythm_event **out_rhythm, // a pointer to the returned rhythm
 							  // the id of the main rhythm wanted
 							  unsigned short int id, 
 							  // the sub-id of the sub-rhythm wanted
