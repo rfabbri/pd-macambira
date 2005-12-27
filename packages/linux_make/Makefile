@@ -98,9 +98,9 @@ installer_readme:
 
 installer_makefile:
 # it is very hard to escape the $ in shell scripts so delete files
-	-rm -f -- $(helpdir)/iemabs/*\$$*.pd $(objectsdir)/iemabs/*\$$*.pd
+	-rm -f -- $(helpdir)/iem*/*\$$*.pd $(objectsdir)/iem*/*\$$*.pd
 # don't put the Makefile into the package yet, otherwise it'll get installed
-	-./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
+	./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
 	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
 
 
