@@ -38,5 +38,11 @@
 	<string>motex</string>
 	<key>loadlib17</key>
 	<string>iemabs</string>
+	<key>loadlib18</key>
+	<string>oscx</string>
+	<key>loadlib19</key>
+	<string>freeverb</string>
+	<key>loadlib20</key>
+	<string>pdogg</string>
 </dict>
 </plist>

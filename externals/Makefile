@@ -107,8 +107,8 @@ CXXFLAGS = $(CFLAGS)
 
 # if your library isn't included here, it won't be built with Pd-extended
 LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex oscx pddp pdp pidip pmpd smlib toxy\
-unauthorized vbap zexy
+iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pdp pidip pmpd \
+smlib toxy unauthorized vbap zexy
 
 
 all: pre_all_$(OS_NAME) buildsrc $(LIB_TARGETS)
@@ -736,6 +736,36 @@ pddp_install: pddp
 
 pddp_clean:
 	-make -C $(externals_src)/mixed/pddp $(DEST_PATHS) clean
+
+
+
+#------------------------------------------------------------------------------#
+# PDOGG
+PDOGG_NAME=pdogg
+PDOGG_OBJECTS := $(wildcard $(externals_src)/pdogg/*/*.c)
+pdogg: $(PDOGG_OBJECTS:.c=.$(EXTENSION))
+
+pdogg_install: pdogg
+	install -d $(objectsdir)/$(PDOGG_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDOGG_NAME) \
+		--author "Olaf Matthes" \
+		--description "objects for reading, writing, and streaming ogg" \
+		--license "LGPL" \
+		--version "0.2"
+	install -p $(PDOGG_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(PDOGG_NAME)
+	install -d $(helpdir)/$(PDOGG_NAME)
+	install -p $(externals_src)/pdogg/*/*.pd \
+		$(helpdir)/$(PDOGG_NAME)
+	install -d $(manualsdir)/$(PDOGG_NAME)
+	install -p $(externals_src)/pdogg/readme \
+		$(manualsdir)/$(PDOGG_NAME)/README.txt
+
+pdogg_clean:
+	-rm -f -- $(externals_src)/pdogg/*/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/pdogg/*/*.o
+	-rm -f -- $(externals_src)/pdogg/*/*.bak
+	-rm -f -- $(externals_src)/pdogg/*/*.*~
+	-rm -f -- $(externals_src)/pdogg/*.*~
 
 
 
