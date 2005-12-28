@@ -47,7 +47,12 @@ CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src \
 LDFLAGS =  
 LIBS = -lm
 
+# turn on weak linking and dlopen support
+MACOSX_DEPLOYMENT_TARGET = 10.3
+
 ifeq ($(OS_NAME),darwin)
+  CC = MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) gcc
+  CXX = MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) g++
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
   LIBS += -lc
@@ -398,16 +403,15 @@ FREEVERB_OBJECTS := $(wildcard $(externals_src)/freeverb~/*.c)
 freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
 
 freeverb_install: freeverb
-	install -d $(objectsdir)/$(FREEVERB_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FREEVERB_NAME) \
-		--author "Olaf Matthes and Jezar Wakefield" \
-		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
-		--license "GNU GPL" \
-		--version "1.2"
-	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FREEVERB_NAME)
-	install -d $(helpdir)/$(FREEVERB_NAME)
-	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
-		$(helpdir)/$(FREEVERB_NAME)
+	install -d $(objectsdir)
+#	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FREEVERB_NAME) \
+#		--author "Olaf Matthes and Jezar Wakefield" \
+#		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
+#		--license "GNU GPL" \
+#		--version "1.2"
+	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
+	install -d $(helpdir)
+	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) $(helpdir)
 	install -d $(manualsdir)/$(FREEVERB_NAME)
 	install -p $(externals_src)/freeverb~/README \
 		$(manualsdir)/$(FREEVERB_NAME)/README.txt
@@ -425,15 +429,15 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # HID
 HID_NAME = hid
-HID_INCLUDES = -I$(externals_src)/hcs/hid -I$(pd_src)/src \
-	-I$(externals_src)/hcs/hid/HID\ Utilities\ Source
-HID_CFLAGS = $(CFLAGS)
+HID_INCLUDES = -I$(externals_src)/hcs/hid -I$(pd_src)/src
+HID_CFLAGS = $(CFLAGS) $(HID_INCLUDES)
 ifeq ($(OS_NAME),windows)
   HID_LIBS = $(LIBS) -lhid -lsetupapi
 else
   ifeq ($(OS_NAME),darwin)
     FRAMEWORKS = Carbon IOKit ForceFeedback
-    HID_LIBS = $(LIBS) -L./HID\ Utilities\ Source/build \
+	HID_CFLAGS += -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
+    HID_LIBS = $(LIBS) -L$(externals_src)/hcs/hid/HID\ Utilities\ Source/build \
        -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
     HID_LIBS = $(LIBS)
@@ -442,12 +446,13 @@ endif
 
 HID_SRC = input_arrays.c hid_$(OS_NAME).c hid.c
 HID_OBJECTS := $(patsubst %.c, $(externals_src)/hcs/hid/%.o, $(HID_SRC))
-%.$(EXTENSION): %.o
-	$(CC) $(LDFLAGS) -o "$*.$(EXTENSION)"  $(HID_OBJECTS) $(HID_LIBS)
-	chmod a-x "$*.$(EXTENSION)"
-#	$(STRIP) $*.$(EXTENSION)
+$(HID_OBJECTS) : %.o : %.c
+	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
 
 $(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS)
+	$(CC) $(LDFLAGS) -o "hid.$(EXTENSION)"  $(HID_OBJECTS) $(HID_LIBS)
+	chmod a-x "$*.$(EXTENSION)"
+#	$(STRIP) $*.$(EXTENSION)
 
 hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
 
@@ -459,8 +464,7 @@ hid_install: hid
 		--description "" \
 		--license "GNU GPL" \
 		--version ""
-	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) \
-		$(objectsdir)/$(HID_NAME)
+	-install -p $(externals_src)/hcs/hid/hid.$(EXTENSION) $(objectsdir)
 	install -p $(externals_src)/hcs/hid/*.pd $(objectsdir)/$(HID_NAME)
 	install -d $(helpdir)/$(HID_NAME)
 	install -p $(externals_src)/hcs/hid/doc/*.pd       $(helpdir)/$(HID_NAME)
@@ -686,17 +690,17 @@ $(externals_src)/OSCx/src/Makefile: $(externals_src)/OSCx/src/Makefile.in
 
 $(externals_src)/OSCx/src/OSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
-	-make -C $(externals_src)/OSCx
+	make -C $(externals_src)/OSCx
 
 oscx: $(externals_src)/OSCx/src/OSC.$(EXTENSION)
 
 
 oscx_install: oscx
-	-install -p $(externals_src)/OSCx/src/OSC.$(EXTENSION) $(objectsdir)
 	install -d $(objectsdir)/$(OSCX_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(OSCX_NAME) \
-		--author "jdl at xdv.org" \
-		--license "BSD"
+		--author "<jdl@xdv.org>" \
+		--license "BSD" \
+		--description "objects for working with OpenSoundControl"
 	install -p $(externals_src)/OSCx/src/*.$(EXTENSION) $(objectsdir)/$(OSCX_NAME)
 	install -d $(helpdir)/$(OSCX_NAME)
 	install -p $(externals_src)/OSCx/doc/*.* $(helpdir)/$(OSCX_NAME)
@@ -746,7 +750,7 @@ $(externals_src)/pdp/Makefile.config: $(externals_src)/pdp/Makefile.config.in
 
 $(externals_src)/pdp/pdp.$(EXTENSION):  $(externals_src)/pdp/configure \
 $(externals_src)/pdp/Makefile.config 
-	-make -C $(externals_src)/pdp
+	make -C $(externals_src)/pdp
 
 pdp: $(externals_src)/pdp/pdp.$(EXTENSION)
 
@@ -756,7 +760,7 @@ pdp_install: pdp
 #		--author "Tom Schouten" \
 #		--description "Pure Data Packet" \
 #		--license "GNU GPL"
-	-install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
+	install -p $(externals_src)/pdp/*.$(EXTENSION) $(objectsdir)
 #	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)/$(PDP_NAME)
 	install -p $(externals_src)/pdp/abstractions/*.pd $(objectsdir)
 	install -d $(helpdir)/$(PDP_NAME)
@@ -918,12 +922,15 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 
 # [cooled~] doesn't compile under MinGW (yet)
 UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
+
 # [vocoder~] is built separately since its made from a number of files
 UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
-unauthorized:  $(UNAUTHORIZED_VOCODER:.c=.o) \
-$(UNAUTHORIZED_TKFILES:.tk=.tk2c) $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
+ $(externals_src)/unauthorized/vocoder~/vocoder~.$(EXTENSION): $(UNAUTHORIZED_VOCODER:.c=.o)
 	$(CC) $(LDFLAGS) -o $(externals_src)/unauthorized/vocoder~/vocoder~.$(EXTENSION) \
 		$(UNAUTHORIZED_VOCODER:.c=.o) $(LIBS)
+
+unauthorized: $(externals_src)/unauthorized/vocoder~/vocoder~.$(EXTENSION) \
+$(UNAUTHORIZED_TKFILES:.tk=.tk2c) $(UNAUTHORIZED_OBJECTS:.c=.$(EXTENSION))
 
 unauthorized_install: unauthorized
 	install -d $(objectsdir)/$(UNAUTHORIZED_NAME)
