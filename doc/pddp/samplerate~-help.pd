@@ -1,0 +1,11 @@
+#N canvas 174 423 524 307 12;
+#X obj 211 123 samplerate~;
+#X floatatom 211 166 8 0 0 0 - - -;
+#X obj 211 80 bng 30 250 50 0 empty empty empty 0 -6 0 8 -260818 -1
+-1;
+#X text 14 25 When banged \, samplerate~ outputs the sample rate that
+Pd is currently running at.;
+#X text 31 217 Pd's sample rate can be changed using the command line
+flag: -r <n>. For example: pd -r 22050;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
