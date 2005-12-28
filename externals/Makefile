@@ -429,17 +429,17 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # HID
 HID_NAME = hid
-HID_INCLUDES = -I$(externals_src)/hcs/hid -I$(pd_src)/src
-HID_CFLAGS = $(CFLAGS) $(HID_INCLUDES)
 ifeq ($(OS_NAME),windows)
+  HID_CFLAGS = $(CFLAGS) 
   HID_LIBS = $(LIBS) -lhid -lsetupapi
 else
   ifeq ($(OS_NAME),darwin)
     FRAMEWORKS = Carbon IOKit ForceFeedback
-	HID_CFLAGS += -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
+	HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
     HID_LIBS = $(LIBS) -L$(externals_src)/hcs/hid/HID\ Utilities\ Source/build \
        -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
+    HID_CFLAGS = $(CFLAGS) 
     HID_LIBS = $(LIBS)
   endif
 endif
@@ -450,9 +450,9 @@ $(HID_OBJECTS) : %.o : %.c
 	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
 
 $(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS)
-	$(CC) $(LDFLAGS) -o "hid.$(EXTENSION)"  $(HID_OBJECTS) $(HID_LIBS)
-	chmod a-x "$*.$(EXTENSION)"
-#	$(STRIP) $*.$(EXTENSION)
+	$(CC) $(LDFLAGS) -o $(externals_src)/hcs/hid/hid.$(EXTENSION) \
+		$(HID_OBJECTS) $(HID_LIBS)
+	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
 
 hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
 
