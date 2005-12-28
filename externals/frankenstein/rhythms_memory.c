@@ -2,16 +2,15 @@
 rhythms_memory
 by Davide Morelli www.davidemorelli.it 2005
 
-a working version of rhythms_memory
-
 uses graphs to store rhythms
 
 TODO:
-  * test and debug core functionalities
-  * memory save/load to file
-  * output rhythms in the form of list of floats
-  * add velo
-  * input rhythms from a list (second inlet)
+  * memory save/load to file (?)
+  * output rhythms in the form of list of floats (easy)
+  * add velo (?)
+  * input rhythms from a list (second inlet) (easy)
+  * let it create variations on known rhythms (?)
+  * let it merge rhythms (?)
 
 */
 

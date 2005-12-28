@@ -1,11 +1,11 @@
-#N canvas 91 38 909 527 12;
+#N canvas 91 38 913 531 12;
 #X obj 126 256 rhythms_memory;
 #X msg 126 212 measure;
 #X msg 232 220 0;
 #X obj 123 48 metro 500;
 #X obj 85 86 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 123 25 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 123 25 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
 #X obj 124 71 int 0;
 #X obj 175 72 + 1;
@@ -47,7 +47,6 @@
 -1;
 #X obj 270 187 dac~;
 #X floatatom 180 155 5 0 0 0 - - -;
-#X msg 384 39 rhythm 1 1;
 #X obj 126 294 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 489 133 1 0 0.5;
@@ -61,8 +60,10 @@ of floats (TODO);
 #X text 235 315 here you'll get the wanted rhythms in the form of lists
 of floats (TODO);
 #X text 373 361 here you get info on the last detected rhythm;
-#X connect 0 0 26 0;
-#X connect 0 1 31 0;
+#X msg 384 39 rhythm_out 6 0;
+#X connect 0 0 25 0;
+#X connect 0 0 21 0;
+#X connect 0 1 30 0;
 #X connect 0 2 12 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -89,5 +90,5 @@ of floats (TODO);
 #X connect 21 0 23 1;
 #X connect 22 0 21 0;
 #X connect 22 0 11 0;
-#X connect 25 0 0 0;
-#X connect 27 0 0 1;
+#X connect 26 0 0 1;
+#X connect 34 0 0 0;

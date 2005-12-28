@@ -387,7 +387,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	unsigned short int *src_rhythm_array, *tmp_rhythm_array;
 	unsigned short int best_subid, curr_subid;
 	float best_closeness, curr_closeness;
-	int sub_ok, sub_no;
+	int sub_ok, sub_no, sub_count;
 	int count_strong;
 	t_rhythm_memory_element *possible_rhythms;
 
@@ -408,6 +408,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	strong_ok=0;
 	strong_no=0;
 	strong_ratio=0;
+	/*
 	average_weight = 0;
 	while(curr_event)
 	{
@@ -419,7 +420,15 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 		beats++;
 		curr_event = curr_event->next;
 	}
-
+	// this is the average weight of this rhythm in this representation
+	if (beats==0)
+	{
+		average_weight = 0;
+	} else
+	{
+		average_weight = (float) (average_weight / ((float) beats));
+	}
+	*/
 	// look all the representation's rhythm 
 	// looking for strong beats corrispondance
 	count_strong = 0;
@@ -446,14 +455,6 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 			}	
 	}
 
-	// this is the average weight of this rhythm in this representation
-	if (beats==0)
-	{
-		average_weight = 0;
-	} else
-	{
-		average_weight = (float) (average_weight / ((float) beats));
-	}
 	// ratio of corresponding strong beats.. 
 	// close to 0 = no corrispondance
 	// close to 1 = corrispondance
@@ -476,7 +477,7 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 	{
 		// create the table of this rhythm
 		create_array_beats(&tmp_rhythm_array, possible_rhythms->rhythm);
-		sub_ok = sub_no = 0;
+		sub_ok = sub_no = sub_count = 0;
 		for (i=0; i<max_i; i++)
 		{
 			if (tmp_rhythm_array[i]>0  && src_rhythm_array[i]>0)
@@ -489,13 +490,14 @@ void compare_rhythm_vs_representation(t_rhythm_memory_representation *this_rep,
 			{
 				sub_no++;
 			}
+			sub_count++;
 		}
 		if (sub_no == 0)
 		{
 			curr_closeness = 1;
 		} else
 		{
-			curr_closeness = (float) ( ((float) sub_ok) / ((float) sub_no) );
+			curr_closeness = (float) (( ((float) sub_ok) - ((float) sub_no) ) / ((float) sub_count));
 		}
 		if (curr_closeness > best_closeness)
 		{

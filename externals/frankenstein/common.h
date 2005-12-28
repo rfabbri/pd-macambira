@@ -77,8 +77,10 @@ struct t_rhythm_memory_arc
 } ;
 // it will be arranged in a heap list.. ?
 
-#define num_possible_denominators 11
-static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
+//#define num_possible_denominators 11
+//static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12,16,18,24,32};
+#define num_possible_denominators 7
+static unsigned short int possible_denominators[] = {1,2,3,4,6,8,12};
 
 // the minimum percentage for a beat to be considered part of the main rhythm
 #define min_to_be_main_rhythm_beat 0.7
