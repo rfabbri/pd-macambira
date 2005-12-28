@@ -1,6 +1,9 @@
 /* 
 rhythms_memory
-by Davide Morelli www.davidemorelli.it 2005
+
+Authors:
+Davide Morelli http://www.davidemorelli.it
+David Plans Casal http://www.studios.uea.ac.uk/people/staff/casal
 
 uses graphs to store rhythms
 
@@ -322,6 +325,24 @@ static void add_rhythm(t_rhythms_memory *x, t_symbol *s, int argc, t_atom *argv)
 	post("TODO");
 }
 
+// creates a variation of a given rhythm (in memory)
+// with a given degree of closeness
+static void variation(t_rhythms_memory *x, t_symbol *s, int argc, t_atom *argv)
+{
+ // TODO
+	post("TODO");
+
+	// get the rhythm
+
+	// using the transitions table create a new one
+
+	// add it to the memory?
+
+	// output to the list outlet?
+
+	// set it as the next played rhythm
+}
+
 static void rhythms_memory_bang(t_rhythms_memory *x) {
 
 	// generate a random value
@@ -399,6 +420,9 @@ void rhythms_memory_setup(void)
         A_GIMME, 0);
 	// adds a rhythm passing it as a list of floats
 	class_addmethod(rhythms_memory_class, (t_method)add_rhythm, gensym("rhythm_in"),
+        A_GIMME, 0);
+	// builds a variation of a given rhythm
+	class_addmethod(rhythms_memory_class, (t_method)variation, gensym("variation"),
         A_GIMME, 0);
 }
 

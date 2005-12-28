@@ -1,3 +1,14 @@
+/*
+
+header file for common functions used by the externals of the "frank framework".
+
+the frank framework is a set of pd externals implementing AI agents for improvisation.
+
+Authors:
+Davide Morelli http://www.davidemorelli.it
+David Plans Casal http://www.studios.uea.ac.uk/people/staff/casal
+
+*/
 
 // here i put common data structures and functions
 

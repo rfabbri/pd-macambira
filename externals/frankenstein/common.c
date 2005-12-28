@@ -1,4 +1,12 @@
+/*
 
+implementation of common functions used by the externals of the frank framework
+
+Authors:
+Davide Morelli http://www.davidemorelli.it
+David Plans Casal http://www.studios.uea.ac.uk/people/staff/casal
+
+*/
 #include "common.h"
 
 #include <math.h>
