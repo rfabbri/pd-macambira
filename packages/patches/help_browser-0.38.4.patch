@@ -4,76 +4,25 @@ RCS file: /cvsroot/pure-data/pd/src/u_main.tk,v
 retrieving revision 1.7.2.4
 diff -u -w -r1.7.2.4 u_main.tk
 --- u_main.tk	21 Feb 2005 04:20:20 -0000	1.7.2.4
-+++ u_main.tk	28 Nov 2005 15:27:03 -0000
-@@ -24,6 +24,14 @@
++++ u_main.tk	29 Dec 2005 00:53:29 -0000
+@@ -24,6 +24,8 @@
  # Tearoff is set to true by default:
  set pd_tearoff 1
  
-+
-+# a menu on the main menubar named $whatever.help while be treated
-+# as a special menu with specific behaviors on different platforms.
-+# See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-+# this is the default name for the Help menu
-+set help_menu_name "help"
 +
 +#################### init for Windows ####################
  if {$pd_nt == 1} {
      global pd_guidir
      global pd_tearoff
-@@ -32,8 +40,12 @@
-     set pd_guidir $pd_gui3/..
-     load $pd_guidir/bin/pdtcl.dll
+@@ -34,6 +36,7 @@
      set pd_tearoff 1
-+    set help_top_directory $pd_guidir/doc
-+    # init last help directory browsed
-+    set help_directory $help_top_directory
  }
  
 +##################### init for Mac OS X/Darwin ####################
  if {$pd_nt == 2} {
  # turn on James Tittle II's fast drawing (wait until I can test this...):
  #   set tk::mac::useCGDrawing 1
-@@ -43,6 +55,39 @@
-     set pd_guidir $pd_gui2/..
-     load $pd_guidir/bin/pdtcl
-     set pd_tearoff 0
-+    set help_top_directory $pd_guidir/doc
-+    
-+    
-+    # This procedure generates a temporary mirror of the documentation directory
-+    # in /tmp so that it can be opened from the Help->Pure Documentation... menu
-+    # under Mac OS X.  It is meant to be run at startup.
-+    # Damn you Apple and your hide-stuff-from-the-user "features".  
-+    # <hans@at.or.at.>
-+    regsub -all "/" $help_top_directory "." help_directory_alias
-+    set help_directory_alias /tmp/.pd_help_directory_alias-$help_directory_alias
-+    set help_directory_tmpdir $help_directory_alias/doc
-+    # if something other than a directory exists, delete it
-+    if [file exists $help_directory_alias] {
-+	file delete -force -- $help_directory_alias
-+    }
-+    if { ! [ file isdirectory $help_directory_tmpdir ] } {
-+	file mkdir $help_directory_tmpdir
-+    }
-+    foreach file [ lsort [ glob -dir $help_top_directory * ] ] {
-+	regsub -all ".*/" $file "" link_file_name
-+	file link -symbolic $help_directory_tmpdir/$link_file_name $file 
-+    }
-+    # init last help directory browsed
-+    set help_directory $help_directory_tmpdir
-+
-+
-+    # a menu on the main menubar named "$whatever.help" while be treated
-+    # as a special menu with specific behaviors on different platforms.
-+    # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
-+    # Apple doesn't allow cascading menus in their Help so I had to call this 
-+    # one "docs" <hans@at.or.at>
-+    set help_menu_name "docs"
-+    
- 
- 	 # tk::mac::OpenDocument is called with the filenames put into the 
- 	 # var args whenever docs are either dropped on the Pd.app icon or 
-@@ -60,14 +105,22 @@
+@@ -60,6 +63,7 @@
  # hack so you can easily test-run this script in linux... define pd_guidir
  # (which is normally defined at startup in pd under linux...)
  
@@ -81,22 +30,23 @@ diff -u -w -r1.7.2.4 u_main.tk
  if {$pd_nt == 0} {
      if {! [info exists pd_guidir]} {
      	global pd_guidir
-     	puts stderr {setting pd_guidir to '.'}
- 	set pd_guidir .
+@@ -68,6 +72,15 @@
      }
-+    set help_top_directory $pd_guidir/doc
-+    # init last help directory browsed
-+    set help_directory $help_top_directory
  }
  
++
 +#################### init for all platforms ####################
++
++set help_top_directory $pd_guidir/doc
++# init last help directory browsed
++set help_directory $help_top_directory
 +
 +
 +
  # it's unfortunate but we seem to have to turn off global bindings
  # for Text objects to get control-s and control-t to do what we want for
  # "text" dialogs below.  Also we have to get rid of tab's changing the focus.
-@@ -95,25 +148,15 @@
+@@ -95,25 +108,15 @@
  if {$pd_nt != 2} {
      .mbar add cascade -label "Windows" -menu .mbar.windows
      .mbar add cascade -label "Media" -menu .mbar.audio
@@ -119,12 +69,12 @@ diff -u -w -r1.7.2.4 u_main.tk
 -	 menu .mbar.docs -tearoff $pd_tearoff
 -	 .mbar add cascade -label "Help" -menu .mbar.docs
  }
-+menu .mbar.$help_menu_name -tearoff $pd_tearoff
-+.mbar add cascade -label "Help" -menu .mbar.$help_menu_name
++menu .mbar.help -tearoff $pd_tearoff
++.mbar add cascade -label "Help" -menu .mbar.help
  
  set ctrls_audio_on 0
  set ctrls_meter_on 0
-@@ -371,25 +414,15 @@
+@@ -371,25 +374,15 @@
  	 }
  }
  
@@ -140,11 +90,11 @@ diff -u -w -r1.7.2.4 u_main.tk
 -    if {$pd_nt == 2} {
 -    	exec rm -rf /tmp/pd-documentation
 -    	exec cp -pr $pd_guidir/doc /tmp/pd-documentation
- 	set filename [tk_getOpenFile -defaultextension .pd \
+-	set filename [tk_getOpenFile -defaultextension .pd \
 -	-filetypes { {{documentation} {.pd .txt .htm}} } \
 -	-initialdir /tmp/pd-documentation]
 -    } else {
--	set filename [tk_getOpenFile -defaultextension .pd \
+ 	set filename [tk_getOpenFile -defaultextension .pd \
 -	-filetypes { {{documentation} {.pd .txt .htm}} } \
 +		      -filetypes { {{documentation} {.pd .txt .htm .html}} } \
  	-initialdir $help_directory]
@@ -152,7 +102,7 @@ diff -u -w -r1.7.2.4 u_main.tk
      if {$filename != ""} {
      	if {[string first .txt $filename] >= 0} {
      	    menu_opentext $filename
-@@ -411,42 +444,69 @@
+@@ -411,35 +404,120 @@
   
      set dirname $pd_guidir/$subdir
  
@@ -172,16 +122,75 @@ diff -u -w -r1.7.2.4 u_main.tk
 -    	pd [concat pd open [pdtk_enquote $basename] \
 -		[pdtk_enquote $dirname] \;]
 +				menu_openhtml $dirname/$basename
-     }
- }
++    }
++}
 +}
 +
++################## prototype help browser #########################
++
++proc menu_doc_browser {dir} {
++	global .mbar
++	if {![file isdirectory $dir]} {
++		puts stderr "menu_doc_browser non-directory $dir\n"
++	}
++	if { [winfo exists .help_browser.frame] } {
++		raise .help_browser
++	} else {
++		toplevel .help_browser -menu .mbar
++		wm title .help_browser "Pure Documentation Browser"
++		frame .help_browser.frame
++		pack .help_browser.frame -side top -fill both
++		doc_make_listbox .help_browser.frame $dir 0
++	}
++}
++
++proc doc_make_listbox {base dir count} {
++	global pd_guidir
++	if {![file isdirectory $dir]} {
++		regsub -- $pd_guidir [file dirname $dir] "" subdir
++		set file [file tail $dir]
++		if { [catch {menu_doc_open $subdir $file} fid] } {
++			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
++		}
++		return; 
++	}
++	# check for [file readable]?
++	if { [info tclversion] >= 8.5 } {
++		# requires Tcl 8.5 but probably deals with special chars better
++#		destroy {expand}[lrange [winfo children $base] [expr { 2 * $count }] end]
++	} else {
++		if { [catch { eval destroy [lrange [winfo children $base] \
++										[expr { 2 * $count }] end] } \
++				  errorMessage] } {
++			puts stderr "doc_make_listbox: error listing $dir\n"
+     }
+ }
++	# exportselection 0 looks good, but selection gets easily out-of-sync
++	set current_listbox [listbox "[set b "$base.listbox$count"]-list" -yscrollcommand \
++							 [list "$b-scroll" set] -height 20 -exportselection 0]
++	pack $current_listbox [scrollbar "$b-scroll" -command [list $current_listbox yview]] \
++		-side left -expand 1 -fill y -anchor w
++	foreach item [concat [lsort -dictionary [glob -directory $dir -nocomplain -types {d} -- *]] \
++					  [lsort -dictionary [glob -directory $dir -nocomplain -types {f} -- *]]]  {
++		$current_listbox insert end "[file tail $item][expr {[file isdirectory $item] ? {/} : {}}]"
++	}
++	bind $current_listbox <Button-1> [list doc_navigate $dir [incr count] %W %x %y]
++}
  
 -proc doc_submenu {helpmenu subdir} {
 -	 global help_top_directory pd_tearoff
-+################## menu_doc_submenu #########################
++proc doc_navigate {dir count width x y} {
++	if {[set subdir [$width get [$width index "@$x,$y"]]] eq {}} {
++		return
++	}
++	doc_make_listbox [winfo parent $width] [file join $dir $subdir] $count
++}
  
 -	 set menudir $help_top_directory/$subdir
+ 
+-    regsub -all "\\\." $subdir "" submenu
++################## menu_doc_submenu #########################
+ 
 +# this is a recursive function to generation a nested menu in the help menu
 +# which shows the complete contents of the doc directory <hans@at.or.at>
 +proc menu_doc_submenu {helpmenu base_dir sub_dir} {
@@ -189,13 +198,12 @@ diff -u -w -r1.7.2.4 u_main.tk
 +    global help_top_directory
 +
 +    set menu_dir $help_top_directory/$base_dir/$sub_dir
- 
--    regsub -all "\\\." $subdir "" submenu
++
 +    catch {
 +	foreach file [ lsort [ glob -nocomplain -dir $menu_dir * ] ] {
 +	    set file_type [file type $file]
 +	    regsub {.*/(.*$)} $file {\1} file_name
- 
++
 +	    # If links are going to be used then there needs to be a check to 
 +	    # see if each link might cause this function to recurse forever
 +	    # <hans@at.or.at>
@@ -230,20 +238,15 @@ diff -u -w -r1.7.2.4 u_main.tk
  	 }
  }
  
- ############# routine to add media, help, and apple menu items ###############
- 
- proc menu_addstd {mbar} {
--    global pd_apilist pd_nt pd_tearoff
-+    global pd_apilist pd_nt pd_tearoff help_menu_name
- #          the "Audio" menu
-     $mbar.audio add command -label {audio ON} -accelerator [accel_munge "Ctrl+/"] \
- 	-command {menu_audio 1} 
-@@ -490,34 +550,17 @@
+@@ -490,34 +568,15 @@
  				-command {pd pd audio-properties \;}
  		  $mbar.apple.preferences add command -label "MIDI settings..." \
  				-command {pd pd midi-properties \;}
--	 }
--
++	 } else {
++	$mbar.help add command -label "About Pd..." -command \
++	    {menu_doc_open doc/1.manual 1.introduction.txt} 
+ 	 }
+ 
 -
 -#          the "Help" menu
 -	 if {$pd_nt != 2} {
@@ -257,52 +260,38 @@ diff -u -w -r1.7.2.4 u_main.tk
 -		  # add menu items for each section instead of using Pd patches
 -		  $mbar.help add separator
 -		  set helpmenuname help
- 	 } else {
+-	 } else {
 -# Apple doesn't allow cascading menus in their Help so I had to call this 
 -# one "docs"  <hans@at.or.at>
 -		  set helpmenuname docs
-+	$mbar.$help_menu_name add command -label "About Pd..." -command \
-+	    {menu_doc_open doc/1.manual 1.introduction.txt} 
- 	 }
- 
+-	 }
+-
 -	 $mbar.$helpmenuname add command -label {1 manual...} \
-+    $mbar.$help_menu_name add command -label {Browse Documentation...} \
-+	-command {menu_documentation} 
-+    $mbar.$help_menu_name add command -label {Pd HTML Manual...} \
++    $mbar.help add command -label {Pure Documentation Browser} \
++	-command {menu_doc_browser $help_top_directory} 
++    $mbar.help add command -label {Pd Manual} \
  		  -command {menu_doc_open doc/1.manual index.htm} 
 -	 doc_submenu $mbar.$helpmenuname 2.control.examples
 -	 doc_submenu $mbar.$helpmenuname 3.audio.examples
 -	 doc_submenu $mbar.$helpmenuname 4.fft.examples
 -	 doc_submenu $mbar.$helpmenuname 5.reference
 -	 doc_submenu $mbar.$helpmenuname 6.externs
-+    $mbar.$help_menu_name add separator
-+    menu_doc_submenu $mbar.$help_menu_name "." "."
  }
  
  #################### the "File" menu for the Pd window ##############
-@@ -820,6 +863,7 @@
-     global pd_opendir
-     global pd_tearoff
-     global pd_nt
-+    global help_menu_name
- 
-     toplevel $name -menu $name.m
- #    puts stderr [concat geometry: $geometry]
-@@ -1078,13 +1122,11 @@
+@@ -1077,15 +1136,8 @@
+ # a menu on the main menubar named "$whatever.help" while be treated
  # as a special menu with specific behaviors on different platforms.
  # See SPECIAL MENUS IN MENUBARS http://www.tcl.tk/man/tcl8.4/TkCmd/menu.htm
- 	 if {$pd_nt != 2} {
--    menu $name.m.help -tearoff $pd_tearoff
--    $name.m add cascade -label Help -menu $name.m.help
-+	menu $name.m.$help_menu_name -tearoff $pd_tearoff
-+	$name.m add cascade -label Help -menu $name.m.$help_menu_name
- 	 } else {
+-	 if {$pd_nt != 2} {
+     menu $name.m.help -tearoff $pd_tearoff
+     $name.m add cascade -label Help -menu $name.m.help
+-	 } else {
 -		  # Apple doesn't allow cascading menus in their Help
 -		  # so I had to call this one "docs". <hans@at.or.at>
 -		  menu $name.m.docs -tearoff $pd_tearoff
 -		  $name.m add cascade -label Help -menu  $name.m.docs
-+	menu $name.m.$help_menu_name -tearoff $pd_tearoff
-+	$name.m add cascade -label Help -menu  $name.m.$help_menu_name
- 	 }
+-	 }
  
      menu_addstd $name.m
+ 
