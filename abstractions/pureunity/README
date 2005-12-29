@@ -1,0 +1,23 @@
+PureUnity
+
+Copyright 2006 by Mathieu Bouchard
+
+$Id: README,v 1.1 2005-12-29 17:27:13 matju Exp $
+
+------------------8<--------cut-here--------8<------------------
+GOALS
+
+  1. Provide a unit-test framework, which also provide benchmarking features,
+     all made in Pd for use in Pd.
+
+  2. Provide tests for functionality in internals, externals, abstractions, etc.,
+     in a modularized way, in a DRY/OAOO fashion, thus abstracting out common
+     features so that many objects share the same test patch for the features
+     that they have in common.
+
+------------------8<--------cut-here--------8<------------------
+OVERVIEW
+
+(write me!)
+
+
