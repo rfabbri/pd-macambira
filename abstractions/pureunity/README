@@ -2,7 +2,7 @@ PureUnity
 
 Copyright 2006 by Mathieu Bouchard <matju à artengine point ca>
 
-$Id: README,v 1.2 2005-12-29 18:47:56 matju Exp $
+$Id: README,v 1.3 2005-12-29 23:04:27 matju Exp $
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 GOALS
@@ -79,8 +79,43 @@ SEVERITIES (in decreasing order)
    epsilon sucks.
 
 +-+-+--+---+-----+--------+-------------+---------------------+
+PROTOCOL FOR [error]
+
+new:
+  optional argument which would either be a float
+  (e.g. the $0 of the enclosing abstraction) or a pointer.
+
+inlet 0:
+  set $scapegoat:
+    replaces the originator of the message by $scapegoat, which can be a
+    float or a pointer
+
+  error $1 ...:
+    causes its arguments to be concatenated, space-separated (may include
+    floats), and then sent through pd_error using the appropriate
+    originator (scapegoat).
+
+  list $1 ...:
+    for future use. would use pd_error2() (see README or previous mail).
+    $1 has to be a symbol.
+
++-+-+--+---+-----+--------+-------------+---------------------+
 ETC
 
 
 (write me!)
 
+
+
+
+If +-test.pd tests [+], it can test for hotness, coldness, it can test
+that only one result is produced per hot message, that all results are
+float, that a few example additions work, and that with random inputs it
+respects commutativity, associativity, invertibility, within appropriate
+relative-error bounds, etc.
+
+However +-test.pd can't test that errormessages aren't printed during the
+testing. This may be something that we want to check for, and currently
+the best way to handle it is to search the console for error messages, and
+if there are any, restart the tests in verbose mode and see where the
+error happens exactly.
