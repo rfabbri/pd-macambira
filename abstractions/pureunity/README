@@ -1,23 +1,86 @@
 PureUnity
 
-Copyright 2006 by Mathieu Bouchard
+Copyright 2006 by Mathieu Bouchard <matju à artengine point ca>
 
-$Id: README,v 1.1 2005-12-29 17:27:13 matju Exp $
+$Id: README,v 1.2 2005-12-29 18:47:56 matju Exp $
 
-------------------8<--------cut-here--------8<------------------
++-+-+--+---+-----+--------+-------------+---------------------+
 GOALS
 
-  1. Provide a unit-test framework, which also provide benchmarking features,
+  1. To provide a unit-test framework, which also provide benchmarking features, 
      all made in Pd for use in Pd.
 
-  2. Provide tests for functionality in internals, externals, abstractions, etc.,
-     in a modularized way, in a DRY/OAOO fashion, thus abstracting out common
-     features so that many objects share the same test patch for the features
-     that they have in common.
+  2. To provide tests for functionality in internals, externals, abstractions, 
+     etc., in a modularized way, in a DRY/OAOO fashion, thus abstracting out
+     common features so that many objects share the same test patch for the 
+     features that they have in common.
 
-------------------8<--------cut-here--------8<------------------
-OVERVIEW
++-+-+--+---+-----+--------+-------------+---------------------+
+TEST PROTOCOL
+
+  new:
+    create common (reusable) fixtures.
+
+  inlet 0:
+    bang:
+      run all available tests in that class. individual tests don't have
+      to be available through individual methods but may. If they do, the
+      names of the methods must match those given in the test results. 
+
+      each test should build its own non-reusable fixtures and reinitialize
+      common fixtures, not assuming that the previous tests have left the
+      common fixtures in a normal state.
+
+  outlet 0:
+    test results. a sequence of lists like:
+      list $name $passed? $accuracy $elapsed
+    for example:
+      list 
+
+    where:
+      $name is a symbol
+      $passed? is either 0 for failure or 1 for success
+      $accuracy is a float proportional to relative error on math
+         (if not applicable, use 0)
+      $elapsed is a float, the time elapsed in milliseconds
+         or it is the symbol "-" if not measured.
+
++-+-+--+---+-----+--------+-------------+---------------------+
+SEVERITIES (in decreasing order)
+
+ * crash: Segmentation Fault, Bus Error, Illegal Instruction, Infinite Loop, 
+   etc.  You can't deal with those errors at the level of the tests. Maybe there 
+   should be a way to tell a test object to skip certain tests, by name, in 
+   order to be able to perform as many tests as possible while waiting for a 
+   fix. It could become possible to rescue from some of those crashes if Pd
+   supported exceptions (stack-unwinding).
+
+ * corruption: this may cause future crashes and failures on innocent 
+   objects/features. I have no solution for this except to be careful.
+
+ * post(),error(),pd_error(): Gets printed in the console. The problem is that 
+   those can't be handled by the test objects, so someone has to read them and 
+   interpret them. Also they prevent test objects to ensure that error 
+   conditions produce error messages.
+
+ * pd_error2(): I wish this would exist. It would be sort of like pd_error() 
+   but it would produce a pd message instead, whose selector would be an 
+   error code, designed to be both localizable and [route]able. By default, that 
+   message would be sent to the console, but there would be an internal class
+   designed to catch those messages. (If stack-unwinding were possible, it would 
+   be disabled by default on pd_error2 and could be enabled explicitly 
+   by-selector).
+
+ * failure: a test object reports a problem through outlet 0.
+
+ * dropout: a failure in realtimeness... difficult for an object to detect.
+
+ * inaccuracy: a test more or less succeeds but the test detected that the 
+   epsilon sucks.
+
++-+-+--+---+-----+--------+-------------+---------------------+
+ETC
+
 
 (write me!)
-
 
