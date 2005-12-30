@@ -57,7 +57,7 @@ externals-howto_install: $(manualsdir)
 	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node3.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node3.html
 	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node4.html > \
-		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node.html
+		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node4.html
 	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node5.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node5.html
 	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node6.html > \
