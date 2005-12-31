@@ -1,0 +1,8 @@
+$Id: ChangeLog,v 1.1 2005-12-31 17:01:26 matju Exp $
+
+version 0.1:
+ * LICENSE is GPL
+ * README
+ * [commutator], [commutative-test]
+ * [associator], [associative-test]
+ * [distributor], [distributive-test]
