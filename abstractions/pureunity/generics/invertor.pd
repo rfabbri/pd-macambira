@@ -1,0 +1,21 @@
+#N canvas 282 67 620 168 10;
+#X obj 18 117 -;
+#X obj 18 19 inlet a;
+#X obj 71 19 inlet b;
+#X obj 18 65 \$1;
+#X text 184 25 (a \$1 b) \$2 b - a = 0;
+#X text 185 40 when the invertor is 0 the rule is respected.;
+#X text 185 63 see invertible-test.pd;
+#X text 184 11 invertibility rule for operator \$1 with right-inverse
+\$2 is:;
+#X obj 18 91 \$2;
+#X obj 18 39 t b a;
+#X obj 18 136 outlet (ab)/b-a;
+#X connect 0 0 10 0;
+#X connect 1 0 9 0;
+#X connect 2 0 3 1;
+#X connect 2 0 8 1;
+#X connect 3 0 8 0;
+#X connect 8 0 0 0;
+#X connect 9 0 3 0;
+#X connect 9 1 0 1;
