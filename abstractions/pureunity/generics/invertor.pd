@@ -7,7 +7,6 @@
 #X text 185 60 when the invertor is 0 the rule is respected.;
 #X text 185 83 see invertible-test.pd;
 #X obj 18 91 \$2;
-#X obj 18 39 t b a;
 #X obj 18 156 outlet (ab)/b-a;
 #X text 19 174 invertor;
 #X text 129 174 antiinvertor;
@@ -16,15 +15,16 @@
 #X obj 128 156 outlet (ab)/b+a;
 #X text 184 11 invertibility rule for operator \$1 with (presumed)
 right-inverse \$2 is:;
-#X connect 0 0 9 0;
-#X connect 1 0 8 0;
+#X obj 18 39 t a a;
+#X connect 0 0 8 0;
+#X connect 1 0 15 0;
 #X connect 2 0 3 1;
 #X connect 2 0 7 1;
 #X connect 3 0 7 0;
-#X connect 7 0 13 0;
-#X connect 8 0 3 0;
-#X connect 8 1 0 1;
-#X connect 8 1 12 1;
-#X connect 12 0 14 0;
-#X connect 13 0 0 0;
-#X connect 13 1 12 0;
+#X connect 7 0 12 0;
+#X connect 11 0 13 0;
+#X connect 12 0 0 0;
+#X connect 12 1 11 0;
+#X connect 15 0 3 0;
+#X connect 15 1 0 1;
+#X connect 15 1 11 1;
