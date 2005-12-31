@@ -1,0 +1,33 @@
+#N canvas 394 81 620 407 10;
+#X obj 18 84 \$1;
+#X obj 52 158 -;
+#X obj 68 115 \$1;
+#X obj 68 96 f;
+#X obj 18 19 inlet a;
+#X obj 84 32 inlet b;
+#X text 75 134 ba;
+#X text 33 103 ab;
+#X obj 18 38 t a b a;
+#X text 10 158 note: - is float-only;
+#X text 218 15 commutativity rule for operator \$1 is: a \$1 b = b
+\$1 a;
+#X text 218 32 which is also a \$1 b - b \$1 a = 0;
+#X text 218 48 the commutator is a \$1 b - b \$1 a;
+#X obj 52 177 outlet ab-ba;
+#X text 189 112 when \$1 = + this is also known as a "group commutator"
+;
+#X text 189 132 when \$1 = * this is also known as a "ring commutator"
+;
+#X text 190 153 however \, this thing i call commutator is more general
+;
+#X text 189 172 see commutative-test.pd;
+#X connect 0 0 1 0;
+#X connect 1 0 13 0;
+#X connect 2 0 1 1;
+#X connect 3 0 2 0;
+#X connect 4 0 8 0;
+#X connect 5 0 3 1;
+#X connect 5 0 0 1;
+#X connect 8 0 0 0;
+#X connect 8 1 3 0;
+#X connect 8 2 2 1;
