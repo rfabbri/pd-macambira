@@ -89,6 +89,8 @@ if {$pd_nt == 0} {
     }
 }
 
+set help_top_directory $pd_guidir/doc
+
 # it's unfortunate but we seem to have to turn off global bindings
 # for Text objects to get control-s and control-t to do what we want for
 # "text" dialogs below.  Also we have to get rid of tab's changing the focus.
@@ -378,49 +380,14 @@ proc menu_openhtml {filename} {
 
     if {$pd_nt == 0} {
         exec sh -c \
-            [format "firefox file:%s || mozilla file:%s &\n" \
-                $filename $filename]
+            [format "firefox file:%s || mozilla file:%s " \
+                $filename $filename] &
     } elseif {$pd_nt == 2} {
         puts stderr [format "open %s" $filename]
             exec sh -c [format "open %s" $filename]
     } else {
         exec rundll32 url.dll,FileProtocolHandler \
             [format "file:%s" $filename] &
-    }
-}
-
-set help_directory $pd_guidir/doc
-set help_top_directory $pd_guidir/doc
-
-proc menu_documentation {} {
-    global help_directory
-    global pd_nt
-    global pd_guidir
-
-    if {$pd_nt == 2} {
-        exec rm -rf /tmp/pd-documentation
-        exec cp -pr $pd_guidir/doc /tmp/pd-documentation
-        set filename [tk_getOpenFile -defaultextension .pd \
-        -filetypes { {{documentation} {.pd .txt .htm}} } \
-        -initialdir /tmp/pd-documentation]
-    } else {
-        set filename [tk_getOpenFile -defaultextension .pd \
-        -filetypes { {{documentation} {.pd .txt .htm}} } \
-        -initialdir $help_directory]
-    }    
-    if {$filename != ""} {
-        if {[string first .txt $filename] >= 0} {
-            menu_opentext $filename
-        } elseif {[string first .htm $filename] >= 0} {
-                                menu_openhtml $filename
-        } else {
-            set help_directory [string range $filename 0 \
-                [expr [string last / $filename ] - 1]]
-            set basename [string range $filename \
-                [expr [string last / $filename ] + 1] end]
-            pd [concat pd open [pdtk_enquote $basename] \
-                 [pdtk_enquote $help_directory] \;]
-        }
     }
 }
 
@@ -439,27 +406,62 @@ proc menu_doc_open {subdir basename} {
     }
 }
 
-proc doc_submenu {helpmenu subdir} {
-         global help_top_directory pd_tearoff
 
-         set menudir $help_top_directory/$subdir
-
-    regsub -all "\\\." $subdir "" submenu
-
-         menu $helpmenu.$submenu -tearoff $pd_tearoff
-    regsub -all "\\\." $subdir " " submenuname
-         $helpmenu add cascade -label $submenuname \
-                  -menu $helpmenu.$submenu
-    catch {
-# use this glob pattern to exclude the supporting files
-#        foreach file [ lsort [ glob -dir $menudir {*[0-9][0-9]*} ] ] 
-         foreach file [ lsort [ glob -dir $menudir * ] ] {
-                  set filename ""
-                  regsub {.*/(.*\..+$)} $file {\1} filename
-                  $helpmenu.$submenu add command -label $filename \
-                                -command "menu_doc_open doc/$subdir $filename"
+################## help browser and support functions #########################
+proc menu_doc_browser {dir} {
+	global .mbar
+	if {![file isdirectory $dir]} {
+		puts stderr "menu_doc_browser non-directory $dir\n"
+	}
+	if { [winfo exists .help_browser.frame] } {
+		raise .help_browser
+	} else {
+		toplevel .help_browser -menu .mbar
+		wm title .help_browser "Pd Documentation Browser"
+		frame .help_browser.frame
+		pack .help_browser.frame -side top -fill both
+		doc_make_listbox .help_browser.frame $dir 0
          }
     }
+
+proc doc_make_listbox {base dir count} {
+	global pd_guidir
+	if {![file isdirectory $dir]} {
+		regsub -- $pd_guidir [file dirname $dir] "" subdir
+		set file [file tail $dir]
+		if { [catch {menu_doc_open $subdir $file} fid] } {
+			puts stderr "Could not open $pd_guidir/$subdir/$file\n"
+		}
+		return; 
+	}
+	# check for [file readable]?
+	if { [info tclversion] >= 8.5 } {
+		# requires Tcl 8.5 but probably deals with special chars better
+#		destroy {expand}[lrange [winfo children $base] [expr {2 * $count}] end]
+	} else {
+		if { [catch { eval destroy [lrange [winfo children $base] \
+										[expr { 2 * $count }] end] } \
+				  errorMessage] } {
+			puts stderr "doc_make_listbox: error listing $dir\n"
+		}
+	}
+	# exportselection 0 looks good, but selection gets easily out-of-sync
+	set current_listbox [listbox "[set b "$base.listbox$count"]-list" -yscrollcommand \
+							 [list "$b-scroll" set] -height 20 -exportselection 0]
+	pack $current_listbox [scrollbar "$b-scroll" -command [list $current_listbox yview]] \
+		-side left -expand 1 -fill y -anchor w
+	foreach item [concat [lsort -dictionary [glob -directory $dir -nocomplain -types {d} -- *]] \
+					  [lsort -dictionary [glob -directory $dir -nocomplain -types {f} -- *]]]  {
+		$current_listbox insert end "[file tail $item][expr {[file isdirectory $item] ? {/} : {}}]"
+	}
+	bind $current_listbox <Button-1> [list doc_navigate $dir [incr count] %W %x %y]
+}
+
+proc doc_navigate {dir count width x y} {
+	if {[set subdir [$width get [$width index "@$x,$y"]]] eq {}} {
+		return
+	}
+	doc_make_listbox [winfo parent $width] [file join $dir $subdir] $count
 }
 
 ############# routine to add media, help, and apple menu items ###############
@@ -526,7 +528,7 @@ proc menu_addstd {mbar} {
     $mbar.help add command -label {Html ...} \
         -command {menu_doc_open doc/1.manual index.htm} 
     $mbar.help add command -label {Browser ...} \
-        -command {menu_documentation} 
+        -command {menu_doc_browser $help_top_directory} 
 }
 
 #################### the "File" menu for the Pd window ##############

@@ -46,10 +46,11 @@ static char sys_dllextent[] =
 
 void class_set_extern_dir(t_symbol *s);
 
-int sys_load_lib(char *dirname, char *classname)
+static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
 {
     char symname[MAXPDSTRING], filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
-        classname2[MAXPDSTRING], *nameptr, *lastdot;
+      classname2[MAXPDSTRING], *nameptr, *lastdot, 
+      altsymname[MAXPDSTRING];
     void *dlobj;
     t_xxx makeout = NULL;
     int fd;
@@ -72,6 +73,25 @@ int sys_load_lib(char *dirname, char *classname)
         if ((fd = open_via_path(dirname, classname2, sys_dllextent,
             dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
         {
+          /* next try (alternative_classname).(sys_dllextent) */
+          if(altname)
+            {
+              if ((fd = open_via_path(dirname, altname, sys_dllextent,
+                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+
+                /* next try (alternative_classname)/(alternative_classname).(sys_dllextent) ... */
+                strncpy(classname2, altname, MAXPDSTRING);
+              filename[MAXPDSTRING-2] = 0;
+              strcat(classname2, "/");
+              strncat(classname2, altname, MAXPDSTRING-strlen(classname2));
+              filename[MAXPDSTRING-1] = 0;
+              if ((fd = open_via_path(dirname, classname2, sys_dllextent,
+                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+                {
+                  return 0;
+                } 
+            }
+          else
             return (0);
         }
     }
@@ -93,9 +113,20 @@ int sys_load_lib(char *dirname, char *classname)
 #ifdef MACOSX
     strcpy(symname, "_");
     strcat(symname, nameptr);
+    if(altname)
+      {
+        strcpy(altsymname, "_setup_");
+        strcat(symname, altname);
+      }
 #else
     strcpy(symname, nameptr);
+    if(altname)
+      {
+        strcpy(altsymname, "setup_");
+        strcat(altsymname, altname);
+      }
 #endif
+
         /* if the last character is a tilde, replace with "_tilde" */
     if (symname[strlen(symname) - 1] == '~')
         strcpy(symname + (strlen(symname) - 1), "_tilde");
@@ -110,6 +141,7 @@ int sys_load_lib(char *dirname, char *classname)
         return (0);
     }
     makeout = (t_xxx)dlsym(dlobj,  symname);
+    if(!makeout)makeout = (t_xxx)dlsym(dlobj,  altsymname);
 #endif
 #ifdef MSW
     sys_bashfilename(filename, filename);
@@ -121,8 +153,9 @@ int sys_load_lib(char *dirname, char *classname)
         return (0);
     }
     makeout = (t_xxx)GetProcAddress(ntdll, symname);  
+    if(!makeout)makeout = (t_xxx)GetProcAddress(ntdll, altsymname);  
 #endif
-#ifdef MACOSX
+#if defined(MACOSX) && !defined(DL_OPEN)
     {
         NSObjectFileImage image; 
         void *ret;
@@ -147,6 +180,8 @@ int sys_load_lib(char *dirname, char *classname)
         }
         s = NSLookupSymbolInModule(ret, symname); 
 
+        if(!s)s=NSLookupSymbolInModule(ret, altsymname); 
+
         if (s)
             makeout = (t_xxx)NSAddressOfSymbol( s);
         else makeout = 0;
@@ -156,6 +191,8 @@ int sys_load_lib(char *dirname, char *classname)
     if (!makeout)
     {
         post("load_object: Symbol \"%s\" not found", symname);
+        if(altname)
+          post("load_object: Symbol \"%s\" not found", altsymname);
         class_set_extern_dir(&s_);
         return 0;
     }
@@ -164,11 +201,45 @@ int sys_load_lib(char *dirname, char *classname)
     return (1);
 }
 
+/* callback type definition */
+typedef int (*loader_t)(char *dirname, char *classname, char *altname);
 
+/* linked list of loaders */
+typedef struct loader_queue {
+    loader_t loader;
+    struct loader_queue *next;
+} loader_queue_t;
 
+static loader_queue_t loaders = {sys_load_lib_alt, NULL};
 
+/* register class loader function */
+void sys_register_loader(loader_t loader)
+{
+    loader_queue_t *q = &loaders;
+    while (1)
+    {
+        if (q->next) 
+            q = q->next;
+        else
+        {
+            q->next = (loader_queue_t *)getbytes(sizeof(loader_queue_t));
+            q->next->loader = loader;
+            q->next->next = NULL;
+            break;
+        }
+    }   
+}
 
-
+int sys_load_lib(char *dirname, char *classname, char *altname)
+{
+    int dspstate = canvas_suspend_dsp();
+    int ok = 0;
+    loader_queue_t *q;
+    for(q = &loaders; q; q = q->next)
+        if(ok = q->loader(dirname, classname, altname)) break;
+    canvas_resume_dsp(dspstate);
+    return ok;
+}
 
 
 

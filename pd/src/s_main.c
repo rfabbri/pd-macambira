@@ -215,7 +215,7 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 #endif
         /* load dynamic libraries specified with "-lib" args */
     for  (nl = sys_externlist; nl; nl = nl->nl_next)
-        if (!sys_load_lib(cwd, nl->nl_string))
+        if (!sys_load_lib(cwd, nl->nl_string, 0))
             post("%s: can't load library", nl->nl_string);
         /* open patches specifies with "-open" args */
     for  (nl = sys_openlist; nl; nl = nl->nl_next)

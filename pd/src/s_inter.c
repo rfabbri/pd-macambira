@@ -40,7 +40,7 @@ typedef int socklen_t;
 #include <string.h>
 #include <stdio.h>
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pthread.h>
@@ -1018,7 +1018,7 @@ int sys_startgui(const char *guidir)
         else if (!childpid)                     /* we're the child */
         {
             seteuid(getuid());          /* lose setuid priveliges */
-#ifndef MACOSX
+#ifndef __APPLE__
                 /* the wish process in Unix will make a wish shell and
                     read/write standard in and out unless we close the
                     file descriptors.  Somehow this doesn't make the MAC OSX
@@ -1037,7 +1037,7 @@ int sys_startgui(const char *guidir)
 #endif
             if (!sys_guicmd)
             {
-#ifdef MACOSX
+#ifdef __APPLE__
                 char *homedir = getenv("HOME"), filename[250];
                 struct stat statbuf;
                     /* first look for Wish bundled with and renamed "Pd" */
@@ -1202,7 +1202,7 @@ int sys_startgui(const char *guidir)
     if (!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS))
         fprintf(stderr, "pd: couldn't set high priority class\n");
 #endif
-#ifdef MACOSX
+#ifdef __APPLE__
     if (sys_hipriority)
     {
         struct sched_param param;
@@ -1214,7 +1214,7 @@ int sys_startgui(const char *guidir)
         if (err)
             post("warning: high priority scheduling failed\n");
     }
-#endif /* MACOSX */
+#endif /* __APPLE__ */
 
     if (!sys_nogui && !sys_guisetportnumber)
     {

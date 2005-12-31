@@ -260,7 +260,7 @@ then
         -framework AudioUnit -framework AudioToolbox \
         -framework Carbon -framework CoreMIDI"
     EXT=pd_darwin
-    MORECFLAGS="-DMACOSX -DUNISTD -I/usr/X11R6/include \
+    MORECFLAGS="-DDL_OPEN -DMACOSX -DUNISTD -I/usr/X11R6/include \
 	 -I../portaudio/pa_common -I../portaudio/pablio \
 	-I../portmidi/pm_common -I../portmidi/pm_mac \
 	-I../portmidi/porttime \
@@ -316,11 +316,11 @@ then
     EXTERNTARGET=pd_darwin
     if test x$jack == "xyes";
     then
-    	LDFLAGS=$LDFLAGS" -framework Jack"
+    	LDFLAGS=$LDFLAGS" -weak_framework Jack"
     fi
     if test x$jack == "xrun";
     then
-        LDFLAGS=$LDFLAGS" -framework Jack"
+        LDFLAGS=$LDFLAGS" -weak_framework Jack"
     fi
 fi
 
@@ -348,6 +348,31 @@ if test x$CC == xccc;
 then
     MORECFLAGS=$MORECFLAGS"  -g3 -D__COMPAQC__ -arch host"
 fi
+
+## JMZ{
+##  this does not do very much, but i guess it is a good idea to use it...
+AC_SYS_LARGEFILE
+## test, whether we can use _LARGEFILE64_SOURCE to 
+## enable large-file reading via "open64" (and lseek64");
+if test "x$enable_largefile" != "xno"; then
+## the following should run on autoconf>2.54 (which pd is not using)
+dnl  AC_LINK_IFELSE ( [AC_LANG_PROGRAM([[
+dnl                          #define _LARGEFILE64_SOURCE
+dnl                          #include <sys/types.h>
+dnl                          #include <sys/stat.h>
+dnl                          #include <fcntl.h>
+dnl                      ]],[[ open64(0,0); ]])], 
+dnl                   [ MORECFLAGS=$MORECFLAGS" -D_LARGEFILE64_SOURCE" ], )
+## and this is for autoconf<2.50
+AC_TRY_LINK( [
+                                        #define _LARGEFILE64_SOURCE
+                                        #include <sys/types.h>
+                                        #include <sys/stat.h>
+                                        #include <fcntl.h>
+                                       ],[ open64(0,0); ],
+                [ MORECFLAGS=$MORECFLAGS" -D_LARGEFILE64_SOURCE" ], )
+fi
+## }JMZ: end of large-file support section
 
 AC_OUTPUT(makefile)
 

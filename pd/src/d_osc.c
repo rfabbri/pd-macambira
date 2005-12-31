@@ -26,11 +26,11 @@
 #define int32 long
 #endif
 
-#if defined(__FreeBSD__) || defined(MACOSX)
+#if defined(__FreeBSD__) || defined(__APPLE__)
 #include <machine/endian.h>
 #endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define __BYTE_ORDER BYTE_ORDER
 #define __LITTLE_ENDIAN LITTLE_ENDIAN
 #endif                                                                          
@@ -39,7 +39,7 @@
 #include <endian.h>
 #endif
 
-#if defined(__unix__) || defined(MACOSX)
+#if defined(__unix__) || defined(__APPLE__)
 #if !defined(__BYTE_ORDER) || !defined(__LITTLE_ENDIAN)                         
 #error No byte order defined                                                    
 #endif                                                                          
@@ -53,7 +53,7 @@
 #endif /* __BYTE_ORDER */                                                       
 #include <sys/types.h>
 #define int32 int32_t
-#endif /* __unix__ or MACOSX*/
+#endif /* __unix__ or __APPLE__*/
 
 
 union tabfudge

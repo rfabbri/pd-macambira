@@ -1187,7 +1187,7 @@ static void poly_free(t_poly *x)
 static void poly_setup(void)
 {
     poly_class = class_new(gensym("poly"), 
-        (t_newmethod)poly_new, (t_method)poly_clear,
+        (t_newmethod)poly_new, (t_method)poly_free,
         sizeof(t_poly), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     class_addfloat(poly_class, poly_float);
     class_addmethod(poly_class, (t_method)poly_stop, gensym("stop"), 0);

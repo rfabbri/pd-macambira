@@ -27,6 +27,11 @@ objects use Posix-like threads.  */
 
 #define MAXSFCHANS 64
 
+#ifdef _LARGEFILE64_SOURCE
+# define open open64
+# define lseek lseek64
+#endif
+
 /***************** soundfile header structures ************************/
 
 typedef unsigned short uint16;

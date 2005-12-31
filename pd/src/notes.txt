@@ -6,7 +6,7 @@ windows:
   modal dialogs confuse watchdog
   check the right-click-on-empty-canvas
   MIDI I/O (inc. sysex)
-
+what does OSX do when jack is compiled into Pd but not installed??
 
 doc:
 object list
@@ -43,7 +43,7 @@ check if _vsnprintf with zero argument in windows works any better...
 detect adc~ and dac~ reblocking
 
 features:
-hook for table mousing
+.dll to .msw32 or .pd_msw (then offer .pd_msw64, .pd_lnx64, etc.)
 integrate video into tilde objects
 flag to suppress printing array name above graph
 flag to suppress scrollbars in canvases
@@ -76,8 +76,12 @@ editing:
     highlight connections (and I/Os) on mouse motion
     select line and hit "insert" to interpolate an object
     option-drag an outlet to make a new, connected object
+    (also, a way to make multiple connections?)
 
 data:
+hook for table mousing
+data to save as succession of "list" messages that textfile can store, etc.
+implement list field (GOP or subwindow, perhaps GOP could suppress bounds rect?)
 fix blue selection rectangle to update if selected datum is redrawn
 data copy/paste doesn't check templates aren't changed
 arrays of non-existent templates crash

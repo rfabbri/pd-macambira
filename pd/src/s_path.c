@@ -356,7 +356,7 @@ void open_via_helppath(const char *name, const char *dir)
 }
 
 
-/* Startup file reading for linux and MACOSX.  As of 0.38 this will be
+/* Startup file reading for linux and __APPLE__.  As of 0.38 this will be
 deprecated in favor of the "settings" mechanism */
 
 int sys_argparse(int argc, char **argv);

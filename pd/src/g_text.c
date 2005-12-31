@@ -1133,7 +1133,7 @@ static t_widgetbehavior gatom_widgetbehavior =
 
 /* -------------------- the "text" class  ------------ */
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define EXTRAPIX 2
 #else
 #define EXTRAPIX 1

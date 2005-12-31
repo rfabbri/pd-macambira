@@ -26,7 +26,7 @@ struct _canvasenvironment
 #define GLIST_DEFCANVASWIDTH 450
 #define GLIST_DEFCANVASHEIGHT 300
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define GLIST_DEFCANVASYLOC 22
 #else
 #define GLIST_DEFCANVASYLOC 0

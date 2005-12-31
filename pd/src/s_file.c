@@ -205,7 +205,7 @@ static void sys_donesavepreferences( void)
 
 #endif /* MSW */
 
-#ifdef MACOSX
+#ifdef __APPLE__
 
 static void sys_initloadpreferences( void)
 {
@@ -255,7 +255,7 @@ static void sys_donesavepreferences( void)
 {
 }
 
-#endif /* MACOSX */
+#endif /* __APPLE__ */
 
 
 void sys_loadpreferences( void)

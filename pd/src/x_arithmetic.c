@@ -11,7 +11,7 @@ inputs to int and their outputs back to float. */
 
 
 /* MSW and OSX don't appear to have single-precision ANSI math */
-#if defined(MSW) || defined(MACOSX)
+#if defined(MSW) || defined(__APPLE__)
 #define sinf sin
 #define cosf cos
 #define atanf atan

@@ -30,7 +30,9 @@
 #include <winsock.h>
 #include <io.h>
 #endif
-#ifdef MSW
+
+/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
+#ifdef _MSC_VER
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast double to float */
 #pragma warning( disable : 4101 )  /* unused local variables */
@@ -40,7 +42,7 @@
 #include "tk.h"
 #endif
 
-#ifdef MACOSX
+#ifdef __APPLE__
 #define STARTGUI
 #endif
 
@@ -546,7 +548,7 @@ void tcl_mess(char *s)
     /* in linux, we load the tk code from here (in MSW and MACOS, this
     is done by passing the name of the file as a startup argument to
     the wish shell.) */
-#if !defined(MSW) && !defined(MACOSX)
+#if !defined(MSW) && !defined(__APPLE__)
 void pdgui_doevalfile(Tcl_Interp *interp, char *s)
 {
     char buf[GUISTRING];
@@ -584,7 +586,7 @@ void pdgui_startup(Tcl_Interp *interp)
 #endif
     pdgui_setupsocket();
         /* read in the startup file */
-#if !defined(MSW) && !defined(MACOSX)
+#if !defined(MSW) && !defined(__APPLE__)
     pdgui_evalfile("pd.tk");
 #endif
 }

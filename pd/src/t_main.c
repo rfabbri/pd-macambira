@@ -14,7 +14,7 @@
  */
 
 
-#ifndef MACOSX     /* linux and IRIX only; in MACOSX we don't link this in */
+#ifndef __APPLE__     /* linux and IRIX only; in __APPLE__ we don't link this in */
 #include "tk.h"
 #include <stdlib.h>
 
@@ -112,4 +112,4 @@ Tcl_AppInit(interp)
     return TCL_OK;
 }
 
-#endif  /* MACOSX */
+#endif  /* __APPLE__ */

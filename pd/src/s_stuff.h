@@ -46,7 +46,7 @@ extern int sys_defaultfont;
 extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
 
 /* s_loader.c */
-int sys_load_lib(char *dirname, char *filename);
+int sys_load_lib(char *dirname, char *filename, char *altname);
 
 /* s_audio.c */
 
@@ -178,7 +178,7 @@ void sys_setvirtualalarm( void);
 #define API_DEFAULT API_MMIO
 #define API_DEFSTRING "MMIO"
 #endif
-#ifdef MACOSX
+#ifdef __APPLE__
 #define API_DEFAULT API_PORTAUDIO
 #define API_DEFSTRING "portaudio"
 #endif

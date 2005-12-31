@@ -1029,7 +1029,7 @@ static void canvas_done_popup(t_canvas *x, float which, float xpos, float ypos)
 
 /* on one-button-mouse machines, you can use double click to
     mean right click (which gets the popup menu.)  Do this for Mac. */
-#ifdef MACOSX
+#ifdef __APPLE__
 #define SIMULATERIGHTCLICK
 #endif
 
@@ -1492,7 +1492,7 @@ void canvas_key(t_canvas *x, t_symbol *s, int ac, t_atom *av)
         keyupsym = gensym("#keyup");
         keynamesym = gensym("#keyname");
     }
-#ifdef MACOSX
+#ifdef __APPLE__
         if (keynum == 30)
             keynum = 0, gotkeysym = gensym("Up");
         else if (keynum == 31)

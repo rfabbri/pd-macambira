@@ -21,7 +21,7 @@
 #include <time.h>
 #endif
 
-#if defined (MACOSX) || defined (__FreeBSD__)
+#if defined (__APPLE__) || defined (__FreeBSD__)
 #define HZ CLK_TCK
 #endif
 

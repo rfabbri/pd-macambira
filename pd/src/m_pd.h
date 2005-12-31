@@ -17,12 +17,13 @@ extern "C" {
 #define MSW
 #endif
 
-#ifdef MSW
+/* These pragmas are only used for MSVC, not MinGW or Cygwin <hans@at.or.at> */
+#ifdef _MSC_VER
 /* #pragma warning( disable : 4091 ) */
 #pragma warning( disable : 4305 )  /* uncast const double to float */
 #pragma warning( disable : 4244 )  /* uncast float/int conversion etc. */
 #pragma warning( disable : 4101 )  /* unused automatic variables */
-#endif /* MSW */
+#endif /* _MSC_VER */
 
     /* the external storage class is "extern" in UNIX; in MSW it's ugly. */
 #ifdef MSW
