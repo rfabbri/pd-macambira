@@ -26,7 +26,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef IS_DENORMAL
 #include "extlib_util.h"
+#endif
 
 #define MAXORDER 64
 
