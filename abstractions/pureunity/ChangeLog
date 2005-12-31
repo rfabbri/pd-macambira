@@ -1,8 +1,9 @@
-$Id: ChangeLog,v 1.1 2005-12-31 17:01:26 matju Exp $
+$Id: ChangeLog,v 1.2 2005-12-31 18:44:54 matju Exp $
 
 version 0.1:
  * LICENSE is GPL
  * README
- * [commutator], [commutative-test]
- * [associator], [associative-test]
+ * [commutator],  [commutative-test]
+ * [associator],  [associative-test]
+ * [invertor],    [invertible-test]
  * [distributor], [distributive-test]

@@ -1,4 +1,4 @@
-$Id: README,v 1.4 2005-12-31 02:50:12 matju Exp $
+$Id: README,v 1.5 2005-12-31 18:44:54 matju Exp $
 
 PureUnity
 
@@ -50,8 +50,6 @@ TEST PROTOCOL
   outlet 0:
     test results. a sequence of lists like:
       list $name $passed? $accuracy $elapsed
-    for example:
-      list 
 
     where:
       $name is a symbol
@@ -60,6 +58,12 @@ TEST PROTOCOL
          (if not applicable, use 0)
       $elapsed is a float, the time elapsed in milliseconds
          or it is the symbol "-" if not measured.
+
+    for example:
+      list commutative1 1 0 -
+
+    Which means that the 1st test about commutativity passed ($2=1) because it
+    was perfectly accurate ($3==0) and that we didn't measure the time ($4=-).
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 SEVERITIES (in decreasing order)
