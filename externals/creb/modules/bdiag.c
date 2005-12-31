@@ -26,6 +26,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "extlib_util.h"
 
 #define MAXORDER 64
 

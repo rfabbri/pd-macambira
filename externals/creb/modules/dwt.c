@@ -190,9 +190,9 @@ static void dwt_permutation(t_dwt *x, t_int n){
 
   /* debug */
   for(k=0; k<n; k++)
-    printf("clutter[%d] = %d\n", k, ctl->c_clutter[k]);
+    printf("clutter[%ld] = %ld\n", k, ctl->c_clutter[k]);
   for(k=0; k<n; k++)
-    printf("unclutter[%d] = %d\n", k, ctl->c_unclutter[k]);
+    printf("unclutter[%ld] = %ld\n", k, ctl->c_unclutter[k]);
 
   exit(1);
 }
@@ -234,7 +234,7 @@ static void dwt_filter(t_dwt *x,  t_symbol *s, int argc, t_atom *argv)
   float *ufilter = x->x_ctl.c_update; 
   float *mask = NULL;
 
-  int *length = NULL;
+  t_int *length = NULL;
   float sum = 0;
 
   if (s == gensym("predict"))
