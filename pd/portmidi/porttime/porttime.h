@@ -27,9 +27,9 @@ typedef void (PtCallback)( PtTimestamp timestamp, void *userData );
 
 
 PtError Pt_Start(int resolution, PtCallback *callback, void *userData);
-PtError Pt_Stop();
-int Pt_Started();
-PtTimestamp Pt_Time();
+PtError Pt_Stop( void);
+int Pt_Started( void);
+PtTimestamp Pt_Time( void);
 
 #ifdef __cplusplus
 }

@@ -91,8 +91,6 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
     PtThreadParams *params = (PtThreadParams*)malloc(sizeof(PtThreadParams));
     pthread_t pthread_id;
 
-    printf("Pt_Start() called\n");
-
     // /* make sure we're not already playing */
     if (time_started_flag) return ptAlreadyStarted;
     startTime = CFAbsoluteTimeGetCurrent();
@@ -113,7 +111,6 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 
 PtError Pt_Stop()
 {
-    printf("Pt_Stop called\n");
 
     CFRunLoopStop(timerRunLoop);
     time_started_flag = FALSE;

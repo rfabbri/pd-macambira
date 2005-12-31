@@ -17,6 +17,7 @@ document tabwrite~_start
 "list" to signal inlet (e.g., "*~") or float inlet (f) complains.
 
 problems:
+"save as" with spaces in filename still messes up
 don't filter locked click() through getrect
 better scalar hit detection (getrect is too greedy)
 when retyping abstractions, offer to save dirty one
@@ -42,6 +43,7 @@ check if _vsnprintf with zero argument in windows works any better...
 detect adc~ and dac~ reblocking
 
 features:
+hook for table mousing
 integrate video into tilde objects
 flag to suppress printing array name above graph
 flag to suppress scrollbars in canvases
