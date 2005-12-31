@@ -1,14 +1,30 @@
+$Id: README,v 1.4 2005-12-31 02:50:12 matju Exp $
+
 PureUnity
 
 Copyright 2006 by Mathieu Bouchard <matju à artengine point ca>
 
-$Id: README,v 1.3 2005-12-29 23:04:27 matju Exp $
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+See file ./COPYING for further informations on licensing terms.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 GOALS
 
-  1. To provide a unit-test framework, which also provide benchmarking features, 
-     all made in Pd for use in Pd.
+  1. To provide a unit-test framework, which also provide benchmarking
+     features, all made in Pd for use in Pd.
 
   2. To provide tests for functionality in internals, externals, abstractions, 
      etc., in a modularized way, in a DRY/OAOO fashion, thus abstracting out
@@ -100,6 +116,49 @@ inlet 0:
     $1 has to be a symbol.
 
 +-+-+--+---+-----+--------+-------------+---------------------+
+ACCURACY AND ERROR (in math-related unit tests)
+
+The "absolute error" between a practical result and the expected value
+is considered to be the distance between the two value. That is the
+absolute value of the difference.
+
+In the case of positions in 2D, 3D, etc., use the L2-Norm which is
+a generalized Pythagoras' Theorem: dist^2 = x^2 + y^2 + z^2 + ...
+A norm is a distance between something and zero.
+
+Sometimes you have several practical results for one expected value
+and must extract a single absolute error out of that. Then you should pick
+the largest of the individual absolute errors.
+
+Sometimes you don't have an expected value, you just have several
+practical results that you expect to be quite the same. In that case,
+the absolute error is the "diameter" of those results. The meaning
+of diameter here is: the largest distance between any two results.
+
+If in a single test you must compare 2D errors with 3D errors and 1D
+errors, etc., you may have to adjust them by dividing the error by
+the square root of N (N is the number of dimensions). In that case,
+the resulting value is called a RMS (Root-Mean-Square).
+
+The maximum error introduced by just representing a number as a float
+(instead of an exact value) is at most proportional to the magnitude
+of the number (e.g. usually 16 million times smaller: about 6 decimals).
+Also, often we are only interested in relative error, which is absolute
+error divided by the norm of the expected result, because small absolute
+errors don't matter much with large results. This is the reason floats
+exist in the first place. By default, use relative error as the $accuracy
+in Pd tests.
+
+If you don't have an expected result, then compute the relative error as
+being the absolute error divided by the norm of the average of practical
+results.
+
+In the RMS case of relative error, the norms of expected results should also
+be adjusted, but both adjustments cancel because they get divided by each
+other. That means: don't divide by the sqrt(N) at all and you'll get an
+appropriate result.
+
++-+-+--+---+-----+--------+-------------+---------------------+
 ETC
 
 
@@ -119,3 +178,18 @@ testing. This may be something that we want to check for, and currently
 the best way to handle it is to search the console for error messages, and
 if there are any, restart the tests in verbose mode and see where the
 error happens exactly.
+
+[...]
+
+Floating-point is the scientific notation for numbers that we all
+learned on paper in school. Rounding and inaccuracy are two sides
+of the same coin. They are required when it is stupid to have perfect
+results, that is, when it would mean too many computations for little
+gain.
+
+However sometimes we want to make sure that our math is accurate enough.
+Many algorithms are data-recursive: each computation uses previous
+results. Many of those algorithms have chaotic and/or unstable
+behaviours, which means that the inaccuracies may skyrocket instead of
+fading out.
+
