@@ -1,0 +1,2 @@
+#N canvas 173 216 450 300 10;
+#X obj 30 20 arith-test;
