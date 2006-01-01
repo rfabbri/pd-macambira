@@ -1,0 +1,14 @@
+#N canvas 118 56 450 182 10;
+#X obj 13 21 inlet;
+#X obj 13 131 outlet;
+#X obj 35 79 transitive-test \$1 \$2;
+#X obj 57 60 reflexive-test \$1 \$2;
+#X obj 13 98 antisymmetric-test \$1 \$2;
+#X obj 13 40 t b b b;
+#X connect 0 0 5 0;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
+#X connect 4 0 1 0;
+#X connect 5 0 4 0;
+#X connect 5 1 2 0;
+#X connect 5 2 3 0;
