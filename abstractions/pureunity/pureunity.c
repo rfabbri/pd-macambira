@@ -29,8 +29,10 @@ void rtimer_1_bang(t_rtimer *self) {
 void pureunity_setup() {
 	t_pd *m = &pd_objectmaker;
 	ALIAS( "f.inlet","inlet"  );
+	ALIAS( "#.inlet","inlet"  );
 	ALIAS( "~.inlet","inlet~" );
 	ALIAS("f.outlet","outlet" );
+	ALIAS("#.outlet","outlet" );
 	ALIAS("~.outlet","outlet~");
 	ALIAS(  "f.swap","swap"   );
 	rtimer_class = class_new(gensym("rtimer"),(t_newmethod)rtimer_new,0,sizeof(t_rtimer),0,0);

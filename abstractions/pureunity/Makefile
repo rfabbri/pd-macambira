@@ -1,6 +1,7 @@
 PD = /home/matju/pd_0_38_4/bin/pd -noaudio
 #PD = pd
 PDFLAGS = -lib pureunity -noaudio -path generics -path specifics
+# PDFLAGS += -lib gridflow
 CFLAGS = -Wall
 
 test:: built
