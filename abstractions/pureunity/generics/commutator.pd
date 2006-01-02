@@ -1,41 +1,41 @@
 #N canvas 394 81 620 407 10;
-#X obj 18 210 -;
-#X obj 68 96 f;
-#X text 75 134 ba;
-#X text 33 103 ab;
-#X obj 18 38 t a b a;
-#X text 190 153 however \, this thing i call commutator is more general
+#X text 90 114 ba;
+#X text 33 93 ab;
+#X text 220 113 however \, this thing i call commutator is more general
 ;
-#X text 189 172 see commutative-test.pd;
-#X obj 18 141 t a a;
-#X obj 127 210 +;
-#X text 127 247 anticommutator;
-#X text 19 247 commutator;
+#X text 219 132 see commutative-test.pd;
+#X text 127 217 anticommutator;
+#X text 19 217 commutator;
 #X obj 18 19 \$1.inlet a;
 #X text 218 15 Say operator \$2 is *. Then the commutativity rule is:
 ;
 #X text 218 32 a*b=b*a which is also a*b-b*a = 0;
 #X text 218 48 the commutator is a*b - b*a;
-#X text 189 112 when \$2=+ this is also known as a "group commutator"
+#X text 219 72 when \$2=+ this is also known as a "group commutator"
 ;
-#X text 189 132 when \$2=* this is also known as a "ring commutator"
+#X text 219 92 when \$2=* this is also known as a "ring commutator"
 ;
-#X obj 18 229 \$1.outlet ab-ba;
-#X obj 127 229 \$1.outlet ab+ba;
+#X obj 18 199 \$1.outlet ab-ba;
+#X obj 127 199 \$1.outlet ab+ba;
 #X obj 93 19 \$1.inlet b;
-#X obj 68 115 \$2;
-#X obj 18 84 \$2;
-#X connect 0 0 17 0;
-#X connect 1 0 20 0;
-#X connect 4 0 21 0;
-#X connect 4 1 1 0;
-#X connect 4 2 20 1;
-#X connect 7 0 0 0;
-#X connect 7 1 8 1;
-#X connect 8 0 18 0;
-#X connect 11 0 4 0;
-#X connect 19 0 1 1;
-#X connect 19 0 21 1;
-#X connect 20 0 0 1;
-#X connect 20 0 8 0;
-#X connect 21 0 7 0;
+#X obj 80 74 \$1.swap;
+#X obj 80 98 \$1.do \$2;
+#X obj 18 74 \$1.do \$2;
+#X obj 18 121 \$1.taa;
+#X obj 18 38 \$1.taa;
+#X obj 18 180 \$1.do -;
+#X obj 127 180 \$1.do +;
+#X connect 6 0 19 0;
+#X connect 14 0 15 1;
+#X connect 14 0 17 1;
+#X connect 15 0 16 0;
+#X connect 15 1 16 1;
+#X connect 16 0 20 1;
+#X connect 16 0 21 0;
+#X connect 17 0 18 0;
+#X connect 18 0 20 0;
+#X connect 18 1 21 1;
+#X connect 19 0 17 0;
+#X connect 19 1 15 0;
+#X connect 20 0 12 0;
+#X connect 21 0 13 0;
