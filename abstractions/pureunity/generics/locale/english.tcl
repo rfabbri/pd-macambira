@@ -18,28 +18,33 @@ say_namespace summary {
   proc pu_say {} {
   }
 
-  pu_say  antireflexive {t  } ""
-  pu_say  antisymmetric {t  } ""
-  pu_say    associative {t  } ""
-  pu_say    commutative {t  } ""
-  pu_say   distributive {t  } ""
-  pu_say    equivalence {t  } ""
-  pu_say     invertible {t  } ""
-  pu_say partialorder   {t  } ""
-  pu_say partialordereq {t  } ""
-  pu_say      reflexive {t  } ""
-  pu_say   totalorder   {t  } ""
-  pu_say   totalordereq {t  } ""
-  pu_say     transitive {t  } ""
-  pu_say     trichotomy {t  } ""
-  pu_say      operator1 {t  } ""
-  pu_say      operator2 {t  } ""
+  pu_say   antireflexive {t  } ""
+  pu_say       reflexive {t  } ""
+
+  pu_say     commutative {t  } ""
+  pu_say anticommutative {t  } ""
+  pu_say   antisymmetric {t  } ""
+
+  pu_say     associative {t  } ""
+  pu_say    distributive {t  } ""
+  pu_say      invertible {t  } ""
+
+  pu_say  partialorder   {t  } "partial order (open)"
+  pu_say  partialordereq {t  } "partial order (closed)"
+  pu_say    totalorder   {t  } "total order (open)"
+  pu_say    totalordereq {t  } "total order (closed)"
+  pu_say     equivalence {t  } "equivalence relation"
+
+  pu_say      transitive {t  } "transitive: "
+  pu_say      trichotomy {t  } "trichotomy: either equal or less or greater"
+  pu_say       operator1 {t  } "1-input operator"
+  pu_say       operator2 {t  } "2-input operator"
 
   say_category cancellators
-  say  associator ""
+  say  associator "(ab)c-a(bc)"
   say  commutator "ab-ba"
-  say distributor ""
-  say    invertor ""
+  say distributor "a&(b^c)-(ab^ac)"
+  say    invertor "ab/b-a"
 
   say_category misc
   say twice ""
