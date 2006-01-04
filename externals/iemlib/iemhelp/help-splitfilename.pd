@@ -1,4 +1,4 @@
-#N canvas 150 53 677 566 10;
+#N canvas 235 44 685 574 10;
 #X text 9 1 splitfilename: split into path and filename;
 #X obj 53 391 print path;
 #X obj 139 391 print file;
@@ -42,6 +42,23 @@
 #X text 135 446 iem.at;
 #X text 50 435 (c) Thomas Musil 2000 - 2005;
 #X text 98 468 Graz \, Austria;
+#X floatatom 273 196 5 0 255 0 - - -;
+#N canvas 191 208 354 235 ASCII_separator 0;
+#X obj 138 55 inlet;
+#X obj 138 143 outlet;
+#X obj 138 76 clip 0 255;
+#X obj 138 98 - 32;
+#X msg 138 121 separator \$1;
+#X obj 37 121 makefilename %c;
+#X obj 37 143 outlet;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 0 5 0;
+#X connect 3 0 4 0;
+#X connect 4 0 1 0;
+#X connect 5 0 6 0;
+#X restore 273 216 pd ASCII_separator;
+#X symbolatom 273 240 0 0 0 0 - - -;
 #X connect 3 0 9 0;
 #X connect 4 0 9 0;
 #X connect 5 0 9 0;
@@ -67,3 +84,6 @@
 #X connect 26 0 27 0;
 #X connect 27 0 1 0;
 #X connect 27 1 2 0;
+#X connect 34 0 35 0;
+#X connect 35 0 36 0;
+#X connect 35 1 9 0;
