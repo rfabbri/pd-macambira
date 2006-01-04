@@ -1,4 +1,4 @@
-$Id: README,v 1.6 2005-12-31 21:29:37 matju Exp $
+$Id: README,v 1.7 2006-01-04 02:59:22 matju Exp $
 
 PureUnity
 
@@ -49,18 +49,18 @@ TEST PROTOCOL
 
   outlet 0:
     test results. a sequence of lists like:
-      list $name $passed? $accuracy $elapsed
+      list $passed? $accuracy $elapsed $name1 ...
 
     where:
-      $name is a symbol
       $passed? is either 0 for failure or 1 for success
       $accuracy is a float proportional to relative error on math
          (if not applicable, use 0)
-      $elapsed is a float, the time elapsed in milliseconds
-         or it is the symbol "-" if not measured.
+      $elapsed is a nonnegative float, the time elapsed in milliseconds
+         or it is any negative float meaning the time hasn't been measured.
+      $name1 and the rest are symbols and/or floats identifying the test
 
     for example:
-      list commutative1 1 0 -
+      list 1 0 -1 commutative f + *
 
     Which means that the 1st test about commutativity passed ($2=1) because it
     was perfectly accurate ($3==0) and that we didn't measure the time ($4=-).
@@ -173,9 +173,9 @@ abstraction arguments.
 
 CURRENT:
   f   float
+  ~   signal
 
 FUTURE (from PureData):
-  ~   signal
   s   symbol
   p   gpointer
   a   anything
@@ -198,6 +198,42 @@ FUTURE (from GridFlow):
   #f  grid of floats (float32)
   #d  grid of doubles (float64)
   #r  grid of rubies (VALUE*)
+
+for a type prefix to be considered implemented, it has to
+have the following class set:
+
+  metaabstraction   for floats   for signals   for grids
+  [$1.inlet]         [inlet]      [inlet~]      [inlet]
+  [$1.outlet]       [outlet]     [outlet~]     [outlet]
+  [$1.do $2 $3]     [$2 $3]      [$2~ $3]      [# $2 $3]
+  [$1.taa]          [t a a]      noop          [t a a]
+  [$1.swap]         [swap]       noop          TODO
+  [$1.norm]         [abs]        [env~]        [# sq]->[#ravel]->[#fold +]->[#export]->[sqrt]
+  [$1.packunpack3]  pack,unpack  noop          TODO
+  
+The first two cannot be implemented as abstractions and instead must be
+defined as aliases in pureunity.c.
+
++-+-+--+---+-----+--------+-------------+---------------------+
+OTHER PROTOCOLS
+
+Those four classes are operators that give verify algebraic properties
+of other operators. The more their outputs are close to zero, the more
+those other operators are faithful to an algebraic property.
+
+(here, supported $types are f and ~)
+
+[commutator  $type $class]          (2 inlets)     ab-ba
+[associator  $type $class]          (2 inlets)  (ab)c-a(bc)
+[distributor $type $class1 $class2] (3 inlets) a(b+c)-(ab+ac)
+[invertor    $type $class1 $class2] (2 inlets)   ab/b-a
+
++-+-+--+---+-----+--------+-------------+---------------------+
+TESTS AND RULES
+
+For each class, a test file's name is the class name followed by "-test.pd",
+and a rule file's name is the class name followed by "-rule.pd",
+in the same way as it is for help files.
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 ETC

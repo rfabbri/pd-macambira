@@ -1,9 +1,9 @@
-#N canvas 385 232 448 442 10;
-#X obj 41 85 arith-test f;
-#X obj 19 20 loadbang;
-#X obj 28 42 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 841 0 408 486 10;
+#X obj 63 169 arith-test f;
+#X obj 19 65 loadbang;
+#X obj 28 87 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 41 180 print;
+#X obj 41 373 print;
 #N canvas 509 382 450 300 other 0;
 #X obj 20 38 twice symbol foo bar;
 #X obj 20 21 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -23,30 +23,46 @@
 #X connect 5 0 4 0;
 #X connect 6 0 8 0;
 #X connect 8 0 7 0;
-#X restore 218 29 pd other;
-#X obj 19 66 t b b b;
-#X obj 71 161 +;
-#X msg 121 161 0;
-#X msg 71 123 float \$1;
-#X obj 41 104 t a a;
-#X obj 96 161 t f;
-#X obj 19 153 f;
-#X obj 71 142 == 0;
-#X obj 19 199 print total_failures;
-#X obj 30 219 sel 0;
-#X obj 38 280 bng 100 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
--262144;
-#X msg 38 261 color \$1 \, bang;
-#X msg 30 238 16;
-#X msg 60 238 13;
-#X text 24 392 This does not count errors not reported by the tests
+#X restore 323 80 pd other;
+#X obj 19 111 t b b b;
+#X obj 71 354 +;
+#X msg 121 354 0;
+#X msg 71 316 float \$1;
+#X obj 41 297 t a a;
+#X obj 96 354 t f;
+#X obj 19 346 f;
+#X obj 71 335 == 0;
+#X obj 19 392 print total_failures;
+#X obj 226 251 sel 0;
+#X obj 234 312 bng 100 250 50 0 empty empty empty 0 -6 0 8 -258699
+-1 -262144;
+#X msg 234 293 color \$1 \, bang;
+#X msg 226 270 16;
+#X msg 256 270 13;
+#X text 24 437 This does not count errors not reported by the tests
 ;
-#X text 25 406 Consult the console for more information;
+#X text 25 464 Consult the console for more information;
+#X obj 41 188 comparators-test f;
+#X obj 4 6 cnv 15 400 40 empty empty PureUnity 8 20 1 18 -34345 -68160
+0;
+#X text 130 7 TM;
+#X obj 15 35 cnv 1 380 1 empty empty Copyright_2006_by_Mathieu_Bouchard
+150 -4 1 9 -258699 -262144 0;
+#X text 25 450 Such as Syntax Error \, Class Not Found \, etc.;
+#X text 297 253 Green: PASS;
+#X text 311 265 Red: FAIL;
+#X obj 85 150 glue-test;
+#X obj 41 131 t b b b;
+#X text 6 48 from the bit rot prevention department;
+#X obj 284 149 protocols-tree;
+#X obj 284 168 print;
+#X symbolatom 284 133 10 0 0 0 - - -;
+#X msg 284 114 symbol field;
 #X connect 0 0 9 0;
 #X connect 1 0 5 0;
 #X connect 2 0 5 0;
 #X connect 5 0 11 0;
-#X connect 5 1 0 0;
+#X connect 5 1 29 0;
 #X connect 5 2 7 0;
 #X connect 6 0 10 0;
 #X connect 6 0 11 1;
@@ -63,3 +79,11 @@
 #X connect 16 0 15 0;
 #X connect 17 0 16 0;
 #X connect 18 0 16 0;
+#X connect 21 0 9 0;
+#X connect 28 0 9 0;
+#X connect 29 0 21 0;
+#X connect 29 1 0 0;
+#X connect 29 2 28 0;
+#X connect 31 0 32 0;
+#X connect 33 0 31 0;
+#X connect 34 0 33 0;
