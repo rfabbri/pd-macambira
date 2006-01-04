@@ -25,6 +25,8 @@ typedef struct _mergefilename
 {
   t_object x_obj;
   char     x_sep[2];
+  char     *x_mem;
+  t_int    x_size;
 } t_mergefilename;
 
 static void mergefilename_separator(t_mergefilename *x, t_symbol *s, int ac, t_atom *av)
@@ -33,37 +35,35 @@ static void mergefilename_separator(t_mergefilename *x, t_symbol *s, int ac, t_a
   {
     if(IS_A_SYMBOL(av, 0))
     {
-      if(strlen(av->a_w.w_symbol->s_name) == 1)
-        x->x_sep[0] = av->a_w.w_symbol->s_name[0];
-      else if(!strcmp(av->a_w.w_symbol->s_name, "backslash"))
+      char *name=av->a_w.w_symbol->s_name;
+
+      if(strlen(name) == 1)
+        x->x_sep[0] = name[0];
+      else if(!strcmp(name, "backslash"))
         x->x_sep[0] = '\\';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "slash"))
+      else if(!strcmp(name, "slash"))
         x->x_sep[0] = '/';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "blank"))
+      else if(!strcmp(name, "blank"))
         x->x_sep[0] = ' ';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "space"))
+      else if(!strcmp(name, "space"))
         x->x_sep[0] = ' ';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "dollar"))
+      else if(!strcmp(name, "dollar"))
         x->x_sep[0] = '$';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "comma"))
+      else if(!strcmp(name, "comma"))
         x->x_sep[0] = ',';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "semi"))
+      else if(!strcmp(name, "semi"))
         x->x_sep[0] = ';';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "leftbrace"))
+      else if(!strcmp(name, "leftbrace"))
         x->x_sep[0] = '{';
-      else if(!strcmp(av->a_w.w_symbol->s_name, "rightbrace"))
+      else if(!strcmp(name, "rightbrace"))
         x->x_sep[0] = '}';
       else
         x->x_sep[0] = 0;
     }
     else if(IS_A_FLOAT(av, 0))
     {
-      int i;
-      float f=fabs(av->a_w.w_float);
+      t_int i=atom_getintarg(0, ac, av);
       
-      while(f >= 10.0)
-        f *= 0.1;
-      i = (int)f;
       x->x_sep[0] = (char)i + '0';
     }
   }
@@ -73,11 +73,11 @@ static void mergefilename_separator(t_mergefilename *x, t_symbol *s, int ac, t_a
 
 static void mergefilename_float(t_mergefilename *x, t_floatarg f)
 {
-  char fbuf[30];
+  char flt_buf[30];
   
-  fbuf[0] = 0;
-  sprintf(fbuf, "%g", f);
-  outlet_symbol(x->x_obj.ob_outlet, gensym(fbuf));
+  flt_buf[0] = 0;
+  sprintf(flt_buf, "%g", f);
+  outlet_symbol(x->x_obj.ob_outlet, gensym(flt_buf));
 }
 
 static void mergefilename_symbol(t_mergefilename *x, t_symbol *s)
@@ -87,35 +87,34 @@ static void mergefilename_symbol(t_mergefilename *x, t_symbol *s)
 
 static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *av)
 {
-  char *cbeg, fbuf[30];
-  int size=400, i, len, cursize=0;
+  char flt_buf[30];
+  t_int i, length, accu_size=0;
   
-  cbeg = (char *)getbytes(size * sizeof(char));
-  cbeg[0] = 0;
+  x->x_mem[0] = 0;
   if(ac > 0)
   {
     if(IS_A_SYMBOL(av, 0))
     {
-      len = strlen(av->a_w.w_symbol->s_name);
-      if((len + cursize) >= (size-1))
+      length = strlen(av->a_w.w_symbol->s_name);
+      if((length + accu_size) >= (x->x_size-2))
       {
-        cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-        size = 2*(len + cursize);
+        x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+        x->x_size = 2*(length + accu_size);
       }
-      strcat(cbeg, av->a_w.w_symbol->s_name);
-      cursize += len;
+      strcat(x->x_mem, av->a_w.w_symbol->s_name);
+      accu_size += length;
     }
     else if(IS_A_FLOAT(av, 0))
     {
-      sprintf(fbuf, "%g", av->a_w.w_float);
-      len = strlen(fbuf);
-      if((len + cursize) >= (size-1))
+      sprintf(flt_buf, "%g", av->a_w.w_float);
+      length = strlen(flt_buf);
+      if((length + accu_size) >= (x->x_size-2))
       {
-        cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-        size = 2*(len + cursize);
+        x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+        x->x_size = 2*(length + accu_size);
       }
-      strcat(cbeg, fbuf);
-      cursize += len;
+      strcat(x->x_mem, flt_buf);
+      accu_size += length;
     }
   }
   
@@ -124,84 +123,86 @@ static void mergefilename_list(t_mergefilename *x, t_symbol *s, int ac, t_atom *
     for(i=1; i<ac; i++)
     {
       av++;
-      strcat(cbeg, x->x_sep);
+      strcat(x->x_mem, x->x_sep);
       if(IS_A_SYMBOL(av, 0))
       {
-        len = strlen(av->a_w.w_symbol->s_name);
-        if((len + cursize) >= (size-1))
+        length = strlen(av->a_w.w_symbol->s_name);
+        if((length + accu_size) >= (x->x_size-2))
         {
-          cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-          size = 2*(len + cursize);
+          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+          x->x_size = 2*(length + accu_size);
         }
-        strcat(cbeg, av->a_w.w_symbol->s_name);
-        cursize += len;
+        strcat(x->x_mem, av->a_w.w_symbol->s_name);
+        accu_size += length;
       }
       else if(IS_A_FLOAT(av, 0))
       {
-        sprintf(fbuf, "%g", av->a_w.w_float);
-        len = strlen(fbuf);
-        if((len + cursize) >= (size-1))
+        sprintf(flt_buf, "%g", av->a_w.w_float);
+        length = strlen(flt_buf);
+        if((length + accu_size) >= (x->x_size-2))
         {
-          cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-          size = 2*(len + cursize);
+          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+          x->x_size = 2*(length + accu_size);
         }
-        strcat(cbeg, fbuf);
-        cursize += len;
+        strcat(x->x_mem, flt_buf);
+        accu_size += length;
       }
     }
   }
-  outlet_symbol(x->x_obj.ob_outlet, gensym(cbeg));
-  freebytes(cbeg, size * sizeof(char));
+  outlet_symbol(x->x_obj.ob_outlet, gensym(x->x_mem));
 }
 
 static void mergefilename_anything(t_mergefilename *x, t_symbol *s, int ac, t_atom *av)
 {
-  char *cbeg, fbuf[30];
-  int size=400, i, len, cursize=0;
+  char flt_buf[30];
+  t_int i, length, accu_size=0;
   
-  cbeg = (char *)getbytes(size * sizeof(char));
-  cbeg[0] = 0;
-  len = strlen(s->s_name);
-  if((len + cursize) >= (size-1))
+  x->x_mem[0] = 0;
+  length = strlen(s->s_name);
+  if((length + accu_size) >= (x->x_size-2))
   {
-    cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-    size = 2*(len + cursize);
+    x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+    x->x_size = 2*(length + accu_size);
   }
-  strcat(cbeg, s->s_name);
-  cursize += len;
+  strcat(x->x_mem, s->s_name);
+  accu_size += length;
   if(ac > 0)
   {
     for(i=0; i<ac; i++)
     {
-      strcat(cbeg, x->x_sep);
+      strcat(x->x_mem, x->x_sep);
       if(IS_A_SYMBOL(av, 0))
       {
-        len = strlen(av->a_w.w_symbol->s_name);
-        if((len + cursize) >= (size-1))
+        length = strlen(av->a_w.w_symbol->s_name);
+        if((length + accu_size) >= (x->x_size-2))
         {
-          cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-          size = 2*(len + cursize);
+          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+          x->x_size = 2*(length + accu_size);
         }
-        strcat(cbeg, av->a_w.w_symbol->s_name);
-        cursize += len;
+        strcat(x->x_mem, av->a_w.w_symbol->s_name);
+        accu_size += length;
       }
       else if(IS_A_FLOAT(av, 0))
       {
-        sprintf(fbuf, "%g", av->a_w.w_float);
-        len = strlen(fbuf);
-        if((len + cursize) >= (size-1))
+        sprintf(flt_buf, "%g", av->a_w.w_float);
+        length = strlen(flt_buf);
+        if((length + accu_size) >= (x->x_size-2))
         {
-          cbeg = (char *)resizebytes(cbeg, size*sizeof(char), 2*(len + cursize)*sizeof(char));
-          size = 2*(len + cursize);
+          x->x_mem = (char *)resizebytes(x->x_mem, x->x_size*sizeof(char), 2*(length + accu_size)*sizeof(char));
+          x->x_size = 2*(length + accu_size);
         }
-        strcat(cbeg, fbuf);
-        cursize += len;
+        strcat(x->x_mem, flt_buf);
+        accu_size += length;
       }
       av++;
     }
   }
-  outlet_symbol(x->x_obj.ob_outlet, gensym(cbeg));
-  freebytes(cbeg, size * sizeof(char));
+  outlet_symbol(x->x_obj.ob_outlet, gensym(x->x_mem));
+}
+
+static void mergefilename_free(t_mergefilename *x)
+{
+  freebytes(x->x_mem, x->x_size*sizeof(char));
 }
 
 static void *mergefilename_new(t_symbol *s, int ac, t_atom *av)
@@ -212,6 +213,8 @@ static void *mergefilename_new(t_symbol *s, int ac, t_atom *av)
   x->x_sep[1] = 0;
   if(ac > 0)
     mergefilename_separator(x, s, ac, av);
+  x->x_size = 400;
+  x->x_mem = (char *)getbytes(x->x_size*sizeof(char));
   outlet_new(&x->x_obj, &s_symbol);
   return (x);
 }
