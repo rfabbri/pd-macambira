@@ -1,4 +1,4 @@
-$Id: README,v 1.7 2006-01-04 02:59:22 matju Exp $
+$Id: README,v 1.8 2006-01-06 20:19:28 matju Exp $
 
 PureUnity
 
@@ -225,7 +225,7 @@ those other operators are faithful to an algebraic property.
 
 [commutator  $type $class]          (2 inlets)     ab-ba
 [associator  $type $class]          (2 inlets)  (ab)c-a(bc)
-[distributor $type $class1 $class2] (3 inlets) a(b+c)-(ab+ac)
+[distributor $type $class1 $class2] (3 inlets) a&(b^c)-(a&b^a&c)
 [invertor    $type $class1 $class2] (2 inlets)   ab/b-a
 
 +-+-+--+---+-----+--------+-------------+---------------------+
@@ -234,6 +234,30 @@ TESTS AND RULES
 For each class, a test file's name is the class name followed by "-test.pd",
 and a rule file's name is the class name followed by "-rule.pd",
 in the same way as it is for help files.
+
+for a class called $foo, the protocol (aka interface aka rule) $foo is the
+set of behaviours expected from the $foo class; the class called $foo-rule
+must repect the $foo protocol as well, plus it should test that the inputs
+are valid, and if they are, it should test for one or several results and
+report any errors.
+
+(((To report errors and inaccuracies, output them through the properties outlet at the right. If there is no
+properties outlet in $foo (curently almost nothing in Pd has one),
+then $foo-rule must have one more outlet than $foo.)))
+
+(((Float messages coming out of the properties outlet of $foo-rule report
+accuracy. Named error messages come out with selector "error" followed by
+an error-symbol and then its arguments.)))
+
+(((In the case of true/false logic, a value of 0 means that a test has passed
+and a 1 means that a test has failed. Those values represent failure and not
+success. The reason is so that it matches with accuracy levels, where 0 is
+perfectly accurate, but any inaccuracy shows up as a relative error fraction.
+Any finite nonnegative value is allowed for accuracy, because it is expected
+to be the result of a norm))).
+
+(((In standard math, "Discrete Metric" is when there are only two possible
+distances between objects: together=0 and apart=1)))
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 ETC
