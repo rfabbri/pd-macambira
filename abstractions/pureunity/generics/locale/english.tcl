@@ -6,12 +6,11 @@ say_namespace summary {
     \# "grid"
   } {
     say_category basic<$x>
-    say ~.do ""
-    say ~.norm ""
-    say ~.packunpack3 ""
-    say ~ ""
-    say ~.swap ""
-    say ~.taa ""
+    say $x.do " ($y)"
+    say $x.norm " ($y)"
+    say $x.packunpack3 " ($y)"
+    say $x.swap " ($y)"
+    say $x.taa " ($y)"
   }
 
   say_category interfaces
@@ -50,7 +49,7 @@ say_namespace summary {
   say twice ""
   say 3times ""
   say 4times ""
-  say ^ ""
+  say ^ "xor"
   say error ""
   say protocols-tree ""
   say tree ""
