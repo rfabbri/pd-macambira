@@ -5,7 +5,7 @@ clean: ; rm -f *.pd_linux *.o *.pd_darwin
 
 # ----------------------- Mac OSX -----------------------
 
-pd_darwin: chord_melo.pd_darwin rhythms_memory.pd_darwin test.pd_darwin GArhythm.pd_darwin	
+pd_darwin: chord_melo.pd_darwin harmonizer.pd_darwin chords_memory.pd_darwin common.pd_darwin rhythms_memory.pd_darwin GArhythm.pd_darwin test.pd_darwin
 
 .SUFFIXES: .pd_darwin
 
@@ -13,7 +13,7 @@ pd_darwin: chord_melo.pd_darwin rhythms_memory.pd_darwin test.pd_darwin GArhythm
 # where are the PD header files?
 # leave it blank if it is a system directory (like /usr/local/include), 
 # 	since gcc 3.2 complains about it
-PDPATH=/Applications/PdOLD.app/Contents/Resources/src
+PDPATH=/Applications/PdOLD.app/Contents/Resources/src/
 #PDPATH=/Users/davidemorelli/Desktop/robaDavide/Pd-0.38-3.app/Contents/Resources/src/
 
 # where is the PD executable?
@@ -29,8 +29,8 @@ DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 .c.pd_darwin:
-	cc $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
-	cc -bundle  -bundle_loader $(PD) -flat_namespace -o $*.pd_darwin *.o
+	cc $(DARWINCFLAGS) $(DARWININCLUDE) -c $*.c common.c
+	cc -bundle  -bundle_loader $(PD) -flat_namespace -o $*.pd_darwin $*.o common.o
 #	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin
 #	rm -f $*.o
 
