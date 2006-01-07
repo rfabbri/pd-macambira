@@ -1,4 +1,4 @@
-$Id: README,v 1.8 2006-01-06 20:19:28 matju Exp $
+$Id: README,v 1.9 2006-01-07 07:19:27 matju Exp $
 
 PureUnity
 
@@ -30,6 +30,11 @@ GOALS
      etc., in a modularized way, in a DRY/OAOO fashion, thus abstracting out
      common features so that many objects share the same test patch for the 
      features that they have in common.
+
++-+-+--+---+-----+--------+-------------+---------------------+
+REQUIREMENTS
+
+  1. Pd 0.39 (PureMSP or Devel)
 
 +-+-+--+---+-----+--------+-------------+---------------------+
 TEST PROTOCOL

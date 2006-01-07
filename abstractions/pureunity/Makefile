@@ -1,4 +1,5 @@
-PD = /home/matju/pd_0_38_4/bin/pd -noaudio
+#PD = /home/matju/pd_0_38_4/bin/pd
+PD = /home/matju/pd_devel_0_39_und/bin/pd
 #PD = pd
 PDFLAGS = -lib pureunity -noaudio -path generics -path specifics
 # PDFLAGS += -lib gridflow
@@ -8,7 +9,6 @@ test:: built
 	$(PD) $(PDFLAGS) main.pd
 
 built: Makefile pureunity.pd_linux
-	# for z in associator commutator distributor invertor; do sed s/inlet/inlet~/ < generics/$$z.pd > generics/$$z~.pd; done
 	echo > built
 
 generic/%~.pd: generic/%.pd
