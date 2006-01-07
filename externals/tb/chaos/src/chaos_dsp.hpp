@@ -372,16 +372,16 @@ void chaos_dsp<system>::m_signal_l_hf(int n, t_sample *const *insigs,
 {
 	int outlets = m_system->get_num_eq();
 	
-	float phase = int(m_phase);
+	float phase = m_phase;
 
 	int i = 0;
 
 	while (n)
 	{
-		if (phase == 0)
+		if (phase <= 0)
 		{
 			m_system->m_perform();
-			phase = int (m_sr * m_invfreq);
+			phase = m_sr * m_invfreq;
 
 			for (int j = 0; j != outlets; ++j)
 				m_slopes[j] = (m_system->get_data(j) - m_values[j]) / phase;
