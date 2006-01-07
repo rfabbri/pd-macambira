@@ -208,13 +208,13 @@ void end_measure(t_rhythms_memory *x)
 		if (rhythm_found==0)
 		{
 			post("rhythms_memory: rhythm %i %i was not found ", x->next_main_rhythm_out, x->next_sub_rhythm_out);
-			return 0;
+			return;
 		}
 
 		if (wanted_rhythm==0)
 		{
 			error("rhythms_memory: wanted_rhythm should not be null! ");
-			return 0;
+			return;
 		}
 
 		// now I setup the events_out list
@@ -383,9 +383,9 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
 	//x->l_out = outlet_new(&x->x_obj, &s_list);
 	x->bangs_out = outlet_new(&x->x_obj, gensym("bang"));
 	// this outputs lists of events
-	x->list_out = outlet_new(&x->x_obj, "symbol");
+	x->list_out = outlet_new(&x->x_obj, gensym("symbol"));
 	// this outputs info on the last detected rhythm
-	x->info_out = outlet_new(&x->x_obj, "symbol");
+	x->info_out = outlet_new(&x->x_obj, gensym("symbol"));
 
 	// inlet for rhythms in the form of lists
 	inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("list"), gensym("rhythm_in"));
@@ -399,13 +399,15 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 }
 
+
 // debugging function
 void crash(t_rhythms_memory *x)
 {
 	int *a;
 	a = malloc(sizeof(int));
-	a[9999999999999999999] = 1;
+	a[99999999999] = 1;
 }
+
 
 void rhythms_memory_setup(void)
 {
