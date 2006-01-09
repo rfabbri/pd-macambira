@@ -1,0 +1,20 @@
+$Id: ChangeLog,v 1.1 2006-01-09 05:04:19 matju Exp $
+
+version 0.1 (2006.01.??):
+ * 
+
+version 0.0 (2006.01.06):
+ * LICENSE is GPL
+ * doc is in README
+ * new object classes:
+   * [commutator],   [commutative-test]
+   * [associator],   [associative-test]
+   * [invertor],      [invertible-test]
+   * [distributor], [distributive-test]
+   * [trichotomy-test], ...
+   * [twice], [3times], [4times], [^]
+   * [tree], [protocols-tree]
+   * [rtimer]
+   * for $1 in f,~ and some of #:
+     [$1.norm], [$1.taa], [$1.do], [$1.packunpack3], [$1.swap]
+     [$1.inlet], [$1.outlet]
