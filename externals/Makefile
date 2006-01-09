@@ -108,7 +108,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included here, it won't be built with Pd-extended
 LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
 iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pdp pidip pmpd \
-smlib toxy unauthorized vbap zexy
+sigpack smlib toxy unauthorized vbap zexy
 
 
 all: pre_all_$(OS_NAME) buildsrc $(LIB_TARGETS)
@@ -885,6 +885,36 @@ pmpd_clean:
 
 
 #------------------------------------------------------------------------------#
+# SIGPACK
+SIGPACK_NAME=sigpack
+SIGPACK_OBJECTS := $(wildcard $(externals_src)/sigpack/source/*~.c)
+SIGPACK_VERSION := $(shell grep "define VERSION" \
+	$(externals_src)/sigpack/source/sIgpAck.c | cut -d '"' -f 2)
+
+sigpack: $(SIGPACK_OBJECTS:.c=.$(EXTENSION))
+
+sigpack_install: sigpack
+	install -d $(objectsdir)/$(SIGPACK_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(SIGPACK_NAME) \
+		--author "weiss@weiss-archiv.de" \
+		--license "GNU GPL 2" \
+		--version "$(SIGPACK_VERSION)"
+	install -p $(SIGPACK_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(SIGPACK_NAME)
+	install -d $(helpdir)/$(SIGPACK_NAME)
+	install -p $(externals_src)/sigpack/help/*.pd \
+		$(helpdir)/$(SIGPACK_NAME)
+	install -d $(manualsdir)/$(SIGPACK_NAME)
+	install -p $(externals_src)/sigpack/readme.txt \
+		$(manualsdir)/$(SIGPACK_NAME)/README.txt
+
+sigpack_clean:
+	-rm -f -- $(externals_src)/sigpack/source/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/sigpack/source/*.o
+	-rm -f -- $(externals_src)/sigpack/*/*.bak
+	-rm -f -- $(externals_src)/sigpack/*/*.*~
+
+
+#------------------------------------------------------------------------------#
 # SMLIB
 SMLIB_NAME=smlib
 # exclude SMlib.c since its just for the compiled library
@@ -1080,10 +1110,7 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: creb_clean cxc_clean cyclone_clean ext13_clean frankenstein_clean \
-freeverb_clean hid_clean loaders_clean markex_clean mjlib_clean motex_clean \
-oscx_clean pddp_clean pdp_clean pidip_clean smlib_clean toxy_clean \
-unauthorized_clean zexy_clean install_clean
+clean:  $(patsubst %, %_clean,$(LIB_TARGETS))
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
 	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 

@@ -1,0 +1,38 @@
+#N canvas 194 385 571 387 12;
+#X obj 62 318 dac~;
+#X obj 95 200 nbx 5 14 0 100 0 0 empty empty empty 0 -6 0 10 -262144
+-1 -1 0 256;
+#X obj 62 283 *~;
+#X obj 95 263 line~;
+#X obj 95 240 pack 0 50;
+#X obj 95 218 dbtorms;
+#X floatatom 119 118 1 0 0 0 - - -;
+#X obj 177 140 nbx 5 14 0 1 0 0 empty empty empty 0 -6 0 10 -262144
+-1 -1 0 256;
+#X text 60 35 signal unity step function;
+#X text 138 117 Mode[0/1];
+#X text 236 136 Thres[0-1];
+#X text 229 179 Mode0: if signal is above the;
+#X text 286 191 specified threshold a unity;
+#X text 286 203 step is output \, otherwise zero;
+#X text 228 218 Mode1: same as above but if below the;
+#X text 283 230 threshold \, the signal passes;
+#X text 284 242 unchanged;
+#X obj 62 92 osc~ 440;
+#X floatatom 62 70 5 0 0 0 - - -;
+#X text 301 15 arg<mode><threshold>;
+#X text 308 331 sIgpAck 0.01;
+#X obj 62 163 sp.ustep~ 0 0.5;
+#X text 269 345 2002 www.weiss-archiv.de;
+#X text 60 13 ---sp.ustep~---;
+#X connect 1 0 5 0;
+#X connect 2 0 0 0;
+#X connect 2 0 0 1;
+#X connect 3 0 2 1;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
+#X connect 6 0 21 1;
+#X connect 7 0 21 2;
+#X connect 17 0 21 0;
+#X connect 18 0 17 0;
+#X connect 21 0 2 0;

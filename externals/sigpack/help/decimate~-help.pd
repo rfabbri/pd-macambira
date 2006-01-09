@@ -1,0 +1,32 @@
+#N canvas 285 400 488 343 12;
+#N canvas 0 0 450 300 graph1 0;
+#X array deci 44100 float 0;
+#X coords 0 1.02 44099 -1.02 100 70 1;
+#X restore 305 189 graph;
+#X msg 8 112 bang;
+#X obj 52 105 osc~ 1.5;
+#N canvas 0 0 450 300 graph1 0;
+#X array osc 44100 float 0;
+#X coords 0 1 44099 -1 100 70 1;
+#X restore 305 102 graph;
+#X obj 62 132 tabwrite~ osc;
+#X obj 125 172 nbx 5 14 0 1 0 0 empty empty ratio 0 -6 0 10 -262144
+-1 -1 0.02 256;
+#X obj 199 172 nbx 5 14 0 32 0 0 empty empty bits[1-32] 0 -6 0 10 -262144
+-1 -1 0 256;
+#X obj 52 228 tabwrite~ deci;
+#X text 51 35 signal decimation;
+#X text 51 50 a ratio of 1 is orig. samplerate 0.5 is half;
+#X text 273 11 arg<ratio><bits>;
+#X text 51 67 of orig. samplerate etc.;
+#X text 260 268 sIgpAck 0.02;
+#X obj 52 195 sp.decimate~ 0.5 16;
+#X text 222 281 2003 www.weiss-archiv.de;
+#X text 51 13 ---sp.decimate~---;
+#X connect 1 0 4 0;
+#X connect 1 0 7 0;
+#X connect 2 0 4 0;
+#X connect 2 0 13 0;
+#X connect 5 0 13 1;
+#X connect 6 0 13 2;
+#X connect 13 0 7 0;
