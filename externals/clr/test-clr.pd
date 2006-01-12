@@ -1,4 +1,4 @@
-#N canvas 0 0 734 482 12;
+#N canvas 0 0 738 486 12;
 #X obj 97 383 clr;
 #X obj 105 80 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -22,6 +22,7 @@
 #X msg 239 342 selFloatList 1.1 2.2 3.3 4.4;
 #X msg 239 364 selFloatList 0.001 1000;
 #X msg 239 387 selGenericList 0.001 abaco 1000;
+#X msg 238 409 selGenericList abaco 1.1;
 #X connect 0 0 14 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -40,3 +41,4 @@
 #X connect 17 0 0 0;
 #X connect 18 0 0 0;
 #X connect 19 0 0 0;
+#X connect 20 0 0 0;

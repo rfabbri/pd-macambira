@@ -71,13 +71,35 @@ typedef struct atom_simple
 	public enum AtomType {Null = 0, Float=1, Symbol=2};
 
 	[StructLayout (LayoutKind.Explicit)]
-	public struct Atom 
+//	[StructLayout (LayoutKind.Sequential)]
+	public class Atom 
 	{
 		//[FieldOffset (0)] AtomType type;
-		[FieldOffset (0)] public int type;
+		//[FieldOffset (0)] public int type;
+		[FieldOffset (0)] 
+		public int type;
 		/* union members */
-		[FieldOffset (4)] public long string_value;
-		[FieldOffset (4)] public float float_value;
+		[FieldOffset (4)] 
+		public float float_value;
+
+//		[FieldOffset (4)] 
+		[FieldOffset (8)] 
+		public string string_value;
+		
+
+		
+		public Atom(string string_value)
+		{
+			this.type = 2;
+			this.float_value = 0;
+			this.string_value = string_value;
+		}
+		public Atom(float float_value)
+		{
+			this.type = 1;
+			this.string_value = "";
+			this.float_value = float_value;
+		}
 	}
 
 

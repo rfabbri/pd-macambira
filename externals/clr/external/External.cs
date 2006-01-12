@@ -89,16 +89,32 @@ namespace PureData
 			}
 		}
 
+		
+		public void SelGenericList(Atom a)
+		{
+				Console.WriteLine("a is type " + a.type);
+				Console.WriteLine("float = " + a.float_value);
+				Console.WriteLine("stringa = " + a.string_value);
+		}
+		
+/*
 		public void SelGenericList(Atom [] list)
 		{
 			pd.PostMessage("SetStringList received a " + list.Length + " long list");
 			for (int i = 0; i<list.Length; i++)
 			{
 				Atom a = (Atom) list[i];
-				pd.PostMessage("list[" + i + "] is type " + a.type + " stringa = " + a.string_value);
-			//	pd.PostMessage("float " + i + " = " + list[i]);
+				Console.WriteLine("a is type " + a.type);
+				Console.WriteLine("float = " + a.float_value);
+				Console.WriteLine("stringa = " + a.string_value);
+				pd.PostMessage("a is type " + a.type);
+				pd.PostMessage("float = " + a.float_value);
+				pd.PostMessage("stringa = " + a.string_value);
+
 			}
+			
 		}
+*/		
 
 		public int test(int a)
 		{

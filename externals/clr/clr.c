@@ -53,10 +53,11 @@ typedef struct atom_simple
 {
 	//t_atomtype_simple a_type;
 	int a_type;
-	union{
+	//MonoString *a_type;
+	//union{
 		float float_value;
 		MonoString *string_value;
-	} stuff;
+	//} stuff;
 };
 
 
@@ -70,6 +71,7 @@ typedef struct _clr
 	MonoDomain *domain;
 	MonoAssembly *assembly;
 	MonoObject *obj;
+	MonoImage *image;
 	MonoMethod *method, *setUp;
 	MonoClass *klass;
 	int n;
@@ -102,7 +104,7 @@ static void mono_load(t_clr *x)
 {
 //	const char *file="D:\\Davide\\cygwin\\home\\Davide\\externalTest1.dll";
 	const char *file="PureData.dll";
-	MonoImage *image;
+	
 	MonoMethod *m = NULL, *ctor = NULL, *fail = NULL, *mvalues;
 	gpointer iter;
 	gpointer args [1];
@@ -146,12 +148,12 @@ printf("will load %s, random_name %s\n", file, random_name_str);
 		error("clr: assembly not found!");
 	}
 
-	image = mono_assembly_get_image (x->assembly);
+	x->image = mono_assembly_get_image (x->assembly);
 
 	
-	x->klass = mono_class_from_name (image, "PureData", "External");
+	x->klass = mono_class_from_name (x->image, "PureData", "External");
 	if (!x->klass) {
-		error("Can't find MyType in assembly %s\n", mono_image_get_filename (image));
+		error("Can't find MyType in assembly %s\n", mono_image_get_filename (x->image));
 		//exit (1);
 	}
 	x->obj = mono_object_new (x->domain, x->klass);
@@ -292,31 +294,47 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 						t_symbol *strsymbol;
 						float ftmp;
 						char *str;
+						char strtmp[265], strtmp2[256];
 						MonoArray * arystr;
-						int j;						
-						arystr = mono_array_new (x->domain, mono_get_string_class (), argc);
+						int j;		
+						atom_simple *atmp;
+						atom_simple *atmp2, *atmp3;
+
+							int *tipo;
+							float *fp;
+
+						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom");
+						arystr = mono_array_new (x->domain, c /*mono_get_string_class ()*/, argc);
+						//arystr = mono_array_new (x->domain, c, 2);
+						/*
 						for (j=0; j<argc; j++)
 						{
-							atom_simple *atmp = malloc(sizeof(atom_simple));
+							atmp = malloc(sizeof(atom_simple));
 							switch ((argv+j)->a_type)
 							{
 							case A_FLOAT:
 post("setting type float in position %i", j);
-								atmp->a_type = 1;
+								//atmp->a_type = 1;
+								sprintf(strtmp, "1");
+						//		atmp->a_type = mono_string_new (x->domain, strtmp);
 								ftmp = atom_getfloat(argv+j);
-								atmp->stuff.float_value = ftmp;
+								atmp->float_value = ftmp;
 								break;
 							case A_SYMBOL:
 post("setting type symbol in position %i", j);
-								atmp->a_type = 2;
+								//atmp->a_type = 2;
+								sprintf(strtmp, "2");
+							//	atmp->a_type = mono_string_new (x->domain, strtmp);
 								strsymbol = atom_getsymbol(argv+j);
-								atmp->stuff.string_value = mono_string_new (x->domain, strsymbol->s_name);
+								atmp->string_value = mono_string_new (x->domain, strsymbol->s_name);
 								break;
 							default:
 post("setting type null in position %i", j);
-								atmp->a_type = 0;
+								//atmp->a_type = 0;
+								sprintf(strtmp, "0");
+							//	atmp->a_type = mono_string_new (x->domain, strtmp);
 							}
-
+						//	mono_array_set (arystr, MonoString *, j, atmp->a_type);
 							mono_array_set (arystr, atom_simple *, j, atmp);
 							//int * ftmp = malloc(sizeof(int));
 							//*ftmp =  j;
@@ -330,7 +348,42 @@ post("setting type null in position %i", j);
 							//mono_array_set (arystr, gint32 , j, ftmp);
 
 						}
-						args[0] = arystr;
+						*/
+
+						// debug:
+						// send just 1 atom
+						
+							atmp2 = malloc(sizeof(atom_simple));
+							atmp2->a_type = 121;
+							atmp2->float_value = atom_getfloat(argv);
+							strsymbol = atom_getsymbol(argv);
+							atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
+						args[0] = atmp2;
+						
+						
+						/*
+						// a list of atoms
+						for (j=0; j<argc; j++)
+						{
+							atmp2 = malloc(sizeof(atom_simple));
+							atmp2->a_type = 4;
+							atmp2->float_value = atom_getfloat(argv+j);
+							strsymbol = atom_getsymbol(argv+j);
+							atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
+							mono_array_set (arystr, atom_simple *, j, atmp2);
+						}
+						*/
+
+
+						/*
+						atmp3 = malloc(sizeof(atom_simple));
+						atmp3->a_type = 2;
+						atmp3->float_value = 0.5;
+						sprintf(strtmp2, "abracadabra");
+						atmp3->string_value = mono_string_new (x->domain, strtmp2);
+						mono_array_set (arystr, atom_simple *, 1, atmp3);
+						*/
+					//	args[0] = arystr;
 						
 						//args[0] = strings;
 						mono_runtime_invoke (x->selectors[i].func, x->obj, args, NULL);
