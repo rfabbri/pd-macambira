@@ -38,8 +38,27 @@ typedef struct outletList outletList;
 typedef struct outletList
 {
 	t_outlet *outlet_pointer;
-//	selectorList *next; // next element of the list
+//	outletList *next; // next element of the list
 };
+
+// simplyfied atom
+typedef struct atom_simple atom_simple;
+typedef enum
+{
+    A_S_NULL=0,
+    A_S_FLOAT=1,
+    A_S_SYMBOL=2,
+}  t_atomtype_simple;
+typedef struct atom_simple
+{
+	//t_atomtype_simple a_type;
+	int a_type;
+	union{
+		float float_value;
+		MonoString *string_value;
+	} stuff;
+};
+
 
 static t_class *clr_class;
 
@@ -55,6 +74,7 @@ typedef struct _clr
 	MonoClass *klass;
 	int n;
 
+	// TODO: dynamic memory allocation
 	selectorList selectors[MAX_SELECTORS];
 	outletList outlets[MAX_OUTLETS];
 
@@ -237,7 +257,6 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 		if (strcmp(x->selectors[i].sel, sl->s_name) == 0)
 		{
 			// I've found the selector!
-printf("selector %s, func %s\n", sl->s_name, x->selectors[i].sel);
 			if (x->selectors[i].func)
 			{
 				// ParametersType {None = 0, Float=1, Symbol=2, List=3};
@@ -271,30 +290,50 @@ printf("selector %s, func %s\n", sl->s_name, x->selectors[i].sel);
 						gpointer args [1];
 						MonoString *strmono;
 						t_symbol *strsymbol;
+						float ftmp;
 						char *str;
 						MonoArray * arystr;
-						int j;
-printf("preparo l'array\n");
-						
+						int j;						
 						arystr = mono_array_new (x->domain, mono_get_string_class (), argc);
 						for (j=0; j<argc; j++)
 						{
-							int * ftmp = malloc(sizeof(int));
-								*ftmp =  j;
-							strsymbol = atom_getsymbol(argv+j);
-							MonoString *arg = mono_string_new (x->domain, strsymbol->s_name);
-							mono_array_set (arystr, MonoString *, j, arg);
-							// gpointer
-							//mono_array_set (arystr, gint32 , j, ftmp);
+							atom_simple *atmp = malloc(sizeof(atom_simple));
+							switch ((argv+j)->a_type)
+							{
+							case A_FLOAT:
+post("setting type float in position %i", j);
+								atmp->a_type = 1;
+								ftmp = atom_getfloat(argv+j);
+								atmp->stuff.float_value = ftmp;
+								break;
+							case A_SYMBOL:
+post("setting type symbol in position %i", j);
+								atmp->a_type = 2;
+								strsymbol = atom_getsymbol(argv+j);
+								atmp->stuff.string_value = mono_string_new (x->domain, strsymbol->s_name);
+								break;
+							default:
+post("setting type null in position %i", j);
+								atmp->a_type = 0;
+							}
 
+							mono_array_set (arystr, atom_simple *, j, atmp);
+							//int * ftmp = malloc(sizeof(int));
+							//*ftmp =  j;
+							//float ftmp = atom_getfloat(argv+j);
+							//strsymbol = atom_getsymbol(argv+j);
+							//MonoString *arg = mono_string_new (x->domain, strsymbol->s_name);
+							//mono_array_set (arystr, MonoString *, j, arg);
+							// gpointer
+							
+							//mono_array_set (arystr, gint32 , j, *ftmp);
+							//mono_array_set (arystr, gint32 , j, ftmp);
 
 						}
 						args[0] = arystr;
 						
 						//args[0] = strings;
-printf("mando a mono\n");
 						mono_runtime_invoke (x->selectors[i].func, x->obj, args, NULL);
-printf("ho mandatao a mono\n");
 						break;
 					}
 				}

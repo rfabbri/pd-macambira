@@ -1,5 +1,7 @@
 using System;
-using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices; // for extern import
+using System.Runtime.InteropServices; // for structures
+
 
 namespace PureData
 {
@@ -46,4 +48,114 @@ namespace PureData
 
 
 	}
+
+/*
+// simplyfied atom
+typedef struct atom_simple atom_simple;
+typedef enum
+{
+    A_S_NULL=0,
+    A_S_FLOAT=1,
+    A_S_SYMBOL=2,
+}  t_atomtype_simple;
+typedef struct atom_simple
+{
+	t_atomtype_simple a_type;
+	union{
+		float float_value;
+		MonoString *string_value;
+	} stuff;
+};
+*/
+
+	public enum AtomType {Null = 0, Float=1, Symbol=2};
+
+	[StructLayout (LayoutKind.Explicit)]
+	public struct Atom 
+	{
+		//[FieldOffset (0)] AtomType type;
+		[FieldOffset (0)] public int type;
+		/* union members */
+		[FieldOffset (4)] public long string_value;
+		[FieldOffset (4)] public float float_value;
+	}
+
+
+
+/*
+	typedef float t_floatarg;  
+
+typedef struct _symbol
+{
+	char *s_name;
+	struct _class **s_thing;
+		struct _symbol *s_next;
+		} t_symbol;
+
+		EXTERN_STRUCT _array;
+#define t_array struct _array      
+
+
+
+#define GP_NONE 0       
+#define GP_GLIST 1      
+#define GP_ARRAY 2      
+
+typedef struct _gstub
+		{
+			union
+			{
+			struct _glist *gs_glist;    
+				struct _array *gs_array;    
+				} gs_un;
+				int gs_which;                   
+				int gs_refcount;                
+			} t_gstub;
+
+typedef struct _gpointer         
+		{
+			union
+			{   
+			struct _scalar *gp_scalar;  
+				union word *gp_w;         
+			} gp_un;
+			int gp_valid;                  
+			t_gstub *gp_stub;               
+		} t_gpointer;
+
+typedef union word
+				{
+t_float w_float;
+t_symbol *w_symbol;
+t_gpointer *w_gpointer;
+t_array *w_array;
+struct _glist *w_list;
+	int w_index;
+} t_word;
+
+typedef enum
+	{
+		A_NULL,
+		A_FLOAT,
+		A_SYMBOL,
+		A_POINTER,
+		A_SEMI,
+		A_COMMA,
+		A_DEFFLOAT,
+		A_DEFSYM,
+		A_DOLLAR, 
+		A_DOLLSYM,
+		A_GIMME,
+		A_CANT
+	}  t_atomtype;
+
+#define A_DEFSYMBOL A_DEFSYM    
+
+typedef struct _atom
+		{
+			t_atomtype a_type;
+			union word a_w;
+		} t_atom;
+*/
+
 }

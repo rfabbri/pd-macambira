@@ -33,6 +33,7 @@ namespace PureData
 			pd.AddSelector(x, "selList", "SelList", ParametersType.List);
 			pd.AddSelector(x, "selStringList", "SelStringList", ParametersType.List);
 			pd.AddSelector(x, "selFloatList", "SelFloatList", ParametersType.List);
+			pd.AddSelector(x, "selGenericList", "SelGenericList", ParametersType.List);
 			Console.WriteLine("selectors set");
 			pd.AddOutlet(x, ParametersType.Float);
 			pd.AddInlet(x, "selFloat", ParametersType.Float);
@@ -79,12 +80,23 @@ namespace PureData
 			}
 		}
 
-		public void SelFloatList(int [] list)
+		public void SelFloatList(float [] list)
 		{
 			pd.PostMessage("SetStringList received a " + list.Length + " long list");
 			for (int i = 0; i<list.Length; i++)
 			{
-				pd.PostMessage("float " + i + " = " + list[0]);
+				pd.PostMessage("float " + i + " = " + list[i]);
+			}
+		}
+
+		public void SelGenericList(Atom [] list)
+		{
+			pd.PostMessage("SetStringList received a " + list.Length + " long list");
+			for (int i = 0; i<list.Length; i++)
+			{
+				Atom a = (Atom) list[i];
+				pd.PostMessage("list[" + i + "] is type " + a.type + " stringa = " + a.string_value);
+			//	pd.PostMessage("float " + i + " = " + list[i]);
 			}
 		}
 

@@ -20,8 +20,8 @@ LINUXCFLAGS = -DPD -O2 -mno-cygwin
 
 LINUXINCLUDE =  -I../../src -I$PDPATH
 
-MONOSRC = -ID:/Davide/cygwin/tmp/build_deps/include -ID:/Davide/cygwin/tmp/build_deps/include/glib-2.0 -ID:/Davide/cygwin/tmp/build_deps/lib/glib-2.0/include -ID:/Davide/cygwin/home/Davide/mono/include 
-MONOLIB = -LD:/Davide/cygwin/tmp/build_deps/lib -LD:/Davide/cygwin/home/Davide/mono/lib -lmono -lm -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv 
+MONOSRC = -IC:/cygwin/tmp/build_deps/include -IC:/cygwin/tmp/build_deps/include/glib-2.0 -IC:/cygwin/tmp/build_deps/lib/glib-2.0/include -IC:/cygwin/home/Davide/mono/include 
+MONOLIB = -LC:/cygwin/tmp/build_deps/lib -LC:/cygwin/home/Davide/mono/lib -lmono -lm -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv 
 
 .c.dll:
 #	gcc $(LINUXCFLAGS) $(LINUXINCLUDE) `pkg-config --cflags --libs mono` -lm -ID:/Davide/cygwin/home/Davide/mono/include -LD:/Davide/cygwin/home/Davide/mono/lib $*.c

@@ -1,4 +1,4 @@
-#N canvas 0 0 726 474 12;
+#N canvas 0 0 734 482 12;
 #X obj 97 383 clr;
 #X obj 105 80 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
@@ -18,8 +18,10 @@
 #X text 424 239 2nd inlet mapped to selFloat;
 #X obj 71 429 print a;
 #X msg 239 297 selStringList abba baab caac dede;
-#X msg 248 360 selFloatList 1 2 3 4;
 #X msg 240 319 selStringList ego filose;
+#X msg 239 342 selFloatList 1.1 2.2 3.3 4.4;
+#X msg 239 364 selFloatList 0.001 1000;
+#X msg 239 387 selGenericList 0.001 abaco 1000;
 #X connect 0 0 14 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
@@ -36,3 +38,5 @@
 #X connect 15 0 0 0;
 #X connect 16 0 0 0;
 #X connect 17 0 0 0;
+#X connect 18 0 0 0;
+#X connect 19 0 0 0;
