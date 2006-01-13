@@ -1,0 +1,146 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+PureUnity
+\layout Author
+
+Mathieu Bouchard <matju@artengine.ca>
+\layout Date
+
+January 13th, 2006
+\layout Abstract
+
+This paper covers the theory behind PureUnity, PureData's test framework.
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Section
+
+What is testing?
+\layout Subsection
+
+a test tests something that gets tested
+\layout Standard
+
+(write ontological nonsense here)
+\layout Subsection
+
+a triad of testing
+\layout Standard
+
+I've thought of a triad:
+\layout Standard
+
+A.
+ "the real thing"
+\layout Standard
+
+B.
+ what it's documented as
+\layout Standard
+
+C.
+ a way to verify that (1) and (2) agree
+\layout Standard
+
+and another one:
+\layout Standard
+
+changing A to match B+C: programming
+\layout Standard
+
+changing B to match A+C: the scientific method (aka reverse engineering)
+\layout Standard
+
+changing C to match A+B: unit-tests and contracts and scientific experiments
+\layout Section
+
+Methodologies of Testing
+\layout Standard
+
+I once called unit-tests "test-by-example" and contracts "test-by-rule".
+ I think that those names are preferable to the more common names.
+ I also hadlisted "test-by-use" which is to use the software in practice:
+ this may include testing a component A using the unit tests for B because
+ B uses A.The last I had listed was "test-by-proof", which is rarer and is
+ the only one that requires analysing the implementation.
+\layout Subsection
+
+test-by-Proof
+\layout Subsection
+
+test-by-Use
+\layout Subsection
+
+test-by-Rule
+\layout Subsection
+
+test-by-Example
+\layout Section
+
+Quelques cossins
+\layout Subsection
+
+Protocol
+\layout Subsection
+
+Preconditions
+\layout Subsection
+
+Postconditions
+\layout Subsection
+
+Wrapconditions
+\layout Subsection
+
+Inheritance
+\layout Subsection
+
+Aspect-programming and stuff
+\layout Subsection
+
+Meta-abstractions
+\layout Subsection
+
+Float-Signal Polymorphism
+\layout Subsection
+
+Unit-Tests
+\layout Subsection
+
+Algebraic Properties
+\layout Subsection
+
+TODO
+\layout Standard
+
+\the_end
