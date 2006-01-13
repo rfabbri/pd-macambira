@@ -103,7 +103,7 @@ static void mono_clean(t_clr *x)
 void registerMonoMethod(void *x, MonoString *selectorString, MonoString *methodString, int type);
 void createInlet(void *x1, MonoString *selectorString, int type);
 void createOutlet(void *x1, int type);
-void out2outlet(void *x, int outlet, int type, unsigned char  *val  /* TODO */);
+void out2outlet(void *x1, int outlet, int atoms_length, atom_simple *atoms);
 void post2pd(MonoString *mesString);
 void error2pd(MonoString *mesString);
 
@@ -139,6 +139,9 @@ static void mono_load(t_clr *x)
 	}
 
 printf("will load %s, random_name %s\n", file, random_name_str);
+
+	//mono_set_dirs (NULL, NULL);
+	//mono_config_parse (NULL);
 
 	x->domain = mono_jit_init (random_name_str);
 
@@ -298,131 +301,54 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 				case 3:
 					{
 						gpointer args [1];
-						MonoString *strmono;
+						MonoString *stringtmp;
+						double *floattmp;
+						t_atomtype_simple *typetmp;
 						t_symbol *strsymbol;
-						float ftmp;
-						char *str;
-						char strtmp[265], strtmp2[256];
-						MonoArray * arystr;
+						MonoArray *atoms;
+						atom_simple *atom_array;
 						int j;		
-						atom_simple *atmp;
-						atom_simple *atmp2, *atmp3;
-
-							int *tipo;
-							float *fp;
-
-						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom2");
-			if (!c)
-				error("----> can't find Atom");
-						//arystr = mono_array_new (x->domain, atom_simple, argc);
-						arystr = mono_array_new (x->domain, c /*mono_get_string_class ()*/, argc);
-						//arystr = mono_array_new (x->domain, c, 2);
-						/*
+						char strfloat[256], strnull[256];
+						sprintf(strfloat, "float");
+						sprintf(strnull, "null");
+						atom_array = malloc(sizeof(atom_simple)*argc);
+						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom");
+						atoms = mono_array_new (x->domain, c, argc);
 						for (j=0; j<argc; j++)
 						{
-							atmp = malloc(sizeof(atom_simple));
 							switch ((argv+j)->a_type)
 							{
 							case A_FLOAT:
-post("setting type float in position %i", j);
-								//atmp->a_type = 1;
-								sprintf(strtmp, "1");
-						//		atmp->a_type = mono_string_new (x->domain, strtmp);
-								ftmp = atom_getfloat(argv+j);
-								atmp->float_value = ftmp;
+								atom_array[j].a_type =  A_S_FLOAT;
+								atom_array[j].float_value = (double) atom_getfloat(argv+j);
+								atom_array[j].string_value = mono_string_new (x->domain, strfloat);
 								break;
 							case A_SYMBOL:
-post("setting type symbol in position %i", j);
-								//atmp->a_type = 2;
-								sprintf(strtmp, "2");
-							//	atmp->a_type = mono_string_new (x->domain, strtmp);
+								atom_array[j].a_type =  A_S_SYMBOL;
 								strsymbol = atom_getsymbol(argv+j);
-								atmp->string_value = mono_string_new (x->domain, strsymbol->s_name);
+								atom_array[j].string_value = mono_string_new (x->domain, strsymbol->s_name);
+								atom_array[j].float_value = 0;
 								break;
 							default:
-post("setting type null in position %i", j);
-								//atmp->a_type = 0;
-								sprintf(strtmp, "0");
-							//	atmp->a_type = mono_string_new (x->domain, strtmp);
+								atom_array[j].a_type =  A_S_NULL;
+								atom_array[j].float_value = 0;
+								atom_array[j].string_value = mono_string_new (x->domain, strnull);
 							}
-						//	mono_array_set (arystr, MonoString *, j, atmp->a_type);
-							mono_array_set (arystr, atom_simple *, j, atmp);
-							//int * ftmp = malloc(sizeof(int));
-							//*ftmp =  j;
-							//float ftmp = atom_getfloat(argv+j);
-							//strsymbol = atom_getsymbol(argv+j);
-							//MonoString *arg = mono_string_new (x->domain, strsymbol->s_name);
-							//mono_array_set (arystr, MonoString *, j, arg);
-							// gpointer
-							
-							//mono_array_set (arystr, gint32 , j, *ftmp);
-							//mono_array_set (arystr, gint32 , j, ftmp);
-
+							mono_array_set (atoms, atom_simple , j, atom_array[j]);
 						}
-						*/
 
-						// debug:
-						// send just 1 atom
-						
-						
-						atmp2 = malloc(sizeof(atom_simple));
-						atmp2->a_type = 121;
-						atmp2->float_value = atom_getfloat(argv);
-						strsymbol = atom_getsymbol(argv);
-printf("strsymbol->s_name = %s\n", strsymbol->s_name);
-						atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
-						args[0] = atmp2;
-						
-
-						/*
-						atmp2 = malloc(sizeof(atom_simple));
-						atmp2->a = 121;
-						atmp2->b = 1;
-						args[0] = atmp2;
-						*/
-
-						/*
-						// a list of atoms
-						for (j=0; j<argc; j++)
-						{
-							atmp2 = malloc(sizeof(atom_simple));
-							atmp2->a_type = 4;
-							atmp2->float_value = atom_getfloat(argv+j);
-							strsymbol = atom_getsymbol(argv+j);
-							atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
-							mono_array_set (arystr, atom_simple *, j, atmp2);
-						}
-						*/
-
-
-						/*
-						atmp3 = malloc(sizeof(atom_simple));
-						atmp3->a_type = 2;
-						atmp3->float_value = 0.5;
-						sprintf(strtmp2, "abracadabra");
-						atmp3->string_value = mono_string_new (x->domain, strtmp2);
-						mono_array_set (arystr, atom_simple *, 1, atmp3);
-						*/
-						//args[0] = arystr;
-						
-						//args[0] = strings;
+						args[0] = atoms;
 						mono_runtime_invoke (x->selectors[i].func, x->obj, args, NULL);
 						break;
 					}
 				}
-				
-				//result = mono_runtime_invoke (x->selectors[i].func, x->obj, args, NULL);
-				//val = *(int*)mono_object_unbox (result);
-				//x->n = val;
 				return;
 			}
 		}
 		if (x->selectors[i].func == 0)
 			i = MAX_SELECTORS;
 	}
-
 	error("clr: selector not recognized");
-
 }
 
 // this function is called by mono when it wants to register a selector callback
@@ -555,12 +481,14 @@ void createOutlet(void *x1, int type)
 }
 
 // out to outlet
-void out2outlet(void *x1, int outlet, int type, unsigned char *val /* TODO */)
+void out2outlet(void *x1, int outlet, int atoms_length, atom_simple *atoms)
 {
 	t_clr *x;
 	x = (t_clr *)x1;
 	t_atom *lista;
-
+	int n;
+printf("outlet = %i\n" + outlet);
+printf("atoms_length = %i\n" + atoms_length);
 	if ((outlet>MAX_OUTLETS) || (outlet<0))
 	{
 		error("outlet number out of range, max is %i", MAX_OUTLETS);
@@ -571,16 +499,28 @@ void out2outlet(void *x1, int outlet, int type, unsigned char *val /* TODO */)
 		error("outlet %i not registered", outlet);
 		return;
 	}
-printf("ricevuto %i %i\n", val[0], val[1]);
-if (val[0]==0x01)
-	printf("val[0]==0x00");
+	lista = (t_atom *) malloc(sizeof(t_atom) * atoms_length);
+	for (n=0; n<atoms_length; n++)
+	{
+		char *mesCstring;
+		switch (atoms[n].a_type)
+		{
+			case A_S_NULL:
+				SETFLOAT(lista+n, (float) 0);
+				break;
+			case A_S_FLOAT:
+				mesCstring = mono_string_to_utf8 (atoms[n].string_value);
+				SETFLOAT(lista+n, (float) atoms[n].float_value);
+				break;
+			case A_S_SYMBOL:
+				SETSYMBOL(lista+n, gensym(mesCstring));
+				break;
+		}
 
-	lista = (t_atom *) malloc(sizeof(t_atom) * 2);
-	SETFLOAT(lista, (float) val[0]);
-	SETFLOAT(lista+1, (float) val[1]);
+	}
 	outlet_anything(x->outlets[outlet].outlet_pointer,
 					gensym("list") ,
-					2, 
+					atoms_length, 
 					lista);
 	free(lista);
 }

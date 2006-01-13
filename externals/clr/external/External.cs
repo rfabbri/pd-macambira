@@ -30,9 +30,6 @@ namespace PureData
 			pd.AddSelector(x, "sel2", "Sel2", ParametersType.None);
 			pd.AddSelector(x, "selFloat", "SelFloat", ParametersType.Float);
 			pd.AddSelector(x, "selString", "SelString", ParametersType.Symbol);
-			pd.AddSelector(x, "selList", "SelList", ParametersType.List);
-			pd.AddSelector(x, "selStringList", "SelStringList", ParametersType.List);
-			pd.AddSelector(x, "selFloatList", "SelFloatList", ParametersType.List);
 			pd.AddSelector(x, "selGenericList", "SelGenericList", ParametersType.List);
 			Console.WriteLine("selectors set");
 			pd.AddOutlet(x, ParametersType.Float);
@@ -49,11 +46,20 @@ namespace PureData
 		public void Sel2()
 		{
 			pd.PostMessage("Sel2 invoked!");
+			
+			// testing outlets
+			Atom[] atoms = new Atom[2];
+			atoms[0] = new Atom("ciao");
+			atoms[1] = new Atom(1.5f);
+			pd.ToOutlet(x, 0, atoms.Length, atoms);
+
 		}
 
 		public void SelFloat(float f)
 		{
 			pd.PostMessage("SelFloat received " + f);
+
+
 		}
 
 		public void SelString(ref string s)
@@ -61,68 +67,33 @@ namespace PureData
 			pd.PostMessage("SelString received " + s);
 		}
 
-		public void SelList(int [] list)
-		{
-			pd.PostMessage("SelList received " + list.Length + " elements");
-			for (int i = 0; i<list.Length; i++)
-			{
-				pd.PostMessage("int " + i + " = " + list[i]);
-			}
-		}
-
-		public void SelStringList(string [] list)
-		{
-			pd.PostMessage("SetStringList received a " + list.Length + " long list");
-			for (int i = 0; i<list.Length; i++)
-			{
-				pd.PostMessage("string " + i + " = " + list[i]);
-			}
-		}
-
-		public void SelFloatList(float [] list)
-		{
-			pd.PostMessage("SetStringList received a " + list.Length + " long list");
-			for (int i = 0; i<list.Length; i++)
-			{
-				pd.PostMessage("float " + i + " = " + list[i]);
-			}
-		}
-
-		
-		public void SelGenericList(Atom a)
-		{
-
-			Console.WriteLine("a is type " + a.type);
-			Console.WriteLine("float = " + a.float_value);
-			Console.WriteLine("stringa = " + a.string_value);
-			
-		}
-		
-		
-/*
 		public void SelGenericList(Atom [] list)
 		{
-			pd.PostMessage("SetStringList received a " + list.Length + " long list");
 			for (int i = 0; i<list.Length; i++)
 			{
 				Atom a = (Atom) list[i];
-				Console.WriteLine("a is type " + a.type);
-				Console.WriteLine("float = " + a.float_value);
-				Console.WriteLine("stringa = " + a.string_value);
-				pd.PostMessage("a is type " + a.type);
-				pd.PostMessage("float = " + a.float_value);
-				pd.PostMessage("stringa = " + a.string_value);
+				switch (a.type)
+				{
+					case (AtomType.Null):
+					{
+						pd.PostMessage("element null");
+						break;
+					}
+					case (AtomType.Float):
+					{
+						pd.PostMessage("" + a.float_value);
+						break;
+					}
+					case (AtomType.Symbol):
+					{
+						pd.PostMessage(a.string_value);
+						break;
+					}
+				}
 			}		
 		}
-*/	
 
-		public int test(int a)
-		{
-			
 
-			Console.WriteLine("test("+a+")");
-			return a+1;
-		}
 	}
 
 
