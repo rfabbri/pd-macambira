@@ -1,0 +1,3 @@
+PureUnity.txt: PureUnity.lyx
+	# please go in LyX and export to text yourself...
+
