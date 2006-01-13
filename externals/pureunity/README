@@ -1,4 +1,4 @@
-$Id: README,v 1.1 2006-01-09 05:04:19 matju Exp $
+$Id: README,v 1.2 2006-01-13 04:54:08 matju Exp $
 
 PureUnity
 
@@ -305,3 +305,178 @@ results. Many of those algorithms have chaotic and/or unstable
 behaviours, which means that the inaccuracies may skyrocket instead of
 fading out.
 
++-+-+--+---+-----+--------+-------------+---------------------+
+
+Date: Fri, 13 Jan 2006 04:07:59 +0900
+From: Mathieu Bouchard <matju@artengine.ca>
+Reply-To: ruby-core@ruby-lang.org
+To: ruby-core@ruby-lang.org
+Subject: Re: Design contracts and refactoring (was Re: mathn: ugly warnings)
+
+On Fri, 13 Jan 2006, mathew wrote:
+
+> *Dean Wampler *<deanwampler gmail.com> writes:
+> > Let me suggest an XP-style alternative; make thorough unit tests
+> > required and make sure they "document" - and test! - the design
+> > "contract".
+> Unit tests are not an alternative. They are an additional requirement.
+
+I find unit-tests to be often decomposable like this. Start with something
+like this:
+
+  raise if Blah.new(666) != Blah.new(666)
+  raise if Blah.new(747) != Blah.new(747)
+  raise if Blah.new(242) != Blah.new(242)
+  raise if Blah.new(69)  != Blah.new(69)
+  raise if Blah.new(37)  != Blah.new(37)
+
+then generalize it ("equality is defined based on the arg of .new"):
+
+  for x in [666,747,242,69,37] do
+    raise if Blah.new(x) != Blah.new(x)
+  end
+
+then extract a contract from it:
+
+  class CheckedBlah < Blah
+    def self.new(x)
+      r = super(x)
+      raise if r != super(x)
+      r
+    end
+  end
+
+so now all Blah object creation may be checked throughout actual uses of a
+program and not just unit tests. The unit test now reduces to:
+
+  for x in [666,747,242,69,37] do Blah.new(x) end
+
+so for many unit tests, all you have to do is just do things and discard
+the results, and the contract will do the job of checking.
+
+ _ _ __ ___ _____ ________ _____________ _____________________ ...
+| Mathieu Bouchard - tél:+1.514.383.3801 - http://artengine.ca/matju
+| Freelance Digital Arts Engineer, Montréal QC Canada
+
++-+-+--+---+-----+--------+-------------+---------------------+
+
+Date: Fri, 13 Jan 2006 05:05:19 +0900
+From: Mathieu Bouchard <matju@artengine.ca>
+Reply-To: ruby-core@ruby-lang.org
+To: ruby-core@ruby-lang.org
+Subject: Re: Design contracts and refactoring (was Re: mathn: ugly warnings)
+
+On Fri, 13 Jan 2006, mathew wrote:
+
+> For example, consider a simple vector addition routine in a 3D library.
+> The unit tests might test its behavior with Float and Integer vectors,
+> since that's why it was written.
+
+Here's another way to factor unit-tests that I haven't mentioned in the
+last mail.
+
+suppose you test for + using:
+
+  class IntegerTest
+    def test; 2+2==4 or raise; end
+  end
+  class FloatTest
+    def test; 2.0+2.0==4.0 or raise; end
+  end
+  class RationalTest
+    def test; Rational(2,1)+Rational(2,1)==Rational(4,1) or raise; end
+  end
+
+you can refactor those tests like this:
+
+  class NumericTest
+    def initialize nt; @nt; end
+    def make x; raise "abstract class" end
+    def test; make(2)+make(2)==make(4) or raise; end
+  end
+  class  IntegerTest; def make x;  Integer(x)   end end
+  class    FloatTest; def make x;    Float(x)   end end
+  class RationalTest; def make x; Rational(x,1) end end
+
+> However, to do that you need to know whether the feature of supporting
+> (say) Complex vectors or BigDecimal vectors is intended or not. The unit
+> tests won't tell you this.
+
+I once called unit-tests "test-by-example" and contracts "test-by-rule". I
+think that those names are preferable to the more common names. I also had
+listed "test-by-use" which is to use the software in practice: this may
+include testing a component A using the unit tests for B because B uses A.
+The last I had listed was "test-by-proof", which is rarer and is the only
+one that requires analysing the implementation.
+
+> > One limitation of documentation is that it has no enforcement power,
+> > so you have to write tests anyway to test conformance.
+> Unit tests have no enforcement power either, because you can just change the
+> test. Indeed, I've already had to do this once when it turned out that the
+> unit test was wrong. (In net/ftp.)
+
+That was a pretty bad case of strawman argument. Dean was assuming that
+your documentation was not executable when you had quite clearly stated
+that it was the contracts that acted as documentation!
+
+I've thought of a triad:
+
+  A. "the real thing"
+  B. what it's documented as
+  C. a way to verify that (1) and (2) agree
+
+and another one:
+
+  changing A to match B+C:
+    programming
+
+  changing B to match A+C:
+    the scientific method (aka reverse engineering)
+
+  changing C to match A+B:
+    unit-tests and contracts and scientific experiments
+
+ _ _ __ ___ _____ ________ _____________ _____________________ ...
+| Mathieu Bouchard - tél:+1.514.383.3801 - http://artengine.ca/matju
+| Freelance Digital Arts Engineer, Montréal QC Canada
+
++-+-+--+---+-----+--------+-------------+---------------------+
+
+Date: Fri, 13 Jan 2006 07:36:36 +0900
+From: Mathieu Bouchard <matju@artengine.ca>
+Reply-To: ruby-core@ruby-lang.org
+To: ruby-core@ruby-lang.org
+Subject: Re: Design contracts and refactoring (was Re: mathn: ugly warnings)
+
+On Fri, 13 Jan 2006, mathew wrote:
+
+> >  The XP view is
+> > that you should eliminate the redundancy.
+> Except it's not redundancy.
+> Unit tests define a set of functionality that is required. Documentation tells
+> you the functionality that is supported, which is generally a superset of the
+> functionality required by the unit tests.
+
+Let's follow the argument of both of you to the end.
+
+1. Unit-tests often match inputs with outputs on a case-by-case basis.
+
+2. Redundancy should be eliminated.
+
+(1) suggests that there is a shorter way to express the unit-tests.
+Suppose you are able to find a formula for generating output-validators
+from inputs. Then that formula is a postcondition of a contract, and the
+explicit output-validators of the unit-tests are redundant.
+
+(2) because part of the unit-tests are redundant, part of the unit-tests
+should be eliminated. This causes the postconditions to become an
+essential part of unit-testing.
+
+Unit-tests vs contracts is a false debate.
+
+ _ _ __ ___ _____ ________ _____________ _____________________ ...
+| Mathieu Bouchard - tél:+1.514.383.3801 - http://artengine.ca/matju
+| Freelance Digital Arts Engineer, Montréal QC Canada
+
+
++-+-+--+---+-----+--------+-------------+---------------------+
