@@ -49,6 +49,7 @@ typedef enum
     A_S_FLOAT=1,
     A_S_SYMBOL=2,
 }  t_atomtype_simple;
+
 typedef struct atom_simple
 {
 	//t_atomtype_simple a_type;
@@ -60,6 +61,13 @@ typedef struct atom_simple
 	//} stuff;
 };
 
+/*
+typedef struct atom_simple
+{
+	int a;
+	int b;
+};
+*/
 
 static t_class *clr_class;
 
@@ -303,7 +311,10 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 							int *tipo;
 							float *fp;
 
-						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom");
+						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom2");
+			if (!c)
+				error("----> can't find Atom");
+						//arystr = mono_array_new (x->domain, atom_simple, argc);
 						arystr = mono_array_new (x->domain, c /*mono_get_string_class ()*/, argc);
 						//arystr = mono_array_new (x->domain, c, 2);
 						/*
@@ -353,14 +364,23 @@ post("setting type null in position %i", j);
 						// debug:
 						// send just 1 atom
 						
-							atmp2 = malloc(sizeof(atom_simple));
-							atmp2->a_type = 121;
-							atmp2->float_value = atom_getfloat(argv);
-							strsymbol = atom_getsymbol(argv);
-							atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
+						
+						atmp2 = malloc(sizeof(atom_simple));
+						atmp2->a_type = 121;
+						atmp2->float_value = atom_getfloat(argv);
+						strsymbol = atom_getsymbol(argv);
+printf("strsymbol->s_name = %s\n", strsymbol->s_name);
+						atmp2->string_value = mono_string_new (x->domain, strsymbol->s_name);
 						args[0] = atmp2;
 						
-						
+
+						/*
+						atmp2 = malloc(sizeof(atom_simple));
+						atmp2->a = 121;
+						atmp2->b = 1;
+						args[0] = atmp2;
+						*/
+
 						/*
 						// a list of atoms
 						for (j=0; j<argc; j++)
@@ -383,7 +403,7 @@ post("setting type null in position %i", j);
 						atmp3->string_value = mono_string_new (x->domain, strtmp2);
 						mono_array_set (arystr, atom_simple *, 1, atmp3);
 						*/
-					//	args[0] = arystr;
+						//args[0] = arystr;
 						
 						//args[0] = strings;
 						mono_runtime_invoke (x->selectors[i].func, x->obj, args, NULL);

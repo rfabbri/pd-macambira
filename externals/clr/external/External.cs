@@ -41,7 +41,6 @@ namespace PureData
 
 
 
-
 		public void Sel1()
 		{
 			pd.PostMessage("Sel1 invoked!");
@@ -92,10 +91,13 @@ namespace PureData
 		
 		public void SelGenericList(Atom a)
 		{
-				Console.WriteLine("a is type " + a.type);
-				Console.WriteLine("float = " + a.float_value);
-				Console.WriteLine("stringa = " + a.string_value);
+
+			Console.WriteLine("a is type " + a.type);
+			Console.WriteLine("float = " + a.float_value);
+			Console.WriteLine("stringa = " + a.string_value);
+			
 		}
+		
 		
 /*
 		public void SelGenericList(Atom [] list)
@@ -110,11 +112,9 @@ namespace PureData
 				pd.PostMessage("a is type " + a.type);
 				pd.PostMessage("float = " + a.float_value);
 				pd.PostMessage("stringa = " + a.string_value);
-
-			}
-			
+			}		
 		}
-*/		
+*/	
 
 		public int test(int a)
 		{
