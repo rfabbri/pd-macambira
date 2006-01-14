@@ -27,8 +27,9 @@ opt = Options(['options.cache'])
 opt.AddOptions(
 	BoolOption('debug', 'Build with debugging symbols', False),
 	('optimize', 'Optimize for specific architecture', None),
-	('icc', 'Build with intel c compiler', False),
+	BoolOption('icc', 'Build with intel c compiler', False),
 	BoolOption('simd', 'build with simd instructions', False),
+	BoolOption('cmem', 'build with normal memory allocation', True),
 	('prefix', 'install prefix', '/usr/local'),
 	('flext_path', 'flext path', None),
 	('pd_path', 'pd path', None),
@@ -39,8 +40,7 @@ opt.Update(env)
 opt.Save('options.cache',env)
 Help(opt.GenerateHelpText(env))
 
-
-if env.Dictionary().has_key('icc') and env['icc']:
+if env['icc']:
 	env.Replace(CC="icc",
 				SHCC="icc",
 				CXX="icc",
@@ -53,6 +53,10 @@ if env.Dictionary().has_key('icc') and env['icc']:
  	env.Append(CCFLAGS=' -ip')
  	env.Append(LINKFLAGS='-ip')
 	print "Using intel c compiler"
+
+
+if env['cmem']:
+ 	env.Append(CPPDEFINES=['FLEXT_USE_CMEM'])
 
 
 if env.Dictionary().has_key('flext_path'):
@@ -75,12 +79,13 @@ if env.Dictionary().has_key('optimize'):
 if env.Dictionary().has_key('debug') and env['debug']:
 	env.Append(CCFLAGS=' -g ')
 	env.Append(CPPDEFINES=['_DEBUG'])
-	env.Append(LIBS = 'flext-pd')
+	env.Append(LIBS = 'flext-pd_d')
 	env.Append(LINKFLAGS=' -g')
 else:
-	env.Append(CPPDEFINES=['FLEXT_SHARED'])
 	env.Append(LIBS = 'flext-pd')
 	env.Append(CPPDEFINES="NDEBUG")
+
+env.Append(CPPDEFINES=['FLEXT_SHARED'])
 
 ######################################################################
 #
@@ -149,5 +154,5 @@ except:
 external = env.SharedLibrary(name, sources, SHLIBPREFIX='', SHLIBSUFFIX='.pd_linux')
 
 prefix = env['prefix']
-env.Install(prefix+'/lib/pd/extra',external)
-env.Alias('install', prefix+'/lib/pd/extra')
+install = env.Install(prefix+'/lib/pd/extra',external)
+env.Alias('install', install)
