@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "External"
+                AssemblyName = "PureData"
                 AssemblyOriginatorKeyFile = ""
                 DefaultClientScript = "JScript"
                 DefaultHTMLPageLayout = "Grid"
@@ -79,11 +79,6 @@
                     AssemblyName = "System.Xml"
                     HintPath = "..\..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.XML.dll"
                 />
-                <Reference
-                    Name = "PureData"
-                    AssemblyName = "PureData"
-                    HintPath = "PureData.dll"
-                />
             </References>
         </Build>
         <Files>
@@ -94,7 +89,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "External.cs"
+                    RelPath = "Atom.cs"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "pd.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

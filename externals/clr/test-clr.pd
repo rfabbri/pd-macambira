@@ -1,44 +1,30 @@
-#N canvas 0 0 742 490 12;
-#X obj 97 383 clr;
-#X obj 105 80 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 73 31 623 538 12;
+#X obj 115 402 clr External External.dll;
+#X obj 122 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 239 110 1 2 3;
-#X msg 238 136 sel3 a b c;
-#X msg 236 176 selFloat 0.5;
-#X msg 247 221 selString ciao;
-#X msg 247 263 selList 1 2 3;
-#X msg 344 161 selFloat \$1;
-#X obj 344 121 hsl 128 15 1 2 0 0 empty empty empty -2 -6 0 8 -262144
+#X floatatom 138 70 5 0 0 0 - - -;
+#X symbolatom 153 93 10 0 0 0 - - -;
+#X text 219 66 simple messages;
+#X msg 200 130 sel1;
+#X msg 214 153 sel2;
+#X text 261 142 selectors;
+#X msg 223 196 selFloat \$1;
+#X obj 226 177 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X floatatom 360 142 5 0 0 0 - - -;
-#X msg 242 59 sel1;
-#X msg 240 87 sel2;
-#X obj 428 260 hsl 128 15 1 2 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 325 354 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 424 239 2nd inlet mapped to selFloat;
-#X obj 71 429 print a;
-#X msg 239 297 selStringList abba baab caac dede;
-#X msg 240 319 selStringList ego filose;
-#X msg 239 342 selFloatList 1.1 2.2 3.3 4.4;
-#X msg 239 364 selFloatList 0.001 1000;
-#X msg 238 409 selGenericList abaco 1.1;
-#X msg 239 387 selGenericList 0.001 abaco 1000 poroppoppero;
+#X text 322 333 mapped to selFloat;
+#X msg 245 274 selGenericList 12 a 0.5 b;
+#X text 244 252 complex list;
+#X obj 114 432 print;
+#X text 204 433 arguments: Class name \, Filename;
 #X connect 0 0 14 0;
 #X connect 1 0 0 0;
 #X connect 2 0 0 0;
 #X connect 3 0 0 0;
-#X connect 4 0 0 0;
 #X connect 5 0 0 0;
 #X connect 6 0 0 0;
-#X connect 7 0 0 0;
-#X connect 8 0 7 0;
-#X connect 8 0 9 0;
-#X connect 10 0 0 0;
-#X connect 11 0 0 0;
-#X connect 12 0 0 1;
-#X connect 15 0 0 0;
-#X connect 16 0 0 0;
-#X connect 17 0 0 0;
-#X connect 18 0 0 0;
-#X connect 19 0 0 0;
-#X connect 20 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 8 0;
+#X connect 10 0 0 1;
+#X connect 12 0 0 0;

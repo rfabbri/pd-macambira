@@ -1,11 +1,8 @@
 using System;
 
-
 namespace PureData
 {
 	
-
-
 	public class External
 	{
 		private IntPtr x;
@@ -14,8 +11,6 @@ namespace PureData
 		{
 			x = IntPtr.Zero;
 		}
-
-		
 
 		// this function MUST exist
 		public void SetUp(IntPtr pdClass)
@@ -31,16 +26,36 @@ namespace PureData
 			pd.AddSelector(x, "selFloat", "SelFloat", ParametersType.Float);
 			pd.AddSelector(x, "selString", "SelString", ParametersType.Symbol);
 			pd.AddSelector(x, "selGenericList", "SelGenericList", ParametersType.List);
+
+			pd.AddSelector(x, "", "GetBang", ParametersType.Bang);
+			pd.AddSelector(x, "", "GetFloat", ParametersType.Float);
+			pd.AddSelector(x, "", "GetSymbol", ParametersType.Symbol);
+
 			Console.WriteLine("selectors set");
 			pd.AddOutlet(x, ParametersType.Float);
 			pd.AddInlet(x, "selFloat", ParametersType.Float);
 		}
 
+		public void GetBang()
+		{
+			pd.PostMessage("GetBang invoked!");
+		}
 
-
+		public void GetFloat(float f)
+		{
+			pd.PostMessage("GetFloat invoked with " + f);
+		}
+		
+		public void GetSymbol(ref string s)
+		{
+			pd.PostMessage("GetSymbol invoked with " + s);
+		}
+		
 		public void Sel1()
 		{
 			pd.PostMessage("Sel1 invoked!");
+			Atom [] a= new Atom[2];
+
 		}
 
 		public void Sel2()
@@ -48,10 +63,12 @@ namespace PureData
 			pd.PostMessage("Sel2 invoked!");
 			
 			// testing outlets
-			Atom[] atoms = new Atom[2];
-			atoms[0] = new Atom("ciao");
-			atoms[1] = new Atom(1.5f);
-			pd.ToOutlet(x, 0, atoms.Length, atoms);
+			Atom[] atoms = new Atom[4];
+			atoms[0] = new Atom(1.5f);
+			atoms[1] = new Atom("ciao");
+			atoms[2] = new Atom(2.5f);
+			atoms[3] = new Atom("hello");
+			pd.SendToOutlet(x, 0, atoms);
 
 		}
 
@@ -69,6 +86,7 @@ namespace PureData
 
 		public void SelGenericList(Atom [] list)
 		{
+			Atom [] ret = new Atom[list.Length];
 			for (int i = 0; i<list.Length; i++)
 			{
 				Atom a = (Atom) list[i];
@@ -82,15 +100,18 @@ namespace PureData
 					case (AtomType.Float):
 					{
 						pd.PostMessage("" + a.float_value);
+						ret[i] = new Atom(a.float_value * 2);
 						break;
 					}
 					case (AtomType.Symbol):
 					{
+						ret[i] = new Atom(a.string_value + "-lo-giuro");
 						pd.PostMessage(a.string_value);
 						break;
 					}
 				}
-			}		
+			}
+			pd.SendToOutlet(x, 0, ret);
 		}
 
 

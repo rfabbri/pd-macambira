@@ -1,11 +1,11 @@
 using System;
 using System.Runtime.CompilerServices; // for extern import
-using System.Runtime.InteropServices; // for structures
+
 
 
 namespace PureData
 {
-	public enum ParametersType {None = 0, Float=1, Symbol=2, List=3};
+	public enum ParametersType {None = 0, Float=1, Symbol=2, List=3, Bang=4};
 
 	public class pd
 	{
@@ -20,8 +20,8 @@ namespace PureData
 		// TODO
 		// send stuff to an outlet
 		[MethodImplAttribute (MethodImplOptions.InternalCall)]
-		public extern static void ToOutlet (IntPtr x, int outlet, int atoms_length, [In, Out] Atom [] atoms);
-		public static void SendToOutlet (IntPtr x, int outlet, [In, Out] Atom [] atoms)
+		private extern static void ToOutlet (IntPtr x, int outlet, int atoms_length, Atom [] atoms);
+		public static void SendToOutlet (IntPtr x, int outlet, Atom [] atoms)
 		{
 			ToOutlet (x, outlet, atoms.Length, atoms);
 		}
@@ -70,28 +70,7 @@ namespace PureData
 		};
 		*/
 	}
-	public enum AtomType {Null = 0, Float=1, Symbol=2, List=3};
 
-	//[StructLayout (LayoutKind.Explicit)]
-	[StructLayout (LayoutKind.Sequential)]
-	public struct Atom 
-	{
-		public AtomType type;
-		public float float_value;
-		public string string_value;
-		public Atom(float f)
-		{
-			this.type = AtomType.Float;
-			this.float_value = f;
-			this.string_value = "float";
-		}
-		public Atom(string s)
-		{
-			this.type = AtomType.Symbol;
-			this.float_value = 0;
-			this.string_value = s;
-		}
-	}
 
 		/*
 			typedef float t_floatarg;  

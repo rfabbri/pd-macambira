@@ -54,20 +54,10 @@ typedef struct atom_simple
 {
 	//t_atomtype_simple a_type;
 	int a_type;
-	//MonoString *a_type;
-	//union{
-		float float_value;
-		MonoString *string_value;
-	//} stuff;
-};
+	float float_value;
+	MonoString *string_value;
 
-/*
-typedef struct atom_simple
-{
-	int a;
-	int b;
 };
-*/
 
 static t_class *clr_class;
 
@@ -75,12 +65,15 @@ typedef struct _clr
 {
     t_object x_obj; // myself
 	t_outlet *l_out;
+	t_symbol *assemblyname;
+	t_symbol *filename;
+	int loaded;
 	// mono stuff
 	MonoDomain *domain;
-	MonoAssembly *assembly;
+	MonoAssembly *assembly, *assemblyPureData;
 	MonoObject *obj;
-	MonoImage *image;
-	MonoMethod *method, *setUp;
+	MonoImage *image, *imagePureData;
+	MonoMethod *method, *setUp, *manageBang, *manageSymbol, *manageFloat, *manageList;
 	MonoClass *klass;
 	int n;
 
@@ -96,35 +89,40 @@ typedef struct _clr
 static void mono_clean(t_clr *x)
 {
 	// clean up stuff
-	mono_jit_cleanup (x->domain);
-
+	//mono_jit_cleanup (x->domain);
+	//mono_domain_free(x->domain);
 }
 
 void registerMonoMethod(void *x, MonoString *selectorString, MonoString *methodString, int type);
 void createInlet(void *x1, MonoString *selectorString, int type);
 void createOutlet(void *x1, int type);
-void out2outlet(void *x1, int outlet, int atoms_length, atom_simple *atoms);
+void out2outlet(void *x1, int outlet, int atoms_length, MonoArray *array);
 void post2pd(MonoString *mesString);
 void error2pd(MonoString *mesString);
+
+static void mono_initialize()
+{
+	mono_jit_init ("PureData");
+}
 
 // load the variables and init mono
 static void mono_load(t_clr *x)
 {
 //	const char *file="D:\\Davide\\cygwin\\home\\Davide\\externalTest1.dll";
-	const char *file="PureData.dll";
+	//const char *file="External.dll";
 	
 	MonoMethod *m = NULL, *ctor = NULL, *fail = NULL, *mvalues;
 	gpointer iter;
 	gpointer args [1];
 	int val;
 	int i;
-	double rnd;
-	int random_name_int;
-	char random_name_str[256];
-	srand( (unsigned)time( NULL ) );
-	rnd = rand()/((double)RAND_MAX + 1);
-	random_name_int =(int) (rnd * RAND_MAX);
-	sprintf(random_name_str, "%s-%i",file, random_name_int);
+
+
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 
 	// prepare the selectors list
 	for (i=0; i<MAX_SELECTORS; i++)
@@ -138,22 +136,16 @@ static void mono_load(t_clr *x)
 		x->outlets[i].outlet_pointer = 0;
 	}
 
-printf("will load %s, random_name %s\n", file, random_name_str);
-
 	//mono_set_dirs (NULL, NULL);
 	//mono_config_parse (NULL);
 
-	x->domain = mono_jit_init (random_name_str);
+	//mono_jit_init (random_name_str);
+	x->domain = mono_domain_get();
 
-		// add mono to C hooks
-	mono_add_internal_call ("PureData.pd::RegisterSelector", registerMonoMethod);
-	mono_add_internal_call ("PureData.pd::ToOutlet", out2outlet);
-	mono_add_internal_call ("PureData.pd::PostMessage", post2pd);
-	mono_add_internal_call ("PureData.pd::ErrorMessage", error2pd);
-	mono_add_internal_call ("PureData.pd::CreateOutlet", createOutlet);
-	mono_add_internal_call ("PureData.pd::CreateInlet", createInlet);
+	x->assembly = mono_domain_assembly_open (x->domain, x->filename->s_name);
 
-	x->assembly = mono_domain_assembly_open (x->domain, file);
+	x->assemblyPureData = mono_domain_assembly_open (x->domain, "PureData.dll");
+
 	if (!x->assembly)
 	{
 		error("clr: assembly not found!");
@@ -161,8 +153,10 @@ printf("will load %s, random_name %s\n", file, random_name_str);
 
 	x->image = mono_assembly_get_image (x->assembly);
 
+	x->imagePureData = mono_assembly_get_image (x->assemblyPureData);
+
 	
-	x->klass = mono_class_from_name (x->image, "PureData", "External");
+	x->klass = mono_class_from_name (x->image, "PureData", x->assemblyname->s_name);
 	if (!x->klass) {
 		error("Can't find MyType in assembly %s\n", mono_image_get_filename (x->image));
 		//exit (1);
@@ -254,6 +248,36 @@ void clr_free(t_clr *x)
 	mono_clean(x);
 }
 
+static void clr_bang(t_clr *x) 
+{
+	if (x->manageBang)
+	{
+		mono_runtime_invoke (x->manageBang, x->obj, NULL, NULL);
+	}
+}
+
+static void clr_symbol(t_clr *x, t_symbol *sl) 
+{
+	gpointer args [1];
+	MonoString *strmono;
+	strmono = mono_string_new (x->domain, sl->s_name);
+	args[0] = &strmono;
+	if (x->manageSymbol)
+	{
+		mono_runtime_invoke (x->manageSymbol, x->obj, args, NULL);
+	}
+}
+
+static void clr_float(t_clr *x, float f) 
+{
+	gpointer args [1];
+	args [0] = &f;
+	if (x->manageFloat)
+	{
+		mono_runtime_invoke (x->manageFloat, x->obj, args, NULL);
+	}
+}
+
 // here i look for the selector and call the right mono method
 void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 {
@@ -263,7 +287,7 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 
 	int i;
 	// first i extract the first atom which should be a symbol
-	//post("clr_manage_list, got symbol = %s", sl->s_name);
+post("clr_manage_list, got symbol = %s", sl->s_name);
 
 	for (i=0; i<MAX_SELECTORS; i++)
 	{
@@ -312,7 +336,7 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 						sprintf(strfloat, "float");
 						sprintf(strnull, "null");
 						atom_array = malloc(sizeof(atom_simple)*argc);
-						MonoClass *c = mono_class_from_name (x->image, "PureData", "Atom");
+						MonoClass *c = mono_class_from_name (x->imagePureData, "PureData", "Atom");
 						atoms = mono_array_new (x->domain, c, argc);
 						for (j=0; j<argc; j++)
 						{
@@ -377,7 +401,27 @@ void registerMonoMethod(void *x1, MonoString *selectorString, MonoString *method
 		return;
 	}
 
-	post("registerMonoMethod: associating %s to %s", selCstring, metCstring);
+	//post("registerMonoMethod: associating %s to %s", selCstring, metCstring);
+
+	if (selectorString->length == 0)
+	{
+printf("selectorString->length == 0");
+		switch (type)
+		{
+		case 1: // float
+			x->manageFloat = met;
+			break;
+		case 2: // string
+			x->manageSymbol = met;
+			break;
+		case 3: // list
+			x->manageList = met;
+			break;
+		case 4: // bang
+			x->manageBang = met;
+			break;
+		}
+	}
 
 	this_selector = MAX_SELECTORS;
 	for (i = 0; i < MAX_SELECTORS; i++)
@@ -481,14 +525,13 @@ void createOutlet(void *x1, int type)
 }
 
 // out to outlet
-void out2outlet(void *x1, int outlet, int atoms_length, atom_simple *atoms)
+void out2outlet(void *x1, int outlet, int atoms_length, MonoArray *array)
 {
 	t_clr *x;
 	x = (t_clr *)x1;
 	t_atom *lista;
+	atom_simple *atoms;
 	int n;
-printf("outlet = %i\n" + outlet);
-printf("atoms_length = %i\n" + atoms_length);
 	if ((outlet>MAX_OUTLETS) || (outlet<0))
 	{
 		error("outlet number out of range, max is %i", MAX_OUTLETS);
@@ -500,8 +543,10 @@ printf("atoms_length = %i\n" + atoms_length);
 		return;
 	}
 	lista = (t_atom *) malloc(sizeof(t_atom) * atoms_length);
+	atoms = (atom_simple *) malloc(sizeof(atom_simple) * atoms_length);
 	for (n=0; n<atoms_length; n++)
 	{
+		atoms[n] = mono_array_get(array, atom_simple, n);
 		char *mesCstring;
 		switch (atoms[n].a_type)
 		{
@@ -509,10 +554,10 @@ printf("atoms_length = %i\n" + atoms_length);
 				SETFLOAT(lista+n, (float) 0);
 				break;
 			case A_S_FLOAT:
-				mesCstring = mono_string_to_utf8 (atoms[n].string_value);
 				SETFLOAT(lista+n, (float) atoms[n].float_value);
 				break;
 			case A_S_SYMBOL:
+				mesCstring = mono_string_to_utf8 (atoms[n].string_value);
 				SETSYMBOL(lista+n, gensym(mesCstring));
 				break;
 		}
@@ -559,10 +604,32 @@ void *clr_new(t_symbol *s, int argc, t_atom *argv)
     t_clr *x = (t_clr *)pd_new(clr_class);
 //	x->l_out = outlet_new(&x->x_obj, &s_list);
 //	x->l_out = outlet_new(&x->x_obj, gensym("float"));
+
+	char strtmp[256];
+	x->manageBang = 0;
+	x->manageSymbol = 0;
+	x->manageFloat = 0;
+	x->manageList = 0;
 	
+	if (argc==0)
+	{
+		x->loaded = 0;
+		error("clr: you must provide an assembly as the first argument");
+		return (x);
+	}
+	x->loaded = 1;
+	x->assemblyname = atom_gensym(argv);
+	
+	if (argc==1)
+	{
+		// only main class passed
+		// filename by default
+		sprintf(strtmp, "%s.dll", x->assemblyname->s_name);
+		x->filename = atom_gensym(strtmp);
+	}
 
+	x->filename = atom_gensym(argv+1);
 
-	x->n = 0;
 	// load mono, init the needed vars
 	mono_load(x);
 
@@ -573,9 +640,19 @@ void clr_setup(void)
 {
     clr_class = class_new(gensym("clr"), (t_newmethod)clr_new,
         (t_method)clr_free, sizeof(t_clr), CLASS_DEFAULT, A_GIMME, 0);
-    //class_addbang(clr_class, (t_method)clr_bang);
-//	ext_class_addbang((t_method) clr_bang);
 
 	class_addlist(clr_class, (t_method)clr_manage_list);
+	class_addbang(clr_class, (t_method)clr_bang);
+	class_addsymbol(clr_class, (t_method)clr_symbol);
+	class_addfloat(clr_class, (t_method)clr_float);
 
+	mono_initialize();
+	
+	// add mono to C hooks
+	mono_add_internal_call ("PureData.pd::RegisterSelector", registerMonoMethod);
+	mono_add_internal_call ("PureData.pd::ToOutlet", out2outlet);
+	mono_add_internal_call ("PureData.pd::PostMessage", post2pd);
+	mono_add_internal_call ("PureData.pd::ErrorMessage", error2pd);
+	mono_add_internal_call ("PureData.pd::CreateOutlet", createOutlet);
+	mono_add_internal_call ("PureData.pd::CreateInlet", createInlet);
 }
