@@ -399,6 +399,16 @@ void *rhythms_memory_new(t_symbol *s, int argc, t_atom *argv)
     return (x);
 }
 
+// debugging function
+void init(t_rhythms_memory *x)
+{
+	if (x->curr_seq)
+		freeBeats(x->curr_seq);	
+	if (x->rhythms_memory)
+		rhythm_memory_free(x->rhythms_memory);
+	x->seq_initialized = 0;
+	rhythm_memory_create(&(x->rhythms_memory));
+}
 
 // debugging function
 void crash(t_rhythms_memory *x)
@@ -426,6 +436,7 @@ void rhythms_memory_setup(void)
 	// builds a variation of a given rhythm
 	class_addmethod(rhythms_memory_class, (t_method)variation, gensym("variation"),
         A_GIMME, 0);
+	class_addmethod(rhythms_memory_class, (t_method)init, gensym("init"), 0);
 }
 
 
