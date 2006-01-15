@@ -45,6 +45,9 @@ or at least set the importance of rules in realtime..
 #define LOWER_POSSIBLE_NOTE 24 // lower note possible, it should be a C
 #define POSSIBLE_NOTES (NOTES_RANGE/12*4) // 4 is the max number of notes in a chord
 
+// default values 
+#define DEF_WIDENESS 3 // 3 octaves
+#define DEF_CENTER_NOTE 72 // central C
 // testing i noticed that we don't need more than 1 generation..
 // this is because we create an initial population that is really good
 // we may not need to crossover at all!
@@ -102,6 +105,14 @@ typedef struct _harmonizer
 	chord_t target_chord;
 	int target_notes[POSSIBLE_NOTES];
 	t_outlet *l_out;
+
+	float wideness;
+	int center_note;
+	float i_like_parallelism;
+	float small_intervals;
+	//TODO
+//	int lower_octave;
+//	int notes_range;
 	
 } t_harmonizer;
 
@@ -338,8 +349,7 @@ int fitness(t_harmonizer *x, int *candidate)
 	directions[1]==directions[2] &&
 	directions[2]==directions[3])
 	{
-		// bad!
-		res -= 10;
+		res += 10 * x->i_like_parallelism;
 		if (DEBUG_VERBOSE)
 			post("same direction!");
 	}
@@ -357,7 +367,7 @@ int fitness(t_harmonizer *x, int *candidate)
 				// bad!
 				if (directions[i]==directions[j])
 				{
-					res -= 10;
+					res += 10 * x->i_like_parallelism;
 					if (DEBUG_VERBOSE)
 						post("hidden or parallel consonance!");
 				}
@@ -379,7 +389,8 @@ int fitness(t_harmonizer *x, int *candidate)
 	tmp = tmp/(VOICES-1);
 	if (DEBUG_VERBOSE)
 		post("average note is %i after division by (VOICES-1)", tmp);
-	tmp = abs((LOWER_POSSIBLE_NOTE + NOTES_RANGE)*2/3 - tmp); // how much average is far from 72
+//	tmp = abs((LOWER_POSSIBLE_NOTE + NOTES_RANGE)*2/3 - tmp); // how much average is far from 72
+	tmp = abs(x->center_note - tmp); // how much average is far from desired center note
 	res += 30; 
 	res -= tmp;
 	
@@ -413,21 +424,21 @@ int fitness(t_harmonizer *x, int *candidate)
 		if (transitions[i]==0)
 			res += 5;
 		if (abs(transitions[i]==1))
-			res += 5;
+			res += 5 * x->small_intervals;
 		if (abs(transitions[i]==2))
-			res += 5;
+			res += 5 * x->small_intervals;
 		if (abs(transitions[i]==3))
-			res += 2;
+			res += 2 * x->small_intervals;
 		if (abs(transitions[i]==4))
-			res += 2;
+			res += 2 * x->small_intervals;
 		if (abs(transitions[i]==5))
-			res += 1;
+			res += 1 * x->small_intervals;
 		if (abs(transitions[i]==6))
-			res += 1;
+			res += 1 * x->small_intervals;
 		if (abs(transitions[i]>11))
-			res -= 2;
+			res -= 2 * x->small_intervals;
 		if (abs(transitions[i]>15))
-			res -= 5;
+			res -= 5 * x->small_intervals;
 
 	}
 	if (DEBUG_VERBOSE)
@@ -435,7 +446,7 @@ int fitness(t_harmonizer *x, int *candidate)
 
 	// TODO: too many near limits?
 	
-	// TODO: is a complete chord?
+	// is a complete chord?
 	// does this voicing have all 5 notes?
 	// first build a table for comparision
 	for (i=0; i<4; i++)
@@ -456,7 +467,7 @@ int fitness(t_harmonizer *x, int *candidate)
 	if (chord_notes_ok[0] == 0)
 	{
 		// no fundamental! this is bad!!
-		res -= 5;
+		res -= 10;
 	}
 	if ((chord_notes_ok[0] != 0) &&
 		(chord_notes_ok[2] != 0) &&
@@ -464,7 +475,7 @@ int fitness(t_harmonizer *x, int *candidate)
 		(chord_notes_ok[4] != 0))
 	{
 		// complete chord! this is good
-		res += 5;
+		res += 10;
 	}
 	for (j=0; j<4; j++)
 	{
@@ -635,13 +646,65 @@ void set_target(t_harmonizer *x, t_symbol *s) {
 		post("harmonizer: set_target %s",s->s_name); 
 }
 
+//how any octaves should this chord be?
+void set_wideness(t_harmonizer *x, t_floatarg f)
+{
+	if (f>=0)
+		x->wideness = f;
+}
+
+// which note should the center note have ?
+void set_center_note(t_harmonizer *x, t_floatarg f)
+{
+	if ((f>=LOWER_POSSIBLE_NOTE)&&(f<120))
+		x->center_note = (int) f;
+}
+
+// which note should the center note have ?
+void set_i_like_parallelism(t_harmonizer *x, t_floatarg f)
+{
+	float newval = f;
+	if (newval<-1)
+		newval = -1;
+	if (newval>1)
+		newval = 1;
+	x->i_like_parallelism = newval;
+}
+
+// which note should the center note have ?
+void set_small_intervals(t_harmonizer *x, t_floatarg f)
+{
+	float newval = f;
+	if (newval<-1)
+		newval = -1;
+	if (newval>1)
+		newval = 1;
+	x->small_intervals = newval;
+}
+
+void print_help(t_harmonizer *x)
+{
+	post("");
+	post("harmonizer is an external that builds voicing");
+	post("takes chords name and outputs a list of %i midi notes", VOICES);
+	post("available commands:");
+	post("current symbol: sets the current chord name (which chordwe are in)");
+	post("target symbol: sets the target chord name (which chord we want to go to)");
+	post("wideness float: now many octaves wide should the next chord be? must be > than 0");
+	post("set_center_note int: sets the desired center chord note, min 24 max 100");
+	post("i_like_parallelism float: do I want parallelism? from -1 (I don't want them) to 1 (I like them), 0 means I don't care, default = -1");
+	post("small_intervals float: do I want small intervals? from -1 (I don't want them) to 1 (I like them), 0 means I don't care, default = 1");
+	post("this externalis part of the frank framework");
+	post("authors: davide morelli, david casals");
+
+}
 
 void *harmonizer_new(t_symbol *s, int argc, t_atom *argv)
 {
 	int i;
 	time_t a;
     t_harmonizer *x = (t_harmonizer *)pd_new(harmonizer_class);
-	x->l_out = outlet_new(&x->x_obj, &s_list);
+	x->l_out = outlet_new(&x->x_obj, gensym("list"));
 /*
 	for (i=0; i<BUFFER_LENGHT; i++)
 	{
@@ -649,7 +712,10 @@ void *harmonizer_new(t_symbol *s, int argc, t_atom *argv)
 	}
 	*/
 	srand(time(&a));
-
+	x->center_note = DEF_CENTER_NOTE;
+	x->wideness = DEF_WIDENESS;
+	x->i_like_parallelism = -1; // by default we don't like them!
+	x->small_intervals = 1; //by default we want small intervals
     return (x);
 }
 
@@ -658,10 +724,15 @@ void harmonizer_setup(void)
     harmonizer_class = class_new(gensym("harmonizer"), (t_newmethod)harmonizer_new,
         (t_method)harmonizer_free, sizeof(t_harmonizer), CLASS_DEFAULT, A_GIMME, 0);
     class_addbang(harmonizer_class, (t_method)harmonizer_bang);
+	class_addmethod(harmonizer_class, (t_method)print_help, gensym("help"),0, 0);
 	class_addmethod(harmonizer_class, (t_method)set_current, gensym("current"),A_SYMBOL, 0);
 	class_addmethod(harmonizer_class, (t_method)set_target, gensym("target"),A_SYMBOL, 0);
 //	class_addmethod(harmonizer_class, (t_method)harmonizer_fitness1_set, gensym("fitness1"), A_DEFFLOAT, 0);
 	class_addlist(harmonizer_class, (t_method)set_current_voices);
-
+	class_addmethod(harmonizer_class, (t_method)set_wideness, gensym("wideness"), A_DEFFLOAT, 0);
+	class_addmethod(harmonizer_class, (t_method)set_center_note, gensym("center_note"), A_DEFFLOAT, 0);
+	class_addmethod(harmonizer_class, (t_method)set_i_like_parallelism, gensym("i_like_parallelism"), A_DEFFLOAT, 0);
+	class_addmethod(harmonizer_class, (t_method)set_small_intervals, gensym("small_intervals"), A_DEFFLOAT, 0);
+	
 
 }

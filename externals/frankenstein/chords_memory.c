@@ -1094,7 +1094,7 @@ void *chords_memory_new(t_symbol *s, int argc, t_atom *argv)
     t_chords_memory *x = (t_chords_memory *)pd_new(chords_memory_class);
 	x->x_outchordname = outlet_new(&x->x_obj, gensym("symbol"));
 	x->x_outtonalityname = outlet_new(&x->x_obj, gensym("symbol"));
-	x->x_outchordssequence = outlet_new(&x->x_obj, &s_list);
+	x->x_outchordssequence = outlet_new(&x->x_obj, gensym("list"));
 	srand(time(&a));
 	chords_memory_init_graph(x);
 	x->fundamental_note = C;
@@ -1115,40 +1115,10 @@ void chords_memory_free(t_chords_memory *x)
 //	free(x->current_fundamental);
 }
 
-// TEST
-typedef struct _bla
-{
-	int value;
-	int index;
-} bla_t;
-typedef struct _bla2
-{
-	bla_t array[10];
-} bla2_t;
-#define BLA_COMPARATOR(e1, e2) (e1.value - e2.value)
-//TEST
-void chords_memory_bang(t_chords_memory *x)
-{
-	int i;
-	bla2_t test[2];
-	for (i=0; i<10; i++)
-	{
-		test[1].array[i].index = i;
-		test[1].array[i].value = 10-i;
-	}
-SGLIB_ARRAY_QUICK_SORT (bla_t, test[1].array, 10, BLA_COMPARATOR, SGLIB_ARRAY_ELEMENTS_EXCHANGER);
-	for (i=0; i<10; i++)
-	{
-		post("array[%i].value = %i, array[%i].index = %i",i, test[1].array[i].value,i, test[1].array[i].index );
-	}
-
-}
-
 void chords_memory_setup(void)
 {
     chords_memory_class = class_new(gensym("chords_memory"), (t_newmethod)chords_memory_new,
         (t_method)chords_memory_free, sizeof(t_chords_memory), CLASS_DEFAULT, A_GIMME, 0);
-class_addbang(chords_memory_class, (t_method)chords_memory_bang);
     // file I/O
 	class_addmethod(chords_memory_class, (t_method)chords_memory_write_to_file, gensym("write"),A_SYMBOL, 0);
     class_addmethod(chords_memory_class, (t_method)chords_memory_read_from_file, gensym("read"),A_SYMBOL, 0);
