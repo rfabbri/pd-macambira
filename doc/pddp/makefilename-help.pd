@@ -195,7 +195,7 @@ box.;
 #X obj 86 325 makefilename ASCII=%c;
 #X text 44 378 Watch out! ASCII characters 123 and 125 (curly braces)
 lock up Pd. Also \, reserved characters that Pd uses show up with a
-backslash in front of them ( \, \; and backslash).;
+backslash in front of them (comma \, semi-colon \, and backslash).;
 #X text 45 507 - currently \, floats are not supported via the printf
 %f pattern. You can only display the integer part of the float using
 %d or %X.;
