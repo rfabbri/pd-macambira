@@ -120,6 +120,9 @@
 				RelativePath="common.h">
 			</File>
 			<File
+				RelativePath="..\m_pd.h">
+			</File>
+			<File
 				RelativePath="sglib.h">
 			</File>
 		</Filter>

@@ -31,11 +31,12 @@ or at least set the importance of rules in realtime..
 #include <string.h>
 #include <ctype.h>
 #include "m_pd.h"
+#include "common.h"
 
 // to sort arrays
 #include "sglib.h"
 
-#define MAX_POPULATION 100
+#define MAX_POPULATION 500
 
 #define DEF_PROB_MUTATION 0.03f
 
@@ -58,40 +59,13 @@ or at least set the importance of rules in realtime..
 
 static t_class *harmonizer_class;
 
-typedef enum {
-			kMaj=0, 
-			kMin=1, 
-			kDim=2, 
-			kAug=3, 
-			kDom7=4, 
-			kMaj7=5,
-			kMin7=6,
-			kMinMaj7=7,
-			kDim7=8,
-			kHalfDim7=9
-			} chordmode_t;
-
-typedef enum {C=0,
-			Db=1,
-			D=2,
-			Eb=3,
-			E=4,
-			F=5,
-			Gb=6,
-			G=7,
-			Ab=8,
-			A=9,
-			Bb=10,
-			B=11			
-			} note_t;
-
 
 
 // this defines a chord in a tonality
 typedef struct _chord
 {
-	chordmode_t mode;
-	note_t note;
+	chord_type_t mode;
+	abs_note_t note;
 } chord_t;
 
 
@@ -179,63 +153,7 @@ void build_possible_notes_table(t_harmonizer *x)
 	}
 }
 
-// tries to find out absolute tones names in this string
-note_t string2note(const char *substr)
-{
-	if (strstr(substr, "C"))
-		return C;
-	if (strstr(substr, "Db"))
-		return Db;
-	if (strstr(substr, "D"))
-		return D;
-	if (strstr(substr, "Eb"))
-		return Eb;
-	if (strstr(substr, "E"))
-		return E;
-	if (strstr(substr, "F"))
-		return F;
-	if (strstr(substr, "Gb"))
-		return Gb;
-	if (strstr(substr, "G"))
-		return G;
-	if (strstr(substr, "Ab"))
-		return Ab;
-	if (strstr(substr, "A"))
-		return A;
-	if (strstr(substr, "Bb"))
-		return Bb;
-	if (strstr(substr, "B"))
-		return B;
-	return C;
-}
 
-chordmode_t string2mode(const char *substr)
-{
-	if (strstr(substr, "minor/major 7th"))
-		return kMinMaj7;
-	if (strstr(substr, "major 7th"))
-		return kMaj7;
-	if (strstr(substr, "major"))
-		return kMaj;
-	if (strstr(substr, "minor 7th"))
-		return kMin7;
-	if (strstr(substr, "minor"))
-		return kMin;
-	if (strstr(substr, "half diminished 7th"))
-		return kHalfDim7;
-	if (strstr(substr, "diminished 7th"))
-		return kDim7;
-	if (strstr(substr, "diminished"))
-		return kDim;
-	if (strstr(substr, "augmented"))
-		return kAug;
-	if (strstr(substr, "dominant 7th"))
-		return kDom7;
-	// TODO: other chords
-	// beware when adding new chords
-	// put shorter names at end of this function!
-	return C;
-}
 
 // -----------------  normal external code ...
 

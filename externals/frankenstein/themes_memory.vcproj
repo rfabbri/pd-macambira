@@ -119,6 +119,9 @@
 			<File
 				RelativePath="common.h">
 			</File>
+			<File
+				RelativePath="..\m_pd.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
