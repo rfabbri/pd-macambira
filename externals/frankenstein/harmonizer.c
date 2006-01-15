@@ -62,11 +62,11 @@ static t_class *harmonizer_class;
 
 
 // this defines a chord in a tonality
-typedef struct _chord
+typedef struct _chord_abs
 {
 	chord_type_t mode;
 	abs_note_t note;
-} chord_t;
+} chord_abs_t;
 
 
 typedef struct _harmonizer
@@ -75,8 +75,8 @@ typedef struct _harmonizer
 	// genotypes
 	int population[MAX_POPULATION][VOICES];
 	int current_voices[VOICES];
-	chord_t current_chord;
-	chord_t target_chord;
+	chord_abs_t current_chord;
+	chord_abs_t target_chord;
 	int target_notes[POSSIBLE_NOTES];
 	t_outlet *l_out;
 

@@ -97,6 +97,7 @@ there are plenty of such algos, we must just copy them down.
 #include <ctype.h>
 
 #include "m_pd.h"
+#include "common.h"
 
 
 #define DEBUG 0 // messaggi di debug
@@ -111,85 +112,6 @@ there are plenty of such algos, we must just copy them down.
 
 static t_class *chords_memory_class;
 
-// how can a chord be?
-#define TYPES_NUM 17 // keep me updated
-typedef enum {
-			kMaj=0, 
-			kMin=1, 
-			kDim=2, 
-			kAug=3, 
-			kDom7=4, 
-			kMaj7=5,
-			kMin7=6,
-			kMinMaj7=7,
-			kDim7=8,
-			kHalfDim7=9,
-			//pland adding 9ths 30.11.05 and beyond
-			kDomb9=10,
-			kMaj9=11,
-			kDom9=12,
-			kMin9=13,
-			kHalfDim9=14,
-			kMinMaj9=15,
-			kDimMaj9=16	
-			} chord_type_t;
-
-// how many tones do we have in our octave?
-#define TONES_NUM 12 // keep me updated
-typedef enum {
-			I=0,
-			Id=1,
-			II=2,
-			IId=3,
-			III=4,
-			IV=5,
-			IVd=6,
-			V=7,
-			Vd=8,
-			VI=9,
-			VId=10,
-			VII=11			
-			} chord_tone_t;
-
-// how many nodes does this graph have?
-// for now TYPES_NUM*TONES_NUM
-// when we introduce modulation
-// we'll have more
-#define NODES_NUM TYPES_NUM*TONES_NUM
-
-// this defines a chord in a tonality
-typedef struct _chord
-{
-	chord_type_t mode;
-	chord_tone_t note;
-} chord_t;
-
-// enumeration of absolute notes 
-// i'll need this when parsing strings like "C major"
-typedef enum {
-			C=0,
-			Db=1,
-			D=2,
-			Eb=3,
-			E=4,
-			F=5,
-			Gb=6,
-			G=7,
-			Ab=8,
-			A=9,
-			Bb=10,
-			B=11			
-			} abs_note_t;
-
-// enumeration of modes
-// i'll start with minor and major only
-// but we could add phrigian, doric, misolidian ,e tc...
-#define MODES_NUM 2
-typedef enum {
-		MAJOR=0,
-		MINOR=1	} modes_t;
-
-#define MODULATIONS_NUM MODES_NUM*TONES_NUM
 
 // data type for the steps of a walk
 typedef struct _step
@@ -280,91 +202,6 @@ void chords_memory_init(t_chords_memory *x, t_floatarg f)
 
 
 // ------------- function for string manipulation (from string to chords)
-
-// tries to find out absolute tones names in this string
-abs_note_t from_string_to_abs_tone(const char *substr)
-{
-	if (strstr(substr, "C"))
-		return C;
-	if (strstr(substr, "Db"))
-		return Db;
-	if (strstr(substr, "D"))
-		return D;
-	if (strstr(substr, "Eb"))
-		return Eb;
-	if (strstr(substr, "E"))
-		return E;
-	if (strstr(substr, "F"))
-		return F;
-	if (strstr(substr, "Gb"))
-		return Gb;
-	if (strstr(substr, "G"))
-		return G;
-	if (strstr(substr, "Ab"))
-		return Ab;
-	if (strstr(substr, "A"))
-		return A;
-	if (strstr(substr, "Bb"))
-		return Bb;
-	if (strstr(substr, "B"))
-		return B;
-	return C;
-}
-
-chord_type_t from_string_to_type(const char *substr)
-{
-	if (strstr(substr, "minor/major 7th"))
-		return kMinMaj7;
-	if (strstr(substr, "major 7th"))
-		return kMaj7;
-	if (strstr(substr, "major"))
-		return kMaj;
-	if (strstr(substr, "minor 7th"))
-		return kMin7;
-	if (strstr(substr, "minor"))
-		return kMin;
-	if (strstr(substr, "half diminished 7th"))
-		return kHalfDim7;
-	if (strstr(substr, "diminished 7th"))
-		return kDim7;
-	if (strstr(substr, "diminished"))
-		return kDim;
-	if (strstr(substr, "augmented"))
-		return kAug;
-	if (strstr(substr, "dominant 7th"))
-		return kDom7;
-	// pland adding chords 30.11.05
-	if (strstr(substr, "dominant b9"))
-		return kDomb9;
-	if (strstr(substr, "major 9th"))
-		return kMaj9;
-	if (strstr(substr, "dominant 9th"))
-		return kDom9;
-	if (strstr(substr, "minor 9th"))
-		return kMin9;
-	if (strstr(substr, "half diminished 9th"))
-		return kHalfDim9;
-	if (strstr(substr, "minor major 9th"))
-		return kMinMaj9;
-	if (strstr(substr, "diminished major 9th"))
-		return kDimMaj9;
-	// TODO: other chords
-	// beware when adding new chords
-	// put shorter names at end of this function!
-	return C;
-}
-
-// find the tonality mode in this string
-modes_t from_string_to_mode(const char *substr)
-{
-	if (strstr(substr, "major"))
-		return MAJOR;
-	if (strstr(substr, "minor"))
-		return MINOR;
-
-	// TODO: other modes (doric, misolidian , custom, etc..
-	return C;
-}
 
 // builds a string for this chord
 // the string is in maxlib's chord format

@@ -7,7 +7,7 @@ PDPATH="H:\PureData\pd-0.38-3.msw\pd"
 
 current: pd_nt distclean
 
-pd_nt: chord_melo.dll chords_memory.dll harmonizer.dll GArhythm.dll ritmo1.dll rhythms_memory.dll themes_memory.dll
+pd_nt: chord_melo.dll chords_memory.dll harmonizer.dll voicing_analyzer.dll GArhythm.dll ritmo1.dll rhythms_memory.dll themes_memory.dll
 
 .SUFFIXES: .dll
 

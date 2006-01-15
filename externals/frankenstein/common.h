@@ -129,6 +129,89 @@ struct t_rhythm_memory_representation
 // define a return value to express "rhythm not found in this representation"
 #define INVALID_RHYTHM 65535
 
+// chords data structure
+// tells you how many durations there // how can a chord be?
+#define TYPES_NUM 17 // keep me updated
+typedef enum {
+			kMaj=0, 
+			kMin=1, 
+			kDim=2, 
+			kAug=3, 
+			kDom7=4, 
+			kMaj7=5,
+			kMin7=6,
+			kMinMaj7=7,
+			kDim7=8,
+			kHalfDim7=9,
+			//pland adding 9ths 30.11.05 and beyond
+			kDomb9=10,
+			kMaj9=11,
+			kDom9=12,
+			kMin9=13,
+			kHalfDim9=14,
+			kMinMaj9=15,
+			kDimMaj9=16	
+			} chord_type_t;
+
+// how many tones do we have in our octave?
+#define TONES_NUM 12 // keep me updated
+typedef enum {
+			I=0,
+			Id=1,
+			II=2,
+			IId=3,
+			III=4,
+			IV=5,
+			IVd=6,
+			V=7,
+			Vd=8,
+			VI=9,
+			VId=10,
+			VII=11			
+			} chord_tone_t;
+
+// how many nodes does this graph have?
+// for now TYPES_NUM*TONES_NUM
+// when we introduce modulation
+// we'll have more
+#define NODES_NUM TYPES_NUM*TONES_NUM
+
+// this defines a chord in a tonality
+typedef struct _chord
+{
+	chord_type_t mode;
+	chord_tone_t note;
+} chord_t;
+
+// enumeration of absolute notes 
+// i'll need this when parsing strings like "C major"
+typedef enum {
+			C=0,
+			Db=1,
+			D=2,
+			Eb=3,
+			E=4,
+			F=5,
+			Gb=6,
+			G=7,
+			Ab=8,
+			A=9,
+			Bb=10,
+			B=11			
+			} abs_note_t;
+
+// enumeration of modes
+// i'll start with minor and major only
+// but we could add phrigian, doric, misolidian ,e tc...
+#define MODES_NUM 2
+typedef enum {
+		MAJOR=0,
+		MINOR=1	} modes_t;
+
+#define MODULATIONS_NUM MODES_NUM*TONES_NUM
+
+
+
 // ------------------------------------------------ functions
 
 // ----------- rhythm manipolation functions
@@ -139,7 +222,7 @@ t_duration int2duration(int n);
 // converts from duration to integer: used to know this duration
 // what corresponds in terms table index
 unsigned short int duration2int(t_duration dur);
-// tells you how many durations there are
+
 int possible_durations();
 
 // converts from float (0-1) to duration. it performs quantization
@@ -287,3 +370,14 @@ void concatenateNote(t_note_event *currentEvent, unsigned short int voice, float
 // used to free the memory allocated by this list
 void freeNotes(t_note_event *currentEvent);
 
+
+
+
+// ------------- function for string manipulation (from string to chords)
+
+// tries to find out absolute tones names in this string
+abs_note_t from_string_to_abs_tone(const char *substr);
+chord_type_t from_string_to_type(const char *substr);
+modes_t from_string_to_mode(const char *substr);
+chord_type_t string2mode(const char *substr);
+abs_note_t string2note(const char *substr);

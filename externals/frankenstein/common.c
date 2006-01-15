@@ -11,6 +11,7 @@ David Plans Casal http://www.studios.uea.ac.uk/people/staff/casal
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "m_pd.h" // to post errors and debug messages
 
@@ -803,3 +804,150 @@ void freeNotes(t_note_event *currentEvent)
 	} while(next);
 
 }
+
+
+// ------------- function for string manipulation (from string to chords)
+
+// tries to find out absolute tones names in this string
+abs_note_t from_string_to_abs_tone(const char *substr)
+{
+	if (strstr(substr, "C"))
+		return C;
+	if (strstr(substr, "Db"))
+		return Db;
+	if (strstr(substr, "D"))
+		return D;
+	if (strstr(substr, "Eb"))
+		return Eb;
+	if (strstr(substr, "E"))
+		return E;
+	if (strstr(substr, "F"))
+		return F;
+	if (strstr(substr, "Gb"))
+		return Gb;
+	if (strstr(substr, "G"))
+		return G;
+	if (strstr(substr, "Ab"))
+		return Ab;
+	if (strstr(substr, "A"))
+		return A;
+	if (strstr(substr, "Bb"))
+		return Bb;
+	if (strstr(substr, "B"))
+		return B;
+	return C;
+}
+
+chord_type_t from_string_to_type(const char *substr)
+{
+	if (strstr(substr, "minor/major 7th"))
+		return kMinMaj7;
+	if (strstr(substr, "major 7th"))
+		return kMaj7;
+	if (strstr(substr, "major"))
+		return kMaj;
+	if (strstr(substr, "minor 7th"))
+		return kMin7;
+	if (strstr(substr, "minor"))
+		return kMin;
+	if (strstr(substr, "half diminished 7th"))
+		return kHalfDim7;
+	if (strstr(substr, "diminished 7th"))
+		return kDim7;
+	if (strstr(substr, "diminished"))
+		return kDim;
+	if (strstr(substr, "augmented"))
+		return kAug;
+	if (strstr(substr, "dominant 7th"))
+		return kDom7;
+	// pland adding chords 30.11.05
+	if (strstr(substr, "dominant b9"))
+		return kDomb9;
+	if (strstr(substr, "major 9th"))
+		return kMaj9;
+	if (strstr(substr, "dominant 9th"))
+		return kDom9;
+	if (strstr(substr, "minor 9th"))
+		return kMin9;
+	if (strstr(substr, "half diminished 9th"))
+		return kHalfDim9;
+	if (strstr(substr, "minor major 9th"))
+		return kMinMaj9;
+	if (strstr(substr, "diminished major 9th"))
+		return kDimMaj9;
+	// TODO: other chords
+	// beware when adding new chords
+	// put shorter names at end of this function!
+	return C;
+}
+
+// find the tonality mode in this string
+modes_t from_string_to_mode(const char *substr)
+{
+	if (strstr(substr, "major"))
+		return MAJOR;
+	if (strstr(substr, "minor"))
+		return MINOR;
+
+	// TODO: other modes (doric, misolidian , custom, etc..
+	return C;
+}
+
+// tries to find out absolute tones names in this string
+abs_note_t string2note(const char *substr)
+{
+	if (strstr(substr, "C"))
+		return C;
+	if (strstr(substr, "Db"))
+		return Db;
+	if (strstr(substr, "D"))
+		return D;
+	if (strstr(substr, "Eb"))
+		return Eb;
+	if (strstr(substr, "E"))
+		return E;
+	if (strstr(substr, "F"))
+		return F;
+	if (strstr(substr, "Gb"))
+		return Gb;
+	if (strstr(substr, "G"))
+		return G;
+	if (strstr(substr, "Ab"))
+		return Ab;
+	if (strstr(substr, "A"))
+		return A;
+	if (strstr(substr, "Bb"))
+		return Bb;
+	if (strstr(substr, "B"))
+		return B;
+	return C;
+}
+
+chord_type_t string2mode(const char *substr)
+{
+	if (strstr(substr, "minor/major 7th"))
+		return kMinMaj7;
+	if (strstr(substr, "major 7th"))
+		return kMaj7;
+	if (strstr(substr, "major"))
+		return kMaj;
+	if (strstr(substr, "minor 7th"))
+		return kMin7;
+	if (strstr(substr, "minor"))
+		return kMin;
+	if (strstr(substr, "half diminished 7th"))
+		return kHalfDim7;
+	if (strstr(substr, "diminished 7th"))
+		return kDim7;
+	if (strstr(substr, "diminished"))
+		return kDim;
+	if (strstr(substr, "augmented"))
+		return kAug;
+	if (strstr(substr, "dominant 7th"))
+		return kDom7;
+	// TODO: other chords
+	// beware when adding new chords
+	// put shorter names at end of this function!
+	return C;
+}
+
