@@ -1,28 +1,15 @@
 
+- OSC did not get included
+
+- check out embed-MacOSX-dependencies.sh script.  There seems to be a bug
+  where the deps in lib/libogg.dylib don't get switched from /sw/lib to
+  @executable_path/blah/blah
+
+
 - check out using TclTkBI package for all of the tcl deps.  It should have all
   of the binaries necessary for extensions/gui/ix
 
      - research Tcl "auto_path"
-
-
-- make Pd open a new window when its launched to workaround the bug where the
-  menus don't work until a window is opened.
-
-
-- otool dylib help: http://qin.laya.com/tech_coding_help/dylib_linking.html
-
-  http://doc.trolltech.com/qq/qq09-mac-deployment.html
-
-	 Now that we have copied the Qt library into the bundle, we must update
-	 both the library and the executable so that they know where they can be
-	 found. This is where the install_name_tool command-line tool comes in
-	 handy. For the Qt library:
-
-    install_name_tool \
-        -id @executable_path/../Frameworks/libqt.3.dylib \
-        demo.app/Contents/Frameworks/libqt.3.dylib
-    
-    otool -L oggcast~.pd_darwin | grep /sw/ | sed -n 's|.*/sw/lib/\(.*\.dylib\).*|\1|p'
 
 
 - from Carmen Rocco about [fiddle~] crash: "is fiddle~: * compiled with the
@@ -31,7 +18,8 @@
   same stacktrace but s/fiddle/bonk) until fixing the above 3 things..."
 
 
-- review permissions so that you can build on top on existing builds (its the Frameworks)
+- review permissions so that you can build on top on existing builds (its the
+  Frameworks, just chmod -R +w after installingx)
 
 
 - add standard paths to included org.puredata.pd.plist following these
@@ -39,23 +27,16 @@
 http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles/WhereToPutFiles.html
 
 
-- Pd should then test to see if Jack is available before switching to it,
-  otherwise it'll just crash.  Here's apple's method of testing:
-
-  http://developer.apple.com/documentation/mac/runtimehtml/RTArch-43.html
-
-
 - try this for the Pref Pane:
  kAEShowPreferences ::tk::mac::ShowPreferences
 
-
-- research Tk + "Custom MDEF" for menus
 
 
 - create Tcl script called from Prefs that creates links for the standard unix
 
 
 - redo menu system
+  	   	 - research Tk + "Custom MDEF" for menus
   		 - the menus are the same for all windows
 		 - instead of hiding menus, grey-out/disable menu items on Pd window
 		 - one method for creating all menus
@@ -74,10 +55,10 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
   __gnu_linux__ and WIN32 while I am at it) and submit to miller
 
 
-- instead of shipping Pd.app with a org.puredata.pd.plist, make a script that
-  uses the "defaults" command to add the desired prefs to any existing
-  file. (its a good idea, but unforunately, the key names prevent that from
-  working, i.e. loadlib1, loadlib2, etc)
+- Pd should then test to see if Jack is available before switching to it,
+  otherwise it'll just crash.  Here's apple's method of testing:
+
+  http://developer.apple.com/documentation/mac/runtimehtml/RTArch-43.html
 
 
 ------------------------------------------------------------------------------
@@ -85,3 +66,8 @@ semi-abandoned TODOs
 
 - make a web page that has stuff that can't be included due to license issues:
   (percolate)
+
+- instead of shipping Pd.app with a org.puredata.pd.plist, make a script that
+  uses the "defaults" command to add the desired prefs to any existing
+  file. (its a good idea, but unforunately, the key names prevent that from
+  working, i.e. loadlib1, loadlib2, etc)
