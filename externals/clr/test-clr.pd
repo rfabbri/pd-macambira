@@ -1,30 +1,51 @@
-#N canvas 73 31 623 538 12;
-#X obj 115 402 clr External External.dll;
-#X obj 122 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 73 31 756 564 12;
+#X obj 49 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X floatatom 138 70 5 0 0 0 - - -;
-#X symbolatom 153 93 10 0 0 0 - - -;
-#X text 219 66 simple messages;
-#X msg 200 130 sel1;
-#X msg 214 153 sel2;
-#X text 261 142 selectors;
-#X msg 223 196 selFloat \$1;
-#X obj 226 177 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+#X floatatom 65 70 5 0 0 0 - - -;
+#X symbolatom 80 93 10 0 0 0 - - -;
+#X text 146 66 simple messages;
+#X msg 221 95 sel1;
+#X msg 235 118 sel2;
+#X text 282 107 selectors;
+#X msg 244 161 selFloat \$1;
+#X obj 247 142 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X obj 325 354 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+#X obj 227 263 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 322 333 mapped to selFloat;
-#X msg 245 274 selGenericList 12 a 0.5 b;
-#X text 244 252 complex list;
-#X obj 114 432 print;
-#X text 204 433 arguments: Class name \, Filename;
-#X connect 0 0 14 0;
-#X connect 1 0 0 0;
-#X connect 2 0 0 0;
-#X connect 3 0 0 0;
-#X connect 5 0 0 0;
-#X connect 6 0 0 0;
-#X connect 8 0 0 0;
-#X connect 9 0 8 0;
-#X connect 10 0 0 1;
-#X connect 12 0 0 0;
+#X text 224 242 mapped to selFloat;
+#X msg 99 216 selGenericList 12 a 0.5 b;
+#X text 98 194 complex list;
+#X obj 82 297 print;
+#X text 43 329 arguments: Class name \, Filename;
+#X obj 438 353 clr Counter External.dll 2;
+#X obj 83 267 clr External;
+#X text 43 345 you omit filename if is the same as classname;
+#X text 40 411 you can pass arguments;
+#X text 39 431 in this case you must provide filename too;
+#X floatatom 438 392 5 0 0 0 - - -;
+#X floatatom 438 302 5 0 0 0 - - -;
+#X msg 510 299 init 0;
+#X text 36 453 the parameter is the initial value of the counter;
+#X floatatom 641 320 5 0 0 0 - - -;
+#X text 408 244 this external sums the value passed in the left inlet
+with the stored one;
+#X obj 411 305 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 287 3 more than one class can be compiled in the same assembly
+;
+#X text 37 477 NB: a class corresponding constructor must exist;
+#X connect 0 0 16 0;
+#X connect 1 0 16 0;
+#X connect 2 0 16 0;
+#X connect 4 0 16 0;
+#X connect 5 0 16 0;
+#X connect 7 0 16 0;
+#X connect 8 0 7 0;
+#X connect 9 0 16 1;
+#X connect 11 0 16 0;
+#X connect 15 0 20 0;
+#X connect 16 0 13 0;
+#X connect 21 0 15 0;
+#X connect 22 0 15 0;
+#X connect 24 0 15 1;
+#X connect 26 0 15 0;
