@@ -28,11 +28,13 @@ prefix=@prefix@
 
 SOURCES = OSC-pattern-match.c OSC.c dumpOSC.c htmsocket.c OSCroute.c sendOSC.c OSC-system-dependent.c
 TARGETS = $(SOURCES:.c=.o)
-EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@ OSC.@pd_suffix@
+EXTS=sendOSC.@pd_suffix@ dumpOSC.@pd_suffix@ OSCroute.@pd_suffix@
 
 # ----------------------- autoconf -----------------------
 
 all: $(EXTS)
+
+lib: OSC.@pd_suffix@
 
 dumpOSC.@pd_suffix@: dumpOSC.o
 	$(CC) $(LDFLAGS) -o dumpOSC.@pd_suffix@ $? $(LIBS)
