@@ -192,7 +192,7 @@ void harmonizer_init_pop(t_harmonizer *x)
 				{
 					// i go up
 					rnd = rand()/((double)RAND_MAX + 1);
-					steps = rnd * 5; // how many steps (good notes) will I ignore?
+					steps = rnd * 10; // how many steps (good notes) will I ignore?
 					note = insertpoint + steps;
 					if (note >= POSSIBLE_NOTES)
 						note = POSSIBLE_NOTES-1;
@@ -201,7 +201,7 @@ void harmonizer_init_pop(t_harmonizer *x)
 				{
 					// i go down
 					rnd = rand()/((double)RAND_MAX + 1);
-					steps = rnd * 5; // how many steps (good notes) will I ignore?
+					steps = rnd * 10; // how many steps (good notes) will I ignore?
 					note = insertpoint - steps;
 					if (note < 0)
 						note = 0;
@@ -223,7 +223,8 @@ void harmonizer_free(t_harmonizer *x)
 // here i evaluate this voicing
 int fitness(t_harmonizer *x, int *candidate)
 {
-	int i, j, tmp, res, last, avgHI, avgLOW;
+	int i, j, tmp, res, last, avgHI, avgLOW, min, max, distance;
+	float wideness, ftmp;
 	short int chord_notes[4];
 	short int chord_notes_ok[4];
 	short int transitions[VOICES];
@@ -337,7 +338,7 @@ int fitness(t_harmonizer *x, int *candidate)
 	{
 		if (DEBUG_VERBOSE)
 			post("transitions[%i] = %i",i, transitions[i]);
-		res-=abs(transitions[i]);
+		res-=abs(transitions[i]) * x->small_intervals;
 		// give an incentive for semitones etc..
 		if (transitions[i]==0)
 			res += 5;
@@ -417,7 +418,14 @@ int fitness(t_harmonizer *x, int *candidate)
 	case 4: res -= 30; break;
 	}
 
-
+	// now wideness	
+	min = notes[0];
+	max = notes[VOICES-1];
+	distance = max - min;
+	wideness = (float) (((float)distance) / ((float)12));
+	ftmp = fabs(wideness - x->wideness);
+	res -= ftmp * 5;
+	
 	if (DEBUG_VERBOSE)
 		post("fitness is %i", res);
 

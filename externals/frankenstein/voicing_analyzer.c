@@ -127,7 +127,9 @@ void analyze_it(t_voicing_analyzer *x, float *wideness, float *i_like_parallelis
 	// now i can compute parallelism
 	*i_like_parallelism = (float) -1;
 	*i_like_parallelism += sameDirection;
-	*i_like_parallelism += (float) ( ((float)(VOICES*(VOICES-1))) / ((float)parallel8_5)  );
+	if (parallel8_5)
+		*i_like_parallelism += (float) ( ((float)parallel8_5) / ((float)(VOICES*(VOICES-1)))  );
+
 
 	// is voice spacing uniform ?(except for the bass)
 	// TODO: use notes[]
@@ -145,9 +147,9 @@ void analyze_it(t_voicing_analyzer *x, float *wideness, float *i_like_parallelis
 	tmp=0;
 	for (i=0; i<VOICES; i++)
 	{
-		if (DEBUG_VERBOSE)
-			post("transitions[%i] = %i",i, transitions[i]);
-		res-=abs(transitions[i]);
+	//	if (DEBUG_VERBOSE)
+	//		post("transitions[%i] = %i",i, transitions[i]);
+	//	res-=abs(transitions[i]);
 		// give an incentive for semitones etc..
 		if (transitions[i]==0)
 			res += 5;
@@ -179,7 +181,6 @@ void analyze_it(t_voicing_analyzer *x, float *wideness, float *i_like_parallelis
 
 
 
-
 }
 
 typedef struct fitness_list_element_t 
@@ -202,8 +203,8 @@ void analyze_voicing(t_voicing_analyzer *x)
 	
 	// order is important!
 	outlet_float(x->i_like_parallelism_out, i_like_parallelism);
-	outlet_float(x->small_intervals_out, small_intervals);
 	outlet_float(x->wideness_out, wideness);
+	outlet_float(x->small_intervals_out, small_intervals);
 	outlet_float(x->center_note_out, center_note);
 	
 }
