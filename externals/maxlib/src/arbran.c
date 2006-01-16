@@ -57,7 +57,7 @@ static void rand_arbran_pdfscale(t_rand_arbran *x)
 	t_float a = 0;
 	t_int k = 0;
 	t_float *tx, *tp;
-	t_int ix, ip;
+	int ix, ip;
 	if (!garray_getfloatarray(bx, &ix, &tx))
 	{
 		post("arbran: couldn't read from array!");
@@ -86,7 +86,7 @@ static void rand_arbran_bang(t_rand_arbran *x)
 	t_float a, u, a0, slope, b, d, r;
 	t_int k = 0;
 	t_float *tx, *tp;
-	t_int ix, ip;
+	int ix, ip;
 	if (!garray_getfloatarray(bx, &ix, &tx))
 	{
 		post("arbran: couldn't read from array!");

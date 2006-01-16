@@ -131,7 +131,7 @@ static int beat_evaluate(t_beat *x)
 		for(i = 1; i < 6; i++)
 		{
 			sortp = &(theories[BEAT_LONG - i]);
-			sprintf(info, " %4d[%3d]", sortp->theory, sortp->points);
+			sprintf(info, " %4d[%3d]", (int) sortp->theory, (int) sortp->points);
 			strcat(string, info);
 		}
 		sprintf(info, "  %g %g", clock_getlogicaltime(), x->x_beatexpect);

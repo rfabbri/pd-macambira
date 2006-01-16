@@ -82,7 +82,8 @@ static void arraycopy_docopy(t_arraycopy *x)
 {
 	t_garray *b;		/* make local copy of array */
 	t_float *tab;                 /* the content itselfe */
-	t_int items, i;
+	int items;
+	t_int i;
 	t_garray *A;
 	int npoints;
 	t_float *vec;

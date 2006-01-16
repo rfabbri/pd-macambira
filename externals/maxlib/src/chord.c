@@ -412,7 +412,7 @@ static void chord_quintad(t_chord *x)
 	static t_type_root quintads[8][8][8][8];
 	register int i, j, k, l;
 	register t_type_root *t;
-	int members[5];
+	t_int members[5];
 	int interval1, interval2, interval3, interval4;
 	int *st;
 	int maj9[5][4] = {{1,1,2,3}, {0,1,1,2}, {3,0,1,1}, {2,3,0,1}, {1,2,3,0}};
@@ -963,7 +963,7 @@ static void chord_sextad(t_chord *x)
 	register int i, j, k, l, m;
 	register t_type_root *t;
 	register int* st;
-	int members[6];
+	t_int members[6];
 	int interval1, interval2, interval3, interval4, interval5;
 
 	int D9b3[6][5] =
@@ -1214,11 +1214,14 @@ static int chord_name_third(t_chord *x, char* chord, int c, int rootName)
 	if (x->x_pc[third]) {					// if one is there
 		x->x_pc[third] = 0;					// erase from pcs array
 		chord[c++] = name_class[(rootName+2)%7];
-		if (chord_accidental(third))			// if it has an chord_accidental
+		if (chord_accidental(third)) {			// if it has an chord_accidental
 			// make it a flat if the root also has an chord_accidental
-			if (chord_accidental(x->x_chord_root)) chord[c++] = 'b';
+			if (chord_accidental(x->x_chord_root)) 
+				chord[c++] = 'b';
 			// otherwise make it a sharp
-			else					   chord[c++] = '#';
+			else					   
+				chord[c++] = '#';
+		}
 		chord[c++] = ' ';
 		return c;						// return if major third found
 	}
@@ -1393,10 +1396,13 @@ static int chord_name_thirteenth(t_chord *x, char* chord, int c, int rootName)
 	if (x->x_pc[thirteenth]) {
 		x->x_pc[thirteenth] = 0;
 		chord[c++] = name_class[(rootName+5)%7];
-		if (chord_accidental(thirteenth))
+		if (chord_accidental(thirteenth)) {
 			if (chord_accidental(x->x_chord_root))
-				chord[c++] = 'b'; else
+				chord[c++] = 'b'; 
+			else
 				chord[c++] = '#';
+		}
+		
 		chord[c++] = ' ';
 		return c;
 	}
