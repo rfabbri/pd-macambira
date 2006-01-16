@@ -32,41 +32,58 @@ The OSC webpage is http://cnmat.cnmat.berkeley.edu/OpenSoundControl
     Modified 6/6/96 by Matt Wright to understand symbolic host names
     in addition to X.X.X.X addresses.
 
-    pd ------------
-    -- added BROADCAST socket option jdl
+    pd: branched jdl
+    -- win additions raf 2002
+    -- enabled broadcast jdl 2003
  */
 
-
-#include <stdio.h>
-#include <strings.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-
-// #include <rpc/rpc.h> l-osc: sendOSC, Date: Fri, 06 Feb 2004 05:02:42 +1100
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/times.h>
-#include <sys/param.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
-
-#include <ctype.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <pwd.h>
-#include <signal.h>
-#include <grp.h>
-#include <sys/fcntl.h>
-#include <sys/file.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#ifndef __APPLE__
-  #include <sys/prctl.h>
+#if HAVE_CONFIG_H 
+#include <config.h> 
 #endif
 
-#include <stdlib.h>
+#ifdef __APPLE__
+  #include <string.h>
+#endif
+
+#ifdef _WIN32
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <winsock2.h>	
+	#include <ctype.h>
+	#include <signal.h>
+	#include <sys/types.h>
+	#include <stdlib.h>
+	#include "OSC-common.h"
+	#include <stdio.h>
+#else
+	#include <stdio.h>
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <netinet/in.h>
+
+//	#include <rpc/rpc.h>
+	#include <sys/socket.h>
+	#include <sys/un.h>
+	#include <sys/times.h>
+	#include <sys/param.h>
+	#include <sys/time.h>
+	#include <sys/ioctl.h>
+
+	#include <ctype.h>
+	#include <arpa/inet.h>
+	#include <netdb.h>
+	#include <pwd.h>
+	#include <signal.h>
+	#include <grp.h>
+	#include <sys/fcntl.h>
+	#include <sys/file.h>
+	#include <sys/time.h>
+	#include <sys/types.h>
+//	#include <sys/prctl.h>
+
+	#include <stdlib.h>
+#endif
 
 #define UNIXDG_PATH "/tmp/htm"
 #define UNIXDG_TMP "/tmp/htm.XXXXXX"
@@ -76,7 +93,9 @@ typedef struct
 	float srate;
 
 	struct sockaddr_in serv_addr; /* udp socket */
-        struct sockaddr_un     userv_addr; /* UNIX socket */
+	#ifndef WIN32
+		struct sockaddr_un userv_addr; /* UNIX socket */
+	#endif
 	int sockfd;		/* socket file descriptor */
 	int index, len,uservlen;
 	void *addr;
@@ -87,18 +106,27 @@ typedef struct
 /* if host is 0 then UNIX protocol is used (i.e. local communication */
 void *OpenHTMSocket(char *host, int portnumber)
 {
-	int sockfd;
-	int oval = 1;
 	struct sockaddr_in  cl_addr;
-	struct sockaddr_un  ucl_addr;
+	#ifndef WIN32
+		int sockfd;
+		struct sockaddr_un ucl_addr;
+	#else
+		unsigned int sockfd;
+	#endif
+
+	char oval = 1;
+
 	desc *o;
 	o = malloc(sizeof(*o));
 	if(!o)
 		return 0;
+
+  #ifndef WIN32
+
 	if(!host)
 	{
-	   // char *mkstemp(char *);
-	   int clilen;
+		char *mktemp(char *);
+		int clilen;
 		  o->len = sizeof(ucl_addr);
 		/*
 		         * Fill in the structure "userv_addr" with the address of the
@@ -128,27 +156,36 @@ void *OpenHTMSocket(char *host, int portnumber)
 			ucl_addr.sun_family = AF_UNIX;
 			strcpy(ucl_addr.sun_path, UNIXDG_TMP);
 
-			mkstemp(ucl_addr.sun_path);
+			mktemp(ucl_addr.sun_path);
 			clilen = sizeof(ucl_addr.sun_family) + strlen(ucl_addr.sun_path);
-
+		
 			if (bind(sockfd, (struct sockaddr *) &ucl_addr, clilen) < 0)
 			{
-				perror("client: can't bind local address");
-				close(sockfd);
-				sockfd = -1;
+			  perror("client: can't bind local address");
+			  close(sockfd);
+			  sockfd = -1;
 			}
 		}
 		else
-			perror("unable to make socket\n");
-
+		  perror("unable to make socket\n");
+		
 	}else
+
+  #endif
+
 	{
 		/*
 		         * Fill in the structure "serv_addr" with the address of the
 		         * server that we want to send to.
 		*/
 		o->len = sizeof(cl_addr);
-		bzero((char *)&o->serv_addr, sizeof(o->serv_addr));
+
+		#ifdef WIN32
+			ZeroMemory((char *)&o->serv_addr, sizeof(o->serv_addr));
+		#else
+			bzero((char *)&o->serv_addr, sizeof(o->serv_addr));
+		#endif
+
 		o->serv_addr.sin_family = AF_INET;
 
 	    /* MW 6/6/96: Call gethostbyname() instead of inet_addr(),
@@ -156,62 +193,89 @@ void *OpenHTMSocket(char *host, int portnumber)
 	       "les") or an Internet address in standard dot notation 
 	       (e.g., "128.32.122.13") */
 	    {
-		struct hostent *hostsEntry;
-		unsigned long address;
+			struct hostent *hostsEntry;
+			unsigned long address;
 
-		hostsEntry = gethostbyname(host);
-		if (hostsEntry == NULL) {
-		    fprintf(stderr, "Couldn't decipher host name \"%s\"\n",
-			    host);
-		    herror(NULL);
-		    return 0;
-		}
-		
-		address = *((unsigned long *) hostsEntry->h_addr_list[0]);
-		o->serv_addr.sin_addr.s_addr = address;
+			hostsEntry = gethostbyname(host);
+			if (hostsEntry == NULL) {
+				fprintf(stderr, "Couldn't decipher host name \"%s\"\n", host);
+				#ifndef WIN32
+				herror(NULL);
+				#endif
+				return 0;
+			}
+			
+			address = *((unsigned long *) hostsEntry->h_addr_list[0]);
+			o->serv_addr.sin_addr.s_addr = address;
 	    }
 
 	    /* was: o->serv_addr.sin_addr.s_addr = inet_addr(host); */
 
 	    /* End MW changes */
 
-			o->serv_addr.sin_port = htons(portnumber);
-		o->addr = &(o->serv_addr);
 		/*
-		* Open a socket (a UDP domain datagram socket).
-		*/
-		if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) >= 0)
-		{
-			bzero((char *)&cl_addr, sizeof(cl_addr));
-			cl_addr.sin_family = AF_INET;
-			cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-			cl_addr.sin_port = htons(0);
-			
-			if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
-			  perror("setsockopt");
+		 * Open a socket (a UDP domain datagram socket).
+		 */
+
+
+		#ifdef WIN32
+			o->serv_addr.sin_port = htons((USHORT)portnumber);
+			o->addr = &(o->serv_addr);
+			if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) != INVALID_SOCKET) {
+				ZeroMemory((char *)&cl_addr, sizeof(cl_addr));
+				cl_addr.sin_family = AF_INET;
+				cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+				cl_addr.sin_port = htons(0);
+				
+				// enable broadcast: jdl ~2003
+				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
+				  perror("setsockopt");
+				}
+
+				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
+					perror("could not bind\n");
+					closesocket(sockfd);
+					sockfd = -1;
+				}
 			}
-		
-			if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0)
-			{
-				perror("could not bind\n");
-				close(sockfd);
-				sockfd = -1;
+			else { perror("unable to make socket\n");}
+		#else
+			o->serv_addr.sin_port = htons(portnumber);
+			o->addr = &(o->serv_addr);
+			if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) >= 0) {
+					bzero((char *)&cl_addr, sizeof(cl_addr));
+				cl_addr.sin_family = AF_INET;
+				cl_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+				cl_addr.sin_port = htons(0);
+				
+				// enable broadcast: jdl ~2003
+				if(setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &oval, sizeof(int)) == -1) {
+				  perror("setsockopt");
+				}
+
+				if(bind(sockfd, (struct sockaddr *) &cl_addr, sizeof(cl_addr)) < 0) {
+					perror("could not bind\n");
+					close(sockfd);
+					sockfd = -1;
+				}
 			}
+			else { perror("unable to make socket\n");}
+		#endif
+	}
+	#ifdef WIN32
+		if(sockfd == INVALID_SOCKET) {
+	#else
+		if(sockfd < 0) {
+	#endif
+			free(o); 
+			o = 0;
 		}
 		else
-		{
-			perror("unable to make socket\n");
-		}
-		
-	}
-	if(sockfd<0)
-	{
-		free(o); o = 0;
-	}
-	else
-		o->sockfd = sockfd;
+			o->sockfd = sockfd;
 	return o;
 }
+
+
 #include <errno.h>
 
 static  bool sendudp(const struct sockaddr *sp, int sockfd,int length, int count, void  *b)
@@ -219,9 +283,8 @@ static  bool sendudp(const struct sockaddr *sp, int sockfd,int length, int count
 	int rcount;
 	if((rcount=sendto(sockfd, b, count, 0, sp, length)) != count)
 	{
-/*	printf("sockfd %d count %d rcount %dlength %d errno %d\n", sockfd,count,rcount,length,
-			errno); */
-			return FALSE;
+		printf("sockfd %d count %d rcount %dlength %d errno %d\n", sockfd,count,rcount,length, errno); 
+		return FALSE;
 	}
 	return TRUE;
 }
@@ -233,6 +296,18 @@ bool SendHTMSocket(void *htmsendhandle, int length_in_bytes, void *buffer)
 void CloseHTMSocket(void *htmsendhandle)
 {
 	desc *o = (desc *)htmsendhandle;
-	close(o->sockfd);
+	#ifdef WIN32
+	if(SOCKET_ERROR == closesocket(o->sockfd)) {
+		perror("CloseHTMSocket::closesocket failed\n");
+		return;
+	}
+	#else
+	if(close(o->sockfd) == -1)
+	  {
+	    perror("CloseHTMSocket::closesocket failed");
+	    return;
+	  }
+	#endif
+
 	free(o);
 }

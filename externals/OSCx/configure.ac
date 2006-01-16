@@ -57,7 +57,7 @@ dnl  for each of the *-*-host's in the following, do the checking and then set y
 dnl  CFLAGS get set for C code, CPPFLAGS for c++ code.  LDFLAGS is the linking flags for both c and c++
 dnl ------------------------------------------
 
-INCLUDES="-I../libOSC -I../../pd/src -I../../../pd/src -I."
+INCLUDES="-I../libOSC -I../../pd/src -I../../../pd/src -I../src"
 LIBOSC=libOSC.a
 if test -z "$GCC"; then
         case $host in 

@@ -4391,7 +4391,7 @@ _ACEOF
 # from augusts template
 
 
-INCLUDES="-I../libOSC -I../../pd/src -I../../../pd/src -I."
+INCLUDES="-I../libOSC -I../../pd/src -I../../../pd/src -I../src"
 LIBOSC=libOSC.a
 if test -z "$GCC"; then
         case $host in

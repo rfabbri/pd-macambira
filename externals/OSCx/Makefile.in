@@ -1,12 +1,17 @@
 dirs = libOSC send+dump  src
 
 all: 
-	cd libOSC ; make
-	cd src ; make
-	cd send+dump ; make
+	cd libOSC && make
+	cd src && make
 
-install: all
-	cd src ; make install
+lib: all
+	cd src && make lib
+
+utils:
+	cd send+dump && make
+
+install: all lib utils
+	cd src && make install
 
 clean:
 	cd libOSC && make clean
