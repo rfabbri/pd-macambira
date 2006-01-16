@@ -17,15 +17,16 @@ namespace PureData
 			// now you can do what you like...
 			Console.WriteLine("pointer set!");
 			Console.WriteLine("setting selectors..");
-			pd.AddSelector(x, "sel1", "Sel1", ParametersType.None);
-			pd.AddSelector(x, "sel2", "Sel2", ParametersType.None);
-			pd.AddSelector(x, "selFloat", "SelFloat", ParametersType.Float);
-			pd.AddSelector(x, "selString", "SelString", ParametersType.Symbol);
-			pd.AddSelector(x, "selGenericList", "SelGenericList", ParametersType.List);
+			pd.AddSelector(x, "sel1", new pd.DelegateWithoutArguments(Sel1));
+			pd.AddSelector(x, "sel2", new pd.DelegateWithoutArguments(Sel2));
+			pd.AddSelector(x, "selFloat", new pd.DelegateFloat(SelFloat));
+			pd.AddSelector(x, "selString", new pd.DelegateString(SelString));
+			pd.AddSelector(x, "selGenericList", new pd.DelegateArray(SelGenericList));
+			pd.AddSelector(x, new pd.DelegateArray(SelGenericList));
 
-			pd.AddSelector(x, "", "GetBang", ParametersType.Bang);
-			pd.AddSelector(x, "", "GetFloat", ParametersType.Float);
-			pd.AddSelector(x, "", "GetSymbol", ParametersType.Symbol);
+			pd.AddSelector(x, new pd.DelegateWithoutArguments(GetBang));
+			pd.AddSelector(x, new pd.DelegateFloat(GetFloat));
+			pd.AddSelector(x, new pd.DelegateString(GetSymbol));
 
 			Console.WriteLine("selectors set");
 			pd.AddOutlet(x, ParametersType.Float);
@@ -34,7 +35,7 @@ namespace PureData
 
 		public void GetBang()
 		{
-			pd.PostMessage("GetBang invoked!");
+			pd.PostMessage("GetBang invoked!");			
 		}
 
 		public void GetFloat(float f)
@@ -101,7 +102,7 @@ namespace PureData
 					}
 					case (AtomType.Symbol):
 					{
-						ret[i] = new Atom(a.string_value + "-lo-giuro");
+						ret[i] = new Atom(a.string_value + "-edited");
 						pd.PostMessage(a.string_value);
 						break;
 					}
@@ -109,6 +110,7 @@ namespace PureData
 			}
 			pd.SendToOutlet(x, 0, ret);
 		}
+
 
 
 	}

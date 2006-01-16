@@ -31,4 +31,24 @@ namespace PureData
 			this.string_value = s;
 		}
 	}
+	// this struct is relative to this c struct, see clr.c
+
+	/*
+		// simplyfied atom
+		typedef struct atom_simple atom_simple;
+		typedef enum
+		{
+			A_S_NULL=0,
+			A_S_FLOAT=1,
+			A_S_SYMBOL=2,
+		}  t_atomtype_simple;
+		typedef struct atom_simple
+		{
+			t_atomtype_simple a_type;
+			union{
+				float float_value;
+				MonoString *string_value;
+			} stuff;
+		};
+		*/
 }

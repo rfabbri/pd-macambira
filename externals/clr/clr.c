@@ -355,12 +355,64 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 	float valFloat;
 
 	int i;
-	// first i extract the first atom which should be a symbol
-post("clr_manage_list, got symbol = %s", sl->s_name);
 	if (x->loaded == 0)
 	{
 		error("assembly not specified");
 		return;
+	}
+
+	// check if a selector is present !
+	//printf("clr_manage_list, got symbol = %s\n", sl->s_name);
+	if (strcmp("list", sl->s_name) == 0)
+	{
+		printf("lista senza selector");
+		if (x->manageList)
+		{
+			gpointer args [1];
+			MonoString *stringtmp;
+			double *floattmp;
+			t_atomtype_simple *typetmp;
+			t_symbol *strsymbol;
+			MonoArray *atoms;
+			atom_simple *atom_array;
+			int j;		
+			char strfloat[256], strnull[256];
+			sprintf(strfloat, "float");
+			sprintf(strnull, "null");
+			atom_array = malloc(sizeof(atom_simple)*argc);
+			MonoClass *c = mono_class_from_name (x->imagePureData, "PureData", "Atom");
+			atoms = mono_array_new (x->domain, c, argc);
+			for (j=0; j<argc; j++)
+			{
+				switch ((argv+j)->a_type)
+				{
+				case A_FLOAT:
+					atom_array[j].a_type =  A_S_FLOAT;
+					atom_array[j].float_value = (double) atom_getfloat(argv+j);
+					atom_array[j].string_value = mono_string_new (x->domain, strfloat);
+					break;
+				case A_SYMBOL:
+					atom_array[j].a_type =  A_S_SYMBOL;
+					strsymbol = atom_getsymbol(argv+j);
+					atom_array[j].string_value = mono_string_new (x->domain, strsymbol->s_name);
+					atom_array[j].float_value = 0;
+					break;
+				default:
+					atom_array[j].a_type =  A_S_NULL;
+					atom_array[j].float_value = 0;
+					atom_array[j].string_value = mono_string_new (x->domain, strnull);
+				}
+				mono_array_set (atoms, atom_simple , j, atom_array[j]);
+			}
+
+			args[0] = atoms;
+			mono_runtime_invoke (x->manageList, x->obj, args, NULL);
+			return;
+		} else
+		{
+			error("you did not specified a function to call for lists without selectors");
+			return;
+		}
 	}
 	for (i=0; i<MAX_SELECTORS; i++)
 	{

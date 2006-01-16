@@ -1,4 +1,4 @@
-#N canvas 73 31 756 564 12;
+#N canvas 73 31 760 568 12;
 #X obj 49 51 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X floatatom 65 70 5 0 0 0 - - -;
@@ -13,8 +13,8 @@
 #X obj 227 263 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
 #X text 224 242 mapped to selFloat;
-#X msg 99 216 selGenericList 12 a 0.5 b;
-#X text 98 194 complex list;
+#X msg 94 210 selGenericList 12 a 0.5 b;
+#X text 93 188 complex list;
 #X obj 82 297 print;
 #X text 43 329 arguments: Class name \, Filename;
 #X obj 438 353 clr Counter External.dll 2;
@@ -34,6 +34,7 @@ with the stored one;
 #X text 287 3 more than one class can be compiled in the same assembly
 ;
 #X text 37 477 NB: a class corresponding constructor must exist;
+#X msg 309 210 1 2 3 a b c;
 #X connect 0 0 16 0;
 #X connect 1 0 16 0;
 #X connect 2 0 16 0;
@@ -49,3 +50,4 @@ with the stored one;
 #X connect 22 0 15 0;
 #X connect 24 0 15 1;
 #X connect 26 0 15 0;
+#X connect 29 0 16 0;
