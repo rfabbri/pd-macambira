@@ -132,11 +132,6 @@ flext:
 	-cd $(externals_src)/nusmuk/msd3D && $(externals_src)/grill/flext/build.sh \
 		pd gcc
 
-#------------------------------------------------------------------------------
-# Gem
-gem:
-#	cd $(gem_src)/Gem && xcodebuild
-
 
 #------------------------------------------------------------------------------
 # pd
@@ -348,6 +343,20 @@ flext_install:
 #------------------------------------------------------------------------------
 # gem_install
 GEM_NAME = Gem
+$(gem_src)/src/configure: $(gem_src)/src/configure.ac
+	cd $(gem_src)/src && autoconf
+
+$(gem_src)/src/Make.config: $(gem_src)/src/Make.config.in
+	cd $(gem_src)/src && ./configure --with-pd=../../pd
+
+$(gem_src)/src/Gem.$(EXTENSION):  $(gem_src)/src/configure \
+$(gem_src)/src/Make.config 
+	make -C $(gem_src)/src
+
+#gem: $(gem_src)/src/Gem.$(EXTENSION)
+gem:
+#	cd $(gem_src)/Gem && xcodebuild
+
 gem_install: gem $(helpdir)
 	install -d $(helpdir)/$(GEM_NAME)
 	install -p $(gem_src)/help/*.* $(helpdir)/$(GEM_NAME)
