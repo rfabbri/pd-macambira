@@ -1,8 +1,11 @@
 
 current: darwin_app
 
+# turn on weak linking and dlopen support
+export MACOSX_DEPLOYMENT_TARGET = 10.3
+
 # needed to support weak linking of frameworks
-MAKE = MACOSX_DEPLOYMENT_TARGET=10.3 make
+#MAKE = MACOSX_DEPLOYMENT_TARGET=10.3 make
 
 CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
