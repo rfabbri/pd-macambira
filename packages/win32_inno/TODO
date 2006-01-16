@@ -1,5 +1,5 @@
 
-- check out dynamic linking in ogg* objects, and included DLL if needed
+- make sure vasp is included in noncvs
 
 - check out using env vars in Path settings in registry, or make relative paths
 
