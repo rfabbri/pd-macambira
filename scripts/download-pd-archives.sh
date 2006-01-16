@@ -7,7 +7,7 @@
 # which lists you want to download.  The lists hosted on this server are:
 #     gem-dev pd-announce pd-cvs pd-dev pd-list pd-ot pdweb
 LISTS="pd-announce pd-dev pd-list pd-ot pdweb"
-MAILBOX_ROOT=~/Library/Mail/Mailboxes
+MAILBOX_ROOT=~/Library/Mail/Mailboxes/Pd
 
 for listname in $LISTS ; do
 	 echo " "
