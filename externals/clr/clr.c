@@ -106,17 +106,20 @@ static void mono_initialize()
 }
 
 // load the variables and init mono
-static void mono_load(t_clr *x)
+static void mono_load(t_clr *x, int argc, t_atom *argv)
 {
 //	const char *file="D:\\Davide\\cygwin\\home\\Davide\\externalTest1.dll";
 	//const char *file="External.dll";
 	
 	MonoMethod *m = NULL, *ctor = NULL, *fail = NULL, *mvalues;
+	MonoClassField *classPointer;
 	gpointer iter;
-	gpointer args [1];
+	gpointer *args;
 	int val;
-	int i;
-
+	int i,j;
+	int params;
+	t_symbol *strsymbol;
+	atom_simple *listparams;
 
 	if (x->loaded == 0)
 	{
@@ -167,7 +170,13 @@ static void mono_load(t_clr *x)
 		return;
 	}
 	x->obj = mono_object_new (x->domain, x->klass);
-	mono_runtime_object_init (x->obj);
+	
+	//mono_runtime_object_init (x->obj);
+
+	if (argc>2)
+		params = argc - 2;
+	else
+		params = 0;
 
 	/* retrieve all the methods we need */
 	iter = NULL;
@@ -185,25 +194,63 @@ static void mono_load(t_clr *x)
 			 * as you see a contrsuctor is a method like any other.
 			 */
 			MonoMethodSignature * sig = mono_method_signature (m);
-			if (mono_signature_get_param_count (sig) == 2) {
+			if (mono_signature_get_param_count (sig) == params) {
 				ctor = m;
 			}
 		}
 	}
-
+	// set the pointer
+	classPointer = 0;
+	classPointer = mono_class_get_field_from_name (x->klass, "x");
+	if (classPointer)
+	{
+		mono_field_set_value (x->obj, classPointer, &x);
+		
+	} else
+	{
+		error("could not find the x field in %s, it is needed!", x->assemblyname->s_name);
+		return;
+	}
 	// call the base functions
 	if (x->setUp)
 	{
-		val = x;
-		args [0] = &val;
-		mono_runtime_invoke (x->setUp, x->obj, args, NULL);
+		mono_runtime_invoke (x->setUp, x->obj, NULL, NULL);
 		post("SetUp() invoked");
-
 	} else
 	{
 		error("clr: the provided assembly is not valid! the SetUp function is missing");
 		return;
 	}
+	// now call the class constructor
+	if (ctor)
+	{
+		args = malloc(sizeof(gpointer)*params);
+		listparams = malloc(sizeof(atom_simple)*params);
+		for (j=2; j<argc; j++)
+		{
+			switch ((argv+j)->a_type)
+			{
+			case A_FLOAT:
+				listparams[j-2].a_type =  A_S_FLOAT;
+				listparams[j-2].float_value = (double) atom_getfloat(argv+j);
+				args[j-2] = &(listparams[j-2].float_value);
+				break;
+			case A_SYMBOL:
+				listparams[j-2].a_type =  A_S_SYMBOL;
+				strsymbol = atom_getsymbol(argv+j);
+				listparams[j-2].string_value = mono_string_new (x->domain, strsymbol->s_name);
+				args[j-2] = listparams[j-2].string_value;
+				break;
+			}
+		}
+		mono_runtime_invoke (ctor, x->obj, args, NULL);
+		free(listparams);
+		free(args);
+	} else
+	{
+		error("%s doesn't have a constructor with %i parameters!",x->assemblyname->s_name, params);
+	}
+
 	// all done without errors
 	x->loaded = 1;
 
@@ -669,7 +716,7 @@ printf(" used did not specified filename, I guess it is %s\n", strtmp);
 	}
 
 	// load mono, init the needed vars
-	mono_load(x);
+	mono_load(x, argc, argv);
 
     return (x);
 }

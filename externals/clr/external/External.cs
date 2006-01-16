@@ -9,15 +9,11 @@ namespace PureData
 		
 		public External()
 		{
-			x = IntPtr.Zero;
 		}
 
 		// this function MUST exist
-		public void SetUp(IntPtr pdClass)
+		public void SetUp()
 		{
-			// you must assign pdclass to x !
-			x = pdClass;
-
 			// now you can do what you like...
 			Console.WriteLine("pointer set!");
 			Console.WriteLine("setting selectors..");

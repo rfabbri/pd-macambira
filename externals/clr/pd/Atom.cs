@@ -18,6 +18,12 @@ namespace PureData
 			this.float_value = f;
 			this.string_value = "float";
 		}
+		public Atom(int i)
+		{
+			this.type = AtomType.Float;
+			this.float_value = (float) i;
+			this.string_value = "float";
+		}
 		public Atom(string s)
 		{
 			this.type = AtomType.Symbol;

@@ -25,7 +25,12 @@ namespace PureData
 		{
 			ToOutlet (x, outlet, atoms.Length, atoms);
 		}
-
+		public static void SendToOutlet (IntPtr x, int outlet, Atom atom)
+		{
+			Atom [] atoms = new Atom[1];
+			atoms[0] = atom;
+			ToOutlet (x, outlet, atoms.Length, atoms);
+		}
 		// create an outlet
 		[MethodImplAttribute (MethodImplOptions.InternalCall)]
 		private extern static void CreateOutlet (IntPtr x, int type);
