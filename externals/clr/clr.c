@@ -141,14 +141,19 @@ static void mono_load(t_clr *x)
 
 	//mono_jit_init (random_name_str);
 	x->domain = mono_domain_get();
-
 	x->assembly = mono_domain_assembly_open (x->domain, x->filename->s_name);
-
 	x->assemblyPureData = mono_domain_assembly_open (x->domain, "PureData.dll");
 
 	if (!x->assembly)
 	{
-		error("clr: assembly not found!");
+		error("clr: file %s not found!", x->filename->s_name);
+		return;
+	}
+
+	if (!x->assemblyPureData)
+	{
+		error("clr: assembly PureData.dll not found! it is necessary!");
+		return;
 	}
 
 	x->image = mono_assembly_get_image (x->assembly);
@@ -158,8 +163,8 @@ static void mono_load(t_clr *x)
 	
 	x->klass = mono_class_from_name (x->image, "PureData", x->assemblyname->s_name);
 	if (!x->klass) {
-		error("Can't find MyType in assembly %s\n", mono_image_get_filename (x->image));
-		//exit (1);
+		error("Can't find %s in assembly %s\n", x->assemblyname->s_name, mono_image_get_filename (x->image));
+		return;
 	}
 	x->obj = mono_object_new (x->domain, x->klass);
 	mono_runtime_object_init (x->obj);
@@ -197,8 +202,10 @@ static void mono_load(t_clr *x)
 	} else
 	{
 		error("clr: the provided assembly is not valid! the SetUp function is missing");
+		return;
 	}
-
+	// all done without errors
+	x->loaded = 1;
 
 }
 
@@ -250,6 +257,11 @@ void clr_free(t_clr *x)
 
 static void clr_bang(t_clr *x) 
 {
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	if (x->manageBang)
 	{
 		mono_runtime_invoke (x->manageBang, x->obj, NULL, NULL);
@@ -262,6 +274,11 @@ static void clr_symbol(t_clr *x, t_symbol *sl)
 	MonoString *strmono;
 	strmono = mono_string_new (x->domain, sl->s_name);
 	args[0] = &strmono;
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	if (x->manageSymbol)
 	{
 		mono_runtime_invoke (x->manageSymbol, x->obj, args, NULL);
@@ -272,6 +289,11 @@ static void clr_float(t_clr *x, float f)
 {
 	gpointer args [1];
 	args [0] = &f;
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	if (x->manageFloat)
 	{
 		mono_runtime_invoke (x->manageFloat, x->obj, args, NULL);
@@ -288,7 +310,11 @@ void clr_manage_list(t_clr *x, t_symbol *sl, int argc, t_atom *argv)
 	int i;
 	// first i extract the first atom which should be a symbol
 post("clr_manage_list, got symbol = %s", sl->s_name);
-
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	for (i=0; i<MAX_SELECTORS; i++)
 	{
 		if (strcmp(x->selectors[i].sel, sl->s_name) == 0)
@@ -405,7 +431,6 @@ void registerMonoMethod(void *x1, MonoString *selectorString, MonoString *method
 
 	if (selectorString->length == 0)
 	{
-printf("selectorString->length == 0");
 		switch (type)
 		{
 		case 1: // float
@@ -459,7 +484,11 @@ void createInlet(void *x1, MonoString *selectorString, int type)
 
     selCstring = mono_string_to_utf8 (selectorString);	
 	x = (t_clr *)x1;
-
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	switch (type)
 	{
 	case 1:
@@ -489,7 +518,11 @@ void createOutlet(void *x1, int type)
 	int i = 0;
 	char typeString[256];
 	x = (t_clr *)x1;
-
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	// public enum ParametersType {None = 0, Float=1, Symbol=2, List=3, Bang=4, Generic=5};
 	switch (type)
 	{
@@ -532,6 +565,11 @@ void out2outlet(void *x1, int outlet, int atoms_length, MonoArray *array)
 	t_atom *lista;
 	atom_simple *atoms;
 	int n;
+	if (x->loaded == 0)
+	{
+		error("assembly not specified");
+		return;
+	}
 	if ((outlet>MAX_OUTLETS) || (outlet<0))
 	{
 		error("outlet number out of range, max is %i", MAX_OUTLETS);
@@ -602,8 +640,6 @@ void *clr_new(t_symbol *s, int argc, t_atom *argv)
 	int i;
 	time_t a;
     t_clr *x = (t_clr *)pd_new(clr_class);
-//	x->l_out = outlet_new(&x->x_obj, &s_list);
-//	x->l_out = outlet_new(&x->x_obj, gensym("float"));
 
 	char strtmp[256];
 	x->manageBang = 0;
@@ -614,21 +650,23 @@ void *clr_new(t_symbol *s, int argc, t_atom *argv)
 	if (argc==0)
 	{
 		x->loaded = 0;
-		error("clr: you must provide an assembly as the first argument");
+		error("clr: you must provide a class name as the first argument");
 		return (x);
 	}
 	x->loaded = 1;
 	x->assemblyname = atom_gensym(argv);
 	
-	if (argc==1)
+	if (argc<2)
 	{
 		// only main class passed
 		// filename by default
 		sprintf(strtmp, "%s.dll", x->assemblyname->s_name);
-		x->filename = atom_gensym(strtmp);
+		x->filename = gensym(strtmp);
+printf(" used did not specified filename, I guess it is %s\n", strtmp);
+	} else
+	{
+		x->filename = atom_gensym(argv+1);
 	}
-
-	x->filename = atom_gensym(argv+1);
 
 	// load mono, init the needed vars
 	mono_load(x);

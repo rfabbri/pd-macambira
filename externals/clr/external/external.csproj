@@ -82,7 +82,7 @@
                 <Reference
                     Name = "PureData"
                     AssemblyName = "PureData"
-                    HintPath = "PureData.dll"
+                    HintPath = "..\PureData.dll"
                 />
             </References>
         </Build>
