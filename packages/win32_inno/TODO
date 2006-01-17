@@ -1,6 +1,4 @@
 
-- make sure vasp is included in noncvs
-
 - check out using env vars in Path settings in registry, or make relative paths
 
 - Another detail is that the menu item "help/1 manual" results in no action -

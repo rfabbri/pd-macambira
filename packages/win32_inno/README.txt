@@ -1,6 +1,6 @@
 
 
-Check this webpage for more build instructions:
+Check this webpage for full build instructions:
 http://puredata.org/docs/developer/mingw
 
 ------------------------------------------------------------------------------
@@ -34,10 +34,8 @@ Microsoft Visual Studio -
 MinGW Makefile
 ------------------------------------------------------------------------------
 
-Since MinGW is the default build system, the file called "Makefile" is the
-MinGW Makefile.  TO compile:
+See: http://puredata.org/docs/developer/windows
 
-cd packages/win32_inno && make
 
 ------------------------------------------------------------------------------
 Microsoft Visual Studio Makefile

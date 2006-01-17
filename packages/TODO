@@ -1,11 +1,5 @@
 
-- make pd-settings.reg and org.puredata.pd.plist have the same libs and same order
-
 - fix patch failures in patch_pd
-
-- make sure PDP is being added
-
-- add pan library
 
 - allow DESTDIR to be a relative path
 
@@ -26,10 +20,6 @@
   		CPU.  In order to do this, a system of optimization flags needs to be
   		developed so that you can specific the target CPU in one place and have
   		everything compile for that CPU.
-
-- add GRIPD for Anders
-
-- mDNS objects!
 
 - make standard targets: distclean (*~, etc.), uninstall instead of install_clean
 

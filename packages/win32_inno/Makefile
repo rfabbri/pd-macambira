@@ -56,7 +56,7 @@ package:  $(PD_INNO_SETUP)
 # makefile.mingw is available from here:
 # http://sourceforge.net/tracker/index.php?func=detail&aid=1374659&group_id=55736&atid=478072
 build_pd:
-	make -C $(pd_src)/src -f makefile.mingw $(DEST_PATHS)
+	make -C $(pd_src)/src -f makefile.mingw
 
 pd_install: build_pd
 # the autoconf/MinGW setup doesn't compile the extras yet
