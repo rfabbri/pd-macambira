@@ -95,7 +95,7 @@ PDDIR=/usr/lib/pd
 
 install:
 	install -d $(PDDIR)/doc/5.reference/pdogg
-	cp help-*.pd ../../doc/5.reference/pdogg
+	cp *-help.pd ../../doc/5.reference/pdogg
 
 clean:
 	rm -f *.o *.pd_* so_locations
