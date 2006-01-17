@@ -100,9 +100,20 @@ CXXFLAGS = $(CFLAGS)
 # ALL
 
 # if your library isn't included here, it won't be built with Pd-extended
-LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pdp pmpd \
+LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb iemabs iemlib \
+iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pmpd \
 sigpack smlib toxy unauthorized vbap zexy
+
+# this is for libraries that don't compile (yet) on all platforms
+ifeq ($(OS_NAME),windows)
+  LIB_TARGETS += 
+else
+  ifeq ($(OS_NAME),darwin)
+    LIB_TARGETS += hid pdp 
+  else
+    LIB_TARGETS += hid pdp pidip
+  endif
+endif
 
 
 all: pre_all_$(OS_NAME) buildsrc $(LIB_TARGETS)
@@ -980,8 +991,10 @@ UNAUTHORIZED_TKFILES = $(wildcard $(externals_src)/unauthorized/*/*.tk)
 %.tk2c: %.tk
 	bash $(externals_src)/unauthorized/tk2c.bash < $*.tk > $*.tk2c
 
-# [cooled~] doesn't compile under MinGW (yet)
-UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-sw-z]*/*.c)
+# [cooled~] doesn't compile under MinGW (yet) and it crashes Pd on Mac OS X,
+# so its excluded from the build here
+UNAUTHORIZED_OBJECTS := $(wildcard $(externals_src)/unauthorized/[a-bd-uw-z]*/*.c) \
+$(wildcard $(externals_src)/unauthorized/c?[a-np-z]*/*.c)
 
 # [vocoder~] is built separately since its made from a number of files
 UNAUTHORIZED_VOCODER = $(wildcard $(externals_src)/unauthorized/vocoder*/*.c)
@@ -1133,6 +1146,9 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
+	@echo " "
+	@echo "Compiling these libs:"
+	@echo "$(LIB_TARGETS)"
 
 
 .PHONY: all install clean distclean test_locations $(LIB_TARGETS) \
