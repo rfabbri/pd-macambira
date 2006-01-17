@@ -1,4 +1,9 @@
 
+- mDNS objects!
+
+- add pan objects to audio basics library
+
+
 - create math library
   - standard constants like Pi, etc.
   - standard math functions
@@ -24,6 +29,7 @@
 
 - create support lib for creating objects in Pd
   - rename blocksize_in_ms to block_size_in_ms
+
 
 ifeel.c
 ------------------------------------------------------------------------
