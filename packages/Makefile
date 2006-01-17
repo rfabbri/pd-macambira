@@ -61,7 +61,7 @@ OSC_VERSION := $(shell grep "define VERSION" $(externals_src)/OSCx/src/OSC.c | \
 	cut -d '"' -f 2)
 
 
-PDP_VERSION := $(shell grep PDP_VERSION= $(externals_src)/pdp/configure | \
+PDP_VERSION := $(shell grep PDP_VERSION= $(externals_src)/pdp/configure.ac | \
 	cut -d '=' -f 2)
 
 

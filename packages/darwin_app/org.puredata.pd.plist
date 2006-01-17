@@ -2,47 +2,58 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>standardpath</key>
-	<string>1</string>
 	<key>loadlib1</key>
 	<string>Gem</string>
 	<key>loadlib2</key>
-	<string>zexy</string>
-	<key>loadlib3</key>
 	<string>cyclone</string>
+	<key>loadlib3</key>
+	<string>zexy</string>
 	<key>loadlib4</key>
-	<string>iemmatrix</string>
+	<string>cxc</string>
 	<key>loadlib5</key>
-	<string>memento</string>
+	<string>ext13</string>
 	<key>loadlib6</key>
-	<string>pixeltango</string>
-	<key>loadlib7</key>
-	<string>pmpd</string>
-	<key>loadlib8</key>
-	<string>rradical</string>
-	<key>loadlib9</key>
-	<string>toxy</string>
-	<key>loadlib10</key>
-	<string>unauthorized</string>
-	<key>loadlib11</key>
-	<string>vasp</string>
-	<key>loadlib12</key>
-	<string>xsample</string>
-	<key>loadlib13</key>
-	<string>markex</string>
-	<key>loadlib14</key>
-	<string>maxlib</string>
-	<key>loadlib15</key>
-	<string>mjlib</string>
-	<key>loadlib16</key>
-	<string>motex</string>
-	<key>loadlib17</key>
 	<string>iemabs</string>
-	<key>loadlib18</key>
+	<key>loadlib7</key>
+	<string>iemmatrix</string>
+	<key>loadlib8</key>
+	<string>markex</string>
+	<key>loadlib9</key>
+	<string>maxlib</string>
+	<key>loadlib10</key>
+	<string>memento</string>
+	<key>loadlib11</key>
+	<string>mjlib</string>
+	<key>loadlib12</key>
+	<string>motex</string>
+	<key>loadlib13</key>
 	<string>oscx</string>
-	<key>loadlib19</key>
-	<string>freeverb</string>
-	<key>loadlib20</key>
+	<key>loadlib14</key>
+	<string>pddp</string>
+	<key>loadlib15</key>
 	<string>pdogg</string>
+	<key>loadlib16</key>
+	<string>pdp</string>
+	<key>loadlib17</key>
+	<string>pidip</string>
+	<key>loadlib18</key>
+	<string>pixeltango</string>
+	<key>loadlib19</key>
+	<string>pmpd</string>
+	<key>loadlib20</key>
+	<string>rradical</string>
+	<key>loadlib21</key>
+	<string>sigpack</string>
+	<key>loadlib22</key>
+	<string>smlib</string>
+	<key>loadlib23</key>
+	<string>toxy</string>
+	<key>loadlib24</key>
+	<string>unauthorized</string>
+	<key>loadlib25</key>
+	<string>vbap</string>
+	<key>loadlib26</key>
+	<string>xsample</string>
 </dict>
-</plist>
+ </plist>
+
