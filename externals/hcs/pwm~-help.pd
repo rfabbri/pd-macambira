@@ -1,0 +1,29 @@
+#N canvas 218 225 905 389 10;
+#N canvas 0 22 450 300 graph1 0;
+#X array array99 100 float 0;
+#X coords 0 1.1 100 -0.1 200 100 1;
+#X restore 67 250 graph;
+#X obj 92 183 metro 500;
+#X obj 92 158 r metro;
+#X text 344 90 <-- Click to start;
+#X text 233 209 <-- graph the output;
+#X text 311 301 see also:;
+#X obj 76 207 tabwrite~ array99;
+#X obj 255 48 tgl 25 0 empty empty start 0 -6 1 9 -24198 -1 -1 1 1
+;
+#X msg 255 76 \; pd dsp \$1 \; metro \$1;
+#X obj 385 301 pwm;
+#X obj 79 98 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 34 98 5 0 0 0 - - -;
+#X obj 76 127 pwm~ 4410;
+#X obj 36 11 pwm~;
+#X text 79 10 after an idea from Roman Haefeli;
+#X text 158 126 argument = pwm rate in Hz;
+#X connect 1 0 6 0;
+#X connect 2 0 1 0;
+#X connect 2 0 1 0;
+#X connect 7 0 8 0;
+#X connect 10 0 11 0;
+#X connect 10 0 12 0;
+#X connect 12 0 6 0;
