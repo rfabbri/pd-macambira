@@ -35,12 +35,12 @@ distclean: clean
 	-rm -Rf autom4te.cache autoscan.log configure.scan
 
 .c.o:
-	$(CC) -c -o $@ $(CFLAGS) -DPD $*.c
+	$(CC) -c -o $@ $(CFLAGS) $(INCLUDE) -DPD $*.c
 
 # cp $@ $*_stat.o
 
 .o.$(EXT):
-	$(CC) -o $@ $(PDCFLAGS) -DPD $*.o
+	$(CC) -o $@ $(PDCFLAGS) $(INCLUDE) -DPD $*.o
 
 
 install::

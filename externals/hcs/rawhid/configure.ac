@@ -8,7 +8,7 @@ dnl the obligatory license
 AC_COPYRIGHT([2003 Hans-Christoph Steiner <hans@eds.org> GNU GPL 2.0 or higher])
 
 dnl get cvs revision
-AC_REVISION($Revision: 1.1 $)
+AC_REVISION($Revision: 1.2 $)
 
 dnl check and make sure the source files are actually there
 AC_CONFIG_SRCDIR([rawjoystick.c])
@@ -40,7 +40,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
 
-LD=ld
+#LD=ld
 
 dnl
 dnl  OK, checks for machines are here now
@@ -64,9 +64,9 @@ then
   CFLAGS="-O2"
   DEFS="-DUNIX -DMACOSX"
   EXT=pd_darwin
-  INCLUDE="-I../../../pd/src -I. -I/usr/local/include"
+  INCLUDE="-I../../../pd/src -I. -I/sw/include"
   LD=cc
-  LFLAGS="-bundle -undefined suppress -flat_namespace"
+  LFLAGS="-bundle -bundle_loader ../../../pd/bin/pd -flat_namespace"
   STRIPFLAGS=
 fi
 

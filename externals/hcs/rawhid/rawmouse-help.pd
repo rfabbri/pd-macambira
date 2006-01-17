@@ -1,0 +1,107 @@
+#N canvas 108 63 748 404 10;
+#X msg 95 34 start;
+#X msg 110 65 stop;
+#X floatatom 226 177 2 0 0 3 button# - -;
+#X floatatom 277 176 2 0 0 3 button_value - -;
+#X floatatom 176 177 6 0 0 3 y-axis - -;
+#X floatatom 128 177 6 0 0 3 x-axis - -;
+#X obj 226 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 244 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 262 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 280 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 298 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 317 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 335 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 608 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 590 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 572 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 554 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 535 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 517 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 499 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 481 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 462 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 444 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 426 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 408 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 390 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 371 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 353 305 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+-1;
+#X obj 247 213 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 181 44 read;
+#X msg 262 54 close;
+#X msg 263 27 open;
+#X text 319 28 [rawjoystick]'s timer defaults to 5 ms. You can change
+it with the [delay( message:;
+#X msg 353 58 delay 20;
+#X obj 226 239 pack f f;
+#X obj 226 259 route 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
+19 20 21;
+#X obj 648 306 bng 35 250 50 0 empty empty empty 0 -6 0 8 -162590 -1
+-1;
+#X obj 192 143 rawmouse;
+#X msg 353 86 absolute;
+#X msg 353 107 relative;
+#X connect 0 0 37 0;
+#X connect 1 0 37 0;
+#X connect 2 0 34 0;
+#X connect 3 0 28 0;
+#X connect 3 0 34 1;
+#X connect 28 0 2 0;
+#X connect 29 0 37 0;
+#X connect 30 0 37 0;
+#X connect 31 0 37 0;
+#X connect 33 0 37 0;
+#X connect 34 0 35 0;
+#X connect 35 0 6 0;
+#X connect 35 1 7 0;
+#X connect 35 2 8 0;
+#X connect 35 3 9 0;
+#X connect 35 4 10 0;
+#X connect 35 5 11 0;
+#X connect 35 6 12 0;
+#X connect 35 7 27 0;
+#X connect 35 8 26 0;
+#X connect 35 9 25 0;
+#X connect 35 10 24 0;
+#X connect 35 11 23 0;
+#X connect 35 12 22 0;
+#X connect 35 13 21 0;
+#X connect 35 14 20 0;
+#X connect 35 15 19 0;
+#X connect 35 16 18 0;
+#X connect 35 17 17 0;
+#X connect 35 18 16 0;
+#X connect 35 19 15 0;
+#X connect 35 20 14 0;
+#X connect 35 21 13 0;
+#X connect 35 22 36 0;
+#X connect 37 0 5 0;
+#X connect 37 1 4 0;
+#X connect 37 2 2 0;
+#X connect 37 3 3 0;
+#X connect 38 0 37 0;
+#X connect 39 0 37 0;
