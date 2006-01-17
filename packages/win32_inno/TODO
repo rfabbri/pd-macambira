@@ -1,12 +1,12 @@
 
-- check out using env vars in Path settings in registry, or make relative paths
+- check out using env vars in Path settings in registry, or make relative
+  paths (I checked, you can't use env vars in the path or loadlib
+  settings... arg, this should be implemented)
 
-- Another detail is that the menu item "help/1 manual" results in no action -
-  possibly some link pointing to the wrong place?  It turns out that the
-  rundll "open" thingy isn't working...
-      - make Pd.exe using MSYS's "start.exe" like MacOSX's "open"
-      - menu_openhtml on Win32 with rundll should be able to open other
-        filetypes like open on MACOSX.
+
+- Another detail is that help browser can't open files if there is a space in
+  the path or filename.  I think its a problem of Tcl escaping.  The problem
+  is in u_main.tk in menu_openhtml on Win32 with rundll32 dll.url.FileHandler
 
 
 - get Windows Makefiles for Gem

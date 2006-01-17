@@ -1,59 +1,6 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Pd]
-
-;;
-;; blow away all lib settings to prevent conflicts, wrong order, etc.
-"loadlib1"=-
-"loadlib2"=-
-"loadlib3"=-
-"loadlib4"=-
-"loadlib5"=-
-"loadlib6"=-
-"loadlib7"=-
-"loadlib8"=-
-"loadlib9"=-
-"loadlib10"=-
-"loadlib11"=-
-"loadlib12"=-
-"loadlib13"=-
-"loadlib14"=-
-"loadlib15"=-
-"loadlib16"=-
-"loadlib17"=-
-"loadlib18"=-
-"loadlib19"=-
-"loadlib20"=-
-"loadlib21"=-
-"loadlib22"=-
-"loadlib23"=-
-"loadlib24"=-
-"loadlib25"=-
-"loadlib26"=-
-"loadlib27"=-
-"loadlib28"=-
-"loadlib29"=-
-"loadlib30"=-
-"loadlib31"=-
-"loadlib32"=-
-"loadlib33"=-
-"loadlib34"=-
-"loadlib35"=-
-"loadlib36"=-
-"loadlib37"=-
-"loadlib38"=-
-"loadlib39"=-
-"loadlib40"=-
-"loadlib41"=-
-"loadlib42"=-
-"loadlib43"=-
-"loadlib44"=-
-"loadlib45"=-
-"loadlib46"=-
-"loadlib47"=-
-"loadlib48"=-
-"loadlib49"=-
-
 ;;
 ;; load libs included with Pd-extended
 "loadlib1"="Gem"
@@ -82,6 +29,32 @@ Windows Registry Editor Version 5.00
 "loadlib24"="unauthorized"
 "loadlib25"="vbap"
 "loadlib26"="xsample"
+
+;;
+;; blow away other lib settings to prevent conflicts, wrong order, etc.
+"loadlib27"=-
+"loadlib28"=-
+"loadlib29"=-
+"loadlib30"=-
+"loadlib31"=-
+"loadlib32"=-
+"loadlib33"=-
+"loadlib34"=-
+"loadlib35"=-
+"loadlib36"=-
+"loadlib37"=-
+"loadlib38"=-
+"loadlib39"=-
+"loadlib40"=-
+"loadlib41"=-
+"loadlib42"=-
+"loadlib43"=-
+"loadlib44"=-
+"loadlib45"=-
+"loadlib46"=-
+"loadlib47"=-
+"loadlib48"=-
+"loadlib49"=-
 
 ;;
 ;; blow away all path settings to prevent conflicts, wrong order, etc.
