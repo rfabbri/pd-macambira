@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-// ------------------------ sp.chop~ -----------------------------
+// ------------------------ chop~ -----------------------------
 // signal chopping modulator
 
 static t_class *chop_tilde_class;
@@ -60,7 +60,7 @@ static void chop_tilde_dsp(t_chop_tilde *x, t_signal **sp)
 
 void chop_tilde_setup(void)
 {
-    chop_tilde_class = class_new(gensym("sp.chop~"), (t_newmethod)chop_tilde_new, 0,
+    chop_tilde_class = class_new(gensym("chop~"), (t_newmethod)chop_tilde_new, 0,
     	sizeof(t_chop_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(chop_tilde_class, t_chop_tilde, x_f);
     class_addmethod(chop_tilde_class, (t_method)chop_tilde_dsp, gensym("dsp"), 0);

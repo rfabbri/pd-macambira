@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.round~ ----------------------------- */
+/* ------------------------ round~ ----------------------------- */
 /* simple rounder */
 
 static t_class *round_tilde_class;
@@ -57,7 +57,7 @@ static void round_tilde_dsp(t_round_tilde *x, t_signal **sp)
 
 void round_tilde_setup(void)
 {
-    round_tilde_class = class_new(gensym("sp.round~"), (t_newmethod)round_tilde_new, 0,
+    round_tilde_class = class_new(gensym("round~"), (t_newmethod)round_tilde_new, 0,
     	sizeof(t_round_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(round_tilde_class, t_round_tilde, x_f);
     class_addmethod(round_tilde_class, (t_method)round_tilde_dsp, gensym("dsp"), 0);

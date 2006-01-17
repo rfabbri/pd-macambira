@@ -10,7 +10,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.diode~ ----------------------------- */
+/* ------------------------ diode~ ----------------------------- */
 /* Mangles the signal as if it had been passed through a diode rectifier network.*/
 /* code from swh_plugins by steve harris www.plugin.org.uk */
 
@@ -71,7 +71,7 @@ static void diode_tilde_dsp(t_diode_tilde *x, t_signal **sp)
 
 void diode_tilde_setup(void)
 {
-    diode_tilde_class = class_new(gensym("sp.diode~"), (t_newmethod)diode_tilde_new, 0,
+    diode_tilde_class = class_new(gensym("diode~"), (t_newmethod)diode_tilde_new, 0,
     	sizeof(t_diode_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(diode_tilde_class, t_diode_tilde, x_f);
     class_addmethod(diode_tilde_class, (t_method)diode_tilde_dsp, gensym("dsp"), 0);

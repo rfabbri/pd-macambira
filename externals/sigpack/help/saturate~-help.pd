@@ -18,9 +18,9 @@
 #X text 263 264 sIgpAck 0.02;
 #X text 60 50 if signal is above threshold;
 #X text 60 65 a soft saturation is added;
-#X obj 61 193 sp.saturate~ 0.5;
+#X obj 61 193 saturate~ 0.5;
 #X text 223 278 2003 www.weiss-archiv.de;
-#X text 60 13 ---sp.saturate~---;
+#X text 60 13 ---saturate~---;
 #X connect 1 0 4 0;
 #X connect 1 0 6 0;
 #X connect 2 0 4 0;

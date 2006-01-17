@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.split~ ----------------------------- */
+/* ------------------------ split~ ----------------------------- */
 /* signal splitter */
 
 static t_class *split_tilde_class;
@@ -65,7 +65,7 @@ static void split_tilde_dsp(t_split_tilde *x, t_signal **sp)
 
 void split_tilde_setup(void)
 {
-    split_tilde_class = class_new(gensym("sp.split~"), (t_newmethod)split_tilde_new, 0,
+    split_tilde_class = class_new(gensym("split~"), (t_newmethod)split_tilde_new, 0,
     	sizeof(t_split_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(split_tilde_class, t_split_tilde, x_f);
     class_addmethod(split_tilde_class, (t_method)split_tilde_dsp, gensym("dsp"), 0);

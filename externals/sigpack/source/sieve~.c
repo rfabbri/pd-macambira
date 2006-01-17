@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.sieve~ ----------------------------- */
+/* ------------------------ sieve~ ----------------------------- */
 /* sift samples */
 
 static t_class *sieve_tilde_class;
@@ -98,7 +98,7 @@ static void sieve_tilde_dsp(t_sieve_tilde *x, t_signal **sp)
 
 void sieve_tilde_setup(void)
 {
-    sieve_tilde_class = class_new(gensym("sp.sieve~"), (t_newmethod)sieve_tilde_new, 0,
+    sieve_tilde_class = class_new(gensym("sieve~"), (t_newmethod)sieve_tilde_new, 0,
     	sizeof(t_sieve_tilde), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(sieve_tilde_class, t_sieve_tilde, x_f);
     class_addmethod(sieve_tilde_class, (t_method)sieve_tilde_dsp, gensym("dsp"), 0);

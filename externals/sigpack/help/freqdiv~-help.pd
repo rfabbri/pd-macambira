@@ -16,9 +16,9 @@
 #X obj 62 78 osc~ 4;
 #X text 220 157 [(int)0-8];
 #X text 293 239 sIgpAck 0.02;
-#X obj 62 168 sp.freqdiv~ 1;
+#X obj 62 168 freqdiv~ 1;
 #X text 254 254 2003 www.weiss-archiv.de;
-#X text 60 13 ---sp.freqdiv~---;
+#X text 60 13 ---freqdiv~---;
 #X connect 1 0 3 0;
 #X connect 1 0 4 0;
 #X connect 5 0 11 1;

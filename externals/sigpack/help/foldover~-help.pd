@@ -18,9 +18,9 @@
 #X text 60 35 foldover distortion;
 #X text 294 12 arg<amp><sym>;
 #X text 262 240 sIgpAck 0.02;
-#X obj 62 168 sp.foldover~ 0 0;
+#X obj 62 168 foldover~ 0 0;
 #X text 223 254 2003 www.weiss-archiv.de;
-#X text 60 13 ---sp.foldover~---;
+#X text 60 13 ---foldover~---;
 #X connect 1 0 4 0;
 #X connect 1 0 7 0;
 #X connect 2 0 4 0;

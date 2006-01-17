@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.foldover~ ----------------------------- */
+/* ------------------------ foldover~ ----------------------------- */
 /* foldover distortion */
 /* code from swh_plugins by steve harris www.plugin.org.uk */
 
@@ -64,7 +64,7 @@ static void foldover_tilde_dsp(t_foldover_tilde *x, t_signal **sp)
 
 void foldover_tilde_setup(void)
 {
-    foldover_tilde_class = class_new(gensym("sp.foldover~"), (t_newmethod)foldover_tilde_new, 0,
+    foldover_tilde_class = class_new(gensym("foldover~"), (t_newmethod)foldover_tilde_new, 0,
     	sizeof(t_foldover_tilde), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(foldover_tilde_class, t_foldover_tilde, x_f);
     class_addmethod(foldover_tilde_class, (t_method)foldover_tilde_dsp, gensym("dsp"), 0);

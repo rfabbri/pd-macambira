@@ -12,12 +12,12 @@
 #X obj 72 105 tabwrite~ osc;
 #X floatatom 145 146 5 0 0 2 coarse - -;
 #X obj 62 201 tabwrite~ round;
-#X text 60 13 ---sp.round~---;
+#X text 60 13 ---round~---;
 #X text 60 35 simple rounder;
 #X text 262 240 sIgpAck 0.03;
 #X text 223 254 2005 www.weiss-archiv.de;
 #X text 312 12 arg<coarse>;
-#X obj 62 168 sp.round~ 2;
+#X obj 62 168 round~ 2;
 #X connect 1 0 4 0;
 #X connect 1 0 6 0;
 #X connect 2 0 4 0;

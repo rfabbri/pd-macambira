@@ -9,10 +9,10 @@
 #X coords 0 1 44099 -1 100 70 1;
 #X restore 337 75 graph;
 #X obj 72 105 tabwrite~ osc;
-#X text 60 13 ---sp.freqshift~---;
+#X text 60 13 ---freqshift~---;
 #X text 60 35 bode frequency shifter;
 #X text 315 12 arg<shift>;
-#X obj 62 168 sp.freqshift~ 100;
+#X obj 62 168 freqshift~ 100;
 #X obj 62 78 osc~ 110;
 #X text 287 334 sIgpAck 0.03;
 #X text 248 349 2005 www.weiss-archiv.de;

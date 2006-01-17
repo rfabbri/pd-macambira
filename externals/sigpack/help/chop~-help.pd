@@ -17,9 +17,9 @@
 #X obj 99 146 osc~ 2;
 #X text 300 11 arg<factor>;
 #X text 252 301 sIgpAck 0.02;
-#X obj 62 186 sp.chop~ 0;
+#X obj 62 186 chop~ 0;
 #X text 213 316 2003 www.weiss-archiv.de;
-#X text 60 13 ---sp.chop~---;
+#X text 60 13 ---chop~---;
 #X connect 0 0 16 2;
 #X connect 2 0 16 0;
 #X connect 4 0 8 0;

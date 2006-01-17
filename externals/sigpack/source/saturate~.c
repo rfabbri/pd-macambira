@@ -10,7 +10,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.saturate~ ----------------------------- */
+/* ------------------------ saturate~ ----------------------------- */
 /* signal soft saturation */
 /* code from www.musicdsp.org posted by bram de jong */
 
@@ -75,7 +75,7 @@ static void saturate_tilde_dsp(t_saturate_tilde *x, t_signal **sp)
 
 void saturate_tilde_setup(void)
 {
-    saturate_tilde_class = class_new(gensym("sp.saturate~"), (t_newmethod)saturate_tilde_new, 0,
+    saturate_tilde_class = class_new(gensym("saturate~"), (t_newmethod)saturate_tilde_new, 0,
     	sizeof(t_saturate_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(saturate_tilde_class, t_saturate_tilde, x_f);
     class_addmethod(saturate_tilde_class, (t_method)saturate_tilde_dsp, gensym("dsp"), 0);

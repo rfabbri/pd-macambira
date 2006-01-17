@@ -10,9 +10,9 @@
 #X coords 0 1 44099 -1 100 70 1;
 #X restore 306 75 graph;
 #X obj 72 105 tabwrite~ osc;
-#X text 60 13 ---sp.diode~---;
+#X text 60 13 ---diode~---;
 #X obj 62 201 tabwrite~ diode;
-#X obj 62 168 sp.diode~ 0;
+#X obj 62 168 diode~ 0;
 #X floatatom 145 147 5 0 2 2 mode[0-2] - -;
 #X text 294 12 arg<mode>;
 #X text 60 35 diode rectifier network;

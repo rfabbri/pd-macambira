@@ -11,7 +11,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-/* ------------------------ sp.freqshift~ ----------------------------- */
+/* ------------------------ freqshift~ ----------------------------- */
 /* frequency shifter */
 /* code from swh_plugins by steve harris www.plugins.org.uk */
 
@@ -190,7 +190,7 @@ static void freqshift_tilde_free(t_freqshift_tilde *x)
 
 void freqshift_tilde_setup(void)
 {
-    freqshift_tilde_class = class_new(gensym("sp.freqshift~"), (t_newmethod)freqshift_tilde_new, (t_method)freqshift_tilde_free,
+    freqshift_tilde_class = class_new(gensym("freqshift~"), (t_newmethod)freqshift_tilde_new, (t_method)freqshift_tilde_free,
     	sizeof(t_freqshift_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(freqshift_tilde_class, t_freqshift_tilde, x_f);
     class_addmethod(freqshift_tilde_class, (t_method)freqshift_tilde_dsp, gensym("dsp"), 0);

@@ -11,9 +11,9 @@
 #X text 60 35 signal split function;
 #X text 164 209 sIgpAck 0.01;
 #X text 224 13 arg<value>;
-#X obj 109 120 sp.split~ 0.5;
+#X obj 109 120 split~ 0.5;
 #X text 124 224 2002 www.weiss-archiv.de;
-#X text 60 13 ---sp.split~---;
+#X text 60 13 ---split~---;
 #X connect 0 0 12 1;
 #X connect 1 0 12 0;
 #X connect 2 0 1 0;

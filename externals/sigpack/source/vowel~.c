@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.vowel~ ----------------------------- */
+/* ------------------------ vowel~ ----------------------------- */
 /* simple formant filter */
 /* code from musicdsp.org posted by alex@smartelectronix.com */
 
@@ -110,7 +110,7 @@ static void vowel_tilde_dsp(t_vowel_tilde *x, t_signal **sp)
 
 void vowel_tilde_setup(void)
 {
-    vowel_tilde_class = class_new(gensym("sp.vowel~"), (t_newmethod)vowel_tilde_new, 0,
+    vowel_tilde_class = class_new(gensym("vowel~"), (t_newmethod)vowel_tilde_new, 0,
     	sizeof(t_vowel_tilde), 0, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(vowel_tilde_class, t_vowel_tilde, x_f);
     class_addmethod(vowel_tilde_class, (t_method)vowel_tilde_dsp, gensym("dsp"), 0);

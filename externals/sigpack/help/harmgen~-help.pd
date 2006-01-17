@@ -34,9 +34,9 @@
 #X text 280 256 ->mag7[-1/1];
 #X text 305 276 ->mag8[-1/1];
 #X text 327 297 ->mag9[-1/1];
-#X obj 62 342 sp.harmgen~ 0 0 0 0 0 0 0 0 0 0;
+#X obj 62 342 harmgen~ 0 0 0 0 0 0 0 0 0 0;
 #X text 298 372 2003 www.weiss-archiv.de;
-#X text 60 13 ---sp.harmgen~---;
+#X text 60 13 ---harmgen~---;
 #X connect 1 0 4 0;
 #X connect 1 0 8 0;
 #X connect 2 0 4 0;

@@ -15,8 +15,8 @@
 #X text 262 240 sIgpAck 0.03;
 #X text 223 254 2005 www.weiss-archiv.de;
 #X obj 62 201 tabwrite~ sieve;
-#X obj 62 168 sp.sieve~ 0 0.5;
-#X text 60 13 ---sp.sieve~---;
+#X obj 62 168 sieve~ 0 0.5;
+#X text 60 13 ---sieve~---;
 #X text 60 35 simple sample sifter;
 #X text 294 12 arg<mode><samp>;
 #X connect 1 0 4 0;

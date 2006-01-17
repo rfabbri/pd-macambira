@@ -17,9 +17,9 @@
 #X text 334 213 -1;
 #X obj 62 201 tabwrite~ rect;
 #X text 208 237 sIgpAck 0.01;
-#X obj 62 165 sp.rectify~;
+#X obj 62 165 rectify~;
 #X text 166 250 2002 www.weiss-archiv.de;
-#X text 60 13 ---sp.rectify~---;
+#X text 60 13 ---rectify~---;
 #X connect 1 0 3 0;
 #X connect 1 0 10 0;
 #X connect 2 0 3 0;

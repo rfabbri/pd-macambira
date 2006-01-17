@@ -9,7 +9,7 @@
 #pragma warning( disable : 4305 )
 #endif
 
-/* ------------------------ sp.ustep~ ----------------------------- */
+/* ------------------------ ustep~ ----------------------------- */
 /* signal unity step function */
 
 static t_class *ustep_tilde_class;
@@ -76,7 +76,7 @@ static void ustep_tilde_dsp(t_ustep_tilde *x, t_signal **sp)
 
 void ustep_tilde_setup(void)
 {
-    ustep_tilde_class = class_new(gensym("sp.ustep~"), (t_newmethod)ustep_tilde_new, 0,
+    ustep_tilde_class = class_new(gensym("ustep~"), (t_newmethod)ustep_tilde_new, 0,
     	sizeof(t_ustep_tilde), 0, A_DEFFLOAT, A_DEFFLOAT, 0);
     CLASS_MAINSIGNALIN(ustep_tilde_class, t_ustep_tilde, x_f);
     class_addmethod(ustep_tilde_class, (t_method)ustep_tilde_dsp, gensym("dsp"), 0);

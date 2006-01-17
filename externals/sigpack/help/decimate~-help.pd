@@ -20,9 +20,9 @@
 #X text 273 11 arg<ratio><bits>;
 #X text 51 67 of orig. samplerate etc.;
 #X text 260 268 sIgpAck 0.02;
-#X obj 52 195 sp.decimate~ 0.5 16;
+#X obj 52 195 decimate~ 0.5 16;
 #X text 222 281 2003 www.weiss-archiv.de;
-#X text 51 13 ---sp.decimate~---;
+#X text 51 13 ---decimate~---;
 #X connect 1 0 4 0;
 #X connect 1 0 7 0;
 #X connect 2 0 4 0;
