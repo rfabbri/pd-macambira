@@ -1,4 +1,30 @@
 
+- create math library
+  - standard constants like Pi, etc.
+  - standard math functions
+
+- create networking library
+  - socket objects
+  - multicast DNS objects
+
+- create mapping library
+  - move [hid] toolkit objects into mapping lib
+
+- create sensors library
+  - objects for smoothing sensor data
+
+- create i/o library
+  - add hid, comport, platform-specific hid, libusb, midi
+  - perhaps specific objects for sensorboxs like the arduino, multio, etc
+
+- create standard gui objects lib (what's the name?)
+  - dsp
+  - pan
+  - amp
+
+- create support lib for creating objects in Pd
+  - rename blocksize_in_ms to block_size_in_ms
+
 ifeel.c
 ------------------------------------------------------------------------
 - make default device be /dev/input/ifeel0 when there are no arguments
