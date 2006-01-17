@@ -25,6 +25,7 @@
 
 #include "m_pd.h"
 #include <stdio.h>
+#include <math.h>
 static t_class *beatpipe_class;
 
 
