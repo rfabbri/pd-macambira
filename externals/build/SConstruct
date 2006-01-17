@@ -22,12 +22,11 @@ elif env['PLATFORM'] == 'posix':
     env['SHLIBSUFFIX']='.pd_linux'
 
 #remove one-off externals that are also in cyclone
-print os.popen("""cd src && test -f prepend.c && rm urn.* match.* prepend.* sinh.c delta~.c reson~.c abs~.c svf~.c matrix~.c atan2~.c avg~.c pmpd.c && echo "poof...no more conflicting externals..!!" """).read()
+print os.popen("""cd src && rm urn.* match.* sinh.c delta~.c reson~.c abs~.c svf~.c matrix~.c atan2~.c avg~.c pmpd.c && echo "poof...no more conflicting externals..!!" """).read()
 
 # C sources in src/
 for extra in glob.glob('src/*.c'):
     name = re.sub("\.c$","",os.path.basename(extra))
-    print name,
     external = env.SharedLibrary(name,'src/'+name+'.c')
     env.Alias('install', env.Install(os.path.join(prefix, 'extra'), external))
     Default(external)
