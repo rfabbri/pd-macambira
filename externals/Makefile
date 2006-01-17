@@ -42,17 +42,11 @@ OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src \
-	-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W
 LDFLAGS =  
 LIBS = -lm
 
-# turn on weak linking and dlopen support
-MACOSX_DEPLOYMENT_TARGET = 10.3
-
 ifeq ($(OS_NAME),darwin)
-  CC = MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) gcc
-  CXX = MACOSX_DEPLOYMENT_TARGET=$(MACOSX_DEPLOYMENT_TARGET) g++
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
   LIBS += -lc
@@ -107,7 +101,7 @@ CXXFLAGS = $(CFLAGS)
 
 # if your library isn't included here, it won't be built with Pd-extended
 LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hid iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pdp pidip pmpd \
+iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pdp pmpd \
 sigpack smlib toxy unauthorized vbap zexy
 
 
@@ -153,7 +147,6 @@ buildsrc_install: $(helpdir) $(objectsdir)
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
 	install -p \
-			$(externals_src)/OSCx/doc/*.pd \
 			$(externals_src)/aenv~/*.pd \
 			$(externals_src)/arraysize/*.pd \
 			$(externals_src)/beatpipe/*.pd \
@@ -688,12 +681,19 @@ $(externals_src)/OSCx/libOSC/Makefile: $(externals_src)/OSCx/libOSC/Makefile.in
 $(externals_src)/OSCx/src/Makefile: $(externals_src)/OSCx/src/Makefile.in
 	cd $(externals_src)/OSCx && ./configure
 
-$(externals_src)/OSCx/src/OSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
+$(externals_src)/OSCx/src/OSCroute.$(EXTENSION):  $(externals_src)/OSCx/configure \
+$(externals_src)/OSCx/Makefile
+	make -C $(externals_src)/OSCx
+$(externals_src)/OSCx/src/dumpOSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
+$(externals_src)/OSCx/Makefile
+	make -C $(externals_src)/OSCx
+$(externals_src)/OSCx/src/sendOSC.$(EXTENSION):  $(externals_src)/OSCx/configure \
 $(externals_src)/OSCx/Makefile
 	make -C $(externals_src)/OSCx
 
-oscx: $(externals_src)/OSCx/src/OSC.$(EXTENSION)
-
+oscx: $(externals_src)/OSCx/src/OSCroute.$(EXTENSION) \
+$(externals_src)/OSCx/src/dumpOSC.$(EXTENSION) \
+$(externals_src)/OSCx/src/sendOSC.$(EXTENSION)
 
 oscx_install: oscx
 	install -d $(objectsdir)/$(OSCX_NAME)
