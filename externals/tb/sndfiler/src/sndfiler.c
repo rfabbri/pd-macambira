@@ -129,7 +129,7 @@ typedef struct _sfprocess
 typedef struct _sfqueue
 {
     t_fifo* x_jobs;
-    sem_t sem;
+    sem_t* sem;
 } t_sfqueue;
 
 typedef struct _syncdata
@@ -154,11 +154,11 @@ static t_sndfiler *sndfiler_new(void)
 /* global soundfiler thread ... sleeping until signaled */
 static void sndfiler_thread(void)
 {
-    while (1)
+    for(;;)
     {
         t_sfprocess * me;
-        sem_wait(&sndfiler_queue.sem);
-        
+        sem_wait(sndfiler_queue.sem);
+
         while (me = (t_sfprocess *)fifo_get(sndfiler_queue.x_jobs))
         {
             (me->process)(me->x, me->argc, me->argv);
@@ -178,8 +178,17 @@ static void sndfiler_start_thread(void)
 
     //initialize queue
     sndfiler_queue.x_jobs = fifo_init();
-    sem_init (&sndfiler_queue.sem,0,0);
-    
+#ifdef __APPLE__
+	sndfiler_queue.sem = sem_open("sndfilerthread",O_CREAT|O_EXCL,0,0);
+    if(sndfiler_queue.sem == SEM_FAILED)
+        error("Couldn't create sndfiler semaphore: %i",errno);
+#else
+	sndfiler_queue.sem = (sem_t *)getbytes(sizeof(sem_t));
+	status = sem_init(sndfiler_queue.sem,0,0);
+    if(status != 0)
+        error("Couldn't create sndfiler semaphore: %i",status);
+#endif
+	
     // initialize thread
     pthread_attr_init(&sf_attr);
     
@@ -224,7 +233,7 @@ static void sndfiler_read(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    sem_post(&sndfiler_queue.sem);
+    sem_post(sndfiler_queue.sem);
 }
 
 static t_int sndfiler_synchonize(t_int * w);
@@ -459,7 +468,7 @@ static void sndfiler_resize(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    sem_post(&sndfiler_queue.sem);
+    sem_post(sndfiler_queue.sem);
 }
 
 static void sndfiler_t_resize(t_sndfiler *y, int argc, t_atom *argv)
