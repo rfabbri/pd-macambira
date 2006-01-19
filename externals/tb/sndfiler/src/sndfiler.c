@@ -44,6 +44,7 @@ struct _garray
 
 #include "m_pd.h"
 #include "m_fifo.h"
+
 #include "pthread.h"
 #include "semaphore.h"
 
@@ -68,6 +69,18 @@ struct _garray
 #include <sys/mman.h>
 #endif /* _POSIX_MEMLOCK */
 
+#ifdef __APPLE__
+#include <mach/semaphore.h>
+#define SEM_T semaphore_t
+#define SEM_INIT(s) (semaphore_create(mach_task_self(),&s,SYNC_POLICY_FIFO,0) == 0)
+#define SEM_SIGNAL(s) semaphore_signal(s)
+#define SEM_WAIT(s) semaphore_wait(s)
+#else
+#define SEM_T sem_t
+#define SEM_INIT(s) (sem_init(&s,0,0) == 0)
+#define SEM_SIGNAL(s) sem_post(&s)
+#define SEM_WAIT(s) sem_wait(&s)
+#endif
 
 /************ forward declarations **************/
 
@@ -129,7 +142,7 @@ typedef struct _sfprocess
 typedef struct _sfqueue
 {
     t_fifo* x_jobs;
-    sem_t* sem;
+    SEM_T sem;
 } t_sfqueue;
 
 typedef struct _syncdata
@@ -157,7 +170,7 @@ static void sndfiler_thread(void)
     for(;;)
     {
         t_sfprocess * me;
-        sem_wait(sndfiler_queue.sem);
+        SEM_WAIT(sndfiler_queue.sem);
 
         while (me = (t_sfprocess *)fifo_get(sndfiler_queue.x_jobs))
         {
@@ -178,16 +191,10 @@ static void sndfiler_start_thread(void)
 
     //initialize queue
     sndfiler_queue.x_jobs = fifo_init();
-#ifdef __APPLE__
-	sndfiler_queue.sem = sem_open("sndfilerthread",O_CREAT|O_EXCL,0,0);
-    if(sndfiler_queue.sem == SEM_FAILED)
-        error("Couldn't create sndfiler semaphore: %i",errno);
-#else
-	sndfiler_queue.sem = (sem_t *)getbytes(sizeof(sem_t));
-	status = sem_init(sndfiler_queue.sem,0,0);
-    if(status != 0)
+
+	status = SEM_INIT(sndfiler_queue.sem);
+    if(!status)
         error("Couldn't create sndfiler semaphore: %i",status);
-#endif
 	
     // initialize thread
     pthread_attr_init(&sf_attr);
@@ -233,7 +240,7 @@ static void sndfiler_read(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    sem_post(sndfiler_queue.sem);
+    SEM_SIGNAL(sndfiler_queue.sem);
 }
 
 static t_int sndfiler_synchonize(t_int * w);
@@ -468,7 +475,7 @@ static void sndfiler_resize(t_sndfiler * x, t_symbol *s, int argc, t_atom* argv)
 
     fifo_put(sndfiler_queue.x_jobs, process);
 
-    sem_post(sndfiler_queue.sem);
+    SEM_SIGNAL(sndfiler_queue.sem);
 }
 
 static void sndfiler_t_resize(t_sndfiler *y, int argc, t_atom *argv)
