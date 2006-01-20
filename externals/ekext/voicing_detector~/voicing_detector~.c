@@ -31,8 +31,8 @@ static t_int *voicing_detector_tilde_perform(t_int *w)
       x->f_low = x->f_high;
       x->f_high = tmp;
     }
-  t_float current, previous, next, temp0, avg, max, peak0;
-  current = previous = next = temp0 = avg = max = peak0 = 0;
+  t_float current, previous, next, temp0, temp1, avg, max, peak0;
+  current = previous = next = temp0 = temp1 = avg = max = peak0 = 0;
   t_float min = 1000;
   t_float samplerate = sys_getsr();
   t_float start = samplerate / x->f_high;
@@ -55,14 +55,15 @@ static t_int *voicing_detector_tilde_perform(t_int *w)
     }
   for (i=1;i<l;i++)
     {
+      temp1 = 0;
       for (j=start;j<=end;j++) /* the Average Magnitude Difference Function */
 	  {
 	    temp[j] = i + j < l ? in[i+j] : 0.0;
 	    temp0 = atom_getfloatarg(i, 4096, ctl->otemp);
-	    temp0 += i == 0 ? 0.0 : fabs(in[j] - temp[j]);
+	    temp1 += fabs(in[j] - temp[j]);
 	  }
-      temp0 += ((float)i / (float)l) * ctl->f_sum_abs;
-      SETFLOAT(&ctl->otemp[i], temp0);
+      temp1 += ((float)i / (float)l) * ctl->f_sum_abs;
+      SETFLOAT(&ctl->otemp[i], temp1);
     }
 
   for (i=start+1;i<end;i++)
