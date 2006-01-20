@@ -70,6 +70,8 @@ struct _garray
 #endif /* _POSIX_MEMLOCK */
 
 #ifdef __APPLE__
+#include <mach/mach.h>
+#include <mach/task.h>
 #include <mach/semaphore.h>
 #define SEM_T semaphore_t
 #define SEM_INIT(s) (semaphore_create(mach_task_self(),&s,SYNC_POLICY_FIFO,0) == 0)
