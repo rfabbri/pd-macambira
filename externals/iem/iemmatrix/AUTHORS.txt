@@ -1,3 +1,4 @@
-iohannes m zmoelnig	<zmoelnig AT iem DOT at>
+IOhannes m zmoelnig	<zmoelnig AT iem DOT at>
 thomas musil		<musil AT iem DOT at>
+franz zotter		<zotter AT iem DOT at>
 
