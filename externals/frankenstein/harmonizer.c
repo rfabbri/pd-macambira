@@ -73,13 +73,15 @@ typedef struct _harmonizer
 {
     t_object x_obj; // myself
 	// genotypes
-	int population[MAX_POPULATION][VOICES];
-	int current_voices[VOICES];
+	//int population[MAX_POPULATION][VOICES];
+	//int current_voices[VOICES];
+	int *population[MAX_POPULATION];
+	int *current_voices;
 	chord_abs_t current_chord;
 	chord_abs_t target_chord;
 	int target_notes[POSSIBLE_NOTES];
 	t_outlet *l_out;
-
+	int voices;
 	float wideness;
 	int center_note;
 	float i_like_parallelism;
@@ -235,7 +237,7 @@ void harmonizer_init_pop(t_harmonizer *x)
 	double rnd;
 	for (i=0; i<MAX_POPULATION; i++)
 	{
-		for (j=0; j<VOICES; j++)
+		for (j=0; j<x->voices; j++)
 		{
 			/*
 			// totally randome version
@@ -285,11 +287,28 @@ void harmonizer_init_pop(t_harmonizer *x)
 	}
 }
 
+void harmonizer_allocate(t_harmonizer *x)
+{
+	int i;
+	for (i=0; i<MAX_POPULATION; i++)
+	{
+		x->population[i] = malloc(sizeof(int)*x->voices);
+	}
+	x->current_voices = malloc(sizeof(int)*x->voices);
+	
+}
 
 void harmonizer_free(t_harmonizer *x)
 {
 //	freebytes(x->buf_strum1, sizeof(x->buf_strum1));
 //	freebytes(x->buf_strum2, sizeof(x->buf_strum2));
+	
+	int i;
+	for (i=0; i<MAX_POPULATION; i++)
+	{
+		free(x->population[i]);
+	}
+	free(x->current_voices);
 }
 
 // here i evaluate this voicing
@@ -299,20 +318,34 @@ int fitness(t_harmonizer *x, int *candidate)
 	float wideness, ftmp;
 	short int chord_notes[4];
 	short int chord_notes_ok[4];
-	short int transitions[VOICES];
-	short int directions[VOICES];
+	//short int transitions[VOICES];
+	short int *transitions;
+	//short int directions[VOICES];
+	short int *directions;
 	// intervals between voices
 	// for parallel and hidden 5ths
 	// voices spacing etc..
-	short int intervals[VOICES][VOICES]; 
-	short int notes[VOICES];
+	//short int intervals[VOICES][VOICES]; 
+	short int **intervals; 
+	//short int notes[VOICES];
+	short int *notes;
 	res=50; // starting fitness
 
 	if (DEBUG_VERBOSE)
 		post("evaluating fitness of %i %i %i %i", candidate[0], candidate[1], candidate[2], candidate[3]);
 
+	// allocate arrays
+	transitions = malloc(sizeof(short int)*x->voices);
+	directions = malloc(sizeof(short int)*x->voices);
+	notes = malloc(sizeof(short int)*x->voices);
+	intervals = malloc(sizeof(short int *) * x->voices);
+	for (i=0; i<x->voices; i++)
+	{
+		intervals[i] = malloc(sizeof(short int) * x->voices);
+	}
+
  	// shared objects
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
 		notes[i]=candidate[i];
 		transitions[i] = candidate[i] - x->current_voices[i];
@@ -324,16 +357,16 @@ int fitness(t_harmonizer *x, int *candidate)
 			post("directions[%i]=%i", i, directions[i]);
 
 	}
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
-		for (j=i+1; j<VOICES; j++)
+		for (j=i+1; j<x->voices; j++)
 		{
 			intervals[i][j] = (candidate[i]-candidate[j])%12 ;
 			if (DEBUG_VERBOSE)
 				post("intervals[%i][%i]=%i", i, j, intervals[i][j]);
 		}
 	}
-	SGLIB_ARRAY_SINGLE_QUICK_SORT(short int, notes, VOICES, SGLIB_NUMERIC_COMPARATOR)
+	SGLIB_ARRAY_SINGLE_QUICK_SORT(short int, notes, x->voices, SGLIB_NUMERIC_COMPARATOR)
 
 	// all same direction? 
 	if ( directions[0]==directions[1] &&
@@ -348,9 +381,9 @@ int fitness(t_harmonizer *x, int *candidate)
 	// parallel 5ths or octaves? (if yes return 0)
 	// how?
 	// hidden 8ths nor 5ths ?
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
-		for (j=i+1; j<VOICES; j++)
+		for (j=i+1; j<x->voices; j++)
 		{
 			if (intervals[i][j]==7 || intervals[i][j]==0)
 			{
@@ -370,16 +403,16 @@ int fitness(t_harmonizer *x, int *candidate)
 	// TODO: use notes[]
 	// are voices average centered?
 	tmp=0;
-	for (i=1; i<VOICES; i++)
+	for (i=1; i<x->voices; i++)
 	{
 		tmp+=notes[i];
 		if (DEBUG_VERBOSE)
 			post("average note is %i at passage %i", tmp, i);
 	}
 	// this is the average note
-	tmp = tmp/(VOICES-1);
+	tmp = tmp/(x->voices-1);
 	if (DEBUG_VERBOSE)
-		post("average note is %i after division by (VOICES-1)", tmp);
+		post("average note is %i after division by (x->voices-1)", tmp);
 //	tmp = abs((LOWER_POSSIBLE_NOTE + NOTES_RANGE)*2/3 - tmp); // how much average is far from 72
 	tmp = abs(x->center_note - tmp); // how much average is far from desired center note
 	res += 30; 
@@ -406,7 +439,7 @@ int fitness(t_harmonizer *x, int *candidate)
 	//res+=50;
 	if (DEBUG_VERBOSE)
 		post("res before transitions %i", res);
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
 		if (DEBUG_VERBOSE)
 			post("transitions[%i] = %i",i, transitions[i]);
@@ -445,7 +478,7 @@ int fitness(t_harmonizer *x, int *candidate)
 		chord_notes[i] = (x->target_notes[i]) % 12;
 		chord_notes_ok[i] = 0;
 	}
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
 		tmp = notes[i] % 12;
 		for (j=0; j<4; j++)
@@ -472,11 +505,11 @@ int fitness(t_harmonizer *x, int *candidate)
 	{
 		res -= 2^chord_notes_ok[j];
 	}
-	res += 2*VOICES;
+	res += 2*x->voices;
 
 	// penalize too many basses
 	tmp = 0;
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
 		if (notes[i]<48)
 			tmp++;
@@ -492,7 +525,7 @@ int fitness(t_harmonizer *x, int *candidate)
 
 	// now wideness	
 	min = notes[0];
-	max = notes[VOICES-1];
+	max = notes[x->voices-1];
 	distance = max - min;
 	wideness = (float) (((float)distance) / ((float)12));
 	ftmp = fabs(wideness - x->wideness);
@@ -500,6 +533,16 @@ int fitness(t_harmonizer *x, int *candidate)
 	
 	if (DEBUG_VERBOSE)
 		post("fitness is %i", res);
+
+		// free memory
+	free(transitions);
+	free(directions); 
+	free(notes);
+	for (i=0; i<x->voices; i++)
+	{
+		free(intervals[i]);
+	}
+	free(intervals);
 
 	return res;
 }
@@ -510,18 +553,18 @@ void new_genotype(t_harmonizer *x, int *mammy, int *daddy, int *kid)
 	double rnd;
 	// crossover
 	rnd = rand()/((double)RAND_MAX + 1);
-	split = rnd * VOICES;
+	split = rnd * x->voices;
 	for (i=0; i<split; i++)
 	{
 		kid[i]=mammy[i];
 	}
-	for (i=split; i<VOICES; i++)
+	for (i=split; i<x->voices; i++)
 	{
 		kid[i]=daddy[i];
 	}
 
 	//  mutation
-	for (i=0; i<VOICES; i++)
+	for (i=0; i<x->voices; i++)
 	{
 		rnd = rand()/((double)RAND_MAX + 1);
 		if (rnd < DEF_PROB_MUTATION)
@@ -545,7 +588,11 @@ void generate_voicing(t_harmonizer *x)
 	fitness_list_element fitness_evaluations[MAX_POPULATION];
 	int i, generation, mum, dad, winner;
 	double rnd;
-	t_atom lista[VOICES];
+	//t_atom lista[VOICES];
+	t_atom *lista;
+
+	lista = malloc(sizeof(t_atom)*x->voices);
+
 	// inizialize tables of notes
 	build_possible_notes_table(x);
 	// inizialize population
@@ -591,7 +638,7 @@ void generate_voicing(t_harmonizer *x)
 	if (DEBUG)
 		post("winner fitness = %i", fitness_evaluations[MAX_POPULATION-1].fitness);
 
-	for (i=0;i<VOICES;i++)
+	for (i=0;i<x->voices;i++)
 	{
 		SETFLOAT(lista+i, x->population[winner][i]);
 	}
@@ -599,8 +646,9 @@ void generate_voicing(t_harmonizer *x)
 	// send output array to outlet
 	outlet_anything(x->l_out,
                      gensym("list") ,
-					 VOICES, 
+					 x->voices, 
 					 lista);
+	free(lista);
 }
 
 // if i want another voicing i can send a bang
@@ -613,13 +661,13 @@ void set_current_voices(t_harmonizer *x, t_symbol *sl, int argc, t_atom *argv)
 {
 	int i=0;	
 	
-	if (argc<VOICES)
+	if (argc<x->voices)
 	{
 		error("insufficient notes sent!");
 		return;
 	}
 	// fill input array with actual data sent to inlet
-	for (i=0;i<VOICES;i++)
+	for (i=0;i<x->voices;i++)
 	{
 		x->current_voices[i] = atom_getint(argv++);
 	}
@@ -680,14 +728,28 @@ void set_small_intervals(t_harmonizer *x, t_floatarg f)
 	x->small_intervals = newval;
 }
 
+void set_voices(t_harmonizer *x, t_floatarg f)
+{
+	int newval = (int)  f;
+	if (newval<1)
+	{
+		error("number of voices must be > 0 !");
+		return;
+	}
+	x->voices = newval;
+	harmonizer_free(x);
+	harmonizer_allocate(x);
+}
+
 void print_help(t_harmonizer *x)
 {
 	post("");
 	post("harmonizer is an external that builds voicing");
-	post("takes chords name and outputs a list of %i midi notes", VOICES);
+	post("takes chords name and outputs a list of midi notes");
 	post("available commands:");
 	post("current symbol: sets the current chord name (which chordwe are in)");
 	post("target symbol: sets the target chord name (which chord we want to go to)");
+	post("voices: sets the number of voices");
 	post("wideness float: now many octaves wide should the next chord be? must be > than 0");
 	post("set_center_note int: sets the desired center chord note, min 24 max 100");
 	post("i_like_parallelism float: do I want parallelism? from -1 (I don't want them) to 1 (I like them), 0 means I don't care, default = -1");
@@ -714,6 +776,12 @@ void *harmonizer_new(t_symbol *s, int argc, t_atom *argv)
 	x->wideness = DEF_WIDENESS;
 	x->i_like_parallelism = -1; // by default we don't like them!
 	x->small_intervals = 1; //by default we want small intervals
+	x->voices = VOICES;
+	if (argc>0) 
+	{
+		x->voices = atom_getintarg(0, argc, argv);
+	}
+	harmonizer_allocate(x);
     return (x);
 }
 
@@ -731,6 +799,8 @@ void harmonizer_setup(void)
 	class_addmethod(harmonizer_class, (t_method)set_center_note, gensym("center_note"), A_DEFFLOAT, 0);
 	class_addmethod(harmonizer_class, (t_method)set_i_like_parallelism, gensym("i_like_parallelism"), A_DEFFLOAT, 0);
 	class_addmethod(harmonizer_class, (t_method)set_small_intervals, gensym("small_intervals"), A_DEFFLOAT, 0);
+	// set number of voices
+	class_addmethod(harmonizer_class, (t_method)set_voices, gensym("voices"), A_DEFFLOAT, 0);
 	
 
 }
