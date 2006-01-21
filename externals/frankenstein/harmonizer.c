@@ -111,6 +111,77 @@ void build_possible_notes_table(t_harmonizer *x)
 		case kHalfDim7:	n2=3; n3=6; n4=10;n5=0;break;
 		case kDim7:		n2=3; n3=6; n4=9;n5=0;break;
 		case kMinMaj7:	n2=4; n3=7; n4=11;n5=0;break;
+
+		case kMaj7b9:	n2=4; n3=7; n4=11;n5=1;break;
+		case kMaj9:		n2=4; n3=7; n4=11;n5=2;break;
+		//case kMinMaj7:	n2=4; n3=7; n4=11;n5=3;break;
+		//case kMaj7:		n2=4; n3=7; n4=11;n5=4;break;
+		case kDom7s11:	n2=4; n3=7; n4=10;n5=6;break;
+		case kDomb9:	n2=4; n3=7; n4=10;n5=1;break;
+		case kMaj7s5:	n2=4; n3=8; n4=11;n5=0;break;
+		case kMin9:		n2=3; n3=7; n4=2;n5=0;break;
+
+		case kDom9:		n2=4; n3=7; n4=10;n5=2;break;
+
+		case kM7b9s13:		n2=1; n3=10; n4=11;n5=4;break;
+		case kMinMajb9:		n2=1; n3=3; n4=11;n5=7;break;
+		case kDimMajb9:		n2=3; n3=6; n4=11;n5=1;break;
+
+		case kMinMaj9:		n2=3; n3=7; n4=11;n5=2;break;
+		case kHalfDimb9:	n2=3; n3=6; n4=1;n5=10;break;
+		case kDim7b9:		n2=3; n3=6; n4=1;n5=9;break;
+		case kMaj7s9:		n2=3; n3=4; n4=7;n5=11;break;
+		case kDom7s9:		n2=3; n3=4; n4=7;n5=10;break;
+		case kMaj11:		n2=4; n3=5; n4=7;n5=11;break;
+		case kMaj7b5:		n2=4; n3=6; n4=11;n5=0;break;
+		case kMaj7s13:		n2=4; n3=7; n4=11;n5=10;break;
+
+		case kUnison:		n2=0; n3=0; n4=0;n5=0;break;
+
+
+		case kDom7b5:		n2=4; n3=6; n4=10;n5=0;break;
+
+		case kHalfDim9:		n2=3; n3=6; n4=10;n5=2;break;
+
+		case kMaj9b5:		n2=4; n3=6; n4=11;n5=2;break;
+		case kDom9b5:		n2=4; n3=6; n4=10;n5=2;break;
+		case kDom9b13:		n2=4; n3=2; n4=8;n5=10;break;
+		case kMin9s11:		n2=2; n3=3; n4=6;n5=7;break;
+		case kmM9b11:		n2=3; n3=11; n4=2;n5=4;break;
+
+		case kMaj7s5b9:		n2=2; n3=4; n4=8;n5=11;break;
+		case kDom7b9:		n2=1; n3=4; n4=7;n5=10;break;
+		case kMin7b9:		n2=1; n3=3; n4=7;n5=10;break;
+		case kMinb9s11:		n2=1; n3=3; n4=7;n5=6;break;
+
+		case kMaj7s11:		n2=4; n3=6; n4=7;n5=11;break;
+		case kMs9s11 :		n2=3; n3=4; n4=6;n5=7;break;
+		case kHDimb11 :		n2=3; n3=6; n4=10;n5=4;break;
+
+		case kDom11 :		n2=4; n3=7; n4=10;n5=5;break;
+		case kMin11 :		n2=3; n3=7; n4=5;n5=0;break;
+		case kHalfDim11 :	n2=3; n3=6; n4=10;n5=5;break;
+		case kDim11 :		n2=3; n3=6; n4=9;n5=5;break;
+		case kMinMaj11 :	n2=3; n3=7; n4=11;n5=5;break;
+		case kDimMaj11 :	n2=3; n3=6; n4=11;n5=5;break;
+		case kMaj11b5 :		n2=4; n3=6; n4=5;n5=0;break;
+		case kMaj11s5 :		n2=4; n3=5; n4=8;n5=0;break;
+		case kMaj11b9 :		n2=4; n3=5; n4=7;n5=1;break;
+		case kMaj11s9 :		n2=4; n3=5; n4=7;n5=3;break;
+		case kMaj11b13 :	n2=4; n3=5; n4=7;n5=8;break;
+		case kMaj11s13 :	n2=4; n3=5; n4=10;n5=11;break;
+		case kM11b5b9 :		n2=4; n3=6; n4=1;n5=11;break;
+		case kDom11b5 :		n2=4; n3=6; n4=10;n5=5;break;
+		case kDom11b9 :		n2=4; n3=5; n4=10;n5=1;break;
+		case kDom11s9 :		n2=4; n3=5; n4=10;n5=3;break;
+		case kHalfDim11b9 :	n2=3; n3=6; n4=5;n5=1;break;
+		case kMin7s11 :		n2=3; n3=7; n4=10;n5=6;break; // is it correct?
+		case kDom13s11 :	n2=4; n3=10; n4=6;n5=9;break; // is it correct ?
+		case kM7b913 :		n2=4; n3=10; n4=1;n5=9;break;
+		case kMaj9s13 :		n2=2; n3=4; n4=11;n5=9;break;
+		case kDom7b13 :		n2=4; n3=10; n4=9;n5=7;break;
+		case kChrom :		n2=1; n3=2; n4=3;n5=4;break;
+
 	}
 	if (DEBUG_VERBOSE)
 		post("build_possible_notes_table n2=%i n3=%i n4=%i", n2, n3, n4);

@@ -837,7 +837,7 @@ abs_note_t from_string_to_abs_tone(const char *substr)
 		return B;
 	return C;
 }
-
+/*
 chord_type_t from_string_to_type(const char *substr)
 {
 	if (strstr(substr, "minor/major 7th"))
@@ -880,7 +880,7 @@ chord_type_t from_string_to_type(const char *substr)
 	// put shorter names at end of this function!
 	return C;
 }
-
+*/
 // find the tonality mode in this string
 modes_t from_string_to_mode(const char *substr)
 {
@@ -929,6 +929,14 @@ chord_type_t string2mode(const char *substr)
 	// put shorter names at end of this function!
 	if (strstr(substr, "unison"))
 		return kUnison;
+	if (strstr(substr, "major 7 b9 13"))
+		return kM7b913;
+	if (strstr(substr, "major 7th #13"))
+		return kMaj7s13;
+	if (strstr(substr, "major 7 b9 #13"))
+		return kM7b9s13;
+	if (strstr(substr, "dominant 7th b13"))
+		return kDom7b13;
 	if (strstr(substr, "major 7th #5"))
 		return kMaj7s5;
 	if (strstr(substr, "major 7th b5"))
@@ -1025,14 +1033,6 @@ chord_type_t string2mode(const char *substr)
 		return kMin7s11;
 	if (strstr(substr, "dominant 13th #11"))
 		return kDom13s11;
-	if (strstr(substr, "major 7 b9 13"))
-		return kM7b913;
-	if (strstr(substr, "major 7th #13"))
-		return kMaj7s13;
-	if (strstr(substr, "major 7 b9 #13"))
-		return kM7b9s13;
-	if (strstr(substr, "dominant 7th b13"))
-		return kDom7b13;
 	if (strstr(substr, "chromatic"))
 		return kChrom;
 	if (strstr(substr, "dominant b9"))
@@ -1047,16 +1047,16 @@ chord_type_t string2mode(const char *substr)
 		return kMinMaj7;
 	if (strstr(substr, "major 7th"))
 		return kMaj7;
+	if (strstr(substr, "half diminished 7th"))
+		return kHalfDim7;
+	if (strstr(substr, "diminished 7th"))
+		return kDim7;
 	if (strstr(substr, "major"))
 		return kMaj;
 	if (strstr(substr, "minor 7th"))
 		return kMin7;
 	if (strstr(substr, "minor"))
 		return kMin;
-	if (strstr(substr, "half diminished 7th"))
-		return kHalfDim7;
-	if (strstr(substr, "diminished 7th"))
-		return kDim7;
 	if (strstr(substr, "diminished"))
 		return kDim;
 	if (strstr(substr, "augmented"))

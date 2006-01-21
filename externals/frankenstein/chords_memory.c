@@ -100,7 +100,7 @@ there are plenty of such algos, we must just copy them down.
 #include "common.h"
 
 
-#define DEBUG 0 // messaggi di debug
+#define DEBUG 1 // messaggi di debug
 #define DEBUG_VERBOSE 0 // messaggi di debug
 
 // is this system Little Endian? (thanks to Mathieu Bouchard)
@@ -227,6 +227,7 @@ void chords_memory_chord2string(t_chords_memory *x, char *string, chord_t chord)
 	}
 	switch (chord.mode)
 	{
+		case kUnison:	strcat(string, "unison"); 			  break;
 		case kMaj:		strcat(string, "major"); 			  break;
 		case kMin:		strcat(string, "minor"); 			  break;
 		case kDim:		strcat(string, "diminished"); 		  break;
@@ -238,7 +239,70 @@ void chords_memory_chord2string(t_chords_memory *x, char *string, chord_t chord)
 		case kHalfDim7:	strcat(string, "half diminished 7th"); break;
 		case kDim7:		strcat(string, "diminished 7th");	  break;
 		case kMinMaj7:	strcat(string, "minor/major 7th");	  break;
+
+		case kMaj7s5:	strcat(string, "major 7th #5");		  break;
+		case kMaj7b5:	strcat(string, "major 7th b5");		  break;
+		case kDom7s5:	strcat(string, "dominant 7th #5"); 	  break;
+		case kDom7b5:	strcat(string, "dominant 7th b5"); 	  break;
 		case kDomb9:	strcat(string, "dominant b9");		  break;
+
+		case kMaj9:		strcat(string, "major 9th");			  break;
+		case kDom9:		strcat(string, "dominant 9th");		  break;
+		case kMin9:		strcat(string, "minor 9th");			  break;
+		case kHalfDim9:	strcat(string, "half diminished 9th"); break;
+		case kMinMaj9:	strcat(string, "minor major 9th");	  break;
+		case kDimMaj9:	strcat(string, "diminished major 9th");break;
+		case kMaj9b5:	strcat(string, "major 9th b5");		  break;
+		case kDom9b5:	strcat(string, "dominant 9th b5");	  break;
+		case kDom9b13:	strcat(string, "dominant 9th b13");	  break;
+		case kMin9s11:	strcat(string, "minor 9th #11");		  break;
+		case kmM9b11:	strcat(string, "minor/maj 9th b11");	  break;
+
+		case kMaj7b9:	strcat(string, "major 7th b9");		  break;
+		case kMaj7s5b9:	strcat(string, "major 7th #5 b9");	  break;
+		case kDom7b9:	strcat(string, "dominant 7th b9");	  break;
+		case kMin7b9:	strcat(string, "minor 7th b9");		  break;
+		case kMinb9s11:	strcat(string, "minor b9 #11");		  break;
+		case kHalfDimb9:strcat(string, "half diminished b9");  break;
+		case kDim7b9:	strcat(string, "diminished b9");		  break;
+		case kMinMajb9: strcat(string, "minor/major b9");	  break;
+		case kDimMajb9:	strcat(string, "diminished M7 b9");	  break;
+
+		case kMaj7s9:	strcat(string, "major 7th #9");		  break;
+		case kDom7s9:	strcat(string, "dominant #9");		  break;
+		case kMaj7s11:	strcat(string, "major 7th #11");		  break;
+		case kMaj9s13:	strcat(string, "major 9th #13");		  break;
+		case kMs9s11:	strcat(string, "major #9 #11");		  break;
+		case kHDimb11:	strcat(string, "half diminished b11"); break;
+
+		case kMaj11:	strcat(string, "major 11th");		  break;
+		case kDom11:	strcat(string, "dominant 11th");		  break;
+		case kMin11:	strcat(string, "minor 11th");		  break;
+		case kHalfDim11:strcat(string, "half diminished 11th");break;
+		case kDim11:	strcat(string, "diminished 11th");	  break;
+		case kMinMaj11:	strcat(string, "minor/major 11th");	  break;
+		case kDimMaj11: strcat(string, "diminished maj 11th"); break;
+
+		case kMaj11b5:	strcat(string, "major 11th b5");		  break;
+		case kMaj11s5:	strcat(string, "major 11th #5");		  break;
+		case kMaj11b9:	strcat(string, "major 11th b9");		  break;
+		case kMaj11s9:	strcat(string, "major 11th #9");		  break;
+		case kMaj11b13:	strcat(string, "major 11th b13");	  break;
+		case kMaj11s13:	strcat(string, "major 11th #13");	  break;
+		case kM11b5b9:	strcat(string, "major 11th b5 b9");	  break;
+		case kDom11b5:	strcat(string, "dominant 11th b5");	  break;
+		case kDom11b9:	strcat(string, "dominant 11th b9");	  break;
+		case kDom11s9:	strcat(string, "dominant 11th #9");	  break;
+		case kHalfDim11b9:strcat(string, "half dim 11th b9");  break;
+		case kDom7s11:	strcat(string, "dominant #11");		  break;
+		case kMin7s11:	strcat(string, "minor 7th #11");		  break;
+
+		case kDom13s11:	strcat(string, "dominant 13th #11");	  break;
+		case kM7b913:	strcat(string, "major 7 b9 13");		  break;
+		case kMaj7s13:	strcat(string, "major 7th #13");		  break;
+		case kM7b9s13:	strcat(string, "major 7 b9 #13");	  break;
+		case kDom7b13:	strcat(string, "dominant 7th b13");	  break;
+		case kChrom:	strcat(string, "chromatic");			  break;
 
 	}
 }
@@ -298,7 +362,7 @@ chord_t chords_memory_string2chord(t_chords_memory *x, char *string)
 	absnote = from_string_to_abs_tone(substr);
 	interval = clean_note(absnote - x->fundamental_note);
 	chord.note = interval;
-	chord.mode=from_string_to_type(substr); 
+	chord.mode=string2mode(substr); 
 	if (DEBUG)
 		post("chords_memory_string2chord: chord.note=%i chord.mode=%i",chord.note, chord.mode);
 	return chord;
