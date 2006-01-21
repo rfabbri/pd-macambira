@@ -132,6 +132,7 @@ typedef struct _chords_memory
 	t_outlet *x_outchordname;         /* chord name, e.g. "Cmajor7" */
 	t_outlet *x_outtonalityname;      /* chord name, e.g. "Cmajor7" */
 	t_outlet *x_outchordssequence;    /* sequence of chords,a walk */
+	t_outlet *x_outnovelty; /* the degree of novelty of last added chord */
 	// the matrix : arcs of the graph
 	// each tonality mode has his matrix
 	// each matrix is in this form:
@@ -772,7 +773,7 @@ void chords_memory_set_chord(t_chords_memory *x, t_symbol *s) {
 }
 
 // add a chord sequence to the graph
-void chords_memory_add(t_chords_memory *x, chord_t chord1, chord_t chord2)
+float chords_memory_add(t_chords_memory *x, chord_t chord1, chord_t chord2)
 {
 	// chords are integers
 	// to know what this integer means do that:
@@ -794,6 +795,7 @@ void chords_memory_add(t_chords_memory *x, chord_t chord1, chord_t chord2)
 		if (DEBUG)
 			post("x->maxweight[%i] = %i",x->fundamental_mode, x->maxweight[x->fundamental_mode]);
 	}
+	return (float) (((float) x->maxweight[x->fundamental_mode]) / ((float) x->arcs[x->fundamental_mode][chord1int][chord2int]) );
 
 }
 
@@ -801,10 +803,11 @@ void chords_memory_add(t_chords_memory *x, chord_t chord1, chord_t chord2)
 // the external remembers the previous played chord
 void chords_memory_add_chord(t_chords_memory *x, t_symbol *s) {
     chord_t chord1;
+	float ret = 0;
 	chord1 = chords_memory_string2chord(x, s->s_name);
 	if (x->last_chord_set)
 	{
-		chords_memory_add(x, x->last_chord, chord1);
+		ret = chords_memory_add(x, x->last_chord, chord1);
 	} 
 	else
 	{
@@ -813,6 +816,7 @@ void chords_memory_add_chord(t_chords_memory *x, t_symbol *s) {
 	x->last_chord = chord1;
 	if (DEBUG)
 		post("chord added: %s", s->s_name); 
+	outlet_float(x->x_outnovelty, ret);
 }
 
 // sets the current tonality
@@ -996,6 +1000,7 @@ void *chords_memory_new(t_symbol *s, int argc, t_atom *argv)
 	x->x_outchordname = outlet_new(&x->x_obj, gensym("symbol"));
 	x->x_outtonalityname = outlet_new(&x->x_obj, gensym("symbol"));
 	x->x_outchordssequence = outlet_new(&x->x_obj, gensym("list"));
+	x->x_outnovelty = outlet_new(&x->x_obj, gensym("float"));
 	srand(time(&a));
 	chords_memory_init_graph(x);
 	x->fundamental_note = C;

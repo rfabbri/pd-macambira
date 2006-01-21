@@ -2,6 +2,7 @@
 
 */
 #include <stdlib.h>
+#include <time.h>
 #include "m_pd.h"
 
 #define BUFFER_LENGHT 16 // lunghezza dei buffers (quanti elementi nel pattern)
@@ -49,6 +50,7 @@ void GArhythm_init_pop(t_GArhythm *x)
 {
 	int i, j, tmp, k;
 	double rnd;
+
 	for (i=0; i<MAX_POPULATION; i++)
 	{
 		for (j=0; j<BUFFER_LENGHT; j++)
@@ -649,7 +651,8 @@ static void *GArhythm_new(t_symbol *s, int argc, t_atom *argv)
 	x->reinsert_src=REINSERT_SRC;
 	x->reinsert_last=REINSERT_LAST;
 
-
+	srand( (unsigned)time( NULL ) );
+	
 	if (argc>0) 
 	{
 		x->x_arrayname_src_strum1 = atom_getsymbolarg(0, argc, argv);

@@ -133,27 +133,7 @@ struct t_rhythm_memory_representation
 // tells you how many durations there // how can a chord be?
 #define TYPES_NUM 69 // keep me updated
 typedef enum {
-	/*
-			kMaj=0, 
-			kMin=1, 
-			kDim=2, 
-			kAug=3, 
-			kDom7=4, 
-			kMaj7=5,
-			kMin7=6,
-			kMinMaj7=7,
-			kDim7=8,
-			kHalfDim7=9,
-			//pland adding 9ths 30.11.05 and beyond
-			kDomb9=10,
-			kMaj9=11,
-			kDom9=12,
-			kMin9=13,
-			kHalfDim9=14,
-			kMinMaj9=15,
-			kDimMaj9=16
-*/
-	// this enumerators are from maxlib chord 
+	// this enumerator is from maxlib chord 
  kUnison = 0,
 kMaj = 1, 
 kMin = 2, 
