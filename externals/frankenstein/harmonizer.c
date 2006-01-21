@@ -44,7 +44,7 @@ or at least set the importance of rules in realtime..
 
 #define NOTES_RANGE 80 // this should be multiple of 16
 #define LOWER_POSSIBLE_NOTE 24 // lower note possible, it should be a C
-#define POSSIBLE_NOTES (NOTES_RANGE/12*4) // 4 is the max number of notes in a chord
+#define POSSIBLE_NOTES (NOTES_RANGE/12*5) // 5 is the max number of notes in a chord
 
 // default values 
 #define DEF_WIDENESS 3 // 3 octaves
@@ -95,22 +95,22 @@ typedef struct _harmonizer
 void build_possible_notes_table(t_harmonizer *x)
 {
 	int i, octave, basenote;
-	int n1, n2, n3, n4;
+	int n1, n2, n3, n4, n5;
 	n1=n2=n3=n4=0; // there always is the fundamental
 	if (DEBUG_VERBOSE)
 		post("build_possible_notes_table target_chord.mode=%i target_chord.note=%i", x->target_chord.mode, x->target_chord.note);
 	switch (x->target_chord.mode)
 	{
-		case kMaj:		n2=4; n3=7; n4=0;break;
-		case kMin:		n2=3; n3=7; n4=0;break;
-		case kDim:		n2=3; n3=6; n4=0;break;
-		case kAug:		n2=4; n3=8; n4=0;break;
-		case kMaj7:		n2=4; n3=7; n4=11;break;
-		case kDom7:		n2=4; n3=7; n4=10;break;
-		case kMin7: 	n2=3; n3=7; n4=10;break;
-		case kHalfDim7:	n2=3; n3=6; n4=10;break;
-		case kDim7:		n2=3; n3=6; n4=9;break;
-		case kMinMaj7:	n2=4; n3=7; n4=11;break;
+		case kMaj:		n2=4; n3=7; n4=0;n5=0;break;
+		case kMin:		n2=3; n3=7; n4=0;n5=0;break;
+		case kDim:		n2=3; n3=6; n4=0;n5=0;break;
+		case kAug:		n2=4; n3=8; n4=0;n5=0;break;
+		case kMaj7:		n2=4; n3=7; n4=11;n5=0;break;
+		case kDom7:		n2=4; n3=7; n4=10;n5=0;break;
+		case kMin7: 	n2=3; n3=7; n4=10;n5=0;break;
+		case kHalfDim7:	n2=3; n3=6; n4=10;n5=0;break;
+		case kDim7:		n2=3; n3=6; n4=9;n5=0;break;
+		case kMinMaj7:	n2=4; n3=7; n4=11;n5=0;break;
 	}
 	if (DEBUG_VERBOSE)
 		post("build_possible_notes_table n2=%i n3=%i n4=%i", n2, n3, n4);
@@ -141,6 +141,7 @@ void build_possible_notes_table(t_harmonizer *x)
 		x->target_notes[i++]=octave*12 + LOWER_POSSIBLE_NOTE + basenote + n2;
 		x->target_notes[i++]=octave*12 + LOWER_POSSIBLE_NOTE + basenote + n3;
 		x->target_notes[i++]=octave*12 + LOWER_POSSIBLE_NOTE + basenote + n4;
+		x->target_notes[i++]=octave*12 + LOWER_POSSIBLE_NOTE + basenote + n5;
 		octave++;
 	}
 	if (DEBUG_VERBOSE)

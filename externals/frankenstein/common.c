@@ -925,6 +925,124 @@ abs_note_t string2note(const char *substr)
 
 chord_type_t string2mode(const char *substr)
 {
+	// beware when adding new chords
+	// put shorter names at end of this function!
+	if (strstr(substr, "unison"))
+		return kUnison;
+	if (strstr(substr, "major 7th #5"))
+		return kMaj7s5;
+	if (strstr(substr, "major 7th b5"))
+		return kMaj7b5;
+	if (strstr(substr, "dominant 7th #5"))
+		return kDom7s5;
+	if (strstr(substr, "dominant 7th b5"))
+		return kDom7b5;
+	if (strstr(substr, "half diminished 9th"))
+		return kHalfDim9;
+	if (strstr(substr, "minor major 9th"))
+		return kMinMaj9;
+	if (strstr(substr, "diminished major 9th"))
+		return kDimMaj9;
+	if (strstr(substr, "major 9th b5"))
+		return kMaj9b5;
+	if (strstr(substr, "dominant 9th b5"))
+		return kDom9b5;
+	if (strstr(substr, "dominant 9th b13"))
+		return kDom9b13;
+	if (strstr(substr, "minor 9th #11"))
+		return kMin9s11;
+	if (strstr(substr, "minor/maj 9th b11"))
+		return kmM9b11;
+	if (strstr(substr, "major 7th b9"))
+		return kMaj7b9;
+	if (strstr(substr, "major 7th #5 b9"))
+		return kMaj7s5b9;
+	if (strstr(substr, "dominant 7th b9"))
+		return kDom7b9;
+	if (strstr(substr, "minor 7th b9"))
+		return kMin7b9;
+	if (strstr(substr, "minor b9 #11"))
+		return kMinb9s11;
+	if (strstr(substr, "half diminished b9"))
+		return kHalfDimb9;
+	if (strstr(substr, "diminished b9"))
+		return kDim7b9;
+	if (strstr(substr, "minor/major b9"))
+		return kMinMajb9;
+	if (strstr(substr, "diminished M7 b9"))
+		return kDimMajb9;
+	if (strstr(substr, "major 7th #9"))
+		return kMaj7s9;
+	if (strstr(substr, "dominant #9"))
+		return kDom7s9;
+	if (strstr(substr, "major 7th #11"))
+		return kMaj7s11;
+	if (strstr(substr, "major 9th #13"))
+		return kMaj9s13;
+	if (strstr(substr, "major #9 #11"))
+		return kMs9s11;
+	if (strstr(substr, "half diminished b11"))
+		return kHDimb11;
+	if (strstr(substr, "major 11th"))
+		return kMaj11;
+	if (strstr(substr, "dominant 11th"))
+		return kDom11;
+	if (strstr(substr, "minor 11th"))
+		return kMin11;
+	if (strstr(substr, "half diminished 11th"))
+		return kHalfDim11;
+	if (strstr(substr, "diminished 11th"))
+		return kDim11;
+	if (strstr(substr, "minor/major 11th"))
+		return kMinMaj11;
+	if (strstr(substr, "diminished maj 11th"))
+		return kDimMaj11;
+	if (strstr(substr, "major 11th b5"))
+		return kMaj11b5;
+	if (strstr(substr, "major 11th #5"))
+		return kMaj11s5;
+	if (strstr(substr, "major 11th b9"))
+		return kMaj11b9;
+	if (strstr(substr, "major 11th #9"))
+		return kMaj11s9;
+	if (strstr(substr, "major 11th b13"))
+		return kMaj11b13;
+	if (strstr(substr, "major 11th #13"))
+		return kMaj11s13;
+	if (strstr(substr, "major 11th b5 b9"))
+		return kM11b5b9;
+	if (strstr(substr, "dominant 11th b5"))
+		return kDom11b5;
+	if (strstr(substr, "dominant 11th b9"))
+		return kDom11b9;
+	if (strstr(substr, "dominant 11th #9"))
+		return kDom11s9;
+	if (strstr(substr, "half dim 11th b9"))
+		return kHalfDim11b9;
+	if (strstr(substr, "dominant #11"))
+		return kDom7s11;
+	if (strstr(substr, "minor 7th #11"))
+		return kMin7s11;
+	if (strstr(substr, "dominant 13th #11"))
+		return kDom13s11;
+	if (strstr(substr, "major 7 b9 13"))
+		return kM7b913;
+	if (strstr(substr, "major 7th #13"))
+		return kMaj7s13;
+	if (strstr(substr, "major 7 b9 #13"))
+		return kM7b9s13;
+	if (strstr(substr, "dominant 7th b13"))
+		return kDom7b13;
+	if (strstr(substr, "chromatic"))
+		return kChrom;
+	if (strstr(substr, "dominant b9"))
+		return kDomb9;
+	if (strstr(substr, "major 9th"))
+		return kMaj9;
+	if (strstr(substr, "dominant 9th"))
+		return kDom9;
+	if (strstr(substr, "minor 9th"))
+		return kMin9;
 	if (strstr(substr, "minor/major 7th"))
 		return kMinMaj7;
 	if (strstr(substr, "major 7th"))
@@ -945,9 +1063,7 @@ chord_type_t string2mode(const char *substr)
 		return kAug;
 	if (strstr(substr, "dominant 7th"))
 		return kDom7;
-	// TODO: other chords
-	// beware when adding new chords
-	// put shorter names at end of this function!
-	return C;
+
+	return kUnison;
 }
 
