@@ -1,0 +1,11 @@
+--- u_main.tk	2006-01-16 21:03:04.937500000 -0500
++++ /c/Program Files/pd/bin/pd.tk	2006-01-22 18:44:12.843750000 -0500
+@@ -370,7 +367,7 @@
+ 		  exec sh -c [format "open %s" $filename]
+ 	 } else {
+ 		  exec rundll32 url.dll,FileProtocolHandler \
+-				[format "file:%s" $filename] &
++				[format "file:%s" [file attributes $filename -shortname]] &
+ 	 }
+ }
+ 
