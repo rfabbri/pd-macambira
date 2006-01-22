@@ -795,7 +795,7 @@ float chords_memory_add(t_chords_memory *x, chord_t chord1, chord_t chord2)
 		if (DEBUG)
 			post("x->maxweight[%i] = %i",x->fundamental_mode, x->maxweight[x->fundamental_mode]);
 	}
-	return (float) (((float) x->maxweight[x->fundamental_mode]) / ((float) x->arcs[x->fundamental_mode][chord1int][chord2int]) );
+	return (float) (((float) x->arcs[x->fundamental_mode][chord1int][chord2int]) / ((float) x->maxweight[x->fundamental_mode]) );
 
 }
 
