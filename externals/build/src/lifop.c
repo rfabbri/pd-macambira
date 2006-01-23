@@ -1,1 +1,1 @@
-#include "../zexy/src/lifop.c"
+#include "../../zexy/src/lifop.c"
