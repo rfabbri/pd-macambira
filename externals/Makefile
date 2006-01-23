@@ -1054,7 +1054,7 @@ vbap_install: vbap
 #------------------------------------------------------------------------------#
 # Zexy
 ZEXY_NAME = zexy
-ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y]*.c)
+ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c $(externals_src)/zexy/src/z~.c)
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
