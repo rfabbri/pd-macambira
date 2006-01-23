@@ -479,7 +479,7 @@ readme_install:
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>License</h3>" >> $(README_FILE)	
 	echo "<p>" >> $(README_FILE)
-	echo "The Pd core is licensed under a <a href="Pd-LICENSE.txt">BSD license</a>, almost every other part of this package is available under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  A couple packages have BSD-style licenses too." >> $(README_FILE)
+	echo "This package is released under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  The Pd core and some other included code is originally available with a <a href="Pd-LICENSE.txt">BSD license</a> from the Pd CVS on SourceForge." >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>Included Versions</h3>" >> $(README_FILE)	
 	echo "<p>These externals are all included from the Pd CVS repository:</p>" >> $(README_FILE)
