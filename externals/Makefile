@@ -1057,12 +1057,13 @@ ZEXY_NAME = zexy
 ZEXY_OBJECTS := $(wildcard $(externals_src)/zexy/src/[a-y0]*.c $(externals_src)/zexy/src/z~.c)
 ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
+
 zexy: $(ZEXY_OBJECTS:.c=.$(EXTENSION))
 
 zexy_install: zexy
 	install -d $(objectsdir)/$(ZEXY_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(ZEXY_NAME) \
-		--author "iohannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
+		--author "IOhannes m zmoelnig <zmoelnig@iem.kug.ac.at>" \
 		--license "GNU GPL" \
 		--description "GUI and streaming objects" \
 		--version "$(ZEXY_VERSION)"
