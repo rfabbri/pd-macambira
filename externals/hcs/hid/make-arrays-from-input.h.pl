@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl -w
 
 use Switch;
 
@@ -37,7 +37,7 @@ sub getDataFromHeaderLine
 	 if ( m/#define ([A-Z0-9_]*)\s+(0x)?([0-9a-f]+)/) 
 	 { 
 		  if ($2) { $index = hex($3); } else { $index = $3; }
-		  if ($index >=0) 
+		  if ($index >= 0) 
 		  {
 				$returnArray[0] = $index;
 				$returnArray[1] = lc("$1");
@@ -47,6 +47,26 @@ sub getDataFromHeaderLine
 #		  if ($index == 0) { print("index: $index   3: $3  2: $2   1: $1   value: $returnArray[1]\n"); }
 	 } 
 }
+
+#------------------------------------------------------------------------
+# 
+#  this is under construction to make the MAX switch structure cleaner
+# donno if it works yet.
+sub createNewArray
+{
+	 my $myTypeName = shift;
+	 my $myTypeMaxName = shift;
+
+	 my $myIndex;
+	 my $myValue;
+	 my @myNewArray;
+
+	 ($myIndex, $myValue) = getDataFromHeaderLine($myTypeMaxName);
+	 @myNewArray = initArrayWithGenericNames( $myTypeName, $myIndex + 1 );
+	 
+	 return @myNewArray;
+}
+
 
 #------------------------------------------------------------------------
 # declare each array in the header
@@ -156,9 +176,9 @@ while (<INPUT_H>)
 										 @SYN = initArrayWithGenericNames( "SYN", $index + 1 ); }
 				case "KEY"       { ($index, $value) = getDataFromHeaderLine($_);
 										 @KEY = initArrayWithGenericNames( "KEY", $index + 1 ); }
-            # BTN codes are actually part of the KEY type
-				case "BTN"       { ($index, $value) = getDataFromHeaderLine($_);
-										 @BTN = initArrayWithGenericNames( "KEY", $index + 1 ); }
+# BTN codes are actually part of the KEY type, so this array is unused
+#				case "BTN"       { ($index, $value) = getDataFromHeaderLine($_);
+#										 @BTN = initArrayWithGenericNames( "KEY", $index + 1 ); }
 				case "REL"       { ($index, $value) = getDataFromHeaderLine($_);
 										 @REL = initArrayWithGenericNames( "REL", $index + 1 ); }
 				case "ABS"       { ($index, $value) = getDataFromHeaderLine($_);
@@ -181,6 +201,10 @@ while (<INPUT_H>)
 		  }
 	 }
 }
+
+# there is no SYN_MAX defined in input.h, so we set it here:
+@SYN = initArrayWithGenericNames( "SYN", 512 );
+
 
 seek( INPUT_H, 0, 0 );
 while (<INPUT_H>)
