@@ -1,10 +1,10 @@
-#N canvas 183 30 603 600 10;
+#N canvas 173 51 577 571 10;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 483 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 135 30 508 636 More_Info 0;
+#N canvas 135 30 512 640 More_Info 0;
 #X text 17 4 COMMON USES;
 #X text 15 577 INNOVATIVE USES;
 #X text 47 19 I believe that this object was developed first to allow
@@ -17,7 +17,7 @@ hard drive...like below:;
 #X obj 82 125 + 1;
 #X obj 53 145 makefilename file-%d.aif;
 #X text 20 430 LIMITATIONS;
-#N canvas 175 22 595 611 spaces_and_multiple_variables 0;
+#N canvas 175 22 599 615 spaces_and_multiple_variables 0;
 #X text 25 19 Instead of using spaces \, an underscore will often produce
 a tolerable compromise.;
 #X obj 210 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -104,7 +104,7 @@ which operates 24 hours per day \, every day.;
 #X restore 47 605 pd spaces_and_multiple_variables;
 #X obj 53 90 bng 30 250 50 0 empty empty start 1 15 1 12 -90049 -1
 -1;
-#N canvas 475 61 515 617 help_with_interfaces 0;
+#N canvas 475 61 519 621 help_with_interfaces 0;
 #X text 17 16 Building user interfaces in Pd is a difficult balance
 between usability and performance. Pd is not winning any awards for
 usability - let's face it: it's powerful \, it's cool \, and that's
@@ -195,7 +195,8 @@ box.;
 #X obj 86 325 makefilename ASCII=%c;
 #X text 44 378 Watch out! ASCII characters 123 and 125 (curly braces)
 lock up Pd. Also \, reserved characters that Pd uses show up with a
-backslash in front of them (comma \, semi-colon \, and backslash).;
+backslash in front of them (comma \, semi-colon \, and backslash).
+;
 #X text 45 507 - currently \, floats are not supported via the printf
 %f pattern. You can only display the integer part of the float using
 %d or %X.;
@@ -217,14 +218,16 @@ of the decimal is discarded.;
 #X connect 20 0 18 0;
 #X connect 22 0 11 0;
 #X restore 106 507 pd More_Info;
-#N canvas 85 22 397 246 Related_Objects 0;
+#N canvas 85 22 401 250 Related_Objects 0;
 #X text 25 8 Native Pd Objects;
 #X text 25 92 Externals and other object libraries;
 #X obj 42 46 symbol;
 #X obj 112 46 int;
 #X obj 156 46 openpanel;
 #X obj 31 126 strcat;
-#X obj 32 155 makesymbol;
+#X obj 30 156 makesymbol;
+#X obj 30 211 ascseq;
+#X obj 30 183 sprintf;
 #X restore 379 507 pd Related_Objects;
 #X text 38 53 INLETS:;
 #X text 15 197 ARGUMENTS:;
@@ -237,16 +240,16 @@ of the decimal is discarded.;
 ;
 #X floatatom 114 346 0 0 0 0 - - -;
 #X text 146 425 numbered filenames;
-#X obj 353 380 symbol;
+#X obj 380 391 symbol;
 #X msg 353 343 dave;
 #X msg 412 341 drums;
 #X msg 479 344 Pd;
 #X msg 526 355 cool;
-#X obj 353 404 makefilename %s_PD.aif;
+#X obj 380 415 makefilename %s_PD.aif;
 #X text 109 115 Symbol - If a symbol is sent to the inlet \, the argument
 should be written with a "%s" which represent the location of the incoming
 variable symbol in the outgoing symbol. Lists will be truncated.;
-#X symbolatom 353 428 0 0 0 0 - - -;
+#X symbolatom 380 439 0 0 0 0 - - -;
 #X symbolatom 114 404 0 0 0 0 - - -;
 #X obj 115 373 makefilename soundfile%d.aif;
 #X text 392 551 updated for Pd 0.38-4;
@@ -261,7 +264,7 @@ checking. Each [makefilename] object can have only one variable.;
 should be written with a "%c" \, "%d" \, or "%X" which represents the
 location of the incoming variable number in the outgoing symbol. Floats
 will be converted to integers.;
-#N canvas 325 212 524 316 all 0;
+#N canvas 325 212 532 324 all 0;
 #X text 37 59 %c;
 #X text 114 59 character;
 #X text 37 79 %d or %i;
