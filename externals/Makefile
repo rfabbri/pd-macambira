@@ -99,7 +99,9 @@ CXXFLAGS = $(CFLAGS)
 #------------------------------------------------------------------------------#
 # ALL
 
-# if your library isn't included here, it won't be built with Pd-extended
+# if your library isn't included in LIB_TARGETS, it won't be built with
+# Pd-extended.  For libraries that build on all platforms, add them directly
+# below, otherwise add to the correct platforms below.
 LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb iemabs iemlib \
 iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pmpd \
 sigpack smlib toxy unauthorized vbap zexy
@@ -111,6 +113,7 @@ else
   ifeq ($(OS_NAME),darwin)
     LIB_TARGETS += hid pdp 
   else
+    # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip
   endif
 endif
