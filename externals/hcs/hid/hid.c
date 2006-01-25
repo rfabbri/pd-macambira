@@ -32,6 +32,8 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
+static t_class *hid_class;
+
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */

@@ -14,13 +14,11 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 6
 
-static char *version = "$Revision: 1.18 $";
+/* static char *version = "$Revision: 1.19 $"; */
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
-static t_class *hid_class;
-
 typedef struct _hid 
 {
 		t_object            x_obj;
