@@ -36,7 +36,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "false"
-                    OutputPath = "bin\Debug\"
+                    OutputPath = "..\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -94,7 +94,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "pd.cs"
+                    RelPath = "PureData.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

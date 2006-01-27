@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Davide Morelli")]
+[assembly: AssemblyCopyright("Davide Morelli, Thomas Grill")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 

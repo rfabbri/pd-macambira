@@ -3,34 +3,83 @@ using System.Runtime.InteropServices; // for structures
 
 namespace PureData
 {
-	public enum AtomType {Null = 0, Float=1, Symbol=2, List=3, Bang=4};
+	public enum AtomType {Null = 0, Float = 1, Symbol = 2, Pointer = 3};
 
-	//[StructLayout (LayoutKind.Explicit)]
+    [StructLayout (LayoutKind.Sequential)]
+    sealed public class Symbol
+    {
+        // this should NOT be public
+        readonly private IntPtr ptr;
+        
+        public Symbol(IntPtr p)
+        {
+            ptr = p;
+        }
+
+        public Symbol(Symbol s)
+        {
+            ptr = s.ptr;
+        }
+
+        public Symbol(string s)
+        {
+            ptr = Core.GenSym(s);
+        }
+        
+        override public string ToString()
+        {
+            return Core.EvalSym(this);
+        }
+    }
+
+    [StructLayout (LayoutKind.Sequential)]
+    sealed public class Pointer
+    {
+        public IntPtr ptr;
+    }
+
+    [StructLayout (LayoutKind.Explicit)]
+    public struct Word
+    {
+        [FieldOffset(0)] public float w_float;
+        [FieldOffset(0)] public Symbol w_symbol;
+        [FieldOffset(0)] public Pointer w_pointer;
+    }
+
+    //[StructLayout (LayoutKind.Explicit)]
 	[StructLayout (LayoutKind.Sequential)]
-	public struct Atom 
+	sealed public class Atom 
 	{
+	
 		public AtomType type;
-		public float float_value;
-		public string string_value;
+		public Word word;
+		
 		public Atom(float f)
 		{
-			this.type = AtomType.Float;
-			this.float_value = f;
-			this.string_value = "float";
+			type = AtomType.Float;
+			word.w_float = f;
 		}
+
 		public Atom(int i)
 		{
-			this.type = AtomType.Float;
-			this.float_value = (float) i;
-			this.string_value = "float";
-		}
+            type = AtomType.Float;
+            word.w_float = (float)i;
+        }
+
+        public Atom(Symbol s)
+        {
+            type = AtomType.Symbol;
+            word.w_symbol = s;
+        }
+        
 		public Atom(string s)
 		{
-			this.type = AtomType.Symbol;
-			this.float_value = 0;
-			this.string_value = s;
+            type = AtomType.Symbol;
+            word.w_symbol = new Symbol(s);
 		}
 	}
+	
+	
 	// this struct is relative to this c struct, see clr.c
 
 	/*
@@ -51,4 +100,5 @@ namespace PureData
 			} stuff;
 		};
 		*/
+
 }
