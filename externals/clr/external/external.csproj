@@ -36,7 +36,7 @@
                     NoStdLib = "false"
                     NoWarn = ""
                     Optimize = "false"
-                    OutputPath = "bin\Debug\"
+                    OutputPath = "..\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -83,6 +83,7 @@
                     Name = "PureData"
                     AssemblyName = "PureData"
                     HintPath = "..\PureData.dll"
+                    Private = "False"
                 />
             </References>
         </Build>
@@ -95,11 +96,6 @@
                 />
                 <File
                     RelPath = "Counter.cs"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "External.cs"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
