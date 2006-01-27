@@ -3,7 +3,7 @@
  (c) 1998-2005  Winfried Ritsch (see LICENCE.txt)
  Institute for Electronic Music - Graz
 
- V 1.0 RC2
+ V 1.0 
 
 */
 

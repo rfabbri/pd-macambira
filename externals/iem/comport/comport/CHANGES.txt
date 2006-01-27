@@ -1,3 +1,6 @@
+1.0 - 25.1.2006
+ released with pd_darwin makefile extension
+
 1.0RC2 - 18.11.2005
 
  made more C-compatible and LGPL
