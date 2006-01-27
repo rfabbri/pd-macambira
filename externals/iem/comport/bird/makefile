@@ -6,7 +6,7 @@
 #
 
 current: 
-	echo choose one command:  make pd_linux, make pd_nt, make pd_irix5, make pd_irix6
+	echo choose one command:  make pd_linux, make pd_nt, make pd_irix5, make pd_irix6, make pd_darwin
 
 # ----------------------- NT -----------------------
 pd_nt: bird.dll
@@ -80,3 +80,18 @@ LINUXINCLUDE =  -I../../src
 	ld -export_dynamic  -shared -o $*.pd_linux $*.o -lc -lm
 	strip --strip-unneeded $*.pd_linux
 	rm $*.o
+
+# ----------------------- Mac OSX -----------------------
+
+pd_darwin: bird.pd_darwin
+
+.SUFFIXES: .pd_darwin
+
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+.c.pd_darwin:
+	cc $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	rm -f $*.o
+

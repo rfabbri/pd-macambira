@@ -3,7 +3,6 @@ bird - PD external for unix/windows to use the flock of birds
  (c) 1998-2005  Winfried Ritsch (see LICENCE.txt)
  Institute for Electronic Music - Graz
 
-
 the external comport is also needed for interfacing.
 
 Please see testbird.pd for more help.
