@@ -6,7 +6,7 @@
 #
 
 current: 
-	echo choose one command:  make pd_linux, make pd_nt, make pd_irix5, make pd_irix6
+	echo choose one command:  make pd_linux, make pd_nt, make pd_irix5, make pd_irix6, make pd_darwin
 
 # ----------------------- NT -----------------------
 pd_nt: comport.dll
