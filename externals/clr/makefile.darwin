@@ -4,6 +4,8 @@ clean: ; rm -f *.o *.pd_darwin
 
 
 # ----------------------- Mac OSX -----------------------
+# You'll have to set the environment variable
+# MACOSX_DEPLOYMENT_TARGET=10.3
 
 pd_darwin: clr.pd_darwin
 
