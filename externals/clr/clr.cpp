@@ -17,7 +17,13 @@ extern "C" {
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
 #include <io.h> // for _close
+#define close _close
+#else
+#include <unistd.h>
+#endif
 
 #include <map>
 
@@ -961,7 +967,7 @@ static int classloader(char *dirname, char *classname)
         goto bailout;
 
     // found
-    _close(fd);
+    close(fd);
 
     clr_class = (t_clr_class *)getbytes(sizeof(t_clr_class));
 
@@ -1096,8 +1102,8 @@ void clr_setup(void)
 	    mono_add_internal_call("PureData.Core::PostBug",(const void *)PD_PostBug);
 	    mono_add_internal_call("PureData.Core::PostVerbose",(const void *)PD_PostVerbose);
 
-	    mono_add_internal_call("PureData.Core::GenSym", PD_GenSym);
-	    mono_add_internal_call("PureData.Core::EvalSym", PD_EvalSym);
+	    mono_add_internal_call("PureData.Core::GenSym", (const void *)PD_GenSym);
+	    mono_add_internal_call("PureData.Core::EvalSym", (const void *)PD_EvalSym);
 
 
         MonoAssembly *assembly = mono_domain_assembly_open (monodomain, "PureData.dll");

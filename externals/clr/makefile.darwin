@@ -1,6 +1,6 @@
 current: pd_darwin
 
-clean: ; rm -f *.pd_linux *.o *.pd_darwin
+clean: ; rm -f *.o *.pd_darwin
 
 
 # ----------------------- Mac OSX -----------------------
@@ -10,31 +10,18 @@ pd_darwin: clr.pd_darwin
 .SUFFIXES: .pd_darwin
 
 
-# where are the PD header files?
-# leave it blank if it is a system directory (like /usr/local/include), 
-# 	since gcc 3.2 complains about it
-#PDPATH=/usr/local/src/pd/src
-PDPATH=/Users/davide/Desktop/Pd-0.39-0.app/Contents/Resources/src/
+PDPATH=/Users/thomas/Develop/pd/devel_0_39
+
+MONO=/Library/Frameworks/Mono.Framework
 
 # where is the PD executable?
-#PD=/usr/local/bin/pd
-PD=/Users/davide/Desktop/Pd-0.39-0.app/Contents/Resources/bin/pd
-#PD=/Users/davidemorelli/Desktop/robaDavide/Pd-0.38-3.app/Contents/Resources/src/
+PD=$(PDPATH)/bin/pd
 
-CFLAGS=`pkg-config --cflags mono`
-#LDFLAGS=`pkg-config --libs mono`
-LDFLAGS=-L/sw/lib -L/sw/lib/pkgconfig/../../lib -lmono  -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 -lintl -liconv
+LDFLAGS=-L$(MONO)/Libraries -lmono  -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 # -lintl -liconv
 
-DARWININCLUDE =  -I../../src -I$(PDPATH)
-
-#DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
-#   -Wno-unused -Wno-parentheses -Wno-switch
+DARWININCLUDE = -I$(MONO)/Headers -I$(MONO)/Headers/glib-2.0 -I$(MONO)/Libraries/glib-2.0/include -I$(PDPATH)/src
 
 DARWINCFLAGS = -DPD -O2 
 
-.c.pd_darwin:
-	cc $(DARWINCFLAGS) $(DARWININCLUDE) $(CFLAGS) -o $*.o -c $*.c
-#	cc -bundle  -bundle_loader $(PD) -multiply_defined supress $(LDFLAGS) -o $*.pd_darwin  *.o
-	cc -bundle  -bundle_loader $(PD) -flat_namespace $(LDFLAGS) -o $*.pd_darwin  *.o
-#	cc -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $(FANNLIB) *.o
-#	rm -f $*.o
+.cpp.pd_darwin:
+	g++ -dynamiclib -undefined dynamic_lookup $(DARWINCFLAGS) $(DARWININCLUDE) $(CFLAGS) $(LDFLAGS) -o $*.pd_darwin $*.cpp
