@@ -1040,7 +1040,6 @@ static int classloader(char *dirname, char *classname)
         class_addfloat(clr_class->pd_class,clr_method_float);
     if((clr_class->method_symbol = mono_method_desc_search_in_class(clr_desc_symbol,clr_class->mono_class)) != NULL)
         class_addsymbol(clr_class->pd_class,clr_method_symbol);
-//    if((clr_class->method_pointer = mono_class_get_method_from_name(clr_class->mono_class,"MethodPointer",1)) != NULL)
     if((clr_class->method_pointer = mono_method_desc_search_in_class(clr_desc_pointer,clr_class->mono_class)) != NULL)
         class_addpointer(clr_class->pd_class,clr_method_pointer);
     if((clr_class->method_list = mono_method_desc_search_in_class(clr_desc_list,clr_class->mono_class)) != NULL)
@@ -1084,19 +1083,15 @@ void clr_setup(void)
     mono_set_dirs(tlib,tconf);
 #endif
 
-    monodomain = mono_jit_init("PureData");
-	if(monodomain) {
-    /*	
-	    // add mono to C hooks
-	    mono_add_internal_call ("PureData.pd::RegisterSelector", registerMonoMethod);
-	    mono_add_internal_call ("PureData.pd::ToOutlet", out2outlet);
-	    mono_add_internal_call ("PureData.pd::PostMessage", post2pd);
-	    mono_add_internal_call ("PureData.pd::ErrorMessage", error2pd);
-	    mono_add_internal_call ("PureData.pd::CreateOutlet", createOutlet);
-	    mono_add_internal_call ("PureData.pd::CreateInlet", createInlet);
-    */
-//	    mono_add_internal_call ("PureData.Core::AddMethod", PD_AddMethod);
+    try { 
+        monodomain = mono_jit_init("PureData"); 
+    }
+    catch(...) {
+        monodomain = NULL;
+    }
 
+	if(monodomain) {
+	    // add mono to C hooks
         mono_add_internal_call("PureData.Core::Post",(const void *)PD_Post);
 	    mono_add_internal_call("PureData.Core::PostError",(const void *)PD_PostError);
 	    mono_add_internal_call("PureData.Core::PostBug",(const void *)PD_PostBug);
