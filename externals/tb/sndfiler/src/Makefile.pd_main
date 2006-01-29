@@ -4,7 +4,7 @@
 
 # this should point to the directory which contains
 # m_pd.h and g_canvas.h
-PD_SCR = /home/holzi/pd-0.39-1/src
+PD_SCR = /usr/local/src/pd/src
 #PD_SCR = c:/pd/src
 
 # this is the pd directory, usually /usr/lib/pd
@@ -19,10 +19,10 @@ SNDFILE_SRC = /usr/include
 # the directory, where libsndfile is located
 # (in linux it' normally not necessary, in windows it's
 # normally in c:/windwos/system or so)
-SNDFILE_PATH = c:/windows/system
+#SNDFILE_PATH = c:/windows/system
 
 # path to threadlib.h
-THREADLIB_SRC = /home/Georg/pd-cvs/externals/grh/threadlib/src
+THREADLIB_SRC = /home/holzi/pd-cvs/externals/grh/threadlib/src
 #THREADLIB_SRC = c:/Georg/pd-cvs/externals/grh/threadlib/src
 
 # path to threadlib.pd_linux/dll/pd_darwin

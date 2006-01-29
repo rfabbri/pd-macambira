@@ -46,7 +46,6 @@ struct _garray
 #include "m_fifo.h"
 
 #include "pthread.h"
-#include "semaphore.h"
 
 #endif /* USE_PD_MAIN */
 
@@ -57,6 +56,7 @@ struct _garray
 #include "stdlib.h"
 #include "sched.h" /* for thread priority */
 #include <string.h>
+#include "semaphore.h"
 
 /* for alloca */
 #ifdef MSW
