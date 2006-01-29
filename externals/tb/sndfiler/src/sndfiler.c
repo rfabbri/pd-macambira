@@ -203,7 +203,10 @@ static void sndfiler_start_thread(void)
     
     sf_param.sched_priority=sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&sf_attr,&sf_param);
-	
+
+    /* 1mb of stack should be enough */
+    pthread_attr_setstacksize(&sf_attr,1048576);
+
 #ifdef UNIX
     if (sys_hipriority == 1/*  && getuid() == 0 */)
     {
