@@ -1,0 +1,44 @@
+#N canvas 229 80 464 537 10;
+#X floatatom 26 76 5 0 0 0 - - -;
+#X floatatom 26 140 0 0 0 0 - - -;
+#X obj 68 258 autoscale;
+#X obj 2 -10 cnv 15 450 20 empty empty [autoscale] 2 11 1 18 -233017
+-66577 0;
+#X text 18 23 [autoscale] scales a stream of numbers based on an output
+range set as arguments \, and an input range which is set dynamically.
+;
+#X floatatom 68 237 5 0 0 0 - - -;
+#X obj 71 281 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 17 441 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 234 455 released under the GNU GPL;
+#X floatatom 150 140 0 0 0 0 - - -;
+#X floatatom 297 140 0 0 0 0 - - -;
+#X obj 213 71 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X text 17 474 $Revision: 1.1 $$Date: 2006-01-29 05:43:33 $;
+#X text 18 487 $Author: eighthave $;
+#X text 25 324 The [reset( message resets the stored max and min to
+zero.;
+#X floatatom 46 348 5 0 0 0 - - -;
+#X obj 71 401 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X msg 96 346 reset;
+#X obj 150 110 autoscale -0.01 0.01;
+#X obj 297 110 autoscale -4095 4095;
+#X obj 68 378 autoscale;
+#X text 13 181 If you use [autoscale] with no arguments \, then the
+output range defaults to 0-1.;
+#X obj 26 110 autoscale;
+#X connect 0 0 22 0;
+#X connect 2 0 6 0;
+#X connect 5 0 2 0;
+#X connect 11 0 18 0;
+#X connect 11 0 19 0;
+#X connect 15 0 20 0;
+#X connect 17 0 20 0;
+#X connect 18 0 9 0;
+#X connect 19 0 10 0;
+#X connect 20 0 16 0;
+#X connect 22 0 1 0;

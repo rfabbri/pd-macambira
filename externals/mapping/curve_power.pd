@@ -1,0 +1,14 @@
+#N canvas 612 444 456 373 10;
+#X obj 42 53 inlet;
+#X obj 42 230 outlet;
+#X text 5 14 input range: -1 to 1;
+#X obj 43 182 pow;
+#X text 98 229 output range: -1 to 1;
+#X obj 138 53 inlet;
+#X obj 146 106 float_argument \$1 1;
+#X obj 146 84 loadbang;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;
+#X connect 5 0 3 1;
+#X connect 6 0 3 1;
+#X connect 7 0 6 0;
