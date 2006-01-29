@@ -30,7 +30,7 @@
 #X obj 170 262 r array_index;
 #X obj 57 13 loadbang;
 #X obj 57 207 / 100;
-#X text 99 207 [hid] output range: 0 to 1;
+#X text 99 207 mapping output range: 0 to 1;
 #X obj 56 283 tabwrite curve_exp;
 #X obj 56 233 curve_exp;
 #X connect 0 0 1 0;
