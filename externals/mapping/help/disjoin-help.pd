@@ -1,12 +1,12 @@
-#N canvas 759 140 610 671 10;
+#N canvas 299 61 346 576 10;
 #X obj 33 34 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 0 1;
+-1 -1 11300 1;
 #X obj 33 205 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 0 1;
+-1 -1 12000 1;
 #X obj 112 205 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 0 1;
+-1 -1 10700 1;
 #X obj 33 396 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 0 1;
+-1 -1 11300 1;
 #X floatatom 134 339 5 0 0 0 - - -;
 #X obj 33 175 disjoin 0.3;
 #X obj 33 364 join 0.3;
