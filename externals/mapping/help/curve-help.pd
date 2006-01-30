@@ -1,6 +1,6 @@
-#N canvas 485 163 480 361 10;
-#X obj 5 2 cnv 15 450 20 empty empty [curve_exp] 2 11 1 18 -233017
--66577 0;
+#N canvas 327 209 484 365 10;
+#X obj 5 2 cnv 15 450 20 empty empty [curve] 2 11 1 18 -233017 -66577
+0;
 #X msg 422 3 pddp;
 #X text 27 320 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
@@ -9,14 +9,14 @@
 #X floatatom 25 163 8 0 0 0 - - -;
 #X floatatom 25 224 8 0 0 0 - - -;
 #X obj 28 241 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -262144
--1 -1 19900 1;
+-1 -1 0 1;
 #X obj 28 143 hsl 200 15 0 1 0 0 empty empty empty 22 8 1 12 -261681
--1 -1 19900 1;
+-1 -1 0 1;
 #N canvas 0 22 450 300 graph1 0;
 #X array \$0-curve 100 float 0;
 #X coords 0 1 99 -1 100 100 1;
 #X restore 321 111 graph;
-#N canvas 266 69 379 369 draw_array 0;
+#N canvas 266 69 383 373 draw_array 0;
 #X msg 54 82 bang;
 #X obj 54 103 until;
 #X text 85 82 start;
@@ -33,7 +33,7 @@
 #X obj 54 180 trigger float float;
 #X obj 127 127 select 0;
 #X obj 53 313 tabwrite \$0-curve;
-#X obj 53 283 curve cos;
+#X obj 53 283 curve sin;
 #X connect 0 0 1 0;
 #X connect 1 0 3 0;
 #X connect 3 0 4 0;
