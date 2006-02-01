@@ -2,6 +2,8 @@
 NAME=sndfiler
 CSYM=sndfiler
 
+OBJ=sndfiler.o file_input.o
+
 current: pd_linux
 
 # ----------------------- NT -----------------------
@@ -65,13 +67,14 @@ LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
-LINUXINCLUDE = -I/home/tim/pd/devel_0_39/src
+LINUXINCLUDE = -I../../../../pd/src
 
 LSTRIP = strip --strip-unneeded -R .note -R .comment
 
 .c.pd_linux:
-	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	cc -Wl,-export_dynamic --shared -o $*.pd_linux $*.o -lm -lsndfile
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o sndfiler.o -c sndfiler.c
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -o file_input.o -c file_input.c
+	cc -Wl,-export_dynamic --shared -o $*.pd_linux $(OBJ) -lm -lsndfile -lvorbisfile
 #	$(LSTRIP) $*.pd_linux
 	rm -f $*.o
 

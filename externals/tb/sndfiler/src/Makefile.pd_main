@@ -41,6 +41,8 @@ CC_FLAGS = -DPD -DUSE_PD_MAIN -O3 -funroll-loops \
            -Wno-unused -fomit-frame-pointer
 LD_FLAGS = --export-dynamic -shared -o
 
+OBJ=sndfiler.o file_input.o
+
 current:
 	@echo ----------------------------
 	@echo  USAGE:
@@ -56,11 +58,12 @@ pd_linux: $(NAME).pd_linux
 .SUFFIXES: .pd_linux
 
 CC_UNIX = -DUNIX -fPIC -pthread
-LIB_UNIX = -lc -lm -lsndfile $(THREADLIB_PATH)/threadlib.pd_linux
+LIB_UNIX = -lc -lm -lsndfile -lvorbisfile $(THREADLIB_PATH)/threadlib.pd_linux
 
 .c.pd_linux:
-	$(CC) $(CC_UNIX) $(CC_FLAGS) $(INCLUDE) -o $*.o -c $*.c
-	$(LD) $(LD_FLAGS) $*.pd_linux $*.o $(LIB_UNIX)
+	$(CC) $(CC_UNIX) $(CC_FLAGS) $(INCLUDE) -o sndfiler.o -c sndfiler.c
+	$(CC) $(CC_UNIX) $(CC_FLAGS) $(INCLUDE) -o file_input.o -c file_input.c
+	$(LD) $(LD_FLAGS) $*.pd_linux $(OBJ) $(LIB_UNIX)
 	strip --strip-unneeded $*.pd_linux
 	chmod 755 $*.pd_linux
 	@test -d ../bin || mkdir -p ../bin
@@ -97,11 +100,12 @@ pd_darwin: $(NAME).pd_darwin
 CC_DARWIN = -pthread
 LD_DARWIN = -bundle -undefined suppress -flat_namespace \
             -bundle_loader $(PD_PATH)/bin/pd --export-dynamic \
-            -L/sw/lib -L/opt/local/lib -lsndfile \
+            -L/sw/lib -L/opt/local/lib -lsndfile -lvorbisfile \
             $(THREADLIB_PATH)/threadlib.pd_darwin
 
 .c.pd_darwin:
-	$(CC) $(CC_FLAGS) $(CC_DARWIN) $(INCLUDE) -o $*.o -c $*.c
+	$(CC) $(CC_UNIX) $(CC_FLAGS) $(INCLUDE) -o sndfiler.o -c sndfiler.c
+	$(CC) $(CC_UNIX) $(CC_FLAGS) $(INCLUDE) -o file_input.o -c file_input.c
 	$(LD) $(LD_DARWIN) -o $*.pd_darwin $*.o $(LIB)
 	chmod 755 $*.pd_darwin
 	@test -d ../bin || mkdir -p ../bin

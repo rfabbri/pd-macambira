@@ -1,6 +1,6 @@
 /*
  *
- * threaded soundfiler based on libsndfile
+ * threaded soundfiler for pd
  * Copyright (C) 2005, Tim Blechmann
  *           (C) 2005, Georg Holzmann <grh@mur.at>
  *
@@ -20,14 +20,18 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/* to be compatible with main pd */
+#include "sndfiler.h"
+#include "file_input.h"
+
+
+/************ forward declarations **************/
+
+#ifdef UNIX
+/* real-time flag, true if priority boosted */
+extern int sys_hipriority;
+#endif
+
 #ifdef USE_PD_MAIN
-
-#define  getalignedbytes(a)     getbytes(a)
-#define  freealignedbytes(a,b)  freebytes(a,b)
-#include "threadlib.h"
-
-/* forward declaration */
 struct _garray
 {
     t_gobj x_gobj;
@@ -39,56 +43,6 @@ struct _garray
     char x_saveit;          /* true if we should save this with parent */
     char x_listviewing;     /* true if list view window is open */
 };
-
-#else /* now for pd_devel */
-
-#include "m_pd.h"
-#include "m_fifo.h"
-
-#include "pthread.h"
-
-#endif /* USE_PD_MAIN */
-
-
-#include "g_canvas.h"
-#include "sndfile.h"
-
-#include "stdlib.h"
-#include "sched.h" /* for thread priority */
-#include <string.h>
-#include "semaphore.h"
-
-/* for alloca */
-#ifdef MSW
-#include <malloc.h>
-#else
-#include "alloca.h"
-#endif
-
-#if (_POSIX_MEMLOCK - 0) >=  200112L
-#include <sys/mman.h>
-#endif /* _POSIX_MEMLOCK */
-
-#ifdef __APPLE__
-#include <mach/mach.h>
-#include <mach/task.h>
-#include <mach/semaphore.h>
-#define SEM_T semaphore_t
-#define SEM_INIT(s) (semaphore_create(mach_task_self(),&s,SYNC_POLICY_FIFO,0) == 0)
-#define SEM_SIGNAL(s) semaphore_signal(s)
-#define SEM_WAIT(s) semaphore_wait(s)
-#else
-#define SEM_T sem_t
-#define SEM_INIT(s) (sem_init(&s,0,0) == 0)
-#define SEM_SIGNAL(s) sem_post(&s)
-#define SEM_WAIT(s) sem_wait(&s)
-#endif
-
-/************ forward declarations **************/
-
-#ifdef UNIX
-/* real-time flag, true if priority boosted */
-extern int sys_hipriority;
 #endif
 
 /* get a garray's "array" structure. */
@@ -206,7 +160,7 @@ static void sndfiler_start_thread(void)
 
     /* 1mb of stack should be enough */
     pthread_attr_setstacksize(&sf_attr,1048576);
-
+	
 #ifdef UNIX
     if (sys_hipriority == 1/*  && getuid() == 0 */)
     {
@@ -252,18 +206,15 @@ static t_int sndfiler_synchonize(t_int * w);
 
 static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
 {
-    int i, j;
+    int i, j, lib;
     int channel_count;
     t_float** helper_arrays;
     int resize = 0;
-    int seek = 0, arraysize = 0, writesize;
+    int seek = 0, arraysize = 0;
 
     t_symbol* file;
     t_garray ** arrays;
 
-    SNDFILE* sndfile;
-    SF_INFO info;
-    
     // parse flags
     while (argc > 0 && argv->a_type == A_SYMBOL &&
         *argv->a_w.w_symbol->s_name == '-')
@@ -276,9 +227,10 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
         }
         else if (!strcmp(flag, "skip"))
         {
-            if (argc < 2 || argv[1].a_type != A_FLOAT ||
-                ((seek = argv[1].a_w.w_float) == 0))
+            if (argc < 2 || argv[1].a_type != A_FLOAT)
                 goto usage;
+            else
+                seek = argv[1].a_w.w_float;
             argc -= 2; argv += 2;
         }
         else goto usage;
@@ -323,85 +275,23 @@ static void sndfiler_read_cb(t_sndfiler * x, int argc, t_atom* argv)
         }
         arraysize = size;
     }
-  
-    sndfile = sf_open(file->s_name, SFM_READ, &info);
 
-    if (sndfile)
+    lib = check_fileformat(file);
+    if(lib == USE_LIBSNDFILE)
+        arraysize = read_libsndfile(helper_arrays, channel_count, seek,
+                                    resize, arraysize, file);
+    else if(lib == USE_LIBVORBISFILE)
+        arraysize = read_libvorbisfile(helper_arrays, channel_count, seek,
+                                       resize, arraysize, file);
+    else
     {
-        int pos = 0;
-        int maxchannels = (channel_count < info.channels) ?
-            channel_count : info.channels;
+        pd_error(x, "Error opening file");
+        return;
+    }
 
-        t_float * item = alloca(maxchannels * sizeof(t_float));
-    
+    if(arraysize > 0)
+    {
         t_int ** syncdata = getbytes(sizeof(t_int*) * 5);
-	
-        // negative seek: offset from the end of the file
-        if(seek<0)
-        {
-            pos = sf_seek(sndfile, seek, SEEK_END);
-        }
-        if(seek>0)
-        {
-            pos = sf_seek(sndfile, seek, SEEK_SET);
-        }
-        if(pos == -1)
-        {
-            pd_error(x, "invalid seek in soundfile");
-            return;
-        }
-	
-        if(resize)
-        {
-            writesize = (info.frames-pos);
-            arraysize = writesize;
-        }
-        else
-            writesize = (arraysize>(info.frames-pos)) ? 
-                info.frames-pos : arraysize;
-
-#if (_POSIX_MEMLOCK - 0) >=  200112L
-        munlockall();
-#endif
-
-        for (i = 0; i != channel_count; ++i)
-        {
-            helper_arrays[i] = getalignedbytes(arraysize * sizeof(t_float));
-        }
-
-        for (i = 0; i != writesize; ++i)
-        {
-            sf_read_float(sndfile, item, info.channels);
-
-            for (j = 0; j != info.channels; ++j)
-            {
-                if (j < channel_count)
-                {
-                    helper_arrays[j][i] = item[j];
-                }
-            }
-        }
-	
-        // fill remaining elements with zero
-        if(!resize && (arraysize>(info.frames-pos)))
-        {
-            for (i = writesize; i != arraysize; ++i)
-            {
-                for (j = 0; j != info.channels; ++j)
-                {
-                    if (j < channel_count)
-                    {
-                        helper_arrays[j][i] = 0;
-                    }
-                }
-            }
-        }
-
-#if (_POSIX_MEMLOCK - 0) >=  200112L
-        mlockall(MCL_FUTURE);
-#endif
-
-        sf_close(sndfile);
 
         syncdata[0] = (t_int*)arrays;
         syncdata[1] = (t_int*)helper_arrays;
