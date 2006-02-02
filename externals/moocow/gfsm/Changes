@@ -1,0 +1,9 @@
+Change log for PD external 'pd-gfsm'
+
+v0.02 Tue, 21 Sep 2004 01:30:45 +0200
+   + added 'arc_seek' message to gfsm_state
+   + added 'add_weight' message to gfsm_state
+   + began work on 'gfsm_markov.pd'
+
+v0.01 Mon, 13 Sep 2004 11:11:43 +0200
+   + initial version
