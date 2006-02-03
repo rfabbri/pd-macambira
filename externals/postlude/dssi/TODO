@@ -1,0 +1,29 @@
+   1. Fix memory allocation issues.
+   2. Restore Trivial Synth compatibility, i.e. is GUI fails, don't crash. - DONE!
+   3. Reomve alsa.h dependency - Included header file!
+   4. Get Hexter/Fluidsynth working - DONE!
+   5. Get LTS working (full functionality i.e Pitch Bend, Control etc.) - DONE!
+   6. Do OSC/GUI - DONE!
+   7. Multiple instances -DONE!
+   8. If OSC is received from another source - update the GUI.
+   9. Patch saving/loading. -DONE (for Hexter)!
+   10. Make GUI close when app closes, or new plugin loaded. -DONE!
+   11. Make ll-scope work.
+   12. Fix note hangs. - DONE - this was due to precedence problems in the PD patch!
+   13. Fix inability to run two instances of the dssi~ external. - DONE!
+   14. Fix exiting handler -DONE!
+   15. Fix GUI close when PD quit - don't leave defunct process
+   16. Fix free() call if plugin isn't loaded successfully -DONE!
+   17. Implement GUI show/hide. -DONE!
+   18. Fix segfault if dssi~ recieves on MIDI channel it doesn't have an instance for -DONE!
+   19. Fix program crash when patch load if audio running. -DONE!
+   20. Make info logged to pd console more meaningful
+   21. Add more error checking.
+   22. Fix: global polyphony handling - DONE!
+   23. Fix: config malloc bugs
+   24. Fix: exit call instance deactivate function - DONE!
+   25. Check DSSI spec conformity!
+   26. FIX: Why does is incorrect patch name chown when program is changed from GUI? - DONE! - query_programs must be sent for each configure call
+   27. FIX: Generic valgrind error - also in jack-dssi-host.
+   28. FIX: crash on close if incorrect plugin path given on command line -DONE!
+
