@@ -1,40 +1,41 @@
-#N canvas 56 302 475 480 10;
-#X obj 5 2 cnv 15 450 20 empty empty [spiral] 2 11 1 18 -233017
--66577 0;
+#N canvas 56 302 487 492 10;
+#X obj 27 457 import unauthorized;
+#X obj 5 2 cnv 15 450 20 empty empty [spiral] 2 11 1 18 -233017 -66577
+0;
 #X msg 422 3 pddp;
 #X text 245 451 released under the GNU GPL;
-#X floatatom 70 288 5 0 0 0 - - -;
-#X floatatom 70 375 5 0 0 0 radius-> - -;
+#X floatatom 32 232 5 0 0 0 - - -;
+#X floatatom 70 385 5 0 0 0 radius-> - -;
 #X text 175 408 For more info:;
 #X text 28 437 (C) Copyright 2005 Hans-Christoph Steiner <hans@at.or.at>
 ;
-#X obj 71 201 hsl 128 15 0 1 0 0 empty empty x-axis 133 7 1 10 -225280
--1 -1 0 0;
-#X obj 127 143 vsl 15 128 0 1 0 0 empty empty y-axis -6 -9 1 10 -261681
--1 -1 0 0;
-#X floatatom 136 376 8 0 0 1 <-angle - -;
-#X floatatom 128 288 5 0 0 0 - - -;
-#X obj 127 305 t b f;
-#X text 246 271 related objects:;
-#X text 264 324 example:;
-#X msg 69 126 0.5;
-#X text 15 126 center:;
-#X obj 323 324 spiral-joystick;
-#X obj 70 335 spiral;
+#X floatatom 136 386 8 0 0 1 <-angle - -;
+#X floatatom 125 232 5 0 0 0 - - -;
+#X obj 124 249 t b f;
+#X text 216 341 related objects:;
+#X text 266 378 example:;
+#X obj 325 378 spiral-joystick;
+#X obj 86 346 spiral;
 #X obj 279 406 pddp_open mapping-about;
-#X obj 362 271 polar;
+#X obj 390 341 polar;
 #X text 24 32 Converts cartesian coordinates(x \, y) to spiral in polar
 coordinates (radius \, angle). The angle is from 0 to 1 The angle 0
 is at cartesian (1 \, 0) or far right center.;
 #X text 24 81 The angle will just keep going up/down as long as there
 is rotation rather than reset like [polar].;
-#X connect 3 0 17 0;
-#X connect 7 0 3 0;
-#X connect 8 0 10 0;
-#X connect 10 0 11 0;
-#X connect 11 0 3 0;
-#X connect 11 1 17 1;
-#X connect 14 0 8 0;
-#X connect 14 0 7 0;
-#X connect 17 0 4 0;
-#X connect 17 1 9 0;
+#X msg 159 293 1;
+#X msg 195 293 -1;
+#X text 223 293 manually add/subtract rotations;
+#X obj 32 124 grid grid1 100 0 1 100 0 1 0 0.01 0.01 10 10 -131 68
+;
+#X obj 339 341 vector;
+#X connect 4 0 14 0;
+#X connect 9 0 10 0;
+#X connect 10 0 4 0;
+#X connect 10 1 14 1;
+#X connect 14 0 5 0;
+#X connect 14 1 8 0;
+#X connect 19 0 14 2;
+#X connect 20 0 14 2;
+#X connect 22 0 4 0;
+#X connect 22 1 9 0;
