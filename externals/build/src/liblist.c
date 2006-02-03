@@ -88,7 +88,7 @@ static void atoms_copy(int argc, t_atom *from, t_atom *to)
 
 /* ------------- fake class to divert inlets to ----------------- */
 
-t_class *alist_class;
+static t_class *alist_class;
 
 static void alist_init(t_alist *x)
 {
@@ -165,7 +165,7 @@ static void alist_setup(void)
 
 /* ------------- list append --------------------- */
 
-t_class *list_append_class;
+static t_class *list_append_class;
 
 typedef struct _list_append
 {
@@ -225,7 +225,7 @@ static void list_append_setup(void)
 
 /* ------------- list prepend --------------------- */
 
-t_class *list_prepend_class;
+static t_class *list_prepend_class;
 
 typedef struct _list_prepend
 {
@@ -285,7 +285,7 @@ static void list_prepend_setup(void)
 
 /* ------------- list split --------------------- */
 
-t_class *list_split_class;
+static t_class *list_split_class;
 
 typedef struct _list_split
 {
@@ -344,7 +344,7 @@ static void list_split_setup(void)
 
 /* ------------- list trim --------------------- */
 
-t_class *list_trim_class;
+static t_class *list_trim_class;
 
 typedef struct _list_trim
 {
@@ -409,7 +409,7 @@ static void *list_new(t_pd *dummy, t_symbol *s, int argc, t_atom *argv)
     return (newest);
 }
 
-void list_setup(void)
+void liblist_setup(void)
 {
     alist_setup();
     list_append_setup();
