@@ -1,0 +1,33 @@
+#N canvas 707 44 458 308 10;
+#X text 41 16 float values are automatically initialized to 0 in Pd.
+;
+#X obj 4 114 +;
+#X obj 5 81 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj 118 114 *;
+#X obj 227 113 float;
+#X obj 347 113 trigger f;
+#X obj 178 151 bng 15 250 50 0 empty empty reset 0 -6 0 8 -262144 -1
+-1;
+#X obj 4 188 pddp_print;
+#X obj 117 187 pddp_print;
+#X obj 227 187 pddp_print;
+#X obj 347 187 pddp_print;
+#X obj 117 81 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 226 81 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 346 81 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X connect 1 0 7 0;
+#X connect 2 0 1 0;
+#X connect 3 0 8 0;
+#X connect 4 0 9 0;
+#X connect 5 0 10 0;
+#X connect 6 0 7 0;
+#X connect 6 0 8 0;
+#X connect 6 0 9 0;
+#X connect 6 0 10 0;
+#X connect 11 0 3 0;
+#X connect 12 0 4 0;
+#X connect 13 0 5 0;

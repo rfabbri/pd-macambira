@@ -1,0 +1,28 @@
+#N canvas 361 163 471 494 10;
+#X text 117 189 (screenshot of main Pd window);
+#X msg 26 288 \; pd dsp 1;
+#X msg 93 288 \; pd dsp 0;
+#X text 19 252 As with most programming languages \, in Pd "1" means
+on \, and "0" means off.;
+#X obj 210 283 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 209 308 \; pd dsp \$1;
+#X text 28 137 To see whether the DSP is on or off \, look at the checkbox
+on the main Pd window. You can also turn the DSP on and off using that
+checkbox.;
+#X obj 344 343 osc~ 250;
+#X obj 330 375 dac~;
+#X text 24 20 You can turn the processing of audio data on and off.
+In order for your patch to run \, you need to make sure that "compute
+audio" is turned on. This is also known as the "DSP". There are a couple
+ways of turning the "DSP" on and off.;
+#X text 23 100 - TODO: is Gem or PDP computation also controlled by
+the DSP?;
+#X text 23 407 There are also keyboard shortcuts:;
+#X text 34 459 (On MacOS X \, you can also use Cmd-. and Cmd-/);
+#X text 41 425 off: Ctrl-.;
+#X text 48 440 on: Ctrl-/;
+#X text 73 84 - TODO: messages are always processed;
+#X connect 4 0 5 0;
+#X connect 7 0 8 0;
+#X connect 7 0 8 1;

@@ -1,0 +1,6 @@
+
+
+- make object which outputs previous and next files
+
+- make patch close itself, otherwise:
+   - upon [loadbang], wait, then close previous patch

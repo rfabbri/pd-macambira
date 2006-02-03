@@ -1,0 +1,41 @@
+#N canvas 277 67 501 498 10;
+#X text 157 15 storage objects;
+#X obj 159 66 symbol;
+#X obj 117 66 bang;
+#X obj 280 66 f;
+#X obj 215 66 float;
+#X text 255 66 aka;
+#X text 88 35 A storage object stores a value.;
+#X text 26 361 If a storage object receives a value on the left inlet
+\, then it outputs that value immediately in addition to storing it.
+;
+#X text 25 231 If a storage object receives a value on the right inlet
+\, then it stores that value.;
+#X text 18 100 If you bang the left inlet of a storage object \, it
+outputs its stored value.;
+#X obj 177 142 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 177 192 pddp_print;
+#X obj 177 165 float;
+#X obj 166 274 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 180 325 pddp_print;
+#X obj 180 298 float;
+#X msg 193 274 123;
+#X obj 180 455 pddp_print;
+#X obj 180 428 float;
+#X msg 210 403 123;
+#X msg 180 403 432;
+#X obj 159 404 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 225 274 321;
+#X connect 10 0 12 0;
+#X connect 12 0 11 0;
+#X connect 13 0 15 0;
+#X connect 15 0 14 0;
+#X connect 16 0 15 1;
+#X connect 18 0 17 0;
+#X connect 19 0 18 1;
+#X connect 20 0 18 0;
+#X connect 21 0 18 0;
+#X connect 22 0 15 1;
