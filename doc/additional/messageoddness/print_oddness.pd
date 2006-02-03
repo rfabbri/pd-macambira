@@ -1,0 +1,9 @@
+#N canvas 0 22 454 304 10;
+#X obj 216 156 print;
+#X msg 168 84 symbol 5;
+#X obj 255 122 symbol;
+#X msg 253 83 5;
+#X text 60 37 neither one outputs what you might expect;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
