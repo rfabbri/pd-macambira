@@ -1,0 +1,12 @@
+#N canvas 0 0 306 391 10;
+#X obj 21 97 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 8700 1;
+#X floatatom 38 19 5 0 0 0 - - -;
+#X text 84 17 from 0 to 1;
+#X obj 38 37 resample 50;
+#X obj 38 60 _clip;
+#X obj 38 81 timeroll;
+#X connect 0 0 3 0;
+#X connect 1 0 3 0;
+#X connect 3 0 4 0;
+#X connect 4 0 5 0;
