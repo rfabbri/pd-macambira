@@ -1,9 +1,11 @@
 # customize here !
 #VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7"
-VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7"
-PDPATH="H:\PureData\pd-0.38-3.msw\pd"
+#VC="C:\Programmi\Microsoft Visual Studio .NET\Vc7"
+VC="C:\Programmi\Microsoft Platform SDK"
+VC="C:\Programmi\Microsoft Visual C++ Toolkit 2003"
+#PDPATH="H:\PureData\pd-0.38-3.msw\pd"
 #PDPATH="C:\Documents and Settings\Davide\Documenti\personali\pd-0.38-3.msw\pd"
-
+PDPATH="C:\Programmi\pd\pd"
 
 current: pd_nt distclean
 
