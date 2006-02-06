@@ -1,4 +1,4 @@
-#N canvas 242 94 904 607 10;
+#N canvas 242 94 808 606 10;
 #X msg 48 59 symbol pie;
 #X msg 67 111 pie;
 #X text 127 59 a symbol;
@@ -26,18 +26,18 @@
 #X obj 133 517 select word;
 #X text 15 445 [select] considers [word( as something other than a
 symbol:;
-#X msg 404 62 symbol pie;
-#X msg 421 108 pie;
-#X text 483 62 a symbol;
-#X floatatom 467 370 5 0 0 0 - - -;
-#X symbolatom 535 369 10 0 0 0 - - -;
-#X obj 400 390 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
+#X msg 320 96 symbol pie;
+#X msg 337 142 pie;
+#X text 399 96 a symbol;
+#X floatatom 388 339 5 0 0 0 - - -;
+#X symbolatom 454 338 10 0 0 0 - - -;
+#X obj 321 359 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
 -1 -1;
-#X obj 467 390 bng 15 250 50 0 empty empty float -4 23 1 12 -262144
+#X obj 388 359 bng 15 250 50 0 empty empty float -4 23 1 12 -262144
 -1 -1;
-#X obj 535 390 bng 15 250 50 0 empty empty symbol -12 23 1 12 -262144
+#X obj 454 359 bng 15 250 50 0 empty empty symbol -12 23 1 12 -262144
 -1 -1;
-#X obj 604 390 bng 15 250 50 0 empty empty list -2 23 1 12 -262144
+#X obj 522 359 bng 15 250 50 0 empty empty list -2 23 1 12 -262144
 -1 -1;
 #X text 28 566 [select] requires a atom type selector in order to understand
 the data (the float selector is implied);
@@ -47,14 +47,28 @@ the data (the float selector is implied);
 #X text 79 218 [route] says these are not lists:;
 #X msg 82 186 list lots of pie;
 #X text 203 187 a list;
-#X msg 431 127 word;
-#X text 424 88 [trigger] says these are not symbols (check Pd window):
+#X msg 347 161 word;
+#X msg 364 221 list lots of pie;
+#X text 491 221 a list;
+#X msg 365 254 lots of pie;
+#X msg 366 278 is this a list 2?;
+#X msg 474 444 symbol pie;
+#X msg 495 496 pie;
+#X msg 502 516 word;
+#X symbolatom 473 554 10 0 0 0 - - -;
+#X obj 473 571 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 616 486 (check Pd Window):;
+#X text 482 474 symbolatom says these are not symbols;
+#X obj 320 315 trigger bang float symbol list anything;
+#X obj 589 359 bng 15 250 50 0 empty empty anything -15 23 1 12 -262144
+-1 -1;
+#X text 340 122 [trigger] says these are not symbols:;
+#X text 310 16 The Pd window reports that it 'can only convert "s"
+to "b" or "a"'. So it considers the non-symbols of type "s" since they
+are converted only to "bang" and "anything". But type "s" is not the
+same as "symbol" because the symbol is converted to all of the types.
 ;
-#X obj 399 346 trigger bang float symbol list;
-#X msg 443 252 list lots of pie;
-#X text 570 252 a list;
-#X msg 444 285 lots of pie;
-#X msg 445 309 is this a list 2?;
 #X connect 0 0 6 0;
 #X connect 1 0 6 0;
 #X connect 3 0 7 0;
@@ -69,18 +83,23 @@ the data (the float selector is implied);
 #X connect 13 0 17 0;
 #X connect 17 0 15 0;
 #X connect 17 1 16 0;
-#X connect 19 0 37 0;
-#X connect 20 0 37 0;
+#X connect 19 0 47 0;
+#X connect 20 0 47 0;
 #X connect 22 0 25 0;
 #X connect 23 0 26 0;
 #X connect 30 0 6 0;
 #X connect 31 0 6 0;
 #X connect 33 0 6 0;
-#X connect 35 0 37 0;
-#X connect 37 0 24 0;
-#X connect 37 1 22 0;
-#X connect 37 2 23 0;
-#X connect 37 3 27 0;
-#X connect 38 0 37 0;
-#X connect 40 0 37 0;
-#X connect 41 0 37 0;
+#X connect 35 0 47 0;
+#X connect 36 0 47 0;
+#X connect 38 0 47 0;
+#X connect 39 0 47 0;
+#X connect 40 0 43 0;
+#X connect 41 0 43 0;
+#X connect 42 0 43 0;
+#X connect 43 0 44 0;
+#X connect 47 0 24 0;
+#X connect 47 1 22 0;
+#X connect 47 2 23 0;
+#X connect 47 3 27 0;
+#X connect 47 4 48 0;
