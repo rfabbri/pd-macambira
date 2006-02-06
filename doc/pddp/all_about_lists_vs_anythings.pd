@@ -13,15 +13,15 @@
 -1 -1;
 #X msg 184 277 list this is a set with a cast;
 #X msg 191 296 this is a set withOUT a cast;
-#X obj 488 138 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
+#X obj 484 135 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
-#X obj 535 138 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+#X obj 533 135 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
 -1;
-#X obj 630 138 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+#X obj 582 135 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
 -1 -1;
 #X msg 486 73 list this is a set with a cast;
 #X msg 493 92 this is a set withOUT a cast;
-#X obj 583 138 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+#X obj 681 135 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
 -1;
 #X obj 120 527 route list;
 #X obj 120 546 bng 15 250 50 0 empty empty list -20 7 1 10 -262144
@@ -49,10 +49,10 @@ NOT a "list":;
 #X text 22 575 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 239 589 released under the GNU GPL;
-#X text 445 576 $Revision: 1.7 $$Date: 2005-07-28 19:45:58 $;
-#X text 446 589 $Author: eighthave $;
+#X text 445 576 $Revision: 1.8 $$Date: 2006-02-06 04:31:31 $;
+#X text 446 589 $Author: matju $;
 #X text 673 551 updated for Pd 0.38-2;
-#X obj 679 138 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+#X obj 731 135 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
 -1 -1;
 #X msg 502 286 1 1;
 #X obj 495 312 +;
@@ -71,10 +71,6 @@ respective inlet. This does not apply to sets that are NOT "lists".
 is implicitly considered a list. A message having more than one atom
 starting with a "symbol" is not \, unless that "symbol" is the selector
 "list".;
-#X obj 11 169 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
--1;
-#X obj 58 169 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
--1;
 #N canvas 183 32 857 475 has 0;
 #X obj 96 162 print;
 #X msg 57 93 list one two three;
@@ -206,43 +202,53 @@ symbol] outputs a symbol from its left outlet.;
 #X text 450 389 When working with sets that might be either "lists"
 or undefined \, use [prepend]. Many of the "list" handling objects
 in Pd have odd quirks which can make things difficult.;
-#X obj 487 117 route bang float list symbol;
-#X obj 10 148 route bang float list symbol;
-#X obj 152 169 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+#X obj 484 115 route bang float symbol pointer list;
+#X obj 632 135 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
 -1 -1;
-#X obj 105 169 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+#X obj 11 169 bng 15 250 50 0 empty empty bang 0 20 1 9 -262144 -1
 -1;
-#X obj 201 169 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+#X obj 60 169 bng 15 250 50 0 empty empty float 0 21 1 9 -262144 -1
+-1;
+#X obj 109 169 bng 15 250 50 0 empty empty symbol 0 21 1 9 -262144
+-1 -1;
+#X obj 208 169 bng 15 250 50 0 empty empty list 0 21 1 9 -262144 -1
+-1;
+#X obj 258 169 bng 15 250 50 0 empty empty UNDEFINED 0 21 1 9 -262144
+-1 -1;
+#X obj 11 149 route bang float symbol pointer list;
+#X obj 159 169 bng 15 250 50 0 empty empty pointer 0 21 1 9 -262144
 -1 -1;
 #X connect 0 0 1 0;
 #X connect 1 0 7 0;
 #X connect 1 1 8 0;
 #X connect 2 0 1 0;
-#X connect 3 0 55 0;
+#X connect 3 0 59 0;
 #X connect 9 0 1 0;
 #X connect 10 0 1 0;
-#X connect 14 0 54 0;
-#X connect 15 0 54 0;
+#X connect 14 0 52 0;
+#X connect 15 0 52 0;
 #X connect 17 0 18 0;
 #X connect 17 1 19 0;
 #X connect 20 0 17 0;
 #X connect 21 0 17 0;
 #X connect 23 0 17 0;
 #X connect 24 0 17 0;
-#X connect 25 0 55 0;
+#X connect 25 0 59 0;
 #X connect 26 0 4 0;
-#X connect 26 0 55 0;
+#X connect 26 0 59 0;
 #X connect 39 0 40 0;
 #X connect 40 0 41 0;
 #X connect 42 0 40 0;
 #X connect 44 0 40 0;
-#X connect 54 0 11 0;
-#X connect 54 1 12 0;
-#X connect 54 2 16 0;
-#X connect 54 3 13 0;
-#X connect 54 4 38 0;
-#X connect 55 0 50 0;
-#X connect 55 1 51 0;
-#X connect 55 2 57 0;
-#X connect 55 3 56 0;
-#X connect 55 4 58 0;
+#X connect 52 0 11 0;
+#X connect 52 1 12 0;
+#X connect 52 2 13 0;
+#X connect 52 3 53 0;
+#X connect 52 4 16 0;
+#X connect 52 5 38 0;
+#X connect 59 0 54 0;
+#X connect 59 1 55 0;
+#X connect 59 2 56 0;
+#X connect 59 3 60 0;
+#X connect 59 4 57 0;
+#X connect 59 5 58 0;
