@@ -1,0 +1,45 @@
+#N canvas 0 22 454 304 10;
+#X floatatom 243 167 5 0 0 0 - - -;
+#X symbolatom 291 166 10 0 0 0 - - -;
+#X obj 196 187 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144
+-1 -1;
+#X obj 196 143 route bang float symbol list;
+#X obj 243 187 bng 15 250 50 0 empty empty float -4 23 1 12 -262144
+-1 -1;
+#X obj 291 187 bng 15 250 50 0 empty empty symbol -12 23 1 12 -262144
+-1 -1;
+#X obj 339 187 bng 15 250 50 0 empty empty list -2 23 1 12 -262144
+-1 -1;
+#X obj 387 187 bng 15 250 50 0 empty empty undefined -18 23 1 12 -262144
+-1 -1;
+#X text 24 35 There are no 0- or 1-element lists. These are immediately
+converted to other types:;
+#X msg 195 75 list;
+#X msg 202 96 list 2;
+#X msg 207 115 list word;
+#X floatatom 11 147 5 0 0 0 - - -;
+#X symbolatom 77 147 10 0 0 0 - - -;
+#X obj 11 165 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 77 165 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 19 244 Therefore \, the definition of list is: a series of
+elements with a selector of "list" and 2 or more elements. (But don't
+forget! A series whose element is a float has an implied "list" selector!)
+;
+#X connect 0 0 4 0;
+#X connect 1 0 5 0;
+#X connect 3 0 2 0;
+#X connect 3 1 0 0;
+#X connect 3 2 1 0;
+#X connect 3 3 6 0;
+#X connect 3 4 7 0;
+#X connect 9 0 3 0;
+#X connect 9 0 13 0;
+#X connect 9 0 12 0;
+#X connect 10 0 3 0;
+#X connect 10 0 12 0;
+#X connect 11 0 3 0;
+#X connect 11 0 13 0;
+#X connect 12 0 14 0;
+#X connect 13 0 15 0;
