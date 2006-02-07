@@ -34,21 +34,24 @@ t_int *zeroxpos_tilde_perform(t_int *w)
   for(i=0;i<n;i++)
     {
       polarity = in[i] >= 0 ? 1 : -1;
-      if((polarity < prev || polarity > prev) && count == number && x->i_bang == 1)
+      while(i>0)
 	{
-	  x->i_ndx = i;
-	  x->i_pol = polarity;
-	  count++;
-	  x->i_bang = 0;
-	}
-      if((polarity < prev || polarity > prev) && count < number)
-	{
-	  count++;
-	}
-      if(i==n-1)
-	{
-	  ctl->final_pol = polarity;
-	  x->i_count = count;
+	  if((polarity < prev || polarity > prev) && count == number && x->i_bang == 1)
+	    {
+	      x->i_ndx = i;
+	      x->i_pol = polarity;
+	      count++;
+	      x->i_bang = 0;
+	    }
+	  if((polarity < prev || polarity > prev) && count < number)
+	    {
+	      count++;
+	    }
+	  if(i==n-1)
+	    {
+	      ctl->final_pol = polarity;
+	      x->i_count = count;
+	    }
 	}
       prev = polarity;
     }
