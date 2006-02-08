@@ -2,7 +2,7 @@
 
 PD_ROOT=$1
 NETRECEIVE_PATCH=/tmp/.____pd_netreceive____.pd
-PORT_NUMBER=55556
+PORT_NUMBER=55555
 LOG_FILE=/tmp/load_every_help-log-`date +20%y-%m-%d_%H.%M.%S`.txt
 
 helpdir=${PD_ROOT}/doc
@@ -45,3 +45,6 @@ for file in `find $helpdir -name '*.pd'`; do
 	 sleep 1
 	 close_patch $filename
 done
+
+echo "COMPLETED!" >> $LOG_FILE
+echo "; pd quit;" | ${bindir}/pdsend $PORT_NUMBER localhost tcp
