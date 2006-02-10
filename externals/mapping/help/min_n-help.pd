@@ -1,0 +1,24 @@
+#N canvas 397 193 522 474 10;
+#X floatatom 40 76 5 0 127 0 - - -;
+#X text 41 58 data;
+#X obj 40 155 t f f;
+#X msg 47 101 0;
+#X floatatom 271 249 5 0 0 0 - - -;
+#X floatatom 318 197 5 2 150 0 - - -;
+#X text 366 195 size: n (n>=2);
+#X text 51 32 min_n return the minimum from the last n (n>1) values
+;
+#X msg 75 101 1;
+#X msg 108 101 0.5;
+#X obj 40 271 timeroll;
+#X obj 246 271 timeroll;
+#X obj 246 219 min_n 20;
+#X connect 0 0 2 0;
+#X connect 2 0 10 0;
+#X connect 2 1 12 0;
+#X connect 3 0 2 0;
+#X connect 5 0 12 1;
+#X connect 8 0 2 0;
+#X connect 9 0 2 0;
+#X connect 12 0 4 0;
+#X connect 12 0 11 0;

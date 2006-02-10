@@ -1,0 +1,22 @@
+#N canvas 354 297 821 592 10;
+#X obj 68 174 t f f;
+#X floatatom 358 195 5 0 0 0 - - -;
+#X text 353 172 order: n;
+#X text 49 37 Fir_mean_n computes a fir low pass mean filter of order
+n;
+#X obj 499 307 -;
+#X floatatom 68 126 5 0 1 0 - - -;
+#X obj 68 148 resample 30;
+#X obj 69 336 timeroll;
+#X obj 280 333 timeroll;
+#X obj 499 335 timeroll;
+#X obj 279 220 mean_n 25;
+#X connect 0 0 4 0;
+#X connect 0 0 7 0;
+#X connect 0 1 10 0;
+#X connect 1 0 10 1;
+#X connect 4 0 9 0;
+#X connect 5 0 6 0;
+#X connect 6 0 0 0;
+#X connect 10 0 4 1;
+#X connect 10 0 8 0;
