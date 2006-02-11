@@ -590,8 +590,10 @@ void generate_voicing(t_harmonizer *x)
 	double rnd;
 	//t_atom lista[VOICES];
 	t_atom *lista;
+	int *winner_notes;
 
 	lista = malloc(sizeof(t_atom)*x->voices);
+	winner_notes = malloc(sizeof(int)*x->voices);
 
 	// inizialize tables of notes
 	build_possible_notes_table(x);
@@ -640,7 +642,13 @@ void generate_voicing(t_harmonizer *x)
 
 	for (i=0;i<x->voices;i++)
 	{
-		SETFLOAT(lista+i, x->population[winner][i]);
+		winner_notes[i] = x->population[winner][i];
+	}
+	SGLIB_ARRAY_SINGLE_QUICK_SORT(int, winner_notes, x->voices, SGLIB_NUMERIC_COMPARATOR)
+
+	for (i=0;i<x->voices;i++)
+	{
+		SETFLOAT(lista+i, winner_notes[i]);
 	}
 
 	// send output array to outlet
@@ -649,6 +657,7 @@ void generate_voicing(t_harmonizer *x)
 					 x->voices, 
 					 lista);
 	free(lista);
+	free(winner_notes);
 }
 
 // if i want another voicing i can send a bang
@@ -659,20 +668,28 @@ static void harmonizer_bang(t_harmonizer *x) {
 // called when i send a list (with midi values)
 void set_current_voices(t_harmonizer *x, t_symbol *sl, int argc, t_atom *argv)
 {
-	int i=0;	
+	int i=0;
+	int *input_voices;
 	
 	if (argc<x->voices)
 	{
 		error("insufficient notes sent!");
 		return;
 	}
+	input_voices = malloc(sizeof(int)*x->voices);
 	// fill input array with actual data sent to inlet
 	for (i=0;i<x->voices;i++)
 	{
-		x->current_voices[i] = atom_getint(argv++);
+		input_voices[i] = atom_getint(argv++);
 	}
-
+	SGLIB_ARRAY_SINGLE_QUICK_SORT(int, input_voices, x->voices, SGLIB_NUMERIC_COMPARATOR)
+	for (i=0;i<x->voices;i++)
+	{
+		x->current_voices[i] = input_voices[i];
+	}
+	
 	generate_voicing(x);
+	free(input_voices);
 
 
 }
