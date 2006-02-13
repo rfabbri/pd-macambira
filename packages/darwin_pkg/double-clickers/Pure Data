@@ -1,4 +1,0 @@
-#!/bin/sh
-
-/usr/bin/open "/Applications/Pure Data.app/Contents/MacOS/Pd.term"
-exit

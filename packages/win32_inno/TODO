@@ -1,4 +1,8 @@
 
+- test 7zip format for the installer packages, make sure it'll run on all
+  platforms.  Its better to use 7zip since its smaller, and its free.
+
+
 - make things compile in Cygwin's MinGW environment (then things can be
   compiled from an ssh session)
 

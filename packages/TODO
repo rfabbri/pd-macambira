@@ -1,21 +1,26 @@
 
-- revert to revision 1.1 of loaderHEX patch to maintain compatibilty with 0.40
-
 - fix patch failures in patch_pd
+
 
 - allow DESTDIR to be a relative path
 
+
 - fiddle~, bonk~, etc. didn't get installed
+
 
 - try out FFTW patch from patch tracker (it applies fine, but the build system
   needs to set the define to enable it).
 
+
 - document generate-libdir-metafile.sh
+
 
 - move darwin_app_perms to here and make generic prerelease_clean target which
   is called separately
 
+
 - test for "configure" before running autoconf, also rm "configure" on distclean
+
 
 - global optimization flags
   		ideally, you would use a version of Pd that is fully optimized for your
@@ -23,12 +28,15 @@
   		developed so that you can specific the target CPU in one place and have
   		everything compile for that CPU.
 
+
 - make standard targets: distclean (*~, etc.), uninstall instead of install_clean
+
 
 - adding flext (from tgrill) "you could take the templates, *.def in the
   buildsys hierarchy from which the original config*.txt files are
   generated. These don't make assumptions about CPU etc. and should therefore
   be portable"
+
 
 - Preferences
 
