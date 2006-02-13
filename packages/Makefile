@@ -136,10 +136,14 @@ flext:
 #------------------------------------------------------------------------------
 # pd
 
-ifeq ($(OS_NAME),windows)
-  PD_CONFIGURE_FLAGS = 
-else
+ifeq ($(OS_NAME),darwin)
   PD_CONFIGURE_FLAGS = --enable-jack
+else
+  ifeq ($(OS_NAME),linux)
+    PD_CONFIGURE_FLAGS = --enable-jack --enable-alsa
+  else
+    PD_CONFIGURE_FLAGS = 
+  endif
 endif
 
 PD_BUILD_FLAGS = 
@@ -534,6 +538,16 @@ doc_format:
 
 
 
+#----------------------------------------------------------------------------
+# STRIP_HACK
+# not all of the build systems are stripping the externals, so strip them here.
+# Gem, xsample, and some other things don't like to be stripped
+strip_hack:
+	$(STRIP) $(objectsdir)/*/*.$(EXTENSION)
+	$(STRIP) $(objectsdir)/[A-FH-Za-wyz]*.$(EXTENSION)
+
+
+
 #==============================================================================#
 #
 # DEVELOPER TARGETS
@@ -641,19 +655,11 @@ patch_pd:
 	cd $(pd_src)/src/ && \
 		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
 		mv s_main.c.tmp s_main.c
-	for file in $(wildcard $(pd_src)/src/*.[ch]); do \
-		sed 's/MACOSX/__APPLE__/g' $${file} > $${file}.tmp && \
-			mv -f $${file}.tmp $$file;\
-	done
 	@echo " "
 	@echo "patching succeeded!"
 
 
 unpatch_pd:
-	for file in $(wildcard $(pd_src)/src/*.[ch]); do \
-		sed 's/__APPLE__/MACOSX/g' $${file} > $${file}.tmp && \
-			mv -f $${file}.tmp $$file;\
-	done
 # this sed pattern won't work with TEST versions
 	cd $(pd_src)/src && \
 		sed 's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \

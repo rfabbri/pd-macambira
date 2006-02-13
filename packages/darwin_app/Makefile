@@ -140,14 +140,15 @@ darwin_app_core: darwin_app_wrapper
 
 
 
-darwin_app_doc_format:
 # set the font to 10pt on all help patches
 # the BSD/Darwin version of sed must create a backup file when doing 
 # in-place replacement, so delete the unneeded backup files
+darwin_app_doc_format:
 	cd $(pddocdir) && \
 		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
 			*/*.pd */*/*.pd */*/*/*.pd
 	find $(DESTDIR) -name '*.pd.bak' -delete
+
 
 #==============================================================================#
 #
@@ -182,13 +183,13 @@ package: dmg
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
-	install -p -m0444 $(manualsdir)/Pd/Pd-LICENSE.txt \
+	install -p -m0644 $(manualsdir)/Pd/Pd-LICENSE.txt \
 		$(manualsdir)/Pd/License.html \
 		$(manualsdir)/Pd/Welcome.html \
 		$(manualsdir)/Pd/ReadMe.html \
 		"$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
-	install -p -m0444 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
+	install -p -m0644 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 

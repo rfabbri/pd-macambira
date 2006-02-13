@@ -1,3 +1,5 @@
 
+- compile Pd with Jack and ALSA
+
 - fix $ escaping in the generated install Makefile
 

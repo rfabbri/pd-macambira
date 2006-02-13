@@ -1,4 +1,6 @@
 
+- revert to revision 1.1 of loaderHEX patch to maintain compatibilty with 0.40
+
 - fix patch failures in patch_pd
 
 - allow DESTDIR to be a relative path

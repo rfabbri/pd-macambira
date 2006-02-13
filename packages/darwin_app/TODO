@@ -1,9 +1,8 @@
 
-- OSC did not get included
+- check code to make it all use single-precision/libmx functions on Mac OSX.
 
-- check out embed-MacOSX-dependencies.sh script.  There seems to be a bug
-  where the deps in lib/libogg.dylib don't get switched from /sw/lib to
-  @executable_path/blah/blah
+
+- make sure that org.puredata.pd.plist is rw in the .dmg (possible?)
 
 
 - check out using TclTkBI package for all of the tcl deps.  It should have all
@@ -33,6 +32,7 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 
 
 - create Tcl script called from Prefs that creates links for the standard unix
+  (this probably makes more sense to have in "make devsymlinks")
 
 
 - redo menu system

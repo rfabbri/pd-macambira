@@ -1,12 +1,18 @@
 
+- make things compile in Cygwin's MinGW environment (then things can be
+  compiled from an ssh session)
+
+
+- switch to Martin Peach's menu_openhtml patch, it handles names with spaces
+  better (i.e. replace openhtml_win32_fix-0.39-2.patch)
+
+
+- make DLLs install into %SystemRoot%\system32 instead of %ProgramFiles%\pd\bin
+
+
 - check out using env vars in Path settings in registry, or make relative
   paths (I checked, you can't use env vars in the path or loadlib
   settings... arg, this should be implemented)
-
-
-- Another detail is that help browser can't open files if there is a space in
-  the path or filename.  I think its a problem of Tcl escaping.  The problem
-  is in u_main.tk in menu_openhtml on Win32 with rundll32 dll.url.FileHandler
 
 
 - get Windows Makefiles for Gem
