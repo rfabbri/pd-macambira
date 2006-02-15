@@ -42,6 +42,7 @@ for section in abstractions doc extensions externals pd packages scripts; do
 done
 
 # Gem is still separate
+echo -e "\n\n The password to the Gem anonymous CVS access is blank, so just press Enter\n"
 export CVSROOT=:pserver:anonymous@cvs.gem.iem.at:/cvsroot/pd-gem
 cvs login
 cvs checkout Gem GemLibs
