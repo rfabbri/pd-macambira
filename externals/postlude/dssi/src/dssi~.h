@@ -30,7 +30,6 @@
 #include <lo/lo.h> 
 #include <unistd.h>
 #include <stdio.h>
-#define __USE_GNU /* for strndup */
 #include <string.h>
 
 #include <stdlib.h> /*for exit()*/
@@ -42,7 +41,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.81
+#define VERSION 0.82
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
@@ -54,4 +53,6 @@
 
 #define LOADGUI 1 /* FIX: depracate this */
 #define DEBUG 0
-
+#ifdef DEBUG
+	#define CHECKSUM_PATCH_FILES_ON_LOAD 1
+#endif

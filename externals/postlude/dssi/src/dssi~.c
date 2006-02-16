@@ -62,6 +62,7 @@ typedef struct _dssi_instance {
    char            *ui_osc_program_path;
    char            *ui_osc_show_path;
    char            *ui_osc_hide_path;
+   char            *ui_osc_quit_path;
    
    int *plugin_PortControlInNumbers; /*not sure if this should go here?*/
   
@@ -69,6 +70,15 @@ typedef struct _dssi_instance {
    pid_t	gui_pid;
    
 } t_dssi_instance;
+
+struct dssi_configure_pair {
+	t_int instance;
+	char *key,
+	     *value;
+	struct dssi_configure_pair *next;
+}; 
+
+typedef struct dssi_configure_pair t_dssi_configure_pair;
 
 typedef struct _dssi_tilde {
   t_object  x_obj;
@@ -111,11 +121,15 @@ pthread_mutex_t midiEventBufferMutex;
   t_float f;
   
   t_float **outlets;
+
+  t_dssi_configure_pair *configure_buffer_head;
   
 } t_dssi_tilde;
 
 static void dssi_load_gui(t_dssi_tilde *x, int instance);
 
+static char *dssi_send_configure(t_dssi_tilde *x, char *key, 
+		char *value, t_int instance);
 static int osc_message_handler(const char *path, const char *types, 
 		lo_arg **argv, int argc, void *data, void *user_data);
 static LADSPA_Data get_port_default(t_dssi_tilde *x, int port);
@@ -177,7 +191,19 @@ encode_7in6(uint8_t *data, int length)
     return buffer;
 }
 
+/*
+ * dx7_bulk_dump_checksum
+** Taken from dx7_voice_data.c by Sean Bolton **
+ */
+int
+dx7_bulk_dump_checksum(uint8_t *data, int length)
+{
+    int sum = 0;
+    int i;
 
+    for (i = 0; i < length; sum -= data[i++]);
+    return sum & 0x7F;
+}
 
 
 static void dssi_load(char *dll_path, void **dll_handle){
@@ -280,6 +306,7 @@ static void dssi_init(t_dssi_tilde *x, t_int instance){
 	x->instances[instance].ui_osc_program_path = NULL;
 	x->instances[instance].ui_osc_show_path = NULL;
 	x->instances[instance].ui_osc_hide_path = NULL;
+	x->instances[instance].ui_osc_quit_path = NULL;
 	x->instances[instance].ui_osc_configure_path = NULL;
 	x->instances[instance].uiNeedsProgramUpdate = 0;
 	x->instances[instance].pendingProgramChange = -1;
@@ -374,6 +401,7 @@ post("querying programs");
     if (x->instances[instance].pluginPrograms) {
         for (i = 0; i < x->instances[instance].plugin_ProgramCount; i++)
 			free((void *)x->instances[instance].pluginPrograms[i].Name);
+	free((char *)x->instances[instance].pluginPrograms);
 		x->instances[instance].pluginPrograms = NULL;
 		x->instances[instance].plugin_ProgramCount = 0;
     }
@@ -386,6 +414,7 @@ post("querying programs");
         x->descriptor->select_program) {
 
 	/* Count the plugins first */
+	    /*FIX ?? */
 		for (i = 0; x->descriptor->
 					   get_program(x->instanceHandles[instance], i); ++i);
 
@@ -668,18 +697,23 @@ static int osc_exiting_handler(t_dssi_tilde *x, lo_arg **argv, int instance){
 #if DEBUG
 	post("exiting handler called: Freeing ui_osc");
 #endif
+     if(x->instances[instance].uiTarget){
 	lo_address_free(x->instances[instance].uiTarget);
+	x->instances[instance].uiTarget = NULL;
+     }
      free(x->instances[instance].ui_osc_control_path);
      free(x->instances[instance].ui_osc_configure_path);
      free(x->instances[instance].ui_osc_hide_path);
      free(x->instances[instance].ui_osc_program_path);
      free(x->instances[instance].ui_osc_show_path); 
+     free(x->instances[instance].ui_osc_quit_path); 
      x->instances[instance].uiTarget = NULL;
      x->instances[instance].ui_osc_control_path = NULL;
      x->instances[instance].ui_osc_configure_path = NULL;
      x->instances[instance].ui_osc_hide_path = NULL;
      x->instances[instance].ui_osc_program_path = NULL;
      x->instances[instance].ui_osc_show_path = NULL;
+     x->instances[instance].ui_osc_quit_path = NULL;
 
 	x->instances[instance].ui_hidden = 1;
 
@@ -692,11 +726,13 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     const char *path;
     t_int i;
     char *host, *port;
+    t_dssi_configure_pair *p;
+
+    p = x->configure_buffer_head;
 
 #if DEBUG
 	post("OSC: got update request from <%s>, instance %d", url, instance);
 #endif
-
 
     if (x->instances[instance].uiTarget) 
 		lo_address_free(x->instances[instance].uiTarget);
@@ -726,6 +762,11 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
 		(char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_program_path, "%s/program", path);
 
+    if (x->instances[instance].ui_osc_quit_path) 
+		free(x->instances[instance].ui_osc_quit_path); 
+    x->instances[instance].ui_osc_quit_path = (char *)malloc(strlen(path) + 10);
+    sprintf(x->instances[instance].ui_osc_hide_path, "%s/quit", path);
+    
     if (x->instances[instance].ui_osc_show_path) 
 		free(x->instances[instance].ui_osc_show_path); 
     x->instances[instance].ui_osc_show_path = (char *)malloc(strlen(path) + 10);
@@ -736,17 +777,18 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     x->instances[instance].ui_osc_hide_path = (char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_hide_path, "%s/hide", path);
 
+    
     free((char *)path);
 
-    /* At this point a more substantial host might also call
-     * configure() on the UI to set any state that it had remembered
-     * for the plugin x.  But we don't remember state for
-     * plugin xs (see our own configure() implementation in
-     * osc_configure_handler), and so we have nothing to send except
-     * the optional project directory. */
+    
+    while(p){
+	if(p->instance == instance)
+		dssi_send_configure(x, p->key, 
+				p->value, instance);
+	p = p->next;
+    }
 
-    if (x->dir) 
-	lo_send(x->instances[instance].uiTarget, x->instances[instance].ui_osc_configure_path, "ss",DSSI_PROJECT_DIRECTORY_KEY, x->dir);
+
     
 
     /* Send current bank/program  (-FIX- another race...) */
@@ -844,9 +886,12 @@ static void dssi_load_gui(t_dssi_tilde *x, int instance){
 	DIR *dp;
 	char *gui_str;
 	
-	gui_base = (char *)malloc(baselen = sizeof(char) * (strlen(x->dll_path) - strlen(".so")));
+	gui_base = (char *)malloc((baselen = sizeof(char) * (strlen(x->dll_path) - strlen(".so"))) + 1);
 
 	strncpy(gui_base, x->dll_path, baselen);
+	gui_base[baselen] = '\0';
+
+	/* don't use strndup - GNU only */
 /*	gui_base = strndup(x->dll_path, baselen);*/
 #if DEBUG
 post("gui_base: %s", gui_base);
@@ -993,31 +1038,7 @@ pthread_mutex_lock(&x->midiEventBufferMutex);
     pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
 }
 
-static void dssi_show(t_dssi_tilde *x, t_int instance, t_int toggle){
-	if(x->instances[instance].uiTarget){
-		if (x->instances[instance].ui_hidden && toggle) {
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_show_path, "");
-			x->instances[instance].ui_hidden = 0;
-		 }
-		else if (!x->instances[instance].ui_hidden && !toggle) {
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_hide_path, "");
-			x->instances[instance].ui_hidden = 1;
-		}
-	}
-	else if(toggle){
-		x->instances[instance].ui_show = 1;
-		dssi_load_gui(x, instance);
-	}
-	/*	if(x->instances[instance].uiTarget){
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_show_path, "");
-			x->instances[instance].ui_hidden = 0;
-		}
-	}*/
 
-}
 
 
 static void dssi_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
@@ -1047,6 +1068,118 @@ static void dssi_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 	free(msg_type);
 }
 
+static char *dssi_send_configure(t_dssi_tilde *x, char *key, 
+		char *value, t_int instance){
+
+	char *debug;
+	
+	debug =   x->descriptor->configure(
+			   x->instanceHandles[instance], 
+			    key, value);
+		/*	if(!strcmp(msg_type, "load"))*/
+	if(x->instances[instance].uiTarget != NULL)
+		lo_send(x->instances[instance].uiTarget, 
+		  x->instances[instance].ui_osc_configure_path,
+		   "ss", key, value);
+	query_programs(x, instance);
+
+	return debug;
+}
+
+static void dssi_show(t_dssi_tilde *x, t_int instance, t_int toggle){
+
+	
+	if(x->instances[instance].uiTarget){
+		if (x->instances[instance].ui_hidden && toggle) {
+			lo_send(x->instances[instance].uiTarget, 
+				x->instances[instance].ui_osc_show_path, "");
+			x->instances[instance].ui_hidden = 0;
+		 }
+		else if (!x->instances[instance].ui_hidden && !toggle) {
+			lo_send(x->instances[instance].uiTarget, 
+				x->instances[instance].ui_osc_hide_path, "");
+			x->instances[instance].ui_hidden = 1;
+		}
+	}
+	else if(toggle){
+		x->instances[instance].ui_show = 1;
+		dssi_load_gui(x, instance);
+		
+	}
+	/*	if(x->instances[instance].uiTarget){
+			lo_send(x->instances[instance].uiTarget, 
+				x->instances[instance].ui_osc_show_path, "");
+			x->instances[instance].ui_hidden = 0;
+		}
+	}*/
+
+}
+
+static t_int dssi_configure_buffer(t_dssi_tilde *x, char *key, 
+		char *value, t_int instance){
+
+/*#ifdef BLAH*/
+	t_dssi_configure_pair *current, *p;
+	t_int add_node;
+	add_node = 0;	
+	current = x->configure_buffer_head;
+
+	while(current){
+		if(!strcmp(current->key, key) && 
+				current->instance == instance)
+			break;
+		current = current->next;
+	}
+	if(current)
+		free(current->value);
+	else {
+		current = (t_dssi_configure_pair *)malloc(sizeof
+						(t_dssi_configure_pair));
+		current->next = x->configure_buffer_head;
+		x->configure_buffer_head = current;
+		current->key = (char *)malloc((strlen(key) + 1) * 
+				sizeof(char));
+		strcpy(current->key, key);
+		current->instance = instance;
+	}
+	current->value = (char *)malloc((strlen(value) + 1) * 
+			sizeof(char));
+	strcpy(current->value, value);
+		
+	
+	p = x->configure_buffer_head;
+
+	
+	while(p){
+		post("key: %s", p->key);
+		post("val: %s", p->value);
+		post("instance: %d", p->instance);
+		p = p->next;
+	}
+	
+	return 0;
+}
+
+static t_int dssi_configure_buffer_free(t_dssi_tilde *x){
+	t_dssi_configure_pair *curr, *prev;
+	prev = curr = NULL;
+	
+	for(curr = x->configure_buffer_head; curr != NULL; curr = curr->next){
+		if(prev != NULL)
+			free(prev);
+		free(curr->key);
+		free(curr->value);
+		prev = curr;
+/*		free(p);*/
+	}
+	free(curr);
+
+
+	return 0;
+}
+
+	
+
 /* Method for list data through right inlet */
 /*FIX: rewrite at some point - this is bad*/
 static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
@@ -1059,7 +1192,7 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 	long filelength = 0;
 	unsigned char *raw_patch_data = NULL;
 	FILE *fp;
-	size_t filename_length;
+	size_t filename_length, key_size, value_size;
 	dx7_patch_t *patchbuf, *firstpatch;
 	atom_string(argv, msg_type, TYPE_STRING_SIZE);
 	debug = NULL;
@@ -1075,8 +1208,6 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 	if(strcmp(msg_type, "configure")){
 		instance = (int)atom_getfloatarg(2, argc, argv) - 1;
 		
-
-
 	
 	
 /*	if(!strcmp(msg_type, "load") && x->descriptor->configure){
@@ -1147,8 +1278,12 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 			return 0;
 	    	}
 		fclose(fp);
+#if DEBUG
+		post("Patch file length is %ul", filelength);
+#endif
 	/* At the moment we only support Hexter patches */
-		if(strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter"))
+		if(strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") && 
+				strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))
 			post("Sorry dssi~ only supports	dx7 patches at the moment.");
 		else{
 		 /* figure out what kind of file it is */
@@ -1158,6 +1293,9 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 			       filelength % DX7_VOICE_SIZE_PACKED == 0) {  
 				/* It's a raw DX7 patch bank */
 
+#if DEBUG
+			    post("Raw DX7 format patch bank passed");
+#endif
 			count = filelength / DX7_VOICE_SIZE_PACKED;
 			if (count > maxpatches)
 			    count = maxpatches;
@@ -1167,13 +1305,20 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 		    } else if (filelength > 6 &&
 			       raw_patch_data[0] == 0xf0 &&
 			       raw_patch_data[1] == 0x43 &&
-			       (raw_patch_data[2] & 0xf0) == 0x00 &&
+			       /*This was used to fix some problem with Galaxy exports - possibly dump in worng format. It is not needed, but it did work, so in future, we may be able to support more formats not just DX7 */
+			    /*   ((raw_patch_data[2] & 0xf0) == 0x00 || 
+				raw_patch_data[2] == 0x7e) &&*/
+			       (raw_patch_data[2] & 0xf0) == 0x00 && 
 			       raw_patch_data[3] == 0x09 &&
 			       (raw_patch_data[4] == 0x10 || 
 					raw_patch_data[4] == 0x20) &&  
 			   /* 0x10 is actual, 0x20 matches typo in manual */
 			       raw_patch_data[5] == 0x00) {  
 			    /* It's a DX7 sys-ex 32 voice dump */
+
+#if DEBUG
+			    post("SYSEX header check passed");
+#endif
 
 			if (filelength != DX7_DUMP_SIZE_BULK ||
 			    raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
@@ -1287,55 +1432,51 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 	/*Use this to send arbitrary configure message to plugin */
 	else if(!strcmp(msg_type, "configure")){
 		key = 
-		  malloc(strlen(argv[1].a_w.w_symbol->s_name) * sizeof(char)); 
-		atom_string(&argv[1], key, TYPE_STRING_SIZE);
+		  (char *)malloc(key_size = (strlen(argv[1].a_w.w_symbol->s_name) + 2) * sizeof(char)); 
+		/*atom_string(&argv[1], key, TYPE_STRING_SIZE);*/
+		atom_string(&argv[1], key, key_size);
+		if(argc >= 3){	
+			if (argv[2].a_type == A_FLOAT){
+				val = atom_getfloatarg(2, argc, argv);
+				value = (char *)malloc(TYPE_STRING_SIZE * 
+						sizeof(char));
+				sprintf(value, "%.2f", val);
+			}
+			else if(argv[2].a_type == A_SYMBOL){
+				value = 
+				 (char *)malloc(value_size = 
+				    (strlen(argv[2].a_w.w_symbol->s_name) + 2) * 
+						 sizeof(char)); 
+				atom_string(&argv[2], value, value_size);
+			}		
 		
-		if (argv[2].a_type == A_FLOAT){
-			val = atom_getfloatarg(2, argc, argv);
-			value = malloc(TYPE_STRING_SIZE * sizeof(char));
-			sprintf(value, "%.2f", val);
-		}
-		else if(argv[2].a_type == A_SYMBOL){
-			value = 
-		         malloc(strlen(argv[2].a_w.w_symbol->s_name) * 
-					 sizeof(char)); 
-			atom_string(&argv[2], value, TYPE_STRING_SIZE);
-		}		
-		if(argv[3].a_type == A_FLOAT)
+		}	
+
+		
+		if(argc == 4 && argv[3].a_type == A_FLOAT)
 			instance = atom_getfloatarg(3, argc, argv) - 1;
+		else if (n_instances)
+			instance = -1;
 	/*	else if(argv[3].a_type == A_SYMBOL)
 			post("Argument 4 should be an integer!");
 	*/
 	}
 
+	
 	if(key != NULL && value != NULL){
 		if(instance == -1){
 			while(n_instances--){
-				debug = 
-				   x->descriptor->configure(
-				    x->instanceHandles[n_instances], 
-				     key, value);
-				/*FIX - sort out 'pending' system so that new GUI's for instances get updated */
-				if(x->instances[n_instances].uiTarget != NULL){
-	/*		if(!strcmp(msg_type, "load"))*/
-					lo_send(x->instances[n_instances].uiTarget, x->instances[n_instances].ui_osc_configure_path, "ss", key, value);
-					query_programs(x, n_instances);
-					/*FIX: better way to do this - OSC handler?*/
-	 			}
+	post("instance = %d, n_instaances = %d",instance,  n_instances);
+				debug =	dssi_send_configure(
+						x, key, value, n_instances);
+			dssi_configure_buffer(x, key, value, n_instances);
 			}
 		}
 		/*FIX: Put some error checking in here to make sure instance is valid*/
 		else{
-			debug = 
-			  x->descriptor->configure(
-			   x->instanceHandles[instance], 
-			    key, value);
-		/*	if(!strcmp(msg_type, "load"))*/
-			if(x->instances[n_instances].uiTarget != NULL)
-				lo_send(x->instances[instance].uiTarget, 
-				  x->instances[instance].ui_osc_configure_path,
-				   "ss", key, value);
-			query_programs(x, instance);
+
+			debug =	dssi_send_configure(x, key, value, instance);
+			dssi_configure_buffer(x, key, value, instance);
 		}
 	}
 #if DEBUG
@@ -1345,12 +1486,12 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 			free(debug);*/
 free(msg_type);
 free(patchbuf);
-free(value);
+/*free(value);
 
 if(key != NULL)
-	free(key);
-if(x->dir != NULL)
-	free(x->dir);
+	free(key);*/
+/*if(x->dir != NULL)
+	free(x->dir);*/
 return 0;
 	
 }
@@ -1464,8 +1605,10 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 	post("dssi~ %.2f\n a DSSI host for Pure Data\n by Jamie Bullock\nIncluding Code from jack-dssi-host\n by Chris Cannam, Steve Harris and Sean Bolton", VERSION);
 	
      if (argc){
-	
 	x->dll_path = argv[0].a_w.w_symbol->s_name;
+#if DEBUG
+	post("x->dll_path = %s", x->dll_path);
+#endif
 	dssi_load(x->dll_path, &x->dll_handle);
 	
 	if (x->dll_handle){
@@ -1483,6 +1626,7 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 		x->blksize = sys_getblksize();
 		x->ports_in = x->ports_out = x->ports_controlIn = x->ports_controlOut = 0;
 		x->dir = NULL;
+		x->configure_buffer_head = NULL;
 		x->bufWriteIndex = x->bufReadIndex = 0;
 		
 		x->dll_name = (char *)malloc(sizeof(char) * 8);/* HARD CODED! */
@@ -1549,9 +1693,20 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 
 static void dssi_free(t_dssi_tilde *x){
 
-	if(x->n_instances){
+	t_int i;
+	
+#if DEBUG
+			  post("Calling dssi_free");
+#endif
+	
 	  t_int instance;
 	  for(instance = 0; instance < x->n_instances; instance++) {
+		if(x->instances[instance].uiTarget){
+			lo_send(x->instances[instance].uiTarget, 
+				x->instances[instance].ui_osc_quit_path, "");
+			lo_address_free(x->instances[instance].uiTarget);
+			x->instances[instance].uiTarget = NULL;
+		}
 		/* no -- see comment in osc_exiting_handler */
 		/* if (!instances[i].inactive) { */
 		    if (x->descriptor->LADSPA_Plugin->deactivate) {
@@ -1567,16 +1722,11 @@ static void dssi_free(t_dssi_tilde *x){
 	    }
 
 		
-#if DEBUG
-			  post("Calling dssi_free");
-#endif
 	 if(x->dll_handle){ 
 		instance = x->n_instances;
 		free((LADSPA_Handle)x->instanceHandles);
 		  free(x->plugin_ControlInPortNumbers); 
 		  free((t_float *)x->plugin_InputBuffers);
-		  free((t_float *)x->plugin_OutputBuffers);
-		  free((snd_seq_event_t *)x->instanceEventBuffers);
 		  free(x->instanceEventCounts);
 		  free(x->plugin_ControlDataInput);
 		  free(x->plugin_ControlDataOutput);
@@ -1588,19 +1738,39 @@ static void dssi_free(t_dssi_tilde *x){
 #endif
 				kill(x->instances[instance].gui_pid, SIGKILL);
 			} 
+			if (x->instances[instance].pluginPrograms) {
+				for (i = 0; i < 
+			   x->instances[instance].plugin_ProgramCount; i++)
+					free((void *)
+				  x->instances[instance].pluginPrograms[i].Name);
+				free((char *)x->instances[instance].pluginPrograms);
+				x->instances[instance].pluginPrograms = NULL;
+				x->instances[instance].plugin_ProgramCount = 0;
+			 }
+			
+			  free(x->plugin_OutputBuffers[instance]);
+			  free(x->instanceEventBuffers[instance]);
 			  free(x->instances[instance].ui_osc_control_path);
 			  free(x->instances[instance].ui_osc_configure_path);
 			  free(x->instances[instance].ui_osc_program_path);
 			  free(x->instances[instance].ui_osc_show_path);
 			  free(x->instances[instance].ui_osc_hide_path);
+			  free(x->instances[instance].ui_osc_quit_path);
 			  free(x->instances[instance].osc_url_path);
 			  free(x->instances[instance].plugin_PortControlInNumbers);
 		  }
+		  free((t_float *)x->plugin_OutputBuffers);
+		  free((snd_seq_event_t *)x->instanceEventBuffers);
+		  free(x->instances);
+		  free(x->dir);
 		  free((t_float *)x->outlets);
 		  free(x->osc_url_base);
 		  free(x->dll_name);
+		  dssi_configure_buffer_free(x);
+	/*	  free(x->configure_buffer_head);*/
+	/*	  free(x->dll_path);*/
 	 }
-	}
+	
 }
 
 
