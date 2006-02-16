@@ -765,7 +765,7 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     if (x->instances[instance].ui_osc_quit_path) 
 		free(x->instances[instance].ui_osc_quit_path); 
     x->instances[instance].ui_osc_quit_path = (char *)malloc(strlen(path) + 10);
-    sprintf(x->instances[instance].ui_osc_hide_path, "%s/quit", path);
+    sprintf(x->instances[instance].ui_osc_quit_path, "%s/quit", path);
     
     if (x->instances[instance].ui_osc_show_path) 
 		free(x->instances[instance].ui_osc_show_path); 
@@ -1506,9 +1506,10 @@ static t_int *dssi_tilde_perform(t_int *w)
 	  int N = (int)(w[1]);
 	  t_dssi_tilde *x = (t_dssi_tilde *)(w[2]);
 	  int i, n, timediff, framediff, instance = 0; 
- 
-	/*FIX -hmmm do we need this */
-	if(x->n_instances){
+
+
+   /* FIX: probably don't need this check, but leave it in now for 'safety' */	  
+   if(x->n_instances){
 	  for (i = 0; i < x->n_instances; i++)
 		  x->instanceEventCounts[i] = 0;
 	  
@@ -1517,70 +1518,78 @@ static t_int *dssi_tilde_perform(t_int *w)
 	  for (;x->bufReadIndex != x->bufWriteIndex; x->bufReadIndex = 
 			  (x->bufReadIndex + 1) % EVENT_BUFSIZE) {
 			
-		    instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
-		    /*This should never happen, but check anyway*/
-		    if(instance > x->n_instances || instance < 0){
-				post("%s: discarding spurious MIDI data, for instance %d", x->descriptor->LADSPA_Plugin->Label, instance);
+	        instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
+	        /*This should never happen, but check anyway*/
+	        if(instance > x->n_instances || instance < 0){
+			post(
+			  "%s: discarding spurious MIDI data, for instance %d", 
+			  	x->descriptor->LADSPA_Plugin->Label, 
+				   instance);
 #if DEBUG
-				post("n_instances = %d", x->n_instances);
+	post("n_instances = %d", x->n_instances);
 #endif
-				continue;
-			}
-			  
-			if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
-				post("MIDI overflow on channel %d", instance);
-				continue;
-			}
+			continue;
+	        }
+		  
+	        if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
+			post("MIDI overflow on channel %d", instance);
+			continue;
+		}
 			
-			timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
-				 x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
-			framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
+		timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
+			x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
+		framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
 			
-			if (framediff >= N || framediff < 0) 
-				x->midiEventBuf[x->bufReadIndex].time.tick = 0;
-			else
-				x->midiEventBuf[x->bufReadIndex].time.tick = N - framediff - 1;
+		if (framediff >= N || framediff < 0) 
+			x->midiEventBuf[x->bufReadIndex].time.tick = 0;
+		else
+			x->midiEventBuf[x->bufReadIndex].time.tick = 
+				N - framediff - 1;
 			
-			x->instanceEventBuffers[instance][x->instanceEventCounts[instance]]
-				= x->midiEventBuf[x->bufReadIndex];
+		x->instanceEventBuffers[instance]
+			[x->instanceEventCounts[instance]] = 
+				x->midiEventBuf[x->bufReadIndex];
 #if DEBUG
-post("%s, note received on channel %d", x->descriptor->LADSPA_Plugin->Label, x->instanceEventBuffers[instance][x->instanceEventCounts[instance]].data.note.channel);
+	post("%s, note received on channel %d", 
+			x->descriptor->LADSPA_Plugin->Label, 
+			x->instanceEventBuffers[instance]
+		          [x->instanceEventCounts[instance]].data.note.channel);
 #endif
-			x->instanceEventCounts[instance]++; 
+		x->instanceEventCounts[instance]++; 
 			
 #if DEBUG
-					post("Instance event count for instance %d of %d: %d\n",
-					instance + 1, x->n_instances, x->instanceEventCounts[instance]);
+	post("Instance event count for instance %d of %d: %d\n",
+		instance + 1, x->n_instances, x->instanceEventCounts[instance]);
 #endif
 
 	  }
 
-	  	i = 0;
-		while(i < x->n_instances){
-			if(x->instanceHandles[i] && 
-					x->descriptor->run_multiple_synths){
-				  x->descriptor->run_multiple_synths
-					  (x->n_instances, x->instanceHandles, 
-					   (unsigned long)N, x->instanceEventBuffers,
-					   &x->instanceEventCounts[0]);
-				break; 
-			}
-			else if (x->instanceHandles[i]){
-				  x->descriptor->run_synth(x->instanceHandles[i], 
-						  (unsigned long)N, x->instanceEventBuffers[i],
-						  x->instanceEventCounts[i]); 
-				  i++;
-			}
+	  i = 0;
+	  while(i < x->n_instances){
+		if(x->instanceHandles[i] && 
+				x->descriptor->run_multiple_synths){
+			  x->descriptor->run_multiple_synths
+				  (x->n_instances, x->instanceHandles, 
+				   (unsigned long)N, x->instanceEventBuffers,
+				   &x->instanceEventCounts[0]);
+			  break; 
 		}
-		
-		for(i = 0; i < x->n_instances; i++){
+		else if (x->instanceHandles[i]){
+			  x->descriptor->run_synth(x->instanceHandles[i], 
+			      (unsigned long)N, x->instanceEventBuffers[i],
+			        x->instanceEventCounts[i]); 
+			  i++;
+		}
+	  }
+	
+	  for(i = 0; i < x->n_instances; i++){
 /*			t_float *out = x->outlets[i];*/
-			for(n = 0; n < N; n++)
-				x->outlets[i][n] = x->plugin_OutputBuffers[i][n];
+		for(n = 0; n < N; n++)
+			x->outlets[i][n] = x->plugin_OutputBuffers[i][n];
 /*				x->outlets[i][n] = 1;*/
-		}
-	}
-	return (w+3);
+	  }
+   }	
+	  return (w+3);
 }
 
 static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
