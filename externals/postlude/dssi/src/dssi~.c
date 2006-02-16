@@ -1149,14 +1149,16 @@ static t_int dssi_configure_buffer(t_dssi_tilde *x, char *key,
 	
 	p = x->configure_buffer_head;
 
-	
+
+/*FIX: eventually give ability to query this buffer (to outlet?) */
+#if DEBUG	
 	while(p){
 		post("key: %s", p->key);
 		post("val: %s", p->value);
 		post("instance: %d", p->instance);
 		p = p->next;
 	}
-	
+#endif
 	return 0;
 }
 
@@ -1466,7 +1468,6 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 	if(key != NULL && value != NULL){
 		if(instance == -1){
 			while(n_instances--){
-	post("instance = %d, n_instaances = %d",instance,  n_instances);
 				debug =	dssi_send_configure(
 						x, key, value, n_instances);
 			dssi_configure_buffer(x, key, value, n_instances);
