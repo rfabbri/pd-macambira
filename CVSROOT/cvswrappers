@@ -61,6 +61,7 @@
 *.mov -k 'b'
 *.mpg -k 'b'
 *.mpeg -k 'b'
+*.mjpeg -k 'b'
 
 # DOCUMENTS
 *.pdf -k 'b'
@@ -81,8 +82,14 @@
 # MACOS X FILES
 *.pmsp -k 'b'
 
+# PD FILES
+# pd files can't be meaningfully merged, so copy instead
+# 2006-02-15 <hans@at.or.at>
+*.pd -m 'COPY'
+
 # prevent keyword replacement on imported sources
 # 2005-05-20 <hans@at.or.at>
 portaudio/* -k 'b'
 portaudio_osx/* -k 'b'
 portaudio_v18/* -k 'b'
+portmidi/* -k 'b'
