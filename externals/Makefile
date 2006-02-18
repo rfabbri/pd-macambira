@@ -486,6 +486,36 @@ hid_clean:
 	-rm -f -- $(externals_src)/hcs/hid/*.*~
 
 
+#------------------------------------------------------------------------------#
+# HIDIN
+HIDIN_NAME=hidin
+HIDIN_OBJECTS := $(wildcard $(externals_src)/hidin/*.c)
+hidin: $(HIDIN_OBJECTS:.c=.$(EXTENSION))
+
+hidin_install: hidin
+	install -d $(objectsdir)/$(HIDIN_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HIDIN_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(HIDIN_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HIDIN_NAME)
+	install -d $(helpdir)/$(HIDIN_NAME)
+	install -p $(externals_src)/hidin/help/*.pd \
+		$(helpdir)/$(HIDIN_NAME)
+	install -d $(manualsdir)/$(HIDIN_NAME)
+	install -p $(externals_src)/hidin/README \
+		$(manualsdir)/$(HIDIN_NAME)/README.txt
+	install -d $(examplesdir)/$(HIDIN_NAME)
+	install -p $(externals_src)/hidin/examples/*.pd \
+		$(examplesdir)/$(HIDIN_NAME)
+
+hidin_clean:
+	-rm -f -- $(externals_src)/hidin/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/hidin/*.o
+	-rm -f -- $(externals_src)/hidin/*.bak
+	-rm -f -- $(externals_src)/hidin/*.*~
+
 
 #------------------------------------------------------------------------------#
 # IEMABS
