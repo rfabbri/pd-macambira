@@ -103,6 +103,9 @@ installer_makefile:
 	./generate_install_makefile.bash  $(DESTDIR)$(prefix) > tarbz2Makefile
 	mv -i tarbz2Makefile $(DESTDIR)$(prefix)/Makefile
 
+installer_clean:
+	chmod -R +w $(packages_src)/linux_make/build
+	rm -rf $(packages_src)/linux_make/build
 
 
 #==============================================================================#
@@ -111,10 +114,14 @@ installer_makefile:
 #
 #==============================================================================#
 
-clean: 	
+clean: installer_clean
 	cd $(packages_src) && make $(DEST_PATHS) clean
 
 
+test_package:
+	cd /tmp && tar xjf $(DESTDIR)/$(PACKAGE_NAME).tar.bz2
+	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local install
+	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local uninstall
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
