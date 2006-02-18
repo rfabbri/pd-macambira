@@ -6,8 +6,6 @@
 #
 #==============================================================================#
 
-# TODO: maybe this should be moved to the root like all the others
-
 CWD := $(shell pwd)
 
 # these are setup to be overridden by the packages/Makefile
@@ -49,7 +47,9 @@ LIBS = -lm
 ifeq ($(OS_NAME),darwin)
   CFLAGS += -I/sw/include -DMACOSX -DUNIX -Dunix
   LDFLAGS += -bundle -bundle_loader $(pd_src)/bin/pd -L/sw/lib
-  LIBS += -lc
+  LIBS += -lc 
+  DYLIB_LDFLAGS = -dynamiclib -read_only_relocs warning -L/sw/lib
+  DYLIB_EXTENSION = dylib
   STRIP = strip -x
 else
   ifeq ($(OS_NAME),windows)
@@ -66,11 +66,15 @@ else
 # libregex are in DLLs, so they get stripped from the external's .dll binary
     LIBS += -L$(pd_src)/bin -lpd \
       -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
+    DYLIB_LDFLAGS = -shared
+    DYLIB_EXTENSION = so
     STRIP = strip --strip-unneeded -R .note -R .comment
   else
     CFLAGS +=  -DUNIX -Dunix -fPIC
     LDFLAGS += -Wl,-export_dynamic  -shared
     LIBS += -lc
+    DYLIB_LDFLAGS = $(LDFLAGS)
+    DYLIB_EXTENSION = dll
     STRIP = strip --strip-unneeded -R .note -R .comment
   endif
 endif
@@ -246,6 +250,38 @@ template_clean:
 
 
 #------------------------------------------------------------------------------#
+# BSAYLOR
+BSAYLOR_NAME=bsaylor
+BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/*~.c)
+bsaylor: $(BSAYLOR_OBJECTS:.c=.$(EXTENSION))
+
+bsaylor_install: bsaylor
+	install -d $(objectsdir)/$(BSAYLOR_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(BSAYLOR_NAME) \
+		--author "Benjamin R. Saylor <bensaylor@fastmail.fm>" \
+		--description "signal objects" \
+		--license "GNU GPL 2" \
+		--version ""
+	install -p $(BSAYLOR_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(BSAYLOR_NAME)
+	install -d $(helpdir)/$(BSAYLOR_NAME)
+	install -p $(externals_src)/bsaylor/help/*.pd \
+		$(helpdir)/$(BSAYLOR_NAME)
+	install -d $(manualsdir)/$(BSAYLOR_NAME)
+	install -p $(externals_src)/bsaylor/README.txt \
+		$(manualsdir)/$(BSAYLOR_NAME)/README.txt
+#	install -d $(examplesdir)/$(BSAYLOR_NAME)
+#	install -p $(externals_src)/bsaylor/examples/*.pd \
+#		$(examplesdir)/$(BSAYLOR_NAME)
+
+bsaylor_clean:
+	-rm -f -- $(externals_src)/bsaylor/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/bsaylor/*.o
+	-rm -f -- $(externals_src)/bsaylor/*.bak
+	-rm -f -- $(externals_src)/bsaylor/*.*~
+
+
+
+#------------------------------------------------------------------------------#
 # CREB
 CREB_NAME=creb
 #CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
@@ -317,6 +353,7 @@ cyclone_install: cyclone
 # this doesn't build in the right place yet
 #	install -p -m0755 $(CYCLONE_OUT_DIR)/cyclist $(bindir) && \
 #		rm $(CYCLONE_OUT_DIR)/cyclist
+	-install -p -m0755 $(externals_src)/miXed/bin/cyclist $(bindir)
 # rename cyclone lib since it will pre-empt libdir functionality
 #	mv $(CYCLONE_OUT_DIR)/cyclone.$(EXTENSION) \
 #		$(CYCLONE_OUT_DIR)/cyclonelib.$(EXTENSION)
@@ -367,6 +404,44 @@ ext13_clean:
 	-rm -f -- $(externals_src)/ext13/*.o
 	-rm -f -- $(externals_src)/ext13/*.bak
 	-rm -f -- $(externals_src)/ext13/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# FFTease
+FFTEASE_NAME=fftease
+FFTEASE_LIB_OBJECTS := $(wildcard $(externals_src)/fftease/lib/*.c)
+FFTEASE_OBJECTS := $(wildcard $(externals_src)/fftease/*.c)
+fftease_lib: $(FFTEASE_LIB_OBJECTS:.c=.o)
+	$(CC) $(DYLIB_LDFLAGS) \
+		-o $(externals_src)/fftease/libfftease.$(DYLIB_EXTENSION) \
+		 $(FFTEASE_LIB_OBJECTS:.c=.o)
+
+fftease: fftease_lib $(FFTEASE_OBJECTS:.c=.$(EXTENSION))
+
+fftease_install: fftease
+	install -d $(objectsdir)/$(FFTEASE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FFTEASE_NAME) \
+		--author "Eric Lyon and Christopher Penrose" \
+		--description "FFTease is a collection of objects implementing various forms of spectral sound processing. These include an additive-synthesis phase vocoder, noise reduction, cross synthesis, and more unusual forms of spectral processing." \
+		--license "MIT License" \
+		--version "2.0"
+	install -p $(FFTEASE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FFTEASE_NAME)
+	install -d $(helpdir)/$(FFTEASE_NAME)
+	install -p $(externals_src)/fftease/help/*.pd \
+		$(helpdir)/$(FFTEASE_NAME)
+	install -d $(manualsdir)/$(FFTEASE_NAME)
+	install -p $(externals_src)/fftease/README \
+		$(manualsdir)/$(FFTEASE_NAME)/README.txt
+	install -d $(examplesdir)/$(FFTEASE_NAME)
+	install -p $(externals_src)/fftease/examples/*.pd \
+		$(examplesdir)/$(FFTEASE_NAME)
+
+fftease_clean:
+	-rm -f -- $(externals_src)/fftease/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/fftease/*.o
+	-rm -f -- $(externals_src)/fftease/*.bak
+	-rm -f -- $(externals_src)/fftease/*.*~
 
 
 
@@ -430,6 +505,38 @@ freeverb_clean:
 	-rm -f -- $(externals_src)/freeverb/*.bak
 	-rm -f -- $(externals_src)/freeverb/*.*~
 
+
+
+#------------------------------------------------------------------------------#
+# HARDWARE
+HARDWARE_NAME=hardware
+HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.c) \
+$(wildcard $(externals_src)/hardware/*/*.cpp)
+hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
+
+hardware_install: hardware
+	install -d $(objectsdir)/$(HARDWARE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HARDWARE_NAME) \
+		--description "objects for working with hardware sensor boxes" \
+		--license "GNU GPL"
+	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HARDWARE_NAME)
+	install -d $(helpdir)/$(HARDWARE_NAME)
+	install -p $(externals_src)/hardware/*/*-help.pd \
+		$(helpdir)/$(HARDWARE_NAME)
+	install -d $(manualsdir)/$(HARDWARE_NAME)
+	install -p $(externals_src)/hardware/README.txt \
+		$(manualsdir)/$(HARDWARE_NAME)/README.txt
+	install -p $(externals_src)/hardware/memPIO/README.txt \
+		$(manualsdir)/$(HARDWARE_NAME)/memPIO.txt
+	install -d $(examplesdir)/$(HARDWARE_NAME)
+	install -p $(externals_src)/hardware/*/examples/*.pd \
+		$(examplesdir)/$(HARDWARE_NAME)
+
+hardware_clean:
+	-rm -f -- $(externals_src)/hardware/*/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/hardware/*/*.o
+	-rm -f -- $(externals_src)/hardware/*/*.bak
+	-rm -f -- $(externals_src)/hardware/*/*.*~
 
 
 
@@ -756,6 +863,7 @@ oscx_clean:
 	-rm $(externals_src)/OSCx/Makefile
 
 
+
 #------------------------------------------------------------------------------#
 # PDDP
 PDDP_NAME=pddp
@@ -766,11 +874,11 @@ pddp:
 
 pddp_install: pddp
 	install -d $(objectsdir)/$(PDDP_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDDP_NAME) \
-		--author "PDDP" \
-		--license "BSD" \
-		--description "objects for working with Tcl and Pd's Tk GUI"
-	cd $(externals_src)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
+#	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PDDP_NAME) \
+#		--author "PDDP" \
+#		--license "BSD" \
+#		--description "objects for working with Tcl and Pd's Tk GUI"
+#	cd $(externals_src)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
 #	install -d $(helpdir)/$(PDDP_NAME)
 #	install -d $(manualsdir)/$(PDDP_NAME)
 	install -d $(examplesdir)/$(PDDP_NAME)
