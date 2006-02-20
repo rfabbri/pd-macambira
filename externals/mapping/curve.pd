@@ -15,26 +15,7 @@
 #X obj 257 50 any_argument \$1;
 #X obj 257 70 route float;
 #X obj 257 155 t f b;
-#N canvas 784 233 470 320 process 0;
-#X obj 96 30 inlet;
-#X obj 132 283 outlet;
-#X obj 97 100 moses 0;
-#X obj 96 128 * -1;
-#X obj 96 180 * -1;
-#X obj 96 69 * 2;
-#X obj 142 128 pow 3;
-#X obj 96 153 pow 3;
-#X text 22 4 this is just a guess \, there is probably a better formula
-for this.;
-#X connect 0 0 5 0;
-#X connect 2 0 3 0;
-#X connect 2 1 6 0;
-#X connect 3 0 7 0;
-#X connect 4 0 1 0;
-#X connect 5 0 2 0;
-#X connect 6 0 1 0;
-#X connect 7 0 4 0;
-#X restore 257 117 pd process curve value;
+#X obj 257 117 * 10;
 #X connect 0 0 3 0;
 #X connect 1 0 8 0;
 #X connect 2 0 13 1;
