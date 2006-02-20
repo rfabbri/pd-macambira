@@ -1,10 +1,31 @@
+Index: configure.in
+===================================================================
+RCS file: /cvsroot/pure-data/pd/src/configure.in,v
+retrieving revision 1.15
+diff -u -w -r1.15 configure.in
+--- configure.in	16 Aug 2005 04:06:28 -0000	1.15
++++ configure.in	20 Feb 2006 02:10:33 -0000
+@@ -316,11 +316,11 @@
+     EXTERNTARGET=pd_darwin
+     if test x$jack == "xyes";
+     then
+-    	LDFLAGS=$LDFLAGS" -framework Jack"
++    	LDFLAGS=$LDFLAGS" -weak_framework Jack"
+     fi
+     if test x$jack == "xrun";
+     then
+-        LDFLAGS=$LDFLAGS" -framework Jack"
++        LDFLAGS=$LDFLAGS" -weak_framework Jack"
+     fi
+ fi
+ 
 Index: makefile.in
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.8
 diff -u -w -r1.8 makefile.in
 --- makefile.in	24 Jul 2005 19:41:14 -0000	1.8
-+++ makefile.in	25 Jul 2005 01:59:05 -0000
++++ makefile.in	20 Feb 2006 02:10:33 -0000
 @@ -85,9 +85,12 @@
  $(BIN_DIR)/pdreceive: u_pdreceive.c
  	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
