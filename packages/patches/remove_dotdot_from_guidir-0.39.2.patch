@@ -1,0 +1,13 @@
+--- u_main.tk	2006-01-26 11:15:41.468750000 -0500
++++ u_main.tk	2006-01-26 11:47:40.375000000 -0500
+@@ -35,8 +35,8 @@
+     global pd_guidir
+     global pd_tearoff
+     set pd_gui2 [string range $argv0 0 [expr [string last \\ $argv0 ] - 1]]
+-    regsub -all \\\\ $pd_gui2 / pd_gui3
+-    set pd_guidir $pd_gui3/..
++    regsub -all \\\\ $pd_gui2 / pd_guidir
++	set pd_guidir [string range $pd_guidir 0 [expr [string last / $pd_guidir] - 1]]
+     load $pd_guidir/bin/pdtcl.dll
+     set pd_tearoff 1
+ }
