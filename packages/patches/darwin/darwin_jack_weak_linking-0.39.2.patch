@@ -4,7 +4,7 @@ RCS file: /cvsroot/pure-data/pd/src/configure.in,v
 retrieving revision 1.15
 diff -u -w -r1.15 configure.in
 --- configure.in	16 Aug 2005 04:06:28 -0000	1.15
-+++ configure.in	20 Feb 2006 02:10:33 -0000
++++ configure.in	22 Feb 2006 05:19:42 -0000
 @@ -316,11 +316,11 @@
      EXTERNTARGET=pd_darwin
      if test x$jack == "xyes";
@@ -25,19 +25,13 @@ RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.8
 diff -u -w -r1.8 makefile.in
 --- makefile.in	24 Jul 2005 19:41:14 -0000	1.8
-+++ makefile.in	20 Feb 2006 02:10:33 -0000
-@@ -85,9 +85,12 @@
- $(BIN_DIR)/pdreceive: u_pdreceive.c
- 	$(CC) $(CFLAGS)  $(STRIPFLAG) -o $(BIN_DIR)/pdreceive u_pdreceive.c
- 
-+# MACOSX_DEPLOYMENT_TARGET=10.3 is necessary on Mac OS X to support weak
-+# linking of frameworks.  Since its just a environment variable, it should be
-+# safely ignored on other platforms.  <hans@at.or.at>
- $(PDEXEC): $(OBJ) 
--	cd ../obj;  $(CC) $(LDFLAGS) $(DBG_CFLAGS) -o $(PDEXEC) $(OBJ) \
--	$(LIB)
-+	cd ../obj; MACOSX_DEPLOYMENT_TARGET=10.3 $(CC) $(LDFLAGS) $(DBG_CFLAGS) \
-+		-o $(PDEXEC) $(OBJ) $(LIB)
- 
- $(BIN_DIR)/pd-gui: $(GOBJ) $(GSRC)
- 	cd ../obj; $(CC) $(INCLUDE) -o $(BIN_DIR)/$(GUINAME) $(GOBJ) \
++++ makefile.in	22 Feb 2006 05:19:42 -0000
+@@ -1,3 +1,8 @@
++# On Mac OS X, this needs to be defined to enable dlopen and weak linking
++# support.  Its safe on other platforms since gcc only checks this env var on
++# Apple's gcc.  <hans@at.or.at>
++export MACOSX_DEPLOYMENT_TARGET = 10.3
++
+ VPATH = ../obj:./
+ OBJ_DIR = ../obj
+ BIN_DIR = ../bin
