@@ -1,13 +1,10 @@
-? configure
-? makefile.mingw
-? pdtcl.def
 Index: configure.in
 ===================================================================
 RCS file: /cvsroot/pure-data/pd/src/configure.in,v
 retrieving revision 1.15
 diff -u -w -r1.15 configure.in
 --- configure.in	16 Aug 2005 04:06:28 -0000	1.15
-+++ configure.in	19 Dec 2005 06:49:31 -0000
++++ configure.in	22 Feb 2006 05:41:08 -0000
 @@ -19,6 +19,7 @@
  AC_SUBST(GUIFLAGS)
  AC_SUBST(OSNUMBER)
@@ -88,10 +85,12 @@ diff -u -w -r1.15 configure.in
  then
      LDFLAGS="-Wl -framework CoreAudio \
          -framework AudioUnit -framework AudioToolbox \
-@@ -324,6 +336,37 @@
+@@ -324,6 +336,39 @@
      fi
  fi
  
++# only Windows uses ASIO, for the rest, set to blank
++ASIOSRC=
 +
 +if test `uname -s` == MINGW32_NT-5.0;
 +then
@@ -132,7 +131,7 @@ RCS file: /cvsroot/pure-data/pd/src/d_mayer_fft.c,v
 retrieving revision 1.3
 diff -u -w -r1.3 d_mayer_fft.c
 --- d_mayer_fft.c	18 May 2005 04:28:50 -0000	1.3
-+++ d_mayer_fft.c	19 Dec 2005 06:49:31 -0000
++++ d_mayer_fft.c	22 Feb 2006 05:41:08 -0000
 @@ -48,7 +48,8 @@
  * of work.  -msp
  */
@@ -149,7 +148,7 @@ RCS file: /cvsroot/pure-data/pd/src/m_pd.h,v
 retrieving revision 1.8
 diff -u -w -r1.8 m_pd.h
 --- m_pd.h	19 Aug 2005 23:28:03 -0000	1.8
-+++ m_pd.h	19 Dec 2005 06:49:31 -0000
++++ m_pd.h	22 Feb 2006 05:41:08 -0000
 @@ -17,15 +17,16 @@
  #define MSW
  #endif
@@ -185,7 +184,7 @@ RCS file: /cvsroot/pure-data/pd/src/makefile.in,v
 retrieving revision 1.8
 diff -u -w -r1.8 makefile.in
 --- makefile.in	24 Jul 2005 19:41:14 -0000	1.8
-+++ makefile.in	19 Dec 2005 06:49:31 -0000
++++ makefile.in	22 Feb 2006 05:41:08 -0000
 @@ -30,6 +30,10 @@
  
  SYSSRC += @SYSSRC@
@@ -260,7 +259,7 @@ RCS file: /cvsroot/pure-data/pd/src/s_entry.c,v
 retrieving revision 1.3
 diff -u -w -r1.3 s_entry.c
 --- s_entry.c	11 Nov 2004 04:58:21 -0000	1.3
-+++ s_entry.c	19 Dec 2005 06:49:31 -0000
++++ s_entry.c	22 Feb 2006 05:41:08 -0000
 @@ -3,7 +3,11 @@
  
  int sys_main(int argc, char **argv);
@@ -294,7 +293,7 @@ RCS file: /cvsroot/pure-data/pd/src/s_inter.c,v
 retrieving revision 1.14
 diff -u -w -r1.14 s_inter.c
 --- s_inter.c	15 Oct 2005 23:14:28 -0000	1.14
-+++ s_inter.c	19 Dec 2005 06:49:31 -0000
++++ s_inter.c	22 Feb 2006 05:41:08 -0000
 @@ -9,7 +9,7 @@
  #include "s_stuff.h"
  #include "m_imp.h"
@@ -532,7 +531,7 @@ RCS file: /cvsroot/pure-data/pd/src/s_watchdog.c,v
 retrieving revision 1.2
 diff -u -w -r1.2 s_watchdog.c
 --- s_watchdog.c	6 Sep 2004 20:20:36 -0000	1.2
-+++ s_watchdog.c	19 Dec 2005 06:49:31 -0000
++++ s_watchdog.c	22 Feb 2006 05:41:08 -0000
 @@ -8,8 +8,13 @@
  
  #include <sys/time.h>
@@ -563,7 +562,7 @@ RCS file: /cvsroot/pure-data/pd/src/t_tkcmd.c,v
 retrieving revision 1.6
 diff -u -w -r1.6 t_tkcmd.c
 --- t_tkcmd.c	15 Oct 2005 23:14:28 -0000	1.6
-+++ t_tkcmd.c	19 Dec 2005 06:49:31 -0000
++++ t_tkcmd.c	22 Feb 2006 05:41:08 -0000
 @@ -30,7 +30,7 @@
  #include <winsock.h>
  #include <io.h>
