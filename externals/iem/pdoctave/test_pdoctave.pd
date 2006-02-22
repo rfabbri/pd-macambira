@@ -1,0 +1,80 @@
+#N canvas 0 0 1027 680 10;
+#X obj 199 138 print;
+#X msg 219 112 hallo;
+#X msg 192 254 list 1 2 3 4 5;
+#X msg 265 212 matrix 2 2 1 2 3 4;
+#X msg 179 213 2;
+#X msg 338 264 symbol halo;
+#X floatatom 139 255 5 0 0 0 - - -;
+#X msg 244 176 float 2;
+#X symbolatom 341 297 10 0 0 0 - - -;
+#X obj 354 121 mtx_ones 4 7;
+#X obj 389 77 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 138 50 pdoctave;
+#X obj 185 291 pdoctave_send a;
+#X obj 137 346 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 246 481 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 251 500 pdoctave_command b=[1:5 \; 1 \, 2 \, 3 \, 4 \, 0];
+#X obj 144 575 pdoctave_get a;
+#X obj 134 552 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 146 606 print;
+#X obj 449 97 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 383 152 mtx_egg 30 15;
+#X obj 354 434 mtx_ones;
+#X msg 371 410 12;
+#X floatatom 436 398 5 0 0 0 - - -;
+#X obj 429 416 pp set;
+#X obj 114 404 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 123 430 pdoctave_command mesh(a);
+#X obj 602 292 mtx_ones 1;
+#X floatatom 610 241 5 0 0 0 - - -;
+#X obj 615 266 pack f 1;
+#X obj 529 194 mtx_rand;
+#X floatatom 596 122 5 0 0 0 - - -;
+#X obj 192 378 pdoctave_command b=repmat(a \, 1 \, 2);
+#X obj 593 546 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 475 316 bang;
+#X msg 516 304 clear;
+#X obj 522 561 pp set;
+#X msg 516 592 ab;
+#X obj 749 601 print;
+#X obj 515 331 entry 500 200 grey90 black;
+#X obj 621 542 pdoctave_command b = [1 \, 2 \, 3 \; 3 4 5];
+#X connect 1 0 0 0;
+#X connect 2 0 12 0;
+#X connect 3 0 12 0;
+#X connect 4 0 12 0;
+#X connect 5 0 12 0;
+#X connect 6 0 12 0;
+#X connect 7 0 12 0;
+#X connect 8 0 12 0;
+#X connect 9 0 12 0;
+#X connect 10 0 9 0;
+#X connect 13 0 32 0;
+#X connect 14 0 15 0;
+#X connect 16 0 18 0;
+#X connect 17 0 16 0;
+#X connect 19 0 20 0;
+#X connect 20 0 12 0;
+#X connect 21 0 12 0;
+#X connect 22 0 21 0;
+#X connect 23 0 24 0;
+#X connect 24 0 22 0;
+#X connect 25 0 26 0;
+#X connect 27 0 12 0;
+#X connect 28 0 29 0;
+#X connect 29 0 27 0;
+#X connect 30 0 12 0;
+#X connect 31 0 30 0;
+#X connect 33 0 40 0;
+#X connect 34 0 39 0;
+#X connect 35 0 39 0;
+#X connect 36 0 37 0;
+#X connect 39 0 40 0;
