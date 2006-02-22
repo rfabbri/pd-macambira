@@ -21,7 +21,10 @@ BUILDLAYOUT_DIR = $(CWD)/..
 # and mount it.  The files will be copied from the mounted .dmg image.
 #WISH = /Applications/Utilities/Wish\ Shell.app
 TCLTK := $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -1|sed 's/\.dmg//')
-WISH_NAME = Wish\ Shell
+# Tcl/Tk < 8.4.10
+#WISH_NAME = Wish\ Shell
+# Tcl/Tk >= 8.4.10
+WISH_NAME = Wish
 WISH = /Volumes/$(TCLTK)/$(WISH_NAME).app
 WISH_CONTENTS = $(WISH)/Contents
 
@@ -103,7 +106,7 @@ darwin_app_wrapper: Info.plist
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
-	mv "$(PD_APP_CONTENTS)/MacOS/Wish Shell" \
+	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
 		"$(PD_APP_CONTENTS)/MacOS/Pd"
 #	diskutil eject /Volumes/$(TCLTK)
 
