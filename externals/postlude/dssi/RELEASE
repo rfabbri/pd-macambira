@@ -1,0 +1,7 @@
+0.83
+
+-Added FluidSynth-DSSI patch load support (i.e. soundfonts)
+
+0.82
+
+-Added hexter6 patch load support
