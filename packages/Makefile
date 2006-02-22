@@ -652,19 +652,21 @@ patch_pd:
 	done
 	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
 # change Pd's version number to reflect the extended build
+# this needs the complete_version_defines patch to work
 	cd $(pd_src)/src/ && \
-		sed 's/\(pd_version\[\] = "Pd version \)[0-9extndRC.-]*/\1$(PD_VERSION)-$(PACKAGE_VERSION)/'  s_main.c > s_main.c.tmp && \
-		mv s_main.c.tmp s_main.c
+		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
+			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
 	@echo " "
 	@echo "patching succeeded!"
 
 
 unpatch_pd:
-# this sed pattern won't work with TEST versions
+# change the version number back to the original 
+# this needs the complete_version_defines patch to work
 	cd $(pd_src)/src && \
-		sed 's/\(pd_version\[\] = "Pd version [0-9]\.[0-9]*[.-][0-9]*\)[0-9extndRC.-]*/\1/' \
-			s_main.c > s_main.c.tmp && \
-		mv s_main.c.tmp s_main.c
+		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION)"|\1"|' \
+			m_pd.h > m_pd.h.tmp && \
+		mv m_pd.h.tmp m_pd.h
 # apply all platform-specific patches
 	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
