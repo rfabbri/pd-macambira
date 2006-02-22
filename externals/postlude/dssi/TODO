@@ -1,4 +1,4 @@
-   1. Fix memory allocation issues.
+   1. Fix memory allocation issues. - DONE!
    2. Restore Trivial Synth compatibility, i.e. is GUI fails, don't crash. - DONE!
    3. Reomve alsa.h dependency - Included header file!
    4. Get Hexter/Fluidsynth working - DONE!
@@ -26,4 +26,5 @@
    26. FIX: Why does is incorrect patch name chown when program is changed from GUI? - DONE! - query_programs must be sent for each configure call
    27. FIX: Generic valgrind error - also in jack-dssi-host.
    28. FIX: crash on close if incorrect plugin path given on command line -DONE!
-
+   29. FIX: crashes if load new patches, set programs, play sequence then set new programs - run through GDB
+   30. FIX: fluidsynth-dssi errors. Example [pd guts] in madonna demo ctrl-x, ctrl-v crashes PD.

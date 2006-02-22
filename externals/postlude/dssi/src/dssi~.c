@@ -149,7 +149,7 @@ static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x);
  *
  * encode a block of 7-bit data, in base64-ish style
  */
-char *
+static char *
 encode_7in6(uint8_t *data, int length)
 {
     char *buffer;
@@ -195,7 +195,7 @@ encode_7in6(uint8_t *data, int length)
  * dx7_bulk_dump_checksum
 ** Taken from dx7_voice_data.c by Sean Bolton **
  */
-int
+static int
 dx7_bulk_dump_checksum(uint8_t *data, int length)
 {
     int sum = 0;
@@ -208,13 +208,14 @@ dx7_bulk_dump_checksum(uint8_t *data, int length)
 
 static void dssi_load(char *dll_path, void **dll_handle){
 	
-	*dll_handle = dlopen(dll_path, RTLD_NOW);
+	*dll_handle = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
 	if (*dll_handle){
 		post("%s loaded successfully", dll_path);
 	}
 	else
 		post("Failed: %s", dlerror());
-	
+
+        
 }
 	
 static void portInfo(t_dssi_tilde *x){
@@ -310,6 +311,7 @@ static void dssi_init(t_dssi_tilde *x, t_int instance){
 	x->instances[instance].ui_osc_configure_path = NULL;
 	x->instances[instance].uiNeedsProgramUpdate = 0;
 	x->instances[instance].pendingProgramChange = -1;
+	x->instances[instance].plugin_ProgramCount = 0;
 	x->instances[instance].pendingBankMSB = -1;
 	x->instances[instance].pendingBankLSB = -1;
 	x->instances[instance].ui_hidden = 1;
@@ -416,7 +418,7 @@ post("querying programs");
 	/* Count the plugins first */
 	    /*FIX ?? */
 		for (i = 0; x->descriptor->
-					   get_program(x->instanceHandles[instance], i); ++i);
+			get_program(x->instanceHandles[instance], i); ++i);
 
 		if (i > 0) {
 			x->instances[instance].plugin_ProgramCount = i;
@@ -441,7 +443,10 @@ post("querying programs");
 #endif
 			}
 		}
-	}
+		/* No - it should be 0 anyway - dssi_init */
+	/*	else
+			x->instances[instance].plugin_ProgramCount = 0;
+*/	}
 }
 
 static LADSPA_Data get_port_default(t_dssi_tilde *x, int port)
@@ -1240,54 +1245,56 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 */
 	if(!strcmp(msg_type, "load") && x->descriptor->configure){
 		filename = argv[1].a_w.w_symbol->s_name;
-		key = malloc(10 * sizeof(char)); /* holds "patchesN" */
-		strcpy(key, "patches0");
 		post("loading patch: %s for instance %d", filename, instance);
-		fp = fopen(filename, "rb");
 		
-	/*From dx7_voice_data by Sean Bolton */
-		if(fp == NULL){
-			post("Unable to open patch file: %s", filename);
-			return 0;
-		}
-		if (fseek(fp, 0, SEEK_END) || 
-			(filelength = ftell(fp)) == -1 ||
-			fseek(fp, 0, SEEK_SET)) {
-				post("couldn't get length of patch file: %s", 
-					filename);
+		if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
+			!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6")){
+			
+			key = malloc(10 * sizeof(char)); /* holds "patchesN" */
+			strcpy(key, "patches0");
+
+			fp = fopen(filename, "rb");
+			
+		/*From dx7_voice_data by Sean Bolton */
+			if(fp == NULL){
+				post("Unable to open patch file: %s", filename);
+				return 0;
+			}
+			if (fseek(fp, 0, SEEK_END) || 
+				(filelength = ftell(fp)) == -1 ||
+				fseek(fp, 0, SEEK_SET)) {
+				   post("couldn't get length of patch file: %s", 
+						filename);
+				fclose(fp);
+				return 0;
+			}
+			if (filelength == 0) {
+				post("patch file has zero length");
+				fclose(fp);
+				return 0;
+			} else if (filelength > 16384) {
+				post("patch file is too large");
+				fclose(fp);
+				return 0;
+			}
+			if (!(raw_patch_data = (unsigned char *)
+						malloc(filelength))) 		     			 {
+				post(
+				  "couldn't allocate memory for raw patch file");
+				fclose(fp);
+				return 0;
+			}
+			if (fread(raw_patch_data, 1, filelength, fp) 
+							!= (size_t)filelength) {
+				post("short read on patch file: %s", filename);
+				free(raw_patch_data);
+				fclose(fp);
+				return 0;
+			}
 			fclose(fp);
-			return 0;
-    		}
-		if (filelength == 0) {
-			post("patch file has zero length");
-			fclose(fp);
-			return 0;
-		} else if (filelength > 16384) {
-			post("patch file is too large");
-			fclose(fp);
-			return 0;
-		}
-		if (!(raw_patch_data = (unsigned char *)malloc(filelength))) 		     {
-			post("couldn't allocate memory for raw patch file");
-			fclose(fp);
-			return 0;
-		}
-		if (fread(raw_patch_data, 1, filelength, fp) 
-						!= (size_t)filelength) {
-			post("short read on patch file: %s", filename);
-			free(raw_patch_data);
-			fclose(fp);
-			return 0;
-	    	}
-		fclose(fp);
 #if DEBUG
-		post("Patch file length is %ul", filelength);
+			post("Patch file length is %ul", filelength);
 #endif
-	/* At the moment we only support Hexter patches */
-		if(strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") && 
-				strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))
-			post("Sorry dssi~ only supports	dx7 patches at the moment.");
-		else{
 		 /* figure out what kind of file it is */
 		    filename_length = strlen(filename);
 		    if (filename_length > 4 &&
@@ -1355,8 +1362,8 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 		    free(raw_patch_data);
 /*		    return count;*/
 		    
-		if(count == 32)
- 		    value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
+		   if(count == 32)
+ 		       value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
 					count * DX7_VOICE_SIZE_PACKED);
 	/*	    post("value = %s", value);	*/
 
@@ -1365,7 +1372,19 @@ static t_int dssi_config(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
 				
 				
 	     }
-        }	
+	     else if(!strcmp(x->descriptor->LADSPA_Plugin->Label, 
+				     "FluidSynth-DSSI")){
+		     key = malloc(6 * sizeof(char));
+		     strcpy(key, "load");
+		     value = filename;
+	     }
+	     else{
+		     post("Sorry, %s patches are not supported", 
+				     x->descriptor->LADSPA_Plugin->Label);
+	     }
+		
+        }
+	
 	/*FIX: tidy up */
 	if(!strcmp(msg_type, "dir") && x->descriptor->configure){
 	/*	if(x->dir)
@@ -1610,7 +1629,10 @@ static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 
 static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 
-	int i, stop = 0;
+	int i,
+	    stop;
+
+	stop = 0;
 	t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
 	post("dssi~ %.2f\n a DSSI host for Pure Data\n by Jamie Bullock\nIncluding Code from jack-dssi-host\n by Chris Cannam, Steve Harris and Sean Bolton", VERSION);
 	
@@ -1704,6 +1726,7 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 static void dssi_free(t_dssi_tilde *x){
 
 	t_int i;
+/*	char *dlinfo;*/
 	
 #if DEBUG
 			  post("Calling dssi_free");
@@ -1742,6 +1765,11 @@ static void dssi_free(t_dssi_tilde *x){
 		  free(x->plugin_ControlDataOutput);
 
 		  while(instance--){
+	/*		dlclose(x->dll_handle);
+#if DEBUG
+	dlinfo = dlerror();
+	post("When attempting to close the dll handle, we get: %s", dlinfo);
+#endif*/
 			if(x->instances[instance].gui_pid){
 #if DEBUG
 			  post("Freeing GUI process PID = %d", x->instances[instance].gui_pid);
