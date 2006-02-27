@@ -488,6 +488,7 @@ static int pdp_theonice_start(t_pdp_theonice *x)
        return ret;
     }
     post("pdp_theonice~ : start streaming at %d frames/second", x->x_framerate);
+    return 0;
 }
 
     /* set password */
@@ -1009,7 +1010,7 @@ static void pdp_theonice_process_yv12(t_pdp_theonice *x)
     {
       if ( gettimeofday(&x->x_tprevstream, NULL) == -1)
       {
-         post("pdp_theonice~ : could set start time" );
+         post("pdp_theonice~ : couldn't set start time" );
       }
     }
 
