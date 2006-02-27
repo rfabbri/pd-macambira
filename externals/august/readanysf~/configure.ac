@@ -306,13 +306,13 @@ AC_CHECK_LIB(flext, AddOutSignal, [have_flext=yes ], [have_flext=no])
 if test "$have_flext" = "yes"; then
 	if test  "$flext_shared" = "yes"; then
 	        FLEXT_LIBS="-lflext"
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_NOGLOBALNEW"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_USE_CMEM"
 	else
 		echo
 		echo "FLEXT is not setup for dynamic linking, you should think about using this!"
 		echo "try configure --enable-flext-shared"
 		echo
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_NOGLOBALNEW"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_USE_CMEM"
 	        FLEXT_LIBS=""
 	fi
 else
@@ -325,12 +325,12 @@ else
 		echo "under /etc/ld.so.conf (for linux).  and, as root do ldconfig"
 		echo
 	        FLEXT_LIBS="-lflext"
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_NOGLOBALNEW"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_USE_CMEM"
 	else
 		echo
 		echo "FLEXT is now setup to link statically. not the best idea, but it works"
 		echo
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_NOGLOBALNEW"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_USE_CMEM"
 	        FLEXT_LIBS="$flext_dir/libflext_t.a"
 	fi	
 fi
