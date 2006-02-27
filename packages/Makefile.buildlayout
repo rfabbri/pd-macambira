@@ -146,9 +146,12 @@ PD_MINOR_VERSION := $(shell grep PD_MINOR_VERSION $(pd_src)/src/m_pd.h | \
 	sed 's|^.define *PD_MINOR_VERSION *\([0-9]*\).*|\1|' )
 PD_BUGFIX_VERSION := $(shell grep PD_BUGFIX_VERSION $(pd_src)/src/m_pd.h | \
 	sed 's|^.define *PD_BUGFIX_VERSION *\([0-9]*\).*|\1|' )
-
-PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
-
+PD_TEST_VERSION := $(shell grep PD_TEST_VERSION $(pd_src)/src/m_pd.h | \
+	sed 's|^.define *PD_TEST_VERSION *"\(.*\)".*|\1|' )
+PD_VERSION := $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
+ifneq ($(PD_TEST_VERSION),)
+	PD_VERSION := $(PD_VERSION)-$(PD_TEST_VERSION)
+endif
 
 # release version for this distro
 PACKAGE_VERSION = extended-test1

@@ -641,12 +641,12 @@ devsymlinks_clean:
 patch_pd:
 	@echo pd_src $(pd_src)
 # apply all platform-neutral patches
-	for patch in $(wildcard $(CWD)/patches/*.patch); do \
+	for patch in $(shell ls -1 $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
 # apply all platform-specific patches
-	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
+	for patch in $(shell ls -1 $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 < $$patch; \
 	done
@@ -668,12 +668,12 @@ unpatch_pd:
 			m_pd.h > m_pd.h.tmp && \
 		mv m_pd.h.tmp m_pd.h
 # apply all platform-specific patches
-	for patch in $(wildcard $(CWD)/patches/$(OS_NAME)/*.patch); do \
+	for patch in $(shell ls -1r $(CWD)/patches/$(OS_NAME)/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
 # apply all platform-neutral patches
-	for patch in $(wildcard $(CWD)/patches/*.patch); do \
+	for patch in $(shell ls -1r $(CWD)/patches/*.patch); do \
 		echo "Applying $$patch"; \
 		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
 	done
