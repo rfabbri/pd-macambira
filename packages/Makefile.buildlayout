@@ -140,13 +140,13 @@ installdirs: $(DESTDIR) $(bindir) $(examplesdir) $(pddocdir) $(includedir) $(hel
 #==============================================================================#
 
 
-PD_MAJOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version \([0-9]\)\.[0-9]*[. TES-]*[0-9]*[0-9extndRC.-]*.n";/\1/')
-PD_MINOR_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.\([0-9]*\)[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
-PD_BUGFIX_VERSION := $(shell grep 'Pd version' $(pd_src)/src/s_main.c | \
-	sed 's/char pd_version\[\] = "Pd version [0-9]\.[0-9]*[. TES-]*\([0-9]*\)[0-9extndRC.-]*.n";/\1/')
-# the separators [.-] need to be the same as in s_main.c or the regexps break
+PD_MAJOR_VERSION := $(shell grep PD_MAJOR_VERSION $(pd_src)/src/m_pd.h | \
+	sed 's|^.define *PD_MAJOR_VERSION *\([0-9]*\).*|\1|' )
+PD_MINOR_VERSION := $(shell grep PD_MINOR_VERSION $(pd_src)/src/m_pd.h | \
+	sed 's|^.define *PD_MINOR_VERSION *\([0-9]*\).*|\1|' )
+PD_BUGFIX_VERSION := $(shell grep PD_BUGFIX_VERSION $(pd_src)/src/m_pd.h | \
+	sed 's|^.define *PD_BUGFIX_VERSION *\([0-9]*\).*|\1|' )
+
 PD_VERSION = $(PD_MAJOR_VERSION).$(PD_MINOR_VERSION).$(PD_BUGFIX_VERSION)
 
 

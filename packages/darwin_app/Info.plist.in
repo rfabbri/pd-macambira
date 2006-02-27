@@ -21,7 +21,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Pd</string>
+	<string>PD_APP_NAME</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.puredata.pd.wish</string>
 	<key>CFBundleInfoDictionaryVersion</key>

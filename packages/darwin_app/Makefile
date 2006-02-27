@@ -21,12 +21,14 @@ BUILDLAYOUT_DIR = $(CWD)/..
 # and mount it.  The files will be copied from the mounted .dmg image.
 #WISH = /Applications/Utilities/Wish\ Shell.app
 TCLTK := $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -1|sed 's/\.dmg//')
-# Tcl/Tk < 8.4.10
-#WISH_NAME = Wish\ Shell
-# Tcl/Tk >= 8.4.10
-WISH_NAME = Wish
-WISH = /Volumes/$(TCLTK)/$(WISH_NAME).app
-WISH_CONTENTS = $(WISH)/Contents
+TCKTK_BUGFIX_VERSION := $(shell echo $(TCLTK) | \
+	sed 's|TclTkAquaStandalone-[0-9]\.[0-9]\.\([0-9]*\)|\1|')
+
+# Wish Shell.app changed to Wish.app in TclTk 8.4.10
+WISH_NAME := $(shell ( test $(TCKTK_BUGFIX_VERSION) -ge 10 && echo Wish ) \
+	|| echo Wish Shell )
+WISH = "/Volumes/$(TCLTK)/$(WISH_NAME).app"
+WISH_CONTENTS = "$(WISH)/Contents"
 
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -94,20 +96,20 @@ darwin_app_wrapper: Info.plist
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(PD_APP_CONTENTS)/MacOS"
 	install -m0755 -p \
-		$(WISH_CONTENTS)/MacOS/$(WISH_NAME) \
+		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" \
 		"$(PD_APP_CONTENTS)/MacOS"
 	install -d "$(PD_APP_CONTENTS)/Resources"
 	install -m0644 -p \
-		$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc \
+		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources"
 	install -d "$(PD_APP_CONTENTS)/Frameworks"
-	cp -Rp $(WISH_CONTENTS)/Frameworks "$(PD_APP_CONTENTS)"
+	cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)"
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
-		"$(PD_APP_CONTENTS)/MacOS/Pd"
+		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
 #	diskutil eject /Volumes/$(TCLTK)
 
 
@@ -214,8 +216,8 @@ darwin_app_clean:
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
 	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
 	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
-	-rm -f -- $(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc \
-		$(WISH_CONTENTS)/Resources/pd*.icns
+	-rm -f -- "$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
+		"$(WISH_CONTENTS)/Resources/pd*.icns"
 	-rmdir $(PD_APP_CONTENTS)/Resources
 	-rm -f -- $(DESTDIR)
 	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
@@ -230,7 +232,10 @@ darwin_app_clean:
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
+	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
+	@echo "WISH_NAME: $(WISH_NAME)"
+	@echo "TCKTK_BUGFIX_VERSION: $(TCKTK_BUGFIX_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"
