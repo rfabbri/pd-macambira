@@ -12,12 +12,12 @@
 #X floatatom 447 226 9 0 0 0 - - -;
 #X msg 361 149 0.5;
 #X obj 44 183 resample 30;
-#X obj 44 210 mpfilter 0.3 0.8;
+#X obj 44 210 pmfilter 0.3 0.8;
 #X obj 93 235 clip 0 1;
 #X obj 93 259 timeroll;
 #X obj 368 251 timeroll;
 #X obj 368 227 clip 0 1;
-#X obj 319 198 mpfilter 0.3 0.3;
+#X obj 319 198 pmfilter 0.3 0.3;
 #X obj 319 175 resample 30;
 #X connect 0 0 8 0;
 #X connect 3 0 9 1;

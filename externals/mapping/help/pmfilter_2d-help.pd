@@ -13,7 +13,7 @@
 #X floatatom 118 257 5 0 0 0 - - -;
 #X floatatom 193 232 5 0 0 0 - - -;
 #X obj 44 183 resample 50;
-#X obj 44 279 mpfilter_2d 0.3 0.3;
+#X obj 44 279 pmfilter_2d 0.3 0.3;
 #X obj 44 360 timeroll;
 #X obj 44 333 clip 0 1;
 #X text 348 44 physical modeling filter (2nd order);
