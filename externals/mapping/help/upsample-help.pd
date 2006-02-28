@@ -1,0 +1,6 @@
+#N canvas 342 493 444 426 10;
+#X msg 26 90 1;
+#X obj 26 144 print;
+#X obj 25 118 upsample 3;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
