@@ -6,8 +6,13 @@ default: all
 
 SOURCES=$(sort $(filter %.c, $(wildcard *.c)))
 
+ifeq (,$(findstring clean, $(MAKECMDGOALS)))
 Make.config: Make.config.in configure
 	./configure
+endif
+
+iem_bin_ambi_sources.c iem_bin_ambi_sources.h:
+	./makesource.sh
 
 configure: configure.ac
 	autoconf
@@ -17,8 +22,9 @@ configure: configure.ac
 
 ifeq (,$(findstring clean, $(MAKECMDGOALS)))
 -include $(SOURCES:.c=.d)
--include Make.config
 endif
+
+-include Make.config
 
 ##  2nd only generate depend-files when we have Make.config included
 ##  and thus MAKEDEP_FLAGS defined
@@ -40,7 +46,7 @@ TARGETS = $(SOURCES:.c=.o)
 all: $(LIBNAME)
 	cp $(LIBNAME).$(EXT) ..
 
-$(LIBNAME): $(TARGETS)
+$(LIBNAME): $(TARGETS) iem_bin_ambi_sources.c iem_bin_ambi_sources.h
 	$(LD) $(LFLAGS) -o $(LIBNAME).$(EXT) *.o $(LIBS)
 	$(STRIP) $(STRIPFLAGS) $(LIBNAME).$(EXT)
 
