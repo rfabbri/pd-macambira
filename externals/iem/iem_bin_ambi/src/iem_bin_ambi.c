@@ -21,15 +21,12 @@ static void *iem_bin_ambi_new(void)
 	return (x);
 }
 
-void bin_ambi_calc_HRTF_setup(void);
-void bin_ambi_reduced_decode_setup(void);
-
 /* ------------------------ setup routine ------------------------- */
+void iem_bin_ambi_sources_setup(void);
 
 void iem_bin_ambi_setup(void)
 {
-	bin_ambi_calc_HRTF_setup();
-	bin_ambi_reduced_decode_setup();
+	iem_bin_ambi_sources_setup();
 
 	post("iem_bin_ambi (R-1.15) library loaded!");
 }
