@@ -1,13 +1,40 @@
-#N canvas 147 52 764 593 10;
-#X obj 94 453 netreceive 4567 0 old;
-#X obj 76 453 tgl 17 0 empty empty empty 0 -6 0 8 -4033 -1 -1 0 1;
-#X text 10 415 sends everything it receives into the global message
-space;
-#X text 12 508 You can send and receive messages to Pd from the command
+#N canvas 300 97 467 585 10;
+#X text 3 531 You can send and receive messages to Pd from the command
 line using 'pdsend' and 'pdreceive'.;
-#X obj 4 -3 cnv 15 750 20 empty empty netreceive 20 10 1 18 -233017
+#X obj 4 1 cnv 15 450 20 empty empty netreceive 20 10 1 18 -233017
 -66577 0;
-#X obj 719 -1 pddp;
-#X obj 612 537 help-netreceive;
-#X text 467 537 Miller's help patch:;
-#X connect 0 0 1 0;
+#X obj 79 313 netreceive 3000;
+#X floatatom 179 334 0 0 0 0 - - -;
+#X obj 79 387 netreceive 3001 1;
+#X text 12 46 The Netreceive object opens a socket for TCP ("stream")
+or UDP ("datagram") network reception on a specified port. If using
+TCP \, an outlet gives you the number of Netsend objects (or other
+compatible clients) have opened connections here.;
+#X text 10 127 Incoming network messages appear on "receive" objects
+\; it's up to the sender to select which one. Here \, a "receive foo"
+fields messages sent from the Netsend help window \, q.v.;
+#X text 34 270 first argument: portnumber = 3000;
+#X text 34 286 second argument: 0 or none for TCP \, nonzero for UDP
+;
+#X text 217 312 <-- TCP \, port 3000;
+#X text 241 386 <-- UDP \, port 3001;
+#X text 213 335 <--- number of open connections;
+#X text 5 366 incoming messages;
+#X obj 79 334 print tcp;
+#X obj 79 408 print udp;
+#X text 11 178 There are some possibilities for intercommunication
+with other programs... see the help for "netsend.";
+#X text 19 26 [netreceive] -- listen for incoming messages from network
+;
+#X text 9 216 SECURITY ALERT: the port that netreceive opens has no
+access restrictions \, so anyone can connect to it and send messages.
+Be careful that;
+#X text 109 509 [netreceive 4567 0 old];
+#X text 7 431 If you set the third argument to the word "old" \, everything
+sent to the specified port is received into the global message space.
+This is the original behavior of [netreceive]. This can be VERY INSECURE
+since it gives someone full access to your computer \, allowing them
+to do anything that Pd can via the network.;
+#X connect 2 0 13 0;
+#X connect 2 1 3 0;
+#X connect 4 0 14 0;
