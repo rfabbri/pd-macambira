@@ -1,10 +1,10 @@
-#N canvas 173 51 577 571 10;
+#N canvas 173 51 581 575 10;
 #X obj 104 539 pddp;
 #X obj 8 8 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #X text 104 483 Pd Documentation Chapter 3.6 - doc/1.manual/x3.htm
 ;
-#N canvas 135 30 512 640 More_Info 0;
+#N canvas 135 30 516 644 More_Info 0;
 #X text 17 4 COMMON USES;
 #X text 15 577 INNOVATIVE USES;
 #X text 47 19 I believe that this object was developed first to allow
@@ -178,8 +178,8 @@ these types of interfaces. Performance vs. Usability.;
 #X restore 298 605 pd help_with_interfaces;
 #X symbolatom 86 345 0 0 0 0 - - -;
 #X obj 90 296 hsl 150 18 0 122 0 1 empty empty ASCII_range 2 9 1 12
--262131 -1 -1 0 0;
-#X floatatom 45 347 5 0 0 0 - - -;
+-262131 -1 -1 7400 0;
+#X floatatom 45 347 3 0 0 0 - - -;
 #X text 45 488 - only one printf pattern can be used at once;
 #X text 45 445 - This object does not provide advanced formatting and
 parsing abilities. For example \, you cannot use spaces or odd characters
@@ -191,7 +191,7 @@ box.;
 #X obj 303 296 hsl 150 18 0 255 0 1 empty empty 0_to_FF 2 9 1 12 -262131
 -1 -1 6000 0;
 #X obj 299 325 makefilename hex=%X;
-#X floatatom 258 347 5 0 0 0 - - -;
+#X floatatom 258 347 3 0 0 0 - - -;
 #X obj 86 325 makefilename ASCII=%c;
 #X text 44 378 Watch out! ASCII characters 123 and 125 (curly braces)
 lock up Pd. Also \, reserved characters that Pd uses show up with a
