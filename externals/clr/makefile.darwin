@@ -13,17 +13,23 @@ pd_darwin: clr.pd_darwin
 
 
 PDPATH=/Users/thomas/Develop/pd/devel_0_39
-
 MONO=/Library/Frameworks/Mono.Framework
+
+CFLAGS += -DPD -O2 
 
 # where is the PD executable?
 PD=$(PDPATH)/bin/pd
 
-LDFLAGS=-L$(MONO)/Libraries -lmono  -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 # -lintl -liconv
+LDFLAGS=-framework Mono
 
-DARWININCLUDE = -I$(MONO)/Headers -I$(MONO)/Headers/glib-2.0 -I$(MONO)/Libraries/glib-2.0/include -I$(PDPATH)/src
+INCLUDE = -I$(MONO)/Headers -I$(MONO)/Headers/glib-2.0 -I$(MONO)/Libraries/glib-2.0/include -I$(PDPATH)/src
 
-DARWINCFLAGS = -DPD -O2 
+# new version
+OPTIONS = -dynamiclib -undefined dynamic_lookup
+
+# old version
+#OPTIONS = -bundle -bundle_loader $(PD) 
+
 
 .cpp.pd_darwin:
-	g++ -dynamiclib -undefined dynamic_lookup $(DARWINCFLAGS) $(DARWININCLUDE) $(CFLAGS) $(LDFLAGS) -o $*.pd_darwin $*.cpp
+	g++ $(OPTIONS) $(INCLUDE) $(CFLAGS) $(LDFLAGS) -o $*.pd_darwin $*.cpp
