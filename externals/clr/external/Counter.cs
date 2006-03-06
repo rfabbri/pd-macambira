@@ -8,7 +8,7 @@ public class Counter:
 {
 	public Counter(PureData.AtomList args)
 	{
-        Post("Count.ctor");
+        Post("Count.ctor "+args.ToString());
 
 //        pd.AddInlet(x, "init", ParametersType.Float);
 //        pd.AddOutlet(x, ParametersType.Float);
