@@ -1,10 +1,11 @@
 using System;
 using System.Runtime.CompilerServices; // for extern import
+using System.Runtime.InteropServices; // for structures
 
 namespace PureData
 {
     // PD core functions
-    public class Core 
+    public unsafe class Core 
     {
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         public extern static void Post(string message);        
@@ -19,18 +20,19 @@ namespace PureData
         public extern static void PostVerbose(string message);        
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
-        public extern static IntPtr GenSym(string sym);        
+        internal extern static void *SymGen(string sym);        
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
-        public extern static string EvalSym(Symbol sym);        
+        internal extern static string SymEval(void *sym);        
     }
     
     // This is the base class for a PD/CLR external
-    public class External
+    public unsafe class External
         : Core
     {
-        private readonly IntPtr ptr;
-        
+        // PD object pointer
+        private readonly void *ptr;
+
         protected virtual void MethodBang() { Post("No bang handler"); }
 
         protected virtual void MethodFloat(float f) { Post("No float handler"); }
@@ -39,8 +41,8 @@ namespace PureData
 
         protected virtual void MethodPointer(Pointer p) { Post("No pointer handler");}
 
-        protected virtual void MethodList(Atom[] lst) { Post("No list handler"); }
+        protected virtual void MethodList(AtomList lst) { Post("No list handler"); }
 
-        protected virtual void MethodAnything(Atom[] lst) { Post("No list handler"); }
+        protected virtual void MethodAnything(Symbol tag,AtomList lst) { Post("No anything handler"); }
     }
 }

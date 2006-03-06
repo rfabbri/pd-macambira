@@ -6,16 +6,9 @@ using System;
 public class Counter:
 	PureData.External
 {
-	public Counter()
+	public Counter(PureData.AtomList args)
 	{
-		Post("Count");
-
-//        EventFloat += new MethodFloat(MyFloat);
-    }
-
-	public Counter(PureData.Atom[] args)
-	{
-        Post("Count with args");
+        Post("Count.ctor");
 
 //        pd.AddInlet(x, "init", ParametersType.Float);
 //        pd.AddOutlet(x, ParametersType.Float);
@@ -51,6 +44,11 @@ public class Counter:
     protected override void MethodSymbol(PureData.Symbol s) 
     { 
         Post("Count-SYMBOL "+s.ToString()); 
+    }
+
+    protected override void MethodList(PureData.AtomList l) 
+    { 
+        Post("Count-LIST "+l.ToString()); 
     }
 
     /*

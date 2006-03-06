@@ -1,104 +1,270 @@
 using System;
 using System.Runtime.InteropServices; // for structures
+using System.Collections;
+#if NET_2_0
+using System.Collections.Generic;
+#endif
 
 namespace PureData
 {
-	public enum AtomType {Null = 0, Float = 1, Symbol = 2, Pointer = 3};
-
     [StructLayout (LayoutKind.Sequential)]
-    sealed public class Symbol
+    public unsafe struct Symbol
     {
-        // this should NOT be public
-        readonly private IntPtr ptr;
-        
-        public Symbol(IntPtr p)
-        {
-            ptr = p;
-        }
-
-        public Symbol(Symbol s)
-        {
-            ptr = s.ptr;
-        }
+        // this should NOT be public (or at least read only)
+        private readonly void *sym;
 
         public Symbol(string s)
         {
-            ptr = Core.GenSym(s);
+            sym = Core.SymGen(s);
         }
-        
-        override public string ToString()
+
+        public override string ToString()
         {
-            return Core.EvalSym(this);
+            return Core.SymEval(sym);
         }
     }
 
     [StructLayout (LayoutKind.Sequential)]
-    sealed public class Pointer
+    public unsafe struct Pointer
     {
-        public IntPtr ptr;
+        private readonly void *ptr;
+
+        public override string ToString()
+        {
+            if(sizeof(void *) == 4)
+                return ((int)ptr).ToString();
+            else
+                return ((long)ptr).ToString();
+        }
     }
 
-    [StructLayout (LayoutKind.Explicit)]
-    public struct Word
-    {
-        [FieldOffset(0)] public float w_float;
-        [FieldOffset(0)] public Symbol w_symbol;
-        [FieldOffset(0)] public Pointer w_pointer;
-    }
-
-    //[StructLayout (LayoutKind.Explicit)]
 	[StructLayout (LayoutKind.Sequential)]
-	sealed public class Atom 
+	public unsafe struct Atom 
 	{
-	
-		public AtomType type;
-		public Word word;
+        private enum AtomType {Null = 0, Float = 1, Symbol = 2, Pointer = 3};
+        
+        [StructLayout (LayoutKind.Explicit)]
+        private struct Word
+        {
+            [FieldOffset(0)] public float w_float;
+            [FieldOffset(0)] public Symbol w_sym;
+            [FieldOffset(0)] public Pointer w_ptr;
+        }
+
+		private AtomType type;
+		private Word word;
 		
 		public Atom(float f)
 		{
 			type = AtomType.Float;
+			word = new Word();
 			word.w_float = f;
 		}
 
 		public Atom(int i)
 		{
             type = AtomType.Float;
+            word = new Word();
             word.w_float = (float)i;
         }
 
         public Atom(Symbol s)
         {
             type = AtomType.Symbol;
-            word.w_symbol = s;
+            word = new Word();
+            word.w_sym = s;
         }
         
 		public Atom(string s)
 		{
             type = AtomType.Symbol;
-            word.w_symbol = new Symbol(s);
+            word = new Word();
+            word.w_sym = new Symbol(s);
 		}
-	}
-	
-	
-	// this struct is relative to this c struct, see clr.c
 
-	/*
-		// simplyfied atom
-		typedef struct atom_simple atom_simple;
-		typedef enum
-		{
-			A_S_NULL=0,
-			A_S_FLOAT=1,
-			A_S_SYMBOL=2,
-		}  t_atomtype_simple;
-		typedef struct atom_simple
-		{
-			t_atomtype_simple a_type;
-			union{
-				float float_value;
-				MonoString *string_value;
-			} stuff;
-		};
-		*/
+        public Atom(Pointer p)
+        {
+            type = AtomType.Pointer;
+            word = new Word();
+            word.w_ptr = p;
+        }
 
+        public bool IsFloat { get { return type == AtomType.Float; } }
+        public bool IsSymbol { get { return type == AtomType.Symbol; } }
+        public bool IsPointer { get { return type == AtomType.Pointer; } }
+
+        public float ToFloat()
+        {
+            if(IsFloat)
+                return word.w_float;
+            else
+                throw new System.InvalidCastException("Can't be cast to float.");
+        }
+        
+        public Symbol ToSymbol()
+        {
+            if(IsSymbol)
+                return word.w_sym;
+            else
+                throw new System.InvalidCastException("Can't be cast to Symbol.");
+        }
+        
+        public Pointer ToPointer()
+        {
+            if(IsPointer)
+                return word.w_ptr;
+            else
+                throw new System.InvalidCastException("Can't be cast to Pointer.");
+        }
+        
+        override public string ToString()
+        {
+            if(IsFloat)
+                return word.w_float.ToString();
+            else if(IsSymbol)
+                return word.w_sym.ToString();
+            else if(IsPointer)
+                return word.w_ptr.ToString();
+            else
+                // should never happen
+                throw new System.InvalidProgramException("Internal error.");
+        }
+
+        public static explicit operator float(Atom a)
+        {
+            return a.ToFloat();
+        }
+
+        public static explicit operator Symbol(Atom a)
+        {
+            return a.ToSymbol();
+        }
+
+        public static explicit operator Pointer(Atom a)
+        {
+            return a.ToPointer();
+        }
+    }
+	
+    public class AtomListEnum
+        : IEnumerator
+    {
+        public AtomList list;
+
+        // Enumerators are positioned before the first element
+        // until the first MoveNext() call.
+        int position = -1;
+
+        public AtomListEnum(AtomList l)
+        {
+            list = l;
+        }
+
+        public bool MoveNext()
+        {
+            return ++position < list.Count;
+        }
+
+        public void Reset()
+        {
+            position = -1;
+        }
+
+        public object Current
+        {
+            get
+            {
+                try
+                {
+                    return list[position];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+        }
+    }
+
+
+    // attention: this is dangerous, because we could do the following
+    // AtomList l2 = l;  
+    // with l also being an AtomList... the two private memebers will get copied, although atoms is only a temporary reference
+
+    [StructLayout (LayoutKind.Sequential)]
+    unsafe public struct AtomList
+#if NET_2_0
+		: ICollection<Atom>
+#else
+        : ICollection
+#endif
+    {
+        private readonly int len;
+        private readonly Atom *atoms;
+        
+        public int Count { get { return len; } }
+#if NET_2_0
+        public bool IsReadOnly { get { return false; } } // member of generic.ICollection<Atom> (C# 2.0)
+#endif        
+        public bool IsSynchronized { get { return false; } }
+        public Object SyncRoot { get { return null; } }
+
+        // protect this from being used
+        private AtomList(AtomList a) { len = 0; atoms = null; }
+
+#if NET_2_0
+        public void CopyTo(Atom[] array,int start)
+#else        
+        public void CopyTo(Array array,int start)
+#endif        
+        {
+            if(len > array.GetUpperBound(0)+1-start)
+                throw new System.ArgumentException("Destination array is not long enough.");
+            int i;                
+            for(i = 0; i < len-start; ++i)
+                array.SetValue(atoms[start+i],i);
+        }
+
+        public IEnumerator GetEnumerator()
+        {
+            return new AtomListEnum(this);
+        }
+        
+        public Atom this[int i]
+        {
+            get
+            {
+                if(i < 0 || i >= len)
+                    throw new System.IndexOutOfRangeException("Index outside array bounds.");
+                return atoms[i];
+            }
+            set
+            {
+                if(i < 0 || i >= len)
+                    throw new System.IndexOutOfRangeException("Index outside array bounds.");
+                atoms[i] = value;
+            }
+        }
+
+#if !NET_2_0
+        public static explicit operator Atom[](AtomList l)
+        {
+            Atom[] ret = new Atom[l.Count];
+            int i;
+            for(i = 0; i < l.Count; ++i) ret[i] = l.atoms[i];
+            return ret;
+        }
+#endif        
+
+        override public string ToString()
+        {
+            string n = "{";
+            if(len > 0) {
+                int i;
+                for(i = 0; i < len-1; ++i) n += atoms[i].ToString()+",";
+                n += atoms[i].ToString();
+            }
+            return n+"}";
+        }
+    }	
 }
