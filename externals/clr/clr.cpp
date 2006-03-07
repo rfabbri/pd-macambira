@@ -27,10 +27,12 @@ extern "C" {
 
 #include <map>
 
+#define CORELIB "PureData"
+#define DLLEXT "dll"
 
 static MonoDomain *monodomain;
 static MonoClass *clr_symbol,*clr_pointer,*clr_atom,*clr_atomlist,*clr_external;
-static MonoMethodDesc *clr_desc_main,*clr_desc_ctor;
+static MonoMethodDesc *clr_desc_tostring,*clr_desc_ctor;
 static MonoMethodDesc *clr_desc_bang,*clr_desc_float,*clr_desc_symbol,*clr_desc_pointer,*clr_desc_list,*clr_desc_anything;
 static MonoMethod *ext_method_bang,*ext_method_float,*ext_method_symbol,*ext_method_list,*ext_method_pointer,*ext_method_anything;
 
@@ -45,6 +47,7 @@ typedef struct
     MonoClass *mono_class;
     MonoClassField *mono_obj_field;
     MonoMethod *mono_ctor;
+    t_symbol *name;
 //    ClrMethodMap *methods;
 } t_clr_class;
 
@@ -65,6 +68,21 @@ typedef struct
 
 
 
+// Print error message given by exception
+static void error_exc(char *txt,char *cname,MonoObject *exc)
+{
+    MonoMethod *m = mono_method_desc_search_in_class(clr_desc_tostring,mono_get_exception_class());
+    assert(m);
+    m = mono_object_get_virtual_method(exc,m);
+    assert(m);
+    MonoString *str = (MonoString *)mono_runtime_invoke(m,exc,NULL,NULL);
+    assert(str);
+    error("CLR class %s: %s",txt,cname);
+    error(mono_string_to_utf8(str));
+}
+
+
+
 static void clr_method_bang(t_clr *x) 
 {
     assert(x && x->clr_clss);
@@ -72,9 +90,7 @@ static void clr_method_bang(t_clr *x)
     assert(m);
     MonoObject *exc;
     mono_runtime_invoke(m,x->mono_obj,NULL,&exc);
-    if(exc) {
-        error("Exception raised");
-    }
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_float(t_clr *x,t_float f) 
@@ -85,9 +101,7 @@ static void clr_method_float(t_clr *x,t_float f)
 	gpointer args = &f;
     MonoObject *exc;
     mono_runtime_invoke(m,x->mono_obj,&args,&exc);
-    if(exc) {
-        error("Exception raised");
-    }
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_symbol(t_clr *x,t_symbol *s) 
@@ -104,9 +118,24 @@ static void clr_method_symbol(t_clr *x,t_symbol *s)
 #endif
     MonoObject *exc;
     mono_runtime_invoke(m,x->mono_obj,&args,&exc);
-    if(exc) {
-        error("Exception raised");
-    }
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
+}
+
+static void clr_method_pointer(t_clr *x,t_gpointer *p)
+{
+    assert(x && x->clr_clss);
+    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_pointer);
+    assert(m);
+#if 0
+    MonoObject *ptrobj = mono_value_box(monodomain,clr_pointer,&p);
+    MonoObject *o = (MonoObject *)mono_object_unbox(ptrobj);
+	gpointer args = o;
+#else
+	gpointer args = &p;
+#endif
+    MonoObject *exc;
+    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 struct AtomList
@@ -151,28 +180,7 @@ static void clr_method_list(t_clr *x,t_symbol *l, int argc, t_atom *argv)
 #endif
     MonoObject *exc;
     mono_runtime_invoke(m,x->mono_obj,&args,&exc);
-    if(exc) {
-        error("Exception raised");
-    }
-}
-
-static void clr_method_pointer(t_clr *x,t_gpointer *p)
-{
-    assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_pointer);
-    assert(m);
-#if 0
-    MonoObject *ptrobj = mono_value_box(monodomain,clr_pointer,&p);
-    MonoObject *o = (MonoObject *)mono_object_unbox(ptrobj);
-	gpointer args = o;
-#else
-	gpointer args = &p;
-#endif
-    MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
-    if(exc) {
-        error("Exception raised");
-    }
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_anything(t_clr *x,t_symbol *sl, int argc, t_atom *argv)
@@ -196,7 +204,6 @@ static void clr_method_anything(t_clr *x,t_symbol *sl, int argc, t_atom *argv)
     assert(x && x->clr_clss);
 #endif
 }
-
 
 // this function is called by mono when it wants post messages to pd
 static void PD_Post(MonoString *str)
@@ -235,6 +242,35 @@ static MonoString *PD_SymEval(t_symbol *sym)
     return mono_string_new(monodomain,sym->s_name);
 }
 
+static void PD_AddBang(MonoObject *method)
+{
+    post("Add bang method");
+}
+
+static void PD_AddFloat(MonoObject *method)
+{
+    post("Add float method");
+}
+
+static void PD_AddSymbol(MonoObject *method)
+{
+    post("Add symbol method");
+}
+
+static void PD_AddPointer(MonoObject *method)
+{
+    post("Add pointer method");
+}
+
+static void PD_AddList(MonoObject *method)
+{
+    post("Add list method");
+}
+
+static void PD_AddAnything(MonoObject *method)
+{
+    post("Add anything method");
+}
 
 #if 0
 // this function is called by mono when it wants post messages to pd
@@ -316,6 +352,7 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 
     // store class pointer
     x->clr_clss = clss;
+    x->clr_clss->name = classname;
 
     // store our object pointer in External::ptr member
     mono_field_set_value(x->mono_obj,clss->mono_obj_field,&x);
@@ -329,18 +366,13 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
         MonoObject *lstobj = new_AtomList(argc,argv);
     	gpointer args = lstobj;
 #endif
+        // call constructor
         MonoObject *exc;
-
-        // call static constructor
-        MonoObject *ret = mono_runtime_invoke(clss->mono_ctor,x->mono_obj,&args,&exc);
-        if(ret) {
-            post("Warning: returned value from %s::.ctor ignored",classname->s_name);
-            // ??? do we have to mark ret as free?
-        }
+        mono_runtime_invoke(clss->mono_ctor,x->mono_obj,&args,&exc);
 
         if(exc) {
             pd_free((t_pd *)x);
-            error("CLR class %s - exception raised in constructor",classname->s_name);
+            error_exc("exception raised in constructor",classname->s_name,exc);
             return NULL;
         }
     }
@@ -365,7 +397,7 @@ static int classloader(char *dirname, char *classname)
     char dirbuf[MAXPDSTRING],*nameptr;
     // search for classname.dll in the PD path
     int fd;
-    if ((fd = open_via_path(dirname, classname, ".dll", dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+    if ((fd = open_via_path(dirname, classname, "." DLLEXT, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
         // not found
         goto bailout;
 
@@ -377,16 +409,13 @@ static int classloader(char *dirname, char *classname)
 //    clr_class->methods = NULL;
 
     // try to load assembly
-    char path[MAXPDSTRING];
-    strcpy(path,dirname);
-    strcat(path,"/");
-//    strcat(path,dirbuf);
-//    strcat(path,"/");
-    strcat(path,nameptr);
+    strcat(dirbuf,"/");
+    strcat(dirbuf,classname);
+    strcat(dirbuf,"." DLLEXT);
 
-    assembly = mono_domain_assembly_open(monodomain,path);
+    assembly = mono_domain_assembly_open(monodomain,dirbuf);
 	if(!assembly) {
-		error("clr: file %s couldn't be loaded!",path);
+		error("clr: file %s couldn't be loaded!",dirbuf);
 		goto bailout;
 	}
 
@@ -414,24 +443,46 @@ static int classloader(char *dirname, char *classname)
 
     // find static Main method
 
+    MonoMethodDesc *clr_desc_main = mono_method_desc_new(":Setup",FALSE);
+    assert(clr_desc_main);
+
     method = mono_method_desc_search_in_class(clr_desc_main,clr_class->mono_class);
 	if(method) {
+        MonoObject *obj = mono_object_new(monodomain,clr_class->mono_class);
+        if(!obj) {
+            error("CLR class %s could not be instantiated",classname);
+            goto bailout;
+        }
+
+        // store NULL in External::ptr member
+        void *x = NULL;
+        mono_field_set_value(obj,clr_class->mono_obj_field,&x);
+
         // set current class
         clr_setup_class = clr_class;
 
         // call static Main method
-        MonoObject *ret = mono_runtime_invoke(method,NULL,NULL,NULL);
+	    gpointer args = obj;
+        MonoObject *exc;
+        MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);
 
         // unset current class
         clr_setup_class = NULL;
 
         if(ret) {
-            post("CLR - Warning: returned value from %s.Main ignored",classname);
+            post("CLR - Warning: returned value from %s.Setup ignored",classname);
             // ??? do we have to mark ret as free?
+        }
+
+        if(exc) {
+            MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);
+
+            error_exc("CLR - Exception raised by Setup",classname,exc);
+            goto bailout;
         }
     }
     else
-        post("CLR - Warning: no %s.Main method found",classname);
+        post("CLR - Warning: no %s.Setup method found",classname);
 
     // find and save constructor
     clr_class->mono_ctor = mono_method_desc_search_in_class(clr_desc_ctor,clr_class->mono_class);
@@ -502,31 +553,50 @@ void clr_setup(void)
 #endif
 
     try { 
-        monodomain = mono_jit_init("PureData"); 
+        monodomain = mono_jit_init(CORELIB); 
     }
     catch(...) {
         monodomain = NULL;
     }
 
 	if(monodomain) {
-	    // add mono to C hooks
-        mono_add_internal_call("PureData.Core::Post",(const void *)PD_Post);
-	    mono_add_internal_call("PureData.Core::PostError",(const void *)PD_PostError);
-	    mono_add_internal_call("PureData.Core::PostBug",(const void *)PD_PostBug);
-	    mono_add_internal_call("PureData.Core::PostVerbose",(const void *)PD_PostVerbose);
+        // try to find PureData.dll in the PD path
+        char dirbuf[MAXPDSTRING],*nameptr;
+        // search for classname.dll in the PD path
+        int fd;
+        if ((fd = open_via_path("",CORELIB,"." DLLEXT,dirbuf,&nameptr,MAXPDSTRING,1)) >= 0) {
+            strcat(dirbuf,"/" CORELIB "." DLLEXT);
+            close(fd);
+        }
+        else 
+            strcpy(dirbuf,CORELIB "." DLLEXT);
 
-	    mono_add_internal_call("PureData.Core::SymGen", (const void *)PD_SymGen);
-	    mono_add_internal_call("PureData.Core::SymEval", (const void *)PD_SymEval);
-
-
-        MonoAssembly *assembly = mono_domain_assembly_open (monodomain, "PureData.dll");
+        // look for PureData.dll
+        MonoAssembly *assembly = mono_domain_assembly_open (monodomain,dirbuf);
 	    if(!assembly) {
-		    error("clr: assembly PureData.dll not found!");
+		    error("clr: assembly " CORELIB "." DLLEXT " not found!");
 		    return;
 	    }
 
 	    MonoImage *image = mono_assembly_get_image(assembly);
         assert(image);
+
+	    // add mono to C hooks
+
+        mono_add_internal_call("PureData.Internal::SymGen(string)", (const void *)PD_SymGen);
+        mono_add_internal_call("PureData.Internal::SymEval(void*)", (const void *)PD_SymEval);
+
+        mono_add_internal_call("PureData.External::Post(string)",(const void *)PD_Post);
+        mono_add_internal_call("PureData.External::PostError(string)",(const void *)PD_PostError);
+        mono_add_internal_call("PureData.External::PostBug(string)",(const void *)PD_PostBug);
+        mono_add_internal_call("PureData.External::PostVerbose(string)",(const void *)PD_PostVerbose);
+
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodBang)", (const void *)PD_AddBang);
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodFloat)", (const void *)PD_AddFloat);
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodSymbol)", (const void *)PD_AddSymbol);
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodPointer)", (const void *)PD_AddPointer);
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodList)", (const void *)PD_AddList);
+        mono_add_internal_call("PureData.External::Add(PureData.External/MethodAnything)", (const void *)PD_AddAnything);
 
         // load important classes
         clr_symbol = mono_class_from_name(image,"PureData","Symbol");
@@ -540,8 +610,8 @@ void clr_setup(void)
         clr_external = mono_class_from_name(image,"PureData","External");
         assert(clr_external);
 
-        clr_desc_main = mono_method_desc_new("::Main()",FALSE);
-        assert(clr_desc_main);
+        clr_desc_tostring = mono_method_desc_new("::ToString()",FALSE);
+        assert(clr_desc_tostring);
         clr_desc_ctor = mono_method_desc_new("::.ctor(AtomList)",FALSE);
         assert(clr_desc_ctor);
 
@@ -570,8 +640,8 @@ void clr_setup(void)
         sys_loader(classloader);
 
         // ready!
-	    post("CLR - (c)2006 Davide Morelli, Thomas Grill");
+	    post("CLR extension - (c)2006 Davide Morelli, Thomas Grill");
     }
     else
-		error("clr: mono domain couldn't be initialized!");
+        error("clr: mono domain couldn't be initialized!");
 }

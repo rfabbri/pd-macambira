@@ -6,7 +6,7 @@ using System;
 public class Counter:
 	PureData.External
 {
-	public Counter(PureData.AtomList args)
+    public Counter(PureData.AtomList args)
 	{
         Post("Count.ctor "+args.ToString());
 
@@ -15,48 +15,37 @@ public class Counter:
     }
 
 	// this function MUST exist
-	public static void Main()
+	private static void Setup(Counter obj)
 	{
-        Post("Count.Main");       
+	    Add(new MethodBang(obj.MyBang));
+        Add(new MethodFloat(obj.MyFloat));
+        Add(new MethodSymbol(obj.MySymbol));
+        Add(new MethodList(obj.MyList));
+
+        Post("Count.Main");
 	}
 
-/*
-    public void MyBang() 
+    protected virtual void MyBang() 
     { 
         Post("Count-BANG"); 
     }
 
-    public void MyFloat(float f)
-    {
-        Post(String.Format("Count-FLOAT {0}",f));       
-    }
-*/    
-    protected override void MethodBang() 
-    { 
-        Post("Count-BANG"); 
-    }
-
-    protected override void MethodFloat(float f) 
+    protected virtual void MyFloat(float f) 
     { 
         Post("Count-FLOAT "+f.ToString()); 
     }
 
-    protected override void MethodSymbol(PureData.Symbol s) 
+    protected virtual void MySymbol(PureData.Symbol s) 
     { 
         Post("Count-SYMBOL "+s.ToString()); 
     }
 
-    protected override void MethodList(PureData.AtomList l) 
+    protected virtual void MyList(PureData.AtomList l) 
     { 
         Post("Count-LIST "+l.ToString()); 
     }
 
-    /*
-	public void Init(float f)
-	{
-		curr  = (int) f;
-	}
-
+/*
 	public void SendOut()
 	{
 		pd.SendToOutlet(x, 0, new Atom(curr));

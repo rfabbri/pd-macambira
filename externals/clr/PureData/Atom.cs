@@ -15,12 +15,12 @@ namespace PureData
 
         public Symbol(string s)
         {
-            sym = Core.SymGen(s);
+            sym = Internal.SymGen(s);
         }
 
         public override string ToString()
         {
-            return Core.SymEval(sym);
+            return Internal.SymEval(sym);
         }
     }
 
