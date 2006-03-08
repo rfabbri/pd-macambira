@@ -189,7 +189,7 @@ namespace PureData
 
     // attention: this is dangerous, because we could do the following
     // AtomList l2 = l;  
-    // with l also being an AtomList... the two private memebers will get copied, although atoms is only a temporary reference
+    // with l also being an AtomList... the two private members of the struct will get copied, although atoms is only a temporary reference
 
     [StructLayout (LayoutKind.Sequential)]
     unsafe public struct AtomList

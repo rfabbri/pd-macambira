@@ -71,6 +71,9 @@ namespace PureData
         // PD object pointer
         private readonly void *ptr;
 
+        // to be returned by Setup function
+        protected enum ClassType { Default = 0,PD = 1,GObj = 2,Patchable = 3,NoInlet = 8 }
+
         // --------------------------------------------------------------------------
 
         protected readonly static Symbol s__ = new Symbol("");

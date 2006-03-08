@@ -23,7 +23,8 @@ public class Counter:
     }
 
 	// this function MUST exist
-	private static void Setup(Counter obj)
+	// returns void or ClassType
+	private static ClassType Setup(Counter obj)
 	{
 	    Add(new MethodBang(obj.MyBang));
         Add(new MethodFloat(obj.MyFloat));
@@ -34,6 +35,7 @@ public class Counter:
         Add(new MethodAnything(obj.MyAnything));
 
         Post("Count.Main");
+        return ClassType.Default;
 	}
 
     protected virtual void MyBang() 

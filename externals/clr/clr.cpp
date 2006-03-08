@@ -381,6 +381,7 @@ static void PD_OutletBang(t_clr *obj,int n)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     outlet_bang((*obj->outlets)[n]);
 }
 
@@ -388,6 +389,7 @@ static void PD_OutletFloat(t_clr *obj,int n,float f)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     outlet_float((*obj->outlets)[n],f);
 }
 
@@ -395,6 +397,7 @@ static void PD_OutletSymbol(t_clr *obj,int n,t_symbol *s)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     outlet_symbol((*obj->outlets)[n],s);
 }
 
@@ -402,6 +405,7 @@ static void PD_OutletPointer(t_clr *obj,int n,t_gpointer *p)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     outlet_pointer((*obj->outlets)[n],p);
 }
 
@@ -409,6 +413,7 @@ static void PD_OutletAtom(t_clr *obj,int n,t_atom l)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     t_outlet *out = (*obj->outlets)[n];
     switch(l.a_type) {
         case A_FLOAT: outlet_float(out,l.a_w.w_float); break;
@@ -423,6 +428,7 @@ static void PD_OutletAnything(t_clr *obj,int n,t_symbol *s,AtomList l)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
     outlet_anything((*obj->outlets)[n],s,l.argc,l.argv);
 }
 
@@ -430,6 +436,7 @@ static void PD_OutletAnything2(t_clr *obj,int n,t_symbol *s,MonoArray *l)
 {
     assert(obj);
     assert(obj->outlets);
+    assert(n >= 0 && n < obj->outlets->size());
 //    assert(mono_object_get_class(&l->obj) == clr_atom);
     outlet_anything((*obj->outlets)[n],s,mono_array_length(l),mono_array_addr(l,t_atom,0));
 }
@@ -555,7 +562,8 @@ static int classloader(char *dirname, char *classname)
 
     // make new class (with classname)
     classsym = gensym(classname);
-    clr_class->pd_class = class_new(classsym,(t_newmethod)clr_new,(t_method)clr_free, sizeof(t_clr), CLASS_DEFAULT, A_GIMME, 0);
+    clr_class->pd_class = NULL;
+    int flags = CLASS_DEFAULT;
 
     clr_class->obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
     assert(clr_class->obj_field);
@@ -582,7 +590,11 @@ static int classloader(char *dirname, char *classname)
         // call static Main method
 	    gpointer args = obj;
         MonoObject *exc;
-        mono_runtime_invoke(method,NULL,&args,&exc);
+        MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);
+        if(ret) {
+            // \TODO check return type
+            flags = *(int *)mono_object_unbox(ret);
+        }
 
         // unset current class
         clr_setup_class = NULL;
@@ -597,6 +609,9 @@ static int classloader(char *dirname, char *classname)
 
     // find and save constructor
     clr_class->mono_ctor = mono_method_desc_search_in_class(clr_desc_ctor,clr_class->mono_class);
+
+    // make pd class
+    clr_class->pd_class = class_new(classsym,(t_newmethod)clr_new,(t_method)clr_free, sizeof(t_clr), flags, A_GIMME, A_NULL);
 
     // find && register methods
     if(clr_class->method_bang)
