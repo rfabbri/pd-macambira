@@ -30,26 +30,60 @@ extern "C" {
 #define CORELIB "PureData"
 #define DLLEXT "dll"
 
+
+// cached mono data
+
 static MonoDomain *monodomain;
 static MonoClass *clr_symbol,*clr_pointer,*clr_atom,*clr_atomlist,*clr_external;
 static MonoMethodDesc *clr_desc_tostring,*clr_desc_ctor;
-static MonoMethodDesc *clr_desc_bang,*clr_desc_float,*clr_desc_symbol,*clr_desc_pointer,*clr_desc_list,*clr_desc_anything;
-static MonoMethod *ext_method_bang,*ext_method_float,*ext_method_symbol,*ext_method_list,*ext_method_pointer,*ext_method_anything;
+static MonoMethod *clr_meth_invoke;
+static MonoProperty *clr_prop_method;
 
-typedef std::map<t_symbol *,MonoMethod *> ClrMethodMap;
+
+struct AtomList
+{
+    int argc;
+    t_atom *argv;
+
+    void Set(int c,t_atom *v) { argc = c,argv = v; }
+};
+
+
+// temporary workspace items
+
+static MonoArray *clr_objarr_1,*clr_objarr_2;
+static MonoObject *clr_obj_single,*clr_obj_symbol,*clr_obj_pointer,*clr_obj_atomlist;
+static float *clr_val_single;
+static t_symbol **clr_val_symbol;
+static void **clr_val_pointer;
+static AtomList *clr_val_atomlist;
+
+
+
+struct Delegate
+{
+    operator bool() const { return methodinfo != NULL; }
+
+    MonoObject *methodinfo;
+    MonoMethod *virtmethod;
+};
+
+typedef std::map<t_symbol *,Delegate> ClrMethodMap;
+
 
 // this is the class structure
 // holding the pd and mono class
 // and our CLR method pointers
-typedef struct
+struct t_clr_class
 {
     t_class *pd_class;
     MonoClass *mono_class;
     MonoClassField *mono_obj_field;
     MonoMethod *mono_ctor;
     t_symbol *name;
-//    ClrMethodMap *methods;
-} t_clr_class;
+    Delegate method_bang,method_float,method_symbol,method_pointer,method_list,method_anything;
+    ClrMethodMap *methods; // explicit method selectors
+};
 
 typedef std::map<t_symbol *,t_clr_class *> ClrMap;
 // this holds the class name to class structure association
@@ -59,12 +93,12 @@ static ClrMap clr_map;
 static t_clr_class *clr_setup_class = NULL;
 
 // this is the class instance object structure
-typedef struct
+struct t_clr
 {
     t_object pd_obj; // myself
     t_clr_class *clr_clss; // pointer to our class structure
-    MonoObject *mono_obj;
-} t_clr;
+    MonoObject *mono_obj;  // the mono class instance
+};
 
 
 
@@ -81,128 +115,121 @@ static void error_exc(char *txt,char *cname,MonoObject *exc)
     error(mono_string_to_utf8(str));
 }
 
-
-
 static void clr_method_bang(t_clr *x) 
 {
     assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_bang);
-    assert(m);
+
+    const Delegate &d = x->clr_clss->method_bang;
+    assert(d);
+
+    gpointer args[2] = {x->mono_obj,NULL};
     MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,NULL,&exc);
+    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_float(t_clr *x,t_float f) 
 {
     assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_float);
-    assert(m);
-	gpointer args = &f;
+
+    const Delegate &d = x->clr_clss->method_float;
+    assert(d);
+
+    *clr_val_single = f;
+    mono_array_set(clr_objarr_1,void*,0,clr_obj_single);
+
+    gpointer args[2] = {x->mono_obj,clr_objarr_1};
     MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
+    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_symbol(t_clr *x,t_symbol *s) 
 {
     assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_symbol);
-    assert(m);
-#if 0
-    MonoObject *symobj = mono_value_box(monodomain,clr_symbol,&s);
-    MonoObject *o = (MonoObject *)mono_object_unbox(symobj);
-	gpointer args = o;
-#else
-	gpointer args = &s;
-#endif
+
+    const Delegate &d = x->clr_clss->method_symbol;
+    assert(d);
+
+    *clr_val_symbol = s;
+    mono_array_set(clr_objarr_1,void*,0,clr_obj_symbol);
+
+    gpointer args[2] = {x->mono_obj,clr_objarr_1};
     MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
+    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_pointer(t_clr *x,t_gpointer *p)
 {
     assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_pointer);
-    assert(m);
-#if 0
-    MonoObject *ptrobj = mono_value_box(monodomain,clr_pointer,&p);
-    MonoObject *o = (MonoObject *)mono_object_unbox(ptrobj);
-	gpointer args = o;
-#else
-	gpointer args = &p;
-#endif
+
+    const Delegate &d = x->clr_clss->method_pointer;
+    assert(d);
+
+    *clr_val_pointer = p;
+    mono_array_set(clr_objarr_1,void*,0,clr_obj_pointer);
+
+    gpointer args[2] = {x->mono_obj,clr_objarr_1};
     MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
+    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
-struct AtomList
-{
-    int argc;
-    t_atom *argv;
-
-    AtomList(int c,t_atom *v): argc(c),argv(v) {}
-};
-
-static MonoObject *new_AtomList(int argc,t_atom *argv)
-{
-	AtomList al(argc,argv);
-    MonoObject *lstobj = mono_value_box(monodomain,clr_atomlist,&al);
-    MonoObject *o = (MonoObject *)mono_object_unbox(lstobj);
-    return o;
-}
-
-static MonoArray *new_Atoms(int argc,t_atom *argv)
-{
-    MonoArray *lstobj = mono_array_new(monodomain,clr_atom,argc);
-    t_atom *lstptr = mono_array_addr(lstobj,t_atom,0);
-    memcpy(lstptr,argv,argc*sizeof(t_atom));
-    return lstobj;
-}
 
 static void clr_method_list(t_clr *x,t_symbol *l, int argc, t_atom *argv)
 {
     assert(x && x->clr_clss);
-    MonoMethod *m = mono_object_get_virtual_method(x->mono_obj,ext_method_list);
-    assert(m);
-#if 1
-    // make PureData.AtomList value type
-//    MonoObject *lstobj = new_AtomList(argc,argv);
-//	gpointer args = lstobj;
-	AtomList al(argc,argv);
-	gpointer args = &al;
-#else
-    // make PureData.Atom[] array - copy data
-    MonoArray *lstobj = new_Atoms(argc,argv);
-	gpointer args = lstobj;
-#endif
+
+    const Delegate &d = x->clr_clss->method_list;
+    assert(d);
+
+    clr_val_atomlist->Set(argc,argv);
+    mono_array_set(clr_objarr_1,void*,0,clr_obj_atomlist);
+
+    gpointer args[2] = {x->mono_obj,clr_objarr_1};
     MonoObject *exc;
-    mono_runtime_invoke(m,x->mono_obj,&args,&exc);
+    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
-static void clr_method_anything(t_clr *x,t_symbol *sl, int argc, t_atom *argv)
+static void clr_method_anything(t_clr *x,t_symbol *s,int argc,t_atom *argv)
 {
-#if 0
     assert(x && x->clr_clss);
+
+    const Delegate *d = NULL;
     ClrMethodMap *methods = x->clr_clss->methods;
     if(methods) {
-        ClrMethodMap::iterator it = methods->find(sl);
-        if(it != methods->end()) {
-            // \TODO call m
-            return;
-        }
+        ClrMethodMap::iterator it = methods->find(s);
+        if(it != methods->end()) d = &it->second;
     }
-    if(x->clr_clss->method_anything) {
-         // \TODO call methodanything
+
+    gpointer args[2];
+    args[0] = x->mono_obj;
+
+    if(d) {
+        // explicit selector
+
+        clr_val_atomlist->Set(argc,argv);
+        mono_array_set(clr_objarr_1,void*,0,clr_obj_atomlist);
+        args[1] = clr_objarr_1;
     }
-    else
-        post("CLR - no method for %s found",sl->s_name);
-#else
-    assert(x && x->clr_clss);
-#endif
+    else {
+        // general method
+
+        d = &x->clr_clss->method_anything;
+        assert(d);
+
+        *clr_val_symbol = s;
+        clr_val_atomlist->Set(argc,argv);
+        mono_array_set(clr_objarr_2,void*,0,clr_obj_symbol);
+        mono_array_set(clr_objarr_2,void*,1,clr_obj_atomlist);
+        args[1] = clr_objarr_2;
+    }
+
+    MonoObject *exc;
+    mono_runtime_invoke(d->virtmethod,d->methodinfo,args,&exc);
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 // this function is called by mono when it wants post messages to pd
@@ -232,8 +259,7 @@ static void PD_PostVerbose(int lvl,MonoString *str)
 static void *PD_SymGen(MonoString *str)
 {
     assert(str);
-	t_symbol *s = gensym(mono_string_to_utf8(str));	
-    return s;
+	return gensym(mono_string_to_utf8(str));	
 }
 
 static MonoString *PD_SymEval(t_symbol *sym)
@@ -244,91 +270,65 @@ static MonoString *PD_SymEval(t_symbol *sym)
 
 static void PD_AddBang(MonoObject *method)
 {
-    post("Add bang method");
+    assert(clr_setup_class);
+    Delegate &d = clr_setup_class->method_bang;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
 }
 
 static void PD_AddFloat(MonoObject *method)
 {
-    post("Add float method");
+    assert(clr_setup_class);
+    Delegate &d = clr_setup_class->method_float;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
 }
 
 static void PD_AddSymbol(MonoObject *method)
 {
-    post("Add symbol method");
+    assert(clr_setup_class);
+    Delegate &d = clr_setup_class->method_symbol;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
 }
 
 static void PD_AddPointer(MonoObject *method)
 {
-    post("Add pointer method");
+    assert(clr_setup_class);
+    Delegate &d = clr_setup_class->method_pointer;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
 }
 
 static void PD_AddList(MonoObject *method)
 {
-    post("Add list method");
+    assert(clr_setup_class);
+    Delegate &d = clr_setup_class->method_list;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
+}
+
+static void PD_AddSelector(t_symbol *sym,MonoObject *method)
+{
+    assert(clr_setup_class);
+    Delegate d;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
+
+    if(!clr_setup_class->methods)
+        clr_setup_class->methods = new ClrMethodMap;
+    // add tag to map
+    (*clr_setup_class->methods)[sym] = d;
 }
 
 static void PD_AddAnything(MonoObject *method)
 {
-    post("Add anything method");
-}
-
-#if 0
-// this function is called by mono when it wants post messages to pd
-static void PD_AddMethod(MonoObject *symobj,MonoObject *obj)
-{
     assert(clr_setup_class);
-
-//    char *tag = mono_string_to_utf8(str);
-//	post("register method %s",tag);
-    t_symbol *sym;
-    mono_field_get_value(symobj,clr_symbol_ptr,&sym);
-
-    // \TODO convert from obj
-    MonoMethod *m = NULL;
-
-    if(sym == &s_bang) {
-        if(!clr_setup_class->method_bang)
-    	    class_addbang(clr_setup_class->pd_class,clr_method_bang);
-        clr_setup_class->method_bang = m;
-    }
-    else if(sym == &s_float) {
-        if(!clr_setup_class->method_bang)
-    	    class_addfloat(clr_setup_class->pd_class,clr_method_float);
-        clr_setup_class->method_bang = m;
-    }
-    else if(sym == &s_symbol) {
-        if(!clr_setup_class->method_symbol)
-    	    class_addsymbol(clr_setup_class->pd_class,clr_method_symbol);
-        clr_setup_class->method_symbol = m;
-    }
-    else if(sym == &s_list) {
-        if(!clr_setup_class->method_list)
-    	    class_addlist(clr_setup_class->pd_class,clr_method_list);
-        clr_setup_class->method_list = m;
-    }
-    else if(sym == &s_pointer) {
-        if(!clr_setup_class->method_pointer)
-        	class_addpointer(clr_setup_class->pd_class,clr_method_pointer);
-        clr_setup_class->method_pointer = m;
-    }
-    else if(sym == &s_) {
-        if(!clr_setup_class->method_anything && !clr_setup_class->methods) // only register once!
-	        class_addanything(clr_setup_class->pd_class,clr_method_anything);
-        clr_setup_class->method_anything = m;
-    }
-    else {
-        if(!clr_setup_class->methods) {
-            // no methods yet
-            clr_setup_class->methods = new ClrMethodMap;
-            if(!clr_setup_class->method_anything) // only register once!
-    	        class_addanything(clr_setup_class->pd_class,clr_method_anything);
-        }
-
-        // add tag to map
-        (*clr_setup_class->methods)[sym] = m;
-    }
+    Delegate &d = clr_setup_class->method_anything;
+    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
 }
-#endif
+
 
 void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 {
@@ -359,13 +359,10 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 
     // ok, we have an object - look for constructor
 	if(clss->mono_ctor) {
-#if 1
-    	AtomList al(argc,argv);
+    	AtomList al; 
+        al.Set(argc,argv);
 	    gpointer args = &al;
-#else
-        MonoObject *lstobj = new_AtomList(argc,argv);
-    	gpointer args = lstobj;
-#endif
+
         // call constructor
         MonoObject *exc;
         mono_runtime_invoke(clss->mono_ctor,x->mono_obj,&args,&exc);
@@ -377,7 +374,7 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
         }
     }
     else
-        post("Warning: no constructor for class %s found",classname->s_name);
+        verbose(1,"CLR - Warning: no constructor for class %s found",classname->s_name);
 
     return x;
 }
@@ -405,6 +402,7 @@ static int classloader(char *dirname, char *classname)
     close(fd);
 
     clr_class = (t_clr_class *)getbytes(sizeof(t_clr_class));
+    memset(clr_class,0,sizeof(*clr_class));
 
 //    clr_class->methods = NULL;
 
@@ -433,17 +431,13 @@ static int classloader(char *dirname, char *classname)
     clr_class->mono_obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
     assert(clr_class->mono_obj_field);
 
-    // ok
-
-	post("CLR class %s loaded",classname);
-
     // make new class (with classname)
     classsym = gensym(classname);
     clr_class->pd_class = class_new(classsym,(t_newmethod)clr_new,(t_method)clr_free, sizeof(t_clr), CLASS_DEFAULT, A_GIMME, 0);
 
     // find static Main method
 
-    MonoMethodDesc *clr_desc_main = mono_method_desc_new(":Setup",FALSE);
+    MonoMethodDesc *clr_desc_main = mono_method_desc_new("::Setup",FALSE);
     assert(clr_desc_main);
 
     method = mono_method_desc_search_in_class(clr_desc_main,clr_class->mono_class);
@@ -464,19 +458,12 @@ static int classloader(char *dirname, char *classname)
         // call static Main method
 	    gpointer args = obj;
         MonoObject *exc;
-        MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);
+        mono_runtime_invoke(method,NULL,&args,&exc);
 
         // unset current class
         clr_setup_class = NULL;
 
-        if(ret) {
-            post("CLR - Warning: returned value from %s.Setup ignored",classname);
-            // ??? do we have to mark ret as free?
-        }
-
         if(exc) {
-            MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);
-
             error_exc("CLR - Exception raised by Setup",classname,exc);
             goto bailout;
         }
@@ -487,40 +474,24 @@ static int classloader(char *dirname, char *classname)
     // find and save constructor
     clr_class->mono_ctor = mono_method_desc_search_in_class(clr_desc_ctor,clr_class->mono_class);
 
-#if 0
     // find && register methods
-    if((clr_class->method_bang = mono_method_desc_search_in_class(clr_desc_bang,clr_class->mono_class)) != NULL)
+    if(clr_class->method_bang)
         class_addbang(clr_class->pd_class,clr_method_bang);
-    if((clr_class->method_float = mono_method_desc_search_in_class(clr_desc_float,clr_class->mono_class)) != NULL)
+    if(clr_class->method_float)
         class_addfloat(clr_class->pd_class,clr_method_float);
-    if((clr_class->method_symbol = mono_method_desc_search_in_class(clr_desc_symbol,clr_class->mono_class)) != NULL)
+    if(clr_class->method_symbol)
         class_addsymbol(clr_class->pd_class,clr_method_symbol);
-    if((clr_class->method_pointer = mono_method_desc_search_in_class(clr_desc_pointer,clr_class->mono_class)) != NULL)
+    if(clr_class->method_pointer)
         class_addpointer(clr_class->pd_class,clr_method_pointer);
-    if((clr_class->method_list = mono_method_desc_search_in_class(clr_desc_list,clr_class->mono_class)) != NULL)
+    if(clr_class->method_list)
         class_addlist(clr_class->pd_class,clr_method_list);
-    if((clr_class->method_anything = mono_method_desc_search_in_class(clr_desc_anything,clr_class->mono_class)) != NULL)
+    if(clr_class->method_anything || clr_class->methods)
         class_addanything(clr_class->pd_class,clr_method_anything);
-#else
-    // register methods
-    if(ext_method_bang) 
-        class_addbang(clr_class->pd_class,clr_method_bang);
-    if(ext_method_float) 
-        class_addfloat(clr_class->pd_class,clr_method_float);
-    if(ext_method_symbol) 
-        class_addsymbol(clr_class->pd_class,clr_method_symbol);
-    if(ext_method_pointer) 
-        class_addpointer(clr_class->pd_class,clr_method_pointer);
-    if(ext_method_list) 
-        class_addlist(clr_class->pd_class,clr_method_list);
-    if(ext_method_anything) 
-        class_addanything(clr_class->pd_class,clr_method_anything);
-#endif
 
     // put into map
     clr_map[classsym] = clr_class;
 
-//    post("Loaded class %s OK",classname);
+    verbose(1,"CLR - Loaded class %s OK",classname);
 
     return 1;
 
@@ -596,6 +567,7 @@ void clr_setup(void)
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodSymbol)", (const void *)PD_AddSymbol);
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodPointer)", (const void *)PD_AddPointer);
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodList)", (const void *)PD_AddList);
+        mono_add_internal_call("PureData.External::Add(PureData.Symbol,PureData.External/MethodList)", (const void *)PD_AddSelector);
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodAnything)", (const void *)PD_AddAnything);
 
         // load important classes
@@ -615,26 +587,26 @@ void clr_setup(void)
         clr_desc_ctor = mono_method_desc_new("::.ctor(AtomList)",FALSE);
         assert(clr_desc_ctor);
 
-        clr_desc_bang = mono_method_desc_new("::MethodBang()",FALSE);
-        assert(clr_desc_bang);
-        clr_desc_float = mono_method_desc_new("::MethodFloat(single)",FALSE);
-        assert(clr_desc_float);
-        clr_desc_symbol = mono_method_desc_new("::MethodSymbol(Symbol)",FALSE);
-        assert(clr_desc_symbol);
-        clr_desc_pointer = mono_method_desc_new("::MethodPointer(Pointer)",FALSE);
-        assert(clr_desc_pointer);
-        clr_desc_list = mono_method_desc_new("::MethodList(AtomList)",FALSE);
-        assert(clr_desc_list);
-        clr_desc_anything = mono_method_desc_new("::MethodAnything(Symbol,AtomList)",FALSE);
-        assert(clr_desc_anything);
+        MonoMethodDesc *desc = mono_method_desc_new("System.Reflection.MethodBase:Invoke(object,object[])",FALSE);
+        clr_meth_invoke = mono_method_desc_search_in_image(desc,mono_get_corlib());
 
-        // find abstract methods
-        ext_method_bang = mono_method_desc_search_in_class(clr_desc_bang,clr_external);
-        ext_method_float = mono_method_desc_search_in_class(clr_desc_float,clr_external);
-        ext_method_symbol = mono_method_desc_search_in_class(clr_desc_symbol,clr_external);
-        ext_method_pointer = mono_method_desc_search_in_class(clr_desc_pointer,clr_external);
-        ext_method_list = mono_method_desc_search_in_class(clr_desc_list,clr_external);
-        ext_method_anything = mono_method_desc_search_in_class(clr_desc_anything,clr_external);
+        MonoClass *delegate = mono_class_from_name(mono_get_corlib(),"System","Delegate");
+        assert(delegate);
+        clr_prop_method = mono_class_get_property_from_name(delegate,"Method");
+        assert(clr_prop_method);
+
+        // static objects to avoid allocation at method call time
+        clr_objarr_1 = mono_array_new(monodomain,mono_get_object_class(),1);
+        clr_objarr_2 = mono_array_new(monodomain,mono_get_object_class(),2);
+        clr_obj_single = mono_object_new(monodomain,mono_get_single_class());
+        clr_obj_symbol = mono_object_new(monodomain,clr_symbol);
+        clr_obj_pointer = mono_object_new(monodomain,clr_pointer);
+        clr_obj_atomlist = mono_object_new(monodomain,clr_atomlist);
+        // unboxed addresses
+        clr_val_single = (float *)mono_object_unbox(clr_obj_single);
+        clr_val_symbol = (t_symbol **)mono_object_unbox(clr_obj_symbol);
+        clr_val_pointer = (void **)mono_object_unbox(clr_obj_pointer);
+        clr_val_atomlist = (AtomList *)mono_object_unbox(clr_obj_atomlist);
 
         // install loader hook
         sys_loader(classloader);

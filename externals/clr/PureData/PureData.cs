@@ -15,7 +15,7 @@ namespace PureData
     }
     
     // This is the base class for a PD/CLR external
-    public unsafe class External
+    public unsafe abstract class External
     {
         // PD object pointer
         private readonly void *ptr;
@@ -57,6 +57,11 @@ namespace PureData
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         protected extern static void Add(MethodList m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void Add(Symbol sel,MethodList m);
+
+        protected static void Add(string sel,MethodList m) { Add(new Symbol(sel),m); }
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         protected extern static void Add(MethodAnything m);
