@@ -8,6 +8,8 @@ public class Counter:
 {
     PureData.Atom[] args;
 
+    float farg;
+
     public Counter(PureData.AtomList args)
 	{
         Post("Count.ctor "+args.ToString());
@@ -15,8 +17,9 @@ public class Counter:
         // that's the way to store args (don't just copy an AtomList instance!!)
         this.args = (PureData.Atom[])args;
 
-//        pd.AddInlet(x, "init", ParametersType.Float);
-//        pd.AddOutlet(x, ParametersType.Float);
+        AddInlet(s_list,new PureData.Symbol("list2"));
+        AddInlet(ref farg);
+        AddOutletBang();
     }
 
 	// this function MUST exist
@@ -27,6 +30,7 @@ public class Counter:
         Add(new MethodSymbol(obj.MySymbol));
         Add(new MethodList(obj.MyList));
         Add("set",new MethodList(obj.MySet));
+        Add("send",new MethodList(obj.MySend));
         Add(new MethodAnything(obj.MyAnything));
 
         Post("Count.Main");
@@ -34,32 +38,44 @@ public class Counter:
 
     protected virtual void MyBang() 
     { 
-        Post("Count-BANG"); 
+        Post("Count-BANG "+farg.ToString()); 
+        Outlet(0);
     }
 
     protected virtual void MyFloat(float f) 
     { 
         Post("Count-FLOAT "+f.ToString()); 
+        Outlet(0,f);
     }
 
     protected virtual void MySymbol(PureData.Symbol s) 
     { 
         Post("Count-SYMBOL "+s.ToString()); 
+        Outlet(0,s);
     }
 
     protected virtual void MyList(PureData.AtomList l) 
     { 
         Post("Count-LIST "+l.ToString()); 
+        Outlet(0,l);
     }
 
     protected virtual void MySet(PureData.AtomList l) 
     { 
         Post("Count-SET "+l.ToString()); 
+        Outlet(0,new PureData.Symbol("set"),l);
+    }
+
+    protected virtual void MySend(PureData.AtomList l) 
+    { 
+        Send(new PureData.Symbol("receiver"),l);
+        Send(new PureData.Symbol("receiver2"),(PureData.Atom[])l);
     }
 
     protected virtual void MyAnything(PureData.Symbol s,PureData.AtomList l) 
     { 
         Post("Count-("+s.ToString()+") "+l.ToString()); 
+        Outlet(0,s,l);
     }
     /*
 	public void SendOut()

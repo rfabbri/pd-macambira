@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 #include <map>
+#include <vector>
 
 #define CORELIB "PureData"
 #define DLLEXT "dll"
@@ -38,7 +39,6 @@ static MonoClass *clr_symbol,*clr_pointer,*clr_atom,*clr_atomlist,*clr_external;
 static MonoMethodDesc *clr_desc_tostring,*clr_desc_ctor;
 static MonoMethod *clr_meth_invoke;
 static MonoProperty *clr_prop_method;
-
 
 struct AtomList
 {
@@ -78,8 +78,8 @@ struct t_clr_class
 {
     t_class *pd_class;
     MonoClass *mono_class;
-    MonoClassField *mono_obj_field;
     MonoMethod *mono_ctor;
+    MonoClassField *obj_field; // ptr field in PureData.External
     t_symbol *name;
     Delegate method_bang,method_float,method_symbol,method_pointer,method_list,method_anything;
     ClrMethodMap *methods; // explicit method selectors
@@ -88,6 +88,8 @@ struct t_clr_class
 typedef std::map<t_symbol *,t_clr_class *> ClrMap;
 // this holds the class name to class structure association
 static ClrMap clr_map;
+
+typedef std::vector<t_outlet *> OutletArr;
 
 // this is the class to be setup (while we are in the CLR static Main method)
 static t_clr_class *clr_setup_class = NULL;
@@ -98,6 +100,7 @@ struct t_clr
     t_object pd_obj; // myself
     t_clr_class *clr_clss; // pointer to our class structure
     MonoObject *mono_obj;  // the mono class instance
+    OutletArr *outlets;
 };
 
 
@@ -175,7 +178,6 @@ static void clr_method_pointer(t_clr *x,t_gpointer *p)
     mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
-
 
 static void clr_method_list(t_clr *x,t_symbol *l, int argc, t_atom *argv)
 {
@@ -330,6 +332,127 @@ static void PD_AddAnything(MonoObject *method)
 }
 
 
+static void PD_AddInlet(t_clr *obj,t_symbol *sel,t_symbol *to_sel)
+{
+    assert(obj);
+    t_inlet *in = inlet_new(&obj->pd_obj,&obj->pd_obj.ob_pd,sel,to_sel);
+    assert(in);
+}
+
+static void PD_AddInletFloat(t_clr *obj,float *f)
+{
+    assert(obj);
+    t_inlet *in = floatinlet_new(&obj->pd_obj,f);
+    assert(in);
+}
+
+static void PD_AddInletSymbol(t_clr *obj,t_symbol **s)
+{
+    assert(obj);
+    t_inlet *in = symbolinlet_new(&obj->pd_obj,s);
+    assert(in);
+}
+
+/*
+static void PD_AddInletPointer(t_clr *obj,t_gpointer *p)
+{
+    assert(obj);
+    t_inlet *in = pointerinlet_new(&obj->pd_obj,p);
+    assert(in);
+}
+*/
+
+static void PD_AddInletProxy(t_clr *obj)
+{
+    assert(obj);
+    // TODO implement
+}
+
+static void PD_AddOutlet(t_clr *obj,t_symbol *type)
+{
+    assert(obj);
+    t_outlet *out = outlet_new(&obj->pd_obj,type);
+    assert(out);
+    if(!obj->outlets) obj->outlets = new OutletArr;
+    obj->outlets->push_back(out);
+}
+
+static void PD_OutletBang(t_clr *obj,int n)
+{
+    assert(obj);
+    assert(obj->outlets);
+    outlet_bang((*obj->outlets)[n]);
+}
+
+static void PD_OutletFloat(t_clr *obj,int n,float f)
+{
+    assert(obj);
+    assert(obj->outlets);
+    outlet_float((*obj->outlets)[n],f);
+}
+
+static void PD_OutletSymbol(t_clr *obj,int n,t_symbol *s)
+{
+    assert(obj);
+    assert(obj->outlets);
+    outlet_symbol((*obj->outlets)[n],s);
+}
+
+static void PD_OutletPointer(t_clr *obj,int n,t_gpointer *p)
+{
+    assert(obj);
+    assert(obj->outlets);
+    outlet_pointer((*obj->outlets)[n],p);
+}
+
+static void PD_OutletAtom(t_clr *obj,int n,t_atom l)
+{
+    assert(obj);
+    assert(obj->outlets);
+    t_outlet *out = (*obj->outlets)[n];
+    switch(l.a_type) {
+        case A_FLOAT: outlet_float(out,l.a_w.w_float); break;
+        case A_SYMBOL: outlet_symbol(out,l.a_w.w_symbol); break;
+        case A_POINTER: outlet_pointer(out,l.a_w.w_gpointer); break;
+        default:
+            error("CLR - internal error in file " __FILE__ ", line %i",__LINE__);
+    }
+}
+
+static void PD_OutletAnything(t_clr *obj,int n,t_symbol *s,AtomList l)
+{
+    assert(obj);
+    assert(obj->outlets);
+    outlet_anything((*obj->outlets)[n],s,l.argc,l.argv);
+}
+
+static void PD_OutletAnything2(t_clr *obj,int n,t_symbol *s,MonoArray *l)
+{
+    assert(obj);
+    assert(obj->outlets);
+//    assert(mono_object_get_class(&l->obj) == clr_atom);
+    outlet_anything((*obj->outlets)[n],s,mono_array_length(l),mono_array_addr(l,t_atom,0));
+}
+
+static void PD_SendAtom(t_symbol *dst,t_atom a)
+{
+    void *cl = dst->s_thing;
+    if(cl) pd_forwardmess((t_class **)cl,1,&a);
+}
+
+static void PD_SendAnything(t_symbol *dst,t_symbol *s,AtomList l)
+{
+    void *cl = dst->s_thing;
+    if(cl) pd_typedmess((t_class **)cl,s,l.argc,l.argv);
+}
+
+static void PD_SendAnything2(t_symbol *dst,t_symbol *s,MonoArray *l)
+{
+    void *cl = dst->s_thing;
+//    assert(mono_object_get_class(&l->obj) == clr_atom);
+    if(cl) pd_typedmess((t_class **)cl,s,mono_array_length(l),mono_array_addr(l,t_atom,0));
+}
+
 void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 {
     // find class name in map
@@ -355,7 +478,9 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
     x->clr_clss->name = classname;
 
     // store our object pointer in External::ptr member
-    mono_field_set_value(x->mono_obj,clss->mono_obj_field,&x);
+    mono_field_set_value(x->mono_obj,clss->obj_field,x);
+
+    x->outlets = NULL;
 
     // ok, we have an object - look for constructor
 	if(clss->mono_ctor) {
@@ -381,6 +506,7 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 
 void clr_free(t_clr *x)
 {
+    if(x->outlets) delete x->outlets;
 }
 
 static int classloader(char *dirname, char *classname)
@@ -402,9 +528,8 @@ static int classloader(char *dirname, char *classname)
     close(fd);
 
     clr_class = (t_clr_class *)getbytes(sizeof(t_clr_class));
+    // set all struct members to 0
     memset(clr_class,0,sizeof(*clr_class));
-
-//    clr_class->methods = NULL;
 
     // try to load assembly
     strcat(dirbuf,"/");
@@ -428,12 +553,12 @@ static int classloader(char *dirname, char *classname)
 		goto bailout;
 	}
 
-    clr_class->mono_obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
-    assert(clr_class->mono_obj_field);
-
     // make new class (with classname)
     classsym = gensym(classname);
     clr_class->pd_class = class_new(classsym,(t_newmethod)clr_new,(t_method)clr_free, sizeof(t_clr), CLASS_DEFAULT, A_GIMME, 0);
+
+    clr_class->obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
+    assert(clr_class->obj_field);
 
     // find static Main method
 
@@ -449,8 +574,7 @@ static int classloader(char *dirname, char *classname)
         }
 
         // store NULL in External::ptr member
-        void *x = NULL;
-        mono_field_set_value(obj,clr_class->mono_obj_field,&x);
+        mono_field_set_value(obj,clr_class->obj_field,NULL);
 
         // set current class
         clr_setup_class = clr_class;
@@ -569,6 +693,29 @@ void clr_setup(void)
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodList)", (const void *)PD_AddList);
         mono_add_internal_call("PureData.External::Add(PureData.Symbol,PureData.External/MethodList)", (const void *)PD_AddSelector);
         mono_add_internal_call("PureData.External::Add(PureData.External/MethodAnything)", (const void *)PD_AddAnything);
+
+        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol,PureData.Symbol)", (const void *)PD_AddInlet);
+        mono_add_internal_call("PureData.Internal::AddInlet(void*,single&)", (const void *)PD_AddInletFloat);
+        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol&)", (const void *)PD_AddInletSymbol);
+//        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Pointer&)", (const void *)PD_AddInletPointer);
+        mono_add_internal_call("PureData.Internal::AddInlet(void*)", (const void *)PD_AddInletProxy);
+
+        mono_add_internal_call("PureData.Internal::AddOutlet(void*,PureData.Symbol)", (const void *)PD_AddOutlet);
+
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int)", (const void *)PD_OutletBang);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,single)", (const void *)PD_OutletFloat);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Symbol)", (const void *)PD_OutletSymbol);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Pointer)", (const void *)PD_OutletPointer);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Atom)", (const void *)PD_OutletAtom);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Symbol,PureData.AtomList)", (const void *)PD_OutletAnything);
+        mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Symbol,PureData.Atom[])", (const void *)PD_OutletAnything2);
+
+//        mono_add_internal_call("PureData.Internal::Bind(void*,PureData.Symbol)", (const void *)PD_Bind);
+//        mono_add_internal_call("PureData.Internal::Unbind(void*,PureData.Symbol)", (const void *)PD_Unbind);
+
+        mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Atom)", (const void *)PD_SendAtom);
+        mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Symbol,PureData.AtomList)", (const void *)PD_SendAnything);
+        mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Symbol,PureData.Atom[])", (const void *)PD_SendAnything2);
 
         // load important classes
         clr_symbol = mono_class_from_name(image,"PureData","Symbol");
