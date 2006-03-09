@@ -23,11 +23,12 @@ static void *iem_ambi_new(void)
 }
 
 /* ------------------------ setup routine ------------------------- */
+void iem_ambi_sources_setup(void);
 
 void iem_ambi_setup(void)
 {
-	iem_ambi_sources_setup();
+  iem_ambi_sources_setup();
 
-    post("iem_ambi (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
-	post("   musil%ciem.at iem KUG Graz Austria", '@');
+  post("iem_ambi (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+  post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
