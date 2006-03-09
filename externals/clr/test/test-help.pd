@@ -1,4 +1,4 @@
-#N canvas 617 153 850 617 12;
+#N canvas 617 153 862 841 12;
 #X floatatom 125 51 5 0 0 0 - - -;
 #X symbolatom 320 81 10 0 0 0 - - -;
 #X msg 536 45 msg one 2 three;
@@ -16,8 +16,8 @@
 #X msg 528 251 list s e c o n d;
 #X obj 152 495 print OUT;
 #X floatatom 530 321 5 0 0 0 - - -;
-#X floatatom 229 112 5 0 0 0 - - -;
-#X msg 228 136 send \$1 b c;
+#X floatatom 290 173 5 0 0 0 - - -;
+#X msg 289 197 send \$1 b c;
 #X obj 407 497 print RECV1;
 #X obj 406 463 r receiver;
 #X obj 554 465 r receiver2;
@@ -31,6 +31,13 @@
 #X msg 589 386 turalu;
 #X msg 578 274 heyho;
 #X obj 151 443 test a b 5;
+#X obj 655 388 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 124 621 test;
+#X obj 124 696 test;
+#X obj 141 650 print A;
+#X obj 138 725 print B;
+#X msg 120 580 trigger;
 #X connect 0 0 30 0;
 #X connect 1 0 30 0;
 #X connect 2 0 30 0;
@@ -57,3 +64,8 @@
 #X connect 28 0 30 3;
 #X connect 29 0 30 1;
 #X connect 30 0 14 0;
+#X connect 31 0 30 3;
+#X connect 32 0 33 0;
+#X connect 32 0 34 0;
+#X connect 33 0 35 0;
+#X connect 36 0 32 0;

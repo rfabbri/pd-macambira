@@ -327,25 +327,28 @@ static void call_anything(t_clr *x,int inlet,t_symbol *s,int argc,t_atom *argv)
             exc = (*d)(x->mono_obj); 
             break;
         case Delegate::k_float: 
-            if(argc == 0 || argv[0].a_type != A_FLOAT) { 
+            if((argc == 1 || (argc >= 1 && s == &s_list)) && argv[0].a_type == A_FLOAT)
+                exc = (*d)(x->mono_obj,argv[0].a_w.w_float); 
+            else {
                 error("%s - %s handler: float argument expected",x->clr_clss->name->s_name,s->s_name); 
                 return; 
             }
-            exc = (*d)(x->mono_obj,argv[0].a_w.w_float); 
             break;
         case Delegate::k_symbol:
-            if(argc == 0 || argv[0].a_type != A_SYMBOL) { 
+            if((argc == 1 || (argc >= 1 && s == &s_list)) && argv[0].a_type == A_SYMBOL)
+                exc = (*d)(x->mono_obj,argv[0].a_w.w_symbol); 
+            else {
                 error("%s - %s handler: symbol argument expected",x->clr_clss->name->s_name,s->s_name); 
                 return; 
             }
-            exc = (*d)(x->mono_obj,argv[0].a_w.w_symbol); 
             break;
         case Delegate::k_pointer:
-            if(argc == 0 || argv[0].a_type != A_POINTER) { 
+            if((argc == 1 || (argc >= 1 && s == &s_list)) && argv[0].a_type == A_POINTER)
+                exc = (*d)(x->mono_obj,argv[0].a_w.w_gpointer); 
+            else {
                 error("%s - %s handler: pointer argument expected",x->clr_clss->name->s_name,s->s_name); 
                 return; 
             }
-            exc = (*d)(x->mono_obj,argv[0].a_w.w_gpointer); 
             break;
         case Delegate::k_list:
             exc = (*d)(x->mono_obj,argc,argv); 
@@ -686,7 +689,7 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 
     ClrMap::iterator it = clr_map.find(classname);
     if(it == clr_map.end()) {
-        error("CLR class %s not found",classname->s_name);
+        error("CLR - class %s not found",classname->s_name);
         return NULL;
     }
 
@@ -697,7 +700,7 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
     x->mono_obj = mono_object_new (monodomain,clss->mono_class);
     if(!x->mono_obj) {
         pd_free((t_pd *)x);
-        error("CLR class %s could not be instantiated",classname->s_name);
+        error("CLR - class %s could not be instantiated",classname->s_name);
         return NULL;
     }
 
@@ -800,8 +803,7 @@ static int classloader(char *dirname, char *classname, char *altname)
     clr_class->obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
     assert(clr_class->obj_field);
 
-    // find static Main method
-
+    // find static Setup method
     MonoMethodDesc *clr_desc_main = mono_method_desc_new("::Setup",FALSE);
     assert(clr_desc_main);
 
@@ -819,7 +821,7 @@ static int classloader(char *dirname, char *classname, char *altname)
         // set current class
         clr_setup_class = clr_class;
 
-        // call static Main method
+        // call static Setup method
 	    gpointer args = obj;
         MonoObject *exc;
         MonoObject *ret = mono_runtime_invoke(method,NULL,&args,&exc);

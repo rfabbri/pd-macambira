@@ -65,7 +65,7 @@ namespace PureData
         internal extern static void Outlet(void *obj,int n,Symbol s,Atom[] l);
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
-        internal extern static void Outlet(void *obj,int n,object o);
+        internal extern static void OutletEx(void *obj,int n,object o);
 
         // --------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ namespace PureData
         protected void Outlet(int n,Symbol s,AtomList l) { Internal.Outlet(ptr,n,s,l); }
         protected void Outlet(int n,Symbol s,Atom[] l) { Internal.Outlet(ptr,n,s,l); }
 
-        protected void OutletEx(int n,object o) { Internal.Outlet(ptr,n,o); }
+        protected void OutletEx(int n,object o) { Internal.OutletEx(ptr,n,o); }
 
         // --------------------------------------------------------------------------
 

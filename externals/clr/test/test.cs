@@ -18,7 +18,7 @@ public class test:
         AddInlet();
         AddInlet(ref farg);
         AddInlet();
-        AddOutletBang();
+        AddOutletAnything();
     }
 
     // this function MUST exist
@@ -31,6 +31,8 @@ public class test:
         AddMethod(0,new MethodList(obj.MyList));
         AddMethod(0,"set",new MethodAnything(obj.MySet));
         AddMethod(0,"send",new MethodAnything(obj.MySend));
+        AddMethod(0,"trigger",new Method(obj.MyTrigger));
+        AddMethod(0,new MethodObject(obj.MyObject));
         AddMethod(0,new MethodAnything(obj.MyAnything));
         AddMethod(1,new MethodFloat(obj.MyFloat1));
         AddMethod(1,new MethodAnything(obj.MyAny1));
@@ -83,6 +85,16 @@ public class test:
     { 
         Send(new PureData.Symbol("receiver"),l);
         Send(new PureData.Symbol("receiver2"),(PureData.Atom[])l);
+    }
+
+    protected virtual void MyTrigger() 
+    { 
+        OutletEx(0,"hey");
+    }
+
+    protected virtual void MyObject(int ix,object obj) 
+    { 
+        Post("OBJECT "+obj.ToString());
     }
 
     protected virtual void MyAnything(int ix,PureData.Symbol s,PureData.AtomList l) 
