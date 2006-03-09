@@ -49,7 +49,7 @@ function foot_c() {
 head_h > $IEMAMBI_H
 head_c > $IEMAMBI_C
 
-for i in $(${LS} *.c | ${EGREP} -v "iem_bin_ambi.*\.c")
+for i in $(${LS} *.c | ${EGREP} -v "iem_ambi.*\.c")
 do
 ## each c-file in iem_ambi needs to have an <file>_setup()-function
 ## that calls all needed setup-functions
