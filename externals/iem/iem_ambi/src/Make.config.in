@@ -1,4 +1,4 @@
-LIBNAME    =iem_bin_ambi
+LIBNAME    =iem_ambi
 
 PREFIX     =@prefix@@PDLIBDIR@
 
@@ -18,7 +18,7 @@ AFLAGS =
 LFLAGS = @LFLAGS@
 WFLAGS =
 
-TARNAME =  $(LIBNAME)-@IEMBINAMBI_VERSION@.tgz
+TARNAME =  $(LIBNAME)-@IEMAMBI_VERSION@.tgz
 
 # ICCFLAGS=-march=pentiumiii -axK
 Z_CFLAGS = $(IFLAGS) $(DEFS) -DPD $(WFLAGS) @CFLAGS@ $(CFLAGS)

@@ -1,5 +1,5 @@
 dnl  Process this file with autoconf to produce a configure script.
-AC_INIT(iem_bin_ambi.c)
+AC_INIT(iem_ambi.c)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -18,7 +18,7 @@ AC_SUBST(INCLUDES)
 
 
 AC_ARG_WITH(pdversion, [  --with-pdversion=<ver>  enforce a certain pd-version (e.g. 0.37)])
-AC_ARG_WITH(version,   [  --with-version=<ver>    enforce a certain iem_bin_ambi-version (e.g. 0.1)])
+AC_ARG_WITH(version,   [  --with-version=<ver>    enforce a certain iem_ambi-version (e.g. 0.1)])
 AC_ARG_WITH(extension, [  --with-extension=<ext>  enforce a certain extension for the dynamic library (e.g. dll)])
 AC_ARG_WITH(pdpath,    [  --with-pd=</path/to/pd> where to look for pd-headers and and -libs])
 AC_ARG_ENABLE(PIC,     [  --disable-PIC           disable compilation with PIC-flag])
@@ -253,8 +253,8 @@ else
 fi
 
 
-dnl check for iem_bin_ambi-version (but why...)
-AC_MSG_CHECKING("iem_bin_ambi-version")
+dnl check for iem_ambi-version (but why...)
+AC_MSG_CHECKING("iem_ambi-version")
 
 if test "$with_version" != ""
 then
@@ -266,7 +266,7 @@ if test "x$cross_compiling" = "xno"
 then
 cat > conftest.c << EOF
 #include <stdio.h>
-#include "iem_bin_ambi.h"
+#include "iem_ambi.h"
 int main(){
   printf("%s\n", VERSION);
   return 0;

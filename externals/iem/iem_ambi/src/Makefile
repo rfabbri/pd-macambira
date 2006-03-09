@@ -11,8 +11,8 @@ Make.config: Make.config.in configure
 	./configure
 endif
 
-iem_bin_ambi_sources.c iem_bin_ambi_sources.h:
-	./makesource.sh
+iem_ambi_sources.c iem_ambi_sources.h:
+	sh ./makesource.sh
 
 configure: configure.ac
 	autoconf
@@ -46,7 +46,7 @@ TARGETS = $(SOURCES:.c=.o)
 all: $(LIBNAME)
 	cp $(LIBNAME).$(EXT) ..
 
-$(LIBNAME): $(TARGETS) iem_bin_ambi_sources.c iem_bin_ambi_sources.h
+$(LIBNAME): $(TARGETS) iem_ambi_sources.c iem_ambi_sources.h
 	$(LD) $(LFLAGS) -o $(LIBNAME).$(EXT) *.o $(LIBS)
 	$(STRIP) $(STRIPFLAGS) $(LIBNAME).$(EXT)
 
