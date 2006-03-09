@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iemlib.h written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifndef __IEMLIB_H__
 #define __IEMLIB_H__
@@ -33,28 +33,40 @@ extern int sys_noloadbang;
 
 #define UNITBIT32 1572864.  /* 3*2^19; bit 32 has place value 1 */
 
-    /* machine-dependent definitions.  These ifdefs really
-    should have been by CPU type and not by operating system! */
+/* machine-dependent definitions.  These ifdefs really
+should have been by CPU type and not by operating system! */
 #ifdef IRIX
-    /* big-endian.  Most significant byte is at low address in memory */
+/* big-endian.  Most significant byte is at low address in memory */
 #define HIOFFSET 0    /* word offset to find MSB */
 #define LOWOFFSET 1    /* word offset to find LSB */
 #define int32 long  /* a data type that has 32 bits */
 #else
-#ifdef NT
-    /* little-endian; most significant byte is at highest address */
+#ifdef MSW
+/* little-endian; most significant byte is at highest address */
 #define HIOFFSET 1
 #define LOWOFFSET 0
 #define int32 long
 #else
-#ifdef  __linux__
+#ifdef __FreeBSD__
+#include <machine/endian.h>
+#if BYTE_ORDER == LITTLE_ENDIAN
+#define HIOFFSET 1
+#define LOWOFFSET 0
+#else
+#define HIOFFSET 0    /* word offset to find MSB */
+#define LOWOFFSET 1    /* word offset to find LSB */
+#endif /* BYTE_ORDER */
+#include <sys/types.h>
+#define int32 int32_t
+#endif
+#ifdef __linux__
 
 #include <endian.h>
 
 #if !defined(__BYTE_ORDER) || !defined(__LITTLE_ENDIAN)                         
 #error No byte order defined                                                    
 #endif                                                                          
-                                                                                
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN                                             
 #define HIOFFSET 1                                                              
 #define LOWOFFSET 0                                                             
@@ -66,14 +78,25 @@ extern int sys_noloadbang;
 #include <sys/types.h>
 #define int32 int32_t
 
+#else
+#ifdef __APPLE__
+#define HIOFFSET 0    /* word offset to find MSB */
+#define LOWOFFSET 1    /* word offset to find LSB */
+#define int32 int  /* a data type that has 32 bits */
+
+#endif /* __APPLE__ */
 #endif /* __linux__ */
-#endif /* NT */
+#endif /* MSW */
 #endif /* SGI */
 
 union tabfudge
 {
-    double tf_d;
-    int32 tf_i[2];
+  double tf_d;
+  int32 tf_i[2];
 };
+
+#define IEM_DENORMAL(f) ((((*(unsigned int*)&(f))&0x60000000)==0) || \
+(((*(unsigned int*)&(f))&0x60000000)==0x60000000))
+/* more stringent test: anything not between 1e-19 and 1e19 in absolute val */
 
 #endif

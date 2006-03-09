@@ -1,0 +1,241 @@
+#N canvas 90 10 884 683 10;
+#X text 795 99 1.arg: <float> ambisonic order;
+#X text 880 255 ambisonic-order = n_ao;
+#X text 1068 330 ambisonic-order-group;
+#X text 856 371 -90 <= delta <= +90;
+#X text 856 383 -180 <= phi <= +180;
+#X text 797 330 input: <ambi_weight> one mul-factor for each;
+#X text 797 279 input: <ls> index + phi [degree] .. 2-dimensional;
+#X text 797 289 input: <ls> index + delta + phi [degree] .. 3-dimensional
+;
+#X text 797 303 input: <phls> index + phi [degree .. 2-dimensional
+;
+#X text 797 314 input: <phls> index + delta + phi [degree] .. 3-dimensional
+;
+#X text 821 461 <float> n_col = (2*n_ao+1) = number of ambisonic-channels
+;
+#X text 809 470 + <float> n_row = (n_ls) = number of loudspeakers;
+#X text 1049 256 number of loudspeakers = n_ls;
+#X text 812 530 + <float> n_row = (n_ls) = number of loudspeakers;
+#X text 797 511 output in case of 3d: <matrix> ((n_ao+1)*(n_ao+1)*n_ls+2)
+;
+#X text 795 450 output in case of 2d: <matrix> ((2*n_ao+1)*n_ls+2)
+;
+#X text 1142 511 <float> :;
+#X text 1099 449 <float> :;
+#X text 1039 521 number of ambisonic-channels;
+#X text 824 521 <float> n_col = (n_ao+1)*(n_ao+1) =;
+#X text 1010 540 <float> elements of a matrix;
+#X text 812 540 + (n_ao + 1) * (n_ao + 1) * n_ls;
+#X text 809 480 + (2*n_ao + 1) * n_ls <float> elements of a matrix
+;
+#X text 790 403 input: <pinv> calculates the pseudo-inverse of the
+encoded;
+#X text 846 414 loudspeaker-positions (+ the phantom-speakers);
+#X text 860 425 and output a matrix-message;
+#X text 871 360 1 <= index <= n_ao;
+#X text 885 211 a regular matrix to inverse it);
+#X text 958 342 to suppress the side-lobe-phenomena;
+#X text 808 201 (it is sometimes necessary to add phantom-ls. for achieving
+;
+#X text 810 117 (1 .. 5 in case of 3 dimensional);
+#X text 810 108 (1 .. 12 in case of 2 dimensional);
+#X text 796 139 3.arg: <float> number of independent loudspeakers;
+#X text 795 127 2.arg: <float> dimension (2 or 3);
+#X text 795 190 5.arg: <float> number of canceled phantom_loudspeakers
+;
+#X text 796 151 4.arg: <float> number of merged and mirrored loudspeakers
+;
+#X text 842 164 (the merged loudspeakers are at the border of the arc
+;
+#X text 855 176 or the hemisphere \, the mirrored loudspeakers are
+;
+#X obj 18 350 soundfiler;
+#X obj 27 188 unpack s s;
+#X msg 18 329 read -skip \$1 \$2 \$3;
+#X obj 358 278 pp element;
+#X obj 45 284 mergefilename /;
+#X text 357 316 multiplexer control indices;
+#X text 353 327 for spec2_matrix_bundle_stat~;
+#X text 423 76 1.arg: <float> unique-number used as table-name-prefix
+;
+#X text 423 86 2.arg: <symbol> left HRIR-table-name;
+#X text 423 96 3.arg: <symbol> real HRTF-table-name;
+#X text 423 106 4.arg: <symbol> imag HRTF-table-name;
+#X text 423 116 5.arg: <symbol> HRIR-fadeout-window-table-name;
+#X obj 18 308 pack f s s;
+#X text 423 126 6.arg: <float> ambisonic order;
+#X text 423 136 7.arg: <float> ambisonic dimension;
+#X text 423 146 8.arg: <float> number of real loudspeakers;
+#X text 423 156 9.arg: <float> number of phantom loudspeakers;
+#X text 417 166 10.arg: <float> FFT-size = 2 x effective HRIR-length
+;
+#X obj 94 108 bin_ambi_reduced_decode_fft2 \$0 HRIR HRTF_re HRTF_im
+fadeout 1 2 4 0 256;
+#X obj 14 473 table \$0_fadeout 256;
+#X obj 45 236 symbol .;
+#X obj 27 211 t b b s;
+#X obj 45 258 pack s s;
+#X obj 18 245 f 0;
+#X obj 94 60 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 357 299 print;
+#X obj 13 387 table \$0_1_HRIR 256;
+#X obj 249 382 table \$0_1_HRTF_re 256;
+#X obj 389 382 table \$0_1_HRTF_im 256;
+#X obj 13 447 table \$0_4_HRIR 256;
+#X obj 13 427 table \$0_3_HRIR 256;
+#X obj 13 407 table \$0_2_HRIR 256;
+#X obj 249 402 table \$0_2_HRTF_re 256;
+#X obj 249 422 table \$0_3_HRTF_re 256;
+#X obj 389 422 table \$0_3_HRTF_im 256;
+#X obj 389 402 table \$0_2_HRTF_im 256;
+#N canvas 26 6 959 718 input_messages 0;
+#X obj 42 641 outlet;
+#X text 33 659 to bin_ambi_reduced_decode;
+#X msg 715 529 calc_reduced \$1;
+#X msg 372 418 calc_pinv;
+#X msg 444 454 check_HRIR_arrays \$1;
+#X msg 581 491 check_HRTF_arrays \$1;
+#X msg 818 545 calc_sym;
+#X obj 134 154 pp pht_ls;
+#X obj 64 110 pp real_ls;
+#X obj 23 60 pp load_HRIR;
+#X obj 444 434 for++ 1 4 10;
+#X obj 444 414 del 10;
+#X obj 581 451 del 10;
+#X obj 581 471 for++ 1 3 10;
+#X obj 715 488 del 10;
+#X obj 715 508 for++ 1 3 10;
+#X obj 818 525 del 10;
+#X msg 23 37 1 L0e045a.wav \, 2 L0e135a.wav \, 3 L0e225a.wav \, 4 L0e315a.wav
+;
+#X obj 197 202 pp ipht_ireal_muladd;
+#X obj 294 336 pp ambi_weight;
+#X obj 240 271 pp sing_range;
+#X msg 134 134 1 -90 0;
+#X msg 240 251 1e-010;
+#X text 403 31 <list> : <float> loudspeaker-index + <symbol> left-ear-HRIR-wav
+\, index beginning with one;
+#X text 272 81 <list> : <float> loudspeaker-index + <float> elevation
+in degree + <float> azimuth in degree \, index beginning with one \,
+elevation geodetical \, azimuth counterclockwise positiv;
+#X text 699 37 list of HRIRs;
+#X text 645 93 list of the real loudspeaker-coordinates;
+#X text 570 147 list of the phantom loudspeaker-coordinates;
+#X text 200 130 <list> : <float> loudspeaker-index + <float> elevation
+in degree + <float> azimuth in degree \, index beginning with one \,
+elevation geodetical \, azimuth counterclockwise positiv;
+#X msg 197 181 1 4 0.707;
+#X text 330 170 <list> : <float> phantom-loudspeaker-index + <float>
+real-loudspeaker-index + <float> mirror-weight \, both index beginning
+greater zero \, mul-factor should be the cosine of the elevation-angle-difference
+;
+#X text 326 239 <float> singularity-range: when calculating the inverse
+of the loudspeaker-matrix \, we use gauss-algorithm. if we divide a
+matrix-element by a number less then this range \, we say \, this matrix
+is not regulary.;
+#X obj 372 397 del 10;
+#X obj 323 292 del 10;
+#X obj 116 63 del 10;
+#X obj 24 7 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1 -1
+;
+#X msg 305 314 1 1;
+#X obj 65 4 inlet;
+#X msg 64 90 1 45 \, 2 135 \, 3 225 \, 4 315;
+#X text 156 74 this is 2-d case;
+#X connect 2 0 0 0;
+#X connect 3 0 0 0;
+#X connect 4 0 0 0;
+#X connect 5 0 0 0;
+#X connect 6 0 0 0;
+#X connect 7 0 0 0;
+#X connect 8 0 0 0;
+#X connect 9 0 0 0;
+#X connect 10 0 4 0;
+#X connect 10 1 12 0;
+#X connect 11 0 10 0;
+#X connect 12 0 13 0;
+#X connect 13 0 5 0;
+#X connect 13 1 14 0;
+#X connect 14 0 15 0;
+#X connect 15 0 2 0;
+#X connect 15 1 16 0;
+#X connect 16 0 6 0;
+#X connect 17 0 9 0;
+#X connect 18 0 0 0;
+#X connect 19 0 0 0;
+#X connect 20 0 0 0;
+#X connect 21 0 7 0;
+#X connect 22 0 20 0;
+#X connect 29 0 18 0;
+#X connect 32 0 3 0;
+#X connect 32 0 11 0;
+#X connect 33 0 32 0;
+#X connect 33 0 36 0;
+#X connect 34 0 38 0;
+#X connect 34 0 33 0;
+#X connect 35 0 17 0;
+#X connect 35 0 34 0;
+#X connect 36 0 19 0;
+#X connect 37 0 35 0;
+#X connect 38 0 8 0;
+#X restore 94 83 pd input_messages;
+#X text 21 12 ambi_reduced_decode_fft2;
+#X text 215 9 calculates a reduced set of HRTF-spectras;
+#N canvas 0 0 461 380 init 0;
+#X obj 124 23 loadbang;
+#X obj 124 45 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 124 73 for++ 0 127;
+#X obj 124 144 t b;
+#X msg 124 164 1;
+#X obj 124 123 moses 95;
+#X obj 167 144 - 95;
+#X obj 167 166 / 32;
+#X obj 167 220 * 3.14159;
+#X obj 167 264 t f f;
+#X obj 172 286 *;
+#X obj 172 317 tabwrite \$0_fadeout;
+#X obj 270 162 + 128;
+#X msg 270 185 0 \$1;
+#X obj 153 97 t f f f;
+#X obj 167 241 cos;
+#X obj 167 199 / 2;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 14 0;
+#X connect 3 0 4 0;
+#X connect 4 0 11 0;
+#X connect 5 0 3 0;
+#X connect 5 1 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 16 0;
+#X connect 8 0 15 0;
+#X connect 9 0 10 0;
+#X connect 9 1 10 1;
+#X connect 10 0 11 0;
+#X connect 12 0 13 0;
+#X connect 13 0 11 0;
+#X connect 14 0 5 0;
+#X connect 14 1 11 1;
+#X connect 14 2 12 0;
+#X connect 15 0 9 0;
+#X connect 16 0 8 0;
+#X restore 92 496 pd init;
+#X connect 39 0 59 0;
+#X connect 39 1 50 2;
+#X connect 40 0 38 0;
+#X connect 41 0 63 0;
+#X connect 42 0 50 1;
+#X connect 50 0 40 0;
+#X connect 56 0 39 0;
+#X connect 56 1 41 0;
+#X connect 58 0 60 0;
+#X connect 59 0 61 0;
+#X connect 59 1 58 0;
+#X connect 59 2 60 1;
+#X connect 60 0 42 0;
+#X connect 61 0 50 0;
+#X connect 62 0 74 0;
+#X connect 74 0 56 0;

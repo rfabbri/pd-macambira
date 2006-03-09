@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -69,7 +69,7 @@ static void bin_ambi_calc_HRTF_init_cos(t_bin_ambi_calc_HRTF *x)
 	{
 		f = g * (float)i;
 		(*sincos).real = cos(f);
-		(*sincos).imag = sin(f);/*change*/
+		(*sincos).imag = -sin(f);/*FFT*/
 		sincos++;
 	}
 }

@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -88,7 +88,7 @@ static void bin_ambi_reduced_decode_init_cos(t_bin_ambi_reduced_decode *x)
 	{
 		f = g * (float)i;
 		(*sincos).real = cos(f);
-		(*sincos).imag = sin(f);/*change*/
+		(*sincos).imag = -sin(f);/*FFT*/
 		sincos++;
 	}
 }
@@ -741,7 +741,7 @@ static void bin_ambi_reduced_decode_check_arrays(t_bin_ambi_reduced_decode *x, f
 
 		if(npoints < fftsize)
 		{
-			post("warning: %s-array-size: %d", hrir->s_name, npoints);
+			post("bin_ambi_reduced_decode-WARNING: %s-array-size: %d < FFT-size: %d", hrir->s_name, npoints, fftsize);
 		}
 		vec = x->x_beg_hrir;
 		vec += index * fftsize;
@@ -858,16 +858,18 @@ static void bin_ambi_reduced_decode_calc_reduced(t_bin_ambi_reduced_decode *x, f
 			val[i] = old1;
 		}
 	}
-
-	vec_hrtf_re[0] = val[0].real;
-	vec_hrtf_im[0] = 0.0f;
-	for( i = 1; i < fs2; i++ )
+	for(i = 0; i<fs2; i++)
 	{
-		vec_hrtf_re[i] = 2.0f*val[i].real;
-		vec_hrtf_im[i] = 2.0f*val[i].imag;
+		vec_hrtf_re[i] = val[i].real;
+		vec_hrtf_im[i] = val[i].imag;
 	}
-	vec_hrtf_re[fs2] = 0.0f;
+	vec_hrtf_re[fs2] = val[fs2].real;
 	vec_hrtf_im[fs2] = 0.0f;
+	for(i = fs2+1; i < fftsize; i++)
+	{
+		vec_hrtf_re[i] = 0.0f;
+		vec_hrtf_im[i] = 0.0f;
+	}
 }
 
 static void bin_ambi_reduced_decode_decoding(t_bin_ambi_reduced_decode *x)
@@ -1031,7 +1033,7 @@ static void bin_ambi_reduced_decode_ambi_weight(t_bin_ambi_reduced_decode *x, t_
 		}
 	}
 	else
-		post("bin_ambi_reduced_decode-ERROR: ambi_weight needs %d float weights", x->x_n_order);
+		post("bin_ambi_reduced_decode-ERROR: ambi_weight needs %d float weights", x->x_n_order+1);
 }
 
 static void bin_ambi_reduced_decode_sing_range(t_bin_ambi_reduced_decode *x, t_floatarg f)
@@ -1081,12 +1083,12 @@ static void *bin_ambi_reduced_decode_new(t_symbol *s, int argc, t_atom *argv)
 {
 	t_bin_ambi_reduced_decode *x = (t_bin_ambi_reduced_decode *)pd_new(bin_ambi_reduced_decode_class);
 	char buf[400];
-	int i, j, fftok;
-	int n_order, n_dim, n_ambi, fftsize, prefix;
-	t_symbol	*s_hrir;
-	t_symbol	*s_hrtf_re;
-	t_symbol	*s_hrtf_im;
-  t_symbol  *s_fade_out_hrir;
+	int i, j, fftok, ok=0;
+	int n_order=0, n_dim=0, n_ambi=0, fftsize=0, prefix=0;
+	t_symbol	*s_hrir=gensym("L_HRIR");
+	t_symbol	*s_hrtf_re=gensym("HRTF_re");
+	t_symbol	*s_hrtf_im=gensym("HRTF_im");
+  t_symbol  *s_fade_out_hrir=gensym("HRIR_win");
 
 	if((argc >= 8) &&
 		IS_A_FLOAT(argv,0) &&
@@ -1109,6 +1111,34 @@ static void *bin_ambi_reduced_decode_new(t_symbol *s, int argc, t_atom *argv)
 		n_dim		= (int)atom_getintarg(6, argc, argv);
 		fftsize	= (int)atom_getintarg(7, argc, argv);
 
+		ok = 1;
+	}
+	else if((argc >= 8) &&
+		IS_A_FLOAT(argv,0) &&
+    IS_A_FLOAT(argv,1) &&
+		IS_A_FLOAT(argv,2) &&
+		IS_A_FLOAT(argv,3) &&
+		IS_A_FLOAT(argv,4) &&
+		IS_A_FLOAT(argv,5) &&
+		IS_A_FLOAT(argv,6) &&
+		IS_A_FLOAT(argv,7))
+	{
+		prefix	= (int)atom_getintarg(0, argc, argv);
+
+		s_hrir								= gensym("L_HRIR");
+		s_hrtf_re							= gensym("HRTF_re");
+		s_hrtf_im							= gensym("HRTF_im");
+		s_fade_out_hrir	      = gensym("HRIR_win");
+
+		n_order	= (int)atom_getintarg(5, argc, argv);
+		n_dim		= (int)atom_getintarg(6, argc, argv);
+		fftsize	= (int)atom_getintarg(7, argc, argv);
+
+		ok = 1;
+	}
+
+	if(ok)
+	{
 		if(n_order < 1)
 			n_order = 1;
 
@@ -1141,7 +1171,8 @@ static void *bin_ambi_reduced_decode_new(t_symbol *s, int argc, t_atom *argv)
 		if(!fftok)
 		{
       fftsize = 512;
-			post("bin_ambi_reduced_decode-ERROR: fftsize not equal to 2 ^ n !!!");
+			post("bin_ambi_reduced_decode-WARNING: fftsize not equal to 2 ^ n !!!");
+			post("                                 fftsize set to %d", fftsize);
 		}
 
 		x->x_n_dim			= n_dim;
@@ -1211,8 +1242,8 @@ static void *bin_ambi_reduced_decode_new(t_symbol *s, int argc, t_atom *argv)
 	else
 	{
 		post("bin_ambi_reduced_decode-ERROR: need 1 float + 4 symbols + 3 floats arguments:");
-		post("  prefix + hrir_name + hrtf_re_name + hrtf_im_name + hrir_fade_out_name +");
-		post("  ambi_order + ambi_dimension + fftsize");
+		post("  prefix(unique-number) + hrir_name + hrtf_re_name + hrtf_im_name + hrir_fade_out_name +");
+		post("   + ambi_order + ambi_dimension + fftsize");
 		return(0);
 	}
 }

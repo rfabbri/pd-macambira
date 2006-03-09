@@ -1,7 +1,7 @@
 /* For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
 
-iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2003 */
+iem_bin_ambi written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
 #ifdef NT
 #pragma warning( disable : 4244 )
@@ -21,12 +21,26 @@ static void *iem_bin_ambi_new(void)
 	return (x);
 }
 
+void bin_ambi_calc_HRTF_setup(void);
+void bin_ambi_reduced_decode_setup(void);
+void bin_ambi_reduced_decode2_setup(void);
+void bin_ambi_reduced_decode_fft_setup(void);
+void bin_ambi_reduced_decode_fir_setup(void);
+void bin_ambi_reduced_decode_fft2_setup(void);
+void bin_ambi_reduced_decode_fir2_setup(void);
+
 /* ------------------------ setup routine ------------------------- */
-void iem_bin_ambi_sources_setup(void);
 
 void iem_bin_ambi_setup(void)
 {
-	iem_bin_ambi_sources_setup();
+	bin_ambi_calc_HRTF_setup();
+	bin_ambi_reduced_decode_setup();
+	bin_ambi_reduced_decode2_setup();
+	bin_ambi_reduced_decode_fft_setup();
+	bin_ambi_reduced_decode_fir_setup();
+	bin_ambi_reduced_decode_fft2_setup();
+	bin_ambi_reduced_decode_fir2_setup();
 
-	post("iem_bin_ambi (R-1.15) library loaded!");
+    post("iem_bin_ambi (R-1.16) library loaded!   (c) Thomas Musil 05.2005");
+	post("   musil%ciem.at iem KUG Graz Austria", '@');
 }
