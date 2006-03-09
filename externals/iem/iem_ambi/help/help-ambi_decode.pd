@@ -1,0 +1,247 @@
+#N canvas 117 18 719 674 10;
+#X obj 47 249 print;
+#X text 291 171 1.arg: <float> ambisonic order;
+#X text 306 180 (1 .. 12 for 2 dimensional use);
+#X obj 47 226 round_zero 1e-006;
+#X text 117 310 ambisonic-order = n_ao;
+#X msg 150 170 ambi_weight 1 1 1;
+#X msg 133 149 ambi_weight 1 1 0.3904;
+#X text 305 385 ambisonic-order-group;
+#X text 98 416 -90 <= delta <= +90;
+#X text 98 428 -180 <= phi <= +180;
+#X text 34 385 input: <ambi_weight> one mul-factor for each;
+#X text 21 12 ambi_decode;
+#X text 105 12 calculates a decoder-matrix;
+#X obj 47 204 ambi_decode 2 2 5 0;
+#X text 291 199 2.arg: <float> dimension;
+#X text 440 199 (2 or 3);
+#X text 291 211 3.arg: <float> number of real loudspeakers;
+#X text 305 222 (best results \, if n_ls = n_ambi_channels);
+#X text 316 232 (could be more or less);
+#X text 292 243 4.arg: <float> number of phantom_loudspeakers;
+#X text 334 254 (optional \, default 0);
+#X msg 46 116 pinv;
+#X obj 59 90 t b b;
+#X obj 59 46 bng 35 250 50 0 empty empty empty 0 -6 0 8 -24198 -42246
+-1;
+#X text 34 334 input: <ls> index + phi [degree] .. 2-dimensional;
+#X text 34 344 input: <ls> index + delta + phi [degree] .. 3-dimensional
+;
+#X text 34 358 input: <phls> index + phi [degree .. 2-dimensional;
+#X text 34 369 input: <phls> index + delta + phi [degree] .. 3-dimensional
+;
+#X text 63 525 <float> n_col = (2*n_ao+1) = number of ambisonic-channels
+;
+#X text 51 534 + <float> n_row = (n_ls) = number of loudspeakers;
+#X text 286 311 number of loudspeakers = n_ls;
+#X text 51 594 + <float> n_row = (n_ls) = number of loudspeakers;
+#X text 36 575 output in case of 3d: <matrix> ((n_ao+1)*(n_ao+1)*n_ls+2)
+;
+#X text 37 514 output in case of 2d: <matrix> ((2*n_ao+1)*n_ls+2);
+#X text 384 575 <float> :;
+#X text 341 513 <float> :;
+#X text 281 585 number of ambisonic-channels;
+#X text 63 585 <float> n_col = (n_ao+1)*(n_ao+1) =;
+#X text 252 604 <float> elements of a matrix;
+#X text 51 604 + (n_ao + 1) * (n_ao + 1) * n_ls;
+#X text 51 544 + (2*n_ao + 1) * n_ls <float> elements of a matrix;
+#X text 34 458 input: <pinv> calculates the pseudo-inverse of the encoded
+;
+#X text 90 469 loudspeaker-positions (+ the phantom-speakers);
+#X text 104 480 and output a matrix-message;
+#X text 306 189 (1 .. 5 for 3 dimensional use);
+#X msg 95 116 ls 1 0 \, ls 2 72 \, ls 3 144 \, ls 4 216 \, ls 5 288
+;
+#X text 113 405 1 <= index <= n_ao;
+#X text 340 275 a regular matrix to inverse it);
+#X text 437 384 to suppress the side-lobe-phenomena;
+#X text 308 265 (it is sometimes necessary to add phantom-ls. for achieving
+;
+#N canvas 0 0 812 677 phantom_example 0;
+#X obj 57 631 print;
+#X obj 57 608 round_zero 1e-006;
+#X msg 57 94 pinv;
+#X obj 70 24 bng 35 250 50 0 empty empty empty 0 -6 0 8 -24198 -42246
+-1;
+#X msg 198 72 ls 1 5 \, ls 2 2.5 \, ls 3 0 \, ls 4 -2.5 \, ls 5 -5
+;
+#X msg 92 176 phls 5 -17.5 \, phls 6 -20 \, phls 7 -22.5 \, phls 8
+-25;
+#X msg 92 200 phls 9 -27.5 \, phls 10 -30 \, phls 11 -32.5 \, phls
+12 -35;
+#X msg 92 223 phls 13 -37.5 \, phls 14 -40 \, phls 15 -42.5 \, phls
+16 -45;
+#X msg 92 247 phls 17 -47.5 \, phls 18 -50 \, phls 19 -52.5 \, phls
+20 -55;
+#X msg 92 270 phls 21 -57.5 \, phls 22 -60 \, phls 23 -62.5 \, phls
+24 -65;
+#X msg 92 294 phls 25 -67.5 \, phls 26 -70 \, phls 27 -72.5 \, phls
+28 -75;
+#X msg 92 317 phls 29 -77.5 \, phls 30 -80 \, phls 31 -82.5 \, phls
+32 -85;
+#X msg 92 340 phls 33 -87.5 \, phls 34 -90 \, phls 35 -92.5 \, phls
+36 -95;
+#X msg 92 364 phls 37 -97.5 \, phls 38 -100 \, phls 39 -102.5 \, phls
+40 -105;
+#X msg 92 387 phls 41 -107.5 \, phls 42 -110 \, phls 43 -112.5 \, phls
+44 -115;
+#X msg 92 411 phls 45 -117.5 \, phls 46 -120 \, phls 47 -122.5 \, phls
+48 -125;
+#X msg 92 434 phls 49 -127.5 \, phls 50 -130 \, phls 51 -132.5 \, phls
+52 -135;
+#X msg 92 456 phls 53 -137.5 \, phls 54 -140 \, phls 55 -142.5 \, phls
+56 -145;
+#X msg 92 480 phls 57 -147.5 \, phls 58 -150 \, phls 59 -152.5 \, phls
+60 -155;
+#X msg 92 503 phls 61 -157.5 \, phls 62 -160 \, phls 63 -162.5 \, phls
+64 -165;
+#X msg 92 527 phls 65 -167.5 \, phls 66 -170 \, phls 67 -172.5 \, phls
+68 -175;
+#X msg 92 550 phls 69 -177.5 \, phls 70 -180 \, phls 71 177.5 \, phls
+72 175;
+#X msg 497 228 phls 73 172.5 \, phls 74 170 \, phls 75 167.5 \, phls
+76 165;
+#X msg 497 249 phls 77 162.5 \, phls 78 160 \, phls 79 157.5 \, phls
+80 155;
+#X msg 497 270 phls 81 152.5 \, phls 82 150 \, phls 83 147.5 \, phls
+84 145;
+#X msg 497 290 phls 85 142.5 \, phls 86 140 \, phls 87 137.5 \, phls
+88 135;
+#X msg 497 312 phls 89 132.5 \, phls 90 130 \, phls 91 127.5 \, phls
+92 125;
+#X msg 497 333 phls 93 122.5 \, phls 94 120 \, phls 95 117.5 \, phls
+96 115;
+#X msg 497 354 phls 97 112.5 \, phls 98 110 \, phls 99 107.5 \, phls
+100 105;
+#X msg 497 375 phls 101 102.5 \, phls 102 100 \, phls 103 97.5 \, phls
+104 95;
+#X msg 497 396 phls 105 92.5 \, phls 106 90 \, phls 107 87.5 \, phls
+108 85;
+#X msg 497 418 phls 109 82.5 \, phls 110 80 \, phls 111 77.5 \, phls
+112 75;
+#X msg 497 439 phls 113 72.5 \, phls 114 70 \, phls 115 67.5 \, phls
+116 65;
+#X msg 497 460 phls 117 62.5 \, phls 118 60 \, phls 119 57.5 \, phls
+120 55;
+#X msg 497 481 phls 121 52.5 \, phls 122 50 \, phls 123 47.5 \, phls
+124 45;
+#X msg 497 502 phls 125 42.5 \, phls 126 40 \, phls 127 37.5 \, phls
+128 35;
+#X msg 497 524 phls 129 32.5 \, phls 130 30 \, phls 131 27.5 \, phls
+132 25;
+#X msg 497 545 phls 133 22.5 \, phls 134 20 \, phls 135 17.5 \, phls
+136 15;
+#X msg 497 566 phls 137 12.5 \, phls 138 10 \, phls 139 7.5;
+#X obj 70 68 t b b b b;
+#X obj 92 127 t b;
+#X obj 497 206 t b;
+#X obj 57 586 ambi_decode 2 2 5 139;
+#X msg 92 152 phls 1 -7.5 \, phls 2 -10 \, phls 3 -12.5 \, phls 4 -15
+;
+#X connect 1 0 0 0;
+#X connect 2 0 42 0;
+#X connect 3 0 39 0;
+#X connect 4 0 42 0;
+#X connect 5 0 42 0;
+#X connect 6 0 42 0;
+#X connect 7 0 42 0;
+#X connect 8 0 42 0;
+#X connect 9 0 42 0;
+#X connect 10 0 42 0;
+#X connect 11 0 42 0;
+#X connect 12 0 42 0;
+#X connect 13 0 42 0;
+#X connect 14 0 42 0;
+#X connect 15 0 42 0;
+#X connect 16 0 42 0;
+#X connect 17 0 42 0;
+#X connect 18 0 42 0;
+#X connect 19 0 42 0;
+#X connect 20 0 42 0;
+#X connect 21 0 42 0;
+#X connect 22 0 42 0;
+#X connect 23 0 42 0;
+#X connect 24 0 42 0;
+#X connect 25 0 42 0;
+#X connect 26 0 42 0;
+#X connect 27 0 42 0;
+#X connect 28 0 42 0;
+#X connect 29 0 42 0;
+#X connect 30 0 42 0;
+#X connect 31 0 42 0;
+#X connect 32 0 42 0;
+#X connect 33 0 42 0;
+#X connect 34 0 42 0;
+#X connect 35 0 42 0;
+#X connect 36 0 42 0;
+#X connect 37 0 42 0;
+#X connect 38 0 42 0;
+#X connect 39 0 2 0;
+#X connect 39 1 41 0;
+#X connect 39 2 40 0;
+#X connect 39 3 4 0;
+#X connect 40 0 43 0;
+#X connect 40 0 5 0;
+#X connect 40 0 6 0;
+#X connect 40 0 7 0;
+#X connect 40 0 8 0;
+#X connect 40 0 9 0;
+#X connect 40 0 10 0;
+#X connect 40 0 11 0;
+#X connect 40 0 12 0;
+#X connect 40 0 13 0;
+#X connect 40 0 14 0;
+#X connect 40 0 15 0;
+#X connect 40 0 16 0;
+#X connect 40 0 17 0;
+#X connect 40 0 18 0;
+#X connect 40 0 19 0;
+#X connect 40 0 20 0;
+#X connect 40 0 21 0;
+#X connect 41 0 22 0;
+#X connect 41 0 23 0;
+#X connect 41 0 24 0;
+#X connect 41 0 25 0;
+#X connect 41 0 26 0;
+#X connect 41 0 27 0;
+#X connect 41 0 28 0;
+#X connect 41 0 29 0;
+#X connect 41 0 30 0;
+#X connect 41 0 31 0;
+#X connect 41 0 32 0;
+#X connect 41 0 33 0;
+#X connect 41 0 34 0;
+#X connect 41 0 35 0;
+#X connect 41 0 36 0;
+#X connect 41 0 37 0;
+#X connect 41 0 38 0;
+#X connect 42 0 1 0;
+#X connect 43 0 42 0;
+#X restore 421 117 pd phantom_example regular;
+#N canvas 0 0 814 679 real_example 0;
+#X obj 58 293 print;
+#X obj 58 270 round_zero 1e-006;
+#X msg 57 94 pinv;
+#X obj 70 24 bng 35 250 50 0 empty empty empty 0 -6 0 8 -24198 -42246
+-1;
+#X msg 103 115 ls 1 5 \, ls 2 2.5 \, ls 3 0 \, ls 4 -2.5 \, ls 5 -5
+;
+#X obj 70 68 t b b;
+#X obj 58 248 ambi_decode 2 2 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 6 0;
+#X connect 3 0 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 2 0;
+#X connect 5 1 4 0;
+#X connect 6 0 1 0;
+#X restore 421 90 pd real_example singular;
+#X connect 3 0 0 0;
+#X connect 5 0 13 0;
+#X connect 6 0 13 0;
+#X connect 13 0 3 0;
+#X connect 21 0 13 0;
+#X connect 22 0 21 0;
+#X connect 22 1 45 0;
+#X connect 23 0 22 0;
+#X connect 45 0 13 0;
