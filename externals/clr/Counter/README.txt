@@ -1,3 +1,6 @@
 to compile External.dll put  PureData.dll in this folder then execute this command:
 
-mcs External.cs Counter.cs -out:External.dll -target:library -r:PureData.dll
+Using the Mono C#: 
+mcs -out:Counter.dll -target:library -r:PureData.dll -optimize+ *.cs
+
+For the Microsoft C# compiler, use csc instead of mcs

@@ -909,7 +909,8 @@ void clr_setup(void)
         // search in the PD path
         int fd;
         if ((fd = open_via_path("",CORELIB,"." DLLEXT,dirbuf,&nameptr,MAXPDSTRING,1)) >= 0) {
-            strcat(dirbuf,"/" CORELIB "." DLLEXT);
+            if(dirbuf != nameptr) // fix for the fact that open_via_path doesn't return a path, when it's found in .
+                strcat(dirbuf,"/" CORELIB "." DLLEXT);
             close(fd);
         }
         else 
@@ -918,7 +919,7 @@ void clr_setup(void)
         // look for PureData.dll
         MonoAssembly *assembly = mono_domain_assembly_open (monodomain,dirbuf);
 	    if(!assembly) {
-		    error("clr: assembly " CORELIB "." DLLEXT " not found!");
+		    error("CLR - assembly %s not found!",dirbuf);
 		    return;
 	    }
 
