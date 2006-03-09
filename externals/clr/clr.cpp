@@ -27,6 +27,7 @@ extern "C" {
 
 #include <map>
 #include <vector>
+#include <list>
 
 #define CORELIB "PureData"
 #define DLLEXT "dll"
@@ -51,25 +52,87 @@ struct AtomList
 
 // temporary workspace items
 
-static MonoArray *clr_objarr_1,*clr_objarr_2;
-static MonoObject *clr_obj_single,*clr_obj_symbol,*clr_obj_pointer,*clr_obj_atomlist;
+static MonoArray *clr_objarr_1,*clr_objarr_3;
+static MonoObject *clr_obj_int,*clr_obj_single,*clr_obj_symbol,*clr_obj_pointer,*clr_obj_atomlist;
+static int *clr_val_int;
 static float *clr_val_single;
 static t_symbol **clr_val_symbol;
 static void **clr_val_pointer;
 static AtomList *clr_val_atomlist;
 
 
+struct t_clr;
 
 struct Delegate
 {
-    operator bool() const { return methodinfo != NULL; }
+    enum Kind { k_bang,k_float,k_symbol,k_pointer,k_list,k_anything };
+
+    inline operator bool() const { return methodinfo != NULL; }
 
     MonoObject *methodinfo;
     MonoMethod *virtmethod;
+    Kind kind;
+
+    inline void init(MonoObject *method,Kind k) 
+    {
+        methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+        virtmethod = mono_object_get_virtual_method(methodinfo,clr_meth_invoke);
+        kind = k;
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,void *arg = NULL) const
+    {
+        gpointer args[2] = {obj,arg};
+        assert(methodinfo);
+        MonoObject *exc;
+        mono_runtime_invoke(virtmethod,methodinfo,args,&exc);
+        return exc;
+    }
+
+    inline MonoObject *invokeatom(MonoObject *obj,MonoObject *atom) const
+    {
+        mono_array_set(clr_objarr_1,void*,0,atom);
+        return operator()(obj,clr_objarr_1);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,float f) const
+    {
+        *clr_val_single = f;
+        return invokeatom(obj,clr_obj_single);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,t_symbol *s) const
+    {
+        *clr_val_symbol = s;
+        return invokeatom(obj,clr_obj_symbol);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,t_gpointer *p) const
+    {
+        *clr_val_pointer = p;
+        return invokeatom(obj,clr_obj_pointer);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,int argc,t_atom *argv) const
+    {
+        clr_val_atomlist->Set(argc,argv);
+        return invokeatom(obj,clr_obj_atomlist);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,int inlet,t_symbol *s,int argc,t_atom *argv) const
+    {
+        *clr_val_int = inlet;
+        *clr_val_symbol = s;
+        clr_val_atomlist->Set(argc,argv);
+        mono_array_set(clr_objarr_3,void*,0,clr_obj_int);
+        mono_array_set(clr_objarr_3,void*,1,clr_obj_symbol);
+        mono_array_set(clr_objarr_3,void*,2,clr_obj_atomlist);
+        return operator()(obj,clr_objarr_3);
+    }
 };
 
 typedef std::map<t_symbol *,Delegate> ClrMethodMap;
-
+typedef std::vector<ClrMethodMap *> ClrMethods;
 
 // this is the class structure
 // holding the pd and mono class
@@ -82,7 +145,16 @@ struct t_clr_class
     MonoClassField *obj_field; // ptr field in PureData.External
     t_symbol *name;
     Delegate method_bang,method_float,method_symbol,method_pointer,method_list,method_anything;
-    ClrMethodMap *methods; // explicit method selectors
+    ClrMethods *methods; // explicit method selectors
+};
+
+static t_class *proxy_class;
+
+struct t_proxy
+{
+    t_object pd_obj; // myself
+    t_clr *parent; // parent object
+    int inlet;
 };
 
 typedef std::map<t_symbol *,t_clr_class *> ClrMap;
@@ -90,9 +162,13 @@ typedef std::map<t_symbol *,t_clr_class *> ClrMap;
 static ClrMap clr_map;
 
 typedef std::vector<t_outlet *> OutletArr;
+typedef std::list<t_proxy *> ProxyList;
 
 // this is the class to be setup (while we are in the CLR static Main method)
 static t_clr_class *clr_setup_class = NULL;
+
+// inlet index... must start with 0 every time a new object is made
+static int clr_inlet;
 
 // this is the class instance object structure
 struct t_clr
@@ -101,6 +177,7 @@ struct t_clr
     t_clr_class *clr_clss; // pointer to our class structure
     MonoObject *mono_obj;  // the mono class instance
     OutletArr *outlets;
+    ProxyList *proxies;
 };
 
 
@@ -121,138 +198,117 @@ static void error_exc(char *txt,char *cname,MonoObject *exc)
 static void clr_method_bang(t_clr *x) 
 {
     assert(x && x->clr_clss);
-
-    const Delegate &d = x->clr_clss->method_bang;
-    assert(d);
-
-    gpointer args[2] = {x->mono_obj,NULL};
-    MonoObject *exc;
-    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
+    MonoObject *exc = x->clr_clss->method_bang(x->mono_obj);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_float(t_clr *x,t_float f) 
 {
     assert(x && x->clr_clss);
-
-    const Delegate &d = x->clr_clss->method_float;
-    assert(d);
-
-    *clr_val_single = f;
-    mono_array_set(clr_objarr_1,void*,0,clr_obj_single);
-
-    gpointer args[2] = {x->mono_obj,clr_objarr_1};
-    MonoObject *exc;
-    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
+    MonoObject *exc = x->clr_clss->method_float(x->mono_obj,f);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_symbol(t_clr *x,t_symbol *s) 
 {
     assert(x && x->clr_clss);
-
-    const Delegate &d = x->clr_clss->method_symbol;
-    assert(d);
-
-    *clr_val_symbol = s;
-    mono_array_set(clr_objarr_1,void*,0,clr_obj_symbol);
-
-    gpointer args[2] = {x->mono_obj,clr_objarr_1};
-    MonoObject *exc;
-    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
+    MonoObject *exc = x->clr_clss->method_symbol(x->mono_obj,s);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
 static void clr_method_pointer(t_clr *x,t_gpointer *p)
 {
     assert(x && x->clr_clss);
-
-    const Delegate &d = x->clr_clss->method_pointer;
-    assert(d);
-
-    *clr_val_pointer = p;
-    mono_array_set(clr_objarr_1,void*,0,clr_obj_pointer);
-
-    gpointer args[2] = {x->mono_obj,clr_objarr_1};
-    MonoObject *exc;
-    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
+    MonoObject *exc = x->clr_clss->method_pointer(x->mono_obj,p);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
-static void clr_method_list(t_clr *x,t_symbol *l, int argc, t_atom *argv)
+static void clr_method_list(t_clr *x,t_symbol *,int argc,t_atom *argv)
+{
+    assert(x && x->clr_clss);
+    MonoObject *exc = x->clr_clss->method_symbol(x->mono_obj,argc,argv);
+    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
+}
+
+static void call_anything(t_clr *x,int inlet,t_symbol *s,int argc,t_atom *argv)
 {
     assert(x && x->clr_clss);
 
-    const Delegate &d = x->clr_clss->method_list;
+    const Delegate *d;
+
+    ClrMethods *methods = x->clr_clss->methods;
+    if(methods && inlet < (int)methods->size()) {
+        ClrMethodMap *methmap = (*methods)[inlet];
+        if(methmap) {
+            ClrMethodMap::iterator it = methmap->find(s);
+            if(it != methmap->end()) {
+                d = &it->second;
+                goto found;
+            }
+
+            if(inlet) {
+                // search for NULL symbol pointer
+                it = methmap->find(NULL);
+                if(it != methmap->end()) {
+                    d = &it->second;
+                    goto found;
+                }
+            }
+        }
+    }
+
+    // no selectors: general method
+    d = &x->clr_clss->method_anything;
+
+    found:
+
+    // we must have found something....
     assert(d);
 
-    clr_val_atomlist->Set(argc,argv);
-    mono_array_set(clr_objarr_1,void*,0,clr_obj_atomlist);
-
-    gpointer args[2] = {x->mono_obj,clr_objarr_1};
     MonoObject *exc;
-    mono_runtime_invoke(d.virtmethod,d.methodinfo,args,&exc);
+    switch(d->kind) {
+        case Delegate::k_bang: 
+            assert(argc == 0);
+            exc = (*d)(x->mono_obj); 
+            break;
+        case Delegate::k_float: 
+            assert(argc == 1 && argv[0].a_type == A_FLOAT);
+            exc = (*d)(x->mono_obj,argv[0].a_w.w_float); 
+            break;
+        case Delegate::k_symbol:
+            assert(argc == 1 && argv[0].a_type == A_SYMBOL);
+            exc = (*d)(x->mono_obj,argv[0].a_w.w_symbol); 
+            break;
+        case Delegate::k_pointer:
+            assert(argc == 1 && argv[0].a_type == A_POINTER);
+            exc = (*d)(x->mono_obj,argv[0].a_w.w_gpointer); 
+            break;
+        case Delegate::k_list:
+            exc = (*d)(x->mono_obj,argc,argv); 
+            break;
+        case Delegate::k_anything: 
+            exc = (*d)(x->mono_obj,inlet,s,argc,argv);  
+            break;
+        default:
+            assert(false);
+    }
+
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
-static void clr_method_anything(t_clr *x,t_symbol *s,int argc,t_atom *argv)
-{
-    assert(x && x->clr_clss);
+static void clr_method_anything(t_clr *x,t_symbol *s,int argc,t_atom *argv) { call_anything(x,0,s,argc,argv); }
+static void clr_method_proxy(t_proxy *x,t_symbol *s,int argc,t_atom *argv) { call_anything(x->parent,x->inlet,s,argc,argv); }
 
-    const Delegate *d = NULL;
-    ClrMethodMap *methods = x->clr_clss->methods;
-    if(methods) {
-        ClrMethodMap::iterator it = methods->find(s);
-        if(it != methods->end()) d = &it->second;
-    }
-
-    gpointer args[2];
-    args[0] = x->mono_obj;
-
-    if(d) {
-        // explicit selector
-
-        clr_val_atomlist->Set(argc,argv);
-        mono_array_set(clr_objarr_1,void*,0,clr_obj_atomlist);
-        args[1] = clr_objarr_1;
-    }
-    else {
-        // general method
-
-        d = &x->clr_clss->method_anything;
-        assert(d);
-
-        *clr_val_symbol = s;
-        clr_val_atomlist->Set(argc,argv);
-        mono_array_set(clr_objarr_2,void*,0,clr_obj_symbol);
-        mono_array_set(clr_objarr_2,void*,1,clr_obj_atomlist);
-        args[1] = clr_objarr_2;
-    }
-
-    MonoObject *exc;
-    mono_runtime_invoke(d->virtmethod,d->methodinfo,args,&exc);
-    if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
-}
-
-// this function is called by mono when it wants post messages to pd
 static void PD_Post(MonoString *str)
 {
 	post("%s",mono_string_to_utf8(str));	
 }
 
-// this function is called by mono when it wants post messages to pd
 static void PD_PostError(MonoString *str)
 {
 	error("%s",mono_string_to_utf8(str));	
 }
 
-// this function is called by mono when it wants post messages to pd
-static void PD_PostBug(MonoString *str)
-{
-	bug("%s",mono_string_to_utf8(str));	
-}
-
-// this function is called by mono when it wants post messages to pd
 static void PD_PostVerbose(int lvl,MonoString *str)
 {
 	verbose(lvl,"%s",mono_string_to_utf8(str));	
@@ -270,70 +326,100 @@ static MonoString *PD_SymEval(t_symbol *sym)
     return mono_string_new(monodomain,sym->s_name);
 }
 
-static void PD_AddBang(MonoObject *method)
-{
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_bang;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
-}
-
-static void PD_AddFloat(MonoObject *method)
-{
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_float;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
-}
-
-static void PD_AddSymbol(MonoObject *method)
-{
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_symbol;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
-}
-
-static void PD_AddPointer(MonoObject *method)
-{
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_pointer;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
-}
-
-static void PD_AddList(MonoObject *method)
-{
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_list;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
-}
-
-static void PD_AddSelector(t_symbol *sym,MonoObject *method)
+static void PD_AddMethodHandler(int inlet,t_symbol *sym,MonoObject *method,Delegate::Kind kind)
 {
     assert(clr_setup_class);
     Delegate d;
     d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
     d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
+    d.kind = kind;
 
-    if(!clr_setup_class->methods)
-        clr_setup_class->methods = new ClrMethodMap;
+    ClrMethods *ms = clr_setup_class->methods;
+    if(!ms)
+        clr_setup_class->methods = ms = new ClrMethods;
+
+    ClrMethodMap *m;
+    if(inlet >= (int)ms->size()) {
+        ms->resize(inlet+1,NULL);
+        (*ms)[inlet] = m = new ClrMethodMap;
+    }
+    else
+        m = (*ms)[inlet];
+    assert(m);
+        
     // add tag to map
-    (*clr_setup_class->methods)[sym] = d;
+    (*m)[sym] = d;
 }
 
-static void PD_AddAnything(MonoObject *method)
+static void PD_AddMethodSelector(int inlet,t_symbol *sym,MonoObject *method)
 {
-    assert(clr_setup_class);
-    Delegate &d = clr_setup_class->method_anything;
-    d.methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
-    d.virtmethod = mono_object_get_virtual_method(d.methodinfo,clr_meth_invoke);
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_anything);
+}
+
+static void PD_AddMethodBang(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,&s_bang,method,Delegate::k_bang);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_bang.init(method,Delegate::k_bang);
+    }
+}
+
+static void PD_AddMethodFloat(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,&s_float,method,Delegate::k_float);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_float.init(method,Delegate::k_float);
+    }
+}
+
+static void PD_AddMethodSymbol(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,&s_symbol,method,Delegate::k_symbol);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_symbol.init(method,Delegate::k_symbol);
+    }
+}
+
+static void PD_AddMethodPointer(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,&s_pointer,method,Delegate::k_pointer);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_pointer.init(method,Delegate::k_pointer);
+    }
+}
+
+static void PD_AddMethodList(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,&s_list,method,Delegate::k_list);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_list.init(method,Delegate::k_list);
+    }
+}
+
+static void PD_AddMethodAnything(int inlet,MonoObject *method)
+{
+    if(inlet)
+        PD_AddMethodHandler(inlet,NULL,method,Delegate::k_anything);
+    else {
+        assert(clr_setup_class);
+        clr_setup_class->method_anything.init(method,Delegate::k_anything);
+    }
 }
 
 
-static void PD_AddInlet(t_clr *obj,t_symbol *sel,t_symbol *to_sel)
+static void PD_AddInletAlias(t_clr *obj,t_symbol *sel,t_symbol *to_sel)
 {
+    ++clr_inlet;
     assert(obj);
     t_inlet *in = inlet_new(&obj->pd_obj,&obj->pd_obj.ob_pd,sel,to_sel);
     assert(in);
@@ -341,6 +427,7 @@ static void PD_AddInlet(t_clr *obj,t_symbol *sel,t_symbol *to_sel)
 
 static void PD_AddInletFloat(t_clr *obj,float *f)
 {
+    ++clr_inlet;
     assert(obj);
     t_inlet *in = floatinlet_new(&obj->pd_obj,f);
     assert(in);
@@ -348,6 +435,7 @@ static void PD_AddInletFloat(t_clr *obj,float *f)
 
 static void PD_AddInletSymbol(t_clr *obj,t_symbol **s)
 {
+    ++clr_inlet;
     assert(obj);
     t_inlet *in = symbolinlet_new(&obj->pd_obj,s);
     assert(in);
@@ -356,17 +444,27 @@ static void PD_AddInletSymbol(t_clr *obj,t_symbol **s)
 /*
 static void PD_AddInletPointer(t_clr *obj,t_gpointer *p)
 {
+    ++clr_inlet;
     assert(obj);
     t_inlet *in = pointerinlet_new(&obj->pd_obj,p);
     assert(in);
 }
 */
 
-static void PD_AddInletProxy(t_clr *obj)
+static void PD_AddInletProxyTyped(t_clr *obj,t_symbol *type)
 {
     assert(obj);
-    // TODO implement
+    t_proxy *p = (t_proxy *)pd_new(proxy_class);
+    p->parent = obj;
+    p->inlet = ++clr_inlet;
+    if(!obj->proxies) obj->proxies = new ProxyList;
+    obj->proxies->push_back(p);
+    t_inlet *in = inlet_new(&obj->pd_obj,&p->pd_obj.ob_pd,type,type);
+    assert(in);
 }
+
+static void PD_AddInletProxy(t_clr *obj) { PD_AddInletProxyTyped(obj,NULL); }
+
 
 static void PD_AddOutlet(t_clr *obj,t_symbol *type)
 {
@@ -381,7 +479,7 @@ static void PD_OutletBang(t_clr *obj,int n)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     outlet_bang((*obj->outlets)[n]);
 }
 
@@ -389,7 +487,7 @@ static void PD_OutletFloat(t_clr *obj,int n,float f)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     outlet_float((*obj->outlets)[n],f);
 }
 
@@ -397,7 +495,7 @@ static void PD_OutletSymbol(t_clr *obj,int n,t_symbol *s)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     outlet_symbol((*obj->outlets)[n],s);
 }
 
@@ -405,7 +503,7 @@ static void PD_OutletPointer(t_clr *obj,int n,t_gpointer *p)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     outlet_pointer((*obj->outlets)[n],p);
 }
 
@@ -413,7 +511,7 @@ static void PD_OutletAtom(t_clr *obj,int n,t_atom l)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     t_outlet *out = (*obj->outlets)[n];
     switch(l.a_type) {
         case A_FLOAT: outlet_float(out,l.a_w.w_float); break;
@@ -428,7 +526,7 @@ static void PD_OutletAnything(t_clr *obj,int n,t_symbol *s,AtomList l)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
     outlet_anything((*obj->outlets)[n],s,l.argc,l.argv);
 }
 
@@ -436,7 +534,7 @@ static void PD_OutletAnything2(t_clr *obj,int n,t_symbol *s,MonoArray *l)
 {
     assert(obj);
     assert(obj->outlets);
-    assert(n >= 0 && n < obj->outlets->size());
+    assert(n >= 0 && n < (int)obj->outlets->size());
 //    assert(mono_object_get_class(&l->obj) == clr_atom);
     outlet_anything((*obj->outlets)[n],s,mono_array_length(l),mono_array_addr(l,t_atom,0));
 }
@@ -463,6 +561,7 @@ static void PD_SendAnything2(t_symbol *dst,t_symbol *s,MonoArray *l)
 void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 {
     // find class name in map
+
     ClrMap::iterator it = clr_map.find(classname);
     if(it == clr_map.end()) {
         error("CLR class %s not found",classname->s_name);
@@ -488,10 +587,14 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
     mono_field_set_value(x->mono_obj,clss->obj_field,x);
 
     x->outlets = NULL;
+    x->proxies = NULL;
 
     // ok, we have an object - look for constructor
 	if(clss->mono_ctor) {
-    	AtomList al; 
+        // reset inlet index
+        clr_inlet = 0;
+
+        AtomList al; 
         al.Set(argc,argv);
 	    gpointer args = &al;
 
@@ -511,9 +614,14 @@ void *clr_new(t_symbol *classname, int argc, t_atom *argv)
     return x;
 }
 
-void clr_free(t_clr *x)
+void clr_free(t_clr *obj)
 {
-    if(x->outlets) delete x->outlets;
+    if(obj->outlets) delete obj->outlets;
+
+    if(obj->proxies) {
+        for(ProxyList::iterator it = obj->proxies->begin(); it != obj->proxies->end(); ++it) pd_free((t_pd *)*it);
+        delete obj->proxies;
+    }
 }
 
 static int classloader(char *dirname, char *classname)
@@ -613,7 +721,7 @@ static int classloader(char *dirname, char *classname)
     // make pd class
     clr_class->pd_class = class_new(classsym,(t_newmethod)clr_new,(t_method)clr_free, sizeof(t_clr), flags, A_GIMME, A_NULL);
 
-    // find && register methods
+    // register methods
     if(clr_class->method_bang)
         class_addbang(clr_class->pd_class,clr_method_bang);
     if(clr_class->method_float)
@@ -698,21 +806,21 @@ void clr_setup(void)
 
         mono_add_internal_call("PureData.External::Post(string)",(const void *)PD_Post);
         mono_add_internal_call("PureData.External::PostError(string)",(const void *)PD_PostError);
-        mono_add_internal_call("PureData.External::PostBug(string)",(const void *)PD_PostBug);
-        mono_add_internal_call("PureData.External::PostVerbose(string)",(const void *)PD_PostVerbose);
+        mono_add_internal_call("PureData.External::PostVerbose(int,string)",(const void *)PD_PostVerbose);
 
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodBang)", (const void *)PD_AddBang);
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodFloat)", (const void *)PD_AddFloat);
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodSymbol)", (const void *)PD_AddSymbol);
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodPointer)", (const void *)PD_AddPointer);
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodList)", (const void *)PD_AddList);
-        mono_add_internal_call("PureData.External::Add(PureData.Symbol,PureData.External/MethodList)", (const void *)PD_AddSelector);
-        mono_add_internal_call("PureData.External::Add(PureData.External/MethodAnything)", (const void *)PD_AddAnything);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodBang)", (const void *)PD_AddMethodBang);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodFloat)", (const void *)PD_AddMethodFloat);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodSymbol)", (const void *)PD_AddMethodSymbol);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodPointer)", (const void *)PD_AddMethodPointer);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodList)", (const void *)PD_AddMethodList);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodAnything)", (const void *)PD_AddMethodSelector);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodAnything)", (const void *)PD_AddMethodAnything);
 
-        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol,PureData.Symbol)", (const void *)PD_AddInlet);
+        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol,PureData.Symbol)", (const void *)PD_AddInletAlias);
         mono_add_internal_call("PureData.Internal::AddInlet(void*,single&)", (const void *)PD_AddInletFloat);
         mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol&)", (const void *)PD_AddInletSymbol);
 //        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Pointer&)", (const void *)PD_AddInletPointer);
+//        mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol)", (const void *)PD_AddInletTyped);
         mono_add_internal_call("PureData.Internal::AddInlet(void*)", (const void *)PD_AddInletProxy);
 
         mono_add_internal_call("PureData.Internal::AddOutlet(void*,PureData.Symbol)", (const void *)PD_AddOutlet);
@@ -759,16 +867,22 @@ void clr_setup(void)
 
         // static objects to avoid allocation at method call time
         clr_objarr_1 = mono_array_new(monodomain,mono_get_object_class(),1);
-        clr_objarr_2 = mono_array_new(monodomain,mono_get_object_class(),2);
+        clr_objarr_3 = mono_array_new(monodomain,mono_get_object_class(),3);
+        clr_obj_int = mono_object_new(monodomain,mono_get_int32_class());
         clr_obj_single = mono_object_new(monodomain,mono_get_single_class());
         clr_obj_symbol = mono_object_new(monodomain,clr_symbol);
         clr_obj_pointer = mono_object_new(monodomain,clr_pointer);
         clr_obj_atomlist = mono_object_new(monodomain,clr_atomlist);
         // unboxed addresses
+        clr_val_int = (int *)mono_object_unbox(clr_obj_int);
         clr_val_single = (float *)mono_object_unbox(clr_obj_single);
         clr_val_symbol = (t_symbol **)mono_object_unbox(clr_obj_symbol);
         clr_val_pointer = (void **)mono_object_unbox(clr_obj_pointer);
         clr_val_atomlist = (AtomList *)mono_object_unbox(clr_obj_atomlist);
+
+        // make proxy class
+        proxy_class = class_new(gensym("clr proxy"),NULL,NULL,sizeof(t_proxy),CLASS_PD|CLASS_NOINLET,A_NULL);
+        class_addanything(proxy_class,clr_method_proxy);
 
         // install loader hook
         sys_loader(classloader);

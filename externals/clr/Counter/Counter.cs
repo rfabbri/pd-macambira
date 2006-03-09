@@ -17,8 +17,10 @@ public class Counter:
         // that's the way to store args (don't just copy an AtomList instance!!)
         this.args = (PureData.Atom[])args;
 
-        AddInlet(s_list,new PureData.Symbol("list2"));
+//        AddInlet(s_list,new PureData.Symbol("list2"));
+        AddInlet();
         AddInlet(ref farg);
+        AddInlet();
         AddOutletBang();
     }
 
@@ -26,13 +28,15 @@ public class Counter:
 	// returns void or ClassType
 	private static ClassType Setup(Counter obj)
 	{
-	    Add(new MethodBang(obj.MyBang));
-        Add(new MethodFloat(obj.MyFloat));
-        Add(new MethodSymbol(obj.MySymbol));
-        Add(new MethodList(obj.MyList));
-        Add("set",new MethodList(obj.MySet));
-        Add("send",new MethodList(obj.MySend));
-        Add(new MethodAnything(obj.MyAnything));
+	    AddMethod(0,new MethodBang(obj.MyBang));
+        AddMethod(0,new MethodFloat(obj.MyFloat));
+        AddMethod(0,new MethodSymbol(obj.MySymbol));
+        AddMethod(0,new MethodList(obj.MyList));
+        AddMethod(0,"set",new MethodAnything(obj.MySet));
+        AddMethod(0,"send",new MethodAnything(obj.MySend));
+        AddMethod(0,new MethodAnything(obj.MyAnything));
+        AddMethod(1,new MethodFloat(obj.MyFloat1));
+        AddMethod(1,new MethodAnything(obj.MyAny1));
 
         Post("Count.Main");
         return ClassType.Default;
@@ -50,6 +54,16 @@ public class Counter:
         Outlet(0,f);
     }
 
+    protected virtual void MyFloat1(float f) 
+    { 
+        Post("Count-FLOAT1 "+f.ToString()); 
+    }
+
+    protected virtual void MyAny1(int ix,PureData.Symbol s,PureData.AtomList l) 
+    { 
+        Post(ix.ToString()+": Count-ANY1 "+l.ToString()); 
+    }
+
     protected virtual void MySymbol(PureData.Symbol s) 
     { 
         Post("Count-SYMBOL "+s.ToString()); 
@@ -62,21 +76,21 @@ public class Counter:
         Outlet(0,l);
     }
 
-    protected virtual void MySet(PureData.AtomList l) 
+    protected virtual void MySet(int ix,PureData.Symbol s,PureData.AtomList l) 
     { 
         Post("Count-SET "+l.ToString()); 
         Outlet(0,new PureData.Symbol("set"),l);
     }
 
-    protected virtual void MySend(PureData.AtomList l) 
+    protected virtual void MySend(int ix,PureData.Symbol s,PureData.AtomList l) 
     { 
         Send(new PureData.Symbol("receiver"),l);
         Send(new PureData.Symbol("receiver2"),(PureData.Atom[])l);
     }
 
-    protected virtual void MyAnything(PureData.Symbol s,PureData.AtomList l) 
+    protected virtual void MyAnything(int ix,PureData.Symbol s,PureData.AtomList l) 
     { 
-        Post("Count-("+s.ToString()+") "+l.ToString()); 
+        Post(ix.ToString()+": Count-("+s.ToString()+") "+l.ToString()); 
         Outlet(0,s,l);
     }
     /*
