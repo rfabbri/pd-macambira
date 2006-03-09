@@ -517,8 +517,7 @@ static void PD_OutletAtom(t_clr *obj,int n,t_atom l)
         case A_FLOAT: outlet_float(out,l.a_w.w_float); break;
         case A_SYMBOL: outlet_symbol(out,l.a_w.w_symbol); break;
         case A_POINTER: outlet_pointer(out,l.a_w.w_gpointer); break;
-        default:
-            error("CLR - internal error in file " __FILE__ ", line %i",__LINE__);
+        default: assert(false);
     }
 }
 
@@ -631,6 +630,7 @@ static int classloader(char *dirname, char *classname)
     MonoAssembly *assembly;
     MonoImage *image;
     MonoMethod *method;
+    int flags = CLASS_DEFAULT;
 
     char dirbuf[MAXPDSTRING],*nameptr;
     // search for classname.dll in the PD path
@@ -671,7 +671,6 @@ static int classloader(char *dirname, char *classname)
     // make new class (with classname)
     classsym = gensym(classname);
     clr_class->pd_class = NULL;
-    int flags = CLASS_DEFAULT;
 
     clr_class->obj_field = mono_class_get_field_from_name(clr_class->mono_class,"ptr");
     assert(clr_class->obj_field);
