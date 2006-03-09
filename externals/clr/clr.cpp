@@ -41,6 +41,9 @@ static MonoMethodDesc *clr_desc_tostring,*clr_desc_ctor;
 static MonoMethod *clr_meth_invoke;
 static MonoProperty *clr_prop_method;
 
+static t_symbol *sym_object;
+
+
 struct AtomList
 {
     int argc;
@@ -49,10 +52,50 @@ struct AtomList
     void Set(int c,t_atom *v) { argc = c,argv = v; }
 };
 
+// transforms a pointer (like MonoObject *) into a 3 element-list
+struct ObjectAtom
+{
+    enum { size = 3,bitshift = 22 };
+
+    // 64-bit safe...
+    t_atom msg[size];
+
+    ObjectAtom() {}
+
+    ObjectAtom(void *o)
+    {
+        size_t ptr = (size_t)o;
+        for(int i = 0; i < size; ++i) {
+            SETFLOAT(msg+i,(int)(ptr&((1<<bitshift)-1)));
+            ptr >>= bitshift;
+        }
+    }
+
+    static bool check(int argc,const t_atom *argv)
+    {
+        if(argc != size) return false;
+        for(int i = 0; i < size; ++i)
+            if(argv[i].a_type != A_FLOAT) return false;
+        return true;
+    }
+
+    static void *ptr(const t_atom *argv)
+    {
+        size_t ret = 0;
+        for(int i = size-1; i >= 0; --i)
+            ret = (ret<<bitshift)+(int)argv[i].a_w.w_float;
+        return (void *)ret;
+    }
+
+    template<class T> static T ptr(const t_atom *argv) { return (T)ptr(argv); }
+
+    operator t_atom *() { return msg; }
+};
+
 
 // temporary workspace items
 
-static MonoArray *clr_objarr_1,*clr_objarr_3;
+static MonoArray *clr_objarr_1,*clr_objarr_2,*clr_objarr_3;
 static MonoObject *clr_obj_int,*clr_obj_single,*clr_obj_symbol,*clr_obj_pointer,*clr_obj_atomlist;
 static int *clr_val_int;
 static float *clr_val_single;
@@ -65,7 +108,7 @@ struct t_clr;
 
 struct Delegate
 {
-    enum Kind { k_bang,k_float,k_symbol,k_pointer,k_list,k_anything };
+    enum Kind { k_bang,k_float,k_symbol,k_pointer,k_list,k_anything,k_object };
 
     inline operator bool() const { return methodinfo != NULL; }
 
@@ -80,7 +123,7 @@ struct Delegate
         kind = k;
     }
 
-    inline MonoObject *operator()(MonoObject *obj,void *arg = NULL) const
+    inline MonoObject *invoke(MonoObject *obj,void *arg) const
     {
         gpointer args[2] = {obj,arg};
         assert(methodinfo);
@@ -92,7 +135,12 @@ struct Delegate
     inline MonoObject *invokeatom(MonoObject *obj,MonoObject *atom) const
     {
         mono_array_set(clr_objarr_1,void*,0,atom);
-        return operator()(obj,clr_objarr_1);
+        return invoke(obj,clr_objarr_1);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj) const
+    {
+        return invoke(obj,NULL);
     }
 
     inline MonoObject *operator()(MonoObject *obj,float f) const
@@ -127,7 +175,15 @@ struct Delegate
         mono_array_set(clr_objarr_3,void*,0,clr_obj_int);
         mono_array_set(clr_objarr_3,void*,1,clr_obj_symbol);
         mono_array_set(clr_objarr_3,void*,2,clr_obj_atomlist);
-        return operator()(obj,clr_objarr_3);
+        return invoke(obj,clr_objarr_3);
+    }
+
+    inline MonoObject *operator()(MonoObject *obj,int inlet,MonoObject *clrobj) const
+    {
+        *clr_val_int = inlet;
+        mono_array_set(clr_objarr_2,void*,0,clr_obj_int);
+        mono_array_set(clr_objarr_2,void*,1,clrobj);
+        return invoke(obj,clr_objarr_2);
     }
 };
 
@@ -144,7 +200,7 @@ struct t_clr_class
     MonoMethod *mono_ctor;
     MonoClassField *obj_field; // ptr field in PureData.External
     t_symbol *name;
-    Delegate method_bang,method_float,method_symbol,method_pointer,method_list,method_anything;
+    Delegate method_bang,method_float,method_symbol,method_pointer,method_list,method_anything,method_object;
     ClrMethods *methods; // explicit method selectors
 };
 
@@ -226,7 +282,7 @@ static void clr_method_pointer(t_clr *x,t_gpointer *p)
 static void clr_method_list(t_clr *x,t_symbol *,int argc,t_atom *argv)
 {
     assert(x && x->clr_clss);
-    MonoObject *exc = x->clr_clss->method_symbol(x->mono_obj,argc,argv);
+    MonoObject *exc = x->clr_clss->method_list(x->mono_obj,argc,argv);
     if(exc) error_exc("Exception raised",x->clr_clss->name->s_name,exc);
 }
 
@@ -268,19 +324,27 @@ static void call_anything(t_clr *x,int inlet,t_symbol *s,int argc,t_atom *argv)
     MonoObject *exc;
     switch(d->kind) {
         case Delegate::k_bang: 
-            assert(argc == 0);
             exc = (*d)(x->mono_obj); 
             break;
         case Delegate::k_float: 
-            assert(argc == 1 && argv[0].a_type == A_FLOAT);
+            if(argc == 0 || argv[0].a_type != A_FLOAT) { 
+                error("%s - %s handler: float argument expected",x->clr_clss->name->s_name,s->s_name); 
+                return; 
+            }
             exc = (*d)(x->mono_obj,argv[0].a_w.w_float); 
             break;
         case Delegate::k_symbol:
-            assert(argc == 1 && argv[0].a_type == A_SYMBOL);
+            if(argc == 0 || argv[0].a_type != A_SYMBOL) { 
+                error("%s - %s handler: symbol argument expected",x->clr_clss->name->s_name,s->s_name); 
+                return; 
+            }
             exc = (*d)(x->mono_obj,argv[0].a_w.w_symbol); 
             break;
         case Delegate::k_pointer:
-            assert(argc == 1 && argv[0].a_type == A_POINTER);
+            if(argc == 0 || argv[0].a_type != A_POINTER) { 
+                error("%s - %s handler: pointer argument expected",x->clr_clss->name->s_name,s->s_name); 
+                return; 
+            }
             exc = (*d)(x->mono_obj,argv[0].a_w.w_gpointer); 
             break;
         case Delegate::k_list:
@@ -288,6 +352,13 @@ static void call_anything(t_clr *x,int inlet,t_symbol *s,int argc,t_atom *argv)
             break;
         case Delegate::k_anything: 
             exc = (*d)(x->mono_obj,inlet,s,argc,argv);  
+            break;
+        case Delegate::k_object: 
+            if(s != sym_object || !ObjectAtom::check(argc,argv)) { 
+                error("CLR - object handler: invalid arguments"); 
+                return; 
+            }
+            exc = (*d)(x->mono_obj,inlet,ObjectAtom::ptr<MonoObject *>(argv));
             break;
         default:
             assert(false);
@@ -351,11 +422,6 @@ static void PD_AddMethodHandler(int inlet,t_symbol *sym,MonoObject *method,Deleg
     (*m)[sym] = d;
 }
 
-static void PD_AddMethodSelector(int inlet,t_symbol *sym,MonoObject *method)
-{
-    PD_AddMethodHandler(inlet,sym,method,Delegate::k_anything);
-}
-
 static void PD_AddMethodBang(int inlet,MonoObject *method)
 {
     if(inlet)
@@ -414,6 +480,41 @@ static void PD_AddMethodAnything(int inlet,MonoObject *method)
         assert(clr_setup_class);
         clr_setup_class->method_anything.init(method,Delegate::k_anything);
     }
+}
+
+static void PD_AddMethodSelBang(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_bang);
+}
+
+static void PD_AddMethodSelFloat(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_float);
+}
+
+static void PD_AddMethodSelSymbol(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_symbol);
+}
+
+static void PD_AddMethodSelPointer(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_pointer);
+}
+
+static void PD_AddMethodSelList(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_list);
+}
+
+static void PD_AddMethodSelAnything(int inlet,t_symbol *sym,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym,method,Delegate::k_anything);
+}
+
+static void PD_AddMethodObject(int inlet,MonoObject *method)
+{
+    PD_AddMethodHandler(inlet,sym_object,method,Delegate::k_object);
 }
 
 
@@ -538,6 +639,17 @@ static void PD_OutletAnything2(t_clr *obj,int n,t_symbol *s,MonoArray *l)
     outlet_anything((*obj->outlets)[n],s,mono_array_length(l),mono_array_addr(l,t_atom,0));
 }
 
+
+static void PD_OutletObject(t_clr *obj,int n,MonoObject *o)
+{
+    assert(obj);
+    assert(obj->outlets);
+    assert(n >= 0 && n < (int)obj->outlets->size());
+    ObjectAtom oa(o);
+    outlet_anything((*obj->outlets)[n],sym_object,oa.size,oa);
+}
+
+
 static void PD_SendAtom(t_symbol *dst,t_atom a)
 {
     void *cl = dst->s_thing;
@@ -556,6 +668,17 @@ static void PD_SendAnything2(t_symbol *dst,t_symbol *s,MonoArray *l)
 //    assert(mono_object_get_class(&l->obj) == clr_atom);
     if(cl) pd_typedmess((t_class **)cl,s,mono_array_length(l),mono_array_addr(l,t_atom,0));
 }
+
+static void PD_SendObject(t_symbol *dst,MonoObject *o)
+{
+    void *cl = dst->s_thing;
+//    assert(mono_object_get_class(&l->obj) == clr_atom);
+    if(cl) {
+        ObjectAtom oa(o);
+        pd_typedmess((t_class **)cl,sym_object,oa.size,oa);
+    }
+}
+
 
 void *clr_new(t_symbol *classname, int argc, t_atom *argv)
 {
@@ -623,7 +746,7 @@ void clr_free(t_clr *obj)
     }
 }
 
-static int classloader(char *dirname, char *classname)
+static int classloader(char *dirname, char *classname, char *altname)
 {
     t_clr_class *clr_class = NULL;
     t_symbol *classsym;
@@ -632,12 +755,14 @@ static int classloader(char *dirname, char *classname)
     MonoMethod *method;
     int flags = CLASS_DEFAULT;
 
+    char *realname;
     char dirbuf[MAXPDSTRING],*nameptr;
     // search for classname.dll in the PD path
     int fd;
-    if ((fd = open_via_path(dirname, classname, "." DLLEXT, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-        // not found
-        goto bailout;
+    if ((fd = open_via_path(dirname, realname = classname, "." DLLEXT, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+        if (!altname || (fd = open_via_path(dirname, realname = altname, "." DLLEXT, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+            // not found
+            goto bailout;
 
     // found
     close(fd);
@@ -648,7 +773,7 @@ static int classloader(char *dirname, char *classname)
 
     // try to load assembly
     strcat(dirbuf,"/");
-    strcat(dirbuf,classname);
+    strcat(dirbuf,realname);
     strcat(dirbuf,"." DLLEXT);
 
     assembly = mono_domain_assembly_open(monodomain,dirbuf);
@@ -662,7 +787,7 @@ static int classloader(char *dirname, char *classname)
 
     // try to find class
     // "" means no namespace
-	clr_class->mono_class = mono_class_from_name(image,"",classname);
+	clr_class->mono_class = mono_class_from_name(image,"",realname);
 	if(!clr_class->mono_class) {
 		error("Can't find %s class in %s\n",classname,mono_image_get_filename(image));
 		goto bailout;
@@ -779,7 +904,7 @@ void clr_setup(void)
 	if(monodomain) {
         // try to find PureData.dll in the PD path
         char dirbuf[MAXPDSTRING],*nameptr;
-        // search for classname.dll in the PD path
+        // search in the PD path
         int fd;
         if ((fd = open_via_path("",CORELIB,"." DLLEXT,dirbuf,&nameptr,MAXPDSTRING,1)) >= 0) {
             strcat(dirbuf,"/" CORELIB "." DLLEXT);
@@ -807,13 +932,19 @@ void clr_setup(void)
         mono_add_internal_call("PureData.External::PostError(string)",(const void *)PD_PostError);
         mono_add_internal_call("PureData.External::PostVerbose(int,string)",(const void *)PD_PostVerbose);
 
-        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodBang)", (const void *)PD_AddMethodBang);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/Method)", (const void *)PD_AddMethodBang);
         mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodFloat)", (const void *)PD_AddMethodFloat);
         mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodSymbol)", (const void *)PD_AddMethodSymbol);
         mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodPointer)", (const void *)PD_AddMethodPointer);
         mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodList)", (const void *)PD_AddMethodList);
-        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodAnything)", (const void *)PD_AddMethodSelector);
         mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodAnything)", (const void *)PD_AddMethodAnything);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/Method)", (const void *)PD_AddMethodSelBang);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodFloat)", (const void *)PD_AddMethodSelFloat);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodSymbol)", (const void *)PD_AddMethodSelSymbol);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodPointer)", (const void *)PD_AddMethodSelPointer);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodList)", (const void *)PD_AddMethodSelList);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.Symbol,PureData.External/MethodAnything)", (const void *)PD_AddMethodSelAnything);
+        mono_add_internal_call("PureData.External::AddMethod(int,PureData.External/MethodObject)", (const void *)PD_AddMethodObject);
 
         mono_add_internal_call("PureData.Internal::AddInlet(void*,PureData.Symbol,PureData.Symbol)", (const void *)PD_AddInletAlias);
         mono_add_internal_call("PureData.Internal::AddInlet(void*,single&)", (const void *)PD_AddInletFloat);
@@ -831,6 +962,7 @@ void clr_setup(void)
         mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Atom)", (const void *)PD_OutletAtom);
         mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Symbol,PureData.AtomList)", (const void *)PD_OutletAnything);
         mono_add_internal_call("PureData.Internal::Outlet(void*,int,PureData.Symbol,PureData.Atom[])", (const void *)PD_OutletAnything2);
+        mono_add_internal_call("PureData.Internal::OutletEx(void*,int,object)", (const void *)PD_OutletObject);
 
 //        mono_add_internal_call("PureData.Internal::Bind(void*,PureData.Symbol)", (const void *)PD_Bind);
 //        mono_add_internal_call("PureData.Internal::Unbind(void*,PureData.Symbol)", (const void *)PD_Unbind);
@@ -838,6 +970,7 @@ void clr_setup(void)
         mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Atom)", (const void *)PD_SendAtom);
         mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Symbol,PureData.AtomList)", (const void *)PD_SendAnything);
         mono_add_internal_call("PureData.External::Send(PureData.Symbol,PureData.Symbol,PureData.Atom[])", (const void *)PD_SendAnything2);
+        mono_add_internal_call("PureData.External::SendEx(PureData.Symbol,object)", (const void *)PD_SendObject);
 
         // load important classes
         clr_symbol = mono_class_from_name(image,"PureData","Symbol");
@@ -866,6 +999,7 @@ void clr_setup(void)
 
         // static objects to avoid allocation at method call time
         clr_objarr_1 = mono_array_new(monodomain,mono_get_object_class(),1);
+        clr_objarr_2 = mono_array_new(monodomain,mono_get_object_class(),2);
         clr_objarr_3 = mono_array_new(monodomain,mono_get_object_class(),3);
         clr_obj_int = mono_object_new(monodomain,mono_get_int32_class());
         clr_obj_single = mono_object_new(monodomain,mono_get_single_class());
@@ -883,8 +1017,11 @@ void clr_setup(void)
         proxy_class = class_new(gensym("clr proxy"),NULL,NULL,sizeof(t_proxy),CLASS_PD|CLASS_NOINLET,A_NULL);
         class_addanything(proxy_class,clr_method_proxy);
 
+        // symbol for Mono object handling
+        sym_object = gensym("clr-object");
+
         // install loader hook
-        sys_loader(classloader);
+        sys_register_loader(classloader);
 
         // ready!
 	    post("CLR extension - (c)2006 Davide Morelli, Thomas Grill");

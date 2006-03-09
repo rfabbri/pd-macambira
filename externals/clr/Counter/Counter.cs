@@ -6,104 +6,76 @@ using System;
 public class Counter:
 	PureData.External
 {
-    PureData.Atom[] args;
-
-    float farg;
+    int i_count,i_down,i_up;
+    float step;
 
     public Counter(PureData.AtomList args)
 	{
-        Post("Count.ctor "+args.ToString());
+	    this.step = args.Count >= 3?(float)args[2]:1;
+        
+        float f2 = args.Count >= 2?(float)args[1]:0;
+        float f1 = args.Count >= 1?(float)args[0]:0;
 
-        // that's the way to store args (don't just copy an AtomList instance!!)
-        this.args = (PureData.Atom[])args;
+        if(args.Count < 2) f2 = f1;
+        
+        this.i_down = (int)((f1<f2)?f1:f2);
+        this.i_up = (int)((f1>f2)?f1:f2);
+        
+	    this.i_count = this.i_down;
 
-//        AddInlet(s_list,new PureData.Symbol("list2"));
-        AddInlet();
-        AddInlet(ref farg);
-        AddInlet();
-        AddOutletBang();
+        AddInlet(_list,new PureData.Symbol("bound"));
+        AddInlet(ref step);
+
+        AddOutlet(_float);
+        AddOutlet(_bang);
     }
 
 	// this function MUST exist
-	// returns void or ClassType
-	private static ClassType Setup(Counter obj)
+	private static void Setup(Counter obj)
 	{
-	    AddMethod(0,new MethodBang(obj.MyBang));
-        AddMethod(0,new MethodFloat(obj.MyFloat));
-        AddMethod(0,new MethodSymbol(obj.MySymbol));
-        AddMethod(0,new MethodList(obj.MyList));
-        AddMethod(0,"set",new MethodAnything(obj.MySet));
-        AddMethod(0,"send",new MethodAnything(obj.MySend));
-        AddMethod(0,new MethodAnything(obj.MyAnything));
-        AddMethod(1,new MethodFloat(obj.MyFloat1));
-        AddMethod(1,new MethodAnything(obj.MyAny1));
-
-        Post("Count.Main");
-        return ClassType.Default;
+	    AddMethod(0,new Method(obj.Bang));
+        AddMethod(0,"reset",new Method(obj.Reset));
+        AddMethod(0,"set",new MethodFloat(obj.Set));
+        AddMethod(0,"bound",new MethodList(obj.Bound));
 	}
 
-    protected virtual void MyBang() 
-    { 
-        Post("Count-BANG "+farg.ToString()); 
-        Outlet(0);
-    }
-
-    protected virtual void MyFloat(float f) 
-    { 
-        Post("Count-FLOAT "+f.ToString()); 
+    protected void Bang() 
+    {
+        float f = this.i_count;
+        int step = (int)this.step;
+        this.i_count += step;
+        
+        if(this.i_down-this.i_up != 0) {
+            if(step > 0 && this.i_count > this.i_up) {
+                this.i_count = this.i_down;
+                Outlet(1);
+            }
+            else if(this.i_count < this.i_down) {
+                this.i_count = this.i_up;
+                Outlet(1);
+            }
+        }
+        
         Outlet(0,f);
     }
 
-    protected virtual void MyFloat1(float f) 
+    protected void Reset() 
     { 
-        Post("Count-FLOAT1 "+f.ToString()); 
+        this.i_count = this.i_down;
     }
 
-    protected virtual void MyAny1(int ix,PureData.Symbol s,PureData.AtomList l) 
+    protected void Set(float f) 
     { 
-        Post(ix.ToString()+": Count-ANY1 "+l.ToString()); 
+        this.i_count = (int)f;
     }
 
-    protected virtual void MySymbol(PureData.Symbol s) 
+    protected void Bound(PureData.AtomList args) 
     { 
-        Post("Count-SYMBOL "+s.ToString()); 
-        Outlet(0,s);
+        float f1 = (float)args[0];
+        float f2 = (float)args[1];
+        
+        this.i_down = (int)((f1<f2)?f1:f2);
+        this.i_up = (int)((f1>f2)?f1:f2);
     }
 
-    protected virtual void MyList(PureData.AtomList l) 
-    { 
-        Post("Count-LIST "+l.ToString()); 
-        Outlet(0,l);
-    }
-
-    protected virtual void MySet(int ix,PureData.Symbol s,PureData.AtomList l) 
-    { 
-        Post("Count-SET "+l.ToString()); 
-        Outlet(0,new PureData.Symbol("set"),l);
-    }
-
-    protected virtual void MySend(int ix,PureData.Symbol s,PureData.AtomList l) 
-    { 
-        Send(new PureData.Symbol("receiver"),l);
-        Send(new PureData.Symbol("receiver2"),(PureData.Atom[])l);
-    }
-
-    protected virtual void MyAnything(int ix,PureData.Symbol s,PureData.AtomList l) 
-    { 
-        Post(ix.ToString()+": Count-("+s.ToString()+") "+l.ToString()); 
-        Outlet(0,s,l);
-    }
-    /*
-	public void SendOut()
-	{
-		pd.SendToOutlet(x, 0, new Atom(curr));
-	}
-
-	public void Sum(float f)
-	{
-		curr += (int) f;
-		pd.SendToOutlet(x, 0, new Atom(curr));
-	}
-
-*/
 }

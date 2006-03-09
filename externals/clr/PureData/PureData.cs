@@ -64,6 +64,9 @@ namespace PureData
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         internal extern static void Outlet(void *obj,int n,Symbol s,Atom[] l);
 
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        internal extern static void Outlet(void *obj,int n,object o);
+
         // --------------------------------------------------------------------------
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
@@ -120,17 +123,18 @@ namespace PureData
 
         // --------------------------------------------------------------------------
 
-        protected delegate void MethodBang();
+        protected delegate void Method();
         protected delegate void MethodFloat(float f);
         protected delegate void MethodSymbol(Symbol s);
         protected delegate void MethodPointer(Pointer p);
         protected delegate void MethodList(AtomList lst);
         protected delegate void MethodAnything(int inlet,Symbol tag,AtomList lst);
+        protected delegate void MethodObject(int inlet,object o);
 
         // --------------------------------------------------------------------------
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
-        protected extern static void AddMethod(int inlet,MethodBang m);
+        protected extern static void AddMethod(int inlet,Method m);
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         protected extern static void AddMethod(int inlet,MethodFloat m);
@@ -145,12 +149,35 @@ namespace PureData
         protected extern static void AddMethod(int inlet,MethodList m);
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,MethodAnything m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,Symbol sel,Method m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,Symbol sel,MethodFloat m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,Symbol sel,MethodSymbol m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,Symbol sel,MethodPointer m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void AddMethod(int inlet,Symbol sel,MethodList m);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
         protected extern static void AddMethod(int inlet,Symbol sel,MethodAnything m);
 
+        protected static void AddMethod(int inlet,string sel,Method m) { AddMethod(inlet,new Symbol(sel),m); }
+        protected static void AddMethod(int inlet,string sel,MethodFloat m) { AddMethod(inlet,new Symbol(sel),m); }
+        protected static void AddMethod(int inlet,string sel,MethodSymbol m) { AddMethod(inlet,new Symbol(sel),m); }
+        protected static void AddMethod(int inlet,string sel,MethodPointer m) { AddMethod(inlet,new Symbol(sel),m); }
+        protected static void AddMethod(int inlet,string sel,MethodList m) { AddMethod(inlet,new Symbol(sel),m); }
         protected static void AddMethod(int inlet,string sel,MethodAnything m) { AddMethod(inlet,new Symbol(sel),m); }
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
-        protected extern static void AddMethod(int inlet,MethodAnything m);
+        protected extern static void AddMethod(int inlet,MethodObject m);
 
         // --------------------------------------------------------------------------
 
@@ -184,6 +211,8 @@ namespace PureData
         protected void Outlet(int n,Symbol s,AtomList l) { Internal.Outlet(ptr,n,s,l); }
         protected void Outlet(int n,Symbol s,Atom[] l) { Internal.Outlet(ptr,n,s,l); }
 
+        protected void OutletEx(int n,object o) { Internal.Outlet(ptr,n,o); }
+
         // --------------------------------------------------------------------------
 
         // bind to symbol
@@ -206,5 +235,8 @@ namespace PureData
 
         [MethodImplAttribute (MethodImplOptions.InternalCall)]
         protected extern static void Send(Symbol sym,Symbol s,Atom[] l);
+
+        [MethodImplAttribute (MethodImplOptions.InternalCall)]
+        protected extern static void SendEx(Symbol sym,object o);
     }
 }
