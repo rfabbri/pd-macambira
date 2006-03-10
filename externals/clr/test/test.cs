@@ -95,6 +95,7 @@ public class test:
     protected virtual void MyObject(int ix,object obj) 
     { 
         Post("OBJECT "+obj.ToString());
+        OutletEx(0,obj);
     }
 
     protected virtual void MyAnything(int ix,PureData.Symbol s,PureData.AtomList l) 

@@ -29,19 +29,23 @@ extern "C" {
 #include <vector>
 #include <list>
 
+
+// main class library
 #define CORELIB "PureData"
 #define DLLEXT "dll"
 
+// symbol for inter-object messages
+#define SYM_OBJECT "clr-object"
+
+static t_symbol *sym_object;
+
 
 // cached mono data
-
 static MonoDomain *monodomain;
 static MonoClass *clr_symbol,*clr_pointer,*clr_atom,*clr_atomlist,*clr_external;
 static MonoMethodDesc *clr_desc_tostring,*clr_desc_ctor;
 static MonoMethod *clr_meth_invoke;
 static MonoProperty *clr_prop_method;
-
-static t_symbol *sym_object;
 
 
 struct AtomList
@@ -55,9 +59,9 @@ struct AtomList
 // transforms a pointer (like MonoObject *) into a 3 element-list
 struct ObjectAtom
 {
-    enum { size = 3,bitshift = 22 };
-
     // 64-bit safe...
+    enum { bitshift = 22,size = sizeof(void*)*8/bitshift+1 };
+
     t_atom msg[size];
 
     ObjectAtom() {}
@@ -119,7 +123,9 @@ struct Delegate
     inline void init(MonoObject *method,Kind k) 
     {
         methodinfo = mono_property_get_value(clr_prop_method,method,NULL,NULL);
+        assert(methodinfo);
         virtmethod = mono_object_get_virtual_method(methodinfo,clr_meth_invoke);
+        assert(virtmethod);
         kind = k;
     }
 
@@ -1021,7 +1027,7 @@ void clr_setup(void)
         class_addanything(proxy_class,clr_method_proxy);
 
         // symbol for Mono object handling
-        sym_object = gensym("clr-object");
+        sym_object = gensym(SYM_OBJECT);
 
         // install loader hook
         sys_register_loader(classloader);
