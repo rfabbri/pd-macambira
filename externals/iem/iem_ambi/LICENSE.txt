@@ -1,4 +1,4 @@
-iem_ambi - ambisonic encoder, rotation and decoder rendering
+iem_ambi - dynamic library for pd; render ambisonic encoder, rotation and decoder
 
 Copyright (C) 2000-2006 Thomas MUSIL [musil_at_iem.at]
 
