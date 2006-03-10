@@ -1,0 +1,52 @@
+current: all
+
+.SUFFIXES: .pd_linux
+
+INCLUDE = -I. -I/usr/local/src/pd/src
+
+LDFLAGS = -export-dynamic -shared
+LIB = -ldl -lm -lpthread
+
+#select either the DBG and OPT compiler flags below:
+
+CFLAGS = -DPD -DUNIX -W -Werror -Wno-unused \
+	-Wno-parentheses -Wno-switch -O6 -funroll-loops -fomit-frame-pointer \
+        -DDL_OPEN
+
+SYSTEM = $(shell uname -m)
+
+# the sources
+
+SRC = ambi_decode.c \
+	ambi_decode2.c \
+	ambi_decode3.c \
+	ambi_decode_cube.c \
+	ambi_encode.c \
+	ambi_rot.c \
+	iem_ambi.c
+
+TARGET = iem_ambi.pd_linux
+
+
+OBJ = $(SRC:.c=.o) 
+
+#
+#  ------------------ targets ------------------------------------
+#
+
+clean:
+	rm $(TARGET)
+	rm *.o
+
+all: $(OBJ)
+	@echo :: $(OBJ)
+	ld $(LDFLAGS) -o $(TARGET) *.o $(LIB)
+	strip --strip-unneeded $(TARGET)
+
+$(OBJ) : %.o : %.c
+	touch $*.c
+	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
+
+
+
+
