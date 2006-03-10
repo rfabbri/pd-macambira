@@ -820,5 +820,5 @@ void ambi_decode2_setup(void)
 	class_addmethod(ambi_decode2_class, (t_method)ambi_decode2_ambi_weight, gensym("ambi_weight"), A_GIMME, 0);
 	class_addmethod(ambi_decode2_class, (t_method)ambi_decode2_sing_range, gensym("sing_range"), A_DEFFLOAT, 0);
 	class_addmethod(ambi_decode2_class, (t_method)ambi_decode2_pseudo_inverse, gensym("pseudo_inverse"), A_GIMME, 0);
-	class_sethelpsymbol(ambi_decode2_class, gensym("iemhelp2/help-ambi_decode2"));
+	class_sethelpsymbol(ambi_decode2_class, gensym("iemhelp2/ambi_decode2-help"));
 }

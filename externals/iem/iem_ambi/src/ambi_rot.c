@@ -1530,5 +1530,5 @@ void ambi_rot_setup(void)
 					 sizeof(t_ambi_rot), 0, A_DEFFLOAT, 0);
 	class_addfloat(ambi_rot_class, (t_method)ambi_rot_float);
 		class_addlist(ambi_rot_class, (t_method)ambi_rot_list);
-	class_sethelpsymbol(ambi_rot_class, gensym("iemhelp2/help-ambi_rot"));
+	class_sethelpsymbol(ambi_rot_class, gensym("iemhelp2/ambi_rot-help"));
 }

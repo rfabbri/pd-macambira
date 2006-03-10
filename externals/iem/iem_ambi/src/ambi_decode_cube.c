@@ -795,5 +795,5 @@ void ambi_decode_cube_setup(void)
 	class_addmethod(ambi_decode_cube_class, (t_method)ambi_decode_cube_mirror_weight, gensym("mirror_weight"), A_DEFFLOAT, 0);
 	class_addmethod(ambi_decode_cube_class, (t_method)ambi_decode_cube_mirror_range, gensym("mirror_range"), A_DEFFLOAT, A_DEFFLOAT, 0);
 	class_addmethod(ambi_decode_cube_class, (t_method)ambi_decode_cube_real_sum_range, gensym("real_sum_range"), A_DEFFLOAT, A_DEFFLOAT, 0);
-	class_sethelpsymbol(ambi_decode_cube_class, gensym("iemhelp/help-ambi_decode_cube"));
+	class_sethelpsymbol(ambi_decode_cube_class, gensym("iemhelp/ambi_decode_cube-help"));
 }
