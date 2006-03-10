@@ -5,7 +5,7 @@ current: all
 INCLUDE = -I. -I/usr/local/src/pd/src
 
 LDFLAGS = -export-dynamic -shared
-LIB = -ldl -lm -lpthread
+LIB = -ldl -lm
 
 #select either the DBG and OPT compiler flags below:
 
@@ -71,12 +71,11 @@ clean:
 
 all: $(OBJ)
 	@echo :: $(OBJ)
-	ld $(LDFLAGS) -o $(TARGET) *.o $(LIB)
+	$(LD) $(LDFLAGS) -o $(TARGET) *.o $(LIB)
 	strip --strip-unneeded $(TARGET)
 
 $(OBJ) : %.o : %.c
-	touch $*.c
-	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
+	$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
 
 
