@@ -1,0 +1,45 @@
+#N canvas 115 92 856 560 10;
+#N canvas 0 0 450 300 graph1 0;
+#X array src 100 float 1;
+#A 0 0 0 0 0 0 0 0 0 0 0.9 0 0 0 0 0 0 0 0 0 0.9 0 0 0 0 0 0 0 0 0
+0.9 0 0 0 0 0 0 0 0 0 0.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0;
+#X coords 0 1 99 0 200 140 1;
+#X restore 527 176 graph;
+#N canvas 0 0 450 300 graph1 0;
+#X array dst 100 float 0;
+#X coords 0 10 99 0 200 140 1;
+#X restore 527 325 graph;
+#X obj 61 106 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 59 310 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 45 185 dst-onset;
+#X text 211 306 1.arg: <symbol> source-name;
+#X msg 255 235 dst dst;
+#X msg 159 229 src src;
+#X text 45 175 src-onset;
+#X text 211 319 2.arg: <symbol> destination-name;
+#X obj 59 271 tab_gt_scalar src dst;
+#X obj 61 78 tab_counter src dst;
+#X msg 125 37 reset;
+#X msg 504 103 \; src const 0;
+#X msg 417 101 \; src \$1 0.9;
+#X floatatom 418 74 5 0 0 0 - - -;
+#X obj 53 33 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 48 228 0 0 100;
+#X text 46 195 n samples to control n counters;
+#X text 33 161 list of 3 floats:;
+#X text 212 22 <bang> controls with src-array the counter-state of
+dst-array (0 = reset counter \, 1 = increment counter);
+#X text 213 47 only the minimum-size of arrays;
+#X connect 6 0 10 0;
+#X connect 7 0 10 0;
+#X connect 10 0 3 0;
+#X connect 11 0 2 0;
+#X connect 12 0 11 0;
+#X connect 15 0 14 0;
+#X connect 16 0 11 0;
+#X connect 17 0 10 0;

@@ -1,0 +1,63 @@
+#N canvas 116 92 812 439 10;
+#X obj 60 52 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 31 195 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 176 168 1.arg: <symbol> source-name;
+#X floatatom 94 236 5 0 0 0 - - -;
+#X floatatom 143 237 5 0 0 0 - - -;
+#X text 163 60 to the end of array;
+#X text 89 50 <bang> calculate max. and max_index from zero-onset;
+#X msg 88 78 src src;
+#X msg 172 91 amp_sort;
+#X msg 178 114 freq_sort;
+#X obj 60 166 tab_find_peaks src;
+#X floatatom 198 235 5 0 0 0 - - -;
+#X obj 51 288 pack 0 0 0;
+#X obj 51 311 print;
+#X msg 253 90 abs_min_height_diff 10;
+#X text 69 249 sort_index;
+#X text 204 246 amp;
+#X text 147 251 index;
+#N canvas 0 0 450 300 graph1 0;
+#X array src 100 float 1;
+#A 0 9.99997 9.28569 9.28569 10.7143 7.14284 7.85712 8.5714 39 10 11
+38 8.5714 7.85712 8.5714 9.28569 8.5714 9.99997 39 40 41 38 12.8571
+12.8571 14.2857 12.8571 11.4285 12.1428 11.4285 9.99997 10.7143 11.4285
+9.99997 9.28569 9.28569 9.99997 10.7143 10.7143 45 9.99997 9.99997
+10.7143 11.4285 12.1428 10.7143 11.4285 12.1428 11.4285 46 11.4285
+11.4285 11.4285 12.1428 12.8571 11.4285 11.4285 12.1428 12.8571 12.1428
+12.1428 12.1428 12.1428 12.1428 11.4285 11.4285 11.4285 11.4285 10.7143
+48 49 43 11.4285 12.1428 13.5714 15 13.5714 13.5714 14.2857 14.2857
+15 15 14.2857 14.2857 14.2857 15 15 15.7142 15.7142 51 53 15 15 15
+15 15 14.2857 14.2857 15 15.7142 16.4285 16.4285;
+#X coords 0 100 99 0 200 140 1;
+#X restore 442 95 graph;
+#X msg 262 123 max_peaks 9;
+#X text 20 211 ready;
+#X msg 270 150 width_range 1 4;
+#N canvas 0 0 454 304 init 0;
+#X msg 233 52 \; src const 0;
+#X msg 234 94 \; src 37 45;
+#X msg 236 133 \; src 47 46;
+#X msg 187 177 \; src 67 48 49 43;
+#X msg 180 218 \; src 87 51 53;
+#X msg 44 223 \; src 7 39 10 11 38;
+#X msg 50 181 \; src 17 39 40 41 38;
+#X restore 450 267 pd init;
+#X text 21 6 tab_find_peaks;
+#X connect 0 0 10 0;
+#X connect 7 0 10 0;
+#X connect 8 0 10 0;
+#X connect 9 0 10 0;
+#X connect 10 0 1 0;
+#X connect 10 1 3 0;
+#X connect 10 1 12 0;
+#X connect 10 2 4 0;
+#X connect 10 2 12 1;
+#X connect 10 3 11 0;
+#X connect 10 3 12 2;
+#X connect 12 0 13 0;
+#X connect 14 0 10 0;
+#X connect 19 0 10 0;
+#X connect 21 0 10 0;
