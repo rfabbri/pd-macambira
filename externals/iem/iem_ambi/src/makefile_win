@@ -21,12 +21,12 @@ PD_WIN_LIB = /NODEFAULTLIB:libc /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel /NOD
 
 
 SRC =	ambi_decode.c \
-		ambi_decode2.c \
-		ambi_decode3.c \
-		ambi_decode_cube.c \
-		ambi_encode.c \
-		ambi_rot.c \
-		iem_ambi.c
+	ambi_decode2.c \
+	ambi_decode3.c \
+	ambi_decode_cube.c \
+	ambi_encode.c \
+	ambi_rot.c \
+	iem_ambi.c
 
 
 OBJ = $(SRC:.c=.obj)
