@@ -40,12 +40,11 @@ clean:
 
 all: $(OBJ)
 	@echo :: $(OBJ)
-	ld $(LDFLAGS) -o $(TARGET) *.o $(LIB)
+	$(LD) $(LDFLAGS) -o $(TARGET) *.o $(LIB)
 	strip --strip-unneeded $(TARGET)
 
 $(OBJ) : %.o : %.c
-	touch $*.c
-	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
+	$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
 
 
