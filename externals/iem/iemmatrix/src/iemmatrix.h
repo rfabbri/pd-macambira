@@ -41,6 +41,9 @@
 # ifndef MSW
 #  define MSW
 # endif
+# ifndef NT
+#  define NT
+# endif
 
 # pragma warning( disable : 4244 )
 # pragma warning( disable : 4305 )
@@ -63,11 +66,24 @@
 # define fabsf fabs
 # define sqrtf sqrt
 # define powf pow
+#endif
 
+#ifdef __APPLE__
+# include <AvailabilityMacros.h>
+# if defined (MAC_OS_X_VERSION_10_3) && MAC_OS_X_VERSION_MAX_ALLOWED  >= MAC_OS_X_VERSION_10_3
+# else
+//float intrinsics not in math.h, so we define them here
+#  define sqrtf(v)    (float)sqrt((double)(v))
+#  define cosf(v)     (float)cos((double)(v))
+#  define sinf(v)     (float)sin((double)(v))
+#  define tanf(v)     (float)tan((double)(v))
+#  define logf(v)     (float)log((double)(v))
+#  define expf(v)     (float)exp((double)(v))
+#  define atan2f(v,p) (float)atan2((double)(v), (double)(p))
+#  define powf(v,p)   (float)pow((double)(v), (double)(p))
 #endif
 
 typedef double t_matrixfloat;
-
 
 /* the main class...*/
 typedef struct _matrix
