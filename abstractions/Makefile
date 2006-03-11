@@ -32,7 +32,7 @@ final_setup:
 install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
 gyre_install keyboardkeys_install la_install-kitchen list-abs_install memento_install \
 nusmuk_install nqpoly_install parazit_install pddp_install pixeltango_install \
-rradical_install
+purepd_install rradical_install
 	@echo " "
 	@echo "abstractions install succeeded!"
 
@@ -235,6 +235,16 @@ pixeltango_install:
 		$(manualsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
 		$(manualsdir)/$(PIXELTANGO_NAME)
+
+
+
+#-------------------------------------------------------------------------------
+# PUREPD
+PUREPD_NAME = purepd
+purepd_install:
+	install -d $(objectsdir)/$(PUREPD_NAME)
+	install -p $(abstractions_src)/purepd/*.pd \
+		 $(objectsdir)/$(PUREPD_NAME)
 
 
 
