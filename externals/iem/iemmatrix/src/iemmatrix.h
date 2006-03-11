@@ -81,6 +81,7 @@
 #  define expf(v)     (float)exp((double)(v))
 #  define atan2f(v,p) (float)atan2((double)(v), (double)(p))
 #  define powf(v,p)   (float)pow((double)(v), (double)(p))
+# endif
 #endif
 
 typedef double t_matrixfloat;
