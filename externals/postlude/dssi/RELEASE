@@ -1,3 +1,8 @@
+0.89
+
+-Added support for LADSPA plugins mostly using code from plugin~
+-Reorganised inlet/outlet structure
+
 0.83
 
 -Added FluidSynth-DSSI patch load support (i.e. soundfonts)

@@ -41,7 +41,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.83
+#define VERSION 0.89
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
@@ -52,7 +52,126 @@
 #define ASCII_b 98
 
 #define LOADGUI 1 /* FIX: depracate this */
-#define DEBUG 0
+#define DEBUG 1
 #ifdef DEBUG
 	#define CHECKSUM_PATCH_FILES_ON_LOAD 1
 #endif
+
+#ifndef MIN
+#define MIN(a,b) ((a)<(b)?(a):(b))
+#endif
+
+
+/*From dx7_voice.h by Sean Bolton */
+
+typedef struct _dx7_patch_t {
+	uint8_t data[128];
+} dx7_patch_t;
+
+typedef struct _dssi_instance {
+   
+   long             currentBank;
+   long             currentProgram;
+   int              pendingBankLSB;
+   int              pendingBankMSB;
+   int              pendingProgramChange;
+   
+   int plugin_ProgramCount;
+   DSSI_Program_Descriptor *pluginPrograms;
+
+   lo_address       uiTarget; /*osc stuff */
+   int              ui_hidden;
+   int              ui_show;
+   int              uiNeedsProgramUpdate;
+   char            *ui_osc_control_path;
+   char            *ui_osc_configure_path;
+   char            *ui_osc_program_path;
+   char            *ui_osc_show_path;
+   char            *ui_osc_hide_path;
+   char            *ui_osc_quit_path;
+   
+   int *plugin_PortControlInNumbers; /*not sure if this should go here?*/
+  
+   char *osc_url_path;
+   pid_t	gui_pid;
+   
+} t_dssi_instance;
+
+struct dssi_configure_pair {
+	t_int instance;
+	char *key,
+	     *value;
+	struct dssi_configure_pair *next;
+}; 
+
+typedef struct dssi_configure_pair t_dssi_configure_pair;
+
+typedef struct _port_info {
+	t_atom type,
+	       data_type,
+	       name,
+	       lower_bound,
+	      upper_bound,
+	      p_default;
+} t_port_info;
+
+typedef struct _dssi_tilde {
+  t_object  x_obj;
+  t_int is_DSSI;
+  const char *dll_arg,  /*arg given by user - either path or dll name*/
+       	     *plugin_label;
+  char	     *dll_path; /*absolute path to plugin */
+  void *dll_handle;
+  char *dir; /* project dircetory */
+  LADSPA_Handle *instanceHandles; /*was handle*/
+  t_dssi_instance *instances; 
+  int n_instances;
+  unsigned long *instanceEventCounts;
+  snd_seq_event_t **instanceEventBuffers;
+
+snd_seq_event_t midiEventBuf[EVENT_BUFSIZE];
+/*static snd_seq_event_t **instanceEventBuffers;*/
+int bufWriteIndex, bufReadIndex;
+pthread_mutex_t midiEventBufferMutex;
+/*static pthread_mutex_t listHandlerMutex = PTHREAD_MUTEX_INITIALIZER;*/
+   
+  DSSI_Descriptor_Function desc_func;
+  DSSI_Descriptor *descriptor;
+  
+  t_port_info *port_info;
+  
+  t_int	ports_in, ports_out, ports_controlIn, ports_controlOut;
+  t_int plugin_ins;/* total audio input ports for plugin*/
+  t_int plugin_outs;/* total audio output ports plugin*/
+  t_int plugin_controlIns;/* total control input ports*/
+  t_int plugin_controlOuts;/* total control output ports */
+
+  unsigned long *plugin_ControlInPortNumbers; /*Array of input port numbers for the plugin */
+
+  t_float **plugin_InputBuffers, **plugin_OutputBuffers; /* arrays of arrays for buffering audio for each audio port */
+  t_float *plugin_ControlDataInput, *plugin_ControlDataOutput; /*arrays for control data for each port (1 item per 'run')*/
+  lo_server_thread osc_thread;
+  char *osc_url_base;
+  char *dll_name;
+  
+  t_int time_ref; /*logical time reference */
+  t_int sr;
+  t_float sr_inv;
+  t_int blksize;
+  t_float f;
+  
+  t_float **outlets, **inlets;
+  t_outlet *control_outlet;
+
+  t_dssi_configure_pair *configure_buffer_head;
+  
+} t_dssi_tilde;
+
+static char *dssi_tilde_send_configure(t_dssi_tilde *x, char *key, 
+		char *value, t_int instance);
+static int osc_message_handler(const char *path, const char *types, 
+		lo_arg **argv, int argc, void *data, void *user_data);
+static LADSPA_Data get_port_default(t_dssi_tilde *x, int port);
+static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x);
+
+

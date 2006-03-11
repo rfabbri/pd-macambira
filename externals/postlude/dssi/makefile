@@ -14,16 +14,23 @@ pd_linux: src/$(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -fPIC -funroll-loops -fomit-frame-pointer \
+#LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow -Wstrict-prototypes -Werror \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+# Debug
+LINUXCFLAGS = -ggdb -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 LINUXINCLUDE =  -I/usr/include -I./include
 
 .c.pd_linux:
-	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
-	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o -lc -lm -llo
-	strip --strip-unneeded $(NAME).pd_linux
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jsearch.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/jload.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/dssi~.c
+	ld -export_dynamic  -shared -o $(NAME).pd_linux dssi~.o jload.o jsearch.o -lc -lm -llo
+#	strip --strip-unneeded $(NAME).pd_linux
 	rm -f *.o
 
 # ----------------------- Mac OSX -----------------------
