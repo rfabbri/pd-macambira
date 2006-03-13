@@ -13,7 +13,7 @@
 #include "m_pd.h"
 #include <math.h>
 
-inline float FLOAT_CLAMP(float x) { return((x > 1.f) ? 1.f : ( (x < 0.f) ? 0.f : x)); }
+static inline float FLOAT_CLAMP(float x) { return((x > 1.f) ? 1.f : ( (x < 0.f) ? 0.f : x)); }
 
 static inline float TRI_MAX(float v1, float v2, float v3)
 { if (v1 > v2 && v1 > v3) return(v1);
