@@ -9,7 +9,7 @@ diff -u -w -r1.20 s_main.c
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
  
--char pd_version[] = "Pd version 0.39-2\n";
+-char pd_version[] = "Pd version 0.39-2\n"
 -char pd_compiletime[] = __TIME__;
 -char pd_compiledate[] = __DATE__;
 -
@@ -20,7 +20,7 @@ diff -u -w -r1.20 s_main.c
  #include <winbase.h>
  #endif
  
-+char *pd_version;
++char pd_version[256];
 +char pd_compiletime[] = __TIME__;
 +char pd_compiledate[] = __DATE__;
 +
@@ -32,7 +32,7 @@ diff -u -w -r1.20 s_main.c
          return (1);
      sys_afterargparse();                    /* post-argparse settings */
 +	/* build version string from defines in m_pd.h */
-+	asprintf(&pd_version, "Pd version %d.%d-%d%s\n",PD_MAJOR_VERSION,
++	sprintf(pd_version, "Pd version %d.%d-%d%s\n",PD_MAJOR_VERSION,
 +			PD_MINOR_VERSION,PD_BUGFIX_VERSION,PD_TEST_VERSION); 
      if (sys_verbose || sys_version) fprintf(stderr, "%scompiled %s %s\n",
          pd_version, pd_compiletime, pd_compiledate);
