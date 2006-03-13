@@ -11,21 +11,20 @@ THEORA_LIBS =  /usr/lib/libtheora.a /usr/local/lib/libtheora.a /usr/lib/libogg.a
 PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps
 PDP_PIDIP_VERSION = 0.12.20
 MPEG4IP_CFLAGS = 
-CAIRO_CFLAGS = -I/usr/include/cairo/ -I/usr/local/include/cairo/
 
 PDP_PIDIP_DISTRO = /mnt/c/ydegoyon.free.fr/pidip-$(PDP_PIDIP_VERSION)
 PDP_PIDIP_TARBALL = $(PDP_PIDIP_DISTRO).tar.gz
 
 
-PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) $(CAIRO_CFLAGS) \
+PDP_PIDIP_CFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes \
+    -Wall -W -Wstrict-prototypes -fPIC \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
-PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) $(CAIRO_CFLAGS) \
+PDP_PIDIP_CPPFLAGS  = $(MPEG4IP_CFLAGS) $(MAGICK_CFLAGS) $(IMLIB_CFLAGS) \
     -DPD -DX_DISPLAY_MISSING -O2 -funroll-loops -fomit-frame-pointer  -ffast-math \
-    -Wall -W -Wstrict-prototypes \
+    -Wall -W -Wstrict-prototypes -fPIC \
     -Wno-unused -Wno-parentheses -Wno-switch \
     -DPDP_PIDIP_VERSION=\"$(PDP_PIDIP_VERSION)\" -g
 
