@@ -103,16 +103,16 @@ else
         *-*-cygwin*)
                 CFLAGS="$CFLAGS -mno-cygwin -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
 					 LDFLAGS="-Wl,-export_dynamic -shared"
-					 INCLUDES="$INCLUDES -I../../../pd/bin"
+					 INCLUDES="$INCLUDES -I../../../pd/src"
 					 pd_suffix=dll
 					 LIBS="-lc -lm"
 					 ;;
         *-*-mingw*)
                 CFLAGS="$CFLAGS -mms-bitfields -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
 					 LDFLAGS="-shared"
-					 INCLUDES="$INCLUDES -I../../../pd/bin"
+					 INCLUDES="$INCLUDES -I../../../pd/src"
 					 pd_suffix=dll
-					 LIBS="-L../../../pd/bin -lpd -lm -lwsock32"
+					 LIBS="-L../../../pd/bin -L../../../pd/obj -lpd -lm -lwsock32"
 					 ;;
         *-*-darwin*)
                 CFLAGS="$CFLAGS -DUNIX -Wall -Wimplicit -Wunused -Wmissing-prototypes -O3 "
