@@ -79,6 +79,7 @@ Version history:
 - fixed serious bug with clearing values and dirs. e.g. "clrall" and "clrrec" messages.
 - fixed double-free for clearing dirs and values
 - re-introduced a help message
+- fixed bug in nested-dir XML saving
 
 0.2.1:
 - fixed "cntsub"... directories in current directory have been forgotten
