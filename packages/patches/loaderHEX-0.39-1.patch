@@ -107,7 +107,7 @@ diff -u -w -r1.6 s_loader.c
 +          if(altname)
 +            {
 +              if ((fd = open_via_path(dirname, altname, sys_dllextent,
-+                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
++                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0) {
 +
 +                /* next try (alternative_classname)/(alternative_classname).(sys_dllextent) ... */
 +                strncpy(classname2, altname, MAXPDSTRING);
@@ -119,7 +119,7 @@ diff -u -w -r1.6 s_loader.c
 +                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
 +                {
 +                  return 0;
-+                } 
++                } }
 +            }
 +          else
              return (0);
