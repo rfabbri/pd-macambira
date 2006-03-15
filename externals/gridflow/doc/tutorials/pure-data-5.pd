@@ -1,0 +1,108 @@
+#N canvas -235 0 891 673 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 627 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 629 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 482 332 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: send receive netsend netreceive cordless communication
+network TCP/IP UDP internet;
+#X restore 16 633 pd META;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 12 20 DESCRIPTION: Communicating between objects w/out connections
+;
+#X text 13 46 "send" & "receive";
+#X obj 86 223 send invisible-link;
+#X obj 86 248 receive invisible-link;
+#X floatatom 86 273 5 0 0 0 - - -;
+#X msg 86 198 10;
+#X floatatom 266 273 5 0 0 0 - - -;
+#X floatatom 266 203 5 0 0 0 - - -;
+#X obj 266 223 s invisible-link2;
+#X obj 266 248 r invisible-link2;
+#X obj 102 483 r send-from-number;
+#X floatatom 102 508 5 0 0 0 - - -;
+#X floatatom 102 462 5 0 0 0 - - send-from-number;
+#X floatatom 242 462 5 0 0 0 - - -;
+#X obj 242 483 s send-to-number2;
+#X floatatom 242 508 5 0 0 0 - send-to-number2 -;
+#X text 19 385 Note: Many GUI objects have built-in send and receive
+objects. The tag names are specified in the GUI properties. Remeber
+to get the GUI properties Right-Click or Control-Click on the GUI object
+and select "Properties".;
+#X text 453 46 "netsend" & "netreceive";
+#X text 19 575 For more info see: send-help.pd \, receive-help.pd \,
+netsend-help.pd and netreceive-help.pd;
+#X text 459 75 While "send" and "receive" allow you to send messages
+without connecting objects with patch-cords "netsend" and "netreceive"
+do the same but communicate between objects using TCP/IP the internet
+protocol. This means that you can send messages from a patch running
+on one machine to a second patch running on a second machine on the
+same network \, or even over the internet.;
+#X text 19 545 You can also send messages using UDP rather than TCP/IP.
+See "more info" below for details.;
+#X obj 589 292 netreceive 8001;
+#X text 459 185 The first argument of "netreceive" is the port the
+netrecive should listen on. "netsend" can connect to this port from
+other machines. "netreceive" has two outlets. The first outlet sends
+out the messages it receives over network \, and the second argument
+send a "1" when netsend is connected and "0" when netsend disconnects.
+;
+#X obj 589 318 print;
+#X obj 689 318 tgl 16 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X obj 503 563 netsend;
+#X text 459 355 "netsend" is controlled using three messages: "connect"
+\, "disconnect" and "send". "connect" has two arguments \, the host
+or IP and the port number you wish to connect to. There needs to be
+a "netreceive" listening on the port you connect to. "disconnect" drops
+the current connection. "send" sends any arguments to the "netreceive"
+over the network. The single outlet of "netsend" prints "1" when a
+connection is made and "0" when the connection is lost.;
+#X obj 503 586 tgl 16 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X msg 503 486 connect localhost 8001;
+#X msg 516 511 disconnect;
+#X msg 525 537 send hello from the internet;
+#X text 602 510 Close connection;
+#X text 673 486 Connect to this machine;
+#X text 733 536 Send message;
+#X text 19 75 In some cases you will want to send messages without
+connecting objects. You may be sending one message to many different
+places that would make connections too laborious. "send" and "receive"
+both have a single argument. This argument is the tag name for the
+communication. "send" will always send any messages it gets in it inlet
+to any number of "receive" objects in a patch with the same tag name.
+"s" and "r" can be used in the place of "send" and "receive".;
+#X obj 86 336 s broadcast;
+#X floatatom 86 317 5 0 0 0 - - -;
+#X obj 176 316 r broadcast;
+#X floatatom 176 339 5 0 0 0 - - -;
+#X obj 266 316 r broadcast;
+#X floatatom 266 339 5 0 0 0 - - -;
+#X text 12 8 5 Intermediate Pure-Data - send and receive;
+#X msg 585 598 send \$1;
+#X floatatom 584 567 5 0 0 0 - - -;
+#X text 651 596 send variables to another computer;
+#X connect 9 0 10 0;
+#X connect 11 0 8 0;
+#X connect 13 0 14 0;
+#X connect 15 0 12 0;
+#X connect 16 0 17 0;
+#X connect 19 0 20 0;
+#X connect 27 0 29 0;
+#X connect 27 1 30 0;
+#X connect 31 0 33 0;
+#X connect 34 0 31 0;
+#X connect 35 0 31 0;
+#X connect 36 0 31 0;
+#X connect 42 0 41 0;
+#X connect 43 0 44 0;
+#X connect 45 0 46 0;
+#X connect 48 0 31 0;
+#X connect 49 0 48 0;

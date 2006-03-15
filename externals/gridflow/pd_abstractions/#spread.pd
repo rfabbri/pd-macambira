@@ -2,7 +2,7 @@
 #X obj 17 12 inlet;
 #X obj 17 52 # & 0;
 #X obj 17 72 # + 5;
-#X obj 17 92 #! rand;
+#X obj 17 92 # rand;
 #X obj 17 112 # - 2;
 #X obj 137 162 # +;
 #X obj 124 68 # >> 1;

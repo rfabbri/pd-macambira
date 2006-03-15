@@ -1,0 +1,98 @@
+#N canvas 0 207 762 514 10;
+#X obj 470 287 display;
+#X obj 7 6 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 7 -29 cnv 15 970 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 7 -29 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 12 661 cnv 15 970 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 20 668 GridFlow 0.8.0;
+#X text 10 6 1.1 What is a grid?;
+#X text 12 -22 1 Introduction to Grids;
+#X text 10 333 GridFlow can create a grid from a list of numbers. The
+[#import] object permits you to set the desired amount of rows and
+columns. A message box permits you to tell the grid which numbers to
+display.;
+#X msg 473 429 3 3 # 6 1 3 6 3 324 6 3 4;
+#X msg 550 169 reset;
+#X msg 494 475 3 3 # 1 0 0 0;
+#X obj 474 572 display;
+#X obj 9 307 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 12 307 1.2 How to create a grid.;
+#X obj 9 307 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 13 307 1.2 How to create a grid using the [#import] object.
+;
+#X text 10 427 1 - Create a list of numbers using a message box. The
+numbers must be seperated by a space. The list can have as many numbers
+as you want but only the amount defined by [#import] will be displayed.
+As you click on the message box the numbers will appear in the grid.
+The numbers are positioned in the grid from left to right and from
+the top to the bottom.;
+#X text 12 605 3 - Connect the objects to a [display] object or a [print]
+object to see the resulting grid. You don't have to "see" the grid
+in order to manipulate it.;
+#X text 558 306 display object;
+#N canvas 0 0 450 300 META 0;
+#X restore 921 616 pd META;
+#X obj 457 6 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 460 6 1.2 How to create a grid.;
+#X obj 457 6 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 663 43 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 469 238 cnv 15 92 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 469 237 #import (3 3);
+#X obj 473 520 cnv 15 37 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 473 519 # + 0;
+#X text 8 267 The following examples illustrate how grids are interpreted
+and represented in GridFlow.;
+#X text 3 402 Steps for creating a grid:;
+#X text 11 537 2 - Create the [#import] object and indicate the parameters
+you want as grid dimensions. By indicating 3 3 in brackets following
+[#import] \, you are creating a grid that has 3 rows and 3 columns.
+This 3 by 3 grid will display 9 numbers.;
+#X text 518 516 works like the [#import] object but allows you to put
+your grid parameters and values into one message box;
+#X text 10 29 A grid is composed of rows and columns that contain numeric
+data. For instance \, a checkerboard is a grid that consists in a series
+of rows and columns containing information: a dark square or a light
+square.;
+#X text 10 91 Computers interpret images as three-dimentional grids:
+the rows (height) and columns (width) contain pixel positions. There
+are usually three channels (depth) of rows and columns. Channels are
+the colours that make up an image. Each channel is a single colour
+\, usually red \, green and blue (RGB). Videos are also interpreted
+as grids since they are a series of still images.;
+#X text 9 194 Because GridFlow uses grids \, images and videos are
+represented as such. GridFlow objects that accept or produce grids
+are identified by the number sign "#" (think of that symbol as a mini
+grid). From now on we will refer to images and videos as grids.;
+#X msg 469 44 1 2 3 4 5 6 7 8 9;
+#X msg 537 107 1 2 3 4;
+#X text 466 6 1.2 Patch example.;
+#X text 471 405 Other objects can create grids...;
+#X text 601 42 <-- step 1: click here to view the numbers from the
+list in a grid.;
+#X text 601 104 <-- click here three times to see how import only outputs
+a grid once it recieves the number of values iassociated with its dimensions
+;
+#X text 602 169 <-- resets the grid to only display the numbers from
+the list;
+#X obj 634 236 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 572 236 <-- step 2: This object creates a grid that is 3 rows
+by 3 columns;
+#X connect 9 0 28 0;
+#X connect 10 0 26 0;
+#X connect 11 0 28 0;
+#X connect 26 0 0 0;
+#X connect 28 0 12 0;
+#X connect 36 0 26 0;
+#X connect 37 0 26 0;

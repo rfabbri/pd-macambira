@@ -1,8 +1,8 @@
 /*
-	$Id: flow_objects_for_image.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: flow_objects_for_image.c,v 1.2 2006-03-15 04:37:08 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002,2003 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -207,7 +207,7 @@ GRID_INLET(GridScaleBy,0) {
 		int p=0;
 		#define LOOP(z) \
 			for (int i=0; i<rowsize; i+=z) \
-			for (int k=0; k<scalex; k++, p+=3)
+			for (int k=0; k<scalex; k++, p+=z)
 		switch (chans) {
 		case 3: LOOP(3) {Z(0);Z(1);Z(2);} break;
 		case 4: LOOP(4) {Z(0);Z(1);Z(2);Z(3);} break;
@@ -476,6 +476,7 @@ GRID_INLET(DrawPolygon,0) {
 		y++;
 	}
 } GRID_END
+
 
 GRID_INPUT(DrawPolygon,1,color) {} GRID_END
 GRID_INPUT(DrawPolygon,2,polygon) {init_lines();} GRID_END

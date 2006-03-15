@@ -1,5 +1,5 @@
 /*
-	$Id: flow_objects_for_matrix.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: flow_objects_for_matrix.c,v 1.2 2006-03-15 04:37:08 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003 by Mathieu Bouchard

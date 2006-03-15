@@ -1,106 +1,106 @@
-#N canvas 19 81 792 565 10;
-#X floatatom 405 212 5 0 0 0 - - -;
-#X obj 347 172 r move;
-#X obj 56 95 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 19 81 792 575 10;
+#X floatatom 398 265 5 0 0 0 - - -;
+#X obj 368 225 r move;
+#X obj 56 129 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 56 128 240 320 3 # 0;
-#X msg 461 357 300;
-#X obj 398 342 # * 300;
-#X obj 311 436 # cos*;
-#X msg 460 319 1600;
-#X msg 513 249 25;
-#X obj 373 212 +;
-#X msg 513 268 100;
-#X obj 504 192 hsl 128 15 100 2600 0 1 empty empty empty -2 -6 0 8
+#X msg 56 162 240 320 3 # 0;
+#X msg 461 407 300;
+#X obj 398 392 # * 300;
+#X obj 261 475 # cos*;
+#X msg 461 369 1600;
+#X msg 513 299 25;
+#X obj 368 263 +;
+#X msg 513 318 100;
+#X obj 505 244 hsl 128 15 100 2600 0 1 empty empty empty -2 -6 0 8
 -260818 -1 -1 2297 1;
-#X text 364 435 make circular orbit of variable radius;
-#X floatatom 502 211 5 0 0 0 - - -;
-#X msg 461 338 800;
-#X text 294 325 frequency of the orbit;
-#X text 500 177 increment;
-#X msg 373 192 1;
-#X obj 64 58 s move;
-#X obj 311 394 #outer + ( 0 9000 );
-#X obj 73 94 loadbang;
-#X obj 19 0 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1;
-#X obj 78 351 #out window;
-#X obj 246 126 # +;
-#X obj 438 299 # + 50;
-#X text 401 197 counter;
-#X obj 19 41 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X text 314 474 make circular orbit of variable radius;
+#X floatatom 502 261 5 0 0 0 - - -;
+#X msg 461 388 800;
+#X text 294 375 frequency of the orbit;
+#X text 501 229 increment;
+#X msg 368 244 1;
+#X obj 58 108 s move;
+#X obj 73 128 loadbang;
+#X obj 19 50 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 75 392 #out window;
+#X obj 186 236 # +;
+#X obj 437 345 # + 50;
+#X text 394 250 counter;
+#X obj 19 91 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 311 458 # + ( 120 160 );
-#X obj 19 309 #store;
-#X text 65 113 blank image to start with;
-#X text 272 127 translate the square;
-#X text 546 247 make a wavy radius (50-100) \; the 1100 is its frequency
+#X obj 261 494 # + ( 120 160 );
+#X obj 19 354 #store;
+#X text 65 147 blank image to start with;
+#X text 212 237 translate the square;
+#X text 546 297 make a wavy radius (50-100) \; the 1100 is its frequency
 \; tune it for fun and profit.;
-#X obj 19 58 t b b;
-#X obj 368 232 t a a a;
-#X msg 246 74 4 2 # -1 -1 -1 1 1 1 1 -1;
-#X obj 19 22 metro 1.367;
-#X obj 8 491 cnv 15 780 30 empty empty empty 20 12 0 14 -200249 -66577
+#X obj 19 108 t b b;
+#X obj 368 282 t a a a;
+#X msg 186 198 4 2 # -1 -1 -1 1 1 1 1 -1;
+#X obj 19 72 metro 1.367;
+#X obj 8 541 cnv 15 780 30 empty empty empty 20 12 0 14 -200249 -66577
 0;
-#X text 16 498 GridFlow 0.8.0;
-#X obj 8 -38 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+#X text 16 548 GridFlow 0.8.0;
+#X obj 8 12 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X text 21 -38 Blob.pd;
-#X msg 514 287 10;
-#X obj 437 257 # * 1000;
-#X obj 101 215 #color;
-#X obj 101 171 loadbang;
-#X text 452 383 duplicate the angle \; make the 2nd 90 degrees apart
+#X text 21 12 Blob.pd;
+#X msg 514 337 10;
+#X obj 437 307 # * 1000;
+#X obj 101 265 #color;
+#X obj 101 221 loadbang;
+#X text 385 432 duplicate the angle \; make the 2nd 90 degrees apart
 (required for a circle \; else it'll be an oval or a line);
-#X obj 78 309 #draw_polygon + (3 # );
-#X text 21 -25 Copyright 2002 Mathieu Bouchard and Alexandre Castonguay
+#X obj 75 354 #draw_polygon + (3 # );
+#X text 21 25 Copyright 2002 Mathieu Bouchard and Alexandre Castonguay
 ;
-#X text 245 58 a 2x2 square's coordinates;
-#X text 288 103 scale factor;
-#X obj 246 102 # * 8;
-#X obj 78 330 #solarize;
-#X text 400 -1 This is the classic "Shadebob" effect of the demoscene
+#X text 185 182 a 2x2 square's coordinates;
+#X text 228 218 scale factor;
+#X obj 186 217 # * 8;
+#X obj 75 373 #solarize;
+#X text 400 49 This is the classic "Shadebob" effect of the demoscene
 ;
-#X msg 101 193 12 24 36;
-#X text 6 284 superimpose the light of many squares;
-#X obj 438 278 # cos* 100;
+#X msg 101 243 12 24 36;
+#X text 6 331 superimpose the light of many squares;
+#X obj 437 326 # cos* 100;
+#X obj 261 444 #outer + (0 9000);
 #X connect 0 0 9 1;
 #X connect 1 0 17 0;
 #X connect 2 0 3 0;
-#X connect 3 0 28 1;
+#X connect 3 0 27 1;
 #X connect 4 0 5 1;
-#X connect 5 0 19 0;
-#X connect 6 0 27 0;
+#X connect 5 0 54 0;
+#X connect 6 0 26 0;
 #X connect 7 0 5 1;
-#X connect 8 0 54 1;
+#X connect 8 0 53 1;
 #X connect 9 0 0 0;
-#X connect 9 0 33 0;
-#X connect 10 0 54 1;
+#X connect 9 0 32 0;
+#X connect 10 0 53 1;
 #X connect 11 0 13 0;
-#X connect 13 0 41 1;
+#X connect 13 0 40 1;
 #X connect 14 0 5 1;
 #X connect 17 0 9 0;
-#X connect 19 0 6 0;
-#X connect 20 0 2 0;
-#X connect 21 0 35 0;
-#X connect 23 0 45 2;
-#X connect 24 0 6 1;
-#X connect 26 0 32 0;
-#X connect 27 0 23 1;
-#X connect 28 0 45 0;
-#X connect 32 0 28 0;
-#X connect 32 1 18 0;
-#X connect 33 0 34 0;
-#X connect 33 1 5 0;
-#X connect 33 2 41 0;
-#X connect 34 0 49 0;
-#X connect 35 0 26 0;
-#X connect 40 0 54 1;
-#X connect 41 0 54 0;
-#X connect 42 0 45 1;
-#X connect 43 0 52 0;
-#X connect 45 0 28 1;
-#X connect 45 0 50 0;
-#X connect 49 0 23 0;
-#X connect 50 0 22 0;
-#X connect 52 0 42 0;
-#X connect 54 0 24 0;
+#X connect 19 0 2 0;
+#X connect 20 0 34 0;
+#X connect 22 0 44 2;
+#X connect 23 0 6 1;
+#X connect 25 0 31 0;
+#X connect 26 0 22 1;
+#X connect 27 0 44 0;
+#X connect 31 0 27 0;
+#X connect 31 1 18 0;
+#X connect 32 0 33 0;
+#X connect 32 1 5 0;
+#X connect 32 2 40 0;
+#X connect 33 0 48 0;
+#X connect 34 0 25 0;
+#X connect 39 0 53 1;
+#X connect 40 0 53 0;
+#X connect 41 0 44 1;
+#X connect 42 0 51 0;
+#X connect 44 0 27 1;
+#X connect 44 0 49 0;
+#X connect 48 0 22 0;
+#X connect 49 0 21 0;
+#X connect 51 0 41 0;
+#X connect 53 0 23 0;
+#X connect 54 0 6 0;

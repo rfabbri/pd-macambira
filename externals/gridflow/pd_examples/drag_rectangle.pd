@@ -1,15 +1,15 @@
 #N canvas 702 123 647 484 10;
-#X obj 231 -7 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+#X obj 231 -7 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
 ;
 #X obj 231 117 #out window;
 #X obj 21 144 hsl 128 15 0 319 0 0 h_end_o h_end_i empty -2 -8 1 10
--262144 -1 -1 12700 1;
+-262144 -1 -1 0 1;
 #X obj 21 -4 hsl 128 15 0 319 0 0 h_start_o h_start_i empty 0 8 1 10
 -262144 -66577 -258699 0 0;
 #X obj 3 13 vsl 15 128 239 0 0 0 v_start_o v_start_i empty 0 -8 1 10
--262144 -1 -1 12647 1;
+-262144 -1 -1 0 1;
 #X obj 151 13 vsl 15 128 239 0 0 0 v_end_o v_end_i empty 0 -8 1 10
--262144 -1 -1 425 1;
+-262144 -1 -1 0 1;
 #N canvas 504 374 452 302 make_rectangle 0;
 #X obj 27 16 inlet;
 #X text 25 -3 image;
@@ -45,21 +45,20 @@
 #X obj 393 25 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 315 117 #mouse \, ...;
-#X obj 260 266 listelement 0;
+#X obj 260 268 listelement 0;
 #X obj 367 190 listelement 1;
 #X obj 260 225 listelement 0;
 #X obj 368 149 listelement 1;
-#X obj 368 170 s h_start_i;
-#X obj 367 211 s h_end_i;
+#X obj 368 168 s h_start_i;
+#X obj 367 209 s h_end_i;
 #X obj 260 287 s v_end_i;
-#X obj 260 246 s v_start_i;
+#X obj 260 244 s v_start_i;
 #X obj 378 65 loadbang;
-#X msg 378 85 0 0;
+#X msg 378 84 0 0;
 #X obj 328 161 t a;
-#X obj 64 330 #out window;
-#X obj 47 267 #for ( 0 0 ) ( 0 0 ) ( 1 1 );
-#X obj 112 221 t b a;
-#X obj 64 294 #store;
+#X obj 47 322 #out window;
+#X obj 86 221 t b a;
+#X obj 47 286 #store;
 #X msg 48 243 set ( \$1 \$2 );
 #X obj 327 43 #in b001.jpg;
 #X text 30 35 drag the mouse;
@@ -67,7 +66,7 @@
 #X text 39 51 inside the;
 #X text 37 66 first window;
 #X text 218 -25 step 1: turn on;
-#X text 69 312 cropping (to 2nd window);
+#X text 52 304 cropping (to 2nd window);
 #X obj -41 373 cnv 15 640 30 empty empty empty 20 12 0 14 -200249 -66577
 0;
 #X text -33 380 GridFlow 0.8.0;
@@ -76,21 +75,22 @@
 0;
 #X text -27 -64 Copyright 2002 Mathieu Bouchard;
 #X text -27 -77 drag_rectangle.pd;
+#X obj 47 267 #for (0 0) (0 0) (1 1);
 #X connect 0 0 7 0;
 #X connect 1 0 13 0;
 #X connect 6 0 1 0;
 #X connect 7 0 11 0;
-#X connect 10 0 30 0;
+#X connect 10 0 29 0;
 #X connect 11 0 6 0;
-#X connect 12 0 30 0;
+#X connect 12 0 29 0;
 #X connect 13 0 6 1;
 #X connect 13 0 16 0;
 #X connect 13 0 17 0;
-#X connect 13 0 29 0;
+#X connect 13 0 28 0;
 #X connect 13 0 24 0;
 #X connect 13 1 24 0;
 #X connect 13 2 24 0;
-#X connect 13 2 27 0;
+#X connect 13 2 26 0;
 #X connect 14 0 20 0;
 #X connect 15 0 19 0;
 #X connect 16 0 21 0;
@@ -101,10 +101,10 @@
 #X connect 24 0 14 0;
 #X connect 24 0 15 0;
 #X connect 24 0 6 2;
-#X connect 26 0 28 0;
-#X connect 27 0 26 0;
-#X connect 27 1 26 1;
-#X connect 28 0 25 0;
-#X connect 29 0 26 0;
-#X connect 30 0 11 1;
-#X connect 30 0 28 1;
+#X connect 26 0 42 0;
+#X connect 26 1 42 1;
+#X connect 27 0 25 0;
+#X connect 28 0 42 0;
+#X connect 29 0 11 1;
+#X connect 29 0 27 1;
+#X connect 42 0 27 0;

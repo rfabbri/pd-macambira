@@ -1,0 +1,27 @@
+#N canvas 183 58 542 460 10;
+#X obj 21 207 #rgb_to_greyscale;
+#X obj 7 -37 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 7 -72 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 320 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 16 327 GridFlow 0.8.0;
+#X obj 21 178 #in;
+#X text 21 -67 2.4 Image manipulation;
+#X text 48 -37 2.4.2 Greyscale;
+#N canvas 0 0 450 300 META 0;
+#X restore 147 327 pd META;
+#X text 149 242 This patch and other image modifications can be can
+be found in the gridflow help files.;
+#X text 159 102 insert your own images to convert it to greyscale.
+click on the message to load image.;
+#X text 19 4 To convert an image to greyscale use [#rgb_to_greyscale].
+It transforms colour information into a black to white gradient.;
+#X obj 33 157 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 21 135 open bluemarble.jpg;
+#X obj 21 282 #out window;
+#X connect 5 0 0 0;
+#X connect 12 0 5 0;
+#X connect 13 0 5 0;

@@ -1,5 +1,5 @@
 /*
-	$Id: puredata.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: puredata.c,v 1.2 2006-03-15 04:38:20 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
@@ -43,6 +43,9 @@ tries to call a Ruby method of the proper name.
 #include <unistd.h>
 #include "g_canvas.h"
 
+#define CObject_free CObject_freeee
+#define gfpost post
+
 /* **************************************************************** */
 struct BFObject;
 struct FMessage {
@@ -61,11 +64,11 @@ static const char *rb_sym_name(Ruby sym) {return rb_id2name(SYM2ID(sym));}
 
 static BuiltinSymbols *syms;
 
-void CObject_freeee (void *victim) {
+void CObject_free (void *victim) {
 	CObject *self = (CObject *)victim;
 	self->check_magic();
 	if (!self->rself) {
-		fprintf(stderr,"attempt to free object that has no rself\n");
+		L fprintf(stderr,"attempt to free object that has no rself\n");
 		abort();
 	}
 	self->rself = 0; /* paranoia */
@@ -81,7 +84,7 @@ static Ruby mPointer=0;
 \class Pointer < CObject
 struct Pointer : CObject {
 	void *p;
-	Pointer() { assert(!"DYING HORRIBLY"); }
+	Pointer() { assert(!"DYING HORRIBLY (GASP)"); }
 	Pointer(void *_p) : p(_p) {}
 	\decl Ruby ptr ();
 };
@@ -94,7 +97,10 @@ struct Pointer : CObject {
 );}
 \end class Pointer
 Ruby Pointer_s_new (void *ptr) {
-	return Data_Wrap_Struct(EVAL("GridFlow::Pointer"), 0, 0, new Pointer(ptr));
+	Pointer *self = new Pointer(ptr);
+	Ruby rself = Data_Wrap_Struct(EVAL("GridFlow::Pointer"), 0, CObject_free, self);
+	self->rself = rself;
+	return rself;
 }
 void *Pointer_get (Ruby rself) {
 	DGS(Pointer);
@@ -129,18 +135,13 @@ static int noutlets_of (Ruby qlass) {
 #endif
 extern "C" void Init_stack(VALUE *addr);
 static VALUE *localize_sysstack () {
-	long bp;
-	sscanf(RUBY_STACK_END,"0x%08lx",&bp);
-	//fprintf(stderr,"old RUBY_STACK_END = %08lx\n",bp);
+	long bp0,bp1;
+	sscanf(STACK_END,"0x%08lx",&bp0);
 	// HACK (2004.08.29: alx has a problem; i hope it doesn't get worse)
-	// this rounds to the last word of a 4k block
-	// cross fingers that no other OS does it too different
-	// !@#$ doesn't use STACK_GROW_DIRECTION
-	// bp=((bp+0xfff)&~0xfff)-sizeof(void*);
-	// GAAAH
-	bp=((bp+0xffff)&~0xffff)-sizeof(void*);
-	//fprintf(stderr,"new RUBY_STACK_END = %08lx\n",bp);
-	return (VALUE *)bp;
+	// this rounds to the last word of a 64k block (bug: doesn't use STACK_GROW_DIRECTION)
+	bp1=((bp0+0xffff)&~0xffff)-sizeof(void*);
+	fprintf(stderr,"STACK_END old=0x%08lx; new=0x%08lx\n",bp0,bp1);
+	return (VALUE *)bp1;
 }
 
 //****************************************************************
@@ -312,7 +313,7 @@ static void BFObject_delete_1 (FMessage *fm) {
 	if (fm->self->rself) {
 		rb_funcall(fm->self->rself,SI(delete),0);
 	} else {
-		post("BFObject_delete is NOT handling BROKEN object at %08x",(int)fm);
+		post("BFObject_delete is NOT handling BROKEN object at %*lx",2*sizeof(long),(long)fm);
 	}
 }
 
@@ -652,7 +653,7 @@ struct Clock : CObject {
 
 void Clock_fn (Ruby rself) { rb_funcall_myrescue(rself,SI(call),0); }
 void Clock_mark (Clock *self) { rb_gc_mark(self->owner); }
-void Clock_free (Clock *self) { clock_free(self->serf); CObject_freeee(self); }
+void Clock_free (Clock *self) { clock_free(self->serf); CObject_free(self); }
 
 Ruby Clock_s_new (Ruby qlass, Ruby owner) {
 	Clock *self = new Clock();

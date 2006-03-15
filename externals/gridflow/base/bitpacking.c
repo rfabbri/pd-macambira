@@ -1,5 +1,5 @@
 /*
-	$Id: bitpacking.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: bitpacking.c,v 1.2 2006-03-15 04:37:06 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
@@ -26,18 +26,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//#define CONVERT0(z) (((in[z] << hb[z]) >> 7) & mask[z])
+#define CONVERT0(z) ((in[z] >> chop[z]) << slide[z])
+
 #define CONVERT1 t = \
-	(((in[0] << hb[0]) >> 7) & mask[0]) | \
-	(((in[1] << hb[1]) >> 7) & mask[1]) | \
-	(((in[2] << hb[2]) >> 7) & mask[2])
+	CONVERT0(0) | CONVERT0(1) | CONVERT0(2)
 
 #define CONVERT2 \
-	for (t=0,i=0; i<self->size; i++) t |= (((in[i] << hb[i]) >> 7) & mask[i]);
+	for (t=0,i=0; i<self->size; i++) t |= CONVERT0(i);
 
 #define CONVERT3 \
-	for (t=0,i=0; i<self->size; i++) { \
-		t |= ((in[i]>>(7-hb[i]))|(in[i]<<(hb[i]-7))) & mask[i]; \
-	}
+	for (t=0,i=0; i<self->size; i++) \
+		t |= (((unsigned)in[i]>>(7-hb[i]))|(in[i]<<(hb[i]-7))) & mask[i];
 
 #define WRITE_LE \
 	for (int bytes = self->bytes; bytes; bytes--, t>>=8) *out++ = t;
@@ -74,29 +74,29 @@ template <class T>
 static void default_pack(BitPacking *self, int n, Pt<T> in, Pt<uint8> out) {
 	uint32 t;
 	int i;
-	int hb[4];
-	uint32 mask[4];
 	int sameorder = self->endian==2 || self->endian==::is_le();
 	int size = self->size;
-
-	for (i=0; i<self->size; i++) hb[i] = highest_bit(self->mask[i]);
-	memcpy(mask,self->mask,size*sizeof(uint32));
-
+	uint32  mask[4]; memcpy(mask,self->mask,size*sizeof(uint32));
+	uint32    hb[4]; for (i=0; i<size; i++) hb[i] = highest_bit(mask[i]);
+	uint32  span[4]; for (i=0; i<size; i++) span[i] = hb[i] - lowest_bit(mask[i]);
+	uint32  chop[4]; for (i=0; i<size; i++) chop[i] = 7-span[i];
+	uint32 slide[4]; for (i=0; i<size; i++) slide[i] = hb[i]-span[i];
+	
 	if (sameorder && size==3) {
 		switch(self->bytes) {
-		case 2:	NTIMES(t=CONVERT1; *((int16 *)out)=t; out+=2; in+=3;) return;
-		case 4:	NTIMES(t=CONVERT1; *((int32 *)out)=t; out+=4; in+=3;) return;
+		case 2:	NTIMES(CONVERT1; *((int16 *)out)=t; out+=2; in+=3;) return;
+		case 4:	NTIMES(CONVERT1; *((int32 *)out)=t; out+=4; in+=3;) return;
 		}
 	}
 	if (self->is_le()) {
 		switch (size) {
 		case 3: for (; n--; in+=3) {CONVERT1; WRITE_LE;} break;
-		case 4:	for (; n--; in+=4) {CONVERT3; WRITE_LE;} break;
+		case 4:	for (; n--; in+=4) {CONVERT1; WRITE_LE;} break;
 		default:for (; n--; in+=size) {CONVERT2; WRITE_LE;}}
 	} else {
 		switch (size) {
 		case 3: for (; n--; in+=3) {CONVERT1; WRITE_BE;} break;
-		case 4: for (; n--; in+=4) {CONVERT3; WRITE_BE;} break;
+		case 4: for (; n--; in+=4) {CONVERT1; WRITE_BE;} break;
 		default:for (; n--; in+=size) {CONVERT2; WRITE_BE;}}
 	}
 }
@@ -132,8 +132,11 @@ template <class T>
 static void pack2_565(BitPacking *self, int n, Pt<T> in, Pt<uint8> out) {
 	const int hb[3] = {15,10,4};
 	const uint32 mask[3] = {0x0000f800,0x000007e0,0x0000001f};
+	uint32 span[3] = {4,5,4};
+	uint32 chop[3] = {3,2,3};
+	uint32 slide[3] = {11,5,0};
 	uint32 t;
-	NTIMES( t=CONVERT1; *((short *)out)=t; out+=2; in+=3; )
+	NTIMES(CONVERT1; *((short *)out)=t; out+=2; in+=3;)
 }
 
 template <class T>
@@ -187,7 +190,8 @@ static void pack3_888b(BitPacking *self, int n, Pt<T> in, Pt<uint8> out) {
 	NTIMES( o32[0] = (in[0]<<16) | (in[1]<<8) | in[2]; o32++; in+=3; )
 }
 
-/* (R,G,B,?) -> B:8,G:8,R:8,0:8 */
+// (R,G,B,?) -> B:8,G:8,R:8,0:8
+// fishy
 template <class T>
 static void pack3_bgrn8888(BitPacking *self, int n, Pt<T> in, Pt<uint8> out) {
 /* NTIMES( out[2]=in[0]; out[1]=in[1]; out[0]=in[2]; out+=4; in+=4; ) */

@@ -1,0 +1,106 @@
+#N canvas 280 89 936 678 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 627 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 629 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 482 332 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: send receive netsend netreceive cordless communication
+network TCP/IP UDP internet;
+#X restore 16 633 pd META;
+#X obj 8 266 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 266 "pack" object;
+#X msg 96 543 2;
+#X msg 45 521 1;
+#X obj 45 588 print mylist;
+#X text 12 20 DESCRIPTION: Using pack \, unpack and route with lists
+;
+#X text 19 75 In the Pure-Data introduction we discussed the three
+different types of data in PD. These are floats (numbers) \, symbols
+(words) and lists (groups of floats and words). Floats and symbols
+are known as atoms. Atoms are single elements \, they do not contain
+spaces or other special characters. Atoms can be grouped into lists.
+;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 46 What is a list?;
+#X msg 145 216 list one two three;
+#X obj 145 239 print this is a list;
+#X text 19 155 Lists can be created in a number of ways \, but we are
+going to cover the two most common ways of creating lists. The most
+simple way to create a list is to type the list into a message box
+starting with the word (symbol) "list":;
+#X text 19 295 The "pack" object is the second most common way to create
+a list. "pack" allows you to take individual atoms and combine them
+into a single list. "pack" accepts a number of arguments. Each argument
+defines the type of atom in the resulting list. The "f" argument creates
+an inlet that accepts float atoms. The "s" argument creates an inlet
+accepts symbol atoms. The number of arguments is the same as the number
+of elements in the resultant list.;
+#X text 19 405 "pack" is the first object we are going to learn that
+has a "cold" inlet. Some control objects in PD have "hot" and "cold"
+inlets. When you send a message to a "cold" inlet the object does not
+generate any output (it does not send any messages). When "hot" inlets
+get messages then the object does generate output. The leftmost inlet
+is always the "hot" inlet and all other inlets are "cold" or in some
+cases all inlets are "hot";
+#X text 75 521 sets the first atom "1" and then sends the list;
+#X text 132 543 sets the second atom "2";
+#X obj 45 566 pack f f;
+#X text 459 45 Note that if you do not set the second and onwards atoms
+via thier "cold" inlets and you generate the list by setting the first
+atom via the "hot" inlet then all float atoms will be set to "0" and
+all symbol atoms will be set to "symbol" in the resultant list.;
+#X obj 448 126 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 126 "unpack" object;
+#X obj 596 241 unpack f f f;
+#X msg 596 219 list 1 2 3;
+#X floatatom 596 294 5 0 0 0 - - -;
+#X floatatom 635 277 5 0 0 0 - - -;
+#X floatatom 675 262 5 0 0 0 - - -;
+#X text 639 293 First Atom;
+#X text 678 277 Second Atom;
+#X text 718 261 Third Atom;
+#X text 459 156 The "unpack" object is very similar to the "pack" object
+except it works in reverse. "unpack" takes a list and splits it up
+into a number of atoms. It uses the same arguments as "pack" but generates
+outlets rather than inlets.;
+#X obj 448 319 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 319 "route" object;
+#X text 459 349 The "route" object sorts lists based on the first atom
+of the list. It as a number of float or symbol arguments. For each
+argument "route" creates one outlet. "route" also creates one additional
+rightmost outlet for rejections. For each list route gets it compares
+the first atom to all its arguments. If the first atom matches one
+of the arguments it the rest of the list \, without the first atom
+\, gets send through the outlet corresponding to that argument. If
+the first atom of the list does not match any arguments the entire
+list \, including the first atom \, gets sent out the rejection outlet.
+;
+#X msg 688 493 rejection 1;
+#X obj 685 553 print rejection;
+#X msg 538 493 o1 2;
+#X msg 613 493 o2 3;
+#X obj 613 531 route o1 o2;
+#X obj 613 593 print o1;
+#X obj 649 573 print o2;
+#X text 12 8 7 Intermediate Pure-Data - Working with lists;
+#X connect 6 0 20 1;
+#X connect 7 0 20 0;
+#X connect 13 0 14 0;
+#X connect 20 0 8 0;
+#X connect 24 0 26 0;
+#X connect 24 1 27 0;
+#X connect 24 2 28 0;
+#X connect 25 0 24 0;
+#X connect 36 0 40 0;
+#X connect 38 0 40 0;
+#X connect 39 0 40 0;
+#X connect 40 0 41 0;
+#X connect 40 1 42 0;
+#X connect 40 2 37 0;

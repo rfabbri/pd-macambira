@@ -1,0 +1,51 @@
+#N canvas 151 21 517 609 10;
+#X obj 15 320 #camera;
+#X obj 15 260 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 142 370 #out window;
+#X obj 90 260 hsl 128 15 20 300 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 142 395 fps detailed;
+#X obj 142 419 print;
+#X obj 15 294 metro 100;
+#X obj 53 473 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 129 506 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 149 505 stop recording;
+#X text 73 471 select filename;
+#X text 111 488 start recording;
+#X obj 91 489 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 15 528 #record_quicktime;
+#X text 21 54 To record a video from a live stream or a video... you
+can use this patch.;
+#X text 224 315 xinitrc ssh pdrc bach rc export bookmarks;
+#X text 11 110 The outside of the patch uses objects seen in previous
+patches. The [#record_quicktime] object is an abstraction in which
+the settings and the optins are situated. to contruct the patch ...
+Do we explain how to do it if it is in an abstraction???;
+#X text 86 198 we don't nec have to explain how to build it since its
+available to them through the pd_examples and they have been through
+enough patvhes to easily understand what's going on.;
+#X obj 11 29 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 14 29 What is a grid?;
+#X obj 11 -6 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 21 -7 2 Images;
+#X text 18 7 Description: opening multiple images from one window.
+;
+#X obj 13 561 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 21 568 GridFlow 0.8.0;
+#X connect 0 0 2 0;
+#X connect 0 0 13 0;
+#X connect 1 0 6 0;
+#X connect 2 0 4 0;
+#X connect 3 0 6 1;
+#X connect 4 0 5 0;
+#X connect 6 0 0 0;
+#X connect 7 0 13 1;
+#X connect 8 0 13 3;
+#X connect 12 0 13 2;

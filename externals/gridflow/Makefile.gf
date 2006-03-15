@@ -1,4 +1,4 @@
-# $Id: Makefile.gf,v 1.1 2005-10-04 02:12:43 matju Exp $
+# $Id: Makefile.gf,v 1.2 2006-03-15 04:48:08 matju Exp $
 # This is an annex that covers what is not covered by the generated Makefile
 
 SYSTEM = $(shell uname -s | sed -e 's/^MINGW.*/NT/')
@@ -92,9 +92,6 @@ vvtest::
 	($(VALG) --leak-check=yes $(RUBY_INSTALL_NAME) -w $(TEST) &> gf-valgrind) || $(BACKTRACE)
 	less gf-valgrind
 
-test16:: test
-	(ruby-1.6.7 -w $(TEST)) || $(BACKTRACE)
-
 testpd::
 	rm -f gridflow.pd_linux && make && \
 	rm -f /opt/lib/ruby/site_ruby/1.7/i586-linux/gridflow.so && \
@@ -145,12 +142,12 @@ puredata-install::
 	cp doc/flow_classes/*.p* $(DOK)/flow_classes
 	cp -r images/ $(PUREDATA_PATH)/extra/gridflow
 	cp $(PD_LIB) pd_abstractions/*.pd $(PUREDATA_PATH)/extra
-	for z in camera_control motion_detection color mouse centroid centre_of_gravity fade \
+	for z in camera_control motion_detection color mouse centre_of_gravity fade \
 	apply_colormap_channelwise checkers contrast posterize ravel remap_image solarize spread \
 	rgb_to_greyscale greyscale_to_rgb rgb_to_yuv yuv_to_rgb; do \
 		cp pd_abstractions/\#$$z.pd $(PUREDATA_PATH)/extra/\@$$z.pd; done
 	mkdir -p $(PUREDATA_PATH)/extra/gridflow/icons
-	$(INSTALL_DATA) java/peephole.gif $(PUREDATA_PATH)/extra/gridflow/icons/peephole.gif
+	$(INSTALL_DATA) icons/peephole.gif $(PUREDATA_PATH)/extra/gridflow/icons/peephole.gif
 
 else
 

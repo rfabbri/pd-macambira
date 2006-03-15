@@ -1,0 +1,89 @@
+#N canvas 238 94 891 621 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 577 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 579 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 482 332 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: send receive netsend netreceive cordless communication
+network TCP/IP UDP internet;
+#X restore 16 583 pd META;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 12 20 DESCRIPTION: nested patches using abstractions & subpatches
+;
+#X text 13 46 What is an abstraction?;
+#X text 23 76 Since objects are very simple in Pure-Data doing complex
+tasks often leads to very complex patches. Often it is useful to use
+the same bit of patching you do for one project for another. Pure-Data
+has a facility to "nest" \, that is to take a number of objects in
+a collection and place them into a group that looks like a single object.
+This is also handy to make a complex patch look simple and clear by
+hiding the nitty-gritty details. There are two types of these collections
+\, the subpatch and the abstraction.;
+#X obj 8 216 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 216 The subpatch;
+#X text 23 246 Subpatches are collections of objects that get "hidden"
+inside a container that looks like a normal PD object. Subpatches are
+created by creating an object box \, and typing the word "pd" followed
+by whatever you want to describe the contents of the subpatch. Subpatches
+are saved at the same time as the "parent" patch. Here is a subpatch:
+;
+#N canvas 0 22 460 310 subpatch 0;
+#X obj 30 34 inlet;
+#X obj 30 77 outlet;
+#X text 99 35 This is inside the subpatch.;
+#X connect 0 0 1 0;
+#X restore 178 359 pd subpatch;
+#X floatatom 178 336 5 0 0 0 - - -;
+#X floatatom 178 387 5 0 0 0 - - -;
+#X text 23 416 To open a subpatch simply click once on the subpatch
+in run-mode or control-click (or right-click) and select open in edit-mode.
+Both subpatches and abstractions communicate with the parent patch
+through special objects called "inlet" and "outlet" for each "inlet"
+in a subpatch or abstraction an inlet is created on the subpatch. This
+example has one inlet and one outlet.;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 46 The abstraction;
+#X text 463 76 Abstractions are very similar to subpatches. They are
+collections of objects that are "hidden" inside PD objects \, and they
+both use "inlet" and "outlet" objects to communicate with the parent
+patch. The difference between subpatches and abstractions is that abstractions
+are saved in a separate file from the parent. This means when you save
+the parent patch containing abstractions the abstractions are not saved.
+The abstractions are saved as separate files so that they can be used
+in multiple patches. A second feature that exists in abstractions and
+not in subpatches is the ability to use arguments. "send" and "receive"
+can be used inside abstractions to send data without connections (patch-cords).
+;
+#X obj 682 253 r output;
+#X obj 682 277 print;
+#X obj 564 253 abstraction 1 2;
+#X text 463 316 To create an abstraction all you need to do is create
+a new PD patch ("File" -> "New"). Create the contents of the abstraction
+and then save it in the same directory as the patch you want to use
+it in. In this case the abstraction is saved as "abstraction.pd". Once
+saved you can easily embed the abstraction simply by typing its name
+\, without the .pd extension \, into an object box.;
+#X obj 448 416 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 416 Dollarsign in object boxes;
+#X text 463 446 If you open the above example you will see that the
+familiar "pack" object has a number of "$" arguments. The "$" arguments
+in a object box differ entirely from the "$" used in message objects.
+When you use a "$" in an object box inside an abstraction the values
+get replaced with the arguments to that abstraction. In the case above
+the "pack" object's first argument "$1" gets replaced with the first
+argument of the abstraction "1" "$2" gets replaced with the second
+argument "2".;
+#X text 23 536 For more info see: 12.PART2.subpatch.pd 14.dollersign.pd
+;
+#X text 12 8 8 Intermediate Pure-Data - Using abstractions and subpacthes
+;
+#X connect 11 0 13 0;
+#X connect 12 0 11 0;
+#X connect 18 0 19 0;

@@ -1,20 +1,18 @@
-#N canvas 400 83 719 454 10;
-#X text 41 -19 click here;
-#X obj 23 -17 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
-;
-#X obj 31 251 #out window;
-#X text 48 92 this is the feedback loop;
-#X obj 123 0 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 400 83 791 374 10;
+#X obj 36 46 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 31 237 #out window;
+#X text 48 122 this is the feedback loop;
+#X obj 143 50 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 141 -1 for 0 10 1;
-#X obj 263 53 loadbang;
-#X obj 141 73 #store;
-#X obj 141 19 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 161 49 for 0 10 1;
+#X obj 262 87 loadbang;
+#X obj 141 103 #store;
+#X obj 161 68 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 31 291 print;
-#X obj 31 271 fps detailed;
-#X obj 31 113 fork;
-#X text 159 19 next;
+#X obj 31 275 print;
+#X obj 31 256 fps detailed;
+#X obj 31 143 fork;
+#X text 179 68 next;
 #N canvas 0 0 450 210 game 0;
 #X obj 28 64 inlet matrix;
 #X obj 28 141 outlet matrix;
@@ -29,39 +27,39 @@ but faster to compute.);
 #X connect 3 0 4 0;
 #X connect 4 0 5 0;
 #X connect 5 0 1 0;
-#X restore 31 72 pd game of life;
-#X text 260 20 init with a random map;
-#X text 262 35 10% white dots;
-#X text 33 179 convert this 1-bit matrix to standard RGB \; 1 becomes
+#X restore 31 102 pd game of life;
+#X text 260 60 init with a random map;
+#X text 261 72 10% white dots;
+#X text 33 169 convert this 1-bit matrix to standard RGB \; 1 becomes
 -1 becomes 255 \, but 0 stays 0;
-#X obj 23 15 metro 5;
-#X obj -15 339 cnv 15 780 30 empty empty empty 20 12 0 14 -200249 -66577
+#X obj 53 45 metro 5;
+#X obj 5 329 cnv 15 780 30 empty empty empty 20 12 0 14 -200249 -66577
 0;
-#X text -7 346 GridFlow 0.8.0;
-#X text -7 346 GridFlow 0.8.0;
-#X obj -13 -85 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+#X text 13 336 GridFlow 0.8.0;
+#X text 13 336 GridFlow 0.8.0;
+#X obj 7 5 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X text 0 -85 game_of_life.pd;
-#X text 0 -72 Copyright 2001 Mathieu Bouchard;
-#X obj 263 97 # rand (b #);
-#X obj 263 119 # == (b # 0);
-#X msg 263 75 240 320 b # 10;
-#X obj 31 209 # inv+ (b # 0);
-#X obj 31 230 #outer ignore (3 b #);
-#X connect 1 0 17 0;
-#X connect 2 0 10 0;
-#X connect 4 0 5 0;
-#X connect 5 0 8 0;
-#X connect 6 0 26 0;
-#X connect 7 0 13 0;
-#X connect 8 0 7 0;
-#X connect 10 0 9 0;
-#X connect 11 0 27 0;
-#X connect 11 1 7 1;
-#X connect 13 0 11 0;
-#X connect 17 0 7 0;
-#X connect 24 0 25 0;
-#X connect 25 0 11 0;
-#X connect 26 0 24 0;
-#X connect 27 0 28 0;
-#X connect 28 0 2 0;
+#X text 20 5 game_of_life.pd;
+#X text 20 18 Copyright 2001 Mathieu Bouchard;
+#X obj 262 125 # rand (b #);
+#X obj 262 144 # == (b # 0);
+#X msg 262 106 240 320 b # 10;
+#X obj 31 199 # inv+ (b # 0);
+#X obj 31 218 #outer ignore (3 b #);
+#X connect 0 0 16 0;
+#X connect 1 0 9 0;
+#X connect 3 0 4 0;
+#X connect 4 0 7 0;
+#X connect 5 0 25 0;
+#X connect 6 0 12 0;
+#X connect 7 0 6 0;
+#X connect 9 0 8 0;
+#X connect 10 0 26 0;
+#X connect 10 1 6 1;
+#X connect 12 0 10 0;
+#X connect 16 0 6 0;
+#X connect 23 0 24 0;
+#X connect 24 0 10 0;
+#X connect 25 0 23 0;
+#X connect 26 0 27 0;
+#X connect 27 0 1 0;

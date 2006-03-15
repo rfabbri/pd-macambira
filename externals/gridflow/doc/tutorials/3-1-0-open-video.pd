@@ -1,0 +1,38 @@
+#N canvas 48 56 545 431 10;
+#X obj 100 156 #in;
+#X obj 100 222 #out window;
+#X obj 124 33 openpanel;
+#X obj 124 9 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 124 58 open \$1;
+#X obj 17 11 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 17 45 metro 33.33;
+#X floatatom 317 190 5 0 0 0 - - -;
+#X obj 401 166 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 401 193 print go;
+#X msg 201 124 loop 0;
+#X msg 201 97 loop 1;
+#X msg 283 13 open home/steph/Desktop/PDDP_summer;
+#X obj 7 -37 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 -37 What is a grid?;
+#X obj 7 -72 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -73 2 Images;
+#X text 14 -59 Description: opening multiple images from one window.
+;
+#X obj 8 320 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 16 327 GridFlow 0.8.0;
+#X connect 0 0 1 0;
+#X connect 0 1 7 0;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 0 0;
+#X connect 5 0 6 0;
+#X connect 6 0 0 0;
+#X connect 8 0 9 0;
+#X connect 10 0 0 0;
+#X connect 11 0 0 0;
+#X connect 12 0 0 0;

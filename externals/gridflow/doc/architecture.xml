@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no" ?>
 <!DOCTYPE documentation SYSTEM 'jmax.dtd'>
 <documentation title="Reference Manual: Architecture">
-<!-- $Id: architecture.xml,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<!-- $Id: architecture.xml,v 1.2 2006-03-15 04:44:50 matju Exp $ -->
 <!--
 	GridFlow Reference Manual: Architecture
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard

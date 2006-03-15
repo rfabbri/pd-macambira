@@ -1,4 +1,18 @@
-/* $Id: ChangeLog,v 1.1 2005-10-04 02:12:43 matju Exp $ */
+/* $Id: ChangeLog,v 1.2 2006-03-15 04:48:08 matju Exp $ */
+
+version 0.8.1 (2006.02.20):
+
+ * [ls] now supports wildcards: ? [] * **
+ * [#color] has new method: delegate
+ * added [regsub], [memstat], [listfind], [sendgui]
+ * x11: removed methods: draw,autodraw; added: use_shm,title
+ * examples : added markov.pd, bounce.pd, doodle.pd, mechanics.pd
+ * [#pack],[#unpack] now default to 2 values
+ * new numops: clip+,clip-
+ * fix for shared memory bug in [#out x11]
+ * added [#out tk]
+ * added [#out opengl] (using GLUT, hackishly)
+ * [unix_time] behaviour changed. (see manual)
 
 version 0.8.0 (2005.06.06):
 
@@ -12,7 +26,7 @@ version 0.8.0 (2005.06.06):
  * 13 object-classes rewritten from Ruby to Pd abstractions
  * merged [@],[@!] -> [#] and added message "op"
  * removed all one-input ops (see next...)
- * new two-input ops: abs- sq- avg hypot sqrt rand (soon erf* clip+ clip-)
+ * new two-input ops: abs- sq- avg hypot sqrt rand
  * [#fold],[#scan]: removed seed arg and right outlet; added msgs "op" and "seed"
  * [#inner],[#convolve] : added msgs "op" and "seed"
  * [#inner],[#convolve] : removed three first args (usually * + 0)
@@ -34,6 +48,7 @@ version 0.8.0 (2005.06.06):
    [exec], [plotter_control], [#text_to_image], [#hueshift], [rubyarray]
  * in pd_examples added Alx's epicycloid.pd, scratch_video.pd, threshold.pd
       and Matju's goop.pd
+ * some new/updated help files by Stéphanie Brodeur & Darsha Hewitt
 
 version 0.7.7 (2004.08.24):
 

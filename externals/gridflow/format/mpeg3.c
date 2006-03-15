@@ -1,5 +1,5 @@
 /*
-	$Id: mpeg3.c,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: mpeg3.c,v 1.2 2006-03-15 04:37:46 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003 by Mathieu Bouchard
@@ -88,7 +88,7 @@ struct FormatMPEG3 : Format {
 }
 
 \classinfo {
-	IEVAL(rself,"install '#in:mpeg',1,1;@flags=4;"
+	IEVAL(rself,"install '#io:mpeg',1,1;@flags=4;"
 	"@comment='Motion Picture Expert Group Format"
 	" (using HeroineWarrior\\'s)';suffixes_are'mpg,mpeg'");
 }

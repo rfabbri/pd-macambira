@@ -1,0 +1,123 @@
+#N canvas 0 0 977 630 10;
+#X obj 17 -114 #out window;
+#X obj 43 -174 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 17 -143 #in;
+#X msg 17 -205 open b001.jpg;
+#X obj 507 -245 cnv 15 185 150 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 529 -205 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 515 -166 #in;
+#X msg 515 -238 open b001.jpg;
+#X obj 555 -167 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 515 -110 s slider;
+#X obj 515 -138 # + 1;
+#X text 11 -499 Numeric Operators (numop): transform an image or video
+by applying a mathematical operation to each pixel value in the grid.
+;
+#X text 12 -445 To transform a grid (in this case an image) using numop
+\, it must first be given an argument (a number value) in order to
+affect a pixel value. The examples here show you the three methods
+that can be used to give the numop an argument.;
+#X obj 3 -643 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 3 -678 cnv 15 970 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 10 -618 GridFlow performs high level grid processing \; in
+other words its main function is the manipulation of images and video.
+There are several ways to madify images in GridFlow \, some are very
+basic while others are more advanced (and are saved for the intermediate
+tutorials.) In this section we will introduce some very basic functions
+of the numeric operator \, one of the most common methods used for
+image transformation.;
+#X obj 155 -220 cnv 15 130 150 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 220 -181 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 174 -152 #in;
+#X msg 174 -213 open b001.jpg;
+#X obj 199 -124 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 174 -124 # + 109;
+#X obj 174 -95 s argument;
+#X text 235 -125 <--- argument in this case is 109;
+#X obj 13 -273 + 1;
+#X floatatom 13 -297 5 0 0 0 - - -;
+#X floatatom 13 -249 5 0 0 0 - - -;
+#X text 54 -282 this is a basic numop. GridFlow has its own set of
+numops that are applied to grids \, 3 dimensions \, on each channel.
+;
+#X obj 14 -357 cnv 15 70 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 11 -672 2.4 Image manipulation;
+#X text 11 -644 2.4.3 Numop;
+#X obj 500 -559 cnv 15 130 150 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 550 -523 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 515 -484 #in;
+#X msg 515 -553 open b001.jpg;
+#X obj 515 -434 # +;
+#X obj 515 -404 s message;
+#X obj 562 -461 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 562 -483 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 563 -439 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X msg 562 -461 67;
+#X msg 562 -483 2;
+#X msg 563 -439 199;
+#X text 596 -461 <--- messages used as arguments;
+#X text 596 -486 <---;
+#X text 596 -438 <---;
+#X obj 764 -116 r argument;
+#X obj 891 -91 #out window;
+#X obj 842 -115 r message;
+#X obj 911 -115 r slider;
+#X obj 3 -67 cnv 15 970 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 14 -57 GridFlow 0.8.0;
+#N canvas 0 0 450 300 META 0;
+#X restore 919 -60 pd META;
+#X text 13 -357 Example #1;
+#X text 12 -338 Shows you how to put an argument directly into the
+numeric operator object.;
+#X obj 507 -320 cnv 15 70 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X obj 497 -629 cnv 15 70 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 496 -628 Example #2;
+#X text 506 -320 Example #3;
+#X text 497 -608 Demonstrates how to send the numop an argument using
+a message box. This method allows you to send the numop several different
+arguments.;
+#X text 507 -299 Introduces the use of the slider as a method to give
+the numop an argument. The slider allows you to easily scroll through
+a series of values.;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X connect 5 0 6 0;
+#X connect 6 0 10 0;
+#X connect 7 0 6 0;
+#X connect 8 0 10 1;
+#X connect 10 0 9 0;
+#X connect 17 0 18 0;
+#X connect 18 0 21 0;
+#X connect 19 0 18 0;
+#X connect 21 0 22 0;
+#X connect 24 0 26 0;
+#X connect 25 0 24 0;
+#X connect 32 0 33 0;
+#X connect 33 0 35 0;
+#X connect 34 0 33 0;
+#X connect 35 0 36 0;
+#X connect 40 0 35 1;
+#X connect 41 0 35 1;
+#X connect 42 0 35 1;
+#X connect 46 0 47 0;
+#X connect 48 0 47 0;
+#X connect 49 0 47 0;

@@ -1,0 +1,89 @@
+#N canvas 226 0 429 638 10;
+#X obj -22 -68 cnv 1 430 80 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -24 49 cnv 1 430 520 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj -24 82 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 57 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -17 49 cnv 1 2 480 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 390 50 cnv 1 2 480 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 144 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 168 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 26 98 1.1 What is a grid?;
+#X obj 41 534 cnv 15 300 30 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 53 539 Stephanie Brodeur & Darsha Hewitt 2005;
+#X obj -22 7 cnv 15 430 30 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 88 -3 cnv 15 100 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 88 -5 GridFlow 0.8.0;
+#X obj -22 -68 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj -23 37 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj 189 11 cnv 15 63 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 188 8 Tutorials;
+#X obj -24 48 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj -24 528 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X text 14 63 1;
+#X obj 32 62 Introduction to Grids;
+#X text 26 178 2.1 How does GridFlow understand images?;
+#X text 15 150 2;
+#X obj 36 147 Introduction to Images;
+#X text 419 224 2.3 Different options on how to open an image.;
+#X text 445 241 2.3.1 Opening different images in one window.;
+#X text 445 258 2.3.2 Opening images using send and receive.;
+#X obj -24 310 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 334 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 18 317 3;
+#X obj 39 315 Introduction to Video;
+#X text 482 201 REMOVE 2.3 -- see pd tuts;
+#X text 17 405 4;
+#X obj 38 405 Introduction to Live Feed;
+#X obj 37 481 Putting it all Together;
+#X text 20 482 5;
+#X text 30 430 4.1 Opening a live video feed;
+#X text 30 446 4.2 Motion Detection;
+#X text 29 372 3.3 Recording video;
+#X obj -24 310 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 334 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 400 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 424 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 400 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 424 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 476 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 500 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 476 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj -24 500 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 26 114 1.2 How to create a grid;
+#X text 26 197 2.2 Opening an image;
+#X text 26 214 2.3 Image manipulation;
+#X text 55 244 2.3.2 Resizing an image;
+#X text 55 228 2.3.1 Numop;
+#X text 55 273 2.3.4 Remap image;
+#X text 55 259 2.3.3 Greyscale;
+#X text 55 286 2.3.5 Convolve;
+#X text 29 342 3.1 Opening a video;
+#X text 29 358 3.2 Video manipulation;

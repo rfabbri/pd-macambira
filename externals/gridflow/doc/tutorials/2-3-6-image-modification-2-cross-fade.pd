@@ -1,0 +1,93 @@
+#N canvas 92 129 774 521 10;
+#X text 24 355 note: the #layer/#join objects can make the crossfade
+process simpler but it's still not faster.;
+#X obj 14 95 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 14 120 metro 33.3667;
+#X obj 14 140 float;
+#X obj 26 169 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-262144 -1 -1 0 256;
+#X obj 58 139 + 4;
+#X obj 14 190 pingpong 256;
+#X obj 25 212 hsl 129 15 0 256 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X text 25 393 also #draw_image/#join is a possibility;
+#X obj 13 40 cnv 15 680 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 27 53 Copyright 2002 Mathieu Bouchard;
+#X text 27 37 cross_fade.pd;
+#X obj 6 324 cnv 15 680 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 18 326 GridFlow 0.8.0;
+#N canvas 515 126 450 300 cross_fade 0;
+#X obj 40 198 # *>>8;
+#X text 67 242 first picture plus a fraction of the difference;
+#X obj 40 240 # +;
+#X obj 40 177 #store;
+#X obj 264 137 # inv+;
+#X obj 95 261 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
+;
+#X msg 422 195 open r001.jpg \, cast int16 \, bang;
+#X obj 321 156 #in;
+#X obj 40 156 #finished;
+#X text 116 264 click to clip out-of-range colours;
+#X text 89 197 multiply by a N/256 fraction;
+#X obj 88 302 # max 0;
+#X obj 254 89 #in;
+#X obj 88 281 # min 255;
+#X obj 44 337 #out window;
+#X obj 40 116 #cast int16;
+#X text 88 177 keep the difference between both pictures;
+#X obj 447 99 t b b;
+#X obj 445 74 loadbang;
+#X obj 40 260 shunt 2;
+#X obj 40 135 t a a;
+#X msg 459 137 open g001.jpg \, cast int16 \, bang;
+#X obj 30 75 inlet;
+#X connect 0 0 2 0;
+#X connect 2 0 19 0;
+#X connect 3 0 0 0;
+#X connect 4 0 3 1;
+#X connect 5 0 19 1;
+#X connect 6 0 7 0;
+#X connect 7 0 4 1;
+#X connect 8 0 3 0;
+#X connect 11 0 14 0;
+#X connect 12 0 4 0;
+#X connect 12 0 2 1;
+#X connect 13 0 11 0;
+#X connect 15 0 20 0;
+#X connect 17 0 21 0;
+#X connect 17 1 6 0;
+#X connect 18 0 17 0;
+#X connect 19 0 14 0;
+#X connect 19 1 13 0;
+#X connect 20 0 8 0;
+#X connect 20 1 0 1;
+#X connect 21 0 12 0;
+#X connect 22 0 15 0;
+#X restore 13 261 pd cross_fade;
+#X obj 15 11 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 18 11 What is a grid?;
+#X obj 15 -24 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 20 -25 2 Images;
+#X text 22 -11 Description: opening multiple images from one window.
+;
+#X obj 11 416 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 19 423 GridFlow 0.8.0;
+#X text 219 118 some objects have been created to perform specoific
+tasks. One of these is the crossfade patch it permits you to fade from
+one image to another. you can chose the images you want to ping pong
+between \, to get a nice steady fade between two images.;
+#N canvas 0 0 450 300 META 0;
+#X restore 146 428 pd META;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 3 0 5 0;
+#X connect 3 0 6 0;
+#X connect 5 0 3 1;
+#X connect 6 0 7 0;
+#X connect 6 0 14 0;

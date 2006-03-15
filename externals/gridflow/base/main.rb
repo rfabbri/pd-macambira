@@ -1,8 +1,8 @@
 =begin
-	$Id: main.rb,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: main.rb,v 1.2 2006-03-15 04:37:28 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -94,6 +94,7 @@ def self.packstring_for_nt(nt)
 	when :u, :u8,  :uint8; "C*"
 	when :s, :i16, :int16; "s*"
 	when :i, :i32, :int32; "l*"
+	when :l, :i64, :int64; raise "int64? lol"
 	when :f, :f32, :float32; "f*"
 	when :d, :f64, :float64; "d*"
 	else raise "no decoder for #{nt.inspect}"
@@ -156,12 +157,26 @@ class FObject
 		attr_accessor :do_loadbangs
 		attr_accessor :comment
 		def foreign_name; @foreign_name if defined? @foreign_name end
+		def doc(selector=nil,text=nil)
+			return @doc if not selector
+			if not defined? @doc; @doc={}; end
+			return @doc[selector] if not text
+			@doc[selector] = text
+		end
+		def doc_out(selector=nil,text=nil)
+			return @doc_out if not selector
+			if not defined? @doc_out; @doc_out={}; end
+			return @doc_out[selector] if not text
+			@doc_out[selector] = text
+		end
 	end
 	def post(*a) GridFlow.post(*a) end
 	def self.subclass(*args,&b)
 		qlass = Class.new self
 		qlass.install(*args)
-		qlass.module_eval(&b)
+		#qlass.module_eval{qlass.instance_eval(&b)}
+		qlass.instance_eval{qlass.module_eval(&b)}
+		#qlass.module_eval(&b)
 	end
 	alias :total_time :total_time_get
 	alias :total_time= :total_time_set

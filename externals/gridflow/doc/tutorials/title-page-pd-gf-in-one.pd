@@ -1,0 +1,129 @@
+#N canvas 18 0 762 514 10;
+#X obj 102 -15 cnv 15 430 50 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 102 66 cnv 1 430 430 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 102 98 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 102 73 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 108 66 cnv 1 2 430 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 516 67 cnv 1 2 430 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 102 158 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 102 182 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 152 114 1.1 What is a grid?;
+#X obj 142 456 cnv 15 300 30 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 154 461 Stephanie Brodeur & Darsha Hewitt 2005;
+#X obj 102 36 cnv 15 430 30 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 214 -6 cnv 15 100 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 214 -6 GridFlow 0.8.0;
+#X obj 102 -15 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj 102 34 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj 315 8 cnv 15 63 17 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 314 8 Tutorials;
+#X obj 102 65 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X obj 102 495 cnv 1 430 1 empty empty empty 20 12 0 14 -66577 -66577
+0;
+#X text 140 79 1;
+#X obj 158 78 Introduction to Grids;
+#X text 152 130 1.2 How to create grid.;
+#X text 152 192 2.1 How does GridFlow understand images?;
+#X text 141 164 2;
+#X obj 162 161 Introduction to Images;
+#X text 152 211 2.2 Opening an image.;
+#X text 152 230 2.3 Different options on how to open an image.;
+#X text 178 247 2.3.1 Opening different images in one window.;
+#X text 178 264 2.3.2 Opening images using send and receive.;
+#X obj 102 356 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 102 380 cnv 1 430 2 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 141 362 3;
+#X obj 162 359 Introduction to Video;
+#X text 178 300 2.4.1 Resizing an image.;
+#X text 151 284 2.4 Image manipulation.;
+#X text 178 315 2.4.2 Greyscale.;
+#X text 178 330 2.4.3 numop.;
+#X text 149 394 4 Introduction to live feed;
+#X text 150 422 5 Putting it all together;
+#X obj -401 -18 cnv 15 455 30 empty empty empty 20 12 0 14 -233017
+-66577 0;
+#X obj -398 898 cnv 15 870 30 empty empty empty 20 12 0 14 -233017
+-66577 0;
+#X text -393 898 Copyright Ben Bogart 2005 \; (See COPYING.TXT for
+details);
+#X text -397 -11 Welcome to Pure-Data...;
+#X obj -401 22 cnv 15 455 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text -396 22 What is Pure-Data (aka PD)?;
+#X text -381 50 Pure-Data is an open-source patching environment for
+multi-media (audio+image). Pure-Data is a programming language where
+you create relationships by connecting visual boxes (rather than typing
+complex commands). This lecture is separated into three sections: An
+Introduction to Pure-Data \, An introduction to Gem and intermediate
+PD and Gem.;
+#X obj -381 152 cnv 15 430 120 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X obj -367 174 pddp_open pure-data-1;
+#X obj -367 197 pddp_open pure-data-2;
+#X obj -367 220 pddp_open pure-data-3;
+#X obj -367 243 pddp_open pure-data-4;
+#X text -192 174 Pure-Data Introduction;
+#X text -192 197 GUI Objects for Interaction;
+#X text -192 220 Creating your first patch;
+#X text -192 243 Control: metro \, random & counter;
+#X obj -382 376 cnv 15 430 145 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X obj -378 580 cnv 15 430 145 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X obj -364 602 pddp_open pure-data-5;
+#X obj -364 625 pddp_open pure-data-6;
+#X text -189 625 The powerful message object;
+#X obj -364 648 pddp_open pure-data-7;
+#X text -189 648 More about lists;
+#X text -189 671 Nesting collections of objects;
+#X text -189 602 Connectionless communications;
+#X obj -364 671 pddp_open pure-data-8;
+#X text -189 695 Using GUI's in abstractions;
+#X obj -364 695 pddp_open pure-data-9;
+#X obj -378 787 cnv 15 430 95 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X text -194 422 Introduction to Images;
+#X text -194 468 Introduction to Live Feeds;
+#X obj -401 308 cnv 15 455 15 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X text -189 837 Putting it all together;
+#X text -190 808 Interfacing with sensors;
+#X text -194 399 Introduction to Grids;
+#X text -384 331 GridFlow is a multidimentional dataflow processing
+library for PureData and Ruby \, designed for interactive multimedia.
+;
+#X text -377 376 2 Introduction to GridFlow;
+#X text -376 152 1 Introduction to Pure-Data;
+#X text -373 580 3 Intermediate Pure-Data;
+#X text -373 787 4 Intermediate GridFlow;
+#X obj -401 542 cnv 15 455 15 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X text -396 542 What is GridFLow?;
+#X obj -400 751 cnv 15 455 15 empty empty empty 20 12 0 14 -179884
+-66577 0;
+#X text -395 751 What is GridFLow?;
+#X obj -283 400 GridFlow-1;
+#X obj -283 423 GridFlow-2;
+#X obj -283 446 GridFlow-3;
+#X obj -283 469 GridFlow-4;
+#X obj -281 809 GridFlow-6;
+#X obj -281 832 GridFlow-7;
+#X text -395 308 What is GridFlow?;
+#X text -194 445 Introduction to Video;

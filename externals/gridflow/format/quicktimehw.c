@@ -1,8 +1,8 @@
 /*
-	$Id: quicktimehw.c,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: quicktimehw.c,v 1.2 2006-03-15 04:37:46 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002,2003 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005,2006 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -21,18 +21,11 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#define QUICKTIMEHW_INCLUDE_HERE
 #include "../base/grid.h.fcs"
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <quicktime/quicktime.h>
-#include <quicktime/colormodels.h>
-
-#include <quicktime/lqt_version.h>
-#ifdef LQT_VERSION
-#include <quicktime/lqt.h>
-#include <quicktime/lqt_codecinfo.h>
-#endif
 
 \class FormatQuickTimeHW < Format
 struct FormatQuickTimeHW : Format {
@@ -218,6 +211,8 @@ GRID_INLET(FormatQuickTimeHW,0) {
 \end ruby
 );
 
+//#define L fprintf(stderr,"%s:%d in %s\n",__FILE__,__LINE__,__PRETTY_FUNCTION__);
+
 #ifdef LQT_VERSION
 	lqt_registry_init();
 	int n = lqt_get_num_video_codecs();
@@ -225,6 +220,10 @@ GRID_INLET(FormatQuickTimeHW,0) {
 	Ruby fourccs = rb_hash_new();
 	for (int i=0; i<n; i++) {
 		const lqt_codec_info_t *s = lqt_get_video_codec_info(i);
+		if (!s->name) {
+			fprintf(stderr,"[#in quicktime]: skipping codec with null name!\n");
+			continue;
+		}
 		Ruby name = rb_str_new2(s->name);
 		Ruby f = rb_ary_new2(s->num_fourccs);
 		for (int j=0; j<s->num_fourccs; j++) {

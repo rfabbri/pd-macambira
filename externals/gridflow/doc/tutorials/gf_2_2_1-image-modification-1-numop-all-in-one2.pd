@@ -1,0 +1,127 @@
+#N canvas 53 0 670 470 10;
+#X obj 20 -34 cnv 15 130 150 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 70 2 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj 35 41 #in;
+#X msg 35 -28 open b001.jpg;
+#X obj 35 91 # +;
+#X obj 21 231 cnv 15 185 150 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 29 313 #in;
+#X msg 29 239 open b001.jpg;
+#X obj 96 323 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 4300 1;
+#X obj 29 349 # + \$1;
+#X obj 54 287 metro 33.3;
+#X obj 54 265 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 82 64 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 82 42 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 83 86 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X msg 82 64 67;
+#X msg 82 42 2;
+#X msg 83 86 199;
+#X floatatom 93 349 5 0 0 0 - - -;
+#X text 21 -501 Numeric Operators (numop): transform an image or video
+by applying a mathematical operation to each pixel value in the grid.
+;
+#X obj 21 -522 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 23 -678 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 18 606 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 27 614 GridFlow 0.8.0;
+#X obj 339 -267 cnv 15 130 150 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 404 -228 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 358 -199 #in;
+#X msg 358 -260 open b001.jpg;
+#X obj 378 -171 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 20 -352 cnv 15 50 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 23 -86 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 26 -87 Example #2 demonstrates how to send the numop an argument
+using a message box. This method allows you to send the numop several
+different arguments.;
+#X text 35 -671 2.4 Image manipulation;
+#X text 57 -523 2.4.1 Numop;
+#X text 25 -445 To transform a grid (in this case an image) using numop
+\, it must first be given an argument (a number value). That value
+will be applied by numop to every value in the grid. The following
+examples show you the three methods that can be used to give the numop
+an argument.;
+#X obj 35 121 s to_out_window;
+#X obj 358 -142 s to_out_window;
+#X obj 29 382 s to_out_window;
+#X obj 246 546 r to_out_window;
+#X msg 498 547 close;
+#X msg 393 544 open window;
+#X obj 30 -294 cnv 15 200 180 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 161 -215 cnv 15 25 17 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 199 -318 display;
+#X msg 79 -282 1 2 3 4 5 6 7 8 9;
+#X obj 79 -253 #import (3 3);
+#X obj 179 -479 display;
+#X obj 140 -215 # + 42;
+#X obj 358 -171 # + 42;
+#X text 337 -288 Here is an example with an image.;
+#X text 19 -352 Example 1: shows how values in a grid are altered when
+an argument is placed directly into the numeric operator object.;
+#X text 157 63 1 click on the argument;
+#X text 124 6 2 click on the bang to see the updated image;
+#X text 94 8 <--;
+#X text 116 42 <--;
+#X text 116 65 <--;
+#X text 116 87 <--;
+#X text 194 -221 <-- argument in this case is 42;
+#X obj 353 581 #out window;
+#X text 22 433 In all these examples the [# +] numop is used. All the
+numeric operators can be found in the numeric operator help patch (right
+click on the [# +] and select help to view them). If you want to see
+what effects other numops can do \, try replacing the [# +] numop with
+another one (either cut and paste a different numop from the help file
+or create the object in the current canvas.;
+#X obj 20 181 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 26 179 Example #3 using the slider and metro.;
+#X text 467 -617 split into 3 patches using ben's switch arrange canvases
+and colors;
+#X text 24 -635 GridFlow performs high level grid processing \; in
+other words its main function is the manipulation of images and video.
+There are several ways to modify images \, one of the most common is
+the numeric operators.;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 3 0 2 0;
+#X connect 4 0 35 0;
+#X connect 6 0 9 0;
+#X connect 7 0 6 0;
+#X connect 8 0 9 1;
+#X connect 8 0 18 0;
+#X connect 9 0 37 0;
+#X connect 10 0 6 0;
+#X connect 11 0 10 0;
+#X connect 15 0 4 1;
+#X connect 16 0 4 1;
+#X connect 17 0 4 1;
+#X connect 25 0 26 0;
+#X connect 26 0 48 0;
+#X connect 27 0 26 0;
+#X connect 38 0 58 0;
+#X connect 39 0 58 0;
+#X connect 40 0 58 0;
+#X connect 44 0 45 0;
+#X connect 45 0 46 0;
+#X connect 45 0 47 0;
+#X connect 47 0 43 0;
+#X connect 48 0 36 0;

@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
-# $Id: configure,v 1.1 2005-10-04 02:12:43 matju Exp $
+# $Id: configure,v 1.2 2006-03-15 04:48:05 matju Exp $
 =begin
 	GridFlow
-	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005,2006 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -25,8 +25,16 @@ require "rbconfig"
 require "mkmf"
 require "ftools"
 include Config
+OSX = !!( CONFIG["arch"] =~ /darwin/ )
+
 require "win32/process" if CONFIG["arch"] =~ /mingw/
 LOG = File.open "./config.log", "w"
+
+Red   = "\e[0;1;31m"
+Green = "\e[0;1;32m"
+Light = "\e[0m"
+Dark  = "\e[0;1;30m"
+Yellow = "\e[0;1;33;44m"
 
 $verbose=false
 LOG.puts "-"*64
@@ -72,10 +80,12 @@ $conf={
 	:FEATURES => {},
 	:OPTIONS => [],
 	:DEFINES => {
-		:RUBY_PREFIX => CONFIG['prefix'],
+#		:RUBY_PREFIX => CONFIG['prefix'],
+		:RUBY_PREFIX => nil,
 		:PREFIX => "/usr/local",
 		:CPU => nil,
 		:RUBY_ARCH => CONFIG['arch'],
+		:GEM_SOURCE => "../Gem/src",
 	},
 	:CC => "g++",
 	:OBJS => [],
@@ -198,34 +208,45 @@ def read_ld_so_conf
 	x
 end
 
+def epath x; (ENV[x]||"").split(":") end
+
 $C_INCLUDE_PATH = (
-	(ENV["CPLUS_INCLUDE_PATH"]||"").split(":") +
-	(ENV["C_INCLUDE_PATH"]||"").split(":") +
+	epath("CPLUS_INCLUDE_PATH") +
+	epath("C_INCLUDE_PATH") +
 	["/usr/include"]).uniq
 
 $LIBRARY_PATH = (
-	(ENV["LIBRARY_PATH"]||"").split(":") +
+	epath("LIBRARY_PATH") +
 	["/usr/lib","/lib"]).uniq
 
 $LD_LIBRARY_PATH = (
-	(ENV["LD_LIBRARY_PATH"]||"").split(":") +
-		read_ld_so_conf +
-		["/usr/lib","/lib"]).uniq
+	epath("LD_LIBRARY_PATH") +
+	read_ld_so_conf +
+	["/usr/lib","/lib"]).uniq
+$LIBX11DIR = ["-L/usr/X11R6/lib"]
+$LIBX11 = ["-L/usr/X11R6/lib","-lX11"]
 
 # making it easier for everybody I hope:
-["/Applications/Pd.app/Contents/Resources","/sw","/usr/local",ENV["home"]].each do|base|
-	if not $LD_LIBRARY_PATH.include? "#{base}/lib" and
-	   not $LIBRARY_PATH.include? "#{base}/lib" then
-		$conf[:LDSOFLAGS].unshift "-L#{base}/lib"
-		$LD_LIBRARY_PATH.unshift "#{base}/lib"
-		$LIBRARY_PATH.unshift "#{base}/lib"
+def prepend_path base
+	bl = base+"/lib"
+	bi = base+"/include"
+	if not $LD_LIBRARY_PATH.include? bl and
+	   not $LIBRARY_PATH.include? bl then
+		$conf[:LDSOFLAGS].unshift "-L"+bl
+		$LD_LIBRARY_PATH.unshift bl
+		$LIBRARY_PATH.unshift bl
 	end
-	#and not $CPLUS_INCLUDE_PATH.include? "#{base}/include"
-	if not $C_INCLUDE_PATH.include? "#{base}/include" then
-		$CFLAGS += " -I#{base}/include"
-		$C_INCLUDE_PATH.unshift "#{base}/include"
+	#and not $CPLUS_INCLUDE_PATH.include? bi
+	if not $C_INCLUDE_PATH.include? bi then
+		$CFLAGS += " -I"+bi
+		$C_INCLUDE_PATH.unshift bi
 	end
 end
+prepend_path "/Applications/Pd.app/Contents/Resources" if OSX
+prepend_path "/sw" if OSX
+prepend_path "/usr/local"
+prepend_path ENV["HOME"]
+# prepend_path "."
 
 for var in [:$C_INCLUDE_PATH, :$LIBRARY_PATH, :$LD_LIBRARY_PATH] do
 	LOG.puts "#{var}: #{eval(var.to_s).inspect}"
@@ -261,6 +282,10 @@ FILES = [
   [:directory, "format/",
     [:ruby, "main.rb"],
   ],
+  [:directory, "optional/",
+    [:ruby, "usb.rb"],
+    [:ruby, "lti.rb"],
+  ],
   [:directory, "extra/",
 	[:ruby, "smpte.rb"],
 	[:ruby, "server_2.rb"],
@@ -273,13 +298,10 @@ FILES = [
 
 #----------------------------------------------------------------#
 Feature.add {
-	tag :fast
-	name "Compile for speed (and not debuggability)"
-}
-Feature.add {
 	tag :gcc3
 	name "GNU C++ Compiler 3"
 	options ["HAVE_GCC3"]
+=begin
 	test proc {
 		pi=File.popen "#{$conf[:CC]} -v 2>&1", "r"
 		vline = pi.readlines.find {|l| /gcc version ([\d\.]+)/.match l }
@@ -288,6 +310,20 @@ Feature.add {
 		if version < "3" then raise "version #{version} < 3" end
 		true
 	}
+=end
+	test proc {
+		c_test %{
+		#include <stdio.h>
+		int main () {
+			printf("GCC_VERSION %d.%d.%d\\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+			return !(__GNUC__>=3);
+		}}
+	}
+	defines :GCC_VERSION => proc {
+		m = /GCC_VERSION\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
+		m[1]
+	}
+
 }
 Feature.add {
 	tag :stl
@@ -309,7 +345,7 @@ Feature.add {
 		#include <stdio.h>
 		#include <stdlib.h>
 		#include <cstddef>
-		#define T(a) printf("%s:%d; ",#a,sizeof(a));
+		#define T(a) printf("%s:%ld; ",#a,(long)sizeof(a));
 		int main () {
 			T(void *)T(ptrdiff_t)T(off_t)T(size_t)puts("");
 			T(char)T(short)T(int)T(long)T(long long)puts("");
@@ -321,13 +357,69 @@ Feature.add {
 
 #----------------------------------------------------------------#
 
-$stack_end_test = %{
+Feature.add {
+	tag :libc_stack_end
+	name "Stack end defined by LibC"
+	status :disabled
+	test proc { c_test '
 	#include <stdio.h>
-	#include <ruby.h>
+	extern void *__libc_stack_end;
+	int main () {
+		printf("#define STACK_END 0x%0*lx",sizeof(long)*2,__libc_stack_end);
+		return 0;
+	}
+	', uses_bridge_so }
+	defines :HAVE_LIBC_STACK_END
+	defines :STACK_END => proc {
+		m = /STACK_END\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
+		m[1]
+	}
+}
+Feature.add {
+	tag :segv_stack_end
+	name "Stack end probed"
+	test proc { c_test %`
+		/* the segfault trick (by Mathieu Bouchard) */
+		#ifndef STACK_GROW_DIRECTION
+		#define STACK_GROW_DIRECTION -1
+		#endif
+		#include <stdio.h>
+		#include <signal.h>
+		#include <setjmp.h>
+		static volatile long bogus = 0; // to force *bp to be read in memory
+		static sigjmp_buf rescue_segfault;
+		static void trap_segfault (int patate) { siglongjmp(rescue_segfault,11); }
+		int main () {
+		// get any stack address
+		volatile long * volatile bp = (volatile long *)&bp;
+		void (*oldsegv)(int) = signal(SIGSEGV,trap_segfault);
+		void (*oldbus)(int)  = signal(SIGBUS, trap_segfault);
+		if (!sigsetjmp(rescue_segfault,0)) for (;;bp-=STACK_GROW_DIRECTION) bogus += *bp;
+		printf("#define STACK_END 0x%0*lx\\n",sizeof(long)*2,(long)(bp+STACK_GROW_DIRECTION));
+		return 0;
+	}
+	`, uses_bridge_so }
+	defines :HAVE_LIBC_STACK_END
+	defines :STACK_END => proc {
+		m = /STACK_END\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
+		m[1]
+	}
+}
+Feature.add {
+	tag :wild_stack_end
+	name "Stack end wild guess"
+	unless_feature [:libc_stack_end,:segv_stack_end]
+	test proc { c_test '
+	#include <stdio.h>
 	int main () {
 		void *bp;
-		printf("#define RUBY_STACK_END 0x%08lx",(long)&bp);
-		return rb_rescue==0;
+		printf("#define STACK_END 0x%0*lx",sizeof(long)*2,(long)&bp);
+		return 0;
+	}
+	', uses_bridge_so }
+	defines :STACK_END => proc {
+		m = /STACK_END\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
+		m[1]
 	}
 }
 Feature.add {
@@ -335,11 +427,8 @@ Feature.add {
 	name "Ruby as a dynamic library"
 	uses_bridge_so ["-lruby"]
 	#uses_h ["ruby.h"] # is in special directory
-	defines :RUBY_STACK_END => proc {
-		m = /RUBY_STACK_END\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
-		m[1]
-	}
-	test proc { c_test $stack_end_test, uses_bridge_so }
+	test proc { c_test "#include <ruby.h>
+		int main () { return rb_rescue==0; }", uses_bridge_so }
 }
 Feature.add {
 	tag :librubystatic
@@ -348,16 +437,12 @@ Feature.add {
 	#uses_h ["ruby.h"] # is in special directory
 	uses_bridge_so {
 		lib = " #{$LIBRUBY_A} #{CONFIG['LIBS']} "
-		unless CONFIG["arch"] =~ /darwin/
-			lib = "-Wl,--whole-archive"+lib+"-Wl,--no-whole-archive"
-		end
+			lib = "-Wl,--whole-archive"+lib+"-Wl,--no-whole-archive" unless OSX
 		[lib]
 	}
-	defines :RUBY_STACK_END => proc {
-		m = /RUBY_STACK_END\s+(.*)/.match(File.popen("tmp/#{$$}","r"){|f| f.read })
-		m[1]
-	}
-	test proc { c_test $stack_end_test, ["-xnone", $LIBRUBY_A, *(CONFIG['LIBS'].split)] }
+	test proc { c_test "#include <ruby.h>
+		int main () { return rb_rescue==0; }",
+		["-xnone", $LIBRUBY_A, *(CONFIG['LIBS'].split)] }
 	options ["HAVE_STATIC_RUBY"] #!@#$ useless?
 }
 #----------------------------------------------------------------#
@@ -366,7 +451,7 @@ Feature.add {
 	name "Pentium-compatible CPU"
 	action proc { $conf[:DEFINES][:CPU] ||= "pentium" }
 	test proc {
-		(CONFIG["arch"] =~ /i\d86/) or raise "#{CONFIG["arch"]} instead"
+		(CONFIG["arch"] =~ /(i\d86|x86_64)/) or raise "#{CONFIG["arch"]} instead"
 		c_test '
 		#include <stdio.h>
 		char get_cpuid[]={
@@ -468,7 +553,7 @@ Feature.add {
 Feature.add {
 	tag :x11
 	name "X11 Display Protocol"
-	uses_so ["-L/usr/X11R6/lib","-lX11","-lXext"]
+	uses_so $LIBX11
 	uses_h ["X11/Xlib.h"]
 	test proc {
 		c_test "
@@ -480,9 +565,9 @@ Feature.add {
 }
 Feature.add {
 	tag :x11_shm
-	name "X11 acceleration through shared memory"
+	name "X11 acceleration by shared memory (XSHM plugin)"
 	uses_feature [:x11]
-	uses_so ["-L/usr/X11R6/lib","-lX11","-lXext"]
+	uses_so $LIBX11+["-lXext"]
 	uses_h ["X11/Xlib.h","sys/shm.h","X11/extensions/XShm.h"]
 	test proc {
 		c_test "
@@ -495,13 +580,26 @@ Feature.add {
 	}
 	options ["HAVE_X11_SHARED_MEMORY"]
 }
-=begin
+Feature.add {
+	tag :x11_xv
+	status :disabled
+	name "X11 acceleration (XVIDEO plugin)"
+	uses_feature [:x11]
+	uses_so $LIBX11+["-lXext","-lXv"]
+	uses_h ["X11/Xlib.h","X11/extensions/Xv.h"]
+	test proc {
+		c_test "
+		#include#
+		int main () {return 0;}
+		"
+	}
+	options ["HAVE_X11_XVIDEO"]
+}
 Feature.add {
 	tag :opengl
 	name "OpenGL (only as framebuffer)"
-	status :disabled
-	uses_so ["-L/usr/X11R6/lib","-lglut","-lGL","-lGLU"]
-	uses_h ["GL/glut.h"]
+	uses_so $LIBX11DIR+["-lglut","-lGL","-lGLU"]
+	uses_h ["GL/gl.h","GL/glu.h","GL/glut.h"]
 	test proc {
 		c_test "
 		#include#
@@ -510,13 +608,12 @@ Feature.add {
 	}
 	uses_o ["format/opengl.o"]
 }
-=end
 Feature.add {
 	tag :sdl
 	name "Simple Directmedia Layer (experimental support)"
 	uses_so {
 		a=["-lSDL","-lpthread"]
-		a<<"-lobjc" if CONFIG["arch"] =~ /darwin/
+		a<<"-lobjc" if OSX
 		a
 	}
 	uses_h ["SDL/SDL.h"]
@@ -607,6 +704,7 @@ Feature.add {
 	}
 	uses_o ["format/png.o"]
 }
+#------------------------------------------------#
 Feature.add {
 	tag :videodev
 	name "Video4linux Digitizer Driver Interface"
@@ -622,8 +720,7 @@ Feature.add {
 Feature.add {
 	tag :mpeg3
 	name "HeroineWarrior LibMPEG3"
-	uses_so ["-lmpeg3","-lpthread","-lm",
-		"-L/usr/X11R6/lib"]
+	uses_so $LIBX11DIR+["-lmpeg3","-lpthread","-lm"]
 	uses_h Or["libmpeg3/libmpeg3.h","libmpeg3.h"]
 	test proc {|f|
 		f.c_test "
@@ -649,11 +746,14 @@ Feature.add {
 Feature.add {
 	tag :quicktimehw
 	unless_feature :quicktimeapple
-	name "HeroineWarrior QuickTime4Linux (or LibQuickTime)"
+	name "Plaum's LibQuickTime"
 	uses_so Or[
 		["-lquicktime","-lpthread","-lpng","-ldl","-lglib","-lz"],
 		["-lquicktime","-lpthread","-lpng","-ldl","-lglib-1.2","-lz"]]
-	uses_h ["quicktime/quicktime.h","quicktime/lqt_version.h"]
+	f = ["quicktime.h","colormodels.h","lqt.h","lqt_version.h","lqt_codecinfo.h"]
+	uses_h Or[
+		f.map{|x| "quicktime/"+x },
+		f.map{|x| "lqt/"+x }]
 	test proc {|f|
 		f.c_test %`
 		#include <stdio.h>
@@ -727,18 +827,38 @@ Feature.add {
 		`
 	}
 }
+#--------------------------------#
+Feature.add {
+	tag :gem
+	name "PureData GEM (source code)"
+#	uses_h [$conf[:DEFINES][:GEM_SOURCE]+"/src/Base/GemBase.h"]
+	uses_feature [:puredata]
+	uses_o ["optional/gem.o"]
+	test proc {
+		# hack
+		$C_INCLUDE_PATH.unshift $conf[:DEFINES][ :GEM_SOURCE]
+		$CFLAGS += " -I"+$conf[:DEFINES][ :GEM_SOURCE]
+		c_test %`
+			#include "Base/GemBase.h"
+			int main () {
+				return 0;
+			}
+		`
+	}
+}
+#--------------------------------#
 
 $features_h = {}
 $features.each {|f| $features_h[f.tag]=f }
 
-#--------------------------------#
 
 def usage
 	log = ""
 	log << "usage: ./configure "
 	log << "[--use-compiler compiler] [--use-compiler-option option]* "
 	log << "[--use-cpu cpu] [--lite] [--debug] [--debug-harder]"
-	log << "[--ruby-prefix directory] "
+	log << "[--ruby-prefix directory] [--gem-source directory]"
+	# [--puredata-prefix directory] "
 	$features_h.keys.map {|k| k.to_s }.sort.each {|k| log << "[--no-#{k}] " }
 	$features_h.keys.map {|k| k.to_s }.sort.each {|k| log << "[--force-#{k}] " }
 	puts
@@ -778,8 +898,11 @@ while ARGV.length>0 do
 		puts "Lite Mode (no float, no int64)"
 		$conf[:OPTIONS].push :HAVE_LITE
 	when "--help"; usage; exit 0
-	when "--prefix", "--ruby-prefix"
-		$conf[:DEFINES][:RUBY_PREFIX]=ARGV.shift
+
+	when "--prefix", "--ruby-prefix"       : $conf[:DEFINES][:RUBY_PREFIX]=ARGV.shift
+	when "--pd-prefix", "--puredata-prefix": $conf[:DEFINES][  :PD_PREFIX]=ARGV.shift
+	when "--gem-source"                    : $conf[:DEFINES][ :GEM_SOURCE]=ARGV.shift
+
 	when "--use-compiler"
 		$conf[:CC] = ARGV.shift
 	when "--use-compiler-option"
@@ -789,7 +912,7 @@ while ARGV.length>0 do
 	when "--verbose"
 		$verbose=true
 	when "--bindir"
-		$conv[:BINDIR] = ARGV.shift
+		$conf[:BINDIR] = ARGV.shift
 	else puts "unknown option \"#{arg}\""; usage; exit 1
 	end
 end
@@ -798,8 +921,7 @@ end
 CONFIG["ruby_version"] ||= "$(MAJOR).$(MINOR)"
 CONFIG["rubylibdir"] ||= "$(libdir)/ruby/$(ruby_version)"
 CONFIG["archdir"] ||= CONFIG["rubylibdir"] + "/" + CONFIG["arch"]
-
-$CFLAGS += " -I " + (make_expand CONFIG["archdir"])
+$CFLAGS += " -I" + (make_expand CONFIG["archdir"])
 
 #--------------------------------#
 
@@ -815,6 +937,7 @@ DUAL.instance_eval {
 }
 
 def try feature
+
 	if Or===feature.uses_so
 		k=1
 		feature.uses_so.a.each {|i|
@@ -826,28 +949,31 @@ def try feature
 	end
 	if Or===feature.uses_h
 		feature.uses_h.a.each {|i|
-			e=feature.dup; e.uses_h i; e.name(e.name+" <#{e.uses_h}>")
+			e=feature.dup; e.uses_h i; e.name(e.name+" <#{i.to_a[0]}>")
 			r=try e; return r if r
 		}
 		return false
 	end
 	LOG.puts "", "-"*64
-	DUAL.print "[#{feature.tag}] #{feature.name}: "
+	line = "[#{feature.tag}] #{feature.name}: "
+	DUAL.print Light + "[#{Yellow}#{feature.tag}#{Light}] #{feature.name}: "
+	arrow = "-"*([78-line.length,0].max)+ "> "
+	#DUAL.print Dark + arrow +Red
 	(feature.uses_feature||[]).find {|f|
 		if not (
 		  if Or===f then f.a.find {|x| $conf[:FEATURES][x] } else $conf[:FEATURES][f] end
 		) then 
-			DUAL.puts "disabled (would need #{f})"
+			DUAL.puts Red+arrow+"disabled (would need #{f})"
 			return
 		end
 	}
-	if feature.status==:disabled then DUAL.puts "disabled (by author)"; return end
-	if not $features_h[feature.tag] then DUAL.puts "disabled (by user)"; return end
+	if feature.status==:disabled then DUAL.puts Dark+arrow+"disabled (by author)"; return end
+	if not $features_h[feature.tag] then DUAL.puts Dark+arrow+"disabled (by user)"; return end
 	fu = feature.unless_feature || []
 	fu = [fu] if not Array===fu
 	for f in fu || [] do
 		if $conf[:FEATURES][f] then
-			DUAL.puts "disabled (using #{f} instead)"
+			DUAL.puts Dark+arrow+"disabled (using #{f} instead)"
 			return
 		end
 	end
@@ -858,7 +984,7 @@ def try feature
 		rescue StandardError => e
 		end
 		if tresult
-			DUAL.puts "found "+(if tresult!=true
+			DUAL.puts Green+arrow+"found "+(if tresult!=true
 				then " (#{tresult})"
 				else "" end)
 			if tresult == "static"
@@ -870,7 +996,7 @@ def try feature
 				} if feature.uses_bridge_so
 			end
 		else
-			DUAL.puts "missing "+(if e
+			DUAL.puts Red+arrow+"missing "+(if e
 				then (if $verbose
 					then "(#{e} @ #{e.backtrace.join', '})"
 					else "(#{e})" end)
@@ -882,7 +1008,7 @@ def try feature
 			return false
 		end
 	else
-		puts "enabled"
+		puts Green+arrow+"enabled"
 		$conf[:FEATURES][feature.tag] = feature
 		feature.action.call if feature.action
 	end
@@ -898,7 +1024,7 @@ def try feature
 	true
 end
 
-DUAL.puts "This is the GridFlow 0.8.0 configurator within Ruby version #{RUBY_VERSION}"
+DUAL.puts "This is the GridFlow 0.8.1 configurator within Ruby version #{RUBY_VERSION}"
 
 begin
   $features.each {|feature| try feature }
@@ -907,10 +1033,12 @@ ensure
   system "/bin/rm -f tmp/#{$$} tmp/#{$$}.c tmp/#{$$}.o tmp/#{$$}.asm"
 end
 
+puts Light
+
 $conf[:LDSOFLAGS].uniq!
 $conf[:BRIDGE_LDFLAGS].uniq!
 
-$CFLAGS += " -falign-functions=4" if $conf[:FEATURES][:gcc3]
+$CFLAGS += " -falign-functions=16" if $conf[:FEATURES][:gcc3]
 
 #if not $conf[:FEATURES][:gcc3]
 #  puts "You should install gcc 3.x; gcc 2.9.x is no longer supported"
@@ -975,17 +1103,18 @@ RUBYARCH=#{CONFIG['arch']}
 
 f.puts "BRIDGE_LDFLAGS = " + $conf[:BRIDGE_LDFLAGS].flatten.join(" ") + " " + $LDFLAGS
 
-if CONFIG["arch"] =~ /darwin/ then
+if OSX then
 	f.puts "BRIDGE_LDFLAGS += -bundle -flat_namespace"
 else
 	f.puts "BRIDGE_LDFLAGS += -rdynamic -shared"
 end
-$CFLAGS +=  " -mcpu=$(CPU)" if $conf[:DEFINES][:CPU]
+$CFLAGS += " -mtune=$(CPU)" if $conf[:DEFINES][:CPU]
 $CFLAGS += " -march=$(CPU)" if $conf[:DEFINES][:CPU]
 #$CFLAGS += " -fforce-addr"
 #$CFLAGS += " -fprefetch-loop-arrays"
 #$CFLAGS += " -falign-jumps=4"
 #$CFLAGS += " -falign-loops=4"
+$CFLAGS += " -DMACOSX" if OSX
 f.puts "CFLAGS += " + $CFLAGS
 
 for k   in $conf[:OPTIONS] do f.puts "#{k}=yes" end
@@ -1023,13 +1152,19 @@ f.puts "#define STARTUP_LIST(PRE) \\"
 f.puts $conf[:OBJS].map {|o| "PRE startup_#{File.basename(o,'.o')}();" }.join("\\\n")
 for k   in $conf[:OPTIONS] do f.puts "\#define #{k}" end
 for k,v in $conf[:DEFINES] do f.puts "\#define #{k} "+v.inspect end
-if $conf[:FEATURES][:mpeg3]
-f.puts "
-\#ifdef LIBMPEG_INCLUDE_HERE
-\#include <#{$conf[:FEATURES][:mpeg3].uses_h}>
-\#endif
-"
+
+def include_here(f,a,b)
+  return unless $conf[:FEATURES][b]
+  f.puts "\#ifdef #{a}_INCLUDE_HERE"
+  for inc in $conf[:FEATURES][b].uses_h.to_a do
+    f.puts "\#include <#{inc}>"
+  end
+  f.puts "\#endif"
 end
+
+include_here f,"LIBMPEG", :mpeg3
+include_here f,"QUICKTIMEHW",:quicktimehw
+
 f.puts "
 \#define RUBY_BINDIR #{make_expand(CONFIG['bindir']).inspect}
 \#endif /* __CONFIG_H */"
@@ -1089,7 +1224,13 @@ mf.sub! /^(OBJS = .*)$/, "\\1 #{$conf[:OBJS].join' '}"
 mf[0,0] = "COMMON_DEPS = config.make Makefile Makefile.gf base/source_filter.rb\n"+
 	"gfbindir = #{$conf[:BINDIR]}\n"
 mf.sub!(/^site-install:\s*install/,"site-install: ")
-mf.sub! /^prefix = .*$/, "prefix = " + make_expand($conf[:DEFINES][:RUBY_PREFIX])
+
+rp=$conf[:DEFINES][:RUBY_PREFIX]
+if rp
+  mf.sub! /^prefix\s*=.*$/,   "prefix = " + make_expand(rp)
+  mf.sub! /^sitedir\s*=.*$/, "sitedir = " + make_expand(rp)
+end
+
 mf.sub! /^LDSHARED = g?cc/, "LDSHARED = $(CXX)"
 # Adam Lindsay's Mac attempts.
 mf.sub! /-no-precomp/, "-no-cpp-precomp"

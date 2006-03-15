@@ -1,10 +1,11 @@
 <?xml version="1.0" standalone="no" ?>
 <!DOCTYPE documentation SYSTEM 'gridflow.dtd'>
 <documentation title="Reference Manual: Flow Classes" indexcols="3">
-<!-- $Id: reference.xml,v 1.1 2005-10-04 02:09:43 matju Exp $ -->
+<!-- $Id: reference.xml,v 1.2 2006-03-15 04:44:50 matju Exp $ -->
 <!--
 	GridFlow Reference Manual: Class Reference
-	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard and Alexandre Castonguay
+	Copyright (c) 2001,2002,2003,2004,2005,2006
+	by Mathieu Bouchard and Alexandre Castonguay
 -->
 
 <section name="Objects for making grids and breaking them down">
@@ -148,8 +149,17 @@
 			<arg name="hidepreview" type="0,1"></arg>
 		</method>
 		<inlet id="0"><method name="grid">
-			Produces a Dim(3) grid of RGB values.
+			changes all three values (R,G,B). The grid must
+			be a Dim(3).
+		</method>
+		<method name="delegate">
+			sends the rest of the message to each of the three sliders.
+			this relies on the fact that [#color] is implemented using
+			three [hsl] and this might not still work in the far future.
 		</method></inlet>
+		<outlet id="0"><method name="grid">
+			Produces a Dim(3) grid of RGB values.
+		</method></outlet>
 	</class>
 
 	<class name="#unpack">
@@ -1342,7 +1352,13 @@
 		directory.  May be used with [listlength] to retrieve the number of files. 
 		Hidden files are displayed.
 		</p>
-		<inlet id="0"><method name="symbol"/></inlet>
+		<inlet id="0"><method name="symbol">
+			lists all files in a given directory
+		</method>
+		<method name="glob">
+			lists all files matching a given pattern.
+			"symbol hello" is like "glob hello/*"
+		</method></inlet>
 	</class>
 
 	<class name="exec">

@@ -1,0 +1,70 @@
+#N canvas 261 121 900 544 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 448 366 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 497 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 499 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 474 324 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: patch first connecting placing place connect
+;
+#X restore 16 503 pd META;
+#X text 12 20 DESCRIPTION: Using PD to create your first patch;
+#X text 13 46 Adding Objects:;
+#X text 19 75 In order to create a patch you need to first place objects
+and GUI objects \, and second make connections between these objects.
+To place an object you need to be in "edit-mode". You should now be
+in run mode \, so please go to the "Edit" pull-down menu and choose
+"Edit mode" at the bottom. You should see your cursor change from an
+arrow to a pointing hand.;
+#X text 19 175 SHORTCUT: You can press "Control" and "e" simultaneously
+in order to toggle (switch) between edit and Run modes.;
+#X obj 448 386 cnv 15 430 100 empty empty empty 20 12 0 14 -233017
+-66577 0;
+#X floatatom 506 406 5 0 0 0 - - -;
+#X text 19 355 SHORTCUT: You can press "Control" and "3" simultaneously
+in order to place a number. All shortcuts are listed next to the items
+in the "Put" menu.;
+#X text 453 366 Patch work area:;
+#X text 19 215 Once you are in "edit-mode" you are now free to place
+objects. To place an object go to the "Put" pull-down menu and choose
+"Number". Once you have chosen this menu item you will see that a "number"
+gui is attached to your mouse pointer. In order to place the number
+into the patch move your pointer to the grey area to the right (in
+the "Patch work area" -> Click once to release it from your mouse.
+Note that the number is coloured blue. The blue colour shows that an
+item in your patch is selected. To unselect any item simply click once
+on the blank (white) space between items.;
+#X obj 520 440 print;
+#X obj 448 156 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 156 Connecting Objects:;
+#X text 19 411 Next we're going to place the familar "print" object
+beneath the "number" GUI. Press "Control" and "1" to place an object
+box. Again the object gets attached to your mouse and again click once
+to place it in the patch area somewhere under the "number".;
+#X text 459 41 While the number box is still selected (coloured blue)
+you can see a flashing cursor. Type the word "print" into the object
+box. The object will retain a dashed line while you type. In order
+to create the object you simply need to unselect \, by clicking somewhere
+outside the object. Note that once you have clicked to create the object
+the dashed line turns solid and an inlet (small rectangle) gets drawn
+around the word "print". The objects have now been created!;
+#X text 459 185 All connections between objects in PD are created from
+outlet to inlet (top to bottom). To start making a connection move
+your hand-pointer over the outlet of the "number" gui. When over the
+outlet your pointer will change to a circle. When you see the circle
+press and hold the mouse button. As you drag (holding the mouse button
+down) the pointer you see a line being drawn from the outlet to your
+pointer. To attach this connection to another object drag your mouse
+to an inlet of another object. The pointer will again change to a circle
+and at this point you can release the mouse button. Once released the
+objects are now connected! To play with your patch go back into run-mode
+and click and drag on the number-box while watching the terminal.;
+#X text 12 8 3 PD Introduction - Creating your first patch;
+#X connect 11 0 15 0;

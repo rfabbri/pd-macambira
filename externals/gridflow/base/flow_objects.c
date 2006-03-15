@@ -1,8 +1,8 @@
 /*
-	$Id: flow_objects.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: flow_objects.c,v 1.2 2006-03-15 04:37:08 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -158,6 +158,7 @@ static Ruby INTORFLOAT2NUM(T       value) {return      INT2NUM(value);}
 static Ruby INTORFLOAT2NUM(int64   value) {return    gf_ll2num(value);}
 static Ruby INTORFLOAT2NUM(float32 value) {return rb_float_new(value);}
 static Ruby INTORFLOAT2NUM(float64 value) {return rb_float_new(value);}
+static Ruby INTORFLOAT2NUM(ruby    value) {return value.r;}
 
 GRID_INLET(GridExport,0) {
 } GRID_FLOW {
@@ -213,9 +214,9 @@ struct GridStore : GridObject {
 	PtrGrid r; // can't be \attr
 	PtrGrid put_at; // can't be //\attr
 	\attr Numop *op;
-	int32 wdex [Dim::MAX_DIMENSIONS]; // temporary buffer, copy of put_at
-	int32 fromb[Dim::MAX_DIMENSIONS];
-	int32 to2  [Dim::MAX_DIMENSIONS];
+	int32 wdex [Dim::MAX_DIM]; // temporary buffer, copy of put_at
+	int32 fromb[Dim::MAX_DIM];
+	int32 to2  [Dim::MAX_DIM];
 	int lsd; // lsd = Last Same Dimension (for put_at)
 	int d; // goes with wdex
 	\decl void initialize (Grid *r=0);
@@ -258,7 +259,7 @@ GRID_INLET(GridStore,0) {
 	int na = in->dim->n;
 	int nb = r->dim->n;
 	int nc = in->dim->get(na-1);
-	STACK_ARRAY(int32,v,Dim::MAX_DIMENSIONS);
+	STACK_ARRAY(int32,v,Dim::MAX_DIM);
 	if (na<1) RAISE("must have at least 1 dimension.",na,1,1+nb);
 	int lastindexable = r->dim->prod()/r->dim->prod(nc) - 1;
 	int ngreatest = nt_greatest((T *)0);
@@ -413,6 +414,8 @@ GRID_INLET(GridOp,0) {
 	SAME_TYPE(in,r);
 	out=new GridOutlet(this,0,in->dim,in->nt);
 	in->set_mode(6);
+} GRID_ALLOC {
+	//out->ask(in->allocn,(Pt<T> &)in->alloc,in->allocfactor,in->allocmin,in->allocmax);
 } GRID_FLOW {
 	Pt<T> rdata = (Pt<T>)*r;
 	int loop = r->dim->prod();
@@ -787,7 +790,7 @@ void GridFor::trigger (T bogus) {
 	if (!from->dim->equal(to->dim) || !to->dim->equal(step->dim))
 		RAISE("dimension mismatch");
 #define FOO(T) trigger((T)0);
-	TYPESWITCH_NOFLOAT(from->nt,FOO,);
+	TYPESWITCH_JUSTINT(from->nt,FOO,);
 #undef FOO
 }
 
@@ -1048,7 +1051,8 @@ GRID_INLET(GridTranspose,0) {
 } GRID_FLOW {
 	STACK_ARRAY(T,res,na*nb*nc*nd);
 	if (dim1==dim2) { out->send(n,data); return; }
-	for (; n; n-=na*nb*nc*nd, data+=na*nb*nc*nd) {
+	int prod = na*nb*nc*nd;
+	for (; n; n-=prod, data+=prod) {
 		for (int a=0; a<na; a++)
 			for (int b=0; b<nb; b++)
 				for (int c=0; c<nc; c++)
@@ -1107,14 +1111,14 @@ GRID_INLET(GridReverse,0) {
 \end class GridReverse
 
 //****************************************************************
-\class GridCentroid2 < GridObject
-struct GridCentroid2 : GridObject {
+\class GridCentroid < GridObject
+struct GridCentroid : GridObject {
 	\decl void initialize ();
 	\grin 0 int
 	int sumx,sumy,sum,y; // temporaries
 };
 
-GRID_INLET(GridCentroid2,0) {
+GRID_INLET(GridCentroid,0) {
 	if (in->dim->n != 3) RAISE("expecting 3 dims");
 	if (in->dim->v[2] != 1) RAISE("expecting 1 channel");
 	in->set_factor(in->dim->prod(1));
@@ -1137,14 +1141,16 @@ GRID_INLET(GridCentroid2,0) {
 	blah[0] = sum ? sumy/sum : 0;
 	blah[1] = sum ? sumx/sum : 0;
 	out->send(2,blah);
+	rb_funcall(rself,SI(send_out),2,INT2NUM(1),INT2NUM(blah[0]));
+	rb_funcall(rself,SI(send_out),2,INT2NUM(2),INT2NUM(blah[1]));
 } GRID_END
 
 \def void initialize () {
 	rb_call_super(argc,argv);
 }
 
-\classinfo { IEVAL(rself,"install '#centroid2',1,1"); }
-\end class GridCentroid2
+\classinfo { IEVAL(rself,"install '#centroid',1,3"); }
+\end class GridCentroid
 
 //****************************************************************
 \class GridPerspective < GridObject

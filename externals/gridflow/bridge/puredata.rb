@@ -1,5 +1,5 @@
 =begin
-	$Id: puredata.rb,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: puredata.rb,v 1.2 2006-03-15 04:38:20 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002 by Mathieu Bouchard

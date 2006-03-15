@@ -1,5 +1,5 @@
 /*
-	$Id: jpeg.c,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: jpeg.c,v 1.2 2006-03-15 04:37:46 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
@@ -42,6 +42,7 @@ struct FormatJPEG : Format {
 	int fd;
 	FILE *f;
 	\decl Ruby frame ();
+	\decl void quality (short quality);
 	\decl void initialize (Symbol mode, Symbol source, String filename);
 	\grin 0 int
 };
@@ -108,6 +109,13 @@ static bool gfeof(FILE *f) {
 	return Qnil;
 }
 
+\def void quality (short quality) {
+	quality = min(max((int)quality,0),100);
+	// should the last arg ("baseline") be set to true ?
+	// and what is it for? is it for accuracy of the DC component?
+	jpeg_set_quality(&cjpeg,quality,false);
+}
+
 \def void initialize (Symbol mode, Symbol source, String filename) {
 	rb_call_super(argc,argv);
 	if (source!=SYM(file)) RAISE("usage: jpeg file <filename>");
@@ -121,7 +129,7 @@ static bool gfeof(FILE *f) {
 
 \classinfo {
 	IEVAL(rself,
-	"install '#in:jpeg',1,1;@mode=6;"
+	"install '#io:jpeg',1,1;@mode=6;"
 	"include GridFlow::EventIO; suffixes_are'jpeg','jpg'");
 }
 \end class FormatJPEG

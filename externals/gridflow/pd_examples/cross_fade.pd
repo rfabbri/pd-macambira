@@ -1,73 +1,74 @@
-#N canvas 401 101 681 500 10;
-#X obj 33 191 # *>>8;
-#X text 60 235 first picture plus a fraction of the difference;
-#X obj 33 233 # +;
-#X obj 33 170 #store;
-#X obj 264 103 # inv+;
-#X obj 88 254 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
+#N canvas 397 101 680 501 10;
+#X obj 13 229 # *>>8;
+#X text 40 293 first picture plus a fraction of the difference;
+#X obj 13 291 # +;
+#X obj 13 210 #store;
+#X obj 211 157 # inv+;
+#X obj 68 311 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X text 152 324 note: the #layer/#join objects can make the crossfade
+#X text 12 372 note: the #layer/#join objects can make the crossfade
 process simpler but it's still not faster.;
-#X obj 50 -30 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
-;
-#X msg 309 72 open r001.jpg \, cast int16 \, bang;
-#X obj 283 72 #in;
-#X obj 33 149 #finished;
-#X text 109 257 click to clip out-of-range colours;
-#X text 82 190 multiply by a N/256 fraction;
-#X obj 81 295 # max 0;
-#X obj 264 51 #in;
-#X obj 81 274 # min 255;
-#X obj 33 326 #out window;
-#X obj 33 109 #cast int16;
-#X text 81 170 keep the difference between both pictures;
-#X msg 290 51 open b001.jpg \, cast int16 \, bang;
-#X obj 290 31 t b b;
-#X obj 330 31 loadbang;
-#X obj 33 253 shunt 2;
-#X obj 50 -5 metro 33.3667;
-#X obj 50 15 float;
-#X obj 62 44 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+#X obj 13 46 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 264 130 #in;
+#X obj 13 191 #finished;
+#X text 85 311 click to clip out-of-range colours;
+#X text 60 229 multiply by a N/256 fraction;
+#X obj 211 111 #in;
+#X obj 13 353 #out window;
+#X obj 13 153 #cast int16;
+#X text 61 213 keep the difference between both pictures;
+#X obj 249 91 t b b;
+#X obj 249 72 loadbang;
+#X obj 13 310 shunt 2;
+#X obj 13 63 metro 33.3667;
+#X obj 13 82 float;
+#X obj 25 101 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
 -262144 -1 -1 0 256;
-#X obj 94 14 + 4;
-#X obj 50 65 pingpong 256;
-#X obj 61 87 hsl 129 15 0 256 0 0 empty empty empty -2 -6 0 8 -260818
+#X obj 52 82 + 4;
+#X obj 13 117 pingpong 256;
+#X obj 21 136 hsl 129 15 0 256 0 0 empty empty empty -2 -6 0 8 -260818
 -1 -1 0 1;
-#X obj 33 128 t a a;
-#X text 153 362 also #draw_image/#join is a possibility;
-#X obj 0 -77 cnv 15 680 30 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 13 172 t a a;
+#X text 11 406 also #draw_image/#join is a possibility;
+#X obj 0 1 cnv 15 680 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X text 14 -64 Copyright 2002 Mathieu Bouchard;
-#X text 14 -80 cross_fade.pd;
-#X obj 0 391 cnv 15 680 30 empty empty empty 20 12 0 14 -200249 -66577
+#X text 14 14 Copyright 2002 Mathieu Bouchard;
+#X text 14 -2 cross_fade.pd;
+#X obj 0 469 cnv 15 680 30 empty empty empty 20 12 0 14 -200249 -66577
 0;
-#X text 8 399 GridFlow 0.8.0;
+#X text 8 477 GridFlow 0.8.0;
+#X obj 57 329 #clip;
+#X msg 237 111 load b001.jpg;
+#X msg 289 130 load r001.jpg;
+#X obj 264 149 #cast s;
+#X obj 211 130 #cast s;
 #X connect 0 0 2 0;
-#X connect 2 0 22 0;
+#X connect 2 0 18 0;
 #X connect 3 0 0 0;
 #X connect 4 0 3 1;
-#X connect 5 0 22 1;
-#X connect 7 0 23 0;
-#X connect 8 0 9 0;
-#X connect 9 0 4 1;
-#X connect 10 0 3 0;
-#X connect 13 0 16 0;
-#X connect 14 0 4 0;
-#X connect 14 0 2 1;
-#X connect 15 0 13 0;
-#X connect 17 0 29 0;
-#X connect 19 0 14 0;
-#X connect 20 0 19 0;
-#X connect 20 1 8 0;
-#X connect 21 0 20 0;
-#X connect 22 0 16 0;
-#X connect 22 1 15 0;
+#X connect 5 0 18 1;
+#X connect 7 0 19 0;
+#X connect 8 0 35 0;
+#X connect 9 0 3 0;
+#X connect 12 0 36 0;
+#X connect 14 0 25 0;
+#X connect 16 0 33 0;
+#X connect 16 1 34 0;
+#X connect 17 0 16 0;
+#X connect 18 0 13 0;
+#X connect 18 1 32 0;
+#X connect 19 0 20 0;
+#X connect 20 0 21 0;
+#X connect 20 0 22 0;
+#X connect 20 0 23 0;
+#X connect 22 0 20 1;
 #X connect 23 0 24 0;
-#X connect 24 0 25 0;
-#X connect 24 0 26 0;
-#X connect 24 0 27 0;
-#X connect 26 0 24 1;
-#X connect 27 0 28 0;
-#X connect 27 0 17 0;
-#X connect 29 0 10 0;
-#X connect 29 1 0 1;
+#X connect 23 0 14 0;
+#X connect 25 0 9 0;
+#X connect 25 1 0 1;
+#X connect 32 0 13 0;
+#X connect 33 0 12 0;
+#X connect 34 0 8 0;
+#X connect 35 0 4 1;
+#X connect 36 0 4 0;
+#X connect 36 0 2 1;

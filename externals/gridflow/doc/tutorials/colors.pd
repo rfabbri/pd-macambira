@@ -1,0 +1,12 @@
+#N canvas 50 148 450 206 10;
+#X obj -10 -171 #pack 3;
+#X obj 46 -203 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -241291
+-1 -1 0 1;
+#X obj 46 -223 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -241291
+-1 -1 0 1;
+#X obj 46 -243 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -241291
+-1 -1 0 1;
+#X obj -6 -132 #color;
+#X connect 1 0 0 2;
+#X connect 2 0 0 1;
+#X connect 3 0 0 0;

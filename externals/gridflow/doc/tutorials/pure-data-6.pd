@@ -1,0 +1,92 @@
+#N canvas 304 98 891 675 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 627 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 629 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 486 336 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: message comma semicolon dollersign receive
+list;
+#X restore 16 633 pd META;
+#X text 12 20 DESCRIPTION: Advanced uses for the message object;
+#X text 19 45 In Pure-Data there are two distinct concepts with the
+name "message". Messages are the data that gets send in PD from object
+to object. There is also the Messsage object that contains a message
+you want to send. The message object is the first GUI object we covered
+in this tutorial. The message is not the only way to send messages
+in a patch \, since all GUI objects also send messages. So what makes
+the message object different? The message object can sent messages
+of any type \, where a number for example can only send float (number)
+messages. There are a number of powerful features in the message object.
+We are familar with the "usual" way of using the message object:;
+#X msg 163 208 hello;
+#X msg 212 208 bye;
+#X obj 196 238 print messages;
+#X text 459 556 Note: It is a very common mistake to confuse the message
+object with an object box. The object box is framed in a rectangle.
+The message object has a notch removed from the right edge.;
+#X obj 106 385 print messages;
+#X msg 106 358 hello \, bye;
+#X text 19 305 You can send multiple messages in succession from a
+single message box by using a comma " \, " between the messages. The
+messages get send from left to right.;
+#X obj 8 276 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 8 416 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 416 Semicolon in message boxes;
+#X text 13 276 Comma in message boxes;
+#X text 19 445 Just like you can specify receive tags directly in GUI
+objects you can also use a message box to send a message directly to
+a particular "receive".;
+#X obj 34 536 r myreceive;
+#X floatatom 34 560 5 0 0 0 - - -;
+#X text 189 360 Click to send both messages;
+#X text 136 502 send "10" to receive tag "myreceive";
+#X text 19 585 For more info see: message-help.pd 04.messages.pd 10.more.messages.pd
+;
+#X msg 34 498 \; myreceive 10;
+#X obj 448 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 46 Dollarsign in message boxes;
+#X msg 534 175 \$1 \$1 \$1;
+#X msg 534 154 10;
+#X text 459 75 In messages there are placeholders that start with "$".
+These placeholders are variables that get replaced with messages you
+send to the message box. In the example below we have a single message
+"10". Each "$1" in the message box gets replaced with the message "10".
+;
+#X text 601 175 \$1 placeholder gets replaced;
+#X text 570 154 message sent to message box;
+#X msg 534 304 list 1 2;
+#X text 600 304 a list with items "1" and "2";
+#X msg 534 325 \$2 \$1;
+#X text 584 325 \$1 becomes "1" and \$2 becomes "2";
+#X obj 534 347 print reverse-list;
+#X text 459 235 The "$1" placeholder refers to the first element of
+the list the message box gets from its inlet. We can use this to use
+a message box to reverse the order of elements (called atoms) in a
+list.;
+#X text 459 385 In this case the list "1 2" has two elements (called
+atoms) when this list gets sent to the inlet of a message box its atoms
+are available to the message box through the $ variables. \$1 gets
+replaced with the first element \, \$2 the second and so on.;
+#X obj 534 197 print repeated-message;
+#X obj 480 511 print complex-message;
+#X msg 480 468 list Fred Marcus;
+#X text 607 468 a list with two symbol atoms;
+#X msg 480 489 Hi \$1. \, Ya know \$2?;
+#X text 623 489 Becomes: "Hi Fred \, Ya know Marcus?";
+#X text 12 8 6 Intermediate Pure-Data - Using the message object;
+#X connect 6 0 8 0;
+#X connect 7 0 8 0;
+#X connect 11 0 10 0;
+#X connect 18 0 19 0;
+#X connect 26 0 38 0;
+#X connect 27 0 26 0;
+#X connect 31 0 33 0;
+#X connect 33 0 35 0;
+#X connect 40 0 42 0;
+#X connect 42 0 39 0;

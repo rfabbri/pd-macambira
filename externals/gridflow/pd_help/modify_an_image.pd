@@ -1,0 +1,33 @@
+#N canvas 270 176 450 432 10;
+#X obj 106 140 #in;
+#X msg 147 94 open babbage.jpg;
+#X obj 89 96 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj 106 311 #out window;
+#X text 34 368 What about getting rid of this cool acid stuff?;
+#N canvas 0 0 450 300 next_patch 0;
+#X restore 36 396 pd next_patch;
+#X obj 169 153 hsl 128 15 0 1000 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 7200 1;
+#X obj 38 52 metro 33.33;
+#X obj 38 24 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1;
+#X obj 106 288 #clip;
+#X obj 226 241 # - 42;
+#X obj 143 189 # - 42;
+#X text 293 386 do [#clip];
+#X text 293 402 clip is an abstraction;
+#X obj 129 257 #scale_by;
+#X obj 233 286 #color;
+#X obj 101 215 # * 0.2;
+#X obj 209 185 / 1000;
+#X floatatom 220 213 5 0 0 0 - - -;
+#X connect 0 0 16 0;
+#X connect 1 0 0 0;
+#X connect 2 0 0 0;
+#X connect 6 0 17 0;
+#X connect 7 0 0 0;
+#X connect 8 0 7 0;
+#X connect 9 0 3 0;
+#X connect 16 0 9 0;
+#X connect 17 0 16 1;
+#X connect 17 0 18 0;

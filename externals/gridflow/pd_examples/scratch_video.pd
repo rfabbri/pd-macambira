@@ -1,29 +1,28 @@
-#N canvas 622 70 580 592 10;
-#X obj 109 21 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+#N canvas 503 45 580 510 10;
+#X obj 109 94 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
 ;
-#X obj 109 329 listelement 1;
-#X floatatom 109 352 5 0 0 0 - - -;
-#X floatatom 132 244 5 0 0 0 - - -;
-#X obj 109 305 route position;
-#X obj 109 221 #in;
-#X msg 142 167 open /home/alx/Documents/images/videos/bus_1.mov;
-#X obj 112 391 hsl 128 15 1 320 0 0 empty empty empty -2 -6 0 8 -260818
--1 -1 3145 1;
-#X obj -13 -85 cnv 15 580 30 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 109 352 listelement 1;
+#X floatatom 109 371 5 0 0 0 - - -;
+#X floatatom 132 279 5 0 0 0 - - -;
+#X obj 109 333 route position;
+#X obj 109 256 #in;
+#X msg 142 202 open /home/alx/Documents/images/videos/bus_1.mov;
+#X obj 112 410 hsl 128 15 1 320 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj -13 0 cnv 15 580 30 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj -16 472 cnv 15 580 30 empty empty empty 20 12 0 14 -200249 -66577
+#X obj -16 477 cnv 15 580 30 empty empty empty 20 12 0 14 -200249 -66577
 0;
-#X text 16 476 GridFlow 0.8.0;
-#X text 16 476 GridFlow 0.8.0;
-#X text 0 -85 traveling.pd;
-#X text 0 -72 Copyright 2003 Alexandre Castonguay;
-#X text -1 -34 Use the mouse position to scratch the video \, a touchscreen
+#X text 16 484 GridFlow 0.8.0;
+#X text 16 484 GridFlow 0.8.0;
+#X text 0 13 Copyright 2003 Alexandre Castonguay;
+#X text 2 52 Use the mouse position to scratch the video \, a touchscreen
 works well.;
 #N canvas 0 0 450 300 decide_framerate 0;
 #X obj 6 56 - 160;
 #X floatatom 6 80 5 0 0 0 - - -;
 #X obj 55 122 hsl 128 15 20 150 0 0 empty empty empty -2 -6 0 8 -24198
--1 -1 5862 1;
+-1 -1 0 1;
 #X obj 6 99 abs;
 #X floatatom 6 142 5 0 0 0 - - -;
 #X obj 6 121 / 3;
@@ -44,81 +43,79 @@ works well.;
 #X connect 8 0 7 0;
 #X connect 9 0 6 0;
 #X connect 10 0 0 0;
-#X restore 257 390 pd decide_framerate;
-#X obj 257 414 s framerate;
-#X obj 181 31 r framerate;
-#X obj 109 279 #out window;
-#X text 176 242 <-- frame number;
-#X text 213 328 <-- get x values;
-#X text 142 184 load your own until we get a bundled video for the
+#X restore 257 409 pd decide_framerate;
+#X obj 257 433 s framerate;
+#X obj 188 92 r framerate;
+#X obj 109 314 #out window;
+#X text 176 277 <-- frame number;
+#X text 213 351 <-- get x values;
+#X text 142 219 load your own until we get a bundled video for the
 docs;
-#X text 142 197 this one is 320 x 240;
-#N canvas 0 0 450 300 frame_count 1;
-#X msg 103 112 1;
-#X floatatom 103 168 5 0 0 0 - - -;
-#X obj 153 153 float \$1;
-#X obj 103 86 shunt 2;
-#X msg 173 69 1;
-#X msg 173 46 0;
-#X obj 103 140 + 1;
-#X msg 147 112 -1;
-#X msg 208 109 0;
-#X obj 46 -34 inlet;
-#X obj 231 68 inlet;
-#X obj 113 212 outlet;
-#X floatatom 147 -41 5 0 0 0 - - -;
-#X obj 147 -19 > 160;
-#X floatatom 147 8 5 0 0 0 - - -;
-#X text 192 -20 <-- is the direction left or right on a width of 320
+#X text 142 232 this one is 320 x 240;
+#N canvas 94 214 571 216 frame_count 0;
+#X msg 16 -5 1;
+#X floatatom 16 50 5 0 0 0 - - -;
+#X obj 48 30 float \$1;
+#X obj 16 -24 shunt 2;
+#X obj 16 30 + 1;
+#X msg 60 -5 -1;
+#X msg 111 49 0;
+#X obj 16 -54 inlet;
+#X obj 111 30 inlet;
+#X obj 16 102 outlet;
+#X floatatom 100 -38 5 0 0 0 - - -;
+#X obj 100 -22 > 160;
+#X text 145 -23 <-- is the direction left or right on a width of 320
 pixels;
-#X text 242 109 <-- reset;
-#X obj 147 -64 r position;
-#X connect 0 0 6 0;
+#X text 145 49 <-- reset;
+#X obj 100 -57 r position;
+#X obj 100 -3 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
+#X connect 0 0 4 0;
 #X connect 1 0 2 0;
-#X connect 1 0 11 0;
-#X connect 2 0 6 1;
+#X connect 1 0 9 0;
+#X connect 2 0 4 1;
 #X connect 3 0 0 0;
-#X connect 3 1 7 0;
-#X connect 4 0 3 1;
-#X connect 5 0 3 1;
+#X connect 3 1 5 0;
+#X connect 4 0 1 0;
+#X connect 5 0 4 0;
 #X connect 6 0 1 0;
-#X connect 7 0 6 0;
-#X connect 8 0 1 0;
-#X connect 9 0 3 0;
-#X connect 10 0 8 0;
-#X connect 12 0 13 0;
-#X connect 13 0 14 0;
-#X connect 14 0 3 1;
-#X connect 17 0 12 0;
-#X restore 109 113 pd frame_count;
-#X obj 202 86 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
+#X connect 7 0 3 0;
+#X connect 8 0 6 0;
+#X connect 10 0 11 0;
+#X connect 11 0 15 0;
+#X connect 14 0 10 0;
+#X connect 15 0 3 1;
+#X restore 109 168 pd frame_count;
+#X obj 202 141 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
 -1;
-#X text 226 85 <-- reset;
-#X obj 13 391 s position;
-#X msg 314 230 loop 1;
-#X obj 206 266 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X text 226 140 <-- reset;
+#X obj 93 433 s position;
+#X msg 314 265 loop 1;
+#X obj 206 301 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 224 62 r loopit;
-#X obj 236 264 print loopit;
-#X obj 109 56 metro 100.33;
-#X obj 71 175 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 330 146 r loopit;
+#X obj 236 299 print loopit;
+#X obj 109 111 metro 100.33;
+#X obj 91 257 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
 -1;
-#X connect 0 0 31 0;
+#X text 0 0 scratch_video.pd;
+#X connect 0 0 30 0;
 #X connect 1 0 2 0;
 #X connect 2 0 7 0;
-#X connect 2 0 15 0;
-#X connect 2 0 26 0;
+#X connect 2 0 14 0;
+#X connect 2 0 25 0;
 #X connect 4 0 1 0;
-#X connect 5 0 18 0;
+#X connect 5 0 17 0;
 #X connect 5 1 3 0;
-#X connect 5 1 28 0;
+#X connect 5 1 27 0;
 #X connect 6 0 5 0;
-#X connect 15 0 16 0;
-#X connect 17 0 31 1;
-#X connect 18 0 4 0;
-#X connect 23 0 5 0;
-#X connect 24 0 23 1;
-#X connect 27 0 5 0;
-#X connect 28 0 30 0;
-#X connect 31 0 23 0;
-#X connect 32 0 5 0;
+#X connect 14 0 15 0;
+#X connect 16 0 30 1;
+#X connect 17 0 4 0;
+#X connect 22 0 5 0;
+#X connect 23 0 22 1;
+#X connect 26 0 5 0;
+#X connect 27 0 29 0;
+#X connect 30 0 22 0;
+#X connect 31 0 5 0;

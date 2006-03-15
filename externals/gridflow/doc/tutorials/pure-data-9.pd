@@ -1,0 +1,43 @@
+#N canvas 291 108 450 562 10;
+#X obj 8 6 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 517 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 228 519 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#N canvas 0 22 486 336 META 0;
+#X text 12 5 CATEGORY: tutorial;
+#X text 12 15 KEYWORDS: GOP graph parent abstraction nesting ui interface
+;
+#X restore 16 523 pd META;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 12 20 DESCRIPTION: Using Graph on Parent abstractions;
+#X text 13 46 What is Graph on Parent?;
+#X text 13 76 Graph on Parent is a feature of PD that allows you to
+show the GUI objects contained in an abstraction on the parent patch.
+This means that you can create abstractions that not only include a
+collection of objects but can also include a user interface. To use
+graph on parent you simply need to create an abstraction the usual
+way but before saving it you need should Control-Click (Right-Click)
+on the background (white area) in the abstraction and choose "properties".
+From the properties menu check the "graph on parent" option. Now when
+you save the patch and embed it in a second patch all GUI objects will
+be visible.;
+#X obj 154 250 gop_abstraction;
+#X text 13 331 In this simple example there is only one GUI object
+\, a slider. Inside the abstraction the slider is connected to an inlet
+and an outlet. If you move the slider you can see the result in the
+outlet. If you set a value in the inlet with the number GUI you can
+see the position of the slider change.;
+#X floatatom 154 231 5 0 0 0 - - -;
+#X floatatom 154 297 5 0 0 0 - - -;
+#X text 13 421 Note you can change the size of the abstractions bounding
+box by Control-Click (Right-Click) on the abstraction and choose "properties".
+The size of the bounding-box is specified by the "screen width" and
+"screen height".;
+#X text 13 487 For more info see:;
+#X text 12 8 9 Intermediate Pure-Data - Using GUI's in abstractions
+;
+#X connect 8 0 11 0;
+#X connect 10 0 8 0;

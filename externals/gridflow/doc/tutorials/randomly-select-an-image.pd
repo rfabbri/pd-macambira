@@ -1,0 +1,53 @@
+#N canvas 417 0 446 428 10;
+#X text 6 15 You can open multiple images in the same window. To do
+so you connect the outputs from the images to the inlet of the out
+window.;
+#X obj 136 295 #out window;
+#X obj 65 198 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 28 232 #in;
+#X msg 28 160 open b001.jpg;
+#X obj 188 197 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 151 231 #in;
+#X msg 151 159 open r001.jpg;
+#X obj 301 196 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 264 230 #in;
+#X msg 264 158 open g001.jpg;
+#X obj 7 -37 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 -37 What is a grid?;
+#X obj 8 320 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 16 327 GridFlow 0.8.0;
+#X obj 7 -72 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -73 2 Images;
+#X text 14 -59 Description: opening multiple images from one window.
+;
+#X obj 56 115 random 3;
+#X floatatom 195 81 5 0 0 0 - - -;
+#X obj 3 55 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1;
+#X obj 163 112 sel 0;
+#X obj 226 127 sel 1;
+#X obj 304 115 sel 2;
+#X obj 55 92 metro 1000;
+#X connect 2 0 3 0;
+#X connect 3 0 1 0;
+#X connect 4 0 3 0;
+#X connect 5 0 6 0;
+#X connect 6 0 1 0;
+#X connect 7 0 6 0;
+#X connect 8 0 9 0;
+#X connect 9 0 1 0;
+#X connect 10 0 9 0;
+#X connect 18 0 19 0;
+#X connect 19 0 21 0;
+#X connect 19 0 22 0;
+#X connect 19 0 23 0;
+#X connect 20 0 24 0;
+#X connect 21 0 2 0;
+#X connect 22 0 5 0;
+#X connect 23 0 8 0;
+#X connect 24 0 18 0;

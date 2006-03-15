@@ -1,5 +1,5 @@
 =begin
-	$Id: main.rb,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: main.rb,v 1.2 2006-03-15 04:37:46 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
@@ -237,7 +237,7 @@ GridObject.subclass("#in",1,2) {
 	def _0_set frame; check_file_open; @format.seek frame end
 	def _0_reset; check_file_open; @format.seek 0; end
 	def _1_grid(*a) send_out 0,:grid,*a end
-	def _0_load name; _0_open name; _0_bang; _0_close end
+	def _0_load(*a); _0_open(*a); _0_bang; _0_close end
 }
 
 GridObject.subclass("#out",1,1) {
@@ -350,8 +350,7 @@ module EventIO
 		else
 			r.close
 			STDOUT.reopen w
-			STDIN.reopen @stream
-			@stream = File.open filename, "r"
+			STDIN.reopen filename, "r"
 			exec "gzip", "-dc"
 		end
 	end
@@ -364,8 +363,7 @@ module EventIO
 		else
 			w.close
 			STDIN.reopen r
-			STDOUT.reopen @stream
-			@stream = File.open filename, "w"
+			STDOUT.reopen filename, "w"
 			exec "gzip", "-c"
 		end
 	end
@@ -375,7 +373,7 @@ module EventIO
 			when :in; "r"
 			when :out; "w"
 			else raise "bad mode" end
-		close
+		@stream.close if @stream
 		case source
 		when :file
 			filename = args[0].to_s
@@ -721,6 +719,27 @@ Format.subclass("#io:ppm",1,1) {
 	end
 	def _0_rgrid_flow(data) @stream.write @bp.pack(data) end
 	def _0_rgrid_end; @stream.flush end
+	self
+}.subclass("#io:tk",1,1) {
+	install_rgrid 0
+	def initialize(mode)
+		if mode!=:out then raise "only #out" end
+		super(mode,:file,"/tmp/tk-#{$$}-#{object_id}.ppm")
+		GridFlow.gui "toplevel .#{object_id}\n"
+		GridFlow.gui "wm title . GridFlow/Tk\n"
+		GridFlow.gui "image create photo #{object_id} -width 320 -height 240\n"
+		GridFlow.gui "pack [label .#{object_id}.im -image #{object_id}]\n"
+	end
+	def _0_rgrid_end
+		super
+		@stream.seek 0,IO::SEEK_SET
+		GridFlow.gui "image create photo #{object_id} -file /tmp/tk-#{$$}-#{object_id}.ppm\n"
+	end
+	def delete
+		GridFlow.gui "destroy .#{object_id}\n"
+		GridFlow.gui "image delete #{object_id}\n"
+	end
+	alias close delete
 }
 
 Format.subclass("#io:targa",1,1) {

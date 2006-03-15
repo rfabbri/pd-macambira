@@ -1,5 +1,5 @@
 /*
-	$Id: usb.c,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: usb.c,v 1.2 2006-03-15 04:45:31 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003 by Mathieu Bouchard
@@ -354,5 +354,6 @@ void startup_usb () {
 		rb_hash_aset(busses,rb_str_new2(bus->dirname),usb_scan_bus(bus));
 	}
 	//IEVAL(cUSB,"STDERR.print '@busses = '; STDERR.puts @busses.inspect");
+	rb_require("gridflow/optional/usb.rb");
 }
 

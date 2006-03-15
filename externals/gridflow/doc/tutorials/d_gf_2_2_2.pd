@@ -1,0 +1,68 @@
+#N canvas 38 0 687 415 10;
+#X obj 31 -223 cnv 15 243 358 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 39 -141 #in;
+#X msg 39 -215 open b001.jpg;
+#X obj 79 -132 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 39 -18 # + \$1;
+#X obj 62 -189 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+;
+#X obj 69 76 #clip;
+#X obj 28 -322 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 62 -167 metro 33.3;
+#X obj 94 -99 #color;
+#X obj 23 -678 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 36 168 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 44 175 GridFlow 0.8.0;
+#X obj 39 108 #out window;
+#X text 35 -671 2.2 Image manipulation \, colour wrapping;
+#X obj 12 -518 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 18 -519 Example #1 colour wrapping;
+#X msg 74 -491 240 0 0;
+#X obj 179 -368 display;
+#X obj 74 -457 # + 20;
+#X obj 178 -423 #cast uint8;
+#X obj 23 -368 display;
+#X text 274 -429 <-- This transforms the grid into 8 bit values \,
+that corresponds to the way that images are usually shown in images
+and video;
+#X text 42 -323 Example #2 clipping the values;
+#X text 10 -545 Tip: Refer to glossary for more information on colour.
+;
+#X text 215 -132 <-- add value to all channels at once;
+#X obj 39 37 shunt;
+#X obj 69 11 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1;
+#X text 93 12 <-- switch to see clip's effect;
+#X text 96 38 <-- directs the flow of data;
+#X text 7 -643 When an image is represented as a grid every pixel value
+will vary between 0 and 255 Color wrapping occurs when the result of
+the operation on the pixel value would be higher than 255 Values above
+255 are counted from 0 For example: if a pixel has a red value of 240
+and 20 is added to it \, you get 5 instead of displaying 260 (240 +
+20 - 255 = 5);
+#X text 450 -583 aks matju to fix bug in [display]'s display;
+#X text 32 -301 The [#clip] object is used with numops in order to
+set an lower and upper range to pixel values in order to eliminate
+color wrapping (those nifty 60s effects).;
+#X text 288 -70 <-- drag to add value to specific channel;
+#X text 163 -206 remember to load the image and strat the metro;
+#X connect 1 0 4 0;
+#X connect 2 0 1 0;
+#X connect 3 0 4 1;
+#X connect 4 0 26 0;
+#X connect 5 0 8 0;
+#X connect 6 0 13 0;
+#X connect 8 0 1 0;
+#X connect 9 0 4 1;
+#X connect 17 0 19 0;
+#X connect 19 0 20 0;
+#X connect 19 0 21 0;
+#X connect 20 0 18 0;
+#X connect 26 0 13 0;
+#X connect 26 1 6 0;
+#X connect 27 0 26 1;

@@ -1,0 +1,80 @@
+#N canvas 66 33 927 601 10;
+#X obj 16 -206 cnv 15 200 170 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 38 -178 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 24 -127 #in;
+#X obj 82 -114 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -241291
+-1 -1 0 1;
+#X obj 24 -88 # + \$1;
+#X obj 125 -157 metro 33.3;
+#X obj 125 -177 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0
+1;
+#X obj 462 -153 cnv 15 400 350 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj 482 -109 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 468 -30 #in;
+#X msg 468 -132 open b001.jpg;
+#X obj 508 -49 hsl 128 15 0 255 0 0 empty empty empty -2 -6 0 8 -241291
+-1 -1 0 1;
+#X obj 468 84 # + \$1;
+#X obj 514 -109 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1
+1;
+#X obj 468 128 #clip;
+#X obj 24 -60 s slider_metro;
+#X obj 468 154 s slider_metro_clip;
+#X floatatom 79 -86 5 0 0 0 - - -;
+#X text 10 210 In all these examples the [# +] numop is used. All the
+numeric operators can be found in the numeric operator help patch (right
+click on the [# +] and select help to view them). If you want to see
+what effects other numops can do \, try replacing the [# +] numop with
+another one (either cut and past a different numop from the help file
+or create the object in the current canvas.;
+#X obj 514 -89 metro 33.3;
+#X obj 552 -21 #color;
+#X msg 552 44 255 0 0;
+#X text 614 44 donner une liste changer couleurs;
+#X obj 552 88 #scale_by (8 8);
+#X msg 552 66 2 2 3 # 255 0 0 0 255 0 0 0 255 191 191 191;
+#X obj 834 211 r slider_metro;
+#X obj 843 238 r slider_metro_clip;
+#X obj 834 265 #out window;
+#X obj 16 -284 cnv 15 70 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 15 -284 Example #4;
+#X text 15 -261 Will demonstrate how to use the metro (see pd_intro
+#4) and the slider which allows you to scroll through values and modify
+a grid in real-time.;
+#X msg 24 -202 open b001.jpg;
+#X obj 456 -281 cnv 15 70 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 455 -281 Example #5;
+#X text 457 -260 We introduce the [#clip] object. It is used with numops
+in order to set constraints on the pixel to eliminate color wrapping.
+Colour wrapping occurs when the individual pixel values in a grid exceed
+255 which results in over-saturation of colour. GridFlow reads colours
+as values from 0 (black) to 255 (white). Refer to glossary for more
+information on colour.;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 3 0 4 1;
+#X connect 3 0 17 0;
+#X connect 4 0 15 0;
+#X connect 5 0 2 0;
+#X connect 6 0 5 0;
+#X connect 8 0 9 0;
+#X connect 9 0 12 0;
+#X connect 10 0 9 0;
+#X connect 11 0 12 1;
+#X connect 12 0 14 0;
+#X connect 13 0 19 0;
+#X connect 14 0 16 0;
+#X connect 19 0 9 0;
+#X connect 20 0 12 1;
+#X connect 21 0 12 1;
+#X connect 23 0 12 1;
+#X connect 24 0 23 0;
+#X connect 25 0 27 0;
+#X connect 26 0 27 0;
+#X connect 31 0 2 0;

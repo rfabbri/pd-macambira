@@ -1,5 +1,5 @@
 /*
-	$Id: main.c,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: main.c,v 1.2 2006-03-15 04:37:08 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
@@ -91,7 +91,7 @@ void CObject_free (void *foo) {
 // Dim
 
 void Dim::check() {
-	if (n>MAX_DIMENSIONS) RAISE("too many dimensions");
+	if (n>MAX_DIM) RAISE("too many dimensions");
 	for (int i=0; i<n; i++) if (v[i]<0) RAISE("Dim: negative dimension");
 }
 
@@ -435,7 +435,7 @@ static Ruby GridFlow_handle_braces(Ruby rself, Ruby argv) {
 				s++;
 			}
 			const char *se = s+strlen(s);
-			while (se[-1]==')' || se[-1]=='}') { se--; close++; }
+			while (se>s && (se[-1]==')' || se[-1]=='}')) { se--; close++; }
 			if (s!=se) {
 				Ruby u = rb_str_new(s,se-s);
 				av[j++] = rb_funcall(rself,SI(FloatOrSymbol),1,u);
@@ -495,7 +495,8 @@ void gfmemcopy(uint8 *out, const uint8 *in, int n) {
 extern "C" {
 void *gfmalloc(size_t n) {
 	uint64 t = rdtsc();
-	void *p = malloc(n);
+//	void *p = malloc(n);
+	void *p = memalign(16,n);
 	long align = (long)p & 7;
 	if (align) fprintf(stderr,"malloc alignment = %ld mod 8\n",align);
 	t=rdtsc()-t;
@@ -573,7 +574,7 @@ BUILTIN_SYMBOLS(FOO)
 	rb_ivar_set(mGridFlow, SI(@bsym), PTR2FIX(&bsym));
 	rb_define_const(mGridFlow, "GF_VERSION", rb_str_new2(GF_VERSION));
 	rb_define_const(mGridFlow, "GF_COMPILE_TIME", rb_str_new2(GF_COMPILE_TIME));
-
+	rb_define_const(mGridFlow, "GCC_VERSION", rb_str_new2(GCC_VERSION));
 	cFObject = rb_define_class_under(mGridFlow, "FObject", rb_cObject);
 	EVAL(
 \ruby

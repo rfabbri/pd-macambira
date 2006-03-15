@@ -1,0 +1,120 @@
+#N canvas 47 0 787 658 10;
+#X msg 468 148 3 3 # 0 4 0 4 9 -4 0 -4 0;
+#X msg 467 100 3 3 # 4 0 0 0 1 0 0 0 4;
+#X obj 80 219 #store;
+#X obj 80 270 # / 9;
+#X msg 467 75 3 3 # 1 1 1 1 1 1 1 1 1;
+#X obj -13 201 #out window;
+#X msg 470 263 1 3 # 0 9 -9;
+#X obj -21 117 #in;
+#X msg 468 124 3 3 # 2 2 2 2 -7 2 2 2 2;
+#X obj 80 145 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 70 325 @! abs;
+#X obj -21 77 loadbang;
+#X obj 80 182 metro 33.3667;
+#X obj -21 139 t a;
+#X obj 80 244 #convolve \, seed 4;
+#X obj 401 78 loadbang;
+#X obj 80 299 shunt 2;
+#X obj 124 270 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
+1;
+#X msg 170 280 0;
+#X obj 124 351 # + 128;
+#X msg 170 304 1;
+#X obj 469 174 display;
+#X obj -13 225 fps;
+#X obj -13 250 print;
+#X obj -50 466 cnv 15 780 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text -42 473 GridFlow 0.8.0;
+#X text -42 473 GridFlow 0.8.0;
+#X msg 470 242 1 3 # 0 2 -2;
+#X msg 470 325 3 3 # 0 -1 0 -1 4 -1 0 -1 0;
+#X msg 470 348 3 3 # -1 -1 -1 -1 8 -1 -1 -1 -1;
+#X msg 470 416 3 3 # 0 -1 0 -1 13 -1 0 -1 0;
+#X obj 124 325 # << 4;
+#X msg -21 97 open babbage.jpg \, bang;
+#X obj -49 -111 cnv 15 780 15 empty empty empty 20 12 0 14 -228992
+-66577 0;
+#X obj -49 -146 cnv 15 780 30 empty empty empty 20 12 0 14 -233017
+-66577 0;
+#X obj 470 218 cnv 15 100 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X obj 468 52 cnv 15 37 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 470 218 Edge detection;
+#X obj 470 303 cnv 15 110 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 472 303 Laplacian masks;
+#X obj 470 393 cnv 15 50 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 470 393 Sharpen;
+#X obj -21 383 #clip;
+#X obj 190 118 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 210 97 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 146 97 <-- step #1: load image;
+#X obj 173 141 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 109 141 <-- step #3: start metro;
+#X text 154 118 step #2: select transformation -->;
+#X text 468 52 Blurs;
+#N canvas 0 0 450 300 META 0;
+#X restore 69 473 pd META;
+#X text -44 -140 2 Introduction to Images;
+#X text -44 -112 2.4 Image Manipulation;
+#X obj -49 24 cnv 15 780 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text -49 23 (Source convolve.pd : Copyright Mathieu Bouchard 2002)
+;
+#X text -16 -67 Convolve is an abstraction used for modifying an image.
+In this patch you can choose to create a "blur" \, to view "edge detection"
+\, to add a "laplacian mask" or to "sharpen" an image. The image must
+be loaded \, the transformation selected and the metro started before
+seeing the transformation applied to the image.;
+#X obj -17 -89 cnv 15 100 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text -17 -90 2.4.4 Convolve;
+#X connect 0 0 18 0;
+#X connect 0 0 14 1;
+#X connect 0 0 21 0;
+#X connect 1 0 18 0;
+#X connect 1 0 14 1;
+#X connect 2 0 14 0;
+#X connect 3 0 16 0;
+#X connect 4 0 18 0;
+#X connect 4 0 14 1;
+#X connect 5 0 22 0;
+#X connect 6 0 14 1;
+#X connect 6 0 20 0;
+#X connect 7 0 13 0;
+#X connect 8 0 18 0;
+#X connect 8 0 14 1;
+#X connect 9 0 12 0;
+#X connect 10 0 42 0;
+#X connect 11 0 32 0;
+#X connect 12 0 2 0;
+#X connect 13 0 2 1;
+#X connect 13 0 5 0;
+#X connect 14 0 3 0;
+#X connect 15 0 4 0;
+#X connect 16 0 10 0;
+#X connect 16 1 31 0;
+#X connect 17 0 16 1;
+#X connect 18 0 17 0;
+#X connect 19 0 42 0;
+#X connect 20 0 17 0;
+#X connect 22 0 23 0;
+#X connect 27 0 18 0;
+#X connect 27 0 14 1;
+#X connect 28 0 14 1;
+#X connect 28 0 20 0;
+#X connect 29 0 20 0;
+#X connect 29 0 14 1;
+#X connect 30 0 18 0;
+#X connect 30 0 14 1;
+#X connect 31 0 19 0;
+#X connect 32 0 7 0;
+#X connect 42 0 13 0;

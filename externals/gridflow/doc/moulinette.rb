@@ -1,5 +1,5 @@
 =begin
-	$Id: moulinette.rb,v 1.1 2005-10-04 02:02:14 matju Exp $
+	$Id: moulinette.rb,v 1.2 2006-03-15 04:44:50 matju Exp $
 	convert GridFlow Documentation XML to HTML with special formatting.
 
 	GridFlow
@@ -22,12 +22,12 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 =end
 
-GF_VERSION = "0.8.0"
+GF_VERSION = "0.8.1"
 
 #$use_rexml = true
 $use_rexml = false
 
-#require "gridflow"
+require "gridflow"
 
 if $use_rexml
 	# this is a pure ruby xml-parser
@@ -138,6 +138,9 @@ class XNode
 			#	public :show_index
 			#}
 		end
+		def [](tag,att,*contents)
+			self.valid_tags[tag].new(tag,att,*contents)
+		end
 	end
 
 	def initialize tag, att, *contents
@@ -166,6 +169,7 @@ class XNode
 	end
 	def inspect; "#<XNode #{tag}>"; end
 	def to_s; inspect; end
+	def << x; contents << x; x.parent=self end
 end
 
 XNode.register("documentation") {}
@@ -549,8 +553,8 @@ puts <<EOF
 <tr><td colspan="4"> 
 <p><font size="-1">
 GridFlow #{GF_VERSION} Documentation<br>
-Copyright &copy; 2001,2002,2003,2004,2005 by Mathieu Bouchard
-<a href="mailto:matju@sympatico.ca">matju@artengine.ca</a>
+Copyright &copy; 2001,2002,2003,2004,2005,2006 by Mathieu Bouchard
+<a href="mailto:matju@artengine.ca">matju@artengine.ca</a>
 </font></p>
 </td></tr></table></body></html>
 EOF
@@ -561,12 +565,53 @@ end
 $nodes = {}
 XMLParserError = Exception if $use_rexml
 
+def harvest_doc_of_class xclass, v, way
+	doc = case way; when:in:v.doc;   when:out:v.doc_out end
+	tag = case way; when:in:"inlet"; when:out:"outlet" end
+	doc.keys.each {|sel|
+		text = v.doc[sel]
+		m=/^_(\d+)_(\w+)/.match sel.to_s
+		if m then
+			xclass << XNode[tag,{"id"=>Integer(m[1])},
+			  XNode["method",{"name"=>m[2]},XString.new(text)]]
+		else
+			xclass << XNode["method",{"name"=>sel.to_s},XString.new(text)]
+		end
+	}
+end
+
+def harvest_doc tree
+	kla = {}
+	tree.contents.find_all {|x| XNode===x and x.tag=="section" }.each {|sex|
+		sex.contents.each {|y|
+			next unless XNode===y and y.tag=="class"
+			kla[y.att["name"]] = y
+		}
+	}
+	#STDERR.puts kla.inspect
+	tree << (nu=XNode["section",{"name"=>"(new documentation)"}])
+	tree << (un=XNode["section",{"name"=>"(undocumented)"}])
+	alph = GridFlow.fclasses.keys.sort
+	alph.each {|k|
+		next if /^@/=~k and GridFlow.fclasses[k.gsub(/^@/,"#")]
+		v = GridFlow.fclasses[k]
+		if v.doc then
+			nu << (xclass=XNode["class",{"name"=>k}])
+			harvest_doc_of_class xclass, v, :in
+			harvest_doc_of_class xclass, v, :out
+		elsif not kla[k] then
+			un << XNode["p",{},XString.new("[#{k}]")]
+		end
+	}
+end
+
 def read_one_page file
 	begin
 		STDERR.puts "reading #{file}"
 		parser = GFDocParser.new(file)
 		parser.do_it
 		$nodes[file] = parser.stack[0][0]
+		if file=="reference.xml" then harvest_doc $nodes[file] end
 	rescue Exception => e
 		puts ""
 		puts ""
@@ -587,8 +632,10 @@ def write_one_page file
 		$file = file
 		output_name = file.sub(/\.xml/,".html")
 		STDERR.puts "writing #{output_name}"
+		STDOUT.flush # bug in 1.9 ?
 		STDOUT.reopen output_name, "w"
 		tree = $nodes[file]
+#		tree.contents.each {|x| STDERR.puts x.inspect }
 		write_header(tree)
 		mk(:tr) { mk(:td,:colspan,2) { mk(:div,:cols,tree.att["indexcols"]||1) {
 			tree.show_index
@@ -605,8 +652,9 @@ def write_one_page file
 end
 
 $files = %w(
-	install.xml project_policy.xml
+	install.xml
 	reference.xml format.xml internals.xml architecture.xml)
+# project_policy.xml
 
 $files.each {|input_name| read_one_page input_name }
 $files.each {|input_name| write_one_page input_name }

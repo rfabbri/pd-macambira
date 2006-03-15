@@ -1,7 +1,7 @@
-#N canvas 106 79 569 546 10;
-#X obj 86 397 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+#N canvas 522 50 597 660 10;
+#X obj 85 386 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X obj 72 149 # max 0;
+#X obj 71 138 # max 0;
 #N canvas 52 305 399 248 motion 0;
 #X obj 60 49 inlet;
 #X obj 60 72 # +;
@@ -21,24 +21,25 @@
 #X connect 4 1 9 0;
 #X connect 8 0 4 0;
 #X connect 9 0 1 1;
-#X restore 130 218 pd motion fade;
-#X obj 28 263 shunt 2;
-#X obj 72 69 #downscale_by 2 smoothly;
-#X obj 28 398 shunt 2;
-#X obj 82 265 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X restore 129 207 pd motion fade;
+#X obj 27 252 shunt 2;
+#X obj 71 58 #downscale_by 2 smoothly;
+#X obj 27 387 shunt 2;
+#X obj 81 254 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X obj 87 88 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 86 77 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X obj 8 7 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1;
-#X obj 316 261 fork;
-#X obj 28 48 shunt 2;
-#X msg 286 243 256;
-#X obj 28 474 #out window;
-#X obj 84 49 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 26 -36 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
 ;
-#X obj 28 515 print;
-#X obj 285 284 #for 0 256 1;
-#X floatatom 316 242 5 0 0 0 - - -;
+#X obj 315 250 fork;
+#X obj 27 37 shunt 2;
+#X msg 285 232 256;
+#X obj 27 463 #out window;
+#X obj 83 38 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
+;
+#X obj 27 504 print;
+#X obj 284 273 #for 0 256 1;
+#X floatatom 315 231 5 0 0 0 - - -;
 #N canvas 67 462 236 230 detect 0;
 #X obj 66 59 # * ( -1 -1 2 );
 #X obj 66 171 # max 0;
@@ -53,19 +54,19 @@
 #X connect 3 0 5 0;
 #X connect 4 0 3 0;
 #X connect 6 0 1 0;
-#X restore 437 236 pd detect blue;
-#X obj 72 285 #outer ignore ( 0 );
-#X obj 103 131 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 5700 1;
-#X obj 28 189 shunt 2;
-#X obj 170 335 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X restore 436 225 pd detect blue;
+#X obj 71 274 #outer ignore ( 0 );
+#X obj 102 120 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -260818
+-1 -1 0 1;
+#X obj 27 178 shunt 2;
+#X obj 169 324 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0
 1;
-#X obj 28 335 shunt 2;
-#X obj 28 495 fps detailed;
-#X obj 286 223 loadbang;
-#X obj 87 335 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 27 324 shunt 2;
+#X obj 27 484 fps detailed;
+#X obj 285 212 loadbang;
+#X obj 86 324 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X obj 72 307 #store;
+#X obj 71 296 #store;
 #N canvas 81 205 480 500 sort 0;
 #X obj 10 305 # * ( 1 0 );
 #X obj 180 260 # * 255;
@@ -142,13 +143,13 @@
 #X connect 30 0 7 1;
 #X connect 31 0 27 0;
 #X connect 31 0 30 0;
-#X restore 87 355 pd sort me out;
-#X obj 285 304 # gamma;
-#X obj 72 129 # -;
-#X obj 82 191 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X restore 86 344 pd sort me out;
+#X obj 284 293 # gamma;
+#X obj 71 118 # -;
+#X obj 81 180 tgl 15 0 empty empty empty 0 -6 0 8 -241291 -1 -1 0 1
 ;
-#X text 74 238 enable gamma correction;
-#X obj 285 266 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X text 73 227 enable gamma correction;
+#X obj 284 255 bng 15 250 50 0 empty empty empty 0 -6 0 8 -241291 -1
 -1;
 #N canvas 372 198 399 273 motion 0;
 #X obj 15 113 # << 2;
@@ -180,10 +181,10 @@
 #X connect 11 0 10 1;
 #X connect 12 0 13 1;
 #X connect 13 0 3 1;
-#X restore 72 109 pd motion detection;
-#X obj 105 335 hradio 15 1 0 4 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 71 98 pd motion detection;
+#X obj 104 324 hradio 15 1 0 4 empty empty empty 0 -6 0 8 -241291 -1
 -1 0;
-#X text 126 149 noise reduction (on find-edges only);
+#X text 125 138 noise reduction (on find-edges only);
 #N canvas 67 462 236 230 detect 0;
 #X obj 66 171 # max 0;
 #X obj 66 31 inlet;
@@ -198,18 +199,18 @@
 #X connect 3 0 2 0;
 #X connect 5 0 0 0;
 #X connect 6 0 5 0;
-#X restore 437 217 pd detect red;
-#X obj 27 8 metro 33.3667;
-#X obj 28 69 t a a;
-#X text 101 49 Smaller Picture;
-#X obj 28 89 shunt 2;
-#X obj 211 96 vradio 15 1 0 2 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 436 206 pd detect red;
+#X obj 26 -8 metro 33.3667;
+#X obj 27 58 t a a;
+#X text 100 38 Smaller Picture;
+#X obj 27 78 shunt 2;
+#X obj 210 85 vradio 15 1 0 2 empty empty empty 0 -6 0 8 -241291 -1
 -1 0;
-#X obj 163 427 #centroid;
-#X obj 163 448 #export_list;
-#X floatatom 165 487 5 0 0 0 - - -;
-#X obj 164 467 unpack 0 0;
-#X floatatom 229 487 5 0 0 0 - - -;
+#X obj 162 416 #centroid;
+#X obj 162 437 #export_list;
+#X floatatom 164 476 5 0 0 0 - - -;
+#X obj 163 456 unpack 0 0;
+#X floatatom 228 476 5 0 0 0 - - -;
 #N canvas 639 147 477 267 crosshair 0;
 #X obj 12 224 outlet;
 #X obj 12 9 inlet;
@@ -230,22 +231,31 @@
 #X connect 6 0 8 0;
 #X connect 7 0 6 0;
 #X connect 8 0 4 0;
-#X restore 72 428 pd crosshair;
-#X msg 128 8 open dc1394;
-#X msg 217 9 open mpeg file images/movies/washington_zoom_in.mpeg;
-#X msg 217 29 open xine images/movies/washington_zoom_in.mpeg;
-#X obj 28 27 #camera;
-#X obj 186 30 #in;
-#X obj 104 192 #fade;
-#X msg 145 194 32 16 4;
-#X obj 28 450 t a;
-#X text 231 110 emboss;
-#X text 230 96 hilite;
-#X text 110 397 designed to work with "hilite" above;
-#X obj 281 96 vradio 15 1 0 2 empty empty empty 0 -6 0 8 -262144 -1
+#X restore 71 417 pd crosshair;
+#X msg 127 -9 open dc1394;
+#X msg 216 -8 open mpeg file images/movies/washington_zoom_in.mpeg
+;
+#X msg 216 12 open xine images/movies/washington_zoom_in.mpeg;
+#X obj 27 16 #camera;
+#X obj 185 13 #in;
+#X obj 103 181 #fade;
+#X msg 144 181 32 16 4;
+#X obj 27 439 t a;
+#X text 230 99 emboss;
+#X text 229 85 hilite;
+#X text 109 386 designed to work with "hilite" above;
+#X obj 280 85 vradio 15 1 0 2 empty empty empty 0 -6 0 8 -241291 -1
 -1 0;
-#X text 300 96 motion;
-#X text 301 110 presence;
+#X text 299 85 motion;
+#X text 300 99 presence;
+#X obj -15 542 cnv 15 620 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text -7 550 GridFlow 0.8.0;
+#X text -7 550 GridFlow 0.8.0;
+#X obj -13 -85 cnv 15 620 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 0 -72 Copyright 2002 Mathieu Bouchard;
+#X text 0 -86 videodev_effects.pd;
 #X connect 0 0 5 1;
 #X connect 1 0 20 0;
 #X connect 2 0 3 0;

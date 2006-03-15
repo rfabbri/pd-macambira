@@ -1,8 +1,8 @@
 =begin
-	$Id: flow_objects.rb,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: flow_objects.rb,v 1.2 2006-03-15 04:37:28 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -70,7 +70,7 @@ FObject.subclass("gridflow",1,1) {
 	def _0_formats
 		post "-"*32
 		GridFlow.fclasses.each {|k,v|
-			next if not /#in:/ =~ k
+			next if not /#io:/ =~ k
 			modes = case v.flags
 			when 2; "#out"
 			when 4; "#in"
@@ -265,7 +265,7 @@ GridPack =
 GridObject.subclass("#pack",1,1) {
 	install_rgrid 0
 	class<<self;attr_reader :ninlets;end
-	def initialize(n=nil,cast=:int32)
+	def initialize(n=2,cast=:int32)
 		n||=self.class.ninlets
 		n>=16 and raise "too many inlets"
 		super
@@ -298,13 +298,13 @@ GridObject.subclass("#pack",1,1) {
 # the install_rgrids in the following are hacks so that
 # outlets can work. (install_rgrid is supposed to be for receiving)
 # maybe GF-0.8 doesn't need that.
-GridPack.subclass("@two",  2,1) { install_rgrid 0 }
-GridPack.subclass("@three",3,1) { install_rgrid 0 }
-GridPack.subclass("@four", 4,1) { install_rgrid 0 }
-GridPack.subclass("@eight",8,1) { install_rgrid 0 }
+GridPack.subclass("@two",  2,1) { install_rgrid 0; def initialize() super 2 end }
+GridPack.subclass("@three",3,1) { install_rgrid 0; def initialize() super 2 end  }
+GridPack.subclass("@four", 4,1) { install_rgrid 0; def initialize() super 2 end  }
+GridPack.subclass("@eight",8,1) { install_rgrid 0; def initialize() super 2 end  }
 GridObject.subclass("#unpack",1,0) {
   install_rgrid 0, true
-  def initialize(n)
+  def initialize(n=2)
     @n=n
     n>=10 and raise "too many outlets"
     super
@@ -338,8 +338,9 @@ GridObject.subclass("unix_time",1,3) {
     tt = t.to_s
     send_out_grid_begin 0, [tt.length], :uint8
     send_out_grid_flow 0, tt, :uint8
-    send_out 1, t.to_i
-    send_out 2, t.to_f-t.to_f.floor
+    send_out 1, t.to_i/86400, t.to_i%86400,
+	((t.to_f-t.to_f.floor)*1000000).to_i
+    send_out 2, t.year, t.month, t.day, t.hour, t.min, t.day
   end
 }
 ### test with "shell xlogo &" -> [exec]
@@ -352,6 +353,7 @@ FObject.subclass("renamefile",1,0) {
 }
 FObject.subclass("ls",1,1) {
         def _0_symbol(s) send_out 0, :list, *Dir.new(s.to_s).map {|x| x.intern } end
+        def _0_glob  (s) send_out 0, :list, *Dir[    s.to_s].map {|x| x.intern } end
 }
 
 #-------- fClasses for: math
@@ -420,36 +422,32 @@ FPatcher.subclass("@scale_to",2,1) {
 }
 
 #<vektor> told me to:
-# RGBtoYUV : @fobjects = ["#inner ( 3 3 # 66 -38 112 128 -74 -94 25 112 -18 )",
+# RGBtoYUV : @fobjects = ["#inner (3 3 # 66 -38 112 128 -74 -94 25 112 -18)",
 #	"@ >> 8","@ + {16 128 128}"]
-# YUVtoRGB : @fobjects = ["@ - ( 16 128 128 )",
-#	"#inner ( 3 3 # 298 298 298 0 -100 516 409 -208 0 )","@ >> 8"]
+# YUVtoRGB : @fobjects = ["@ - (16 128 128)",
+#	"#inner (3 3 # 298 298 298 0 -100 516 409 -208 0)","@ >> 8"]
 
 FPatcher.subclass("#rotate",2,1) {
-	@fobjects = ["@inner * + 0","@ >> 8"]
+	@fobjects = ["#inner","# >> 8"]
 	@wires = [-1,0,0,0, 0,0,1,0, 1,0,-1,0]
 	def update_rotator
-		rotator = (0...@axis[2]).map {|i|
-			(0...@axis[2]).map {|j|
-				if i==j then 256 else 0 end
-			}
-		}
+		n = @axis[2]
+		rotator = (0...n).map {|i| (0...n).map {|j| if i==j then 256 else 0 end }}
 		th = @angle * Math::PI / 18000
 		scale = 1<<8
-		(0...2).each {|i|
-			(0...2).each {|j|
-				rotator[@axis[i]][@axis[j]] =
-					(scale*Math.cos(th+(j-i)*Math::PI/2)).to_i
-			}
-		}
-		@fobjects[0].send_in 2,
-			@axis[2], @axis[2], "#".intern, *rotator.flatten
+		(0...2).each {|i| (0...2).each {|j|
+				a = @axis[i].to_i
+				b = @axis[j].to_i
+				#GridFlow.post "(#{a},#{b}) #{rotator[a].inspect}"
+				rotator[a][b] = (scale*Math.cos(th+(j-i)*Math::PI/2)).to_i
+		}}
+		@fobjects[0].send_in 1,n,n,"#".intern,*rotator.flatten
 	end
 	def _0_axis(from,to,total)
 		total>=0 or raise "total-axis number incorrect"
 		from>=0 and from<total or raise "from-axis number incorrect"
 		to  >=0 and to  <total or raise   "to-axis number incorrect"
-		@axis = [from,to,total]
+		@axis = [from.to_i,to.to_i,total.to_i]
 		update_rotator
 	end
 	def initialize(rot=0,axis=[0,1,2])
@@ -644,7 +642,7 @@ class PDNetSocket < FObject
 				@socket.bind nil, port
 			end
 		when :tcp
-			if host=="-" then
+ 			if host=="-" then
 				@server = TCPServer.new("localhost",port)
 			else
 				@socket = TCPSocket.new(host,port)
@@ -722,7 +720,7 @@ PDNetSocket.subclass("pd_netreceive",0,2) {
 
 # bogus class for representing objects that have no recognized class.
 FObject.subclass("broken",0,0) {
-	def args; a=@args.dup; a[7,0] = " "+classname; a end
+ 	def args; a=@args.dup; a[7,0] = " "+classname; a end
 }
 
 FObject.subclass("fork",1,2) {
@@ -891,6 +889,21 @@ FObject.subclass("range",1,1) {
     @a[m[1].to_i-1] = a[0]
     post "setting a[#{m[1].to_i-1}] = #{a[0]}"
   end
+}
+FObject.subclass("listfind",2,1) {
+  def initialize(*a) _1_list(*a) end
+  def _1_list(*a) @a = a end
+  def _0_float(x)
+    i=0
+    while i<@a.length
+      (send_out 0,i; return) if @a[i]==x
+      i+=1
+    end
+    send_out 0,-1
+  end
+  doc:_1_list,"list to search into"
+  doc:_0_float,"float to find in that list"
+  doc_out:_0_float,"position of the incoming float in the stored list"
 }
 
 #-------- fClasses for: GUI
@@ -1257,92 +1270,6 @@ end
 
 #-------- fClasses for: Hardware
 
-if const_defined? :USB
-
-class<<USB
-	attr_reader :busses
-end
-
-class DelcomUSB < GridFlow::FObject
-	Vendor,Product=0x0FC5,0x1222
-	def self.find
-		r=[]
-		USB.busses.each {|dir,bus|
-			bus.each {|dev|
-				r<<dev if dev.idVendor==Vendor and dev.idProduct==Product
-			}
-		}
-		r
-	end
-	def initialize #(bus=nil,dev=nil)
-		r=DelcomUSB.find
-		raise "no such device" if r.length<1
-		raise "#{r.length} such devices (which one???)" if r.length>1
-		@usb=USB.new(r[0])
-		if_num=nil
-		r[0].config.each {|config|
-			config.interface.each {|interface|
-				if_num = interface.bInterfaceNumber
-			}
-		}
-		# post "Interface # %i\n", if_num
-		@usb.set_configuration 1
-		@usb.claim_interface if_num
-		@usb.set_altinterface 0 rescue ArgumentError
-	end
-	# libdelcom had this:
-        # uint8 recipient, deviceModel, major, minor, dataL, dataM;
-        # uint16 length; uint8[8] extension;
-	def _0_send_command(major,minor,dataL,dataM,extension="\0\0\0\0\0\0\0\0")
-		raise "closed" if not @usb
-		raise "extension.length!=8" if extension.length!=8
-		@usb.control_msg(
-			0x000000c8, 0x00000012,
-			minor*0x100+major,
-			dataM*0x100+dataL,
-			extension, 5000)
-	end
-	def delete; @usb.close; end
-	install "delcomusb", 1, 1
-end
-
-# Klippeltronics
-FObject.subclass("multio",1,1) {
-	Vendor,Product=0xDEAD,0xBEEF
-	def self.find
-	  r=[]
-	  USB.busses.each {|dir,bus|
-	    bus.each {|dev|
-	      post "dir=%s, vendor=%x, product=%x",
-		      dir, dev.idVendor, dev.idProduct
-	      r<<dev if dev.idVendor==Vendor and dev.idProduct==Product
-	    }
-	  }
-	  r
-	end
-	def initialize
-		r=self.class.find
-		raise "no such device" if r.length<1
-		raise "#{r.length} such devices (which one???)" if r.length>1
-		$iobox=@usb=USB.new(r[0])
-		if_num=nil
-		r[0].config.each {|config|
-			config.interface.each {|interface|
-				#post "interface=%s", interface.to_s
-				if_num = interface.bInterfaceNumber
-			}
-		}
-		# post "Interface # %i\n", if_num
-		# @usb.set_configuration 0
-		@usb.claim_interface if_num
-		@usb.set_altinterface 0 rescue ArgumentError
-	end
-	#@usb.control_msg(0b10100001,0x01,0,0,"",1000)
-	#@usb.control_msg(0b10100001,0x01,0,1," ",0)
-	def delete; @usb.close; end
-}
-end # if const_defined? :USB
-
 # requires Ruby 1.8.0 because of bug in Ruby 1.6.x
 FObject.subclass("joystick_port",0,1) {
   def initialize(port)
@@ -1388,6 +1315,21 @@ FObject.subclass("plotter_control",1,1) {
   end
 }
 
+# ASCII, useful for controlling pics
+FObject.subclass("ascii",1,1) {
+  def puts(x)
+  x.each_byte {|b| send_out 0, b }
+  end
+  def _0_float x; puts "#{x.to_i}" end
+}
+
+# System, similar to shell
+FObject.subclass("system",1,1) {
+  def _0_system(*a)
+    system(a.join(" "))
+  end
+}
+
 (begin require "linux/ParallelPort"; true; rescue LoadError; false end) and
 FObject.subclass("parallel_port",1,3) {
   def initialize(port,manually=0)
@@ -1419,7 +1361,8 @@ FObject.subclass("parallel_port",1,3) {
 }
 
 (begin require "linux/SoundMixer"; true; rescue LoadError; false end) and
-FObject.subclass("SoundMixer",1,1) {
+#FObject.subclass("SoundMixer",1,1) {
+class GFSoundMixer < FObject; install "SoundMixer",1,1
   # BUG? i may have the channels (left,right) backwards
   def initialize(filename)
     super
@@ -1449,7 +1392,7 @@ FObject.subclass("SoundMixer",1,1) {
       @@vars.each {|var| _0_get var }
     end
   end
-}
+end#}
 
 # experimental
 FObject.subclass("rubyarray",2,1) {
@@ -1473,4 +1416,42 @@ FObject.subclass("rubyarray",2,1) {
   end
 }
 
+FObject.subclass("regsub",3,1) {
+  def initialize(from,to) _1_symbol(from); _2_symbol(to) end
+  def _0_symbol(s) send_out 0, :symbol, s.to_s.gsub(@from, @to).intern end
+  def _1_symbol(from) @from = Regexp.new(from.to_s.gsub(/`/,"\\")) end
+  def _2_symbol(to)   @to = to.to_s.gsub(/`/,"\\") end
+  doc:_0_symbol,"a string to transform"
+  doc:_1_symbol,"a regexp pattern to be found inside of the string"
+  doc:_2_symbol,"a replacement for the found pattern"
+  doc_out:_0_symbol,"the transformed string"
+}
+
+FObject.subclass("memstat",1,1) {
+  def _0_bang
+    f = File.open("/proc/#{$$}/stat")
+    send_out 0, Float(f.gets.split(" ")[22]) / 1024.0
+    f.close
+  end
+  doc:_0_bang,"lookup process stats for the currently running pd+ruby "+
+  	"and figure out how much RAM it uses."
+  doc_out:_0_float,"virtual size of RAM in kilobytes (includes swapped out and shared memory)"
+}
+
+FObject.subclass("sendgui",1,0) {
+  def _0_list(*x)
+    GridFlow.gui x.join(" ").gsub(/`/,";")+"\n"
+  end
+  install "sys_vgui", 1, 0
+  doc:_0_list,"a Tcl/Tk command to send to the pd client."
+}
+
 end # module GridFlow
+
+begin
+  require "gridflow/rblti"
+  GridFlow.post "Ruby-LTI support loaded."
+rescue Exception => e
+  #GridFlow.post "%s", e.inspect
+  #GridFlow.post "(rblti not found)"
+end

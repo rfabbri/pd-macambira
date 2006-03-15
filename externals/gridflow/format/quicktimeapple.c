@@ -1,5 +1,5 @@
 /*
-	$Id: quicktimeapple.c,v 1.1 2005-10-04 02:02:15 matju Exp $
+	$Id: quicktimeapple.c,v 1.2 2006-03-15 04:37:46 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard

@@ -1,8 +1,8 @@
 /*
-	$Id: grid.h,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: grid.h,v 1.2 2006-03-15 04:37:08 matju Exp $
 
 	GridFlow
-	Copyright (c) 2001,2002,2003,2004 by Mathieu Bouchard
+	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 #define __GF_GRID_H
 
 // current version number as string literal
-#define GF_VERSION "0.8.0"
+#define GF_VERSION "0.8.1"
 #define GF_COMPILE_TIME __DATE__ ", " __TIME__
 
 #include <new>
@@ -35,6 +35,12 @@
 #include <signal.h>
 #include <stdio.h>
 #include <math.h>
+
+#ifdef __APPLE__
+static inline void *memalign (size_t a, size_t n) {return malloc(n);}
+#else
+#include <malloc.h>
+#endif
 
 extern "C" {
 #include <ruby.h>
@@ -58,11 +64,7 @@ extern "C" {
 #endif
 
 #define BUG(s,args...) {fprintf(stderr,s "\nat: %s\n",args,__PRETTY_FUNCTION__); ::raise(11);}
-
-// !@#$ what am I going to do about this? should this be changed?
-// should I wrap all of the Ruby API for C++-style convenience?
-typedef VALUE Ruby;
-// typedef struct Ruby { VALUE x };
+#define L gfpost("%s:%d in %s",__FILE__,__LINE__,__PRETTY_FUNCTION__);
 
 #ifdef IS_BRIDGE
 #define RAISE(args...) rb_raise(rb_eArgError,args)
@@ -76,6 +78,8 @@ typedef VALUE Ruby;
 	if (RUBY_RELEASE_CODE < 20030716) rb_enable_super(a,b)
 #endif
 
+typedef VALUE Ruby;
+
 /* undocumented function from Ruby that is one thing we need to fix a very elusive bug
 that manifests itself when embedding ruby inside a plugin of another app. This exists
 for all versions of Ruby up to now, and I don't know when it gets fixed. */
@@ -86,7 +90,6 @@ void rb_raise0(
 const char *file, int line, const char *func, VALUE exc, const char *fmt, ...)
 __attribute__ ((noreturn));
 };
-#define L fprintf(stderr,"%s:%d in %s\n",__FILE__,__LINE__,__PRETTY_FUNCTION__);
 #define SI(_sym_) (rb_intern(#_sym_))
 #define SYM(_sym_) (ID2SYM(SI(_sym_)))
 #define DGS(_class_) \
@@ -104,21 +107,16 @@ static inline long  rb_ary_len(Ruby s) {return  RARRAY(s)->len;}
 static inline Ruby *rb_ary_ptr(Ruby s) {return  RARRAY(s)->ptr;}
 static inline const char *rb_sym_name(Ruby sym) {return rb_id2name(SYM2ID(sym));}
 #define rb_str_pt(s,t) Pt<t>((t*)rb_str_ptr(s),rb_str_len(s))
-
-// shorthands
 #define IEVAL(_self_,s) rb_funcall(_self_,SI(instance_eval),1,rb_str_new2(s))
 #define EVAL(s) rb_eval_string(s)
 #define rassert(_p_) if (!(_p_)) RAISE(#_p_);
-
 // because of older versions of Ruby (1.6.?)
 #define rb_obj_class(o) rb_funcall((o),SI(class),0)
 
 #define WATCH(n,ar) { \
-	char foo[16*1024], *p=foo; \
-	p += sprintf(p,"%s: ",#ar); \
+	char foo[16*1024], *p=foo; p += sprintf(p,"%s: ",#ar); \
 	for (int q=0; q<n; q++) p += sprintf(p,"%lld ",(long long)ar[q]); \
-	gfpost("%s",foo); \
-}
+	gfpost("%s",foo);}
 
 // we're gonna override assert, so load it first, to avoid conflicts
 #include <assert.h>
@@ -148,7 +146,7 @@ static inline const char *rb_sym_name(Ruby sym) {return rb_id2name(SYM2ID(sym));
 
 static inline Ruby PTR2FIX (const void *ptr) {
 	long p = (long)ptr;
-	if ((p&3)!=0) BUG("unaligned pointer: %08x\n",(long)(ptr));
+	if ((p&3)!=0) BUG("unaligned pointer: %p\n",ptr);
 	return LONG2NUM(p>>2);
 }
 #define FIX2PTR(type,ruby) ((type *)(TO(long,ruby)<<2))
@@ -184,7 +182,7 @@ static inline float64 gf_abs(float64 a) { return fabs(a); }
 // integer powers in log(b) time. T is assumed Integer
 template <class T> static inline T ipow(T a, T b) {
 	for(T r=1;;) {if (b&1) r*=a; b>>=1; if (!b) return r; a*=a;}
-}	
+}
 
 // kludge
 static inline float32 ipow(float32 a, float32 b) { return pow(a,b); }
@@ -196,7 +194,6 @@ static inline float64 ipow(float64 a, float64 b) { return pow(a,b); }
 template <class T> static inline T min(T a, T b) { return a<b?a:b; }
 template <class T> static inline T max(T a, T b) { return a>b?a:b; }
 //template <class T> inline T min(T a, T b) { T c = (a-b)>>31; return (a&c)|(b&~c); }
-//template <class T> inline T max(T a, T b) { T c = (a-b)>>31; return (a&c)|(b&~c); }
 
 // greatest common divisor, by euclid's algorithm
 // this runs in log(a+b) number operations
@@ -221,12 +218,12 @@ template <class T> static T gcd2 (T a, T b) {
 template <class T> static inline T lcm (T a, T b) {return a*b/gcd(a,b);}
 
 // returns the position (0..31) of highest bit set in a word, or 0 if none.
-#define FOO(N) if ((x>>N)&(((typeof(x))1<<N)-1)) { x>>=N; i+=N; }
-static int highest_bit(uint8  x) {int i=0;                    FOO(4)FOO(2)FOO(1)return i;}
-static int highest_bit(uint16 x) {int i=0;              FOO(8)FOO(4)FOO(2)FOO(1)return i;}
-static int highest_bit(uint32 x) {int i=0;       FOO(16)FOO(8)FOO(4)FOO(2)FOO(1)return i;}
-static int highest_bit(uint64 x) {int i=0;FOO(32)FOO(16)FOO(8)FOO(4)FOO(2)FOO(1)return i;}
-#undef FOO
+#define Z(N) if ((x>>N)&(((typeof(x))1<<N)-1)) { x>>=N; i+=N; }
+static int highest_bit(uint8  x) {int i=0;              Z(4)Z(2)Z(1)return i;}
+static int highest_bit(uint16 x) {int i=0;          Z(8)Z(4)Z(2)Z(1)return i;}
+static int highest_bit(uint32 x) {int i=0;     Z(16)Z(8)Z(4)Z(2)Z(1)return i;}
+static int highest_bit(uint64 x) {int i=0;Z(32)Z(16)Z(8)Z(4)Z(2)Z(1)return i;}
+#undef Z
 // returns the position (0..31) of lowest bit set in a word, or 0 if none.
 template <class T> static int lowest_bit(T n) { return highest_bit((~n+1)&n); }
 
@@ -262,7 +259,7 @@ static inline uint64 rdtsc() {return 0;}
 #define EACH_INT_TYPE(MACRO) MACRO(uint8) MACRO(int16) MACRO(int32) MACRO(int64)
 #define EACH_FLOAT_TYPE(MACRO) MACRO(float32) MACRO(float64)
 #endif
-#define EACH_NUMBER_TYPE(MACRO) EACH_INT_TYPE(MACRO) EACH_FLOAT_TYPE(MACRO)
+#define EACH_NUMBER_TYPE(MACRO) EACH_INT_TYPE(MACRO) EACH_FLOAT_TYPE(MACRO) MACRO(ruby)
 
 // note: loop unrolling macros assume N!=0
 // btw this may cause alignment problems when 8 does not divide N
@@ -277,6 +274,132 @@ static inline uint64 rdtsc() {return 0;}
 	switch (n__) { start: \
 		case 0:MACRO(0); case 1:MACRO(1); case 2:MACRO(2); case 3:MACRO(3); \
 		PTR+=4; N-=4; ARGS; if (N) goto start; }
+
+//****************************************************************
+// my own little Ruby <-> C++ layer
+
+//struct Arg { Ruby a; };
+//struct ArgList { int n; Pt<Arg> v; };
+static inline bool INTEGER_P(Ruby x) {return FIXNUM_P(x)||TYPE(x)==T_BIGNUM;}
+static inline bool FLOAT_P(Ruby x)   {return TYPE(x)==T_FLOAT;}
+#define INT(x) TO(int32,x)
+#define TO(t,x) convert(x,(t*)0)
+
+// not using NUM2INT because Ruby can convert Symbol to int
+// (by compatibility with Ruby 1.4)
+static inline int32 convert(Ruby x, int32 *foo) {
+	if (INTEGER_P(x)) return NUM2INT(x);
+	if (FLOAT_P(x)) return NUM2INT(rb_funcall(x,SI(round),0));
+	RAISE("expected Integer or Float (got %s)",
+		rb_str_ptr(rb_funcall(x,SI(inspect),0)));
+}
+static int16 convert(Ruby x, int16 *foo) {
+	int v = INT(x);
+	if (v<-0x8000 || v>=0x8000) RAISE("value %d is out of range",v);
+	return v;}
+static uint16 convert(Ruby x, uint16 *foo) {
+	int v = INT(x);
+	if (v<0 || v>=0x10000) RAISE("value %d is out of range",v);
+	return v;}
+static bool  convert(Ruby x, bool  *foo) {
+	if (x==Qtrue) return true;
+	if (x==Qfalse) return false;
+	switch (TYPE(x)) {
+		case T_FIXNUM: case T_BIGNUM: case T_FLOAT: return !!INT(x);
+		default: RAISE("can't convert to bool");
+	}
+}
+
+#ifdef HAVE_GCC64
+static uint64 convert(Ruby val, uint64 *foo) { return NUM2ULONG(val); }
+static  int64 convert(Ruby val,  int64 *foo) { return NUM2ULONG(val); }
+static Ruby gf_ull2num(uint64 val) { return ULONG2NUM(val); }
+static  Ruby gf_ll2num(uint64 val) { return  LONG2NUM(val); }
+#else
+static uint64 convert(Ruby val, uint64 *foo) {
+	if (FIXNUM_P(val)) return (uint64)FIX2LONG(val);
+	if (TYPE(val)!=T_BIGNUM) RAISE("type error");
+	uint64 v = (uint64)NUM2UINT(rb_funcall(val,SI(>>),1,INT2FIX(32))) << 32;
+	return v + NUM2UINT(rb_funcall(val,SI(&),1,UINT2NUM(0xffffffff)));}
+static int64 convert(Ruby val, int64 *foo) {
+	if (FIXNUM_P(val)) return (int64)FIX2LONG(val);
+	if (TYPE(val)!=T_BIGNUM) RAISE("type error");
+	int64 v = (int64)NUM2INT(rb_funcall(val,SI(>>),1,INT2FIX(32))) << 32;
+	return v + NUM2UINT(rb_funcall(val,SI(&),1,UINT2NUM(0xffffffff)));}
+static Ruby gf_ull2num(uint64 val) {
+    Ruby x = rb_funcall(UINT2NUM((uint32)(val>>32)),SI(<<),1,INT2FIX(32));
+    return rb_funcall(x,SI(+),1,UINT2NUM((uint32)val));}
+static Ruby gf_ll2num(int64 val) {
+    Ruby x = rb_funcall( INT2NUM(( int32)(val>>32)),SI(<<),1,INT2FIX(32));
+    return rb_funcall(x,SI(+),1,UINT2NUM((uint32)val));}
+#endif
+    
+static long convert(Ruby x, long *foo) {
+	return sizeof(long)==sizeof(int32) ?
+		convert(x,(int32 *)0) :
+		convert(x,(int64 *)0);
+}
+
+static float64 convert(Ruby x, float64 *foo) {
+	if (INTEGER_P(x)) return INT(x);
+	if (TYPE(x)!=T_FLOAT) RAISE("not a Float");
+	return ((RFloat*)x)->value;}
+static float32 convert(Ruby x, float32 *foo) {
+	return (float32) convert(x,(float64 *)0);}
+typedef Ruby Symbol, Array, String, Integer;
+static Ruby convert(Ruby x, Ruby *bogus) { return x; }
+typedef Ruby (*RMethod)(...); /* !@#$ fishy */
+
+#define BUILTIN_SYMBOLS(MACRO) \
+	MACRO(_grid,"grid") MACRO(_bang,"bang") MACRO(_float,"float") \
+	MACRO(_list,"list") MACRO(_sharp,"#") \
+	MACRO(iv_outlets,"@outlets") \
+	MACRO(iv_ninlets,"@ninlets") \
+	MACRO(iv_noutlets,"@noutlets")
+extern struct BuiltinSymbols {
+#define FOO(_sym_,_str_) Ruby _sym_;
+BUILTIN_SYMBOLS(FOO)
+#undef FOO
+} bsym;
+
+typedef struct R {
+	VALUE r;
+	R() {r=Qnil;}
+	R(int x) {r=INT2NUM(x);}
+	R(unsigned x) {r=UINT2NUM(x);}
+	R(long x) {r=LONG2NUM(x);}
+	R(unsigned long x) {r=ULONG2NUM(x);}
+	R(double x) {r=rb_float_new(x);}
+	R( int64 x) {r= gf_ll2num(x);}
+	R(uint64 x) {r=gf_ull2num(x);}
+	operator bool() {return !!INT2NUM(r);}
+	operator uint8 () {return INT2NUM(r);}
+	operator int16 () {return INT2NUM(r);}
+	operator int32 () {return INT2NUM(r);}
+	operator int64 () {return convert(r,(int64*)0);}
+	operator float32 () {return convert(r,(float32*)0);}
+	operator float64 () {return convert(r,(float64*)0);}
+#define FOO(As,Op) \
+	R &operator As (int x) {r=rb_funcall(r, SI(Op),1,INT2NUM(x)); return *this;}
+	FOO(+=,+) FOO(-=,-) FOO(*=,*) FOO(/=,/) FOO(%=,%)
+	FOO(&=,&) FOO(|=,|) FOO(^=,^) FOO(<<=,<<) FOO(>>=,>>)
+#undef FOO
+//	bool operator  == (int x) {return rb_funcall(r,SI(==),1,INT2NUM(x));}
+#define FOO(Op) \
+	R operator Op (R x)   {return rb_funcall(r,SI(Op),1,x.r);} \
+	R operator Op (int x) {return rb_funcall(r,SI(Op),1,INT2NUM(x));}
+	FOO(+) FOO(-) FOO(*) FOO(/) FOO(%)
+	FOO(&) FOO(|) FOO(^) FOO(<<) FOO(>>)
+	FOO(<) FOO(>) FOO(<=) FOO(>=) FOO(==) FOO(!=)
+#undef FOO
+	static R value(VALUE r) {R x; x.r=r; return x;}
+} ruby;
+
+static R operator -(int a, R b) {return rb_funcall(a,SI(Op),1,INT2NUM(b.r));}
+
+static inline R ipow(R a, R b) {return R::value(rb_funcall(a.r,SI(**),1,b.r));}
+static inline R gf_abs(R a) { return R::value(rb_funcall(a.r,SI(abs),0)); }
+static inline R cmp(R a, R b) { return R::value(rb_funcall(a.r,SI(<=>),1,b.r));}
 
 //****************************************************************
 // hook into pointer manipulation. will help find memory corruption bugs.
@@ -377,10 +500,11 @@ public:
 #ifndef IS_BRIDGE
 extern "C" void *gfmalloc(size_t n);
 extern "C" void gffree(void *p);
-inline void *::operator new   (size_t n) { return gfmalloc(n); }
-inline void *::operator new[] (size_t n) { return gfmalloc(n); }
-inline void  ::operator delete   (void *p) { gffree(p); }
-inline void  ::operator delete[] (void *p) { gffree(p); }
+// note that C++ (GCC 3.4) now refuses the :: prefix so i removed it in the 4 following lines:
+inline void *operator new   (size_t n) { return gfmalloc(n); }
+inline void *operator new[] (size_t n) { return gfmalloc(n); }
+inline void  operator delete   (void *p) { gffree(p); }
+inline void  operator delete[] (void *p) { gffree(p); }
 #endif
 
 #define STACK_ARRAY(T,V,N) T V##_foo[N]; Pt<T> V(V##_foo,N);
@@ -398,88 +522,6 @@ template <class T> inline void CLEAR(Pt<T> dest, int n) {
 template <class T> static void memswap (Pt<T> a, Pt<T> b, int n) {
 	STACK_ARRAY(T,c,n); COPY(c,a,n); COPY(a,b,n); COPY(b,c,n);
 }
-
-//****************************************************************
-// my own little Ruby <-> C++ layer
-
-struct Arg { Ruby a; };
-struct ArgList { int n; Pt<Arg> v; };
-static inline bool INTEGER_P(Ruby x) {return FIXNUM_P(x)||TYPE(x)==T_BIGNUM;}
-static inline bool FLOAT_P(Ruby x)   {return TYPE(x)==T_FLOAT;}
-#define INT(x) TO(int32,x)
-#define TO(t,x) convert(x,(t*)0)
-
-// not using NUM2INT because Ruby can convert Symbol to int
-// (by compatibility with Ruby 1.4)
-static inline int32 convert(Ruby x, int32 *foo) {
-	if (INTEGER_P(x)) return NUM2INT(x);
-	if (FLOAT_P(x)) return NUM2INT(rb_funcall(x,SI(round),0));
-	RAISE("expected Integer or Float (got %s)",
-		rb_str_ptr(rb_funcall(x,SI(inspect),0)));
-}
-static int16 convert(Ruby x, int16 *foo) {
-	int v = INT(x);
-	if (v<-0x8000 || v>=0x8000) RAISE("value %d is out of range",v);
-	return v;}
-static uint16 convert(Ruby x, uint16 *foo) {
-	int v = INT(x);
-	if (v<0 || v>=0x10000) RAISE("value %d is out of range",v);
-	return v;}
-static bool  convert(Ruby x, bool  *foo) {
-	if (x==Qtrue) return true;
-	if (x==Qfalse) return false;
-	switch (TYPE(x)) {
-		case T_FIXNUM: case T_BIGNUM: case T_FLOAT: return !!INT(x);
-		default: RAISE("can't convert to bool");
-	}
-}
-
-static uint64 convert(Ruby val, uint64 *foo) {
-	if (FIXNUM_P(val)) return (uint64)FIX2LONG(val);
-	if (TYPE(val)!=T_BIGNUM) RAISE("type error");
-	uint64 v = (uint64)NUM2UINT(rb_funcall(val,SI(>>),1,INT2FIX(32))) << 32;
-	return v + NUM2UINT(rb_funcall(val,SI(&),1,UINT2NUM(0xffffffff)));}
-static int64 convert(Ruby val, int64 *foo) {
-	if (FIXNUM_P(val)) return (int64)FIX2LONG(val);
-	if (TYPE(val)!=T_BIGNUM) RAISE("type error");
-	int64 v = (int64)NUM2INT(rb_funcall(val,SI(>>),1,INT2FIX(32))) << 32;
-	return v + NUM2UINT(rb_funcall(val,SI(&),1,UINT2NUM(0xffffffff)));}
-
-static Ruby gf_ull2num(uint64 val) {
-    return rb_funcall(
-	rb_funcall(UINT2NUM((uint32)(val>>32)),SI(<<),1,INT2FIX(32)),
-	SI(+),1,UINT2NUM((uint32)val));}
-static Ruby gf_ll2num(int64 val) {
-    return rb_funcall(
-	rb_funcall(INT2NUM((int32)(val>>32)),SI(<<),1,INT2FIX(32)),
-	SI(+),1,UINT2NUM((uint32)val));}
-
-static  long  convert(Ruby x,   long *foo) {
-	return sizeof(long)==sizeof(int32) ?
-		convert(x,(int32 *)0) :
-		convert(x,(int64 *)0);
-}
-static float64 convert(Ruby x, float64 *foo) {
-	if (INTEGER_P(x)) return INT(x);
-	if (TYPE(x)!=T_FLOAT) RAISE("not a Float");
-	return ((RFloat*)x)->value;}
-static float32 convert(Ruby x, float32 *foo) {
-	return (float32) convert(x,(float64 *)0);}
-typedef Ruby Symbol, Array, String, Integer;
-static Ruby convert(Ruby x, Ruby *bogus) { return x; }
-typedef Ruby (*RMethod)(...); /* !@#$ fishy */
-
-#define BUILTIN_SYMBOLS(MACRO) \
-	MACRO(_grid,"grid") MACRO(_bang,"bang") MACRO(_float,"float") \
-	MACRO(_list,"list") MACRO(_sharp,"#") \
-	MACRO(iv_outlets,"@outlets") \
-	MACRO(iv_ninlets,"@ninlets") \
-	MACRO(iv_noutlets,"@noutlets")
-extern struct BuiltinSymbols {
-#define FOO(_sym_,_str_) Ruby _sym_;
-BUILTIN_SYMBOLS(FOO)
-#undef FOO
-} bsym;
 
 //****************************************************************
 // CObject is the base class for C++ classes that get exported to Ruby.
@@ -509,32 +551,23 @@ void CObject_free (void *);
 // you shouldn't use MethodDecl directly (used by source_filter.rb)
 struct MethodDecl { const char *selector; RMethod method; };
 void define_many_methods(Ruby rself, int n, MethodDecl *methods);
-
 extern Ruby mGridFlow, cFObject, cGridObject, cFormat;
 
 //****************************************************************
 // a Dim is a list of dimensions that describe the shape of a grid
 \class Dim < CObject
 struct Dim : CObject {
-	static const int MAX_DIMENSIONS=16; // maximum number of dimensions in a grid
+	static const int MAX_DIM=16; // maximum number of dimensions in a grid
 	int n;
 	Pt<int32> v; // safe pointer
-	int32 v2[MAX_DIMENSIONS]; // real stuff
+	int32 v2[MAX_DIM]; // real stuff
 	void check(); // test invariants
-	Dim(int n, Pt<int32> v) {
-		this->v = Pt<int32>(v2,MAX_DIMENSIONS);
-		this->n = n;
-		COPY(this->v,v,n); check();
-	}
-	Dim(int n, int32* v) {
-		this->v = Pt<int32>(v2,MAX_DIMENSIONS);
-		this->n = n;
-		COPY(this->v,Pt<int32>(v,n),n); check();
-	}
-	Dim()                 {v=Pt<int32>(v2,MAX_DIMENSIONS); n=0;                     check();}
-	Dim(int a)            {v=Pt<int32>(v2,MAX_DIMENSIONS); n=1;v[0]=a;              check();}
-	Dim(int a,int b)      {v=Pt<int32>(v2,MAX_DIMENSIONS); n=2;v[0]=a;v[1]=b;       check();}
-	Dim(int a,int b,int c){v=Pt<int32>(v2,MAX_DIMENSIONS); n=3;v[0]=a;v[1]=b;v[2]=c;check();}
+	Dim(int n, Pt<int32> v) { this->v = Pt<int32>(v2,MAX_DIM); this->n = n; COPY(this->v,v,n); check();}
+	Dim(int n,    int32 *v) { this->v = Pt<int32>(v2,MAX_DIM); this->n = n; COPY(this->v,Pt<int32>(v,n),n); check();}
+	Dim()                 {v=Pt<int32>(v2,MAX_DIM); n=0;                     check();}
+	Dim(int a)            {v=Pt<int32>(v2,MAX_DIM); n=1;v[0]=a;              check();}
+	Dim(int a,int b)      {v=Pt<int32>(v2,MAX_DIM); n=2;v[0]=a;v[1]=b;       check();}
+	Dim(int a,int b,int c){v=Pt<int32>(v2,MAX_DIM); n=3;v[0]=a;v[1]=b;v[2]=c;check();}
 	int count() {return n;}
 	int get(int i) { return v[i]; }
 	int32 prod(int start=0, int end=-1) {
@@ -610,6 +643,7 @@ NUMBER_TYPE_LIMITS(  int32,-0x80000000,0x7fffffff,-1)
 NUMBER_TYPE_LIMITS(  int64,-0x8000000000000000LL,0x7fffffffffffffffLL,-1)
 NUMBER_TYPE_LIMITS(float32,-HUGE_VAL,+HUGE_VAL,(RAISE("all_ones"),0))
 NUMBER_TYPE_LIMITS(float64,-HUGE_VAL,+HUGE_VAL,(RAISE("all_ones"),0))
+NUMBER_TYPE_LIMITS(   ruby,ruby(-HUGE_VAL),ruby(+HUGE_VAL),(RAISE("all_ones"),0))
 
 #ifdef HAVE_LITE
 #define NT_NOTLITE NT_UNIMPL
@@ -624,7 +658,8 @@ NUMBER_TYPE_LIMITS(float64,-HUGE_VAL,+HUGE_VAL,(RAISE("all_ones"),0))
 	MACRO( uint32,32,NT_UNSIGNED|NT_UNIMPL, "u32") MACRO(int32,32,0, "i32,i") \
 	MACRO( uint64,64,NT_UNSIGNED|NT_UNIMPL, "u64") MACRO(int64,64,NT_NOTLITE, "i64,l") \
 	MACRO(float32,32,NT_NOTLITE|NT_FLOAT, "f32,f") \
-	MACRO(float64,64,NT_NOTLITE|NT_FLOAT, "f64,d")
+	MACRO(float64,64,NT_NOTLITE|NT_FLOAT, "f64,d") \
+	MACRO(   ruby,sizeof(long),NT_NOTLITE,"r")
 
 enum NumberTypeE {
 #define FOO(_sym_,args...) _sym_##_e,
@@ -661,11 +696,12 @@ NumberTypeE NumberTypeE_find (Ruby sym);
 #define TYPESWITCH(T,C,E) switch (T) { \
   case uint8_e:   C(uint8) break;         case int16_e: C(int16) break; \
   case int32_e:   C(int32) break; NONLITE(case int64_e: C(int64) break; \
-  case float32_e: C(float32) break; case float64_e: C(float64) break;) \
+  case float32_e: C(float32) break; case float64_e: C(float64) break; \
+  case ruby_e: C(ruby) break;) \
   default: E; RAISE("type '%s' not available here",number_type_table[T].sym);}
-#define TYPESWITCH_NOFLOAT(T,C,E) switch (T) { \
+#define TYPESWITCH_JUSTINT(T,C,E) switch (T) { \
   case uint8_e: C(uint8) break; case int16_e: C(int16) break; \
-  case int32_e: C(int32) break;   NONLITE(case int64_e: C(int64) break;)\
+  case int32_e: C(int32) break;   NONLITE(case int64_e: C(int64) break;) \
   default: E; RAISE("type '%s' not available here",number_type_table[T].sym);}
 
 // Numop objects encapsulate optimised loops of simple operations
@@ -683,21 +719,22 @@ struct NumopOn : CObject {
 	typedef bool (*AlgebraicCheck)(T x, LeftRight side);
 	// neutral: right: forall y {f(x,y)=x}; left: forall x {f(x,y)=y};
 	// absorbent: right: exists a forall y {f(x,y)=a}; ...
+	T (*neutral)(LeftRight); // default neutral: e.g. 0 for addition, 1 for multiplication
 	AlgebraicCheck is_neutral, is_absorbent;
-	NumopOn(Map m, Zip z, Fold f, Scan s, AlgebraicCheck n, AlgebraicCheck a) :
-		op_map(m), op_zip(z), op_fold(f), op_scan(s),
-		is_neutral(n), is_absorbent(a) {}
+	NumopOn(Map m, Zip z, Fold f, Scan s, T (*neu)(LeftRight), AlgebraicCheck n, AlgebraicCheck a) :
+		op_map(m), op_zip(z), op_fold(f), op_scan(s), neutral(neu), is_neutral(n), is_absorbent(a) {}
 	NumopOn() {}
 	NumopOn(const NumopOn &z) {
 		op_map  = z.op_map;  op_zip  = z.op_zip;
 		op_fold = z.op_fold; op_scan = z.op_scan;
-		is_neutral = z.is_neutral; is_absorbent = z.is_absorbent; }
+		is_neutral = z.is_neutral; neutral = z.neutral;
+		is_absorbent = z.is_absorbent; }
 };
 
 // semigroup property: associativity: f(a,f(b,c))=f(f(a,b),c)
 #define OP_ASSOC (1<<0)
 // abelian property: commutativity: f(a,b)=f(b,a)
-#define OP_COMM  (1<<1)
+#define OP_COMM (1<<1)
 
 \class Numop < CObject
 struct Numop : CObject {
@@ -773,7 +810,6 @@ struct Grid : CObject {
 	P<Dim> dim;
 	NumberTypeE nt;
 	void *data;
-	void *rdata;
 	Grid(P<Dim> dim, NumberTypeE nt, bool clear=false) : dim(0), nt(int32_e), data(0) {
 		if (!dim) RAISE("hell");
 		init(dim,nt);
@@ -795,14 +831,13 @@ EACH_NUMBER_TYPE(FOO)
 		memcpy(foo->data,data,bytes());
 		return foo;
 	}
-	~Grid() {if (rdata) delete[] (uint8 *)rdata;}
+	~Grid() {if (data) free(data);}
 private:
 	void init(P<Dim> dim, NumberTypeE nt) {
 		this->dim = dim;
 		this->nt = nt;
-		rdata = dim ? new int64[1+(bytes()+7)/8] : 0;
-		int align = ((long)rdata) & 7;
-		data = (char *)rdata + ((8-align)&7);
+		data = 0;
+		if (dim) data = memalign(16,bytes()+16);
 		//fprintf(stderr,"rdata=%p data=%p align=%d\n",rdata,data,align);
 	}
 	void init_from_ruby(Ruby x);
@@ -937,18 +972,18 @@ private:
 // C is for class, I for inlet number
 // GRIN1 : int32 only
 // GRIN4 : all types
-// GRIN2 : integers only; no floats
+// GRIN2 : integers only; no floats (no R either actually)
 // GRINF : floats only; no integers
 #ifndef HAVE_LITE
-#define GRIN(TB,TS,TI,TL,TF,TD) {TB,TS,TI,TL,TF,TD}
+#define GRIN(TB,TS,TI,TL,TF,TD,TR) {TB,TS,TI,TL,TF,TD,TR}
 #else
-#define GRIN(TB,TS,TI,TL,TF,TD) {TB,TS,TI}
+#define GRIN(TB,TS,TI,TL,TF,TD,TR) {TB,TS,TI}
 #endif // HAVE_LITE
 
-#define GRIN1(C,I) GRIN(0,0,C::grinw_##I,0,0,0)
-#define GRIN4(C,I) GRIN(C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I)
-#define GRIN2(C,I) GRIN(C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,0,0)
-#define GRINF(C,I) GRIN(0,0,0,0,C::grinw_##I,C::grinw_##I)
+#define GRIN1(C,I) GRIN(0,0,C::grinw_##I,0,0,0,0)
+#define GRIN4(C,I) GRIN(C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I)
+#define GRIN2(C,I) GRIN(C::grinw_##I,C::grinw_##I,C::grinw_##I,C::grinw_##I,0,0,0)
+#define GRINF(C,I) GRIN(0,0,0,0,C::grinw_##I,C::grinw_##I,0)
 
 struct FClass { // 0.7.8: removed all GridObject-specific stuff.
 	void *(*allocator)(); // returns a new C++ object
@@ -1081,6 +1116,8 @@ static void SAME_DIM(int n, P<Dim> a, int ai, P<Dim> b, int bi) {
 
 // a stack for the profiler, etc.
 #define GF_STACK_MAX 256
+//#define NO_INLINE(decl) decl __attribute__((noinline))
+#define NO_INLINE(decl) decl
 struct GFStack {
 	struct GFStackFrame {
 		FObject *o;
@@ -1090,8 +1127,8 @@ struct GFStack {
 	GFStackFrame s[GF_STACK_MAX];
 	int n;
 	GFStack() { n = 0; }
-	void push (FObject *o) __attribute__((noinline));
-	void pop () __attribute__((noinline));
+	NO_INLINE(void push (FObject *o));
+	NO_INLINE(void pop ());
 };
 extern GFStack gf_stack;
 struct GFStackMarker {

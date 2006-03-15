@@ -1,25 +1,29 @@
-#N canvas 696 154 450 446 10;
-#X obj 137 107 unix_time;
-#X obj 136 68 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 134 38 639 312 10;
+#X obj 91 113 unix_time;
+#X obj 91 82 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 78 146 #export_list;
-#X obj 167 171 display;
-#X obj 43 18 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+#X obj 8 172 #export_list;
+#X obj 91 40 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
 ;
-#X obj 283 243 nbx 9 14 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
--262144 -1 -1 0 256;
-#X obj 11 290 display;
-#X text 381 243 <-- 1/100000 th of a second \, useful for generating
-filenames;
-#X text 213 170 <-- Unix timestamp;
-#X obj 86 30 metro 500;
-#X text 274 19 GridFlow 0.8.0;
-#X text 225 88 Outputs;
-#X text 62 287 <-- Ascii format for the date;
+#X obj 9 246 display;
+#X obj 91 58 metro 500;
+#X text 60 243 <-- Ascii format for the date;
+#X obj 308 221 display;
+#X obj 123 171 display;
+#X obj 307 195 display;
+#X obj 306 170 rubysprintf %04d%02d%02d-%02d%02d%02d;
+#X obj 8 282 cnv 15 720 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 16 289 GridFlow 0.8.0;
+#X obj 8 5 cnv 15 720 15 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 9 5 SUMMARY : the unixtime command;
 #X connect 0 0 2 0;
-#X connect 0 1 3 0;
-#X connect 0 2 5 0;
+#X connect 0 1 8 0;
+#X connect 0 2 7 0;
+#X connect 0 2 10 0;
 #X connect 1 0 0 0;
-#X connect 2 0 6 0;
-#X connect 4 0 9 0;
-#X connect 9 0 1 0;
+#X connect 2 0 4 0;
+#X connect 3 0 5 0;
+#X connect 5 0 1 0;
+#X connect 10 0 9 0;

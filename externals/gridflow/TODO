@@ -1,46 +1,37 @@
-/* $Id: TODO,v 1.1 2005-10-04 02:12:43 matju Exp $ */
+/* $Id: TODO,v 1.2 2006-03-15 04:48:05 matju Exp $ */
 
-matju cvs update -dP :
-P format/quicktimeapple.c
-cvs update: warning: pd_examples/binary_operations.pd was lost
-C pd_examples/color_correction.pd
-C pd_examples/convolve.pd
-C pd_examples/drag_rectangle.pd
-C pd_examples/eclipse.pd
-C pd_examples/linear_transform.pd
-C pd_examples/waves.pd
+[ ] SWIG: try -fcompact -fvirtual
 
-Checking in README;
-/home/cvs/gridflow/README,v  <--  README
-new revision: 1.22; previous revision: 1.21
-done
-$helo_domain: web.artengine.ca
-$from_address: matju@web.artengine.ca (matju)
-loginfo.rb is writing changelog...done
-loginfo.rb is parsing log message...done
-loginfo.rb is testing modules...log info for `/home/cvs/gridflow/README' is not ready
-done
-loginfo.rb is composing a mail...done
-loginfo.rb is posting email to gridflow ...ERROR: cannot send email using MTA on ns
-450 <gridflow>: Recipient address rejected: User unknown in local recipient table
+ClaudiusMaximus matju: [#draw_image] inlet 0 method "op <opname>" is undocumented, but very useful :)
+ClaudiusMaximus matju: [unix_time] is maldocumented, outlet 0 is a grid Dim[28](uint8), not a symbol
 
-done
-loginfo.rb is deleting tmp files...done
 
-AMD64 :
- char 1 1
- short 2 2
- int 4 4
- long 4 8
- long long 8 8
- float 4 4
- double 8 8
- void * 4 8
+[ ] pd_examples -> examples
+[ ] update doc
+[ ] 0.8.1
+[ ] make good use of the R type (automatic Ruby/C++ convs)
+[ ] ditch xml, switch to docstrings or whatever
+[ ] ...
+claude wants http://en.wikipedia.org/wiki/Graham_scan
+
+X Error of failed request:  BadValue (integer parameter out of range for operation)
+error=0x2
+request=0x91 (MIT-SHM)
+minor=0x3 (X_ShmPutImage)
+value in failed request: 0x04b008 == 240*320*4+8 (matju)
+
+invalid read of size 1 (main.c.fcs:438)
+malloc alignment = 4 mod 8 (en utilisant valgrind)
+
+ClaudiusMaximus matju: feature request:  [#store4], behaves like store but accepts grids 
+of floats as coordinates and interpolate using 4-point interpolation, eg, right inlet -> 
+(3 3 f # 0 0 0 1 1 1 2 4 8), left inlet -> (1 # 0.5) outputs (0.5 0.5 0.5) 
+(or whatever the interpolation would really be), left inlet (2 # 1.5 1.5) outputs (3)
+
+AMD64 diffs: long 4->8, void * 4->8
 
 <ClaudiusMaximus> hmm, sending a [reassign( message to the right inlet of a [#store] segfaults Pd
-
 <ClaudiusMaximus> hmmm, i get a segfault with a simple patch sending "reassign, put_at ( 0 0 ), reassign" to the right inlet of [#store ( 3 3 # 0 )]
-
 <alx1> matju: for the ./configure, I often get an error from aalib since common installs do not put the headers
 <alx1> matju: would it be possible to make it a user defined choice like --with-aalib and turn it off by default?
 <alx1> matju: not noticing that configure returns an error leads to an error when compiling
@@ -48,6 +39,7 @@ AMD64 :
 <alx1> and returns a 'pd_activate' error after I move it
 <alx1> matju: once I delete it, unlike the other gui objects, it takes about one second before it dissapears, maybe a difference in tcl versions?
 
+http://oprofile.sourceforge.net/about/
 for 0.8.0:
 
 drag_rectangle.pd is fucked (x11 error)
@@ -55,17 +47,7 @@ FObject#send_out2 : bself is NULL, rself=4097cbe8
 [gf] ruby: ObjectSpace._id2ref(0x4097cbe8/2)
 [gf] returns: #<GridFlow::FormatX11 [FormatX11 out]>
 
-test with waves.pd, 24 by 32.
-==1673== 809108 bytes in 187 blocks are still reachable in loss record 64 of 64
-==1673==    at 0x40026DAA: __builtin_vec_new (vg_replace_malloc.c:203)
-==1673==    by 0x40026E01: operator new[](unsigned) (vg_replace_malloc.c:216)
-==1673==    by 0x41FE269F: Grid::init(P<Dim>, NumberTypeE) (base/grid.h.fcs:910)
-==1673==    by 0x41FCBE27: Grid::init_from_ruby_list(int, unsigned long*, NumberTypeE) (base/grid.c.fcs:100)
-==1673==    by 0x41FCC679: Grid::init_from_ruby(unsigned long) (base/grid.c.fcs:117)
-==1673==    by 0x41FE223F: Grid::Grid(unsigned long) (base/grid.h.fcs:888)
-==1673==    by 0x42093152: convert(unsigned long, Grid**) (base/grid.h.fcs:921)
-==1673==    by 0x4208F72B: GridOuter::initialize_wrap(int, unsigned long*, unsigned long) (base/flow_objects.c.fcs:862)
-
+[ ] FIX LIBQUICKTIME CODE: #include <lqt/*> instead of <quicktime/*>
 [ ] try removing or modifying -falign on PPC/OSX
 [ ] c++ typecasting is nuts (see class Pt<T>)
 [ ] make c++ refcount and ruby gc to cooperate.
@@ -96,8 +78,6 @@ test with waves.pd, 24 by 32.
 [ ] #: option swap
 [ ] consider including [mysql] [renamefile] [ls] [shell]
 [ ] re-enable int64,float64
-[ ] <alx_> #define RUBY_STACK_END "0xbfffd5c0" (!?!?!?)
-[ ] remember who i am supposed to credit for making pd_help back in march 2003... alx knows
 [ ] added #matrix_solve, #slice
 [ ] Copy-on-Write (COW)
 [ ] < 10 bugs in buglist
@@ -108,6 +88,7 @@ test with waves.pd, 24 by 32.
 [ ] unbork make test and plain ruby mode.
 [ ] add support for "anything" methods (def _0_(sel,*a))
 [ ] look into -ftree-vectorize
+[ ] should STACK_ARRAY remain at all?
 
 for 0.8.1:
 
@@ -116,7 +97,7 @@ for 0.8.1:
 
 Bugs (High Priority) (!!! Fix all of these before 0.8.0 !!!)
 
-pick a number: [147]
+pick a number: [149]
 
 [147] [#store] blows up in nervous_video (reassign)
 [146] [#peephole] resize problem
@@ -138,7 +119,6 @@ pick a number: [147]
 [133] numop ** can freeze GF
 [129] jmax2pd: [display] should not be translated
 [128] jmax2pd(?): loadbang-messages (comma) don't get translated to .pd ??
-[119] osx: SDL doesn't work here
 [118] error messages can be unclear (eg. file not open... is it #in's, or #out's?)
 [117] osx: [#store] crash instead of raising
 [112] Pt<T>: some casts aren't done properly
@@ -177,7 +157,6 @@ Bugs (Low Priority)
 [046] write unit tests about error checking
 [047] make system to ensure everything is working before a release.
 [048] potential issues between fork() and X11 ?
-[050] BitPacking has trouble with masks that extend beyond int25be
 [051] remove the crap given by -w of ruby
 [054] it's possible to crash by sending data in two inlets of a same object at once
 [059] mess with options in format grid

@@ -1,0 +1,31 @@
+#N canvas 452 202 450 438 10;
+#X obj 91 104 #camera;
+#X obj 40 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj 91 12 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1;
+#X obj 91 59 metro 50;
+#X obj 100 253 #out window;
+#X obj 88 134 trigger anything anything;
+#X obj 133 162 # -;
+#X obj 133 201 #clip;
+#X obj 343 223 @! abs;
+#X obj 343 254 # + 50;
+#X obj 7 -37 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 10 -37 What is a grid?;
+#X obj 7 -72 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -73 2 Images;
+#X text 14 -59 Description: opening multiple images from one window.
+;
+#X obj 8 320 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 16 327 GridFlow 0.8.0;
+#X connect 0 0 5 0;
+#X connect 1 0 0 0;
+#X connect 2 0 3 0;
+#X connect 3 0 0 0;
+#X connect 5 0 6 1;
+#X connect 5 1 6 0;
+#X connect 6 0 7 0;
+#X connect 7 0 4 0;

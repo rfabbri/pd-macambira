@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no" ?>
 <!DOCTYPE documentation SYSTEM 'jmax.dtd'>
 <documentation title="Reference Manual: Format Classes">
-<!-- $Id: format.xml,v 1.1 2005-10-04 02:09:42 matju Exp $ -->
+<!-- $Id: format.xml,v 1.2 2006-03-15 04:44:50 matju Exp $ -->
 <!--
 	GridFlow Reference Manual: Format Handler Reference
 	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard

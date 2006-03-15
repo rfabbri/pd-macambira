@@ -1,5 +1,5 @@
 =begin
-	$Id: placebo.rb,v 1.1 2005-10-04 02:02:13 matju Exp $
+	$Id: placebo.rb,v 1.2 2006-03-15 04:38:20 matju Exp $
 
 	GridFlow
 	Copyright (c) 2001,2002,2003,2004,2005 by Mathieu Bouchard
@@ -23,7 +23,9 @@
 
 class Object
   def self.dummy(sel)
-    self.module_eval "def #{sel}(*args) GridFlow.post \"dummy #{sel}: %s\", args.inspect end"
+    self.module_eval "def #{sel}(*args)
+	#GridFlow.post \"dummy #{sel}: %s\", args.inspect
+    end"
   end
 end
 
@@ -36,6 +38,7 @@ module GridFlow
   class Clock
     def initialize(victim) @victim=victim end
     dummy :delay
+    dummy :unset
   end
   class Pointer
     dummy :initialize

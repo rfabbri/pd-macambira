@@ -1,0 +1,60 @@
+#N canvas 127 0 672 603 10;
+#X obj 22 160 metro 10;
+#X obj 22 118 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X floatatom 80 298 5 1 4 0 - - -;
+#X obj 7 -37 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 7 -72 cnv 15 430 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 26 478 cnv 15 430 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 34 485 GridFlow 0.8.0;
+#X obj 22 438 #out window;
+#X obj 59 248 #in;
+#X msg 59 225 load bluemarble.jpg;
+#X obj 80 387 #pack 2;
+#X floatatom 124 369 5 1 4 0 - - -;
+#X obj 22 272 #store;
+#X text 21 -67 2.4 Image manipulation;
+#X text 46 -37 2.4.1 Resizing an image;
+#X obj 22 272 #store;
+#X obj 59 202 loadbang;
+#N canvas 0 0 450 300 META 0;
+#X restore 154 484 pd META;
+#X obj 274 226 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 23 414 cnv 15 63 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 113 118 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X text 49 117 <-- step #2 : start the metro;
+#X obj 22 413 #scale_by;
+#X obj 468 344 cnv 15 15 15 empty empty empty 20 12 0 14 -259603 -66577
+0;
+#X obj 165 379 cnv 15 152 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 167 365 changing this number permits you to change the image's
+horizontal parameters.;
+#X text 404 344 <-- step #3 : change the parameters;
+#X text 11 -10 [#scale_by] resizes grids by multiplying its parameters
+(width and height). To resize an image proportionatily a specific scaleing
+size must appylied \, ex: [#scale_by 4].;
+#X text 11 31 [# pack] lets you resize grids by altering the vertical
+and horizontal parameters.;
+#X text 88 157 the metro refreshes the display window so you don't
+have to reload the grid every time it's altered.;
+#X text 210 225 <-- step #1 : load the image;
+#X text 132 295 changing this number changes the grid's vertical parameters.
+(a slider can be connected to [#pack] instead of a number box.;
+#X connect 0 0 12 0;
+#X connect 0 0 15 0;
+#X connect 1 0 0 0;
+#X connect 2 0 10 0;
+#X connect 8 0 12 1;
+#X connect 8 0 15 1;
+#X connect 9 0 8 0;
+#X connect 10 0 22 1;
+#X connect 11 0 10 1;
+#X connect 15 0 22 0;
+#X connect 16 0 9 0;

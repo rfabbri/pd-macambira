@@ -1,5 +1,5 @@
 # Copyright 2001 by Mathieu Bouchard
-# $Id: smpte.rb,v 1.1 2005-10-04 02:02:15 matju Exp $
+# $Id: smpte.rb,v 1.2 2006-03-15 04:40:47 matju Exp $
 
 # The standard SMPTE color test pattern.
 # AS SEEN ON TV !!! (but this is a cheap plastic imitation)

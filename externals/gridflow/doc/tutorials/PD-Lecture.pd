@@ -1,0 +1,64 @@
+#N canvas 116 102 890 501 10;
+#X obj 8 6 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 8 457 cnv 15 870 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 668 459 Copyright Ben Bogart 2005 \; (See COPYING.TXT for details)
+;
+#X text 12 13 Welcome to Pure-Data...;
+#X obj 8 46 cnv 15 430 15 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 46 What is Pure-Data (aka PD)?;
+#X text 28 74 Pure-Data is an open-source patching environment for
+multi-media (audio+image). Pure-Data is a programming language where
+you create relationships by connecting visual boxes (rather than typing
+complex commands). This lecture is separated into three sections: An
+Introduction to Pure-Data \, An introduction to Gem and intermediate
+PD and Gem.;
+#X obj 8 176 cnv 15 430 120 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X obj 22 198 pddp_open pure-data-1;
+#X obj 22 221 pddp_open pure-data-2;
+#X obj 22 244 pddp_open pure-data-3;
+#X obj 22 267 pddp_open pure-data-4;
+#X text 197 198 Pure-Data Introduction;
+#X text 197 221 GUI Objects for Interaction;
+#X text 197 244 Creating your first patch;
+#X text 197 267 Control: metro \, random & counter;
+#X obj 8 306 cnv 15 430 145 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 13 176 Introduction to Pure-Data;
+#X text 13 306 Introduction to Gem (Graphics Environment for Multimedia)
+;
+#X obj 22 328 pddp_open gem-1;
+#X obj 22 351 pddp_open gem-2;
+#X obj 22 374 pddp_open gem-3;
+#X obj 22 397 pddp_open gem-4;
+#X obj 22 421 pddp_open gem-5;
+#X text 197 328 Gem Introduction;
+#X text 197 351 What are gemchains?;
+#X text 197 374 translate \, rotate and scale;
+#X text 197 397 Texturing using pix objects;
+#X text 197 421 Video & Free Exploration;
+#X obj 448 46 cnv 15 430 145 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 453 46 Intermediate Pure-Data;
+#X obj 462 68 pddp_open pure-data-5;
+#X obj 462 91 pddp_open pure-data-6;
+#X text 637 91 The powerful message object;
+#X obj 462 114 pddp_open pure-data-7;
+#X text 637 114 More about lists;
+#X text 637 137 Nesting collections of objects;
+#X text 637 68 Connectionless communications;
+#X obj 462 137 pddp_open pure-data-8;
+#X text 637 161 Using GUI's in abstractions;
+#X obj 462 161 pddp_open pure-data-9;
+#X obj 448 200 cnv 15 430 95 empty empty empty 20 12 0 14 -179884 -66577
+0;
+#X text 637 222 Grouping Gem entities;
+#X text 637 245 Gem render order;
+#X text 453 200 Intermediate Gem;
+#X obj 462 222 pddp_open gem-6;
+#X obj 462 245 pddp_open gem-7;
+#X obj 462 268 pddp_open gem-8;
+#X text 637 268 Video Tracking & Pixel Operations;

@@ -1,0 +1,62 @@
+#N canvas 0 0 887 417 10;
+#X obj 4 278 cnv 15 868 30 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X text 12 285 GridFlow 0.8.0;
+#X obj 5 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X obj 5 -106 cnv 15 868 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 5 -106 cnv 15 780 30 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 -99 2 Introduction to Images;
+#X text 556 86 <--- click here;
+#N canvas 0 0 450 300 META 0;
+#X restore 126 285 pd META;
+#X obj 452 191 #out window;
+#X msg 452 84 open b001.jpg;
+#X obj 473 107 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text 13 84 step 3: Add a [bang<.;
+#X text 13 105 step 4: Create a [#out window].;
+#X text 13 63 step 2: Create [#in] object.;
+#X text 14 27 step 1: create message box [open< with the file name
+and extension you want to open.;
+#X text 506 110 <--- then click here;
+#X obj 447 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 450 -67 1.2 How to create a grid.;
+#X obj 447 -67 cnv 15 430 15 empty empty empty 20 12 0 14 -228992 -66577
+0;
+#X text 8 -68 2.1 Opening an image.;
+#X text 456 -66 2.1 Patch example.;
+#X obj 452 130 cnv 15 22 15 empty empty empty 20 12 0 14 -241291 -66577
+0;
+#X obj 452 129 #in;
+#X text 12 150 Tip: In order for GridFlow to be able to find your images
+you have to specify the correct path.;
+#X obj 14 151 cnv 15 25 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 12 -33 One of the first things you need to know when working
+with GridFlow is how to open an image. GridFlow accepts several image
+formats (.jpg \, .png \, .tiff etc.).;
+#X text 12 150 Tip: In order for GridFlow to be able to find your images
+you have to specify the correct path. Gridflow has an "images" folder
+\, put them there to access them by filename only.;
+#X obj 451 38 cnv 15 25 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 450 38 Tip: Sometimes the display window opens behind the patch
+\, try moving the patch if the display seems to be missing.;
+#X text 447 -45 To view the image you must initialize the patch. This
+is done in "run mode" by clicking on the message box \, and then on
+the bang. The image will be displayed in a display window \, off to
+the side of the patch.;
+#X text 476 216 In order to close the parent window displaying your
+image \, the [#out window] object must be deleted.;
+#X obj 512 133 cnv 15 25 15 empty empty empty 20 12 0 14 -260818 -66577
+0;
+#X text 489 132 <--Tip: remember \, as with the rest of PD \, you can
+obtain information regarding specific objects by right-clicking on
+it. Try this for [#in].;
+#X connect 9 0 22 0;
+#X connect 10 0 22 0;
+#X connect 22 0 8 0;
