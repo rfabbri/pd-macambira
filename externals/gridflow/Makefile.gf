@@ -1,4 +1,4 @@
-# $Id: Makefile.gf,v 1.2 2006-03-15 04:48:08 matju Exp $
+# $Id: Makefile.gf,v 1.3 2006-03-15 04:56:39 matju Exp $
 # This is an annex that covers what is not covered by the generated Makefile
 
 SYSTEM = $(shell uname -s | sed -e 's/^MINGW.*/NT/')
@@ -146,8 +146,6 @@ puredata-install::
 	apply_colormap_channelwise checkers contrast posterize ravel remap_image solarize spread \
 	rgb_to_greyscale greyscale_to_rgb rgb_to_yuv yuv_to_rgb; do \
 		cp pd_abstractions/\#$$z.pd $(PUREDATA_PATH)/extra/\@$$z.pd; done
-	mkdir -p $(PUREDATA_PATH)/extra/gridflow/icons
-	$(INSTALL_DATA) icons/peephole.gif $(PUREDATA_PATH)/extra/gridflow/icons/peephole.gif
 
 else
 
