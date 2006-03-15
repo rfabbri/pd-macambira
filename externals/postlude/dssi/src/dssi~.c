@@ -1,6 +1,6 @@
 /* dssi~ - A DSSI host for PD 
  * 
- * Copyright 2006 Jamie Bullock and others 
+ * Copyright (C) 2006 Jamie Bullock and others 
  *
  * This file incorporates code from the following sources:
  * 
@@ -24,13 +24,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-
+ */
 
 #include "dssi~.h"
 #include "jutils.h"
-
 
 static t_class *dssi_tilde_class;
 
@@ -39,18 +36,17 @@ static t_class *dssi_tilde_class;
 static char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 /*static void init_MidiEventBuf(snd_seq_event_t *MidiEventBuf){
-	int i;
-	for(i = 0; i < EVENT_BUFSIZE; i++){
-		MidiEventBuf[i].*/
-
+  int i;
+  for(i = 0; i < EVENT_BUFSIZE; i++){
+  MidiEventBuf[i].*/
 
 /*
  * encode_7in6
-** Taken from gui_data.c by Sean Bolton **
+ ** Taken from gui_data.c by Sean Bolton **
  *
  * encode a block of 7-bit data, in base64-ish style
  */
-static char *
+    static char *
 encode_7in6(uint8_t *data, int length)
 {
     char *buffer;
@@ -59,32 +55,32 @@ encode_7in6(uint8_t *data, int length)
     unsigned int sum = 0;
 
     if (!(buffer = (char *)malloc(25 + outchars)))
-        return NULL;
+	return NULL;
 
     out = snprintf(buffer, 12, "%d ", length);
 
     in = reg = above = below = 0;
     while (outchars) {
-        if (above == 6) {
-            buffer[out] = base64[reg >> 7];
-            reg &= 0x7f;
-            above = 0;
-            out++;
-            outchars--;
-        }
-        if (below == 0) {
-            if (in < length) {
-                reg |= data[in] & 0x7f;
-                sum += data[in];
-            }
-            below = 7;
-            in++;
-        }
-        shift = 6 - above;
-        if (below < shift) shift = below;
-        reg <<= shift;
-        above += shift;
-        below -= shift;
+	if (above == 6) {
+	    buffer[out] = base64[reg >> 7];
+	    reg &= 0x7f;
+	    above = 0;
+	    out++;
+	    outchars--;
+	}
+	if (below == 0) {
+	    if (in < length) {
+		reg |= data[in] & 0x7f;
+		sum += data[in];
+	    }
+	    below = 7;
+	    in++;
+	}
+	shift = 6 - above;
+	if (below < shift) shift = below;
+	reg <<= shift;
+	above += shift;
+	below -= shift;
     }
 
     snprintf(buffer + out, 12, " %d", sum);
@@ -94,9 +90,9 @@ encode_7in6(uint8_t *data, int length)
 
 /*
  * dx7_bulk_dump_checksum
-** Taken from dx7_voice_data.c by Sean Bolton **
+ ** Taken from dx7_voice_data.c by Sean Bolton **
  */
-static int
+    static int
 dx7_bulk_dump_checksum(uint8_t *data, int length)
 {
     int sum = 0;
@@ -107,106 +103,104 @@ dx7_bulk_dump_checksum(uint8_t *data, int length)
 }
 
 static DSSI_Descriptor * ladspa_to_dssi(
-		LADSPA_Descriptor *ladspaDesc){
-	DSSI_Descriptor *dssiDesc;
-	dssiDesc = (DSSI_Descriptor *)calloc(1, sizeof(DSSI_Descriptor));
-       ((DSSI_Descriptor *)dssiDesc)->DSSI_API_Version = 1;
-       ((DSSI_Descriptor *)dssiDesc)->LADSPA_Plugin = 
-	       					(LADSPA_Descriptor *)ladspaDesc;
-       return (DSSI_Descriptor *)dssiDesc;
+	LADSPA_Descriptor *ladspaDesc){
+    DSSI_Descriptor *dssiDesc;
+    dssiDesc = (DSSI_Descriptor *)calloc(1, sizeof(DSSI_Descriptor));
+    ((DSSI_Descriptor *)dssiDesc)->DSSI_API_Version = 1;
+    ((DSSI_Descriptor *)dssiDesc)->LADSPA_Plugin = 
+	(LADSPA_Descriptor *)ladspaDesc;
+    return (DSSI_Descriptor *)dssiDesc;
 }
-		   
 
 static void dssi_tilde_load_plugin(const char *dll_path, void **dll_handle){
-	
-	*dll_handle = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
-	if (*dll_handle){
-		post("%s loaded successfully", dll_path);
-	}
-	else
-		post("Failed: %s", dlerror());
 
-        
+    *dll_handle = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
+    if (*dll_handle){
+	post("%s loaded successfully", dll_path);
+    }
+    else
+	post("Failed: %s", dlerror());
+
 }
-	
+
 static void dssi_tilde_port_info(t_dssi_tilde *x){
-	t_int i;
-	
-	for (i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++) {
-		
-		x->port_info[i].type.a_type = A_SYMBOL;
-		x->port_info[i].data_type.a_type = A_SYMBOL;
-		x->port_info[i].name.a_type = A_SYMBOL;
-		x->port_info[i].upper_bound.a_type = A_FLOAT;
-		x->port_info[i].lower_bound.a_type = A_FLOAT;
-		x->port_info[i].p_default.a_type = A_FLOAT;
-		
-		LADSPA_PortDescriptor pod =	
-			x->descriptor->LADSPA_Plugin->PortDescriptors[i];
+    t_int i;
+
+    for (i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++) {
+
+	x->port_info[i].type.a_type = A_SYMBOL;
+	x->port_info[i].data_type.a_type = A_SYMBOL;
+	x->port_info[i].name.a_type = A_SYMBOL;
+	x->port_info[i].upper_bound.a_type = A_FLOAT;
+	x->port_info[i].lower_bound.a_type = A_FLOAT;
+	x->port_info[i].p_default.a_type = A_FLOAT;
+
+	LADSPA_PortDescriptor pod =	
+	    x->descriptor->LADSPA_Plugin->PortDescriptors[i];
 #if DEBUG
-		post("Port %d: %s", i, x->descriptor->LADSPA_Plugin->PortNames[i]);
+	post("Port %d: %s", i, x->descriptor->LADSPA_Plugin->PortNames[i]);
 #endif
-		if (LADSPA_IS_PORT_AUDIO(pod)) {
-			x->port_info[i].data_type.a_w.w_symbol = 
-				gensym("audio");
-			if (LADSPA_IS_PORT_INPUT(pod)){
-				x->port_info[i].type.a_w.w_symbol = 
-					gensym("in");
-				++x->plugin_ins;
-			}
-			else if (LADSPA_IS_PORT_OUTPUT(pod)){
-				x->port_info[i].type.a_w.w_symbol = 
-					gensym("out");
-				++x->plugin_outs;
-			}
-		} 
-		else if (LADSPA_IS_PORT_CONTROL(pod)) {
-			x->port_info[i].data_type.a_w.w_symbol = 
-				gensym("control");
-			if (LADSPA_IS_PORT_INPUT(pod)){
-				x->port_info[i].type.a_w.w_symbol = 
-					gensym("in");
-				++x->plugin_controlIns;
-			}
-			else if (LADSPA_IS_PORT_OUTPUT(pod)){
-				++x->plugin_controlOuts;
-				x->port_info[i].type.a_w.w_symbol = 
-					gensym("out");
-			}
-		}
-		if (LADSPA_IS_HINT_BOUNDED_BELOW(
-		 x->descriptor->LADSPA_Plugin->PortRangeHints[i].HintDescriptor))
-			x->port_info[i].lower_bound.a_w.w_float = 
-				x->descriptor->LADSPA_Plugin->
-				PortRangeHints[i].LowerBound;
-		else
-			x->port_info[i].lower_bound.a_w.w_float = 0;
-		
-		if (LADSPA_IS_HINT_BOUNDED_ABOVE(
-		 x->descriptor->LADSPA_Plugin->PortRangeHints[i].HintDescriptor))
-			x->port_info[i].upper_bound.a_w.w_float = 
-				x->descriptor->LADSPA_Plugin->
-				PortRangeHints[i].UpperBound;
-		else
-			x->port_info[i].lower_bound.a_w.w_float = 1;
-
-		x->port_info[i].p_default.a_w.w_float = (float)
-						get_port_default(x, i);
-
-		x->port_info[i].name.a_w.w_symbol = 
-			gensym ((char *)
-				x->descriptor->LADSPA_Plugin->PortNames[i]);
+	if (LADSPA_IS_PORT_AUDIO(pod)) {
+	    x->port_info[i].data_type.a_w.w_symbol = 
+		gensym("audio");
+	    if (LADSPA_IS_PORT_INPUT(pod)){
+		x->port_info[i].type.a_w.w_symbol = 
+		    gensym("in");
+		++x->plugin_ins;
+	    }
+	    else if (LADSPA_IS_PORT_OUTPUT(pod)){
+		x->port_info[i].type.a_w.w_symbol = 
+		    gensym("out");
+		++x->plugin_outs;
+	    }
+	} 
+	else if (LADSPA_IS_PORT_CONTROL(pod)) {
+	    x->port_info[i].data_type.a_w.w_symbol = 
+		gensym("control");
+	    if (LADSPA_IS_PORT_INPUT(pod)){
+		x->port_info[i].type.a_w.w_symbol = 
+		    gensym("in");
+		++x->plugin_controlIns;
+	    }
+	    else if (LADSPA_IS_PORT_OUTPUT(pod)){
+		++x->plugin_controlOuts;
+		x->port_info[i].type.a_w.w_symbol = 
+		    gensym("out");
+	    }
 	}
+	if (LADSPA_IS_HINT_BOUNDED_BELOW(
+		x->descriptor->LADSPA_Plugin->PortRangeHints[i].HintDescriptor))
+	    x->port_info[i].lower_bound.a_w.w_float = 
+		x->descriptor->LADSPA_Plugin->
+		PortRangeHints[i].LowerBound;
+	else
+	    x->port_info[i].lower_bound.a_w.w_float = 0;
+
+	if (LADSPA_IS_HINT_BOUNDED_ABOVE(
+		x->descriptor->LADSPA_Plugin->PortRangeHints[i].HintDescriptor))
+	    x->port_info[i].upper_bound.a_w.w_float = 
+		x->descriptor->LADSPA_Plugin->
+		PortRangeHints[i].UpperBound;
+	else
+	    x->port_info[i].lower_bound.a_w.w_float = 1;
+
+	x->port_info[i].p_default.a_w.w_float = (float)
+	    get_port_default(x, i);
+
+	x->port_info[i].name.a_w.w_symbol = 
+	    gensym ((char *)
+		    x->descriptor->LADSPA_Plugin->PortNames[i]);
+    }
 #if DEBUG
-post("%d inputs, %d outputs, %d control inputs, %d control outs", x->plugin_ins, x->plugin_outs, x->plugin_controlIns, x->plugin_controlOuts);
+    post("%d inputs, %d outputs, %d control inputs, %d control outs", x->plugin_ins, x->plugin_outs, x->plugin_controlIns, x->plugin_controlOuts);
 #endif
 }
 
 static void dssi_tilde_assign_ports(t_dssi_tilde *x){
-	int i;
+    int i;
 
 #if DEBUG
-	post("%d instances", x->n_instances);
+    post("%d instances", x->n_instances);
 #endif
 
     x->plugin_ins *= x->n_instances;
@@ -215,145 +209,143 @@ static void dssi_tilde_assign_ports(t_dssi_tilde *x){
     x->plugin_controlOuts *= x->n_instances;
 
 #if DEBUG
-	post("%d plugin outs", x->plugin_outs);
+    post("%d plugin outs", x->plugin_outs);
 #endif
-	
-	x->plugin_InputBuffers = 
-		(float **)malloc(x->plugin_ins * sizeof(float *));
-	x->plugin_OutputBuffers = 
-		(float **)malloc(x->plugin_outs * sizeof(float *));
-	x->plugin_ControlDataInput = 
-		(float *)calloc(x->plugin_controlIns, sizeof(float));
-	x->plugin_ControlDataOutput = 
-		(float *)calloc(x->plugin_controlOuts, sizeof(float));
-	for(i = 0; i < x->plugin_ins; i++)
-		x->plugin_InputBuffers[i] = 
-			(float *)calloc(x->blksize, sizeof(float));
-	for(i = 0; i < x->plugin_outs; i++)
-		x->plugin_OutputBuffers[i] = 
-			(float *)calloc(x->blksize, sizeof(float));
-	x->instanceEventBuffers = 
-		(snd_seq_event_t **)malloc(x->n_instances * sizeof(snd_seq_event_t *));
 
-	
+    x->plugin_InputBuffers = 
+	(float **)malloc(x->plugin_ins * sizeof(float *));
+    x->plugin_OutputBuffers = 
+	(float **)malloc(x->plugin_outs * sizeof(float *));
+    x->plugin_ControlDataInput = 
+	(float *)calloc(x->plugin_controlIns, sizeof(float));
+    x->plugin_ControlDataOutput = 
+	(float *)calloc(x->plugin_controlOuts, sizeof(float));
+    for(i = 0; i < x->plugin_ins; i++)
+	x->plugin_InputBuffers[i] = 
+	    (float *)calloc(x->blksize, sizeof(float));
+    for(i = 0; i < x->plugin_outs; i++)
+	x->plugin_OutputBuffers[i] = 
+	    (float *)calloc(x->blksize, sizeof(float));
+    x->instanceEventBuffers = 
+	(snd_seq_event_t **)malloc(x->n_instances * sizeof(snd_seq_event_t *));
+
     x->instanceHandles = (LADSPA_Handle *)malloc(x->n_instances *
-                                              sizeof(LADSPA_Handle));
+	    sizeof(LADSPA_Handle));
     x->instanceEventCounts = (unsigned long *)malloc(x->n_instances *
-                                                  sizeof(unsigned long));
+	    sizeof(unsigned long));
 
-	for(i = 0; i < x->n_instances; i++){
-		x->instanceEventBuffers[i] = (snd_seq_event_t *)malloc(EVENT_BUFSIZE *
-								sizeof(snd_seq_event_t));
+    for(i = 0; i < x->n_instances; i++){
+	x->instanceEventBuffers[i] = (snd_seq_event_t *)malloc(EVENT_BUFSIZE *
+		sizeof(snd_seq_event_t));
 
-		x->instances[i].plugin_PortControlInNumbers = 
-			(int *)malloc(x->descriptor->LADSPA_Plugin->PortCount * 
-						  sizeof(int));/* hmmm... as we don't support instances of differing plugin types, we probably don't need to do this dynamically*/
-	}
-	
-	x->plugin_ControlInPortNumbers = 
-		(unsigned long *)malloc(sizeof(unsigned long) * x->plugin_controlIns);
+	x->instances[i].plugin_PortControlInNumbers = 
+	    (int *)malloc(x->descriptor->LADSPA_Plugin->PortCount * 
+			  sizeof(int));/* hmmm... as we don't support instances of differing plugin types, we probably don't need to do this dynamically*/
+    }
+
+    x->plugin_ControlInPortNumbers = 
+	(unsigned long *)malloc(sizeof(unsigned long) * x->plugin_controlIns);
 
 #if DEBUG		
-	post("Buffers assigned!");
+    post("Buffers assigned!");
 #endif
 
 }
 
 static void dssi_tilde_initialize(t_dssi_tilde *x, t_int instance){
 
-	x->instances[instance].pluginPrograms = NULL;
-	x->instances[instance].currentBank = 0;
-	x->instances[instance].currentProgram = 0;
-	x->instances[instance].uiTarget = NULL;
-	x->instances[instance].ui_osc_control_path = NULL;
-	x->instances[instance].ui_osc_program_path = NULL;
-	x->instances[instance].ui_osc_show_path = NULL;
-	x->instances[instance].ui_osc_hide_path = NULL;
-	x->instances[instance].ui_osc_quit_path = NULL;
-	x->instances[instance].ui_osc_configure_path = NULL;
-	x->instances[instance].uiNeedsProgramUpdate = 0;
-	x->instances[instance].pendingProgramChange = -1;
-	x->instances[instance].plugin_ProgramCount = 0;
-	x->instances[instance].pendingBankMSB = -1;
-	x->instances[instance].pendingBankLSB = -1;
-	x->instances[instance].ui_hidden = 1;
-	x->instances[instance].ui_show = 0;
+    x->instances[instance].pluginPrograms = NULL;
+    x->instances[instance].currentBank = 0;
+    x->instances[instance].currentProgram = 0;
+    x->instances[instance].uiTarget = NULL;
+    x->instances[instance].ui_osc_control_path = NULL;
+    x->instances[instance].ui_osc_program_path = NULL;
+    x->instances[instance].ui_osc_show_path = NULL;
+    x->instances[instance].ui_osc_hide_path = NULL;
+    x->instances[instance].ui_osc_quit_path = NULL;
+    x->instances[instance].ui_osc_configure_path = NULL;
+    x->instances[instance].uiNeedsProgramUpdate = 0;
+    x->instances[instance].pendingProgramChange = -1;
+    x->instances[instance].plugin_ProgramCount = 0;
+    x->instances[instance].pendingBankMSB = -1;
+    x->instances[instance].pendingBankLSB = -1;
+    x->instances[instance].ui_hidden = 1;
+    x->instances[instance].ui_show = 0;
 #if DEBUG		
-	post("Instance %d initialized!", instance);
+    post("Instance %d initialized!", instance);
 #endif
-
 
 }
 
 static void dssi_tilde_connect_ports(t_dssi_tilde *x, t_int instance){
 
-	t_int i;
+    t_int i;
 
-	for(i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++){
+    for(i = 0; i < (t_int)x->descriptor->LADSPA_Plugin->PortCount; i++){
 #if DEBUG
-		post("PortCount: %d of %d", i, 
-				x->descriptor->LADSPA_Plugin->PortCount);
+	post("PortCount: %d of %d", i, 
+		x->descriptor->LADSPA_Plugin->PortCount);
 #endif
-		LADSPA_PortDescriptor pod =
-					 x->descriptor->LADSPA_Plugin->PortDescriptors[i];
+	LADSPA_PortDescriptor pod =
+	    x->descriptor->LADSPA_Plugin->PortDescriptors[i];
 
-		x->instances[instance].plugin_PortControlInNumbers[i] = -1;
-		
-		if (LADSPA_IS_PORT_AUDIO(pod)) {
-			if (LADSPA_IS_PORT_INPUT(pod)) {
-				x->descriptor->LADSPA_Plugin->connect_port
-					(x->instanceHandles[instance], i, 
-					 x->plugin_InputBuffers[x->ports_in++]);
-			} 
-			else if (LADSPA_IS_PORT_OUTPUT(pod)) {
-				x->descriptor->LADSPA_Plugin->connect_port
-					(x->instanceHandles[instance], i, 
-					 x->plugin_OutputBuffers[x->ports_out++]);
+	x->instances[instance].plugin_PortControlInNumbers[i] = -1;
+
+	if (LADSPA_IS_PORT_AUDIO(pod)) {
+	    if (LADSPA_IS_PORT_INPUT(pod)) {
+		x->descriptor->LADSPA_Plugin->connect_port
+		    (x->instanceHandles[instance], i, 
+		     x->plugin_InputBuffers[x->ports_in++]);
+	    } 
+	    else if (LADSPA_IS_PORT_OUTPUT(pod)) {
+		x->descriptor->LADSPA_Plugin->connect_port
+		    (x->instanceHandles[instance], i, 
+		     x->plugin_OutputBuffers[x->ports_out++]);
 #if DEBUG
-	post("Audio Input port %d connected", x->ports_in);
-	post("Audio Output port %d connected", x->ports_out);
+		post("Audio Input port %d connected", x->ports_in);
+		post("Audio Output port %d connected", x->ports_out);
 #endif
-			}
-		} 
-		else if (LADSPA_IS_PORT_CONTROL(pod)) {
-			if (LADSPA_IS_PORT_INPUT(pod)) {
-				x->plugin_ControlInPortNumbers[x->ports_controlIn] = (unsigned long) i;
-				x->instances[instance].plugin_PortControlInNumbers[i] = x->ports_controlIn;
-				x->plugin_ControlDataInput[x->ports_controlIn] = 
-					(t_float) get_port_default(x, i);
+	    }
+	} 
+	else if (LADSPA_IS_PORT_CONTROL(pod)) {
+	    if (LADSPA_IS_PORT_INPUT(pod)) {
+		x->plugin_ControlInPortNumbers[x->ports_controlIn] = (unsigned long) i;
+		x->instances[instance].plugin_PortControlInNumbers[i] = x->ports_controlIn;
+		x->plugin_ControlDataInput[x->ports_controlIn] = 
+		    (t_float) get_port_default(x, i);
 #if DEBUG
-				post("default for port %d, controlIn, %d is %.2f",i,
-						x->ports_controlIn, x->plugin_ControlDataInput[x->ports_controlIn]);
+		post("default for port %d, controlIn, %d is %.2f",i,
+			x->ports_controlIn, x->plugin_ControlDataInput[x->ports_controlIn]);
 #endif
 
-				x->descriptor->LADSPA_Plugin->connect_port
-					(x->instanceHandles[instance], i, 
-					 &x->plugin_ControlDataInput[x->ports_controlIn++]);
+		x->descriptor->LADSPA_Plugin->connect_port
+		    (x->instanceHandles[instance], i, 
+		     &x->plugin_ControlDataInput[x->ports_controlIn++]);
 
-			} else if (LADSPA_IS_PORT_OUTPUT(pod)) {
-				x->descriptor->LADSPA_Plugin->connect_port
-					(x->instanceHandles[instance], i, 
-					 &x->plugin_ControlDataOutput[x->ports_controlOut++]);
-			}
+	    } else if (LADSPA_IS_PORT_OUTPUT(pod)) {
+		x->descriptor->LADSPA_Plugin->connect_port
+		    (x->instanceHandles[instance], i, 
+		     &x->plugin_ControlDataOutput[x->ports_controlOut++]);
+	    }
 #if DEBUG
-	post("Control Input port %d connected", x->ports_controlIn);
-	post("Control Output port %d connected", x->ports_controlOut);
+	    post("Control Input port %d connected", x->ports_controlIn);
+	    post("Control Output port %d connected", x->ports_controlOut);
 #endif
-		}
 	}
-	
+    }
+
 #if DEBUG
-post("ports connected!");
+    post("ports connected!");
 #endif
-	
+
 }
 
 static void dssi_tilde_activate(t_dssi_tilde *x, t_int instance){
 
-	if(x->descriptor->LADSPA_Plugin->activate)
-		x->descriptor->LADSPA_Plugin->activate(x->instanceHandles[instance]);
+    if(x->descriptor->LADSPA_Plugin->activate)
+	x->descriptor->LADSPA_Plugin->activate(x->instanceHandles[instance]);
 #if DEBUG
-		post("plugin activated!");
+    post("plugin activated!");
 #endif
 }
 
@@ -365,15 +357,15 @@ static void osc_error(int num, const char *msg, const char *where)
 static void query_programs(t_dssi_tilde *x, t_int instance) {
     int i;
 #if DEBUG
-post("querying programs");
+    post("querying programs");
 #endif
     /* free old lot */
     if (x->instances[instance].pluginPrograms) {
-        for (i = 0; i < x->instances[instance].plugin_ProgramCount; i++)
-			free((void *)x->instances[instance].pluginPrograms[i].Name);
+	for (i = 0; i < x->instances[instance].plugin_ProgramCount; i++)
+	    free((void *)x->instances[instance].pluginPrograms[i].Name);
 	free((char *)x->instances[instance].pluginPrograms);
-		x->instances[instance].pluginPrograms = NULL;
-		x->instances[instance].plugin_ProgramCount = 0;
+	x->instances[instance].pluginPrograms = NULL;
+	x->instances[instance].plugin_ProgramCount = 0;
     }
 
     x->instances[instance].pendingBankLSB = -1;
@@ -381,45 +373,45 @@ post("querying programs");
     x->instances[instance].pendingProgramChange = -1;
 
     if (x->descriptor->get_program &&
-        x->descriptor->select_program) {
+	    x->descriptor->select_program) {
 
 	/* Count the plugins first */
-	    /*FIX ?? */
-		for (i = 0; x->descriptor->
-			get_program(x->instanceHandles[instance], i); ++i);
+	/*FIX ?? */
+	for (i = 0; x->descriptor->
+		get_program(x->instanceHandles[instance], i); ++i);
 
-		if (i > 0) {
-			x->instances[instance].plugin_ProgramCount = i;
-			x->instances[instance].pluginPrograms = 
-				(DSSI_Program_Descriptor *)malloc(i * sizeof(DSSI_Program_Descriptor)); 
-			while (i > 0) {
-				const DSSI_Program_Descriptor *descriptor;
-				--i;
-				descriptor = x->descriptor->
-					get_program(x->instanceHandles[instance], i);
-				x->instances[instance].pluginPrograms[i].Bank = 
-					descriptor->Bank;
-				x->instances[instance].pluginPrograms[i].Program = 
-					descriptor->Program;
-				x->instances[instance].pluginPrograms[i].Name = 
-					strdup(descriptor->Name);
+	if (i > 0) {
+	    x->instances[instance].plugin_ProgramCount = i;
+	    x->instances[instance].pluginPrograms = 
+		(DSSI_Program_Descriptor *)malloc(i * sizeof(DSSI_Program_Descriptor)); 
+	    while (i > 0) {
+		const DSSI_Program_Descriptor *descriptor;
+		--i;
+		descriptor = x->descriptor->
+		    get_program(x->instanceHandles[instance], i);
+		x->instances[instance].pluginPrograms[i].Bank = 
+		    descriptor->Bank;
+		x->instances[instance].pluginPrograms[i].Program = 
+		    descriptor->Program;
+		x->instances[instance].pluginPrograms[i].Name = 
+		    strdup(descriptor->Name);
 #if DEBUG
-				post("program %d is MIDI bank %lu program %lu, named '%s'",i,
-				   x->instances[instance].pluginPrograms[i].Bank,
-				   x->instances[instance].pluginPrograms[i].Program,
-				   x->instances[instance].pluginPrograms[i].Name);
+		post("program %d is MIDI bank %lu program %lu, named '%s'",i,
+			x->instances[instance].pluginPrograms[i].Bank,
+			x->instances[instance].pluginPrograms[i].Program,
+			x->instances[instance].pluginPrograms[i].Name);
 #endif
-			}
-		}
-		/* No - it should be 0 anyway - dssi_init */
+	    }
+	}
+	/* No - it should be 0 anyway - dssi_init */
 	/*	else
-			x->instances[instance].plugin_ProgramCount = 0;
-*/	}
+		x->instances[instance].plugin_ProgramCount = 0;
+		*/	}
 }
 
 static LADSPA_Data get_port_default(t_dssi_tilde *x, int port)
 {
-	LADSPA_Descriptor *plugin = (LADSPA_Descriptor *)x->descriptor->LADSPA_Plugin;
+    LADSPA_Descriptor *plugin = (LADSPA_Descriptor *)x->descriptor->LADSPA_Plugin;
     LADSPA_PortRangeHint hint = plugin->PortRangeHints[port];
     float lower = hint.LowerBound *
 	(LADSPA_IS_HINT_SAMPLE_RATE(hint.HintDescriptor) ? x->sr : 1.0f);
@@ -428,7 +420,7 @@ static LADSPA_Data get_port_default(t_dssi_tilde *x, int port)
 
     if (!LADSPA_IS_HINT_HAS_DEFAULT(hint.HintDescriptor)) {
 	if (!LADSPA_IS_HINT_BOUNDED_BELOW(hint.HintDescriptor) ||
-	    !LADSPA_IS_HINT_BOUNDED_ABOVE(hint.HintDescriptor)) {
+		!LADSPA_IS_HINT_BOUNDED_ABOVE(hint.HintDescriptor)) {
 	    /* No hint, its not bounded, wild guess */
 	    return 0.0f;
 	}
@@ -443,7 +435,7 @@ static LADSPA_Data get_port_default(t_dssi_tilde *x, int port)
     }
 
     /* Try all the easy ones */
-    
+
     if (LADSPA_IS_HINT_DEFAULT_0(hint.HintDescriptor)) {
 	return 0.0f;
     } else if (LADSPA_IS_HINT_DEFAULT_1(hint.HintDescriptor)) {
@@ -481,7 +473,7 @@ static LADSPA_Data get_port_default(t_dssi_tilde *x, int port)
 }
 
 static unsigned dssi_tilde_get_parm_number (t_dssi_tilde *x,
-                              const char *str)
+	const char *str)
 /* find out if str points to a parameter number or not and return the
    number or zero.  The number string has to begin with a '#' character */
 {
@@ -489,69 +481,67 @@ static unsigned dssi_tilde_get_parm_number (t_dssi_tilde *x,
     char* strend = NULL;
 
     if (str == NULL) {
-        return 0;
+	return 0;
     }
     if (str[0] != '#') {
-        return 0;
+	return 0;
     }
     num = strtol (&str[1], &strend, 10);
     if (str[1] == 0 || *strend != 0) {
-        /* invalid string */
-        return 0;
+	/* invalid string */
+	return 0;
     }
     else if (num >= 1 && num <= (long)x->plugin_controlIns) {
-        /* string ok and within range */
-        return (unsigned)num;
+	/* string ok and within range */
+	return (unsigned)num;
     }
     else {
-        /* number out of range */
-        return 0;
+	/* number out of range */
+	return 0;
     }
 }
 
 static void dssi_tilde_set_control_input_by_index (t_dssi_tilde *x,
-				       signed ctrl_input_index,
-				       float value,
-				       t_int instance)
+	signed ctrl_input_index,
+	float value,
+	t_int instance)
 {
     long port, portno;
-    
+
     if (ctrl_input_index >= x->plugin_controlIns) {
- 	post("plugin~: control port number %d is out of range [1, %d]",
- 	       ctrl_input_index + 1, x->plugin_controlIns);
- 	return;
+	post("plugin~: control port number %d is out of range [1, %d]",
+		ctrl_input_index + 1, x->plugin_controlIns);
+	return;
     }
-   
+
 #if DEBUG
     post("ctrl input number = %d", ctrl_input_index);
 #endif
- 
-    port = x->plugin_ControlInPortNumbers[ctrl_input_index];
-    
-    portno = 
-     x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index + 1];
 
-    
+    port = x->plugin_ControlInPortNumbers[ctrl_input_index];
+
+    portno = 
+	x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index + 1];
+
 #if DEBUG
     post("Global ctrl input number = %d", ctrl_input_index);
 #endif   
-    
+
     /* set the appropriate control port value */
     x->plugin_ControlDataInput[portno] = value;
 
-   lo_send(x->instances[instance].uiTarget, 
-	   x->instances[instance].ui_osc_control_path, "if", port, value);
+    lo_send(x->instances[instance].uiTarget, 
+	    x->instances[instance].ui_osc_control_path, "if", port, value);
 }
 
 static void dssi_tilde_set_control_input_by_name (t_dssi_tilde *x,
-				       const char* name,
-				       float value,
-				       t_int instance)
+	const char* name,
+	float value,
+	t_int instance)
 {
     unsigned port_index = 0;
     unsigned ctrl_input_index = 0;
     int found_port = 0; /* boolean */
-
 
     if (name == NULL || strlen (name) == 0) {
 	post("dssi~: no control port name specified");
@@ -567,14 +557,14 @@ static void dssi_tilde_set_control_input_by_name (t_dssi_tilde *x,
 	LADSPA_PortDescriptor port_type;
 	port_type = x->descriptor->LADSPA_Plugin->PortDescriptors[port_index];
 	if (LADSPA_IS_PORT_CONTROL (port_type)
-	    && LADSPA_IS_PORT_INPUT (port_type))
+		&& LADSPA_IS_PORT_INPUT (port_type))
 	{
 	    const char* port_name = NULL;
 	    unsigned cmp_length = 0;
 	    port_name = x->descriptor->LADSPA_Plugin->PortNames[port_index];
 	    cmp_length = MIN (strlen (name), strlen (port_name));
 	    if (cmp_length != 0
-		&& strncasecmp (name, port_name, cmp_length) == 0)
+		    && strncasecmp (name, port_name, cmp_length) == 0)
 	    {
 		/* found the first port to match */
 		found_port = 1;
@@ -587,7 +577,7 @@ static void dssi_tilde_set_control_input_by_name (t_dssi_tilde *x,
     if (!found_port)
     {
 	post("dssi~: plugin doesn't have a control input port named \"%s\"",
-	       name);
+		name);
 	return;
     }
 
@@ -595,200 +585,197 @@ static void dssi_tilde_set_control_input_by_name (t_dssi_tilde *x,
 }
 
 static void dssi_tilde_control (t_dssi_tilde *x, 
-		t_symbol* ctrl_name, 
-		t_float ctrl_value,
-		t_float instance_f)
-     /* Change the value of a named control port of the plug-in */
+	t_symbol* ctrl_name, 
+	t_float ctrl_value,
+	t_float instance_f)
+/* Change the value of a named control port of the plug-in */
 {
     unsigned parm_num = 0;
     t_int instance = (t_int)instance_f;
     int n_instances = x->n_instances;
-    
+
     if (instance > x->n_instances || instance < 0){
-	    post("dssi~: control: Invalid instance number");
-	    return;
+	post("dssi~: control: Invalid instance number");
+	return;
     }
-    
+
     instance -= 1;
-    
+
 #if DEBUG
     post("Received LADSPA control data for instance %d", instance);
 #endif
 
-    
     if (ctrl_name->s_name == NULL || strlen (ctrl_name->s_name) == 0) {
-        post("dssi~: control messages must have a name and a value");
-        return;
+	post("dssi~: control messages must have a name and a value");
+	return;
     }
     parm_num = dssi_tilde_get_parm_number (x, ctrl_name->s_name);
     if (parm_num) {
-	    if(instance >= 0)
-        	dssi_tilde_set_control_input_by_index (x, parm_num - 1, 
-				ctrl_value, instance);
-	    else if (instance == -1){
-		    while(n_instances--)
-			dssi_tilde_set_control_input_by_index (x, parm_num - 1, 
-				ctrl_value, n_instances);
-	    }
+	if(instance >= 0)
+	    dssi_tilde_set_control_input_by_index (x, parm_num - 1, 
+		    ctrl_value, instance);
+	else if (instance == -1){
+	    while(n_instances--)
+		dssi_tilde_set_control_input_by_index (x, parm_num - 1, 
+			ctrl_value, n_instances);
+	}
     }
     else {
-	    if(instance >= 0)
-		dssi_tilde_set_control_input_by_name (x, ctrl_name->s_name, 
-				ctrl_value, instance);
-	    else if (instance == -1){
-		    while(n_instances--)
-			dssi_tilde_set_control_input_by_name (x, 
-				ctrl_name->s_name, ctrl_value, n_instances);
-	    }
+	if(instance >= 0)
+	    dssi_tilde_set_control_input_by_name (x, ctrl_name->s_name, 
+		    ctrl_value, instance);
+	else if (instance == -1){
+	    while(n_instances--)
+		dssi_tilde_set_control_input_by_name (x, 
+			ctrl_name->s_name, ctrl_value, n_instances);
+	}
     }
 }
 
 static void dssi_tilde_info (t_dssi_tilde *x){
-	unsigned int i;
-	t_atom argv[6];
+    unsigned int i;
+    t_atom argv[6];
 
-	
-	for(i = 0; i < x->descriptor->LADSPA_Plugin->PortCount; i++){
-		memcpy(&argv[0], &x->port_info[i].type, 
-				sizeof(t_atom));
-		memcpy(&argv[1], &x->port_info[i].data_type, 
-				sizeof(t_atom));
-		memcpy(&argv[2], &x->port_info[i].name, 
-				sizeof(t_atom));
-		memcpy(&argv[3], &x->port_info[i].lower_bound, 
-				sizeof(t_atom));
-		memcpy(&argv[4], &x->port_info[i].upper_bound, 
-				sizeof(t_atom));
-		memcpy(&argv[5], &x->port_info[i].p_default, 
-				sizeof(t_atom));
-		outlet_anything (x->control_outlet, gensym ("port"), 6, argv);
-	}
+    for(i = 0; i < x->descriptor->LADSPA_Plugin->PortCount; i++){
+	memcpy(&argv[0], &x->port_info[i].type, 
+		sizeof(t_atom));
+	memcpy(&argv[1], &x->port_info[i].data_type, 
+		sizeof(t_atom));
+	memcpy(&argv[2], &x->port_info[i].name, 
+		sizeof(t_atom));
+	memcpy(&argv[3], &x->port_info[i].lower_bound, 
+		sizeof(t_atom));
+	memcpy(&argv[4], &x->port_info[i].upper_bound, 
+		sizeof(t_atom));
+	memcpy(&argv[5], &x->port_info[i].p_default, 
+		sizeof(t_atom));
+	outlet_anything (x->control_outlet, gensym ("port"), 6, argv);
+    }
 }
 
 static void dssi_tilde_ladspa_description(t_dssi_tilde *x, t_atom *at, 
-		DSSI_Descriptor *psDescriptor){
+	DSSI_Descriptor *psDescriptor){
     at[0].a_w.w_symbol = 
-    	gensym ((char*)psDescriptor->LADSPA_Plugin->Name); 
+	gensym ((char*)psDescriptor->LADSPA_Plugin->Name); 
     outlet_anything (x->control_outlet, gensym ("name"), 1, at);
     at[0].a_w.w_symbol = 
-	    gensym ((char*)psDescriptor->LADSPA_Plugin->Label); 
+	gensym ((char*)psDescriptor->LADSPA_Plugin->Label); 
     outlet_anything (x->control_outlet, gensym ("label"), 1, at);
     at[0].a_type = A_FLOAT;
     at[0].a_w.w_float = psDescriptor->LADSPA_Plugin->UniqueID; 
     outlet_anything (x->control_outlet, gensym ("id"), 1, at);
     at[0].a_type = A_SYMBOL;
     at[0].a_w.w_symbol =
-	    gensym ((char*)psDescriptor->LADSPA_Plugin->Maker);
+	gensym ((char*)psDescriptor->LADSPA_Plugin->Maker);
     outlet_anything (x->control_outlet, gensym ("maker"), 1, at);
 }	
 
 static void dssi_tilde_ladspa_describe(const char * pcFullFilename, 
-		void * pvPluginHandle,
-		DSSI_Descriptor_Function fDescriptorFunction, 
-		void* user_data,
-		int is_DSSI) {
+	void * pvPluginHandle,
+	DSSI_Descriptor_Function fDescriptorFunction, 
+	void* user_data,
+	int is_DSSI) {
 
-  t_dssi_tilde *x = (((void**)user_data)[0]);
-  t_atom at[1];
-  DSSI_Descriptor *psDescriptor;
-  long lIndex;
-  
-  at[0].a_type = A_SYMBOL;
-  at[0].a_w.w_symbol = gensym ((char*)pcFullFilename); 
-  outlet_anything (x->control_outlet, gensym ("library"), 1, at);
-  
-  
-	if(is_DSSI){
+    t_dssi_tilde *x = (((void**)user_data)[0]);
+    t_atom at[1];
+    DSSI_Descriptor *psDescriptor;
+    long lIndex;
+
+    at[0].a_type = A_SYMBOL;
+    at[0].a_w.w_symbol = gensym ((char*)pcFullFilename); 
+    outlet_anything (x->control_outlet, gensym ("library"), 1, at);
+
+    if(is_DSSI){
 #if DEBUG
-		post("DSSI plugin found by listinfo");
+	post("DSSI plugin found by listinfo");
 #endif
-	  for (lIndex = 0;
-	       (psDescriptor = (DSSI_Descriptor *)
+	for (lIndex = 0;
+		(psDescriptor = (DSSI_Descriptor *)
 		 fDescriptorFunction(lIndex)) != NULL; lIndex++) 
-		  dssi_tilde_ladspa_description(x, &at[0], psDescriptor);
-  	}
+	    dssi_tilde_ladspa_description(x, &at[0], psDescriptor);
+    }
 
-
-	
-	else if(!is_DSSI)
+    else if(!is_DSSI)
 	lIndex = 0;
-		do{
-			psDescriptor = ladspa_to_dssi((LADSPA_Descriptor *)fDescriptorFunction(lIndex++));
-/*			psDescriptor = (DSSI_Descriptor *)calloc(1,
-					sizeof(DSSI_Descriptor));
-		       ((DSSI_Descriptor *)psDescriptor)->DSSI_API_Version = 1;
-		       ((DSSI_Descriptor *)psDescriptor)->LADSPA_Plugin = 
-			       (LADSPA_Descriptor *)
-			       fDescriptorFunction(lIndex++);
-*/		       if(psDescriptor->LADSPA_Plugin != NULL){
-			 dssi_tilde_ladspa_description(x, &at[0], psDescriptor);
-		       		free((DSSI_Descriptor *)psDescriptor);
-		       }
-		       else
-			       break;
-		} while(1);
-
-  dlclose(pvPluginHandle);
+    do{
+	psDescriptor = ladspa_to_dssi((LADSPA_Descriptor *)fDescriptorFunction(lIndex++));
+	/*			psDescriptor = (DSSI_Descriptor *)calloc(1,
+				sizeof(DSSI_Descriptor));
+				((DSSI_Descriptor *)psDescriptor)->DSSI_API_Version = 1;
+				((DSSI_Descriptor *)psDescriptor)->LADSPA_Plugin = 
+				(LADSPA_Descriptor *)
+				fDescriptorFunction(lIndex++);
+				*/		       
+	if(psDescriptor->LADSPA_Plugin != NULL){
+	    dssi_tilde_ladspa_description(x, &at[0], psDescriptor);
+	    free((DSSI_Descriptor *)psDescriptor);
+	}
+	else
+	    break;
+    } while(1);
+/* Not needed
+	dlclose(pvPluginHandle);
+	*/
 }
 
 static void dssi_tilde_list_plugins (t_dssi_tilde *x) {
-  void* user_data[1];
-  user_data[0] = x;
-  LADSPAPluginSearch(dssi_tilde_ladspa_describe,(void*)user_data);
+    void* user_data[1];
+    user_data[0] = x;
+    LADSPAPluginSearch(dssi_tilde_ladspa_describe,(void*)user_data);
 }
 
 static int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
-                      int argc, void *data, t_dssi_tilde *x)
+	int argc, void *data, t_dssi_tilde *x)
 {
     int i;
     printf("got unhandled OSC message:\npath: <%s>\n", path);
     for (i=0; i<argc; i++) {
-        printf("arg %d '%c' ", i, types[i]);
-        lo_arg_pp(types[i], argv[i]);
-        printf("\n");
+	printf("arg %d '%c' ", i, types[i]);
+	lo_arg_pp(types[i], argv[i]);
+	printf("\n");
     }
     return 1;
 }
 
 static void dssi_tilde_program_change(t_dssi_tilde *x, int instance){
-/* jack-dssi-host queues program changes by using  pending program change variables. In the audio callback, if a program change is received via MIDI it over writes the pending value (if any) set by the GUI. If unset, or processed the value will default back to -1. The following call to select_program is then made. I don't think it eventually needs to be done this way - i.e. do we need 'pending'? */ 
+    /* jack-dssi-host queues program changes by using  pending program change variables. In the audio callback, if a program change is received via MIDI it over writes the pending value (if any) set by the GUI. If unset, or processed the value will default back to -1. The following call to select_program is then made. I don't think it eventually needs to be done this way - i.e. do we need 'pending'? */ 
 #if DEBUG
-	post("executing program change");
+    post("executing program change");
 #endif
-	if (x->instances[instance].pendingProgramChange >= 0){           
-		if (x->instances[instance].pendingBankLSB >= 0) {
-			if (x->instances[instance].pendingBankMSB >= 0) {
-				x->instances[instance].currentBank = x->instances[instance].pendingBankLSB + 128 * x->instances[instance].pendingBankMSB;
-			} 
-			else {
-				x->instances[instance].currentBank = x->instances[instance].pendingBankLSB + 
-					128 * (x->instances[instance].currentBank / 128);
-			}
-		} 
-		else if (x->instances[instance].pendingBankMSB >= 0) {
-			x->instances[instance].currentBank = (x->instances[instance].currentBank % 128) + 128 * x->instances[instance].pendingBankMSB;
-		}
-
-		x->instances[instance].currentProgram = x->instances[instance].pendingProgramChange;
-
-	   if (x->descriptor->select_program) {
-			x->descriptor->select_program(x->instanceHandles[instance],
-							   x->instances[instance].currentBank, x->instances[instance].currentProgram);
-	   }
-	   if (x->instances[instance].uiNeedsProgramUpdate){
-#if DEBUG
-		   post("Updating GUI program");
-#endif 
-		   lo_send(x->instances[instance].uiTarget, 
-				   x->instances[instance].ui_osc_program_path, "ii", 
-				   x->instances[instance].currentBank, 
-				   x->instances[instance].currentProgram);
-	   }
-		x->instances[instance].uiNeedsProgramUpdate = 0;
-	    x->instances[instance].pendingProgramChange = -1;
-		x->instances[instance].pendingBankMSB = -1;
-		x->instances[instance].pendingBankLSB = -1;
+    if (x->instances[instance].pendingProgramChange >= 0){           
+	if (x->instances[instance].pendingBankLSB >= 0) {
+	    if (x->instances[instance].pendingBankMSB >= 0) {
+		x->instances[instance].currentBank = x->instances[instance].pendingBankLSB + 128 * x->instances[instance].pendingBankMSB;
+	    } 
+	    else {
+		x->instances[instance].currentBank = x->instances[instance].pendingBankLSB + 
+		    128 * (x->instances[instance].currentBank / 128);
+	    }
+	} 
+	else if (x->instances[instance].pendingBankMSB >= 0) {
+	    x->instances[instance].currentBank = (x->instances[instance].currentBank % 128) + 128 * x->instances[instance].pendingBankMSB;
 	}
+
+	x->instances[instance].currentProgram = x->instances[instance].pendingProgramChange;
+
+	if (x->descriptor->select_program) {
+	    x->descriptor->select_program(x->instanceHandles[instance],
+		    x->instances[instance].currentBank, x->instances[instance].currentProgram);
+	}
+	if (x->instances[instance].uiNeedsProgramUpdate){
+#if DEBUG
+	    post("Updating GUI program");
+#endif 
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_program_path, "ii", 
+		    x->instances[instance].currentBank, 
+		    x->instances[instance].currentProgram);
+	}
+	x->instances[instance].uiNeedsProgramUpdate = 0;
+	x->instances[instance].pendingProgramChange = -1;
+	x->instances[instance].pendingBankMSB = -1;
+	x->instances[instance].pendingBankLSB = -1;
+    }
 }
 
 static int osc_program_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
@@ -799,20 +786,20 @@ static int osc_program_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     int found = 0;
 
 #if DEBUG
-post("osc_program_hander active!");
+    post("osc_program_hander active!");
 
-post("%d programs", x->instances[instance].plugin_ProgramCount);
-	
+    post("%d programs", x->instances[instance].plugin_ProgramCount);
+
 #endif
     for (i = 0; i < x->instances[instance].plugin_ProgramCount; ++i) {
-		if (x->instances[instance].pluginPrograms[i].Bank == bank &&
-			x->instances[instance].pluginPrograms[i].Program == program) {
-			post("OSC: setting bank %u, program %u, name %s\n",
-				bank, program, x->instances[instance].pluginPrograms[i].Name);
-	    
-			found = 1;
-			break;
-		}
+	if (x->instances[instance].pluginPrograms[i].Bank == bank &&
+		x->instances[instance].pluginPrograms[i].Program == program) {
+	    post("OSC: setting bank %u, program %u, name %s\n",
+		    bank, program, x->instances[instance].pluginPrograms[i].Name);
+
+	    found = 1;
+	    break;
+	}
     }
 
     if (!found) {
@@ -823,13 +810,12 @@ post("%d programs", x->instances[instance].plugin_ProgramCount);
     x->instances[instance].pendingBankLSB = bank % 128;
     x->instances[instance].pendingProgramChange = program;
 #if DEBUG
-	post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", bank, program, x->instances[instance].pendingBankMSB, x->instances[instance].pendingBankLSB);
+    post("bank = %d, program = %d, BankMSB = %d BankLSB = %d", bank, program, x->instances[instance].pendingBankMSB, x->instances[instance].pendingBankLSB);
 #endif
-	dssi_tilde_program_change(x, instance);
-	
+    dssi_tilde_program_change(x, instance);
+
     return 0;
 }
-
 
 static int osc_control_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
 {
@@ -838,44 +824,44 @@ static int osc_control_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
 
     x->plugin_ControlDataInput[x->instances[instance].plugin_PortControlInNumbers[port]] = value;
 #if DEBUG
-	post("OSC: port %d = %f", port, value);
+    post("OSC: port %d = %f", port, value);
 #endif
-    
+
     return 0;
 }
 
 static int osc_midi_handler(t_dssi_tilde *x, lo_arg **argv, t_int instance)
 {
 
-	int ev_type = 0, chan = 0;
+    int ev_type = 0, chan = 0;
 #if DEBUG
-	post("OSC: got midi request for"
-	       "(%02x %02x %02x %02x)",
-	       argv[0]->m[0], argv[0]->m[1], argv[0]->m[2], argv[0]->m[3]);
+    post("OSC: got midi request for"
+	    "(%02x %02x %02x %02x)",
+	    argv[0]->m[0], argv[0]->m[1], argv[0]->m[2], argv[0]->m[3]);
 #endif
-	chan = instance;
+    chan = instance;
 #if DEBUG
-	post("channel: %d", chan);
+    post("channel: %d", chan);
 #endif
 
-	if(argv[0]->m[1] <= 239){
-		if(argv[0]->m[1] >= 224)
-			ev_type = SND_SEQ_EVENT_PITCHBEND;
-		else if(argv[0]->m[1] >= 208)
-			ev_type = SND_SEQ_EVENT_CHANPRESS;
-		else if(argv[0]->m[1] >= 192)
-			ev_type = SND_SEQ_EVENT_PGMCHANGE;
-		else if(argv[0]->m[1] >= 176)
-			ev_type = SND_SEQ_EVENT_CONTROLLER;
-		else if(argv[0]->m[1] >= 160)
-			ev_type = SND_SEQ_EVENT_KEYPRESS;
-		else if(argv[0]->m[1] >= 144)
-			ev_type = SND_SEQ_EVENT_NOTEON;
-		else if(argv[0]->m[1] >= 128)
-			ev_type = SND_SEQ_EVENT_NOTEOFF;
-	}
-	if(ev_type != 0)
-		MIDIbuf(ev_type, chan, argv[0]->m[2], argv[0]->m[3], x);
+    if(argv[0]->m[1] <= 239){
+	if(argv[0]->m[1] >= 224)
+	    ev_type = SND_SEQ_EVENT_PITCHBEND;
+	else if(argv[0]->m[1] >= 208)
+	    ev_type = SND_SEQ_EVENT_CHANPRESS;
+	else if(argv[0]->m[1] >= 192)
+	    ev_type = SND_SEQ_EVENT_PGMCHANGE;
+	else if(argv[0]->m[1] >= 176)
+	    ev_type = SND_SEQ_EVENT_CONTROLLER;
+	else if(argv[0]->m[1] >= 160)
+	    ev_type = SND_SEQ_EVENT_KEYPRESS;
+	else if(argv[0]->m[1] >= 144)
+	    ev_type = SND_SEQ_EVENT_NOTEON;
+	else if(argv[0]->m[1] >= 128)
+	    ev_type = SND_SEQ_EVENT_NOTEOFF;
+    }
+    if(ev_type != 0)
+	MIDIbuf(ev_type, chan, argv[0]->m[2], argv[0]->m[3], x);
 
     return 0;
 }
@@ -887,59 +873,57 @@ static int osc_configure_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     char *message;
 
 #if DEBUG
-	post("osc_configure_handler active!");
+    post("osc_configure_handler active!");
 #endif
-    
+
     if (x->descriptor->configure) {
 
 	if (!strncmp(key, DSSI_RESERVED_CONFIGURE_PREFIX,
-		     strlen(DSSI_RESERVED_CONFIGURE_PREFIX))) {
+		    strlen(DSSI_RESERVED_CONFIGURE_PREFIX))) {
 	    fprintf(stderr, ": OSC: UI for plugin '' attempted to use reserved configure key \"%s\", ignoring\n", key);
 	    return 0;
 	}
-	
-	    message = x->descriptor->configure(x->instanceHandles[instance], key, value);
-	    if (message) {
-		printf(": on configure  '%s', plugin '' returned error '%s'\n",
-		        key, message);
-		free(message);
-	    }
-		
-	    query_programs(x, instance);
 
-	}	    
-    
+	message = x->descriptor->configure(x->instanceHandles[instance], key, value);
+	if (message) {
+	    printf(": on configure  '%s', plugin '' returned error '%s'\n",
+		    key, message);
+	    free(message);
+	}
+
+	query_programs(x, instance);
+
+    }	    
 
     return 0;
 }
 
-
 static int osc_exiting_handler(t_dssi_tilde *x, lo_arg **argv, int instance){
 
 #if DEBUG
-	post("exiting handler called: Freeing ui_osc");
+    post("exiting handler called: Freeing ui_osc");
 #endif
-     if(x->instances[instance].uiTarget){
+    if(x->instances[instance].uiTarget){
 	lo_address_free(x->instances[instance].uiTarget);
 	x->instances[instance].uiTarget = NULL;
-     }
-     free(x->instances[instance].ui_osc_control_path);
-     free(x->instances[instance].ui_osc_configure_path);
-     free(x->instances[instance].ui_osc_hide_path);
-     free(x->instances[instance].ui_osc_program_path);
-     free(x->instances[instance].ui_osc_show_path); 
-     free(x->instances[instance].ui_osc_quit_path); 
-     x->instances[instance].uiTarget = NULL;
-     x->instances[instance].ui_osc_control_path = NULL;
-     x->instances[instance].ui_osc_configure_path = NULL;
-     x->instances[instance].ui_osc_hide_path = NULL;
-     x->instances[instance].ui_osc_program_path = NULL;
-     x->instances[instance].ui_osc_show_path = NULL;
-     x->instances[instance].ui_osc_quit_path = NULL;
+    }
+    free(x->instances[instance].ui_osc_control_path);
+    free(x->instances[instance].ui_osc_configure_path);
+    free(x->instances[instance].ui_osc_hide_path);
+    free(x->instances[instance].ui_osc_program_path);
+    free(x->instances[instance].ui_osc_show_path); 
+    free(x->instances[instance].ui_osc_quit_path); 
+    x->instances[instance].uiTarget = NULL;
+    x->instances[instance].ui_osc_control_path = NULL;
+    x->instances[instance].ui_osc_configure_path = NULL;
+    x->instances[instance].ui_osc_hide_path = NULL;
+    x->instances[instance].ui_osc_program_path = NULL;
+    x->instances[instance].ui_osc_show_path = NULL;
+    x->instances[instance].ui_osc_quit_path = NULL;
 
-	x->instances[instance].ui_hidden = 1;
+    x->instances[instance].ui_hidden = 1;
 
-	return 0;
+    return 0;
 }
 
 static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
@@ -953,11 +937,11 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     p = x->configure_buffer_head;
 
 #if DEBUG
-	post("OSC: got update request from <%s>, instance %d", url, instance);
+    post("OSC: got update request from <%s>, instance %d", url, instance);
 #endif
 
     if (x->instances[instance].uiTarget) 
-		lo_address_free(x->instances[instance].uiTarget);
+	lo_address_free(x->instances[instance].uiTarget);
     host = lo_url_get_hostname(url);
     port = lo_url_get_port(url);
     x->instances[instance].uiTarget = lo_address_new(host, port);
@@ -967,528 +951,504 @@ static int osc_update_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     path = lo_url_get_path(url);
 
     if (x->instances[instance].ui_osc_control_path) 
-		free(x->instances[instance].ui_osc_control_path);
+	free(x->instances[instance].ui_osc_control_path);
     x->instances[instance].ui_osc_control_path = 
-		(char *)malloc(strlen(path) + 10);
+	(char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_control_path, "%s/control", path);
 
     if (x->instances[instance].ui_osc_configure_path) 
-		free(x->instances[instance].ui_osc_configure_path);
+	free(x->instances[instance].ui_osc_configure_path);
     x->instances[instance].ui_osc_configure_path = 
-		(char *)malloc(strlen(path) + 12);
+	(char *)malloc(strlen(path) + 12);
     sprintf(x->instances[instance].ui_osc_configure_path, "%s/configure", path);
 
     if (x->instances[instance].ui_osc_program_path) 
-		free(x->instances[instance].ui_osc_program_path); 
+	free(x->instances[instance].ui_osc_program_path); 
     x->instances[instance].ui_osc_program_path = 
-		(char *)malloc(strlen(path) + 10);
+	(char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_program_path, "%s/program", path);
 
     if (x->instances[instance].ui_osc_quit_path) 
-		free(x->instances[instance].ui_osc_quit_path); 
+	free(x->instances[instance].ui_osc_quit_path); 
     x->instances[instance].ui_osc_quit_path = (char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_quit_path, "%s/quit", path);
-    
+
     if (x->instances[instance].ui_osc_show_path) 
-		free(x->instances[instance].ui_osc_show_path); 
+	free(x->instances[instance].ui_osc_show_path); 
     x->instances[instance].ui_osc_show_path = (char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_show_path, "%s/show", path);
-    
+
     if (x->instances[instance].ui_osc_hide_path) 
-		free(x->instances[instance].ui_osc_hide_path); 
+	free(x->instances[instance].ui_osc_hide_path); 
     x->instances[instance].ui_osc_hide_path = (char *)malloc(strlen(path) + 10);
     sprintf(x->instances[instance].ui_osc_hide_path, "%s/hide", path);
 
-    
     free((char *)path);
 
-    
     while(p){
 	if(p->instance == instance)
-		dssi_tilde_send_configure(x, p->key, 
-				p->value, instance);
+	    dssi_tilde_send_configure(x, p->key, 
+		    p->value, instance);
 	p = p->next;
     }
 
-
-    
-
     /* Send current bank/program  (-FIX- another race...) */
-	if (x->instances[instance].pendingProgramChange >= 0)
-		dssi_tilde_program_change(x, instance);
+    if (x->instances[instance].pendingProgramChange >= 0)
+	dssi_tilde_program_change(x, instance);
 #if DEBUG
-	post("pendingProgramChange = %d", x->instances[instance].pendingProgramChange);
+    post("pendingProgramChange = %d", x->instances[instance].pendingProgramChange);
 #endif
-	if (x->instances[instance].pendingProgramChange < 0) {
-        unsigned long bank = x->instances[instance].currentBank;
-        unsigned long program = x->instances[instance].currentProgram;
-        x->instances[instance].uiNeedsProgramUpdate = 0;
-        if (x->instances[instance].uiTarget) {
-            lo_send(x->instances[instance].uiTarget, 
-					x->instances[instance].ui_osc_program_path, 
-					"ii", bank, program);
-        }
+    if (x->instances[instance].pendingProgramChange < 0) {
+	unsigned long bank = x->instances[instance].currentBank;
+	unsigned long program = x->instances[instance].currentProgram;
+	x->instances[instance].uiNeedsProgramUpdate = 0;
+	if (x->instances[instance].uiTarget) {
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_program_path, 
+		    "ii", bank, program);
+	}
     }
 
     /* Send control ports */
     for (i = 0; i < x->plugin_controlIns; i++) {
 	lo_send(x->instances[instance].uiTarget, x->instances[instance].ui_osc_control_path, "if", 
-			x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);  
+		x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);  
 #if DEBUG
 	post("Port: %d, Default value: %.2f", x->plugin_ControlInPortNumbers[i], x->plugin_ControlDataInput[i]);
 #endif
     }
 
-/* Send 'show' */
+    /* Send 'show' */
     if (x->instances[instance].ui_show) {
-        lo_send(x->instances[instance].uiTarget, x->instances[instance].ui_osc_show_path, "");
-        x->instances[instance].ui_hidden = 0;
-        x->instances[instance].ui_show = 0;
+	lo_send(x->instances[instance].uiTarget, x->instances[instance].ui_osc_show_path, "");
+	x->instances[instance].ui_hidden = 0;
+	x->instances[instance].ui_show = 0;
     }
-
-
 
     return 0;
 }
 
 static void dssi_tilde_osc_setup(t_dssi_tilde *x, int instance){
 
-	if(instance == 0){
-		x->osc_thread = lo_server_thread_new(NULL, osc_error);
-		char *osc_url_tmp;
-		osc_url_tmp = lo_server_thread_get_url(x->osc_thread);
+    if(instance == 0){
+	x->osc_thread = lo_server_thread_new(NULL, osc_error);
+	char *osc_url_tmp;
+	osc_url_tmp = lo_server_thread_get_url(x->osc_thread);
 #if DEBUG
-		post("string length of osc_url_tmp:%d", strlen(osc_url_tmp));
+	post("string length of osc_url_tmp:%d", strlen(osc_url_tmp));
 #endif
-		x->osc_url_base = (char *)malloc(sizeof(char) 
-				* (strlen(osc_url_tmp) + strlen("dssi") + 1)); 
-		sprintf(x->osc_url_base, "%s%s", osc_url_tmp, "dssi");
-		free(osc_url_tmp);
-		lo_server_thread_add_method(x->osc_thread, NULL, NULL, 
-				osc_message_handler, x);
-		lo_server_thread_start(x->osc_thread);
-	}
-	x->instances[instance].osc_url_path = (char *)malloc(sizeof(char) * 
-			(strlen(x->dll_name) + strlen(x->descriptor->LADSPA_Plugin->Label) + 			strlen("chan00") + 3));
-	sprintf(x->instances[instance].osc_url_path, "%s/%s/chan%02d", x->dll_name, 
-			x->descriptor->LADSPA_Plugin->Label, instance); 
+	x->osc_url_base = (char *)malloc(sizeof(char) 
+		* (strlen(osc_url_tmp) + strlen("dssi") + 1)); 
+	sprintf(x->osc_url_base, "%s%s", osc_url_tmp, "dssi");
+	free(osc_url_tmp);
+	lo_server_thread_add_method(x->osc_thread, NULL, NULL, 
+		osc_message_handler, x);
+	lo_server_thread_start(x->osc_thread);
+    }
+    x->instances[instance].osc_url_path = (char *)malloc(sizeof(char) * 
+	    (strlen(x->dll_name) + strlen(x->descriptor->LADSPA_Plugin->Label) + 			strlen("chan00") + 3));
+    sprintf(x->instances[instance].osc_url_path, "%s/%s/chan%02d", x->dll_name, 
+	    x->descriptor->LADSPA_Plugin->Label, instance); 
 #if DEBUG
-post("OSC Path is: %s", x->instances[instance].osc_url_path);
-	post("OSC thread started: %s", x->osc_url_base);
+    post("OSC Path is: %s", x->instances[instance].osc_url_path);
+    post("OSC thread started: %s", x->osc_url_base);
 #endif
 }
 
 static void dssi_tilde_init_programs(t_dssi_tilde *x, int instance){
 
 #if DEBUG
-	post("Setting up program data");
+    post("Setting up program data");
 #endif
-	query_programs(x, instance);
-	if (x->descriptor->select_program &&
-			x->instances[instance].plugin_ProgramCount > 0) {
+    query_programs(x, instance);
+    if (x->descriptor->select_program &&
+	    x->instances[instance].plugin_ProgramCount > 0) {
 
-		/* select program at index 0 */
-			unsigned long bank = 
-				x->instances[instance].pluginPrograms[0].Bank;
-			x->instances[instance].pendingBankMSB = bank / 128;
-			x->instances[instance].pendingBankLSB = bank % 128;
-			x->instances[instance].pendingProgramChange = 
-				x->instances[instance].pluginPrograms[0].Program;
-			x->instances[instance].uiNeedsProgramUpdate = 1;
-	}
+	/* select program at index 0 */
+	unsigned long bank = 
+	    x->instances[instance].pluginPrograms[0].Bank;
+	x->instances[instance].pendingBankMSB = bank / 128;
+	x->instances[instance].pendingBankLSB = bank % 128;
+	x->instances[instance].pendingProgramChange = 
+	    x->instances[instance].pluginPrograms[0].Program;
+	x->instances[instance].uiNeedsProgramUpdate = 1;
+    }
 }
 
 static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
-	t_int err = 0;
-    	char *osc_url;
-	char *gui_path;
-	struct dirent *dir_entry = NULL;
-	char *gui_base;
-	size_t baselen;
-	DIR *dp;
-	char *gui_str;
-	
-	gui_base = (char *)malloc((baselen = sizeof(char) * (strlen(x->dll_path) - strlen(".so"))) + 1);
+    t_int err = 0;
+    char *osc_url;
+    char *gui_path;
+    struct dirent *dir_entry = NULL;
+    char *gui_base;
+    size_t baselen;
+    DIR *dp;
+    char *gui_str;
 
-	strncpy(gui_base, x->dll_path, baselen);
-	gui_base[baselen] = '\0';
+    gui_base = (char *)malloc((baselen = sizeof(char) * (strlen(x->dll_path) - strlen(".so"))) + 1);
 
-	/* don't use strndup - GNU only */
-/*	gui_base = strndup(x->dll_path, baselen);*/
+    strncpy(gui_base, x->dll_path, baselen);
+    gui_base[baselen] = '\0';
+
+    /* don't use strndup - GNU only */
+    /*	gui_base = strndup(x->dll_path, baselen);*/
 #if DEBUG
-post("gui_base: %s", gui_base);
+    post("gui_base: %s", gui_base);
 #endif
 
-	gui_str = (char *)malloc(sizeof(char) * (strlen("channel 00") + 1));
-	sprintf (gui_str,"channel %02d", instance);
+    gui_str = (char *)malloc(sizeof(char) * (strlen("channel 00") + 1));
+    sprintf (gui_str,"channel %02d", instance);
 
 #if DEBUG
-	post("GUI name string, %s", gui_str);
+    post("GUI name string, %s", gui_str);
 #endif
 
-	if(!(dp = opendir(gui_base))){
-		post("can't open %s, unable to find GUI", gui_base);
-		return;
+    if(!(dp = opendir(gui_base))){
+	post("can't open %s, unable to find GUI", gui_base);
+	return;
+    }
+    else {
+	while((dir_entry = readdir(dp))){
+	    if (dir_entry->d_name[0] == '.') continue;
+	    if (strchr(dir_entry->d_name, '_')){
+		if (strstr(dir_entry->d_name, "gtk") ||
+			strstr(dir_entry->d_name, "qt"))
+		    break;
+	    }
 	}
-	else {
-		while((dir_entry = readdir(dp))){
-			if (dir_entry->d_name[0] == '.') continue;
-			if (strchr(dir_entry->d_name, '_')){
-				if (strstr(dir_entry->d_name, "gtk") ||
-					strstr(dir_entry->d_name, "qt"))
-					break;
-			}
-		}
 #if DEBUG
-		post("GUI filename: %s", dir_entry->d_name);
+	post("GUI filename: %s", dir_entry->d_name);
 #endif
-	}
+    }
 
-	gui_path = (char *)malloc(sizeof(char) * (strlen(gui_base) + strlen("/") + 
-				strlen(dir_entry->d_name) + 1));
-	
+    gui_path = (char *)malloc(sizeof(char) * (strlen(gui_base) + strlen("/") + 
+		strlen(dir_entry->d_name) + 1));
 
-	sprintf(gui_path, "%s/%s", gui_base, dir_entry->d_name);
-			
-	free(gui_base);
+    sprintf(gui_path, "%s/%s", gui_base, dir_entry->d_name);
+
+    free(gui_base);
 #if DEBUG
-	post("gui_path: %s", gui_path);
-#endif
-	
-	osc_url = (char *)malloc
-		(sizeof(char) * (strlen(x->osc_url_base) + 
-						 strlen(x->instances[instance].osc_url_path) + 2));
-
-
-	
-
-	
-/*	char osc_url[1024];*/
-	sprintf(osc_url, "%s/%s", x->osc_url_base, 
-			x->instances[instance].osc_url_path);
-	post("Instance %d OSC URL is: %s",instance, osc_url);
-#if DEBUG
-	post("Trying to open GUI!");
+    post("gui_path: %s", gui_path);
 #endif
 
-	
-	x->instances[instance].gui_pid = fork();
-	if (x->instances[instance].gui_pid == 0){
-		err = execlp(gui_path, gui_path, osc_url, dir_entry->d_name, 
-				x->descriptor->LADSPA_Plugin->Label, gui_str, NULL);
-	    perror("exec failed");
-		exit(1); /* terminates the process */ 
-	}
-	
+    osc_url = (char *)malloc
+	(sizeof(char) * (strlen(x->osc_url_base) + 
+			 strlen(x->instances[instance].osc_url_path) + 2));
+
+    /*	char osc_url[1024];*/
+    sprintf(osc_url, "%s/%s", x->osc_url_base, 
+	    x->instances[instance].osc_url_path);
+    post("Instance %d OSC URL is: %s",instance, osc_url);
 #if DEBUG
-post("errorcode = %d", err);
+    post("Trying to open GUI!");
 #endif
 
-	free(gui_path);
-	free(osc_url);
-	free(gui_str);
-	if(dp){
+    x->instances[instance].gui_pid = fork();
+    if (x->instances[instance].gui_pid == 0){
+	err = execlp(gui_path, gui_path, osc_url, dir_entry->d_name, 
+		x->descriptor->LADSPA_Plugin->Label, gui_str, NULL);
+	perror("exec failed");
+	exit(1); /* terminates the process */ 
+    }
 
 #if DEBUG
-		post("directory handle closed = %d", closedir(dp));
+    post("errorcode = %d", err);
 #endif
-	}
+
+    free(gui_path);
+    free(osc_url);
+    free(gui_str);
+    if(dp){
+
+#if DEBUG
+	post("directory handle closed = %d", closedir(dp));
+#endif
+    }
 }
 
 static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x){
 
+    if(chan > x->n_instances - 1 || chan < 0){
+	post("Note discarded: MIDI data is destined for a channel that doesn't exist");
+	return;
+    }
 
-	if(chan > x->n_instances - 1 || chan < 0){
-		post("Note discarded: MIDI data is destined for a channel that doesn't exist");
-		return;
-	}
+    t_int time_ref = x->time_ref;
 
-	
-	t_int time_ref = x->time_ref;
-	
-pthread_mutex_lock(&x->midiEventBufferMutex);
-	
-	x->midiEventBuf[x->bufWriteIndex].time.time.tv_sec = 
-		(t_int)(clock_gettimesince(time_ref) * .001); 
-	x->midiEventBuf[x->bufWriteIndex].time.time.tv_nsec = 
-		(t_int)(clock_gettimesince(time_ref) * 1000); /*actually usec - we can't store this in nsec! */
-	
-	if ((type == SND_SEQ_EVENT_NOTEON && val != 0) || 
-			type != SND_SEQ_EVENT_NOTEON) {
-		x->midiEventBuf[x->bufWriteIndex].type = type;
-		switch (type) {
-		case SND_SEQ_EVENT_NOTEON:
-			x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
-			x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
-			x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
-			break;
-		case SND_SEQ_EVENT_NOTEOFF:
-			x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
-			x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
-			x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
-			break;
-		case SND_SEQ_EVENT_CONTROLLER:
-			x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
-			x->midiEventBuf[x->bufWriteIndex].data.control.param = param;
-			x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
-			break;
-		case SND_SEQ_EVENT_PITCHBEND:
-			x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
-			x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
-			x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
-			break;
-		case SND_SEQ_EVENT_PGMCHANGE:
-			x->instances[chan].pendingBankMSB = (param - 1) / 128;
-			x->instances[chan].pendingBankLSB = (param - 1) % 128;
-			x->instances[chan].pendingProgramChange = val;
-			x->instances[chan].uiNeedsProgramUpdate = 1; 
-#if DEBUG
-			post("pgm chabge received in buffer: MSB: %d, LSB %d, prog: %d",
-					x->instances[chan].pendingBankMSB, x->instances[chan].pendingBankLSB, val);
-#endif
-			dssi_tilde_program_change(x, chan);
-			break;
-		}
-	}
-	else if (type == SND_SEQ_EVENT_NOTEON && val == 0) {
-		x->midiEventBuf[x->bufWriteIndex].type = SND_SEQ_EVENT_NOTEOFF;
+    pthread_mutex_lock(&x->midiEventBufferMutex);
+
+    x->midiEventBuf[x->bufWriteIndex].time.time.tv_sec = 
+	(t_int)(clock_gettimesince(time_ref) * .001); 
+    x->midiEventBuf[x->bufWriteIndex].time.time.tv_nsec = 
+	(t_int)(clock_gettimesince(time_ref) * 1000); /*actually usec - we can't store this in nsec! */
+
+    if ((type == SND_SEQ_EVENT_NOTEON && val != 0) || 
+	    type != SND_SEQ_EVENT_NOTEON) {
+	x->midiEventBuf[x->bufWriteIndex].type = type;
+	switch (type) {
+	    case SND_SEQ_EVENT_NOTEON:
 		x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
 		x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
 		x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
+		break;
+	    case SND_SEQ_EVENT_NOTEOFF:
+		x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+		x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
+		x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
+		break;
+	    case SND_SEQ_EVENT_CONTROLLER:
+		x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+		x->midiEventBuf[x->bufWriteIndex].data.control.param = param;
+		x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
+		break;
+	    case SND_SEQ_EVENT_PITCHBEND:
+		x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+		x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
+		x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
+		break;
+	    case SND_SEQ_EVENT_PGMCHANGE:
+		x->instances[chan].pendingBankMSB = (param - 1) / 128;
+		x->instances[chan].pendingBankLSB = (param - 1) % 128;
+		x->instances[chan].pendingProgramChange = val;
+		x->instances[chan].uiNeedsProgramUpdate = 1; 
+#if DEBUG
+		post("pgm chabge received in buffer: MSB: %d, LSB %d, prog: %d",
+			x->instances[chan].pendingBankMSB, x->instances[chan].pendingBankLSB, val);
+#endif
+		dssi_tilde_program_change(x, chan);
+		break;
 	}
+    }
+    else if (type == SND_SEQ_EVENT_NOTEON && val == 0) {
+	x->midiEventBuf[x->bufWriteIndex].type = SND_SEQ_EVENT_NOTEOFF;
+	x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+	x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
+	x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
+    }
 
 #if DEBUG
-			post("MIDI received in buffer: chan %d, param %d, val %d",
-					chan, param, val);
+    post("MIDI received in buffer: chan %d, param %d, val %d",
+	    chan, param, val);
 #endif
-	    x->bufWriteIndex = (x->bufWriteIndex + 1) % EVENT_BUFSIZE;
+    x->bufWriteIndex = (x->bufWriteIndex + 1) % EVENT_BUFSIZE;
     pthread_mutex_unlock(&x->midiEventBufferMutex); /**release mutex*/
 }
 
-
-
-
 static void dssi_tilde_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
-	char *msg_type;
-	int ev_type = 0;
-	msg_type = (char *)malloc(TYPE_STRING_SIZE);
-	atom_string(argv, msg_type, TYPE_STRING_SIZE);
-	int chan = (int)atom_getfloatarg(1, argc, argv) - 1;
-	int param = (int)atom_getfloatarg(2, argc, argv);
-	int val = (int)atom_getfloatarg(3, argc, argv);
-	switch (msg_type[0]){
-		case ASCII_n: ev_type = SND_SEQ_EVENT_NOTEON;
-					  break;
-		case ASCII_c: ev_type = SND_SEQ_EVENT_CONTROLLER;
-					  break;
-		case ASCII_p: ev_type = SND_SEQ_EVENT_PGMCHANGE;
-					  break;
-		case ASCII_b: ev_type = SND_SEQ_EVENT_PITCHBEND;
-					  break;
-	}
+    char *msg_type;
+    int ev_type = 0;
+    msg_type = (char *)malloc(TYPE_STRING_SIZE);
+    atom_string(argv, msg_type, TYPE_STRING_SIZE);
+    int chan = (int)atom_getfloatarg(1, argc, argv) - 1;
+    int param = (int)atom_getfloatarg(2, argc, argv);
+    int val = (int)atom_getfloatarg(3, argc, argv);
+    switch (msg_type[0]){
+	case ASCII_n: ev_type = SND_SEQ_EVENT_NOTEON;
+		      break;
+	case ASCII_c: ev_type = SND_SEQ_EVENT_CONTROLLER;
+		      break;
+	case ASCII_p: ev_type = SND_SEQ_EVENT_PGMCHANGE;
+		      break;
+	case ASCII_b: ev_type = SND_SEQ_EVENT_PITCHBEND;
+		      break;
+    }
 #if DEBUG
-	post("initial midi NOTE:, arg1 = %d, arg2 = %d, arg3 = %d, arg4 = %d",ev_type,chan,param,val);
+    post("initial midi NOTE:, arg1 = %d, arg2 = %d, arg3 = %d, arg4 = %d",ev_type,chan,param,val);
 #endif
-	if(ev_type != 0){
-		MIDIbuf(ev_type, chan, param, val, x);
-	}
-	free(msg_type);
+    if(ev_type != 0){
+	MIDIbuf(ev_type, chan, param, val, x);
+    }
+    free(msg_type);
 }
 
-
 static char *dssi_tilde_send_configure(t_dssi_tilde *x, char *key, 
-		char *value, t_int instance){
+	char *value, t_int instance){
 
-	char *debug;
-	
-	debug =   x->descriptor->configure(
-			   x->instanceHandles[instance], 
-			    key, value);
-	if(x->instances[instance].uiTarget != NULL)
-		lo_send(x->instances[instance].uiTarget, 
-		  x->instances[instance].ui_osc_configure_path,
-		   "ss", key, value);
-	query_programs(x, instance);
+    char *debug;
 
-	return debug;
+    debug =   x->descriptor->configure(
+	    x->instanceHandles[instance], 
+	    key, value);
+    if(x->instances[instance].uiTarget != NULL)
+	lo_send(x->instances[instance].uiTarget, 
+		x->instances[instance].ui_osc_configure_path,
+		"ss", key, value);
+    query_programs(x, instance);
+
+    return debug;
 }
 
 static void dssi_show(t_dssi_tilde *x, t_int instance, t_int toggle){
 
-	
-	if(x->instances[instance].uiTarget){
-		if (x->instances[instance].ui_hidden && toggle) {
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_show_path, "");
-			x->instances[instance].ui_hidden = 0;
-		 }
-		else if (!x->instances[instance].ui_hidden && !toggle) {
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_hide_path, "");
-			x->instances[instance].ui_hidden = 1;
-		}
+    if(x->instances[instance].uiTarget){
+	if (x->instances[instance].ui_hidden && toggle) {
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_show_path, "");
+	    x->instances[instance].ui_hidden = 0;
 	}
-	else if(toggle){
-		x->instances[instance].ui_show = 1;
-		dssi_tilde_load_gui(x, instance);
-		
+	else if (!x->instances[instance].ui_hidden && !toggle) {
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_hide_path, "");
+	    x->instances[instance].ui_hidden = 1;
 	}
+    }
+    else if(toggle){
+	x->instances[instance].ui_show = 1;
+	dssi_tilde_load_gui(x, instance);
+
+    }
 }
 
 static t_int dssi_tilde_configure_buffer(t_dssi_tilde *x, char *key, 
-		char *value, t_int instance){
+	char *value, t_int instance){
 
-/*#ifdef BLAH*/
-	t_dssi_configure_pair *current, *p;
-	t_int add_node;
-	add_node = 0;	
-	current = x->configure_buffer_head;
+    /*#ifdef BLAH*/
+    t_dssi_configure_pair *current, *p;
+    t_int add_node;
+    add_node = 0;	
+    current = x->configure_buffer_head;
 
-	while(current){
-		if(!strcmp(current->key, key) && 
-				current->instance == instance)
-			break;
-		current = current->next;
-	}
-	if(current)
-		free(current->value);
-	else {
-		current = (t_dssi_configure_pair *)malloc(sizeof
-						(t_dssi_configure_pair));
-		current->next = x->configure_buffer_head;
-		x->configure_buffer_head = current;
-		current->key = (char *)malloc((strlen(key) + 1) * 
-				sizeof(char));
-		strcpy(current->key, key);
-		current->instance = instance;
-	}
-	current->value = (char *)malloc((strlen(value) + 1) * 
-			sizeof(char));
-	strcpy(current->value, value);
-		
-	
-	p = x->configure_buffer_head;
+    while(current){
+	if(!strcmp(current->key, key) && 
+		current->instance == instance)
+	    break;
+	current = current->next;
+    }
+    if(current)
+	free(current->value);
+    else {
+	current = (t_dssi_configure_pair *)malloc(sizeof
+		(t_dssi_configure_pair));
+	current->next = x->configure_buffer_head;
+	x->configure_buffer_head = current;
+	current->key = (char *)malloc((strlen(key) + 1) * 
+		sizeof(char));
+	strcpy(current->key, key);
+	current->instance = instance;
+    }
+    current->value = (char *)malloc((strlen(value) + 1) * 
+	    sizeof(char));
+    strcpy(current->value, value);
 
+    p = x->configure_buffer_head;
 
-/*FIX: eventually give ability to query this buffer (to outlet?) */
+    /*FIX: eventually give ability to query this buffer (to outlet?) */
 #if DEBUG	
-	while(p){
-		post("key: %s", p->key);
-		post("val: %s", p->value);
-		post("instance: %d", p->instance);
-		p = p->next;
-	}
+    while(p){
+	post("key: %s", p->key);
+	post("val: %s", p->value);
+	post("instance: %d", p->instance);
+	p = p->next;
+    }
 #endif
-	return 0;
+    return 0;
 }
 
 static t_int dssi_tilde_configure_buffer_free(t_dssi_tilde *x){
-	t_dssi_configure_pair *curr, *prev;
-	prev = curr = NULL;
-	
-	for(curr = x->configure_buffer_head; curr != NULL; curr = curr->next){
-		if(prev != NULL)
-			free(prev);
-		free(curr->key);
-		free(curr->value);
-		prev = curr;
-	}
-	free(curr);
+    t_dssi_configure_pair *curr, *prev;
+    prev = curr = NULL;
 
+    for(curr = x->configure_buffer_head; curr != NULL; curr = curr->next){
+	if(prev != NULL)
+	    free(prev);
+	free(curr->key);
+	free(curr->value);
+	prev = curr;
+    }
+    free(curr);
 
-	return 0;
+    return 0;
 }
 
 /*
-static void dssi_tilde_plug (t_dssi_tilde *x, t_symbol* plug_name) {
-  plugin_tilde_ladspa_close_plugin(x);
-  x->plugin_library_filename = NULL;
-  x->plugin_library_filename = plugin_tilde_search_plugin (x, plug_name->s_name);
-  if (x->plugin_library_filename == NULL)
-    post("plugin~: plugin not found in any library");
-  if (plugin_tilde_open_plugin (x, plug_name->s_name, x->plugin_library_filename,(unsigned long)sys_getsr ()))
-    post("plugin~: Unable to open plugin");
-}
-*/
+   static void dssi_tilde_plug (t_dssi_tilde *x, t_symbol* plug_name) {
+   plugin_tilde_ladspa_close_plugin(x);
+   x->plugin_library_filename = NULL;
+   x->plugin_library_filename = plugin_tilde_search_plugin (x, plug_name->s_name);
+   if (x->plugin_library_filename == NULL)
+   post("plugin~: plugin not found in any library");
+   if (plugin_tilde_open_plugin (x, plug_name->s_name, x->plugin_library_filename,(unsigned long)sys_getsr ()))
+   post("plugin~: Unable to open plugin");
+   }
+   */
 
 static t_int dssi_tilde_reset(t_dssi_tilde *x, t_float instance_f){
-	
-	t_int instance = (t_int)instance_f;
-	if (instance == -1){
-		for(instance = 0; instance < x->n_instances; instance++) 			{
-		    if (x->descriptor->LADSPA_Plugin->deactivate &&
-			  x->descriptor->LADSPA_Plugin->activate){ 
-			x->descriptor->LADSPA_Plugin->deactivate
-			    (x->instanceHandles[instance]);
-			x->descriptor->LADSPA_Plugin->activate
-			    (x->instanceHandles[instance]);
-		    }
-		}
-	}
-	else if (x->descriptor->LADSPA_Plugin->deactivate && 
-		  x->descriptor->LADSPA_Plugin->activate) {
+
+    t_int instance = (t_int)instance_f;
+    if (instance == -1){
+	for(instance = 0; instance < x->n_instances; instance++) 			{
+	    if (x->descriptor->LADSPA_Plugin->deactivate &&
+		    x->descriptor->LADSPA_Plugin->activate){ 
 		x->descriptor->LADSPA_Plugin->deactivate
 		    (x->instanceHandles[instance]);
 		x->descriptor->LADSPA_Plugin->activate
 		    (x->instanceHandles[instance]);
+	    }
 	}
-	return 0;
+    }
+    else if (x->descriptor->LADSPA_Plugin->deactivate && 
+	    x->descriptor->LADSPA_Plugin->activate) {
+	x->descriptor->LADSPA_Plugin->deactivate
+	    (x->instanceHandles[instance]);
+	x->descriptor->LADSPA_Plugin->activate
+	    (x->instanceHandles[instance]);
+    }
+    return 0;
 }
- 
+
 static void dssi_tilde_search_plugin_callback (
-		const char* full_filename,
-		void* plugin_handle,
-	        DSSI_Descriptor_Function descriptor_function,
-		void* user_data,
-		int is_DSSI)
+	const char* full_filename,
+	void* plugin_handle,
+	DSSI_Descriptor_Function descriptor_function,
+	void* user_data,
+	int is_DSSI)
 {
     DSSI_Descriptor* descriptor = NULL;
     unsigned plug_index = 0;
 
     char** out_lib_name = (char**)(((void**)user_data)[0]);
     char* name = (char*)(((void**)user_data)[1]);
-    
+
     /* Stop searching when a first matching plugin is found */
     if (*out_lib_name == NULL)
     {
 #if DEBUG
-      	post("plugin~: searching library \"%s\"...", full_filename);
+	post("plugin~: searching library \"%s\"...", full_filename);
 #endif
 	for(plug_index = 0;(is_DSSI ? 
-				(descriptor = 
-			(DSSI_Descriptor *)descriptor_function(plug_index)) : 
-				((DSSI_Descriptor *)(descriptor = 
-				 ladspa_to_dssi((LADSPA_Descriptor *)
-			descriptor_function(plug_index)))->LADSPA_Plugin)) 
-			!= NULL; plug_index++){
+		    (descriptor = 
+		     (DSSI_Descriptor *)descriptor_function(plug_index)) : 
+		    ((DSSI_Descriptor *)(descriptor = 
+					 ladspa_to_dssi((LADSPA_Descriptor *)
+					     descriptor_function(plug_index)))->LADSPA_Plugin)) 
+		!= NULL; plug_index++){
 #if DEBUG		
 	    post("plugin~: label \"%s\"", descriptor->LADSPA_Plugin->Label);
 #endif
 	    if (strcasecmp (name, descriptor->LADSPA_Plugin->Label) 
-			    == 0)
+		    == 0)
 	    {
 		*out_lib_name = strdup (full_filename);
 #if DEBUG
 		post("plugin~: found plugin \"%s\" in library \"%s\"",
-		       name, full_filename);
+			name, full_filename);
 #endif
-	/*	if(!is_DSSI){
+		/*	if(!is_DSSI){
 			free((DSSI_Descriptor *)descriptor);
 			descriptor = NULL;
-		}*/
+			}*/
 		break;
 	    }
-/*	    if (descriptor != NULL){
-		free((DSSI_Descriptor *)descriptor);
-		descriptor = NULL;
-	    }*/
+	    /*	    if (descriptor != NULL){
+		    free((DSSI_Descriptor *)descriptor);
+		    descriptor = NULL;
+		    }*/
 	}
     }
 }
 
-       
 static const char* plugin_tilde_search_plugin (t_dssi_tilde *x,
-			    const char *name)
+	const char *name)
 {
     char* lib_name = NULL;
     void* user_data[2];
@@ -1498,7 +1458,7 @@ static const char* plugin_tilde_search_plugin (t_dssi_tilde *x,
 
     lib_name = NULL;
     LADSPAPluginSearch (dssi_tilde_search_plugin_callback,
-			(void*)user_data);
+	    (void*)user_data);
 
     /* The callback (allocates and) writes lib_name, if it finds the plugin */
     return lib_name;
@@ -1506,705 +1466,741 @@ static const char* plugin_tilde_search_plugin (t_dssi_tilde *x,
 }
 
 static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
-	char *msg_type, *debug, *filename, *key, *value;
-	msg_type = (char *)malloc(TYPE_STRING_SIZE);
-	int instance = -1, pathlen, toggle; 
-	int n_instances = x->n_instances;
-	int count, maxpatches;
-	t_float val;
-	long filelength = 0;
-	unsigned char *raw_patch_data = NULL;
-	FILE *fp;
-	size_t filename_length, key_size, value_size;
-	dx7_patch_t *patchbuf, *firstpatch;
-	atom_string(argv, msg_type, TYPE_STRING_SIZE);
-	debug = NULL;
-	key = NULL;	
-	value = NULL;
-	maxpatches = 128; 
-	patchbuf = malloc(32 * sizeof(dx7_patch_t));
-	firstpatch = &patchbuf[0];
-	val = 0;
+    char *msg_type, *debug, *filename, *key, *value;
+    msg_type = (char *)malloc(TYPE_STRING_SIZE);
+    int instance = -1, pathlen, toggle; 
+    int n_instances = x->n_instances;
+    int count, maxpatches;
+    t_float val;
+    long filelength = 0;
+    unsigned char *raw_patch_data = NULL;
+    FILE *fp;
+    size_t filename_length, key_size, value_size;
+    dx7_patch_t *patchbuf, *firstpatch;
+    atom_string(argv, msg_type, TYPE_STRING_SIZE);
+    debug = NULL;
+    key = NULL;	
+    value = NULL;
+    maxpatches = 128; 
+    patchbuf = malloc(32 * sizeof(dx7_patch_t));
+    firstpatch = &patchbuf[0];
+    val = 0;
 
-
-	/*FIX: Temporary - at the moment we always load the first 32 patches to 0 */
-	if(strcmp(msg_type, "configure")){
-		instance = (int)atom_getfloatarg(2, argc, argv) - 1;
-		
+    /*FIX: Temporary - at the moment we always load the first 32 patches to 0 */
+    if(strcmp(msg_type, "configure")){
+	instance = (int)atom_getfloatarg(2, argc, argv) - 1;
 
 	if(!strcmp(msg_type, "load") && x->descriptor->configure){
-		filename = argv[1].a_w.w_symbol->s_name;
-		post("loading patch: %s for instance %d", filename, instance);
-		
-		if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
-			!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))		{
-			
-			key = malloc(10 * sizeof(char)); /* holds "patchesN" */
-			strcpy(key, "patches0");
+	    filename = argv[1].a_w.w_symbol->s_name;
+	    post("loading patch: %s for instance %d", filename, instance);
 
-			fp = fopen(filename, "rb");
-			
+	    if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
+		    !strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))		{
+
+		key = malloc(10 * sizeof(char)); /* holds "patchesN" */
+		strcpy(key, "patches0");
+
+		fp = fopen(filename, "rb");
+
 		/*From dx7_voice_data by Sean Bolton */
-			if(fp == NULL){
-				post("Unable to open patch file: %s", filename);
-				return 0;
-			}
-			if (fseek(fp, 0, SEEK_END) || 
-				(filelength = ftell(fp)) == -1 ||
-				fseek(fp, 0, SEEK_SET)) {
-				   post("couldn't get length of patch file: %s", 
-						filename);
-				fclose(fp);
-				return 0;
-			}
-			if (filelength == 0) {
-				post("patch file has zero length");
-				fclose(fp);
-				return 0;
-			} else if (filelength > 16384) {
-				post("patch file is too large");
-				fclose(fp);
-				return 0;
-			}
-			if (!(raw_patch_data = (unsigned char *)
-						malloc(filelength))) 		     			 {
-				post(
-				  "couldn't allocate memory for raw patch file");
-				fclose(fp);
-				return 0;
-			}
-			if (fread(raw_patch_data, 1, filelength, fp) 
-							!= (size_t)filelength) {
-				post("short read on patch file: %s", filename);
-				free(raw_patch_data);
-				fclose(fp);
-				return 0;
-			}
-			fclose(fp);
+		if(fp == NULL){
+		    post("Unable to open patch file: %s", filename);
+		    return 0;
+		}
+		if (fseek(fp, 0, SEEK_END) || 
+			(filelength = ftell(fp)) == -1 ||
+			fseek(fp, 0, SEEK_SET)) {
+		    post("couldn't get length of patch file: %s", 
+			    filename);
+		    fclose(fp);
+		    return 0;
+		}
+		if (filelength == 0) {
+		    post("patch file has zero length");
+		    fclose(fp);
+		    return 0;
+		} else if (filelength > 16384) {
+		    post("patch file is too large");
+		    fclose(fp);
+		    return 0;
+		}
+		if (!(raw_patch_data = (unsigned char *)
+			    malloc(filelength))) 		     			 {
+		    post(
+			    "couldn't allocate memory for raw patch file");
+		    fclose(fp);
+		    return 0;
+		}
+		if (fread(raw_patch_data, 1, filelength, fp) 
+			!= (size_t)filelength) {
+		    post("short read on patch file: %s", filename);
+		    free(raw_patch_data);
+		    fclose(fp);
+		    return 0;
+		}
+		fclose(fp);
 #if DEBUG
-			post("Patch file length is %ul", filelength);
+		post("Patch file length is %ul", filelength);
 #endif
-		 /* figure out what kind of file it is */
-		    filename_length = strlen(filename);
-		    if (filename_length > 4 &&
-			       !strcmp(filename + filename_length - 4, ".dx7") &&
-			       filelength % DX7_VOICE_SIZE_PACKED == 0) {  
-				/* It's a raw DX7 patch bank */
-
-#if DEBUG
-			    post("Raw DX7 format patch bank passed");
-#endif
-			count = filelength / DX7_VOICE_SIZE_PACKED;
-			if (count > maxpatches)
-			    count = maxpatches;
-			memcpy(firstpatch, raw_patch_data, count * 
-				DX7_VOICE_SIZE_PACKED);
-
-		    } else if (filelength > 6 &&
-			       raw_patch_data[0] == 0xf0 &&
-			       raw_patch_data[1] == 0x43 &&
-			       /*This was used to fix some problem with Galaxy exports - possibly dump in worng format. It is not needed, but it did work, so in future, we may be able to support more formats not just DX7 */
-			    /*   ((raw_patch_data[2] & 0xf0) == 0x00 || 
-				raw_patch_data[2] == 0x7e) &&*/
-			       (raw_patch_data[2] & 0xf0) == 0x00 && 
-			       raw_patch_data[3] == 0x09 &&
-			       (raw_patch_data[4] == 0x10 || 
-					raw_patch_data[4] == 0x20) &&  
-			   /* 0x10 is actual, 0x20 matches typo in manual */
-			       raw_patch_data[5] == 0x00) {  
-			    /* It's a DX7 sys-ex 32 voice dump */
+		/* figure out what kind of file it is */
+		filename_length = strlen(filename);
+		if (filename_length > 4 &&
+			!strcmp(filename + filename_length - 4, ".dx7") &&
+			filelength % DX7_VOICE_SIZE_PACKED == 0) {  
+		    /* It's a raw DX7 patch bank */
 
 #if DEBUG
-			    post("SYSEX header check passed");
+		    post("Raw DX7 format patch bank passed");
+#endif
+		    count = filelength / DX7_VOICE_SIZE_PACKED;
+		    if (count > maxpatches)
+			count = maxpatches;
+		    memcpy(firstpatch, raw_patch_data, count * 
+			    DX7_VOICE_SIZE_PACKED);
+
+		} else if (filelength > 6 &&
+			raw_patch_data[0] == 0xf0 &&
+			raw_patch_data[1] == 0x43 &&
+			/*This was used to fix some problem with Galaxy exports - possibly dump in worng format. It is not needed, but it did work, so in future, we may be able to support more formats not just DX7 */
+			/*   ((raw_patch_data[2] & 0xf0) == 0x00 || 
+			     raw_patch_data[2] == 0x7e) &&*/
+			(raw_patch_data[2] & 0xf0) == 0x00 && 
+			raw_patch_data[3] == 0x09 &&
+			(raw_patch_data[4] == 0x10 || 
+			 raw_patch_data[4] == 0x20) &&  
+			/* 0x10 is actual, 0x20 matches typo in manual */
+			raw_patch_data[5] == 0x00) {  
+		    /* It's a DX7 sys-ex 32 voice dump */
+
+#if DEBUG
+		    post("SYSEX header check passed");
 #endif
 
-			if (filelength != DX7_DUMP_SIZE_BULK ||
+		    if (filelength != DX7_DUMP_SIZE_BULK ||
 			    raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
-			    post("badly formatted DX7 32 voice dump!");
-			    count = 0;
-		
-#ifdef CHECKSUM_PATCH_FILES_ON_LOAD
-			} else if (dx7_bulk_dump_checksum(&raw_patch_data[6],
-				DX7_VOICE_SIZE_PACKED * 32) !=
-				   raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
-
-			    post("DX7 32 voice dump with bad checksum!");
-			    count = 0;
-
-#endif
-			} else {
-
-			    count = 32;
-			    if (count > maxpatches)
-				count = maxpatches;
-			    memcpy(firstpatch, raw_patch_data + 6, count * DX7_VOICE_SIZE_PACKED);
-
-			}
-		    } else {
-
-			/* unsuccessful load */
-			post("unknown patch bank file format!");
+			post("badly formatted DX7 32 voice dump!");
 			count = 0;
 
+#ifdef CHECKSUM_PATCH_FILES_ON_LOAD
+		    } else if (dx7_bulk_dump_checksum(&raw_patch_data[6],
+				DX7_VOICE_SIZE_PACKED * 32) !=
+			    raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
+
+			post("DX7 32 voice dump with bad checksum!");
+			count = 0;
+
+#endif
+		    } else {
+
+			count = 32;
+			if (count > maxpatches)
+			    count = maxpatches;
+			memcpy(firstpatch, raw_patch_data + 6, count * DX7_VOICE_SIZE_PACKED);
+
 		    }
+		} else {
 
-		    free(raw_patch_data);
-		    
-		   if(count == 32)
- 		       value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
-					count * DX7_VOICE_SIZE_PACKED);
-				
-	     }
-	     else if(!strcmp(x->descriptor->LADSPA_Plugin->Label, 
-				     "FluidSynth-DSSI")){
-		     key = malloc(6 * sizeof(char));
-		     strcpy(key, "load");
-		     value = filename;
-	     }
-	     else{
-		     post("Sorry, %s patches are not supported", 
-				     x->descriptor->LADSPA_Plugin->Label);
-	     }
-		
-        }
-	
-	if(!strcmp(msg_type, "dir") && x->descriptor->configure){
-		pathlen = strlen(argv[1].a_w.w_symbol->s_name) + 2;
-		x->dir = malloc((pathlen) * sizeof(char));
-		atom_string(&argv[1], x->dir, pathlen);
-		post("Project directory for instance %d has been set to: %s", instance, x->dir);
-		key = DSSI_PROJECT_DIRECTORY_KEY;
-		value = x->dir;
-	}
-	
-	else if(!strcmp(msg_type, "dir"))
-		post("%s %s: operation not supported", msg_type, 
-			argv[1].a_w.w_symbol->s_name);
-	
-	if(!strcmp(msg_type, "show") || !strcmp(msg_type, "hide")){
-		instance = (int)atom_getfloatarg(1, argc, argv) - 1;
-		if(!strcmp(msg_type, "show"))
-			toggle = 1;
-		else
-			toggle = 0;
+		    /* unsuccessful load */
+		    post("unknown patch bank file format!");
+		    count = 0;
 
-		if(instance == -1){
-			while(n_instances--)
-				dssi_show(x, n_instances, toggle);
 		}
-		else
-			dssi_show(x, instance, toggle);
-	  }
-	
+
+		free(raw_patch_data);
+
+		if(count == 32)
+		    value = encode_7in6((uint8_t *)&patchbuf[0].data[0], 
+			    count * DX7_VOICE_SIZE_PACKED);
+
+	    }
+	    else if(!strcmp(x->descriptor->LADSPA_Plugin->Label, 
+			"FluidSynth-DSSI")){
+		key = malloc(6 * sizeof(char));
+		strcpy(key, "load");
+		value = filename;
+	    }
+	    else{
+		post("Sorry, %s patches are not supported", 
+			x->descriptor->LADSPA_Plugin->Label);
+	    }
+
+	}
+
+	if(!strcmp(msg_type, "dir") && x->descriptor->configure){
+	    pathlen = strlen(argv[1].a_w.w_symbol->s_name) + 2;
+	    x->project_dir = malloc((pathlen) * sizeof(char));
+	    atom_string(&argv[1], x->project_dir, pathlen);
+	    post("Project directory for instance %d has been set to: %s", instance, x->project_dir);
+	    key = DSSI_PROJECT_DIRECTORY_KEY;
+	    value = x->project_dir;
+	}
+
+	else if(!strcmp(msg_type, "dir"))
+	    post("%s %s: operation not supported", msg_type, 
+		    argv[1].a_w.w_symbol->s_name);
+
+	if(!strcmp(msg_type, "show") || !strcmp(msg_type, "hide")){
+	    instance = (int)atom_getfloatarg(1, argc, argv) - 1;
+	    if(!strcmp(msg_type, "show"))
+		toggle = 1;
+	    else
+		toggle = 0;
+
+	    if(instance == -1){
+		while(n_instances--)
+		    dssi_show(x, n_instances, toggle);
+	    }
+	    else
+		dssi_show(x, instance, toggle);
+	}
+
     }
 
+    /*Use this to send arbitrary configure message to plugin */
+    else if(!strcmp(msg_type, "configure")){
+	key = 
+	    (char *)malloc(key_size = (strlen(argv[1].a_w.w_symbol->s_name) + 2) * sizeof(char)); 
+	atom_string(&argv[1], key, key_size);
+	if(argc >= 3){	
+	    if (argv[2].a_type == A_FLOAT){
+		val = atom_getfloatarg(2, argc, argv);
+		value = (char *)malloc(TYPE_STRING_SIZE * 
+			sizeof(char));
+		sprintf(value, "%.2f", val);
+	    }
+	    else if(argv[2].a_type == A_SYMBOL){
+		value = 
+		    (char *)malloc(value_size = 
+				   (strlen(argv[2].a_w.w_symbol->s_name) + 2) * 
+				   sizeof(char)); 
+		atom_string(&argv[2], value, value_size);
+	    }		
 
-	
-	/*Use this to send arbitrary configure message to plugin */
-	else if(!strcmp(msg_type, "configure")){
-		key = 
-		  (char *)malloc(key_size = (strlen(argv[1].a_w.w_symbol->s_name) + 2) * sizeof(char)); 
-		atom_string(&argv[1], key, key_size);
-		if(argc >= 3){	
-			if (argv[2].a_type == A_FLOAT){
-				val = atom_getfloatarg(2, argc, argv);
-				value = (char *)malloc(TYPE_STRING_SIZE * 
-						sizeof(char));
-				sprintf(value, "%.2f", val);
-			}
-			else if(argv[2].a_type == A_SYMBOL){
-				value = 
-				 (char *)malloc(value_size = 
-				    (strlen(argv[2].a_w.w_symbol->s_name) + 2) * 
-						 sizeof(char)); 
-				atom_string(&argv[2], value, value_size);
-			}		
-		
-		}	
+	}	
 
-		
-		if(argc == 4 && argv[3].a_type == A_FLOAT)
-			instance = atom_getfloatarg(3, argc, argv) - 1;
-		else if (n_instances)
-			instance = -1;
+	if(argc == 4 && argv[3].a_type == A_FLOAT)
+	    instance = atom_getfloatarg(3, argc, argv) - 1;
+	else if (n_instances)
+	    instance = -1;
+    }
+
+    if(key != NULL && value != NULL){
+	if(instance == -1){
+	    while(n_instances--){
+		debug =	dssi_tilde_send_configure(
+			x, key, value, n_instances);
+		dssi_tilde_configure_buffer(x, key, value, n_instances);
+	    }
 	}
+	/*FIX: Put some error checking in here to make sure instance is valid*/
+	else{
 
-	
-	if(key != NULL && value != NULL){
-		if(instance == -1){
-			while(n_instances--){
-				debug =	dssi_tilde_send_configure(
-						x, key, value, n_instances);
-			dssi_tilde_configure_buffer(x, key, value, n_instances);
-			}
-		}
-		/*FIX: Put some error checking in here to make sure instance is valid*/
-		else{
-
-			debug =	dssi_tilde_send_configure(x, key, value, instance);
-			dssi_tilde_configure_buffer(x, key, value, instance);
-		}
+	    debug =	dssi_tilde_send_configure(x, key, value, instance);
+	    dssi_tilde_configure_buffer(x, key, value, instance);
 	}
+    }
 #if DEBUG
-	post("The plugin returned %s", debug);
+    post("The plugin returned %s", debug);
 #endif
-	free(msg_type);
-	free(patchbuf);
-	return 0;
-	
+    free(msg_type);
+    free(patchbuf);
+    return 0;
+
 }
 
 static void dssi_bang(t_dssi_tilde *x)
 {
-	post("Running instances of %s", x->descriptor->LADSPA_Plugin->Label);
+    post("Running instances of %s", x->descriptor->LADSPA_Plugin->Label);
 }
 
 static t_int *dssi_tilde_perform(t_int *w)
 {
-  int N = (int)(w[1]);
-  t_dssi_tilde *x = (t_dssi_tilde *)(w[2]);
-  int i, n, timediff, framediff, instance = 0; 
+    int N = (int)(w[1]);
+    t_dssi_tilde *x = (t_dssi_tilde *)(w[2]);
+    int i, n, timediff, framediff, instance = 0; 
 
-  for(i = 0; i < x->plugin_ins; i++)
-	  memcpy(x->plugin_InputBuffers[i], x->inlets[i], N * 
-			  sizeof(LADSPA_Data));
-	  
-  for (i = 0; i < x->n_instances; i++)
-	  x->instanceEventCounts[i] = 0;
-								
-  for (;x->bufReadIndex != x->bufWriteIndex; x->bufReadIndex = 
-		  (x->bufReadIndex + 1) % EVENT_BUFSIZE) {
-		
+    for(i = 0; i < x->plugin_ins; i++)
+	memcpy(x->plugin_InputBuffers[i], x->inlets[i], N * 
+		sizeof(LADSPA_Data));
+
+    for (i = 0; i < x->n_instances; i++)
+	x->instanceEventCounts[i] = 0;
+
+    for (;x->bufReadIndex != x->bufWriteIndex; x->bufReadIndex = 
+	    (x->bufReadIndex + 1) % EVENT_BUFSIZE) {
+
 	instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
 	/*This should never happen, but check anyway*/
 	if(instance > x->n_instances || instance < 0){
-		post(
-		  "%s: discarding spurious MIDI data, for instance %d", 
-			x->descriptor->LADSPA_Plugin->Label, 
-			   instance);
+	    post(
+		    "%s: discarding spurious MIDI data, for instance %d", 
+		    x->descriptor->LADSPA_Plugin->Label, 
+		    instance);
 #if DEBUG
-post("n_instances = %d", x->n_instances);
+	    post("n_instances = %d", x->n_instances);
 #endif
-		continue;
+	    continue;
 	}
-	  
+
 	if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
-		post("MIDI overflow on channel %d", instance);
-		continue;
+	    post("MIDI overflow on channel %d", instance);
+	    continue;
 	}
-		
+
 	timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
-		x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
+	    x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
 	framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
-		
+
 	if (framediff >= N || framediff < 0) 
-		x->midiEventBuf[x->bufReadIndex].time.tick = 0;
+	    x->midiEventBuf[x->bufReadIndex].time.tick = 0;
 	else
-		x->midiEventBuf[x->bufReadIndex].time.tick = 
-			N - framediff - 1;
-		
+	    x->midiEventBuf[x->bufReadIndex].time.tick = 
+		N - framediff - 1;
+
 	x->instanceEventBuffers[instance]
-		[x->instanceEventCounts[instance]] = 
-			x->midiEventBuf[x->bufReadIndex];
+	    [x->instanceEventCounts[instance]] = 
+	    x->midiEventBuf[x->bufReadIndex];
 #if DEBUG
-post("%s, note received on channel %d", 
+	post("%s, note received on channel %d", 
 		x->descriptor->LADSPA_Plugin->Label, 
 		x->instanceEventBuffers[instance]
-		  [x->instanceEventCounts[instance]].data.note.channel);
+		[x->instanceEventCounts[instance]].data.note.channel);
 #endif
 	x->instanceEventCounts[instance]++; 
-		
+
 #if DEBUG
-post("Instance event count for instance %d of %d: %d\n",
-	instance + 1, x->n_instances, x->instanceEventCounts[instance]);
+	post("Instance event count for instance %d of %d: %d\n",
+		instance + 1, x->n_instances, x->instanceEventCounts[instance]);
 #endif
 
-  }
+    }
 
-  i = 0;
-  while(i < x->n_instances){
+    i = 0;
+    while(i < x->n_instances){
 	if(x->instanceHandles[i] && 
-			x->descriptor->run_multiple_synths){
-		  x->descriptor->run_multiple_synths
-			  (x->n_instances, x->instanceHandles, 
-			   (unsigned long)N, x->instanceEventBuffers,
-			   &x->instanceEventCounts[0]);
-		  break; 
+		x->descriptor->run_multiple_synths){
+	    x->descriptor->run_multiple_synths
+		(x->n_instances, x->instanceHandles, 
+		 (unsigned long)N, x->instanceEventBuffers,
+		 &x->instanceEventCounts[0]);
+	    break; 
 	}
 	else if (x->instanceHandles[i] && 
-			x->descriptor->run_synth){
-		  x->descriptor->run_synth(x->instanceHandles[i], 
-		      (unsigned long)N, x->instanceEventBuffers[i],
-			x->instanceEventCounts[i]); 
-		  i++;
+		x->descriptor->run_synth){
+	    x->descriptor->run_synth(x->instanceHandles[i], 
+		    (unsigned long)N, x->instanceEventBuffers[i],
+		    x->instanceEventCounts[i]); 
+	    i++;
 	}
 	else if (x->instanceHandles[i] && 
-			x->descriptor->LADSPA_Plugin->run){
-		x->descriptor->LADSPA_Plugin->run
-			(x->instanceHandles[i], N);
-		i++;
+		x->descriptor->LADSPA_Plugin->run){
+	    x->descriptor->LADSPA_Plugin->run
+		(x->instanceHandles[i], N);
+	    i++;
 	}
-  }
+    }
 
-  for(i = 0; i < x->plugin_outs; i++)
-	  memcpy(x->outlets[i], x->plugin_OutputBuffers[i], N * 
-			  sizeof(LADSPA_Data));
-  	
-	  return (w+3);
+    for(i = 0; i < x->plugin_outs; i++)
+	memcpy(x->outlets[i], x->plugin_OutputBuffers[i], N * 
+		sizeof(LADSPA_Data));
+
+    return (w+3);
 }
 
 static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 {
-	if(x->n_instances){
-		int n, m;
-		t_float **outlets = x->outlets;
-		t_float **inlets = x->inlets;
+    if(x->n_instances){
+	int n, m;
+	t_float **outlets = x->outlets;
+	t_float **inlets = x->inlets;
 
-		m = 1;	
-		
-		for(n = 0; n < x->plugin_ins; n++)
-			*inlets++ = sp[m++]->s_vec;
-		for(n = 0; n < x->plugin_outs; n++)
-			*outlets++ = sp[m++]->s_vec;
-	}		
-	    dsp_add(dssi_tilde_perform, 2, sp[0]->s_n, x);
-	
-	
+	m = 1;	
+
+	for(n = 0; n < x->plugin_ins; n++)
+	    *inlets++ = sp[m++]->s_vec;
+	for(n = 0; n < x->plugin_outs; n++)
+	    *outlets++ = sp[m++]->s_vec;
+    }		
+    dsp_add(dssi_tilde_perform, 2, sp[0]->s_n, x);
+
 }
 
 static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 
-	int i,
-	    stop;
+    int i,
+	stop;
+    char *tmpstr,
+	 *argstr,
+	 *dll_arg,
+	 *dll_name,
+	 *plugin_label;
+    
+    stop = 0;
+    tmpstr = argstr = dll_name = dll_arg = NULL;
+    
+    t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
+    post("==============================\ndssi~ %.2f\n a DSSI/LADSPA host for Pure Data\n==============================", VERSION);
+    
+    x->project_dir = NULL;
+    x->configure_buffer_head = NULL;
+    x->outlets = NULL;
+    x->inlets = NULL;
+    x->control_outlet = NULL;
+    x->dll_handle = NULL;
+    x->dll_path = NULL;
+    x->dll_arg = NULL;
+    x->plugin_label = NULL;
+    x->sr = (t_int)sys_getsr();
+    x->sr_inv = 1 / (t_float)x->sr;
+    x->time_ref = (t_int)clock_getlogicaltime;
+    x->blksize = sys_getblksize();
+    x->ports_in = x->ports_out = x->ports_controlIn = x->ports_controlOut = 0;
+    x->bufWriteIndex = x->bufReadIndex = 0;
+    x->n_instances = 0; 
 
-	char *tmpPath;
-
-	
-	stop = 0;
-	t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
-	post("dssi~ %.2f\n a DSSI host for Pure Data\n by Jamie Bullock\nIncluding Code from jack-dssi-host\n by Chris Cannam, Steve Harris and Sean Bolton", VERSION);
-	x->dir = NULL;
-	x->configure_buffer_head = NULL;
-	x->outlets = NULL;
-	x->inlets = NULL;
-	x->control_outlet = NULL;
-	x->dll_handle = NULL;
-	x->dll_path = NULL;
-	x->dll_arg = NULL;
-	
-	x->bufWriteIndex = x->bufReadIndex = 0;
-     if (argc){
-	
-
-	if(strstr(argv[0].a_w.w_symbol->s_name, ":") != NULL){
-		x->dll_arg = strtok(
-				argv[0].a_w.w_symbol->s_name, ":");
-		x->plugin_label = strtok(NULL, ":");
+    
+    
+    if (argc){
+	argstr = (char *)malloc((strlen(argv[0].a_w.w_symbol->s_name) + 1) * 
+		sizeof(char));
+	strcpy(argstr, argv[0].a_w.w_symbol->s_name);
+	if(strstr(argstr, ":") != NULL){
+	    dll_arg = strtok(argstr, ":");
+	    x->dll_arg = (char *)malloc((strlen(dll_arg) + 1) * sizeof(char));
+	    strcpy(x->dll_arg, dll_arg);
+	    plugin_label = strtok(NULL, ":");
+	    x->plugin_label = (char *)malloc((strlen(plugin_label) + 1) * 
+		    sizeof(char));
+	    strcpy(x->plugin_label, plugin_label);
 	}
 	else{ 
-		x->plugin_label = argv[0].a_w.w_symbol->s_name;
-		x->dll_arg = 
-			plugin_tilde_search_plugin(x, x->plugin_label);
+	    x->plugin_label = (char *)malloc((strlen(argstr) + 1) 
+		    * sizeof(char));
+	    strcpy(x->plugin_label, argstr);
+	    dll_arg = (char *)plugin_tilde_search_plugin(x, x->plugin_label);
+	    if(dll_arg != NULL){
+		x->dll_arg = (char *)malloc((strlen(dll_arg) + 1) * 
+			sizeof(char));
+		strcpy(x->dll_arg, dll_arg);
+	    }
 	}
-		
+
 #if DEBUG
 	post("plugin library = %s", x->dll_arg);
 	post("plugin name = %s", x->plugin_label);
 #endif
-				
+	
 	if(x->dll_arg != NULL){
-		x->dll_handle = loadLADSPAPluginLibrary(x->dll_arg);
-		x->dll_path = (char *)x->dll_arg;
+	    x->dll_handle = loadLADSPAPluginLibrary(x->dll_arg);
+	    x->dll_path = (char *)x->dll_arg;
 	}
+
 
 	if (x->dll_handle != NULL){
+	    tmpstr = (char *)malloc((strlen(x->dll_arg) + 1) * sizeof(char));
+	    strcpy(tmpstr, x->dll_arg);  
+	    if(strstr(tmpstr, ".so")){
+		dll_name = strtok((char *)tmpstr, "/");
+		while(strstr(dll_name, ".so") == NULL)
+		    dll_name = strtok(NULL, "/");
+		x->dll_name = (char *)malloc(sizeof(char) * 
+			(strlen(dll_name) + 1)); 
+		strcpy(x->dll_name, dll_name);  
+#if DEBUG	
+		post("library name = %s", x->dll_name);
+#endif
+		free(tmpstr);
+	    }
+	    else{
+		post("Invalid library name; must end in .so");
+		return (void *) x;
+	    }
+	    if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->dll_handle,			"dssi_descriptor")){
+		x->is_DSSI = 1;
+		x->descriptor = (DSSI_Descriptor *)x->desc_func(0);
+	    }
+	    else if(x->desc_func = 
+		    (DSSI_Descriptor_Function)dlsym(x->dll_handle,						"ladspa_descriptor")){
+		x->is_DSSI = 0;
+		x->descriptor = 
+		    ladspa_to_dssi((LADSPA_Descriptor *)
+			    x->desc_func(0));
+	    }
+
+
+	    if(argc >= 2)
+		x->n_instances = (t_int)argv[1].a_w.w_float;
+	    else
+		x->n_instances = 1;
+
+	    x->instances = (t_dssi_instance *)malloc(sizeof(t_dssi_instance) * 
+		    x->n_instances);
+
+	    if(x->descriptor){
+#if DEBUG
+		post("%s loaded successfully!", 
+			x->descriptor->LADSPA_Plugin->Label);
+#endif
+
+		/*allocate memory for port_info*/
+
+		x->port_info = (t_port_info *)malloc
+		    (x->descriptor->LADSPA_Plugin->PortCount * 
+		     sizeof(t_port_info));
+
+		dssi_tilde_port_info(x);
+		dssi_tilde_assign_ports(x);
+		for(i = 0; i < x->n_instances; i++){
+		    x->instanceHandles[i] = x->descriptor->LADSPA_Plugin->instantiate(x->descriptor->LADSPA_Plugin, x->sr);
+		    if (!x->instanceHandles[i]){
+			post("instantiation of instance %d failed", i);
+			stop = 1;
+			break;
+		    }
+		}
 		pthread_mutex_init(&x->midiEventBufferMutex, NULL);
-		
-		x->sr = (t_int)sys_getsr();
-		x->sr_inv = 1 / (t_float)x->sr;
-#if DEBUG
-	post("sr_inv = %.6f", x->sr_inv);
-#endif
-		if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->dll_handle,			"dssi_descriptor")){
-			x->is_DSSI = 1;
-			x->descriptor = (DSSI_Descriptor *)x->desc_func(0);
-		}
-		else if(x->desc_func = 
-				(DSSI_Descriptor_Function)dlsym(x->dll_handle,						"ladspa_descriptor")){
-			x->is_DSSI = 0;
-			x->descriptor = 
-				ladspa_to_dssi((LADSPA_Descriptor *)
-						x->desc_func(0));
-		}
-	
-		
-		x->time_ref = (t_int)clock_getlogicaltime;
-		x->blksize = sys_getblksize();
-		x->ports_in = x->ports_out = x->ports_controlIn = x->ports_controlOut = 0;
-		
-		
-		x->dll_name = (char *)malloc(sizeof(char) * 8);/* HARD CODED! */
-		sprintf(x->dll_name, "%s", "plugin");       /* for now - Fix! */
-		
-		if(argc >= 2)
-			x->n_instances = (t_int)argv[1].a_w.w_float;
-		else
-			x->n_instances = 1;
-		
-		x->instances = (t_dssi_instance *)malloc(sizeof(t_dssi_instance) * 
-			x->n_instances);
-
-		if(x->descriptor){
-#if DEBUG
-			post("%s loaded successfully!", 
-					x->descriptor->LADSPA_Plugin->Label);
-#endif
-			
-			/*allocate memory for port_info*/
-
-			x->port_info = (t_port_info *)malloc
-				(x->descriptor->LADSPA_Plugin->PortCount * 
-				sizeof(t_port_info));
-
-			dssi_tilde_port_info(x);
-			dssi_tilde_assign_ports(x);
-			for(i = 0; i < x->n_instances; i++){
-				x->instanceHandles[i] = x->descriptor->LADSPA_Plugin->instantiate(x->descriptor->LADSPA_Plugin, x->sr);
-				if (!x->instanceHandles[i]){
-					post("instantiation of instance %d failed", i);
-					stop = 1;
-					break;
-				}
-			}
-			if(!stop){
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_initialize(x, i);
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_connect_ports(x, i); 
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_osc_setup(x, i);
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_activate(x, i);
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_init_programs(x, i);
+		if(!stop){
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_initialize(x, i);
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_connect_ports(x, i); 
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_osc_setup(x, i);
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_activate(x, i);
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_init_programs(x, i);
 #if LOADGUI
-				for(i = 0;i < x->n_instances; i++)
-					dssi_tilde_load_gui(x, i);
+		    for(i = 0;i < x->n_instances; i++)
+			dssi_tilde_load_gui(x, i);
 #endif
-				x->control_outlet =
-				     outlet_new (&x->x_obj, gensym("control"));
-
-				for(i = 0;i < x->plugin_outs; i++)
-					outlet_new(&x->x_obj, &s_signal);
-					
-				
-				x->outlets = 
-					(t_float **)calloc(x->plugin_outs, 
-						sizeof(t_float *));
-				
-				for(i = 0;i < x->plugin_ins; i++)
-					inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
-				x->inlets = 
-					(t_float **)calloc(x->plugin_ins, 
-						sizeof(t_float *));
-			}
 		}
-
+	    }
 	}
-
 	else
-		post("unknown error");
+	    post("Error: plugin not loaded");
     }
     else
 	post("No arguments given, please supply a path");
+
+    x->control_outlet =
+	outlet_new (&x->x_obj, gensym("control"));
+
+    if(x->plugin_outs){
+	for(i = 0;i < x->plugin_outs; i++)
+	    outlet_new(&x->x_obj, &s_signal);
+	x->outlets = 
+	    (t_float **)calloc(x->plugin_outs, 
+			       sizeof(t_float *));
+    }
+    if(x->plugin_ins){
+	for(i = 0;i < x->plugin_ins; i++)
+	    inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
+	x->inlets = 
+	    (t_float **)calloc(x->plugin_ins, 
+			       sizeof(t_float *));
+    }
+    
     return (void *)x;
 }
 
 static void dssi_tilde_free(t_dssi_tilde *x){
 
-	t_int i;
-	
+    t_int i;
+
 #if DEBUG
-			  post("Calling dssi_tilde_free");
+    post("Calling dssi_tilde_free");
 #endif
-	
-	  t_int instance;
-	  for(instance = 0; instance < x->n_instances; instance++) {
-		if(x->instances[instance].uiTarget && x->is_DSSI){
-			lo_send(x->instances[instance].uiTarget, 
-				x->instances[instance].ui_osc_quit_path, "");
-			lo_address_free(x->instances[instance].uiTarget);
-			x->instances[instance].uiTarget = NULL;
-		}
-		/* no -- see comment in osc_exiting_handler */
-		/* if (!instances[i].inactive) { */
-		    if (x->descriptor->LADSPA_Plugin->deactivate) {
-			x->descriptor->LADSPA_Plugin->deactivate
-			    (x->instanceHandles[instance]);
-		    }
-		/* } */
-		if (x->descriptor->LADSPA_Plugin &&
-		    x->descriptor->LADSPA_Plugin->cleanup) {
-		    x->descriptor->LADSPA_Plugin->cleanup
-			(x->instanceHandles[instance]);
-		}
+
+    t_int instance;
+    for(instance = 0; instance < x->n_instances; instance++) {
+	if(x->instances[instance].uiTarget && x->is_DSSI){
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_quit_path, "");
+	    lo_address_free(x->instances[instance].uiTarget);
+	    x->instances[instance].uiTarget = NULL;
+	}
+	/* no -- see comment in osc_exiting_handler */
+	/* if (!instances[i].inactive) { */
+	if (x->descriptor->LADSPA_Plugin->deactivate) {
+	    x->descriptor->LADSPA_Plugin->deactivate
+		(x->instanceHandles[instance]);
+	}
+	/* } */
+	if (x->descriptor->LADSPA_Plugin &&
+		x->descriptor->LADSPA_Plugin->cleanup) {
+	    x->descriptor->LADSPA_Plugin->cleanup
+		(x->instanceHandles[instance]);
+	}
+    }
+
+    if(x->dll_arg != NULL)
+	free((char *)x->dll_arg);
+    
+    if(x->plugin_label != NULL)
+	free((char *)x->plugin_label);
+    
+    if(x->dll_handle){ 
+	instance = x->n_instances;
+	free((LADSPA_Handle)x->instanceHandles);
+	free(x->plugin_ControlInPortNumbers); 
+	free((t_float *)x->plugin_InputBuffers);
+	free(x->instanceEventCounts);
+	free(x->plugin_ControlDataInput);
+	free(x->plugin_ControlDataOutput);
+
+	while(instance--){
+
+	    if(x->instances[instance].gui_pid){
+#if DEBUG
+		post("Freeing GUI process PID = %d", x->instances[instance].gui_pid);
+#endif
+		kill(x->instances[instance].gui_pid, SIGKILL);
+	    } 
+	    if (x->instances[instance].pluginPrograms) {
+		for (i = 0; i < 
+			x->instances[instance].plugin_ProgramCount; i++)
+		    free((void *)
+			    x->instances[instance].pluginPrograms[i].Name);
+		free((char *)x->instances[instance].pluginPrograms);
+		x->instances[instance].pluginPrograms = NULL;
+		x->instances[instance].plugin_ProgramCount = 0;
 	    }
-
-		
-	 if(x->dll_handle){ 
-		instance = x->n_instances;
-		free((LADSPA_Handle)x->instanceHandles);
-		  free(x->plugin_ControlInPortNumbers); 
-		  free((t_float *)x->plugin_InputBuffers);
-		  free(x->instanceEventCounts);
-		  free(x->plugin_ControlDataInput);
-		  free(x->plugin_ControlDataOutput);
-
-		  while(instance--){
-
-			if(x->instances[instance].gui_pid){
-#if DEBUG
-			  post("Freeing GUI process PID = %d", x->instances[instance].gui_pid);
-#endif
-				kill(x->instances[instance].gui_pid, SIGKILL);
-			} 
-			if (x->instances[instance].pluginPrograms) {
-				for (i = 0; i < 
-			   x->instances[instance].plugin_ProgramCount; i++)
-					free((void *)
-				  x->instances[instance].pluginPrograms[i].Name);
-				free((char *)x->instances[instance].pluginPrograms);
-				x->instances[instance].pluginPrograms = NULL;
-				x->instances[instance].plugin_ProgramCount = 0;
-			 }
-			if(x->plugin_outs)
-			  free(x->plugin_OutputBuffers[instance]);
-			  free(x->instanceEventBuffers[instance]);
-			  free(x->instances[instance].ui_osc_control_path);
-			  free(x->instances[instance].ui_osc_configure_path);
-			  free(x->instances[instance].ui_osc_program_path);
-			  free(x->instances[instance].ui_osc_show_path);
-			  free(x->instances[instance].ui_osc_hide_path);
-			  free(x->instances[instance].ui_osc_quit_path);
-			  free(x->instances[instance].osc_url_path);
-			  free(x->instances[instance].plugin_PortControlInNumbers);
-		  }
-		  free((t_float *)x->plugin_OutputBuffers);
-		  free((snd_seq_event_t *)x->instanceEventBuffers);
-		  free(x->instances);
-		  free(x->dir);
-		  free((t_float *)x->outlets);
-		  free(x->osc_url_base);
-		  free(x->dll_name);
-		  free(x->port_info);
-		  dssi_tilde_configure_buffer_free(x);
+	    if(x->plugin_outs)
+		free(x->plugin_OutputBuffers[instance]);
+	    free(x->instanceEventBuffers[instance]);
+	    free(x->instances[instance].ui_osc_control_path);
+	    free(x->instances[instance].ui_osc_configure_path);
+	    free(x->instances[instance].ui_osc_program_path);
+	    free(x->instances[instance].ui_osc_show_path);
+	    free(x->instances[instance].ui_osc_hide_path);
+	    free(x->instances[instance].ui_osc_quit_path);
+	    free(x->instances[instance].osc_url_path);
+	    free(x->instances[instance].plugin_PortControlInNumbers);
+	}
+	free((t_float *)x->plugin_OutputBuffers);
+	free((snd_seq_event_t *)x->instanceEventBuffers);
+	free(x->instances);
+	free(x->project_dir);
+	free((t_float *)x->outlets);
+	free(x->osc_url_base);
+	free(x->dll_name);
+	free(x->port_info);
+	dssi_tilde_configure_buffer_free(x);
 	/*	  free(x->configure_buffer_head);*/
 	/*	  free(x->dll_path);*/
-	 }
-	
+    }
+
 }
 
-
 void dssi_tilde_setup(void) {
-	
-	dssi_tilde_class = class_new(gensym("dssi~"), (t_newmethod)dssi_tilde_new,(t_method)dssi_tilde_free, sizeof(t_dssi_tilde), 0, A_GIMME, 0);
-	class_addlist(dssi_tilde_class, dssi_tilde_list);
-	class_addbang(dssi_tilde_class, dssi_bang);
-	class_addmethod(dssi_tilde_class, 
-			(t_method)dssi_tilde_dsp, gensym("dsp"), 0);
-	class_addmethod(dssi_tilde_class, (t_method)dssi_tilde_dssi_methods, 
-			gensym("dssi"), A_GIMME, 0);
-	class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_control, gensym ("control"),A_DEFSYM, A_DEFFLOAT, A_DEFFLOAT, 0);
-	class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_info,gensym ("info"),0);
-	class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_list_plugins,gensym ("listplugins"),0);
-	class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_reset,gensym ("reset"), A_DEFFLOAT, 0);
-  	class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
-  CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde,f);
+
+    dssi_tilde_class = class_new(gensym("dssi~"), (t_newmethod)dssi_tilde_new,
+	    (t_method)dssi_tilde_free, sizeof(t_dssi_tilde), 0, A_GIMME, 0);
+    class_addlist(dssi_tilde_class, dssi_tilde_list);
+    class_addbang(dssi_tilde_class, dssi_bang);
+    class_addmethod(dssi_tilde_class, 
+	    (t_method)dssi_tilde_dsp, gensym("dsp"), 0);
+    class_addmethod(dssi_tilde_class, (t_method)dssi_tilde_dssi_methods, 
+	    gensym("dssi"), A_GIMME, 0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_control, 
+	    gensym ("control"),A_DEFSYM, A_DEFFLOAT, A_DEFFLOAT, 0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_info,
+	    gensym ("info"),0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_list_plugins,
+	    gensym ("listplugins"),0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_reset,
+	    gensym ("reset"), A_DEFFLOAT, 0);
+/*    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug,
+	    gensym ("plug"),A_DEFSYM,0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_active,
+	    gensym ("active"),A_DEFFLOAT,0);*/
+    class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
+    CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde, f);
 }
 
 static int osc_message_handler(const char *path, const char *types, 
-		lo_arg **argv,int argc, void *data, void *user_data)
+	lo_arg **argv,int argc, void *data, void *user_data)
 {
 #if DEBUG
-	post("osc_message_handler active");
+    post("osc_message_handler active");
 #endif
     int i, instance = 0;
     const char *method;
-	char chantemp[2];
-	t_dssi_tilde *x = (t_dssi_tilde *)(user_data);
-	
+    char chantemp[2];
+    t_dssi_tilde *x = (t_dssi_tilde *)(user_data);
+
     if (strncmp(path, "/dssi/", 6)){
 #if DEBUG
-		post("calling osc_debug_handler"); 
+	post("calling osc_debug_handler"); 
 #endif
-        return osc_debug_handler(path, types, argv, argc, data, x);
+	return osc_debug_handler(path, types, argv, argc, data, x);
+    }
+    for (i = 0; i < x->n_instances; i++) {
+	if (!strncmp(path + 6, x->instances[i].osc_url_path,
+		    strlen(x->instances[i].osc_url_path))) {
+	    instance = i;
+	    break;
 	}
-	for (i = 0; i < x->n_instances; i++) {
-		if (!strncmp(path + 6, x->instances[i].osc_url_path,
-					 strlen(x->instances[i].osc_url_path))) {
-			instance = i;
-			break;
-		}
-	}
+    }
 #if DEBUG
-	for(i = 0; i < argc; i++){
-		post("got osc request %c from instance %d, path: %s", 
-			types[i],instance,path);
-	}
+    for(i = 0; i < argc; i++){
+	post("got osc request %c from instance %d, path: %s", 
+		types[i],instance,path);
+    }
 #endif
-	
+
     if (!x->instances[instance].osc_url_path){
 #if DEBUG
-		post("calling osc_debug_handler"); 
+	post("calling osc_debug_handler"); 
 #endif
-        return osc_debug_handler(path, types, argv, argc, data, x);
-	}
+	return osc_debug_handler(path, types, argv, argc, data, x);
+    }
     method = path + 6 + strlen(x->instances[instance].osc_url_path);
     if (*method != '/' || *(method + 1) == 0){
 #if DEBUG
-		post("calling osc_debug_handler"); 
+	post("calling osc_debug_handler"); 
 #endif
-        return osc_debug_handler(path, types, argv, argc, data, x);
-	}
+	return osc_debug_handler(path, types, argv, argc, data, x);
+    }
     method++;
 
     if (!strcmp(method, "configure") && argc == 2 && !strcmp(types, "ss")) {
 
 #if DEBUG
-		post("calling osc_configure_handler");
+	post("calling osc_configure_handler");
 #endif
-        return osc_configure_handler(x, argv, instance);
+	return osc_configure_handler(x, argv, instance);
 
     } else if (!strcmp(method, "control") && argc == 2 && !strcmp(types, "if")) {
 #if DEBUG
-		post("calling osc_control_handler");
+	post("calling osc_control_handler");
 #endif
-        return osc_control_handler(x, argv, instance);
-	}
+	return osc_control_handler(x, argv, instance);
+    }
 
-     else if (!strcmp(method, "midi") && argc == 1 && !strcmp(types, "m")) {
-		
+    else if (!strcmp(method, "midi") && argc == 1 && !strcmp(types, "m")) {
+
 #if DEBUG
-		post("calling osc_midi_handler");
+	post("calling osc_midi_handler");
 #endif
-        return osc_midi_handler(x, argv, instance);
+	return osc_midi_handler(x, argv, instance);
 
     } else if (!strcmp(method, "program") && argc == 2 && !strcmp(types, "ii")){
 #if DEBUG
-		post("calling osc_program_handler"); 
+	post("calling osc_program_handler"); 
 #endif
-        return osc_program_handler(x, argv, instance);
+	return osc_program_handler(x, argv, instance);
 
     } else if (!strcmp(method, "update") && argc == 1 && !strcmp(types, "s")){
 #if DEBUG
-		post("calling osc_update_handler"); 
+	post("calling osc_update_handler"); 
 #endif
-        return osc_update_handler(x, argv, instance);
-	
+	return osc_update_handler(x, argv, instance);
 
     } else if (!strcmp(method, "exiting") && argc == 0) {
 
-        return osc_exiting_handler(x, argv, instance);
+	return osc_exiting_handler(x, argv, instance);
     }
 
     return osc_debug_handler(path, types, argv, argc, data, x);
