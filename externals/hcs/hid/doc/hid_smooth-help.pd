@@ -13,7 +13,7 @@
 -1 -1 16509 1;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_smooth] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X obj 102 221 hid_smooth;
 #X text 18 36 Smooths a stream of numbers using weighted averaging
 of the last 10 values. This object is an shortcut for [hid_average]

@@ -16,7 +16,7 @@
 -1 -1 0 1;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_average] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X obj 101 221 hid_average;
 #X text 18 36 Smooths a stream of numbers using weighted averaging.
 By default \, the average is the last 10 values. You can set this using

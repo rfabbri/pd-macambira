@@ -119,7 +119,7 @@
 ;
 #X text 228 436 released under the GNU GPL;
 #X text 424 436 $Author: eighthave $;
-#X text 424 423 $Revision: 1.12 $;
+#X text 424 423 $Revision: 1.13 $;
 #X obj 466 382 pddp_open all_about_hid;
 #X text 357 383 For more info:;
 #X obj 601 334 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
@@ -132,7 +132,7 @@ in each axis to calibrate it.;
 #X text 13 111 turn on polling:;
 #X msg 180 146 refresh;
 #X obj 130 171 mouse 0;
-#X obj 619 3 pddp;
+#X msg 619 3 pddp;
 #X msg 500 148 open \$1;
 #X obj 500 128 hradio 15 1 1 8 \$0-device-number empty choose_a_device
 0 -6 1 9 -262144 -1 -1 4;

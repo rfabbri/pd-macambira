@@ -1,0 +1,14 @@
+Right now, [hid] basically outputs events in response to the OS.  It polls the
+event queue at a given frequency and processes everything in the queue on each
+cycle.  This means that the data stream is a bit erratic.
+
+The first part of the question is whether [hid] should output everything it
+finds in the event queue, or just the most recent event.
+
+- buttons output every event, since its state change (on/off) triggers something.
+
+- For absolute axes, it probably should just output the most recent event per
+  poll, since absolute axes are position, and its not really necessary to know
+  how many events there were between [hid] polls, just the position where it
+  ended up.
+

@@ -35,7 +35,7 @@
 ;
 #X text 218 426 released under the GNU GPL;
 #X text 414 426 $Author: eighthave $;
-#X text 414 413 $Revision: 1.10 $;
+#X text 414 413 $Revision: 1.11 $;
 #X obj 239 375 pddp_open all_about_hid;
 #X text 130 376 For more info:;
 #X floatatom 245 234 5 0 0 3 hat0X - -;
@@ -99,7 +99,7 @@ btn_8 btn_9;
 #X obj 440 92 tgl 25 0 empty empty empty 0 -6 0 8 -225271 -1 -1 0 1
 ;
 #X text 333 73 Select your device and turn on to make noise:;
-#X obj 619 3 pddp;
+#X msg 619 3 pddp;
 #X msg 503 125 open \$1;
 #X obj 503 105 hradio 15 1 1 8 \$0-device-number empty choose_a_device
 0 -6 1 9 -262144 -1 -1 2;

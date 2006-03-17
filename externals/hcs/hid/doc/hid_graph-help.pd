@@ -1,7 +1,7 @@
 #N canvas 61 248 495 470 10;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_graph] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 27 410 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 424 released under the GNU GPL;

@@ -1,7 +1,7 @@
 #N canvas 147 313 467 307 10;
 #X obj 5 2 cnv 15 450 20 empty empty [rad2hid] 2 11 1 18 -233017 -66577
 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 254 269 released under the GNU GPL;
 #X text 185 228 For more info:;
 #X obj 289 226 pddp_open all_about_hid_mapping;

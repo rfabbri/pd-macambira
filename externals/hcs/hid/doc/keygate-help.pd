@@ -24,7 +24,7 @@ inlet takes the data to be gated.;
 #X text 18 89 The "f" key on the any keyboard controls this gate:;
 #X text 310 263 <-- key released;
 #X text 41 264 key pressed -->;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X connect 2 0 3 0;
 #X connect 3 0 4 0;
 #X connect 4 0 14 0;

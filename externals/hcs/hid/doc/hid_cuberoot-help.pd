@@ -1,7 +1,7 @@
 #N canvas 416 140 464 319 10;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_cuberoot] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 27 280 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 294 released under the GNU GPL;

@@ -1,7 +1,7 @@
 #N canvas 56 302 475 480 10;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_spiral] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 245 451 released under the GNU GPL;
 #X floatatom 70 288 5 0 0 0 - - -;
 #X floatatom 70 375 5 0 0 0 radius-> - -;

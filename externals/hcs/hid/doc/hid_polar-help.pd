@@ -1,7 +1,7 @@
 #N canvas 601 232 482 455 10;
 #X obj 5 2 cnv 15 450 20 empty empty [hid_polar] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 244 411 released under the GNU GPL;
 #X floatatom 100 248 5 0 0 0 - - -;
 #X floatatom 100 335 7 0 0 0 radius-> - -;
