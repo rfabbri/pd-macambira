@@ -106,8 +106,8 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb iemabs iemlib \
-iemmatrix loaders markex maxlib mjlib motex oscx pddp pdogg pmpd \
+LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hardware iemabs iemlib \
+iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd \
 sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
@@ -115,7 +115,8 @@ ifeq ($(OS_NAME),windows)
   LIB_TARGETS += 
 else
   ifeq ($(OS_NAME),darwin)
-    LIB_TARGETS += hid pdp 
+    LIB_TARGETS += hid
+#    LIB_TARGETS += hid pdp
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip
@@ -510,8 +511,9 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # HARDWARE
 HARDWARE_NAME=hardware
-HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.c) \
-$(wildcard $(externals_src)/hardware/*/*.cpp)
+HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp)
+# multio.c requires libusb, so don't include it yet...  <hans@at.or.at>
+#$(wildcard $(externals_src)/hardware/*/*.c)
 hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
 
 hardware_install: hardware
@@ -709,9 +711,41 @@ loaders_clean:
 
 
 #------------------------------------------------------------------------------#
+# MAPPING
+MAPPING_NAME=mapping
+MAPPING_OBJECTS := $(wildcard $(externals_src)/mapping/src/*.c)
+mapping: $(MAPPING_OBJECTS:.c=.$(EXTENSION))
+
+mapping_install: mapping
+	install -d $(objectsdir)/$(MAPPING_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(MAPPING_NAME) \
+		--author "Cyrille Henry and Hans-Christoph Steiner" \
+		--description "objects for mapping data to control" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAPPING_NAME)
+	install -p $(externals_src)/mapping/*.pd $(objectsdir)/$(MAPPING_NAME)
+	install -d $(helpdir)/$(MAPPING_NAME)
+	install -p $(externals_src)/mapping/help/*.pd \
+		$(helpdir)/$(MAPPING_NAME)
+	install -d $(manualsdir)/$(MAPPING_NAME)
+	install -p $(externals_src)/mapping/README.txt \
+		$(manualsdir)/$(MAPPING_NAME)/README.txt
+	install -d $(examplesdir)/$(MAPPING_NAME)
+	install -p $(externals_src)/mapping/examples/*.pd \
+		$(examplesdir)/$(MAPPING_NAME)
+
+mapping_clean:
+	-rm -f -- $(externals_src)/mapping/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/mapping/src/*.o
+	-rm -f -- $(externals_src)/mapping/*.bak
+	-rm -f -- $(externals_src)/mapping/*.*~
+
+
+#------------------------------------------------------------------------------#
 # MARKEX
 MARKEX_NAME=markex
-MARKEX_OBJECTS := $(wildcard $(externals_src)/markex/*.c)
+MARKEX_OBJECTS := $(wildcard $(externals_src)/markex/[a-z]*.c)
 markex: $(MARKEX_OBJECTS:.c=.$(EXTENSION))
 
 markex_install: markex

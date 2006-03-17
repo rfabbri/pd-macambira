@@ -1,8 +1,5 @@
 
-- try compiling with as many warnings as possible  Currently, this is the
-  setup:	-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wno-shadow
-
-- fix PDP inclusion. it seems to get skipped on Darwin.  maybe with ifeq(windows...
+- make iemlibs into libdir for backwards compatibility
 
 - make C++ compile targets (packages/darwin_app/Makefile has some)
 
@@ -19,7 +16,6 @@
 
 - put objects with conflicting names into a directory namespace
 
-  		maxlib/scale
 		Gem/scale
 		iem/prepend
 		flext/prepend
