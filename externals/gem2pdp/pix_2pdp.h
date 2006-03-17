@@ -36,6 +36,11 @@ class GEM_EXTERN pix_2pdp : public GemPixObj
     // pdp processing
     virtual void bangMess(void);
     
+    // altivec processing
+#ifdef __VEC__
+    virtual void YUV422_to_YV12_altivec(short*pY, short*pY2, short*pU, short*pV, size_t psize);
+#endif
+
     // the pixBlock with the current image
     unsigned char *gem_image;
     int gem_xsize;
