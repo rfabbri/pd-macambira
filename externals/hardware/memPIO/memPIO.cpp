@@ -18,6 +18,9 @@
  * copyleft:forum::für::umläute:2004
  */
 
+/* This only works on Microsoft Windows */
+#ifdef _WIN32
+
 #include <conio.h>
 
 #include "m_pd.h"
@@ -185,3 +188,5 @@ void memPIO_setup(void)
 
   class_addbang(memPIO_class, (t_method)memPIO_bang);
 }
+
+#endif /* _WIN32 */
