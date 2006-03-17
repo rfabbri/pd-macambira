@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LIBS="Gem cyclone zexy cxc ext13 iemabs iemmatrix markex maxlib memento mjlib motex oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap xsample"
+LIBS="Gem cyclone zexy cxc ext13 fftease hid iemabs iemmatrix liblist list-abs mapping markex maxlib memento mjlib motex oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vasp vbap xsample"
 
 
 ROOT_DIR=~/cvs/pure-data/packages
@@ -33,6 +33,11 @@ function print_windows ()
 	 echo "\"loadlib$1\"=\"$2\"" >> $WINDOWS_FILE
 }
 
+function print_windows_delete ()
+{
+	 echo "\"${1}${2}\"=\"-\"" >> $WINDOWS_FILE
+}
+
 
 i=1
 for lib in $LIBS; do
@@ -42,5 +47,20 @@ for lib in $LIBS; do
 	 ((++i)) 
 done
 echo " "
+
+# print lines to delete existing loadlib flags
+echo "; delete any previous loadlib flags" >> $WINDOWS_FILE
+while [ $i -lt 50 ]; do
+	 print_windows_delete loadlib $i
+	 ((++i)) 
+done
+
+i=1
+# print lines to delete existing path flags
+echo "; delete all existing path flags" >> $WINDOWS_FILE
+while [ $i -lt 50 ]; do
+	 print_windows_delete path $i
+	 ((++i)) 
+done
 
 echo -e $MACOSX_FOOTER >> $MACOSX_FILE
