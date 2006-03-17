@@ -1,7 +1,7 @@
 #N canvas 256 153 461 330 10;
 #X obj 5 2 cnv 15 450 20 empty empty [blocksize_in_ms] 2 11 1 18 -233017
 -66577 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X text 27 270 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 244 284 released under the GNU GPL;

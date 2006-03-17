@@ -1,7 +1,7 @@
 #N canvas 65 227 466 251 10;
 #X obj 5 2 cnv 15 450 20 empty empty [pi] 2 11 1 18 -233017 -66577
 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X obj 142 149 pi;
 #X floatatom 143 192 11 0 0 0 - - -;
 #X msg 142 106 bang;

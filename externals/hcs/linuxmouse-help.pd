@@ -21,7 +21,7 @@ screen size.;
 #X msg 147 122 open;
 #X msg 152 142 open /dev/input/event1;
 #X text 183 123 opens the previous device;
-#X obj 419 10 pddp;
+#X msg 419 10 pddp;
 #X text 178 417 For more info on HIDs:;
 #X text 10 441 by Hans-Christoph Steiner <hans@at.or.at>;
 #X obj 340 417 pddp_open all_about_hid;

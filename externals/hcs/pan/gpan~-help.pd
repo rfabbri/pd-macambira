@@ -5,7 +5,7 @@
 #X obj 129 246 dac~;
 #X obj 5 2 cnv 15 450 20 empty empty [gpan~] 2 11 1 18 -233017 -66577
 0;
-#X obj 422 3 pddp;
+#X msg 422 3 pddp;
 #X msg 190 101 0;
 #X msg 239 101 0.5;
 #X msg 284 101 1;
