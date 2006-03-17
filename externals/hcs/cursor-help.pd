@@ -1,0 +1,17 @@
+#N canvas 0 22 454 304 10;
+#X msg 178 124 start;
+#X msg 227 124 stop;
+#X obj 142 123 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 157 151 cursor 80 80;
+#X floatatom 99 242 5 0 0 0 - - -;
+#X floatatom 239 242 5 0 0 0 - - -;
+#X obj 131 258 print LEFT;
+#X obj 226 265 print RIGHT;
+#X connect 0 0 3 0;
+#X connect 1 0 3 0;
+#X connect 2 0 3 0;
+#X connect 3 0 4 0;
+#X connect 3 0 6 0;
+#X connect 3 1 5 0;
+#X connect 3 1 7 0;
