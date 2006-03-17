@@ -1,5 +1,5 @@
-#N canvas 556 82 592 566 10;
-#X obj -77 536 pddp;
+#N canvas 556 82 596 570 10;
+#X msg -77 536 pddp;
 #X obj -173 4 cnv 15 90 553 empty empty empty 20 12 0 14 -233017 -66577
 0;
 #N canvas 316 127 613 636 More_Info 0;
@@ -188,7 +188,7 @@ in order to create a stereo effect.;
 #X text 17 39 - size of the room to be simulated (default=0.85);
 #X text -29 537 Hans-Christoph Steiner 2005 \, based on Olaf Matthes'
 Max help;
-#X obj 98 310 pddp_dsp;
+#X obj 98 310 pddp/dsp;
 #X connect 14 0 15 0;
 #X connect 14 0 19 0;
 #X connect 15 0 16 0;
