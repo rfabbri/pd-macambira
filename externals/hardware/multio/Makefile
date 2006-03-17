@@ -3,6 +3,8 @@ CSYM=multio
 
 current: pd_linux
 
+pd_src = ../../../pd
+
 # ----------------------- NT -----------------------
 
 pd_nt: $(NAME).dll
@@ -39,7 +41,7 @@ LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer -fPIC \
     -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch $(CFLAGS)
 
-LINUXINCLUDE =  -I../../src
+LINUXINCLUDE =  -I../../src -I$(pd_src)/src
 
 .c.pd_linux:
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
@@ -53,12 +55,15 @@ pd_darwin: $(NAME).pd_darwin
 
 .SUFFIXES: .pd_darwin
 
-DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+DARWINCFLAGS = -DPD -O2 -Wall -W
+
+DARWININCLUDE =  -I../../src -I$(pd_src)/src -I/sw/include
+DARWINLIBS = -L/sw/lib -lusb
 
 .c.pd_darwin:
-	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
-	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $*.o -c $*.c
+	$(CC) -bundle -bundle_loader $(pd_src)/bin/pd $(DARWINLIBS) \
+		-o $*.pd_darwin $*.o 
 	rm -f $*.o
 
 # ----------------------------------------------------------

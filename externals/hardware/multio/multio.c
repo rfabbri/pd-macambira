@@ -9,9 +9,9 @@ output is a list of 2 floats (channel, value)
 
 
 */
-#ifdef NT
+#ifdef _WIN32
 #include <windows.h>
-#endif
+#endif /* _WIN32 */
 
 #include "m_pd.h"
 #include "usb.h"
@@ -83,9 +83,9 @@ static void *usb_read_thread(void *w)
 //				post("thread read %i bytes to buffer %i (now %i bytes)",bytesread, mybuf,x->buf_count[mybuf] );
 			}
 		}
-#ifdef NT
+#ifdef _WIN32
 		Sleep(1);
-#endif
+#endif /* _WIN32 */
 	}
 }
 
