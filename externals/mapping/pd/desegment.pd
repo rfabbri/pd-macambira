@@ -1,0 +1,14 @@
+#N canvas 410 221 692 329 10;
+#X obj 83 58 inlet;
+#X obj 75 266 outlet;
+#X obj 123 58 inlet;
+#X obj 163 58 inlet;
+#X obj 203 58 inlet;
+#X obj 243 58 inlet;
+#X obj 283 58 inlet;
+#X obj 323 58 inlet;
+#X obj 363 58 inlet;
+#X obj 403 58 inlet;
+#X obj 443 58 inlet;
+#X obj 483 58 inlet;
+#X obj 523 58 inlet;
