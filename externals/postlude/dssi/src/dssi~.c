@@ -111,7 +111,7 @@ static DSSI_Descriptor * ladspa_to_dssi(
 	(LADSPA_Descriptor *)ladspaDesc;
     return (DSSI_Descriptor *)dssiDesc;
 }
-
+/*
 static void dssi_tilde_load_plugin(const char *dll_path, void **dll_handle){
 
     *dll_handle = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
@@ -122,7 +122,7 @@ static void dssi_tilde_load_plugin(const char *dll_path, void **dll_handle){
 	post("Failed: %s", dlerror());
 
 }
-
+*/
 static void dssi_tilde_port_info(t_dssi_tilde *x){
     t_int i;
 
@@ -252,7 +252,7 @@ static void dssi_tilde_assign_ports(t_dssi_tilde *x){
 
 }
 
-static void dssi_tilde_initialize(t_dssi_tilde *x, t_int instance){
+static void dssi_tilde_init_instance(t_dssi_tilde *x, t_int instance){
 
     x->instances[instance].pluginPrograms = NULL;
     x->instances[instance].currentBank = 0;
@@ -271,6 +271,7 @@ static void dssi_tilde_initialize(t_dssi_tilde *x, t_int instance){
     x->instances[instance].pendingBankLSB = -1;
     x->instances[instance].ui_hidden = 1;
     x->instances[instance].ui_show = 0;
+    x->instances[instance].gui_pid = 0;
 #if DEBUG		
     post("Instance %d initialized!", instance);
 #endif
@@ -530,8 +531,9 @@ static void dssi_tilde_set_control_input_by_index (t_dssi_tilde *x,
     /* set the appropriate control port value */
     x->plugin_ControlDataInput[portno] = value;
 
-    lo_send(x->instances[instance].uiTarget, 
-	    x->instances[instance].ui_osc_control_path, "if", port, value);
+    if(x->is_DSSI)
+	lo_send(x->instances[instance].uiTarget, 
+		x->instances[instance].ui_osc_control_path, "if", port, value);
 }
 
 static void dssi_tilde_set_control_input_by_name (t_dssi_tilde *x,
@@ -737,6 +739,21 @@ static int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
     return 1;
 }
 
+static void dssi_tilde_get_current_program(t_dssi_tilde *x, int instance){
+    int i;
+    t_atom argv[2];
+    
+    argv[0].a_type = A_FLOAT;
+    argv[1].a_type = A_SYMBOL;
+    i = x->instances[instance].currentProgram;
+    
+    argv[0].a_w.w_float = x->instances[instance].pluginPrograms[i].Program;
+    argv[1].a_w.w_symbol = 
+	gensym ((char*)x->instances[instance].pluginPrograms[i].Name); 
+    outlet_anything (x->control_outlet, gensym ("program"), 2, argv);
+
+}
+
 static void dssi_tilde_program_change(t_dssi_tilde *x, int instance){
     /* jack-dssi-host queues program changes by using  pending program change variables. In the audio callback, if a program change is received via MIDI it over writes the pending value (if any) set by the GUI. If unset, or processed the value will default back to -1. The following call to select_program is then made. I don't think it eventually needs to be done this way - i.e. do we need 'pending'? */ 
 #if DEBUG
@@ -776,6 +793,7 @@ static void dssi_tilde_program_change(t_dssi_tilde *x, int instance){
 	x->instances[instance].pendingBankMSB = -1;
 	x->instances[instance].pendingBankLSB = -1;
     }
+    dssi_tilde_get_current_program(x, instance);
 }
 
 static int osc_program_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
@@ -1269,7 +1287,7 @@ static char *dssi_tilde_send_configure(t_dssi_tilde *x, char *key,
     debug =   x->descriptor->configure(
 	    x->instanceHandles[instance], 
 	    key, value);
-    if(x->instances[instance].uiTarget != NULL)
+    if(x->instances[instance].uiTarget != NULL && x->is_DSSI)
 	lo_send(x->instances[instance].uiTarget, 
 		x->instances[instance].ui_osc_configure_path,
 		"ss", key, value);
@@ -1466,6 +1484,7 @@ static const char* plugin_tilde_search_plugin (t_dssi_tilde *x,
 }
 
 static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv) {
+    if(x->is_DSSI){
     char *msg_type, *debug, *filename, *key, *value;
     msg_type = (char *)malloc(TYPE_STRING_SIZE);
     int instance = -1, pathlen, toggle; 
@@ -1704,6 +1723,9 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 #endif
     free(msg_type);
     free(patchbuf);
+    }
+    else
+	post("dssi~: plugin is not a DSSI plugin, operation not supported");
     return 0;
 
 }
@@ -1719,91 +1741,93 @@ static t_int *dssi_tilde_perform(t_int *w)
     t_dssi_tilde *x = (t_dssi_tilde *)(w[2]);
     int i, n, timediff, framediff, instance = 0; 
 
-    for(i = 0; i < x->plugin_ins; i++)
-	memcpy(x->plugin_InputBuffers[i], x->inlets[i], N * 
-		sizeof(LADSPA_Data));
+    if(x->dsp){
 
-    for (i = 0; i < x->n_instances; i++)
-	x->instanceEventCounts[i] = 0;
+	for(i = 0; i < x->plugin_ins; i++)
+	    memcpy(x->plugin_InputBuffers[i], x->inlets[i], N * 
+		    sizeof(LADSPA_Data));
 
-    for (;x->bufReadIndex != x->bufWriteIndex; x->bufReadIndex = 
-	    (x->bufReadIndex + 1) % EVENT_BUFSIZE) {
+	for (i = 0; i < x->n_instances; i++)
+	    x->instanceEventCounts[i] = 0;
 
-	instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
-	/*This should never happen, but check anyway*/
-	if(instance > x->n_instances || instance < 0){
-	    post(
-		    "%s: discarding spurious MIDI data, for instance %d", 
+	for (;x->bufReadIndex != x->bufWriteIndex; x->bufReadIndex = 
+		(x->bufReadIndex + 1) % EVENT_BUFSIZE) {
+
+	    instance = x->midiEventBuf[x->bufReadIndex].data.note.channel;
+	    /*This should never happen, but check anyway*/
+	    if(instance > x->n_instances || instance < 0){
+		post(
+			"%s: discarding spurious MIDI data, for instance %d", 
+			x->descriptor->LADSPA_Plugin->Label, 
+			instance);
+#if DEBUG
+		post("n_instances = %d", x->n_instances);
+#endif
+		continue;
+	    }
+
+	    if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
+		post("MIDI overflow on channel %d", instance);
+		continue;
+	    }
+
+	    timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
+		x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
+	    framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
+
+	    if (framediff >= N || framediff < 0) 
+		x->midiEventBuf[x->bufReadIndex].time.tick = 0;
+	    else
+		x->midiEventBuf[x->bufReadIndex].time.tick = 
+		    N - framediff - 1;
+
+	    x->instanceEventBuffers[instance]
+		[x->instanceEventCounts[instance]] = 
+		x->midiEventBuf[x->bufReadIndex];
+#if DEBUG
+	    post("%s, note received on channel %d", 
 		    x->descriptor->LADSPA_Plugin->Label, 
-		    instance);
-#if DEBUG
-	    post("n_instances = %d", x->n_instances);
+		    x->instanceEventBuffers[instance]
+		    [x->instanceEventCounts[instance]].data.note.channel);
 #endif
-	    continue;
+	    x->instanceEventCounts[instance]++; 
+
+#if DEBUG
+	    post("Instance event count for instance %d of %d: %d\n",
+		    instance + 1, x->n_instances, x->instanceEventCounts[instance]);
+#endif
+
 	}
 
-	if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
-	    post("MIDI overflow on channel %d", instance);
-	    continue;
+	i = 0;
+	while(i < x->n_instances){
+	    if(x->instanceHandles[i] && 
+		    x->descriptor->run_multiple_synths){
+		x->descriptor->run_multiple_synths
+		    (x->n_instances, x->instanceHandles, 
+		     (unsigned long)N, x->instanceEventBuffers,
+		     &x->instanceEventCounts[0]);
+		break; 
+	    }
+	    else if (x->instanceHandles[i] && 
+		    x->descriptor->run_synth){
+		x->descriptor->run_synth(x->instanceHandles[i], 
+			(unsigned long)N, x->instanceEventBuffers[i],
+			x->instanceEventCounts[i]); 
+		i++;
+	    }
+	    else if (x->instanceHandles[i] && 
+		    x->descriptor->LADSPA_Plugin->run){
+		x->descriptor->LADSPA_Plugin->run
+		    (x->instanceHandles[i], N);
+		i++;
+	    }
 	}
 
-	timediff = (t_int)(clock_gettimesince(x->time_ref) * 1000) - 
-	    x->midiEventBuf[x->bufReadIndex].time.time.tv_nsec;
-	framediff = (t_int)((t_float)timediff * .000001 / x->sr_inv); 
-
-	if (framediff >= N || framediff < 0) 
-	    x->midiEventBuf[x->bufReadIndex].time.tick = 0;
-	else
-	    x->midiEventBuf[x->bufReadIndex].time.tick = 
-		N - framediff - 1;
-
-	x->instanceEventBuffers[instance]
-	    [x->instanceEventCounts[instance]] = 
-	    x->midiEventBuf[x->bufReadIndex];
-#if DEBUG
-	post("%s, note received on channel %d", 
-		x->descriptor->LADSPA_Plugin->Label, 
-		x->instanceEventBuffers[instance]
-		[x->instanceEventCounts[instance]].data.note.channel);
-#endif
-	x->instanceEventCounts[instance]++; 
-
-#if DEBUG
-	post("Instance event count for instance %d of %d: %d\n",
-		instance + 1, x->n_instances, x->instanceEventCounts[instance]);
-#endif
-
+	for(i = 0; i < x->plugin_outs; i++)
+	    memcpy(x->outlets[i], x->plugin_OutputBuffers[i], N * 
+		    sizeof(LADSPA_Data));
     }
-
-    i = 0;
-    while(i < x->n_instances){
-	if(x->instanceHandles[i] && 
-		x->descriptor->run_multiple_synths){
-	    x->descriptor->run_multiple_synths
-		(x->n_instances, x->instanceHandles, 
-		 (unsigned long)N, x->instanceEventBuffers,
-		 &x->instanceEventCounts[0]);
-	    break; 
-	}
-	else if (x->instanceHandles[i] && 
-		x->descriptor->run_synth){
-	    x->descriptor->run_synth(x->instanceHandles[i], 
-		    (unsigned long)N, x->instanceEventBuffers[i],
-		    x->instanceEventCounts[i]); 
-	    i++;
-	}
-	else if (x->instanceHandles[i] && 
-		x->descriptor->LADSPA_Plugin->run){
-	    x->descriptor->LADSPA_Plugin->run
-		(x->instanceHandles[i], N);
-	    i++;
-	}
-    }
-
-    for(i = 0; i < x->plugin_outs; i++)
-	memcpy(x->outlets[i], x->plugin_OutputBuffers[i], N * 
-		sizeof(LADSPA_Data));
-
     return (w+3);
 }
 
@@ -1811,8 +1835,8 @@ static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 {
     if(x->n_instances){
 	int n, m;
-	t_float **outlets = x->outlets;
-	t_float **inlets = x->inlets;
+	t_float **outlets = (t_float **)x->outlets;
+	t_float **inlets = (t_float **)x->inlets;
 
 	m = 1;	
 
@@ -1825,22 +1849,102 @@ static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 
 }
 
-static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
+static void dssi_tilde_quit_plugin(t_dssi_tilde *x){
 
-    int i,
-	stop;
-    char *tmpstr,
-	 *argstr,
-	 *dll_arg,
-	 *dll_name,
-	 *plugin_label;
-    
-    stop = 0;
-    tmpstr = argstr = dll_name = dll_arg = NULL;
-    
-    t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
-    post("==============================\ndssi~ %.2f\n a DSSI/LADSPA host for Pure Data\n==============================", VERSION);
-    
+    t_int i, instance;
+    for(instance = 0; instance < x->n_instances; instance++) {
+	if(x->instances[instance].uiTarget && x->is_DSSI){
+	    lo_send(x->instances[instance].uiTarget, 
+		    x->instances[instance].ui_osc_quit_path, "");
+	    lo_address_free(x->instances[instance].uiTarget);
+	    x->instances[instance].uiTarget = NULL;
+	}
+	/* no -- see comment in osc_exiting_handler */
+	/* if (!instances[i].inactive) { */
+	if (x->descriptor->LADSPA_Plugin->deactivate) {
+	    x->descriptor->LADSPA_Plugin->deactivate
+		(x->instanceHandles[instance]);
+	}
+	/* } */
+	if (x->descriptor->LADSPA_Plugin &&
+		x->descriptor->LADSPA_Plugin->cleanup) {
+	    x->descriptor->LADSPA_Plugin->cleanup
+		(x->instanceHandles[instance]);
+	}
+    }
+}
+
+static void dssi_tilde_free_plugin(t_dssi_tilde *x){
+
+    t_int i, instance;
+    if(x->dll_arg != NULL)
+	free((char *)x->dll_arg);
+    if(x->plugin_label != NULL)
+	free((char *)x->plugin_label);
+    if(x->dll_handle != NULL){
+	instance = x->n_instances;
+	free((LADSPA_Handle)x->instanceHandles);
+	free(x->plugin_ControlInPortNumbers); 
+	free((t_float *)x->plugin_InputBuffers);
+	free(x->instanceEventCounts);
+	free(x->plugin_ControlDataInput);
+	free(x->plugin_ControlDataOutput);
+
+	while(instance--){
+
+	    if(x->instances[instance].gui_pid){
+#if DEBUG
+		post("Killing GUI process PID = %d", x->instances[instance].gui_pid);
+#endif
+		kill(x->instances[instance].gui_pid, SIGKILL);
+	    } 
+	    if (x->instances[instance].pluginPrograms) {
+		for (i = 0; i < 
+			x->instances[instance].plugin_ProgramCount; i++)
+		    free((void *)
+			    x->instances[instance].pluginPrograms[i].Name);
+		free((char *)x->instances[instance].pluginPrograms);
+		x->instances[instance].pluginPrograms = NULL;
+		x->instances[instance].plugin_ProgramCount = 0;
+	    }
+	    free(x->instanceEventBuffers[instance]);
+	    if(x->is_DSSI){
+		free(x->instances[instance].ui_osc_control_path);
+		free(x->instances[instance].ui_osc_configure_path);
+		free(x->instances[instance].ui_osc_program_path);
+		free(x->instances[instance].ui_osc_show_path);
+		free(x->instances[instance].ui_osc_hide_path);
+		free(x->instances[instance].ui_osc_quit_path);
+		free(x->instances[instance].osc_url_path);
+	    }
+	    free(x->instances[instance].plugin_PortControlInNumbers);
+	    if(x->plugin_outs)
+		free(x->plugin_OutputBuffers[instance]);
+	}
+	if(x->is_DSSI){	
+	    if(x->project_dir != NULL)
+		free(x->project_dir);
+	    free(x->osc_url_base);
+	    dssi_tilde_configure_buffer_free(x);
+	}
+	free((snd_seq_event_t *)x->instanceEventBuffers);
+	free(x->instances);
+	free((t_float *)x->plugin_OutputBuffers);
+
+	/* Have a little nap so PD can catch up */
+	/*sleep(1);*/
+	for(i = 0; i < x->plugin_outs; i++)
+	    outlet_free(x->outlets[i]);
+	for(i = 0; i < x->plugin_ins; i++)
+	    inlet_free(x->inlets[i]);
+	outlet_free(x->control_outlet);
+	free(x->dll_name);
+	free(x->port_info);
+    }
+}
+
+static void dssi_tilde_init_plugin(t_dssi_tilde *x){
+ 
     x->project_dir = NULL;
     x->configure_buffer_head = NULL;
     x->outlets = NULL;
@@ -1850,17 +1954,42 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     x->dll_path = NULL;
     x->dll_arg = NULL;
     x->plugin_label = NULL;
-    x->sr = (t_int)sys_getsr();
-    x->sr_inv = 1 / (t_float)x->sr;
-    x->time_ref = (t_int)clock_getlogicaltime;
-    x->blksize = sys_getblksize();
+    x->dll_name = NULL;
+    x->osc_url_base = NULL;
+    x->plugin_ControlDataInput = x->plugin_ControlDataOutput = NULL;
+    x->plugin_InputBuffers = x->plugin_OutputBuffers = NULL;
+    x->plugin_ControlInPortNumbers = NULL;
+    x->port_info = NULL;
+    x->descriptor = NULL;
+    x->instanceEventCounts = NULL;
+    x->instances = NULL;
+    x->instanceHandles = NULL;
+    x->is_DSSI = 0;
+    x->n_instances = 0;
+    x->dsp = 0;
+    x->plugin_ins = x->plugin_outs = 
+	x->plugin_controlIns = x->plugin_controlOuts = 0;
     x->ports_in = x->ports_out = x->ports_controlIn = x->ports_controlOut = 0;
     x->bufWriteIndex = x->bufReadIndex = 0;
-    x->n_instances = 0; 
 
-    
-    
+}
+
+static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
+    char *tmpstr,
+	 *argstr,
+	 *dll_arg,
+	 *dll_name,
+	 *plugin_label;
+#if DEBUG
+    post("argc = %d", argc);
+#endif
+    int i,
+	stop;
+
+    stop = 0;
+
     if (argc){
+	tmpstr = argstr = dll_name = dll_arg = NULL;
 	argstr = (char *)malloc((strlen(argv[0].a_w.w_symbol->s_name) + 1) * 
 		sizeof(char));
 	strcpy(argstr, argv[0].a_w.w_symbol->s_name);
@@ -1884,17 +2013,15 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 		strcpy(x->dll_arg, dll_arg);
 	    }
 	}
-
 #if DEBUG
 	post("plugin library = %s", x->dll_arg);
 	post("plugin name = %s", x->plugin_label);
 #endif
-	
+
 	if(x->dll_arg != NULL){
 	    x->dll_handle = loadLADSPAPluginLibrary(x->dll_arg);
 	    x->dll_path = (char *)x->dll_arg;
 	}
-
 
 	if (x->dll_handle != NULL){
 	    tmpstr = (char *)malloc((strlen(x->dll_arg) + 1) * sizeof(char));
@@ -1933,6 +2060,10 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 	    else
 		x->n_instances = 1;
 
+
+#if DEBUG
+	    post("n_instances = %d", x->n_instances);
+#endif
 	    x->instances = (t_dssi_instance *)malloc(sizeof(t_dssi_instance) * 
 		    x->n_instances);
 
@@ -1951,29 +2082,31 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
 		dssi_tilde_port_info(x);
 		dssi_tilde_assign_ports(x);
 		for(i = 0; i < x->n_instances; i++){
-		    x->instanceHandles[i] = x->descriptor->LADSPA_Plugin->instantiate(x->descriptor->LADSPA_Plugin, x->sr);
+		    x->instanceHandles[i] = 
+			x->descriptor->LADSPA_Plugin->
+			instantiate(x->descriptor->LADSPA_Plugin, x->sr);
 		    if (!x->instanceHandles[i]){
 			post("instantiation of instance %d failed", i);
 			stop = 1;
 			break;
 		    }
 		}
-		pthread_mutex_init(&x->midiEventBufferMutex, NULL);
 		if(!stop){
 		    for(i = 0;i < x->n_instances; i++)
-			dssi_tilde_initialize(x, i);
+			dssi_tilde_init_instance(x, i);
 		    for(i = 0;i < x->n_instances; i++)
 			dssi_tilde_connect_ports(x, i); 
 		    for(i = 0;i < x->n_instances; i++)
-			dssi_tilde_osc_setup(x, i);
-		    for(i = 0;i < x->n_instances; i++)
 			dssi_tilde_activate(x, i);
-		    for(i = 0;i < x->n_instances; i++)
-			dssi_tilde_init_programs(x, i);
+		    if(x->is_DSSI)
+			for(i = 0;i < x->n_instances; i++)
+			    dssi_tilde_osc_setup(x, i);
 #if LOADGUI
-		    for(i = 0;i < x->n_instances; i++)
-			dssi_tilde_load_gui(x, i);
+			for(i = 0;i < x->n_instances; i++)
+			    dssi_tilde_load_gui(x, i);
 #endif
+			for(i = 0;i < x->n_instances; i++)
+			    dssi_tilde_init_programs(x, i);
 		}
 	    }
 	}
@@ -1986,111 +2119,66 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     x->control_outlet =
 	outlet_new (&x->x_obj, gensym("control"));
 
-    if(x->plugin_outs){
-	for(i = 0;i < x->plugin_outs; i++)
-	    outlet_new(&x->x_obj, &s_signal);
-	x->outlets = 
-	    (t_float **)calloc(x->plugin_outs, 
-			       sizeof(t_float *));
+    if (x->dll_handle != NULL){
+	if(x->plugin_outs){
+	    x->outlets = (t_outlet **)getbytes(x->plugin_outs * sizeof(t_outlet *)); 
+	    for(i = 0;i < x->plugin_outs; i++)
+		x->outlets[i] = outlet_new(&x->x_obj, &s_signal);
+	    /*	x->outlets = 
+		(t_float **)calloc(x->plugin_outs, 
+		sizeof(t_float *));
+		*/}
+	    if(x->plugin_ins){
+		x->inlets = (t_inlet **)getbytes(x->plugin_ins * sizeof(t_inlet *)); 
+		for(i = 0;i < x->plugin_ins; i++)
+		    x->inlets[i] = inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
+		/*	x->inlets = 
+			(t_float **)calloc(x->plugin_ins, 
+			sizeof(t_float *));
+			*/}
+
+		post("dssi~: ready for input");
+		x->dsp = 1;
     }
-    if(x->plugin_ins){
-	for(i = 0;i < x->plugin_ins; i++)
-	    inlet_new(&x->x_obj, &x->x_obj.ob_pd,						&s_signal, &s_signal);
-	x->inlets = 
-	    (t_float **)calloc(x->plugin_ins, 
-			       sizeof(t_float *));
-    }
+    return (void *)x;    
+}
+
+static void dssi_tilde_plug_plugin(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv){
     
-    return (void *)x;
+    x->dsp = 0;
+    dssi_tilde_quit_plugin(x);
+    dssi_tilde_free_plugin(x);
+    dssi_tilde_init_plugin(x);
+    dssi_tilde_load_plugin(x, argc, argv);
+    
+}
+
+static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
+    
+    t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
+    post("==============================\ndssi~ %.2f\n a DSSI/LADSPA host for Pure Data\n==============================", VERSION);
+      
+    dssi_tilde_init_plugin(x);
+    
+    x->sr = (t_int)sys_getsr();
+    x->sr_inv = 1 / (t_float)x->sr;
+    x->time_ref = (t_int)clock_getlogicaltime;
+    x->blksize = sys_getblksize();
+ 
+    pthread_mutex_init(&x->midiEventBufferMutex, NULL);
+    return dssi_tilde_load_plugin(x, argc, argv);
+    
 }
 
 static void dssi_tilde_free(t_dssi_tilde *x){
-
-    t_int i;
 
 #if DEBUG
     post("Calling dssi_tilde_free");
 #endif
 
-    t_int instance;
-    for(instance = 0; instance < x->n_instances; instance++) {
-	if(x->instances[instance].uiTarget && x->is_DSSI){
-	    lo_send(x->instances[instance].uiTarget, 
-		    x->instances[instance].ui_osc_quit_path, "");
-	    lo_address_free(x->instances[instance].uiTarget);
-	    x->instances[instance].uiTarget = NULL;
-	}
-	/* no -- see comment in osc_exiting_handler */
-	/* if (!instances[i].inactive) { */
-	if (x->descriptor->LADSPA_Plugin->deactivate) {
-	    x->descriptor->LADSPA_Plugin->deactivate
-		(x->instanceHandles[instance]);
-	}
-	/* } */
-	if (x->descriptor->LADSPA_Plugin &&
-		x->descriptor->LADSPA_Plugin->cleanup) {
-	    x->descriptor->LADSPA_Plugin->cleanup
-		(x->instanceHandles[instance]);
-	}
-    }
-
-    if(x->dll_arg != NULL)
-	free((char *)x->dll_arg);
+    dssi_tilde_quit_plugin(x);
+    dssi_tilde_free_plugin(x);
     
-    if(x->plugin_label != NULL)
-	free((char *)x->plugin_label);
-    
-    if(x->dll_handle){ 
-	instance = x->n_instances;
-	free((LADSPA_Handle)x->instanceHandles);
-	free(x->plugin_ControlInPortNumbers); 
-	free((t_float *)x->plugin_InputBuffers);
-	free(x->instanceEventCounts);
-	free(x->plugin_ControlDataInput);
-	free(x->plugin_ControlDataOutput);
-
-	while(instance--){
-
-	    if(x->instances[instance].gui_pid){
-#if DEBUG
-		post("Freeing GUI process PID = %d", x->instances[instance].gui_pid);
-#endif
-		kill(x->instances[instance].gui_pid, SIGKILL);
-	    } 
-	    if (x->instances[instance].pluginPrograms) {
-		for (i = 0; i < 
-			x->instances[instance].plugin_ProgramCount; i++)
-		    free((void *)
-			    x->instances[instance].pluginPrograms[i].Name);
-		free((char *)x->instances[instance].pluginPrograms);
-		x->instances[instance].pluginPrograms = NULL;
-		x->instances[instance].plugin_ProgramCount = 0;
-	    }
-	    if(x->plugin_outs)
-		free(x->plugin_OutputBuffers[instance]);
-	    free(x->instanceEventBuffers[instance]);
-	    free(x->instances[instance].ui_osc_control_path);
-	    free(x->instances[instance].ui_osc_configure_path);
-	    free(x->instances[instance].ui_osc_program_path);
-	    free(x->instances[instance].ui_osc_show_path);
-	    free(x->instances[instance].ui_osc_hide_path);
-	    free(x->instances[instance].ui_osc_quit_path);
-	    free(x->instances[instance].osc_url_path);
-	    free(x->instances[instance].plugin_PortControlInNumbers);
-	}
-	free((t_float *)x->plugin_OutputBuffers);
-	free((snd_seq_event_t *)x->instanceEventBuffers);
-	free(x->instances);
-	free(x->project_dir);
-	free((t_float *)x->outlets);
-	free(x->osc_url_base);
-	free(x->dll_name);
-	free(x->port_info);
-	dssi_tilde_configure_buffer_free(x);
-	/*	  free(x->configure_buffer_head);*/
-	/*	  free(x->dll_path);*/
-    }
-
 }
 
 void dssi_tilde_setup(void) {
@@ -2111,8 +2199,8 @@ void dssi_tilde_setup(void) {
 	    gensym ("listplugins"),0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_reset,
 	    gensym ("reset"), A_DEFFLOAT, 0);
-/*    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug,
-	    gensym ("plug"),A_DEFSYM,0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
+	    gensym ("plug"),A_GIMME,0);/*
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_active,
 	    gensym ("active"),A_DEFFLOAT,0);*/
     class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));

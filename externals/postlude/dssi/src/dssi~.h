@@ -52,7 +52,7 @@
 #define ASCII_b 98
 
 #define LOADGUI 1 /* FIX: depracate this */
-#define DEBUG 1
+#define DEBUG 0
 #ifdef DEBUG
 	#define CHECKSUM_PATCH_FILES_ON_LOAD 1
 #endif
@@ -118,11 +118,11 @@ typedef struct _port_info {
 typedef struct _dssi_tilde {
   t_object  x_obj;
   t_int is_DSSI;
-  const char *dll_arg,  /*arg given by user - either path or dll name*/
-       	     *plugin_label;
+  char *dll_arg,  /*arg given by user - either path or dll name*/
+       	*plugin_label;
   char	     *dll_path; /*absolute path to plugin */
   void *dll_handle;
-  char *dir; /* project dircetory */
+  char *project_dir; /* project dircetory */
   LADSPA_Handle *instanceHandles; /*was handle*/
   t_dssi_instance *instances; 
   int n_instances;
@@ -160,10 +160,13 @@ pthread_mutex_t midiEventBufferMutex;
   t_int blksize;
   t_float f;
   
-  t_float **outlets, **inlets;
+  t_outlet **outlets; 
+  t_inlet **inlets;
   t_outlet *control_outlet;
 
   t_dssi_configure_pair *configure_buffer_head;
+
+  t_int dsp; /* boolean dsp setting */
   
 } t_dssi_tilde;
 

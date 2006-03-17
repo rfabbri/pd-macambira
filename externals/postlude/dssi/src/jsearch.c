@@ -37,7 +37,7 @@ LADSPADirectoryPluginSearch (const char * pcDirectory,
   long iNeedSlash;
   struct dirent * psDirectoryEntry;
   void * pvPluginHandle;
-  int is_DSSI;
+  int is_DSSI = 0;
 
   lDirLength = strlen(pcDirectory);
   if (!lDirLength)

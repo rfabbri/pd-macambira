@@ -14,12 +14,12 @@ pd_linux: src/$(NAME).pd_linux
 
 .SUFFIXES: .pd_linux
 
-#LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
+LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
 # Debug
-LINUXCFLAGS = -ggdb -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
+#LINUXCFLAGS = -ggdb -g -DPD -O0 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
