@@ -4,9 +4,6 @@ current: darwin_app
 # turn on weak linking and dlopen support
 export MACOSX_DEPLOYMENT_TARGET = 10.3
 
-# needed to support weak linking of frameworks
-#MAKE = MACOSX_DEPLOYMENT_TARGET=10.3 make
-
 CWD := $(shell pwd)
 BUILD_BASE = $(CWD)/build
 PD_APP_NAME = $(PACKAGE_NAME)
@@ -224,11 +221,11 @@ darwin_app_clean:
 		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
 
 
-
-
-
-
-
+#==============================================================================#
+#
+## TEST TARGETS
+#
+#==============================================================================#
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
@@ -248,96 +245,4 @@ test_locations:
 	@echo "HELPDIR  $(helpdir)"
 	@echo "MANUALSDIR  $(manualsdir)"
 	@echo "EXAMPLESDIR  $(examplesdir)"
-
-
-
-#==============================================================================#
-#
-## DEPRECATED TARGETS
-#
-#==============================================================================#
-
-darwin_app_externals_flext_clean:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) flext_clean"
-
-
-darwin_app_externals_flext:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) flext_install"
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) flext_install
-
-
-darwin_app_noncvs:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) noncvs_install"
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) noncvs_install
-
-darwin_app_externals_gem_clean:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) gem_clean"
-
-darwin_app_externals_gem:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) gem_install"
-
-darwin_app_externals_standard_clean:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) externals_clean"
-
-darwin_pd_clean:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(packages_src) && $(MAKE) pd_clean"
-
-darwin_app_externals:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(externals_src) && $(MAKE) install"
-
-darwin_app_externals_standard:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(externals_src) && $(MAKE) install"
-
-darwin_patch_pd:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd .. && $(MAKE) patch_pd"
-
-darwin_unpatch_pd:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd .. && $(MAKE) unpatch_pd"
-
-darwin_app_docs:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd $(doc_src) && $(MAKE) install"
-
-darwin_app_license:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd .. && $(MAKE) license"
-
-darwin_app_welcome:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd .. && $(MAKE) welcome"
-
-darwin_app_readme:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "cd .. && $(MAKE) readme"
-
-darwin_prebuilt_app:
-	@echo " "
-	@echo "Deprecated!!" 
-	@echo "Use make extended_app_install"
 

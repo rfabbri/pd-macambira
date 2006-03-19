@@ -13,6 +13,9 @@ cvs_root_dir = $(CWD)/..
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
+# turn on weak linking and dlopen support
+export MACOSX_DEPLOYMENT_TARGET = 10.3
+
 # default target
 default: all
 
@@ -116,7 +119,6 @@ ifeq ($(OS_NAME),windows)
 else
   ifeq ($(OS_NAME),darwin)
     LIB_TARGETS += hid
-#    LIB_TARGETS += hid pdp
   else
     # GNU/Linux, BSD, IRIX, etc.
     LIB_TARGETS += hid pdp pidip
@@ -551,8 +553,10 @@ ifeq ($(OS_NAME),windows)
 else
   ifeq ($(OS_NAME),darwin)
     FRAMEWORKS = Carbon IOKit ForceFeedback
-	HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
-    HID_LIBS = $(LIBS) -L$(externals_src)/hcs/hid/HID\ Utilities\ Source/build \
+    HID_CFLAGS = $(CFLAGS) -I$(externals_src)/hcs/hid/HID\ Utilities\ Source
+    HID_UTILITIES_SOURCE = $(externals_src)/hcs/hid/HID\ Utilities\ Source
+    HID_LIBS = $(LIBS) -L$(HID_UTILITIES_SOURCE)/build \
+       -L$(HID_UTILITIES_SOURCE)/build/Default \
        -lHIDUtilities $(patsubst %,-weak_framework %,$(FRAMEWORKS))
   else
     HID_CFLAGS = $(CFLAGS) 
@@ -565,7 +569,14 @@ HID_OBJECTS := $(patsubst %.c, $(externals_src)/hcs/hid/%.o, $(HID_SRC))
 $(HID_OBJECTS) : %.o : %.c
 	$(CC) $(HID_CFLAGS) -o "$*.o" -c "$*.c"
 
-$(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS)
+$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a:
+# Apple changed the XCode CLI tool's name in xcode2... arg
+	cd $(HID_UTILITIES_SOURCE) && \
+		(test -x /usr/bin/xcodebuild && /usr/bin/xcodebuild) || pbxbuild
+
+
+$(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
+$(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
 	$(CC) $(LDFLAGS) -o $(externals_src)/hcs/hid/hid.$(EXTENSION) \
 		$(HID_OBJECTS) $(HID_LIBS)
 	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
@@ -723,8 +734,9 @@ mapping_install: mapping
 		--description "objects for mapping data to control" \
 		--license "GNU GPL" \
 		--version ""
-	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAPPING_NAME)
-	install -p $(externals_src)/mapping/*.pd $(objectsdir)/$(MAPPING_NAME)
+# no compiled objects yet...
+#	install -p $(MAPPING_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(MAPPING_NAME)
+	install -p $(externals_src)/mapping/pd/*.pd $(objectsdir)/$(MAPPING_NAME)
 	install -d $(helpdir)/$(MAPPING_NAME)
 	install -p $(externals_src)/mapping/help/*.pd \
 		$(helpdir)/$(MAPPING_NAME)
@@ -732,8 +744,8 @@ mapping_install: mapping
 	install -p $(externals_src)/mapping/README.txt \
 		$(manualsdir)/$(MAPPING_NAME)/README.txt
 	install -d $(examplesdir)/$(MAPPING_NAME)
-	install -p $(externals_src)/mapping/examples/*.pd \
-		$(examplesdir)/$(MAPPING_NAME)
+#	install -p $(externals_src)/mapping/examples/*.pd \
+#		$(examplesdir)/$(MAPPING_NAME)
 
 mapping_clean:
 	-rm -f -- $(externals_src)/mapping/*.$(EXTENSION)

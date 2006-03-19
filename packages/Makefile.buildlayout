@@ -154,8 +154,8 @@ ifneq ($(PD_TEST_VERSION),)
 endif
 
 # release version for this distro
-PACKAGE_VERSION = extended-test1
-PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)
+PACKAGE_VERSION = extended-test2
+PACKAGE_NAME = Pd-$(PD_VERSION)
 
 
 
