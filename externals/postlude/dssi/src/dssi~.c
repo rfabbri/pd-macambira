@@ -526,8 +526,12 @@ static void dssi_tilde_set_control_input_by_index (t_dssi_tilde *x,
 
 #if DEBUG
     post("Global ctrl input number = %d", ctrl_input_index);
+    post("Global ctrl input value = %.2f", value);
 #endif   
 
+
+    
+    
     /* set the appropriate control port value */
     x->plugin_ControlDataInput[portno] = value;
 
@@ -1732,19 +1736,23 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 
 static void dssi_bang(t_dssi_tilde *x)
 {
-    post("Running instances of %s", x->descriptor->LADSPA_Plugin->Label);
+    post("dssi~: running %d instances of %s", x->n_instances,
+	    x->descriptor->LADSPA_Plugin->Label);
 }
 
 static t_int *dssi_tilde_perform(t_int *w)
 {
-    int N = (int)(w[1]);
-    t_dssi_tilde *x = (t_dssi_tilde *)(w[2]);
+    int N = (t_int)(w[2]);
+    t_dssi_tilde *x = (t_dssi_tilde *)(w[1]);
+    t_float **inputs = (t_float **)(&w[3]);
+    t_float **outputs = (t_float **)(&w[3] + x->plugin_ins);
     int i, n, timediff, framediff, instance = 0; 
-
+/*See comment for dssi_tilde_plug_plugin 
     if(x->dsp){
+	x->dsp_loop = 1;*/
 
 	for(i = 0; i < x->plugin_ins; i++)
-	    memcpy(x->plugin_InputBuffers[i], x->inlets[i], N * 
+	    memcpy(x->plugin_InputBuffers[i], inputs[i], N * 
 		    sizeof(LADSPA_Data));
 
 	for (i = 0; i < x->n_instances; i++)
@@ -1824,17 +1832,52 @@ static t_int *dssi_tilde_perform(t_int *w)
 	    }
 	}
 
+	
 	for(i = 0; i < x->plugin_outs; i++)
-	    memcpy(x->outlets[i], x->plugin_OutputBuffers[i], N * 
+	    memcpy(outputs[i], (t_float *)x->plugin_OutputBuffers[i], N * 
 		    sizeof(LADSPA_Data));
-    }
-    return (w+3);
+
+/*
+	for(i = 0; i < x->plugin_outs; i++)
+	    memcpy(x->outlets[i], (t_outlet *)x->plugin_OutputBuffers[i], N * 
+		    sizeof(LADSPA_Data));*/
+/*	x->dsp_loop = 0;
+    }*/ 
+    return w + (x->plugin_ins + x->plugin_outs + 3);
 }
 
 static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 {
     if(x->n_instances){
-	int n, m;
+
+
+	t_int *dsp_vector, i, N, M;
+
+	M = x->plugin_ins + x->plugin_outs + 2;
+
+	dsp_vector = (t_int *) getbytes(M * sizeof(t_int));
+
+	dsp_vector[0] = (t_int)x;
+	dsp_vector[1] = (t_int)sp[0]->s_n;
+
+	for(i = 2; i < M; i++)
+	    dsp_vector[i] = (t_int)sp[i - 1]->s_vec;
+	
+	dsp_addv(dssi_tilde_perform, M, dsp_vector);
+	
+	
+/*    int n, m;
+
+	t_float **outlets; 
+	t_float **inlets;
+    
+	for(n = 0, m = 1; n < x->plugin_ins; n++, m++)
+	    inlets[n] = sp[m]->s_vec;
+	for(n = 0; n < x->plugin_outs; n++, ++m)
+	    outlets[n] = sp[m]->s_vec;
+
+  */ /* 
+	
 	t_float **outlets = (t_float **)x->outlets;
 	t_float **inlets = (t_float **)x->inlets;
 
@@ -1844,8 +1887,8 @@ static void dssi_tilde_dsp(t_dssi_tilde *x, t_signal **sp)
 	    *inlets++ = sp[m++]->s_vec;
 	for(n = 0; n < x->plugin_outs; n++)
 	    *outlets++ = sp[m++]->s_vec;
-    }		
-    dsp_add(dssi_tilde_perform, 2, sp[0]->s_n, x);
+  */ }		
+   /* dsp_add(dssi_tilde_perform, 2, sp[0]->s_n, x); */
 
 }
 
@@ -1931,12 +1974,18 @@ static void dssi_tilde_free_plugin(t_dssi_tilde *x){
 	free(x->instances);
 	free((t_float *)x->plugin_OutputBuffers);
 
-	/* Have a little nap so PD can catch up */
 	/*sleep(1);*/
-	for(i = 0; i < x->plugin_outs; i++)
-	    outlet_free(x->outlets[i]);
-	for(i = 0; i < x->plugin_ins; i++)
-	    inlet_free(x->inlets[i]);
+	if(x->plugin_ins){
+	    for(i = 0; i < x->plugin_ins; i++)
+		inlet_free((t_inlet *)x->inlets[i]);
+	    freebytes(x->inlets, x->plugin_ins * sizeof(t_inlet *));
+	}
+
+	if(x->plugin_outs){
+	    for(i = 0; i < x->plugin_outs; i++)
+		outlet_free((t_outlet *)x->outlets[i]);
+	    freebytes(x->outlets, x->plugin_outs * sizeof(t_outlet *));
+	}
 	outlet_free(x->control_outlet);
 	free(x->dll_name);
 	free(x->port_info);
@@ -1967,6 +2016,7 @@ static void dssi_tilde_init_plugin(t_dssi_tilde *x){
     x->is_DSSI = 0;
     x->n_instances = 0;
     x->dsp = 0;
+    x->dsp_loop = 0;
     x->plugin_ins = x->plugin_outs = 
 	x->plugin_controlIns = x->plugin_controlOuts = 0;
     x->ports_in = x->ports_out = x->ports_controlIn = x->ports_controlOut = 0;
@@ -2138,18 +2188,30 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 			*/}
 
 		post("dssi~: ready for input");
-		x->dsp = 1;
     }
     return (void *)x;    
 }
 
+
+/* This method is currently disabled. PD's inlet/outlet handling seems buggy if you try to create ins/outs on the fly. Needs further investigation ...*/
 static void dssi_tilde_plug_plugin(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv){
     
     x->dsp = 0;
     dssi_tilde_quit_plugin(x);
-    dssi_tilde_free_plugin(x);
+    while(1){
+	if(!x->dsp_loop){
+	    dssi_tilde_free_plugin(x);
+	    break;
+	}
+    }
     dssi_tilde_init_plugin(x);
     dssi_tilde_load_plugin(x, argc, argv);
+    
+}
+
+static void dssi_tilde_activate_plugin(t_dssi_tilde *x){
+
+    x->dsp = 1;
     
 }
 
@@ -2199,9 +2261,9 @@ void dssi_tilde_setup(void) {
 	    gensym ("listplugins"),0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_reset,
 	    gensym ("reset"), A_DEFFLOAT, 0);
-    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
-	    gensym ("plug"),A_GIMME,0);/*
-    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_active,
+/*    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
+	    gensym ("plug"),A_GIMME,0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_activate_plugin,
 	    gensym ("active"),A_DEFFLOAT,0);*/
     class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
     CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde, f);
