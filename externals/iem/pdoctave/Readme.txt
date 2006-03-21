@@ -7,6 +7,20 @@ This idea was started approximately in February 2005.
 I want to appologize for the limited flexibility of the code at the moment. 
 That's why the use of this external is only recommended to developers.
 
+Following packages have to be installed:
+puredata (+sources)
+octave
+octave-headers
+
+Nice to have:
+bbogart's "entry" pd-external
+
+INSTALLING:
+please edit the linker parameters in "Makefile" to match your pd-sources paths
+type "make"
+TESTING:
+"pd -lib pdoctave test_pdoctave.pd"
+
 This code collection consists of four pd-objects:
 
 1. pdoctave: an object that calls octave and holds a pipe to its std in. this pipe can be acessed through the other pd-objects.
