@@ -6,7 +6,7 @@
  *  Based on code of gem2pdp by Yves Degoyon
  *  Many thanks to IOhannes M Zmölnig
  *
- *  Copyright (c) 2005 Georg Holzmann <grh@mur.at>
+ *  Copyright (c) 2005-06 Georg Holzmann <grh@mur.at>
  *
  */
 
@@ -14,6 +14,7 @@
 #define INCLUDE_PIX2PDP_H_
 
 #include "Base/GemPixObj.h"
+
 #include "pdp-light.h"
 
 class GEM_EXTERN pix_2pdp : public GemPixObj
@@ -35,11 +36,6 @@ class GEM_EXTERN pix_2pdp : public GemPixObj
     
     // pdp processing
     virtual void bangMess(void);
-    
-    // altivec processing
-#ifdef __VEC__
-    virtual void YUV422_to_YV12_altivec(short*pY, short*pY2, short*pU, short*pV, size_t psize);
-#endif
 
     // the pixBlock with the current image
     unsigned char *gem_image;

@@ -14,6 +14,8 @@
 #include "pix_2pdp.h"
 #include "yuv.h"
 
+//#define __TIMING__
+
 CPPEXTERN_NEW(pix_2pdp)
 
 pix_2pdp::pix_2pdp(void)
@@ -95,8 +97,13 @@ void pix_2pdp::bangMess()
         
       // YUV
       case GL_YUV422_GEM: {
+#ifdef __TIMING__
+	    UnsignedWide start, end;
+	    Microseconds(&start);
+#endif
+
 #ifdef __VEC__
- 		YUV422_to_YV12_altivec(pY, pY2, pV, pU, psize);
+ 		YUV422_to_YV12_altivec(pY, pY2, pV, pU, gem_image, gem_xsize, gem_ysize);
 #else
 	    int row=gem_ysize>>1;
 		int cols=gem_xsize>>1;
@@ -132,6 +139,11 @@ void pix_2pdp::bangMess()
                   pY += gem_xsize; pY2 += gem_xsize;
 		}
 #endif // __VEC__
+#ifdef __TIMING__
+	  Microseconds(&end);
+	  float seconds = (float)(end.lo - start.lo) / 1000000.f;
+	  post("UYVYtoYV12 frame time = %f", seconds);
+#endif
         pdp_packet_pass_if_valid(m_pdpoutlet, &m_packet0);
         } break;
       
@@ -159,78 +171,6 @@ void pix_2pdp::bangMess()
     }
   }
 }
-
-#ifdef __VEC__
-void pix_2pdp :: YUV422_to_YV12_altivec(short*pY, short*pY2, short*pU, short*pV, size_t psize)
-{
-  // UYVY UYVY UYVY UYVY
-  vector unsigned char *pixels1=(vector unsigned char *)gem_image;
-  vector unsigned char *pixels2=(vector unsigned char *)(gem_image+(gem_xsize*2));
-  // PDP packet to be filled:
-  // first Y plane
-  vector signed short *py1 = (vector signed short *)pY;
-  // 2nd Y pixel
-  vector signed short *py2 = (vector signed short *)pY2;
-  // U plane
-  vector signed short *pCr = (vector signed short *)pU;
-  // V plane
-  vector signed short *pCb = (vector signed short *)pV;
-  vector signed short uvSub = (vector signed short)( 128, 128, 128, 128,
-													 128, 128, 128, 128 );
-  vector signed short yShift = (vector signed short)( 7, 7, 7, 7, 7, 7, 7, 7 );
-  vector signed short uvShift = (vector signed short)( 8, 8, 8, 8, 8, 8, 8, 8 );
-  
-  vector signed short tempY1, tempY2, tempY3, tempY4,
-		tempUV1, tempUV2, tempUV3, tempUV4, tempUV5, tempUV6;
-
-  vector unsigned char uvPerm = (vector unsigned char)( 16, 0, 17, 4, 18,  8, 19, 12,   // u0..u3
-  														20, 2, 21, 6, 22, 10, 23, 14 ); // v0..v3
-
-  vector unsigned char uPerm = (vector unsigned char)( 0, 1, 2, 3, 4, 5, 6, 7, 
-													   16,17,18,19,20,21,22,23);
-  vector unsigned char vPerm = (vector unsigned char)( 8, 9, 10,11,12,13,14,15,
-													   24,25,26,27,28,29,30,31);
-  
-  vector unsigned char yPerm = (vector unsigned char)( 16, 1, 17,  3, 18,  5, 19,  7, // y0..y3
-													   20, 9, 21, 11, 23, 13, 25, 15);// y4..y7
-  vector unsigned char zeroVec = (vector unsigned char)(0);
-  
-  int row=gem_ysize>>1;
-  int cols=gem_xsize>>4;
-  
-  while(row--){
-    int col=cols;
-    while(col--){
-      tempUV1 = (vector signed short) vec_perm( *pixels1, zeroVec, uvPerm);
-      tempY1  = (vector signed short) vec_perm( *pixels1, zeroVec, yPerm);
-      tempY2  = (vector signed short) vec_perm( *pixels2, zeroVec, yPerm);
-	  pixels1++;pixels2++;
-      
-      tempUV2 = (vector signed short) vec_perm( *pixels1, zeroVec, uvPerm);
-      tempY3  = (vector signed short) vec_perm( *pixels1, zeroVec, yPerm);
-      tempY4  = (vector signed short) vec_perm( *pixels2, zeroVec, yPerm);
-	  pixels1++;pixels2++;
-  
-	  tempUV3 = vec_sub( tempUV1, uvSub );
-	  tempUV4 = vec_sub( tempUV2, uvSub );
-	  tempUV5 = vec_sl( tempUV3, uvShift );
-	  tempUV6 = vec_sl( tempUV4, uvShift );
-	  
-	  *pCb = vec_perm( tempUV5, tempUV6, uPerm );
-	  *pCr = vec_perm( tempUV5, tempUV6, vPerm );
-	  pCr++; pCb++;
-
-	  *py1++ = vec_sl( tempY1, yShift);
-      *py2++ = vec_sl( tempY2, yShift);
-      *py1++ = vec_sl( tempY3, yShift);
-      *py2++ = vec_sl( tempY4, yShift);      
-	}
-
-	py1+=(gem_xsize>>3); py2+=(gem_xsize>>3);
-	pixels1+=(gem_xsize*2)>>4; pixels2+=(gem_xsize*2)>>4;
-  }
-}
-#endif
 
 void pix_2pdp::obj_setupCallback(t_class *classPtr)
 {
