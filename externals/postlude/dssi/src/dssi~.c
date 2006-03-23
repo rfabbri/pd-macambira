@@ -352,7 +352,7 @@ static void dssi_tilde_activate(t_dssi_tilde *x, t_int instance){
 
 static void osc_error(int num, const char *msg, const char *where)
 {
-    post("osc error %d in path %s: %s\n",num, where, msg);
+    post("dssi~: osc error %d in path %s: %s\n",num, where, msg);
 }
 
 static void query_programs(t_dssi_tilde *x, t_int instance) {
@@ -510,7 +510,7 @@ static void dssi_tilde_set_control_input_by_index (t_dssi_tilde *x,
     long port, portno;
 
     if (ctrl_input_index >= x->plugin_controlIns) {
-	post("plugin~: control port number %d is out of range [1, %d]",
+	post("dssi~: control port number %d is out of range [1, %d]",
 		ctrl_input_index + 1, x->plugin_controlIns);
 	return;
     }
@@ -521,9 +521,14 @@ static void dssi_tilde_set_control_input_by_index (t_dssi_tilde *x,
 
     port = x->plugin_ControlInPortNumbers[ctrl_input_index];
 
-    portno = 
-	x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index + 1];
 
+    /* FIX - temporary hack */
+    if(x->is_DSSI)
+	portno = 
+	    x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index + 1];
+    else
+	portno = 
+	    x->instances[instance].plugin_PortControlInNumbers[ctrl_input_index];
 #if DEBUG
     post("Global ctrl input number = %d", ctrl_input_index);
     post("Global ctrl input value = %.2f", value);
@@ -601,7 +606,7 @@ static void dssi_tilde_control (t_dssi_tilde *x,
     int n_instances = x->n_instances;
 
     if (instance > x->n_instances || instance < 0){
-	post("dssi~: control: Invalid instance number");
+	post("dssi~: control: invalid instance number");
 	return;
     }
 
@@ -786,11 +791,14 @@ static void dssi_tilde_program_change(t_dssi_tilde *x, int instance){
 	if (x->instances[instance].uiNeedsProgramUpdate){
 #if DEBUG
 	    post("Updating GUI program");
-#endif 
-	    lo_send(x->instances[instance].uiTarget, 
-		    x->instances[instance].ui_osc_program_path, "ii", 
-		    x->instances[instance].currentBank, 
-		    x->instances[instance].currentProgram);
+#endif
+	    /* FIX - this is a hack to make text ui work*/
+	    if(x->instances[instance].uiTarget)
+		lo_send(x->instances[instance].uiTarget, 
+			x->instances[instance].ui_osc_program_path, "ii", 
+			x->instances[instance].currentBank, 
+			x->instances[instance].currentProgram);
+	    
 	}
 	x->instances[instance].uiNeedsProgramUpdate = 0;
 	x->instances[instance].pendingProgramChange = -1;
@@ -816,7 +824,7 @@ static int osc_program_handler(t_dssi_tilde *x, lo_arg **argv, int instance)
     for (i = 0; i < x->instances[instance].plugin_ProgramCount; ++i) {
 	if (x->instances[instance].pluginPrograms[i].Bank == bank &&
 		x->instances[instance].pluginPrograms[i].Program == program) {
-	    post("OSC: setting bank %u, program %u, name %s\n",
+	    post("dssi~: OSC: setting bank %u, program %u, name %s\n",
 		    bank, program, x->instances[instance].pluginPrograms[i].Name);
 
 	    found = 1;
@@ -1126,7 +1134,7 @@ static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
 #endif
 
     if(!(dp = opendir(gui_base))){
-	post("can't open %s, unable to find GUI", gui_base);
+	post("dssi~: can't open %s, unable to find GUI", gui_base);
 	return;
     }
     else {
@@ -1134,7 +1142,8 @@ static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
 	    if (dir_entry->d_name[0] == '.') continue;
 	    if (strchr(dir_entry->d_name, '_')){
 		if (strstr(dir_entry->d_name, "gtk") ||
-			strstr(dir_entry->d_name, "qt"))
+			strstr(dir_entry->d_name, "qt") || 
+			strstr(dir_entry->d_name, "text"))
 		    break;
 	    }
 	}
@@ -1160,7 +1169,7 @@ static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
     /*	char osc_url[1024];*/
     sprintf(osc_url, "%s/%s", x->osc_url_base, 
 	    x->instances[instance].osc_url_path);
-    post("Instance %d OSC URL is: %s",instance, osc_url);
+    post("dssi~: instance %d URL: %s",instance, osc_url);
 #if DEBUG
     post("Trying to open GUI!");
 #endif
@@ -1191,7 +1200,7 @@ static void dssi_tilde_load_gui(t_dssi_tilde *x, int instance){
 static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x){
 
     if(chan > x->n_instances - 1 || chan < 0){
-	post("Note discarded: MIDI data is destined for a channel that doesn't exist");
+	post("dssi~: note discarded: MIDI data is destined for a channel that doesn't exist");
 	return;
     }
 
@@ -1515,7 +1524,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 
 	if(!strcmp(msg_type, "load") && x->descriptor->configure){
 	    filename = argv[1].a_w.w_symbol->s_name;
-	    post("loading patch: %s for instance %d", filename, instance);
+	    post("dssi~: loading patch: %s for instance %d", filename, instance);
 
 	    if(!strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter") || 
 		    !strcmp(x->descriptor->LADSPA_Plugin->Label, "hexter6"))		{
@@ -1527,36 +1536,36 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 
 		/*From dx7_voice_data by Sean Bolton */
 		if(fp == NULL){
-		    post("Unable to open patch file: %s", filename);
+		    post("dssi~: unable to open patch file: %s", filename);
 		    return 0;
 		}
 		if (fseek(fp, 0, SEEK_END) || 
 			(filelength = ftell(fp)) == -1 ||
 			fseek(fp, 0, SEEK_SET)) {
-		    post("couldn't get length of patch file: %s", 
+		    post("dssi~: couldn't get length of patch file: %s", 
 			    filename);
 		    fclose(fp);
 		    return 0;
 		}
 		if (filelength == 0) {
-		    post("patch file has zero length");
+		    post("dssi~: patch file has zero length");
 		    fclose(fp);
 		    return 0;
 		} else if (filelength > 16384) {
-		    post("patch file is too large");
+		    post("dssi~: patch file is too large");
 		    fclose(fp);
 		    return 0;
 		}
 		if (!(raw_patch_data = (unsigned char *)
 			    malloc(filelength))) 		     			 {
 		    post(
-			    "couldn't allocate memory for raw patch file");
+			    "dssi~: couldn't allocate memory for raw patch file");
 		    fclose(fp);
 		    return 0;
 		}
 		if (fread(raw_patch_data, 1, filelength, fp) 
 			!= (size_t)filelength) {
-		    post("short read on patch file: %s", filename);
+		    post("dssi~: short read on patch file: %s", filename);
 		    free(raw_patch_data);
 		    fclose(fp);
 		    return 0;
@@ -1601,7 +1610,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 
 		    if (filelength != DX7_DUMP_SIZE_BULK ||
 			    raw_patch_data[DX7_DUMP_SIZE_BULK - 1] != 0xf7) {
-			post("badly formatted DX7 32 voice dump!");
+			post("dssi~: badly formatted DX7 32 voice dump!");
 			count = 0;
 
 #ifdef CHECKSUM_PATCH_FILES_ON_LOAD
@@ -1609,7 +1618,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 				DX7_VOICE_SIZE_PACKED * 32) !=
 			    raw_patch_data[DX7_DUMP_SIZE_BULK - 2]) {
 
-			post("DX7 32 voice dump with bad checksum!");
+			post("dssi~: DX7 32 voice dump with bad checksum!");
 			count = 0;
 
 #endif
@@ -1624,7 +1633,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 		} else {
 
 		    /* unsuccessful load */
-		    post("unknown patch bank file format!");
+		    post("dssi~: unknown patch bank file format!");
 		    count = 0;
 
 		}
@@ -1643,7 +1652,7 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 		value = filename;
 	    }
 	    else{
-		post("Sorry, %s patches are not supported", 
+		post("dssi~: %s patches are not supported", 
 			x->descriptor->LADSPA_Plugin->Label);
 	    }
 
@@ -1653,13 +1662,13 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 	    pathlen = strlen(argv[1].a_w.w_symbol->s_name) + 2;
 	    x->project_dir = malloc((pathlen) * sizeof(char));
 	    atom_string(&argv[1], x->project_dir, pathlen);
-	    post("Project directory for instance %d has been set to: %s", instance, x->project_dir);
+	    post("dssi~: project directory for instance %d has been set to: %s", instance, x->project_dir);
 	    key = DSSI_PROJECT_DIRECTORY_KEY;
 	    value = x->project_dir;
 	}
 
 	else if(!strcmp(msg_type, "dir"))
-	    post("%s %s: operation not supported", msg_type, 
+	    post("dssi~: %s %s: operation not supported", msg_type, 
 		    argv[1].a_w.w_symbol->s_name);
 
 	if(!strcmp(msg_type, "show") || !strcmp(msg_type, "hide")){
@@ -1734,10 +1743,24 @@ static t_int dssi_tilde_dssi_methods(t_dssi_tilde *x, t_symbol *s, int argc, t_a
 
 }
 
-static void dssi_bang(t_dssi_tilde *x)
+static void dssi_tilde_bang(t_dssi_tilde *x)
 {
-    post("dssi~: running %d instances of %s", x->n_instances,
-	    x->descriptor->LADSPA_Plugin->Label);
+    t_atom at[3];
+
+    at[0].a_type = A_FLOAT;
+    at[1].a_type = A_SYMBOL;
+    at[2].a_type = A_SYMBOL;
+    
+    if(x->plugin_label != NULL){
+	at[0].a_w.w_float = x->n_instances;
+	at[1].a_w.w_symbol = gensym ((char *)x->plugin_label); 
+    }
+    else{
+	at[0].a_w.w_float = 0;
+	at[1].a_w.w_symbol = gensym ("plugin"); 
+    }	
+    at[2].a_w.w_symbol = gensym ("instances"); 
+    outlet_anything (x->control_outlet, gensym ("running"), 3, at);
 }
 
 static t_int *dssi_tilde_perform(t_int *w)
@@ -1747,9 +1770,9 @@ static t_int *dssi_tilde_perform(t_int *w)
     t_float **inputs = (t_float **)(&w[3]);
     t_float **outputs = (t_float **)(&w[3] + x->plugin_ins);
     int i, n, timediff, framediff, instance = 0; 
-/*See comment for dssi_tilde_plug_plugin 
+/*See comment for dssi_tilde_plug_plugin */
     if(x->dsp){
-	x->dsp_loop = 1;*/
+	x->dsp_loop = 1;
 
 	for(i = 0; i < x->plugin_ins; i++)
 	    memcpy(x->plugin_InputBuffers[i], inputs[i], N * 
@@ -1765,7 +1788,7 @@ static t_int *dssi_tilde_perform(t_int *w)
 	    /*This should never happen, but check anyway*/
 	    if(instance > x->n_instances || instance < 0){
 		post(
-			"%s: discarding spurious MIDI data, for instance %d", 
+			"dssi~: %s: discarding spurious MIDI data, for instance %d", 
 			x->descriptor->LADSPA_Plugin->Label, 
 			instance);
 #if DEBUG
@@ -1775,7 +1798,7 @@ static t_int *dssi_tilde_perform(t_int *w)
 	    }
 
 	    if (x->instanceEventCounts[instance] == EVENT_BUFSIZE){
-		post("MIDI overflow on channel %d", instance);
+		post("dssi~: MIDI overflow on channel %d", instance);
 		continue;
 	    }
 
@@ -1841,8 +1864,8 @@ static t_int *dssi_tilde_perform(t_int *w)
 	for(i = 0; i < x->plugin_outs; i++)
 	    memcpy(x->outlets[i], (t_outlet *)x->plugin_OutputBuffers[i], N * 
 		    sizeof(LADSPA_Data));*/
-/*	x->dsp_loop = 0;
-    }*/ 
+	x->dsp_loop = 0;
+    } 
     return w + (x->plugin_ins + x->plugin_outs + 3);
 }
 
@@ -2089,7 +2112,7 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 		free(tmpstr);
 	    }
 	    else{
-		post("Invalid library name; must end in .so");
+		post("dssi~: invalid library name; must end in .so");
 		return (void *) x;
 	    }
 	    if(x->desc_func = (DSSI_Descriptor_Function)dlsym(x->dll_handle,			"dssi_descriptor")){
@@ -2136,7 +2159,7 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 			x->descriptor->LADSPA_Plugin->
 			instantiate(x->descriptor->LADSPA_Plugin, x->sr);
 		    if (!x->instanceHandles[i]){
-			post("instantiation of instance %d failed", i);
+			post("dssi~: instantiation of instance %d failed", i);
 			stop = 1;
 			break;
 		    }
@@ -2148,7 +2171,7 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 			dssi_tilde_connect_ports(x, i); 
 		    for(i = 0;i < x->n_instances; i++)
 			dssi_tilde_activate(x, i);
-		    if(x->is_DSSI)
+		    if(x->is_DSSI){
 			for(i = 0;i < x->n_instances; i++)
 			    dssi_tilde_osc_setup(x, i);
 #if LOADGUI
@@ -2157,14 +2180,15 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 #endif
 			for(i = 0;i < x->n_instances; i++)
 			    dssi_tilde_init_programs(x, i);
+		    }
 		}
 	    }
 	}
 	else
-	    post("Error: plugin not loaded");
+	    post("dssi~: error: plugin not loaded");
     }
     else
-	post("No arguments given, please supply a path");
+	post("dssi~: no arguments given, please supply a path");
 
     x->control_outlet =
 	outlet_new (&x->x_obj, gensym("control"));
@@ -2186,14 +2210,15 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 			(t_float **)calloc(x->plugin_ins, 
 			sizeof(t_float *));
 			*/}
-
-		post("dssi~: ready for input");
+		x->dsp = 1;
+		post("dssi~: %d instances of %s, ready.", x->n_instances, 
+			x->plugin_label);
     }
     return (void *)x;    
 }
 
 
-/* This method is currently disabled. PD's inlet/outlet handling seems buggy if you try to create ins/outs on the fly. Needs further investigation ...*/
+/* This method is currently buggy. PD's inlet/outlet handling seems buggy if you try to create ins/outs on the fly. Needs further investigation ...*/
 static void dssi_tilde_plug_plugin(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv){
     
     x->dsp = 0;
@@ -2206,7 +2231,6 @@ static void dssi_tilde_plug_plugin(t_dssi_tilde *x, t_symbol *s, int argc, t_ato
     }
     dssi_tilde_init_plugin(x);
     dssi_tilde_load_plugin(x, argc, argv);
-    
 }
 
 static void dssi_tilde_activate_plugin(t_dssi_tilde *x){
@@ -2218,7 +2242,7 @@ static void dssi_tilde_activate_plugin(t_dssi_tilde *x){
 static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     
     t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
-    post("==============================\ndssi~ %.2f\n a DSSI/LADSPA host for Pure Data\n==============================", VERSION);
+    post("\n========================================\ndssi~: DSSI/LADSPA host - version %.2f\n========================================\n", VERSION);
       
     dssi_tilde_init_plugin(x);
     
@@ -2226,6 +2250,7 @@ static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     x->sr_inv = 1 / (t_float)x->sr;
     x->time_ref = (t_int)clock_getlogicaltime;
     x->blksize = sys_getblksize();
+    x->dsp = 0;
  
     pthread_mutex_init(&x->midiEventBufferMutex, NULL);
     return dssi_tilde_load_plugin(x, argc, argv);
@@ -2248,7 +2273,7 @@ void dssi_tilde_setup(void) {
     dssi_tilde_class = class_new(gensym("dssi~"), (t_newmethod)dssi_tilde_new,
 	    (t_method)dssi_tilde_free, sizeof(t_dssi_tilde), 0, A_GIMME, 0);
     class_addlist(dssi_tilde_class, dssi_tilde_list);
-    class_addbang(dssi_tilde_class, dssi_bang);
+    class_addbang(dssi_tilde_class, dssi_tilde_bang);
     class_addmethod(dssi_tilde_class, 
 	    (t_method)dssi_tilde_dsp, gensym("dsp"), 0);
     class_addmethod(dssi_tilde_class, (t_method)dssi_tilde_dssi_methods, 
@@ -2261,10 +2286,10 @@ void dssi_tilde_setup(void) {
 	    gensym ("listplugins"),0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_reset,
 	    gensym ("reset"), A_DEFFLOAT, 0);
-/*    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
 	    gensym ("plug"),A_GIMME,0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_activate_plugin,
-	    gensym ("active"),A_DEFFLOAT,0);*/
+	    gensym ("active"),A_DEFFLOAT,0);
     class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
     CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde, f);
 }

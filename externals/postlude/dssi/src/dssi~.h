@@ -41,7 +41,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.89
+#define VERSION 0.91
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
@@ -167,6 +167,7 @@ pthread_mutex_t midiEventBufferMutex;
   t_dssi_configure_pair *configure_buffer_head;
 
   t_int dsp; /* boolean dsp setting */
+  t_int dsp_loop;
   
 } t_dssi_tilde;
 
