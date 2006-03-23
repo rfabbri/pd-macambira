@@ -4,6 +4,7 @@ AC_INIT([readanysf~], [0.15],
         [readanysf~])   dnl last part is the tarname
 
 
+dnl AC_LANG_PUSH([C++])
 
 dnl ----------------------------------
 dnl ---- have your makefiles call recursively 
@@ -32,21 +33,13 @@ dnl AC_PROG_AWK
 dnl AC_PROG_LN_S
 dnl AC_PROG_RANLIB
 
-echo
-echo "$CPPFLAGS"
-echo "$CXXFLAGS"
-echo "$CFLAGS"
-echo "$LDFLAGS"
-echo
-
 have_vorbis=no
 have_mad=no
 have_flc=no
 
 flext_sys=2
-flext_dir=/usr/local/lib/pd/flext
+flext_dir=/usr/local/include/flext
 flext_shared=yes
-
 
 
 
@@ -84,12 +77,12 @@ else
 		pd_suffix=pd_linux
 		;;
         powerpc-*-linux*)
-                CPPFLAGS="$CPPFLAGS -DUNIX -Wno-deprecated -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
+                CPPFLAGS="$CPPFLAGS -DUNIX -Wno-deprecated -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1 "
 		LDFLAGS="$LDFLAGS -shared"
 		pd_suffix=pd_linux
 		;;
         *-*-linux*)
-                CPPFLAGS="$CPPFLAGS -DUNIX -Wno-deprecated -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1"
+                CPPFLAGS="$CPPFLAGS -DUNIX -Wno-deprecated -Wall -Wimplicit -Wunused -Wmissing-prototypes -O1 -fPIC"
 		LDFLAGS="$LDFLAGS -shared"
 		pd_suffix=pd_linux
 		;;
@@ -113,11 +106,8 @@ fi
 
 dnl -dylib -dynamic -flat_namespace -undefined suppress
 
-echo
 echo "Using cppflags= $CPPFLAGS"
 echo "Using ldflags= $LDFLAGS"
-echo
-
 
 
 
@@ -167,7 +157,7 @@ dnl ----  add Flext includes and lib dir
 dnl ----  usually /usr/local/lib/pd/flext
 dnl ------------------------------------------
 AC_ARG_WITH(flext_dir, 
-	[  --with-flext-dir=path	flext headers path (default=/usr/local/lib/pd/flext) ], 
+	[  --with-flext-dir=path	flext headers path (default=/usr/local/include/flext) ], 
 	[
 	flext_dir=$withval
 	CPPFLAGS="$CPPFLAGS -I$withval"
@@ -214,7 +204,7 @@ AC_CHECK_LIB(samplerate, src_is_valid_ratio, [
 	AC_CHECK_HEADER(samplerate.h, [have_src_hdr=yes ], [  
         	echo
         	echo "found libsamplerate, but didn't find header.  make sure samplerate.h is somewhere"
-		echo "that can be found and try configure again."
+		echo "that can be found and try configure again.  on debian, do: apt-get install libsamplerate0-dev"
         	echo
         	exit
         	])
@@ -229,7 +219,7 @@ AC_CHECK_LIB(samplerate, src_is_valid_ratio, [
 		], [  
 		SRC_LIBS=""
 		echo "you need libsamplerate. download it here <http://www.mega-nerd.com/SRC/>"
-		echo
+		echo "on debian, do: apt-get install libsamplerate0-dev"
 	        exit
 	        ])
 	])
@@ -298,6 +288,7 @@ dnl	echo; echo "HAVE THE FUCKING FLAC LIB"; echo
 	])
 
 
+echo "checking for old flext libraries"
 
 dnl ------------------------------------------
 dnl ----  Checks for FLEXT libraries.
@@ -306,37 +297,37 @@ AC_CHECK_LIB(flext, AddOutSignal, [have_flext=yes ], [have_flext=no])
 if test "$have_flext" = "yes"; then
 	if test  "$flext_shared" = "yes"; then
 	        FLEXT_LIBS="-lflext"
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_USE_CMEM"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_NOGLOBALNEW"
 	else
 		echo
 		echo "FLEXT is not setup for dynamic linking, you should think about using this!"
 		echo "try configure --enable-flext-shared"
 		echo
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_USE_CMEM"
+		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_NOGLOBALNEW"
 	        FLEXT_LIBS=""
 	fi
 else
-	if test  "$flext_shared" = "yes"; then
-		echo
-		echo "you want to link to FLEXT dynamicaly, a very good idea, but..."
-		echo "...configure couldn't find the FLEXT lib.  Taking your word for it."
-		echo "This seems to be normal on linux.  Don't know why it happens."
-		echo "just make sure you have the libflext.so in one of the paths listed"
-		echo "under /etc/ld.so.conf (for linux).  and, as root do ldconfig"
-		echo
-	        FLEXT_LIBS="-lflext"
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_USE_CMEM"
+	AC_CHECK_LIB(flext-pd, AddOutSignal, [have_flext_pd=yes ], [have_flext_pd=no])
+	if test "$have_flext_pd" = "yes"; then
+		echo "setting up for newer flext-pd"
+	        FLEXT_LIBS="-lflext-pd"
+		if test  "$flext_shared" = "yes"; then
+			echo "setting up flext-pd as a shared lib."
+			FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_SHARED -DFLEXT_USE_CMEM -I$flext_dir" 
+		else
+			FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_USE_CMEM -I$flext_dir" 
+		fi
 	else
 		echo
-		echo "FLEXT is now setup to link statically. not the best idea, but it works"
+		echo "no flext or flext-pd libraries found!  build will probably fail."
 		echo
-		FLEXT_CFLAGS="-DFLEXT_SYS=$flext_sys  -DFLEXT_THREADS -DFLEXT_USE_CMEM"
-	        FLEXT_LIBS="$flext_dir/libflext_t.a"
 	fi	
 fi
 
-
-
+echo
+echo "If $flext_dir does not have the flext header files in it."
+echo "do:  ./configure --with-flext-dir=/path/to/flext/headers"
+echo
 
 
 AC_SUBST(FLEXT_LIBS)
@@ -373,9 +364,9 @@ echo "_________________readanysf~__________________"
 
 
 if test "$flext_sys" = "1"; then
-	echo "	+ FLEXT support for Max/MSP @ $flext_dir"
+	echo "	+ FLEXT support for Max/MSP "
 elif test "$flext_sys" = "2"; then
-	echo "	+ FLEXT support for PureData @ $flext_dir"
+	echo "	+ FLEXT support for PureData "
 fi
 
 echo "	+ Wav,Aiff,Next decoding support (always)"
