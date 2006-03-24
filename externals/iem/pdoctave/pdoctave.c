@@ -120,6 +120,7 @@ void pdoctave_setup (void)
        (t_method) deletePDOctave,
        sizeof (PDOctave),
        CLASS_NOINLET, 0);
+   class_sethelpsymbol(pdoctave_class, gensym("pdoctave-help.pd"));
    post("pdoctave successfully loaded!");
    pdoctave_send_setup ();
    pdoctave_command_setup ();
