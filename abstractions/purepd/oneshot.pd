@@ -1,4 +1,4 @@
-#N canvas 233 201 674 542 10;
+#N canvas 233 201 475 294 10;
 #X obj 149 40 inlet;
 #X obj 221 176 outlet;
 #X text 10 7 [oneshot];
