@@ -36,9 +36,9 @@ void writeOctScalarIntoFloat (double d, float *f)
 {
    *f = (float) d;
 }
-void writeOctStringIntoString (char *s, char *c) 
+void writeOctStringIntoString (char *dst, char *src) 
 {
-   strcpy (s,c);
+   strcpy (dst, src);
 }
 
 
@@ -65,6 +65,17 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
 
    if (args(0).is_string()) {
       pdtype = SYMBOL;
+      size = args(0).string_value().size();
+      if (data = newSharedData (sdf, size, sizeof(char),pdtype)) {
+	 writeOctStringIntoString( (char*)data, (char*)args(0).string_value().c_str() );
+      }
+      else {
+	 error("failed to get new data memory!");
+	 unBlockForWriting (sdf);
+	 freeSharedDataFrame (&sdf);
+	 return octave_value();
+      }
+
    }
    else if (args(0).is_real_matrix()) {
       pdtype = MATRIX;
