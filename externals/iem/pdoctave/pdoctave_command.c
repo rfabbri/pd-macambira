@@ -84,7 +84,8 @@ static void *newPDOctaveCommand (t_symbol *s, int argc, t_atom *argv)
 
    post("getpdoctaveinstances returned %d", getPDOctaveInstances());
    if (getPDOctaveInstances()<1) {
-      post("Octave not running, insert a 'pdoctave' object!!");
+      error("Octave not running, insert a 'pdoctave' object!!");
+      return 0;
    }
    pdoctcmd_obj->pos = 0;
    if (argc>0) 

@@ -28,18 +28,21 @@ static void *newPDOctaveGet (t_symbol *s, int argc, t_atom *argv)
 
    post("getpdoctaveinstances returned %d", getPDOctaveInstances());
    if (getPDOctaveInstances()<1) {
-      post("Octave not running, insert a 'pdoctave' object!!");
+      error("Octave not running, insert a 'pdoctave' object!!");
+      return 0;
    }
    if (argc>0)
       name = atom_getsymbol(argv);
    else
       name = gensym ("pdm1");
 
-   pdoctget_obj->sdf = newSharedDataFrame ();
+   if ((pdoctget_obj->sdf = newSharedDataFrame ())==0) {
+	   error("pdoctave_get: failed to get shared memory");
+	   return 0;
+   }
    pdoctget_obj->data = 0;
    pdoctget_obj->oct_name = name->s_name;
    pdoctget_obj->outlet = outlet_new (&pdoctget_obj->x_obj, 0);
-
    return ((void *) pdoctget_obj);
 }
 
