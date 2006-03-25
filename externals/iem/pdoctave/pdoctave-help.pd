@@ -24,7 +24,7 @@
 #X obj 62 407 entry 124 100 grey70 yellow;
 #X msg 61 266 list a = [1 2 3];
 #X text 29 231 send commands to octave:;
-#X text 372 158 set variables in octave (you can also use the iemmatrix
+#X text 371 150 set variables in octave (you can also use the iemmatrix
 objects !) :;
 #X text 516 364 <- set variable a;
 #X obj 430 309 mtx_ones 3 3;
@@ -42,7 +42,8 @@ objects !) :;
 -1;
 #X obj 35 616 pdoctave_command mesh(rand(20 \, 20));
 #X text 32 575 use gnuplot to plot a matrix:;
-#X text 365 613 (help-patch by Georg Holzmann);
+#X msg 384 189 symbol hello;
+#X text 365 613 (help-patch provided by Georg Holzmann);
 #X connect 0 0 6 0;
 #X connect 1 0 6 0;
 #X connect 2 0 6 0;
@@ -62,3 +63,4 @@ objects !) :;
 #X connect 24 0 26 0;
 #X connect 26 0 25 0;
 #X connect 33 0 34 0;
+#X connect 36 0 6 0;
