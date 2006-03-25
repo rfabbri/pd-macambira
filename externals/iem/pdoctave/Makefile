@@ -62,16 +62,18 @@ $(OBJ) : %.o : %.c
 	#touch $*.c
 	cc $(CFLAGS) $(INCLUDE) -c -o $*.o $*.c
 
-read_shared_mem.oct: read_shared_mem.cc
+pdoctave_dataframe.o: pdoctave_dataframe.h pdoctave_dataframe.c
+
+read_shared_mem.oct: read_shared_mem.cc pdoctave_dataframe.o
 	mkoctfile read_shared_mem.cc -c -o read_shared_mem.o
 	mkoctfile read_shared_mem.o pdoctave_dataframe.o -o read_shared_mem.oct
 
-write_shared_mem.oct: write_shared_mem.cc
+write_shared_mem.oct: write_shared_mem.cc pdoctave_dataframe.o
 	mkoctfile write_shared_mem.cc -c -o write_shared_mem.o
 	mkoctfile write_shared_mem.o pdoctave_dataframe.o -o write_shared_mem.oct
 
-pdoctave_send.o: pdoctave_send.c
+pdoctave_send.o: pdoctave_dataframe.o pdoctave_send.c
 
-pdoctave_command.o: pdoctave_command.c
+pdoctave_command.o: pdoctave_dataframe.o pdoctave_command.c
 
-pdoctave_get.o: pdoctave_get.c
+pdoctave_get.o: pdoctave_dataframe.o pdoctave_get.c

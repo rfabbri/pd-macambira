@@ -61,9 +61,15 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
       return octave_value();
    }
 
-   sleepUntilWriteBlocked (sdf,STD_USLEEP_TIME);
-
-   if (args(0).is_string()) {
+   if((sleepUntilWriteBlocked (sdf))==0) {
+	   error("write_shared_mem: pd and octave scheduling error, restart pd!");
+	   return octave_value();
+   }
+   if (args(0).is_empty()) {
+	   pdtype = UNKNOWN;
+	   return octave_value();
+   }
+   else if (args(0).is_string()) {
       pdtype = SYMBOL;
       size = args(0).string_value().size();
       if (data = newSharedData (sdf, size, sizeof(char),pdtype)) {

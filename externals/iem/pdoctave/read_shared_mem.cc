@@ -58,8 +58,14 @@ DEFUN_DLD (read_shared_mem, args, , "reading and returning a pd-value in octave"
       error("failed to attach memory!\n");
       return octave_value();
    }
-   sleepUntilWriteBlocked (sdf,STD_USLEEP_TIME);
-   sleepUntilReadBlocked (sdf, STD_USLEEP_TIME);
+   if((sleepUntilWriteBlocked (sdf))==0) {
+	   error("read_shared_mem: pd and octave scheduling error, restart pd!");
+	   return octave_value();
+   }
+   if((sleepUntilReadBlocked (sdf))==0) {
+	   error("read_shared_mem: pd and octave scheduling error, restart pd!");
+	   return octave_value();
+   }
    
    data = getSharedData (sdf);
    if (!data) {

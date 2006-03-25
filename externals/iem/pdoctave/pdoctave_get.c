@@ -145,13 +145,19 @@ static void pDOctaveGetBang (PDOctaveGet *pdoctget_obj)
 
    sdf = pdoctget_obj->sdf;
 
-   sleepUntilReadUnBlocked (sdf,STD_USLEEP_TIME);
+   if((sleepUntilReadUnBlocked (sdf))==0) {
+	   error("pdoctave_get: pd and octave scheduling error, restart pd!");
+	   return;
+   }
    blockForReading (sdf);
    
    // sending read command
    blockForWriting (sdf);
    pDOctaveGetCommand (pdoctget_obj);
-   sleepUntilWriteUnBlocked (sdf,STD_USLEEP_TIME);
+   if((sleepUntilWriteUnBlocked (sdf))==0) {
+	   error("pdoctave_get: pd and octave scheduling error, restart pd!");
+	   return;
+   }
    
    // waiting for results
    pdoctget_obj->data = getSharedData (sdf); 

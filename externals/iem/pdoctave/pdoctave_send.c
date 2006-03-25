@@ -96,7 +96,11 @@ static void pDOctaveSend (PDOctaveSend *pdoctsnd_obj,
 
    sdf = pdoctsnd_obj->sdf;
    
-   sleepUntilWriteUnBlocked (sdf, STD_USLEEP_TIME);
+   //sleepUntilWriteUnBlocked (sdf, STD_USLEEP_TIME);
+   if ((sleepUntilWriteUnBlocked (sdf))==0) {
+	   error("pdoctave_send: pd and octave scheduling error, restart pd");
+	   return;
+   }
    blockForWriting (sdf);
    
    if (pdoctsnd_obj->data)
@@ -128,7 +132,10 @@ static void pDOctaveSend (PDOctaveSend *pdoctsnd_obj,
    blockForReading (sdf);
    freeSharedData (sdf, &(pdoctsnd_obj->data));
    pDOctaveSendBang (pdoctsnd_obj);
-   sleepUntilReadUnBlocked (sdf,STD_USLEEP_TIME);
+   if ((sleepUntilReadUnBlocked (sdf))==0) {
+		   error("pdoctave_send: pd and octave scheduling error, restart pd");
+		   return;
+   }
    unBlockForWriting (sdf);
 }
 

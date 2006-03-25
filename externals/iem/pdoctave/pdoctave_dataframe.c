@@ -1,4 +1,5 @@
 #include "pdoctave_dataframe.h"
+static int scheduling_ok = 1;
 
 SharedDataFrame *newSharedDataFrame () 
 {
@@ -203,6 +204,38 @@ void blockForWriting (SharedDataFrame *sdf)
    if (sdf)
       sdf->block_for_write = 1;
 }
+
+int sleepUntilReadUnBlocked (SharedDataFrame *sdf)
+{
+	alarm(MAX_SLEEP_TIME);
+      while ((sdf->block_for_read!=0)&&scheduling_ok) 
+	      sched_yield();
+      return scheduling_ok;
+}
+
+int sleepUntilReadBlocked (SharedDataFrame *sdf)
+{
+	alarm(MAX_SLEEP_TIME);
+      while ((sdf->block_for_read==0)&&scheduling_ok)
+	      sched_yield();
+      return scheduling_ok; 
+}
+
+int sleepUntilWriteUnBlocked (SharedDataFrame *sdf)
+{
+	alarm(MAX_SLEEP_TIME);
+      while ((sdf->block_for_write!=0)&&scheduling_ok) 
+	      sched_yield();
+      return scheduling_ok;
+}
+int sleepUntilWriteBlocked (SharedDataFrame *sdf)
+{
+	alarm(MAX_SLEEP_TIME);
+      while ((sdf->block_for_write==0)&&scheduling_ok)
+	      sched_yield();
+      return scheduling_ok;
+}
+/*
 void sleepUntilReadUnBlocked (SharedDataFrame *sdf, int usleep_time)
 {
    int timer = 0;
@@ -246,4 +279,4 @@ void sleepUntilWriteBlocked (SharedDataFrame *sdf, int usleep_time)
 	 
    }
 }
-      
+      */

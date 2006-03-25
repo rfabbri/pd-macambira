@@ -15,7 +15,7 @@ extern "C" {
 #include "pdoctave_datatypes.h"
 
 #define STD_USLEEP_TIME 100
-#define MAX_SLEEP_TIME 200000
+#define MAX_SLEEP_TIME 2
 
 typedef struct _SharedDataFrame_ SharedDataFrame;
 
@@ -53,10 +53,16 @@ void unBlockForReading (SharedDataFrame *sdf);
 void unBlockForWriting (SharedDataFrame *sdf);
 void blockForReading (SharedDataFrame *sdf);
 void blockForWriting (SharedDataFrame *sdf);
+int sleepUntilReadUnBlocked (SharedDataFrame *sdf);
+int sleepUntilReadBlocked (SharedDataFrame *sdf);
+int sleepUntilWriteUnBlocked (SharedDataFrame *sdf);
+int sleepUntilWriteBlocked (SharedDataFrame *sdf);
+/*
 void sleepUntilReadUnBlocked (SharedDataFrame *sdf, int usleep_time);
 void sleepUntilReadBlocked (SharedDataFrame *sdf, int usleep_time);
 void sleepUntilWriteUnBlocked (SharedDataFrame *sdf, int usleep_time);
 void sleepUntilWriteBlocked (SharedDataFrame *sdf, int usleep_time);
+*/
 
 
 #ifdef __cplusplus

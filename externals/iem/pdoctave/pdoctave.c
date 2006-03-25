@@ -72,7 +72,7 @@ static void deletePDOctave (PDOctave *pdoctave_obj)
    }
 }
 
-
+/*
 static void *newPDOctave (t_symbol *s, int argc, t_atom *argv)
 {
    PDOctave * pdoctave_obj;
@@ -85,7 +85,8 @@ static void *newPDOctave (t_symbol *s, int argc, t_atom *argv)
 	 post("Error creating pipe.");
       }
       
-      if ((octave_pid = fork()) == 0) { /* child process */
+      if ((octave_pid = fork()) == 0) { 
+         //child process
 	 // execution of octave and pipe to octave stdin
 	 close(fd[1]);
 	 
@@ -102,7 +103,8 @@ static void *newPDOctave (t_symbol *s, int argc, t_atom *argv)
 	 post("shell command ``octave'' could not be executed");
       } else if (octave_pid == -1) {
 	 // Error handling
-      } else {                          /* parent process */
+      } else {       
+         //parent process
 	 close(fd[0]);
 	 // waiting for the child process having the octave pipe
 	 // and process properly set up
@@ -111,16 +113,56 @@ static void *newPDOctave (t_symbol *s, int argc, t_atom *argv)
    }
    return ((void *) pdoctave_obj);
 } 
+*/
+static void openPDOctave ()
+{
+   if (!obj_instances++) {
+
+      if (pipe(fd) == -1) {
+	 post("Error creating pipe.");
+      }
+      
+      if ((octave_pid = fork()) == 0) { 
+         //child process
+	 // execution of octave and pipe to octave stdin
+	 close(fd[1]);
+	 
+	 if (dup2(fd[0], STDIN_FILENO) == -1) {
+	    post("error duplicating filedescriptor to STDIN");
+	    exit(1);
+	    return; 
+	 }
+	 
+	 close(fd[0]);
+	 execlp("octave", "octave", "-i", NULL);
+	 // this is only reached, when the octave process is
+	 // dying before the pdoctave object
+	 post("shell command ``octave'' could not be executed");
+      } else if (octave_pid == -1) {
+	 // Error handling
+      } else {       
+         //parent process
+	 close(fd[0]);
+	 // waiting for the child process having the octave pipe
+	 // and process properly set up
+	 sleep(1);
+      }
+   }
+} 
+
 
 void pdoctave_setup (void)
 {
-   pdoctave_class = class_new 
+/*
+     	pdoctave_class = class_new 
       (gensym("pdoctave"),
        (t_newmethod) newPDOctave,
        (t_method) deletePDOctave,
        sizeof (PDOctave),
        CLASS_NOINLET, 0);
    class_sethelpsymbol(pdoctave_class, gensym("pdoctave-help.pd"));
+   */
+   openPDOctave();
    post("pdoctave successfully loaded!");
    pdoctave_send_setup ();
    pdoctave_command_setup ();
