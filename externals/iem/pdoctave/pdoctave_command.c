@@ -58,7 +58,7 @@ static void removeEscapeSlashes (char *c)
 }
 static void pDOctaveCommandBang (PDOctaveCommand *pdoctcmd_obj)
 {
-   post("command: %s sent", pdoctcmd_obj->oct_command);
+   //post("command: %s sent", pdoctcmd_obj->oct_command);
    writeToOctaveStdIN (pdoctcmd_obj->oct_command);
 }
 
@@ -82,7 +82,7 @@ static void *newPDOctaveCommand (t_symbol *s, int argc, t_atom *argv)
    PDOctaveCommand *pdoctcmd_obj = (PDOctaveCommand *)
       pd_new (pdoctave_command_class);
 
-   post("getpdoctaveinstances returned %d", getPDOctaveInstances());
+//   post("getpdoctaveinstances returned %d", getPDOctaveInstances());
    if (getPDOctaveInstances()<1) {
       error("Octave not running, insert a 'pdoctave' object!!");
       return 0;

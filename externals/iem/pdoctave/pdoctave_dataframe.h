@@ -15,7 +15,7 @@ extern "C" {
 #include "pdoctave_datatypes.h"
 
 #define STD_USLEEP_TIME 100
-#define MAX_SLEEP_TIME 2
+#define MAX_USLEEP_TIME 5000000
 
 typedef struct _SharedDataFrame_ SharedDataFrame;
 

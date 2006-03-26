@@ -1,5 +1,5 @@
 #include "pdoctave_dataframe.h"
-static int scheduling_ok = 1;
+//static int scheduling_ok = 1;
 
 SharedDataFrame *newSharedDataFrame () 
 {
@@ -207,40 +207,48 @@ void blockForWriting (SharedDataFrame *sdf)
 
 int sleepUntilReadUnBlocked (SharedDataFrame *sdf)
 {
-	//alarm(MAX_SLEEP_TIME);
-      while ((sdf->block_for_read!=0)&&scheduling_ok) 
-	      sched_yield();
-      return scheduling_ok;
+      int elapsed_time=0;
+      while ((sdf->block_for_read!=0)&&(elapsed_time<MAX_USLEEP_TIME)) {
+	   elapsed_time += STD_USLEEP_TIME;
+	   usleep(STD_USLEEP_TIME);
+      }
+      return (elapsed_time<MAX_USLEEP_TIME);
 }
 
 int sleepUntilReadBlocked (SharedDataFrame *sdf)
 {
-	//alarm(MAX_SLEEP_TIME);
-      while ((sdf->block_for_read==0)&&scheduling_ok)
-	      sched_yield();
-      return scheduling_ok; 
+      int elapsed_time=0;
+      while ((sdf->block_for_read==0)&&(elapsed_time<MAX_USLEEP_TIME)) {
+	   elapsed_time += STD_USLEEP_TIME;
+	   usleep(STD_USLEEP_TIME);
+      }
+      return (elapsed_time<MAX_USLEEP_TIME);
 }
 
 int sleepUntilWriteUnBlocked (SharedDataFrame *sdf)
 {
-	//alarm(MAX_SLEEP_TIME);
-      while ((sdf->block_for_write!=0)&&scheduling_ok) 
-	      sched_yield();
-      return scheduling_ok;
+      int elapsed_time=0;
+      while ((sdf->block_for_write!=0)&&(elapsed_time<MAX_USLEEP_TIME)) {
+	   elapsed_time += STD_USLEEP_TIME;
+	   usleep(STD_USLEEP_TIME);
+      }
+      return (elapsed_time<MAX_USLEEP_TIME);
 }
 int sleepUntilWriteBlocked (SharedDataFrame *sdf)
 {
-	//alarm(MAX_SLEEP_TIME);
-      while ((sdf->block_for_write==0)&&scheduling_ok)
-	      sched_yield();
-      return scheduling_ok;
+      int elapsed_time=0;
+      while ((sdf->block_for_write==0)&&(elapsed_time<MAX_USLEEP_TIME)) {
+	   elapsed_time += STD_USLEEP_TIME;
+	   usleep(STD_USLEEP_TIME);
+      }
+      return (elapsed_time<MAX_USLEEP_TIME);
 }
 /*
 void sleepUntilReadUnBlocked (SharedDataFrame *sdf, int usleep_time)
 {
    int timer = 0;
    if (sdf) {
-      while ((sdf->block_for_read!=0)&&(timer < MAX_SLEEP_TIME)) {
+      while ((sdf->block_for_read!=0)&&(timer < MAX_USLEEP_TIME)) {
 	 timer += usleep_time;
 	 usleep (usleep_time);
       }
@@ -250,7 +258,7 @@ void sleepUntilReadBlocked (SharedDataFrame *sdf, int usleep_time)
 {
    int timer = 0;
    if (sdf) {
-      while ((sdf->block_for_read==0)&&(timer < MAX_SLEEP_TIME)) {
+      while ((sdf->block_for_read==0)&&(timer < MAX_USLEEP_TIME)) {
 	 timer +=usleep_time;
 	 usleep (usleep_time);
       }
@@ -261,7 +269,7 @@ void sleepUntilWriteUnBlocked (SharedDataFrame *sdf, int usleep_time)
 {
    int timer = 0;
    if (sdf) {
-      while ((sdf->block_for_write!=0)&&(timer < MAX_SLEEP_TIME)) {
+      while ((sdf->block_for_write!=0)&&(timer < MAX_USLEEP_TIME)) {
 	 timer +=usleep_time;
 	 usleep (usleep_time);
       }
@@ -272,7 +280,7 @@ void sleepUntilWriteBlocked (SharedDataFrame *sdf, int usleep_time)
 {
    int timer = 0;
    if (sdf) {
-      while ((sdf->block_for_write==0)&&(timer < MAX_SLEEP_TIME)) {
+      while ((sdf->block_for_write==0)&&(timer < MAX_USLEEP_TIME)) {
 	 timer +=usleep_time;
 	 usleep (usleep_time);
       }

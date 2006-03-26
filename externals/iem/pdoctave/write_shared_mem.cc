@@ -66,9 +66,8 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
 	   return octave_value();
    }
    if (args(0).is_empty()) {
-	   pdtype = UNKNOWN;
 	   unBlockForWriting (sdf);
-	   freeSharedDataFrame (&sdf);
+	   removeSharedDataFrame (&sdf);
 	   return octave_value();
    }
    else if (args(0).is_string()) {
@@ -80,7 +79,7 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
       else {
 	 error("failed to get new data memory!");
 	 unBlockForWriting (sdf);
-	 freeSharedDataFrame (&sdf);
+	 removeSharedDataFrame (&sdf);
 	 return octave_value();
       }
 
@@ -94,7 +93,7 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
       else {
 	 error("failed to get new data memory!");
 	 unBlockForWriting (sdf);
-	 freeSharedDataFrame (&sdf);
+	 removeSharedDataFrame (&sdf);
 	 return octave_value();
       }
    }
@@ -106,7 +105,7 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
       else {
 	 error("failed to get new data memory!");
 	 unBlockForWriting (sdf);
-	 freeSharedDataFrame (&sdf);
+	 removeSharedDataFrame (&sdf);
 	 return octave_value();
       }
    }

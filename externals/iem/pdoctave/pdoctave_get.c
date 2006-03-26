@@ -26,7 +26,7 @@ static void *newPDOctaveGet (t_symbol *s, int argc, t_atom *argv)
       pd_new (pdoctave_get_class);
    t_symbol *name;
 
-   post("getpdoctaveinstances returned %d", getPDOctaveInstances());
+//   post("getpdoctaveinstances returned %d", getPDOctaveInstances());
    if (getPDOctaveInstances()<1) {
       error("Octave not running, insert a 'pdoctave' object!!");
       return 0;
@@ -64,7 +64,7 @@ static void pDOctaveGetCommand (PDOctaveGet *pdoctget_obj)
    sprintf(cmd, "%d", getSharedDataFrameId(pdoctget_obj->sdf));
    cmd +=strlen(cmd);
    strcpy (cmd,");\n end\n\0");
-   post("pdoctave_get: %s",pdoctget_obj->oct_command);
+   //post("pdoctave_get: %s",pdoctget_obj->oct_command);
    
    writeToOctaveStdIN (pdoctget_obj->oct_command);
 }
@@ -140,6 +140,7 @@ static void pdoctaveOutletList (PDOctaveGet *pdoctget_obj)
 	 break;
       case UNKNOWN:
 	 post("pdoctave_get: unknown return value");
+	 s = gensym("");
 	 return;
    }
    outlet_anything (pdoctget_obj->outlet,
@@ -161,13 +162,18 @@ static void pDOctaveGetBang (PDOctaveGet *pdoctget_obj)
    // sending read command
    blockForWriting (sdf);
    pDOctaveGetCommand (pdoctget_obj);
+   // waiting for results
    if((sleepUntilWriteUnBlocked (sdf))==0) {
 	   error("pdoctave_get: pd and octave scheduling error, restart pd!");
+	   unBlockForReading (sdf);
 	   return;
    }
    
-   // waiting for results
-   pdoctget_obj->data = getSharedData (sdf); 
+   if ((pdoctget_obj->data = getSharedData (sdf))==0) {
+	   error("pdoctave_get: empty data package received");
+	   unBlockForReading (sdf);
+	   return;
+   }
    
    // converting incoming data
    pdoctaveConvertData (pdoctget_obj);
