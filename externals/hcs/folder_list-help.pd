@@ -1,29 +1,28 @@
-#N canvas 254 219 504 539 10;
-#X msg 74 72 bang;
+#N canvas 254 219 528 563 10;
+#X msg 19 48 bang;
 #X msg 101 320 bang;
-#X obj 124 267 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 64 267 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 85 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 235 218 symbol /usr/*;
-#X text 36 25 Get a listing of files based on a "glob" pattern.;
-#X text 110 74 list current directory;
-#X text 219 200 set pattern without no output;
-#X text 241 111 all files with a dot in your Home;
+#X msg 175 218 symbol /usr/*;
+#X text 30 5 Get a listing of files based on a "glob" pattern.;
+#X text 55 50 list current directory;
+#X text 159 200 set pattern without no output;
 #X obj 101 351 folder_list;
-#X obj 142 243 folder_list /*;
-#X obj 143 278 print;
-#X text 34 49 left/hot inlet gives immediate output using stored path
+#X obj 82 243 folder_list /*;
+#X obj 83 278 print;
+#X text 28 29 left/hot inlet gives immediate output using stored path
 ;
 #X text 49 298 For UNIX people \, [folder_list] behaves just like "ls
 -d1A";
 #X obj 102 384 print;
-#X msg 142 109 symbol ~/*.*;
+#X msg 91 126 symbol ~/*.*;
 #X text 153 381 WARNING: the default will change in the future!;
-#X text 156 131 patterns default to path Pd launched from;
-#X msg 156 148 symbol *;
-#X text 258 174 relative paths work;
-#X msg 173 175 symbol ../*;
+#X text 153 151 patterns default to path Pd launched from;
+#X msg 97 153 symbol *;
+#X text 187 177 relative paths work;
+#X msg 102 178 symbol ../*;
 #X obj 51 440 getdir;
 #X obj 51 482 folder_list;
 #X msg 51 420 bang;
@@ -33,19 +32,27 @@
 #X symbolatom 186 476 0 0 0 0 - - -;
 #X text 128 425 What's in the same folder as this patch?;
 #X text 186 350 defaults to /;
-#X connect 0 0 10 0;
-#X connect 1 0 9 0;
-#X connect 4 0 10 1;
-#X connect 9 0 3 0;
-#X connect 9 0 14 0;
-#X connect 10 0 2 0;
-#X connect 10 0 11 0;
-#X connect 15 0 10 0;
-#X connect 18 0 10 0;
-#X connect 20 0 10 0;
-#X connect 21 0 25 0;
-#X connect 21 0 26 0;
-#X connect 22 0 24 0;
-#X connect 23 0 21 0;
-#X connect 25 0 22 0;
-#X connect 25 0 27 0;
+#X text 144 97 drive letters work on ReactOS/Windows;
+#X msg 69 97 symbol C:/*;
+#X text 190 128 all files with a dot in your home;
+#X msg 47 73 symbol %USERPROFILE%/*;
+#X text 185 73 On ReactOS/Windows you can use Environment variables
+;
+#X connect 0 0 9 0;
+#X connect 1 0 8 0;
+#X connect 4 0 9 1;
+#X connect 8 0 3 0;
+#X connect 8 0 13 0;
+#X connect 9 0 2 0;
+#X connect 9 0 10 0;
+#X connect 14 0 9 0;
+#X connect 17 0 9 0;
+#X connect 19 0 9 0;
+#X connect 20 0 24 0;
+#X connect 20 0 25 0;
+#X connect 21 0 23 0;
+#X connect 22 0 20 0;
+#X connect 24 0 21 0;
+#X connect 24 0 26 0;
+#X connect 30 0 9 0;
+#X connect 32 0 9 0;
