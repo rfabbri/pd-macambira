@@ -1,5 +1,19 @@
 
+
+- write [version] object
+  - [bang( outputs list of version major minor bugfix i.e. [0 39 2(
+  - [time( outputs pd_compiletime
+  - [date( outputs pd_compiledate
+  - this should really be handled by messages to Pd, [;pd get date(
+
+
+- [cursor] object
+  - based on [MouseState] and/or [gcanvas]
+  - inlet to control the mouse cursor icon (pointer, X, text select, etc)
+
+
 - mDNS objects!
+
 
 - add pan objects to audio basics library
 
@@ -8,19 +22,26 @@
   - standard constants like Pi, etc.
   - standard math functions
 
+
 - create networking library
   - socket objects
   - multicast DNS objects
 
+
 - create mapping library
   - move [hid] toolkit objects into mapping lib
-
-- create sensors library
+  - sort thru Cyrille's ds_ objects
   - objects for smoothing sensor data
+
 
 - create i/o library
   - add hid, comport, platform-specific hid, libusb, midi
+  - convert [hid] to libhid
+  - write [directinput]
+  - [serial]
+  	 - port numbering on darwin: number /dev/cu.* sequentially
   - perhaps specific objects for sensorboxs like the arduino, multio, etc
+
 
 - create standard gui objects lib (what's the name?)
   - dsp
@@ -28,7 +49,9 @@
   - amp
 
 - create support lib for creating objects in Pd
+  - *_argument objects
   - rename blocksize_in_ms to block_size_in_ms
+  - how about "foundation" or "class" or "support"
 
 
 ifeel.c

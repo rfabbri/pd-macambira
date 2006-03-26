@@ -9,7 +9,7 @@
 #include <glob.h>
 #endif
 
-static char *version = "$Revision: 1.5 $";
+static char *version = "$Revision: 1.6 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -118,7 +118,8 @@ static void *folder_list_new(t_symbol *s)
 
 	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
 	
-	post("[folder_list] %s, written by Hans-Christoph Steiner <hans@at.or.at>",version);  
+	post("[folder_list] %s",version);  
+	post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
 	/* TODO set current dir of patch as default */
 #ifdef _WIN32
 	x->x_pattern = gensym(getenv("USERPROFILE"));

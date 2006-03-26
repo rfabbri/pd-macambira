@@ -1,16 +1,16 @@
-#N canvas 254 219 528 563 10;
+#N canvas 254 219 532 567 10;
 #X msg 19 48 bang;
 #X msg 101 320 bang;
-#X obj 64 267 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 64 280 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 85 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 175 218 symbol /usr/*;
+#X msg 176 235 symbol /usr/*;
 #X text 30 5 Get a listing of files based on a "glob" pattern.;
-#X text 55 50 list current directory;
-#X text 159 200 set pattern without no output;
+#X text 62 49 list current directory;
+#X text 160 217 set pattern without no output;
 #X obj 101 351 folder_list;
-#X obj 82 243 folder_list /*;
+#X obj 83 257 folder_list /*;
 #X obj 83 278 print;
 #X text 28 29 left/hot inlet gives immediate output using stored path
 ;
@@ -19,7 +19,7 @@
 #X obj 102 384 print;
 #X msg 91 126 symbol ~/*.*;
 #X text 153 381 WARNING: the default will change in the future!;
-#X text 153 151 patterns default to path Pd launched from;
+#X text 165 152 patterns default to path Pd launched from;
 #X msg 97 153 symbol *;
 #X text 187 177 relative paths work;
 #X msg 102 178 symbol ../*;
@@ -32,12 +32,11 @@
 #X symbolatom 186 476 0 0 0 0 - - -;
 #X text 128 425 What's in the same folder as this patch?;
 #X text 186 350 defaults to /;
-#X text 144 97 drive letters work on ReactOS/Windows;
-#X msg 69 97 symbol C:/*;
+#X text 164 104 drive letters work on ReactOS/Windows;
+#X msg 77 103 symbol C:/*;
 #X text 190 128 all files with a dot in your home;
-#X msg 47 73 symbol %USERPROFILE%/*;
-#X text 185 73 On ReactOS/Windows you can use Environment variables
-;
+#X msg 40 78 symbol %USERPROFILE%/*;
+#X text 203 79 ReactOS/Windows environment variables work;
 #X connect 0 0 9 0;
 #X connect 1 0 8 0;
 #X connect 4 0 9 1;
