@@ -1,7 +1,7 @@
 #include <m_pd.h>
 #include <glob.h>
 
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -25,7 +25,7 @@ typedef struct _folder_list {
 static void folder_list_output(t_folder_list* x)
 {
 	DEBUG(post("folder_list_output"););
-	t_int i;
+	unsigned int i;
 
 	DEBUG(post("globbing %s",x->x_pattern->s_name););
 	switch( glob( x->x_pattern->s_name, GLOB_TILDE, NULL, &(x->x_glob) ) )
@@ -72,7 +72,7 @@ static void *folder_list_new(t_symbol *s)
 	
 	post("[folder_list] %s, written by Hans-Christoph Steiner <hans@at.or.at>",version);  
 	/* TODO set current dir of patch as default */
-	x->x_pattern = gensym("/"));
+	x->x_pattern = gensym("/");
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
 	outlet_new(&x->x_obj, &s_symbol);
