@@ -1,30 +1,30 @@
-#N canvas 254 219 474 457 10;
-#X obj 100 214 print OUTPUT;
-#X msg 32 49 bang;
-#X msg 100 100 symbol /;
-#X text 69 48 immediate listing of current directory;
-#X text 160 99 immediate listing of /;
-#X text 180 133 set current dir without no output;
-#X obj 100 180 folder_list /var;
-#X obj 57 392 print OUTPUT;
-#X msg 56 328 bang;
-#X text 182 357 defaults to $HOME;
-#X msg 203 152 symbol /usr;
-#X obj 63 280 print ===================;
-#X msg 63 252 bang;
-#X obj 82 204 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 254 219 494 477 10;
+#X msg 74 72 bang;
+#X msg 101 336 bang;
+#X text 227 365 defaults to $HOME;
+#X obj 124 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 40 377 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 85 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 57 358 folder_list;
-#X symbolatom 73 79 10 0 0 0 - - -;
-#X connect 1 0 6 0;
-#X connect 2 0 6 0;
-#X connect 6 0 0 0;
-#X connect 6 0 13 0;
-#X connect 8 0 15 0;
-#X connect 10 0 6 1;
-#X connect 12 0 11 0;
-#X connect 15 0 7 0;
-#X connect 15 0 14 0;
-#X connect 16 0 6 0;
+#X msg 235 178 symbol /usr/*;
+#X text 36 25 Get a listing of files based on a "glob" pattern.;
+#X text 110 74 list current directory;
+#X text 219 160 set pattern without no output;
+#X text 241 111 all files with a dot in your Home;
+#X obj 101 367 folder_list;
+#X obj 142 203 folder_list /*;
+#X obj 143 238 print;
+#X text 34 49 left/hot inlet gives immediate output using stored path
+;
+#X text 38 279 For UNIX people \, [folder_list] behaves just like "ls
+-d1A";
+#X obj 102 400 print;
+#X msg 142 109 symbol ~/*.*;
+#X connect 0 0 11 0;
+#X connect 1 0 10 0;
+#X connect 5 0 11 1;
+#X connect 10 0 4 0;
+#X connect 10 0 15 0;
+#X connect 11 0 3 0;
+#X connect 11 0 12 0;
+#X connect 16 0 11 0;

@@ -1,13 +1,8 @@
 #include <m_pd.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <dirent.h>
-#include <fnmatch.h>
-#include <string.h>
-#include <sys/stat.h>
+#include <glob.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -19,9 +14,8 @@ static t_class *folder_list_class;
 
 typedef struct _folder_list {
 	t_object            x_obj;
-	t_symbol            *x_folder_name;
 	t_symbol            *x_pattern;
-	DIR                 *x_folder_pointer;
+	glob_t              x_glob;
 } t_folder_list;
 
 /*------------------------------------------------------------------------------
@@ -29,52 +23,29 @@ typedef struct _folder_list {
  */
 
 
-static t_int folder_list_open(t_folder_list* x) 
-{
-	DEBUG(post("folder_list_rewind"););
-
-	if((x->x_folder_pointer = opendir(x->x_folder_name->s_name)) == NULL) {
-        error("cannot open directory: %s\n", x->x_folder_name->s_name);
-        return(0);
-    }
-	return(1);
-}
-
-
-static void folder_list_close(t_folder_list* x) 
-{
-	DEBUG(post("folder_list_close"););
-
-	closedir(x->x_folder_pointer);
-}
-
-/*
-static void folder_list_rewind(t_folder_list* x) 
-{
-	DEBUG(post("folder_list_rewind"););
-	rewinddir(x->x_folder_pointer);
-}
-*/
-
 static void folder_list_output(t_folder_list* x)
 {
 	DEBUG(post("folder_list_output"););
-	struct dirent *entry;
+	t_int i;
 
-	if( !folder_list_open(x) ) return;
-    while( ( entry = readdir( x->x_folder_pointer ) ) != NULL) 
+	DEBUG(post("globbing %s",x->x_pattern->s_name););
+	switch( glob( x->x_pattern->s_name, GLOB_TILDE, NULL, &(x->x_glob) ) )
 	{
-		if( fnmatch( x->x_folder_name, entry->d_name, 0 ) )
-			if( strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..") ) 
-				outlet_symbol(x->x_obj.ob_outlet, gensym(entry->d_name));
-    }
-	folder_list_close(x);
+	case GLOB_NOSPACE: 
+		error("[folder_list] out of memory"); break;
+	case GLOB_ABORTED: 
+		error("[folder_list] aborted"); break;
+	case GLOB_NOMATCH: 
+		error("[folder_list] no match"); break;
+	}
+	for(i = 0; i < x->x_glob.gl_matchc; i++)
+		outlet_symbol( x->x_obj.ob_outlet, gensym(x->x_glob.gl_pathv[i]) );
 }
 
 
 static void folder_list_symbol(t_folder_list *x, t_symbol *s) 
 {
-	x->x_folder_name = s;
+	x->x_pattern = s;
 	folder_list_output(x);
 }
 
@@ -82,7 +53,7 @@ static void folder_list_symbol(t_folder_list *x, t_symbol *s)
 static void folder_list_set(t_folder_list* x, t_symbol *s) 
 {
 	DEBUG(post("folder_list_set"););
-	x->x_folder_name = s;
+	x->x_pattern = s;
 }
 
 
@@ -90,6 +61,7 @@ static void folder_list_free(t_folder_list* x)
 {
 	DEBUG(post("folder_list_free"););
 
+	globfree( &(x->x_glob) );
 }
 
 
@@ -100,16 +72,15 @@ static void *folder_list_new(t_symbol *s)
 	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
 	
 	post("[folder_list] %s, written by Hans-Christoph Steiner <hans@at.or.at>",version);  
-	
-	/* init vars */
-	x->x_folder_name = gensym(getenv("HOME"));
+	/* set HOME as default */
+	x->x_pattern = gensym(getenv("HOME"));
 
-    symbolinlet_new(&x->x_obj, &x->x_folder_name);
+    symbolinlet_new(&x->x_obj, &x->x_pattern);
 	outlet_new(&x->x_obj, &s_symbol);
 	
 	/* set to the value from the object argument, if that exists */
 	if (s != &s_)
-		x->x_folder_name = s;
+		x->x_pattern = s;
 	
 	return (x);
 }
@@ -125,82 +96,12 @@ void folder_list_setup(void)
 								  A_DEFSYM, 
 								  0);
 	/* add inlet datatype methods */
-//	class_addfloat(folder_list_class,(t_method) folder_list_float);
+//	class_addfloat(folder_list_class,(t_method) glob_float);
 	class_addbang(folder_list_class,(t_method) folder_list_output);
 	class_addsymbol(folder_list_class,(t_method) folder_list_symbol);
 	
 	/* add inlet message methods */
-/*	class_addmethod(folder_list_class, 
-					(t_method) folder_list_rewind, 
-					gensym("rewind"), 
-					0);
 	class_addmethod(folder_list_class,(t_method) folder_list_set,gensym("set"), 
-  A_DEFSYM, 0);*/
+					A_DEFSYM, 0);
 }
 
-
-
-/*
- * WINDOWS EXAMPLE
-http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnucmg/html/UCMGch09.asp
-
-#include <windows.h>
-#include <stdio.h>
-
-void ScanDir(char *dirname, int indent)
-{
-    BOOL            fFinished;
-    HANDLE          hList;
-    TCHAR           szDir[MAX_PATH+1];
-    TCHAR           szSubDir[MAX_PATH+1];
-    WIN32_FIND_DATA FileData;
-
-    // Get the proper directory path
-    sprintf(szDir, "%s\\*", dirname);
-
-    // Get the first file
-    hList = FindFirstFile(szDir, &FileData);
-    if (hList == INVALID_HANDLE_VALUE)
-    { 
-        printf("No files found\n\n");
-    }
-    else
-    {
-        // Traverse through the directory structure
-        fFinished = FALSE;
-        while (!fFinished)
-        {
-            // Check the object is a directory or not
-            if (FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                if ((strcmp(FileData.cFileName, ".") != 0) &&
-(strcmp(FileData.cFileName, "..") != 0))
-                {
-                    printf("%*s%s\\\n", indent, "",
-                      FileData.cFileName);
-
-                    // Get the full path for sub directory
-                    sprintf(szSubDir, "%s\\%s", dirname,
-                      FileData.cFileName);
-
-                    ScanDir(szSubDir, indent + 4);
-                }
-            }
-            else
-                printf("%*s%s\n", indent, "", FileData.cFileName);
-
-
-            if (!FindNextFile(hList, &FileData))
-            {
-                if (GetLastError() == ERROR_NO_MORE_FILES)
-                {
-                    fFinished = TRUE;
-                }
-            }
-        }
-    }
-
-    FindClose(hList);
-}
-
-*/
