@@ -1,0 +1,30 @@
+#N canvas 254 219 474 457 10;
+#X obj 100 214 print OUTPUT;
+#X msg 32 49 bang;
+#X msg 100 100 symbol /;
+#X text 69 48 immediate listing of current directory;
+#X text 160 99 immediate listing of /;
+#X text 180 133 set current dir without no output;
+#X obj 100 180 folder_list /var;
+#X obj 57 392 print OUTPUT;
+#X msg 56 328 bang;
+#X text 182 357 defaults to $HOME;
+#X msg 203 152 symbol /usr;
+#X obj 63 280 print ===================;
+#X msg 63 252 bang;
+#X obj 82 204 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 40 377 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 57 358 folder_list;
+#X symbolatom 73 79 10 0 0 0 - - -;
+#X connect 1 0 6 0;
+#X connect 2 0 6 0;
+#X connect 6 0 0 0;
+#X connect 6 0 13 0;
+#X connect 8 0 15 0;
+#X connect 10 0 6 1;
+#X connect 12 0 11 0;
+#X connect 15 0 7 0;
+#X connect 15 0 14 0;
+#X connect 16 0 6 0;
