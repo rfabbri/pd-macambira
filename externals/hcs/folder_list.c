@@ -1,8 +1,7 @@
 #include <m_pd.h>
-#include <stdlib.h>
 #include <glob.h>
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -38,7 +37,7 @@ static void folder_list_output(t_folder_list* x)
 	case GLOB_NOMATCH: 
 		error("[folder_list] no match"); break;
 	}
-	for(i = 0; i < x->x_glob.gl_matchc; i++)
+	for(i = 0; i < x->x_glob.gl_pathc; i++)
 		outlet_symbol( x->x_obj.ob_outlet, gensym(x->x_glob.gl_pathv[i]) );
 }
 
@@ -72,8 +71,8 @@ static void *folder_list_new(t_symbol *s)
 	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
 	
 	post("[folder_list] %s, written by Hans-Christoph Steiner <hans@at.or.at>",version);  
-	/* set HOME as default */
-	x->x_pattern = gensym(getenv("HOME"));
+	/* TODO set current dir of patch as default */
+	x->x_pattern = gensym("/"));
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
 	outlet_new(&x->x_obj, &s_symbol);

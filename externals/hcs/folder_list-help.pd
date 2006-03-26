@@ -1,30 +1,51 @@
-#N canvas 254 219 494 477 10;
+#N canvas 254 219 504 539 10;
 #X msg 74 72 bang;
-#X msg 101 336 bang;
-#X text 227 365 defaults to $HOME;
-#X obj 124 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X msg 101 320 bang;
+#X obj 124 267 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X obj 85 385 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 235 178 symbol /usr/*;
+#X msg 235 218 symbol /usr/*;
 #X text 36 25 Get a listing of files based on a "glob" pattern.;
 #X text 110 74 list current directory;
-#X text 219 160 set pattern without no output;
+#X text 219 200 set pattern without no output;
 #X text 241 111 all files with a dot in your Home;
-#X obj 101 367 folder_list;
-#X obj 142 203 folder_list /*;
-#X obj 143 238 print;
+#X obj 101 351 folder_list;
+#X obj 142 243 folder_list /*;
+#X obj 143 278 print;
 #X text 34 49 left/hot inlet gives immediate output using stored path
 ;
-#X text 38 279 For UNIX people \, [folder_list] behaves just like "ls
+#X text 49 298 For UNIX people \, [folder_list] behaves just like "ls
 -d1A";
-#X obj 102 400 print;
+#X obj 102 384 print;
 #X msg 142 109 symbol ~/*.*;
-#X connect 0 0 11 0;
-#X connect 1 0 10 0;
-#X connect 5 0 11 1;
-#X connect 10 0 4 0;
-#X connect 10 0 15 0;
-#X connect 11 0 3 0;
-#X connect 11 0 12 0;
-#X connect 16 0 11 0;
+#X text 153 381 WARNING: the default will change in the future!;
+#X text 156 131 patterns default to path Pd launched from;
+#X msg 156 148 symbol *;
+#X text 258 174 relative paths work;
+#X msg 173 175 symbol ../*;
+#X obj 51 440 getdir;
+#X obj 51 482 folder_list;
+#X msg 51 420 bang;
+#X obj 51 504 print;
+#X obj 51 460 makefilename %s/*;
+#X symbolatom 186 456 0 0 0 0 - - -;
+#X symbolatom 186 476 0 0 0 0 - - -;
+#X text 128 425 What's in the same folder as this patch?;
+#X text 186 350 defaults to /;
+#X connect 0 0 10 0;
+#X connect 1 0 9 0;
+#X connect 4 0 10 1;
+#X connect 9 0 3 0;
+#X connect 9 0 14 0;
+#X connect 10 0 2 0;
+#X connect 10 0 11 0;
+#X connect 15 0 10 0;
+#X connect 18 0 10 0;
+#X connect 20 0 10 0;
+#X connect 21 0 25 0;
+#X connect 21 0 26 0;
+#X connect 22 0 24 0;
+#X connect 23 0 21 0;
+#X connect 25 0 22 0;
+#X connect 25 0 27 0;
