@@ -207,7 +207,7 @@ void blockForWriting (SharedDataFrame *sdf)
 
 int sleepUntilReadUnBlocked (SharedDataFrame *sdf)
 {
-	alarm(MAX_SLEEP_TIME);
+	//alarm(MAX_SLEEP_TIME);
       while ((sdf->block_for_read!=0)&&scheduling_ok) 
 	      sched_yield();
       return scheduling_ok;
@@ -215,7 +215,7 @@ int sleepUntilReadUnBlocked (SharedDataFrame *sdf)
 
 int sleepUntilReadBlocked (SharedDataFrame *sdf)
 {
-	alarm(MAX_SLEEP_TIME);
+	//alarm(MAX_SLEEP_TIME);
       while ((sdf->block_for_read==0)&&scheduling_ok)
 	      sched_yield();
       return scheduling_ok; 
@@ -223,14 +223,14 @@ int sleepUntilReadBlocked (SharedDataFrame *sdf)
 
 int sleepUntilWriteUnBlocked (SharedDataFrame *sdf)
 {
-	alarm(MAX_SLEEP_TIME);
+	//alarm(MAX_SLEEP_TIME);
       while ((sdf->block_for_write!=0)&&scheduling_ok) 
 	      sched_yield();
       return scheduling_ok;
 }
 int sleepUntilWriteBlocked (SharedDataFrame *sdf)
 {
-	alarm(MAX_SLEEP_TIME);
+	//alarm(MAX_SLEEP_TIME);
       while ((sdf->block_for_write==0)&&scheduling_ok)
 	      sched_yield();
       return scheduling_ok;

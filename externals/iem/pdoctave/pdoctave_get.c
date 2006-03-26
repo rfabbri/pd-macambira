@@ -50,14 +50,21 @@ static void pDOctaveGetCommand (PDOctaveGet *pdoctget_obj)
 {
    char *cmd;
    cmd = pdoctget_obj->oct_command;
-   strcpy(cmd, "write_shared_mem(");
-   cmd += 17;
+   strcpy(cmd, "try\n write_shared_mem(");
+   cmd += strlen(cmd);
    strcpy(cmd, pdoctget_obj->oct_name);
    cmd += strlen (cmd);
    *cmd++ = ',';
    sprintf(cmd, "%d", getSharedDataFrameId(pdoctget_obj->sdf));
    cmd += strlen(cmd);
-   strcpy (cmd, ")\n");
+   strcpy (cmd, ");\n catch\n disp(\"undefined variable\"); write_shared_mem(");
+   cmd += strlen(cmd);
+   strcpy (cmd, "[],");
+   cmd +=strlen(cmd);
+   sprintf(cmd, "%d", getSharedDataFrameId(pdoctget_obj->sdf));
+   cmd +=strlen(cmd);
+   strcpy (cmd,");\n end\n\0");
+   post("pdoctave_get: %s",pdoctget_obj->oct_command);
    
    writeToOctaveStdIN (pdoctget_obj->oct_command);
 }

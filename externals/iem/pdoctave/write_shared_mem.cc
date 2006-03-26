@@ -67,6 +67,8 @@ DEFUN_DLD (write_shared_mem, args, , "returning an octave value to pd-value")
    }
    if (args(0).is_empty()) {
 	   pdtype = UNKNOWN;
+	   unBlockForWriting (sdf);
+	   freeSharedDataFrame (&sdf);
 	   return octave_value();
    }
    else if (args(0).is_string()) {
