@@ -9,7 +9,7 @@
 #include <glob.h>
 #endif
 
-static char *version = "$Revision: 1.6 $";
+static char *version = "$Revision: 1.7 $";
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -36,12 +36,21 @@ static void folder_list_output(t_folder_list* x)
 	DEBUG(post("folder_list_output"););
 
 #ifdef _WIN32
-	WIN32_FIND_DATA FindFileData;
+	WIN32_FIND_DATA findData;
 	HANDLE hFind;
 	DWORD errorNumber;
 	LPVOID lpErrorMessage;
+	char fullPathNameBuffer[MAX_PATH+1] = "";
+	char unbashBuffer[MAX_PATH+1] = "";
+	char pathBuffer[MAX_PATH+1] = "";
+	int length;
+
+// arg, looks perfect, but only in Windows Vista
+//	GetFinalPathNameByHandle(hFind,fullPathNameBuffer,MAX_PATH,FILE_NAME_NORMALIZED);
+	GetFullPathName(x->x_pattern->s_name,MAX_PATH,fullPathNameBuffer,NULL);
+	sys_unbashfilename(fullPathNameBuffer,unbashBuffer);
 	
-	hFind = FindFirstFile(x->x_pattern->s_name, &FindFileData);
+	hFind = FindFirstFile(x->x_pattern->s_name, &findData);
 	if (hFind == INVALID_HANDLE_VALUE) 
 	{
 	   errorNumber = GetLastError();
@@ -65,8 +74,19 @@ static void folder_list_output(t_folder_list* x)
 	   return;
 	} 
 	do {
-	   outlet_symbol( x->x_obj.ob_outlet, gensym(FindFileData.cFileName) );
-	} while (FindNextFile(hFind, &FindFileData) != 0);
+		if( strcmp(findData.cFileName, ".") && strcmp(findData.cFileName, "..") ) 
+		{
+			length = strlen(unbashBuffer);
+			do 
+			{
+				length--;
+			} while ( *(unbashBuffer + length) == '/' );
+			strncpy(pathBuffer, unbashBuffer, length);
+			pathBuffer[length] = '\0';
+			strcat(pathBuffer,findData.cFileName);
+			outlet_symbol( x->x_obj.ob_outlet, gensym(pathBuffer) );
+		}
+	} while (FindNextFile(hFind, &findData) != 0);
 	FindClose(hFind);
 #else
 	unsigned int i;
