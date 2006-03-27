@@ -5,7 +5,7 @@ LIBDIR=/usr/local/lib
 PDDIR=$(LIBDIR)/pd
 INSTALLPATH=$(PDDIR)/extra/
 
-current: pd_linux
+current: pd_darwin
 
 
 # ----------------------- Linux -----------------------
@@ -45,8 +45,10 @@ DARWINCFLAGS = -DPD -O3 -Wall -W -Wshadow -Wstrict-prototypes \
 DARWININCLUDE = -I ./ -I ../src -I/usr/local/include/ -I ./include -I/usr/local/include/dssi/
 
 .c.pd_darwin:
-	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -o $(NAME).o -c $*.c
-	$(CC) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin $(NAME).o
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jsearch.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/jload.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/dssi~.c
+	$(CC) -bundle -undefined suppress -flat_namespace -llo -o $(NAME).pd_darwin dssi~.o jload.o jsearch.o 
 	rm -f *.o
 
 # ----------------------- Generic -----------------------
