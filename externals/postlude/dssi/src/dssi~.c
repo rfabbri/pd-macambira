@@ -341,12 +341,23 @@ static void dssi_tilde_connect_ports(t_dssi_tilde *x, t_int instance){
 
 }
 
-static void dssi_tilde_activate(t_dssi_tilde *x, t_int instance){
+static void dssi_tilde_activate_plugin(t_dssi_tilde *x, t_float instance_f){
 
+    t_int instance = (t_int)instance_f;
     if(x->descriptor->LADSPA_Plugin->activate)
 	x->descriptor->LADSPA_Plugin->activate(x->instanceHandles[instance]);
 #if DEBUG
     post("plugin activated!");
+#endif
+}
+
+static void dssi_tilde_deactivate_plugin(t_dssi_tilde *x, t_float instance_f){
+
+    t_int instance = (t_int)instance_f;
+    if(x->descriptor->LADSPA_Plugin->deactivate)
+	x->descriptor->LADSPA_Plugin->deactivate(x->instanceHandles[instance]);
+#if DEBUG
+    post("plugin deactivated!");
 #endif
 }
 
@@ -602,15 +613,13 @@ static void dssi_tilde_control (t_dssi_tilde *x,
 /* Change the value of a named control port of the plug-in */
 {
     unsigned parm_num = 0;
-    t_int instance = (t_int)instance_f;
+    t_int instance = (t_int)instance_f - 1;
     int n_instances = x->n_instances;
 
     if (instance > x->n_instances || instance < 0){
-	post("dssi~: control: invalid instance number");
+	post("dssi~: control: invalid instance number %d", instance);
 	return;
     }
-
-    instance -= 1;
 
 #if DEBUG
     post("Received LADSPA control data for instance %d", instance);
@@ -645,22 +654,24 @@ static void dssi_tilde_control (t_dssi_tilde *x,
 
 static void dssi_tilde_info (t_dssi_tilde *x){
     unsigned int i;
-    t_atom argv[6];
+    t_atom argv[7];
 
     for(i = 0; i < x->descriptor->LADSPA_Plugin->PortCount; i++){
 	memcpy(&argv[0], &x->port_info[i].type, 
 		sizeof(t_atom));
 	memcpy(&argv[1], &x->port_info[i].data_type, 
 		sizeof(t_atom));
-	memcpy(&argv[2], &x->port_info[i].name, 
+	memcpy(&argv[3], &x->port_info[i].name, 
 		sizeof(t_atom));
-	memcpy(&argv[3], &x->port_info[i].lower_bound, 
+	memcpy(&argv[4], &x->port_info[i].lower_bound, 
 		sizeof(t_atom));
-	memcpy(&argv[4], &x->port_info[i].upper_bound, 
+	memcpy(&argv[5], &x->port_info[i].upper_bound, 
 		sizeof(t_atom));
-	memcpy(&argv[5], &x->port_info[i].p_default, 
+	memcpy(&argv[6], &x->port_info[i].p_default, 
 		sizeof(t_atom));
-	outlet_anything (x->control_outlet, gensym ("port"), 6, argv);
+	argv[2].a_type = A_FLOAT;
+	argv[2].a_w.w_float = (t_float)i - 1;
+	outlet_anything (x->control_outlet, gensym ("port"), 7, argv);
     }
 }
 
@@ -750,16 +761,18 @@ static int osc_debug_handler(const char *path, const char *types, lo_arg **argv,
 
 static void dssi_tilde_get_current_program(t_dssi_tilde *x, int instance){
     int i;
-    t_atom argv[2];
+    t_atom argv[3];
     
     argv[0].a_type = A_FLOAT;
-    argv[1].a_type = A_SYMBOL;
+    argv[1].a_type = A_FLOAT;
+    argv[2].a_type = A_SYMBOL;
     i = x->instances[instance].currentProgram;
     
-    argv[0].a_w.w_float = x->instances[instance].pluginPrograms[i].Program;
-    argv[1].a_w.w_symbol = 
+    argv[0].a_w.w_float = (t_float)instance;
+    argv[1].a_w.w_float = x->instances[instance].pluginPrograms[i].Program;
+    argv[2].a_w.w_symbol = 
 	gensym ((char*)x->instances[instance].pluginPrograms[i].Name); 
-    outlet_anything (x->control_outlet, gensym ("program"), 2, argv);
+    outlet_anything (x->control_outlet, gensym ("program"), 3, argv);
 
 }
 
@@ -1405,7 +1418,7 @@ static t_int dssi_tilde_configure_buffer_free(t_dssi_tilde *x){
 
 static t_int dssi_tilde_reset(t_dssi_tilde *x, t_float instance_f){
 
-    t_int instance = (t_int)instance_f;
+    t_int instance = (t_int)instance_f - 1;
     if (instance == -1){
 	for(instance = 0; instance < x->n_instances; instance++) 			{
 	    if (x->descriptor->LADSPA_Plugin->deactivate &&
@@ -1927,10 +1940,11 @@ static void dssi_tilde_quit_plugin(t_dssi_tilde *x){
 	}
 	/* no -- see comment in osc_exiting_handler */
 	/* if (!instances[i].inactive) { */
-	if (x->descriptor->LADSPA_Plugin->deactivate) {
+/*	if (x->descriptor->LADSPA_Plugin->deactivate) {
 	    x->descriptor->LADSPA_Plugin->deactivate
 		(x->instanceHandles[instance]);
-	}
+	}*/
+	dssi_tilde_deactivate_plugin(x, (t_float)instance);
 	/* } */
 	if (x->descriptor->LADSPA_Plugin &&
 		x->descriptor->LADSPA_Plugin->cleanup) {
@@ -2170,7 +2184,7 @@ static void *dssi_tilde_load_plugin(t_dssi_tilde *x, t_int argc, t_atom *argv){
 		    for(i = 0;i < x->n_instances; i++)
 			dssi_tilde_connect_ports(x, i); 
 		    for(i = 0;i < x->n_instances; i++)
-			dssi_tilde_activate(x, i);
+			dssi_tilde_activate_plugin(x, (t_float)i);
 		    if(x->is_DSSI){
 			for(i = 0;i < x->n_instances; i++)
 			    dssi_tilde_osc_setup(x, i);
@@ -2233,12 +2247,6 @@ static void dssi_tilde_plug_plugin(t_dssi_tilde *x, t_symbol *s, int argc, t_ato
     dssi_tilde_load_plugin(x, argc, argv);
 }
 
-static void dssi_tilde_activate_plugin(t_dssi_tilde *x){
-
-    x->dsp = 1;
-    
-}
-
 static void *dssi_tilde_new(t_symbol *s, t_int argc, t_atom *argv){
     
     t_dssi_tilde *x = (t_dssi_tilde *)pd_new(dssi_tilde_class);
@@ -2288,8 +2296,10 @@ void dssi_tilde_setup(void) {
 	    gensym ("reset"), A_DEFFLOAT, 0);
     class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_plug_plugin,
 	    gensym ("plug"),A_GIMME,0);
-    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_activate_plugin,
-	    gensym ("active"),A_DEFFLOAT,0);
+/*    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_activate_plugin,
+	    gensym ("activate"),A_DEFFLOAT - 1,0);
+    class_addmethod (dssi_tilde_class,(t_method)dssi_tilde_deactivate_plugin,
+	    gensym ("deactivate"),A_DEFFLOAT - 1,0);*/
     class_sethelpsymbol(dssi_tilde_class, gensym("help-dssi"));
     CLASS_MAINSIGNALIN(dssi_tilde_class, t_dssi_tilde, f);
 }
