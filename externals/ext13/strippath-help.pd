@@ -1,0 +1,10 @@
+#N canvas 0 22 454 304 10;
+#X obj 113 163 ext13/strippath;
+#X symbolatom 113 196 0 0 0 0 - - -;
+#X msg 113 109 symbol /this/is/a/testfile.txt;
+#X msg 58 88 bang;
+#X obj 58 109 getdir;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
+#X connect 3 0 4 0;
+#X connect 4 0 0 0;
