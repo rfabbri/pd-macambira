@@ -1,0 +1,46 @@
+#N canvas 293 91 746 588 10;
+#X obj 504 24 import cyclone unauthorized;
+#X obj 30 70 bng 15 250 50 0 \$1 \$1 empty 20 8 0 8 -262144 -1 -1;
+#X obj 30 102 tgl 15 1.04858e+06 empty \$2 empty 20 8 0 8 -262144 -1
+-1 0 1;
+#X obj 34 148 vsl 15 128 0 127 0 1.04858e+06 empty \$3 empty 20 8 0
+8 -262144 -1 -1 12700 1;
+#X obj 191 278 hsl 128 15 0 127 0 0 empty empty empty 20 8 0 8 -262144
+-1 -1 2700 1;
+#X obj 201 249 hdl 15 1 2.6624e+06 8 \$5 \$5 empty 20 8 192 8 -262144
+-1 -1 0;
+#X obj 254 87 vu 15 120 \$6 empty 35 8 0 8 -66577 -1 1 0;
+#X obj 111 69 cnv 15 100 60 empty empty [canvas] 20 12 0 14 -233017
+-66577 1.04858e+06;
+#X obj 126 149 vdl 15 1 4.79232e+06 8 \$9 \$9 empty 20 8 192 8 -262144
+-1 -1 0;
+#X obj 341 136 nbx 5 14 -1e+37 1e+37 0 0 \$5 \$5 empty 45 7 0 10 -262144
+-1 -1 0 256;
+#X text 8 22 Pd comes with a standard \, built-in set of GUI elements
+\, which you can select from the "Put" menu.;
+#X text 16 323 There are also some OS-native GUI elements available
+;
+#X obj 44 363 button OK;
+#X obj 142 367 popup 124 25 #ffffff popup option;
+#X obj 298 363 ticker ;
+#X obj 503 415 envgen 200 140 1 0  ;
+#X obj 366 499 knob 32 32 0 127 0 0 empty empty empty 0 -8 32 8 -262144
+-1 -1 3100 1;
+#X text 360 473 [knob];
+#X text 281 340 [ticker];
+#X obj 492 96 grid grid1 200 0 199 200 0 199 1 1 1 10 10 19 11;
+#X text 500 73 [unauthorized/grid];
+#X text 483 391 [envgen];
+#X text 112 405 [cyclone/Scope~];
+#X text 23 339 [button];
+#X text 129 341 [popup];
+#X text 250 67 [vu];
+#X text 46 69 [bng];
+#X text 46 101 [tgl];
+#X text 21 280 [vslider];
+#X text 325 248 [hradio];
+#X text 325 278 [hslider];
+#X text 107 277 [vradio];
+#X obj 105 432 Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255 51 135
+135 135 0;
+#X text 337 118 [nbx];

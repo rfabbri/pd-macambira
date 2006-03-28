@@ -1,24 +1,24 @@
-#N canvas 427 300 455 442 10;
-#X text 19 12 In Pd \, you read a patch from right to left \, from
-top to bottom.;
-#X text 18 47 The [trigger] object is used to enforce execution order.
+#N canvas 406 232 616 416 12;
+#X text 10 110 The [trigger] object is used to enforce execution order.
 If you need things to run in a certain order \, then you use a [trigger].
 ;
-#X obj 74 117 bng 25 250 50 0 empty empty empty -2 -8 1 10 -24198 -1
--1;
-#X obj 74 151 trigger bang bang bang;
-#X obj 85 257 +;
-#X obj 136 233 +;
-#X msg 197 198 1;
-#X msg 127 197 2;
-#X msg 78 196 3;
-#X floatatom 86 280 5 0 0 0 - - -;
-#X connect 2 0 3 0;
-#X connect 3 0 8 0;
-#X connect 3 1 7 0;
-#X connect 3 2 6 0;
-#X connect 4 0 9 0;
-#X connect 5 0 4 1;
-#X connect 6 0 5 1;
-#X connect 7 0 5 0;
-#X connect 8 0 4 0;
+#X obj 165 177 bng 25 250 50 0 empty empty empty -2 -8 1 10 -24198
+-1 -1;
+#X obj 165 217 trigger bang bang bang;
+#X msg 381 256 1;
+#X msg 273 256 2;
+#X msg 165 256 3;
+#X obj 273 332 print ORDER;
+#X obj 8 10 cnv 15 400 40 empty empty right_to_left_order 20 12 0 24
+-228992 -66577 0;
+#X text 212 180 <-- click here \,;
+#X text 10 65 In Pd \, you read a patch from right to left \, from
+top to bottom. Objects also output from right to left;
+#X text 89 380 then check the Pd window to see the order.;
+#X connect 1 0 2 0;
+#X connect 2 0 5 0;
+#X connect 2 1 4 0;
+#X connect 2 2 3 0;
+#X connect 3 0 6 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;

@@ -1,0 +1,23 @@
+#N canvas 476 37 643 580 12;
+#X msg 134 443 menuclose;
+#X obj 36 530 s pd-mon-nouveau-patch.pd;
+#X obj 22 136 cnv 15 5 5 empty empty 1 5 0 0 20 -262144 -258699 0;
+#X obj 23 210 cnv 15 5 5 empty empty 2 5 0 0 20 -262144 -258699 0;
+#X obj 20 262 cnv 15 5 5 empty empty 3 5 0 0 20 -262144 -258699 0;
+#X msg 60 105 \; pd filename mon-nouveau-patch.pd /tmp \; #N canvas
+\; #X pop 1 \;;
+#X text 14 16 Keeping true to the name "Pure Data" \, you can send
+messages to Pd itself.;
+#X text 13 69 Click these messages starting from the top:;
+#X msg 76 251 symbolatom 20 100 0 0 0 0;
+#X msg 92 317 connect 0 0 1 0;
+#X msg 60 199 msg 20 27 symbol Hello_World!;
+#X text 131 364 click on [symbol Hello_World!( in the new window;
+#X text 243 442 now close the new window;
+#X obj 20 327 cnv 15 5 5 empty empty 4 5 0 0 20 -262144 -258699 0;
+#X obj 19 378 cnv 15 5 5 empty empty 5 5 0 0 20 -262144 -258699 0;
+#X obj 18 453 cnv 15 5 5 empty empty 6 5 0 0 20 -262144 -258699 0;
+#X connect 0 0 1 0;
+#X connect 8 0 1 0;
+#X connect 9 0 1 0;
+#X connect 10 0 1 0;
