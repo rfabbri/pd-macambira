@@ -9,4 +9,5 @@ together. The boxes have "inlets" and "outlets" \, where they are connected.
 #X text 144 178 outlet-->;
 #X obj 234 265 print;
 #X text 289 266 <-- object box;
+#X text 89 357 Now look in the Pd window to see the result.;
 #X connect 0 0 6 0;
