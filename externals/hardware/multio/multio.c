@@ -50,6 +50,7 @@ typedef struct _multio
 	char old_digi[8]; // buffer of digital input, is a byte, 8 values at a time
 	char digi_outs[8]; // buffer of digital input, is a byte, 8 values at a time
 	int analog_buffer[64]; // buffered analog outs
+	int x_verbose;
 	t_outlet *a_out, *d_out, *s_out; // outlets
 } t_multio;
 
@@ -80,7 +81,7 @@ static void *usb_read_thread(void *w)
 				{
 					x->double_buffer[mybuf][x->buf_count[mybuf]++] = buffer[cnt];
 				}
-//				post("thread read %i bytes to buffer %i (now %i bytes)",bytesread, mybuf,x->buf_count[mybuf] );
+//				if(x->x_verbose)post("thread read %i bytes to buffer %i (now %i bytes)",bytesread, mybuf,x->buf_count[mybuf] );
 			}
 		}
 #ifdef _WIN32
@@ -95,22 +96,22 @@ static void start_thread(t_multio *x)
 // create the worker thread
     if(pthread_attr_init(&x->multio_thread_attr) < 0)
 	{
-       post("multio: could not launch receive thread");
+       error("multio: could not launch receive thread");
        return;
     }
     if(pthread_attr_setdetachstate(&x->multio_thread_attr, PTHREAD_CREATE_DETACHED) < 0)
 	{
-       post("multio: could not launch receive thread");
+       error("multio: could not launch receive thread");
        return;
     }
     if(pthread_create(&x->x_threadid, &x->multio_thread_attr, usb_read_thread, x) < 0)
 	{
-       post("multio: could not launch receive thread");
+       error("multio: could not launch receive thread");
        return;
     }
     else
     {
-       post("multio: thread %d launched", (int)x->x_threadid );
+       if(x->x_verbose)post("multio: thread %d launched", (int)x->x_threadid );
     }
 }
 
@@ -139,7 +140,7 @@ static void multio_analog_write(t_multio *x, t_symbol *s, int argc, t_atom *argv
 
 	 if(channel < 0 || channel > 63)
 	{
-		error("multio: inconsistent dac output channel");
+		error("multio: inconsistent dac output channel: %d", channel);
 		return;
 	}
 
@@ -177,7 +178,7 @@ static void multio_digi_write(t_multio *x, t_symbol *s, int argc, t_atom *argv)
 
 	if(channel < 0 || channel > 63)
 	{
-		error("multio: inconsistent digital output channel");
+		error("multio: inconsistent digital output channel: %d", channel);
 		return;
 	}
 
@@ -194,7 +195,7 @@ static void multio_digi_write(t_multio *x, t_symbol *s, int argc, t_atom *argv)
 		buffer[0] = group + 1; // + 1 is the offset for digi outs (1..9) 
 		buffer[1] = ctmp;
 		bytesread = usb_interrupt_write(x->d, 1, buffer, 3, TIMEOUT);
-		post("multio: writing %i to group %i", ctmp, group);
+		if(x->x_verbose)post("multio: writing %i to group %i", ctmp, group);
 	}
 
 }
@@ -327,7 +328,7 @@ static void multio_read(t_multio *x)
 	{
 	} else
 	{
-		post("error, connection not inizialized");
+		error("multIO: connection not inizialized");
 		return;
 	}
 
@@ -486,7 +487,7 @@ static void multio_open(t_multio *x)
 		}
 	}
 	// if i am here then i couldn't find mutlIO!
-	post("multio: unable to find multI/O !");
+	error("multio: unable to find multI/O !");
 }
 
 
@@ -522,25 +523,29 @@ static void multio_ft1(t_multio *x, t_floatarg g)
     if (g < 1) g = 1;
     x->x_deltime = g;
 }
+static void multio_verbose(t_multio *x, t_floatarg g)
+{
+    x->x_verbose=(g > 0) ;
+}
 
 
 
 static void multio_free(t_multio *x) 
 {
 if(is_open)
-{
+ {
 	clock_free(x->x_clock);
 	if(x->d)
 	{
 		while(pthread_cancel(x->x_threadid) < 0)
-			post("multio: killing thread\n");
-		post("multio: thread canceled\n");
+			if(x->x_verbose)post("multio: killing thread\n");
+		if(x->x_verbose)post("multio: thread canceled\n");
     		usb_close(x->d);
 	}
     is_open = 0;
-}
-else
-post("multio: not active object");
+ }
+ else
+  if(x->x_verbose)post("multio: not active object");
 }
 
 
@@ -551,6 +556,7 @@ if(!is_open)
     t_multio *x = (t_multio *)pd_new(multio_class);
 	x->x_clock = clock_new(x, (t_method)multio_tick);
 	x->x_deltime = DEFDELTIME;
+	x->x_verbose = 0;
 	x->a_out = outlet_new(&x->x_obj, &s_list);
 	x->d_out = outlet_new(&x->x_obj, &s_list);
 	x->s_out = outlet_new(&x->x_obj, &s_list);
@@ -568,7 +574,7 @@ if(!is_open)
 }
 else
 {
-post("multio: object already exists");
+error("multio: object already exists");
 return(0);
 }
 }
@@ -595,6 +601,9 @@ void multio_setup(void)
 	class_addmethod(multio_class, (t_method)multio_system_write, gensym("system_write"),
         A_GIMME, 0);
 is_open = 0;
+
+	class_addmethod(multio_class, (t_method)multio_verbose, gensym("verbose"), A_FLOAT, 0);
+
 	// welcome message
 	post("\nmultio: a pd driver for the multI/O USB device");
 	post("multio: www.davidemorelli.it - multio.mamalala.de");
