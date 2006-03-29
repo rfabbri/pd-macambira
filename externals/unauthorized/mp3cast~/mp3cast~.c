@@ -28,7 +28,7 @@
 
 
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -42,27 +42,29 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef MACOSX
+#include <ctype.h>
+
+#ifndef __APPLE__
 #include <malloc.h>
 #endif
-#include <ctype.h>
-#ifdef UNIX
+
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#include <winsock.h>
+#include <windef.h>
+#else 
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <time.h>
 #include <sys/time.h>
+#define SOCKET_ERROR -1
+#endif
+
 #include <lame/lame.h>        /* lame encoder stuff */
 #include "mpg123.h" 
-#define SOCKET_ERROR -1
-#else
-#include <io.h>
-#include <windows.h>
-#include <winsock.h>
-#include <windef.h>
-#include "lame_enc.h"        /* lame encoder stuff */
-#endif
 
 
 #define        MY_MP3_MALLOC_IN_SIZE        65536
@@ -73,16 +75,6 @@
 #define        STRBUF_SIZE 32
 
 static char   *mp3cast_version = "mp3cast~: mp3 streamer version 0.5, written by Yves Degoyon";
-
-#ifndef UNIX
-static        HINSTANCE           dll             = NULL;
-static        BEINITSTREAM        initStream      = NULL;
-static        BEENCODECHUNK       encodeChunk     = NULL;
-static        BEDEINITSTREAM      deinitStream    = NULL;
-static        BECLOSESTREAM       closeStream     = NULL;
-static        BEVERSION           dllVersion      = NULL;
-static        BEWRITEVBRHEADER    writeVBRHeader  = NULL;
-#endif
 
 static char base64table[65] = {
     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
@@ -131,9 +123,7 @@ typedef struct _mp3cast
 
     t_float x_f;              /* float needed for signal input */
 
-#ifdef UNIX
     lame_global_flags *lgfp;  /* lame encoder configuration */
-#endif
 
 } t_mp3cast;
 
@@ -199,27 +189,16 @@ static void mp3cast_encode(t_mp3cast *x)
     }
 
         /* encode mp3 data */
-#ifndef UNIX
-    err = encodeChunk(x->x_lame, x->x_lamechunk, x->x_mp3inbuf, x->x_mp3outbuf, &x->x_mp3size);
-#else
     x->x_mp3size = lame_encode_buffer_interleaved(x->lgfp, x->x_mp3inbuf, 
                    x->x_lamechunk/lame_get_num_channels(x->lgfp), 
                    x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     // post( "mp3cast~ : encoding returned %d frames", x->x_mp3size );
-#endif
 
         /* check result */
-#ifndef UNIX
-    if(err != BE_ERR_SUCCESSFUL)
-    {
-        closeStream(x->x_lame);
-        error("mp3cast~: lameEncodeChunk() failed (%lu)", err);
-#else
     if(x->x_mp3size<0)
     {
         lame_close( x->lgfp );
         error("mp3cast~: lame_encode_buffer_interleaved failed (%d)", x->x_mp3size);
-#endif
         x->x_lame = -1;
     }
 }
@@ -235,17 +214,13 @@ static void mp3cast_stream(t_mp3cast *x)
     if(err < 0)
     {
         error("mp3cast~: could not send encoded data to server (%d)", err);
-#ifndef UNIX
-        closeStream(x->x_lame);
-#else
         lame_close( x->lgfp );
-#endif
         x->x_lame = -1;
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(x->x_fd);
 #else
         close(x->x_fd);
-#endif
+#endif /* _WIN32 */
         x->x_fd = -1;
         outlet_float(x->x_obj.ob_outlet, 0);
     } 
@@ -355,21 +330,14 @@ static void mp3cast_dsp(t_mp3cast *x, t_signal **sp)
     /* initialize the lame library */
 static void mp3cast_tilde_lame_init(t_mp3cast *x)
 {
-#ifndef UNIX
-        /* encoder related stuff (calculating buffer size) */
-    BE_VERSION    lameVersion        = {0,};                                /* version number of LAME */
-    BE_CONFIG     lameConfig         = {0,};                                /* config structure of LAME */
-    unsigned int    ret;
-#else
     int    ret;
     x->lgfp = lame_init(); /* set default parameters for now */
-#endif
 
-#ifndef UNIX
+#ifdef _WIN32
     /* load lame_enc.dll library */
-
-    dll=LoadLibrary("lame_enc.dll");
-    if(dll==NULL)
+	 HINSTANCE dll;
+	 dll=LoadLibrary("lame_enc.dll");
+    if(!dll)
     {
         error("mp3cast~: error loading lame_enc.dll");
         closesocket(x->x_fd);
@@ -378,75 +346,13 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
         post("mp3cast~: connection closed");
         return;
     }
-
-        /* get Interface functions */
-    initStream      = (BEINITSTREAM) GetProcAddress(dll, TEXT_BEINITSTREAM);
-    encodeChunk     = (BEENCODECHUNK) GetProcAddress(dll, TEXT_BEENCODECHUNK);
-    deinitStream    = (BEDEINITSTREAM) GetProcAddress(dll, TEXT_BEDEINITSTREAM);
-    closeStream     = (BECLOSESTREAM) GetProcAddress(dll, TEXT_BECLOSESTREAM);
-    dllVersion      = (BEVERSION) GetProcAddress(dll, TEXT_BEVERSION);
-    writeVBRHeader  = (BEWRITEVBRHEADER) GetProcAddress(dll,TEXT_BEWRITEVBRHEADER);
-
-        /* check if all interfaces are present */
-    if(!initStream || !encodeChunk || !deinitStream || !closeStream || !dllVersion || !writeVBRHeader)
-    {
-
-        error("mp3cast~: unable to get LAME interfaces");
-        closesocket(x->x_fd);
-        x->x_fd = -1;
-        outlet_float(x->x_obj.ob_outlet, 0);
-        post("mp3cast~: connection closed");
-        return;
-    }
-
-        /* get LAME version number */
-    dllVersion(&lameVersion);
-
-    post(   "mp3cast~: lame_enc.dll version %u.%02u (%u/%u/%u)\n"
-            "            lame_enc engine %u.%02u",    
-            lameVersion.byDLLMajorVersion, lameVersion.byDLLMinorVersion,
-            lameVersion.byDay, lameVersion.byMonth, lameVersion.wYear,
-            lameVersion.byMajorVersion, lameVersion.byMinorVersion);
-
-    memset(&lameConfig,0,sizeof(lameConfig));                        /* clear all fields */
-#else
+#endif  /* _WIN32 */
     {
        const char *lameVersion = get_lame_version();
        post( "mp3cast~ : using lame version : %s", lameVersion );
     }
-#endif 
 
-#ifndef UNIX
 
-        /* use the LAME config structure */
-    lameConfig.dwConfig = BE_CONFIG_LAME;
-
-        /* set the mpeg format flags */
-    lameConfig.format.LHV1.dwStructVersion  = 1;
-    lameConfig.format.LHV1.dwStructSize     = sizeof(lameConfig);        
-    lameConfig.format.LHV1.dwSampleRate     = (int)sys_getsr();     /* input frequency - pd's sample rate */
-    lameConfig.format.LHV1.dwReSampleRate   = x->x_samplerate;      /* output s/r - resample if necessary */
-    lameConfig.format.LHV1.nMode            = x->x_mp3mode;         /* output mode */
-    lameConfig.format.LHV1.dwBitrate        = x->x_bitrate;         /* mp3 bitrate */
-    lameConfig.format.LHV1.nPreset          = x->x_mp3quality;      /* mp3 encoding quality */
-    lameConfig.format.LHV1.dwMpegVersion    = MPEG1;                /* use MPEG1 */
-    lameConfig.format.LHV1.dwPsyModel       = 0;                    /* USE DEFAULT PSYCHOACOUSTIC MODEL */
-    lameConfig.format.LHV1.dwEmphasis       = 0;                    /* NO EMPHASIS TURNED ON */
-    lameConfig.format.LHV1.bOriginal        = TRUE;                 /* SET ORIGINAL FLAG */
-    lameConfig.format.LHV1.bCopyright       = TRUE;                 /* SET COPYRIGHT FLAG */
-    lameConfig.format.LHV1.bNoRes           = TRUE;                 /* no bit resorvoir */
-
-        /* init the MP3 stream */
-    ret = initStream(&lameConfig, &x->x_lamechunk, &x->x_mp3size, &x->x_lame);
-
-        /* check result */
-    if(ret != BE_ERR_SUCCESSFUL)
-    {
-        post("mp3cast~: error opening encoding stream (%lu)", ret);
-        return;
-    }
-
-#else
         /* setting lame parameters */
     lame_set_num_channels( x->lgfp, 2);
     lame_set_in_samplerate( x->lgfp, sys_getsr() );
@@ -470,9 +376,6 @@ static void mp3cast_tilde_lame_init(t_mp3cast *x)
        post( "mp3cast~ : lame initialization done. (%d)", x->x_lame );
     }
     lame_init_bitstream( x->lgfp );
-#endif
-
-
 }
 
 char *mp3cast_base64_encode(char *data)
@@ -534,12 +437,7 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     fd_set          fdset;
     struct timeval  tv;
     int    sockfd;
-
-#ifndef UNIX
-    unsigned int    ret;
-#else
     int    ret;
-#endif
 
     if(x->x_icecast == 0)portno++;    /* use SHOUTcast, portno is one higher */
 
@@ -562,11 +460,7 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     if (hp == 0)
     {
         post("mp3cast~: bad host?");
-#ifndef UNIX
-        closesocket(sockfd);
-#else
         close(sockfd);
-#endif
         return;
     }
     memcpy((char *)&server.sin_addr, (char *)hp->h_addr, hp->h_length);
@@ -579,11 +473,11 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     if (connect(sockfd, (struct sockaddr *) &server, sizeof (server)) < 0)
     {
         error("mp3cast~: connection failed!\n");
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(sockfd);
 #else
         close(sockfd);
-#endif
+#endif /* _WIN32 */
         return;
     }
 
@@ -597,24 +491,22 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     if(ret < 0)
     {
         error("mp3cast~: can not read from socket");
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(sockfd);
 #else
         close(sockfd);
-#endif
+#endif /* _WIN32 */
         return;
     }
+#ifndef _WIN32
     ret = select(sockfd + 1, NULL, &fdset, NULL, &tv);
     if(ret < 0)
     {
         error("mp3cast~: can not write to socket");
-#ifndef UNIX
-        closesocket(sockfd);
-#else
         close(sockfd);
-#endif
         return;
     }
+#endif /* not _WIN32 */
 
     if(x->x_icecast == 0) /* SHOUTCAST */
     {
@@ -814,11 +706,11 @@ static void mp3cast_connect(t_mp3cast *x, t_symbol *hostname, t_floatarg fportno
     {
         post("mp3cast~: login failed!");
         if ( len>0 ) post("mp3cast~: server answered : %s", resp);
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(sockfd);
 #else
         close(sockfd);
-#endif
+#endif /* _WIN32 */
         return;
     }
 
@@ -842,34 +734,23 @@ static void mp3cast_disconnect(t_mp3cast *x)
     int err = -1;
     if(x->x_lame >= 0)
     {
-#ifndef UNIX
-            /* deinit the stream */
-        err = deinitStream(x->x_lame, x->x_mp3outbuf, &x->x_mp3size);
-
-            /* check result */
-        if(err != BE_ERR_SUCCESSFUL)
-        {
-            error("exiting mp3 stream failed (%lu)", err);
-        }
-        closeStream(x->x_lame); /* close mp3 encoder stream */
-#else
-            /* ignore remaining bytes */
+		 /* ignore remaining bytes */
         if ( x->x_mp3size = lame_encode_flush( x->lgfp, x->x_mp3outbuf, 0) < 0 ) {
             post( "mp3cast~ : warning : remaining encoded bytes" );
         }
         lame_close( x->lgfp );
-#endif
+
         x->x_lame = -1;
         post("mp3cast~: encoder stream closed");
     }
 
     if(x->x_fd >= 0)            /* close socket */
     {
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(x->x_fd);
 #else
         close(x->x_fd);
-#endif
+#endif /* _WIN32 */
         x->x_fd = -1;
         outlet_float(x->x_obj.ob_outlet, 0);
         post("mp3cast~: connection closed");
@@ -925,11 +806,7 @@ static void mp3cast_print(t_mp3cast *x)
     }
     post("    mode: %s\n"
          "    quality: %d", buf, x->x_mp3quality);
-#ifndef UNIX
-    if(x->x_lamechunk!=0)post("    calculated mp3 chunk size: %d", x->x_lamechunk);
-#else
     post("    mp3 chunk size: %d", x->x_lamechunk);
-#endif
     if(x->x_samplerate!=sys_getsr())
     {
         post("    resampling from %d to %d Hz!", (int)sys_getsr(), x->x_samplerate);
@@ -1022,17 +899,13 @@ static void mp3cast_description(t_mp3cast *x, t_symbol *description)
 static void mp3cast_free(t_mp3cast *x)    
 {
     if(x->x_lame >= 0)
-#ifndef UNIX
-        closeStream(x->x_lame);
-#else
         lame_close( x->lgfp );
-#endif
     if(x->x_fd >= 0)
-#ifndef UNIX
+#ifdef _WIN32
         closesocket(x->x_fd);
 #else
         close(x->x_fd);
-#endif
+#endif /* _WIN32 */
     freebytes(x->x_mp3inbuf, MY_MP3_MALLOC_IN_SIZE*sizeof(short));
     freebytes(x->x_mp3outbuf, MY_MP3_MALLOC_OUT_SIZE);
     freebytes(x->x_buffer, MY_MP3_MALLOC_IN_SIZE*sizeof(short));
