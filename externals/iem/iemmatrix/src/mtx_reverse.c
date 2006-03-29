@@ -5,6 +5,7 @@
  *  mostly refering to matlab/octave matrix functions
  *
  * Copyright (c) 2005, Franz Zotter
+ * Copyright (c) 2006, IOhannes m zmölnig
  * IEM, Graz, Austria
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
@@ -16,22 +17,17 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_reverse_class;
-static t_symbol *row_sym;
-static t_symbol *col_sym;
-static t_symbol *col_sym2;
 
 typedef struct _MTXreverse_ MTXreverse;
 struct _MTXreverse_
 {
-   t_object x_obj;
-   int size;
-   //int reverse_dimension;
-   t_symbol *reverse_mode;
+  t_object x_obj;
+  int size;
+  int reverse_mode; // 0=col; 1=row
 
-   t_outlet *list_outlet;
-
-   t_atom *list_out;
-   t_atom *list_in;
+  t_outlet *list_outlet;
+  t_atom *list_out;
+  t_atom *list_in;
 };
 
 static void deleteMTXreverse (MTXreverse *mtx_reverse_obj) 
@@ -41,36 +37,31 @@ static void deleteMTXreverse (MTXreverse *mtx_reverse_obj)
 }
 static void mTXSetReverseMode (MTXreverse *mtx_reverse_obj, t_symbol *c_mode)
 {
-   mtx_reverse_obj->reverse_mode = c_mode;
+  char c=*c_mode->s_name;
+  switch(c){
+  case 'c': case 'C': case ':': /* "column" */
+    mtx_reverse_obj->reverse_mode = 1;
+    break;
+  case 'r': case 'R': /* "row" */
+    mtx_reverse_obj->reverse_mode = 0;
+    break;
+  case 'l': case 'L': // "list" just revert the whole matrix as if it was a list
+    mtx_reverse_obj->reverse_mode = -1;
+    break;
+  default:
+    error("mtx_reverse: invalid mode '%s'", c_mode->s_name);
+    break;
+  }
 }
-/*
-static void mTXSetreverseDimension (MTXreverse *mtx_reverse_obj, t_float c_dim)
-{
-   int dimension = (int) c_dim;
-   dimension = (dimension > 0)?dimension:0;
-   dimension = (dimension < 2)?dimension:2;
-   mtx_reverse_obj->reverse_dimension = dimension;
-}
-*/
-
 
 static void *newMTXreverse (t_symbol *s, int argc, t_atom *argv)
 {
    MTXreverse *mtx_reverse_obj = (MTXreverse *) pd_new (mtx_reverse_class);
-   mTXSetReverseMode (mtx_reverse_obj, gensym(":"));
-   switch ((argc>1)?1:argc) {
-      case 1:
-	 mTXSetReverseMode (mtx_reverse_obj, atom_getsymbol (argv));
-   }
-   /*int c_dim = 0;
+   if(argc&&(A_SYMBOL==argv->a_type))
+     mTXSetReverseMode (mtx_reverse_obj, atom_getsymbol (argv));
+   else
+     mTXSetReverseMode (mtx_reverse_obj, gensym(":"));
 
-   mtx_reverse_obj->reverse_dimension = c_dim;
-   switch ((argc>1)?1:argc) {
-      case 1:
-	 c_dim = atom_getint(argv);
-   }
-   mTXSetreverseDimension (mtx_reverse_obj, (t_float) c_dim);
-*/
    mtx_reverse_obj->list_outlet = outlet_new (&mtx_reverse_obj->x_obj, gensym("matrix"));
    return ((void *) mtx_reverse_obj);
 } 
@@ -125,11 +116,11 @@ static void mTXreverseMatrix (MTXreverse *mtx_reverse_obj, t_symbol *s,
 
    // size check
    if (!size) {
-      post("mtx_reverse: invalid dimensions");
+      error("mtx_reverse: invalid dimensions");
       return;
    }
    else if (list_size<size) {
-      post("mtx_reverse: sparse matrix not yet supported: use \"mtx_check\"");
+      error("mtx_reverse: sparse matrix not yet supported: use \"mtx_check\"");
       return;
    }
    
@@ -141,43 +132,26 @@ static void mTXreverseMatrix (MTXreverse *mtx_reverse_obj, t_symbol *s,
 	       sizeof (t_atom) * (mtx_reverse_obj->size+2),
 	       sizeof (t_atom) * (size + 2));
    }
-
+   
    mtx_reverse_obj->size = size;
    mtx_reverse_obj->list_out = list_out;
-
+   
    // main part
    list_out += 2;
    copyList (size, argv, list_out);
 
-   if ((mtx_reverse_obj->reverse_mode == col_sym)||
-	 (mtx_reverse_obj->reverse_mode == col_sym2)) {
-      for (count = columns; count--; list_out++)
-	 reverseListStep (size, columns, list_out);
+   if ((mtx_reverse_obj->reverse_mode == 0)) {
+     for (count = columns; count--; list_out++)
+       reverseListStep (size, columns, list_out);
    }
-   else if (mtx_reverse_obj->reverse_mode == row_sym) {
-      for (count = rows; count--; list_out += columns) 
-	 reverseList (columns, list_out);
+   else if (mtx_reverse_obj->reverse_mode == 1) {
+     for (count = rows; count--; list_out += columns) 
+       reverseList (columns, list_out);
    }
    else 
-      reverseList (size, list_out); 
-
-/*
-   switch (mtx_reverse_obj->reverse_dimension) {
-      case 2:
-	 for (count = columns; count--; list_out++)
-	    reverseListStep (size, columns, list_out);
-	 break;
-      case 1:
-	 for (count = rows; count--; list_out += columns) 
-	    reverseList (columns, list_out);
-	 break;
-      case 0:
-	 reverseList (size, list_out); 
-	 break;
-   }
-   */
+     reverseList (size, list_out); 
+   
    list_out = mtx_reverse_obj->list_out;
-
 
    SETSYMBOL(list_out, gensym("matrix"));
    SETFLOAT(list_out, rows);
@@ -198,10 +172,6 @@ void mtx_reverse_setup (void)
    class_addmethod (mtx_reverse_class, (t_method) mTXreverseMatrix, gensym("matrix"), A_GIMME,0);
 //   class_addmethod (mtx_reverse_class, (t_method) mTXSetreverseDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_reverse_class, (t_method) mTXSetReverseMode, gensym("mode"), A_DEFSYMBOL,0);
-
-   row_sym = gensym("row");
-   col_sym = gensym("col");
-   col_sym2 = gensym("column");
 }
 
 void iemtx_reverse_setup(void){
