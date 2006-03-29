@@ -1250,6 +1250,16 @@ static void MIDIbuf(int type, int chan, int param, int val, t_dssi_tilde *x){
 		x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
 		x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
 		break;
+	    case SND_SEQ_EVENT_CHANPRESS:
+		x->midiEventBuf[x->bufWriteIndex].data.control.channel = chan;
+		x->midiEventBuf[x->bufWriteIndex].data.control.param = 0;
+		x->midiEventBuf[x->bufWriteIndex].data.control.value = val;
+		break;
+	    case SND_SEQ_EVENT_KEYPRESS:
+		x->midiEventBuf[x->bufWriteIndex].data.note.channel = chan;
+		x->midiEventBuf[x->bufWriteIndex].data.note.note = param;
+		x->midiEventBuf[x->bufWriteIndex].data.note.velocity = val;
+		break;
 	    case SND_SEQ_EVENT_PGMCHANGE:
 		x->instances[chan].pendingBankMSB = (param - 1) / 128;
 		x->instances[chan].pendingBankLSB = (param - 1) % 128;
@@ -1294,6 +1304,10 @@ static void dssi_tilde_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv
 	case ASCII_p: ev_type = SND_SEQ_EVENT_PGMCHANGE;
 		      break;
 	case ASCII_b: ev_type = SND_SEQ_EVENT_PITCHBEND;
+		      break;
+	case ASCII_t: ev_type = SND_SEQ_EVENT_CHANPRESS;
+		      break;
+	case ASCII_a: ev_type = SND_SEQ_EVENT_KEYPRESS;
 		      break;
     }
 #if DEBUG

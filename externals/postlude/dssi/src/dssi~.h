@@ -41,7 +41,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.93
+#define VERSION 0.94
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */
@@ -50,6 +50,8 @@
 #define ASCII_p 112
 #define ASCII_c 99
 #define ASCII_b 98
+#define ASCII_t 116
+#define ASCII_a 97
 
 #define LOADGUI 1 /* FIX: depracate this */
 #define DEBUG 0
