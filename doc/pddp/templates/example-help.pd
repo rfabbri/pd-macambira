@@ -1,0 +1,137 @@
+#N canvas 684 24 579 627 10;
+#X obj 8 586 cnv 15 550 20 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 550 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 28 DESCRIPTION: Float object stores a floating point number.
+;
+#X obj 7 186 cnv 15 550 15 empty empty Inlets(2) 3 7 0 13 -200249 -1
+0;
+#N canvas 0 22 470 320 META 0;
+#X text 12 15 KEYWORDS: control number float store;
+#X text 12 5 CATEGORY: control;
+#X restore 142 588 pd META;
+#X obj 12 9 float;
+#X obj 82 9 f;
+#X obj 74 128 cnv 10 50 16 empty empty empty 20 12 0 14 -262126 -66577
+0;
+#X obj 351 129 cnv 10 23 16 empty empty empty 20 12 0 14 -262126 -66577
+0;
+#X floatatom 374 107 5 0 0 0 - - -;
+#X floatatom 341 155 5 0 0 0 - - -;
+#X obj 371 79 bng 15 250 50 0 empty empty Bang-Message 20 7 0 12 -118429
+-1 -1;
+#X floatatom 73 153 5 0 0 0 - - -;
+#X msg 73 104 bang;
+#X msg 298 87 7 3 4;
+#X obj 352 129 f;
+#X obj 73 128 float 7;
+#X text 298 69 lists;
+#X text 130 128 creation argument;
+#X text 56 10 or;
+#X text 13 589 PDDP Project 2005;
+#X text 105 526 LINK: doc/2.control.examples/sendnumber.pd;
+#X text 105 538 LINK: PDDP:all_about_data-types.pd;
+#X text 105 550 LINK: PDDP:all_about_gui-objects.pd;
+#X text 415 106 LINK: number tip;
+#X obj 7 396 cnv 15 550 15 empty empty Outlets(1) 3 7 0 13 -200249
+-1 0;
+#X obj 7 446 cnv 15 550 15 empty empty Arguments(1) 3 7 0 13 -200249
+-1 0;
+#X obj 7 506 cnv 15 550 15 empty empty More_Info 3 7 0 13 -200249 -1
+0;
+#X obj 27 341 cnv 15 60 45 empty empty Inlet_1 3 9 0 12 -233017 -1
+0;
+#X text 105 563 LINK: Tutorial: Intro to Pure-Data Control;
+#X obj 27 207 cnv 15 60 125 empty empty Inlet_0 3 9 0 12 -233017 -1
+0;
+#X obj 27 416 cnv 15 60 24 empty empty Outlet_0 3 9 0 12 -233017 -1
+0;
+#X text 105 470 [float] accepts a single float as a creation argument
+which initializes the first value to be sent out the left outlet.;
+#X text 104 416 FLOAT - outputs the stored floating point value of
+the object.;
+#X text 104 206 FLOAT - A float at the left inlet will update the stored
+value of the object and will send the number immediately to the outlet.
+;
+#X text 104 249 BANG - A bang at the left inlet will force [float]
+to send its value to the outlet.;
+#X text 104 279 LIST - A list at the left inlet will be truncated to
+include only the first element. The first element in the list will
+update the stored value of the object and will send the number immediately
+to the outlet.;
+#X text 105 343 FLOAT - A float at the right inlet is stored for later
+use. It will be sent to the left outlet when a float or bang is received
+in the left inlet.;
+#N canvas 696 168 464 344 PAGES 0;
+#N canvas 528 80 578 631 PAGE2 0;
+#X obj 8 586 cnv 15 550 20 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 550 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 28 DESCRIPTION: Float object stores a floating point number.
+;
+#X obj 12 9 float;
+#X obj 82 9 f;
+#X text 56 10 or;
+#X text 13 589 PDDP Project 2005;
+#X text 459 22 LINK:Glossary;
+#X text 459 10 LINK:Contents;
+#X text 243 300 This is page 2;
+#X obj 501 588 cnv 15 15 15 empty empty 2 0 8 0 12 -200249 -1 0;
+#X obj 517 588 cnv 15 15 15 empty empty of 0 8 0 12 -200249 -1 0;
+#X obj 533 588 cnv 15 25 15 empty pddpNumPages 3 4 8 0 12 -200249 -1
+0;
+#X obj 460 589 bng 15 250 50 0 pddpNextPage \$0- < 4 8 0 12 -262144
+-1 -1;
+#X obj 478 589 bng 15 250 50 0 pddpNextPage \$0- > 4 8 0 12 -262144
+-1 -1;
+#X restore 8 55 pd PAGE2;
+#N canvas 528 82 575 623 PAGE3 0;
+#X obj 8 586 cnv 15 550 20 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 550 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 28 DESCRIPTION: Float object stores a floating point number.
+;
+#X obj 12 9 float;
+#X obj 82 9 f;
+#X text 56 10 or;
+#X text 13 589 PDDP Project 2005;
+#X text 459 22 LINK:Glossary;
+#X text 459 10 LINK:Contents;
+#X text 243 300 This is page 3;
+#X obj 501 588 cnv 15 15 15 empty empty 3 0 8 0 12 -200249 -1 0;
+#X obj 517 588 cnv 15 15 15 empty empty of 0 8 0 12 -200249 -1 0;
+#X obj 533 588 cnv 15 25 15 empty pddpNumPages 3 4 8 0 12 -200249 -1
+0;
+#X obj 460 589 bng 15 250 50 0 pddpNextPage \$0- < 4 8 0 12 -262144
+-1 -1;
+#X obj 478 589 bng 15 250 50 0 pddpNextPage \$0- > 4 8 0 12 -262144
+-1 -1;
+#X restore 68 55 pd PAGE3;
+#X text 9 109 Don't forget to set the number of pages...;
+#X text 7 11 Put your pages here: (They must be named [pd PAGE1] [pd
+PAGE2] ...;
+#X obj 12 143 pddp_page 3;
+#X text 24 179 BUG: these page-turns need to be local! Add logic for
+back button;
+#X coords 0 0 1.01598e-05 1.58148e-05 96 15 0;
+#X restore 197 588 pd PAGES;
+#X obj 460 589 bng 15 250 50 0 pddpNextPage \$0- < 4 8 0 12 -262144
+-1 -1;
+#X text 459 22 LINK:Glossary;
+#X text 459 10 LINK:Contents;
+#X obj 500 589 cnv 15 15 15 empty empty 1 0 8 0 12 -200249 -1 0;
+#X obj 516 589 cnv 15 15 15 empty empty of 0 8 0 12 -200249 -1 0;
+#X obj 532 589 cnv 15 25 15 empty pddpNumPages 3 4 8 0 12 -200249 -1
+0;
+#X obj 478 589 bng 15 250 50 0 pddpNextPage \$0- > 4 8 0 12 -262144
+-1 -1;
+#X text 361 589 Previous/Next;
+#X connect 9 0 15 1;
+#X connect 11 0 15 0;
+#X connect 13 0 16 0;
+#X connect 14 0 15 0;
+#X connect 15 0 10 0;
+#X connect 16 0 12 0;

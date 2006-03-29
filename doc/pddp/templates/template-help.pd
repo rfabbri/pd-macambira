@@ -1,0 +1,79 @@
+#N canvas 471 30 579 627 10;
+#X obj 8 586 cnv 15 550 20 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 550 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 7 186 cnv 15 550 15 empty empty Inlets(?) 3 7 0 13 -200249 -1
+0;
+#N canvas 0 22 474 324 META 0;
+#X text 12 5 CATEGORY:;
+#X text 12 15 KEYWORDS:;
+#X restore 142 588 pd META;
+#X text 56 10 or;
+#X text 13 589 PDDP Project 2005;
+#X obj 7 396 cnv 15 550 15 empty empty Outlets(1) 3 7 0 13 -200249
+-1 0;
+#X obj 7 446 cnv 15 550 15 empty empty Arguments(1) 3 7 0 13 -200249
+-1 0;
+#X obj 7 506 cnv 15 550 15 empty empty More_Info 3 7 0 13 -200249 -1
+0;
+#X obj 27 341 cnv 15 60 45 empty empty Inlet_1 3 9 0 12 -233017 -1
+0;
+#X obj 27 207 cnv 15 60 125 empty empty Inlet_0 3 9 0 12 -233017 -1
+0;
+#X obj 27 416 cnv 15 60 24 empty empty Outlet_0 3 9 0 12 -233017 -1
+0;
+#N canvas 696 168 468 348 PAGES 0;
+#N canvas 528 80 578 631 PAGE2 0;
+#X obj 8 586 cnv 15 550 20 empty empty empty 20 12 0 14 -200249 -66577
+0;
+#X obj 8 6 cnv 15 550 40 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X text 12 28 DESCRIPTION: Float object stores a floating point number.
+;
+#X obj 12 9 float;
+#X obj 82 9 f;
+#X text 56 10 or;
+#X text 13 589 PDDP Project 2005;
+#X text 459 22 LINK:Glossary;
+#X text 459 10 LINK:Contents;
+#X text 243 300 This is page 2;
+#X obj 501 588 cnv 15 15 15 empty empty 2 0 8 0 12 -200249 -1 0;
+#X obj 517 588 cnv 15 15 15 empty empty of 0 8 0 12 -200249 -1 0;
+#X obj 533 588 cnv 15 25 15 empty pddpNumPages 2 4 8 0 12 -200249 -1
+0;
+#X obj 460 589 bng 15 250 50 0 pddpNextPage \$0- < 4 8 0 12 -262144
+-1 -1;
+#X obj 478 589 bng 15 250 50 0 pddpNextPage \$0- > 4 8 0 12 -262144
+-1 -1;
+#X restore 8 55 pd PAGE2;
+#X text 9 109 Don't forget to set the number of pages...;
+#X text 7 11 Put your pages here: (They must be named [pd PAGE1] [pd
+PAGE2] ...;
+#X text 24 179 BUG: these page-turns need to be local! Add logic for
+back button;
+#X obj 12 143 pddp_page 2;
+#X coords 0 0 1.01598e-05 1.58148e-05 96 15 0;
+#X restore 197 588 pd PAGES;
+#X obj 460 589 bng 15 250 50 0 pddpNextPage \$0- < 4 8 0 12 -262144
+-1 -1;
+#X text 459 22 LINK:Glossary;
+#X text 459 10 LINK:Contents;
+#X obj 500 589 cnv 15 15 15 empty empty 1 0 8 0 12 -200249 -1 0;
+#X obj 516 589 cnv 15 15 15 empty empty of 0 8 0 12 -200249 -1 0;
+#X obj 532 589 cnv 15 25 15 empty pddpNumPages 2 4 8 0 12 -200249 -1
+0;
+#X obj 478 589 bng 15 250 50 0 pddpNextPage \$0- > 4 8 0 12 -262144
+-1 -1;
+#X text 361 589 Previous/Next;
+#X text 12 28 DESCRIPTION:;
+#X text 104 206;
+#X text 104 249;
+#X text 104 279;
+#X text 105 343;
+#X text 104 416;
+#X text 105 470;
+#X text 105 538;
+#X text 105 526;
+#X text 105 551;
+#X text 105 563;
