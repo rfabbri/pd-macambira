@@ -45,7 +45,7 @@ static void mTXSetReverseMode (MTXreverse *mtx_reverse_obj, t_symbol *c_mode)
   case 'r': case 'R': /* "row" */
     mtx_reverse_obj->reverse_mode = 0;
     break;
-  case 'l': case 'L': // "list" just revert the whole matrix as if it was a list
+  case 'e': case 'E': case '.': // "element" just revert the whole matrix as if it was a list
     mtx_reverse_obj->reverse_mode = -1;
     break;
   default:
