@@ -219,9 +219,8 @@ void mtx_mul_setup(void)
   class_addlist  (mtx_mulscalar_class, mtx_mulscalar_list);
   class_addbang  (mtx_mulscalar_class, mtx_binscalar_bang);
 
-  class_sethelpsymbol(mtx_mul_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_mulelement_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_mulscalar_class, gensym("iemmatrix/mtx_binops"));
+  class_sethelpsymbol(mtx_mulelement_class, gensym("mtx_mul-help"));
+  class_sethelpsymbol(mtx_mulscalar_class, gensym("mtx_mul-help"));
 }
 
 
@@ -355,8 +354,8 @@ void mtx_div_setup(void)
   class_addlist  (mtx_divscalar_class, mtx_divscalar_list);
   class_addbang  (mtx_divscalar_class, mtx_binscalar_bang);
 
-  class_sethelpsymbol(mtx_divelement_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_divscalar_class, gensym("iemmatrix/mtx_binops"));
+  class_sethelpsymbol(mtx_divelement_class, gensym("mtx_mul-help"));
+  class_sethelpsymbol(mtx_divscalar_class, gensym("mtx_mul-help"));
 }
 
 void iemtx_mul_setup(void)

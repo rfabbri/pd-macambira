@@ -916,12 +916,13 @@ static void *matrix_multilde_new(t_symbol *s, int argc, t_atom *argv)
 
 void mtx_mul_tilde_setup(void)
 {
-  matrix_multilde_class = class_new(gensym("mtx_*~"),
+  matrix_multilde_class = class_new(gensym("mtx_mul~"),
 				       (t_newmethod)matrix_multilde_new, 
 				       (t_method)matrix_multilde_free,
 				       sizeof(t_matrix_multilde), 0, A_GIMME, 0);
 
   class_addcreator((t_newmethod)matrix_multilde_new, gensym("matrix_mul~"), A_GIMME, 0);
+  class_addcreator((t_newmethod)matrix_multilde_new, gensym("mtx_*~"), A_GIMME, 0);
   /* compatibility with tm's iem_matrix */
   class_addcreator((t_newmethod)matrix_multilde_new, gensym("matrix_mul_line~"), A_GIMME, 0);
   /* compatibility with jmz's zexy */
@@ -939,8 +940,6 @@ void mtx_mul_tilde_setup(void)
   class_addmethod(matrix_multilde_class, (t_method)matrix_multilde_time, gensym("time"), A_FLOAT, 0);
 
   class_addmethod(matrix_multilde_class, (t_method)matrix_multilde_matrixT, gensym(""), A_GIMME, 0);
-
-  class_sethelpsymbol(matrix_multilde_class, gensym("iemmatrix/matrix_mul~"));
 }
 
 void iemtx_mul__setup(void)
