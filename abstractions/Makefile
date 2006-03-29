@@ -22,6 +22,11 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
+# if your library isn't included in LIB_TARGETS, it won't be built with
+# Pd-extended. 
+LIB_TARGETS = gyre keyboardkeys la-kitchen list-abs memento \
+nusmuk nqpoly parazit pddp pixeltango purepd rradical
+
 # in case anything needs to be compiled or processed somehow before installing
 all:
 
@@ -30,9 +35,7 @@ final_setup:
 	chmod -R ugo-w $(pddocdir)
 
 install: all $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
-gyre_install keyboardkeys_install la_install-kitchen list-abs_install memento_install \
-nusmuk_install nqpoly_install parazit_install pddp_install pixeltango_install \
-purepd_install rradical_install
+$(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "abstractions install succeeded!"
 
@@ -94,7 +97,7 @@ list-abs_install:
 #-------------------------------------------------------------------------------
 # la-kitchen
 LA-KITCHEN_NAME = la-kitchen
-la_install-kitchen:
+la-kitchen_install:
 	install -d $(objectsdir)/$(LA-KITCHEN_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/La-kitchen/*.pd | \
 		grep -v '\-help.pd')    $(objectsdir)/$(LA-KITCHEN_NAME)
@@ -217,8 +220,9 @@ pixeltango_install:
 	install -d $(objectsdir)/$(PIXELTANGO_NAME)
 	install -p $(abstractions_src)/pixelTANGO/abstractions/*.pd \
 		$(objectsdir)/$(PIXELTANGO_NAME)
+	install -d $(objectsdir)/$(PIXELTANGO_NAME)/fx
 	install -p $(abstractions_src)/pixelTANGO/abstractions/fx/*.pd \
-		$(objectsdir)/$(PIXELTANGO_NAME)
+		$(objectsdir)/$(PIXELTANGO_NAME)/fx
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PIXELTANGO_NAME) \
 		--author "Ben Bogart" \
 		--license "GNU GPL" \
@@ -236,6 +240,15 @@ pixeltango_install:
 	install -p $(abstractions_src)/pixelTANGO/dev-notes/*.txt \
 		$(manualsdir)/$(PIXELTANGO_NAME)
 
+pixeltango_clean:
+	-rm -f -- $(objectsdir)/$(PIXELTANGO_NAME)/fx/*.*
+	-rmdir -- $(objectsdir)/$(PIXELTANGO_NAME)/fx
+	-rm -f -- $(objectsdir)/$(PIXELTANGO_NAME)/*.*
+	-rmdir -- $(objectsdir)/$(PIXELTANGO_NAME)
+	-rm -f -- $(examplesdir)/$(PIXELTANGO_NAME)/*.*
+	-rmdir -- $(examplesdir)/$(PIXELTANGO_NAME)
+	-rm -f -- $(manualsdir)/$(PIXELTANGO_NAME)/*.*
+	-rmdir -- $(manualsdir)/$(PIXELTANGO_NAME)
 
 
 #-------------------------------------------------------------------------------
