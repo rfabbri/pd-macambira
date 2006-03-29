@@ -67,7 +67,7 @@ else
     LDFLAGS += -shared
 # all of these included libs are part of libc in UNIX platforms.  All except
 # libregex are in DLLs, so they get stripped from the external's .dll binary
-    LIBS += -L$(pd_src)/bin -lpd \
+    LIBS += -L$(pd_src)/bin  -L$(pd_src)/obj  -lpd \
       -lwsock32 -lpthreadGC2 -lkernel32 -luser32 -lgdi32 -lregex
     DYLIB_LDFLAGS = -shared
     DYLIB_EXTENSION = so
@@ -513,7 +513,8 @@ freeverb_clean:
 #------------------------------------------------------------------------------#
 # HARDWARE
 HARDWARE_NAME=hardware
-HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp)
+# memPIO has some special deps, so don't include it yet.
+#HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp)
 # multio.c requires libusb, so don't include it yet...  <hans@at.or.at>
 #$(wildcard $(externals_src)/hardware/*/*.c)
 hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
