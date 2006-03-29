@@ -31,6 +31,7 @@ pseudo-inverse will be calculated.;
 #X obj 153 269 mtx_rand 3 4;
 #X obj 181 358 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
+#X text 199 359 instability detected!;
 #X connect 16 0 21 0;
 #X connect 16 1 28 0;
 #X connect 17 0 22 0;
