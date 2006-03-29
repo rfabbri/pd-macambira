@@ -20,14 +20,14 @@ static t_symbol *row_sym;
 typedef struct _MTXconcat_ MTXconcat;
 struct _MTXconcat_
 {
-   t_object x_obj;
-   int size;
-   t_symbol *concat_mode;
-   t_matrix mtx_in1;
-   t_matrix mtx_in2;
-   t_matrix mtx_out;
-
-   t_outlet *outl;
+  t_object x_obj;
+  int size;
+  int concat_mode;
+  t_matrix mtx_in1;
+  t_matrix mtx_in2;
+  t_matrix mtx_out;
+  
+  t_outlet *outl;
 };
 
 static void deleteMTXConcat (MTXconcat *mtx_concat_obj) 
@@ -38,16 +38,27 @@ static void deleteMTXConcat (MTXconcat *mtx_concat_obj)
 
 static void mTXSetConcatMode (MTXconcat *mtx_concat_obj, t_symbol *c_mode)
 {
-   mtx_concat_obj->concat_mode = c_mode;
+  char c=*c_mode->s_name;
+  switch(c){
+  case 'c': case 'C': case ':': /* "column" */
+    mtx_concat_obj->concat_mode = 1;
+    break;
+  case 'r': case 'R': /* "row" */
+    mtx_concat_obj->concat_mode = 0;
+    break;
+  default:
+    error("mtx_concat: invalid mode '%s'", c_mode->s_name);
+    break;
+  }
 }
 
 static void *newMTXConcat (t_symbol *s, int argc, t_atom *argv)
 {
    MTXconcat *mtx_concat_obj = (MTXconcat *) pd_new (mtx_concat_class);
-
-   mTXSetConcatMode (mtx_concat_obj, gensym(":"));
-   if ((argc>=1))
-      mTXSetConcatMode (mtx_concat_obj, atom_getsymbol(argv));
+   if(argc&&(A_SYMBOL==argv->a_type))
+     mTXSetConcatMode (mtx_concat_obj, atom_getsymbol (argv));
+   else
+     mTXSetConcatMode (mtx_concat_obj, gensym(":"));
 
    mtx_concat_obj->outl = mtx_concat_obj->mtx_out.x_outlet = outlet_new (&mtx_concat_obj->x_obj, gensym("matrix"));
    inlet_new(&mtx_concat_obj->x_obj, &mtx_concat_obj->x_obj.ob_pd, gensym("matrix"),gensym(""));
@@ -153,7 +164,7 @@ static void mTXConcatMatrix (MTXconcat *mtx_concat_obj, t_symbol *s,
 // alternatively to the above:
 //   matrix_matrix2 (mtx_in1, s, argc, argv);
 
-   if (mtx_concat_obj->concat_mode == row_sym) {
+   if (mtx_concat_obj->concat_mode == 0) {
       mTXConcatDoRowConcatenation(mtx_concat_obj, mtx_in1, mtx_in2, mtx_out);
    }
    else {
