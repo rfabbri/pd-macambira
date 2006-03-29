@@ -51,7 +51,7 @@ void mtx_egg_setup(void)
   class_addbang(mtx_egg_class, matrix_bang);
   class_addmethod(mtx_egg_class, (t_method)matrix_egg, gensym("matrix"), A_GIMME, 0);
 
-  class_sethelpsymbol(mtx_egg_class, gensym("iemmatrix/mtx_special"));
+
 }
 void iemtx_egg_setup(void){
   mtx_egg_setup();

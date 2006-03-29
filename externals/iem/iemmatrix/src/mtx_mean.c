@@ -52,7 +52,7 @@ void mtx_mean_setup(void)
   mtx_mean_class = class_new(gensym("mtx_mean"), (t_newmethod)mtx_mean_new, 
 			     (t_method)matrix_free, sizeof(t_matrix), 0, 0, 0);
   class_addmethod(mtx_mean_class, (t_method)mtx_mean_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_mean_class, gensym("iemmatrix/mtx_mean"));
+
 }
 
 void iemtx_mean_setup(void)

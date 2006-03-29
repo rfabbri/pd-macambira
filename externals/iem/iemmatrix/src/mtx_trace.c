@@ -48,7 +48,7 @@ void mtx_trace_setup(void)
 			      0, sizeof(t_mtx_trace), 0, A_GIMME, 0);
   class_addbang  (mtx_trace_class, mtx_trace_bang);
   class_addmethod(mtx_trace_class, (t_method)mtx_trace_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_trace_class, gensym("iemmatrix/mtx_trace"));
+
 }
 
 void iemtx_trace_setup(void)

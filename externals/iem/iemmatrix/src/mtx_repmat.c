@@ -152,7 +152,7 @@ void mtx_repmat_setup (void)
    class_addbang (mtx_repmat_class, (t_method) mTXRepmatBang);
    class_addmethod (mtx_repmat_class, (t_method) mTXRepmatMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_repmat_class, (t_method) mTXRepmatList, gensym(""), A_GIMME,0);
-   class_sethelpsymbol (mtx_repmat_class, gensym("iemmatrix/mtx_repmat"));
+
 }
 
 void iemtx_repmat_setup(void){

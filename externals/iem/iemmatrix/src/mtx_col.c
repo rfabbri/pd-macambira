@@ -120,7 +120,7 @@ void mtx_col_setup(void)
   class_addlist  (mtx_col_class, mtx_col_list);
   class_addmethod(mtx_col_class, (t_method)mtx_col_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod(mtx_col_class, (t_method)mtx_col_float, gensym(""), A_FLOAT, 0);
-  class_sethelpsymbol(mtx_col_class, gensym("iemmatrix/mtx_element"));
+
 }
 
 void iemtx_col_setup(void)

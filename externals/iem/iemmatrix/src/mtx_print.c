@@ -54,7 +54,7 @@ void mtx_print_setup(void)
   mtx_print_class = class_new(gensym("mtx_print"), (t_newmethod)mtx_print_new, 
 			      0, sizeof(t_mtxprint), 0, A_DEFSYM, 0);
   class_addmethod  (mtx_print_class, (t_method)mtx_print, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_print_class, gensym("iemmatrix/matrix"));
+
 }
 
 void iemtx_print_setup(void){

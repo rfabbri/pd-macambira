@@ -49,7 +49,7 @@ void mtx_diegg_setup(void)
   class_addlist  (mtx_diegg_class, matrix_diegg);
   class_addbang  (mtx_diegg_class, matrix_bang);
   class_addmethod(mtx_diegg_class, (t_method)mtx_diegg_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_diegg_class, gensym("iemmatrix/mtx_special"));
+
 }
 void iemtx_diegg_setup(void){
   mtx_diegg_setup();

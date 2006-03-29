@@ -284,7 +284,7 @@ void mtx_decay_setup (void)
    class_addmethod (mtx_decay_class, (t_method) mTXSetDecayParameter, gensym("alpha"), A_DEFFLOAT,0);
    class_addmethod (mtx_decay_class, (t_method) mTXSetDecayMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_decay_class, (t_method) mTXSetDecayDirection, gensym("direction"), A_DEFFLOAT,0);
-   class_sethelpsymbol (mtx_decay_class, gensym("iemmatrix/mtx_decay"));
+
    row_sym = gensym("row");
    col_sym = gensym("col");
    col_sym2 = gensym("column");

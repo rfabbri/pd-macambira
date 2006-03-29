@@ -49,7 +49,7 @@ void mtx_zeros_setup(void)
   class_addbang(mtx_zeros_class, matrix_bang);
   class_addmethod(mtx_zeros_class, (t_method)matrix_zeros, gensym("matrix"), A_GIMME, 0);
 
-  class_sethelpsymbol(mtx_zeros_class, gensym("iemmatrix/mtx_special"));
+
 }
 void iemtx_zeros_setup(void){
   mtx_zeros_setup();

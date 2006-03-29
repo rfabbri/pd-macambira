@@ -84,7 +84,7 @@ void mtx_rand_setup(void)
   class_addbang  (mtx_rand_class, mtx_rand_bang);
 
   class_addmethod(mtx_rand_class, (t_method)mtx_rand_seed, gensym("seed"), A_FLOAT, 0);
-  class_sethelpsymbol(mtx_rand_class, gensym("iemmatrix/mtx_rand"));
+
 }
 
 void iemtx_rand_setup(void){

@@ -74,7 +74,7 @@ void mtx_int_setup(void)
   class_addlist  (mtx_int_class, mtx_int_list);
   class_addbang  (mtx_int_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_int_class, gensym("iemmatrix/mtx_int"));
+
 }
 
 void iemtx_int_setup(void)

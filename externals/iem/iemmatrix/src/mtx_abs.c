@@ -74,7 +74,7 @@ void mtx_abs_setup(void)
   class_addlist  (mtx_abs_class, mtx_abs_list);
   class_addbang  (mtx_abs_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_abs_class, gensym("iemmatrix/mtx_abs"));
+
 }
 
 void iemtx_abs_setup(void)

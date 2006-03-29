@@ -49,7 +49,7 @@ void mtx_ones_setup(void)
   class_addbang(mtx_ones_class, matrix_bang);
   class_addmethod(mtx_ones_class, (t_method)matrix_ones, gensym("matrix"), A_GIMME, 0);
 
-  class_sethelpsymbol(mtx_ones_class, gensym("iemmatrix/mtx_special"));
+
 }
 void iemtx_ones_setup(void){
   mtx_ones_setup();

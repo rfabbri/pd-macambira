@@ -252,7 +252,7 @@ void mtx_diff_setup (void)
    class_addmethod (mtx_diff_class, (t_method) mTXdiffMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_diff_class, (t_method) mTXSetdiffMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_diff_class, (t_method) mTXSetdiffDirection, gensym("direction"), A_DEFFLOAT,0);
-   class_sethelpsymbol (mtx_diff_class, gensym("iemmatrix/mtx_diff"));
+
    row_sym = gensym("row");
    col_sym = gensym("col");
    col_sym2 = gensym("column");

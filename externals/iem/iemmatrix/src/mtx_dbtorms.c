@@ -83,7 +83,7 @@ void mtx_dbtorms_setup(void)
   class_addlist  (mtx_dbtorms_class, mtx_dbtorms_list);
   class_addbang  (mtx_dbtorms_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_dbtorms_class, gensym("iemmatrix/mtx_dbtorms"));
+
 }
 
 void iemtx_dbtorms_setup(void)

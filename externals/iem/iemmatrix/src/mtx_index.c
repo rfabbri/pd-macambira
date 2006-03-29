@@ -208,7 +208,7 @@ void mtx_index_setup (void)
    class_addbang (mtx_index_class, (t_method) mTXIndexBang);
    class_addmethod (mtx_index_class, (t_method) mTXIndexMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_index_class, (t_method) mTXIndexRightMatrix, gensym(""), A_GIMME,0);
-   class_sethelpsymbol (mtx_index_class, gensym("iemmatrix/mtx_index"));
+
 }
 
 void iemtx_index_setup(void){

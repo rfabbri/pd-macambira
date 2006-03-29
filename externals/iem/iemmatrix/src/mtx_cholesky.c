@@ -106,7 +106,7 @@ void mtx_cholesky_setup(void)
 				(t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addbang  (mtx_cholesky_class, matrix_bang);
   class_addmethod(mtx_cholesky_class, (t_method)mtx_cholesky_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_cholesky_class, gensym("iemmatrix/mtx_cholesky"));
+
 }
 
 void iemtx_cholesky_setup(void){

@@ -74,7 +74,7 @@ void mtx_log_setup(void)
   class_addlist  (mtx_log_class, mtx_log_list);
   class_addbang  (mtx_log_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_log_class, gensym("iemmatrix/mtx_log"));
+
 }
 
 void iemtx_log_setup(void)

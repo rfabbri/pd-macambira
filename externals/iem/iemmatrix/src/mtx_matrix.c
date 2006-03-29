@@ -594,7 +594,7 @@ void matrix_setup(void)
   class_addmethod  (matrix_class, (t_method)matrix_write, gensym("write"), A_SYMBOL, 0);
   class_addmethod  (matrix_class, (t_method)matrix_read , gensym("read") , A_SYMBOL, 0);
  
-  class_sethelpsymbol(matrix_class, gensym("iemmatrix/matrix"));
+
 }
 
 void iemtx_matrix_setup(void){

@@ -122,7 +122,7 @@ void mtx_colon_setup (void)
    class_addmethod (mtx_colon_class, (t_method) mTXSetColonMode, gensym("mode"), A_DEFSYMBOL, 0);
    class_addlist (mtx_colon_class, (t_method) mTXColonList);
    class_addcreator ((t_newmethod) newMTXColon, gensym("mtx_:"), A_GIMME, 0);
-   class_sethelpsymbol (mtx_colon_class, gensym("iemmatrix/mtx_colon"));
+
    col_sym = gensym("col");
    col_sym2 = gensym("column");
 }

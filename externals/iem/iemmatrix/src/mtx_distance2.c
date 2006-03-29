@@ -98,7 +98,7 @@ void mtx_distance2_setup(void)
   class_addmethod(mtx_distance2_class, (t_method)mtx_bin_matrix2, gensym(""), A_GIMME, 0);
   class_addbang  (mtx_distance2_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_distance2_class, gensym("iemmatrix/mtx_distance2"));
+
 }
 
 void iemtx_distance2_setup(void)

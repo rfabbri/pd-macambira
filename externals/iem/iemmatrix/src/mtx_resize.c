@@ -95,7 +95,7 @@ void mtx_resize_setup(void)
 			       0, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addmethod  (mtx_resize_class, (t_method)mtx_resize_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod  (mtx_resize_class, (t_method)mtx_resize_list2,  gensym(""), A_GIMME, 0);
-  class_sethelpsymbol(mtx_resize_class, gensym("iemmatrix/mtx_size"));
+
 }
 void iemtx_resize_setup(void){
   mtx_resize_setup();

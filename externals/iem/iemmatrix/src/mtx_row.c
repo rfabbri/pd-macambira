@@ -110,7 +110,7 @@ void mtx_row_setup(void)
   class_addlist  (mtx_row_class, mtx_row_list);
   class_addmethod(mtx_row_class, (t_method)mtx_row_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod(mtx_row_class, (t_method)mtx_row_float, gensym(""), A_FLOAT, 0);
-  class_sethelpsymbol(mtx_row_class, gensym("iemmatrix/mtx_element"));
+
 }
 
 

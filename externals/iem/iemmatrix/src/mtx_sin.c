@@ -74,7 +74,7 @@ void mtx_sin_setup(void)
   class_addlist  (mtx_sin_class, mtx_sin_list);
   class_addbang  (mtx_sin_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_sin_class, gensym("iemmatrix/mtx_sin"));
+
 }
 
 void iemtx_sin_setup(void)

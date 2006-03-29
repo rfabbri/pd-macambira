@@ -158,7 +158,7 @@ void mtx_inverse_setup(void)
                                 (t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addbang  (mtx_inverse_class, matrix_bang);
   class_addmethod(mtx_inverse_class, (t_method)mtx_inverse_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_inverse_class, gensym("iemmatrix/mtx_inverse"));
+
 }
 
 void iemtx_inverse_setup(void){

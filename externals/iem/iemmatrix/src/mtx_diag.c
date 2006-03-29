@@ -52,7 +52,7 @@ void mtx_diag_setup(void)
   class_addlist  (mtx_diag_class, matrix_diag);
   class_addbang  (mtx_diag_class, matrix_bang);
   class_addmethod(mtx_diag_class, (t_method)mtx_diag_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_diag_class, gensym("iemmatrix/mtx_trace"));
+
 }
 void iemtx_diag_setup(void){
   mtx_diag_setup();

@@ -182,7 +182,7 @@ void mtx_rowrfft_setup (void)
      CLASS_DEFAULT, A_GIMME, 0);
   class_addbang (mtx_rowrfft_class, (t_method) mTXrowrfftBang);
   class_addmethod (mtx_rowrfft_class, (t_method) mTXrowrfftMatrix, gensym("matrix"), A_GIMME,0);
-  class_sethelpsymbol (mtx_rowrfft_class, gensym("iemmatrix/mtx_rowrfft"));
+
 }
 
 void iemtx_rowrfft_setup(void){

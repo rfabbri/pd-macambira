@@ -147,8 +147,8 @@ void mtx_max2_setup(void)
   class_addlist  (mtx_max2scalar_class, mtx_max2scalar_list);
   class_addbang  (mtx_max2scalar_class, mtx_binscalar_bang);
 
-  class_sethelpsymbol(mtx_max2_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_max2scalar_class, gensym("iemmatrix/mtx_binops"));
+
+
 }
 
 void iemtx_max2_setup(void)

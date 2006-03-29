@@ -66,7 +66,7 @@ void mtx_roll_setup(void)
 				  (t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addbang  (mtx_roll_class, matrix_bang);
   class_addmethod(mtx_roll_class, (t_method)mtx_roll_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_roll_class, gensym("iemmatrix/mtx_transpose"));
+
 }
 void iemtx_roll_setup(void){
   mtx_roll_setup();

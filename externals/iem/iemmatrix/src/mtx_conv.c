@@ -312,7 +312,7 @@ void mtx_conv_setup (void)
    class_addbang (mtx_conv_class, (t_method) mTXConvBang);
    class_addmethod (mtx_conv_class, (t_method) mTXConvMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_conv_class, (t_method) mTXConvKernelMatrix, gensym(""), A_GIMME,0);
-   class_sethelpsymbol (mtx_conv_class, gensym("iemmatrix/mtx_conv"));
+
 }
 
 void iemtx_conv_setup(void){

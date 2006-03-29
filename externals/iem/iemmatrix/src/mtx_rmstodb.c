@@ -79,7 +79,7 @@ void mtx_rmstodb_setup(void)
   class_addlist  (mtx_rmstodb_class, mtx_rmstodb_list);
   class_addbang  (mtx_rmstodb_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_rmstodb_class, gensym("iemmatrix/mtx_rmstodb"));
+
 }
 
 void iemtx_rmstodb_setup(void)

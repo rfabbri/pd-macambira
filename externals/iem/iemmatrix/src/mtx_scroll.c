@@ -52,7 +52,7 @@ void mtx_scroll_setup(void)
 				  (t_method)matrix_free, sizeof(t_matrix), 0, A_GIMME, 0);
   class_addbang  (mtx_scroll_class, matrix_bang);
   class_addmethod(mtx_scroll_class, (t_method)mtx_scroll_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_scroll_class, gensym("iemmatrix/mtx_transpose"));
+
 }
 void iemtx_scroll_setup(void){
   mtx_scroll_setup();

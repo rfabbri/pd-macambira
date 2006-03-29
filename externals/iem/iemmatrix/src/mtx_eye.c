@@ -53,7 +53,7 @@ void mtx_eye_setup(void)
   class_addbang(mtx_eye_class, matrix_bang);
   class_addmethod(mtx_eye_class, (t_method)matrix_eye, gensym("matrix"), A_GIMME, 0);
 
-  class_sethelpsymbol(mtx_eye_class, gensym("iemmatrix/mtx_special"));
+
 }
 void iemtx_eye_setup(void){
   mtx_eye_setup();

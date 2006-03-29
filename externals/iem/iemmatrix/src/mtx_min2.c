@@ -147,8 +147,8 @@ void mtx_min2_setup(void)
   class_addlist  (mtx_min2scalar_class, mtx_min2scalar_list);
   class_addbang  (mtx_min2scalar_class, mtx_binscalar_bang);
 
-  class_sethelpsymbol(mtx_min2_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_min2scalar_class, gensym("iemmatrix/mtx_binops"));
+
+
 }
 
 void iemtx_min2_setup(void)

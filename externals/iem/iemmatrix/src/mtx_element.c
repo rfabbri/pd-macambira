@@ -108,7 +108,7 @@ void mtx_element_setup(void)
   class_addfloat (mtx_element_class, mtx_element_float);
   class_addmethod(mtx_element_class, (t_method)mtx_element_matrix, gensym("matrix"), A_GIMME, 0);
   class_addmethod(mtx_element_class, (t_method)mtx_element_list2, gensym(""), A_FLOAT, A_FLOAT, 0);
-  class_sethelpsymbol(mtx_element_class, gensym("iemmatrix/mtx_element"));
+
 }
 
 

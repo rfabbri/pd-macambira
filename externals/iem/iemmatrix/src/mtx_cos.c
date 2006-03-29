@@ -74,7 +74,7 @@ void mtx_cos_setup(void)
   class_addlist  (mtx_cos_class, mtx_cos_list);
   class_addbang  (mtx_cos_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_cos_class, gensym("iemmatrix/mtx_cos"));
+
 }
 
 void iemtx_cos_setup(void)

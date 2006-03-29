@@ -198,7 +198,7 @@ void mtx_reverse_setup (void)
    class_addmethod (mtx_reverse_class, (t_method) mTXreverseMatrix, gensym("matrix"), A_GIMME,0);
 //   class_addmethod (mtx_reverse_class, (t_method) mTXSetreverseDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_reverse_class, (t_method) mTXSetReverseMode, gensym("mode"), A_DEFSYMBOL,0);
-   class_sethelpsymbol (mtx_reverse_class, gensym("iemmatrix/mtx_reverse"));
+
    row_sym = gensym("row");
    col_sym = gensym("col");
    col_sym2 = gensym("column");

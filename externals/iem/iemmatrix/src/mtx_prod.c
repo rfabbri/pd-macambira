@@ -65,7 +65,7 @@ void mtx_prod_setup(void)
   class_addlist  (mtx_prod_class, mtx_prod_list);
   //  class_addbang  (mtx_prod_class, matrix_bang);
   class_addmethod(mtx_prod_class, (t_method)mtx_prod_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_prod_class, gensym("iemmatrix/mtx_prod"));
+
 }
 void iemtx_prod_setup(void){
   mtx_prod_setup();

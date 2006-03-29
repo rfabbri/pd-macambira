@@ -358,7 +358,7 @@ void mtx_sort_setup (void)
    class_addmethod (mtx_sort_class, (t_method) mTXSetSortMode, gensym("mode"), A_DEFSYMBOL,0);
 //   class_addmethod (mtx_sort_class, (t_method) mTXSetSortDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_sort_class, (t_method) mTXSetSortDirection, gensym("direction"), A_DEFFLOAT,0);
-   class_sethelpsymbol (mtx_sort_class, gensym("iemmatrix/mtx_sort"));
+
    row_sym = gensym("row");
    col_sym = gensym("col");
    col_sym2 = gensym("column");

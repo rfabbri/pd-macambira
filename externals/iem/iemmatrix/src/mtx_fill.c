@@ -349,7 +349,7 @@ void mtx_fill_setup (void)
    class_addmethod (mtx_fill_class, (t_method) mTXBigMatrix, gensym("fill_mtx"), A_GIMME,0);
    class_addmethod (mtx_fill_class, (t_method) mTXFillIndexMatrix, gensym("index"), A_GIMME,0);
    class_addfloat (mtx_fill_class, (t_method) mTXFillScalar);
-   class_sethelpsymbol (mtx_fill_class, gensym("iemmatrix/mtx_fill"));
+
 }
 
 void iemtx_fill_setup(void){

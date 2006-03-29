@@ -78,7 +78,7 @@ void mtx_not_setup(void)
   class_addlist  (mtx_not_class, mtx_not_list);
   class_addbang  (mtx_not_class, mtx_binmtx_bang);
 
-  class_sethelpsymbol(mtx_not_class, gensym("iemmatrix/mtx_not"));
+
 }
 
 void iemtx_not_setup(void)

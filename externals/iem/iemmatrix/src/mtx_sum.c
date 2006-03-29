@@ -65,7 +65,7 @@ void mtx_sum_setup(void)
   class_addlist  (mtx_sum_class, mtx_sum_list);
   //  class_addbang  (mtx_sum_class, matrix_bang);
   class_addmethod(mtx_sum_class, (t_method)mtx_sum_matrix, gensym("matrix"), A_GIMME, 0);
-  class_sethelpsymbol(mtx_sum_class, gensym("iemmatrix/mtx_sum"));
+
 }
 void iemtx_sum_setup(void){
   mtx_sum_setup();

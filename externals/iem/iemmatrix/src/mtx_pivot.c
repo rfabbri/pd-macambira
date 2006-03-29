@@ -180,7 +180,7 @@ void mtx_pivot_setup(void)
 			      A_DEFFLOAT, 0);
   class_addmethod(mtx_pivot_class, (t_method)mtx_pivot_matrix, gensym("matrix"), A_GIMME, 0);
 
-  class_sethelpsymbol(mtx_pivot_class, gensym("iemmatrix/mtx_transpose"));
+
 }
 
 void iemtx_pivot_setup(void)

@@ -145,8 +145,8 @@ void mtx_pow_setup(void)
   class_addlist  (mtx_powscalar_class, mtx_powscalar_list);
   class_addbang  (mtx_powscalar_class, mtx_binscalar_bang);
 
-  class_sethelpsymbol(mtx_powelement_class, gensym("iemmatrix/mtx_binops"));
-  class_sethelpsymbol(mtx_powscalar_class, gensym("iemmatrix/mtx_binops"));
+  class_sethelpsymbol(mtx_powelement_class, gensym("mtx_pow-help"));
+  class_sethelpsymbol(mtx_powscalar_class, gensym("mtx_pow-help"));
 }
 
 void iemtx_pow_setup(void)
