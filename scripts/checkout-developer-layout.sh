@@ -37,9 +37,12 @@ fi
 mkdir pure-data
 cd pure-data
 
-for section in abstractions doc extensions externals pd packages scripts; do
+for section in abstractions doc extensions externals packages scripts; do
     cvs checkout $section
 done
+
+# For Pd-extended, "pd" needs to be a specific version currently, not HEAD
+cvs checkout -r v0-39-2 pd
 
 # Gem is still separate
 echo -e "\n\n The password to the Gem anonymous CVS access is blank, so just press Enter\n"
