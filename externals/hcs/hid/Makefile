@@ -21,11 +21,18 @@ cvs_root_dir = $(CWD)/../../..
 DESTDIR = $(CWD)/build/
 BUILDLAYOUT_DIR = $(cvs_root_dir)/packages
 
-include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+-include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+
+
 
 CFLAGS = $(OPT_FLAGS) -Wall -I./ -I../../../pd/src
 LDFLAGS = 
 LIBS = -lm
+
+ifeq (x$(OS_NAME),x)
+default:
+	@echo no OS_NAME specified
+endif
 
 
 #SRC = $(wildcard $(externals_src)/hcs/hid/hid*.c)
@@ -132,15 +139,15 @@ test_locations:
 	@echo "OS_NAME: $(OS_NAME)"
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
-	@echo "CWD $(CWD)"
-	@echo "DESTDIR $(DESTDIR)"
-	@echo "PREFIX $(prefix)"
-	@echo "BINDIR  $(bindir)"
-	@echo "LIBDIR  $(libdir)"
-	@echo "OBJECTSDIR  $(objectsdir)"
-	@echo "PDDOCDIR  $(pddocdir)"
-	@echo "LIBPDDIR  $(libpddir)"
-	@echo "LIBPDBINDIR  $(libpdbindir)"
-	@echo "HELPDIR  $(helpdir)"
-	@echo "MANUALSDIR  $(manualsdir)"
-	@echo "EXAMPLESDIR  $(examplesdir)"
+	@echo "CWD: $(CWD)"
+	@echo "DESTDIR: $(DESTDIR)"
+	@echo "PREFIX: $(prefix)"
+	@echo "BINDIR:  $(bindir)"
+	@echo "LIBDIR:  $(libdir)"
+	@echo "OBJECTSDIR:  $(objectsdir)"
+	@echo "PDDOCDIR:  $(pddocdir)"
+	@echo "LIBPDDIR:  $(libpddir)"
+	@echo "LIBPDBINDIR:  $(libpdbindir)"
+	@echo "HELPDIR:  $(helpdir)"
+	@echo "MANUALSDIR:  $(manualsdir)"
+	@echo "EXAMPLESDIR:  $(examplesdir)"
