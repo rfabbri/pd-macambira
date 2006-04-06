@@ -2,8 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-   <key>defeatrt</key>
-   <string>1</string>
+	<key>defeatrt</key>
+	<string>1</string>
 	<key>loadlib1</key>
 	<string>Gem</string>
 	<key>loadlib2</key>
@@ -39,35 +39,45 @@
 	<key>loadlib17</key>
 	<string>motex</string>
 	<key>loadlib18</key>
-	<string>oscx</string>
+	<string>mtx</string>
 	<key>loadlib19</key>
-	<string>pddp</string>
+	<string>oscx</string>
 	<key>loadlib20</key>
-	<string>pdogg</string>
+	<string>pddp</string>
 	<key>loadlib21</key>
-	<string>pdp</string>
+	<string>pdogg</string>
 	<key>loadlib22</key>
-	<string>pidip</string>
+	<string>pdp</string>
 	<key>loadlib23</key>
-	<string>pixeltango</string>
+	<string>pidip</string>
 	<key>loadlib24</key>
-	<string>pmpd</string>
+	<string>pixeltango</string>
 	<key>loadlib25</key>
-	<string>rradical</string>
+	<string>pmpd</string>
 	<key>loadlib26</key>
-	<string>sigpack</string>
+	<string>rradical</string>
 	<key>loadlib27</key>
-	<string>smlib</string>
+	<string>sigpack</string>
 	<key>loadlib28</key>
-	<string>toxy</string>
+	<string>smlib</string>
 	<key>loadlib29</key>
-	<string>unauthorized</string>
+	<string>toxy</string>
 	<key>loadlib30</key>
-	<string>vasp</string>
+	<string>unauthorized</string>
 	<key>loadlib31</key>
-	<string>vbap</string>
+	<string>vasp</string>
 	<key>loadlib32</key>
+	<string>vbap</string>
+	<key>loadlib33</key>
 	<string>xsample</string>
+	<key>path1</key>
+	<string>/System/Library/Fonts</string>
+	<key>path2</key>
+	<string>/Library/Fonts</string>
+	<key>path3</key>
+	<string>/usr/X11R6/lib/X11/fonts/TTF</string>
+	<key>path4</key>
+	<string>/System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts</string>
 </dict>
  </plist>
 
