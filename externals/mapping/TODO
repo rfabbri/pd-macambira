@@ -1,0 +1,15 @@
+
+- check out behavior of [curve_power] and [curve_root] if non-integers are
+  used as arguments on in the right inlets
+
+
+- implement [spiral clockwise], (cart2pol is counter-clockwise)
+
+
+- implement [desegment]
+
+
+- debug [segment]
+
+
+- merge ds_ list objects with abstractions/footils/list-abs
