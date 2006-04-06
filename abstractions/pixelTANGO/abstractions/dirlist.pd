@@ -1,29 +1,13 @@
-#N canvas 133 243 542 374 10;
-#X obj 20 61 inlet;
-#X obj 20 234 outlet;
-#X obj 215 84 loadbang;
-#X text 129 200 \$1 is pattern \$2 is dir;
-#X text 15 284 ONLY sends absolute pathnames \, otherwise hard to add
-before load!;
-#X msg 54 175 \$1 \$2;
-#X obj 20 210 py pt dirlist;
-#X obj 20 84 route pattern set-dir bang;
-#X obj 54 154 pack s s;
-#X obj 125 122 symbol \$2;
-#X obj 54 122 symbol \$1;
-#X text 20 17 Lists the files in a set with 'set-dir' selector. Sends
-the files matching 'pattern' selector as a list. Requires PWD to provide
-a reasonable default location.;
-#X obj 215 123 getdir;
-#X connect 0 0 7 0;
-#X connect 2 0 12 0;
-#X connect 5 0 6 1;
-#X connect 6 0 1 0;
-#X connect 7 0 10 0;
-#X connect 7 1 9 0;
-#X connect 7 2 9 0;
-#X connect 7 2 10 0;
-#X connect 8 0 5 0;
-#X connect 9 0 8 1;
-#X connect 10 0 8 0;
-#X connect 12 0 8 1;
+#N canvas 432 263 556 400 12;
+#X obj 250 169 folder_list;
+#X obj 164 83 trigger bang bang;
+#X obj 177 264 tolist;
+#X obj 179 334 print;
+#X msg 151 41 bang;
+#X msg 250 142 symbol /usr/*;
+#X connect 0 0 2 0;
+#X connect 1 0 2 1;
+#X connect 1 1 5 0;
+#X connect 2 0 3 0;
+#X connect 4 0 1 0;
+#X connect 5 0 0 0;

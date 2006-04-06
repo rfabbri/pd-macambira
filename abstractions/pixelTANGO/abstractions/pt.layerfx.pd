@@ -1,4 +1,4 @@
-#N canvas 76 42 130 49 10;
+#N canvas 277 433 390 250 10;
 #X obj 1 1 cnv 5 128 47 empty empty empty 5 6 1 9 -249661 -66577 0
 ;
 #X text 6 52 layer_fx;
@@ -15,7 +15,7 @@ references? (how to manage them?) dir2Abstraction array would need
 to do the work... the paths would be absolute.;
 #X obj 159 28 route bang;
 #X obj 75 91 inlet;
-#N canvas 135 22 674 578 new 0;
+#N canvas 597 235 654 526 new 0;
 #X obj 13 28 inlet;
 #X text 13 -1 Pixel Effects;
 #X obj 13 447 outlet;
@@ -25,70 +25,47 @@ to do the work... the paths would be absolute.;
 #X obj 569 123 outlet;
 #X obj 65 46 r \$0-fxAmount;
 #X obj 392 58 mementoSetup pt.layerfx \$0;
-#X obj 119 389 prepend options;
 #X obj 169 313 r \$0-index;
-#X obj 119 416 s \$0-index-set;
-#X msg 72 168 pattern fx/*.pd;
-#X text 416 233 ^ Hard-coded \, bad bad bad!;
-#X obj 84 72 r pt.updateArrays;
-#X obj 137 95 loadbang;
-#X msg 202 247 clear bang;
-#X obj 248 343 print pt.layerfx-Dynamic-FX;
-#X msg 248 293 bang;
-#X obj 13 346 dir2abstractionArray \$0;
+#X obj 169 379 s \$0-index-set;
+#X obj 80 72 r pt.updateArrays;
+#X obj 133 95 loadbang;
+#X msg 198 247 clear bang;
 #X obj 392 80 s \$0-defaults;
 #X obj 448 129 route layerNum;
-#X obj 383 419 print DEBUG;
-#X msg 145 198 set-dir /Applications/PixelTANGO-CVS/abstractions/;
-#X obj 383 370 pack s s f;
-#X obj 262 318 prepend symbol;
-#X msg 383 397 Dir: \$2 Read-dir: \$1 Layernum \$3;
-#X obj 415 292 prepend symbol;
-#X obj 123 116 t b b b;
-#X obj 415 270 route set-dir;
+#X obj 119 116 t b b b;
+#X obj 118 174 getdir;
+#X obj 118 195 makefilename %s/fx/*.pd;
+#X obj 13 346 dir2abstractionArray \$0;
+#X msg 118 218 pattern symbol \$1;
+#X msg 134 149 bang;
 #X connect 0 0 18 0;
 #X connect 4 0 7 0;
 #X connect 6 0 18 1;
-#X connect 7 0 19 0;
+#X connect 7 0 13 0;
 #X connect 7 1 5 0;
-#X connect 7 1 20 0;
-#X connect 8 0 10 0;
-#X connect 9 0 18 3;
-#X connect 11 0 17 0;
-#X connect 11 0 18 2;
-#X connect 13 0 27 0;
-#X connect 14 0 27 0;
-#X connect 15 0 18 2;
-#X connect 17 0 16 0;
-#X connect 17 0 24 0;
+#X connect 7 1 14 0;
+#X connect 8 0 18 3;
+#X connect 10 0 15 0;
+#X connect 11 0 15 0;
+#X connect 12 0 18 2;
+#X connect 15 0 16 0;
+#X connect 15 2 12 0;
+#X connect 16 0 17 0;
+#X connect 17 0 19 0;
 #X connect 18 0 2 0;
-#X connect 18 2 8 0;
-#X connect 20 0 23 2;
-#X connect 22 0 18 2;
-#X connect 22 0 28 0;
-#X connect 23 0 25 0;
-#X connect 24 0 23 0;
-#X connect 25 0 21 0;
-#X connect 26 0 23 1;
-#X connect 27 0 11 0;
-#X connect 27 1 22 0;
-#X connect 27 2 15 0;
-#X connect 28 0 26 0;
+#X connect 18 2 9 0;
+#X connect 19 0 18 2;
+#X connect 20 0 16 0;
 #X restore 16 112 pd new interna;
 #X msg 140 207 options empty;
-#X obj 3 21 popup 124 25 grey95 Effects Passthrough /Applications/PixelTANGO-CVS/abstractions/fx/edge.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/emboss.pd /Applications/PixelTANGO-CVS/abstractions/fx/gain.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/motionblur.pd /Applications/PixelTANGO-CVS/abstractions/fx/negative.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/normalize.pd /Applications/PixelTANGO-CVS/abstractions/fx/posterize.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/randomdot.pd /Applications/PixelTANGO-CVS/abstractions/fx/roll.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/rtx-DANGER_USE_AT_YOUR_OWN_RISK.pd
-/Applications/PixelTANGO-CVS/abstractions/fx/scanline.pd;
-#X obj 159 105 popup_lister 500 \$0-index-set;
+#X obj 3 21 popup 124 25 grey95 Effects Passthrough edge.pd emboss.pd
+gain.pd motionblur.pd negative.pd normalize.pd posterize.pd randomdot.pd
+roll.pd rtx-DANGER_USE_AT_YOUR_OWN_RISK.pd scanline.pd;
+#X obj 228 138 r \$0-index-set;
 #X connect 2 0 12 0;
 #X connect 5 0 7 0;
 #X connect 6 0 14 0;
 #X connect 7 0 5 0;
-#X connect 10 0 15 0;
 #X connect 10 1 6 0;
 #X connect 10 1 8 0;
 #X connect 11 0 12 1;
@@ -97,4 +74,4 @@ to do the work... the paths would be absolute.;
 #X connect 13 0 14 0;
 #X connect 14 0 10 0;
 #X connect 15 0 14 0;
-#X coords 0 0 1 1 130 49 1;
+#X coords 0 0 1 1 130 49 1 0 0;
