@@ -43,8 +43,21 @@
 /* LINUX-SPECIFIC SUPPORT FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
 
-void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
+/* JMZ: i changed the convert functions (and the get-event function too!) to return
+ * t_symbol* instead of writing into a fixed-sized buffer (which was way too
+ * small and those made this object crash)
+ * in order to change as little lines as possible the callback functions to the
+ * hid-object still use (char*): so we convert a char[] into a symbol and then 
+ * extract the (char*) out of it to make it a symbol again
+ * LATER: use t_symbol's all over, since it is very flexible (with respect to length)
+ * and sooner or later the strings are converted to t_symbol anyhow...
+ *
+ * Why? bug-fixing
+ */
+
+t_symbol* hid_convert_linux_buttons_to_numbers(__u16 linux_code)
 {
+  char hid_code[10];
     if(linux_code >= 0x100) 
     {
         if(linux_code < BTN_MOUSE)   
@@ -59,58 +72,62 @@ void hid_convert_linux_buttons_to_numbers(__u16 linux_code, char *hid_code)
             sprintf(hid_code,"btn_%d",linux_code - BTN_DIGI);  /* tablet buttons */
         else if(linux_code < KEY_OK)
             sprintf(hid_code,"btn_%d",linux_code - BTN_WHEEL);  /* wheel buttons */
+	else return 0;
     }
+    return gensym(hid_code);
 }
 
 /* Georg Holzmann: implementation of the keys */
-void hid_convert_linux_keys(__u16 linux_code, char *hid_code)
+/* JMZ: use t_symbol instead of char[] (s.a.) AND 
+ * appended "key_" in the array so we don't have to append it each time AND
+ * made the table static
+ */
+t_symbol* hid_convert_linux_keys(__u16 linux_code)
 {  
     if(linux_code > 226)
-        return;
-  
+        return 0;
     /*         quick hack to get the keys         */
     /* (in future this should be auto-generated)  */
 
-    char key_names[227][20] =
+    static char key_names[227][20] =
         { 
-            "reserved", "esc", "1", "2", "3", "4", "5", "6", "7",
-            "8", "9", "0", "minus", "equal", "backspace", "tab",
-            "q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
-            "leftbrace", "rightbrace", "enter", "leftctrl", "a",
-            "s", "d", "f", "g", "h", "j", "k", "l", "semicolon",
-            "apostrophe", "grave", "leftshift", "backslash", "z",
-            "x", "c", "v", "b", "n", "m", "comma", "dot", "slash",
-            "rightshift", "kpasterisk", "leftalt", "space", "capslock",
-            "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10",
-            "numlock", "scrolllock", "kp7", "kp8", "kp9", "kpminus",
-            "kp4", "kp5", "kp6", "kpplus", "kp1", "kp2", "kp3", "kp3",  "kpdot",
-            "103rd", "f13", "102nd", "f11", "f12", "f14", "f15", "f16",
-            "f17", "f18", "f19", "f20", "kpenter", "rightctrl", "kpslash",
-            "sysrq", "rightalt", "linefeed", "home", "up", "pageup", "left",
-            "right", "end", "down", "pagedown", "insert", "delete", "macro",
-            "mute", "volumedown", "volumeup", "power", "kpequal", "kpplusminus",
-            "pause", "f21", "f22", "f23", "f24", "kpcomma", "leftmeta",
-            "rightmeta", "compose",
+            "key_reserved", "key_esc", "key_1", "key_2", "key_3", "key_4", "key_5", "key_6", "key_7",
+            "key_8", "key_9", "key_0", "key_minus", "key_equal", "key_backspace", "key_tab",
+            "key_q", "key_w", "key_e", "key_r", "key_t", "key_y", "key_u", "key_i", "key_o", "key_p",
+            "key_leftbrace", "key_rightbrace", "key_enter", "key_leftctrl", "key_a",
+            "key_s", "key_d", "key_f", "key_g", "key_h", "key_j", "key_k", "key_l", "key_semicolon",
+            "key_apostrophe", "key_grave", "key_leftshift", "key_backslash", "key_z",
+            "key_x", "key_c", "key_v", "key_b", "key_n", "key_m", "key_comma", "key_dot", "key_slash",
+            "key_rightshift", "key_kpasterisk", "key_leftalt", "key_space", "key_capslock",
+            "key_f1", "key_f2", "key_f3", "key_f4", "key_f5", "key_f6", "key_f7", "key_f8", "key_f9", "key_f10",
+            "key_numlock", "key_scrolllock", "key_kp7", "key_kp8", "key_kp9", "key_kpminus",
+            "key_kp4", "key_kp5", "key_kp6", "key_kpplus", "key_kp1", "key_kp2", "key_kp3", "key_kp3",  "key_kpdot",
+            "key_103rd", "key_f13", "key_102nd", "key_f11", "key_f12", "key_f14", "key_f15", "key_f16",
+            "key_f17", "key_f18", "key_f19", "key_f20", "key_kpenter", "key_rightctrl", "key_kpslash",
+            "key_sysrq", "key_rightalt", "key_linefeed", "key_home", "key_up", "key_pageup", "key_left",
+            "key_right", "key_end", "key_down", "key_pagedown", "key_insert", "key_delete", "key_macro",
+            "key_mute", "key_volumedown", "key_volumeup", "key_power", "key_kpequal", "key_kpplusminus",
+            "key_pause", "key_f21", "key_f22", "key_f23", "key_f24", "key_kpcomma", "key_leftmeta",
+            "key_rightmeta", "key_compose",
     
-            "stop", "again", "props", "undo", "front", "copy", "open",
-            "paste", "find", "cut", "help", "menu", "calc", "setup", "sleep", "wakeup",
-            "file", "sendfile", "deletefile", "xfer", "prog1", "prog2", "www",
-            "msdos", "coffee", "direction", "cyclewindows", "mail", "bookmarks",
-            "computer", "back", "forward", "colsecd", "ejectcd", "ejectclosecd",
-            "nextsong", "playpause", "previoussong", "stopcd", "record",
-            "rewind", "phone", "iso", "config", "homepage", "refresh", "exit",
-            "move", "edit", "scrollup", "scrolldown", "kpleftparen", "kprightparen",
+            "key_stop", "key_again", "key_props", "key_undo", "key_front", "key_copy", "key_open",
+            "key_paste", "key_find", "key_cut", "key_help", "key_menu", "key_calc", "key_setup", "key_sleep", "key_wakeup",
+            "key_file", "key_sendfile", "key_deletefile", "key_xfer", "key_prog1", "key_prog2", "key_www",
+            "key_msdos", "key_coffee", "key_direction", "key_cyclewindows", "key_mail", "key_bookmarks",
+            "key_computer", "key_back", "key_forward", "key_colsecd", "key_ejectcd", "key_ejectclosecd",
+            "key_nextsong", "key_playpause", "key_previoussong", "key_stopcd", "key_record",
+            "key_rewind", "key_phone", "key_iso", "key_config", "key_homepage", "key_refresh", "key_exit",
+            "key_move", "key_edit", "key_scrollup", "key_scrolldown", "key_kpleftparen", "key_kprightparen",
     
-            "intl1", "intl2", "intl3", "intl4", "intl5", "intl6", "intl7",
-            "intl8", "intl9", "lang1", "lang2", "lang3", "lang4", "lang5",
-            "lang6", "lang7", "lang8", "lang9", "playcd", "pausecd", "prog3",
-            "prog4", "suspend", "close", "play", "fastforward", "bassboost",
-            "print", "hp", "camera", "sound", "question", "email", "chat",
-            "search", "connect", "finance", "sport", "shop", "alterase",
-            "cancel", "brightnessdown", "brightnessup", "media"
+            "key_intl1", "key_intl2", "key_intl3", "key_intl4", "key_intl5", "key_intl6", "key_intl7",
+            "key_intl8", "key_intl9", "key_lang1", "key_lang2", "key_lang3", "key_lang4", "key_lang5",
+            "key_lang6", "key_lang7", "key_lang8", "key_lang9", "key_playcd", "key_pausecd", "key_prog3",
+            "key_prog4", "key_suspend", "key_close", "key_play", "key_fastforward", "key_bassboost",
+            "key_print", "key_hp", "key_camera", "key_sound", "key_question", "key_email", "key_chat",
+            "key_search", "key_connect", "key_finance", "key_sport", "key_shop", "key_alterase",
+            "key_cancel", "key_brightnessdown", "key_brightnessup", "key_media"
         };
-  
-    sprintf(hid_code,"key_%s",key_names[linux_code]);
+    return gensym(key_names[linux_code]);
 }
 
 void hid_print_element_list(t_hid *x)
@@ -174,13 +191,14 @@ void hid_print_element_list(t_hid *x)
                 {
                     if ((i == EV_KEY) && (j >= BTN_MISC) && (j < KEY_OK) )
                     {
-                        char hid_code[7];
-                        hid_convert_linux_buttons_to_numbers(j,hid_code);
-                        post("  %s\t%s\t%s",
+			t_symbol*hid_codesym=hid_convert_linux_buttons_to_numbers(j);
+			if(hid_codesym){
+			  post("  %s\t%s\t%s",
                              ev[i] ? ev[i] : "?", 
-                             hid_code,
+                             hid_codesym->s_name,
                              event_names[i] ? (event_names[i][j] ? event_names[i][j] : "?") : "?");
-                    }
+			}
+		    }
                     else if (i != EV_SYN)
                     {
                         post("  %s\t%s\t%s",
@@ -337,7 +355,7 @@ t_int hid_get_events(t_hid *x)
 /* for debugging, counts how many events are processed each time hid_read() is called */
     DEBUG(t_int event_counter = 0;);
 
-    char hid_code[7];
+    t_symbol*hid_code=0;
 
 /* this will go into the generic read function declared in hid.h and
  * implemented in hid_linux.c 
@@ -348,10 +366,15 @@ t_int hid_get_events(t_hid *x)
 
     while( read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1 )
     {
+        hid_code=0;
         if( hid_input_event.type == EV_KEY )
         {
-            hid_convert_linux_buttons_to_numbers(hid_input_event.code,hid_code);
-            hid_convert_linux_keys(hid_input_event.code,hid_code);
+	  /* JMZ: originally both functions were called, the latter evtl. overwriting
+	   * the former; now i only call the latter if the former does not return 
+	   * a valid result
+	   */
+	  if(!(hid_code=hid_convert_linux_buttons_to_numbers(hid_input_event.code)))
+            hid_code=hid_convert_linux_keys(hid_input_event.code);
         }
         else if( hid_input_event.type == EV_SYN )
         {
@@ -359,15 +382,14 @@ t_int hid_get_events(t_hid *x)
         }
         else if( event_names[hid_input_event.type][hid_input_event.code] != NULL )
         {
-            strcpy(hid_code, event_names[hid_input_event.type][hid_input_event.code]);
+	  hid_code=gensym(event_names[hid_input_event.type][hid_input_event.code]);
         }
         else 
         {
-            strcpy(hid_code, "unknown");
+	  hid_code=gensym("unknown");
         }
-		
-        if( hid_input_event.type != EV_SYN )
-            hid_output_event(x, ev[hid_input_event.type], hid_code, 
+        if( hid_code && hid_input_event.type != EV_SYN )
+            hid_output_event(x, ev[hid_input_event.type], hid_code->s_name, 
                              (t_float)hid_input_event.value);
         DEBUG(++event_counter;);
     }
