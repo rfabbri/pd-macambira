@@ -1,83 +1,83 @@
-#N canvas 169 86 636 480 10;
+#N canvas 169 86 628 485 10;
 #X obj 2 2 cnv 15 620 20 empty empty glossary 2 11 1 18 -195568 -66577
 0;
 #X msg 586 4 pddp;
-#X text 20 30 anything;
-#X text 160 30 a keyword in certain objects which matches an atom or
-series;
-#X text 20 50 atom;
-#X text 160 50 the most basic element of data in Pd;
-#X text 20 70 bang;
-#X text 160 70 a special selector that means "do it!";
-#X text 20 90 canvas;
-#X text 20 110 float;
-#X text 20 140 list;
-#X text 20 200 message;
-#X text 20 250 pointer;
-#X text 20 290 selector;
-#X text 20 320 selector series;
-#X text 160 320 a series of 2 or more atoms whose first atom is neither
+#X text 20 27 anything;
+#X text 20 57 atom;
+#X text 160 57 the most basic element of data in Pd;
+#X text 20 77 bang;
+#X text 160 77 a special selector that means "do it!";
+#X text 20 97 canvas;
+#X text 20 117 float;
+#X text 20 147 list;
+#X text 20 207 message;
+#X text 20 257 pointer;
+#X text 20 307 selector;
+#X text 20 337 selector series;
+#X text 160 337 a series of 2 or more atoms whose first atom is neither
 the selector "list" nor a numeric atom;
-#X text 20 350 series;
-#X text 160 350 a collection of zero or more atoms;
-#X text 20 370 numeric atom;
-#X text 20 410 symbolic atom;
-#X text 20 430 symbol;
-#X text 20 230 patch;
-#X text 160 230 a program written in Pd;
-#X text 160 430 a special selector to tell an object to receive a symbolic
+#X text 20 367 series;
+#X text 160 367 a collection of zero or more atoms;
+#X text 20 387 numeric atom;
+#X text 20 427 symbolic atom;
+#X text 20 447 symbol;
+#X text 20 237 patch;
+#X text 160 237 a program written in Pd;
+#X text 160 447 a special selector to tell an object to receive a symbolic
 atom as data.;
-#X text 160 200 data in any form sent to an object which causes the
+#X text 160 207 data in any form sent to an object which causes the
 object to do something specific;
-#X text 20 390 struct;
-#X text 20 270 scalar;
-#X text 160 270 a graphical instance of a struct;
-#X text 160 110 a special selector to tell an object to receive a numeric
+#X text 20 407 struct;
+#X text 20 287 scalar;
+#X text 160 287 a graphical instance of a struct;
+#X text 160 117 a special selector to tell an object to receive a numeric
 atom as data;
-#X text 160 390 an object to create templates for data structures;
-#X text 160 370 any atom which functions as a number \, i.e. 53 \,
+#X text 160 407 an object to create templates for data structures;
+#X text 160 387 any atom which functions as a number \, i.e. 53 \,
 3.1 \, 1e-25;
-#X text 160 410 any atom that is not a numeric atom \, i.e. word \,
+#X text 160 427 any atom that is not a numeric atom \, i.e. word \,
 3.1.1 \, 1two;
-#X obj 0 137 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 144 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 107 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 114 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 87 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 94 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 67 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 74 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 47 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 54 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 197 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 204 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 227 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 234 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 247 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 254 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 267 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 284 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 287 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 304 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 317 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 334 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 347 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 364 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 367 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 384 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 387 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 404 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 407 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 424 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X obj 0 427 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
+#X obj 0 444 cnv 15 620 2 empty empty empty 20 12 0 14 -233017 -66577
 0;
-#X text 160 250 a reference to a scalar used to manipulate read data
-from it;
-#X text 160 290 a symbolic atom that serves as an instruction to the
+#X text 160 307 a symbolic atom that serves as an instruction to the
 receiving object as how to handle the message;
-#X text 160 140 a series of 3 or more atoms whose first atom is the
+#X text 160 147 a series of 3 or more atoms whose first atom is the
 selector "list" \, or \, a series of 2 or more atoms whose first atom
 is numeric \, which causes the "list" selector to be implied \, i.e.
 [list one two( \, [1 2( \, [1 two(;
-#X text 160 90 the blank area of the window where you write your patches
+#X text 160 97 the blank area of the window where you write your patches
 ;
+#X text 160 257 a reference to a position in a scalar used to manipulate
+and read data from it;
+#X text 160 27 a keyword in certain objects which matches an atom or
+series \, sometimes written as "a" or "any";
