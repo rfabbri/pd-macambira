@@ -18,6 +18,8 @@
 
 
 /*Calculate the (non optimized) cross correlation of two signal vectors*/
+/*Based on code by Phil Bourke */
+
 
 #include "flib.h"
 #define SQ(a) (a * a)
@@ -76,22 +78,7 @@ static t_int *cross_perform(t_int *w)
          j %= N;
          sxy += (x[i] - mx) * (y[j] - my);
 
-
-    /*  
-	   if (j < 0 || j >= N)
-            continue;
-         else
-            sxy += (x[i] - mx) * (y[j] - my);
-        */ 
-
-
-	/* Or should it be (?)
-         if (j < 0 || j >= n)
-            sxy += (x[i] - mx) * (-my);
-         else
-            sxy += (x[i] - mx) * (y[j] - my);
-         */
-      }
+     }
       r = sxy / denom;
 	*out++ = r;
       /* r is the correlation coefficient at "delay" */
