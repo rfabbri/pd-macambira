@@ -26,20 +26,39 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
+DOC_TARGETS = externals-howto media pd_fileformat pd-msg pddp tutorials
+
 # clean up after everything is installed
 final_setup:
 	chmod -R ugo-w $(pddocdir)
 
-install: externals-howto_install pd_fileformat_install pd-msg_install 
-install: pddp_install tutorials_install
+install: $(objectsdir) $(helpdir) $(manualsdir) $(examplesdir) \
+$(patsubst %, %_install,$(DOC_TARGETS))
 	@echo " "
 	@echo "doc install succeeded!"
+
 
 #==============================================================================#
 #
 # PROJECT-SPECIFIC TARGETS
 #
 #==============================================================================#
+
+
+#------------------------------------------------------------------------------#
+# TEMPLATE
+TEMPLATE_NAME = template
+template_install: $(manualsdir)
+	install -d $(manualsdir)/$(TEMPLATE_NAME)
+	install -p $(doc_src)/template/*.* \
+		$(manualsdir)/$(TEMPLATE_NAME) 
+
+template_clean:
+	rm -f -- $(manualsdir)/$(TEMPLATE_NAME)/*.*
+	rmdir --	$(manualsdir)/$(TEMPLATE_NAME) 
+
+
+
 
 #------------------------------------------------------------------------------#
 # EXTERNALS-HOWTO
@@ -71,6 +90,23 @@ externals-howto_install: $(manualsdir)
 	-curl http://iem.kug.ac.at/pd/externals-HOWTO/node10.html > \
 		$(manualsdir)/$(EXTERNALS-HOWTO_NAME)/node10.html
 
+externals-howto_clean:
+
+
+
+
+#------------------------------------------------------------------------------#
+# MEDIA
+MEDIA_NAME = media
+media_install: $(manualsdir)
+	install -d $(manualsdir)/$(MEDIA_NAME)
+	install -p $(doc_src)/media/*.* \
+		$(manualsdir)/$(MEDIA_NAME) 
+
+media_clean:
+	rm -f -- $(manualsdir)/$(MEDIA_NAME)/*.*
+	rmdir --	$(manualsdir)/$(MEDIA_NAME) 
+
 
 #------------------------------------------------------------------------------#
 # PD-MSG
@@ -86,6 +122,7 @@ pd-msg_install: $(manualsdir)
 			$(manualsdir)/$(PD-MSG_NAME)/$$dir; \
 	done
 
+pd-msg_clean:
 
 
 #------------------------------------------------------------------------------#
@@ -96,6 +133,8 @@ pd_fileformat_install: $(manualsdir)
 	-curl http://student-kmt.hku.nl/%7Etjeerd/pd/pd_fileformat.html > \
 		$(manualsdir)/$(PD_FILEFORMAT_NAME)/Pd_File_Format.html
 
+pd_fileformat_clean:
+
 
 #------------------------------------------------------------------------------#
 # PDDP
@@ -103,6 +142,9 @@ pddp_install: $(helpdir)
 	install -p $(doc_src)/pddp/*.pd $(helpdir)
 # this file is used in key-help.pd
 	install -p $(doc_src)/pddp/keyboard_fun.txt $(helpdir)
+
+pddp_clean:
+
 
 
 
@@ -114,9 +156,38 @@ tutorials_install: $(manualsdir)
 	install -p $(doc_src)/tutorials/footils/pddrums/*.* $(manualsdir)/PdDrums
 # playnow
 	install -d $(manualsdir)/PlayNow
-	install -p $(doc_src)/tutorials/playnow/*.pd $(manualsdir)/PlayNow
-# these aren't needed yet <hans@at.or.at>
-#	install -p $(doc_src)/tutorials/playnow/*.mid $(manualsdir)/PlayNow
+	install -p $(doc_src)/tutorials/playnow/*.* $(manualsdir)/PlayNow
+# intro
+	install -d $(manualsdir)/Intro
+	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/Intro
+# sound
+	install -d $(manualsdir)/Sound
+	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/Sound
+# visual
+	install -d $(manualsdir)/Visual
+	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/Visual
+# networking
+	install -d $(manualsdir)/Networking
+	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/Networking
+# physical
+	install -d $(manualsdir)/Physical
+	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/Physical
+
+tutorials_clean:
+	rm -f -- $(manualsdir)/PdDrums/*.*
+	rmdir -- $(manualsdir)/PdDrums
+	rm -f -- $(manualsdir)/PlayNow/*.*
+	rmdir -- $(manualsdir)/PlayNow
+	rm -f -- $(manualsdir)/Intro/*.*
+	rmdir -- $(manualsdir)/Intro
+	rm -f -- $(manualsdir)/Sound/*.*
+	rmdir -- $(manualsdir)/Sound
+	rm -f -- $(manualsdir)/Visual/*.*
+	rmdir -- $(manualsdir)/Visual
+	rm -f -- $(manualsdir)/Networking/*.*
+	rmdir -- $(manualsdir)/Networking
+	rm -f -- $(manualsdir)/Physical/*.*
+	rmdir -- $(manualsdir)/Physical
 
 
 #==============================================================================#
@@ -152,7 +223,7 @@ devsymlinks:
 #==============================================================================#
 
 # the destination-specific clean targets are in Makefile.buildlayout
-clean: install_clean
+clean: $(patsubst %, %_clean,$(DOC_TARGETS))
 
 distclean: clean cruft_clean
 
