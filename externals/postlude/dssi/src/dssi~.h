@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <stdlib.h> /*for exit()*/
 #include <sys/types.h> /* for fork() */
 #include <signal.h> /* for kill() */
@@ -41,7 +40,7 @@
 #define DX7_DUMP_SIZE_BULK 	4096+8
 
 
-#define VERSION 0.94
+#define VERSION 0.95
 #define EVENT_BUFSIZE 1024
 #define OSC_BASE_MAX 1024
 #define TYPE_STRING_SIZE 20 /* Max size of event type string (must be two more bytes than needed) */

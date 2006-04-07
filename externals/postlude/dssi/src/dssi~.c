@@ -616,7 +616,7 @@ static void dssi_tilde_control (t_dssi_tilde *x,
     t_int instance = (t_int)instance_f - 1;
     int n_instances = x->n_instances;
 
-    if (instance > x->n_instances || instance < 0){
+    if (instance > x->n_instances || instance < -1){
 	post("dssi~: control: invalid instance number %d", instance);
 	return;
     }
@@ -653,8 +653,12 @@ static void dssi_tilde_control (t_dssi_tilde *x,
 }
 
 static void dssi_tilde_info (t_dssi_tilde *x){
-    unsigned int i;
+    unsigned int i, 
+		 ctrl_portno, 
+		 audio_portno;
     t_atom argv[7];
+
+    ctrl_portno = audio_portno = 0;
 
     for(i = 0; i < x->descriptor->LADSPA_Plugin->PortCount; i++){
 	memcpy(&argv[0], &x->port_info[i].type, 
@@ -670,7 +674,12 @@ static void dssi_tilde_info (t_dssi_tilde *x){
 	memcpy(&argv[6], &x->port_info[i].p_default, 
 		sizeof(t_atom));
 	argv[2].a_type = A_FLOAT;
-	argv[2].a_w.w_float = (t_float)i - 1;
+	if(!strcmp(argv[1].a_w.w_symbol->s_name, "control"))
+	    argv[2].a_w.w_float = (t_float)++ctrl_portno;
+	
+	else if(!strcmp(argv[1].a_w.w_symbol->s_name, "audio"))
+	    argv[2].a_w.w_float = (t_float)++audio_portno;
+	
 	outlet_anything (x->control_outlet, gensym ("port"), 7, argv);
     }
 }
@@ -1296,6 +1305,8 @@ static void dssi_tilde_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv
     int chan = (int)atom_getfloatarg(1, argc, argv) - 1;
     int param = (int)atom_getfloatarg(2, argc, argv);
     int val = (int)atom_getfloatarg(3, argc, argv);
+    int n_instances = x->n_instances;
+    
     switch (msg_type[0]){
 	case ASCII_n: ev_type = SND_SEQ_EVENT_NOTEON;
 		      break;
@@ -1314,7 +1325,12 @@ static void dssi_tilde_list(t_dssi_tilde *x, t_symbol *s, int argc, t_atom *argv
     post("initial midi NOTE:, arg1 = %d, arg2 = %d, arg3 = %d, arg4 = %d",ev_type,chan,param,val);
 #endif
     if(ev_type != 0){
-	MIDIbuf(ev_type, chan, param, val, x);
+	if(chan > 0)
+	    MIDIbuf(ev_type, chan, param, val, x);
+	else {
+	    while(n_instances--)
+		MIDIbuf(ev_type, n_instances, param, val, x);
+	}
     }
     free(msg_type);
 }
