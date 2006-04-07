@@ -1,0 +1,44 @@
+#N canvas 726 204 492 381 10;
+#X obj 8 10 cnv 15 400 40 empty empty basic_3D_objects 20 12 0 24 -228992
+-66577 0;
+#X obj 29 120 gemwin;
+#X msg 28 63 create \, 1;
+#X msg 42 90 destroy;
+#X obj 39 190 gemhead;
+#X obj 38 162 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 39 218 cube;
+#X obj 99 190 gemhead;
+#X obj 98 162 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 99 218 sphere;
+#X obj 159 190 gemhead;
+#X obj 158 162 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 159 218 cone;
+#X obj 221 191 gemhead;
+#X obj 220 163 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 281 191 gemhead;
+#X obj 280 163 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 281 219 teapot;
+#X obj 221 219 tube;
+#X obj 341 191 gemhead;
+#X obj 340 163 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 341 219 torus;
+#X connect 2 0 1 0;
+#X connect 3 0 1 0;
+#X connect 4 0 6 0;
+#X connect 5 0 4 0;
+#X connect 7 0 9 0;
+#X connect 8 0 7 0;
+#X connect 10 0 12 0;
+#X connect 11 0 10 0;
+#X connect 13 0 18 0;
+#X connect 14 0 13 0;
+#X connect 15 0 17 0;
+#X connect 16 0 15 0;
+#X connect 19 0 21 0;
+#X connect 20 0 19 0;

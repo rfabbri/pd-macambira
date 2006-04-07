@@ -5,14 +5,6 @@ http://puredata.info/dev/pddp
 
 Contributors include (in alphabetical order):
 
-Alexandre Castonguay
-Aymeric Mansoux
-Ben Bogart
-Frank Barknecht
+David Cuartielles
 Hans-Christoph Steiner
-Jerome Abel
 Koray Tahiroglu
-Malte Steiner
-Max Neupert
-Miller Puckette
-Thomas Musil
