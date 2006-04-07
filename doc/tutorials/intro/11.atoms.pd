@@ -1,0 +1,10 @@
+#N canvas 546 135 614 464 12;
+#X obj 10 12 cnv 15 400 40 empty empty atoms 20 12 0 24 -228992 -66577
+0;
+#X text 24 87 The basic data types of Pd are called "atoms". There
+are three atom types: "float" \, "symbol" \, and "pointer".;
+#X text 10 282 An atom is a piece of data that cannot be broken down
+into smaller parts.;
+#X text 21 160 A numeric atom is anything that can be interpreted as
+a number.;
+#X text 18 225 A symbolic atom is...;

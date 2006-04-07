@@ -1,0 +1,29 @@
+#N canvas 231 101 638 461 12;
+#X obj 8 -33 cnv 15 400 40 empty empty selectors 20 12 0 24 -228992
+-66577 0;
+#N canvas 328 337 454 304 object 0;
+#X obj 79 36 inlet;
+#X obj 86 270 outlet;
+#X obj 308 267 outlet;
+#X obj 71 131 route output-left output-right;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;
+#X connect 3 1 2 0;
+#X restore 157 211 pd object;
+#X floatatom 157 264 5 0 0 0 - - -;
+#X floatatom 242 264 5 0 0 0 - - -;
+#X msg 189 165 output-right 309;
+#X msg 156 115 output-left 8675;
+#X text 9 24 Every message has a selector. The selector is the first
+element in the message. It tells the object which receives that message
+what to do with it. A selector is basically like a command or a function.
+;
+#X text 23 304 Here's the technical definition:;
+#X text 23 335 The selector is a symbolic atom \, which is a non-numeric
+string with no white space \, semicolons \, or commas. In the case
+of messages whose first element is a numeric atom \, the selector is
+implied.;
+#X connect 1 0 2 0;
+#X connect 1 1 3 0;
+#X connect 4 0 1 0;
+#X connect 5 0 1 0;

@@ -1,0 +1,42 @@
+#N canvas 570 267 619 435 12;
+#X obj -60 8 cnv 15 400 40 empty empty ordering_messages 20 12 0 24
+-228992 -66577 0;
+#X obj 214 364 t f b s l p a;
+#X text 64 362 abbreviations:;
+#X obj -26 396 trigger float bang symbol list pointer anything;
+#X obj 239 89 trigger;
+#X msg 471 223 now;
+#X msg 392 223 this;
+#X msg 313 223 makes;
+#X msg 234 223 sense;
+#X msg 156 223 !;
+#X msg 232 326;
+#X obj 233 265 symbol;
+#X msg 233 289 add2 \$1;
+#X msg 196 133 bang;
+#X text -56 54 The [trigger] object allows you to specify the order
+of execution. If you need to make sure that one thing executes before
+another \, use:;
+#X msg 3 155 set;
+#X text -62 155 reset:;
+#X obj 196 160 trigger bang bang bang bang bang;
+#X msg 88 154 bang;
+#X connect 5 0 11 0;
+#X connect 6 0 11 0;
+#X connect 7 0 11 0;
+#X connect 8 0 11 0;
+#X connect 9 0 11 0;
+#X connect 11 0 12 0;
+#X connect 12 0 10 0;
+#X connect 13 0 17 0;
+#X connect 15 0 10 0;
+#X connect 17 0 9 0;
+#X connect 17 1 8 0;
+#X connect 17 2 7 0;
+#X connect 17 3 6 0;
+#X connect 17 4 5 0;
+#X connect 18 0 8 0;
+#X connect 18 0 9 0;
+#X connect 18 0 6 0;
+#X connect 18 0 7 0;
+#X connect 18 0 5 0;

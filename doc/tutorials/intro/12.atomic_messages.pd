@@ -1,0 +1,6 @@
+#N canvas 384 167 602 456 12;
+#X obj 10 12 cnv 15 400 40 empty empty atomic_messages 20 12 0 24 -228992
+-66577 0;
+#X msg 27 81 bang;
+#X msg 27 197 symbol atom;
+#X msg 29 300 float 1.234;

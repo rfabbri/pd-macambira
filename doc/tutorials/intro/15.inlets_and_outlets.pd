@@ -1,0 +1,42 @@
+#N canvas 520 22 615 396 12;
+#N canvas 0 22 470 320 object 0;
+#X obj 175 99 inlet;
+#X obj 174 206 outlet;
+#X text 14 39 this object does nothing but pass data thru;
+#X connect 0 0 1 0;
+#X restore 366 208 pd object;
+#N canvas 0 22 618 378 another 0;
+#X obj 17 94 inlet;
+#X obj 431 320 outlet;
+#X obj 16 324 print;
+#X text 9 28 this object says hello in the Pd window \, then passes
+the data thru;
+#X obj 16 182 trigger bang anything;
+#X msg 16 292 hi from inside [pd another object]!;
+#X connect 0 0 4 0;
+#X connect 4 0 5 0;
+#X connect 4 1 1 0;
+#X connect 5 0 2 0;
+#X restore 365 254 pd another object;
+#X obj 12 13 cnv 15 400 40 empty empty inlets_and_outlets 20 12 0 24
+-228992 -66577 0;
+#X text 14 76 When making your own objects \, you can make your own
+inlets and outlets \, whether in a subpatch or an abstraction.;
+#X msg 333 162 bang;
+#X obj 327 297 bng 25 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 30 154 cnv 15 220 180 empty empty empty 20 12 0 14 -233017 -66577
+0;
+#X obj 43 177 inlet;
+#X obj 43 283 outlet;
+#X text 98 177 take in data;
+#X text 60 227 do some stuff here;
+#X text 113 282 output data;
+#X msg 391 161 what's in here?;
+#X obj 373 301 print;
+#X connect 0 0 1 0;
+#X connect 1 0 5 0;
+#X connect 1 0 13 0;
+#X connect 4 0 0 0;
+#X connect 7 0 8 0;
+#X connect 12 0 0 0;
