@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LIBS="Gem cyclone zexy cxc ext13 fftease hid iemabs iemmatrix liblist list-abs mapping markex maxlib memento mjlib motex mtx oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vasp vbap xsample"
+LIBS="Gem cyclone zexy cxc ext13 fftease hid iemabs iemmatrix list-abs mapping markex maxlib memento mjlib motex mtx oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vasp vbap xsample"
 
 GNULINUX_FONTPATH="/usr/X11R6/lib/X11/fonts /usr/X11R6/lib/X11/fonts/TTF /usr/lib/X11/fonts /usr/share/fonts/truetype"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
