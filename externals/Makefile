@@ -514,17 +514,20 @@ freeverb_clean:
 # HARDWARE
 HARDWARE_NAME=hardware
 # memPIO has some special deps, so don't include it yet.
-#HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp)
 # multio.c requires libusb, so don't include it yet...  <hans@at.or.at>
+#HARDWARE_OBJECTS := $(wildcard $(externals_src)/hardware/*/*.cpp) \
 #$(wildcard $(externals_src)/hardware/*/*.c)
-hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
+#hardware: $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(HARDWARE_OBJECTS:.cpp=.$(EXTENSION))
+hardware:
 
 hardware_install: hardware
 	install -d $(objectsdir)/$(HARDWARE_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HARDWARE_NAME) \
 		--description "objects for working with hardware sensor boxes" \
 		--license "GNU GPL"
-	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HARDWARE_NAME)
+# nothing built from source yet
+#	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
+#		$(objectsdir)/$(HARDWARE_NAME)
 	install -d $(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
 		$(helpdir)/$(HARDWARE_NAME)
