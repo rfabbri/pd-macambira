@@ -54,8 +54,8 @@ template_install: $(manualsdir)
 		$(manualsdir)/$(TEMPLATE_NAME) 
 
 template_clean:
-	rm -f -- $(manualsdir)/$(TEMPLATE_NAME)/*.*
-	rmdir --	$(manualsdir)/$(TEMPLATE_NAME) 
+	-rm -f -- $(manualsdir)/$(TEMPLATE_NAME)/*.*
+	-rmdir --	$(manualsdir)/$(TEMPLATE_NAME) 
 
 
 
@@ -104,8 +104,8 @@ media_install: $(manualsdir)
 		$(manualsdir)/$(MEDIA_NAME) 
 
 media_clean:
-	rm -f -- $(manualsdir)/$(MEDIA_NAME)/*.*
-	rmdir --	$(manualsdir)/$(MEDIA_NAME) 
+	-rm -f -- $(manualsdir)/$(MEDIA_NAME)/*.*
+	-rmdir --	$(manualsdir)/$(MEDIA_NAME) 
 
 
 #------------------------------------------------------------------------------#
@@ -174,20 +174,20 @@ tutorials_install: $(manualsdir)
 	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/Physical
 
 tutorials_clean:
-	rm -f -- $(manualsdir)/PdDrums/*.*
-	rmdir -- $(manualsdir)/PdDrums
-	rm -f -- $(manualsdir)/PlayNow/*.*
-	rmdir -- $(manualsdir)/PlayNow
-	rm -f -- $(manualsdir)/Intro/*.*
-	rmdir -- $(manualsdir)/Intro
-	rm -f -- $(manualsdir)/Sound/*.*
-	rmdir -- $(manualsdir)/Sound
-	rm -f -- $(manualsdir)/Visual/*.*
-	rmdir -- $(manualsdir)/Visual
-	rm -f -- $(manualsdir)/Networking/*.*
-	rmdir -- $(manualsdir)/Networking
-	rm -f -- $(manualsdir)/Physical/*.*
-	rmdir -- $(manualsdir)/Physical
+	-rm -f -- $(manualsdir)/PdDrums/*.*
+	-rmdir -- $(manualsdir)/PdDrums
+	-rm -f -- $(manualsdir)/PlayNow/*.*
+	-rmdir -- $(manualsdir)/PlayNow
+	-rm -f -- $(manualsdir)/Intro/*.*
+	-rmdir -- $(manualsdir)/Intro
+	-rm -f -- $(manualsdir)/Sound/*.*
+	-rmdir -- $(manualsdir)/Sound
+	-rm -f -- $(manualsdir)/Visual/*.*
+	-rmdir -- $(manualsdir)/Visual
+	-rm -f -- $(manualsdir)/Networking/*.*
+	-rmdir -- $(manualsdir)/Networking
+	-rm -f -- $(manualsdir)/Physical/*.*
+	-rmdir -- $(manualsdir)/Physical
 
 
 #==============================================================================#
