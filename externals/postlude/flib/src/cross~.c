@@ -45,6 +45,9 @@ static t_int *cross_perform(t_int *w)
    if(maxdelay > N * .5){
 	maxdelay = N * .5;
 	post("cross~: invalid maxdelay, must be <= blocksize/2");
+   } 
+   else if (!maxdelay){
+       maxdelay = N * .5;
    }
  
    /* Calculate the mean of the two series x[], y[] */
