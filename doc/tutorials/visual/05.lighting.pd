@@ -1,8 +1,18 @@
-#N canvas 548 149 492 381 10;
-#X obj 11 9 cnv 15 400 40 empty empty lighting 20 12 0 24 -228992 -66577
+#N canvas 362 246 632 452 10;
+#X obj 8 10 cnv 15 400 40 empty empty lighting 20 12 0 24 -228992 -66577
 0;
-#X obj 29 120 gemwin;
-#X msg 28 63 create \, 1;
-#X msg 42 90 destroy;
-#X connect 2 0 1 0;
-#X connect 3 0 1 0;
+#X obj 465 16 gemwin_control;
+#X obj 466 60 import Gem;
+#X obj 29 150 gemwin;
+#X msg 29 119 lighting \$1;
+#X obj 29 101 tgl 15 1 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
+;
+#X obj 72 294 world_light;
+#X obj 72 256 gemhead;
+#X obj 295 253 gemhead;
+#X obj 295 274 sphere 1 35;
+#X text 255 228 draw a sphere;
+#X connect 4 0 3 0;
+#X connect 5 0 4 0;
+#X connect 7 0 6 0;
+#X connect 8 0 9 0;
