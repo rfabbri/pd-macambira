@@ -28,7 +28,8 @@
 /* David Thomas - Final Solution                                                */
 /* ---------------------------------------------------------------------------- */
 
-
+/* this doesn't compile on MinGW */
+#ifndef _WIN32
 
 #include <sys/types.h>
 #include <string.h>
@@ -2037,3 +2038,6 @@ void sonogram_tilde_setup(void)
     class_addmethod(sonogram_class, (t_method)sonogram_readspeed, gensym("readspeed"), A_FLOAT, A_NULL);
     class_addmethod(sonogram_class, (t_method)sonogram_undo, gensym("undo"), A_NULL);
 }
+
+
+#endif /* not _WIN32 */
