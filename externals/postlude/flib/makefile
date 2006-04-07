@@ -12,7 +12,7 @@ INSTALL_PREFIX = /usr/local
 PDLIBDIR = /lib/pd
 PDDIR = $(INSTALL_PREFIX)$(PDLIBDIR)
 
-TARGETS = sc~ ss~ irreg~ mspec~ peak~ pspec~ sfm~ trist~ pp~ bmax~ melf~ clean~ wdv~ hca~
+TARGETS = sc~ ss~ irreg~ mspec~ peak~ pspec~ sfm~ trist~ pp~ bmax~ melf~ clean~ wdv~ hca~ cross~
 
 
 # ----------------------- NT -----------------------
@@ -53,6 +53,7 @@ PDNTLIB = $(PDNTLDIR)\msvcrt.lib \
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/clean~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/wdv~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/hca~.c
+	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/cross~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
 	link /dll /export:$(CSYM)_setup $(NAME).obj $(PDNTOBJECTS) $(PDNTLIB)
 
@@ -88,6 +89,7 @@ DARWINOBJECTS = $(TARGETS:%=%.o)
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/clean~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/wdv~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/hca~.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/cross~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c $*.c 
 	$(CC) -bundle -undefined suppress -flat_namespace -o $(NAME).pd_darwin $(NAME).o $(DARWINOBJECTS)
 	rm -f $(NAME).o ../$(NAME).pd_darwin
@@ -125,7 +127,7 @@ endif
 
 $(LINUXOBJECTS): *.h
 
-LINUXCFLAGS = -DPD -O2 -fPIC -funroll-loops -Wall -W -Wshadow -Wstrict-prototypes -Werror -fomit-frame-pointer -Wno-unused -Wno-parentheses -Wno-switch $(AFLAGS)
+LINUXCFLAGS = -DPD -O3 -fPIC -funroll-loops -Wall -W -Wshadow -Wstrict-prototypes -Werror -fomit-frame-pointer -Wno-unused -Wno-parentheses -Wno-switch $(AFLAGS)
 
 LINUXINCLUDE =  -I/usr/include
 
@@ -145,6 +147,7 @@ LINUXINCLUDE =  -I/usr/include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/clean~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/wdv~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/hca~.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/cross~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
 	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o $(LINUXOBJECTS) -lc -lm
 	strip --strip-unneeded $(NAME).pd_linux
