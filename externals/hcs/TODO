@@ -1,4 +1,6 @@
 
+- rename [folder_list] to [file/match] and make other file lib objects
+  - make [file/match] handle lists of patterns
 
 - write [version] object
   - [bang( outputs list of version major minor bugfix i.e. [0 39 2(

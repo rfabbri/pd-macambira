@@ -34,7 +34,9 @@
 #include <glob.h>
 #endif
 
-static char *version = "$Revision: 1.8 $";
+static char *version = "$Revision: 1.9 $";
+
+t_int folder_list_instance_count;
 
 #define DEBUG(x)
 //#define DEBUG(x) x 
@@ -163,8 +165,13 @@ static void *folder_list_new(t_symbol *s)
 
 	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
 	
-	post("[folder_list] %s",version);  
-	post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+	if(!folder_list_instance_count) 
+	{
+		post("[folder_list] %s",version);  
+		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+	}
+	folder_list_instance_count++;
+
 	/* TODO set current dir of patch as default */
 #ifdef _WIN32
 	x->x_pattern = gensym(getenv("USERPROFILE"));
