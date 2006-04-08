@@ -1,0 +1,21 @@
+#N canvas 15 58 632 452 10;
+#X obj 8 10 cnv 15 400 40 empty empty TEMPLATE 20 12 0 24 -228992 -66577
+0;
+#X obj 56 151 send \$0-local-data;
+#X obj 56 192 receive \$0-local-data;
+#X obj 60 124 hsl 150 20 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 3700 1;
+#X obj 59 221 hsl 150 20 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 3700 1;
+#X obj 342 124 hsl 150 20 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 341 221 hsl 150 20 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X obj 338 192 netreceive;
+#X obj 338 151 netsend;
+#X text 45 78 At the most basic level \, networking in Pd works like
+the standard [send] and [receive] objects:;
+#X connect 2 0 4 0;
+#X connect 3 0 1 0;
+#X connect 5 0 8 0;
+#X connect 7 0 6 0;
