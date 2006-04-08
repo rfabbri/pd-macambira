@@ -19,6 +19,6 @@ cd $cvs_root_dir
 for section in abstractions doc extensions externals packages scripts Gem GemLibs; do
 	 echo "$section"
 	 cd $section
-    cvs up
+    cvs up -Pd
 	 cd ..
 done
