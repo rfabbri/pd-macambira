@@ -109,8 +109,8 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = buildsrc creb cxc cyclone ext13 freeverb hardware iemabs iemlib \
-iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd \
+LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb hardware iemabs \
+iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd \
 sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
@@ -255,7 +255,8 @@ template_clean:
 #------------------------------------------------------------------------------#
 # BSAYLOR
 BSAYLOR_NAME=bsaylor
-BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/*~.c)
+# partconv~.c requires fftw3, which is not part of the build system yet
+BSAYLOR_OBJECTS := $(wildcard $(externals_src)/bsaylor/[a-oq-z]*~.c)
 bsaylor: $(BSAYLOR_OBJECTS:.c=.$(EXTENSION))
 
 bsaylor_install: bsaylor
