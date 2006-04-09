@@ -177,7 +177,6 @@ buildsrc_install: $(helpdir) $(objectsdir)
 			$(externals_src)/creb/doc/*.pd \
 				$(helpdir)
 	install -p \
-			$(externals_src)/creb/doc/examples/*.pd \
 			$(externals_src)/dfx/*/*.pd \
 			$(externals_src)/ggee/*/*-help.pd \
 			$(externals_src)/ggee/*/*.gif \
@@ -288,26 +287,43 @@ bsaylor_clean:
 #------------------------------------------------------------------------------#
 # CREB
 CREB_NAME=creb
-#CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
+# ead* don't compile yet...
+CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/[a-df-z]*.c)
+# haven't figured these out yet
 #CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
-#creb: $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) $(CREB_OBJECTS:.c=.$(EXTENSION))
-creb:
 
+# kludge to make objects find the headers
+pre_creb:
+	test -e $(externals_src)/creb/modules/extlib_util.h || \
+		( cd $(externals_src)/creb/modules && ln -s ../include/extlib_util.h )
+	test -e $(externals_src)/creb/modules/filters.h || \
+		( cd $(externals_src)/creb/modules && ln -s ../include/filters.h )
+
+creb: pre_creb $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) \
+$(CREB_OBJECTS:.c=.$(EXTENSION))
 
 creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CREB_NAME) \
+		--author "Tom Schouten <creb@zzz.kotnet.org>" \
+		--description "" \
+		--license "GNU GPL 2" \
+		--version ""
 	install -p $(externals_src)/creb/abs/*.pd $(objectsdir)/$(CREB_NAME)
+	install -p $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) \
+		$(objectsdir)/$(CREB_NAME)
 	install -d $(helpdir)/$(CREB_NAME)
-	install -p $(externals_src)/creb/doc/examples/*.* \
-		$(helpdir)/$(CREB_NAME)
-#	install -d $(manualsdir)/$(CREB_NAME)
-#	install -d $(examplesdir)/$(CREB_NAME)
+	install -p $(externals_src)/creb/doc/*.* $(helpdir)/$(CREB_NAME)
+	install -d $(manualsdir)/$(CREB_NAME)
+	install -p $(externals_src)/creb/doc/reference.txt $(manualsdir)/$(CREB_NAME)
+	install -d $(examplesdir)/$(CREB_NAME)
+	install -p $(externals_src)/creb/doc/examples/*.* $(examplesdir)/$(CREB_NAME)
 
 creb_clean:
-	-rm -f -- $(externals_src)/creb/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/creb/*.o
-	-rm -f -- $(externals_src)/creb/*.bak
-	-rm -f -- $(externals_src)/creb/*.*~
+	-rm -f -- $(externals_src)/creb/*/*.$(EXTENSION)
+	-rm -f -- $(externals_src)/creb/*/*.o
+	-rm -f -- $(externals_src)/creb/*/*.bak
+	-rm -f -- $(externals_src)/creb/*/*.*~
 
 
 #------------------------------------------------------------------------------#
