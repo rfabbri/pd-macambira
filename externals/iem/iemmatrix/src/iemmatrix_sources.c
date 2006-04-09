@@ -15,6 +15,7 @@ void iemmatrix_sources_setup(void)
 	iemtx_bitleft_setup(); /* mtx_bitleft.c */
 	iemtx_bitor_setup(); /* mtx_bitor.c */
 	iemtx_bitright_setup(); /* mtx_bitright.c */
+	iemtx_bspline_setup(); /* mtx_bspline.c */
 	iemtx_check_setup(); /* mtx_check.c */
 	iemtx_cholesky_setup(); /* mtx_cholesky.c */
 	iemtx_col_setup(); /* mtx_col.c */
@@ -50,8 +51,8 @@ void iemmatrix_sources_setup(void)
 	iemtx_mean_setup(); /* mtx_mean.c */
 	iemtx_min2_setup(); /* mtx_min2.c */
 	iemtx_minmax_setup(); /* mtx_minmax.c */
-	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_mul_setup(); /* mtx_mul.c */
+	iemtx_mul__setup(); /* mtx_mul~.c */
 	iemtx_neq_setup(); /* mtx_neq.c */
 	iemtx_not_setup(); /* mtx_not.c */
 	iemtx_ones_setup(); /* mtx_ones.c */
