@@ -324,6 +324,8 @@ creb_clean:
 	-rm -f -- $(externals_src)/creb/*/*.o
 	-rm -f -- $(externals_src)/creb/*/*.bak
 	-rm -f -- $(externals_src)/creb/*/*.*~
+	-rm -f -- $(externals_src)/creb/modules/filters.h
+	-rm -f -- $(externals_src)/creb/modules/extlib_util.h 
 
 
 #------------------------------------------------------------------------------#
