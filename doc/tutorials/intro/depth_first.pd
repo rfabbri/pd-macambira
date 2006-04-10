@@ -1,0 +1,31 @@
+#N canvas 21 40 627 443 12;
+#X obj -43 8 cnv 15 400 40 empty empty depth_first 20 12 0 24 -228992
+-66577 0;
+#X obj 258 249 trigger bang bang;
+#X msg 208 358 add2 \$1;
+#X msg 207 397 1 2 3 4;
+#X msg 77 254 set;
+#X text 11 254 reset:;
+#X msg 257 215 4;
+#X msg 258 282 3;
+#X msg 423 280 2;
+#X msg 423 315 1;
+#X text 8 398 see result here -->;
+#X obj 258 184 bng 25 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X text -39 66 Pd processes messages in "depth first". This means the
+bottom-most message in a chain runs first. Everything below a spot
+in a chain is run before. As you'll see from the example below \, the
+[4( message actually runs last \, since everything below it executed
+before it.;
+#X connect 1 0 7 0;
+#X connect 1 1 8 0;
+#X connect 2 0 3 0;
+#X connect 4 0 3 0;
+#X connect 6 0 1 0;
+#X connect 6 0 2 0;
+#X connect 7 0 2 0;
+#X connect 8 0 9 0;
+#X connect 8 0 2 0;
+#X connect 9 0 2 0;
+#X connect 11 0 6 0;
