@@ -949,7 +949,8 @@ pddp_install: pddp
 #		--author "PDDP" \
 #		--license "BSD" \
 #		--description "objects for working with Tcl and Pd's Tk GUI"
-#	cd $(externals_src)/miXed/pddp && $(MAKE) OUT_DIR=$(PDDP_OUT_DIR)
+	cd $(externals_src)/miXed/pddp && $(MAKE) \
+		OUT_DIR=$(objectsdir)/$(PDDP_NAME_DIR)
 #	install -d $(helpdir)/$(PDDP_NAME)
 #	install -d $(manualsdir)/$(PDDP_NAME)
 	install -d $(examplesdir)/$(PDDP_NAME)
