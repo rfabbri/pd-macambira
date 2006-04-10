@@ -258,6 +258,14 @@ purepd_install:
 	install -d $(objectsdir)/$(PUREPD_NAME)
 	install -p $(abstractions_src)/purepd/*.pd \
 		 $(objectsdir)/$(PUREPD_NAME)
+# temp hack, to make these available to anything until they get settled into a
+# proper lib <hans@at.or.at>
+	install -p $(abstractions_src)/purepd/*_argument.pd \
+		 $(objectsdir)
+
+purepd_clean:
+	rm -f -- $(objectsdir)/$(PUREPD_NAME)/*.*
+	rmdir -- $(objectsdir)/$(PUREPD_NAME)
 
 
 
@@ -278,6 +286,9 @@ rradical_install:
 		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/rradical/stuff/*.* | \
 		grep -v '\-help.pd')  $(objectsdir)/$(RRADICAL_NAME)
+	install -d $(helpdir)/$(RRADICAL_NAME)
+	install -p $(abstractions_src)/rradical/*/*-help.pd \
+		$(helpdir)/$(RRADICAL_NAME)
 	install -d $(examplesdir)/$(RRADICAL_NAME)
 	install -p $(abstractions_src)/rradical/usecases/*.* \
 		$(examplesdir)/$(RRADICAL_NAME)
@@ -298,14 +309,32 @@ rradical_install:
 #==============================================================================#
 
 # make the symlinks necessary to simulate the installed environment
-devsymlinks: devsymlinks_keyboardkeys
+devsymlinks:
+# make symlinks for help patches
+	test -e $(abstractions_src)/../2.control.examples || \
+		ln -s $(pd_src)/doc/2.control.examples \
+			$(abstractions_src)/../2.control.examples
+	test -e $(abstractions_src)/../3.audio.examples || \
+		ln -s $(pd_src)/doc/3.audio.examples \
+			$(abstractions_src)/../3.audio.examples
+# pd <= 0.38-4 has 4.fft.examples
+	test -e $(abstractions_src)/../4.fft.examples || \
+		ln -s $(pd_src)/doc/4.fft.examples $(abstractions_src)/../4.fft.examples
+# pd > 0.38-4 has 4.data.structures
+	test -e $(abstractions_src)/../4.data.structures || \
+		ln -s $(pd_src)/doc/4.data.structures \
+			$(abstractions_src)/../4.data.structures
+	test -e $(abstractions_src)/../7.stuff || \
+		ln -s $(pd_src)/doc/7.stuff $(abstractions_src)/../7.stuff
+	test -e $(abstractions_src)/../sound || \
+		ln -s $(pd_src)/doc/sound $(abstractions_src)/../sound
 
-
-devsymlinks_keyboardkeys:
-	ln -s abs \
-		$(abstractions_src)/keyboardkeys/keyboardkeys
-	ln -s ../keyboardkeys \
-		$(abstractions_src)/keyboardkeys/doc/keyboardkeys
+# hmm, seems broken and unneeded
+#devsymlinks_keyboardkeys:
+#	test -e abs || \
+#		ln -s abs $(abstractions_src)/keyboardkeys/keyboardkeys
+#	test -e ../keyboardkeys || \
+#		ln -s ../keyboardkeys $(abstractions_src)/keyboardkeys/doc/keyboardkeys
 
 #==============================================================================#
 #
