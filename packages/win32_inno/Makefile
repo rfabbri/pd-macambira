@@ -97,7 +97,10 @@ lib_install:
 	install -p $(bin_src)/tclpip84.dll  $(dlldir)/tclpip84.dll
 	install -p $(bin_src)/tk84.dll  $(dlldir)/tk84.dll
 # this is a quick hack, since the gripd.dll still looks for pthreadVC.dll
-	install -p $(DESTDIR)$(prefix)/gripd/pthreadVC.dll $(dlldir)/pthreadVC.dll
+	(test -e $(DESTDIR)$(prefix)/gripd/pthreadVC.dll && \
+		install -p $(DESTDIR)$(prefix)/gripd/pthreadVC.dll $(dlldir)/pthreadVC.dll) || \
+		test -e $(SYSTEMROOT)/system32/pthreadVC.dll || \
+			install -p $(SYSTEMROOT)/pthreadVC.dll $(dlldir)/pthreadVC.dll
 # these go into the Pd package's lib dir
 	install -d $(libdir)/tcl8.4
 	cp -r /usr/local/lib/tcl8.4/* $(libdir)/tcl8.4
