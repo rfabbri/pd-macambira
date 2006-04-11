@@ -39,7 +39,7 @@
 #X connect 11 0 7 0;
 #X coords 0 -1 1 1 25 25 1 100 100;
 #X restore 181 345 pd;
-#X msg 108 266 connect pdbox.at.or.at 50505;
+#X msg 108 266 connect pdbox.at.or.at 47292;
 #X msg 27 27 send;
 #X obj 108 398 entry 300 100 grey90 black;
 #X obj 49 121 entry 300 100 grey90 black;

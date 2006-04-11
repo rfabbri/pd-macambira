@@ -1,6 +1,6 @@
 #N canvas 769 55 458 308 10;
 #X obj 258 13 import maxlib cyclone zexy;
-#X obj 141 112 netserver 50505;
+#X obj 141 112 netserver 47292;
 #X obj 68 83 prepend broadcast;
 #X obj 153 204 prepend;
 #X obj 197 176 makesymbol client%s_%s;
