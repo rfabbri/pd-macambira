@@ -662,47 +662,51 @@ hidin_clean:
 	-rm -f -- $(externals_src)/hidin/*.*~
 
 
-#------------------------------------------------------------------------------#
-# IEMABS
-IEMABS_NAME=iemabs
-iemabs:
-
-
-iemabs_install: iemabs
-#  iemabs still has the help patches in the old help-*.pd style
-	install -d $(objectsdir)/$(IEMABS_NAME)
-	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMABS_NAME) \
-		--description "a collection of objects written at IEM/KUG"
-	cd $(externals_src)/iemlib/iemabs/ && \
-		install -p $(shell cd $(externals_src)/iemlib/iemabs/ && ls -1 *.pd | \
-			grep -v 'help') $(objectsdir)/$(IEMABS_NAME)
-	install -d $(helpdir)/$(IEMABS_NAME)
-	cd $(externals_src)/iemlib/iemabs/ && \
-		install -p *help*.pd $(helpdir)/$(IEMABS_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMABS_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMABS_NAME)
-	install -d $(manualsdir)/$(IEMABS_NAME)
-	install -p $(externals_src)/iemlib/iemabs/*.txt \
-		$(manualsdir)/$(IEMABS_NAME)
-
-
 
 #------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
-iemlib:
-
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/iem_t3_lib/[st]*.c) \
+$(wildcard $(externals_src)/iemlib/src/iem_mp3/[a-hj-z]*.c) \
+$(wildcard $(externals_src)/iemlib/src/iemlib1/[a-hj-z]*.c) \
+$(wildcard $(externals_src)/iemlib/src/iemlib2/[a-hj-z]*.c)
+iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
-#	install -d $(objectsdir)/$(IEMLIB_NAME)
-#	install -d $(helpdir)/$(IEMLIB_NAME)
+	install -d $(objectsdir)/$(IEMLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMLIB_NAME) \
+		--description "a collection of objects written at IEM/KUG" \
+		--license "GNU GPL"
+	install -p $(IEMLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMLIB_NAME)
+	cd $(externals_src)/iemlib/iemabs/ && \
+		install -p $(shell cd $(externals_src)/iemlib/iemabs/ && ls -1 *.pd | \
+			grep -v 'help') $(objectsdir)/$(IEMLIB_NAME)
+#  iemabs still has the help patches in the old help-*.pd style
+	install -d $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*help*.pd $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.mp3 $(helpdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.wav $(helpdir)/$(IEMLIB_NAME)
+# iemlib objects have their help path hard-coded :(
 	install -d $(helpdir)/iemhelp
 	install -p $(externals_src)/iemlib/iemhelp/*.* $(helpdir)/iemhelp
-#	install -d $(manualsdir)/$(IEMLIB_NAME)
 	install -d $(examplesdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(examplesdir)/$(IEMLIB_NAME)
+	install -d $(manualsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/iemabs/*.txt \
+		$(manualsdir)/$(IEMLIB_NAME)
 
+iemlib_clean: 
+	-rm -f -- $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
+	-rmdir -- $(objectsdir)/$(IEMLIB_NAME)
+	-rm -f -- $(helpdir)/$(IEMLIB_NAME)/*.*
+	-rmdir -- $(helpdir)/$(IEMLIB_NAME)
+	-rm -f -- $(helpdir)/iemhelp/*.*
+	-rmdir -- $(helpdir)/iemhelp
+	-rm -f -- $(examplessdir)/$(IEMLIB_NAME)/*.*
+	-rmdir -- $(examplessdir)/$(IEMLIB_NAME)
+	-rm -f -- $(manualsdir)/$(IEMLIB_NAME)/*.*
+	-rmdir -- $(manualsdir)/$(IEMLIB_NAME)
 
 
 #------------------------------------------------------------------------------#
@@ -938,8 +942,6 @@ oscx_clean:
 #------------------------------------------------------------------------------#
 # PDDP
 PDDP_NAME=pddp
-# pddp is compiled straight into $(OUT_DIR)
-PDDP_OUT_DIR=$(objectsdir)/$(PDDP_NAME)
 pddp:
 
 
@@ -949,8 +951,12 @@ pddp_install: pddp
 #		--author "PDDP" \
 #		--license "BSD" \
 #		--description "objects for working with Tcl and Pd's Tk GUI"
+# pddp is compiled straight into $(OUT_DIR)
 	cd $(externals_src)/miXed/pddp && $(MAKE) \
-		OUT_DIR=$(objectsdir)/$(PDDP_NAME_DIR)
+		OUT_DIR=$(objectsdir)/$(PDDP_NAME)
+	install -d $(objectsdir)/$(PDDP_NAME)/pddp
+	install -p $(externals_src)/miXed/bin/pddp/*.tcl \
+		$(objectsdir)/$(PDDP_NAME)/pddp
 #	install -d $(helpdir)/$(PDDP_NAME)
 #	install -d $(manualsdir)/$(PDDP_NAME)
 	install -d $(examplesdir)/$(PDDP_NAME)
