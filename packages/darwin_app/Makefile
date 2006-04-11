@@ -115,7 +115,7 @@ darwin_app_wrapper: Info.plist
 Info.plist: Info.plist.in 
 	cat Info.plist.in | \
 		sed 's/PD_APP_NAME/$(PD_APP_NAME)/' | \
-		sed 's/PD_VERSION/$(PD_VERSION)-$(PACKAGE_VERSION)/' > \
+		sed 's/PD_VERSION/$(PD_VERSION)/' > \
 		Info.plist
 
 # tigital's Gem window focus black magic
