@@ -26,7 +26,7 @@ set -e
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DESC="Pure Data"
 NAME=pd
-DAEMON=/usr/local/bin/$NAME
+DAEMON=/usr/bin/$NAME
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -36,7 +36,12 @@ test -x $DAEMON || exit 0
 # options
 RUNPDDAEMON=no
 USER=nobody
-PORT=34985
+#PORT=34985
+
+# TODO: write daemon.pd patch which is always started and provides basic
+# commands, like start, stop, quit, dsp, etc. over a TCP port
+
+# TODO: figure out how to have a log of the stderr/console output
 
 # Read config file if it is present.
 if [ -r /etc/default/$NAME ]

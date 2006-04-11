@@ -1,8 +1,9 @@
 # this needs to be "yes" for it to start automatically
-RUNPDDAEMON=yes
+#RUNPDDAEMON=yes
 
 # load your patches here
-OPTIONS="-open /home/hans/cvs/pure-data/doc/tutorials/networking/chat-server.pd"
+#OPTIONS="-open /home/hans/cvs/pure-data/doc/tutorials/networking/chat-server.pd"
 
-
+# if you want to use a different user.  AVOID USING "root"! Pd is not secure!
+#USER=nobody
 
