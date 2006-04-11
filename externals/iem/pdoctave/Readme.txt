@@ -18,8 +18,12 @@ bbogart's "entry" pd-external
 INSTALLING:
 please edit the linker parameters in "Makefile" to match your pd-sources paths
 type "make"
+
+ADD THE FOLLOWING LINE TO YOUR ~/.octaverc (Pathdefinition) and modify the path to your personal pdoctave path (the second slash is mandatory)
+'  LOADPATH = ":/home/franz/pdoctave//"  '
+
 TESTING:
-"pd -lib pdoctave test_pdoctave.pd"
+"pd -lib pdoctave pdoctave-help.pd"
 
 This code collection consists of four pd-objects:
 
