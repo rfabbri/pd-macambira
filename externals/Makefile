@@ -703,8 +703,8 @@ iemlib_clean:
 	-rmdir -- $(helpdir)/$(IEMLIB_NAME)
 	-rm -f -- $(helpdir)/iemhelp/*.*
 	-rmdir -- $(helpdir)/iemhelp
-	-rm -f -- $(examplessdir)/$(IEMLIB_NAME)/*.*
-	-rmdir -- $(examplessdir)/$(IEMLIB_NAME)
+	-rm -f -- $(examplesdir)/$(IEMLIB_NAME)/*.*
+	-rmdir -- $(examplesdir)/$(IEMLIB_NAME)
 	-rm -f -- $(manualsdir)/$(IEMLIB_NAME)/*.*
 	-rmdir -- $(manualsdir)/$(IEMLIB_NAME)
 
