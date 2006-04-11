@@ -1,0 +1,34 @@
+#N canvas 163 297 636 456 10;
+#X obj 541 21 pddp/dsp;
+#X obj 11 8 cnv 15 400 40 empty empty detecting_pitch 20 12 0 24 -228992
+-66577 0;
+#X obj 119 176 fiddle~;
+#X text 28 121 Now its time to be the fool and start singing into the
+mic!;
+#X obj 119 148 adc~;
+#X obj 133 223 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 152 223 <-- banged on attack;
+#X obj 163 197 - 100;
+#X obj 118 267 mtof;
+#X obj 516 59 import rradical;
+#X obj 124 361 ezdac~;
+#X obj 147 330 *~;
+#X obj 118 287 osc~;
+#X obj 180 263 mavg 200;
+#X obj 164 286 -;
+#X obj 164 306 / 100;
+#X connect 2 0 8 0;
+#X connect 2 1 5 0;
+#X connect 2 3 7 0;
+#X connect 4 0 2 0;
+#X connect 4 1 2 0;
+#X connect 7 0 13 0;
+#X connect 7 0 14 0;
+#X connect 8 0 12 0;
+#X connect 11 0 10 0;
+#X connect 11 0 10 1;
+#X connect 12 0 11 0;
+#X connect 13 0 14 1;
+#X connect 14 0 15 0;
+#X connect 15 0 11 1;
