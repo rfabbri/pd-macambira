@@ -1,0 +1,8 @@
+# this needs to be "yes" for it to start automatically
+RUNPDDAEMON=yes
+
+# load your patches here
+OPTIONS="-open /home/hans/cvs/pure-data/doc/tutorials/networking/chat-server.pd"
+
+
+

@@ -21,37 +21,82 @@
 # .hc <hans@at.or.at>
 #
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/bin/pd
-NAME=pd
-DESC="Pure Data"
+set -e
 
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="Pure Data"
+NAME=pd
+DAEMON=/usr/local/bin/$NAME
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Gracefully exit if the package has been removed.
 test -x $DAEMON || exit 0
 
+# options
+RUNPDDAEMON=no
+USER=nobody
+PORT=34985
 
-function start() {
-	 /bin/su - arw -c "/usr/bin/pd -nogui" > /tmp/pd-`date +20%y-%m-%d_%H.%M.%S`.log 2>&1 &
+# Read config file if it is present.
+if [ -r /etc/default/$NAME ]
+then
+	. /etc/default/$NAME
+fi
+
+if [ "$RUNPDDAEMON" != "yes" ];then
+	echo "Pd not configured to run as a daemon. Edit /etc/default/$NAME."
+	exit 1
+fi
+
+if [ "x$USER" = "x" ]
+then
+  echo "Error: empty USER name"
+  exit 1
+fi
+
+PARAMS="-nogui -noaudio -nomidi $OPTIONS"
+
+# for the log file
+DATE=`date +20%y-%m-%d_%H.%M.%S`
+
+#
+#	Function that starts the daemon/service.
+#
+d_start() {
+#	 /bin/su - arw -c "/usr/bin/pd -nogui" > /tmp/pd-`date +20%y-%m-%d_%H.%M.%S`.log 2>&1 &
+	start-stop-daemon -v --start --quiet --background --make-pidfile \
+		 --chuid $USER --pidfile $PIDFILE --exec $DAEMON -- $PARAMS
 }
 
-function stop() {
-	 echo "quit;quit;quit;" | /usr/bin/pdsend 5555
-	 sleep 5
-	 /usr/bin/killall -KILL pd || echo "Warning: $DESC was not running"
+#
+#	Function that stops the daemon/service.
+#
+d_stop() {
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+		--user $USER --name $NAME --retry 5
+#	 echo "quit;quit;quit;" | /usr/bin/pdsend $PORT
+#	 sleep 5
+#	 /usr/bin/killall -KILL pd || echo "Warning: $DESC was not running"
+}
+
+#
+#	Function that sends a SIGHUP to the daemon/service.
+#
+d_reload() {
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+		--name $NAME --signal 1
 }
 
 case "$1" in
   start)
 	echo -n "Starting $DESC: $NAME"
-	start
-	#start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
-	#	--exec $DAEMON
+	d_start
 	echo "."
 	;;
   stop)
 	echo -n "Stopping $DESC: $NAME "
-	stop
-	#start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
-	#	--exec $DAEMON
+	d_stop
 	echo "."
 	;;
   #reload)
@@ -74,13 +119,9 @@ case "$1" in
 	#	just the same as "restart".
 	#
 	echo -n "Restarting $DESC: $NAME"
-	stop
-	#start-stop-daemon --stop --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
-	sleep 5
-	start
-	#start-stop-daemon --start --quiet --pidfile \
-	#	/var/run/$NAME.pid --exec $DAEMON
+	d_stop
+	sleep 1
+	d_start
 	echo "."
 	;;
   *)
