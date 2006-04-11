@@ -39,11 +39,6 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
  kAEShowPreferences ::tk::mac::ShowPreferences
 
 
-
-- create Tcl script called from Prefs that creates links for the standard unix
-  (this probably makes more sense to have in "make devsymlinks")
-
-
 - redo menu system
   	   	 - research Tk + "Custom MDEF" for menus
   		 - the menus are the same for all windows
@@ -76,3 +71,7 @@ semi-abandoned TODOs
   uses the "defaults" command to add the desired prefs to any existing
   file. (its a good idea, but unforunately, the key names prevent that from
   working, i.e. loadlib1, loadlib2, etc)
+
+
+- create Tcl script called from Prefs that creates links for the standard unix
+  (this probably makes more sense to have in "make devsymlinks")
