@@ -3,7 +3,7 @@
 
 iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -14,7 +14,7 @@ iemlib2 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include "g_all_guis.h"
 #include <string.h>
 
-#ifdef NT
+#ifdef _MSC_VER
 #include <io.h>
 #else
 #include <unistd.h>

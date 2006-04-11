@@ -3,7 +3,7 @@
 
 iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 */
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -21,12 +21,12 @@ iem_t3_lib written by Gerhard Eckel, Thomas Musil, Copyright (c) IEM KUG Graz Au
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#ifndef NT
+#ifndef _WIN32
 #include <sys/signal.h>
 #include <unistd.h>
 #endif
   
-#ifdef NT
+#ifdef _WIN32
 #include <io.h>
 #endif
 */

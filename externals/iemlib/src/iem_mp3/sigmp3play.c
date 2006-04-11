@@ -18,7 +18,7 @@ iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 
  */
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
 #endif
@@ -35,7 +35,7 @@ iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include <fcntl.h>
 #include <math.h>
 
-#ifndef NT
+#ifndef _MSC_VER
 #include <sys/signal.h>
 #include <unistd.h>
 #endif
