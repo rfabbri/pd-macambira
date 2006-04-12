@@ -1,5 +1,5 @@
 #N canvas 531 196 237 190 10;
-#X obj 1 1 cnv 15 198 16 empty \$0-pddp_print 61 2 8 1 14 -262144 -33289
+#X obj 1 1 cnv 15 198 16 empty \$0-pddp_print empty 2 8 1 14 -262144 -33289
 0;
 #X obj 62 47 inlet;
 #X obj 62 130 send \$0-pddp_print;
