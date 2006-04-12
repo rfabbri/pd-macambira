@@ -287,20 +287,25 @@ bsaylor_clean:
 #------------------------------------------------------------------------------#
 # CREB
 CREB_NAME=creb
-# ead* don't compile yet...
-CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/[a-df-z]*.c)
+# ead* are compiled separately
+CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/[a-df-z]*.c) \
+$(externals_src)/creb/modules/eblosc.c
 # haven't figured these out yet
 #CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
 
-# kludge to make objects find the headers
-pre_creb:
-	test -e $(externals_src)/creb/modules/extlib_util.h || \
-		( cd $(externals_src)/creb/modules && ln -s ../include/extlib_util.h )
-	test -e $(externals_src)/creb/modules/filters.h || \
-		( cd $(externals_src)/creb/modules && ln -s ../include/filters.h )
+# these are built separately since they made from a number of files
+CREB_EA_OBJECTS = $(wildcard $(externals_src)/creb/modules/ea*.c)
+CREB_ENVELOPE_UTIL = $(externals_src)/creb/system/envelope_util.c
+$(CREB_OBJECTS:.c=.o):
+$(CREB_ENVELOPE_UTIL:.c=.o):
+	$(CC) $(CFLAGS) -I$(externals_src)/creb/include -o $*.o -c $*.c
 
-creb: pre_creb $(CREB_CXXOBJECTS:.cc=.$(EXTENSION)) \
-$(CREB_OBJECTS:.c=.$(EXTENSION))
+$(patsubst %.c,%~.$(EXTENSION),$(CREB_EA_OBJECTS)): $(CREB_ENVELOPE_UTIL:.c=.o)
+	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(CREB_ENVELOPE_UTIL:.c=.o) $(LIBS)
+	chmod a-x $*.$(EXTENSION)
+
+creb:  $(patsubst %.c,%~.$(EXTENSION),$(CREB_EA_OBJECTS)) \
+$(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
 
 creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
@@ -320,12 +325,13 @@ creb_install: creb
 	install -p $(externals_src)/creb/doc/examples/*.* $(examplesdir)/$(CREB_NAME)
 
 creb_clean:
-	-rm -f -- $(externals_src)/creb/*/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/creb/*/*.o
+	-rm -f -- $(CREB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(CREB_ENVELOPE_UTIL:.c=.$(EXTENSION))
+	-rm -f -- $(CREB_EA_OBJECTS:.c=.$(EXTENSION)) 
+	-rm -f -- $(CREB_OBJECTS:.c=.o)
+	-rm -f -- $(CREB_ENVELOPE_UTIL:.c=.o) $(CREB_EA_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/creb/*/*.bak
 	-rm -f -- $(externals_src)/creb/*/*.*~
-	-rm -f -- $(externals_src)/creb/modules/filters.h
-	-rm -f -- $(externals_src)/creb/modules/extlib_util.h 
 
 
 #------------------------------------------------------------------------------#
@@ -666,10 +672,7 @@ hidin_clean:
 #------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/iem_t3_lib/[st]*.c) \
-$(wildcard $(externals_src)/iemlib/src/iem_mp3/[a-hj-z]*.c) \
-$(wildcard $(externals_src)/iemlib/src/iemlib1/[a-hj-z]*.c) \
-$(wildcard $(externals_src)/iemlib/src/iemlib2/[a-hj-z]*.c)
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-z]*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
