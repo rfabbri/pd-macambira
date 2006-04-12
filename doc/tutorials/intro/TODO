@@ -9,3 +9,52 @@
 
 - in pure_data_files.pd, make the patch reset itself once it finishes the
   clone. (remember that [pd clone] has to be the last object.)
+
+- make looping sequence
+
+File Order:
+
+- hello world
+- basic elements
+- getting help
+- edit mode
+- objects
+- connections
+- messages
+- make your first Pd patch
+- bang
+- hot and cold inlets
+- storage objects
+- atoms
+- atomic messages
+
+
+Unsorted topics
+
+- arguments
+
+- guis
+- gui objects
+
+- Example: its all just data
+- Example: parazit
+
+- right-to-left order
+- depth first
+
+- ordering messages
+
+
+- math objects
+- expr
+
+- subpatches
+- inlets and outlets
+- outlet order
+
+- loading libraries
+- namespaces
+- import
+
+- send messages to Pd
+- pure data files

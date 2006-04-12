@@ -1,12 +1,20 @@
-#N canvas 0 22 458 308 12;
-#X text 121 112 <-- click here \,;
-#X obj 51 151 unpack float float float;
+#N canvas 298 70 628 444 12;
+#X text 198 212 <-- click here \,;
+#X obj 128 251 unpack float float float;
 #X obj 8 10 cnv 15 400 40 empty empty outlet_order 20 12 0 24 -228992
 -66577 0;
-#X msg 51 112 3 2 1;
-#X obj 28 193 print último;
-#X obj 315 193 print first;
-#X obj 167 193 print nächste;
+#X msg 128 212 3 2 1;
+#X obj 105 293 print último;
+#X obj 392 293 print first;
+#X obj 244 293 print nächste;
+#X text 18 363 There are occasional exceptions where it makes sense
+to break this convention. But you shouldn't do it unless it really
+is necessary. This will save you in the long run.;
+#X text 15 68 While there is nothing forcing you to output data to
+the outlets in any order \, Pd has a very strong convention for how
+data should be output from an object.;
+#X text 14 130 Just like the flow of programming in Pd \, the data
+should be output from right to left:;
 #X connect 1 0 4 0;
 #X connect 1 1 6 0;
 #X connect 1 2 5 0;
