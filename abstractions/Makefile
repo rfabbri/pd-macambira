@@ -171,6 +171,7 @@ nqpoly_install4:
 	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
 		grep -v '\-help.pd')  $(examplesdir)/$(NQPOLY4_NAME)
 
+
 #-------------------------------------------------------------------------------
 # nusmuk
 NUSMUK_NAME = nusmuk
@@ -188,11 +189,14 @@ nusmuk_install:
 		$(helpdir)/$(NUSMUK_NAME)
 
 
+
 #-------------------------------------------------------------------------------
 # parazit
 parazit_install:
 	install -d $(objectsdir)
 	install -p $(abstractions_src)/parazit/parazit.pd $(objectsdir)
+	install -d $(helpdir)
+	install -p $(abstractions_src)/parazit/parazit-help.pd $(helpdir)
 
 
 
