@@ -12,7 +12,9 @@
 
 - make looping sequence
 
-File Order:
+----------
+File Order
+----------
 
 - hello world
 - basic elements
@@ -21,40 +23,64 @@ File Order:
 - objects
 - connections
 - messages
-- make your first Pd patch
+- EXERCISE: make your first Pd patch
 - bang
+- event driven processing
+- counters
 - hot and cold inlets
+- right-to-left order
+- ordering messages
+- depth first
 - storage objects
 - atoms
 - atomic messages
-
-
-Unsorted topics
-
-- arguments
-
-- guis
-- gui objects
-
-- Example: its all just data
-- Example: parazit
-
-- right-to-left order
-- depth first
-
-- ordering messages
-
-
-- math objects
-- expr
-
+- selectors
 - subpatches
 - inlets and outlets
 - outlet order
+- Example: its all just data
+- guis
+- gui objects
+- nervous guis
+
+
+- EXERCISE
+
+
+---------------
+Unsorted topics
+---------------
+
+- trigger conversions
+- symbol conversion
+
+- arguments
+
+- keywords
+
+- init to 0
+- math
+- expr
+
+- number limitations
+
+- timing/metro
+
+- writing objects in Pd (abstractions)
 
 - loading libraries
 - namespaces
 - import
 
+- selectors
+- multiple messages
+- sends and receives
+- sends in a message box
+
+- Example: parazit
 - send messages to Pd
 - pure data files
+
+
+
+data structures tutorial?

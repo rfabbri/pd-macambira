@@ -1,0 +1,5 @@
+#N canvas 10 40 628 453 12;
+#X obj 10 10 cnv 15 400 40 empty empty determinism 20 12 0 24 -228992
+-66577 0;
+#X obj 31 229 pddp/pddplink http://crca.ucsd.edu/~msp/Pd_documentation/x2.htm#s5.3
+;

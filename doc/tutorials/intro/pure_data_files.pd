@@ -1,4 +1,4 @@
-#N canvas 615 56 576 539 10;
+#N canvas 615 56 580 543 10;
 #X obj 191 249 textfile;
 #X obj 111 279 print all;
 #X msg 100 223 bang;
@@ -12,7 +12,7 @@
 #X obj 51 394 unpack f f f f f;
 #X obj 295 427 s pd-clone;
 #X obj 191 274 route #N #X;
-#X obj 234 106 tgl 20 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+#X obj 234 106 tgl 20 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 1
 ;
 #X msg 294 338 vis 1 \, clear;
 #X obj 142 174 + 1;

@@ -1,4 +1,4 @@
-#N canvas 476 37 651 588 12;
+#N canvas 476 37 655 592 12;
 #X msg 134 485 menuclose;
 #X obj 46 550 s pd-mon-nouveau-patch.pd;
 #X obj 22 216 cnv 15 5 5 empty empty 1 5 0 0 20 -262144 -258699 0;

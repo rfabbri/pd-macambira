@@ -1,4 +1,4 @@
-#N canvas 111 50 650 395 12;
+#N canvas 111 50 654 399 12;
 #X msg 179 150;
 #X obj 61 150 trigger;
 #X text 54 28 comment;
