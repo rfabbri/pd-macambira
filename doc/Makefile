@@ -160,18 +160,23 @@ tutorials_install: $(manualsdir)
 # intro
 	install -d $(manualsdir)/Intro
 	install -p $(doc_src)/tutorials/intro/*.* $(manualsdir)/Intro
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Intro
 # sound
 	install -d $(manualsdir)/Sound
 	install -p $(doc_src)/tutorials/sound/*.* $(manualsdir)/Sound
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Sound
 # visual
 	install -d $(manualsdir)/Visual
 	install -p $(doc_src)/tutorials/visual/*.* $(manualsdir)/Visual
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Visual
 # networking
 	install -d $(manualsdir)/Networking
 	install -p $(doc_src)/tutorials/networking/*.* $(manualsdir)/Networking
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Networking
 # physical
 	install -d $(manualsdir)/Physical
 	install -p $(doc_src)/tutorials/physical/*.* $(manualsdir)/Physical
+	install -p $(abstractions_src)/pddp/0-pager.pd $(manualsdir)/Physical
 
 tutorials_clean:
 	-rm -f -- $(manualsdir)/PdDrums/*.*
