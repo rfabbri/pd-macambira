@@ -26,4 +26,8 @@ fi
 
 make install && make package > $LOGFILE 2>&1
 
-cat $LOGFILE | mail -s "Pd Autobuild Log on $UNAME - $DATE" $RECIPIENTS
+if [ "${UNAME}" == "MINGW32_NT-5.1" ]; then
+	 echo "No mailer for windows yet"
+else
+	 cat $LOGFILE | mail -s "Pd Autobuild Log on $UNAME - $DATE" $RECIPIENTS
+fi
