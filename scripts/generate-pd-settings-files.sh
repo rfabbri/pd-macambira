@@ -16,7 +16,7 @@ WINDOWS_FILE=${ROOT_DIR}/win32_inno/pd-settings.reg
 GNULINUX_HEADER='standardpath: 1\nverbose: 0'
 
 
-MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>1</string>'
+MACOSX_HEADER='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n<dict>\n\t<key>defeatrt</key>\n\t<string>0</string>'
 MACOSX_FOOTER='</dict>\n
 </plist>\n'
 
