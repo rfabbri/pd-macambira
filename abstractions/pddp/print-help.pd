@@ -1,4 +1,4 @@
-#N canvas 246 157 454 304 10;
+#N canvas 286 187 458 308 10;
 #X obj 151 182 pddp/print;
 #X text 17 48 this object is for displaying generic messages in the
 patch rather than in the Pd window.;
