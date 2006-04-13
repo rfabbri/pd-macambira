@@ -1,0 +1,27 @@
+#N canvas 10 40 632 457 12;
+#X obj 10 10 cnv 15 400 40 empty empty selecting_events 20 12 0 24
+-228992 -66577 0;
+#X floatatom 75 138 5 0 0 0 - - -;
+#X text 130 136 <--haga click y arrastre;
+#X obj 75 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 105 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 75 161 select 2 3 4 5 6 10;
+#X obj 136 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 167 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 198 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 229 187 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X floatatom 260 187 5 0 0 0 - - -;
+#X connect 1 0 5 0;
+#X connect 5 0 3 0;
+#X connect 5 1 4 0;
+#X connect 5 2 6 0;
+#X connect 5 3 7 0;
+#X connect 5 4 8 0;
+#X connect 5 5 9 0;
+#X connect 5 6 10 0;

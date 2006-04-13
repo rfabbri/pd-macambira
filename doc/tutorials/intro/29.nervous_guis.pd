@@ -1,16 +1,16 @@
-#N canvas 10 40 624 449 12;
+#N canvas 10 40 632 457 12;
 #X obj 10 10 cnv 15 400 40 empty empty nervous_guis 20 12 0 24 -228992
 -66577 0;
 #X obj 486 20 tgl 20 1 empty start_nervously1 start_it 8 -8 0 10 -24198
 -1 -250685 0 1;
-#X obj 127 179 bng 16 1200 50 0 empty nerv_bng bang 8 -8 0 10 -91120
--252939 -113209;
-#X obj 112 346 hsl 116 29 0 127 0 0 empty nerv_hsl h-slider 8 -8 0
-10 -140002 -259981 -172176 2336 1;
-#X obj 400 211 tgl 70 1 empty nerv_tgl toggle 8 -8 0 10 -77819 -177692
--11757 0 1;
-#X obj 370 329 vsl 8 81 0 127 0 0 empty nerv_vsl v-slider 8 -8 0 10
--55101 -168903 -47444 1998 1;
+#X obj 138 200 bng 15 1200 50 0 empty nerv_bng bang 8 -8 0 10 -262144
+-55405 -1;
+#X obj 132 385 hsl 127 15 0 127 0 0 empty nerv_hsl h-slider 8 -8 0
+10 -262144 -1 -1 0 1;
+#X obj 364 184 tgl 15 1 empty nerv_tgl toggle 8 -8 0 10 -262144 -1
+-1 1 1;
+#X obj 359 305 vsl 15 127 0 127 0 0 empty nerv_vsl v-slider 8 -8 0
+10 -262144 -1 -1 0 1;
 #N canvas 135 99 386 473 control 0;
 #X obj 19 21 inlet;
 #X obj 19 50 t b f;

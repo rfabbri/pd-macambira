@@ -12,59 +12,40 @@
 
 - make looping sequence
 
-----------
-File Order
-----------
 
-- hello world
-- basic elements
-- getting help
-- edit mode
-- objects
-- connections
-- messages
-- EXERCISE: make your first Pd patch
-- bang
-- event driven processing
-- counters
-- hot and cold inlets
-- right-to-left order
-- ordering messages
-- depth first
-- storage objects
-- atoms
-- atomic messages
-- selectors
-- subpatches
-- inlets and outlets
-- outlet order
-- Example: its all just data
-- guis
-- gui objects
-- nervous guis
-
-
-- EXERCISE
 
 
 ---------------
 Unsorted topics
 ---------------
 
+- math
+- init to 0
+- comparing numbers
+- expr
+- creation arguments
+
+
+- selecting events ([select])
+- sorting_messages_by_selectors ([route])
+- sorting_messages_by_atom ([route])
+
+- storing a number globally ([value])
+
+- building lists (pack and unpack, arguments)
+- list2symbol
+
 - trigger conversions
 - symbol conversion
 
-- arguments
-
 - keywords
-
-- init to 0
-- math
-- expr
 
 - number limitations
 
-- timing/metro
+- more on timing
+
+- building lists
+- using lists (unpack, lists replacing inlets)
 
 - writing objects in Pd (abstractions)
 
@@ -72,7 +53,6 @@ Unsorted topics
 - namespaces
 - import
 
-- selectors
 - multiple messages
 - sends and receives
 - sends in a message box

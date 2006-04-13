@@ -7,12 +7,13 @@ Contributors include (in alphabetical order):
 
 Alexandre Castonguay
 Aymeric Mansoux
-Ben Bogart
+Ben Bogart <ben@ekran.org>
 Frank Barknecht
-Hans-Christoph Steiner
+Gregorio García Karman <ggkarman@airtel.net>
+Hans-Christoph Steiner <hans@at.or.at>
 Jerome Abel
 Koray Tahiroglu
 Malte Steiner
 Max Neupert
-Miller Puckette
-Thomas Musil
+Miller Puckette <msp@crca.ucsd.edu>
+Thomas Musil <musil@iem.at>
