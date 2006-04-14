@@ -1,4 +1,4 @@
-#N canvas 546 135 614 464 12;
+#N canvas 10 40 620 460 12;
 #X obj 10 12 cnv 15 400 40 empty empty atoms 20 12 0 24 -228992 -66577
 0;
 #X text 24 87 The basic data types of Pd are called "atoms". There

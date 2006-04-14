@@ -1,4 +1,4 @@
-#N canvas 298 70 632 448 12;
+#N canvas 10 40 620 460 12;
 #X text 223 149 <-- click here \,;
 #X obj 8 10 cnv 15 400 40 empty empty outlet_order 20 12 0 24 -228992
 -66577 0;
@@ -11,7 +11,7 @@ to break this convention. But you shouldn't do it unless it really
 is necessary. This will save you in the long run.;
 #X text 15 80 Just like the flow of programming in Pd \, the data should
 be output from right to left.;
-#N canvas 0 22 454 304 spread 0;
+#N canvas 10 40 620 460 spread 0;
 #X obj 68 2 inlet;
 #X obj 38 235 outlet;
 #X obj 201 235 outlet;

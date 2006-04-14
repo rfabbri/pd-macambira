@@ -1,5 +1,5 @@
-#N canvas 153 19 568 572 10;
-#X obj -4 -4 cnv 15 600 700 empty empty gui-INTRO 237 20 2 14 -261819
+#N canvas 10 40 624 464 10;
+#X obj -4 -4 cnv 15 620 700 empty empty gui-INTRO 237 20 2 14 -261819
 -143491 0;
 #X text 101 4 bng;
 #X obj 456 313 vsl 15 128 0 127 0 0 empty empty default_15x128 8 -8
@@ -33,11 +33,11 @@
 #X obj 100 376 vu 15 120 empty empty 8 -8 0 8 -66577 -1 1 0;
 #X obj 186 375 vu 10 80 empty empty 8 -8 0 8 -66577 -1 1 0;
 #X text 99 313 vu;
-#N canvas 438 180 374 414 animate_vu 0;
+#N canvas 10 40 620 460 animate_vu 0;
 #X obj 40 211 t f f;
 #X obj 65 233 + 6;
 #X obj 40 257 pack 0 0;
-#X obj 78 94 tgl 15 0 empty empty empty 8 -8 0 10 -262144 -1 -1 0 1
+#X obj 78 94 tgl 15 0 empty empty empty 8 -8 0 10 -262144 -1 -1 1 1
 ;
 #X obj 78 115 sel 0 1;
 #X obj 78 74 metro 4000;
@@ -87,7 +87,7 @@
 -1 -1 2;
 #X obj 254 223 hradio 25 1 1 12 empty empty 12*25 8 -8 0 8 -1433 -225280
 -355 1;
-#N canvas 179 78 690 573 nervous 0;
+#N canvas 10 40 620 460 nervous 0;
 #X obj 10 23 tgl 55 1 empty start_nervously1 start_it 8 -8 0 10 -260818
 -1 -250685 0 1;
 #X obj 131 141 bng 51 1200 50 0 empty nerv_bng bang 8 -8 0 10 -253378
@@ -98,7 +98,7 @@
 -51488 0 1;
 #X obj 447 383 vsl 15 111 0 127 0 0 empty nerv_vsl v-slider 8 -8 0
 10 -150187 -73940 -248863 0 1;
-#N canvas 135 99 382 469 control 0;
+#N canvas 10 40 620 460 control 0;
 #X obj 19 21 inlet;
 #X obj 19 50 t b f;
 #X obj 19 153 del 900;
@@ -109,7 +109,7 @@
 #X obj 33 180 f;
 #X obj 33 245 f;
 #X obj 33 309 f;
-#N canvas 280 166 794 432 bng 0;
+#N canvas 10 40 620 460 bng 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -128,9 +128,9 @@
 #X obj 445 168 + 8;
 #X obj 445 145 % 120;
 #X obj 84 32 metro 100;
-#X obj 234 261 random 1.67772e+007;
-#X obj 266 283 random 1.67772e+007;
-#X obj 299 315 random 1.67772e+007;
+#X obj 234 261 random 1.67772e+07;
+#X obj 266 283 random 1.67772e+07;
+#X obj 299 315 random 1.67772e+07;
 #X obj 84 11 inlet;
 #X msg 64 312 \; nerv_bng delta \$1 \$2;
 #X msg 234 390 \; nerv_bng color \$1 \$2 \$3;
@@ -175,7 +175,7 @@
 #X connect 27 0 12 1;
 #X connect 28 0 12 2;
 #X restore 114 143 pd bng;
-#N canvas 139 89 794 432 tgl 0;
+#N canvas 10 40 620 460 tgl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -199,9 +199,9 @@
 #X msg 445 192 \; nerv_tgl size \$1;
 #X msg 264 51 \; nerv_tgl bang;
 #X obj 226 298 pack 0 0 0;
-#X obj 226 191 random 1.67772e+007;
-#X obj 258 213 random 1.67772e+007;
-#X obj 291 245 random 1.67772e+007;
+#X obj 226 191 random 1.67772e+07;
+#X obj 258 213 random 1.67772e+07;
+#X obj 291 245 random 1.67772e+07;
 #X obj 226 270 * -1;
 #X obj 258 246 * -1;
 #X obj 291 272 * -1;
@@ -241,7 +241,7 @@
 #X connect 27 0 22 1;
 #X connect 28 0 22 2;
 #X restore 114 198 pd tgl;
-#N canvas 322 99 794 432 hsl 0;
+#N canvas 10 40 620 460 hsl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -270,9 +270,9 @@
 #X msg 254 373 \; nerv_hsl set \$1;
 #X msg 445 231 \; nerv_hsl size \$1 \$2;
 #X obj 245 202 pack 0 0 0;
-#X obj 245 95 random 1.67772e+007;
-#X obj 277 117 random 1.67772e+007;
-#X obj 310 149 random 1.67772e+007;
+#X obj 245 95 random 1.67772e+07;
+#X obj 277 117 random 1.67772e+07;
+#X obj 310 149 random 1.67772e+07;
 #X obj 245 174 * -1;
 #X obj 277 150 * -1;
 #X obj 310 176 * -1;
@@ -321,7 +321,7 @@
 #X connect 32 0 27 1;
 #X connect 33 0 27 2;
 #X restore 112 263 pd hsl;
-#N canvas 148 132 794 432 vsl 0;
+#N canvas 10 40 620 460 vsl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -351,9 +351,9 @@
 #X msg 64 310 \; nerv_vsl delta \$1 \$2;
 #X msg 241 376 \; nerv_vsl set \$1;
 #X obj 239 203 pack 0 0 0;
-#X obj 239 96 random 1.67772e+007;
-#X obj 271 118 random 1.67772e+007;
-#X obj 304 150 random 1.67772e+007;
+#X obj 239 96 random 1.67772e+07;
+#X obj 271 118 random 1.67772e+07;
+#X obj 304 150 random 1.67772e+07;
 #X obj 239 175 * -1;
 #X obj 271 151 * -1;
 #X obj 304 177 * -1;
@@ -422,7 +422,7 @@
 #X connect 0 0 5 0;
 #X restore 295 424 pd nervous;
 #X floatatom 239 84 4 0 0 0 - - -;
-#N canvas 226 38 811 519 properties 0;
+#N canvas 10 40 620 460 properties 0;
 #X obj 2 1 cnv 8 870 590 empty empty about_gui_properties 290 20 2
 18 -225280 -1109 0;
 #X text 12 62 "selectable dimensions(pix): size:" = square-size of
@@ -505,7 +505,7 @@ by its;
 #X text 235 490 RGB-values (0 .. 252 \, step 4) and a click on the
 set-button.;
 #X restore 287 361 pd properties;
-#N canvas 146 190 460 120 move 0;
+#N canvas 10 40 620 460 move 0;
 #X obj 0 0 cnv 8 460 120 empty empty how_to_move_gui_objects 100 18
 2 20 -225271 -42246 0;
 #X text 11 43 Select a gui-object \, then navigate the object by using
@@ -513,7 +513,7 @@ the 4 direction-keys: UP \, DOWN \, LEFT or RIGHT.;
 #X text 12 70 If you press the SHIFT-Key too \, the object will move
 10 times faster.;
 #X restore 308 331 pd move;
-#N canvas 151 38 522 451 dollar 0;
+#N canvas 10 40 620 460 dollar 0;
 #X obj 0 0 cnv 8 560 160 empty empty the_dollar_thing 100 18 2 20 -261681
 -123526 0;
 #X text 10 39 if you want to send to \, or to receive from gui-objects
@@ -526,7 +526,7 @@ the 4 direction-keys: UP \, DOWN \, LEFT or RIGHT.;
 #X restore 299 391 pd dollar;
 #X obj 283 448 cnv 15 100 30 empty empty empty 20 12 2 20 -228992 -66577
 0;
-#N canvas 177 21 730 638 messages 0;
+#N canvas 10 40 620 460 messages 0;
 #X obj 1 1 cnv 8 870 640 empty empty about_gui_messages 200 20 2 18
 -228992 -355 0;
 #X text 366 99 in pixels.;
@@ -600,7 +600,7 @@ x- and y-;
 #X text 85 71 to its receive-label (edit properties).;
 #X text 11 237 "color 0 22 22" = change background- \,;
 #X text 11 252 "color 0 22" = change background- and;
-#X text 13 268 "color -1.67772e+007 (-1) -1" = change background- \,
+#X text 13 268 "color -1.67772e+07 (-1) -1" = change background- \,
 ;
 #X text 364 267 (front-) and label-color of object with RGB-values.
 ;
@@ -631,7 +631,7 @@ x- and y-;
 #X floatatom 276 84 4 0 0 0 - - -;
 #X obj 239 43 tgl 15 0 empty dsp_tgl empty 20 8 0 10 -370 -262144 -1
 0 1;
-#N canvas 145 31 380 506 dsp 0;
+#N canvas 10 40 620 460 dsp 0;
 #X msg 31 88 \; pd dsp \$1;
 #X obj 20 199 cputime;
 #X obj 20 178 t b b;
@@ -668,7 +668,7 @@ x- and y-;
 #X obj 247 341 r dsp_tgl;
 #X obj 246 257 route float;
 #X obj 146 227 del 3990;
-#N canvas 305 120 336 257 once 0;
+#N canvas 10 40 620 460 once 0;
 #X text 7 204 (c) musil@iem.kug.ac.at;
 #X text 49 214 IEM KUG;
 #X text 24 223 graz \, austria 2001;
@@ -691,7 +691,7 @@ x- and y-;
 #X connect 10 0 9 0;
 #X connect 11 0 8 0;
 #X restore 111 264 pd once;
-#N canvas 297 130 530 376 1p1z 0;
+#N canvas 10 40 620 460 1p1z 0;
 #X text 7 315 (c) musil@iem.kug.ac.at;
 #X text 52 325 IEM KUG;
 #X obj 22 231 +;

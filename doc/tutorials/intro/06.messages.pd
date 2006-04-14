@@ -1,8 +1,8 @@
-#N canvas 364 149 628 453 12;
+#N canvas 10 40 624 464 12;
 #X obj 10 10 cnv 15 400 40 empty empty messages 20 12 0 24 -228992
 -66577 0;
 #X msg 354 162 say hello;
-#N canvas 0 22 466 316 myObject 0;
+#N canvas 10 40 620 460 myObject 0;
 #X obj 70 24 inlet;
 #X obj 68 243 outlet;
 #X obj 76 86 route say;
@@ -30,7 +30,6 @@
 from data to commands.;
 #X text 124 128 data;
 #X text 359 127 commands;
-#X text 18 394 For more on messages:;
 #X text 19 341 All communication within Pd is in the form of messages
 \, including when the user is controlling the program.;
 #X msg 143 189 2;
@@ -39,4 +38,4 @@ from data to commands.;
 #X connect 4 0 6 0;
 #X connect 5 0 4 0;
 #X connect 9 0 2 0;
-#X connect 16 0 4 0;
+#X connect 15 0 4 0;

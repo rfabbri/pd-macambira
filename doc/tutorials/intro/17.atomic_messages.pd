@@ -1,4 +1,4 @@
-#N canvas 384 167 602 456 12;
+#N canvas 10 40 620 460 12;
 #X obj 10 12 cnv 15 400 40 empty empty atomic_messages 20 12 0 24 -228992
 -66577 0;
 #X msg 27 81 bang;

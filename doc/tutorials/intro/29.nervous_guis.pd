@@ -1,28 +1,19 @@
-#N canvas 10 40 632 457 12;
+#N canvas 10 40 632 472 12;
 #X obj 10 10 cnv 15 400 40 empty empty nervous_guis 20 12 0 24 -228992
 -66577 0;
-#X obj 486 20 tgl 20 1 empty start_nervously1 start_it 8 -8 0 10 -24198
+#X obj 23 146 tgl 20 1 empty start_nervously1 empty 8 -8 0 10 -24198
 -1 -250685 0 1;
-#X obj 138 200 bng 15 1200 50 0 empty nerv_bng bang 8 -8 0 10 -262144
--55405 -1;
-#X obj 132 385 hsl 127 15 0 127 0 0 empty nerv_hsl h-slider 8 -8 0
+#X obj 255 165 bng 15 1200 50 0 empty nerv_bng bang 8 -8 0 10 -262144
+-1 -1;
+#X obj 250 343 hsl 127 15 0 127 0 0 empty nerv_hsl h-slider 8 -8 0
 10 -262144 -1 -1 0 1;
-#X obj 364 184 tgl 15 1 empty nerv_tgl toggle 8 -8 0 10 -262144 -1
--1 1 1;
-#X obj 359 305 vsl 15 127 0 127 0 0 empty nerv_vsl v-slider 8 -8 0
+#X obj 443 164 tgl 15 1 empty nerv_tgl toggle 8 -8 0 10 -262144 -1
+-1 0 1;
+#X obj 482 282 vsl 15 127 0 127 0 0 empty nerv_vsl v-slider 8 -8 0
 10 -262144 -1 -1 0 1;
-#N canvas 135 99 386 473 control 0;
+#N canvas 13 42 258 427 control 0;
 #X obj 19 21 inlet;
-#X obj 19 50 t b f;
-#X obj 19 153 del 900;
-#X obj 19 212 del 900;
-#X obj 19 93 del 100;
-#X obj 19 283 del 900;
-#X obj 33 125 f;
-#X obj 33 180 f;
-#X obj 33 245 f;
-#X obj 33 309 f;
-#N canvas 280 166 794 432 bng 0;
+#N canvas 10 40 632 472 bng 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -34,13 +25,13 @@
 #X obj 150 192 % 50;
 #X obj 79 145 % 50;
 #X obj 64 289 pack 0 0;
-#X obj 85 53 t b b b;
+#X obj 84 60 t b b b;
 #X obj 234 368 pack 0 0 0;
 #X obj 250 29 metro 2000;
 #X obj 445 122 random 555666;
 #X obj 445 168 + 8;
 #X obj 445 145 % 120;
-#X obj 84 32 metro 100;
+#X obj 84 35 metro 100;
 #X obj 234 261 random 1.67772e+07;
 #X obj 266 283 random 1.67772e+07;
 #X obj 299 315 random 1.67772e+07;
@@ -87,8 +78,8 @@
 #X connect 26 0 12 0;
 #X connect 27 0 12 1;
 #X connect 28 0 12 2;
-#X restore 114 143 pd bng;
-#N canvas 139 89 794 432 tgl 0;
+#X restore 52 130 pd bng;
+#N canvas 10 40 620 460 tgl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -153,8 +144,8 @@
 #X connect 26 0 22 0;
 #X connect 27 0 22 1;
 #X connect 28 0 22 2;
-#X restore 114 198 pd tgl;
-#N canvas 322 99 794 432 hsl 0;
+#X restore 33 217 pd tgl;
+#N canvas 10 40 620 460 hsl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -233,8 +224,8 @@
 #X connect 31 0 27 0;
 #X connect 32 0 27 1;
 #X connect 33 0 27 2;
-#X restore 112 263 pd hsl;
-#N canvas 148 132 794 432 vsl 0;
+#X restore 33 312 pd hsl;
+#N canvas 10 40 620 460 vsl 0;
 #X obj 114 260 - 0;
 #X obj 148 258 f;
 #X obj 147 222 t f b;
@@ -313,25 +304,35 @@
 #X connect 32 0 28 0;
 #X connect 33 0 28 1;
 #X connect 34 0 28 2;
-#X restore 113 327 pd vsl;
-#X connect 0 0 1 0;
-#X connect 1 0 4 0;
-#X connect 1 1 6 1;
-#X connect 1 1 7 1;
-#X connect 1 1 8 1;
-#X connect 1 1 9 1;
-#X connect 2 0 3 0;
-#X connect 2 0 7 0;
-#X connect 3 0 5 0;
-#X connect 3 0 8 0;
-#X connect 4 0 2 0;
-#X connect 4 0 6 0;
-#X connect 5 0 9 0;
+#X restore 32 395 pd vsl;
+#X obj 19 80 delay 100;
+#X obj 19 163 delay 900;
+#X obj 19 252 delay 900;
+#X obj 19 343 delay 900;
+#X obj 33 285 float;
+#X obj 33 190 float;
+#X obj 52 107 float;
+#X obj 32 369 float;
+#X obj 19 50 trigger bang float;
+#X connect 0 0 13 0;
+#X connect 5 0 6 0;
+#X connect 5 0 11 0;
+#X connect 6 0 7 0;
 #X connect 6 0 10 0;
-#X connect 7 0 11 0;
+#X connect 7 0 8 0;
+#X connect 7 0 9 0;
 #X connect 8 0 12 0;
-#X connect 9 0 13 0;
-#X restore 486 46 pd control;
-#X text 17 88 You can dynamically control just about everything about
-most GUI objects.;
+#X connect 9 0 3 0;
+#X connect 10 0 2 0;
+#X connect 11 0 1 0;
+#X connect 12 0 4 0;
+#X connect 13 0 5 0;
+#X connect 13 1 9 1;
+#X connect 13 1 10 1;
+#X connect 13 1 11 1;
+#X connect 13 1 12 1;
+#X restore 23 172 pd control;
+#X text 49 146 <-- start!;
+#X text 17 88 You can programmatically control just about every property
+and behavior of most GUI objects.;
 #X connect 1 0 6 0;

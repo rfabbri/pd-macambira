@@ -1,5 +1,5 @@
-#N canvas 333 243 686 482 12;
-#N canvas 414 102 546 555 guts 0;
+#N canvas 10 40 624 464 12;
+#N canvas 10 40 620 460 guts 0;
 #X msg 280 45 \; pd filename exercise-patch.pd /tmp \; #N canvas \;
 #X pop 1 \;;
 #X obj 300 328 s pd-exercise-patch.pd;
@@ -19,7 +19,7 @@
 #X obj 34 134 delay 2000;
 #X obj 21 187 delay 2000;
 #X obj 10 245 delay 2000;
-#N canvas 261 307 459 387 connection-effect 0;
+#N canvas 10 40 620 460 connection-effect 0;
 #X obj 186 312 dac~;
 #X obj 72 233 osc~ 1000;
 #X obj 138 266 *~;
@@ -84,13 +84,13 @@
 #X connect 20 0 1 0;
 #X connect 21 0 22 0;
 #X connect 22 0 8 0;
-#X restore 233 269 pd guts;
-#X msg 233 242 solve;
-#X text 32 64 In the exercise patch \, connect the existing objects
+#X restore 220 269 pd guts;
+#X msg 220 242 solve;
+#X text 19 64 In the exercise patch \, connect the existing objects
 so that you can control the frequency of the oscillator and hear the
 resulting sound.;
-#X text 35 131 If you want help \, click the solve message below.;
-#X msg 298 242 try again;
+#X text 22 131 If you want help \, click the solve message below.;
+#X msg 285 242 try again;
 #X obj 11 10 cnv 15 600 40 empty empty EXERCISE-make_your_first_patch
 20 12 0 24 -262131 -66577 0;
 #X connect 1 0 0 0;

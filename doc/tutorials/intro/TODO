@@ -1,8 +1,9 @@
 
-- make object which outputs previous and next files
+- finish up content in 16.atoms.pd
 
-- make patch close itself, otherwise:
-   - upon [loadbang], wait, then close previous patch
+- finish up 17.atomic_messages.pd
+
+- make new exercise in 23.EXERCISE.hmmmm
 
 - in pure_data_files.pd, make the patch create [pd clone] dynamically,
   probably like how send_messages_to_pd.pd does it.

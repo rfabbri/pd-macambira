@@ -1,11 +1,11 @@
-#N canvas 520 22 615 396 12;
-#N canvas 0 22 470 320 object 0;
+#N canvas 10 40 620 460 12;
+#N canvas 10 40 620 460 object 0;
 #X obj 175 99 inlet;
 #X obj 174 206 outlet;
 #X text 14 39 this object does nothing but pass data thru;
 #X connect 0 0 1 0;
 #X restore 366 208 pd object;
-#N canvas 0 22 618 378 another 0;
+#N canvas 10 40 620 460 another 0;
 #X obj 17 94 inlet;
 #X obj 431 320 outlet;
 #X obj 16 324 print;

@@ -1,7 +1,7 @@
-#N canvas 400 118 624 449 12;
+#N canvas 10 40 624 464 12;
 #X obj 10 10 cnv 15 400 40 empty empty counters 20 12 0 24 -228992
 -66577 0;
-#X obj 156 362 cnv 15 100 60 empty empty empty 20 12 0 14 -261681 -66577
+#X obj 156 362 cnv 15 100 60 empty empty empty 20 12 0 14 -261039 -66577
 0;
 #X obj 174 382 f;
 #X obj 209 382 + 1;

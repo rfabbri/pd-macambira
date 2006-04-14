@@ -1,8 +1,8 @@
-#N canvas 585 87 502 438 10;
-#X obj 180 406 import unauthorized Gem;
+#N canvas 10 40 624 464 10;
+#X obj 177 265 import unauthorized Gem;
 #X obj 154 102 grid grid1 200 0 199 200 0 199 1 1 1 10 10 113 347;
 #X obj 25 39 pddp/dsp;
-#N canvas 446 285 662 482 guts 0;
+#N canvas 10 40 620 460 guts 0;
 #X obj 20 10 inlet;
 #X obj 275 14 inlet;
 #X obj 78 108 osc~;

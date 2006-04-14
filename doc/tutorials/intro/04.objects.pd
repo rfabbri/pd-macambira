@@ -1,4 +1,4 @@
-#N canvas 359 93 607 497 12;
+#N canvas 10 40 624 464 12;
 #X obj 28 151 float;
 #X text 10 61 The fundamental building block of a Pd program is the
 object. Each object is itself like a tiny program that does a very
@@ -18,8 +18,8 @@ text name of the object:;
 #X obj 27 358 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X text 15 329 [bng];
-#X obj 108 355 vsl 15 128 0 127 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 10000 1;
+#X obj 108 355 vsl 15 80 0 127 0 0 empty empty empty 0 -8 0 8 -262144
+-1 -1 0 1;
 #X text 85 329 [vslider];
 #X text 227 331 [hslider];
 #X obj 197 353 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
