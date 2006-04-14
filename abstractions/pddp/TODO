@@ -1,0 +1,5 @@
+
+- fix 0-pager.pd so that it doesn't crash if it doesn't find any files that
+  match the pattern
+
+
