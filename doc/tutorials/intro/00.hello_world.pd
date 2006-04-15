@@ -1,6 +1,4 @@
-#N canvas 10 40 628 468 12;
-#X obj 230 162 cnv 15 140 30 empty empty empty 20 12 0 14 -225271 -66577
-0;
+#N canvas 10 40 632 472 12;
 #X msg 235 167 Hello world!;
 #X text 238 216 <-- connection \, aka "cord";
 #X text 17 32 In Pd \, programming is done with boxes which are connected
@@ -18,4 +16,4 @@ together. The boxes have "inlets" and "outlets" \, where they are connected.
 stuff will be printed to the Pd window.;
 #X obj 133 415 print;
 #X text 198 415 prints to the Pd window.;
-#X connect 1 0 7 0;
+#X connect 0 0 6 0;
