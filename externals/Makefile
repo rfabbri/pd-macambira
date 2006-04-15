@@ -672,7 +672,7 @@ hidin_clean:
 #------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
-IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-z]*.c)
+IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-rt-z]*.c)
 iemlib: $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
 
 iemlib_install: iemlib
