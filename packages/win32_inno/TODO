@@ -20,3 +20,7 @@
 
 
 - get Windows Makefiles for Gem
+
+
+- make gripd compile from source (then we don't need to include pthreadVC.dll
+  from Miller's pd package, and other hacks)
