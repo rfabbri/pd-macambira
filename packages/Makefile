@@ -649,8 +649,6 @@ doc_format:
 # run script to move help-*.pd files to *-help.pd according to the standard
 	cd $(helpdir) && \
 		$(scripts_src)/convert-help-to-standard.sh
-	cd $(helpdir)/iemabs && \
-		$(scripts_src)/convert-help-to-standard.sh
 # remove write perms to prevent people form editing the helpfiles by mistake
 	find $(pddocdir) -name '*.pd' -print0 | xargs -0 chmod a-wx
 	find $(pddocdir) -name '*.txt' -print0 | xargs -0 chmod a-wx
