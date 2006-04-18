@@ -1,4 +1,4 @@
-#N canvas 10 40 640 480 10;
+#N canvas 10 40 644 484 10;
 #X obj 420 33 import cyclone unauthorized;
 #X obj 11 57 cnv 15 600 650 empty empty empty 20 12 0 14 -262131 -66577
 0;
@@ -30,13 +30,13 @@
 #X obj 49 404 button OK;
 #X obj 147 408 popup 124 25 #ffffff popup option;
 #X obj 333 404 ticker ;
-#X obj 397 510 envgen 200 140 1 0  ;
-#X obj 286 544 knob 32 32 0 127 0 0 empty empty empty 0 -8 32 8 -262144
+#X obj 324 529 envgen 200 140 1 0  ;
+#X obj 491 454 knob 32 32 0 127 0 0 empty empty empty 0 -8 32 8 -262144
 -1 -1 0 1;
-#X text 280 518 [knob];
+#X text 485 428 [knob];
 #X text 316 381 [ticker];
-#X text 463 486 [envgen];
-#X text 449 124 [cyclone/Scope~];
+#X text 390 505 [envgen];
+#X text 449 90 [cyclone/Scope~];
 #X text 40 380 [button];
 #X text 134 382 [popup];
 #X text 250 107 [vu];
@@ -46,21 +46,21 @@
 #X text 325 288 [hradio];
 #X text 325 318 [hslider];
 #X text 107 317 [vradio];
-#X obj 441 146 Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255 51 135
+#X obj 441 112 Scope~ 130 130 256 3 128 -1 1 0 0 0 0 102 255 51 135
 135 135 0;
 #X text 337 98 [nbx];
-#X obj 461 333 gcanvas 80 80;
-#X text 472 308 [gcanvas];
-#X obj 21 472 grid grid1 200 0 199 200 0 199 1 1 1 10 10 103 520;
-#X text 41 453 [unauthorized/grid];
-#X floatatom 462 420 5 0 0 0 - - -;
-#X floatatom 534 421 5 0 0 0 - - -;
+#X obj 461 299 gcanvas 80 80;
+#X text 472 274 [gcanvas];
+#X obj 51 472 grid grid1 200 0 199 200 0 199 1 1 1 10 10 133 520;
+#X text 71 453 [unauthorized/grid];
+#X floatatom 462 386 5 0 0 0 - - -;
+#X floatatom 534 387 5 0 0 0 - - -;
 #X obj 10 10 cnv 15 400 40 empty empty gui_objects 20 12 0 24 -228992
 -66577 0;
-#X floatatom 214 680 5 0 0 0 - - -;
-#X floatatom 21 679 5 0 0 0 - - -;
-#X floatatom 286 582 5 0 0 0 - - -;
-#X text 422 101 And various others:;
+#X floatatom 244 680 5 0 0 0 - - -;
+#X floatatom 51 679 5 0 0 0 - - -;
+#X floatatom 491 492 5 0 0 0 - - -;
+#X text 422 67 And various others:;
 #X connect 19 0 44 0;
 #X connect 35 0 39 0;
 #X connect 35 1 40 0;

@@ -1,22 +1,22 @@
-#N canvas 10 40 620 460 12;
+#N canvas 14 57 624 464 12;
 #N canvas 10 40 620 460 object 0;
 #X obj 175 99 inlet;
 #X obj 174 206 outlet;
 #X text 14 39 this object does nothing but pass data thru;
 #X connect 0 0 1 0;
 #X restore 366 208 pd object;
-#N canvas 10 40 620 460 another 0;
+#N canvas 10 40 628 468 another 0;
 #X obj 17 94 inlet;
-#X obj 431 320 outlet;
-#X obj 16 324 print;
-#X text 9 28 this object says hello in the Pd window \, then passes
-the data thru;
+#X obj 471 382 outlet;
+#X obj 16 386 print;
+#X msg 16 354 hi from inside [pd another object]!;
 #X obj 16 182 trigger bang anything;
-#X msg 16 292 hi from inside [pd another object]!;
+#X text 9 28 This object first passes the data thru \, then says hi
+in the Pd window.;
 #X connect 0 0 4 0;
-#X connect 4 0 5 0;
+#X connect 3 0 2 0;
+#X connect 4 0 3 0;
 #X connect 4 1 1 0;
-#X connect 5 0 2 0;
 #X restore 365 254 pd another object;
 #X obj 12 13 cnv 15 400 40 empty empty inlets_and_outlets 20 12 0 24
 -228992 -66577 0;

@@ -1,6 +1,4 @@
 
-- finish up content in 16.atoms.pd
-
 - finish up 17.atomic_messages.pd
 
 - make new exercise in 23.EXERCISE.hmmmm
@@ -13,6 +11,9 @@
 
 - make looping sequence
 
+- 20.inlets_and_outlets: explain the message building, prepend, add2, set,
+     etc.  probalby, I should make a patch or two before that about message
+     buildling
 
 
 

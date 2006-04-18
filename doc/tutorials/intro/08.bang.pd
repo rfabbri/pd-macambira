@@ -1,4 +1,4 @@
-#N canvas 10 40 632 472 12;
+#N canvas 10 40 636 476 12;
 #X obj 18 191 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
 #X msg 18 269 bang;
@@ -23,7 +23,7 @@ on the object receiving the bang.;
 #X msg 279 350 send me!;
 #X obj 395 320 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X floatatom 395 352 5 0 0 0 - - -;
+#X msg 394 349 234;
 #X connect 0 0 11 0;
 #X connect 1 0 10 0;
 #X connect 7 0 8 0;
