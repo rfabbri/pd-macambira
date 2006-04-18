@@ -8,38 +8,57 @@ using System.Collections.Generic;
 namespace PureData
 {
     [StructLayout (LayoutKind.Sequential)]
-    public unsafe struct Symbol
+    public struct Symbol
     {
         // this should NOT be public (or at least read only)
-        private readonly void *sym;
+        private readonly IntPtr sym;
 
         public Symbol(string s)
         {
-            sym = Internal.SymGen(s);
+            this = Internal.SymGen(s);
         }
 
         public override string ToString()
         {
-            return Internal.SymEval(sym);
+            return Internal.SymEval(this);
+        }
+
+        public static bool operator ==(Symbol s1,Symbol s2)
+        {
+            return s1.sym == s2.sym;
+        }
+
+        public static bool operator !=(Symbol s1, Symbol s2)
+        {
+            return s1.sym != s2.sym;
+        }
+
+        public override bool Equals(object o)
+        {
+            try { return this == (Symbol)o; }
+            catch {}
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)sym;
         }
     }
 
     [StructLayout (LayoutKind.Sequential)]
-    public unsafe struct Pointer
+    public struct Pointer
     {
-        private readonly void *ptr;
+        private readonly IntPtr ptr;
 
         public override string ToString()
         {
-            if(sizeof(void *) == 4)
-                return ((int)ptr).ToString();
-            else
-                return ((long)ptr).ToString();
+            return ptr.ToString();
         }
     }
 
 	[StructLayout (LayoutKind.Sequential)]
-	public unsafe struct Atom 
+	public struct Atom 
 	{
         private enum AtomType {Null = 0, Float = 1, Symbol = 2, Pointer = 3};
         
@@ -146,7 +165,7 @@ namespace PureData
         }
     }
 	
-    public class AtomListEnum
+    internal class AtomListEnum
         : IEnumerator
     {
         public AtomList list;
@@ -192,8 +211,8 @@ namespace PureData
     // with l also being an AtomList... the two private members of the struct will get copied, although atoms is only a temporary reference
 
     [StructLayout (LayoutKind.Sequential)]
-    unsafe public struct AtomList
-#if NET_2_0
+    internal unsafe struct AtomList
+#if xNET_2_0
 		: ICollection<Atom>
 #else
         : ICollection
@@ -203,7 +222,7 @@ namespace PureData
         private readonly Atom *atoms;
         
         public int Count { get { return len; } }
-#if NET_2_0
+#if xNET_2_0
         public bool IsReadOnly { get { return false; } } // member of generic.ICollection<Atom> (C# 2.0)
 #endif        
         public bool IsSynchronized { get { return false; } }
@@ -212,7 +231,7 @@ namespace PureData
         // protect this from being used
         private AtomList(AtomList a) { len = 0; atoms = null; }
 
-#if NET_2_0
+#if xNET_2_0
         public void CopyTo(Atom[] array,int start)
 #else        
         public void CopyTo(Array array,int start)
@@ -246,7 +265,7 @@ namespace PureData
             }
         }
 
-#if !NET_2_0
+//#if 1 // !NET_2_0
         public static explicit operator Atom[](AtomList l)
         {
             Atom[] ret = new Atom[l.Count];
@@ -254,7 +273,7 @@ namespace PureData
             for(i = 0; i < l.Count; ++i) ret[i] = l.atoms[i];
             return ret;
         }
-#endif        
+//#endif        
 
         override public string ToString()
         {

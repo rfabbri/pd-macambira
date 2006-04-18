@@ -1,18 +1,22 @@
 using System;
+using Timing;
+using PureData;
 
 public class test:
-    PureData.External
+    External
 {
-    PureData.Atom[] args;
-
+    Atom[] args;
     float farg;
 
-    public test(PureData.AtomList args)
+    // necessary (for now...)
+    public test() {}  
+
+    public test(Atom[] args)
     {
         Post("Test.ctor "+args.ToString());
 
-        // that's the way to store args (don't just copy an AtomList instance!!)
-        this.args = (PureData.Atom[])args;
+        // save args
+        this.args = args;
 
         //        AddInlet(s_list,new PureData.Symbol("list2"));
         AddInlet();
@@ -25,23 +29,23 @@ public class test:
     // returns void or ClassType
     private static ClassType Setup(test obj)
     {
-        AddMethod(0,new Method(obj.MyBang));
-        AddMethod(0,new MethodFloat(obj.MyFloat));
-        AddMethod(0,new MethodSymbol(obj.MySymbol));
-        AddMethod(0,new MethodList(obj.MyList));
-        AddMethod(0,"set",new MethodAnything(obj.MySet));
-        AddMethod(0,"send",new MethodAnything(obj.MySend));
-        AddMethod(0,"trigger",new Method(obj.MyTrigger));
-        AddMethod(0,new MethodObject(obj.MyObject));
-        AddMethod(0,new MethodAnything(obj.MyAnything));
-        AddMethod(1,new MethodFloat(obj.MyFloat1));
-        AddMethod(1,new MethodAnything(obj.MyAny1));
+//        Post("Test.Setup");
 
-        Post("Test.Main");
+        AddMethod(obj.bang);
+        AddMethod(obj.MyFloat);
+        AddMethod(obj.symbol);
+        AddMethod(obj.list);
+        AddMethod(0,"set",obj.set);
+        AddMethod(0,"send",obj.send);
+        AddMethod(0,"trigger",obj.trigger);
+        AddMethod(0,obj.MyObject);
+        AddMethod(0,obj.MyAnything);
+        AddMethod(1,obj.MyFloat1);
+        AddMethod(1,obj.MyAny1);
         return ClassType.Default;
     }
 
-    protected virtual void MyBang() 
+    protected void bang() 
     { 
         Post("Test-BANG "+farg.ToString()); 
         Outlet(0);
@@ -58,36 +62,35 @@ public class test:
         Post("Test-FLOAT1 "+f.ToString()); 
     }
 
-    protected virtual void MyAny1(int ix,PureData.Symbol s,PureData.AtomList l) 
+    protected virtual void MyAny1(int ix,Symbol s,Atom[] l) 
     { 
         Post(ix.ToString()+": Test-ANY1 "+l.ToString()); 
     }
 
-    protected virtual void MySymbol(PureData.Symbol s) 
+    protected virtual void symbol(Symbol s) 
     { 
         Post("Test-SYMBOL "+s.ToString()); 
         Outlet(0,s);
     }
 
-    protected virtual void MyList(PureData.AtomList l) 
+    protected virtual void list(Atom[] l) 
     { 
         Post("Test-LIST "+l.ToString()); 
         Outlet(0,l);
     }
 
-    protected virtual void MySet(int ix,PureData.Symbol s,PureData.AtomList l) 
+    protected virtual void set(int ix,Symbol s,Atom[] l) 
     { 
         Post("Test-SET "+l.ToString()); 
-        Outlet(0,new PureData.Symbol("set"),l);
+        Outlet(0,new Symbol("set"),l);
     }
 
-    protected virtual void MySend(int ix,PureData.Symbol s,PureData.AtomList l) 
+    protected virtual void send(int ix,Symbol s,Atom[] l) 
     { 
-        Send(new PureData.Symbol("receiver"),l);
-        Send(new PureData.Symbol("receiver2"),(PureData.Atom[])l);
+        Send(new Symbol("receiver"),l);
     }
 
-    protected virtual void MyTrigger() 
+    protected virtual void trigger() 
     { 
         OutletEx(0,"hey");
     }
@@ -98,7 +101,7 @@ public class test:
         OutletEx(0,obj);
     }
 
-    protected virtual void MyAnything(int ix,PureData.Symbol s,PureData.AtomList l) 
+    protected virtual void MyAnything(int ix,Symbol s,Atom[] l) 
     { 
         Post(ix.ToString()+": Test-("+s.ToString()+") "+l.ToString()); 
         Outlet(0,s,l);

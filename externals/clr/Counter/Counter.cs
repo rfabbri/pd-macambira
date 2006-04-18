@@ -1,29 +1,32 @@
 using System;
+using PureData;
 
 /// <summary>
 /// Descrizione di riepilogo per Counter.
 /// </summary>
 public class Counter:
-	PureData.External
+	External
 {
     int i_count,i_down,i_up;
     float step;
 
-    public Counter(PureData.AtomList args)
-	{
-	    this.step = args.Count >= 3?(float)args[2]:1;
-        
-        float f2 = args.Count >= 2?(float)args[1]:0;
-        float f1 = args.Count >= 1?(float)args[0]:0;
+    public Counter() { }
 
-        if(args.Count < 2) f2 = f1;
+    public Counter(Atom[] args)
+	{
+	    this.step = args.Length >= 3?(float)args[2]:1;
+        
+        float f2 = args.Length >= 2?(float)args[1]:0;
+        float f1 = args.Length >= 1?(float)args[0]:0;
+
+        if(args.Length < 2) f2 = f1;
         
         this.i_down = (int)((f1<f2)?f1:f2);
         this.i_up = (int)((f1>f2)?f1:f2);
         
 	    this.i_count = this.i_down;
 
-        AddInlet(_list,new PureData.Symbol("bound"));
+        AddInlet(_list,new Symbol("bound"));
         AddInlet(ref step);
 
         AddOutlet(_float);
@@ -33,14 +36,15 @@ public class Counter:
 	// this function MUST exist
 	private static void Setup(Counter obj)
 	{
-	    AddMethod(0,new Method(obj.Bang));
-        AddMethod(0,"reset",new Method(obj.Reset));
-        AddMethod(0,"set",new MethodFloat(obj.Set));
-        AddMethod(0,"bound",new MethodList(obj.Bound));
+	    AddMethod(obj.Bang);
+        AddMethod(0,"reset",obj.Reset);
+        AddMethod(0,"set",obj.Set);
+        AddMethod(0,"bound",obj.Bound);
 	}
 
     protected void Bang() 
     {
+    
         float f = this.i_count;
         int step = (int)this.step;
         this.i_count += step;
@@ -56,7 +60,7 @@ public class Counter:
             }
         }
         
-        Outlet(0,f);
+        Outlet(0,f);   
     }
 
     protected void Reset() 
@@ -69,7 +73,7 @@ public class Counter:
         this.i_count = (int)f;
     }
 
-    protected void Bound(PureData.AtomList args) 
+    protected void Bound(Atom[] args) 
     { 
         float f1 = (float)args[0];
         float f2 = (float)args[1];
@@ -77,5 +81,4 @@ public class Counter:
         this.i_down = (int)((f1<f2)?f1:f2);
         this.i_up = (int)((f1>f2)?f1:f2);
     }
-
 }
