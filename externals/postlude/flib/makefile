@@ -1,6 +1,6 @@
-# Makefile hacked together from various others, mostly the old zexy makefile I think. All credit to IOhannes Zmoelnig and anyone else who understands make better than me.
+# Makefile hacked together from various others, mostly the old zexy makefile and pique. All credit to IOhannes Zmoelnig, Miller Puckette and anyone else who understands make better than me.
 #
-# Should work with Linux and OS X. No idea about Windows.
+# Should work with Linux and OS X. No idea about Windows and Irix.
 
 NAME=flib
 CSYM=flib
@@ -151,6 +151,71 @@ LINUXINCLUDE =  -I/usr/include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
 	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o $(LINUXOBJECTS) -lc -lm
 	strip --strip-unneeded $(NAME).pd_linux
+
+# ----------------------- IRIX 5.x -----------------------
+
+pd_irix5: src/$(NAME).pd_irix5
+
+.SUFFIXES: .pd_irix5
+
+SGIOBJECTS = $(TARGETS:%=%.o)
+
+SGICFLAGS5 = -o32 -DPD -DUNIX -DIRIX -O2
+
+SGIINCLUDE =  -I/usr/include/ -I/usr/local/include/
+
+.c.pd_irix5:
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/sc~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/ss~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/irreg~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/mspec~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/peak~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/pspec~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/sfm~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/trist~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/pp~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/bmax~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/melf~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/clean~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/wdv~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/hca~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cross~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c $*.c
+	ld -elf -shared -rdata_shared -o $(NAME).pd_irix5 $(NAME).o $(LINUXOBJECTS) -lm -lc
+	rm $*.o
+
+# ----------------------- IRIX 6.x -----------------------
+
+pd_irix6: src/$(NAME).pd_irix6
+
+.SUFFIXES: .pd_irix6
+
+SGICFLAGS6 = -n32 -DPD -DUNIX -DIRIX -DN32 -woff 1080,1064,1185 \
+	-OPT:roundoff=3 -OPT:IEEE_arithmetic=3 -OPT:cray_ivdep=true \
+	-Ofast=ip32
+
+SGIOBJECTS = $(TARGETS:%=%.o)
+
+SGIINCLUDE =  -I/usr/include/ -I/usr/local/include/
+
+.c.pd_irix6:
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/ss~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/irreg~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/mspec~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/peak~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/pspec~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/sfm~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/trist~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/pp~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/bmax~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/melf~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/clean~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/wdv~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/hca~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cross~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c $*.c
+	ld -n32 -IPA -shared -rdata_shared -o $*.pd_irix6 $(NAME).o $(LINUXOBJECTS) -lm -lc
+	rm $*.o
 
 # ----------------------------------------------------------
 

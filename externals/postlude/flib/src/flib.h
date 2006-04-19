@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.8"
+#define VERSION "0.82"
 
 void sc_tilde_setup(void);
 void ss_tilde_setup(void);
