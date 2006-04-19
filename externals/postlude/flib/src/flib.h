@@ -37,5 +37,5 @@ void melf_tilde_setup(void);
 void clean_tilde_setup(void);
 void wdv_tilde_setup(void);
 void hca_tilde_setup(void);
-void cross_tilde_setup(void);
+void cc_tilde_setup(void);
 

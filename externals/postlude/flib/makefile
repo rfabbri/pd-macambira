@@ -12,7 +12,7 @@ INSTALL_PREFIX = /usr/local
 PDLIBDIR = /lib/pd
 PDDIR = $(INSTALL_PREFIX)$(PDLIBDIR)
 
-TARGETS = sc~ ss~ irreg~ mspec~ peak~ pspec~ sfm~ trist~ pp~ bmax~ melf~ clean~ wdv~ hca~ cross~
+TARGETS = sc~ ss~ irreg~ mspec~ peak~ pspec~ sfm~ trist~ pp~ bmax~ melf~ clean~ wdv~ hca~ cc~
 
 
 # ----------------------- NT -----------------------
@@ -53,7 +53,7 @@ PDNTLIB = $(PDNTLDIR)\msvcrt.lib \
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/clean~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/wdv~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/hca~.c
-	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/cross~.c
+	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) -c src/cc~.c
 	$(CC) $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
 	link /dll /export:$(CSYM)_setup $(NAME).obj $(PDNTOBJECTS) $(PDNTLIB)
 
@@ -89,7 +89,7 @@ DARWINOBJECTS = $(TARGETS:%=%.o)
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/clean~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/wdv~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/hca~.c
-	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/cross~.c
+	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c src/cc~.c
 	$(CC) $(DARWINCFLAGS) $(DARWININCLUDE) -c $*.c 
 	$(CC) -bundle -undefined suppress -flat_namespace -o $(NAME).pd_darwin $(NAME).o $(DARWINOBJECTS)
 	rm -f $(NAME).o ../$(NAME).pd_darwin
@@ -147,7 +147,7 @@ LINUXINCLUDE =  -I/usr/include
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/clean~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/wdv~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/hca~.c
-	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/cross~.c
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c src/cc~.c
 	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -c $*.c
 	ld -export_dynamic  -shared -o $(NAME).pd_linux $(NAME).o $(LINUXOBJECTS) -lc -lm
 	strip --strip-unneeded $(NAME).pd_linux
@@ -179,7 +179,7 @@ SGIINCLUDE =  -I/usr/include/ -I/usr/local/include/
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/clean~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/wdv~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/hca~.c
-	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cross~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cc~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c $*.c
 	ld -elf -shared -rdata_shared -o $(NAME).pd_irix5 $(NAME).o $(LINUXOBJECTS) -lm -lc
 	rm $*.o
@@ -212,7 +212,7 @@ SGIINCLUDE =  -I/usr/include/ -I/usr/local/include/
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/clean~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/wdv~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/hca~.c
-	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cross~.c
+	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c src/cc~.c
 	$(CC) $(SGICFLAGS) $(SGIINCLUDE) -c $*.c
 	ld -n32 -IPA -shared -rdata_shared -o $*.pd_irix6 $(NAME).o $(LINUXOBJECTS) -lm -lc
 	rm $*.o

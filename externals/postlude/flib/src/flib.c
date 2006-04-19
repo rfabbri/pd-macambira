@@ -36,7 +36,7 @@ void flib_setup(void)
 {
 	int i;
 
-	char *ext[] = {"sc~\t\tSpectral Centroid", "ss~\t\tSpectral Smoothness", "irreg~\t\tSpectral Irregularity (methods 1 and 2)", "mspec~\t\tMagnitude Spectrum", "peak~\t\tAmplitude and Frequency of Spectral Peaks", "pspec~\t\tPhase Spectrum", "sfm~\t\tSpectral Flatness Measure", "trist~\t\tTristimulus (x,y,z)", "++~\t\tSum of the samples in each block", "bmax~\t\tThe maximum value and location(s) each block", "melf~\t\tGenerate a mel spaced filter for fft", "clean~\t\tRemoves NaN, inf and -inf from a signal vector", "wdv~\t\tCalculate a wavelet dispersion vector (requires creb)", "hca~\t\tHarmonic component analysis", "cross~\t\tCross correlation"};
+	char *ext[] = {"sc~\t\tSpectral Centroid", "ss~\t\tSpectral Smoothness", "irreg~\t\tSpectral Irregularity (methods 1 and 2)", "mspec~\t\tMagnitude Spectrum", "peak~\t\tAmplitude and Frequency of Spectral Peaks", "pspec~\t\tPhase Spectrum", "sfm~\t\tSpectral Flatness Measure", "trist~\t\tTristimulus (x,y,z)", "++~\t\tSum of the samples in each block", "bmax~\t\tThe maximum value and location(s) each block", "melf~\t\tGenerate a mel spaced filter for fft", "clean~\t\tRemoves NaN, inf and -inf from a signal vector", "wdv~\t\tCalculate a wavelet dispersion vector (requires creb)", "hca~\t\tHarmonic component analysis", "cc~\t\tCross correlation"};
 	sc_tilde_setup();
 	ss_tilde_setup();
 	pp_tilde_setup();
@@ -51,7 +51,7 @@ void flib_setup(void)
 	clean_tilde_setup();
 	wdv_tilde_setup();
 	hca_tilde_setup();
-	cross_tilde_setup();
+	cc_tilde_setup();
    
     post("\n\tflib "VERSION" Feature Extraction Library\n\tby Jamie Bullock\n");
 
