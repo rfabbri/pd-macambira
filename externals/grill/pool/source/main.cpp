@@ -39,7 +39,7 @@ protected:
 	V mg_pool(AtomList &l);
 
     // print some help message
-    static V m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2005 Thomas Grill"); }
+    static V m_help() { post("pool " POOL_VERSION " - hierarchical storage object, (C)2002-2006 Thomas Grill"); }
 
 	// clear all data in pool
 	V m_reset();
