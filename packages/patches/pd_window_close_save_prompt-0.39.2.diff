@@ -1,0 +1,12 @@
+--- u_main.tk	2006-03-24 06:41:56.000000000 +0100
++++ u_main.tk	2006-04-20 17:55:49.000000000 +0200
+@@ -201,6 +201,9 @@
+ wm title . "Pd"
+ . configure -menu .mbar -width 200 -height 150
+ 
++# Intercept closing the main pd window: MP 20060413:
++wm protocol . WM_DELETE_WINDOW menu_quit
++
+ ############### set up global variables ################################
+ 
+ set untitled_number 1
