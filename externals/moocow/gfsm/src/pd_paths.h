@@ -1,9 +1,9 @@
 /*=============================================================================*\
- * File: pd_state.h
+ * File: pd_paths.h
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
- * Description: finite state automata for Pd
+ * Description: finite state automata for Pd: paths()
  *
- * Copyright (c) 2004-2006 Bryan Jurish.
+ * Copyright (c) 2006 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -28,8 +28,8 @@
 /*=====================================================================
  * Protos
  *=====================================================================*/
-#ifndef PD_GFSM_STATE_H
-#define PD_GFSM_STATE_H
+#ifndef PD_GFSM_PATHS_H
+#define PD_GFSM_PATHS_H
 
 /*----------------------------------------------------------------------
  * includes
@@ -37,22 +37,22 @@
 #include <pd_automaton.h>
 
 /*--------------------------------------------------------------
- * pd_gfsm_state
+ * pd_gfsm_lookup
  */
-typedef struct _pd_gfsm_state
+typedef struct _pd_gfsm_paths
 {
   t_object                 x_obj;
   t_pd_gfsm_automaton_pd  *x_automaton_pd;
-  gfsmStateId              x_id;
-  gfsmArcIter              x_arci;
-  gboolean                 x_open;
-  t_atom                   x_argv[4];
-  t_outlet                *x_valout;
-} t_pd_gfsm_state;
+  GPtrArray               *x_paths;
+  t_outlet                *x_out_lo;
+  t_outlet                *x_out_hi;
+  t_outlet                *x_out_w;
+  t_outlet                *x_out_done;
+} t_pd_gfsm_lookup;
 
 /*----------------------------------------------------------------------
  * setup routines
  */
-void pd_gfsm_state_setup(void);
+void pd_gfsm_paths_setup(void);
 
-#endif /* PD_GFSM_STATE_H */
+#endif /* PD_GFSM_PATHS_H */

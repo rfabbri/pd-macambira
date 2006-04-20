@@ -1,6 +1,6 @@
-#N canvas 0 0 430 269 10;
+#N canvas 0 0 436 289 10;
 #X obj 66 7 gfsm;
-#X text 126 232 Bryan Jurish <moocow@ling.uni-potsdam.de>;
+#X text 126 241 Bryan Jurish <moocow@ling.uni-potsdam.de>;
 #X text 21 43 EXTERNALS:;
 #X obj 41 72 gfsm_alphabet;
 #X obj 41 98 gfsm_automaton;
@@ -8,8 +8,8 @@
 #X obj 41 124 gfsm_state;
 #X text 161 125 automaton position;
 #X text 160 98 weighted finite state machine;
-#X text 21 184 SEE ALSO:;
-#X text 38 201 gfsmutils(1);
+#X text 21 194 SEE ALSO:;
+#X text 38 211 gfsmutils(1);
 #X text 99 8 : finite state machine external library;
 #X obj 40 150 gfsm_markov;
 #X text 161 151 trainable Markov chain;

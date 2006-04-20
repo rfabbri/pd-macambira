@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state automata for Pd
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2006 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -52,8 +52,21 @@ typedef struct _pd_gfsm_automaton_pd
 typedef struct _pd_gfsm_automaton_obj
 {
   t_object                 x_obj;
+
+  //-- underlying automaton
   t_pd_gfsm_automaton_pd  *x_automaton_pd;
-  t_atom                   x_argv[5];
+
+  //-- for lookup()
+  gfsmLabelVector         *x_labels;
+
+  //-- for paths()
+  gfsmSet                 *x_paths_s;
+  GPtrArray               *x_paths_a;
+  guint                    x_paths_i;
+
+  //-- output-related stuff
+  t_int                    x_argc;
+  t_atom                  *x_argv;
   t_outlet                *x_valout;
 } t_pd_gfsm_automaton_obj;
 

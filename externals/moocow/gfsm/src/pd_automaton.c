@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state automata for Pd
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2006 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -43,6 +43,8 @@
  *=====================================================================*/
 static t_class *pd_gfsm_automaton_pd_class;
 static t_class *pd_gfsm_automaton_obj_class;
+
+#define PD_GFSM_AUTOMATON_OBJ_DEFAULT_LABELS_LENGTH 32
 
 /*=====================================================================
  * pd_gfsm_automaton_pd: Methods
@@ -150,7 +152,7 @@ void pd_gfsm_automaton_obj_outlet_symbol(t_pd_gfsm_automaton_obj *x, t_symbol *s
 }
 
 /*--------------------------------------------------------------------
- * Utilties: pd_gfsm_automaton_obj: outlet_symbol()
+ * Utilties: pd_gfsm_automaton_obj: outlet_symbol_float()
  */
 void pd_gfsm_automaton_obj_outlet_symbol_float(t_pd_gfsm_automaton_obj *x, t_symbol *sel, t_symbol *sym, t_float f)
 {
@@ -187,6 +189,28 @@ void pd_gfsm_automaton_obj_outlet_bang(t_pd_gfsm_automaton_obj *x, t_symbol *sel
   outlet_anything(x->x_valout, sel, 1, x->x_argv);
 }
 
+/*--------------------------------------------------------------------
+ * Utilties: pd_gfsm_automaton_obj: outlet_labels()
+ */
+void pd_gfsm_automaton_obj_outlet_labels(t_pd_gfsm_automaton_obj *x, t_symbol *sel, gfsmLabelVector *labs)
+{
+
+  if (labs->len > 0) {
+    int i;
+    if (x->x_argc < labs->len) {
+      size_t newsize = labs->len * sizeof(t_atom);
+      x->x_argv = resizebytes(x->x_argv, x->x_argc*sizeof(t_atom), newsize);
+      x->x_argc = labs->len;
+    }
+    for (i=0; i < labs->len; i++) {
+      SETFLOAT(x->x_argv+i, (gfsmLabelVal)g_ptr_array_index(labs,i));
+    }
+    outlet_anything(x->x_valout, sel, labs->len, x->x_argv);
+  } else {
+    SETSYMBOL(x->x_argv, &s_bang);
+    outlet_anything(x->x_valout, sel, 1, x->x_argv);
+  }
+}
 
 
 /*=====================================================================
@@ -211,17 +235,24 @@ static void *pd_gfsm_automaton_obj_new(t_symbol *name)
        x);
 #endif
 
-    //-- defaults
-    //x->x_automaton_pd = NULL;
+  //-- defaults
+  //x->x_automaton_pd = NULL;
+  x->x_labels       = NULL;
+  x->x_paths_s      = NULL;
+  x->x_paths_a      = NULL;
 
-    //-- bindings
-    x->x_automaton_pd = pd_gfsm_automaton_pd_get(name);
-    x->x_automaton_pd->x_refcnt++;
+  //-- bindings
+  x->x_automaton_pd = pd_gfsm_automaton_pd_get(name);
+  x->x_automaton_pd->x_refcnt++;
 
-    //-- outlets
-    x->x_valout = outlet_new(&x->x_obj, &s_anything);  //-- value outlet
+  //-- output buffer
+  x->x_argc = 5;
+  x->x_argv = (t_atom*)getbytes(x->x_argc * sizeof(t_atom));
 
-    return (void *)x;
+  //-- outlets
+  x->x_valout = outlet_new(&x->x_obj, &s_anything);  //-- value outlet
+
+  return (void *)x;
 }
 
 
@@ -235,6 +266,11 @@ static void pd_gfsm_automaton_obj_free(t_pd_gfsm_automaton_obj *x)
 #endif
 
   pd_gfsm_automaton_pd_release(x->x_automaton_pd);
+  if (x->x_labels) g_ptr_array_free(x->x_labels,TRUE);
+  if (x->x_paths_s) gfsm_set_free(x->x_paths_s);
+  if (x->x_paths_a) g_ptr_array_free(x->x_paths_a,TRUE);
+
+  freebytes(x->x_argv, x->x_argc*sizeof(t_atom));
 
   //-- do we need to do this?
   outlet_free(x->x_valout);
@@ -337,6 +373,20 @@ static void pd_gfsm_automaton_obj_semiring(t_pd_gfsm_automaton_obj *x, GIMME_ARG
   srsym = gensym(gfsm_sr_type_to_name(x->x_automaton_pd->x_automaton->sr->type));
   pd_gfsm_automaton_obj_outlet_symbol(x, sel, srsym);
 }
+
+/*=====================================================================
+ * automaton_obj: automaton properties
+ */
+
+/*--------------------------------------------------------------------
+ * pd_gfsm_automaton_obj: cyclic()
+ */
+static void pd_gfsm_automaton_obj_cyclic(t_pd_gfsm_automaton_obj *x)
+{
+  gboolean rc = gfsm_automaton_is_cyclic(x->x_automaton_pd->x_automaton);
+  pd_gfsm_automaton_obj_outlet_float(x, gensym("cyclic"), (t_float)rc);
+}
+
 
 /*=====================================================================
  * automaton_obj: state properties
@@ -643,6 +693,192 @@ static void pd_gfsm_automaton_obj_draw_dot(t_pd_gfsm_automaton_obj *x, GIMME_ARG
   pd_gfsm_automaton_obj_outlet_symbol(x, gensym("draw_dot"), filename);
 }
 
+/*=====================================================================
+ * automaton_obj: lookup
+ */
+
+/*--------------------------------------------------------------------
+ * lookup()
+ *   lookup RESULT LABELS
+ */
+static void pd_gfsm_automaton_obj_lookup(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  if (argc > 1) {
+    guint i;
+    t_pd_gfsm_automaton_pd *result_pd;
+
+    //-- get result automaton
+    result_pd = pd_gfsm_automaton_pd_get(atom_getsymbol(argv));
+    result_pd->x_refcnt++;
+
+    //-- ensure labels exists, is cleared, & is sufficiently allocated
+    if (!x->x_labels) {
+      x->x_labels = g_ptr_array_sized_new(argc-1);
+    } else if (argc > x->x_labels->len) {
+      g_ptr_array_set_size(x->x_labels, argc);
+    }
+    x->x_labels->len = 0;
+
+    //-- get labels
+    for (i=1; i < argc; i++) {
+      gfsmLabelVal lab = atom_getfloat(argv+i);
+      //if (lab==gfsmEpsilon) continue; //-- ignore epsilons (?)
+      g_ptr_array_add(x->x_labels, (gpointer)lab);
+    }
+
+    //-- actual lookup
+    gfsm_automaton_lookup(x->x_automaton_pd->x_automaton,
+			  x->x_labels,
+			  result_pd->x_automaton);
+   
+
+    //-- outlet
+    pd_gfsm_automaton_obj_outlet_symbol(x, sel, result_pd->x_name);
+
+    //-- cleanup
+    pd_gfsm_automaton_pd_release(result_pd);
+  }
+  else {
+    //-- no result automaton specified: complain
+    error("gfsm_automaton: lookup: no result automaton specified!");
+  }
+}
+
+
+/*=====================================================================
+ * automaton_obj: paths
+ */
+
+/*--------------------------------------------------------------------
+ * paths_unsafe()
+ */
+static void pd_gfsm_automaton_obj_paths_unsafe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  //-- clear set first
+  if (x->x_paths_s) gfsm_set_clear(x->x_paths_s);
+
+  //-- get paths
+  x->x_paths_s = gfsm_automaton_paths(x->x_automaton_pd->x_automaton, x->x_paths_s);
+
+  //-- get array of paths
+  if (!x->x_paths_a) {
+    x->x_paths_a = g_ptr_array_sized_new(gfsm_set_size(x->x_paths_s));
+  } else {
+    g_ptr_array_set_size(x->x_paths_a,0);
+  }
+  gfsm_set_to_ptr_array(x->x_paths_s, x->x_paths_a);
+
+  //-- set path index
+  x->x_paths_i = 0;
+
+  //-- report done
+  pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_a->len);
+}
+
+/*--------------------------------------------------------------------
+ * paths_safe()
+ */
+static void pd_gfsm_automaton_obj_paths_safe(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  gfsmAutomaton *fsm = x->x_automaton_pd->x_automaton;
+
+  if (fsm && gfsm_automaton_is_cyclic(fsm)) {
+    error("gfsm_automaton: paths: automaton is cyclic!");
+    return;
+  } else if (!fsm || !gfsm_automaton_has_state(fsm,fsm->root_id)) {
+    pd_gfsm_automaton_obj_outlet_float(x, sel, 0);
+  } else {
+    pd_gfsm_automaton_obj_paths_unsafe(x,sel, 0,NULL);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_first()
+ */
+static void pd_gfsm_automaton_obj_path_first(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  x->x_paths_i = 0;
+  if (x->x_paths_a && x->x_paths_i < x->x_paths_a->len) {
+    pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_i);
+  } else {
+    pd_gfsm_automaton_obj_outlet_float(x, sel, -1);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_next()
+ */
+static void pd_gfsm_automaton_obj_path_next(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i+1 < x->x_paths_a->len) {
+    x->x_paths_i++;
+    pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_i);
+  } else {
+    pd_gfsm_automaton_obj_outlet_float(x, sel, -1);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_nth()
+ */
+static void pd_gfsm_automaton_obj_path_nth(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  int ni = argc > 0 ? atom_getfloat(argv) : 0;
+  if (x->x_paths_a && ni >= 0 && ni < x->x_paths_a->len) {
+    x->x_paths_i = ni;
+    pd_gfsm_automaton_obj_outlet_float(x, sel, x->x_paths_i);
+  } else {
+    pd_gfsm_automaton_obj_outlet_float(x, sel, -1);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_lo()
+ */
+static void pd_gfsm_automaton_obj_path_lo(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+    gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
+    pd_gfsm_automaton_obj_outlet_labels(x, sel, p->lo);
+  }
+  else {
+    pd_gfsm_automaton_obj_outlet_bang(x, sel);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_hi()
+ */
+static void pd_gfsm_automaton_obj_path_hi(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+    gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
+    pd_gfsm_automaton_obj_outlet_labels(x, sel, p->hi);
+  }
+  else {
+    pd_gfsm_automaton_obj_outlet_bang(x, sel);
+  }
+}
+
+/*--------------------------------------------------------------------
+ * path_w()
+ */
+static void pd_gfsm_automaton_obj_path_w(t_pd_gfsm_automaton_obj *x, GIMME_ARGS)
+{
+  if (x->x_paths_a && x->x_paths_i >= 0 && x->x_paths_i < x->x_paths_a->len) {
+    gfsmPath *p = (gfsmPath*)g_ptr_array_index(x->x_paths_a,x->x_paths_i);
+    pd_gfsm_automaton_obj_outlet_float(x, sel, p->w);
+  }
+  else {
+    pd_gfsm_automaton_obj_outlet_bang(x, sel);
+  }
+}
+
+
+/*=====================================================================
+ * automaton_obj: setup
+ */
+
 /*--------------------------------------------------------------------
  * pd_gfsm_automaton_obj: setup()
  */
@@ -689,6 +925,12 @@ static void pd_gfsm_automaton_obj_setup(void)
   class_addmethod(pd_gfsm_automaton_obj_class,
 		  (t_method)pd_gfsm_automaton_obj_clear,
 		  gensym("clear"),
+		  A_NULL);
+
+  //-- methods: automaton properties
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_cyclic,
+		  gensym("cyclic"),
 		  A_NULL);
 
   //-- methods: state properties
@@ -743,6 +985,46 @@ static void pd_gfsm_automaton_obj_setup(void)
   class_addmethod(pd_gfsm_automaton_obj_class,
 		  (t_method)pd_gfsm_automaton_obj_draw_dot,
 		  gensym("draw_dot"),
+		  A_GIMME, A_NULL);
+
+  //-- methods: lookup
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_lookup,
+		  gensym("lookup"),
+		  A_GIMME, A_NULL);
+
+  //-- methods: paths
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_paths_safe,
+		  gensym("paths"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_paths_unsafe,
+		  gensym("paths_fast"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_first,
+		  gensym("path_first"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_next,
+		  gensym("path_next"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_nth,
+		  gensym("path_nth"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_lo,
+		  gensym("path_lo"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_hi,
+		  gensym("path_hi"),
+		  A_GIMME, A_NULL);
+  class_addmethod(pd_gfsm_automaton_obj_class,
+		  (t_method)pd_gfsm_automaton_obj_path_w,
+		  gensym("path_w"),
 		  A_GIMME, A_NULL);
 
   //-- help symbol

@@ -24,8 +24,8 @@
 #X msg 58 239 degree;
 #X text 137 240 "degree" : get number of outgoing arcs (linear time)
 ;
-#X msg 58 295 arc_first;
-#X msg 58 317 arc_next;
+#X msg 61 295 arc_first;
+#X msg 61 317 arc_next;
 #X msg 59 382 arc_reset;
 #X obj 26 508 gfsm_state fsm-help 0;
 #X text 229 398 arcs are output as a list:;
@@ -42,6 +42,8 @@ first);
 ID;
 #X text 416 463 with labels LO:HI;
 #X text 271 479 (implicitly resets arc iterator);
+#X msg 59 263 cyclic;
+#X text 141 263 "cyclic" : does this state lead to any cycles?;
 #X connect 12 0 25 0;
 #X connect 15 0 25 0;
 #X connect 16 0 25 0;
@@ -53,3 +55,4 @@ ID;
 #X connect 25 0 11 0;
 #X connect 29 0 25 0;
 #X connect 34 0 25 0;
+#X connect 38 0 25 0;

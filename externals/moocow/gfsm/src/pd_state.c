@@ -3,7 +3,7 @@
  * Author: Bryan Jurish <moocow@ling.uni-potsdam.de>
  * Description: finite state automata for Pd
  *
- * Copyright (c) 2004 Bryan Jurish.
+ * Copyright (c) 2004-2006 Bryan Jurish.
  *
  * For information on usage and redistribution, and for a DISCLAIMER OF ALL
  * WARRANTIES, see the file, "LICENSE.txt," in this distribution.
@@ -128,15 +128,6 @@ static void pd_gfsm_state_set(t_pd_gfsm_state *x, t_floatarg qf)
   x->x_id   = gfsm_automaton_ensure_state(x->x_automaton_pd->x_automaton, (gfsmStateId)qf);
 }
 
-/*--------------------------------------------------------------------
- * degree
- */
-static void pd_gfsm_state_degree(t_pd_gfsm_state *x)
-{
-  gfsmState *s = gfsm_automaton_find_state(x->x_automaton_pd->x_automaton, x->x_id);
-  SETFLOAT(x->x_argv, (s ? (t_float)gfsm_state_out_degree(s) : 0));
-  outlet_anything(x->x_valout, gensym("degree"), 1, x->x_argv);
-}
 
 /*=====================================================================
  * Navigation
@@ -249,6 +240,39 @@ static void pd_gfsm_state_add_weight(t_pd_gfsm_state *x,
   pd_gfsm_state_arc_reset(x);
 }
 
+/*=====================================================================
+ * Properties
+ */
+
+/*--------------------------------------------------------------------
+ * degree
+ */
+static void pd_gfsm_state_degree(t_pd_gfsm_state *x)
+{
+  gfsmState *s = gfsm_automaton_find_state(x->x_automaton_pd->x_automaton, x->x_id);
+  SETFLOAT(x->x_argv, (s ? (t_float)gfsm_state_out_degree(s) : 0));
+  outlet_anything(x->x_valout, gensym("degree"), 1, x->x_argv);
+}
+
+/*--------------------------------------------------------------------
+ * cyclic()
+ */
+static void pd_gfsm_state_cyclic(t_pd_gfsm_state *x)
+{
+  gfsmAutomaton *fsm = x->x_automaton_pd->x_automaton;
+  gfsmBitVector *visited, *completed;
+  gboolean rc = FALSE;
+
+  if (gfsm_automaton_has_state(fsm,x->x_id)) {
+    visited   = gfsm_bitvector_sized_new(fsm->states->len);
+    completed = gfsm_bitvector_sized_new(fsm->states->len);
+    rc        = gfsm_automaton_is_cyclic_state(fsm, x->x_id, visited, completed);
+    gfsm_bitvector_free(visited);
+    gfsm_bitvector_free(completed);
+  }
+  SETFLOAT(x->x_argv, (t_float)rc);
+  outlet_anything(x->x_valout, gensym("cyclic"), 1, x->x_argv);
+}
 
 
 /*=====================================================================
@@ -280,9 +304,6 @@ void pd_gfsm_state_setup(void)
   class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_set,
 		  gensym("set"), A_DEFFLOAT, A_NULL);
 
-  //-- methods: degree
-  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_degree,
-		  gensym("degree"), A_NULL);
 
   //-- methods: navigation
   class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_arc_first,
@@ -297,6 +318,12 @@ void pd_gfsm_state_setup(void)
   //-- methods: manipulation
   class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_add_weight,
 		  gensym("add_weight"), A_FLOAT, A_FLOAT, A_FLOAT, A_FLOAT, A_NULL);
+
+  //-- methods: properties
+  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_degree,
+		  gensym("degree"), A_NULL);
+  class_addmethod(pd_gfsm_state_class, (t_method)pd_gfsm_state_cyclic,
+		  gensym("cyclic"), A_NULL);
 
   //-- help symbol
   class_sethelpsymbol(pd_gfsm_state_class, gensym("gfsm_state-help.pd"));
