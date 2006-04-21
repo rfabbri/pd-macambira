@@ -1897,4 +1897,4 @@ template<int N> const t_symbol *msdN<N>::S_massesForcesL;
 
 #define MSD(NAME,CLASS,N) \
 typedef msdN<N> CLASS; \
-FLEXT_NEW_V(NAME,CLASS)
+template<> FLEXT_NEW_V(NAME,CLASS)
