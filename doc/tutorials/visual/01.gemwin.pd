@@ -1,4 +1,4 @@
-#N canvas 548 149 480 369 10;
+#N canvas 10 40 620 460 10;
 #X obj 196 258 gemwin;
 #X obj 8 10 cnv 15 400 40 empty empty gemwin 20 12 0 24 -228992 -66577
 0;
