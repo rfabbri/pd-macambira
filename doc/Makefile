@@ -26,7 +26,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 #==============================================================================#
 
-DOC_TARGETS = externals-howto media pd_fileformat pd-msg pddp tutorials
+DOC_TARGETS = externals-howto media messageoddness pd_fileformat pd-msg pddp \
+tutorials
 
 # clean up after everything is installed
 final_setup:
@@ -106,6 +107,23 @@ media_install: $(manualsdir)
 media_clean:
 	-rm -f -- $(manualsdir)/$(MEDIA_NAME)/*.*
 	-rmdir --	$(manualsdir)/$(MEDIA_NAME) 
+
+
+
+
+#------------------------------------------------------------------------------#
+# MESSAGEODDNESS
+MESSAGEODDNESS_NAME = MessageOddness
+messageoddness_install: $(manualsdir)
+	install -d $(manualsdir)/$(MESSAGEODDNESS_NAME)
+	install -p $(doc_src)/additional/messageoddness/*.* \
+		$(manualsdir)/$(MESSAGEODDNESS_NAME) 
+
+messageoddness_clean:
+	-rm -f -- $(manualsdir)/$(MESSAGEODDNESS_NAME)/*.*
+	-rmdir --	$(manualsdir)/$(MESSAGEODDNESS_NAME) 
+
+
 
 
 #------------------------------------------------------------------------------#
