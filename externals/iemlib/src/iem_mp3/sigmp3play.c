@@ -35,7 +35,7 @@ iem_mp3 written by Thomas Musil, Copyright (c) IEM KUG Graz Austria 2000 - 2005 
 #include <fcntl.h>
 #include <math.h>
 
-#ifndef _MSC_VER
+#ifndef _WIN32
 #include <sys/signal.h>
 #include <unistd.h>
 #endif
