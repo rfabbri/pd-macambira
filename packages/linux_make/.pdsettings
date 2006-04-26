@@ -34,4 +34,4 @@ path1: /usr/X11R6/lib/X11/fonts
 path2: /usr/X11R6/lib/X11/fonts/TTF
 path3: /usr/lib/X11/fonts
 path4: /usr/share/fonts/truetype
-nloadlib: 4
+nloadlib: 30

@@ -73,10 +73,10 @@ function print_windows ()
 
 function print_windows_fontpath ()
 {
-	 i=0
+	 j=0
 	 for fontpath in $WINDOWS_FONTPATH; do
-		  ((++i)) 
-		  echo "\"path${i}\"=\"${fontpath}\"" >> $WINDOWS_FILE
+		  ((++j)) 
+		  echo "\"path${j}\"=\"${fontpath}\"" >> $WINDOWS_FILE
 	 done
 }
 
@@ -97,27 +97,30 @@ for lib in $LIBS; do
 done
 echo " "
 
-# the .pd-settings file needs an end tag for the loadlib statements
-print_gnulinux_fontpath
-print_gnulinux_footer $i
-
-print_macosx_fontpath
-echo -e $MACOSX_FOOTER >> $MACOSX_FILE
-
+# the .pdsettings file needs a terminator with the lib count
+linux_end_count=$i
 
 # print lines to delete existing loadlib flags
 echo "; delete any previous loadlib flags" >> $WINDOWS_FILE
-while [ $i -lt 50 ]; do
-	 print_windows_delete loadlib $i
+while [ $i -lt 100 ]; do
 	 ((++i)) 
+	 print_windows_delete loadlib $i
 done
 
 print_windows_fontpath
 
 # print lines to delete existing path flags
+i=1
 echo "; delete all existing path flags" >> $WINDOWS_FILE
-while [ $i -lt 50 ]; do
-	 print_windows_delete path $i
+while [ $i -lt 100 ]; do
 	 ((++i)) 
+	 print_windows_delete path $i
 done
+
+# the .pd-settings file needs an end tag for the loadlib statements
+print_gnulinux_fontpath
+print_gnulinux_footer $linux_end_count
+
+print_macosx_fontpath
+echo -e $MACOSX_FOOTER >> $MACOSX_FILE
 
