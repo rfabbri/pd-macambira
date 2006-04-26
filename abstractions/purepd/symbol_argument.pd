@@ -6,7 +6,7 @@
 #X obj 413 389 outlet;
 #X obj 38 13 inlet;
 #X obj 248 108 bang;
-#X obj 249 154 purepd_error symbol_argument;
+#X obj 249 154 purepd/purepd_error symbol_argument;
 #X obj 37 285 trigger bang bang;
 #X obj 151 305 symbol;
 #X obj 37 331 select symbol;

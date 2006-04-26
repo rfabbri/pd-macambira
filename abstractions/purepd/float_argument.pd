@@ -10,7 +10,7 @@ if there is no argument specified.;
 #X obj 63 96 float \$1;
 #X text 211 191 if 2nd arg \, then use as default value;
 #X obj 63 14 inlet;
-#X obj 211 138 purepd_error float_argument;
+#X obj 211 138 purepd/purepd_error float_argument;
 #X obj 211 92 bang;
 #X obj 64 49 route bang float;
 #X msg 211 114 wrong data type on inlet;
