@@ -167,6 +167,8 @@ nqpoly_install4:
 # all of the patches should be installed into help since [nqpoly4] needs to be
 # in the same directory as the patches its manipulating
 	install -p $(abstractions_src)/nqpoly/nqpoly4/*.pd $(helpdir)/$(NQPOLY4_NAME)
+# install just the help file into the root helpdir since this isn't a libdir
+	install -p $(abstractions_src)/nqpoly/*/*-help.pd $(helpdir)
 	install -d $(examplesdir)/$(NQPOLY4_NAME)
 	install -p $(shell ls -1 $(abstractions_src)/nqpoly/nqpoly4/*.pd | \
 		grep -v '\-help.pd')  $(examplesdir)/$(NQPOLY4_NAME)
