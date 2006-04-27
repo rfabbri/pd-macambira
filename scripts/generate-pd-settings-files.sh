@@ -1,10 +1,10 @@
 #!/bin/sh
 
-LIBS="Gem cyclone zexy creb cxc ext13 hid iemabs iemmatrix list-abs mapping markex maxlib memento mjlib motex mtx oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap"
+LIBS="Gem cyclone zexy creb cxc ext13 iemlib iemmatrix list-abs mapping markex maxlib memento mjlib motex mtx oscx pddp pdogg pdp pidip pixeltango pmpd rradical sigpack smlib toxy unauthorized vbap"
 
 GNULINUX_FONTPATH="/usr/X11R6/lib/X11/fonts /usr/X11R6/lib/X11/fonts/TTF /usr/lib/X11/fonts /usr/share/fonts/truetype"
 MACOSX_FONTPATH="/System/Library/Fonts /Library/Fonts ~/Library/Fonts /usr/X11R6/lib/X11/fonts/TTF /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Home/lib/fonts /sw/lib/X11/fonts/msttf /sw/lib/X11/fonts/intl/TrueType /sw/lib/X11/fonts/applettf"
-WINDOWS_FONTPATH="%SystemRoot%/Fonts"
+WINDOWS_FONTPATH="hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,74,00,25,00,2f,00,46,00,6f,00,6e,00,74,00,73,00,00,00"
 
 ROOT_DIR=~/cvs/pure-data/packages
 
@@ -76,13 +76,13 @@ function print_windows_fontpath ()
 	 j=0
 	 for fontpath in $WINDOWS_FONTPATH; do
 		  ((++j)) 
-		  echo "\"path${j}\"=\"${fontpath}\"" >> $WINDOWS_FILE
+		  echo "\"path${j}\"=${fontpath}" >> $WINDOWS_FILE
 	 done
 }
 
 function print_windows_delete ()
 {
-	 echo "\"${1}${2}\"=\"-\"" >> $WINDOWS_FILE
+	 echo "\"${1}${2}\"=-" >> $WINDOWS_FILE
 }
 
 #==============================================================================#
