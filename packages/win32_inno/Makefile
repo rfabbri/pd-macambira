@@ -138,12 +138,14 @@ distclean: clean
 	cd $(packages_src) && make $(DEST_PATHS) distclean
 
 
-clean: 	
+package_clean: 	
 	-rm $(PD_INNO_SETUP)
-	-cd $(packages_src) && make $(DEST_PATHS) clean
+	-chmod -R +w $(DESTDIR)
+	-rm -rf $(DESTDIR)
 
 
-
+clean: package_clean
+	cd $(packages_src) && make $(DEST_PATHS) clean
 
 
 test_locations:
