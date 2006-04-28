@@ -1,16 +1,26 @@
 #N canvas 0 22 458 308 10;
-#X obj 111 141 split_path;
-#X symbolatom 111 201 0 0 0 3 path - -;
-#X symbolatom 175 165 0 0 0 3 filename - -;
-#X msg 80 43 symbol just-a-file.pd;
-#X msg 108 71 symbol /path/to/a/file;
-#X obj 95 161 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 111 201 split_path;
+#X symbolatom 111 261 0 0 0 3 path - -;
+#X symbolatom 175 225 0 0 0 3 filename - -;
+#X msg 31 20 symbol just-a-file.pd;
+#X obj 95 221 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 159 160 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 159 220 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
+#X msg 139 102 symbol relative-path/;
+#X text 302 102 <-- note trailing /;
+#X msg 152 167 symbol /path/to/too/many//////slashes;
+#X text 213 283 ^-- always ends without a /;
+#X msg 76 46 symbol /path/to/just-a-file.pd;
+#X msg 118 78 symbol no-trailing-slash;
+#X msg 146 131 symbol ../another/relative/path/to/file.pd;
 #X connect 0 0 1 0;
-#X connect 0 0 5 0;
+#X connect 0 0 4 0;
 #X connect 0 1 2 0;
-#X connect 0 1 6 0;
+#X connect 0 1 5 0;
 #X connect 3 0 0 0;
-#X connect 4 0 0 0;
+#X connect 6 0 0 0;
+#X connect 8 0 0 0;
+#X connect 10 0 0 0;
+#X connect 11 0 0 0;
+#X connect 12 0 0 0;
