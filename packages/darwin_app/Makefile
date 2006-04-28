@@ -195,13 +195,16 @@ dmg: darwin_app_perms
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
 
 
-
 distclean: clean
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS) distclean
 
 
-clean: darwin_app_clean
+clean: package_clean
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
+
+
+package_clean: darwin_app_clean
+	-rm -rf -- $(DESTDIR)
 	-rm Info.plist
 
 
