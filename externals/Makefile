@@ -723,7 +723,7 @@ iem_bin_ambi_install: iem_bin_ambi
 		$(helpdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
-		$(manualsdir)/$(IEM_BIN_AMBI_NAME)/README.txt
+		$(readmesdir)/$(IEM_BIN_AMBI_NAME).txt
 #	install -d $(examplesdir)/$(IEM_BIN_AMBI_NAME)
 #	install -p $(externals_src)/iem/iem_bin_ambi/examples/*.pd \
 #		$(examplesdir)/$(IEM_BIN_AMBI_NAME)
@@ -933,9 +933,9 @@ maxlib_install: maxlib
 	install -d $(helpdir)/$(MAXLIB_NAME)
 	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
 		$(helpdir)/$(MAXLIB_NAME)
-	install -d $(manualsdir)/$(MAXLIB_NAME)
+#	install -d $(manualsdir)/$(MAXLIB_NAME)
 	install -p $(externals_src)/maxlib/README \
-		$(manualsdir)/$(MAXLIB_NAME)/README.txt
+		$(readmesdir)/$(MAXLIB_NAME).txt
 
 maxlib_clean:
 	-rm -f -- $(externals_src)/maxlib/src/*.$(EXTENSION)
