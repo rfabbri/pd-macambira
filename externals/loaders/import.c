@@ -52,7 +52,7 @@ static void import_load_arguments(t_import *x, int argc, t_atom *argv)
                 x->current = x->loaded_libs;
                 x->num_libs++;
             }
-            post("blahsymbol: %s",libname->s_name);
+            post("[import] loaded library: %s",libname->s_name);
             break;
         default:
             post("[import] ERROR: Unsupported atom type");
