@@ -162,36 +162,30 @@ flext:
 		) && \
 		MACOSX_DEPLOYMENT_TARGET=10.3 bash build.sh pd gcc build-release-shared FLEXTLIB=@executable_path/../extra FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
 	ln -sf $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.dylib
-	install -p -m0444 $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
+	install -p $(externals_src)/grill/flext/pd-darwin/release-shared/libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)
 	ln -sf libflext-pd.$(FLEXT_VERSION).dylib $(objectsdir)/libflext-pd.dylib
 	install -d $(examplesdir)
 	cp -rp $(externals_src)/grill/flext/tutorial $(examplesdir)/flext
-	install -d $(manualsdir)/flext
-	install -p -m0644 $(externals_src)/grill/flext/gpl.txt  \
-		$(externals_src)/grill/flext/readme.txt   \
-		$(externals_src)/grill/flext/license.txt  \
-		$(manualsdir)/flext
+#	install -d $(manualsdir)/flext
+	install -p	$(externals_src)/grill/flext/readme.txt   \
+		$(readmesdir)/flext.txt
 # FLEXTERNALS
 #########
 # dyn~
 	cd $(externals_src)/grill/dynext && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	install -p -m0444 $(externals_src)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p -m0644 $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
-	install -d $(manualsdir)/dynext
-	install -p -m0644 $(externals_src)/grill/dynext/gpl.txt  \
-		$(externals_src)/grill/dynext/readme.txt   \
-		$(externals_src)/grill/dynext/license.txt  \
-		$(manualsdir)/dynext
+	install -p $(externals_src)/grill/dynext/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p $(externals_src)/grill/dynext/pd/*.pd $(helpdir)
+#	install -d $(manualsdir)/dynext
+	install -p $(externals_src)/grill/dynext/readme.txt   \
+		$(readmesdir)/dynext.txt
 #########
 # pool
 	cd $(externals_src)/grill/pool && bash ../flext/build.sh pd gcc build-release-shared FLEXTLIB=../flext/pd-darwin/release-shared FLEXTINC=../flext/source FLEXTSYS=$(objectsdir)
-	install -p -m0444 $(externals_src)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p -m0644 $(externals_src)/grill/pool/pool-help.pd $(helpdir)
-	install -d $(manualsdir)/pool
-	install -p -m0644 $(externals_src)/grill/pool/gpl.txt \
-		$(externals_src)/grill/pool/readme.txt   \
-		$(externals_src)/grill/pool/license.txt \
-		$(manualsdir)/pool
+	install -p $(externals_src)/grill/pool/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p $(externals_src)/grill/pool/pool-help.pd $(helpdir)
+#	install -d $(manualsdir)/pool
+	install -p $(externals_src)/grill/pool/readme.txt   \
+		$(readmesdir)/pool.txt
 #########
 # py/pyext
 #	cd $(externals_src)/grill/py && \
@@ -199,15 +193,14 @@ flext:
 #			cp -f build/config-mac.def config.txt \
 #		) && \
 #		bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p -m0444 $(externals_src)/grill/py/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+#	install -p $(externals_src)/grill/py/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
 # this wasn't building for me -HCS 2005-06-09
 	install -d $(manualsdir)/py/examples
 	install -d $(manualsdir)/py/scripts
-	install -p -m0644 $(externals_src)/grill/py/pd/*.pd $(manualsdir)/py/examples
-	install -p -m0644 $(externals_src)/grill/py/scripts/*.py $(manualsdir)/py/scripts
-	install -p -m0644 $(externals_src)/grill/py/gpl.txt  \
-		$(externals_src)/grill/py/readme.txt $(externals_src)/grill/py/license.txt \
-		$(manualsdir)/py
+	install -p $(externals_src)/grill/py/pd/*.pd $(manualsdir)/py/examples
+	install -p $(externals_src)/grill/py/scripts/*.py $(manualsdir)/py/scripts
+	install -p $(externals_src)/grill/py/readme.txt
+		$(readmesdir)/py.txt
 #	install -d $(INSTALL_PREFIX)/Library/Frameworks
 #	cp -R /Library/Frameworks/Python.framework $(INSTALL_PREFIX)/Library/Frameworks
 #########
@@ -215,33 +208,28 @@ flext:
 #  fails without the dir
 #	test -d ../../vasp/pd-darwin || mkdir -p ../../vasp/pd-darwin 
 #	cd $(externals_src)/grill/vasp/ && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-#	install -p -m0444 $(externals_src)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+#	install -p $(externals_src)/grill/vasp/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
 # this wasn't building for me -HCS 2005-06-09
-	install -p -m0644 $(externals_src)/grill/vasp/pd-help/*.pd $(helpdir)
-	install -d $(manualsdir)/vasp
-	install -p -m0644 $(externals_src)/grill/vasp/gpl.txt  \
-		$(externals_src)/grill/vasp/readme.txt   \
-		$(externals_src)/grill/vasp/license.txt  \
-		$(externals_src)/grill/vasp/changes.txt  \
-		$(externals_src)/grill/vasp/todo.txt     \
-		$(manualsdir)/vasp
-	cp -rp $(externals_src)/grill/vasp/pd-ex $(manualsdir)/vasp
+	install -p $(externals_src)/grill/vasp/pd-help/*.pd $(helpdir)
+#	install -d $(manualsdir)/vasp
+	install -p $(externals_src)/grill/vasp/readme.txt   \
+		$(readmesdir)/vasp.txt
+	install -d $(examplesdir)/vasp
+	install -p $(externals_src)/grill/vasp/pd-ex/*.* $(examplesdir)/vasp
 #########
 # xsample
 	cd $(externals_src)/grill/xsample && bash ../flext/build.sh pd gcc build-release-shared FLEXTPREFIX=. FLEXTLIB=$(objectsdir) FLEXTINC=../flext/source
-	install -p -m0444 $(externals_src)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
-	install -p -m0644 $(externals_src)/grill/xsample/pd/*.pd $(helpdir)
-	install -d $(manualsdir)/xsample
-	install -p -m0644 $(externals_src)/grill/xsample/gpl.txt \
-		$(externals_src)/grill/xsample/readme.txt \
-		$(externals_src)/grill/xsample/license.txt \
-		$(manualsdir)/xsample
+	install -p $(externals_src)/grill/xsample/pd-darwin/release-shared/*.pd_darwin $(objectsdir)
+	install -p $(externals_src)/grill/xsample/pd/*.pd $(helpdir)
+#	install -d $(manualsdir)/xsample
+	install -p $(externals_src)/grill/xsample/readme.txt \
+		$(readmesdir)/xsample.txt
 ########## FOOTILS #########
 # syncgrain
 #	cd $(externals_src)/footils/syncgrain/ && $(MAKE) -f makefile.pd-darwin
-#	install -p -m0444 $(externals_src)/footils/syncgrain/pd-darwin/*.pd_darwin \
+#	install -p $(externals_src)/footils/syncgrain/pd-darwin/*.pd_darwin \
 #		$(objectsdir)
-	install -p -m0644 $(externals_src)/footils/syncgrain/pd/*.* $(helpdir)
+	install -p $(externals_src)/footils/syncgrain/pd/*.* $(helpdir)
 
 # nusmuk
 	-cd $(externals_src)/nusmuk/msd && $(externals_src)/grill/flext/build.sh \
