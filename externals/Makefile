@@ -587,7 +587,7 @@ hardware_install: hardware
 # nothing built from source yet
 #	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
 #		$(objectsdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/lanbox/lanbox.pd
+	install -p $(externals_src)/hardware/lanbox/lanbox.pd \
 		$(objectsdir)/$(HARDWARE_NAME)
 	install -d $(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
