@@ -29,7 +29,8 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 final_setup:
 	chmod -R ugo-w $(pddocdir)
 
-install: gripd_install ix_install
+install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
+gripd_install ix_install
 	@echo " "
 	@echo "extensions install succeeded!"
 
@@ -49,9 +50,9 @@ gripd_install:
 	install -d $(helpdir)
 	install -p $(extensions_src)/gripd/examples/gripd.pd \
 		$(helpdir)/gripd-help.pd
-	install -d $(manualsdir)/$(GRIPD_NAME)
+#	install -d $(manualsdir)/$(GRIPD_NAME)
 	install -p $(extensions_src)/gripd/README.txt \
-		$(manualsdir)/$(GRIPD_NAME) 
+		$(readmesdir)/$(GRIPD_NAME).txt
 	install -d $(examplesdir)/$(GRIPD_NAME)
 	install -p $(extensions_src)/gripd/examples/*.* \
 		$(examplesdir)/$(GRIPD_NAME) 
@@ -64,9 +65,9 @@ IX_NAME = ix
 ix_install:
 	install -d $(objectsdir)/$(IX_NAME)
 	install -p $(extensions_src)/gui/ix/*.wid $(objectsdir)/$(IX_NAME) 
-	install -d $(manualsdir)/$(IX_NAME)
+#	install -d $(manualsdir)/$(IX_NAME)
 	install -p $(extensions_src)/gui/ix/README \
-		$(manualsdir)/$(IX_NAME)/README.txt
+		$(readmesdir)/$(IX_NAME).txt
 	install -d $(examplesdir)/$(IX_NAME)
 	install -p $(extensions_src)/gui/ix/*.pd $(examplesdir)/$(IX_NAME) 
 
