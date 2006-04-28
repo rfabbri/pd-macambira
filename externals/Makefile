@@ -109,7 +109,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -198,7 +198,6 @@ buildsrc_install: $(helpdir) $(objectsdir)
 			$(externals_src)/sprinkler/sprinkler-help.pd \
 			$(externals_src)/susloop~/*.pd \
 			$(externals_src)/svf~/*.pd \
-			$(externals_src)/vbap/*.pd \
 			$(externals_src)/vst/*.pd \
 			$(externals_src)/zhzxh~/*.pd \
 				$(helpdir)
@@ -239,7 +238,7 @@ template_install: template
 #	install -p $(externals_src)/template/manual.txt \
 #		$(manualsdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/README \
-		$(readmesdir)/$(IEM_AMBI_NAME).txt
+		$(readmesdir)/$(TEMPLATE_NAME).txt
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/examples/*.pd \
 		$(examplesdir)/$(TEMPLATE_NAME)
@@ -534,6 +533,41 @@ freeverb_clean:
 	-rm -f -- $(externals_src)/freeverb/*.*~
 
 
+#------------------------------------------------------------------------------#
+# GGEE
+GGEE_NAME=ggee
+# experimental needs C++ and tools is command line, so exclude
+GGEE_OBJECTS := $(wildcard $(externals_src)/ggee/[a-df-su-z]*/*.c)
+ggee: $(GGEE_OBJECTS:.c=.$(EXTENSION))
+
+ggee_install: ggee
+	install -d $(objectsdir)/$(GGEE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(GGEE_NAME) \
+		--author "Guenter Geiger" \
+		--description "" \
+		--license "BSD" \
+		--version "0.25"
+	install -p $(GGEE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(GGEE_NAME)
+	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
+		 $(objectsdir)/$(GGEE_NAME)
+	install -d $(helpdir)/$(GGEE_NAME)
+	install -p $(externals_src)/ggee/*/*-help.pd \
+		$(helpdir)/$(GGEE_NAME)
+#	install -d $(manualsdir)/$(GGEE_NAME)
+#	install -p $(externals_src)/ggee/manual.txt \
+#		$(manualsdir)/$(GGEE_NAME)
+#	install -p $(externals_src)/ggee/README \
+#		$(readmesdir)/$(GGEE_NAME).txt
+#	install -d $(examplesdir)/$(GGEE_NAME)
+#	install -p $(externals_src)/ggee/examples/*.pd \
+#		$(examplesdir)/$(GGEE_NAME)
+
+ggee_clean:
+	-rm -f -- $(GGEE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(GGEE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/ggee/*.bak
+	-rm -f -- $(externals_src)/ggee/*.*~
+
 
 #------------------------------------------------------------------------------#
 # HARDWARE
@@ -553,6 +587,8 @@ hardware_install: hardware
 # nothing built from source yet
 #	install -p $(HARDWARE_OBJECTS:.c=.$(EXTENSION)) \
 #		$(objectsdir)/$(HARDWARE_NAME)
+	install -p $(externals_src)/hardware/lanbox/lanbox.pd
+		$(objectsdir)/$(HARDWARE_NAME)
 	install -d $(helpdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/*-help.pd \
 		$(helpdir)/$(HARDWARE_NAME)
@@ -1361,20 +1397,35 @@ unauthorized_clean:
 	-rm -f -- $(externals_src)/*/*.*~
 	-rm -f -- $(externals_src)/*.*~
 
-
 #------------------------------------------------------------------------------#
 # VBAP
 VBAP_NAME=vbap
-vbap:
-
+VBAP_OBJECTS := $(wildcard $(externals_src)/vbap/*.c)
+vbap: $(VBAP_OBJECTS:.c=.$(EXTENSION))
 
 vbap_install: vbap
 	install -d $(objectsdir)/$(VBAP_NAME)
-#	install -d $(helpdir)/$(VBAP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(VBAP_NAME) \
+		--author "Ville Pulkki" \
+		--description "Vector Based Amplitude Panning" \
+		--version ""
+	install -p $(VBAP_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(VBAP_NAME)
+	install -p $(shell ls -1 $(externals_src)/vbap/*.pd | grep -v '-help.pd') \
+		 $(objectsdir)/$(VBAP_NAME)
+	install -d $(helpdir)/$(VBAP_NAME)
+	install -p $(externals_src)/vbap/*-help.pd $(helpdir)/$(VBAP_NAME)
 #	install -d $(manualsdir)/$(VBAP_NAME)
+#	install -p $(externals_src)/vbap/manual.txt \
+#		$(manualsdir)/$(VBAP_NAME)
 #	install -d $(examplesdir)/$(VBAP_NAME)
-	install -p $(externals_src)/vbap/graph-to-aziele.pd \
-		$(objectsdir)/$(VBAP_NAME)
+#	install -p $(externals_src)/vbap/examples/*.pd \
+#		$(examplesdir)/$(VBAP_NAME)
+
+vbap_clean:
+	-rm -f -- $(VBAP_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(VBAP_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/vbap/*.bak
+	-rm -f -- $(externals_src)/vbap/*.*~
 
 
 
