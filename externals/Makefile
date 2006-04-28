@@ -552,7 +552,7 @@ ggee_install: ggee
 		 $(objectsdir)/$(GGEE_NAME)
 	install -d $(helpdir)/$(GGEE_NAME)
 	install -p $(externals_src)/ggee/*/*-help.pd \
-		$(helpdir)/$(GGEE_NAME)
+		$(externals_src)/ggee/*/*.gif $(helpdir)/$(GGEE_NAME)
 #	install -d $(manualsdir)/$(GGEE_NAME)
 #	install -p $(externals_src)/ggee/manual.txt \
 #		$(manualsdir)/$(GGEE_NAME)
