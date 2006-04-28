@@ -9,9 +9,12 @@
 
 #include "m_pd.h"
 
-#ifdef NT
+#ifdef _MSC_VER
 #pragma warning( disable : 4244 )
 #pragma warning( disable : 4305 )
+#endif
+
+#ifdef _WIN32
 #include <windows.h>
 #include <commctrl.h>
 #else
@@ -21,7 +24,7 @@
 #include <unistd.h>
 #define HANDLE int
 #define INVALID_HANDLE_VALUE -1
-#endif
+#endif /* _WIN32 */
 
 #include <string.h>
 #include <errno.h>
@@ -35,7 +38,7 @@ typedef struct comport
 
   HANDLE comhandle;              /* holds the comport handle */
 
-#ifdef NT
+#ifdef _WIN32
   DCB dcb;                      /* holds the comm pars */
   DCB dcb_old;                  /* holds the comm pars */
   COMMTIMEOUTS old_timeouts;
@@ -73,13 +76,21 @@ typedef struct comport
 #define RXBUFOVERRUN    -4
 #define TXBUFOVERRUN    -5
 
-#ifdef NT
+#ifdef _WIN32
 
-#define COMPORT_MAX 8
+#define COMPORT_MAX 40
 static char *sys_com_port[COMPORT_MAX] = 
 {
   "COM1", "COM2", "COM3", "COM4",
-  "COM5", "COM6", "COM7", "COM8"
+  "COM5", "COM6", "COM7", "COM8",
+  "COM9", "COM10", "COM11", "COM12",
+  "COM13", "COM14", "COM15", "COM16",
+  "COM17", "COM18", "COM19", "COM20",
+  "COM21", "COM22", "COM23", "COM24",
+  "COM25", "COM26", "COM27", "COM28",
+  "COM29", "COM30", "COM31", "COM32",
+  "COM33", "COM34", "COM35", "COM36",
+  "COM37", "COM38", "COM39", "COM40"
 };
 
 static
@@ -102,7 +113,7 @@ long baudspeedbittable[] =
   CBR_110
 }; 
 
-#else /* NT */
+#else /* _WIN32 */
 
 #ifdef  IRIX  
 #define COMPORT_MAX 2
@@ -161,7 +172,7 @@ short baudspeedbittable[] =
 
 struct timeval null_tv;
 
-#endif /* else NT */
+#endif /* else _WIN32 */
 
 
 #define BAUDRATETABLE_LEN 15
@@ -213,7 +224,7 @@ static long get_baud_ratebits(t_float *baud)
 
 /* --------------------- NT ------------------------------------ */
 
-#ifdef NT
+#ifdef _WIN32
 
 
 static float set_baudrate(t_comport *x,t_float baud)
@@ -327,11 +338,7 @@ static HANDLE open_serial(int com_nr, t_comport *x)
 		   0, 
 		   0, 
 		   OPEN_EXISTING,
-#ifdef WIN2000
 		   0,
-#else
-		   FILE_FLAG_OVERLAPPED,
-#endif
 		   0);
 
   if(fd == INVALID_HANDLE_VALUE)
@@ -679,7 +686,7 @@ static void comport_tick(t_comport *x)
   if(fd == INVALID_HANDLE_VALUE) return;
   
   /* while there are bytes, read them and send them out, ignore errors */
-#ifdef NT
+#ifdef _WIN32
   {
     DWORD dwCommEvent;
     DWORD dwRead;
@@ -775,7 +782,7 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
     x->baud = test.baud;
     x->comhandle = fd;           /* holds the comport handle */
 
-#ifdef NT
+#ifdef _WIN32
   memcpy(&(test.dcb_old),&(x->dcb_old),sizeof(DCB));    /*  save the old com config  */
   memcpy(&(test.dcb),&(x->dcb),sizeof(DCB));       /*  for the new com config  */
 #else  
@@ -977,10 +984,10 @@ void comport_setup(void)
 
   class_addmethod(comport_class, (t_method)comport_pollintervall, gensym("pollintervall"), 
 		  A_FLOAT, 0);
-#ifndef NT
+#ifndef _WIN32
   null_tv.tv_sec = 0; /* no wait */
   null_tv.tv_usec = 0;
-#endif
+#endif /* NOT _WIN32 */
   post("comport - PD external for unix/windows\n"
        "LGPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
        "Institute for Electronic Music - Graz");
