@@ -806,6 +806,40 @@ iem_tab_clean:
 
 
 #------------------------------------------------------------------------------#
+# IEM16
+IEM16_NAME=iem16
+IEM16_OBJECTS := $(wildcard $(externals_src)/iem16/src/iem16_*.c)
+iem16: $(IEM16_OBJECTS:.c=.$(EXTENSION))
+
+iem16_install: iem16
+	install -d $(objectsdir)/$(IEM16_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM16_NAME) \
+		--author "IOhannes m zmoelnig" \
+		--description "16bit objects for low memory usage" \
+		--license "GNU GPL" \
+		--version "0.1"
+	install -p $(IEM16_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM16_NAME)
+#	install -d $(helpdir)/$(IEM16_NAME)
+#	install -p $(externals_src)/iem16/help/*.pd \
+#		$(helpdir)/$(IEM16_NAME)
+#	install -d $(manualsdir)/$(IEM16_NAME)
+#	install -p $(externals_src)/iem16/manual.txt \
+#		$(manualsdir)/$(IEM16_NAME)
+#	install -p $(externals_src)/iem16/README \
+#		$(readmesdir)/$(IEM16_NAME).txt
+	install -d $(examplesdir)/$(IEM16_NAME)
+	install -p $(externals_src)/iem16/examples/*.pd \
+		$(examplesdir)/$(IEM16_NAME)
+
+iem16_clean:
+	-rm -f -- $(IEM16_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEM16_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem16/*.bak
+	-rm -f -- $(externals_src)/iem16/*.*~
+
+
+
+#------------------------------------------------------------------------------#
 # IEMLIB
 IEMLIB_NAME=iemlib
 IEMLIB_OBJECTS := $(wildcard $(externals_src)/iemlib/src/*/[a-hj-rt-z]*.c)
