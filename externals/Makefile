@@ -109,9 +109,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb hardware iemabs \
-iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd \
-sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -143,7 +141,7 @@ pre_all_unknown:
 
 #------------------------------------------------------------------------------#
 # INSTALL
-install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) \
+install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
 all unfiltered_install $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "externals install succeeded!"
@@ -237,16 +235,18 @@ template_install: template
 	install -d $(helpdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/help/*.pd \
 		$(helpdir)/$(TEMPLATE_NAME)
-	install -d $(manualsdir)/$(TEMPLATE_NAME)
+#	install -d $(manualsdir)/$(TEMPLATE_NAME)
+#	install -p $(externals_src)/template/manual.txt \
+#		$(manualsdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/README \
-		$(manualsdir)/$(TEMPLATE_NAME)/README.txt
+		$(readmesdir)/$(IEM_AMBI_NAME).txt
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
 	install -p $(externals_src)/template/examples/*.pd \
 		$(examplesdir)/$(TEMPLATE_NAME)
 
 template_clean:
-	-rm -f -- $(externals_src)/template/*.$(EXTENSION)
-	-rm -f -- $(externals_src)/template/*.o
+	-rm -f -- $(TEMPLATE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(TEMPLATE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/template/*.bak
 	-rm -f -- $(externals_src)/template/*.*~
 
@@ -269,9 +269,9 @@ bsaylor_install: bsaylor
 	install -d $(helpdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/help/*.pd \
 		$(helpdir)/$(BSAYLOR_NAME)
-	install -d $(manualsdir)/$(BSAYLOR_NAME)
+#	install -d $(manualsdir)/$(BSAYLOR_NAME)
 	install -p $(externals_src)/bsaylor/README.txt \
-		$(manualsdir)/$(BSAYLOR_NAME)/README.txt
+		$(readmesdir)/$(BSAYLOR_NAME).txt
 #	install -d $(examplesdir)/$(BSAYLOR_NAME)
 #	install -p $(externals_src)/bsaylor/examples/*.pd \
 #		$(examplesdir)/$(BSAYLOR_NAME)
@@ -351,9 +351,9 @@ cxc_install: cxc
 	install -d $(helpdir)/$(CXC_NAME)
 	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
 		$(helpdir)/$(CXC_NAME)
-	install -d $(manualsdir)/$(CXC_NAME)
+#	install -d $(manualsdir)/$(CXC_NAME)
 	install -p $(externals_src)/cxc/README \
-		 $(manualsdir)/$(CXC_NAME)/README.txt
+		 $(readmesdir)/$(CXC_NAME).txt
 
 cxc_clean:
 	-rm -f -- $(CXC_OBJECTS:.c=.$(EXTENSION))
@@ -423,9 +423,9 @@ ext13_install: ext13
 	install -d $(helpdir)/$(EXT13_NAME)
 	install -p $(wildcard $(externals_src)/ext13/doc/*.pd) \
 		$(helpdir)/$(EXT13_NAME)
-	install -d $(manualsdir)/$(EXT13_NAME)
+#	install -d $(manualsdir)/$(EXT13_NAME)
 	install -p $(externals_src)/ext13/README \
-		$(manualsdir)/$(EXT13_NAME)/README.txt
+		$(readmesdir)/$(EXT13_NAME).txt
 
 ext13_clean:
 	-rm -f -- $(externals_src)/ext13/*.$(EXTENSION)
@@ -458,9 +458,9 @@ fftease_install: fftease
 	install -d $(helpdir)/$(FFTEASE_NAME)
 	install -p $(externals_src)/fftease/help/*.pd \
 		$(helpdir)/$(FFTEASE_NAME)
-	install -d $(manualsdir)/$(FFTEASE_NAME)
+#	install -d $(manualsdir)/$(FFTEASE_NAME)
 	install -p $(externals_src)/fftease/README \
-		$(manualsdir)/$(FFTEASE_NAME)/README.txt
+		$(readmesdir)/$(FFTEASE_NAME).txt
 	install -d $(examplesdir)/$(FFTEASE_NAME)
 	install -p $(externals_src)/fftease/examples/*.pd \
 		$(examplesdir)/$(FFTEASE_NAME)
@@ -522,9 +522,9 @@ freeverb_install: freeverb
 	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
 	install -d $(helpdir)
 	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) $(helpdir)
-	install -d $(manualsdir)/$(FREEVERB_NAME)
+#	install -d $(manualsdir)/$(FREEVERB_NAME)
 	install -p $(externals_src)/freeverb~/README \
-		$(manualsdir)/$(FREEVERB_NAME)/README.txt
+		$(readmesdir)/$(FREEVERB_NAME).txt
 
 
 freeverb_clean:
@@ -557,10 +557,10 @@ hardware_install: hardware
 	install -p $(externals_src)/hardware/*/*-help.pd \
 		$(helpdir)/$(HARDWARE_NAME)
 	install -d $(manualsdir)/$(HARDWARE_NAME)
-	install -p $(externals_src)/hardware/README.txt \
-		$(manualsdir)/$(HARDWARE_NAME)/README.txt
 	install -p $(externals_src)/hardware/memPIO/README.txt \
 		$(manualsdir)/$(HARDWARE_NAME)/memPIO.txt
+	install -p $(externals_src)/hardware/README.txt \
+		$(readmesdir)/$(HARDWARE_NAME).txt
 	install -d $(examplesdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/*/examples/*.pd \
 		$(examplesdir)/$(HARDWARE_NAME)
@@ -654,9 +654,9 @@ hidin_install: hidin
 	install -d $(helpdir)/$(HIDIN_NAME)
 	install -p $(externals_src)/hidin/help/*.pd \
 		$(helpdir)/$(HIDIN_NAME)
-	install -d $(manualsdir)/$(HIDIN_NAME)
+#	install -d $(manualsdir)/$(HIDIN_NAME)
 	install -p $(externals_src)/hidin/README \
-		$(manualsdir)/$(HIDIN_NAME)/README.txt
+		$(readmesdir)/$(HIDIN_NAME).txt
 	install -d $(examplesdir)/$(HIDIN_NAME)
 	install -p $(externals_src)/hidin/examples/*.pd \
 		$(examplesdir)/$(HIDIN_NAME)
@@ -666,6 +666,106 @@ hidin_clean:
 	-rm -f -- $(externals_src)/hidin/*.o
 	-rm -f -- $(externals_src)/hidin/*.bak
 	-rm -f -- $(externals_src)/hidin/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# IEM_AMBI
+IEM_AMBI_NAME=iem_ambi
+# exclude the files for the single-file library format
+IEM_AMBI_OBJECTS := $(wildcard $(externals_src)/iem/iem_ambi/src/[a-hj-z]*.c)
+iem_ambi: $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION))
+
+iem_ambi_install: iem_ambi
+	install -d $(objectsdir)/$(IEM_AMBI_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM_AMBI_NAME) \
+		--author "IEM/KUG, Graz, Austria" \
+		--description "calculate ambisonic encoder matrices rotation matrices and decoder matrices from 1st to 4th order in 2D or 3D." \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION)) \
+		$(objectsdir)/$(IEM_AMBI_NAME)
+	install -d $(helpdir)/$(IEM_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_ambi/help/*.pd \
+		$(helpdir)/$(IEM_AMBI_NAME)
+#	install -d $(manualsdir)/$(IEM_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_ambi/READ_ME.txt \
+		$(readmesdir)/$(IEM_AMBI_NAME).txt
+#	install -d $(examplesdir)/$(IEM_AMBI_NAME)
+#	install -p $(externals_src)/iem/iem_ambi/examples/*.pd \
+#		$(examplesdir)/$(IEM_AMBI_NAME)
+
+iem_ambi_clean:
+	-rm -f -- $(IEM_AMBI_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEM_AMBI_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_ambi/*/*.bak
+	-rm -f -- $(externals_src)/iem/iem_ambi/*/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# IEM_BIN_AMBI
+IEM_BIN_AMBI_NAME=iem_bin_ambi
+# exclude the files for the single-file library format
+IEM_BIN_AMBI_OBJECTS := $(wildcard $(externals_src)/iem/iem_bin_ambi/src/[a-hj-z]*.c)
+iem_bin_ambi: $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION))
+
+iem_bin_ambi_install: iem_bin_ambi
+	install -d $(objectsdir)/$(IEM_BIN_AMBI_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM_BIN_AMBI_NAME) \
+		--author "IEM/KUG, Graz, Austria" \
+		--description "calculate the product of an ambisonic decoder-matrix and the binaural HRIR's (in frequency and in time domain)" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM_BIN_AMBI_NAME)
+	install -d $(helpdir)/$(IEM_BIN_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_bin_ambi/help/*.pd \
+		$(helpdir)/$(IEM_BIN_AMBI_NAME)
+	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
+	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
+		$(manualsdir)/$(IEM_BIN_AMBI_NAME)/README.txt
+#	install -d $(examplesdir)/$(IEM_BIN_AMBI_NAME)
+#	install -p $(externals_src)/iem/iem_bin_ambi/examples/*.pd \
+#		$(examplesdir)/$(IEM_BIN_AMBI_NAME)
+
+iem_bin_ambi_clean:
+	-rm -f -- $(IEM_BIN_AMBI_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEM_BIN_AMBI_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_bin_ambi/*/*.bak
+	-rm -f -- $(externals_src)/iem/iem_bin_ambi/*/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# IEM_TAB
+IEM_TAB_NAME=iem_tab
+# exclude the files for the single-file library format
+IEM_TAB_OBJECTS := $(wildcard $(externals_src)/iem/iem_tab/src/[a-hj-z]*.c)
+iem_tab: $(IEM_TAB_OBJECTS:.c=.$(EXTENSION))
+
+iem_tab_install: iem_tab
+	install -d $(objectsdir)/$(IEM_TAB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEM_TAB_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(IEM_TAB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEM_TAB_NAME)
+	install -d $(helpdir)/$(IEM_TAB_NAME)
+	install -p $(externals_src)/iem/iem_tab/help/*.pd \
+		$(helpdir)/$(IEM_TAB_NAME)
+#	install -d $(manualsdir)/$(IEM_TAB_NAME)
+	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
+		$(readmesdir)/$(IEM_TAB_NAME).txt
+	install -d $(examplesdir)/$(IEM_TAB_NAME)
+	install -p $(externals_src)/iem/iem_tab/examples/*.pd \
+		$(examplesdir)/$(IEM_TAB_NAME)
+
+iem_tab_clean:
+	-rm -f -- $(IEM_TAB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEM_TAB_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem/iem_tab/*.bak
+	-rm -f -- $(externals_src)/iem/iem_tab/*.*~
 
 
 
@@ -696,8 +796,13 @@ iemlib_install: iemlib
 	install -p $(externals_src)/iemlib/examples/*.* \
 		$(examplesdir)/$(IEMLIB_NAME)
 	install -d $(manualsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*.pdf \
+		$(manualsdir)/$(IEMLIB_NAME)
+	install -p $(externals_src)/iemlib/*.txt \
+		$(manualsdir)/$(IEMLIB_NAME)
 	install -p $(externals_src)/iemlib/iemabs/*.txt \
 		$(manualsdir)/$(IEMLIB_NAME)
+
 
 iemlib_clean: 
 	-rm -f -- $(IEMLIB_OBJECTS:.c=.$(EXTENSION))
@@ -772,9 +877,9 @@ mapping_install: mapping
 	install -d $(helpdir)/$(MAPPING_NAME)
 	install -p $(externals_src)/mapping/help/*.pd \
 		$(helpdir)/$(MAPPING_NAME)
-	install -d $(manualsdir)/$(MAPPING_NAME)
+#	install -d $(manualsdir)/$(MAPPING_NAME)
 	install -p $(externals_src)/mapping/README.txt \
-		$(manualsdir)/$(MAPPING_NAME)/README.txt
+		$(readmesdir)/$(MAPPING_NAME).txt
 	install -d $(examplesdir)/$(MAPPING_NAME)
 #	install -p $(externals_src)/mapping/examples/*.pd \
 #		$(examplesdir)/$(MAPPING_NAME)
@@ -801,9 +906,9 @@ markex_install: markex
 	install -d $(helpdir)/$(MARKEX_NAME)
 	install -p $(wildcard $(externals_src)/markex/*.pd) \
 		$(helpdir)/$(MARKEX_NAME)
-	install -d $(manualsdir)/$(MARKEX_NAME)
+#	install -d $(manualsdir)/$(MARKEX_NAME)
 	install -p $(externals_src)/markex/README \
-		$(manualsdir)/$(MARKEX_NAME)/README.txt
+		$(readmesdir)/$(MARKEX_NAME).txt
 
 markex_clean:
 	-rm -f -- $(externals_src)/markex/*.$(EXTENSION)
@@ -857,9 +962,9 @@ mjlib_install: mjlib
 	install -d $(helpdir)/$(MJLIB_NAME)
 	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
 		$(helpdir)/$(MJLIB_NAME)
-	install -d $(manualsdir)/$(MJLIB_NAME)
+#	install -d $(manualsdir)/$(MJLIB_NAME)
 	install -p $(externals_src)/mjlib/readme.txt \
-		$(manualsdir)/$(MJLIB_NAME)
+		$(readmesdir)/$(MJLIB_NAME).txt
 
 mjlib_clean:
 	-rm -f -- $(externals_src)/mjlib/*.$(EXTENSION)
@@ -885,9 +990,9 @@ motex_install: motex
 	install -d $(helpdir)/$(MOTEX_NAME)
 	install -p $(wildcard $(externals_src)/motex/*-help.pd) \
 		$(helpdir)/$(MOTEX_NAME)
-	install -d $(manualsdir)/$(MOTEX_NAME)
+#	install -d $(manualsdir)/$(MOTEX_NAME)
 	install -p $(externals_src)/motex/README \
-		$(manualsdir)/$(MOTEX_NAME)/README.txt
+		$(readmesdir)/$(MOTEX_NAME).txt
 
 motex_clean:
 	-rm -f -- $(externals_src)/motex/*.$(EXTENSION)
@@ -989,9 +1094,9 @@ pdogg_install: pdogg
 	install -d $(helpdir)/$(PDOGG_NAME)
 	install -p $(externals_src)/pdogg/*/*.pd \
 		$(helpdir)/$(PDOGG_NAME)
-	install -d $(manualsdir)/$(PDOGG_NAME)
+#	install -d $(manualsdir)/$(PDOGG_NAME)
 	install -p $(externals_src)/pdogg/readme \
-		$(manualsdir)/$(PDOGG_NAME)/README.txt
+		$(readmesdir)/$(PDOGG_NAME).txt
 
 pdogg_clean:
 	-rm -f -- $(externals_src)/pdogg/*/*.$(EXTENSION)
@@ -1069,9 +1174,9 @@ pidip_install:
 	install -p $(externals_src)/pidip/doc/*.pd $(helpdir)/$(PIDIP_NAME)
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
-	install -d $(manualsdir)/$(PIDIP_NAME)
+#	install -d $(manualsdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/README \
-		$(manualsdir)/$(PIDIP_NAME)/README.txt
+		$(readmesdir)/$(PIDIP_NAME).txt
 	install -d $(examplesdir)/$(PIDIP_NAME)/images
 	install -p $(externals_src)/pidip/patches/images/*.* \
 		$(examplesdir)/$(PIDIP_NAME)/images
@@ -1136,9 +1241,9 @@ sigpack_install: sigpack
 	install -d $(helpdir)/$(SIGPACK_NAME)
 	install -p $(externals_src)/sigpack/help/*.pd \
 		$(helpdir)/$(SIGPACK_NAME)
-	install -d $(manualsdir)/$(SIGPACK_NAME)
+#	install -d $(manualsdir)/$(SIGPACK_NAME)
 	install -p $(externals_src)/sigpack/readme.txt \
-		$(manualsdir)/$(SIGPACK_NAME)/README.txt
+		$(readmesdir)/$(SIGPACK_NAME).txt
 
 sigpack_clean:
 	-rm -f -- $(externals_src)/sigpack/source/*.$(EXTENSION)
@@ -1164,8 +1269,8 @@ smlib_install: smlib
 	install -d $(helpdir)/$(SMLIB_NAME)
 	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
 		$(helpdir)/$(SMLIB_NAME)
-	install -d $(manualsdir)/$(SMLIB_NAME)
-	install -p $(externals_src)/smlib/readme.txt $(manualsdir)/$(SMLIB_NAME)
+#	install -d $(manualsdir)/$(SMLIB_NAME)
+	install -p $(externals_src)/smlib/readme.txt $(readmesdir)/$(SMLIB_NAME).txt
 	install -d $(examplesdir)/$(SMLIB_NAME)
 	install -p $(wildcard $(externals_src)/smlib/examples/*.pd) \
 		$(examplesdir)/$(SMLIB_NAME)
