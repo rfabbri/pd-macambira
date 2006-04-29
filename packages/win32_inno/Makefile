@@ -50,6 +50,7 @@ PD_INNO_SETUP = pd-inno.iss
 
 package:  $(PD_INNO_SETUP)
 	start $(PD_INNO_SETUP)
+#	start "c:\\Program Files\\Inno Setup 5\\Compil32.exe /cc C:\\msys\\1.0\\\home\\**\\packages\\win32_inno\\pd-inno.iss"
 	@echo " "
 	@echo "win32_inno install succeeded!"
 
