@@ -992,3 +992,4 @@ void comport_setup(void)
        "LGPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
        "Institute for Electronic Music - Graz");
 }
+
