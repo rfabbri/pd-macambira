@@ -1,4 +1,4 @@
-#N canvas 483 96 839 834 10;
+#N canvas 574 52 839 834 10;
 #X obj 52 15 loadbang;
 #X obj 314 524 print msd;
 #X obj 633 647 gemwin;
