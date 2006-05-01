@@ -56,6 +56,8 @@ typedef struct comport
   int x_hit;
   double x_deltime;
 
+  int verbose;
+
 } t_comport;
 
 #ifndef TRUE
@@ -802,6 +804,8 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
 
   clock_delay(x->x_clock, x->x_deltime);
 
+  x->verbose = 0;
+
   return x;
 }
 
@@ -809,7 +813,7 @@ static void *comport_new(t_floatarg comnr, t_floatarg fbaud) {
 static void
 comport_free(t_comport *x)
 {
-  post("close serial...");
+  post("free serial...");
 
   clock_unset(x->x_clock);
   clock_free(x->x_clock);
@@ -899,7 +903,8 @@ static void comport_xonxoff(t_comport *x,t_floatarg f)
     post("** ERROR ** could not set xonxoff of device %s\n",
 	 sys_com_port[x->comport]);
   }
-  else post("set xonxoff of %s to %f\n",sys_com_port[x->comport],f);
+  else if(x->verbose > 0)
+	post("set xonxoff of %s to %f\n",sys_com_port[x->comport],f);
 }
 
 static void comport_close(t_comport *x)
@@ -929,7 +934,12 @@ static void comport_devicename(t_comport *x, t_symbol *s)
 {
   if(x->comport >= 0 && x->comport < COMPORT_MAX){
     sys_com_port[x->comport] = s->s_name;   
+    if(x->verbose > 0)
+        post("comport %d: set devicename %s",x->comport,sys_com_port[x->comport]);
   }
+  else if(x->verbose > 0)
+     post("comport %d: could not set devicename %s",x->comport,s->s_name);
+
 }
 
 static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
@@ -947,6 +957,38 @@ static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
     }
   }
 }
+/* ---------------- HELPER ------------------------- */
+static void comport_verbose(t_comport *x, t_floatarg f)
+{
+  x->verbose = f;
+  if(f >  0)
+	post("Comport Verbose is on: %d", (int) f);
+}
+
+
+static void comport_help(t_comport *x)
+{
+	post("Comport %d (baud %f):",x->comport,x->baud);
+	if(x->comport >= 0 && x->comport < COMPORT_MAX){
+    		post("devicename: %s",sys_com_port[x->comport]);
+	  }
+
+	post("  Methods:");
+	post("   baud <baud>     ... set baudrate to nearest possible baud\n"
+             "   bits <bits>     ... set number of bits (7 or 8)\n"
+             "   stopbit <0|1>   ... set off|on stopbit\n"
+             "   rtscts <0|1>    ... set rts/cts off|on\n"
+             "   parity <0|1>    ... set parity off|on\n"
+             "   xonxoff <0|1>   ... set xon/xoff off|on\n"
+             "   close           ... close device\n"
+             "   open <num>      ... open device number num\n"
+             "   devicename <d>  ... set device name to s (eg. /dev/ttyS8)\n"
+             "   print <list>    ... print list of atoms on serial\n"
+             "   pollintervall <t> ... set poll ibntervall to t ticks\n"
+             "   verbose <level> ... for debug set verbosity to level\n"
+             "   help            ... post this help");
+}
+
 /* ---------------- SETUP OBJECTS ------------------ */
 
 void comport_setup(void)
@@ -961,29 +1003,22 @@ void comport_setup(void)
   /*
     class_addbang(comport_class, comport_bang
   */  
-  class_addmethod(comport_class, (t_method)comport_baud, gensym("baud"), 
-		  A_FLOAT, 0); 
+  class_addmethod(comport_class, (t_method)comport_baud, gensym("baud"),A_FLOAT, 0); 
   
-  class_addmethod(comport_class, (t_method)comport_bits, gensym("bits"), 
-		  A_FLOAT, 0);
-  class_addmethod(comport_class, (t_method)comport_stopbit, gensym("stopbit"), 
-		  A_FLOAT, 0);
-  class_addmethod(comport_class, (t_method)comport_rtscts, gensym("rtscts"), 
-		  A_FLOAT, 0);
-  class_addmethod(comport_class, (t_method)comport_parity, gensym("parity"), 
-		  A_FLOAT, 0);
-  class_addmethod(comport_class, (t_method)comport_xonxoff, gensym("xonxoff"), 
-		  A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_bits, gensym("bits"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_stopbit, gensym("stopbit"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_rtscts, gensym("rtscts"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_parity, gensym("parity"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_xonxoff, gensym("xonxoff"), A_FLOAT, 0);
   class_addmethod(comport_class, (t_method)comport_close, gensym("close"), 0);
-  class_addmethod(comport_class, (t_method)comport_open, gensym("open"),
-		  A_FLOAT, 0);
-  class_addmethod(comport_class, (t_method)comport_devicename, gensym("devicename"),
-		  A_SYMBOL, 0);
-  class_addmethod(comport_class, (t_method)comport_print, gensym("print"),
-  		  A_GIMME, 0);
+  class_addmethod(comport_class, (t_method)comport_open, gensym("open"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_devicename, gensym("devicename"), A_SYMBOL, 0);
+  class_addmethod(comport_class, (t_method)comport_print, gensym("print"), A_GIMME, 0);
+  class_addmethod(comport_class, (t_method)comport_pollintervall, gensym("pollintervall"), A_FLOAT, 0);
 
-  class_addmethod(comport_class, (t_method)comport_pollintervall, gensym("pollintervall"), 
-		  A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_verbose, gensym("verbose"), A_FLOAT, 0);
+  class_addmethod(comport_class, (t_method)comport_help, gensym("help"), 0);
+
 #ifndef _WIN32
   null_tv.tv_sec = 0; /* no wait */
   null_tv.tv_usec = 0;
