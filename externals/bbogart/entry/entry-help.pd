@@ -1,14 +1,19 @@
-#N canvas 0 22 407 362 10;
-#X obj 43 152 entry 150 100 grey95 black;
-#X obj 28 88 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 200 48 434 445 10;
+#X obj 73 132 entry 150 100 grey95 black;
+#X obj 11 84 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 68 284 print;
-#X msg 154 79 clear;
-#X msg 158 111 set one two three four five six;
-#X msg 124 292 Can you see what I am;
-#X msg 124 268 set \$1 \$2 \$3 \$4 \$5 \$6;
-#X msg 103 55 fgcolour yellow;
-#X msg 67 27 bgcolour purple;
+#X obj 32 266 print;
+#X msg 137 75 clear;
+#X msg 141 107 set one two three four five six;
+#X msg 88 274 Can you see what I am;
+#X msg 88 250 set \$1 \$2 \$3 \$4 \$5 \$6;
+#X msg 86 51 fgcolour yellow;
+#X msg 50 23 bgcolour purple;
+#X obj 128 363 entry 150 50 grey70 purple;
+#X text 11 336 The one was created with: entry 150 50 grey70 purple
+;
+#X text 8 305 Creation arguments are: width height bgcolor fgcolor.
+The width and height are in pixels.;
 #X connect 0 0 2 0;
 #X connect 0 0 6 0;
 #X connect 1 0 0 0;
