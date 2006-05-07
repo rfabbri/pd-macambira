@@ -4,13 +4,13 @@
 #X obj 11 8 cnv 15 450 40 empty empty building_waveforms_with_sines
 20 12 0 24 -228992 -66577 0;
 #X obj 467 373 ezdac~;
-#X obj 32 219 sixteen_harmonics testing;
+#X obj 32 219 sixteen_harmonics wavetable;
 #X obj 522 238 random 64;
 #X obj 522 262 + 32;
 #X obj 522 285 mtof;
 #X msg 408 190 bang;
 #X obj 479 336 *~;
-#X obj 522 309 tabosc4~ testing;
+#X obj 522 309 tabosc4~ wavetable;
 #X obj 440 105 cnv 15 100 60 empty empty empty 20 12 0 14 -241291 -66577
 0;
 #X obj 446 125 vsl 10 32 0 1 0 1 \$0-a \$0-a a 0 -8 0 8 -262144 -1

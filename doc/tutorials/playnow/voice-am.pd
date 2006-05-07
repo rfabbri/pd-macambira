@@ -1,4 +1,4 @@
-#N canvas 450 159 679 598 10;
+#N canvas 475 82 481 584 10;
 #X obj 246 34 adc~;
 #X obj 152 496 dac~;
 #X obj 72 106 fiddle~;
@@ -6,70 +6,53 @@
 #X obj 159 223 osc~;
 #X floatatom 32 107 5 0 0 0 - - -;
 #X obj 155 467 *~;
-#X obj 172 448 r \$0-master-amp;
 #X obj 248 299 *~;
-#X obj 285 266 line~;
+#X obj 280 270 line~;
 #X obj 160 343 cos~;
 #X obj 160 323 +~;
-#X obj 285 243 pack 0 50;
-#X floatatom 285 195 0 0 0 0 - - -;
-#X obj 285 219 / 100;
-#X obj 549 24 vsl 22 200 0 1 0 0 \$0-master-amp empty volume -9 -8
-1 8 -225271 -1 -1 0 0;
+#X obj 280 247 pack 0 50;
 #X floatatom 129 105 5 0 0 0 - - -;
 #X obj 143 276 *~;
-#X obj 121 250 / 100;
-#X obj 91 212 - 55;
-#X obj 366 505 writesf~;
-#X msg 323 448 start;
-#X msg 384 468 stop;
-#X msg 366 419 open \$1;
-#X obj 367 342 +;
-#X floatatom 393 343 5 0 0 0 - - -;
-#X msg 365 319 1;
-#X obj 357 251 bng 25 250 50 0 empty empty empty 0 -6 0 8 -4033 -1
--1;
-#X obj 358 287 t b b b;
-#X obj 342 412 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
--1;
-#X obj 367 379 makesymbol /Users/hans/Desktop/voice-fm-%s.wav;
-#X text 87 5 sing into the mic to control AM synthesis with your voice
+#X obj 119 201 / 100;
+#X obj 119 181 - 55;
+#X text 48 6 sing into the mic to control AM synthesis with your voice
 ;
 #X text 17 539 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 236 555 released under the GNU GPL;
+#X obj 186 460 nbx 3 18 -1e+37 1e+37 0 0 empty empty empty -9 -10 1
+14 -124831 -1 -1 0.267384 256;
+#X obj 175 437 hsl 200 18 0.01 1 1 0 empty empty master_amplitude 20
+9 1 14 -24198 -1 -1 14200 0;
+#X obj 355 84 pddp/dsp;
+#X obj 159 199 line~;
+#X msg 159 178 \$1 1;
+#X obj 119 246 line~;
+#X msg 119 225 \$1 1;
+#X obj 283 221 hsl 128 15 0.1 1 1 0 empty empty voice_level 10 8 0
+12 -225271 -1 -1 12700 1;
 #X connect 0 0 2 0;
-#X connect 0 0 8 0;
+#X connect 0 0 7 0;
 #X connect 2 0 3 0;
 #X connect 2 0 5 0;
-#X connect 2 3 16 0;
-#X connect 2 3 19 0;
-#X connect 3 0 4 0;
-#X connect 4 0 17 1;
+#X connect 2 3 12 0;
+#X connect 2 3 15 0;
+#X connect 3 0 23 0;
+#X connect 4 0 13 1;
 #X connect 6 0 1 1;
 #X connect 6 0 1 0;
-#X connect 6 0 20 0;
-#X connect 7 0 6 1;
-#X connect 8 0 11 1;
-#X connect 9 0 8 1;
-#X connect 10 0 6 0;
-#X connect 11 0 10 0;
-#X connect 12 0 9 0;
-#X connect 13 0 14 0;
-#X connect 14 0 12 0;
-#X connect 17 0 11 0;
-#X connect 18 0 17 0;
-#X connect 19 0 18 0;
-#X connect 21 0 20 0;
-#X connect 22 0 20 0;
-#X connect 23 0 20 0;
-#X connect 24 0 25 0;
-#X connect 24 0 30 0;
-#X connect 25 0 24 1;
-#X connect 26 0 24 0;
-#X connect 27 0 28 0;
-#X connect 28 0 21 0;
-#X connect 28 1 26 0;
-#X connect 28 2 22 0;
-#X connect 30 0 29 0;
-#X connect 30 0 23 0;
+#X connect 7 0 10 1;
+#X connect 8 0 7 1;
+#X connect 9 0 6 0;
+#X connect 10 0 9 0;
+#X connect 11 0 8 0;
+#X connect 13 0 10 0;
+#X connect 14 0 25 0;
+#X connect 15 0 14 0;
+#X connect 20 0 19 0;
+#X connect 20 0 6 1;
+#X connect 22 0 4 0;
+#X connect 23 0 22 0;
+#X connect 24 0 13 0;
+#X connect 25 0 24 0;
+#X connect 26 0 11 0;

@@ -1,4 +1,4 @@
-#N canvas 20 42 632 472 10;
+#N canvas 10 40 620 460 10;
 #X obj 8 10 cnv 15 400 40 empty empty basic_2d_objects 20 12 0 24 -228992
 -66577 0;
 #X obj 168 196 gemhead;
