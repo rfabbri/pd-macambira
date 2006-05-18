@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* MacOS X object to use HIDs (Human Interface Devices)                      */
+/* Pd interface to the USB HID API using libhid                              */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
 /* Copyright (c) 2004 Hans-Christoph Steiner                                 */
@@ -54,7 +54,7 @@ struct usb_dev_handle {
  * count the number of instances of this object so that certain free()
  * functions can be called only after the final instance is detroyed.
  */
-t_int libhid_instance_count;
+t_int usbhid_instance_count;
 
 char *hid_id[32]; /* FIXME: 32 devices MAX */
 t_int hid_id_count;
@@ -63,10 +63,10 @@ t_int hid_id_count;
  *  CLASS DEF
  */
 
-typedef struct _libhid 
+typedef struct _usbhid 
 {
 	t_object            x_obj;
-/* libhid types */
+/* usbhid types */
 	HIDInterface        *x_hidinterface;
 	u_int8_t            x_iSerialNumber;
 	hid_return          x_hid_return;
@@ -83,7 +83,7 @@ typedef struct _libhid
 /* outlets */
 	t_outlet            *x_data_outlet;
 	t_outlet            *x_control_outlet;
-} t_libhid;
+} t_usbhid;
 
 
 
@@ -92,13 +92,13 @@ typedef struct _libhid
  * LOCAL DEFINES
  */
 
-#define LIBHID_MAJOR_VERSION 0
-#define LIBHID_MINOR_VERSION 0
+#define USBHID_MAJOR_VERSION 0
+#define USBHID_MINOR_VERSION 0
 
 //#define DEBUG(x)
 #define DEBUG(x) x 
 
-static t_class *libhid_class;
+static t_class *usbhid_class;
 
 #define SEND_PACKET_LENGTH 1
 #define RECEIVE_PACKET_LENGTH 6
@@ -197,7 +197,7 @@ static t_int* make_hid_packet(t_int element_count, t_int argc, t_atom *argv)
  	for(i=0; i < element_count; ++i) 
 	{
 /*
- * A libhid path component is 32 bits, the high 16 bits identify the usage page,
+ * A usbhid path component is 32 bits, the high 16 bits identify the usage page,
  * and the low 16 bits the item number.
  */
 		return_array[i] = 
@@ -213,9 +213,9 @@ static t_int* make_hid_packet(t_int element_count, t_int argc, t_atom *argv)
  */
 
 /* -------------------------------------------------------------------------- */
-static void libhid_open(t_libhid *x, t_float vendor_id, t_float product_id)
+static void usbhid_open(t_usbhid *x, t_float vendor_id, t_float product_id)
 {
-	DEBUG(post("libhid_open"););
+	DEBUG(post("usbhid_open"););
 	
 	HIDInterfaceMatcher matcher = { (unsigned short)vendor_id, 
 									(unsigned short)product_id, 
@@ -227,7 +227,7 @@ static void libhid_open(t_libhid *x, t_float vendor_id, t_float product_id)
 	{
 		x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 3);
 		if (x->x_hid_return != HID_RET_SUCCESS) {
-			error("[libhid] hid_force_open failed with return code %d\n", x->x_hid_return);
+			error("[usbhid] hid_force_open failed with return code %d\n", x->x_hid_return);
 		}
 	}
 }
@@ -235,9 +235,9 @@ static void libhid_open(t_libhid *x, t_float vendor_id, t_float product_id)
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_read(t_libhid *x)
+static void usbhid_read(t_usbhid *x)
 {
-	DEBUG(post("libhid_read"););
+	DEBUG(post("usbhid_read"););
 /* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
 	int const PATH_OUT[PATH_LENGTH] = { 0x00010030, 0x00010031, 0x00010038 };
 
@@ -245,7 +245,7 @@ static void libhid_read(t_libhid *x)
 
 /* 	if ( !hid_is_opened(x->x_hidinterface) ) */
 /* 	{ */
-/* 		libhid_open(x); */
+/* 		usbhid_open(x); */
 /* 	} */
 /* 	else */
 /* 	{ */
@@ -255,7 +255,7 @@ static void libhid_read(t_libhid *x)
 											   packet, 
 											   RECEIVE_PACKET_LENGTH);
 		if (x->x_hid_return != HID_RET_SUCCESS) 
-			error("[libhid] hid_get_input_report failed with return code %d\n", 
+			error("[usbhid] hid_get_input_report failed with return code %d\n", 
 				  x->x_hid_return);
 /* 	} */
 }
@@ -264,9 +264,9 @@ static void libhid_read(t_libhid *x)
 
 /* -------------------------------------------------------------------------- */
 /* set the HID packet for which elements to read */
-static void libhid_set_read(t_libhid *x, int argc, t_atom *argv)
+static void usbhid_set_read(t_usbhid *x, int argc, t_atom *argv)
 {
-	DEBUG(post("libhid_set_read"););
+	DEBUG(post("usbhid_set_read"););
 	t_int i;
 
 	x->x_read_element_count = argc / 2;
@@ -279,9 +279,9 @@ static void libhid_set_read(t_libhid *x, int argc, t_atom *argv)
 
 /* -------------------------------------------------------------------------- */
 /* set the HID packet for which elements to write */
-static void libhid_set_write(t_libhid *x, int argc, t_atom *argv)
+static void usbhid_set_write(t_usbhid *x, int argc, t_atom *argv)
 {
-	DEBUG(post("libhid_set_write"););
+	DEBUG(post("usbhid_set_write"););
 	t_int i;
 
 	x->x_write_element_count = argc / 2;
@@ -295,23 +295,23 @@ static void libhid_set_write(t_libhid *x, int argc, t_atom *argv)
 
 /* -------------------------------------------------------------------------- */
 /* convert a list to a HID packet and set it */
-static void libhid_set(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
+static void usbhid_set(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
 {
-	DEBUG(post("libhid_set"););
+	DEBUG(post("usbhid_set"););
 	t_symbol *subselector;
 
 	subselector = atom_getsymbol(&argv[0]);
 	if(strcmp(subselector->s_name,"read") == 0)
-		libhid_set_read(x,argc-1,argv+1); 
+		usbhid_set_read(x,argc-1,argv+1); 
 	if(strcmp(subselector->s_name,"write") == 0)
-		libhid_set_write(x,argc-1,argv+1);
+		usbhid_set_write(x,argc-1,argv+1);
 }
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_get(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
+static void usbhid_get(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
 {
-	DEBUG(post("libhid_get"););
+	DEBUG(post("usbhid_get"););
 	t_symbol *subselector;
 
 	subselector = atom_getsymbol(&argv[0]);
@@ -324,28 +324,28 @@ static void libhid_get(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_close(t_libhid *x) 
+static void usbhid_close(t_usbhid *x) 
 {
-	DEBUG(post("libhid_close"););
+	DEBUG(post("usbhid_close"););
 
 /* just to be safe, stop it first */
-//	libhid_stop(x);
+//	usbhid_stop(x);
 
 	if ( hid_is_opened(x->x_hidinterface) ) 
 	{
 		x->x_hid_return = hid_close(x->x_hidinterface);
 		if (x->x_hid_return == HID_RET_SUCCESS) 
-			post("[libhid] closed device %d",x->x_device_number);
+			post("[usbhid] closed device %d",x->x_device_number);
 		else
-			error("[libhid] could not close %d, error #%d",x->x_device_number,x->x_hid_return);
+			error("[usbhid] could not close %d, error #%d",x->x_device_number,x->x_hid_return);
 	}
 }
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_print(t_libhid *x)
+static void usbhid_print(t_usbhid *x)
 {
-	DEBUG(post("libhid_print"););
+	DEBUG(post("usbhid_print"););
 	t_int i;
 	t_atom event_data[3];
 
@@ -362,20 +362,20 @@ static void libhid_print(t_libhid *x)
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_reset(t_libhid *x)
+static void usbhid_reset(t_usbhid *x)
 {
-	DEBUG(post("libhid_reset"););
+	DEBUG(post("usbhid_reset"););
 	
 	hid_reset_HIDInterface(x->x_hidinterface);
 }
 
 
 /* -------------------------------------------------------------------------- */
-static void libhid_free(t_libhid* x) 
+static void usbhid_free(t_usbhid* x) 
 {
-	DEBUG(post("libhid_free"););
+	DEBUG(post("usbhid_free"););
 		
-	libhid_close(x);
+	usbhid_close(x);
 	clock_free(x->x_clock);
 
 	freebytes(x->x_read_elements,sizeof(t_int) * x->x_read_element_count);
@@ -384,28 +384,28 @@ static void libhid_free(t_libhid* x)
 	hid_delete_HIDInterface(&(x->x_hidinterface));
 	x->x_hid_return = hid_cleanup();
 	if (x->x_hid_return != HID_RET_SUCCESS) 
-		error("[libhid] hid_cleanup failed with return code %d\n", x->x_hid_return);
+		error("[usbhid] hid_cleanup failed with return code %d\n", x->x_hid_return);
 
-	libhid_instance_count--;
+	usbhid_instance_count--;
 }
 
 
 
 /* -------------------------------------------------------------------------- */
-static void *libhid_new(t_float f) 
+static void *usbhid_new(t_float f) 
 {
 	t_int i;
 	HIDInterfaceMatcher matcher;
-	t_libhid *x = (t_libhid *)pd_new(libhid_class);
+	t_usbhid *x = (t_usbhid *)pd_new(usbhid_class);
 	
-	DEBUG(post("libhid_new"););
+	DEBUG(post("usbhid_new"););
 	
 /* only display the version when the first instance is loaded */
-	if(!libhid_instance_count)
-		post("[libhid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
-			 LIBHID_MAJOR_VERSION, LIBHID_MINOR_VERSION);  
+	if(!usbhid_instance_count)
+		post("[usbhid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
+			 USBHID_MAJOR_VERSION, USBHID_MINOR_VERSION);  
 	
-/*   x->x_clock = clock_new(x, (t_method)libhid_read); */
+/*   x->x_clock = clock_new(x, (t_method)usbhid_read); */
 
 	/* create anything outlet used for HID data */ 
 	x->x_data_outlet = outlet_new(&x->x_obj, 0);
@@ -451,34 +451,34 @@ static void *libhid_new(t_float f)
 	/* Open the device and save settings.  If there is an error, return the object
 	 * anyway, so that the inlets and outlets are created, thus not breaking the
 	 * patch.   */
-/* 	if (libhid_open(x,f)) */
-/* 		error("[libhid] device %d did not open",(t_int)f); */
+/* 	if (usbhid_open(x,f)) */
+/* 		error("[usbhid] device %d did not open",(t_int)f); */
 
-	libhid_instance_count++;
+	usbhid_instance_count++;
 
 	return (x);
 }
 
-void libhid_setup(void) 
+void usbhid_setup(void) 
 {
-	DEBUG(post("libhid_setup"););
-	libhid_class = class_new(gensym("libhid"), 
-							 (t_newmethod)libhid_new, 
-							 (t_method)libhid_free,
-							 sizeof(t_libhid),
+	DEBUG(post("usbhid_setup"););
+	usbhid_class = class_new(gensym("usbhid"), 
+							 (t_newmethod)usbhid_new, 
+							 (t_method)usbhid_free,
+							 sizeof(t_usbhid),
 							 CLASS_DEFAULT,
 							 A_DEFFLOAT,
 							 NULL);
 	
 /* add inlet datatype methods */
-	class_addbang(libhid_class,(t_method) libhid_read);
+	class_addbang(usbhid_class,(t_method) usbhid_read);
 
 /* add inlet message methods */
-	class_addmethod(libhid_class,(t_method) libhid_print,gensym("print"),0);
-	class_addmethod(libhid_class,(t_method) libhid_reset,gensym("reset"),0);
-	class_addmethod(libhid_class,(t_method) libhid_set,gensym("set"),A_GIMME,0);
-	class_addmethod(libhid_class,(t_method) libhid_get,gensym("get"),A_DEFSYM,0);
-	class_addmethod(libhid_class,(t_method) libhid_open,gensym("open"),A_DEFFLOAT,A_DEFFLOAT,0);
-	class_addmethod(libhid_class,(t_method) libhid_close,gensym("close"),0);
+	class_addmethod(usbhid_class,(t_method) usbhid_print,gensym("print"),0);
+	class_addmethod(usbhid_class,(t_method) usbhid_reset,gensym("reset"),0);
+	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),A_GIMME,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_get,gensym("get"),A_DEFSYM,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_open,gensym("open"),A_DEFFLOAT,A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_close,gensym("close"),0);
 }
 

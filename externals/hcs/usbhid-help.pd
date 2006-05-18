@@ -1,5 +1,5 @@
 #N canvas 338 93 593 471 10;
-#X obj 111 373 libhid;
+#X obj 111 373 usbhid;
 #X msg 125 14 bang;
 #X msg 185 98 close;
 #X msg 185 124 reset;
