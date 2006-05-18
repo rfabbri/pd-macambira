@@ -31,6 +31,22 @@
 
 
 /*------------------------------------------------------------------------------
+ *  INCLUDE HACK
+ */
+
+/* NOTE: included from libusb/usbi.h. UGLY, i know, but so is libusb! */
+struct usb_dev_handle {
+  int fd;
+  struct usb_bus *bus;
+  struct usb_device *device;
+  int config;
+  int interface;
+  int altsetting;
+  void *impl_info;
+};
+
+
+/*------------------------------------------------------------------------------
  *  GLOBAL VARIABLES
  */
 
@@ -41,6 +57,7 @@
 t_int libhid_instance_count;
 
 char *hid_id[32]; /* FIXME: 32 devices MAX */
+t_int hid_id_count;
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -65,20 +82,10 @@ typedef struct _libhid
 	t_int               x_started;
 /* outlets */
 	t_outlet            *x_data_outlet;
-	t_outlet            *x_device_name_outlet;
+	t_outlet            *x_control_outlet;
 } t_libhid;
 
 
-/* NOTE: included from libusb/usbi.h. UGLY, i know, but so is libusb! */
-struct usb_dev_handle {
-  int fd;
-  struct usb_bus *bus;
-  struct usb_device *device;
-  int config;
-  int interface;
-  int altsetting;
-  void *impl_info;
-};
 
 
 /*------------------------------------------------------------------------------
@@ -131,6 +138,11 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 	{
 		hid_id[i] = (char *) malloc(strlen(usbdev->device->filename) + strlen(usbdev->bus->dirname) );
 		sprintf(hid_id[i], "%s/%s", usbdev->bus->dirname, usbdev->device->filename);
+		post("bus %s device %s: %d %d",
+			 usbdev->bus->dirname, 
+			 usbdev->device->filename,
+			 usbdev->device->descriptor.idVendor,
+			 usbdev->device->descriptor.idProduct);
 	}
 	else /* device already seen */
 	{
@@ -148,9 +160,9 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 	return ret;
 }
 
-/*
-  This function is used in a HIDInterfaceMatcher in order to match devices by
-  serial number.
+/* -------------------------------------------------------------------------- */
+/* This function is used in a HIDInterfaceMatcher in order to match devices by
+ * serial number.
  */
 /* static bool match_serial_number(struct usb_dev_handle* usbdev, void* custom, unsigned int len) */
 /* { */
@@ -164,6 +176,7 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 /* } */
 
 
+/* -------------------------------------------------------------------------- */
 /* static HIDInterface* get_device_by_number(t_int device_number) */
 /* { */
 /* 	HIDInterface* return_hid; */
@@ -172,59 +185,10 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 /* } */
 
 
-
-/*------------------------------------------------------------------------------
- * IMPLEMENTATION                    
- */
-
 /* -------------------------------------------------------------------------- */
-static void libhid_open(t_libhid *x)
+static t_int* make_hid_packet(t_int element_count, t_int argc, t_atom *argv)
 {
-	DEBUG(post("libhid_open"););
-	
-/* Microsoft 5-Button Mouse with IntelliEye(TM) */
-	HIDInterfaceMatcher matcher = { 0x045e, 0x0039, NULL, NULL, 0 };
-
-	x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 3);
-	if (x->x_hid_return != HID_RET_SUCCESS) {
-		error("[libhid] hid_force_open failed with return code %d\n", x->x_hid_return);
-	}
-
-}
-
-
-
-/* -------------------------------------------------------------------------- */
-static void libhid_read(t_libhid *x)
-{
-	DEBUG(post("libhid_read"););
-/* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
-	int const PATH_OUT[PATH_LENGTH] = { 0x00010030, 0x00010031, 0x00010038 };
-
-	char packet[RECEIVE_PACKET_LENGTH];
-
-	if ( !hid_is_opened(x->x_hidinterface) )
-	{
-		libhid_open(x);
-	}
-	else
-	{
-		x->x_hid_return = hid_get_input_report(x->x_hidinterface, 
-											   PATH_OUT, 
-											   PATH_LENGTH, 
-											   packet, 
-											   RECEIVE_PACKET_LENGTH);
-		if (x->x_hid_return != HID_RET_SUCCESS) 
-			error("[libhid] hid_get_input_report failed with return code %d\n", 
-				  x->x_hid_return);
-	}
-}
-
-
-/* -------------------------------------------------------------------------- */
-static t_int* libhid_make_packet(t_int element_count, t_int argc, t_atom *argv)
-{
-	DEBUG(post("libhid_make_packet"););
+	DEBUG(post("make_hid_packet"););
 	t_int i;
 	t_int *return_array = NULL;
 	
@@ -243,6 +207,61 @@ static t_int* libhid_make_packet(t_int element_count, t_int argc, t_atom *argv)
 	return return_array;
 }
 
+
+/*------------------------------------------------------------------------------
+ * IMPLEMENTATION                    
+ */
+
+/* -------------------------------------------------------------------------- */
+static void libhid_open(t_libhid *x, t_float vendor_id, t_float product_id)
+{
+	DEBUG(post("libhid_open"););
+	
+	HIDInterfaceMatcher matcher = { (unsigned short)vendor_id, 
+									(unsigned short)product_id, 
+									NULL, 
+									NULL, 
+									0 };
+
+ 	if ( !hid_is_opened(x->x_hidinterface) ) 
+	{
+		x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 3);
+		if (x->x_hid_return != HID_RET_SUCCESS) {
+			error("[libhid] hid_force_open failed with return code %d\n", x->x_hid_return);
+		}
+	}
+}
+
+
+
+/* -------------------------------------------------------------------------- */
+static void libhid_read(t_libhid *x)
+{
+	DEBUG(post("libhid_read"););
+/* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
+	int const PATH_OUT[PATH_LENGTH] = { 0x00010030, 0x00010031, 0x00010038 };
+
+	char packet[RECEIVE_PACKET_LENGTH];
+
+/* 	if ( !hid_is_opened(x->x_hidinterface) ) */
+/* 	{ */
+/* 		libhid_open(x); */
+/* 	} */
+/* 	else */
+/* 	{ */
+		x->x_hid_return = hid_get_input_report(x->x_hidinterface, 
+											   PATH_OUT, 
+											   PATH_LENGTH, 
+											   packet, 
+											   RECEIVE_PACKET_LENGTH);
+		if (x->x_hid_return != HID_RET_SUCCESS) 
+			error("[libhid] hid_get_input_report failed with return code %d\n", 
+				  x->x_hid_return);
+/* 	} */
+}
+
+
+
 /* -------------------------------------------------------------------------- */
 /* set the HID packet for which elements to read */
 static void libhid_set_read(t_libhid *x, int argc, t_atom *argv)
@@ -251,7 +270,7 @@ static void libhid_set_read(t_libhid *x, int argc, t_atom *argv)
 	t_int i;
 
 	x->x_read_element_count = argc / 2;
-	x->x_read_elements = libhid_make_packet(x->x_read_element_count, argc, argv);
+	x->x_read_elements = make_hid_packet(x->x_read_element_count, argc, argv);
 	post("x_read_element_count %d",x->x_read_element_count);
 	for(i=0;i<x->x_read_element_count;++i)
 		post("x_read_elements %d: %d",i,x->x_read_elements[i]);
@@ -266,7 +285,7 @@ static void libhid_set_write(t_libhid *x, int argc, t_atom *argv)
 	t_int i;
 
 	x->x_write_element_count = argc / 2;
-	x->x_write_elements = libhid_make_packet(x->x_write_element_count, argc, argv);
+	x->x_write_elements = make_hid_packet(x->x_write_element_count, argc, argv);
 	post("x_write_element_count %d",x->x_write_element_count);
 	for(i=0;i<x->x_write_element_count;++i)
 		post("x_write_elements %d: %d",i,x->x_write_elements[i]);
@@ -275,6 +294,7 @@ static void libhid_set_write(t_libhid *x, int argc, t_atom *argv)
 
 
 /* -------------------------------------------------------------------------- */
+/* convert a list to a HID packet and set it */
 static void libhid_set(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
 {
 	DEBUG(post("libhid_set"););
@@ -285,6 +305,20 @@ static void libhid_set(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
 		libhid_set_read(x,argc-1,argv+1); 
 	if(strcmp(subselector->s_name,"write") == 0)
 		libhid_set_write(x,argc-1,argv+1);
+}
+
+
+/* -------------------------------------------------------------------------- */
+static void libhid_get(t_libhid *x, t_symbol *s, int argc, t_atom *argv)
+{
+	DEBUG(post("libhid_get"););
+	t_symbol *subselector;
+
+	subselector = atom_getsymbol(&argv[0]);
+/* 	if(strcmp(subselector->s_name,"read") == 0) */
+
+/* 	if(strcmp(subselector->s_name,"write") == 0) */
+
 }
 
 
@@ -312,8 +346,18 @@ static void libhid_close(t_libhid *x)
 static void libhid_print(t_libhid *x)
 {
 	DEBUG(post("libhid_print"););
-	
-	hid_write_identification(stdout, x->x_hidinterface);
+	t_int i;
+	t_atom event_data[3];
+
+	for ( i = 0 ; ( hid_id[i] != NULL ) ; i++ )
+	{
+		if( hid_id[i] != NULL )
+			post("hid_id[%d]: %s",i,hid_id[i]);
+	}
+/* 	SETSYMBOL(event_data, gensym(type));	   /\* type *\/ */
+/* 	SETSYMBOL(event_data + 1, gensym(code));	/\* code *\/ */
+/* 	SETSYMBOL(event_data + 2, value);	         /\* value *\/ */
+//	outlet_list(x->x_control_outlet, &s_list,
 }
 
 
@@ -365,7 +409,7 @@ static void *libhid_new(t_float f)
 
 	/* create anything outlet used for HID data */ 
 	x->x_data_outlet = outlet_new(&x->x_obj, 0);
-	x->x_device_name_outlet = outlet_new(&x->x_obj, 0);
+	x->x_control_outlet = outlet_new(&x->x_obj, 0);
 	
 	/* hid_write_library_config(stdout); */
 	/* hid_set_debug(HID_DEBUG_NOTRACES); */
@@ -392,7 +436,7 @@ static void *libhid_new(t_float f)
 	/* open recursively all HID devices found */
 	while ( (x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 2)) != HID_RET_DEVICE_NOT_FOUND)
 	{
-		printf("************************************************************************\n");
+/* 		printf("************************************************************************\n"); */
 		
 /* 		hid_write_identification(stdout, x->x_hidinterface); */
 		
@@ -433,7 +477,8 @@ void libhid_setup(void)
 	class_addmethod(libhid_class,(t_method) libhid_print,gensym("print"),0);
 	class_addmethod(libhid_class,(t_method) libhid_reset,gensym("reset"),0);
 	class_addmethod(libhid_class,(t_method) libhid_set,gensym("set"),A_GIMME,0);
-	class_addmethod(libhid_class,(t_method) libhid_open,gensym("open"),0);
+	class_addmethod(libhid_class,(t_method) libhid_get,gensym("get"),A_DEFSYM,0);
+	class_addmethod(libhid_class,(t_method) libhid_open,gensym("open"),A_DEFFLOAT,A_DEFFLOAT,0);
 	class_addmethod(libhid_class,(t_method) libhid_close,gensym("close"),0);
 }
 
