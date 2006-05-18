@@ -1,4 +1,4 @@
-#N canvas 338 93 593 471 10;
+#N canvas 338 93 597 475 10;
 #X obj 111 373 usbhid;
 #X msg 125 14 bang;
 #X msg 185 98 close;
@@ -10,10 +10,10 @@
 #X msg 218 231 set write 1 30 1 31 1 38;
 #X text 233 258 GARBAGE FOR TESTING;
 #X msg 250 292 set read 1 30 word 1 31 1 38;
-#X msg 205 182 set read 1 30 1 31 12 38;
 #X msg 198 142 print;
 #X msg 177 78 open 1149 16392;
 #X text 298 78 Gravis/Destroyer Tiltpad;
+#X msg 205 182 set read 1 30 1 31;
 #X connect 0 0 4 0;
 #X connect 0 1 5 0;
 #X connect 1 0 0 0;
@@ -23,4 +23,4 @@
 #X connect 10 0 0 0;
 #X connect 11 0 0 0;
 #X connect 12 0 0 0;
-#X connect 13 0 0 0;
+#X connect 14 0 0 0;

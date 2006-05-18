@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------------*/
 /*                                                                           */
-/* Pd interface to the USB HID API using libhid                              */
+/* Pd interface to the USB HID API using libhid, which is built on libusb    */
 /* Written by Hans-Christoph Steiner <hans@at.or.at>                         */
 /*                                                                           */
 /* Copyright (c) 2004 Hans-Christoph Steiner                                 */
@@ -34,7 +34,9 @@
  *  INCLUDE HACK
  */
 
-/* NOTE: included from libusb/usbi.h. UGLY, i know, but so is libusb! */
+/* NOTE: included from libusb/usbi.h. UGLY, i know, but so is libusb! 
+ * this struct doesn't seem to be defined in usb.h, only prototyped
+ */
 struct usb_dev_handle {
   int fd;
   struct usb_bus *bus;
@@ -56,7 +58,8 @@ struct usb_dev_handle {
  */
 t_int usbhid_instance_count;
 
-char *hid_id[32]; /* FIXME: 32 devices MAX */
+#define HID_ID_MAX 32
+char *hid_id[HID_ID_MAX]; /* FIXME: 32 devices MAX */
 t_int hid_id_count;
 
 /*------------------------------------------------------------------------------
@@ -86,8 +89,6 @@ typedef struct _usbhid
 } t_usbhid;
 
 
-
-
 /*------------------------------------------------------------------------------
  * LOCAL DEFINES
  */
@@ -100,9 +101,13 @@ typedef struct _usbhid
 
 static t_class *usbhid_class;
 
+/* for USB strings */
+#define STRING_BUFFER_LENGTH 256
+
 #define SEND_PACKET_LENGTH 1
 #define RECEIVE_PACKET_LENGTH 6
 #define PATH_LENGTH 3
+
 
 /*------------------------------------------------------------------------------
  * SUPPORT FUNCTIONS
@@ -113,7 +118,7 @@ static t_class *usbhid_class;
  * HID devices on the USB bus
  */
 static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom, 
-					  unsigned int len)
+					  unsigned int length)
 {
 	bool ret = false;
 	t_int i;
@@ -121,7 +126,7 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
   
 	/* only here to prevent the unused warning */
 	/* TODO remove */
-	len = *((unsigned long*)custom);
+	length = *((unsigned long*)custom);
  
 	/* Obtain the device's full path */
 	sprintf(current_dev_path, "%s/%s", usbdev->bus->dirname, usbdev->device->filename);
@@ -138,11 +143,6 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 	{
 		hid_id[i] = (char *) malloc(strlen(usbdev->device->filename) + strlen(usbdev->bus->dirname) );
 		sprintf(hid_id[i], "%s/%s", usbdev->bus->dirname, usbdev->device->filename);
-		post("bus %s device %s: %d %d",
-			 usbdev->bus->dirname, 
-			 usbdev->device->filename,
-			 usbdev->device->descriptor.idVendor,
-			 usbdev->device->descriptor.idProduct);
 	}
 	else /* device already seen */
 	{
@@ -153,9 +153,21 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 	if ( (usbdev->device->descriptor.bDeviceClass == 0) /* Class defined at interface level */
 		 && usbdev->device->config
 		 && usbdev->device->config->interface->altsetting->bInterfaceClass == USB_CLASS_HID)
+	{
+		
+		post("bus %s device %s: %d %d",
+			 usbdev->bus->dirname, 
+			 usbdev->device->filename,
+			 usbdev->device->descriptor.idVendor,
+			 usbdev->device->descriptor.idProduct);
 		ret = true;
+	}
+	
 	else
+	{
 		ret = false;
+	}
+	
   
 	return ret;
 }
@@ -164,24 +176,27 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 /* This function is used in a HIDInterfaceMatcher in order to match devices by
  * serial number.
  */
-/* static bool match_serial_number(struct usb_dev_handle* usbdev, void* custom, unsigned int len) */
+/* static bool match_serial_number(struct usb_dev_handle* usbdev, void* custom, unsigned int length) */
 /* { */
 /*   bool ret; */
-/*   char* buffer = (char*)malloc(len); */
+/*   char* buffer = (char*)malloc(length); */
 /*   usb_get_string_simple(usbdev, usb_device(usbdev)->descriptor.iSerialNumber, */
-/*       buffer, len); */
-/*   ret = strncmp(buffer, (char*)custom, len) == 0; */
+/*       buffer, length); */
+/*   ret = strncmp(buffer, (char*)custom, length) == 0; */
 /*   free(buffer); */
 /*   return ret; */
 /* } */
 
 
 /* -------------------------------------------------------------------------- */
-/* static HIDInterface* get_device_by_number(t_int device_number) */
+/* static bool get_device_by_number(struct usb_dev_handle* usbdev,  */
+/* 								 void* custom,  */
+/* 								 unsigned int length)  */
 /* { */
-/* 	HIDInterface* return_hid; */
+/* 	bool ret; */
 	
-/* 	return return_hid; */
+	
+/* 	return ret; */
 /* } */
 
 
@@ -208,6 +223,64 @@ static t_int* make_hid_packet(t_int element_count, t_int argc, t_atom *argv)
 }
 
 
+static t_int get_device_string(HIDInterface *hidif, char *device_string)
+{
+	int length;
+	t_int ret = 0;
+	char buffer[STRING_BUFFER_LENGTH];
+	
+	if ( !hid_is_opened(hidif) ) 
+		return(0);
+
+	if (hidif->device->descriptor.iManufacturer) {
+		length = usb_get_string_simple(hidif->dev_handle,
+									hidif->device->descriptor.iManufacturer, 
+									buffer, 
+									STRING_BUFFER_LENGTH);
+		if (length > 0)
+		{
+			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+			strncat(device_string, " ",1);
+			ret = 1;
+		}
+		else
+		{
+			post("(unable to fetch manufacturer string)");
+		}
+	}
+	
+	if (hidif->device->descriptor.iProduct) {
+		length = usb_get_string_simple(hidif->dev_handle,
+									hidif->device->descriptor.iProduct, 
+									buffer, 
+									STRING_BUFFER_LENGTH);
+		if (length > 0)
+		{
+			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+			strncat(device_string, " ",1);
+			ret = 1;
+		}
+		else
+		{
+			post("(unable to fetch product string)");
+		}
+	}
+
+	if (hidif->device->descriptor.iSerialNumber) {
+		length = usb_get_string_simple(hidif->dev_handle,
+									hidif->device->descriptor.iSerialNumber, 
+									buffer, 
+									STRING_BUFFER_LENGTH);
+		if (length > 0)
+			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
+		else
+			post("(unable to fetch product string)");
+	}
+	
+	return ret;
+}
+
+
 /*------------------------------------------------------------------------------
  * IMPLEMENTATION                    
  */
@@ -216,6 +289,7 @@ static t_int* make_hid_packet(t_int element_count, t_int argc, t_atom *argv)
 static void usbhid_open(t_usbhid *x, t_float vendor_id, t_float product_id)
 {
 	DEBUG(post("usbhid_open"););
+	char string_buffer[STRING_BUFFER_LENGTH];
 	
 	HIDInterfaceMatcher matcher = { (unsigned short)vendor_id, 
 									(unsigned short)product_id, 
@@ -226,7 +300,13 @@ static void usbhid_open(t_usbhid *x, t_float vendor_id, t_float product_id)
  	if ( !hid_is_opened(x->x_hidinterface) ) 
 	{
 		x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 3);
-		if (x->x_hid_return != HID_RET_SUCCESS) {
+		if (x->x_hid_return == HID_RET_SUCCESS) 
+		{
+			if (get_device_string(x->x_hidinterface,string_buffer))
+				post("[usbhid]: opened %s",string_buffer);
+		}
+		else
+		{
 			error("[usbhid] hid_force_open failed with return code %d\n", x->x_hid_return);
 		}
 	}
@@ -239,7 +319,7 @@ static void usbhid_read(t_usbhid *x)
 {
 	DEBUG(post("usbhid_read"););
 /* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
-	int const PATH_OUT[PATH_LENGTH] = { 0x00010030, 0x00010031, 0x00010038 };
+	int const PATH_OUT[2] = { 0x00010030, 0x00010031 };
 
 	char packet[RECEIVE_PACKET_LENGTH];
 
@@ -251,14 +331,15 @@ static void usbhid_read(t_usbhid *x)
 /* 	{ */
 		x->x_hid_return = hid_get_input_report(x->x_hidinterface, 
 											   PATH_OUT, 
-											   PATH_LENGTH, 
+											   2, 
 											   packet, 
 											   RECEIVE_PACKET_LENGTH);
 		if (x->x_hid_return != HID_RET_SUCCESS) 
 			error("[usbhid] hid_get_input_report failed with return code %d\n", 
 				  x->x_hid_return);
-/* 	} */
+/*  	} */
 }
+
 
 
 
@@ -327,17 +408,24 @@ static void usbhid_get(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
 static void usbhid_close(t_usbhid *x) 
 {
 	DEBUG(post("usbhid_close"););
+	t_int ret;
+	char string_buffer[STRING_BUFFER_LENGTH];
 
 /* just to be safe, stop it first */
 //	usbhid_stop(x);
 
 	if ( hid_is_opened(x->x_hidinterface) ) 
 	{
+		ret = get_device_string(x->x_hidinterface,string_buffer);
 		x->x_hid_return = hid_close(x->x_hidinterface);
 		if (x->x_hid_return == HID_RET_SUCCESS) 
-			post("[usbhid] closed device %d",x->x_device_number);
+		{
+			if (ret) post("[usbhid]: closed %s",string_buffer);
+		}
 		else
+		{
 			error("[usbhid] could not close %d, error #%d",x->x_device_number,x->x_hid_return);
+		}
 	}
 }
 
@@ -347,13 +435,17 @@ static void usbhid_print(t_usbhid *x)
 {
 	DEBUG(post("usbhid_print"););
 	t_int i;
-	t_atom event_data[3];
+	char string_buffer[STRING_BUFFER_LENGTH];
+/* 	t_atom event_data[3]; */
 
 	for ( i = 0 ; ( hid_id[i] != NULL ) ; i++ )
 	{
 		if( hid_id[i] != NULL )
 			post("hid_id[%d]: %s",i,hid_id[i]);
 	}
+	if (get_device_string(x->x_hidinterface,string_buffer))
+		post("%s is currently open",string_buffer);
+
 /* 	SETSYMBOL(event_data, gensym(type));	   /\* type *\/ */
 /* 	SETSYMBOL(event_data + 1, gensym(code));	/\* code *\/ */
 /* 	SETSYMBOL(event_data + 2, value);	         /\* value *\/ */
@@ -412,14 +504,14 @@ static void *usbhid_new(t_float f)
 	x->x_control_outlet = outlet_new(&x->x_obj, 0);
 	
 	/* hid_write_library_config(stdout); */
-	/* hid_set_debug(HID_DEBUG_NOTRACES); */
-	// hid_set_debug(HID_DEBUG_NONE);
-/* 	hid_set_debug(HID_DEBUG_ALL); */
-	hid_set_debug_stream(stderr);
+	//hid_set_debug(HID_DEBUG_NONE);
+	hid_set_debug(HID_DEBUG_NOTRACES);
+ 	//hid_set_debug(HID_DEBUG_ALL); 
+	hid_set_debug_stream(stdout);
 	hid_set_usb_debug(0);
 	
 	/* data init */
-	for (i = 0 ; i < 32 ; i++)
+	for (i = 0 ; i < HID_ID_MAX ; i++)
 		hid_id[i] = NULL;
 
 	if (! hid_is_initialised() )
