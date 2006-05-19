@@ -1,6 +1,6 @@
-#PD = /home/matju/pd_0_38_4/bin/pd
-PD = /home/matju/pd_devel_0_39_und/bin/pd
-#PD = pd
+# if you don't want the standard pd, set the PD-variable before doing "make"
+# e.g. "PD=/home/matju/pd_devel_0_39_und/bin/pd make"
+PD ?= pd
 PDFLAGS = -lib pureunity -noaudio -path generics -path specifics
 PDFLAGS += -lib gridflow
 CFLAGS = -Wall
