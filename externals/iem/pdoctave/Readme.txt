@@ -1,6 +1,6 @@
 pdoctave:
 
-pd-octave shall be an interface to octave, mainly in order to access octaves command-line functionality and enourmous function space.
+pd-octave shall be an interface to octave, mainly in order to access octaves command-line functionality and enormous function space.
 
 This idea was started approximately in February 2005. 
 
