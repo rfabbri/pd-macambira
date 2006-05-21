@@ -38,7 +38,7 @@ public:
 	{
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		data_t x = m_data[0];
 		data_t alpha = CHAOS_PARAMETER(alpha);

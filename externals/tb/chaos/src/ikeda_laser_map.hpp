@@ -46,7 +46,7 @@ public:
 		CHAOS_SYS_INIT(y,0.5,1);
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		data_t x = m_data[0];
 		data_t y = m_data[1];

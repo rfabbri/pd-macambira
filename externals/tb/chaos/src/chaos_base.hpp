@@ -42,12 +42,12 @@ public:
 		return dimensions;
 	}
 
-	inline void m_perform()
-	{
-		m_step();
-		m_bash_denormals();
-		m_verify();
-	}
+//	inline void m_perform()
+//	{
+//		m_step();
+//		m_bash_denormals();
+//		m_verify();
+//	}
 
  	std::map<const t_symbol*,int> attr_ind;
 	
@@ -70,7 +70,7 @@ public:
 	data_t m_data[dimensions];  // state of the system
 
 protected:
-	virtual void m_step() = 0;            // iteration
+//	void m_step() = 0;            // iteration
  	flext::AtomList Parameter;    // parameter
  	flext::AtomList System;       // system
 };

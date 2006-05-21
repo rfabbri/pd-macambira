@@ -62,7 +62,7 @@ public:
 		return (f >= 0);
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		(this->*m_routine)();
 	}

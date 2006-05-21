@@ -43,7 +43,7 @@ public:
 		
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		data_t I = m_data[0];
 		data_t theta = m_data[1];

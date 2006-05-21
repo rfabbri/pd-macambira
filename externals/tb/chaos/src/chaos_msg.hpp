@@ -42,7 +42,11 @@ public:
 
 	void m_bang()
 	{
-		m_system.m_perform();
+        m_system.m_step();
+        m_system.m_bash_denormals();
+        m_system.m_verify();
+
+        
 		int outlets = m_system.get_num_eq();
 
 		while (outlets--)

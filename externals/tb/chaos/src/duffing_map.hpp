@@ -39,7 +39,7 @@ public:
 
 
 
-	virtual void m_step()
+	void m_step()
 	{
 		data_t x1 = m_data[0], x2 = m_data[1];
 

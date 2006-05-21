@@ -40,7 +40,7 @@ public:
 		
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		m_data[0] = sin (M_PI * m_data[0]);
 	}

@@ -38,7 +38,7 @@ public:
 		CHAOS_PAR_INIT(b,0.3);
 	}
 
-	virtual void m_step()
+	void m_step()
 	{
 		data_t x = m_data[0];
 		data_t y = m_data[1];

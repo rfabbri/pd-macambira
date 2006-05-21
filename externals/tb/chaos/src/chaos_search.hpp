@@ -137,7 +137,9 @@ void chaos_search<system>::m_search()
 	/* transient dynamics */
 	for (int i = 0; i != m_transient_steps; ++i)
 	{
-		m_system.m_perform();
+        m_system.m_step();
+        m_system.m_bash_denormals();
+        m_system.m_verify();
 	}
 
 	for (int i = 0; i != dimensions; ++i)
@@ -149,8 +151,9 @@ void chaos_search<system>::m_search()
 
 	for (int i = 0; i != m_asymptotic_steps; ++i)
 	{
-		
-		m_system.m_perform();
+        m_system.m_step();
+        m_system.m_bash_denormals();
+        m_system.m_verify();
 		
 		data_t diff = 0;
 		for (int j = 0; j != dimensions; ++j)

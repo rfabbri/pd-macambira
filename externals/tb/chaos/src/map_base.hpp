@@ -28,7 +28,7 @@ class map_base
 	: public chaos_base<dimensions>
 {
 protected:
-	virtual void m_step()
+	void m_step()
 	{
 	}
 };

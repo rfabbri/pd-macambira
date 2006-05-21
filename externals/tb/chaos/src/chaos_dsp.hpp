@@ -257,7 +257,10 @@ void chaos_dsp<system>::m_signal_(int n, t_sample *const *insigs,
 
 	for (int i = 0; i!=n; ++i)
 	{
-		m_system.m_perform();
+        m_system.m_step();
+        m_system.m_bash_denormals();
+        m_system.m_verify();
+
 		for (int j = 0; j != outlets; ++j)
 		{
 			outsigs[j][i] = m_system.get_data(j);
@@ -279,7 +282,10 @@ void chaos_dsp<system>::m_signal_n_hf(int n, t_sample *const *insigs,
 	{
 		while (phase <= 0)
 		{
- 			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
 			phase += m_sr * m_invfreq;
 		}
 		int next = (phase < n) ? int(ceilf (phase)) : n;
@@ -309,7 +315,10 @@ void chaos_dsp<system>::m_signal_n(int n, t_sample *const *insigs,
 	{
 		if (phase == 0)
 		{
- 			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
 			phase = int (m_sr * m_invfreq);
 		}
 		
@@ -341,7 +350,10 @@ void chaos_dsp<system>::m_signal_l(int n, t_sample *const *insigs,
 	{
 		if (phase == 0)
 		{
-			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
 			phase = int (m_sr * m_invfreq);
 
 			for (int j = 0; j != outlets; ++j)
@@ -381,7 +393,10 @@ void chaos_dsp<system>::m_signal_l_hf(int n, t_sample *const *insigs,
 	{
 		if (phase <= 0)
 		{
-			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
 			phase = m_sr * m_invfreq;
 
 			for (int j = 0; j != outlets; ++j)
@@ -420,7 +435,10 @@ void chaos_dsp<system>::m_signal_c(int n, t_sample *const *insigs,
 	{
 		if (phase == 0)
 		{
-			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
 			phase = int (m_sr * m_invfreq);
 			phase = (phase > 2) ? phase : 2;
 			
@@ -472,7 +490,11 @@ void chaos_dsp<system>::m_signal_c_hf(int n, t_sample *const *insigs,
 	{
 		if (phase == 0)
 		{
-			m_system.m_perform();
+            m_system.m_step();
+            m_system.m_bash_denormals();
+            m_system.m_verify();
+
+
 			phase = int (m_sr * m_invfreq);
 			phase = (phase > 2) ? phase : 2;
 			
