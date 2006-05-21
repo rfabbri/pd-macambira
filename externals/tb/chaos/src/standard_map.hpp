@@ -27,11 +27,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class standard_map:
-	public map_base
+	public map_base<2>
 {
 public:
-	standard_map():
-		map_base(2)
+	standard_map()
 	{
 		CHAOS_SYS_INIT(I,0.1,0);
 		CHAOS_SYS_INIT(theta,0.2,1);

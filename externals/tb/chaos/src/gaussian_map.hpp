@@ -26,11 +26,10 @@
 //  taken from Robert C. Hilborn: Chaos and Nonlinear Dynamics 
 
 class gaussian_map:
-	public map_base
+	public map_base<1>
 {
 public:
-	gaussian_map():
-		map_base(1)
+	gaussian_map()
 	{
 		CHAOS_SYS_INIT(x, 0.5, 0);
 
@@ -38,10 +37,7 @@ public:
 		CHAOS_PAR_INIT(c,0.5);
 	}
 
-	~gaussian_map()
-	{
-		
-	}
+
 
 	virtual void m_step()
 	{

@@ -23,14 +23,13 @@
 //  roessler model: dx1/dt = - (x2 + x3)
 //                  dx2/dt = x1 + a * x2
 //                  dx3/dt = b + (x1 - c) * x3
-//  taken from Peitgen / Jürgens / Saupe: Chaos and Fractals
+//  taken from Peitgen / Jï¿½rgens / Saupe: Chaos and Fractals
 
 class roessler
-	: public ode_base
+	: public ode_base<3>
 {
 public:
-	roessler():
-		ode_base(3)
+	roessler()
 	{
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.001);
@@ -44,9 +43,6 @@ public:
 		CHAOS_PAR_INIT(c,4);
 	}
 	
-	~roessler()
-	{
-	}
 
 	virtual void m_system(data_t* deriv, data_t* data)
 	{

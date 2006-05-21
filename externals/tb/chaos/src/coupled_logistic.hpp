@@ -26,11 +26,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class coupled_logistic:
-	public map_base
+	public map_base<2>
 {
 public:
-	coupled_logistic():
-		map_base(2)
+	coupled_logistic()
 	{
 		CHAOS_PAR_INIT(e, 0.06);
 		CHAOS_PAR_INIT(r, 3.7);
@@ -39,11 +38,7 @@ public:
 		CHAOS_SYS_INIT(y, 0.2,1);
 	}
 
-	~coupled_logistic()
-	{
-	}
-
-	virtual void m_step()
+	virtual inline void m_step()
 	{
 		data_t x = m_data[0];
 		data_t y = m_data[1];
@@ -56,7 +51,7 @@ public:
 
 	CHAOS_SYSPAR_FUNCS(e);
 	CHAOS_SYSPAR_FUNCS_PRED(r, m_pred_r);
-	bool m_pred_r(t_float f)
+	static bool m_pred_r(t_float f)
 	{
 		return (f > 0) && (f < 4);
 	}
@@ -64,12 +59,12 @@ public:
 	CHAOS_SYSVAR_FUNCS_PRED(x, 0, m_pred_xy);
 	CHAOS_SYSVAR_FUNCS_PRED(y, 0, m_pred_xy);
 	
-	bool m_pred_xy(t_float f)
+	static bool m_pred_xy(t_float f)
 	{
 		return (f > 0) && (f < 1);
 	}
 
-	virtual void m_verify()
+	inline void m_verify()
 	{
 		data_t x = m_data[0];
 		data_t y = m_data[1];
@@ -83,8 +78,6 @@ public:
 			m_data[1] += -rand_range(0,0.2);
 		}
 	}
-
-	
 };
 
 #define COUPLED_LOGISTIC_CALLBACKS				\

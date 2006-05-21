@@ -20,29 +20,34 @@
 
 #include "chaos_base.hpp"
 
-template <class system> class chaos_msg
-	: public flext_base
+template <class system> 
+class chaos_msg: 
+    public flext_base
 {
 	FLEXT_HEADER(chaos_msg, flext_base);
 
-	~chaos_msg()
-	{
-		delete m_system;
-	}
+protected:
+    chaos_msg(int argc, t_atom* argv)
+    {
+        int size = m_system.get_num_eq();
+
+        for (int i = 0; i != size; ++i)
+            AddOutFloat();
+        FLEXT_ADDBANG(0, m_bang);
+    }
 
 public:
 
-	/* local data for system, output and interpolation */
-	system * m_system; /* the system */
+	system m_system; /* the system */
 
 	void m_bang()
 	{
-		m_system->m_perform();
-		int outlets = m_system->get_num_eq();
+		m_system.m_perform();
+		int outlets = m_system.get_num_eq();
 
 		while (outlets--)
 		{
-			ToOutFloat(outlets, m_system->get_data(outlets));
+			ToOutFloat(outlets, m_system.get_data(outlets));
 		}
 	}
 
@@ -54,15 +59,8 @@ public:
 #define CHAOS_MSG_INIT(SYSTEM, ATTRIBUTES)		\
 FLEXT_HEADER(SYSTEM##_msg, chaos_msg<SYSTEM>)	\
 												\
-SYSTEM##_msg(int argc, t_atom* argv )			\
+SYSTEM##_msg(int argc, t_atom* argv ):          \
+chaos_msg<SYSTEM>(argc, argv)             	    \
 {												\
-	m_system = new SYSTEM;						\
-												\
-	int size = m_system->get_num_eq();			\
-												\
-    for (int i = 0; i != size; ++i)				\
-        AddOutFloat();							\
-												\
     ATTRIBUTES;									\
-    FLEXT_ADDBANG(0, m_bang);					\
 }

@@ -33,19 +33,13 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class bungalow_tent:
-	public map_base
+	public map_base<1>
 {
 public:
-	bungalow_tent():
-		map_base(1)
+	bungalow_tent()
 	{
 		CHAOS_SYS_INIT(x, 0.6,0);
 		CHAOS_PAR_INIT(r, 0.5);
-	}
-
-	~bungalow_tent()
-	{
-		
 	}
 
 	virtual void m_step()

@@ -26,11 +26,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class henon:
-	public map_base
+	public map_base<2>
 {
 public:
-	henon():
-		map_base(2)
+	henon()
 	{
 		CHAOS_SYS_INIT(x,0,0);
 		CHAOS_SYS_INIT(y,0,1);
@@ -39,10 +38,6 @@ public:
 		CHAOS_PAR_INIT(b,0.3);
 	}
 
-	~henon()
-	{
-		
-	}
 
 	virtual void m_step()
 	{

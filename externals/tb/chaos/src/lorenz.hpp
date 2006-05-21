@@ -26,11 +26,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class lorenz
-	: public ode_base
+	: public ode_base<3>
 {
 public:
-	lorenz():
-		ode_base(3)
+	lorenz()
 	{
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.01);

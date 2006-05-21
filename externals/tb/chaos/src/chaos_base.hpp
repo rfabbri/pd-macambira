@@ -1,7 +1,7 @@
 // 
 //  
 //  chaos~
-//  Copyright (C) 2004  Tim Blechmann
+//  Copyright (C) 2004, 2006  Tim Blechmann
 //  
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,26 +23,23 @@
 #include "chaos.hpp"
 #include <map>
 
-#define MAXDIMENSION 5 // this should be enough for the first 
-
+template <int dimensions>
 class chaos_base
 {
 public:
-	chaos_base(int n):
-		m_num_eq(n)
+	chaos_base()
 	{
-		m_data = new data_t[n];
 	}
 
-		
 	inline t_sample get_data(unsigned int i)
 	{
+        assert(i<dimensions);
 		return (t_sample)m_data[i]; /* this is not save, but fast */
 	}
 
 	inline int get_num_eq() const
 	{
-		return m_num_eq;
+		return dimensions;
 	}
 
 	inline void m_perform()
@@ -53,16 +50,15 @@ public:
 	}
 
  	std::map<const t_symbol*,int> attr_ind;
-	//	TableAnyMap attr_ind; /* thomas fragen :-) */
 	
 	// check the integrity of the system
-	virtual void m_verify() 
+	inline void m_verify() 
 	{
 	}
 	
 	inline void m_bash_denormals()
 	{
-		for (int i = 0; i != get_num_eq(); ++i)
+		for (int i = 0; i != dimensions; ++i)
 		{
 #ifndef DOUBLE_PRECISION
 			if (PD_BIGORSMALL(m_data[i]))
@@ -71,28 +67,13 @@ public:
 		}
 	};
 	
-	data_t * m_data;  // state of the system
+	data_t m_data[dimensions];  // state of the system
 
 protected:
-	virtual void m_step() = 0;    // iteration
-	const int m_num_eq;                 // number of equations of the system
+	virtual void m_step() = 0;            // iteration
  	flext::AtomList Parameter;    // parameter
  	flext::AtomList System;       // system
 };
-
-#define CHAOS_CALLBACKS							\
-public:											\
-void get_dimension(int &i)						\
-{												\
-	i = m_system->get_num_eq();					\
-}												\
-FLEXT_CALLGET_I(get_dimension);
-
-
-#define CHAOS_ATTRIBUTES						\
-FLEXT_ADDATTR_GET("dimension",get_dimension);
-
-
 
 #define __chaos_base_hpp
 #endif /* __chaos_base_hpp */

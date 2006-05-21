@@ -23,26 +23,18 @@
 
 #include "chaos_base.hpp"
 
+template <int dimensions>
 class map_base
-	: public chaos_base
+	: public chaos_base<dimensions>
 {
 protected:
-	map_base(int n):
-		chaos_base(n)
-	{
-	}
-		
 	virtual void m_step()
 	{
 	}
 };
 
-#define MAP_CALLBACKS							\
-CHAOS_CALLBACKS
-
-
-#define MAP_ATTRIBUTES 							\
-CHAOS_ATTRIBUTES;
+#define MAP_CALLBACKS
+#define MAP_ATTRIBUTES
 
 #define __map_base_hpp
 #endif /* __map_base_hpp */

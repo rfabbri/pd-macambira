@@ -32,11 +32,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class ikeda_laser_map:
-	public map_base
+	public map_base<1>
 {
 public:
-	ikeda_laser_map():
-		map_base(1)
+	ikeda_laser_map()
 	{
 		CHAOS_PAR_INIT(c1,0.4);
 		CHAOS_PAR_INIT(c2,0.9);
@@ -45,10 +44,6 @@ public:
 
 		CHAOS_SYS_INIT(x,0.5,0);
 		CHAOS_SYS_INIT(y,0.5,1);
-	}
-
-	~ikeda_laser_map()
-	{
 	}
 
 	virtual void m_step()

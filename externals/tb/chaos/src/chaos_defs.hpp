@@ -100,11 +100,11 @@ data_t m_##NAME;
 public:											\
 void get_##NAME(t_float &f)						\
 {												\
-	f = m_system->get_##NAME();					\
+	f = m_system.get_##NAME();					\
 }												\
 void set_##NAME(t_float &f)						\
 {												\
-	m_system->set_##NAME(f);					\
+	m_system.set_##NAME(f);					\
 }												\
 FLEXT_CALLVAR_F(get_##NAME, set_##NAME);
 
@@ -113,11 +113,11 @@ FLEXT_CALLVAR_F(get_##NAME, set_##NAME);
 public:											\
 void get_##NAME(int &i)							\
 {												\
-	i = m_system->get_##NAME();					\
+	i = m_system.get_##NAME();					\
 }												\
 void set_##NAME(int &i)							\
 {												\
-	m_system->set_##NAME(i);					\
+	m_system.set_##NAME(i);					\
 }												\
 FLEXT_CALLVAR_I(get_##NAME, set_##NAME);
 

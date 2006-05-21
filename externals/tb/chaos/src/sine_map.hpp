@@ -26,12 +26,11 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class sine_map:
-	public map_base
+	public map_base<1>
 {
 	
 public:
-	sine_map():
-		map_base(1)
+	sine_map()
 	{
 		CHAOS_SYS_INIT(x,0,0);
 	}

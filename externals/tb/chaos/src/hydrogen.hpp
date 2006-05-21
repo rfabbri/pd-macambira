@@ -24,13 +24,12 @@
 // hydrogen atom in a magnetic field
 
 class hydrogen
-	: public ode_base
+	: public ode_base<4>
 {
 
 
 public:
-	hydrogen():
-		ode_base(4)
+	hydrogen()
 	{
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.01);
@@ -45,9 +44,6 @@ public:
 		reset = 0;
 	}
 	
-	~hydrogen()
-	{
-	}
 
 	virtual void m_system(data_t* deriv, data_t* data)
 	{

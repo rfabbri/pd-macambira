@@ -23,45 +23,27 @@
 
 #include "chaos_base.hpp"
 
-class ode_base
-	: public chaos_base
+template <int dimensions>
+class ode_base:
+    public chaos_base<dimensions>
 {
 public:
-	ode_base(int n):
-		chaos_base (n)
-	{
-		for (int i = 0; i != 3; ++i)
-		{
-			m_k[i] = new data_t[n];
-		}
-		m_tmp = new data_t[n];
 
-	}
-
-	~ode_base()
-	{
-		for (int i = 0; i != 3; ++i)
-		{
-			delete[] m_k[i];
-		}
-		delete[] m_tmp;
-	}
-	
 	void set_method(int i)
 	{
-		if (i >=0 && i <4)
+		if (i >= 0 && i < 4)
 		{
 			m_method = (unsigned char) i;
 			switch (i)
 			{
 			case 0:
-				m_routine = &ode_base::rk1;
+				m_routine = &ode_base<dimensions>::rk1;
 				break;
 			case 1:
-				m_routine = &ode_base::rk2;
+				m_routine = &ode_base<dimensions>::rk2;
 				break;
 			case 2:
-				m_routine = &ode_base::rk4;
+				m_routine = &ode_base<dimensions>::rk4;
 			}
 		}
 		else
@@ -86,27 +68,75 @@ public:
 	}
 	
 protected:
- 	void (ode_base::*m_routine)(void);
+ 	void (ode_base<dimensions>::*m_routine)(void);
 
 	unsigned char m_method; /* 0: rk1, 1: rk2, 3: rk4 */
 
-	data_t* m_k[3];         /* temporary arrays for runge kutta */
-	data_t* m_tmp;   
+    data_t m_k0[dimensions];
+    data_t m_k1[dimensions];
+    data_t m_k2[dimensions];
+    data_t m_k3[dimensions];
+	data_t m_tmp[dimensions];
+//    data_t m_tmp[dimensions];     
 
 	virtual void m_system (data_t* deriv, data_t* data) = 0;
 
-	void rk1 ();
-	void rk2 ();
-	void rk4 ();
+    void rk1()
+    {
+//        m_system (m_k0, m_data);
+//        for (int i = 0; i != dimensions; ++i)
+//            m_data[i] += m_dt * m_k0[i];
+    }
+    
+    void rk2()
+    {
+//        m_system (m_k0, m_data);
+//        for (int i = 0; i != dimensions; ++i)
+//            m_k0[i] = m_k0[i] * 0.5 * m_dt + m_data[i];
+//        
+//        m_system (m_k1, m_k0);
+//        for (int i = 0; i != dimensions; ++i)
+//            m_data[i] += m_dt * m_k1[i];
+    }
+    
+    void rk4()
+    {
+//        m_system (m_k0, m_data);
+//        for (int i = 0; i != dimensions; ++i)
+//        {
+//            m_k0[i] *= m_dt;
+//            m_tmp[i] = m_data[i] + 0.5 * m_k0[i];
+//        }
+//    
+//        m_system (m_k1, m_tmp);
+//        for (int i = 0; i != dimensions; ++i)
+//        {
+//            m_k1[i] *= m_dt;
+//            m_tmp[i] = m_data[i] + 0.5 * m_k1[i];
+//        }
+//        
+//        m_system (m_k2, m_tmp);
+//        for (int i = 0; i != dimensions; ++i)
+//        {
+//            m_k2[i] *= m_dt;
+//            m_tmp[i] = m_data[i] + m_k2[i];
+//        }
+//    
+//        m_system (m_k3, m_tmp);
+//        for (int i = 0; i != dimensions; ++i)
+//            m_k3[i] *= m_dt;
+//    
+//        for (int i = 0; i != dimensions; ++i)
+//            m_data[i] += (m_k0[i] + 2. * (m_k1[i] + m_k2[i]) + m_k3[i]) 
+//                / 6.;
+    }
 };
 
 #define ODE_CALLBACKS							\
-CHAOS_CALLBACKS;								\
 CHAOS_SYS_CALLBACKS_I(method);					\
 CHAOS_SYS_CALLBACKS(dt);
 
 #define ODE_ATTRIBUTES							\
-CHAOS_ATTRIBUTES;								\
 CHAOS_SYS_ATTRIBUTE(method);					\
 CHAOS_SYS_ATTRIBUTE(dt);
 

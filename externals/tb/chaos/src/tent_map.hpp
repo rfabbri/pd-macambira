@@ -26,19 +26,14 @@
 
 
 class tent_map:
-	public map_base
+	public map_base<1>
 {
 public:
-	tent_map():
-		map_base(1)
+	tent_map()
 	{
 		CHAOS_SYS_INIT(x, 0.6,0);
 	}
 	
-	~tent_map()
-	{
-		
-	}
 
 	virtual void m_step()
 	{

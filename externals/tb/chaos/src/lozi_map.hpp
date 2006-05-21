@@ -26,22 +26,16 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class lozi_map:
-	public map_base
+	public map_base<2>
 {
 public:
-	lozi_map():
-		map_base(2)
+	lozi_map()
 	{
 		CHAOS_SYS_INIT(x,0,0);
 		CHAOS_SYS_INIT(y,0,1);
 
 		CHAOS_PAR_INIT(a,1.4);
 		CHAOS_PAR_INIT(b,0.3);
-	}
-
-	~lozi_map()
-	{
-		
 	}
 
 	virtual void m_step()

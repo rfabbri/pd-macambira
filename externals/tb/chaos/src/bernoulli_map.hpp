@@ -25,19 +25,13 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class bernoulli:
-	public map_base
+	public map_base<1>
 {
 public:
 
-	bernoulli():
-		map_base(1)
+	bernoulli()
 	{
 		CHAOS_SYS_INIT(x,0.5,0);
-	}
-
-	~bernoulli()
-	{
-		
 	}
 
 	virtual void m_step()

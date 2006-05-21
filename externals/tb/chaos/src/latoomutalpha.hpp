@@ -27,11 +27,10 @@
 //  taken from Pickover: Chaos In Wonderland
 
 class latoomutalpha
-	: public map_base
+	: public map_base<2>
 {
 public:
-	latoomutalpha():
-		map_base(2)
+	latoomutalpha()
 	{
 		CHAOS_SYS_INIT(x1,0.5,0);
 		CHAOS_SYS_INIT(x2,0.2,1);
@@ -41,10 +40,6 @@ public:
 		CHAOS_PAR_INIT(c,0.765145);
 	}
 	
-	~latoomutalpha()
-	{
-		
-	}
 
 	virtual void m_step()
 	{

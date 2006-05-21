@@ -27,11 +27,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class circle_map:
-	public map_base
+	public map_base<1>
 {
 public:
 	circle_map()
-		: map_base(1)
 	{
 		CHAOS_SYS_INIT(x, 0.4,0);
 
@@ -39,10 +38,6 @@ public:
 		CHAOS_PAR_INIT(r, 3);
 	}
 
-	~circle_map()
-	{
-		
-	}
 
 	virtual void m_step()
 	{

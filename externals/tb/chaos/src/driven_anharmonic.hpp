@@ -29,11 +29,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class driven_anharmonic
-	: public ode_base
+	: public ode_base<2>
 {
 public:
-	driven_anharmonic():
-		ode_base(2)
+	driven_anharmonic()
 	{
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.01);
@@ -50,10 +49,7 @@ public:
 
 		m_t = 0;
 	}
-	
-	~driven_anharmonic()
-	{
-	}
+
 
 	virtual void m_system(data_t* deriv, data_t* data)
 	{

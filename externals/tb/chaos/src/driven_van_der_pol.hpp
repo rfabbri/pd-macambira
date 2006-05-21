@@ -30,11 +30,10 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class driven_van_der_pol
-	: public ode_base
+	: public ode_base<3>
 {
 public:
-	driven_van_der_pol():
-		ode_base(3)
+	driven_van_der_pol()
 	{
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.01);
@@ -48,9 +47,7 @@ public:
 		CHAOS_PAR_INIT(k,5);
 	}
 	
-	~driven_van_der_pol()
-	{
-	}
+
 
 	virtual void m_system(data_t* deriv, data_t* data)
 	{

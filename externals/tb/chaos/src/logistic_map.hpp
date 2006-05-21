@@ -25,11 +25,10 @@
 //                0 <= alpha <= 4
 
 class logistic:
-	public map_base
+	public map_base<1>
 {
 public:
-	logistic():
-		map_base(1)
+	logistic()
 	{
 		CHAOS_PAR_INIT(alpha, 3.8);
 		CHAOS_SYS_INIT(x, 0.5,0);

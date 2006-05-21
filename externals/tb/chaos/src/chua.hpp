@@ -31,11 +31,10 @@
 //  taken from Viktor Avrutin: lecture notes
 
 class chua:
-	public ode_base
+	public ode_base<3>
 {
 public:
-	chua():
-		ode_base(3)
+	chua()
 	{
 		CHAOS_PAR_INIT(method,2);
 		CHAOS_PAR_INIT(dt,0.05);
@@ -48,10 +47,6 @@ public:
 		CHAOS_PAR_INIT(b,30);
 		CHAOS_PAR_INIT(alpha,30);
 		CHAOS_PAR_INIT(beta,30);
-	}
-
-	~chua()
-	{
 	}
 
 	virtual void m_system(data_t* deriv, data_t* data)

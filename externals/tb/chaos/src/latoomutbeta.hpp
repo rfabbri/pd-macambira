@@ -27,11 +27,10 @@
 //  taken from Pickover: Chaos In Wonderland
 
 class latoomutbeta
-	: public map_base
+	: public map_base<2>
 {
 public:
-	latoomutbeta():
-		map_base(2)
+	latoomutbeta()
 	{
 		CHAOS_SYS_INIT(x1,0.5,0);
 		CHAOS_SYS_INIT(x2,0.5,1);
@@ -40,11 +39,6 @@ public:
 		CHAOS_PAR_INIT(b,2.879879);
 	}
 	
-	~latoomutbeta()
-	{
-		
-	}
-
 	virtual void m_step()
 	{
 		data_t x1 = m_data[0], x2 = m_data[1];

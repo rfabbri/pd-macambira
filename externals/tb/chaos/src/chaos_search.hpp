@@ -20,6 +20,8 @@
 
 #include "chaos_base.hpp"
 
+#define MAXDIMENSION 5
+
 template <class system> class chaos_search
 	: public flext_base
 {
@@ -28,7 +30,7 @@ template <class system> class chaos_search
 public:
 
 	/* local data for system, output and interpolation */
-	system * m_system; /* the system */
+	system m_system; /* the system */
 	
 
  	data_t min[MAXDIMENSION];      /* minimal coordinates */
@@ -75,11 +77,11 @@ public:
 		   - send lyapunov exponent to 4
 		*/
 		
-		for (std::map<const t_symbol*,int>::iterator it = m_system->attr_ind.begin();
-			 it != m_system->attr_ind.end(); ++it)
+		for (std::map<const t_symbol*,int>::iterator it = m_system.attr_ind.begin();
+			 it != m_system.attr_ind.end(); ++it)
 		{
 			post("key %s", it->first->s_name);
-			post("value %f", m_system->get_data(it->second));
+			post("value %f", m_system.get_data(it->second));
 		}
 	}	
 	
@@ -99,9 +101,7 @@ FLEXT_HEADER(SYSTEM##_search, chaos_search<SYSTEM>)					\
 																	\
 SYSTEM##_search(int argc, t_atom* argv )							\
 {																	\
-	m_system = new SYSTEM;											\
-																	\
-	int size = m_system->get_num_eq();								\
+	int size = m_system.get_num_eq();								\
 																	\
 																	\
     m_asymptotic_steps = 10000; 									\
@@ -119,10 +119,6 @@ SYSTEM##_search(int argc, t_atom* argv )							\
     FLEXT_ADDMETHOD_(0,"search", m_search);							\
 }																	\
 																	\
-~SYSTEM##_search()													\
-{																	\
-	delete m_system;												\
-}																	\
 																	\
 FLEXT_ATTRVAR_I(m_transient_steps);									\
 FLEXT_ATTRVAR_I(m_asymptotic_steps);
@@ -132,7 +128,7 @@ FLEXT_ATTRVAR_I(m_asymptotic_steps);
 template <class system> 
 void chaos_search<system>::m_search()
 {
-	int dimensions = m_system->get_num_eq();
+	int dimensions = m_system.get_num_eq();
 	
 	ly = 0;
 	data_t diff_old = 0.1;
@@ -141,12 +137,12 @@ void chaos_search<system>::m_search()
 	/* transient dynamics */
 	for (int i = 0; i != m_transient_steps; ++i)
 	{
-		m_system->m_perform();
+		m_system.m_perform();
 	}
 
 	for (int i = 0; i != dimensions; ++i)
 	{
-		last[i] = min[i] = max[i] = m_system->m_data[i];
+		last[i] = min[i] = max[i] = m_system.m_data[i];
 	}
 	
 	/* now we start the analysis */
@@ -154,13 +150,13 @@ void chaos_search<system>::m_search()
 	for (int i = 0; i != m_asymptotic_steps; ++i)
 	{
 		
-		m_system->m_perform();
+		m_system.m_perform();
 		
 		data_t diff = 0;
 		for (int j = 0; j != dimensions; ++j)
 		{
 			/* update min/max */
-			data_t datum = m_system->m_data[j];
+			data_t datum = m_system.m_data[j];
 			if (datum > max[j])
 				max[j] = datum;
 			else if (datum < min[j])

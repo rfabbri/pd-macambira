@@ -28,19 +28,14 @@
 //  taken from Willi-Hans Steeb: Chaos and Fractals
 
 class gauss_map:
-	public map_base
+	public map_base<1>
 {
 public:
-	gauss_map():
-		map_base(1)
+	gauss_map()
 	{
 		CHAOS_SYS_INIT(x,0.5, 0);
 	}
 
-	~gauss_map()
-	{
-		
-	}
 
 	virtual void m_step()
 	{

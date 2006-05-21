@@ -25,11 +25,10 @@
 //  taken from Julien C. Sprott, Chaos and Time-Series Analysis
 
 class linear_congruental:
-	public map_base
+	public map_base<2>
 {
 public:
-	linear_congruental():
-		map_base(1)
+	linear_congruental()
 	{
 		CHAOS_SYS_INIT(x, 0, 0);
 		

@@ -27,22 +27,16 @@
 //  taken from Pickover: Chaos In Wonderland
 
 class latoomutgamma
-	: public map_base
+	: public map_base<2>
 {
 public:
-	latoomutgamma():
-		map_base(2)
+	latoomutgamma()
 	{
 		CHAOS_SYS_INIT(x1,0.5,0);
 		CHAOS_SYS_INIT(x2,0.5,1);
 		
 		CHAOS_PAR_INIT(a,-0.966918);
 		CHAOS_PAR_INIT(b,2.879879);
-	}
-	
-	~latoomutgamma()
-	{
-		
 	}
 
 	virtual void m_step()
@@ -59,7 +53,7 @@ public:
 
 
 	/* function has a fix point for x1 == x2 == 0 */
-	virtual void m_verify() 
+	void m_verify() 
 	{
 		if (m_data[0] == 0 && m_data[1] == 0)
 			for (int i = 0; i != 2; ++i)

@@ -26,11 +26,10 @@
 // taken from E. Atlee Jackson: Perspective of nonlinear dynamics (Vol. 2)
 
 class delayed_logistic:
-	public map_base
+	public map_base<1>
 {
 public:
-	delayed_logistic():
-		map_base(1)
+	delayed_logistic()
 	{
 		CHAOS_SYS_INIT(x, 0.5, 0);
 		CHAOS_PAR_INIT(alpha, 3.8);
@@ -38,10 +37,7 @@ public:
 		m_delayed = get_x(); /* the initial state of the delay */
 	}
 
-	~delayed_logistic()
-	{
-		
-	}
+
 
 	virtual void m_step()
 	{

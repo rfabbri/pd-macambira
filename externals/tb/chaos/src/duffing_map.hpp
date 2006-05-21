@@ -26,11 +26,10 @@
 //  taken from Viktor Avrutin: AnT-Demos-4.669
 
 class duffing_map:
-	public map_base
+	public map_base<2>
 {
 public:
-	duffing_map():
-		map_base(2)
+	duffing_map()
 	{
 		CHAOS_SYS_INIT(x1, 0.5, 0);
 		CHAOS_SYS_INIT(x2, 0.5, 1);
@@ -38,10 +37,7 @@ public:
 		CHAOS_PAR_INIT(b, 0.5);
 	}
 
-	~duffing_map()
-	{
-		
-	}
+
 
 	virtual void m_step()
 	{

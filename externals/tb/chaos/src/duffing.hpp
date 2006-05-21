@@ -26,11 +26,10 @@
 
 
 class duffing:
-	public ode_base
+	public ode_base<2>
 {
 public:
-	duffing():
-		ode_base(2)
+	duffing()
 	{
 		CHAOS_PAR_INIT(method,0);
 		CHAOS_PAR_INIT(dt,0.01);
@@ -45,9 +44,6 @@ public:
 		t = 0;
 	}
 
-	~duffing()
-	{
-	}
 
 	virtual void m_system(data_t* deriv, data_t* data)
 	{
