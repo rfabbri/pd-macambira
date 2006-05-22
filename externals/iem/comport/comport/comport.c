@@ -62,6 +62,8 @@ typedef struct comport
 
   int verbose;
 
+	t_outlet *x_data_outlet;
+	t_outlet *x_status_outlet;
 } t_comport;
 
 #ifndef TRUE
@@ -406,7 +408,9 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 	  return INVALID_HANDLE_VALUE;	
   };
 
-  
+// this causes a segfault... WHY?!?
+//  outlet_float(x->x_status_outlet, (t_float)com_num);
+
   return fd;
 }
 
@@ -414,18 +418,22 @@ static HANDLE close_serial(t_comport *x)
 {
   if(x->comhandle != INVALID_HANDLE_VALUE){
 
-    if (!SetCommState(x->comhandle, &(x->dcb_old)) )
+	  if (!SetCommState(x->comhandle, &(x->dcb_old)) )
       {
-	post("** ERROR ** could not reset params to DCB of device %s\n",
-	     x->serial_device->s_name);
+		  post("[comport] ** ERROR ** could not reset params to DCB of device %s\n",
+			   x->serial_device->s_name);
       }
-
-    if (!SetCommTimeouts(x->comhandle, &(x->old_timeouts))){
-      post("Couldnt reset old_timeouts for serial device");
-    };
-    CloseHandle(x->comhandle); 
+	  
+	  if (!SetCommTimeouts(x->comhandle, &(x->old_timeouts))){
+		  post("[comport] Couldnt reset old_timeouts for serial device");
+	  };
+	  CloseHandle(x->comhandle); 
+// for some reason, this causes a segfault...
+//	  post("[comport] closed %s",x->serial_device->s_name);
   }
-
+// this causes a segfault... WHY?!?
+//  outlet_float(x->x_status_outlet, 0);
+  
   return INVALID_HANDLE_VALUE;
 }
 
@@ -557,44 +565,48 @@ static int open_serial(unsigned int com_num, t_comport *x)
   float *baud = &(x->baud);
   glob_t glob_buffer;
 
-  if(com_num >= COMPORT_MAX) {
-	  post("[comport] ** WARNING ** port %d not valid, must be between 0 and %d",
-		   com_num, COMPORT_MAX - 1);
-	  return INVALID_HANDLE_VALUE;
-  }
+/* if com_num == 9999, use device name directly, else try port # */
+  if(com_num != 9999)
+  {  
+	  if(com_num >= COMPORT_MAX) 
+	  {
+		  post("[comport] ** WARNING ** port %d not valid, must be between 0 and %d",
+			   com_num, COMPORT_MAX - 1);
+		  return INVALID_HANDLE_VALUE;
+	  }
 //  post("[comport] globbing %s",x->serial_device_name);
-  /* get the device path based on the com# and the glob pattern */
-  switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
-  {
-  case GLOB_NOSPACE: 
-	  error("[comport] out of memory for \"%s\"",x->serial_device_name); 
+	  /* get the device path based on the port# and the glob pattern */
+	  switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
+	  {
+	  case GLOB_NOSPACE: 
+		  error("[comport] out of memory for \"%s\"",x->serial_device_name); 
 		  break;
-  case GLOB_ABORTED: 
-	  error("[comport] aborted \"%s\"",x->serial_device_name); 
+	  case GLOB_ABORTED: 
+		  error("[comport] aborted \"%s\"",x->serial_device_name); 
 		  break;
-  case GLOB_NOMATCH: 
-	  error("[comport] no serial devices found for \"%s\"",x->serial_device_name); 
-	  break;
+	  case GLOB_NOMATCH: 
+		  error("[comport] no serial devices found for \"%s\"",x->serial_device_name); 
+		  break;
+	  }
+	  if(com_num < glob_buffer.gl_pathc)
+	  {
+		  x->serial_device = gensym(glob_buffer.gl_pathv[com_num]);
+	  }
+	  else
+	  {
+		  post("[comport] ** WARNING ** port #%d does not exist! (max == %d)",
+			   com_num,glob_buffer.gl_pathc - 1);
+		  return INVALID_HANDLE_VALUE;
+	  }
+	  globfree( &(glob_buffer) );
   }
-  if(com_num < glob_buffer.gl_pathc)
+  if((fd = open(x->serial_device->s_name, OPENPARAMS)) == INVALID_HANDLE_VALUE)
   {
-	  x->serial_device = gensym(glob_buffer.gl_pathv[com_num]);
-  }
-  else
-  {
-	  post("[comport] ** WARNING ** port #%d does not exist! (max == %d)",
-		   com_num,glob_buffer.gl_pathc - 1);
+	  error("[comport] ** ERROR ** could not open device %s:\n failure(%d): %s\n",
+			x->serial_device->s_name,errno,strerror(errno));
 	  return INVALID_HANDLE_VALUE;
   }
-  globfree( &(glob_buffer) );
-
-  if((fd = open(x->serial_device->s_name, OPENPARAMS)) == INVALID_HANDLE_VALUE)
-    {
-		error("[comport] ** ERROR ** could not open device %s:\n failure(%d): %s\n",
-			  x->serial_device->s_name,errno,strerror(errno));
-		return INVALID_HANDLE_VALUE;
-    }
-
+  
   /* set no wait on any operation */
   fcntl(fd, F_SETFL, FNDELAY);
   
@@ -640,6 +652,8 @@ static int open_serial(unsigned int com_num, t_comport *x)
 	 {
 		 post("[comport] opened serial line device %d (%s)\n",
 			  com_num,x->serial_device->s_name);
+// this causes a segfault... WHY?!?
+//		 outlet_float(x->x_status_outlet, (t_float)com_num);
 	 }
   else 
 	 {
@@ -655,14 +669,18 @@ static int open_serial(unsigned int com_num, t_comport *x)
 
 static int close_serial(t_comport *x)
 {
-  struct termios *tios = &(x->com_termio);
-  HANDLE fd = x->comhandle;
+	struct termios *tios = &(x->com_termio);
+	HANDLE fd = x->comhandle;
 
-   if(fd != INVALID_HANDLE_VALUE){
-    tcsetattr(fd, TCSANOW, tios);
-    close(fd);
-   }
-   return INVALID_HANDLE_VALUE;
+	if(fd != INVALID_HANDLE_VALUE){
+		tcsetattr(fd, TCSANOW, tios);
+		close(fd);
+// for some reason, this causes a segfault...
+//		post("[comport] closed %s",x->serial_device->s_name);
+// this causes a segfault... WHY?!?
+//		outlet_float(x->x_status_outlet, 0);
+	}
+	return INVALID_HANDLE_VALUE;
 }
 
 
@@ -724,7 +742,7 @@ static void comport_tick(t_comport *x)
 	  {	
 	    for(dwX=0;dwX<dwRead;dwX++)
 	      {
-		outlet_float(x->x_obj.ob_outlet, (t_float) serial_byte[dwX]);
+		outlet_float(x->x_data_outlet, (t_float) serial_byte[dwX]);
 	      }
 	  }
       }
@@ -746,7 +764,7 @@ static void comport_tick(t_comport *x)
       err = read(fd,(char *) &serial_byte,1); 
 
       /*  while(    (err = read(fd,(char *) &serial_byte,1)) > 0){ */
-      outlet_float(x->x_obj.ob_outlet, (t_float) serial_byte);
+      outlet_float(x->x_data_outlet, (t_float) serial_byte);
 
     };
   }
@@ -823,7 +841,9 @@ static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 
   x->rxerrors = 0;             /* holds the rx line errors */
 
-  outlet_new(&x->x_obj, &s_float);
+  x->x_data_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_float);
+// for some unknown reason, outputting on this outlet causes segfaults...
+//  x->x_status_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_float);
 
   x->x_hit = 0;
   x->x_deltime = 1;
@@ -946,7 +966,6 @@ static void comport_open(t_comport *x, t_floatarg f)
   if(x->comhandle != INVALID_HANDLE_VALUE)
     comport_close(x);
 
-
   x->comhandle = open_serial(f,x);
 
   clock_delay(x->x_clock, x->x_deltime);
@@ -959,14 +978,8 @@ static void comport_open(t_comport *x, t_floatarg f)
 
 static void comport_devicename(t_comport *x, t_symbol *s)
 {
-  if(x->comport >= 0 && x->comport < COMPORT_MAX){
-    x->serial_device->s_name = s->s_name;   
-    if(x->verbose > 0)
-        post("[comport] %d: set devicename %s",x->comport,x->serial_device->s_name);
-  }
-  else if(x->verbose > 0)
-     post("[comport] %d: could not set devicename %s",x->comport,s->s_name);
-
+	x->serial_device = s;   
+	x->comhandle = open_serial(9999,x);
 }
 
 static void comport_print(t_comport *x, t_symbol *s, int argc, t_atom *argv)
@@ -1051,7 +1064,7 @@ void comport_setup(void)
   null_tv.tv_usec = 0;
 #endif /* NOT _WIN32 */
   post("comport - PD external for unix/windows\n"
-       "LGPL 1998-2005,  Winfried Ritsch and others (see LICENCE.txt)\n"
+       "LGPL 1998-2006,  Winfried Ritsch and others (see LICENCE.txt)\n"
        "Institute for Electronic Music - Graz");
 }
 
