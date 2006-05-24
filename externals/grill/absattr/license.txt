@@ -1,5 +1,5 @@
-pdattr - patcher attributes
-Copyright (C) 2005 Thomas Grill
+absattr - patcher attributes
+Copyright (C) 2005-2006 Thomas Grill
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

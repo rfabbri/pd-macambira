@@ -1,6 +1,6 @@
 absattr - patcher attributes
 
-Copyright (c)2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2005-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -41,6 +41,10 @@ bash ../flext/build.sh
 ----------------------------------------------------------------------------
 
 Version history:
+
+0.2.0:
+- added loadbang prioritization
+
 
 0.1.0:
 - first public version

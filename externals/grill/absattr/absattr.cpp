@@ -2,13 +2,13 @@
 
 absattr - patcher attributes
 
-Copyright (c) 2002-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
 */
 
-#define VERSION "0.1.0"
+#define VERSION "0.2.0"
 
 #include <flext.h>
 
@@ -17,6 +17,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #endif
 
 #include <map>
+#include <set>
 
 class absattr
     : public flext_base
@@ -25,7 +26,8 @@ class absattr
 
 public:
     absattr(int argc,const t_atom *argv)
-//        : loadbang(lb)
+          : parent(0),prior(0)
+          , loadbang(true)
     {
         AddInAnything("bang/get/set");
         AddInAnything("external attribute messages");
@@ -34,23 +36,42 @@ public:
         AddOutAnything("external attribute outlet");
 
 		// process default values (only attributes can have default values)
-		Process(argc,argv);
+		Process(argc,argv,false);
 
 		// process canvas arguments
         AtomListStatic<20> args;
         GetCanvasArgs(args);
-        Process(args.Count(),args.Atoms());
+        Process(args.Count(),args.Atoms(),true);
+
+        // add to loadbang registry
+        Objects &o = loadbangs[parent].obj;
+        o.insert(this);
+    }
+
+    ~absattr()
+    {
+        // remove from loadbang registry
+        Loadbangs::iterator it = loadbangs.find(parent);
+        if(it != loadbangs.end()) {
+            Objects &o = it->second.obj;
+            for(Objects::iterator oit = o.begin(); oit != o.end(); ++oit) {
+                if(*oit == this) {
+                    // found
+                    o.erase(oit);
+                    break;
+                }
+            }
+            FLEXT_ASSERT(oit != o.end());
+            if(o.empty()) loadbangs.erase(it);
+        }
+        else
+            error("%s - not found in loadbang registry");
     }
 
     //! dump parameters
-    void m_bang()
-    {
-        ToOutList(0,args);
-        for(AttrMap::const_iterator it = attrs.begin(); it != attrs.end(); ++it) {
-            const AtomList &lst = it->second;
-            ToOutAnything(1,it->first,lst.Count(),lst.Atoms());
-        }
-    }
+    void m_bang() { BangAttr(0); }
+
+    void m_bangx() { BangAttr(1); }
 
     void m_dump() { DumpAttr(0); }
 
@@ -75,11 +96,66 @@ protected:
 
     typedef std::map<const t_symbol *,AtomList> AttrMap;
 
-//    bool loadbang;
+    int parent;  // don't change after inserting into registry
+    float prior; // don't change after inserting into registry
+    bool loadbang;
+
     AtomList args;
     AttrMap attrs;  
 
-//    virtual void CbLoadbang() { if(loadbang) m_bang(); }
+    class Compare
+    {
+    public:
+        bool operator()(const absattr *a,const absattr *b) const { return a->prior == b->prior?a < b:a->prior < b->prior; }
+    };
+
+    typedef std::set<absattr *,Compare> Objects;
+
+    struct Loadbang 
+    {
+        double lasttime;
+        Objects obj;
+    };
+
+    typedef std::map<int,Loadbang> Loadbangs;
+
+    static Loadbangs loadbangs;
+
+    virtual void CbLoadbang() 
+    { 
+        // all loadbangs have the same logical time
+    	double time = GetTime();
+
+        Loadbangs::iterator it = loadbangs.find(parent);
+        if(it != loadbangs.end()) {
+            Loadbang &lb = it->second;
+            // found
+            if(lb.lasttime < time) {
+                // bang all objects with the same parent in the prioritized order
+                for(Objects::iterator oit = lb.obj.begin(); oit != lb.obj.end(); ++oit) {
+                    absattr *o = *oit;
+                    FLEXT_ASSERT(o);
+                    if(o->loadbang) o->m_bang();
+                }
+
+                // set timestamp
+                lb.lasttime = time;
+            }
+        }
+        else
+            error("%s - not found in database");
+    }
+
+    void BangAttr(int ix)
+    {
+        if(ix == 0)
+            ToOutList(ix,args);
+
+        for(AttrMap::const_iterator it = attrs.begin(); it != attrs.end(); ++it) {
+            const AtomList &lst = it->second;
+            ToOutAnything(1+ix,it->first,lst.Count(),lst.Atoms());
+        }
+    }
 
     void DumpAttr(int ix)
     {
@@ -116,10 +192,9 @@ protected:
 
     static bool IsAttr(const t_atom &at) { return IsSymbol(at) && *GetString(at) == '@'; }
 
-    void Process(int argc,const t_atom *argv)
+    void Process(int argc,const t_atom *argv,bool ext)
     {
-        int cnt;
-        for(cnt = 0; cnt < argc && !IsAttr(argv[cnt]); ++cnt) {}
+        int cnt = CheckAttrib(argc,argv);
 
         args.Set(cnt,argv,0,true);
         argc -= cnt,argv += cnt;
@@ -129,11 +204,28 @@ protected:
             const t_symbol *attr = MakeSymbol(GetString(*argv)+1);
             --argc,++argv;
 
-            for(cnt = 0; cnt < argc && !IsAttr(argv[cnt]); ++cnt) {}
-
+            cnt = CheckAttrib(argc,argv);
             if(cnt) {
-                AtomList &lst = attrs[attr];
-                lst.Set(cnt,argv,0,true);
+                if(attr == sym_loadbang) {
+                    if(ext) {
+                        if(cnt == 2 && CanbeInt(argv[0]) && CanbeFloat(argv[1])) {
+                            parent = GetAInt(argv[0]);
+                            prior = GetAFloat(argv[1]);
+                        }
+                        else
+                            post("%s - expected: @loadbang [parent-id ($0)] priority",thisName());
+                    }
+                    else {
+                        if(cnt == 1 && CanbeBool(*argv))
+                            loadbang = GetABool(*argv);
+                        else
+                            post("%s - expected: @loadbang 0/1",thisName());
+                    }
+                }
+                else {
+                    AtomList &lst = attrs[attr];
+                    lst.Set(cnt,argv,0,true);
+                }
                 argc -= cnt,argv += cnt;
             }
             else
@@ -144,10 +236,12 @@ protected:
 private:
 
     static const t_symbol *sym_attributes;
+    static const t_symbol *sym_loadbang;
 
     FLEXT_CALLBACK(m_bang);
     FLEXT_CALLBACK_S(m_get);
     FLEXT_CALLBACK(m_dump);
+    FLEXT_CALLBACK(m_bangx);
     FLEXT_CALLBACK_S(m_getx);
     FLEXT_CALLBACK(m_dumpx);
     FLEXT_CALLBACK_V(m_set);
@@ -155,11 +249,13 @@ private:
 	static void Setup(t_classid cl)
     {
         sym_attributes = MakeSymbol("attributes");
+        sym_loadbang = MakeSymbol("loadbang");
 
         FLEXT_CADDBANG(cl,0,m_bang);
         FLEXT_CADDMETHOD_(cl,0,"get",m_get);
         FLEXT_CADDMETHOD_(cl,0,"getattributes",m_dump);
         FLEXT_CADDMETHOD_(cl,0,"set",m_set);
+        FLEXT_CADDBANG(cl,1,m_bangx);
         FLEXT_CADDMETHOD_(cl,1,"get",m_getx);
         FLEXT_CADDMETHOD_(cl,1,"getattributes",m_dumpx);
         FLEXT_CADDMETHOD_(cl,1,"set",m_set);
@@ -167,6 +263,8 @@ private:
 };
 
 const t_symbol *absattr::sym_attributes;
+const t_symbol *absattr::sym_loadbang;
 
+absattr::Loadbangs absattr::loadbangs;
 
 FLEXT_NEW_V("absattr",absattr)
