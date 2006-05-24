@@ -114,7 +114,7 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_obj):
 		/*! \brief Enable/disable attribute procession (default = false)
 			\note Use that in the static class setup function (also library setup function)
 		*/
-		static void ProcessAttributes(bool attr); //{ process_attributes = attr; }
+//		static void ProcessAttributes(bool attr); //{ process_attributes = attr; }
 
 		//! Virtual function called at creation time (but after the constructor)
 		// this also guarantees that there are no instances of flext_obj
@@ -156,6 +156,7 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_obj):
 		//! Get class pointer from class id
 		static t_class *getClass(t_classid id);
 		
+        static bool HasAttributes(t_classid id);
         static bool IsDSP(t_classid id);
         static bool IsLib(t_classid id);
 
@@ -204,7 +205,7 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_obj):
         //! backpointer to object header
         mutable flext_hdr *x_obj;        	
 
-        static bool	process_attributes;
+//        static bool	process_attributes;
 
     private:
 
@@ -250,7 +251,7 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_obj):
         static bool Exiting() { return exiting; }
 
 		// Definitions for library objects
-		static void lib_init(const char *name,void setupfun(),bool attr);
+		static void lib_init(const char *name,void setupfun());
 		static void obj_add(bool lib,bool dsp,bool attr,const char *idname,const char *names,void setupfun(t_classid),FLEXT_CLASSDEF(flext_obj) *(*newfun)(int,t_atom *),void (*freefun)(flext_hdr *),int argtp1,...);
 #if FLEXT_SYS == FLEXT_SYS_MAX
 		static flext_hdr *obj_new(const t_symbol *s,short argc,t_atom *argv);
@@ -307,25 +308,27 @@ class FLEXT_SHARE FLEXT_CLASSDEF(flext_obj):
 #define FLEXT_REALHDR(NEW_CLASS, PARENT_CLASS)    	    	\
 public:     	    	    \
 typedef NEW_CLASS thisType;  \
+typedef PARENT_CLASS thisParent;  \
 static FLEXT_CLASSDEF(flext_obj) *__init__(int argc,t_atom *argv);  \
 static void __free__(flext_hdr *hdr) {  	    	    	\
 	FLEXT_CLASSDEF(flext_obj) *mydata = hdr->data; delete mydata; \
 	hdr->flext_hdr::~flext_hdr(); \
 }   	    	\
-static void __setup__(t_classid classid) { PARENT_CLASS::__setup__(classid); }
+static void __setup__(t_classid classid) { thisParent::__setup__(classid); }
 
 
 #define FLEXT_REALHDR_S(NEW_CLASS, PARENT_CLASS,SETUPFUN)    	    	\
 public:     	    	    \
 typedef NEW_CLASS thisType;  \
+typedef PARENT_CLASS thisParent;  \
 static FLEXT_CLASSDEF(flext_obj) *__init__(int argc,t_atom *argv);  \
 static void __free__(flext_hdr *hdr) {  	    	    	\
 	FLEXT_CLASSDEF(flext_obj) *mydata = hdr->data; delete mydata; \
 	hdr->flext_hdr::~flext_hdr(); \
 }   	    	\
 static void __setup__(t_classid classid) { 	    	\
-	PARENT_CLASS::__setup__(classid);    	    	\
-	NEW_CLASS::SETUPFUN(classid); \
+	thisParent::__setup__(classid);    	    	\
+	thisType::SETUPFUN(classid); \
 }
 
 
@@ -349,9 +352,9 @@ static void __setup__(t_classid classid) { 	    	\
 
 // specify that to define the library itself
 #if FLEXT_SYS == FLEXT_SYS_PD
-#define REAL_LIB_SETUP(NAME,SETUPFUN) extern "C" FLEXT_EXT void NAME##_setup() { flext_obj::lib_init(#NAME,SETUPFUN,FLEXT_ATTRIBUTES); }
+#define REAL_LIB_SETUP(NAME,SETUPFUN) extern "C" FLEXT_EXT void NAME##_setup() { flext_obj::lib_init(#NAME,SETUPFUN); }
 #elif FLEXT_SYS == FLEXT_SYS_MAX
-#define REAL_LIB_SETUP(NAME,SETUPFUN) extern "C" FLEXT_EXT int main() { flext_obj::lib_init(#NAME,SETUPFUN,FLEXT_ATTRIBUTES); return 0; }
+#define REAL_LIB_SETUP(NAME,SETUPFUN) extern "C" FLEXT_EXT int main() { flext_obj::lib_init(#NAME,SETUPFUN); return 0; }
 #else
 #error Platform not supported
 #endif
