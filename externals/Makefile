@@ -38,7 +38,9 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
+DEBUG_CFLAGS = -ggdb
+
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer $(DEBUG_CFLAGS)
 
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
@@ -287,24 +289,11 @@ bsaylor_clean:
 # CREB
 CREB_NAME=creb
 # ead* are compiled separately
-CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/[a-df-z]*.c) \
-$(externals_src)/creb/modules/eblosc.c
+CREB_OBJECTS := $(wildcard $(externals_src)/creb/modules/*.c)
 # haven't figured these out yet
 #CREB_CXXOBJECTS := $(wildcard $(externals_src)/creb/modules++/*.cc)
 
-# these are built separately since they made from a number of files
-CREB_EA_OBJECTS = $(wildcard $(externals_src)/creb/modules/ea*.c)
-CREB_ENVELOPE_UTIL = $(externals_src)/creb/system/envelope_util.c
-$(CREB_OBJECTS:.c=.o):
-$(CREB_ENVELOPE_UTIL:.c=.o):
-	$(CC) $(CFLAGS) -I$(externals_src)/creb/include -o $*.o -c $*.c
-
-$(patsubst %.c,%~.$(EXTENSION),$(CREB_EA_OBJECTS)): $(CREB_ENVELOPE_UTIL:.c=.o)
-	$(CC) $(LDFLAGS) -o $*.$(EXTENSION) $(CREB_ENVELOPE_UTIL:.c=.o) $(LIBS)
-	chmod a-x $*.$(EXTENSION)
-
-creb:  $(patsubst %.c,%~.$(EXTENSION),$(CREB_EA_OBJECTS)) \
-$(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
+creb: $(CREB_OBJECTS:.c=.$(EXTENSION)) $(CREB_CXXOBJECTS:.cc=.$(EXTENSION))
 
 creb_install: creb
 	install -d $(objectsdir)/$(CREB_NAME)
@@ -606,6 +595,39 @@ hardware_clean:
 	-rm -f -- $(externals_src)/hardware/*/*.o
 	-rm -f -- $(externals_src)/hardware/*/*.bak
 	-rm -f -- $(externals_src)/hardware/*/*.*~
+
+
+#------------------------------------------------------------------------------#
+# HCS
+HCS_NAME=hcs
+HCS_OBJECTS := $(wildcard $(externals_src)/hcs/*.c)
+hcs: $(HCS_OBJECTS:.c=.$(EXTENSION))
+
+hcs_install: hcs
+	install -d $(objectsdir)/$(HCS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HCS_NAME) \
+		--author "Hans-Christoph Steiner <hans@at.or.at>" \
+		--description "" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HCS_NAME)
+	install -d $(helpdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/help/*.pd \
+		$(helpdir)/$(HCS_NAME)
+#	install -d $(manualsdir)/$(HCS_NAME)
+#	install -p $(externals_src)/hcs/manual.txt \
+#		$(manualsdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/README \
+		$(readmesdir)/$(HCS_NAME).txt
+	install -d $(examplesdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/examples/*.pd \
+		$(examplesdir)/$(HCS_NAME)
+
+hcs_clean:
+	-rm -f -- $(HCS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(HCS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/hcs/*.bak
+	-rm -f -- $(externals_src)/hcs/*.*~
 
 
 
