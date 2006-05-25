@@ -1,29 +1,31 @@
-#N canvas 218 225 905 389 10;
+#N canvas 122 138 523 408 10;
 #N canvas 0 22 450 300 graph1 0;
-#X array array99 100 float 0;
+#X array \$0-pwm~ 100 float 0;
 #X coords 0 1.1 100 -0.1 200 100 1;
-#X restore 67 250 graph;
-#X obj 92 183 metro 500;
-#X obj 92 158 r metro;
-#X text 344 90 <-- Click to start;
-#X text 233 209 <-- graph the output;
-#X text 311 301 see also:;
-#X obj 76 207 tabwrite~ array99;
-#X obj 255 48 tgl 25 0 empty empty start 0 -6 1 9 -24198 -1 -1 1 1
+#X restore 58 236 graph;
+#X obj 83 144 r metro;
+#X text 355 21 <-- Click to start;
+#X text 194 193 <-- graph the output;
+#X text 302 287 see also:;
+#X obj 311 20 tgl 25 0 empty empty start 0 -6 1 9 -24198 -1 -1 1 1
 ;
-#X msg 255 76 \; pd dsp \$1 \; metro \$1;
-#X obj 385 301 pwm;
-#X obj 79 98 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
-#X floatatom 34 98 5 0 0 0 - - -;
-#X obj 76 127 pwm~ 4410;
-#X obj 36 11 pwm~;
-#X text 79 10 after an idea from Roman Haefeli;
-#X text 158 126 argument = pwm rate in Hz;
-#X connect 1 0 6 0;
-#X connect 2 0 1 0;
-#X connect 2 0 1 0;
-#X connect 7 0 8 0;
-#X connect 10 0 11 0;
-#X connect 10 0 12 0;
-#X connect 12 0 6 0;
+#X msg 311 48 \; pd dsp \$1 \; metro \$1;
+#X obj 376 287 pwm;
+#X obj 71 66 hsl 128 15 0 1 0 1 empty empty pulse_width -2 -6 1 12
+-225280 -1 -1 5400 0;
+#X floatatom 80 88 5 0 0 0 - - -;
+#X text 139 112 argument = pwm rate in Hz;
+#X obj 67 112 pwm~ 2000;
+#X obj 83 169 metro 238.3;
+#X obj 82 372 pddp/pddplink http://en.wikipedia.org/wiki/Pulse-width_modulation
+;
+#X text 22 351 for more info:;
+#X text 16 11 pulse width modulation at audio rate;
+#X obj 67 193 tabwrite~ \$0-pwm~;
+#X connect 1 0 12 0;
+#X connect 1 0 12 0;
+#X connect 5 0 6 0;
+#X connect 8 0 9 0;
+#X connect 8 0 11 0;
+#X connect 11 0 16 0;
+#X connect 12 0 16 0;
