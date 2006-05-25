@@ -1,4 +1,4 @@
-#N canvas 68 255 513 462 10;
+#N canvas 68 255 517 466 10;
 #X msg 49 73 bang;
 #X msg 51 189 bang;
 #X obj 50 246 print blank;
@@ -32,7 +32,7 @@ is numeric \, the default will be used.;
 #X obj 204 219 symbol_argument \$1;
 #X obj 242 362 symbol_argument 44 default;
 #X text 25 21 This object can takes a symbolic atom as an argument
-and outputs either a symbol message.;
+and outputs a symbol message.;
 #X connect 0 0 20 0;
 #X connect 1 0 21 0;
 #X connect 3 0 23 0;
