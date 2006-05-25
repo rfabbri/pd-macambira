@@ -19,7 +19,7 @@
 
 #include <m_pd.h>
 #include <math.h>
-#include "../include/extlib_util.h"
+#include "extlib_util.h"
 
 /* pointer to */
 t_class *ead_class;
