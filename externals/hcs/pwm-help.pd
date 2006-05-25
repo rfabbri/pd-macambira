@@ -1,0 +1,54 @@
+#N canvas 172 95 530 434 10;
+#X text 140 148 the argument sets the frequency;
+#X obj 88 102 tgl 15 0 empty empty empty 0 -6 0 8 -24198 -1 -1 1 1
+;
+#X obj 142 96 hsl 128 15 0 1 0 0 empty empty amount -2 -6 1 12 -261681
+-1 -1 11100 1;
+#X floatatom 149 118 5 0 0 0 - - -;
+#X text 14 20 this object does Pulse Width Modulation at the message
+rate:;
+#X text 3 101 turn on/off;
+#X obj 77 397 pddp/pddplink http://en.wikipedia.org/wiki/Pulse-width_modulation
+;
+#X text 17 376 for more info:;
+#N canvas 0 0 450 300 graph1 0;
+#X array \$0-pwm 200 float 0;
+#X coords 0 1.2 199 -0.2 200 140 1;
+#X restore 284 202 graph;
+#N canvas 727 94 454 304 display 0;
+#X obj 115 35 inlet;
+#X obj 117 265 tabwrite \$0-pwm;
+#X obj 238 127 float;
+#X obj 281 127 + 1;
+#X obj 275 157 arraysize \$0-pwm;
+#X obj 250 31 inlet;
+#X obj 356 110 bang;
+#X obj 258 181 mod;
+#X obj 116 103 spigot;
+#X obj 118 239 float;
+#X obj 194 204 trigger bang float;
+#X obj 237 105 metro 3;
+#X connect 0 0 8 0;
+#X connect 2 0 7 0;
+#X connect 3 0 2 1;
+#X connect 4 0 7 1;
+#X connect 5 0 6 0;
+#X connect 5 0 8 1;
+#X connect 5 0 11 0;
+#X connect 6 0 4 0;
+#X connect 7 0 3 0;
+#X connect 7 0 10 0;
+#X connect 8 0 9 1;
+#X connect 9 0 1 0;
+#X connect 10 0 9 0;
+#X connect 10 1 1 1;
+#X connect 11 0 2 0;
+#X restore 95 310 pd display guts;
+#X obj 195 283 tgl 15 0 empty empty display 0 -6 0 8 -225271 -1 -1
+1 1;
+#X obj 96 147 pwm 10;
+#X connect 1 0 11 0;
+#X connect 2 0 3 0;
+#X connect 2 0 11 1;
+#X connect 10 0 9 1;
+#X connect 11 0 9 0;
