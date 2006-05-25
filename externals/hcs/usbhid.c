@@ -27,24 +27,34 @@
 #include <hid.h>
 #include <stdio.h>
 #include <string.h>
+#include <float.h>
 #include "m_pd.h"
+
+/* 
+ * TODO: rename read, get, set messages so they make sense
+ * TODO: make size output work well
+ */
+
+/* 
+ * BUG: for some reason it skips one of the button bits
+ */
 
 
 /*------------------------------------------------------------------------------
- *  INCLUDE HACK
+ *  INCLUDE KLUDGE
  */
 
 /* NOTE: included from libusb/usbi.h. UGLY, i know, but so is libusb! 
  * this struct doesn't seem to be defined in usb.h, only prototyped
  */
 struct usb_dev_handle {
-  int fd;
-  struct usb_bus *bus;
-  struct usb_device *device;
-  int config;
-  int interface;
-  int altsetting;
-  void *impl_info;
+	int fd;
+	struct usb_bus *bus;
+	struct usb_device *device;
+	int config;
+	int interface;
+	int altsetting;
+	void *impl_info;
 };
 
 
@@ -52,15 +62,17 @@ struct usb_dev_handle {
  *  GLOBAL VARIABLES
  */
 
-/*
- * count the number of instances of this object so that certain free()
- * functions can be called only after the final instance is detroyed.
- */
+/* count the number of instances of this object so that certain free()
+ * functions can be called only after the final instance is detroyed. */
 t_int usbhid_instance_count;
 
 #define HID_ID_MAX 32
 char *hid_id[HID_ID_MAX]; /* FIXME: 32 devices MAX */
 t_int hid_id_count;
+
+/* this array is for keeping track of whether each device has been read in
+ * each cycle */
+char usbhid_device_read_status[HID_ID_MAX];
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -71,23 +83,22 @@ typedef struct _usbhid
 	t_object            x_obj;
 /* usbhid types */
 	HIDInterface        *x_hidinterface;
-	u_int8_t            x_iSerialNumber;
 	hid_return          x_hid_return;
 /* internal state */
+	unsigned short      vendor_id;    // idVendor for current device
+	unsigned short      product_id;   // idProduct for current device
+	unsigned short      debug_level;  // control debug messages to the console
 	t_int               x_device_number;
 	t_int               x_read_element_count;
 	t_int               *x_read_elements;
 	t_int               x_write_element_count;
 	t_int               *x_write_elements;
-/* clock support */
-	t_clock             *x_clock;
-	t_int               x_delay;
-	t_int               x_started;
-/* outlets */
-	t_atom              *output;
-	t_int               output_count;
+	t_int               report_size;  // size in bytes of the HID report
+/* output */
+	t_atom              *output; // holder for a list of atoms to be outputted
+	t_int               output_count;  // number of atoms in in x->output 
 	t_outlet            *x_data_outlet;
-	t_outlet            *x_control_outlet;
+	t_outlet            *x_status_outlet;
 } t_usbhid;
 
 
@@ -97,9 +108,6 @@ typedef struct _usbhid
 
 #define USBHID_MAJOR_VERSION 0
 #define USBHID_MINOR_VERSION 0
-
-//#define DEBUG(x)
-#define DEBUG(x) x 
 
 static t_class *usbhid_class;
 
@@ -128,6 +136,22 @@ static void add_atom_to_output(t_usbhid *x, t_atom *new_atom)
 	++(x->output_count);
 }
 
+static void add_symbol_to_output(t_usbhid *x, t_symbol *s)
+{
+	t_atom *temp_atom = getbytes(sizeof(t_atom));
+	SETSYMBOL(temp_atom, s); 
+	add_atom_to_output(x,temp_atom);
+	freebytes(temp_atom,sizeof(t_atom));
+}
+		
+static void add_float_to_output(t_usbhid *x, t_float f)
+{
+	t_atom *temp_atom = getbytes(sizeof(t_atom));
+	SETFLOAT(temp_atom, f);
+	add_atom_to_output(x,temp_atom);
+	freebytes(temp_atom,sizeof(t_atom));
+}
+
 static void reset_output(t_usbhid *x)
 {
 	if(x->output)
@@ -139,12 +163,27 @@ static void reset_output(t_usbhid *x)
 }
 
 
+static t_int init_libhid(t_usbhid *x)
+{
+	if (! hid_is_initialised() )
+	{
+		x->x_hid_return = hid_init();
+		if(x->x_hid_return != HID_RET_SUCCESS)
+		{
+			error("[usbhid] hid_init failed with return code %d\n", 
+				  x->x_hid_return);
+		}
+	}
+	return(x->x_hid_return);
+}
+
+
 /* 
  * This function is used in a HIDInterfaceMatcher to iterate thru all of the
  * HID devices on the USB bus
  */
 static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom, 
-					  unsigned int length)
+							 unsigned int length)
 {
 	bool ret = false;
 	t_int i;
@@ -229,7 +268,6 @@ static bool device_iterator (struct usb_dev_handle const* usbdev, void* custom,
 /* -------------------------------------------------------------------------- */
 static t_int* make_hid_path(t_int element_count, t_int argc, t_atom *argv)
 {
-	DEBUG(post("make_hid_path"););
 	t_int i;
 	t_int *return_array = NULL;
 	
@@ -254,15 +292,15 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 	int length;
 	t_int ret = 0;
 	char buffer[STRING_BUFFER_LENGTH];
-	
+
 	if ( !hid_is_opened(hidif) ) 
 		return(0);
 
 	if (hidif->device->descriptor.iManufacturer) {
 		length = usb_get_string_simple(hidif->dev_handle,
-									hidif->device->descriptor.iManufacturer, 
-									buffer, 
-									STRING_BUFFER_LENGTH);
+									   hidif->device->descriptor.iManufacturer, 
+									   buffer, 
+									   STRING_BUFFER_LENGTH);
 		if (length > 0)
 		{
 			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
@@ -277,9 +315,9 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 	
 	if (hidif->device->descriptor.iProduct) {
 		length = usb_get_string_simple(hidif->dev_handle,
-									hidif->device->descriptor.iProduct, 
-									buffer, 
-									STRING_BUFFER_LENGTH);
+									   hidif->device->descriptor.iProduct, 
+									   buffer, 
+									   STRING_BUFFER_LENGTH);
 		if (length > 0)
 		{
 			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
@@ -294,9 +332,9 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
 
 	if (hidif->device->descriptor.iSerialNumber) {
 		length = usb_get_string_simple(hidif->dev_handle,
-									hidif->device->descriptor.iSerialNumber, 
-									buffer, 
-									STRING_BUFFER_LENGTH);
+									   hidif->device->descriptor.iSerialNumber, 
+									   buffer, 
+									   STRING_BUFFER_LENGTH);
 		if (length > 0)
 			strncat(device_string, buffer, STRING_BUFFER_LENGTH - strlen(device_string));
 		else
@@ -311,79 +349,169 @@ static t_int get_device_string(HIDInterface *hidif, char *device_string)
  * IMPLEMENTATION                    
  */
 
-/* -------------------------------------------------------------------------- */
-static void usbhid_open(t_usbhid *x, t_float vendor_id, t_float product_id)
-{
-	DEBUG(post("usbhid_open"););
-	char string_buffer[STRING_BUFFER_LENGTH];
-	
-	HIDInterfaceMatcher matcher = { (unsigned short)vendor_id, 
-									(unsigned short)product_id, 
-									NULL, 
-									NULL, 
-									0 };
 
- 	if ( !hid_is_opened(x->x_hidinterface) ) 
+/* -------------------------------------------------------------------------- */
+static void usbhid_close(t_usbhid *x) 
+{
+	if(x->debug_level) post("usbhid_close");
+	t_int ret;
+	char string_buffer[STRING_BUFFER_LENGTH];
+
+	if ( hid_is_opened(x->x_hidinterface) ) 
 	{
+		ret = get_device_string(x->x_hidinterface,string_buffer);
+		x->x_hid_return = hid_close(x->x_hidinterface);
+		if (x->x_hid_return == HID_RET_SUCCESS) 
+		{
+			if (ret) 
+				post("[usbhid]: closed %s",string_buffer);
+			else
+				post("[usbhid]: closed device");
+			reset_output(x);
+			add_float_to_output(x,0);
+			outlet_anything(x->x_status_outlet, gensym("open"), 
+							x->output_count, x->output);
+		}
+		else
+		{
+			error("[usbhid] could not close %d, error #%d",x->x_device_number,x->x_hid_return);
+		}
+	}
+}
+
+
+/* -------------------------------------------------------------------------- */
+static void usbhid_open(t_usbhid *x, t_symbol *vendor_id_hex, t_symbol *product_id_hex)
+{
+	if(x->debug_level) post("usbhid_open");
+	char string_buffer[STRING_BUFFER_LENGTH];
+
+	if( init_libhid(x) != HID_RET_SUCCESS ) return;
+
+/* convert hex symbols to ints */
+	x->vendor_id = (unsigned short) strtol(vendor_id_hex->s_name, NULL, 16);
+	x->product_id = (unsigned short) strtol(product_id_hex->s_name, NULL, 16);
+ 	if( hid_is_opened(x->x_hidinterface) ) 
+	{
+		if( (x->vendor_id == x->x_hidinterface->device->descriptor.idVendor) &&
+			(x->product_id == x->x_hidinterface->device->descriptor.idProduct))
+		{
+			post("[usbhid] device already opened");
+			return;
+		}
+		else
+		{
+			usbhid_close(x);
+		}
+	}
+
+ 	if( !hid_is_opened(x->x_hidinterface) ) 
+	{
+		HIDInterfaceMatcher matcher = { x->vendor_id, 
+										x->product_id, 
+										NULL, 
+										NULL, 
+										0 };
 		x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 3);
 		if (x->x_hid_return == HID_RET_SUCCESS) 
 		{
 			if (get_device_string(x->x_hidinterface,string_buffer))
 				post("[usbhid]: opened %s",string_buffer);
+			reset_output(x);
+			add_float_to_output(x,1);
+			outlet_anything(x->x_status_outlet, gensym("open"), 
+							x->output_count, x->output);
 		}
 		else
 		{
-			error("[usbhid] hid_force_open failed with return code %d\n", x->x_hid_return);
+			error("[usbhid] hid_force_open failed with return code %d\n", 
+				  x->x_hid_return);
 		}
 	}
 }
 
 
-
 /* -------------------------------------------------------------------------- */
-static void usbhid_read(t_usbhid *x,t_float length_arg)
+static void usbhid_set(t_usbhid *x, t_float length_arg)
 {
-	DEBUG(post("usbhid_read"););
-/* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
-//	int const PATH_OUT[3] = { 0x00010002, 0x00010001, 0x00010030 };
-	int i;
+	if(x->debug_level) post("usbhid_set");
 	int packet_bytes = (int)length_arg;
-	t_atom *temp_atom = getbytes(sizeof(t_atom));
-		
 	char packet[packet_bytes];
 
  	if ( !hid_is_opened(x->x_hidinterface) )
 	{
-//		usbhid_open(x);
+		error("[usbhid] device not open, can't set data");
+		return;
+	}
+	x->x_hid_return = hid_set_output_report(x->x_hidinterface, 
+										   x->x_write_elements, 
+										   x->x_write_element_count, 
+										   packet, 
+										   length_arg);
+	if (x->x_hid_return != HID_RET_SUCCESS) 
+	{
+		error("[usbhid] hid_get_input_report failed with return code %d\n", 
+			  x->x_hid_return);
+		reset_output(x);
+		add_float_to_output(x, x->x_hid_return);
+		outlet_anything(x->x_status_outlet, gensym("setError"), 
+						x->output_count, x->output);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+static void usbhid_get(t_usbhid *x, t_float length_arg)
+{
+	if(x->debug_level) post("usbhid_get");
+	int i;
+	int packet_bytes = (int)length_arg;
+	char packet[packet_bytes];
+
+ 	if ( !hid_is_opened(x->x_hidinterface) )
+	{
+		error("[usbhid] device not open, can't get data");
 		return;
 	}
 	x->x_hid_return = hid_get_input_report(x->x_hidinterface, 
-										   x->x_read_elements, 
+										   NULL, 
 										   x->x_read_element_count, 
 										   packet, 
 										   length_arg);
 	if (x->x_hid_return != HID_RET_SUCCESS) 
+	{
 		error("[usbhid] hid_get_input_report failed with return code %d\n", 
 			  x->x_hid_return);
+		reset_output(x);
+		add_float_to_output(x, x->x_hid_return);
+		outlet_anything(x->x_status_outlet, gensym("getError"), 
+						x->output_count, x->output);
+	}
 
 	reset_output(x);
 	for(i=0; i<packet_bytes; ++i)
-	{
-		SETFLOAT(temp_atom,packet[i]);
-		add_atom_to_output(x,temp_atom);
-	}
+		add_float_to_output(x,packet[i]);
 	outlet_list(x->x_data_outlet, &s_list, x->output_count, x->output);
-	
+	post("x->x_read_elements %d",x->x_read_elements);
 }
 
 
+/* -------------------------------------------------------------------------- */
+/* reinit libhid to get update the list of attached devices */
+static void usbhid_refresh(t_usbhid *x)
+{
+	x->x_hid_return = hid_cleanup();
+	if (x->x_hid_return != HID_RET_SUCCESS) 
+		error("[usbhid] hid_cleanup failed with return code %d\n", 
+			  x->x_hid_return);
+	if( init_libhid(x) != HID_RET_SUCCESS ) return;
+}
 
 
 /* -------------------------------------------------------------------------- */
 /* set the HID packet for which elements to read */
 static void usbhid_set_read(t_usbhid *x, int argc, t_atom *argv)
 {
-	DEBUG(post("usbhid_set_read"););
+	if(x->debug_level) post("usbhid_set_read");
 	t_int i;
 
 	x->x_read_element_count = argc / 2;
@@ -395,10 +523,13 @@ static void usbhid_set_read(t_usbhid *x, int argc, t_atom *argv)
 
 
 /* -------------------------------------------------------------------------- */
+/* convert a list to a HID packet and set it */
 /* set the HID packet for which elements to write */
-static void usbhid_set_write(t_usbhid *x, int argc, t_atom *argv)
+static void usbhid_set_descriptor(t_usbhid *x, int argc, t_atom *argv)
 {
-	DEBUG(post("usbhid_set_write"););
+	if(x->debug_level) post("usbhid_descriptor");
+/* int const PATH_IN[PATH_LENGTH] = { 0xffa00001, 0xffa00002, 0xffa10003 }; */
+//	int const PATH_OUT[3] = { 0x00010002, 0x00010001, 0x00010030 };
 	t_int i;
 
 	x->x_write_element_count = argc / 2;
@@ -411,123 +542,81 @@ static void usbhid_set_write(t_usbhid *x, int argc, t_atom *argv)
 
 
 /* -------------------------------------------------------------------------- */
-/* convert a list to a HID packet and set it */
-static void usbhid_set(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
+static void usbhid_get_descriptor(t_usbhid *x)
 {
-	DEBUG(post("usbhid_set"););
-	t_symbol *subselector;
-
-	if(argc)
-	{
-		subselector = atom_getsymbol(&argv[0]);
-		if(strcmp(subselector->s_name,"read") == 0)
-			usbhid_set_read(x,argc-1,argv+1); 
-		if(strcmp(subselector->s_name,"write") == 0)
-			usbhid_set_write(x,argc-1,argv+1);
-	}
-}
-
-
-/* -------------------------------------------------------------------------- */
-static void usbhid_get(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
-{
-	DEBUG(post("usbhid_get"););
-	t_symbol *subselector;
+	if(x->debug_level) post("usbhid_get");
 	unsigned int i = 0;
-	t_atom *temp_atom = getbytes(sizeof(t_atom));
-	
+	t_int input_size = 0;
+	t_int output_size = 0;
+	t_int feature_size = 0;
+
 	if (!hid_is_opened(x->x_hidinterface)) {
 		error("[usbget] cannot dump tree of unopened HIDinterface.");
 	}
-	else if(argc)
+	else 
 	{
-		subselector = atom_getsymbol(&argv[0]);
-		
-		if(strcmp(subselector->s_name,"read") == 0) 
-		{
-			post("[usbhid] parse tree of HIDInterface %s:\n", x->x_hidinterface->id);
-			reset_output(x);
-			while (HIDParse(x->x_hidinterface->hid_parser, x->x_hidinterface->hid_data)) {
-				switch(x->x_hidinterface->hid_data->Type)
-				{
-				case 0x80: SETSYMBOL(temp_atom, gensym("input")); break;
-				case 0x90: SETSYMBOL(temp_atom, gensym("output")); break;
-				case 0xb0: SETSYMBOL(temp_atom, gensym("feature")); break;
-				default: SETSYMBOL(temp_atom, gensym("UNKNOWN_TYPE"));
-				}
-				add_atom_to_output(x,temp_atom);
-				SETFLOAT(temp_atom, x->x_hidinterface->hid_data->Size);
-				add_atom_to_output(x,temp_atom);
-				SETFLOAT(temp_atom, x->x_hidinterface->hid_data->Offset);
-				add_atom_to_output(x,temp_atom);
-				SETSYMBOL(temp_atom, gensym("path"));
-				add_atom_to_output(x,temp_atom);
-				for (i = 0; i < x->x_hidinterface->hid_data->Path.Size; ++i) {
-					SETSYMBOL(temp_atom, gensym("usage"));
-					add_atom_to_output(x,temp_atom);
-					SETFLOAT(temp_atom, x->x_hidinterface->hid_data->Path.Node[i].UPage);
-					add_atom_to_output(x,temp_atom);
-					SETFLOAT(temp_atom, x->x_hidinterface->hid_data->Path.Node[i].Usage);
-					add_atom_to_output(x,temp_atom);
-					post("page: 0x%04x\t%d\t\tusage: 0x%04x\t%d",
-							x->x_hidinterface->hid_data->Path.Node[i].UPage,
-							x->x_hidinterface->hid_data->Path.Node[i].UPage,
-							x->x_hidinterface->hid_data->Path.Node[i].Usage,
-							x->x_hidinterface->hid_data->Path.Node[i].Usage);
-				}
-				post("type: 0x%02x\n", x->x_hidinterface->hid_data->Type);
-				SETSYMBOL(temp_atom, gensym("logical"));
-				add_atom_to_output(x,temp_atom);
-				SETFLOAT(temp_atom, x->x_hidinterface->hid_data->LogMin);
-				add_atom_to_output(x,temp_atom);
-				SETFLOAT(temp_atom, x->x_hidinterface->hid_data->LogMax);
-				add_atom_to_output(x,temp_atom);
+		post("[usbhid] parse tree of HIDInterface %s:\n", x->x_hidinterface->id);
+		reset_output(x);
+		while (HIDParse(x->x_hidinterface->hid_parser, x->x_hidinterface->hid_data)) {
+			add_symbol_to_output(x, gensym("path"));
+			switch(x->x_hidinterface->hid_data->Type)
+			{
+			case 0x80: 
+				add_symbol_to_output(x, gensym("input")); 
+				input_size = input_size + x->x_hidinterface->hid_data->Size;
+				break;
+			case 0x90: 
+				add_symbol_to_output(x, gensym("output")); 
+				output_size = output_size + x->x_hidinterface->hid_data->Size;
+				break;
+			case 0xb0: 
+				add_symbol_to_output(x, gensym("feature")); 
+				feature_size = feature_size + x->x_hidinterface->hid_data->Size;
+				break;
+			default: add_symbol_to_output(x, gensym("UNKNOWN_TYPE"));
 			}
-			outlet_anything(x->x_control_outlet, gensym("device"), 
-							x->output_count, x->output);
+			add_float_to_output(x, x->x_hidinterface->hid_data->Size);
+			add_float_to_output(x, x->x_hidinterface->hid_data->Offset);
+			for (i = 0; i < x->x_hidinterface->hid_data->Path.Size; ++i) {
+				add_symbol_to_output(x, gensym("usage"));
+				add_float_to_output(x, x->x_hidinterface->hid_data->Path.Node[i].UPage);
+				add_float_to_output(x, x->x_hidinterface->hid_data->Path.Node[i].Usage);
+				post("page: 0x%04x\t%d\t\tusage: 0x%04x\t%d",
+					 x->x_hidinterface->hid_data->Path.Node[i].UPage,
+					 x->x_hidinterface->hid_data->Path.Node[i].UPage,
+					 x->x_hidinterface->hid_data->Path.Node[i].Usage,
+					 x->x_hidinterface->hid_data->Path.Node[i].Usage);
+			}
+			post("type: 0x%02x\n", x->x_hidinterface->hid_data->Type);
+			add_symbol_to_output(x, gensym("logical"));
+			add_float_to_output(x, x->x_hidinterface->hid_data->LogMin);
+			add_float_to_output(x, x->x_hidinterface->hid_data->LogMax);
 		}
-		
-		if(strcmp(subselector->s_name,"write") == 0) 
-		{
-		}
-	}
-	else
-	{
-		error("[usbhid] must specify \"read\" or \"write\" as first element of %s message",s->s_name);
+		add_symbol_to_output(x, gensym("totalSize"));
+		add_float_to_output(x, input_size);
+		add_float_to_output(x, output_size);
+		add_float_to_output(x, feature_size);
+		outlet_anything(x->x_status_outlet, gensym("device"), 
+						x->output_count, x->output);
 	}
 }
-
 
 /* -------------------------------------------------------------------------- */
-static void usbhid_close(t_usbhid *x) 
+static void usbhid_descriptor(t_usbhid *x, t_symbol *s, int argc, t_atom *argv)
 {
-	DEBUG(post("usbhid_close"););
-	t_int ret;
-	char string_buffer[STRING_BUFFER_LENGTH];
-
-/* just to be safe, stop it first */
-//	usbhid_stop(x);
-
-	if ( hid_is_opened(x->x_hidinterface) ) 
+	if(s == gensym("descriptor")) // get rid of unused s warning
 	{
-		ret = get_device_string(x->x_hidinterface,string_buffer);
-		x->x_hid_return = hid_close(x->x_hidinterface);
-		if (x->x_hid_return == HID_RET_SUCCESS) 
-		{
-			if (ret) post("[usbhid]: closed %s",string_buffer);
-		}
+		if(argc)
+			usbhid_set_descriptor(x,argc,argv);
 		else
-		{
-			error("[usbhid] could not close %d, error #%d",x->x_device_number,x->x_hid_return);
-		}
+			usbhid_get_descriptor(x);
 	}
 }
-
 
 /* -------------------------------------------------------------------------- */
 static void usbhid_print(t_usbhid *x)
 {
-	DEBUG(post("usbhid_print"););
+	if(x->debug_level) post("usbhid_print");
 	t_int i;
 	char string_buffer[STRING_BUFFER_LENGTH];
 /* 	t_atom event_data[3]; */
@@ -537,7 +626,7 @@ static void usbhid_print(t_usbhid *x)
 		if( hid_id[i] != NULL )
 			post("hid_id[%d]: %s",i,hid_id[i]);
 	}
-	if (get_device_string(x->x_hidinterface,string_buffer))
+	if(get_device_string(x->x_hidinterface,string_buffer))
 		post("%s is currently open",string_buffer);
 
 	x->x_hid_return = hid_dump_tree(stdout, x->x_hidinterface);
@@ -549,36 +638,61 @@ static void usbhid_print(t_usbhid *x)
 /* 	SETSYMBOL(event_data, gensym(type));	   /\* type *\/ */
 /* 	SETSYMBOL(event_data + 1, gensym(code));	/\* code *\/ */
 /* 	SETSYMBOL(event_data + 2, value);	         /\* value *\/ */
-//	outlet_list(x->x_control_outlet, &s_list,
+//	outlet_list(x->x_status_outlet, &s_list,
 }
 
 
 /* -------------------------------------------------------------------------- */
 static void usbhid_reset(t_usbhid *x)
 {
-	DEBUG(post("usbhid_reset"););
+	if(x->debug_level) post("usbhid_reset");
 	
 	hid_reset_HIDInterface(x->x_hidinterface);
+}
 
-	x->x_hid_return = hid_init();
+
+/* -------------------------------------------------------------------------- */
+static void usbhid_debug(t_usbhid *x, t_float f)
+{
+	x->debug_level = f;
+	
+	switch(x->debug_level)
+	{
+	case 0: hid_set_usb_debug(0); hid_set_debug(HID_DEBUG_NONE); break;
+	case 1: hid_set_usb_debug(0); hid_set_debug(HID_DEBUG_ERRORS); break;
+	case 2: hid_set_usb_debug(0); 
+		hid_set_debug(HID_DEBUG_ERRORS | HID_DEBUG_WARNINGS); break;
+	case 3: hid_set_usb_debug(0); 
+		hid_set_debug(HID_DEBUG_ERRORS | HID_DEBUG_WARNINGS | HID_DEBUG_NOTICES); break;
+	case 4: hid_set_usb_debug(0); hid_set_debug(HID_DEBUG_NOTRACES); break;
+	case 5: hid_set_usb_debug(0); hid_set_debug(HID_DEBUG_ALL); break;
+	default:
+		hid_set_usb_debug(x->debug_level - 5); hid_set_debug(HID_DEBUG_ALL); break;
+	}
 }
 
 
 /* -------------------------------------------------------------------------- */
 static void usbhid_free(t_usbhid* x) 
 {
-	DEBUG(post("usbhid_free"););
+	if(x->debug_level) post("usbhid_free");
 		
 	usbhid_close(x);
-	clock_free(x->x_clock);
 
 	freebytes(x->x_read_elements,sizeof(t_int) * x->x_read_element_count);
 	freebytes(x->x_write_elements,sizeof(t_int) * x->x_write_element_count);
 
+	if(x->debug_level) 
+		post("[usbhid] freeing instance %d",usbhid_instance_count);
 	hid_delete_HIDInterface(&(x->x_hidinterface));
-	x->x_hid_return = hid_cleanup();
-	if (x->x_hid_return != HID_RET_SUCCESS) 
-		error("[usbhid] hid_cleanup failed with return code %d\n", x->x_hid_return);
+	if(usbhid_instance_count <= 1)
+	{
+		post("[usbhid] freeing last instance");
+		x->x_hid_return = hid_cleanup();
+		if (x->x_hid_return != HID_RET_SUCCESS) 
+			error("[usbhid] hid_cleanup failed with return code %d\n", 
+				  x->x_hid_return);
+	}
 
 	usbhid_instance_count--;
 }
@@ -592,23 +706,19 @@ static void *usbhid_new(t_float f)
 	HIDInterfaceMatcher matcher;
 	t_usbhid *x = (t_usbhid *)pd_new(usbhid_class);
 	
-	DEBUG(post("usbhid_new"););
+	if(x->debug_level) post("usbhid_new");
 	
 /* only display the version when the first instance is loaded */
 	if(!usbhid_instance_count)
 		post("[usbhid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 			 USBHID_MAJOR_VERSION, USBHID_MINOR_VERSION);  
 	
-/*   x->x_clock = clock_new(x, (t_method)usbhid_read); */
-
 	/* create anything outlet used for HID data */ 
 	x->x_data_outlet = outlet_new(&x->x_obj, 0);
-	x->x_control_outlet = outlet_new(&x->x_obj, 0);
-	
-	/* hid_write_library_config(stdout); */
-	//hid_set_debug(HID_DEBUG_NONE);
-	hid_set_debug(HID_DEBUG_NOTRACES);
- 	//hid_set_debug(HID_DEBUG_ALL); 
+	x->x_status_outlet = outlet_new(&x->x_obj, 0);
+
+	/* turn off the flood of libhid debug messages by default */
+	hid_set_debug(HID_DEBUG_NONE);
 	hid_set_debug_stream(stdout);
 	hid_set_usb_debug(0);
 	
@@ -617,9 +727,6 @@ static void *usbhid_new(t_float f)
 	x->output_count = 0;
 	for (i = 0 ; i < HID_ID_MAX ; i++)
 		hid_id[i] = NULL;
-
-	if (! hid_is_initialised() )
-		x->x_hid_return = hid_init();
 	
 	x->x_hidinterface = hid_new_HIDInterface();
 	matcher.vendor_id = HID_ID_MATCH_ANY;
@@ -628,25 +735,9 @@ static void *usbhid_new(t_float f)
 	
 	x->x_device_number = f;
 
-	/* find and report the list of devices */
-	/* open recursively all HID devices found */
-	while ( (x->x_hid_return = hid_force_open(x->x_hidinterface, 0, &matcher, 2)) != HID_RET_DEVICE_NOT_FOUND)
-	{
-/* 		printf("************************************************************************\n"); */
-		
-/* 		hid_write_identification(stdout, x->x_hidinterface); */
-		
-		/* Only dump HID tree if asked */
-		/* hid_dump_tree(stdout, x->x_hidinterface); */
-		
-		hid_close(x->x_hidinterface);
-	}
-	
-
-  
-	/* Open the device and save settings.  If there is an error, return the object
-	 * anyway, so that the inlets and outlets are created, thus not breaking the
-	 * patch.   */
+/* Open the device and save settings.  If there is an error, return the object
+ * anyway, so that the inlets and outlets are created, thus not breaking the
+ * patch.   */
 /* 	if (usbhid_open(x,f)) */
 /* 		error("[usbhid] device %d did not open",(t_int)f); */
 
@@ -657,7 +748,6 @@ static void *usbhid_new(t_float f)
 
 void usbhid_setup(void) 
 {
-	DEBUG(post("usbhid_setup"););
 	usbhid_class = class_new(gensym("usbhid"), 
 							 (t_newmethod)usbhid_new, 
 							 (t_method)usbhid_free,
@@ -672,10 +762,17 @@ void usbhid_setup(void)
 /* add inlet message methods */
 	class_addmethod(usbhid_class,(t_method) usbhid_print,gensym("print"),0);
 	class_addmethod(usbhid_class,(t_method) usbhid_reset,gensym("reset"),0);
-	class_addmethod(usbhid_class,(t_method) usbhid_read,gensym("read"),A_DEFFLOAT,0);
-	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),A_GIMME,0);
-	class_addmethod(usbhid_class,(t_method) usbhid_get,gensym("get"),A_GIMME,0);
-	class_addmethod(usbhid_class,(t_method) usbhid_open,gensym("open"),A_DEFFLOAT,A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_refresh,gensym("refresh"),0);
+	class_addmethod(usbhid_class,(t_method) usbhid_debug,gensym("debug"),
+					A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_descriptor,gensym("descriptor"),
+					A_GIMME,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_set,gensym("set"),
+					A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_get,gensym("get"),
+					A_DEFFLOAT,0);
+	class_addmethod(usbhid_class,(t_method) usbhid_open,gensym("open"),
+					A_DEFSYM,A_DEFSYM,0);
 	class_addmethod(usbhid_class,(t_method) usbhid_close,gensym("close"),0);
 }
 
