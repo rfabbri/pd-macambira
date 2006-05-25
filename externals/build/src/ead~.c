@@ -1,3 +1,3 @@
-#ifdef __gnu_linux__
-#include "../../creb/modules/ead.c"
+#ifndef _WIN32
+#include "../../creb/modules/ead~.c"
 #endif
