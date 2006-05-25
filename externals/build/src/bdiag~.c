@@ -1,7 +1,3 @@
-#ifndef __i386__
-#define IS_DENORMAL(f) f
-#else
-#include "../../creb/include/extlib_util.h"
+#ifdef __gnu_linux__
+#include "../../creb/modules/bdiag~.c"
 #endif
-
-#include "../../creb/modules/bdiag.c"

@@ -1,2 +1,2 @@
 #define HAVE_ABS_TILDE
-#include "../../creb/modules/abs.c"
+#include "../../creb/modules/abs~.c"
