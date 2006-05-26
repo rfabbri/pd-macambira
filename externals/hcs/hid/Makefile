@@ -1,16 +1,20 @@
-TARGET=hid
+TARGET := `pwd|sed 's|.*/\(.*\)$|\1|'`
+EXTERNALS_ROOT := `pwd | sed 's|^\(/.*externals\).*|\1|'`
 
 default: 
-	make -C ../../ $(TARGET)
+	make -C $(EXTERNALS_ROOT) $(TARGET)
 
 install:
-	make -C ../../ $(TARGET)_install
+	make -C $(EXTERNALS_ROOT) $(TARGET)_install
 
 clean:
-	make -C ../../ $(TARGET)_clean
+	make -C $(EXTERNALS_ROOT) $(TARGET)_clean
 
-
-
+#==============================================================================
+#==============================================================================
+#==============================================================================
+#==============================================================================
+#==============================================================================
 # this stuff below probably works, but its not maintained anymore since I use
 # externals/Makefile
 
@@ -50,7 +54,7 @@ ifeq ($(OS_NAME),linux)
 endif
 
 # ----------------------- Windows MinGW -----------------------
-ifeq ($(OS_NAME),win)
+ifeq ($(OS_NAME),windows)
   EXTENSION = dll
   CFLAGS += -mms-bitfields
   LDFLAGS += -shared 
@@ -70,6 +74,7 @@ ifeq ($(OS_NAME),darwin)
        -lHIDUtilities $(patsubst %,-framework %,$(FRAMEWORKS))
   STRIP = strip -x
   hid.$(EXTENSION): input_arrays hid_utilites $(OBJ)
+.SUFFIXES: .pd_darwin
 endif
 
 all: hid.$(EXTENSION)
@@ -77,7 +82,6 @@ all: hid.$(EXTENSION)
 .SUFFIXES: .$(EXTENSION)
 
 # ----------------------- GENERAL ---------------------------------------------
-
 # generic optimization
 OPT_FLAGS = -O3 -ffast-math
 # G4 optimization on Mac OS X
