@@ -1,12 +1,19 @@
 
 
+==============================================================================
+= output device data on open
 
-TODO: make open functions:
+- Logical Min/Max i.e. [range -127 127(
+- open 1/0 i.e. [open 1(
+- vendor/product id i.e. [id 0x1234 0x4567(
+- device string  [name Trackpad( 
 
-device number
-vendor_id product_id
-Product String
 
+
+==============================================================================
+= open devices by name
+
+i.e "Trackpad" a la Max's [hi]
 
 
 ==============================================================================
@@ -63,36 +70,10 @@ Product String
 - find out if [autoscale] takes a lot of CPU power, or where in [hid] is using
   CPU where it doesn't have to be
 
-
-==============================================================================
-= device selection 
-
-by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
-("Trackpad", "Microsoft 5-button Mouse with IntelliEye(TM)", etc.)
-
-
 ==============================================================================
 = Report available FF effects
 
 - check against HID Utilities Source/PID.h
-
-
-==============================================================================
-= device 0 gets events for all available devices
-
-- it might be useful to have device #0 open all available devices and output
-  the events.
-
-
-==============================================================================
-= figure out how to store device ID in obj struct
-
-(in SC_HID.c its locID and cookie)
-
-- it should probably just store the Pd arguments
-
-- this will have to be dealt with when the "mouse0", "joystick2" arguments are
-  implemented 
 
 
 ==============================================================================
@@ -115,68 +96,10 @@ by # (1,2,...), generic name (mouse1, joystick2, tablet3...), or device name
 
 
 ==============================================================================
-= control input messages
-
-- are [poll(, [start(, and [stop( needed?  is 0/1/delay# enough?
-
-
-==============================================================================
-=  consistent console output 
-
-void hid_post(const char *format, const char *);
-
-
-==============================================================================
 = event name changes
 
 - make key/button Type "button" rather than "key" (undecided on this one)
 
-
-==============================================================================
-= make [linuxhid] [darwinhid] and [windowshid]
-
-- so much info is lost in the translation to a common event scheme that it
-  would be quite handy to have platform-specific objects.  This would give
-  access to the entire range of devices supported by HID Manager, Linux input
-  events, etc.
-
-- these objects should follow the same conventions as [hid]
-
-
-==============================================================================
-= figure out whole degree issue
-
-- should degree conversion also change rotation direction and 0 point?  The
-  degrees on a compass rotate the opposite direction of radians.  The 0 point
-  of a compass is due north, with radians, its right/due east.
-
-- [hid_polar] should take an argument (in degrees?) which specifies where the
-  0 is on the circle
-
-
-==============================================================================
-= mapping object ideas
-
-[hid2midi] [midi2hid]
-
-midi value + bend <-> hid
-	  - use MIDI pitch and bend data for values in between MIDI notes?
-
-object for Fletcher-Munson Equal-loudness contours 
-
-median average object
-
-[infinitepot] for use with a [knob] or any single axis that could be infinite.
-
-[hid_debounce]
-
-peak finder object
-
-"kalman filters"
-
-Curves!!
-
-http://www.2dcurves.com
 
 ==============================================================================
 = check out using USB timestamp 
@@ -205,16 +128,6 @@ ______________________________________________________________________________
 
 - deleting that instance also closes the device for all other instances
   pointing to that same device
-
-
-______________________________________________________________________________
-- BUG: on MacOS X, mouse axis data is limited by the screen dimensions
-
-- the axes data stops outputting when the mouse pointer reaches the edge of
-  the screen.  Hopefully the HID Manager API will allow raw mouse data
-  access.  It must since its used with games.
-
-- turn off/unlink mousepointer for that device?
 
 
 ______________________________________________________________________________

@@ -144,17 +144,17 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
 		case kHIDPage_LEDs:
 			/* temporary kludge until I feel like writing the translation table */
 			sprintf(linux_type, "led"); 
-			sprintf(linux_code, "led_%ld", element->usage - 1); 
+			sprintf(linux_code, "led_%ld", element->usage); 
 			break;
 		case kHIDPage_PID:
 			/* temporary kludge until I feel like writing the translation table */
 			sprintf(linux_type, "ff"); 
-			sprintf(linux_code, "ff_%ld", element->usage - 1); 
+			sprintf(linux_code, "ff_%ld", element->usage); 
 			break;
 		default:
 			/* temporary kludge until I feel like writing the translation table */
 			sprintf(linux_type, "not_implemented"); 
-			sprintf(linux_code, "notimp_%ld", element->usage - 1); 
+			sprintf(linux_code, "notimp_%ld", element->usage); 
 	}
 }
 
@@ -164,13 +164,14 @@ void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, 
  * hatswitch type with each direction represented by a unique number.  This
  * function converts the unique number to the Linux style axes.
  */
+
+/* 
+ * hmm, not sure how to implement this cleanly yet, so I left the code
+ * inline in hid_get_events().
 void hid_convert_hatswitch_values(IOHIDEventStruct event, char *linux_type, char *linux_code)
 {
-	/* 
-	 * hmm, not sure how to implement this cleanly yet, so I left the code
-	 * inline in hid_get_events().
-	 */
 }
+*/
 
 /* ============================================================================== */
 /* DARWIN-SPECIFIC SUPPORT FUNCTIONS */
@@ -202,9 +203,10 @@ pRecDevice hid_get_device_by_number(t_int device_number)
 	return pCurrentHIDDevice;
 }
 
-t_int get_device_number_by_ids(unsigned short vendor_id, unsigned short product_id)
+t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
-	return(1);
+	// TODO: implement! (check usbhid.c)
+	return(-1);
 }
 
 t_int get_device_number_from_usage_list(t_int device_number, 
@@ -220,6 +222,9 @@ t_int get_device_number_from_usage_list(t_int device_number,
 
 	if( !HIDHaveDeviceList() ) hid_build_device_list();
 
+	/* TODO: check that this function doesn't return a number that is higher
+	 * than the highest device of this type */
+
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while(pCurrentHIDDevice != NULL)
 	{
@@ -232,15 +237,9 @@ t_int get_device_number_from_usage_list(t_int device_number,
 	}
 	i = total_devices;
 	device_count = HIDCountDevices();
-	debug_print(LOG_DEBUG,"[hid]  %d is less than %d",i,device_number);
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while( (pCurrentHIDDevice != NULL) && (i > device_number) ) 
 	{
-		debug_print(LOG_DEBUG,"[hid] %d:  %d == %d     %d == %d",i,
-					pCurrentHIDDevice->usagePage, 
-					usage_page,
-					pCurrentHIDDevice->usage,
-					usage);
 		device_count--;
 		if( (pCurrentHIDDevice->usagePage == usage_page) && 
 			(pCurrentHIDDevice->usage == usage) )
@@ -249,19 +248,26 @@ t_int get_device_number_from_usage_list(t_int device_number,
 			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
 							pCurrentHIDDevice->usage, 
 							cstrDeviceName);
-			debug_print(LOG_DEBUG,"[hid]: found a %s at %d: %s %s",cstrDeviceName,i,
-						pCurrentHIDDevice->manufacturer,pCurrentHIDDevice->product);
+			debug_print(LOG_DEBUG,"[hid]: found a %s at %d: %s %s"
+						,cstrDeviceName,
+						i,
+						pCurrentHIDDevice->manufacturer,
+						pCurrentHIDDevice->product);
 		}
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
-	} 
-	return(device_count);
+	}
+	if(device_count < total_devices)
+		return(device_count);
+	else
+		return(-1);
 }
 
-
+/*
 void hid_build_element_list(t_hid *x) 
 {
 	
 }
+*/
 
 t_int hid_print_element_list(t_hid *x)
 {
@@ -379,6 +385,19 @@ void hid_print_device_list(t_hid *x)
 		post("");
 	}
 }
+/* ============================================================================== 
+ * STATUS/INFO OUTPUT
+ * ============================================================================== */
+
+void hid_info(t_hid *x)
+{
+	t_atom output_atoms[4];
+
+	SETSYMBOL(output_atoms,gensym("open"));
+	SETFLOAT(output_atoms + 1, x->x_device_open);
+	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
+}
+
 
 void hid_output_device_name(t_hid *x, char *manufacturer, char *product) 
 {
@@ -697,23 +716,27 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	if( !HIDHaveDeviceList() ) hid_build_device_list();
 	
 	pCurrentHIDDevice = hid_get_device_by_number(device_number);
-	if( ! HIDIsValidDevice(pCurrentHIDDevice) )
+	if( HIDIsValidDevice(pCurrentHIDDevice) )
 	{
-		error("[hid]: device %d is not a valid device\n",device_number);
+		x->x_device_number = device_number;
+	}
+	else
+	{
+		debug_error(x,"[hid]: device %d is not a valid device\n",device_number);
 		return(1);
 	}
-
+	
 	hid_output_device_name( x, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product );
 
 	post("[hid] opened device %d: %s %s",
 		  device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
 
-	hid_build_element_list(x);
+	//hid_build_element_list(x);
 
 	hidDevice = AllocateHIDObjectFromRecDevice( pCurrentHIDDevice );
 	if( FFIsForceFeedback(hidDevice) == FF_OK ) 
 	{
-		post("\tdevice has Force Feedback support");
+		debug_print(LOG_WARNING,"\tdevice has Force Feedback support");
 		if( FFCreateDevice(hidDevice,&ffDeviceReference) == FF_OK ) 
 		{
 			x->x_has_ff = 1;

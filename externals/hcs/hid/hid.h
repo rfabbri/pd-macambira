@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.20 $"; */
+/* static char *version = "$Revision: 1.21 $"; */
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -24,8 +24,7 @@ typedef struct _hid
 {
 	t_object            x_obj;
 	t_int               x_fd;
-//	unsigned short      x_device_number;
-	t_float      x_device_number;
+	t_int               x_device_number;
 	unsigned short      vendor_id;    // USB idVendor for current device
 	unsigned short      product_id;   // USB idProduct for current device
 	t_int               x_has_ff;
@@ -74,9 +73,10 @@ t_int hid_open_device(t_hid *x, t_int device_number);
 t_int hid_close_device(t_hid *x);
 void hid_build_device_list(void);
 t_int hid_get_events(t_hid *x);
-void hid_print(t_hid* x);
+void hid_info(t_hid* x);  /* output device info on the status outlet */
+void hid_print(t_hid* x); /* print info to the console */
 void hid_platform_specific_free(t_hid *x);
-t_int get_device_number_by_ids(unsigned short vendor_id, unsigned short product_id);
+t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
 t_int get_device_number_from_usage_list(t_int device_number, 
 										unsigned short usage_page, unsigned short usage);
 

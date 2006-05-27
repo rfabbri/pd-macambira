@@ -46,11 +46,11 @@ static t_class *hid_class;
  * FUNCTION PROTOTYPES
  */
 
-static void hid_poll(t_hid *x, t_float f);
-static t_int hid_open(t_hid *x, t_symbol *s, t_int argc, t_atom *argv);
-static t_int hid_close(t_hid *x);
-static t_int hid_read(t_hid *x,int fd);
-static void hid_float(t_hid* x, t_floatarg f);
+//static void hid_poll(t_hid *x, t_float f);
+static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv);
+//static t_int hid_close(t_hid *x);
+//static t_int hid_read(t_hid *x,int fd);
+//static void hid_float(t_hid* x, t_floatarg f);
 
 
 /*------------------------------------------------------------------------------
@@ -97,6 +97,67 @@ static unsigned int name_to_usage(char *usage_name)
 	return(0);
 }
 
+
+static t_int get_device_number_from_arguments(int argc, t_atom *argv)
+{
+	t_int device_number = -1;
+	unsigned short usage_number;
+	unsigned int usage;
+	unsigned short vendor_id;
+	unsigned short product_id;
+	char usage_string[MAXPDSTRING] = "";
+	t_symbol *first_argument;
+	t_symbol *second_argument;
+
+	if(argc == 1)
+	{
+		post("one arg");
+		first_argument = atom_getsymbolarg(0,argc,argv);
+		if(first_argument == &s_) 
+		{ // single float arg means device
+			device_number = (unsigned short) atom_getfloatarg(0,argc,argv);
+			if(device_number < 0) device_number = -1;
+			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
+		}
+		else
+		{ // single symbol arg means first instance of usage
+			debug_print(LOG_DEBUG,"[hid] setting device via usagepage/usage");
+			atom_string(argv, usage_string, MAXPDSTRING-1);
+			usage = name_to_usage(usage_string);
+			device_number = get_device_number_from_usage_list(0, 
+															  usage >> 16, 
+															  usage & 0xffff);
+			debug_print(LOG_INFO,"[hid] using 0x%04x 0x%04x for %s",
+						usage, usage >> 16, usage & 0xffff, usage_string);
+		}
+	}
+	else if(argc == 2)
+	{ 
+		post("two arg");
+		first_argument = atom_getsymbolarg(0,argc,argv);
+		second_argument = atom_getsymbolarg(1,argc,argv);
+		if( second_argument == &s_ ) 
+		{ /* a symbol then a float means match on usage */
+			atom_string(argv, usage_string, MAXPDSTRING-1);
+			usage = name_to_usage(usage_string);
+			usage_number = atom_getfloatarg(1,argc,argv);
+			debug_print(LOG_DEBUG,"[hid] looking for %s at #%d",usage_string,usage_number);
+			device_number = get_device_number_from_usage_list(usage_number,
+															  usage >> 16, 
+															  usage & 0xffff);
+		}
+		else
+		{ /* two symbols means idVendor and idProduct in hex */
+			post("idVendor and idProduct");
+			vendor_id = (unsigned short) strtol(first_argument->s_name, NULL, 16);
+			product_id = (unsigned short) strtol(second_argument->s_name, NULL, 16);
+			device_number = get_device_number_by_id(vendor_id,product_id);
+		}
+	}
+	return(device_number);
+}
+
+
 void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 {
 	t_atom event_data[3];
@@ -109,7 +170,7 @@ void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 }
 
 /* stop polling the device */
-void stop_poll(t_hid* x) 
+static void stop_poll(t_hid* x) 
 {
   debug_print(LOG_DEBUG,"stop_poll");
   
@@ -121,7 +182,31 @@ void stop_poll(t_hid* x)
   }
 }
 
-void hid_set_from_float(t_hid *x, t_floatarg f)
+/*------------------------------------------------------------------------------
+ * METHODS FOR [hid]'s MESSAGES                    
+ */
+
+
+void hid_poll(t_hid* x, t_float f) 
+{
+	debug_print(LOG_DEBUG,"hid_poll");
+  
+/*	if the user sets the delay less than one, ignore */
+	if( f > 0 ) 	
+		x->x_delay = (t_int)f;
+
+	if( (!x->x_device_open) && (x->x_device_number > -1) )
+		hid_open(x,gensym("open"),0,NULL);
+	
+	if(!x->x_started) 
+	{
+		clock_delay(x->x_clock, x->x_delay);
+		debug_print(LOG_DEBUG,"[hid] polling started");
+		x->x_started = 1;
+	} 
+}
+
+static void hid_set_from_float(t_hid *x, t_floatarg f)
 {
 /* values greater than 1 set the polling delay time */
 /* 1 and 0 for start/stop so you can use a [tgl] */
@@ -140,11 +225,6 @@ void hid_set_from_float(t_hid *x, t_floatarg f)
 		stop_poll(x);
 	}
 }
-
-/*------------------------------------------------------------------------------
- * METHODS FOR [hid]'s MESSAGES                    
- */
-
 
 /* close the device */
 t_int hid_close(t_hid *x) 
@@ -173,86 +253,34 @@ t_int hid_close(t_hid *x)
  * closed / different device     open 
  * open / different device       close open 
  */
-
-t_int hid_open(t_hid *x, t_symbol *s, t_int argc, t_atom *argv) 
+static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv) 
 {
-	debug_print(LOG_DEBUG,"hid_open");
-	unsigned short i;
-	unsigned short device_number = 0;
-	unsigned short usage_number;
-	unsigned int usage;
-	char usage_string[MAXPDSTRING] = "";
-
-	if(argc == 1)
-	{
-		if(atom_getsymbolarg(0,argc,argv) == &s_) 
-		{ // single float arg means device
-			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
-			device_number = (unsigned short) atom_getfloatarg(0,argc,argv);
-		}
-		else
-		{ // single symbol arg means usagepage/usage
-			debug_print(LOG_DEBUG,"[hid] setting device via usagepage/usage");
-			atom_string(argv, usage_string, MAXPDSTRING-1);
-			i = strlen(usage_string);
-			do {
-				--i;
-			} while(isdigit(usage_string[i]));
-			usage_number = strtol(usage_string + i + 1,NULL,10);
-			usage_string[i+1] = '\0';
-			debug_print(LOG_DEBUG,"[hid] looking for %s #%d",usage_string,usage_number);
-			usage = name_to_usage(usage_string);
-			debug_print(LOG_DEBUG,"[hid] usage 0x%08x 0x%04x 0x%04x",usage, usage >> 16, usage & 0xffff);
-			device_number = get_device_number_from_usage_list(usage_number, 
-															  usage >> 16, usage & 0xffff);
-		}
-	}
-	else if( (argc == 2) && (atom_getsymbolarg(0,argc,argv) != NULL) 
-			 && (atom_getsymbolarg(1,argc,argv) != NULL) )
-	{ /* two symbols means idVendor and idProduct in hex */
-	}
-	
+	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
 /* store running state to be restored after the device has been opened */
 	t_int started = x->x_started;
-
-/* only close the device if its different than the current and open */	
-	if( (device_number != x->x_device_number) && (x->x_device_open) ) 
-		hid_close(x);
-
-	if(device_number > 0)
-		x->x_device_number = device_number;
-	else
-		x->x_device_number = 0;
-
-/* if device is open still, that means the same device is trying to be opened,
- * therefore ignore the redundant open request.  To reopen the same device,
- * send a [close( msg, then an [open( msg. */
-	if(! x->x_device_open) 
+	
+	int device_number = get_device_number_from_arguments(argc, argv);
+	if(device_number > -1)
 	{
-		if(hid_open_device(x,x->x_device_number))
+		if( (device_number != x->x_device_number) && (x->x_device_open) ) 
+			hid_close(x);
+		if(! x->x_device_open)
 		{
-			error("[hid] can not open device %d",x->x_device_number);
-			return (1);
-		}
-		else
-		{
-			x->x_device_open = 1;
+			if(hid_open_device(x,device_number))
+				error("[hid] can not open device %d",device_number);
+			else
+				x->x_device_open = 1;
 		}
 	}
-	
-
 /* restore the polling state so that when I [tgl] is used to start/stop [hid],
  * the [tgl]'s state will continue to accurately reflect [hid]'s state  */
 	if(started)
 		hid_set_from_float(x,x->x_delay);
-
 	debug_print(LOG_DEBUG,"[hid] done device# to %d",device_number);
-
-	return (0);
 }
 
 
-t_int hid_read(t_hid *x,int fd) 
+t_int hid_read(t_hid *x, int fd) 
 {
 //	debug_print(LOG_DEBUG,"hid_read");
 
@@ -267,30 +295,12 @@ t_int hid_read(t_hid *x,int fd)
 	return 1; 
 }
 
-void hid_poll(t_hid* x, t_float f) 
-{
-	debug_print(LOG_DEBUG,"hid_poll");
-  
-/*	if the user sets the delay less than one, ignore */
-	if( f > 0 ) 	
-		x->x_delay = (t_int)f;
-
-	if(!x->x_device_open)
-		hid_open(x,gensym("open"),0,NULL);
-	
-	if(!x->x_started) 
-	{
-		clock_delay(x->x_clock, x->x_delay);
-		debug_print(LOG_DEBUG,"[hid] polling started");
-		x->x_started = 1;
-	} 
-}
-
+/* eventually, this will be used to open devices by long name
 static void hid_anything(t_hid *x, t_symbol *s, t_int argc, t_atom *argv)
 {
 	int i;
 	t_symbol *my_symbol;
-	char device_name[MAXPDSTRING];
+	//char device_name[MAXPDSTRING];
 		
 	startpost("ANYTHING! selector: %s data:");
 	for(i=0; i<argc; ++i)
@@ -302,7 +312,7 @@ static void hid_anything(t_hid *x, t_symbol *s, t_int argc, t_atom *argv)
 			post(" %f",atom_getfloatarg(i,argc,argv));
 	}
 }
-
+*/
 
 static void hid_float(t_hid* x, t_floatarg f) 
 {
@@ -332,11 +342,11 @@ static void hid_free(t_hid* x)
 }
 
 /* create a new instance of this class */
-static void *hid_new(t_float f) 
+static void *hid_new(t_symbol *s, int argc, t_atom *argv) 
 {
-  t_hid *x = (t_hid *)pd_new(hid_class);
+	t_hid *x = (t_hid *)pd_new(hid_class);
   
-  debug_print(LOG_DEBUG,"hid_new");
+	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
   
 /* only display the version when the first instance is loaded */
   if(!hid_instance_count)
@@ -365,12 +375,7 @@ static void *hid_new(t_float f)
   x->x_data_outlet = outlet_new(&x->x_obj, 0);
   x->x_device_name_outlet = outlet_new(&x->x_obj, 0);
 
-  x->x_device_number = 0;
-
-  if(f > 0)
-	  x->x_device_number = f;
-  else
-	  x->x_device_number = 0;
+  x->x_device_number = get_device_number_from_arguments(argc, argv);
   
   hid_instance_count++;
 
@@ -385,17 +390,18 @@ void hid_setup(void)
 								 (t_method)hid_free,
 								 sizeof(t_hid),
 								 CLASS_DEFAULT,
-								 A_DEFFLOAT,0);
+								 A_GIMME,0);
 	
 	/* add inlet datatype methods */
 	class_addfloat(hid_class,(t_method) hid_float);
 	class_addbang(hid_class,(t_method) hid_read);
-	class_addanything(hid_class,(t_method) hid_anything);
+/* 	class_addanything(hid_class,(t_method) hid_anything); */
 	
 	/* add inlet message methods */
 	class_addmethod(hid_class,(t_method) hid_debug,gensym("debug"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_build_device_list,gensym("refresh"),0);
 	class_addmethod(hid_class,(t_method) hid_print,gensym("print"),0);
+	class_addmethod(hid_class,(t_method) hid_info,gensym("info"),0);
 	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_GIMME,0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
 	class_addmethod(hid_class,(t_method) hid_poll,gensym("poll"),A_DEFFLOAT,0);
