@@ -85,6 +85,30 @@ void debug_error(t_hid *x, t_int message_debug_level, const char *fmt, ...)
 	}
 }
 
+
+static void output_status(t_hid *x, t_symbol *selector, t_float output_value)
+{
+	t_atom *output_atom = getbytes(sizeof(t_atom));
+	SETFLOAT(output_atom, output_value);
+	outlet_anything( x->x_status_outlet, selector, 1, output_atom);
+	freebytes(output_atom,sizeof(t_atom));
+}
+
+static void output_open_status(t_hid *x)
+{
+	output_status(x, gensym("open"), x->x_device_open);
+}
+
+static void output_device_number(t_hid *x)
+{
+	output_status(x, gensym("device"), x->x_device_number);
+}
+
+static void output_poll_time(t_hid *x)
+{
+	output_status(x, gensym("poll"), x->x_delay);
+}
+
 static unsigned int name_to_usage(char *usage_name)
 { // output usagepage << 16 + usage
 	if(strcmp(usage_name,"pointer") == 0)   return(0x00010001);
@@ -133,7 +157,6 @@ static t_int get_device_number_from_arguments(int argc, t_atom *argv)
 	}
 	else if(argc == 2)
 	{ 
-		post("two arg");
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		second_argument = atom_getsymbolarg(1,argc,argv);
 		if( second_argument == &s_ ) 
@@ -148,7 +171,6 @@ static t_int get_device_number_from_arguments(int argc, t_atom *argv)
 		}
 		else
 		{ /* two symbols means idVendor and idProduct in hex */
-			post("idVendor and idProduct");
 			vendor_id = (unsigned short) strtol(first_argument->s_name, NULL, 16);
 			product_id = (unsigned short) strtol(second_argument->s_name, NULL, 16);
 			device_number = get_device_number_by_id(vendor_id,product_id);
@@ -157,14 +179,13 @@ static t_int get_device_number_from_arguments(int argc, t_atom *argv)
 	return(device_number);
 }
 
-
-void hid_output_event(t_hid *x, char *type, char *code, t_float value)
+void hid_output_event(t_hid *x, t_symbol *type, t_symbol *code, t_float value)
 {
 	t_atom event_data[3];
 	
-	SETSYMBOL(event_data, gensym(type));	   /* type */
-	SETSYMBOL(event_data + 1, gensym(code));	/* code */
-	SETFLOAT(event_data + 2, value);	         /* value */
+	SETSYMBOL(event_data, type);	
+	SETSYMBOL(event_data + 1, code);
+	SETFLOAT(event_data + 2, value);
 
 	outlet_anything(x->x_data_outlet,atom_gensym(event_data),2,event_data+1);
 }
@@ -272,11 +293,14 @@ static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv)
 				x->x_device_open = 1;
 		}
 	}
+	else debug_print(LOG_WARNING,"[hid] device does not exist");
 /* restore the polling state so that when I [tgl] is used to start/stop [hid],
  * the [tgl]'s state will continue to accurately reflect [hid]'s state  */
 	if(started)
 		hid_set_from_float(x,x->x_delay);
-	debug_print(LOG_DEBUG,"[hid] done device# to %d",device_number);
+	debug_print(LOG_DEBUG,"[hid] set device# to %d",device_number);
+	output_open_status(x);
+	output_device_number(x);
 }
 
 
@@ -313,6 +337,14 @@ static void hid_anything(t_hid *x, t_symbol *s, t_int argc, t_atom *argv)
 	}
 }
 */
+
+static void hid_info(t_hid *x)
+{
+	output_open_status(x);
+	output_device_number(x);
+	output_poll_time(x);
+	hid_platform_specific_info(x);
+}
 
 static void hid_float(t_hid* x, t_floatarg f) 
 {
@@ -373,7 +405,7 @@ static void *hid_new(t_symbol *s, int argc, t_atom *argv)
 
   /* create anything outlet used for HID data */ 
   x->x_data_outlet = outlet_new(&x->x_obj, 0);
-  x->x_device_name_outlet = outlet_new(&x->x_obj, 0);
+  x->x_status_outlet = outlet_new(&x->x_obj, 0);
 
   x->x_device_number = get_device_number_from_arguments(argc, argv);
   

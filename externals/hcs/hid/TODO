@@ -1,11 +1,13 @@
 
 
 ==============================================================================
+= make second inlet for poll # (for [human->pd]
+
+
+==============================================================================
 = output device data on open
 
 - Logical Min/Max i.e. [range -127 127(
-- open 1/0 i.e. [open 1(
-- vendor/product id i.e. [id 0x1234 0x4567(
 - device string  [name Trackpad( 
 
 

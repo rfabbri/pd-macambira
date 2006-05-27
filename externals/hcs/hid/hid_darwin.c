@@ -205,8 +205,34 @@ pRecDevice hid_get_device_by_number(t_int device_number)
 
 t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
 {
-	// TODO: implement! (check usbhid.c)
-	return(-1);
+	debug_print(LOG_DEBUG,"get_device_number_from_usage_list");
+
+	pRecDevice    pCurrentHIDDevice;
+	t_int i;
+	t_int return_device_number = -1;
+
+	if( !HIDHaveDeviceList() ) hid_build_device_list();
+
+	pCurrentHIDDevice = HIDGetFirstDevice();
+	i = HIDCountDevices();
+	while(pCurrentHIDDevice != NULL)
+	{
+		--i;
+		debug_print(LOG_INFO,"compare 0x%04x == 0x%04x  0x%04x == 0x%04x",
+					pCurrentHIDDevice->vendorID,
+					vendor_id,
+					pCurrentHIDDevice->productID,
+					product_id);
+		if( (pCurrentHIDDevice->vendorID == vendor_id) && 
+			(pCurrentHIDDevice->productID == product_id) )
+		{
+			return_device_number = i;
+			pCurrentHIDDevice = NULL;
+		}
+		else
+			pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
+	}
+	return(return_device_number);
 }
 
 t_int get_device_number_from_usage_list(t_int device_number, 
@@ -216,14 +242,11 @@ t_int get_device_number_from_usage_list(t_int device_number,
 
 	pRecDevice    pCurrentHIDDevice;
 	t_int i;
-	t_int device_count;
+	t_int return_device_number = -1;
 	t_int total_devices = 0;
 	char cstrDeviceName[MAXPDSTRING];
 
 	if( !HIDHaveDeviceList() ) hid_build_device_list();
-
-	/* TODO: check that this function doesn't return a number that is higher
-	 * than the highest device of this type */
 
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while(pCurrentHIDDevice != NULL)
@@ -236,11 +259,11 @@ t_int get_device_number_from_usage_list(t_int device_number,
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	}
 	i = total_devices;
-	device_count = HIDCountDevices();
+	return_device_number = HIDCountDevices();
 	pCurrentHIDDevice = HIDGetFirstDevice();
 	while( (pCurrentHIDDevice != NULL) && (i > device_number) ) 
 	{
-		device_count--;
+		return_device_number--;
 		if( (pCurrentHIDDevice->usagePage == usage_page) && 
 			(pCurrentHIDDevice->usage == usage) )
 		{
@@ -248,16 +271,17 @@ t_int get_device_number_from_usage_list(t_int device_number,
 			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
 							pCurrentHIDDevice->usage, 
 							cstrDeviceName);
-			debug_print(LOG_DEBUG,"[hid]: found a %s at %d: %s %s"
+			debug_print(LOG_DEBUG,"[hid]: found a %s at %d/%d: %s %s"
 						,cstrDeviceName,
 						i,
+						total_devices,
 						pCurrentHIDDevice->manufacturer,
 						pCurrentHIDDevice->product);
 		}
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	}
-	if(device_count < total_devices)
-		return(device_count);
+	if(i < total_devices)
+		return(return_device_number);
 	else
 		return(-1);
 }
@@ -389,29 +413,57 @@ void hid_print_device_list(t_hid *x)
  * STATUS/INFO OUTPUT
  * ============================================================================== */
 
-void hid_info(t_hid *x)
+void hid_platform_specific_info(t_hid *x)
 {
-	t_atom output_atoms[4];
+	pRecDevice  pCurrentHIDDevice = NULL;
+	char vendor_id_pointer[7];
+	char product_id_pointer[7];
+	t_symbol *output_symbol;
+	t_atom *output_atom = getbytes(sizeof(t_atom));
 
-	SETSYMBOL(output_atoms,gensym("open"));
-	SETFLOAT(output_atoms + 1, x->x_device_open);
-	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
-}
-
-
-void hid_output_device_name(t_hid *x, char *manufacturer, char *product) 
-{
-	char      *device_name;
-//	t_symbol  *device_name_symbol;
-
-	device_name = malloc( strlen(manufacturer) + 1 + strlen(product) + 1 );
-//	device_name = malloc( 7 + strlen(manufacturer) + 1 + strlen(product) + 1 );
-//	strcpy( device_name, "append " );
-	strcat( device_name, manufacturer );
-	strcat ( device_name, " ");
-	strcat( device_name, product );
-//	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
-	outlet_symbol( x->x_device_name_outlet, gensym( device_name ) );
+	if(x->x_device_number > -1)
+	{
+		pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+		if(pCurrentHIDDevice != NULL)
+		{
+            /* product */
+			SETSYMBOL(output_atom, gensym(pCurrentHIDDevice->product));
+			outlet_anything( x->x_status_outlet, gensym("product"), 
+							 1, output_atom);
+			/* manufacturer */
+			SETSYMBOL(output_atom, gensym(pCurrentHIDDevice->manufacturer));
+			outlet_anything( x->x_status_outlet, gensym("manufacturer"), 
+							 1, output_atom);
+			/* serial */
+			if(pCurrentHIDDevice->serial != NULL)
+			{
+				output_symbol = gensym(pCurrentHIDDevice->serial);
+				if( output_symbol != &s_ )
+				{ /* the serial is rarely used on USB devices, so test for it */
+					SETSYMBOL(output_atom, output_symbol);
+					outlet_anything( x->x_status_outlet, gensym("serial"), 
+									 1, output_atom);
+				}
+			}
+			/* transport */
+			SETSYMBOL(output_atom, gensym(pCurrentHIDDevice->transport));
+			outlet_anything( x->x_status_outlet, gensym("transport"), 
+							 1, output_atom);
+            /* vendor id */
+			sprintf(vendor_id_pointer,"0x%04x",
+					 (unsigned int)pCurrentHIDDevice->vendorID);
+			SETSYMBOL(output_atom, gensym(vendor_id_pointer));
+			outlet_anything( x->x_status_outlet, gensym("vendorID"), 
+							 1, output_atom);
+            /* product id */
+			sprintf(product_id_pointer,"0x%04x",
+					 (unsigned int)pCurrentHIDDevice->productID);
+			SETSYMBOL(output_atom, gensym(product_id_pointer));
+			outlet_anything( x->x_status_outlet, gensym("productID"), 
+							 1, output_atom);
+		}
+	}
+	freebytes(output_atom,sizeof(t_atom));
 }
 
 /* ============================================================================== 
@@ -605,55 +657,55 @@ t_int hid_get_events(t_hid *x)
  */
 					case 0: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 					case 1: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 2: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 3: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 1;
 						break;
 					case 4: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 					case 5: 
 						sprintf(code,"abs_hat0y");value = -1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 6: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 7: 
 						sprintf(code,"abs_hat0y");value = 1;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = -1;
 						break;
 					case 8: 
 						sprintf(code,"abs_hat0y");value = 0;
-						hid_output_event(x,type,code,(t_float)value);
+						hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 						sprintf(code,"abs_hat0x");value = 0;
 						break;
 				}
-				hid_output_event(x,type,code,(t_float)value);
+				hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 				break;
 			default:
 				convertDarwinElementToLinuxTypeCode(pCurrentHIDElement,type,code);
-				hid_output_event(x,type,code,(t_float)value);
+				hid_output_event(x,gensym(type),gensym(code),(t_float)value);
 		}
 
 //		DEBUG(post("type: %s    code: %s   event name: %s",type,code,event_output_string););
@@ -722,13 +774,10 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	}
 	else
 	{
-		debug_error(x,"[hid]: device %d is not a valid device\n",device_number);
+		debug_error(x,LOG_ERR,"[hid]: device %d is not a valid device\n",device_number);
 		return(1);
 	}
-	
-	hid_output_device_name( x, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product );
-
-	post("[hid] opened device %d: %s %s",
+	debug_print(LOG_WARNING,"[hid] opened device %d: %s %s",
 		  device_number, pCurrentHIDDevice->manufacturer, pCurrentHIDDevice->product);
 
 	//hid_build_element_list(x);

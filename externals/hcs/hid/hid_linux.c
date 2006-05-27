@@ -389,7 +389,7 @@ t_int hid_get_events(t_hid *x)
 	  hid_code=gensym("unknown");
         }
         if( hid_code && hid_input_event.type != EV_SYN )
-            hid_output_event(x, ev[hid_input_event.type], hid_code->s_name, 
+            hid_output_event(x, gensym(ev[hid_input_event.type]), hid_code, 
                              (t_float)hid_input_event.value);
         DEBUG(++event_counter;);
     }

@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.21 $"; */
+/* static char *version = "$Revision: 1.22 $"; */
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -34,7 +34,7 @@ typedef struct _hid
 	t_int               x_started;
 	t_int               x_device_open;
 	t_outlet            *x_data_outlet;
-	t_outlet            *x_device_name_outlet;
+	t_outlet            *x_status_outlet;
 } t_hid;
 
 
@@ -64,7 +64,7 @@ extern unsigned short global_debug_level;
 /* support functions */
 void debug_print(t_int debug_level, const char *fmt, ...);
 void debug_error(t_hid *x, t_int debug_level, const char *fmt, ...);
-void hid_output_event(t_hid *x, char *type, char *code, t_float value);
+void hid_output_event(t_hid *x, t_symbol *type, t_symbol *code, t_float value);
 
 /* generic, cross-platform functions implemented in a separate file for each
  * platform 
@@ -73,12 +73,13 @@ t_int hid_open_device(t_hid *x, t_int device_number);
 t_int hid_close_device(t_hid *x);
 void hid_build_device_list(void);
 t_int hid_get_events(t_hid *x);
-void hid_info(t_hid* x);  /* output device info on the status outlet */
 void hid_print(t_hid* x); /* print info to the console */
+void hid_platform_specific_info(t_hid* x); /* device info on the status outlet */
 void hid_platform_specific_free(t_hid *x);
 t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
 t_int get_device_number_from_usage_list(t_int device_number, 
-										unsigned short usage_page, unsigned short usage);
+										unsigned short usage_page, 
+										unsigned short usage);
 
 
 /* cross-platform force feedback functions */

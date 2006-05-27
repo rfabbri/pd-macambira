@@ -179,8 +179,8 @@ void hid_output_device_name(t_hid *x, char *manufacturer, char *product)
 	strcat( device_name, manufacturer );
 	strcat ( device_name, " ");
 	strcat( device_name, product );
-//	outlet_anything( x->x_device_name_outlet, gensym( device_name ),0,NULL );
-	outlet_symbol( x->x_device_name_outlet, gensym( device_name ) );
+//	outlet_anything( x->x_status_outlet, gensym( device_name ),0,NULL );
+	outlet_symbol( x->x_status_outlet, gensym( device_name ) );
 }
 
 /* ------------------------------------------------------------------------------ */
