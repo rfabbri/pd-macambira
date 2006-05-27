@@ -40,12 +40,12 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 
 DEBUG_CFLAGS = -ggdb
 
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer $(DEBUG_CFLAGS)
+OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
-CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W
+CFLAGS = -DPD $(OPT_CFLAGS) -I$(pd_src)/src -Wall -W $(DEBUG_CFLAGS)
 LDFLAGS =  
 LIBS = -lm
 
@@ -101,8 +101,8 @@ CXXFLAGS = $(CFLAGS)
 		`test -f $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs && \
 			cat $(dir $*)../$(BUILDSRC_OS_NAME)/$(notdir $*).libs`
 	chmod a-x "$*.$(EXTENSION)"
-	$(STRIP) $*.$(EXTENSION)
-	rm -f -- $*.o
+#	$(STRIP) $*.$(EXTENSION)
+#	rm -f -- $*.o
 
 
 #------------------------------------------------------------------------------#
@@ -282,6 +282,40 @@ bsaylor_clean:
 	-rm -f -- $(externals_src)/bsaylor/*.o
 	-rm -f -- $(externals_src)/bsaylor/*.bak
 	-rm -f -- $(externals_src)/bsaylor/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# CORELIBS
+CORELIBS_NAME=corelibs
+CORELIBS_OBJECTS := $(wildcard $(externals_src)/corelibs/*.c)
+corelibs: $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
+
+corelibs_install: corelibs
+	install -d $(objectsdir)/$(CORELIBS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CORELIBS_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(CORELIBS_NAME)
+	install -d $(helpdir)/$(CORELIBS_NAME)
+	install -p $(externals_src)/corelibs/help/*.pd \
+		$(helpdir)/$(CORELIBS_NAME)
+#	install -d $(manualsdir)/$(CORELIBS_NAME)
+#	install -p $(externals_src)/corelibs/manual.txt \
+#		$(manualsdir)/$(CORELIBS_NAME)
+	install -p $(externals_src)/corelibs/README \
+		$(readmesdir)/$(CORELIBS_NAME).txt
+	install -d $(examplesdir)/$(CORELIBS_NAME)
+	install -p $(externals_src)/corelibs/examples/*.pd \
+		$(examplesdir)/$(CORELIBS_NAME)
+
+corelibs_clean:
+	-rm -f -- $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(CORELIBS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/corelibs/*.bak
+	-rm -f -- $(externals_src)/corelibs/*.*~
 
 
 
@@ -1091,7 +1125,6 @@ motex_clean:
 	-rm -f -- $(externals_src)/motex/*.o
 	-rm -f -- $(externals_src)/motex/*.bak
 	-rm -f -- $(externals_src)/motex/*.*~
-
 
 
 #----------------------------------------------------------------------------

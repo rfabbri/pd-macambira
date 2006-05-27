@@ -17,7 +17,6 @@
 - put objects with conflicting names into a directory namespace
 
 		Gem/scale
-		iem/prepend
 		flext/prepend
 
 - add these to the build system:
