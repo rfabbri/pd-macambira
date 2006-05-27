@@ -72,7 +72,7 @@ void hid_build_element_list(t_hid *x)
 
 t_int hid_print_element_list(t_hid *x)
 {
-	DEBUG(post("hid_print_element_list"););
+	debug_print(LOG_DEBUG,"hid_print_element_list");
 
 
 	return (0);	
@@ -248,7 +248,7 @@ void hid_ff_print( t_hid *x )
 
 t_int hid_get_events(t_hid *x)
 {
-	//DEBUG(post("hid_get_events"););
+	//debug_print(LOG_DEBUG,"hid_get_events");
 
 	return (0);	
 }
@@ -256,7 +256,7 @@ t_int hid_get_events(t_hid *x)
 
 t_int hid_open_device(t_hid *x, t_int device_number)
 {
-	DEBUG(post("hid_open_device"););
+	debug_print(LOG_DEBUG,"hid_open_device");
 	t_int result = 0;
 	
 
@@ -266,7 +266,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 
 t_int hid_close_device(t_hid *x)
 {
-	DEBUG(post("hid_close_device"););
+	debug_print(LOG_DEBUG,"hid_close_device");
 
 	t_int result = 0;
 	
@@ -276,7 +276,7 @@ t_int hid_close_device(t_hid *x)
 
 t_int hid_build_device_list(t_hid *x)
 {
-	DEBUG(post("hid_build_device_list"););
+	debug_print(LOG_DEBUG,"hid_build_device_list");
 	
 /*
  * The Windows DDK "hid.dll" has to be loaded manually because Windows gets
@@ -321,7 +321,7 @@ void hid_print(t_hid *x)
 
 void hid_platform_specific_free(t_hid *x)
 {
-	DEBUG(post("hid_platform_specific_free"););
+	debug_print(LOG_DEBUG,"hid_platform_specific_free");
 /* only call this if the last instance is being freed */
 	if (hid_instance_count < 1) 
 	{

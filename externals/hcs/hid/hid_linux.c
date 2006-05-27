@@ -132,7 +132,7 @@ t_symbol* hid_convert_linux_keys(__u16 linux_code)
 
 void hid_print_element_list(t_hid *x)
 {
-    DEBUG(post("hid_print_element_list"););
+    debug_print(LOG_DEBUG,"hid_print_element_list");
     unsigned long bitmask[EV_MAX][NBITS(KEY_MAX)];
 //    char event_type_string[256];
 //    char event_code_string[256];
@@ -252,7 +252,7 @@ void hid_print_element_list(t_hid *x)
 
 void hid_print_device_list(void)
 {
-    DEBUG(post("hid_print_device_list"););
+    debug_print(LOG_DEBUG,"hid_print_device_list");
     int i,fd;
     char device_output_string[256] = "Unknown";
     char dev_handle_name[20] = "/dev/input/event0";
@@ -350,7 +350,7 @@ void hid_ff_print( t_hid *x )
 
 t_int hid_get_events(t_hid *x)
 {
-    DEBUG(post("hid_get_events"););
+    debug_print(LOG_DEBUG,"hid_get_events");
 
 /* for debugging, counts how many events are processed each time hid_read() is called */
     DEBUG(t_int event_counter = 0;);
@@ -411,7 +411,7 @@ void hid_print(t_hid* x)
 
 t_int hid_open_device(t_hid *x, t_int device_number)
 {
-    DEBUG(post("hid_open_device"););
+    debug_print(LOG_DEBUG,"hid_open_device");
 
     char device_name[256] = "Unknown";
     char dev_handle_name[20] = "/dev/input/event0";
@@ -453,7 +453,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
  */
 t_int hid_close_device(t_hid *x)
 {
-    DEBUG(post("hid_close_device"););
+    debug_print(LOG_DEBUG,"hid_close_device");
     if (x->x_fd <0) 
         return 0;
     else
@@ -462,7 +462,7 @@ t_int hid_close_device(t_hid *x)
 
 t_int hid_build_device_list(t_hid *x)
 {
-    DEBUG(post("hid_build_device_list"););
+    debug_print(LOG_DEBUG,"hid_build_device_list");
     /* the device list should be refreshed here */
 /*
  *	since in GNU/Linux the device list is the input event devices 

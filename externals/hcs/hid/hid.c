@@ -23,6 +23,12 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
+#include <unistd.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 #include "hid.h"
 
 /*------------------------------------------------------------------------------
@@ -32,23 +38,64 @@
 #define DEBUG(x)
 //#define DEBUG(x) x 
 
+unsigned short global_debug_level = 0;
+
 static t_class *hid_class;
 
 /*------------------------------------------------------------------------------
  * FUNCTION PROTOTYPES
  */
 
-void hid_start(t_hid *x, t_float f);
-void hid_stop(t_hid *x);
-t_int hid_open(t_hid *x, t_float f);
-t_int hid_close(t_hid *x);
-t_int hid_read(t_hid *x,int fd);
+static void hid_poll(t_hid *x, t_float f);
+static t_int hid_open(t_hid *x, t_symbol *s, t_int argc, t_atom *argv);
+static t_int hid_close(t_hid *x);
+static t_int hid_read(t_hid *x,int fd);
 static void hid_float(t_hid* x, t_floatarg f);
 
 
 /*------------------------------------------------------------------------------
  * SUPPORT FUNCTIONS
  */
+
+void debug_print(t_int message_debug_level, const char *fmt, ...)
+{
+	if(message_debug_level <= global_debug_level)
+	{
+		char buf[MAXPDSTRING];
+		va_list ap;
+		//t_int arg[8];
+		va_start(ap, fmt);
+		vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
+		post(buf);
+		va_end(ap);
+	}
+}
+
+void debug_error(t_hid *x, t_int message_debug_level, const char *fmt, ...)
+{
+	if(message_debug_level <= global_debug_level)
+	{
+		char buf[MAXPDSTRING];
+		va_list ap;
+		//t_int arg[8];
+		va_start(ap, fmt);
+		vsnprintf(buf, MAXPDSTRING-1, fmt, ap);
+		pd_error(x, buf);
+		va_end(ap);
+	}
+}
+
+static unsigned int name_to_usage(char *usage_name)
+{ // output usagepage << 16 + usage
+	if(strcmp(usage_name,"pointer") == 0)   return(0x00010001);
+	if(strcmp(usage_name,"mouse") == 0)     return(0x00010002);
+	if(strcmp(usage_name,"joystick") == 0)  return(0x00010004);
+	if(strcmp(usage_name,"gamepad") == 0)   return(0x00010005);
+	if(strcmp(usage_name,"keyboard") == 0)  return(0x00010006);
+	if(strcmp(usage_name,"keypad") == 0)    return(0x00010007);
+	if(strcmp(usage_name,"multiaxiscontroller") == 0) return(0x00010008);
+	return(0);
+}
 
 void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 {
@@ -61,6 +108,19 @@ void hid_output_event(t_hid *x, char *type, char *code, t_float value)
 	outlet_anything(x->x_data_outlet,atom_gensym(event_data),2,event_data+1);
 }
 
+/* stop polling the device */
+void stop_poll(t_hid* x) 
+{
+  debug_print(LOG_DEBUG,"stop_poll");
+  
+  if (x->x_started) 
+  { 
+	  clock_unset(x->x_clock);
+	  debug_print(LOG_INFO,"[hid] polling stopped");
+	  x->x_started = 0;
+  }
+}
+
 void hid_set_from_float(t_hid *x, t_floatarg f)
 {
 /* values greater than 1 set the polling delay time */
@@ -68,47 +128,35 @@ void hid_set_from_float(t_hid *x, t_floatarg f)
 	if (f > 1)
 	{
 		x->x_delay = (t_int)f;
-		hid_start(x,f);
+		hid_poll(x,f);
 	}
 	else if (f == 1) 
 	{
 		if (! x->x_started)
-		hid_start(x,f);
+		hid_poll(x,f);
 	}
 	else if (f == 0) 		
 	{
-		hid_stop(x);
+		stop_poll(x);
 	}
 }
 
 /*------------------------------------------------------------------------------
- * IMPLEMENTATION                    
+ * METHODS FOR [hid]'s MESSAGES                    
  */
 
-/* stop polling the device */
-void hid_stop(t_hid* x) 
-{
-  DEBUG(post("hid_stop"););
-  
-  if (x->x_started) 
-  { 
-	  clock_unset(x->x_clock);
-	  DEBUG(post("[hid] polling stopped"););
-	  x->x_started = 0;
-  }
-}
 
 /* close the device */
 t_int hid_close(t_hid *x) 
 {
-	DEBUG(post("hid_close"););
+	debug_print(LOG_DEBUG,"hid_close");
 
 /* just to be safe, stop it first */
-	hid_stop(x);
+	stop_poll(x);
 
 	if(! hid_close_device(x)) 
 	{
-		post("[hid] closed device %d",x->x_device_number);
+		debug_print(LOG_INFO,"[hid] closed device %d",x->x_device_number);
 		x->x_device_open = 0;
 		return (0);
 	}
@@ -126,28 +174,62 @@ t_int hid_close(t_hid *x)
  * open / different device       close open 
  */
 
-t_int hid_open(t_hid *x, t_float f) 
+t_int hid_open(t_hid *x, t_symbol *s, t_int argc, t_atom *argv) 
 {
-	DEBUG(post("hid_open"););
+	debug_print(LOG_DEBUG,"hid_open");
+	unsigned short i;
+	unsigned short device_number = 0;
+	unsigned short usage_number;
+	unsigned int usage;
+	char usage_string[MAXPDSTRING] = "";
 
+	if(argc == 1)
+	{
+		if(atom_getsymbolarg(0,argc,argv) == &s_) 
+		{ // single float arg means device
+			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
+			device_number = (unsigned short) atom_getfloatarg(0,argc,argv);
+		}
+		else
+		{ // single symbol arg means usagepage/usage
+			debug_print(LOG_DEBUG,"[hid] setting device via usagepage/usage");
+			atom_string(argv, usage_string, MAXPDSTRING-1);
+			i = strlen(usage_string);
+			do {
+				--i;
+			} while(isdigit(usage_string[i]));
+			usage_number = strtol(usage_string + i + 1,NULL,10);
+			usage_string[i+1] = '\0';
+			debug_print(LOG_DEBUG,"[hid] looking for %s #%d",usage_string,usage_number);
+			usage = name_to_usage(usage_string);
+			debug_print(LOG_DEBUG,"[hid] usage 0x%08x 0x%04x 0x%04x",usage, usage >> 16, usage & 0xffff);
+			device_number = get_device_number_from_usage_list(usage_number, 
+															  usage >> 16, usage & 0xffff);
+		}
+	}
+	else if( (argc == 2) && (atom_getsymbolarg(0,argc,argv) != NULL) 
+			 && (atom_getsymbolarg(1,argc,argv) != NULL) )
+	{ /* two symbols means idVendor and idProduct in hex */
+	}
+	
 /* store running state to be restored after the device has been opened */
 	t_int started = x->x_started;
 
 /* only close the device if its different than the current and open */	
-	if ( (f != x->x_device_number) && (x->x_device_open) ) 
+	if( (device_number != x->x_device_number) && (x->x_device_open) ) 
 		hid_close(x);
 
-	if (f > 0)
-		x->x_device_number = f;
+	if(device_number > 0)
+		x->x_device_number = device_number;
 	else
 		x->x_device_number = 0;
 
 /* if device is open still, that means the same device is trying to be opened,
  * therefore ignore the redundant open request.  To reopen the same device,
  * send a [close( msg, then an [open( msg. */
-	if (! x->x_device_open) 
+	if(! x->x_device_open) 
 	{
-		if (hid_open_device(x,x->x_device_number))
+		if(hid_open_device(x,x->x_device_number))
 		{
 			error("[hid] can not open device %d",x->x_device_number);
 			return (1);
@@ -164,13 +246,15 @@ t_int hid_open(t_hid *x, t_float f)
 	if(started)
 		hid_set_from_float(x,x->x_delay);
 
+	debug_print(LOG_DEBUG,"[hid] done device# to %d",device_number);
+
 	return (0);
 }
 
 
 t_int hid_read(t_hid *x,int fd) 
 {
-//	DEBUG(post("hid_read"););
+//	debug_print(LOG_DEBUG,"hid_read");
 
 	hid_get_events(x);
 	
@@ -183,36 +267,62 @@ t_int hid_read(t_hid *x,int fd)
 	return 1; 
 }
 
-void hid_start(t_hid* x, t_float f) 
+void hid_poll(t_hid* x, t_float f) 
 {
-	DEBUG(post("hid_start"););
+	debug_print(LOG_DEBUG,"hid_poll");
   
 /*	if the user sets the delay less than one, ignore */
-	if( f >= 1 ) 	
+	if( f > 0 ) 	
 		x->x_delay = (t_int)f;
 
 	if(!x->x_device_open)
-		hid_open(x,x->x_device_number);
+		hid_open(x,gensym("open"),0,NULL);
 	
-   if(!x->x_started) 
+	if(!x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
-		DEBUG(post("[hid] polling started"););
+		debug_print(LOG_DEBUG,"[hid] polling started");
 		x->x_started = 1;
 	} 
 }
 
+static void hid_anything(t_hid *x, t_symbol *s, t_int argc, t_atom *argv)
+{
+	int i;
+	t_symbol *my_symbol;
+	char device_name[MAXPDSTRING];
+		
+	startpost("ANYTHING! selector: %s data:");
+	for(i=0; i<argc; ++i)
+	{
+		my_symbol = atom_getsymbolarg(i,argc,argv);
+		if(my_symbol != NULL)
+			post(" %s",my_symbol->s_name);
+		else
+			post(" %f",atom_getfloatarg(i,argc,argv));
+	}
+}
+
+
 static void hid_float(t_hid* x, t_floatarg f) 
 {
-	DEBUG(post("hid_float"););
+	debug_print(LOG_DEBUG,"hid_float");
 
 	hid_set_from_float(x,f);
 }
 
-/* setup functions */
+static void hid_debug(t_hid *x, t_float f)
+{
+	global_debug_level = f;
+}
+
+
+/*------------------------------------------------------------------------------
+ * system functions 
+ */
 static void hid_free(t_hid* x) 
 {
-	DEBUG(post("hid_free"););
+	debug_print(LOG_DEBUG,"hid_free");
 		
 	hid_close(x);
 	clock_free(x->x_clock);
@@ -225,13 +335,16 @@ static void hid_free(t_hid* x)
 static void *hid_new(t_float f) 
 {
   t_hid *x = (t_hid *)pd_new(hid_class);
-
-  DEBUG(post("hid_new"););
-
+  
+  debug_print(LOG_DEBUG,"hid_new");
+  
 /* only display the version when the first instance is loaded */
   if(!hid_instance_count)
+  {
 	  post("[hid] %d.%d, written by Hans-Christoph Steiner <hans@eds.org>",
 			 HID_MAJOR_VERSION, HID_MINOR_VERSION);  
+	  post("\tcompiled on "__DATE__" at "__TIME__ " ");
+  }
 
 #if !defined(__linux__) && !defined(__APPLE__)
   error("    !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !! WARNING !!");
@@ -240,6 +353,7 @@ static void *hid_new(t_float f)
 #endif
 
   /* init vars */
+  global_debug_level = 9; /* high numbers here means see more messages */
   x->x_has_ff = 0;
   x->x_device_open = 0;
   x->x_started = 0;
@@ -250,16 +364,14 @@ static void *hid_new(t_float f)
   /* create anything outlet used for HID data */ 
   x->x_data_outlet = outlet_new(&x->x_obj, 0);
   x->x_device_name_outlet = outlet_new(&x->x_obj, 0);
-  
-  /* find and report the list of devices */
-  hid_build_device_list(x);
-  
-  /* Open the device and save settings.  If there is an error, return the object
-   * anyway, so that the inlets and outlets are created, thus not breaking the
-   * patch.   */
-  if (hid_open(x,f))
-	  error("[hid] device %d did not open",(t_int)f);
 
+  x->x_device_number = 0;
+
+  if(f > 0)
+	  x->x_device_number = f;
+  else
+	  x->x_device_number = 0;
+  
   hid_instance_count++;
 
   return (x);
@@ -267,7 +379,7 @@ static void *hid_new(t_float f)
 
 void hid_setup(void) 
 {
-	DEBUG(post("hid_setup"););
+	debug_print(LOG_DEBUG,"hid_setup");
 	hid_class = class_new(gensym("hid"), 
 								 (t_newmethod)hid_new, 
 								 (t_method)hid_free,
@@ -278,16 +390,15 @@ void hid_setup(void)
 	/* add inlet datatype methods */
 	class_addfloat(hid_class,(t_method) hid_float);
 	class_addbang(hid_class,(t_method) hid_read);
+	class_addanything(hid_class,(t_method) hid_anything);
 	
 	/* add inlet message methods */
+	class_addmethod(hid_class,(t_method) hid_debug,gensym("debug"),A_DEFFLOAT,0);
 	class_addmethod(hid_class,(t_method) hid_build_device_list,gensym("refresh"),0);
 	class_addmethod(hid_class,(t_method) hid_print,gensym("print"),0);
-	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_DEFFLOAT,0);
+	class_addmethod(hid_class,(t_method) hid_open,gensym("open"),A_GIMME,0);
 	class_addmethod(hid_class,(t_method) hid_close,gensym("close"),0);
-	class_addmethod(hid_class,(t_method) hid_start,gensym("start"),A_DEFFLOAT,0);
-	class_addmethod(hid_class,(t_method) hid_start,gensym("poll"),A_DEFFLOAT,0);
-	class_addmethod(hid_class,(t_method) hid_stop,gensym("stop"),0);
-	class_addmethod(hid_class,(t_method) hid_stop,gensym("nopoll"),0);
+	class_addmethod(hid_class,(t_method) hid_poll,gensym("poll"),A_DEFFLOAT,0);
    /* force feedback messages */
 	class_addmethod(hid_class,(t_method) hid_ff_autocenter,
 						 gensym("ff_autocenter"),A_DEFFLOAT,0);

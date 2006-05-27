@@ -63,7 +63,7 @@
 extern t_int hid_instance_count;
 
 /*==============================================================================
- * FUNCTION PROTOTYPES
+h * FUNCTION PROTOTYPES
  *==============================================================================
  */
 
@@ -96,7 +96,7 @@ void convertAxis(pRecElement element, char *linux_type, char *linux_code, char *
 
 void convertDarwinElementToLinuxTypeCode(pRecElement element, char *linux_type, char *linux_code) 
 {
-	t_int button_offset = 0;
+//	t_int button_offset = 0;
 
 	switch(element->type)
 	{
@@ -202,6 +202,61 @@ pRecDevice hid_get_device_by_number(t_int device_number)
 	return pCurrentHIDDevice;
 }
 
+t_int get_device_number_by_ids(unsigned short vendor_id, unsigned short product_id)
+{
+	return(1);
+}
+
+t_int get_device_number_from_usage_list(t_int device_number, 
+										unsigned short usage_page, unsigned short usage)
+{
+	debug_print(LOG_DEBUG,"get_device_number_from_usage_list");
+
+	pRecDevice    pCurrentHIDDevice;
+	t_int i;
+	t_int device_count;
+	t_int total_devices = 0;
+	char cstrDeviceName[MAXPDSTRING];
+
+	if( !HIDHaveDeviceList() ) hid_build_device_list();
+
+	pCurrentHIDDevice = HIDGetFirstDevice();
+	while(pCurrentHIDDevice != NULL)
+	{
+		if( (pCurrentHIDDevice->usagePage == usage_page) && 
+			(pCurrentHIDDevice->usage == usage) )
+		{
+			++total_devices;
+		}
+		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
+	}
+	i = total_devices;
+	device_count = HIDCountDevices();
+	debug_print(LOG_DEBUG,"[hid]  %d is less than %d",i,device_number);
+	pCurrentHIDDevice = HIDGetFirstDevice();
+	while( (pCurrentHIDDevice != NULL) && (i > device_number) ) 
+	{
+		debug_print(LOG_DEBUG,"[hid] %d:  %d == %d     %d == %d",i,
+					pCurrentHIDDevice->usagePage, 
+					usage_page,
+					pCurrentHIDDevice->usage,
+					usage);
+		device_count--;
+		if( (pCurrentHIDDevice->usagePage == usage_page) && 
+			(pCurrentHIDDevice->usage == usage) )
+		{
+			i--;
+			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
+							pCurrentHIDDevice->usage, 
+							cstrDeviceName);
+			debug_print(LOG_DEBUG,"[hid]: found a %s at %d: %s %s",cstrDeviceName,i,
+						pCurrentHIDDevice->manufacturer,pCurrentHIDDevice->product);
+		}
+		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
+	} 
+	return(device_count);
+}
+
 
 void hid_build_element_list(t_hid *x) 
 {
@@ -210,7 +265,7 @@ void hid_build_element_list(t_hid *x)
 
 t_int hid_print_element_list(t_hid *x)
 {
-	DEBUG(post("hid_print_element_list"););
+	debug_print(LOG_DEBUG,"hid_print_element_list");
 
 	UInt32 i;
 	pRecElement	pCurrentHIDElement;
@@ -264,7 +319,7 @@ t_int hid_print_element_list(t_hid *x)
 
 void hid_ff_print( t_hid *x )
 {
-	DEBUG(post("hid_ff_print"););
+	debug_print(LOG_DEBUG,"hid_ff_print");
 	HRESULT result;
 	UInt32 value;
 
@@ -291,7 +346,7 @@ void hid_print_device_list(t_hid *x)
 {
 	char cstrDeviceName [256];
 	t_int i,numdevs;
-	UInt32 usagePage, usage;
+//	UInt32 usagePage, usage;
 	pRecDevice pCurrentHIDDevice = NULL;
 
 	if( HIDHaveDeviceList() )
@@ -303,16 +358,23 @@ void hid_print_device_list(t_hid *x)
 		for(i=0; i < numdevs; i++)
 		{
 			pCurrentHIDDevice = hid_get_device_by_number(i);
-			post("Device %d: '%s' '%s' version %d",i,pCurrentHIDDevice->manufacturer,
-				  pCurrentHIDDevice->product,pCurrentHIDDevice->version);
+			debug_print(LOG_INFO,"Device %d: '%s' '%s' version %d",
+						i,
+						pCurrentHIDDevice->manufacturer,
+						pCurrentHIDDevice->product,
+						pCurrentHIDDevice->version);
 			//usage
-			HIDGetUsageName (pCurrentHIDDevice->usagePage, 
+			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
 								  pCurrentHIDDevice->usage, 
 								  cstrDeviceName);
-			DEBUG(post("       vendorID: %d   productID: %d   locID: %d",
+			debug_print(LOG_INFO,"\t\tcstrDeviceName: %s",cstrDeviceName);
+			debug_print(LOG_INFO,"\t\tusage page: 0x%04x\tusage: 0x%04x",
+						pCurrentHIDDevice->usagePage,
+						pCurrentHIDDevice->usage);
+			debug_print(LOG_INFO,"\t\tvendorID: 0x%04x\tproductID: 0x%04x\tlocID: 0x%08x",
 						  pCurrentHIDDevice->vendorID,
 						  pCurrentHIDDevice->productID,
-						  pCurrentHIDDevice->locID););
+						  pCurrentHIDDevice->locID);
 		}
 		post("");
 	}
@@ -321,7 +383,7 @@ void hid_print_device_list(t_hid *x)
 void hid_output_device_name(t_hid *x, char *manufacturer, char *product) 
 {
 	char      *device_name;
-	t_symbol  *device_name_symbol;
+//	t_symbol  *device_name_symbol;
 
 	device_name = malloc( strlen(manufacturer) + 1 + strlen(product) + 1 );
 //	device_name = malloc( 7 + strlen(manufacturer) + 1 + strlen(product) + 1 );
@@ -344,7 +406,7 @@ void hid_output_device_name(t_hid *x, char *manufacturer, char *product)
 
 t_int hid_ff_autocenter(t_hid *x, t_float value)
 {
-	DEBUG(post("hid_ff_autocenter"););
+	debug_print(LOG_DEBUG,"hid_ff_autocenter");
 	HRESULT result;
 	UInt32 autocenter_value;
 
@@ -368,7 +430,7 @@ t_int hid_ff_autocenter(t_hid *x, t_float value)
 
 t_int hid_ff_gain(t_hid *x, t_float value)
 {
-	DEBUG(post("hid_ff_gain"););
+	debug_print(LOG_DEBUG,"hid_ff_gain");
 	HRESULT result;
 	UInt32 ffgain_value;
 	
@@ -408,37 +470,37 @@ t_int hid_ff_send_ff_command (t_hid *x, UInt32 ff_command)
 
 t_int hid_ff_continue( t_hid *x )
 {
-	DEBUG(post("hid_ff_continue"););
+	debug_print(LOG_DEBUG,"hid_ff_continue");
 	return(  hid_ff_send_ff_command( x, FFSFFC_CONTINUE ) );
 }
 
 t_int hid_ff_pause( t_hid *x )
 {
-	DEBUG(post("hid_ff_pause"););
+	debug_print(LOG_DEBUG,"hid_ff_pause");
 	return(  hid_ff_send_ff_command( x, FFSFFC_PAUSE ) );
 }
 
 t_int hid_ff_reset( t_hid *x )
 {
-	DEBUG(post("hid_ff_reset"););
+	debug_print(LOG_DEBUG,"hid_ff_reset");
 	return(  hid_ff_send_ff_command( x, FFSFFC_RESET ) );
 }
 
 t_int hid_ff_setactuatorsoff( t_hid *x )
 {
-	DEBUG(post("hid_ff_setactuatorsoff"););
+	debug_print(LOG_DEBUG,"hid_ff_setactuatorsoff");
 	return(  hid_ff_send_ff_command( x, FFSFFC_SETACTUATORSOFF ) );
 }
 
 t_int hid_ff_setactuatorson( t_hid *x )
 {
-	DEBUG(post("hid_ff_setactuatorson"););
+	debug_print(LOG_DEBUG,"hid_ff_setactuatorson");
 	return(  hid_ff_send_ff_command( x, FFSFFC_SETACTUATORSON ) );
 }
 
 t_int hid_ff_stopall( t_hid *x )
 {
-	DEBUG(post("hid_ff_stopall"););
+	debug_print(LOG_DEBUG,"hid_ff_stopall");
 	return(  hid_ff_send_ff_command( x, FFSFFC_STOPALL ) );
 }
 
@@ -461,7 +523,7 @@ t_int hid_ff_motors( t_hid *x, t_float value )
 
 t_int hid_ff_fftest ( t_hid *x, t_float value)
 {
-	DEBUG(post("hid_get_events"););
+	debug_print(LOG_DEBUG,"hid_get_events");
 	
 	return( 0 );
 }
@@ -472,7 +534,7 @@ t_int hid_ff_fftest ( t_hid *x, t_float value)
 
 t_int hid_get_events(t_hid *x)
 {
-	//DEBUG(post("hid_get_events"););
+	//debug_print(LOG_DEBUG,"hid_get_events");
 
 	SInt32 value;
 	pRecDevice  pCurrentHIDDevice;
@@ -481,10 +543,10 @@ t_int hid_get_events(t_hid *x)
 	char type[256];
 	char code[256];
 	char event_output_string[256];
-	t_atom event_data[4];
+//	t_atom event_data[4];
 
 	int event_counter = 0;
-	Boolean result;
+//	Boolean result;
 
 	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
 
@@ -623,28 +685,19 @@ t_int hid_get_events(t_hid *x)
 
 t_int hid_open_device(t_hid *x, t_int device_number)
 {
-	DEBUG(post("hid_open_device"););
+	debug_print(LOG_DEBUG,"hid_open_device");
 
 	t_int result = 0;
 	pRecDevice pCurrentHIDDevice = NULL;
 
-	io_service_t hidDevice = NULL;
+	io_service_t hidDevice = 0;
 	FFDeviceObjectReference ffDeviceReference = NULL;
 
 /* rebuild device list to make sure the list is current */
-	if ( ! HIDHaveDeviceList() )
-	{
-		result = (t_int) HIDBuildDeviceList (NULL, NULL); 
-		// returns false if no device found
-		if(result) 
-		{
-			error("[hid]: no HID devices found\n");
-			return(result);
-		}
-	}
+	if( !HIDHaveDeviceList() ) hid_build_device_list();
 	
 	pCurrentHIDDevice = hid_get_device_by_number(device_number);
-	if ( ! HIDIsValidDevice(pCurrentHIDDevice) )
+	if( ! HIDIsValidDevice(pCurrentHIDDevice) )
 	{
 		error("[hid]: device %d is not a valid device\n",device_number);
 		return(1);
@@ -658,10 +711,10 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 	hid_build_element_list(x);
 
 	hidDevice = AllocateHIDObjectFromRecDevice( pCurrentHIDDevice );
-	if ( FFIsForceFeedback(hidDevice) == FF_OK ) 
+	if( FFIsForceFeedback(hidDevice) == FF_OK ) 
 	{
 		post("\tdevice has Force Feedback support");
-		if ( FFCreateDevice(hidDevice,&ffDeviceReference) == FF_OK ) 
+		if( FFCreateDevice(hidDevice,&ffDeviceReference) == FF_OK ) 
 		{
 			x->x_has_ff = 1;
 			x->x_ff_device = ffDeviceReference;
@@ -684,42 +737,27 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 
 t_int hid_close_device(t_hid *x)
 {
-	DEBUG(post("hid_close_device"););
+	debug_print(LOG_DEBUG,"hid_close_device");
 
 	t_int result = 0;
 	pRecDevice pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
 
 	HIDDequeueDevice(pCurrentHIDDevice);
-// this doesn't seem to be needed at all
+// this doesn't seem to be needed at all, but why not use it?
 //   result = HIDCloseReleaseInterface(pCurrentHIDDevice);
 	
 	return(result);
 }
 
 
-t_int hid_build_device_list(t_hid *x)
+void hid_build_device_list(void)
 {
-	DEBUG(post("hid_build_device_list"););
+	debug_print(LOG_DEBUG,"hid_build_device_list");
 
-	pRecDevice    pCurrentHIDDevice;
-	t_atom        device_name_atoms[2];
-	
-// returns false if no device found
-	if(HIDBuildDeviceList (NULL, NULL)) 
-		error("[hid]: no HID devices found\n");
-
-	/* send the [options( msg to set the [hid_menu] to blank */
-	outlet_anything( x->x_device_name_outlet, gensym( "options" ),0,NULL );
-
-	pCurrentHIDDevice = HIDGetFirstDevice();
-	while ( pCurrentHIDDevice != NULL )
-	{
-		hid_output_device_name( x, pCurrentHIDDevice->manufacturer, 
-										pCurrentHIDDevice->product );
-		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
-	} 
-	
-	return (0);
+	debug_print(LOG_WARNING,"[hid] Building device list...");
+	if(HIDBuildDeviceList (0, 0)) 
+		post("[hid]: no HID devices found\n");
+	debug_print(LOG_WARNING,"[hid] completed device list.");
 }
 
 
@@ -737,7 +775,7 @@ void hid_print(t_hid *x)
 
 void hid_platform_specific_free(t_hid *x)
 {
-	DEBUG(post("hid_platform_specific_free"););
+	debug_print(LOG_DEBUG,"hid_platform_specific_free");
 /* only call this if the last instance is being freed */
 	if (hid_instance_count < 1) 
 	{
