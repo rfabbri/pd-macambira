@@ -15,7 +15,16 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.22 $"; */
+/* static char *version = "$Revision: 1.23 $"; */
+
+/*------------------------------------------------------------------------------
+ * GLOBAL DEFINES
+ */
+
+#define DEFAULT_DELAY 5
+
+/* this is set to simplify data structures (arrays instead of linked lists) */
+#define MAX_DEVICES 128
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF
@@ -25,8 +34,8 @@ typedef struct _hid
 	t_object            x_obj;
 	t_int               x_fd;
 	t_int               x_device_number;
-	unsigned short      vendor_id;    // USB idVendor for current device
-	unsigned short      product_id;   // USB idProduct for current device
+//	unsigned short      vendor_id;    // USB idVendor for current device
+//	unsigned short      product_id;   // USB idProduct for current device
 	t_int               x_has_ff;
 	void                *x_ff_device;
 	t_clock             *x_clock;
@@ -38,11 +47,6 @@ typedef struct _hid
 } t_hid;
 
 
-/*------------------------------------------------------------------------------
- * GLOBAL DEFINES
- */
-
-#define DEFAULT_DELAY 5
 
 
 /*------------------------------------------------------------------------------
@@ -56,6 +60,9 @@ typedef struct _hid
 t_int hid_instance_count;
 
 extern unsigned short global_debug_level;
+
+/* next I need to make a data structure to hold the data to be output for this
+ * poll.  This should probably be an array for efficiency */
 
 /*------------------------------------------------------------------------------
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS

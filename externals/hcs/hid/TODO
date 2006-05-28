@@ -1,7 +1,29 @@
 
 
 ==============================================================================
-= make second inlet for poll # (for [human->pd]
+= output one value per poll
+
+- for relative axes, sum up all events and output one
+http://lists.apple.com/archives/mac-games-dev/2005/Oct/msg00060.html
+
+- for absolute axes, just output latest value.  if they are not in the queue,
+  I can check them manually
+
+- buttons, output everything
+
+- is this at all necessary?  How often do multiple events happen in one poll period?
+
+
+==============================================================================
+= iterate through elements and do a proper queue of the ones we want:
+
+- also, label multiple instances of the same usage
+
+http://mud.5341.com/msg/8455.html
+
+
+==============================================================================
+= make second inlet for poll # (for [human->pd])
 
 
 ==============================================================================
@@ -16,6 +38,17 @@
 = open devices by name
 
 i.e "Trackpad" a la Max's [hi]
+
+
+==============================================================================
+= 
+= autoscaling based on Logical min/max
+
+- this is probably essential for input, the question is how to find out what
+  the data range is easily.
+
+- output would be handy, rather than autoscale, to save on CPU
+
 
 
 ==============================================================================
@@ -43,6 +76,12 @@ i.e "Trackpad" a la Max's [hi]
 
 
 ==============================================================================
+= event name changes
+
+- make key/button Type "button" rather than "key" (undecided on this one)
+
+
+==============================================================================
 = hid/serial
 
 - open/close status outlet
@@ -61,16 +100,13 @@ i.e "Trackpad" a la Max's [hi]
   data, as they are intended.
 
 
-==============================================================================
-= open/close status outlet
-
-
 
 ==============================================================================
 = profile [hid] object and usage
 
 - find out if [autoscale] takes a lot of CPU power, or where in [hid] is using
   CPU where it doesn't have to be
+
 
 ==============================================================================
 = Report available FF effects
@@ -98,15 +134,11 @@ i.e "Trackpad" a la Max's [hi]
 
 
 ==============================================================================
-= event name changes
-
-- make key/button Type "button" rather than "key" (undecided on this one)
-
-
-==============================================================================
 = check out using USB timestamp 
 
-- use the USB timestamp to correctly space the output data
+- use the USB timestamp to correctly space the output data (meh, probably
+  unnecessary)
+
 
 
  /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\

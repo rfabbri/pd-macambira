@@ -62,8 +62,11 @@
 
 extern t_int hid_instance_count;
 
+/* store device pointers */
+pRecDevice device_pointer[MAX_DEVICES];
+
 /*==============================================================================
-h * FUNCTION PROTOTYPES
+ * FUNCTION PROTOTYPES
  *==============================================================================
  */
 
@@ -182,6 +185,8 @@ pRecDevice hid_get_device_by_number(t_int device_number)
 	pRecDevice pCurrentHIDDevice;
 	t_int i, numdevs;
 
+// TODO: implement this using the global array built by hid_build_device_list()
+
 /*
  *	If the specified device is greater than the total number of devices, return
  *	an error.
@@ -289,7 +294,39 @@ t_int get_device_number_from_usage_list(t_int device_number,
 /*
 void hid_build_element_list(t_hid *x) 
 {
-	
+	   if ( HIDIsValidDevice( device ) ) {
+       elRec = HIDGetFirstDeviceElement( js_devices[id].device,
+kHIDElementTypeInput );
+       if ( elRec ) {
+           switch (elRec->usagePage) {
+               case kHIDPage_GenericDesktop:
+                   switch ( elRec->usage ) {
+                       case kHIDUsage_GD_X:
+                               x_axis = elRec;
+                               break;
+                       case kHIDUsage_GD_Y:
+                               y_axis = elRec;
+                               break;
+                       case kHIDUsage_GD_GamePad:
+                               pad = elRec;
+                               break;
+                       //etc
+                   }
+           }
+      //if the right element was not found, continue looping through the
+      //rest of the elements by calling HIDGetNextDeviceElement() until you
+      //find the right one or it returns NULL
+   }
+
+   // only queue buttons and relative axes
+   if ( HIDIsValidElement( devicePtr, elementPtr ) ) {
+       HIDQueueElement (devicePtr, elementPtr);
+   }
+
+   // for absolute axes, poll them
+   if ( HIDIsValidElement( devicePtr, elementPtr ) )  {
+       value = HIDGetElementValue(devicePtr, elementPtr);
+   }
 }
 */
 
@@ -306,7 +343,8 @@ t_int hid_print_element_list(t_hid *x)
 	char type_name[256];
 	char usage_name[256];
 
-	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+//	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+	pCurrentHIDDevice = device_pointer[x->x_device_number];
 	if ( ! HIDIsValidDevice(pCurrentHIDDevice) )
 	{
 		error("[hid]: device %d is not a valid device\n",x->x_device_number);
@@ -387,7 +425,8 @@ void hid_print_device_list(t_hid *x)
 		/* display device list in console */
 		for(i=0; i < numdevs; i++)
 		{
-			pCurrentHIDDevice = hid_get_device_by_number(i);
+//			pCurrentHIDDevice = hid_get_device_by_number(i);
+			pCurrentHIDDevice = device_pointer[i];
 			debug_print(LOG_INFO,"Device %d: '%s' '%s' version %d",
 						i,
 						pCurrentHIDDevice->manufacturer,
@@ -423,7 +462,8 @@ void hid_platform_specific_info(t_hid *x)
 
 	if(x->x_device_number > -1)
 	{
-		pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+//		pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+		pCurrentHIDDevice = device_pointer[x->x_device_number];
 		if(pCurrentHIDDevice != NULL)
 		{
             /* product */
@@ -619,7 +659,8 @@ t_int hid_get_events(t_hid *x)
 	int event_counter = 0;
 //	Boolean result;
 
-	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+//	pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+	pCurrentHIDDevice = device_pointer[x->x_device_number];
 
 	if(!pCurrentHIDDevice) 
 	{
@@ -767,7 +808,8 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 /* rebuild device list to make sure the list is current */
 	if( !HIDHaveDeviceList() ) hid_build_device_list();
 	
-	pCurrentHIDDevice = hid_get_device_by_number(device_number);
+//	pCurrentHIDDevice = hid_get_device_by_number(device_number);
+	pCurrentHIDDevice = device_pointer[device_number];
 	if( HIDIsValidDevice(pCurrentHIDDevice) )
 	{
 		x->x_device_number = device_number;
@@ -802,7 +844,10 @@ t_int hid_open_device(t_hid *x, t_int device_number)
 
 	HIDQueueDevice(pCurrentHIDDevice);
 // TODO: queue all elements except absolute axes, those can just be polled
-
+/*   if ( HIDIsValidElement( devicePtr, elementPtr ) )  {
+       value = HIDGetElementValue(devicePtr, elementPtr);
+   }
+*/
 	return(result);
 }
 
@@ -812,7 +857,8 @@ t_int hid_close_device(t_hid *x)
 	debug_print(LOG_DEBUG,"hid_close_device");
 
 	t_int result = 0;
-	pRecDevice pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+//	pRecDevice pCurrentHIDDevice = hid_get_device_by_number(x->x_device_number);
+	pRecDevice pCurrentHIDDevice = device_pointer[x->x_device_number];
 
 	HIDDequeueDevice(pCurrentHIDDevice);
 // this doesn't seem to be needed at all, but why not use it?
@@ -824,11 +870,27 @@ t_int hid_close_device(t_hid *x)
 
 void hid_build_device_list(void)
 {
+	int device_number = 0;
+	pRecDevice pCurrentHIDDevice;
+	
 	debug_print(LOG_DEBUG,"hid_build_device_list");
 
 	debug_print(LOG_WARNING,"[hid] Building device list...");
 	if(HIDBuildDeviceList (0, 0)) 
 		post("[hid]: no HID devices found\n");
+
+/*	The most recently discovered HID is the first element of the list here.  I
+ *	want the oldest to be number 0 rather than the newest. */
+	device_number = (int) HIDCountDevices();
+	pCurrentHIDDevice = HIDGetFirstDevice();
+	while(pCurrentHIDDevice != NULL)
+	{
+		--device_number;
+		if(device_number < MAX_DEVICES)
+			device_pointer[device_number] = pCurrentHIDDevice;
+		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
+	}
+	
 	debug_print(LOG_WARNING,"[hid] completed device list.");
 }
 

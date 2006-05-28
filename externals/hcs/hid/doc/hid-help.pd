@@ -1,10 +1,10 @@
-#N canvas 54 47 924 649 10;
-#X msg 233 353 not_implemented notimp_64 -255;
+#N canvas 242 96 932 657 10;
+#X msg 233 353 abs abs_y 55;
 #X floatatom 27 484 5 0 0 0 - - -;
 #X floatatom 83 484 5 0 0 0 - - -;
 #X floatatom 63 440 6 0 0 0 - - -;
-#X obj 129 122 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 0 25
-;
+#X obj 129 122 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25
+25;
 #X floatatom 571 385 12 0 0 1 value - -;
 #X symbolatom 531 401 15 0 0 1 event_code - -;
 #X symbolatom 492 417 15 0 0 1 event_type - -;
@@ -34,7 +34,7 @@
 #X text 49 588 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 266 602 released under the GNU GPL;
-#X text 472 589 $Revision: 1.22 $$Date: 2006-05-27 23:12:51 $;
+#X text 472 589 $Revision: 1.23 $$Date: 2006-05-28 20:13:58 $;
 #X text 473 602 $Author: eighthave $;
 #X msg 421 266 poll 20;
 #X msg 359 266 poll 2;
@@ -265,7 +265,7 @@ of it could change without notice !!!;
 #X obj 492 366 unpack s s f;
 #X msg 203 68 open \$1;
 #X obj 203 50 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
+-1 2;
 #X floatatom 190 71 1 0 0 0 - - -;
 #X text 270 382 event_type event_code value;
 #X obj 63 419 route abs_x abs_y abs_z abs_rx abs_ry abs_rz abs_throttle
@@ -387,9 +387,23 @@ vendorID productID;
 #X connect 0 7 4 0;
 #X connect 2 0 0 0;
 #X connect 2 0 3 0;
-#X restore 494 323 pd see device info;
+#X restore 512 290 pd see device info;
 #X msg 397 179 open 0x046d 0xc01d;
 #X text 535 179 Logitech USB-PS/2 Optical Mouse;
+#N canvas 0 22 458 308 test 1;
+#X obj 60 23 inlet;
+#X obj 61 53 route not_implemented;
+#X obj 65 100 route notimp_64;
+#X obj 165 138 print;
+#X floatatom 69 146 5 0 0 0 - - -;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 2 1 3 0;
+#X restore 490 330 pd test;
+#X obj 36 63 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 0;
+#X msg 45 83 open joystick \$1;
 #X connect 4 0 49 0;
 #X connect 23 0 24 1;
 #X connect 24 0 23 0;
@@ -413,6 +427,7 @@ vendorID productID;
 #X connect 49 0 38 0;
 #X connect 49 0 59 0;
 #X connect 49 0 94 0;
+#X connect 49 0 108 0;
 #X connect 49 1 105 0;
 #X connect 56 0 49 0;
 #X connect 57 0 1 0;
@@ -462,3 +477,5 @@ vendorID productID;
 #X connect 103 0 49 0;
 #X connect 104 0 49 0;
 #X connect 106 0 49 0;
+#X connect 109 0 110 0;
+#X connect 110 0 49 0;
