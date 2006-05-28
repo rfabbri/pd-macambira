@@ -416,8 +416,8 @@ void hid_print_device_list(t_hid *x)
 void hid_platform_specific_info(t_hid *x)
 {
 	pRecDevice  pCurrentHIDDevice = NULL;
-	char vendor_id_pointer[7];
-	char product_id_pointer[7];
+	char vendor_id_string[7];
+	char product_id_string[7];
 	t_symbol *output_symbol;
 	t_atom *output_atom = getbytes(sizeof(t_atom));
 
@@ -450,15 +450,15 @@ void hid_platform_specific_info(t_hid *x)
 			outlet_anything( x->x_status_outlet, gensym("transport"), 
 							 1, output_atom);
             /* vendor id */
-			sprintf(vendor_id_pointer,"0x%04x",
+			sprintf(vendor_id_string,"0x%04x",
 					 (unsigned int)pCurrentHIDDevice->vendorID);
-			SETSYMBOL(output_atom, gensym(vendor_id_pointer));
+			SETSYMBOL(output_atom, gensym(vendor_id_string));
 			outlet_anything( x->x_status_outlet, gensym("vendorID"), 
 							 1, output_atom);
             /* product id */
-			sprintf(product_id_pointer,"0x%04x",
+			sprintf(product_id_string,"0x%04x",
 					 (unsigned int)pCurrentHIDDevice->productID);
-			SETSYMBOL(output_atom, gensym(product_id_pointer));
+			SETSYMBOL(output_atom, gensym(product_id_string));
 			outlet_anything( x->x_status_outlet, gensym("productID"), 
 							 1, output_atom);
 		}

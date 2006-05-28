@@ -460,7 +460,7 @@ t_int hid_close_device(t_hid *x)
         return (close(x->x_fd));
 }
 
-t_int hid_build_device_list(t_hid *x)
+void hid_build_device_list(void)
 {
     debug_print(LOG_DEBUG,"hid_build_device_list");
     /* the device list should be refreshed here */
@@ -470,13 +470,52 @@ t_int hid_build_device_list(t_hid *x)
  * the device list.  Once the device name can be other things in addition
  * the current t_float, then this will probably need to be changed.
  */
-
-    return (0);
 }
 
 void hid_platform_specific_free(t_hid *x)
 {
     /* nothing to be done here on GNU/Linux */
+}
+
+/* device info on the status outlet */
+void hid_platform_specific_info(t_hid* x)
+{
+    struct input_id my_id;
+    char device_name[256] = "Unknown";
+    char vendor_id_string[7];
+    char product_id_string[7];
+    t_symbol *output_symbol;
+    t_atom *output_atom = getbytes(sizeof(t_atom));
+
+    ioctl(x->x_fd, EVIOCGID);
+    sprintf(vendor_id_string,"0x%04x", my_id.vendor);
+    SETSYMBOL(output_atom, gensym(vendor_id_string));
+    outlet_anything( x->x_status_outlet, gensym("vendorID"), 
+                     1, output_atom);
+    sprintf(product_id_string,"0x%04x", my_id.product);
+    SETSYMBOL(output_atom, gensym(product_id_string));
+    outlet_anything( x->x_status_outlet, gensym("productID"), 
+                     1, output_atom);
+    ioctl(x->x_fd, EVIOCGNAME(sizeof(device_name)), device_name);
+    SETSYMBOL(output_atom, gensym(device_name));
+    outlet_anything( x->x_status_outlet, gensym("name"), 
+                     1, output_atom);
+    freebytes(output_atom,sizeof(t_atom));
+}
+
+        
+t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id)
+{
+    
+    return -1;
+}
+
+t_int get_device_number_from_usage_list(t_int device_number, 
+                                        unsigned short usage_page, 
+                                        unsigned short usage)
+{
+
+    return -1;
 }
 
 
