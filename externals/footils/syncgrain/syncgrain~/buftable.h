@@ -52,7 +52,7 @@ class buftable : public Table
 		}
 		float* GetTable()
 		{ 
-			if ( buf )
+			if ( Ok() )
 			{
 				return buf->Data(); 
 			}
@@ -65,7 +65,7 @@ class buftable : public Table
 		bool set(const t_symbol *s = NULL,bool delayed = false);
 		bool Ok()
 		{
-			return buf->Ok();
+			return buf->Ok() && buf->Valid();
 		}
 
 	private:
