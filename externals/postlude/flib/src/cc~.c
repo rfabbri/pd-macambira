@@ -17,29 +17,36 @@
    */
 
 
-/*Calculate the cross correlation of two signal vectors*/
+/*Calculate the cc correlation of two signal vectors*/
 
 /*The time domain implementation is based on code by Phil Bourke 
  * the frequency domain version is based on code by Charles Henry 
  * 
- * Specify a time delay as an argument for the time domain implemenation, for example an argument of 32 will give the correlation coefficients  for delays from -32 to 32 samples between the two input vectors
+ * Specify a time delay as an argument for the time domain implemenation, for example an argument of 32 will give the 
+ * correlation coefficients  for delays from -32 to 32 samples between the two input vectors
  *
- * Specify an argument of 'f' for the frequency domain implementation*/
+ * Specify an argument of 'f' for the frequency domain implementation,   
+ * or 'r' for the running cross covariance (not normalized)              instead of the numerical delay argument
+ * these two methods both have got positive delays on 0,N/2-1 and the negative delays (-N/2, -1) are indexed on N/2,N-1 */
 
 
 #include "flib.h"
 #define SQ(a) (a * a)
 
-static t_class *cross_class;
+static t_class *cc_class;
 
-typedef struct _cross {
+typedef struct _cc {
     t_object  x_obj;
     t_float f;
     t_int delay;
     t_int is_freq_domain;
-} t_cross;
+    t_float *buffer2Nsig1, *buffer2Nsig2;
+    t_float *output_prev_block;
+    t_int is_new;
+    t_int n;
+} t_cc;
 
-static t_int *cross_perform_time_domain(t_int *w)
+static t_int *cc_perform_time_domain(t_int *w)
 {
     t_sample *x = (t_sample *)(w[1]);
     t_sample *y = (t_sample *)(w[2]);
@@ -51,7 +58,7 @@ static t_int *cross_perform_time_domain(t_int *w)
   
    if(maxdelay > N * .5){
 	maxdelay = N * .5;
-	post("cross~: invalid maxdelay, must be <= blocksize/2");
+	post("cc~: invalid maxdelay, must be <= blocksize/2");
    }
  
 /* Calculate the mean of the two series x[], y[] */
@@ -97,103 +104,179 @@ static t_int *cross_perform_time_domain(t_int *w)
 }
 
 
-t_int *cross_perform_freq_domain(t_int *w)
+static t_int *cc_perform_freq_domain(t_int *w)
 {
-  t_cross *x = (t_cross *)(w[1]);
+  t_cc *x = (t_cc *)(w[1]);
 
   t_sample *sig1 = (t_sample *)(w[2]);
   t_sample *sig2 = (t_sample *)(w[3]);
   t_sample *out  = (t_sample *)(w[4]);
-  long int size  = (long int) w[5];
-  long int k     = size/2;
-  float *expsig1 = NULL;
-  float *revsig2 = NULL;
-  float temp, temp2;
-  long int i=0;
-  int well_defined=1;
-  int qtr, thrqtr;
+  t_int size  = (int) w[5];
+  x->n = size;
+  t_int size2 = size*2;
+  t_int half = size/2;
+  t_float *expsig1 = NULL;
+  t_float *revsig2 = NULL;
+  t_float temp, temp2;
+  t_int i=0;
+  t_int thrhalf;
 
-// The two signals are created, nonzero on 0 to N/4 and 3N/4 to N
-// This will be revised
+// This stuff here sets up two buffers to hold the previous N samples
+// To get the usual overlapping block (2) design on each input
 
-  expsig1=(float *) alloca(size*sizeof(float));
-  revsig2=(float *) alloca(size*sizeof(float));
-  qtr = size/4;
-  thrqtr = 3*size/4;
-  for (i=0; i < qtr ; i++)
+  if (x->is_new)
   {
-    expsig1[i]=sig1[i];
+    x->buffer2Nsig1=getbytes(size*sizeof(t_float));    
+    x->buffer2Nsig2=getbytes(size*sizeof(t_float));
+    x->output_prev_block=getbytes(size*sizeof(t_float));        
+    x->is_new=0;
+  }
+//  Here we set the buffers for the next round
+  for(i=half; i < size; i++)
+ {
+    x->buffer2Nsig1[i]=sig1[i];
+    x->buffer2Nsig2[i]=sig2[i];
+  }
+// The two signals are created, nonzero on 0 to 1/4 and 3/4 to 1
+// Using a block size of 2N, --size2
+
+  expsig1=(float *) getbytes(size2*sizeof(float));
+  revsig2=(float *) getbytes(size2*sizeof(float));
+
+// Loops for assignment of old values in buffer + new block
+  thrhalf = 3*half;
+  for (i=0; i < half ; i++)
+  {
+    expsig1[i]=x->buffer2Nsig1[i];
     revsig2[i]=0;
   }
-  for (i=qtr; i < thrqtr ; i++)
+  for (i=half; i < size ; i++)
   {
-    expsig1[i]=sig1[i];
-    revsig2[i]=sig2[size-i];
+    expsig1[i]=x->buffer2Nsig1[i];
+    revsig2[i]=sig2[size-i];            /// Needs revision here, not too clear
   }
-  for (i=thrqtr; i < size ; i++)
+  expsig1[size]=sig1[0];
+  revsig2[size]=sig2[0];
+  for (i=size+1; i < thrhalf ; i++)
   {
-    expsig1[i]=sig1[i];
+    expsig1[i]=sig1[i-size];
+    revsig2[i]=x->buffer2Nsig2[size2-i];
+  }
+  for (i=thrhalf; i < size2 ; i++)
+  {
+    expsig1[i]=sig1[i-size];
     revsig2[i]=0;
   }
 
-  mayer_realfft(size, expsig1);
-  mayer_realfft(size, revsig2);
+//  fft the two blocks and multiply them
+  mayer_realfft(size2, expsig1);
+  mayer_realfft(size2, revsig2);
+
   expsig1[0]*=revsig2[0];
-  expsig1[k]*=revsig2[k];
-  for(i=1; i < k; i++)
+  expsig1[size]*=revsig2[size];
+  for(i=1; i < size2; i++)  
   {
     temp=expsig1[i];
-    temp2=expsig1[size-i];
-    expsig1[i]=temp*revsig2[i]-temp2*revsig2[size-i];
-    expsig1[size-i]=temp*revsig2[size-i]+temp2*revsig2[i];
+    temp2=expsig1[size2-i];
+    expsig1[i]=temp*revsig2[i]-temp2*revsig2[size2-i];
+    expsig1[size2-i]=temp*revsig2[size2-i]+temp2*revsig2[i];
   }
   
-  mayer_realifft(size, expsig1);
-  for(i=0; i < size; i++)
-  {
-    out[i]=expsig1[i];
-  }
+//  ifft
+  mayer_realifft(size2, expsig1);
 
+//  format the output:  this section formats the ouptut either as
+//  a simple cc or as a running cc
+if (x->is_freq_domain == 1)
+{
+  for(i=0; i < half; i++)
+  {
+    out[i]=expsig1[i]/size2;
+    out[half + i]=expsig1[half + i]/size2;
+  }
+} else {
+  for(i=0; i < half; i++)
+  {
+    out[i]=x->output_prev_block[i] + expsig1[i]/size2;
+    out[half + i]=x->output_prev_block[half + i] + expsig1[half + i]/size2;
+    x->output_prev_block[i] = out[i];
+    x->output_prev_block[half + i] = out[half + i];
+  }
+}
+
+freebytes(expsig1, size2*sizeof(float));
+freebytes(revsig2, size2*sizeof(float));
   return(w+6);
 
 }
 
-static void cross_dsp(t_cross *x, t_signal **sp)
+static void cc_dsp(t_cc *x, t_signal **sp)
 {
     if(!x->is_freq_domain)
-	dsp_add(cross_perform_time_domain, 5,
+	dsp_add(cc_perform_time_domain, 5,
 		sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n, x->delay);
     else
-	dsp_add(cross_perform_freq_domain, 5, x,
+	dsp_add(cc_perform_freq_domain, 5, x,
 		sp[0]->s_vec, sp[1]->s_vec, sp[2]->s_vec, sp[0]->s_n);
 }
 
-static void *cross_new(t_symbol *s, t_int argc, t_atom *argv)
-{
-    t_cross *x = (t_cross *)pd_new(cross_class);
 
+//  For using with running calculation, send a bang to clear the buffer
+//  and start over with calculations
+
+static void cc_bang(t_cc *x)
+{
+  int i;
+  for(i=0;i<x->n;i++)
+    x->output_prev_block[i]=0;
+}
+
+
+static void *cc_new(t_symbol *s, t_int argc, t_atom *argv)
+{
+    t_cc *x = (t_cc *)pd_new(cc_class);
     if(atom_getsymbol(argv) == gensym("f")){
 	    x->is_freq_domain = 1;
-	    post("flib: cross: Frequency domain selected");
+	    post("flib: cc: Frequency domain selected");
+    }
+    else if(atom_getsymbol(argv) == gensym("r")){
+	    x->is_freq_domain = 2;
+	    post("flib: cc: Running frequency domain selected");
     }
     else {
 	x->delay = atom_getfloat(argv);
-	post("flib: cross: Time domain selected");
+	post("flib: cc: Time domain selected");
     } 
     inlet_new(&x->x_obj, &x->x_obj.ob_pd, &s_signal, &s_signal);
     outlet_new(&x->x_obj, &s_signal);
+    x->is_new=1;
+    x->buffer2Nsig1=NULL;
+    x->buffer2Nsig2=NULL;
+    x->output_prev_block=NULL;
     return (void *)x;
 }
 
+static void cc_free(t_cc *x)
+{
+  if     (x->buffer2Nsig1 != NULL)
+    freebytes(x->buffer2Nsig1, x->n*sizeof(float));
+  if     (x->buffer2Nsig2 != NULL)
+    freebytes(x->buffer2Nsig2, x->n*sizeof(float));
+  if     (x->output_prev_block != NULL)
+    freebytes(x->output_prev_block, x->n*sizeof(float));
+}
 
-void cross_tilde_setup(void) {
-    cross_class = class_new(gensym("cross~"),
-	    (t_newmethod)cross_new,
-	    0, sizeof(t_cross),
+
+void cc_tilde_setup(void) {
+    cc_class = class_new(gensym("cc~"),
+	    (t_newmethod)cc_new,
+	    (t_method)cc_free, sizeof(t_cc),
 	    CLASS_DEFAULT, A_GIMME, 0);
 
-    class_addmethod(cross_class,
-	    (t_method)cross_dsp, gensym("dsp"), 0);
-    CLASS_MAINSIGNALIN(cross_class, t_cross,f);
-    class_sethelpsymbol(cross_class, gensym("help-flib"));
+    class_addbang(cc_class, (t_method)cc_bang);
+    class_addmethod(cc_class,
+	    (t_method)cc_dsp, gensym("dsp"), 0);
+    CLASS_MAINSIGNALIN(cc_class, t_cc,f);
+    class_sethelpsymbol(cc_class, gensym("help-flib"));
 }
+

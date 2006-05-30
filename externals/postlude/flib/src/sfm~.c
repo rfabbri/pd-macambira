@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 
-/* calculates spectral flatness measure as described by Tae Hong Park*/
+/* calculates spectral flatness measure: Geometric Mean/ Arithemtic Mean (In this case converted to a DB scale */
 
 #include "m_pd.h"
 #include <math.h>

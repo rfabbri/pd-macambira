@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 
-/* calculates the spectral irreg of one frame according to Jensen et al 1999*/
+/* calculates the spectral irreg of one frame according to Jensen  1999. Original formula by Krimphoff et al 1994*/
 
 #include "flib.h"
 static t_class *irreg_class;

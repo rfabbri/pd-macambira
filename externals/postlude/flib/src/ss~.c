@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 
-/* calculates the spectral smoothness of one frame according to Krimphoff et al. 1994*/
+/* calculates the spectral smoothness of one frame according to McAdams 1999. Takes magnitude spectrum as input*/
 
 #include "flib.h"
 static t_class *ss_class;
@@ -35,9 +35,9 @@ static t_int *ss_perform(t_int *w)
   t_int N = (t_int)(w[3]),M = N >> 1,n;
   t_float I = 0, buf[M];
   for(n = 0; n < M; buf[n++] = *in++);
-  for(n = 2; n < M - 1; n++){
+  for(n = 2; n < M - 1; n++){ 
 	  if(buf[n] != 0 && buf[n-1] != 0 && buf[n+1] != 0)
-		  I += (buf[n] - (buf[n-1] + buf[n] + buf[n+1]) / 3);
+		  I += (20 * log10(buf[n]) - (20 * log10(buf[n-1]) + 20 * log10(buf[n]) + 20 * log10(buf[n+1])) / 3);
   }
 
   outlet_float(x->x_obj.ob_outlet, I);
