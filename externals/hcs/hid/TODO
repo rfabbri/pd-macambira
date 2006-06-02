@@ -1,6 +1,57 @@
 
+- fix up hatswitch logic... hmmm
+  on Mac OS X, just make the next element in the array always be the Y axis of
+  the hatswitch, then when receiving a hatswitch event, output, increment,
+  then output again (yes, its a hack).
 
-==============================================================================
+- add device type to [info(
+HIDGetUsageName(pCurrentHIDDevice->usagePage, pCurrentHIDDevice->usage, cstrDeviceName);
+
+i.e. cstrDeviceName
+
+
+
+
+______________________________________________________________________________
+= array lookups for symbols
+
+- make arrays to lookup symbols by usagepage# and usage#
+
+- advantage: much fewer symbol lookups
+
+- disadvantage: much more RAM used.
+
+implementation idea #1:
+
+make hid-specific gensym() function which checks an array for the symbol by
+#.  If it doesn't exist, it looks up the symbol and adds it to the array.  The
+array size should be dynamically allocated so that [hid] doesn't use massive
+amounts of memory.
+
+If no vendor-defined pages are used, then the array could be quite small.  If
+only one usage page is used, then it would also be not too big.  Otherwise, it
+could use 10+ megs of RAM... hmm..
+
+implementation idea #2:
+
+this array should be built by hid_build_elements_list().  Then each time it
+fetches an event using the element_pointer array, it would also get the stored
+usage_page and usage symbols, and instance t_float.  So I need to make an
+element struct like:
+
+struct _hid_element
+{
+		  void *element;
+		  t_symbol *type; // HID "usage page"
+		  t_symbol *usage; // Linux "code"
+		  t_float instance;
+		  t_float previous_value; //only output on change on abs and buttons
+} t_hid_element;
+
+For Linux input.h, instead void *element, store the type and code numbers to
+compare against
+
+______________________________________________________________________________
 = output one value per poll
 
 - for relative axes, sum up all events and output one
@@ -11,10 +62,18 @@ http://lists.apple.com/archives/mac-games-dev/2005/Oct/msg00060.html
 
 - buttons, output everything
 
-- is this at all necessary?  How often do multiple events happen in one poll period?
+- is this at all necessary?  How often do multiple events happen in one poll
+  period?  ANSWER: on Mac OS X, most hid_get_events() calls fetch multiple
+  events for each mouse axis, so yes, its probably necessary
 
 
-==============================================================================
+______________________________________________________________________________
+= [poll 1( message set to exact delay based on block size
+
+to eliminate the jitter of the messages being processed every block, have
+[poll 1( set the time to the poll size (~1.5ms for 44,100)
+
+______________________________________________________________________________
 = iterate through elements and do a proper queue of the ones we want:
 
 - also, label multiple instances of the same usage
@@ -22,11 +81,11 @@ http://lists.apple.com/archives/mac-games-dev/2005/Oct/msg00060.html
 http://mud.5341.com/msg/8455.html
 
 
-==============================================================================
+______________________________________________________________________________
 = make second inlet for poll # (for [human->pd])
 
 
-==============================================================================
+______________________________________________________________________________
 = output device data on open
 
 - Logical Min/Max i.e. [range -127 127(
@@ -34,13 +93,13 @@ http://mud.5341.com/msg/8455.html
 
 
 
-==============================================================================
+______________________________________________________________________________
 = open devices by name
 
 i.e "Trackpad" a la Max's [hi]
 
 
-==============================================================================
+______________________________________________________________________________
 = 
 = autoscaling based on Logical min/max
 
@@ -49,9 +108,9 @@ i.e "Trackpad" a la Max's [hi]
 
 - output would be handy, rather than autoscale, to save on CPU
 
+- this should probably be done in Pd space
 
-
-==============================================================================
+______________________________________________________________________________
 = test verbose names
 
 - matju says symbols are compared by pointer, so they are fast
@@ -75,13 +134,13 @@ i.e "Trackpad" a la Max's [hi]
 - change word "code" to "element"
 
 
-==============================================================================
+______________________________________________________________________________
 = event name changes
 
 - make key/button Type "button" rather than "key" (undecided on this one)
 
 
-==============================================================================
+______________________________________________________________________________
 = hid/serial
 
 - open/close status outlet
@@ -91,7 +150,7 @@ i.e "Trackpad" a la Max's [hi]
 - [tgl] 1/0 for open/close
 
 
-==============================================================================
+______________________________________________________________________________
 = linux input synch events (EV_SYN)
 
 - these seem to be generated by the Linux kernel, so they probably don't fit
@@ -100,21 +159,26 @@ i.e "Trackpad" a la Max's [hi]
   data, as they are intended.
 
 
+______________________________________________________________________________
+= writing support!
 
-==============================================================================
+- Linux example: http://www.linuxjournal.com/article/6429
+
+
+______________________________________________________________________________
 = profile [hid] object and usage
 
 - find out if [autoscale] takes a lot of CPU power, or where in [hid] is using
   CPU where it doesn't have to be
 
 
-==============================================================================
+______________________________________________________________________________
 = Report available FF effects
 
 - check against HID Utilities Source/PID.h
 
 
-==============================================================================
+______________________________________________________________________________
 = pollfn for mouse-like devices
 
 - determine whether using a pollfn is actually better than using a t_clock
@@ -127,13 +191,13 @@ i.e "Trackpad" a la Max's [hi]
 - at standard block size (64 samples), one block = ~1.5ms
 
 
-==============================================================================
+______________________________________________________________________________
 = function return values
 
 - most functions probably do not need return values
 
 
-==============================================================================
+______________________________________________________________________________
 = check out using USB timestamp 
 
 - use the USB timestamp to correctly space the output data (meh, probably
@@ -141,11 +205,21 @@ i.e "Trackpad" a la Max's [hi]
 
 
 
- /++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ /----------------------------------------------------------------------------\
+------------------------------------------------------------------------------
    BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS BUGS 
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- \++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++/
+------------------------------------------------------------------------------
+ \----------------------------------------------------------------------------/
+
+______________________________________________________________________________
+- BUG: crashes when you try yo open "mouse" with no args
+
+
+______________________________________________________________________________
+- BUG: on Mac OS X, polling starts without hid_build_device_list()
+
+- when polling starts, hid_build_device_list() should be called before starting
+
 
 ______________________________________________________________________________
 - BUG: figure out how to prevent segfaults on mismapped devices/elements

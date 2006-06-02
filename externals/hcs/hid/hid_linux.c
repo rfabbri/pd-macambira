@@ -348,7 +348,7 @@ void hid_ff_print( t_hid *x )
 /* Pd [hid] FUNCTIONS */
 /* ------------------------------------------------------------------------------ */
 
-t_int hid_get_events(t_hid *x)
+void hid_get_events(t_hid *x)
 {
     debug_print(LOG_DEBUG,"hid_get_events");
 
@@ -362,7 +362,7 @@ t_int hid_get_events(t_hid *x)
  */
     struct input_event hid_input_event;
 
-    if (x->x_fd < 0) return 0;
+    if (x->x_fd < 0) return;
 
     while( read (x->x_fd, &(hid_input_event), sizeof(struct input_event)) > -1 )
     {
@@ -398,7 +398,7 @@ t_int hid_get_events(t_hid *x)
         //post("output %d events",event_counter);
 	);
 	
-    return (0);
+    return;
 }
 
 
@@ -420,7 +420,7 @@ t_int hid_open_device(t_hid *x, t_int device_number)
     x->x_fd = -1;
   
     x->x_device_number = device_number;
-    sprintf(dev_handle_name,"/dev/input/event%d",(int)x->x_device_number);
+    sprintf(dev_handle_name,"/dev/input/event%d",x->x_device_number);
 
     if (dev_handle_name) 
     {

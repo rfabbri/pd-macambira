@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.23 $"; */
+/* static char *version = "$Revision: 1.24 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -26,6 +26,13 @@
 /* this is set to simplify data structures (arrays instead of linked lists) */
 #define MAX_DEVICES 128
 
+/* think 64 is the limit per device as defined in the OS */
+#define MAX_ELEMENTS 64
+
+/* this is limited so that the object doesn't cause a click getting too many
+ * events from the OS's event queue */
+#define MAX_EVENTS_PER_POLL 64
+
 /*------------------------------------------------------------------------------
  *  CLASS DEF
  */
@@ -33,7 +40,7 @@ typedef struct _hid
 {
 	t_object            x_obj;
 	t_int               x_fd;
-	t_int               x_device_number;
+	short               x_device_number;
 //	unsigned short      vendor_id;    // USB idVendor for current device
 //	unsigned short      product_id;   // USB idProduct for current device
 	t_int               x_has_ff;
@@ -64,6 +71,28 @@ extern unsigned short global_debug_level;
 /* next I need to make a data structure to hold the data to be output for this
  * poll.  This should probably be an array for efficiency */
 
+
+typedef struct _hid_element
+{
+#ifdef __linux__
+	//GNU/Linux store type and code to compare against
+#else
+	void *os_pointer;  // pRecElement on Mac OS X; 
+#endif /* __linux__ */
+	t_symbol *type; // Linux "type"; HID "usagePage"
+	t_symbol *name; // Linux "code"; HID "usage"
+	unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
+	unsigned char relative; // relative data gets output everytime
+	t_float instance; // usage page/usage instance # ([absolute throttle 2 163( 
+	t_int value; // output the sum of events in a poll for relative axes
+	t_int previous_value; //only output on change on abs and buttons
+} t_hid_element;
+
+/* store element structs to eliminate symbol table lookups, etc. */
+t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];
+/* number of active elements per device */
+unsigned short element_count[MAX_DEVICES]; 
+
 /*------------------------------------------------------------------------------
  *  FUNCTION PROTOTYPES FOR DIFFERENT PLATFORMS
  */
@@ -71,20 +100,23 @@ extern unsigned short global_debug_level;
 /* support functions */
 void debug_print(t_int debug_level, const char *fmt, ...);
 void debug_error(t_hid *x, t_int debug_level, const char *fmt, ...);
+void hid_output_event(t_hid *x, t_hid_element *output_data);
+/* the old way
 void hid_output_event(t_hid *x, t_symbol *type, t_symbol *code, t_float value);
+*/
 
 /* generic, cross-platform functions implemented in a separate file for each
  * platform 
  */
-t_int hid_open_device(t_hid *x, t_int device_number);
+t_int hid_open_device(t_hid *x, short device_number);
 t_int hid_close_device(t_hid *x);
 void hid_build_device_list(void);
-t_int hid_get_events(t_hid *x);
+void hid_get_events(t_hid *x);
 void hid_print(t_hid* x); /* print info to the console */
 void hid_platform_specific_info(t_hid* x); /* device info on the status outlet */
 void hid_platform_specific_free(t_hid *x);
-t_int get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
-t_int get_device_number_from_usage_list(t_int device_number, 
+short get_device_number_by_id(unsigned short vendor_id, unsigned short product_id);
+short get_device_number_from_usage_list(short device_number, 
 										unsigned short usage_page, 
 										unsigned short usage);
 

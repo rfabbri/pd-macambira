@@ -13,3 +13,7 @@ clean:
 test_locations:
 	make -C $(EXTERNALS_ROOT) test_locations
 
+# for emacs
+etags:
+	etags *.[ch] linux/input.h HID\ Utilities\ Source/*.[ch] \
+		/System/Library/Frameworks/IOKit.framework/Headers/hid*/*.[ch]

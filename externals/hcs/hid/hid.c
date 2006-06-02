@@ -122,9 +122,9 @@ static unsigned int name_to_usage(char *usage_name)
 }
 
 
-static t_int get_device_number_from_arguments(int argc, t_atom *argv)
+static short get_device_number_from_arguments(int argc, t_atom *argv)
 {
-	t_int device_number = -1;
+	short device_number = -1;
 	unsigned short usage_number;
 	unsigned int usage;
 	unsigned short vendor_id;
@@ -135,11 +135,10 @@ static t_int get_device_number_from_arguments(int argc, t_atom *argv)
 
 	if(argc == 1)
 	{
-		post("one arg");
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		if(first_argument == &s_) 
 		{ // single float arg means device
-			device_number = (unsigned short) atom_getfloatarg(0,argc,argv);
+			device_number = (short) atom_getfloatarg(0,argc,argv);
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
 		}
@@ -164,31 +163,37 @@ static t_int get_device_number_from_arguments(int argc, t_atom *argv)
 			atom_string(argv, usage_string, MAXPDSTRING-1);
 			usage = name_to_usage(usage_string);
 			usage_number = atom_getfloatarg(1,argc,argv);
-			debug_print(LOG_DEBUG,"[hid] looking for %s at #%d",usage_string,usage_number);
+			debug_print(LOG_DEBUG,"[hid] looking for %s at #%d",
+						usage_string,usage_number);
 			device_number = get_device_number_from_usage_list(usage_number,
 															  usage >> 16, 
 															  usage & 0xffff);
 		}
 		else
 		{ /* two symbols means idVendor and idProduct in hex */
-			vendor_id = (unsigned short) strtol(first_argument->s_name, NULL, 16);
-			product_id = (unsigned short) strtol(second_argument->s_name, NULL, 16);
+			vendor_id = 
+				(unsigned short) strtol(first_argument->s_name, NULL, 16);
+			product_id = 
+				(unsigned short) strtol(second_argument->s_name, NULL, 16);
 			device_number = get_device_number_by_id(vendor_id,product_id);
 		}
 	}
 	return(device_number);
 }
 
-void hid_output_event(t_hid *x, t_symbol *type, t_symbol *code, t_float value)
-{
-	t_atom event_data[3];
-	
-	SETSYMBOL(event_data, type);	
-	SETSYMBOL(event_data + 1, code);
-	SETFLOAT(event_data + 2, value);
 
-	outlet_anything(x->x_data_outlet,atom_gensym(event_data),2,event_data+1);
+void hid_output_event(t_hid *x, t_hid_element *output_data)
+{
+	if( (output_data->value != output_data->previous_value) ||
+		(output_data->relative) )  // relative data should always be output
+	{
+		t_atom event_data[2];
+		SETSYMBOL(event_data, output_data->name);
+		SETFLOAT(event_data + 1, output_data->value);
+		outlet_anything(x->x_data_outlet,output_data->type,2,event_data);
+	}
 }
+
 
 /* stop polling the device */
 static void stop_poll(t_hid* x) 
@@ -212,36 +217,39 @@ void hid_poll(t_hid* x, t_float f)
 {
 	debug_print(LOG_DEBUG,"hid_poll");
   
-/*	if the user sets the delay less than one, ignore */
-	if( f > 0 ) 	
+/*	if the user sets the delay less than 2, set to block size */
+	if( f > 2 )
 		x->x_delay = (t_int)f;
-
-	if( (!x->x_device_open) && (x->x_device_number > -1) )
-		hid_open(x,gensym("open"),0,NULL);
-	
-	if(!x->x_started) 
+	else if( f > 0 ) //TODO make this the actual time between message processing
+		x->x_delay = 1.54; 
+	if(x->x_device_number > -1) 
 	{
-		clock_delay(x->x_clock, x->x_delay);
-		debug_print(LOG_DEBUG,"[hid] polling started");
-		x->x_started = 1;
-	} 
+		if(!x->x_device_open) 
+			hid_open(x,gensym("open"),0,NULL);
+		if(!x->x_started) 
+		{
+			clock_delay(x->x_clock, x->x_delay);
+			debug_print(LOG_DEBUG,"[hid] polling started");
+			x->x_started = 1;
+		} 
+	}
 }
 
 static void hid_set_from_float(t_hid *x, t_floatarg f)
 {
 /* values greater than 1 set the polling delay time */
 /* 1 and 0 for start/stop so you can use a [tgl] */
-	if (f > 1)
+	if(f > 1)
 	{
 		x->x_delay = (t_int)f;
 		hid_poll(x,f);
 	}
-	else if (f == 1) 
+	else if(f == 1) 
 	{
-		if (! x->x_started)
-		hid_poll(x,f);
+		if(! x->x_started)
+			hid_poll(x,f);
 	}
-	else if (f == 0) 		
+	else if(f == 0) 		
 	{
 		stop_poll(x);
 	}
@@ -280,7 +288,7 @@ static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv)
 /* store running state to be restored after the device has been opened */
 	t_int started = x->x_started;
 	
-	int device_number = get_device_number_from_arguments(argc, argv);
+	short device_number = get_device_number_from_arguments(argc, argv);
 	if(device_number > -1)
 	{
 		if( (device_number != x->x_device_number) && (x->x_device_open) ) 
