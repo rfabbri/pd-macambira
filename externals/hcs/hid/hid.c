@@ -339,9 +339,27 @@ static void hid_open(t_hid *x, t_symbol *s, int argc, t_atom *argv)
 t_int hid_read(t_hid *x, int fd) 
 {
 //	debug_print(LOG_DEBUG,"hid_read");
-
-	hid_get_events(x);
+	unsigned int i;
+	double right_now = clock_getlogicaltime();
+	t_hid_element *current_element;
 	
+	if(right_now > last_execute_time[x->x_device_number])
+	{
+		hid_get_events(x);
+		last_execute_time[x->x_device_number] = right_now;
+/*		post("executing: instance %d/%d at %ld", 
+		x->x_instance, hid_instance_count, right_now);*/
+	}
+	for(i=0; i< element_count[x->x_device_number]; ++i)
+	{
+		current_element = element[x->x_device_number][i];
+		if(current_element->previous_value != current_element->value)
+		{
+			hid_output_event(x, current_element);
+			if(!current_element->relative)
+				current_element->previous_value = current_element->value;
+		}
+	}
 	if (x->x_started) 
 	{
 		clock_delay(x->x_clock, x->x_delay);
@@ -350,25 +368,6 @@ t_int hid_read(t_hid *x, int fd)
 	// TODO: why is this 1? 
 	return 1; 
 }
-
-/* eventually, this will be used to open devices by long name
-static void hid_anything(t_hid *x, t_symbol *s, t_int argc, t_atom *argv)
-{
-	int i;
-	t_symbol *my_symbol;
-	//char device_name[MAXPDSTRING];
-		
-	startpost("ANYTHING! selector: %s data:");
-	for(i=0; i<argc; ++i)
-	{
-		my_symbol = atom_getsymbolarg(i,argc,argv);
-		if(my_symbol != NULL)
-			post(" %s",my_symbol->s_name);
-		else
-			post(" %f",atom_getfloatarg(i,argc,argv));
-	}
-}
-*/
 
 static void hid_info(t_hid *x)
 {
@@ -411,6 +410,7 @@ static void hid_free(t_hid* x)
 static void *hid_new(t_symbol *s, int argc, t_atom *argv) 
 {
 	t_hid *x = (t_hid *)pd_new(hid_class);
+	unsigned int i;
   
 	debug_print(LOG_DEBUG,"hid_%s",s->s_name);
   
@@ -434,6 +434,7 @@ static void *hid_new(t_symbol *s, int argc, t_atom *argv)
   x->x_device_open = 0;
   x->x_started = 0;
   x->x_delay = DEFAULT_DELAY;
+  for(i=0; i<MAX_DEVICES; ++i) last_execute_time[i] = 0;
 
   x->x_clock = clock_new(x, (t_method)hid_read);
 
@@ -443,6 +444,7 @@ static void *hid_new(t_symbol *s, int argc, t_atom *argv)
 
   x->x_device_number = get_device_number_from_arguments(argc, argv);
   
+  x->x_instance = hid_instance_count;
   hid_instance_count++;
 
   return (x);

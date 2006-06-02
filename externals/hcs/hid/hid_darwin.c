@@ -624,8 +624,6 @@ void hid_platform_specific_info(t_hid *x)
 
 void hid_get_events(t_hid *x)
 {
-	//debug_print(LOG_DEBUG,"hid_get_events");
-	
 	unsigned int i;
 	pRecDevice  pCurrentHIDDevice;
 	t_hid_element *current_element;
@@ -659,12 +657,6 @@ void hid_get_events(t_hid *x)
 			current_element->value = 
 				HIDGetElementValue(pCurrentHIDDevice, 
 								   (pRecElement)current_element->os_pointer);
-		}
-		if(current_element->previous_value != current_element->value)
-		{
-			hid_output_event(x, current_element);
-			if(!current_element->relative)
-				current_element->previous_value = current_element->value;
 		}
 	}
 }

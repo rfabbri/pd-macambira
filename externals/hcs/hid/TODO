@@ -65,6 +65,8 @@ ______________________________________________________________________________
 - for relative axes, sum up all events and output one
 http://lists.apple.com/archives/mac-games-dev/2005/Oct/msg00060.html
 
+- current method only works for instances in the same patch...
+
 ______________________________________________________________________________
 = [poll 1( message set to exact delay based on block size
 

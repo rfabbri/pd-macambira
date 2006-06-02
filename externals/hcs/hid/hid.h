@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.25 $"; */
+/* static char *version = "$Revision: 1.26 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -42,6 +42,7 @@ typedef struct _hid
 	t_int               x_fd;
 	void                *x_ff_device;
 	short               x_device_number;
+	short               x_instance;
 	t_int               x_has_ff;
 	t_int               x_started;
 	t_int               x_device_open;
@@ -61,6 +62,9 @@ typedef struct _hid
  * functions can be called only after the final instance is detroyed.
  */
 t_int hid_instance_count;
+
+/* this is used to test for the first instance to execute */
+double last_execute_time[MAX_DEVICES];
 
 extern unsigned short global_debug_level;
 
