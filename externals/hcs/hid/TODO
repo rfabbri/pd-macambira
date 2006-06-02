@@ -1,16 +1,24 @@
+______________________________________________________________________________
+- deal with hatswitches!!
+
+Because of the currnently implementation of the conversion of the MacOS X
+style event to the Linux style event, an event with a value of zero is output
+on the unchanged axis when the hatswitch is moved in along the X or Y axis (as
+opposed to diagonally). but this might be fixed...
 
 - fix up hatswitch logic... hmmm
   on Mac OS X, just make the next element in the array always be the Y axis of
   the hatswitch, then when receiving a hatswitch event, output, increment,
   then output again (yes, its a hack).
 
-- add device type to [info(
-HIDGetUsageName(pCurrentHIDDevice->usagePage, pCurrentHIDDevice->usage, cstrDeviceName);
-
-i.e. cstrDeviceName
+- what do standard hatswitches output on the various platforms?  they should
+  probably always output like axes, but then the CUI will be screwed
 
 
+______________________________________________________________________________
+= fix key names on Mac OS X
 
+I think they are unimplemented... :-(
 
 ______________________________________________________________________________
 = array lookups for symbols
@@ -57,16 +65,6 @@ ______________________________________________________________________________
 - for relative axes, sum up all events and output one
 http://lists.apple.com/archives/mac-games-dev/2005/Oct/msg00060.html
 
-- for absolute axes, just output latest value.  if they are not in the queue,
-  I can check them manually
-
-- buttons, output everything
-
-- is this at all necessary?  How often do multiple events happen in one poll
-  period?  ANSWER: on Mac OS X, most hid_get_events() calls fetch multiple
-  events for each mouse axis, so yes, its probably necessary
-
-
 ______________________________________________________________________________
 = [poll 1( message set to exact delay based on block size
 
@@ -82,8 +80,13 @@ http://mud.5341.com/msg/8455.html
 
 
 ______________________________________________________________________________
-= make second inlet for poll # (for [human->pd])
+= make second inlet for specific status requests [human->pd])
 
+- [vendor(, [product(
+- [range(
+- [poll(
+- [name(
+- [type(
 
 ______________________________________________________________________________
 = output device data on open
@@ -192,16 +195,11 @@ ______________________________________________________________________________
 
 
 ______________________________________________________________________________
-= function return values
-
-- most functions probably do not need return values
-
-
-______________________________________________________________________________
 = check out using USB timestamp 
 
-- use the USB timestamp to correctly space the output data (meh, probably
-  unnecessary)
+- use the USB timestamp to correctly space the output data 
+
+(meh, probably not useful)
 
 
 
@@ -216,7 +214,7 @@ ______________________________________________________________________________
 
 
 ______________________________________________________________________________
-- BUG: on Mac OS X, polling starts without hid_build_device_list()
+- BUG: on Mac OS X, polling starts without hid_build_device_list() or hid_open()
 
 - when polling starts, hid_build_device_list() should be called before starting
 
@@ -249,14 +247,6 @@ This is probably only a problem on relative axes.
   - On Darwin/MacOSX, I think that the HIDGetEvent() loop will have to be
     followed by one call to HIDGetElementValue()
 
-
-______________________________________________________________________________
-- BUG: hatswitches on MacOS X output an event without a change in value
-
-Because of the currnently implementation of the conversion of the MacOS X
-style event to the Linux style event, an event with a value of zero is output
-on the unchanged axis when the hatswitch is moved in along the X or Y axis (as
-opposed to diagonally).
 
 
 ______________________________________________________________________________

@@ -1,45 +1,45 @@
-#N canvas 59 45 910 595 10;
-#X floatatom 27 454 5 0 0 0 - - -;
-#X floatatom 83 454 5 0 0 0 - - -;
-#X floatatom 63 410 6 0 0 0 - - -;
-#X obj 129 92 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25 25
+#N canvas 59 45 913 587 10;
+#X floatatom 27 439 5 0 0 0 - - -;
+#X floatatom 83 439 5 0 0 0 - - -;
+#X floatatom 63 395 6 0 0 0 - - -;
+#X obj 129 77 tgl 35 0 empty empty empty 0 -6 0 8 -24198 -1 -1 25 25
 ;
-#X floatatom 571 355 12 0 0 1 value - -;
-#X symbolatom 531 371 15 0 0 1 event_code - -;
-#X symbolatom 492 387 15 0 0 1 event_type - -;
+#X floatatom 571 340 12 0 0 1 value - -;
+#X symbolatom 531 356 15 0 0 1 event_code - -;
+#X symbolatom 492 372 15 0 0 1 event_type - -;
 #X obj 2 2 cnv 15 900 20 empty empty [hid] 2 11 1 18 -233017 -66577
 0;
-#X text 274 347 outlet message format:;
-#X obj 772 114 ev-list;
-#X obj 772 165 ev_syn-list;
-#X obj 772 187 ev_key-list;
-#X obj 772 209 ev_rel-list;
-#X obj 772 231 ev_abs-list;
-#X obj 772 253 ev_msc-list;
-#X obj 772 275 ev_led-list;
-#X obj 772 297 ev_snd-list;
-#X obj 772 319 ev_rep-list;
-#X obj 772 341 ev_ff-list;
-#X obj 772 363 ev_ff_status-list;
-#X text 740 95 Event Types:;
-#X text 740 146 Event Codes:;
-#X floatatom 138 358 5 0 0 1 ev_syn - -;
-#X obj 111 357 +;
-#X msg 111 337 1;
-#X msg 402 117 close;
-#X msg 402 96 refresh;
-#X text 463 94 refresh device list;
-#X text 537 502 For more info:;
-#X text 266 572 released under the GNU GPL;
-#X text 472 559 $Revision: 1.24 $$Date: 2006-06-02 20:06:51 $;
-#X text 473 572 $Author: eighthave $;
-#X msg 436 216 poll 20;
-#X msg 374 216 poll 2;
-#X text 370 201 start polling and set the poll delay in ms;
-#X text 462 48 !!! This software is very much alpha \, so any aspect
+#X text 274 332 outlet message format:;
+#X obj 772 99 ev-list;
+#X obj 772 150 ev_syn-list;
+#X obj 772 172 ev_key-list;
+#X obj 772 194 ev_rel-list;
+#X obj 772 216 ev_abs-list;
+#X obj 772 238 ev_msc-list;
+#X obj 772 260 ev_led-list;
+#X obj 772 282 ev_snd-list;
+#X obj 772 304 ev_rep-list;
+#X obj 772 326 ev_ff-list;
+#X obj 772 348 ev_ff_status-list;
+#X text 740 80 Event Types:;
+#X text 740 131 Event Codes:;
+#X floatatom 138 343 5 0 0 1 ev_syn - -;
+#X obj 111 342 +;
+#X msg 111 322 1;
+#X msg 402 102 close;
+#X msg 402 81 refresh;
+#X text 463 79 refresh device list;
+#X text 537 487 For more info:;
+#X text 266 557 released under the GNU GPL;
+#X text 472 544 $Revision: 1.25 $$Date: 2006-06-02 21:32:53 $;
+#X text 473 557 $Author: eighthave $;
+#X msg 436 201 poll 20;
+#X msg 374 201 poll 2;
+#X text 370 186 start polling and set the poll delay in ms;
+#X text 462 33 !!! This software is very much alpha \, so any aspect
 of it could change without notice !!!;
-#X obj 16 306 route key rel abs syn;
-#X obj 9 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X obj 16 291 route key rel abs syn;
+#X obj 9 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
 #N canvas 278 328 631 544 Event_Codes 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
@@ -193,7 +193,7 @@ of it could change without notice !!!;
 #X text 138 476 BTN_BASE6;
 #X text 245 463 298;
 #X text 245 477 299;
-#X restore 774 429 pd Event_Codes;
+#X restore 774 414 pd Event_Codes;
 #N canvas 50 289 469 317 Event_Types 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
@@ -236,144 +236,153 @@ of it could change without notice !!!;
 #X text 331 255 22;
 #X text 230 255 EV_PWR;
 #X text 61 255 Power Events (for UPS);
-#X restore 774 409 pd Event_Types;
+#X restore 774 394 pd Event_Types;
 #N canvas 0 22 450 300 Event_Values 0;
 #X text 28 48 (For a complete listing of Linux Input Events \, see
 /usr/include/linux/input.h.);
 #X obj 11 9 cnv 15 400 30 empty empty Event_Values 20 12 1 14 -261681
 -66577 0;
-#X restore 774 449 pd Event_Values;
-#X floatatom 140 454 5 0 0 0 - - -;
-#X obj 421 409 route abs_hat0x abs_hat0y abs_hat1x abs_hat1y;
-#X floatatom 421 431 7 0 0 0 - - -;
-#X msg 402 138 print;
-#X obj 304 265 hid 0;
-#X text 465 118 close the device;
-#X text 465 139 print the device and element lists;
-#X text 9 227 Any non-zero value starts polling \,;
-#X text 8 240 0 stops the polling. If the number;
-#X text 9 253 is greater than 1 \, then the poll;
-#X text 9 266 delay is set to that number.;
-#X obj 27 434 route rel_x rel_y rel_z rel_wheel;
-#X floatatom 196 454 5 0 0 0 - - -;
-#X obj 492 336 unpack s s f;
-#X msg 258 125 open \$1;
-#X obj 258 107 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
-#X floatatom 247 126 1 0 0 0 - - -;
-#X text 298 361 event_type event_code value;
-#X obj 63 389 route abs_x abs_y abs_z abs_rx abs_ry abs_rz abs_throttle
+#X restore 774 434 pd Event_Values;
+#X floatatom 140 439 5 0 0 0 - - -;
+#X obj 421 394 route abs_hat0x abs_hat0y abs_hat1x abs_hat1y;
+#X floatatom 421 416 7 0 0 0 - - -;
+#X msg 402 123 print;
+#X obj 304 250 hid 0;
+#X text 465 103 close the device;
+#X text 465 124 print the device and element lists;
+#X text 9 212 Any non-zero value starts polling \,;
+#X text 8 225 0 stops the polling. If the number;
+#X text 9 238 is greater than 1 \, then the poll;
+#X text 9 251 delay is set to that number.;
+#X obj 27 419 route rel_x rel_y rel_z rel_wheel;
+#X floatatom 196 439 5 0 0 0 - - -;
+#X obj 492 321 unpack s s f;
+#X msg 258 110 open \$1;
+#X obj 258 92 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
+-1 2;
+#X floatatom 247 111 1 0 0 0 - - -;
+#X text 298 346 event_type event_code value;
+#X obj 63 374 route abs_x abs_y abs_z abs_rx abs_ry abs_rz abs_throttle
 ;
-#X obj 421 447 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 421 432 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 -1;
-#X floatatom 498 431 7 0 0 0 - - -;
-#X obj 498 447 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X floatatom 498 416 7 0 0 0 - - -;
+#X obj 498 432 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X floatatom 576 431 7 0 0 0 - - -;
-#X obj 576 447 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X floatatom 576 416 7 0 0 0 - - -;
+#X obj 576 432 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X floatatom 653 431 7 0 0 0 - - -;
-#X obj 653 447 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X floatatom 653 416 7 0 0 0 - - -;
+#X obj 653 432 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
 1;
-#X floatatom 113 410 6 0 0 0 - - -;
-#X floatatom 163 410 6 0 0 0 - - -;
-#X floatatom 213 410 6 0 0 0 - - -;
-#X floatatom 263 410 6 0 0 0 - - -;
-#X floatatom 313 410 6 0 0 0 - - -;
-#X floatatom 363 410 6 0 0 0 - - -;
-#X obj 39 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X floatatom 113 395 6 0 0 0 - - -;
+#X floatatom 163 395 6 0 0 0 - - -;
+#X floatatom 213 395 6 0 0 0 - - -;
+#X floatatom 263 395 6 0 0 0 - - -;
+#X floatatom 313 395 6 0 0 0 - - -;
+#X floatatom 363 395 6 0 0 0 - - -;
+#X obj 39 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 69 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X obj 69 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 99 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
+#X obj 99 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0 1
 ;
-#X obj 129 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 129 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 159 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 159 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 189 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 189 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 219 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 219 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 249 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 249 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 279 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 279 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 309 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 309 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 339 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 339 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 369 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 369 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 399 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 399 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 9 475 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
+#X obj 9 460 route btn_0 btn_1 btn_2 btn_3 btn_4 btn_5 btn_6 btn_7
 btn_8 btn_9 btn_10 btn_11 btn_12 btn_13 btn_14 btn_15;
-#X obj 429 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 429 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 459 517 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
+#X obj 459 502 tgl 25 0 empty empty empty 0 -6 0 8 -195568 -1 -1 0
 1;
-#X obj 262 313 cyclone/prepend set;
-#X msg 37 166 debug \$1;
-#X obj 37 144 hradio 15 1 1 10 empty empty empty 0 -6 0 8 -262144 -1
--1 0;
-#X obj 646 501 pddp/pddp_open all_about_hid;
-#X msg 298 160 info;
-#N canvas 477 37 399 223 see 0;
-#N canvas 247 287 550 277 route 0;
-#X obj 53 13 inlet;
-#X obj 98 225 outlet;
-#X obj 45 225 outlet;
-#X obj 198 203 symbol;
-#X obj 198 225 outlet;
-#X obj 258 203 symbol;
-#X obj 258 225 outlet;
-#X obj 318 203 symbol;
-#X obj 318 225 outlet;
-#X obj 378 203 symbol;
-#X obj 378 225 outlet;
-#X obj 438 203 symbol;
-#X obj 438 225 outlet;
-#X obj 52 62 route open device poll product manufacturer transport
-vendorID productID;
-#X obj 148 224 outlet;
+#X obj 262 298 cyclone/prepend set;
+#X msg 37 151 debug \$1;
+#X obj 37 129 hradio 15 1 1 10 empty empty empty 0 -6 0 8 -262144 -1
+-1 5;
+#X obj 646 486 pddp/pddp_open all_about_hid;
+#X msg 298 145 info;
+#N canvas 477 37 411 235 see 0;
+#N canvas 108 318 543 264 route 0;
+#X obj 27 14 inlet;
+#X obj 72 226 outlet;
+#X obj 19 226 outlet;
+#X obj 172 226 outlet;
+#X obj 222 204 symbol;
+#X obj 222 226 outlet;
+#X obj 272 204 symbol;
+#X obj 272 226 outlet;
+#X obj 322 204 symbol;
+#X obj 322 226 outlet;
+#X obj 372 204 symbol;
+#X obj 372 226 outlet;
+#X obj 122 225 outlet;
+#X obj 26 63 route open device total poll product manufacturer transport
+type vendorID productID;
+#X obj 422 204 symbol;
+#X obj 422 226 outlet;
+#X obj 472 204 symbol;
+#X obj 472 226 outlet;
 #X connect 0 0 13 0;
-#X connect 3 0 4 0;
-#X connect 5 0 6 0;
-#X connect 7 0 8 0;
-#X connect 9 0 10 0;
-#X connect 11 0 12 0;
+#X connect 4 0 5 0;
+#X connect 6 0 7 0;
+#X connect 8 0 9 0;
+#X connect 10 0 11 0;
 #X connect 13 0 2 0;
 #X connect 13 1 1 0;
-#X connect 13 2 14 0;
+#X connect 13 2 12 0;
 #X connect 13 3 3 0;
-#X connect 13 4 5 0;
-#X connect 13 5 7 0;
-#X connect 13 6 9 0;
-#X connect 13 7 11 0;
+#X connect 13 4 4 0;
+#X connect 13 5 6 0;
+#X connect 13 6 8 0;
+#X connect 13 7 10 0;
+#X connect 13 8 14 0;
+#X connect 13 9 16 0;
+#X connect 14 0 15 0;
+#X connect 16 0 17 0;
 #X restore 55 66 pd route info;
-#X obj 54 88 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
-;
+#X obj 32 97 tgl 15 0 empty empty open 0 -6 0 8 -262144 -1 -1 1 1;
 #X obj 61 23 inlet;
 #X obj 74 44 print info;
 #X symbolatom 255 94 0 0 0 0 productID - -;
 #X symbolatom 255 113 0 0 0 0 vendorID - -;
-#X symbolatom 255 132 0 0 0 0 transport - -;
-#X symbolatom 255 152 0 0 0 0 manufacturer - -;
-#X symbolatom 137 173 0 0 0 0 product - -;
+#X symbolatom 255 152 0 0 0 0 transport - -;
+#X symbolatom 255 172 0 0 0 0 manufacturer - -;
+#X symbolatom 137 193 0 0 0 0 product - -;
 #X floatatom 48 141 5 0 0 0 device - -;
 #X floatatom 48 163 5 0 0 0 poll - -;
+#X symbolatom 255 132 0 0 0 0 type - -;
+#X floatatom 48 183 5 0 0 0 total - -;
 #X connect 0 0 1 0;
 #X connect 0 1 9 0;
 #X connect 0 2 10 0;
-#X connect 0 3 8 0;
-#X connect 0 4 7 0;
-#X connect 0 5 6 0;
-#X connect 0 6 5 0;
-#X connect 0 7 4 0;
+#X connect 0 3 12 0;
+#X connect 0 4 8 0;
+#X connect 0 5 7 0;
+#X connect 0 6 6 0;
+#X connect 0 7 11 0;
+#X connect 0 8 5 0;
+#X connect 0 9 4 0;
 #X connect 2 0 0 0;
 #X connect 2 0 3 0;
-#X restore 418 286 pd see device info;
+#X restore 418 271 pd see device info;
 #N canvas 0 22 380 450 open 0;
 #X obj 77 61 hradio 15 1 0 8 empty empty empty 0 -6 0 8 -262144 -1
 -1 0;
@@ -416,7 +425,7 @@ vendorID productID;
 #X connect 14 0 5 0;
 #X connect 16 0 5 0;
 #X connect 17 0 5 0;
-#X restore 203 74 pd open by device type;
+#X restore 203 59 pd open by device type;
 #N canvas 88 102 470 320 open 0;
 #X text 217 82 Gravis/Destroyer Tiltpad;
 #X msg 76 81 open 0x047D 0x4008;
@@ -430,8 +439,8 @@ IDs (it is not case sensitive):;
 #X connect 1 0 4 0;
 #X connect 2 0 4 0;
 #X connect 7 0 4 0;
-#X restore 174 52 pd open by vendor/product ID;
-#N canvas 114 93 523 432 test 0;
+#X restore 174 37 pd open by vendor/product ID;
+#N canvas 114 93 527 436 test 0;
 #X obj 122 5 inlet;
 #X obj 66 64 route DESKTOP;
 #X obj 65 118 route DESKTOP57;
@@ -440,19 +449,26 @@ IDs (it is not case sensitive):;
 #X floatatom 73 172 5 0 0 0 - - -;
 #X obj 126 175 spigot;
 #X obj 124 216 print test;
-#X obj 167 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 167 152 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
+#X obj 270 82 spigot;
+#X obj 268 123 print test;
+#X obj 311 59 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0 1
+;
 #X connect 0 0 1 0;
+#X connect 0 0 8 0;
 #X connect 1 0 2 0;
 #X connect 2 0 3 0;
 #X connect 2 0 4 0;
 #X connect 2 0 5 0;
 #X connect 5 0 6 0;
 #X connect 7 0 5 1;
-#X restore 197 318 pd test;
-#X msg 504 216 poll 200;
-#X msg 261 332 abs abs_y 55;
-#X text 49 558 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
+#X connect 8 0 9 0;
+#X connect 10 0 8 1;
+#X restore 197 303 pd test;
+#X msg 504 201 poll 200;
+#X msg 261 317 key btn_0 0;
+#X text 49 543 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X connect 3 0 45 0;
 #X connect 22 0 23 1;

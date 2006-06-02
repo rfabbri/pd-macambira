@@ -109,6 +109,30 @@ static void output_poll_time(t_hid *x)
 	output_status(x, gensym("poll"), x->x_delay);
 }
 
+static void output_device_count(t_hid *x)
+{
+	output_status(x, gensym("total"), device_count);
+}
+
+static void output_element_ranges(t_hid *x)
+{
+	if( (x->x_device_number > -1) && (x->x_device_open) )
+	{
+		unsigned int i;
+		t_atom output_data[4];
+		
+		for(i=0;i<element_count[x->x_device_number];++i)
+		{
+			SETSYMBOL(output_data, element[x->x_device_number][i]->type);
+			SETSYMBOL(output_data + 1, element[x->x_device_number][i]->name);
+			SETFLOAT(output_data + 2, element[x->x_device_number][i]->min);
+			SETFLOAT(output_data + 3, element[x->x_device_number][i]->max);
+			outlet_anything(x->x_status_outlet, gensym("range"), 4, output_data);
+		}
+	}
+}
+
+
 static unsigned int name_to_usage(char *usage_name)
 { // output usagepage << 16 + usage
 	if(strcmp(usage_name,"pointer") == 0)   return(0x00010001);
@@ -137,7 +161,7 @@ static short get_device_number_from_arguments(int argc, t_atom *argv)
 	{
 		first_argument = atom_getsymbolarg(0,argc,argv);
 		if(first_argument == &s_) 
-		{ // single float arg means device
+		{ // single float arg means device #
 			device_number = (short) atom_getfloatarg(0,argc,argv);
 			if(device_number < 0) device_number = -1;
 			debug_print(LOG_DEBUG,"[hid] setting device# to %d",device_number);
@@ -350,7 +374,9 @@ static void hid_info(t_hid *x)
 {
 	output_open_status(x);
 	output_device_number(x);
+	output_device_count(x);
 	output_poll_time(x);
+	output_element_ranges(x);
 	hid_platform_specific_info(x);
 }
 

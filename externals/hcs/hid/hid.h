@@ -15,7 +15,7 @@
 #define HID_MAJOR_VERSION 0
 #define HID_MINOR_VERSION 7
 
-/* static char *version = "$Revision: 1.24 $"; */
+/* static char *version = "$Revision: 1.25 $"; */
 
 /*------------------------------------------------------------------------------
  * GLOBAL DEFINES
@@ -40,19 +40,16 @@ typedef struct _hid
 {
 	t_object            x_obj;
 	t_int               x_fd;
-	short               x_device_number;
-//	unsigned short      vendor_id;    // USB idVendor for current device
-//	unsigned short      product_id;   // USB idProduct for current device
-	t_int               x_has_ff;
 	void                *x_ff_device;
-	t_clock             *x_clock;
-	t_int               x_delay;
+	short               x_device_number;
+	t_int               x_has_ff;
 	t_int               x_started;
 	t_int               x_device_open;
+	t_int               x_delay;
+	t_clock             *x_clock;
 	t_outlet            *x_data_outlet;
 	t_outlet            *x_status_outlet;
 } t_hid;
-
 
 
 
@@ -60,18 +57,14 @@ typedef struct _hid
  *  GLOBAL VARIABLES
  */
 
-/*
- * count the number of instances of this object so that certain free()
+/* count the number of instances of this object so that certain free()
  * functions can be called only after the final instance is detroyed.
  */
 t_int hid_instance_count;
 
 extern unsigned short global_debug_level;
 
-/* next I need to make a data structure to hold the data to be output for this
- * poll.  This should probably be an array for efficiency */
-
-
+/* built up when the elements of an open device are enumerated */
 typedef struct _hid_element
 {
 #ifdef __linux__
@@ -83,10 +76,15 @@ typedef struct _hid_element
 	t_symbol *name; // Linux "code"; HID "usage"
 	unsigned char polled; // is it polled or queued? (maybe only on Mac OS X?)
 	unsigned char relative; // relative data gets output everytime
+	t_int min; // from device report
+	t_int max; // from device report
 	t_float instance; // usage page/usage instance # ([absolute throttle 2 163( 
 	t_int value; // output the sum of events in a poll for relative axes
 	t_int previous_value; //only output on change on abs and buttons
 } t_hid_element;
+
+/* mostly for status querying */
+unsigned short device_count;
 
 /* store element structs to eliminate symbol table lookups, etc. */
 t_hid_element *element[MAX_DEVICES][MAX_ELEMENTS];

@@ -60,7 +60,7 @@
  *  GLOBAL VARS
  *======================================================================== */
 
-extern t_int hid_instance_count;
+extern t_int hid_instance_count; // in hid.h
 
 /* store device pointers so I don't have to query them all the time */
 pRecDevice device_pointer[MAX_DEVICES];
@@ -432,23 +432,24 @@ void hid_build_element_list(t_hid *x)
 				case kHIDUsage_GD_Wheel:
 					//case kHIDUsage_GD_Hatswitch: // hatswitches are more like buttons, so queue them
 					debug_print(LOG_INFO,"[hid] storing absolute axis to poll %s, %s (0x%04x 0x%04x)",
-								type_name, usage_name, pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
+								type_name, usage_name, 
+								pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 					if(HIDDequeueElement(pCurrentHIDDevice,pCurrentHIDElement) != kIOReturnSuccess)
 						debug_print(LOG_ERR,"[hid] could not dequeue element");
 					new_element->polled = 1;
 					break;
-				default:
-					debug_print(LOG_CRIT,"[hid] SKIPPED %s, %s (0x%04x 0x%04x)x", type_name, usage_name,
-								pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 				}
 			}
 			else
 			{
-				debug_print(LOG_INFO,"[hid] queuing element %s, %s (0x%04x 0x%04x)",type_name, usage_name,
+				debug_print(LOG_INFO,"[hid] queuing element %s, %s (0x%04x 0x%04x)",
+							type_name, usage_name,
 							pCurrentHIDElement->usagePage, pCurrentHIDElement->usage);
 			}
-			post("\tlogical min %d max %d",pCurrentHIDElement->minReport,pCurrentHIDElement->maxReport);
-			
+			new_element->min = pCurrentHIDElement->min;
+			new_element->max = pCurrentHIDElement->max;
+			debug_print(LOG_DEBUG,"\tlogical min %d max %d",
+						pCurrentHIDElement->min,pCurrentHIDElement->max);
 			element[x->x_device_number][element_count[x->x_device_number]] = new_element;
 			++element_count[x->x_device_number];
 			pCurrentHIDElement = HIDGetNextDeviceElement(pCurrentHIDElement, kHIDElementTypeInput);
@@ -519,6 +520,7 @@ void hid_print_device_list(t_hid *x)
 {
 	char device_type_buffer[256];
 	t_int i, numdevs;
+	unsigned int j;
 	pRecDevice pCurrentHIDDevice = NULL;
 
 	if( HIDHaveDeviceList() )
@@ -536,6 +538,8 @@ void hid_print_device_list(t_hid *x)
 				 pCurrentHIDDevice->version,pCurrentHIDDevice->locID);
 			HIDGetUsageName(pCurrentHIDDevice->usagePage, pCurrentHIDDevice->usage, 
 							device_type_buffer);
+			for(j=0; j< strlen(device_type_buffer); ++j)
+				device_type_buffer[j] = tolower(device_type_buffer[j]);
 			post("\tdevice type: %s\tusage page: 0x%04x\tusage: 0x%04x",
 				 device_type_buffer, pCurrentHIDDevice->usagePage,
 				 pCurrentHIDDevice->usage);
@@ -551,9 +555,11 @@ void hid_print_device_list(t_hid *x)
 
 void hid_platform_specific_info(t_hid *x)
 {
+	unsigned int i;
 	pRecDevice  pCurrentHIDDevice = NULL;
 	char vendor_id_string[7];
 	char product_id_string[7];
+	char device_type_buffer[256];
 	t_symbol *output_symbol;
 	t_atom *output_atom = getbytes(sizeof(t_atom));
 
@@ -571,7 +577,7 @@ void hid_platform_specific_info(t_hid *x)
 			SETSYMBOL(output_atom, gensym(pCurrentHIDDevice->manufacturer));
 			outlet_anything( x->x_status_outlet, gensym("manufacturer"), 
 							 1, output_atom);
-			/* serial */
+			/* serial number */
 			if(pCurrentHIDDevice->serial != NULL)
 			{
 				output_symbol = gensym(pCurrentHIDDevice->serial);
@@ -597,6 +603,15 @@ void hid_platform_specific_info(t_hid *x)
 					(unsigned int)pCurrentHIDDevice->productID);
 			SETSYMBOL(output_atom, gensym(product_id_string));
 			outlet_anything( x->x_status_outlet, gensym("productID"), 
+							 1, output_atom);
+            /* type */
+			HIDGetUsageName(pCurrentHIDDevice->usagePage, 
+							pCurrentHIDDevice->usage, 
+							device_type_buffer);
+			for(i=0; i< strlen(device_type_buffer); ++i)
+				device_type_buffer[i] = tolower(device_type_buffer[i]);
+			SETSYMBOL(output_atom, gensym(device_type_buffer));
+			outlet_anything( x->x_status_outlet, gensym("type"), 
 							 1, output_atom);
 		}
 	}
@@ -742,7 +757,7 @@ void hid_build_device_list(void)
 			device_pointer[device_number] = pCurrentHIDDevice;
 		pCurrentHIDDevice = HIDGetNextDevice(pCurrentHIDDevice);
 	}
-	
+	device_count = (unsigned int) HIDCountDevices(); // set the global variable
 	debug_print(LOG_WARNING,"[hid] completed device list.");
 }
 
