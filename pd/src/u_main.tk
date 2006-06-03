@@ -89,6 +89,8 @@ if {$pd_nt == 0} {
     }
 }
 
+set pd_deffont {courier 12 bold}
+
 set help_top_directory $pd_guidir/doc
 
 # it's unfortunate but we seem to have to turn off global bindings
@@ -354,7 +356,6 @@ proc menu_opentext {filename} {
     global doc_number
     global pd_guidir
     global pd_myversion
-#    global pd_font3
     set name [format ".help%d" $doc_number]
     toplevel $name
     text $name.text -relief raised -bd 2 -font -*-times-regular--normal--14-* \
@@ -573,7 +574,7 @@ proc menu_print {name} {
        -filetypes { {{postscript} {.ps}} }]
 
     if {$filename != ""} {
-        $name.c postscript -file $filename
+        $name.c postscript -file $filename 
     }
 }
 
@@ -1229,10 +1230,15 @@ proc pdtk_array_listview_fillpage {arrayName} {
     global pd_array_listview_page
     global pd_array_listview_id
     set windowName [format ".%sArrayWindow" $arrayName]
+    set topItem [expr [lindex [$windowName.lb yview] 0] * \
+                 [$windowName.lb size]]
+   
     if {[winfo exists $windowName]} {
       set cmd "$pd_array_listview_id($arrayName) \
                arrayviewlistfillpage \
-               $pd_array_listview_page($arrayName)"
+               $pd_array_listview_page($arrayName) \
+               $topItem"
+   
       pd [concat $cmd \;]
     }
 }
@@ -1260,7 +1266,7 @@ proc pdtk_array_listview_new {id arrayName page} {
     set $windowName.lb.sb [scrollbar $windowName.lb.sb \
                            -command "$windowName.lb yview" -orient vertical]
     place configure $windowName.lb.sb -relheight 1 -relx 0.9 -relwidth 0.1
-    pack $windowName.lb
+    pack $windowName.lb -expand 1 -fill both
     bind $windowName.lb <Double-ButtonPress-1> \
          "pdtk_array_listview_edit $arrayName $page $font"
     # handle copy/paste
@@ -1277,8 +1283,8 @@ proc pdtk_array_listview_new {id arrayName page} {
         -command "pdtk_array_listview_changepage $arrayName -1"]
     set $windowName.nextBtn [button $windowName.nextBtn -text "->" \
         -command "pdtk_array_listview_changepage $arrayName 1"]
-    pack $windowName.prevBtn -side left -ipadx 20 -pady 10
-    pack $windowName.nextBtn -side right -ipadx 20 -pady 10
+    pack $windowName.prevBtn -side left -ipadx 20 -pady 10 -anchor s
+    pack $windowName.nextBtn -side right -ipadx 20 -pady 10 -anchor s
     focus $windowName
 }
 
@@ -3144,7 +3150,7 @@ proc dodata_ok {name} {
 }
 
 proc pdtk_data_dialog {name stuff} {
-    global pd_font3
+    global pd_deffont
     toplevel $name
     wm title $name {Atom}
     wm protocol $name WM_DELETE_WINDOW [concat dodata_cancel $name]
@@ -3159,7 +3165,7 @@ proc pdtk_data_dialog {name stuff} {
     pack $name.buttonframe.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 40 -width 60 \
-        -yscrollcommand "$name.scroll set" -font $pd_font3
+        -yscrollcommand "$name.scroll set" -font $pd_deffont
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -3185,15 +3191,18 @@ proc pdtk_text_new {canvasname myname x y text font color} {
 #    if {$font < 13} {set fontname [format -*-courier-bold----%d-* $font]}
 #    if {$font >= 13} {set fontname [format -*-courier-----%d-* $font]}
 
-        global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7 
+        global pd_fontlist 
         switch -- $font {
-                8  { set typeface $pd_font1 }
-                10 { set typeface $pd_font2 }
-                12 { set typeface $pd_font3 }
-                14 { set typeface $pd_font4 }
-                16 { set typeface $pd_font5 }
-                24 { set typeface $pd_font6 }
-                36 { set typeface $pd_font7 }
+                8  { set typeface [lindex $pd_fontlist 0] }
+                9  { set typeface [lindex $pd_fontlist 1] }
+                10 { set typeface [lindex $pd_fontlist 2] }
+                12 { set typeface [lindex $pd_fontlist 3] }
+                14 { set typeface [lindex $pd_fontlist 4] }
+                16 { set typeface [lindex $pd_fontlist 5] }
+                18 { set typeface [lindex $pd_fontlist 6] }
+                24 { set typeface [lindex $pd_fontlist 7] }
+                30 { set typeface [lindex $pd_fontlist 8] }
+                36 { set typeface [lindex $pd_fontlist 9] }
         }
 
     $canvasname create text $x $y \
@@ -3226,7 +3235,7 @@ proc pdtk_pd_ctrlkey {name key shift} {
 ######### startup function.  ##############
 # Tell pd the current directory; this is used in case the command line
 # asked pd to open something.  Also, get character width and height for
-# font sizes 8, 10, 12, 14, 16, and 24.
+# seven "useful" font sizes.
 
 # tb: user defined typefaces
 proc pdtk_pd_startup {version apilist midiapilist fontname} {
@@ -3235,49 +3244,29 @@ proc pdtk_pd_startup {version apilist midiapilist fontname} {
     set pd_myversion $version
     set pd_apilist $apilist
     set pd_midiapilist $midiapilist
-    global pd_font1 pd_font2 pd_font3 pd_font4 pd_font5 pd_font6 pd_font7
+    global pd_fontlist
+    set pd_fontlist {}
 
-    set pd_font1 [format -*-%s-bold--normal--8-* $fontname]
-    set pd_font2 [format -*-%s-bold--normal--10-* $fontname]
-    set pd_font3 [format -*-%s-bold--normal--12-* $fontname]
-    set pd_font4 [format -*-%s-bold--normal--14-* $fontname]
-    set pd_font5 [format -*-%s-bold--normal--16-* $fontname]
-    set pd_font6 [format -*-%s-bold--normal--24-* $fontname]
-    set pd_font7 [format -*-%s-bold--normal--36-* $fontname]
-
-    set width1 [font measure  $pd_font1 x]
-    set height1 [lindex [font metrics $pd_font1] 5]
-    set width2 [font measure  $pd_font2 x]
-    set height2 [lindex [font metrics $pd_font2] 5]
-    set width3 [font measure  $pd_font3 x]
-    set height3 [lindex [font metrics $pd_font3] 5]
-    set width4 [font measure  $pd_font4 x]
-    set height4 [lindex [font metrics $pd_font4] 5]
-    set width5 [font measure  $pd_font5 x]
-    set height5 [lindex [font metrics $pd_font5] 5]
-    set width6 [font measure  $pd_font6 x]
-    set height6 [lindex [font metrics $pd_font6] 5]
-    set width7 [font measure  $pd_font7 x]
-    set height7 [lindex [font metrics $pd_font7] 5]
+    set fontlist ""
+    foreach i {8 9 10 12 14 16 18 24 30 36} {
+       set font [concat $fontname -$i bold]
+       set pd_fontlist [linsert $pd_fontlist 100000 $font] 
+       set width0 [font measure  $font x]
+       set height0 [lindex [font metrics $font] 5]
+       set fontlist [concat $fontlist $i [font measure  $font x] \
+	   [lindex [font metrics $font] 5]]
+    }
 
     set tclpatch [info patchlevel]
     if {$tclpatch == "8.3.0" || \
-        $tclpatch == "8.3.1" || \
-        $tclpatch == "8.3.2" || \
-        $tclpatch == "8.3.3" } {
-        set oldtclversion 1
+	$tclpatch == "8.3.1" || \
+	$tclpatch == "8.3.2" || \
+	$tclpatch == "8.3.3" } {
+	set oldtclversion 1
     } else {
-        set oldtclversion 0
+	set oldtclversion 0
     }
-    pd [concat pd init [pdtk_enquote [pwd]] \
-        8 $width1 $height1 \
-        10 $width2 $height2 \
-        12 $width3 $height3 \
-        14 $width4 $height4 \
-        16 $width5 $height5 \
-        24 $width6 $height6 \
-        36 $width7 $height7 \
-        $oldtclversion \;];
+    pd [concat pd init [pdtk_enquote [pwd]] $oldtclversion $fontlist \;];
 
     # add the audio and help menus to the Pd window.  We delayed this
     # so that we'd know the value of "apilist".
@@ -3352,7 +3341,7 @@ proc texteditor_ok {name} {
 
 
 proc pdtk_pd_texteditor {stuff} {
-    global edit_number pd_font3
+    global edit_number pd_deffont
     set name [format ".text%d" $edit_number]
     set edit_number [expr $edit_number + 1]
 
@@ -3369,7 +3358,7 @@ proc pdtk_pd_texteditor {stuff} {
     pack $name.buttons.ok -side left -expand 1
 
     text $name.text -relief raised -bd 2 -height 12 -width 60 \
-        -yscrollcommand "$name.scroll set" -font $pd_font3
+        -yscrollcommand "$name.scroll set" -font $pd_deffont
     scrollbar $name.scroll -command "$name.text yview"
     pack $name.scroll -side right -fill y
     pack $name.text -side left -fill both -expand 1
@@ -3394,23 +3383,26 @@ proc pdtk_pastetext {} {
 
 ############# open and save dialogs for objects in Pd ##########
 
-proc pdtk_openpanel {target} {
+proc pdtk_openpanel {target localdir} {
     global pd_opendir
+    if {$localdir == ""} {
+      set localdir $pd_opendir
+    }
     set filename [tk_getOpenFile \
-        -initialdir $pd_opendir]
+        -initialdir $localdir]
     if {$filename != ""} {
         set directory [string range $filename 0 \
             [expr [string last / $filename ] - 1]]
         set pd_opendir $directory
 
-        pd [concat $target symbol [pdtk_enquote $filename] \;]
+        pd [concat $target callback [pdtk_enquote $filename] \;]
     }
 }
 
-proc pdtk_savepanel {target} {
-    set filename [tk_getSaveFile]
+proc pdtk_savepanel {target localdir} {
+    set filename [tk_getSaveFile -initialdir $localdir]
     if {$filename != ""} {
-        pd [concat $target symbol [pdtk_enquote $filename] \;]
+        pd [concat $target callback [pdtk_enquote $filename] \;]
     }
 }
 

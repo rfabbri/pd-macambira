@@ -608,7 +608,7 @@ static void sys_listaudiodevs(void )
     {
         post("input devices:");
         for (i = 0; i < nindevs; i++)
-            post("%d. %s", i+1, indevlist + i * DEVDESCSIZE);
+            post("%d. %s", i + DEVONSET, indevlist + i * DEVDESCSIZE);
     }
     if (!noutdevs)
         post("no audio output devices found");

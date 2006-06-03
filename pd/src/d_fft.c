@@ -1,8 +1,15 @@
-/* Copyright (c) 1997-1999 Miller Puckette and others.
+/* Copyright (c) 1997- Miller Puckette and others.
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
 #include "m_pd.h"
+
+/* This file interfaces to one of the Mayer, Ooura, or fftw FFT packages
+to implement the "fft~", etc, Pd objects.  If using Mayer, also compile
+d_fft_mayer.c; if ooura, use d_fft_fftsg.c instead; if fftw, use d_fft_fftw.c
+and also link in the fftw library.  You can only have one of these three
+linked in.  The configure script can be used to select which one.
+*/
 
 /* ---------------- utility functions for DSP chains ---------------------- */
 

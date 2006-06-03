@@ -7,7 +7,7 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: s_audio_pablio.h,v 1.1 2004-09-06 20:20:35 millerpuckette Exp $
+ * $Id: s_audio_pablio.h,v 1.2 2006-06-03 19:13:07 millerpuckette Exp $
  * PABLIO.h
  * Portable Audio Blocking read/write utility.
  *
@@ -46,13 +46,13 @@ extern "C"
 #include <stdlib.h>
 #include <math.h>
 #include "portaudio.h"
-#include "ringbuffer.h"
+#include "s_audio_paring.h"
 #include <string.h>
 
 typedef struct
 {
-    RingBuffer   inFIFO;
-    RingBuffer   outFIFO;
+    sys_ringbuf   inFIFO;
+    sys_ringbuf   outFIFO;
     PaStream *stream;
     int          inbytesPerFrame;
     int          insamplesPerFrame;

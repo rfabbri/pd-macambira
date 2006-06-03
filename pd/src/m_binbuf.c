@@ -149,14 +149,14 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
                     && *textp != '\t' &&*textp != ',' && *textp != ';')));
             *bufp = 0;
 #if 0
-            post("buf %s", buf);
+            post("binbuf_text: buf %s", buf);
 #endif
             if (*buf == '$' && buf[1] >= '0' && buf[1] <= '9' && !firstslash)
             {
                 for (bufp = buf+2; *bufp; bufp++)
                     if (*bufp < '0' || *bufp > '9')
                 {
-                    SETDOLLSYM(ap, gensym(buf+1));
+                    SETDOLLSYM(ap, gensym(buf));
                     goto didit;
                 }
                 SETDOLLAR(ap, atoi(buf+1));
@@ -307,7 +307,7 @@ void binbuf_addbinbuf(t_binbuf *x, t_binbuf *y)
             SETSYMBOL(ap, gensym(tbuf));
             break;
         case A_DOLLSYM:
-            sprintf(tbuf, "$%s", ap->a_w.w_symbol->s_name);
+            atom_string(ap, tbuf, MAXPDSTRING);
             SETSYMBOL(ap, gensym(tbuf));
             break;
         case A_SYMBOL:
@@ -363,7 +363,7 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
                     if (*str2 < '0' || *str2 > '9')
                         dollsym = 1;
                 if (dollsym)
-                    SETDOLLSYM(ap, gensym(str + 1));
+                    SETDOLLSYM(ap, gensym(str));
                 else
                 {
                     int dollar = 0;
@@ -413,26 +413,106 @@ t_atom *binbuf_getvec(t_binbuf *x)
 
 int canvas_getdollarzero( void);
 
+/* JMZ:
+ * s points to the first character after the $
+ * (e.g. if the org.symbol is "$1-bla", then s will point to "1-bla")
+ * (e.g. org.symbol="hu-$1mu", s="1mu")
+ * LATER: think about more complex $args, like ${$1+3}
+ *
+ * the return value holds the length of the $arg (in most cases: 1)
+ * buf holds the expanded $arg
+ *
+ * if some error occured, "-1" is returned
+ *
+ * e.g. "$1-bla" with list "10 20 30"
+ * s="1-bla"
+ * buf="10"
+ * return value = 1; (s+1=="-bla")
+ */
+int binbuf_expanddollsym(char*s, char*buf,t_atom dollar0, int ac, t_atom *av, int tonew)
+{
+  int argno=atol(s);
+  int arglen=0;
+  char*cs=s;
+  char c=*cs;
+  *buf=0;
+
+  while(c&&(c>='0')&&(c<='9')){
+    c=*cs++;
+    arglen++;
+  }
+
+  if (cs==s) { /* invalid $-expansion (like "$bla") */
+    sprintf(buf, "$");
+    return 0;
+  }
+  else if (argno < 0 || argno > ac) /* undefined argument */
+    {
+      if(!tonew)return 0;
+      sprintf(buf, "$%d", argno);
+    }
+  else if (argno == 0){ /* $0 */
+    atom_string(&dollar0, buf, MAXPDSTRING/2-1);
+  }
+  else{ /* fine! */
+    atom_string(av+(argno-1), buf, MAXPDSTRING/2-1);
+  }
+  return (arglen-1);
+}
+
 /* LATER remove the dependence on the current canvas for $0; should be another
 argument. */
 t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
 {
-    int argno = atol(s->s_name), lastnum;
-    char buf[MAXPDSTRING], c, *sp;
-    for (lastnum = 0, sp = s->s_name; ((c = *sp) && c >= '0' && c <= '9');
-        sp++, lastnum++)
-    if (!c || argno < 0 || argno > ac)
-    {
-        if (!tonew)
-            return (0);
-        else sprintf(buf, "$%d", argno);
+    char buf[MAXPDSTRING];
+    char buf2[MAXPDSTRING];
+    char*str=s->s_name;
+    char*substr;
+    int next=0, i=MAXPDSTRING;
+    t_atom dollarnull;
+    SETFLOAT(&dollarnull, canvas_getdollarzero());
+    while(i--)buf2[i]=0;
+
+#if 1
+    /* JMZ: currently, a symbol is detected to be A_DOLLSYM if it starts with '$'
+     * the leading $ is stripped and the rest stored in "s"
+     * i would suggest to NOT strip the leading $
+     * and make everything a A_DOLLSYM that contains(!) a $
+     *
+     * whenever this happened, enable this code
+     */
+    substr=strchr(str, '$');
+    if(substr){
+      strncat(buf2, str, (substr-str));
+      str=substr+1;
     }
-    else if (argno == 0)
-        sprintf(buf, "%d", canvas_getdollarzero());
-    else
-        atom_string(av+(argno-1), buf, MAXPDSTRING/2-1);
-    strncat(buf, sp, MAXPDSTRING/2-1);
-    return (gensym(buf));
+#endif
+
+    while((next=binbuf_expanddollsym(str, buf, dollarnull, ac, av, tonew))>=0)
+      {
+      /*
+       * JMZ: i am not sure what this means, so i might have broken it
+       * it seems like that if "tonew" is set and the $arg cannot be expanded (or the dollarsym is in reality a A_DOLLAR)
+       * 0 is returned from binbuf_realizedollsym
+       * this happens, when expanding in a message-box, but does not happen when the A_DOLLSYM is the name of a subpatch
+       */
+        if(!tonew&&(0==next)&&(0==*buf)){
+          return 0; /* JMZ: this should mimick the original behaviour */
+        }
+
+        strncat(buf2, buf, MAXPDSTRING/2-1);
+        str+=next;
+        substr=strchr(str, '$');
+        if(substr){
+          strncat(buf2, str, (substr-str));
+          str=substr+1;
+        } else {
+          strcat(buf2, str);
+
+          return gensym(buf2);
+        }
+      }
+    return (gensym(buf2));
 }
 
 void binbuf_eval(t_binbuf *x, t_pd *target, int argc, t_atom *argv)
@@ -817,7 +897,7 @@ static t_binbuf *binbuf_convert(t_binbuf *oldb, int maxtopd)
                 else if (nextmess[i].a_type == A_DOLLSYM)
                 {
                     char buf[100];
-                    sprintf(buf, "$%s", nextmess[i].a_w.w_symbol->s_name);
+                    sprintf(buf, "%s", nextmess[i].a_w.w_symbol->s_name);
                     SETSYMBOL(nextmess+i, gensym(buf));
                 }
             }

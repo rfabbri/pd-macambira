@@ -1,7 +1,7 @@
 #ifndef PA_UTIL_H
 #define PA_UTIL_H
 /*
- * $Id: pa_util.h,v 1.1.2.12 2003/09/20 21:09:55 rossbencina Exp $
+ * $Id: pa_util.h,v 1.1.2.13 2005/11/09 06:31:42 aknudsen Exp $
  * Portable Audio I/O Library implementation utilities header
  * common implementation utilities and interfaces
  *
@@ -114,7 +114,7 @@ void PaUtil_SetLastHostErrorInfo( PaHostApiTypeId hostApiType, long errorCode,
 
 void PaUtil_DebugPrint( const char *format, ... );
 
-#if (0) /* set to 1 to print debug messages */
+#ifdef PA_ENABLE_DEBUG_OUTPUT
 #define PA_DEBUG(x) PaUtil_DebugPrint x ;
 #else
 #define PA_DEBUG(x)

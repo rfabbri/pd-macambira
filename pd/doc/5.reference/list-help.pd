@@ -1,4 +1,4 @@
-#N canvas 105 298 629 492 12;
+#N canvas 596 406 629 492 12;
 #X obj 29 11 list;
 #X text 352 455 updated for Pd version 0.39;
 #X text 76 12 - building and using variable-length messages;

@@ -672,7 +672,7 @@ void glist_redraw(t_glist *x)
 /* --------------------------- widget behavior  ------------------- */
 
 extern t_widgetbehavior text_widgetbehavior;
-t_symbol *garray_getname(t_garray *x);
+int garray_getname(t_garray *x, t_symbol **namep);
 
 
     /* Note that some code in here would also be useful for drawing
@@ -726,6 +726,7 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
         float f;
         t_gobj *g;
         t_symbol *arrayname;
+        t_garray *ga;
             /* draw a rectangle around the graph */
         sys_vgui(".x%lx.c create line\
             %d %d %d %d %d %d %d %d %d %d -tags %s\n",
@@ -734,13 +735,14 @@ static void graph_vis(t_gobj *gr, t_glist *parent_glist, int vis)
         
             /* if there's just one "garray" in the graph, write its name
                 along the top */
-        if ((g = x->gl_list) && !g->g_next && (g->g_pd == garray_class))
+        for (i = (y1 < y2 ? y1 : y2)-1, g = x->gl_list; g; g = g->g_next)
+            if (g->g_pd == garray_class &&
+                !garray_getname((t_garray *)g, &arrayname))
         {
-            int ymin = (y1 < y2 ? y1 : y2);
-            t_symbol *s = garray_getname((t_garray *)g);
-            sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor sw\
+            i -= sys_fontheight(glist_getfont(x));
+            sys_vgui(".x%lx.c create text %d %d -text {%s} -anchor nw\
              -font -*-courier-bold--normal--%d-* -tags %s\n",
-                (long)glist_getcanvas(x),  x1, ymin, s->s_name,
+                (long)glist_getcanvas(x),  x1, i, arrayname->s_name,
                 sys_hostfontsize(glist_getfont(x)), tag);
         }
         

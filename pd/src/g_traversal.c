@@ -1036,8 +1036,6 @@ static void append_float(t_append *x, t_float f)
         sc->sc_gobj.g_next = glist->gl_list;
         glist->gl_list = &sc->sc_gobj;
     }
-    if (glist_isvisible(glist_getcanvas(glist)))
-        gobj_vis(&sc->sc_gobj, glist, 1);
 
     gp->gp_un.gp_scalar = sc;
     vec = sc->sc_vec;
@@ -1046,7 +1044,10 @@ static void append_float(t_append *x, t_float f)
         template_setfloat(template, vp->gv_sym, vec, vp->gv_f, 1);
     }
  
-    scalar_redraw(sc, glist);  
+    if (glist_isvisible(glist_getcanvas(glist)))
+        gobj_vis(&sc->sc_gobj, glist, 1);
+    /*  scalar_redraw(sc, glist);  ... have to do 'vis' instead here because
+    redraw assumes we're already visible??? ... */
 
     outlet_pointer(x->x_obj.ob_outlet, gp);
 }

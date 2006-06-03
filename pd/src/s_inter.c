@@ -788,6 +788,8 @@ void sys_queuegui(void *client, t_glist *glist, t_guicallbackfn f)
         for (gq = sys_guiqueuehead; gq->gq_next; gq = gq->gq_next)
             if (gq->gq_client == client)
                 return;
+        if (gq->gq_client == client)
+            return;
         gqnextptr = &gq->gq_next;
     }
     gq = t_getbytes(sizeof(*gq));

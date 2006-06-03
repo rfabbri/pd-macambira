@@ -1,5 +1,5 @@
 /*
- * $Id: pa_asio.cpp,v 1.7.2.65 2005/02/21 08:07:10 rossbencina Exp $
+ * $Id: pa_asio.cpp,v 1.7.2.68 2005/12/05 04:55:28 rossbencina Exp $
  * Portable Audio I/O Library for ASIO Drivers
  *
  * Author: Stephane Letz
@@ -1081,6 +1081,26 @@ PaError PaAsio_Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex
 
         for( i=0; i < driverCount; ++i )
         {
+
+            PA_DEBUG(("ASIO names[%d]:%s\n",i,names[i]));
+
+            // Since portaudio opens ALL ASIO drivers, and no one else does that,
+            // we face fact that some drivers were not meant for it, drivers which act
+            // like shells on top of REAL drivers, for instance.
+            // so we get duplicate handles, locks and other problems.
+            // so lets NOT try to load any such wrappers. 
+            // The ones i [davidv] know of so far are:
+
+            if (   strcmp (names[i],"ASIO DirectX Full Duplex Driver") == 0
+                || strcmp (names[i],"ASIO Multimedia Driver")          == 0
+                || strncmp(names[i],"Premiere",8)                      == 0   //"Premiere Elements Windows Sound 1.0"
+                || strncmp(names[i],"Adobe",5)                         == 0 ) //"Adobe Default Windows Sound 1.5"
+            {
+                PA_DEBUG(("BLACKLISTED!!!\n"));
+                continue;
+            }
+
+
             /* Attempt to load the asio driver... */
             if( LoadAsioDriver( names[i], &paAsioDriverInfo, asioHostApi->systemSpecific ) == paNoError )
             {
@@ -1733,16 +1753,52 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
         }
     }
 
-    PA_DEBUG(("before ASIOSetSampleRate(%f)\n",sampleRate));
-    asioError = ASIOSetSampleRate( sampleRate );
-    /* Set sample rate */
+
+    // check that the device supports the requested sample rate 
+
+    asioError = ASIOCanSampleRate( sampleRate );
+    PA_DEBUG(("ASIOCanSampleRate(%f):%d\n",sampleRate, asioError ));
+
     if( asioError != ASE_OK )
     {
         result = paInvalidSampleRate;
-        PA_DEBUG(("ERROR: ASIOSetSampleRate: %s\n", PaAsio_GetAsioErrorText(asioError) ));
+        PA_DEBUG(("ERROR: ASIOCanSampleRate: %s\n", PaAsio_GetAsioErrorText(asioError) ));
         goto error;
     }
-    PA_DEBUG(("after ASIOSetSampleRate(%f)\n",sampleRate));
+
+
+    // retrieve the current sample rate, we only change to the requested
+    // sample rate if the device is not already in that rate.
+
+    ASIOSampleRate oldRate;
+    asioError = ASIOGetSampleRate(&oldRate);
+    if( asioError != ASE_OK )
+    {
+        result = paInvalidSampleRate;
+        PA_DEBUG(("ERROR: ASIOGetSampleRate: %s\n", PaAsio_GetAsioErrorText(asioError) ));
+        goto error;
+    }
+    PA_DEBUG(("ASIOGetSampleRate:%f\n",oldRate));
+
+    if (oldRate != sampleRate){
+
+        PA_DEBUG(("before ASIOSetSampleRate(%f)\n",sampleRate));
+        asioError = ASIOSetSampleRate( sampleRate );
+        /* Set sample rate */
+        if( asioError != ASE_OK )
+        {
+            result = paInvalidSampleRate;
+            PA_DEBUG(("ERROR: ASIOSetSampleRate: %s\n", PaAsio_GetAsioErrorText(asioError) ));
+            goto error;
+        }
+        PA_DEBUG(("after ASIOSetSampleRate(%f)\n",sampleRate));
+    }
+    else
+    {
+        PA_DEBUG(("No Need to change SR\n"));
+    }
+
+
     /*
         IMPLEMENT ME:
             - if a full duplex stream is requested, check that the combination
@@ -2035,6 +2091,7 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
     return result;
 
 error:
+    PA_DEBUG(("goto errored\n"));
     if( stream )
     {
         if( completedBuffersPlayedEventInited )

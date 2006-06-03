@@ -6,7 +6,7 @@ extern "C"
 #endif /* __cplusplus */
 
 /*
- * $Id: s_audio_paring.h,v 1.1 2004-09-06 20:20:35 millerpuckette Exp $
+ * $Id: s_audio_paring.h,v 1.2 2006-06-03 19:13:07 millerpuckette Exp $
  * ringbuffer.h
  * Ring Buffer utility..
  *
@@ -43,58 +43,58 @@ extern "C"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "ringbuffer.h"
+#include "s_audio_paring.h"
 #include <string.h>
 
 typedef struct
 {
-    long   bufferSize; /* Number of bytes in FIFO. Power of 2. Set by RingBuffer_Init. */
+    long   bufferSize; /* Number of bytes in FIFO. Power of 2. Set by sys_ringbuf_Init. */
 /* These are declared volatile because they are written by a different thread than the reader. */
-    volatile long   writeIndex; /* Index of next writable byte. Set by RingBuffer_AdvanceWriteIndex. */
-    volatile long   readIndex;  /* Index of next readable byte. Set by RingBuffer_AdvanceReadIndex. */
+    volatile long   writeIndex; /* Index of next writable byte. Set by sys_ringbuf_AdvanceWriteIndex. */
+    volatile long   readIndex;  /* Index of next readable byte. Set by sys_ringbuf_AdvanceReadIndex. */
     long   bigMask;    /* Used for wrapping indices with extra bit to distinguish full/empty. */
     long   smallMask;  /* Used for fitting indices to buffer. */
     char *buffer;
 }
-RingBuffer;
+sys_ringbuf;
 /*
  * Initialize Ring Buffer.
  * numBytes must be power of 2, returns -1 if not.
  */
-long RingBuffer_Init( RingBuffer *rbuf, long numBytes, void *dataPtr );
+long sys_ringbuf_Init( sys_ringbuf *rbuf, long numBytes, void *dataPtr );
 
 /* Clear buffer. Should only be called when buffer is NOT being read. */
-void RingBuffer_Flush( RingBuffer *rbuf );
+void sys_ringbuf_Flush( sys_ringbuf *rbuf );
 
 /* Return number of bytes available for writing. */
-long RingBuffer_GetWriteAvailable( RingBuffer *rbuf );
+long sys_ringbuf_GetWriteAvailable( sys_ringbuf *rbuf );
 /* Return number of bytes available for read. */
-long RingBuffer_GetReadAvailable( RingBuffer *rbuf );
+long sys_ringbuf_GetReadAvailable( sys_ringbuf *rbuf );
 /* Return bytes written. */
-long RingBuffer_Write( RingBuffer *rbuf, const void *data, long numBytes );
+long sys_ringbuf_Write( sys_ringbuf *rbuf, const void *data, long numBytes );
 /* Return bytes read. */
-long RingBuffer_Read( RingBuffer *rbuf, void *data, long numBytes );
+long sys_ringbuf_Read( sys_ringbuf *rbuf, void *data, long numBytes );
 
 /* Get address of region(s) to which we can write data.
 ** If the region is contiguous, size2 will be zero.
 ** If non-contiguous, size2 will be the size of second region.
 ** Returns room available to be written or numBytes, whichever is smaller.
 */
-long RingBuffer_GetWriteRegions( RingBuffer *rbuf, long numBytes,
+long sys_ringbuf_GetWriteRegions( sys_ringbuf *rbuf, long numBytes,
                                  void **dataPtr1, long *sizePtr1,
                                  void **dataPtr2, long *sizePtr2 );
-long RingBuffer_AdvanceWriteIndex( RingBuffer *rbuf, long numBytes );
+long sys_ringbuf_AdvanceWriteIndex( sys_ringbuf *rbuf, long numBytes );
 
 /* Get address of region(s) from which we can read data.
 ** If the region is contiguous, size2 will be zero.
 ** If non-contiguous, size2 will be the size of second region.
 ** Returns room available to be read or numBytes, whichever is smaller.
 */
-long RingBuffer_GetReadRegions( RingBuffer *rbuf, long numBytes,
+long sys_ringbuf_GetReadRegions( sys_ringbuf *rbuf, long numBytes,
                                 void **dataPtr1, long *sizePtr1,
                                 void **dataPtr2, long *sizePtr2 );
 
-long RingBuffer_AdvanceReadIndex( RingBuffer *rbuf, long numBytes );
+long sys_ringbuf_AdvanceReadIndex( sys_ringbuf *rbuf, long numBytes );
 
 #ifdef __cplusplus
 }

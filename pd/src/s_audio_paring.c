@@ -1,5 +1,5 @@
 /*
- * $Id: s_audio_paring.c,v 1.1 2004-09-06 20:20:35 millerpuckette Exp $
+ * $Id: s_audio_paring.c,v 1.2 2006-06-03 19:13:07 millerpuckette Exp $
  * ringbuffer.c
  * Ring Buffer utility..
  *
@@ -47,35 +47,35 @@
 /***************************************************************************
  * Initialize FIFO.
  */
-long RingBuffer_Init( RingBuffer *rbuf, long numBytes, void *dataPtr )
+long sys_ringbuf_Init( sys_ringbuf *rbuf, long numBytes, void *dataPtr )
 {
     rbuf->bufferSize = numBytes;
     rbuf->buffer = (char *)dataPtr;
-    RingBuffer_Flush( rbuf );
+    sys_ringbuf_Flush( rbuf );
     return 0;
 }
 /***************************************************************************
 ** Return number of bytes available for reading. */
-long RingBuffer_GetReadAvailable( RingBuffer *rbuf )
+long sys_ringbuf_GetReadAvailable( sys_ringbuf *rbuf )
 {
     long ret = rbuf->writeIndex - rbuf->readIndex;
     if (ret < 0)
         ret += 2 * rbuf->bufferSize;
     if (ret < 0 || ret > rbuf->bufferSize)
         fprintf(stderr,
-            "consistency check failed: RingBuffer_GetReadAvailable\n");
+            "consistency check failed: sys_ringbuf_GetReadAvailable\n");
     return ( ret );
 }
 /***************************************************************************
 ** Return number of bytes available for writing. */
-long RingBuffer_GetWriteAvailable( RingBuffer *rbuf )
+long sys_ringbuf_GetWriteAvailable( sys_ringbuf *rbuf )
 {
-    return ( rbuf->bufferSize - RingBuffer_GetReadAvailable(rbuf));
+    return ( rbuf->bufferSize - sys_ringbuf_GetReadAvailable(rbuf));
 }
 
 /***************************************************************************
 ** Clear buffer. Should only be called when buffer is NOT being read. */
-void RingBuffer_Flush( RingBuffer *rbuf )
+void sys_ringbuf_Flush( sys_ringbuf *rbuf )
 {
     rbuf->writeIndex = rbuf->readIndex = 0;
 }
@@ -86,12 +86,12 @@ void RingBuffer_Flush( RingBuffer *rbuf )
 ** If non-contiguous, size2 will be the size of second region.
 ** Returns room available to be written or numBytes, whichever is smaller.
 */
-long RingBuffer_GetWriteRegions( RingBuffer *rbuf, long numBytes,
+long sys_ringbuf_GetWriteRegions( sys_ringbuf *rbuf, long numBytes,
                                  void **dataPtr1, long *sizePtr1,
                                  void **dataPtr2, long *sizePtr2 )
 {
     long   index;
-    long   available = RingBuffer_GetWriteAvailable( rbuf );
+    long   available = sys_ringbuf_GetWriteAvailable( rbuf );
     if( numBytes > available ) numBytes = available;
     /* Check to see if write is not contiguous. */
     index = rbuf->writeIndex;
@@ -119,7 +119,7 @@ long RingBuffer_GetWriteRegions( RingBuffer *rbuf, long numBytes,
 
 /***************************************************************************
 */
-long RingBuffer_AdvanceWriteIndex( RingBuffer *rbuf, long numBytes )
+long sys_ringbuf_AdvanceWriteIndex( sys_ringbuf *rbuf, long numBytes )
 {
     long ret = (rbuf->writeIndex + numBytes);
     if ( ret >= 2 * rbuf->bufferSize)
@@ -133,12 +133,12 @@ long RingBuffer_AdvanceWriteIndex( RingBuffer *rbuf, long numBytes )
 ** If non-contiguous, size2 will be the size of second region.
 ** Returns room available to be written or numBytes, whichever is smaller.
 */
-long RingBuffer_GetReadRegions( RingBuffer *rbuf, long numBytes,
+long sys_ringbuf_GetReadRegions( sys_ringbuf *rbuf, long numBytes,
                                 void **dataPtr1, long *sizePtr1,
                                 void **dataPtr2, long *sizePtr2 )
 {
     long   index;
-    long   available = RingBuffer_GetReadAvailable( rbuf );
+    long   available = sys_ringbuf_GetReadAvailable( rbuf );
     if( numBytes > available ) numBytes = available;
     /* Check to see if read is not contiguous. */
     index = rbuf->readIndex;
@@ -165,7 +165,7 @@ long RingBuffer_GetReadRegions( RingBuffer *rbuf, long numBytes,
 }
 /***************************************************************************
 */
-long RingBuffer_AdvanceReadIndex( RingBuffer *rbuf, long numBytes )
+long sys_ringbuf_AdvanceReadIndex( sys_ringbuf *rbuf, long numBytes )
 {
     long ret = (rbuf->readIndex + numBytes);
     if( ret >= 2 * rbuf->bufferSize)
@@ -175,11 +175,11 @@ long RingBuffer_AdvanceReadIndex( RingBuffer *rbuf, long numBytes )
 
 /***************************************************************************
 ** Return bytes written. */
-long RingBuffer_Write( RingBuffer *rbuf, const void *data, long numBytes )
+long sys_ringbuf_Write( sys_ringbuf *rbuf, const void *data, long numBytes )
 {
     long size1, size2, numWritten;
     void *data1, *data2;
-    numWritten = RingBuffer_GetWriteRegions( rbuf, numBytes, &data1, &size1, &data2, &size2 );
+    numWritten = sys_ringbuf_GetWriteRegions( rbuf, numBytes, &data1, &size1, &data2, &size2 );
     if( size2 > 0 )
     {
 
@@ -191,17 +191,17 @@ long RingBuffer_Write( RingBuffer *rbuf, const void *data, long numBytes )
     {
         memcpy( data1, data, size1 );
     }
-    RingBuffer_AdvanceWriteIndex( rbuf, numWritten );
+    sys_ringbuf_AdvanceWriteIndex( rbuf, numWritten );
     return numWritten;
 }
 
 /***************************************************************************
 ** Return bytes read. */
-long RingBuffer_Read( RingBuffer *rbuf, void *data, long numBytes )
+long sys_ringbuf_Read( sys_ringbuf *rbuf, void *data, long numBytes )
 {
     long size1, size2, numRead;
     void *data1, *data2;
-    numRead = RingBuffer_GetReadRegions( rbuf, numBytes, &data1, &size1, &data2, &size2 );
+    numRead = sys_ringbuf_GetReadRegions( rbuf, numBytes, &data1, &size1, &data2, &size2 );
     if( size2 > 0 )
     {
         memcpy( data, data1, size1 );
@@ -212,6 +212,6 @@ long RingBuffer_Read( RingBuffer *rbuf, void *data, long numBytes )
     {
         memcpy( data, data1, size1 );
     }
-    RingBuffer_AdvanceReadIndex( rbuf, numRead );
+    sys_ringbuf_AdvanceReadIndex( rbuf, numRead );
     return numRead;
 }

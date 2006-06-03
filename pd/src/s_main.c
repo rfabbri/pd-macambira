@@ -103,7 +103,7 @@ typedef struct _fontinfo
     in the six fonts.  */
 
 static t_fontinfo sys_fontlist[] = {
-    {8, 5, 9, 0, 0, 0}, {10, 7, 13, 0, 0, 0}, {12, 9, 16, 0, 0, 0},
+    {8, 6, 10, 0, 0, 0}, {10, 7, 13, 0, 0, 0}, {12, 9, 16, 0, 0, 0},
     {16, 10, 20, 0, 0, 0}, {24, 15, 25, 0, 0, 0}, {36, 25, 45, 0, 0, 0}};
 #define NFONT (sizeof(sys_fontlist)/sizeof(*sys_fontlist))
 
@@ -175,8 +175,6 @@ static void openit(const char *dirname, const char *filename)
         error("%s: can't open", filename);
 }
 
-#define NHOSTFONT 7
-
 /* this is called from the gui process.  The first argument is the cwd, and
 succeeding args give the widths and heights of known fonts.  We wait until 
 these are known to open files and send messages specified on the command line.
@@ -189,25 +187,33 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
 {
     char *cwd = atom_getsymbolarg(0, argc, argv)->s_name;
     t_namelist *nl;
-    unsigned int i, j;
-    if (argc != 2 + 3 * NHOSTFONT) bug("glob_initfromgui");
+    unsigned int i;
+    int j;
+    int nhostfont = (argc-2)/3;
+    sys_oldtclversion = atom_getfloatarg(1, argc, argv);
+    if (argc != 2 + 3 * nhostfont) bug("glob_initfromgui");
     for (i = 0; i < NFONT; i++)
     {
+        int best = 0;
         int wantheight = sys_fontlist[i].fi_maxheight;
-        for (j = 0; j < NHOSTFONT-1; j++)
+        int wantwidth = sys_fontlist[i].fi_maxwidth;
+        for (j = 1; j < nhostfont; j++)
         {
-            if (atom_getintarg(3 * (j + 1) + 3, argc, argv) > wantheight)
-                    break;
+            if (atom_getintarg(3 * j + 4, argc, argv) <= wantheight &&
+                atom_getintarg(3 * j + 3, argc, argv) <= wantwidth)
+                    best = j;
         }
-            /* j is now the "real" font index for the desired font index i. */
-        sys_fontlist[i].fi_hostfontsize = atom_getintarg(3 * j + 1, argc, argv);
-        sys_fontlist[i].fi_width = atom_getintarg(3 * j + 2, argc, argv);
-        sys_fontlist[i].fi_height = atom_getintarg(3 * j + 3, argc, argv);
+            /* best is now the host font index for the desired font index i. */
+        sys_fontlist[i].fi_hostfontsize =
+            atom_getintarg(3 * best + 2, argc, argv);
+        sys_fontlist[i].fi_width = atom_getintarg(3 * best + 3, argc, argv);
+        sys_fontlist[i].fi_height = atom_getintarg(3 * best + 4, argc, argv);
     }
 #if 0
     for (i = 0; i < 6; i++)
-        fprintf(stderr, "font %d %d %d %d %d\n",
+        fprintf(stderr, "font (%d %d %d) -> (%d %d %d)\n",
             sys_fontlist[i].fi_fontsize,
+            sys_fontlist[i].fi_maxwidth,
             sys_fontlist[i].fi_maxheight,
             sys_fontlist[i].fi_hostfontsize,
             sys_fontlist[i].fi_width,
@@ -232,7 +238,6 @@ void glob_initfromgui(void *dummy, t_symbol *s, int argc, t_atom *argv)
     }
     namelist_free(sys_messagelist);
     sys_messagelist = 0;
-    sys_oldtclversion = atom_getfloatarg(1 + 3 * NHOSTFONT, argc, argv);
 }
 
 static void sys_afterargparse(void);
@@ -517,7 +522,7 @@ int sys_argparse(int argc, char **argv)
             argc -= 2;
             argv += 2;
         }
-        else if (!strcmp(*argv, "-inchannels"))
+        else if (!strcmp(*argv, "-inchannels") && (argc > 1))
         {
             sys_parsedevlist(&sys_nchin,
                 sys_chinlist, MAXAUDIOINDEV, argv[1]);
@@ -527,7 +532,7 @@ int sys_argparse(int argc, char **argv)
 
           argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-outchannels"))
+        else if (!strcmp(*argv, "-outchannels") && (argc > 1))
         {
             sys_parsedevlist(&sys_nchout, sys_choutlist,
                 MAXAUDIOOUTDEV, argv[1]);
@@ -537,7 +542,7 @@ int sys_argparse(int argc, char **argv)
 
           argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-channels"))
+        else if (!strcmp(*argv, "-channels") && (argc > 1))
         {
             sys_parsedevlist(&sys_nchin, sys_chinlist,MAXAUDIOINDEV,
                 argv[1]);
@@ -549,7 +554,7 @@ int sys_argparse(int argc, char **argv)
 
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-soundbuf") || !strcmp(*argv, "-audiobuf"))
+        else if (!strcmp(*argv, "-soundbuf") || !strcmp(*argv, "-audiobuf") && (argc > 1))
         {
             sys_main_advance = atoi(argv[1]);
             argc -= 2; argv += 2;
@@ -559,7 +564,7 @@ int sys_argparse(int argc, char **argv)
             sys_setblocksize(atoi(argv[1]));
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-sleepgrain"))
+        else if (!strcmp(*argv, "-sleepgrain") && (argc > 1))
         {
             sys_sleepgrain = 1000 * atoi(argv[1]);
             argc -= 2; argv += 2;
@@ -601,7 +606,7 @@ int sys_argparse(int argc, char **argv)
             sys_set_audio_api(API_ALSA);
             argc--; argv++;
         }
-        else if (!strcmp(*argv, "-alsaadd"))
+        else if (!strcmp(*argv, "-alsaadd") && (argc > 1))
         {
             if (argc > 1)
                 alsa_adddev(argv[1]);
@@ -664,7 +669,7 @@ int sys_argparse(int argc, char **argv)
                 goto usage;
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-midioutdev"))
+        else if (!strcmp(*argv, "-midioutdev") && (argc > 1))
         {
             sys_parsedevlist(&sys_nmidiout, sys_midioutdevlist, MAXMIDIOUTDEV,
                 argv[1]);
@@ -672,7 +677,7 @@ int sys_argparse(int argc, char **argv)
                 goto usage;
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-mididev"))
+        else if (!strcmp(*argv, "-mididev") && (argc > 1))
         {
             sys_parsedevlist(&sys_nmidiin, sys_midiindevlist, MAXMIDIINDEV,
                 argv[1]);
@@ -682,7 +687,7 @@ int sys_argparse(int argc, char **argv)
                 goto usage;
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-path"))
+        else if (!strcmp(*argv, "-path") && (argc > 1))
         {
             sys_searchpath = namelist_append_files(sys_searchpath, argv[1]);
             argc -= 2; argv += 2;
@@ -822,7 +827,8 @@ int sys_argparse(int argc, char **argv)
                 goto usage;
             argc -= 2; argv += 2;
         }
-        else if (!strcmp(*argv, "-sounddev") || !strcmp(*argv, "-audiodev"))
+        else if ((!strcmp(*argv, "-sounddev") || !strcmp(*argv, "-audiodev"))
+                 && (argc > 1))
         {
             sys_parsedevlist(&sys_nsoundin, sys_soundindevlist,
                 MAXAUDIOINDEV, argv[1]);

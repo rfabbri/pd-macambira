@@ -1790,7 +1790,6 @@ static t_int *readsf_perform(t_int *w)
     }
     else
     {
-    idle:
         for (i = 0; i < noutlets; i++)
             for (j = vecsize, fp = x->x_outvec[i]; j--; )
                 *fp++ = 0;

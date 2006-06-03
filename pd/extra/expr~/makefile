@@ -124,7 +124,6 @@ linux_clobber: clean
 
 # ----------------------- MAC OSX -----------------------
 
-pd_darwin: expr.pd_darwin expr~.pd_darwin fexpr~.pd_darwin
 MACOSXOBJ =  vexp.pd_darwin_o vexp_fun.pd_darwin_o vexp_if.pd_darwin_o
 .SUFFIXES: .pd_darwin_o
 
@@ -133,6 +132,7 @@ MACOSXCFLAGS = -DMACOSX -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 
 MACOSXINCLUDE =  -I../../src
 
+pd_darwin: expr.pd_darwin expr~.pd_darwin fexpr~.pd_darwin
 .c.pd_darwin_o:
 	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_darwin_o -c $*.c
 
@@ -151,6 +151,26 @@ fexpr~.pd_darwin: expr.pd_darwin
 	-ln -s expr.pd_darwin fexpr~.pd_darwin
 	rm -f ../fexpr~.pd_darwin
 	-ln -s expr~/fexpr~.pd_darwin ..
+
+pd_imac: expr.pd_imac expr~.pd_imac fexpr~.pd_imac
+.c.pd_imac_o:
+	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_imac_o -c $*.c
+
+expr.pd_imac: $(MACOSXOBJ)
+	$(CC) -bundle -undefined suppress  -flat_namespace \
+		-o expr.pd_imac $(MACOSXOBJ)  -lm
+	rm -f ../expr.pd_imac
+	-ln -s expr~/expr.pd_imac ..
+
+expr~.pd_imac: expr.pd_imac
+	-ln -s expr.pd_imac expr~.pd_imac
+	rm -f ../expr~.pd_imac
+	-ln -s expr~/expr~.pd_imac ..
+
+fexpr~.pd_imac: expr.pd_imac
+	-ln -s expr.pd_imac fexpr~.pd_imac
+	rm -f ../fexpr~.pd_imac
+	-ln -s expr~/fexpr~.pd_imac ..
 
 install_darwin:
 	install expr.pd_darwin $(PDEXTERN)

@@ -1082,10 +1082,20 @@ static void curve_activate(t_gobj *z, t_glist *glist,
     /* fill in later */
 }
 
+#if 0
 static int rangecolor(int n)    /* 0 to 9 in 5 steps */
 {
     int n2 = n/2;               /* 0 to 4 */
     int ret = (n2 << 6);        /* 0 to 256 in 5 steps */
+    if (ret > 255) ret = 255;
+    return (ret);
+}
+#endif
+
+static int rangecolor(int n)    /* 0 to 9 in 5 steps */
+{
+    int n2 = (n == 9 ? 8 : n);               /* 0 to 8 */
+    int ret = (n2 << 5);        /* 0 to 256 in 9 steps */
     if (ret > 255) ret = 255;
     return (ret);
 }

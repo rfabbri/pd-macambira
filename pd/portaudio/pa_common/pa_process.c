@@ -1,5 +1,5 @@
 /*
- * $Id: pa_process.c,v 1.1.2.48 2004/12/13 09:48:43 rossbencina Exp $
+ * $Id: pa_process.c,v 1.1.2.51 2005/10/27 23:28:48 aknudsen Exp $
  * Portable Audio I/O Library
  * streamCallback <-> host buffer processing adapter
  *
@@ -130,6 +130,14 @@ PaError PaUtil_InitializeBufferProcessor( PaUtilBufferProcessor* bp,
     PaError result = paNoError;
     PaError bytesPerSample;
     unsigned long tempInputBufferSize, tempOutputBufferSize;
+
+    if( streamFlags & paNeverDropInput )
+    {
+        /* paNeverDropInput is only valid for full-duplex callback streams, with an unspecified number of frames per buffer. */
+        if( !streamCallback || !(inputChannelCount > 0 && outputChannelCount > 0) ||
+                framesPerUserBuffer != paFramesPerBufferUnspecified )
+            return paInvalidFlag;
+    }
 
     /* initialize buffer ptrs to zero so they can be freed if necessary in error */
     bp->tempInputBuffer = 0;
@@ -571,7 +579,8 @@ void PaUtil_SetOutputChannel( PaUtilBufferProcessor* bp,
         unsigned int channel, void *data, unsigned int stride )
 {
     assert( channel < bp->outputChannelCount );
-    
+    assert( data != NULL );
+
     bp->hostOutputChannels[0][channel].data = data;
     bp->hostOutputChannels[0][channel].stride = stride;
 }
@@ -592,9 +601,8 @@ void PaUtil_SetInterleavedOutputChannels( PaUtilBufferProcessor* bp,
     
     for( i=0; i< channelCount; ++i )
     {
-        bp->hostOutputChannels[0][channel+i].data = p;
+        PaUtil_SetOutputChannel( bp, channel + i, p, channelCount );
         p += bp->bytesPerHostOutputSample;
-        bp->hostOutputChannels[0][channel+i].stride = channelCount;
     }
 }
 
@@ -604,8 +612,7 @@ void PaUtil_SetNonInterleavedOutputChannel( PaUtilBufferProcessor* bp,
 {
     assert( channel < bp->outputChannelCount );
 
-    bp->hostOutputChannels[0][channel].data = data;
-    bp->hostOutputChannels[0][channel].stride = 1;
+    PaUtil_SetOutputChannel( bp, channel, data, 1 );
 }
 
 
@@ -620,6 +627,7 @@ void PaUtil_Set2ndOutputChannel( PaUtilBufferProcessor* bp,
         unsigned int channel, void *data, unsigned int stride )
 {
     assert( channel < bp->outputChannelCount );
+    assert( data != NULL );
 
     bp->hostOutputChannels[1][channel].data = data;
     bp->hostOutputChannels[1][channel].stride = stride;
@@ -641,9 +649,8 @@ void PaUtil_Set2ndInterleavedOutputChannels( PaUtilBufferProcessor* bp,
     
     for( i=0; i< channelCount; ++i )
     {
-        bp->hostOutputChannels[1][channel+i].data = p;
+        PaUtil_Set2ndOutputChannel( bp, channel + i, p, channelCount );
         p += bp->bytesPerHostOutputSample;
-        bp->hostOutputChannels[1][channel+i].stride = channelCount;
     }
 }
 
@@ -653,8 +660,7 @@ void PaUtil_Set2ndNonInterleavedOutputChannel( PaUtilBufferProcessor* bp,
 {
     assert( channel < bp->outputChannelCount );
     
-    bp->hostOutputChannels[1][channel].data = data;
-    bp->hostOutputChannels[1][channel].stride = 1;
+    PaUtil_Set2ndOutputChannel( bp, channel, data, 1 );
 }
 
 
@@ -1180,6 +1186,7 @@ static void CopyTempOutputBuffersToHostOutputBuffers( PaUtilBufferProcessor *bp)
 
          for( i=0; i<bp->outputChannelCount; ++i )
          {
+             assert( hostOutputChannels[i].data != NULL );
              bp->outputConverter(    hostOutputChannels[i].data,
                                      hostOutputChannels[i].stride,
                                      srcBytePtr, srcSampleStrideSamples,

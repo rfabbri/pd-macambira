@@ -274,12 +274,16 @@ void pa_getdevs(char *indevlist, int *nindevs,
         const PaDeviceInfo *pdi = Pa_GetDeviceInfo(i);
         if (pdi->maxInputChannels > 0 && nin < maxndev)
         {
-            strcpy(indevlist + nin * devdescsize, pdi->name);
+            sprintf(indevlist + nin * devdescsize, "(%d)%s",
+                pdi->hostApi,pdi->name);
+            /* strcpy(indevlist + nin * devdescsize, pdi->name); */
             nin++;
         }
         if (pdi->maxOutputChannels > 0 && nout < maxndev)
         {
-            strcpy(outdevlist + nout * devdescsize, pdi->name);
+            sprintf(outdevlist + nout * devdescsize, "(%d)%s",
+                pdi->hostApi,pdi->name);
+            /* strcpy(outdevlist + nout * devdescsize, pdi->name); */
             nout++;
         }
     }

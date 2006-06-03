@@ -133,6 +133,7 @@ struct _garray
     char x_usedindsp;       /* true if some DSP routine is using this */
     char x_saveit;          /* true if we should save this with parent */
     char x_listviewing;     /* true if list view window is open */
+    char x_hidename;        /* don't print name above graph */
 };
 
 static t_pd *garray_arraytemplatecanvas;
@@ -245,10 +246,11 @@ static t_array *garray_getarray_floatonly(t_garray *x,
     return (a);
 }
 
-    /* get the array's name */
-t_symbol *garray_getname(t_garray *x)
+    /* get the array's name.  Return nonzero if it should be hidden */
+int garray_getname(t_garray *x, t_symbol **namep)
 {
-    return (x->x_name);
+    *namep = x->x_name;
+    return (x->x_hidename);
 }
 
         /* if there is one garray in a graph, reset the graph's coordinates
@@ -320,6 +322,7 @@ t_garray *graph_array(t_glist *gl, t_symbol *s, t_symbol *templateargsym,
     }
     saveit = ((flags & 1) != 0);
     x = graph_scalar(gl, s, templatesym, saveit);
+    x->x_hidename = ((flags & 8) >> 3);
 
     if (n <= 0)
         n = 100;
@@ -486,14 +489,16 @@ void garray_arrayviewlist_new(t_garray *x)
 }
 
 void garray_arrayviewlist_fillpage(t_garray *x,
-                                   t_float page)
+                                   t_float page,
+                                   t_float fTopItem)
 {
-    int i, xonset=0, yonset=0, type=0, elemsize=0;
+    int i, xonset=0, yonset=0, type=0, elemsize=0, topItem;
     float yval;
     char cmdbuf[200];
     t_symbol *arraytype;
     t_array *a = garray_getarray_floatonly(x, &yonset, &elemsize);
-
+    
+    topItem = (int)fTopItem;
     if (!a)
     {
         /* FIXME */
@@ -527,6 +532,9 @@ void garray_arrayviewlist_fillpage(t_garray *x,
                  i,
                  yval);
     }
+    sys_vgui(".%sArrayWindow.lb yview %d\n",
+             x->x_realname->s_name,
+             topItem);
 }
 
 void garray_arrayviewlist_close(t_garray *x)
@@ -540,8 +548,9 @@ void garray_arrayviewlist_close(t_garray *x)
 static void garray_free(t_garray *x)
 {
     t_pd *x2;
+        sys_unqueuegui(&x->x_gobj);
     /* jsarlo { */
-    if (x->x_listviewing)
+        if (x->x_listviewing)
     {
         garray_arrayviewlist_close(x);
     }
@@ -1028,7 +1037,8 @@ static void garray_save(t_gobj *z, t_binbuf *b)
     filestyle = (style == PLOTSTYLE_POINTS ? 1 : 
         (style == PLOTSTYLE_POLY ? 0 : style)); 
     binbuf_addv(b, "sssisi;", gensym("#X"), gensym("array"),
-        x->x_name, array->a_n, &s_float, x->x_saveit + 2 * filestyle);
+        x->x_name, array->a_n, &s_float,
+            x->x_saveit + 2 * filestyle + 8*x->x_hidename);
     if (x->x_saveit)
     {
         int n = array->a_n, n2 = 0;
@@ -1494,7 +1504,7 @@ void g_array_setup(void)
     class_addmethod(garray_class, (t_method)garray_arrayviewlist_new,
         gensym("arrayviewlistnew"), A_NULL);
     class_addmethod(garray_class, (t_method)garray_arrayviewlist_fillpage,
-        gensym("arrayviewlistfillpage"), A_FLOAT, A_NULL);
+        gensym("arrayviewlistfillpage"), A_FLOAT, A_DEFFLOAT, A_NULL);
     class_addmethod(garray_class, (t_method)garray_arrayviewlist_close,
       gensym("arrayviewclose"), A_NULL);
 /* } jsarlo */

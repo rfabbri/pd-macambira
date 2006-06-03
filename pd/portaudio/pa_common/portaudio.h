@@ -2,7 +2,7 @@
 #ifndef PORTAUDIO_H
 #define PORTAUDIO_H
 /*
- * $Id: portaudio.h,v 1.5.2.50 2004/12/13 11:50:40 rossbencina Exp $
+ * $Id: portaudio.h,v 1.5.2.53 2006/03/20 17:49:38 aknudsen Exp $
  * PortAudio Portable Real-Time Audio Library
  * PortAudio API Header File
  * Latest version available at: http://www.portaudio.com/
@@ -92,7 +92,8 @@ typedef enum PaErrorCode
     paCanNotWriteToACallbackStream,       /**< @todo review error code name */
     paCanNotReadFromAnOutputOnlyStream,   /**< @todo review error code name */
     paCanNotWriteToAnInputOnlyStream,     /**< @todo review error code name */
-    paIncompatibleStreamHostApi
+    paIncompatibleStreamHostApi,
+    paBadBufferPtr
 } PaErrorCode;
 
 
@@ -247,13 +248,13 @@ typedef struct PaHostApiInfo
     */
     int deviceCount;
 
-    /** The the default input device for this host API. The value will be a
+    /** The default input device for this host API. The value will be a
      device index ranging from 0 to (Pa_GetDeviceCount()-1), or paNoDevice
      if no default input device is available.
     */
     PaDeviceIndex defaultInputDevice;
 
-    /** The the default output device for this host API. The value will be a
+    /** The default output device for this host API. The value will be a
      device index ranging from 0 to (Pa_GetDeviceCount()-1), or paNoDevice
      if no default output device is available.
     */
@@ -496,8 +497,8 @@ typedef struct PaStreamParameters
      configure their latency based on these parameters, otherwise they may
      choose the closest viable latency instead. Unless the suggested latency
      is greater than the absolute upper limit for the device implementations
-     shouldround the suggestedLatency up to the next practial value - ie to
-     provide an equal or higher latency than suggestedLatency whereever possibe.
+     should round the suggestedLatency up to the next practial value - ie to
+     provide an equal or higher latency than suggestedLatency wherever possibe.
      Actual latency values for an open stream may be retrieved using the
      inputLatency and outputLatency fields of the PaStreamInfo structure
      returned by Pa_GetStreamInfo().

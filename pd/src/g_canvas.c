@@ -1494,7 +1494,7 @@ void g_canvas_setup(void)
     class_addmethod(canvas_class, (t_method)glist_scalar,
         gensym("scalar"), A_GIMME, A_NULL);
 
-    /* -------------- Thomas Musil's GUI objects ------------ */
+/* -------------- IEMGUI: button, toggle, slider, etc.  ------------ */
     class_addmethod(canvas_class, (t_method)canvas_bng, gensym("bng"),
                     A_GIMME, A_NULL);
     class_addmethod(canvas_class, (t_method)canvas_toggle, gensym("toggle"),

@@ -182,7 +182,7 @@ typedef struct _openpanel
     t_symbol *x_s;
 } t_openpanel;
 
-static void *openpanel_new(void)
+static void *openpanel_new( void)
 {
     char buf[50];
     t_openpanel *x = (t_openpanel *)pd_new(openpanel_class);
@@ -193,15 +193,22 @@ static void *openpanel_new(void)
     return (x);
 }
 
-static void openpanel_bang(t_openpanel *x)
+static void openpanel_symbol(t_openpanel *x, t_symbol *s)
 {
-    sys_vgui("pdtk_openpanel %s\n", x->x_s->s_name);
+    char *path = (s && s->s_name) ? s->s_name : "\"\"";
+    sys_vgui("pdtk_openpanel {%s} {%s}\n", x->x_s->s_name, path);
 }
 
-static void openpanel_symbol(t_openpanel *x, t_symbol *s)
+static void openpanel_bang(t_openpanel *x)
+{
+    openpanel_symbol(x, &s_);
+}
+
+static void openpanel_callback(t_openpanel *x, t_symbol *s)
 {
     outlet_symbol(x->x_obj.ob_outlet, s);
 }
+
 
 static void openpanel_free(t_openpanel *x)
 {
@@ -212,9 +219,11 @@ static void openpanel_setup(void)
 {
     openpanel_class = class_new(gensym("openpanel"),
         (t_newmethod)openpanel_new, (t_method)openpanel_free,
-        sizeof(t_openpanel), 0, A_DEFFLOAT, 0);
+        sizeof(t_openpanel), 0, 0);
     class_addbang(openpanel_class, openpanel_bang);
     class_addsymbol(openpanel_class, openpanel_symbol);
+    class_addmethod(openpanel_class, (t_method)openpanel_callback,
+        gensym("callback"), A_SYMBOL, 0);
 }
 
 /* -------------------------- savepanel ------------------------------ */
@@ -227,7 +236,7 @@ typedef struct _savepanel
     t_symbol *x_s;
 } t_savepanel;
 
-static void *savepanel_new(void)
+static void *savepanel_new( void)
 {
     char buf[50];
     t_savepanel *x = (t_savepanel *)pd_new(savepanel_class);
@@ -238,12 +247,18 @@ static void *savepanel_new(void)
     return (x);
 }
 
-static void savepanel_bang(t_savepanel *x)
+static void savepanel_symbol(t_savepanel *x, t_symbol *s)
 {
-    sys_vgui("pdtk_savepanel %s\n", x->x_s->s_name);
+    char *path = (s && s->s_name) ? s->s_name : "\"\"";
+    sys_vgui("pdtk_savepanel {%s} {%s}\n", x->x_s->s_name, path);
 }
 
-static void savepanel_symbol(t_savepanel *x, t_symbol *s)
+static void savepanel_bang(t_savepanel *x)
+{
+    savepanel_symbol(x, &s_);
+}
+
+static void savepanel_callback(t_savepanel *x, t_symbol *s)
 {
     outlet_symbol(x->x_obj.ob_outlet, s);
 }
@@ -257,9 +272,11 @@ static void savepanel_setup(void)
 {
     savepanel_class = class_new(gensym("savepanel"),
         (t_newmethod)savepanel_new, (t_method)savepanel_free,
-        sizeof(t_savepanel), 0, A_DEFFLOAT, 0);
+        sizeof(t_savepanel), 0, 0);
     class_addbang(savepanel_class, savepanel_bang);
     class_addsymbol(savepanel_class, savepanel_symbol);
+    class_addmethod(savepanel_class, (t_method)savepanel_callback,
+        gensym("callback"), A_SYMBOL, 0);
 }
 
 /* ---------------------- key and its relatives ------------------ */

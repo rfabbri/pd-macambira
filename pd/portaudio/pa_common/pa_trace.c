@@ -1,5 +1,5 @@
 /*
- * $Id: pa_trace.c,v 1.1.1.1.2.3 2003/09/20 21:09:15 rossbencina Exp $
+ * $Id: pa_trace.c,v 1.1.1.1.2.4 2005/11/02 12:06:44 rossbencina Exp $
  * Portable Audio I/O Library Trace Facility
  * Store trace information in real-time for later printing.
  *
@@ -42,8 +42,8 @@
 
 #if PA_TRACE_REALTIME_EVENTS
 
-static char *traceTextArray[MAX_TRACE_RECORDS];
-static int traceIntArray[MAX_TRACE_RECORDS];
+static char *traceTextArray[PA_MAX_TRACE_RECORDS];
+static int traceIntArray[PA_MAX_TRACE_RECORDS];
 static int traceIndex = 0;
 static int traceBlock = 0;
 
@@ -65,7 +65,7 @@ void PaUtil_DumpTraceMessages()
         printf("%3d: %s = 0x%08X\n",
                i, traceTextArray[i], traceIntArray[i] );
     }
-    ResetTraceMessages();
+    PaUtil_ResetTraceMessages();
     fflush(stdout);
 }
 

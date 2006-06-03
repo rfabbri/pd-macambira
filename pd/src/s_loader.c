@@ -38,7 +38,11 @@ static char sys_dllextent[] =
     ".pd_linux";
 #endif
 #ifdef MACOSX
+#ifdef  __i386
+        ".pd_imac";
+#else
     ".pd_darwin";
+#endif
 #endif
 #ifdef MSW
     ".dll";
@@ -73,30 +77,30 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
         if ((fd = open_via_path(dirname, classname2, sys_dllextent,
             dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
         {
-          /* next try (alternative_classname).(sys_dllextent) */
-          if(altname)
+            /* next try (alternative_classname).(sys_dllextent) */
+            if (altname)
             {
-              if ((fd = open_via_path(dirname, altname, sys_dllextent,
-                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-
-                /* next try (alternative_classname)/(alternative_classname).(sys_dllextent) ... */
-                strncpy(classname2, altname, MAXPDSTRING);
-              filename[MAXPDSTRING-2] = 0;
-              strcat(classname2, "/");
-              strncat(classname2, altname, MAXPDSTRING-strlen(classname2));
-              filename[MAXPDSTRING-1] = 0;
-              if ((fd = open_via_path(dirname, classname2, sys_dllextent,
-                                      dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+                if ((fd = open_via_path(dirname, altname, sys_dllextent,
+                    dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
                 {
-                  return 0;
-                } 
+                    /* next try 
+                        (alt_classname)/(alt_classname).(sys_dllextent) */
+                    strncpy(classname2, altname, MAXPDSTRING);
+                    filename[MAXPDSTRING-2] = 0;
+                    strcat(classname2, "/");
+                    strncat(classname2, altname,
+                        MAXPDSTRING-strlen(classname2));
+                    filename[MAXPDSTRING-1] = 0;
+                    if ((fd = open_via_path(dirname, classname2,
+                        sys_dllextent, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
+                    {
+                        return 0;
+                    } 
+                }
             }
-          else
-            return (0);
+          else return (0);
         }
     }
-
-
     close(fd);
     class_set_extern_dir(gensym(dirbuf));
 
@@ -110,7 +114,7 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
     if (lastdot = strrchr(nameptr, '.'))
         *lastdot = 0;
 
-#ifdef MACOSX
+#ifdef DIDFORMACOSX             /* no longer correct on macosx??? */
     strcpy(symname, "_");
     strcat(symname, nameptr);
     if(altname)
@@ -134,6 +138,7 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
     strcat(symname, "_setup");
 #ifdef DL_OPEN
     dlobj = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
+        post("opened %x", dlobj);
     if (!dlobj)
     {
         post("%s: %s", filename, dlerror());

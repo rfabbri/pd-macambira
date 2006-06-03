@@ -785,10 +785,13 @@ static t_gobj *canvas_findhitbox(t_canvas *x, int xpos, int ypos,
     int *x1p, int *y1p, int *x2p, int *y2p)
 {
     t_gobj *y, *rval = 0;
+    int x1, y1, x2, y2;
+    *x1p = -0x7fffffff;
     for (y = x->gl_list; y; y = y->g_next)
     {
-        if (canvas_hitbox(x, y, xpos, ypos, x1p, y1p, x2p, y2p))
-            rval = y; 
+        if (canvas_hitbox(x, y, xpos, ypos, &x1, &y1, &x2, &y2)
+            && (x1 > *x1p))
+                *x1p = x1, *y1p = y1, *x2p = x2, *y2p = y2, rval = y; 
     }
     return (rval);
 }

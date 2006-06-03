@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_ds.c,v 1.1.2.49 2004/05/16 04:08:55 rossbencina Exp $
+ * $Id: pa_win_ds.c,v 1.1.2.51 2006/01/26 01:13:18 rossbencina Exp $
  * Portable Audio I/O Library DirectSound implementation
  *
  * Based on the Open Source API proposed by Ross Bencina
@@ -75,11 +75,17 @@
 #pragma comment( lib, "winmm.lib" )
 #endif
 
+/*
+ provided in newer platform sdks and x64
+ */
+#ifndef DWORD_PTR
+#define DWORD_PTR DWORD
+#endif
 
-#define PRINT(x) /* { printf x; fflush(stdout); } */
+#define PRINT(x) PA_DEBUG(x);
 #define ERR_RPT(x) PRINT(x)
-#define DBUG(x)  /* PRINT(x) */
-#define DBUGX(x) /* PRINT(x) */
+#define DBUG(x)   PRINT(x)
+#define DBUGX(x)  PRINT(x)
 
 #define PA_USE_HIGH_LATENCY   (0)
 #if PA_USE_HIGH_LATENCY
@@ -366,6 +372,15 @@ static BOOL CALLBACK CollectGUIDsProc(LPGUID lpGUID,
 }
 
 
+/* 
+    GUIDs for emulated devices which we blacklist below.
+    are there more than two of them??
+*/
+
+GUID IID_IRolandVSCEmulated1 = {0xc2ad1800, 0xb243, 0x11ce, 0xa8, 0xa4, 0x00, 0xaa, 0x00, 0x6c, 0x45, 0x01};
+GUID IID_IRolandVSCEmulated2 = {0xc2ad1800, 0xb243, 0x11ce, 0xa8, 0xa4, 0x00, 0xaa, 0x00, 0x6c, 0x45, 0x02};
+
+
 #define PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_  (13) /* must match array length below */
 static double defaultSampleRateSearchOrder_[] =
     { 44100.0, 48000.0, 32000.0, 24000.0, 22050.0, 88200.0, 96000.0, 192000.0,
@@ -404,6 +419,16 @@ static PaError AddOutputDeviceInfoFromDirectSound(
     }
 
     
+    if( lpGUID )
+    {
+        if (IsEqualGUID (&IID_IRolandVSCEmulated1,lpGUID) ||
+            IsEqualGUID (&IID_IRolandVSCEmulated2,lpGUID) )
+        {
+            PA_DEBUG(("BLACKLISTED: %s \n",name));
+            return paNoError;
+        }
+    }
+
     /* Create a DirectSound object for the specified GUID
         Note that using CoCreateInstance doesn't work on windows CE.
     */
@@ -427,7 +452,24 @@ static PaError AddOutputDeviceInfoFromDirectSound(
     
     if( hr != DS_OK )
     {
+        if (hr == DSERR_ALLOCATED)
+            PA_DEBUG(("AddOutputDeviceInfoFromDirectSound %s DSERR_ALLOCATED\n",name));
         DBUG(("Cannot create DirectSound for %s. Result = 0x%x\n", name, hr ));
+        if (lpGUID)
+            DBUG(("%s's GUID: {0x%x,0x%x,0x%x,0x%x,0x%x,0x%x,0x%x,0x%x,0x%x,0x%x, 0x%x} \n",
+                 name,
+                 lpGUID->Data1,
+                 lpGUID->Data2,
+                 lpGUID->Data3,
+                 lpGUID->Data4[0],
+                 lpGUID->Data4[1],
+                 lpGUID->Data4[2],
+                 lpGUID->Data4[3],
+                 lpGUID->Data4[4],
+                 lpGUID->Data4[5],
+                 lpGUID->Data4[6],
+                 lpGUID->Data4[7]));
+
         deviceOK = FALSE;
     }
     else
@@ -491,7 +533,7 @@ static PaError AddOutputDeviceInfoFromDirectSound(
                         */
                         deviceInfo->defaultSampleRate = 44100.0f;
 
-                        DBUG(("PA - Reported rates both zero. Setting to fake values for device #%d\n", sDeviceIndex ));
+                        DBUG(("PA - Reported rates both zero. Setting to fake values for device #%s\n", name ));
                     }
                     else
                     {
@@ -505,7 +547,7 @@ static PaError AddOutputDeviceInfoFromDirectSound(
                     ** So when we see a ridiculous set of rates, assume it is a range.
                     */
                   deviceInfo->defaultSampleRate = 44100.0f;
-                  DBUG(("PA - Sample rate range used instead of two odd values for device #%d\n", sDeviceIndex ));
+                  DBUG(("PA - Sample rate range used instead of two odd values for device #%s\n", name ));
                 }
                 else deviceInfo->defaultSampleRate = caps.dwMaxSecondarySampleRate;
 
@@ -1511,7 +1553,7 @@ error2:
     return result;
 }
 /*******************************************************************/
-static void CALLBACK Pa_TimerCallback(UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2)
+static void CALLBACK Pa_TimerCallback(UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD dw1, DWORD dw2)
 {
     PaWinDsStream *stream;
 
@@ -1635,7 +1677,7 @@ static PaError StartStream( PaStream *s )
         else if( msecPerWakeup > 100 ) msecPerWakeup = 100;
         resolution = msecPerWakeup/4;
         stream->timerID = timeSetEvent( msecPerWakeup, resolution, (LPTIMECALLBACK) Pa_TimerCallback,
-                                             (DWORD) stream, TIME_PERIODIC );
+                                             (DWORD_PTR) stream, TIME_PERIODIC );
     }
     if( stream->timerID == 0 )
     {

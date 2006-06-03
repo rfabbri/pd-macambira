@@ -88,8 +88,7 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
         int quote;
         for (sp = a->a_w.w_symbol->s_name, len = 0, quote = 0; *sp; sp++, len++)
             if (*sp == ';' || *sp == ',' || *sp == '\\' || 
-                (*sp == '$' && sp == a->a_w.w_symbol->s_name && sp[1] >= '0'
-                    && sp[1] <= '9'))
+                (*sp == '$' && sp[1] >= '0' && sp[1] <= '9'))
                 quote = 1;
         if (quote)
         {
@@ -98,7 +97,7 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
             while (bp < ep && *sp)
             {
                 if (*sp == ';' || *sp == ',' || *sp == '\\' ||
-                    (*sp == '$' && bp == buf && sp[1] >= '0' && sp[1] <= '9'))
+                    (*sp == '$' && sp[1] >= '0' && sp[1] <= '9'))
                         *bp++ = '\\';
                 *bp++ = *sp++;
             }
@@ -121,7 +120,8 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
         sprintf(buf, "$%d", a->a_w.w_index);
         break;
     case A_DOLLSYM:
-        sprintf(buf, "$%s", a->a_w.w_symbol->s_name);
+        snprintf(buf, bufsize-1, "%s", a->a_w.w_symbol->s_name);
+        buf[bufsize-1] = 0;
         break;
     default:
         bug("atom_string");

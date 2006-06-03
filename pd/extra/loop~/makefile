@@ -76,8 +76,9 @@ LINUXINCLUDE =  -I../../src
 # ----------------------- Mac OSX -----------------------
 
 pd_darwin: $(NAME).pd_darwin
+pd_imac: $(NAME).pd_imac
 
-.SUFFIXES: .pd_darwin
+.SUFFIXES: .pd_darwin .pd_imac
 
 DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
@@ -85,6 +86,11 @@ DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
 .c.pd_darwin:
 	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
 	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	rm -f $*.o
+
+.c.pd_imac:
+	$(CC) $(DARWINCFLAGS) $(LINUXINCLUDE) -o $*.o -c $*.c
+	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_imac $*.o 
 	rm -f $*.o
 
 # ----------------------------------------------------------

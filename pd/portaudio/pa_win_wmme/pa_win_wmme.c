@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_wmme.c,v 1.6.2.86 2004/02/21 11:38:28 rossbencina Exp $
+ * $Id: pa_win_wmme.c,v 1.6.2.88 2006/02/16 01:56:45 rossbencina Exp $
  * pa_win_wmme.c
  * Implementation of PortAudio for Windows MultiMedia Extensions (WMME)       
  *                                                                                         
@@ -126,6 +126,13 @@ Non-critical stuff for the future:
 
 #if (defined(WIN32) && (defined(_MSC_VER) && (_MSC_VER >= 1200))) /* MSC version 6 and above */
 #pragma comment(lib, "winmm.lib")
+#endif
+
+/*
+ provided in newer platform sdks
+ */
+#ifndef DWORD_PTR
+#define DWORD_PTR DWORD
 #endif
 
 /************************************************* Constants ********/
@@ -1555,10 +1562,10 @@ static PaError InitializeWaveHandles( PaWinMmeHostApiRepresentation *winMmeHostA
 
         if( isInput )
             mmresult = waveInOpen( &((HWAVEIN*)handlesAndBuffers->waveHandles)[i], winMmeDeviceId, &wfx,
-                               (DWORD)handlesAndBuffers->bufferEvent, (DWORD)0, CALLBACK_EVENT );
+                               (DWORD_PTR)handlesAndBuffers->bufferEvent, (DWORD_PTR)0, CALLBACK_EVENT );
         else
             mmresult = waveOutOpen( &((HWAVEOUT*)handlesAndBuffers->waveHandles)[i], winMmeDeviceId, &wfx,
-                                (DWORD)handlesAndBuffers->bufferEvent, (DWORD)0, CALLBACK_EVENT );
+                                (DWORD_PTR)handlesAndBuffers->bufferEvent, (DWORD_PTR)0, CALLBACK_EVENT );
 
         if( mmresult != MMSYSERR_NOERROR )
         {
@@ -1616,11 +1623,15 @@ static PaError TerminateWaveHandles( PaWinMmeSingleDirectionHandlesAndBuffers *h
             {
                 if( ((HWAVEIN*)handlesAndBuffers->waveHandles)[i] )
                     mmresult = waveInClose( ((HWAVEIN*)handlesAndBuffers->waveHandles)[i] );
+                else
+                    mmresult = MMSYSERR_NOERROR;
             }
             else
             {
                 if( ((HWAVEOUT*)handlesAndBuffers->waveHandles)[i] )
                     mmresult = waveOutClose( ((HWAVEOUT*)handlesAndBuffers->waveHandles)[i] );
+                else
+                    mmresult = MMSYSERR_NOERROR;
             }
 
             if( mmresult != MMSYSERR_NOERROR &&

@@ -1,5 +1,5 @@
 /*
- * $Id: pa_jack.c,v 1.1.2.19 2004/12/23 18:30:09 aknudsen Exp $
+ * $Id: pa_jack.c,v 1.1.2.20 2005/10/02 22:02:26 aknudsen Exp $
  * PortAudio Portable Real-Time Audio Library
  * Latest Version at: http://www.portaudio.com
  * JACK Implementation by Joshua Haberman
@@ -573,7 +573,6 @@ static PaError BuildDeviceList( PaJackHostApiRepresentation *jackApi )
             jack_port_t *p = jack_port_by_name( jackApi->jack_client, clientPorts[0] );
             curDevInfo->defaultLowInputLatency = curDevInfo->defaultHighInputLatency =
                 jack_port_get_latency( p ) / globalSampleRate;
-            free( p );
 
             for( i = 0; clientPorts[i] != NULL; i++)
             {
@@ -595,7 +594,6 @@ static PaError BuildDeviceList( PaJackHostApiRepresentation *jackApi )
             jack_port_t *p = jack_port_by_name( jackApi->jack_client, clientPorts[0] );
             curDevInfo->defaultLowOutputLatency = curDevInfo->defaultHighOutputLatency =
                 jack_port_get_latency( p ) / globalSampleRate;
-            free( p );
 
             for( i = 0; clientPorts[i] != NULL; i++)
             {
@@ -961,13 +959,11 @@ static void CleanUpStream( PaJackStream *stream, int terminateStreamRepresentati
     {
         if( stream->local_input_ports[i] )
             ASSERT_CALL( jack_port_unregister( stream->jack_client, stream->local_input_ports[i] ), 0 );
-        free( stream->remote_output_ports[i] );
     }
     for( i = 0; i < stream->num_outgoing_connections; ++i )
     {
         if( stream->local_output_ports[i] )
             ASSERT_CALL( jack_port_unregister( stream->jack_client, stream->local_output_ports[i] ), 0 );
-        free( stream->remote_input_ports[i] );
     }
 
     if( terminateStreamRepresentation )
