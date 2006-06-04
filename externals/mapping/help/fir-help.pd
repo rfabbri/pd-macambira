@@ -1,4 +1,4 @@
-#N canvas 408 203 739 423 10;
+#N canvas 141 49 626 486 10;
 #X obj 174 76 loadbang;
 #X text 97 58 data;
 #X obj 93 161 t f f;
@@ -10,7 +10,10 @@
 #X obj 345 247 timeroll 10;
 #X obj 123 187 fir 5;
 #X obj 77 10 vsl 15 128 0 1 0 0 empty empty empty 0 -8 0 8 -262144
--1 -1 8300 1;
+-1 -1 12200 1;
+#X obj 116 423 pddp/pddplink http://www.dspguru.com/info/faqs/firfaq.htm
+;
+#X text 67 407 For more info on FIR:;
 #X connect 0 0 6 0;
 #X connect 2 0 7 0;
 #X connect 2 1 9 0;
