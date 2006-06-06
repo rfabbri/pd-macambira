@@ -119,12 +119,10 @@ void mtx_colon_setup (void)
        sizeof (MTXColon),
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_colon_class, (t_method) mTXColonBang);
-   class_addmethod (mtx_colon_class, (t_method) mTXSetColonMode, gensym("mode"), A_DEFSYMBOL, 0);
+   class_addmethod (mtx_colon_class, (t_method) mTXSetColonMode, gensym("mode"), A_SYMBOL, 0);
    class_addlist (mtx_colon_class, (t_method) mTXColonList);
    class_addcreator ((t_newmethod) newMTXColon, gensym("mtx_:"), A_GIMME, 0);
 
-   col_sym = gensym("col");
-   col_sym2 = gensym("column");
 }
 
 void iemtx_colon_setup(void){

@@ -16,10 +16,14 @@
 /*
   mtx_bspline: 
   this is only in the iemmatrix library since i have to make sure that there is an x-value
-  for each y-value; this however enforces that for each point we have to define a point in all dimensions;
+  for each y-value; this however enforces that for each point we have to define a point 
+  in all dimensions;
+
+  think: should we split this into 2 objects?
+  - one for calculating the coefficients of the polynomial function for the bspline
+  - another for calculating the value of a piecewise polyfuns
 */
 
-/* mtx_bspline */
 static t_class *mtx_bspline_class;
 
 typedef struct _mtx_spline
@@ -80,11 +84,10 @@ static void mtx_bspline_matrix2(t_mtx_spline *X, t_symbol *s, int argc, t_atom *
 {
   int row=0;
   int col=0;
-  t_atom *m = argv+2;
 
   t_matrixfloat *x, **y, **u, **p, *w, *d, *fp;
   t_matrixfloat*dummy;
-  int i,j,n;
+  int i,j;
   int N;
 
   if (argc<2){    error("mtx_bspline: crippled matrix");    return;  }
@@ -151,10 +154,7 @@ static void mtx_bspline_matrix2(t_mtx_spline *X, t_symbol *s, int argc, t_atom *
     for(i=N-1; i>0; i--)
       p[j][i] = (w[i]-u[j][i]*p[j][i+1])/d[i];  
   }
-
 }
-
-
 
 static void mtx_bspline_list(t_mtx_spline *x, t_symbol *s, int argc, t_atom *argv)
 {
@@ -162,7 +162,6 @@ static void mtx_bspline_list(t_mtx_spline *x, t_symbol *s, int argc, t_atom *arg
 }
 static void mtx_bspline_float(t_mtx_spline *X, t_float f)
 {
-  t_matrixfloat t, t3, t3i;
   int i=0, j=0;
   int dim=X->x_dimension;
   t_matrixfloat *x=X->x_x, **y=X->x_y, **u=X->x_u, **p=X->x_p;
