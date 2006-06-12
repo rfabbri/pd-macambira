@@ -1,0 +1,33 @@
+#N canvas 185 212 477 316 10;
+#X msg 57 49 symbol root;
+#X msg 76 81 symbol hans;
+#X obj 56 190 username->uid;
+#X floatatom 56 240 5 0 0 0 - - -;
+#X text 12 14 convert a username to a UID.;
+#X msg 14 148 bang;
+#X msg 143 162 symbol daemon;
+#X obj 30 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 94 109 symbol lp;
+#X msg 100 135 symbol trash;
+#X floatatom 272 231 5 0 0 0 - - -;
+#X msg 271 159 bang;
+#X text 192 136 ignore bad usernames;
+#X obj 142 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 145 262 ^-- bang if not found;
+#X obj 409 228 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 272 201 username->uid daemon;
+#X connect 0 0 2 0;
+#X connect 1 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 0 7 0;
+#X connect 2 1 13 0;
+#X connect 5 0 2 0;
+#X connect 6 0 2 1;
+#X connect 8 0 2 0;
+#X connect 9 0 2 0;
+#X connect 11 0 16 0;
+#X connect 16 0 10 0;
+#X connect 16 1 15 0;

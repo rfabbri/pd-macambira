@@ -1,0 +1,26 @@
+#N canvas 185 212 477 316 10;
+#X msg 14 148 bang;
+#X obj 30 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 271 159 bang;
+#X obj 142 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 145 262 ^-- bang if not found;
+#X text 12 14 convert a UID to a username;
+#X symbolatom 55 242 0 0 0 0 - - -;
+#X msg 143 162 1;
+#X symbolatom 272 242 0 0 0 0 - - -;
+#X obj 60 93 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 300 1;
+#X floatatom 58 123 5 0 0 0 - - -;
+#X obj 56 190 uid->username;
+#X obj 272 201 uid->username 0;
+#X connect 0 0 11 0;
+#X connect 2 0 12 0;
+#X connect 7 0 11 1;
+#X connect 9 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X connect 11 0 6 0;
+#X connect 11 1 3 0;
+#X connect 12 0 8 0;
