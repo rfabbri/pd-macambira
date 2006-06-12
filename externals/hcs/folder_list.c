@@ -34,7 +34,9 @@
 #include <glob.h>
 #endif
 
-static char *version = "$Revision: 1.9 $";
+#include <string.h>
+
+static char *version = "$Revision: 1.10 $";
 
 t_int folder_list_instance_count;
 
@@ -47,8 +49,8 @@ t_int folder_list_instance_count;
 static t_class *folder_list_class;
 
 typedef struct _folder_list {
-	  t_object            x_obj;
-      t_symbol            *x_pattern;
+	t_object            x_obj;
+	t_symbol            *x_pattern;
 } t_folder_list;
 
 /*------------------------------------------------------------------------------
@@ -164,28 +166,35 @@ static void *folder_list_new(t_symbol *s)
 	DEBUG(post("folder_list_new"););
 
 	t_folder_list *x = (t_folder_list *)pd_new(folder_list_class);
-	
+	t_symbol *currentdir;
+	char buffer[MAXPDSTRING];
+
 	if(!folder_list_instance_count) 
 	{
 		post("[folder_list] %s",version);  
 		post("\twritten by Hans-Christoph Steiner <hans@at.or.at>");
+		post("\tcompiled on "__DATE__" at "__TIME__ " ");
 	}
 	folder_list_instance_count++;
 
-	/* TODO set current dir of patch as default */
-#ifdef _WIN32
-	x->x_pattern = gensym(getenv("USERPROFILE"));
-#else
-	x->x_pattern = gensym(getenv("HOME"));
-#endif
 
     symbolinlet_new(&x->x_obj, &x->x_pattern);
 	outlet_new(&x->x_obj, &s_symbol);
 	
 	/* set to the value from the object argument, if that exists */
 	if (s != &s_)
+	{
 		x->x_pattern = s;
-	
+	}
+	else
+	{
+		currentdir = canvas_getcurrentdir();
+		strncpy(buffer,currentdir->s_name,MAXPDSTRING);
+		strncat(buffer,"/*",MAXPDSTRING);
+		x->x_pattern = gensym(buffer);
+		post("setting pattern to default: %s",x->x_pattern->s_name);
+	}
+
 	return (x);
 }
 

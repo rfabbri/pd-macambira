@@ -1,48 +1,41 @@
-#N canvas 536 89 536 571 10;
-#X msg 19 53 bang;
-#X msg 101 323 bang;
-#X obj 64 280 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 536 89 539 485 10;
+#X msg 19 73 bang;
+#X msg 27 355 bang;
+#X obj 64 300 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X obj 85 388 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#X obj 11 420 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 176 235 symbol /usr/*;
-#X text 51 56 list current directory;
-#X text 160 217 set pattern without no output;
-#X obj 101 354 folder_list;
-#X obj 83 257 folder_list /*;
-#X obj 83 278 print;
-#X text 65 39 left/hot inlet gives immediate output using stored path
+#X msg 176 255 symbol /usr/*;
+#X text 54 73 list current directory;
+#X text 160 237 set pattern without no output;
+#X obj 27 386 folder_list;
+#X obj 83 277 folder_list /*;
+#X obj 83 298 print;
+#X text 8 49 left/hot inlet gives immediate output using stored path
 ;
-#X text 49 301 For UNIX people \, [folder_list] behaves just like "ls
+#X text 19 325 For UNIX people \, [folder_list] behaves just like "ls
 -d1A";
-#X obj 102 387 print;
-#X msg 91 126 symbol ~/*.*;
-#X text 153 384 WARNING: the default will change in the future!;
-#X msg 97 153 symbol *;
-#X text 187 177 relative paths work;
-#X msg 102 178 symbol ../*;
-#X obj 51 440 getdir;
-#X obj 51 482 folder_list;
-#X msg 51 420 bang;
-#X obj 51 504 print;
-#X obj 51 460 makefilename %s/*;
-#X symbolatom 186 456 0 0 0 0 - - -;
-#X symbolatom 186 476 0 0 0 0 - - -;
-#X text 128 425 What's in the same folder as this patch?;
-#X text 164 104 drive letters work on ReactOS/Windows;
-#X msg 77 103 symbol C:/*;
-#X text 190 128 all files with a dot in your home;
-#X msg 40 78 symbol %USERPROFILE%/*;
-#X text 203 79 ReactOS/Windows environment variables work;
-#X text 186 353 defaults to your home folder;
-#X text 267 200 nested wildcards work on UNIX;
-#X msg 119 199 symbol /var/*/*.log;
-#X text 30 5 Get a listing of files based on a wildcard pattern. On
-UNIX \, it follows glob rules \, on Windows it follows the cmd.exe
-rules.;
-#X text 165 152 patterns default to path that Pd launched from;
-#X text 274 541 released under the GNU GPL;
-#X text 57 527 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+#X obj 28 419 print;
+#X msg 91 146 symbol ~/*.*;
+#X msg 97 173 symbol *;
+#X text 187 197 relative paths work;
+#X msg 102 198 symbol ../*;
+#X text 164 124 drive letters work on ReactOS/Windows;
+#X msg 77 123 symbol C:/*;
+#X text 190 148 all files with a dot in your home;
+#X msg 40 98 symbol %USERPROFILE%/*;
+#X text 203 99 ReactOS/Windows environment variables work;
+#X text 262 218 nested wildcards work on UNIX;
+#X msg 119 219 symbol /var/*/*.log;
+#X text 165 172 patterns default to path that Pd launched from;
+#X text 329 464 released under the GNU GPL;
+#X text 15 449 (C) Copyright 2006 Hans-Christoph Steiner <hans@at.or.at>
+;
+#X text 8 5 Get a listing of files based on a wildcard pattern. On
+UNIX \, it follows glob rules \, on ReactOS/Windows it follows the
+cmd.exe rules.;
+#X text 115 380 With no argument \, it defaults to the contents of
+the folder of the current patch \, i.e. "/path/to/current/patch/*".
 ;
 #X connect 0 0 8 0;
 #X connect 1 0 7 0;
@@ -52,14 +45,8 @@ rules.;
 #X connect 8 0 2 0;
 #X connect 8 0 9 0;
 #X connect 13 0 8 0;
-#X connect 15 0 8 0;
-#X connect 17 0 8 0;
-#X connect 18 0 22 0;
-#X connect 18 0 23 0;
-#X connect 19 0 21 0;
-#X connect 20 0 18 0;
-#X connect 22 0 19 0;
-#X connect 22 0 24 0;
-#X connect 27 0 8 0;
-#X connect 29 0 8 0;
-#X connect 33 0 8 0;
+#X connect 14 0 8 0;
+#X connect 16 0 8 0;
+#X connect 18 0 8 0;
+#X connect 20 0 8 0;
+#X connect 23 0 8 0;
