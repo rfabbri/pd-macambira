@@ -1,0 +1,34 @@
+#N canvas 185 212 481 320 10;
+#X floatatom 56 240 5 0 0 0 - - -;
+#X msg 14 148 bang;
+#X msg 143 162 symbol daemon;
+#X obj 30 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 94 109 symbol lp;
+#X msg 100 135 symbol trash;
+#X floatatom 272 231 5 0 0 0 - - -;
+#X msg 271 159 bang;
+#X obj 142 240 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 145 262 ^-- bang if not found;
+#X obj 421 227 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 57 49 symbol wheel;
+#X msg 76 81 symbol staff;
+#X text 12 14 convert a group name to a GID.;
+#X obj 272 201 group_name->gid staff;
+#X obj 56 190 group_name->gid;
+#X msg 361 166 symbol postfix;
+#X connect 1 0 15 0;
+#X connect 2 0 15 1;
+#X connect 4 0 15 0;
+#X connect 5 0 15 0;
+#X connect 7 0 14 0;
+#X connect 11 0 15 0;
+#X connect 12 0 15 0;
+#X connect 14 0 6 0;
+#X connect 14 1 10 0;
+#X connect 15 0 0 0;
+#X connect 15 0 3 0;
+#X connect 15 1 8 0;
+#X connect 16 0 14 1;

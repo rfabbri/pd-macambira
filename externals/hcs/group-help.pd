@@ -1,0 +1,43 @@
+#N canvas 296 212 557 427 10;
+#X obj 98 40 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 95 63 5 0 0 0 User_ID - -;
+#X obj 47 200 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X msg 112 86 bang;
+#X text 209 168 <-- set by argument or cold inlet;
+#X text 148 85 output current;
+#X symbolatom 14 365 0 0 0 3 group_name - -;
+#X symbolatom 43 331 0 0 0 3 password - -;
+#X floatatom 191 323 0 0 0 3 gid - -;
+#X msg 269 105 symbol trash;
+#X text 365 76 use a symbolic group name;
+#X msg 269 56 symbol daemon;
+#X text 188 195 bang on right inlet if no match;
+#X obj 138 195 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 94 167 group;
+#X obj 94 200 list;
+#X obj 14 299 unpack symbol symbol float;
+#X obj 94 220 list split 3;
+#X msg 271 83 symbol wheel;
+#X msg 194 148 20;
+#X obj 133 245 print group_members;
+#X text 37 20 fetch passwd data based on UID or group name;
+#X text 361 105 ignore bad group names;
+#X connect 0 0 1 0;
+#X connect 1 0 14 0;
+#X connect 3 0 14 0;
+#X connect 9 0 14 0;
+#X connect 11 0 14 0;
+#X connect 14 0 2 0;
+#X connect 14 0 15 0;
+#X connect 14 1 13 0;
+#X connect 15 0 17 0;
+#X connect 16 0 6 0;
+#X connect 16 1 7 0;
+#X connect 16 2 8 0;
+#X connect 17 0 16 0;
+#X connect 17 1 20 0;
+#X connect 18 0 14 0;
+#X connect 19 0 14 1;

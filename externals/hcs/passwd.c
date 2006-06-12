@@ -38,13 +38,8 @@
 #endif
 
 #include <string.h>
-/*
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/errno.h>
-*/
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int passwd_instance_count;
 
@@ -78,7 +73,7 @@ static void passwd_output(t_passwd *x)
 #else
 	if( x->x_uid < 0 )
 	{
-		post("[passwd]: ignoring UID less than zero or bad username");
+		post("[passwd]: ignoring bad username or UID less than zero");
 		outlet_bang(x->x_status_outlet);
 	}
 	else

@@ -1,20 +1,29 @@
-#N canvas 378 215 466 316 10;
-#X obj 94 157 gid->group_name;
-#X obj 98 60 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 500 1;
-#X floatatom 95 83 5 0 0 0 Group_ID - -;
-#X symbolatom 94 207 0 0 0 0 Group_Name - -;
-#X text 52 40 convert group GID number to group name symbol;
-#X obj 106 188 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+#N canvas 185 212 485 324 10;
+#X msg 43 118 bang;
+#X obj 59 210 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X text 68 255 outputs a blank symbol if no match;
-#X msg 194 138 10;
-#X msg 112 106 bang;
-#X text 209 158 <-- set by argument or cold inlet;
-#X text 148 105 output current;
-#X connect 0 0 3 0;
-#X connect 0 0 5 0;
-#X connect 1 0 2 0;
-#X connect 2 0 0 0;
-#X connect 7 0 0 1;
-#X connect 8 0 0 0;
+#X msg 300 129 bang;
+#X obj 184 216 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 187 238 ^-- bang if not found;
+#X text 12 14 convert a UID to a username;
+#X symbolatom 84 212 0 0 0 0 - - -;
+#X msg 172 132 1;
+#X symbolatom 301 212 0 0 0 0 - - -;
+#X obj 89 63 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
+#X floatatom 87 93 5 0 0 0 - - -;
+#X obj 85 160 gid->group_name;
+#X obj 417 193 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 301 171 gid->group_name 0;
+#X connect 0 0 11 0;
+#X connect 2 0 13 0;
+#X connect 7 0 11 1;
+#X connect 9 0 10 0;
+#X connect 10 0 11 0;
+#X connect 11 0 1 0;
+#X connect 11 0 6 0;
+#X connect 11 1 3 0;
+#X connect 13 0 8 0;
+#X connect 13 1 12 0;
