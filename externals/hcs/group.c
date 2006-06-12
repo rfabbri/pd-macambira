@@ -39,7 +39,7 @@
 
 #include <string.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int group_instance_count;
 
@@ -128,7 +128,8 @@ static void group_output(t_group *x)
 		if( group_pointer != NULL )
 		{
 			reset_output(x);
-			add_symbol_to_output(x, gensym(group_pointer->gr_passwd));
+            /* group passwd just seems to be always blank, so omit it */
+			/* add_symbol_to_output(x, gensym(group_pointer->gr_passwd)); */
 			add_float_to_output(x, group_pointer->gr_gid);
 			members = group_pointer->gr_mem;
 			while(*members)
