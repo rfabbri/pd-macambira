@@ -1,0 +1,46 @@
+#N canvas 167 231 605 454 10;
+#X msg 114 53 bang;
+#X text 156 53 run on current folder;
+#X obj 91 147 file_status;
+#X obj 90 226 unpack symbol float float float float float float float
+;
+#X symbolatom 91 414 0 0 0 3 filename - -;
+#X floatatom 145 359 0 0 0 3 hard_links - -;
+#X floatatom 199 340 0 0 0 3 User_ID - -;
+#X floatatom 253 323 0 0 0 3 Group_ID - -;
+#X floatatom 309 309 0 0 0 3 Device_ID - -;
+#X obj 12 188 print data;
+#X obj 163 174 route error;
+#X symbolatom 163 199 0 0 0 0 error - -;
+#X floatatom 360 288 0 0 0 3 File_Size - -;
+#X floatatom 416 267 0 0 0 3 Blocks_Allocated - -;
+#X floatatom 470 247 0 0 0 3 Block_Size - -;
+#X msg 127 79 symbol /tmp/;
+#X msg 138 103 symbol /tmp/test.txt;
+#X obj 79 8 bng 15 250 50 0 empty empty empty 0 -6 0 8 -24198 -1 -1
+;
+#X obj 79 26 openpanel;
+#X text 151 16 try it on any file (it doesn't change anything \, just
+reads data from the file system).;
+#X text 174 144 <-- set filename by cold inlet or object argument;
+#X obj 252 360 gid->group_name;
+#X symbolatom 252 379 0 0 0 3 group_name - -;
+#X connect 0 0 2 0;
+#X connect 2 0 3 0;
+#X connect 2 0 9 0;
+#X connect 2 1 10 0;
+#X connect 3 0 4 0;
+#X connect 3 1 5 0;
+#X connect 3 2 6 0;
+#X connect 3 3 7 0;
+#X connect 3 4 8 0;
+#X connect 3 5 12 0;
+#X connect 3 6 13 0;
+#X connect 3 7 14 0;
+#X connect 7 0 21 0;
+#X connect 10 0 11 0;
+#X connect 15 0 2 0;
+#X connect 16 0 2 0;
+#X connect 17 0 18 0;
+#X connect 18 0 2 0;
+#X connect 21 0 22 0;
