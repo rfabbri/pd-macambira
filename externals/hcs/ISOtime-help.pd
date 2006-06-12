@@ -1,0 +1,7 @@
+#N canvas 98 95 426 266 10;
+#X msg 139 82 bang;
+#X symbolatom 138 156 0 0 0 0 - - -;
+#X obj 139 114 ISOtime;
+#X text 49 29 output the current time in ISO format;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;

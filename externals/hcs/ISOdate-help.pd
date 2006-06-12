@@ -1,0 +1,7 @@
+#N canvas 212 52 426 266 10;
+#X msg 139 82 bang;
+#X symbolatom 138 156 0 0 0 0 - - -;
+#X text 49 29 output the current date in ISO format;
+#X obj 139 114 ISOdate;
+#X connect 0 0 3 0;
+#X connect 3 0 1 0;
