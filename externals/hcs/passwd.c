@@ -39,7 +39,7 @@
 
 #include <string.h>
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 t_int passwd_instance_count;
 
@@ -66,7 +66,7 @@ static void passwd_output(t_passwd *x)
 {
 	DEBUG(post("passwd_output"););
 	struct passwd *passwd_pointer;
-	t_atom output_data[11];
+	t_atom output_data[6];
 
 #ifdef _WIN32
 	/* TODO: implement for Windows! */
@@ -84,16 +84,11 @@ static void passwd_output(t_passwd *x)
 			SETSYMBOL(output_data, gensym(passwd_pointer->pw_passwd));
 			SETFLOAT(output_data + 1, passwd_pointer->pw_uid);
 			SETFLOAT(output_data + 2, passwd_pointer->pw_gid);
-			SETFLOAT(output_data + 3, passwd_pointer->pw_change / 86400);
-			SETFLOAT(output_data + 4, passwd_pointer->pw_change % 86400);
-			SETSYMBOL(output_data + 5, gensym(passwd_pointer->pw_class));
-			SETSYMBOL(output_data + 6, gensym(passwd_pointer->pw_gecos));
-			SETSYMBOL(output_data + 7, gensym(passwd_pointer->pw_dir));
-			SETSYMBOL(output_data + 8, gensym(passwd_pointer->pw_shell));
-			SETFLOAT(output_data + 9, (passwd_pointer->pw_expire / 86400));
-			SETFLOAT(output_data + 10, (passwd_pointer->pw_expire % 86400));
+			SETSYMBOL(output_data + 3, gensym(passwd_pointer->pw_gecos));
+			SETSYMBOL(output_data + 4, gensym(passwd_pointer->pw_dir));
+			SETSYMBOL(output_data + 5, gensym(passwd_pointer->pw_shell));
 			outlet_anything(x->x_data_outlet, gensym(passwd_pointer->pw_name), 
-							11, output_data);
+							6, output_data);
 		}
 		else
 		{
