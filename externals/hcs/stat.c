@@ -38,7 +38,7 @@
 #include <sys/stat.h>
 #include <sys/errno.h>
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 t_int stat_instance_count;
 
@@ -194,6 +194,13 @@ static void stat_output(t_stat* x)
 		add_float_to_output(x, (t_float) stat_buffer.st_blksize);
 		/* 86400 seconds == 24 hours == 1 day */
 #ifdef _POSIX_C_SOURCE
+		add_float_to_output(x, (t_float) (stat_buffer.st_atime / 86400));
+		add_float_to_output(x, (t_float) (stat_buffer.st_atime % 86400));
+		add_float_to_output(x, (t_float) (stat_buffer.st_mtime / 86400));
+		add_float_to_output(x, (t_float) (stat_buffer.st_mtime % 86400));
+		add_float_to_output(x, (t_float) (stat_buffer.st_ctime / 86400));
+		add_float_to_output(x, (t_float) (stat_buffer.st_ctime % 86400));
+#else
 		add_float_to_output(x, 
 				 (t_float) (stat_buffer.st_atimespec.tv_sec / 86400));
 		add_float_to_output(x, 
@@ -206,13 +213,6 @@ static void stat_output(t_stat* x)
 				 (t_float) (stat_buffer.st_ctimespec.tv_sec / 86400));
 		add_float_to_output(x, 
 				 (t_float) (stat_buffer.st_ctimespec.tv_sec % 86400));
-#else
-		add_float_to_output(x, (t_float) (stat_buffer.st_atime / 86400));
-		add_float_to_output(x, (t_float) (stat_buffer.st_atime % 86400));
-		add_float_to_output(x, (t_float) (stat_buffer.st_mtime / 86400));
-		add_float_to_output(x, (t_float) (stat_buffer.st_mtime % 86400));
-		add_float_to_output(x, (t_float) (stat_buffer.st_ctime / 86400));
-		add_float_to_output(x, (t_float) (stat_buffer.st_ctime % 86400));
 #endif /* _POSIX_C_SOURCE */
 		outlet_anything(x->x_data_outlet,x->x_filename,
 						x->output_count,x->output);
