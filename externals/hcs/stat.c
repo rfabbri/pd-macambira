@@ -38,7 +38,7 @@
 #include <sys/stat.h>
 #include <sys/errno.h>
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int stat_instance_count;
 
@@ -111,24 +111,24 @@ static void reset_output(t_stat *x)
  * IMPLEMENTATION                    
  */
 
-static void stat_output_error(t_stat *x, int error_number)
+static void stat_output_error(t_stat *x)
 {
 	t_atom output_atoms[2];
-	switch(error_number)
+	switch(errno)
 	{
 	case EACCES:
 		error("[stat]: access denied: %s", x->x_filename->s_name);
-		SETSYMBOL(output_atoms, gensym("access"));
+		SETSYMBOL(output_atoms, gensym("access_denied"));
 		break;
 	case EIO:
 		error("[stat]: An error occured while reading %s", 
 			  x->x_filename->s_name);
-		SETSYMBOL(output_atoms, gensym("io"));
+		SETSYMBOL(output_atoms, gensym("io_error"));
 		break;
 	case ELOOP:
 		error("[stat]: A loop exists in symbolic links in %s", 
 			  x->x_filename->s_name);
-		SETSYMBOL(output_atoms, gensym("loop"));
+		SETSYMBOL(output_atoms, gensym("symlink_loop"));
 		break;
 	case ENAMETOOLONG:
 		error("[stat]: The filename %s is too long", 
@@ -147,11 +147,11 @@ static void stat_output_error(t_stat *x, int error_number)
 	case EOVERFLOW:
 		error("[stat]: %s caused overflow in stat struct", 
 			  x->x_filename->s_name);
-		SETSYMBOL(output_atoms, gensym("overflow"));
+		SETSYMBOL(output_atoms, gensym("internal_overflow"));
 		break;
 	case EFAULT:
 		error("[stat]: fault in stat struct (%s)", x->x_filename->s_name);
-		SETSYMBOL(output_atoms, gensym("fault"));
+		SETSYMBOL(output_atoms, gensym("internal_fault"));
 		break;
 	case EINVAL:
 		error("[stat]: invalid argument to stat() (%s)", 
@@ -159,8 +159,7 @@ static void stat_output_error(t_stat *x, int error_number)
 		SETSYMBOL(output_atoms, gensym("invalid"));
 		break;
 	default:
-		error("[stat]: unknown error %d: %s", 
-			  error_number, x->x_filename->s_name);
+		error("[stat]: unknown error %d: %s", errno, x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("unknown"));
 	}
 	SETSYMBOL(output_atoms + 2, x->x_filename);
@@ -180,12 +179,11 @@ static void stat_output(t_stat* x)
 #endif /* _WIN32 */
 	if(result != 0)
 	{
-		stat_output_error(x, result);
+		stat_output_error(x);
 	}
 	else
 	{
 		reset_output(x);
-		post("");
 		add_float_to_output(x, (t_float) stat_buffer.st_mode);
 		add_float_to_output(x, (t_float) stat_buffer.st_nlink);
 		add_float_to_output(x, (t_float) stat_buffer.st_uid);
