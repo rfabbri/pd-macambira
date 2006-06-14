@@ -44,10 +44,13 @@ gripd_install ix_install
 # GRIPD
 GRIPD_NAME = gripd
 gripd:
-
+	make -C $(extensions_src)/gripd/src -f Makefile.Linux all
 
 gripd_install: 
 	install -d $(helpdir)
+	install -p $(extensions_src)/gripd/*.$(EXTENSION) \
+		$(extensions_src)/gripd/*.so \
+		$(externalsdir)/$(GRIPD_NAME)
 	install -p $(extensions_src)/gripd/examples/gripd.pd \
 		$(helpdir)/gripd-help.pd
 #	install -d $(manualsdir)/$(GRIPD_NAME)
@@ -56,6 +59,10 @@ gripd_install:
 	install -d $(examplesdir)/$(GRIPD_NAME)
 	install -p $(extensions_src)/gripd/examples/*.* \
 		$(examplesdir)/$(GRIPD_NAME) 
+
+
+gripd_clean:
+	make -C $(extensions_src)/gripd/src clean
 
 
 
