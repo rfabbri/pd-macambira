@@ -1,3 +1,12 @@
 
-- port packages/patches/libdir-0.38.4.patch to 0.39.2
+- check out Mac/Intel patches
+
+
+----------------------
+Patches accepted into 0.40
+----------------------
+
+- number_bug_list_bug-0.39.2.patch
+- help_browser-0.39.2.patch
+- mingw_fixes-0.39-2.patch
 
