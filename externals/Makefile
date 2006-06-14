@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = bsaylor buildsrc creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = bsaylor buildsrc corelibs creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -294,11 +294,12 @@ corelibs: $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
 corelibs_install: corelibs
 	install -d $(objectsdir)/$(CORELIBS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(CORELIBS_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
+		--author "Miller Puckette and others" \
+		--description "core libraries stripped out of Pd" \
+		--license "BSD" \
 		--version ""
-	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(CORELIBS_NAME)
+	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) 
+		$(objectsdir)/$(CORELIBS_NAME)
 	install -d $(helpdir)/$(CORELIBS_NAME)
 	install -p $(externals_src)/corelibs/help/*.pd \
 		$(helpdir)/$(CORELIBS_NAME)
@@ -418,6 +419,42 @@ cyclone_install: cyclone
 
 cyclone_clean:
 	-make -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
+
+
+#------------------------------------------------------------------------------#
+# DEVELLIBS
+DEVELLIBS_NAME=devellibs
+DEVELLIBS_OBJECTS := $(wildcard $(externals_src)/devellibs/*.c)
+devellibs: $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION))
+
+devellibs_install: devellibs
+	install -d $(objectsdir)/$(DEVELLIBS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(DEVELLIBS_NAME) \
+		--author "Miller Puckette and others" \
+		--description "core libraries stripped out of Pd-devel" \
+		--license "BSD" \
+		--version ""
+	install -p $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION)) 
+		$(objectsdir)/$(DEVELLIBS_NAME)
+	install -d $(helpdir)/$(DEVELLIBS_NAME)
+	install -p $(externals_src)/devellibs/help/*.pd \
+		$(helpdir)/$(DEVELLIBS_NAME)
+#	install -d $(manualsdir)/$(DEVELLIBS_NAME)
+#	install -p $(externals_src)/devellibs/manual.txt \
+#		$(manualsdir)/$(DEVELLIBS_NAME)
+	install -p $(externals_src)/devellibs/README \
+		$(readmesdir)/$(DEVELLIBS_NAME).txt
+	install -d $(examplesdir)/$(DEVELLIBS_NAME)
+	install -p $(externals_src)/devellibs/examples/*.pd \
+		$(examplesdir)/$(DEVELLIBS_NAME)
+
+devellibs_clean:
+	-rm -f -- $(DEVELLIBS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(DEVELLIBS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/devellibs/*.bak
+	-rm -f -- $(externals_src)/devellibs/*.*~
+
+
 
 
 
@@ -702,10 +739,9 @@ $(externals_src)/hcs/hid/hid.$(EXTENSION): $(HID_OBJECTS) \
 $(HID_UTILITIES_SOURCE)/build/libHIDUtilities.a
 	$(CC) $(LDFLAGS) -o $(externals_src)/hcs/hid/hid.$(EXTENSION) \
 		$(HID_OBJECTS) $(HID_LIBS)
-	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
+#	$(STRIP) $(externals_src)/hcs/hid/hid.$(EXTENSION)
 
 hid: $(externals_src)/hcs/hid/hid.$(EXTENSION)
-
 
 hid_install: hid
 	install -d $(objectsdir)/$(HID_NAME)
@@ -1320,7 +1356,8 @@ pidip_clean:
 #------------------------------------------------------------------------------#
 # PMPD
 PMPD_NAME=pmpd
-PMPD_OBJECTS := $(wildcard $(externals_src)/pmpd/src/[a-lq-z]*.c)
+PMPD_OBJECTS := $(wildcard $(externals_src)/pmpd/src/[a-oq-z]*.c) \
+$(externals_src)/pmpd/src/pmpd~.c
 pmpd: $(PMPD_OBJECTS:.c=.$(EXTENSION))
 
 pmpd_install: pmpd
@@ -1342,9 +1379,9 @@ pmpd_install: pmpd
 
 pmpd_clean:
 	-rm -f -- $(PMPD_OBJECTS:.c=.$(EXTENSION))
-	-find $(externals_src)/pmpd -name '*.o' | xargs rm -f --
-	-find $(externals_src)/pmpd -name '*.bak' | xargs rm -f --
-	-find $(externals_src)/pmpd -name '*~' | xargs rm -f --
+	-rm -f -- $(externals_src)/pmpd/*/*.o
+	-rm -f -- $(externals_src)/pmpd/*/*.bak
+	-rm -f -- $(externals_src)/pmpd/*/*~
 
 
 #------------------------------------------------------------------------------#
