@@ -23,6 +23,9 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
+/* libhid hasn't been ported to Win32 yet */
+#ifndef _WIN32
+
 #include <usb.h>
 #include <hid.h>
 #include <stdio.h>
@@ -776,3 +779,4 @@ void usbhid_setup(void)
 	class_addmethod(usbhid_class,(t_method) usbhid_close,gensym("close"),0);
 }
 
+#endif /* NOT _WIN32 */

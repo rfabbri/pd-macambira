@@ -23,18 +23,15 @@
 /*                                                                           */
 /* --------------------------------------------------------------------------*/
 
+/* sadly, there is no uname in Windows, Cygwin has it tho */
+#ifndef _WIN32
+
 #include <m_pd.h>
 
-#ifdef _WIN32
-#define _WIN32_WINNT 0x0400
-#include <windows.h>
-#include <stdio.h>
-#else
 #include <sys/utsname.h>
 #include <stdlib.h>
-#endif
 
-static char *version = "$Revision: 1.1 $";
+static char *version = "$Revision: 1.2 $";
 
 t_int uname_instance_count;
 
@@ -114,3 +111,5 @@ void uname_setup(void)
 	
 }
 
+
+#endif /* NOT _WIN32 */

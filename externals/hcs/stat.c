@@ -36,9 +36,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/errno.h>
+#include <errno.h>
 
-static char *version = "$Revision: 1.3 $";
+static char *version = "$Revision: 1.4 $";
 
 t_int stat_instance_count;
 
@@ -50,7 +50,11 @@ t_int stat_instance_count;
  */
 static t_class *stat_class;
 
+#ifdef _WIN32
+typedef struct _stat_win {
+#else
 typedef struct _stat {
+#endif /* _WIN32 */
 	t_object            x_obj;
 	t_symbol            *x_filename;
 /* output */
@@ -125,11 +129,13 @@ static void stat_output_error(t_stat *x)
 			  x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("io_error"));
 		break;
+#ifndef _WIN32
 	case ELOOP:
 		error("[stat]: A loop exists in symbolic links in %s", 
 			  x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("symlink_loop"));
 		break;
+#endif
 	case ENAMETOOLONG:
 		error("[stat]: The filename %s is too long", 
 			  x->x_filename->s_name);
@@ -144,11 +150,13 @@ static void stat_output_error(t_stat *x)
 			  x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("not_folder"));
 		break;
+#ifndef _WIN32
 	case EOVERFLOW:
 		error("[stat]: %s caused overflow in stat struct", 
 			  x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("internal_overflow"));
 		break;
+#endif
 	case EFAULT:
 		error("[stat]: fault in stat struct (%s)", x->x_filename->s_name);
 		SETSYMBOL(output_atoms, gensym("internal_fault"));
@@ -169,11 +177,15 @@ static void stat_output_error(t_stat *x)
 static void stat_output(t_stat* x)
 {
 	DEBUG(post("stat_output"););
+#ifdef _WIN32
+	struct _stat stat_buffer;
+#else
 	struct stat stat_buffer;
+#endif
 	int result;
 
 #ifdef _WIN32
-	result = _stat(x->x_filename, &stat_buffer);
+	result = _stat(x->x_filename->s_name, &stat_buffer);
 #else
 	result = stat(x->x_filename->s_name, &stat_buffer);
 #endif /* _WIN32 */
@@ -190,10 +202,15 @@ static void stat_output(t_stat* x)
 		add_float_to_output(x, (t_float) stat_buffer.st_gid);
 		add_float_to_output(x, (t_float) stat_buffer.st_rdev);
 		add_float_to_output(x, (t_float) stat_buffer.st_size);
+#ifdef _WIN32
+		add_float_to_output(x, (t_float) 0);
+		add_float_to_output(x, (t_float) 0);
+#else
 		add_float_to_output(x, (t_float) stat_buffer.st_blocks);
 		add_float_to_output(x, (t_float) stat_buffer.st_blksize);
+#endif
 		/* 86400 seconds == 24 hours == 1 day */
-#ifdef _POSIX_C_SOURCE
+#if defined(_POSIX_C_SOURCE) || defined(_WIN32)
 		add_float_to_output(x, (t_float) (stat_buffer.st_atime / 86400));
 		add_float_to_output(x, (t_float) (stat_buffer.st_atime % 86400));
 		add_float_to_output(x, (t_float) (stat_buffer.st_mtime / 86400));
