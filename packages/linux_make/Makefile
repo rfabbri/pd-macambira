@@ -67,7 +67,7 @@ install:
 
 package: tarbz2
 
-PACKAGE_NAME = Pd-$(PD_VERSION)-$(PACKAGE_VERSION)-$(OS_NAME)-$(shell uname -m)
+PACKAGE_NAME = Pd-$(PD_VERSION)-$(OS_NAME)-$(shell uname -m)
 tarbz2: installer_makefile installer_readme
 	mv $(DESTDIR)$(prefix) $(DESTDIR)$(PACKAGE_NAME)
 	cd $(DESTDIR) && \
