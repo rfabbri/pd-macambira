@@ -1,0 +1,9 @@
+
+These are just the objects included in Miller's Pd compiled as stand-alone
+libraries based on their source files.  Its a quick and dirty hack to strip Pd
+down to the bare essentials so that the namespace will be fully functional.
+
+These files are generated using the included script, generate.sh.  They should
+not be modified directly.
+
+
