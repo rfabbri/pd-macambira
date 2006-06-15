@@ -298,7 +298,7 @@ corelibs_install: corelibs
 		--description "core libraries stripped out of Pd" \
 		--license "BSD" \
 		--version ""
-	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) 
+	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) \
 		$(objectsdir)/$(CORELIBS_NAME)
 	install -d $(helpdir)/$(CORELIBS_NAME)
 	install -p $(externals_src)/corelibs/help/*.pd \
