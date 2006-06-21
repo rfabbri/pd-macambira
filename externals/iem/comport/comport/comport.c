@@ -3,10 +3,12 @@
  (c) 1998-2005  Winfried Ritsch (see LICENCE.txt)
  Institute for Electronic Music - Graz
 
- V 1.0 
+ V 1.0
 MP 20060603 memset and memcpy arguments were backwards for Windows version. close_serial doesn't crash now.
-MP 20060618 make sure name is set up in comport_new (x->serial_device = test.serial_device) so help message works. 
-
+MP 20060618 make sure name is set up in comport_new (x->serial_device = test.serial_device) so help message works.
+MP 20060619 implemented status outlet
+MP 20060620 Add DTR and RTS control, add outputs to reflect CTS and DSR states.
+MP 20060621 Do all the above for Windows too.
 */
 
 #include "m_pd.h"
@@ -21,8 +23,9 @@ MP 20060618 make sure name is set up in comport_new (x->serial_device = test.ser
 #include <commctrl.h>
 #else
 #include <sys/time.h>
-#include <fcntl.h> 
-#include <termios.h>               /* for TERMIO ioctl calls */
+#include <fcntl.h>
+#include <sys/ioctl.h> /* for ioctl DTR */
+#include <termios.h> /* for TERMIO ioctl calls */
 #include <unistd.h>
 #include <glob.h>
 #define HANDLE int
@@ -42,7 +45,7 @@ typedef struct comport
 #ifdef _WIN32
     DCB            dcb; /* holds the comm pars */
     DCB            dcb_old; /* holds the comm pars */
-    COMMTIMEOUTS   old_timeouts; 
+    COMMTIMEOUTS   old_timeouts;
 #else
     struct termios oldcom_termio; /* save the old com config */
     struct termios com_termio; /* for the new com config */
@@ -50,6 +53,9 @@ typedef struct comport
     t_symbol       *serial_device;
     char           serial_device_name[FILENAME_MAX];
     short          comport; /* holds the comport # */
+    short          last_comport; /* the last comport that was output on x_status_outlet */
+    short          last_dsr;/* last dsr input state */
+    short          last_cts;/* last cts input state */
     t_float        baud; /* holds the current baud rate */
     short          rxerrors; /* holds the rx line errors */
     t_clock        *x_clock;
@@ -58,6 +64,8 @@ typedef struct comport
     int            verbose;
     t_outlet       *x_data_outlet;
     t_outlet       *x_status_outlet;
+    t_outlet       *x_dsr_outlet;
+    t_outlet       *x_cts_outlet;
 } t_comport;
 
 #ifndef TRUE
@@ -80,8 +88,8 @@ typedef struct comport
 #define COMPORT_MAX 99
 
 #ifdef _WIN32
-static long baudspeedbittable[] = 
-{ 
+static long baudspeedbittable[] =
+{
     CBR_256000,
     CBR_128000,
     CBR_115200,
@@ -97,11 +105,11 @@ static long baudspeedbittable[] =
     CBR_600,
     CBR_300,
     CBR_110
-}; 
+};
 
 #else /* _WIN32 */
 
-#ifdef  IRIX  
+#ifdef  IRIX
 #define OPENPARAMS (O_RDWR|O_NDELAY|O_NOCTTY)
 #define TIONREAD FIONREAD         /* re map the IOCTL function */
 #define BAUDRATE_256000 -1
@@ -123,8 +131,8 @@ static long baudspeedbittable[] =
 #endif /* else IRIX */
 
 static
-short baudspeedbittable[] = 
-{ 
+short baudspeedbittable[] =
+{
     BAUDRATE_256000,  /* CPU SPECIFIC */
     BAUDRATE_128000,  /* CPU SPECIFIC */
     BAUDRATE_115200,  /* CPU SPECIFIC */
@@ -140,7 +148,7 @@ short baudspeedbittable[] =
     B600,
     B300,
     B110
-}; 
+};
 
 struct timeval null_tv;
 
@@ -148,8 +156,8 @@ struct timeval null_tv;
 
 #define BAUDRATETABLE_LEN 15
 
-static long baudratetable[] = 
-{ 
+static long baudratetable[] =
+{
     256000L,
     128000L,
     115200L,
@@ -169,14 +177,14 @@ static long baudratetable[] =
 
 t_class *comport_class;
 
-/* --------- sys independend serial setup helpers ---------------- */
+/* --------- sys independent serial setup helpers ---------------- */
 
 static long get_baud_ratebits(t_float *baud)
 {
     int i = 0;
 
     while(i < BAUDRATETABLE_LEN && baudratetable[i] > *baud) i++;
-  
+
     /* nearest Baudrate finding */
     if(i==BAUDRATETABLE_LEN ||  baudspeedbittable[i] < 0)
     {
@@ -189,7 +197,7 @@ static long get_baud_ratebits(t_float *baud)
 }
 
 
-/* ------------ sys dependend serial setup helpers ---------------- */
+/* ------------ sys dependent serial setup helpers ---------------- */
 
 
 /* --------------------- NT ------------------------------------ */
@@ -261,11 +269,37 @@ static int set_ctsrts(t_comport *x, int nr)
     return 0;
 }
 
+static int set_dtr(t_comport *x, int nr)
+{
+    HANDLE  fd = x->comhandle;
+    BOOL    status;
+    DWORD   dwFunc = (nr==0)?CLRDTR:SETDTR;
+
+    if (fd == INVALID_HANDLE_VALUE) return -1;
+
+    status = EscapeCommFunction(fd, dwFunc);
+    if (status != 0) return nr;
+    return -1; /* didn't work, GetLastError tells why */
+}
+
+static int set_rts(t_comport *x, int nr)
+{
+    HANDLE  fd = x->comhandle;
+    BOOL    status;
+    DWORD   dwFunc = (nr==0)?CLRRTS:SETRTS;
+
+    if (fd == INVALID_HANDLE_VALUE) return -1;
+
+    status = EscapeCommFunction(fd, dwFunc);
+    if (status != 0) return nr;
+    return -1; /* didn't work, GetLastError tells why */
+}
+
 static int set_xonxoff(t_comport *x, int nr)
 {
     /*   x->dcb.fTXContinueOnXoff = FALSE;  XOFF continues Tx  */
     if(nr == 1)
-    { 
+    {
         x->dcb.fOutX  = TRUE; /*  XON/XOFF out flow control  */
         x->dcb.fInX  = TRUE; /*  XON/XOFF in flow control */
         return 1;
@@ -291,17 +325,17 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if(com_num < 1 || com_num >= COMPORT_MAX)
     {
-        post("comport open %d, baud %d not valid (args: [portnum] [baud])",com_num,*baud);
+        post("comport number %d out of range (0-%d)", com_num, COMPORT_MAX);
         return INVALID_HANDLE_VALUE;
     }
 
     sprintf(buffer, "%s%d", x->serial_device_name, com_num);
     x->serial_device = gensym(buffer);
     post("Opening %s",x->serial_device->s_name);
-    fd = CreateFile( x->serial_device->s_name,  
-        GENERIC_READ | GENERIC_WRITE, 
-        0, 
-        0, 
+    fd = CreateFile( x->serial_device->s_name,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        0,
         OPEN_EXISTING,
         FILE_FLAG_OVERLAPPED,
         0);
@@ -318,9 +352,9 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!GetCommState(fd, &(x->dcb_old)))
     {
-        post("** ERROR ** could not get old dcb of device %s\n", 
+        post("** ERROR ** could not get old dcb of device %s\n",
             x->serial_device->s_name);
-        CloseHandle(fd); 
+        CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
 
@@ -328,10 +362,10 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!GetCommState(fd, &(x->dcb)))
     {
-        post("** ERROR ** could not get new dcb of device %s\n", 
+        post("** ERROR ** could not get new dcb of device %s\n",
             x->serial_device->s_name);
 
-        CloseHandle(fd); 
+        CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
 
@@ -366,11 +400,11 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
         post("[comport] opened serial line device %d (%s)\n",
             com_num,x->serial_device->s_name);
     }
-    else 
+    else
     {
         error("[comport] ** ERROR ** could not set params to control dcb of device %s\n",
             x->serial_device->s_name);
-        CloseHandle(fd); 
+        CloseHandle(fd);
         return INVALID_HANDLE_VALUE;
     }
 
@@ -380,7 +414,7 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
     }
 
     /* setting new timeouts for read to immediately return */
-    timeouts.ReadIntervalTimeout = MAXDWORD; 
+    timeouts.ReadIntervalTimeout = MAXDWORD;
     timeouts.ReadTotalTimeoutMultiplier = 0;
     timeouts.ReadTotalTimeoutConstant = 0;
     timeouts.WriteTotalTimeoutMultiplier = 0;
@@ -388,13 +422,11 @@ static HANDLE open_serial(unsigned int com_num, t_comport *x)
 
     if (!SetCommTimeouts(fd, &timeouts))
     {
-        post("Couldnt set timeouts for serial device");
-        return INVALID_HANDLE_VALUE;	
+        post("Couldn't set timeouts for serial device");
+        return INVALID_HANDLE_VALUE;
     }
 
-    // this causes a segfault... WHY?!?
-    // outlet_float(x->x_status_outlet, (t_float)com_num);
-
+    x->comport = com_num;/* output on next tick */
     return fd;
 }
 
@@ -404,19 +436,16 @@ static HANDLE close_serial(t_comport *x)
     {
         if (!SetCommState(x->comhandle, &(x->dcb_old)))
         {
-            post("[comport] ** ERROR ** could not reset params to DCB of device %s\n",
+            post("[comport] ** ERROR ** couldn't reset params to DCB of device %s\n",
             x->serial_device->s_name);
         }
         if (!SetCommTimeouts(x->comhandle, &(x->old_timeouts)))
         {
             post("[comport] Couldn't reset old_timeouts for serial device");
         }
-        CloseHandle(x->comhandle); 
-// for some reason, this causes a segfault...
-//	  post("[comport] closed %s",x->serial_device->s_name);
+        CloseHandle(x->comhandle);
+        post("[comport] closed %s",x->serial_device->s_name);
     }
-// this causes a segfault... WHY?!?
-//  outlet_float(x->x_status_outlet, 0);
     return INVALID_HANDLE_VALUE;
 }
 
@@ -428,7 +457,7 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
     DWORD      dwToWrite = 1;
     DWORD      dwErr;
     char       cErr[100];
-  
+
     osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (osWrite.hEvent == NULL)
     {
@@ -436,15 +465,15 @@ static int write_serial(t_comport *x, unsigned char serial_byte)
         return 0;
     }
 
-    if (!WriteFile(x->comhandle, &serial_byte, dwToWrite, &dwWritten, &osWrite)) 
+    if (!WriteFile(x->comhandle, &serial_byte, dwToWrite, &dwWritten, &osWrite))
     {
         dwErr = GetLastError();
-        if (dwErr != ERROR_IO_PENDING) 
+        if (dwErr != ERROR_IO_PENDING)
         {
             sprintf(cErr, "WriteFile error: %d", (int)dwErr);
             post(cErr);
-            return 0; 
-        }  
+            return 0;
+        }
     }
     CloseHandle(osWrite.hEvent);
     return 1;
@@ -476,7 +505,7 @@ static float set_bits(t_comport *x, int nr)
         case 5: tio->c_cflag |= CS5; return 5;
         case 6: tio->c_cflag |= CS6; return 6;
         case 7: tio->c_cflag |= CS7; return 7;
-        default: tio->c_cflag |= CS8; 
+        default: tio->c_cflag |= CS8;
     }
     return 8;
 }
@@ -529,13 +558,45 @@ static int set_ctsrts(t_comport *x, int nr)
     return 0;
 }
 
+static int set_dtr(t_comport *x, int nr)
+{
+    int fd = x->comhandle;
+    int status;
+
+    if (fd == INVALID_HANDLE_VALUE) return -1;
+
+    ioctl(fd, TIOCMGET, &status);
+     if (nr == 0)
+        status &= ~TIOCM_DTR;
+    else
+        status |= TIOCM_DTR;
+    ioctl(fd, TIOCMSET, &status);
+    return (nr !=0);
+}
+
+static int set_rts(t_comport *x, int nr)
+{
+    int fd = x->comhandle;
+    int status;
+
+    if (fd == INVALID_HANDLE_VALUE) return -1;
+
+    ioctl(fd, TIOCMGET, &status);
+    if (nr == 0)
+        status &= ~TIOCM_RTS;
+    else
+        status |= TIOCM_RTS;
+    ioctl(fd, TIOCMSET, &status);
+    return (nr !=0);
+}
+
 static int set_xonxoff(t_comport *x, int nr)
 {
     struct termios *tio = &(x->com_termio);
 
     if(nr == 1)
-    { 
-        tio->c_iflag |= (IXON | IXOFF | IXANY); 
+    {
+        tio->c_iflag |= (IXON | IXOFF | IXANY);
         return 1;
     }
 
@@ -551,27 +612,27 @@ static int open_serial(unsigned int com_num, t_comport *x)
     float          *baud = &(x->baud);
     glob_t         glob_buffer;
 
-/* if com_num == 9999, use device name directly, else try port # */
+    /* if com_num == 9999, use device name directly, else try port # */
     if(com_num != 9999)
-    {  
-        if(com_num >= COMPORT_MAX) 
+    {
+        if(com_num >= COMPORT_MAX)
         {
             post("[comport] ** WARNING ** port %d not valid, must be between 0 and %d",
                 com_num, COMPORT_MAX - 1);
             return INVALID_HANDLE_VALUE;
         }
-//  post("[comport] globbing %s",x->serial_device_name);
+        /*  post("[comport] globbing %s",x->serial_device_name);*/
         /* get the device path based on the port# and the glob pattern */
         switch( glob( x->serial_device_name, 0, NULL, &glob_buffer ) )
         {
-            case GLOB_NOSPACE: 
-                error("[comport] out of memory for \"%s\"",x->serial_device_name); 
+            case GLOB_NOSPACE:
+                error("[comport] out of memory for \"%s\"",x->serial_device_name);
                 break;
-            case GLOB_ABORTED: 
-                error("[comport] aborted \"%s\"",x->serial_device_name); 
+            case GLOB_ABORTED:
+                error("[comport] aborted \"%s\"",x->serial_device_name);
                 break;
-            case GLOB_NOMATCH: 
-                error("[comport] no serial devices found for \"%s\"",x->serial_device_name); 
+            case GLOB_NOMATCH:
+                error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
                 break;
         }
         if(com_num < glob_buffer.gl_pathc)
@@ -592,10 +653,10 @@ static int open_serial(unsigned int com_num, t_comport *x)
             x->serial_device->s_name,errno,strerror(errno));
         return INVALID_HANDLE_VALUE;
     }
-  
+
     /* set no wait on any operation */
     fcntl(fd, F_SETFL, FNDELAY);
-  
+
     /*   Save the Current Port Configuration  */
     if(tcgetattr(fd, old) == -1 || tcgetattr(fd, new) == -1)
     {
@@ -604,7 +665,7 @@ static int open_serial(unsigned int com_num, t_comport *x)
         close(fd);
         return INVALID_HANDLE_VALUE;
     }
-  
+
     /* Setup the new port configuration...NON-CANONICAL INPUT MODE
     .. as defined in termios.h */
 
@@ -617,14 +678,14 @@ static int open_serial(unsigned int com_num, t_comport *x)
     /* no post processing */
     new->c_oflag &= ~OPOST;
 
-    /* setup to return after 0 seconds 
-        ..if no characters are received 
+    /* setup to return after 0 seconds
+        ..if no characters are received
         TIME units are assumed to be 0.1 secs */
     /* not needed anymore ??? in new termios in linux
-    new->c_cc[VMIN] = 0;     
-    new->c_cc[VTIME] = 0;   
+    new->c_cc[VMIN] = 0;
+    new->c_cc[VTIME] = 0;
     */
-  
+
     /* defaults, see input */
 
     set_bits(x,8);      /* CS8 */
@@ -632,21 +693,23 @@ static int open_serial(unsigned int com_num, t_comport *x)
     set_ctsrts(x,0);  /* ~CRTSCTS;*/
     set_xonxoff(x,0); /* (IXON | IXOFF | IXANY) */
     set_baudrate(x,*baud);
-  
+
     if(tcsetattr(fd, TCSAFLUSH, new) != -1)
     {
         post("[comport] opened serial line device %d (%s)\n",
             com_num,x->serial_device->s_name);
-// this causes a segfault... WHY?!?
-//		 outlet_float(x->x_status_outlet, (t_float)com_num);
     }
-    else 
+    else
     {
 		error("[comport] ** ERROR ** could not set params to ioctl of device %s\n",
             x->serial_device->s_name);
         close(fd);
         return INVALID_HANDLE_VALUE;
     }
+    x->comport = com_num; /* output at next comport_tick */
+    x->last_comport = 777; /* a wrong number to force ouput at next comport_tick */
+    x->last_dsr = -1; /* a wrong number so state will be output at next comport_tick */
+    x->last_cts = -1; /* a wrong number so state will be output at next comport_tick */
     return fd;
 }
 
@@ -659,10 +722,7 @@ static int close_serial(t_comport *x)
     {
         tcsetattr(fd, TCSANOW, tios);
         close(fd);
-// for some reason, this causes a segfault...
-//		post("[comport] closed %s",x->serial_device->s_name);
-// this causes a segfault... WHY?!?
-//		outlet_float(x->x_status_outlet, 0);
+        post("[comport] closed %s",x->serial_device->s_name);
     }
     return INVALID_HANDLE_VALUE;
 }
@@ -676,15 +736,17 @@ static int set_serial(t_comport *x)
 
 static int write_serial(t_comport *x, unsigned char  serial_byte)
 {
-    return write(x->comhandle,(char *) &serial_byte,1);
-
+    int result = write(x->comhandle,(char *) &serial_byte,1);
+    if (result != 1)
+        post ("[comport] write returned %d, errno is %d", result, errno);
+    return result;
     /* flush pending I/O chars */
 /* but nowadays discards them ;-(
     else
     {
         ioctl(x->comhandle,TCFLSH,TCOFLUSH);
     }
-*/  
+*/
 }
 
 #endif /* else NT */
@@ -698,13 +760,54 @@ static void comport_pollintervall(t_comport *x, t_floatarg g)
 
 static void comport_tick(t_comport *x)
 {
-    int    err;
-    HANDLE fd = x->comhandle;
+    int          err;
+    HANDLE       fd = x->comhandle;
+    short        newdsr, newcts;
+#ifdef _WIN32
+    {
+        DWORD modemStat;
+        /* get the DSR input state and if it's changed, output it */
+        BOOL status = GetCommModemStatus( fd, &modemStat);
+        if (status)
+        {
+            newdsr = ((modemStat&MS_DSR_ON)!=0);/* read the DSR input line */
+            newcts = ((modemStat&MS_CTS_ON)!=0);/* read the CTS input line */
+        }
+        else
+        {
+            ;/* call GetLastError, only once so as not to hang pd */
+        }
+    }
+#else
+    {
+        int          status;/*dsr outlet*/
+
+        /* get the DSR input state and if it's changed, output it */
+        ioctl(fd, TIOCMGET, &status);/*dsr outlet*/
+        newdsr = ((status&TIOCM_LE)!=0);/* read the DSR input line */
+        newcts = ((status&TIOCM_CTS)!=0);/* read the CTS input line */
+    }
+#endif
+    if (newdsr != x->last_dsr)
+    {
+       x->last_dsr = newdsr;
+       if(x->x_dsr_outlet!=NULL) outlet_float(x->x_dsr_outlet, (float)(x->last_dsr));/*dsr outlet*/
+    }
+    if (newcts != x->last_cts)
+    {
+       x->last_cts = newcts;
+       if(x->x_cts_outlet!=NULL) outlet_float(x->x_cts_outlet, (float)(x->last_cts));/*cts outlet*/
+    }
 
     x->x_hit = 0;
 
+    if(x->last_comport != x->comport)
+    {
+        x->last_comport = x->comport;
+        if (x->x_status_outlet != NULL) outlet_float(x->x_status_outlet, (float)x->comport);
+    }
     if(fd == INVALID_HANDLE_VALUE) return;
-  
+
     /* while there are bytes, read them and send them out, ignore errors */
 #ifdef _WIN32
     {
@@ -712,14 +815,14 @@ static void comport_tick(t_comport *x)
         DWORD         dwRead;
         OVERLAPPED    osReader = {0};
         DWORD         dwX;
-    
+
         err = 0;
-    
+
         osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
         if(ReadFile(x->comhandle, serial_byte, 1000, &dwRead, &osReader))
         {
             if(dwRead > 0)
-            { 	
+            {
                 for(dwX=0;dwX<dwRead;dwX++)
                 {
                     outlet_float(x->x_data_outlet, (t_float) serial_byte[dwX]);
@@ -735,19 +838,19 @@ static void comport_tick(t_comport *x)
 #else
     {
         unsigned char serial_byte;
-        fd_set        com_rfds;  	 
+        fd_set        com_rfds;
 
         FD_ZERO(&com_rfds);
         FD_SET(fd,&com_rfds);
 
         while((err=select(fd+1,&com_rfds,NULL,NULL,&null_tv)) > 0)
         {
-            err = read(fd,(char *) &serial_byte,1); 
+            err = read(fd,(char *) &serial_byte,1);
             /*  while(    (err = read(fd,(char *) &serial_byte,1)) > 0){ */
             outlet_float(x->x_data_outlet, (t_float) serial_byte);
         }
     }
-#endif 
+#endif
 
     if(err < 0)
     { /* if a read error detected */
@@ -768,7 +871,7 @@ static void comport_float(t_comport *x, t_float f)
     }
 }
 
-static void *comport_new(t_floatarg com_num, t_floatarg fbaud) 
+static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 {
     t_comport test;
     t_comport *x;
@@ -791,16 +894,18 @@ static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 
 
 /*	 Open the Comport for RD and WR and get a handle */
-    strncpy(test.serial_device_name,serial_device_name,strlen(serial_device_name)+1);
+    strncpy(test.serial_device_name, serial_device_name, strlen(serial_device_name)+1);
     test.baud = fbaud;
-    fd = open_serial((unsigned int)com_num,&test);
+    fd = open_serial((unsigned int)com_num, &test);
 
     /* Now  nothing really bad could happen so we create the class */
     x = (t_comport *)pd_new(comport_class);
 
-    x->comport = (short)com_num;
+    x->comport = test.comport;/* com_num */
+    x->last_comport = 777; /* no known comport to force output at comport_tick */
     strncpy(x->serial_device_name,serial_device_name,strlen(serial_device_name)+1);
-    x->serial_device = test.serial_device; /* MP: we need this so 'help' doesn't crash */
+    x->serial_device = test.serial_device; /* we need this so 'help' doesn't crash */
+
     x->baud = test.baud;
     x->comhandle = fd; /* holds the comport handle */
 
@@ -814,18 +919,19 @@ static void *comport_new(t_floatarg com_num, t_floatarg fbaud)
 #ifdef _WIN32
         memcpy(&(x->dcb_old), &(test.dcb_old), sizeof(DCB)); /*  save the old com config  */
         memcpy(&(x->dcb), &(test.dcb), sizeof(DCB)); /*  for the new com config  */
-#else  
+#else
         /* save the old com and new com config */
-        bcopy(&(test.oldcom_termio),&(x->oldcom_termio),sizeof(struct termios));    
-        bcopy(&(test.com_termio),&(x->com_termio),sizeof(struct termios));       
+        bcopy(&(test.oldcom_termio),&(x->oldcom_termio),sizeof(struct termios));
+        bcopy(&(test.com_termio),&(x->com_termio),sizeof(struct termios));
 #endif
     }
 
     x->rxerrors = 0; /* holds the rx line errors */
 
-    x->x_data_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_float);
-// for some unknown reason, outputting on this outlet causes segfaults...
-//  x->x_status_outlet = (t_outlet *)outlet_new(&x->x_obj, &s_float);
+    x->x_data_outlet = outlet_new(&x->x_obj, &s_float);
+    x->x_status_outlet = outlet_new(&x->x_obj, &s_float);
+    x->x_dsr_outlet = outlet_new(&x->x_obj, &s_float);
+    x->x_cts_outlet = outlet_new(&x->x_obj, &s_float);
 
     x->x_hit = 0;
     x->x_deltime = 1;
@@ -931,6 +1037,36 @@ static void comport_rtscts(t_comport *x,t_floatarg f)
         post("[comport] set rts-cts of %s to %f\n",x->serial_device->s_name,f);
 }
 
+static void comport_dtr(t_comport *x,t_floatarg f)
+{
+    f = set_dtr(x,f);
+
+    if(x->comhandle == INVALID_HANDLE_VALUE)return;
+
+    if(f < 0)
+    {
+        error("[comport] ** ERROR ** could not set dtr of device %s\n",
+            x->serial_device->s_name);
+    }
+    else if(x->verbose > 0)
+        post("[comport] set dtr of %s to %f\n",x->serial_device->s_name,f);
+}
+
+static void comport_rts(t_comport *x,t_floatarg f)
+{
+    f = set_rts(x,f);
+
+    if(x->comhandle == INVALID_HANDLE_VALUE)return;
+
+    if(f < 0)
+    {
+        error("[comport] ** ERROR ** could not set rts of device %s\n",
+            x->serial_device->s_name);
+    }
+    else if(x->verbose > 0)
+        post("[comport] set rts of %s to %f\n",x->serial_device->s_name,f);
+}
+
 static void comport_xonxoff(t_comport *x,t_floatarg f)
 {
     f = set_xonxoff(x,f);
@@ -951,6 +1087,9 @@ static void comport_close(t_comport *x)
     clock_unset(x->x_clock);
     x->x_hit = 1;
     x->comhandle = close_serial(x);
+    x->comport = -1; /* none */
+    if (x->x_status_outlet != NULL) outlet_float(x->x_status_outlet, (float)x->comport);
+    x->last_comport = x->comport;
 }
 
 static void comport_open(t_comport *x, t_floatarg f)
@@ -963,14 +1102,14 @@ static void comport_open(t_comport *x, t_floatarg f)
     clock_delay(x->x_clock, x->x_deltime);
 }
 
-/* 
-   dangerous but if you really have some stupid devicename ... 
+/*
+   dangerous but if you really have some stupid devicename ...
    you can open any file on systems if suid is set on pd be careful
 */
 
 static void comport_devicename(t_comport *x, t_symbol *s)
 {
-    x->serial_device = s;   
+    x->serial_device = s;
     x->comhandle = open_serial(9999,x);
 }
 
@@ -1014,6 +1153,8 @@ static void comport_help(t_comport *x)
         "   rtscts <0|1>    ... set rts/cts off|on\n"
         "   parity <0|1>    ... set parity off|on\n"
         "   xonxoff <0|1>   ... set xon/xoff off|on\n"
+        "   dtr <0|1>       ... set dtr off|on\n"
+        "   rts <0|1>       ... set rts off|on\n"
         "   close           ... close device\n"
         "   open <num>      ... open device number num\n"
         "   devicename <d>  ... set device name to s (eg. /dev/ttyS8)\n"
@@ -1024,25 +1165,24 @@ static void comport_help(t_comport *x)
 }
 
 /* ---------------- SETUP OBJECTS ------------------ */
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
 void comport_setup(void)
 {
     comport_class = class_new(gensym("comport"), (t_newmethod)comport_new,
-        (t_method)comport_free, sizeof(t_comport), 
+        (t_method)comport_free, sizeof(t_comport),
         0, A_DEFFLOAT, A_DEFFLOAT, 0);
 
     class_addfloat(comport_class, (t_method)comport_float);
 
     /*
         class_addbang(comport_class, comport_bang
-    */  
-    class_addmethod(comport_class, (t_method)comport_baud, gensym("baud"),A_FLOAT, 0); 
-  
+    */
+    class_addmethod(comport_class, (t_method)comport_baud, gensym("baud"),A_FLOAT, 0);
+
     class_addmethod(comport_class, (t_method)comport_bits, gensym("bits"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_stopbit, gensym("stopbit"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_rtscts, gensym("rtscts"), A_FLOAT, 0);
+    class_addmethod(comport_class, (t_method)comport_dtr, gensym("dtr"), A_FLOAT, 0);
+    class_addmethod(comport_class, (t_method)comport_rts, gensym("rts"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_parity, gensym("parity"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_xonxoff, gensym("xonxoff"), A_FLOAT, 0);
     class_addmethod(comport_class, (t_method)comport_close, gensym("close"), 0);
