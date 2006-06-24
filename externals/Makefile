@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = bsaylor buildsrc corelibs creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -250,6 +250,39 @@ template_clean:
 	-rm -f -- $(TEMPLATE_OBJECTS:.c=.o)
 	-rm -f -- $(externals_src)/template/*.bak
 	-rm -f -- $(externals_src)/template/*.*~
+
+
+#------------------------------------------------------------------------------#
+# BOIDS
+BOIDS_NAME=boids
+BOIDS_OBJECTS := $(wildcard $(externals_src)/boids/boids*/*.c)
+boids: $(BOIDS_OBJECTS:.c=.$(EXTENSION))
+
+boids_install: boids
+	install -d $(objectsdir)/$(BOIDS_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(BOIDS_NAME) \
+		--author "Eric Singer, A. Sier, and Jasch" \
+		--description "2D and 3D boids flocking algorithm" \
+		--license "GNU GPL 2" \
+		--version ""
+	install -p $(BOIDS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(BOIDS_NAME)
+	install -d $(helpdir)/$(BOIDS_NAME)
+	install -p $(externals_src)/boids/boids*/*-help.pd \
+		$(helpdir)/$(BOIDS_NAME)
+#	install -d $(manualsdir)/$(BOIDS_NAME)
+#	install -p $(externals_src)/boids/manual.txt \
+#		$(manualsdir)/$(BOIDS_NAME)
+	install -p $(externals_src)/boids/boids.readme.txt \
+		$(readmesdir)/$(BOIDS_NAME).txt
+#	install -d $(examplesdir)/$(BOIDS_NAME)
+#	install -p $(externals_src)/boids/examples/*.pd \
+#		$(examplesdir)/$(BOIDS_NAME)
+
+boids_clean:
+	-rm -f -- $(BOIDS_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(BOIDS_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/boids/*/*.bak
+	-rm -f -- $(externals_src)/boids/*/*.*~
 
 
 #------------------------------------------------------------------------------#
