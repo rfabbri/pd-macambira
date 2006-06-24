@@ -29,8 +29,6 @@
 /* Gang Of Four -- Guns Before Butter                                           */
 /* ---------------------------------------------------------------------------- */  
 
-#ifndef _WIN32 /* this object doesn't compile on Windows because of alphasort() */
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -44,15 +42,11 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#ifdef _WIN32
+#ifdef NT
 #include <io.h>
-#include <pthread.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
-#endif
-
-#ifndef _MSC_VER
 #include <dirent.h>
 #endif
 
@@ -269,6 +263,7 @@ static void playlist_output_current(t_playlist* x)
        outlet_symbol( x->x_dir, gensym( x->x_curdir ) );
        outlet_symbol( x->x_file, gensym( x->x_dentries[x->x_itemselected] ) );
        outlet_symbol( x->x_fullpath, gensym( tmpstring ) );
+       freebytes( tmpstring, strlen( x->x_curdir ) + strlen( x->x_dentries[x->x_itemselected]) + 2 ); 
     }
 }             
 
@@ -291,7 +286,7 @@ static void playlist_font(t_playlist* x, t_symbol *fname, t_symbol *fcase, t_flo
        post( "playlist : wrong font size in font message : %d", (t_int)fsize );
        return;
     }
-    sprintf( x->x_font, "{%s %d %s}", fname->s_name, (t_int)fsize, fcase->s_name );
+    sprintf( x->x_font, "{%s %d %s}", fname->s_name, (int)fsize, fcase->s_name );
     x->x_charheight = (t_int)fsize;
     x->x_charwidth = (2*x->x_charheight)/3;
     post( "playlist : setting font to : %s", x->x_font );
@@ -662,7 +657,7 @@ static void playlist_properties(t_gobj *z, t_glist *owner)
  t_playlist *x=(t_playlist *)z;
 
    sprintf(buf, "pdtk_playlist_dialog %%s %s %d %d %s %s %s %s %s\n",
-            x->x_extension, x->x_width, x->x_height, 
+            x->x_extension, (int)x->x_width, (int)x->x_height, 
             x->x_font, x->x_bgcolor, x->x_sbcolor,
             x->x_fgcolor, x->x_secolor );
    // post("playlist_properties : %s", buf );
@@ -691,7 +686,7 @@ static void playlist_dialog(t_playlist *x, t_symbol *s, int argc, t_atom *argv)
    x->x_width = (int)argv[1].a_w.w_float;
    x->x_height = (int)argv[2].a_w.w_float;
    sprintf( x->x_font, "{%s %d %s}", argv[3].a_w.w_symbol->s_name, 
-                       (t_int)argv[4].a_w.w_float, argv[5].a_w.w_symbol->s_name );
+                       (int)argv[4].a_w.w_float, argv[5].a_w.w_symbol->s_name );
    x->x_charheight = (t_int)argv[4].a_w.w_float;
    strcpy( x->x_bgcolor, argv[6].a_w.w_symbol->s_name );
    strcpy( x->x_sbcolor, argv[7].a_w.w_symbol->s_name );
@@ -799,7 +794,7 @@ static t_playlist *playlist_new(t_symbol *s, int argc, t_atom *argv )
       {
         x->x_charheight = (t_int)argv[4].a_w.w_float;
         sprintf( x->x_font, "%s %d %s", argv[3].a_w.w_symbol->s_name, 
-                           x->x_charheight, argv[5].a_w.w_symbol->s_name );
+                           (int)x->x_charheight, argv[5].a_w.w_symbol->s_name );
         argoffset=0;
       }
       post( "playlist : font : %s, size : %d", x->x_font, x->x_charheight );
@@ -1023,5 +1018,3 @@ void playlist_setup(void)
     class_setwidget(playlist_class, &playlist_widgetbehavior);
     class_sethelpsymbol(playlist_class, gensym("playlist.pd"));
 }
-
-#endif /* not _WIN32 */
