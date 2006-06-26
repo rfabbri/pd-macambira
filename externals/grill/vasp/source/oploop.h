@@ -2,7 +2,7 @@
 
 VASP modular - vector assembling signal processor / objects for Max/MSP and PD
 
-Copyright (c) 2002 Thomas Grill (xovo@gmx.net)
+Copyright (c) 2002-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -16,20 +16,13 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #define _D_MIN(a,b) ((a) < (b)?(a):(b))
 
 #ifdef FLEXT_THREADS
-/*
+
     #define _D_LOOP(VAR,LEN) { \
-	    register I __i__; \
-	    for(__i__ = 0; __i__ < LEN; flext_base::ThrYield()) { \
-	    I __m__ = _D_MIN(LEN,__i__+_D_BLOCK); for(; (VAR = __i__) < __m__; ++__i__) {
+	    for(register int __i__ = 0; __i__ < LEN; flext_base::ThrYield()) { \
+	    register const I __m__ = _D_MIN(LEN,__i__+_D_BLOCK); \
+        for(; __i__ < __m__; ++__i__) { VAR = __i__; 
 
     #define _E_LOOP	} if(__i__ < __m__) break; }}
-*/
-    #define _D_LOOP(VAR,LEN) { \
-	    for(VAR = 0; VAR < LEN; flext_base::ThrYield()) { \
-	    register const I __m__ = _D_MIN(LEN,VAR+_D_BLOCK); \
-        for(; VAR < __m__; ++VAR) {
-
-    #define _E_LOOP	}}}
 
     #define _D_WHILE(COND) { \
 	    for(; (COND) ; flext_base::ThrYield()) { \
