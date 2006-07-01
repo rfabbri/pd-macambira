@@ -1,5 +1,5 @@
-#N canvas 36 61 829 548 12;
-#N canvas 71 10 558 565 examples 0;
+#N canvas 50 60 833 552 12;
+#N canvas 71 10 562 569 examples 0;
 #X floatatom 148 239 5 0 0 0 - - -;
 #X floatatom 105 304 5 0 0 0 - - -;
 #X floatatom 113 501 5 0 0 0 - - -;
@@ -71,42 +71,40 @@ conn a 0 0;
 #X text 187 98 reload all objects (keep connections);
 #X msg 127 98 reload;
 #X text 218 432 (connections are not drawn at the moment!);
-#N canvas 178 192 582 438 dsp-ex 0;
-#X obj 73 380 dac~;
-#X obj 183 257 hsl 128 15 0 1000 0 0 empty empty empty -2 -6 0 8 -261681
--1 -1 0 1;
-#X obj 194 282 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -262144 -1 -1 0 256;
-#X msg 66 78 reset;
-#X obj 467 323 loadbang;
-#X msg 466 347 \; pd dsp 1;
-#X text 65 56 clear all;
-#X obj 47 278 dyn~ 0 1 2 0;
-#X text 70 107 make an oscillator (left);
-#X text 66 167 add an oscillator (double frq \, right);
-#X text 24 17 signals passing through dyn~ are delayed by one block
-;
-#X text 74 239 select frequency;
-#X obj 57 341 *~ 0.2;
-#X obj 141 340 *~ 0.2;
-#X obj 179 313 hsl 128 15 0.001 1 1 0 empty empty empty -2 -6 0 8 -262131
--1 -1 0 1;
-#X text 316 309 gain;
-#X msg 64 129 newobj . o1 osc~ 220 \, conn 0 o1 0 \, conn o1 0 0;
-#X msg 67 187 newobj . m * 1.5 \, newobj . o2 osc~ 330 \, conn 0 m
+#N canvas 178 192 594 450 dsp-ex 0;
+#X obj 63 357 dac~;
+#X obj 173 234 hsl 128 15 0 1000 0 0 empty empty empty -2 -6 0 8 -261681
+-1 -1 2800 1;
+#X obj 184 259 nbx 5 14 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -262144 -1 -1 220.472 256;
+#X msg 56 55 reset;
+#X obj 457 300 loadbang;
+#X msg 456 324 \; pd dsp 1;
+#X text 55 33 clear all;
+#X obj 37 255 dyn~ 0 1 2 0;
+#X text 60 84 make an oscillator (left);
+#X text 56 144 add an oscillator (double frq \, right);
+#X text 64 216 select frequency;
+#X obj 47 318 *~ 0.2;
+#X obj 131 317 *~ 0.2;
+#X obj 169 290 hsl 128 15 0.001 1 1 0 empty empty empty -2 -6 0 8 -262131
+-1 -1 3300 1;
+#X text 306 286 gain;
+#X msg 54 106 newobj . o1 osc~ 220 \, conn 0 o1 0 \, conn o1 0 0;
+#X msg 57 164 newobj . m * 1.5 \, newobj . o2 osc~ 330 \, conn 0 m
 0 \, conn m 0 o2 0 \, conn o2 0 1;
 #X connect 1 0 2 0;
 #X connect 1 0 7 1;
 #X connect 3 0 7 0;
 #X connect 4 0 5 0;
-#X connect 7 0 12 0;
-#X connect 7 1 13 0;
-#X connect 12 0 0 0;
-#X connect 13 0 0 1;
-#X connect 14 0 12 1;
-#X connect 14 0 13 1;
+#X connect 7 0 11 0;
+#X connect 7 1 12 0;
+#X connect 11 0 0 0;
+#X connect 12 0 0 1;
+#X connect 13 0 11 1;
+#X connect 13 0 12 1;
+#X connect 15 0 7 0;
 #X connect 16 0 7 0;
-#X connect 17 0 7 0;
 #X restore 514 487 pd dsp-ex;
 #X msg 129 156 newmsg . b Hello;
 #X msg 128 124 newobj . a + 1;
@@ -118,10 +116,8 @@ patcher;
 #X text 273 200 make sub patcher;
 #X msg 432 198 newobj c d bang;
 #X text 561 198 make object in sub patcher;
-#X text 133 12 dynamic object management \, (C)2003-2005 Thomas Grill
-;
 #X text 133 30 http://grrrr.org/ext;
-#N canvas 132 483 562 540 proxies 0;
+#N canvas 132 483 566 544 proxies 0;
 #X text 25 78 Instead you have to create a "real" object that;
 #X text 24 94 gets the message and passes it along to the abstraction.
 ;
@@ -155,6 +151,8 @@ in it;
 #X connect 16 0 6 0;
 #X restore 626 469 pd proxies;
 #X msg 128 387 send a message 1;
+#X text 133 12 dynamic object management \, (C)2003-2006 Thomas Grill
+;
 #X connect 1 0 13 0;
 #X connect 3 0 13 0;
 #X connect 5 0 13 0;
@@ -168,4 +166,4 @@ in it;
 #X connect 25 0 13 0;
 #X connect 28 0 13 0;
 #X connect 30 0 13 0;
-#X connect 35 0 13 0;
+#X connect 34 0 13 0;

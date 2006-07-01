@@ -121,7 +121,6 @@ protected:
 
     virtual bool CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv);
 	virtual bool CbDsp();
-	virtual void CbSignal();
 
 
 	// proxy object
@@ -130,15 +129,33 @@ protected:
 	public:
 		t_object obj;
 		dyn *th;
-		int n;
-		t_sample *buf;
-		t_sample defsig;
 
 		void init(dyn *t)
         { 
 	        th = t; 
-	        n = 0,buf = NULL;
+        }
+	};
+
+	// proxy object
+	class sigproxy
+        : public proxy
+	{ 
+	public:
+		t_sample defsig;
+		int n;
+		t_sample *vec;
+
+		void init(dyn *t)
+        { 
+            proxy::init(t); 
 	        defsig = 0;
+	        n = 0,vec = NULL;
+        }
+
+        void set(int n,t_sample *vec)
+        {
+            this->n = n;
+            this->vec = vec;
         }
 	};
 
@@ -147,21 +164,35 @@ protected:
 		public proxy
 	{ 
 	public:
-		t_outlet *outlet;
+		void init(dyn *t)
+        { 
+	        proxy::init(t);
+	        outlet_new(&obj,&s_anything); 
+        }
 
 		void Message(const t_symbol *s,int argc,const t_atom *argv) 
 		{
-			typedmess((t_pd *)&obj,(t_symbol *)s,argc,(t_atom *)argv);
+			outlet_anything(obj.te_outlet,(t_symbol *)s,argc,(t_atom *)argv);
 		}
-
-		void init(dyn *t,bool s);
 
 		static void px_method(proxyin *obj,const t_symbol *s,int argc,const t_atom *argv)
 		{
-			outlet_anything(obj->outlet,(t_symbol *)s,argc,(t_atom *)argv);
+			obj->Message(s,argc,argv);
 		}
+	};
 
-		static void dsp(proxyin *x, t_signal **sp);
+	// proxy for inbound signals
+	class sigproxyin:
+		public sigproxy
+	{ 
+	public:
+		void init(dyn *t)
+        { 
+	        sigproxy::init(t);
+	        outlet_new(&obj,&s_signal); 
+        }
+
+		static void dsp(sigproxyin *x, t_signal **sp);
 	};
 
 
@@ -170,30 +201,49 @@ protected:
 		public proxy
 	{ 
 	public:
-		int outlet;
-
-		void init(dyn *t,int o,bool s);
+		void init(dyn *t,int o)
+        { 
+	        proxy::init(t);
+	        outlet = o;
+        }
 
 		static void px_method(proxyout *obj,const t_symbol *s,int argc,const t_atom *argv)
 		{
 			obj->th->ToOutAnything(obj->outlet,s,argc,argv);
 		}
 
-		static void dsp(proxyout *x, t_signal **sp);
+    protected:
+		int outlet;
+	};
+
+	// proxy for outbound messages
+	class sigproxyout:
+		public sigproxy
+	{ 
+	public:
+		void init(dyn *t)
+        { 
+	        sigproxy::init(t);
+	        outlet_new(&obj,&s_signal); 
+        }
+
+		static void dsp(sigproxyout *x, t_signal **sp);
 	};
 
 	static t_class *pxin_class,*pxout_class;
 	static t_class *pxins_class,*pxouts_class;
 
-	proxyin **pxin;
-	proxyout **pxout;
+    int s_inlets,m_inlets,s_outlets,m_outlets;
+    sigproxyin **pxsin;
+	proxyin **pxmin;
+	sigproxyout **pxsout;
+	proxyout **pxmout;
 
     static t_object *pxin_new() { return (t_object *)pd_new(pxin_class); }
     static t_object *pxins_new() { return (t_object *)pd_new(pxins_class); }
     static t_object *pxout_new() { return (t_object *)pd_new(pxout_class); }
     static t_object *pxouts_new() { return (t_object *)pd_new(pxouts_class); }
 
-    int m_inlets,s_inlets,m_outlets,s_outlets;
 	t_canvas *canvas;
     bool stripext,canvasmsg,symreuse;
 
@@ -261,18 +311,18 @@ void dyn::setup(t_classid c)
 	add_anything(pxin_class,proxyin::px_method); 
 
 	// set up proxy class for inbound signals
-	pxins_class = class_new(const_cast<t_symbol *>(sym_dynsin),(t_newmethod)pxins_new,NULL,sizeof(proxyin),0, A_NULL);
-    add_dsp(pxins_class,proxyin::dsp);
-    CLASS_MAINSIGNALIN(pxins_class, proxyin, defsig);
+	pxins_class = class_new(const_cast<t_symbol *>(sym_dynsin),(t_newmethod)pxins_new,NULL,sizeof(sigproxyin),0, A_NULL);
+    add_dsp(pxins_class,sigproxyin::dsp);
+    CLASS_MAINSIGNALIN(pxins_class, sigproxyin, defsig);
 
 	// set up proxy class for outbound messages
 	pxout_class = class_new(const_cast<t_symbol *>(sym_dynout),(t_newmethod)pxout_new,NULL,sizeof(proxyout),0, A_NULL);
 	add_anything(pxout_class,proxyout::px_method); 
 
 	// set up proxy class for outbound signals
-	pxouts_class = class_new(const_cast<t_symbol *>(sym_dynsout),(t_newmethod)pxouts_new,NULL,sizeof(proxyout),0, A_NULL);
-	add_dsp(pxouts_class,proxyout::dsp);
-    CLASS_MAINSIGNALIN(pxouts_class, proxyout, defsig);
+	pxouts_class = class_new(const_cast<t_symbol *>(sym_dynsout),(t_newmethod)pxouts_new,NULL,sizeof(sigproxyout),0, A_NULL);
+	add_dsp(pxouts_class,sigproxyout::dsp);
+    CLASS_MAINSIGNALIN(pxouts_class, sigproxyout, defsig);
 
 	// set up dyn~
 	FLEXT_CADDMETHOD_(c,0,"reset",m_reset);
@@ -335,7 +385,7 @@ In all cases the 1)s have been chosen as the cleaner solution
 
 dyn::dyn(int argc,const t_atom *argv):
 	canvas(NULL),
-	pxin(NULL),pxout(NULL),
+	pxsin(NULL),pxmin(NULL),pxsout(NULL),pxmout(NULL),
     stripext(false),symreuse(true),canvasmsg(false)
 {
 	if(argc < 4) { 
@@ -403,20 +453,27 @@ void dyn::NewProxies()
 {
 	// --- create inlet proxies ------
     int i;
-	pxin = new proxyin *[s_inlets+m_inlets];
+	if(s_inlets) pxsin = new sigproxyin *[s_inlets];
+	if(m_inlets) pxmin = new proxyin *[m_inlets];
 	for(i = 0; i < s_inlets+m_inlets; ++i) {
-		bool sig = i < s_inlets;
-
         t_atom lst[5];
         SetInt(lst[0],i*100);
         SetInt(lst[1],10);
         SetSymbol(lst[2],sym_dot);
         SetSymbol(lst[3],sym__);
-        SetSymbol(lst[4],sig?sym_dynsin:sym_dynin);
 
         try {
-            pxin[i] = (proxyin *)New(k_obj,5,lst,false);
-		    if(pxin[i]) pxin[i]->init(this,sig);
+            if(i < s_inlets) {
+                SetSymbol(lst[4],sym_dynsin);
+                pxsin[i] = (sigproxyin *)New(k_obj,5,lst,false);
+		        if(pxsin[i]) pxsin[i]->init(this);
+            }
+            else {
+                int j = i-s_inlets;
+                SetSymbol(lst[4],sym_dynin);
+                pxmin[j] = (proxyin *)New(k_obj,5,lst,false);
+		        if(pxmin[j]) pxmin[j]->init(this);
+            }
         }
         catch(...) {
             error("%s - Error creating inlet proxy",thisName());
@@ -425,20 +482,27 @@ void dyn::NewProxies()
 
 	// --- create outlet proxies ------
 
-	pxout = new proxyout *[s_outlets+m_outlets];
+	if(s_outlets) pxsout = new sigproxyout *[s_outlets];
+	if(m_outlets) pxmout = new proxyout *[m_outlets];
 	for(i = 0; i < s_outlets+m_outlets; ++i) {
-		bool sig = i < s_outlets;
-
         t_atom lst[5];
         SetInt(lst[0],i*100);
         SetInt(lst[1],500);
         SetSymbol(lst[2],sym_dot);
         SetSymbol(lst[3],sym__);
-        SetSymbol(lst[4],sig?sym_dynsout:sym_dynout);
 
         try {
-            pxout[i] = (proxyout *)New(k_obj,5,lst,false);
-            if(pxout[i]) pxout[i]->init(this,i,sig);
+            if(i < s_outlets) {
+                SetSymbol(lst[4],sym_dynsout);
+                pxsout[i] = (sigproxyout *)New(k_obj,5,lst,false);
+                if(pxsout[i]) pxsout[i]->init(this);
+            }
+            else {
+                int j = i-s_outlets;
+                SetSymbol(lst[4],sym_dynout);
+                pxmout[j] = (proxyout *)New(k_obj,5,lst,false);
+                if(pxmout[j]) pxmout[j]->init(this,i);
+            }
         }
         catch(...) {
             error("%s - Error creating outlet proxy",thisName());
@@ -449,13 +513,21 @@ void dyn::NewProxies()
 void dyn::DelProxies()
 {
     int i;
-    if(pxin) {
-	    for(i = 0; i < s_inlets+m_inlets; ++i) glist_delete(canvas,(t_gobj *)pxin[i]);
-	    delete[] pxin;
+    if(pxsin) {
+	    for(i = 0; i < s_inlets; ++i) glist_delete(canvas,(t_gobj *)pxsin[i]);
+	    delete[] pxsin; pxsin = NULL;
     }
-    if(pxout) {
-	    for(i = 0; i < s_outlets+m_outlets; ++i) glist_delete(canvas,(t_gobj *)pxout[i]);
-	    delete[] pxout;
+    if(pxmin) {
+	    for(i = 0; i < m_inlets; ++i) glist_delete(canvas,(t_gobj *)pxmin[i]);
+	    delete[] pxmin; pxmin = NULL;
+    }
+    if(pxsout) {
+	    for(i = 0; i < s_outlets; ++i) glist_delete(canvas,(t_gobj *)pxsout[i]);
+	    delete[] pxsout; pxsout = NULL;
+    }
+    if(pxmout) {
+	    for(i = 0; i < m_outlets; ++i) glist_delete(canvas,(t_gobj *)pxmout[i]);
+	    delete[] pxmout; pxmout = NULL;
     }
 }
 
@@ -730,14 +802,14 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 		d_x = GetAInt(argv[2]);
 	}
 	else if(argc == 2 && CanbeInt(argv[0]) && CanbeInt(argv[1])) {
-		// direct connection from proxy-in to proxy-out (for testing above all....)
+		// direct connection from proxy-in to proxy-out
 		s_n = NULL;
 		s_x = GetAInt(argv[0]);
 		d_n = NULL;
 		d_x = GetAInt(argv[1]);
 	}
 	else {
-		post("%s - connect: [src] srcslot [dst] dstslot",thisName());
+		post("%s - connect: [src-name] src-slot [dst-name] dst-slot",thisName());
 		return;
 	}
 
@@ -757,7 +829,7 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 		return;
 	}
 	else {
-		s_obj = &pxin[s_x]->obj;
+        s_obj = s_x < s_inlets?&pxsin[s_x]->obj:&pxmin[s_x-s_inlets]->obj;
         s_cnv = canvas;
 		s_x = 0; // always 0 for proxy
 	}
@@ -776,7 +848,7 @@ void dyn::ConnDis(bool conn,int argc,const t_atom *argv)
 		return;
 	}
 	else  {
-		d_obj = &pxout[d_x]->obj;
+        d_obj = d_x < s_outlets?&pxsout[d_x]->obj:&pxmout[d_x-s_outlets]->obj;
         d_cnv = canvas;
 		d_x = 0; // always 0 for proxy
 	}
@@ -818,7 +890,10 @@ bool dyn::CbMethodResort(int n,const t_symbol *s,int argc,const t_atom *argv)
 		return flext_base::m_method_(n,s,argc,argv);
 	else {
 		// all other messages are forwarded to proxies (and connected objects)
-		pxin[n-1]->Message(s,argc,argv);
+        if(n >= s_inlets)
+    		pxmin[n-s_inlets-1]->Message(s,argc,argv);
+        else
+            post("%s - message to signal inlet",thisName());
 		return true;
 	}
 }
@@ -843,56 +918,37 @@ void dyn::m_send(int argc,const t_atom *argv)
 	}
 }
 
-void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
+void dyn::sigproxyin::dsp(sigproxyin *x,t_signal **sp)
 {
-    FLEXT_ASSERT(x->buf && x->n);
+    FLEXT_ASSERT(x->vec && x->n);
 	int n = sp[0]->s_n;
 	if(n != x->n) {
         post("dyn~ proxyin - blocksize doesn't match!");
 	}
     else
-	    dsp_add_copy(x->buf,sp[0]->s_vec,n);
+	    dsp_add_copy(x->vec,sp[0]->s_vec,n);
 }
 
-void dyn::proxyin::init(dyn *t,bool s) 
-{ 
-	proxy::init(t);
-	outlet = outlet_new(&obj,s?&s_signal:&s_anything); 
-}
-
-
-
-	
-void dyn::proxyout::dsp(proxyout *x,t_signal **sp)
+void dyn::sigproxyout::dsp(sigproxyout *x,t_signal **sp)
 {
-    FLEXT_ASSERT(x->buf && x->n);
+    FLEXT_ASSERT(x->vec && x->n);
 	int n = sp[0]->s_n;
 	if(n != x->n) {
         post("dyn~ proxyout - blocksize doesn't match!");
 	}
     else
-	    dsp_add_copy(sp[0]->s_vec,x->buf,n);
+	    dsp_add_copy(sp[0]->s_vec,x->vec,n);
 }
-
-void dyn::proxyout::init(dyn *t,int o,bool s) 
-{ 
-	proxy::init(t);
-	outlet = o;
-	if(s) outlet_new(&obj,&s_signal); 
-}
-
 
 bool dyn::CbDsp()
 {
     int n = Blocksize();
     t_sample *const *in = InSig(),*const *out = OutSig();
 	int i;
-	for(i = 0; i < s_inlets; ++i) pxin[i]->buf = in[i+1],pxin[i]->n = n;
-	for(i = 0; i < s_outlets; ++i) pxout[i]->buf = out[i],pxout[i]->n = n;
+	for(i = 0; i < s_inlets; ++i) pxsin[i]->set(n,in[i+1]);
+	for(i = 0; i < s_outlets; ++i) pxsout[i]->set(n,out[i]);
 
     // add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
     mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
-    return true;
+    return false;
 }
-    
-void dyn::CbSignal() {}
