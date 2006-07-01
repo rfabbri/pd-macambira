@@ -28,6 +28,9 @@ BUGS:
 CHANGES:
 --------
 
+0.1.2:
+- optimized DSP path (less copying, no block delay)
+
 0.1.1:
 - using aligned memory
 - cached several symbols
@@ -66,3 +69,5 @@ CHANGES:
 TODO:
 --------
 - add mute attribute
+- separate message and signal proxy objects to save memory
+

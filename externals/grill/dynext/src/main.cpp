@@ -2,7 +2,7 @@
 
 dyn~ - dynamical object management for PD
 
-Copyright (c)2003-2005 Thomas Grill (gr@grrrr.org)
+Copyright (c)2003-2006 Thomas Grill (gr@grrrr.org)
 For information on usage and redistribution, and for a DISCLAIMER OF ALL
 WARRANTIES, see the file, "license.txt," in this distribution.  
 
@@ -19,7 +19,7 @@ WARRANTIES, see the file, "license.txt," in this distribution.
 #error You need at least flext version 0.5.0
 #endif
 
-#define DYN_VERSION "0.1.1"
+#define DYN_VERSION "0.1.2"
 
 
 #if FLEXT_SYS != FLEXT_SYS_PD
@@ -45,7 +45,7 @@ public:
 	dyn(int argc,const t_atom *argv);
 	virtual ~dyn();
 
-    void m_reset() { DoExit(); DoInit(); }
+    void m_reset();
 	void m_reload(); // refresh objects/abstractions
 	void m_newobj(int argc,const t_atom *argv);
 	void m_newmsg(int argc,const t_atom *argv);
@@ -140,8 +140,6 @@ protected:
 	        n = 0,buf = NULL;
 	        defsig = 0;
         }
-
-        static void px_exit(proxy *px) { if(px->buf) FreeAligned(px->buf); }
 	};
 
 	// proxy for inbound messages
@@ -247,7 +245,7 @@ const t_symbol *dyn::sym_pop = NULL;
 void dyn::setup(t_classid c)
 {
 	post("");
-	post("dyn~ %s - dynamic object management, (C)2003-2005 Thomas Grill",DYN_VERSION);
+	post("dyn~ %s - dynamic object management, (C)2003-2006 Thomas Grill",DYN_VERSION);
 	post("");
 
     sym_dynsin = MakeSymbol("dyn_in~");
@@ -259,20 +257,20 @@ void dyn::setup(t_classid c)
     sym_dyncanvas = MakeSymbol(" dyn~-canvas ");
 
 	// set up proxy class for inbound messages
-    pxin_class = class_new(const_cast<t_symbol *>(sym_dynin),(t_newmethod)pxin_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
+    pxin_class = class_new(const_cast<t_symbol *>(sym_dynin),(t_newmethod)pxin_new,NULL,sizeof(proxyin),0, A_NULL);
 	add_anything(pxin_class,proxyin::px_method); 
 
 	// set up proxy class for inbound signals
-	pxins_class = class_new(const_cast<t_symbol *>(sym_dynsin),(t_newmethod)pxins_new,(t_method)proxy::px_exit,sizeof(proxyin),0, A_NULL);
+	pxins_class = class_new(const_cast<t_symbol *>(sym_dynsin),(t_newmethod)pxins_new,NULL,sizeof(proxyin),0, A_NULL);
     add_dsp(pxins_class,proxyin::dsp);
     CLASS_MAINSIGNALIN(pxins_class, proxyin, defsig);
 
 	// set up proxy class for outbound messages
-	pxout_class = class_new(const_cast<t_symbol *>(sym_dynout),(t_newmethod)pxout_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
+	pxout_class = class_new(const_cast<t_symbol *>(sym_dynout),(t_newmethod)pxout_new,NULL,sizeof(proxyout),0, A_NULL);
 	add_anything(pxout_class,proxyout::px_method); 
 
 	// set up proxy class for outbound signals
-	pxouts_class = class_new(const_cast<t_symbol *>(sym_dynsout),(t_newmethod)pxouts_new,(t_method)proxy::px_exit,sizeof(proxyout),0, A_NULL);
+	pxouts_class = class_new(const_cast<t_symbol *>(sym_dynsout),(t_newmethod)pxouts_new,NULL,sizeof(proxyout),0, A_NULL);
 	add_dsp(pxouts_class,proxyout::dsp);
     CLASS_MAINSIGNALIN(pxouts_class, proxyout, defsig);
 
@@ -651,6 +649,14 @@ t_gobj *dyn::New(const t_symbol *kind,int _argc_,const t_atom *_argv_,bool add)
     return newest;
 }
 
+void dyn::m_reset() 
+{ 
+    int dsp = canvas_suspend_dsp(); 
+    DoExit(); 
+    DoInit(); 
+    canvas_resume_dsp(dsp); 
+}
+
 void dyn::m_reload()
 {
 	post("%s - reload: not implemented yet",thisName());
@@ -837,16 +843,15 @@ void dyn::m_send(int argc,const t_atom *argv)
 	}
 }
 
-
 void dyn::proxyin::dsp(proxyin *x,t_signal **sp)
 {
+    FLEXT_ASSERT(x->buf && x->n);
 	int n = sp[0]->s_n;
 	if(n != x->n) {
-		// if vector size has changed make new buffer
-		if(x->buf) FreeAligned(x->buf);
-		x->buf = (t_sample *)NewAligned(sizeof(t_sample)*(x->n = n));
+        post("dyn~ proxyin - blocksize doesn't match!");
 	}
-	dsp_add_copy(x->buf,sp[0]->s_vec,n);
+    else
+	    dsp_add_copy(x->buf,sp[0]->s_vec,n);
 }
 
 void dyn::proxyin::init(dyn *t,bool s) 
@@ -860,13 +865,13 @@ void dyn::proxyin::init(dyn *t,bool s)
 	
 void dyn::proxyout::dsp(proxyout *x,t_signal **sp)
 {
+    FLEXT_ASSERT(x->buf && x->n);
 	int n = sp[0]->s_n;
 	if(n != x->n) {
-		// if vector size has changed make new buffer
-		if(x->buf) FreeAligned(x->buf);
-		x->buf = (t_sample *)NewAligned(sizeof(t_sample)*(x->n = n));
+        post("dyn~ proxyout - blocksize doesn't match!");
 	}
-	dsp_add_copy(sp[0]->s_vec,x->buf,n);
+    else
+	    dsp_add_copy(sp[0]->s_vec,x->buf,n);
 }
 
 void dyn::proxyout::init(dyn *t,int o,bool s) 
@@ -879,20 +884,15 @@ void dyn::proxyout::init(dyn *t,int o,bool s)
 
 bool dyn::CbDsp()
 {
-	// add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
+    int n = Blocksize();
+    t_sample *const *in = InSig(),*const *out = OutSig();
+	int i;
+	for(i = 0; i < s_inlets; ++i) pxin[i]->buf = in[i+1],pxin[i]->n = n;
+	for(i = 0; i < s_outlets; ++i) pxout[i]->buf = out[i],pxout[i]->n = n;
+
+    // add sub canvas to dsp list (no signal vector to borrow from .. set it to NULL)
     mess1((t_pd *)canvas,const_cast<t_symbol *>(sym_dsp),NULL);
     return true;
 }
     
-void dyn::CbSignal()
-{
-	int i,n = Blocksize();
-    t_sample *const *in = InSig(),*const *out = OutSig();
-	for(i = 0; i < s_inlets; ++i)
-		if(pxin[i]->buf)
-		    CopySamples(pxin[i]->buf,in[i+1],n);
-
-	for(i = 0; i < s_outlets; ++i)
-		if(pxout[i]->buf)
-		    CopySamples(out[i],pxout[i]->buf,n);
-}
+void dyn::CbSignal() {}
