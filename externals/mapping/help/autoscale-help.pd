@@ -1,15 +1,14 @@
-#N canvas 229 80 468 541 10;
+#N canvas 229 80 464 532 10;
 #X floatatom 26 76 5 0 0 0 - - -;
 #X floatatom 26 140 0 0 0 0 - - -;
-#X obj 68 258 autoscale;
 #X obj 2 -10 cnv 15 450 20 empty empty [autoscale] 2 11 1 18 -233017
 -66577 0;
 #X text 18 23 [autoscale] scales a stream of numbers based on an output
 range set as arguments \, and an input range which is set dynamically.
 ;
-#X floatatom 68 237 5 0 0 0 - - -;
-#X obj 71 281 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 17 1;
+#X floatatom 177 244 5 0 0 1 min - -;
+#X obj 161 301 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 0 1;
 #X text 17 441 (C) Copyright 2004 Hans-Christoph Steiner <hans@at.or.at>
 ;
 #X text 234 455 released under the GNU GPL;
@@ -17,28 +16,37 @@ range set as arguments \, and an input range which is set dynamically.
 #X floatatom 297 140 0 0 0 0 - - -;
 #X obj 213 71 hsl 128 15 0 127 0 0 empty empty empty -2 -6 0 8 -262144
 -1 -1 0 1;
-#X text 17 474 $Revision: 1.2 $$Date: 2006-01-29 08:12:33 $;
+#X text 17 474 $Revision: 1.3 $$Date: 2006-07-07 04:08:55 $;
 #X text 18 487 $Author: eighthave $;
-#X text 25 324 The [reset( message resets the stored max and min to
-zero.;
-#X floatatom 46 348 5 0 0 0 - - -;
-#X obj 71 401 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
--1 -1 0 1;
-#X msg 96 346 reset;
-#X obj 150 110 autoscale -0.01 0.01;
-#X obj 297 110 autoscale -4095 4095;
-#X obj 68 378 autoscale;
+#X floatatom 136 363 5 0 0 0 - - -;
+#X obj 161 416 hsl 128 15 0 1 0 0 empty empty empty -2 -6 0 8 -262144
+-1 -1 12700 1;
+#X msg 186 361 reset;
 #X text 13 181 If you use [autoscale] with no arguments \, then the
 output range defaults to 0-1.;
+#X text 25 329 The [reset( message or banging the 4th inlet resets
+the stored max and min to zero.;
+#X msg 239 361 bang;
 #X obj 26 110 autoscale;
-#X connect 0 0 22 0;
-#X connect 2 0 6 0;
-#X connect 5 0 2 0;
-#X connect 11 0 18 0;
-#X connect 11 0 19 0;
+#X obj 158 393 autoscale;
+#X obj 158 278 autoscale;
+#X obj 150 110 autoscale -0.01 0.01;
+#X obj 297 110 autoscale -4095 4095;
+#X text 14 211 You can also set the output min and max using the 2nd
+and 3rd inlets:;
+#X floatatom 195 260 5 0 0 1 max - -;
+#X floatatom 117 250 5 0 0 0 - - -;
+#X connect 0 0 19 0;
+#X connect 4 0 21 1;
+#X connect 10 0 22 0;
+#X connect 10 0 23 0;
+#X connect 13 0 20 0;
 #X connect 15 0 20 0;
-#X connect 17 0 20 0;
-#X connect 18 0 9 0;
-#X connect 19 0 10 0;
-#X connect 20 0 16 0;
-#X connect 22 0 1 0;
+#X connect 18 0 20 3;
+#X connect 19 0 1 0;
+#X connect 20 0 14 0;
+#X connect 21 0 5 0;
+#X connect 22 0 8 0;
+#X connect 23 0 9 0;
+#X connect 25 0 21 2;
+#X connect 26 0 21 0;
