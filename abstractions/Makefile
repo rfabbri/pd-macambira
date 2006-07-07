@@ -262,6 +262,9 @@ pixeltango_clean:
 PUREPD_NAME = purepd
 purepd_install:
 	install -d $(objectsdir)/$(PUREPD_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PUREPD_NAME) \
+		--license "GNU GPL" \
+		--description "existing objects reimplemented in Pd"
 	install -p $(abstractions_src)/purepd/*.pd \
 		 $(objectsdir)/$(PUREPD_NAME)
 # temp hack, to make these available to anything until they get settled into a
