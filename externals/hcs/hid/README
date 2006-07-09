@@ -12,6 +12,10 @@ hid.pd_linux = Linux/PowerPC
 COMPILING
 ---------
 
+WARNING!! This build system in this directory is deprecated and no longer
+maintained!  "cd externals/ && make hid" is probably what you want now.  This
+is also part of the Pd-extended build system.
+
 The compiler needs to know where the Pd source is to find the headers, and the
 linker needs to know where the Pd binary is to check symbols.  You can either
 set these on the command line or edit the Makefile
