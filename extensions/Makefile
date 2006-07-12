@@ -48,9 +48,10 @@ gripd:
 
 gripd_install: 
 	install -d $(helpdir)
+	install -d $(objectsdir)
 	install -p $(extensions_src)/gripd/*.$(EXTENSION) \
 		$(extensions_src)/gripd/*.so \
-		$(externalsdir)/$(GRIPD_NAME)
+		$(objectsdir)
 	install -p $(extensions_src)/gripd/examples/gripd.pd \
 		$(helpdir)/gripd-help.pd
 #	install -d $(manualsdir)/$(GRIPD_NAME)
