@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
-LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ext13 freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ext13 flib freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -562,6 +562,76 @@ fftease_clean:
 	-rm -f -- $(externals_src)/fftease/*.o
 	-rm -f -- $(externals_src)/fftease/*.bak
 	-rm -f -- $(externals_src)/fftease/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# FILE
+FILE_NAME=file
+FILE_OBJECTS := $(wildcard $(externals_src)/file/*.c)
+file: $(FILE_OBJECTS:.c=.$(EXTENSION))
+
+file_install: file
+	install -d $(objectsdir)/$(FILE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FILE_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version ""
+	install -p $(FILE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FILE_NAME)
+	install -d $(helpdir)/$(FILE_NAME)
+	install -p $(externals_src)/file/help/*.pd \
+		$(helpdir)/$(FILE_NAME)
+#	install -d $(manualsdir)/$(FILE_NAME)
+#	install -p $(externals_src)/file/manual.txt \
+#		$(manualsdir)/$(FILE_NAME)
+#	install -p $(externals_src)/file/README \
+#		$(readmesdir)/$(FILE_NAME).txt
+#	install -d $(examplesdir)/$(FILE_NAME)
+#	install -p $(externals_src)/file/examples/*.pd \
+#		$(examplesdir)/$(FILE_NAME)
+
+file_clean:
+	-rm -f -- $(FILE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(FILE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/file/*.bak
+	-rm -f -- $(externals_src)/file/*.*~
+
+
+
+
+#------------------------------------------------------------------------------#
+# FLIB
+FLIB_NAME=flib
+# exclude the flib.c file for the single-file library
+# plus ha~.c doesn't compile at the moment.
+FLIB_OBJECTS := $(wildcard $(externals_src)/postlude/flib/src/[a-ei-z]*.c)
+flib: $(FLIB_OBJECTS:.c=.$(EXTENSION))
+
+flib_install: flib
+	install -d $(objectsdir)/$(FLIB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FLIB_NAME) \
+		--author "Jamie Bullock" \
+		--description "library for feature extraction" \
+		--license "GNU GPL"
+	install -p $(FLIB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FLIB_NAME)
+	install -d $(helpdir)/$(FLIB_NAME)
+	install -p $(externals_src)/postlude/flib/doc/*.pd \
+		$(helpdir)/$(FLIB_NAME)
+#	install -d $(manualsdir)/$(FLIB_NAME)
+#	install -p $(externals_src)/postlude/flib/manual.txt \
+#		$(manualsdir)/$(FLIB_NAME)
+	install -p $(externals_src)/postlude/flib/README \
+		$(readmesdir)/$(FLIB_NAME).txt
+#	install -d $(examplesdir)/$(FLIB_NAME)
+#	install -p $(externals_src)/postlude/flib/examples/*.pd \
+#		$(examplesdir)/$(FLIB_NAME)
+
+flib_clean:
+	-rm -f -- $(FLIB_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(FLIB_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/postlude/flib/*/*.bak
+	-rm -f -- $(externals_src)/postlude/flib/*/*.*~
 
 
 
@@ -1415,6 +1485,42 @@ pmpd_clean:
 	-rm -f -- $(externals_src)/pmpd/*/*.o
 	-rm -f -- $(externals_src)/pmpd/*/*.bak
 	-rm -f -- $(externals_src)/pmpd/*/*~
+
+
+
+#------------------------------------------------------------------------------#
+# POSTLUDE
+POSTLUDE_NAME=postlude
+# flib is separate, so exclude it here
+POSTLUDE_OBJECTS := $(wildcard $(externals_src)/postlude/[a-eg-z]*/src/*.c)
+postlude: $(POSTLUDE_OBJECTS:.c=.$(EXTENSION))
+
+postlude_install: postlude
+	install -d $(objectsdir)/$(POSTLUDE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(POSTLUDE_NAME) \
+		--author "Jamie Bullock" \
+		--license "GNU GPL"
+	install -p $(POSTLUDE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(POSTLUDE_NAME)
+	install -d $(helpdir)/$(POSTLUDE_NAME)
+	install -p $(externals_src)/postlude/*/doc/help-*.pd \
+		$(helpdir)/$(POSTLUDE_NAME)
+#	install -d $(manualsdir)/$(POSTLUDE_NAME)
+#	install -p $(externals_src)/postlude/manual.txt \
+#		$(manualsdir)/$(POSTLUDE_NAME)
+	install -p $(externals_src)/postlude/dssi/README \
+		$(readmesdir)/$(POSTLUDE_NAME)-dssi.txt
+	install -p $(externals_src)/postlude/getpatchname/README \
+		$(readmesdir)/$(POSTLUDE_NAME)-getpatchname.txt
+	install -d $(examplesdir)/$(POSTLUDE_NAME)
+#	install -p $(externals_src)/postlude/examples/*.pd \
+#		$(examplesdir)/$(POSTLUDE_NAME)
+
+postlude_clean:
+	-rm -f -- $(POSTLUDE_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(POSTLUDE_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/postlude/*/*.bak
+	-rm -f -- $(externals_src)/postlude/*/*.*~
+
 
 
 #------------------------------------------------------------------------------#
