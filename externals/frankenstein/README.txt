@@ -3,7 +3,9 @@ frankenstein set of externals
 authors:
 dmorelli: www.davidemorelli.it
 pland: www.davidcasal.com
-with the help of vatic
+with the help of vatic and using soundspotter code (copyright 2006 Michael Casey)
+
+copyright (c) 2006 Davide Morelli and David Plans Casal
 
 last update: 
 14-10-2005
