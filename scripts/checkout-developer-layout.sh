@@ -20,7 +20,7 @@ function print_usage ()
 }
 
 if [ $# -eq 0 ]; then
-    export CVSROOT=":pserver:anonymous@cvs.sourceforge.net:/cvsroot/pure-data"
+    export CVSROOT=":pserver:anonymous@pure-data.cvs.sourceforge.net:/cvsroot/pure-data"
     echo "Checking out anonymously. Give your SourceForge ID as an argument otherwise."
     echo "The anonymous password is: anoncvs"
     cvs login
@@ -29,7 +29,7 @@ elif [ "$1" == "--help" ]; then
 elif [ "$1" == "-h" ]; then
     print_usage
 elif [ $# -eq 1 ]; then
-    export CVSROOT=":ext:${1}@cvs.sourceforge.net:/cvsroot/pure-data"
+    export CVSROOT=":ext:${1}@pure-data.cvs.sourceforge.net:/cvsroot/pure-data"
 else
     print_usage
 fi
