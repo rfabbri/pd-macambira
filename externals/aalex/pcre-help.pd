@@ -1,0 +1,38 @@
+#N canvas 4 301 765 489 10;
+#X obj 136 -59 cnv 15 200 140 empty empty empty 20 12 0 14 -258699
+-66577 0;
+#X obj 129 161 cnv 15 300 140 empty empty empty 20 12 0 14 -258699
+-66577 0;
+#X obj 176 107 symbol;
+#X obj 239 259 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X obj 152 257 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
+1;
+#X msg 148 -23 F#9;
+#X msg 214 -23 D7b9;
+#X text 395 60 Matches a symbol against a Perl-compatible regular expression.
+See man pcre.;
+#X obj 327 262 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+1;
+#X msg 265 -10 Am7;
+#X obj 152 236 pcre #9;
+#X obj 239 237 pcre b9;
+#X obj 327 240 pcre !9;
+#X text 399 30 pcre;
+#X text 166 -53 patterns;
+#X text 140 170 masks;
+#X msg 298 127 foo;
+#X msg 86 11 foo;
+#X obj 317 162 symbol;
+#X connect 2 0 10 0;
+#X connect 2 0 11 0;
+#X connect 2 0 12 0;
+#X connect 5 0 2 0;
+#X connect 6 0 2 0;
+#X connect 9 0 2 0;
+#X connect 10 0 4 0;
+#X connect 11 0 3 0;
+#X connect 12 0 8 0;
+#X connect 16 0 18 0;
+#X connect 17 0 2 0;
+#X connect 18 0 10 1;
