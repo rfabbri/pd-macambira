@@ -2,12 +2,13 @@
 
 # this script is the first attempt to have an automated updater and builder
 
-auto_build_root_dir=`echo $0 | sed 's|\(.*\)/.*$|\1|'`/..
 SYSTEM=`uname -s`
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H.%M.%S`
-LOGFILE=/tmp/build-log_${SYSTEM}_${DATE}_${TIME}.txt
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
+auto_build_root_dir=`echo $0 | sed 's|\(.*\)/.*$|\1|'`/..
 # convert into absolute path
 cd ${auto_build_root_dir}
 auto_build_root_dir=`pwd`
