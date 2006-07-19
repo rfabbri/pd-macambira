@@ -184,6 +184,7 @@ void mtx_concat_setup (void)
    class_addmethod (mtx_concat_class, (t_method) mTXConcatMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_concat_class, (t_method) mTXConcatMatrix2, gensym(""), A_GIMME,0);
    class_addmethod (mtx_concat_class, (t_method) mTXSetConcatMode, gensym("mode"), A_DEFSYMBOL,0);
+   class_sethelpsymbol (mtx_concat_class, gensym("mtx_concat-help"));
 
    row_sym = gensym("row");
 }

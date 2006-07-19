@@ -206,6 +206,7 @@ void mtx_slice_setup (void)
   class_addbang (mtx_slice_class, (t_method) mTXSliceBang);
   class_addmethod (mtx_slice_class, (t_method) mTXSliceMatrix, gensym("matrix"), A_GIMME,0);
   class_addmethod (mtx_slice_class, (t_method) mTXSliceIndexList, gensym(""), A_GIMME,0);
+  class_sethelpsymbol (mtx_slice_class, gensym("mtx_slice-help"));
 
 }
 

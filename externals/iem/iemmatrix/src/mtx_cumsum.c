@@ -260,6 +260,7 @@ void mtx_cumsum_setup (void)
    class_addmethod (mtx_cumsum_class, (t_method) mTXCumsumMatrix, gensym("matrix"), A_GIMME,0);
    class_addmethod (mtx_cumsum_class, (t_method) mTXSetCumsumMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_cumsum_class, (t_method) mTXSetCumsumDirection, gensym("direction"), A_DEFFLOAT,0);
+   class_sethelpsymbol (mtx_cumsum_class, gensym("mtx_cumsum-help"));
 
    row_sym = gensym("row");
    col_sym = gensym("col");

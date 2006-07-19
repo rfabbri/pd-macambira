@@ -217,6 +217,7 @@ static void mtx_rowrifft_setup (void)
   class_addbang (mtx_rowrifft_class, (t_method) mTXrowrifftBang);
   class_addmethod (mtx_rowrifft_class, (t_method) mTXrowrifftMatrixHot, gensym("matrix"), A_GIMME,0);
   class_addmethod (mtx_rowrifft_class, (t_method) mTXrowrifftMatrixCold, gensym(""), A_GIMME,0);
+  class_sethelpsymbol (mtx_rowrifft_class, gensym("mtx_rowrifft-help"));
 
 }
 
