@@ -6,8 +6,14 @@ PDP_PIDIP_LIBS =  -lbz2 -lz -ldl -lmp3lame -logg -lvorbis -lvorbisenc
 IMLIB_CFLAGS = -I/usr/local/include -I/usr/X11R6/include
 IMLIB_LIBS = -L/usr/local/lib -lImlib2 -lfreetype -lz -lm -ldl -lXext -lXext -lX11 -L/usr/X11R6/lib
 MAGICK_CFLAGS = -I/usr/X11R6/include -g -O2 -Wall -pthread 
-MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljpeg -lpng -ldpstk -ldps -lXext -lXt -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -lpthread -L/usr/local/lib -L/usr/X11R6/lib -lfreetype -lz -L/usr/lib
-THEORA_LIBS =  /usr/lib/libtheora.a /usr/local/lib/libtheora.a /usr/lib/libogg.a /usr/lib/libvorbis.a /usr/local/lib/libvorbis.a /usr/lib/libvorbisenc.a /usr/local/lib/libvorbisenc.a
+MAGICK_LIBS = -L/usr/X11R6/lib -lMagick -lMagick -ltiff -lfreetype -ljpeg -lpng -lXext -lXt -lSM -lICE -lX11 -lbz2 -lxml2 -lz -lpthread -lm -lpthread -L/usr/local/lib -L/usr/X11R6/lib -lfreetype -lz -L/usr/lib
+
+# what are those? seem to be related to xorg
+#MAGICK_LIBS += -ldpstk -ldps
+
+#THEORA_LIBS =  /usr/lib/libtheora.a /usr/lib/libogg.a /usr/lib/libvorbis.a /usr/lib/libvorbisenc.a
+#THEORA_LIBS += /usr/local/lib/libtheora.a /usr/local/lib/libogg.a /usr/local/lib/libvorbis.a /usr/local/lib/libvorbisenc.a
+THEORA_LIBS =  -ltheora -logg -lvorbis -lvorbisenc
 PDP_PIDIP_INCLUDES =  -I/usr/local/pd/src -I. -I/usr/local/pd/pdp/include -I../include -I../charmaps
 PDP_PIDIP_VERSION = 0.12.20
 MPEG4IP_CFLAGS = 
