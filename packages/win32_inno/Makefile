@@ -12,29 +12,9 @@ BUILDLAYOUT_DIR = $(CWD)/..
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-# base level optimizations
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 
 # Generic x86 (tune for Pentium III, since that's most common these days)
 OPT_CFLAGS += -mcpu=i586 -mtune=pentium3
-
-# INTEL
-#
-# Pentium MMX
-#OPT_CFLAGS += -march=pentium-mmx -mmmx
-# Pentium Pro
-#OPT_CFLAGS += -march=pentiumpro -mmmx
-# Pentium II/Celeron
-#OPT_CFLAGS += -mfpmath=sse -mmmx -msse -march=pentium2
-# Pentium III/Celeron2
-#OPT_CFLAGS += -mfpmath=sse -mmmx -msse -march=pentium3
-# Pentium 4
-#OPT_CFLAGS += -mfpmath=sse -mmmx -msse -msse2 -march=pentium4
-
-# AMD
-#
-# Athlon XP K7
-#OPT_CFLAGS = -O3 -march=athlon-xp -m3dnow -msse -mfpmath=sse
 
 
 # these are sent to all of the various Makefiles so that they all copy their

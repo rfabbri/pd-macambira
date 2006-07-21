@@ -30,8 +30,9 @@ WISH_CONTENTS = "$(WISH)/Contents"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 
-# base level optimizations
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
+
+# which CPU to compile for
+TARGET_PLATFORM := $(shell uname -p)
 
 # CPU-specific gleaned from http://developer.apple.com/releasenotes/DeveloperTools/GCC3.html
 # check this too: http://hpc.sourceforge.net/
@@ -46,8 +47,13 @@ OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 # PowerPC G5 (gcc-3.3)
 #OPT_CFLAGS += -fast -fPIC -faltivec -mpowerpc-gpopt -mpowerpc-gfxopt
 
-# Package default, support older PowerPCs, but G4 (7450) is the most common
-OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
+# auto-vectorization would be nice:
+# http://gcc.gnu.org/projects/tree-ssa/vectorization.html
+
+ifeq ($(TARGET_PLATFORM),powerpc)
+  # Package default, support older PowerPCs, but G4 (7450) is the most common
+  OPT_CFLAGS += -mcpu=powerpc -mtune=7450 -mpowerpc-gfxopt
+endif
 
 
 # these are sent to all of the various Makefiles so that they all copy their

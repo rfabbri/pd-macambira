@@ -85,9 +85,6 @@ ZEXY_VERSION := $(shell grep VERSION $(externals_src)/zexy/src/zexy.h | \
 	grep -v _VERSION | cut -d ' ' -f 3 | cut -d '"' -f 2)
 
 
-
-OPT_FLAGS = -O6 -funroll-loops -fomit-frame-pointer
-
 # these are sent to all of the various Makefiles so that they all copy their
 # output to the same directory tree
 DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
