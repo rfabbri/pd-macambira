@@ -1,6 +1,7 @@
 current: all_modules
 
 include ../Makefile
+PDP_PIDIP_CFLAGS += -I../../pdp/include -I../../../pd/src
 
 OBJECTS = pdp_intrusion.o  pdp_yqt.o  pdp_simura.o  pdp_underwatch.o  \
           pdp_vertigo.o  pdp_yvu2rgb.o pdp_lens.o pdp_baltan.o \
