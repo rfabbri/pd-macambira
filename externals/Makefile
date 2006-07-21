@@ -337,9 +337,9 @@ corelibs_install: corelibs
 #		$(manualsdir)/$(CORELIBS_NAME)
 	install -p $(externals_src)/corelibs/README \
 		$(readmesdir)/$(CORELIBS_NAME).txt
-	install -d $(examplesdir)/$(CORELIBS_NAME)
-	install -p $(externals_src)/corelibs/examples/*.pd \
-		$(examplesdir)/$(CORELIBS_NAME)
+#	install -d $(examplesdir)/$(CORELIBS_NAME)
+#	install -p $(externals_src)/corelibs/examples/*.pd \
+#		$(examplesdir)/$(CORELIBS_NAME)
 
 corelibs_clean:
 	-rm -f -- $(CORELIBS_OBJECTS:.c=.$(EXTENSION))
