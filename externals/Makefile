@@ -38,10 +38,6 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 #
 #==============================================================================#
 
-DEBUG_CFLAGS = -ggdb
-
-OPT_CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
-
 # this variable is to support old "win" directories, rather than "windows"
 BUILDSRC_OS_NAME = $(OS_NAME)
 
@@ -333,9 +329,9 @@ corelibs_install: corelibs
 		--version ""
 	install -p $(CORELIBS_OBJECTS:.c=.$(EXTENSION)) \
 		$(objectsdir)/$(CORELIBS_NAME)
-	install -d $(helpdir)/$(CORELIBS_NAME)
-	install -p $(externals_src)/corelibs/help/*.pd \
-		$(helpdir)/$(CORELIBS_NAME)
+#	install -d $(helpdir)/$(CORELIBS_NAME)
+#	install -p $(externals_src)/corelibs/help/*.pd \
+#		$(helpdir)/$(CORELIBS_NAME)
 #	install -d $(manualsdir)/$(CORELIBS_NAME)
 #	install -p $(externals_src)/corelibs/manual.txt \
 #		$(manualsdir)/$(CORELIBS_NAME)
