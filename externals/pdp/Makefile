@@ -1,7 +1,12 @@
 include Makefile.config
 
+# all: $(PDP_TARGET)
 
-all: $(PDP_TARGET)
+ifeq ($(OS_NAME),darwin)
+all: darwin
+else
+all: linux
+endif
 
 pdp_all:
 	make -C system
