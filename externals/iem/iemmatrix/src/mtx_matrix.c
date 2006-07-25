@@ -18,6 +18,11 @@
 */
 
 #include "iemmatrix.h"
+#include <stdio.h>
+#ifdef _WIN32
+/* or should we use the security enhanced _snprintf_s() ?? */
+# define snprintf _snprintf
+#endif
 
 /* -------------------- matrix ------------------------------ */
 
@@ -442,7 +447,7 @@ static void matrix_read(t_matrix *x, t_symbol *filename)
   int n;
 
   if (binbuf_read_via_path(bbuf, filename->s_name, canvas_getdir(x->x_canvas)->s_name, 0))
-    pd_error(x,"matrix: failed to read %s", filename->s_name);
+    pd_error(x,"matrix: failed to read %128s", filename->s_name);
 
   ap=binbuf_getvec(bbuf);
   n =binbuf_getnatom(bbuf)-1;
@@ -457,7 +462,7 @@ static void matrix_read(t_matrix *x, t_symbol *filename)
 static void matrix_write(t_matrix *x, t_symbol *filename)
 {
   t_atom *ap=x->atombuffer+2;
-  char filnam[MAXPDSTRING];
+  char *filnam = (char*)getbytes(sizeof(char)*MAXPDSTRING);;
   int rows = x->row, cols = x->col;
   FILE *f=0;
 
@@ -465,7 +470,7 @@ static void matrix_write(t_matrix *x, t_symbol *filename)
 
   /* open file */
   if (!(f = fopen(filnam, "w"))) {
-    pd_error(x,"matrix : failed to open %s", filnam);
+    pd_error(x,"matrix : failed to open %128s", filnam);
   } else {
     char *text=(char *)getbytes(sizeof(char)*MAXPDSTRING);
     int textlen;
@@ -475,24 +480,26 @@ static void matrix_write(t_matrix *x, t_symbol *filename)
      * so that these files can easily read by other 
      * applications such as octave
      */
-    sprintf(text, "#matrix %d %d\n", rows, cols);
+    snprintf(text, MAXPDSTRING, "#matrix %d %d\n", rows, cols);
+    text[MAXPDSTRING-1]=0;
     textlen = strlen(text);
     if (fwrite(text, textlen*sizeof(char), 1, f) < 1) {
-      pd_error(x,"matrix : failed to write %s", filnam); goto end;
+      pd_error(x,"matrix : failed to write %128s", filnam); goto end;
     }
 
     while(rows--) {
       int c = cols;
       while (c--) {
 	t_float val = atom_getfloat(ap++);
-	sprintf(text, "%.15f ", val);
+	snprintf(text, MAXPDSTRING, "%.15f ", val);
+        text[MAXPDSTRING-1]=0;
 	textlen=strlen(text);
 	if (fwrite(text, textlen*sizeof(char), 1, f) < 1) {
-	  pd_error(x,"matrix : failed to write %s", filnam); goto end;
+	  pd_error(x,"matrix : failed to write %128s", filnam); goto end;
 	}
       }
       if (fwrite("\n", sizeof(char), 1, f) < 1) {
-	pd_error(x, "matrix : failed to write %s", filnam); goto end;
+	pd_error(x, "matrix : failed to write %128s", filnam); goto end;
       }
     }
     freebytes(text, sizeof(char)*MAXPDSTRING);
@@ -501,6 +508,7 @@ static void matrix_write(t_matrix *x, t_symbol *filename)
  end:
   /* close file */
   if (f) fclose(f);
+  if(filnam)freebytes(filnam, sizeof(char)*MAXPDSTRING);
 }
 
 void matrix_free(t_matrix *x)
