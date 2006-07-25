@@ -85,7 +85,10 @@
 # PD FILES
 # pd files can't be meaningfully merged, so copy instead
 # 2006-02-15 <hans@at.or.at>
-*.pd -m 'COPY'
+# for some reason we now get this error message:
+# -m wrapper option is not supported remotely; ignored
+# 2006-07-24 <hans@at.or.at>
+#*.pd -m 'COPY'
 
 # prevent keyword replacement on imported sources
 # 2005-05-20 <hans@at.or.at>
