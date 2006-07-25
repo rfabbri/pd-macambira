@@ -342,7 +342,6 @@ void mtx_find_setup (void)
 //   class_addmethod (mtx_find_class, (t_method) mTXSetFindDimension, gensym("dimension"), A_DEFFLOAT,0);
    class_addmethod (mtx_find_class, (t_method) mTXSetFindMode, gensym("mode"), A_DEFSYMBOL,0);
    class_addmethod (mtx_find_class, (t_method) mTXSetFindDirection, gensym("direction"), A_DEFFLOAT,0);
-   class_sethelpsymbol (mtx_find_class, gensym("mtx_find-help"));
 
    row_sym = gensym("row");
    col_sym = gensym("col");

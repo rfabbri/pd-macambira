@@ -80,14 +80,13 @@ static void copyList (int n, t_atom *x, t_atom *y)
 }
 static void reverseList (int n, t_atom *y)
 {
-   t_atom *read = y;
+   t_atom *read = y+n-1;
    t_atom tmp;
-   y += n-1;
    n >>= 1;
-   for (;n--;) { 
+   while(n-->0) { 
       tmp = *y;
-      *y-- = *read;
-      *read++ = tmp;
+      *y++ = *read;
+      *read-- = tmp;
    }
 }
 static void reverseListStep (int n, int step, t_atom *y)

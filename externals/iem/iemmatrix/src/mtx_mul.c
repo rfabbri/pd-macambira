@@ -210,6 +210,7 @@ void mtx_mul_setup(void)
   class_addmethod(mtx_mulelement_class, (t_method)mtx_bin_matrix2, gensym(""), A_GIMME, 0);
   class_addfloat (mtx_mulelement_class, mtx_mul_float);
   class_addbang  (mtx_mulelement_class, mtx_binmtx_bang);
+  class_sethelpsymbol(mtx_mulelement_class, gensym("mtx_mul-help"));
 
   mtx_mulscalar_class = class_new(gensym("mtx_mul"), 0, (t_method)mtx_binscalar_free,
                                   sizeof(t_mtx_binscalar), 0, 0);
@@ -218,9 +219,6 @@ void mtx_mul_setup(void)
   class_addmethod(mtx_mulscalar_class, (t_method)mtx_mulscalar_matrix, gensym("matrix"), A_GIMME, 0);
   class_addlist  (mtx_mulscalar_class, mtx_mulscalar_list);
   class_addbang  (mtx_mulscalar_class, mtx_binscalar_bang);
-
-  class_sethelpsymbol(mtx_mulelement_class, gensym("mtx_mul-help"));
-  class_sethelpsymbol(mtx_mulscalar_class, gensym("mtx_mul-help"));
 }
 
 
