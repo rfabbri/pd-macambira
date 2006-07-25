@@ -15,10 +15,7 @@ auto_build_root_dir=`pwd`
 
 echo "root: $auto_build_root_dir" 
 
-cd ${auto_build_root_dir}/packages
-# let rsync handle the cleanup
-#make unpatch_pd
-
+# let rsync handle the cleanup with --delete
 rsync -av --delete rsync://128.238.56.50/pure-data/ ${auto_build_root_dir}/
 
 BUILD_DIR=.
@@ -32,11 +29,7 @@ if [ "`echo $SYSTEM | sed -n 's|\(MINGW\)|\1|p'`" == "MINGW" ]; then
 	 BUILD_DIR=win32_inno
 fi
 
-cd "$BUILD_DIR"
-pwd
-make distclean
-make package_clean
-rm -rf build
+cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" patch_pd
 make install && make package
 
