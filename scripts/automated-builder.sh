@@ -25,9 +25,11 @@ BUILD_DIR=.
 if [ "$SYSTEM" == "Linux" ]; then
 	 BUILD_DIR=linux_make
 fi
-
 if [ "$SYSTEM" == "Darwin" ]; then
 	 BUILD_DIR=darwin_app
+fi
+if [ "`echo $SYSTEM | sed -n 's|\(MINGW\)|\1|p'`" == "MINGW" ]; then
+	 BUILD_DIR=win32_inno
 fi
 
 cd "$BUILD_DIR"
@@ -35,8 +37,8 @@ pwd
 make distclean
 make package_clean
 rm -rf build
-#make -C "${auto_build_root_dir}/packages" patch_pd
+make -C "${auto_build_root_dir}/packages" patch_pd
 make install && make package
 
-#make test_package
+make test_package
 make test_locations
