@@ -823,11 +823,11 @@ pd_clean
 
 
 distclean: clean cruft_clean
-	cd $(abstractions_src) && make distclean
-	cd $(doc_src) && make distclean
-	cd $(extensions_src) && make distclean
-	cd $(externals_src) && make distclean
-	-cd $(pd_src) && make distclean
+	make -C $(abstractions_src) distclean
+	make -C $(doc_src) distclean
+	make -C $(extensions_src) distclean
+	make -C $(externals_src) distclean
+	-make -C $(pd_src) distclean
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"

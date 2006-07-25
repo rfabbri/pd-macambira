@@ -1,4 +1,6 @@
 
+- reintroduce patch for making Pd window font not bold
+
 - make all of pd/src/x_*.c into a standalone library that is optionally loaded
   by Pd.  Then these objects can be placed into the namespace.
 
