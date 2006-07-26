@@ -12,7 +12,7 @@
  Based on Pure Data by Miller Puckette and others
  Based on pmpd by Cyrille Henry 
 
- Contact : Nicolas Montgermont, montgermont@la-kitchen.fr
+ Contact : Nicolas Montgermont, nicolas@basseslumieres.org
 	   Cyrille Henry, Cyrille.Henry@la-kitchen.fr
 
  This library is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
- Version 0.07 -- 17.05.2005
+ Version 0.08 -- 26.07.2006
 */
 
 // include flext header
@@ -167,32 +167,35 @@ public:
 	t_float distance_old;
 	t_float puissance;
 	t_int oriented; //0 : no, 1 : tangential, 2 : normal
-	t_float tdirection1[3], tdirection2[3];
+	t_float tdirection1[N], tdirection2[N];
 	
-	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float xa=0, t_float ya=0, t_float za=0,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10)
+	Link(t_int n,const t_symbol *id,Mass<N> *m1,Mass<N> *m2,t_float k1,t_float d1, t_int o=0, t_float tangent[N]=NULL,t_float pow=1, t_float lmin = 0,t_float lmax = 1e10)
 		: nbr(n),Id(id)
 		, mass1(m1),mass2(m2)
 		, K1(k1),D1(d1),D2(0),oriented(o),puissance(pow)
 		, long_min(lmin),long_max(lmax)
 	{
-		for (int i=0; i<3; i++)	{
+		for (int i=0; i<N; i++)	{
 			tdirection1[i] = 0;
 			tdirection2[i] = 0;
 			}
 		if (oriented == 0)
 			distance_old = longueur = Mass<N>::dist(*mass1,*mass2); // L[n-1]
 		else if (oriented == 1)	{			// TANGENTIAL LINK
-			const t_float norme = sqrt(sqr(xa)+sqr(ya)+sqr(za));
-			tdirection1[0] = xa/norme;
-			tdirection1[1] = ya/norme;
-			tdirection1[2] = za/norme;
+			t_float norme = 0;
+			for(int i = 0; i < N; ++i) norme += sqr(tangent[i]);
+			norme = sqrt(norme);
+			//t_float norme = sqrt(sqr(xa)+sqr(ya)+sqr(za));
+			for(int i = 0; i < N; ++i)tdirection1[i] = tangent[i]/norme;
+			//tdirection1[1] = ya/norme;
+			//tdirection1[2] = za/norme;
 			distance_old = 0;
 			for(int i = 0; i < N; ++i)	
 				distance_old += sqr((m1->pos[i]-m2->pos[i])*tdirection1[i]);
 			distance_old  = sqrt(distance_old);
 			longueur = distance_old;
 		}
-		else if (oriented == 2)	{			// NORMAL LINK 2D
+		/*else if (oriented == 2)	{			// NORMAL LINK 2D
 			if (N >= 2)	{
 				const t_float norme = sqrt(sqr(xa)+sqr(ya));
 				tdirection1[0]=ya/norme;
@@ -222,7 +225,7 @@ public:
 				distance_old  = sqrt(distance_old);
 				longueur = distance_old;			
 			}
-		}	
+		}*/	
 		mass1->links.insert(this);
 		mass2->links.insert(this);
 	}
@@ -746,7 +749,7 @@ protected:
 						it1.data(),it.data(), // pointer to mass1, mass2
 						GetAFloat(argv[3]), // K1
 						GetAFloat(argv[4]), // D1
-						0,0,0,0,
+						0,NULL,
 						argc >= 6?GetFloat(argv[5]):1, // power
 						argc >= 7?GetFloat(argv[6]):0,
 						argc >= 8?GetFloat(argv[7]):1e10
@@ -768,7 +771,7 @@ protected:
 					mass1,it.data(), // pointer to mass1, mass2
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
-					0,0,0,0,
+					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
 					argc >= 8?GetFloat(argv[7]):1e10
@@ -789,7 +792,7 @@ protected:
 					it.data(),mass2, // pointer to mass1, mass2
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
-					0,0,0,0,
+					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
 					argc >= 8?GetFloat(argv[7]):1e10
@@ -814,7 +817,7 @@ protected:
 				mass1,mass2, // pointer to mass1, mass2
 				GetAFloat(argv[3]), // K1
 				GetAFloat(argv[4]), // D1
-				0,0,0,0,
+				0,NULL,
 				argc >= 6?GetFloat(argv[5]):1, // power
 				argc >= 7?GetFloat(argv[6]):0,	// Lmin
 				argc >= 8?GetFloat(argv[7]):1e10// Lmax
@@ -846,7 +849,7 @@ protected:
 					it1.data(),it.data(), // pointer to mass1, mass2
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
-					0,0,0,0,
+					0,NULL,
 					argc >= 6?GetFloat(argv[5]):1, // power
 					argc >= 7?GetFloat(argv[6]):0,
 					argc >= 8?GetFloat(argv[7]):1e10
@@ -867,6 +870,8 @@ protected:
 			error("%s - %s Syntax : Id Nomass1 Nomass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
 			return;
 		}
+		t_float tangent[N];
+		for(int i = 0; i < N; ++i) tangent[i] = GetAFloat(argv[5+i]);
 
 		if (IsSymbol(argv[1]) && IsSymbol(argv[2]))	{		// ID & ID
 			typename IDMap<t_mass *>::iterator it1,it2,it;
@@ -881,10 +886,15 @@ protected:
 						GetAFloat(argv[3]), // K1
 						GetAFloat(argv[4]), // D1
 						1,					// tangential
-						GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
-						(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
-						(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
-						(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+						tangent,
+						argc >= 6+N?GetFloat(argv[5+N]):1, // power
+						argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
+						argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+
+//GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+						//(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+						//(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+						//(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
 
 					);
 					linkids.insert(l);
@@ -905,14 +915,19 @@ protected:
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
 					1,					// tangential
-					GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
-					(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
-					(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
-					(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+					tangent,
+					argc >= 6+N?GetFloat(argv[5+N]):1, // power
+					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
+					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+
+					//GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+					//(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+					//(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+					//(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
-				outlink(S_iLink,l);
+				outlink(S_tLink,l);
 			}
 		}
 		else if (IsSymbol(argv[1]) && IsSymbol(argv[2])==0)	{	// ID & No
@@ -926,15 +941,20 @@ protected:
 					it.data(),mass2, // pointer to mass1, mass2
 					GetAFloat(argv[3]), // K1
 					GetAFloat(argv[4]), // D1
-					1,					// tangential
-					GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
-					(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
-					(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
-					(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+					1,
+					tangent,					// tangential
+					argc >= 6+N?GetFloat(argv[5+N]):1, // power
+					argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
+					argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+
+					//GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+					//(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+					//(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+					//(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
 				);
 				linkids.insert(l);
 				link.insert(id_link++,l);
-				outlink(S_iLink,l);
+				outlink(S_tLink,l);
 			}
 		}
 		else	{										// No & No
@@ -952,11 +972,16 @@ protected:
 				GetAFloat(argv[3]), // K1
 				GetAFloat(argv[4]), // D1
 				1,					// tangential
-				GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
-				(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
-				(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
-				(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
-			);
+				tangent,					// tangential
+				argc >= 6+N?GetFloat(argv[5+N]):1, // power
+				argc >= 7+N?GetFloat(argv[6+N]):0, // Lmin
+				argc >= 8+N?GetFloat(argv[7+N]):1e10 // Lmax
+
+				//GetAFloat(argv[5]),N >= 2?GetAFloat(argv[6]):0,N >= 3?GetAFloat(argv[7]):0,	// vector
+				//(N==1 && argc >= 7)?GetFloat(argv[6]):((N==2 && argc >= 8)?GetFloat(argv[7]):((N==3 && argc >= 9)?GetFloat(argv[8]):1)), // power
+				//(N==1 && argc >= 8)?GetFloat(argv[7]):((N==2 && argc >= 9)?GetFloat(argv[8]):((N==3 && argc >= 10)?GetFloat(argv[9]):0)),	// Lmin
+				//(N==1 && argc >= 9)?GetFloat(argv[8]):((N==2 && argc >= 10)?GetFloat(argv[9]):((N==3 && argc >= 11)?GetFloat(argv[10]):1e10))// Lmax
+);
 			linkids.insert(l);
 			link.insert(id_link++,l);
 			outlink(S_tLink,l);
@@ -966,7 +991,7 @@ protected:
 	// add a normal link
 	// Id, *mass1, *mass2, K1, D1, D2, (Lmin,Lmax)
 	void m_nlink(int argc,t_atom *argv) 
-	{
+	{/*
 		if (argc < 5+N || argc > 8+N) {
 			error("%s - %s Syntax : Id No/Idmass1 No/Idmass2 K D1 xa%s%s (pow Lmin Lmax)",thisName(),GetString(thisTag()),N >= 2?" ya":"",N >= 3?" za":"");
 			return;
@@ -1069,7 +1094,7 @@ protected:
 			link.insert(id_link++,l);
 			outlink(S_nLink,l);
 		}
-	}
+	*/}
 
 	// set Id of link(s) named Id or number No
 	void m_setLinkId(int argc,t_atom *argv) 
