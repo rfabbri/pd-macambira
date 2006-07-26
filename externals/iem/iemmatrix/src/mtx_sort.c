@@ -100,12 +100,12 @@ static void *newMTXSort (t_symbol *s, int argc, t_atom *argv)
 
 static void mTXSortBang (MTXSort *mtx_sort_obj)
 {
-   if (mtx_sort_obj->list_out1) 
-      outlet_anything(mtx_sort_obj->list_outlet1, gensym("matrix"), 
-	    mtx_sort_obj->size+2, mtx_sort_obj->list_out1);
    if (mtx_sort_obj->list_out2) 
       outlet_anything(mtx_sort_obj->list_outlet2, gensym("matrix"), 
 	    mtx_sort_obj->size+2, mtx_sort_obj->list_out2);
+   if (mtx_sort_obj->list_out1) 
+      outlet_anything(mtx_sort_obj->list_outlet1, gensym("matrix"), 
+	    mtx_sort_obj->size+2, mtx_sort_obj->list_out1);
 }
 
 static void writeFloatIntoList (int n, t_atom *l, t_float *f) 
@@ -333,16 +333,18 @@ static void mTXSortMatrix (MTXSort *mtx_sort_obj, t_symbol *s,
       writeFloatIntoList (size, list_out2+2, i);
    }
 
-   SETSYMBOL(list_out1, gensym("matrix"));
-   SETFLOAT(list_out1, rows);
-   SETFLOAT(&list_out1[1], columns);
-   outlet_anything(mtx_sort_obj->list_outlet1, gensym("matrix"), 
-	 mtx_sort_obj->size+2, list_out1);
+   // writing indices
    SETSYMBOL(list_out2, gensym("matrix"));
    SETFLOAT(list_out2, rows);
    SETFLOAT(&list_out2[1], columns);
    outlet_anything(mtx_sort_obj->list_outlet2, gensym("matrix"), 
 	 mtx_sort_obj->size+2, list_out2);
+   // writing sorted values
+   SETSYMBOL(list_out1, gensym("matrix"));
+   SETFLOAT(list_out1, rows);
+   SETFLOAT(&list_out1[1], columns);
+   outlet_anything(mtx_sort_obj->list_outlet1, gensym("matrix"), 
+	 mtx_sort_obj->size+2, list_out1);
 }
 
 void mtx_sort_setup (void)
