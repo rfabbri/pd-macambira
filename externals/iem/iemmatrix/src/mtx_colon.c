@@ -16,15 +16,12 @@
 #include "iemmatrix.h"
 
 static t_class *mtx_colon_class;
-static t_symbol *col_sym;
-static t_symbol *col_sym2;
 
 typedef struct _MTXColon_ MTXColon;
 struct _MTXColon_
 {
    t_object x_obj;
    int size;
-   t_symbol *colon_mode;
 
    t_atom *list_out;
    t_outlet *list_outlet;
@@ -34,11 +31,6 @@ static void deleteMTXColon (MTXColon *mtx_colon_obj)
 {
    if (mtx_colon_obj->list_out)
       freebytes (mtx_colon_obj->list_out, sizeof(t_atom)*(mtx_colon_obj->size+2));
-}
-
-static void mTXSetColonMode (MTXColon *mtx_colon_obj, t_symbol *c_mode) 
-{
-   mtx_colon_obj->colon_mode = c_mode;
 }
 
 static void *newMTXColon (t_symbol *s, int argc, t_atom *argv)
@@ -93,21 +85,57 @@ static void mTXColonList (MTXColon *mtx_colon_obj, t_symbol *s,
       }
       mtx_colon_obj->list_out = list_out;
 
-      if ((mtx_colon_obj->colon_mode == col_sym)||
-	    (mtx_colon_obj->colon_mode == col_sym2)) {
-	 SETFLOAT (&list_out[1],1.0f);
-	 SETFLOAT (&list_out[0],(t_float)size);
-      }
-      else {
-	 SETFLOAT (&list_out[0],1.0f);
-	 SETFLOAT (&list_out[1],(t_float)size);
-      }
+      SETFLOAT (&list_out[0],1.0f);
+      SETFLOAT (&list_out[1],(t_float)size);
       list_out += 2;
       for (;size--;list_out++,startval+=step)
 	 SETFLOAT(list_out,startval);
 
       mTXColonBang (mtx_colon_obj);
    }
+}
+
+static void mTXColonMtx (MTXColon *mtx_colon_obj, t_symbol *s,
+      int argc, t_atom *argv)
+{
+   int rows = atom_getint (argv++);
+   int columns = atom_getint (argv++);
+   int size = rows * columns;
+   int list_size = argc - 2;
+   t_atom *list_ptr = argv;
+   t_atom *list_out = mtx_colon_obj->list_out;
+ 
+   if (!size) {
+      post("mtx_colon: invalid matrix dimensions");
+      return;
+   }
+   else if (list_size<size) {
+      post("mtx_colon: sparse matrix not yet supported: use \"mtx_check\"");
+      return;
+   }
+   else if (!list_out) {
+      list_out = (t_atom*) getbytes (sizeof (t_atom) * (size+2));
+   }
+   else if (size != mtx_colon_obj->size)
+   {
+      list_out = (t_atom*) resizebytes (list_out, 
+	    sizeof (t_atom) * (mtx_colon_obj->size+2),
+	    sizeof (t_atom) * (size+2));
+   }
+   mtx_colon_obj->list_out = list_out;
+   mtx_colon_obj->size = size;
+
+   list_out+=2;
+   while (size--)
+      *list_out++ = *list_ptr++;
+
+   list_out = mtx_colon_obj->list_out;
+   size = mtx_colon_obj->size;
+
+   SETSYMBOL(list_out, gensym("matrix"));
+   SETFLOAT(list_out, 1);
+   SETFLOAT(&list_out[1], size);
+   mTXColonBang (mtx_colon_obj);
 }
 
 void mtx_colon_setup (void)
@@ -119,7 +147,7 @@ void mtx_colon_setup (void)
        sizeof (MTXColon),
        CLASS_DEFAULT, A_GIMME, 0);
    class_addbang (mtx_colon_class, (t_method) mTXColonBang);
-   class_addmethod (mtx_colon_class, (t_method) mTXSetColonMode, gensym("mode"), A_SYMBOL, 0);
+   class_addmethod (mtx_colon_class, (t_method) mTXColonMtx, gensym("matrix"), A_GIMME, 0);
    class_addlist (mtx_colon_class, (t_method) mTXColonList);
    class_addcreator ((t_newmethod) newMTXColon, gensym("mtx_:"), A_GIMME, 0);
 
