@@ -55,7 +55,7 @@ static t_class *playlist_class;
 
 static int guidebug=0;
 
-static char   *playlist_version = "playlist: 1 click file chooser : version 0.11, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *playlist_version = "playlist: 1 click file chooser : version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define MAX_DIR_LENGTH 2048 // maximum length for a directory name
 
@@ -403,7 +403,7 @@ static void playlist_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving playlist : %s", x->x_extension );
    binbuf_addv(b, "ssiissiisssss", gensym("#X"), gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("playlist"), gensym(x->x_extension), x->x_width, x->x_height,
                 gensym(x->x_font), gensym(x->x_bgcolor), gensym(x->x_sbcolor), 
                 gensym(x->x_fgcolor), gensym(x->x_secolor) );

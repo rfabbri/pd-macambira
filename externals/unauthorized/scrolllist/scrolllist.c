@@ -41,9 +41,8 @@
 #include "g_canvas.h"
 #include "t_tk.h"
 
-#ifdef _WIN32
+#ifdef NT
 #include <io.h>
-#include <pthread.h>
 #else
 #include <unistd.h>
 #include <sys/types.h>
@@ -55,7 +54,7 @@ static t_class *scrolllist_class;
 
 static int guidebug=0;
 
-static char   *scrolllist_version = "scrolllist: scrolling list of text items : version 0.1, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *scrolllist_version = "scrolllist: scrolling list of text items : version 0.2, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define MIN(a,b) (a>b?b:a)
 
@@ -280,7 +279,7 @@ static void scrolllist_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving scrolllist : %d", x->x_capacity );
    binbuf_addv(b, "ssiisiiissss", gensym("#X"), gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("scrolllist"), x->x_capacity, x->x_width, x->x_height,
                 gensym(x->x_font), gensym(x->x_bgcolor), 
                 gensym(x->x_fgcolor), gensym(x->x_secolor) );

@@ -44,9 +44,8 @@
 #include "t_tk.h"
 #include "exciter.h"
 
-#ifdef _WIN32
+#ifdef NT
 #include <io.h>
-#include "timeval.h"
 #else
 #include <unistd.h>
 #endif
@@ -63,7 +62,7 @@ void canvas_startmotion(t_canvas *x);
 
 #define EXCITER_PIXEL_GRAIN 5
 
-static char   *exciter_version = "exciter: a bang-events sequencer, version 0.4 (ydegoyon@free.fr)"; 
+static char   *exciter_version = "exciter: a bang-events sequencer, version 0.5 (ydegoyon@free.fr)"; 
 
 t_widgetbehavior exciter_widgetbehavior;
 static t_class *exciter_class;
@@ -322,7 +321,7 @@ static void exciter_save(t_gobj *z, t_binbuf *b)
    int ei,gi;
 
    binbuf_addv(b, "ssiisiiifii", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("exciter"), x->x_width, x->x_height,
 		x->x_nbevents, x->x_timegrain,
                 x->x_loop, x->x_save 
@@ -350,8 +349,7 @@ static void exciter_properties(t_gobj *z, t_glist *owner)
    t_exciter *x=(t_exciter *)z;
 
    sprintf(buf, "pdtk_exciter_dialog %%s %d %d %d %.2f %d %d\n",
-			  (int)x->x_width, (int)x->x_height, (int)x->x_nbevents, 
-			  x->x_timegrain, x->x_loop, x->x_save );
+            x->x_width, x->x_height, x->x_nbevents, x->x_timegrain, x->x_loop, x->x_save );
    // post("exciter_properties : %s", buf );
    gfxstub_new(&x->x_obj.ob_pd, x, buf);
 }

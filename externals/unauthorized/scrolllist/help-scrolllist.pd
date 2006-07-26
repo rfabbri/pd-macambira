@@ -50,11 +50,11 @@
 #X msg 620 270 rewind;
 #X obj 527 269 l2s;
 #X msg 525 236 add \$1;
-#X obj 748 216 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 0
+#X obj 748 216 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1
 1;
 #X obj 747 237 metro 1000;
-#X obj 35 222 scrolllist 25 400 200 {Helvetica 12 normal} black green
-#904562;
+#X obj 35 222 scrolllist 25 400 200 {Courier 12 bold} black green #904562
+;
 #X text 470 343 the mouse in the text area;
 #X msg 33 57 clear;
 #X text 79 57 clear all;

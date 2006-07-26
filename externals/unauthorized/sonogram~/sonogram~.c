@@ -29,9 +29,6 @@
 /* ---------------------------------------------------------------------------- */
 
 
-/* this doesn't compile on MinGW */
-#ifndef _WIN32
-
 
 #include <sys/types.h>
 #include <string.h>
@@ -40,27 +37,16 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef __APPLE__
-#include <sys/malloc.h>
-#else
 #include <malloc.h>
-#endif
-
 #include <ctype.h>
 #include <pthread.h>
-#ifdef _WIN32
-#include <io.h>
-#define random rand
-#define usleep(a) _sleep(a/1000)
-#else
+#ifdef UNIX
 #include <unistd.h>
 #endif
-#include <math.h>
-
-#ifndef M_PI
+#ifdef NT
 #define M_PI 3.14159265358979323846
 #endif
+#include <math.h>
 
 #include "m_pd.h"
 #include "m_imp.h"
@@ -110,7 +96,7 @@ static int ignorevisible=1; // ignore visible test
 
 #define THREAD_SLEEP_TIME 100000   // 100000 us = 100 ms
 
-static char   *sonogram_version = "sonogram~: version 0.12, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *sonogram_version = "sonogram~: version 0.14, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *sonogram_class;
 t_widgetbehavior sonogram_widgetbehavior;
@@ -334,7 +320,7 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
     }
     for ( i=0; i<x->x_zoom; i++ )
     {
-		 sprintf( x->x_guicommand, "SONIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (int) ((bnumber*x->x_zoom)+i) );
+        sprintf( x->x_guicommand, "SONIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
         sys_gui( x->x_guicommand );
     }
 
@@ -354,7 +340,7 @@ static void sonogram_update_block(t_sonogram *x, t_glist *glist, t_int bnumber)
       }
       for ( i=0; i<x->x_zoom; i++ )
       {
-			sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (int) ((bnumber*x->x_zoom)+i) );
+        sprintf( x->x_guicommand, "FAZIMAGE%x put {%s} -to %d 0\n", (unsigned int)x, x->x_gifdata, (bnumber*x->x_zoom)+i );
         sys_gui( x->x_guicommand );
       }
     }
@@ -385,15 +371,15 @@ static void sonogram_erase_block(t_sonogram *x, t_glist *glist, t_int bnumber )
 
 static void *sonogram_do_update_part(void *tdata)
 {
-	t_sonogram *x = (t_sonogram*) tdata;
-	t_int si;
-	t_int nbpoints = 0;
-	t_float percentage = 0, opercentage = 0;
-	t_canvas *canvas=glist_getcanvas(x->x_glist);
-	
-	
+ t_sonogram *x = (t_sonogram*) tdata;
+ t_int si;
+ t_int nbpoints = 0;
+ t_float percentage = 0, opercentage = 0;
+ t_canvas *canvas=glist_getcanvas(x->x_glist);
+ 
+
    // loose synchro
-	usleep( THREAD_SLEEP_TIME );
+   usleep( THREAD_SLEEP_TIME );
 
    // check boundaries
    if ( x->x_updateend > x->x_size-1 ) x->x_updateend = x->x_size-1;
@@ -860,7 +846,7 @@ static void sonogram_save(t_gobj *z, t_binbuf *b)
    t_sonogram *x = (t_sonogram *)z;
 
    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_xpos, (t_int)x->x_ypos,
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("sonogram~"), x->x_size, x->x_graphic, x->x_phaso );
    binbuf_addv(b, ";");
 }
@@ -2090,5 +2076,3 @@ void sonogram_tilde_setup(void)
     class_addmethod(sonogram_class, (t_method)sonogram_readspeed, gensym("readspeed"), A_FLOAT, A_NULL);
     class_addmethod(sonogram_class, (t_method)sonogram_undo, gensym("undo"), A_NULL);
 }
-
-#endif /* not _WIN32 */

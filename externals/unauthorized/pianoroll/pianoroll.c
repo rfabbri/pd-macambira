@@ -60,7 +60,7 @@ void canvas_startmotion(t_canvas *x);
 #define DEFAULT_SEQUENCER_PITCH_MIN -15
 #define DEFAULT_SEQUENCER_PITCH_MAX 15
 
-static char   *pianoroll_version = "pianoroll: a graphical sequencer controller, version 0.9 (ydegoyon@free.fr)"; 
+static char   *pianoroll_version = "pianoroll: a graphical sequencer controller, version 0.10 (ydegoyon@free.fr)"; 
 
 t_widgetbehavior pianoroll_widgetbehavior;
 static t_class *pianoroll_class;
@@ -263,7 +263,7 @@ static void pianoroll_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving pianoroll : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiiffiiifi", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("pianoroll"), x->x_name, x->x_width, x->x_height,
 		x->x_pmin, x->x_pmax,
                 x->x_nbgrades, x->x_nbsteps,

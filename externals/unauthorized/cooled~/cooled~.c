@@ -36,26 +36,16 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef __APPLE__
-#include <sys/malloc.h>
-#else
 #include <malloc.h>
-#endif
-
 #include <ctype.h>
 #include <pthread.h>
-#ifdef _WIN32
-#include <io.h>
-#define usleep(a) _sleep(a/1000)
-#else
+#ifdef UNIX
 #include <unistd.h>
 #endif
-
-#include <math.h>
-#ifndef M_PI
+#ifdef NT
 #define M_PI 3.14159265358979323846
 #endif
+#include <math.h>
 
 #include "m_pd.h"
 #include "m_imp.h"
@@ -125,12 +115,12 @@ typedef struct _cooled
 {
     t_object x_obj;
 
-    t_int x_size;                  /* size of the stored sound                                  */
+    int x_size;                  /* size of the stored sound                                  */
     t_float x_readpos;             /* data's playing position                                   */
-    t_int x_writepos;              /* data's recording position                                 */
+    int x_writepos;              /* data's recording position                                 */
     t_float x_readstart;           /* data's starting position for reading                      */
     t_float x_readend;             /* data's ending position for reading                        */
-    t_int x_play;                  /* playing on/off flag                                       */
+    int x_play;                  /* playing on/off flag                                       */
     t_float x_readspeed;           /* speed increment                                           */
     t_float x_record;              /* flag to start recording process                           */
     t_float x_allocate;            /* flag to indicate pending allocation                       */
@@ -145,25 +135,25 @@ typedef struct _cooled
     t_float *x_lsemp;              /* temporary sample buffer ( left )                          */
     char*   x_gifdata;             /* buffer to store graphic data                              */
     char*   x_guicommand;          /* buffer to store gui command                               */
-    t_int   x_draw;                /* drawing option                                            */
+    int   x_draw;                /* drawing option                                            */
 
            /* graphical data block */
-    t_int x_width;                 /* graphical width                             */
-    t_int x_height;                /* graphical height                            */
-    t_int x_selected;              /* flag to remember if we are seleted or not   */
-    t_int x_erase;                 /* flag used when an erase is needed           */
-    t_int x_redraw;                /* flag used when drawing  is needed           */
+    int x_width;                 /* graphical width                             */
+    int x_height;                /* graphical height                            */
+    int x_selected;              /* flag to remember if we are seleted or not   */
+    int x_erase;                 /* flag used when an erase is needed           */
+    int x_redraw;                /* flag used when drawing  is needed           */
     t_glist *x_glist;              /* keep graphic context for various operations */
-    t_int x_zoom;                  /* zoom factor                                 */
+    int x_zoom;                    /* zoom factor                                 */
     pthread_t x_updatechild;       /* thread id for the update child              */
-    t_int x_updatestart;           /* starting position for update                */
-    t_int x_updateend;             /* ending position for update                  */
-    t_int x_xpos;                  /* stuck x position                            */
-    t_int x_ypos;                  /* stuck y position                            */
-    t_int x_shifted;               /* remember shift state from last click        */
-    t_int x_alted;                 /* remember alt state from last click          */
-    t_int x_xdraw;                 /* x drawing position                          */
-    t_int x_edraw;                 /* end of drawing                              */
+    int x_updatestart;             /* starting position for update                */
+    int x_updateend;               /* ending position for update                  */
+    int x_xpos;                    /* stuck x position                            */
+    int x_ypos;                    /* stuck y position                            */
+    int x_shifted;                 /* remember shift state from last click        */
+    int x_alted;                   /* remember alt state from last click          */
+    int x_xdraw;                   /* x drawing position                          */
+    int x_edraw;                   /* end of drawing                              */
 
     t_float x_f;                   /* float needed for signal input */
 
@@ -171,11 +161,11 @@ typedef struct _cooled
 
 /* ------------------------ drawing functions ---------------------------- */
 
-static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
+static void cooled_update_block(t_cooled *x, t_glist *glist, int bnumber)
 {
-    t_int hi, i=0;
+    int hi, i=0;
     t_float fspectrum=0.0;
-    t_int phase=0;
+    int phase=0;
     char color[8];
 
     memset( x->x_gifdata, 0x0, x->x_height*x->x_zoom*sizeof("#FFFFFF ") );
@@ -203,9 +193,9 @@ static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
 
     // set all points
     {
-       t_int fsamp = ( bnumber * x->x_size ) / x->x_width;
-       t_int lsamp = ( ( bnumber+1) * x->x_size ) / x->x_width;
-       t_int si;
+       int fsamp = ( bnumber * x->x_size ) / x->x_width;
+       int lsamp = ( ( bnumber+1) * x->x_size ) / x->x_width;
+       int si;
 
        // post ( "cooled~ : updating samples [%d,%d]", fsamp, lsamp );
 
@@ -213,7 +203,7 @@ static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
        {
          // calculate right channel index
          {
-            t_int rind =  3*x->x_height/4 + ( *(x->x_rdata+si) * (x->x_height/4) ) - 1;
+            int rind =  3*x->x_height/4 + ( *(x->x_rdata+si) * (x->x_height/4) ) - 1;
 
             if ( rind > x->x_height - 1 ) rind = x->x_height - 1;
             if ( rind < x->x_height/2 ) rind = x->x_height/2;
@@ -227,7 +217,7 @@ static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
 
          // calculate left channel index
          {
-            t_int lind =  x->x_height/4 + ( *(x->x_ldata+si) * (x->x_height/4) ) - 1;
+            int lind =  x->x_height/4 + ( *(x->x_ldata+si) * (x->x_height/4) ) - 1;
 
             if ( lind > x->x_height/2 - 1 ) lind = x->x_height/2 - 1;
             if ( lind < 0 ) lind = 0;
@@ -250,10 +240,10 @@ static void cooled_update_block(t_cooled *x, t_glist *glist, t_int bnumber)
 
 }
 
-static void cooled_erase_block(t_cooled *x, t_glist *glist, t_int sample )
+static void cooled_erase_block(t_cooled *x, t_glist *glist, int sample )
 {
   t_canvas *canvas=glist_getcanvas(glist);
-  t_int hi;
+  int hi;
   t_float fspectrum=0.0;
   char fillColor[ 16 ];
 
@@ -277,8 +267,8 @@ static void *cooled_do_update_part(void *tdata)
 {
  t_cooled *x = (t_cooled*) tdata;
  t_canvas *canvas=glist_getcanvas(x->x_glist);
- t_int si;
- t_int nbpoints = 0;
+ int si;
+ int nbpoints = 0;
  t_float percentage = 0, opercentage = 0;
 
    // loose synchro
@@ -342,8 +332,8 @@ static void *cooled_do_update_part(void *tdata)
    return NULL;
 }
 
-static void cooled_update_part(t_cooled *x, t_glist *glist, t_int bstart, t_int bend, 
-                                 t_int erase, t_int redraw, t_int keepframe)
+static void cooled_update_part(t_cooled *x, t_glist *glist, int bstart, int bend, 
+                                 int erase, int redraw, int keepframe)
 {
   pthread_attr_t update_child_attr;
   t_canvas *canvas=glist_getcanvas(x->x_glist);
@@ -601,7 +591,7 @@ static void cooled_save(t_gobj *z, t_binbuf *b)
  t_cooled *x = (t_cooled *)z;
 
    binbuf_addv(b, "ssiisiiii", gensym("#X"),gensym("obj"),
-		(t_int)x->x_xpos, (t_int)x->x_ypos,
+		(int)x->x_obj.te_xpix, (int)x->x_obj.te_ypix,
 		gensym("cooled~"), x->x_size, x->x_width, x->x_height, x->x_draw );
    binbuf_addv(b, ";");
 }
@@ -638,8 +628,8 @@ static void cooled_delete(t_gobj *z, t_glist *glist)
 static void cooled_displace(t_gobj *z, t_glist *glist, int dx, int dy)
 {
   t_cooled *x = (t_cooled *)z;
-  t_int xold = x->x_xpos;
-  t_int yold = x->x_ypos;
+  int xold = x->x_xpos;
+  int yold = x->x_ypos;
 
     x->x_xpos += dx;
     x->x_ypos += dy;
@@ -665,8 +655,8 @@ static void cooled_motion(t_cooled *x, t_floatarg dx, t_floatarg dy)
      /* erase data form readstart to readend */
 static void cooled_erase( t_cooled *x )
 {
-  t_int startsamp, endsamp, si;
-  t_int lreadstart = x->x_readstart, lreadend = x->x_readend;
+  int startsamp, endsamp, si;
+  int lreadstart = x->x_readstart, lreadend = x->x_readend;
 
     if (x->x_allocate) {
         post( "cooled~ : error : cannot erase while re-allocation" );
@@ -694,8 +684,8 @@ static void cooled_erase( t_cooled *x )
      /* paste data form readstart to readend */
 static void cooled_paste( t_cooled *x )
 {
-  t_int startsamp, endsamp, si, inssamp, hlimit, csize;
-  t_int lreadstart = x->x_readstart, lreadend = x->x_readend;
+  int startsamp, endsamp, si, inssamp, hlimit, csize;
+  int lreadstart = x->x_readstart, lreadend = x->x_readend;
 
     if (x->x_allocate) {
         post( "cooled~ : error : cannot paste while re-allocation" );
@@ -735,8 +725,8 @@ static void cooled_paste( t_cooled *x )
      /* replace data form readstart to readend */
 static void cooled_replace( t_cooled *x )
 {
-  t_int startsamp, endsamp, si, inssamp, hlimit, csize;
-  t_int lreadstart = x->x_readstart, lreadend = x->x_readend;
+  int startsamp, endsamp, si, inssamp, hlimit, csize;
+  int lreadstart = x->x_readstart, lreadend = x->x_readend;
 
     if (x->x_allocate) {
         post( "cooled~ : error : cannot replace while re-allocation" );
@@ -838,7 +828,7 @@ static int cooled_click(t_gobj *z, struct _glist *glist,
 			    int xpix, int ypix, int shift, int alt, int dbl, int doit)
 {
  t_cooled* x = (t_cooled *)z;
- t_int pipos;
+ int pipos;
  t_canvas *canvas=glist_getcanvas(x->x_glist);
 
     // post( "cooled_click : x=%d y=%d doit=%d alt=%d, shift=%d", xpix, ypix, doit, alt, shift );
@@ -924,9 +914,9 @@ static void cooled_free(t_cooled *x)
 }
 
     /* allocate tables for storing sound and temporary copy */
-static t_int cooled_allocate(t_cooled *x)
+static int cooled_allocate(t_cooled *x)
 {
-  t_int fi;
+  int fi;
 
     if ( !(x->x_rdata = getbytes( x->x_size*sizeof(float) ) ) ) {
        post( "cooled~ : error : could not allocate buffers" );
@@ -969,9 +959,9 @@ static t_int cooled_allocate(t_cooled *x)
 }
 
     /* allocate tables for storing sound and temporary copy */
-static t_int cooled_reallocate(t_cooled *x, t_int ioldsize, t_int inewsize)
+static int cooled_reallocate(t_cooled *x, int ioldsize, int inewsize)
 {
-  t_int fi, csize;
+  int fi, csize;
   t_float *prdata=x->x_rdata, *pldata=x->x_ldata, *prsemp=x->x_rsemp, *plsemp=x->x_lsemp;
 
     if ( !(x->x_rdata = getbytes( inewsize*sizeof(float) ) ) ) {
@@ -1039,11 +1029,11 @@ static t_int *cooled_perform(t_int *w)
     t_float *rin = (t_float *)(w[2]);
     t_float *rout = (t_float *)(w[3]);
     t_float *lout = (t_float *)(w[4]);
-    t_int   is;
-    t_int n = (int)(w[5]);                      /* number of samples */
-    t_int startsamp, endsamp;
+    int   is;
+    int n = (int)(w[5]);                      /* number of samples */
+    int startsamp, endsamp;
     t_cooled *x = (t_cooled *)(w[6]);
-    t_int lreadstart = x->x_readstart, lreadend = x->x_readend;
+    int lreadstart = x->x_readstart, lreadend = x->x_readend;
 
     if ( lreadstart <= lreadend )
     {
@@ -1121,7 +1111,7 @@ static void cooled_record(t_cooled *x)
     /* map to stereo */
 static void cooled_stereo(t_cooled *x)
 {
-  t_int si;
+  int si;
 
     if (x->x_allocate) {
         post( "cooled~ : error : cannot map to stereo while re-allocation" );
@@ -1226,7 +1216,7 @@ static void cooled_zoom(t_cooled *x, t_floatarg fzoom )
 static void cooled_loop(t_cooled *x, t_symbol *soperator )
 {
   char *operator = soperator->s_name;
-  t_int ci;
+  int ci;
   t_float fvalue, freadstart = x->x_readstart, freadend = x->x_readend;
 
     if ( (soperator->s_name[0] != '*')  &&    

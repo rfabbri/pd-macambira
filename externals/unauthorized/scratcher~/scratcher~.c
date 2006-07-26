@@ -37,28 +37,18 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
-#ifdef __APPLE__
-#include <sys/malloc.h>
-#else
 #include <malloc.h>
-#endif
-
 #include <ctype.h>
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-#ifdef _WIN32
-#include <io.h>
-#include "timeval.h"
-#else
+#ifdef UNIX
 #include <unistd.h>
-#endif /* _WIN32 */
-#include <math.h>
-
-#ifndef M_PI
+#endif
+#ifdef NT
 #define M_PI 3.14159265358979323846
-#endif /* not M_PI */
+#endif
+#include <math.h>
 
 #include "m_pd.h"
 #include "m_imp.h"
@@ -120,7 +110,7 @@ static int ignorevisible=1; // ignore visible test
 #define SCRATCHER_NB_GROOVES 20  
 #define SCRATCHER_MOVE_TIMEOUT 20
 
-static char   *scratcher_version = "scratcher~: version 0.9, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *scratcher_version = "scratcher~: version 0.10, written by Yves Degoyon (ydegoyon@free.fr)";
 
 static t_class *scratcher_class;
 t_widgetbehavior scratcher_widgetbehavior;
@@ -288,7 +278,7 @@ static void scratcher_save(t_gobj *z, t_binbuf *b)
    t_scratcher *x = (t_scratcher *)z;
 
    binbuf_addv(b, "ssiisiiiiff", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("scratcher~"), x->x_size, x->x_width, x->x_height, 
                 x->x_sensibility, x->x_maxspeed, x->x_inertia );
    binbuf_addv(b, ";");

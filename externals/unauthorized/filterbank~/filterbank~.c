@@ -33,12 +33,11 @@
 
 #include "filterbank~.h"
 
-#ifdef _WIN32
+#ifdef NT
 #include <io.h>
-#define random rand
 #else
 #include <unistd.h>
-#endif /* _WIN32 */
+#endif
 
 #define DEFAULT_FILTERBANK_LOWFREQ 0
 #define DEFAULT_FILTERBANK_HIGHFREQ 1600
@@ -46,7 +45,7 @@
 #define FILTERBANK_OUTLET_WIDTH 5
 #define FILTERBANK_HEIGHT 16
 
-static char   *filterbank_version = "filterbank : responses from a set of band-pass filters, version 0.3 (ydegoyon@free.fr)";
+static char   *filterbank_version = "filterbank : responses from a set of band-pass filters, version 0.4 (ydegoyon@free.fr)";
 
 t_widgetbehavior filterbank_widgetbehavior;
 static t_class *filterbank_class_tilde;
@@ -253,7 +252,7 @@ static void filterbank_save(t_gobj *z, t_binbuf *b)
   t_int ii;
 
    binbuf_addv(b, "ssiisiii", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("filterbank~"), x->x_lowfreq, x->x_highfreq,
                 x->x_nbfilters );
    binbuf_addv(b, ";");

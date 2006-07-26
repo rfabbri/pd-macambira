@@ -29,7 +29,7 @@ pd_linux: $(NAME).pd_linux
 
 LINUXCFLAGS = -DPD -DUNIX -O2 -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wno-shadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch -Werror -g
+    -Wno-unused -Wno-parentheses -Wno-switch -g
 
 .c.pd_linux:
 	./tk2c.bash < $*.tk > $*.tk2c

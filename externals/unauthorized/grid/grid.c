@@ -35,7 +35,7 @@ static int gridcount=0;
 static int guidebug=0;
 static int pointsize = 5;
 
-static char   *grid_version = "grid: version 0.6, written by Yves Degoyon (ydegoyon@free.fr)";
+static char   *grid_version = "grid: version 0.7, written by Yves Degoyon (ydegoyon@free.fr)";
 
 #define GRID_SYS_VGUI2(a,b) if (guidebug) \
                          post(a,b);\
@@ -271,7 +271,7 @@ static void grid_save(t_gobj *z, t_binbuf *b)
 
    // post( "saving grid : %s", x->x_name->s_name );
    binbuf_addv(b, "ssiissiffiffiffiiff", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("grid"), x->x_name, x->x_width, x->x_min,
 		x->x_max, x->x_height,
                 x->y_min, x->y_max,

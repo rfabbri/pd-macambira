@@ -65,7 +65,7 @@
 // a pixel is 0.1 meter
 #define PIXELSIZE 0.1
 
-static char   *audience_version = "audience : 2d audience simulation, version 0.6 (ydegoyon@free.fr)";
+static char   *audience_version = "audience : 2d audience simulation, version 0.7 (ydegoyon@free.fr)";
 
 t_widgetbehavior audience_widgetbehavior;
 static t_class *audience_class_tilde;
@@ -366,7 +366,7 @@ static void audience_save(t_gobj *z, t_binbuf *b)
   t_int ii;
 
    binbuf_addv(b, "ssiisiiiifi", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("audience~"), x->x_width, x->x_height,
                 x->x_nbinputs, x->x_nboutputs, x->x_attenuation, x->x_applydelay );
    for ( ii=0; ii<x->x_nbinputs; ii++ )

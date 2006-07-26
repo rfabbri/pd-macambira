@@ -42,12 +42,11 @@
 #include "t_tk.h"
 #include "probalizer.h"
 
-#ifdef _WIN32
+#ifdef NT
 #include <io.h>
-#define random rand
 #else
 #include <unistd.h>
-#endif /* _WIN32 */
+#endif
 
 #define DEFAULT_PROBALIZER_WIDTH 200
 #define DEFAULT_PROBALIZER_HEIGHT 200
@@ -55,7 +54,7 @@
 #define DEFAULT_PROBALIZER_NBOCCURRENCES 100
 #define DEFAULT_PROB_VALUE 10
 
-static char   *probalizer_version = "probalizer : outputs integer values according to a drawn probability curve , version 0.3 (ydegoyon@free.fr)"; 
+static char   *probalizer_version = "probalizer : outputs integer values according to a drawn probability curve , version 0.4 (ydegoyon@free.fr)"; 
 
 t_widgetbehavior probalizer_widgetbehavior;
 static t_class *probalizer_class;
@@ -276,7 +275,7 @@ static void probalizer_save(t_gobj *z, t_binbuf *b)
    int ei,gi;
 
    binbuf_addv(b, "ssiisiiiii", gensym("#X"),gensym("obj"),
-		(t_int)text_xpix(&x->x_obj, x->x_glist), (t_int)text_ypix(&x->x_obj, x->x_glist),
+		(t_int)x->x_obj.te_xpix, (t_int)x->x_obj.te_ypix,
 		gensym("probalizer"), x->x_width, x->x_height,
 		x->x_nvalues, x->x_noccurrences, x->x_save );
    if ( x->x_save ) 
