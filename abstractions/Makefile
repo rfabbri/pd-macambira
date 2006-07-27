@@ -23,9 +23,11 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #==============================================================================#
 
 # if your library isn't included in LIB_TARGETS, it won't be built with
-# Pd-extended. 
-LIB_TARGETS = gyre keyboardkeys la-kitchen list-abs memento \
-nusmuk nqpoly parazit pddp pixeltango purepd rradical
+# Pd-extended.  
+#
+# WARNING!  this MUST be all on one line because the automatic package
+# building scripts rely on it being that way.
+LIB_TARGETS = gyre keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
