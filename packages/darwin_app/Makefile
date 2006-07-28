@@ -17,14 +17,15 @@ BUILDLAYOUT_DIR = $(CWD)/..
 # download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
 # and mount it.  The files will be copied from the mounted .dmg image.
 #WISH = /Applications/Utilities/Wish\ Shell.app
-TCLTK := $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -1|sed 's/\.dmg//')
-TCKTK_BUGFIX_VERSION := $(shell echo $(TCLTK) | \
+TCLTK := $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -n 1|sed 's/\.dmg//')
+TCLTK_BUGFIX_VERSION := $(shell echo $(TCLTK) | \
 	sed 's|TclTkAquaStandalone-[0-9]\.[0-9]\.\([0-9]*\)|\1|')
 
+WISH_SOURCE = $(shell $(scripts_src)/find-wish.app.sh)
 # Wish Shell.app changed to Wish.app in TclTk 8.4.10
-WISH_NAME := $(shell ( test $(TCKTK_BUGFIX_VERSION) -ge 10 && echo Wish ) \
-	|| echo Wish Shell )
-WISH = "/Volumes/$(TCLTK)/$(WISH_NAME).app"
+WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
+	|| echo Wish Shell)
+WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
 
 
@@ -94,7 +95,6 @@ extended_app_install:
 # check here for a reference on how to do this:
 # http://cvs.sourceforge.net/viewcvs.py/tkcvs/tkcvs-proj/PackApp?rev=1.4
 darwin_app_wrapper: Info.plist
-	test -d /Volumes/$(TCLTK) || hdiutil mount $(TCLTK).dmg
 # copy Wish Shell.app from default install location
 # note: use the "standalone" Wish shell to make a "standalone" pd app
 	install -d "$(PD_APP_CONTENTS)/MacOS"
@@ -113,7 +113,6 @@ darwin_app_wrapper: Info.plist
 	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
 		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
-#	diskutil eject /Volumes/$(TCLTK)
 
 
 #------------------------------------------------------------------------------#
@@ -241,7 +240,7 @@ test_locations:
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
 	@echo "WISH_NAME: $(WISH_NAME)"
-	@echo "TCKTK_BUGFIX_VERSION: $(TCKTK_BUGFIX_VERSION)"
+	@echo "TCLTK_BUGFIX_VERSION: $(TCLTK_BUGFIX_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
 	@echo "PREFIX $(prefix)"
