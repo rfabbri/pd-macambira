@@ -13,6 +13,8 @@ DESTDIR = $(PD_APP_CONTENTS)/Resources
 cvs_root_dir = $(CWD)/../..
 BUILDLAYOUT_DIR = $(CWD)/..
 
+include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
+
 # source for the Wish Shell.app used to build Pd
 # download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
 # and mount it.  The files will be copied from the mounted .dmg image.
@@ -27,10 +29,6 @@ WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 	|| echo Wish Shell)
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
-
-
-include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
-
 
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
