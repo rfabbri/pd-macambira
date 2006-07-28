@@ -1,4 +1,3 @@
-
 current: darwin_app
 
 # turn on weak linking and dlopen support
@@ -29,6 +28,10 @@ WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 	|| echo Wish Shell)
 WISH = "$(WISH_SOURCE)/$(WISH_NAME).app"
 WISH_CONTENTS = "$(WISH)/Contents"
+#WISH_CONTENTS = $(WISH)/Contents
+
+# base level optimizations
+OPT_CFLAGS = -Os -funroll-loops -fomit-frame-pointer
 
 # which CPU to compile for
 TARGET_PLATFORM := $(shell uname -p)
@@ -68,6 +71,7 @@ all:
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS)
 
 install: darwin_app
+devel_install: darwin_app_devel
 
 #------------------------------------------------------------------------------#
 darwin_app: darwin_app_core extended_install darwin_app_doc_format rez_install \
@@ -77,6 +81,11 @@ darwin_app_embed_libs
 
 extended_install:
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS) install
+	
+#------------------------------------------------------------------------------#
+darwin_app_devel: darwin_app_devel_core rez_install
+	@echo " "
+	@echo "Pd_devel.app build succeeded!"
 
 #------------------------------------------------------------------------------#
 # this target is for when you already have a pre-built Pd.app and you
@@ -112,6 +121,30 @@ darwin_app_wrapper: Info.plist
 	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
 		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
 
+#------------------------------------------------------------------------------#
+# 
+darwin_app_devel_wrapper: Info.plist
+#	test -d /Volumes/$(TCLTK) || hdiutil mount $(TCLTK).dmg
+# copy Wish Shell.app from default install location
+# note: use the "standalone" Wish shell to make a "standalone" pd app
+	install -d "$(PD_APP_CONTENTS)/MacOS"
+	install -m0755 -p \
+		"$(WISH_CONTENTS)/MacOS/$(WISH_NAME)" \
+		"$(PD_APP_CONTENTS)/MacOS"
+	install -d "$(PD_APP_CONTENTS)/Resources"
+	install -m0644 -p \
+		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
+		"$(PD_APP_CONTENTS)/Resources"
+	install -d "$(PD_APP_CONTENTS)/Frameworks"
+	cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)"
+# set up app wrapper
+	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
+	install -d "$(PD_APP_CONTENTS)/Resources/bin"
+	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
+	install -m0644 -p *.icns  "$(PD_APP_CONTENTS)/Resources"
+	mv "$(PD_APP_CONTENTS)/MacOS/${WISH_NAME}" \
+		"$(PD_APP_CONTENTS)/MacOS/${PD_APP_NAME}"
+#	diskutil eject /Volumes/$(TCLTK)
 
 #------------------------------------------------------------------------------#
 # generate Info.plist using PD_APP_NAME and PD_VERSION
@@ -123,7 +156,7 @@ Info.plist: Info.plist.in
 
 # tigital's Gem window focus black magic
 rez_install:
-	install -p $(CWD)/mac.r $(bindir)
+	install -pv "$(CWD)/mac.r" "$(bindir)"
 	cd $(bindir) && /Developer/tools/Rez -t APPL mac.r -o pd
 
 
@@ -143,7 +176,17 @@ darwin_app_core: darwin_app_wrapper
 	cd $(pddocdir) && \
 		$(scripts_src)/convert-help-to-standard.sh
 
-
+#------------------------------------------------------------------------------#
+darwin_app_devel_core: darwin_app_devel_wrapper
+	cd $(packages_src) && \
+		$(MAKE) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack devel_install 
+	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
+		ln -s ../bin/pd.tk AppMain.tcl
+# support for Info Panel Plugins mgmt
+	cd "$(PD_APP_CONTENTS)" && ln -s Resources/extra Plugins
+# run script to move help-*.pd files to *-help.pd according to the standard
+	cd $(pddocdir) && \
+		$(scripts_src)/convert-help-to-standard.sh
 
 # set the font to 10pt on all help patches
 # the BSD/Darwin version of sed must create a backup file when doing 
@@ -210,6 +253,9 @@ package_clean: darwin_app_clean
 	-rm -rf -- $(DESTDIR)
 	-rm Info.plist
 
+devel_clean: darwin_app_devel_clean
+	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
+	-rm Info.plist
 
 darwin_app_clean:
 	-chmod -R u+w $(PD_APP_CONTENTS)/Frameworks

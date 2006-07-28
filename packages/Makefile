@@ -15,7 +15,8 @@ BUILDLAYOUT_DIR = $(CWD)
 
 
 # default target
-all: pd abstractions doc externals
+all: pd++
+#all: pd abstractions doc externals
 #all: pd abstractions doc externals flext gem
 	@echo "Complete build succeeded!"
 
@@ -268,6 +269,13 @@ pd: $(pd_src)/src/configure
 	-cd $(pd_src)/src && ./configure $(PD_CONFIGURE_FLAGS) && \
 		make $(DEST_PATHS) $(PD_BUILD_FLAGS)
 
+pd++:
+# the next line doesn't work?
+#	echo $$MACOSX_DEPLOYMENT_TARGET=10.3
+	-cd $(pd_src) && scons app_pkg=yes desire=no prefix=$(DESTDIR)\
+		portaudiopath=../../../../dev/portaudio \
+		portmidipath=../../../../dev/portmidi \
+		atomic=yes threadedsf=no debug=yes install
 
 #==============================================================================#
 #
@@ -286,6 +294,11 @@ license_install noncvs_install
 install: pd_install extended_install
 	@echo "Complete install succeeded!"
 
+#------------------------------------------------------------------------------
+# install_devel
+devel_install: pd_devel_install
+	@echo "Complete install succeeded!"
+	
 #------------------------------------------------------------------------------
 # abstractions_install
 abstractions_install:
@@ -505,7 +518,12 @@ pd_install: pd
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
-
+#------------------------------------------------------------------------------
+# pd_devel_install
+PD_NAME=Pd++
+pd_devel_install: pd++
+	install -d $(manualsdir)/$(PD_NAME)
+	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
 #==============================================================================#
 #
@@ -783,6 +801,48 @@ unpatch_pd:
 	@echo " "
 	@echo "unpatching completed."
 
+patch_pd_devel:
+	@echo pd_src $(pd_src)
+# apply all platform-neutral patches
+	for patch in $(shell ls -1 $(CWD)/patches/*.patch); do \
+		echo "Applying $$patch"; \
+		cd $(pd_src)/src/ && patch -p0 < $$patch; \
+	done
+# apply all platform-specific patches
+	for patch in $(shell ls -1 $(CWD)/patches/$(OS_NAME)/*.patch); do \
+		echo "Applying $$patch"; \
+		cd $(pd_src)/src/ && patch -p0 < $$patch; \
+	done
+	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
+# change Pd's version number to reflect the extended build
+# this needs the complete_version_defines patch to work
+	cd $(pd_src)/src/ && \
+		sed 's|^\(#define PD_TEST_VERSION "\).*"|\1$(PACKAGE_VERSION)"|' m_pd.h > \
+			m_pd.h.tmp && mv m_pd.h.tmp m_pd.h
+	@echo " "
+	@echo "patching completed."
+
+
+unpatch_pd_devel:
+# change the version number back to the original 
+# this needs the complete_version_defines patch to work
+	cd $(pd_src)/src && \
+		sed 's|^\(#define PD_TEST_VERSION ".*\)$(PACKAGE_VERSION)"|\1"|' \
+			m_pd.h > m_pd.h.tmp && \
+		mv m_pd.h.tmp m_pd.h
+# apply all platform-specific patches
+	for patch in $(shell ls -1r $(CWD)/patches/$(OS_NAME)/*.patch); do \
+		echo "Applying $$patch"; \
+		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
+	done
+# apply all platform-neutral patches
+	for patch in $(shell ls -1r $(CWD)/patches/*.patch); do \
+		echo "Applying $$patch"; \
+		cd $(pd_src)/src/ && patch -p0 -R < $$patch; \
+	done
+	-rm -f -- $(pd_src)/src/configure  $(pd_src)/src/makefile
+	@echo " "
+	@echo "unpatching completed."
 
 #==============================================================================#
 #
