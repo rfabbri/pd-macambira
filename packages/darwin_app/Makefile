@@ -18,11 +18,11 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 # download TclTkAquaStandalone-8.?.*.dmg from http://tcltkaqua.sourceforge.net/
 # and mount it.  The files will be copied from the mounted .dmg image.
 #WISH = /Applications/Utilities/Wish\ Shell.app
-TCLTK := $(shell /bin/ls -1r TclTkAquaStandalone-8.?.*.dmg|head -n 1|sed 's/\.dmg//')
+TCLTK := $(shell find $(packages_src)/darwin_app -name 'TclTkAquaStandalone-8.?.*.dmg'|head -n 1|sed 's|.*/\(.*\)\.dmg|\1|')
 TCLTK_BUGFIX_VERSION := $(shell echo $(TCLTK) | \
-	sed 's|TclTkAquaStandalone-[0-9]\.[0-9]\.\([0-9]*\)|\1|')
+	sed 's|.*TclTkAquaStandalone-[0-9]\.[0-9]\.\([0-9]*\)|\1|')
 
-WISH_SOURCE = $(shell $(scripts_src)/find-wish.app.sh)
+WISH_SOURCE = $(shell $(scripts_src)/find-wish.app.sh "$(TCLTK)")
 # Wish Shell.app changed to Wish.app in TclTk 8.4.10
 WISH_NAME := $(shell ( test -d $(WISH_SOURCE)/Wish.app && echo Wish) \
 	|| echo Wish Shell)
@@ -81,7 +81,7 @@ darwin_app_embed_libs
 
 extended_install:
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS) install
-	
+
 #------------------------------------------------------------------------------#
 darwin_app_devel: darwin_app_devel_core rez_install
 	@echo " "
@@ -112,8 +112,11 @@ darwin_app_wrapper: Info.plist
 	install -m0644 -p \
 		"$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources"
-	install -d "$(PD_APP_CONTENTS)/Frameworks"
-	cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)"
+# only install Frameworks if using a standalone Wish.app
+	(test -d "$(WISH_CONTENTS)/Frameworks" && \
+		(install -d "$(PD_APP_CONTENTS)/Frameworks"; \
+		cp -Rp "$(WISH_CONTENTS)/Frameworks" "$(PD_APP_CONTENTS)" ) ) || \
+		echo "Skipping Frameworks copy."
 # set up app wrapper
 	install -d "$(PD_APP_CONTENTS)/Resources/Scripts"
 	install -m0644 -p Info.plist "$(PD_APP_CONTENTS)"
@@ -283,7 +286,8 @@ test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
 	@echo "PACKAGE_VERSION: $(PACKAGE_VERSION)"
-	@echo "WISH_NAME: $(WISH_NAME)"
+	@echo "WISH: $(WISH)"
+	@echo "TCLTK: $(TCLTK)"
 	@echo "TCLTK_BUGFIX_VERSION: $(TCLTK_BUGFIX_VERSION)"
 	@echo "CWD $(CWD)"
 	@echo "DESTDIR $(DESTDIR)"
