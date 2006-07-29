@@ -69,7 +69,7 @@ pd_linux: comport.pd_linux
 
 .SUFFIXES: .pd_linux
 
-LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
+LINUXCFLAGS = -DPD -O2 -fPIC -funroll-loops -fomit-frame-pointer \
     -Wall -W -Wshadow -Wstrict-prototypes -Werror \
     -Wno-unused -Wno-parentheses -Wno-switch
 
