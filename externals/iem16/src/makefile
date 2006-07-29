@@ -14,7 +14,7 @@ current: all
 # PD will install to $(DESTDIR)$(INSTALLL_PREFIX)$(PDLIBDIR), which is /usr/local/lib/pd
 # by default
 DESTDIR =
-INSTALL_PREFIX = /usr
+INSTALL_PREFIX = /usr/local
 PDLIBDIR = /lib/pd
 #these were the user adjustables
 
@@ -42,7 +42,7 @@ LINCLUDE =
 $(LINUXOBJECTS): *.h
 
 #CFLAGS = -O2 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
-CFLAGS = -O3 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
+CFLAGS = -fPIC -O3 -g -Wall $(LINCLUDE) $(UCFLAGS) $(AFLAGS)
 
 
 everything: clean all install distclean
