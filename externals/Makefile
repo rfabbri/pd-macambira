@@ -238,6 +238,7 @@ template_install: template
 #	install -d $(manualsdir)/$(TEMPLATE_NAME)
 #	install -p $(externals_src)/template/manual.txt \
 #		$(manualsdir)/$(TEMPLATE_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/template/README \
 		$(readmesdir)/$(TEMPLATE_NAME).txt
 	install -d $(examplesdir)/$(TEMPLATE_NAME)
@@ -271,6 +272,7 @@ boids_install: boids
 #	install -d $(manualsdir)/$(BOIDS_NAME)
 #	install -p $(externals_src)/boids/manual.txt \
 #		$(manualsdir)/$(BOIDS_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/boids/boids.readme.txt \
 		$(readmesdir)/$(BOIDS_NAME).txt
 #	install -d $(examplesdir)/$(BOIDS_NAME)
@@ -303,6 +305,7 @@ bsaylor_install: bsaylor
 	install -p $(externals_src)/bsaylor/help/*.pd \
 		$(helpdir)/$(BSAYLOR_NAME)
 #	install -d $(manualsdir)/$(BSAYLOR_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/bsaylor/README.txt \
 		$(readmesdir)/$(BSAYLOR_NAME).txt
 #	install -d $(examplesdir)/$(BSAYLOR_NAME)
@@ -338,6 +341,7 @@ corelibs_install: corelibs
 #	install -d $(manualsdir)/$(CORELIBS_NAME)
 #	install -p $(externals_src)/corelibs/manual.txt \
 #		$(manualsdir)/$(CORELIBS_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/corelibs/README \
 		$(readmesdir)/$(CORELIBS_NAME).txt
 #	install -d $(examplesdir)/$(CORELIBS_NAME)
@@ -407,6 +411,7 @@ cxc_install: cxc
 	install -p $(wildcard $(externals_src)/cxc/reference/*.pd) \
 		$(helpdir)/$(CXC_NAME)
 #	install -d $(manualsdir)/$(CXC_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/cxc/README \
 		 $(readmesdir)/$(CXC_NAME).txt
 
@@ -474,6 +479,7 @@ devellibs_install: devellibs
 #	install -d $(manualsdir)/$(DEVELLIBS_NAME)
 #	install -p $(externals_src)/devellibs/manual.txt \
 #		$(manualsdir)/$(DEVELLIBS_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/devellibs/README \
 		$(readmesdir)/$(DEVELLIBS_NAME).txt
 	install -d $(examplesdir)/$(DEVELLIBS_NAME)
@@ -515,6 +521,7 @@ ext13_install: ext13
 	install -p $(wildcard $(externals_src)/ext13/doc/*.pd) \
 		$(helpdir)/$(EXT13_NAME)
 #	install -d $(manualsdir)/$(EXT13_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/ext13/README \
 		$(readmesdir)/$(EXT13_NAME).txt
 
@@ -550,6 +557,7 @@ fftease_install: fftease
 	install -p $(externals_src)/fftease/help/*.pd \
 		$(helpdir)/$(FFTEASE_NAME)
 #	install -d $(manualsdir)/$(FFTEASE_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/fftease/README \
 		$(readmesdir)/$(FFTEASE_NAME).txt
 	install -d $(examplesdir)/$(FFTEASE_NAME)
@@ -620,6 +628,7 @@ flib_install: flib
 #	install -d $(manualsdir)/$(FLIB_NAME)
 #	install -p $(externals_src)/postlude/flib/manual.txt \
 #		$(manualsdir)/$(FLIB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/postlude/flib/README \
 		$(readmesdir)/$(FLIB_NAME).txt
 #	install -d $(examplesdir)/$(FLIB_NAME)
@@ -684,6 +693,7 @@ freeverb_install: freeverb
 	install -d $(helpdir)
 	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) $(helpdir)
 #	install -d $(manualsdir)/$(FREEVERB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/freeverb~/README \
 		$(readmesdir)/$(FREEVERB_NAME).txt
 
@@ -757,6 +767,7 @@ hardware_install: hardware
 	install -d $(manualsdir)/$(HARDWARE_NAME)
 	install -p $(externals_src)/hardware/memPIO/README.txt \
 		$(manualsdir)/$(HARDWARE_NAME)/memPIO.txt
+	install -d $(readmesdir)
 	install -p $(externals_src)/hardware/README.txt \
 		$(readmesdir)/$(HARDWARE_NAME).txt
 	install -d $(examplesdir)/$(HARDWARE_NAME)
@@ -790,6 +801,7 @@ hcs_install: hcs
 #	install -d $(manualsdir)/$(HCS_NAME)
 #	install -p $(externals_src)/hcs/manual.txt \
 #		$(manualsdir)/$(HCS_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/hcs/README \
 		$(readmesdir)/$(HCS_NAME).txt
 	install -d $(examplesdir)/$(HCS_NAME)
@@ -885,6 +897,7 @@ hidin_install: hidin
 	install -p $(externals_src)/hidin/help/*.pd \
 		$(helpdir)/$(HIDIN_NAME)
 #	install -d $(manualsdir)/$(HIDIN_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/hidin/README \
 		$(readmesdir)/$(HIDIN_NAME).txt
 	install -d $(examplesdir)/$(HIDIN_NAME)
@@ -919,6 +932,7 @@ iem_ambi_install: iem_ambi
 	install -p $(externals_src)/iem/iem_ambi/help/*.pd \
 		$(helpdir)/$(IEM_AMBI_NAME)
 #	install -d $(manualsdir)/$(IEM_AMBI_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_ambi/READ_ME.txt \
 		$(readmesdir)/$(IEM_AMBI_NAME).txt
 #	install -d $(examplesdir)/$(IEM_AMBI_NAME)
@@ -952,6 +966,7 @@ iem_bin_ambi_install: iem_bin_ambi
 	install -p $(externals_src)/iem/iem_bin_ambi/help/*.pd \
 		$(helpdir)/$(IEM_BIN_AMBI_NAME)
 	install -d $(manualsdir)/$(IEM_BIN_AMBI_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_bin_ambi/READ_ME.txt \
 		$(readmesdir)/$(IEM_BIN_AMBI_NAME).txt
 #	install -d $(examplesdir)/$(IEM_BIN_AMBI_NAME)
@@ -985,6 +1000,7 @@ iem_tab_install: iem_tab
 	install -p $(externals_src)/iem/iem_tab/help/*.pd \
 		$(helpdir)/$(IEM_TAB_NAME)
 #	install -d $(manualsdir)/$(IEM_TAB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/iem/iem_tab/READ_ME.txt \
 		$(readmesdir)/$(IEM_TAB_NAME).txt
 	install -d $(examplesdir)/$(IEM_TAB_NAME)
@@ -1142,6 +1158,7 @@ mapping_install: mapping
 	install -p $(externals_src)/mapping/help/*.pd \
 		$(helpdir)/$(MAPPING_NAME)
 #	install -d $(manualsdir)/$(MAPPING_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/mapping/README.txt \
 		$(readmesdir)/$(MAPPING_NAME).txt
 	install -d $(examplesdir)/$(MAPPING_NAME)
@@ -1171,6 +1188,7 @@ markex_install: markex
 	install -p $(wildcard $(externals_src)/markex/*.pd) \
 		$(helpdir)/$(MARKEX_NAME)
 #	install -d $(manualsdir)/$(MARKEX_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/markex/README \
 		$(readmesdir)/$(MARKEX_NAME).txt
 
@@ -1198,6 +1216,7 @@ maxlib_install: maxlib
 	install -p $(wildcard $(externals_src)/maxlib/help/*.pd) \
 		$(helpdir)/$(MAXLIB_NAME)
 #	install -d $(manualsdir)/$(MAXLIB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/maxlib/README \
 		$(readmesdir)/$(MAXLIB_NAME).txt
 
@@ -1227,6 +1246,7 @@ mjlib_install: mjlib
 	install -p $(wildcard $(externals_src)/mjlib/doc/*.pd) \
 		$(helpdir)/$(MJLIB_NAME)
 #	install -d $(manualsdir)/$(MJLIB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/mjlib/readme.txt \
 		$(readmesdir)/$(MJLIB_NAME).txt
 
@@ -1255,6 +1275,7 @@ motex_install: motex
 	install -p $(wildcard $(externals_src)/motex/*-help.pd) \
 		$(helpdir)/$(MOTEX_NAME)
 #	install -d $(manualsdir)/$(MOTEX_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/motex/README \
 		$(readmesdir)/$(MOTEX_NAME).txt
 
@@ -1358,6 +1379,7 @@ pdogg_install: pdogg
 	install -p $(externals_src)/pdogg/*/*.pd \
 		$(helpdir)/$(PDOGG_NAME)
 #	install -d $(manualsdir)/$(PDOGG_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/pdogg/readme \
 		$(readmesdir)/$(PDOGG_NAME).txt
 
@@ -1438,6 +1460,7 @@ pidip_install:
 	install -d $(examplesdir)/$(PIDIP_NAME)
 	install -p $(externals_src)/pidip/patches/*.* $(examplesdir)/$(PIDIP_NAME)
 #	install -d $(manualsdir)/$(PIDIP_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/pidip/README \
 		$(readmesdir)/$(PIDIP_NAME).txt
 	install -d $(examplesdir)/$(PIDIP_NAME)/images
@@ -1506,6 +1529,7 @@ postlude_install: postlude
 #	install -d $(manualsdir)/$(POSTLUDE_NAME)
 #	install -p $(externals_src)/postlude/manual.txt \
 #		$(manualsdir)/$(POSTLUDE_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/postlude/dssi/README \
 		$(readmesdir)/$(POSTLUDE_NAME)-dssi.txt
 	install -p $(externals_src)/postlude/getpatchname/README \
@@ -1542,6 +1566,7 @@ sigpack_install: sigpack
 	install -p $(externals_src)/sigpack/help/*.pd \
 		$(helpdir)/$(SIGPACK_NAME)
 #	install -d $(manualsdir)/$(SIGPACK_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/sigpack/readme.txt \
 		$(readmesdir)/$(SIGPACK_NAME).txt
 
@@ -1570,6 +1595,7 @@ smlib_install: smlib
 	install -p $(wildcard $(externals_src)/smlib/help/*.pd )\
 		$(helpdir)/$(SMLIB_NAME)
 #	install -d $(manualsdir)/$(SMLIB_NAME)
+	install -d $(readmesdir)
 	install -p $(externals_src)/smlib/readme.txt $(readmesdir)/$(SMLIB_NAME).txt
 	install -d $(examplesdir)/$(SMLIB_NAME)
 	install -p $(wildcard $(externals_src)/smlib/examples/*.pd) \
