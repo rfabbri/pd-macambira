@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-static char *version = "$Revision: 1.11 $";
+static char *version = "$Revision: 1.12 $";
 
 t_int folder_list_instance_count;
 
@@ -127,12 +127,16 @@ static void folder_list_output(t_folder_list* x)
 	   case GLOB_NOSPACE: 
 		  error("[folder_list] out of memory for \"%s\"",x->x_pattern->s_name); 
 		  break;
+#ifdef GLOB_ABORTED
 	   case GLOB_ABORTED: 
 		  error("[folder_list] aborted \"%s\"",x->x_pattern->s_name); 
 		  break;
+#endif
+#ifdef GLOB_NOMATCH
 	   case GLOB_NOMATCH: 
 		  error("[folder_list] nothing found for \"%s\"",x->x_pattern->s_name); 
 		  break;
+#endif
 	}
 	for(i = 0; i < glob_buffer.gl_pathc; i++)
 		outlet_symbol( x->x_obj.ob_outlet, gensym(glob_buffer.gl_pathv[i]) );
