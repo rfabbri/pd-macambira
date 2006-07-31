@@ -1,0 +1,19 @@
+#!/bin/sh
+
+SYSTEM=`uname -s`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
+
+touch $LOGFILE
+
+# standard update
+su pd -c "/home/pd/rsync/pure-data/scripts/update-developer-layout.sh"  >> $LOGFILE 2>&1
+
+# some files are missing, so remove the whole shebang...
+rm -rf /home/pd/rsync/pure-data/pd/portaudio*  >> $LOGFILE 2>&1
+
+# then replace it with a SVN snapshot
+su pd -c "cd /home/pd/rsync/pure-data/pd/ && tar xzf ../../pa_snapshot_v19.tar.gz" \
+	 >> $LOGFILE 2>&1

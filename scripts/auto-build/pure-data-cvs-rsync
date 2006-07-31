@@ -1,0 +1,30 @@
+#!/bin/sh
+
+SYSTEM=`uname -s`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
+
+VERBOSE_FLAGS=-v
+#VERBOSE_FLAGS="-v --progress"
+
+touch $LOGFILE
+
+echo "rsync pure-data" >> $LOGFILE 2>&1
+echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
+(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  rsync://pure-data.cvs.sourceforge.net/cvsroot/p/pu/pure-data/ /home/pd/cvsroot/pure-data/  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pure-data CVS FAILED") >> $LOGFILE 2>&1
+
+echo "chown -R pd /home/pd/cvsroot/pure-data" >> $LOGFILE 2>&1
+echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
+chown -R pd /home/pd/cvsroot/pure-data >> $LOGFILE 2>&1
+
+echo "rsync pd-gem" >> $LOGFILE 2>&1
+echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
+(/usr/bin/rsync -ax $VERBOSE_FLAGS --delete  rsync://pd-gem.cvs.sourceforge.net/cvsroot/p/pd/pd-gem/ /home/pd/cvsroot/pd-gem  || /usr/bin/logger -i -p local6.warning -t "$0" "rsync pd-gem CVS FAILED") >> $LOGFILE 2>&1
+
+echo "chown -R pd /home/pd/cvsroot/pd-gem" >> $LOGFILE 2>&1
+echo "----------------------------------------------------------------------" >> $LOGFILE 2>&1
+chown -R pd /home/pd/cvsroot/pd-gem >> $LOGFILE 2>&1
+
+

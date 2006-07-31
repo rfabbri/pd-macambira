@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# prepare a directory per date for the auto-builders to upload to
+
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+
+BUILD_ROOT="/var/www/auto-build"
+TODAYS_ROOT="${BUILD_ROOT}/${DATE}"
+
+chown -R root.root "${BUILD_ROOT}"
+mkdir "${TODAYS_ROOT}"
+chown nobody.nogroup "${TODAYS_ROOT}"
+

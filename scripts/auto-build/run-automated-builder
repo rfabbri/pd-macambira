@@ -1,0 +1,22 @@
+#!/bin/sh
+
+HOSTNAME=`hostname`
+SYSTEM=`uname -s`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
+
+touch ${LOGFILE}
+
+su - pd -c /home/pd/auto-build/scripts/automated-builder.sh >> $LOGFILE 2>&1
+
+# upload files to webpage
+rsync -a /home/pd/auto-build/packages/linux_make/build/Pd*.tar.bz2 rsync://128.238.56.50/upload/${DATE}/`ls -1 /home/pd/auto-build/packages/linux_make/build/Pd*.tar.bz2 | sed "s|.*/\(.*\)tar\.bz2|\1${HOSTNAME}.tar.bz2|"`  >> $LOGFILE 2>&1
+
+# send status report
+SUBJECT="$HOSTNAME Pd-$SYSTEM build results $DATE $TIME"
+tail -200 ${LOG_FILE} | mail -s "${SUBJECT}" hans@eds.org
+
+
+
