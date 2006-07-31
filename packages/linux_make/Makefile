@@ -112,6 +112,9 @@ test_package:
 	cd /tmp && tar xjf $(DESTDIR)/$(PACKAGE_NAME).tar.bz2
 	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local install
 	make -C /tmp/$(PACKAGE_NAME) prefix=/tmp/usr/local uninstall
+	-rmdir /tmp/usr/local
+	-rmdir /tmp/usr
+	-rm -rf -- /tmp/$(PACKAGE_NAME)
 
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
