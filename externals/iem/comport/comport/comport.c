@@ -721,12 +721,16 @@ static int open_serial(unsigned int com_num, t_comport *x)
             case GLOB_NOSPACE:
                 error("[comport] out of memory for \"%s\"",x->serial_device_name);
                 break;
+#ifdef GLOB_ABORTED
             case GLOB_ABORTED:
                 error("[comport] aborted \"%s\"",x->serial_device_name);
                 break;
+#endif
+#ifdef GLOB_NOMATCH
             case GLOB_NOMATCH:
                 error("[comport] no serial devices found for \"%s\"",x->serial_device_name);
                 break;
+#endif
         }
         if(com_num < glob_buffer.gl_pathc)
         {
