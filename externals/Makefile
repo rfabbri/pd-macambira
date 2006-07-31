@@ -107,10 +107,11 @@ CXXFLAGS = $(CFLAGS)
 # if your library isn't included in LIB_TARGETS, it won't be built with
 # Pd-extended.  For libraries that build on all platforms, add them directly
 # below, otherwise add to the correct platforms below.
+
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ext13 flib freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ekext ext13 flib freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -492,6 +493,42 @@ devellibs_clean:
 	-rm -f -- $(externals_src)/devellibs/*.bak
 	-rm -f -- $(externals_src)/devellibs/*.*~
 
+
+
+
+
+#------------------------------------------------------------------------------#
+# EKEXT
+EKEXT_NAME=ekext
+EKEXT_OBJECTS := $(wildcard $(externals_src)/ekext/*/*.c) \
+$(wildcard $(externals_src)/ekext/*/*/*.c)
+ekext: $(EKEXT_OBJECTS:.c=.$(EXTENSION))
+
+ekext_install: ekext
+	install -d $(objectsdir)/$(EKEXT_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(EKEXT_NAME) \
+		--author "Ed Kelly <morph_2016@yahoo.co.uk>" \
+		--description "" \
+		--license "BSD" \
+		--version ""
+	install -p $(EKEXT_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(EKEXT_NAME)
+	install -d $(helpdir)/$(EKEXT_NAME)
+	install -p $(externals_src)/ekext/*/help-*.pd \
+		$(helpdir)/$(EKEXT_NAME)
+#	install -d $(manualsdir)/$(EKEXT_NAME)
+#	install -p $(externals_src)/ekext/manual.txt \
+#		$(manualsdir)/$(EKEXT_NAME)
+#	install -p $(externals_src)/ekext/README \
+#		$(readmesdir)/$(EKEXT_NAME).txt
+#	install -d $(examplesdir)/$(EKEXT_NAME)
+#	install -p $(externals_src)/ekext/examples/*.pd \
+#		$(examplesdir)/$(EKEXT_NAME)
+
+ekext_clean:
+	-rm -f -- $(EKEXT_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(EKEXT_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/ekext/*/*.bak
+	-rm -f -- $(externals_src)/ekext/*/*.*~
 
 
 
