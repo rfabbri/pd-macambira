@@ -41,6 +41,7 @@ void *arraysize_new(t_symbol *s)
 {
   t_arraysize *x = (t_arraysize *)pd_new(arraysize_class);
 
+  symbolinlet_new(&x->x_obj, &x->array_name);
   outlet_new(&x->x_obj, gensym("float"));
 
   x->array_name = s;
@@ -52,6 +53,6 @@ void arraysize_setup(void)
 {
   arraysize_class = class_new(gensym("arraysize"), (t_newmethod)arraysize_new, 0, sizeof(t_arraysize), CLASS_DEFAULT, A_DEFSYMBOL, 0);
   
-  class_addmethod(arraysize_class,(t_method)arraysize_set,gensym("set"), A_DEFSYM, 0);
+  class_addmethod(arraysize_class,(t_method)arraysize_set,gensym("set"), A_DEFSYMBOL, 0);
   class_addbang(arraysize_class,arraysize_bang);
 }
