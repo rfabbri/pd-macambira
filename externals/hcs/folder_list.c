@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-static char *version = "$Revision: 1.10 $";
+static char *version = "$Revision: 1.11 $";
 
 t_int folder_list_instance_count;
 
@@ -206,7 +206,7 @@ void folder_list_setup(void)
 								  0,
 								  sizeof(t_folder_list), 
 								  0, 
-								  A_DEFSYM, 
+								  A_DEFSYMBOL, 
 								  0);
 	/* add inlet datatype methods */
 	class_addbang(folder_list_class,(t_method) folder_list_output);
@@ -214,6 +214,6 @@ void folder_list_setup(void)
 	
 	/* add inlet message methods */
 	class_addmethod(folder_list_class,(t_method) folder_list_set,gensym("set"), 
-					A_DEFSYM, 0);
+					A_DEFSYMBOL, 0);
 }
 
