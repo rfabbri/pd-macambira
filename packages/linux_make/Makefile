@@ -1,7 +1,6 @@
 #
 # for making a tar.bz2 that installs using a Makefile
 #
-all: install
 
 CWD := $(shell pwd)
 
@@ -41,6 +40,9 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				prefix=$(prefix) \
 				OPT_CFLAGS="$(OPT_CFLAGS)" \
 				UNAME=$(UNAME)
+
+all: 	
+	make -C $(packages_src) $(DEST_PATHS)
 
 
 install: 
