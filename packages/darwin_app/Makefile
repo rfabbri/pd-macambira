@@ -68,7 +68,7 @@ DEST_PATHS = BUILDLAYOUT_DIR=$(BUILDLAYOUT_DIR) \
 				UNAME=$(UNAME)
 
 all:
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS)
+	$(MAKE) -C $(packages_src) $(DEST_PATHS)
 
 install: darwin_app
 devel_install: darwin_app_devel
@@ -80,7 +80,7 @@ darwin_app_embed_libs
 	@echo "Pd.app build succeeded!"
 
 extended_install:
-	cd $(packages_src) && $(MAKE) $(DEST_PATHS) install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------#
 darwin_app_devel: darwin_app_devel_core rez_install
