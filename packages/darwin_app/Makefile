@@ -268,8 +268,8 @@ darwin_app_clean:
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
 	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
 	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
-	-rm -f -- "$(WISH_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
-		"$(WISH_CONTENTS)/Resources/pd*.icns"
+	-rm -f -- "$(PD_APP_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
+		"$(PD_APP_CONTENTS)/Resources/pd*.icns"
 	-rmdir $(PD_APP_CONTENTS)/Resources
 	-rm -f -- $(DESTDIR)
 	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
