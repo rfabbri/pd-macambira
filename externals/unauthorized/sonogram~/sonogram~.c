@@ -37,7 +37,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#ifdef __APPLE__  
+#include <sys/malloc.h>  
+#else
 #include <malloc.h>
+#endif
 #include <ctype.h>
 #include <pthread.h>
 #ifdef UNIX
