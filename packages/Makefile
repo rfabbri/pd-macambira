@@ -14,10 +14,10 @@ DESTDIR = $(CWD)/build
 BUILDLAYOUT_DIR = $(CWD)
 
 
-# default target
-all: pd++
-#all: pd abstractions doc externals
+## default target
+all: pd abstractions doc externals
 #all: pd abstractions doc externals flext gem
+#all: pd++
 	@echo "Complete build succeeded!"
 
 include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
@@ -298,7 +298,7 @@ install: pd_install extended_install
 # install_devel
 devel_install: pd_devel_install
 	@echo "Complete install succeeded!"
-	
+
 #------------------------------------------------------------------------------
 # abstractions_install
 abstractions_install:
