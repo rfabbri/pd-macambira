@@ -520,7 +520,8 @@ pd_install: pd
 
 #------------------------------------------------------------------------------
 # pd_devel_install
-PD_NAME=Pd++
+##PD_NAME=Pd++  # this breaks Pd-extended compilation!
+# it should use its own variable, like PDDEVEL_NAME <hans@at.or.at>
 pd_devel_install: pd++
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
