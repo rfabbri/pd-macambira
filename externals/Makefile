@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ekext ext13 flib freeverb ggee hardware iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ekext ext13 flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -828,22 +828,22 @@ hcs_install: hcs
 	install -d $(objectsdir)/$(HCS_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HCS_NAME) \
 		--author "Hans-Christoph Steiner <hans@at.or.at>" \
-		--description "" \
+		--description "random grab bag of object prototypes" \
 		--license "GNU GPL" \
 		--version ""
 	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HCS_NAME)
 	install -d $(helpdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/help/*.pd \
+	install -p $(externals_src)/hcs/*-help.pd \
 		$(helpdir)/$(HCS_NAME)
-#	install -d $(manualsdir)/$(HCS_NAME)
-#	install -p $(externals_src)/hcs/manual.txt \
-#		$(manualsdir)/$(HCS_NAME)
-	install -d $(readmesdir)
-	install -p $(externals_src)/hcs/README \
-		$(readmesdir)/$(HCS_NAME).txt
-	install -d $(examplesdir)/$(HCS_NAME)
-	install -p $(externals_src)/hcs/examples/*.pd \
-		$(examplesdir)/$(HCS_NAME)
+	install -d $(manualsdir)/$(HCS_NAME)
+	install -p $(externals_src)/hcs/README* $(externals_src)/hcs/TODO \
+		$(manualsdir)/$(HCS_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/hcs/README \
+#		$(readmesdir)/$(HCS_NAME).txt
+#	install -d $(examplesdir)/$(HCS_NAME)
+#	install -p $(externals_src)/hcs/examples/*.pd \
+#g		$(examplesdir)/$(HCS_NAME)
 
 hcs_clean:
 	-rm -f -- $(HCS_OBJECTS:.c=.$(EXTENSION))
@@ -1723,6 +1723,43 @@ unauthorized_clean:
 	-rm -f -- $(externals_src)/unauthorized/*/*.bak
 	-rm -f -- $(externals_src)/*/*.*~
 	-rm -f -- $(externals_src)/*.*~
+
+
+
+#------------------------------------------------------------------------------#
+# USBHID
+USBHID_NAME=usbhid
+USBHID_OBJECTS := $(wildcard $(externals_src)/hcs/usbhid/*.c)
+usbhid: $(USBHID_OBJECTS:.c=.$(EXTENSION))
+
+usbhid_install: usbhid
+	install -d $(objectsdir)/$(USBHID_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(USBHID_NAME) \
+		--author "Hans-Christoph Steiner" \
+		--description "pure USB HID object for accessing HID devices" \
+		--license "GNU GPL" \
+		--version ""
+	install -p $(USBHID_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(USBHID_NAME)
+	install -d $(helpdir)/$(USBHID_NAME)
+	install -p $(externals_src)/hcs/usbhid/*-help.pd \
+		$(helpdir)/$(USBHID_NAME)
+#	install -d $(manualsdir)/$(USBHID_NAME)
+#	install -p $(externals_src)/usbhid/manual.txt \
+#		$(manualsdir)/$(USBHID_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/usbhid/README \
+#		$(readmesdir)/$(USBHID_NAME).txt
+#	install -d $(examplesdir)/$(USBHID_NAME)
+#	install -p $(externals_src)/usbhid/examples/*.pd \
+#		$(examplesdir)/$(USBHID_NAME)
+
+usbhid_clean:
+	-rm -f -- $(USBHID_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(USBHID_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/usbhid/*.bak
+	-rm -f -- $(externals_src)/usbhid/*.*~
+
+
 
 #------------------------------------------------------------------------------#
 # VBAP
