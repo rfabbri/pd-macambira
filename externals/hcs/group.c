@@ -33,13 +33,14 @@
 #include <stdio.h>
 #include <lm.h>
 #else
+#include <sys/types.h>
 #include <stdlib.h>
 #include <grp.h>
 #endif
 
 #include <string.h>
 
-static char *version = "$Revision: 1.2 $";
+static char *version = "$Revision: 1.3 $";
 
 t_int group_instance_count;
 
