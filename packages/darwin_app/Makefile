@@ -277,6 +277,15 @@ darwin_app_clean:
 #
 #==============================================================================#
 
+test_package:
+	echo "Mounting $(DMG_NAME)"
+	cd $(CWD) && hdiutil mount "$(DMG_NAME)"
+# some better tests should go in here
+	echo "Ejecting $(DMG_NAME)"
+	cd $(CWD) && hdiutil eject "$(DMG_NAME)"
+
+
+
 test_locations:
 	@echo "PD_VERSION: $(PD_VERSION)"
 	@echo "PACKAGE_NAME: $(PACKAGE_NAME)"
