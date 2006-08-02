@@ -80,7 +80,7 @@ darwin_app_embed_libs
 	@echo "Pd.app build succeeded!"
 
 extended_install:
-	$(MAKE) -C $(packages_src) $(DEST_PATHS) install
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) extended_install
 
 #------------------------------------------------------------------------------#
 darwin_app_devel: darwin_app_devel_core rez_install
@@ -169,8 +169,8 @@ darwin_app_embed_libs:
 
 #------------------------------------------------------------------------------#
 darwin_app_core: darwin_app_wrapper
-	cd $(packages_src) && \
-		$(MAKE) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack pd_install 
+	$(MAKE) -C $(packages_src) $(DEST_PATHS) PD_CONFIGURE_FLAGS=--enable-jack \
+		pd_install 
 	cd "$(PD_APP_CONTENTS)/Resources/Scripts" && \
 		ln -s ../bin/pd.tk AppMain.tcl
 # support for Info Panel Plugins mgmt
@@ -193,12 +193,11 @@ darwin_app_devel_core: darwin_app_devel_wrapper
 
 # set the font to 10pt on all help patches
 # the BSD/Darwin version of sed must create a backup file when doing 
-# in-place replacement, so delete the unneeded backup files
+# in-place replacement, so delete the unneeded backup files.
 darwin_app_doc_format:
-	cd $(pddocdir) && \
-		sed -i.bak 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' \
-			*/*.pd */*/*.pd */*/*/*.pd
-	find $(DESTDIR) -name '*.pd.bak' -delete
+	find $(pddocdir) -name '*.pd' -exec \
+		sed -i.b 's/^\(\#N canvas [0-9]* [0-9]* [0-9]* [0-9]*\) 12/\1 10/' '{}' \;
+	find $(DESTDIR) -name '*.pd.b' -delete
 
 
 #==============================================================================#
@@ -234,11 +233,7 @@ package: dmg
 DMG_NAME = $(PACKAGE_NAME)
 dmg: darwin_app_perms
 	install -d "$(CWD)/$(DMG_NAME)"
-	install -p -m0644 $(manualsdir)/Pd/Pd-LICENSE.txt \
-		$(manualsdir)/Pd/License.html \
-		$(manualsdir)/Pd/Welcome.html \
-		$(manualsdir)/Pd/ReadMe.html \
-		"$(CWD)/$(DMG_NAME)"
+	install -p -m0644 $(manualsdir)/Pd/ReadMe.html "$(CWD)/$(DMG_NAME)"
 	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 	install -p -m0644 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"

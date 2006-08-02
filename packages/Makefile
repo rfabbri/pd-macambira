@@ -302,24 +302,24 @@ devel_install: pd_devel_install
 #------------------------------------------------------------------------------
 # abstractions_install
 abstractions_install:
-	cd $(abstractions_src) && make $(DEST_PATHS) install
+	make -C $(abstractions_src) $(DEST_PATHS) install
 
 #------------------------------------------------------------------------------
 # doc_install
 doc_install: 
-	cd $(doc_src) && make $(DEST_PATHS) install
+	make -C $(doc_src) $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # extensions_install
 extensions_install: 
-	cd $(extensions_src) && make $(DEST_PATHS) install
+	make -C $(extensions_src) $(DEST_PATHS) install
 
 
 #------------------------------------------------------------------------------
 # externals_install
 externals_install: 
-	cd $(externals_src) && make $(DEST_PATHS) install
+	make -C $(externals_src) $(DEST_PATHS) install
 
 
 
@@ -500,21 +500,19 @@ gem_install: gem $(helpdir)
 # noncvs_install
 # this is for including pre-compiled binaries in a build
 noncvs_install:
-		-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(bindir)
-		-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* \
-			$(helpdir)
-		-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
-		-install -d $(DESTDIR)$(prefix)/gripd
-		-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
-			 $(DESTDIR)$(prefix)/gripd
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/bin/*.* $(bindir)
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/doc/5.reference/*.* $(helpdir)
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/extra/*.* $(objectsdir)
+	-install -d $(DESTDIR)$(prefix)/gripd
+	-install -p $(packages_src)/noncvs/$(OS_NAME)/gripd/*.* \
+		$(DESTDIR)$(prefix)/gripd
 
 
 #------------------------------------------------------------------------------
 # pd_install
 PD_NAME=Pd
 pd_install: pd
-	cd $(pd_src)/src && \
-		make $(DEST_PATHS) $(PD_BUILD_FLAGS) install
+	make -C $(pd_src)/src $(DEST_PATHS) $(PD_BUILD_FLAGS) install
 	install -d $(manualsdir)/$(PD_NAME)
 	install -p $(pd_src)/src/notes.txt $(manualsdir)/$(PD_NAME)
 
