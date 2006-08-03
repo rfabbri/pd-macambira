@@ -8,26 +8,14 @@ TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
-function upload_build ()
-{
-	 platform_folder=$1
-	 archive_format=$2
-
-# upload files to webpage
-test -e /home/pd/auto-build/packages/${platform_folder}/build/Pd*.${archive_format} && \
-	 rsync -a /home/pd/auto-build/packages/${platform_folder}/build/Pd*.${archive_format} \
-	 rsync://128.238.56.50/upload/${DATE}/`ls -1 /home/pd/auto-build/packages/*/build/Pd*.${archive_format} | sed "s|.*/\(.*\)${archive_format}|\1${HOSTNAME}.${archive_format}|"` 
-}
-
-
 # convert into absolute path
 cd `echo $0 | sed 's|\(.*\)/.*$|\1|'`/../..
 auto_build_root_dir=`pwd`
-
 echo "root: $auto_build_root_dir" 
 
 # let rsync handle the cleanup with --delete
-rsync -av --delete rsync://128.238.56.50/pure-data/ ${auto_build_root_dir}/
+rsync -av --delete rsync://128.238.56.50/distros/pd-extended/ \
+	 ${auto_build_root_dir}/
 
 BUILD_DIR=.
 if [ "$SYSTEM" == "Linux" ]; then
@@ -46,6 +34,19 @@ make install && make package
 
 make test_package
 make test_locations
+
+
+
+function upload_build ()
+{
+	 platform_folder=$1
+	 archive_format=$2
+
+# upload files to webpage
+test -e ${auto_build_root_dir}/packages/${platform_folder}/build/Pd*.${archive_format} && \
+	 rsync -a ${auto_build_root_dir}/packages/${platform_folder}/build/Pd*.${archive_format} \
+	 rsync://128.238.56.50/upload/${DATE}/`ls -1 ${auto_build_root_dir}/packages/*/build/Pd*.${archive_format} | sed "s|.*/\(.*\)${archive_format}|\1${HOSTNAME}.${archive_format}|"` 
+}
 
 case $SYSTEM in 
 	 Linux)
