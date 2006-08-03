@@ -22,3 +22,7 @@ for section in abstractions doc extensions externals packages scripts Gem GemLib
     cvs up -Pd
 	 cd ..
 done
+
+# use specific portaudio version, since that's always a mess
+#cd ${cvs_root_dir}/pd
+#cvs up -APd port*

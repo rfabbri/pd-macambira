@@ -8,9 +8,6 @@ LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
 touch $LOGFILE
 
-chown -R pd /home/pd/                                 >> $LOGFILE 2>&1
-chmod -R u+rw /home/pd/                               >> $LOGFILE 2>&1
-
 # extended
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
 echo "pd-extended"	>> $LOGFILE 2>&1

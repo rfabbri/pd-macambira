@@ -5,46 +5,24 @@ SYSTEM=`uname -s`
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
-LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
-function upload_build ()
+run_build_script ()
 {
-	 platform_folder=$1
-	 archive_format=$2
+	 distro=$1
 
-# upload files to webpage
-test -e /home/pd/auto-build/packages/${platform_folder}/build/Pd*.${archive_format} && \
-	 rsync -a /home/pd/auto-build/packages/${platform_folder}/build/Pd*.${archive_format} \
-	 rsync://128.238.56.50/upload/${DATE}/`ls -1 /home/pd/auto-build/packages/*/build/Pd*.${archive_format} | sed "s|.*/\(.*\)${archive_format}|\1${HOSTNAME}.${archive_format}|"` 
-}
+	 LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${distro}_-_${SYSTEM}.txt
+	 touch ${LOGFILE}
 
-
-touch ${LOGFILE}
-
-chown -R pd /home/pd/auto-build                                 >> $LOGFILE 2>&1
-chmod -R u+rw /home/pd/auto-build                               >> $LOGFILE 2>&1
-
-su - pd -c /home/pd/auto-build/scripts/automated-builder.sh     >> $LOGFILE 2>&1
-
-case $SYSTEM in 
-	 Linux)
-		  upload_build linux_make tar.bz2                         >> $LOGFILE 2>&1
-		  ;;
-	 Darwin)
-		  upload_build darwin_app dmg                             >> $LOGFILE 2>&1
-		  ;;
-	 MINGW*)
-		  upload_build win32_inno exe                             >> $LOGFILE 2>&1
-		  ;;
-	 *)
-		  echo "ERROR: Platform $SYSTEM not supported!"           >> $LOGFILE 2>&1
-		  exit
-		  ;;
-esac
+	 su - pd -c /home/pd/auto-build/scripts/auto-build/${distro}-auto-builder.sh \
+		  >> $LOGFILE 2>&1
 
 # send status report
-SUBJECT="$HOSTNAME Pd-$SYSTEM build results $DATE $TIME"
-tail -200 ${LOGFILE} | mail -s "${SUBJECT}" hans@eds.org
+	 SUBJECT="$HOSTNAME Pd-$SYSTEM $distro build results $DATE $TIME"
+	 tail -200 ${LOGFILE} | mail -s "${SUBJECT}" hans@eds.org
+}
 
+run_build_script pd-main
+run_build_script pd-extended
+run_build_script pd-devel
 
 
