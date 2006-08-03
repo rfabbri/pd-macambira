@@ -27,9 +27,21 @@ case $SYSTEM in
 		  ;;
 esac
 
-package_name="${ROOT_DIR{}/pd-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
+package_name="${ROOT_DIR}/pd-${DATE}-${SYSTEM}-${HOSTNAME}-${platform_name}.tar.bz2"
 
-cd ${ROOT_DIR}/pure-data/pd/src && \
+
+auto_build_root_dir=`echo $0 | sed 's|\(.*\)/.*$|\1|'`/..
+# convert into absolute path
+cd ${auto_build_root_dir}
+auto_build_root_dir=`pwd`
+
+echo "root: $auto_build_root_dir" 
+
+# let rsync handle the cleanup with --delete
+#rsync -av --delete rsync://128.238.56.50/pure-data/pd-main/ ${auto_build_root_dir}/
+
+
+cd ${ROOT_DIR}/pd/src && \
 	 autoconf && \
 	 ./configure $configure_options && \
 	 make  && \
