@@ -8,12 +8,26 @@ LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
 
 touch $LOGFILE
 
-# standard update
-su pd -c "/home/pd/rsync/pure-data/scripts/update-developer-layout.sh"  >> $LOGFILE 2>&1
+chown -R pd /home/pd/                                 >> $LOGFILE 2>&1
+chmod -R u+rw /home/pd/                               >> $LOGFILE 2>&1
 
-# some files are missing, so remove the whole shebang...
-rm -rf /home/pd/rsync/pure-data/pd/portaudio*  >> $LOGFILE 2>&1
+# extended
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+echo "pd-extended"	>> $LOGFILE 2>&1
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+su pd -c "/home/pd/rsync/pd-extended/pure-data/scripts/update-developer-layout.sh"  \
+	 >> $LOGFILE 2>&1
 
-# then replace it with a SVN snapshot
-su pd -c "cd /home/pd/rsync/pure-data/pd/ && tar xzf ../../pa_snapshot_v19.tar.gz" \
+# devel
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+echo "pd-devel"	>> $LOGFILE 2>&1
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+su pd -c "/home/pd/rsync/pd-devel/pure-data/scripts/update-developer-layout.sh"  \
+	 >> $LOGFILE 2>&1
+
+# main
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+echo "pd-main"	>> $LOGFILE 2>&1
+echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
+su pd -c "/home/pd/rsync/pd-main/pure-data/scripts/update-developer-layout.sh"  \
 	 >> $LOGFILE 2>&1
