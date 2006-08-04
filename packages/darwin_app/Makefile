@@ -282,7 +282,7 @@ test_package:
 	cd $(CWD) && hdiutil mount "$(DMG_NAME).dmg"
 # some better tests should go in here
 	echo "Ejecting $(DMG_NAME)"
-   cd $(CWD) && hdiutil eject `mount | grep "$(DMG_NAME)" | cut -d ' ' -f 1`
+	cd $(CWD) && hdiutil eject `mount | grep "$(DMG_NAME)" | cut -d ' ' -f 1`
 
 
 
