@@ -1,0 +1,23 @@
+#N canvas 125 122 409 287 10;
+#X text 12 227 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+;
+#X text 12 247 Released under the BSD License;
+#X text 276 100 Inlets;
+#X text 276 170 Outlets;
+#X text 276 50 Arguments;
+#X msg 137 78 500;
+#X text 175 87 Velocity (ms);
+#X floatatom 26 139 5 0 0 0 - - -;
+#X text 12 10 [snaps~] - snapshot~ implementation;
+#X obj 26 99 osc~ 0.5;
+#X text 276 70 - Meter speed (ms);
+#X text 276 120 - Signal;
+#X text 276 140 - Meter speed (ms);
+#X text 276 190 - Signal level;
+#X obj 26 169 -dsp;
+#X obj 26 119 snaps~;
+#X msg 147 98 50;
+#X connect 5 0 15 1;
+#X connect 9 0 15 0;
+#X connect 15 0 7 0;
+#X connect 16 0 15 1;

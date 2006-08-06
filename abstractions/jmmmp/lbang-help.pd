@@ -1,0 +1,17 @@
+#N canvas 125 122 373 208 10;
+#X text 12 157 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+;
+#X text 12 177 Released under the BSD License;
+#X obj 68 83 lbang;
+#X text 216 46 Inlets;
+#X text 216 96 Outlets;
+#X text 12 10 [lbang] - loadbang which can be triggered more often
+;
+#X text 216 66 - bang;
+#X text 216 116 - loadbang / bang;
+#X obj 68 63 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X obj 68 103 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X connect 2 0 9 0;
+#X connect 8 0 2 0;

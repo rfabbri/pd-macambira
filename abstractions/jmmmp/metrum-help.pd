@@ -1,0 +1,30 @@
+#N canvas 125 122 426 305 10;
+#X obj 16 109 tgl 15 0 empty empty empty 0 -6 0 8 -262144 -1 -1 1 1
+;
+#X msg 161 108 100;
+#X text 12 247 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+;
+#X text 12 267 Released under the BSD License;
+#X text 306 100 Inlets;
+#X text 306 120 - On / Off;
+#X text 306 170 Outlets;
+#X text 36 108 On / Off;
+#X obj 16 129 metrum 100 1;
+#X text 12 10 [metrum] - Metro with GUI;
+#X obj 16 149 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
+-1;
+#X text 306 140 - Velocity (ms);
+#X text 306 190 - Bang;
+#X text 306 210 - Velocity (ms);
+#X text 306 30 Arguments;
+#X text 306 50 - Velocity (ms);
+#X text 306 70 - Initial state;
+#X msg 151 88 500;
+#X text 192 94 Velocity (ms);
+#X floatatom 151 149 5 0 0 0 - - -;
+#X text 192 149 Velocity (ms);
+#X connect 0 0 8 0;
+#X connect 1 0 8 1;
+#X connect 8 0 10 0;
+#X connect 8 1 19 0;
+#X connect 17 0 8 1;
