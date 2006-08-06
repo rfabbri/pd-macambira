@@ -578,23 +578,23 @@ readme_install:
 	echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://puredata.org/plone.css\" />" >> $(README_FILE)
 	echo "</head>" >> $(README_FILE)
 	echo "<body>" >> $(README_FILE)
-	echo "<h2>Pure Data $(PD_VERSION)-$(PACKAGE_VERSION)</h2>" 	>> $(README_FILE)
-	echo "<p>Pd is a free real-time computer music software package resembling Max.  It provides a patchable environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</p>" >> $(README_FILE)
+	echo "<h2>Pure Data $(PD_VERSION)</h2>" 	>> $(README_FILE)
+	echo "<p>Pd is a real-time, graphical programming language for media processing.  It provides an environment for audio analysis, synthesis, and processing, with a rich set of multimedia capabilities.  You can get Pd for Linux, Windows, MacOS X, BSD, or IRIX.</p>" >> $(README_FILE)
 	echo "<p>For more information, go to: <a href=\"http://puredata.org\" target=\"pd\">http://puredata.org</a></p>" >> $(README_FILE)
 	echo "<h3>Installation</h3>" >> $(README_FILE)	
-	echo "<dl><dt>GNU/Linux</dt><dd>" >> $(README_FILE)
+ifeq ($(OS_NAME),linux)
 	echo "<p></p>" >> $(README_FILE)
 	echo "<p></p>" >> $(README_FILE)
-	echo "</dd><dt>Mac OS X</dt>" >> $(README_FILE)
-	echo "<dd>" >> $(README_FILE)
-	echo "<p>To install Pd, drag the Pd.app to anywhere in your hard disk.</p>" >> $(README_FILE)	
-	echo "<p>To install Gem, pmpd, xsample, dyn~, and vasp support, copy <code>org.puredata.pd.plist</code> to <code>~/Library/Preferences</code> (<code>~</code> means your home folder).  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)	
-	echo "</dd>" >> $(README_FILE)
-	echo "<dt>Windows</dt><dd>" >> $(README_FILE)
+endif
+ifeq ($(OS_NAME),darwin)
+	echo "<p>To install Pd, drag the $(PACKAGE_NAME).app into your /Applications folder.</p>" >> $(README_FILE)	
+	echo "<p>If you want to have all of the included libraries loaded at startup, copy <code>org.puredata.pd.plist</code> to <code>~/Library/Preferences</code> (<code>~</code> means your home folder).  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)	
+endif
+ifeq ($(OS_NAME),windows)
 	echo "<p>To install, run the installer.</p>" >> $(README_FILE)
-	echo "<p>To make sure that all of the libraries are loaded when Pd runs, " >> $(README_FILE)
-	echo "double-click <code>C:\Program Files\pd\pd-settings.reg</code> to import the settings to the registry.</p>" >> $(README_FILE)
-	echo "</dd></dl>" >> $(README_FILE)
+	echo "<p>To make sure that all of the included libraries are loaded when Pd runs, " >> $(README_FILE)
+	echo "double-click <code>C:\Program Files\pd\pd-settings.reg</code> to import the settings to the registry.  WARNING: this will overwrite any existing Pd preferences!</p>" >> $(README_FILE)
+endif
 	echo "<h3>Pure Data CVS Developers</h3>" >> $(README_FILE)	
 # this may seem whack, but it generates the list of developers from the SourceForge site:
 	curl 'http://sourceforge.net/project/memberlist.php?group_id=55736' | grep -A2 -e '<td>' | sed 's|\(href="\)|target="w" \1http://sourceforge.net|' >> $(README_FILE)
@@ -604,7 +604,7 @@ readme_install:
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>License</h3>" >> $(README_FILE)	
 	echo "<p>" >> $(README_FILE)
-	echo "This package is released under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  The Pd core and some other included code is originally available with a <a href="Pd-LICENSE.txt">BSD license</a> from the Pd CVS on SourceForge." >> $(README_FILE)
+	echo "This package is released under the <a href="http://www.gnu.org/copyleft/gpl.html" target="gpl">GNU GPL</a>.  The Pd core and some other included code is originally available with a <a href="http://pure-data.cvs.sourceforge.net/pure-data/pd/LICENSE.txt">BSD license</a> from the Pd CVS on SourceForge." >> $(README_FILE)
 	echo "</p>" >> $(README_FILE)
 	echo "<h3>Included Versions</h3>" >> $(README_FILE)	
 	echo "<p>These externals are all included from the Pd CVS repository:</p>" >> $(README_FILE)
@@ -614,10 +614,6 @@ readme_install:
 	echo "<li>flext: $(FLEXT_VERSION)" >> $(README_FILE)
 	echo "<li>gem: $(GEM_VERSION)" >> $(README_FILE)
 	echo "<li>iemlib: `date +20%y.%m.%d`" >> $(README_FILE)
-#
-# these cause this error:
-# Makefile:308: *** unterminated call to function `shell': missing `)'.  Stop.
-#
 	echo "<li>maxlib: $(MAXLIB_VERSION)" >> $(README_FILE)
 	echo "<li>osc: $(OSC_VERSION)" >> $(README_FILE)
 	echo "<li>pmpd: $(PMPD_VERSION)" >> $(README_FILE)
@@ -630,6 +626,9 @@ readme_install:
 	echo "<li>unauthorized: `date +20%y.%m.%d`" >> $(README_FILE)
 	echo "<li>zexy: $(ZEXY_VERSION)" >> $(README_FILE)
 	echo "</ul>" >> $(README_FILE)
+	echo "<p>" >> $(README_FILE)
+	echo "This package may contain software that is covered by patents in certain countries.  In order to use this software you must have the proper license." >> $(README_FILE)
+	echo "</p>" >> $(README_FILE)
 	echo "(this package was built on `date`) <BR>" >> $(README_FILE)
 	echo "</body></html>" >> $(README_FILE)
 
