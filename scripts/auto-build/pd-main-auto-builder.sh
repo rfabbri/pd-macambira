@@ -43,6 +43,7 @@ cd ${auto_build_root_dir}/pd/src && \
 	 make  && \
 	 cd ../../ && \
 	 tar cjf $package_name pd && \
-	 rsync -a ${package_name} rsync://128.238.56.50/upload/${DATE}/
+	 rsync -a ${package_name} rsync://128.238.56.50/upload/${DATE}/ && \
+	 echo SUCCESS
 rm -f -- $package_name
 

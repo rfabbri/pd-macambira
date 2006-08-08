@@ -39,13 +39,13 @@ upload_build ()
     platform_folder=$1
     build_folder=$2
     archive_format=$3
+
+	 archive="${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format}"
     
-    echo "Uploading $1 $2 $3"
-# upload files to webpage
-    echo ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} 
-    test -e ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} && \
-	rsync -a ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} \
-	rsync://128.238.56.50/upload/${DATE}/`ls -1 ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"` 
+    echo "upload specs $1 $2 $3"
+    echo "Uploading $archive"
+    test -e ${archive} && rsync -a ${archive} \
+		  rsync://128.238.56.50/upload/${DATE}/`ls -1 ${archive} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"`  &&  echo SUCCESS
 }
 
 if [ "$SYSTEM" == "Linux" ]; then
