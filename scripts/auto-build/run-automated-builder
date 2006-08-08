@@ -13,10 +13,7 @@ run_build_script ()
 	 LOGFILE=/home/pd/logs/${DATE}_${TIME}_-_${SYSTEM}_-_${distro}_-_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
-	 chmod a+x /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh\
-		  >> $LOGFILE 2>&1
-	 su pd -c /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh\
-		  >> $LOGFILE 2>&1
+	 su pd -c "sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh" >> $LOGFILE 2>&1
 
 # send status report
 	 SUBJECT="$HOSTNAME Pd-$SYSTEM $distro build results $DATE $TIME"
@@ -25,6 +22,6 @@ run_build_script ()
 
 run_build_script pd-main
 run_build_script pd-extended
-run_build_script pd-devel
+#run_build_script pd-devel
 
 
