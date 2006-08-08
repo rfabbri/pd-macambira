@@ -6,7 +6,7 @@ SYSTEM=`uname -s`
 DATE=`date +%Y-%m-%d`
 TIME=`date +%H.%M.%S`
 SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
-LOGFILE=/home/pd/logs/${DATE}_-_${TIME}_-_${SCRIPT}_-_${SYSTEM}.txt
+
 
 # convert into absolute path
 cd `echo $0 | sed 's|\(.*\)/.*$|\1|'`/../..
@@ -30,36 +30,31 @@ fi
 
 cd "${auto_build_root_dir}/packages/$BUILD_DIR"
 make -C "${auto_build_root_dir}/packages" patch_pd
-make install && make package
-
-make test_package
+make install && make package && make test_package
 make test_locations
 
 
-
-function upload_build ()
+upload_build ()
 {
-	 platform_folder=$1
-	 archive_format=$2
-
+    platform_folder=$1
+    build_folder=$2
+    archive_format=$3
+    
+    echo "Uploading $1 $2 $3"
 # upload files to webpage
-test -e ${auto_build_root_dir}/packages/${platform_folder}/build/Pd*.${archive_format} && \
-	 rsync -a ${auto_build_root_dir}/packages/${platform_folder}/build/Pd*.${archive_format} \
-	 rsync://128.238.56.50/upload/${DATE}/`ls -1 ${auto_build_root_dir}/packages/*/build/Pd*.${archive_format} | sed "s|.*/\(.*\)${archive_format}|\1${HOSTNAME}.${archive_format}|"` 
+    echo ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} 
+    test -e ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} && \
+	rsync -a ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} \
+	rsync://128.238.56.50/upload/${DATE}/`ls -1 ${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format} | sed "s|.*/\(.*\)\.${archive_format}|\1-${HOSTNAME}.${archive_format}|"` 
 }
 
-case $SYSTEM in 
-	 Linux)
-		  upload_build linux_make tar.bz2                         >> $LOGFILE 2>&1
-		  ;;
-	 Darwin)
-		  upload_build darwin_app dmg                             >> $LOGFILE 2>&1
-		  ;;
-	 MINGW*)
-		  upload_build win32_inno exe                             >> $LOGFILE 2>&1
-		  ;;
-	 *)
-		  echo "ERROR: Platform $SYSTEM not supported!"           >> $LOGFILE 2>&1
-		  exit
-		  ;;
-esac
+if [ "$SYSTEM" == "Linux" ]; then
+    upload_build linux_make build tar.bz2
+fi
+if [ "$SYSTEM" == "Darwin" ]; then
+    upload_build darwin_app . dmg
+fi
+if [ "`echo $SYSTEM | sed -n 's|\(MINGW\)|\1|p'`" == "MINGW" ]; then
+    upload_build win32_inno Output exe
+fi
+
