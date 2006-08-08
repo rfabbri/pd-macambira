@@ -12,19 +12,17 @@ touch $LOGFILE
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
 echo "pd-extended"	>> $LOGFILE 2>&1
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-extended/scripts/update-developer-layout.sh"  \
-	 >> $LOGFILE 2>&1
+su pd -c "/home/pd/rsync/pd-extended/scripts/update-developer-layout.sh" >> $LOGFILE 2>&1
 
 # devel
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
 echo "pd-devel"	>> $LOGFILE 2>&1
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-devel/scripts/update-developer-layout.sh"  \
-	 >> $LOGFILE 2>&1
+su pd -c "cd /home/pd/rsync/pd-devel/pd && cvs up -Pd" >> $LOGFILE 2>&1
+su pd -c "/home/pd/rsync/pd-extended/scripts/update-developer-layout.sh" >> $LOGFILE 2>&1
 
 # main
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
 echo "pd-main"	>> $LOGFILE 2>&1
 echo "------------------------------------------------------------"	>> $LOGFILE 2>&1
-su pd -c "/home/pd/rsync/pd-main/scripts/update-developer-layout.sh"  \
-	 >> $LOGFILE 2>&1
+su pd -c "cd /home/pd/rsync/pd-main/pd && cvs up -APd" >> $LOGFILE 2>&1
