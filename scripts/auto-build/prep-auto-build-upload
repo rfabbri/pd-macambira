@@ -16,5 +16,5 @@ chown -R root.root "${BUILD_ROOT}"     >> $LOGFILE 2>&1
 mkdir "${TODAYS_ROOT}"                 >> $LOGFILE 2>&1
 chown nobody.nogroup "${TODAYS_ROOT}"  >> $LOGFILE 2>&1
 
-chown -R pd /home/pd                   >> $LOGFILE 2>&1
-chmod -R u+rw /home/pd                 >> $LOGFILE 2>&1
+chown -R pd.pd /home/pd/               >> $LOGFILE 2>&1
+chmod -R u+rw /home/pd/                >> $LOGFILE 2>&1
