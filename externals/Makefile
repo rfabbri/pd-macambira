@@ -764,15 +764,16 @@ FREEVERB_OBJECTS := $(wildcard $(externals_src)/freeverb~/*.c)
 freeverb: $(FREEVERB_OBJECTS:.c=.$(EXTENSION))
 
 freeverb_install: freeverb
-	install -d $(objectsdir)
-#	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FREEVERB_NAME) \
-#		--author "Olaf Matthes and Jezar Wakefield" \
-#		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
-#		--license "GNU GPL" \
-#		--version "1.2"
-	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
+	install -d $(objectsdir)/$(FREEVERB_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FREEVERB_NAME) \
+		--author "Olaf Matthes and Jezar Wakefield" \
+		--description "Freeverb is a simple implementation of the standard Schroeder/Moorer reverb model" \
+		--license "GNU GPL" \
+		--version "1.2"
+	install -p $(FREEVERB_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FREEVERB_NAME)
 	install -d $(helpdir)
-	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) $(helpdir)
+	install -p $(wildcard $(externals_src)/freeverb~/*-help.pd) \
+		$(helpdir)/$(FREEVERB_NAME)
 #	install -d $(manualsdir)/$(FREEVERB_NAME)
 	install -d $(readmesdir)
 	install -p $(externals_src)/freeverb~/README \
@@ -1181,22 +1182,49 @@ iemlib_clean:
 	-rmdir -- $(manualsdir)/$(IEMLIB_NAME)
 
 
+
+
 #------------------------------------------------------------------------------#
 # IEMMATRIX
 IEMMATRIX_NAME=iemmatrix
-iemmatrix:
+IEMMATRIX_OBJECTS := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
+IEMMATRIX_VERSION := $(shell echo $(externals_src)/iem/iemmatrix/VERSION.txt)
+iemmatrix: $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION))
 
 
 iemmatrix_install: iemmatrix
 	install -d $(objectsdir)/$(IEMMATRIX_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(IEMMATRIX_NAME) \
-		--description "objects for matrix operations and math"
-	mv $(objectsdir)/mtx*.$(EXTENSION) $(objectsdir)/$(IEMMATRIX_NAME)
+		--author "IOhannes m zmoelnig (zmoelnig AT iem DOT at), thomas musil (musil AT iem DOT at), franz zotter (zotter AT iem DOT at)" \
+		--description "objects for matrix operations and math" \
+		--license "GNU GPL" \
+		--version "$(IEMMATRIX_VERSION)"
+	install -p $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(IEMMATRIX_NAME)
 	install -p $(shell ls -1 $(externals_src)/iem/iemmatrix/abs/*.* | \
 		grep -v '\-help.pd') $(objectsdir)/$(IEMMATRIX_NAME)
 	install -d $(helpdir)/$(IEMMATRIX_NAME)
 	install -p $(externals_src)/iem/iemmatrix/doc/*.pd \
 		$(helpdir)/$(IEMMATRIX_NAME)
+	install -p $(externals_src)/iem/iemmatrix/abs/*-help.pd \
+		$(helpdir)/$(IEMMATRIX_NAME)
+	install -d $(manualsdir)/$(IEMMATRIX_NAME)
+	install -p $(externals_src)/iem/iemmatrix/*.txt \
+		$(manualsdir)/$(IEMMATRIX_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/iem/iemmatrix/README \
+#		$(readmesdir)/$(IEMMATRIX_NAME).txt
+#	install -d $(examplesdir)/$(IEMMATRIX_NAME)
+#	install -p $(externals_src)/iem/iemmatrix/examples/*.pd \
+#		$(examplesdir)/$(IEMMATRIX_NAME)
+
+iemmatrix_clean:
+	-rm -f -- $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(IEMMATRIX_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/iem/iemmatrix/*.bak
+	-rm -f -- $(externals_src)/iem/iemmatrix/*.*~
+
+#iemmatrix_install: iemmatrix
+#	mv $(objectsdir)/mtx*.$(EXTENSION) $(objectsdir)/$(IEMMATRIX_NAME)
 
 
 
