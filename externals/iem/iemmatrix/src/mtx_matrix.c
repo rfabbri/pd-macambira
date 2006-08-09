@@ -165,11 +165,12 @@ void matrix_set(t_matrix *x, t_float f)
 
 void matrix_size(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
 {
-  int col, row, size=x->row*x->col;
+  int col, row;
 
   switch(argc) {
   case 0: /* size */
-    outlet_list(x->x_obj.ob_outlet, gensym("size"), 2, x->atombuffer);
+    if (x->row*x->col)
+       outlet_list(x->x_obj.ob_outlet, gensym("size"), 2, x->atombuffer);
     break;
   case 1:
     row=atom_getfloat(argv);
