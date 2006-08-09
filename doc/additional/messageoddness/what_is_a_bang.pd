@@ -1,4 +1,4 @@
-#N canvas 163 173 794 501 10;
+#N canvas 312 241 798 505 10;
 #X floatatom 80 298 5 0 0 0 - - -;
 #X symbolatom 128 297 10 0 0 0 - - -;
 #X obj 33 318 bng 15 250 50 0 empty empty bang -6 23 1 12 -262144 -1
@@ -15,8 +15,8 @@
 #X msg 32 21 bang;
 #X obj 46 40 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
 -1;
-#X msg 79 37 element;
-#X obj 57 68 bang;
+#X msg 72 31 element;
+#X obj 68 54 bang;
 #X msg 81 96 float bang;
 #X text 164 96 invalid;
 #X msg 86 118 symbol bang;
@@ -56,6 +56,7 @@
 #X obj 47 416 list trim;
 #X obj 47 440 print;
 #X text 124 414 another way to convert a list to a bang;
+#X msg 77 77 list;
 #X connect 0 0 4 0;
 #X connect 1 0 5 0;
 #X connect 3 0 2 0;
@@ -87,3 +88,4 @@
 #X connect 41 0 44 0;
 #X connect 46 0 47 0;
 #X connect 47 0 48 0;
+#X connect 50 0 3 0;
