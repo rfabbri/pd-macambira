@@ -296,7 +296,7 @@ static void mTXFillMatrix (MTXfill *mtx_fill_obj, t_symbol *s,
 	 }
 	 break;
       case FILL_INDEXED_ELEMENTS:
-	 if (list_size > mtx_fill_obj->index_size) {
+	 if (list_size < mtx_fill_obj->index_size) {
 	    post("mtx_fill: fill matrix smaller than indexing vector");
 	    return;
 	 }

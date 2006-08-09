@@ -134,7 +134,7 @@ static int findPreviousNonZero (const int n, t_atom *x, int offset)
 static int findPreviousNonZeroStep (const int step, t_atom *x, int offset)
 {
    x += offset;
-   for (; offset > 0; offset-=step, x-=step) 
+   for (; offset >= 0; offset-=step, x-=step) 
       if (atom_getfloat(x))
 	 return offset;
    return -1;
