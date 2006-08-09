@@ -1,8 +1,5 @@
 #N canvas 0 25 1367 915 10;
-#X obj 49 93 print A;
-#X obj 49 70 route 0 1;
-#X obj 107 140 print C;
-#X obj 78 116 print B;
+#X obj 49 116 route 0 1;
 #X obj 49 10 loadbang;
 #X obj 49 45 input_noticer joystick "SideWinder Dual Strike";
 #X obj 110 10 bng 15 250 50 0 empty empty empty 0 -6 0 8 -262144 -1
@@ -21,12 +18,9 @@ field is returned \, which will be something like "/dev/input/event6".
 This can be used to connect to objects like [hid].;
 #X text 127 10 <- BANG to scan for devices \, outputs any that are
 found;
-#X text 59 469 USING input_noticer output:;
-#X text 63 489 Output from input_noticer is a list \, like 0 \, /dev/input/event5
+#X text 13 430 Output from input_noticer is a list \, like 0 \, /dev/input/event5
 1 \, /dev/input/event6;
-#X text 61 535 Use [route] to separate the messages \, and you'll have
-just the second list element \, like /dev/input/event5;
-#X text 109 611 5 means /dev/input/event5;
+#X text 59 552 5 means /dev/input/event5;
 #X text 661 60 In linux \, this references the HAL (Hardware Abstraction
 Layer) Capabilities field for the device. You can have a look at what
 your favorite device has by using the HAL Device Manager \, and look
@@ -37,27 +31,52 @@ USB Version 1.0". Capabilities listed are: input \, input.joystick
 ;
 #X text 549 236 2) product substring: for instance \, as I have entered
 here: "SideWinder Dual Strike";
-#X text 61 568 To feed this to [hid] \, you'll need to strip the number
+#X text 11 509 To feed this to [hid] \, you'll need to strip the number
 from the end \, since [hid] currently wants just the number \, and
 interprets the number as follows:;
-#X obj 7 166 parseeventnodenum;
-#X floatatom 7 188 5 0 0 0 - - -;
-#X obj 37 280 hid 0;
-#X msg 37 236 open \$1;
-#X obj 37 301 print joystick;
-#X obj 7 207 t b f;
-#X msg -8 235 start;
-#X connect 1 0 0 0;
-#X connect 1 0 19 0;
-#X connect 1 1 3 0;
-#X connect 1 2 2 0;
-#X connect 4 0 5 0;
-#X connect 5 0 1 0;
-#X connect 6 0 5 0;
-#X connect 19 0 20 0;
-#X connect 20 0 24 0;
-#X connect 21 0 23 0;
-#X connect 22 0 21 0;
-#X connect 24 0 25 0;
-#X connect 24 1 22 0;
-#X connect 25 0 21 0;
+#X obj 49 180 parseeventnodenum;
+#X floatatom 49 202 5 0 0 0 - - -;
+#X obj 79 294 hid 0;
+#X msg 79 250 open \$1;
+#X obj 49 221 t b f;
+#X msg 34 249 start;
+#X text 173 181 <- converts '/dev/input/eventX' to 'X';
+#X text 11 476 Use [route] to separate the messages \, and you'll be
+left with the second list element \, like /dev/input/event5;
+#X text 120 295 <- gets told which /dev/input/eventX to use;
+#X text 258 309 then is opened \, started;
+#X text 9 410 USING input_noticer:;
+#X text 57 74 <- outputs are tuples like 0 \, /dev/input/event5;
+#X text 246 89 1 \, /dev/input/event6;
+#X text 246 104 etc...;
+#X text 56 148 <- add more below here for multiple input devices;
+#N canvas 282 199 759 562 creating_input_abstractions 0;
+#X text 31 23 The philosophy behind input_noticer is really "plug and
+play". It's silly to have to manually figure out which device file
+a piece of hardware has mapped to \, then change your PD patch to match..
+Or to have to make sure to plug your devices in in the same order every
+time \, to make sure that the device files get created in a deterministic
+way \, etc..;
+#X text 30 122 The point of input_noticer is to make all of this "just
+work" \, so that you can get to the more interesting parts of interaction/instrument/sound/performance
+design.;
+#X text 30 167 -David Merrill <dmerrill@media.mit.edu>;
+#X restore 48 605 pd creating_input_abstractions;
+#X obj 79 321 route abs;
+#X floatatom 79 365 5 0 0 0 - - -;
+#X obj 79 343 route abs_x abs_y;
+#X floatatom 136 367 5 0 0 0 - - -;
+#X connect 0 0 14 0;
+#X connect 1 0 2 0;
+#X connect 2 0 0 0;
+#X connect 3 0 2 0;
+#X connect 14 0 15 0;
+#X connect 15 0 18 0;
+#X connect 16 0 30 0;
+#X connect 17 0 16 0;
+#X connect 18 0 19 0;
+#X connect 18 1 17 0;
+#X connect 19 0 16 0;
+#X connect 30 0 32 0;
+#X connect 32 0 31 0;
+#X connect 32 1 33 0;
