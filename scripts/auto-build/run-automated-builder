@@ -15,9 +15,12 @@ run_build_script ()
 
 	 su pd -c "sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh" >> $LOGFILE 2>&1
 
-# send status report
-	 SUBJECT="$HOSTNAME Pd-$SYSTEM $distro build results $DATE $TIME"
-	 tail -200 ${LOGFILE} | mail -s "${SUBJECT}" hans@eds.org
+# send status report if something failed
+	 completion_test=`tail -1 ${LOGFILE}`
+	 if [ "x${completion_test}" != "xSUCCESS" ]; then
+		  SUBJECT="$HOSTNAME Pd-$SYSTEM $distro build results $DATE $TIME"
+		  tail -200 ${LOGFILE} | mail -s "${SUBJECT}" hans@eds.org
+	 fi
 }
 
 run_build_script pd-main
