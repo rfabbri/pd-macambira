@@ -1,4 +1,4 @@
-#N canvas 184 135 775 545 10;
+#N canvas 209 116 779 549 10;
 #X obj 0 0 cnv 15 750 17 empty empty Mapping 10 9 0 16 -233017 -66577
 0;
 #X obj 305 18 cnv 15 445 15 empty empty Getting_your_message_across
@@ -283,10 +283,10 @@ the main page.;
 #X obj 67 248 polar;
 #X obj 110 248 spiral;
 #X obj 17 248 vector;
-#X obj 130 315 degrees2mapping;
-#X obj 18 315 mapping2degrees;
-#X obj 130 295 radians2mapping;
-#X obj 18 295 mapping2radians;
 #X text 9 340 CURVES;
 #X obj 18 366 curve;
 #X obj 62 366 sinusoid;
+#X obj 141 295 radians->mapping;
+#X obj 143 315 degrees->mapping;
+#X obj 18 295 mapping->radians;
+#X obj 18 315 mapping->degrees;
