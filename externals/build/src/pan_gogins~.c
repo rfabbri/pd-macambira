@@ -1,1 +1,1 @@
-#include "../../hcs/pan_gogins~.c"
+#include "../../deprecated/pan_gogins~.c"

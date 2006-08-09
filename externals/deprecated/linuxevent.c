@@ -4,7 +4,7 @@
 
 #define LINUXEVENT_DEVICE   "/dev/input/event0"
 
-static char *version = "$Revision: 1.9 $";
+static char *version = "$Revision: 1.1 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

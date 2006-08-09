@@ -1,1 +1,1 @@
-#include "../../hcs/linuxmouse.c"
+#include "../../deprecated/linuxmouse.c"

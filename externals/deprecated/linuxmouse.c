@@ -11,7 +11,7 @@
 #define LINUXMOUSE_DEVICE   "/dev/input/event0"
 #define LINUXMOUSE_AXES     3
 
-static char *version = "$Revision: 1.7 $";
+static char *version = "$Revision: 1.1 $";
 
 /*------------------------------------------------------------------------------
  *  CLASS DEF

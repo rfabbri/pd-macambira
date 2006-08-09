@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor buildsrc corelibs creb cxc cyclone ekext ext13 flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -126,7 +126,7 @@ else
 endif
 
 
-all: pre_all_$(OS_NAME) buildsrc $(LIB_TARGETS)
+all: pre_all_$(OS_NAME) $(LIB_TARGETS)
 	@echo " "
 	@echo "Compiled external for $(OS_NAME) aka $(UNAME)"
 
@@ -144,7 +144,7 @@ pre_all_unknown:
 #------------------------------------------------------------------------------#
 # INSTALL
 install: $(examplesdir) $(helpdir) $(manualsdir) $(objectsdir) $(readmesdir) \
-all unfiltered_install $(patsubst %, %_install,$(LIB_TARGETS))
+all $(patsubst %, %_install,$(LIB_TARGETS))
 	@echo " "
 	@echo "externals install succeeded!"
 
@@ -153,18 +153,24 @@ all unfiltered_install $(patsubst %, %_install,$(LIB_TARGETS))
 #
 # OLD EXTERNALS BUILD SYSTEM TARGETS
 #
-# this is all stuff related to the externals/build/src/*.c links
+# This is all stuff related to the externals/build/src/*.c links.  The idea is
+# that they make for a flat namespace, here they are included as a libdir
 #
 #==============================================================================#
 
+FLATSPACE_NAME=flatspace
+FLATSPACE_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
 
-BUILDSRC_OBJECTS := $(wildcard $(externals_src)/build/src/*.c)
+flatspace: $(FLATSPACE_OBJECTS:.c=.$(EXTENSION))
 
-buildsrc: $(BUILDSRC_OBJECTS:.c=.$(EXTENSION))
-
-
-buildsrc_install: $(helpdir) $(objectsdir)
-	install -p $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)
+flatspace_install: flatspace $(helpdir) $(objectsdir)
+	install -d $(objectsdir)/$(FLATSPACE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(FLATSPACE_NAME) \
+		--author "Numerous" \
+		--description "This is a collection of externals in a flat namespace" \
+		--license "GNU GPL"
+	install -p $(FLATSPACE_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(FLATSPACE_NAME)
+	install -d $(helpdir)/$(FLATSPACE_NAME)
 # all standard objs' help files
 #    it had to be broken up because the list is soo long
 	install -p \
@@ -175,7 +181,7 @@ buildsrc_install: $(helpdir) $(objectsdir)
 			$(externals_src)/bbogart/chaos/tools/*.pd \
 			$(externals_src)/bbogart/*/*.pd \
 			$(externals_src)/creb/doc/*.pd \
-				$(helpdir)
+				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/dfx/*/*.pd \
 			$(externals_src)/ggee/*/*-help.pd \
@@ -183,13 +189,12 @@ buildsrc_install: $(helpdir) $(objectsdir)
 			$(externals_src)/gem2pdp/*.pd \
 			$(externals_src)/ff/*.pd \
 			$(externals_src)/hcs/*-help.pd \
-				$(helpdir)
+				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/hcs/*/doc/*.pd \
-			$(externals_src)/hcs/pan/*-help.pd \
 			$(externals_src)/iem/comport/*/*-help.pd \
 			$(externals_src)/nusmuk/line3/*.pd\
-				$(helpdir)
+				$(helpdir)/$(FLATSPACE_NAME)
 	install -p \
 			$(externals_src)/pdogg/*/*.pd \
 			$(externals_src)/pdp/doc/objects/*.* \
@@ -202,13 +207,15 @@ buildsrc_install: $(helpdir) $(objectsdir)
 			$(externals_src)/svf~/*.pd \
 			$(externals_src)/vst/*.pd \
 			$(externals_src)/zhzxh~/*.pd \
-				$(helpdir)
+				$(helpdir)/$(FLATSPACE_NAME)
 
 
-buildsrc_clean:
-	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION))
+flatspace_clean:
+	-rm -f -- $(FLATSPACE_OBJECTS:.c=.o) 
+	-rm -f -- $(FLATSPACE_OBJECTS:.c=.$(EXTENSION))
 	-rm -f -- $(externals_src)/build/src/*.*~
 	-rm -f -- $(externals_src)/build/src/*.c.bak
+
 
 
 #==============================================================================#
@@ -457,6 +464,43 @@ cyclone_install: cyclone
 
 cyclone_clean:
 	-make -C $(externals_src)/miXed/cyclone $(DEST_PATHS) clean
+
+
+
+
+#------------------------------------------------------------------------------#
+# DEPRECATED
+DEPRECATED_NAME=deprecated
+DEPRECATED_OBJECTS := $(wildcard $(externals_src)/deprecated/*.c)
+deprecated: $(DEPRECATED_OBJECTS:.c=.$(EXTENSION))
+
+deprecated_install: deprecated
+	install -d $(objectsdir)/$(DEPRECATED_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(DEPRECATED_NAME) \
+		--author "numerous" \
+		--description "a collection of deprecated objects that still have some use" \
+		--license "" \
+		--version ""
+	install -p $(DEPRECATED_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(DEPRECATED_NAME)
+	install -d $(helpdir)/$(DEPRECATED_NAME)
+	install -p $(externals_src)/deprecated/help/*.pd \
+		$(helpdir)/$(DEPRECATED_NAME)
+	install -d $(manualsdir)/$(DEPRECATED_NAME)
+	install -p $(externals_src)/deprecated/doc/*.* \
+		$(manualsdir)/$(DEPRECATED_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/deprecated/README \
+#		$(readmesdir)/$(DEPRECATED_NAME).txt
+	install -d $(examplesdir)/$(DEPRECATED_NAME)
+	install -p $(externals_src)/deprecated/examples/*.pd \
+		$(examplesdir)/$(DEPRECATED_NAME)
+
+deprecated_clean:
+	-rm -f -- $(DEPRECATED_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(DEPRECATED_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/deprecated/*.bak
+	-rm -f -- $(externals_src)/deprecated/*.*~
+
 
 
 #------------------------------------------------------------------------------#
@@ -832,6 +876,10 @@ hcs_install: hcs
 		--license "GNU GPL" \
 		--version ""
 	install -p $(HCS_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HCS_NAME)
+	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
+			 grep -v '\-help.pd') $(objectsdir)/$(HCS_NAME)
+# hmm, these don't have a home yet...
+	install -p $(externals_src)/hcs/general/*.pd $(objectsdir)/$(HCS_NAME)
 	install -d $(helpdir)/$(HCS_NAME)
 	install -p $(externals_src)/hcs/*-help.pd \
 		$(helpdir)/$(HCS_NAME)
@@ -1368,6 +1416,47 @@ oscx_clean:
 
 
 
+
+#------------------------------------------------------------------------------#
+# PAN
+PAN_NAME=pan
+PAN_OBJECTS := $(wildcard $(externals_src)/hcs/pan/*.c)
+pan: $(PAN_OBJECTS:.c=.$(EXTENSION))
+
+pan_install: pan
+	install -d $(objectsdir)/$(PAN_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(PAN_NAME) \
+		--author "Hans-Christoph Steiner <hans@at.or.at>" \
+		--description "A library of panning algoritms" \
+		--license "GNU GPL" \
+		--version ""
+# everything is .pd, nothing to compile (yet?)
+#	install -p $(PAN_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(PAN_NAME)
+	install -p $(wildcard $(externals_src)/hcs/pan/*.pd) \
+		$(objectsdir)/$(PAN_NAME)
+	install -d $(helpdir)/$(PAN_NAME)
+	install -p $(externals_src)/hcs/pan/help/*.pd \
+		$(helpdir)/$(PAN_NAME)
+#	install -d $(manualsdir)/$(PAN_NAME)
+#	install -p $(externals_src)/hcs/pan/manual.txt \
+#		$(manualsdir)/$(PAN_NAME)
+#	install -d $(readmesdir)
+#	install -p $(externals_src)/hcs/pan/README \
+#		$(readmesdir)/$(PAN_NAME).txt
+#	install -d $(examplesdir)/$(PAN_NAME)
+#	install -p $(externals_src)/hcs/pan/examples/*.pd \
+#		$(examplesdir)/$(PAN_NAME)
+
+
+pan_clean:
+	-rm -f -- $(PAN_OBJECTS:.c=.$(EXTENSION))
+	-rm -f -- $(PAN_OBJECTS:.c=.o)
+	-rm -f -- $(externals_src)/hcs/pan/*.bak
+	-rm -f -- $(externals_src)/hcs/pan/*.*~
+
+
+
+
 #------------------------------------------------------------------------------#
 # PDDP
 PDDP_NAME=pddp
@@ -1830,24 +1919,6 @@ zexy_clean:
 
 
 
-#==============================================================================#
-#
-# UNFILTERED PROJECT TARGETS
-#
-#==============================================================================#
-# this is not yet organized into libdirs, but just leftover <hans@at.or.at>
-
-unfiltered_install:
-#----------------------------------------------------------------------------
-# hcs
-	install -p $(shell ls -1 $(externals_src)/hcs/*.pd | \
-			 grep -v '\-help.pd') $(objectsdir)
-# general
-	install -p $(externals_src)/hcs/general/*.pd $(objectsdir)
-# pan
-	install -p $(shell ls -1 $(externals_src)/hcs/pan/*.pd | \
-			 grep -v '\-help.pd') $(objectsdir)
-
 
 #==============================================================================#
 #
@@ -1867,8 +1938,6 @@ devsymlinks:
 
 # the destination-specific clean targets are in Makefile.buildlayout
 clean:  $(patsubst %, %_clean,$(LIB_TARGETS))
-	-rm -f -- $(BUILDSRC_OBJECTS:.c=.o) 
-	-rm -f -- $(BUILDSRC_OBJECTS:.c=.$(EXTENSION)) 
 
 
 distclean: clean cruft_clean
