@@ -163,6 +163,27 @@ void matrix_set(t_matrix *x, t_float f)
   if(x->atombuffer)while(size--)SETFLOAT(&buf[size], f);
 }
 
+void matrix_size(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
+{
+  int col, row, size=x->row*x->col;
+
+  switch(argc) {
+  case 0: /* size */
+    outlet_list(x->x_obj.ob_outlet, gensym("size"), 2, x->atombuffer);
+    break;
+  case 1:
+    row=atom_getfloat(argv);
+    adjustsize(x, row, row);
+    matrix_set(x, 0);
+    break;
+  default:
+    row=atom_getfloat(argv++);
+    col=atom_getfloat(argv);
+    adjustsize(x, row, col);
+    matrix_set(x, 0);
+  }
+}
+
 void matrix_zeros(t_matrix *x, t_symbol *s, int argc, t_atom *argv)
 {
   int col, row;
@@ -582,6 +603,7 @@ void matrix_setup(void)
   class_addmethod  (matrix_class, (t_method)matrix_matrix2, gensym(""), A_GIMME, 0);
  
   /* the basics : functions for creation */
+  class_addmethod  (matrix_class, (t_method)matrix_size, gensym("size"), A_GIMME, 0);
   class_addmethod  (matrix_class, (t_method)matrix_eye, gensym("eye"), A_GIMME, 0);
   class_addmethod  (matrix_class, (t_method)matrix_diag, gensym("diag"), A_GIMME, 0);
   class_addmethod  (matrix_class, (t_method)matrix_ones, gensym("ones"), A_GIMME, 0);
