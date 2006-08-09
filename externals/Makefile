@@ -111,11 +111,11 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
-  LIB_TARGETS += 
+  LIB_TARGETS += hidin
 else
   ifeq ($(OS_NAME),darwin)
     LIB_TARGETS += hid
@@ -973,10 +973,9 @@ hidin: $(HIDIN_OBJECTS:.c=.$(EXTENSION))
 hidin_install: hidin
 	install -d $(objectsdir)/$(HIDIN_NAME)
 	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(HIDIN_NAME) \
-		--author "" \
-		--description "" \
-		--license "" \
-		--version ""
+		--author "Olaf Matthes" \
+		--description "HID input for Windows HID" \
+		--license "GNU GPL"
 	install -p $(HIDIN_OBJECTS:.c=.$(EXTENSION)) $(objectsdir)/$(HIDIN_NAME)
 	install -d $(helpdir)/$(HIDIN_NAME)
 	install -p $(externals_src)/hidin/help/*.pd \
