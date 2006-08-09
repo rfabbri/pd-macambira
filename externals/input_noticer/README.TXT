@@ -39,6 +39,13 @@ source test_noticer_compile.sh
 Then, run test_noticer, and when it's running you should see messages when 
 you plug, or un-plug a joystick.
 
+dmerrill@dmerrill-t40:~/externals/input_noticer$ ./test_noticer
+device added, udi = /org/freedesktop/Hal/devices/usb_device_45e_28_noserial
+device added, udi = /org/freedesktop/Hal/devices/usb_device_45e_28_noserial_if0
+device added, udi = /org/freedesktop/Hal/devices/usb_device_45e_28_noserial_usbraw
+device added, udi = /org/freedesktop/Hal/devices/usb_device_45e_28_noserial_if0_logicaldev_input
+found the joystick at: /dev/input/event6
+
 Thanks to Dan Willmans, Seth Nickell, and David Zeuthen for their 
 invaluable help with the whole dbus/hal part. Also, thanks to Hans-Christoph
 Steiner for his help with (and creation of) the joystick external.

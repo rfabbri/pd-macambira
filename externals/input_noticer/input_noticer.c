@@ -28,7 +28,7 @@
 #include <string.h>
 #include "input_noticer.h"
 
-static char *version = "$Revision: 1.1.1.1 $";
+static char *version = "$Revision: 1.2 $";
 #define MAX_INPUT_DEVICES 32
 
 /*------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ static char *remove_quotes(char *input_str)
 	char *rv, *tp;
 	unsigned int i;
 
-	post ("removing quotes from %s", input_str);
+	// post ("removing quotes from %s", input_str);
 		
 	if (input_str != NULL)
 	{

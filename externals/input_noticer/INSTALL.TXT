@@ -23,5 +23,5 @@ you plug, or un-plug a joystick.
 Once you've got your libraries sorted out, to compile and install, you should
 first modify the Makefile to suit your system. Then you can type:
 
-make
+make pd_linux
 make install_noticer

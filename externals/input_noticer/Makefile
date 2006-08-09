@@ -1,6 +1,6 @@
 CC=gcc
 
-pd_linux: input_noticer.pd_linux
+pd_linux: input_noticer.pd_linux parseeventnodenum.pd_linux
 
 clean: ; rm -f *.pd_linux *.o *~
 
