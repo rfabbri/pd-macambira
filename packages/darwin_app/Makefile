@@ -224,19 +224,34 @@ darwin_app_externals_c++:
 #	cd $(externals_src)/gem2pdp && $(MAKE) -f Makefile.darwin
 #	install -p -m0444 $(externals_src)/gem2pdp/*.pd_darwin $(objectsdir)
 
-
-darwin_app_perms:
-	chmod -R a-w $(pddocdir)
+#==============================================================================#
+#
+## PACKAGING
+#
+#==============================================================================#
 
 package: dmg
 
 DMG_NAME = $(PACKAGE_NAME)
-dmg: darwin_app_perms
+dmg: 
+	chmod -R a-w $(pddocdir)
 	install -d "$(CWD)/$(DMG_NAME)"
 	install -p -m0644 $(manualsdir)/Pd/ReadMe.html "$(CWD)/$(DMG_NAME)"
-	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 	install -p -m0644 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
+	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
 	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
+# reset user's write perm so that things can be removed easily
+	cd "$(CWD)/$(DMG_NAME)/" && mv $(PD_APP_NAME).app $(BUILD_BASE)
+	chmod -R u+w $(pddocdir)
+
+
+
+
+#==============================================================================#
+#
+## CLEAN TARGETS
+#
+#==============================================================================#
 
 
 distclean: clean
@@ -250,6 +265,8 @@ clean: package_clean
 package_clean: darwin_app_clean
 	-rm -rf -- $(DESTDIR)
 	-rm Info.plist
+	-rm -f -- "$(CWD)/$(DMG_NAME)/ReadMe.html"
+	-rm -f -- "$(CWD)/$(DMG_NAME)/org.puredata.pd.plistx"
 
 devel_clean: darwin_app_devel_clean
 	cd $(packages_src) && $(MAKE) $(DEST_PATHS) clean
@@ -259,16 +276,31 @@ darwin_app_clean:
 	-chmod -R u+w $(PD_APP_CONTENTS)/Frameworks
 	-rm -rf -- $(PD_APP_CONTENTS)/Frameworks
 	-rm -f -- $(PD_APP_CONTENTS)/Plugins $(PD_APP_CONTENTS)/Info.plist
-	-rm -f -- $(PD_APP_CONTENTS)/MacOS/Pd
+	-rm -f -- "$(PD_APP_CONTENTS)/MacOS/$(PD_APP_NAME)"
 	-rmdir  $(PD_APP_CONTENTS)/MacOS
 	-rm -f -- $(PD_APP_CONTENTS)/Resources/Scripts/AppMain.tcl
 	-rmdir $(PD_APP_CONTENTS)/Resources/Scripts
 	-rm -f -- "$(PD_APP_CONTENTS)/Resources/$(WISH_NAME).rsrc" \
 		"$(PD_APP_CONTENTS)/Resources/pd*.icns"
-	-rmdir $(PD_APP_CONTENTS)/Resources
-	-rm -f -- $(DESTDIR)
-	-rm -f -- *~ 1 $(README_FILE) $(WELCOME_FILE) $(LICENSE_FILE) \
-		$(UNIX_PACKAGE_NAME).pkg  "$(DMG_NAME).dmg"
+	-rmdir  $(PD_APP_CONTENTS)/Resources
+	-rmdir  $(BUILD_BASE)/$(PD_APP_NAME).app/Contents
+	-rmdir  $(BUILD_BASE)/$(PD_APP_NAME).app
+	-rmdir  $(BUILD_BASE)
+	-rm -f -- "$(DMG_NAME).dmg"
+	-chmod -R u+w $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Frameworks
+	-rm -rf -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Frameworks
+	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Plugins 
+	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Info.plist
+	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/MacOS/$(PD_APP_NAME)
+	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents/MacOS
+	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/Scripts/AppMain.tcl
+	-rmdir $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/Scripts
+	-rm -f -- "$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/$(WISH_NAME).rsrc" \
+		"$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/pd*.icns"
+	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources
+	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents
+	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app
+	-rmdir  $(DMG_NAME)
 
 
 #==============================================================================#
