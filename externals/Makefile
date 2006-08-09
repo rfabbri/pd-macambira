@@ -111,7 +111,7 @@ CXXFLAGS = $(CFLAGS)
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib iemmatrix loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
+LIB_TARGETS = boids bsaylor corelibs creb cxc cyclone ekext ext13 flatspace flib freeverb ggee hardware hcs iem_ambi iem_bin_ambi iemlib loaders mapping markex maxlib mjlib motex oscx pan pddp pdogg pmpd sigpack smlib toxy unauthorized vbap zexy
 
 # this is for libraries that don't compile (yet) on all platforms
 ifeq ($(OS_NAME),windows)
@@ -1187,9 +1187,10 @@ iemlib_clean:
 #------------------------------------------------------------------------------#
 # IEMMATRIX
 IEMMATRIX_NAME=iemmatrix
+IEMMATRIX_SOURCES := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
 IEMMATRIX_OBJECTS := $(wildcard $(externals_src)/iem/iemmatrix/src/mtx_*.c)
 IEMMATRIX_VERSION := $(shell echo $(externals_src)/iem/iemmatrix/VERSION.txt)
-iemmatrix: $(IEMMATRIX_OBJECTS:.c=.$(EXTENSION))
+iemmatrix: $(IEMMATRIX_OBJECTS:.c=.o)
 
 
 iemmatrix_install: iemmatrix
