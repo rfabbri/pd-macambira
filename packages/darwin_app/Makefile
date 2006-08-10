@@ -247,16 +247,14 @@ dmg:
 #	install -p background.png "/Volumes/$(DMG_NAME)/.imagefolder/"
 	install -p DS_Store "/Volumes/$(DMG_NAME)/.DS_Store"
 	chmod -R a-w "/Volumes/$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
-	hdiutil detach "/Volumes/$(DMG_NAME)"
+	hdiutil detach `mount | grep $(DMG_NAME) | cut -d ' ' -f 1`
 	hdiutil convert -format UDZO -o "$(DMG_NAME).dmg" build.dmg
 	rm -f build.dmg
 # install license
 	hdiutil unflatten "$(DMG_NAME).dmg"
 	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/*.r SLA.r -a \
-		-o "$(DMG_NAME)"
+		-o "$(DMG_NAME).dmg"
 	hdiutil flatten "$(DMG_NAME).dmg"
-# mystery file of 0 size...
-	rm -f "$(DMG_NAME)"
 
 
 
