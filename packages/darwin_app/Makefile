@@ -234,16 +234,29 @@ package: dmg
 
 DMG_NAME = $(PACKAGE_NAME)
 dmg: 
-	chmod -R a-w $(pddocdir)
-	install -d "$(CWD)/$(DMG_NAME)"
-	install -p -m0644 $(manualsdir)/Pd/ReadMe.html "$(CWD)/$(DMG_NAME)"
-	install -p -m0644 org.puredata.pd.plist "$(CWD)/$(DMG_NAME)"
-	cd $(BUILD_BASE) && mv $(PD_APP_NAME).app "$(CWD)/$(DMG_NAME)/"
-	cd $(CWD) && /bin/sh mkdmg "$(DMG_NAME)"
-# reset user's write perm so that things can be removed easily
-	cd "$(CWD)/$(DMG_NAME)/" && mv $(PD_APP_NAME).app $(BUILD_BASE)
-	chmod -R u+w $(pddocdir)
-
+	hdiutil create -format UDRW -fs HFS+ -srcfolder "$(BUILD_BASE)" \
+		-volname $(DMG_NAME) build.dmg
+# detach one with the same name first
+	-hdiutil detach "/Volumes/$(DMG_NAME)"
+	hdiutil attach build.dmg
+	install -p $(manualsdir)/Pd/ReadMe.html "/Volumes/$(DMG_NAME)"
+	install -p -m0644 org.puredata.pd.plist "/Volumes/$(DMG_NAME)"
+	install -d "/Volumes/$(DMG_NAME)/.imagefolder"
+# background image will only show when the disk image is called "Pd-extended
+# the background image needs to be added to the .DS_Store to work
+#	install -p background.png "/Volumes/$(DMG_NAME)/.imagefolder/"
+	install -p DS_Store "/Volumes/$(DMG_NAME)/.DS_Store"
+	chmod -R a-w "/Volumes/$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/doc"
+	hdiutil detach "/Volumes/$(DMG_NAME)"
+	hdiutil convert -format UDZO -o "$(DMG_NAME).dmg" build.dmg
+	rm -f build.dmg
+# install license
+	hdiutil unflatten "$(DMG_NAME).dmg"
+	/Developer/Tools/Rez /Developer/Headers/FlatCarbon/*.r SLA.r -a \
+		-o "$(DMG_NAME)"
+	hdiutil flatten "$(DMG_NAME).dmg"
+# mystery file of 0 size...
+	rm -f "$(DMG_NAME)"
 
 
 
@@ -287,20 +300,7 @@ darwin_app_clean:
 	-rmdir  $(BUILD_BASE)/$(PD_APP_NAME).app
 	-rmdir  $(BUILD_BASE)
 	-rm -f -- "$(DMG_NAME).dmg"
-	-chmod -R u+w $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Frameworks
-	-rm -rf -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Frameworks
-	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Plugins 
-	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Info.plist
-	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/MacOS/$(PD_APP_NAME)
-	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents/MacOS
-	-rm -f -- $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/Scripts/AppMain.tcl
-	-rmdir $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/Scripts
-	-rm -f -- "$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/$(WISH_NAME).rsrc" \
-		"$(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources/pd*.icns"
-	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents/Resources
-	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app/Contents
-	-rmdir  $(DMG_NAME)/$(PD_APP_NAME).app
-	-rmdir  $(DMG_NAME)
+	-rm -f -- build.dmg
 
 
 #==============================================================================#
