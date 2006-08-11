@@ -27,7 +27,7 @@ include $(BUILDLAYOUT_DIR)/Makefile.buildlayout
 #
 # WARNING!  this MUST be all on one line because the automatic package
 # building scripts rely on it being that way.
-LIB_TARGETS = gyre keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical
+LIB_TARGETS = gyre jmmmp keyboardkeys la-kitchen list-abs memento nusmuk nqpoly parazit pddp pixeltango purepd rradical
 
 # in case anything needs to be compiled or processed somehow before installing
 all:
@@ -47,6 +47,32 @@ $(patsubst %, %_install,$(LIB_TARGETS))
 #
 #==============================================================================#
 
+
+#-------------------------------------------------------------------------------
+# TEMPLATE
+TEMPLATE_NAME = template
+template_install:
+	install -d $(objectsdir)/$(TEMPLATE_NAME)
+	install -p $(abstractions_src)/template/*.pd $(objectsdir)/$(TEMPLATE_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(TEMPLATE_NAME) \
+		--author "" \
+		--description "" \
+		--license "" \
+		--version "" 
+	install -d $(helpdir)/$(TEMPLATE_NAME)
+	install -p $(abstractions_src)/template/help/*-help.pd \
+		 $(helpdir)/$(TEMPLATE_NAME)
+#	install -d $(manualsdir)/$(TEMPLATE_NAME)
+#	install -p $(abstractions_src)/template/doc/*.txt \
+#		 $(manualsdir)/$(TEMPLATE_NAME)
+#	install -d $(readmesdir)
+#	install -p $(abstractions_src)/template/README \
+#		$(readmesdir)/$(TEMPLATE_NAME).txt
+
+
+
+
+
 #-------------------------------------------------------------------------------
 # GYRE
 GYRE_NAME = gyre
@@ -60,6 +86,33 @@ gyre_install:
 	install -d $(examplesdir)/$(GYRE_NAME)
 	install -p $(abstractions_src)/audionerd/GYRE/gyre.pd \
 		 $(examplesdir)/$(GYRE_NAME)
+
+
+#-------------------------------------------------------------------------------
+# JMMMP
+JMMMP_NAME = jmmmp
+jmmmp_install:
+	install -d $(objectsdir)/$(JMMMP_NAME)
+	$(scripts_src)/generate-libdir-metafile.sh $(objectsdir) $(JMMMP_NAME) \
+		--author "Joao Miguel Pais <jmmmpais@googlemail.com>" \
+		--description "" \
+		--license "BSD" \
+		--version "" 
+	install -p $(abstractions_src)/jmmmp/*.pd \
+		 $(objectsdir)/$(JMMMP_NAME)
+	install -d $(helpdir)/$(JMMMP_NAME)
+	install -p $(abstractions_src)/jmmmp/*-help.pd \
+		 $(helpdir)/$(JMMMP_NAME)
+#	install -d $(manualsdir)/$(JMMMP_NAME)
+#	install -p $(abstractions_src)/jmmmp/*.html \
+#		 $(manualsdir)/$(JMMMP_NAME)
+#	install -d $(examplesdir)/$(JMMMP_NAME)
+#	install -p $(abstractions_src)/jmmmp/examples/jmmmp.pd \
+#		 $(examplesdir)/$(JMMMP_NAME)
+	install -d $(readmesdir)
+	install -p $(abstractions_src)/jmmmp/jmmmp-ext.txt \
+		$(readmesdir)/$(JMMMP_NAME).txt
+
 
 
 #-------------------------------------------------------------------------------
@@ -109,9 +162,12 @@ la-kitchen_install:
 	install -d $(helpdir)/$(LA-KITCHEN_NAME)
 	install -p $(abstractions_src)/La-kitchen/*-help.pd \
 		 $(helpdir)/$(LA-KITCHEN_NAME)
-	install -d $(manualsdir)/$(LA-KITCHEN_NAME)
+#	install -d $(manualsdir)/$(LA-KITCHEN_NAME)
+#	install -p $(abstractions_src)/La-kitchen/doc/*.* \
+#		 $(manualsdir)/$(LA-KITCHEN_NAME)
+	install -d $(readmesdir)
 	install -p $(abstractions_src)/La-kitchen/readme.txt \
-		 $(manualsdir)/$(LA-KITCHEN_NAME)
+		$(readmesdir)/$(LA_KITCHEN_NAME).txt
 
 
 #-------------------------------------------------------------------------------
