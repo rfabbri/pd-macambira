@@ -23,122 +23,114 @@
 
 typedef void (*t_xxx)(void);
 
-static char sys_dllextent[] = 
+/* naming convention for externs.  The names are kept distinct for those
+who wich to make "fat" externs compiled for many platforms.  Less specific
+fallbacks are provided, primarily for back-compatibility; these suffice if
+you are building a package which will run with a single set of compiled
+objects.  The specific name is the letter b, l, d, or m for  BSD, linux,
+darwin, or microsoft, followed by a more specific string, either "fat" for
+a fat binary or an indication of the instruction set. */
+
 #ifdef __FreeBSD__
-    ".pd_freebsd";
-#endif
-#ifdef IRIX
-#ifdef N32
-    ".pd_irix6";
-#else
-    ".pd_irix5";
-#endif
+static char sys_dllextent[] = ".b_i386", sys_dllextent2[] = ".pd_freebsd";
 #endif
 #ifdef __linux__
-    ".pd_linux";
+#ifdef __ia64__
+static char sys_dllextent[] = ".l_ia64", sys_dllextent2[] = ".pd_linux";
+#else
+static char sys_dllextent[] = ".l_i386", sys_dllextent2[] = ".pd_linux";
+#endif
 #endif
 #ifdef MACOSX
-#ifdef  __i386
-        ".pd_imac";
+#ifdef __i386__
+static char sys_dllextent[] = ".d_fat", sys_dllextent2[] = ".pd_darwin";
 #else
-    ".pd_darwin";
+static char sys_dllextent[] = ".d_ppc", sys_dllextent2[] = ".pd_darwin";
 #endif
 #endif
 #ifdef MSW
-    ".dll";
+static char sys_dllextent[] = ".m_i386", sys_dllextent2[] = ".dll";
 #endif
 
 void class_set_extern_dir(t_symbol *s);
 
-static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
+static int sys_do_load_lib(char *dirname, char *classname)
 {
     char symname[MAXPDSTRING], filename[MAXPDSTRING], dirbuf[MAXPDSTRING],
-      classname2[MAXPDSTRING], *nameptr, *lastdot, 
-      altsymname[MAXPDSTRING];
+        *nameptr, altsymname[MAXPDSTRING];
     void *dlobj;
     t_xxx makeout = NULL;
-    int fd;
+    int i, hexmunge = 0, fd;
 #ifdef MSW
     HINSTANCE ntdll;
 #endif
+    for (i = 0, nameptr = classname; i < MAXPDSTRING-7 && *nameptr; nameptr++)
+    {
+        char c = *nameptr;
+        if ((c>='0' && c<='9') || (c>='A' && c<='Z')||
+           (c>='a' && c<='z' )|| c == '_')
+        {
+            symname[i] = c;
+            i++;
+        }
+            /* trailing tilde becomes "_tilde" */
+        else if (c == '~' && nameptr[1] == 0)
+        {
+            strcpy(symname+i, "_tilde");
+            i += strlen(symname+i);
+        }
+        else /* anything you can't put in a C symbol is sprintf'ed in hex */
+        {
+            sprintf(symname+i, "0x%02x", c);
+            i += strlen(symname+i);
+            hexmunge = 1;
+        }
+    }
+    symname[i] = 0;
+    if (hexmunge)
+    {
+        memmove(symname+6, symname, strlen(symname+1));
+        strncpy(symname, "setup_", 6);
+    }
+    else strcat(symname, "_setup");
+
 #if 0
     fprintf(stderr, "lib %s %s\n", dirname, classname);
 #endif
         /* try looking in the path for (classname).(sys_dllextent) ... */
     if ((fd = open_via_path(dirname, classname, sys_dllextent,
-        dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-    {
-            /* next try (classname)/(classname).(sys_dllextent) ... */
-        strncpy(classname2, classname, MAXPDSTRING);
-        filename[MAXPDSTRING-2] = 0;
-        strcat(classname2, "/");
-        strncat(classname2, classname, MAXPDSTRING-strlen(classname2));
-        filename[MAXPDSTRING-1] = 0;
-        if ((fd = open_via_path(dirname, classname2, sys_dllextent,
-            dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-        {
-            /* next try (alternative_classname).(sys_dllextent) */
-            if (altname)
-            {
-                if ((fd = open_via_path(dirname, altname, sys_dllextent,
-                    dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-                {
-                    /* next try 
-                        (alt_classname)/(alt_classname).(sys_dllextent) */
-                    strncpy(classname2, altname, MAXPDSTRING);
-                    filename[MAXPDSTRING-2] = 0;
-                    strcat(classname2, "/");
-                    strncat(classname2, altname,
-                        MAXPDSTRING-strlen(classname2));
-                    filename[MAXPDSTRING-1] = 0;
-                    if ((fd = open_via_path(dirname, classname2,
-                        sys_dllextent, dirbuf, &nameptr, MAXPDSTRING, 1)) < 0)
-                    {
-                        return 0;
-                    } 
-                }
-            }
-          else return (0);
-        }
-    }
+        dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
+            goto gotone;
+        /* same, with the more generic sys_dllextent2 */
+    if ((fd = open_via_path(dirname, classname, sys_dllextent2,
+        dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
+            goto gotone;
+        /* next try (classname)/(classname).(sys_dllextent) ... */
+    strncpy(filename, classname, MAXPDSTRING);
+    filename[MAXPDSTRING-2] = 0;
+    strcat(filename, "/");
+    strncat(filename, classname, MAXPDSTRING-strlen(filename));
+    filename[MAXPDSTRING-1] = 0;
+    if ((fd = open_via_path(dirname, filename, sys_dllextent,
+        dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
+            goto gotone;
+    if ((fd = open_via_path(dirname, filename, sys_dllextent2,
+        dirbuf, &nameptr, MAXPDSTRING, 1)) >= 0)
+            goto gotone;
+    return (0);
+gotone:
     close(fd);
     class_set_extern_dir(gensym(dirbuf));
 
-        /* refabricate the pathname */
+        /* rebuild the absolute pathname */
     strncpy(filename, dirbuf, MAXPDSTRING);
     filename[MAXPDSTRING-2] = 0;
     strcat(filename, "/");
     strncat(filename, nameptr, MAXPDSTRING-strlen(filename));
     filename[MAXPDSTRING-1] = 0;
-        /* extract the setup function name */
-    if (lastdot = strrchr(nameptr, '.'))
-        *lastdot = 0;
 
-#ifdef DIDFORMACOSX             /* no longer correct on macosx??? */
-    strcpy(symname, "_");
-    strcat(symname, nameptr);
-    if(altname)
-      {
-        strcpy(altsymname, "_setup_");
-        strcat(symname, altname);
-      }
-#else
-    strcpy(symname, nameptr);
-    if(altname)
-      {
-        strcpy(altsymname, "setup_");
-        strcat(altsymname, altname);
-      }
-#endif
-
-        /* if the last character is a tilde, replace with "_tilde" */
-    if (symname[strlen(symname) - 1] == '~')
-        strcpy(symname + (strlen(symname) - 1), "_tilde");
-        /* and append _setup to form the C setup function name */
-    strcat(symname, "_setup");
 #ifdef DL_OPEN
     dlobj = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
-        post("opened %x", dlobj);
     if (!dlobj)
     {
         post("%s: %s", filename, dlerror());
@@ -146,7 +138,6 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
         return (0);
     }
     makeout = (t_xxx)dlsym(dlobj,  symname);
-    if(!makeout)makeout = (t_xxx)dlsym(dlobj,  altsymname);
 #endif
 #ifdef MSW
     sys_bashfilename(filename, filename);
@@ -158,46 +149,11 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
         return (0);
     }
     makeout = (t_xxx)GetProcAddress(ntdll, symname);  
-    if(!makeout)makeout = (t_xxx)GetProcAddress(ntdll, altsymname);  
-#endif
-#if defined(MACOSX) && !defined(DL_OPEN)
-    {
-        NSObjectFileImage image; 
-        void *ret;
-        NSSymbol s; 
-        if ( NSCreateObjectFileImageFromFile( filename, &image) != NSObjectFileImageSuccess )
-        {
-            post("%s: couldn't load", filename);
-            class_set_extern_dir(&s_);
-            return 0;
-        }
-        ret = NSLinkModule( image, filename, 
-               NSLINKMODULE_OPTION_BINDNOW |
-               NSLINKMODULE_OPTION_RETURN_ON_ERROR);
-               
-        if (ret == NULL) {
-                int err;
-                const char *fname, *errt;
-                NSLinkEditErrors c;
-                NSLinkEditError(&c, &err, &fname, &errt);
-                post("link error %d %s %s", err, fname, errt);
-                return 0;
-        }
-        s = NSLookupSymbolInModule(ret, symname); 
-
-        if(!s)s=NSLookupSymbolInModule(ret, altsymname); 
-
-        if (s)
-            makeout = (t_xxx)NSAddressOfSymbol( s);
-        else makeout = 0;
-    }
 #endif
 
     if (!makeout)
     {
         post("load_object: Symbol \"%s\" not found", symname);
-        if(altname)
-          post("load_object: Symbol \"%s\" not found", altsymname);
         class_set_extern_dir(&s_);
         return 0;
     }
@@ -207,7 +163,7 @@ static int sys_load_lib_alt(char *dirname, char *classname, char *altname)
 }
 
 /* callback type definition */
-typedef int (*loader_t)(char *dirname, char *classname, char *altname);
+typedef int (*loader_t)(char *dirname, char *classname);
 
 /* linked list of loaders */
 typedef struct loader_queue {
@@ -215,7 +171,7 @@ typedef struct loader_queue {
     struct loader_queue *next;
 } loader_queue_t;
 
-static loader_queue_t loaders = {sys_load_lib_alt, NULL};
+static loader_queue_t loaders = {sys_do_load_lib, NULL};
 
 /* register class loader function */
 void sys_register_loader(loader_t loader)
@@ -235,16 +191,14 @@ void sys_register_loader(loader_t loader)
     }   
 }
 
-int sys_load_lib(char *dirname, char *classname, char *altname)
+int sys_load_lib(char *dirname, char *classname)
 {
     int dspstate = canvas_suspend_dsp();
     int ok = 0;
     loader_queue_t *q;
     for(q = &loaders; q; q = q->next)
-        if(ok = q->loader(dirname, classname, altname)) break;
+        if(ok = q->loader(dirname, classname)) break;
     canvas_resume_dsp(dspstate);
     return ok;
 }
-
-
 

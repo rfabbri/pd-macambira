@@ -147,30 +147,34 @@ int iemgui_modulo_color(int col)
     return(col);
 }
 
-t_symbol *iemgui_raute2dollar(t_symbol *s)
-{
-    if (s->s_name[0] == '#')
-    {
-        char buf[MAXPDSTRING];
-        strncpy(buf, s->s_name, MAXPDSTRING);
-        buf[MAXPDSTRING-1] = 0;
-        buf[0] = '$';
-        return (gensym(buf));
-    }
-    else return (s);
-}
-
 t_symbol *iemgui_dollar2raute(t_symbol *s)
 {
-    if (s->s_name[0] == '$')
+    char buf[MAXPDSTRING+1], *s1, *s2;
+    if (strlen(s->s_name) >= MAXPDSTRING)
+        return (s);
+    for (s1 = s->s_name, s2 = buf; ; s1++, s2++)
     {
-        char buf[MAXPDSTRING];
-        strncpy(buf, s->s_name, MAXPDSTRING);
-        buf[MAXPDSTRING-1] = 0;
-        buf[0] = '#';
-        return (gensym(buf));
+        if (*s1 == '$')
+            *s2 = '#';
+        else if (!(*s2 = *s1))
+            break;
     }
-    else return (s);
+    return(gensym(buf));
+}
+
+t_symbol *iemgui_raute2dollar(t_symbol *s)
+{
+    char buf[MAXPDSTRING+1], *s1, *s2;
+    if (strlen(s->s_name) >= MAXPDSTRING)
+        return (s);
+    for (s1 = s->s_name, s2 = buf; ; s1++, s2++)
+    {
+        if (*s1 == '#')
+            *s2 = '$';
+        else if (!(*s2 = *s1))
+            break;
+    }
+    return(gensym(buf));
 }
 
 void iemgui_verify_snd_ne_rcv(t_iemgui *iemgui)

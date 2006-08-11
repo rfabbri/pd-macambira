@@ -1,5 +1,5 @@
 /*
- * $Id: pa_unix_oss.c,v 1.6.2.27 2006/02/21 19:13:56 bjornroche Exp $
+ * $Id: pa_unix_oss.c,v 1.6.2.28 2006/03/20 18:22:06 aknudsen Exp $
  * PortAudio Portable Real-Time Audio Library
  * Latest Version at: http://www.portaudio.com
  * OSS implementation by:
@@ -530,12 +530,15 @@ static PaError BuildDeviceList( PaOSSHostApiRepresentation *ossApi )
            PA_UNLESS( deviceInfos = (PaDeviceInfo **) realloc( deviceInfos, maxDeviceInfos * sizeof (PaDeviceInfo *) ),
                    paInsufficientMemory );
        }
-       deviceInfos[numDevices - 1] = deviceInfo;
+       {
+           int devIdx = numDevices - 1;
+           deviceInfos[devIdx] = deviceInfo;
 
-       if( commonApi->info.defaultInputDevice == paNoDevice && deviceInfo->maxInputChannels > 0 )
-           commonApi->info.defaultInputDevice = i;
-       if( commonApi->info.defaultOutputDevice == paNoDevice && deviceInfo->maxOutputChannels > 0 )
-           commonApi->info.defaultOutputDevice = i;
+           if( commonApi->info.defaultInputDevice == paNoDevice && deviceInfo->maxInputChannels > 0 )
+               commonApi->info.defaultInputDevice = devIdx;
+           if( commonApi->info.defaultOutputDevice == paNoDevice && deviceInfo->maxOutputChannels > 0 )
+               commonApi->info.defaultOutputDevice = devIdx;
+       }
     }
 
     /* Make an array of PaDeviceInfo pointers out of the linked list */

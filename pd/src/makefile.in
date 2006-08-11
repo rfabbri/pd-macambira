@@ -20,21 +20,19 @@ libpddir = $(libdir)/pd
 pddocdir = $(libpddir)/doc
 libpdbindir = $(libpddir)/bin
 
+CPPFLAGS = @CPPFLAGS@
 MORECFLAGS = @MORECFLAGS@
-
-INCLUDE = -I.
-GINCLUDE = $(INCLUDE) @GUIFLAGS@
+GINCLUDE = $(CPPFLAGS) @GUIFLAGS@
 GLIB = @LIBS@
 
 LDFLAGS = @LDFLAGS@
 LIB =  @PDLIB@
 
-OPT_CFLAGS = @OPT_CFLAGS@
 WARN_CFLAGS = -Wall -W -Wstrict-prototypes \
     -Wno-unused -Wno-parentheses -Wno-switch
 ARCH_CFLAGS = -DPD 
 
-CFLAGS = @CFLAGS@ $(ARCH_CFLAGS) $(WARN_CFLAGS) $(OPT_CFLAGS) $(MORECFLAGS)
+CFLAGS = @CFLAGS@ $(ARCH_CFLAGS) $(WARN_CFLAGS) $(CPPFLAGS) $(MORECFLAGS)
 
 # the sources
 
@@ -188,7 +186,7 @@ tags: $(SRC) $(GSRC); ctags *.[ch]
 depend: makefile.dependencies
 
 makefile.dependencies: makefile
-	$(CC) $(INCLUDE) $(CFLAGS) -M $(SRC) > makefile.dependencies
+	$(CC) $(CPPFLAGS) -M $(SRC) > makefile.dependencies
 
 uninstall:
 	rm -f -r $(libpddir)

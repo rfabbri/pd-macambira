@@ -8,9 +8,9 @@ AC_SUBST(portmidi, no)
 AC_SUBST(binarymode, -m755)
 AC_SUBST(fftw, no)
 AC_SUBST(PDLIB)
+AC_SUBST(CPPFLAGS)
 AC_SUBST(MORECFLAGS)
 AC_SUBST(EXT)
-AC_SUBST(OPT_CFLAGS)
 AC_SUBST(USE_DEBUG_CFLAGS, no)
 AC_SUBST(SYSSRC)
 AC_SUBST(TCLTK_FRAMEWORKS_PATH)
@@ -171,8 +171,8 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
       LDFLAGS="$LDFLAGS -static"
     fi 
     EXT=pd_linux
-    MORECFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD\
-    	 -DUSEAPI_OSS \
+    CPPFLAGS="-DDL_OPEN -DPA_USE_OSS -DUNIX -DUNISTD\
+    	-DUSEAPI_OSS \
         -I../portaudio/pa_common -I../portaudio/pablio \
         -I../portmidi/pm_common \
         -I../portmidi/pm_linux \
@@ -181,7 +181,7 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
     if test x$alsa == "xyes";
     then
     	SYSSRC=$SYSSRC" s_audio_alsa.c s_audio_alsamm.c s_midi_alsa.c"
-	MORECFLAGS=$MORECFLAGS" -DPA_USE_ALSA -DUSEAPI_ALSA"
+	CPPFLAGS=$CPPFLAGS" -DPA_USE_ALSA -DUSEAPI_ALSA"
 	LDFLAGS=$LDFLAGS" -lasound"
     fi
 
@@ -190,7 +190,7 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
 
 
     then
-    	MORECFLAGS="-DUSEAPI_PORTAUDIO -DPA19 "$MORECFLAGS
+    	CPPFLAGS=$CPPFLAGS" -DUSEAPI_PORTAUDIO -DPA19"
 	SYSSRC="s_audio_pa.c \
     	s_audio_pablio.c     \
 	s_audio_paring.c     \
@@ -209,7 +209,7 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
 	if test x$alsa == "xyes";
 	then
 	    SYSSRC=$SYSSRC" ../portaudio/pa_linux_alsa/pa_linux_alsa.c"
-	    MORECFLAGS=$MORECFLAGS" -Wno-error"
+	    CPPFLAGS=$CPPFLAGS" -Wno-error"
     	fi
     fi
     if test x$setuid == "xyes";
@@ -220,9 +220,9 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
     GUINAME="pd-gui"
     if test x$USE_DEBUG_CFLAGS == "xyes";
     then
-	OPT_CFLAGS="-g"
+	MORECFLAGS=$MORECFLAGS" -g"
     else
-	OPT_CFLAGS="-O6 -funroll-loops -fomit-frame-pointer"
+	MORECFLAGS=$MORECFLAGS" -O6 -funroll-loops -fomit-frame-pointer"
     fi
     if test x$jack == "xyes";
     then
@@ -233,7 +233,7 @@ dnl This should be fixed so Pd can use ALSA shared libraries where appropriate.
         LDFLAGS=$LDFLAGS" -lrt -ljack"
     fi
 
-    echo OPT_CFLAGS --------------- $OPT_CFLAGS
+    echo MORECFLAGS --------------- $MORECFLAGS
     OSNUMBER=0
 
 fi
@@ -244,12 +244,19 @@ then
         -framework AudioUnit -framework AudioToolbox \
         -framework Carbon -framework CoreMIDI"
     EXT=pd_darwin
-    MORECFLAGS="-DDL_OPEN -DMACOSX -DUNISTD -I/usr/X11R6/include \
-	 -I../portaudio/pa_common -I../portaudio/pablio \
+    CPPFLAGS="-DDL_OPEN -DMACOSX -DUNISTD -I/usr/X11R6/include \
+	-I../portaudio/pa_common -I../portaudio/pablio \
 	-I../portmidi/pm_common -I../portmidi/pm_mac \
 	-I../portmidi/porttime \
-	-Wno-error \
 	-DUSEAPI_PORTAUDIO -DPA19 -DPA_USE_COREAUDIO"
+    if test `uname -r` = 7.9.0;
+    then
+        MORECFLAGS="-Wno-error"
+    	EXTERNTARGET=d_ppc
+    else
+        MORECFLAGS="-arch i386 -arch ppc -Wno-error"
+    	EXTERNTARGET=d_fat
+    fi
     SYSSRC="s_midi_pm.c s_audio_pa.c \
     	s_audio_pablio.c     \
 	s_audio_paring.c     \
@@ -292,17 +299,11 @@ then
         -I$TCLTK_FRAMEWORKS_PATH/Tcl.framework/Versions/8.4/PrivateHeaders"
     if test x$USE_DEBUG_CFLAGS == "xyes";
     then
-	OPT_CFLAGS="-g"
+	MORECFLAGS=$MORECFLAGS" -g"
     else
-	OPT_CFLAGS="-O2"
+	MORECFLAGS=$MORECFLAGS" -O2"
     fi
     OSNUMBER=2
-    if test `uname -m`  = i386;
-    then
-    	EXTERNTARGET=pd_imac
-    else
-    	EXTERNTARGET=pd_darwin
-    fi
     if test x$jack == "xyes";
     then
     	LDFLAGS=$LDFLAGS" -weak_framework Jack"

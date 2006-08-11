@@ -46,7 +46,7 @@ extern int sys_defaultfont;
 extern t_symbol *sys_libdir;    /* library directory for auxilliary files */
 
 /* s_loader.c */
-int sys_load_lib(char *dirname, char *filename, char *altname);
+int sys_load_lib(char *dirname, char *filename);
 
 /* s_audio.c */
 

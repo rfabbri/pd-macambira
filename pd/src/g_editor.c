@@ -1960,8 +1960,12 @@ static void canvas_copy(t_canvas *x)
         int bufsize;
         rtext_getseltext(x->gl_editor->e_textedfor, &buf, &bufsize);
 
-#ifdef UNIX
-            /* in X windows (i.e., UNIX) the selection already went to the
+#if defined(MSW) || defined(MACOSX)
+            /* for Mac or Windows, copy the text to the clipboard here */
+        sys_vgui("clipboard clear\n", bufsize, buf);
+        sys_vgui("clipboard append {%.*s}\n", bufsize, buf);
+#else
+            /* in X windows the selection already went to the
             clipboard when it was made; here we "copy" it to our own buffer
             as well, because, annoyingly, the clipboard will usually be 
             destroyed by the time the user asks to "paste". */
@@ -1970,11 +1974,7 @@ static void canvas_copy(t_canvas *x)
         canvas_textcopybuf = (char *)getbytes(bufsize);
         memcpy(canvas_textcopybuf, buf, bufsize);
         canvas_textcopybufsize = bufsize;
-#else /* UNIX */
-            /* otherwise just copy the text to the clipboard here */
-        sys_vgui("clipboard clear\n", bufsize, buf);
-        sys_vgui("clipboard append {%.*s}\n", bufsize, buf);
-#endif /* UNIX */
+#endif
     }
 }
 
@@ -2124,19 +2124,18 @@ static void canvas_paste(t_canvas *x)
     if (x->gl_editor->e_textedfor)
     {
             /* simulate keystrokes as if the copy buffer were typed in. */
-#ifdef UNIX
-            /* in UNIX we kept the text in our own copy buffer */
+#if defined(MSW) || defined(MACOSX)
+            /* for Mac or Windows,  ask the GUI to send the clipboard down */
+        sys_gui("pdtk_pastetext\n");
+#else
+            /* in X windows we kept the text in our own copy buffer */
         int i;
         for (i = 0; i < canvas_textcopybufsize; i++)
         {
             pd_vmess(&x->gl_gobj.g_pd, gensym("key"), "iii",
                 1, canvas_textcopybuf[i]&0xff, 0);
         }
-#else /* UNIX */
-            /* otherwise appeal to the GUI to send the clipboard down */
-        sys_gui("pdtk_pastetext\n");
-#endif /* UNIX */
-
+#endif
     }
     else
     {

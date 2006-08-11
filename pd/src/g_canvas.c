@@ -17,10 +17,11 @@ to be different but are now unified except for some fossilized names.) */
     /* LATER consider adding font size to this struct (see glist_getfont()) */
 struct _canvasenvironment
 {
-    t_symbol *ce_dir;   /* directory patch lives in */
-    int ce_argc;        /* number of "$" arguments */
-    t_atom *ce_argv;    /* array of "$" arguments */
-    int ce_dollarzero;  /* value of "$0" */
+    t_symbol *ce_dir;      /* directory patch lives in */
+    int ce_argc;           /* number of "$" arguments */
+    t_atom *ce_argv;       /* array of "$" arguments */
+    int ce_dollarzero;     /* value of "$0" */
+    t_namelist *ce_path;   /* search path */
 };
 
 #define GLIST_DEFCANVASWIDTH 450
@@ -181,12 +182,11 @@ t_symbol *canvas_realizedollar(t_canvas *x, t_symbol *s)
 {
     t_symbol *ret;
     char *name = s->s_name;
-    if (*name == '$' && name[1] >= '0' && name[1] <= '9')
+    if (strchr(name, '$'))
     {
         t_canvasenvironment *env = canvas_getenv(x);
         canvas_setcurrent(x);
-        ret = binbuf_realizedollsym(gensym(name+1),
-            env->ce_argc, env->ce_argv, 1);
+        ret = binbuf_realizedollsym(s, env->ce_argc, env->ce_argv, 1);
         canvas_unsetcurrent(x);
     }
     else ret = s;
@@ -337,8 +337,8 @@ void glist_init(t_glist *x)
 }
 
     /* make a new glist.  It will either be a "root" canvas or else
-    its parent will be a "text" object in another window... we don't
-    know which yet. */
+    it appears as a "text" object in another window (canvas_getcurrnet() 
+    tells us which.) */
 t_canvas *canvas_new(void *dummy, t_symbol *sel, int argc, t_atom *argv)
 {
     t_canvas *x = (t_canvas *)pd_new(canvas_class);
@@ -981,35 +981,15 @@ void canvas_objfor(t_glist *gl, t_text *x, int argc, t_atom *argv);
 void canvas_restore(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
 {
     t_pd *z;
-        /* this should be unnecessary, but sometimes the canvas's name gets
-        out of sync with the owning box's argument; this fixes that */
     if (argc > 3)
     {
         t_atom *ap=argv+3;
         if (ap->a_type == A_SYMBOL)
         {
-            char *buf=ap->a_w.w_symbol->s_name, *bufp;
-            if (*buf == '$' && buf[1] >= '0' && buf[1] <= '9')
-            {
-                for (bufp = buf+2; *bufp; bufp++)
-                    if (*bufp < '0' || *bufp > '9')
-                {
-                    SETDOLLSYM(ap, gensym(buf+1));
-                    goto didit;
-                }
-                SETDOLLAR(ap, atoi(buf+1));
-            didit: ;
-            }
-        }
-
-        if (ap->a_type == A_DOLLSYM)
-        {
             t_canvasenvironment *e = canvas_getenv(canvas_getcurrent());
             canvas_rename(x, binbuf_realizedollsym(ap->a_w.w_symbol,
-                e->ce_argc, e->ce_argv, 1), 0); 
+                e->ce_argc, e->ce_argv, 1), 0);
         }
-        else if (ap->a_type == A_SYMBOL)
-          canvas_rename(x, argv[3].a_w.w_symbol, 0);
     }
     canvas_pop(x, x->gl_willvis);
 
@@ -1432,6 +1412,7 @@ void canvas_redrawallfortemplatecanvas(t_canvas *x, int action)
     }
     canvas_redrawallfortemplate(0, action);
 }
+
 
 /* ------------------------------- setup routine ------------------------ */
 

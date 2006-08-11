@@ -312,19 +312,19 @@ void rtext_retext(t_rtext *x)
             for (s1 = nextchar - wantreduce, s2 = s1 + wantreduce;
                 s2 < ebuf; s1++, s2++)
                     *s1 = *s2;
-            t_resizebytes(x->x_buf, bufsize, text->te_width);
+            x->x_buf = t_resizebytes(x->x_buf, bufsize, text->te_width);
             bufsize = text->te_width;
             goto done;
         giveup:
                 /* give up and bash it to "+" or "-" */
             x->x_buf[0] = (atomp->a_w.w_float < 0 ? '-' : '+');
-            t_resizebytes(x->x_buf, bufsize, 1);
+            x->x_buf = t_resizebytes(x->x_buf, bufsize, 1);
             bufsize = 1;
         }
         else if (bufsize > text->te_width)
         {
             x->x_buf[text->te_width - 1] = '>';
-            t_resizebytes(x->x_buf, bufsize, text->te_width);
+            x->x_buf = t_resizebytes(x->x_buf, bufsize, text->te_width);
             bufsize = text->te_width;
         }
     done:

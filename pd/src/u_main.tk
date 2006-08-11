@@ -1783,13 +1783,8 @@ proc gatom_escape {sym} {
         set ret [string replace $sym 0 0 "--"]
 #       puts stderr [concat escape $sym $ret]
         } else {
-            if {[string equal -length 1 $sym "$"]} {
-                set ret [string replace $sym 0 0 "#"]
-#               puts stderr [concat unescape $sym $ret]
-            } else {
-                set ret $sym
-#               puts stderr [concat escape $sym "no change"]
-            }
+            set ret [string map {"$" "#"} $sym]
+#            puts stderr [concat unescape $sym $ret]
         }
     }
     pdtk_unspace $ret
@@ -1800,13 +1795,8 @@ proc gatom_unescape {sym} {
         set ret [string replace $sym 0 0 ""]
 #       puts stderr [concat unescape $sym $ret]
     } else {
-        if {[string equal -length 1 $sym "#"]} {
-            set ret [string replace $sym 0 0 "$"]
-#           puts stderr [concat unescape $sym $ret]
-        } else {
-            set ret $sym
-#           puts stderr [concat unescape $sym "no change"]
-        }
+        set ret [string map {"#" "$"} $sym]
+#        puts stderr [concat unescape $sym $ret]
     }
     concat $ret
 }

@@ -41,7 +41,6 @@ static void print_float(t_print *x, t_float f)
 static void print_list(t_print *x, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
-    char buf[80];
     if (argc && argv->a_type != A_SYMBOL) startpost("%s:", x->x_sym->s_name);
     else startpost("%s: %s", x->x_sym->s_name,
         (argc > 1 ? s_list.s_name : (argc == 1 ? s_symbol.s_name :
@@ -53,7 +52,6 @@ static void print_list(t_print *x, t_symbol *s, int argc, t_atom *argv)
 static void print_anything(t_print *x, t_symbol *s, int argc, t_atom *argv)
 {
     int i;
-    char buf[80];
     startpost("%s: %s", x->x_sym->s_name, s->s_name);
     postatom(argc, argv);
     endpost();

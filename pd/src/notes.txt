@@ -1,11 +1,19 @@
 ---------------- dolist --------------------
 
+fix:
+look again at array vis/invis conundrum, g_template.c
+subpatches appear at top left of screen regardless
+$1-args not evaluated (z.pd)
+
 test:
 compile on various versions of linux
 windows:
   modal dialogs confuse watchdog
   check the right-click-on-empty-canvas
   MIDI I/O (inc. sysex)
+mac:
+  text paste broken
+  clicking on windows seems sometimes not to open them
 what does OSX do when jack is compiled into Pd but not installed??
 turn on paMacCore_ChangeDeviceParameters for mac (pa_mac_core.h)
 

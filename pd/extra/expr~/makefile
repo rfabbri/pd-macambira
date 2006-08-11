@@ -124,65 +124,66 @@ linux_clobber: clean
 
 # ----------------------- MAC OSX -----------------------
 
-MACOSXOBJ =  vexp.pd_darwin_o vexp_fun.pd_darwin_o vexp_if.pd_darwin_o
-.SUFFIXES: .pd_darwin_o
+MACOSXOBJ =  vexp.d_ppc_o vexp_fun.d_ppc_o vexp_if.d_ppc_o
+.SUFFIXES: .d_ppc_o
 
 MACOSXCFLAGS = -DMACOSX -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
-    -Wno-unused -Wno-parentheses -Wno-switch
+    -Wno-unused -Wno-parentheses -Wno-switch 
 
 MACOSXINCLUDE =  -I../../src
 
-pd_darwin: expr.pd_darwin expr~.pd_darwin fexpr~.pd_darwin
-.c.pd_darwin_o:
-	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_darwin_o -c $*.c
+d_ppc: expr.d_ppc expr~.d_ppc fexpr~.d_ppc
+.c.d_ppc_o:
+	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.d_ppc_o -c $*.c
 
-expr.pd_darwin: $(MACOSXOBJ)
+expr.d_ppc: $(MACOSXOBJ)
 	$(CC) -bundle -undefined suppress  -flat_namespace \
-		-o expr.pd_darwin $(MACOSXOBJ)  -lm
-	rm -f ../expr.pd_darwin
-	-ln -s expr~/expr.pd_darwin ..
+		-o expr.d_ppc $(MACOSXOBJ)  -lm
+	rm -f ../expr.d_ppc
+	-ln -s expr~/expr.d_ppc ..
 
-expr~.pd_darwin: expr.pd_darwin
-	-ln -s expr.pd_darwin expr~.pd_darwin
-	rm -f ../expr~.pd_darwin
-	-ln -s expr~/expr~.pd_darwin ..
+expr~.d_ppc: expr.d_ppc
+	-ln -s expr.d_ppc expr~.d_ppc
+	rm -f ../expr~.d_ppc
+	-ln -s expr~/expr~.d_ppc ..
 
-fexpr~.pd_darwin: expr.pd_darwin
-	-ln -s expr.pd_darwin fexpr~.pd_darwin
-	rm -f ../fexpr~.pd_darwin
-	-ln -s expr~/fexpr~.pd_darwin ..
+fexpr~.d_ppc: expr.d_ppc
+	-ln -s expr.d_ppc fexpr~.d_ppc
+	rm -f ../fexpr~.d_ppc
+	-ln -s expr~/fexpr~.d_ppc ..
 
-pd_imac: expr.pd_imac expr~.pd_imac fexpr~.pd_imac
-.c.pd_imac_o:
-	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE) -o $*.pd_imac_o -c $*.c
+d_fat: expr.d_fat expr~.d_fat fexpr~.d_fat
+.c.d_fat_o:
+	$(CC) -g $(MACOSXCFLAGS) $(MACOSXINCLUDE)  -arch i386 -arch ppc \
+	-o $*.d_ppc_o -c $*.c
 
-expr.pd_imac: $(MACOSXOBJ)
+expr.d_fat: $(MACOSXOBJ)
 	$(CC) -bundle -undefined suppress  -flat_namespace \
-		-o expr.pd_imac $(MACOSXOBJ)  -lm
-	rm -f ../expr.pd_imac
-	-ln -s expr~/expr.pd_imac ..
+		-o expr.d_fat $(MACOSXOBJ)  -lm
+	rm -f ../expr.d_fat
+	-ln -s expr~/expr.d_fat ..
 
-expr~.pd_imac: expr.pd_imac
-	-ln -s expr.pd_imac expr~.pd_imac
-	rm -f ../expr~.pd_imac
-	-ln -s expr~/expr~.pd_imac ..
+expr~.d_fat: expr.d_fat
+	-ln -s expr.d_fat expr~.d_fat
+	rm -f ../expr~.d_fat
+	-ln -s expr~/expr~.d_fat ..
 
-fexpr~.pd_imac: expr.pd_imac
-	-ln -s expr.pd_imac fexpr~.pd_imac
-	rm -f ../fexpr~.pd_imac
-	-ln -s expr~/fexpr~.pd_imac ..
+fexpr~.d_fat: expr.d_fat
+	-ln -s expr.d_fat fexpr~.d_fat
+	rm -f ../fexpr~.d_fat
+	-ln -s expr~/fexpr~.d_fat ..
 
 install_darwin:
-	install expr.pd_darwin $(PDEXTERN)
-	rm -f $(PDEXTERN)/expr~.pd_darwin
-	rm -f $(PDEXTERN)/fexpr~.pd_darwin
+	install expr.d_ppc $(PDEXTERN)
+	rm -f $(PDEXTERN)/expr~.d_ppc
+	rm -f $(PDEXTERN)/fexpr~.d_ppc
 	cd $(PDEXTERN); \
-	-ln -s expr.pd_darwin expr~.pd_darwin; \
-	-ln -s expr.pd_darwin fexpr~.pd_darwin
+	-ln -s expr.d_ppc expr~.d_ppc; \
+	-ln -s expr.d_ppc fexpr~.d_ppc
 
 darwin_clean:
-	rm -f *.pd_darwin_o *.o
+	rm -f *.d_ppc_o *.o
 
 darwin_clobber: clean
-	rm -f expr.pd_darwin
+	rm -f expr.d_ppc
 

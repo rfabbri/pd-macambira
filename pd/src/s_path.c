@@ -12,7 +12,6 @@
 
 /* #define DEBUG(x) x */
 #define DEBUG(x)
-void readsf_banana( void);    /* debugging */
 
 #include <stdlib.h>
 #ifdef UNISTD
@@ -84,7 +83,7 @@ static const char* strtokcpy(char *to, const char *from, int delim)
 
 /* add a single item to a namelist.  If "allowdup" is true, duplicates
 may be added; othewise they're dropped.  */
-  
+
 t_namelist *namelist_append(t_namelist *listwas, const char *s, int allowdup)
 {
     t_namelist *nl, *nl2;

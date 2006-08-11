@@ -1,6 +1,14 @@
 This file describes implementation and API changes; stuff more visible to the
 user appears in the "release notes" instead.
 
+0.40.0
+
+0.39.0
+
+canvas_dspstate and signalinlet_new() exported to m_pd.h
+
+new function verbose() added to m_pd.h 
+
 0.38.0
 
 finally figured out how to do "-enable-", etc., flags in the configure

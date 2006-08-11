@@ -30,8 +30,8 @@ t_widgetbehavior text_widgetbehavior;
 
 /* ----------------- the "text" object.  ------------------ */
 
-    /* add a "text" object (comment) to a glist.  While this one goes for any glist,
-    the other 3 below are for canvases only.  (why?)  This is called
+    /* add a "text" object (comment) to a glist.  While this one goes for any
+    glist, the other 3 below are for canvases only.  (why?)  This is called
     without args if invoked from the GUI; otherwise at least x and y
     are provided.  */
 
@@ -564,6 +564,19 @@ static void gatom_symbol(t_gatom *x, t_symbol *s)
     SETSYMBOL(&at, s);
     gatom_set(x, 0, 1, &at);
     gatom_bang(x);
+}
+
+    /* We need a list method because, since there's both an "inlet" and a
+    "nofirstin" flag, the standard list behavior gets confused. */
+static void gatom_list(t_gatom *x, t_symbol *s, int argc, t_atom *argv)
+{
+    if (!argc)
+        gatom_bang(x);
+    else if (argv->a_type == A_FLOAT)
+        gatom_float(x, argv->a_w.w_float);
+    else if (argv->a_type == A_SYMBOL)
+        gatom_symbol(x, argv->a_w.w_symbol);
+    else pd_error(x, "gatom_list: need float or symbol");
 }
 
 static void gatom_motion(void *z, t_floatarg dx, t_floatarg dy)
@@ -1349,6 +1362,7 @@ void g_text_setup(void)
     class_addbang(gatom_class, gatom_bang);
     class_addfloat(gatom_class, gatom_float);
     class_addsymbol(gatom_class, gatom_symbol);
+    class_addlist(gatom_class, gatom_list);
     class_addmethod(gatom_class, (t_method)gatom_set, gensym("set"),
         A_GIMME, 0);
     class_addmethod(gatom_class, (t_method)gatom_click, gensym("click"),

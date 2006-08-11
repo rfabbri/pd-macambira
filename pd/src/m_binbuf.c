@@ -76,8 +76,7 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
         {
                 /* it's an atom other than a comma or semi */
             char c;
-            int floatstate = 0, slash = 0, lastslash = 0,
-                firstslash = (*textp == '\\');
+            int floatstate = 0, slash = 0, lastslash = 0, dollar = 0;
             bufp = buf;
             do
             {
@@ -142,6 +141,9 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
                         if (!digit) floatstate = -1;
                     }
                 }
+                if (!lastslash && c == '$' && (textp != etext && 
+                    textp[0] >= '0' && textp[0] <= '9'))
+                        dollar = 1;
                 if (!slash) bufp++;
             }
             while (textp != etext && bufp != ebuf && 
@@ -151,24 +153,25 @@ void binbuf_text(t_binbuf *x, char *text, size_t size)
 #if 0
             post("binbuf_text: buf %s", buf);
 #endif
-            if (*buf == '$' && buf[1] >= '0' && buf[1] <= '9' && !firstslash)
+            if (floatstate == 2 || floatstate == 4 || floatstate == 5 ||
+                floatstate == 8)
+                    SETFLOAT(ap, atof(buf));
+                /* LATER try to figure out how to mix "$" and "\$" correctly;
+                here, the backslashes were already stripped so we assume all
+                "$" chars are real dollars.  In fact, we only know at least one
+                was. */
+            else if (dollar)
             {
-                for (bufp = buf+2; *bufp; bufp++)
+                if (buf[0] != '$') 
+                    dollar = 0;
+                for (bufp = buf+1; *bufp; bufp++)
                     if (*bufp < '0' || *bufp > '9')
-                {
-                    SETDOLLSYM(ap, gensym(buf));
-                    goto didit;
-                }
-                SETDOLLAR(ap, atoi(buf+1));
-            didit: ;
+                        dollar = 0;
+                if (dollar)
+                    SETDOLLAR(ap, atoi(buf+1));
+                else post("dollsym %s", buf), SETDOLLSYM(ap, gensym(buf));
             }
-            else
-            {
-                if (floatstate == 2 || floatstate == 4 || floatstate == 5 ||
-                    floatstate == 8)
-                        SETFLOAT(ap, atof(buf));
-                else SETSYMBOL(ap, gensym(buf));
-            }
+            else SETSYMBOL(ap, gensym(buf));
         }
         ap++;
         natom++;
@@ -352,16 +355,21 @@ void binbuf_restore(t_binbuf *x, int argc, t_atom *argv)
     {
         if (argv->a_type == A_SYMBOL)
         {
-            char *str = argv->a_w.w_symbol->s_name;
+            char *str = argv->a_w.w_symbol->s_name, *str2;
             if (!strcmp(str, ";")) SETSEMI(ap);
             else if (!strcmp(str, ",")) SETCOMMA(ap);
-            else if (str[0] == '$' && str[1] >= '0' && str[1] <= '9')
+            else if ((str2 = strchr(str, '$')) && str2[1] >= '0'
+                & str2[1] <= '9')
             {
                 int dollsym = 0;
-                char *str2;
-                for (str2 = str + 2; *str2; str2++)
+                if (*str != '$')
+                    dollsym = 1;
+                else for (str2 = str + 1; *str2; str2++)
                     if (*str2 < '0' || *str2 > '9')
-                        dollsym = 1;
+                {
+                    dollsym = 1;
+                    break;
+                }
                 if (dollsym)
                     SETDOLLSYM(ap, gensym(str));
                 else
@@ -482,36 +490,43 @@ t_symbol *binbuf_realizedollsym(t_symbol *s, int ac, t_atom *av, int tonew)
      * whenever this happened, enable this code
      */
     substr=strchr(str, '$');
-    if(substr){
-      strncat(buf2, str, (substr-str));
-      str=substr+1;
+    if(substr)
+    {
+        strncat(buf2, str, (substr-str));
+        str=substr+1;
     }
 #endif
 
     while((next=binbuf_expanddollsym(str, buf, dollarnull, ac, av, tonew))>=0)
-      {
-      /*
-       * JMZ: i am not sure what this means, so i might have broken it
-       * it seems like that if "tonew" is set and the $arg cannot be expanded (or the dollarsym is in reality a A_DOLLAR)
-       * 0 is returned from binbuf_realizedollsym
-       * this happens, when expanding in a message-box, but does not happen when the A_DOLLSYM is the name of a subpatch
-       */
-        if(!tonew&&(0==next)&&(0==*buf)){
-          return 0; /* JMZ: this should mimick the original behaviour */
+    {
+        /*
+        * JMZ: i am not sure what this means, so i might have broken it
+        * it seems like that if "tonew" is set and the $arg cannot be expanded
+        * (or the dollarsym is in reality a A_DOLLAR)
+        * 0 is returned from binbuf_realizedollsym
+        * this happens, when expanding in a message-box, but does not happen
+        * when the A_DOLLSYM is the name of a subpatch
+        */
+        if(!tonew&&(0==next)&&(0==*buf))
+        {
+            return 0; /* JMZ: this should mimick the original behaviour */
         }
 
         strncat(buf2, buf, MAXPDSTRING/2-1);
         str+=next;
         substr=strchr(str, '$');
-        if(substr){
-          strncat(buf2, str, (substr-str));
-          str=substr+1;
-        } else {
-          strcat(buf2, str);
-
-          return gensym(buf2);
+        if(substr)
+        {
+            strncat(buf2, str, (substr-str));
+            str=substr+1;
+        } 
+        else
+        {
+            strcat(buf2, str);
+            goto done;
         }
-      }
+    }
+done:
     return (gensym(buf2));
 }
 

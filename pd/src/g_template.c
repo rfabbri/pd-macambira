@@ -1634,8 +1634,8 @@ static void plot_vis(t_gobj *z, t_glist *glist,
     if (plot_readownertemplate(x, data, template, 
         &elemtemplatesym, &array, &linewidth, &xloc, &xinc, &yloc, &style,
         &vis, &scalarvis, &xfielddesc, &yfielddesc, &wfielddesc) ||
-            (vis == 0) || 
-            array_getfields(elemtemplatesym, &elemtemplatecanvas,
+            ((vis == 0) && tovis) /* FIXME - why is 'tovis' flag necessary? */
+            || array_getfields(elemtemplatesym, &elemtemplatecanvas,
                 &elemtemplate, &elemsize, xfielddesc, yfielddesc, wfielddesc,
                 &xonset, &yonset, &wonset))
                     return;

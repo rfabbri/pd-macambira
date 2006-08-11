@@ -514,42 +514,6 @@ extern t_pd *newest;
 t_symbol* pathsearch(t_symbol *s,char* ext);
 int pd_setloadingabstraction(t_symbol *sym);
 
-
-/* replace everything but [a-zA-Z0-9_] by "0x%x" */
-static char*alternative_classname(char*classname)
-{
-  char *altname=(char*)getbytes(sizeof(char)*MAXPDSTRING);
-  int count=0;
-  int i=0;
-  for(i=0; i<MAXPDSTRING; i++)
-    altname[i]=0;
-  i=0;
-  while(*classname)
-    {
-      char c=*classname;
-      if((c>=48 && c<=57)|| /* [0-9] */
-         (c>=65 && c<=90)|| /* [A-Z] */
-         (c>=97 && c<=122)||/* [a-z] */
-         (c==95)) /* [_] */
-        {
-          altname[i]=c;
-          i++;
-        }
-      else /* a "bad" character */
-        {
-          sprintf(altname+i, "0x%02x", c);
-          i+=4;
-          count++;
-        }
-      classname++;
-    }
-  if(count>0)return altname;
-  /* seems like the given classname is fine as can be */
-  freebytes(altname, sizeof(char)*MAXPDSTRING);
-  return 0;
-}
-
-
     /* this routine is called when a new "object" is requested whose class Pd
     doesn't know.  Pd tries to load it as an extern, then as an abstraction. */
 void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
@@ -558,11 +522,10 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
     t_symbol *dir = canvas_getcurrentdir();
     int fd;
     char dirbuf[MAXPDSTRING], *nameptr;
-    char *altname=alternative_classname(s->s_name);
     if (tryingalready) return;
     newest = 0;
     class_loadsym = s;
-    if (sys_load_lib(dir->s_name, s->s_name, altname))
+    if (sys_load_lib(dir->s_name, s->s_name))
     {
         tryingalready = 1;
         typedmess(dummy, s, argc, argv);
@@ -573,8 +536,6 @@ void new_anything(void *dummy, t_symbol *s, int argc, t_atom *argv)
     current = s__X.s_thing;
     if ((fd = open_via_path(dir->s_name, s->s_name, ".pd",
         dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0 ||
-        (altname && (fd = open_via_path(dir->s_name, altname, ".pd",
-              dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0) ||
             (fd = open_via_path(dir->s_name, s->s_name, ".pat",
                 dirbuf, &nameptr, MAXPDSTRING, 0)) >= 0)
     {

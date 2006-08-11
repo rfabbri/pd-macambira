@@ -2,10 +2,13 @@
 * For information on usage and redistribution, and for a DISCLAIMER OF ALL
 * WARRANTIES, see the file, "LICENSE.txt," in this distribution.  */
 
-/* this file reads and writes the "data" portions of a canvas to a file.
-See also canvas_saveto(), etc., in g_editor.c.  The data portion is a
-collection of "scalar" objects.  Routines here can save collections of
-scalars into a file and reload them; also, support is included here for
+/* 
+Routines to read and write canvases to files:
+canvas_savetofile() writes a root canvas to a "pd" file.  (Reading "pd" files
+is done simply by passing the contents to the pd message interpreter.)
+Alternatively, the  glist_read() and glist_write() routines read and write
+"data" from and to files (reading reads into an existing canvas), using a
+file format as in the dialog window for data.
 */
 
 #include <stdlib.h>
@@ -13,6 +16,9 @@ scalars into a file and reload them; also, support is included here for
 #include "m_pd.h"
 #include "g_canvas.h"
 #include <string.h>
+
+static t_class *declare_class;
+static void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b);
 
     /* the following routines read "scalars" from a file into a canvas. */
 
@@ -566,22 +572,31 @@ static void canvas_saveto(t_canvas *x, t_binbuf *b)
         /* subpatch */
     if (x->gl_owner && !x->gl_env)
     {
+        /* have to go to original binbuf to find out how we were named. */
+        t_binbuf *bz = binbuf_new();
+        t_symbol *patchsym;
+        binbuf_addbinbuf(bz, x->gl_obj.ob_binbuf);
+        patchsym = atom_getsymbolarg(1, binbuf_getnatom(bz), binbuf_getvec(bz));
+        binbuf_free(bz);
         binbuf_addv(b, "ssiiiisi;", gensym("#N"), gensym("canvas"),
             (int)(x->gl_screenx1),
             (int)(x->gl_screeny1),
             (int)(x->gl_screenx2 - x->gl_screenx1),
             (int)(x->gl_screeny2 - x->gl_screeny1),
-            (*x->gl_name->s_name ? x->gl_name: gensym("(subpatch)")),
+            (patchsym != &s_ ? patchsym: gensym("(subpatch)")),
             x->gl_mapped);
     }
         /* root or abstraction */
-    else binbuf_addv(b, "ssiiiii;", gensym("#N"), gensym("canvas"),
+    else 
+    {
+        binbuf_addv(b, "ssiiiii;", gensym("#N"), gensym("canvas"),
             (int)(x->gl_screenx1),
             (int)(x->gl_screeny1),
             (int)(x->gl_screenx2 - x->gl_screenx1),
             (int)(x->gl_screeny2 - x->gl_screeny1),
                 (int)x->gl_font);
-
+        canvas_savedeclarationsto(x, b);
+    }
     for (y = x->gl_list; y; y = y->g_next)
         gobj_save(y, b);
 
@@ -714,6 +729,63 @@ static void canvas_menusave(t_canvas *x)
     else canvas_menusaveas(x2);
 }
 
+/* ------------------------------- declare ------------------------ */
+
+/* put "declare" objects in a patch to tell it about the environment in
+which objects should be created in this canvas.  This includes directories to
+search ("-path", "-stdpath") and object libraries to load
+("-lib" and "-stdlib").  These must be set before the patch containing
+the "declare" object is filled in with its contents; so when the patch is
+saved,  we throw early messages to the canvas to set the environment
+before any objects are created in it. */
+
+
+typedef struct _declare
+{
+    t_object x_obj;
+    t_canvas *x_canvas;
+    int x_useme;
+} t_declare;
+
+static void *declare_new(t_symbol *s, int argc, t_atom *argv)
+{
+    t_declare *x = (t_declare *)pd_new(declare_class);
+    x->x_useme = 1;
+    x->x_canvas = canvas_getcurrent();
+        /* LATER update environment and/or load libraries */
+    return (x);
+}
+
+static void declare_free(t_declare *x)
+{
+    x->x_useme = 0;
+        /* LATER update environment */
+}
+
+static void canvas_savedeclarationsto(t_canvas *x, t_binbuf *b)
+{
+    t_gobj *y;
+
+    for (y = x->gl_list; y; y = y->g_next)
+    {
+        if (pd_class(&y->g_pd) == declare_class)
+        {
+            binbuf_addv(b, "s", gensym("#X"));
+            binbuf_addbinbuf(b, ((t_declare *)y)->x_obj.te_binbuf);
+            binbuf_addv(b, ";");
+        }
+        else if (pd_class(&y->g_pd) == canvas_class)
+            canvas_savedeclarationsto((t_canvas *)y, b);
+    }
+}
+
+static void canvas_declare(t_canvas *x, t_symbol *s, int argc, t_atom *argv)
+{
+    startpost("declare:: %s", s->s_name);
+    postatom(argc, argv);
+    endpost();
+}
+
 
 void g_readwrite_setup(void)
 {
@@ -727,9 +799,15 @@ void g_readwrite_setup(void)
         gensym("savetofile"), A_SYMBOL, A_SYMBOL, 0);
     class_addmethod(canvas_class, (t_method)canvas_saveto,
         gensym("saveto"), A_CANT, 0);
+    class_addmethod(canvas_class, (t_method)canvas_declare,
+        gensym("declare"), A_GIMME, 0);
 /* ------------------ from the menu ------------------------- */
     class_addmethod(canvas_class, (t_method)canvas_menusave,
         gensym("menusave"), 0);
     class_addmethod(canvas_class, (t_method)canvas_menusaveas,
         gensym("menusaveas"), 0);
+/*---------------------------- declare ------------------- */
+    declare_class = class_new(gensym("declare"), (t_newmethod)declare_new,
+        (t_method)declare_free, sizeof(t_declare), CLASS_NOINLET, A_GIMME, 0);
+
 }

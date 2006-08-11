@@ -120,7 +120,7 @@ void atom_string(t_atom *a, char *buf, unsigned int bufsize)
         sprintf(buf, "$%d", a->a_w.w_index);
         break;
     case A_DOLLSYM:
-        snprintf(buf, bufsize-1, "%s", a->a_w.w_symbol->s_name);
+        strncpy(buf, a->a_w.w_symbol->s_name, bufsize);
         buf[bufsize-1] = 0;
         break;
     default:
