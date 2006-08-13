@@ -5,7 +5,6 @@
 #X obj 12 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
 -1;
 #X obj 12 347 swap;
-#X obj 54 157 datei-s;
 #X obj 54 217 s bcf2000;
 #X obj 64 177 datei-r;
 #X obj 10 277 tabwrite bcf2000;
@@ -18,10 +17,10 @@
 ;
 #X obj 28 257 gate;
 #X obj 28 102 init 1;
-#X obj 97 122 nbx 2 15 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -233017 -1 -1 0 256;
-#X obj 60 122 nbx 3 15 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -233017 -1 -1 0 256;
+#X obj 97 122 nbx 2 15 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-233017 -1 -1 0 256;
+#X obj 60 122 nbx 3 15 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-233017 -1 -1 0 256;
 #X msg 96 197 const 0;
 #X obj 96 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -1 -233017
 -1;
@@ -35,7 +34,7 @@
 #X restore 12 19 graph;
 #X restore 62 367 pd array;
 #X obj 12 62 inlet;
-#N canvas 332 299 297 178 bcf-map 1;
+#N canvas 332 299 297 178 bcf-map 0;
 #X text 59 48 1-8;
 #X text 69 58 33-40;
 #X text 109 48 9-16;
@@ -57,7 +56,7 @@
 #X restore 122 367 pd bcf-map;
 #X obj 133 177 s pd-bcf-map;
 #X msg 133 157 vis \$1;
-#X obj 112 139 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1
+#X obj 112 139 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 0
 1;
 #X obj 12 82 t b a;
 #X text 264 76 GUI;
@@ -98,27 +97,28 @@ in the documentation and/or other materials provided with the distribution.
 #X text 8 27 jmmmpais@googlemail.com;
 #X text 8 7 Copyright 2006 \, João Miguel Pais;
 #X restore 10 415 pd license;
-#X connect 1 0 13 1;
-#X connect 1 0 16 0;
-#X connect 1 1 8 1;
-#X connect 1 1 15 0;
+#X obj 54 157 datei-w;
+#X connect 1 0 12 1;
+#X connect 1 0 15 0;
+#X connect 1 1 7 1;
+#X connect 1 1 14 0;
 #X connect 2 0 4 0;
-#X connect 3 0 9 0;
+#X connect 3 0 8 0;
 #X connect 4 0 0 0;
 #X connect 4 1 0 1;
-#X connect 5 0 6 0;
-#X connect 7 0 6 0;
-#X connect 9 0 2 0;
-#X connect 10 0 5 0;
-#X connect 11 0 7 0;
-#X connect 12 0 13 0;
-#X connect 13 0 8 0;
-#X connect 14 0 12 0;
-#X connect 17 0 6 0;
-#X connect 18 0 17 0;
-#X connect 20 0 25 0;
+#X connect 6 0 5 0;
+#X connect 8 0 2 0;
+#X connect 9 0 37 0;
+#X connect 10 0 6 0;
+#X connect 11 0 12 0;
+#X connect 12 0 7 0;
+#X connect 13 0 11 0;
+#X connect 16 0 5 0;
+#X connect 17 0 16 0;
+#X connect 19 0 24 0;
+#X connect 22 0 21 0;
 #X connect 23 0 22 0;
-#X connect 24 0 23 0;
-#X connect 25 0 3 0;
-#X connect 25 1 7 0;
+#X connect 24 0 3 0;
+#X connect 24 1 6 0;
+#X connect 37 0 5 0;
 #X coords 0 -1 1 1 117 34 1 10 120;

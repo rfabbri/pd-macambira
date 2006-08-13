@@ -5,7 +5,6 @@
 #X text 12 377 Released under the BSD License;
 #X text 230 85 Inlets;
 #X text 230 175 Outlets;
-#X obj 16 85 -dsp;
 #N canvas 0 0 392 215 signal 0;
 #X obj 47 75 random 7;
 #X obj 47 54 metrum 400 1;
@@ -47,11 +46,12 @@
 #X text 11 8 [mat~] - Level meter with amplitude control;
 #X text 11 38 Controls the amplitude of a signal with values between
 0 and 127 Lighter as met~.;
-#X connect 6 0 20 0;
-#X connect 6 1 20 2;
-#X connect 9 0 20 1;
-#X connect 17 0 20 2;
-#X connect 18 0 20 2;
-#X connect 20 0 7 0;
-#X connect 20 1 8 0;
+#X obj 16 85 dsp01;
+#X connect 5 0 19 0;
+#X connect 5 1 19 2;
+#X connect 8 0 19 1;
+#X connect 16 0 19 2;
+#X connect 17 0 19 2;
+#X connect 19 0 6 0;
+#X connect 19 1 7 0;
 #X coords 0 0 1 1 31 130 0;

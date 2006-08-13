@@ -2,8 +2,8 @@
 #X obj 65 163 snapshot~;
 #X obj 75 63 loadbang;
 #X obj 65 43 inlet~;
-#X obj 65 203 nbx 7 13 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
-10 -233017 -1 -1 -0.882933 256;
+#X obj 65 203 nbx 7 13 -1e+37 1e+37 0 0 empty empty empty 0 -6 0 10
+-233017 -1 -1 0 256;
 #X obj 75 183 outlet;
 #X obj 98 103 \$1;
 #X obj 75 83 t b b;
@@ -13,7 +13,6 @@
 #X text 196 100 Inlets;
 #X text 196 170 Outlets;
 #X text 196 50 Arguments;
-#X text 12 10 [snaps~] - snapshot~ implementation;
 #X text 196 70 - Meter speed (ms);
 #X text 196 120 - Signal;
 #X text 196 140 - Meter speed (ms);
@@ -45,6 +44,7 @@ in the documentation and/or other materials provided with the distribution.
 #X text 8 27 jmmmpais@googlemail.com;
 #X text 8 7 Copyright 2006 \, João Miguel Pais;
 #X restore 10 255 pd license;
+#X text 12 10 [snaps~] - snapshot~ GUI implementation;
 #X connect 0 0 3 0;
 #X connect 0 0 4 0;
 #X connect 1 0 6 0;

@@ -5,7 +5,6 @@
 #X text 12 377 Released under the BSD License;
 #X text 230 85 Inlets;
 #X text 230 195 Outlets;
-#X obj 16 85 -dsp;
 #N canvas 0 0 396 219 signal 0;
 #X obj 47 75 random 7;
 #X obj 47 54 metrum 400 1;
@@ -51,13 +50,14 @@
 #X text 230 235 - Amplified right signal;
 #X text 11 38 Controls the amplitude of a stereo signal with values
 between 0 and 127 Lighter as met~.;
-#X connect 6 0 18 0;
-#X connect 6 0 18 1;
-#X connect 6 1 18 3;
-#X connect 9 0 18 2;
-#X connect 15 0 18 3;
-#X connect 16 0 18 3;
-#X connect 18 0 7 0;
-#X connect 18 1 20 0;
-#X connect 18 2 8 0;
+#X obj 16 85 dsp01;
+#X connect 5 0 17 0;
+#X connect 5 0 17 1;
+#X connect 5 1 17 3;
+#X connect 8 0 17 2;
+#X connect 14 0 17 3;
+#X connect 15 0 17 3;
+#X connect 17 0 6 0;
+#X connect 17 1 19 0;
+#X connect 17 2 7 0;
 #X coords 0 0 1 1 31 130 0;
