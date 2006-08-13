@@ -10,7 +10,7 @@ run_build_script ()
 {
 	 distro=$1
 
-	 LOGFILE=/home/pd/logs/${DATE}_${TIME}_-_${SYSTEM}_-_${distro}_-_${SCRIPT}.txt
+	 LOGFILE=/home/pd/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
 	 touch ${LOGFILE} 
 
 	 su pd -c "sh /home/pd/auto-build/${distro}/scripts/auto-build/${distro}-auto-builder.sh" >> $LOGFILE 2>&1
