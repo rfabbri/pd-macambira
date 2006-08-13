@@ -1,4 +1,8 @@
 
+- create background image for .dmg
+
+- create /Applications link in .dmg
+
 - fix app permissions so that you can drop a new app on top of an old one to
   upgrade
 
@@ -64,14 +68,8 @@ http://developer.apple.com/documentation/MacOSX/Conceptual/BPFileSystem/Articles
 ------------------------------------------------------------------------------
 semi-abandoned TODOs
 
-- make a web page that has stuff that can't be included due to license issues:
-  (percolate)
-
 - instead of shipping Pd.app with a org.puredata.pd.plist, make a script that
   uses the "defaults" command to add the desired prefs to any existing
   file. (its a good idea, but unforunately, the key names prevent that from
   working, i.e. loadlib1, loadlib2, etc)
 
-
-- create Tcl script called from Prefs that creates links for the standard unix
-  (this probably makes more sense to have in "make devsymlinks")
