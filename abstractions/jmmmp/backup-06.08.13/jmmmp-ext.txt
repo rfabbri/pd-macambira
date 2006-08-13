@@ -1,0 +1,32 @@
+Abstractions from João Miguel Pais
+
+(c) 2005-6 João Miguel Pais - jmmmpais@googlemail.com
+Released under the BSD license (more information in each abstraction).
+
+This package is composed of the following abstractions:
+
+-dsp - DSP switch
+bcf2000 - Store and recall presets for Behringer BCF2000
+clock - Chronometer with display in seconds
+datei-l - Sends the message "open ../../"
+datei-r - Sends the message "read ../../"
+datei-w - Sends the message "write ../../"
+f+ - Counter with variable increment
+farben-data-s - Data structures color scheme
+farben30 - PD GUI color scheme
+gui-edit - edit standard GUI objects fast
+lbang - loadbang which can be triggered more often
+m-i - Automatic conversion of MIDI controller
+mat~ - Level meter with amplitude control
+maat~ - Level meter with amplitude control, stereo
+met~ - Level meter with amplitude control
+metrum - Metro with GUI
+mk - shows the controller number and MIDI value
+oscD - Counts received OSC messages
+oscS - Interface for sendOSC
+snaps~ - snapshot~ implementation
+stoppuhr - Chronometer with two layers
+tastin - Gate for keyboard input
+
+
+2006.07.05

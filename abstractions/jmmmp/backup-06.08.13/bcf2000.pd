@@ -1,0 +1,124 @@
+#N canvas 147 170 442 458 10;
+#X obj 12 367 ctlout;
+#X obj 47 237 ctlin;
+#X obj 12 327 listfunnel;
+#X obj 12 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -233017 -1
+-1;
+#X obj 12 347 swap;
+#X obj 54 157 datei-s;
+#X obj 54 217 s bcf2000;
+#X obj 64 177 datei-r;
+#X obj 10 277 tabwrite bcf2000;
+#X obj 12 307 tabdump bcf2000;
+#X obj 54 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -258699 -1
+-1;
+#X obj 70 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -24198 -1
+-1;
+#X obj 28 139 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1 1
+;
+#X obj 28 257 gate;
+#X obj 28 102 init 1;
+#X obj 97 122 nbx 2 15 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -233017 -1 -1 0 256;
+#X obj 60 122 nbx 3 15 -1e+037 1e+037 0 0 empty empty empty 0 -6 0
+10 -233017 -1 -1 0 256;
+#X msg 96 197 const 0;
+#X obj 96 139 bng 13 250 50 0 empty empty empty 0 -6 0 8 -1 -233017
+-1;
+#N canvas 0 0 291 185 array 0;
+#N canvas 0 0 450 300 graph2 0;
+#X array bcf2000 92 float 3;
+#A 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 75 9 93 0 0 127;
+#X coords 0 127 91 -1 184 127 1;
+#X restore 12 19 graph;
+#X restore 62 367 pd array;
+#X obj 12 62 inlet;
+#N canvas 332 299 297 178 bcf-map 1;
+#X text 59 48 1-8;
+#X text 69 58 33-40;
+#X text 109 48 9-16;
+#X text 119 58 41-48;
+#X text 58 68 17-24;
+#X text 69 78 49-56;
+#X text 109 68 25-32;
+#X text 119 78 57-64;
+#X text 130 18 BCF2000;
+#X text 59 98 65-72;
+#X text 59 108 73-80;
+#X text 59 128 81-88;
+#X text 119 128 89-92;
+#X text 169 48 R-Fader;
+#X text 169 128 Fader;
+#X text 169 58 Button;
+#X text 169 98 Button;
+#X text 219 128 Button;
+#X restore 122 367 pd bcf-map;
+#X obj 133 177 s pd-bcf-map;
+#X msg 133 157 vis \$1;
+#X obj 112 139 tgl 13 0 empty empty empty 0 -6 0 8 -233017 -1 -1 1
+1;
+#X obj 12 82 t b a;
+#X text 264 76 GUI;
+#X text 264 226 Inlets;
+#X text 264 96 - Parameter Dump;
+#X text 264 116 - Receive / cut dataflow;
+#X text 264 136 - Save file;
+#X text 264 156 - Open file;
+#X text 264 176 - Empty buffer;
+#X text 264 196 - Show map of Behringer;
+#X text 264 246 - Filename (open);
+#X text 12 20 [bcf2000] - Store and recall presets for Behringer BCF2000
+;
+#X text 7 397 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com;
+#N canvas 0 0 426 446 license 0;
+#X text 8 47 All rights reserved.;
+#X text 8 227 The names of its contributors may not be used to endorse
+or promote products derived from this software without specific prior
+written permission.;
+#X text 8 87 Redistribution and use in source and binary forms \, with
+or without modification \, are permitted provided that the following
+conditions are met:;
+#X text 8 127 Redistributions of source code must retain the above
+copyright notice \, this list of conditions and the following disclaimer.
+;
+#X text 8 297 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES \, INCLUDING
+\, BUT NOT LIMITED TO \, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT \, INDIRECT
+\, INCIDENTAL \, SPECIAL \, EXEMPLARY \, OR CONSEQUENTIAL DAMAGES (INCLUDING
+\, BUT NOT LIMITED TO \, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES
+;
+#X text 8 167 Redistributions in binary form must reproduce the above
+copyright notice \, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the distribution.
+;
+#X text 8 27 jmmmpais@googlemail.com;
+#X text 8 7 Copyright 2006 \, João Miguel Pais;
+#X restore 10 415 pd license;
+#X connect 1 0 13 1;
+#X connect 1 0 16 0;
+#X connect 1 1 8 1;
+#X connect 1 1 15 0;
+#X connect 2 0 4 0;
+#X connect 3 0 9 0;
+#X connect 4 0 0 0;
+#X connect 4 1 0 1;
+#X connect 5 0 6 0;
+#X connect 7 0 6 0;
+#X connect 9 0 2 0;
+#X connect 10 0 5 0;
+#X connect 11 0 7 0;
+#X connect 12 0 13 0;
+#X connect 13 0 8 0;
+#X connect 14 0 12 0;
+#X connect 17 0 6 0;
+#X connect 18 0 17 0;
+#X connect 20 0 25 0;
+#X connect 23 0 22 0;
+#X connect 24 0 23 0;
+#X connect 25 0 3 0;
+#X connect 25 1 7 0;
+#X coords 0 -1 1 1 117 34 1 10 120;

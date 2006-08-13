@@ -1,0 +1,63 @@
+#N canvas 658 117 265 365 10;
+#X obj 39 38 cnv 20 30 25 empty empty 0 -25 14 0 14 -262144 -33289
+0;
+#X obj 39 63 cnv 20 30 25 empty empty 1 -25 14 0 14 -166441 -33289
+0;
+#X obj 39 88 cnv 20 30 25 empty empty 2 -25 14 0 14 -66577 -33289 0
+;
+#X obj 39 113 cnv 20 30 25 empty empty 3 -25 14 0 14 -261689 -33289
+0;
+#X obj 39 138 cnv 20 30 25 empty empty 4 -25 14 0 14 -261681 -33289
+0;
+#X obj 39 163 cnv 20 30 25 empty empty 5 -25 14 0 14 -262131 -33289
+0;
+#X obj 39 188 cnv 20 30 25 empty empty 6 -25 14 0 14 -225271 -33289
+0;
+#X obj 39 213 cnv 20 30 25 empty empty 7 -25 14 0 14 -225280 -33289
+0;
+#X obj 39 238 cnv 20 30 25 empty empty 8 -25 14 0 14 -228992 -33289
+0;
+#X obj 39 263 cnv 20 30 25 empty empty 9 -25 14 0 14 -257472 -33289
+0;
+#X obj 119 38 cnv 20 30 25 empty empty 10 -25 14 0 14 -233017 -33289
+0;
+#X obj 119 63 cnv 20 30 25 empty empty 11 -25 14 0 14 -128992 -33289
+0;
+#X obj 119 88 cnv 20 30 25 empty empty 12 -25 14 0 14 -33289 -33289
+0;
+#X obj 119 113 cnv 20 30 25 empty empty 13 -25 14 0 14 -258699 -33289
+0;
+#X obj 119 138 cnv 20 30 25 empty empty 14 -25 14 0 14 -260818 -33289
+0;
+#X obj 119 163 cnv 20 30 25 empty empty 15 -25 14 0 14 -241291 -33289
+0;
+#X obj 119 188 cnv 20 30 25 empty empty 16 -25 14 0 14 -24198 -33289
+0;
+#X obj 119 213 cnv 20 30 25 empty empty 17 -25 14 0 14 -44926 -33289
+0;
+#X obj 119 238 cnv 20 30 25 empty empty 18 -25 14 0 14 -62784 -33289
+0;
+#X obj 119 263 cnv 20 30 25 empty empty 19 -25 14 0 14 -250685 -33289
+0;
+#X obj 199 38 cnv 20 30 25 empty empty 20 -25 14 0 14 -195568 -33289
+0;
+#X obj 199 63 cnv 20 30 25 empty empty 21 -25 14 0 14 -99865 -33289
+0;
+#X obj 199 88 cnv 20 30 25 empty empty 22 -25 14 0 14 -1 -33289 0;
+#X obj 199 113 cnv 20 30 25 empty empty 23 -25 14 0 14 -143491 -33289
+0;
+#X obj 199 138 cnv 20 30 25 empty empty 24 -25 14 0 14 -90881 -33289
+0;
+#X obj 199 163 cnv 20 30 25 empty empty 25 -25 14 0 14 -123526 -33289
+0;
+#X obj 199 188 cnv 20 30 25 empty empty 26 -25 14 0 14 -42246 -33289
+0;
+#X obj 199 213 cnv 20 30 25 empty empty 27 -25 14 0 14 -1109 -33289
+0;
+#X obj 199 238 cnv 20 30 25 empty empty 28 -25 14 0 14 -355 -33289
+0;
+#X obj 199 263 cnv 20 30 25 empty empty 29 -25 14 0 14 -90133 -33289
+0;
+#X text 12 323 jmmmpais@googlemail.com;
+#X text 12 303 (C) 2006 Joao Miguel Pais;
+#X text 90 10 PD GUI Colors;

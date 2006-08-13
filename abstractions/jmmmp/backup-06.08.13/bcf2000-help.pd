@@ -1,0 +1,24 @@
+#N canvas 273 81 439 398 10;
+#X text 257 131 GUI;
+#X text 257 281 Inlets;
+#X text 257 151 - Parameter Dump;
+#X text 257 171 - Receive / cut dataflow;
+#X text 257 191 - Save file;
+#X text 257 211 - Open file;
+#X text 257 251 - Show map of Behringer;
+#X text 257 301 - Filename (open);
+#X msg 15 181 datei.txt;
+#X text 13 40 I work with a Behringer BCF 2000 \, connected through
+USB. With this patch I can store and recall presets for it. The patch
+records only the MIDI values of the Faders/Knobs/Buttons \, and not
+the settings for each key (scale \, lights \, etc.). These can be changeed/stored
+only in the Behringer itself.;
+#X text 12 337 (C) 2006 Joao Miguel Pais - jmmmpais@googlemail.com
+;
+#X text 12 357 Released under the BSD License;
+#X text 12 10 [bcf2000] - Store and recall presets for Behringer BCF2000
+;
+#X text 78 181 Load file;
+#X text 257 231 - Erase buffer;
+#X obj 15 211 bcf2000;
+#X connect 8 0 15 0;
