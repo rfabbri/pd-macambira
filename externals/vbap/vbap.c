@@ -47,11 +47,14 @@ static void cross_prod(float v1[3], float v2[3],
                 float v3[3]);
 static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x);
 static void vbap_bang(t_vbap *x);
-static void vbap_int(t_vbap *x, t_float n);
+/* static void vbap_int(t_vbap *x, t_float n); */
 static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av);
+/*
+ * unused 2006-08-13 <hans@at.or.at>
 static void vbap_in1(t_vbap *x, long n);
 static void vbap_in2(t_vbap *x, long n);
 static void vbap_in3(t_vbap *x, long n);
+*/
 static void spread_it(t_vbap *x, float *final_gs);
 static void *vbap_new(t_symbol *s, int ac, t_atom *av); /* using A_GIMME - typed message list */
 static void vbap(float g[3], long ls[3], t_vbap *x);
@@ -65,7 +68,7 @@ void vbap_setup(void)
 	vbap_class = class_new(gensym("vbap"), (t_newmethod)vbap_new, 0, (short)sizeof(t_vbap), 0, A_GIMME, 0); 
 	/* vbap_new = creation function, A_DEFLONG = its (optional) arguement is a long (32-bit) int */
 
-#if 0
+#ifdef MAXMSP
 /* max methods ... */
 
 	addbang((method)vbap_bang);			/* the procedure it uses when it gets a bang in the left inlet */
@@ -78,7 +81,7 @@ void vbap_setup(void)
  pure data: 
 #endif
 	class_addbang(vbap_class, vbap_bang);
-	class_addfloat(vbap_class, vbap_int);
+/* 	class_addfloat(vbap_class, vbap_int); */
 	class_addmethod(vbap_class, (t_method)vbap_matrix, gensym("loudspeaker-matrices"), A_GIMME, 0);
 }
 
@@ -95,10 +98,10 @@ static void angle_to_cart(long azi, long ele, float res[3])
 static void cart_to_angle(float cvec[3], float avec[3])
 /* converts cartesian coordinates to angular */
 {
-  float tmp, tmp2, tmp3, tmp4;
+//  float tmp, tmp2, tmp3, tmp4; /* warning: unused variable */
   float atorad = (2 * 3.1415927 / 360) ;
   float pi =  3.1415927;
-  float power;
+//  float power; /* warning: unused variable */
   float dist, atan_y_per_x, atan_x_pl_y_per_z;
   float azi, ele;
   
@@ -115,10 +118,12 @@ static void cart_to_angle(float cvec[3], float avec[3])
   else
     atan_x_pl_y_per_z = atan(cvec[2] / dist);
   if(dist == 0.0)
+  {
     if(cvec[2]<0.0)
       atan_x_pl_y_per_z = -pi/2.0;
     else
       atan_x_pl_y_per_z = pi/2.0;
+  }
   ele = atan_x_pl_y_per_z / atorad;
   dist = sqrtf(cvec[0] * cvec[0] +cvec[1] * cvec[1] +cvec[2]*cvec[2]);
   avec[0]=azi;
@@ -134,7 +139,7 @@ static void vbap(float g[3], long ls[3], t_vbap *x)
   int i,j,k, gains_modified;
   float small_g;
   float big_sm_g, gtmp[3];
-  long winner_set;
+  long winner_set=0;
   float cartdir[3];
   float new_cartdir[3];
   float new_angle_dir[3];
@@ -254,16 +259,21 @@ static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
   	float small_g;
   	float big_sm_g, gtmp[3];
   	long winner_set;
-  	float new_cartdir[3];
-  	float new_angle_dir[3];
+//  	float new_cartdir[3];   /* warning: unused variable */
+//  	float new_angle_dir[3];     /* warning: unused variable */
   	long dim = x->x_dimension;
   	long neg_g_am, best_neg_g_am;
 	float g[3];
-	long ls[3];
+	long ls[3] = { 0, 0, 0 };
 	
   	big_sm_g = -100000.0;
   	best_neg_g_am=3;
-  
+
+/* BUG: there is a bug that sometimes causes x->x_lsset_amount to be a massive
+ * number.  I haven't tracked it down yet, but its probably an init
+ * bug. 2006-08-13 <hans@at.or.at>
+ */
+//	post("x_lsset_amount: %li", x->x_lsset_amount);  
   	for(i=0;i<x->x_lsset_amount;i++){
   	  small_g = 10000000.0;
   	  neg_g_am = 3;
@@ -299,14 +309,22 @@ static void additive_vbap(float *final_gs, float cartdir[3], t_vbap *x)
   		}
   
   	if(gains_modified != 1){
-  		power=sqrt(g[0]*g[0] + g[1]*g[1] + g[2]*g[2]);
+      	if(dim==3)
+			power=sqrt(g[0]*g[0] + g[1]*g[1] + g[2]*g[2]);
+		else
+			power=sqrt(g[0]*g[0] + g[1]*g[1]);
   		g[0] /= power;
   		g[1] /= power;
-  		g[2] /= power;
+      	if(dim==3) 
+			g[2] /= power;
   		
   		final_gs[ls[0]-1] += g[0];
   		final_gs[ls[1]-1] += g[1];
-  		final_gs[ls[2]-1] += g[2];
+		/* BUG FIX: this was causing negative indices with 2 dimensions so I
+		 * made it only try when using 3 dimensions.
+		 * 2006-08-13 <hans@at.or.at> */
+      	if(dim==3)
+			final_gs[ls[2]-1] += g[2];
   	}
 }
 
@@ -472,21 +490,23 @@ static void vbap_bang(t_vbap *x)
 
 /*--------------------------------------------------------------------------*/
 
-static void vbap_int(t_vbap *x, t_float n) /* x = the instance of the object, n = the int received in the right inlet */
+/*
+static void vbap_int(t_vbap *x, t_float n) // x = the instance of the object, n = the int received in the right inlet
 {
- /* do something if an int comes in the left inlet??? */
+	// do something if an int comes in the left inlet???
 }
+*/
 
 static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
 /* read in loudspeaker matrices */
 {
-	long counter;
+	long counter=0;
 	long datapointer=0;
 	long setpointer=0;
 	long i;
-	long deb=0;
+//	long deb=0;
  
- 	if(ac>0) 
+ 	if(ac>0) {
 /* 		if(av[datapointer].a_type == A_LONG){
  			x->x_dimension = av[datapointer++].a_w.w_long;
  			x->x_lsset_available=1;
@@ -499,8 +519,9 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
  			x->x_lsset_available=0;
  			return;
  		}
+	}
 /* 	post("%d",deb++); */
- 	if(ac>1) 
+ 	if(ac>1) {
 /* 		if(av[datapointer].a_type == A_LONG)
  			x->x_ls_amount = av[datapointer++].a_w.w_long;
  		else */
@@ -511,6 +532,7 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
  			x->x_lsset_available=0;
  			return;
  		}
+	}
  	else
  		x->x_lsset_available=0;
  	
@@ -521,7 +543,7 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
  		counter = (ac - 2) / ((x->x_dimension * x->x_dimension) + x->x_dimension);
  	x->x_lsset_amount=counter;
 
- 	if(counter<=0){
+ 	if(counter<=0) {
  		post("vbap: Error in loudspeaker data!",0);
  		x->x_lsset_available=0;
  		return;
@@ -571,30 +593,31 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
 	post("vbap: Loudspeaker setup configured!",0);
 }
 
-static void vbap_in1(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
-/* panning angle azimuth */
+/*
+ * unused 2006-08-13 <hans@at.or.at>
+static void vbap_in1(t_vbap *x, long n)	// x = the instance of the object, n = the int received in the right inlet
+// panning angle azimuth
 {
-	x->x_azi = n;							/* store n in a global variable */
+	x->x_azi = n; // store n in a global variable
 	
 }
 
-static void vbap_in2(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
-/* panning angle elevation */
+static void vbap_in2(t_vbap *x, long n)  // x = the instance of the object, n = the int received in the right inlet
+// panning angle elevation
 {
-	x->x_ele = n;							/* store n in a global variable */
+	x->x_ele = n; // store n in a global variable
 
 }
-/*--------------------------------------------------------------------------*/
 
-static void vbap_in3(t_vbap *x, long n)				/* x = the instance of the object, n = the int received in the right inlet */
-/* spread amount */
+static void vbap_in3(t_vbap *x, long n)	// x = the instance of the object, n = the int received in the right inlet
+// spread amount
 {
 	if (n<0) n = 0;
 	if (n>100) n = 100;
-	x->x_spread = n;							/* store n in a global variable */
+	x->x_spread = n;	// store n in a global variable
 	
 }
-
+*/
 
 static void *vbap_new(t_symbol *s, int ac, t_atom *av)	
 /* create new instance of object... MUST send it an int even if you do nothing with this int!! */
