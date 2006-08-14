@@ -19,10 +19,10 @@ static t_class *mtx_abs_class;
 
 static void mtx_abs_matrix(t_mtx_binmtx *x, t_symbol *s, int argc, t_atom *argv)
 {
-  int row=atom_getfloat(argv++);
-  int col=atom_getfloat(argv++);
+  int row=atom_getint(argv++);
+  int col=atom_getint(argv++);
   t_atom *m;
-  int n = argc-2;
+  int n = row*col;
 
   if (argc<2){    post("mtx_abs: crippled matrix");    return;  }
   if ((col<1)||(row<1)) {    post("mtx_abs: invalid dimensions");    return;  }
